@@ -12,6 +12,7 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import Iyzipay from "npm:iyzipay";
 import { tenantFromRow } from '../_shared/tenant.ts'
 import { buildAllowedOrigins, isAllowedRedirectTarget, normalizeOrigin } from '../_shared/origins.ts'
+import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 
 // Minimal types to avoid `any` while keeping integration flexible
 type CheckoutRetrieveResponse = {
@@ -167,16 +168,12 @@ Deno.serve(async (req) => {
 
     const apiKey = Deno.env.get("IYZICO_API_KEY");
     const secretKey = Deno.env.get("IYZICO_SECRET_KEY");
-    // LANSMAN ENGELİ İDİ (T022-VH, 2026-08-15): burası sandbox'ı SABİT kodluyordu.
-    // Kardeşleri env'den okuyor (iyzico-payment:232, iyzico-refund:53) — yalnız callback sabitti.
-    // Etki: prod anahtarları konulduğu an ödeme PROD'da başlar ama callback retrieve'i
-    // SANDBOX'a sorar → para çekilir, sipariş DOĞRULANAMAZ. Aynı desene çekildi.
-    const baseUrl = Deno.env.get("IYZICO_BASE_URL") || "https://sandbox-api.iyzipay.com";
+    const iyz = resolveIyzicoBase(Deno.env.toObject());
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
-    if (!apiKey || !secretKey || !supabaseUrl || !serviceRoleKey) {
+    if (!apiKey || !secretKey || !supabaseUrl || !serviceRoleKey || !iyz) {
       return new Response(
         JSON.stringify({
           error: { code: "CONFIG_ERROR", message: "Environment değişkenleri eksik" },
@@ -194,6 +191,7 @@ Deno.serve(async (req) => {
       };
     };
     const IyziCb = Iyzipay as unknown as IyziCtorCb;
+    const baseUrl = iyz.base;
     const sdk = new IyziCb({ apiKey, secretKey, uri: baseUrl });
 
     const retrieveReq: { locale: string; token: string; conversationId?: string } = {

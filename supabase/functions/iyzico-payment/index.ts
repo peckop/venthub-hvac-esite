@@ -19,6 +19,7 @@ import {
 } from '../_shared/caller.ts'
 import { buildAllowedOrigins, isOriginAccepted, pickRedirectOrigin } from '../_shared/origins.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
+import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 
 
 /**
@@ -388,11 +389,11 @@ Deno.serve(async (req: Request) => {
         // İyzico credentials (Environment)
         const iyzicoApiKey = Deno.env.get('IYZICO_API_KEY');
         const iyzicoSecretKey = Deno.env.get('IYZICO_SECRET_KEY');
-        const iyzicoBaseUrl = Deno.env.get('IYZICO_BASE_URL') || 'https://sandbox-api.iyzipay.com';
+        const iyz = resolveIyzicoBase(Deno.env.toObject());
 
-        if (!iyzicoApiKey || !iyzicoSecretKey) {
+        if (!iyzicoApiKey || !iyzicoSecretKey || !iyz) {
             return new Response(JSON.stringify({
-                error: { code: 'CONFIG_ERROR', message: 'IYZICO_API_KEY / IYZICO_SECRET_KEY eksik' }
+                error: { code: 'CONFIG_ERROR', message: 'IYZICO_API_KEY / IYZICO_SECRET_KEY / IYZICO_BASE_URL eksik' }
             }), {
                 status: 500,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
