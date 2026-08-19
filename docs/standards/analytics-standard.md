@@ -28,9 +28,36 @@
 | Arama | `search` | search_term |
 | Mühendislik | `calculator_used` | calculator (jetfan/duct/hrv/aircurtain), inputs_summary |
 | Lead | `lead_submit` / `whatsapp_click` | source, context |
+| Gezinme | `nav_click` | target, mode |
+| İçerik | `case_study_click` | title |
 
 > **Kural:** olay adı boş string olamaz (`analytics.ts` Aksiyom 3 — anlamsız veri birikir). Param
 > şeması sabit; yeni olay → bu tabloya eklenir (SSOT).
+
+> **Bu tablo artık bir bekçiye bağlı: `INV-ANALYTICS-1`**
+> (`src/__tests__/conformance/analytics-event-taxonomy.test.ts`). Kodda `trackEvent()` ile
+> ateşlenen her olay adı bu tabloda **yazılı olmak zorundadır**; tabloda olmayan bir ad eklenirse
+> kapı kırmızıya döner. Son iki satır (`nav_click`, `case_study_click`) tam olarak bu yüzden
+> eklendi: kodda **zaten** ateşleniyorlardı ve tabloda yoktular — yani tablo, yazıldığı günden
+> beri kodun gerisindeydi ve bunu kimse görmüyordu.
+
+### Bugünkü kapsama (ölçüldü 2026-08-19, T021-VH)
+
+Kodda `trackEvent()` çağrı yeri **üçtür** ve tamamı gezinme/içerik olayıdır:
+`StickyHeader.tsx` (2) · `CaseStudySection.tsx` (1). Yukarıdaki **ticaret hunisinin on olayının
+hiçbiri bağlı değildir** — `purchase` ve `lead_submit` dâhil.
+
+Bunun pratik sonucu GA4 kimliği env'e konulduğu gün ortaya çıkar: ölçüm "açılmış" olur ama GA4'e
+yalnızca menü tıklamaları akar, dönüşüm hunisi **boş** görünür. Boş huni "satış yok"tan ayırt
+edilemez — ölçüm kurulmuş gibi dururken hiçbir ticari soruya cevap vermez.
+
+Bu yüzden huninin bağlanması, kimliğin girilmesiyle **aynı işin parçasıdır** ve INV-ANALYTICS-1
+içindeki `HENUZ_BAGLI_DEGIL` listesi bir geri sayımdır: bir olay koda bağlandığında listeden
+düşürülmek **zorundadır**, yoksa kapı kırmızıya döner. Liste kısalır, uzamaz.
+
+> **Şerit sınırı:** huni olaylarının çağrı yerleri sepet/ödeme/ürün yüzeyleridir ve o dosyalar
+> başka şeritlerin sahasındadır. Bağlama işi tek bir şeridin kendi başına alacağı iş değildir;
+> iş dağılımı OPS-AUDIT'e bırakıldı → `docs/audits/t021-analytics-coverage-2026-08-19.md`.
 
 ## Dönüşümler (GA4'te "conversion" işaretlenecek)
 - Birincil: `purchase`, `lead_submit` (teklif/iletişim).
@@ -99,6 +126,10 @@ GA açıldığı an YALAN olur, metin de güncellenmeli).
       `src/views/legal/components/{tr,en}/CookiePolicyContent.tsx`.
 - [ ] GA4 + GTM canlı, ID env'de, consent-mode bağlı.
 - [ ] Huni olayları (en az view_item → add_to_cart → begin_checkout → purchase) akıyor.
+      **Bu madde de bir bekçiye devredildi:** `INV-ANALYTICS-1` içindeki `HENUZ_BAGLI_DEGIL`
+      listesi bugün on olayı sayıyor; liste boşaldığında bu kutu işaretlenebilir. Kutuyu listeden
+      önce işaretlemek mümkün değil — kapı, listedeki bir olay koda bağlandığı anda düşürülmesini
+      **zorunlu** kılar (bkz. §Bugünkü kapsama).
 - [ ] Search Console bağlı + sitemap gönderildi.
 - [ ] İlk aylık rapor üretilebiliyor.
 
