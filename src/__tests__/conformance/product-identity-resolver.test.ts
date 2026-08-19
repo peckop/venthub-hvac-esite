@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
@@ -118,5 +119,74 @@ describe('INV-PRODUCT-IDENTITY · kaynak sabitlemesi', () => {
         `${ad} gövdesinde sku geçiyor — ham iç kod müşteriye sızabilir`,
       ).toBe(false)
     }
+  })
+})
+
+/**
+ * CAGRI YERI — cozucunun VAR OLMASI yetmez, KULLANILMASI gerekir.
+ *
+ * NICIN AYRI BLOK: 2026-08-19'da cozucu yazildi ama cagri yeri baska bir seridin
+ * dalinda tasindi ve o dal cozucu olmadan merge oldu (#670). Sonuc: fonksiyonlar
+ * hicbir yerde cagrilmiyordu, testler yesildi, vitrinde ham alan okumasi yasamaya
+ * devam etti. Bir cozucu, cagrilmiyorsa YOKTUR.
+ *
+ * TARAMA HAM METIN UZERINDE, yorum siyirma YOK: yasak dizge yorumda bile gecmemeli.
+ * Siyiricinin kendisi bu depoda uc kez kor nokta uretti; deterministik olan secildi.
+ */
+describe('INV-PRODUCT-IDENTITY · çağrı yeri (ürün detay sayfası)', () => {
+  const PDP = resolve(process.cwd(), 'src/app/_components/ProductDetailPageView.tsx')
+  const pdpKaynak = readFileSync(PDP, 'utf8')
+  const SATIR_SONU = String.fromCharCode(10)
+
+  it('çözücüyü İTHAL ediyor (yoksa çağırıyor olamaz)', () => {
+    expect(pdpKaynak).toContain('getProductDisplayName')
+    expect(pdpKaynak).toContain('getProductModelLabel')
+  })
+
+  it('ham varyant adı render EDİLMİYOR', () => {
+    const isabet = pdpKaynak.split(SATIR_SONU).filter((s) => s.includes('selectedVariant.name'))
+    expect(
+      isabet,
+      'Ham selectedVariant.name okuması geri geldi. Görünen ad TEK kaynaktan gelir: ' +
+        'getProductDisplayName(selectedVariant, family). Satırlar: ' + isabet.join(' | '),
+    ).toEqual([])
+  })
+
+  // BILINEN ve KABUL EDILEN uc kullanim. Muafiyet ADIYLA yazilir, sessiz gecilmez.
+  // (a) selectedSku={...} — VariantSelector'a giden SECIM ANAHTARI, gorunen metin degil.
+  // (c) etiketli SKU satiri — musteriye ACIKCA 'SKU: ...' diye gosteriliyor. Bu bir URUN
+  //     KARARI, kusur degil; T098 kapsaminda DEGISTIRILMEDI (LEGAL'in onayladigi dar diff
+  //     disindaydi) ve karari OPS'a bildirildi. Karar 'gosterilmesin' cikarsa BU SATIR
+  //     listeden silinir ve kapi kendiliginden kirmizi verir.
+  const BILINEN_SKU_KULLANIMI = [
+    'selectedSku={selectedVariant.sku}',
+    "{t('pdp.labels.sku')}: {selectedVariant.sku}",
+  ]
+
+  it('ham SKU yedeği geri gelmiyor (bilinen kullanımlar dışında)', () => {
+    const isabet = pdpKaynak
+      .split(SATIR_SONU)
+      .filter((s) => s.includes('selectedVariant.sku') || /model_code\s*\|\|/.test(s))
+      .filter((s) => !BILINEN_SKU_KULLANIMI.some((bilinen) => s.includes(bilinen)))
+    expect(
+      isabet,
+      'Model etiketinde ham SKU yedeği geri geldi. SKU İÇ koddur, kimlik metnine karışmaz; ' +
+        'kod yoksa etiket satırı HİÇ çizilmez. Satırlar: ' + isabet.join(' | '),
+    ).toEqual([])
+  })
+
+  it('muafiyet listesinde BAYAT satır yok (kullanım kalktıysa satır silinmeli)', () => {
+    const bayat = BILINEN_SKU_KULLANIMI.filter((bilinen) => !pdpKaynak.includes(bilinen))
+    expect(
+      bayat,
+      'Muafiyet listesi gerçeği anlatmıyor: aşağıdaki kullanım artık dosyada YOK, satırı SİL. ' +
+        bayat.join(' | '),
+    ).toEqual([])
+  })
+  it('model etiketi satırı KOŞULLU çiziliyor (kod yoksa boş etiket basılmaz)', () => {
+    expect(
+      pdpKaynak,
+      'getProductModelLabel null dönebiliyor; etiket satırı koşulsuz çizilirse boş etiket basılır.',
+    ).toContain('{variantLabel && (')
   })
 })
