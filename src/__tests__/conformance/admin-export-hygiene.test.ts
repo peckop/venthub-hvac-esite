@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 /**
- * INV-ADMIN-EXPORT-1 · Admin paylaşılan bileşenleri TEK KAPIDAN girer (T102-VH).
+ * INV-ADMIN-EXPORT-1 · Admin paylaşılan bileşenleri TEK KAPIDAN girer (T103-VH).
  *
  * NİÇİN VAR
  *

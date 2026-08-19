@@ -1093,7 +1093,7 @@ yanlış-yeşil veremez).
 
 ---
 
-### 6.4 Paylaşılan admin bileşeni TEK KAPIDAN girer (2026-08-19, T102-VH)
+### 6.4 Paylaşılan admin bileşeni TEK KAPIDAN girer (2026-08-19, T103-VH)
 
 **Kural:** `src/components/admin/data-table/` ve `src/components/admin/overlay/` altındaki her
 bileşen **yalnız NAMED** export edilir. `export default` yasaktır, bu dizinlerden default ithal
