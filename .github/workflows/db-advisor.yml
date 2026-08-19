@@ -167,6 +167,11 @@ jobs:
   # ---------------------------------------------------------------------------
   catalog-integrity-precheck:
     runs-on: ubuntu-latest
+    # PRICING'in ACIK IZNIYLE eklendi (2026-08-19, panoda kayitli). Kendi bulgulari:
+    # "benim iki isimde de timeout YOK; is prod DB'ye baglaniyor, havuz asilirsa
+    # GitHub varsayilani 6 saat - bugun onardigimiz kilitlenmenin aynisini benim
+    # isim uretebilirdi." Bu is bir sir yoklamasi, olculen sure 3 saniye.
+    timeout-minutes: 5
     outputs:
       ready: ${{ steps.probe.outputs.ready }}
     steps:
@@ -195,6 +200,8 @@ jobs:
     needs: catalog-integrity-precheck
     if: needs.catalog-integrity-precheck.outputs.ready == 'true'
     runs-on: ubuntu-latest
+    # PRICING izniyle (bkz. precheck). Olculen sure dort kosumda 57-65 saniye.
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
