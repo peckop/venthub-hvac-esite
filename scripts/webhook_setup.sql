@@ -87,3 +87,30 @@ WHEN (
   OR OLD.currency IS DISTINCT FROM NEW.currency
 )
 EXECUTE FUNCTION public.handle_supabase_webhook();
+
+-- ─── Render Dalga-1 / W4 (2026-08-17) — vitrini besleyen üç eksik zincir ───────
+-- Cetvel: rendering-cache-standard §3. Migration karşılığı:
+-- 20260817204312_render_dalga1_missing_webhook_triggers.sql
+-- Bu dosya KURULUM TEK KAYNAĞIDIR; INV-RENDER-2 cetvel ↔ burası paritesini doğrular.
+
+-- product_images: PDP + kart görseli. Tablo bugün 0 satır; zincir T069 görsel
+-- yüklemesinden ÖNCE yerinde olmalı, sonra kurulursa görseller girer ve hiçbir
+-- sayfa tazelenmez (lansman kritik).
+DROP TRIGGER IF EXISTS on_product_images_change ON public.product_images;
+CREATE TRIGGER on_product_images_change
+AFTER INSERT OR DELETE OR UPDATE ON public.product_images
+FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
+
+-- brands: marka bilgisi PDP ve kartlarda görünür.
+DROP TRIGGER IF EXISTS on_brands_change ON public.brands;
+CREATE TRIGGER on_brands_change
+AFTER INSERT OR DELETE OR UPDATE ON public.brands
+FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
+
+-- price_lists: fiyat listesi değişimi PDP fiyatını etkiler. Handler dalı TÜM ailelerin
+-- PDP yollarını tazeler (32 aile → 64 çağrı, 2026-08-17 ölçümü); birkaç yüz aileye
+-- çıkıldığında tag tabanlı çözüme geçilmeli.
+DROP TRIGGER IF EXISTS on_price_lists_change ON public.price_lists;
+CREATE TRIGGER on_price_lists_change
+AFTER INSERT OR DELETE OR UPDATE ON public.price_lists
+FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();

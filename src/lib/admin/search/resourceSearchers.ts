@@ -2,6 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 
 import { adminSearchProducts } from '@/lib/services/product.service'
 import type { Database } from '@/types/database.types'
+import { orIlikeContains } from '@/utils/adminQueryFilters'
 
 export interface CommandResult {
   resourceKey: string
@@ -16,13 +17,6 @@ export type AdminSearcher = (
   query: string,
   limit: number
 ) => Promise<CommandResult[]>
-
-interface VenthubReturnJoinedRow {
-  id: string
-  reason: string
-  status: string
-  venthub_orders: { order_number: string | null; customer_name: string | null } | { order_number: string | null; customer_name: string | null }[] | null
-}
 
 interface InventoryMovementJoinedRow {
   id: string
@@ -57,7 +51,7 @@ export const searchOrders: AdminSearcher = async (supabase, query, limit) => {
   const { data, error } = await supabase
     .from('view_admin_orders')
     .select('id, order_number, conversation_id, customer_name, customer_email')
-    .or(`order_number.ilike.%${query}%,conversation_id.ilike.%${query}%`)
+    .or(orIlikeContains(['order_number', 'conversation_id'], query))
     .limit(limit)
   if (error) throw error
   return (data || []).map((o) => ({
@@ -71,21 +65,30 @@ export const searchOrders: AdminSearcher = async (supabase, query, limit) => {
 
 export const searchReturns: AdminSearcher = async (supabase, query, limit) => {
   if (!query || query.trim().length < 2) return []
+  /*
+    T090-VH: burası `venthub_orders.order_number` diye GÖMÜLÜ bir kolona atıf
+    yapıyordu; PostgREST üst-düzey or= içinde gömülü kaynağa atıf kabul etmez, yani
+    komut paletinin iade araması da üretimden beri 400 ile düşüyordu. Artık
+    `view_admin_returns` okunur ve tek `search_text` kolonu aranır — sayfanın
+    kendi aramasıyla AYNI kaynak, iki farklı cevap üretemezler.
+
+    Yan kazanç: view satırı düz olduğu için "ilişki obje mi tek-elemanlı dizi mi"
+    belirsizliğini çözen tip zorlaması da gerekmiyor; satır artık ÜRETİLMİŞ tipten
+    geliyor, elle bildirilen bir şekilden değil.
+  */
   const { data, error } = await supabase
-    .from('venthub_returns')
-    .select('id, reason, status, venthub_orders!inner(order_number, customer_name)')
-    .or(`reason.ilike.%${query}%,venthub_orders.order_number.ilike.%${query}%`)
+    .from('view_admin_returns')
+    .select('id, reason, status, order_number')
+    .ilike('search_text', `%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as VenthubReturnJoinedRow[]
-  return rows.map((r) => {
-    const order = Array.isArray(r.venthub_orders) ? r.venthub_orders[0] : r.venthub_orders
-    const orderNum = order?.order_number || ''
+  return (data ?? []).map((r) => {
+    const orderNum = r.order_number ?? ''
     return {
       resourceKey: 'returns',
       id: String(r.id),
       title: orderNum ? `Order #${orderNum}` : 'Return Request',
-      subtitle: `${r.reason} (${r.status})`,
+      subtitle: `${r.reason ?? ''} (${r.status ?? ''})`,
       route: `/admin/returns?q=${orderNum}`
     }
   })
@@ -96,7 +99,7 @@ export const searchCategories: AdminSearcher = async (supabase, query, limit) =>
   const { data, error } = await supabase
     .from('categories')
     .select('id, name, slug, description')
-    .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+    .or(orIlikeContains(['name', 'description'], query))
     .limit(limit)
   if (error) throw error
   return (data || []).map((c) => ({
@@ -113,7 +116,7 @@ export const searchUsers: AdminSearcher = async (supabase, query, limit) => {
   const { data, error } = await supabase
     .from('user_profiles')
     .select('id, full_name, phone, role')
-    .or(`full_name.ilike.%${query}%,phone.ilike.%${query}%`)
+    .or(orIlikeContains(['full_name', 'phone'], query))
     .limit(limit)
   if (error) throw error
   return (data || []).map((u) => ({
@@ -130,7 +133,7 @@ export const searchCoupons: AdminSearcher = async (supabase, query, limit) => {
   const { data, error } = await supabase
     .from('coupons')
     .select('id, code, discount_type, discount_value')
-    .or(`code.ilike.%${query}%,discount_type.ilike.%${query}%`)
+    .or(orIlikeContains(['code', 'discount_type'], query))
     .limit(limit)
   if (error) throw error
   return (data || []).map((c) => ({
@@ -147,7 +150,15 @@ export const searchMovements: AdminSearcher = async (supabase, query, limit) => 
   const { data, error } = await supabase
     .from('inventory_movements')
     .select('id, reason, delta, products!inner(name, sku)')
-    .or(`reason.ilike.%${query}%,products.name.ilike.%${query}%,products.sku.ilike.%${query}%`)
+    /*
+      Gömülü kaynağa süzme `foreignTable` ile YAPILIR — üst-düzey or= içinde
+      `products.name` yazmak sorguyu 400'e düşürüyordu (aynı sınıf: T090-VH).
+      `reason` bilinçli olarak DÜŞTÜ: tek sorguda hem ana tabloyu hem gömülü
+      kaynağı OR'lamak PostgREST'te ifade edilemez ve paletin yönlendirdiği
+      /admin/movements sayfası zaten YALNIZ ürün adı/SKU arıyor (MovementsTableBody).
+      İki yüzeyin farklı cevap vermesi, çalışmayan bir `reason` aramasından beterdi.
+    */
+    .or(orIlikeContains(['name', 'sku'], query), { foreignTable: 'products' })
     .limit(limit)
   if (error) throw error
   const rows = (data || []) as unknown as InventoryMovementJoinedRow[]
@@ -169,7 +180,7 @@ export const searchErrorGroups: AdminSearcher = async (supabase, query, limit) =
   const { data, error } = await supabase
     .from('error_groups')
     .select('id, signature, last_message, status')
-    .or(`signature.ilike.%${query}%,last_message.ilike.%${query}%`)
+    .or(orIlikeContains(['signature', 'last_message'], query))
     .limit(limit)
   if (error) throw error
   return (data || []).map((eg) => ({
@@ -186,7 +197,7 @@ export const searchAudit: AdminSearcher = async (supabase, query, limit) => {
   const { data, error } = await supabase
     .from('admin_audit_log')
     .select('id, table_name, row_pk, comment, action')
-    .or(`table_name.ilike.%${query}%,row_pk.ilike.%${query}%,comment.ilike.%${query}%`)
+    .or(orIlikeContains(['table_name', 'row_pk', 'comment'], query))
     .limit(limit)
   if (error) throw error
   return (data || []).map((a) => ({
@@ -203,7 +214,7 @@ export const searchInventory: AdminSearcher = async (supabase, query, limit) => 
   const { data, error } = await supabase
     .from('inventory_velocity' as never)
     .select('product_id, name, physical_stock, available_stock, warehouse_location, supplier_name')
-    .or(`name.ilike.%${query}%,warehouse_location.ilike.%${query}%,supplier_name.ilike.%${query}%`)
+    .or(orIlikeContains(['name', 'warehouse_location', 'supplier_name'], query))
     .limit(limit)
   if (error) throw error
   const rows = (data || []) as unknown as InventoryVelocityRow[]

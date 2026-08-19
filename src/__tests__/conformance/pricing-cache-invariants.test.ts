@@ -41,6 +41,27 @@ function normalize(path: string): string {
   return path.replace(/\\/g, '/').replace(/^\/+/, '')
 }
 
+/**
+ * F4 — YORUM SIYIRMA. Bekçi KODU ölçmeli, kodu ANLATAN yorumu değil.
+ *
+ * Ölçülen körlük: `is_derived` bu depoda hem gerçek kodda hem de onu açıklayan iki yorumda
+ * geçiyor. Koruma kodu silinse yorumlar iddiayı doyurur ve kapı YEŞİL kalırdı — INV-STOCK-1
+ * (#556) ile birebir aynı sınıf. İyi belgelenmiş kod bu tuzağı BÜYÜTÜR: yorum ne kadar
+ * açıklayıcıysa naif iddia o kadar kolay tatmin olur.
+ *
+ * İki tuzak, ikisi de bu depoda yaşandı:
+ *  · **CRLF:** `.` karakteri `\r`'yi EŞLEŞTİRMEZ → satır sonu deseni `[^\r\n]*` olmalı,
+ *    yoksa CRLF dosyalarda sıyırma sessizce yarım kalır.
+ *  · **URL yeme:** çıplak `\/\/` deseni `https://...` adresini yorum sanıp satırın kalanını
+ *    siler → gerçek kod kaybolur, YANLIŞ-KIRMIZI doğar. `(?<!:)` ön-bakışı bunu keser.
+ */
+function stripComments(source: string, kind: 'ts' | 'sql'): string {
+  const withoutBlocks = source.replace(/\/\*[\s\S]*?\*\//g, ' ')
+  return kind === 'sql'
+    ? withoutBlocks.replace(/--[^\r\n]*/g, ' ')
+    : withoutBlocks.replace(/(?<!:)\/\/[^\r\n]*/g, ' ')
+}
+
 describe('INV-PRICE-6 · fiyat cache değişmezleri', () => {
   it('product_prices tekil anahtarı currency içerir (en son tanım kazanır)', () => {
     // Tekil anahtar İKİ biçimde tanımlanabilir: serbest UNIQUE INDEX ya da UNIQUE CONSTRAINT
@@ -51,7 +72,9 @@ describe('INV-PRICE-6 · fiyat cache değişmezleri', () => {
       /create\s+unique\s+index[^;]*\bproduct_prices_unique\b[^;]*;/gi,
       /add\s+constraint\s+product_prices_unique\s+unique[^;]*;/gi,
     ]
-    for (const [file, source] of Object.entries(MIGRATION_SOURCES)) {
+    for (const [file, rawSource] of Object.entries(MIGRATION_SOURCES)) {
+      // Yorumdaki örnek bir "create unique index ...;" satırı gerçek tanım sayılmasın.
+      const source = stripComments(rawSource, 'sql')
       for (const re of PATTERNS) {
         for (const match of source.matchAll(re)) {
           definitions.push({ file: normalize(file), def: match[0] })
@@ -74,11 +97,13 @@ describe('INV-PRICE-6 · fiyat cache değişmezleri', () => {
 
   it('product_prices\'a yalnız materialize servisi yazar', () => {
     const offenders: string[] = []
-    for (const [file, source] of Object.entries(SRC_SOURCES)) {
+    for (const [file, rawSource] of Object.entries(SRC_SOURCES)) {
       const path = normalize(file)
       if (WRITE_ALLOWLIST.includes(path)) continue
       if (path.includes('__tests__')) continue
 
+      // Yorumda ÖRNEK olarak gösterilen yasak çağrı ihlal sayılmasın (yanlış-KIRMIZI da kusurdur).
+      const source = stripComments(rawSource, 'ts')
       // .from('product_prices') zincirinde yazma çağrısı (upsert/insert/update/delete) var mı?
       const re = /from\(\s*['"]product_prices['"]\s*\)[\s\S]{0,200}?\.(upsert|insert|update|delete)\s*\(/g
       if (re.test(source)) offenders.push(path)
@@ -96,7 +121,9 @@ describe('INV-PRICE-6 · fiyat cache değişmezleri', () => {
       ([file]) => normalize(file) === WRITE_ALLOWLIST[0],
     )
     expect(entry, 'materialize servisi bulunamadı — allowlist yolu eskimiş olabilir').toBeDefined()
-    const source = entry ? entry[1] : ''
+    // F4'ün asıl hedefi: `is_derived` bu dosyada İKİ yorumda daha geçiyor. Sıyırmadan
+    // ölçülürse koruma kodu silinse bile yorumlar iddiayı doyurur ve kapı yeşil kalır.
+    const source = stripComments(entry ? entry[1] : '', 'ts')
 
     expect(
       /is_derived/.test(source),

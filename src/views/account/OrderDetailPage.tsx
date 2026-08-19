@@ -13,6 +13,7 @@ import type { Product } from '@/types/ui-models'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -141,7 +142,9 @@ export default function OrderDetailPage() {
             status: orderData.status || 'pending',
             payment_status: orderData.payment_status || undefined,
             created_at: orderData.created_at,
-            customer_name: (orderData).customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
+            // Görünen-ad yedeği sözlükten gelir: ham Türkçe dizge EN kullanıcıya da
+            // "Kullanıcı" gösteriyordu (I18N-SWEEP bildirdi; anahtar ortak sözlükte).
+            customer_name: (orderData).customer_name || (user?.user_metadata?.full_name || user?.email || t('common.userFallback')),
             customer_email: (orderData).customer_email || (user?.email || '-'),
             shipping_address: orderData.shipping_address,
             order_items: mappedItems,
@@ -172,7 +175,7 @@ export default function OrderDetailPage() {
   }, [user, id, t, router])
 
   const formatDate = (d?: string | null) => (d ? formatDateTime(d, lang) : '-')
-  const formatPrice = (n: number | string) => formatCurrency(Number(n) || 0, lang, { maximumFractionDigits: 0 })
+  const formatPrice = (n: number | string) => formatCurrency(Number(n) || 0, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })
 
   const handleCopy = async (text?: string) => {
     try { if (!text) return; await navigator.clipboard.writeText(text); toast.success(t('orders.copied')) } catch { toast.error(t('orders.copyFailed')) }

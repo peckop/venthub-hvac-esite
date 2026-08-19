@@ -7,6 +7,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useAuth } from '../../hooks/useAuth'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDate as formatOnlyDate } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -97,7 +98,7 @@ export default function AccountShipmentsPage() {
 
   const formatPrice = (price: number | string) => {
     const n = Number(price) || 0
-    return formatCurrency(n, lang, { maximumFractionDigits: 0 })
+    return formatCurrency(n, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })
   }
 
   const handleCopy = async (text?: string | null) => {

@@ -49,6 +49,9 @@ const AdminThemeToggle: React.FC<AdminThemeToggleProps> = ({
       <DropdownMenu.Trigger asChild>
         <button
           type="button"
+          /* e2e, hesaplanmis rengi olcmek icin bu yuzeyi ADIYLA bulmali;
+             erisilebilir ad sozlukten gelir ve dile gore degisir. */
+          data-testid="admin-theme-toggle"
           aria-label={t('admin.theme.label')}
           className="inline-flex h-9 w-9 items-center justify-center rounded-admin-sm
             text-admin-fg-muted transition-colors hover:bg-admin-surface-2 hover:text-admin-fg

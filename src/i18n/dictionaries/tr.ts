@@ -1425,6 +1425,9 @@ export const tr = {
       preInfoRequired: 'Ön bilgilendirme formu onayı gereklidir',
       orderConfirmRequired: 'Lütfen siparişi onaylayın',
       paymentInit: 'Ödeme başlatılırken bir hata oluştu',
+      paymentFormRenderTitle: 'Ödeme formu açılamadı',
+      paymentFormRender: 'Güvenli ödeme formu yüklenemedi. Kartınızdan herhangi bir tahsilat YAPILMADI. Lütfen tekrar deneyin; sorun sürerse bizimle iletişime geçin.',
+      paymentRetry: 'Tekrar dene',
       validation: 'Formdaki bazı alanlar eksik veya hatalı. Lütfen kontrol edin.',
       database: 'Veritabanı hatası. Lütfen tekrar deneyin.'
     }

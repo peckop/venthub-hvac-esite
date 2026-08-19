@@ -10,6 +10,9 @@ import {
   variantStockTag,
 } from '@/lib/cache/tags'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+// Yalnız `type` import eden saf yardımcı (React/i18n/client bağımlılığı YOK — ölçüldü),
+// bu yüzden route handler'da güvenle kullanılır.
+import { getLocalizedCategorySlug } from '@/utils/categoryHelpers'
 
 export const dynamic = 'force-dynamic'
 
@@ -53,6 +56,71 @@ async function familySlugById(familyId: string | undefined): Promise<string | nu
     .eq('id', familyId)
     .single()
   return data?.slug ?? null
+}
+
+/** Kategori yolu çözmek için gereken minimum satır (slug + metadata). */
+type CategoryRow = { id?: string; slug: string | null; metadata?: unknown; parent_id?: string | null }
+
+/**
+ * KATEGORİ YOLLARI — W1 + W2 (render-dalga1 planı).
+ *
+ * ⚠️ Buradaki iki kusur denetimle ölçüldü ve TR yüzeyini tamamen kör bırakıyordu:
+ *
+ *  W1 — Yol **kanonik EN slug** ile kuruluyordu (`/tr/category/<en-slug>`). TR sayfası
+ *       `metadata.slug.tr` ile prerender edildiği için TR yolu HİÇ geçersiz kılınmıyordu:
+ *       kategori değişir, Türkçe vitrin eski hâlinde donar. Artık dil başına doğru slug
+ *       `getLocalizedCategorySlug` ile çözülür (CLAUDE.md kural 7 — kanonik EN, görünen
+ *       URL dile göre). Kanonik yol da tazelenmeye DEVAM eder: 308 kaynağı olsa bile
+ *       prerender edilmiş olabilir, kaldırmak yeni bir delik açardı.
+ *
+ *  W2 — 14 `revalidatePath` çağrısının tamamı TEK segmentliydi; `/category/[c]/[s]`
+ *       (alt-kategori) hiç tazelenmiyordu. Artık `parent_id` varsa iki segmentli yol da
+ *       üretilir.
+ *
+ * Yollar tekilleştirilir: iki dilin slug'ı aynı olabilir (çeviri yoksa kanoniğe düşer).
+ */
+function categoryPathsFor(category: CategoryRow, parent: CategoryRow | null): string[] {
+  const paths = new Set<string>()
+  const canonical = category.slug ?? ''
+
+  for (const lang of ['tr', 'en'] as const) {
+    const own = getLocalizedCategorySlug(category, lang) || canonical
+    if (!own) continue
+
+    paths.add(`/${lang}/category/${own}`)
+
+    if (parent) {
+      const parentSlug = getLocalizedCategorySlug(parent, lang) || parent.slug || ''
+      if (parentSlug) paths.add(`/${lang}/category/${parentSlug}/${own}`)
+    }
+  }
+
+  // Kanonik EN yolu her hâlükârda kalsın (yukarıdaki gerekçe).
+  if (canonical) {
+    paths.add(`/tr/category/${canonical}`)
+    paths.add(`/en/category/${canonical}`)
+  }
+
+  return [...paths]
+}
+
+/** `categories` satırını id ile çeker (yol çözümü için gereken alanlarla). */
+async function categoryRowById(id: string | undefined): Promise<CategoryRow | null> {
+  if (!id) return null
+  const { data } = await supabase
+    .from('categories')
+    .select('id, slug, metadata, parent_id')
+    .eq('id', id)
+    .single()
+  return data ?? null
+}
+
+/** Bir kategori için tüm yolları (kendi + ebeveyn zinciri) tazeler; üretilenleri döndürür. */
+async function revalidateCategoryTree(category: CategoryRow): Promise<string[]> {
+  const parent = await categoryRowById(category.parent_id ?? undefined)
+  const paths = categoryPathsFor(category, parent)
+  for (const p of paths) revalidatePath(p)
+  return paths
 }
 
 export async function POST(request: NextRequest) {
@@ -166,27 +234,42 @@ export async function POST(request: NextRequest) {
       // If category has changed or is associated, we also revalidate the category path
       const categoryId = activeRecord.category_id as string | undefined
       if (categoryId) {
-        const { data: category } = await supabase
-          .from('categories')
-          .select('slug')
-          .eq('id', categoryId)
-          .single()
-        
-        if (category?.slug) {
-          revalidatePath(`/tr/category/${category.slug}`)
-          revalidatePath(`/en/category/${category.slug}`)
-          revalidatedPaths.push(`/tr/category/${category.slug}`, `/en/category/${category.slug}`)
+        const category = await categoryRowById(categoryId)
+        if (category) {
+          revalidatedPaths.push(...(await revalidateCategoryTree(category)))
         }
       }
     }
 
     // 2. Table: categories
     else if (table === 'categories') {
-      const categorySlug = activeRecord.slug as string | undefined
-      if (categorySlug) {
-        revalidatePath(`/tr/category/${categorySlug}`)
-        revalidatePath(`/en/category/${categorySlug}`)
-        revalidatedPaths.push(`/tr/category/${categorySlug}`, `/en/category/${categorySlug}`)
+      // Payload zaten `to_jsonb(NEW)` — `metadata` ve `parent_id` içinde, ek sorgu gerekmez.
+      const self: CategoryRow = {
+        id: activeRecord.id as string | undefined,
+        slug: (activeRecord.slug as string | null) ?? null,
+        metadata: activeRecord.metadata,
+        parent_id: (activeRecord.parent_id as string | null) ?? null,
+      }
+      if (self.slug) {
+        revalidatedPaths.push(...(await revalidateCategoryTree(self)))
+      }
+
+      /**
+       * W2 TERS YÖNÜ — denetimde HİÇ yoktu: bir ÜST kategorinin slug'ı değişirse
+       * TÜM çocuklarının iki segmentli yolları değişir. Çocuklar tazelenmezse ebeveyn
+       * adı düzelir ama alt-kategori sayfaları eski yolda donar (sessiz bayatlama).
+       * Tavan küçük (ölçüm: en fazla 18 satır), tek sorgu yeter.
+       */
+      if (self.id) {
+        const { data: children } = await supabase
+          .from('categories')
+          .select('id, slug, metadata, parent_id')
+          .eq('parent_id', self.id)
+        for (const child of children ?? []) {
+          const childPaths = categoryPathsFor(child, self)
+          for (const p of childPaths) revalidatePath(p)
+          revalidatedPaths.push(...childPaths)
+        }
       }
 
       // Revalidate listing caches since categorization structure changed
@@ -217,16 +300,9 @@ export async function POST(request: NextRequest) {
 
           // If product is linked to a category, revalidate category path too
           if (product.category_id) {
-            const { data: category } = await supabase
-              .from('categories')
-              .select('slug')
-              .eq('id', product.category_id)
-              .single()
-
-            if (category?.slug) {
-              revalidatePath(`/tr/category/${category.slug}`)
-              revalidatePath(`/en/category/${category.slug}`)
-              revalidatedPaths.push(`/tr/category/${category.slug}`, `/en/category/${category.slug}`)
+            const category = await categoryRowById(product.category_id)
+            if (category) {
+              revalidatedPaths.push(...(await revalidateCategoryTree(category)))
             }
           }
         }
@@ -290,6 +366,94 @@ export async function POST(request: NextRequest) {
       // shouldRevalidateDiscovery=false ataması ile de garanti altına alınmıştır.
       // Biri "eksik" sanıp buraya revalidateTag(HOME_DATA_TAG) /
       // revalidateTag(PRODUCTS_DISCOVERY_TAG) EKLEMESİN.
+    }
+
+    /**
+     * 6. Table: product_images (W4 — LANSMAN KRİTİK)
+     *
+     * Bugün tabloda **0 satır** var; zincir görseller yüklenmeden ÖNCE yerinde olmalı,
+     * yoksa T069'da 374 ürünün görseli girilir ve hiçbir sayfa tazelenmez. Doğruluğu
+     * canlı veriyle kanıtlanamadığı için sabotajla kanıtlanır (INV-RENDER-2).
+     */
+    else if (table === 'product_images') {
+      const productId = activeRecord.product_id as string | undefined
+      if (productId) {
+        const { data: product } = await supabase
+          .from('products')
+          .select('family_id')
+          .eq('id', productId)
+          .single()
+
+        const familySlug = await familySlugById(product?.family_id ?? undefined)
+        if (familySlug) {
+          revalidatePath(`/tr/products/${familySlug}`)
+          revalidatePath(`/en/products/${familySlug}`)
+          revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
+        }
+      }
+
+      // Görsel keşif yüzeyinde GÖRÜNÜR (kart görseli) — fiyattan farklı olarak burada
+      // keşif tag'i tetiklenir.
+      revalidateTag(PRODUCTS_DISCOVERY_TAG)
+      revalidateTag(HOME_DATA_TAG)
+      revalidatedTags.push(PRODUCTS_DISCOVERY_TAG, HOME_DATA_TAG)
+    }
+
+    /** 7. Table: brands (W4) — markanın tüm ailelerinin PDP yolları + keşif. */
+    else if (table === 'brands') {
+      const brandId = activeRecord.id as string | undefined
+      if (brandId) {
+        const { data: families } = await supabase
+          .from('product_families')
+          .select('slug')
+          .eq('brand_id', brandId)
+          .is('deleted_at', null)
+
+        for (const f of families ?? []) {
+          if (!f.slug) continue
+          revalidatePath(`/tr/products/${f.slug}`)
+          revalidatePath(`/en/products/${f.slug}`)
+          revalidatedPaths.push(`/tr/products/${f.slug}`, `/en/products/${f.slug}`)
+        }
+      }
+
+      revalidateTag(PRODUCTS_DISCOVERY_TAG)
+      revalidateTag(HOME_DATA_TAG)
+      revalidatedTags.push(PRODUCTS_DISCOVERY_TAG, HOME_DATA_TAG)
+    }
+
+    /**
+     * 8. Table: price_lists (W4) — TÜM ailelerin PDP yolları; keşife DOKUNMAZ.
+     *
+     * ⚠️ FAN-OUT SINIRI: bu dal aile sayısı kadar yol tazeler (ölçüm 2026-08-17: **32 aile**
+     * → 64 çağrı). Katalog birkaç yüz aileye çıkarsa bu dal pahalılaşır ve **tag tabanlı**
+     * çözüme geçilmelidir. Sınır cetvele sayıyla yazıldı; sessizce yavaşlamasın.
+     *
+     * Keşife dokunmama kararı `product_prices` ile aynı gerekçeye dayanır: fiyat yalnız
+     * PDP'de gösterilir, kartlarda gösterilmez.
+     */
+    else if (table === 'price_lists') {
+      const { data: families } = await supabase
+        .from('product_families')
+        .select('slug')
+        .is('deleted_at', null)
+
+      for (const f of families ?? []) {
+        if (!f.slug) continue
+        revalidatePath(`/tr/products/${f.slug}`)
+        revalidatePath(`/en/products/${f.slug}`)
+        revalidatedPaths.push(`/tr/products/${f.slug}`, `/en/products/${f.slug}`)
+      }
+    }
+
+    /**
+     * W3 — `sitemap.xml` DB'den üretiliyor ama hiçbir dal onu tazelemiyordu: build'de
+     * donuyor, yeni ürün/kategori/aile arama motorlarına hiç bildirilmiyordu.
+     * Katalog yapısını değiştiren dört tablo için tazelenir.
+     */
+    if (table === 'products' || table === 'categories' || table === 'product_families' || table === 'product_images') {
+      revalidatePath('/sitemap.xml')
+      revalidatedPaths.push('/sitemap.xml')
     }
 
     return NextResponse.json({

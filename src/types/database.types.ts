@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       _migration_ledger: {
@@ -2122,6 +2147,50 @@ export type Database = {
           },
         ]
       }
+      quote_email_events: {
+        Row: {
+          created_at: string
+          email_to: string | null
+          error: string | null
+          id: string
+          provider: string
+          provider_message_id: string | null
+          quote_id: string
+          status: string
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_to?: string | null
+          error?: string | null
+          id?: string
+          provider?: string
+          provider_message_id?: string | null
+          quote_id: string
+          status: string
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_to?: string | null
+          error?: string | null
+          id?: string
+          provider?: string
+          provider_message_id?: string | null
+          quote_id?: string
+          status?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_email_events_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rate_limits: {
         Row: {
           bucket: string
@@ -3153,6 +3222,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          request_email_sent_at: string | null
           source: string
           source_project_id: string | null
           status: string
@@ -3163,6 +3233,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          request_email_sent_at?: string | null
           source: string
           source_project_id?: string | null
           status?: string
@@ -3173,6 +3244,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          request_email_sent_at?: string | null
           source?: string
           source_project_id?: string | null
           status?: string
@@ -3547,6 +3619,67 @@ export type Database = {
           },
           {
             foreignKeyName: "venthub_orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_admin_returns: {
+        Row: {
+          admin_notes: string | null
+          approved_at: string | null
+          completed_at: string | null
+          created_at: string | null
+          customer_email: string | null
+          customer_name: string | null
+          description: string | null
+          id: string | null
+          order_id: string | null
+          order_number: string | null
+          processed_at: string | null
+          reason: string | null
+          refund_amount: number | null
+          requested_at: string | null
+          search_text: string | null
+          status: string | null
+          tenant_id: string | null
+          total_amount: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venthub_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "reserved_orders"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "venthub_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_returns_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_returns_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "admin_users"
@@ -4011,6 +4144,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       contact_department: ["sales", "support", "consulting"],

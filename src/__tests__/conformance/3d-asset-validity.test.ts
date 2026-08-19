@@ -34,8 +34,12 @@ const PUBLIC_3D: Record<string, string> = import.meta.glob('/public/**/*.{hdr,gl
 
 const LOCAL_ASSET_REF = /['"](\/[\w./-]+\.(?:hdr|glb|gltf))['"]/g
 
+/**
+ * Yorum sıyırma — `(?<!:)` ŞART: onsuz `https://x` içindeki `//` yorum sanılır ve
+ * satırın geri kalanı silinir; URL arayan dedektör SESSİZCE kör kalır (T081-VH).
+ */
 function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(?<!:)\/\/[^\n]*/g, '')
 }
 
 describe('INV-3D-1 · 3D asset-validity', () => {
