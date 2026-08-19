@@ -958,6 +958,7 @@ Skor = ✓ / 40. Kabuk maddeleri **kabuk başına bir kez**, sayfa maddeleri **s
 | **INV-ADMIN-OVERLAY-3** | Overlay katmanında ham `z-30/40/50` ve arbitrary `z-[…]` yasağı; token kullanımı | statik tarama |
 | **Portal tema kapsamı** | AdminLayout tema kapsamını gövdeye basmalı (yetim kanca kapısı); portal içeriğinin kapsam taşıyan atası olmalı; gerçek tarayıcıda menü arka planı şeffaf olmamalı | statik + jsdom + e2e |
 | **INV-ADMIN-SEARCH-1** | Üst-düzey `or()` içinde gömülü kaynağa atıf YASAK (sıfır tolerans); iade yüzeyi view üzerinden okur. Ham kullanıcı metni kuralı burada DEĞİL, INV-FILTER-1'de (duplicate-ruler önlemi) | statik tarama |
+| **INV-ADMIN-EXPORT-1** | `components/admin/data-table/` ve `components/admin/overlay/` altında `export default` YASAK; aynı dizinlerden DEFAULT ithal de YASAK (iki kural birbirinin yedeği) | statik tarama |
 | **INV-ADMIN-DESIGN-1** (ratchet) | `font-black`, `uppercase`, `shadow-[…]`, ham `rounded-xl/2xl/3xl`, ham `slate-*`/`gray-*` sayaçları — **yeni kod artıramaz**, dalgalar düşürür | ratchet (INV-5/INV-9 deseni) |
 | **ESLint kaçağı kapatma** | `tailwindcss/no-arbitrary-value` şu an **yalnız literal `className`'i** görüyor; admin'de 38 arbitrary değer sabit/obje içinde kaçıyor (ölçüldü: o dosyalarda eslint 0 hata veriyor). `settings.tailwindcss.callees` + sabit tarama eklenir | lint |
 | **Zoom kapısı** | Playwright: 1280×1024 @ %400 → iki-yönlü scroll yok; %200 metin → kırpılma yok | e2e |
@@ -1089,6 +1090,40 @@ Kapı ayrı sabotajlarla kanıtlandı; her sabotaj **farklı** bir testi düşü
 Kapının ölçmediği, **adıyla**: sorgu çalıştırılmaz (sonucun doğruluğu ölçülmez); yorum
 ayıklama yalnız tam-satır yorumlarını atar (satır-sonu yorumu yanlış-KIRMIZI verebilir,
 yanlış-yeşil veremez).
+
+---
+
+### 6.4 Paylaşılan admin bileşeni TEK KAPIDAN girer (2026-08-19, T102-VH)
+
+**Kural:** `src/components/admin/data-table/` ve `src/components/admin/overlay/` altındaki her
+bileşen **yalnız NAMED** export edilir. `export default` yasaktır, bu dizinlerden default ithal
+de yasaktır. Muafiyet **adla** yazılır; şu an muafiyet yok.
+
+**Niçin — tercih değil, ölçüm.** 2026-08-19 taraması: bu iki dizindeki sekiz bileşenin hepsi hem
+named hem default export ediyordu. Sekiz default kapının **altısı hiçbir yerden kullanılmıyordu**
+(ölü), kalan ikisi tek çağrı-yerindeydi. Ve `BulkBar` aynı depoda **iki farklı kapıdan** giriyordu:
+`AdminLogisticsTableBody` default, diğer yedi dosya named.
+
+İki kapı kendi başına çökme üretmez — ürettiği şey **sessiz ayrışmadır**: yeniden adlandırma yalnız
+bir kapıyı takip eder, arama yalnız bir biçimi bulur, ve ölü-kod ölçümleri (knip) ölü kapıyı canlı
+sanar. Yani kusur bir yazım tercihi değil, **ölçülebilirliği bozan** bir kusurdur; bu cetvelin geri
+kalanı ölçüme dayandığı için buraya aittir.
+
+**Zorlayan kapı:** INV-ADMIN-EXPORT-1 — `src/__tests__/conformance/admin-export-hygiene.test.ts`.
+
+Kapı **üç ayrı sabotajla** kanıtlandı ve her sabotaj **farklı** bir testi düşürdü:
+
+1. `BulkBar.tsx` dosyasına `export default BulkBar` geri kondu → **kural A** kırmızı.
+2. `AdminLogisticsTableBody` default ithale döndürüldü → **kural B** kırmızı (kural A yeşilken).
+   Bu, iki kuralın birbirinin yedeği olduğunu gösterir: biri diğerini gereksiz kılmaz.
+3. Kapsam dizini var olmayan bir adla değiştirilerek tarama **kör edildi** → **stale-guard**
+   kırmızı. Bu üçüncüsü olmasa, dizin yeniden adlandırıldığı gün kapı sessizce hiçbir şeyi ölçmez
+   olur ve yeşil kalırdı — yani kapı kendi ön koşulunu da doğrular.
+
+**Kapının ölçmediği, adıyla:** hiçbir modül çalıştırılmaz — "named export gerçekten var mı"
+sorusunu `tsc` yanıtlar, bu kapı değil. `export * from` yeniden-ihracatı izlenmez (kapsanan
+dizinlerde böyle bir kullanım yok, ölçüldü). Yorum ayıklama yalnız tam-satır yorumlarını atar:
+satır-sonu yorumundaki örnek kod yanlış-KIRMIZI verebilir, yanlış-yeşil veremez.
 
 ---
 

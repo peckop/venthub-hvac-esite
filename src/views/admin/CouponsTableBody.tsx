@@ -291,7 +291,7 @@ const CouponsTableBody: React.FC = () => {
           const response = await supabaseBrowserClient.functions.invoke('admin-create-coupon', {
             body: {
               code: validatedData.code,
-              type: validatedData.type as AllowedCouponType,
+              type: validatedData.type,
               value: validatedData.value,
               starts_at: validatedData.starts_at || null,
               ends_at: validatedData.ends_at || null,
@@ -509,7 +509,9 @@ const CouponsTableBody: React.FC = () => {
                 id="coupon-type"
                 value={form.type as string}
                 onChange={(e) => {
-                  setForm((f) => ({ ...f, type: e.target.value as AllowedCouponType }))
+                  const nextType = e.target.value
+                  if (!isAllowedCouponType(nextType)) return
+                  setForm((f) => ({ ...f, type: nextType }))
                   setErrors((errs) => ({ ...errs, type: '' }))
                 }}
                 className={`${adminSelectClass} ${errors.type ? 'border-admin-danger/30 focus-visible:border-admin-danger/30 focus-visible:ring-admin-danger/30' : ''}`}

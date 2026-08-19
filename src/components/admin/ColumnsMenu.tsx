@@ -7,7 +7,6 @@ import { Density } from '../../types/admin-shared'
 import { adminButtonSecondaryClass } from '../../utils/adminUi'
 
 export type ColumnToggle = { key: string; label: string; checked: boolean; onChange: (v: boolean) => void }
-export type { Density }
 
 const ColumnsMenu: React.FC<{
   columns: ColumnToggle[]

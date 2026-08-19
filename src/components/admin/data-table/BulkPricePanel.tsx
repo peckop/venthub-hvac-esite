@@ -120,5 +120,3 @@ export function BulkPricePanel({ onApply, onClose }: BulkPricePanelProps): React
     </div>
   )
 }
-
-export default BulkPricePanel

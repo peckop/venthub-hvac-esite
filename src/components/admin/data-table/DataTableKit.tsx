@@ -357,5 +357,3 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
     </div>
   )
 }
-
-export default DataTableKit

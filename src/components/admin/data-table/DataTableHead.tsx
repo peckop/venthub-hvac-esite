@@ -88,5 +88,3 @@ export function DataTableHead<T>(props: DataTableHeadProps<T>): ReactNode {
     </thead>
   )
 }
-
-export default DataTableHead
