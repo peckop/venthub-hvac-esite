@@ -46,6 +46,25 @@
  * **OLCULEMEDI** olarak isaretlenir — "gecti" DEMEZ. Tek basina RED gozlemi "kanal kapali"
  * ile ayirt edilemez; bu yuzden kabul kolu zorunludur.
  *
+ * ── YUKLEM AILELERI — olcumun NEREDE gecerli oldugu (2026-08-20, AUTH tespiti) ───────
+ * Kimlik takma her yuklemi sinayamaz. Aile METINDEN DEGIL DAVRANISTAN turetilir, cunku
+ * metin yaniltiyor: `is_admin_user()` de govdesinde `user_profiles` okur ama JWT dali KISA
+ * DEVRE yapar ve sahte uid ile `true` doner; `is_user_admin(uid)` ayni iddia altinda `false`
+ * doner. Fark metinde YOK, davranista VAR — bu yuzden betik her yardimciyi admin iddiasi
+ * altinda CAGIRIR ve sonuca gore siniflandirir.
+ *   (A) JWT onurunu koruyan yuklem            → yontem GECERLI
+ *   (B) Profil satirina bagimli yuklem        → yontem KOR; sahte uid'in satiri yok, yuklem
+ *                                               tablo DOLU olsa bile her zaman false doner.
+ *                                               (B)'deki her "0 satir" OLCUM DEGIL ARTIFAKTTIR.
+ *   (C) Rol yuklemi hic yok (tenant_id = ...)  → rol SINANMIYOR; satir gormek yetkiyi
+ *                                               KANITLAMAZ, yalnizca yuzeyin rolden bagimsiz
+ *                                               acik oldugunu gosterir.
+ * Hukum yalniz (A) tablolarindan kurulur; (B) hukme katilmaz, (C) ayrica isaretlenir.
+ *
+ * ⚠ NEGATIF KONTROL YETMEZ: kontrol kolumuz (`is_admin_user()` admin'de true, moderator'de
+ * false) (A) ailesindendi ve GECTI — kor oldugumuz aile (B) idi. **Kontrol kolu, kor oldugun
+ * aileden secilmezse korlugu gizler.**
+ *
  * ── BU BETIGIN OLCMEDIGI ─────────────────────────────────────────────────────────────
  *  1. YAZMA yolunu olcmez — yalniz SELECT. `canWrite`/`ROLE_WRITE_ACCESS` ayri sorudur.
  *  2. Rota→tablo haritasini STATIK import yuruyusuyle cikarir. Kosul icinde secilen tablo
@@ -207,6 +226,88 @@ function claimler(rol) {
  * Tek (rol, tablo) ucusu. Hata satir sayisi degil KANITTIR: RLS reddi ile "tablo yok"
  * ayri seylerdir ve ayri raporlanir.
  */
+/**
+ * YUKLEM AILESI — kimlik takma yonteminin O TABLODA gecerli olup olmadigini belirler.
+ * AUTH'un 2026-08-20 tespiti; kendi tablolarimda `pg_policies` ile dogrulandi.
+ *
+ *   (A) JWT-OKUYAN  — `is_admin_user()`, `jwt_tenant_id()`. Sahte kimlik bunlari DOGRU sinar.
+ *   (B) PROFIL-JOIN — `EXISTS (... FROM user_profiles up WHERE up.id = auth.uid() ...)`.
+ *                     Sahte uid'in `user_profiles`'ta SATIRI YOK; yuklem HER ZAMAN false
+ *                     doner, tablo dolu olsa ve rol dogru olsa bile. Yontem burada KORDUR.
+ *   (C) ROL YUKLEMI YOK — yalniz `tenant_id = jwt_tenant_id()` gibi. Rol hic sorulmaz;
+ *                     "rol satir goruyor" sonucu rolun YETKILI oldugunu KANITLAMAZ.
+ *
+ * NICIN ZORUNLU: negatif kontrolumuz (`is_admin_user()` admin'de true, moderator'de false)
+ * (A) ailesindendi ve GECTI — kor oldugumuz aile (B) idi. **Kontrol kolu, kor oldugun
+ * aileden secilmezse korlugu gizler.**
+ */
+async function yuklemAileleri(client, tablolar) {
+    // 1) YALNIZ tarayicidan gecerli politikalar. `service_role` politikalari `qual = true`
+    //    tasir ve rol suzgeci OLMADAN bakilirsa "rol yuklemi yok" gibi gorunur — kendi
+    //    siniflandiricimda yakaladigim korluk buydu. Kisit `roles` sutunundadir, qual'de degil.
+    const { rows } = await client.query(
+        `select tablename, coalesce(qual,'') as qual
+           from pg_policies
+          where schemaname = 'public' and cmd in ('SELECT','ALL')
+            and ('authenticated' = any(roles) or 'public' = any(roles))
+            and tablename = any($1::text[])`,
+        [tablolar],
+    )
+
+    // 2) Yuklemlerde gecen public fonksiyonlarini topla ve HER BIRINI DAVRANISSAL SINA.
+    //    Metinle siniflandirmak YANLIS sonuc verir: `is_admin_user()` de govdesinde
+    //    `user_profiles` okur, ama JWT dali KISA DEVRE yapar ve sahte uid ile true doner.
+    //    `is_user_admin(uid)` ayni iddia altinda false doner. Fark metinde YOK, davranista VAR.
+    const adaylar = new Set()
+    for (const r of rows) for (const m of r.qual.matchAll(/([a-z_][a-z0-9_]*)\s*\(/g)) adaylar.add(m[1])
+
+    const jwtOnuruKoruyan = new Set() // (A) — admin iddiasi sahte uid ile de gecer
+    for (const fn of adaylar) {
+        for (const cagri of [`public.${fn}()`, `public.${fn}((select auth.uid()))`]) {
+            try {
+                await client.query('begin')
+                await client.query('select set_config($1,$2,true)', [
+                    'request.jwt.claims',
+                    claimler('admin'),
+                ])
+                await client.query('set local role authenticated')
+                const { rows: r2 } = await client.query(`select ${cagri} as v`)
+                if (r2[0].v === true) jwtOnuruKoruyan.add(fn)
+            } catch {
+                /* imza uymadi ya da fonksiyon degil — aday listesi zaten genis tutuldu */
+            } finally {
+                await client.query('rollback').catch(() => {})
+            }
+        }
+    }
+
+    // 3) Tablo bazinda hukum. Oncelik sirasi gerekcelidir:
+    //    (C) once — rolden bagimsiz bir dal varsa satirlar ROLE RAGMEN gelir, olcum rolu sinamaz.
+    //    (A) sonra — jwt onurunu koruyan bir yuklem varsa sahte kimlik DOGRU sinar.
+    //    (B) en son — geriye kalan profil-bagimli yuklemlerde yontem KORDUR.
+    const harita = {}
+    for (const t of tablolar) {
+        const q = rows.filter((r) => r.tablename === t).map((r) => r.qual)
+        if (!q.length) {
+            harita[t] = 'B' // politikasi yok ya da yalniz service_role — tarayici goremez
+            continue
+        }
+        const fnleri = (x) => [...x.matchAll(/([a-z_][a-z0-9_]*)\s*\(/g)].map((m) => m[1])
+        const rolsuz = q.some(
+            (x) =>
+                !x.includes('user_profiles') &&
+                !x.includes('auth.uid()') &&
+                !fnleri(x).some((f) => adaylar.has(f) && f !== 'jwt_tenant_id' && f !== 'select'),
+        )
+        if (rolsuz) harita[t] = 'C'
+        else if (q.some((x) => fnleri(x).some((f) => jwtOnuruKoruyan.has(f)))) harita[t] = 'A'
+        else if (q.some((x) => x.includes('user_profiles') || fnleri(x).some((f) => adaylar.has(f) && !jwtOnuruKoruyan.has(f) && f !== 'jwt_tenant_id')))
+            harita[t] = 'B'
+        else harita[t] = 'A' // yalniz `user_id = auth.uid()` — olculebilir, sonuc dogru semantiktir
+    }
+    return harita
+}
+
 async function satirSayisi(client, rol, tablo) {
     try {
         await client.query('begin')
@@ -280,6 +381,13 @@ async function main() {
     const client = new pg.Client({ connectionString: temiz, ssl: tlsAyari() })
     await client.connect()
 
+    // Yuklem ailelerini TEK sorguda topla — her (rol,rota) icin tekrar sormak gereksiz
+    // yuk olurdu ve ayni cevabi verirdi.
+    const tumTablolar = [
+        ...new Set(roller.flatMap((r) => matris[r].flatMap((rota) => rotaninTablolari(rota).tablolar))),
+    ]
+    const aileler = await yuklemAileleri(client, tumTablolar)
+
     const sonuc = []
     try {
         for (const rol of roller) {
@@ -304,24 +412,41 @@ async function main() {
                     const adminSonuc = await satirSayisi(client, 'admin', tablo) // KABUL KOLU
                     olcumler.push({ tablo, rol: rolSonuc, admin: adminSonuc })
                 }
-                // Kor sonda: admin de goremiyorsa o tablo hakkinda hukum verilmez.
-                const gorunur = olcumler.filter((o) => (o.admin.n ?? 0) > 0)
+                // Once YUKLEM AILESI, sonra sayi. Sayiyi aileden once okumak, bugun
+                // dustugumuz tuzagin ta kendisi: (B) ailesinde 'sifir satir' bir OLCUM
+                // degil YONTEM ARTIFAKTIDIR ve 'yetkisiz' diye okunur.
+                const aile = (t) => aileler[t] || 'A'
+                const kor = olcumler.filter((o) => aile(o.tablo) === 'B')
+                const rolsuz = olcumler.filter((o) => aile(o.tablo) === 'C')
+                const olculebilir = olcumler.filter((o) => aile(o.tablo) === 'A')
+                // Kabul kolu: admin de goremiyorsa o tablo hakkinda hukum verilmez.
+                const gorunur = olculebilir.filter((o) => (o.admin.n ?? 0) > 0)
                 const rolGoren = gorunur.filter((o) => (o.rol.n ?? 0) > 0)
                 let hukum, sebep
                 if (gorunur.length === 0) {
                     hukum = 'OLCULEMEDI'
-                    sebep = 'admin kimligi de sifir satir gordu — sonda KOR'
+                    const parca = []
+                    if (kor.length) parca.push(`${kor.length} tablo (B) ailesi — sahte uid ile YONTEM KOR`)
+                    if (rolsuz.length) parca.push(`${rolsuz.length} tablo rol yuklemi TASIMIYOR`)
+                    if (!parca.length) parca.push('admin kimligi de sifir satir gordu — sonda KOR')
+                    sebep = parca.join('; ')
                 } else if (rolGoren.length === 0) {
                     hukum = 'VAAT-BOS'
-                    sebep = `admin ${gorunur.length} tabloda satir goruyor, ${rol} HICBIRINDE gormuyor`
+                    sebep = `admin ${gorunur.length} olculebilir tabloda satir goruyor, ${rol} HICBIRINDE gormuyor`
                 } else if (rolGoren.length < gorunur.length) {
                     hukum = 'KISMI'
-                    sebep = `${rolGoren.length}/${gorunur.length} tabloda satir var`
+                    sebep = `${rolGoren.length}/${gorunur.length} olculebilir tabloda satir var`
                 } else {
                     hukum = 'TUTARLI'
-                    sebep = `${gorunur.length}/${gorunur.length} tabloda satir var`
+                    sebep = `${gorunur.length}/${gorunur.length} olculebilir tabloda satir var`
                 }
-                sonuc.push({ rol, rota, hukum, sebep, olcumler })
+                if (rolsuz.length) {
+                    sebep += ` · ${rolsuz.length} tablo ROL-KAPISI YOK (satir gormek yetkiyi kanitlamaz)`
+                }
+                if (kor.length && hukum !== 'OLCULEMEDI') {
+                    sebep += ` · ${kor.length} tablo (B) ailesi, hukme KATILMADI`
+                }
+                sonuc.push({ rol, rota, hukum, sebep, olcumler, aileler: Object.fromEntries(olcumler.map((o) => [o.tablo, aile(o.tablo)])) })
             }
         }
     } finally {

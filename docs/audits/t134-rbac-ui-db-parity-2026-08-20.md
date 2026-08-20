@@ -1,107 +1,143 @@
 # RBAC UI↔DB Parite Karnesi — `moderator` (2026-08-20)
 
 **Üreten:** `scripts/db/checks/rbac-ui-db-parity.mjs` · **Şerit:** ADMIN-CUSTOMER · **İş:** T134-VH
-**Ölçülen matris:** PR #714'ün daraltılmış 6 rotalı `moderator` listesi. Ölçüm PR henüz açıkken
-dal üzerinde yapıldı; #714 `f3ae845d` ile master'a indikten sonra karne **yeniden üretilerek
-doğrulandı** — `--kuru` koşusu birleşmiş master'da tam olarak aşağıdaki altı rotayı ve aynı
-tablo kümesini veriyor. Yani bu karne bir anlık fotoğraf değil, komutla tekrarlanabilir.
+**Ölçülen matris:** PR #714'ün daraltılmış 6 rotalı `moderator` listesi (master `f3ae845d`).
+`--kuru` koşusu birleşmiş master'da aşağıdaki altı rotayı ve aynı tablo kümesini birebir
+yeniden üretiyor — bu karne anlık fotoğraf değil, komutla tekrarlanabilir.
 
-## Bu karne ne diyor, ne demiyor
+> **Bu karnenin ilk sürümü YANLIŞTI ve düzeltildi.** İlk sürüm altı rotayı da `KISMİ` diye
+> işaretlemişti. AUTH (`99fa366e`) kimlik takma yönteminin sistematik bir kör noktasını
+> bildirdi; ölçtüm, doğruladım ve **kendi eklediğim üçüncü aileyle** birlikte hükümler
+> değişti. Aşağıdaki §2 bunu anlatır. Eski sürüm PR #718'in ilk commit'inde durur.
 
-- **Der:** arayüz bir role şu rotayı vaat ediyor; o rolün kimliğiyle o rotanın okuduğu tablolar
-  gerçekten satır veriyor mu.
-- **Demez:** yazma yolunu ölçmez (yalnız SELECT). Politika **metnini** okumaz, **davranışını**
-  ölçer. `rls-role-coverage.mjs` ile kesişmez — o DB-içi (politika var mı), bu DB↔UI (satır
-  geliyor mu). Ayrım betiğin baş yorumunda yazılı.
+## 1. Bu karne ne diyor, ne demiyor
 
-## Ölçüm kurulumu ve ayırt edicilik kanıtı
+- **Der:** arayüz bir role şu rotayı vaat ediyor; o rolün kimliğiyle o rotanın okuduğu
+  tablolar gerçekten satır veriyor mu.
+- **Demez:** yazma yolunu ölçmez (yalnız SELECT). `rls-role-coverage.mjs` ile kesişmez —
+  o DB-içi (politika var mı), bu DB↔UI (satır geliyor mu).
 
-Kimlik `request.jwt.claims` ile takıldı, ardından `set local role authenticated`. **Sonda kör
-değil** — ayırt edici kontrol koşuldu:
+## 2. Yüklem aileleri — ölçümün NEREDE geçerli olduğu
 
-| Kimlik | `is_admin_user()` |
-|---|---|
-| `user_role: admin` | `true` |
-| `user_role: moderator` | `false` |
+Yöntem: sahte bir `uid` ile `request.jwt.claims` takıp `set local role authenticated` demek,
+sonra satır saymak. Bu yöntem **her yüklemi sınayamaz**. Aile ayrımı **metinden değil
+davranıştan** türetildi — çünkü metin yanıltıyor:
 
-`sub` **sentetik** bir UUID'dir. "Kendi satırın VEYA admin" biçimli politikalar bu kimliğe doğal
-olarak sıfır satır verir — bu, *yönetim ekranı olarak boş* demektir ve doğru semantiktir.
-
-## Tablo bazında ham ölçüm (14 tablo, iki kol)
-
-| Tablo | `moderator` | `admin` (kabul kolu) | Okuma |
-|---|---:|---:|---|
-| `admin_audit_log` | **0** | **60** | moderator KÖR, admin görüyor |
-| `categories` | 31 | 31 | tutarlı |
-| `coupons` | 1 | 1 | tutarlı |
-| `inventory_settings` | 1 | 1 | tutarlı |
-| `inventory_summary` | 374 | 374 | tutarlı |
-| `products` | 374 | 374 | tutarlı |
-| `tenants` | 1 | 1 | tutarlı |
-| `venthub_orders` | **0** | **5** | moderator KÖR, admin görüyor |
-| `goods_receipts` | 0 | 0 | **ölçülemedi** — tablo boş, kabul kolu kör |
-| `product_images` | 0 | 0 | **ölçülemedi** — tablo boş |
-| `purchase_order_items` | 0 | 0 | **ölçülemedi** — tablo boş |
-| `purchase_orders` | 0 | 0 | **ölçülemedi** — tablo boş |
-| `suppliers` | 0 | 0 | **ölçülemedi** — tablo boş |
-| `venthub_returns` | 0 | 0 | **ölçülemedi** — tablo boş |
-
-`0/0` satırlar **"temiz" değildir**: admin de göremediği için o tablo hakkında hüküm verilemez.
-Bunları "geçti" saymak, tam olarak bu karnenin engellemek için var olduğu hatadır.
-
-## Rota bazında hüküm — `moderator`, 6 rota
-
-| Rota | Hüküm | Dayanak |
+| Yardımcı | Gövdesinde `user_profiles` | Admin iddiası + sahte uid ile dönen |
 |---|---|---|
-| `/admin` | KISMİ | 2/3 görünür tabloda satır var; `venthub_orders` boş (admin 5) |
-| `/admin/categories` | KISMİ | 2/3; `admin_audit_log` boş (admin 60) |
-| `/admin/coupons` | KISMİ | 2/3; `admin_audit_log` boş |
-| `/admin/products` | KISMİ | 2/3; `admin_audit_log` boş |
-| `/admin/inventory/settings` | KISMİ | 1/2; `admin_audit_log` boş |
-| `/admin/purchasing` | KISMİ | 1/2; satınalma tablolarının **hepsi** ölçülemez durumda |
+| `is_admin_user()` | **evet** | `true` — JWT dalı kısa devre yapıyor |
+| `is_user_admin(uid)` | evet | `false` — profil satırı arıyor |
 
-**Altı rotanın altısı da KISMİ.** Yani #714'ün daraltması doğru yöne gitti (VAAT-BOŞ kalmadı),
-ama hiçbir rota tam tutarlı değil.
+İkisi de `user_profiles` okuyor; **metinle ayırt edilemezler, davranışla edilirler.** Betik
+artık her yardımcıyı admin iddiası altında **çağırıp** sınıflandırıyor.
 
-## İki bulgu — biri yaygın, biri yapısal
+| Aile | Tanım | Yöntem |
+|---|---|---|
+| **(A)** | JWT onurunu koruyan yüklem (`is_admin_user()`) | **geçerli** |
+| **(B)** | Profil satırına bağımlı yüklem (`is_user_admin()`, `EXISTS … user_profiles`) | **KÖR** — sahte uid'in satırı yok, yüklem tablo dolu olsa da her zaman `false` |
+| **(C)** | Rol yüklemi hiç yok (`tenant_id = jwt_tenant_id()`) | rol **sınanmıyor** — satır görmek yetkiyi kanıtlamaz |
 
-### 1. `admin_audit_log` sistematik sessiz-boş (moderator 0, admin 60)
+**Sınıflandırıcının kendi körlüğü de bulundu ve kapatıldı:** `service_role` politikaları
+`qual = true` taşır; rol süzgeci olmadan bakılınca "rol yüklemi yok" gibi görünüp tabloyu
+yanlışlıkla (C) yapıyorlardı. Kısıt `qual`'de değil `pg_policies.roles` sütununda. Süzgeç eklendi.
 
-Denetim defteri **altı rotanın beşinde** okunuyor ve moderator hiçbirinde satır görmüyor.
-Sayfa açılır, ekranın denetim paneli boş gelir, hata yoktur. Bu tek bir rotanın kusuru değil,
-**yatay** bir sınıftır: rota listesini daraltmak onu çözmez, çünkü kalan rotalarda da var.
+### Neden negatif kontrolüm bunu yakalamadı
 
-Karar gerektirir (ADMIN-CUSTOMER'ın kendi başına vereceği karar değil): ya denetim paneli
-moderator için **gizlenir** (UI kararı), ya politika moderator'ü **sayar** (migration = Recep
-kapısı). Üçüncü seçenek — bugünkü hâl — sessiz-boş üretmeye devam eder.
+Kontrol kolum `is_admin_user()` admin'de `true`, moderator'de `false` idi ve **geçti** — çünkü
+o kontrol **(A) ailesinden**. Kör olduğum aile **(B)** idi.
+**Kontrol kolu, kör olduğun aileden seçilmezse körlüğü gizler.**
 
-### 2. `/admin/purchasing`'in gerekçesi bugün **ölçülemez**
+## 3. Tablo bazında ölçüm ve aile
 
-`rbac.ts` bu rotayı moderator listesinde tutuyor ve gerekçesi *"`purchase_orders` politikası
-`moderator`'ü AÇIKÇA sayıyor"* — yani **politika metnine** dayanıyor. Davranışsal ölçüm bunu
-bugün **doğrulayamaz**: `purchase_orders`, `purchase_order_items`, `suppliers`, `goods_receipts`
-tablolarının **dördü de boş**, dolayısıyla kabul kolu da kör.
+| Tablo | Aile | `moderator` | `admin` | Okuma |
+|---|---|---:|---:|---|
+| `admin_audit_log` | **A** | **0** | **60** | ölçüldü — moderator KÖR |
+| `venthub_orders` | **A** | **0** | **5** | ölçüldü — yönetim düzeyi okuma YOK |
+| `venthub_returns` | A | 0 | 0 | kabul kolu kör (tablo boş) |
+| `goods_receipts` | **B** | 0 | 0 | **ölçülemedi — yöntem kör** |
+| `purchase_order_items` | **B** | 0 | 0 | **ölçülemedi — yöntem kör** |
+| `purchase_orders` | **B** | 0 | 0 | **ölçülemedi — yöntem kör** |
+| `suppliers` | **B** | 0 | 0 | **ölçülemedi — yöntem kör** |
+| `coupons` | B/karma | 1 | 1 | aynı yüklemde hem profil-bağımlı dal hem `is_active` dalı var; satır **ikinci daldan** geliyor |
+| `categories` | **C** | 31 | 31 | rol kapısı YOK |
+| `products` | **C** | 374 | 374 | rol kapısı YOK |
+| `product_images` | **C** | 0 | 0 | rol kapısı YOK |
+| `inventory_settings` | **C** | 1 | 1 | rol kapısı YOK |
+| `tenants` | **C** | 1 | 1 | rol kapısı YOK |
+| `inventory_summary` | — | 374 | 374 | görünüm; kendi politikası yok, atfedilemez |
 
-Bu bir çelişki değil, bir **kanıt boşluğu**dur ve öyle yazılmalıdır: gerekçe metinden geliyor,
-davranıştan gelmiyor. Satınalma defterine ilk gerçek satır girdiği gün bu ölçüm tekrarlanmalı —
-o gün gerekçe ya doğrulanır ya düşer. Bugün "doğru" demek de "yanlış" demek de ölçümün
-söylemediğini söyletmek olur.
+## 4. Rota bazında hüküm — `moderator`, 6 rota
 
-## Sınırlar (betiğin baş yorumundakiyle aynı, burada tekrarı kasıtlı)
+Hüküm **yalnız (A) ailesindeki tablolardan** kurulur. (B) hükme katılmaz, (C) rolü sınamaz.
 
-1. Rota→tablo haritası **statik import yürüyüşüyle** çıkarılır. Koşul içinde seçilen tablo adı,
-   şablon dizgesiyle kurulan ad ve RPC arkasındaki tablo **görünmez**.
+| Rota | Ölçülebilir (A) tablolar | Hüküm | Kör (B) | Rol kapısı yok (C) |
+|---|---|---|---|---|
+| `/admin` | `venthub_orders` 0/5 | **VAAT-BOŞ** | — | `products`, `inventory_summary` |
+| `/admin/categories` | `admin_audit_log` 0/60 | **VAAT-BOŞ** | — | `categories`, `products` |
+| `/admin/coupons` | `admin_audit_log` 0/60 | **VAAT-BOŞ** | `coupons` | `tenants` |
+| `/admin/products` | `admin_audit_log` 0/60 | **VAAT-BOŞ** | — | `categories`, `products`, `product_images` |
+| `/admin/inventory/settings` | `admin_audit_log` 0/60 | **VAAT-BOŞ** | — | `inventory_settings` |
+| `/admin/purchasing` | `admin_audit_log` 0/60 | **VAAT-BOŞ** | `goods_receipts`, `purchase_order_items`, `purchase_orders`, `suppliers` | `products` |
+
+## 5. Sonuç — ilk sürümden daha sert
+
+**Ölçülebilir her tabloda moderator hiçbir şey görmüyor.** Moderator'ün satır gördüğü tablolar
+— `categories`, `products`, `inventory_settings`, `tenants` — **rol kapısı taşımıyor**: o
+satırları tenant içindeki *herhangi* bir oturum açmış kullanıcı da görür. Yani moderator'ün
+yönetim yüzeyi bugün ya **rolden bağımsız açık** ya da **görünmez**; arada rolün gerçekten iş
+gördüğü bir yüzey ölçülemedi.
+
+İlk sürümdeki `KISMİ` hükümleri bunu **gizliyordu**: (C) tablolarındaki satırları "tutarlı"
+sayınca rol yetkili görünüyordu, oysa o satırlar rolden gelmiyordu.
+
+### Bulgu 1 — `admin_audit_log` yatay sessiz-boş (A ailesi, hüküm sağlam)
+
+Denetim defteri altı rotanın **beşinde** okunuyor; moderator 0, admin 60. Yüklem
+`tenant_id = jwt_tenant_id() AND is_admin_user()` — (A) ailesinden, yani bu **gerçek bir
+ölçüm**, yöntem artefaktı değil. Rota listesini daraltmak bunu çözmez.
+
+Karar gerekiyor (ADMIN-CUSTOMER'ın tek başına vereceği karar değil): panel moderator için
+**gizlensin** (UI kararı) ya da politika moderator'ü **saysın** (migration = Recep kapısı).
+Üçüncü seçenek — bugünkü hâl — sessiz-boş üretmeye devam eder.
+
+### Bulgu 2 — `/admin/purchasing` ölçülemez, ve sebebi ilk sandığımdan güçlü
+
+Bu rotanın listede kalma gerekçesi *"`purchase_orders` politikası `moderator`'ü açıkça
+sayıyor"* — politika **metnine** dayanıyor. Dört tablosu da **(B) ailesinden**: sahte `uid`
+ile o sorgu **tablo dolu olsa bile** 0 dönerdi. Yani "dört tablo boş" açıklaması yetersizdi.
+
+Sonuç: satınalma defterine ilk satır girdiği gün ölçümü tekrarlamak **yetmez** — **gerçek bir
+moderator kullanıcısı** da gerekir. (Ayrım AUTH'a ait; kendi tablolarımda doğruladım.)
+
+**Not — "metne dayandı" eleştirisi burada geçerli değil:** AUTH gerekçesini `pg_policies`
+**canlı kataloğundan** okumuştu, migration dosyasından değil. Katalog, DB'nin kendi beyanıdır.
+
+### Bulgu 3 — rol matrisinin tamamı bugün kullanılmıyor
+
+`user_profiles`'ta **toplam 2 satır** var ve **ikisi de `super_admin`** (AUTH ölçtü). Sistemde
+hiç `moderator`, `admin`, `viewer`, `warehouse`, `sales` kullanıcısı yok. Bu, "moderator vaat
+mi kalıntı mı" sorusunun **cevabını değiştirmez ama ağırlığını değiştirir**: bugün hiçbir
+gerçek kullanıcı bu yüzeylerden etkilenmiyor, dolayısıyla onarım **acil değil ama ucuz** —
+kimseyi bozmadan yapılabilecek bir pencere açık.
+
+## 6. Sınırlar
+
+1. Rota→tablo haritası **statik import yürüyüşüyle** çıkarılır. Koşul içinde seçilen tablo
+   adı, şablon dizgesiyle kurulan ad ve RPC arkasındaki tablo **görünmez**.
 2. Yürüyüş **yorumları atar**. Gerekçe ölçüldü: `ensureSessionFresh.ts` bir JSDoc örneğinde
-   `.from('table')` yazıyor ve ham tarama `table` adlı **hayali** bir tabloyu beş rotada birden
-   gerçek sandı. Örnek kod, kod değildir.
-3. Ölçüm **canlı prod DB'de** yapıldı; yalnız `SELECT`, her kol `begin`/`rollback` içinde,
+   `.from('table')` yazıyor; ham tarama `table` adlı **hayali** tabloyu beş rotada gerçek sandı.
+3. **Aynı yüklem içindeki ayrık dallar ayrıştırılamaz.** `coupons` bunun canlı örneği: tek
+   politikada hem profil-bağımlı dal hem `is_active` dalı var; moderator'ün gördüğü satır
+   ikincisinden geliyor ama betik tabloyu tek bir aileye koymak zorunda.
+4. **Görünümlerin** kendi politikası yoktur; `inventory_summary` bir aileye atfedilemez.
+5. Ölçüm **canlı prod DB'de** yapıldı; yalnız `SELECT`, her kol `begin`/`rollback` içinde,
    hiçbir yazma yok.
-4. Betiğin kendi canlı kolu bu koşuda `SUPABASE_DB_URL` ile **çalıştırılamadı** (kimlik doğrulama
-   reddi). Karnedeki sayılar Supabase MCP üzerinden **aynı SQL şekliyle** alındı; betiğin statik
-   yarısı (`--kuru`) doğrulandı. Bağlantı dizesi tazelenince uçtan uca tek komutla üretilebilir.
-   Bu satır, "betik koştu" izlenimi vermemek için burada.
+6. Betiğin **kendi canlı kolu bu koşuda çalıştırılamadı** (`SUPABASE_DB_URL` kimlik reddi).
+   Sayılar aynı SQL şekliyle Supabase MCP üzerinden alındı; statik yarı `--kuru` ile,
+   sözdizimi `node --check` ile doğrulandı. Bu satır, "betik uçtan uca koştu" izlenimi
+   doğmasın diye burada.
 
-## Tekrar üretme
+## 7. Tekrar üretme
 
 ```
 SUPABASE_DB_URL=... node scripts/db/checks/rbac-ui-db-parity.mjs --rol moderator
