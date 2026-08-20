@@ -281,6 +281,52 @@ Teklif iletilen **her** müşteri, kendi tekliflerini **korumalı girişle geçm
 verisi hiçbir statik/ISR yüzeyde görünmez, dolayısıyla `rendering-cache-standard.md`'nin
 tetik + revalidate şartı **bu modüle uygulanmaz.** Sınır şartı aynen taşınır: teklif verisi bir
 gün statik bir yüzeye çıkarsa, o PR aynı gün DB tetiği + revalidate dalını getirmek zorundadır.
+## 8.5) Ekran yerleşimi — E5 Kompozör (T133 bağı)
+
+> **Kaynak:** `erp-workspace-design-standard.md` v0 (T133-VH, commit `44def9e8`, 318 satır).
+> Bu belge yazıldığında o cetvel **henüz gönderilmemişti**; kararlar ADMIN'in 08-20 08:50
+> panosundan alındı ve dosya indiğinde birebir aynısı okunacak. Dosya inince bu bölümün
+> kaynağı **dosya adına** çevrilir.
+
+Teklif kompozörü, T133'ün beş kanonik ekran deseninden **E5 (Kompozör)**'dür ve teklif modülü
+o desenin **ilk uygulamasıdır**. ADMIN bunu adıyla işaretledi: E5 ödünç bir desen değil —
+Fiori'de ve Power Apps'te karşılığı yok, en yakın akraba (Salesforce console workspace) başka
+bir sorunu çözüyor. **Ödünç olmadığı için ilk uygulamasında şablona güvenilmez, davranış ölçülür.**
+
+**Yerleşim (Recep kararı, T133'te sabit):**
+
+| Bölge | İçerik |
+|---|---|
+| üst | durum şeridi · revizyon no · sahip · son değişiklik |
+| sol | bağlam: müşteri / proje-saha / geçmiş — **salt okunur** |
+| orta | kalem tablosu: katalog arama + katalog-dışı **hızlı pasif ürün kaydı** (§3.2) |
+| sağ | **canlı PDF önizleme** |
+| alt | eylem çubuğu: Taslak kaydet · Onaya gönder |
+
+**Dört kural (T133'ten, teklif yüzeyine bağlanmış hâli):**
+
+1. **Sonlandırıcı eylemler altta.** Üst şerit bilgi alanıdır, eylem barı değildir: üstte kimlik,
+   altta karar. Yayımlama (`draft → quoted`) alt çubuktan yapılır.
+2. **Sol sütun salt bağlamdır.** Müşteri/proje kaydı kompozörden düzenlenmez — iki farklı
+   nesneyi aynı anda yazmak kaydetme semantiğini bozar.
+3. **Sağ sütun ayrı bir rapor değildir.** Canlı PDF önizleme ortadaki verinin çıktısıdır;
+   *"Önizleme üret"* düğmesi **olmaz**, önizleme veriyle aynı anda yaşar.
+4. **Dar ekranda üç sütun yığılır, gizlenmez.** Önizleme sekmeye düşebilir; **bağlam düşemez** —
+   bağlamı gizlemek kompozörün varlık sebebini siler.
+
+⚠ **Tuzak — portal tema kapsamı.** Sağ önizleme ve katalog arama açılırları portala çıkıyorsa
+`admin-design-standard.md` §4.11'in tema kapsamı **dışında** kalır; 2026-08-19'da #659'da tam bu
+yaşandı (modal şeffaf, menü okunmaz). Önizlemeyi portal'a çıkarmadan önce o bölüm okunur.
+
+**Çok-bağlamlı çalışma (iki teklifi yan yana) v0'da YOKTUR** — ihtiyaç henüz kanıtlanmadı.
+Kompozör bağlamı tek ekranda tuttuğu için madde kapalıdır; kullanıcı iki teklifi karşılaştırmak
+zorunda kalırsa **kanıtı bu modül üretir** ve madde yeniden açılır.
+
+> **T133'ün C5 envanter maddesine cevap (kapsam bende):** ADMIN, "müşterinin siteden kendi
+> teklifini kabul edebilmesi yeni modelle çelişiyor" diye işaretledi. **Çelişmiyor** — Recep'in
+> 08-20 kabul kararı site-tıklamasını *birincil dijital kanal* olarak açıkça korur (§7.1).
+> Çelişen şey kabulün kendisi değil, kabulün **kanıtsız** olmasıydı; §7.2 onu kapatıyor.
+> Migration'lı olduğu ve Recep kapısı olduğu tespiti ise doğrudur (§16).
 ## 9) Çakışma ve fiyat tutarlılığı — UYAR, bloklama
 
 T134/8 ve /9: üç ERP'nin **hiçbiri** çakışan teklifi engellemiyor ya da uyarmıyor; deal
@@ -374,7 +420,7 @@ kesim **ölçülebilir bir bitiş kriteriyle** yazılır:
 | 8 basamaklı fiyat merdiveni (List→Net) | Bayi hattı **PARK** (Recep 08-20) | Bayi hattı parktan çıktığında |
 | Misafir (hesapsız) teklif | Kabul kanıtı oturuma dayanıyor (§7) | Ayrı bir kimlik doğrulama akışı tasarlandığında |
 | Çok-seviyeli onay zinciri | v2'de tek seviye yeter (§7.3) | Eşik iki kademeye çıktığında |
-| Ekran yerleşimi | **T133 ERP kabuğu** v0'ı bekliyor | T133 v0 merge edildiğinde bu cetvele yerleşim bölümü eklenir |
+| ~~Ekran yerleşimi~~ **DÜŞTÜ** | T133 v0 yazıldı (`44def9e8`) | §8.5 eklendi; T133 dosyası inince kaynak dosya adına çevrilir |
 | E-imza (çizim) | Clickwrap hukuken eşdeğer (§7.1) | Karşı taraf sözleşmesi çizim imza şart koşarsa |
 
 **Bu tablo bir söz senedidir:** bir kesimin bitiş kriteri sağlandığı hâlde cetvel
