@@ -1,6 +1,6 @@
 import { describe, expect,it } from 'vitest';
 
-import { canAccessPage, canWrite, isReadOnly } from '../rbac';
+import { canAccessPage, canWrite, ENTITY_TO_RESOURCE, isReadOnly, RESERVED_WRITE_ENTITIES } from '../rbac';
 
 describe('RBAC (Role Based Access Control)', () => {
     describe('canAccessPage', () => {
@@ -15,6 +15,7 @@ describe('RBAC (Role Based Access Control)', () => {
 
         it('should deny non-superadmin access to /admin/users', () => {
             expect(canAccessPage('admin', '/admin/users')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/users')).toBe(false);
             expect(canAccessPage('warehouse', '/admin/users')).toBe(false);
             expect(canAccessPage('sales', '/admin/users')).toBe(false);
             expect(canAccessPage('viewer', '/admin/users')).toBe(false);
@@ -24,20 +25,55 @@ describe('RBAC (Role Based Access Control)', () => {
             expect(canAccessPage('super_admin', '/admin/users')).toBe(true);
         });
 
-        it('should allow warehouse role access only to warehouse pages', () => {
-            expect(canAccessPage('warehouse', '/admin/inventory')).toBe(true);
-            // In ROLE_PAGE_ACCESS, '/admin' is allowed for warehouse which matches '/admin/orders' because startsWith('/admin/') is true if the allowed path is '/admin'. So warehouse CAN access /admin/orders due to the startsWith logic matching '/admin'.
-            // Actually wait, canAccessPage logic: allowedPaths.some(p => path === p || path.startsWith(p + '/'))
-            // If path is '/admin/orders', and allowed path is '/admin', it will match '/admin/orders'.startsWith('/admin/') -> true.
-            // So /admin allows access to all sub-pages. This is a flaw in the app's RBAC logic or intentional.
-            // To pass the test based on current code behavior:
-            expect(canAccessPage('warehouse', '/user/profile')).toBe(false);
+        // T134 — DUZELTILEN CANLI KUSUR. Her rolun listesinde pano girdisi ('/admin') var;
+        // eski eslestirici onu ON-EK sayiyordu, dolayisiyla '/admin/<hersey>' esliyordu ve
+        // acik liste hicbir sey kapatmiyordu. Bu blok kusurun geri gelmesini engeller.
+        describe("'/admin' pano koku ON-EK DEGILDIR", () => {
+            it('warehouse panoyu gorur ama satinalma sayfasini GORMEZ (T062 niyeti)', () => {
+                expect(canAccessPage('warehouse', '/admin')).toBe(true);
+                expect(canAccessPage('warehouse', '/admin/purchasing')).toBe(false);
+                expect(canAccessPage('warehouse', '/admin/orders')).toBe(false);
+                expect(canAccessPage('warehouse', '/admin/pricing')).toBe(false);
+            });
+
+            it('sales kendi sayfalarini gorur, fiyat/stok sayfalarini GORMEZ', () => {
+                expect(canAccessPage('sales', '/admin/orders')).toBe(true);
+                expect(canAccessPage('sales', '/admin/pricing')).toBe(false);
+                expect(canAccessPage('sales', '/admin/inventory')).toBe(false);
+            });
+
+            it('listedeki DIGER girdiler ON-EK olmaya devam eder', () => {
+                expect(canAccessPage('warehouse', '/admin/inventory/report')).toBe(true);
+                expect(canAccessPage('warehouse', '/admin/inventory/settings')).toBe(true);
+            });
         });
 
-        it('should allow viewer access to general admin pages (except users)', () => {
+        it('viewer yalniz panoyu gorur (T134: eskiden her sayfayi goruyordu)', () => {
             expect(canAccessPage('viewer', '/admin')).toBe(true);
-            expect(canAccessPage('viewer', '/admin/orders')).toBe(true);
+            expect(canAccessPage('viewer', '/admin/orders')).toBe(false);
             expect(canAccessPage('viewer', '/admin/users')).toBe(false);
+        });
+
+        // moderator artik '*' tasimiyor: RLS'in gercekten satir verdigi sayfalar acik,
+        // is_admin_user() kapisina takilanlar KAPALI (yoksa "yetkin yok" yerine
+        // "kayit yok" ekrani = sessiz-bos).
+        it('moderator RLS ile uyumlu: calisma sayfalari acik, admin-only defterler kapali', () => {
+            expect(canAccessPage('moderator', '/admin/orders')).toBe(true);
+            expect(canAccessPage('moderator', '/admin/products')).toBe(true);
+            expect(canAccessPage('moderator', '/admin/purchasing')).toBe(true);
+            expect(canAccessPage('moderator', '/admin/data-requests')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/invoices')).toBe(false);
+        });
+
+        it('admin ve super_admin genis yetkisini korur', () => {
+            expect(canAccessPage('admin', '/admin/data-requests')).toBe(true);
+            expect(canAccessPage('admin', '/admin/invoices')).toBe(true);
+            expect(canAccessPage('super_admin', '/admin/invoices')).toBe(true);
+        });
+
+        it('admin disi yollar her rolde kapali', () => {
+            expect(canAccessPage('warehouse', '/user/profile')).toBe(false);
+            expect(canAccessPage('viewer', '/user/profile')).toBe(false);
         });
     });
 
@@ -62,6 +98,56 @@ describe('RBAC (Role Based Access Control)', () => {
         it('should allow warehouse to write to logistics, but not orders', () => {
             expect(canWrite('warehouse', 'logistics')).toBe(true);
             expect(canWrite('warehouse', 'orders')).toBe(false);
+        });
+
+        // T134 — ad suruklemesi. Eski ad 'webhook' hicbir yuzeye karsilik gelmiyordu;
+        // cagrilsaydi sessizce FALSE donerdi (yaniltici butonun ters yonu: hakki olan
+        // rol butonu goremez). Gercek anahtar admin-resources.ts'te 'webhook_events'.
+        it("'webhook_events' yazilabilir, eski 'webhook' adi ARTIK YOK", () => {
+            expect(canWrite('admin', 'webhook_events')).toBe(true);
+            expect(canWrite('moderator', 'webhook_events')).toBe(true);
+            expect(canWrite('admin', 'webhook')).toBe(false);
+        });
+
+        // T134 — 'logs' silindi. Sebep "cagrilmiyor" degil: karsiligi /admin/audit-logs,
+        // yani DENETIM DEFTERI, ve defter append-only. Buraya yazma izni vermek kaniti
+        // bozan bir islemi mesrulastirir. super_admin'in '*' hakki ayri konudur.
+        it("denetim defterine ('logs') hicbir rolun ACIK yazma izni yok", () => {
+            expect(canWrite('admin', 'logs')).toBe(false);
+            expect(canWrite('moderator', 'logs')).toBe(false);
+            expect(canWrite('warehouse', 'logs')).toBe(false);
+        });
+
+        it('admin fatura ve KVKK defterine yazabilir, moderator YAZAMAZ', () => {
+            expect(canWrite('admin', 'invoices')).toBe(true);
+            expect(canWrite('admin', 'data_requests')).toBe(true);
+            expect(canWrite('moderator', 'invoices')).toBe(false);
+            expect(canWrite('moderator', 'data_requests')).toBe(false);
+        });
+    });
+
+    // T134 — ENTITY_TO_RESOURCE "bilinen varlik" SSOT'u. Buradaki assert'ler haritanin
+    // KENDI tutarliligini olcer; UI cagrisi ile matrisi karsilastiran kapi ADMIN seridinde.
+    describe('ENTITY_TO_RESOURCE + RESERVED_WRITE_ENTITIES', () => {
+        it("'users' bilinen varliktir ama hicbir matriste ACIK degil", () => {
+            expect(ENTITY_TO_RESOURCE.users).toBe('users');
+            expect(canWrite('admin', 'users')).toBe(false);
+            expect(canWrite('moderator', 'users')).toBe(false);
+        });
+
+        it('ad suruklemesi haritada gorunur: data_requests defterde camelCase', () => {
+            expect(ENTITY_TO_RESOURCE.data_requests).toBe('dataRequests');
+        });
+
+        it('rezerve varliklar haritada TANIMLI olmali (uydurma ad rezerve edilemez)', () => {
+            for (const e of RESERVED_WRITE_ENTITIES) {
+                expect(ENTITY_TO_RESOURCE[e]).toBeDefined();
+            }
+        });
+
+        it("silinen 'logs' ve eski 'webhook' adi haritada YOK", () => {
+            expect(ENTITY_TO_RESOURCE.logs).toBeUndefined();
+            expect(ENTITY_TO_RESOURCE.webhook).toBeUndefined();
         });
     });
 
