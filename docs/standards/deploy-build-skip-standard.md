@@ -372,3 +372,56 @@ diye yazılır, *ucuz* diye değil.
 (#691) düşünüldü — 13 dosyanın çoğu `.md`. Ama içinde
 `src/__tests__/conformance/eol-normalization.test.ts` var, yani **md-only değil** ve
 atlama sınıfına hiç girmiyor. Ayırt edici olmayan veri kanıt diye sunulmaz.
+
+## D13 — İKİ AYRI BÜTÇE: derleme dakikası ≠ dağıtım kotası
+
+Bu cetvel bugüne kadar "atlama tasarruf eder" derken hangi tasarruftan söz ettiğini
+söylemiyordu. 2026-08-20'de filo bu boşluğa iki kez düştü (biri bendim), o yüzden
+ayrımı cetvele yazıyorum.
+
+**İki bütçe vardır ve atlama yalnız birine dokunur:**
+
+| bütçe | atlama etkisi | neyi sayar |
+|---|---|---|
+| **Derleme dakikası** | **tasarruf eder** — iş gerçekten derlenmez | değişen içerik |
+| **Dağıtım kotası** | **tasarruf ETMEZ** | gönderim sayısı; içerik önemsiz |
+
+**Ayırt edici ölçüm** (aynı gün, iki commit yan yana):
+
+| sha | değişen dosya | KAYIT | status | açıklama |
+|---|---|---|---|---|
+| `aa257ad1` | **0** (ağaç SHA'sı ebeveyniyle aynı) | 0 | failure | `Deployment rate limited` |
+| `9224bc68` | 1 (`docs/`) | 0 | success | `Canceled by Ignored Build Step` |
+
+`aa257ad1` atlama sınıfına `9224bc68`'den **daha kesin** girer — hiç dosya
+değiştirmiyor, hiçbir içerik kuralı onu derlemeye sokamaz. Buna rağmen
+"atlandı" değil **"reddedildi"** aldı.
+
+**Hüküm: sınır, atlama kararından ÖNCE değerlendirilir.** Atlanacak bir iş bile önce
+kotaya çarpar; çarpmazsa atlanır. Dolayısıyla *"atlanan işler kota açısından bedava"*
+cümlesi **kurulamaz** — ve `KAYIT 0`'dan hiç türetilemez.
+
+### D13.1 — `KAYIT 0` tek başına yorumlanamaz
+
+`deployments?sha=` uç noktasının boş dönmesi **beş** farklı duruma karşılık gelir.
+Taksonomi ADMIN + AUTH ölçümüdür, buraya atıfla alınmıştır:
+
+| status | açıklama | kayıt |
+|---|---|---|
+| success | `Deployment has completed` | **VAR** |
+| success | `Canceled by Ignored Build Step` | yok |
+| failure | `Canceled from the Vercel Dashboard` | **VAR** |
+| failure | `Deployment rate limited` | yok |
+| *status hiç yok* | (Vercel olaydan haberi olmadı) | yok |
+
+Yani `success` görmek **dağıtıldı demek değildir**, ve `KAYIT 0` görmek
+**reddedildi demek değildir**. Ayırt eden tek alan **açıklama**dır.
+
+**Kural:** kota/pencere hesaplayan hiçbir ölçüm kayıt sayısını tek çapa olarak
+kullanmaz; çapa **commit status + açıklama**dır.
+
+**Öz-denetim notu:** bu maddenin ilk yarısını ("docs-only ucuz değil") 08-19'da
+ölçüp yayınlamıştım, ama bütçe ayrımını yapmamıştım. ADMIN aynı veriden ters yöne
+gitti ("atlanan iş bedava"). İki ölçüm çarpıştı ve **ikisi de daraldı** — doğru
+sonuç bu. Sayı ikimizde de doğruydu; eksik olan, sayının **hangi bütçeyi** saydığıydı.
+Kardeş ders: `docs/standards/measurement-discipline-standard.md` K13.
