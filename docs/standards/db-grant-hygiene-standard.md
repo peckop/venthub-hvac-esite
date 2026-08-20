@@ -102,6 +102,94 @@ Taban `rls-role-coverage-baseline.json`, her satiri gerekce + kapanis kosulu tas
 ilgilendirmez. Vitrin (`anon`) yuzeyleri ayri bir sorudur — oradaki bosluk "veri siziyor
 mu"dur, "bos mu gorunuyor" degil; ayni kapiya sikistirilmasi iki soruyu da bulaniklastirir.
 
+## 3.2 Politika VAR ve rolu KAPSIYOR — ama yuklemi hangi aileden?
+
+§3.1 "politika okuyan rolu kapsiyor mu" diye soruyor. Bekci de yalnizca bunu soruyor:
+yuklemin **icine bakmaz**. Bu bilincli bir darliktir, ama bir bedeli var ve bedeli burada
+yaziyoruz: **ayni "kapsiyor" cevabi, iki farkli mekanizmayi ortuyor.**
+
+**Olculdu (2026-08-20, canli katalog `pg_policies` + `pg_get_functiondef`).** Siniflandirma
+**(tablo, komut)** basinadir, tablo basina DEGIL: asagidaki tablo yalnizca **SELECT/ALL**
+politikalarini kapsar. Ayni tablonun yazma politikasi baska bir aileden olabilir ve
+cogu zaman oyledir (ornek: `products` okuma tarafinda rol yuklemi tasimazken yazma
+tarafinda profil JOIN'i kullanir). "Bu tablo A ailesinden" cumlesi **eksiktir**; dogru
+cumle "bu tablo SELECT'te A ailesinden"dir.
+
+| Aile | Yuklem nasil karar veriyor | Tablolar (SELECT/ALL) |
+|---|---|---|
+| **A — JWT iddiasi** | `is_admin_user()`, rolu **token claim**'inden okur | `admin_audit_log`, `data_subject_requests`, `error_groups`, `shipping_email_events`, `user_profiles`, `venthub_orders`, `venthub_quotes`, `venthub_quote_items`, `venthub_returns` |
+| **B — profil JOIN** | `is_user_admin(uid)` ya da `EXISTS ... user_profiles`, rolu **her sorguda tablodan** okur | `brands`, `coupons`, `inventory_movements`, `order_notes`, `price_lists`, `pricing_policy`, `purchase_orders`, `site_settings`, `suppliers` |
+| **C — yalniz tenant** | rol yuklemi **hic yok**, sadece `tenant_id` | `categories`, `currency_rates`, `inventory_settings`, `product_images`, `products`, `brands` (genel okuma) |
+
+### Olcum yontemi aileye gore secilir
+
+Sahte kimlik takarak olcme yontemi (`request.jwt.claims` doldur + `set local role
+authenticated` + satir say) **yalniz A ailesinde gecerlidir**. B ailesinde sahte `uid`'in
+`user_profiles`'ta satiri olmadigi icin yuklem **her zaman false** doner: tablo dolu olsa
+ve rol dogru olsa bile sonuc 0 satirdir. Yani B ailesindeki her "bu rol hicbir sey
+goremiyor" sonucu **olcum degil, yontem artifaktidir**.
+
+Negatif kontrol bu korlugu **gizler**: "admin'de true, moderator'de false" kontrolu
+A ailesinden secilirse gecer ve B ailesindeki korluk hakkinda hicbir sey soylemez.
+**Kontrol kolu, kor olunan aileden secilmelidir.**
+
+### Iki aile bagimsiz iki otorite DEGILDIR
+
+Her ikisinin de nihai kaynagi ayni kolondur: `user_profiles.role`. Fark **kaynakta degil
+zamandadir**, ve mekanizma canli govdelerden okundu:
+
+- `custom_access_token_hook` **token uretilirken** `user_profiles`'tan rolu okuyup claim'e
+  basar (profil satiri yoksa `user` damgalar — fail-closed).
+- Dolayisiyla **A ailesi rolun token anindaki halini** gorur ve token yenilenene kadar
+  **donmus** kalir; **B ailesi her sorguda yeniden** degerlendirir.
+
+**BULGU — davranisla kapatildi (2026-08-20, canli prod, salt-okunur, geri alindi).**
+Cikarim once fonksiyon govdelerinden turetildi, sonra **uc kolla** olculdu; ayni kimlik,
+yalniz claim ile profil uyusmazligi degistirildi:
+
+| Kol | Durum | A ailesi | B ailesi |
+|---|---|---|---|
+| S1 | Jeton ESKI-DUSUK rol tasiyor, profil YUKSEK (yukseltme jetona islememis) | `false` | `true` |
+| S2 | Jeton ESKI-YUKSEK rol tasiyor, profil desteklemiyor (**dusurme** jetona islememis) | **`true`** | `false` |
+| Kontrol | claim ile profil UYUMLU | `true` | `true` |
+
+**Kontrol kolu sarttir:** onsuz "bu iki fonksiyon zaten hep ayrisir" denebilirdi. Uyumluyken
+ikisi de ayni cevabi veriyor — demek ki ayrisma fonksiyonlardan degil **uyusmazligin
+kendisinden** geliyor.
+
+Iki sonuc:
+
+1. **Bolunmus beyin.** Rol degistiginde A ailesindeki dokuz yuzey eski rolle, B ailesindeki
+   dokuz yuzey yeni rolle cevap verir. Ne hata ne uyari cikar; sadece bazi ekranlar dolu,
+   bazilari bos gorunur.
+2. **Yetki dusurme A ailesinde ANINDA ETKILI DEGILDIR (S2).** Jeton hala `admin` iddia
+   ettigi surece `is_admin_user()` **true** donmeye devam eder — profil artik desteklemese
+   bile. Yaricapi yukaridaki A listesidir: dokuz tablo.
+
+**Olculmeyen, acikca:** bayat claim'in **ne kadar sure** tasindigi. Jeton TTL'i ve yenileme
+davranisi auth servisindedir, DB'den olculemez. Dogru cumle: *pencere VAR ve uzunlugu jeton
+yenilenmesine baglidir*; "X dakika" **denemez**.
+
+**Siddet kalibrasyonu:** bugun sistemde rol degistirilecek kullanici yok (`user_profiles` =
+2 satir, ikisi de `super_admin`), yani pencere bugun **hic acilmiyor — LATENT**. Faz-2 /
+bayi acilisindan once kapatilmalidir. Cozum bu cetvelin isi degildir ve iki secenek de urun
+karari ister: jeton omrunu kisaltmak, ya da rol degisiminde oturumu zorla sonlandirmak
+(refresh token iptali).
+
+### Uyari — A/B ayriminin kendi onkosulu var
+
+Bu ayrim, "**JWT icinde `user_role` claim'i VAR**" varsayimina dayanir; claim'i basan sey
+`custom_access_token_hook`'tur. Hook'un **var oldugu** ve `supabase_auth_admin`'in EXECUTE
+yetkisinin bulundugu olculdu — ama bunlar **vekildir, kanit degil**: izin verilmis olup hook
+panelde kapali olabilir ve `auth` semasinda bunu gosteren bir yapilandirma tablosu yoktur.
+Kesin test gercek bir oturumun jetonuna bakmaktir; **SQL'den dogrulanamaz**.
+
+Hook kapaliysa claim hic basilmaz, `is_admin_user()` ilk daldan gecemez ve **profil aramasina
+duser** — yani gercek oturumlarda A ailesi de fiilen B gibi calisir. Bu durumda sahte-claim
+ile yapilan her olcum, gercek kullanicinin **hic girmedigi** bir yolu olcmus olur. Bu yuzden
+A/B ayrimina dayanan her hukum, hook'un durumunu **olculmemis onkosul** olarak yaninda
+tasimalidir.
+
 ## 4. Tehlike sinifi: latent yetki
 
 Bugun bir view'a yazilamiyor olmasi, yetkinin zararsiz oldugu anlamina gelmez.
