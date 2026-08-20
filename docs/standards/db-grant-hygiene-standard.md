@@ -57,6 +57,51 @@ degerlendirilecegini soyler; view'in kendisine erisimi kapatmaz). Dolayisiyla:
 | Tablo | RLS politikasi | kabul edilir (model boyle) |
 | View  | **GRANT** | **kabul edilmez** — tek tek geri alinir |
 
+## 3.1 Tablonun kapisi ACIK KALABILIR: politika OKUYAN ROLE yazilmamis olabilir
+
+Yukaridaki tablo "tabloda kapi RLS politikasidir" diyor. Eksik olan sey su: **politika
+var olmasi yetmez, OKUYAN ROLU kapsamasi gerekir.** Kapsamiyorsa sorgu hata vermez —
+bos doner. Yuzey "kayit yok" gosterir, log temizdir, kimse bakmaz.
+
+**Olculmus vaka (2026-08-20, canli prod).** `client_errors` tablosunda iki politika var:
+`merged_client_errors_service_role_select` ve `service_role_only`. **Ikisi de yalniz
+`service_role` icin.** `authenticated` icin SELECT'e izin veren tek politika yok — ve
+admin hata sayfasi bu tabloyu `authenticated` ile okuyor. Sonuc: **39 gercek hata,
+ekranda SIFIR.** Kardes tablo `error_groups` ayni sinifta degil, cunku onun politikasi
+`authenticated` + `is_admin_user()`.
+
+Yazma yolu saglikliydi: hata kaydeden uc `service_role` ile yaziyor, yani boru CALISIYOR.
+Bozuk olan yalniz **pencere**. Gozlemlenebilirlik yuzeyinde en pahali bicim budur: sistem
+"hata yok" der, cunku hatalari GOSTEREMEZ — gormedigi icin degil.
+
+### Kuralin iki kez daraltilmasi (kapi tasarimi icin kritik)
+
+Bu sinifi olcen kural iki kez yanlis kuruldu; ikisi de rakamla curudu:
+
+| Kural | Bulgu | Niçin yanlis |
+|---|---|---|
+| "RLS acik + GRANT var + politika YOK" | 1 tablo | `client_errors`'i **kacirir** (orada politika VAR, ama yanlis rol icin) |
+| "(komut, rol) bazli kapsama yok" | 16 cift | Cogu **dogru tasarim**: `payment_transactions`'ta `authenticated`, `suppliers`/`purchase_orders`'ta `anon` zaten okumamali |
+| **"kodda okuyan yuzey VAR + okuyan rolun politikasi YOK"** | **1 bulgu** | dogru: kesisim, gurultuyu sifirlar |
+
+**Cikarim — cetvele giren asil cumle:** politika yoklugu **tek basina kusur degildir**,
+cogu zaman guvenli haldir (varsayilan ACL genis, RLS dogru sekilde engeller). Kusur,
+**kodun okudugu ile DB'nin izin verdigi ayrildiginda** dogar. Bu yuzden bu soru semaya
+tek basina sorulamaz; **kod ile kesistirilmeden sorulursa gurultu uretir ve kapi susturulur.**
+
+### Bekci
+
+`scripts/db/checks/rls-role-coverage.mjs` (INV-RLS-COVERAGE-1) — yonetim yuzeylerinin
+`.from()` ile okudugu tablolari cikarir, canli semada `authenticated` icin SELECT'e izin
+veren politika olup olmadigina bakar, tabanin disindaki her yeni ihlalde kirmizi olur.
+Taban `rls-role-coverage-baseline.json`, her satiri gerekce + kapanis kosulu tasir ve
+**yalniz kucululur**. Olcemedigi hallerde (baglanti yok, kod taramasi bosaldi) kapi
+**yesil DONMEZ**, cikis 2 verir.
+
+**Kapsam disi ve nicin:** Edge fonksiyonlari `service_role` ile okur, RLS onlari
+ilgilendirmez. Vitrin (`anon`) yuzeyleri ayri bir sorudur — oradaki bosluk "veri siziyor
+mu"dur, "bos mu gorunuyor" degil; ayni kapiya sikistirilmasi iki soruyu da bulaniklastirir.
+
 ## 4. Tehlike sinifi: latent yetki
 
 Bugun bir view'a yazilamiyor olmasi, yetkinin zararsiz oldugu anlamina gelmez.
