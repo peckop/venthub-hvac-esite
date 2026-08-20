@@ -56,7 +56,7 @@ kendisini eklemek insanın işidir ve PR incelemesinde aranır.
 |---|---|---|---|---|---|
 | 1 | Zorunlu yasal onaylar alınmadan ödeme başlamaz | Mesafeli Satış Sözl. §4 | `validateLegalConsents` + INV-LEGAL-1 | Kod | ✅ |
 | 2 | Analitik/pazarlama çerezleri yalnız açık rızayla | Çerez Politikası | Rıza kapısı + INV-LEGAL-2 | Kod | ✅ |
-| 3 | Fatura, beyan edilen bilgilere göre düzenlenir | Mesafeli Satış Sözl. §5 | §2 köprü prosedürü | Manuel | 🟡 köprü |
+| 3 | Fatura, beyan edilen bilgilere göre düzenlenir | Mesafeli Satış Sözl. §5 | §2 köprü prosedürü + `order_invoices` defteri (T132-VH, **hedef: bu PR ile geliyor**) + INV-INVOICE-1 | Manuel kesim + kod defter | 🟡 köprü — kesim elle, **kayıt mekanik** |
 | 4 | KVKK talepleri 30 gün içinde ücretsiz sonuçlandırılır | KVKK Aydınlatma | §3 prosedürü + `/admin/data-requests` defteri (T063) + veri sahibi kanalı (§3.6) | Kod + Manuel | 🟡 kanal adresi Recep'te |
 | 5 | Cayma hâlinde bedel 14 gün içinde iade edilir | Mesafeli Satış Sözl. §7 | `iyzico-refund` (T053-VH) | Kod | 🔴 EDGE-REFUND şeridinde |
 | 6 | Teslimat süresi / kargo firması / iade adresi | Sözl. §6, §7 | `legal.ts` alanları | Konfigürasyon | 🔴 yer tutucu |
@@ -116,16 +116,39 @@ karşılamak ve bu sırada satışı bloke etmemek.
 
 **Adımlar:**
 
-1. **Tespit (günde en az bir kez, iş günü).** Admin panelindeki sipariş listesinden
-   `payment_status='paid'` ve henüz faturalanmamış siparişler okunur.
+1. **Tespit (günde en az bir kez, iş günü).** Ödemesi tamamlanmış ama defterde satırı
+   olmayan siparişler `view_admin_uninvoiced_orders` görünümünden okunur
+   (**hedef: T132-VH ile geliyor**). Süzme DB tarafındadır ve bu bilinçlidir: "faturalandı
+   mı" sorusu istemcide hesaplanırsa sayfalama ile birlikte yanlış cevap verir — o sayfada
+   görünmeyen bir fatura satırı yüzünden faturalı sipariş "faturasız" listelenir.
 2. **Fatura kimliği kontrolü.** Siparişin `invoice_type` ve `invoice_info` alanları
    dolu ve geçerli mi? Değilse → adım 6.
 3. **Kesim.** Entegratör panelinde e-arşiv faturası düzenlenir. Kalemler, birim fiyatlar
    ve toplam **siparişin snapshot alanlarından** okunur — vitrindeki güncel fiyattan değil
    (fiyat değişmiş olabilir; fatura sipariş anındaki bedeli gösterir).
 4. **İletim.** Fatura PDF'i müşterinin sipariş e-postasına gönderilir.
-5. **Kayıt.** Sipariş, faturalandı olarak işaretlenir (köprü döneminde `payment_debug`
-   içine `invoice_no` + `invoice_date`; kalıcı çözümde `invoices` tablosu).
+5. **Kayıt.** Fatura, `order_invoices` defterine **bir satır** olarak yazılır
+   (**hedef: T132-VH ile geliyor**): `invoice_no`, `invoice_date`, `invoice_type` anlık
+   görüntüsü ve kesen kullanıcı. **"Faturalandı" bir bayrak değildir** — işaret, defterde
+   satırın VARLIĞIDIR; `venthub_orders` üzerine `is_invoiced` benzeri bir kolon eklenmez.
+
+   > **Karar kaydı (2026-08-20, Recep).** Bu maddenin önceki hâli köprü döneminde kaydı
+   > `payment_debug` JSON'una yazmayı söylüyordu. O kolonu **ödeme ve iade yolları da**
+   > yazar; aynı sınıf bir gün önce T114-VH'de ölçüldü — koruması olmayan bir değer
+   > sessizce ezildi. Yasal delil, paylaşılan bir yazıcının kolonunda yaşamaz. Ayrıca
+   > JSON'da fatura numarası tekilliği zorlanamaz ve "hangi ödenmiş sipariş faturalanmadı"
+   > sorusu indekssiz tarama olur.
+
+   Defterin üç kilidi ve her birinin **nerede durduğu**:
+
+   | Kilit | Nerede | Niçin orada |
+   |---|---|---|
+   | Fatura numarası tekil | `lower(btrim(invoice_no))` üzerinde UNIQUE indeks | Aynı numaranın iki siparişe yazılması vergi hukukunda ciddi kusurdur; tekillik ham kolonda kurulursa boşluk veya büyük-küçük harf farkıyla delinir |
+   | Ödenmemiş siparişe fatura kesilemez | **Tetik** — politikanın `WITH CHECK`'i değil | Politika yalnız kendi yolunu bağlar; tetik **tüm** yolları bağlar: admin ekranı, servis, ileride otomatik kesim ve elle SQL dahil. Defteri hiçbir yol atlayamamalı |
+   | Yasal kayıt değiştirilemez | RLS — UPDATE/DELETE politikası **yok** | Düzeltme yolu iptal + yeni satırdır. İptal v1 kapsamı dışındadır ve adıyla dışarıdadır: geldiğinde `cancelled_at` + `cancel_reason` eklenir |
+
+   Bekçi: **INV-INVOICE-1** (`src/__tests__/conformance/invoice-ledger-contract.test.ts`)
+   bu üç kilidin ve bu maddenin geri kaymasını engeller.
 6. **Eksik kimlik hâli.** Fatura bilgisi eksik/geçersizse müşteriye e-posta ile sorulur;
    yanıt gelene kadar sipariş **kargolanmaz**. (Bu hâlin hiç oluşmaması için §4'teki
    doğrulama zorunludur — köprünün en kırılgan yeri burasıdır.)
@@ -140,7 +163,9 @@ iade e-postası müşteriye gitmeden ÖNCE yapılır (aksi hâlde müşteri elin
 faturayla, iadesi işlenmemiş bir kayıt kalır).
 
 **Bitiş kriteri (köprü ne zaman kapanır).** Aşağıdakilerin üçü birden sağlandığında:
-(a) `invoices` tablosu + `payment_status='paid'` dalından tetiklenen otomatik kesim canlı,
+(a) `order_invoices` defteri canlı **ve** `payment_status='paid'` dalından tetiklenen
+**otomatik kesim** çalışıyor — defterin tek başına var olması köprüyü kapatmaz, T132 sonrası
+kesim hâlâ elle yapılır,
 (b) başarısız kesimler için yeniden deneme kuyruğu var ve gözlemlenebilir,
 (c) fatura bağlantısı müşteri e-postasında ve hesap sayfasında görünüyor.
 Üçü sağlanana kadar §1 tablosundaki 3 numaralı satır 🟡 kalır.

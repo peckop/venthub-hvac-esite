@@ -43,9 +43,18 @@
 
 ### Bugünkü kapsama (ölçüldü 2026-08-19, T021-VH)
 
-Kodda `trackEvent()` çağrı yeri **üçtür** ve tamamı gezinme/içerik olayıdır:
+Kodda `trackEvent()` çağrı yeri ölçüldüğünde **üçtü** ve tamamı gezinme/içerik olayıydı:
 `StickyHeader.tsx` (2) · `CaseStudySection.tsx` (1). Yukarıdaki **ticaret hunisinin on olayının
-hiçbiri bağlı değildir** — `purchase` ve `lead_submit` dâhil.
+hiçbiri bağlı değildi** — `purchase` ve `lead_submit` dâhil.
+
+**Güncelleme (aynı gün):** `calculator_used` bağlandı — dört hesaplayıcı sayfası
+(`views/calculators/`), paylaşılan `useCalculatorUsage` hook'u üzerinden. Geri sayım
+**10 → 9**. Ölçümün doğru olması için önemli bir ayrıntı: hesaplayıcıların girdileri
+**varsayılan değerle** doluyor ve sonuç sayfa açılır açılmaz hesaplanıyor; "ilk geçerli
+sonuçta ateşle" deseydik olay sayacı **sayfa görüntülemesini** sayardı ve GA4'te "hesaplayıcı
+kullanımı" diye okunurdu. Bu yüzden taban çizgisi mount anıdır ve olay, kullanıcı bir girdiyi
+gerçekten değiştirip değişim durulunca, mount başına en fazla bir kez gider. Bu davranış
+statik kapıyla görülemez, `src/hooks/__tests__/useCalculatorUsage.test.ts` ile ölçülür.
 
 Bunun pratik sonucu GA4 kimliği env'e konulduğu gün ortaya çıkar: ölçüm "açılmış" olur ama GA4'e
 yalnızca menü tıklamaları akar, dönüşüm hunisi **boş** görünür. Boş huni "satış yok"tan ayırt

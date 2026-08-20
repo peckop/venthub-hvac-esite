@@ -32,18 +32,6 @@ const KOK = process.cwd()
  */
 const MUAFIYETLER: ReadonlyArray<{ paket: string; peer: string; gerekce: string }> = [
   {
-    paket: 'react-day-picker',
-    peer: 'date-fns',
-    gerekce:
-      'Olculdu 2026-08-19: react-day-picker@8.10.1 date-fns ten 31 adlandirilmis sembol + enUS/es locale ithal ediyor; kurulu date-fns@4.1.0 icinde EKSIK EXPORT YOK. v9 a cikmak icin olculmus bir kusur gerekiyor, beyan tek basina yetmez. BILINCLI BORC.',
-  },
-  {
-    paket: 'react-day-picker',
-    peer: 'react',
-    gerekce:
-      'Olculdu 2026-08-19: react-day-picker@8.10.1 yalnizca ^16.8 || ^17 || ^18 beyan ediyor, kurulu react 19.0.0 — paket React 19 destegini HIC beyan etmiyor. Admin tarih filtresi calisiyor (DateRangePicker, AdminInventoryReportPage, MovementsTableBody) ama bu DAVRANIS kaniti degil, yalnizca cokmedigi gozlemi. BILINCLI BORC.',
-  },
-  {
     paket: '@eslint/js',
     peer: 'eslint',
     gerekce:

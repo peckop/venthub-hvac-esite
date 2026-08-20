@@ -36,7 +36,7 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
  */
 const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'],
-    admin: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing', 'purchasing', 'data_requests'],
+    admin: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing', 'purchasing', 'data_requests', 'invoices'],
     // 'data_requests' BILEREK yalniz admin'de (+ super_admin '*'): RLS is_admin_user()
     // moderator'u kabul ETMEZ; moderator'a yazma izni vermek yalniz yaniltici buton uretirdi.
     moderator: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing', 'purchasing'],
@@ -67,6 +67,16 @@ export function canAccessPage(role: UserRole | null | undefined, path: string): 
     // "yetkin yok" yerine "kayıt yok" ekranı = SESSİZ-BOŞ. UI izni DB izninin ötesine
     // geçemez (INV-KVKK-1 R3; aynı sınıf hata T062'de warehouse'ta yaşandı).
     if (path.startsWith('/admin/data-requests') && role !== 'admin' && role !== 'super_admin') {
+        return false;
+    }
+
+    // T132 — fatura defteri: `order_invoices` RLS politikaları `is_admin_user()`'a bağlı.
+    // Canlı tanım 2026-08-20'de prod'dan okundu: `user_role IN ('admin','super_admin')`.
+    // moderator ve viewer burada '*' taşıdığı için sayfayı AÇABİLİRDİ ama RLS tek satır
+    // vermezdi → "yetkin yok" yerine "kayıt yok" ekranı = SESSİZ-BOŞ. Aynı sınıf iki kez
+    // yaşandı (T062 warehouse/purchasing, T063 moderator/KVKK); üçüncüsünü kapıda
+    // durduruyoruz. UI izni DB izninin ötesine geçemez (INV-INVOICE-1 R7).
+    if (path.startsWith('/admin/invoices') && role !== 'admin' && role !== 'super_admin') {
         return false;
     }
 

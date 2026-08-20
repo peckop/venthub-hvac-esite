@@ -11,6 +11,7 @@ import { dataTable } from './dataTable.tr'
 import { errorGroups } from './errorGroups.tr'
 import { errors } from './errors.tr'
 import { inventory } from './inventory.tr'
+import { invoices } from './invoices.tr'
 import { logistics } from './logistics.tr'
 import { menu } from './menu.tr'
 import { movements } from './movements.tr'
@@ -41,6 +42,7 @@ export const admin = {
   dataTable,
   users,
   inventory,
+  invoices,
   orders,
   dashboard,
   errors,
