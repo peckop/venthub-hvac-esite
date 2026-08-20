@@ -363,21 +363,27 @@ katmanda değil.
 3. D9 ("kota reddi bir COMMIT harcar") ile birlikte okunur: **reddedilen gönderim de
    maliyetlidir**, yani tekrar denemek maliyeti ikiye katlar, sıfırlamaz.
 
-**Ayırt ederek — hâlâ ÖLÇÜLMEMİŞ olan:** yukarıdaki, **reddin** atlama kararından önce
-geldiğini kanıtlar. **Başarılı** bir atlanan dağıtımın kotadan bir birim düşüp düşmediğini
-kanıtlamaz. Ayrı sorudur ve cevabı için bir slot harcamaya değmez; buraya *bilinmiyor*
-diye yazılır, *ucuz* diye değil.
+**Ayırt ederek — ne kanıtlandı, ne kanıtlanmadı:** yukarıdaki, **reddin** atlama
+kararından önce geldiğini kanıtlar. **Başarılı** bir atlanan dağıtımın kotadan bir birim
+düşüp düşmediğini kanıtlamaz.
+
+2026-08-20 ölçümü bu açık soruyu **daralttı ama kapatmadı**: atlanan iş `deployments`
+listesine hiç girmiyor (`9224bc68` → `KAYIT 0`, açıklama `Canceled by Ignored Build
+Step`). Buradan "demek ki kotadan düşmüyor" sonucu **çıkarılamaz** — o liste kotanın
+sayacı değildir, vekildir. Vekili asıl şeyin yerine koymak bu depoda daha önce yanılttı.
+Soru hâlâ açık ve buraya *bilinmiyor* diye yazılır, *ucuz* diye değil.
 
 **Kullanılmayan veri, niçin kullanılmadığı da yazılıyor:** ikinci örnek olarak `37cdc2d9`
 (#691) düşünüldü — 13 dosyanın çoğu `.md`. Ama içinde
 `src/__tests__/conformance/eol-normalization.test.ts` var, yani **md-only değil** ve
 atlama sınıfına hiç girmiyor. Ayırt edici olmayan veri kanıt diye sunulmaz.
 
-## D13 — İKİ AYRI BÜTÇE: derleme dakikası ≠ dağıtım kotası
+### D13.1 — İki ayrı bütçe: derleme dakikası ≠ dağıtım kotası
 
-Bu cetvel bugüne kadar "atlama tasarruf eder" derken hangi tasarruftan söz ettiğini
-söylemiyordu. 2026-08-20'de filo bu boşluğa iki kez düştü (biri bendim), o yüzden
-ayrımı cetvele yazıyorum.
+D13 "atlama ucuz değildir" diyor; bu madde **hangi** bütçeden söz ettiğini söylüyor.
+2026-08-20'de filo tam bu boşluğa iki ayrı yönden düştü — biri bendim ("ucuz değil",
+bütçe adı verilmeden), biri ADMIN'di ("atlanan iş bedava", `KAYIT 0`'dan türetilerek).
+İki ölçüm çarpıştı ve ikisi de daraldı.
 
 **İki bütçe vardır ve atlama yalnız birine dokunur:**
 
@@ -401,7 +407,7 @@ değiştirmiyor, hiçbir içerik kuralı onu derlemeye sokamaz. Buna rağmen
 kotaya çarpar; çarpmazsa atlanır. Dolayısıyla *"atlanan işler kota açısından bedava"*
 cümlesi **kurulamaz** — ve `KAYIT 0`'dan hiç türetilemez.
 
-### D13.1 — `KAYIT 0` tek başına yorumlanamaz
+### D13.2 — `KAYIT 0` tek başına yorumlanamaz
 
 `deployments?sha=` uç noktasının boş dönmesi **beş** farklı duruma karşılık gelir.
 Taksonomi ADMIN + AUTH ölçümüdür, buraya atıfla alınmıştır:
@@ -420,7 +426,7 @@ Yani `success` görmek **dağıtıldı demek değildir**, ve `KAYIT 0` görmek
 **Kural:** kota/pencere hesaplayan hiçbir ölçüm kayıt sayısını tek çapa olarak
 kullanmaz; çapa **commit status + açıklama**dır.
 
-### D13.2 — Ölçüm aracının kendisi sessizce kör olabilir: KISA SHA tuzağı
+### D13.3 — Ölçüm aracının kendisi sessizce kör olabilir: KISA SHA tuzağı
 
 `deployments?sha=` **kısa SHA kabul etmez ve hata da vermez** — boş dizi döner.
 Aynı commit, aynı an, iki ölçüm:
