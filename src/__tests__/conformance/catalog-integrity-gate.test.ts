@@ -95,13 +95,16 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
       'utf8',
     )
     // Kapı işi bir ön-kontrole BAĞLI olmalı ve yalnız sırlar tamken koşmalı.
-    expect(wf).toMatch(/needs:\s*catalog-integrity-precheck/)
-    expect(wf).toMatch(/if:\s*needs\.catalog-integrity-precheck\.outputs\.ready == 'true'/)
+    // 2026-08-20 (T138 - EDGE): on-kontrolun adi `catalog-integrity-precheck` -> `db-gate-precheck`
+    // oldu. Sebep KAPSAM: ayni on-kontrol artik INV-RLS-COVERAGE-1 isini de besliyor ve eski ad
+    // yaptigi isi ANLATMIYORDU. Sozlesme daralmadi - bag hala ZORUNLU, yalniz adi dogrulandi.
+    expect(wf).toMatch(/needs:\s*db-gate-precheck/)
+    expect(wf).toMatch(/if:\s*needs\.db-gate-precheck\.outputs\.ready == 'true'/)
     // Ön-kontrol İKİ sırrı da aramalı; birini unutmak kapıyı yarı-kör bırakır.
     // DİKKAT: düz `toContain` yetmez — sabotajda `SUPABASE_CA_CERTX` yazdım ve iddia yeşil kaldı
     // (üst-dize tuzağı). Bu yüzden (a) yalnız ÖN-KONTROL bloğuna bakılır, (b) sırrın tam
     // kullanımı aranır, (c) sırların gerçekten SINANDIĞI kabuk koşulu aranır — adı geçmesi değil.
-    const precheckStart = wf.indexOf('catalog-integrity-precheck:')
+    const precheckStart = wf.indexOf('db-gate-precheck:')
     const precheck = wf.slice(precheckStart, wf.indexOf('  catalog-integrity:', precheckStart + 1))
     expect(precheck.length).toBeGreaterThan(0)
     expect(precheck.includes('secrets.SUPABASE_DB_URL }}'), 'SUPABASE_DB_URL ön-kontrolde yok').toBe(true)
@@ -140,8 +143,21 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     expect(wf).not.toMatch(/secrets\.SUPABASE_CA_CERT/)
     // PGSSLROOTCERT tek bir yerden, DEPO dosyasından beslenmeli.
     const assignments = wf.match(/PGSSLROOTCERT=[^\n]*/g) ?? []
-    expect(assignments.length, 'PGSSLROOTCERT tam olarak bir kez atanmalı').toBe(1)
-    expect(assignments[0]).toContain('scripts/db/checks/supabase-root-2021-ca.pem')
+    //
+    // 2026-08-20 (T138 - EDGE) - sayi 1'den "en az 1 ve HEPSI ayni depo dosyasi"na cevrildi.
+    // NICIN BU GEVSEME DEGIL: korunmak istenen sey atama SAYISI degil, kok sertifikanin
+    // KAYNAGIYDI ("tek bir yerden ... beslenmeli"). Workflow'a ikinci bir DB kapisi
+    // (INV-RLS-COVERAGE-1) eklendi ve o da ayni depo dosyasini disa aktariyor; sabit sayi
+    // burada gercek degismezin YERINE GECEN bir vekildi. Yeni iddia daha SERT: tek bir atama
+    // bile depo dosyasinin disini gosterirse KIRMIZI olur - eski halde ikinci atamanin nereyi
+    // gosterdigi hic sorulmuyordu. Sirla-ezme yolu ayrica ustteki `secrets.SUPABASE_CA_CERT`
+    // iddiasiyla kapali; bu iki iddia birbirinin yedegi.
+    expect(assignments.length, 'PGSSLROOTCERT hic atanmamis - kapi dogrulanmamis kokle kosar').toBeGreaterThan(0)
+    for (const atama of assignments) {
+      expect(atama, 'PGSSLROOTCERT depo dosyasi DISINDA bir kaynagi gosteriyor').toContain(
+        'scripts/db/checks/supabase-root-2021-ca.pem',
+      )
+    }
   })
 
   it('kapı, doğrulanmamış TLS ile prod DB\'ye bağlanmaz', () => {
