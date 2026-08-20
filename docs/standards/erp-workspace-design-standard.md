@@ -286,13 +286,23 @@ kaydedilen bir görünüm nesnesi yok. Üç dış sistemin üçünde de var.
 **Geri alma planı:** yokluk, yanlışlık değil — E1 bunu **hedef** olarak koyar, borç olarak
 işaretlenir. Kapatılması ayrı iş emri ister.
 
-### Ç5 — Müşteri kendi teklifini kabul edebiliyor · **yeni modelle çelişir**
+### Ç5 — Müşterinin kabulü KANITSIZ · *(çelişen davranış değil, eksik kanıt)*
 
-OPS-AUDIT 08-20 kaydı: `quotes_update_customer_decision` politikası + `quoted → accepted` müşteri
-geçişi canlıda. Yeni modelde kabul **insan onaylıdır**. Sepet/PDP "teklif iste" girişleri kalır
-(talep girdisi), **kabul yetkisi** kalkar. **Migration'lı → Recep kapısı.**
+**Bu maddeyi AUTH düzeltti ve düzeltme haklı; ilk yazdığım hâli yanlıştı.**
 
-*(Bu kalem AUTH/T131'in kapsamındadır, buraya çelişki envanteri tam olsun diye yazıldı.)*
+Yanlış yazmıştım: *"müşterinin siteden kendi teklifini kabul edebilmesi yeni modelle çelişiyor."*
+**Çelişmiyor.** Recep'in 08-20 kabul-mekanizması kararı site tıklamasını **birincil dijital kanal**
+olarak açıkça koruyor: kabul **tek kavramdır**, üç kanalı vardır — site · e-posta beyanı · telefon.
+
+Çelişen şey kabulün **kendisi** değil, kabulün **kanıtsız** olması: bugün yalnız `status` yazılıyor;
+damga, IP, kanal, beyan sürümü ve revizyon bağı **hiçbiri tutulmuyor**. Yani "kim, ne zaman, hangi
+kanaldan, hangi revizyonu kabul etti" sorusunun canlıda cevabı yok.
+
+**Yön:** mevcut politika geri alınmaz, **sertleştirilir** (AUTH'un quote cetveli §7.2, beş şart).
+**Migration'lı → Recep kapısı.** *(Kalem AUTH/T131 kapsamındadır; envanter tam olsun diye burada.)*
+
+**Bu düzeltmenin dersi bu cetvele de yazılıyor:** bir davranışı "çelişiyor" diye işaretlemeden önce
+onu **yürüten kararı** okumak gerekir. Ben ekranı ölçüp kararı okumadan hüküm kurdum.
 
 ---
 
