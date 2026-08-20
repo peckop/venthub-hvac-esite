@@ -198,8 +198,13 @@ onarılmıyor, hepsi ayrı iş emri ister:
 | 3 | `shipping_idempotency` tablosu **yalnız yazılıyor, hiç okunmuyor** — adı "idempotency" olan tablo sıfır idempotency veriyor (`admin-update-shipping:287-298`, dosyada başka geçiş yok) | EDGE | EDGE |
 | 4 | `order_email_events`'te `tenant_id` yok | canlı DB + migration | EDGE/ALTYAPI |
 | 5 | `order_email_events`/`shipping_email_events` başarısızlığı yazmıyor | canlı DB | EDGE |
-| 6 | `order-confirmation` metinleri gömülü Türkçe | satır 167, 176-183 | I18N (bende) |
+| 6 | `order-confirmation` metinleri gömülü Türkçe | satır 167, 176-183 | kural I18N · **dosya EDGE** |
 | 7 | `delivery-notification` kaydını kargo defterine yazıyor | satır 162 | EDGE |
+
+**Sahiplik notu:** 6 numaralı kalemin *kuralı* I18N'e (sözlük + CLAUDE.md Kural 7), *dosyası*
+EDGE'e aittir (`supabase/functions/**` EDGE'in şerit talebinde). Onarım tek şeritte bitmez;
+sözlük anahtarlarını I18N verir, uca EDGE işler. Bunu ayrı yazıyorum çünkü tabloda tek bir
+şerit adı yazmak işi yanlış adrese yollar.
 
 **Not:** 3 numaralı bulgu bu cetvelin kapsamının dışında (kargo yazma işlemi, bildirim değil)
 ama **aynı sınıfın** en keskin örneği olduğu için buraya yazıldı: defterin adı korumayı
