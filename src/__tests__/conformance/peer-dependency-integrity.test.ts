@@ -31,18 +31,10 @@ const KOK = process.cwd()
  * kör eden en sinsi şeydir. (Cetvel §4.)
  */
 const MUAFIYETLER: ReadonlyArray<{ paket: string; peer: string; gerekce: string }> = [
-  {
-    paket: 'react-day-picker',
-    peer: 'date-fns',
-    gerekce:
-      'Olculdu 2026-08-19: react-day-picker@8.10.1 date-fns ten 31 adlandirilmis sembol + enUS/es locale ithal ediyor; kurulu date-fns@4.1.0 icinde EKSIK EXPORT YOK. v9 a cikmak icin olculmus bir kusur gerekiyor, beyan tek basina yetmez. BILINCLI BORC.',
-  },
-  {
-    paket: 'react-day-picker',
-    peer: 'react',
-    gerekce:
-      'Olculdu 2026-08-19: react-day-picker@8.10.1 yalnizca ^16.8 || ^17 || ^18 beyan ediyor, kurulu react 19.0.0 — paket React 19 destegini HIC beyan etmiyor. Admin tarih filtresi calisiyor (DateRangePicker, AdminInventoryReportPage, MovementsTableBody) ama bu DAVRANIS kaniti degil, yalnizca cokmedigi gozlemi. BILINCLI BORC.',
-  },
+  // 2026-08-20: liste BOS ve bu bir hata degil, olculmus bir durum. Uc muafiyetin ucu de
+  // KENDI onarimlariyla dustu: react-day-picker -> {date-fns, react} ikilisi #698 in v9
+  // yukseltmesiyle, @eslint/js -> eslint ise bu daldaki surum hizalamasiyla. Yani su an
+  // depoda BILINEN peer ihlali YOK; yeni bir ihlal dogarsa kapi dogrudan kirmizi verir.
 ]
 
 type Surum = { ana: number; orta: number; kucuk: number; on: string | null }

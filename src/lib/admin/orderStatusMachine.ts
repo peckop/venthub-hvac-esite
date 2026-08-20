@@ -12,7 +12,26 @@
  * hangi hedefi kabul edeceğini belirler hem de mutasyonu KORUR.
  */
 
-/** Kanban'ın kullandığı efektif statüler (DB status + ödeme kaynaklı türevler). */
+/**
+ * Kanban'ın kullandığı **efektif** statüler.
+ *
+ * ⚠ BU BİR SSOT DEĞİL, **BİRLEŞİMDİR** (T111-VH ile açıkça yazıldı).
+ * Aşağıdaki dokuz değer İKİ AYRI DB kolonundan gelir:
+ *
+ *   · `venthub_orders.status`         → pending · confirmed · processing ·
+ *                                        shipped · delivered · cancelled
+ *   · `venthub_orders.payment_status` → paid · refunded · partial_refunded
+ *
+ * Kolonların kendi sözlükleri `orderStatusDomain.ts`'te, canlı DB kısıtından
+ * ölçülmüş hâlleriyle durur ve **otorite orasıdır**. Bu tip yalnız panonun
+ * iki kolonu tek bir görünümde birleştirdiği hâli ifade eder.
+ *
+ * Karıştırmanın bedeli İKİ KEZ ödendi: T052'de `status IN ('paid',…)` kapısı
+ * hiç açılmadığı için satışta stok hiç düşmedi; T111'de admin filtresi üç
+ * ödeme değerini `status`'a sorduğu için o filtreler hep boş döndü.
+ * `status IN (…)` yazan yeni kod, değerleri **bu tipe değil**
+ * `ORDER_DB_STATUSES`'a karşı doğrulamalıdır.
+ */
 export type OrderBoardStatus =
   | 'pending'
   | 'paid'
