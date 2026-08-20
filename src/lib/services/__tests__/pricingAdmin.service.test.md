@@ -2,17 +2,17 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\__tests__\pricingAdmin.service.test.ts
-skeleton_hash: 1fede8c0f298d4b3
+source_path: C:\Users\alize\venthub-wt-altyapi\src\lib\services\__tests__\pricingAdmin.service.test.ts
+skeleton_hash: 9e07364cadbe3e67
 entity_hashes:
   func:readField: e927400a64da6d8f
-  func:stubClient: bbb22df8f0944217
-  overview: 19a92951e8cc85f2
-generated_at: 2026-08-14T09:16:25Z
+  func:stubClient: e7872c073ace7457
+  overview: 7f63248beb061ae0
+generated_at: 2026-08-18T06:49:02Z
 ---
 
 ## Genel Bakış
-Bu modül, pricingAdmin servisi için yazılan testlerde kullanılan yardımcı fonksiyonları içerir. Temel amacı, test senaryolarında gerçek API çağrıları yerine kontrol edilebilir sahte (stub) veriler sağlamak ve test edilen nesnelerden alan değerlerini güvenli bir şekilde okumaktır.
+Bu modül, pricingAdmin servisi için yazılan testlerde kullanılan yardımcı fonksiyonları içerir. Temel amacı, test senaryolarında gerçek API çağrıları yerine kontrol edilebilir sahte veriler sağlamak ve test edilen nesnelerden alan değerlerini güvenli bir şekilde okumaktır.
 
 ## Fonksiyon Grupları
 
@@ -37,24 +37,48 @@ Bu modül için test stub ve veri okuma yardımcı fonksiyonları tanımlanmış
 
 [Aksiyom 4]: Eğer `readField` fonksiyonuna geçirilen `key` parametresi string türünde değilse, kaynaktan alan okuma işlemi başarısız olur.
 
-[Aksiyom 5]: Eğer `readField` fonksiyonuna geçirilen `source` parametresi `null` veya `undefined` ise, verilen `key` ile alan okunamaz ve fonksiyon `undefined` döndürür.
+---
 
-[Aksiyom 6]: Eğer `PRODUCT_ROW` sabiti bir object olarak tanımlanmamışsa, bu sabiti referans alan test senaryoları veya veri yapıları eksik kalır.
+## Bağımlılıklar ve Mimari Bağlam
+Bu modül test altyapısına ait yardımcı fonksiyonlar içerdiğinden, production koduna doğrudan bağımlılığı yoktur. Ancak, `stubClient` fonksiyonunun döndürdüğü `StubResult` yapısının, test edilen pricingAdmin servisinin beklediği istemci arayüzüyle (örn. Supabase veya başka bir veri erişim katmanı) uyumlu olması gerekmektedir. `readField` fonksiyonu ise genel bir yardımcı olup, herhangi bir nesne veya alan derinliği için kullanılabilir. Bu fonksiyonlar dinamik veya lazy yüklenen modüllere bağlı değildir; doğrudan test dosyası içinde tanımlı ve izoledir. Mimari açıdan, test süresince dış servis bağımlılıklarının soyutlanması ve test edilen birimlerin yalıtılması prensibine hizmet eder.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, test yardımcı fonksiyonları içerir. Aşağıdaki varsayımlar fonksiyon imzalarından çıkarılmıştır.
+
+[Aksiyom 1]: Eğer `stubClient` çağrısında `tables` parametresi geçilmezse veya `Record<string, unknown[]>` yapısına uymazsa, stub istemci tablo verilerini doğru şekilde simüle edemez.
+
+[Aksiyom 2]: Eğer `stubClient` çağrısında `totalCount` parametresi geçilmezse, stub istemcinin toplam kayıt sayısı bilinmez ve sayfalama/sayı hesaplama testleri tutarsız çalışır.
+
+[Aksiyom 3]: Eğer `stubClient`'e `pages` parametresi geçilmezse (opsiyonel parametre), modül varsayılan bir sayfalama davranışıyla çalışmalıdır; bu durumun sonucu implementasyona bağlıdır (bilinmiyor).
+
+[Aksiyom 4]: Eğer `readField` fonksiyonunda `source` parametresi `null` veya `undefined` ise ve `key` geçerli bir alan adı ise, fonksiyon `undefined` veya hata döndürür.
+
+[Aksiyom 5]: Eğer `readField` fonksiyonunda `key` boş string (`""`) olarak geçilirse, okunacak alan belirsiz olur ve sonucu belirsizdir.
+
+[Aksiyom 6]: `PRODUCT_ROW` sabiti bir nesne (object) olarak tanımlıdır; bu sabitin testlerde beklenen ürün verisi yapısını temsil ettiği varsayılır.
+
+---
+
+**Not:** Aksiyom 5'te belirtildiği gibi `readField`'in empty string `key` durumundaki davranışı fonksiyon imzasından anlaşılamamaktadır (bilinmiyor). Benzer şekilde `totalCount`'ın veri tipi imzada belirtilmemiştir (bilinmiyor).
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### stubClient
-**Ne yapar**: Test ortamında gerçek Supabase istemcisi yerine kullanılacak sahte (stub) bir istemci oluşturur. Verilen tablo verilerine göre HTTP isteklerini yakalar ve tanımlı mock yanıtları döndürür. Yakalanan tüm istekleri bir diziye kaydederek testlerde doğrulama yapılmasını sağlar.
+**Ne yapar**: Bu fonksiyon, Supabase ile yapılan veritabanı işlemlerini test edebilmek için sahte (mock) bir istemci oluşturur. Gerçek bir ağ isteği yapmak yerine, önceden tanımlanmış test verilerini döndüren bir fetch fonksiyonu sağlayarak_Unit test_lerin deterministik ve izole olmasını sağlar.
 
-**Nasıl yapar**: İçeride tanımlanan `fakeFetch` fonksiyonu, gerçek `fetch` API'sinin yerine geçer. Her gelen istekte URL'den tablo adını çıkarır, `tables` sözlüğünden ilgili satırları bulur. `Accept` başlığında `pgrst.object` içeriği varsa tek bir nesne, yoksa dizi döndürür. HEAD isteklerinde gövde boş döner. Tüm istekler `calls` dizisine method, URL, body ve header bilgileriyle birlikte kaydedilir. Son olarak `createClient` ile `'http://stub.local'` adresine bağlanan sahte bir Supabase istemcisi oluşturulur. `persistSession` ve `autoRefreshToken` devre dışı bırakılarak oturum yönetimi engellenir. Döndürülen `StubResult` nesnesi hem istemciyi hem de yakalanan istekleri içerir.
+**Nasıl yapar**: Fonksiyon, bir `fakeFetch` fonksiyonu tanımlar. Bu sahte fetch, her gelen isteği yakalayarak (`calls` dizisine kaydeder) ve URL'deki tablo adını analiz ederek, `tables` nesnesinden veya `pages` parametresinden ilgili verileri döndürür. `pages` parametresi verildiğinde, her istek için bir sonraki sayfayı otomatik olarak sunarak sayfalama senaryolarını test etmeye olanak tanır. Son olarak, `@supabase/supabase-js`'in `createClient` metodunu çağırarak, bu `fakeFetch`'i `global.fetch` olarak enjekte eden ve oturum yönetimini devre dışı bırakan bir Supabase istemcisi oluşturur.
 
 **Parametreler**:
-- `tables`: `Record<string, unknown[]>` — Tablo adlarını (anahtar) ve her tablonun satırlarını (değer olarak nesne dizisi) eşleştiren sözlük yapısı. URL'den çıkarılan tablo adına göre ilgili veri dizisi buradan okunur.
-- `totalCount`: `number` (varsayılan: `0`) — Stub'un `content-range` yanıt başlığında toplam kayıt sayısı olarak bildireceği değer. Tek bir sayfalık veri döndürse bile, bu değer ile daha büyük bir veri kümesinin varmış gibi davranmasını sağlar.
+- `tables`: `Record<string, unknown[]>` — Tablo adlarını (anahtar) ve her tablodaki satırların bir dizisini (değer) eşleştiren nesne. Her istek için `fakeFetch`, URL'den çıkan tablo adına karşılık gelen satırları döndürür.
+- `totalCount`: `number` — `content-range` yanıt başlığında kullanılacak toplam kayıt sayısını belirtir. Varsayılan değer `0`'dır.
+- `pages`: `Record<string, unknown[][]>` (opsiyonel) — Belirli bir tablo için ardışık sayfalı yanıtları tutan nesnenin yerleşik bir sürümü. Bir tablonun bu listede olması durumunda, `fakeFetch` her istek için sırasıyla bir sonraki sayfa dizisini (satır grubunu) döndürerek gerçekçi sayfalama akışını simüle eder.
 
-**Dönüş**: `StubResult` — `{ supabase: SupabaseClient<Database>, calls: CapturedRequest[] }`形状inde bir nesne döndürür. `supabase`, testlerde kullanılacak sahte Supabase istemcisidir. `calls`, test süresince yapılan tüm isteklerin method, url, body ve headers bilgilerini tutan yakalama dizisidir.
+**Dönüş**: `StubResult` nesnesi döndürür. Bu nesne iki alan içerir: `supabase`, sahte fetch ile yapılandırılmış `SupabaseClient` instance'ı; `calls`, test süresince `fakeFetch` tarafından yakalanan tüm isteklerin bir dizisi (`CapturedRequest[]` tipinde). Bu sayede testler hem veri alışverişini doğrulayabilir hem de hangi isteklerin atıldığını analiz edebilir.
 
 ### readField
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -97,94 +121,31 @@ Bu modül için test stub ve veri okuma yardımcı fonksiyonları tanımlanmış
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: `__tests__/pricingAdmin.service.test.ts`::stubClient
-- **params**: `(tables: Record<string, unknown[]>, totalCount = 0)` — `tables` sahte tablo verilerini (tablo adı → satır dizisi) tutar; `totalCount` content-range header'ındaki toplam satır sayısını belirtir (varsayılan 0)
+- **params**: `tables: Record<string, unknown[]>` (tablo adı → satır dizisi), `totalCount = 0` (content-range toplam satır sayısı), `pages?: Record<string, unknown[][]>` (çoklu sayfalama senaryosu için tablo → sayfa listesi)
 - **ic_degiskenler**:
-  - `calls` — yakalanan tüm isteklerin dizisi (method, url, body, headers); testlerde asserting için kullanılır
-  - `fakeFetch` — Supabase client'ın global fetch'ini ikame eden sahte fetch fonksiyonu; her çağrıyı `calls`'a kaydeder ve `tables`'dan uygun veriyi döner
-  - `href` — input'un string, URL veya Request objesinden çıkarılan ham URL dizesi
-  - `method` — HTTP methodu (GET, POST, PATCH, HEAD vb.), `init?.method`'dan alınır, yoksa 'GET'
-  - `headers` — küçük harfe çevrilmiş header键值çiftlerini tutan sözlük; accept header'ı ile `pgrst.object` algılanır
-  - `rawBody` — request body'sinin string hali; JSON.parse ile parse edilerek `calls`'a kaydedilir
-  - `table` — URL pathname'den çıkarılan tablo adı (son path segment); `tables[table]` ile satırlar getirilir
-  - `rows` — `tables` sözlüğünden tablo adına karşılık gelen satır dizisi; yoksa boş dizi
-  - `wantsSingleObject` — accept header'ı `pgrst.object` içeriyorsa true; tek obje dönülüp dönülmeyeceğini belirler
-  - `payload` — `wantsSingleObject` ise ilk satır (null olabilir), değilse tüm satırlar
-  - `supabase` — `createClient` ile oluşturulan sahte Supabase client'ı; `fakeFetch` ile donatılmış, `stub.local` adresine bağlanır
-- **Dönüş**: `{ supabase, calls }` — stub Supabase client'ı ve yakalanan isteklerin dizisi
+  - `calls` — yakalanan tüm HTTP isteklerinin dizisi; her eleman method, url, body, headers içerir
+  - `pageCursor` — her tablo için sayaç; sayfalı testlerde sıradaki sayfaya geçmek için kullanılır
+  - `fakeFetch` — Supabase client'a enjekte edilen sahte fetch fonksiyonu; gerçek HTTP çağrısı yapmaz
+  - `href` — input'tan (string | URL | Request).href) normalize edilmiş URL stringi
+  - `method` — HTTP methodu, tanımsızsa `'GET'` varsayılır
+  - `headers` — istek header'larını küçük harfe normalize ederek tutan nesne
+  - `rawBody` — request body'si; string ise JSON.parse ile çözümlenir, değilse null
+  - `table` — URL path'inin son segmentinden çıkarılan tablo adı (ör. `products`, `brands`)
+  - `pageList` — `pages` map'inden tablo adına karşılık gelen sayfalı veri listesi (varsa)
+  - `index` — `pageCursor[table]` değerinden okunan mevcut sayfa indeksi
+  - `rows` — tablonun actual satırları; sayfalama varsa `pageList[index]`, yoksa `tables[table]`
+  - `wantsSingleObject` — `accept` header'da `pgrst.object` içerip içermediği (tek kayıt bekleyen sorgular için)
+  - `payload` — stub'un döndürüceği veri; `wantsSingleObject` ise `rows[0] ?? null`, değilse tüm `rows` dizisi
+  - `supabase` — `createClient<Database>` ile oluşturulan stub Supabase client; `fakeFetch` enjekte edilir
+- **Dönüş**: `{ supabase, calls }` — stub client ve yakalanan istekler dizisi
 
 ---
 
 ### [N2_NASIL] AST Pointer: `__tests__/pricingAdmin.service.test.ts`::readField
-- **params**: `(source: unknown, key: string)` — `source` okunacak obje; `key` erişilecek alan adı
+- **params**: `source: unknown` (okunacak nesne), `key: string` (alan adı)
 - **ic_degiskenler**:
-  - `record` — `source`'un spread ile shallow-copy'su; `Record<string, unknown>` olarak cast edilmiş ve `record[key]` ile alan değeri okunur
-- **Dönüş**: `record[key]` (alan mevcutsa) veya `undefined` (source nesne değilse veya key yoksa)
-
----
-
-### [N3_NASIL] AST Pointer: `__tests__/pricingAdmin.service.test.ts`::anonymous (fakeFetch gövdesi)
-- **params**: `(input, init)` — fetch API'sine gelen URL/request ve options
-- **ic_degiskenler**: (stubClient içindekifakeFetch ile aynı yapı)
-  - `href`, `method`, `headers`, `rawBody`, `table`, `rows`, `wantsSingleObject`, `payload` — stubClient açıklamasıyla aynı
-- **Dönüş**: `Promise<Response>` — JSON payload ile 200 status, content-range header'ı dahil
-
----
-
-### [N4_NASIL] AST Pointer: `__tests__/pricingAdmin.service.test.ts`::anonymous (Headers.forEach callback)
-- **params**: `(value, key)` — header değerini ve adını alır
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `headers[key.toLowerCase()] = value` ile yan etki
-
----
-
-### [N5_NASIL] AST Pointer: `__tests__/pricingAdmin.service.test.ts`::anonymous (describe/coefficientToMarginPct testleri)
-- **params**: (yok)
-- **ic_degiskenler**: (yok — doğrudan expect çağrılır)
-- **Dönüş**: yok — `coefficientToMarginPct` ve `marginPctToCoefficient` fonksiyonlarının doğru sonuç ürettiğini doğrular
-
----
-
-### [N6_NASIL] AST Pointer: `__tests__/pricingAdmin.service.test.ts`::anonymous (toPricingProductInput testleri)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `map` — `Map<['Vortice', 'brand-vortice']>` marka adından brandId'ye eşleme; `toPricingProductInput`'a brand köprüsü olarak verilir
-  - `out` — `toPricingProductInput`'ın dönüş değeri; pricing motoruna gönderilecek ürüne dönüştürülmüş nesne
-- **Dönüş**: yok — `out`'un brandId, costInBase, id, sku, name alanlarını doğrular
-
----
-
-### [N7_NASIL] AST Pointer: `__tests__/pricingAdmin.service.test.ts`::anonymous (countProductsInScope testleri)
-- **params**: (yok — async arrow fonksiyon)
-- **ic_degiskenler**:
-  - `supabase` — `stubClient`'tan dönen sahte Supabase client'ı; `countProductsInScope`'a bağlanır
-  - `calls` — yakalanan istekler dizisi; URL'lerin content-range ve filtre parametrelerini doğrulamak için kullanılır
-  - `count` — `countProductsInScope`'ın döndüğü ürün sayısı; beklenen değerle karşılaştırılır
-  - `url` — `calls[0].url`'in `decodeURIComponent` ile çözülmüş hali; `deleted_at=is.null`, `status=eq.active` gibi filtreler kontrol edilir
-  - `productsUrl` — `calls[calls.length - 1].url`'in çözülmüş hali; `category_id=in.` içeriğini doğrular
-- **Dönüş**: yok — `count` değerinin beklenen sayıya eşitliğini ve URL parametrelerinin doğruluğunu assert eder
-
----
-
-### [N8_NASIL] AST Pointer: `__tests__/pricingAdmin.service.test.ts`::anonymous (sampleProductsInScope testi)
-- **params**: (yok — async arrow fonksiyon)
-- **ic_degiskenler**:
-  - `supabase` — stub Supabase client'ı
-  - `calls` — yakalanan istekler
-  - `samples` — `sampleProductsInScope`'ın döndüğü fiyat motoru girdisi dizisi; `id`, `sku`, `brandId`, `costInBase` alanlarını içerir
-  - `url` — ilk isteğin çözülmüş URL'si; `limit=3` ve `cost_in_base` parametrelerini doğrular
-- **Dönüş**: yok — `samples` dizisinin uzunluğunu ve `toMatchObject` ile yapısını assert eder
-
----
-
-### [N9_NASIL] AST Pointer: `__tests__/pricingAdmin.service.test.ts`::anonymous (createPricingRule / updatePricingRule testleri)
-- **params**: (yok — async arrow fonksiyon)
-- **ic_degiskenler**:
-  - `supabase` — stub Supabase client'ı
-  - `calls` — yakalanan istekler
-  - `insert` — `calls.find(c => c.method === 'POST')` ile bulunan INSERT isteği; `body`'sinde `tenant_id` olmaması doğrulanır
-  - `body` — `insert?.body` veya `patch?.body`; isArray kontrolü ile unwrap edilir; `scope`, `brand_id`, `margin_pct`, `updated_by`, `updated_at` alanları assert edilir
-  - `patch` — `calls.find(c => c.method === 'PATCH')` ile bulunan UPDATE isteği; URL'sinde `id=eq.r1` filtresi kontrol edilir
-- **Dönüş**: yok — `body`'nin `toMatchObject` ile içeriğini, `tenant_id` absence'ini ve `updated_at`'in string tipini assert eder
+  - `record` — source'un shallow copy'si (`{ ...source }`) olarak `Record<string, unknown>` türüne düzeltilir
+- **Dönüş**: `record[key]` (source nesne ve key mevcutsa) veya `undefined`
 
 ---
 

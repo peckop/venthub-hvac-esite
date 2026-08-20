@@ -8,6 +8,7 @@ import {
   Recommendations,
   ResultCard,
   ResultGrid} from '../../components/calculators'
+import { useCalculatorUsage } from '../../hooks/useCalculatorUsage'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
   calculateDuct,
@@ -47,6 +48,10 @@ const DuctCalcPage: React.FC = () => {
   const [height, setHeight] = useState('200')
   const [length, setLength] = useState('10')
   const [material, setMaterial] = useState<DuctMaterial>('galvanized')
+
+  // T021-VH · `calculator_used`. Taban çizgisi mount anıdır: girdilerin varsayılan değeri
+  // olduğu için "ilk geçerli sonuçta ateşle" sayfa görüntülemesini ölçerdi. Bkz. hook.
+  useCalculatorUsage('duct', { airflow, ductType, diameter, width, height, length, material })
 
   // Real-time calculation
   const result = useMemo(() => {

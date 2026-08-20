@@ -97,6 +97,23 @@ Bu bir "sürüm güncellemesi" değil, **bilinçli bir karar**dır. Sırayla:
   2026-08-18, `engine-strict` ayarlı değil, `pnpm install` çıkış kodu 0 — yalnız uyarır). Bu
   kasıtlı bir yumuşaklıktır: filoyu gün ortasında bloke etmemek için. Ama lokal 22'de kalırken
   kapılar 24'te koşuyorsa, **lokal ölçüm prod kanıtı değildir** — o dönemde kanıt CI'dır.
+- **Prod ana sürümü, platform yüzeylerinden OKUNAMIYOR — 2026-08-19'da üç yüzey tek tek denendi:**
+  Vercel build günlüğü Node sürümünü hiç yazmıyor · dağıtım kaydında `nodeVersion` alanı yok
+  (`lambdaRuntimeStats` yalnız `{"nodejs":5}` diyor, sürüm değil) · `/api/health` `process.version`
+  yayınlamıyor. Bu yüzden "prod 24'te koşuyor" iddiası bir dönem **ölçüme değil belgeye** dayandı.
+  Boşluk `scripts/assert-node-major.mjs` ile kapatıldı: derleme sırasında sürümü **günlüğe basar**
+  (pozitif satır) ve ayrışmada derlemeyi **düşürür**. Reddedilen alternatif: sürümü bir uç noktadan
+  yayınlamak — kalıcı bir public bilgi-sizdirma yüzeyi, tek seferlik bir doğrulama için fazla bedel.
+- **Betik `prebuild` DEĞİL, `build` betiğinin İÇİNE zincirlenmiştir.** Ölçüldü: depoda `.npmrc` yok,
+  dolayısıyla pnpm'in `enable-pre-post-scripts` ayarı varsayılan `false` — `prebuild` yazmak **hiç
+  koşmayan** bir bekçi yazmak olurdu. `INV-NODE-1` bu çağrının `scripts.build` içinde kalmasını ölçer.
+- **Ölçülen şey BUILD çalışma zamanıdır, lambda çalışma zamanı DEĞİL.** İkisinin aynı ana sürüm
+  olduğunu **varsayıyoruz**; bu varsayım ölçülmedi ve burada adıyla durur. Lambda tarafını ölçmenin
+  bilinen tek yolu çalışma zamanı sürümünü dışarıya yayınlamaktır ve o bedel kabul edilmedi.
+- **Lokal muafiyet ADIYLA:** `assert-node-major.mjs` yalnız `VERCEL` veya `CI` ortamında **katı**dır
+  (çıkış 1); geliştirici makinesinde **uyarır ve geçer**. Gerekçe §6'nın ilk maddesiyle aynı: filoyu
+  gün ortasında bloke etmemek. Muafiyet **yalnız lokaldedir**; CI ve Vercel'de muafiyet yoktur.
+  Hedef türetilemiyorsa (`engines.node` yok/bozuk) betik **lokalde de** düşer — *ölçemedim ≠ geçtim*.
 - **`pnpm` ana sürümü bu cetvelin konusu değil.** Workflow'lardaki `pnpm/action-setup version: 10`
   ile lokal pnpm ayrı bir hizalama kalemidir; karıştırılmasın.
 

@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\ContactPage.tsx
-skeleton_hash: 0763ea0be4a69f11
+source_path: C:\Users\alize\venthub-wt-altyapi\src\views\ContactPage.tsx
+skeleton_hash: f0abe85fd597d1ce
 entity_hashes:
   func:ArrowRight: 1546741fbe749202
   func:ContactPage: a5b3030a0864a814
   func:handleSubmit: 460293fdfa9263b6
   overview: 060d74556606246c
   style_tokens: 21b7b2d66d6de05a
-generated_at: 2026-06-14T21:14:42Z
+generated_at: 2026-08-18T06:51:24Z
 ---
 
 ## Genel Bakış

@@ -87,8 +87,88 @@ jobs:
       - name: Install dependencies
         run: pnpm install --prefer-offline --config.allow-scripts true
 
+      # ══════════════════════════════════════════════════════════════════════
+      # KURULUM ADIMI SINIRLANDI (2026-08-19, üç bağımsız koşumla ölçüldü)
+      #
+      # Eski hâli tek satırdı: `playwright install --with-deps chromium`. O satır
+      # 32225114226 · 32225609438 · 32224496574 koşumlarında ~24,5 dakika asılı
+      # kalıp 25 dakikalık iş bütçesini yedi. Asılan kısım tarayıcı indirmesi
+      # DEĞİLDİ — `--with-deps`'in çağırdığı apt'ydi (günlükte azure aynası
+      # erişilemiyor, archive.ubuntu.com'a düşüyor ve 24 dakika tek satır çıktı
+      # üretmiyor). Sağlıklı koşumda aynı adım 1dk18sn: apt ~70sn, tarayıcı ~8sn.
+      #
+      # Bu yüzden adım ÜÇE bölündü ve her parça kendi başına sınırlandı:
+      #   1) apt yapılandırması  → asılma yerine zaman aşımı
+      #   2) sistem bağımlılıkları (apt) → sınırlı + tekrarlı
+      #   3) tarayıcı indirmesi (CDN)    → sınırlı + tekrarlı, önbellekli
+      # `timeout-minutes` ikinci kemerdir: betik bozulursa iş bütçesini yemesin.
+      # ══════════════════════════════════════════════════════════════════════
+      - name: apt sertlestirmesi
+        timeout-minutes: 3
+        run: bash scripts/ci/apt-hardening.sh
+
+      - name: Playwright tarayici onbellegi
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ms-playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ms-playwright-${{ runner.os }}-
+
+      # ── KEMER ARITMETIGI (ilk surumde YANLISTI, duzeltildi) ──────────────
+      # `timeout-minutes` sarmalayicinin EN KOTU suresini GECMELI, yoksa dis kemer
+      # icteki denemeyi keser. Ilk surum 300sn x 3 deneme (en kotu 920sn = 15,3dk)
+      # yaziyor ama adima 12 dakika veriyordu: ucuncu deneme HIC kosamazdi.
+      #
+      # Ikinci kisit: adim sinirlarinin TOPLAMI is butcesini (25dk) asmamali, yoksa
+      # sinirlama isi kurtarmaz - yine 25 dakika yanar. Bu yuzden deneme sayisi 3'ten
+      # 2'ye indi: 300sn x 2 + 10sn = 610sn = 10,2dk -> adim siniri 11dk.
+      # Iki kurulum adimi = en kotu 22dk < 25dk. Saglikli deger 47 saniye, yani
+      # 300 saniyelik sinir zaten 6 kat pay birakiyor; ucuncu deneme pay degil kumardi.
+      # ── EN IYI CABA + GERCEK YETENEK KAPISI (2026-08-19, master'da olculdu) ──
+      # Bu adım artık işi DÜŞÜRMEZ. Gerekçe ölçüme dayanıyor: master a8854cf7
+      # koşumunda apt iki denemede de 300 saniyeyi doldurdu, üçüncüsü kesildi ve
+      # `admin-smoke` KIRMIZI yandı — hâlbuki asıl soru "apt geçti mi" değil,
+      # "TARAYICI AÇILIYOR MU". Koşucu imajında gerekli kütüphaneler zaten varsa
+      # apt'nin düşmesi hiçbir şeyi bozmaz; yoksa aşağıdaki prob bunu ADIYLA söyler.
+      #
+      # Bu fail-open DEĞİL: kapı bir vekilden (apt çıkış kodu) ASIL ŞEYE (Chromium
+      # gerçekten açılıyor mu) taşındı ve asıl şey daha güçlü bir iddiadır.
+      - name: Playwright sistem bagimliliklari (en iyi caba)
+        continue-on-error: true
+        timeout-minutes: 11
+        env:
+          RETRY_APT_TEMIZLE: '1'
+        run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install-deps chromium
+
       - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
+        timeout-minutes: 11
+        run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install chromium
+
+      # GERÇEK KAPI: sistem bağımlılıkları eksikse Chromium burada açılmaz ve iş
+      # ADIYLA düşer. "apt geçti" demek tarayıcının çalıştığını kanıtlamaz; bu adım
+      # kanıtlar. Ucuz (~5 sn) ve teşhis mesajı net.
+      - name: Tarayici gercekten aciliyor mu
+        timeout-minutes: 3
+        run: |
+          node -e "
+          const { chromium } = require('@playwright/test')
+          chromium.launch()
+            .then(async (b) => {
+              const p = await b.newPage()
+              await p.setContent('<h1>ok</h1>')
+              const t = await p.textContent('h1')
+              await b.close()
+              if (t !== 'ok') throw new Error('sayfa render etmedi')
+              console.log('tarayici-probu: Chromium acildi ve sayfa render etti')
+            })
+            .catch((e) => {
+              console.error('::error::Chromium ACILAMADI: ' + e.message)
+              console.error('::error::Sistem bagimliliklari gercekten eksik — apt adimi bu kez KRITIK.')
+              process.exit(1)
+            })
+          "
 
       - name: Build (real Supabase env)
         run: pnpm run build:ci

@@ -2,39 +2,50 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx
-skeleton_hash: 3ad475fd417d92dc
+source_path: C:\Users\alize\venthub-wt-altyapi\src\views\OrdersPage.tsx
+skeleton_hash: fe6dc71cc313e46e
 entity_hashes:
   func:OrdersPage: 438a8bbd716fd9a1
   func:formatDate: cda2f023d87c7e9e
   func:formatPrice: ca980d25e00442de
   func:getStatusColor: 278d94f1c8a522db
   func:getStatusText: 248f40bb51719423
-  overview: 1d7002471970a13f
+  overview: d2d19e08b3574a45
   style_tokens: 4894888e4850f9b4
-generated_at: 2026-06-14T22:21:39Z
+generated_at: 2026-08-18T06:51:52Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC sistemindeki siparişlerin listelendiği ve yönetildiği temel React sayfasıdır. Sayfa, sipariş verilerini kullanıcıya göstermek için tarih, fiyat ve sipariş durumu gibi bilgileri okunabilir ve görsel olarak tutarlı formata dönüştüren yardımcı fonksiyonları içerir.
+OrdersPage modülü, VentHub HVAC uygulamasının sipariş yönetimi arayüzünü oluşturan temel React sayfasıdır. Sipariş listesini sunar, kullanıcının durum filtrelemesi yapmasını sağlar ve sipariş detaylarını gösterir. Modül, ham veri değerlerini (tarih, fiyat, durum kodları) arayüzde okunabilir ve tutarlı bir şekilde formatlayan yardımcı fonksiyonlar içerir; bu soyutlama sayesinde ana bileşenin sorumlulukları netleşir ve kodun bakım kolaylığı artar.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Siparişler sayfasının tüm yapısını, durum yönetimini ve veri akışını kontrol eden, arayüzü oluşturan temel React bileşenidir.
+### Sayfa Bileşeni ve Ana Mantık
+Sipariş sayfasının tüm yaşam döngüsünü (veri çekme, filtreleme, durum yönetimi) ve kullanıcı arayüzünün yapısını kontrol eden ana React bileşenidir. Bileşen, iç bağımlılıklar olarak Yardımcı Format Fonksiyonlarını çağırarak verileri görsel formata dönüştürür.
 - OrdersPage
 
-### Veri Görünüm Formatlayıcıları
-Siparişlerle ilgili ham veri değerlerini (tarih dizgeleri, sayısal fiyatlar, durum kodları) kullanıcı arayüzünde doğrudan ve anlaşılır bir şekilde gösterilecek metinlere ve renklere dönüştüren yardımcı işlevlerdir. Bu fonksiyonlar, bileşen içindeki gösterim mantığını soyutlayarak kodun okunabilirliğini artırır.
+### Yardımcı Format Fonksiyonları
+Sipariş verilerinin temel bileşenlerini (tarih dizeleri, sayısal fiyatlar, durum kodları) kullanıcı arayüzünde doğrudan gösterilecek standart formatlara ve renklere dönüştürerek soyutlayan işlevlerdir. Bu fonksiyonlar, bileşen içindeki tekrar eden formatlama mantığını kaldırır ve görünüm tutarlılığını sağlar.
 - formatDate, formatPrice, getStatusColor, getStatusText
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için, sipariş verilerinin formatlanması ve sunulmasıyla ilgili temel veri bütünlüğü ve geçerlilik varsayımları tanımlanmıştır.
 
-[Aksiyom 1]: Eğer `formatDate` fonksiyonuna geçersiz veya boş bir `dateString` parametresi verilirse, fonksiyon geçersiz bir tarih formatı hatası üretebilir veya uygulamanın beklenmeyen davranış göstermesine neden olabilir.
-[Aksiyom 2]: Eğer `formatPrice` fonksiyonuna negatif bir `price` parametresi verilirse, işlenen fiyat değeri mantıksal olarak tutarsız olabilir ve arayüzde negatif bir fiyat gösterimine yol açabilir.
-[Aksiyom 3]: Eğer `getStatusColor` veya `getStatusText` fonksiyonlarına, bilinmeyen veya desteklenmeyen bir `status` dizgesi verilirse, fonksiyonlar önceden tanımlanmamış bir renk kodu veya metin döndürebilir; bu da arayüzde tutarsız veya eksik bilgi display edilmesine yol açabilir.
+Bu modül için aksiyomlar, fonksiyon imzalarındaki parametre tiplerinden ve dönüş tiplerinden türetilmiştir.
+
+**[Aksiyom 1]:** Eğer `formatDate` fonksiyonuna string olmayan bir değer (örn: `Date` objesi veya `number` timestamp) verilirse, fonksiyon beklenmedik sonuç döner veya hata oluşur.
+
+**[Aksiyom 2]:** Eğer `formatPrice` fonksiyonuna `number` olmayan bir değer (örn: string fiyat "150.00") verilirse, fonksiyon beklenmedik sonuç döner veya hata oluşur.
+
+**[Aksiyom 3]:** Eğer `getStatusColor` veya `getStatusText` fonksiyonlarına geçerli olmayan bir status string'i verilirse (örn: boş string, null, veya tanınmayan bir durum), beklenmeyen renk/metin döner veya varsayılan bir değer döndürülmeyebilir.
+
+**[Aksiyom 4]:** Eğer `OrdersPage` bileşeni çağrılmadan önce sipariş verisi (tarih, fiyat, durum alanları) hazırlanmamışsa veya bu alanların tipleri yukarıdaki formatlara uymuyorsa, sayfa hatalı render edilir.
+
+**[Aksiyom 5]:** `OrdersPage` fonksiyonu `React.FC` dönüş tipine sahiptir — bileşen React fiber ağacına bağlanabilir bir JSX döndürmelidir; farklı bir dönüş tipi beklenmemelidir.
+
+---
+
+**Not:** Bu modülde herhangi bir modül sabiti veya eşik değeri tanımlanmadığından, buna ilişkin ek aksiyom bulunmamaktadır. `formatDate`, `formatPrice`, `getStatusColor` ve `getStatusText` fonksiyonlarının gövdeleri verilmediğinden, hangi string değerlerinin geçerli kabul edildiği ve hangi dönüşlerin yapıldığı bilinmemektedir.
 
 ---
 
@@ -79,11 +90,11 @@ Bu modül için, sipariş verilerinin formatlanması ve sunulmasıyla ilgili tem
 
 ## İTHALATLAR (IMPORTS)
 - import: ../hooks/useAuth::useAuth
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
 - import: ../i18n/datetime::formatDateTime
 - import: ../i18n/format::formatCurrency
 - import: ../lib/type-converters::isRecord
-- import: ../utils/routes::Routes
 - import: @/lib/supabase/client::supabaseBrowserClient
 - import: lucide-react::Calendar
 - import: lucide-react::CreditCard
@@ -143,20 +154,74 @@ type StatusFilter = 'all' | 'pending' | 'paid' | 'shipped' | 'delivered' | 'fail
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `OrdersPage.tsx`::fetchOrders (async anonim)
-- **params**: () — parametre yok; dış kapsamdan `user`, `setLoading`, `t`, `searchParams`, `setOrders`, `setProductFilter` kapanır
+### [N1_NASIL] AST Pointer: src/views/OrdersPage.tsx::OrdersPage
+- **params**: ()
 - **ic_degiskenler**:
-  - `ordersData` — Supabase'den dönen sipariş satırları dizisi (ham veri)
-  - `ordersError` — Supabase sorgusundaki hata nesnesi; null ise sorgu başarılı demektir
-  - `formattedOrders` — Ham `ordersData` dizisinin `Order[]` tipine dönüştürülmüş hali
-  - `rawOrder` — `.map()` iterasyonundaki her bir ham sipariş kaydı (`unknown`)
-  - `order` — `isRecord(rawOrder)` ile tip güvencesi alınmış kayıt nesnesi; tüm alanlara erişim sağlar
-  - `itemsList` — `order.venthub_order_items` alanından çıkarılan dizi; dizi değilse boş dizi kullanılır
-  - `items` — Her bir `rawIt` öğesinin `OrderItem` objesine dönüştürülmüş hali
-  - `rawIt` — `itemsList.map()` içindeki her bir ham sipariş kalemi (`unknown`)
-  - `it` — `isRecord(rawIt)` ile tip güvencesi alınmış sipariş kalemi nesnesi
-  - `productQ` — URL search parametresinden okunan `?product=...` değeri; filtre amaçlı kullanılır
-- **Dönüş**: `void` — state setter'ları çağırarak bileşen durumunu günceller; `setOrders(formattedOrders)` ile siparişleri, `setLoading(false)` ile yükleme durumunu, `setProductFilter(productQ)` ile filtre değerini ayarlar
+  - `setLoading` — loading durumunu güncelleyen state setter
+  - `setOrders` — sipariş listesini güncelleyen state setter
+  - `setProductFilter` — ürün filtresini güncelleyen state setter
+  - `supabase` — Supabase tarayıcı istemcisi, veritabanı sorguları için
+  - `user` — useAuth hook'undan gelen mevcut kullanıcı nesnesi
+  - `authLoading` — kimlik doğrulama durumunun yüklenme bayrağı
+  - `searchParams` — URL arama parametrelerini okuyan hook çıktısı
+  - `router` — Next.js yönlendirme nesnesi
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
+  - `lang` — useI18n hook'undan gelen aktif dil kodu
+  - `Routes` — useLocalizedRoutes hook'undan gelen rotalar nesnesi
+  - `loading` — sayfa yüklenme durumu boolean
+  - `orders` — sipariş listesi state dizisi
+  - `productFilter` — URL'den gelen ürün adı filtresi string
+  - `statusFilter` — durum filtresi string (varsayılan 'all')
+  - `dateFrom` — başlangıç tarihi filtresi string
+  - `dateTo` — bitiş tarihi filtresi string
+  - `searchCode` — sipariş kodu arama filtresi string
+  - `ordersData` — supabase.from('venthub_orders').select() sorgusundan dönen ham veri
+  - `ordersError` — supabase sorgusundan dönen hata nesnesi
+  - `formattedOrders` — ham verinin Order[] tipine dönüştürülmüş hali
+  - `rawOrder` — map içindeki her bir ham sipariş nesnesi (unknown)
+  - `order` — isRecord ile doğrulanmış sipariş nesnesi
+  - `itemsList` — order.venthub_order_items dizisi veya boş dizi
+  - `rawIt` — order items içindeki her bir ham ürün nesnesi (unknown)
+  - `it` — isRecord ile doğrulanmış ürün nesnesi
+  - `items` — OrderItem[] tipinde dönüştürülmüş ürün listesi
+  - `productQ` — searchParams.get('product') sonucu string veya null
+  - `steps` — durum adım dizisi ['pending','paid','shipped','delivered']
+  - `stepLabel` — adım etiketlerini tutan nesne
+  - `code` — sipariş numarasının son 8 karakteri veya split ile çıkarılan kod
+- **Dönüş**: JSX element (React.FC)
+
+---
+
+### [N2_NASIL] AST Pointer: src/views/OrdersPage.tsx::formatDate
+- **params**: `dateString: string` — biçimlendirilecek tarih stringi
+- **ic_degiskenler**:
+  - `formatDateTime` — import edilen tarih biçimlendirme yardımcı fonksiyonu
+  - `lang` — useI18n hook'undan gelen aktif dil kodu
+- **Dönüş**: string (biçimlendirilmiş tarih)
+
+---
+
+### [N3_NASIL] AST Pointer: src/views/OrdersPage.tsx::formatPrice
+- **params**: `price: number` — biçimlendirilecek para miktarı
+- **ic_degiskenler**:
+  - `formatCurrency` — import edilen para birimi biçimlendirme yardımcı fonksiyonu
+  - `lang` — useI18n hook'undan gelen aktif dil kodu
+- **Dönüş**: string (biçimlendirilmiş para birimi)
+
+---
+
+### [N4_NASIL] AST Pointer: src/views/OrdersPage.tsx::getStatusColor
+- **params**: `status: string` — sipariş durumu stringi
+- **ic_degiskenler**: (yok — switch statement içinde inline CSS class döner)
+- **Dönüş**: string (Tailwind CSS renk sınıfı, örn `'bg-yellow-100 text-yellow-800'`)
+
+---
+
+### [N5_NASIL] AST Pointer: src/views/OrdersPage.tsx::getStatusText
+- **params**: `status: string` — sipariş durumu stringi
+- **ic_degiskenler**:
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
+- **Dönüş**: string (localized durum metni, örn `'orders.pending'` çeviri anahtarı sonucu)
 
 ---
 
@@ -169,8 +234,8 @@ graph TD
     OrdersPage_tsx__formatPrice["formatPrice"]
     OrdersPage_tsx__getStatusColor["getStatusColor"]
     OrdersPage_tsx__getStatusText["getStatusText"]
-    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusColor
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatDate
 ```

@@ -107,5 +107,3 @@ export function AdminModal({
     </Dialog.Root>
   )
 }
-
-export default AdminModal

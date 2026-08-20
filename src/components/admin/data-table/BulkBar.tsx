@@ -99,5 +99,3 @@ export function BulkBar({
         </div>
     )
 }
-
-export default BulkBar

@@ -131,5 +131,3 @@ export function AdminSidePanel({
     document.body,
   )
 }
-
-export default AdminSidePanel

@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import AdminToolbar from '@/components/admin/AdminToolbar'
-import BulkBar, { type BulkAction } from '@/components/admin/data-table/BulkBar'
+import { type BulkAction, BulkBar } from '@/components/admin/data-table/BulkBar'
 import { DataTableKit } from '@/components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '@/components/admin/data-table/types'
 import ExportMenu from '@/components/admin/ExportMenu'

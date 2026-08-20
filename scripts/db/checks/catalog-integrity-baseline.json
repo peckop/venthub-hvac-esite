@@ -1,0 +1,28 @@
+{
+  "_okuma_notu": "T099 — bilinen katalog ihlalleri tabani (circir). Kapi bu satirlarin DISINDAKI her yeni ihlalde kirmizi olur. Taban YALNIZ kuculur: bir satiri buradan silmek, o ihlalin veride duzeltildigi anlamina gelir. Gerekcesiz satir kabul edilmez.",
+  "_olcum": "2026-08-18 · prod · 374 urun / 32 aile · dup-name 21 grup / 74 satir · dup-label 0 · orphan 0 · brand-mix 0",
+  "_karar_sahibi": "Veri duzeltmeleri prod yazimidir -> Recep kapisi. Karar paketi: docs/audits/t099-aile-icerik-uyumu-2026-08-18.md",
+  "entries": {
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|JET 20": "T099-B4 · 6 kayit, ayni ticari ad farkli konfigurasyon; ayirt edici SKU. Recep karari bekliyor (adlari ayristir mi, aileyi seriye bol mu).",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|SEAT 20": "T099-B4 · 6 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|SEAT 25": "T099-B4 · 6 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|JET 25": "T099-B4 · 5 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|SEAT 15": "T099-B4 · 5 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|SEAT 35": "T099-B4 · 5 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|STORM 10": "T099-B4 · 4 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|STORM 12": "T099-B4 · 4 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|JET 20 ATEX": "T099-B4 · 3 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|JET 25 ATEX": "T099-B4 · 3 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|JET 30": "T099-B4 · 3 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|SEAT 20 ATEX": "T099-B4 · 3 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|SEAT 25 ATEX": "T099-B4 · 3 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|SEAT 30": "T099-B4 · 3 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|SEAT 35 ATEX": "T099-B4 · 3 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|SEAT 15 ATEX": "T099-B4 · 2 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|SEAT 50": "T099-B4 · 2 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|STORM 10 ATEX": "T099-B4 · 2 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|STORM 12 ATEX": "T099-B4 · 2 kayit — ayni gerekce.",
+    "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|STORM 14": "T099-B4 · 2 kayit — ayni gerekce.",
+    "dup-name:AVenS Elektrikli Kanal Isıtıcıları|AvenS 5000": "T099-C1 · 2 kayit (AVE-42500, AVE-47300) ayni ad iki SKU. Mukerrer kayit mi iki ayri urun mu — Recep karari."
+  }
+}

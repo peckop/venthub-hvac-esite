@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\pricing.en.ts
-skeleton_hash: 156c3aba4ff0480c
+source_path: C:\Users\alize\venthub-wt-altyapi\src\i18n\dictionaries\admin\pricing.en.ts
+skeleton_hash: 38f60efe046c348a
 entity_hashes:
   overview: a30f302d74ed1c78
-generated_at: 2026-08-15T03:54:29Z
+generated_at: 2026-08-18T06:48:23Z
 ---
 
 ## Genel Bakış
@@ -31,10 +31,10 @@ Bu modül için fonksiyon imzası veya kullanım detayı verilmediğinden, apena
 
 ## SABİTLER
 - **pricing** (object) — `{
-  common: {
-    scopeLabel: "Scope",
-    methodLabel: "Method",
-    scope: ...`
+  policies: {
+    effective: {
+      title: "Effective lock lookup",
+  ...`
 
 ---
 
