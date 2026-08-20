@@ -31,12 +31,10 @@ const KOK = process.cwd()
  * kör eden en sinsi şeydir. (Cetvel §4.)
  */
 const MUAFIYETLER: ReadonlyArray<{ paket: string; peer: string; gerekce: string }> = [
-  {
-    paket: '@eslint/js',
-    peer: 'eslint',
-    gerekce:
-      'Olculdu 2026-08-19, bu kapinin ILK yakaladigi TAZE ayrisma: package.json "@eslint/js": "^10.0.1" beyan ediyor ama "eslint": ^9 kurulu (9.39.4), yani @eslint/js ana surumu tek basina v10 a cikarilmis. eslint.config.cjs bu paketi gercekten kullaniyor (require("@eslint/js")) ve pnpm lint su an yesil — yani gozlemlenmis bir kirilma YOK, ama bu kanit degil. ONCEKI IKISI GIBI BILINCLI BORC DEGIL: bu bir IS EMRI bekleyen gercek surum ayrismasi, dogru onarim iki surumu ayni ana surumde hizalamak. package.json su an merge kuyrugunda sicak oldugu icin bu PR de degistirilmedi; OPS-AUDIT e bildirildi. Onarildigi anda bayat-muafiyet testi bu satiri SILMEYE zorlar.',
-  },
+  // 2026-08-20: liste BOS ve bu bir hata degil, olculmus bir durum. Uc muafiyetin ucu de
+  // KENDI onarimlariyla dustu: react-day-picker -> {date-fns, react} ikilisi #698 in v9
+  // yukseltmesiyle, @eslint/js -> eslint ise bu daldaki surum hizalamasiyla. Yani su an
+  // depoda BILINEN peer ihlali YOK; yeni bir ihlal dogarsa kapi dogrudan kirmizi verir.
 ]
 
 type Surum = { ana: number; orta: number; kucuk: number; on: string | null }
