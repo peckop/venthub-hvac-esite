@@ -112,7 +112,8 @@ const KNOWN_VIOLATIONS = {
     'admin-update-shipping', // gövdede getUser+rol var; sınıf (a) — §3.2 canlı açığı buradaydı
     'apply-coupon', // gövdede kimlik sinyali YOK; sınıf belirsiz — blokla birlikte denetlenmeli
     'delivery-notification', // gövdede service-key (Bearer) karşılaştırması var; sınıf (b) adayı
-    'healthz', // gövdede kimlik yok (uptime probe); sınıf yazılmadan (d)/public sayılamaz
+    // healthz 2026-08-19'da listeden ÇIKTI (T100-VH): config.toml'a [functions."healthz"]
+    // bloğu yazıldı (verify_jwt = true, prod'daki ölçülen değerle aynı — beyan, değişiklik değil).
     'iyzico-payment', // gövdede kimlik sinyali YOK; ödeme başlatan uç — sınıf yazılmalı
     'iyzico-refund', // gövdede getUser var (admin ya da sipariş sahibi); sınıf (a) adayı
     'log-client-error', // gövdede getUser var; tarayıcıdan çağrılıyor — sınıf (a) adayı
@@ -155,7 +156,8 @@ const KNOWN_VIOLATIONS = {
     'supabase/functions/admin-order-inspect/index.ts',
     'supabase/functions/admin-orders-latest/index.ts',
     'supabase/functions/apply-coupon/index.ts',
-    'supabase/functions/healthz/index.ts',
+    // healthz 2026-08-19'da listeden ÇIKTI (T100-VH): dosya başına "Çağıran sınıfı: (d) izleme ucu"
+    // beyanı yazıldı; uç aynı turda ölçemediğinde yeşil dönmeyecek biçimde yeniden kuruldu.
     'supabase/functions/log-client-error/index.ts',
     'supabase/functions/order-housekeeping/index.ts',
     'supabase/functions/order-validate/index.ts',
