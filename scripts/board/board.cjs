@@ -402,8 +402,85 @@ function markSeen(sid, notes) {
 module.exports = {
   BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS, PANOYA_YAZAN_FIILLER,
   append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary,
-  notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids,
+  notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, gozcuDurumu,
   globToRegExp, toRepoRelative, repoRootFor,
+}
+
+/**
+ * YOKLAMA — filonun canlılık fotoğrafı, ÜÇ AYRI EKSENDE.
+ *
+ * NİÇİN ÜÇ EKSEN (2026-08-20 ölçümü): "atışı taze" ile "şerit çalışıyor" AYNI ŞEY DEĞİL.
+ * Ölçülen vaka: bir şeridin atışı 1 dakikalıktı, son notu 1642 dakikalıktı ve içeriği
+ * "test"ti. Atış oturumun YAŞADIĞINI söyler; panoyu DUYDUĞUNU ya da iş ÜRETTİĞİNİ söylemez.
+ * Tek eksenli canlılık bu üç durumu tek kelimeye ("canlı") indirger ve sağırlığı GİZLER.
+ *
+ *   ATIS  = oturum yaşıyor mu   → board heartbeat yaşı
+ *   GOZCU = panoyu DUYUYOR mu   → gozcu.cjs kalıcı imlecinin son tarama yaşı
+ *   SES   = iş ÜRETİYOR mu      → son notunun yaşı
+ *
+ * GOZCU ekseni yoklamanın asıl getirisidir: sağırlık SESSİZDİR ve sessizlik, "sakin gün" ile
+ * "kimse duymuyor" arasında ayrım yapmaz. İmleç dosyası o ayrımı diskte görünür kılar.
+ * 2026-08-20 sabahı dört oturum sağır kaldı ve bunu kimse panodan göremedi — çünkü pano
+ * yalnızca YAZANI ölçüyordu, OKUYANI değil.
+ */
+function gozcuDurumu(sid, now) {
+  try {
+    const iy = path.join(BOARD_DIR, '.gozcu-imlec.' + String(sid).slice(0, 8) + '.json')
+    const im = JSON.parse(fs.readFileSync(iy, 'utf8'))
+    const aralikSn = Number(im.aralikSn || 60)
+    if (!im.sonTarama) return 'IMLEC BOS'
+    const yasSn = (now - Date.parse(im.sonTarama)) / 1000
+    // Üç tarama aralığı: bir tur kaçırmak gürültü, üç tur kaçırmak arızadır.
+    return yasSn <= aralikSn * 3 ? 'CANLI' : 'ASILMIS'
+  } catch {
+    // Dosya yok ya da bozuk. DİKKAT: bu "gözcüsü YOK" demek DEĞİL — şeridin kendi
+    // izleyicisi olabilir ama ölçülebilir imleç sözleşmesini yazmıyordur. "Ölçemedim" ile
+    // "yok" ayrı şeylerdir; etiket bu yüzden KANITSIZ. Fail-closed davranış aynı kalır
+    // (kanıtsız katman çökmüş sayılır), ama hüküm doğru adlandırılır.
+    return 'KANITSIZ'
+  }
+}
+
+function yoklama(now = Date.now()) {
+  const events = readEvents()
+  const hepsi = tumTalepler(now)
+  if (hepsi.length === 0) return 'YOKLAMA: panoda talep yok.'
+
+  const dk = (ts) => (ts ? Math.round((now - Date.parse(ts)) / 60000) : null)
+  const yasYaz = (d) => (d === null ? 'YOK' : d + 'dk')
+
+  const sonNot = new Map()
+  for (const e of events) {
+    if (e.type !== 'note' || !e.sid) continue
+    const o = sonNot.get(e.sid)
+    if (!o || String(e.ts) > String(o)) sonNot.set(e.sid, e.ts)
+  }
+
+  const durumlar = hepsi.map((c) => ({ c, gozcu: gozcuDurumu(c.sid, now) }))
+
+  const satirlar = durumlar.map(({ c, gozcu }) => {
+    const bayrak = c.bayat ? ' [BAYAT-TALEP]' : ''
+    return (
+      '  ' + String(c.lane).padEnd(16) +
+      ' ATIS ' + yasYaz(c.yasDk).padStart(7) +
+      '  GOZCU ' + gozcu.padEnd(13) +
+      ' SES ' + yasYaz(dk(sonNot.get(c.sid))).padStart(7) +
+      '  [' + c.sid.slice(0, 8) + ']' + bayrak
+    )
+  })
+
+  const sagir = durumlar.filter((d) => d.gozcu !== 'CANLI')
+  const bas =
+    'YOKLAMA — ' + hepsi.length + ' serit (ATIS=yasiyor, GOZCU=duyuyor, SES=uretiyor)'
+  const alt =
+    sagir.length === 0
+      ? '  Gozcusu kanitlanamayan serit YOK.'
+      : '  UYARI — GOZCUSU KANITLANAMAYAN ' + sagir.length + ' serit: ' +
+        sagir.map((d) => d.c.lane + '/' + d.c.sid.slice(0, 8)).join(', ') +
+        '\n  Bunlar panoya YAZABILIR ama OKUDUKLARI kanitli DEGIL: adresli emir ulasmayabilir.' +
+        '\n  Kurulum: node scripts/board/mechanism-setup.cjs plan --sid <uuid> --serit <SERIT>'
+
+  return bas + '\n' + satirlar.join('\n') + '\n' + alt
 }
 
 /* ---------------------------- CLI ---------------------------- */
@@ -474,8 +551,14 @@ if (require.main === module) {
     console.log(`not bırakıldı → ${target.how}`)
   } else if (verb === 'who') {
     console.log(summary(sid))
+  } else if (verb === 'yoklama' || verb === 'rollcall') {
+    // OKUYAN fiil: --sid ISTEMEZ. Yoklamayı kimlik şartının ardına koymak, sağırlığı ölçmek
+    // isteyen tarafı (orkestratör, Recep, yeni açılan oturum) tam da ölçüme muhtaç anda
+    // dışarıda bırakırdı. Yazan fiiller kimliksiz koşmaz; okuyan fiiller koşar.
+    console.log(yoklama())
   } else {
-    console.log('kullanım: board.cjs <claim|heartbeat|release|note|who> --sid X [--lane Y] [--globs "a/**,b/**"] [--to Z] [--text "..."]')
+    console.log('kullanım: board.cjs <claim|heartbeat|release|note|who|yoklama> --sid X [--lane Y] [--globs "a/**,b/**"] [--to Z] [--text "..."]')
+    console.log('yoklama (rollcall): filonun UC EKSENLI canlilik fotografi — ATIS=yasiyor, GOZCU=duyuyor, SES=uretiyor. --sid istemez.')
     console.log('--sid YAZAN fiillerde (claim/heartbeat/release/note) ZORUNLUDUR; CLAUDE_SESSION_ID doluysa oradan okunur.')
   }
 }
