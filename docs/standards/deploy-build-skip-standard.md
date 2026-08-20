@@ -456,3 +456,40 @@ karakter döner). Ve ölçüme **kontrol kolu** koy: bilinen-dağıtılmış bir
 gitti ("atlanan iş bedava"). İki ölçüm çarpıştı ve **ikisi de daraldı** — doğru
 sonuç bu. Sayı ikimizde de doğruydu; eksik olan, sayının **hangi bütçeyi** saydığıydı.
 Kardeş ders: `docs/standards/measurement-discipline-standard.md` K13.
+
+## D14 — Atlama garantisi TEMPOYA bağlıdır: üretim tabanı ebeveyn DEĞİL, son TAMAMLANMIŞ üretim dağıtımıdır
+
+D4 "karşılaştırma tabanı `VERCEL_GIT_PREVIOUS_SHA`" der. Bu doğru ama **eksik**: o değişkenin
+ne gösterdiği dala göre değişir ve üretimde **zamanla kayar**.
+
+**ÖLÇÜM (2026-08-20, Vercel derleme günlüğü):** master'a inen bir birleştirmede kapı şunu
+yazdı — `ignore-build: taban = VERCEL_GIT_PREVIOUS_SHA (59eb9161...)` ve kararı
+`package.json -> BUILD` oldu. Oysa o commit'in **kendi** değişikliği yalnız `docs/` altındaydı.
+
+**Mekanizma:** üretimde `VERCEL_GIT_PREVIOUS_SHA`, birleştirmenin ebeveyni değil, **en son
+TAMAMLANMIŞ üretim dağıtımının** SHA'sıdır. Birleştirmeler dağıtımlardan hızlı akarsa taban
+geride kalır ve fark penceresi genişler:
+
+```
+üretim dağıtımı tamamlandı  ->  A            (taban buraya çakılır)
+merge 1 (docs)              ->  B
+merge 2 (package.json)      ->  C
+merge 3 (docs)              ->  D   <- kapı A..D bakar, package.json GÖRÜR, BUILD der
+```
+
+`D`'nin sahibi yalnız doküman değiştirmiştir ama derlemeyi **başkasının dosyası** tetikler.
+
+**BAĞIMSIZ İKİNCİ VAKA (PRICING şeridi, aynı gün):** #709 ATLANDI, #705 DERLENDİ.
+İkisi de doküman sınıfıydı, aralarında 27 dakika vardı ve **tek değişken tempoydu**.
+
+### Sonuçları
+
+1. **"Doküman değiştirdim, atlanacak" bir GARANTİ DEĞİLDİR** — bir tahmindir ve doğruluğu
+   filonun o andaki birleştirme temposuna bağlıdır. Emir yazarken "bu PR derlenmeyecek"
+   diye taahhüt etme.
+2. **Kapı KUSURLU DEĞİLDİR.** Fail-safe doğru çalışıyor: pencerede build gerektiren bir dosya
+   varsa BUILD demek D2/D5'in gereğidir. Yanlış olan, tabanın sabit sanılmasıdır.
+3. **Ölçmek istiyorsan tek doğru kaynak derleme günlüğüdür** — kapının bastığı
+   `taban = ...` satırı. Commit ebeveyninden hesap yapmak bu penceresi görmez.
+4. **Yoğun günlerde atlama oranı DÜŞER.** Kota planlaması bunu hesaba katmalı: sakin günün
+   ölçümü yoğun günü tahmin etmez.
