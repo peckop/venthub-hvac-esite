@@ -137,6 +137,29 @@ kimseyi bozmadan yapılabilecek bir pencere açık.
    sözdizimi `node --check` ile doğrulandı. Bu satır, "betik uçtan uca koştu" izlenimi
    doğmasın diye burada.
 
+## 6b. Sınıflandırmanın iki sınırı — LEGAL (#719) ile mutabık
+
+### (TABLO, KOMUT) — tablo başına değil
+
+Aynı tablo **SELECT'te (C), yazmada (B)** olabilir. `products` ve `categories` canlı örneği:
+okuma yüklemi yalnız `tenant_id`, yazma yüklemi `user_profiles`'a JOIN eder (AUTH'un ölçümü).
+Bu karne **yalnız SELECT** ölçer; sorgusu `cmd in ('SELECT','ALL')` ile sınırlıdır. Dolayısıyla
+tablo–aile tablosu aslında **(tablo, SELECT) → aile** haritasıdır. **Yazma tarafına taşımak
+yanıltır.**
+
+### Önkoşul: JWT'de `user_role` claim'i bulunduğu varsayımı
+
+(A)/(B) ayrımı, JWT'nin `user_role` claim'ini **taşıdığı** varsayımına dayanır. Claim yoksa
+`is_admin_user()` yedek dalına düşer ve `user_profiles` okur — yani **(A) ailesi fiilen (B) gibi
+çalışır** ve bu karnenin "ölçülebilir" dediği tablolar da ölçülemez hâle gelir.
+
+Bu varsayım **SQL'den doğrulanamaz**: custom access token hook'unun açık olup olmadığı
+veritabanı kataloğunda değil, projenin auth yapılandırmasında yaşar. Otorite burada **DB değil,
+Supabase auth ayarıdır.** Karne bunu **ölçmez, varsayım olarak beyan eder** — yeşil verirken
+neyi varsaydığını söylememiş olmamak için.
+
+*(İki inceliği de LEGAL bildirdi; ilki AUTH'un ölçümünden geliyor.)*
+
 ## 7. Tekrar üretme
 
 ```

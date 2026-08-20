@@ -65,6 +65,24 @@
  * false) (A) ailesindendi ve GECTI — kor oldugumuz aile (B) idi. **Kontrol kolu, kor oldugun
  * aileden secilmezse korlugu gizler.**
  *
+ * ── AILE SINIFLANDIRMASININ IKI SINIRI (LEGAL / #719 ile mutabik) ────────────────────
+ *
+ * 1. SINIF (TABLO, KOMUT) BASINADIR, TABLO BASINA DEGIL. Ayni tablo SELECT'te (C),
+ *    yazmada (B) olabilir — `products` ve `categories` canli ornegidir: okuma yuklemi
+ *    yalniz `tenant_id`, yazma yuklemi `user_profiles`'a JOIN eder. Bu betik YALNIZ SELECT
+ *    olcer ve sorgusu `cmd in ('SELECT','ALL')` ile SINIRLIDIR; dolayisiyla urettigi harita
+ *    "tablo → aile" degil **"(tablo, SELECT) → aile"** haritasidir. Ciktiyi yazma tarafina
+ *    TASIMAK yaniltir.
+ *
+ * 2. ONKOSUL, ADIYLA TASINIYOR: (A)/(B) ayrimi **JWT icinde `user_role` claim'inin BULUNDUGU**
+ *    varsayimina dayanir. Claim yoksa `is_admin_user()` yedek daline duser ve `user_profiles`
+ *    okur — yani (A) ailesi FIILEN (B) gibi calisir ve bu betigin "olculebilir" dedigi
+ *    tablolar da olculemez hale gelir.
+ *    Bu varsayim **SQL'den dogrulanamaz**: custom access token hook'unun acik olup olmadigi
+ *    veritabani katalogunda degil, projenin auth yapilandirmasinda yasar. Yani otorite burada
+ *    DB DEGIL, Supabase auth ayaridir. Betik bunu OLCMEZ; **varsayim olarak beyan eder.**
+ *    Yesil verirken neyi varsaydigini soylememis olmamak icin burada yazilidir.
+ *
  * ── BU BETIGIN OLCMEDIGI ─────────────────────────────────────────────────────────────
  *  1. YAZMA yolunu olcmez — yalniz SELECT. `canWrite`/`ROLE_WRITE_ACCESS` ayri sorudur.
  *  2. Rota→tablo haritasini STATIK import yuruyusuyle cikarir. Kosul icinde secilen tablo
