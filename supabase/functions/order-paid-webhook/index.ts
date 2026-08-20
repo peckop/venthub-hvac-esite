@@ -135,6 +135,23 @@ Deno.serve(async (req: Request) => {
       return json({ ok: true, skipped: 'already_sent', order_id: order.id }, 200)
     }
 
+    // ── ÖNCE 'attempt' SATIRI — ölüm penceresini görünür kılar ─────────────────────
+    // Sıra bilinçli: GÖNDER → DAMGALA (at-least-once). Ters sırası (önce damgala) çift
+    // gönderimi imkânsız kılardı ama uç damgadan sonra ölürse e-posta hiç gitmez ve damga
+    // "gitti" der — sessiz kayıp, yani T068-VH'nin kapattığı sınıf. Müşteri PARA ÖDEDİ:
+    // eksik onay, mükerrer onaydan pahalıdır.
+    // Bu satır mükerrerliği ENGELLEMEZ; gönderim ile damga arasında ölen bir çağrının TEK
+    // izi olur. Terminal duruma hiç geçmeyen bir attempt = "e-posta gitmiş olabilir".
+    let denemeId: string | null = null
+    try {
+      const { data: deneme } = await supabase
+        .from('order_email_events')
+        .insert({ order_id: order.id, kind: KIND, provider: 'resend', status: 'attempt' })
+        .select('id')
+        .maybeSingle()
+      denemeId = deneme?.id ?? null
+    } catch { /* defter düşerse gönderimi ENGELLEME — kayıt gözlem içindir, kapı değil */ }
+
     // ── Gönderim: mevcut uca devredilir (tek şablon, tek gönderim mantığı) ─────────
     let gonderimHatasi: string | null = null
     try {
@@ -159,14 +176,19 @@ Deno.serve(async (req: Request) => {
       // gitmedi" sorusu cevapsız kalır ve sessiz kayıp hiçbir yerde görünmez (T068 dersi).
       // Bu yazma best-effort'tur: defter düşerse asıl hatayı YUTMAMALI.
       try {
-        await supabase.from('order_email_events').insert({
-          order_id: order.id,
-          kind: KIND,
-          subject: null,
-          provider: 'resend',
-          status: 'failed',
-          error: gonderimHatasi.slice(0, 1000),
-        })
+        if (denemeId) {
+          await supabase.from('order_email_events')
+            .update({ status: 'failed', error: gonderimHatasi.slice(0, 1000) })
+            .eq('id', denemeId)
+        } else {
+          await supabase.from('order_email_events').insert({
+            order_id: order.id,
+            kind: KIND,
+            provider: 'resend',
+            status: 'failed',
+            error: gonderimHatasi.slice(0, 1000),
+          })
+        }
       } catch { /* defter düşse bile asıl hata aşağıda bildirilecek */ }
       // 500: pg_net tekrar dener. Damga ATILMADIĞI için tekrar denemesi GÜVENLİ.
       return json({ error: 'send_failed', detail: gonderimHatasi.slice(0, 500) }, 500)
@@ -191,12 +213,16 @@ Deno.serve(async (req: Request) => {
     }
 
     try {
-      await supabase.from('order_email_events').insert({
-        order_id: order.id,
-        kind: KIND,
-        provider: 'resend',
-        status: 'sent',
-      })
+      if (denemeId) {
+        await supabase.from('order_email_events').update({ status: 'sent' }).eq('id', denemeId)
+      } else {
+        await supabase.from('order_email_events').insert({
+          order_id: order.id,
+          kind: KIND,
+          provider: 'resend',
+          status: 'sent',
+        })
+      }
     } catch { /* kısıt ikinci `sent` satırını reddeder — beklenen davranış */ }
 
     return json({
