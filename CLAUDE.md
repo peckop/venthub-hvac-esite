@@ -59,6 +59,13 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 1. **No-Plan-No-Code:** Değişiklikten önce plan çıkar, onay al. Plan, **kendisini hangi cetvelin
    yönettiğini** söylemeli: ya `docs/standards/` altından bir dosya adı, ya açıkça "cetvel yok".
    "Cetvel yok" geçerli bir cevap ama **bedava değil** — o zaman iş, cetveli yazmayı da kapsar.
+   **İş emri de aynı kurala tabidir (2026-08-20):** registry'de açılan her görevin
+   açıklamasında zorunlu **KAYNAK/CETVEL bloğu** bulunur — yöneten cetvel dosya adları +
+   karne/ölçüm tazeliği; cetvel yoksa açıkça "cetvel yok — yazımı bu işin kapsamında" yazılır.
+   Emri açan (orkestratör dahil) önce docs/README haritasına ve ikize "bu konuda mevcut
+   cetvel var mı" diye SORAR. (Niçin: 2026-08-20'de ERP yetenek çerçeveleri zaten yazılıyken
+   "yazılmadı" sanılıp sıfırdan emirler açıldı — belge vardı, emre bağlanmamıştı; el kitabı
+   "hatırlanan" değil "emre yazılan" şey olmalı.)
    (Niçin: 2026-08-15'te 1044 fiyat satırı prod'a yazıldı ve vitrin değişmedi; sebebi render/önbellek
    cetvelinin hiç yazılmamış olmasıydı — hata tam o boşlukta yaşadı ve hiçbir kapı görmedi.)
 2. **Dependency Injection:** Tüm `lib/services/*` fonksiyonları ilk parametre olarak
