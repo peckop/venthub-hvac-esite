@@ -274,9 +274,24 @@ tasarlanır. **Migration gerektirir → Recep kapısı.** Bu cetvel v0'da yalnı
 çizilir ve hiçbir kapı görmez. Bu sınıf 08-19'da T108'de bir kez ödendi (sipariş durum etiketleri
 ham DB dizesi basıyordu).
 
-**Geri alma planı:** INV-ERP-RESOURCE-1 — her kaydın `labelKey`'i `admin/menu.{tr,en}.ts`'te var
-mı, `route`'u `src/app/admin/**` altında gerçek mi. Davranışsal, statik tarama değil. ADMIN
-şeridinde yazılacak; bu cetvelin zorlama borcudur.
+**KAPATILDI — bu cetvelle AYNI PR'da:** `INV-ERP-RESOURCE-1`
+(`src/__tests__/conformance/admin-erp-resource-registry.test.ts`). Cetvel ile onu zorlayan test
+**tek kontroldür**; ayrı PR'a bölmek cetveli dişsiz bırakırdı.
+
+Kapı üç şey ölçer: (1) her `labelKey` **hem tr hem en** sözlüğünde çözülüyor mu — gerçek çözücü
+`getDictValue` ile, ham anahtar dönerse KIRMIZI; (2) her `route` `src/app/admin/**` altında
+gerçek bir `page.tsx`'e karşılık geliyor mu; (3) registry ya da rota listesi boşsa KIRMIZI
+(sessiz-boş sınıfı — boş liste üzerinde ilk iki test geçerdi).
+
+⚠ **İlk yazımdaki bir netlik hatası düzeltildi:** anahtarların hepsi `admin/menu.{tr,en}.ts`'te
+yaşamıyor — ör. `quotes.admin.navLabel` başka bir sözlük ağacından geliyor. Kapı bu yüzden **tam
+tr/en sözlüğüne** karşı çözüm yapar, tek bir dosyaya değil.
+
+**Kanıt:** iki kasıtlı sabotaj da KIRMIZI verdi (`labelKey` → var olmayan anahtar;
+`route` → `/admin/hayali-rota`). **Şu an yeşil:** 33 kaydın 33'ü, 24 benzersiz rotanın 24'ü.
+Kapı bir kusuru değil, bir **seviyeyi** kilitliyor.
+
+**Geri alma planı:** test dosyasını sil — hiçbir üretim kodu ona bağlı değil.
 
 ### Ç4 — Kaydedilmiş görünüm kavramı YOK · **E1 ile çelişir**
 
