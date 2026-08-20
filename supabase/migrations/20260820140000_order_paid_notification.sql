@@ -102,13 +102,17 @@ begin
   ) then
     alter table public.order_email_events
       add constraint order_email_events_status_check
-      check (status is null or status in ('sent', 'failed'));
+      check (status is null or status in ('attempt', 'sent', 'failed'));
   end if;
 end $$;
 
 comment on column public.order_email_events.status is
-  'sent | failed | NULL(eski satir). T137-VH: defter yalniz basariyi yazdigi surece '
-  '"nicin gitmedi" sorusu cevapsiz kalir — atesle-unut cagrida sessiz kayip gorunmez.';
+  'attempt | sent | failed | NULL(eski satir). T137-VH: defter yalniz basariyi yazdigi surece '
+  '"nicin gitmedi" sorusu cevapsiz kalir — atesle-unut cagrida sessiz kayip gorunmez. '
+  'attempt = gonderim DENENDI, sonucu henuz yazilmadi. Terminal duruma HIC gecmeyen bir '
+  'attempt satiri, uc ile damga arasinda OLEN bir cagrinin TEK izidir: e-posta gitmis '
+  'olabilir ama damga atilmamistir, yani tekrar denemede MUKERRER gonderim olur. Bu satir '
+  'o mukerrerligi ENGELLEMEZ, ACIKLANABILIR kilar.';
 
 comment on column public.order_email_events.kind is
   'Bildirim turu (ornek: order_paid). T137-VH oncesi tek tur vardi ve adlandirilmamisti; '
@@ -116,6 +120,30 @@ comment on column public.order_email_events.kind is
 
 create index if not exists idx_order_email_events_order_kind
   on public.order_email_events(order_id, kind, created_at desc);
+
+-- ⭐ DEFTER GÖNDERİMDEN ÖNCE Mİ SONRA MI — karar ve niçin (OPS'un ek kolu, I18N'in tespiti)
+-- ---------------------------------------------------------------------------------
+-- I18N doğru tespit etti: mevcut `order-confirmation` defteri gönderimden SONRA ve
+-- `try/catch` içinde yazıyor, yani defter eksik kalabilir. Soru şu: yazma gönderimden
+-- ÖNCE mi olmalı, atomik mi?
+--
+-- İKİ SEÇENEK VE GERÇEK BEDELLERİ:
+--  (a) ÖNCE DAMGALA, SONRA GÖNDER (at-most-once): çift gönderim İMKÂNSIZ olur. Ama uç
+--      damgayı attıktan sonra ölürse e-posta HİÇ gitmez ve damga "gitti" der —
+--      SESSİZ KAYIP. T068-VH'nin kapattığı sınıfın ta kendisi.
+--  (b) GÖNDER, SONRA DAMGALA (at-least-once): kayıp olmaz; ölüm penceresinde İKİNCİ
+--      e-posta gidebilir.
+--
+-- SEÇİM (b), ve gerekçesi ticari asimetridir, teknik zarafet değil: müşteri PARA ÖDEDİ.
+-- Eksik ödeme onayı, bu işin düzeltmek için var olduğu kusurdur; mükerrer onay ise
+-- rahatsız edicidir ama zarar vermez. Belirsizlikte pahalı olan tarafa değil ucuz olan
+-- tarafa yanılıyoruz. Aynı tercih tetiğin fail-open dalında da yapıldı (bkz. §4).
+--
+-- AMA (b)'nin ölüm penceresi GÖRÜNMEZ kalmamalı: uç, göndermeden ÖNCE `attempt` satırı
+-- yazar ve sonucu o satıra işler. Terminal duruma hiç geçmeyen bir `attempt`, e-postanın
+-- gitmiş ama damgalanmamış olabileceğinin TEK izidir. Mükerrerliği engellemez —
+-- AÇIKLANABİLİR kılar. Sessiz kalan bir mükerrerlik ile açıklanabilir bir mükerrerlik
+-- arasındaki fark, üçüncü kez yaşamadan öğrenmektir.
 
 -- SON SAVUNMA — damga düşse bile ikinci "sent" satırı yazılamaz.
 -- Kısmi ve YALNIZ başarılı satırlar için: başarısız denemeler tekrar edebilmeli.
