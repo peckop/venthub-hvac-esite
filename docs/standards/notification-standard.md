@@ -61,7 +61,7 @@ veritabanı tetiği · webhook · cron. Tek biçimli taramanın sıfırı, yoklu
 
 | Defter | Başarısızlık satır bırakır mı | `tenant_id` | Gönderimden ÖNCE okunuyor mu |
 |---|---|---|---|
-| `order_email_events` | **HAYIR** (yalnız başarı) | **YOK** (canlı DB, 08-20) | **HAYIR** |
+| `order_email_events` | **EVET** (v1.1: `status` + `error`) | **YOK** (canlı DB, 08-20 · v1.1'de de yok) | uç HAYIR · **tetik EVET** |
 | `shipping_email_events` | **HAYIR** (yalnız başarı) | VAR | **HAYIR** |
 | `quote_email_events` | **EVET** (`status in ('sent','failed')` + `error`) | ölçülmedi | **EVET** (damga üzerinden) |
 
@@ -193,13 +193,18 @@ onarılmıyor, hepsi ayrı iş emri ister:
 
 | # | Çelişki | Yer | Sahip şerit |
 |---|---|---|---|
-| 1 | `order-confirmation` mükerrerlik koruması olmadan gönderiyor | `supabase/functions/order-confirmation/index.ts` | EDGE |
+| 1 | ~~`order-confirmation` mükerrerlik koruması olmadan gönderiyor~~ → **`#711` ile çözüldü** (DB damgası + UNIQUE); uç hâlâ kendi başına çağrılırsa korumasız | `order-confirmation/index.ts` | EDGE |
 | 2 | `shipping-notification` ve `delivery-notification` de deftere yazıp okumuyor | aynı klasör | EDGE |
 | 3 | `shipping_idempotency` tablosu **yalnız yazılıyor, hiç okunmuyor** — adı "idempotency" olan tablo sıfır idempotency veriyor (`admin-update-shipping:287-298`, dosyada başka geçiş yok) | EDGE | EDGE |
 | 4 | `order_email_events`'te `tenant_id` yok | canlı DB + migration | EDGE/ALTYAPI |
-| 5 | `order_email_events`/`shipping_email_events` başarısızlığı yazmıyor | canlı DB | EDGE |
-| 6 | `order-confirmation` metinleri gömülü Türkçe | satır 167, 176-183 | I18N (bende) |
+| 5 | ~~`order_email_events` başarısızlığı yazmıyor~~ → **`#711` ile çözüldü** (`status`/`error`/`kind`). `shipping_email_events` için **hâlâ geçerli** | canlı DB | EDGE |
+| 6 | `order-confirmation` metinleri gömülü Türkçe | satır 167, 176-183 | kural I18N · **dosya EDGE** |
 | 7 | `delivery-notification` kaydını kargo defterine yazıyor | satır 162 | EDGE |
+
+**Sahiplik notu:** 6 numaralı kalemin *kuralı* I18N'e (sözlük + CLAUDE.md Kural 7), *dosyası*
+EDGE'e aittir (`supabase/functions/**` EDGE'in şerit talebinde). Onarım tek şeritte bitmez;
+sözlük anahtarlarını I18N verir, uca EDGE işler. Bunu ayrı yazıyorum çünkü tabloda tek bir
+şerit adı yazmak işi yanlış adrese yollar.
 
 **Not:** 3 numaralı bulgu bu cetvelin kapsamının dışında (kargo yazma işlemi, bildirim değil)
 ama **aynı sınıfın** en keskin örneği olduğu için buraya yazıldı: defterin adı korumayı
@@ -261,6 +266,41 @@ için değil **hiçbir yere bakmadığı** için yeşil olabilir.
    (damga + başarısızlık yazan defter) ve `supabase/functions/quote-notification-webhook/index.ts`
    (satır 107 oku · 118 vazgeç · 172 damgala).
 
+## B11 — v1.1 kaydı: cetvel kendi konusunda BİR COMMIT BAYAT doğdu
+
+v1.0'ın ölçüm tabanı `57e82a4d` idi. Cetvel `d61f5295` olarak master'a indi — ve **bir önceki
+commit** `d542a1d2` (`#711`, EDGE) tam da bu cetvelin çekirdek konusunu değiştirmişti.
+Yani belge, yayımlandığı anda kendi ana iddiasında güncelliğini yitirmişti.
+
+**`#711` ne getirdi** (canlı DB'den doğrulandı, migration prod'a inmiş):
+
+| Ne | Nerede |
+|---|---|
+| `venthub_orders.paid_at` — **olgu** damgası | `20260820140000_order_paid_notification.sql:52` |
+| `venthub_orders.paid_email_sent_at` — **idempotans** damgası | aynı dosya, satır 55 |
+| `order_email_events.status` · `.error` · `.kind` | satır 88-94 |
+| `uq_order_email_events_sent_once` — kalıcı UNIQUE | satır 150 |
+| `trg_stamp_order_paid_at` · `trg_notify_order_paid` (pg_net) | satır 172, 238 |
+
+Bu, §B3'ün **ilk uygulamasıdır**: veriye bağlı tetik + göndermeden önce okunan kalıcı damga.
+EDGE'in getirdiği ve v1.0'da yalnız ima edilen ayrım şudur ve buraya adıyla alınıyor:
+
+> **Olgu damgası ile idempotans damgası AYNI ŞEY DEĞİLDİR.** `paid_at` "bu sipariş ödendi"
+> der; `paid_email_sent_at` "bunun e-postası gitti" der. Tek kolona ikisini birden yükleyen
+> tasarım, e-posta başarısız olduğunda ya olguyu yalanlar ya da tekrarı açar.
+
+### Bundan çıkan cetvel kuralı
+
+**Bir cetvelin ölçüm tabanı, yayımlandığı andaki master OLMAK ZORUNDA DEĞİLDİR — ama tabanı
+YAZILI olmak ve yayımdan önce SON KEZ kontrol edilmek zorundadır.** Bu belge tabanını yazmıştı
+(§KAYNAK/CETVEL), o yüzden bayatlık *görünür* oldu ve bir saat içinde düzeltilebildi. Tabanı
+yazmayan bir cetvel aynı durumda sessizce yanlış kalırdı.
+
+**Hâlâ geçerli olanlar** (v1.1'de yeniden ölçüldü): `order_email_events`'te `tenant_id` **yok**
+(§B5) · `shipping_idempotency` yalnız yazılıyor, hiç okunmuyor (§B7-3) · `delivery-notification`
+kaydını kargo defterine yazıyor (§B7-7) · `shipping_email_events` başarısızlığı yazmıyor.
+
 ---
 
-**Sürüm:** v1.0 · 2026-08-20 · ölçüm tabanı `origin/master` = `57e82a4d` + canlı Postgres.
+**Sürüm:** v1.1 · 2026-08-20 · ölçüm tabanı `origin/master` = `94ec69c3` + canlı Postgres.
+(v1.0 tabanı `57e82a4d` idi ve **kendi konusunda bir commit bayat doğdu** — bkz. §B11.)
