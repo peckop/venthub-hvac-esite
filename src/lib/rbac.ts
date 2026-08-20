@@ -14,28 +14,40 @@ export type UserRole = 'super_admin' | 'admin' | 'moderator' | 'warehouse' | 'sa
 const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'], // Her seye erişim
     admin: ['*'], // Her seye erişim (kullanıcılar sayfası haricinde kontrol edilecek)
-    // moderator: RLS'in okuma verdiği yüzeyler. DIŞARIDA BIRAKILANLAR ve sebepleri:
-    //   /admin/users         → yalnız super_admin (aşağıdaki özel yetki kontrolü)
-    //   /admin/data-requests → is_admin_user() moderator'u kabul etmez (T063, prod'dan ölçüldü)
-    //   /admin/invoices      → order_invoices RLS: user_role IN ('admin','super_admin') (T132)
+    // moderator: liste CANLI DB'den ÖLÇÜLDÜ (2026-08-20), tahminle yazılmadı.
+    // Yöntem: moderator kimliğiyle (request.jwt.claims + set local role authenticated)
+    // RLS'li 26 tabloda satır sayımı; kabul eden kol olarak aynı sorgu admin kimliğiyle
+    // tekrarlandı (admin 16 tablo görür, moderator 11 → sonda kör bir sonda DEĞİL).
+    //
+    // MODERATOR'UN GERÇEKTEN OKUYABİLDİĞİ yüzeyler ve dayanağı:
+    //   /admin/products, /admin/categories → products/categories tenant geneli okuma, TAM
+    //   /admin/coupons                     → TAM (⚠ VERİYE BAĞLI: politika admin olmayana
+    //                                        yalnız AKTİF kuponu verir; bugün hepsi aktif
+    //                                        olduğu için tam göründü. Pasif kupon girildiği
+    //                                        gün kısmi olur — kupon defteri büyüyünce ölç.)
+    //   /admin/purchasing                  → purchase_orders politikası 'moderator'ü AÇIKÇA
+    //                                        sayıyor (tek istisna; T062 notu bunu doğruluyor)
+    //   /admin/inventory/settings          → inventory_settings tenant geneli okuma, TAM
+    //
+    // ÇIKARILANLAR — hepsi ÖLÇÜLDÜ, hiçbiri tahmin değil (moderator 0 satır görüyor):
+    //   audit-logs (admin_audit_log) · error-groups · errors (client_errors: service_role
+    //   ONLY, admin bile göremiyor → T136) · webhook-events · settings (site_settings) ·
+    //   pricing (pricing_rule kör, product_prices 348/1044 KISMİ) · movements ve
+    //   inventory/report (inventory_movements → is_user_admin(), moderator kabul edilmiyor) ·
+    //   orders/quotes/returns (politika 'kendi satırın VEYA admin' → moderator YALNIZ KENDİ
+    //   siparişini görür, yani yönetim ekranı olarak boş).
+    //
+    // ⚠ AÇIK KARAR (Recep): bu ölçüm moderator'ün DB düzeyinde neredeyse yetkisiz olduğunu
+    // söylüyor — viewer ile aynı sınıf. Rol ya DB'de açılmalı (politikalara moderator
+    // eklenerek) ya da vaat edilmediği kabul edilmeli. UI'yi geniş tutmak üçüncü bir seçenek
+    // DEĞİL: sessiz-boş ekran üretir. Ölçemediğim rota FAIL-CLOSED bırakıldı (listede yok).
     moderator: [
         '/admin',
-        '/admin/audit-logs',
         '/admin/categories',
         '/admin/coupons',
-        '/admin/error-groups',
-        '/admin/errors',
-        '/admin/inventory',
-        '/admin/logistics',
-        '/admin/movements',
-        '/admin/orders',
-        '/admin/pricing',
+        '/admin/inventory/settings',
         '/admin/products',
-        '/admin/purchasing',
-        '/admin/quotes',
-        '/admin/returns',
-        '/admin/settings',
-        '/admin/webhook-events'
+        '/admin/purchasing'
     ],
     // T062 NOTU: `/admin/purchasing` warehouse'ta BİLEREK YOK. `process_goods_receipt` RPC'si
     // warehouse'u kabul eder, ama satınalma tablolarının RLS SELECT'i (maliyet hassas)
@@ -83,10 +95,16 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
 const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'],
     admin: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook_events', 'error_groups', 'settings', 'pricing', 'purchasing', 'data_requests', 'invoices'],
-    // 'data_requests' ve 'invoices' BILEREK yalniz admin'de (+ super_admin '*'): her ikisinin
-    // RLS kapisi is_admin_user() ve o moderator'u kabul ETMEZ; moderator'a yazma izni vermek
-    // yalniz yaniltici buton uretirdi.
-    moderator: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook_events', 'error_groups', 'settings', 'pricing', 'purchasing'],
+    // moderator YAZMA listesi de CANLI POLITIKADAN olculdu (2026-08-20), sayfa listesiyle
+    // ayni yontemle. UC tablo moderator'u ACIKCA sayiyor (INSERT/UPDATE/DELETE hepsinde):
+    //   products · categories · purchase_orders + purchase_order_items
+    // OKUYUP YAZAMADIKLARI - sayfasi acik ama yazma izni YOK, kasitli asimetri:
+    //   coupons ve inventory_settings yazma politikalari is_user_admin() istiyor, o da
+    //   yalniz admin/super_admin kabul ediyor. Sayfayi goruyor, degistiremiyor.
+    // Digerlerinin (orders, returns, quotes, pricing, settings, error_groups, movements,
+    // webhook_events) sayfasini zaten ACAMIYOR; yazma izni vermek yalniz yaniltici buton
+    // uretirdi. 'data_requests' ve 'invoices' de ayni sebeple yalniz admin'de.
+    moderator: ['products', 'categories', 'purchasing'],
     // warehouse'a 'purchasing' yazma izni YOK — yukarıdaki sayfa notuna bak (RLS okuma
     // vermiyor; yazma izni tek başına kullanılamaz, yalnız yanıltıcı buton üretirdi).
     warehouse: ['logistics', 'inventory', 'movements', 'inventory_settings'],

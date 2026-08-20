@@ -54,15 +54,41 @@ describe('RBAC (Role Based Access Control)', () => {
             expect(canAccessPage('viewer', '/admin/users')).toBe(false);
         });
 
-        // moderator artik '*' tasimiyor: RLS'in gercekten satir verdigi sayfalar acik,
-        // is_admin_user() kapisina takilanlar KAPALI (yoksa "yetkin yok" yerine
-        // "kayit yok" ekrani = sessiz-bos).
-        it('moderator RLS ile uyumlu: calisma sayfalari acik, admin-only defterler kapali', () => {
-            expect(canAccessPage('moderator', '/admin/orders')).toBe(true);
+        // moderator listesi CANLI RLS OLCUMUNDEN turetildi (2026-08-20), tahminden degil.
+        // Kabul kolu: moderator'un GERCEKTEN satir gordugu yuzeyler.
+        it('moderator: RLS satir VEREN yuzeyler acik', () => {
+            expect(canAccessPage('moderator', '/admin')).toBe(true);
             expect(canAccessPage('moderator', '/admin/products')).toBe(true);
+            expect(canAccessPage('moderator', '/admin/categories')).toBe(true);
+            expect(canAccessPage('moderator', '/admin/coupons')).toBe(true);
+            // purchase_orders politikasi 'moderator'u ACIKCA sayiyor - tek istisna
             expect(canAccessPage('moderator', '/admin/purchasing')).toBe(true);
+            expect(canAccessPage('moderator', '/admin/inventory/settings')).toBe(true);
+        });
+
+        // Red kolu: moderator'un SIFIR satir gordugu yuzeyler. Bunlar acik kalsaydi
+        // "yetkin yok" yerine "kayit yok" ekrani cikardi - sessiz-bos sinifi.
+        it('moderator: RLS satir VERMEYEN yuzeyler KAPALI (sessiz-bos onlemi)', () => {
+            expect(canAccessPage('moderator', '/admin/orders')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/returns')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/quotes')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/audit-logs')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/error-groups')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/errors')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/webhook-events')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/settings')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/pricing')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/movements')).toBe(false);
             expect(canAccessPage('moderator', '/admin/data-requests')).toBe(false);
             expect(canAccessPage('moderator', '/admin/invoices')).toBe(false);
+        });
+
+        // Envanter AYRIMI: ayarlar okunabilir, RAPOR degil (inventory_movements ->
+        // is_user_admin(), moderator'u kabul etmiyor). Alt-yol on-eki bunu ayirt etmeli.
+        it('moderator: envanter AYARLARI acik ama RAPOR kapali', () => {
+            expect(canAccessPage('moderator', '/admin/inventory/settings')).toBe(true);
+            expect(canAccessPage('moderator', '/admin/inventory/report')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/inventory')).toBe(false);
         });
 
         it('admin ve super_admin genis yetkisini korur', () => {
@@ -105,8 +131,26 @@ describe('RBAC (Role Based Access Control)', () => {
         // rol butonu goremez). Gercek anahtar admin-resources.ts'te 'webhook_events'.
         it("'webhook_events' yazilabilir, eski 'webhook' adi ARTIK YOK", () => {
             expect(canWrite('admin', 'webhook_events')).toBe(true);
-            expect(canWrite('moderator', 'webhook_events')).toBe(true);
             expect(canWrite('admin', 'webhook')).toBe(false);
+        });
+
+        // Yazma matrisi de canli politikadan olculdu: UC tablo moderator'u ACIKCA sayiyor.
+        it('moderator yalniz politikanin ACIKCA saydigi uc varliga yazar', () => {
+            expect(canWrite('moderator', 'products')).toBe(true);
+            expect(canWrite('moderator', 'categories')).toBe(true);
+            expect(canWrite('moderator', 'purchasing')).toBe(true);
+            expect(canWrite('moderator', 'orders')).toBe(false);
+            expect(canWrite('moderator', 'pricing')).toBe(false);
+            expect(canWrite('moderator', 'settings')).toBe(false);
+        });
+
+        // KASITLI ASIMETRI: sayfayi GORUR ama YAZAMAZ. Yazma politikalari is_user_admin()
+        // istiyor, o da moderator'u kabul etmiyor. Ikisini esitlemek yaniltici buton uretirdi.
+        it('moderator kupon ve envanter ayarlarini OKUR ama YAZAMAZ', () => {
+            expect(canAccessPage('moderator', '/admin/coupons')).toBe(true);
+            expect(canWrite('moderator', 'coupons')).toBe(false);
+            expect(canAccessPage('moderator', '/admin/inventory/settings')).toBe(true);
+            expect(canWrite('moderator', 'inventory_settings')).toBe(false);
         });
 
         // T134 — 'logs' silindi. Sebep "cagrilmiyor" degil: karsiligi /admin/audit-logs,
