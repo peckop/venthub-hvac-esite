@@ -86,23 +86,54 @@ Servis testinin asıl iddiası R3: tipler henüz üretilmediği için satırlar 
 okunuyor ve böyle bir yerde en sinsi kusur, alan kaybolduğunda satırın **boş dizelerle dolu
 "başarıyla"** dönmesidir — ekran boş görünür, hata yoktur, kimse bakmaz.
 
-## 5. Şerit sınırları (kendi başıma yapmadıklarım)
+## 5. Şerit sınırları — ve ölçülünce çöken premis
 
-- `docs/standards/legal-compliance-standard.md` **AUTH şeridinde**; lane-guard beni doğru
-  şekilde blokladı, Bash ile aşmadım. §2.3 güncellemesi için dar diff izni istendi.
-  **INV-INVOICE-1 R6 bu izin gelene kadar KIRMIZI** — yani PR yeşillenemez. Kapı burada
-  formalite değil, gerçek bir engel.
-- `src/config/admin-resources.ts` **ADMIN-CUSTOMER şeridinde**; izin **verildi**, beş şartla
-  (tek nesne, mevcut grup, ikon alfabetik import, `labelKey` iki sözlükte de var olacak,
-  `route` gerçekten var olacak).
+İlk hâlinde bu bölüm şunu söylüyordu: "cetvel AUTH şeridinde, lane-guard beni blokluyor,
+izin bekliyorum." **O premis ölçülünce çöktü.** `board.cjs` içindeki `findConflict` okundu:
+kıdem atlaması `if (mine && c.ts > mine.ts) continue` satırında yaşıyor.
 
-**ADMIN'in bildirdiği boşluk, kayda geçiyor:** `admin-resources.ts`'i koruyan **hiçbir kapı
-yok** — `labelKey`in sözlükte var olduğunu ya da `route`un gerçek olduğunu ölçen conformance
-testi bulunmuyor. Yani o beş şart bugün **insan disiplini**, mekanizma değil. Bu, dün
-ölçtüğümüz "ham anahtar ekrana basılıyor" sınıfının açık kapısıdır. Kapının sahibi ADMIN
-şerididir; yazmayı teklif ettim.
+Guard **simetrik değil**: yalnız senden **kıdemli** claim'ler bloklar. Benim claim'im
+08-17T16:49Z, AUTH'unki 08-20T08:27Z — yani AUTH beni hiç bloklamıyordu. Kendi sid'imle
+sekiz hedef yolu tek tek sordum: **hepsi serbest**. Dedektörün sağlığı da kanıtlandı
+(aynı araç EDGE ve I18N-SWEEP yollarında BLOK üretti).
 
-## 6. Açık kalan
+Daha tehlikeli ikinci yarısı: **kendi claim'in yoksa koruma tümüyle düşer.** Claim TTL ile
+bayatlarsa herkes seni bloklar. Gördüğüm blokları açıklayabilecek tek kod yolu budur ve
+sınıf olarak yenidir: kod değişmeden, yalnız kendi kaydın düştüğü için dünkü yazma bugün
+reddedilir. Panoya yayınlandı; kalıcı çözüm ALTYAPI şeridinde.
+
+**Ders:** sahiplik listesi kimin ne tuttuğunu gösterir, **kararı** kıdem verir. İzin
+istemeden önce guard'a doğrudan sormak iki tur kazandırırdı.
+
+## 6. Ölçerken çıkan CANLI kusur — ekran yetkisi DB yetkisini aşıyordu
+
+Faz-2'yi yazarken `is_admin_user()`'ın canlı tanımı prod'dan okundu ve yalnız
+`admin`/`super_admin` kabul ettiği görüldü. `order_invoices` politikaları buna bağlı.
+Ama `rbac.ts` sayfa matrisinde **moderator ve viewer `*` taşıyor** — yani fatura defterini
+AÇABİLİRLERDİ, RLS tek satır vermezdi ve ekranda "yetkin yok" değil **"kayıt yok"**
+görünürdü. Sessiz-boş: hata yok, log yok, kimse bakmaz.
+
+Bu sınıf bu depoda **iki kez** yaşandı (T062 warehouse/purchasing, T063 moderator/KVKK).
+Üçüncüsü kapıda durduruldu: `rbac.ts`'e `/admin/invoices` kapısı eklendi ve
+**INV-INVOICE-1 R7** kapının varlığını ölçüyor. R8 aynı simetriyi servis tarafında kuruyor:
+DB'de UPDATE/DELETE politikası yoksa servis de öyle bir fonksiyon sunamaz — aksi hâlde
+ekranda çalışmayan bir düğme doğar ve kusur ancak kullanıcıda görünür.
+
+## 7. ADMIN'in bildirdiği boşluk KAPATILDI
+
+`admin-resources.ts`'i koruyan hiçbir kapı yoktu: `labelKey`in sözlükte var olduğunu ya da
+`route`un gerçek olduğunu ölçen test bulunmuyordu — beş şart **insan disiplini**ydi.
+Yeni bekçi **INV-ADMIN-RESOURCE-1** (`admin-resource-integrity.test.ts`) bunları mekanik
+yapıyor: R1 labelKey iki menü sözlüğünde de var (yoksa menüye ham anahtar basılır),
+R2 route gerçek bir sayfaya gidiyor (yoksa menü 404'e götürür), R3 `requiredAccess`
+rotayla tutarlı, R4 key tekil; R0/R0b ayrıştırıcının kör koşmasını engelliyor.
+
+Üç iddia **bilerek kırılarak** kanıtlandı (kapıyı kaldır → R7 kırmızı · İngilizce etiketi
+sil → R1 kırmızı · rotayı olmayan sayfaya çevir → R2 kırmızı), sonra geri yüklendi.
+
+Dosya ADMIN-CUSTOMER şeridinin mülküdür; merge sonrası onlara geri döner.
+
+## 8. Açık kalan
 
 - **Merge Recep kapısı** (kural 13: migration merge = prod'a otomatik uygulama). Kuyruk
   slotu OPS'tan; sıram #680'den sonra, #695'ten önce.

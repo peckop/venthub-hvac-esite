@@ -141,6 +141,33 @@ describe('INV-INVOICE-1 — fatura defteri sözleşmesi', () => {
     ).toBe(false)
   })
 
+  it('R7 — ekran YETKISI, DB yetkisinin otesine gecmiyor (sessiz-bos onlemi)', () => {
+    const rbac = readFileSync(path.join(KOK, 'src/lib/rbac.ts'), 'utf8')
+
+    // order_invoices RLS'i is_admin_user()'a bagli; canli tanim 2026-08-20'de prod'dan
+    // okundu ve YALNIZ 'admin'/'super_admin' kabul ediyor. moderator ve viewer sayfa
+    // matrisinde '*' tasidigi icin ekrani ACABILIR ama tek satir goremezdi: "yetkin yok"
+    // yerine "kayit yok" = SESSIZ-BOS. Ayni sinif T062 ve T063'te yasandi.
+    const kapi = /path\.startsWith\(\s*'\/admin\/invoices'\s*\)[\s\S]{0,160}?return\s+false/i
+    expect(
+      kapi.test(rbac),
+      '\nrbac.ts icinde /admin/invoices icin admin/super_admin kapisi YOK. moderator ve ' +
+        'viewer sayfayi acar, RLS satir vermez ve BOS defter gorurler — hata da almazlar. ' +
+        'UI izni DB izninin otesine gecemez.',
+    ).toBe(true)
+  })
+
+  it('R8 — servis fatura satirini GUNCELLEYEN/SILEN bir yol sunmuyor', () => {
+    const servis = readFileSync(path.join(KOK, 'src/lib/services/orderInvoice.service.ts'), 'utf8')
+    const yasak = servis.match(/export\s+async\s+function\s+(update|delete|edit|cancel)\w*/gi)
+    expect(
+      yasak ?? [],
+      '\norderInvoice.service.ts fatura satirini degistiren bir fonksiyon sunuyor. DB ' +
+        'tarafinda UPDATE/DELETE politikasi YOK; servis onu vaat ederse ekranda calismayan ' +
+        'bir dugme dogar ve kusur ancak kullanicida gorunur. Ikisi ayni seyi soylemeli.',
+    ).toEqual([])
+  })
+
   it('R6 — cetvel §2.3 yeni kaydı anlatıyor (doküman koddan geri kalmıyor)', () => {
     const cetvel = readFileSync(CETVEL, 'utf8')
     expect(
