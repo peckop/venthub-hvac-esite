@@ -114,6 +114,33 @@ describe('INV-CETVEL-YAPI · cetvellerin bölüm yapısı', () => {
     expect(olculenler().length, 'ölçülen cetvel sayısı').toBeGreaterThanOrEqual(10)
   })
 
+  /**
+   * YANLIŞ KIRMIZI KORUMASI — AUTH'un (99fa366e, 2026-08-20 10:11Z) uyarısından doğdu.
+   *
+   * "Her alt bölüm ana bölümüne sahip olmalı" cümlesi iki biçimde kodlanabilir:
+   * ANA = en üst düzey (`3`) ya da ANA = DOĞRUDAN ebeveyn (`3.8`). İlkini kodlayan
+   * üç düzeyli belgelerde hiçbir şey yakalamaz; ikincisini kodlarken ebeveyn kümesine
+   * yalnız noktasız başlıkları koyan, `3.8.1`'e YANLIŞ KIRMIZI verir.
+   *
+   * AUTH tam bu tuzağa düştü ve `admin-design-standard` ile `pricing-standard`
+   * dosyalarına iki yanlış alarm üretti (ikisi de başka şeritlerin dosyası).
+   * Yeni bir kapının ilk işi yanlış kırmızı olursa kapıya güven biter.
+   */
+  it('meşru üç düzeyli başlığa YANLIŞ KIRMIZI vermez', () => {
+    const SATIR_SONU = String.fromCharCode(10)
+    const temiz = ['## 3. Ana', '### 3.8 Ara', '#### 3.8.1 Alt alt'].join(SATIR_SONU)
+    const bolumler = bolumleriCikar(temiz)
+    const anahtarlar = new Set(bolumler.map((b) => b.no))
+
+    // Ara başlık `3.8` ebeveyn kümesinde OLMALI — asıl tuzak burada.
+    expect(anahtarlar.has('3.8'), '`3.8` ebeveyn adayı sayılmalı').toBe(true)
+
+    const yetim = bolumler
+      .filter((b) => b.seviye >= 3 && b.no.includes('.'))
+      .filter((b) => !anahtarlar.has(b.no.slice(0, b.no.lastIndexOf('.'))))
+    expect(yetim.map((b) => b.no), 'meşru üç düzeyli belge temiz dönmeli').toEqual([])
+  })
+
   it('ayıklayıcı gerçekten çalışıyor: bozuk girdi yakalanır (vacuous-pass koruması)', () => {
     const SATIR_SONU = String.fromCharCode(10)
     const bozuk = ['## 3. Bir bolum', '### 3.1 Alt', '## 3. AYNI NUMARA', '### 9.7 Anasiz'].join(
