@@ -266,7 +266,7 @@ yok; `features` serbest sözlüğüne sıkıştırmak da paket ile bayrağı kar
 tasarlanır. **Migration gerektirir → Recep kapısı.** Bu cetvel v0'da yalnız kuralı koyar,
 şemayı önermez — şema T130 (CRM) ve T131 (teklif) veri modelleriyle birlikte kararlaştırılmalı.
 
-### Ç3 — Kaynak registry'sini koruyan KAPI YOK · **§7 adım 3 ile çelişir**
+### Ç3 — Kaynak registry'sini koruyan kapı YOKTU · **✅ KAPATILDI (bu PR)**
 
 **Ölçüm:** `ADMIN_RESOURCES`'i tüketen yalnız `AdminSidebar.tsx` ve `CommandPalette.tsx`;
 `src/__tests__/` altında tüketen **hiçbir dosya yok**. `labelKey`'in sözlükte bulunduğunu ya da
