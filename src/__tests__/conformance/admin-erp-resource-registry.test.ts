@@ -32,8 +32,9 @@ import { getDictValue } from '../../i18n/getDictValue'
  *
  * KAPSAM DIŞI (bilinçli, sessiz cap DEĞİL): dinamik segment taşıyan rotalar
  * (`/admin/categories/[id]/builder`) registry'de köküyle temsil edilir; bu kapı
- * kök eşleşmesini yeterli sayar. RBAC (`requiredAccess`) doğruluğu bu kapının işi
- * değil — o `src/lib/rbac.ts` sahibinin (AUTH) alanı.
+ * kök eşleşmesini yeterli sayar. `requiredAccess` değerinin RBAC'ta ÇALIŞMA ANINDA
+ * ne yaptığı bu kapının işi değil — o `src/lib/rbac.ts` sahibinin (AUTH) alanı;
+ * burada yalnız rotayla TUTARLILIĞI ölçülür.
  */
 
 const APP_ADMIN_DIR = path.resolve(__dirname, '../../app/admin')
@@ -53,7 +54,7 @@ const ROTALAR = new Set(gercekRotalar(APP_ADMIN_DIR))
 
 describe('INV-ERP-RESOURCE-1 · admin kaynak registry bütünlüğü', () => {
   it('registry BOŞ DEĞİL — kapı vakumda yeşil vermez', () => {
-    // Sessiz-boş sınıfı: kayıt listesi bir gün boşalırsa aşağıdaki iki test
+    // Sessiz-boş sınıfı: kayıt listesi bir gün boşalırsa aşağıdaki testler
     // sıfır kayıt üzerinde koşup GEÇER ve kapı kör olur.
     expect(ADMIN_RESOURCES.length).toBeGreaterThan(20)
     expect(ROTALAR.size).toBeGreaterThan(20)
@@ -65,7 +66,7 @@ describe('INV-ERP-RESOURCE-1 · admin kaynak registry bütünlüğü', () => {
       if (getDictValue(tr, r.labelKey) === r.labelKey) kirik.push(`tr · ${r.key} → ${r.labelKey}`)
       if (getDictValue(en, r.labelKey) === r.labelKey) kirik.push(`en · ${r.key} → ${r.labelKey}`)
     }
-    expect(kirik, `Sözlükte çözülmeyen labelKey (menüde HAM ANAHTAR görünür):\n${kirik.join('\n')}`).toEqual([])
+    expect(kirik, `Sözlükte çözülmeyen labelKey (menüde HAM ANAHTAR görünür): ${kirik.join(' · ')}`).toEqual([])
   })
 
   it('her route diskte GERÇEK bir sayfaya karşılık gelir (menü 404 üretmez)', () => {
@@ -73,6 +74,34 @@ describe('INV-ERP-RESOURCE-1 · admin kaynak registry bütünlüğü', () => {
     for (const r of ADMIN_RESOURCES) {
       if (!ROTALAR.has(r.route)) yetim.push(`${r.key} → ${r.route}`)
     }
-    expect(yetim, `src/app/admin altında page.tsx'i olmayan registry rotası:\n${yetim.join('\n')}`).toEqual([])
+    expect(yetim, `src/app/admin altında page.tsx'i olmayan registry rotası: ${yetim.join(' · ')}`).toEqual([])
+  })
+
+  /*
+   * Aşağıdaki iki kontrol LEGAL şeridinin (eda80084) `admin-resource-integrity.test.ts`
+   * taslağından alındı — PR #701, R3 ve R4. Aynı boşluğu aynı gün iki şerit kapattı;
+   * OPS-AUDIT kapının ADMIN'de kalmasına hükmetti, LEGAL kendi dosyasını #701'den çıkardı.
+   * Onların BENDE OLMAYAN iki kontrolünü kaynak göstererek devraldım: aynı şeyi ölçen iki
+   * kapı zamanla ayrışır ve hangisinin otorite olduğu belirsizleşir — birini gevşetip
+   * diğerini unuttuğunda "kapı var" hissi kalır, koruma kalmaz. Tek kapı iki kapıdan iyidir.
+   */
+
+  it('requiredAccess rotayla TUTARLI — öğe başka sayfanın iznine bağlanmamış', () => {
+    // Kaynak: LEGAL / PR #701, R3.
+    const tutarsiz = ADMIN_RESOURCES
+      .filter((r) => r.requiredAccess && !r.route.startsWith(r.requiredAccess))
+      .map((r) => `${r.key}: route=${r.route} requiredAccess=${r.requiredAccess}`)
+    expect(
+      tutarsiz,
+      `requiredAccess rotanın önekiyle uyuşmuyor — öğe BAŞKA bir sayfanın iznine bağlanmış: ${tutarsiz.join(' · ')}`,
+    ).toEqual([])
+  })
+
+  it('key TEKİL — registry iki kez tüketiliyor (sidebar + komut paleti)', () => {
+    // Kaynak: LEGAL / PR #701, R4.
+    const sayac = new Map<string, number>()
+    for (const r of ADMIN_RESOURCES) sayac.set(r.key, (sayac.get(r.key) ?? 0) + 1)
+    const tekrar = [...sayac.entries()].filter(([, n]) => n > 1).map(([k]) => k)
+    expect(tekrar, `Aynı key birden fazla tanımlı — menüde çift öğe doğar: ${tekrar.join(' · ')}`).toEqual([])
   })
 })
