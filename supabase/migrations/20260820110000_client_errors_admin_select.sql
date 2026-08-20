@@ -16,7 +16,15 @@
 --   satır 46: CREATE POLICY admins_read_error_groups      ... USING (is_admin_user())
 --   satır 52: CREATE POLICY admins_read_returns_webhooks  ... USING (is_admin_user())
 --   satır 56: CREATE POLICY admins_read_shipping_webhooks ... USING (is_admin_user())
---   client_errors -> POLİTİKA YOK. Hiç yazılmamış.
+--   client_errors -> authenticated icin POLITIKA YAZILMAMIS.
+--
+-- ⚠ DIKKAT (LEGAL duzeltmesi, 2026-08-20 11:22): "client_errors'ta politika yok" demek
+-- YANLIS olur ve bu ayrim kapinin sorusunu degistirir. Canli semada IKI politika VAR:
+--   merged_client_errors_service_role_select (SELECT, roller: {service_role})
+--   service_role_only                        (ALL,    roller: {service_role})
+-- Ikisi de YALNIZ service_role icindir. Eksik olan sey "politika" degil, OKUYAN ROLE
+-- yazilmis politika: `authenticated` icin SELECT'e izin veren TEK BIR politika yok.
+-- Dogru sinif adi: "politika unutulmus" DEGIL, "politika OKUYAN ROLE yazilmamis".
 --
 -- RLS açıkken GRANT tek başına SIFIR satır demektir: kolon kapısı açık, satır kapısı yok.
 -- Kontrol kolu belgenin KENDİ İÇİNDE duruyor — kardeş tablo çalışıyor, bu çalışmıyor.
