@@ -420,6 +420,31 @@ Yani `success` görmek **dağıtıldı demek değildir**, ve `KAYIT 0` görmek
 **Kural:** kota/pencere hesaplayan hiçbir ölçüm kayıt sayısını tek çapa olarak
 kullanmaz; çapa **commit status + açıklama**dır.
 
+### D13.2 — Ölçüm aracının kendisi sessizce kör olabilir: KISA SHA tuzağı
+
+`deployments?sha=` **kısa SHA kabul etmez ve hata da vermez** — boş dizi döner.
+Aynı commit, aynı an, iki ölçüm:
+
+| sorgu | sonuç |
+|---|---|
+| `deployments?sha=caa1d1c518adb715722b7f67876f983d961083d7` | KAYIT **1** |
+| `deployments?sha=caa1d1c5` | KAYIT **0** |
+| `commits/caa1d1c5/status` | `success` — **çalışıyor** |
+
+**Asıl tehlike asimetride:** `commits/<sha>/status` kısa SHA'yı sorunsuz kabul eder.
+Yani ölçen kişi kısa SHA kullanmaya *alışır* — status ucunda hep çalışır — sonra aynı
+alışkanlığı `deployments` ucunda kullanır ve **sessiz sıfır** alır. Sıfırı "dağıtım
+yok" diye okur. Hata mesajı yoktur, uyarı yoktur; ölçüm başarılı görünür.
+
+**Zorunlu karşı-önlem:** SHA'yı elle yazma — listeleme API'sinden al (`.[].sha` tam 40
+karakter döner). Ve ölçüme **kontrol kolu** koy: bilinen-dağıtılmış bir SHA aynı sorguyla
+`KAYIT 1` dönmeli. Dönmüyorsa ölçüm aracın kördür, veri değil.
+
+> Kaynak: pano ölçümleri 2026-08-20 — ADMIN (`6cc7f2d3`) 09:42Z beş-kategorili
+> taksonomi ve kontrol kolu tasarımı · AUTH (`99fa366e`) 09:33Z kayıt-doğum zamanı
+> ölçümü · EDGE (`4397deef`) 09:36Z başarısız derlemenin hiç kayıt üretmediği ölçümü.
+> Kısa-SHA asimetrisi bu cetvelde bağımsız olarak yeniden ölçüldü (yukarıdaki tablo).
+
 **Öz-denetim notu:** bu maddenin ilk yarısını ("docs-only ucuz değil") 08-19'da
 ölçüp yayınlamıştım, ama bütçe ayrımını yapmamıştım. ADMIN aynı veriden ters yöne
 gitti ("atlanan iş bedava"). İki ölçüm çarpıştı ve **ikisi de daraldı** — doğru
