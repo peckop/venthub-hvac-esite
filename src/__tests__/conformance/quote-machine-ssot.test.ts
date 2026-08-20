@@ -34,9 +34,31 @@ const SRC: Record<string, string> = import.meta.glob('/src/**/*.{ts,tsx}', {
   eager: true,
 })
 
-const QUOTE_MIGRATIONS: Record<string, string> = import.meta.glob(
-  '/supabase/migrations/*_quotes_*.sql',
+/**
+ * KAPSAM ADA DEĞİL İÇERİĞE BAĞLI — T134'te ölçülen kusurun onarımı.
+ *
+ * Eskiden burada `'/supabase/migrations/*_quotes_*.sql'` yazıyordu, yani seçim DOSYA
+ * ADINA bakıyordu ve ad ÇOĞULDU. `20260817200000_quote_request_notification.sql`
+ * (TEKİL `_quote_`) `venthub_quotes`'a dokunduğu HALDE kapıya GÖRÜNMÜYORDU — ve
+ * içinde `quote_email_events_admin_read` politikası var, **tenant_id şartı YOK**.
+ * Yani kör nokta varsayımsal bir risk değildi: gerçek bir tenant kapsamı boşluğunu
+ * saklıyordu. Bir dosyayı yeniden adlandırmak, kapıyı kapatmanın en sessiz yoluydu.
+ *
+ * Artık TÜM migration'lar okunur ve seçim İÇERİKTEN yapılır: quote adlı bir tabloya
+ * veya durum-geçiş tetiğine dokunan her dosya kapsamdadır. Ad değişse de kapsamda kalır.
+ */
+const ALL_MIGRATIONS: Record<string, string> = import.meta.glob(
+  '/supabase/migrations/*.sql',
   { query: '?raw', import: 'default', eager: true },
+)
+
+/** İçerikte quote adlı bir tabloya ya da geçiş tetiğine dokunuyor mu? */
+function touchesQuotes(sql: string): boolean {
+  return /public\.[a-z_]*quote[a-z_]*/i.test(sql) || sql.includes('enforce_quote_status_transition')
+}
+
+const QUOTE_MIGRATIONS: Record<string, string> = Object.fromEntries(
+  Object.entries(ALL_MIGRATIONS).filter(([, sql]) => touchesQuotes(sql)),
 )
 
 /** SQL satır-yorumlarını CRLF-güvenli sıyırır (LEGAL dersi: [^\r\n], NOKTA DEĞİL). */
@@ -84,6 +106,31 @@ function parseMigrationTransitions(sql: string): Record<string, string[]> {
 }
 
 describe('INV-QUOTE-1 · teklif durum-makinesi SSOT', () => {
+  /* ---- R0: KAPSAM KANARYASI — kapi bos kumede kosup YESIL veremez ---- */
+  it('R0: kapsam gercekten okundu (bos kume sessizce GECEMEZ)', () => {
+    // Bu kapinin bugune kadarki en sinsi kusuru "hicbir sey olcmeden yesil" idi:
+    // dosya adi degisince glob bos donuyor, dongu sifir eleman uzerinde kosuyor ve
+    // TUM assert'ler GECIYORDU. Once tarama gercekten oldu mu, ONU olceriz.
+    expect(Object.keys(ALL_MIGRATIONS).length, 'migration dizini hic okunamadi').toBeGreaterThan(50)
+    expect(
+      Object.keys(QUOTE_MIGRATIONS).length,
+      'icerikte quote gecen migration BULUNAMADI — secim bozulmus olabilir',
+    ).toBeGreaterThanOrEqual(2)
+
+    // Ayirt edicilik: secici gercekten AYIKLIYOR mu, yoksa her seyi mi aliyor?
+    // Ikisi esit olsaydi filtre calismiyor demekti ve "2 dosya bulundu" yanlis guven verirdi.
+    expect(
+      Object.keys(QUOTE_MIGRATIONS).length,
+      'filtre hicbir seyi elemiyor — icerik secimi calismiyor',
+    ).toBeLessThan(Object.keys(ALL_MIGRATIONS).length)
+
+    // Gecis tetigi kapsamda mi? (R2/R3 buna dayaniyor)
+    const tetikli = Object.keys(QUOTE_MIGRATIONS).filter((k) =>
+      QUOTE_MIGRATIONS[k].includes('enforce_quote_status_transition'),
+    )
+    expect(tetikli.length, 'gecis tetigini tanimlayan migration kapsamda yok').toBeGreaterThan(0)
+  })
+
   /* ---- R1a (çağrı-bazlı): rol dilimleri haritanın alt kümesi + birleşimi haritayı KAPLAR ---- */
   it('R1a: rol dilimleri SSOT haritasının içinde ve birleşimleri haritayı tam kaplar', () => {
     for (const status of QUOTE_STATUSES) {
@@ -164,20 +211,89 @@ describe('INV-QUOTE-1 · teklif durum-makinesi SSOT', () => {
 
   /* ---- R4: RLS politikaları sahiplik VE tenant şartını birlikte taşır ---- */
   it('R4: her quotes RLS politikası tenant_id + (sahiplik|admin) şartı taşır', () => {
-    const { path, sql } = migrationSource()
-    const clean = stripSqlComments(sql)
+    // T134 ONARIMI: eskiden yalniz migrationSource() yani TEK dosya denetleniyordu.
+    // Politika baska bir migration'da tanimlanirsa (ki normal akis budur — sonraki
+    // migration politikayi yeniden yazar) kapi onu HIC gormezdi. Artik kapsamdaki
+    // TUM migration'lar taranir.
     const policyRe = /create\s+policy\s+([a-z_]+)\s+on\s+public\.(venthub_quotes|venthub_quote_items)[\s\S]*?;/g
-    const policies = [...clean.matchAll(policyRe)]
-    expect(policies.length, `${path}: hiç policy bulunamadı — RLS ilk günden şart (cetvel Q3)`).toBeGreaterThan(0)
+    let toplam = 0
 
-    for (const [block, name, table] of policies) {
-      expect(block, `${path} · ${table}.${name}: tenant kapsamı yok (T057 regresyon sınıfı)`)
-        .toMatch(/tenant_id\s*=\s*public\.jwt_tenant_id\(\)/)
-      expect(
-        /auth\.uid\(\)/.test(block) || /is_admin_user\(\)/.test(block),
-        `${path} · ${table}.${name}: ne sahiplik (auth.uid) ne admin şartı var`,
-      ).toBe(true)
+    for (const [path, sql] of Object.entries(QUOTE_MIGRATIONS)) {
+      const clean = stripSqlComments(sql)
+      for (const [block, name, table] of clean.matchAll(policyRe)) {
+        toplam += 1
+        expect(block, `${path} · ${table}.${name}: tenant kapsamı yok (T057 regresyon sınıfı)`)
+          .toMatch(/tenant_id\s*=\s*public\.jwt_tenant_id\(\)/)
+        expect(
+          /auth\.uid\(\)/.test(block) || /is_admin_user\(\)/.test(block),
+          `${path} · ${table}.${name}: ne sahiplik (auth.uid) ne admin şartı var`,
+        ).toBe(true)
+      }
     }
+
+    expect(toplam, 'hiç policy bulunamadı — RLS ilk günden şart (cetvel Q3)').toBeGreaterThan(0)
+  })
+
+  /* ---- R4b: quote ADLI HER tabloda tenant kapsami (R4'un kapsam genislemesi) ---- */
+  it('R4b: quote tablolarindaki politikalar tenant kapsami tasir; muaflar ADIYLA sayili', () => {
+    // NICIN AYRI BIR MADDE: R4 yalniz venthub_quotes / venthub_quote_items'a bakiyor.
+    // Ama kapsam icerige baglandiginda quote adli BASKA tablolar da gorunur oldu ve
+    // ilkinde gercek bir bosluk cikti. Kapi bunu ya olcer ya gizler; gizlemesin.
+    //
+    // MUAF LISTE, "gecis modu" DEGIL: kusuru GORUNUR kilar. Onarim migration ister,
+    // migration Recep kapisidir; o gelene kadar kusurun ADI burada yazili durur.
+    // Grace mode kusuru gizler, bu liste ISIMLENDIRIR — fark budur.
+    const TENANT_KAPSAMI_MUAFLARI: Record<string, string> = {
+      quote_email_events_admin_read:
+        'T068 bildirim defteri (20260817200000_quote_request_notification.sql). Politika yalniz ' +
+        'user_profiles.role bakiyor, tenant_id sarti YOK -> bir tenant admini digerinin teklif ' +
+        'e-posta defterini okuyabilir. ESKI GLOB BU DOSYAYI HIC GORMUYORDU. Onarim migration ' +
+        'ister (Recep kapisi); indigi gun bu satir SILINECEK.',
+    }
+
+    const policyRe = /create\s+policy\s+([a-z_]+)\s+on\s+public\.([a-z_]*quote[a-z_]*)[\s\S]*?;/gi
+    const bulunanlar: string[] = []
+    const ihlaller: string[] = []
+
+    for (const [path, sql] of Object.entries(QUOTE_MIGRATIONS)) {
+      const clean = stripSqlComments(sql)
+      for (const [block, name, table] of clean.matchAll(policyRe)) {
+        bulunanlar.push(name)
+        if (/tenant_id\s*=\s*(public\.)?jwt_tenant_id\(\)/.test(block)) continue
+        if (name in TENANT_KAPSAMI_MUAFLARI) continue
+        ihlaller.push(`${path} · ${table}.${name}`)
+      }
+    }
+
+    expect(bulunanlar.length, 'quote tablolarinda hic politika bulunamadi — secim bozulmus olabilir')
+      .toBeGreaterThan(0)
+    expect(
+      ihlaller,
+      `Tenant kapsami olmayan politika (cok-kiracili sizinti sinifi, CLAUDE.md kural 12): ${ihlaller.join(', ')}`,
+    ).toEqual([])
+  })
+
+  /* ---- R4b-kanarya: muafiyet BAYATLAYAMAZ ---- */
+  it('R4b-kanarya: muaf edilen politika hala VAR ve hala ihlalci', () => {
+    // Bayat muafiyet kendi kapisini kor eder: politika duzeltilse ya da silinse bile
+    // liste orada kalir ve bir dahaki gercek ihlali sessizce yutar. O yuzden her
+    // muafiyetin HALA GEREKLI oldugunu kanitlariz.
+    const MUAF_ADLAR = ['quote_email_events_admin_read']
+    const policyRe = /create\s+policy\s+([a-z_]+)\s+on\s+public\.([a-z_]*quote[a-z_]*)[\s\S]*?;/gi
+    const hala: string[] = []
+
+    for (const sql of Object.values(QUOTE_MIGRATIONS)) {
+      const clean = stripSqlComments(sql)
+      for (const [block, name] of clean.matchAll(policyRe)) {
+        if (!MUAF_ADLAR.includes(name)) continue
+        if (!/tenant_id\s*=\s*(public\.)?jwt_tenant_id\(\)/.test(block)) hala.push(name)
+      }
+    }
+
+    expect(
+      hala.sort(),
+      'Muaf listedeki politika ya ONARILMIS ya SILINMIS — muafiyeti KALDIR (bayat muafiyet kapiyi kor eder)',
+    ).toEqual([...MUAF_ADLAR].sort())
   })
 
   /* ---- R5: müşteri yüzü fiyat kolonu YAZMAZ ---- */
