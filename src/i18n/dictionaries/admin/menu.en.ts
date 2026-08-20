@@ -14,6 +14,7 @@ export const menu = {
       inventoryReport: 'Inventory Report',
       inventorySettings: 'Thresholds & Settings',
       returns: 'Returns',
+      invoices: 'Invoices',
       users: 'Users',
       logs: 'Logs',
       errors: 'Errors',
