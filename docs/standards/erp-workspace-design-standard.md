@@ -229,7 +229,9 @@ genişlikleri ham `w-[..]` ile değil token'la verilir (Mutlak Kural 8).
 1. Modülün ekranlarını **§3'teki beş desenden** birine oturt. Oturmuyorsa cetveli değiştir.
 2. **Paket** kaydını yaz (kiracı bu modülü aldı mı) — **rolden ayrı**.
 3. `src/config/admin-resources.ts`'e kaydını ekle; `labelKey` **iki sözlükte de** var olmalı,
-   `route` **gerçekten** var olmalı (§8/Ç3'teki boşluk kapanana kadar bu insan disiplinidir).
+   `route` **gerçekten** var olmalı. **Bu artık insan disiplini değil, kapı:**
+   `INV-ERP-RESOURCE-1` (`src/__tests__/conformance/admin-erp-resource-registry.test.ts`)
+   ikisini de ölçer ve ihlalde kırmızı verir.
 4. UI izni ⊆ DB izni ölçümünü yap (`admin-design-standard.md` §6.1).
 5. Ekranın **kullanıldığını** kanıtla — render olduğunu değil. (K13: varlık ≠ kullanım.)
 
