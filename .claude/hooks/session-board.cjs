@@ -58,6 +58,27 @@ try {
     : `Şeridin: TALEP EDİLMEMİŞ. Çok dosyalı bir işe başlamadan önce şeridi al:\n` +
       `  node scripts/board/board.cjs claim --sid ${sid} --lane <ad> --globs "src/**"\n`
 
+  // MEKANİZMA (T115-VH) — oturumun İLK işi.
+  //
+  // Gözcü (Monitor), cron ve tur-sonu uyanışı ÜÇÜ DE bu oturumun içinde yaşar ve oturumla
+  // birlikte ÖLÜR; yeni oturum onları devralmaz. 2026-08-20 sabahı dört oturum tam bu yüzden
+  // SAĞIR açıldı ve Recep her birini elle dürtmek zorunda kaldı. Talimat dört kanaldan
+  // ulaşmıştı; kurulum üretmedi. O yüzden hatırlatma artık oturumun kendi açılışına gömülü.
+  try {
+    const durum = board.gozcuDurumu ? board.gozcuDurumu(sid, Date.now()) : 'KANITSIZ'
+    if (durum === 'CANLI') {
+      context += 'MEKANIZMA: gozcun CANLI (imlec taze).\n'
+    } else {
+      context +=
+        'MEKANIZMA — ILK IS BU (' + durum + '): uc katmani kur ve KANITLA.\n' +
+        '  node scripts/board/mechanism-setup.cjs plan --sid ' + sid + ' --serit <SERIT>\n' +
+        '  Kurulumdan sonra: mechanism-setup.cjs prob --sid ' + sid + '\n' +
+        '  prob AYIRT EDICI testtir: gozcu olu olsaydi sonuc FARKLI olurdu. Beyan yeterli degil.\n'
+    }
+  } catch {
+    /* ölçüm aracının kendisi patlarsa oturum yine açılır (fail-open, lane-guard ile aynı ilke) */
+  }
+
   context += board.summary(sid) + '\n'
 
   const notes = board.notesFor(sid, mine && mine.lane)
