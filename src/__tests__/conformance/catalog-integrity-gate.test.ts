@@ -104,8 +104,18 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     // DİKKAT: düz `toContain` yetmez — sabotajda `SUPABASE_CA_CERTX` yazdım ve iddia yeşil kaldı
     // (üst-dize tuzağı). Bu yüzden (a) yalnız ÖN-KONTROL bloğuna bakılır, (b) sırrın tam
     // kullanımı aranır, (c) sırların gerçekten SINANDIĞI kabuk koşulu aranır — adı geçmesi değil.
-    const precheckStart = wf.indexOf('db-gate-precheck:')
-    const precheck = wf.slice(precheckStart, wf.indexOf('  catalog-integrity:', precheckStart + 1))
+    // 2026-08-20 (T138 - EDGE, PRICING'in incelemesiyle): dilimin BITIS siniri artik sabit bir
+    // is ADI degil, DESEN. Eskiden `wf.indexOf('  catalog-integrity:')` ile kesiliyordu; is sirasi
+    // degisirse (ornegin araya ucuncu bir DB kapisi girerse) dilim o isi de YUTAR ve 'yalniz
+    // on-kontrol blogunda ara' korumasi SESSIZCE genislerdi. Ikinci bir DB kapisi eklenmesi bu
+    // ihtimali bugun dogurdu - onceden tek kapi vardi, yani kirilganlik latentti.
+    const precheckStart = wf.indexOf('  db-gate-precheck:')
+    expect(precheckStart, 'on-kontrol isi workflowda YOK').toBeGreaterThan(-1)
+    const sonrasi = wf.slice(precheckStart + 1)
+    const bitis = /\r?\n {2}[A-Za-z0-9_-]+:/.exec(sonrasi)
+    const precheck = bitis ? sonrasi.slice(0, bitis.index) : sonrasi
+    // Dilim TEK is kapsamali: baska bir is basligi icine sizarsa iddialar yanlis blokta arar.
+    expect(precheck, 'dilim komsu isi de yuttu').not.toMatch(/\r?\n {2}[A-Za-z0-9_-]+:/)
     expect(precheck.length).toBeGreaterThan(0)
     expect(precheck.includes('secrets.SUPABASE_DB_URL }}'), 'SUPABASE_DB_URL ön-kontrolde yok').toBe(true)
     expect(precheck.includes('-n "${DB_URL:-}"'), 'DB_URL kabuk koşulunda SINANMIYOR').toBe(true)
