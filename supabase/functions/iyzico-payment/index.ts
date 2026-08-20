@@ -18,6 +18,7 @@ import {
     TenantMismatchError,
 } from '../_shared/caller.ts'
 import { buildAllowedOrigins, isOriginAccepted, pickRedirectOrigin } from '../_shared/origins.ts'
+import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 
 
@@ -84,6 +85,14 @@ Deno.serve(async (req: Request) => {
         try {
             const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
             const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+            if (!supabaseUrl || !serviceRoleKey) {
+                // T100-VH: SESSIZ ATLAMA BITTI. Davranis AYNI kaldi — hiz sinirlayici bozuksa
+                // odemeyi oldurmuyoruz (fail-open bilincli bir tercih). Degisen tek sey GORUNURLUK:
+                // eskiden bu dal hicbir iz birakmiyordu, yani sinirlayicinin HIC KOSMADIGI ile
+                // kostugu disaridan AYNI goruniyordu. Alarmsiz fail-open, kapali kapiyla ayni
+                // gorunur ve kimse fark etmez.
+                console.error('rate_limit DEVRE DISI: SUPABASE_URL / SERVICE_ROLE_KEY eksik — odeme ucu sinirsiz calisiyor')
+            }
             if (supabaseUrl && serviceRoleKey) {
                 const forwarded = req.headers.get('x-forwarded-for') || ''
                 const ip = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '') || 'unknown'
@@ -96,7 +105,10 @@ Deno.serve(async (req: Request) => {
                 }
             }
         } catch (_e) {
-            if (debugEnabled) console.warn('rate_limit skipped:', _e)
+            // KOSULSUZ: eskiden yalniz debugEnabled iken yaziliyordu, yani prod'da bozuk bir
+            // sinirlayici TAMAMEN gorunmezdi. Hata ayiklama bayragi bir TESHIS anahtaridir;
+            // bir guvenlik katmaninin sessizce dusmesini ona bagli birakmak, alarmi da kapatir.
+            console.error('rate_limit COKTU — odeme ucu bu istekte sinirsiz gecti:', _e)
         }
 
         const mask = (s?: string) => typeof s === 'string' ? s.replace(/.(?=.{2})/g, '*') : s;
@@ -388,7 +400,13 @@ Deno.serve(async (req: Request) => {
         // İyzico credentials (Environment)
         const iyzicoApiKey = Deno.env.get('IYZICO_API_KEY');
         const iyzicoSecretKey = Deno.env.get('IYZICO_SECRET_KEY');
-        const iyzicoBaseUrl = Deno.env.get('IYZICO_BASE_URL') || 'https://sandbox-api.iyzipay.com';
+        // T100-VH: ADRES DE EN AZ ANAHTAR KADAR KIMLIKTIR.
+        // Eskiden burada `|| 'https://sandbox-api.iyzipay.com'` vardi. O satir, yapilandirma
+        // bosugunu bir ARIZA olmaktan cikarip SESSIZ BIR DAVRANIS DEGISIKLIGINE ceviriyordu:
+        // prod anahtarlariyla sandbox'a istek. Hemen asagidaki anahtar kontrolu fail-CLOSED'di,
+        // yani ayni fonksiyonda ayni yapilandirma ailesi icin IKI ZIT POLITIKA yasiyordu.
+        // Cozucu varsayilan URETMEZ: deger yoksa ya da URL ayristirilamiyorsa null doner.
+        const iyzicoCfg = resolveIyzicoBase({ IYZICO_BASE_URL: Deno.env.get('IYZICO_BASE_URL') });
 
         if (!iyzicoApiKey || !iyzicoSecretKey) {
             return new Response(JSON.stringify({
@@ -398,6 +416,18 @@ Deno.serve(async (req: Request) => {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
             });
         }
+
+        if (!iyzicoCfg) {
+            // Anahtarlarla AYNI bicim: yeni bir hata sozlesmesi icat edilmiyor.
+            return new Response(JSON.stringify({
+                error: { code: 'CONFIG_ERROR', message: 'IYZICO_BASE_URL eksik veya gecersiz' }
+            }), {
+                status: 500,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
+            });
+        }
+
+        const iyzicoBaseUrl = iyzicoCfg.base;
 
         // Maskeli anahtar logu (güvenli): ilk 6 + … + son 4
         const maskKey = (k?: string | null) => {
