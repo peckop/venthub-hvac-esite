@@ -47,6 +47,7 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { claimRefund, fullCancelKey, settleRefund } from '../_shared/refund_guard.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
+import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 
 import Iyzipay from "npm:iyzipay";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
@@ -111,7 +112,12 @@ Deno.serve(async (req) => {
   try {
     const IYZ_API = Deno.env.get("IYZICO_API_KEY") || "";
     const IYZ_SEC = Deno.env.get("IYZICO_SECRET_KEY") || "";
-    const IYZ_URI = Deno.env.get("IYZICO_BASE_URL") || "https://sandbox-api.iyzipay.com";
+    // T100-VH: burada eskiden `|| "https://sandbox-api.iyzipay.com"` vardı. Üç satır aşağıda
+    // anahtarlar için fail-CLOSED kontrol duruyordu — yani AYNI yapılandırma ailesi için iki
+    // farklı politika: anahtar eksikse DURUYORDUK, hedef ortam eksikse SESSİZCE BAŞKA ORTAMA
+    // gidiyorduk. Eksik anahtar gürültülüdür, eksik adres sessizdir; sessiz olan daha tehlikeli.
+    // Artık ikisi de aynı politikaya bağlı. Çözücü varsayılan ÜRETMEZ.
+    const iyz = resolveIyzicoBase(Deno.env.toObject());
 
     if (!supabaseUrl || !serviceKey) {
       return json({ error: { code: "CONFIG_ERROR", message: "Supabase config missing" } }, 500);
@@ -119,6 +125,12 @@ Deno.serve(async (req) => {
     if (!IYZ_API || !IYZ_SEC) {
       return json({ error: { code: "CONFIG_ERROR", message: "IyziCo config missing" } }, 500);
     }
+    if (!iyz) {
+      // Adıyla düşer. "Hangi ortama gideceğimi bilmiyorum" ile "sandbox'a giderim" arasındaki
+      // fark, gerçek para iadesinde bir teşhis meselesi değil, doğrudan bir para meselesidir.
+      return json({ error: { code: "CONFIG_ERROR", message: "IYZICO_BASE_URL missing or invalid" } }, 500);
+    }
+    const IYZ_URI = iyz.base;
     const ctx = { supabaseUrl, serviceRoleKey: serviceKey };
 
     const body = await req.json().catch(() => ({}));

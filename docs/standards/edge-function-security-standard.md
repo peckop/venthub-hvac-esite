@@ -406,6 +406,67 @@ koşulda, hangi üst sınıra kadar, hangi kaydı bırakarak.
 
 ---
 
+### 3.11 Yapılandırma boşluğu **davranış değiştiremez** — fail-CLOSED, ve görünür
+
+**KURAL.** Bir ortam değişkeni eksik ya da geçersizse doğru cevap *"başka bir şey yap"* değil,
+**"yapma"**dır. Özellikle: bir env okuması **mutlak bir http(s) adresine** düşürülemez. Adres
+varsayılanı, yapılandırma boşluğunu bir **arıza** olmaktan çıkarıp **sessiz bir davranış
+değişikliğine** çevirir — istek başarılı olur, yalnızca yanlış yere gider.
+
+**NİÇİN (2026-08-19 · T100-VH, ölçüldü).** Üç ödeme ucunda birden şu satır vardı:
+
+```
+Deno.env.get('IYZICO_BASE_URL') || 'https://sandbox-api.iyzipay.com'
+```
+
+Hemen alt satırlarda `IYZICO_API_KEY`/`IYZICO_SECRET_KEY` için **fail-CLOSED** kontrol
+duruyordu (eksikse `500 CONFIG_ERROR`). Yani **aynı dosyada, aynı yapılandırma ailesi için iki
+farklı politika** yaşıyordu: *anahtar* eksikse duruyoruz, *hedef ortam* eksikse sessizce başka
+bir ortama gidiyoruz.
+
+Tehlike sıralaması sezgiye aykırıdır ve kuralın çekirdeği budur: **eksik anahtar gürültülüdür**
+(istek düşer, biri görür), **eksik adres sessizdir** (istek geçer, yanlış yere gider). Sessiz
+olan daha tehlikelidir.
+
+> ⚠️ **ONARIM, ONARDIĞI ŞEYİN ADINI TAŞIYIP KUSURUNU TAŞIMAYA DEVAM EDEBİLİR.**
+> `iyzico-callback` içindeki T022-VH yorumu bu tehlikeyi zaten **adıyla** anlatıyordu
+> ("prod anahtarları konulduğu an ödeme prod'da başlar ama callback sandbox'a sorar → para
+> çekilir, sipariş doğrulanamaz"). O düzeltme sabit-kodlu sandbox'ı env'e taşıdı ama
+> **sandbox varsayılanını korudu**. Sınıf kapanmadı, yalnızca **yer değiştirdi** — ve yeni
+> yerinde bir daha görülmedi, çünkü üstünde "düzeltildi" etiketi vardı.
+
+**ÜÇ ALT KURAL.**
+
+1. **Fail-closed çözücü.** Kritik adresler `_shared/config_audit.ts::resolveIyzicoBase` gibi
+   **varsayılan üretmeyen** bir çözücüden geçer; değer yoksa çağıran uç isteği adıyla düşürür.
+2. **Pozitif öz-denetim.** Denetim hata *aramaz*, her kalemin iyi olduğunu **kanıtlamaya**
+   çalışır ve kanıtlayamadığını `eksik`/`gecersiz` diye işaretler. Fark pratiktir: hata arayan
+   bir denetim hiç okunmamış bir değişken için **sessiz kalır**; kanıt arayan bir denetim onu
+   "kanıtlanamadı" diye raporlar.
+3. **İLİŞKİ de denetlenir.** En değerli hüküm `tutarsiz`'dir: *üretim sitesi + sandbox ödeme
+   ucu*. İki değer de **tek başına geçerli** görünür; kusur değerlerde değil **aralarındaki
+   ilişkide** yaşar. Kalemleri tek tek denetleyen hiçbir kapı bunu göremez.
+
+**GÖRÜNÜRLÜK.** Sonuç bir **hükümdür** ve dışarı verilir (`healthz`). Hüküm sır **değeri**
+taşımaz; yalnız `ok/eksik/gecersiz/tutarsiz` ve URL'ler için **konak adı** yazılır — konak adı
+sır değildir ve teşhisin tamamı ona bağlıdır.
+
+**ÖLÇEMEYEN YEŞİL DÖNEMEZ.** `healthz` eskiden `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` yokken
+DB'ye **hiç bakmadan** `200 {ok:true}` dönüyordu: "ölçülemedi" yalnızca bir **etiketti**. Uç artık
+üç durum ayırır ve ikisi yeşil değildir: `saglikli` (200) · `bozuk` (503, ölçüldü ve yanlış) ·
+`olculemedi` (503, ölçüm yapılamadı). İkisi ayrı tutulur çünkü **onarımları farklıdır** — biri
+değeri düzeltmeyi, diğeri ölçüm yolunu onarmayı gerektirir.
+
+**KAPI.** `INV-CONFIG-1` — `src/__tests__/conformance/config-fail-closed.test.ts`.
+
+**AÇIK BORÇ (ölçüldü, çözülmedi).** `healthz`'in repoda **hiçbir çağıranı yok** ve
+`verify_jwt = true` olduğu için kimliksiz bir uptime probe'u zaten `401` alır: "izleme ucu"
+diye yazılmış ama o işi yapamıyor — yetenek var, çağıran yok (krş. T095). Doğru çözüm bu uca
+kapıyı açmak **değildir** (uç artık teşhis içeriği taşıyor); içerik taşımayan ayrı bir canlılık
+ucu ya da kimlikli bir izleyici gerekir. **Ürün kararı — Recep'te.**
+
+---
+
 ## 4. Doğrulama — kaynağa bakarak değil, **ÇAĞIRARAK**
 
 **KURAL.** Bir fonksiyonun güvenli olduğu, kodunu okuyarak değil **prod'a istek atarak** kanıtlanır.
@@ -452,7 +513,9 @@ sonra R7/R8/R9/R10/R11 de tek tek bozuldu — R10 hem **yeni-ihlal** hem **bayat
 | **E4** | §3.4 elle cors objesi yasak | aynı | `Access-Control-Allow-` literali `_shared/cors.ts` **dışında** geçiyor | **CANLI — R3** (baseline: `apply-coupon`) |
 | **E5** | §3.7 per-fonksiyon toml yasak | `supabase/functions/*/supabase.toml` | dosya sayısı > 0 | **CANLI — R4** |
 | **E6** | §3.1 `verify_jwt=false` allow-list | `supabase/config.toml` | `false` olan uçta gövdede kimlik/imza sinyali yok | **CANLI — R5** (baseline: `iyzico-callback`, `shipping-status`; muaf: `tcmb-rates-sync`) |
-| **E7** | §3.7 config kapsamı | `config.toml` ↔ `functions/*/` dizinleri | dizini olup `[functions."x"]` bloğu olmayan fonksiyon | **CANLI — R7** (baseline: 26'nın 13'ünde blok yok) |
+| **E7** | §3.7 config kapsamı | `config.toml` ↔ `functions/*/` dizinleri | dizini olup `[functions."x"]` bloğu olmayan fonksiyon | **CANLI — R7** (baseline: 26'nın 13'ünde blok yok; `healthz` 2026-08-19'da çıktı) |
+| **E14** | §3.11 ortam değiştiren sessiz varsayılan yasak | `supabase/functions/**/*.ts` | `Deno.env.get(...)` sonrası `\|\|`/`??` ile **mutlak http(s) adresi** varsayılanı | **CANLI — INV-CONFIG-1** (2026-08-19 kurulduğunda **bilinçli KIRMIZI**: `iyzico-payment:384`, `iyzico-callback:174`) |
+| **E13** | §3.11 ölçemeyen yeşil dönemez | `healthz/index.ts` + `config.toml` | koşulsuz `ok: true`, ya da öz-denetim çağrılmıyor, ya da `healthz` toml'da beyan edilmemiş | **CANLI — INV-CONFIG-1** |
 | **E8** | §3.8 deploy kapsamı | `.github/workflows/deploy-functions.yml` | elle sabit fonksiyon listesi içeriyor (dizin taraması değil) | **karşılandı** — liste `scripts/edge/select-functions.mjs` ile türetiliyor; ayrıca `scripts/edge/drift-check.mjs` repo↔prod sapmasını CI'da ölçüyor |
 | **E9** | §3.2 admin ucu rol kontrolü | `functions/admin-*/index.ts` | dosyada `'admin'`/`'superadmin'` rol kontrolü yok | **CANLI — R8** (baseline BOŞ — 6/6 admin ucu geçiyor) |
 | **E10** | §3.5 webhook fail-closed | `functions/*webhook*/index.ts` | HMAC imza doğrulaması **veya** ZORUNLU timestamp guard'ı yok | **CANLI — R9** (baseline BOŞ — `shipping-webhook` T025-VH ile uyumlu hâle geldi) |
@@ -469,6 +532,18 @@ sonra R7/R8/R9/R10/R11 de tek tek bozuldu — R10 hem **yeni-ihlal** hem **bayat
 > yolunun tek meşru kullanımını (service_role kanıtlanmış) kilitler. Üçü de kasıtlı bozmayla
 > kanıtlandı: B'ye yorum içinde `req.headers.get` eklemek, D'de `timingSafeEquals` kapısını
 > `true` yapmak — ikisi de FAIL verdi, geri alındı.
+
+> **E12 numarası ÖLÜ — yeniden kullanılamaz (2026-08-20).** `E12` artık *tek başına* bir kural
+> değil, **`E12-B/C/D` ailesinin kökü**; ailenin tamamı §3.9'a (tenant_id) bağlıdır ve
+> `edge-security.test.ts` başlığındaki eşleme de `R11→E12` der. 2026-08-19'da §3.11 kuralını
+> yazarken "sırada boş görünen numara" diye `E12`'yi yeniden kullandım: aynı kimlik iki ayrı
+> kuralı gösterir hâle geldi ve **cetvel ile testin eşlemesi birbiriyle çelişti**. Hiçbir kapı
+> görmedi — kapılar edge KAYNAĞINI ölçüyordu, cetvelin kendisini ölçen bir kapı yoktu.
+> Satır `E14`'e taşındı; **`E12` bilerek boş bırakıldı** ki geçmiş kayıtlar
+> (`kapanmis-bulgular.md`, `tenant-id-hardening` planı, test yorumları) doğru şeyi göstermeye
+> devam etsin. Bunu tekrarlanamaz kılan kapı: `edge-security.test.ts` içindeki **E-kimlik
+> ailesi tutarlılığı** testi — aynı sayısal kökü paylaşan tüm satırlar aynı § bölümüne
+> bakmak zorunda.
 
 **Makine ile denetlenemeyenler** (insan/runtime kapısı, §4'e bağlıdır):
 `config.toml` ↔ **prod** sürüm çelişkisi (canlı sorgu gerektirir) · gerçek 401/403 davranışı ·

@@ -184,14 +184,30 @@ describe('E2E Test Infrastructure - High-Fidelity Mocks Sanity Test', () => {
 
       // Invoke the Edge Function
       const response = await simulator.invokeFunction(healthzPath, request)
-      
-      expect(response.status).toBe(200)
+
+      // T100-VH (2026-08-19) — BEKLENTİ BİLEREK TERSİNE ÇEVRİLDİ, testin AMACI değişmedi.
+      //
+      // Bu testin işi "simülatör global Deno'yu kurup gerçek bir Edge Function'ı koşturabiliyor
+      // mu" sorusudur; o iş 503 ile de aynı ölçüde kanıtlanır. Değişen şey healthz'in
+      // SÖZLEŞMESİDİR: env'de SUPABASE_URL ve SUPABASE_SERVICE_ROLE_KEY BOŞ verilmiş (yukarıya
+      // bak), yani DB sağlığı ÖLÇÜLEMEZ. Eski hâl bu durumda 200 + ok:true dönüyordu ve bu
+      // satırlar tam olarak o fail-open davranışı KİLİTLİYORDU — kusur bir testin içinde
+      // yaşıyordu, dolayısıyla hiçbir kapı onu ihlal saymıyordu.
+      //
+      // Yeni sözleşme: ölçülemeyen şey sağlıklı ilan edilemez (cetvel §3.11).
+      // Geri çevirmeden önce oraya bak — bu satırlar bir gözden kaçma değil, bir karardır.
+      expect(response.status).toBe(503)
       const body = await response.json()
-      
-      expect(body.ok).toBe(true)
+
+      expect(body.durum).toBe('olculemedi')
+      expect(body.ok).toBe(false)
+      expect(body.sebep).toBe('db_erisim_degiskenleri_yok')
       expect(body.release).toBe('v1.0.0-test')
       expect(body.commit).toBe('abc123commit')
       expect(body.time).toBeDefined()
+      // Pozitif öz-denetim ölçüm yapılamasa bile koşar: yapılandırma bölümü GELMELİ.
+      expect(body.config).toBeDefined()
+      expect(body.config.odeme_ortami).toBe('bilinmiyor')
     })
 
     it('should handle method_not_allowed on POST requests', async () => {
