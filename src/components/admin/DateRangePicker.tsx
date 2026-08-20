@@ -1,11 +1,11 @@
-import 'react-day-picker/dist/style.css' // react-day-picker v8 CSS (önemli!)
+import 'react-day-picker/style.css' // react-day-picker v9 CSS (önemli!)
 
 import * as Popover from '@radix-ui/react-popover'
 import { endOfDay,endOfMonth, endOfWeek, endOfYear, format, startOfDay, startOfMonth, startOfWeek, startOfYear, subDays, subMonths } from 'date-fns'
 import { enUS,tr } from 'date-fns/locale'
 import { Calendar as CalendarIcon, Check,ChevronDown } from 'lucide-react'
 import React, { useState } from 'react'
-import { DateRange,DayPicker } from 'react-day-picker'
+import { ClassNames,DateRange,DayPicker } from 'react-day-picker'
 
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -31,12 +31,23 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
         return () => window.removeEventListener('resize', checkMobile)
     }, [])
 
-    // Geriye dönük senkronizasyon (value dışarıdan değişirse)
+    // Geriye dönük senkronizasyon: YALNIZ `value` dışarıdan değişirse.
+    //
+    // ⚠ ESKİ HÂLİ SEÇİMİ ANINDA SİLİYORDU. Bağımlılıklarda `selectedRange`
+    // vardı ve gövde `value !== selectedRange` ise `setSelectedRange(value)`
+    // diyordu; yani kullanıcı bir aralık seçer seçmez efekt tetikleniyor,
+    // yerel seçimi görüp "farklı" sayıyor ve `value`'ya (çoğu zaman
+    // `undefined`) geri döndürüyordu. Sonuç: seçim hiç tutmuyor, "uygula"
+    // düğmesi hep disabled kalıyor, tarih filtresi HİÇ ÇALIŞMIYORDU.
+    //
+    // Ölçüldü (2026-08-19, T113-VH): hazır aralık düğmesine de takvimde bir
+    // güne de basıldıktan sonra "uygula" hâlâ disabled=true. Kusur v9 ile
+    // ilgili DEĞİL, önceden de oradaydı — v9 geçişinin K13 kanıtı ("filtre
+    // gerçekten filtreliyor mu") aramasaydı görünmeyecekti; ekranda takvim
+    // açılıyordu ve "çalışıyor" sanılıyordu.
     React.useEffect(() => {
-        if (value?.from !== selectedRange?.from || value?.to !== selectedRange?.to) {
-            setSelectedRange(value)
-        }
-    }, [value, selectedRange?.from, selectedRange?.to])
+        setSelectedRange(value)
+    }, [value])
 
     const presets = [
         {
@@ -94,29 +105,36 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
         ? `${format(value.from, 'dd MMM yyyy', { locale })} ${value.to ? `- ${format(value.to, 'dd MMM yyyy', { locale })}` : ''}`
         : (placeholder || t('admin.common.selectDateRange'))
 
-    // Tailwind CSS override for react-day-picker
-    const dayPickerClassNames = {
+    // Tailwind CSS override for react-day-picker (v9 anahtarları)
+    //
+    // TİP ZORUNLU (`Partial<ClassNames>`): tipsiz bırakılırsa bu harita çıplak
+    // bir `const` olur, fazla-özellik denetimi HİÇ çalışmaz ve tanınmayan bir
+    // anahtar — v8 kalıntısı ya da yazım hatası — sessizce yok sayılır; takvim
+    // çıplak render olurken `tsc` tertemiz geçer. Ölçüldü (2026-08-19): v9
+    // kuruluyken harita v8 anahtarlarıyla dururken `pnpm type-check` hiçbir
+    // hata vermedi. İkinci kapı: INV-ADMIN-DAYPICKER-CLASS-1.
+    const navButton = "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-admin-surface-2 rounded-md transition-colors flex items-center justify-center text-admin-fg-subtle"
+    const dayPickerClassNames: Partial<ClassNames> = {
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 text-admin-fg-subtle",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
+        month_caption: "flex justify-center pt-1 relative items-center",
         caption_label: "text-sm font-semibold text-admin-fg-subtle",
         nav: "space-x-1 flex items-center",
-        nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-admin-surface-2 rounded-md transition-colors flex items-center justify-center text-admin-fg-subtle",
-        nav_button_previous: "absolute left-2",
-        nav_button_next: "absolute right-2",
-        table: "w-full border-collapse space-y-1",
-        head_row: "flex",
-        head_cell: "text-admin-fg-muted rounded-md w-9 font-normal text-xs",
-        row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-admin-surface-2 [&:has([aria-selected])]:bg-admin-surface-2 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-raised",
-        day: "h-9 w-9 p-0 font-normal hover:bg-admin-surface-2 hover:text-admin-fg-subtle rounded-md transition-colors aria-selected:opacity-100",
-        day_range_end: "day-range-end",
-        day_selected: "bg-admin-accent text-admin-accent-fg hover:bg-admin-accent hover:text-admin-accent-fg focus-visible:bg-admin-accent focus-visible:text-admin-accent-fg",
-        day_today: "bg-admin-surface-2 font-semibold text-admin-fg-subtle",
-        day_outside: "day-outside text-admin-fg-muted opacity-50 aria-selected:bg-admin-surface-2 aria-selected:text-admin-fg-muted aria-selected:opacity-30",
-        day_disabled: "text-admin-fg-muted opacity-50",
-        day_range_middle: "aria-selected:bg-admin-surface-2 aria-selected:text-admin-fg-subtle aria-selected:rounded-none",
-        day_hidden: "invisible",
+        button_previous: `${navButton} absolute left-2`,
+        button_next: `${navButton} absolute right-2`,
+        month_grid: "w-full border-collapse space-y-1",
+        weekdays: "flex",
+        weekday: "text-admin-fg-muted rounded-md w-9 font-normal text-xs",
+        week: "flex w-full mt-2",
+        day: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-admin-surface-2 [&:has([aria-selected])]:bg-admin-surface-2 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-raised",
+        day_button: "h-9 w-9 p-0 font-normal hover:bg-admin-surface-2 hover:text-admin-fg-subtle rounded-md transition-colors aria-selected:opacity-100",
+        range_end: "day-range-end",
+        selected: "bg-admin-accent text-admin-accent-fg hover:bg-admin-accent hover:text-admin-accent-fg focus-visible:bg-admin-accent focus-visible:text-admin-accent-fg",
+        today: "bg-admin-surface-2 font-semibold text-admin-fg-subtle",
+        outside: "day-outside text-admin-fg-muted opacity-50 aria-selected:bg-admin-surface-2 aria-selected:text-admin-fg-muted aria-selected:opacity-30",
+        disabled: "text-admin-fg-muted opacity-50",
+        range_middle: "aria-selected:bg-admin-surface-2 aria-selected:text-admin-fg-subtle aria-selected:rounded-none",
+        hidden: "invisible",
     }
 
     return (
