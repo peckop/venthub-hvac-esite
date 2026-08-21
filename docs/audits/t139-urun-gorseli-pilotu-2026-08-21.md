@@ -104,3 +104,21 @@ raporda HÜKÜM DEĞİL, KAYITTIR — karar Recep'te. Dosyalar kaynak URL'leriyl
   kararı → product-schema-standard genişletmesi.
 - **Admin ekran-kanıtı:** oturumlu gözle doğrulama (Recep 1 dk).
 - **Dar-adlı iznin kaldırılması:** OPS kuyruğunda; bu PR merge olunca hatırlatılacak.
+
+## EK — VORTICE-169 koşumu sonrası bilinen durumlar (2026-08-21, Recep kararı)
+
+**Diyagram-kapak kararı (Recep, 08-21 öğleden sonra):** 16 üründe vortice.com'da GERÇEK
+ürün fotoğrafı yok, yalnız teknik çizim/performans eğrisi var — bu ürünlerde kapak şu an
+DİYAGRAM görünüyor. Recep kararı: **bilinçli bırakıldı** ("diyagram da olsa boş karttan
+iyi; gerekirse yenisini bulur koyarız"). Liste:
+- VORT-E ATEX ailesinin tamamı (14): 40320-40333 (E 254-606 M/T ATEX)
+- 15274 SLIMROOF 250 M ES
+- 43157 VORT QBK SAL KC EVO 400 T4 (kardeş varyantların fotoğrafı VAR — ileride
+  kardeş-fotoğrafı bağlama seçeneği mevcut, SEAT-ATEX kararıyla aynı sınıf)
+
+Gelecek iyileştirme adayı (yapılmadı, kayıt): görsel önceliğinde quota (ölçülü ürün
+çizimi) eğriden önce gelecek şekilde sıralanabilir; kardeş-varyant fotoğrafı fallback'i
+Recep onayına bağlı.
+
+**Koşum sonucu (özet):** 161/173 ürün görselli canlı; 624 satır; görselsiz 12 =
+8 kaynakta-yok (16080 + Nordik HVLS 61181-61190) + 4 hayalet-kod (16076-79, PRICING'de).
