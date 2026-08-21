@@ -112,6 +112,28 @@ export async function getFamilyDetail(
 export async function getAllFamilySlugs(
   supabase: SupabaseClient<Database>
 ): Promise<{ slug: string }[]> {
-  const { items } = await getFamiliesEnriched(supabase, { limit: 96 })
-  return items.map((f) => ({ slug: f.slug }))
+  // SESSİZ KIRPMA YASAK: tek sayfa yerine total'e ulaşana kadar SAYFALAYARAK tüketilir.
+  // (Ölçüm 2026-08-21: sabit limit 96 + total yok sayımı; model katmanıyla aile sayısı
+  // 96'yı aşınca sitemap ve generateStaticParams sessizce kesilirdi — T138 ön-koşulu,
+  // render-dalga1 §W5. Bekçi: INV-FAMILY-SLUGS-1.)
+  const PAGE = 96
+  const MAX_PAGES = 50 // 4800 aile tavanı — sonsuz döngü emniyeti
+  const slugs: { slug: string }[] = []
+  let offset = 0
+  let total = 0
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const { items, total: t } = await getFamiliesEnriched(supabase, { limit: PAGE, offset })
+    total = t
+    slugs.push(...items.map((f) => ({ slug: f.slug })))
+    offset += items.length
+    if (items.length < PAGE || slugs.length >= total) break
+  }
+  if (total > 0 && slugs.length < total) {
+    // Fail-visible: eksik liste sitemap/SSG'de sessiz boşluk demektir.
+    throw new Error(
+      'getAllFamilySlugs: ' + slugs.length + '/' + total +
+        ' aile alinabildi (sayfalama tavani ' + MAX_PAGES * PAGE + ')'
+    )
+  }
+  return slugs
 }
