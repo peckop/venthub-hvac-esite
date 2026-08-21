@@ -86,6 +86,67 @@ const CHECKS = [
     key: (r) => `brand-mix:${r.family_name}`,
     detail: (r) => r.brand_list,
   },
+  /* ──────────────────────────────────────────────────────────────────────────
+   * T140 — BİRİM SÖZLEŞMESİ (2026-08-21). Cetvel: product-schema-standard §11.6.
+   *
+   * Ölçüm: `max_absorbed_power_w` alanı SEAT'te 0,06–7,5 arası değer taşıyor,
+   * Vortice'te 4–10230. Yani aynı alan, aynı tablo, markaya göre FARKLI BİRİM
+   * (kW vs W). Bu "boş alan"dan tehlikelidir: boş alan görünür, yanlış birim
+   * DOLU ve makul görünür. Karşılaştırma, sıralama, filtreleme ve hesaplayıcı
+   * yüzeylerinin hepsi bu alanda yanlış sonuç verir, hiçbiri kırmızı vermez.
+   *
+   * ⚠️ YANLIŞ-KIRMIZI TUZAKLARI (ölçülüp ELENDİ — kural yazmadan ÖNCE bakıldı):
+   *   • `blade_diameter_mm` 3000–7000: GERÇEK veri. NORDIK HVLS HYPERBLADE
+   *     tavan fanları 3–7 METRE kanatlı. "Şüpheli büyük sayı" kuralı yazsaydık
+   *     7 doğru satırı kırmızı yapardı.
+   *   • `frequency_hz = 0`: BRA.VO S1–S4, 5 V'luk DC cihazlar; 0 Hz orada
+   *     anlamlı. Bu bir birim hatası değil, alan-uygunluğu konusu.
+   * Bu yüzden kapsam, KESİN olarak ölçülebilen iki sınıfla sınırlı tutuldu.
+   * ────────────────────────────────────────────────────────────────────────── */
+  {
+    id: 'spec-unit',
+    title: 'Birim kayması: alan adının ima ettiği birimle bağdaşmayan değer',
+    why: 'Alan adı birimi TAAHHÜT eder. Bir HVAC fanının/sürücüsünün çektiği güç 1 W altında olamaz; 1 W altındaki bir `max_absorbed_power_w` değeri oraya kW yazıldığı anlamına gelir. Değer dolu ve makul göründüğü için hiçbir yüzey şikâyet etmez, ama karşılaştırma ve hesap yanlış olur.',
+    // Anahtar SKU bazında DEĞİL, alan|marka bazında: tek bir ingestion hatası 81 ürüne
+    // yayıldığı için SKU bazlı taban 191 gerekçesiz satır olurdu ve kimse okumazdı.
+    // Sınıf bazlı taban, "bu marka bu alanda hâlâ yanlış birimde" der ve marka
+    // düzeltilince TEK satır silinir. (dup-name'in grup bazlı anahtarıyla aynı desen.)
+    sql: `select b.name as brand, count(*)::int as n,
+                 min((p.technical_specs->>'max_absorbed_power_w')::numeric) as min_value,
+                 max((p.technical_specs->>'max_absorbed_power_w')::numeric) as max_value,
+                 (array_agg(p.sku order by p.sku))[1] as sample_sku
+          from public.products p
+          join public.product_families f on f.id = p.family_id
+          join public.brands b on b.id = f.brand_id
+          where p.deleted_at is null
+            and p.technical_specs->>'max_absorbed_power_w' ~ '^[0-9]+(\\.[0-9]+)?$'
+            and (p.technical_specs->>'max_absorbed_power_w')::numeric < 1
+          group by b.name`,
+    key: (r) => `spec-unit:max_absorbed_power_w|${r.brand}`,
+    detail: (r) => `${r.n} kayıt · ${r.min_value}–${r.max_value} (1 W altı = kW yazılmış) · ör. ${r.sample_sku}`,
+  },
+  {
+    id: 'spec-type',
+    title: 'Birimli sayısal alanda metin değer',
+    why: 'Adı bir SI birimiyle biten alan (`_v`, `_m3h`, `_w`, `_pa`, `_kg`, `_mm`, `_a`, `_ls`, `_pct`) sayı taşımak zorundadır. "380 V" gibi birimi metne gömülü bir değer sıralanamaz, filtrelenemez, karşılaştırılamaz; aynı alanın bazı satırda sayı bazı satırda metin olması bu üç yüzeyi de sessizce bozar.',
+    // Anahtar alan|marka bazında — gerekçesi yukarıdaki `spec-unit` ile aynı.
+    sql: `select k.key, b.name as brand, count(*)::int as n,
+                 (array_agg(p.technical_specs->>k.key order by p.sku))[1] as sample_value,
+                 (array_agg(p.sku order by p.sku))[1] as sample_sku
+          from public.products p
+          join public.product_families f on f.id = p.family_id
+          join public.brands b on b.id = f.brand_id
+          cross join lateral jsonb_object_keys(p.technical_specs) k(key)
+          where p.deleted_at is null
+            and p.technical_specs is not null
+            and k.key ~ '_(v|m3h|w|pa|kg|mm|a|ls|pct)$'
+            and (p.technical_specs->>k.key) is not null
+            and (p.technical_specs->>k.key) <> ''
+            and (p.technical_specs->>k.key) !~ '^[0-9]+(\\.[0-9]+)?$'
+          group by k.key, b.name`,
+    key: (r) => `spec-type:${r.key}|${r.brand}`,
+    detail: (r) => `${r.n} kayıt · ör. "${r.sample_value}" (${r.sample_sku}) — sayı değil`,
+  },
 ]
 
 /**

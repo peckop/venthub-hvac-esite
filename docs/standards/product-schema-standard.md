@@ -242,6 +242,38 @@ Kurallar:
 Veri gecisi: `scripts/db/product-data/t138-model-split.mjs` (dry-run varsayilan, envanterli,
 geri alinabilir) + plan `docs/plans/t138-model-katmani-plani-2026-08-21.md`.
 
+## 11.6 BİRİM SÖZLEŞMESİ — `technical_specs` (T140-VH, 2026-08-21)
+
+**Kural: alan adı birimi TAAHHÜT eder.** `technical_specs` anahtarı bir SI birim soneki
+taşıyorsa (`_w`, `_v`, `_a`, `_hz`, `_pa`, `_kg`, `_mm`, `_m3h`, `_ls`, `_pct`, `_c`),
+o alandaki değer **o birimde ve sayı olarak** yazılır.
+
+- ❌ Aynı alanda **çift birim yasak** (kW ile W, m³/h ile L/s). Birim dönüşümü **yükleme
+  anında** yapılır; okuma tarafı dönüşüm varsayamaz.
+- ❌ Birim **metne gömülmez**: `"380 V"` değil `380`. Metne gömülü değer sıralanamaz,
+  filtrelenemez, karşılaştırılamaz.
+- ❌ Bir alan **iki bilgi taşımaz**: gerilimle fazı aynı alana koymak (`"three-phase 400V"`)
+  ikisini de kullanılamaz hâle getirir; faz AYRI alandır.
+- Birim soneki olmayan anahtar (`motor_type`, `ip_rating`, `atex_marking`…) serbest metindir
+  ve bu maddenin kapsamı dışındadır.
+
+**Niçin bu kadar sert:** ölçüm (2026-08-21) `max_absorbed_power_w` alanının SEAT'te 0,06–7,5
+(kW), Vortice'te 4–10230 (W) değer taşıdığını gösterdi. Yanlış birim **boş alandan
+tehlikelidir**: boş alan görünür, yanlış birim *dolu ve makul* görünür. Karşılaştırma,
+sıralama, filtreleme ve hesaplayıcı yüzeylerinin hepsi bu alanda yanlış sonuç verir ve
+**hiçbiri kırmızı vermez**.
+
+**Bekçi:** `scripts/db/checks/catalog-integrity.mjs` → `spec-unit` (alan adının ima ettiği
+birimle bağdaşmayan değer) ve `spec-type` (birimli alanda metin). Circir kuralı geçerlidir:
+bilinen ihlaller `catalog-integrity-baseline.json`'da **gerekçeli** durur, taban yalnız
+küçülür; taban dışındaki her yeni ihlal kırmızıdır.
+
+**⚠️ Kural yazmadan önce ölç — iki yanlış-kırmızı adayı elendi:**
+`blade_diameter_mm` 3000–7000 **gerçek** veridir (NORDIK HVLS tavan fanları 3–7 **metre**
+kanatlı), `frequency_hz = 0` ise 5 V'luk DC cihazlarda (BRA.VO S1–S4) anlamlıdır. "Şüpheli
+büyük/küçük sayı" biçiminde genel bir eşik kuralı bu 11 doğru satırı kırmızı yapardı.
+Bu yüzden kapsam **kesin olarak ölçülebilen** iki sınıfla sınırlı tutuldu.
+
 ## 12. Referanslar
 
 1.  **Medusa.js v2 Pricing & Attribute Architecture:** [medusajs.com/docs/modules/pricing](https://docs.medusajs.com) (Multi-currency PriceSets and Rule Engines).
