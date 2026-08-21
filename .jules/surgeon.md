@@ -11,3 +11,8 @@
 **Type Smell:** None.
 **Learning:** A comprehensive diagnostic sweep of the codebase for type escape hatches (`as any`, `as unknown as`, `// @ts-ignore`, `// @ts-expect-error`) returned zero results in production code. The codebase relies entirely on strong typing, type guards (`isRecord`), and Supabase generated types (`database.types.ts`).
 **Solution:** Clean sweep: zero type escape hatches found. Codebase health is optimal.
+
+## 2026-08-21 - Abstracting Supabase Queries for Type Inference
+**Type Smell:** Using `as unknown as ManualInterface[]` to bypass Supabase return types on complex `.select()` and joined queries.
+**Learning:** Hardcoded manual interfaces for Supabase rows go out of sync easily and require risky double-casting when joins or aliased columns are involved.
+**Solution:** Extract the query chain into a reusable `const queryFn = (supabase: SupabaseClient) => supabase.from(...).select(...)`, and define the expected row type using `@supabase/supabase-js`'s built-in `QueryData<ReturnType<typeof queryFn>>[number]`. This strictly syncs the TypeScript shape with the database columns actually requested, eliminating the need for `as unknown as`.

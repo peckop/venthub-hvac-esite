@@ -1,4 +1,4 @@
-import { SupabaseClient } from '@supabase/supabase-js'
+import { type QueryData, SupabaseClient } from '@supabase/supabase-js'
 
 import { adminSearchProducts } from '@/lib/services/product.service'
 import type { Database } from '@/types/database.types'
@@ -18,21 +18,15 @@ export type AdminSearcher = (
   limit: number
 ) => Promise<CommandResult[]>
 
-interface InventoryMovementJoinedRow {
-  id: string
-  reason: string
-  delta: number
-  products: { name: string; sku: string } | { name: string; sku: string }[] | null
-}
+const _movementQueryFn = (supabase: SupabaseClient<Database>) => supabase
+  .from('inventory_movements')
+  .select('id, reason, delta, products!inner(name, sku)')
+export type InventoryMovementJoinedRow = QueryData<ReturnType<typeof _movementQueryFn>>[number]
 
-interface InventoryVelocityRow {
-  product_id: string
-  name: string | null
-  physical_stock: number | null
-  available_stock: number | null
-  warehouse_location: string | null
-  supplier_name: string | null
-}
+const _velocityQueryFn = (supabase: SupabaseClient<Database>) => supabase
+  .from('inventory_velocity')
+  .select('product_id, name, physical_stock, available_stock, warehouse_location, supplier_name')
+export type InventoryVelocityRow = QueryData<ReturnType<typeof _velocityQueryFn>>[number]
 
 export const searchProducts: AdminSearcher = async (supabase, query, limit) => {
   if (!query || query.trim().length < 2) return []
@@ -147,9 +141,7 @@ export const searchCoupons: AdminSearcher = async (supabase, query, limit) => {
 
 export const searchMovements: AdminSearcher = async (supabase, query, limit) => {
   if (!query || query.trim().length < 2) return []
-  const { data, error } = await supabase
-    .from('inventory_movements')
-    .select('id, reason, delta, products!inner(name, sku)')
+  const q = _movementQueryFn(supabase)
     /*
       Gömülü kaynağa süzme `foreignTable` ile YAPILIR — üst-düzey or= içinde
       `products.name` yazmak sorguyu 400'e düşürüyordu (aynı sınıf: T090-VH).
@@ -160,8 +152,9 @@ export const searchMovements: AdminSearcher = async (supabase, query, limit) => 
     */
     .or(orIlikeContains(['name', 'sku'], query), { foreignTable: 'products' })
     .limit(limit)
+  const { data, error } = await q
   if (error) throw error
-  const rows = (data || []) as unknown as InventoryMovementJoinedRow[]
+  const rows = data || []
   return rows.map((m) => {
     const prod = Array.isArray(m.products) ? m.products[0] : m.products
     const prodName = prod?.name || ''
@@ -211,13 +204,11 @@ export const searchAudit: AdminSearcher = async (supabase, query, limit) => {
 
 export const searchInventory: AdminSearcher = async (supabase, query, limit) => {
   if (!query || query.trim().length < 2) return []
-  const { data, error } = await supabase
-    .from('inventory_velocity' as never)
-    .select('product_id, name, physical_stock, available_stock, warehouse_location, supplier_name')
+  const { data, error } = await _velocityQueryFn(supabase)
     .or(orIlikeContains(['name', 'warehouse_location', 'supplier_name'], query))
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as InventoryVelocityRow[]
+  const rows = data || []
   return rows.map((i) => ({
     resourceKey: 'inventory',
     id: String(i.product_id),

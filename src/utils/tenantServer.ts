@@ -44,27 +44,6 @@ export const DEFAULT_TENANT_CONFIG: TenantConfig = {
   },
 };
 
-interface SupabaseClientOverride {
-  from: (table: string) => {
-    select: (fields: string) => {
-      eq: (field: string, val: string) => {
-        maybeSingle: () => Promise<{
-          data: {
-            id: string;
-            name: string;
-            subdomain: string | null;
-            custom_domain: string | null;
-            is_active: boolean;
-            features: unknown;
-            styles: unknown;
-          } | null;
-          error: unknown;
-        }>;
-      };
-    };
-  };
-}
-
 export const getTenantConfig = cache(async function getTenantConfig(): Promise<TenantConfig> {
   let tenantId: string | null = null;
   
@@ -80,7 +59,7 @@ export const getTenantConfig = cache(async function getTenantConfig(): Promise<T
   }
 
   try {
-    const { data, error } = await (supabase as unknown as SupabaseClientOverride)
+    const { data, error } = await supabase
       .from('tenants')
       .select('id, name, subdomain, custom_domain, is_active, features, styles')
       .eq('id', tenantId)

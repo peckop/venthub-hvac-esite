@@ -25,9 +25,9 @@ import { buildWhatsAppLink } from '../lib/utils'
  */
 export type WhatsAppLang = 'tr' | 'en'
 
-function msg(lang: WhatsAppLang, key: string, vars?: Record<string, string>): string {
+function msg(lang: WhatsAppLang, key: keyof typeof tr.whatsappMessages, vars?: Record<string, string>): string {
   const dict = lang === 'en' ? en : tr
-  const table = (dict as unknown as { whatsappMessages: Record<string, string> }).whatsappMessages
+  const table = dict.whatsappMessages
   let out = table[key] ?? key
   if (vars) {
     for (const [k, v] of Object.entries(vars)) {
