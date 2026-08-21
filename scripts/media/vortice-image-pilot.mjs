@@ -89,10 +89,19 @@ function save() {
 
 async function discover() {
   for (const p of pilot.pilots) {
+    const prev = state.products[p.model_code];
+    if (prev && (prev.images?.length || prev.no_images)) continue; // devam: onceden kesfedildi
     console.log(`[discover] ${p.model_code} ${p.page_url}`);
     const html = await (await politeFetch(p.page_url)).text();
     const images = extractImages(html, p.model_code);
-    if (images.length === 0) throw new Error(`gorsel bulunamadi: ${p.model_code} — sayfa yapisi degismis olabilir, HTML elle incelenmeli`);
+    if (images.length === 0) {
+      // Kaynakta sinifa uyan gorsel yok (61181/16080 sinifi) — kosuyu OLDURMEZ, fail-visible.
+      state.products[p.model_code] = { ...p, images: [], no_images: true,
+        reason: 'kaynak sayfada Foto_WEB/teknik sinifinda gorsel yok' };
+      console.log('  !! GORSEL YOK (fail-visible kaydedildi)');
+      save();
+      continue;
+    }
     state.products[p.model_code] = {
       ...p,
       images: images.map((img, i) => ({

@@ -57,6 +57,11 @@ const inv = fs.existsSync(invPath)
 const saveInv = () => fs.writeFileSync(invPath, JSON.stringify(inv, null, 2));
 
 for (const [code, prod] of Object.entries(manifest.products)) {
+  // Cift-kayit korumasi: urunun ZATEN product_images satiri varsa (pilot-5 gibi) atla.
+  const { count, error: cntErr } = await supabase.from('product_images')
+    .select('id', { count: 'exact', head: true }).eq('product_id', prod.product_id);
+  if (cntErr) { console.error(`[on-kontrol HATA] ${code}: ${cntErr.message}`); process.exit(1); }
+  if ((count ?? 0) > 0) { console.log(`[atla] ${code} zaten ${count} satiri var (pilot/onceki kosum)`); continue; }
   for (const img of prod.images) {
     if (img.download_error) { console.log(`[atla] ${code}#${img.sort_order} kaynakta indirilememisti: ${img.download_error}`); continue; }
     if (!img.webp_file || !img.storage_path) { console.error(`EKSIK webp: ${code}#${img.sort_order} — convert kosmadi mi?`); process.exit(1); }
