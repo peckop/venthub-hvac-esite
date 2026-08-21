@@ -274,6 +274,56 @@ kanatlı), `frequency_hz = 0` ise 5 V'luk DC cihazlarda (BRA.VO S1–S4) anlaml�
 büyük/küçük sayı" biçiminde genel bir eşik kuralı bu 11 doğru satırı kırmızı yapardı.
 Bu yüzden kapsam **kesin olarak ölçülebilen** iki sınıfla sınırlı tutuldu.
 
+## 11.7 SEMANTİK SÖZLEŞMESİ — alan adı neyi ölçtüğünü de söyler (T140-VH, 2026-08-21)
+
+§11.6 alan adının **birimini** bağlar. Bu madde **neyi ölçtüğünü** bağlar. İkisi ayrı
+sözleşmedir ve ikincisi olmadan birincisi yetmez: doğru birimde ama **yanlış büyüklüğü**
+ölçen bir değer de "dolu ama yanlış"tır.
+
+**Nereden çıktı (ölçüm, 2026-08-21):** SEAT teknik föylerinde debi/basınç değerleri devir
+başına **nominal bir çalışma noktası**dır — fan eğrisi üzerinde bir nokta, serbest hava
+maksimumu değil. Bu değeri `max_delivery_m3h` alanına yazmak, birim hatasını kapatırken
+**semantik hata** üretirdi.
+
+### Ön ek → anlam
+
+| Ön ek / son ek | Anlamı | Örnek |
+|---|---|---|
+| `max_…` | Üreticinin verdiği çalışma aralığının **üst** sınırı (serbest hava / kapalı kanal ucu) | `max_delivery_m3h` |
+| `min_…` | Aynı aralığın **alt** sınırı. Kaynak aralık veriyorsa **çift olarak** yazılır | `min_delivery_m3h` |
+| `nominal_…` | Eğri üzerinde **belirli bir çalışma noktası** (devir + karşı basınç ile tanımlı) | `nominal_delivery_m3h` |
+| ölçüt son eki | Aynı büyüklüğün birden çok ölçütü varsa ölçüt **ADA girer** | `noise_lpa_3m_db` |
+
+- ❌ Aralığı **tek alana** sıkıştırmak yasak: `min_`/`max_` çifti yazılır. Yalnız üst değeri
+  yazıp aralık olduğunu gizlemek, kullanıcıya "bu fan hep bu debiyi verir" der.
+- ❌ Nominal noktayı `max_` alanına yazmak yasak.
+- ❌ Ölçütü ada koymadan dB yazmak yasak (aşağıya bak).
+
+### Ses: ölçüt ADA girer
+
+Kaynaklar iki ayrı büyüklük veriyor: **LpA** (belirli mesafede ses *basıncı*) ve **LwA**
+(ses *gücü*). Aralarında tipik olarak 15–20 dB fark var. Ölçüm: mevcut `noise_level_db_a`
+alanı Vortice'te 142 kayıtta dolu ve 25–79,5 aralığında (ortalama 50,5) — bu **LpA** ile
+uyumlu, ama alan adı bunu **söylemiyor**. SEAT'e LwA yazsaydık aynı alanda iki farklı
+büyüklük bulunurdu ve karşılaştırma sessizce anlamsızlaşırdı.
+
+**Kural:** yeni yazımlarda ölçüt ada girer — `noise_lpa_3m_db`. Mesafe de ada girer, çünkü
+ses basıncı mesafeye bağlıdır. Eski `noise_level_db_a` alanı **legacy**'dir; taşınana kadar
+"ölçütü belirsiz" sayılır ve yeni marka verisi oraya yazılmaz.
+
+### Gerilim: bir alan bir bilgi
+
+Yıldız-üçgen motorlar kaynakta `400/690` gibi **çift gerilim** taşır. Bu tek bir sayı alanına
+sığmaz ve `"400/690"` yazmak §11.6'yı ihlal eder.
+
+**Kural:** `voltage_v` = **çalışma gerilimi** (tek sayı, ör. `400`) · `wiring` = bağlantı
+tipi (`'star-delta'`, `'direct'`) · `voltage_alt_v` = varsa ikinci gerilim (`690`) ·
+`phase` = `1` veya `3`. Faz bilgisi **asla** gerilim alanına gömülmez.
+
+**Bekçi:** §11.6'nın `spec-type` değişmezi metne gömülü değeri zaten yakalıyor; `min_`/`max_`
+çiftinin tutarlılığı (`min ≤ max`) ve `nominal_` değerinin aralık içinde kalması, veri
+yazımı yapan betiğin ön koşuludur (`scripts/db/product-data/*`), tek tek satırda doğrulanır.
+
 ## 12. Referanslar
 
 1.  **Medusa.js v2 Pricing & Attribute Architecture:** [medusajs.com/docs/modules/pricing](https://docs.medusajs.com) (Multi-currency PriceSets and Rule Engines).
