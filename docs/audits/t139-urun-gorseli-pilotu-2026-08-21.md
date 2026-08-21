@@ -133,20 +133,25 @@ STORM 10 XRM (ayrı türev, karar yok). Betikler: `seat-image-run.mjs` +
 LEGAL bilgi kalemi olarak OPS'a işlendi.
 
 **Nicotra (avensair.com/nicotra-gebhardt, Recep kaynağı + "eşleşenleri direk bağla"
-GO'su):** 28/35 ürün eşleşti ve yüklendi (33 satır; RDH serisinde 2'şer görsel).
-Eşleşmeyen 7 (avensair'da yok, vekil-foto-yok kuralı): ADH-500/560 E2, ADH-1000-K,
-AT 18/13, RDH-500 E2, DD 9/7 300W (6M0671), DD 9/9 373W (6M0642).
-Betik: `avensair-nicotra-run.mjs`. Ölçülen sınıflar:
-- **Arama sonucu sorgu başına SINIRLI:** 3 DD ürünü yalnız boyut-bazlı sorguda
-  ("DD 10", "DD 12") göründü — keşif tek genel sorguya bırakılamaz.
+GO'su):** üç turda **35/35 ürün görselli** (41 satır; RDH serisinde 2'şer görsel).
+Tur 1: arama+kategori keşfi → 25. Tur 2: boyut-bazlı arama → 28. Tur 3 (Recep'in
+"bunlar sitede olmalı" itirazı ÜZERİNE): doğrudan-URL yoklaması → +5 (ADH-500/560,
+ADH-1000-K, AT 18/13, RDH-500). Son 2 DD (6M0671/6M0642) sitede ürün sayfası olarak
+bulunamadı → **Recep kararı (URL vererek): DD 7/7 150W fotoğrafı bağlandı**
+(sitede tüm DD'ler aynı seri fotoğrafını kullanıyor; SEAT-ATEX sınıfı;
+`nicotra-dd-fill-manifest.mjs`). Betik: `avensair-nicotra-run.mjs`. Ölçülen sınıflar:
+- **Arama sonucu sorgu başına SINIRLI ve listeleme "daha fazla" butonlu (JS):**
+  statik HTML tüm ürünleri İÇERMEZ — "aramada/listede yok" ≠ "sitede yok".
+  Doğru kapı: doğrudan-URL yoklaması + içerik kapısı (site olmayan slug'a soft-200
+  döner ama carousel img sayısı 0 — kontrol koluyla ölçüldü).
 - **Sipariş kodu iki kaynakta 1↔N yazım farklı** (61090P/6N090P, 6M06HX/6N06HX) →
   eşleme KOD'a değil model tanımlayıcısına (boyut+watt+faz+kutup+hız) yapılır; kod
   rapora yazılır.
 - Ürün görseli = sayfa carousel'indeki `thumbnail fancybox` img'leri; teknik tablo
-  sekmelerindeki görseller alınmaz. AT/ADH/DD sayfaları seri fotoğrafı paylaşır
-  (kaynak sitenin kendi tercihi; Recep GO'su bu kaynağa verildi).
+  sekmelerindeki görseller alınmaz. Recep bilgisi: ADH ve RDH fotoğrafları kaynakta
+  zaten aynı (gelecek eksiklerde birbirinin yerine kullanılabilir).
 
-**Gün sonu genel durum: 269/374 ürün görselli** (Vortice 161 + SEAT 80 + Nicotra 28).
+**Gün sonu genel durum: 276/374 ürün görselli** (Vortice 161 + SEAT 80 + Nicotra 35).
 Kalan: AVenS 51 (Recep arşivi bekleniyor) + Danfoss 34 (kaynak keşfedilmedi) +
 tekil eksikler (yukarıdaki listeler). Kalıcı arşiv: `C:/Users/alize/venthub-media/`
 (vortice-/seat-/nicotra-2026-08-21).

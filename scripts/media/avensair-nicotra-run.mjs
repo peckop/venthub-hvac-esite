@@ -80,11 +80,27 @@ const state = { tenant_id: [...tenants][0], products: {}, unmatched: [], downloa
 const imageCache = new Map(); // kaynak URL -> yerel webp (seri fotoğrafı paylaşılır)
 for (const r of rows.sort((a, b) => a.name.localeCompare(b.name))) {
   const key = nameKey(r.name);
-  const slug = bySlugKey.get(key);
-  if (!slug) { state.unmatched.push({ sku: r.sku, name: r.name, reason: 'avensair-da eslesme yok - Recep karari: vekil foto YOK' }); continue; }
-  let html;
-  try { html = await (await politeFetch(`${BASE}/${slug}`)).text(); }
-  catch (e) { state.download_errors.push({ sku: r.sku, slug, error: String(e.message) }); continue; }
+  let slug = bySlugKey.get(key);
+  let html = null;
+  if (!slug) {
+    // Fallback: doğrudan URL yoklaması — ARAMA EKSİK LİSTELİYOR (ölçüldü 08-21:
+    // ADH-500/560, AT 18/13, RDH-500, ADH-1000-K sayfaları var ama aramada yok).
+    // İçerik kapısı: site olmayan slug'a da soft-200 döner; carousel img sayısı ayırt eder.
+    const guesses = key.startsWith('dd-')
+      ? [`nicotra-gebhardt-${key}-direkt-akuple-motorlu-fan-${(r.name.match(/-\s*([A-Z0-9]{6})\s*$/i)?.[1] || '').toLowerCase()}`]
+      : [`nicotra-gebhardt-${key}-cift-emisli-radyal-fan`];
+    for (const g of guesses) {
+      try {
+        const t = await (await politeFetch(`${BASE}/${g}`)).text();
+        if (/class="thumbnail fancybox"/.test(t)) { slug = g; html = t; console.log(`[fallback-url] ${r.name} -> ${g}`); break; }
+      } catch { /* soft-404 / ağ hatası: sıradaki tahmin */ }
+    }
+    if (!slug) { state.unmatched.push({ sku: r.sku, name: r.name, reason: 'avensair-da eslesme yok (arama + dogrudan-URL yoklamasi) - Recep karari: vekil foto YOK' }); continue; }
+  }
+  if (!html) {
+    try { html = await (await politeFetch(`${BASE}/${slug}`)).text(); }
+    catch (e) { state.download_errors.push({ sku: r.sku, slug, error: String(e.message) }); continue; }
+  }
   // carousel içindeki ürün görselleri (fancybox thumbnail); tablo sekmeleri hariç
   const srcs = [...html.matchAll(/<img src="(https?:\/\/www\.avensair\.com\/uploads\/[^"]+\.(?:png|jpe?g|webp))"[^>]*class="thumbnail fancybox"/gi)]
     .map(m => m[1]);
