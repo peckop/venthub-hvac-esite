@@ -122,3 +122,31 @@ Recep onayına bağlı.
 
 **Koşum sonucu (özet):** 161/173 ürün görselli canlı; 624 satır; görselsiz 12 =
 8 kaynakta-yok (16080 + Nordik HVLS 61181-61190) + 4 hayalet-kod (16076-79, PRICING'de).
+
+## EK-2 — SEAT ve Nicotra koşumları (2026-08-21 öğleden sonra)
+
+**SEAT (seat-ventilation.fr, Shopify `products.json`):** 53 SKU eşleşti ve yüklendi;
+ATEX eki (Recep kararı: kaynak site ATEX modellerde aynı fotoğrafı kullanıyor →
+baz-model fotoğrafı bağlanır) ile toplam **80/81 SEAT ürünü görselli**. Kalan 1:
+STORM 10 XRM (ayrı türev, karar yok). Betikler: `seat-image-run.mjs` +
+`seat-atex-manifest.mjs`. Fotoğraflarda gömülü "non-contractual photo" ibaresi var —
+LEGAL bilgi kalemi olarak OPS'a işlendi.
+
+**Nicotra (avensair.com/nicotra-gebhardt, Recep kaynağı + "eşleşenleri direk bağla"
+GO'su):** 28/35 ürün eşleşti ve yüklendi (33 satır; RDH serisinde 2'şer görsel).
+Eşleşmeyen 7 (avensair'da yok, vekil-foto-yok kuralı): ADH-500/560 E2, ADH-1000-K,
+AT 18/13, RDH-500 E2, DD 9/7 300W (6M0671), DD 9/9 373W (6M0642).
+Betik: `avensair-nicotra-run.mjs`. Ölçülen sınıflar:
+- **Arama sonucu sorgu başına SINIRLI:** 3 DD ürünü yalnız boyut-bazlı sorguda
+  ("DD 10", "DD 12") göründü — keşif tek genel sorguya bırakılamaz.
+- **Sipariş kodu iki kaynakta 1↔N yazım farklı** (61090P/6N090P, 6M06HX/6N06HX) →
+  eşleme KOD'a değil model tanımlayıcısına (boyut+watt+faz+kutup+hız) yapılır; kod
+  rapora yazılır.
+- Ürün görseli = sayfa carousel'indeki `thumbnail fancybox` img'leri; teknik tablo
+  sekmelerindeki görseller alınmaz. AT/ADH/DD sayfaları seri fotoğrafı paylaşır
+  (kaynak sitenin kendi tercihi; Recep GO'su bu kaynağa verildi).
+
+**Gün sonu genel durum: 269/374 ürün görselli** (Vortice 161 + SEAT 80 + Nicotra 28).
+Kalan: AVenS 51 (Recep arşivi bekleniyor) + Danfoss 34 (kaynak keşfedilmedi) +
+tekil eksikler (yukarıdaki listeler). Kalıcı arşiv: `C:/Users/alize/venthub-media/`
+(vortice-/seat-/nicotra-2026-08-21).
