@@ -1,18 +1,23 @@
 import type { Route } from 'next'
-import { permanentRedirect } from 'next/navigation'
+import { notFound,permanentRedirect } from 'next/navigation'
 
 import { storagePathToUrl } from '@/lib/images/productImage'
 import { assertNoUuid, buildProductGroupJsonLd } from '@/lib/seo/jsonld'
 import { getAllFamilySlugs } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+import SeriesLandingView from '@/views/category/SeriesLandingView'
 
 import { SITE_URL } from '../../../../config/siteUrl'
 import {
   getCachedFamilyDetail,
   getCachedFamilySlugById,
   getCachedProductBySlug,
+  getCachedSeriesLanding,
+  getFamilyDetailForRoute,
   preloadFamily,
 } from '../../../../lib/data/preload'
+import type { ProductRouteResolution } from '../../../../lib/data/productRoute'
+import { resolveProductRoute } from '../../../../lib/data/productRoute'
 import { Routes } from '../../../../utils/routes'
 import { ProductDetailPage as PageComponent } from '../../../_components/ProductDetailPageView'
 
@@ -126,40 +131,40 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
   const { lang, slug } = await params
   preloadFamily(slug, lang)
 
-  let detail: Awaited<ReturnType<typeof getCachedFamilyDetail>> = null
-  // Aile bulunamazsa: slug bir VARYANT slug'ı olabilir → 308 hedefi.
-  let redirectTo: Route | null = null
+  // T138 K1: zincir kararı `resolveProductRoute`'ta (saf, DI'lı, test edilebilir);
+  // sayfa yalnız SONUCU uygular. 'generic' prerender tohumu sorgu yapmadan geçer.
+  const resolution: ProductRouteResolution =
+    slug === 'generic'
+      ? { kind: 'unavailable' }
+      : await resolveProductRoute(slug, lang, {
+          familyDetail: getFamilyDetailForRoute,
+          seriesLanding: getCachedSeriesLanding,
+          variantBySlug: getCachedProductBySlug,
+          familySlugById: getCachedFamilySlugById,
+        })
 
-  try {
-    // 'generic' prerender tohumu veya Supabase env yoksa nazikçe geç.
-    if (slug !== 'generic') {
-      // 1) ÖNCE aile aranır → aile slug'ı asla redirect üretmez (döngü yok).
-      detail = await getCachedFamilyDetail(slug, lang)
+  // permanentRedirect / notFound birer istisna fırlatır — koşulsuz, en üstte çağrılır.
+  if (resolution.kind === 'redirect') permanentRedirect(resolution.to as Route)
 
-      if (!detail) {
-        // 2) Varyant slug'ı mı? Ailesi varsa kanonik aile URL'ine 308.
-        const variant = await getCachedProductBySlug(slug)
-        if (variant?.family_id) {
-          const familySlug = await getCachedFamilySlugById(variant.family_id)
-          if (familySlug && familySlug !== slug) {
-            redirectTo = `/${lang}/products/${familySlug}?sku=${encodeURIComponent(variant.sku)}` as Route
-          }
-        }
-      }
-    }
-  } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : String(err)
-    if (errorMsg.includes('fetch failed')) {
-      console.warn(`Network fetch failed for family ${slug} (expected if Supabase env is missing)`)
-    } else {
-      console.warn(`Error fetching family data for ${slug}:`, err)
-    }
+  // SERİ → kendi landing'i (HTTP 200). Doğrudan varyantı olmadığı için PDP'ye giremez;
+  // K1 öncesinde burada "ürün bulunamadı" kutusu basılıyordu (soft-404: 200 + boş sayfa).
+  if (resolution.kind === 'series') {
+    return (
+      <SeriesLandingView
+        series={resolution.landing.series}
+        models={resolution.landing.models}
+        lang={lang}
+      />
+    )
   }
 
-  // permanentRedirect bir istisna fırlatır — try/catch DIŞINDA çağrılmalı.
-  if (redirectTo) permanentRedirect(redirectTo)
+  // GERÇEK 404 → ne aktif varyantlı aile, ne seri, ne varyant slug'ı. Varyantsız ve
+  // seri OLMAYAN aile de buraya düşer: içi boş bir ürün sayfası 200 dönmemeli.
+  if (resolution.kind === 'not-found') notFound()
 
-  // 3) Ne aile ne varyant → mevcut "bulunamadı" davranışı (görünüm katmanında).
+  // `unavailable` = veri yok DEĞİL, veriye ULAŞILAMADI (ağ/RPC/env). 404 basılmaz —
+  // önbelleğe alınabilen kalıcı bir yokluk beyanı olurdu; mevcut "bulunamadı" görünümü çizilir.
+  const detail = resolution.kind === 'family' ? resolution.detail : null
   const family = detail?.family ?? null
   const variants = detail?.variants ?? []
 
