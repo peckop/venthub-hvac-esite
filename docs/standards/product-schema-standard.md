@@ -211,6 +211,37 @@ ama bunu zorlayan bir kısıt YOK. Doğru kalıcı çözüm katalog alımında z
 (`catalog-ingestion-standard.md`) ya da DB kısıtıdır. Sahibi: katalog hattı (PRICING).
 Bu madde, kuralın **ölçülemez tarafını** adıyla yazar — kapının kapsamını abartmamak için.
 
+## 11.5 MODEL KATMANI — seri / model / varyant (T138-VH, Recep onayi 2026-08-21)
+
+`product_families` iki rol tasir; ayrim **`parent_family_id`** kolonundadir:
+
+| parent_family_id | Rol | Vitrin karsiligi | Ornek |
+|---|---|---|---|
+| NULL | **SERI** | landing sayfasi (tanitim + model kartlari + karsilastirma tablosu) | Lineo Quiet |
+| NOT NULL | **MODEL** | vitrin KARTI + urun sayfasi (fiyat, spec, sepet) | Lineo 100 Quiet |
+
+**Varyant** ayri satir DEGILDIR-kart degildir: `products` satiridir ve model sayfasi icinde
+`?sku=` ile secilir (standart/ES, faz, ATEX). Kural degismedi (Aksiyom-3 Sifir-EAV).
+
+Kurallar:
+1. **Hiyerarsi TEK SEVIYE**: seri -> model. Modelin altina model asilamaz (DB trigger
+   `product_families_single_level`), satir kendi ebeveyni olamaz (check constraint).
+2. **Kart = satin alinan birim = MODEL.** Piyasa olcumu (avensair, seat-ventilation.fr,
+   vortice.com, danfoss.com): alici kapasiteyi arar ("JET 20"), seriyi degil.
+3. **Model turetme SALT ADLA yapilamaz.** Bazi ailelerde varyant ekseni adda degil kodda
+   (M4/T4 faz-kutup) veya `technical_specs`'tedir. Kural: **cap/debi degisiyorsa MODEL,
+   faz/guc/donanim degisiyorsa VARYANT**; her aile icin dry-run raporu insan onayina sunulur.
+   (Olcum 2026-08-21: salt-ad kurali 374 urunu 276 aileye bolerek "kart=urun"e dejenere etti.)
+4. **1:1 aileler mesrudur**: Nicotra/Danfoss/aksiyel gibi yerlerde model = SKU olabilir;
+   kaynak siteler de boyle gosterir. Orada seri landing tasiyici gorevi gorur.
+5. **Eski seri slug'i KORUNUR** — seri satiri silinmez, landing olur (aksi halde eski URL
+   404 verir; olculdu, T141 ajan-2 K1/K3). Varyant slug'lari 308 ile MODEL sayfasina gider.
+6. **SEO kapisi:** her model sayfasinin OZGUN aciklamasi olmali; varyant ayri sayfa degil
+   (`?sku=` + canonical = model sayfasi, INV-CANONICAL-2).
+
+Veri gecisi: `scripts/db/product-data/t138-model-split.mjs` (dry-run varsayilan, envanterli,
+geri alinabilir) + plan `docs/plans/t138-model-katmani-plani-2026-08-21.md`.
+
 ## 12. Referanslar
 
 1.  **Medusa.js v2 Pricing & Attribute Architecture:** [medusajs.com/docs/modules/pricing](https://docs.medusajs.com) (Multi-currency PriceSets and Rule Engines).
