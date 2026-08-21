@@ -62,6 +62,10 @@ const seriesLandingFixture: SeriesLanding = {
     brand_name: 'Vortice',
     category_id: null,
     subcategory_id: null,
+    // T138-VH K7: breadcrumb/JSON-LD kategori zenginleştirmesi bu fixture'ın konusu değil —
+    // resolveProductRoute kategori alanlarına hiç bakmaz, yalnız tip sözleşmesi için doldurulur.
+    category: null,
+    subcategory: null,
   },
   models: [
     {

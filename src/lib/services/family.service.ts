@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
+import type { DbCategory } from '../../types/db-rows'
 import type { FamilyListItem } from '../../types/ui-models'
 
 // F5-B W2.x — Aile (product_families) servis katmanı.
@@ -130,6 +131,16 @@ export interface SeriesLanding {
     brand_name: string | null
     category_id: string | null
     subcategory_id: string | null
+    /**
+     * T138-VH K7 — breadcrumb + JSON-LD hiyerarşisi için gömülü kategori/alt kategori.
+     * `category_id`/`subcategory_id` YALNIZ id taşır; görünen ad (`getCategoryDisplayName`)
+     * ve görünen slug (`getLocalizedCategorySlug`) tam `DbCategory` satırı ister — bu yüzden
+     * ayrı bir sorguyla (aşağıda) doldurulur. İkisi de yoksa `null` (breadcrumb kısalır,
+     * kırılmaz — CategoryLandingView/CategorySeriesView'daki "parentVm yoksa basamak yok"
+     * kuralıyla aynı desen).
+     */
+    category: DbCategory | null
+    subcategory: DbCategory | null
   }
   /** Seri altındaki modeller — aktif varyantı olmayan model listeye GİRMEZ (RPC ile aynı kural). */
   models: FamilyListItem[]
@@ -219,6 +230,24 @@ export async function getSeriesLanding(
 
   if (models.length === 0) return null
 
+  // T138-VH K7: breadcrumb kategori basamağı için tam kategori satırı (ad + görünen slug).
+  // `category_id`/`subcategory_id` zaten seride var — ayrı sorgu ikisini BİRLİKTE çeker
+  // (tek round-trip; hiçbiri yoksa hiç sorgu atılmaz).
+  const categoryIds = [series.category_id, series.subcategory_id].filter(
+    (id): id is string => !!id
+  )
+  let categoryById = new Map<string, DbCategory>()
+  if (categoryIds.length > 0) {
+    const { data: categoryRows, error: categoryError } = await supabase
+      .from('categories')
+      .select('*')
+      .in('id', categoryIds)
+      .returns<DbCategory[]>()
+
+    if (categoryError) throw categoryError
+    categoryById = new Map((categoryRows ?? []).map((c) => [c.id, c]))
+  }
+
   return {
     series: {
       id: series.id,
@@ -229,6 +258,10 @@ export async function getSeriesLanding(
       brand_name: embeddedBrandName(series.brands),
       category_id: series.category_id,
       subcategory_id: series.subcategory_id,
+      category: series.category_id ? (categoryById.get(series.category_id) ?? null) : null,
+      subcategory: series.subcategory_id
+        ? (categoryById.get(series.subcategory_id) ?? null)
+        : null,
     },
     models,
   }

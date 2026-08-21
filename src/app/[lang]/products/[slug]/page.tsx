@@ -2,7 +2,7 @@ import type { Route } from 'next'
 import { notFound,permanentRedirect } from 'next/navigation'
 
 import { storagePathToUrl } from '@/lib/images/productImage'
-import { assertNoUuid, buildProductGroupJsonLd } from '@/lib/seo/jsonld'
+import { assertNoUuid, buildProductGroupJsonLd, buildSeriesLandingJsonLd } from '@/lib/seo/jsonld'
 import { getAllFamilySlugs } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 import SeriesLandingView from '@/views/category/SeriesLandingView'
@@ -148,13 +148,35 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
 
   // SERİ → kendi landing'i (HTTP 200). Doğrudan varyantı olmadığı için PDP'ye giremez;
   // K1 öncesinde burada "ürün bulunamadı" kutusu basılıyordu (soft-404: 200 + boş sayfa).
+  //
+  // T138-VH K7: K1 bu dalda HİÇ JSON-LD basmıyordu (`buildProductGroupJsonLd` yalnız aşağıdaki
+  // `family` dalında çağrılıyor, `variants` boş olduğu için seriye hiç girmiyordu — ölçüldü).
+  // `ProductGroup` burada UYGUN DEĞİL (seri satılabilir bir ürün değil, model listesi);
+  // `buildSeriesLandingJsonLd` CollectionPage + ItemList üretir (gerekçe: jsonld.ts yorumu).
   if (resolution.kind === 'series') {
+    const { series, models } = resolution.landing
+    const description =
+      pickLang(series.description, lang) ||
+      (lang === 'en' ? `${series.name} models at VentHub` : `VentHub'da ${series.name} modelleri`)
+    const seriesJsonLd = buildSeriesLandingJsonLd({
+      lang,
+      baseUrl: SITE_URL,
+      seriesSlug: series.slug,
+      name: series.name,
+      description,
+      models,
+    })
+
+    assertNoUuid(seriesJsonLd)
+
     return (
-      <SeriesLandingView
-        series={resolution.landing.series}
-        models={resolution.landing.models}
-        lang={lang}
-      />
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(seriesJsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
+        />
+        <SeriesLandingView series={series} models={models} lang={lang} />
+      </>
     )
   }
 
