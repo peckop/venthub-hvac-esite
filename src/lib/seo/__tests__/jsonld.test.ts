@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { FamilyListItem } from '../../../types/ui-models'
 import type { FamilyVariant } from '../../services/family.service'
-import { assertNoUuid, buildCategoryJsonLd, buildProductGroupJsonLd } from '../jsonld'
+import { assertNoUuid, buildCategoryJsonLd, buildProductGroupJsonLd, buildSeriesLandingJsonLd } from '../jsonld'
 
 // F5-B W3.1 — jsonld.ts saf-fonksiyon birim testleri.
 // Sunucu bileşenlerine (page.tsx) hiç dokunmaz; yalnız buildProductGroupJsonLd /
@@ -295,6 +295,121 @@ describe('buildCategoryJsonLd', () => {
     })
 
     expect(jsonLd.numberOfItems).toBe(42)
+  })
+})
+
+describe('buildSeriesLandingJsonLd', () => {
+  // T138-VH K7 — seri landing JSON-LD'si. Kart modeli kasıtlı `FamilyListItem` (SERİ kartıyla
+  // BİREBİR aynı sözleşme, bkz. family.service.ts SeriesLanding yorumu).
+  function makeFamilyListItem(overrides: Partial<FamilyListItem> = {}): FamilyListItem {
+    return {
+      id: 'model-1',
+      name: 'Model',
+      slug: 'model-slug',
+      series_code: null,
+      description: null,
+      brand_name: null,
+      category_id: null,
+      subcategory_id: null,
+      cover_image_path: null,
+      variant_count: 1,
+      min_price: null,
+      total_count: 1,
+      ...overrides,
+    }
+  }
+
+  it('ProductGroup DEĞİL — CollectionPage üretir (seri satılabilir bir ürün değil, model listesi)', () => {
+    const jsonLd = buildSeriesLandingJsonLd({
+      lang: 'tr',
+      baseUrl: BASE_URL,
+      seriesSlug: 'lineo-quiet',
+      name: 'Lineo Quiet',
+      description: 'Lineo Quiet serisi',
+      models: [],
+    })
+
+    expect(jsonLd['@type']).toBe('CollectionPage')
+    expect(jsonLd['@type']).not.toBe('ProductGroup')
+    expect(jsonLd).not.toHaveProperty('productGroupID')
+    expect(jsonLd).not.toHaveProperty('hasVariant')
+  })
+
+  it('url alanına dil prefix\'i garanti eder (/products/<seri-slug>, /<kategori> DEĞİL)', () => {
+    const jsonLd = buildSeriesLandingJsonLd({
+      lang: 'en',
+      baseUrl: BASE_URL,
+      seriesSlug: 'lineo-quiet',
+      name: 'Lineo Quiet',
+      description: 'x',
+      models: [],
+    })
+
+    expect(jsonLd.url).toBe(`${BASE_URL}/en/products/lineo-quiet`)
+  })
+
+  it('itemListElement her modelin AİLE URL\'ini (slug) taşır, id/UUID değil', () => {
+    const jsonLd = buildSeriesLandingJsonLd({
+      lang: 'tr',
+      baseUrl: BASE_URL,
+      seriesSlug: 'lineo-quiet',
+      name: 'Lineo Quiet',
+      description: 'x',
+      models: [
+        makeFamilyListItem({ id: '11111111-2222-3333-4444-555555555555', slug: 'lineo-100-quiet' }),
+        makeFamilyListItem({ id: '22222222-3333-4444-5555-666666666666', slug: 'lineo-150-quiet' }),
+      ],
+    })
+
+    const items = jsonLd.itemListElement as Record<string, unknown>[]
+    expect(items).toHaveLength(2)
+    expect(items[0]).toEqual({
+      '@type': 'ListItem',
+      position: 1,
+      url: `${BASE_URL}/tr/products/lineo-100-quiet`,
+    })
+    expect(items[1].url).toBe(`${BASE_URL}/tr/products/lineo-150-quiet`)
+    // Fiyat/offers hiç yazılmaz (kategori sayfasıyla aynı disiplin).
+    expect(items[0]).not.toHaveProperty('offers')
+  })
+
+  it('numberOfItems = models.length', () => {
+    const jsonLd = buildSeriesLandingJsonLd({
+      lang: 'tr',
+      baseUrl: BASE_URL,
+      seriesSlug: 'lineo-quiet',
+      name: 'Lineo Quiet',
+      description: 'x',
+      models: [makeFamilyListItem(), makeFamilyListItem({ id: 'model-2', slug: 'model-2' })],
+    })
+
+    expect(jsonLd.numberOfItems).toBe(2)
+  })
+
+  it('isPartOf (WebSite) ekler', () => {
+    const jsonLd = buildSeriesLandingJsonLd({
+      lang: 'tr',
+      baseUrl: BASE_URL,
+      seriesSlug: 'lineo-quiet',
+      name: 'Lineo Quiet',
+      description: 'x',
+      models: [],
+    })
+
+    expect(jsonLd.isPartOf).toEqual({ '@type': 'WebSite', name: 'VentHub', url: BASE_URL })
+  })
+
+  it('serialize edilmiş çıktıda UUID sızmaz (assertNoUuid yeşil) — model id DEĞİL slug yazılır', () => {
+    const jsonLd = buildSeriesLandingJsonLd({
+      lang: 'tr',
+      baseUrl: BASE_URL,
+      seriesSlug: 'lineo-quiet',
+      name: 'Lineo Quiet',
+      description: 'x',
+      models: [makeFamilyListItem({ id: '11111111-2222-3333-4444-555555555555', slug: 'lineo-100-quiet' })],
+    })
+
+    expect(() => assertNoUuid(jsonLd)).not.toThrow()
   })
 })
 

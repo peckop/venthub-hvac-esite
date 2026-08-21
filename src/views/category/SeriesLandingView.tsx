@@ -9,7 +9,9 @@ import VentImage from '@/components/ui/VentImage'
 import { productImagePlaceholder, resolveProductImageUrl } from '@/lib/images/productImage'
 import type { SeriesLanding } from '@/lib/services/family.service'
 
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
+import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 
 /**
  * T138-VH K1 — SERİ LANDING görünümü.
@@ -40,6 +42,7 @@ interface SeriesLandingViewProps {
 
 const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, lang }) => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
 
   const description =
     (lang === 'en' ? series.description?.en : series.description?.tr) ||
@@ -52,8 +55,31 @@ const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, l
     resolveProductImageUrl({ cover_image_path: models[0]?.cover_image_path ?? null }) ??
     productImagePlaceholder(series.slug)
 
+  // T138-VH K7: K1 burada yalnız İKİ basamak basıyordu (Ana Sayfa > seri adı) — kategori
+  // katmanı yoktu (ölçüldü). Desen `ProductDetailPageView.tsx`'teki mainCategory/subCategory
+  // zincirinin AYNISI: kategori yoksa basamak hiç eklenmez (kırılmaz, kısalır), alt kategori
+  // varsa üst kategorinin görünen slug'ıyla birlikte iki-segmentli URL kurulur (Routes.category
+  // ikinci argümanı ilkiyle aynıysa otomatik tek segmente düşer — utils/routes.ts).
+  const categorySlug = series.category ? getLocalizedCategorySlug(series.category, lang) : null
+  const subcategorySlug = series.subcategory
+    ? getLocalizedCategorySlug(series.subcategory, lang)
+    : null
+
   const breadcrumbItems = [
     { label: t('category.breadcrumbHome'), href: '/' },
+    ...(series.category
+      ? [{ label: getCategoryDisplayName(series.category, t), href: Routes.category(categorySlug!) }]
+      : []),
+    ...(series.subcategory
+      ? [
+          {
+            label: getCategoryDisplayName(series.subcategory, t),
+            href: categorySlug
+              ? Routes.category(categorySlug, subcategorySlug!)
+              : Routes.category(subcategorySlug!),
+          },
+        ]
+      : []),
     { label: series.name, href: '' }
   ]
 
