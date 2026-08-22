@@ -43,11 +43,11 @@ GEÇERSİZ OLUR EĞER: <bu koşul oluşursa yeniden ölçülür>
   ölçmez. Oluştuysa yeniden ölçer.
 - Şartı bayatlatan **zaman değil, öncüllerin değişmesidir** (Recep 08-22: "sadece zaman geçti =
   bayat değil; elektrik kesintisi gibi düşün"). Şart, zaman değil **değişim** cümlesidir.
-- Örnekler (08-22, gerçek):
-  - `ÇÖZÜLDÜ: STORM 18 ağırlık kopyası — hata bizde değil, distribütör kataloğunda böyle basılı
-    (katalog s.42 gözle doğrulandı). GEÇERSİZ OLUR EĞER: üretici (OEM) föyü repoya girerse.`
+- Örnek (08-22, gerçek):
   - `ÇÖZÜLDÜ: pilot migration prod'da (kolon/tetik/check/indeks 1/1/1/1, sabotajla kanıtlı).
     GEÇERSİZ OLUR EĞER: product_families şeması değişirse.`
+  - STORM 18 ağırlığı BİLE BİLE buraya KONMADI — o kalem "çözüldü" DEĞİL, hâlâ açık (prod-GO
+    bekliyor). İlk yazdığım şart ("OEM föyü repoya girerse geçersiz") daha baştan yanlıştı; bkz §5.
 
 ## 2. GEÇERSİZ ÖNCÜL — üçüncü sonuç (kritik)
 Bir kalem sonradan ölçülünce **dayanağı bulunamıyorsa** (hatırdan yazılmış, korpusta yok), o kalem
@@ -84,6 +84,10 @@ Bir kalem "çözüldü" görünüyor mu?
 - Bekçi kurmak maliyetlidir; her kalem hak etmez. Küçük/nadir kalemler için (B) yeterli.
 - Geçersizlik-şartı **iyi yazılmalı** — çok darsa yanlış-güven, çok genişse hiç güvenilmez. Şart,
   ölçülebilir bir olguya bağlanır ("X tablosuna satır eklenirse", "kademe-2 tekrar koşarsa").
+- **Kapanış şartının kendisi de yanlış yazılabilir** (ÜRÜN, 08-22). STORM 18 örneği: şart "OEM föyü
+  repoya girerse geçersiz" yazıldı; oysa föy zaten repodaydı (`seat-content-manifest.json:140`, doğru
+  değer 70.4/77 kg) → şart **daha baştan karşılanmıştı**, kalem "çözüldü" değil hâlâ AÇIK. Kural:
+  kapanış şartını yazarken önkoşulun **şu an** karşılanıp karşılanmadığını da ölç.
 - Bu cetvel "çözüldü mü" sorusunu yönetir; "doğru mu" sorusunu değil — doğruluğu (A)'daki kapı ya da
   (B)'deki kanıt taşır.
 
