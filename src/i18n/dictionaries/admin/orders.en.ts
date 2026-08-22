@@ -11,11 +11,13 @@ export const orders = {
         pending: 'Pending',
         paid: 'Paid',
         confirmed: 'Confirmed',
+        processing: 'Processing',
         shipped: 'Shipped',
         delivered: 'Delivered',
         cancelled: 'Cancelled',
         refunded: 'Refunded',
-        partialRefunded: 'Partial Refunded'
+        partialRefunded: 'Partial Refunded',
+        unknown: 'Unknown Status'
       },
       customerFilter: {
         active: 'This list is filtered to a single customer.',

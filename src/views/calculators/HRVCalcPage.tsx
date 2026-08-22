@@ -9,6 +9,7 @@ import {
   Recommendations,
   ResultCard,
   ResultGrid} from '../../components/calculators'
+import { useCalculatorUsage } from '../../hooks/useCalculatorUsage'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
   type BuildingType,
@@ -66,6 +67,20 @@ const HRVCalcPage: React.FC = () => {
   const [sensibleEfficiency, setSensibleEfficiency] = useState(searchParams?.get('sensibleEfficiency') || '75')
   const [latentEfficiency, setLatentEfficiency] = useState(searchParams?.get('latentEfficiency') || '65')
   const [electricityCost, setElectricityCost] = useState(searchParams?.get('electricityCost') || '3.5')
+
+  // T021-VH · `calculator_used`. Taban çizgisi mount anıdır — paylaşılmış bir bağlantıyı
+  // (?area=120) açıp hiçbir şeye dokunmayan ziyaretçi olay üretmez. Bkz. hook.
+  useCalculatorUsage('hrv', {
+    recoveryType,
+    buildingType,
+    climateZone,
+    area,
+    occupancy,
+    operatingHours,
+    sensibleEfficiency,
+    latentEfficiency,
+    electricityCost,
+  })
 
   // URL Sync Effect
   useEffect(() => {

@@ -37,12 +37,36 @@
 # olabilir. Boş kümede "her dosya güvenli" iddiası VACUOUS olarak doğrudur ve
 # kapıyı sessizce açar — kapı yazarken tekrar tekrar karşımıza çıkan sınıf.
 #
-# NİÇİN `VERCEL_GIT_PREVIOUS_SHA`, `HEAD^` DEĞİL:
-# Bu değişken **son BAŞARILI dağıtımın** SHA'sıdır (Vercel sistem değişkeni),
-# önceki commit değil. Arka arkaya birkaç commit atlanmışsa, `HEAD^` yalnız EN SON
-# commit'e bakar ve daha önceki ATLANMAMIŞ OLMASI GEREKEN bir kaynak değişikliğini
-# göremez → "kod değişti, deploy olmadı". Son başarılı dağıtımdan bu yana biriken
-# TÜM değişiklikler karşılaştırılmalı.
+# KARŞILAŞTIRMA TABANI — ÖLÇÜLDÜ, TAHMİN EDİLMEDİ (2026-08-18, PR #664):
+#
+# v1 yalnız `VERCEL_GIT_PREVIOUS_SHA`'ya bakıyordu ve bu değişkenin DOLU GELECEĞİ
+# VARSAYILMIŞTI. İlk canlı ölçüm bunu çürüttü — salt-Markdown bir PR'da dağıtım
+# günlüğü aynen şunu yazdı:
+#
+#     Running "sh scripts/vercel-ignore-build.sh"
+#     ignore-build: VERCEL_GIT_PREVIOUS_SHA yok (ilk dagitim?) -> BUILD
+#
+# Değişken **o dal için son BAŞARILI dağıtımın** SHA'sıdır; YENİ bir dalın İLK
+# dağıtımında böyle bir şey yoktur, yani boş gelir. Bu depoda kural "bir-iş-bir-dal"
+# olduğu için neredeyse HER önizleme dağıtımı bir dalın ilk dağıtımıdır → atlama
+# fiilen HİÇ çalışmıyordu. Betik güvenli tarafa düştüğü için hiçbir kırmızı üretmedi;
+# yani kusur SESSİZDİ ve ancak günlüğe bakınca görüldü. (Kapı da göremezdi: bekçi
+# betiği dosya-listesi kipinde koşturuyor, taban çözümü o yoldan hiç geçmiyor.)
+#
+# TABAN ZİNCİRİ (ilk çözülen kazanır, hiçbiri çözülmezse BUILD):
+#   1. `VERCEL_GIT_PREVIOUS_SHA` — en doğrusu: son başarılı dağıtımdan bu yana
+#      biriken TÜM değişiklikler. Yalnız bu klonda GERÇEKTEN varsa kullanılır.
+#   2. Varsayılan dalla ORTAK ATA (`git merge-base HEAD origin/<varsayılan>`) —
+#      dalın TAMAMINI kapsar, yani dalın içindeki eski bir kaynak değişikliği de
+#      görülür. (1) yoksa doğru taban budur.
+#
+# `HEAD^` HÂLÂ YASAK ve gerekçesi değişmedi: yalnız EN SON commit'e bakar; arka
+# arkaya atlanmış commit'lerden sonra daha eski bir kaynak değişikliğini göremez →
+# tam olarak "kod değişti, deploy olmadı", yani 2026-08-15 vitrin kazasının sınıfı.
+# Zincirin 2. adımı bu tuzağa düşmez çünkü ortak ata, dalın tamamını kapsar.
+#
+# Zincirin HANGİ adımının kazandığı günlüğe YAZILIR — bir sonraki dağıtımın kaydı,
+# bu düzeltmenin işe yarayıp yaramadığını tahmin ettirmez, GÖSTERİR.
 #
 # TEST EDİLEBİLİRLİK: birinci argüman verilirse, değişen dosya listesi git yerine
 # o dosyadan (satır başına bir yol) okunur. Bekçi (INV-BUILD-SKIP) betiği bu yolla
@@ -60,16 +84,52 @@ if [ "$#" -ge 1 ] && [ -n "${1:-}" ]; then
   [ -f "$1" ] || { echo "ignore-build: liste dosyasi yok: $1 -> BUILD"; exit 1; }
   CHANGED=$(cat "$1")
 else
-  BASE="${VERCEL_GIT_PREVIOUS_SHA:-}"
-  if [ -z "$BASE" ]; then
-    # İlk dağıtım ya da değişken yok: karşılaştıracak taban yok → BUILD.
-    echo "ignore-build: VERCEL_GIT_PREVIOUS_SHA yok (ilk dagitim?) -> BUILD"
-    exit 1
+  BASE=""
+
+  # --- Zincir 1: son BASARILI dagitimin SHA'si ---
+  if [ -n "${VERCEL_GIT_PREVIOUS_SHA:-}" ]; then
+    if git cat-file -e "${VERCEL_GIT_PREVIOUS_SHA}^{commit}" 2>/dev/null; then
+      BASE="$VERCEL_GIT_PREVIOUS_SHA"
+      echo "ignore-build: taban = VERCEL_GIT_PREVIOUS_SHA ($BASE)"
+    else
+      # Degisken dolu ama commit bu klonda YOK (sig klon / force-push).
+      # Sessizce gecme: hangi adimin nicin dustugunu gunluge yaz.
+      echo "ignore-build: VERCEL_GIT_PREVIOUS_SHA klonda bulunamadi ($VERCEL_GIT_PREVIOUS_SHA) -> ortak ataya dusuyorum"
+    fi
+  else
+    echo "ignore-build: VERCEL_GIT_PREVIOUS_SHA bos (dalin ilk dagitimi) -> ortak ataya dusuyorum"
   fi
-  if ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
-    # Taban bu klonda yok (sığ klon / force-push sonrası) → ölçemiyoruz → BUILD.
-    echo "ignore-build: taban commit bulunamadi ($BASE) -> BUILD"
-    exit 1
+
+  # --- Zincir 2: varsayilan dalla ORTAK ATA ---
+  if [ -z "$BASE" ]; then
+    DEFAULT_BRANCH="${VERCEL_GIT_REPO_DEFAULT_BRANCH:-master}"
+    REMOTE_REF="origin/$DEFAULT_BRANCH"
+
+    if ! git rev-parse --verify --quiet "$REMOTE_REF" >/dev/null 2>&1; then
+      # Sig klon varsayilan dali tasimayabilir. Sinirli bir cekme DENENIR;
+      # basarisiz olursa hata DEGIL, yalnizca taban cozulemez -> BUILD.
+      git fetch --no-tags --depth=50 origin         "+refs/heads/$DEFAULT_BRANCH:refs/remotes/origin/$DEFAULT_BRANCH" >/dev/null 2>&1 || true
+    fi
+
+    if git rev-parse --verify --quiet "$REMOTE_REF" >/dev/null 2>&1; then
+      MERGE_BASE=$(git merge-base HEAD "$REMOTE_REF" 2>/dev/null) || MERGE_BASE=""
+      HEAD_SHA=$(git rev-parse HEAD 2>/dev/null) || HEAD_SHA=""
+      if [ -z "$MERGE_BASE" ]; then
+        echo "ignore-build: ortak ata bulunamadi ($REMOTE_REF) -> BUILD"
+        exit 1
+      fi
+      if [ "$MERGE_BASE" = "$HEAD_SHA" ]; then
+        # HEAD zaten varsayilan dalin ucu (uretim dagitimi). Kendisiyle
+        # karsilastirmak BOS liste uretir ve bos liste ATLAMA gerekcesi DEGILDIR.
+        echo "ignore-build: HEAD varsayilan dalin ucu, karsilastirilacak taban yok -> BUILD"
+        exit 1
+      fi
+      BASE="$MERGE_BASE"
+      echo "ignore-build: taban = $REMOTE_REF ile ortak ata ($BASE)"
+    else
+      echo "ignore-build: $REMOTE_REF bu klonda yok -> BUILD"
+      exit 1
+    fi
   fi
   CHANGED=$(git diff --name-only "$BASE" HEAD 2>/dev/null) || {
     echo "ignore-build: git diff basarisiz -> BUILD"

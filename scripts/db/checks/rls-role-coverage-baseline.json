@@ -1,0 +1,14 @@
+{
+  "_aciklama": "INV-RLS-COVERAGE-1 tabani. Anahtar bicimi: 'rol:tablo'. Her satir GEREKCE ve KAPANIS KOSULU tasir; gerekcesiz satir kabul edilmez. Taban YALNIZ kucululur — yeni satir eklemek, kusuru tabana yazip gecmek demektir ve ancak bilincli bir karar olarak, kaydiyla birlikte yapilir.",
+  "_olculdu": "2026-08-20, canli prod semasi (pg_policies + pg_class). Kodda okunan 25 yonetim tablosu ile kesistirildi; kesisimde TEK bulgu cikti.",
+  "entries": {
+    "authenticated:client_errors": {
+      "gerekce": "Tabloda iki politika var ama IKISI DE yalniz service_role icin (merged_client_errors_service_role_select ve service_role_only). authenticated icin SELECT'e izin veren tek politika yok, bu yuzden admin hata sayfasi 39 gercek hatayi SIFIR gosteriyor. Yazma yolu saglikli: log-client-error ucu service_role ile yaziyor, yani boru calisiyor, bozuk olan PENCERE.",
+      "kok_sebep": "2026-06-02 tarihli resolve_performance_and_duplicate_rls.sql, 'gereksiz merged politikalari temizle' toplu bloguyla merged_client_errors_authenticated_select politikasini dusurdu. O blok kalabalik tablolarda FAZLALIGI aliyordu; client_errors'ta ise o TEK authenticated politikasiydi ve yeniden yaratma bolumunde tablo hic gecmiyor. Sinif: 'toplu temizlik, yalniz tabloda kapiyi kaldirir.'",
+      "kapanis_kosulu": "client_errors uzerine authenticated icin is_admin_user() kosullu SELECT politikasi eklenmesi (kardes tablo error_groups zaten boyle calisiyor). Bu bir MIGRATION'dir = prod'a otomatik uygulama = Recep kapisi. Politika inince bu satir SILINIR.",
+      "dikkat": "is_admin_user() moderator'u KABUL ETMEZ. Ayni desen kopyalandiginda moderator icin liste yine bos kalir; bu SESSIZ olmamali, arayuz 'yetkin yok' demeli. Aksi halde bir sessiz-bos digeriyle degistirilmis olur.",
+      "bulan": "EDGE (4397deef) - belirti ve arkeoloji; LEGAL (eda80084) - canli semadan mekanizma ve kural daraltmasi",
+      "tarih": "2026-08-20"
+    }
+  }
+}

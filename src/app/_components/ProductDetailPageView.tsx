@@ -41,6 +41,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
+import { selectVariant } from '../../lib/data/selectVariant'
 import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
 import type { FamilyDetail, FamilyVariant } from '../../lib/services/family.service'
 import { getFamiliesEnriched } from '../../lib/services/family.service'
@@ -51,6 +52,8 @@ import type { FamilyListItem,Product } from '../../types/ui-models'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import {
   formatSpecValue,
+  getProductDisplayName,
+  getProductModelLabel,
   groupTechnicalSpecs,
   SPEC_SORT_ORDER,
   translateSpecKey} from '../../utils/productHelpers'
@@ -134,10 +137,26 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const navTriggerRef = useRef<HTMLDivElement>(null)
 
   // Seçili varyant: ?sku= → yoksa ailenin ilk varyantı.
-  const selectedVariant = useMemo(
-    () => variants.find((v) => v.sku === skuParam) ?? variants[0] ?? null,
-    [variants, skuParam]
-  )
+  // Karar `selectVariant`e taşındı (INV-SKU-PARAM-1): eskiden bu tek satır, ailede OLMAYAN
+  // bir SKU istendiğinde sessizce ilk varyanta düşüyordu — kullanıcı başka kapasitedeki bir
+  // ürünün fiyatını kendi istediği ürün sanıyordu ve adres çubuğu onu doğruluyordu.
+  const variantSelection = useMemo(() => selectVariant(variants, skuParam), [variants, skuParam])
+  const selectedVariant = variantSelection.kind === 'empty' ? null : variantSelection.variant
+
+  /*
+   * BAYAT `?sku=` — istenen varyant ailede yok. İlk varyantı göstermeye devam ediyoruz
+   * (boş sayfa basmak daha kötü) ama adres çubuğunu KANONİKLEŞTİRİYORUZ: parametre
+   * silinir. Aksi halde URL var olmayan bir ürünü işaret etmeye devam eder ve gösterilen
+   * fiyatı "istediğim ürünün fiyatı" diye okutur.
+   * `replace` kullanılır — geri tuşu kullanıcıyı bozuk linke geri atmasın.
+   */
+  useEffect(() => {
+    if (variantSelection.kind !== 'stale') return
+    const next = new URLSearchParams(window.location.search)
+    next.delete('sku')
+    const qs = next.toString()
+    router.replace((qs ? `${pathname}?${qs}` : pathname) as Route, { scroll: false })
+  }, [variantSelection, pathname, router])
   const selectedVariantId = selectedVariant?.id ?? null
 
   // --- GATEWAY ADAPTATION: CENTRAL CATEGORY DISPATCH (aile üzerinden) ---
@@ -378,10 +397,14 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const canonicalUrl = `${SITE_URL}${localizedHref(Routes.product(family.slug), lang)}`
   const variantDescription = selectedVariant.description || pickLang(family.description, lang)
   const metaDesc = variantDescription || t('pdp.descFallback')
-  const variantLabel = selectedVariant.model_code || selectedVariant.sku
+  // T098: ham alan okumasi YASAK — kimlik metni tek cozucuden gelir.
+  // `|| sku` yedegi musteriye IC KODU gosterebiliyordu; getProductModelLabel kod yoksa
+  // null doner ve asagidaki model etiketi satiri HIC cizilmez (bos etiket basmaktansa yokluk).
+  const variantLabel = getProductModelLabel(selectedVariant)
+  const variantDisplayName = getProductDisplayName(selectedVariant, family)
   const hasMultipleVariants = variants.length > 1
   // Varyant adı aile adıyla aynıysa tekrar basmanın anlamı yok; farklıysa GÖSTERİLİR.
-  const showsVariantIdentity = selectedVariant.name !== family.name
+  const showsVariantIdentity = variantDisplayName !== family.name
   const inlineSelector = hasMultipleVariants && variants.length <= VARIANT_PILL_MAX
   const stockQty = selectedVariant.stock_qty
   const inStock = typeof stockQty === 'number' && stockQty > 0
@@ -447,7 +470,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
               <ImageGallery
               key={selectedVariant.id}
               images={galleryImages}
-              productName={selectedVariant.name}
+              productName={variantDisplayName}
               slug={family.slug}
               modelType={(mainCategory?.metadata as CategoryMetadata | null)?.model_type}
               />
@@ -491,21 +514,24 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 NİÇİN: sepete/siparişe/e-postaya giden metin `product.name`'dir; sayfa yalnız aile
                 adını yazarsa müşteri aldığı şeyin adını İLK KEZ sepette görür (ölçüm: 374/374
                 üründe ad ≠ aile adı). Ad tek başına yetmez — 74 satırda aile içinde çakışıyor;
-                ayırt ediciliği `variantLabel` (model_code || sku) taşıyor, o yüzden İKİSİ birlikte.
+                ayırt ediciliği `variantLabel` (yalnız model_code — ham SKU müşteriye gösterilmez)
+                taşıyor, o yüzden İKİSİ birlikte.
                 Ölçüm: docs/audits/t099-aile-icerik-uyumu-2026-08-18.md */}
             <h1 className="text-2xl sm:text-3xl font-black text-industrial-gray leading-hvac-11 mb-2 tracking-tight">
               {family.name}
             </h1>
             {showsVariantIdentity && (
               <p className="text-base font-bold text-primary-navy leading-hvac-11 mb-1">
-                {selectedVariant.name}
+                {variantDisplayName}
               </p>
             )}
             {/* KOŞULSUZ: tek üyeli ailede de görünür. Eski hâli `hasMultipleVariants`'a bağlıydı
                 ve kimliği tam da aile adının yanlış olduğu tek-üyeli ailede yutuyordu. */}
-            <p className="text-xs font-bold text-steel-gray uppercase tracking-widest mb-4">
-              {t('pdp.variant.selectedModel')}: <span className="text-primary-navy">{variantLabel}</span>
-            </p>
+            {variantLabel && (
+              <p className="text-xs font-bold text-steel-gray uppercase tracking-widest mb-4">
+                {t('pdp.variant.selectedModel')}: <span className="text-primary-navy">{variantLabel}</span>
+              </p>
+            )}
 
             {/* Smart Engineering Inference (tam Product satırı gerektirir) */}
             {actionProduct && <ProductSmartInference product={actionProduct} />}
@@ -735,7 +761,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
             <div className="hidden lg:flex items-center space-x-3 pl-6 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-8 duration-500">
               <div className="flex flex-col items-end mr-2">
                 {/* Satın alma çubuğu: sepete DÜŞECEK ad gösterilir, aile adı değil. */}
-                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px uppercase tracking-tight">{selectedVariant.name}</span>
+                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px uppercase tracking-tight">{variantDisplayName}</span>
                 <span className="text-xs text-primary-navy font-black tracking-widest">
                   {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                 </span>
@@ -809,7 +835,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                           <div className="space-y-4">
                             {[
                               { label: t('pdp.brand'), value: family.brand_name ?? '-' },
-                              { label: t('pdp.model'), value: variantLabel },
+                              { label: t('pdp.model'), value: variantLabel ?? '-' },
                               { label: t('pdp.labels.category'), value: getCategoryDisplayName(mainCategory, t) || '-' }
                             ].map((item, i) => (
                               <div key={i} className="flex justify-between items-center py-3 border-b border-light-gray/30 group">
@@ -985,7 +1011,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
         onClose={() => setQuoteOpen(false)}
         source="pdp"
         qtyEditable
-        items={[{ productId: selectedVariant.id, productName: selectedVariant.name, qty: 1 }]}
+        items={[{ productId: selectedVariant.id, productName: variantDisplayName, qty: 1 }]}
       />
     </div>
   )

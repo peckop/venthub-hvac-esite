@@ -30,6 +30,17 @@
 | **Ticaret** (ne satıyoruz, TR-KOD, **€ alış**, KDV, kur) | **Avensair** (TR bayi, satış otoritesi) | `e3b18fa3-6310-4067-9873-2deb847d15a8` |
 
 - **Köprü = model kodu** (Vortice `cod. 61121` = Avensair `KOD 61121`). İki kaynağı bu bağlar.
+- ⚠ **Kodun biçimi hakkında varsayım YOK.** Kod salt sayısal (`61121`, `11313`), **dört haneli**
+  (`1200`, `1355`), alfanümerik (`NS311280`, `NX313290`), **boşluklu** (`ENKEC 155`)
+  ya da uzun/karışık (`253080106XN`) olabilir. Kaynakta yazdığı gibi **birebir** kopyalanır; kırpma,
+  doldurma, yeniden biçimlendirme yoktur ve **biçimi tuhaf göründü diye satır atlanmaz**.
+  (Ölçüldü — T119: yalnız beş haneli kod bekleyen bir çıkarım **74 ürünü** düşürdü, bunların 7'si dört haneliydi.
+  Kayıt: `docs/audits/t119-katalog-cikarim-dogrulama-2026-08-20.md`)
+- ⚠ **Köprü kaynakta TEKİL DEĞİL — açık karar.** Aynı model kodu birden fazla ürüne ait olabilir
+  (ölçüldü: 543 kodun 41'i mükerrer, ~20'si farklı fiyatlı gerçek çakışma; ör. `43151` hem
+  VORT QBK SAL KC EVO 315 hem TORRETTE TR-A 315 ATEX). Bu cetvel kodu "köprü" saymaya devam eder,
+  ama **tekillik garantisi vermez**. Bileşik anahtara mı geçileceği yoksa çakışmanın kırmızı mı sayılacağı
+  **Recep kararı bekliyor**; karar çıkana kadar aktarımda tekillik kısıtına güvenilmez.
 - **Mağaza = Avensair'in sattığı küme.** Vortice'de olup Avensair'in satmadığı kalemler (ev tipi yaz vantilatörü,
   mutfak davlumbaz, Ariett/Vort Press, gelişmiş HRV, VMC kanal, Vorticel MPC) **CSV'ye girmez**.
 - **Avensair ticari şartları (sabit):** fiyatlar **Euro** · **%20 KDV hariç** · **TCMB Efektif Satış Kuru** · AVenS depo teslim.

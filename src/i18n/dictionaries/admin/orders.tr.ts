@@ -11,11 +11,13 @@ export const orders = {
         pending: 'Bekliyor',
         paid: 'Ödendi',
         confirmed: 'Onaylandı',
+        processing: 'Hazırlanıyor',
         shipped: 'Kargoda',
         delivered: 'Teslim Edildi',
         cancelled: 'İptal Edildi',
         refunded: 'İade Edildi',
-        partialRefunded: 'Kısmi İade'
+        partialRefunded: 'Kısmi İade',
+        unknown: 'Bilinmeyen Durum'
       },
       customerFilter: {
         active: 'Liste tek bir müşteriye göre filtrelenmiş.',
