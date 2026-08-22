@@ -61,6 +61,14 @@ export const products = {
     closeSymbol: '✕',
     moreRows: '... and {{count}} more rows.',
     processing: 'Processing...',
+    // Unknown-SKU guard. Wording is a ROUTE, not a diagnosis. Counts are interpolated and
+    // the phrasing is deliberately count-agnostic — "1 SKU are ..." must never happen.
+    unknownSkuTitle: 'SKUs not found in the database: {{count}}',
+    unknownSkuHelp: 'These rows do not match any existing product. To add them as new products, choose "Create as new". If you meant to update existing products, you may be using an outdated export file — fix the SKUs in the file, or choose "Update existing only".',
+    unknownSkuExamples: 'Examples: {{skus}}',
+    createNewAction: 'Create as new ({{count}})',
+    updateExistingOnly: 'Update existing only ({{count}})',
+    updateExistingDone: 'Updated existing products only: {{ok}} rows. Skipped (not in database): {{skipped}} rows.',
   },
   edit: {
     editing: 'Editing',
