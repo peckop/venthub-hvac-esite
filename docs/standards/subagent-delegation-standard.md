@@ -75,6 +75,15 @@ ajan varsayılan olarak yardımsever davranır ve boşluğu doldurur.
    ancak iş bittikten sonra öğrendim. Sistem değişikliği **oturumdan uzun yaşar**: ajan
    biter, kurulum kalır. Devrin sınırı ajanın ömrüyle bitmeli.
 
+   **Yasak olan kurulumun kendisi değil, izinsiz kurulumdur.** Kapı iki kademelidir
+   (kullanıcı onayı 2026-08-22):
+   - **Düşük riskli, geri alınabilir, yerel** araç (PDF aracı, geliştirme bağımlılığı) →
+     **lider onayı yeterlidir.** Ajan "şu lazım, kurayım mı?" diye sorar; lider onaylar,
+     kayda geçirir ve kullanıcıya **bildirir** (görünürlük onayın parçasıdır).
+   - **Geri alınamaz / prod veri yazımı / migration / silme / güvenlik-hassas** →
+     **yalnız kullanıcı.** Bu kademe devredilemez.
+   - **Emin değilsen üst kademeyi say.** Varsayılan sıkı taraftır.
+
 ---
 
 ## 4. Paralellik kuralı: çakışma yüzeyine göre
@@ -136,7 +145,48 @@ Ajanın raporu **iddiadır, kanıt değildir.** Kabul etmeden önce:
 
 ---
 
-## 7. Devredilemez olanlar
+## 7. Kendi teşhisini çürüt
+
+Buraya kadarki bölümler ajanın çıktısını denetlemeyi anlatıyor. Bu bölüm **kendi
+çıktını** denetlemeyi anlatıyor ve daha önemlidir: ajanın hatasını yakalamak için zaten
+şüpheci bakıyorsun, kendi teşhisine bakmıyorsun.
+
+**Damıtıldığı olay (2026-08-22):** "Ürün sayfasının etiketleri koda gömülü bir haritadan
+geliyor" diye teşhis koydum ve kullanıcıya ilettim. Yanlıştı — sayfa zaten sözlükten okuyan
+doğru katmanı kullanıyordu, koda gömülü harita başka bir yüzeye (PDF üretimi) gidiyordu.
+Hatayı ben bulmadım; başka bir şerit ölçüp düzeltti. **Tek şerit olsaydım yanlış teşhis
+işe dönüşecekti.**
+
+Beni yanıltan üç adım, sırayla:
+1. Dosyayı arama ile buldum, içindeki fonksiyonu gördüm, **çağıranın onu kullandığını
+   varsaydım** — çağrı zincirini okumadım.
+2. Canlı sayfada o dizeyi **aradım ve bulamadım.** Yani teşhisi çürüten bir ölçüm elime
+   geçti.
+3. O ölçümü "araç kör olabilir" diye **geçtim** ve teşhisi değiştirmedim.
+
+Üçüncüsü asıl hatadır. Araç gerçekten kör olabilir — ama körlük iddiası, teşhisi ayakta
+tutmanın bedava yolu değildir: **körlüğü ayrıca kanıtlaman gerekir.**
+
+### Uygulama
+
+- **Teşhis ≠ ölçüm.** "Şu dosyada şu fonksiyon var" bir ölçümdür. "Sayfa onu kullanıyor"
+  bir teşhistir ve ayrı ölçüm ister (çağrı zinciri, import, canlı çıktı).
+- **Çürüten ölçüm gelirse teşhis değişir.** Aracı suçlamadan önce aracın kör olduğunu
+  kanıtla; kanıtlayamıyorsan ölçüm haklıdır.
+- **"Ölçtüm" ile "ölçebildim" ayrıdır.** Aracın göremediği yeri **adıyla** yaz:
+  *"curl sunucu HTML'ini görür; varyant seçimi tarayıcıda olduğu için bu soruya kördür."*
+  Bunu yazmayan bir ölçüm, cevabı "sorun yok" sanılır.
+- **Çürütücü ajan koş.** Şu üç eşikte, kendi işini **yıkmakla görevli** bir ajan aç:
+  (a) prod yazımından önce, (b) plan sunmadan önce, (c) kullanıcıya teşhis iletmeden önce.
+  Tarifi doğrulama değil **çürütme** olmalı: iddiaları tek tek say, her birine
+  ÇÜRÜTÜLDÜ / AYAKTA / ÖLÇEMEDİM dedirt, ve **"emin değilsen plan sahibinin aleyhine
+  karar ver"** de. "Planı gözden geçir" diyen bir tarif, onay üretir.
+- **"Bulamadım" ile "yok" ayrıdır.** Çürütücünün "ÖLÇEMEDİM"i bir başarı raporu değil,
+  açık bir risktir; kullanıcıya öyle taşınır.
+- Çok şeritli çalışmada başka bir şeridin seni düzeltmesi **şans**tır, mekanizma değil.
+  Mekanizma, kendi kurduğun çürütmedir.
+
+## 8. Devredilemez olanlar
 
 Şunlar hiçbir koşulda alt-ajana geçmez:
 
@@ -148,7 +198,7 @@ Ajanın raporu **iddiadır, kanıt değildir.** Kabul etmeden önce:
 
 ---
 
-## 8. Bu cetvelin kapısı
+## 9. Bu cetvelin kapısı
 
 Bu cetvel bir **süreç** cetvelidir; kodu değil davranışı yönetir, bu yüzden onu zorlayan
 otomatik test **yoktur** ve olmaması bilinçlidir. Uygulanmasının tek ölçüsü, devredilen her
