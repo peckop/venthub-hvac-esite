@@ -147,6 +147,55 @@ export function buildCategoryJsonLd(params: BuildCategoryJsonLdParams): Record<s
   }
 }
 
+export interface BuildSeriesLandingJsonLdParams {
+  lang: string
+  baseUrl: string
+  seriesSlug: string
+  name: string
+  description: string
+  /** Seri altındaki modeller — kart listesiyle AYNI kaynak (`FamilyListItem[]`). */
+  models: FamilyListItem[]
+}
+
+/**
+ * T138-VH K7 — Seri landing → schema.org CollectionPage + ItemList.
+ *
+ * `ProductGroup` KASITLI KULLANILMAZ: seri satılabilir bir ürün değil, altındaki MODELLERİN
+ * listesidir (K1 kararı — "KART = MODEL, SERİ = LANDING"). Şekil `buildCategoryJsonLd` ile
+ * BİREBİR aynı (CollectionPage + numberOfItems + itemListElement) — kategori sayfası da aynı
+ * sınıf içerik sunar (bir grup ürünün landing'i). Sayfalama YOK: seri sayfası tüm modellerini
+ * tek seferde basar (`?page=` bu yüzeyde hiç yok), bu yüzden `buildCategoryJsonLd`'nin
+ * page/pageSize parametreleri burada bulunmaz.
+ *
+ * BreadcrumbList KASITLI EKLENMEZ: `Breadcrumb.tsx` bileşeni (paylaşılan navigasyon)
+ * kendi `items` prop'undan zaten TAM bir BreadcrumbList JSON-LD'si basıyor (bkz.
+ * `src/components/navigation/Breadcrumb.tsx`). Burada ikinci bir BreadcrumbList üretmek
+ * aynı sayfada İKİ ayrı BreadcrumbList düğümü demek olurdu (mükerrer yapılandırılmış veri) —
+ * seri sayfasının breadcrumb hiyerarşisini derinleştirmek (`SeriesLandingView`'daki
+ * `breadcrumbItems`) tek başına yeterli, çünkü Breadcrumb bileşeni onu otomatik JSON-LD'ye çevirir.
+ *
+ * Fiyat/offers HİÇ yazılmaz — `itemListElement` yalnız `url` taşır (kategori sayfasıyla aynı
+ * disiplin); "Teklif Alın" modelinde model listesinden fiyat sızdırmanın bir yolu yok.
+ */
+export function buildSeriesLandingJsonLd(params: BuildSeriesLandingJsonLdParams): Record<string, unknown> {
+  const { lang, baseUrl, seriesSlug, name, description, models } = params
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name,
+    description,
+    url: `${baseUrl}/${lang}/products/${seriesSlug}`,
+    isPartOf: buildWebSiteRef(baseUrl),
+    numberOfItems: models.length,
+    itemListElement: models.map((model, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `${baseUrl}/${lang}/products/${model.slug}`,
+    })),
+  }
+}
+
 const UUID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
 
 /**

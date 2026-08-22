@@ -74,7 +74,13 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     for (const [key, reason] of Object.entries(parsed.entries)) {
       expect(typeof reason, `${key} gerekçesi metin olmalı`).toBe('string')
       expect(reason.trim().length, `${key} gerekçesiz`).toBeGreaterThan(20)
-      expect(reason, `${key} bir T099 bulgusuna atıf yapmalı`).toMatch(/T099/)
+      // Gerekçe izlenebilir bir GÖREV KİMLİĞİNE bağlanmalı — ama kimliğin T099 olması şart
+      // değil. Kalıp 2026-08-21'e kadar `/T099/` idi; taban yalnız T099 denetiminden doğduğu
+      // için o gün doğruydu, ama sözleşmenin kendisi "bir bulguya bağlan" demek. T140 (birim
+      // sözleşmesi) satırları eklendiğinde bu test, gerekçesi TAM olan satırları yanlış
+      // kırmızıya çevirdi — testin eski sözleşmeyi kodladığı sınıf. Kural aynı kalıyor,
+      // kapsamı düzeltiliyor: herhangi bir `T<sayı>` atfı geçerli, atıfsızlık hâlâ kırmızı.
+      expect(reason, `${key} izlenebilir bir görev kimliğine (T###) atıf yapmalı`).toMatch(/\bT\d{2,}\b/)
     }
   })
 

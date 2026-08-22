@@ -806,6 +806,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "inventory_movements_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "inventory_movements_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
@@ -943,6 +950,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "order_attachments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "order_attachments_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -955,28 +969,37 @@ export type Database = {
         Row: {
           created_at: string
           email_to: string
+          error: string | null
           id: string
+          kind: string | null
           order_id: string
           provider: string
           provider_message_id: string | null
+          status: string | null
           subject: string
         }
         Insert: {
           created_at?: string
           email_to: string
+          error?: string | null
           id?: string
+          kind?: string | null
           order_id: string
           provider?: string
           provider_message_id?: string | null
+          status?: string | null
           subject: string
         }
         Update: {
           created_at?: string
           email_to?: string
+          error?: string | null
           id?: string
+          kind?: string | null
           order_id?: string
           provider?: string
           provider_message_id?: string | null
+          status?: string | null
           subject?: string
         }
         Relationships: [
@@ -999,6 +1022,82 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_email_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_invoices: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_date: string
+          invoice_no: string
+          invoice_type: string | null
+          issued_by: string | null
+          note: string | null
+          order_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_date: string
+          invoice_no: string
+          invoice_type?: string | null
+          issued_by?: string | null
+          note?: string | null
+          order_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_date?: string
+          invoice_no?: string
+          invoice_type?: string | null
+          issued_by?: string | null
+          note?: string | null
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_invoices_issued_by_fkey"
+            columns: ["issued_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "reserved_orders"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -1054,6 +1153,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
           {
@@ -1197,6 +1303,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
           {
@@ -1578,6 +1691,7 @@ export type Database = {
           meta_description: Json | null
           meta_title: Json | null
           name: string
+          parent_family_id: string | null
           series_code: string | null
           slug: string
           sort_order: number
@@ -1596,6 +1710,7 @@ export type Database = {
           meta_description?: Json | null
           meta_title?: Json | null
           name: string
+          parent_family_id?: string | null
           series_code?: string | null
           slug: string
           sort_order?: number
@@ -1614,6 +1729,7 @@ export type Database = {
           meta_description?: Json | null
           meta_title?: Json | null
           name?: string
+          parent_family_id?: string | null
           series_code?: string | null
           slug?: string
           sort_order?: number
@@ -1634,6 +1750,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_families_parent_family_id_fkey"
+            columns: ["parent_family_id"]
+            isOneToOne: false
+            referencedRelation: "product_families"
             referencedColumns: ["id"]
           },
           {
@@ -2281,6 +2404,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "refund_attempts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "refund_attempts_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -2399,6 +2529,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipping_email_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
           {
@@ -2982,6 +3119,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "venthub_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "venthub_order_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
@@ -3030,6 +3174,8 @@ export type Database = {
           legal_consents: Json | null
           locale: string | null
           order_number: string
+          paid_at: string | null
+          paid_email_sent_at: string | null
           payment_debug: Json | null
           payment_method: string | null
           payment_status: string | null
@@ -3066,6 +3212,8 @@ export type Database = {
           legal_consents?: Json | null
           locale?: string | null
           order_number: string
+          paid_at?: string | null
+          paid_email_sent_at?: string | null
           payment_debug?: Json | null
           payment_method?: string | null
           payment_status?: string | null
@@ -3102,6 +3250,8 @@ export type Database = {
           legal_consents?: Json | null
           locale?: string | null
           order_number?: string
+          paid_at?: string | null
+          paid_email_sent_at?: string | null
           payment_debug?: Json | null
           payment_method?: string | null
           payment_status?: string | null
@@ -3351,6 +3501,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "venthub_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "venthub_returns_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -3459,6 +3616,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wizard_selections_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
           {
@@ -3672,6 +3836,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "venthub_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "venthub_returns_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -3686,6 +3857,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      view_admin_uninvoiced_orders: {
+        Row: {
+          created_at: string | null
+          customer_email: string | null
+          customer_name: string | null
+          id: string | null
+          invoice_info: Json | null
+          invoice_type: string | null
+          order_number: string | null
+          total_amount: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          id?: string | null
+          invoice_info?: Json | null
+          invoice_type?: string | null
+          order_number?: string | null
+          total_amount?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          id?: string | null
+          invoice_info?: Json | null
+          invoice_type?: string | null
+          order_number?: string | null
+          total_amount?: number | null
+        }
+        Relationships: []
       }
     }
     Functions: {
@@ -3803,6 +4007,8 @@ export type Database = {
           legal_consents: Json | null
           locale: string | null
           order_number: string
+          paid_at: string | null
+          paid_email_sent_at: string | null
           payment_debug: Json | null
           payment_method: string | null
           payment_status: string | null
@@ -3848,6 +4054,8 @@ export type Database = {
           legal_consents: Json | null
           locale: string | null
           order_number: string
+          paid_at: string | null
+          paid_email_sent_at: string | null
           payment_debug: Json | null
           payment_method: string | null
           payment_status: string | null

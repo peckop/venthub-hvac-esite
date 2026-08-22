@@ -23,6 +23,10 @@
     "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|STORM 10 ATEX": "T099-B4 · 2 kayit — ayni gerekce.",
     "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|STORM 12 ATEX": "T099-B4 · 2 kayit — ayni gerekce.",
     "dup-name:SEAT Storm Jet Asit Dayanımlı Fanlar|STORM 14": "T099-B4 · 2 kayit — ayni gerekce.",
-    "dup-name:AVenS Elektrikli Kanal Isıtıcıları|AvenS 5000": "T099-C1 · 2 kayit (AVE-42500, AVE-47300) ayni ad iki SKU. Mukerrer kayit mi iki ayri urun mu — Recep karari."
+    "dup-name:AVenS Elektrikli Kanal Isıtıcıları|AvenS 5000": "T099-C1 · 2 kayit (AVE-42500, AVE-47300) ayni ad iki SKU. Mukerrer kayit mi iki ayri urun mu — Recep karari.",
+    "spec-unit:max_absorbed_power_w|SEAT": "T140 · KUCULDU 49 -> 2 (2026-08-22 SEAT icerik yazimi). Kalan 2: SEA-51201003 (SEAT 20 ATEX 930rpm) ve SEA-61103110 (STORM 10) — ikisinin de referans kodu ureticinin foyunde YOK, kaynaksiz alana uydurma YAZILMADI. Kaynak bulunursa bu satir SILINIR.",
+    "spec-type:voltage_v|SEAT": "T140 · KUCULDU 81 -> 3 (2026-08-22 SEAT icerik yazimi; voltage_v sayiya cevrildi + faz AYRI alana ayrildi). Kalan 3: SEA-51201003, SEA-61103110 (foyde referans yok) ve SEA-61102010 (kaynak eslesmesi RE-sonek VARSAYIMINA dayaniyordu, gerilim bilerek yazilmadi).",
+    "spec-type:max_delivery_m3h|Nicotra Gebhardt": "T140 · 35 kayit, or. NIC-11901. Deger sayisal degil. Nicotra katalogunda tek bir 'maks. debi' rakami YOK, P-Q egrisi var — kaynak dogrulanmadan sayiya cevrilmez. Nicotra icerik turunun kalemi.",
+    "spec-type:max_delivery_m3h|AVenS": "T140 · 26 kayit, or. AVE-13010. Ayni sinif; AVenS isi geri kazanim PDF datasheet'lerinde debi TEK deger olarak var (or. AVENS 1000 = 1000 m3/h), AVenS icerik turunde cevrilecek."
   }
 }
