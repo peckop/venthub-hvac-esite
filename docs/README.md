@@ -29,6 +29,7 @@
 | Fiyat/kur/marj **nasıl hesaplanır**? | `standards/pricing-standard.md` |
 | Hangi sayfa **nasıl üretilir**, veri değişince **ne tazelenir**, fiyat **hangi yüzeyde** görünür? | `standards/rendering-cache-standard.md` |
 | Birden çok Claude oturumu **nasıl çakışmadan** çalışır? | `standards/multi-session-coordination-standard.md` |
+| Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
 | **Niçin** / moat / vizyon? | `../VISION.md` |
 | Kapsamlı uçtan uca referans | `../CONTEXT.md` (NLM üretir) |
 
