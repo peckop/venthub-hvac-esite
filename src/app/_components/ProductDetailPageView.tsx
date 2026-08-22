@@ -41,6 +41,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
+import { selectVariant } from '../../lib/data/selectVariant'
 import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
 import type { FamilyDetail, FamilyVariant } from '../../lib/services/family.service'
 import { getFamiliesEnriched } from '../../lib/services/family.service'
@@ -136,10 +137,26 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const navTriggerRef = useRef<HTMLDivElement>(null)
 
   // Seçili varyant: ?sku= → yoksa ailenin ilk varyantı.
-  const selectedVariant = useMemo(
-    () => variants.find((v) => v.sku === skuParam) ?? variants[0] ?? null,
-    [variants, skuParam]
-  )
+  // Karar `selectVariant`e taşındı (INV-SKU-PARAM-1): eskiden bu tek satır, ailede OLMAYAN
+  // bir SKU istendiğinde sessizce ilk varyanta düşüyordu — kullanıcı başka kapasitedeki bir
+  // ürünün fiyatını kendi istediği ürün sanıyordu ve adres çubuğu onu doğruluyordu.
+  const variantSelection = useMemo(() => selectVariant(variants, skuParam), [variants, skuParam])
+  const selectedVariant = variantSelection.kind === 'empty' ? null : variantSelection.variant
+
+  /*
+   * BAYAT `?sku=` — istenen varyant ailede yok. İlk varyantı göstermeye devam ediyoruz
+   * (boş sayfa basmak daha kötü) ama adres çubuğunu KANONİKLEŞTİRİYORUZ: parametre
+   * silinir. Aksi halde URL var olmayan bir ürünü işaret etmeye devam eder ve gösterilen
+   * fiyatı "istediğim ürünün fiyatı" diye okutur.
+   * `replace` kullanılır — geri tuşu kullanıcıyı bozuk linke geri atmasın.
+   */
+  useEffect(() => {
+    if (variantSelection.kind !== 'stale') return
+    const next = new URLSearchParams(window.location.search)
+    next.delete('sku')
+    const qs = next.toString()
+    router.replace((qs ? `${pathname}?${qs}` : pathname) as Route, { scroll: false })
+  }, [variantSelection, pathname, router])
   const selectedVariantId = selectedVariant?.id ?? null
 
   // --- GATEWAY ADAPTATION: CENTRAL CATEGORY DISPATCH (aile üzerinden) ---
