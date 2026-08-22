@@ -174,6 +174,14 @@ describe('INV-CETVEL-YAPI · cetvellerin bölüm yapısı', () => {
  *       aynı dosyada iki başlıkta geçiyorsa → tek bulgu = gerçek vaka, yanlış
  *       pozitif SIFIR, ve numara değişse de yakalar. KABUL EDİLEN.
  *
+ * ⚠ BU DARALTMANIN KIRILGAN BİR BAĞIMLILIĞI VAR (ÜRÜN şeridi yakaladı, kayda geçiyorum):
+ * yukarıdaki yanlış kırmızının temizlenmesi, o dosyada `2.6`'nın `###` ve `11.6`'nın `##`
+ * olmasına — yani bir YAPISAL TUTARSIZLIĞA — dayanıyor. Biri o başlık düzeylerini
+ * "düzeltirse" aynı çapa aynı düzeyde iki kez görünür ve kol yeniden yanlış kırmızı verir;
+ * üstelik bu sefer HAKLI görünür. Yani kolun doğruluğu, düzeltilmesi gereken bir
+ * tutarsızlığın DURMASINA bağlı. Bu rahatsız edici ve gizlenmemeli: düzey normalizasyonu
+ * yapılacaksa önce bu kola ADIYLA muafiyet eklenmeli (şema tanımı ↔ sözleşme çifti meşrudur).
+ *
  * MENZİL DÜRÜSTLÜĞÜ: 557 başlığın yalnız ~32'si çapa taşır. Bu kol DAR ama KESİN;
  * çapasız iki tarifi görmez. Dar-kesin, geniş-gürültülüye tercih edildi çünkü B'nin
  * dört yanlış kırmızısı kapıyı ilk gününde gürültüye çevirirdi.
