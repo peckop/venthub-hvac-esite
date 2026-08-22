@@ -302,5 +302,13 @@ kaydını kargo defterine yazıyor (§B7-7) · `shipping_email_events` başarıs
 
 ---
 
-**Sürüm:** v1.1 · 2026-08-20 · ölçüm tabanı `origin/master` = `94ec69c3` + canlı Postgres.
+**Sürüm:** v1.1 · 2026-08-20, **iddiaları 2026-08-22'de yeniden ölçüldü** ·
+ölçüm tabanı `origin/master` = `ea316814` + canlı Postgres.
+
+> **Niçin yeniden ölçüldü:** bu düzeltme iki gün gönderilmeden bekledi. "İki gün önce
+> doğruydu" bugün doğru olduğunu göstermez — belgenin kendi §B11'i tam da bunu anlatıyor.
+> Canlı DB'den 08-22'de doğrulandı: `order_email_events` → `status`/`error`/`kind` **var**,
+> `tenant_id` **hâlâ yok**; `uq_order_email_events_sent_once` **var**; `venthub_orders` →
+> `paid_at` ve `paid_email_sent_at` **var**. §B5'teki kiracı boşluğu ve §B7'deki kalemler
+> **aynen geçerli**.
 (v1.0 tabanı `57e82a4d` idi ve **kendi konusunda bir commit bayat doğdu** — bkz. §B11.)
