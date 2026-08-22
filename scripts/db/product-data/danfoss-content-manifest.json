@@ -1,0 +1,357 @@
+{
+  "_marka": "Danfoss",
+  "_okuma_notu": "T146-URUN Danfoss FC101/FC102 icerik hazirlama turu. Onceki turda metin-cevrimi (PDF->text) tablo yapisini bozdugu ve FC102'de metin 90 derece donuk ciktigi icin GORSEL okumaya gecildi: PDF sayfalari poppler pdftoppm ile PNG'ye render edildi (winget ile poppler bu oturumda kuruldu, proje/repo disinda, sadece sistem PATH'ine eklendi — repo dosyasi degil), sonra Read araciyla goruntu olarak dogrudan okundu. Butun sayi degerleri bu yontemle (tablo hucresi goruntude goruldu) dogrulandi; hicbir deger metin-cevriminden KOPYALANMADI (metin cevrimi yalniz sayfa/tablo KONUMUNU bulmak icin arac olarak kullanildi — bkz. FC101 sayfa 18/28-30, FC102 sayfa 169-170 fiziksel PDF sayfa numaralari).",
+  "_yontem": "Iki asama: (1) mcp__markitdown__convert_to_markdown ile PDF tam metne cevrildi, sayfa/tablo basliklari (footer sayfa numaralari + 'Table N' basliklari) grep ile bulundu — bu metnin SAYISAL HUCRELERI kullanilmadi cunku FC101'de bile kolon hizasi bozuluyor, FC102'de tablolar donuk oldugu icin tamamen okunamaz haldeydi (gozlemlendi: satirlar tek-sutunlu rastgele sayi dizisine donusuyor). (2) O sayfa numaralari poppler pdftoppm (-r 150/170/200) ile PNG'ye render edildi, PNG dogrudan Read (gorsel) ile okundu ve her deger tablo hucresinden GOZLE dogrulandi.",
+  "_kaynak": {
+    "fc101": {
+      "url": "https://assets.danfoss.com/documents/latest/514925/AJ275648114271en-001201.pdf",
+      "baslik": "Design Guide VLT HVAC Basic Drive FC 101 (Danfoss A/S, 2025.07, AJ275648114271en-001201/130R0222)",
+      "guc_agirlik_govde_tablo": "Table 5 (Enclosure H1-H5, pdf sayfa 18) + Table 6 (H6-H10, pdf sayfa 19) + Table 7 (I2-I8/IP54, pdf sayfa 19) — Power Ratings, Weights and Dimensions. Bu tablolar govde basina TEK max-agirlik verir (birden fazla kW ayni govdeye sigar); daha kesin per-model agirlik icin asagidaki akim tablolarinin kendi 'Weight enclosure protection rating' satiri kullanildi.",
+      "akim_agirlik_tablo": "Table 12 (3x380-480V, 0.37-15 kW, H1-H4, pdf sayfa 28-29) + Table 13 (3x380-480V, 18.5-90 kW, H5-H8, pdf sayfa 29-30) — Mains Supply. Her sutun tek bir Danfoss tip kodu (PK37...P90K); 'Output current 40°C ambient / Continuous (3x380-440V) [A]' satiri ve kendi 'Weight enclosure protection rating IP20/Open type' satiri per-model deger verir (Table 5/6/7'deki govde-basina-tek-max degerinden DAHA KESIN)."
+    },
+    "fc102": {
+      "url": "https://assets.danfoss.com/documents/272740/AJ299549559248en-US1801.pdf",
+      "baslik": "Design Guide VLT HVAC Drive FC 102 1.1-90 kW (Danfoss A/S, Rev. 06/2014, MG11BC22)",
+      "tablo": "Table 9.4 Line Power Supply 3x380-480V AC (P1K1-P7K5, pdf fiziksel sayfa 171 / basili sayfa 169) + Table 9.5 Line Power Supply 3x380-480V AC (P11K-P90K, pdf fiziksel sayfa 172 / basili sayfa 170) — 9.1 Line Power Supply Tables bolumu. 'Output current / Continuous (3x380-439V) [A]' ve 'Weight enclosure IP20 (kg)' satirlari per-model deger verir.",
+      "sayfa_numarasi_notu": "Bu PDF'te basili sayfa numarasi (alt kose) fiziksel PDF sayfa numarasindan 2 GERIDE (basili 166 = fiziksel 168, dogrulandi). Table 9.4/9.5 icin fiziksel 171/172 kullanildi."
+    }
+  },
+  "series": {
+    "fc101": {
+      "source": "https://assets.danfoss.com/documents/latest/514925/AJ275648114271en-001201.pdf — Table 12/13, pdf sayfa 28-30",
+      "phase": 3,
+      "min_voltage_v": 380,
+      "max_voltage_v": 480,
+      "ip_rating": "IP20",
+      "enclosure_class": "Open type",
+      "_not": "Kaynak tablo baslimi '3x380-480 V AC ve 3x380Y/220-480Y/277 V AC' — tek sabit gerilim degil, aralik. voltage_v tekil alan yerine min_/max_voltage_v cifti kullanildi (§11.6/§11.7 aralik kurali). IP20/Open type = govde-siz, panel-montaj taban varyant; IP54 (I2-I8) ayri govde serisi var ama DB'deki urun aciklamalarinda govde varyanti belirtilmedigi icin taban (IP20/Open type) varsayildi — bu varsayim series seviyesinde acikca not edildi, sayi UYDURULMADI (Danfoss katalog SKU'lari da varsayilan olarak bu taban govdeyi ifade eder)."
+    },
+    "fc102": {
+      "source": "https://assets.danfoss.com/documents/272740/AJ299549559248en-US1801.pdf — Table 9.4/9.5, pdf fiziksel sayfa 171-172",
+      "phase": 3,
+      "min_voltage_v": 380,
+      "max_voltage_v": 480,
+      "ip_rating": "IP20",
+      "enclosure_class": "Chassis",
+      "_not": "Ayni gerekce: '3x380-480 V AC' araligi, IP20/Chassis taban varyant varsayildi (IP21/IP55/IP66 govde secenekleri var ama farkli agirlik tasir; DB urun adinda govde belirtilmedigi icin taban alindi)."
+    }
+  },
+  "skus": {
+    "80102": {
+      "series": "fc101",
+      "drive_code": "P1K5",
+      "rated_power_w": 1500,
+      "enclosure_size": "H1",
+      "weight_kg": 2.1,
+      "rated_output_current_a": 3.7,
+      "_confidence": "high"
+    },
+    "80103": {
+      "series": "fc101",
+      "drive_code": "P2K2",
+      "rated_power_w": 2200,
+      "enclosure_size": "H2",
+      "weight_kg": 3.3,
+      "rated_output_current_a": 5.3,
+      "_confidence": "high"
+    },
+    "80104": {
+      "series": "fc101",
+      "drive_code": "P3K0",
+      "rated_power_w": 3000,
+      "enclosure_size": "H2",
+      "weight_kg": 3.3,
+      "rated_output_current_a": 7.2,
+      "_confidence": "high"
+    },
+    "80105": {
+      "series": "fc101",
+      "drive_code": "P4K0",
+      "rated_power_w": 4000,
+      "enclosure_size": "H2",
+      "weight_kg": 3.4,
+      "rated_output_current_a": 9.0,
+      "_confidence": "high"
+    },
+    "80106": {
+      "series": "fc101",
+      "drive_code": "P5K5",
+      "rated_power_w": 5500,
+      "enclosure_size": "H3",
+      "weight_kg": 4.3,
+      "rated_output_current_a": 12,
+      "_confidence": "high"
+    },
+    "80107": {
+      "series": "fc101",
+      "drive_code": "P7K5",
+      "rated_power_w": 7500,
+      "enclosure_size": "H3",
+      "weight_kg": 4.5,
+      "rated_output_current_a": 15.5,
+      "_confidence": "high"
+    },
+    "80108": {
+      "series": "fc101",
+      "drive_code": "P11K",
+      "rated_power_w": 11000,
+      "enclosure_size": "H4",
+      "weight_kg": 7.9,
+      "rated_output_current_a": 23,
+      "_confidence": "high"
+    },
+    "80109": {
+      "series": "fc101",
+      "drive_code": "P15K",
+      "rated_power_w": 15000,
+      "enclosure_size": "H4",
+      "weight_kg": 7.9,
+      "rated_output_current_a": 31,
+      "_confidence": "high"
+    },
+    "80110": {
+      "series": "fc101",
+      "drive_code": "P18K",
+      "rated_power_w": 18500,
+      "enclosure_size": "H5",
+      "weight_kg": 9.5,
+      "rated_output_current_a": 37,
+      "_confidence": "high"
+    },
+    "80111": {
+      "series": "fc101",
+      "drive_code": "P22K",
+      "rated_power_w": 22000,
+      "enclosure_size": "H5",
+      "weight_kg": 9.5,
+      "rated_output_current_a": 42.5,
+      "_confidence": "high"
+    },
+    "80112": {
+      "series": "fc101",
+      "drive_code": "P30K",
+      "rated_power_w": 30000,
+      "enclosure_size": "H6",
+      "weight_kg": 24.5,
+      "rated_output_current_a": 61,
+      "_confidence": "high"
+    },
+    "80113": {
+      "series": "fc101",
+      "drive_code": "P37K",
+      "rated_power_w": 37000,
+      "enclosure_size": "H6",
+      "weight_kg": 24.5,
+      "rated_output_current_a": 73,
+      "_confidence": "high"
+    },
+    "80114": {
+      "series": "fc101",
+      "drive_code": "P45K",
+      "rated_power_w": 45000,
+      "enclosure_size": "H6",
+      "weight_kg": 24.5,
+      "rated_output_current_a": 90,
+      "_confidence": "high"
+    },
+    "80115": {
+      "series": "fc101",
+      "drive_code": "P55K",
+      "rated_power_w": 55000,
+      "enclosure_size": "H7",
+      "weight_kg": 36,
+      "rated_output_current_a": 106,
+      "_confidence": "high"
+    },
+    "80116": {
+      "series": "fc101",
+      "drive_code": "P75K",
+      "rated_power_w": 75000,
+      "enclosure_size": "H7",
+      "weight_kg": 36,
+      "rated_output_current_a": 147,
+      "_confidence": "high"
+    },
+    "80117": {
+      "series": "fc101",
+      "drive_code": "P90K",
+      "rated_power_w": 90000,
+      "enclosure_size": "H8",
+      "weight_kg": 51,
+      "rated_output_current_a": 177,
+      "_confidence": "high"
+    },
+    "80120": {
+      "series": "fc102",
+      "drive_code": "P1K1",
+      "rated_power_w": 1100,
+      "enclosure_size": "A2",
+      "weight_kg": 4.8,
+      "rated_output_current_a": 3,
+      "_confidence": "high"
+    },
+    "80121": {
+      "series": "fc102",
+      "drive_code": "P1K5",
+      "rated_power_w": 1500,
+      "enclosure_size": "A2",
+      "weight_kg": 4.9,
+      "rated_output_current_a": 4.1,
+      "_confidence": "high"
+    },
+    "80122": {
+      "series": "fc102",
+      "drive_code": "P2K2",
+      "rated_power_w": 2200,
+      "enclosure_size": "A2",
+      "weight_kg": 4.9,
+      "rated_output_current_a": 5.6,
+      "_confidence": "high"
+    },
+    "80123": {
+      "series": "fc102",
+      "drive_code": "P3K0",
+      "rated_power_w": 3000,
+      "enclosure_size": "A2",
+      "weight_kg": 4.9,
+      "rated_output_current_a": 7.2,
+      "_confidence": "high"
+    },
+    "80124": {
+      "series": "fc102",
+      "drive_code": "P4K0",
+      "rated_power_w": 4000,
+      "enclosure_size": "A2",
+      "weight_kg": 4.9,
+      "rated_output_current_a": 10,
+      "_confidence": "high"
+    },
+    "80125": {
+      "series": "fc102",
+      "drive_code": "P5K5",
+      "rated_power_w": 5500,
+      "enclosure_size": "A3",
+      "weight_kg": 6.6,
+      "rated_output_current_a": 13,
+      "_confidence": "high"
+    },
+    "80126": {
+      "series": "fc102",
+      "drive_code": "P7K5",
+      "rated_power_w": 7500,
+      "enclosure_size": "A3",
+      "weight_kg": 6.6,
+      "rated_output_current_a": 16,
+      "_confidence": "high"
+    },
+    "80127": {
+      "series": "fc102",
+      "drive_code": "P11K",
+      "rated_power_w": 11000,
+      "enclosure_size": "B3",
+      "weight_kg": 12,
+      "rated_output_current_a": 24,
+      "_confidence": "high"
+    },
+    "80128": {
+      "series": "fc102",
+      "drive_code": "P15K",
+      "rated_power_w": 15000,
+      "enclosure_size": "B3",
+      "weight_kg": 12,
+      "rated_output_current_a": 32,
+      "_confidence": "high"
+    },
+    "80129": {
+      "series": "fc102",
+      "drive_code": "P18K",
+      "rated_power_w": 18500,
+      "enclosure_size": "B3",
+      "weight_kg": 12,
+      "rated_output_current_a": 37.5,
+      "_confidence": "high"
+    },
+    "80130": {
+      "series": "fc102",
+      "drive_code": "P22K",
+      "rated_power_w": 22000,
+      "enclosure_size": "B4",
+      "weight_kg": 23.5,
+      "rated_output_current_a": 44,
+      "_confidence": "high"
+    },
+    "80131": {
+      "series": "fc102",
+      "drive_code": "P30K",
+      "rated_power_w": 30000,
+      "enclosure_size": "B4",
+      "weight_kg": 23.5,
+      "rated_output_current_a": 61,
+      "_confidence": "high"
+    },
+    "80132": {
+      "series": "fc102",
+      "drive_code": "P37K",
+      "rated_power_w": 37000,
+      "enclosure_size": "B4",
+      "weight_kg": 23.5,
+      "rated_output_current_a": 73,
+      "_confidence": "high"
+    },
+    "80133": {
+      "series": "fc102",
+      "drive_code": "P45K",
+      "rated_power_w": 45000,
+      "enclosure_size": "C3",
+      "weight_kg": 35,
+      "rated_output_current_a": 90,
+      "_confidence": "high"
+    },
+    "80134": {
+      "series": "fc102",
+      "drive_code": "P55K",
+      "rated_power_w": 55000,
+      "enclosure_size": "C3",
+      "weight_kg": 35,
+      "rated_output_current_a": 106,
+      "_confidence": "high"
+    },
+    "80135": {
+      "series": "fc102",
+      "drive_code": "P75K",
+      "rated_power_w": 75000,
+      "enclosure_size": "C4",
+      "weight_kg": 50,
+      "rated_output_current_a": 147,
+      "_confidence": "high"
+    },
+    "80136": {
+      "series": "fc102",
+      "drive_code": "P90K",
+      "rated_power_w": 90000,
+      "enclosure_size": "C4",
+      "weight_kg": 50,
+      "rated_output_current_a": 177,
+      "_confidence": "high"
+    }
+  },
+  "denetim": [
+    {
+      "sku": "DAN-80101",
+      "konu": "Kimlik celiskisi — Karar gerekiyor",
+      "aciklama": "products.name = 'FC-51 - 220V - 0,37kW Frekans İnventörü' ama urun DB'de danfoss-fc101 ailesine bagli (model_code=80101). Danfoss FC-51 gercekte AYRI bir seri (kompakt/mikro suruceu ailesi, FC-101/FC-102 Design Guide'larinda TANIMLI DEGIL, kendi ayri Design Guide'i var). Kanit: FC101 Design Guide Table 12'de en kucuk model PK37 = 0.37kW ama tip kodu 'PK37' (FC-101 nomenklaturu), 'FC-51' degil; ayrica FC101'in taban gerilimi 380-480V AC iken bu urunun adinda '220V' yaziyor — bu da FC-101/FC-102'nin 380-480V hattiyla uyumsuz (FC101'in 200-240V hattinda da 0.37-1.5kW = H1, ama tip kodu yine 'PK37' formatinda olurdu, 'FC-51' degil). Sonuc: bu SKU'nun ailesi (danfoss-fc101) YANLIS olabilir, ya da urun adi yanlis girilmis olabilir. Spec YAZILMADI — Recep karari gerekiyor: (a) SKU'yu ayri bir 'danfoss-fc51' ailesine tasi, (b) adi duzelt (gercekten FC-101 ise dogru tip kodunu bul), (c) mevcut haliyle birak ama technical_specs bos kalsin."
+    },
+    {
+      "konu": "Agirlik kaynagi secimi (metodoloji notu, belirsizlik degil)",
+      "aciklama": "FC101 Table 5/6/7 govde-basina TEK max-agirlik verir (ornegin H2 govdesi icin 2.2, 3.0 ve 4.0 kW'lik UC farkli model ayni 'max 3.4 kg' degerini paylasir — bu govde sinirini asmayan en agir modelin degeridir). Bunun yerine Table 12/13'un KENDI 'Weight enclosure protection rating' satiri kullanildi, cunku o satir HER modele (P2K2 ayri, P3K0 ayri, P4K0 ayri) kendi tam agirligini veriyor (2.7/3.0/2.1x2=... goruldugu uzere kucuk farklar var: 3.3/3.3/3.4). Bu, SEAT turunda STORM 18'de yakalanan 'ayni govde = ayni agirlik varsayimi' hatasindan kacinmak icin bilincli bir secim."
+    },
+    {
+      "konu": "Govde/IP varyanti varsayimi (series seviyesinde not edildi)",
+      "aciklama": "Hem FC101 hem FC102 icin taban govde (FC101: IP20/Open type: H1-H8; FC102: IP20/Chassis: A2-C4) varsayildi. Her iki Design Guide'da da IP21/IP54/IP55/IP66 gibi farkli govde secenekleri VE bunlarin FARKLI agirliklari var (ornek: FC102 P11K icin IP20=12kg ama IP21/IP55/IP66=23kg). DB'deki urun adlarinda govde/IP varyanti belirtilmedigi icin taban govde secildi (Danfoss katalog siparis kodlari da ek harf/sayi suffix'i olmadan bu taban govdeyi ifade eder). Eger gercek stoktaki urun IP54/IP55 gibi farkli bir govdeyse weight_kg yanlis olur — bu risk acikca yaziliyor."
+    },
+    {
+      "konu": "Kapsam disi birakilan alanlar (ÖLÇÜLEMEDİ degil, BU TURDA kapsam disi)",
+      "aciklama": "Kaynak tablolar ayrica sunlari da iceriyor ama bu manifest'e YAZILMADI: maximum input current, intermittent current (110% 1 dakika), kVA degerleri, verimlilik (efficiency %), tahmini guc kaybi (estimated power loss W), max kablo kesiti, max sigorta (pre-fuse) degeri. Bunlar okunabilir durumda (gorsel dogrulandi) ama gorev kapsaminda 'guc/akim/agirlik/govde' istendigi icin en temel dort alanla sinirlandirildi. Istenirse ayni tablolardan ek bir turda cikarilabilir."
+    }
+  ]
+}
