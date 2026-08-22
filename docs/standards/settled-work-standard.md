@@ -1,0 +1,79 @@
+# Çözüldü (Settled) Standardı — v1.0
+
+> **Bu dosya nedir?** Bir işin ne zaman "çözüldü" sayılacağının ve sonradan bakan bir ajanın onu
+> **yeniden ölçmeden** ne zaman doğru kabul edebileceğinin kuralı.
+>
+> **Neden var?** (Recep, 2026-08-22) "İleride geriye dönük bakıldığında, bir çalışma yapılmış ve
+> eksiksizse, o ajanın bunu istisnasız doğru kabul etmesini nasıl sağlarız? Olmazsa mükerrer
+> tekrarlar olur." Aynı gün canlı kanıt: ÜRÜN'ün "ağırlık sapması" diye taşıdığı açık kalem
+> ölçülünce ne DB'de ne kaynakta çıktı — **hatırdan yazılmış** bir kalemdi; bir geçersizlik-şartına
+> bağlı olmasaydı biri onu "düzeltmeye" çalışıp saatler yakardı.
+
+## 0. Gerilim: iki ders çarpışıyor
+
+- **"Tamamlanma kanıtlanır, varsayılmaz"** (completion-proven-not-assumed) → düz bir "BİTTİ" notuna
+  güvenme.
+- **"Ölçümü kodlayan yorum bayatlar"** (comment-encoding-a-measurement-goes-stale) → "bugün 32 aile"
+  yazan bir not yarın yanlış olur.
+
+Uzlaşma: **Güven bedava değildir; güveni bir mekanizma taşır.** Düz "bitti" kaydına güvenilmez;
+kendini yeniden kanıtlayan bir **kapı** ya da açık bir **geçersizlik-şartı** taşıyan kayda güvenilir.
+
+## 1. İki meşru "çözüldü" biçimi
+
+### A) BEKÇİLİ çözüldü (tercih edilen)
+İş, kendini her CI'da **saniyeler içinde yeniden kanıtlayan** bir teste (INV / conformance /
+integrity-check) bağlıdır. Örnek: SEAT birim sözleşmesi → `catalog-integrity` spec-unit değişmezi.
+
+- **Sonradan bakan ajan işi ELLE ÖLÇMEZ. Yeşil kapıya bakar, geçer.** Kapı ölçümün kendisidir;
+  biri bozarsa kırmızı olur.
+- Kapı varken elle yeniden ölçmek **yasaktır** (mükerrer emek + kapıyla çelişme riski).
+- Kapı, "artık buna dönme" demenin **tek meşru yolu**dur — hem insanı hem ajanı geri bakmaktan kurtaran şey odur.
+
+### B) ŞARTLI çözüldü (kapı kurulamayan bir-kerelik işler için)
+Her iş testle korunamaz (bir defalık ölçüm, dış-kaynak kararı). Bunlar deftere yazılır ama düz
+"BİTTİ" değil — **geçersizlik-şartıyla**:
+
+```
+ÇÖZÜLDÜ: <ne kanıtlandı> · KANIT: <ölçüm/dosya:satır/PR> · TARİH: <YYYY-MM-DD>
+GEÇERSİZ OLUR EĞER: <bu koşul oluşursa yeniden ölçülür>
+```
+
+- Sonradan bakan ajan tek şeye bakar: **geçersizlik-şartı oluştu mu?** Oluşmadıysa güvenir, elle
+  ölçmez. Oluştuysa yeniden ölçer.
+- Şartı bayatlatan **zaman değil, öncüllerin değişmesidir** (Recep 08-22: "sadece zaman geçti =
+  bayat değil; elektrik kesintisi gibi düşün"). Şart, zaman değil **değişim** cümlesidir.
+- Örnekler (08-22, gerçek):
+  - `ÇÖZÜLDÜ: STORM 18 ağırlık kopyası — hata bizde değil, distribütör kataloğunda böyle basılı
+    (katalog s.42 gözle doğrulandı). GEÇERSİZ OLUR EĞER: üretici (OEM) föyü repoya girerse.`
+  - `ÇÖZÜLDÜ: pilot migration prod'da (kolon/tetik/check/indeks 1/1/1/1, sabotajla kanıtlı).
+    GEÇERSİZ OLUR EĞER: product_families şeması değişirse.`
+
+## 2. GEÇERSİZ ÖNCÜL — üçüncü sonuç (kritik)
+Bir kalem sonradan ölçülünce **dayanağı bulunamıyorsa** (hatırdan yazılmış, korpusta yok), o kalem
+"çözüldü" DEĞİL, **"geçersiz öncül"** olarak kapatılır ve farkı işaretlenir — ki aynı tuzağa
+düşülmesin. Bu bir başarısızlık değil, dürüstlüktür. (Kaynak: 08-22 ağırlık-sapması kalemi.)
+
+## 3. Registry bağı (uygulama)
+Bir iş `completed` durumuna geçerken **ya bekçisini (A) ya geçersizlik-şartını (B)** kaydına yazmak
+ZORUNLUDUR. İkisi de yoksa `completed` sayılmaz — `open` kalır ya da "kanıtsız-tamam" olarak işaretlenir.
+Bu, "doküman commit'lendi ≠ iş bitti" (doc-committed-not-work-done) dersinin registry karşılığıdır.
+
+## 4. Sonradan bakan ajanın kuralı (özet karar akışı)
+```
+Bir kalem "çözüldü" görünüyor mu?
+ ├─ Bekçisi (INV/gate) var mı?  → EVET: yeşilse GÜVEN, elle ölçme. Kırmızıysa o kırmızı senin işin.
+ ├─ Geçersizlik-şartı var mı?   → EVET: şart oluşmadıysa GÜVEN. Oluştuysa yeniden ölç.
+ └─ İkisi de yok (düz "bitti")  → GÜVENME. Ölç ve çözüldüyse bu cetvele göre yeniden kaydet.
+```
+
+## 5. Bilinen sınırlar
+- Bekçi kurmak maliyetlidir; her kalem hak etmez. Küçük/nadir kalemler için (B) yeterli.
+- Geçersizlik-şartı **iyi yazılmalı** — çok darsa yanlış-güven, çok genişse hiç güvenilmez. Şart,
+  ölçülebilir bir olguya bağlanır ("X tablosuna satır eklenirse", "kademe-2 tekrar koşarsa").
+- Bu cetvel "çözüldü mü" sorusunu yönetir; "doğru mu" sorusunu değil — doğruluğu (A)'daki kapı ya da
+  (B)'deki kanıt taşır.
+
+İlgili: [[completion-proven-not-assumed]] · [[comment-encoding-a-measurement-goes-stale]] ·
+[[standard-plus-enforcing-test-is-control]] · [[work-tracking-ssot-model]] ·
+`measurement-discipline-standard.md` · `execution-method-standard.md`
