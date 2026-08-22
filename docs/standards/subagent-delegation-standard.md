@@ -67,6 +67,13 @@ ajan varsayılan olarak yardımsever davranır ve boşluğu doldurur.
 4. **Geri alınamaz kabuk komutu YASAK** (`push --force`, `reset --hard`, dosya silme,
    dağıtım tetikleme).
 5. **Kapsam dışı dosyaya dokunma YASAK.** Ajanın yazabileceği yollar tarifte **adıyla** sayılır.
+6. **Sistem değişikliği YASAK.** Paket kurulumu (`winget install`, `npm i -g`, `pip install`,
+   `apt`, `brew`), PATH değişikliği, servis/daemon başlatma, global yapılandırma yazımı.
+   İhtiyaç duyduğu araç yoksa ajan bunu **rapor eder, kurmaz.**
+   *Niçin:* 2026-08-22'de bir ajan PDF sayfalarını görüntüye çevirmek için `winget` ile
+   poppler kurdu. Araç zararsızdı ve iş doğru çıktı — ama karar bana ait değildi ve ben
+   ancak iş bittikten sonra öğrendim. Sistem değişikliği **oturumdan uzun yaşar**: ajan
+   biter, kurulum kalır. Devrin sınırı ajanın ömrüyle bitmeli.
 
 ---
 
@@ -119,6 +126,13 @@ Ajanın raporu **iddiadır, kanıt değildir.** Kabul etmeden önce:
   sebebidir: gerçek veride her zaman artık kalır.
 - **Ajanın hatasını peşinen kabul etme, peşinen reddetme de.** Ajan bir keresinde benim
   verdiğim zayıf eşleme kuralını kendiliğinden daha sağlamıyla değiştirdi ve haklıydı.
+- **Yalnız çıktıyı değil, ajanın NE YAPTIĞINI da denetle.** Rapor "şu değeri buldum" der;
+  o değeri bulmak için makinede ne değiştirdiğini söylemeyebilir. Sistem durumunu
+  (kurulu paket, yeni dosya, değişen yapılandırma) ayrıca ölç — özellikle ajan bir
+  aracın eksik olduğundan söz ediyorsa.
+- **Fiziksel/mantıksal tutarlılığı ücretsiz bir kapı olarak kullan.** Sayılar monoton mu,
+  büyüklükler makul mü, birimler birbirini tutuyor mu — bu kontrol kaynağa gitmeden
+  yapılır ve uydurma değerlerin çoğunu tek başına eler.
 
 ---
 
