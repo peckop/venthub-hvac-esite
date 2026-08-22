@@ -26,6 +26,12 @@ try { input = JSON.parse(readStdin() || '{}') } catch { input = {} }
 const sid = input.session_id || ''
 if (!sid) process.exit(0)
 
+// SessionStart 'source': startup | resume | clear | compact | fork (Claude Code 2.1.234, hooks-guide).
+// 08-22 dersi (docs/audits/platform-capability-audit-2026-08-22.md): makine ~24s kapandi, acilinca
+// eklenti oturumlari 'resume' ile geri yuklendi; gozcu (Monitor) olmustu, cron kismen dondu, ekip
+// SAGIR kaldi ve Recep elle durtmek zorunda kaldi. Bu alani OKUYUP resume'da davranis veriyoruz.
+const source = input.source || 'startup'
+
 /**
  * Registry oto-senkronu — KOPARILMIŞ süreç olarak başlatılır.
  *
@@ -47,6 +53,25 @@ try {
 } catch { /* senkron başlatılamadıysa oturumu bloklama — bir sonraki açılışta tekrar denenir */ }
 
 let context = `Oturum kimliğin: ${sid}\n`
+context += `Açılış türü (source): ${source}\n`
+
+// RESUME UYANDIRMA REFLEKSI (Recep 08-22 onayi: yalniz otomatik uyandirma). Makine kapanip
+// acildiginda oturumlar 'resume' ile geri gelir ama gozcu/cron olabilir; ekip SAGIR acilir.
+// LIDER (OPS/AUDIT-DOCS) resume ile acildiginda ILK IS: ListAgents ile uyuyan peer oturumlarini
+// bul, her birine SendMessage ile 'uyan: uclunu kur + panoyu oku + isbasi notu' gonder.
+// Bu kanca ajan degil harness'tir; mesaji ATAMAZ — yalnizca lidere TALIMAT yazar, mesaji ajan atar.
+if (source === 'resume') {
+  const lider = /audit|ops/i.test(process.env.CC_LANE || '') || sid === 'cb0467f1-f1a3-437d-bc15-52c0bd90feb3'
+  context +=
+    'RESUME ACILISI — makine geri dondu. UCLU YEDEGINI YENIDEN KUR (gozcu Monitor + cron; ' +
+    'resume Monitor\'u getirmez, cron\'u 7 gun icinde getirebilir ama GUVENME, CronList ile OLC).\n' +
+    (lider
+      ? '⭐LIDERSIN: uyandirma refleksi — ListAgents ile canli peer oturumlarini listele, uyuyan ' +
+        'her birine SendMessage: "makine dondu, uyan: uclunu kur + panoyu oku + isbasi notu birak". ' +
+        'Sonra panoyu ve bu oturuma adresli notlari isle.\n'
+      : 'Panoya ISBASI notu birak (uyandiginin kaniti) ve liderin uyandirma mesajini bekleme — ' +
+        'kendi ucluunu simdi kur.\n')
+}
 
 try {
   const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
