@@ -198,18 +198,26 @@ describe('INV-CETVEL-YAPI · aynı konunun İKİ TARİFİ (çapa kolu)', () => {
     let capaliBaslik = 0
 
     for (const yol of cetvelDosyalari()) {
-      const harita = new Map<string, number[]>()
+      // Çapa → aynı BAŞLIK DÜZEYİNDEKİ satırlar (düzey neden ayırt edici: yorum bloğunda).
+      const harita = new Map<string, Map<number, number[]>>()
       readFileSync(yol, 'utf8')
         .split(/\r?\n/)
         .forEach((satir, i) => {
           const m = /^(#{2,4})\s+(.*)$/.exec(satir)
           if (!m) return
+          const seviye = m[1].length
           const c = capalar(m[2])
           if (c.length > 0) capaliBaslik++
-          for (const x of c) harita.set(x, [...(harita.get(x) ?? []), i + 1])
+          for (const x of c) {
+            const seviyeler = harita.get(x) ?? new Map<number, number[]>()
+            seviyeler.set(seviye, [...(seviyeler.get(seviye) ?? []), i + 1])
+            harita.set(x, seviyeler)
+          }
         })
-      for (const [capa, satirlar] of harita) {
+      for (const [capa, seviyeler] of harita) {
+        for (const [seviye, satirlar] of seviyeler) {
         if (satirlar.length > 1) ihlaller.push(`${yol} → ${capa} (satır ${satirlar.join(', ')})`)
+        }
       }
     }
 
