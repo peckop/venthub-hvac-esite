@@ -54,6 +54,19 @@ Bir kalem sonradan ölçülünce **dayanağı bulunamıyorsa** (hatırdan yazıl
 "çözüldü" DEĞİL, **"geçersiz öncül"** olarak kapatılır ve farkı işaretlenir — ki aynı tuzağa
 düşülmesin. Bu bir başarısızlık değil, dürüstlüktür. (Kaynak: 08-22 ağırlık-sapması kalemi.)
 
+## 2.1 AÇIK kalemler de öncül taşır (ÜRÜN önerisi, 08-22)
+Bu cetvel yalnız "çözüldü"yü değil **"açık"**ı da kapsar. Bir kalem `open` taşınıyor olsa bile,
+**üzerine iş başlamadan önce** öncülünün ölçüm dayanağı sorulur:
+
+- Kalem, öncülünü (kaç ürün, hangi değer, nerede) taşıyan bir **ölçüm referansı** (DB sorgusu /
+  `dosya:satır` / katalog s.N) içeriyor mu?
+- İçermiyorsa (hatırdan yazılmış) → **iş başlamadan ölç.** Aksi halde geçersiz bir öncül üzerine
+  saatler harcanır — "düzeltme" diye var olmayan bir şey aranır.
+
+Aynı gün iki canlı örnek, ikisi de açık kalemdi ve ölçülünce dayanaksız çıktı:
+`23,7↔37,8 ağırlık sapması` (37,8 ne DB'de ne 74-CSV korpusunda var) · `Danfoss 17 ürün`
+(doğrusu **34**: FC-101 17 + FC-102 17). Kural: **açık kalem = ölçülmüş öncül + kanıt; yoksa önce ölç.**
+
 ## 3. Registry bağı (uygulama)
 Bir iş `completed` durumuna geçerken **ya bekçisini (A) ya geçersizlik-şartını (B)** kaydına yazmak
 ZORUNLUDUR. İkisi de yoksa `completed` sayılmaz — `open` kalır ya da "kanıtsız-tamam" olarak işaretlenir.
