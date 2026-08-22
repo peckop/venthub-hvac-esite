@@ -281,3 +281,215 @@ harcamadan ölçmenin bilinen tek yolu budur.
 
 Ignored Build Step *Behavior*'ı **Automatic**'e çevirmek yeterli; repoda değişiklik
 gerekmez. Betik ve bekçi zararsız biçimde durur.
+
+---
+
+## D11 — Kırmızı bir Vercel kapısını uyandıran tek şey PUSH olayıdır
+
+**Ölçüm (ADMIN, 2026-08-19, PR #686):** PR'ı kapatıp yeniden açmak Actions'ı yeniden
+koşturur ama **Vercel'i tetiklemez**.
+
+| taraf | kapat-aç sonrası |
+|---|---|
+| GitHub Actions | `ci`, `admin-smoke`, `advisor`, `catalog-integrity` **yeniden başladı**, hepsi success |
+| Vercel | 25 dakika boyunca **hiçbir şey**: dağıtım kaydı sıfır, tek commit status 25 dk önceki **bayat failure** |
+
+**Ayırt edici kanıt** (bu olmadan "kota yine doldu" denirdi ve yanlış olurdu): aynı
+dakikalarda **başka bir dal** preview dağıtımı aldı — Vercel canlıydı. Ayrıca Vercel kota
+sınırına takıldığında **status yazar**; burada 25 dakika boyunca hiç status yazılmadı.
+*"Reddetti"* ile *"olaydan hiç haberi olmadı"* farkı tam buradadır: reddetseydi iz bırakırdı.
+
+**Sonuç:** Vercel **push olayına** bakar, PR'ın açık/kapalı durumuna değil. "Yeni commit
+üretmeden tetikle" talimatı Actions için doğru, **Vercel için işlevsizdir — ve işlevsizliği
+SESSİZDİR**, çünkü hiçbir şey kırmızı olmaz, sadece hiçbir şey olmaz.
+
+**Çözüm:** ağaç SHA'sı aynı kalan **boş commit** push'lamak. İçerik birebir korunur,
+yalnız yeni bir commit nesnesi doğar ve push olayı Vercel'i uyandırır. Bu betik onu
+**atlamaz**: değişen dosya listesi boş çıkarsa vacuous-skip koruması (`scripts/vercel-ignore-build.sh`,
+"Vacuous-skip koruması" bloğu) *"ölçemedim, atlamıyorum"* deyip BUILD'e düşer.
+
+**Ölçerken:** dağıtım **kaydı** sayısına bak, yalnız status'a değil — bayat status yeni
+sonuç gibi görünür.
+
+## D12 — "Bedava prob" DÜZELTİLDİ: yön değil, SIRA belirleyicidir
+
+Yukarıdaki *Bedava prob* paragrafı olduğu gibi bırakılırsa yanıltır; kendi ölçümümle
+daraltıyorum.
+
+Paragraf "reddinden sonra yazılmış bir success ara, varsa pencere açıktır" diyor. İki
+düzeltme gerekiyor:
+
+1. **Sıra kuralı.** Reddin **öncesindeki** başarı hiçbir şey kanıtlamaz. 2026-08-19 ölçümü:
+   `10:14:11Z` başarı → `10:14:22Z` rate-limited → `10:17:57Z` başarı. Aradaki **11 saniye**,
+   sınırın kesintili olduğunun bugüne kadarki en dar kanıtı. İlk satıra bakıp "kota akıyor"
+   demek yanlış olurdu; hüküm ancak **üçüncü** satırla kurulur.
+
+2. **Probun cevapladığı soru dardır.** "Redden sonra başarı var" = *filo çapında dondurma
+   haksız*. **"Benim gönderimim geçer" DEMEZ.** Kesintili sınırda ikisi ayrılmazsa prob
+   yeşil ışık sanılır, peş peşe gönderim olur ve sınır yeniden dolar — bu bir kez yaşandı.
+
+**Doğru rejim:** dondurma değil **sıralı-tek-tek gönderim**, her gönderimden sonra hedefin
+**kendi kaydından** ölçüm, redde **tekrar yok** (her tekrar bir commit harcar).
+
+İlgili: `docs/standards/measurement-discipline-standard.md` K5.
+
+## D13 — Atlama UCUZ DEĞİLDİR: sınır, dağıtım kaydı yaratılırken işler
+
+Bu cetvel boyunca örtük bir varsayım taşındı: *"nasılsa build atlanıyor, o gönderim
+kotaya yük bindirmez."* 2026-08-19'da ölçüldü ve **çürüdü**.
+
+**Kanıt — mümkün olan en temiz biçimi:** `aa257ad1` bir **boş commit**. Ağaç SHA'sı
+ebeveyniyle birebir aynı (`d61401ec`), `git diff --name-only` **sıfır** dosya döndürüyor.
+Hiçbir içerik kuralı böyle bir commit'i build'e sokamaz; tanımı gereği atlanır.
+
+Buna rağmen:
+
+```
+commits/aa257ad1/status → Vercel: failure  2026-08-19T13:20:52Z
+                          "Deployment rate limited — retry in 24 hours."
+```
+
+**Hüküm:** sınır **dağıtım kaydı yaratılırken** işliyor — Ignored Build Step'ten **önce**.
+Atlama, dağıtımın *içinde* verilen bir karardır; sınır ise **kapıda** durur. İkisi aynı
+katmanda değil.
+
+**Sonuçları, adıyla:**
+
+1. **`docs/`-only ve `*.md`-only PR'ler ucuz değildir.** Sıralamada tam slot sayılır.
+   Bu cetvelin kendi PR'ı da dahil — yazarı olarak muafiyet istemiyorum.
+2. **Boş commit ile yeniden-tetik de tam slot harcar.** D11 "kırmızıyı uyandıran tek şey
+   push olayıdır" diyor; D13 bunun **fiyatını** ekliyor. Tetik ucuz sanıldığı için kolay
+   verilir — 08-19'da bir yeniden-tetik verildikten 2 dakika sonra duvara çarptı.
+3. D9 ("kota reddi bir COMMIT harcar") ile birlikte okunur: **reddedilen gönderim de
+   maliyetlidir**, yani tekrar denemek maliyeti ikiye katlar, sıfırlamaz.
+
+**Ayırt ederek — ne kanıtlandı, ne kanıtlanmadı:** yukarıdaki, **reddin** atlama
+kararından önce geldiğini kanıtlar. **Başarılı** bir atlanan dağıtımın kotadan bir birim
+düşüp düşmediğini kanıtlamaz.
+
+2026-08-20 ölçümü bu açık soruyu **daralttı ama kapatmadı**: atlanan iş `deployments`
+listesine hiç girmiyor (`9224bc68` → `KAYIT 0`, açıklama `Canceled by Ignored Build
+Step`). Buradan "demek ki kotadan düşmüyor" sonucu **çıkarılamaz** — o liste kotanın
+sayacı değildir, vekildir. Vekili asıl şeyin yerine koymak bu depoda daha önce yanılttı.
+Soru hâlâ açık ve buraya *bilinmiyor* diye yazılır, *ucuz* diye değil.
+
+**Kullanılmayan veri, niçin kullanılmadığı da yazılıyor:** ikinci örnek olarak `37cdc2d9`
+(#691) düşünüldü — 13 dosyanın çoğu `.md`. Ama içinde
+`src/__tests__/conformance/eol-normalization.test.ts` var, yani **md-only değil** ve
+atlama sınıfına hiç girmiyor. Ayırt edici olmayan veri kanıt diye sunulmaz.
+
+### D13.1 — İki ayrı bütçe: derleme dakikası ≠ dağıtım kotası
+
+D13 "atlama ucuz değildir" diyor; bu madde **hangi** bütçeden söz ettiğini söylüyor.
+2026-08-20'de filo tam bu boşluğa iki ayrı yönden düştü — biri bendim ("ucuz değil",
+bütçe adı verilmeden), biri ADMIN'di ("atlanan iş bedava", `KAYIT 0`'dan türetilerek).
+İki ölçüm çarpıştı ve ikisi de daraldı.
+
+**İki bütçe vardır ve atlama yalnız birine dokunur:**
+
+| bütçe | atlama etkisi | neyi sayar |
+|---|---|---|
+| **Derleme dakikası** | **tasarruf eder** — iş gerçekten derlenmez | değişen içerik |
+| **Dağıtım kotası** | **tasarruf ETMEZ** | gönderim sayısı; içerik önemsiz |
+
+**Ayırt edici ölçüm** (aynı gün, iki commit yan yana):
+
+| sha | değişen dosya | KAYIT | status | açıklama |
+|---|---|---|---|---|
+| `aa257ad1` | **0** (ağaç SHA'sı ebeveyniyle aynı) | 0 | failure | `Deployment rate limited` |
+| `9224bc68` | 1 (`docs/`) | 0 | success | `Canceled by Ignored Build Step` |
+
+`aa257ad1` atlama sınıfına `9224bc68`'den **daha kesin** girer — hiç dosya
+değiştirmiyor, hiçbir içerik kuralı onu derlemeye sokamaz. Buna rağmen
+"atlandı" değil **"reddedildi"** aldı.
+
+**Hüküm: sınır, atlama kararından ÖNCE değerlendirilir.** Atlanacak bir iş bile önce
+kotaya çarpar; çarpmazsa atlanır. Dolayısıyla *"atlanan işler kota açısından bedava"*
+cümlesi **kurulamaz** — ve `KAYIT 0`'dan hiç türetilemez.
+
+### D13.2 — `KAYIT 0` tek başına yorumlanamaz
+
+`deployments?sha=` uç noktasının boş dönmesi **beş** farklı duruma karşılık gelir.
+Taksonomi ADMIN + AUTH ölçümüdür, buraya atıfla alınmıştır:
+
+| status | açıklama | kayıt |
+|---|---|---|
+| success | `Deployment has completed` | **VAR** |
+| success | `Canceled by Ignored Build Step` | yok |
+| failure | `Canceled from the Vercel Dashboard` | **VAR** |
+| failure | `Deployment rate limited` | yok |
+| *status hiç yok* | (Vercel olaydan haberi olmadı) | yok |
+
+Yani `success` görmek **dağıtıldı demek değildir**, ve `KAYIT 0` görmek
+**reddedildi demek değildir**. Ayırt eden tek alan **açıklama**dır.
+
+**Kural:** kota/pencere hesaplayan hiçbir ölçüm kayıt sayısını tek çapa olarak
+kullanmaz; çapa **commit status + açıklama**dır.
+
+### D13.3 — Ölçüm aracının kendisi sessizce kör olabilir: KISA SHA tuzağı
+
+`deployments?sha=` **kısa SHA kabul etmez ve hata da vermez** — boş dizi döner.
+Aynı commit, aynı an, iki ölçüm:
+
+| sorgu | sonuç |
+|---|---|
+| `deployments?sha=caa1d1c518adb715722b7f67876f983d961083d7` | KAYIT **1** |
+| `deployments?sha=caa1d1c5` | KAYIT **0** |
+| `commits/caa1d1c5/status` | `success` — **çalışıyor** |
+
+**Asıl tehlike asimetride:** `commits/<sha>/status` kısa SHA'yı sorunsuz kabul eder.
+Yani ölçen kişi kısa SHA kullanmaya *alışır* — status ucunda hep çalışır — sonra aynı
+alışkanlığı `deployments` ucunda kullanır ve **sessiz sıfır** alır. Sıfırı "dağıtım
+yok" diye okur. Hata mesajı yoktur, uyarı yoktur; ölçüm başarılı görünür.
+
+**Zorunlu karşı-önlem:** SHA'yı elle yazma — listeleme API'sinden al (`.[].sha` tam 40
+karakter döner). Ve ölçüme **kontrol kolu** koy: bilinen-dağıtılmış bir SHA aynı sorguyla
+`KAYIT 1` dönmeli. Dönmüyorsa ölçüm aracın kördür, veri değil.
+
+> Kaynak: pano ölçümleri 2026-08-20 — ADMIN (`6cc7f2d3`) 09:42Z beş-kategorili
+> taksonomi ve kontrol kolu tasarımı · AUTH (`99fa366e`) 09:33Z kayıt-doğum zamanı
+> ölçümü · EDGE (`4397deef`) 09:36Z başarısız derlemenin hiç kayıt üretmediği ölçümü.
+> Kısa-SHA asimetrisi bu cetvelde bağımsız olarak yeniden ölçüldü (yukarıdaki tablo).
+
+**Öz-denetim notu:** bu maddenin ilk yarısını ("docs-only ucuz değil") 08-19'da
+ölçüp yayınlamıştım, ama bütçe ayrımını yapmamıştım. ADMIN aynı veriden ters yöne
+gitti ("atlanan iş bedava"). İki ölçüm çarpıştı ve **ikisi de daraldı** — doğru
+sonuç bu. Sayı ikimizde de doğruydu; eksik olan, sayının **hangi bütçeyi** saydığıydı.
+Kardeş ders: `docs/standards/measurement-discipline-standard.md` K13.
+
+## D14 — Atlama garantisi TEMPOYA bağlıdır: üretim tabanı ebeveyn DEĞİL, son TAMAMLANMIŞ üretim dağıtımıdır
+
+D4 "karşılaştırma tabanı `VERCEL_GIT_PREVIOUS_SHA`" der. Bu doğru ama **eksik**: o değişkenin
+ne gösterdiği dala göre değişir ve üretimde **zamanla kayar**.
+
+**ÖLÇÜM (2026-08-20, Vercel derleme günlüğü):** master'a inen bir birleştirmede kapı şunu
+yazdı — `ignore-build: taban = VERCEL_GIT_PREVIOUS_SHA (59eb9161...)` ve kararı
+`package.json -> BUILD` oldu. Oysa o commit'in **kendi** değişikliği yalnız `docs/` altındaydı.
+
+**Mekanizma:** üretimde `VERCEL_GIT_PREVIOUS_SHA`, birleştirmenin ebeveyni değil, **en son
+TAMAMLANMIŞ üretim dağıtımının** SHA'sıdır. Birleştirmeler dağıtımlardan hızlı akarsa taban
+geride kalır ve fark penceresi genişler:
+
+```
+üretim dağıtımı tamamlandı  ->  A            (taban buraya çakılır)
+merge 1 (docs)              ->  B
+merge 2 (package.json)      ->  C
+merge 3 (docs)              ->  D   <- kapı A..D bakar, package.json GÖRÜR, BUILD der
+```
+
+`D`'nin sahibi yalnız doküman değiştirmiştir ama derlemeyi **başkasının dosyası** tetikler.
+
+**BAĞIMSIZ İKİNCİ VAKA (PRICING şeridi, aynı gün):** #709 ATLANDI, #705 DERLENDİ.
+İkisi de doküman sınıfıydı, aralarında 27 dakika vardı ve **tek değişken tempoydu**.
+
+### Sonuçları
+
+1. **"Doküman değiştirdim, atlanacak" bir GARANTİ DEĞİLDİR** — bir tahmindir ve doğruluğu
+   filonun o andaki birleştirme temposuna bağlıdır. Emir yazarken "bu PR derlenmeyecek"
+   diye taahhüt etme.
+2. **Kapı KUSURLU DEĞİLDİR.** Fail-safe doğru çalışıyor: pencerede build gerektiren bir dosya
+   varsa BUILD demek D2/D5'in gereğidir. Yanlış olan, tabanın sabit sanılmasıdır.
+3. **Ölçmek istiyorsan tek doğru kaynak derleme günlüğüdür** — kapının bastığı
+   `taban = ...` satırı. Commit ebeveyninden hesap yapmak bu penceresi görmez.
+4. **Yoğun günlerde atlama oranı DÜŞER.** Kota planlaması bunu hesaba katmalı: sakin günün
+   ölçümü yoğun günü tahmin etmez.
