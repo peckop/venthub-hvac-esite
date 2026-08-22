@@ -204,7 +204,7 @@ Kural: `model_code` yoksa **etiket hiç gösterilmez**. `sku`'ya düşmek yasakt
 "hangi modeli aldım" sorusunu cevaplamıyor; `model_code` etiketi süs değil, kimliğin
 parçasıdır.
 
-### 11.5 Veri tarafı borcu (açık)
+### 11.4.1 Veri tarafı borcu (açık)
 
 Bu cetvel yüzeyi bağlar; **veriyi bağlamaz.** `products.model_code` bugün 374/374 dolu
 ama bunu zorlayan bir kısıt YOK. Doğru kalıcı çözüm katalog alımında zorunlu alan
