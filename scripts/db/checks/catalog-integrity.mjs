@@ -97,6 +97,37 @@ const CHECKS = [
     key: (r) => `family-empty:${r.slug}`,
     detail: (r) => `"${r.name}" — dogrudan urun 0, cocuk aile ${r.cocuk} (${r.cocuk > 0 ? 'HIYERARSI EBEVEYNI: silme, tasarim karari' : 'OLU KABUK: silinebilir'})`,
   },
+  /* ──────────────────────────────────────────────────────────────────────────
+   * T160 — KATALOG DERINLIGI (2026-08-23). Cetvel: catalog-depth-standard §K1.
+   *
+   * Kural bir tasarim tercihi degil, bir CELISKININ olcumunden dogdu: ayni
+   * katalogda, ayni hafta, ayni soruya iki farkli cevap verilmis.
+   *   · air-curtains  : 8 urun TEK ailede; aile sayfasindan disari cikan urun
+   *                     baglantisi 0 -> musteri anlatidan sepete IKI sayfada variyor.
+   *   · inline-duct-fans: ayni buyuklukteki 12 urun ALTI aileye bolunmus, ustlerinde
+   *                     dogrudan urunu olmayan bir semsiye -> UC kademe.
+   * Ayni soruya iki cevap = kuralin hic yazilmamis oldugunun kaniti.
+   *
+   * K1: derinlik IKI kademedir (kategori -> aile[tum varyantlar] -> urun adresi
+   * yalnizca satinalma ucu). Ucuncu GEZINME kademesi ancak AILE HIYERARSISIYLE
+   * dogar; bu yuzden makine kapisi tam olarak onu olcer.
+   *
+   * Bu kural katalogun COGUNLUK davranisini yaziya cevirir, yeni sey dayatmaz:
+   * 38 ailenin 37'si tek katmanli; iki katmanli olan TEK ornek 08-21'deki aile
+   * ayrismasindan kalmistir ve o gun bu olcut yaziliydi degildi.
+   * ────────────────────────────────────────────────────────────────────────── */
+  {
+    id: 'family-nested',
+    title: 'Aile hiyerarsisi — ailenin ust ailesi var',
+    why: 'Vitrin derinligi IKI kademedir (catalog-depth-standard §K1): kategori -> aile (tum varyantlar tek sayfada) -> urun adresi yalnizca satinalma ucu. Ucuncu bir GEZINME kademesi aile hiyerarsisiyle dogar ve musteriyi ayni urun kumesi icinde bir kez daha sayfa degistirmeye zorlar. Recep kurali: yeni sayfa YALNIZ gercek bir karar noktasinda acilir; sadece bir SAYI degisiyorsa orasi sayfa degil, ayni sayfadaki secicidir. Anahtar EBEVEYN bazindadir: kusur tek tek cocuklarda degil, hiyerarsinin KURULMUS olmasindadir.',
+    sql: `select pf.slug as parent_slug, pf.name as parent_name, count(*)::int as cocuk,
+                 (array_agg(f.slug order by f.slug))[1] as sample_child
+          from public.product_families f
+          join public.product_families pf on pf.id = f.parent_family_id
+          group by pf.slug, pf.name`,
+    key: (r) => `family-nested:${r.parent_slug}`,
+    detail: (r) => `"${r.parent_name}" altinda ${r.cocuk} cocuk aile (or. ${r.sample_child}) — ucuncu gezinme kademesi`,
+  },
   {
     id: 'product-no-subcategory',
     title: 'Yaprak kategorisi olmayan urun',
