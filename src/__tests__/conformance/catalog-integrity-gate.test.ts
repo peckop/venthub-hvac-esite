@@ -258,4 +258,45 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     expect(/rejectUnauthorized:\s*false/.test(source)).toBe(false)
     expect(/rejectUnauthorized:\s*true/.test(source)).toBe(true)
   })
+
+  /* ────────────────────────────────────────────────────────────────────────────
+   * T162 — KAPATILAN AİLE İHLAL DEĞİLDİR (2026-08-23, ÜRÜN).
+   *
+   * Kusur Lineo işinden BAĞIMSIZ ve ölçülmüş: okuma katmanı silinmiş aileyi zaten
+   * görmüyor (`family.service.ts` — `deleted_at` null süzgeci dört ayrı sorguda),
+   * ama kapı görüyordu. Yani vitrinde ADRESİ OLMAYAN bir satır, kapıda "canlı adres
+   * üretiyor" diye raporlanabilirdi — iki katman aynı soruya farklı cevap veriyordu.
+   *
+   * Bugünkü etkisi ölçüldü ve SIFIR: canlı DB'de silinmiş aile sayısı 0. Bu yüzden
+   * değişiklik davranış değiştirmez; koruma ileri dönüktür ve bu test onu yerinde tutar.
+   * ──────────────────────────────────────────────────────────────────────────── */
+  function kuralSql(id: string): string {
+    // Satır sonu NORMALLEŞTİRİLMEZ ve gerekmez: çıkarım `indexOf` ile, iddialar tek
+    // satırlık desenlerle yapılır — CRLF ikisini de bozmaz.
+    const source = fs.readFileSync(SCRIPT, 'utf8')
+    const start = source.indexOf(`id: '${id}'`)
+    if (start === -1) throw new Error(`kural '${id}' betikte BULUNAMADI — yeniden adlandırılmış olabilir`)
+    const sqlStart = source.indexOf('sql: `', start)
+    if (sqlStart === -1) throw new Error(`kural '${id}' için sql bloğu bulunamadı`)
+    return source.slice(sqlStart, source.indexOf('`,', sqlStart + 6))
+  }
+
+  it('AİLE kuralları KAPATILMIŞ aileyi saymaz — temizlik ihlal gibi görünmez', () => {
+    expect(kuralSql('family-empty')).toMatch(/f\.deleted_at is null/)
+    const nested = kuralSql('family-nested')
+    expect(nested).toMatch(/f\.deleted_at is null/)
+    expect(nested).toMatch(/pf\.deleted_at is null/)
+  })
+
+  it('POZİTİF KONTROL — kural okuyucusu gerçekten okuyor (sessiz-boş değil)', () => {
+    // NİÇİN: yukarıdaki iddia bir METİN taramasıdır. Okuyucu yanlış kurala bakarsa ya da
+    // her SQL'de "deleted_at" bulan kör bir tarayıcıya dönüşürse SESSİZCE yeşil kalırdı.
+    // Bu yüzden okuyucunun bilinmeyen kuralda PATLADIĞI ve okuduğu metnin gerçekten o
+    // kurala ait olduğu ayrıca ölçülür. (memory: measure-tool-can-be-blind)
+    expect(() => kuralSql('boyle-bir-kural-yok')).toThrow(/BULUNAMADI/)
+    expect(kuralSql('family-empty')).toContain('public.product_families')
+    expect(kuralSql('family-nested')).toContain('parent_family_id')
+    // Süzgeci OLMAYAN bir kural hâlâ süzgeçsiz görünmeli — aksi hâlde tarayıcı kördür.
+    expect(kuralSql('product-no-subcategory')).not.toMatch(/f\.deleted_at is null/)
+  })
 })
