@@ -70,6 +70,11 @@ interface BoardModule {
   globToRegExp: (glob: string) => RegExp
   toRepoRelative: (filePath: string, repoRoot?: string) => string
   resolveNoteTarget: (rawTo?: string) => { ok: boolean; to?: string; how?: string; reason?: string; valid?: string[] }
+  /**
+   * Kimligin BICIMINI dogrular. resolveNoteTarget HEDEFI (--to) dogruluyordu; bu, GONDERENIN
+   * kimligini (--sid) dogrular — olculmus vaka icin INV-BOARD-3 icindeki BOZUK kimlik kolu.
+   */
+  sidDogrula: (sid: string) => { ok: boolean; tur?: string; sebep?: string; oneri?: string }
 }
 
 /**
