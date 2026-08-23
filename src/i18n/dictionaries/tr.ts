@@ -765,14 +765,7 @@ export const tr = {
       back: 'Geri Dön',
       subCategoryCount: '{{count}} Alt Kategori',
     },
-    navigation: 'Navigasyon Menüsü',
-    quickAccess: 'Hızlı Erişim',
-    myCart: 'Sepetim',
-    loadingCategories: 'Kategoriler yükleniyor...',
     productCategories: 'Ürün Kategorileri',
-    pickCategory: 'Premium HVAC çözümleri için kategori seçiminizi yapın',
-    subcategories: 'alt kategori',
-    more: 'daha fazla'
   },
   header: {
     adminBar: {
@@ -1046,51 +1039,10 @@ export const tr = {
     },
     title: 'İletişim',
     subtitle: 'Size her konuda yardımcı olmaktan mutluluk duyarız.',
-    formTitle: 'Bize Mesaj Gönderin',
-    name: 'Adınız Soyadınız',
-    email: 'E-posta Adresiniz',
-    phone: 'Telefon Numaranız',
-    subject: 'Konu',
-    message: 'Mesajınız',
-    submit: 'Gönder',
-    submitting: 'Gönderiliyor...',
-    success: 'Mesajınız başarıyla iletildi. En kısa sürede size dönüş yapacağız.',
-    error: 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.',
-    officialDistributor: 'Resmi Distribütör & Mühendislik Ortağı',
-    address: 'Adres',
-    phoneLabel: 'Telefon',
-    emailLabel: 'E-posta',
-    workingHours: 'Çalışma Saatleri',
-    businessInquiry: 'İş Ortaklığı & Proje Teklifleri',
-    addressLabel: 'Adres',
-    addressLine1: 'Teknokent Mah. Teknopark Bulvarı',
-    addressLine2: 'No: 1/4A 34906 Pendik/İstanbul',
-    emailPh: 'E-posta',
-    messagePh: 'Mesajınız / Proje detayları',
-    namePh: 'Adınız Soyadınız',
-    quickButton: 'WhatsApp\'tan Yazın',
-    quickDesc: 'Acil konular ve hızlı yanıtlar için bize doğrudan WhatsApp üzerinden ulaşın.',
-    quickTitle: 'Hızlı İletişim',
-    subjectPh: 'Konu'
   },
   aboutPage: {
     title: 'Hakkımızda',
-    subtitle: 'Havalandırma teknolojilerinde mühendislik ve inovasyonun birleştiği nokta.',
-    history: 'Hikayemiz',
     vision: 'Vizyonumuz',
-    mission: 'Misyonumuz',
-    team: 'Ekibimiz',
-    stats: {
-      projects: 'Tamamlanan Projeler',
-      clients: 'Mutlu Müşteriler',
-      years: 'Yıllık Tecrübe',
-      brands: 'Global Markalar',
-      deliveryTarget: 'Teslimat Hedefi',
-      launchYear: 'Kuruluş Yılı',
-      premiumBrands: 'Premium Markalar',
-      productTypes: 'Ürün Tipleri',
-      yearsExperience: 'Yıllık Tecrübe'
-    },
     experience: 'Yıllık Tecrübe',
     distributorship: 'Global Distribütörlük',
     completedProject: 'Tamamlanan Proje',
@@ -1118,60 +1070,10 @@ export const tr = {
     ctaContact: 'İletişime Geçin',
     ctaExplore: 'Ürünleri Keşfedin',
     seoDescription: 'VentHub: Türkiye\'nin premium HVAC distribütörü. 15 yıllık tecrübe ve mühendislik odaklı havalandırma çözümleri.',
-    bullets: {
-      bullet1: 'Mühendislik odaklı seçim desteği ve doğru ürün yönlendirmesi',
-      bullet2: 'Stok, teslimat ve satış sonrasında şeffaf iletişim',
-      bullet3: 'KVKK/iyzico uyumlu, güvenli ödeme ve veri koruma'
-    },
-    cta: {
-      primary: 'Ürünleri Keşfet',
-      secondary: 'Bizimle İletişime Geçin',
-      subtitle: 'Projeniz için en uygun HVAC çözümünü birlikte bulalım. Uzman ekibimiz size yardımcı olmaya hazır.',
-      title: 'Birlikte Çalışalım'
-    },
-    experienceLabel: '2009\'dan Beri',
-    heroSubtitle: 'Profesyonel havalandırma çözümlerinde 15 yılı aşkın deneyimimizle, dünya standartlarında ürünleri Türkiye\'ye getiriyoruz.',
-    heroTitleText: 'Yeniden Tanımlıyoruz',
-    trustBadges: {
-      ce: {
-        label: 'CE Sertifikalı Ürünler',
-        sublabel: 'Avrupa Standartları'
-      },
-      original: {
-        label: 'Orijinal Ürünler',
-        sublabel: 'Kalite Garantisi'
-      },
-      premium: {
-        label: 'Premium Markalar',
-        sublabel: 'Global Üreticiler'
-      },
-      reliable: {
-        label: 'Güvenilir Platform',
-        sublabel: 'Profesyonel Servis'
-      }
-    },
-    values: {
-      itemsSubtitle: 'Aldığımız her kararda müşterilerimizin ihtiyaçlarını önceliklendiriyoruz',
-      itemsTitle: 'Bizi Tanımlayan Değerler',
-      mission: {
-        description: 'Türkiye\'de profesyonel HVAC çözümlerini erişilebilir kılmak, B2B müşterilerimize dünya standartlarında ürünler sunmak.',
-        title: 'Misyonumuz'
-      },
-      values: {
-        description: 'Kalite, güvenilirlik, müşteri memnuniyeti ve sürdürülebilirlik ilkelerimizin temelini oluşturur.',
-        title: 'Değerlerimiz'
-      },
-      vision: {
-        description: 'Global markaların güvenilir temsilcisi olarak büyüyerek havalandırma sektöründe Türkiye\'nin referans e-ticaret platformu olmak.',
-        title: 'Vizyonumuz'
-      }
-    },
     whySubtitle: 'Güveninize layık olmak için çalışıyoruz',
-    whyTitle: 'Neden VentHub?'
   },
   cartToast: {
     added: 'Ürün sepete eklendi!',
-    whatNext: 'Ne yapmak istersiniz?',
     continue: 'Alışverişe Devam Et',
     goToCart: 'Sepete Git',
     autoClose: 'Bu pencere 5 saniye içinde otomatik olarak kapanacak'
@@ -1854,7 +1756,6 @@ export const tr = {
       loadingModel: '3D Model Yükleniyor',
       dragToRotate: 'Döndürmek İçin Sürükleyin',
     },
-    loading: 'Ürün yükleniyor...',
     productNotFound: 'Ürün Bulunamadı',
     backHome: 'Ana Sayfaya Dön',
     back: 'Geri Dön',
@@ -1867,20 +1768,12 @@ export const tr = {
     vatExcluded: '(+KDV)',
     qty: 'Adet:',
     addToCart: 'Sepete Ekle',
-    askStock: 'Stok Sor',
     techQuote: 'Teknik Teklif İste',
-    askPriceButton: 'Teklif İste',
-    freeShipping: 'Ücretsiz Kargo',
-    warranty2y: '2 Yıl Garanti',
-    support247: '7/24 Destek',
     descFallback: 'Bu ürün için detaylı açıklama yakında eklenecektir.',
-    relatedGuide: 'İlgili Kılavuz',
-    statusLabel: 'Durum',
     relatedProducts: 'İlgili Ürünler',
     officialDistributor: 'RESMİ DİSTRİBÜTÖR',
     priceAvailability: 'Fiyat & Stok',
     shareCopied: 'Link kopyalandı!',
-    variantDetails: 'Varyant Detayları',
     messages: {
       pdfStarted: 'PDF üretiliyor...'
     },
@@ -1888,33 +1781,13 @@ export const tr = {
       pdfFailed: 'PDF üretilemedi.'
     },
     labels: {
-      productFeatures: 'Ürün Özellikleri',
       productDescription: 'Ürün Açıklaması',
-      technicalSpecs: 'Teknik Özellikler',
       category: 'Kategori',
-      price: 'Fiyat',
-      physicalDimensions: 'Fiziksel Boyutlar',
-      performanceMetrics: 'Performans Metrikleri',
-      width: 'Genişlik',
-      height: 'Yükseklik',
-      depth: 'Derinlik',
-      weight: 'Ağırlık',
-      airflow: 'Hava Debisi',
-      pressure: 'Basınç',
-      power: 'Güç',
-      noise: 'Ses Seviyesi',
       noSpecsAvailable: 'Bu ürün için teknik özellik bulunmamaktadır.',
       technicalDatasheet: 'TEKNİK VERİ SAYFASI',
       engineeringAnalysis: 'Mühendislik Analizi',
       sku: 'SKU',
       datasheetPdf: 'TEKNİK DÖKÜMAN (PDF)'
-    },
-    features: {
-      materialQuality: 'Birinci sınıf malzeme ve üretim kalitesi',
-      energyEfficient: 'Enerji tasarruflu tasarım ve düşük tüketim',
-      quietOperation: 'Sessiz çalışma ve minimum titreşim',
-      easyMaintenance: 'Kolay kurulum ve bakım',
-      durable: 'Uzun ömürlü ve dayanıklı'
     },
     diagramsExtra: {
       technicalDiagrams: 'Teknik Şemalar',
@@ -1944,7 +1817,6 @@ export const tr = {
       download: 'İndir',
       downloadCatalog: 'Kataloğu İndir',
       downloadBrochure: 'Broşürü İndir',
-      liveDataNotice: 'ℹ️ Veriler gerçek zamanlı güncellenmektedir',
       interactive3D: '3D GÖRÜNÜM',
       addToProject: 'Projeye Ekle',
       removeFromWishlist: 'Favorilerden Kaldır',
@@ -1968,14 +1840,11 @@ export const tr = {
       yearSuffix: '-2024',
       standardValue: 'ISO/EN-STD',
       certificateNo: 'Sertifika No',
-      validity: 'Geçerlilik',
       standard: 'Standart',
-      efficiency: 'Verimlilik'
     },
     sections: {
       general: 'Genel Bilgiler',
       models: 'Modeller',
-      dimensions: 'Boyutlar',
       diagrams: 'Şemalar',
       documents: 'Belgeler',
       brochure: 'Broşür/Katalog',
@@ -2663,31 +2532,11 @@ export const tr = {
     }
   },
   lead: {
-    message: 'Mesaj',
-    title: 'Teknik Teklif İsteği',
-    product: 'Ürün',
-    contactInfo: 'İletişim Bilgileri',
-    name: 'Ad Soyad',
-    company: 'Şirket',
     companyPlaceholder: 'Şirketiniz A.Ş.',
     cityPlaceholder: 'Örn: İstanbul',
-    email: 'E-posta',
-    phone: 'Telefon',
-    city: 'Şehir',
-    projectNeed: 'Proje/İhtiyaç',
-    applicationArea: 'Uygulama Alanı',
-    select: 'Seçiniz',
-    quantity: 'Adet',
-    budgetRange: 'Bütçe Aralığı',
-    timeframe: 'Zaman Çizelgesi',
-    contactPref: 'İletişim Tercihi',
-    contactTime: 'Uygun saatler (örneğin: 10:00–12:00)',
     consent: {
       text: 'okudum ve kabul ediyorum.'
     },
-    submit: 'Gönder',
-    submitting: 'Gönderiliyor...',
-    cancel: 'İptal',
     appAreas: {
       parking: 'Otopark Havalandırma',
       kitchen: 'Endüstriyel Mutfak',
@@ -2731,58 +2580,6 @@ export const tr = {
       consent: 'KVKK metnini onaylamalısınız'
     },
     defaultMessage: '{{productName}} için detaylı teknik teklif...',
-    aboutPage: {
-      stats: {
-        yearsExperience: 'Proje Hattı'
-      }
-    },
-    cinematicShowcase: {
-      eyebrow: 'TEKNİK DETAY',
-      title: 'Mühendislik Başyapıtı',
-      subtitle: 'Zirve Performans ve Verimlilik',
-      description: 'Her bir bileşen, en zorlu endüstriyel koşullarda kesintisiz hava akışı sağlamak üzere optimize edilmiştir.',
-      cta: 'Teknik Kataloğu İncele',
-      badge: 'Endüstriyel Sınıf',
-      componentLabel: 'Sistem Bileşeni',
-      hotspots: {
-        motor: 'EC Motor Teknolojisi',
-        motorDetail: 'Düşük enerji tüketimi ve yüksek tork sağlayan fırçasız motor yapısı.',
-        clamps: 'Easy-Fit Kelepçeler',
-        clampsDetail: 'Alet gerektirmeden hızlı montaj ve bakım sağlayan özel bağlantı sistemi.',
-        housing: 'Polimer Gövde',
-        housingDetail: 'Darbe ve korozyon direnci yüksek, hafif aerodinamik dış yüzey.',
-        airflow: 'Laminar Akış',
-        airflowDetail: 'Türbülansı minimize eden ve ses seviyesini düşüren iç kanat tasarımı.'
-      }
-    },
-    trustProof: {
-      badge: 'Güvenilir',
-      eyebrow: 'NEDEN VENTHUB?',
-      title: 'Mühendislik ve Güven Odaklı Yaklaşım',
-      subtitle: 'Sektörün lider markaları ve uzman mühendis kadromuzla projelerinize değer katıyoruz.',
-      items: {
-        brands: {
-          eyebrow: 'Yetkinlik',
-          title: 'Global Markalar',
-          description: 'Dünyanın en güvenilir HVAC üreticilerinin yetkili ortağı.'
-        },
-        guidance: {
-          eyebrow: 'Uzmanlık',
-          title: 'Proje Desteği',
-          description: 'Şartnameden devreye almaya kadar her adımda yanınızdayız.'
-        },
-        delivery: {
-          eyebrow: 'Hız',
-          title: 'Hızlı Teslimat',
-          description: 'Geniş stok ağımızla Türkiye genelinde zamanında teslimat.'
-        },
-        support: {
-          eyebrow: 'Süreklilik',
-          title: 'Satış Sonrası',
-          description: 'Teknik destek ve yedek parça garantisi ile kesintisiz işletme.'
-        }
-      }
-    }
   },
   calculators: {
     recommendations: 'Öneriler',
@@ -2991,15 +2788,9 @@ export const tr = {
       smokeSystemDesc: 'Bu hesaplama ön boyutlandırma amaçlıdır. Kesin tasarım için CFD analizi ve yangın güvenlik uzmanı danışmanlığı gereklidir.',
       emptyStateLine1: 'Geçerli değerler girerek',
       emptyStateLine2: 'sonuçları görüntüleyin',
-      title: 'Jet Fan Hesaplayıcı',
-      description: 'Otopark ve tünel jet fan itki ve havalandırma hesabı',
-      infoText: 'Kapalı otopark veya tünellerde gereken jet fan adedini, itki kuvvetini ve hava değişim miktarını hesaplar.',
       form: {
-        appType: 'Uygulama Alanı',
         parking: 'Otopark',
-        parkingDesc: 'Kapalı otopark havalandırması',
         tunnel: 'Tünel',
-        tunnelDesc: 'Karayolu veya metro tüneli',
         mode: 'Havalandırma Modu',
         normal: 'Normal',
         normalDesc: 'Günlük havalandırma',
@@ -3010,9 +2801,7 @@ export const tr = {
         height: 'Yükseklik'
       },
       results: {
-        ach: 'Hava Değişim Sayısı',
         totalThrust: 'Toplam İtki Kuvveti',
-        count: 'Jet Fan Adedi'
       }
     }
   },
@@ -3149,10 +2938,7 @@ export const tr = {
     },
     coldStorage: 'Soğuk Hava Deposu',
     coldStorageDesc: 'Soğuk zincir koruması',
-    coldStorageTip: 'Gıda güvenliği ve enerji tasarrufu sağlar',
     industrial: 'Endüstriyel Tesis',
-    industrialDesc: 'Fabrika, depo, lojistik',
-    industrialTip: 'Endüstriyel gereksinimlere uygun güç',
     retail: 'Market / Süpermarket',
     retailDesc: 'Soğutucu reyonlar',
     retailTip: 'Soğutucu reyonlardan sıcak havayı uzak tutar',
