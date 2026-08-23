@@ -1,0 +1,87 @@
+{
+  "_marka": "AVenS",
+  "_okuma_notu": "T148-VH — AVenS sulu batarya ailesinde KIMLIK duzeltmesi. Bu manifest technical_specs YAZMAZ; yalniz sku / model_code / name / slug alanlarini duzeltir.",
+  "_kaynak": "AVenS Urun Fiyat Katalogu 2026, sayfa 69, 'SULU BATARYALAR' tablosu. Sutun duzeni: KOD | MODEL | DEBI | ISITICI GUCU (Kcal/h) 90/70C | UYGUN MODEL | FIYAT (Euro). Sayfa goruntusu 02-work/pages/page_69.png ile GORSEL olarak dogrulandi.",
+  "_kusur": "Ingestion 'KOD' sutunu yerine 'ISITICI GUCU (Kcal/h)' sutununu model_code'a, 'UYGUN MODEL' sutununu (urunun takilacagi cihazin adi) name'e yazmis. sku ve slug de bu yanlis kimlikten turemis. Ayni tablonun ilk iki satiri (13050, 13051) DOGRU eslesmis — kusur 8 satirin 6'sinda.",
+  "_dogru_kalip": "13050/13051 satirlari kurulu konvansiyonu gosteriyor: name = katalogun MODEL sutunundaki TAM METIN; slug = ad-slug + '-' + model_code; sku = 'AVE-' + model_code.",
+  "_recep_karari": "2026-08-22: TAM DUZELTME (sku + model_code + name birlikte). slug da ayni kimlikten turedigi icin pakete dahil edildi — ayri birakmak, duzeltilmis bir urunun eski kimligi tasiyan bir URL'de yasamasi demekti.",
+  "_degismez": "sku = <MARKA>-<model_code>. Olcum 2026-08-22: 5 markada 374/374 istisnasiz. Yazim sonrasi YENIDEN olculur; bozulursa betik kendi yazdigini geri alir.",
+  "items": [
+    {
+      "current_sku": "AVE-11300",
+      "katalog_kod": "13052",
+      "next_sku": "AVE-13052",
+      "next_model_code": "13052",
+      "next_name": "SULU BATARYA 11 KW KANAL TİPİ-11300(Kcal/h) 90/70ºC",
+      "next_slug": "sulu-batarya-11-kw-kanal-tipi-11300-kcal-h-90-70-c-13052",
+      "_not": "11300 = isitici gucu (Kcal/h), KOD degil. Katalogta 11 KW satiri."
+    },
+    {
+      "current_sku": "AVE-20700",
+      "katalog_kod": "13053",
+      "next_sku": "AVE-13053",
+      "next_model_code": "13053",
+      "next_name": "SULU BATARYA 14 KW KANAL TİPİ-20700(Kcal/h) 90/70ºC",
+      "next_slug": "sulu-batarya-14-kw-kanal-tipi-20700-kcal-h-90-70-c-13053",
+      "_not": "20700 = isitici gucu (Kcal/h). Katalogta 14 KW satiri."
+    },
+    {
+      "current_sku": "AVE-33000",
+      "katalog_kod": "13054",
+      "next_sku": "AVE-13054",
+      "next_model_code": "13054",
+      "next_name": "SULU BATARYA 20 KW KANAL TİPİ-33000(Kcal/h) 90/70ºC",
+      "next_slug": "sulu-batarya-20-kw-kanal-tipi-33000-kcal-h-90-70-c-13054",
+      "_not": "33000 = isitici gucu (Kcal/h). Katalogta 20 KW satiri."
+    },
+    {
+      "current_sku": "AVE-37400",
+      "katalog_kod": "13055",
+      "next_sku": "AVE-13055",
+      "next_model_code": "13055",
+      "next_name": "SULU BATARYA 28 KW KANAL TİPİ-37400(Kcal/h) 90/70ºC",
+      "next_slug": "sulu-batarya-28-kw-kanal-tipi-37400-kcal-h-90-70-c-13055",
+      "_not": "37400 = isitici gucu (Kcal/h). Katalogta 28 KW satiri."
+    },
+    {
+      "current_sku": "AVE-42500",
+      "katalog_kod": "13056",
+      "next_sku": "AVE-13056",
+      "next_model_code": "13056",
+      "next_name": "SULU BATARYA 36 KW KANAL TİPİ-42500(Kcal/h) 90/70ºC",
+      "next_slug": "sulu-batarya-36-kw-kanal-tipi-42500-kcal-h-90-70-c-13056",
+      "_not": "42500 = isitici gucu (Kcal/h). Katalogta 36 KW satiri. Bu ve 47300 ayni 'AvenS 5000' adini tasidigi icin dup-name taban satirini doguran cift."
+    },
+    {
+      "current_sku": "AVE-47300",
+      "katalog_kod": "13057",
+      "next_sku": "AVE-13057",
+      "next_model_code": "13057",
+      "next_name": "SULU BATARYA 40 KW KANAL TİPİ-47300(Kcal/h) 90/70ºC",
+      "next_slug": "sulu-batarya-40-kw-kanal-tipi-47300-kcal-h-90-70-c-13057",
+      "_not": "47300 = isitici gucu (Kcal/h). Katalogta 40 KW satiri."
+    }
+  ],
+  "denetim": [
+    {
+      "kalem": "DAN-80101 kimlik celiskisi",
+      "durum": "BU MANIFESTE DAHIL DEGIL",
+      "gerekce": "Adi 'FC-51 - 220V - 0,37kW' ama ailesi danfoss-fc101 (o hat 3x380-480V ve 0,37 kW modeli PK37 kodunu tasir). Kaynaktan TEK BASINA cozulemez: ya ad yanlis ya urun yanlis aileye bagli. Satici bilgisi gerekir -> Recep karari."
+    },
+    {
+      "kalem": "Eski ?sku= linkleri",
+      "durum": "ON KOSUL KAPANDI",
+      "gerekce": "#755 (INV-SKU-PARAM-1) ile eslesmeyen sku artik sessizce baska urune dusmuyor; adres cubugu kanoniklesiyor."
+    },
+    {
+      "kalem": "CSV disa/ice aktarim tuzagi",
+      "durum": "ON KOSUL HAZIR",
+      "gerekce": "#759 (INV-CSV-IMPORT-1) ile bilinmeyen SKU sessizce yeni urun yaratmiyor. Bu duzeltmeden ONCE alinmis export dosyalari artik uyari uretir."
+    },
+    {
+      "kalem": "JSON-LD yapilandirilmis veri",
+      "durum": "BILINEN ETKI",
+      "gerekce": "src/lib/seo/jsonld.ts sku ve mpn alanlarini ProductGroup.hasVariant icine gomuyor. SKU degisimi arama motorundaki yapilandirilmis veriyi eskitir; bu normal urun verisi guncellemesidir, ama 'SEO etkisi yok' demek YANLISTI (curutme turunda duzeltildi)."
+    }
+  ]
+}
