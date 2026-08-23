@@ -75,8 +75,8 @@
     },
     {
       "kalem": "CSV disa/ice aktarim tuzagi",
-      "durum": "ON KOSUL HAZIR",
-      "gerekce": "#759 (INV-CSV-IMPORT-1) ile bilinmeyen SKU sessizce yeni urun yaratmiyor. Bu duzeltmeden ONCE alinmis export dosyalari artik uyari uretir."
+      "durum": "ON KOSUL KAPANDI",
+      "gerekce": "#759 (INV-CSV-IMPORT-1) 2026-08-23 master.a merge edildi (0d087d0a); bilinmeyen SKU artik sessizce yeni urun yaratmiyor. Bu duzeltmeden ONCE alinmis export dosyalari artik uyari uretir."
     },
     {
       "kalem": "JSON-LD yapilandirilmis veri",

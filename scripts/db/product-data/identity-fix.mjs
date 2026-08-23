@@ -12,8 +12,14 @@
  * ÖN KOŞULLAR (fail-closed — biri bile düşerse HİÇ yazmaz):
  *   Ö1. Her kaynak SKU tam olarak 1 ürüne denk gelmeli.
  *   Ö2. Hedef `sku`/`slug` değerleri DB'de KULLANILMIYOR olmalı (çakışma yok).
- *   Ö3. Hedef satırların sipariş kaydı 0 olmalı — **yazım anında YENİDEN ölçülür.**
- *       (2026-08-22'de 0'dı; ölçüm bayatlayabilir, o yüzden burada tekrar ölçülür.)
+ *   Ö3. Hedef satırlara ATIF YAPAN HİÇBİR KAYIT olmamalı — beş tablo birden ölçülür
+ *       (venthub_order_items · cart_items · venthub_quote_items · project_items ·
+ *       purchase_order_items); herhangi biri sıfırdan büyükse HİÇ YAZILMAZ.
+ *       **Yazım anında YENİDEN ölçülür** (önceki ölçüm bayatlamış olabilir).
+ *       Ö3 aynı zamanda YETKİ KANARYASIDIR: bu tablolarda yetkisiz bağlantı boş liste
+ *       değil `permission denied` alır ve `rest()` fail-closed olduğu için betik ölür.
+ *       Yani "sıfır atıf" cevabı yalnız gerçekten görebilen bir bağlantıdan gelebilir —
+ *       kör bir bağlantı yeşil veremez.
  *   Ö4. Manifest'in kendi iç tutarlılığı: next_sku == 'AVE-' + next_model_code.
  *
  * YAZIM SONRASI DOĞRULAMA:
@@ -21,7 +27,9 @@
  *       Bozulursa betik KENDİ YAZDIĞINI GERİ ALIR ve hata ile çıkar.
  *
  * Kullanım:
- *   node identity-fix.mjs --url <URL> --key <ANON>                          # dry-run
+ *   node identity-fix.mjs --url <URL> --key <SERVICE>                       # dry-run (yazmaz)
+ *     Not: dry-run da service_role ister. Ö3'ün okuduğu tablolarda anon anahtarın
+ *     SELECT yetkisi yok (ölçüldü: 401 / 42501), yani anon ile dry-run hiç koşamaz.
  *   node identity-fix.mjs --url <URL> --key <SERVICE> --apply --out <dizin>
  *   node identity-fix.mjs --rollback <envanter.json> --url <URL> --key <SERVICE>
  */
@@ -123,17 +131,34 @@ for (const c of clashSku) violations.push(`HEDEF CAKISMASI: sku "${c.sku}" DB'de
 const clashSlug = await rest(`products?slug=in.(${nextSlugs.map(encodeURIComponent).join(',')})&select=slug`);
 for (const c of clashSlug) violations.push(`HEDEF CAKISMASI: slug "${c.slug}" DB'de ZATEN VAR`);
 
-// Ö3 — sipariş kaydı YENİDEN ölçülür (önceki ölçüm bayatlamış olabilir)
-const orderRows = await rest(
-  `venthub_order_items?or=(product_sku.in.(${currentSkus.join(',')}),product_sku_snapshot.in.(${currentSkus.join(',')}))&select=product_sku,product_sku_snapshot`
-);
-if (orderRows.length > 0) {
-  violations.push(`SIPARIS KAYDI VAR (${orderRows.length} satir) — kimlik degisimi siparis gecmisini kopartir. ELLE INCELE.`);
+// Ö3 — ÜRÜNE ATIF YAPAN HER TABLO yeniden ölçülür (önceki ölçüm bayatlamış olabilir).
+//
+// Bu koşul 2026-08-23'e kadar YALNIZ `venthub_order_items`'a bakıyordu. Ölçüm genişletilince
+// ürüne atıf yapan beş tablo olduğu, dördünün hiç ölçülmediği görüldü. O gün hepsi sıfırdı, yani
+// sonuç doğruydu — ama koşulun VAADİ ("sipariş kaydı 0") ölçtüğünden genişti: ürün birinin
+// sepetinde ya da bir teklifte dursaydı betik onu görmeden yazardı. Eksik kapı, kırmızı kapı
+// değildir; kapının kapsamı vaadi kadar geniş olmalı.
+const productIds = rows.map(r => r.id).join(',');
+const refTables = [
+  // Sipariş satırı ürüne hem kimlikle hem de yazım-anı SKU kopyasıyla bağlanabilir; üçü de sorulur.
+  { tablo: 'venthub_order_items',  yol: `venthub_order_items?or=(product_id.in.(${productIds}),product_sku.in.(${currentSkus.join(',')}),product_sku_snapshot.in.(${currentSkus.join(',')}))&select=id` },
+  { tablo: 'cart_items',           yol: `cart_items?product_id=in.(${productIds})&select=id` },
+  { tablo: 'venthub_quote_items',  yol: `venthub_quote_items?product_id=in.(${productIds})&select=id` },
+  { tablo: 'project_items',        yol: `project_items?product_id=in.(${productIds})&select=id` },
+  { tablo: 'purchase_order_items', yol: `purchase_order_items?product_id=in.(${productIds})&select=id` },
+];
+const refCounts = [];
+for (const t of refTables) {
+  const found = await rest(t.yol);
+  refCounts.push(`${t.tablo}=${found.length}`);
+  if (found.length > 0) {
+    violations.push(`ATIF VAR — ${t.tablo}: ${found.length} satir. Kimlik degisimi bu kaydin isaret ettigi urunu kopartir. ELLE INCELE.`);
+  }
 }
 
 const before = await invariantCount();
 console.log(`DEGISMEZ (yazim oncesi): ${before.ok}/${before.total} urun "sku = <onek>-<model_code>" kuralina uyuyor`);
-console.log(`SIPARIS KAYDI: ${orderRows.length} satir`);
+console.log(`URUNE ATIF (bes tablo): ${refCounts.join(' · ')}`);
 
 console.log(`\n== ${APPLY ? 'APPLY' : 'DRY-RUN'} — KIMLIK DEGISIKLIKLERI`);
 const writes = [];
@@ -163,7 +188,7 @@ if (violations.length) {
   violations.forEach(v => console.error(`   ${v}`));
   process.exit(3);
 }
-console.log('\n  on kosullar (O1 kaynak · O2 cakisma · O3 siparis · O4 manifest): TEMIZ');
+console.log('\n  on kosullar (O1 kaynak · O2 cakisma · O3 URUNE ATIF/bes tablo · O4 manifest): TEMIZ');
 
 if (!APPLY) {
   console.log('\nDRY-RUN — hicbir sey yazilmadi. Yazim icin: --apply + service_role + GO.');
