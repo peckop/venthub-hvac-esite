@@ -1691,6 +1691,7 @@ export type Database = {
           meta_description: Json | null
           meta_title: Json | null
           name: string
+          parent_family_id: string | null
           series_code: string | null
           slug: string
           sort_order: number
@@ -1709,6 +1710,7 @@ export type Database = {
           meta_description?: Json | null
           meta_title?: Json | null
           name: string
+          parent_family_id?: string | null
           series_code?: string | null
           slug: string
           sort_order?: number
@@ -1727,6 +1729,7 @@ export type Database = {
           meta_description?: Json | null
           meta_title?: Json | null
           name?: string
+          parent_family_id?: string | null
           series_code?: string | null
           slug?: string
           sort_order?: number
@@ -1747,6 +1750,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_families_parent_family_id_fkey"
+            columns: ["parent_family_id"]
+            isOneToOne: false
+            referencedRelation: "product_families"
             referencedColumns: ["id"]
           },
           {

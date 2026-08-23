@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider'
+import { splitByExistingSku } from '@/lib/data/csvImportGuard'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import type { Database } from '../../../types/database.types'
@@ -30,6 +31,22 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
      * `role="status"`/`aria-live` ile ekran okuyucuya da duyurulur.
      */
     const [notice, setNotice] = React.useState<{ tone: 'error' | 'info'; text: string } | null>(null)
+    /**
+     * BİLİNMEYEN SKU KORUMASI (T148-VH çürütme turunda bulundu).
+     * `upsert(..., { onConflict: 'sku' })` eşleşme bulamazsa satırı SESSİZCE **INSERT** eder.
+     * Yani düzeltmeden önce alınmış bir dışa aktarım dosyası yeniden yüklenirse, eski SKU'lar
+     * artık bulunamayacağı için kopya ürünler doğar — ve ekranda "başarılı içe aktarım"
+     * yazar. Kusur bozuk görünmez; tam da bu yüzden hiçbir kapı görmüyordu.
+     * Burada yazımdan ÖNCE ölçüyoruz ve kararı kullanıcıya bırakıyoruz.
+     */
+    const [pendingWrite, setPendingWrite] = React.useState<
+        {
+            payloads: Database['public']['Tables']['products']['Insert'][]
+            unknownSkus: string[]
+            /** Ayrim ON OLCUMDE bir kez yapilir; buton onu YENIDEN hesaplamaz. */
+            known: Database['public']['Tables']['products']['Insert'][]
+        } | null
+    >(null)
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0]
@@ -109,6 +126,39 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             return
         }
 
+        /* ── ÖN ÖLÇÜM: hangi SKU'lar DB'de YOK ────────────────────────────────
+         * Yazımdan önce ölçülür. Bilinmeyen varsa yazım YAPILMAZ; karar kullanıcıya
+         * gider. "Sessizce doğru olanı yapmak" burada mümkün değil, çünkü iki meşru
+         * niyet var: yeni ürün eklemek ve mevcutları güncellemek. Hangisi olduğunu
+         * yalnız kullanıcı bilir; tahmin etmek kopya ürün üretme riskini geri getirir.
+         * ──────────────────────────────────────────────────────────────────── */
+        try {
+            const skus = payloads.map((p) => String(p.sku)).filter(Boolean)
+            const existing = new Set<string>()
+            for (let i = 0; i < skus.length; i += 200) {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('sku')
+                    .in('sku', skus.slice(i, i + 200))
+                if (error) throw error
+                for (const r of data ?? []) if (r.sku) existing.add(r.sku)
+            }
+            const split = splitByExistingSku(payloads, existing)
+            if (split.unknown.length > 0) {
+                setPendingWrite({ payloads, unknownSkus: split.unknownSkus, known: split.known })
+                setIsProcessing(false)
+                return
+            }
+            await writePayloads(payloads, 0)
+        } catch (e) {
+            setNotice({ tone: 'error', text: t('admin.products.import.error', { msg: ((e as Error).message || String(e)) }) })
+            setIsProcessing(false)
+        }
+    }
+
+    /** Asıl yazım. `skipped` yalnız raporlama içindir — kullanıcı neyin atlandığını görsün. */
+    const writePayloads = async (payloads: Database['public']['Tables']['products']['Insert'][], skipped: number) => {
+        setIsProcessing(true)
         try {
             // chunked upsert by sku
             let ok = 0, fail = 0
@@ -122,7 +172,13 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                     ok += chunk.length
                 }
             }
-            setNotice({ tone: 'info', text: t('admin.products.import.done', { ok, fail }) })
+            setNotice({
+                tone: 'info',
+                text: skipped > 0
+                    ? t('admin.products.import.updateExistingDone', { ok, skipped })
+                    : t('admin.products.import.done', { ok, fail }),
+            })
+            setPendingWrite(null)
             setImportPreview(null)
             setImportRows(null)
             onSuccess()
@@ -142,6 +198,57 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             >
                 {t('admin.products.import.button')}
             </button>
+
+            {/*
+              BİLİNMEYEN SKU ONAYI — yazımdan önce, geri alınamaz karar kullanıcıda.
+              İki eylem de ADIYLA yazılıdır ("Evet/Hayır" değil): geri alınamaz bir yazımda
+              kullanıcının ne onayladığı butonun üzerinde okunabilir olmalı.
+            */}
+            {pendingWrite && (
+                <div
+                    role="alertdialog"
+                    aria-labelledby="csv-unknown-sku-title"
+                    className="mt-3 rounded-2xl border border-admin-border bg-admin-surface-2 p-4"
+                >
+                    <p id="csv-unknown-sku-title" className="font-bold text-admin-fg">
+                        {t('admin.products.import.unknownSkuTitle', { count: pendingWrite.unknownSkus.length })}
+                    </p>
+                    <p className="mt-2 text-sm text-admin-fg-muted">
+                        {t('admin.products.import.unknownSkuHelp')}
+                    </p>
+                    <p className="mt-2 text-xs text-admin-fg-muted">
+                        {t('admin.products.import.unknownSkuExamples', { skus: pendingWrite.unknownSkus.slice(0, 5).join(', ') })}
+                    </p>
+                    <div className="mt-4 flex flex-wrap items-center gap-3 justify-end">
+                        <button
+                            className={`${adminButtonSecondaryClass} h-10`}
+                            onClick={() => { setPendingWrite(null) }}
+                            disabled={isProcessing}
+                        >
+                            {t('admin.products.import.close')}
+                        </button>
+                        <button
+                            className={`${adminButtonSecondaryClass} h-10`}
+                            onClick={() => {
+                                void writePayloads(
+                                    pendingWrite.known,
+                                    pendingWrite.payloads.length - pendingWrite.known.length,
+                                )
+                            }}
+                            disabled={isProcessing}
+                        >
+                            {t('admin.products.import.updateExistingOnly', { count: pendingWrite.known.length })}
+                        </button>
+                        <button
+                            className={`${adminButtonPrimaryClass} h-10`}
+                            onClick={() => { void writePayloads(pendingWrite.payloads, 0) }}
+                            disabled={isProcessing}
+                        >
+                            {t('admin.products.import.createNewAction', { count: pendingWrite.unknownSkus.length })}
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/*
               Inline bildirim — `alert()`'in yerini alır. `role="status"` + `aria-live`

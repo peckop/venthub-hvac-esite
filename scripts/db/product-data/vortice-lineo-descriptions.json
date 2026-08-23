@@ -1,0 +1,58 @@
+{
+  "_okuma_notu": "T141/T149-VH — Vortice Lineo Quiet aile aciklamalari. `product_families.description` (JSONB {tr,en}) yazar; products'a DOKUNMAZ.",
+  "_kusur": "T138 model bolme pilotunda (2026-08-21) model aileleri yaratilirken SERI aciklamasi oldugu gibi KOPYALANDI. Sonuc: 125/150/200/250/315 mm modellerinin HEPSINDE '100 mm capli' yaziyor — bes model icin FAKTUEL YANLIS. Seri aciklamasi da yaniltici: seri tek cap degil, 100-315 mm arasi bir aile.",
+  "_sorumluluk": "Kusur bu seridin kendi pilotundan dogdu; T141 denetimi buldu.",
+  "_kaynak": "Metinlerdeki HER SAYI canli DB'den geliyor: cap = ailenin urunlerinin technical_specs->>'diameter_mm' (tekil deger), debi araligi = ayni urunlerin max_delivery_m3h min/max degerleri. Uydurma yok; kaynak tablo yerine URUNUN KENDI VERISI.",
+  "_on_kosul": "Betik, manifest'teki diameter_mm'yi ailenin urunlerinden YENIDEN olcer. Eslesmezse HIC YAZMAZ — metnin veriden koptugu an tam budur ve bugunku kusur da oradan dogdu.",
+  "families": [
+    {
+      "slug": "vortice-lineo-quiet",
+      "kind": "seri",
+      "diameter_mm": null,
+      "tr": "Ultra sessiz çalışan, akustik susturucu gövdeli kanal tipi karma akışlı havalandırma fanı serisi. 100–315 mm çap seçenekleri ve 260–2890 m³/h debi aralığı ile konut ve ticari havalandırma uygulamalarına uygundur.",
+      "en": "Ultra-quiet mixed-flow inline duct fan series with acoustic silencer housing. Available in 100–315 mm diameters with an airflow range of 260–2890 m³/h, suitable for residential and commercial ventilation."
+    },
+    {
+      "slug": "vortice-lineo-100-quiet",
+      "kind": "model",
+      "diameter_mm": 100,
+      "tr": "Ultra sessiz çalışan, akustik susturucu gövdeli, 100 mm çaplı kanal tipi karma akışlı havalandırma fanı. 260–300 m³/h debi aralığında çalışır.",
+      "en": "Ultra-quiet mixed-flow inline duct fan with acoustic silencer housing, 100 mm diameter. Airflow range 260–300 m³/h."
+    },
+    {
+      "slug": "vortice-lineo-125-quiet",
+      "kind": "model",
+      "diameter_mm": 125,
+      "tr": "Ultra sessiz çalışan, akustik susturucu gövdeli, 125 mm çaplı kanal tipi karma akışlı havalandırma fanı. 320–380 m³/h debi aralığında çalışır.",
+      "en": "Ultra-quiet mixed-flow inline duct fan with acoustic silencer housing, 125 mm diameter. Airflow range 320–380 m³/h."
+    },
+    {
+      "slug": "vortice-lineo-150-quiet",
+      "kind": "model",
+      "diameter_mm": 150,
+      "tr": "Ultra sessiz çalışan, akustik susturucu gövdeli, 150 mm çaplı kanal tipi karma akışlı havalandırma fanı. 510–515 m³/h debi aralığında çalışır.",
+      "en": "Ultra-quiet mixed-flow inline duct fan with acoustic silencer housing, 150 mm diameter. Airflow range 510–515 m³/h."
+    },
+    {
+      "slug": "vortice-lineo-200-quiet",
+      "kind": "model",
+      "diameter_mm": 200,
+      "tr": "Ultra sessiz çalışan, akustik susturucu gövdeli, 200 mm çaplı kanal tipi karma akışlı havalandırma fanı. 1145–1160 m³/h debi aralığında çalışır.",
+      "en": "Ultra-quiet mixed-flow inline duct fan with acoustic silencer housing, 200 mm diameter. Airflow range 1145–1160 m³/h."
+    },
+    {
+      "slug": "vortice-lineo-250-quiet",
+      "kind": "model",
+      "diameter_mm": 250,
+      "tr": "Ultra sessiz çalışan, akustik susturucu gövdeli, 250 mm çaplı kanal tipi karma akışlı havalandırma fanı. 1485–1550 m³/h debi aralığında çalışır.",
+      "en": "Ultra-quiet mixed-flow inline duct fan with acoustic silencer housing, 250 mm diameter. Airflow range 1485–1550 m³/h."
+    },
+    {
+      "slug": "vortice-lineo-315-quiet",
+      "kind": "model",
+      "diameter_mm": 315,
+      "tr": "Ultra sessiz çalışan, akustik susturucu gövdeli, 315 mm çaplı kanal tipi karma akışlı havalandırma fanı. 2630–2890 m³/h debi aralığında çalışır.",
+      "en": "Ultra-quiet mixed-flow inline duct fan with acoustic silencer housing, 315 mm diameter. Airflow range 2630–2890 m³/h."
+    }
+  ]
+}

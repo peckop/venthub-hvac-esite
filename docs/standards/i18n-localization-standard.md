@@ -60,9 +60,79 @@
 | F | Hreflang/SEO | hreflang seti | — manuel denetim | ⚠️ blueprint var (`seo-transition-blueprint.md`) |
 | G | **i18n key-çözünürlük** | `getDictValue` nested-only | **INV-5** `i18n-key-resolution.test.ts` (her statik `t('a.b.c')` sözlükte çözülmeli; içinde-nokta düz anahtar = ham-key render) | ✅ KAPALI (ratchet: 2026-06-16'da 32 debt donduruldu → admin literal batch #364 15'ini çözünce 32→17 sıkıştı; yeni kırılma kırar) |
 
+| H | **Ölü sözlük anahtarı** (ters yön) | sözlükteki her yaprağın bir tüketicisi olmalı | **INV-6** `i18n-dead-key.test.ts` (7 tüketim ekseni: statik · şablon **ayraçsız VE ayraçlı** · `dict.x` erişimi · veri-anahtarı · ata-anahtar · yaprak-adıyla indeksleme) | ✅ KAPALI (ratchet: 2026-08-23'te 431 borç donduruldu → 79'u **canlı çıktı**, gerçek borç **352**; liste yalnız küçülebilir) |
+
+> **G ile H aynı eksen DEĞİL.** G **çağrı → sözlük** yönünü tarar (anahtar çözülüyor mu),
+> H **sözlük → çağrı** yönünü (anahtarın tüketicisi var mı). G'nin yakaladığı kusur
+> **görünür**dür (ekranda ham anahtar); H'ninki **görünmez** — bu yüzden bugüne kadar kapı
+> almadı ve birikti. Ölçüm: `docs/audits/i18n-sozluk-render-denetimi-2026-08-23.md`.
+>
+> **H'nin en kritik kuralı — önek eşlemesi AYRAÇSIZ olmalı.** Kod anahtarı ayraçsız
+> birleştirebiliyor: `` t(`pdp.actions.download${'Catalog'}`) ``. Önek `önek.` diye eşlenirse
+> bu anahtarlar ölü sanılır; denetimde tam bu yüzden **10 canlı anahtar** ölü listesine
+> düşmüştü. INV-6 o 10 anahtarı **kanarya** olarak tutar: ölü görünüyorlarsa sözlük değil
+> **kapının kendisi kördür**.
+>
+> **H'nin İKİNCİ kritik kuralı — önek eşlemesi HER İKİ şablon biçimini tanımalı.**
+> Kod anahtarı iki biçimde kurar: ayraçsız (`önek${x}`) **ve** ayraçlı (`önek.${x}`).
+> İlk sürüm yalnız ayraçsızı tanıyordu; `common.categoryList.${tKey}` (`categoryHelpers.ts:32`)
+> ve `pdp.specs.${specKey}` eşleşmedi → **79 CANLI anahtar ölü sanılıp borç listesine yazıldı**
+> (18 kategori adı + 61 PDP spec etiketi). Bu sınıfın canlılığı **veritabanında** yaşar
+> (`categories.translation_key`, ürün spec anahtarları): tam yol kaynakta HİÇ geçmez, dolayısıyla
+> anahtar silinseydi INV-5 de görmezdi ve ekranda ham anahtar belirirdi. INV-6 artık
+> `KANARYA_AYRACLI` setiyle bu körlüğü de sınar.
+
+| I | **Kasa dönüşümü ile dil** (`text-transform`) | veri kaynaklı özel ad CSS ile büyütülmez | **INV-7** `i18n-uppercase-proper-noun.test.ts` (kapsam + tespit kanaryası, ratchet 21 borç) | ✅ KAPALI (2026-08-23) |
+| J | **Locale-siz kasa çevirimi** (JS) | `src/i18n/case.ts` → `localeLower`/`localeUpper` (ekran), `foldForSearch` (arama) | **INV-8** `i18n-locale-case.test.ts` (kullanıcı-metni ifadesine uygulanan `toLowerCase()`/`toUpperCase()`; teknik dize kapsam dışı) | ✅ KAPALI (mandal: 14 dosya / 23 ihlal donduruldu, 6'sı teknik yanlış-pozitif; liste yalnız küçülebilir) |
+
+> **I ekseni — `text-transform: uppercase` DİLE DUYARLIDIR.** Eleman `lang="tr"` mirası
+> altındaysa tarayıcı Türkçe kasa uygular ve `i → İ` olur. Türkçe metin için DOĞRU, yabancı
+> özel ad için YANLIŞ: **Vortice → VORTİCE**, **Lineo → LİNEO**, **Quiet → QUİET**.
+> Kusur 2026-08-23'te canlı vitrinde görüldü (Recep bildirdi, `/tr/products/vortice-lineo-quiet`).
+>
+> **Çözüm "elemana `lang` ver" DEĞİL — ölçüldü, mümkün değil.** Aile adları **karışık dilde
+> tek dize**: `'Vortice Lineo Quiet Kanal Fanları'`. `lang="tr"` markayı bozar (VORTİCE),
+> `lang="en"` Türkçe kelimeleri bozar (ENDÜSTRIYEL, EMIŞLI). Canlı ölçüm: `product_families.name`
+> 38 adın **36'sı** bu sınıfta, `brands.name` 5 markanın 2'si. Dize tek kolonda yaşadığı için
+> parçalanamaz. Tek doğru kural: **veri kaynaklı özel adı CSS ile büyütme.**
+>
+> **Kapsam dışı (bilerek):** sözlükten gelen STATİK arayüz metnini `uppercase` ile basmak
+> serbesttir — o metnin dili sayfanın diliyle zaten aynıdır. Kusur, metnin dili ile elemanın
+> dili AYRILDIĞINDA doğar; bu yüzden `t('...')` interpolasyonları elenir.
+>
+> **Bu eksenin KAPATAMADIĞI komşu kusur:** `src/app/layout.tsx` kökte `<html lang="tr">`'yi
+> SABİT yazıyor; `/en/...` sayfaları da `lang="tr"` alıyor. INV-7 kod tarar, bu niteliği
+> göremez — ayrı kusur, ayrı sahip (rota/altyapı alanı). Görmediğini gizlemiyoruz.
+
+> **I ile J aynı eksen DEĞİL.** I, **CSS**'in (`text-transform: uppercase`) dile göre farklı
+> davranmasıdır — kusur *niteliktedir*, ekranda görünür. J, **JavaScript**'in
+> `toLowerCase()`/`toUpperCase()` metotlarının **locale'den bağımsız** olmasıdır: Türkçe'de
+> `İ → i̇` (birleşen nokta U+0307) ve `I → i` (`ı` değil) üretirler. J'nin kusuru **sessizdir** —
+> kimse hata almaz, arama boş döner.
+>
+> **J'nin GÖRMEDİĞİ üç şey** (üçü de ayrı iş):
+> 1. **Kök `<html lang>` sabit** (`src/app/layout.tsx`) — I ekseninin donmuş 21 yerini asıl
+>    açacak olan budur ve **HOLD'dadır** (çoklu-kök layout restructure, ADMIN koordinasyonu bekler).
+>    T147a başlık/açıklama/OG-yerelini getirir, `<html lang>`'i **düzeltmez**.
+> 2. **`localeCompare` dil parametresiz** — 11 kullanım, 9'unda yok. Bedeli yalnız "yanlış sıra"
+>    değil: SSR (Node) ile istemci (tarayıcı) **farklı varsayılan locale** kullanır, yani sıra
+>    **hidrasyonda değişebilir**. Müşteriye dokunan dördü ölçüm belgesinde adıyla yazılı.
+> 3. **Postgres tarafı** — vitrin araması `get_search_suggestions` / `fts_search_products`
+>    RPC'lerine gider ve JS'te kasa çevirmez; doğruluğu DB collation'ı ve Türkçe FTS sözlüğüyle
+>    ölçülür, bu kapının konusu **değildir**.
+>
+> **`toLocaleLowerCase('tr')` KULLANILMAZ:** ICU verisine bağlıdır, ICU'suz (small-icu) bir Node
+> çalıştırmasında **sessizce** locale'siz davranışa düşer. `case.ts` eşlemeyi elle yazar.
+>
+> **Arama aksan duyarsızdır** (`foldForSearch`): "siginak" yazan kullanıcı "Sığınak Fanı"nı bulur.
+> Recep onayı 2026-08-23. Eşleşmeyi yalnız **genişletir**. Ekrana basılan metinde KULLANILMAZ.
+>
+> Ölçüm: `docs/audits/locale-kasa-envanteri-2026-08-23.md`.
+
 **Açık eksenleri kapatma yöntemi:** drift denetimi (ajan) → maestro paralel göç → merkezi kapı (type+lint+test+build) → **yeni INV-x conformance testi** → commit. (B ekseninin yaptığı gibi.)
 
 ---
+
 
 ## 4. DoD — Canlı UI'da ASLA görünmemeli
 

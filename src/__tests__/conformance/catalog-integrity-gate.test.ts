@@ -74,8 +74,84 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     for (const [key, reason] of Object.entries(parsed.entries)) {
       expect(typeof reason, `${key} gerekçesi metin olmalı`).toBe('string')
       expect(reason.trim().length, `${key} gerekçesiz`).toBeGreaterThan(20)
-      expect(reason, `${key} bir T099 bulgusuna atıf yapmalı`).toMatch(/T099/)
+      // Gerekçe izlenebilir bir GÖREV KİMLİĞİNE bağlanmalı — ama kimliğin T099 olması şart
+      // değil. Kalıp 2026-08-21'e kadar `/T099/` idi; taban yalnız T099 denetiminden doğduğu
+      // için o gün doğruydu, ama sözleşmenin kendisi "bir bulguya bağlan" demek. T140 (birim
+      // sözleşmesi) satırları eklendiğinde bu test, gerekçesi TAM olan satırları yanlış
+      // kırmızıya çevirdi — testin eski sözleşmeyi kodladığı sınıf. Kural aynı kalıyor,
+      // kapsamı düzeltiliyor: herhangi bir `T<sayı>` atfı geçerli, atıfsızlık hâlâ kırmızı.
+      expect(reason, `${key} izlenebilir bir görev kimliğine (T###) atıf yapmalı`).toMatch(/\bT\d{2,}\b/)
     }
+  })
+
+  /* ────────────────────────────────────────────────────────────────────────
+   * T159 — `orphan`'in TERS YONU ve bugunku iki hatanin kapisi.
+   *
+   * 2026-08-23'te iki hata ust uste bindi: (1) 08-21'deki aile ayrismasi bir
+   * semsiye aileyi BOS birakti ve iki gun hicbir kapi gormedi; (2) o boslugu
+   * gorunce "olu kabuk, silelim" dedim — oysa aile ALTI cocugun ebeveyniydi ve
+   * silinseydi hiyerarsi kirilacakti. Yani kural yalnizca "bos aile" demeli
+   * DEGIL; bosluğun HANGI TURDEN oldugunu da soylemeli. Asagidaki sinavlar
+   * ikisini birden bekcilir.
+   * ──────────────────────────────────────────────────────────────────────── */
+  it('T159 — ürünsüz aile TABAN DIŞINDA doğarsa KIRMIZI', () => {
+    const { status, output } = runWithFixture([...baselineKeys(), 'family-empty:sinav-ailesi'])
+    expect(status).toBe(1)
+    expect(output).toContain('family-empty:sinav-ailesi')
+  })
+
+  it('T159 — yaprak kategorisiz ürün TABAN DIŞINDA doğarsa KIRMIZI', () => {
+    const { status, output } = runWithFixture([...baselineKeys(), 'product-no-subcategory:sinav-ailesi'])
+    expect(status).toBe(1)
+    expect(output).toContain('product-no-subcategory:sinav-ailesi')
+  })
+
+  it('T159 — ürünsüz aile kuralı ÇOCUK SAYISINI ölçer (ebeveyni ölü kabukla bir tutmaz)', () => {
+    const kaynak = fs.readFileSync(SCRIPT, 'utf8')
+    const blokBasi = kaynak.indexOf("id: 'family-empty'")
+    expect(blokBasi, 'family-empty kurali betikte yok').toBeGreaterThan(-1)
+    const blok = kaynak.slice(blokBasi, kaynak.indexOf("id: 'product-no-subcategory'"))
+    // Kural cocuk sayisini SORMAZSA, iki hali ayirt edemez ve "sil" onerisi ureten
+    // okumayi durduramaz — 2026-08-23'te tam bu oldu.
+    expect(blok, 'kural cocuk aileleri saymiyor').toContain('parent_family_id')
+    // Ve detay satiri o sayiyi KULLANMALI; saymak ama yazmamak okuyucuya ulasmaz.
+    expect(blok, 'detay satiri cocuk sayisini kullanmiyor').toMatch(/detail:[\s\S]*cocuk/)
+  })
+
+  /* ────────────────────────────────────────────────────────────────────────
+   * T160 — KATALOG DERINLIGI (catalog-depth-standard §K1).
+   *
+   * Kural: derinlik IKI kademe. Ucuncu GEZINME kademesi ancak aile hiyerarsisiyle
+   * dogar, bu yuzden kapi tam olarak onu olcer. Sinav uc sey bekcilir: kural VAR,
+   * anahtar EBEVEYN bazinda (kusur cocuklarda degil hiyerarsinin kurulmasinda), ve
+   * cetvel dosyasi kapiyi ADIYLA gosteriyor (cetvel-kapi baginin kopmamasi icin).
+   * ──────────────────────────────────────────────────────────────────────── */
+  it('T160 — aile hiyerarşisi TABAN DIŞINDA doğarsa KIRMIZI', () => {
+    const { status, output } = runWithFixture([...baselineKeys(), 'family-nested:sinav-ailesi'])
+    expect(status).toBe(1)
+    expect(output).toContain('family-nested:sinav-ailesi')
+  })
+
+  it('T160 — kural EBEVEYN bazında sayar (çocuk başına satır üretmez)', () => {
+    const kaynak = fs.readFileSync(SCRIPT, 'utf8')
+    const blokBasi = kaynak.indexOf("id: 'family-nested'")
+    expect(blokBasi, 'family-nested kurali betikte yok').toBeGreaterThan(-1)
+    const blok = kaynak.slice(blokBasi, kaynak.indexOf("id: 'product-no-subcategory'"))
+    // Kusur tek tek cocuklarda DEGIL, hiyerarsinin kurulmus olmasinda. Cocuk bazli anahtar
+    // altı gerekcesiz taban satiri uretirdi ve kimse okumazdi (spec-type ile ayni desen).
+    expect(blok, 'anahtar ebeveyn bazinda degil').toMatch(/key:.*parent_slug/)
+    expect(blok, 'kural ust aile bagini sorgulamiyor').toContain('parent_family_id')
+  })
+
+  it('T160 — cetvel dosyası duruyor ve kapıyı ADIYLA gösteriyor', () => {
+    const cetvel = path.join(process.cwd(), 'docs', 'standards', 'catalog-depth-standard.md')
+    expect(fs.existsSync(cetvel), 'catalog-depth-standard.md yok').toBe(true)
+    const metin = fs.readFileSync(cetvel, 'utf8')
+    // Cetvel kapiyi adiyla gostermezse, kural degisince kimse cetveli guncellemez.
+    expect(metin, 'cetvel kapiyi adiyla gostermiyor').toContain('family-nested')
+    // Ve K2'nin makineye devredilmedigini ACIKCA yazmali — yoksa biri onu da
+    // "kapiya baglayalim" diye olculemez bir sinav yazar.
+    expect(metin, 'cetvel K2 icin makine kapisi olmadigini yazmiyor').toMatch(/K2[\s\S]{0,400}makine kapisi|makine kapısı/i)
   })
 
   it('ölçemeyen kapı YEŞİL dönmez — bağlantı dizesi yokken çıkış 0 DEĞİL', () => {
