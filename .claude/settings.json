@@ -61,6 +61,16 @@
             "statusMessage": "lane-guard"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/bash-write-guard.cjs",
+            "statusMessage": "bash-write-guard"
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -105,6 +115,16 @@
           {
             "type": "command",
             "command": "node .claude/hooks/accumulate-edits.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/bash-write-audit.cjs",
+            "statusMessage": "bash-write-audit"
           }
         ]
       }
