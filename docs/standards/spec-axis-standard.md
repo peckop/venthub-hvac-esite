@@ -120,11 +120,30 @@ uydurmaz (bkz. `ductFanSelection.parsePQCurve`).
 
 ## 4. Kapı
 
-`scripts/db/checks/catalog-integrity.mjs` içindeki **`spec-value-not-numeric`** kuralı K1'i
-bekçiler: adı sayısal birim eki taşıyan bir alanda sayısal olmayan değer bulursa sayar.
+K1'i bekçileyen kural `scripts/db/checks/catalog-integrity.mjs` içindeki **`spec-type`**'tır:
+adı sayısal birim eki taşıyan bir alanda sayısal olmayan değer bulursa alan|marka bazında sayar.
 
-Taban (`catalog-integrity-baseline.json`) **yalnız kısalır**: bugünkü 41 ihlal gerekçesiyle
-af edilmiştir, **yeni ihlal eklenemez**. K2 ve K3 bugün için insan kuralıdır — makine kapısı
+> **Düzeltme (2026-08-23).** Bu bölümün ilk sürümü "kapı henüz yazılmadı, `spec-value-not-numeric`
+> adında yeni bir kural gerekiyor" diyordu. **Yanlıştı** — betik ölçülmeden, hatırdan yazılmıştı.
+> `spec-type` zaten vardı ve Nicotra'nın 35 kaydı tabanda gerekçesiyle affedilmişti bile. Gerçek
+> boşluk kuralın yokluğu değil, **kapsamının darlığı**ydı: sonek listesi dokuz kalemdi
+> (`v|m3h|w|pa|kg|mm|a|ls|pct`) ve K1'in listesiyle örtüşmüyordu. (memory:
+> `scope-written-from-memory-not-measured`)
+
+**Kapsam ölçülerek genişletildi.** Canlı DB'deki 34 ayrı anahtar soneki tek tek elden geçirildi;
+birim olanlar eklendi (`_c`, `_l`, `_ms`, `_hz`, `_db`, `_kw`, `_24h`), birim olmayanlar
+(`_type`, `_class`, `_sensor`, `_curve`, `_rating`, `_code`, `_model`, `_size`, `_max`, …) kasten
+dışarıda bırakıldı — ikincisini eklemek kapıyı gürültüye boğar ve gürültülü kapı kapatılır.
+Genişletmenin ölçülen bedeli **tek yeni sınıf**: `operating_temperature_c` (Vortice, 3 kayıt,
+`"5 - 32"`); yani dokuzdan on altı soneğe çıkmak **sıfır yanlış kırmızı** üretti.
+
+**Kapsamın kendisinin de bir kapısı var:** `src/__tests__/conformance/spec-axis-gate.test.ts`
+(INV-SPEC-AXIS-1). Sonek listesini betikten **okur** (kopyalamaz) ve iki yönlü kanaryayla sınar:
+birim eki taşıyan ad yakalanmalı, taşımayan ad yakalanmamalı. Tek yönlü kanarya listeyi `.*`
+yaparak da geçilirdi. Sınav sabotajla doğrulandı: eski dar desen kanaryada **8 ad kaçırıyor**.
+
+Taban (`catalog-integrity-baseline.json`) **yalnız kısalır**: bugünkü ihlaller gerekçesiyle
+affedilmiştir, **yeni ihlal eklenemez**. K2 ve K3 bugün için insan kuralıdır — makine kapısı
 ancak alanlar eksen etiketiyle beyan edilirse mümkün olur, o da şema işidir (Recep kapısı).
 
 ## 5. İlgili
