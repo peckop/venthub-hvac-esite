@@ -117,22 +117,72 @@ gerçek aynı anda inmelidir.
 
 ## 6. Uygulama sırası (Recep kararı, OPS sıralaması)
 
-1. **Bu cetvel** (docs, migration yok) — buradasınız.
-2. **Migration**: sözlük genişletme + `DEFAULT 'TRY'` kaldırma (`payment_transactions.currency`
-   **ve** `venthub_order_items.display_currency` — sessiz varsayılan **iki** kolonda) +
-   `venthub_orders`'a `currency NOT NULL` kolonu (5 sipariş, hepsi TRY → backfill güvenli) +
-   `CASCADE → RESTRICT` + `INV-LEDGER-1` kapısı. **Merge = Recep** (migration = prod).
-3. **Yazıcı**: `iyzico-callback` ve `iyzico-refund` defteri yazar; `payment_status` türetilir.
+> ⚠ **Bu bölüm 2026-08-23 akşamı ÖLÇÜMLE yeniden yazıldı.** İlk hâli "migration + yazıcı
+> **aynı PR**'da insin" diyordu ve bu **yetmiyor** — gerekçesi hemen aşağıda. Cetvelin
+> kendisiyle çelişmemesi için sıra iki adıma bölündü.
+
+### 6.0 Neden aynı PR yetmiyor — ÖLÇÜLDÜ
+
+`master`'a bir push, **iki ayrı iş akışını PARALEL** tetikler ve aralarında **sıra garantisi yoktur**:
+
+| İş akışı | Neyi canlıya taşır | Tetikleyici |
+|---|---|---|
+| `supabase-migrate.yml` | DB şeması | `supabase/migrations/**.sql` yolu |
+| `deploy-functions.yml` | Edge Function kodu | değişen fonksiyonlar |
+
+Yani "aynı PR" yalnız **niyeti** birleştirir, **canlıya iniş ânını** birleştirmez. Arada bir
+pencere vardır ve `venthub_orders.currency` için **iki yön de kırıyor**:
+
+- **migration önce inerse** → eski fonksiyon `currency` göndermez → `NOT NULL` ihlali → sipariş oluşturma **500**.
+- **fonksiyon önce inerse** → kolon henüz yoktur → PostgREST "column does not exist" → yine **500**.
+
+Üçüncü ölçüm tuzağı kapatıyor: `iyzico-payment/index.ts`'te zaten bir şema-sapması yakalama kolu
+**var** (satır ~502–520), ama regexi **yalnız** `shipping_method` ile eşleşiyor — `currency`
+hatasında **devreye girmez**, sert 500 döner. Bu, kodun varlığına değil **regexin kapsamına**
+bakılarak doğrulandı.
+
+> **KURAL (bu cetvelin dışına da geçerlidir):** migration ile onu tüketen kod **aynı PR'da olsa
+> bile**, şema değişikliği **yazıcıya geriye uyumlu** olmak zorundadır — *genişlet, sonra daralt*
+> (expand-contract). "Aynı PR" bir dağıtım garantisi değildir.
+
+### 6.1 Adımlar
+
+1. **Bu cetvel** (docs, migration yok) — *inmiş durumda* (#795, merge `98bc08ba`).
+2. **ADIM-1 — genişlet** (migration + yazıcı + kapı, tek PR, **merge = Recep**):
+   - `venthub_orders.currency text NOT NULL **DEFAULT 'TRY'**` — varsayılan **bilerek** var:
+     eski yazıcı da yeni yazıcı da çalışır, pencere kapanır.
+   - `iyzico-payment` `orderData`'sı `currency`'yi **açıkça** gönderir.
+   - Şema-sapması kolunun regexi `currency`'yi de kapsar (yalnız ADIM-1 penceresi için; ADIM-2'de kaldırılır).
+   - **Sözlük CHECK genişletme** (§2) + **`CASCADE → RESTRICT`**. İkisi de burada, çünkü
+     `payment_transactions` **0 satır** ve kod tabanında **hiç yazıcısı yok** (ölçüldü) —
+     geriye uyumluluk sorunu üretmiyorlar.
+   - **`INV-LEDGER-1` kapısı** burada iner: §5'in kuralı "kapı, zorladığı gerçek aynı anda
+     inmelidir" der; sözlük kısıtı bu adımda indiği için kapısı da bu adımda olmalıdır.
+     Kapı **statiktir**: §2 tablosu ile migration SQL'indeki CHECK listesi birebir eşitlenir
+     (canlı DB'ye sormaz → CI'da deterministik).
+3. **ADIM-2 — daralt** (ayrı PR, **merge = Recep**). Yalnızca ADIM-1'in **her iki tarafının da
+   canlı olduğu ÖLÇÜLDÜKTEN** sonra:
+   - `DEFAULT 'TRY'` düşürülür — `venthub_orders.currency`, `payment_transactions.currency`
+     **ve** `venthub_order_items.display_currency` (sessiz varsayılan **üç** kolonda).
+   - Şema-sapması kolunun `currency` dalı kaldırılır (geçici koltuk değneğiydi).
+4. **Yazıcı**: `iyzico-callback` ve `iyzico-refund` defteri yazar; `payment_status` türetilir.
    **Aynı adımda** `trg_sync_payment_status_*` tetikleyicisinin kapsamı daraltılır ya da kaldırılır
    (§7 #8) — ikinci otorite ayakta kalırken defter otorite olamaz.
 
-⚠ **Adım 2'de ölçülmüş bir tuzak var: `venthub_orders.currency` NOT NULL, varsayılansız eklenirse
-sipariş oluşturma KIRILIR.** Ölçüldü: `iyzico-payment/index.ts`'teki `orderData` nesnesi
-(satır ~464) `currency` **göndermiyor** — kolon bugün yok. Bu yüzden migration, alanı gönderen
-kod değişikliğiyle **aynı PR'da** inmelidir; anahtar ile tüketicisi ayrı inerse bir sonraki
-gerçek sipariş insert'te patlar. Karşılaştırma: `venthub_order_items.display_currency`'de bu
-tuzak **yok** — orada yazıcı zaten açıkça `display_currency: 'TRY'` gönderiyor (satır 674),
-yani o kolonda varsayılanı kaldırmak tek başına güvenli.
+### 6.2 ADIM-2 ne zaman güvenli — KANIT TANIMI
+
+"Bir süre geçti" kanıt değildir. ADIM-2 ancak şu **üçü birden** ölçüldüğünde açılır:
+
+1. ADIM-1 merge commit'inde **`supabase-migrate.yml` ve `deploy-functions.yml` iş akışlarının
+   İKİSİ de `success`** (biri `skipped` ise bu şart **sağlanmamıştır**).
+2. **Canlı fonksiyon sürümü** ADIM-1'i içeriyor — prod'daki `iyzico-payment` sürüm numarası
+   deploy sonrası **artmış** olmalı (repo ile prod sapma işi bunu zaten ölçüyor).
+3. **Kolon canlıda var**: `venthub_orders.currency` DB'de sorgulanarak doğrulanır.
+
+⚠ `venthub_order_items.display_currency` ve `payment_transactions.currency` bu üç şarta
+**bağlı değildir** — orada varsayılanı düşürmek tek başına güvenlidir (ilkinde yazıcı zaten
+`display_currency: 'TRY'` gönderiyor, satır 674; ikincisinde **yazıcı yok**). ADIM-2'de
+birlikte inmelerinin tek sebebi, üç kolonun **aynı sınıf** olması ve tek yerde bitmesidir.
 
 ## 7. ÇELİŞEN-MEVCUT
 
