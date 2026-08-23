@@ -83,6 +83,48 @@ Bu yüzden Satış Projesi **VentHub'ın özgün cetvel alanıdır** ve şu kura
 > (aşama, tahmini bütçe, sorumlu temsilci) **T130 CRM tasarımının işidir**. Burada yalnız
 > teklifle kesişen üç şey bağlanır: kimlik, muhatap rolü, RLS izolasyonu.
 
+## 2.5) Muhatap kimliği — **hesapsız teklif OLUR, kimliksiz teklif OLMAZ**
+
+Recep kararı (08-20), iki cümlede ve bu cetvelin en sert ayrımlarından biri:
+
+1. *"Müşterinin teklif sürecinde olabilmesi için cari/iletişim/isim bilgileri sistemde girili
+   olmalı — kimliksiz birine teklif iletilemez."*
+2. *"Kişinin teklifini ONAYLAYABİLMESİ veya TAKİP EDEBİLMESİ için sisteme KAYIT olması gerekir."*
+
+Buradan **iki ayrı eksen** çıkar ve karıştırılmaları v1'in en pahalı hatası olurdu:
+
+| Eksen | Şart | Niçin |
+|---|---|---|
+| **Kimlik** (teklifin var olabilmesi) | isim + e-posta + telefon **zorunlu** | Kime teklif verildiği belgede yazmalı; ERP'de muhatapsız belge yoktur |
+| **Hesap** (teklifin onaylanabilmesi/takip edilebilmesi) | `user_id` dolu | Kabul hukuki bir eylemdir (§7.1); kimin kabul ettiği kimliklenmiş bir oturuma bağlanmalı |
+
+**Sonuç — prospect (hesapsız cari) teklifi:**
+
+- `venthub_quotes.user_id` **NULLABLE** olur. Satıcı, hesabı olmayan bir muhatap için teklif
+  hazırlayıp e-postayla iletebilir. Bu **RFQ yolunun tersi** bir giriştir ve §4'teki `draft`
+  girişinin doğal genişlemesidir.
+- İletilen jeton-linki **yalnız GÖRÜNTÜLEMEdir**: PDF/özet açılır, **kabul aksiyonu taşımaz**.
+  Kabul etmek isteyen kayıt olur; **aynı e-posta** ile açılan hesap teklifle eşleşir (`user_id`
+  dolar), ondan sonra §7.2'nin değer kapısından geçerek kabul edebilir.
+- ⭐ **Kapı DB'dedir, ekranda değil.** `user_id IS NULL` iken durum makinesi **onay yönüne
+  geçemez**: `quoted → accepted` ve `accepted → converted` geçişleri `enforce_quote_status_transition`
+  içinde reddedilir. Jeton-linkinden kabul düğmesini kaldırmak bir yüzey kararıdır ve **tek
+  başına sayılmaz** — bu belgenin §6'da yazdığı "üçüncü kapı" kuralının aynısı.
+
+> **Bu kilit bir bulgunun kökten panzehiridir.** T134 ölçümünde şunu kanıtlamıştım: §3.3 ile
+> admin INSERT politikası açıldığında, giriş-durumu kilidi olmasa admin bir belgeyi doğrudan
+> `converted` yazabilirdi (R8 onu `draft` ile kapatır). `user_id` kilidi ikinci ve bağımsız
+> bir kapıdır: belge doğru durumdan başlasa bile, **muhatabı hesapsızken** kabul/dönüşüm
+> yönüne yürüyemez.
+
+**Eşleşme kuralı — e-posta tekilliği.** Hesap açılışında teklifle eşleşme `contact_email`
+üzerinden yapılır ve **tenant kapsamında** çalışır. Eşleşme **otomatik doldurma değil,
+sahiplenmedir**: `user_id` bir kez dolar, geri alınmaz (satıcı iptali ayrı eksendir).
+
+**Sınır — bu cetvelin yazmadığı:** cari kartın CRM tarafındaki tam alan seti (vergi no, adres,
+ödeme koşulu) **T130'un işidir**. Burada yalnız teklifin var olabilmesi için gereken üçlü
+bağlanır: isim, e-posta, telefon.
+
 ## 3) Veri modeli v2
 
 ### 3.1 Başlık (`venthub_quotes`) — eklenecek alanlar
@@ -97,6 +139,8 @@ Bu yüzden Satış Projesi **VentHub'ın özgün cetvel alanıdır** ve şu kura
 | `valid_until` | timestamptz | Belge düzeyinde süre (Ç7) | Odoo/PandaDoc |
 | `currency` | char(3), NOT NULL | Para birimi **türetilmez** | INV-CURRENCY-1 |
 | `total_amount` | numeric | Belge toplamı (kalemlerden türetilir, snapshot'lanır) | fatura hattı |
+| `user_id` | uuid → `auth.users`, **NULLABLE** | Hesapsız (prospect) muhatap; hesap açılınca dolar (§2.5) | Recep 08-20 |
+| `contact_name` · `contact_email` · `contact_phone` | text, **NOT NULL** | Kimlik üçlüsü; kimliksiz teklif olmaz (§2.5) | Recep 08-20 |
 | `sales_project_id` | uuid, nullable | Satış Projesi bağı (§2) | özgün |
 | `party_role` | text, nullable | Muhatap rolü; proje bağı varsa NOT NULL | özgün |
 | `sent_at` | timestamptz | İletim damgası (§12) | — |
@@ -138,6 +182,10 @@ dışıdır** (§14).
 - Müşteri kabul politikası **geri alınmaz, sertleştirilir** (§7.2).
 - **Satış Projesi izolasyonu:** muhatap yalnız kendi tekliflerini görür. `sales_project_id`
   üzerinden JOIN ile "aynı projedeki diğer teklifler" **müşteri yüzüne asla açılmaz**.
+- **Prospect kapsamı (§2.5):** `user_id IS NULL` olan teklif **hiçbir müşteri politikasında**
+  görünmez — sahiplik yüklemi (`user_id = auth.uid()`) NULL ile eşleşmez, bu yüzden hesapsız
+  belge yalnız satıcı yüzünde yaşar. Jeton-linki bir RLS yolu **değildir**: belgeyi sunucu
+  tarafında, yalnız okuma amaçlı üretir (§12) ve kabul aksiyonu taşımaz.
 - Tüm politikalar `tenant_id = jwt_tenant_id()` kapsamında kalır (v0.1 Q3, T057 dersi).
 
 ## 4) Durum makinesi v2
@@ -171,6 +219,13 @@ kazanılan tek şey terim güzelliği olurdu. `sent_at` damgası zaten iletim an
 **`superseded` niçin ayrı bir terminal:** revizyon yayımlandığında eski revizyon ne
 reddedilmiştir ne süresi dolmuştur — **yerine geçilmiştir**. Bunu `rejected`'a katlamak
 müşteri portalındaki geçmişi yalan söyler hâle getirirdi (§8).
+
+**⭐ MUHATAP KİLİDİ (§2.5) — geçiş haritasının üstünde ikinci bir şart.** `user_id IS NULL`
+iken `quoted → accepted` ve `accepted → converted` geçişleri **reddedilir**. Kilit
+`enforce_quote_status_transition` içindedir; ekranda kabul düğmesini gizlemek üçüncü kapıdır
+ve tek başına sayılmaz (§6 ile aynı gerekçe). Harita diğer yönlerde hesapsız belge için
+**açık kalır**: satıcı hesapsız muhataba teklif hazırlar, iletir, gerekirse iptal eder —
+yalnız **kabul ve dönüşüm** hesap ister.
 
 **SSOT değişmez:** `src/lib/quotes/quoteStatusMachine.ts` tek kaynaktır; DB tetiği
 `enforce_quote_status_transition` aynı haritanın aynasıdır (INV-QUOTE-1 R1–R3 aynen geçerli,
@@ -231,6 +286,12 @@ Kabul **tek bir kavramdır**; değişen yalnız kanaldır ve her kanal kendi kan
 | **site** (birincil dijital) | Müşteri, oturumla | beyan metni + `accept_ip` + `accept_declaration_version` + kabul edilen `revision_no` + damga |
 | **e-posta beyanı** | Admin işler | `accept_evidence_ref` (ekli dosya/mesaj referansı) + `accept_recorded_by` |
 | **telefon** | Admin işler | `accept_evidence_ref` (not/kayıt referansı) + `accept_recorded_by` |
+
+**⭐ Üç kanalın ortak ön şartı: `user_id` DOLU olmalıdır (§2.5).** E-posta ve telefon
+kanallarında kabulü admin işler, ama **kimin adına** işlediği hesaplı bir muhataba bağlanır;
+hesapsız muhatabın kabulü hiçbir kanaldan kaydedilemez. Admin bu durumda önce muhatabı
+hesaba bağlar (aynı e-posta ile davet), sonra kabulü işler. Bu, kanal sayısını değil
+**kanıt zincirinin kime bağlandığını** korur.
 
 **Site kanalı için beyan metni:** *"teklifi ve satış şartlarını kabul ediyorum."* Bu bir
 checkbox/clickwrap'tir ve T134'ün hukuki bulgusuna göre **çizilmiş imzayla eşdeğer
@@ -441,9 +502,15 @@ terminaller, sahiplik+tenant, fiyat kolonlarına müşteri yazamaz, rota↔sayfa
 | R13 | Kabul gerçekleştiğinde bildirim ucu **çağrılır** | §12 — Dolibarr #20204 sınıfı |
 | R14 | Müşteri yüzü sorgularında `sales_project_id` üzerinden **başka muhatabın** teklifi görünmez | §2/3 — çoklu-taraf izolasyonu; ihlali ticari felaket |
 
+| R15 | `user_id IS NULL` iken `accepted` ve `converted` yönüne geçiş **DB tarafından** reddedilir | §2.5 — muhatap kilidi; ekran kapısı sayılmaz |
+| R16 | `contact_name`/`contact_email`/`contact_phone` NOT NULL; kimliksiz teklif satırı oluşamaz | §2.5 — kimlik ekseni |
+| R17 | Hesapsız teklif hiçbir müşteri SELECT politikasından dönmez | §3.3 — sahiplik yüklemi NULL ile eşleşmemeli |
+
 **Ölçüm biçimi zorunlu:** kurallar **etki** ölçer, metin değil. R9/R12 için ayırt edici kol
 şarttır — yalnız ret gözlemi "kanal kapalı" hâlinden ayırt edilemez; **kabul eden bir kol**
-da denenmelidir (KVKK §3.6 kapanış kanıtının yöntemi: `begin … rollback`, prod'a sıfır yazma).
+da denenmelidir. R15 için kabul eden kol: `user_id` dolduruldu → AYNI geçiş **geçmeli**;
+yalnız ret gözlemi "tetik hiç çalışmıyor" hâlinden ayırt edilemez. R17 için: hesap bağlanınca
+AYNI belge müşteri sorgusundan **dönmeli**. Yöntem (KVKK §3.6 kapanış kanıtının yöntemi: `begin … rollback`, prod'a sıfır yazma).
 
 Bekçinin kendisi **bilerek bozularak** kırmızı gösterilir; geçmesi çalıştığını kanıtlamaz.
 Yorum sıyırma `[^\r\n]` ile yapılır (CRLF fantomu, T017 dersi).
@@ -459,8 +526,19 @@ sonra **tek bir migration** olarak iner:
 5. RLS: admin INSERT politikaları (Ç1/Ç2), müşteri kabul politikasının sertleştirilmesi (§7.2),
    Satış Projesi izolasyonu (§2/3)
 6. Expiry cron işi (§6, kapı 1)
+7. **Muhatap kimliği (§2.5):** `user_id` NULLABLE'a çekilir; `contact_name`/`contact_email`/
+   `contact_phone` NOT NULL eklenir; muhatap kilidi `enforce_quote_status_transition` içine yazılır
 
-**Göç riski SIFIR — ölçüldü:** `venthub_quotes` 0 satır, `venthub_quote_items` 0 satır. Bu,
+⚠ **NOT NULL kısıtı MEVCUT satırlarda da koşar.** Bugün `venthub_quotes` 0 satır olduğu için
+bedeli sıfır; modül kullanılmaya başladıktan sonra aynı kısıt geriye dönük ihlal üretir. Kısıt
+eklenmeden önce canlı DB'de ihlal sayısı **merge öncesi** ölçülür.
+
+**Bugünkü şema — ölçüldü (2026-08-23, canlı `information_schema.columns`):** `venthub_quotes.user_id`
+şu an **NOT NULL**. Yani §2.5 kilidi bir ekleme değil, önce bir **gevşetmedir** (`drop not null`)
+ve ardından gelen kilit tetikte kurulur. Sıra tersine çevrilirse hesapsız belge hiç oluşamaz.
+
+**Göç riski SIFIR — ölçüldü:** `venthub_quotes` 0 satır, `venthub_quote_items` 0 satır. **Yeniden ölçüldü 2026-08-23: hâlâ 0/0** (bu iddia
+zamanla bayatlar; kısıt eklenmeden önce tekrar ölçülür). Bu,
 şemayı bugün doğru kurmak için elimizdeki en ucuz penceredir; modül kullanılmaya başladıktan
 sonra aynı değişikliklerin bedeli veri göçüyle birlikte artar.
 
