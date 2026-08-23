@@ -1,10 +1,19 @@
 import type { Route } from 'next'
 import { notFound,permanentRedirect } from 'next/navigation'
 
+import { en } from '@/i18n/dictionaries/en'
+import { tr } from '@/i18n/dictionaries/tr'
+import { getDictValue } from '@/i18n/getDictValue'
 import { storagePathToUrl } from '@/lib/images/productImage'
-import { assertNoUuid, buildProductGroupJsonLd, buildSeriesLandingJsonLd } from '@/lib/seo/jsonld'
+import {
+  assertNoUuid,
+  buildBreadcrumbJsonLd,
+  buildProductGroupJsonLd,
+  buildSeriesLandingJsonLd,
+} from '@/lib/seo/jsonld'
 import { getAllFamilySlugs } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+import { getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
 import SeriesLandingView from '@/views/category/SeriesLandingView'
 
 import { SITE_URL } from '../../../../config/siteUrl'
@@ -198,12 +207,60 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
 
   if (jsonLd) assertNoUuid(jsonLd)
 
+  // T154-VH bağlama — MODEL dalında BreadcrumbList JSON-LD.
+  //
+  // Kategori adları SUNUCUDA çözülür. Görsel breadcrumb (ProductDetailPageView) adları
+  // `useCategories()` istemci bağlamından alır; o bağlam ilk render'da BOŞTUR. Zinciri
+  // oradan üretseydik JSON-LD boş çıkardı ve iş "bitmiş görünüp" yüzey düzelmezdi —
+  // makine breadcrumb'ı yine göremezdi.
+  //
+  // Ham `category.name`/slug YAZILMAZ (Mutlak Kural 7): DB'deki ad İngilizce'dir ve TR
+  // sayfaya sızar. Sözlük → menu_label → name zinciri `getCategoryDisplayName` içinde.
+  const dict = lang === 'en' ? en : tr
+  const t = (key: string) => getDictValue(dict, key)
+
+  const mainCategory = family?.category ?? null
+  const subCategory = family?.subcategory ?? null
+  const mainName = mainCategory ? getCategoryDisplayName(mainCategory, t) : ''
+  const mainSlug = mainCategory ? getLocalizedCategorySlug(mainCategory, lang) : ''
+  const subName = subCategory ? getCategoryDisplayName(subCategory, t) : ''
+  const subSlug = subCategory ? getLocalizedCategorySlug(subCategory, lang) : ''
+
+  // Kategori çözülemezse basamak HİÇ eklenmez (zincir kısalır, kırılmaz) — görsel
+  // breadcrumb'ın ve CategoryLandingView'ın "parentVm yoksa basamak yok" kuralıyla aynı.
+  // Ad boşsa da eklenmez: `buildBreadcrumbJsonLd` boş adda ATAR, ve boş bir basamak
+  // zaten makineye hiçbir şey söylemez.
+  const breadcrumbJsonLd =
+    family && family.name.trim()
+      ? buildBreadcrumbJsonLd({
+          lang,
+          baseUrl: SITE_URL,
+          steps: [
+            { name: t('category.breadcrumbHome'), path: '/' },
+            ...(mainName && mainSlug ? [{ name: mainName, path: Routes.category(mainSlug) }] : []),
+            ...(subName && subSlug && mainSlug && subSlug !== mainSlug
+              ? [{ name: subName, path: Routes.category(mainSlug, subSlug) }]
+              : []),
+            // Bulunulan sayfa: path NULL olmak ZORUNDA (helper sözleşmesi).
+            { name: family.name, path: null },
+          ],
+        })
+      : null
+
+  if (breadcrumbJsonLd) assertNoUuid(breadcrumbJsonLd)
+
   return (
     <>
       {jsonLd && (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
+        />
+      )}
+      {breadcrumbJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
         />
       )}
       {/* W4b: KDV etiketi sabit değil — bireysel/anon brüt, bayi/kurumsal net görür. */}
