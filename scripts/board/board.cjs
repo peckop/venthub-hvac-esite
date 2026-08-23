@@ -402,7 +402,7 @@ function markSeen(sid, notes) {
 module.exports = {
   BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS, PANOYA_YAZAN_FIILLER,
   append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary,
-  notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, gozcuDurumu,
+  notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, gozcuDurumu, sidDogrula,
   globToRegExp, toRepoRelative, repoRootFor,
 }
 
@@ -483,6 +483,88 @@ function yoklama(now = Date.now()) {
   return bas + '\n' + satirlar.join('\n') + '\n' + alt
 }
 
+/**
+ * OTURUM KİMLİĞİ DOĞRULAMASI — `--to` doğrulanıyordu, `--sid` DOĞRULANMIYORDU.
+ *
+ * ⚠ ÖLÇÜLMÜŞ VAKA (2026-08-20): bir şerit uzun bir karar notu gönderirken kendi sid'ine
+ * altı KİRİL harf karıştı (kod noktaları 0x432 0x437 0x430 0x438 0x43c 0x43e). Komut
+ * **başarılı** döndü ve "not bırakıldı" yazdı. Ama `sessionFile()` geçersiz karakterleri
+ * `_` ile değiştirdiği için not `events.99fa366e-d8bb-4______61.jsonl` adlı YENİ bir
+ * dosyaya düştü: gönderen teslim edildiğini sandı, alıcı hiç görmedi. Not ancak başka bir
+ * şerit dizini tararken bulundu.
+ *
+ * Sınıf tanıdık ve bu dosyada zaten yazılı: **sahte-yeşil**. `--to` için 2026-08-16'da
+ * kapatılmıştı (bkz. `resolveNoteTarget`), `--sid` tarafı açık kalmıştı. Yani kapı vardı,
+ * kapsamı eksikti.
+ *
+ * NİÇİN SANITIZE YETMEZ: temizleme, bozulmayı ONARMAZ — GİZLER. Yanlış kimlik yanlış dosyaya
+ * yazar, kıdem yanlış oturuma geçer, `who` panoyu iki sahiple gösterir. Doğru davranış
+ * fail-closed: okunamayan kimlikle YAZMA.
+ */
+const SID_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+/** Elle çalıştıran için serbest kimlik — ASCII, dar küme. */
+const SID_ELLE = /^[A-Za-z0-9][A-Za-z0-9._-]{1,40}$/
+
+/** Kimliğin içindeki kabul edilmeyen karakterleri KOD NOKTASIYLA gösterir. */
+function bozukKarakterler(sid) {
+  const kotu = []
+  for (const ch of String(sid)) {
+    if (!/[A-Za-z0-9._-]/.test(ch)) {
+      kotu.push(`"${ch}" (U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')})`)
+    }
+  }
+  return kotu
+}
+
+/**
+ * @returns {{ok: true, tur: string} | {ok: false, sebep: string, oneri: string}}
+ */
+function sidDogrula(sid) {
+  const ham = String(sid)
+
+  if (SID_UUID.test(ham)) return { ok: true, tur: 'oturum kimliği' }
+
+  const kotu = bozukKarakterler(ham)
+  if (kotu.length > 0) {
+    return {
+      ok: false,
+      sebep: `kimlikte kabul edilmeyen karakter var: ${kotu.slice(0, 8).join(', ')}`,
+      oneri:
+        'Bu tam olarak 2026-08-20 vakası: karakterler sessizce "_" yapılır, not YENİ bir ' +
+        'dosyaya düşer ve alıcı hiç görmez. Kimliği yeniden yaz (kopyala-yapıştır, elle DEĞİL).',
+    }
+  }
+
+  // UUID'e BENZİYOR ama uymuyor: en tehlikeli sınıf — göz onu doğru sanır.
+  if (ham.includes('-') && ham.length >= 24) {
+    return {
+      ok: false,
+      sebep: `kimlik uuid'e benziyor ama geçerli bir uuid DEĞİL (uzunluk ${ham.length})`,
+      oneri: 'Beklenen biçim: 8-4-4-4-12 onaltılık. Kimliği yeniden kopyala.',
+    }
+  }
+
+  if (!SID_ELLE.test(ham)) {
+    return {
+      ok: false,
+      sebep: 'kimlik ne geçerli bir uuid ne de kabul edilebilir bir elle-kimlik',
+      oneri: 'Elle çalıştırıyorsan dar biçim kullan: --sid recep-manual',
+    }
+  }
+
+  // Buraya gelen kimlik dar ASCII biçimini karşılıyor → ELLE KİMLİK, serbest.
+  //
+  // ⚠ BURADA BİR KOL DENEDİM VE GERİ ALDIM — gerekçesi ölçüm: ilk sürüm, panoda geçmişi
+  // olmayan yeni bir elle-kimliği reddedip `--yeni-kimlik` bayrağı istiyordu ("yazım hatası
+  // ile kasıtlı yeni kimlik ayırt edilemez"). İki sebeple çıkardım:
+  //   1) INV-BOARD-3 bunu KIRDI: `--sid recep-manual` bayraksız çalışmalı — bu YAZILI bir
+  //      muafiyet ve insanın elle çalışmasını koruyor. Kapı kendi sözleşmemizi bozuyordu.
+  //   2) Asıl vakayı o kol YAKALAMADI: 2026-08-20'de bozulan kimlik Kiril harf taşıyordu ve
+  //      onu KARAKTER kolu yakalıyor. Yani kolun bedeli ölçülmüş, getirisi ölçülmemişti.
+  // Ölçülmemiş getiri için yazılı bir muafiyeti kırmak, kapıyı sertleştirmek değil daraltmaktır.
+  return { ok: true, tur: 'elle kimlik' }
+}
+
 /* ---------------------------- CLI ---------------------------- */
 if (require.main === module) {
   /** Değer alan bayraklar — değerleri serbest metinden AYIKLANMALI, yoksa nota sızar. */
@@ -520,6 +602,24 @@ if (require.main === module) {
     console.error('başarılı görünür — o yüzden yazmıyoruz (T079-VH).')
     console.error('çözüm: --sid <oturum-kimliğin> ekle. Elle çalıştırıyorsan kendine ad ver: --sid recep-manual')
     process.exit(1)
+  }
+
+  // KIMLIGIN VARLIGI YETMEZ, BICIMI DE DOGRULANIR (2026-08-20 vakasi — sidDogrula yorumuna bak).
+  // Eski hali yalniz "sid var mi" diye bakiyordu; bozuk bir kimlik sessizce YENI bir pano
+  // dosyasi doguruyor ve komut yine "not birakildi" diyordu. Ayni sahte-yesil ailesi.
+  if (sid && PANOYA_YAZAN_FIILLER.has(verb)) {
+    const kimlik = sidDogrula(sid)
+    // KAÇIŞ KAPISI YOK — ve bu bilinçli. İlk sürümde `--yeni-kimlik` bayrağı vardı; kendi
+    // sabotaj testimde Kiril harfli kimliğe o bayrağı verdim ve komut YAZDI, yani kaçış
+    // kapısı kapının kapattığı deliği yeniden açıyordu. Bayrak tümden kaldırıldı: bozuk
+    // kimlik hiçbir biçimde geçmez, geçerli elle-kimlik ise zaten bayrak istemez.
+    if (!kimlik.ok) {
+      console.error('oturum kimliği REDDEDİLDİ: ' + kimlik.sebep)
+      console.error(kimlik.oneri)
+      console.error('YAZMIYORUZ: bozuk kimlikle yazmak SESSİZCE yeni bir pano dosyası doğurur;')
+      console.error('komut başarılı görünür ama not TESLİM EDİLMEZ (sahte-yeşil).')
+      process.exit(1)
+    }
   }
   if (!sid && verb === 'who') {
     console.error('uyarı: --sid yok, kendi şeridin "(sen)" olarak işaretlenemez.')
