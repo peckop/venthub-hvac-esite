@@ -167,12 +167,16 @@ export interface BuildSeriesLandingJsonLdParams {
  * tek seferde basar (`?page=` bu yüzeyde hiç yok), bu yüzden `buildCategoryJsonLd`'nin
  * page/pageSize parametreleri burada bulunmaz.
  *
- * BreadcrumbList KASITLI EKLENMEZ: `Breadcrumb.tsx` bileşeni (paylaşılan navigasyon)
- * kendi `items` prop'undan zaten TAM bir BreadcrumbList JSON-LD'si basıyor (bkz.
- * `src/components/navigation/Breadcrumb.tsx`). Burada ikinci bir BreadcrumbList üretmek
- * aynı sayfada İKİ ayrı BreadcrumbList düğümü demek olurdu (mükerrer yapılandırılmış veri) —
- * seri sayfasının breadcrumb hiyerarşisini derinleştirmek (`SeriesLandingView`'daki
- * `breadcrumbItems`) tek başına yeterli, çünkü Breadcrumb bileşeni onu otomatik JSON-LD'ye çevirir.
+ * BreadcrumbList BU DALDA eklenmez: seri landing'i `SeriesLandingView` üzerinden paylaşılan
+ * `Breadcrumb.tsx` bileşenini kullanır ve o bileşen kendi `items` prop'undan zaten TAM bir
+ * BreadcrumbList JSON-LD'si basar. Burada ikincisini üretmek aynı sayfada İKİ BreadcrumbList
+ * düğümü demek olurdu (mükerrer yapılandırılmış veri).
+ *
+ * ⚠️ BU GEREKÇE YALNIZ SERİ DALI İÇİN GEÇERLİDİR — 2026-08-23'te ölçüldü. Aynı rotanın MODEL
+ * dalı (`ProductDetailPageView`) o bileşeni HİÇ kullanmıyor, breadcrumb'ı elle `<nav>` olarak
+ * yazıyor; dolayısıyla en çok trafik alan sayfa tipinde BreadcrumbList HİÇ basılmıyordu.
+ * Yani gerekçe doğru bir ölçüme dayanıyordu ama YANLIŞ KAPSAMA uygulanmıştı. Model dalı için
+ * `buildBreadcrumbJsonLd` (aşağıda) kullanılır.
  *
  * Fiyat/offers HİÇ yazılmaz — `itemListElement` yalnız `url` taşır (kategori sayfasıyla aynı
  * disiplin); "Teklif Alın" modelinde model listesinden fiyat sızdırmanın bir yolu yok.
@@ -192,6 +196,80 @@ export function buildSeriesLandingJsonLd(params: BuildSeriesLandingJsonLdParams)
       '@type': 'ListItem',
       position: index + 1,
       url: `${baseUrl}/${lang}/products/${model.slug}`,
+    })),
+  }
+}
+
+/** Breadcrumb zincirinin tek basamağı. `path` = dil öneksiz site yolu (`/category/fans`). */
+export interface BreadcrumbStep {
+  /**
+   * Kullanıcıya GÖRÜNEN ad — **çağıran taraf çözer**, bu modül ad çözmez.
+   *
+   * Ham `category.name` ya da slug YAZILMAZ (Mutlak Kural 7: DB'deki ham ad İngilizce'dir ve
+   * TR sayfaya sızar). Çağıran, aktif dilin sözlüğünden bir `t` kurup görünen adı üretir:
+   *
+   * ```ts
+   * const dict = lang === 'en' ? en : tr          // src/i18n/dictionaries/{en,tr}
+   * const t = (key: string) => getDictValue(dict, key)
+   * const name = getCategoryDisplayName(category, t)   // imza: (category, t)
+   * ```
+   *
+   * Bu fonksiyon `name`i olduğu gibi basar; yanlış dilde ya da ham gelen bir ad burada
+   * yakalanmaz — sorumluluk çağırandadır. (Tek kontrol: boş ad ATAR.)
+   */
+  name: string
+  /**
+   * Bu basamağın hedefi. **Son basamak (bulunulan sayfa) `null` olmak ZORUNDA** — site
+   * genelindeki `Breadcrumb.tsx` de son öğeye `item` yazmaz; iki yüzeyin aynı şekli üretmesi
+   * için burada da kural aynıdır.
+   */
+  path: string | null
+}
+
+export interface BuildBreadcrumbJsonLdParams {
+  lang: string
+  baseUrl: string
+  steps: BreadcrumbStep[]
+}
+
+/**
+ * Breadcrumb zinciri → schema.org BreadcrumbList.
+ *
+ * NİÇİN AYRI BİR FONKSİYON: BreadcrumbList'i bugüne kadar YALNIZ `Breadcrumb.tsx` bileşeni
+ * basıyordu. Ürün detay sayfası (model dalı) o bileşeni kullanmıyor, breadcrumb'ını elle
+ * `<nav>` olarak yazıyor — sonuç: en çok trafik alan sayfa tipinde yapılandırılmış breadcrumb
+ * verisi HİÇ yoktu, diğer tüm sayfalarda vardı. Görsel breadcrumb'ın varlığı, makinenin onu
+ * okuyabildiği anlamına gelmiyordu.
+ *
+ * Şekil bilerek `Breadcrumb.tsx` ile BİREBİR aynı: `name` her basamakta var, `item` yalnız
+ * hedefi olan basamaklarda. Aynı sitede iki farklı BreadcrumbList şekli üretmek, ileride
+ * "hangisi doğru" sorusunu doğurur.
+ *
+ * SÖZLEŞME İHLALİ SESSİZ GEÇMEZ: iki basamaktan az zincir ya da son basamağa yol verilmesi
+ * ATAR. Bunlar kullanıcı verisinden değil ÇAĞIRAN KODDAN gelir; sessizce düzeltmek, bozuk
+ * yapılandırılmış veriyi fark edilmeden yayına almak olurdu.
+ */
+export function buildBreadcrumbJsonLd(params: BuildBreadcrumbJsonLdParams): Record<string, unknown> {
+  const { lang, baseUrl, steps } = params
+
+  if (steps.length < 2) {
+    throw new Error(`buildBreadcrumbJsonLd: zincir en az iki basamak olmali (gelen: ${steps.length})`)
+  }
+  const son = steps[steps.length - 1]
+  if (son.path !== null) {
+    throw new Error(`buildBreadcrumbJsonLd: son basamak bulunulan sayfadir, path null olmali (gelen: "${son.path}")`)
+  }
+  const bosAd = steps.find((s) => !s.name.trim())
+  if (bosAd) throw new Error('buildBreadcrumbJsonLd: basamak adi bos olamaz')
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: steps.map((step, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: step.name,
+      ...(step.path ? { item: `${baseUrl}/${lang}${step.path}` } : {}),
     })),
   }
 }
