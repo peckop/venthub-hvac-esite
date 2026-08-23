@@ -20,6 +20,9 @@ verify_jwt = false          # kargo/iade firması webhook'u (gövdede HMAC + rep
 [functions."quote-notification-webhook"]
 verify_jwt = false          # DB tetiği (pg_net) çağırıyor — JWT üretemez; gövdede sır + ZORUNLU replay guard var (T068-VH)
 
+[functions."order-paid-webhook"]
+verify_jwt = false          # DB tetiği (pg_net) çağırıyor — JWT üretemez; gövdede sır + ZORUNLU replay guard var (T137-VH)
+
 # --- Admin uçları: src'de tarayıcı çağıranı YOK ya da oturumlu admin çağırıyor.
 # Gövdede tam kimlik+rol kapısı var; kapı JWT bekliyor, dolayısıyla geçit de zorlamalı.
 # 2026-08-14'te dördü de false'tan true'ya alındı (prod'da 4 canlı yetkisiz-erişim vardı). ---

@@ -38,7 +38,32 @@ if (!dbUrl || !dbKey || (!familySlug && !ROLLBACK)) {
  * ────────────────────────────────────────────────────────────────────────── */
 if (ROLLBACK) {
   const inv = JSON.parse(fs.readFileSync(ROLLBACK, 'utf8'));
+  /* T162 (2026-08-23) — GERI ALMANIN KURU KOSUMU.
+   * Bu dal yaziyordu ve KURU KOSUMU YOKTU: ileri yon (`--apply`) varsayilan olarak kuru
+   * kosarken, KALICI SILME yapan geri yon dogrudan yaziyordu. Yani betigin en tehlikeli
+   * yolu, en az provasi olan yoldu. Ayrica envanter ELDE de kurulabilir (T162.de oyle
+   * yapildi: T138 kosumunun envanteri diske yazilmis ama depoya girmemisti) — elde kurulan
+   * bir envanteri once GORMEDEN kosmak, yanlis id'lerle 12 urunu kaybetmek demekti.
+   * Varsayilan HALA yazimdir (mevcut cagri sekilleri bozulmasin); --dry-run acikca istenir. */
+  const RB_DRY = has('dry-run');
   const rq = async (p, method, body) => {
+    if (RB_DRY) {
+      console.log(`  [KURU] ${method} ${p}${body ? ' ' + JSON.stringify(body) : ''}`);
+      // Kuru kosumda "kac satir etkilenirdi" SAYIMI da olculur; yoksa rapor, niyeti
+      // gosterir ama GERCEGI gostermez (hedef id yoksa yazim sessizce 0 satir yapardi).
+      if (method === 'PATCH' || method === 'DELETE') {
+        const m = /^(\w+)\?id=in\.\(([^)]*)\)$/.exec(p);
+        if (m) {
+          const r = await fetch(`${dbUrl}/rest/v1/${m[1]}?id=in.(${m[2]})&select=id`, {
+            headers: { apikey: dbKey, authorization: `Bearer ${dbKey}` },
+          });
+          const rows = r.ok ? await r.json() : [];
+          console.log(`         -> DB'de eslesen satir: ${rows.length}/${m[2].split(',').length}`);
+          return rows;
+        }
+      }
+      return [];
+    }
     const r = await fetch(`${dbUrl}/rest/v1/${p}`, {
       method,
       headers: { apikey: dbKey, authorization: `Bearer ${dbKey}`, 'content-type': 'application/json', prefer: 'return=representation' },
@@ -49,7 +74,7 @@ if (ROLLBACK) {
     return t ? JSON.parse(t) : [];
   };
 
-  console.log(`GERI ALMA: ${ROLLBACK} (durum: ${inv.status}, ${inv.product_previous_family?.length ?? 0} urun, ${inv.created_family_ids?.length ?? 0} aile)`);
+  console.log(`GERI ALMA${RB_DRY ? ' [KURU KOSUM — HICBIR SEY YAZILMAZ]' : ''}: ${ROLLBACK} (durum: ${inv.status}, ${inv.product_previous_family?.length ?? 0} urun, ${inv.created_family_ids?.length ?? 0} aile)`);
 
   // 1) Urunleri eski ailelerine dondur — ESKI family_id'ye gore grupla, tek istek/grup.
   const byPrev = new Map();

@@ -30,6 +30,16 @@ const nextConfig = {
     },
     async redirects() {
         return [
+            // ── T162 — Lineo çap aileleri TEK ailede birleşti (docs/standards/catalog-depth-standard.md §K1).
+            // Altı çap ailesi 2026-08-21'de açılmış, 2026-08-23'te kapatıldı: çap bir KARAR noktası
+            // değil, aynı sayfadaki seçicidir. Kapanan altı adres sitemap'te DURUYORDU; yönlendirme
+            // olmadan altısı da 404 verirdi. Ürünler kaybolmadı — hepsi kanonik aile sayfasında.
+            // (Aile slug'ı `/products/<slug>` biçimindedir; varyant `?sku=` ile aynı sayfada seçilir.)
+            ...['100', '125', '150', '200', '250', '315'].map((cap) => ({
+                source: `/:lang(tr|en)/products/vortice-lineo-${cap}-quiet`,
+                destination: '/:lang/products/vortice-lineo-quiet',
+                permanent: true,
+            })),
             { source: '/category/fanlar/:path*', destination: '/category/fans/:path*', permanent: true },
             { source: '/category/hava-perdeleri/:path*', destination: '/category/air-curtains/:path*', permanent: true },
             { source: '/category/isi-geri-kazanim-cihazlari/:path*', destination: '/category/heat-recovery-units/:path*', permanent: true },
