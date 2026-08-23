@@ -38,6 +38,8 @@ function makeFamily(overrides: Partial<Parameters<typeof buildProductGroupJsonLd
     subcategory_id: null,
     meta_title: null,
     meta_description: null,
+    category: null,
+    subcategory: null,
     ...overrides,
   }
 }
