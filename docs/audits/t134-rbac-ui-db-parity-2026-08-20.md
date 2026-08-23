@@ -10,6 +10,11 @@ yeniden üretiyor — bu karne anlık fotoğraf değil, komutla tekrarlanabilir.
 > bildirdi; ölçtüm, doğruladım ve **kendi eklediğim üçüncü aileyle** birlikte hükümler
 > değişti. Aşağıdaki §2 bunu anlatır. Eski sürüm PR #718'in ilk commit'inde durur.
 
+> **Tekrarlanabilirlik ÖLÇÜLDÜ (2026-08-23):** karne 08-20'de üretildi; üç gün ve ~70 PR
+> sonraki master'da (`5e052853`) `--kuru` koşusu **birebir aynı** altı rotayı ve aynı tablo
+> kümesini verdi. `ROLE_PAGE_ACCESS` bu sürede hiç değişmedi (`git diff` boş). Yani karnenin
+> konusu bayat değil; iddia "tekrarlanabilir" sözünden ibaret kalmadı, **tekrarlandı**.
+
 ## 1. Bu karne ne diyor, ne demiyor
 
 - **Der:** arayüz bir role şu rotayı vaat ediyor; o rolün kimliğiyle o rotanın okuduğu
@@ -18,6 +23,11 @@ yeniden üretiyor — bu karne anlık fotoğraf değil, komutla tekrarlanabilir.
   o DB-içi (politika var mı), bu DB↔UI (satır geliyor mu).
 
 ## 2. Yüklem aileleri — ölçümün NEREDE geçerli olduğu
+
+> **SSOT:** ailelerin **tanımı ve gerekçesi** bu karnede değil,
+> `docs/standards/db-grant-hygiene-standard.md` §3.2'dedir (LEGAL, PR #719 — 2026-08-20'de
+> birleşti). Aşağısı o cetvelin **ölçülmüş uygulamasıdır**. Çelişkide: **tanım için cetvel,
+> bugünkü değer için betik** — çünkü betik aileleri her koşuda canlı katalogdan türetir.
 
 Yöntem: sahte bir `uid` ile `request.jwt.claims` takıp `set local role authenticated` demek,
 sonra satır saymak. Bu yöntem **her yüklemi sınayamaz**. Aile ayrımı **metinden değil

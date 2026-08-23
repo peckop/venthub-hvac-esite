@@ -8,6 +8,15 @@
  * ciktisi `docs/audits/` altina dusen bir OLCUMDUR. Yesil/kirmizi degil, KARNE verir.
  * (Karar: OPS-AUDIT, 2026-08-20.)
  *
+ * ── SSOT — aile TANIMI burada DEGIL, cetvelde ──────────────────────────────────────
+ * A/B/C aile ayriminin ANLAMI ve gerekcesi:
+ *     docs/standards/db-grant-hygiene-standard.md §3.2  (LEGAL, PR #719)
+ * Bu betik o cetvelin UYGULAMASIDIR: cetvel NIYE'yi tasir ve degismez; betik NASIL'i tasir
+ * ve DB semasi degistikce degisir. Cetveldeki tablo listesi TARIHLI bir olcum fotografidir
+ * (otorite degil ornek); GUNCEL siniflandirmanin kaynagi bu betiktir — cunku aileleri her
+ * kosuda CANLI katalogdan turetir, sabit liste TUTMAZ.
+ * Celiskide: aile TANIMI icin cetvel, bugunku aile DEGERI icin betik.
+ *
  * ── KAPSAM AYRIMI — `rls-role-coverage.mjs` ile AYNI SEYI OLCMEZ ──────────────────────
  * Ayni seyi olcen iki sey ayrisir ve otorite belirsizlesir; o yuzden sinir burada YAZILI:
  *
