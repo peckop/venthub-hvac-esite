@@ -31,6 +31,8 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const BASELINE_PATH = path.join(__dirname, 'catalog-integrity-baseline.json')
+/** scripts/db/checks -> depo koku (uc seviye yukari). Kaynak tarayan kontroller buradan yurur. */
+const REPO_KOK = path.join(__dirname, '..', '..', '..')
 
 /**
  * Her kontrol bir anahtar kümesi üretir. Anahtar = ihlalin KİMLİĞİ; taban bu anahtarları tutar.
@@ -147,7 +149,105 @@ const CHECKS = [
     key: (r) => `spec-type:${r.key}|${r.brand}`,
     detail: (r) => `${r.n} kayıt · ör. "${r.sample_value}" (${r.sample_sku}) — sayı değil`,
   },
+  {
+    id: 'slug-unresolved',
+    title: 'Kaynak koda gömülü kategori slug\'ı canlı taksonomide çözülmüyor',
+    why: 'Vitrindeki bazı kategori bağlantıları ve bölüm koşulları DB\'den değil, koda yazılmış sabit dizeden kurulur. Böyle bir dize hiçbir kategoriye karşılık gelmediğinde ne tip hatası ne kırmızı test doğar: bağlantı kullanıcıyı boş sayfaya götürür, koşul hiç açılmaz ve kodu okuyan "bu bölüm var" sanır. Kusur tek tek satırlarda değil, sabit slug yazılabilmesinde ve doğruluğunun HİÇ ölçülmemesinde.',
+    // SQL DEĞİL, KAYNAK TARAR: bu yüzden `sql` yerine `collect` taşır (koşucu ikisini de bilir).
+    collect: async (client) => {
+      const { rows: catRows } = await client.query(
+        `select slug,
+                metadata->'slug'->>'tr' as tr_slug,
+                metadata->'slug'->>'en' as en_slug
+         from public.categories`,
+      )
+      const cozulur = new Set()
+      for (const r of catRows) for (const s of [r.slug, r.tr_slug, r.en_slug]) if (s) cozulur.add(s)
+
+      // Kapının kendi ön koşulu: taksonomi boş dönerse HER literal "çözülmüyor" görünür ve kapı
+      // toptan yanlış-kırmızı verir. Ölçemeyen kapı ne yeşil ne kırmızı demeli — ölçülemedi demeli.
+      if (cozulur.size === 0) {
+        throw new Error('slug-unresolved: categories tablosu BOS dondu — taksonomi okunamadi, OLCULEMEDI')
+      }
+
+      return scanSourceSlugLiterals()
+        .filter((b) => !cozulur.has(b.slug))
+        .map((b) => ({ ...b, taksonomi_boyutu: cozulur.size }))
+    },
+    key: (r) => `slug-unresolved:${r.file}|${r.slug}`,
+    detail: (r) => `${r.file}:${r.line} — "${r.slug}" (${r.pattern}); canli taksonomide ${r.taksonomi_boyutu} slug var, bu yok`,
+  },
 ]
+
+/**
+ * `src/` altında KATEGORİ slug'ı olduğu KESİN olan sabit dizeleri toplar.
+ *
+ * Desenler bilerek DAR: yalnız kategori rotası kuran ve kategori slug'ı karşılaştıran biçimler.
+ * `.includes('...')` gibi parça eşleşmeleri ve ürün/marka/aile slug'ları KAPSAM DIŞI — geniş bir
+ * tarama, kategori olmayan dizeleri "çözülmedi" diye kırmızıya çevirir, kapı gürültüye boğulur ve
+ * kapatılır. Dar kapı, kapatılan kapıdan iyidir.
+ *
+ * Testler HARİÇ: test dosyaları KASTEN var olmayan slug taşır (sabotaj fikstürleri, kayıtlı
+ * karar-bekleyenler). Onları saymak, kapıyı kendi kanıtıyla çelişkiye düşürürdü.
+ */
+function scanSourceSlugLiterals() {
+  const SRC = path.join(REPO_KOK, 'src')
+  const DESENLER = [
+    { ad: "Routes.category('X')", re: /Routes\.category\(\s*'([a-z0-9-]+)'/g , ornek: "Routes.category('kanarya-slug')"},
+    // Ilk argumanda IC ICE CAGRI olmamali. `Routes.category(getLocalizedCategorySlug(cat, 'tr'))`
+    // gibi bir ifadede eski desen ic fonksiyonun DIL argumanini ('tr') alt-slug saniyordu —
+    // sitemap.ts iki yanlis-kirmizi uretti. Ilk argumani tanimlayici/uye ifadesiyle sinirlamak
+    // `Routes.category(categoryUrlSlug, 'elektrikli-isitici')` gercek isabetini korur.
+    { ad: "Routes.category(_, 'X')", re: /Routes\.category\(\s*(?:'[a-z0-9-]+'|[A-Za-z_$][\w$.]*)\s*,\s*'([a-z0-9-]+)'/g , ornek: "Routes.category(ustSlug, 'kanarya-slug')"},
+    // Alici ADIYLA sinirli: `b.slug === 'nicotra-gebhardt'` bir MARKA slug'idir ve genel
+    // `.slug === 'X'` deseni onu kategori sanip yanlis-kirmizi uretmisti. Ayni alan adi farkli
+    // varliklarda yasiyor; kapi hangi varligi olctugunu bilmek zorunda.
+    { ad: "category.slug === 'X'", re: /(?:category|subCategory|mainCategory|subcategory)\.slug\s*===\s*'([a-z0-9-]+)'/g , ornek: "category.slug === 'kanarya-slug'"},
+    { ad: "categorySlug: 'X'", re: /\bcategorySlug\s*:\s*'([a-z0-9-]+)'/g , ornek: "categorySlug: 'kanarya-slug'"},
+    { ad: "subSlug: 'X'", re: /\bsubSlug\s*:\s*'([a-z0-9-]+)'/g , ornek: "subSlug: 'kanarya-slug'"},
+  ]
+
+  // ── DESEN KANARYASI ────────────────────────────────────────────────────────
+  // Her desen, tanidigini iddia ettigi bicimi GERCEKTEN taniyor mu? Bu blok bir
+  // paranoya degil, yasanmis bir kusurun panzehiri: 2026-08-23'te desenlerden birinin
+  // basina gorunmez bir BACKSPACE (U+0008) karakteri sizdi (kabuk \b kacisini yedi).
+  // Regex sorunsuz derlendi, .source ekranda DOGRU gorundu, ve HICBIR SEYLE eslesmedi.
+  // Kapi yesil donuyordu; oysa o desen kordu ve iki gercek ihlali hic gormuyordu.
+  // Kor desen, olmayan desenden TEHLIKELIDIR: varligi guvence sanilir.
+  for (const desen of DESENLER) {
+    const eslesme = desen.ornek.match(desen.re)
+    desen.re.lastIndex = 0
+    if (!eslesme) {
+      throw new Error(
+        `slug-unresolved: "${desen.ad}" deseni KENDI ORNEGINI tanimiyor — desen bozuk, tarama KOR. ` +
+        `ornek: ${desen.ornek} · desen: ${desen.re.source}`,
+      )
+    }
+  }
+
+  const bulgular = []
+  const gez = (dizin) => {
+    for (const girdi of fs.readdirSync(dizin, { withFileTypes: true })) {
+      const tam = path.join(dizin, girdi.name)
+      if (girdi.isDirectory()) {
+        if (girdi.name === '__tests__' || girdi.name === 'node_modules') continue
+        gez(tam)
+        continue
+      }
+      if (!/\.tsx?$/.test(girdi.name) || /\.test\.tsx?$/.test(girdi.name)) continue
+      const icerik = fs.readFileSync(tam, 'utf8')
+      const goreli = path.relative(REPO_KOK, tam).replace(/\\/g, '/')
+      for (const desen of DESENLER) {
+        for (const eslesme of icerik.matchAll(desen.re)) {
+          const satir = icerik.slice(0, eslesme.index).split('\n').length
+          bulgular.push({ file: goreli, line: satir, slug: eslesme[1], pattern: desen.ad })
+        }
+      }
+    }
+  }
+  gez(SRC)
+  return bulgular
+}
 
 /**
  * TLS ayarı — doğrulama DAİMA açık.
@@ -205,7 +305,11 @@ async function collectFromDatabase(connectionString) {
   const found = new Map()
   try {
     for (const check of CHECKS) {
-      const { rows } = await client.query(check.sql)
+      // Iki tur kontrol var: `sql` tasiyanlar dogrudan sorgulanir, `collect` tasiyanlar kendi
+      // olcumunu yapar (or. kaynak kodu tarayip DB ile karsilastiran `slug-unresolved`).
+      const rows = await (check.collect
+        ? check.collect(client)
+        : client.query(check.sql).then((r) => r.rows))
       for (const row of rows) found.set(check.key(row), { check, detail: check.detail(row) })
     }
   } finally {
