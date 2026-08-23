@@ -109,6 +109,24 @@ const T_OPAQUE = /(?<![\w$])_?t\(\s*[A-Za-z_$][\w$.]*\s*[,)]/g
  * yanlış kırmızı veren kapı kapatılır, kaçıran kapı bir sonraki denetimde yakalanır.
  */
 const BARE_WORD = /(['"])([A-Za-z][\w]*)\1/g
+/**
+ * 7. EKSENİN KAPSAMI — çeviriye DOKUNMAYAN dosya tüketici SAYILMAZ.
+ *
+ * BARE_WORD bilerek gevşek: tırnaklı her sözcüğü toplar. Kapsam tüm ağaç olursa bu gevşeklik
+ * kapıyı YER: bir servis dosyasındaki DB KOLON ADI (`'max_absorbed_power_w'`) ya da bir
+ * seçenek kimliği (`id: 'bathroom'`) sözlük tüketicisi sanılır. 2026-08-23'te tam bu oldu —
+ * sihirbaz servisi eklenince altı ölü anahtar "canlandı" ve borç kaydı yalancıktan küçüldü.
+ * Borç gerçekte azalmadı; kapı kör oldu.
+ *
+ * Ayrım: **bir dosya çeviriye hiç dokunmuyorsa çeviri tüketicisi olamaz.** Ölçüldü —
+ *   `utils/whatsapp.ts`      : `import { tr } … { en }` (sözlüğü CAST'leyip yaprak adıyla
+ *                              indeksler; 7. eksen ZATEN bunun için var, korunmalı)
+ *   `services/wizard.service.ts`: i18n ile HİÇBİR bağı yok, dizeleri DB kolon adları
+ * Bu yüzden 7. eksen yalnız `t(` çağrısı yapan ya da sözlüğü/`useI18n`i import eden
+ * dosyalardan toplanır. Diğer altı eksen TÜM ağaçtan toplanmaya devam eder — daraltma
+ * yalnız en gevşek eksene uygulanır.
+ */
+const I18N_DOKUNAN = /(?:from\s+['"][^'"]*i18n[^'"]*['"])|useI18n|(?<![\w$])_?t\(/
 
 interface Tarama {
   staticKeys: Set<string>
@@ -117,6 +135,7 @@ interface Tarama {
   bareWords: Set<string>
   opaque: { file: string; line: number }[]
   tarananDosya: number
+  bareWordDosya: number
   eslesmeSayisi: number
 }
 
@@ -127,12 +146,16 @@ function tara(): Tarama {
   const bareWords = new Set<string>()
   const opaque: { file: string; line: number }[] = []
   let tarananDosya = 0
+  let bareWordDosya = 0
   let eslesmeSayisi = 0
 
   for (const [path, raw] of Object.entries(SOURCES)) {
     if (isDictFile(path) || isTestFile(path)) continue
     tarananDosya++
     const src = stripComments(raw)
+    // 7. eksenin kapsamı: çeviriye DOKUNAN dosyalar. Bkz. I18N_DOKUNAN açıklaması.
+    const i18nDokunan = I18N_DOKUNAN.test(src)
+    if (i18nDokunan) bareWordDosya++
     src.split('\n').forEach((line, i) => {
       for (const m of line.matchAll(T_STATIC)) {
         staticKeys.add(m[2])
@@ -158,8 +181,10 @@ function tara(): Tarama {
         staticKeys.add(m[2])
         eslesmeSayisi++
       }
-      for (const m of line.matchAll(BARE_WORD)) {
-        bareWords.add(m[2])
+      if (i18nDokunan) {
+        for (const m of line.matchAll(BARE_WORD)) {
+          bareWords.add(m[2])
+        }
       }
       for (const _m of line.matchAll(T_OPAQUE)) {
         opaque.push({ file: path.replace(/^\//, ''), line: i + 1 })
@@ -167,7 +192,7 @@ function tara(): Tarama {
     })
   }
 
-  return { staticKeys, prefixes, dictPaths, bareWords, opaque, tarananDosya, eslesmeSayisi }
+  return { staticKeys, prefixes, dictPaths, bareWords, opaque, tarananDosya, bareWordDosya, eslesmeSayisi }
 }
 
 /**
@@ -205,6 +230,19 @@ function canli(key: string, t: Tarama): boolean {
  * Dağılım: admin 200 · pdp 61 · common 47 · category 39 · account 29 · products 21 · diğer 34
  */
 const DONMUS_BORC: ReadonlySet<string> = new Set([
+  // --- 2026-08-23: 7. eksen kapsami daraltilinca ORTAYA CIKAN uc olu anahtar ---
+  // Bu uc anahtar daha once CANLI gorunuyordu, ama yalniz cevirye DOKUNMAYAN dosyalardaki
+  // tirnakli sozcukler sayesinde: 'template' -> checkout/injectCheckoutForm.ts (i18n bagi YOK),
+  // 'phone'/'city' -> cesitli form dosyalari. Kapsam daralinca gercek durumlari gorundu.
+  // Ucu de elle dogrulandi: admin.inventory.export.headers.* KULLANILIYOR ama .template DEGIL;
+  // account.addresses.ph.* zaten yeniden-adlandirma yetimi (sayfa .placeholders.* kullaniyor)
+  // ve dort kardesi bu listede ZATEN duruyor.
+  // NOT: borc bu commit'te 352 -> 355 BUYUDU. 'Liste yalniz kuculur' kurali VERI degisince
+  // gecerlidir; KAPI KESKINLESTIGINDE gizli borcun gorunur olmasi beklenen sonuctur. Gizli
+  // kalmasi daha kotuydu.
+  'admin.inventory.export.template',
+  'account.addresses.ph.phone',
+  'account.addresses.ph.city',
   'account.addresses.addressLabel',
   'account.addresses.defaultBillingTag',
   'account.addresses.defaultShippingTag',
@@ -670,6 +708,28 @@ describe('INV-6: sözlükte tüketicisi olmayan anahtar bırakılmaz', () => {
         '79 canlı anahtar ölü sanıldı.',
     ).toEqual([])
     expect(KANARYA_AYRACLI.length).toBe(3)
+  })
+
+  it('KANARYA: 7. eksen kapsami — ceviriye dokunmayan dosya tuketici SAYILMAZ', () => {
+    // NEGATIF taraf: 'template' yalniz checkout/injectCheckoutForm.ts'te tirnakli geciyor ve
+    // o dosyanin i18n ile HICBIR bagi yok. Kapsam daraltmasi bozulursa bu sozcuk yeniden
+    // "tuketici" sayilir ve admin.inventory.export.template olu anahtari CANLI gorunur.
+    expect(
+      tarama.bareWords.has('template'),
+      "'template' yalniz i18n'e dokunmayan bir dosyada tirnakli geciyor; 7. eksen kapsami " +
+        'genislemis olmali. DB kolon adlari ve secenek kimlikleri tuketici SAYILMAZ.',
+    ).toBe(false)
+
+    // POZITIF taraf: 7. eksen whatsapp.ts icin VAR. Daraltma onu oldurmemeli.
+    expect(
+      tarama.bareWords.has('stockInquiry'),
+      "whatsapp.ts sozlugun whatsappMessages agacini cast'leyip yaprak adiyla indeksliyor. " +
+        'Bu sozcuk kaybolduysa daraltma cok ileri gitti ve 12 CANLI anahtar olu gorunecek.',
+    ).toBe(true)
+
+    // Daraltma GERCEKTEN oldu mu? Kapsam tum agacsa daraltma hic uygulanmamis demektir.
+    expect(tarama.bareWordDosya).toBeGreaterThan(50)
+    expect(tarama.bareWordDosya).toBeLessThan(tarama.tarananDosya)
   })
 
   it('ÖN KOŞUL: `t(degisken)` yalnız BİLİNEN dosyalarda', () => {
