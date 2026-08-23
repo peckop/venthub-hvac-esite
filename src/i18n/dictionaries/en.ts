@@ -240,6 +240,11 @@ export const en: typeof tr = {
       }
     }
   },
+  meta: {
+    siteTitle: 'VentHub — Premium HVAC Solutions',
+    siteDesc: 'Car park jet fans, air curtains, heat recovery units and duct fans — engineering-led product selection and technical support.',
+  },
+
   home: {
     seoTitle: 'VentHub - Premium HVAC Solutions | Fans, Speed Control, Heating & Cooling',
     seoDesc: 'Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.',
