@@ -99,5 +99,9 @@ katman yok** — bugün bunu sistem değil Recep fark etti.
 ## 5. Uygulama sırası
 
 T011 (faz kapısı, ORION) → **K2** (MCP stabil kopya + restart, OPS) → venthub roadmap
-kurulumu (OPS) → **Faz 1 köprü** (ORION iş emri) → **Faz 0** pano işleri (ALTYAPI, uyanınca)
-→ **Nöbetçi Adım 1** (Faz 0 sonrası; sahip ALTYAPI/OPS) → bir hafta gözlem → **Faz 2**.
+kurulumu (OPS) → **Faz 0** (ALTYAPI uyanınca; Faz 1'i BLOKLAMAZ — köprü hayalet-sid'e karşı
+kendi sınavıyla korunur, Bölüm 4/2) ∥ **Faz 1 köprü** (ORION iş emri) → **Nöbetçi Adım 1**
+(Faz 0'ın PARK durumu indikten sonra; sahip ALTYAPI/OPS) → bir hafta gözlem → **Faz 2**.
+
+Not: Faz 0 "önkoşul"dur ama sıkı-sıralı değil: sid-RET/rotasyon Faz 1 ile paralel inebilir;
+yalnız **PARK durumu, Nöbetçi'nin** ve **Faz 2'nin** sert önkoşuludur.
