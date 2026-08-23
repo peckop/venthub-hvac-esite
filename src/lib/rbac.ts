@@ -19,6 +19,14 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
     // RLS'li 26 tabloda satır sayımı; kabul eden kol olarak aynı sorgu admin kimliğiyle
     // tekrarlandı (admin 16 tablo görür, moderator 11 → sonda kör bir sonda DEĞİL).
     //
+    // ⚠ ÖNEMLİ ÇERÇEVE (2026-08-20, ADMIN'in (C) ailesi bulgusundan sonra eklendi):
+    // Aşağıdaki yüzeyleri moderator'ün görmesi, ROLÜN ona izin verdiği anlamına GELMEZ.
+    // Bu tabloların politikaları role HİÇ BAKMIYOR — yalnız tenant kapsamı arıyor
+    // (LEGAL'in sınıflandırmasında (C) ailesi). Rolün gerçekten kapı olduğu her yüzeyde
+    // moderator ya hiçbir şey görmüyor ya da ölçülemiyor. Yani bu liste "moderator'ün
+    // yetkileri" değil, "moderator'ün boş ekran görmeyeceği yerler"dir. Fark, Recep'in
+    // 'moderator vaat mi kalıntı mı' kararında belirleyici.
+    //
     // MODERATOR'UN GERÇEKTEN OKUYABİLDİĞİ yüzeyler ve dayanağı:
     //   /admin/products, /admin/categories → products/categories tenant geneli okuma, TAM
     //   /admin/coupons                     → TAM (⚠ VERİYE BAĞLI: politika admin olmayana
@@ -30,12 +38,20 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
     //   /admin/inventory/settings          → inventory_settings tenant geneli okuma, TAM
     //
     // ÇIKARILANLAR — hepsi ÖLÇÜLDÜ, hiçbiri tahmin değil (moderator 0 satır görüyor):
-    //   audit-logs (admin_audit_log) · error-groups · errors (client_errors: service_role
-    //   ONLY, admin bile göremiyor → T136) · webhook-events · settings (site_settings) ·
+    //   audit-logs (admin_audit_log) · error-groups · errors (client_errors) ·
+    //   webhook-events · settings (site_settings) ·
     //   pricing (pricing_rule kör, product_prices 348/1044 KISMİ) · movements ve
     //   inventory/report (inventory_movements → is_user_admin(), moderator kabul edilmiyor) ·
     //   orders/quotes/returns (politika 'kendi satırın VEYA admin' → moderator YALNIZ KENDİ
     //   siparişini görür, yani yönetim ekranı olarak boş).
+    //
+    // ⚠ BU YORUM BİR ÖLÇÜMÜ AKTARIYOR — ölçülen şey değişirse yorum YALAN olur ve hiçbir
+    // test bunu yakalamaz (yorum çalışmaz). Yaşandı: burada önce "client_errors: admin bile
+    // göremiyor → T136" yazıyordu; aynı gün #704 `admins_read_client_errors` politikasını
+    // ekledi ve cümle yanlış oldu. KARAR değişmedi (yeni politika da `is_admin_user()`
+    // istiyor, moderator'ü kabul etmiyor) ama GEREKÇE bayatladı. O yüzden burada artık
+    // dayanağın ADI var, anlık ölçüm değeri yok. Kaynak: canlı `pg_policies` (migration
+    // dosyası değil), 2026-08-20.
     //
     // ⚠ AÇIK KARAR (Recep): bu ölçüm moderator'ün DB düzeyinde neredeyse yetkisiz olduğunu
     // söylüyor — viewer ile aynı sınıf. Rol ya DB'de açılmalı (politikalara moderator

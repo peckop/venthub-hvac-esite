@@ -118,6 +118,42 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     expect(blok, 'detay satiri cocuk sayisini kullanmiyor').toMatch(/detail:[\s\S]*cocuk/)
   })
 
+  /* ────────────────────────────────────────────────────────────────────────
+   * T160 — KATALOG DERINLIGI (catalog-depth-standard §K1).
+   *
+   * Kural: derinlik IKI kademe. Ucuncu GEZINME kademesi ancak aile hiyerarsisiyle
+   * dogar, bu yuzden kapi tam olarak onu olcer. Sinav uc sey bekcilir: kural VAR,
+   * anahtar EBEVEYN bazinda (kusur cocuklarda degil hiyerarsinin kurulmasinda), ve
+   * cetvel dosyasi kapiyi ADIYLA gosteriyor (cetvel-kapi baginin kopmamasi icin).
+   * ──────────────────────────────────────────────────────────────────────── */
+  it('T160 — aile hiyerarşisi TABAN DIŞINDA doğarsa KIRMIZI', () => {
+    const { status, output } = runWithFixture([...baselineKeys(), 'family-nested:sinav-ailesi'])
+    expect(status).toBe(1)
+    expect(output).toContain('family-nested:sinav-ailesi')
+  })
+
+  it('T160 — kural EBEVEYN bazında sayar (çocuk başına satır üretmez)', () => {
+    const kaynak = fs.readFileSync(SCRIPT, 'utf8')
+    const blokBasi = kaynak.indexOf("id: 'family-nested'")
+    expect(blokBasi, 'family-nested kurali betikte yok').toBeGreaterThan(-1)
+    const blok = kaynak.slice(blokBasi, kaynak.indexOf("id: 'product-no-subcategory'"))
+    // Kusur tek tek cocuklarda DEGIL, hiyerarsinin kurulmus olmasinda. Cocuk bazli anahtar
+    // altı gerekcesiz taban satiri uretirdi ve kimse okumazdi (spec-type ile ayni desen).
+    expect(blok, 'anahtar ebeveyn bazinda degil').toMatch(/key:.*parent_slug/)
+    expect(blok, 'kural ust aile bagini sorgulamiyor').toContain('parent_family_id')
+  })
+
+  it('T160 — cetvel dosyası duruyor ve kapıyı ADIYLA gösteriyor', () => {
+    const cetvel = path.join(process.cwd(), 'docs', 'standards', 'catalog-depth-standard.md')
+    expect(fs.existsSync(cetvel), 'catalog-depth-standard.md yok').toBe(true)
+    const metin = fs.readFileSync(cetvel, 'utf8')
+    // Cetvel kapiyi adiyla gostermezse, kural degisince kimse cetveli guncellemez.
+    expect(metin, 'cetvel kapiyi adiyla gostermiyor').toContain('family-nested')
+    // Ve K2'nin makineye devredilmedigini ACIKCA yazmali — yoksa biri onu da
+    // "kapiya baglayalim" diye olculemez bir sinav yazar.
+    expect(metin, 'cetvel K2 icin makine kapisi olmadigini yazmiyor').toMatch(/K2[\s\S]{0,400}makine kapisi|makine kapısı/i)
+  })
+
   it('ölçemeyen kapı YEŞİL dönmez — bağlantı dizesi yokken çıkış 0 DEĞİL', () => {
     const res = spawnSync(process.execPath, [SCRIPT], {
       encoding: 'utf8',
