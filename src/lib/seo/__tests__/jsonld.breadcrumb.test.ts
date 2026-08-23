@@ -115,6 +115,22 @@ describe('INV-BREADCRUMB-LD-1 — buildBreadcrumbJsonLd', () => {
       ).toThrow(/son basamak/)
     })
 
+    it('adı ÇAĞIRAN çözer — fonksiyon verilen dizeyi olduğu gibi basar', () => {
+      // Kural 7 sorumlulugu kontratta nerede duruyor: cagiranda. Fonksiyon sozluge bakmaz,
+      // getCategoryDisplayName cagirmaz, dil cozmez — verilen gorunen adi aynen yazar.
+      // Yanlis dilde ya da ham DB adi gelirse BURASI yakalamaz.
+      const ld = buildBreadcrumbJsonLd({
+        ...TEMEL,
+        steps: [
+          { name: 'Ana Sayfa', path: '/' },
+          { name: 'Kanal İçi Hayalet Fanlar', path: '/category/inline-duct-fans' },
+          { name: 'Lineo 150 Quiet', path: null },
+        ],
+      })
+      const ogeler = ld.itemListElement as Array<Record<string, unknown>>
+      expect(ogeler[1].name).toBe('Kanal İçi Hayalet Fanlar')
+    })
+
     it('boş adlı basamak atar — adsız düğüm geçerli yapılandırılmış veri değildir', () => {
       expect(() =>
         buildBreadcrumbJsonLd({

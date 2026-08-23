@@ -202,6 +202,21 @@ export function buildSeriesLandingJsonLd(params: BuildSeriesLandingJsonLdParams)
 
 /** Breadcrumb zincirinin tek basamağı. `path` = dil öneksiz site yolu (`/category/fans`). */
 export interface BreadcrumbStep {
+  /**
+   * Kullanıcıya GÖRÜNEN ad — **çağıran taraf çözer**, bu modül ad çözmez.
+   *
+   * Ham `category.name` ya da slug YAZILMAZ (Mutlak Kural 7: DB'deki ham ad İngilizce'dir ve
+   * TR sayfaya sızar). Çağıran, aktif dilin sözlüğünden bir `t` kurup görünen adı üretir:
+   *
+   * ```ts
+   * const dict = lang === 'en' ? en : tr          // src/i18n/dictionaries/{en,tr}
+   * const t = (key: string) => getDictValue(dict, key)
+   * const name = getCategoryDisplayName(category, t)   // imza: (category, t)
+   * ```
+   *
+   * Bu fonksiyon `name`i olduğu gibi basar; yanlış dilde ya da ham gelen bir ad burada
+   * yakalanmaz — sorumluluk çağırandadır. (Tek kontrol: boş ad ATAR.)
+   */
   name: string
   /**
    * Bu basamağın hedefi. **Son basamak (bulunulan sayfa) `null` olmak ZORUNDA** — site
