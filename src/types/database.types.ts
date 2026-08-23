@@ -398,12 +398,16 @@ export type Database = {
       }
       contact_messages: {
         Row: {
+          application_area: string | null
+          city: string | null
           company: string | null
+          consent_at: string | null
           created_at: string | null
           department: Database["public"]["Enums"]["contact_department"]
-          email: string
+          email: string | null
           id: string
           ip_address: string | null
+          kvkk_consent: boolean
           message: string
           name: string
           phone: string | null
@@ -411,25 +415,33 @@ export type Database = {
           subject: string
         }
         Insert: {
+          application_area?: string | null
+          city?: string | null
           company?: string | null
+          consent_at?: string | null
           created_at?: string | null
           department?: Database["public"]["Enums"]["contact_department"]
-          email: string
+          email?: string | null
           id?: string
           ip_address?: string | null
+          kvkk_consent?: boolean
           message: string
           name: string
           phone?: string | null
           status?: Database["public"]["Enums"]["contact_status"]
-          subject: string
+          subject?: string
         }
         Update: {
+          application_area?: string | null
+          city?: string | null
           company?: string | null
+          consent_at?: string | null
           created_at?: string | null
           department?: Database["public"]["Enums"]["contact_department"]
-          email?: string
+          email?: string | null
           id?: string
           ip_address?: string | null
+          kvkk_consent?: boolean
           message?: string
           name?: string
           phone?: string | null
@@ -1691,6 +1703,7 @@ export type Database = {
           meta_description: Json | null
           meta_title: Json | null
           name: string
+          name_i18n: Json | null
           parent_family_id: string | null
           series_code: string | null
           slug: string
@@ -1710,6 +1723,7 @@ export type Database = {
           meta_description?: Json | null
           meta_title?: Json | null
           name: string
+          name_i18n?: Json | null
           parent_family_id?: string | null
           series_code?: string | null
           slug: string
@@ -1729,6 +1743,7 @@ export type Database = {
           meta_description?: Json | null
           meta_title?: Json | null
           name?: string
+          name_i18n?: Json | null
           parent_family_id?: string | null
           series_code?: string | null
           slug?: string
@@ -4214,6 +4229,20 @@ export type Database = {
       set_user_role: {
         Args: { new_role: string; user_id: string }
         Returns: boolean
+      }
+      submit_contact_message: {
+        Args: {
+          p_application_area?: string
+          p_city?: string
+          p_company?: string
+          p_consent?: boolean
+          p_email?: string
+          p_message: string
+          p_name: string
+          p_phone?: string
+          p_subject?: string
+        }
+        Returns: string
       }
       update_inventory_settings: {
         Args: { p_default_low_stock_threshold: number }
