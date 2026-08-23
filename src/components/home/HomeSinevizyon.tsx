@@ -16,7 +16,16 @@ interface SlideProduct {
   url: string
   labelKey: string
   subLabelKey: string
-  link: string
+  /**
+   * Ürün AİLESİ slug'ı — ham URL DEĞİL.
+   * Eskiden burada ham bir URL dizesi (kategori yolu) elle yazılmış
+   * duruyordu ve üç şey birden yanlıştı: (a) o kategori slug'ları canlı DB'de HİÇ YOKTU,
+   * (b) dil öneki yoktu — `/[lang]/category/...` şemasında `lang="category"` diye parse
+   * edilirdi, (c) `as Route` cast'i Next.js'in tipli rota korumasını susturuyordu.
+   * Anasayfa hero'sundaki 6 linkin 6'sı da kırıktı (T141 denetimi, 2026-08-22).
+   * Artık yol `Routes.product()` ile SSOT'tan üretilir; burada yalnız KİMLİK durur.
+   */
+  familySlug: string
 }
 
 interface SlideData {
@@ -29,24 +38,24 @@ const slidesData: SlideData[] = [
   {
     image: '/images/hero_hvac_industrial_premium_1.webp',
     products: [
-      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.0.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.0.subLabel', link: '/category/fans/duct-type-fans' },
-      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.0.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.1.subLabel', link: '/category/fans/quiet-duct-fans' }
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.0.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.0.subLabel', familySlug: 'vortice-lineo-quiet' },
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.0.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.1.subLabel', familySlug: 'vortice-lineo-quiet' }
     ],
     key: 0
   },
   {
     image: '/images/vortice_lineo_futuristic.webp',
     products: [
-      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.1.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.0.subLabel', link: '/category/fans/duct-type-fans' },
-      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.1.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.1.subLabel', link: '/category/fans/duct-type-fans' }
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.1.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.0.subLabel', familySlug: 'vortice-lineo-quiet' },
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.1.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.1.subLabel', familySlug: 'vortice-lineo-quiet' }
     ],
     key: 1
   },
   {
     image: '/images/hvac_installation_close_up_premium_3.webp',
     products: [
-      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.2.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.0.subLabel', link: '/category/fans/duct-type-fans' },
-      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.2.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.1.subLabel', link: '/category/fans/duct-type-fans' }
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.2.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.0.subLabel', familySlug: 'vortice-lineo-quiet' },
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.2.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.1.subLabel', familySlug: 'vortice-lineo-quiet' }
     ],
     key: 2
   }
@@ -249,7 +258,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                       : 'opacity-0'
                   }`}
                 >
-                  <Link href={p.link as import('next').Route} className="relative block group">
+                  <Link href={Routes.product(p.familySlug)} className="relative block group">
                     {/* Technical HUD Label - Redesigned for High-Tech Aesthetic */}
                     <div className={`absolute ${i === 0 ? '-right-24 top-0' : '-left-24 bottom-0'} z-30 hidden lg:block`}>
                       <div className="relative">
