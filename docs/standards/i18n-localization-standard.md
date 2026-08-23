@@ -83,6 +83,7 @@
 > `KANARYA_AYRACLI` setiyle bu körlüğü de sınar.
 
 | I | **Kasa dönüşümü ile dil** (`text-transform`) | veri kaynaklı özel ad CSS ile büyütülmez | **INV-7** `i18n-uppercase-proper-noun.test.ts` (kapsam + tespit kanaryası, ratchet 21 borç) | ✅ KAPALI (2026-08-23) |
+| J | **Locale-siz kasa çevirimi** (JS) | `src/i18n/case.ts` → `localeLower`/`localeUpper` (ekran), `foldForSearch` (arama) | **INV-8** `i18n-locale-case.test.ts` (kullanıcı-metni ifadesine uygulanan `toLowerCase()`/`toUpperCase()`; teknik dize kapsam dışı) | ✅ KAPALI (mandal: 14 dosya / 23 ihlal donduruldu, 6'sı teknik yanlış-pozitif; liste yalnız küçülebilir) |
 
 > **I ekseni — `text-transform: uppercase` DİLE DUYARLIDIR.** Eleman `lang="tr"` mirası
 > altındaysa tarayıcı Türkçe kasa uygular ve `i → İ` olur. Türkçe metin için DOĞRU, yabancı
@@ -103,9 +104,35 @@
 > SABİT yazıyor; `/en/...` sayfaları da `lang="tr"` alıyor. INV-7 kod tarar, bu niteliği
 > göremez — ayrı kusur, ayrı sahip (rota/altyapı alanı). Görmediğini gizlemiyoruz.
 
+> **I ile J aynı eksen DEĞİL.** I, **CSS**'in (`text-transform: uppercase`) dile göre farklı
+> davranmasıdır — kusur *niteliktedir*, ekranda görünür. J, **JavaScript**'in
+> `toLowerCase()`/`toUpperCase()` metotlarının **locale'den bağımsız** olmasıdır: Türkçe'de
+> `İ → i̇` (birleşen nokta U+0307) ve `I → i` (`ı` değil) üretirler. J'nin kusuru **sessizdir** —
+> kimse hata almaz, arama boş döner.
+>
+> **J'nin GÖRMEDİĞİ üç şey** (üçü de ayrı iş):
+> 1. **Kök `<html lang>` sabit** (`src/app/layout.tsx`) — I ekseninin donmuş 21 yerini asıl
+>    açacak olan budur ve **HOLD'dadır** (çoklu-kök layout restructure, ADMIN koordinasyonu bekler).
+>    T147a başlık/açıklama/OG-yerelini getirir, `<html lang>`'i **düzeltmez**.
+> 2. **`localeCompare` dil parametresiz** — 11 kullanım, 9'unda yok. Bedeli yalnız "yanlış sıra"
+>    değil: SSR (Node) ile istemci (tarayıcı) **farklı varsayılan locale** kullanır, yani sıra
+>    **hidrasyonda değişebilir**. Müşteriye dokunan dördü ölçüm belgesinde adıyla yazılı.
+> 3. **Postgres tarafı** — vitrin araması `get_search_suggestions` / `fts_search_products`
+>    RPC'lerine gider ve JS'te kasa çevirmez; doğruluğu DB collation'ı ve Türkçe FTS sözlüğüyle
+>    ölçülür, bu kapının konusu **değildir**.
+>
+> **`toLocaleLowerCase('tr')` KULLANILMAZ:** ICU verisine bağlıdır, ICU'suz (small-icu) bir Node
+> çalıştırmasında **sessizce** locale'siz davranışa düşer. `case.ts` eşlemeyi elle yazar.
+>
+> **Arama aksan duyarsızdır** (`foldForSearch`): "siginak" yazan kullanıcı "Sığınak Fanı"nı bulur.
+> Recep onayı 2026-08-23. Eşleşmeyi yalnız **genişletir**. Ekrana basılan metinde KULLANILMAZ.
+>
+> Ölçüm: `docs/audits/locale-kasa-envanteri-2026-08-23.md`.
+
 **Açık eksenleri kapatma yöntemi:** drift denetimi (ajan) → maestro paralel göç → merkezi kapı (type+lint+test+build) → **yeni INV-x conformance testi** → commit. (B ekseninin yaptığı gibi.)
 
 ---
+
 
 ## 4. DoD — Canlı UI'da ASLA görünmemeli
 

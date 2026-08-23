@@ -11,6 +11,7 @@ import { SITE_URL } from '../../config/siteUrl'
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
+import { compareText } from '../../i18n/sort'
 import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import HomePage from '../../views/HomePage'
@@ -133,7 +134,7 @@ export default async function RootPage({ params }: Props) {
 
   const displayCategories: CategoryViewModelLite[] = categories
     .filter((c) => !c.parent_id && (productCounts[c.id] ?? 0) > 0)
-    .sort((a, b) => a.name.localeCompare(b.name))
+    .sort((a, b) => compareText(a.name, b.name, lang))
     .map(c => ({
       id: c.id,
       // Görünen slug dile göre (kanonik EN kolon → TR sayfada TR slug)
