@@ -47,21 +47,32 @@ metin ayrıldı: yapı atarsız, metin incelenir.
 
 Bu 23 satırda marka ve model kodu olduğu gibi korunur; yalnız tür adı çevrilir.
 
-## 2. ⚠ DOMAIN DOĞRULAMASI İSTEYEN İKİ SATIR
+## 2. İKİ SATIR — OEM KAYNAĞINDAN ÖLÇÜLDÜ (Recep teyidi bekliyor)
 
-| # | TR | Düz karşılık | Sektör terimi olabilir | Not |
-|---:|---|---|---|---|
-| 24 | Nicotra Gebhardt **ADH** Sık Kanatlı Radyal Fanlar | ADH Close-Bladed Centrifugal Fans | ADH **Forward-Curved** Centrifugal Fans | "Sık kanatlı" HVAC'ta çoğu zaman **öne eğik (forward-curved)** kanat demektir |
-| 25 | Nicotra Gebhardt **RDH** Seyrek Kanatlı Radyal Fanlar | RDH Sparse-Bladed Centrifugal Fans | RDH **Backward-Curved** Centrifugal Fans | "Seyrek kanatlı" çoğu zaman **geriye eğik (backward-curved)** |
+İlk yazımda "domain doğrulaması gerekir" diye bırakmıştım. Sonra ölçtüm — üreticinin kendi
+ürün sayfaları soruyu kapatıyor:
 
-**Bunu ben karara bağlamıyorum.** "Sık/seyrek kanatlı" ile "öne/geriye eğik" **aynı şey
-değildir** — biri kanat SAYISINI, öbürü kanat GEOMETRİSİNİ anlatır ve pratikte örtüşseler de
-teknik olarak ayrı eksenlerdir. Yanlış seçilirse İngilizce vitrinde fanın performans sınıfı
-yanlış ilan edilmiş olur. Doğrusu OEM föyünden (Nicotra Gebhardt ADH/RDH veri sayfası)
-okunmalı; kaynak katalog `C:/Users/alize/venthub-pdf-ingestor` altında.
+| # | TR | Önerilen EN | Kaynak |
+|---:|---|---|---|
+| 24 | Nicotra Gebhardt ADH Sık Kanatlı Radyal Fanlar | Nicotra Gebhardt ADH **Forward-Curved** Centrifugal Fans | nicotra-gebhardt.com/en → ADH: "double inlet … impeller with **forward curved** blades" |
+| 25 | Nicotra Gebhardt RDH Seyrek Kanatlı Radyal Fanlar | Nicotra Gebhardt RDH **Backward-Inclined** Centrifugal Fans | nicotra-gebhardt.com/en → RDH: "impeller … 11 **backward inclined** blades" |
 
-Sınıf: bu tam olarak `fidelity-is-not-correctness` — kaynağa sadık çeviri, kaynak yanlışsa
-ya da belirsizse doğru sonuç vermez.
+### ÖNEMLİ: ilk önerim RDH'de YANLIŞTI
+
+Önce "Backward-**Curved**" önermiştim. Üretici kendi metninde "backward **inclined**" diyor —
+ikisi aynı şey değil: *curved* kanat eğrisel, *inclined* kanat düz ama eğik durur. Bir satıcı
+sitesi (mep-global) "backward-curved" yazıyor; çelişkide **OEM kazanır**, satıcı metni değil.
+Eğer OEM'i okumasaydım makul görünen ama yanlış bir terimi 16 ürünlük aileye basacaktım.
+
+Bu tam olarak `fidelity-is-not-correctness` sınıfı: satıcı metnine sadakat, OEM yanlış
+kopyalanmışsa doğru sonuç vermez.
+
+### Kapsam dışı gözlem (URUN/taksonomi kalemi, çözmüyorum)
+
+ADH ve RDH'nin ikisi de üreticiye göre **çift emişli (double inlet)**. Ama katalogda "Çift
+Emişli" adını taşıyan ayrı bir aile var: `Nicotra Gebhardt AT Çift Emişli Radyal Fanlar`.
+Yani "çift emişlilik" AT'yi diğerlerinden AYIRMIYOR; ayırt edici özellik başka bir şey olmalı.
+Bu bir adlandırma tutarsızlığı olabilir — i18n kusuru değil, taksonomi kalemi.
 
 ## 3. Yazılmayacaklar — dil-nötr 13 model adı
 
@@ -73,7 +84,7 @@ Bunlarda EN = TR yazılır (migration adım 2 bunu yapar); çeviri **yanlış** 
 
 ## 4. Sonraki adımlar
 
-1. Recep §1'i onaylar, §2'nin iki satırını OEM föyüyle karara bağlar.
+1. Recep §1'i onaylar. §2 OEM kaynağından ÖLÇÜLDÜ — Recep'ten gereken karar değil TEYİT.
 2. Onaylı 25 satır küçük bir veri migration'ıyla `name_i18n->'en'` alanına yazılır.
 3. **Okuma yolu** bağlanır: `name_i18n[lang] → name` sırası. Bu `src/lib/services/
    family.service.ts` (+ görünüm katmanı) demektir ve **ÜRÜN şeridinin alanıdır** — I18N
