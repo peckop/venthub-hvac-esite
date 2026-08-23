@@ -60,6 +60,19 @@
 | F | Hreflang/SEO | hreflang seti | — manuel denetim | ⚠️ blueprint var (`seo-transition-blueprint.md`) |
 | G | **i18n key-çözünürlük** | `getDictValue` nested-only | **INV-5** `i18n-key-resolution.test.ts` (her statik `t('a.b.c')` sözlükte çözülmeli; içinde-nokta düz anahtar = ham-key render) | ✅ KAPALI (ratchet: 2026-06-16'da 32 debt donduruldu → admin literal batch #364 15'ini çözünce 32→17 sıkıştı; yeni kırılma kırar) |
 
+| H | **Ölü sözlük anahtarı** (ters yön) | sözlükteki her yaprağın bir tüketicisi olmalı | **INV-6** `i18n-dead-key.test.ts` (7 tüketim ekseni: statik · şablon **ayraçsız** · `dict.x` erişimi · veri-anahtarı · ata-anahtar · yaprak-adıyla indeksleme) | ✅ KAPALI (ratchet: 2026-08-23'te **431 borç** donduruldu; liste yalnız küçülebilir) |
+
+> **G ile H aynı eksen DEĞİL.** G **çağrı → sözlük** yönünü tarar (anahtar çözülüyor mu),
+> H **sözlük → çağrı** yönünü (anahtarın tüketicisi var mı). G'nin yakaladığı kusur
+> **görünür**dür (ekranda ham anahtar); H'ninki **görünmez** — bu yüzden bugüne kadar kapı
+> almadı ve birikti. Ölçüm: `docs/audits/i18n-sozluk-render-denetimi-2026-08-23.md`.
+>
+> **H'nin en kritik kuralı — önek eşlemesi AYRAÇSIZ olmalı.** Kod anahtarı ayraçsız
+> birleştirebiliyor: `` t(`pdp.actions.download${'Catalog'}`) ``. Önek `önek.` diye eşlenirse
+> bu anahtarlar ölü sanılır; denetimde tam bu yüzden **10 canlı anahtar** ölü listesine
+> düşmüştü. INV-6 o 10 anahtarı **kanarya** olarak tutar: ölü görünüyorlarsa sözlük değil
+> **kapının kendisi kördür**.
+
 **Açık eksenleri kapatma yöntemi:** drift denetimi (ajan) → maestro paralel göç → merkezi kapı (type+lint+test+build) → **yeni INV-x conformance testi** → commit. (B ekseninin yaptığı gibi.)
 
 ---
