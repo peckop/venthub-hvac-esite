@@ -477,6 +477,11 @@ Deno.serve(async (req: Request) => {
             customer_name: ci.name,
             customer_phone: ci.phone || null,
             payment_method: 'iyzico',
+            // Islem para birimi DAIMA TRY (pricing-standard 4.1; ayni deger asagida
+            // iyzico istegine de yaziliyor). Odeme defteri cetveli para birimini
+            // TASINIR sayar, TURETILMEZ (payment-ledger-standard 3, degismez 3) — bu
+            // yuzden kolonun DEFAULT'una GUVENMIYORUZ, degeri aciktan gonderiyoruz.
+            currency: 'TRY',
             status: 'pending',
             invoice_type: invoiceType || null,
             invoice_info: invoiceInfo || null,
@@ -501,10 +506,24 @@ Deno.serve(async (req: Request) => {
 
         if (!orderResponse.ok) {
             const errorText = await orderResponse.text();
-            // Fallback: remove shipping_method if column doesn't exist yet
-            const mayRetry = /shipping_method/i.test(errorText) && /does not exist|column/i.test(errorText)
-            if (mayRetry) {
-                const { shipping_method: _shipping_method, ...withoutShipMethod } = orderData as Record<string, unknown>
+            // Fallback: sema sapmasinda eksik kolonu dusurup bir kez daha dene.
+            //
+            // ADIM-1 PENCERESI (payment-ledger-standard 6.0 — GECICI, ADIM-2'de kaldirilir):
+            // master'a push, supabase-migrate.yml ile deploy-functions.yml is akislarini
+            // PARALEL tetikler ve aralarinda sira garantisi YOKTUR. Bu fonksiyon migration'dan
+            // ONCE dagitilirsa venthub_orders.currency kolonu henuz yoktur ve PostgREST
+            // "column does not exist" doner. O pencerede siparis olusturma KIRILMASIN diye
+            // alani dusurup yeniden deniyoruz.
+            //
+            // BILINEN SINIR (sessiz birakilmiyor): PostgREST tek seferde tek kolonu sikayet
+            // eder; iki alan da eksik olsaydi ikinci deneme yine patlardi. Kabul edilebilir,
+            // cunku shipping_method kolonu canlida ZATEN VAR (o dal tarihi bir artiktir).
+            const eksikKolonHatasi = /does not exist|column/i.test(errorText)
+            const dusurulecekAlanlar = ['shipping_method', 'currency']
+                .filter((alan) => eksikKolonHatasi && new RegExp(alan, 'i').test(errorText))
+            if (dusurulecekAlanlar.length > 0) {
+                const withoutShipMethod: Record<string, unknown> = { ...(orderData as Record<string, unknown>) }
+                for (const alan of dusurulecekAlanlar) delete withoutShipMethod[alan]
                 orderResponse = await fetch(`${supabaseUrl}/rest/v1/venthub_orders`, {
                     method: 'POST',
                     headers: {
