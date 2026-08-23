@@ -103,7 +103,8 @@ export const tr = {
         shelter: 'Sığınak Havalandırma Sistemleri',
         'acid-fans': 'Asit Dayanımlı Fanlar',
         'freq-converters': 'Frekans Konvertörleri',
-        'duct-heaters': 'Elektrikli Kanal Isıtıcıları'
+        'duct-heaters': 'Elektrikli Kanal Isıtıcıları',
+        dehumidifier: 'Nem Alma Cihazları'
       }
     },
     byApplication: 'Uygulamaya Göre Çözümler',
@@ -162,38 +163,6 @@ export const tr = {
       faqSupportMessage: 'Sıkça Sorulan Sorular sayfasında aradığım cevabı bulamadım...',
       supportMessageDefault: 'Merhaba, VentHub HVAC destek ekibiyle iletişime geçmek istiyorum.',
       technicalQuoteMessage: '{{productName}} için teknik teklif ve projelendirme talep ediyorum. Proje detayları: {{projectInfo}}'
-    }
-  },
-  homeGallery: {
-    title: 'Uygulama Vitrini',
-    subtitle: 'Gerçek dünya kullanım senaryolarına hızlı bir bakış',
-    productsCta: 'Ürünleri Gör',
-    guideCta: 'Kılavuzu Aç',
-    items: {
-      parking: {
-        title: 'Otopark Havalandırması',
-        subtitle: 'Jet fan / CO kontrolü'
-      },
-      airCurtain: {
-        title: 'Hava Perdesi',
-        subtitle: 'Giriş konforu'
-      },
-      heatRecovery: {
-        title: 'Isı Geri Kazanım',
-        subtitle: 'Enerji verimliliği'
-      },
-      industrialKitchen: {
-        title: 'Endüstriyel Mutfak',
-        subtitle: 'Davlumbaz ve kanal'
-      },
-      smokeExhaust: {
-        title: 'Duman Tahliye',
-        subtitle: 'Acil durum'
-      },
-      hvac: {
-        title: 'Isıtma/Soğutma',
-        subtitle: 'Konfor HVAC'
-      }
     }
   },
   homeShowcase: {
@@ -296,16 +265,6 @@ export const tr = {
     detailedSearchCta: 'Detaylı arama için tıklayın',
     brandPrefix: 'Marka: ',
     fuzzyMatchNotice: 'Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor.'
-  },
-  resources: {
-    title: 'Kaynaklar ve Kılavuzlar',
-    allGuides: 'Tüm kılavuzlar',
-    teaser: 'Hızlı başlangıç için pratik ipuçları',
-    items: {
-      jetFan: 'Otopark Jet Fan seçimi',
-      airCurtain: 'Hava perdesi seçimi',
-      hrv: 'Isı geri kazanım (HRV) rehberi'
-    }
   },
   knowledge: {
     hub: {
@@ -2083,13 +2042,6 @@ export const tr = {
       }
     }
   },
-  categories: {
-    title: 'Ürün Kategorileri',
-    subtitle: 'Tüm HVAC alanlarını kapsayan geniş yelpazemizle profesyonel havalandırma çözümlerini bulun.',
-    subCount: '{{count}} alt kategori',
-    allTitle: 'Tüm Kategoriler',
-    variantCount: '{{count}} çeşit'
-  },
   quickView: {
     title: 'Hızlı Bakış',
     close: 'Kapat',
@@ -3269,51 +3221,10 @@ export const tr = {
     retry: 'Tekrar Dene',
     devDetails: 'Hata Detayları (Geliştirme)'
   },
-  applications: {
-    'air-curtain': {
-      subtitle: 'Enerji kaybını azaltan giriş çözümleri',
-      title: 'AVM / Giriş Tipi Hava Perdesi'
-    },
-    airCurtain: {
-      subtitle: 'Enerji kaybını azaltan giriş çözümleri',
-      title: 'AVM / Giriş Tipi Hava Perdesi'
-    },
-    'heat-recovery': {
-      subtitle: 'Verimli havalandırma ve enerji tasarrufu',
-      title: 'Isı Geri Kazanım'
-    },
-    heatRecovery: {
-      subtitle: 'Verimli havalandırma ve enerji tasarrufu',
-      title: 'Isı Geri Kazanım'
-    },
-    parking: {
-      subtitle: 'Yüksek hava debisi ve basınç gerektiren çözümler',
-      title: 'Otopark Havalandırması'
-    }
-  },
   homeCta: {
     button: 'Teklif Al / Uzman Desteği',
     subtitle: 'Bize kısa bilgi verin, doğru çözümü birlikte şekillendirelim.',
     title: 'Projeniz Hakkında Konuşalım'
-  },
-  homeFaq: {
-    items: {
-      airCurtain: {
-        a: 'Konforu artırmak ve enerji kaybını azaltmak için girişlerde kullanılır; açıklıkta bir hava bariyeri oluşturur.',
-        q: 'Hava perdesini ne zaman kullanmalıyım?'
-      },
-      hrv: {
-        a: 'Hava debisi, ısı geri kazanım verimliliği, basınç kaybı ve ses seviyeleri belirleyicidir.',
-        q: 'Isı Geri Kazanım Cihazı (VMC) seçerken nelere dikkat etmeliyim?'
-      },
-      jetFan: {
-        a: 'Otopark hacmi, CO/NOx sensörleri, hava değişim oranı ve yerleşim planına göre hesaplanır.',
-        q: 'Jet fan seçimi nasıl yapılır?'
-      }
-    },
-    readMore: 'Daha fazlasını oku →',
-    subtitle: 'Temel konulara hızlı yanıtlar — daha fazlası için destek sayfamızı inceleyin.',
-    title: 'Sıkça Sorulan Sorular'
   },
   homeProcess: {
     stepPrefix: 'Adım',
@@ -3341,44 +3252,6 @@ export const tr = {
     },
     subtitle: 'Başlangıçtan teslimata kadar şeffaf ve öngörülebilir bir süreç',
     title: 'Nasıl Çalışıyoruz'
-  },
-  homeSpotlight: {
-    items: {
-      airCurtain: {
-        desc: 'Giriş konforu ve azaltılmış ısı kaybı',
-        title: 'Hava Perdesi'
-      },
-      hrv: {
-        desc: 'İç ortam hava kalitesi ve verimlilik',
-        title: 'Isı Geri Kazanım Cihazı (VMC)'
-      },
-      parkingJetFan: {
-        desc: 'CO sensör kontrolü ve energy tasarrufu',
-        title: 'Otopark Jet Fanı'
-      },
-      smokeExhaust: {
-        desc: 'Acil durum yönetimi',
-        title: 'Duman Tahliye'
-      }
-    },
-    subtitle: 'İçeriği vurgulamak için imleci hareket ettirin',
-    title: 'Öne Çıkan Uygulamalar'
-  },
-  homeTrust: {
-    kvkk: {
-      desc: 'Kişisel veriler güvenli bir şekilde saklanır ve yalnızca gerekli olduğunda kullanılır.',
-      title: 'KVKK Uyumlu'
-    },
-    payment: {
-      desc: '3D Secure ve gelişmiş dolandırıcılık önleme kontrolleri.',
-      title: 'Güvenli Ödeme (iyzico)'
-    },
-    returns: {
-      desc: 'Şeffaf prosedürler ve hızlı, sonuç odaklı destek.',
-      title: 'Kolay İade/Değişim'
-    },
-    subtitle: 'Altyapımız, güvenliğimiz ve süreçlerimiz şeffaf ve standartlara uygundur.',
-    title: 'Güven & Uyum'
   },
   beforeAfterSlider: {
     title: 'Öncesi / Sonrası',

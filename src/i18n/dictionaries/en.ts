@@ -99,7 +99,8 @@ export const en: typeof tr = {
         shelter: 'Shelter Ventilation Systems',
         'acid-fans': 'Acid-Resistant Fans',
         'freq-converters': 'Frequency Converters',
-        'duct-heaters': 'Electric Duct Heaters'
+        'duct-heaters': 'Electric Duct Heaters',
+        dehumidifier: 'Dehumidifiers'
       }
     },
     byApplication: 'Solutions by Application',
@@ -186,16 +187,6 @@ export const en: typeof tr = {
     detailedSearchCta: 'Click for detailed search',
     brandPrefix: 'Brand: ',
     fuzzyMatchNotice: 'No exact match found, showing similar results.'
-  },
-  resources: {
-    title: 'Resources & Guides',
-    allGuides: 'All guides',
-    teaser: 'Quick tips to get started',
-    items: {
-      jetFan: 'Parking Jet Fan selection',
-      airCurtain: 'Air curtain selection',
-      hrv: 'Heat recovery (HRV) guide'
-    }
   },
   knowledge: {
     hub: {
@@ -713,95 +704,6 @@ export const en: typeof tr = {
       }
     }
   },
-  homeTrust: {
-    title: 'Trust & Compliance',
-    subtitle: 'Our infrastructure, security and processes are transparent and standards-compliant.',
-    kvkk: {
-      title: 'KVKK Compliant',
-      desc: 'Personal data is stored securely and used only where necessary.'
-    },
-    payment: {
-      title: 'Secure Payment (iyzico)',
-      desc: '3D Secure and advanced anti-fraud checks.'
-    },
-    returns: {
-      title: 'Easy Returns/Exchanges',
-      desc: 'Transparent procedures and fast, result-focused support.'
-    }
-  },
-  homeFaq: {
-    title: 'FAQs (Short)',
-    subtitle: 'Quick answers to essentials — see our support page for more.',
-    readMore: 'Read more →',
-    items: {
-      airCurtain: {
-        q: 'When should I use an air curtain?',
-        a: 'Used at entrances to improve comfort and reduce energy loss; creates an air barrier at the opening.'
-      },
-      jetFan: {
-        q: 'How is jet fan selection done?',
-        a: 'Calculated by parking volume, CO/NOx sensors, air change rate and layout plan.'
-      },
-      hrv: {
-        q: 'What should I consider when choosing HRV?',
-        a: 'Airflow, heat recovery efficiency, pressure loss and noise levels are key.'
-      }
-    }
-  },
-  homeSpotlight: {
-    title: 'Featured Applications',
-    subtitle: 'Move the pointer to spotlight content',
-    items: {
-      parkingJetFan: {
-        title: 'Parking Jet Fan',
-        desc: 'CO sensor control and energy saving'
-      },
-      airCurtain: {
-        title: 'Air Curtain',
-        desc: 'Entrance comfort and reduced heat loss'
-      },
-      hrv: {
-        title: 'Heat Recovery (HRV)',
-        desc: 'Indoor air quality and efficiency'
-      },
-      smokeExhaust: {
-        title: 'Smoke Exhaust',
-        desc: 'Emergency management'
-      }
-    }
-  },
-  homeGallery: {
-    title: 'Application Showcase',
-    subtitle: 'Quick look at real-world use cases',
-    productsCta: 'View Products',
-    guideCta: 'Open Guide',
-    items: {
-      parking: {
-        title: 'Parking Ventilation',
-        subtitle: 'Jet fan / CO control'
-      },
-      airCurtain: {
-        title: 'Air Curtain',
-        subtitle: 'Entrance comfort'
-      },
-      heatRecovery: {
-        title: 'Heat Recovery',
-        subtitle: 'Energy efficiency'
-      },
-      industrialKitchen: {
-        title: 'Industrial Kitchen',
-        subtitle: 'Hood and duct'
-      },
-      smokeExhaust: {
-        title: 'Smoke Exhaust',
-        subtitle: 'Emergency'
-      },
-      hvac: {
-        title: 'Heating/Cooling',
-        subtitle: 'Comfort HVAC'
-      }
-    }
-  },
   homeShowcase: {
     slide1: {
       title: 'Expertise in Industrial Ventilation',
@@ -880,28 +782,6 @@ export const en: typeof tr = {
     systemTotalPrefix: 'All in system',
     viewGrid: 'Grid',
     viewList: 'List'
-  },
-  applications: {
-    parking: {
-      title: 'Parking Ventilation',
-      subtitle: 'Solutions requiring high airflow and pressure'
-    },
-    airCurtain: {
-      title: 'Mall / Entrance Air Curtain',
-      subtitle: 'Entrance solutions that reduce energy loss'
-    },
-    heatRecovery: {
-      title: 'Heat Recovery',
-      subtitle: 'Efficient HVAC and energy saving'
-    },
-    'air-curtain': {
-      title: 'Mall / Entrance Air Curtain',
-      subtitle: 'Entrance solutions that reduce energy loss'
-    },
-    'heat-recovery': {
-      title: 'Heat Recovery',
-      subtitle: 'Efficient HVAC and energy saving'
-    }
   },
   megamenu: {
     elite: {
@@ -2276,13 +2156,6 @@ export const en: typeof tr = {
       originSuffix: 'Origin',
       estPrefix: 'EST.'
     }
-  },
-  categories: {
-    title: 'Product Categories',
-    subtitle: 'Find professional ventilation solutions with our wide range covering all HVAC areas.',
-    subCount: '{{count}} subcategories',
-    allTitle: 'All Categories',
-    variantCount: '{{count}} types'
   },
   quickView: {
     title: 'Quick View',
