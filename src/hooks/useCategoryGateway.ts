@@ -5,6 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useCategories } from '../contexts/CategoryContext'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
+import { useI18n } from '../i18n/I18nProvider'
+import { compareText } from '../i18n/sort'
 import { DomainCategory } from '../lib/type-converters'
 import { useIsMounted } from './useIsMounted'
 
@@ -45,6 +47,7 @@ export function useCategoryGateway(
   const router = useRouter()
   const pathname = usePathname()
   const { categories: globalCategories, loading: categoriesLoading } = useCategories()
+  const { lang } = useI18n()
 
   const [filters, setFilters] = useState<CategoryFilters>(DEFAULT_FILTERS)
 
@@ -117,9 +120,9 @@ export function useCategoryGateway(
     return [...(categoryMaps.childrenByParentId.get(category.id) || [])].sort((a, b) => {
       const orderA = Number((a.metadata as Record<string, unknown>)?.sort_order ?? 0)
       const orderB = Number((b.metadata as Record<string, unknown>)?.sort_order ?? 0)
-      return orderA !== orderB ? orderA - orderB : a.name.localeCompare(b.name)
+      return orderA !== orderB ? orderA - orderB : compareText(a.name, b.name, lang)
     })
-  }, [initialSubCategories, category, categoryMaps])
+  }, [initialSubCategories, category, categoryMaps, lang])
 
   return {
     category,
