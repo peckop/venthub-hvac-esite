@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider'
-import { kategoriIdBul, urunSlugUret, type KategoriSecenegi } from '@/lib/admin/csvProductMapping'
+import { hazirlaUrunSatirlari, type KategoriSecenegi } from '@/lib/admin/csvProductMapping'
 import { splitByExistingSku } from '@/lib/data/csvImportGuard'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
@@ -89,43 +89,17 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
 
         setIsProcessing(true)
         /**
-         * ERR_SLUG_NOT_IN_DB (cetvel: csv-import-export-standard.md §4) — eşleşmeyen
-         * kategori SESSİZ GEÇİLMEZ. Eski davranış null yazıyordu: ürün kategorisiz
-         * kaydoluyor, vitrinde HİÇBİR yerde görünmüyor, ekranda ise "içe aktarma
-         * tamamlandı" yazıyordu. Cetvel bu vakaya severity Error verir ve satırın
-         * insana işaretlenmesini ister; bu yüzden yazım BAŞLAMAZ.
+         * Eşleme ve satır hazırlama SAF modülde (src/lib/admin/csvProductMapping.ts).
+         *
+         * NİÇİN TAŞINDI: burada, bir tıklama işleyicisinin gövdesinde yaşarken davranışı
+         * hiçbir kapı ölçemiyordu — kapı ancak dosyada geçen kelimelere bakabiliyordu.
+         * Nitekim ilk yazdığım kapı tam bu yüzden kör kaldı: reddetme dalını silen sabotaj
+         * kelimeler yerinde durduğu için YEŞİL geçti. Saf hâlde sabotaj davranışı bozar.
+         *
+         * SÖZLEŞME: kategori değeri var ama canlı DB'de karşılığı yoksa satır payloads'a
+         * GİRMEZ, reddedilen'e düşer (ERR_SLUG_NOT_IN_DB — sessiz null YOK).
          */
-        const reddedilen: { sku: string; deger: string }[] = []
-
-        const payloads: Database['public']['Tables']['products']['Insert'][] = []
-
-        for (const r of importRows) {
-            if (!r['sku'] || !r['name']) continue
-            const p: Database['public']['Tables']['products']['Insert'] = {
-                sku: r['sku'].trim(),
-                name: r['name'].trim(),
-                slug: urunSlugUret(r['name']),
-                brand: r['brand']?.trim() || 'Generic' 
-            }
-            if (r['model_code']) p.model_code = r['model_code'].trim()
-            else if (r['model']) p.model_code = r['model'].trim()
-            if (r['brand']) p.brand = r['brand'].trim()
-            if (r['status']) p.status = (r['status'].trim() as Database['public']['Tables']['products']['Insert']['status'])
-            if (r['price']) p.price = Number(r['price'])
-            if (r['stock_qty']) p.stock_qty = Number(r['stock_qty'])
-            if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
-            if (r['category_id']) p.category_id = r['category_id'] || null
-            else if (r['category_slug'] || r['category']) {
-                const kategoriDegeri = r['category_slug'] || r['category']
-                const kategoriId = kategoriIdBul(kategoriDegeri, categories)
-                if (!kategoriId) {
-                    reddedilen.push({ sku: r['sku'].trim(), deger: kategoriDegeri.trim() })
-                    continue
-                }
-                p.category_id = kategoriId
-            }
-            payloads.push(p)
-        }
+        const { payloads, reddedilen } = hazirlaUrunSatirlari(importRows, categories)
 
         /* Kategorisi çözülemeyen satır varsa YAZIM YAPILMAZ. Kısmi yazım burada en kötü
          * seçenek olurdu: dosyanın bir kısmı içeri girer, geri kalanı girmez ve kullanıcı

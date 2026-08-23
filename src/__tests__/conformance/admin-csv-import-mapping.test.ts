@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { kategoriIdBul, metadataSluglari, slugAnahtari, urunSlugUret } from '@/lib/admin/csvProductMapping'
+import { hazirlaUrunSatirlari, kategoriIdBul, metadataSluglari, slugAnahtari, urunSlugUret } from '@/lib/admin/csvProductMapping'
 
 /**
  * INV-CSV-MAP-1 — CSV içe aktarımında kategori SLUG ile eşlenir, ürün slug'ı Türkçe
@@ -109,8 +109,9 @@ describe('INV-CSV-MAP-1 · yüzey ve veri yolu', () => {
 
   it('bileşen saf modülü kullanır (mantık tıklama işleyicisine geri dönmez)', () => {
     expect(bilesen).toMatch(/from '@\/lib\/admin\/csvProductMapping'/)
-    expect(bilesen).toMatch(/urunSlugUret\(/)
-    expect(bilesen).toMatch(/kategoriIdBul\(/)
+    expect(bilesen).toMatch(/hazirlaUrunSatirlari\(/)
+    // Döngü bileşene GERİ TAŞINIRSA (kapıyı kör eden hâl) bu assert kırmızı verir.
+    expect(bilesen).not.toMatch(/payloads\.push\(/)
   })
 
   it('eski kusur kalıpları geri gelmez', () => {
@@ -131,5 +132,62 @@ describe('INV-CSV-MAP-1 · yüzey ve veri yolu', () => {
      * doğruyken — geri gelir. Sessiz, kimse hata almaz.
      */
     expect(cagiran).toMatch(/\.select\('id,name,slug,metadata'\)/)
+  })
+})
+
+describe('INV-CSV-MAP-1 · satır hazırlama DAVRANIŞI', () => {
+  /**
+   * NİÇİN DAVRANIŞSAL: ilk sürümde bu kol yalnız METİN tarıyordu (dosyada "reddedilen"
+   * kelimesi geçiyor mu). Kasıtlı bozma turunda S4 — reddetme dalını silmek — YEŞİL geçti,
+   * çünkü kelimeler yerinde duruyordu ama artık hiçbir şeye bağlı değildi.
+   * Ders: kapsamı ADA değil ŞEKLE/DAVRANIŞA bağla. Mantık saf hâle getirildi ve burada
+   * çıktısıyla ölçülüyor; aynı sabotaj artık kırmızı verir.
+   */
+  it('kategorisi çözülemeyen satır YAZILMAZ ve reddedilenlere düşer', () => {
+    const sonuc = hazirlaUrunSatirlari(
+      [
+        { sku: 'A-1', name: 'Çatı Tipi Fan Küçük', category_slug: 'cati-tipi-fanlar' },
+        { sku: 'A-2', name: 'Hayalet Fan', category_slug: 'boyle-bir-kategori-yok' },
+      ],
+      KATEGORILER,
+    )
+
+    expect(sonuc.payloads.map(p => p.sku)).toEqual(['A-1'])
+    expect(sonuc.reddedilen).toEqual([{ sku: 'A-2', deger: 'boyle-bir-kategori-yok' }])
+  })
+
+  it('çözülen satırın kategori kimliği ve harf-çevrimli slug ı yazılır', () => {
+    const { payloads } = hazirlaUrunSatirlari(
+      [{ sku: 'A-1', name: 'Sığınak Fanı', category: 'siginak-fanlari' }],
+      KATEGORILER,
+    )
+
+    expect(payloads).toHaveLength(1)
+    expect(payloads[0].category_id).toBe('kat-sig')
+    expect(payloads[0].slug).toBe('siginak-fani')
+  })
+
+  it('category_id doğrudan verilmişse eşleme denenmez', () => {
+    const { payloads, reddedilen } = hazirlaUrunSatirlari(
+      [{ sku: 'A-1', name: 'Fan', category_id: 'elle-verilen-id', category_slug: 'boyle-bir-kategori-yok' }],
+      KATEGORILER,
+    )
+
+    expect(reddedilen).toHaveLength(0)
+    expect(payloads[0].category_id).toBe('elle-verilen-id')
+  })
+
+  it('kategori sütunu hiç yoksa satır normal yazılır (kategori zorunlu değil)', () => {
+    const { payloads, reddedilen } = hazirlaUrunSatirlari([{ sku: 'A-1', name: 'Fan' }], KATEGORILER)
+    expect(reddedilen).toHaveLength(0)
+    expect(payloads[0].category_id).toBeUndefined()
+  })
+
+  it('sku veya name eksik satır sessizce atlanır (mevcut davranış korunur)', () => {
+    const { payloads } = hazirlaUrunSatirlari(
+      [{ sku: '', name: 'Fan' }, { sku: 'A-2', name: '' }, { sku: 'A-3', name: 'Fan' }],
+      KATEGORILER,
+    )
+    expect(payloads.map(p => p.sku)).toEqual(['A-3'])
   })
 })

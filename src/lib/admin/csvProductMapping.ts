@@ -18,6 +18,9 @@
  * şikâyetini geri getirir.
  */
 import { foldForSearch } from '@/i18n/case'
+import type { Database } from '@/types/database.types'
+
+type UrunYazimi = Database['public']['Tables']['products']['Insert']
 
 /** Bileşene giren kategori seçeneği. `slug`/`metadata` opsiyoneldir ki çağıran kademeli geçebilsin. */
 export interface KategoriSecenegi {
@@ -86,4 +89,66 @@ export function kategoriIdBul(girdi: string, kategoriler: readonly KategoriSecen
     if (slugAnahtari(kategori.name) === aranan) return kategori.id
   }
   return null
+}
+
+/** Kategorisi çözülemediği için YAZILMAYACAK satır. Cetvel §4: ERR_SLUG_NOT_IN_DB. */
+export interface ReddedilenSatir {
+  sku: string
+  deger: string
+}
+
+export interface HazirlamaSonucu {
+  payloads: UrunYazimi[]
+  reddedilen: ReddedilenSatir[]
+}
+
+/**
+ * CSV satırlarını yazım nesnelerine çevirir.
+ *
+ * NİÇİN BİLEŞENDE DEĞİL BURADA: bu döngü bir tıklama işleyicisinin gövdesinde yaşıyordu.
+ * Orada yaşayan mantığın DAVRANIŞI ölçülemez — kapı ancak dosyada geçen kelimelere
+ * bakabilir. Nitekim ilk yazdığım kapı tam bu yüzden kör kaldı: reddetme dalını silen
+ * sabotaj (S4) kelimeler yerinde durduğu için YEŞİL geçti. Mantık saf hâle gelince
+ * sabotaj davranışı bozar ve kapı görür.
+ *
+ * SÖZLEŞME: kategori değeri verilmiş ama canlı DB'de karşılığı yoksa satır `payloads`a
+ * GİRMEZ, `reddedilen`e düşer. Sessiz `null` YOK.
+ */
+export function hazirlaUrunSatirlari(
+  rows: readonly Record<string, string>[],
+  kategoriler: readonly KategoriSecenegi[],
+): HazirlamaSonucu {
+  const payloads: UrunYazimi[] = []
+  const reddedilen: ReddedilenSatir[] = []
+
+  for (const r of rows) {
+    if (!r['sku'] || !r['name']) continue
+    const p: UrunYazimi = {
+      sku: r['sku'].trim(),
+      name: r['name'].trim(),
+      slug: urunSlugUret(r['name']),
+      brand: r['brand']?.trim() || 'Generic',
+    }
+    if (r['model_code']) p.model_code = r['model_code'].trim()
+    else if (r['model']) p.model_code = r['model'].trim()
+    if (r['brand']) p.brand = r['brand'].trim()
+    if (r['status']) p.status = r['status'].trim() as UrunYazimi['status']
+    if (r['price']) p.price = Number(r['price'])
+    if (r['stock_qty']) p.stock_qty = Number(r['stock_qty'])
+    if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
+
+    if (r['category_id']) p.category_id = r['category_id'] || null
+    else if (r['category_slug'] || r['category']) {
+      const deger = r['category_slug'] || r['category']
+      const id = kategoriIdBul(deger, kategoriler)
+      if (!id) {
+        reddedilen.push({ sku: r['sku'].trim(), deger: deger.trim() })
+        continue
+      }
+      p.category_id = id
+    }
+    payloads.push(p)
+  }
+
+  return { payloads, reddedilen }
 }
