@@ -280,3 +280,90 @@ src/components/products/VariantSelector.tsx:73 a.localeCompare(b)
 > **Ders:** "sayı tek başına kanıt değildir" kuralı yalnız tarayıcının *kapsamı* için değil,
 > *sınıflandırması* için de geçerli. Her dedektöre bilinen bir pozitif VE bilinen bir negatif
 > örnek sokulmalı; ilk sürüm ikisinden birini geçemedi ve sessizce yanlış rapor üretiyordu.
+
+---
+
+## 10. Eksen D KAPANDI — `localeCompare` dil argümanı (INV-9)
+
+§7'de "AÇIK" bırakılan eksen bu turda kapandı. Kayıt için: §7'nin verdiği sayı
+(11 kullanım / 9'u dilsiz) **iki kez** ölçüldü, çünkü ilk dedektör kusurluydu (§9.1).
+
+### 10.1 Kusurun kendisi — ölçüldü, tahmin değil
+
+Dil verilmeyen `localeCompare`, **çalışma ortamının varsayılan yerelini** kullanır.
+Aynı diziyi aynı çalıştırmada iki dille sıraladım:
+
+```
+'tr' → Cam Fanları · Çatı Fanları · Isıtıcı · İç Ortam · Sığınak · Sirkülasyon
+'en' → Cam Fanları · Çatı Fanları · İç Ortam · Isıtıcı · Sirkülasyon · Sığınak
+                                    ^^^^^^^^^^^^^^^^^^   ^^^^^^^^^^^^^^^^^^^^
+                                    iki çift yer değiştirdi
+```
+
+Bu makinenin varsayılanı `tr-TR` olduğu için locale'siz çağrı **tesadüfen** doğru sıra
+üretiyor. Sunucu varsayılanı farklıysa (Vercel Node genelde `en-US`) sunucu bir sırayla
+HTML basar, istemci başka sırayla yeniden sıralar: **hidrasyonda değişen sıra**.
+Kusur "yanlış sıra" değil, **kararsız sıra**dır — bu yüzden gözle yakalanması zordur.
+
+### 10.2 Yardımcı — `src/i18n/sort.ts`
+
+```ts
+compareText(a, b, lang)          // Array.prototype.sort ile doğrudan
+byText(seçici, lang)             // nesne dizisi için karşılaştırıcı üretir
+harmanlamaDileDuyarliMi()        // ICU gerçekten var mı — VARSAYIM DEĞİL, ölçüm
+```
+
+`Intl.Collator` ICU verisine dayanır ve ICU'suz bir çalıştırmada **sessizce** kök
+harmanlamaya düşer, hata fırlatmaz. Bu yüzden üçüncü fonksiyon var: birim takımı onu
+çağırır, ICU yoksa kırmızı verir. `numeric: true` de eklendi — aksi halde "Fan 10"
+"Fan 2"den önce gelirdi.
+
+### 10.3 Kural BİLEREK semantik değil
+
+INV-8'de "bu ifade kullanıcı metni mi" diye ayıklamak zorundaydım (çünkü teknik dizede
+locale'siz kasa çevirimi DOĞRU kullanımdır). Burada öyle değil: **dil argümanı var ya da
+yok.** Teknik sıralamalarda (uuid) da dil vermek zararsızdır, sadece acil değildir —
+onlar donmuş borçta. Tahmin katmanı olmayan kural, yanlış pozitif de üretmez.
+
+### 10.4 Kapı INV-9 ve kanıtı
+
+`src/__tests__/conformance/i18n-locale-compare.test.ts` · 8 kol.
+
+Argüman listesi **parantez dengeleyerek** okunuyor. Naif `localeCompare\([^)]*,` deseni
+`String(a).localeCompare(String(b), 'tr')` çağrısını "dil YOK" diye sayar — §9.1'deki
+kusurun aynısı. Kanaryalar üç taraflı: pozitif (dilsiz yakalanır), negatif (iç içe
+parantezli dilli çağrı yakalanmaz), yorum (yorumdaki çağrı sayılmaz).
+
+> Yorum kanaryası boşuna değil: kapı ilk koşuşunda **kendi SSOT'unu** ihlalci gösterdi.
+> `src/i18n/sort.ts` kusuru ANLATMAK için doküman yorumunda `localeCompare(b)` yazıyor.
+> Tarayıcı yorumu koddan ayırmayınca çözümü kusur sandı.
+
+**Bilerek bozuldu:** düzelttiğim `src/app/[lang]/page.tsx` çağrısını eski hâline
+döndürdüm → 3. kol kırmızı. Geri alınca 8/8 yeşil.
+
+**Mandal kendini zorladı:** üç yeri düzelttikten sonra donmuş borcu güncellemeyi
+unutmuştum; 5. kol "liste 1, gerçek 0" diye kırmızı verdi. Listeyi elle hatırlamadım,
+**kapı hatırlattı** — mandalın tek yönlü olmasının bütün amacı bu.
+
+### 10.5 Kim neyi aldı (OPS route, 2026-08-23)
+
+| Yer | Sahip | Durum |
+|---|---|---|
+| `src/app/[lang]/page.tsx:136` | SAHİPSİZ → I18N | ✅ düzeltildi |
+| `src/hooks/useCategoryGateway.ts:120` | SAHİPSİZ → I18N | ✅ düzeltildi |
+| `src/views/CategoryMasterView.tsx:86` | SAHİPSİZ → I18N | ✅ düzeltildi |
+| `src/components/products/VariantSelector.tsx:73` | **ÜRÜN** | 🔴 devredildi, mandalda donmuş |
+| 5 teknik yer (uuid/anahtar) | çeşitli | 🟡 donmuş, düşük öncelik |
+
+Borç: **8 dosya / 9 çağrı → 5 dosya / 6 çağrı**.
+
+### 10.6 Bu turda DÜZELTMEDİĞİM, ama gördüğüm bir şey
+
+Üç yerde de sıralama **ham `c.name`** üzerinden yapılıyor. Oysa kategori ADI ekranda
+`getCategoryDisplayName` ile çözülüyor (translation_key → menu_label → name). İkisi
+ayrıştığında **liste, göründüğünden farklı bir alana göre sıralanmış olur** — kullanıcı
+alfabetik olmayan bir alfabetik liste görür.
+
+Bu eksen D'nin konusu değil (dil argümanı değil, sıralama ANAHTARI meselesi) ve
+düzeltmesi görünen adın sıralama anında çözülmesini gerektirir. **Ölçmedim, kusur
+olduğunu iddia etmiyorum** — gözlem olarak kaydediyorum ki kaybolmasın.
