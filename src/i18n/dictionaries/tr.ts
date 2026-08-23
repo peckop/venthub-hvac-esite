@@ -41,28 +41,20 @@ export const tr = {
     quickDetails: 'Hızlı Detaylar',
     scrollTo: 'bölümüne git',
     addToProject: 'Proje Listesine Ekle',
-    loadingApp: 'VentHub yükleniyor... ',
     loading: 'Yükleniyor...',
     categories: 'Kategoriler',
     products: 'Ürünler',
     brands: 'Markalar',
     about: 'Hakkımızda',
     contact: 'İletişim',
-    supportCenter: 'Destek Merkezi',
     knowledgeHub: 'Bilgi Merkezi',
-    myOrders: 'Siparişlerim',
     signOut: 'Çıkış Yap',
     signIn: 'Giriş Yap',
     signUp: 'Kayıt Ol',
     skipToContent: 'Ana içeriğe geç',
-    searchHeaderPlaceholder: 'Ürün, marka veya model ara...',
     search: 'Ara',
-    quickSearch: 'Hızlı ara...',
     allCategories: 'Tüm Kategoriler',
-    priceRange: 'Fiyat Aralığı',
-    systemPreparing: 'Sistem Hazırlanıyor...',
     adminPanel: 'Yönetim Paneli',
-    goToStore: 'Mağazaya Git',
     backToSite: 'Siteye Dön',
     languageSwitcher: 'Dil Seçimi',
     turkish: 'Türkçe',
@@ -103,25 +95,18 @@ export const tr = {
         shelter: 'Sığınak Havalandırma Sistemleri',
         'acid-fans': 'Asit Dayanımlı Fanlar',
         'freq-converters': 'Frekans Konvertörleri',
-        'duct-heaters': 'Elektrikli Kanal Isıtıcıları'
+        'duct-heaters': 'Elektrikli Kanal Isıtıcıları',
+        dehumidifier: 'Nem Alma Cihazları'
       }
     },
-    byApplication: 'Uygulamaya Göre Çözümler',
     viewAll: 'Tümü',
     featured: 'Öne Çıkan Ürünler',
-    newProducts: 'Yeni Ürünler',
-    whyUs: 'Neden VentHub?',
     homeLabel: 'Ana Sayfa',
-    discoverPage: 'Keşfet',
     notFound: 'Sonuç bulunamadı',
-    clearSearch: 'Aramayı Temizle',
     searchPlaceholder: 'Ürün adı, marka...',
-    searchPlaceholderLong: 'Ürün adı, marka, model...',
-    selectByNeed: 'İhtiyacına Göre Seç',
     seeAllProducts: 'Tüm Ürünleri Gör',
     back: 'Geri',
     backToTop: 'Başa dön',
-    gotoCategory: 'Kategoriye git',
     cancel: 'İptal',
     close: 'Kapat',
     noVisuals: 'Görsel Mevcut Değil',
@@ -161,39 +146,6 @@ export const tr = {
     whatsapp: {
       faqSupportMessage: 'Sıkça Sorulan Sorular sayfasında aradığım cevabı bulamadım...',
       supportMessageDefault: 'Merhaba, VentHub HVAC destek ekibiyle iletişime geçmek istiyorum.',
-      technicalQuoteMessage: '{{productName}} için teknik teklif ve projelendirme talep ediyorum. Proje detayları: {{projectInfo}}'
-    }
-  },
-  homeGallery: {
-    title: 'Uygulama Vitrini',
-    subtitle: 'Gerçek dünya kullanım senaryolarına hızlı bir bakış',
-    productsCta: 'Ürünleri Gör',
-    guideCta: 'Kılavuzu Aç',
-    items: {
-      parking: {
-        title: 'Otopark Havalandırması',
-        subtitle: 'Jet fan / CO kontrolü'
-      },
-      airCurtain: {
-        title: 'Hava Perdesi',
-        subtitle: 'Giriş konforu'
-      },
-      heatRecovery: {
-        title: 'Isı Geri Kazanım',
-        subtitle: 'Enerji verimliliği'
-      },
-      industrialKitchen: {
-        title: 'Endüstriyel Mutfak',
-        subtitle: 'Davlumbaz ve kanal'
-      },
-      smokeExhaust: {
-        title: 'Duman Tahliye',
-        subtitle: 'Acil durum'
-      },
-      hvac: {
-        title: 'Isıtma/Soğutma',
-        subtitle: 'Konfor HVAC'
-      }
     }
   },
   homeShowcase: {
@@ -215,9 +167,6 @@ export const tr = {
     nextAria: 'Sonraki'
   },
   products: {
-    categoryCard: {
-      seriesCount: '{{count}} seri',
-    },
     orbital: {
       dragHint: 'Tut Çevir',
     },
@@ -247,29 +196,14 @@ export const tr = {
     viewList: 'Liste',
     emptyTitle: 'Ürün Bulunamadı',
     emptyDesc: 'Daha fazla ürün görmek için kategorilerden birini seçin.',
-    breadcrumbDiscover: 'Keşfet',
     heroTitle: 'HVAC ürünlerini keşfedin: mühendislik odaklı seçim, hızlı teklif',
     heroSubtitle: 'Uygulama yönlendirmeli alanlar, popüler kategoriler ve öne çıkan ürünlerle aradığınızı hızla bulun.',
     itemsListed: 'ürün listeleniyor',
     resultsFound: 'sonuç bulundu',
-    heroValue1: 'Sertifikalı, güvenilir ürünler',
-    heroValue2: 'Mühendislik desteği ve doğru seçim',
-    heroValue3: 'Hızlı teklif / yönlendirme',
-    helpCtaTitle: 'Emin değil misiniz? Uygulamaya göre doğru ürünü seçelim.',
-    helpCtaSubtitle: 'Proje detayınızı paylaşın; mühendislik ekibimiz hızla dönüş yapsın.',
-    applicationTitle: 'Uygulamaya Göre Çözümler',
     popularCategories: 'Popüler Kategoriler',
-    discoverVisual: 'Keşfet görsel alanı',
-    searchResultsTitle: 'Arama Sonuçları',
-    searchSeoTitle: 'Arama: {{q}}',
-    searchSeoDesc: '"{{q}}" için arama sonuçları',
-    discoverSeoDesc: 'VentHub üzerindeki ürünleri, öne çıkanları ve popüler kategorileri keşfedin.',
-    hubBadge: 'Türkiye\'nin HVAC Uzmanı',
     hubTitle: 'Profesyonel HVAC Çözümleri',
-    hubSubtitle: 'Hava perdesi, endüstriyel fan ve ısı geri kazanım sistemleri. İhtiyacınız olanı beraber bulalım.',
     searchPlaceholder: 'Ürün veya model ara...',
     noResults: 'Sonuç Bulunamadı',
-    noResultsDesc: 'Lütfen filtreleri temizleyin veya farklı bir terim deneyin.',
     clearFilters: 'Filtreleri Temizle',
     heroAlt: 'HVAC Ürünleri Keşif Görseli',
     searchAriaLabel: 'Ürün Arama',
@@ -287,25 +221,13 @@ export const tr = {
     popularCategories: 'Popüler Kategoriler',
     noResults: 'Sonuç bulunamadı',
     detailedSearch: 'için detaylı ara',
-    allResults: 'Tüm sonuçları gör',
     keyboardHint: 'Ok tuşları ile gezinebilirsiniz',
     enterHint: 'Tüm sonuçlar için',
     placeholder: 'Ürün, kategori veya marka ara...',
     placeholderAi: 'Ürün, kategori veya yapay zeka destekli arama...',
     noResultsAdvice: 'Farklı anahtar kelimeler deneyin',
-    detailedSearchCta: 'Detaylı arama için tıklayın',
     brandPrefix: 'Marka: ',
     fuzzyMatchNotice: 'Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor.'
-  },
-  resources: {
-    title: 'Kaynaklar ve Kılavuzlar',
-    allGuides: 'Tüm kılavuzlar',
-    teaser: 'Hızlı başlangıç için pratik ipuçları',
-    items: {
-      jetFan: 'Otopark Jet Fan seçimi',
-      airCurtain: 'Hava perdesi seçimi',
-      hrv: 'Isı geri kazanım (HRV) rehberi'
-    }
   },
   knowledge: {
     hub: {
@@ -806,14 +728,7 @@ export const tr = {
       back: 'Geri Dön',
       subCategoryCount: '{{count}} Alt Kategori',
     },
-    navigation: 'Navigasyon Menüsü',
-    quickAccess: 'Hızlı Erişim',
-    myCart: 'Sepetim',
-    loadingCategories: 'Kategoriler yükleniyor...',
     productCategories: 'Ürün Kategorileri',
-    pickCategory: 'Premium HVAC çözümleri için kategori seçiminizi yapın',
-    subcategories: 'alt kategori',
-    more: 'daha fazla'
   },
   header: {
     adminBar: {
@@ -831,7 +746,6 @@ export const tr = {
     cart: 'Sepet',
     brandName: 'VentHub',
     brandTagline: 'HVAC Premium',
-    commandSearch: 'Hızlı arama... (/)',
     commandSearchCompact: 'Ara...'
   },
   roles: {
@@ -987,7 +901,6 @@ export const tr = {
     registering: 'Kayıt yapılıyor...',
     alreadyHave: 'Zaten hesabınız var mı?',
     emailAlready: 'Bu e-posta adresi zaten kullanımda',
-    goToLogin: 'Giriş Sayfasına Git',
     registrationComplete: 'Kayıt Tamamlandı!',
     backHome: 'Ana Sayfaya Dön',
     emailSentTitle: 'E-posta Gönderildi!',
@@ -997,7 +910,6 @@ export const tr = {
     registrationCompleteTitle: 'Kayıt Tamamlandı!',
     registrationCompleteDesc: 'E-postanıza bir doğrulama bağlantısı gönderildi. Kaydı tamamlamak için lütfen doğrulayın.',
     or: 'veya',
-    googleSignIn: 'Google ile giriş',
     googleSignInFail: 'Google ile giriş başlatılamadı',
     googleSignInError: 'Google ile giriş sırasında beklenmeyen hata',
     features: {
@@ -1025,7 +937,6 @@ export const tr = {
     seoDesc: 'VentHub çatısı altındaki premium HVAC markaları',
     notFound: 'Marka bulunamadı',
     backToAll: 'Tüm markalara dön',
-    countryLabel: 'Ülke:',
     aboutBrand: 'hakkında bilgi',
     trust: {
       eyebrow: 'Supply Chain Authority',
@@ -1087,51 +998,10 @@ export const tr = {
     },
     title: 'İletişim',
     subtitle: 'Size her konuda yardımcı olmaktan mutluluk duyarız.',
-    formTitle: 'Bize Mesaj Gönderin',
-    name: 'Adınız Soyadınız',
-    email: 'E-posta Adresiniz',
-    phone: 'Telefon Numaranız',
-    subject: 'Konu',
-    message: 'Mesajınız',
-    submit: 'Gönder',
-    submitting: 'Gönderiliyor...',
-    success: 'Mesajınız başarıyla iletildi. En kısa sürede size dönüş yapacağız.',
-    error: 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.',
-    officialDistributor: 'Resmi Distribütör & Mühendislik Ortağı',
-    address: 'Adres',
-    phoneLabel: 'Telefon',
-    emailLabel: 'E-posta',
-    workingHours: 'Çalışma Saatleri',
-    businessInquiry: 'İş Ortaklığı & Proje Teklifleri',
-    addressLabel: 'Adres',
-    addressLine1: 'Teknokent Mah. Teknopark Bulvarı',
-    addressLine2: 'No: 1/4A 34906 Pendik/İstanbul',
-    emailPh: 'E-posta',
-    messagePh: 'Mesajınız / Proje detayları',
-    namePh: 'Adınız Soyadınız',
-    quickButton: 'WhatsApp\'tan Yazın',
-    quickDesc: 'Acil konular ve hızlı yanıtlar için bize doğrudan WhatsApp üzerinden ulaşın.',
-    quickTitle: 'Hızlı İletişim',
-    subjectPh: 'Konu'
   },
   aboutPage: {
     title: 'Hakkımızda',
-    subtitle: 'Havalandırma teknolojilerinde mühendislik ve inovasyonun birleştiği nokta.',
-    history: 'Hikayemiz',
     vision: 'Vizyonumuz',
-    mission: 'Misyonumuz',
-    team: 'Ekibimiz',
-    stats: {
-      projects: 'Tamamlanan Projeler',
-      clients: 'Mutlu Müşteriler',
-      years: 'Yıllık Tecrübe',
-      brands: 'Global Markalar',
-      deliveryTarget: 'Teslimat Hedefi',
-      launchYear: 'Kuruluş Yılı',
-      premiumBrands: 'Premium Markalar',
-      productTypes: 'Ürün Tipleri',
-      yearsExperience: 'Yıllık Tecrübe'
-    },
     experience: 'Yıllık Tecrübe',
     distributorship: 'Global Distribütörlük',
     completedProject: 'Tamamlanan Proje',
@@ -1159,60 +1029,10 @@ export const tr = {
     ctaContact: 'İletişime Geçin',
     ctaExplore: 'Ürünleri Keşfedin',
     seoDescription: 'VentHub: Türkiye\'nin premium HVAC distribütörü. 15 yıllık tecrübe ve mühendislik odaklı havalandırma çözümleri.',
-    bullets: {
-      bullet1: 'Mühendislik odaklı seçim desteği ve doğru ürün yönlendirmesi',
-      bullet2: 'Stok, teslimat ve satış sonrasında şeffaf iletişim',
-      bullet3: 'KVKK/iyzico uyumlu, güvenli ödeme ve veri koruma'
-    },
-    cta: {
-      primary: 'Ürünleri Keşfet',
-      secondary: 'Bizimle İletişime Geçin',
-      subtitle: 'Projeniz için en uygun HVAC çözümünü birlikte bulalım. Uzman ekibimiz size yardımcı olmaya hazır.',
-      title: 'Birlikte Çalışalım'
-    },
-    experienceLabel: '2009\'dan Beri',
-    heroSubtitle: 'Profesyonel havalandırma çözümlerinde 15 yılı aşkın deneyimimizle, dünya standartlarında ürünleri Türkiye\'ye getiriyoruz.',
-    heroTitleText: 'Yeniden Tanımlıyoruz',
-    trustBadges: {
-      ce: {
-        label: 'CE Sertifikalı Ürünler',
-        sublabel: 'Avrupa Standartları'
-      },
-      original: {
-        label: 'Orijinal Ürünler',
-        sublabel: 'Kalite Garantisi'
-      },
-      premium: {
-        label: 'Premium Markalar',
-        sublabel: 'Global Üreticiler'
-      },
-      reliable: {
-        label: 'Güvenilir Platform',
-        sublabel: 'Profesyonel Servis'
-      }
-    },
-    values: {
-      itemsSubtitle: 'Aldığımız her kararda müşterilerimizin ihtiyaçlarını önceliklendiriyoruz',
-      itemsTitle: 'Bizi Tanımlayan Değerler',
-      mission: {
-        description: 'Türkiye\'de profesyonel HVAC çözümlerini erişilebilir kılmak, B2B müşterilerimize dünya standartlarında ürünler sunmak.',
-        title: 'Misyonumuz'
-      },
-      values: {
-        description: 'Kalite, güvenilirlik, müşteri memnuniyeti ve sürdürülebilirlik ilkelerimizin temelini oluşturur.',
-        title: 'Değerlerimiz'
-      },
-      vision: {
-        description: 'Global markaların güvenilir temsilcisi olarak büyüyerek havalandırma sektöründe Türkiye\'nin referans e-ticaret platformu olmak.',
-        title: 'Vizyonumuz'
-      }
-    },
     whySubtitle: 'Güveninize layık olmak için çalışıyoruz',
-    whyTitle: 'Neden VentHub?'
   },
   cartToast: {
     added: 'Ürün sepete eklendi!',
-    whatNext: 'Ne yapmak istersiniz?',
     continue: 'Alışverişe Devam Et',
     goToCart: 'Sepete Git',
     autoClose: 'Bu pencere 5 saniye içinde otomatik olarak kapanacak'
@@ -1390,7 +1210,6 @@ export const tr = {
       back: 'Geri',
       next: 'Devam Et',
       proceedPayment: 'Ödemeye Geç',
-      backToAddress: 'Adrese Dön'
     },
     security: {
       secureNote: 'Ödeme bilgileriniz güvenli bir şekilde şifrelenmektedir'
@@ -1589,25 +1408,15 @@ export const tr = {
       dehumidifierNoiseValue: '42dB',
       dehumidifierNoiseLabel: 'Sessiz Operasyon',
       modelsSuffix: 'Modelleri',
-      solutionsListed: '{{count}} Teknik Çözüm Listeleniyor',
       filterAll: 'Tüm Modeller',
-      filterQuiet: 'En Sessiz',
       venthubSolution: 'VentHub Çözümü',
     },
     series: {
       technicalFamily: 'Teknik Ürün Ailesi',
       heroDefaultDesc: 'Profesyonel havalandırma çözümlerini teknik serilerine göre inceleyin.',
       seriesDetail: 'Seri Detayı',
-      seriesHeading: '{{name}} SERİSİ',
-      seriesConfigCount: '{{count}} farklı teknik konfigürasyon sunan yüksek verimli çözüm ailesi.',
-      showcaseView: 'VİTRİN',
-      matrixView: 'MATRİS',
-      startingFrom: 'Başlangıç',
       requestQuote: 'Teklif Alın',
       colModel: 'Model',
-      colAirflow: 'Debi (m³/h)',
-      colNoise: 'Ses (dB)',
-      colPower: 'Güç (W)',
       colPrice: 'Fiyat',
       colAction: 'İşlem',
       skuLabel: 'SKU: {{sku}}',
@@ -1624,9 +1433,7 @@ export const tr = {
     breadcrumbHome: 'Ana Sayfa',
     premiumCollection: 'Premium Koleksiyon',
     findModel: 'Bana Uygun Modeli Bul',
-    aboutCategory: 'Kategori Hakkında',
     productCount: 'Ürün Sayısı',
-    goToCategory: 'Kategoriye Git',
     showcase: {
       defaultDescription: 'Yüksek performanslı, akıllı ve sürdürülebilir havalandırma sistemlerinin teknik otoritesi.',
       premiumTitle: 'Premium Engineering Solutions',
@@ -1692,30 +1499,14 @@ export const tr = {
     clean: 'Temizle',
     clearFilters: 'Filtreleri Temizle',
     close: 'Kapat',
-    compareBar: 'Karşılaştır',
-    compareTitle: 'Karşılaştırma',
     feature: 'Özellik',
     filters: 'Filtreler',
-    gridViewAria: 'Izgara görünümü',
-    labelBrand: 'Marka',
-    labelModel: 'Model',
-    labelPrice: 'Fiyat',
-    listViewAria: 'Liste görünümü',
     localSearchPlaceholder: 'Bu kategori içinde ara (ad/marka/model/SKU)',
-    ltePlaceholder: '≤',
-    maxPlaceholder: 'Maks',
-    minPlaceholder: 'Min',
     noProducts: 'Ürün Bulunamadı',
-    noProductsDesc: 'Filtrelerinizle eşleşen ürün bulunamadı.',
     noise: 'Ses Seviyesi [dB(A)] (Maks)',
     open: 'Aç',
     pressure: 'Basınç (Pa)',
-    priceRange: 'Fiyat Aralığı',
-    sortByName: 'Ada Göre Sırala',
-    sortByPriceHigh: 'Fiyat: Yüksekten Düşüğe',
-    sortByPriceLow: 'Fiyat: Düşükten Yükseğe',
     subcategories: 'Alt Kategoriler',
-    techFilters: 'Teknik Filtreler',
     howItWorksAirCurtain: {
       title: 'Hava Perdesi Nasıl Çalışır?',
       subtitle: 'Basit ama etkili bir prensip: Görünmez hava duvarı',
@@ -1779,6 +1570,95 @@ export const tr = {
     }
   },
   pdp: {
+    // Teknik ozellik ALAN adlari — specLabel.ts 'pdp.specs.<anahtar>' yolunu arar.
+    // Kaynak: canli DB technical_specs anahtarlari (2026-08-22, 73 tekil anahtar).
+    // Birim etikete GIRMEZ — deger tarafi formatSpecValue ile birimi kendi ekler.
+    // TEK ISTISNA: max_delivery_m3h / max_delivery_ls ayni 180 uründe BIRLIKTE bulunur;
+    // birim yazilmazsa iki satir ayni etiketle farkli sayi gosterir ve celiskili okunur.
+    specs: {
+      absorbed_current_a: 'Çekilen Akım',
+      airflow_speed_max_ms: '2. Kademe Hava Hızı',
+      airflow_speed_min_ms: '1. Kademe Hava Hızı',
+      atex_marking: 'ATEX İşareti',
+      blade_diameter_mm: 'Pervane Çapı',
+      co2_sensor: 'CO2 Sensörü',
+      compatible_model: 'Uyumlu Model',
+      connection_height_mm: 'Bağlantı Yüksekliği',
+      connection_width_mm: 'Bağlantı Genişliği',
+      diameter_mm: 'Çap',
+      discharge_type: 'Hava Çıkış Yönü',
+      discharge_velocity_curve: 'Üfleme Hızı Eğrisi',
+      drive_code: 'Sürücü Kodu',
+      enclosure_class: 'Muhafaza Tipi',
+      enclosure_size: 'Muhafaza Boyutu',
+      erp_compliant: 'ErP Uyumlu',
+      filter_classes: 'Filtre Sınıfı',
+      fire_rating: 'Yangın Sınıfı',
+      frequency_hz: 'Frekans',
+      has_bypass: 'Bypass',
+      has_humidistat: 'Higrostat',
+      has_timer: 'Zamanlayıcı',
+      heating_capacity_kw: 'Isıtma Kapasitesi',
+      heating_power_w: 'Isıtıcı Gücü',
+      height_mm: 'Yükseklik',
+      humidity_removed_l_24h: 'Nem Alma Kapasitesi (24 Saat)',
+      insulation_class: 'Yalıtım Sınıfı',
+      ip_rating: 'Koruma Sınıfı (IP)',
+      length_mm: 'Uzunluk',
+      max_absorbed_power_w: 'Maksimum Çekilen Güç',
+      max_ambient_temp_c: 'Maksimum Ortam Sıcaklığı',
+      max_current_a: 'Maksimum Akım',
+      max_delivery_ls: 'Maksimum Debi (l/s)',
+      max_delivery_m3h: 'Maksimum Debi (m³/h)',
+      max_static_pressure_pa: 'Maksimum Statik Basınç',
+      max_voltage_v: 'Maksimum Voltaj',
+      min_delivery_m3h: 'Minimum Debi',
+      min_static_pressure_pa: 'Minimum Statik Basınç',
+      min_voltage_v: 'Minimum Voltaj',
+      motor_poles: 'Motor Kutup Sayısı',
+      motor_type: 'Motor Tipi',
+      noise_level_db_a: 'Ses Seviyesi',
+      noise_lpa_3m_db: 'Ses Basıncı (3 m)',
+      nominal_delivery_m3h: 'Nominal Debi',
+      nominal_static_pressure_pa: 'Nominal Statik Basınç',
+      number_of_blades: 'Kanat Sayısı',
+      number_of_speeds: 'Hız Kademesi Sayısı',
+      operating_temperature_c: 'Çalışma Sıcaklığı',
+      optional_heater_power_w: 'Opsiyonel Isıtıcı Gücü',
+      phase: 'Faz',
+      pm10_sensor: 'PM10 Sensörü',
+      pm2_5_sensor: 'PM2.5 Sensörü',
+      pq_curve: 'Basınç-Debi Eğrisi',
+      rated_output_current_a: 'Anma Çıkış Akımı',
+      rated_power_w: 'Anma Gücü',
+      refrigerant_type: 'Soğutucu Gaz Tipi',
+      relative_humidity_sensor: 'Nem Sensörü',
+      reversible: 'Ters Dönüş',
+      rpm_max: 'Maksimum Devir Hızı',
+      size_a_mm: 'Genişlik (A)',
+      size_b_mm: 'Derinlik (B)',
+      size_c_mm: 'Yükseklik (C)',
+      size_d_mm: 'Boyut (D)',
+      tank_capacity_l: 'Su Tankı Kapasitesi',
+      temp_sensor: 'Sıcaklık Sensörü',
+      thermal_efficiency_curve: 'Isıl Verim Eğrisi',
+      thermal_efficiency_pct: 'Isıl Verim',
+      voc_sensor: 'VOC Sensörü',
+      voltage_alt_v: 'Alternatif Voltaj',
+      voltage_v: 'Voltaj',
+      weight_kg: 'Ağırlık',
+      width_mm: 'Genişlik',
+      wiring: 'Bağlantı Tipi'
+    },
+    // Teknik ozellik GRUP basliklari — specLabel.ts 'pdp.specGroups.<grup>' yolunu arar.
+    // Bunlar yoksa groupTechnicalSpecs'in HARDCODED Turkce etiketi kullaniliyordu:
+    // EN sayfada da Turkce basiyordu (CLAUDE.md Kural 7 ihlali).
+    specGroups: {
+      performance: 'Performans Ölçüleri',
+      physical: 'Fiziksel Ölçüler',
+      electrical: 'Elektriksel Veriler',
+      other: 'Diğer Özellikler'
+    },
     variant: {
       heading: 'Model Seçimi',
       count: '{{count}} model',
@@ -1806,7 +1686,6 @@ export const tr = {
       loadingModel: '3D Model Yükleniyor',
       dragToRotate: 'Döndürmek İçin Sürükleyin',
     },
-    loading: 'Ürün yükleniyor...',
     productNotFound: 'Ürün Bulunamadı',
     backHome: 'Ana Sayfaya Dön',
     back: 'Geri Dön',
@@ -1819,20 +1698,12 @@ export const tr = {
     vatExcluded: '(+KDV)',
     qty: 'Adet:',
     addToCart: 'Sepete Ekle',
-    askStock: 'Stok Sor',
     techQuote: 'Teknik Teklif İste',
-    askPriceButton: 'Teklif İste',
-    freeShipping: 'Ücretsiz Kargo',
-    warranty2y: '2 Yıl Garanti',
-    support247: '7/24 Destek',
     descFallback: 'Bu ürün için detaylı açıklama yakında eklenecektir.',
-    relatedGuide: 'İlgili Kılavuz',
-    statusLabel: 'Durum',
     relatedProducts: 'İlgili Ürünler',
     officialDistributor: 'RESMİ DİSTRİBÜTÖR',
     priceAvailability: 'Fiyat & Stok',
     shareCopied: 'Link kopyalandı!',
-    variantDetails: 'Varyant Detayları',
     messages: {
       pdfStarted: 'PDF üretiliyor...'
     },
@@ -1840,33 +1711,13 @@ export const tr = {
       pdfFailed: 'PDF üretilemedi.'
     },
     labels: {
-      productFeatures: 'Ürün Özellikleri',
       productDescription: 'Ürün Açıklaması',
-      technicalSpecs: 'Teknik Özellikler',
       category: 'Kategori',
-      price: 'Fiyat',
-      physicalDimensions: 'Fiziksel Boyutlar',
-      performanceMetrics: 'Performans Metrikleri',
-      width: 'Genişlik',
-      height: 'Yükseklik',
-      depth: 'Derinlik',
-      weight: 'Ağırlık',
-      airflow: 'Hava Debisi',
-      pressure: 'Basınç',
-      power: 'Güç',
-      noise: 'Ses Seviyesi',
       noSpecsAvailable: 'Bu ürün için teknik özellik bulunmamaktadır.',
       technicalDatasheet: 'TEKNİK VERİ SAYFASI',
       engineeringAnalysis: 'Mühendislik Analizi',
       sku: 'SKU',
       datasheetPdf: 'TEKNİK DÖKÜMAN (PDF)'
-    },
-    features: {
-      materialQuality: 'Birinci sınıf malzeme ve üretim kalitesi',
-      energyEfficient: 'Enerji tasarruflu tasarım ve düşük tüketim',
-      quietOperation: 'Sessiz çalışma ve minimum titreşim',
-      easyMaintenance: 'Kolay kurulum ve bakım',
-      durable: 'Uzun ömürlü ve dayanıklı'
     },
     diagramsExtra: {
       technicalDiagrams: 'Teknik Şemalar',
@@ -1896,7 +1747,6 @@ export const tr = {
       download: 'İndir',
       downloadCatalog: 'Kataloğu İndir',
       downloadBrochure: 'Broşürü İndir',
-      liveDataNotice: 'ℹ️ Veriler gerçek zamanlı güncellenmektedir',
       interactive3D: '3D GÖRÜNÜM',
       addToProject: 'Projeye Ekle',
       removeFromWishlist: 'Favorilerden Kaldır',
@@ -1920,14 +1770,11 @@ export const tr = {
       yearSuffix: '-2024',
       standardValue: 'ISO/EN-STD',
       certificateNo: 'Sertifika No',
-      validity: 'Geçerlilik',
       standard: 'Standart',
-      efficiency: 'Verimlilik'
     },
     sections: {
       general: 'Genel Bilgiler',
       models: 'Modeller',
-      dimensions: 'Boyutlar',
       diagrams: 'Şemalar',
       documents: 'Belgeler',
       brochure: 'Broşür/Katalog',
@@ -1994,13 +1841,6 @@ export const tr = {
       }
     }
   },
-  categories: {
-    title: 'Ürün Kategorileri',
-    subtitle: 'Tüm HVAC alanlarını kapsayan geniş yelpazemizle profesyonel havalandırma çözümlerini bulun.',
-    subCount: '{{count}} alt kategori',
-    allTitle: 'Tüm Kategoriler',
-    variantCount: '{{count}} çeşit'
-  },
   quickView: {
     title: 'Hızlı Bakış',
     close: 'Kapat',
@@ -2022,11 +1862,7 @@ export const tr = {
     },
     home: {
       subtitle: 'İhtiyacınız olan bilgilere hızlıca ulaşın.',
-      faqDesc: 'Siparişler, ödeme, kurulum ve daha fazlası',
-      returnsDesc: 'Cayma hakkı, iade süreci ve koşulları',
-      shippingDesc: 'Teslimat süreleri, ücretler ve takip bilgileri',
       warrantyDesc: 'Garanti kapsamı ve yetkili servis bilgileri',
-      knowledgeDesc: 'Konu bazlı kılavuzlar ve yakında hesaplayıcılar'
     },
     returns: {
       title: 'İade ve Değişim',
@@ -2180,12 +2016,8 @@ export const tr = {
       activeOrders: 'Aktif Sipariş',
       completedOrders: 'Tamamlanan',
       totalVolume: 'Toplam Hacim',
-      defaultAddressesTitle: 'Varsayılan Adresler',
       shippingAddress: 'Teslimat Adresi',
       billingAddress: 'Fatura Adresi',
-      notSetShipping: 'Varsayılan teslimat adresi tanımlanmamış.',
-      notSetBilling: 'Varsayılan fatura adresi tanımlanmamış.',
-      manageAddresses: 'Adresleri yönet',
       defaultPartnerName: 'Değerli İş Ortağımız',
       loadingDashboard: 'Dashboard Hazırlanıyor...',
       liveTracking: 'Canlı Kargo Takibi',
@@ -2268,10 +2100,6 @@ export const tr = {
       cityLine: '{{district}}, {{city}} {{postal}}',
       title: 'Adreslerim',
       addressLabel: 'Adres',
-      defaultShippingTag: 'Varsayılan teslimat',
-      defaultBillingTag: 'Varsayılan fatura',
-      makeDefaultShipping: 'Teslimat için varsayılan yap',
-      makeDefaultBilling: 'Fatura için varsayılan yap',
       noItems: 'Henüz adres eklenmemiş.',
       formTitleEdit: 'Adresi Düzenle',
       formTitleNew: 'Yeni Adres Ekle',
@@ -2334,11 +2162,9 @@ export const tr = {
       pageSubtitle: 'Fatura bilgilerini burada yönetebilirsiniz.',
       empty: 'Henüz profil eklenmemiş',
       title: 'Fatura Profilleri',
-      addNew: 'Yeni Profil Ekle',
       type: 'Tür',
       individual: 'Bireysel',
       corporate: 'Kurumsal',
-      titleLabel: 'Başlık (Opsiyonel)',
       tcknLabel: 'T.C. Kimlik No',
       companyLabel: 'Şirket Ünvanı',
       vknLabel: 'Vergi Numarası (VKN)',
@@ -2353,8 +2179,6 @@ export const tr = {
       created: 'Fatura profili oluşturuldu',
       updated: 'Fatura profili güncellendi',
       deleted: 'Fatura profili silindi',
-      setDefaultSuccess: 'Varsayılan profil güncellendi',
-      noProfiles: 'Kayıtlı fatura profili bulunmuyor'
     },
     profile: {
       title: 'Profil Bilgileri',
@@ -2387,7 +2211,6 @@ export const tr = {
       confirmLabel: 'Yeni şifre (tekrar)',
       save: 'Kaydet',
       currentRequired: 'Lütfen mevcut şifrenizi girin',
-      minLength: 'Şifre en az 8 karakter olmalıdır',
       mismatch: 'Şifreler eşleşmiyor',
       pwned: 'Bu şifre veri sızıntılarında görülmüş. Lütfen daha güçlü bir şifre seçin.',
       wrongCurrent: 'Mevcut şifre hatalı',
@@ -2425,7 +2248,6 @@ export const tr = {
     title: 'Siparişlerim',
     empty: 'Henüz siparişiniz bulunmuyor.',
     orderDate: 'Sipariş Tarihi',
-    orderTotal: 'Toplam Tutar',
     status: 'Durum',
     orderNo: 'Sipariş No',
     orderCode: 'Sipariş Kodu (son 8)',
@@ -2456,10 +2278,8 @@ export const tr = {
     totalCol: 'Toplam',
     grandTotal: 'Genel Toplam',
     noItems: 'Ürün detayı bulunamadı',
-    demoNote: 'Bu test amaçlı bir demo sipariştir',
     totalAmount: 'Toplam Tutar',
     reorder: 'Tekrar Sipariş Et',
-    viewReceipt: 'Makbuzu Görüntüle',
     copied: 'Kopyalandı',
     copyFailed: 'Kopyalanamadı',
     reorderedToast: '{{count}} ürün sepete eklendi',
@@ -2545,7 +2365,6 @@ export const tr = {
       loginRequired: 'Teklif istemek için giriş yapmalısınız',
       successToast: 'Teklif talebiniz alındı',
       errorToast: 'Teklif talebi oluşturulamadı',
-      cartQuoteItems: 'Sepetinizdeki fiyatı belirlenmemiş ürünler'
     },
     detail: {
       title: 'Teklif Detayı',
@@ -2622,31 +2441,11 @@ export const tr = {
     }
   },
   lead: {
-    message: 'Mesaj',
-    title: 'Teknik Teklif İsteği',
-    product: 'Ürün',
-    contactInfo: 'İletişim Bilgileri',
-    name: 'Ad Soyad',
-    company: 'Şirket',
     companyPlaceholder: 'Şirketiniz A.Ş.',
     cityPlaceholder: 'Örn: İstanbul',
-    email: 'E-posta',
-    phone: 'Telefon',
-    city: 'Şehir',
-    projectNeed: 'Proje/İhtiyaç',
-    applicationArea: 'Uygulama Alanı',
-    select: 'Seçiniz',
-    quantity: 'Adet',
-    budgetRange: 'Bütçe Aralığı',
-    timeframe: 'Zaman Çizelgesi',
-    contactPref: 'İletişim Tercihi',
-    contactTime: 'Uygun saatler (örneğin: 10:00–12:00)',
     consent: {
       text: 'okudum ve kabul ediyorum.'
     },
-    submit: 'Gönder',
-    submitting: 'Gönderiliyor...',
-    cancel: 'İptal',
     appAreas: {
       parking: 'Otopark Havalandırma',
       kitchen: 'Endüstriyel Mutfak',
@@ -2690,58 +2489,6 @@ export const tr = {
       consent: 'KVKK metnini onaylamalısınız'
     },
     defaultMessage: '{{productName}} için detaylı teknik teklif...',
-    aboutPage: {
-      stats: {
-        yearsExperience: 'Proje Hattı'
-      }
-    },
-    cinematicShowcase: {
-      eyebrow: 'TEKNİK DETAY',
-      title: 'Mühendislik Başyapıtı',
-      subtitle: 'Zirve Performans ve Verimlilik',
-      description: 'Her bir bileşen, en zorlu endüstriyel koşullarda kesintisiz hava akışı sağlamak üzere optimize edilmiştir.',
-      cta: 'Teknik Kataloğu İncele',
-      badge: 'Endüstriyel Sınıf',
-      componentLabel: 'Sistem Bileşeni',
-      hotspots: {
-        motor: 'EC Motor Teknolojisi',
-        motorDetail: 'Düşük enerji tüketimi ve yüksek tork sağlayan fırçasız motor yapısı.',
-        clamps: 'Easy-Fit Kelepçeler',
-        clampsDetail: 'Alet gerektirmeden hızlı montaj ve bakım sağlayan özel bağlantı sistemi.',
-        housing: 'Polimer Gövde',
-        housingDetail: 'Darbe ve korozyon direnci yüksek, hafif aerodinamik dış yüzey.',
-        airflow: 'Laminar Akış',
-        airflowDetail: 'Türbülansı minimize eden ve ses seviyesini düşüren iç kanat tasarımı.'
-      }
-    },
-    trustProof: {
-      badge: 'Güvenilir',
-      eyebrow: 'NEDEN VENTHUB?',
-      title: 'Mühendislik ve Güven Odaklı Yaklaşım',
-      subtitle: 'Sektörün lider markaları ve uzman mühendis kadromuzla projelerinize değer katıyoruz.',
-      items: {
-        brands: {
-          eyebrow: 'Yetkinlik',
-          title: 'Global Markalar',
-          description: 'Dünyanın en güvenilir HVAC üreticilerinin yetkili ortağı.'
-        },
-        guidance: {
-          eyebrow: 'Uzmanlık',
-          title: 'Proje Desteği',
-          description: 'Şartnameden devreye almaya kadar her adımda yanınızdayız.'
-        },
-        delivery: {
-          eyebrow: 'Hız',
-          title: 'Hızlı Teslimat',
-          description: 'Geniş stok ağımızla Türkiye genelinde zamanında teslimat.'
-        },
-        support: {
-          eyebrow: 'Süreklilik',
-          title: 'Satış Sonrası',
-          description: 'Teknik destek ve yedek parça garantisi ile kesintisiz işletme.'
-        }
-      }
-    }
   },
   calculators: {
     recommendations: 'Öneriler',
@@ -2950,15 +2697,9 @@ export const tr = {
       smokeSystemDesc: 'Bu hesaplama ön boyutlandırma amaçlıdır. Kesin tasarım için CFD analizi ve yangın güvenlik uzmanı danışmanlığı gereklidir.',
       emptyStateLine1: 'Geçerli değerler girerek',
       emptyStateLine2: 'sonuçları görüntüleyin',
-      title: 'Jet Fan Hesaplayıcı',
-      description: 'Otopark ve tünel jet fan itki ve havalandırma hesabı',
-      infoText: 'Kapalı otopark veya tünellerde gereken jet fan adedini, itki kuvvetini ve hava değişim miktarını hesaplar.',
       form: {
-        appType: 'Uygulama Alanı',
         parking: 'Otopark',
-        parkingDesc: 'Kapalı otopark havalandırması',
         tunnel: 'Tünel',
-        tunnelDesc: 'Karayolu veya metro tüneli',
         mode: 'Havalandırma Modu',
         normal: 'Normal',
         normalDesc: 'Günlük havalandırma',
@@ -2969,9 +2710,7 @@ export const tr = {
         height: 'Yükseklik'
       },
       results: {
-        ach: 'Hava Değişim Sayısı',
         totalThrust: 'Toplam İtki Kuvveti',
-        count: 'Jet Fan Adedi'
       }
     }
   },
@@ -3097,6 +2836,106 @@ export const tr = {
       ]
     }
   },
+  silentFanWizard: {
+    headerTitle: 'Sessiz Fan Seçim Asistanı',
+    goBack: 'Önceki adım',
+    continue: 'Devam et',
+    skipToResult: 'Sonucu göster',
+    defaultsHint: 'Tüm adımlar dolu — istediğiniz an sonuca geçebilirsiniz',
+    step1Title: 'Fan nereye takılacak?',
+    step1Desc: 'Mahal tipi, saatte kaç kez hava değişmesi gerektiğini belirler.',
+    step2Title: 'Oda ne kadar büyük?',
+    step2Desc: 'Kabaca bilmeniz yeterli; hacmi ve gereken debiyi biz hesaplıyoruz.',
+    areaLabel: 'Taban alanı',
+    ceilingLabel: 'Tavan yüksekliği',
+    step3Title: 'Kanal nasıl gidiyor?',
+    step3Desc: 'Kanal ne kadar uzun ve dolambaçlıysa fan o kadar zorlanır.',
+    routeLabel: 'Kanal güzergâhı',
+    materialLabel: 'Kanal malzemesi',
+    diameterLabel: 'Kanal çapı',
+    diameterUnknown: 'Bilmiyorum',
+    diameterHint: 'Bilmiyorsanız boş bırakın — her modeli kendi çapına göre değerlendiririz.',
+    step4Title: 'Sessizlik sizin için ne kadar önemli?',
+    step4Desc: 'Bu tercih sıralamayı değiştirir; yetersiz modeller yine de elenir.',
+    calculating: 'Modeller sizin tesisatınıza göre hesaplanıyor…',
+    resultTitle: 'Sizin için üç öneri',
+    resultNeed: 'Odanız yaklaşık {hacim} m³ — bu mahal için saatte {debi} m³ hava taşınması gerekiyor.',
+    badgeBest: 'En uygun',
+    badgeQuietest: 'En sessiz',
+    badgeEfficient: 'En verimli',
+    cardDelivers: 'Sizin kanalınızda',
+    cardNoise: 'Ses seviyesi',
+    cardDiameter: 'Bağlantı çapı',
+    cardCta: 'Ürünü incele',
+    showDetails: 'Hesabı göster',
+    hideDetails: 'Hesabı gizle',
+    detailVolume: 'Oda hacmi',
+    detailAch: 'Saatlik hava değişimi',
+    detailNeed: 'Gereken debi',
+    detailMinApplied: '(standart alt sınır uygulandı)',
+    detailPressure: 'Tahmini sistem direnci',
+    detailEliminated: 'Yetersiz kalan model',
+    noMatchTitle: 'Bu koşullarda uygun model çıkmadı',
+    noMatchDesc: 'Kanal çapını serbest bırakmayı ya da güzergâhı kısaltmayı deneyin.',
+    errorTitle: 'Modeller getirilemedi',
+    errorDesc: 'Bağlantıda bir sorun oluştu. Lütfen tekrar deneyin.',
+    restart: 'Baştan başla',
+    unitM: 'm',
+    unitM2: 'm²',
+    unitM3: 'm³',
+    unitM3h: 'm³/h',
+    unitMm: 'mm',
+    unitPa: 'Pa',
+    unitDbA: 'dB(A)',
+    unitTimes: '×',
+    approx: '≈',
+    room: {
+      bathroom: 'Banyo',
+      kitchen: 'Mutfak',
+      bedroom: 'Yatak odası',
+      living: 'Oturma odası',
+      office: 'Ofis',
+      shop: 'Dükkân / kafe',
+    },
+    roomHint: {
+      bathroom: 'Nem ve koku hızlı atılmalı',
+      kitchen: 'Yağ buharı için en yüksek debi',
+      bedroom: 'Gece sessizliği belirleyici',
+      living: 'Sürekli, sakin havalandırma',
+      office: 'Kişi yoğunluğuna göre taze hava',
+      shop: 'Yoğun kullanım, yüksek debi',
+    },
+    route: {
+      short: 'Kısa ve düz',
+      medium: 'Orta',
+      long: 'Uzun / dolambaçlı',
+    },
+    routeHint: {
+      short: 'Yaklaşık 3 m, tek dirsek',
+      medium: 'Yaklaşık 6 m, iki-üç dirsek',
+      long: '10 m üzeri, çok dirsek',
+    },
+    material: {
+      galvanized: 'Sert metal kanal',
+      pvc: 'Sert plastik kanal',
+      flex: 'Esnek spiral boru',
+    },
+    materialHint: {
+      galvanized: 'En yaygın; düşük sürtünme',
+      pvc: 'En düşük sürtünme',
+      flex: 'Kolay montaj ama sürtünme çok yüksek',
+    },
+    quiet: {
+      normal: 'Fark etmez',
+      important: 'Önemli',
+      critical: 'Çok önemli',
+    },
+    quietHint: {
+      normal: 'Performans önce gelsin',
+      important: 'Sessizlik ve güç dengeli',
+      critical: 'Yatak odası, gece kullanımı',
+    },
+  },
   needsWizard: {
     stepOf: '/ {{total}}',
     enhanced: {
@@ -3108,10 +2947,7 @@ export const tr = {
     },
     coldStorage: 'Soğuk Hava Deposu',
     coldStorageDesc: 'Soğuk zincir koruması',
-    coldStorageTip: 'Gıda güvenliği ve enerji tasarrufu sağlar',
     industrial: 'Endüstriyel Tesis',
-    industrialDesc: 'Fabrika, depo, lojistik',
-    industrialTip: 'Endüstriyel gereksinimlere uygun güç',
     retail: 'Market / Süpermarket',
     retailDesc: 'Soğutucu reyonlar',
     retailTip: 'Soğutucu reyonlardan sıcak havayı uzak tutar',
@@ -3180,51 +3016,10 @@ export const tr = {
     retry: 'Tekrar Dene',
     devDetails: 'Hata Detayları (Geliştirme)'
   },
-  applications: {
-    'air-curtain': {
-      subtitle: 'Enerji kaybını azaltan giriş çözümleri',
-      title: 'AVM / Giriş Tipi Hava Perdesi'
-    },
-    airCurtain: {
-      subtitle: 'Enerji kaybını azaltan giriş çözümleri',
-      title: 'AVM / Giriş Tipi Hava Perdesi'
-    },
-    'heat-recovery': {
-      subtitle: 'Verimli havalandırma ve enerji tasarrufu',
-      title: 'Isı Geri Kazanım'
-    },
-    heatRecovery: {
-      subtitle: 'Verimli havalandırma ve enerji tasarrufu',
-      title: 'Isı Geri Kazanım'
-    },
-    parking: {
-      subtitle: 'Yüksek hava debisi ve basınç gerektiren çözümler',
-      title: 'Otopark Havalandırması'
-    }
-  },
   homeCta: {
     button: 'Teklif Al / Uzman Desteği',
     subtitle: 'Bize kısa bilgi verin, doğru çözümü birlikte şekillendirelim.',
     title: 'Projeniz Hakkında Konuşalım'
-  },
-  homeFaq: {
-    items: {
-      airCurtain: {
-        a: 'Konforu artırmak ve enerji kaybını azaltmak için girişlerde kullanılır; açıklıkta bir hava bariyeri oluşturur.',
-        q: 'Hava perdesini ne zaman kullanmalıyım?'
-      },
-      hrv: {
-        a: 'Hava debisi, ısı geri kazanım verimliliği, basınç kaybı ve ses seviyeleri belirleyicidir.',
-        q: 'Isı Geri Kazanım Cihazı (VMC) seçerken nelere dikkat etmeliyim?'
-      },
-      jetFan: {
-        a: 'Otopark hacmi, CO/NOx sensörleri, hava değişim oranı ve yerleşim planına göre hesaplanır.',
-        q: 'Jet fan seçimi nasıl yapılır?'
-      }
-    },
-    readMore: 'Daha fazlasını oku →',
-    subtitle: 'Temel konulara hızlı yanıtlar — daha fazlası için destek sayfamızı inceleyin.',
-    title: 'Sıkça Sorulan Sorular'
   },
   homeProcess: {
     stepPrefix: 'Adım',
@@ -3252,44 +3047,6 @@ export const tr = {
     },
     subtitle: 'Başlangıçtan teslimata kadar şeffaf ve öngörülebilir bir süreç',
     title: 'Nasıl Çalışıyoruz'
-  },
-  homeSpotlight: {
-    items: {
-      airCurtain: {
-        desc: 'Giriş konforu ve azaltılmış ısı kaybı',
-        title: 'Hava Perdesi'
-      },
-      hrv: {
-        desc: 'İç ortam hava kalitesi ve verimlilik',
-        title: 'Isı Geri Kazanım Cihazı (VMC)'
-      },
-      parkingJetFan: {
-        desc: 'CO sensör kontrolü ve energy tasarrufu',
-        title: 'Otopark Jet Fanı'
-      },
-      smokeExhaust: {
-        desc: 'Acil durum yönetimi',
-        title: 'Duman Tahliye'
-      }
-    },
-    subtitle: 'İçeriği vurgulamak için imleci hareket ettirin',
-    title: 'Öne Çıkan Uygulamalar'
-  },
-  homeTrust: {
-    kvkk: {
-      desc: 'Kişisel veriler güvenli bir şekilde saklanır ve yalnızca gerekli olduğunda kullanılır.',
-      title: 'KVKK Uyumlu'
-    },
-    payment: {
-      desc: '3D Secure ve gelişmiş dolandırıcılık önleme kontrolleri.',
-      title: 'Güvenli Ödeme (iyzico)'
-    },
-    returns: {
-      desc: 'Şeffaf prosedürler ve hızlı, sonuç odaklı destek.',
-      title: 'Kolay İade/Değişim'
-    },
-    subtitle: 'Altyapımız, güvenliğimiz ve süreçlerimiz şeffaf ve standartlara uygundur.',
-    title: 'Güven & Uyum'
   },
   beforeAfterSlider: {
     title: 'Öncesi / Sonrası',

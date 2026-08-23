@@ -110,6 +110,15 @@ export const products = {
     closeSymbol: '✕',
     moreRows: '... ve {{count}} satır daha.',
     processing: 'İşleniyor...',
+    // Bilinmeyen SKU koruması: eski bir dışa aktarım dosyası yeniden yüklenirse
+    // `upsert(onConflict:'sku')` sessizce KOPYA ÜRÜN yaratıyordu. Metinler teşhis değil
+    // YOL TARİFİ verir; sayı interpolasyonla gelir, sabit metne gömülmez.
+    unknownSkuTitle: 'Veritabanında bulunmayan SKU: {{count}}',
+    unknownSkuHelp: 'Bu satırlar mevcut bir ürünle eşleşmiyor. Yeni ürün olarak eklemek istiyorsanız "Yeni olarak oluştur"a basın. Amacınız mevcut ürünleri güncellemekse eski bir dışa aktarım dosyası kullanıyor olabilirsiniz — dosyadaki SKU değerlerini düzeltin ya da "Yalnız mevcutları güncelle"yi seçin.',
+    unknownSkuExamples: 'Örnek: {{skus}}',
+    createNewAction: 'Yeni olarak oluştur ({{count}})',
+    updateExistingOnly: 'Yalnız mevcutları güncelle ({{count}})',
+    updateExistingDone: 'Yalnız mevcut ürünler güncellendi: {{ok}} satır. Atlanan (veritabanında yok): {{skipped}} satır.',
   },
   statusLabels: {
     active: 'Aktif',
