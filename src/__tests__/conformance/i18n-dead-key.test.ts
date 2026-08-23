@@ -82,7 +82,13 @@ const T_STATIC = /(?<![\w$])_?t\(\s*(['"])([A-Za-z][\w]*(?:\.[\w]+)*)\1/g
 // `` t(`a.b.${x}`) `` — şablonun SABİT önü.
 const T_TEMPLATE = /(?<![\w$])_?t\(\s*`([A-Za-z][\w.]*?)\$\{/g
 // `` `a.b.${x}` `` — `t()` dışında kurulan anahtar (ör. specLabel.ts).
-const ANY_TEMPLATE = /`([a-z][\w]*(?:\.[\w]+)+?)\$\{/g
+//
+// Sondaki nokta OPSİYONEL (`\.?`) OLMAK ZORUNDA. Kod anahtarı iki biçimde de kurar:
+// `` `a.b${x}` `` (ayraçsız) ve `` `a.b.${x}` `` (ayraçlı). İlk sürüm yalnız ayraçsızı
+// tanıyordu; `` `common.categoryList.${tKey}` `` (categoryHelpers.ts:32) eşleşmedi ve
+// DB sürücülü 18 kategori anahtarı ÖLÜ sanılıp donmuş borca yazıldı — hepsi CANLI.
+// Cetveldeki "önek eşlemesi ayraçsız olmalı" kuralının ters yüzü; iki biçim de gerekli.
+const ANY_TEMPLATE = /`([a-z][\w]*(?:\.[\w]+)+\.?)\$\{/g
 // `'a.b.' + x` — birleştirme.
 const T_CONCAT = /(['"])([A-Za-z][\w]*(?:\.[\w]+)*\.)\1\s*\+/g
 // `dict.a.b` / `dictionary.a.b` — `t()` ATLANARAK doğrudan obje erişimi.
@@ -103,6 +109,24 @@ const T_OPAQUE = /(?<![\w$])_?t\(\s*[A-Za-z_$][\w$.]*\s*[,)]/g
  * yanlış kırmızı veren kapı kapatılır, kaçıran kapı bir sonraki denetimde yakalanır.
  */
 const BARE_WORD = /(['"])([A-Za-z][\w]*)\1/g
+/**
+ * 7. EKSENİN KAPSAMI — çeviriye DOKUNMAYAN dosya tüketici SAYILMAZ.
+ *
+ * BARE_WORD bilerek gevşek: tırnaklı her sözcüğü toplar. Kapsam tüm ağaç olursa bu gevşeklik
+ * kapıyı YER: bir servis dosyasındaki DB KOLON ADI (`'max_absorbed_power_w'`) ya da bir
+ * seçenek kimliği (`id: 'bathroom'`) sözlük tüketicisi sanılır. 2026-08-23'te tam bu oldu —
+ * sihirbaz servisi eklenince altı ölü anahtar "canlandı" ve borç kaydı yalancıktan küçüldü.
+ * Borç gerçekte azalmadı; kapı kör oldu.
+ *
+ * Ayrım: **bir dosya çeviriye hiç dokunmuyorsa çeviri tüketicisi olamaz.** Ölçüldü —
+ *   `utils/whatsapp.ts`      : `import { tr } … { en }` (sözlüğü CAST'leyip yaprak adıyla
+ *                              indeksler; 7. eksen ZATEN bunun için var, korunmalı)
+ *   `services/wizard.service.ts`: i18n ile HİÇBİR bağı yok, dizeleri DB kolon adları
+ * Bu yüzden 7. eksen yalnız `t(` çağrısı yapan ya da sözlüğü/`useI18n`i import eden
+ * dosyalardan toplanır. Diğer altı eksen TÜM ağaçtan toplanmaya devam eder — daraltma
+ * yalnız en gevşek eksene uygulanır.
+ */
+const I18N_DOKUNAN = /(?:from\s+['"][^'"]*i18n[^'"]*['"])|useI18n|(?<![\w$])_?t\(/
 
 interface Tarama {
   staticKeys: Set<string>
@@ -111,6 +135,7 @@ interface Tarama {
   bareWords: Set<string>
   opaque: { file: string; line: number }[]
   tarananDosya: number
+  bareWordDosya: number
   eslesmeSayisi: number
 }
 
@@ -121,12 +146,16 @@ function tara(): Tarama {
   const bareWords = new Set<string>()
   const opaque: { file: string; line: number }[] = []
   let tarananDosya = 0
+  let bareWordDosya = 0
   let eslesmeSayisi = 0
 
   for (const [path, raw] of Object.entries(SOURCES)) {
     if (isDictFile(path) || isTestFile(path)) continue
     tarananDosya++
     const src = stripComments(raw)
+    // 7. eksenin kapsamı: çeviriye DOKUNAN dosyalar. Bkz. I18N_DOKUNAN açıklaması.
+    const i18nDokunan = I18N_DOKUNAN.test(src)
+    if (i18nDokunan) bareWordDosya++
     src.split('\n').forEach((line, i) => {
       for (const m of line.matchAll(T_STATIC)) {
         staticKeys.add(m[2])
@@ -152,8 +181,10 @@ function tara(): Tarama {
         staticKeys.add(m[2])
         eslesmeSayisi++
       }
-      for (const m of line.matchAll(BARE_WORD)) {
-        bareWords.add(m[2])
+      if (i18nDokunan) {
+        for (const m of line.matchAll(BARE_WORD)) {
+          bareWords.add(m[2])
+        }
       }
       for (const _m of line.matchAll(T_OPAQUE)) {
         opaque.push({ file: path.replace(/^\//, ''), line: i + 1 })
@@ -161,7 +192,7 @@ function tara(): Tarama {
     })
   }
 
-  return { staticKeys, prefixes, dictPaths, bareWords, opaque, tarananDosya, eslesmeSayisi }
+  return { staticKeys, prefixes, dictPaths, bareWords, opaque, tarananDosya, bareWordDosya, eslesmeSayisi }
 }
 
 /**
@@ -199,6 +230,19 @@ function canli(key: string, t: Tarama): boolean {
  * Dağılım: admin 200 · pdp 61 · common 47 · category 39 · account 29 · products 21 · diğer 34
  */
 const DONMUS_BORC: ReadonlySet<string> = new Set([
+  // --- 2026-08-23: 7. eksen kapsami daraltilinca ORTAYA CIKAN uc olu anahtar ---
+  // Bu uc anahtar daha once CANLI gorunuyordu, ama yalniz cevirye DOKUNMAYAN dosyalardaki
+  // tirnakli sozcukler sayesinde: 'template' -> checkout/injectCheckoutForm.ts (i18n bagi YOK),
+  // 'phone'/'city' -> cesitli form dosyalari. Kapsam daralinca gercek durumlari gorundu.
+  // Ucu de elle dogrulandi: admin.inventory.export.headers.* KULLANILIYOR ama .template DEGIL;
+  // account.addresses.ph.* zaten yeniden-adlandirma yetimi (sayfa .placeholders.* kullaniyor)
+  // ve dort kardesi bu listede ZATEN duruyor.
+  // NOT: borc bu commit'te 352 -> 355 BUYUDU. 'Liste yalniz kuculur' kurali VERI degisince
+  // gecerlidir; KAPI KESKINLESTIGINDE gizli borcun gorunur olmasi beklenen sonuctur. Gizli
+  // kalmasi daha kotuydu.
+  'admin.inventory.export.template',
+  'account.addresses.ph.phone',
+  'account.addresses.ph.city',
   'account.addresses.addressLabel',
   'account.addresses.defaultBillingTag',
   'account.addresses.defaultShippingTag',
@@ -485,24 +529,6 @@ const DONMUS_BORC: ReadonlySet<string> = new Set([
   'common.allProducts',
   'common.backToSite',
   'common.byApplication',
-  'common.categoryList.air-treatment',
-  'common.categoryList.hvls',
-  'common.categoryList.hygiene',
-  'common.categoryList.parking-jet',
-  'common.categoryList.smart-home',
-  'common.categoryList.sub.acid-fans',
-  'common.categoryList.sub.air-curtain',
-  'common.categoryList.sub.axial-ind',
-  'common.categoryList.sub.bathroom',
-  'common.categoryList.sub.conditioning',
-  'common.categoryList.sub.duct-heaters',
-  'common.categoryList.sub.freq-converters',
-  'common.categoryList.sub.ghost',
-  'common.categoryList.sub.rect-duct',
-  'common.categoryList.sub.round-duct',
-  'common.categoryList.sub.shelter',
-  'common.categoryList.sub.window',
-  'common.categoryList.summer',
   'common.clearSearch',
   'common.discover',
   'common.discoverPage',
@@ -538,67 +564,6 @@ const DONMUS_BORC: ReadonlySet<string> = new Set([
   'orders.orderTotal',
   'orders.viewAll',
   'orders.viewReceipt',
-  'pdp.specGroups.other',
-  'pdp.specs.absorbed_current_a',
-  'pdp.specs.atex_marking',
-  'pdp.specs.blade_diameter_mm',
-  'pdp.specs.co2_sensor',
-  'pdp.specs.compatible_model',
-  'pdp.specs.connection_height_mm',
-  'pdp.specs.connection_width_mm',
-  'pdp.specs.diameter_mm',
-  'pdp.specs.discharge_type',
-  'pdp.specs.discharge_velocity_curve',
-  'pdp.specs.drive_code',
-  'pdp.specs.enclosure_class',
-  'pdp.specs.enclosure_size',
-  'pdp.specs.erp_compliant',
-  'pdp.specs.filter_classes',
-  'pdp.specs.fire_rating',
-  'pdp.specs.has_bypass',
-  'pdp.specs.has_humidistat',
-  'pdp.specs.has_timer',
-  'pdp.specs.heating_capacity_kw',
-  'pdp.specs.heating_power_w',
-  'pdp.specs.height_mm',
-  'pdp.specs.humidity_removed_l_24h',
-  'pdp.specs.insulation_class',
-  'pdp.specs.ip_rating',
-  'pdp.specs.length_mm',
-  'pdp.specs.max_absorbed_power_w',
-  'pdp.specs.max_current_a',
-  'pdp.specs.max_delivery_ls',
-  'pdp.specs.max_delivery_m3h',
-  'pdp.specs.max_static_pressure_pa',
-  'pdp.specs.max_voltage_v',
-  'pdp.specs.min_delivery_m3h',
-  'pdp.specs.min_static_pressure_pa',
-  'pdp.specs.min_voltage_v',
-  'pdp.specs.motor_poles',
-  'pdp.specs.motor_type',
-  'pdp.specs.noise_level_db_a',
-  'pdp.specs.noise_lpa_3m_db',
-  'pdp.specs.nominal_delivery_m3h',
-  'pdp.specs.nominal_static_pressure_pa',
-  'pdp.specs.number_of_blades',
-  'pdp.specs.operating_temperature_c',
-  'pdp.specs.optional_heater_power_w',
-  'pdp.specs.pm10_sensor',
-  'pdp.specs.pm2_5_sensor',
-  'pdp.specs.pq_curve',
-  'pdp.specs.rated_output_current_a',
-  'pdp.specs.rated_power_w',
-  'pdp.specs.refrigerant_type',
-  'pdp.specs.relative_humidity_sensor',
-  'pdp.specs.reversible',
-  'pdp.specs.size_d_mm',
-  'pdp.specs.tank_capacity_l',
-  'pdp.specs.temp_sensor',
-  'pdp.specs.thermal_efficiency_curve',
-  'pdp.specs.thermal_efficiency_pct',
-  'pdp.specs.voc_sensor',
-  'pdp.specs.voltage_alt_v',
-  'pdp.specs.width_mm',
   'products.applicationTitle',
   'products.breadcrumbDiscover',
   'products.categoryCard.seriesCount',
@@ -684,6 +649,31 @@ const KANARYA = [
   'calculators.airCurtain.results.efficiencyWarningDesc',
 ] as const
 
+/**
+ * AYRAÇLI ŞABLON + VERİTABANI SÜRÜCÜLÜ KANARYA — kapının İKİNCİ körlüğünü ölçer.
+ *
+ * Yukarıdaki kanarya `önek${x}` (ayraçsız) biçimini korur. Kod anahtarı DİĞER biçimde de
+ * kurar: `` `önek.${x}` `` — sondaki noktayla. İlk sürümün `ANY_TEMPLATE` regex'i sondaki
+ * noktayı ZORUNLU-YOK saymıştı ve iki tam öneki kaçırdı:
+ *
+ *   categoryHelpers.ts:32   `common.categoryList.${tKey}`     ← tKey VERİTABANINDAN gelir
+ *   specLabel               `pdp.specs.${specKey}`            ← specKey ÜRÜN VERİSİNDEN gelir
+ *
+ * Sonuç: 79 CANLI anahtar (18 kategori + 61 spec etiketi) "ölü" sanılıp donmuş borca yazıldı.
+ * Silinselerdi kategori adları ve PDP teknik tablosu ham anahtara düşerdi ve HİÇBİR KAPI
+ * görmezdi — INV-5 de göremez, çünkü statik `t('...')` çağrısı yok.
+ *
+ * Bu sınıfın ayrı kanarya hak etmesinin sebebi: anahtarın CANLILIĞI **veritabanında**
+ * yaşıyor. Kaynak taraması onu yalnız ÖNEK üzerinden görebilir; önek kaçarsa anahtar
+ * sessizce ölü görünür. Aşağıdaki üç anahtarın canlılığı 2026-08-23'te canlı DB'de
+ * `categories.translation_key` / ürün spec anahtarları ile doğrulandı.
+ */
+const KANARYA_AYRACLI = [
+  'common.categoryList.sub.duct-heaters',
+  'common.categoryList.sub.dehumidifier',
+  'pdp.specs.noise_level_db_a',
+] as const
+
 describe('INV-6: sözlükte tüketicisi olmayan anahtar bırakılmaz', () => {
   const tarama = tara()
   const yapraklar = leafKeys(tr)
@@ -705,6 +695,41 @@ describe('INV-6: sözlükte tüketicisi olmayan anahtar bırakılmaz', () => {
     ).toEqual([])
     // Kanarya seti sessizce boşaltılamaz.
     expect(KANARYA.length).toBe(10)
+  })
+
+  it('KANARYA: AYRAÇLI şablonla üretilen DB sürücülü anahtarlar CANLI görülmeli', () => {
+    const olu = KANARYA_AYRACLI.filter((k) => !canli(k, tarama))
+    expect(
+      olu,
+      'Bu anahtarların canlılığı VERİTABANINDA yaşıyor: `common.categoryList.${tKey}` ve ' +
+        '`pdp.specs.${specKey}` şablonlarıyla üretiliyorlar; kaynakta tam yolları GEÇMEZ. ' +
+        'Ölü görünüyorlarsa sözlük değil KAPI kördür — ANY_TEMPLATE sondaki noktayı ' +
+        'zorunlu-yok saymış olabilir (`a.b.${x}` biçimi). 2026-08-23’te tam bu oldu ve ' +
+        '79 canlı anahtar ölü sanıldı.',
+    ).toEqual([])
+    expect(KANARYA_AYRACLI.length).toBe(3)
+  })
+
+  it('KANARYA: 7. eksen kapsami — ceviriye dokunmayan dosya tuketici SAYILMAZ', () => {
+    // NEGATIF taraf: 'template' yalniz checkout/injectCheckoutForm.ts'te tirnakli geciyor ve
+    // o dosyanin i18n ile HICBIR bagi yok. Kapsam daraltmasi bozulursa bu sozcuk yeniden
+    // "tuketici" sayilir ve admin.inventory.export.template olu anahtari CANLI gorunur.
+    expect(
+      tarama.bareWords.has('template'),
+      "'template' yalniz i18n'e dokunmayan bir dosyada tirnakli geciyor; 7. eksen kapsami " +
+        'genislemis olmali. DB kolon adlari ve secenek kimlikleri tuketici SAYILMAZ.',
+    ).toBe(false)
+
+    // POZITIF taraf: 7. eksen whatsapp.ts icin VAR. Daraltma onu oldurmemeli.
+    expect(
+      tarama.bareWords.has('stockInquiry'),
+      "whatsapp.ts sozlugun whatsappMessages agacini cast'leyip yaprak adiyla indeksliyor. " +
+        'Bu sozcuk kaybolduysa daraltma cok ileri gitti ve 12 CANLI anahtar olu gorunecek.',
+    ).toBe(true)
+
+    // Daraltma GERCEKTEN oldu mu? Kapsam tum agacsa daraltma hic uygulanmamis demektir.
+    expect(tarama.bareWordDosya).toBeGreaterThan(50)
+    expect(tarama.bareWordDosya).toBeLessThan(tarama.tarananDosya)
   })
 
   it('ÖN KOŞUL: `t(degisken)` yalnız BİLİNEN dosyalarda', () => {
