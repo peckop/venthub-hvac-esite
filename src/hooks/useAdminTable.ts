@@ -8,6 +8,7 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { TableSortDir } from '@/types/admin-shared'
 import type { Database } from '@/types/database.types'
 
+import { foldForSearch } from '../i18n/case'
 import { useI18n } from '../i18n/I18nProvider'
 
 export type AdminMode = 'server' | 'client' | 'none'
@@ -126,9 +127,9 @@ function defaultCompare(a: unknown, b: unknown): number {
   return String(a).localeCompare(String(b), 'tr')
 }
 
-function matchesQuery<T>(row: T, needleLower: string): boolean {
+function matchesQuery<T>(row: T, needleFolded: string, lang: string): boolean {
   for (const v of Object.values(row as Record<string, unknown>)) {
-    if (typeof v === 'string' && v.toLowerCase().includes(needleLower)) return true
+    if (typeof v === 'string' && foldForSearch(v, lang).includes(needleFolded)) return true
   }
   return false
 }
@@ -154,7 +155,7 @@ function parseFiltersFromParams(params: URLSearchParams): Record<string, string[
 /* ------------------------------- hook ---------------------------------- */
 
 export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTableResult<T> {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const {
     resource,
     rowId,
@@ -279,8 +280,8 @@ export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTabl
   const processedRows = useMemo(() => {
     if (paginationMode === 'server') return rawRows
     let out = rawRows
-    const needle = debouncedQuery.toLowerCase()
-    if (needle) out = out.filter((r) => matchesQuery(r, needle))
+    const needle = foldForSearch(debouncedQuery, lang)
+    if (needle) out = out.filter((r) => matchesQuery(r, needle, lang))
     for (const [k, vals] of Object.entries(filters)) {
       if (vals.length) out = out.filter((r) => vals.includes(String(getCell(r, k) ?? '')))
     }
@@ -289,7 +290,7 @@ export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTabl
       out = [...out].sort((a, b) => factor * defaultCompare(getCell(a, sort.key), getCell(b, sort.key)))
     }
     return out
-  }, [paginationMode, rawRows, debouncedQuery, filters, sortMode, sort])
+  }, [paginationMode, rawRows, debouncedQuery, filters, sortMode, sort, lang])
 
   const totalMatched = paginationMode === 'server' ? serverTotal : processedRows.length
   const pageCount = paginationMode === 'none' ? 1 : Math.max(1, Math.ceil(totalMatched / pageSize))
