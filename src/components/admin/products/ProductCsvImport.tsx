@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider'
+import { kategoriIdBul, urunSlugUret, type KategoriSecenegi } from '@/lib/admin/csvProductMapping'
 import { splitByExistingSku } from '@/lib/data/csvImportGuard'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
@@ -8,13 +9,8 @@ import type { Database } from '../../../types/database.types'
 import { adminButtonPrimaryClass, adminButtonSecondaryClass, adminCardClass } from '../../../utils/adminUi'
 
 
-interface CategoryOpt {
-    id: string
-    name: string
-}
-
 interface ProductCsvImportProps {
-    categories: CategoryOpt[]
+    categories: KategoriSecenegi[]
     onSuccess: () => void
 }
 
@@ -92,11 +88,14 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
         }
 
         setIsProcessing(true)
-        const mapCategorySlugToId = (slug: string) => {
-            const s = (slug || '').toLowerCase().trim()
-            const found = categories.find(c => c.name.toLowerCase() === s)
-            return found?.id || null
-        }
+        /**
+         * ERR_SLUG_NOT_IN_DB (cetvel: csv-import-export-standard.md §4) — eşleşmeyen
+         * kategori SESSİZ GEÇİLMEZ. Eski davranış null yazıyordu: ürün kategorisiz
+         * kaydoluyor, vitrinde HİÇBİR yerde görünmüyor, ekranda ise "içe aktarma
+         * tamamlandı" yazıyordu. Cetvel bu vakaya severity Error verir ve satırın
+         * insana işaretlenmesini ister; bu yüzden yazım BAŞLAMAZ.
+         */
+        const reddedilen: { sku: string; deger: string }[] = []
 
         const payloads: Database['public']['Tables']['products']['Insert'][] = []
 
@@ -105,7 +104,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             const p: Database['public']['Tables']['products']['Insert'] = {
                 sku: r['sku'].trim(),
                 name: r['name'].trim(),
-                slug: r['name'].trim().toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+                slug: urunSlugUret(r['name']),
                 brand: r['brand']?.trim() || 'Generic' 
             }
             if (r['model_code']) p.model_code = r['model_code'].trim()
@@ -116,8 +115,34 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             if (r['stock_qty']) p.stock_qty = Number(r['stock_qty'])
             if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
             if (r['category_id']) p.category_id = r['category_id'] || null
-            else if (r['category_slug'] || r['category']) p.category_id = mapCategorySlugToId(r['category_slug'] || r['category'])
+            else if (r['category_slug'] || r['category']) {
+                const kategoriDegeri = r['category_slug'] || r['category']
+                const kategoriId = kategoriIdBul(kategoriDegeri, categories)
+                if (!kategoriId) {
+                    reddedilen.push({ sku: r['sku'].trim(), deger: kategoriDegeri.trim() })
+                    continue
+                }
+                p.category_id = kategoriId
+            }
             payloads.push(p)
+        }
+
+        /* Kategorisi çözülemeyen satır varsa YAZIM YAPILMAZ. Kısmi yazım burada en kötü
+         * seçenek olurdu: dosyanın bir kısmı içeri girer, geri kalanı girmez ve kullanıcı
+         * hangi hâlde olduğunu bilemez. Karar kullanıcıya gider — CSV düzeltilip yeniden
+         * yüklenir (bilinmeyen SKU korumasının kalıbıyla aynı). */
+        if (reddedilen.length > 0) {
+            const ornekler = [...new Set(reddedilen.map(x => x.deger))].slice(0, 5).join(', ')
+            setNotice({
+                tone: 'error',
+                text: [
+                    t('admin.products.import.unknownCategoryTitle', { count: reddedilen.length }),
+                    t('admin.products.import.unknownCategoryHelp'),
+                    t('admin.products.import.unknownCategoryExamples', { skus: ornekler }),
+                ].join(' ')
+            })
+            setIsProcessing(false)
+            return
         }
 
         if (payloads.length === 0) {
