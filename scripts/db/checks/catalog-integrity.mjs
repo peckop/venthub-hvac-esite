@@ -127,10 +127,29 @@ const CHECKS = [
     key: (r) => `spec-unit:max_absorbed_power_w|${r.brand}`,
     detail: (r) => `${r.n} kayıt · ${r.min_value}–${r.max_value} (1 W altı = kW yazılmış) · ör. ${r.sample_sku}`,
   },
+  /* ──────────────────────────────────────────────────────────────────────────
+   * T158 — SONEK KAPSAMI OLCULEREK GENISLETILDI (2026-08-23).
+   *
+   * Kural yeni DEGIL; kapsami dardi. Onceki sonek kumesi dokuz kalemdi
+   * (v|m3h|w|pa|kg|mm|a|ls|pct) ve cetvelin K1 listesiyle ORTUSMUYORDU: adi
+   * birim tasiyan bes alan kapinin gormedigi yerdeydi. Canli DB'de
+   * technical_specs'in TUM anahtar sonekleri sayildi (374 aktif urun, 34 ayri
+   * sonek) ve birim olanlarla olmayanlar ELLE ayrildi:
+   *   · BIRIM (kapsama alindi): _c (2 anahtar) · _l (1) · _ms (2) · _hz (1)
+   *     · _db (1) · _kw (1) · _24h (1)
+   *   · BIRIM DEGIL (KASTEN disarida): _sensor · _curve · _type · _rating
+   *     · _class(es) · _marking · _model · _size · _code · _poles · _blades
+   *     · _speeds · _timer · _bypass · _humidistat · _compliant · _max
+   * Ikinci kumeyi eklemek kapiyi gurultuye bogar ve kapi kapatilir.
+   *
+   * Genisletmenin OLCULEN bedeli: bir tek yeni sinif — operating_temperature_c
+   * (Vortice, 3 kayit, "5 - 32"). Yani sonek kumesini 9'dan 16'ya cikarmak
+   * SIFIR yanlis-kirmizi uretti; tabana gerekcesiyle yazildi.
+   * ────────────────────────────────────────────────────────────────────────── */
   {
     id: 'spec-type',
     title: 'Birimli sayısal alanda metin değer',
-    why: 'Adı bir SI birimiyle biten alan (`_v`, `_m3h`, `_w`, `_pa`, `_kg`, `_mm`, `_a`, `_ls`, `_pct`) sayı taşımak zorundadır. "380 V" gibi birimi metne gömülü bir değer sıralanamaz, filtrelenemez, karşılaştırılamaz; aynı alanın bazı satırda sayı bazı satırda metin olması bu üç yüzeyi de sessizce bozar.',
+    why: 'Adı bir SI birimiyle biten alan sayı taşımak zorundadır (spec-axis-standard §K1). "380 V" gibi birimi metne gömülü bir değer sıralanamaz, filtrelenemez, karşılaştırılamaz; aynı alanın bazı satırda sayı bazı satırda metin olması bu üç yüzeyi de sessizce bozar.',
     // Anahtar alan|marka bazında — gerekçesi yukarıdaki `spec-unit` ile aynı.
     sql: `select k.key, b.name as brand, count(*)::int as n,
                  (array_agg(p.technical_specs->>k.key order by p.sku))[1] as sample_value,
@@ -141,7 +160,7 @@ const CHECKS = [
           cross join lateral jsonb_object_keys(p.technical_specs) k(key)
           where p.deleted_at is null
             and p.technical_specs is not null
-            and k.key ~ '_(v|m3h|w|pa|kg|mm|a|ls|pct)$'
+            and k.key ~ '_(v|m3h|w|pa|kg|mm|a|ls|pct|c|l|ms|hz|db|kw|24h)$'
             and (p.technical_specs->>k.key) is not null
             and (p.technical_specs->>k.key) <> ''
             and (p.technical_specs->>k.key) !~ '^[0-9]+(\\.[0-9]+)?$'
