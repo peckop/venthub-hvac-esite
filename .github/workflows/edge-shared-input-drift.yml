@@ -1,0 +1,121 @@
+name: Edge paylasilan girdi — sapma kapisi
+
+# ---------------------------------------------------------------------------
+# INV-EDGE-DRIFT-1 (T163-VH · EDGE) — PAYLASILAN GIRDIYE DOKUNAN PR, PROD'U
+# MASTER'A KARSI OLCMEDEN GECMEZ.
+#
+# NICIN VAR (2026-08-23'te olculdu, tahmin degil)
+#
+# `supabase/config.toml` ve `supabase/functions/_shared/**` PAYLASILAN girdilerdir:
+# biri degisince `scripts/edge/select-functions.mjs` TUM uclari secer ve merge
+# 27+ fonksiyonu yeniden dagitir. Olculdu: #794'un dosya listesi seciciye verildi,
+# 28 fonksiyon secildi.
+#
+# Toplu yeniden dagitim, prod'da master'dan SAPMIS bir uc varsa onu SESSIZCE EZER.
+# Bu depoda sapmanin bedeli daha once odendi: 19 fonksiyon aylarca donmus kaldi ve
+# repoda kapatilmis dort kimlik-dogrulamasiz acik prod'da CANLI kaldi
+# (bkz. scripts/edge/drift-check.mjs bas yorumu).
+#
+# NICIN DAGITIM ISINDEKI DRIFT YETMIYOR: `deploy-functions.yml` icindeki sapma
+# dedektoru `needs: [deploy]` ile tanimli, yani prod ZATEN ezildikten SONRA kosar.
+# Orada yesil olmasi kacinilmazdir; olctugu sey "dagitim eksiksiz oturdu mu",
+# "onceden sapma var miydi" DEGIL. Iki farkli soru; ikincisini yalniz merge'den
+# ONCE sorabilirsin ve cevabi merge'den sonra ARTIK OLCULEMEZ.
+#
+# NICIN BEYAN DEGIL OLCUM: ilk tarif "PR govdesinde DRIFT: blogu bulunsun, rapor
+# 24 saatten eskiyse tazele" idi. Iki kusuru vardi: (1) govdede bir kelimenin
+# bulunmasi raporun okundugunu da dogru oldugunu da kanitlamaz — beyan, mekanizma
+# degildir; (2) "24 saat" ZAMANLA KAYAN bir olcudur, ayni kanit on dakika sonra
+# gecersiz sayilir. Bu is olcumu PR aninda yapar, tazelik sorusu ortadan kalkar.
+#
+# INCE NOKTA — NICIN MASTER CHECKOUT: `drift-check.mjs` prod'u CALISMA AGACIYLA
+# karsilastirir. PR dalinda kosarsa PR'in KENDI degisikligi "sapma" gorunur ve
+# yanlis kirmizi verir. Bu yuzden checkout PR head'ine DEGIL master'a yapilir:
+# sorulan soru "prod SU AN master ile ayni mi" — PR'in icerigiden bagimsiz.
+#
+# Cetvel: docs/standards/edge-function-security-standard.md 3.12 (E15)
+# ---------------------------------------------------------------------------
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/config.toml'
+      - 'supabase/functions/_shared/**'
+
+jobs:
+  # Sir yoklamasi AYRI bir is: kapi olcemedigi bir durumda ASLA YESIL DONMEMELI.
+  # Sir yoksa (ornek: fork PR'i) kapi isi hic KOSMAZ, GitHub'da "skipped" gorunur.
+  # ATLANMIS IS BASARILI DEGILDIR — bunu uyari olarak da basiyoruz.
+  sapma-on-kontrol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ready: ${{ steps.probe.outputs.ready }}
+    steps:
+      - name: Sirlar var mi
+        id: probe
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -Eeuo pipefail
+          if [ -n "${TOKEN:-}" ] && [ -n "${REF:-}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "INV-EDGE-DRIFT-1: sirlar tam -> kapi KOSACAK"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=INV-EDGE-DRIFT-1 ATLANDI::SUPABASE_ACCESS_TOKEN/PROJECT_REF yok -> kapi isi ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda repo-prod sapmasi OLCULMEDI ve bu PR toplu yeniden dagitim tetikliyor."
+          fi
+
+  sapma-master:
+    name: Sapma (prod != master) — paylasilan girdi
+    needs: sapma-on-kontrol
+    if: needs.sapma-on-kontrol.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    # Olculen sure: 27 fonksiyon icin 11 saniye (kosum 32618970030, 04:53:30 -> 04:53:41).
+    # Sinir yine de ILAN EDILIR: sinirsiz adim paylasilan esszamanlilik havuzunu yakar.
+    timeout-minutes: 15
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+    steps:
+      # DIKKAT ref: master — PR head'i DEGIL. Gerekce bas yorumdaki INCE NOKTA.
+      - name: Checkout (MASTER — PR dali degil)
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # Surum PINLI: drift-check.mjs `functions download --use-api` bayragina bagli ve
+      # o bayragin davranisi CLI surumune bagli. 2.101.0 = davranisin olculdugu surum.
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.101.0
+
+      - name: Sapma taramasi (prod ile master)
+        shell: bash
+        run: |
+          # set +e SART: GitHub `shell: bash`'i -e ile acar; script sifirdan farkli
+          # donunce adim TAM O SATIRDA olur ve rapor HIC basilmaz — yani kanit, en
+          # cok gerektigi anda kaybolur. (deploy-functions.yml'de olculdu.)
+          set -uo pipefail
+          set +e
+          node scripts/edge/drift-check.mjs > drift.log 2>&1
+          rc=$?
+          set -e
+          cat drift.log
+          {
+            echo '### INV-EDGE-DRIFT-1 — prod ile master sapma raporu'
+            echo '```'
+            cat drift.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$rc" -ne 0 ]; then
+            echo "::error title=INV-EDGE-DRIFT-1::Prod master ile AYNI DEGIL. Bu PR paylasilan girdiye dokunuyor; merge TUM uclari yeniden dagitir ve sapan ucu EZER. Merge DURDU: bulguyu panoya yaz, karari Recep verir."
+          fi
+          exit "$rc"
