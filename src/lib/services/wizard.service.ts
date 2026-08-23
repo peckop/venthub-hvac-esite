@@ -17,24 +17,42 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { FanAdayi } from '@/lib/hvac/ductFanSelection'
 import type { Database } from '@/types/database.types'
 import type { DbJson, DbProduct } from '@/types/db-rows'
+import { eqValue, orConditions } from '@/utils/adminQueryFilters'
 
 import { VARIANT_DETAIL_COLUMNS } from './product.columns'
 
 /**
- * Aynı fiziksel büyüklük markaya göre FARKLI anahtar adıyla yazılıyor
- * (2026-08-23 T140 denetimi, `products.technical_specs`):
- *   · güç  → Vortice/SEAT/AVenS `max_absorbed_power_w` · Danfoss `rated_power_w`
- *   · debi → Vortice `max_delivery_m3h` · SEAT/AVenS ağırlıkla `nominal_delivery_m3h`
- *   · ses  → Vortice `noise_level_db_a` · SEAT `noise_lpa_3m_db`
+ * Okunacak spec anahtarları — **EKSEN KARIŞTIRMADAN**.
  *
- * Tek anahtar okunursa o markanın ürünleri sihirbazda sessizce "verisi yok" sayılır ve
- * hiç önerilmez. O yüzden okuma KAVRAM bazlıdır: sırayla denenir, ilk dolu olan kazanır.
- * Sıra anlamlıdır — baştaki, o kavramın kanonik adıdır.
+ * ÖNEMLİ DÜZELTME (2026-08-23, aynı gün): burada önce şu liste vardı —
+ * `sesDbA: ['noise_level_db_a', 'noise_lpa_3m_db']`, `gucW: [..., 'rated_power_w']`.
+ * "Aynı büyüklük farklı adla yazılmış, ikisini de oku" diye düşünmüştüm. YANLIŞTI ve
+ * ölçümle çürüdü:
+ *
+ *   · `noise_lpa_3m_db` **3 metrede** ölçülmüş ses basıncıdır (SEAT, 45–77 dB);
+ *     `noise_level_db_a` mesafe belirtmez (Vortice, 25–79,5 dB). Aynı sütuna konursa
+ *     3 m'de 45 dB olan fan, yakından 45 dB ölçülenle EŞİT sayılır — oysa çok daha
+ *     gürültülüdür. Sonuç: yanlış "en sessiz" önerisi.
+ *   · `rated_power_w` **Danfoss frekans konvertörlerinin** anma gücüdür (34 ürün,
+ *     `frequency-converters` kategorisi) — fan değil, sürücü. Fanın çektiği güçle
+ *     kıyaslanamaz.
+ *   · `nominal_delivery_m3h` ile `max_delivery_m3h` farklı ÇALIŞMA NOKTASIDIR.
+ *
+ * KURAL: sessizce birleştirme YOK. Aynı eksende olmayan bir alan okunmaz; o ürün için
+ * değer `null` kalır ve motor onu "bu boyutta bilgi yok" diye ele alır (elenmez, yalnız
+ * o boyutta öne çıkmaz). Yanlış sıralamaktansa bilmediğini söylemek doğrudur.
+ *
+ * Debi tek istisnadır ve YÖNÜ güvenlidir: `nominal` her zaman `max`'tan küçüktür, yani
+ * yedek olarak okunması fanı olduğundan GÜÇLÜ değil ZAYIF gösterir. Zaten yalnız P-Q
+ * eğrisi yokken kaba yedek olarak kullanılır.
  */
-const KAVRAM_ANAHTARLARI = {
+const SPEC_ANAHTARLARI = {
+  /** Yedek yön güvenli: nominal ≤ max, yani fanı abartmaz. */
   debiM3h: ['max_delivery_m3h', 'nominal_delivery_m3h'],
-  sesDbA: ['noise_level_db_a', 'noise_lpa_3m_db'],
-  gucW: ['max_absorbed_power_w', 'rated_power_w'],
+  /** TEK eksen — `noise_lpa_3m_db` BİLEREK dışarıda (farklı ölçüm mesafesi). */
+  sesDbA: ['noise_level_db_a'],
+  /** TEK eksen — `rated_power_w` BİLEREK dışarıda (sürücü gücü, fan değil). */
+  gucW: ['max_absorbed_power_w'],
   capMm: ['diameter_mm'],
 } as const
 
@@ -62,10 +80,10 @@ function satiriAdayaCevir(satir: DbProduct): FanAdayi {
     ad: satir.name ?? '',
     slug: satir.slug ?? '',
     pqCurveHam: specs?.pq_curve ?? null,
-    maksDebiM3h: sayiOku(specs, KAVRAM_ANAHTARLARI.debiM3h),
-    sesDbA: sayiOku(specs, KAVRAM_ANAHTARLARI.sesDbA),
-    gucW: sayiOku(specs, KAVRAM_ANAHTARLARI.gucW),
-    capMm: sayiOku(specs, KAVRAM_ANAHTARLARI.capMm),
+    maksDebiM3h: sayiOku(specs, SPEC_ANAHTARLARI.debiM3h),
+    sesDbA: sayiOku(specs, SPEC_ANAHTARLARI.sesDbA),
+    gucW: sayiOku(specs, SPEC_ANAHTARLARI.gucW),
+    capMm: sayiOku(specs, SPEC_ANAHTARLARI.capMm),
   }
 }
 
@@ -92,7 +110,9 @@ export async function getWizardCandidates(
   const { data, error } = await supabase
     .from('products')
     .select(VARIANT_DETAIL_COLUMNS)
-    .or(`category_id.eq.${kategori.id}, subcategory_id.eq.${kategori.id}`)
+    // INV-FILTER-1: `or()` bir GRAMER; ham interpolasyon yasak. Kaçış tek yerde yaşar
+    // (`adminQueryFilters`), ikinci kopya yazılmaz.
+    .or(orConditions([eqValue('category_id', kategori.id), eqValue('subcategory_id', kategori.id)]))
     .eq('status', 'active')
     .is('deleted_at', null)
     .order('name', { ascending: true })

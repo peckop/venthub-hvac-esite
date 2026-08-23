@@ -88,8 +88,8 @@ const SESSIZLIKLER: readonly SessizlikOnceligi[] = ['normal', 'important', 'crit
 const CAPLAR = [100, 125, 150, 200, 250, 315] as const
 
 const KART_TEMEL =
-  'focus-ring group p-5 text-left rounded-3xl border transition-shadow duration-500'
-const KART_PASIF = 'border-slate-100 bg-slate-50 hover:border-cyan-500/30 hover:bg-white hover:shadow-xl'
+  'focus-ring group p-5 text-left rounded-hvac-lg border transition-shadow duration-500'
+const KART_PASIF = 'border-light-gray bg-light-gray hover:border-cyan-500/30 hover:bg-white hover:shadow-xl'
 const KART_AKTIF = 'border-cyan-500 bg-white shadow-xl'
 
 export default function SilentFanWizard({ isOpen, onClose, categorySlug }: SilentFanWizardProps) {
@@ -158,27 +158,27 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
     >
       <button
         type="button"
-        className="absolute inset-0 w-full h-full bg-slate-900/60 backdrop-blur-xl cursor-default border-none outline-none"
+        className="absolute inset-0 w-full h-full bg-industrial-gray/60 backdrop-blur-xl cursor-default border-none outline-none"
         onClick={onClose}
         aria-label={t('common.close')}
         tabIndex={-1}
       />
 
       <div className="relative w-full max-w-4xl bg-white rounded-hvac-2xl shadow-2xl overflow-hidden flex flex-col max-h-90vh">
-        <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div className="px-8 py-6 border-b border-light-gray flex items-center justify-between bg-light-gray/50">
           <div className="flex items-center gap-4">
             {adim > 1 && (
               <button
                 type="button"
                 onClick={geri}
                 aria-label={t('silentFanWizard.goBack')}
-                className="focus-ring p-2 hover:bg-white rounded-xl transition-colors"
+                className="focus-ring p-2 hover:bg-white rounded-hvac-sm transition-colors"
               >
-                <ChevronLeft size={20} className="text-slate-400" />
+                <ChevronLeft size={20} className="text-steel-gray" />
               </button>
             )}
             <div>
-              <h3 id="sessiz-fan-sihirbaz-baslik" className="text-lg font-bold text-slate-900">
+              <h3 id="sessiz-fan-sihirbaz-baslik" className="text-lg font-bold text-industrial-gray">
                 {t('silentFanWizard.headerTitle')}
               </h3>
               <div className="flex gap-1 mt-1">
@@ -186,7 +186,7 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                   <div
                     key={s}
                     className={`h-1 rounded-full transition-colors duration-500 ${
-                      s <= adim ? 'w-6 bg-cyan-500' : 'w-2 bg-slate-200'
+                      s <= adim ? 'w-6 bg-cyan-500' : 'w-2 bg-light-gray'
                     }`}
                   />
                 ))}
@@ -197,9 +197,9 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
             type="button"
             onClick={onClose}
             aria-label={t('common.close')}
-            className="focus-ring p-2 hover:bg-white rounded-xl transition-colors"
+            className="focus-ring p-2 hover:bg-white rounded-hvac-sm transition-colors"
           >
-            <X size={20} className="text-slate-400" />
+            <X size={20} className="text-steel-gray" />
           </button>
         </div>
 
@@ -208,10 +208,10 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
           {adim === 1 && (
             <section className="space-y-8">
               <header className="text-center max-w-lg mx-auto">
-                <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">
+                <h2 className="text-3xl font-bold text-industrial-gray mb-3 tracking-tight">
                   {t('silentFanWizard.step1Title')}
                 </h2>
-                <p className="text-slate-500 font-light leading-relaxed">
+                <p className="text-steel-gray font-light leading-relaxed">
                   {t('silentFanWizard.step1Desc')}
                 </p>
               </header>
@@ -226,11 +226,11 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                     }}
                     className={`${KART_TEMEL} ${girdi.mahal === id ? KART_AKTIF : KART_PASIF}`}
                   >
-                    <div className="w-11 h-11 rounded-2xl bg-white flex items-center justify-center mb-4 group-hover:bg-cyan-500 group-hover:text-white transition-colors">
+                    <div className="w-11 h-11 rounded-hvac-md bg-white flex items-center justify-center mb-4 group-hover:bg-cyan-500 group-hover:text-white transition-colors">
                       <Ikon size={20} />
                     </div>
-                    <p className="font-bold text-slate-900">{t(`silentFanWizard.room.${id}`)}</p>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="font-bold text-industrial-gray">{t(`silentFanWizard.room.${id}`)}</p>
+                    <p className="text-sm text-steel-gray mt-1">
                       {t(`silentFanWizard.roomHint.${id}`)}
                     </p>
                   </button>
@@ -243,10 +243,10 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
           {adim === 2 && (
             <section className="space-y-8">
               <header className="text-center max-w-lg mx-auto">
-                <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">
+                <h2 className="text-3xl font-bold text-industrial-gray mb-3 tracking-tight">
                   {t('silentFanWizard.step2Title')}
                 </h2>
-                <p className="text-slate-500 font-light leading-relaxed">
+                <p className="text-steel-gray font-light leading-relaxed">
                   {t('silentFanWizard.step2Desc')}
                 </p>
               </header>
@@ -254,8 +254,8 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
               <div className="max-w-lg mx-auto space-y-8">
                 <div>
                   <label htmlFor="oda-alan" className="flex justify-between items-baseline mb-3">
-                    <span className="font-bold text-slate-900">{t('silentFanWizard.areaLabel')}</span>
-                    <span className="text-2xl font-black text-cyan-600">
+                    <span className="font-bold text-industrial-gray">{t('silentFanWizard.areaLabel')}</span>
+                    <span className="text-2xl font-bold text-cyan-600">
                       {girdi.alanM2} {t('silentFanWizard.unitM2')}
                     </span>
                   </label>
@@ -273,10 +273,10 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
 
                 <div>
                   <label htmlFor="tavan" className="flex justify-between items-baseline mb-3">
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-industrial-gray">
                       {t('silentFanWizard.ceilingLabel')}
                     </span>
-                    <span className="text-2xl font-black text-cyan-600">
+                    <span className="text-2xl font-bold text-cyan-600">
                       {girdi.tavanYuksekligiM.toFixed(1)} {t('silentFanWizard.unitM')}
                     </span>
                   </label>
@@ -295,7 +295,7 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                 <button
                   type="button"
                   onClick={ileri}
-                  className="focus-ring w-full bg-primary-navy text-white py-4 rounded-2xl font-bold hover:bg-secondary-blue transition-colors active:scale-95"
+                  className="focus-ring w-full bg-primary-navy text-white py-4 rounded-hvac-md font-bold hover:bg-secondary-blue transition-colors active:scale-95"
                 >
                   {t('silentFanWizard.continue')}
                 </button>
@@ -307,17 +307,17 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
           {adim === 3 && (
             <section className="space-y-8">
               <header className="text-center max-w-lg mx-auto">
-                <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">
+                <h2 className="text-3xl font-bold text-industrial-gray mb-3 tracking-tight">
                   {t('silentFanWizard.step3Title')}
                 </h2>
-                <p className="text-slate-500 font-light leading-relaxed">
+                <p className="text-steel-gray font-light leading-relaxed">
                   {t('silentFanWizard.step3Desc')}
                 </p>
               </header>
 
               <div className="space-y-6">
                 <fieldset>
-                  <legend className="font-bold text-slate-900 mb-3">
+                  <legend className="font-bold text-industrial-gray mb-3">
                     {t('silentFanWizard.routeLabel')}
                   </legend>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -328,8 +328,8 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                         onClick={() => yaz({ guzergah: g })}
                         className={`${KART_TEMEL} ${girdi.guzergah === g ? KART_AKTIF : KART_PASIF}`}
                       >
-                        <p className="font-bold text-slate-900">{t(`silentFanWizard.route.${g}`)}</p>
-                        <p className="text-sm text-slate-500 mt-1">
+                        <p className="font-bold text-industrial-gray">{t(`silentFanWizard.route.${g}`)}</p>
+                        <p className="text-sm text-steel-gray mt-1">
                           {t(`silentFanWizard.routeHint.${g}`)}
                         </p>
                       </button>
@@ -338,7 +338,7 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                 </fieldset>
 
                 <fieldset>
-                  <legend className="font-bold text-slate-900 mb-3">
+                  <legend className="font-bold text-industrial-gray mb-3">
                     {t('silentFanWizard.materialLabel')}
                   </legend>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -349,10 +349,10 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                         onClick={() => yaz({ malzeme: m })}
                         className={`${KART_TEMEL} ${girdi.malzeme === m ? KART_AKTIF : KART_PASIF}`}
                       >
-                        <p className="font-bold text-slate-900">
+                        <p className="font-bold text-industrial-gray">
                           {t(`silentFanWizard.material.${m}`)}
                         </p>
-                        <p className="text-sm text-slate-500 mt-1">
+                        <p className="text-sm text-steel-gray mt-1">
                           {t(`silentFanWizard.materialHint.${m}`)}
                         </p>
                       </button>
@@ -361,17 +361,17 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                 </fieldset>
 
                 <fieldset>
-                  <legend className="font-bold text-slate-900 mb-3">
+                  <legend className="font-bold text-industrial-gray mb-3">
                     {t('silentFanWizard.diameterLabel')}
                   </legend>
                   <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
                       onClick={() => yaz({ kanalCapiMm: null })}
-                      className={`focus-ring px-4 py-2 rounded-xl border font-bold transition-colors ${
+                      className={`focus-ring px-4 py-2 rounded-hvac-sm border font-bold transition-colors ${
                         girdi.kanalCapiMm === null
                           ? 'border-cyan-500 bg-cyan-500 text-white'
-                          : 'border-slate-200 bg-white text-slate-600 hover:border-cyan-500/40'
+                          : 'border-light-gray bg-white text-steel-gray hover:border-cyan-500/40'
                       }`}
                     >
                       {t('silentFanWizard.diameterUnknown')}
@@ -381,17 +381,17 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                         key={c}
                         type="button"
                         onClick={() => yaz({ kanalCapiMm: c })}
-                        className={`focus-ring px-4 py-2 rounded-xl border font-bold transition-colors ${
+                        className={`focus-ring px-4 py-2 rounded-hvac-sm border font-bold transition-colors ${
                           girdi.kanalCapiMm === c
                             ? 'border-cyan-500 bg-cyan-500 text-white'
-                            : 'border-slate-200 bg-white text-slate-600 hover:border-cyan-500/40'
+                            : 'border-light-gray bg-white text-steel-gray hover:border-cyan-500/40'
                         }`}
                       >
                         {c}
                       </button>
                     ))}
                   </div>
-                  <p className="text-sm text-slate-400 mt-2">
+                  <p className="text-sm text-steel-gray mt-2">
                     {t('silentFanWizard.diameterHint')}
                   </p>
                 </fieldset>
@@ -399,7 +399,7 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                 <button
                   type="button"
                   onClick={ileri}
-                  className="focus-ring w-full bg-primary-navy text-white py-4 rounded-2xl font-bold hover:bg-secondary-blue transition-colors active:scale-95"
+                  className="focus-ring w-full bg-primary-navy text-white py-4 rounded-hvac-md font-bold hover:bg-secondary-blue transition-colors active:scale-95"
                 >
                   {t('silentFanWizard.continue')}
                 </button>
@@ -411,10 +411,10 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
           {adim === 4 && (
             <section className="space-y-8">
               <header className="text-center max-w-lg mx-auto">
-                <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">
+                <h2 className="text-3xl font-bold text-industrial-gray mb-3 tracking-tight">
                   {t('silentFanWizard.step4Title')}
                 </h2>
-                <p className="text-slate-500 font-light leading-relaxed">
+                <p className="text-steel-gray font-light leading-relaxed">
                   {t('silentFanWizard.step4Desc')}
                 </p>
               </header>
@@ -429,11 +429,11 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                     }}
                     className={`${KART_TEMEL} ${girdi.sessizlik === s ? KART_AKTIF : KART_PASIF}`}
                   >
-                    <div className="w-11 h-11 rounded-2xl bg-white flex items-center justify-center mb-4 group-hover:bg-cyan-500 group-hover:text-white transition-colors">
+                    <div className="w-11 h-11 rounded-hvac-md bg-white flex items-center justify-center mb-4 group-hover:bg-cyan-500 group-hover:text-white transition-colors">
                       <Volume2 size={20} />
                     </div>
-                    <p className="font-bold text-slate-900">{t(`silentFanWizard.quiet.${s}`)}</p>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="font-bold text-industrial-gray">{t(`silentFanWizard.quiet.${s}`)}</p>
+                    <p className="text-sm text-steel-gray mt-1">
                       {t(`silentFanWizard.quietHint.${s}`)}
                     </p>
                   </button>
@@ -448,24 +448,24 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
               {yukleniyor && (
                 <div className="flex flex-col items-center justify-center py-16 gap-4">
                   <Loader2 size={32} className="animate-spin text-cyan-500" />
-                  <p className="text-slate-500">{t('silentFanWizard.calculating')}</p>
+                  <p className="text-steel-gray">{t('silentFanWizard.calculating')}</p>
                 </div>
               )}
 
               {hata && !yukleniyor && (
                 <div className="max-w-lg mx-auto text-center py-12">
-                  <p className="font-bold text-slate-900 mb-2">{t('silentFanWizard.errorTitle')}</p>
-                  <p className="text-slate-500">{t('silentFanWizard.errorDesc')}</p>
+                  <p className="font-bold text-industrial-gray mb-2">{t('silentFanWizard.errorTitle')}</p>
+                  <p className="text-steel-gray">{t('silentFanWizard.errorDesc')}</p>
                 </div>
               )}
 
               {sonuc && !yukleniyor && !hata && (
                 <>
                   <header className="text-center max-w-2xl mx-auto">
-                    <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">
+                    <h2 className="text-3xl font-bold text-industrial-gray mb-3 tracking-tight">
                       {t('silentFanWizard.resultTitle')}
                     </h2>
-                    <p className="text-slate-500 font-light leading-relaxed">
+                    <p className="text-steel-gray font-light leading-relaxed">
                       {t('silentFanWizard.resultNeed', {
                         hacim: Math.round(sonuc.hesap.hacimM3),
                         debi: Math.round(sonuc.hesap.tasarimDebiM3h),
@@ -475,10 +475,10 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
 
                   {sonuc.uygunlar.length === 0 ? (
                     <div className="text-center py-10">
-                      <p className="font-bold text-slate-900 mb-2">
+                      <p className="font-bold text-industrial-gray mb-2">
                         {t('silentFanWizard.noMatchTitle')}
                       </p>
-                      <p className="text-slate-500">{t('silentFanWizard.noMatchDesc')}</p>
+                      <p className="text-steel-gray">{t('silentFanWizard.noMatchDesc')}</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -508,7 +508,7 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                     <button
                       type="button"
                       onClick={() => setDokumAcik((a) => !a)}
-                      className="focus-ring text-sm font-bold text-slate-500 hover:text-cyan-600 transition-colors"
+                      className="focus-ring text-sm font-bold text-steel-gray hover:text-cyan-600 transition-colors"
                     >
                       {dokumAcik
                         ? t('silentFanWizard.hideDetails')
@@ -516,29 +516,29 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                     </button>
 
                     {dokumAcik && (
-                      <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm bg-slate-50 rounded-2xl p-6">
-                        <dt className="text-slate-500">{t('silentFanWizard.detailVolume')}</dt>
-                        <dd className="font-bold text-slate-900">
+                      <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm bg-light-gray rounded-hvac-md p-6">
+                        <dt className="text-steel-gray">{t('silentFanWizard.detailVolume')}</dt>
+                        <dd className="font-bold text-industrial-gray">
                           {sonuc.hesap.hacimM3.toFixed(1)} {t('silentFanWizard.unitM3')}
                         </dd>
-                        <dt className="text-slate-500">{t('silentFanWizard.detailAch')}</dt>
-                        <dd className="font-bold text-slate-900">{sonuc.hesap.ach}{t('silentFanWizard.unitTimes')}</dd>
-                        <dt className="text-slate-500">{t('silentFanWizard.detailNeed')}</dt>
-                        <dd className="font-bold text-slate-900">
+                        <dt className="text-steel-gray">{t('silentFanWizard.detailAch')}</dt>
+                        <dd className="font-bold text-industrial-gray">{sonuc.hesap.ach}{t('silentFanWizard.unitTimes')}</dd>
+                        <dt className="text-steel-gray">{t('silentFanWizard.detailNeed')}</dt>
+                        <dd className="font-bold text-industrial-gray">
                           {Math.round(sonuc.hesap.tasarimDebiM3h)} {t('silentFanWizard.unitM3h')}
                           {sonuc.hesap.minimumUygulandi && (
-                            <span className="font-normal text-slate-400">
+                            <span className="font-normal text-steel-gray">
                               {' '}
                               {t('silentFanWizard.detailMinApplied')}
                             </span>
                           )}
                         </dd>
-                        <dt className="text-slate-500">{t('silentFanWizard.detailPressure')}</dt>
-                        <dd className="font-bold text-slate-900">
+                        <dt className="text-steel-gray">{t('silentFanWizard.detailPressure')}</dt>
+                        <dd className="font-bold text-industrial-gray">
                           {t('silentFanWizard.approx')} {Math.round(sonuc.sistemBasinciPa)} {t('silentFanWizard.unitPa')}
                         </dd>
-                        <dt className="text-slate-500">{t('silentFanWizard.detailEliminated')}</dt>
-                        <dd className="font-bold text-slate-900">{sonuc.elenenler.length}</dd>
+                        <dt className="text-steel-gray">{t('silentFanWizard.detailEliminated')}</dt>
+                        <dd className="font-bold text-industrial-gray">{sonuc.elenenler.length}</dd>
                       </dl>
                     )}
                   </div>
@@ -547,7 +547,7 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
                     <button
                       type="button"
                       onClick={bastanBasla}
-                      className="focus-ring px-6 py-3 rounded-2xl border-2 border-slate-200 font-bold text-slate-600 hover:border-cyan-500 transition-colors"
+                      className="focus-ring px-6 py-3 rounded-hvac-md border-2 border-light-gray font-bold text-steel-gray hover:border-cyan-500 transition-colors"
                     >
                       {t('silentFanWizard.restart')}
                     </button>
@@ -559,8 +559,8 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
         </div>
 
         {adim < 5 && (
-          <footer className="px-8 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-            <p className="text-sm text-slate-400 flex items-center gap-2">
+          <footer className="px-8 py-4 border-t border-light-gray bg-light-gray/50 flex items-center justify-between">
+            <p className="text-sm text-steel-gray flex items-center gap-2">
               <Ruler size={14} />
               {t('silentFanWizard.defaultsHint')}
             </p>
@@ -597,40 +597,40 @@ function OneriKarti({
 
   return (
     <article
-      className={`rounded-3xl border p-6 flex flex-col ${
-        vurgulu ? 'border-cyan-500 bg-white shadow-xl' : 'border-slate-100 bg-slate-50'
+      className={`rounded-hvac-lg border p-6 flex flex-col ${
+        vurgulu ? 'border-cyan-500 bg-white shadow-xl' : 'border-light-gray bg-light-gray'
       }`}
     >
-      <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-widest text-cyan-600 mb-3">
+      <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-cyan-600 mb-3">
         <Wind size={12} />
         {rozet}
       </span>
-      <h3 className="font-bold text-slate-900 leading-snug">{aday.ad}</h3>
+      <h3 className="font-bold text-industrial-gray leading-snug">{aday.ad}</h3>
 
       <dl className="mt-4 space-y-1 text-sm flex-1">
         <div className="flex justify-between">
-          <dt className="text-slate-500">{t('silentFanWizard.cardDelivers')}</dt>
-          <dd className="font-bold text-slate-900">
+          <dt className="text-steel-gray">{t('silentFanWizard.cardDelivers')}</dt>
+          <dd className="font-bold text-industrial-gray">
             {Math.round(sonuc.calismaDebisiM3h)} {t('silentFanWizard.unitM3h')}
           </dd>
         </div>
         {aday.sesDbA != null && (
           <div className="flex justify-between">
-            <dt className="text-slate-500">{t('silentFanWizard.cardNoise')}</dt>
-            <dd className="font-bold text-slate-900">{aday.sesDbA} {t('silentFanWizard.unitDbA')}</dd>
+            <dt className="text-steel-gray">{t('silentFanWizard.cardNoise')}</dt>
+            <dd className="font-bold text-industrial-gray">{aday.sesDbA} {t('silentFanWizard.unitDbA')}</dd>
           </div>
         )}
         {aday.capMm != null && (
           <div className="flex justify-between">
-            <dt className="text-slate-500">{t('silentFanWizard.cardDiameter')}</dt>
-            <dd className="font-bold text-slate-900">{aday.capMm} {t('silentFanWizard.unitMm')}</dd>
+            <dt className="text-steel-gray">{t('silentFanWizard.cardDiameter')}</dt>
+            <dd className="font-bold text-industrial-gray">{aday.capMm} {t('silentFanWizard.unitMm')}</dd>
           </div>
         )}
       </dl>
 
       <Link
         href={Routes.product(aday.slug)}
-        className="focus-ring mt-5 text-center bg-primary-navy text-white py-3 rounded-2xl font-bold hover:bg-secondary-blue transition-colors"
+        className="focus-ring mt-5 text-center bg-primary-navy text-white py-3 rounded-hvac-md font-bold hover:bg-secondary-blue transition-colors"
       >
         {t('silentFanWizard.cardCta')}
       </Link>
