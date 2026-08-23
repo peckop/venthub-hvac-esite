@@ -53,7 +53,13 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     const parentVm = wrapCategory(parentCategory ?? undefined)
     
     const isAirCurtain = category.slug === 'air-curtains'
-    const isSilentFan = category.slug === 'quiet-duct-fans'
+    // Sessiz kanal fanı anlatısı `inline-duct-fans` kategorisine bağlıdır. Kategorinin GÖRÜNEN
+    // adı "Kanal İçi Hayalet Fanlar" ama içeriği tam olarak budur: altındaki ürünlerin HEPSİ
+    // Vortice Lineo Quiet serisidir. Bölüm daha önce hiç var olmamış bir `quiet-duct-fans`
+    // slug'ına bağlıydı; koşul hiçbir zaman açılmadı ve bu beş bileşenlik anlatı kullanıcıya
+    // hiç görünmedi. Kategorinin ADI ile kanonik slug'ı AYRI konulardır — ad değişse de burası
+    // değişmez; slug değişirse `catalog-integrity` kapısı (slug-unresolved) kırmızı verir.
+    const isSilentFan = category.slug === 'inline-duct-fans'
     const isDehumidifier = category.slug === 'dehumidifiers'
 
     // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
