@@ -67,6 +67,16 @@ export interface FamilyDetail {
     subcategory_id: string | null
     meta_title: { tr?: string | null; en?: string | null } | null
     meta_description: { tr?: string | null; en?: string | null } | null
+    /**
+     * Breadcrumb kategori basamağı için TAM kategori satırı — `category_id`'nin yanında
+     * bilerek durur. `getSeriesLanding` bunu K7'de zaten yapıyordu; MODEL dalı yapmıyordu,
+     * yani iki dal asimetrikti: seri sayfası kategori ADINI çözebiliyor, ürün sayfası
+     * çözemiyordu. Ad çözümü (`getCategoryDisplayName`) id ile değil SATIRLA çalışır
+     * (translation_key/menu_label/name orada) — id taşımak yetmez.
+     * RPC yalnız id döndürür; satırlar burada tek ek sorguyla gömülür.
+     */
+    category: DbCategory | null
+    subcategory: DbCategory | null
   }
   variants: FamilyVariant[]
   /**
@@ -103,7 +113,35 @@ export async function getFamilyDetail(
   })
 
   if (error) throw error
-  return parseFamilyDetail(data)
+  const detail = parseFamilyDetail(data)
+  if (!detail) return null
+
+  // Kategori SATIRLARINI göm — `getSeriesLanding` ile BİREBİR aynı desen (aşağıda). RPC yalnız
+  // id döndürüyor; ad çözümü (`getCategoryDisplayName`) satır ister. İkisi tek sorguda çekilir;
+  // hiçbiri yoksa hiç sorgu atılmaz.
+  const categoryIds = [detail.family.category_id, detail.family.subcategory_id].filter(
+    (id): id is string => !!id
+  )
+  let categoryById = new Map<string, DbCategory>()
+  if (categoryIds.length > 0) {
+    const { data: categoryRows, error: categoryError } = await supabase
+      .from('categories')
+      .select('*')
+      .in('id', categoryIds)
+      .returns<DbCategory[]>()
+
+    if (categoryError) throw categoryError
+    categoryById = new Map((categoryRows ?? []).map((c) => [c.id, c]))
+  }
+
+  detail.family.category = detail.family.category_id
+    ? (categoryById.get(detail.family.category_id) ?? null)
+    : null
+  detail.family.subcategory = detail.family.subcategory_id
+    ? (categoryById.get(detail.family.subcategory_id) ?? null)
+    : null
+
+  return detail
 }
 
 /**

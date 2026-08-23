@@ -35,6 +35,8 @@ function familyDetailFixture(variantCount: number): FamilyDetail {
       subcategory_id: null,
       meta_title: null,
       meta_description: null,
+      category: null,
+      subcategory: null,
     },
     variants: Array.from({ length: variantCount }, (_, i) => ({
       id: 'var-' + i,
