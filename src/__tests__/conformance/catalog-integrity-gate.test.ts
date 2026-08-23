@@ -118,6 +118,42 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     expect(blok, 'detay satiri cocuk sayisini kullanmiyor').toMatch(/detail:[\s\S]*cocuk/)
   })
 
+  /* ────────────────────────────────────────────────────────────────────────
+   * T160 — KATALOG DERINLIGI (catalog-depth-standard §K1).
+   *
+   * Kural: derinlik IKI kademe. Ucuncu GEZINME kademesi ancak aile hiyerarsisiyle
+   * dogar, bu yuzden kapi tam olarak onu olcer. Sinav uc sey bekcilir: kural VAR,
+   * anahtar EBEVEYN bazinda (kusur cocuklarda degil hiyerarsinin kurulmasinda), ve
+   * cetvel dosyasi kapiyi ADIYLA gosteriyor (cetvel-kapi baginin kopmamasi icin).
+   * ──────────────────────────────────────────────────────────────────────── */
+  it('T160 — aile hiyerarşisi TABAN DIŞINDA doğarsa KIRMIZI', () => {
+    const { status, output } = runWithFixture([...baselineKeys(), 'family-nested:sinav-ailesi'])
+    expect(status).toBe(1)
+    expect(output).toContain('family-nested:sinav-ailesi')
+  })
+
+  it('T160 — kural EBEVEYN bazında sayar (çocuk başına satır üretmez)', () => {
+    const kaynak = fs.readFileSync(SCRIPT, 'utf8')
+    const blokBasi = kaynak.indexOf("id: 'family-nested'")
+    expect(blokBasi, 'family-nested kurali betikte yok').toBeGreaterThan(-1)
+    const blok = kaynak.slice(blokBasi, kaynak.indexOf("id: 'product-no-subcategory'"))
+    // Kusur tek tek cocuklarda DEGIL, hiyerarsinin kurulmus olmasinda. Cocuk bazli anahtar
+    // altı gerekcesiz taban satiri uretirdi ve kimse okumazdi (spec-type ile ayni desen).
+    expect(blok, 'anahtar ebeveyn bazinda degil').toMatch(/key:.*parent_slug/)
+    expect(blok, 'kural ust aile bagini sorgulamiyor').toContain('parent_family_id')
+  })
+
+  it('T160 — cetvel dosyası duruyor ve kapıyı ADIYLA gösteriyor', () => {
+    const cetvel = path.join(process.cwd(), 'docs', 'standards', 'catalog-depth-standard.md')
+    expect(fs.existsSync(cetvel), 'catalog-depth-standard.md yok').toBe(true)
+    const metin = fs.readFileSync(cetvel, 'utf8')
+    // Cetvel kapiyi adiyla gostermezse, kural degisince kimse cetveli guncellemez.
+    expect(metin, 'cetvel kapiyi adiyla gostermiyor').toContain('family-nested')
+    // Ve K2'nin makineye devredilmedigini ACIKCA yazmali — yoksa biri onu da
+    // "kapiya baglayalim" diye olculemez bir sinav yazar.
+    expect(metin, 'cetvel K2 icin makine kapisi olmadigini yazmiyor').toMatch(/K2[\s\S]{0,400}makine kapisi|makine kapısı/i)
+  })
+
   it('ölçemeyen kapı YEŞİL dönmez — bağlantı dizesi yokken çıkış 0 DEĞİL', () => {
     const res = spawnSync(process.execPath, [SCRIPT], {
       encoding: 'utf8',
@@ -135,14 +171,27 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
       'utf8',
     )
     // Kapı işi bir ön-kontrole BAĞLI olmalı ve yalnız sırlar tamken koşmalı.
-    expect(wf).toMatch(/needs:\s*catalog-integrity-precheck/)
-    expect(wf).toMatch(/if:\s*needs\.catalog-integrity-precheck\.outputs\.ready == 'true'/)
+    // 2026-08-20 (T161-VH - EDGE): on-kontrolun adi `catalog-integrity-precheck` -> `db-gate-precheck`
+    // oldu. Sebep KAPSAM: ayni on-kontrol artik INV-RLS-COVERAGE-1 isini de besliyor ve eski ad
+    // yaptigi isi ANLATMIYORDU. Sozlesme daralmadi - bag hala ZORUNLU, yalniz adi dogrulandi.
+    expect(wf).toMatch(/needs:\s*db-gate-precheck/)
+    expect(wf).toMatch(/if:\s*needs\.db-gate-precheck\.outputs\.ready == 'true'/)
     // Ön-kontrol İKİ sırrı da aramalı; birini unutmak kapıyı yarı-kör bırakır.
     // DİKKAT: düz `toContain` yetmez — sabotajda `SUPABASE_CA_CERTX` yazdım ve iddia yeşil kaldı
     // (üst-dize tuzağı). Bu yüzden (a) yalnız ÖN-KONTROL bloğuna bakılır, (b) sırrın tam
     // kullanımı aranır, (c) sırların gerçekten SINANDIĞI kabuk koşulu aranır — adı geçmesi değil.
-    const precheckStart = wf.indexOf('catalog-integrity-precheck:')
-    const precheck = wf.slice(precheckStart, wf.indexOf('  catalog-integrity:', precheckStart + 1))
+    // 2026-08-20 (T161-VH - EDGE, PRICING'in incelemesiyle): dilimin BITIS siniri artik sabit bir
+    // is ADI degil, DESEN. Eskiden `wf.indexOf('  catalog-integrity:')` ile kesiliyordu; is sirasi
+    // degisirse (ornegin araya ucuncu bir DB kapisi girerse) dilim o isi de YUTAR ve 'yalniz
+    // on-kontrol blogunda ara' korumasi SESSIZCE genislerdi. Ikinci bir DB kapisi eklenmesi bu
+    // ihtimali bugun dogurdu - onceden tek kapi vardi, yani kirilganlik latentti.
+    const precheckStart = wf.indexOf('  db-gate-precheck:')
+    expect(precheckStart, 'on-kontrol isi workflowda YOK').toBeGreaterThan(-1)
+    const sonrasi = wf.slice(precheckStart + 1)
+    const bitis = /\r?\n {2}[A-Za-z0-9_-]+:/.exec(sonrasi)
+    const precheck = bitis ? sonrasi.slice(0, bitis.index) : sonrasi
+    // Dilim TEK is kapsamali: baska bir is basligi icine sizarsa iddialar yanlis blokta arar.
+    expect(precheck, 'dilim komsu isi de yuttu').not.toMatch(/\r?\n {2}[A-Za-z0-9_-]+:/)
     expect(precheck.length).toBeGreaterThan(0)
     expect(precheck.includes('secrets.SUPABASE_DB_URL }}'), 'SUPABASE_DB_URL ön-kontrolde yok').toBe(true)
     expect(precheck.includes('-n "${DB_URL:-}"'), 'DB_URL kabuk koşulunda SINANMIYOR').toBe(true)
@@ -180,8 +229,21 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     expect(wf).not.toMatch(/secrets\.SUPABASE_CA_CERT/)
     // PGSSLROOTCERT tek bir yerden, DEPO dosyasından beslenmeli.
     const assignments = wf.match(/PGSSLROOTCERT=[^\n]*/g) ?? []
-    expect(assignments.length, 'PGSSLROOTCERT tam olarak bir kez atanmalı').toBe(1)
-    expect(assignments[0]).toContain('scripts/db/checks/supabase-root-2021-ca.pem')
+    //
+    // 2026-08-20 (T161-VH - EDGE) - sayi 1'den "en az 1 ve HEPSI ayni depo dosyasi"na cevrildi.
+    // NICIN BU GEVSEME DEGIL: korunmak istenen sey atama SAYISI degil, kok sertifikanin
+    // KAYNAGIYDI ("tek bir yerden ... beslenmeli"). Workflow'a ikinci bir DB kapisi
+    // (INV-RLS-COVERAGE-1) eklendi ve o da ayni depo dosyasini disa aktariyor; sabit sayi
+    // burada gercek degismezin YERINE GECEN bir vekildi. Yeni iddia daha SERT: tek bir atama
+    // bile depo dosyasinin disini gosterirse KIRMIZI olur - eski halde ikinci atamanin nereyi
+    // gosterdigi hic sorulmuyordu. Sirla-ezme yolu ayrica ustteki `secrets.SUPABASE_CA_CERT`
+    // iddiasiyla kapali; bu iki iddia birbirinin yedegi.
+    expect(assignments.length, 'PGSSLROOTCERT hic atanmamis - kapi dogrulanmamis kokle kosar').toBeGreaterThan(0)
+    for (const atama of assignments) {
+      expect(atama, 'PGSSLROOTCERT depo dosyasi DISINDA bir kaynagi gosteriyor').toContain(
+        'scripts/db/checks/supabase-root-2021-ca.pem',
+      )
+    }
   })
 
   it('kapı, doğrulanmamış TLS ile prod DB\'ye bağlanmaz', () => {

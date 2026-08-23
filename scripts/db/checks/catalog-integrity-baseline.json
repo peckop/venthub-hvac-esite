@@ -37,7 +37,8 @@
     "product-no-subcategory:vortice-vort-nordik-hvls": "T159 · 7 urun yaprak kategorisiz. Ailesinin kategorisi industrial-ceiling-fans zaten LEVEL 0 ve altinda yaprak yok; urunler kategori sayfasinda category_id uzerinden gorunuyor. Taksonomi derinlestirilirse yazilir.",
     "product-no-subcategory:vortice-isi-geri-kazanim": "T159 · 5 urun yaprak kategorisiz. vort-mono ile ayni sinif (heat-recovery-vmc yapragi yok).",
     "product-no-subcategory:vortice-vortice-bravo-s": "T159 · 4 urun yaprak kategorisiz. smart-home altinda yaprak kategori yok; ayni sinif.",
-    "product-no-subcategory:avens-isi-geri-kazanim": "T159 · 3 urun yaprak kategorisiz. vort-mono ile ayni sinif (heat-recovery-vmc yapragi yok)."
+    "product-no-subcategory:avens-isi-geri-kazanim": "T159 · 3 urun yaprak kategorisiz. vort-mono ile ayni sinif (heat-recovery-vmc yapragi yok).",
+    "family-nested:vortice-lineo-quiet": "T160 · 6 cocuk aile (Lineo Quiet 100/125/150/200/250/315). Katalogda TEK iki-katmanli yapi; 38 ailenin 37'si tek katmanli. 2026-08-21 aile ayrismasindan kaldi ve o gun catalog-depth-standard §K1 olcutu HENUZ YAZILI DEGILDI — kural geriye donuk suc degil. Cozum: 12 urunu tek ailede topla, 6 parcayi kapat (hava perdesi yapisi). Bu PROD VERI YAZIMIDIR = RECEP KAPISI; cetvel inince onerilecek. Birlestirme yapilinca bu satir BAYAT olur ve silinir. Taban yalniz kisalir: ikinci bir hiyerarsi DOGAMAZ."
   },
   "_slug_unresolved_notu": "slug-unresolved satirlarinin HEPSI Recep karari bekler (kategori yaratmak/silmek = taksonomi karari, olcumle cozulmez). Bu yuzden buradalar. Karar gelip slug duzeltilince ya da kod silinince ilgili satir BURADAN SILINIR — taban yalniz kuculur. Yeni bir slug-unresolved satirini gerekcesiz eklemek, kirik bir vitrin baglantisini onaylamak demektir."
 }
