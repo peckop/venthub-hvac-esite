@@ -82,7 +82,13 @@ const T_STATIC = /(?<![\w$])_?t\(\s*(['"])([A-Za-z][\w]*(?:\.[\w]+)*)\1/g
 // `` t(`a.b.${x}`) `` — şablonun SABİT önü.
 const T_TEMPLATE = /(?<![\w$])_?t\(\s*`([A-Za-z][\w.]*?)\$\{/g
 // `` `a.b.${x}` `` — `t()` dışında kurulan anahtar (ör. specLabel.ts).
-const ANY_TEMPLATE = /`([a-z][\w]*(?:\.[\w]+)+?)\$\{/g
+//
+// Sondaki nokta OPSİYONEL (`\.?`) OLMAK ZORUNDA. Kod anahtarı iki biçimde de kurar:
+// `` `a.b${x}` `` (ayraçsız) ve `` `a.b.${x}` `` (ayraçlı). İlk sürüm yalnız ayraçsızı
+// tanıyordu; `` `common.categoryList.${tKey}` `` (categoryHelpers.ts:32) eşleşmedi ve
+// DB sürücülü 18 kategori anahtarı ÖLÜ sanılıp donmuş borca yazıldı — hepsi CANLI.
+// Cetveldeki "önek eşlemesi ayraçsız olmalı" kuralının ters yüzü; iki biçim de gerekli.
+const ANY_TEMPLATE = /`([a-z][\w]*(?:\.[\w]+)+\.?)\$\{/g
 // `'a.b.' + x` — birleştirme.
 const T_CONCAT = /(['"])([A-Za-z][\w]*(?:\.[\w]+)*\.)\1\s*\+/g
 // `dict.a.b` / `dictionary.a.b` — `t()` ATLANARAK doğrudan obje erişimi.
@@ -485,24 +491,6 @@ const DONMUS_BORC: ReadonlySet<string> = new Set([
   'common.allProducts',
   'common.backToSite',
   'common.byApplication',
-  'common.categoryList.air-treatment',
-  'common.categoryList.hvls',
-  'common.categoryList.hygiene',
-  'common.categoryList.parking-jet',
-  'common.categoryList.smart-home',
-  'common.categoryList.sub.acid-fans',
-  'common.categoryList.sub.air-curtain',
-  'common.categoryList.sub.axial-ind',
-  'common.categoryList.sub.bathroom',
-  'common.categoryList.sub.conditioning',
-  'common.categoryList.sub.duct-heaters',
-  'common.categoryList.sub.freq-converters',
-  'common.categoryList.sub.ghost',
-  'common.categoryList.sub.rect-duct',
-  'common.categoryList.sub.round-duct',
-  'common.categoryList.sub.shelter',
-  'common.categoryList.sub.window',
-  'common.categoryList.summer',
   'common.clearSearch',
   'common.discover',
   'common.discoverPage',
@@ -538,67 +526,6 @@ const DONMUS_BORC: ReadonlySet<string> = new Set([
   'orders.orderTotal',
   'orders.viewAll',
   'orders.viewReceipt',
-  'pdp.specGroups.other',
-  'pdp.specs.absorbed_current_a',
-  'pdp.specs.atex_marking',
-  'pdp.specs.blade_diameter_mm',
-  'pdp.specs.co2_sensor',
-  'pdp.specs.compatible_model',
-  'pdp.specs.connection_height_mm',
-  'pdp.specs.connection_width_mm',
-  'pdp.specs.diameter_mm',
-  'pdp.specs.discharge_type',
-  'pdp.specs.discharge_velocity_curve',
-  'pdp.specs.drive_code',
-  'pdp.specs.enclosure_class',
-  'pdp.specs.enclosure_size',
-  'pdp.specs.erp_compliant',
-  'pdp.specs.filter_classes',
-  'pdp.specs.fire_rating',
-  'pdp.specs.has_bypass',
-  'pdp.specs.has_humidistat',
-  'pdp.specs.has_timer',
-  'pdp.specs.heating_capacity_kw',
-  'pdp.specs.heating_power_w',
-  'pdp.specs.height_mm',
-  'pdp.specs.humidity_removed_l_24h',
-  'pdp.specs.insulation_class',
-  'pdp.specs.ip_rating',
-  'pdp.specs.length_mm',
-  'pdp.specs.max_absorbed_power_w',
-  'pdp.specs.max_current_a',
-  'pdp.specs.max_delivery_ls',
-  'pdp.specs.max_delivery_m3h',
-  'pdp.specs.max_static_pressure_pa',
-  'pdp.specs.max_voltage_v',
-  'pdp.specs.min_delivery_m3h',
-  'pdp.specs.min_static_pressure_pa',
-  'pdp.specs.min_voltage_v',
-  'pdp.specs.motor_poles',
-  'pdp.specs.motor_type',
-  'pdp.specs.noise_level_db_a',
-  'pdp.specs.noise_lpa_3m_db',
-  'pdp.specs.nominal_delivery_m3h',
-  'pdp.specs.nominal_static_pressure_pa',
-  'pdp.specs.number_of_blades',
-  'pdp.specs.operating_temperature_c',
-  'pdp.specs.optional_heater_power_w',
-  'pdp.specs.pm10_sensor',
-  'pdp.specs.pm2_5_sensor',
-  'pdp.specs.pq_curve',
-  'pdp.specs.rated_output_current_a',
-  'pdp.specs.rated_power_w',
-  'pdp.specs.refrigerant_type',
-  'pdp.specs.relative_humidity_sensor',
-  'pdp.specs.reversible',
-  'pdp.specs.size_d_mm',
-  'pdp.specs.tank_capacity_l',
-  'pdp.specs.temp_sensor',
-  'pdp.specs.thermal_efficiency_curve',
-  'pdp.specs.thermal_efficiency_pct',
-  'pdp.specs.voc_sensor',
-  'pdp.specs.voltage_alt_v',
-  'pdp.specs.width_mm',
   'products.applicationTitle',
   'products.breadcrumbDiscover',
   'products.categoryCard.seriesCount',
@@ -684,6 +611,31 @@ const KANARYA = [
   'calculators.airCurtain.results.efficiencyWarningDesc',
 ] as const
 
+/**
+ * AYRAÇLI ŞABLON + VERİTABANI SÜRÜCÜLÜ KANARYA — kapının İKİNCİ körlüğünü ölçer.
+ *
+ * Yukarıdaki kanarya `önek${x}` (ayraçsız) biçimini korur. Kod anahtarı DİĞER biçimde de
+ * kurar: `` `önek.${x}` `` — sondaki noktayla. İlk sürümün `ANY_TEMPLATE` regex'i sondaki
+ * noktayı ZORUNLU-YOK saymıştı ve iki tam öneki kaçırdı:
+ *
+ *   categoryHelpers.ts:32   `common.categoryList.${tKey}`     ← tKey VERİTABANINDAN gelir
+ *   specLabel               `pdp.specs.${specKey}`            ← specKey ÜRÜN VERİSİNDEN gelir
+ *
+ * Sonuç: 79 CANLI anahtar (18 kategori + 61 spec etiketi) "ölü" sanılıp donmuş borca yazıldı.
+ * Silinselerdi kategori adları ve PDP teknik tablosu ham anahtara düşerdi ve HİÇBİR KAPI
+ * görmezdi — INV-5 de göremez, çünkü statik `t('...')` çağrısı yok.
+ *
+ * Bu sınıfın ayrı kanarya hak etmesinin sebebi: anahtarın CANLILIĞI **veritabanında**
+ * yaşıyor. Kaynak taraması onu yalnız ÖNEK üzerinden görebilir; önek kaçarsa anahtar
+ * sessizce ölü görünür. Aşağıdaki üç anahtarın canlılığı 2026-08-23'te canlı DB'de
+ * `categories.translation_key` / ürün spec anahtarları ile doğrulandı.
+ */
+const KANARYA_AYRACLI = [
+  'common.categoryList.sub.duct-heaters',
+  'common.categoryList.sub.dehumidifier',
+  'pdp.specs.noise_level_db_a',
+] as const
+
 describe('INV-6: sözlükte tüketicisi olmayan anahtar bırakılmaz', () => {
   const tarama = tara()
   const yapraklar = leafKeys(tr)
@@ -705,6 +657,19 @@ describe('INV-6: sözlükte tüketicisi olmayan anahtar bırakılmaz', () => {
     ).toEqual([])
     // Kanarya seti sessizce boşaltılamaz.
     expect(KANARYA.length).toBe(10)
+  })
+
+  it('KANARYA: AYRAÇLI şablonla üretilen DB sürücülü anahtarlar CANLI görülmeli', () => {
+    const olu = KANARYA_AYRACLI.filter((k) => !canli(k, tarama))
+    expect(
+      olu,
+      'Bu anahtarların canlılığı VERİTABANINDA yaşıyor: `common.categoryList.${tKey}` ve ' +
+        '`pdp.specs.${specKey}` şablonlarıyla üretiliyorlar; kaynakta tam yolları GEÇMEZ. ' +
+        'Ölü görünüyorlarsa sözlük değil KAPI kördür — ANY_TEMPLATE sondaki noktayı ' +
+        'zorunlu-yok saymış olabilir (`a.b.${x}` biçimi). 2026-08-23’te tam bu oldu ve ' +
+        '79 canlı anahtar ölü sanıldı.',
+    ).toEqual([])
+    expect(KANARYA_AYRACLI.length).toBe(3)
   })
 
   it('ÖN KOŞUL: `t(degisken)` yalnız BİLİNEN dosyalarda', () => {

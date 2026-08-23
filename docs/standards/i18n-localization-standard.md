@@ -60,7 +60,7 @@
 | F | Hreflang/SEO | hreflang seti | — manuel denetim | ⚠️ blueprint var (`seo-transition-blueprint.md`) |
 | G | **i18n key-çözünürlük** | `getDictValue` nested-only | **INV-5** `i18n-key-resolution.test.ts` (her statik `t('a.b.c')` sözlükte çözülmeli; içinde-nokta düz anahtar = ham-key render) | ✅ KAPALI (ratchet: 2026-06-16'da 32 debt donduruldu → admin literal batch #364 15'ini çözünce 32→17 sıkıştı; yeni kırılma kırar) |
 
-| H | **Ölü sözlük anahtarı** (ters yön) | sözlükteki her yaprağın bir tüketicisi olmalı | **INV-6** `i18n-dead-key.test.ts` (7 tüketim ekseni: statik · şablon **ayraçsız** · `dict.x` erişimi · veri-anahtarı · ata-anahtar · yaprak-adıyla indeksleme) | ✅ KAPALI (ratchet: 2026-08-23'te **431 borç** donduruldu; liste yalnız küçülebilir) |
+| H | **Ölü sözlük anahtarı** (ters yön) | sözlükteki her yaprağın bir tüketicisi olmalı | **INV-6** `i18n-dead-key.test.ts` (7 tüketim ekseni: statik · şablon **ayraçsız VE ayraçlı** · `dict.x` erişimi · veri-anahtarı · ata-anahtar · yaprak-adıyla indeksleme) | ✅ KAPALI (ratchet: 2026-08-23'te 431 borç donduruldu → 79'u **canlı çıktı**, gerçek borç **352**; liste yalnız küçülebilir) |
 
 > **G ile H aynı eksen DEĞİL.** G **çağrı → sözlük** yönünü tarar (anahtar çözülüyor mu),
 > H **sözlük → çağrı** yönünü (anahtarın tüketicisi var mı). G'nin yakaladığı kusur
@@ -72,6 +72,15 @@
 > bu anahtarlar ölü sanılır; denetimde tam bu yüzden **10 canlı anahtar** ölü listesine
 > düşmüştü. INV-6 o 10 anahtarı **kanarya** olarak tutar: ölü görünüyorlarsa sözlük değil
 > **kapının kendisi kördür**.
+>
+> **H'nin İKİNCİ kritik kuralı — önek eşlemesi HER İKİ şablon biçimini tanımalı.**
+> Kod anahtarı iki biçimde kurar: ayraçsız (`önek${x}`) **ve** ayraçlı (`önek.${x}`).
+> İlk sürüm yalnız ayraçsızı tanıyordu; `common.categoryList.${tKey}` (`categoryHelpers.ts:32`)
+> ve `pdp.specs.${specKey}` eşleşmedi → **79 CANLI anahtar ölü sanılıp borç listesine yazıldı**
+> (18 kategori adı + 61 PDP spec etiketi). Bu sınıfın canlılığı **veritabanında** yaşar
+> (`categories.translation_key`, ürün spec anahtarları): tam yol kaynakta HİÇ geçmez, dolayısıyla
+> anahtar silinseydi INV-5 de görmezdi ve ekranda ham anahtar belirirdi. INV-6 artık
+> `KANARYA_AYRACLI` setiyle bu körlüğü de sınar.
 
 **Açık eksenleri kapatma yöntemi:** drift denetimi (ajan) → maestro paralel göç → merkezi kapı (type+lint+test+build) → **yeni INV-x conformance testi** → commit. (B ekseninin yaptığı gibi.)
 
