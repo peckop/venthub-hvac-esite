@@ -87,77 +87,101 @@ function tara(): { bulgular: Bulgu[]; tarananDosya: number } {
 }
 
 /**
- * DONMUŞ BORÇ — 2026-08-23 ölçümü, 21 yer.
+ * DONMUŞ BORÇ — 2026-08-23 ölçümü: **14 dosya / 21 ihlal**.
+ *
+ * NİÇİN DOSYA→SAYI, `dosya:satır` DEĞİL — 2026-08-23'te ÖLÇÜLDÜ, master KIRMIZI verdi:
+ * İlk sürüm satır numarası donduruyordu. ÜRÜN `src/views/category/**` ve
+ * `src/components/category/**` dosyalarını düzenleyince satırlar kaydı ve bu kapı,
+ * KOD BOZULMADIĞI HALDE üç kolundan kırmızı verdi — aynı 14 dosya, aynı 21 ihlal,
+ * yalnız numaralar farklıydı. Satır-tabanlı kayıt **yanlış kırmızı üretir** ve o kırmızı
+ * bütün şeritlerin CI'ını bloklar. Dosya→sayı bu sürüklenmeden bağışıktır: dosya içinde
+ * satır kaysa bile sayı değişmez; YENİ bir ihlal eklenirse sayı büyür ve kapı görür.
  *
  * Ratchet: liste yalnız KÜÇÜLEBİLİR. Dosyaların çoğu ÜRÜN/GÖRSEL şeridinde; bu kapı
  * cetveli koyar, düzeltmeyi sahibi yapar ve liste küçülür. Yeni ihlal KIRMIZI.
  */
-const DONMUS_BORC: ReadonlySet<string> = new Set([
-  'src/app/_components/ProductDetailPageView.tsx:501',
-  'src/app/_components/ProductDetailPageView.tsx:608',
-  'src/components/BrandsShowcase.tsx:43',
-  'src/components/HVACIcons.tsx:295',
-  'src/components/LeadModal.tsx:197',
-  'src/components/ProductCard.tsx:102',
-  'src/components/ProductCard.tsx:173',
-  'src/components/category/EnhancedNeedsWizard.tsx:318',
-  'src/components/products/AddToProjectModal.tsx:100',
-  'src/components/products/FamilyCard.tsx:76',
-  'src/components/products/FamilyCard.tsx:131',
-  'src/components/products/VariantSelector.tsx:217',
-  'src/components/products/VariantSelector.tsx:269',
-  'src/views/BrandDetailPage.tsx:187',
-  'src/views/BrandDetailPage.tsx:254',
-  'src/views/BrandsPage.tsx:89',
-  'src/views/BrandsPage.tsx:94',
-  'src/views/category/CategoryLandingView.tsx:192',
-  'src/views/category/CategorySeriesView.tsx:95',
-  'src/views/category/SeriesLandingView.tsx:104',
-  'src/views/category/SeriesLandingView.tsx:133',
-])
+const DONMUS_BORC: ReadonlyArray<readonly [string, number]> = [
+  ['src/app/_components/ProductDetailPageView.tsx', 2], // {family.brand_name} · {selectedVariant.sku}
+  ['src/components/BrandsShowcase.tsx', 1], // {brand.name}
+  ['src/components/HVACIcons.tsx', 1], // {brand}
+  ['src/components/LeadModal.tsx', 1], // {name}
+  ['src/components/ProductCard.tsx', 2], // {product.brand}
+  ['src/components/category/EnhancedNeedsWizard.tsx', 1], // {p.name}
+  ['src/components/products/AddToProjectModal.tsx', 1], // {product.brand}
+  ['src/components/products/FamilyCard.tsx', 2], // {family.brand_name}
+  ['src/components/products/VariantSelector.tsx', 2], // {v.name} · {v.sku}
+  ['src/views/BrandDetailPage.tsx', 2], // {brand.country} · {brand.headquarters}
+  ['src/views/BrandsPage.tsx', 2], // {brand.country} · {brand.specialty}
+  ['src/views/category/CategoryLandingView.tsx', 1], // {vm?.displayName}
+  ['src/views/category/CategorySeriesView.tsx', 1], // {vm?.displayName || category.name}
+  ['src/views/category/SeriesLandingView.tsx', 2], // {series.series_code} · {series.name}
+]
 
 /**
  * TESPİT KANARYASI — kapının kendi körlüğünü ölçer.
- * Bu iki yer Recep'in bildirdiği kusurun TA KENDİSİ (`{series.name}` ve `{vm?.displayName}`
- * `uppercase` altında). Kapı bunları göremiyorsa kod değil KAPI bozuktur.
+ * Recep'in 2026-08-23'te CANLI vitrinde gördüğü kusurun TA KENDİSİ. Kapı bunları
+ * göremiyorsa kod değil KAPI bozuktur.
+ *
+ * SATIRA DEĞİL İÇERİĞE bağlı: satır numarası komşu şeridin her düzenlemesinde kayar ve
+ * kanaryayı yanlış yere kırmızı verdirir — bu kapı tam bunu yaşadı.
  */
-const KANARYA = ['src/views/category/SeriesLandingView.tsx:133', 'src/views/category/CategoryLandingView.tsx:192']
+const KANARYA: ReadonlyArray<readonly [string, string]> = [
+  ['src/views/category/SeriesLandingView.tsx', 'series.name'],
+  ['src/views/category/CategoryLandingView.tsx', 'displayName'],
+]
+
+const MESAJ_YENI =
+  'Veri kaynaklı özel ad CSS `uppercase` ile basılıyor. text-transform DİLE DUYARLIDIR: ' +
+  'lang="tr" altında Vortice -> VORTİCE olur. Aile adları karışık dilde tek dize olduğu ' +
+  "için `lang` vermek ÇÖZMEZ (38 adın 36'sı bu sınıfta). Çözüm: bu metni büyütme."
+
+const MESAJ_KANARYA =
+  "Recep 2026-08-23'te bu iki yerdeki kusuru CANLI vitrinde gördü (VORTİCE/LİNEO). " +
+  'Kapı göremiyorsa desen bozulmuştur: `uppercase` sınıfı ile veri interpolasyonu ' +
+  'farklı satırlara düşmüş ya da alan adı listesi eksik olabilir.'
+
+const MESAJ_BAYAT =
+  "Bu dosyalarda ihlal AZALDI. DONMUS_BORC'u gerçek sayıya indir (0 olduysa satırı SİL) — " +
+  'borç kaydı yalnız küçülebilir.'
 
 describe('INV-7: veri kaynaklı özel ad CSS uppercase ile basılmaz', () => {
   const { bulgular, tarananDosya } = tara()
-  const yerler = new Set(bulgular.map((b) => b.yer))
+  const borcHaritasi = new Map(DONMUS_BORC.map(([d, n]) => [d, n]))
+  const sayim = new Map<string, number>()
+  for (const b of bulgular) {
+    const dosya = b.yer.split(':')[0]
+    sayim.set(dosya, (sayim.get(dosya) ?? 0) + 1)
+  }
 
   it('KAPSAM KANARYASI: tarama gerçekten bir şeye baktı', () => {
     // "0 ihlal" ancak tarama koştuysa bilgi taşır. Glob bozulursa bekçi sessizce YEŞİL döner.
     expect(tarananDosya).toBeGreaterThan(300)
   })
 
-  it('TESPİT KANARYASI: bilinen iki ihlal GÖRÜLMELİ', () => {
-    const gorulmeyen = KANARYA.filter((k) => !yerler.has(k))
-    expect(
-      gorulmeyen,
-      'Recep 2026-08-23\'te bu iki yerdeki kusuru CANLI vitrinde gördü (VORTİCE/LİNEO). ' +
-        'Kapı göremiyorsa desen bozulmuştur: `uppercase` sınıfı ile veri interpolasyonu ' +
-        'farklı satırlara düşmüş ya da alan adı listesi eksik olabilir.',
-    ).toEqual([])
+  it('TESPİT KANARYASI: bilinen iki ihlal GÖRÜLMELİ (satırla değil İÇERİKLE)', () => {
+    const gorulmeyen = KANARYA.filter(
+      ([dosya, parca]) => !bulgular.some((b) => b.yer.startsWith(`${dosya}:`) && b.ornek.includes(parca)),
+    ).map(([dosya, parca]) => `${dosya} içinde "${parca}"`)
+    expect(gorulmeyen, MESAJ_KANARYA).toEqual([])
   })
 
-  it('YENİ ihlal yok (donmuş borç dışında)', () => {
-    const yeni = bulgular.filter((b) => !DONMUS_BORC.has(b.yer)).map((b) => `${b.yer}  ${b.ornek}`)
-    expect(
-      yeni,
-      'Veri kaynaklı özel ad CSS `uppercase` ile basılıyor. text-transform DİLE DUYARLIDIR: ' +
-        'lang="tr" altında Vortice -> VORTİCE olur. Aile adları karışık dilde tek dize olduğu ' +
-        'için `lang` vermek ÇÖZMEZ (38 adın 36\'sı bu sınıfta). Çözüm: bu metni büyütme.',
-    ).toEqual([])
+  it('Donmuş listede OLMAYAN hiçbir dosya ihlal etmiyor', () => {
+    const yeni = [...sayim.keys()].filter((d) => !borcHaritasi.has(d)).sort()
+    expect(yeni, `${MESAJ_YENI}\nDosyalar:\n${yeni.map((d) => `  - ${d}`).join('\n')}`).toEqual([])
   })
 
-  it('donmuş borç bayatlamaz (yalnız küçülebilir)', () => {
-    const gereksiz = [...DONMUS_BORC].filter((y) => !yerler.has(y))
-    expect(
-      gereksiz,
-      'Bu yerler artık ihlal değil (düzeltildi ya da satır kaydı bayatladı). ' +
-        'DONMUS_BORC listesinden de çıkar — borç kaydı yalnız küçülebilir.',
-    ).toEqual([])
+  it('Borçlu dosyalar ihlal sayısını ARTIRMIYOR', () => {
+    const artan = [...sayim.entries()]
+      .filter(([d, n]) => borcHaritasi.has(d) && n > borcHaritasi.get(d)!)
+      .map(([d, n]) => `${d}: ${borcHaritasi.get(d)} → ${n}`)
+      .sort()
+    expect(artan, `BORÇ BÜYÜDÜ:\n${artan.join('\n')}`).toEqual([])
+  })
+
+  it('MANDAL: düşen borç listede güncellenmiş (yalnız küçülebilir)', () => {
+    const bayat = DONMUS_BORC.filter(([d, n]) => (sayim.get(d) ?? 0) < n)
+      .map(([d, n]) => `${d}: liste ${n}, gerçek ${sayim.get(d) ?? 0}`)
+      .sort()
+    expect(bayat, `${MESAJ_BAYAT}\n${bayat.join('\n')}`).toEqual([])
   })
 })
