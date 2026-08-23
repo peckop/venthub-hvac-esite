@@ -10,6 +10,7 @@ import React, { useCallback,useEffect, useState } from 'react'
 import { useI18n } from '@/i18n/I18nProvider';
 import { productImagePlaceholder,resolveProductImageUrl } from '@/lib/images/productImage'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+import { eqValue, orConditions } from '@/utils/adminQueryFilters'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { calculateAirCurtain } from '../../lib/hvacCalculations'
@@ -120,7 +121,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
 
             const { data, error } = await supabase
                 .from('products').select(VARIANT_DETAIL_COLUMNS)
-                .or(`category_id.eq.${kategori.id}, subcategory_id.eq.${kategori.id}`)
+                .or(orConditions([eqValue('category_id', kategori.id), eqValue('subcategory_id', kategori.id)]))
                 .eq('status', 'active')
                 .is('deleted_at', null)
 
