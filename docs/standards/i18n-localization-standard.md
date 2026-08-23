@@ -82,6 +82,27 @@
 > anahtar silinseydi INV-5 de görmezdi ve ekranda ham anahtar belirirdi. INV-6 artık
 > `KANARYA_AYRACLI` setiyle bu körlüğü de sınar.
 
+| I | **Kasa dönüşümü ile dil** (`text-transform`) | veri kaynaklı özel ad CSS ile büyütülmez | **INV-7** `i18n-uppercase-proper-noun.test.ts` (kapsam + tespit kanaryası, ratchet 21 borç) | ✅ KAPALI (2026-08-23) |
+
+> **I ekseni — `text-transform: uppercase` DİLE DUYARLIDIR.** Eleman `lang="tr"` mirası
+> altındaysa tarayıcı Türkçe kasa uygular ve `i → İ` olur. Türkçe metin için DOĞRU, yabancı
+> özel ad için YANLIŞ: **Vortice → VORTİCE**, **Lineo → LİNEO**, **Quiet → QUİET**.
+> Kusur 2026-08-23'te canlı vitrinde görüldü (Recep bildirdi, `/tr/products/vortice-lineo-quiet`).
+>
+> **Çözüm "elemana `lang` ver" DEĞİL — ölçüldü, mümkün değil.** Aile adları **karışık dilde
+> tek dize**: `'Vortice Lineo Quiet Kanal Fanları'`. `lang="tr"` markayı bozar (VORTİCE),
+> `lang="en"` Türkçe kelimeleri bozar (ENDÜSTRIYEL, EMIŞLI). Canlı ölçüm: `product_families.name`
+> 38 adın **36'sı** bu sınıfta, `brands.name` 5 markanın 2'si. Dize tek kolonda yaşadığı için
+> parçalanamaz. Tek doğru kural: **veri kaynaklı özel adı CSS ile büyütme.**
+>
+> **Kapsam dışı (bilerek):** sözlükten gelen STATİK arayüz metnini `uppercase` ile basmak
+> serbesttir — o metnin dili sayfanın diliyle zaten aynıdır. Kusur, metnin dili ile elemanın
+> dili AYRILDIĞINDA doğar; bu yüzden `t('...')` interpolasyonları elenir.
+>
+> **Bu eksenin KAPATAMADIĞI komşu kusur:** `src/app/layout.tsx` kökte `<html lang="tr">`'yi
+> SABİT yazıyor; `/en/...` sayfaları da `lang="tr"` alıyor. INV-7 kod tarar, bu niteliği
+> göremez — ayrı kusur, ayrı sahip (rota/altyapı alanı). Görmediğini gizlemiyoruz.
+
 **Açık eksenleri kapatma yöntemi:** drift denetimi (ajan) → maestro paralel göç → merkezi kapı (type+lint+test+build) → **yeni INV-x conformance testi** → commit. (B ekseninin yaptığı gibi.)
 
 ---
