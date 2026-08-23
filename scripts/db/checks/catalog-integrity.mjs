@@ -74,6 +74,45 @@ const CHECKS = [
     key: (r) => `orphan:${r.sku}`,
     detail: (r) => r.name,
   },
+  /* ──────────────────────────────────────────────────────────────────────────
+   * T159 — `orphan`'in TERS YONU (2026-08-23).
+   *
+   * `orphan` ailesiz URUNU bekcilerdi. Ters yon — urunsuz AILE ve yaprak
+   * kategorisi olmayan URUN — hic bekcilenmiyordu. Bedeli olculdu: 08-21'de bir
+   * aile ayrismasi 12 urunu alti yeni aileye tasidi ve eski semsiye aileyi
+   * BOS birakti; sayfa canlida HTTP 200 donuyor, sitemap'te TR+EN duruyor, ama
+   * vitrinde hicbir yerden baglantisi yok. Iki gun boyunca hicbir kapi gormedi.
+   * ────────────────────────────────────────────────────────────────────────── */
+  {
+    id: 'family-empty',
+    title: 'Dogrudan urunu olmayan aile',
+    why: 'Aile URL kanonik adrestir; dogrudan urunu olmayan aile canli bir adres uretir ama gosterecek urunu yoktur. DETAY cocuk aile sayisini soyler ve bu ayrim KRITIKTIR: cocugu OLMAYAN aile olu kabuktur (silinir), cocugu OLAN aile bir hiyerarsi ebeveynidir (silinemez — silinirse alti aile sahipsiz kalir; karar tasarim isidir, temizlik degil). Bu iki hali ayni sayan bir okuma 2026-08-23 gunu yanlis silme karari uretti ve son anda durduruldu.',
+    sql: `select f.slug, f.name,
+                 (select count(*) from public.products p where p.family_id = f.id and p.deleted_at is null)::int as urun,
+                 (select count(*) from public.product_families c where c.parent_family_id = f.id)::int as cocuk
+          from public.product_families f
+          where not exists (
+            select 1 from public.products p where p.family_id = f.id and p.deleted_at is null
+          )`,
+    key: (r) => `family-empty:${r.slug}`,
+    detail: (r) => `"${r.name}" — dogrudan urun 0, cocuk aile ${r.cocuk} (${r.cocuk > 0 ? 'HIYERARSI EBEVEYNI: silme, tasarim karari' : 'OLU KABUK: silinebilir'})`,
+  },
+  {
+    id: 'product-no-subcategory',
+    title: 'Yaprak kategorisi olmayan urun',
+    // Anahtar AILE bazinda: tek bir ingestion adimi bir ailenin tamamini ayni sekilde
+    // birakiyor; SKU bazli taban 27 gerekcesiz satir olurdu ve kimse okumazdi.
+    // (spec-unit / spec-type ile ayni desen.)
+    why: 'Vitrindeki yaprak kategori sayfalari urunleri `subcategory_id` uzerinden toplar (ailenin `category_id`si UST kategoridir, ayri kademe). `subcategory_id` bos olan urun hicbir yaprak kategori sayfasinda GORUNEMEZ — urun aktif, adresi var, arama bulur, ama kategori gezinmesiyle ulasilamaz. Bos alan burada "eksik veri" degil, GORUNMEZ URUN demektir.',
+    sql: `select coalesce(f.slug, '(ailesiz)') as family_slug, count(*)::int as n,
+                 (array_agg(p.sku order by p.sku))[1] as sample_sku
+          from public.products p
+          left join public.product_families f on f.id = p.family_id
+          where p.deleted_at is null and p.subcategory_id is null
+          group by f.slug`,
+    key: (r) => `product-no-subcategory:${r.family_slug}`,
+    detail: (r) => `${r.n} urun (or. ${r.sample_sku}) yaprak kategorisiz — kategori gezinmesinde gorunmez`,
+  },
   {
     id: 'brand-mix',
     title: 'Aile içinde marka karışımı',

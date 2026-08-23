@@ -84,6 +84,40 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     }
   })
 
+  /* ────────────────────────────────────────────────────────────────────────
+   * T159 — `orphan`'in TERS YONU ve bugunku iki hatanin kapisi.
+   *
+   * 2026-08-23'te iki hata ust uste bindi: (1) 08-21'deki aile ayrismasi bir
+   * semsiye aileyi BOS birakti ve iki gun hicbir kapi gormedi; (2) o boslugu
+   * gorunce "olu kabuk, silelim" dedim — oysa aile ALTI cocugun ebeveyniydi ve
+   * silinseydi hiyerarsi kirilacakti. Yani kural yalnizca "bos aile" demeli
+   * DEGIL; bosluğun HANGI TURDEN oldugunu da soylemeli. Asagidaki sinavlar
+   * ikisini birden bekcilir.
+   * ──────────────────────────────────────────────────────────────────────── */
+  it('T159 — ürünsüz aile TABAN DIŞINDA doğarsa KIRMIZI', () => {
+    const { status, output } = runWithFixture([...baselineKeys(), 'family-empty:sinav-ailesi'])
+    expect(status).toBe(1)
+    expect(output).toContain('family-empty:sinav-ailesi')
+  })
+
+  it('T159 — yaprak kategorisiz ürün TABAN DIŞINDA doğarsa KIRMIZI', () => {
+    const { status, output } = runWithFixture([...baselineKeys(), 'product-no-subcategory:sinav-ailesi'])
+    expect(status).toBe(1)
+    expect(output).toContain('product-no-subcategory:sinav-ailesi')
+  })
+
+  it('T159 — ürünsüz aile kuralı ÇOCUK SAYISINI ölçer (ebeveyni ölü kabukla bir tutmaz)', () => {
+    const kaynak = fs.readFileSync(SCRIPT, 'utf8')
+    const blokBasi = kaynak.indexOf("id: 'family-empty'")
+    expect(blokBasi, 'family-empty kurali betikte yok').toBeGreaterThan(-1)
+    const blok = kaynak.slice(blokBasi, kaynak.indexOf("id: 'product-no-subcategory'"))
+    // Kural cocuk sayisini SORMAZSA, iki hali ayirt edemez ve "sil" onerisi ureten
+    // okumayi durduramaz — 2026-08-23'te tam bu oldu.
+    expect(blok, 'kural cocuk aileleri saymiyor').toContain('parent_family_id')
+    // Ve detay satiri o sayiyi KULLANMALI; saymak ama yazmamak okuyucuya ulasmaz.
+    expect(blok, 'detay satiri cocuk sayisini kullanmiyor').toMatch(/detail:[\s\S]*cocuk/)
+  })
+
   it('ölçemeyen kapı YEŞİL dönmez — bağlantı dizesi yokken çıkış 0 DEĞİL', () => {
     const res = spawnSync(process.execPath, [SCRIPT], {
       encoding: 'utf8',
