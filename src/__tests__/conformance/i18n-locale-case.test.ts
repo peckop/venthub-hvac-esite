@@ -113,6 +113,23 @@ describe('INV-8: locale-siz kasa çevirimi kullanıcı metnine uygulanmaz', () =
     expect(taranan).toBeGreaterThan(400)
   })
 
+  it('0b. POZİTİF KONTROL: köşeli-parantezli App Router dizinleri taranıyor', () => {
+    // 2026-08-23 (ALTYAPI ölçümü): git pathspec'te köşeli parantez GLOB KARAKTER SINIFIDIR.
+    // `src/app/[lang]/**` deseni 'l|a|n|g' harflerinden BİRİNİ eşler, literal [lang] dizinini
+    // DEĞİL — ve hata vermeden EKSİK liste döner. Bu tarayıcı fs.readdirSync ile yürür,
+    // yani bağışıktır; ama "bağışık" bir varsayımdır ve varsayım ölçülmedikçe kanıt değildir.
+    // Sayı tek başına kanıt olmadığı için ADIYLA iki dosya sınanır.
+    const taranmisYollar = new Set(
+      kaynakDosyalari(SRC).map((t) => path.relative(KOK, t).split(path.sep).join('/'))
+    )
+    for (const beklenen of [
+      'src/app/[lang]/products/[slug]/page.tsx',
+      'src/app/[lang]/page.tsx',
+    ]) {
+      expect(taranmisYollar.has(beklenen), `TARAYICI KÖR: ${beklenen} taranmadı`).toBe(true)
+    }
+  })
+
   it('1. KANARYA: dedektör bilinen bir ihlali YAKALAR', () => {
     // Sentetik girdi — dosya sisteminden bağımsız, regex'in kendisini sınar.
     const sentetik = [

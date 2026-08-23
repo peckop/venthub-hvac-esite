@@ -229,3 +229,54 @@ Ve tablonun altına açıklama olarak:
 > Ölçüm: `docs/audits/locale-kasa-envanteri-2026-08-23.md`.
 
 **Kapsam notu:** bu belge `t146-*` kalıbından ÇIKARILDI — o glob ÜRÜN şeridinin claim'indedir.
+
+---
+
+## 9. Ölçüm aracının kendisi denetlendi (2026-08-23, ALTYAPI uyarısı üzerine)
+
+ALTYAPI yayınladı: **git pathspec'te köşeli parantez glob karakter sınıfıdır.**
+`src/app/[lang]/**` deseni `l|a|n|g` harflerinden birini eşler, literal `[lang]` dizinini
+DEĞİL — ve hata vermeden **eksik liste** döner. App Router yüzünden bu dizinler her yerde.
+
+**Bu belgedeki hiçbir sayı o yöntemle üretilmedi** — tarayıcılar dosya sistemini yürüyor
+(`os.walk` / `fs.readdirSync`), glob ya da git pathspec katmanı devreye hiç girmiyor.
+Varsayım değil, **ölçüldü** (pozitif kontrol):
+
+```
+taranan .ts/.tsx: 641 · köşeli-parantezli dizinde görülen: 50
+  VAR  src/app/[lang]/products/[slug]/page.tsx     ← ALTYAPI'nın "kaybolur" dediği dosya
+  VAR  src/app/[lang]/products/page.tsx            ← diğeri
+  VAR  src/app/[lang]/page.tsx
+```
+
+Bu kontrol INV-8'e **kalıcı kol olarak** eklendi (0b) ve bilerek bozuldu: tarayıcıya
+`[` ile başlayan dizinleri atlattığımda `TARAYICI KÖR: src/app/[lang]/products/[slug]/page.tsx
+taranmadı` diye kırmızı verdi.
+
+### 9.1 Kendi aracımda bir kusur çıktı — eksen D sayısı iki kez ölçüldü
+
+Eksen D dedektörünün ilk sürümü `localeCompare\([^)]*,\s*['"]` deseniyle dil parametresini
+arıyordu. `[^)]*` ifadesi `String(b)` içindeki kapanış parantezinde duruyor ve dil parametresi
+**olan** iki satırı "yok" sayıyordu — araç **tek yöne** yanılıyordu (yanlış "parametresiz").
+
+Düzeltildi ve **iki taraflı kanarya** eklendi (bilinen bir pozitif ve bilinen bir negatif
+örnek dedektöre sokulur). Doğrulanmış sayı:
+
+| | adet |
+|---|---|
+| `localeCompare` toplam (test hariç) | **11** |
+| dil parametresi **var** | 2 (`useAdminTable.ts:127`, `AdminUsersTableBody.tsx:200` — ikisi de `'tr'`) |
+| dil parametresi **YOK** | **9** |
+
+Dokuzun beşi teknik (uuid/anahtar sıralaması). **Müşteriye dokunan dördü:**
+
+```
+src/app/[lang]/page.tsx:136                    a.name.localeCompare(b.name)
+src/hooks/useCategoryGateway.ts:120            a.name.localeCompare(b.name)
+src/views/CategoryMasterView.tsx:86            a.name.localeCompare(b.name)
+src/components/products/VariantSelector.tsx:73 a.localeCompare(b)
+```
+
+> **Ders:** "sayı tek başına kanıt değildir" kuralı yalnız tarayıcının *kapsamı* için değil,
+> *sınıflandırması* için de geçerli. Her dedektöre bilinen bir pozitif VE bilinen bir negatif
+> örnek sokulmalı; ilk sürüm ikisinden birini geçemedi ve sessizce yanlış rapor üretiyordu.
