@@ -135,7 +135,7 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
       'utf8',
     )
     // Kapı işi bir ön-kontrole BAĞLI olmalı ve yalnız sırlar tamken koşmalı.
-    // 2026-08-20 (T138 - EDGE): on-kontrolun adi `catalog-integrity-precheck` -> `db-gate-precheck`
+    // 2026-08-20 (T161-VH - EDGE): on-kontrolun adi `catalog-integrity-precheck` -> `db-gate-precheck`
     // oldu. Sebep KAPSAM: ayni on-kontrol artik INV-RLS-COVERAGE-1 isini de besliyor ve eski ad
     // yaptigi isi ANLATMIYORDU. Sozlesme daralmadi - bag hala ZORUNLU, yalniz adi dogrulandi.
     expect(wf).toMatch(/needs:\s*db-gate-precheck/)
@@ -144,7 +144,7 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     // DİKKAT: düz `toContain` yetmez — sabotajda `SUPABASE_CA_CERTX` yazdım ve iddia yeşil kaldı
     // (üst-dize tuzağı). Bu yüzden (a) yalnız ÖN-KONTROL bloğuna bakılır, (b) sırrın tam
     // kullanımı aranır, (c) sırların gerçekten SINANDIĞI kabuk koşulu aranır — adı geçmesi değil.
-    // 2026-08-20 (T138 - EDGE, PRICING'in incelemesiyle): dilimin BITIS siniri artik sabit bir
+    // 2026-08-20 (T161-VH - EDGE, PRICING'in incelemesiyle): dilimin BITIS siniri artik sabit bir
     // is ADI degil, DESEN. Eskiden `wf.indexOf('  catalog-integrity:')` ile kesiliyordu; is sirasi
     // degisirse (ornegin araya ucuncu bir DB kapisi girerse) dilim o isi de YUTAR ve 'yalniz
     // on-kontrol blogunda ara' korumasi SESSIZCE genislerdi. Ikinci bir DB kapisi eklenmesi bu
@@ -194,7 +194,7 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     // PGSSLROOTCERT tek bir yerden, DEPO dosyasından beslenmeli.
     const assignments = wf.match(/PGSSLROOTCERT=[^\n]*/g) ?? []
     //
-    // 2026-08-20 (T138 - EDGE) - sayi 1'den "en az 1 ve HEPSI ayni depo dosyasi"na cevrildi.
+    // 2026-08-20 (T161-VH - EDGE) - sayi 1'den "en az 1 ve HEPSI ayni depo dosyasi"na cevrildi.
     // NICIN BU GEVSEME DEGIL: korunmak istenen sey atama SAYISI degil, kok sertifikanin
     // KAYNAGIYDI ("tek bir yerden ... beslenmeli"). Workflow'a ikinci bir DB kapisi
     // (INV-RLS-COVERAGE-1) eklendi ve o da ayni depo dosyasini disa aktariyor; sabit sayi

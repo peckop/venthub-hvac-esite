@@ -153,7 +153,7 @@ jobs:
         continue-on-error: true
 
   # ---------------------------------------------------------------------------
-  # ON-YOKLAMA IKI KAPIYA HIZMET EDER (2026-08-20, T138 · EDGE):
+  # ON-YOKLAMA IKI KAPIYA HIZMET EDER (2026-08-20, T161-VH - EDGE):
   # `db-gate-precheck` yalnizca "SUPABASE_DB_URL var mi" diye sorar; INV-CATALOG-1 ve
   # INV-RLS-COVERAGE-1 ayni cevaba baglidir. Is adi bilerek DEGISTIRILDI: eski ad
   # `catalog-integrity-precheck` idi ve ikinci kapiyi tasidiginda ad artik yaptigi isi
@@ -256,7 +256,7 @@ jobs:
           openssl x509 -in scripts/db/checks/supabase-root-2021-ca.pem -noout -subject -fingerprint -sha256
 
   # ---------------------------------------------------------------------------
-  # INV-RLS-COVERAGE-1 — kodun OKUDUGU ile DB'nin IZIN VERDIGI ayrissin (T138-VH).
+  # INV-RLS-COVERAGE-1 — kodun OKUDUGU ile DB'nin IZIN VERDIGI ayrissin (T161-VH).
   #
   # NICIN CI'YA BAGLANIYOR: kapi #712 ile geldi ama HICBIR is onu cagirmiyordu; yalniz
   # elle kosuluyordu. Elle kosulan kapi, kosulmadigi her gun YOK demektir - ve tam olarak
