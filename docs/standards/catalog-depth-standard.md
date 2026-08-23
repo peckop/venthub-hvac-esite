@@ -41,6 +41,24 @@ perdesi ailesinde **zaten sağlanmaktadır** (dışarı çıkan ürün bağlant�
 tasarım değil, katalogun **ölçülmüş çoğunluk davranışını** kurala çevirmektir: 38 ailenin
 **37'si tek katmanlıdır**; iki katmanlı olan **tek** aile istisnadır.
 
+### K1'in sayısal karşılığı — `VARIANT_PILL_MAX`
+
+"Varyantı yerinde seçtirir" cümlesinin koddaki karşılığı **tek bir sabittir**:
+`src/components/products/VariantSelector.tsx` → `VARIANT_PILL_MAX`.
+
+Sabitin **altında** seçici ürünün yanında durur. **Üstünde** seçici gövdeden çıkar,
+"N model" düğmesine ve sayfanın altındaki Modeller bölümüne dönüşür — sayfa değişmez
+(K1 ihlali değildir) ama varyant artık *yerinde* seçilmez.
+
+**Değer: 12** (Recep kararı, 2026-08-23; öncesi 8). Eski 8, hava perdesi ailesini
+(tam 8 varyant) **tesadüfen** kapsıyordu ve o sayfa referans kabul edilmişti; 12'ye
+çıkarmak tesadüfü kurala çevirir. Üst sınır serbest değildir: 20+ varyantta hap listesi
+okunmaz hâle gelir ve `VARIANT_MATRIX_MIN` matris görünümünü devreye sokar.
+
+Bekçi: `src/__tests__/conformance/variant-selector-threshold.test.ts` (INV-VARIANT-PILL-1)
+— sınırın 12'nin altına düşürülmesini ve PDP'nin sabiti atlayıp kendi sayısını yazmasını
+engeller. Sabotaj iki yönde kırmızı verir.
+
 ### Recep'in netleştirmesi
 
 > **Yeni sayfa yalnız gerçek bir karar noktasında açılır, keyfi olarak değil.**

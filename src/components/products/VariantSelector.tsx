@@ -15,15 +15,35 @@ import { specFieldLabel } from '../../utils/specLabel'
  * Bir ailede 1…81 varyant olabilir (seat-storm-jet). Tek bir kontrol tipi bu
  * aralığı taşıyamadığı için görünüm varyant sayısına göre kademelenir:
  *
- *   n ≤ 8            → hap (pill) listesi, arama yok
- *   9 ≤ n ≤ 19       → aranabilir kompakt liste
+ *   n ≤ 12           → hap (pill) listesi, arama yok
+ *   13 ≤ n ≤ 19      → aranabilir kompakt liste
  *   n ≥ 20           → aranabilir liste + MATRİS görünümü (ayırt edici spec kolonları)
  *
  * Seçim yukarı bildirilir; URL (?sku=) yönetimi çağıranın işidir (router.replace).
  */
 
-/** Hap listesi üst sınırı — üzerinde arama kutusu açılır. */
-export const VARIANT_PILL_MAX = 8
+/**
+ * Hap listesi üst sınırı — üzerinde arama kutusu açılır.
+ *
+ * T163 (2026-08-23, Recep kararı): 8 → 12.
+ *
+ * NİÇİN: bu sayı yalnız bir görünüm ayarı değil, **ürün ailesinin tek sayfada durup
+ * durmadığını** belirliyor. `ProductDetailPageView` bu sınırın ALTINDA seçiciyi ürünün
+ * yanına koyuyor; ÜSTÜNDE ise seçici gövdeden çıkıp "N model" düğmesi + aşağıdaki
+ * Modeller bölümüne dönüşüyor. Yani sınır, `catalog-depth-standard` §K1'in "varyant
+ * YERİNDE seçilir" cümlesinin fiilî karşılığı.
+ *
+ * Eski 8, hava perdesi ailesini (tam 8 varyant) tesadüfen kapsıyordu ve o sayfa
+ * referans kabul edildi; 12'ye çıkarmak referansı KURALA çevirir.
+ *
+ * ÜST SINIR NİÇİN 12, "sınırsız" değil: 20+ varyantta hap listesi okunmaz hâle gelir
+ * ve zaten matris görünümü devreye girer (VARIANT_MATRIX_MIN). 12, ölçülmüş katalog
+ * yoğunluğunun üst ucunu kapsayan ama hap listesini boğmayan değer.
+ *
+ * Sayıyı değiştiren, `ProductDetailPageView`'daki `inlineSelector` dalını da
+ * değiştirmiş olur — ikisi TEK sabite bağlıdır ve bu kasıtlıdır.
+ */
+export const VARIANT_PILL_MAX = 12
 /** Matris görünümünün sunulmaya başladığı varyant sayısı. */
 export const VARIANT_MATRIX_MIN = 20
 /** Matriste gösterilecek en fazla ayırt edici spec kolonu (yatay taşmayı sınırlar). */
