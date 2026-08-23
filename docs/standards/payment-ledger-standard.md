@@ -48,6 +48,16 @@ ikisini birbirine karıştırır — mutabakat o noktada imkânsızlaşır.
 **Eşleme tek yönlüdür:** defterden siparişe. Sipariş durumunu elle yazan hiçbir yol, defterde
 karşılığı olan bir olay üretmeden `paid`/`refunded` yazamaz.
 
+⚠ **Bu kural bugün SAĞLANMIYOR ve bunu ölçtüm.** Canlıda `trg_sync_payment_status_ins/upd`
+tetikleyicisi var: `status = 'confirmed'` olduğunda ve `payment_status` boş/`pending` ise
+`payment_status := 'paid'` yazıyor. Yani **ikinci bir otorite** var — sipariş yaşam döngüsü —
+ve defterden haberi yok. Tetikleyici kötü niyetli değil: dolu bir değeri **asla ezmiyor**
+(T114-VH'de kısmi iadeyi yutan kusur tam buydu). Ama "sevkiyat onaylandı" ile "para tahsil
+edildi" **aynı şey değildir**; birinden ötekini türetmek, defterin varlık sebebini ortadan
+kaldırır. Karar ve sırası §6'da (adım 3): yazıcı inince bu tetikleyicinin **kapsamı daraltılır**
+ya da kaldırılır — ikisi de migration, ikisi de Recep kapısı. Bu satır olmadan cetvel,
+sağlanmayan bir şeyi sağlanmış gibi okuturdu.
+
 ### 2.1 Terk edilen sözlük ve karşılığı
 
 Canlı CHECK kısıtı bugün `pending · success · failed · cancelled` diyor. Karşılıkları:
@@ -113,6 +123,16 @@ gerçek aynı anda inmelidir.
    `venthub_orders`'a `currency NOT NULL` kolonu (5 sipariş, hepsi TRY → backfill güvenli) +
    `CASCADE → RESTRICT` + `INV-LEDGER-1` kapısı. **Merge = Recep** (migration = prod).
 3. **Yazıcı**: `iyzico-callback` ve `iyzico-refund` defteri yazar; `payment_status` türetilir.
+   **Aynı adımda** `trg_sync_payment_status_*` tetikleyicisinin kapsamı daraltılır ya da kaldırılır
+   (§7 #8) — ikinci otorite ayakta kalırken defter otorite olamaz.
+
+⚠ **Adım 2'de ölçülmüş bir tuzak var: `venthub_orders.currency` NOT NULL, varsayılansız eklenirse
+sipariş oluşturma KIRILIR.** Ölçüldü: `iyzico-payment/index.ts`'teki `orderData` nesnesi
+(satır ~464) `currency` **göndermiyor** — kolon bugün yok. Bu yüzden migration, alanı gönderen
+kod değişikliğiyle **aynı PR'da** inmelidir; anahtar ile tüketicisi ayrı inerse bir sonraki
+gerçek sipariş insert'te patlar. Karşılaştırma: `venthub_order_items.display_currency`'de bu
+tuzak **yok** — orada yazıcı zaten açıkça `display_currency: 'TRY'` gönderiyor (satır 674),
+yani o kolonda varsayılanı kaldırmak tek başına güvenli.
 
 ## 7. ÇELİŞEN-MEVCUT
 
@@ -125,6 +145,7 @@ gerçek aynı anda inmelidir.
 | 5 | `updated_at` kolonu append-only ilkesine aykırı sinyal veriyor | Canlı şema | Kolon kalacaksa **gerekçesi yazılmalı**; defter satırı güncellenmez |
 | 6 | `admin-iyzico-reconcile` mutabakatı **türetilmiş özete** karşı yapıyor | Edge fonksiyonu | Defter dolunca asıl kaynak defter olmalı |
 | 7 | `checkout-payment-standard.md` ödeme cetveli sayılıyor ama defteri kapsamıyor | Komşu cetvel | Bu dosya o boşluğu doldurur; komşuya çapraz atıf eklenmeli |
+| 8 | ⭐ **İkinci otorite:** `trg_sync_payment_status_ins/upd` tetikleyicisi `status='confirmed'` görünce `payment_status='paid'` yazıyor — defterden bağımsız | Canlı tetikleyici (ölçüldü) | §2'nin "tek yönlü eşleme" kuralı bugün sağlanmıyor. Yazıcı inince kapsam daraltılır ya da kaldırılır → **migration, Recep kapısı**. Dolu değeri ezmediği için (T114) bugün **veri kaybı üretmiyor**; ürettiği şey **kanıtsız `paid`** |
 
 ## 8. Ölçülen, karara bağlanmamış
 
