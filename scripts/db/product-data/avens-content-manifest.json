@@ -1,0 +1,378 @@
+{
+  "_marka": "AVenS",
+  "_okuma_notu": "AVenS envanteri (51 SKU, canli DB, 2026-08-22) icin KAYNAK-DOGRULANMIS manifest. Sayfalar GORSEL olarak (page_NN.png) okundu, tablo hucreleri elle transkribe edildi. Eslesme katalog KOD sutunu <-> DB model_code BIREBIR yapildi (ADA GORE DEGIL) — bu markada bilinen hata tam olarak yanlis kolondan doldurmaydi (bkz. denetim[0..5]).",
+  "_kaynak": "PDF: C:/Users/alize/venthub-pdf-ingestor/venthub/ticaret/avensair-fiyat-listesi-2026/01-input/avens_fiyat_listesi_2026_HQ.pdf . Okunan sayfalar: page_28 (AVenS-HF/FW ve AVenS-HF/S hucreli aspirator tablolari), page_56 (BVU + BVU-LS), page_68 (Isi Geri Kazanim debi/olcu tablolari), page_69 (Elektrikli Isiticilar + Sulu Bataryalar), page_27 (Hiz Anahtarlari tablosu: KOD 60006/01801). Ayrica page_2,3,25,26,29,30 AVE-80141 icin arandi, BULUNAMADI (asagida ÖLÇEMEDİM).",
+  "_sema": "product-schema-standard.md §11.6 (birim sozlesmesi, alan adi birimi taahhut eder) + §11.7 (semantik sozlesme: max_/min_/nominal_ ayrimi, ölçüt ADA girer). nominal_ = kaynak sutun basligi sadece 'DEBI' diyorsa (tek calisma noktasi); max_ = sutun basligi acikca 'MAKS.' diyorsa.",
+  "series": {
+    "HF/FW": {
+      "source": "page_28.png, 'AVenS-HF/FW Sik Kanatli Kayis Kasnakli Hucreli Radyal Fanlar' tablosu",
+      "nominal_static_pressure_pa": 250,
+      "_not": "Tablodaki 6 satirdan 5'i (20100-20140) 250 Pa; 6. satir (KOD 20150, 18/18 5,5K, 350 Pa) DB'de YOK — bkz. denetim."
+    },
+    "HF/S": {
+      "source": "page_28.png, 'AVenS-HF/S Seyrek Kanatli Kayis Kasnakli Hucreli Radyal Fanlar' tablosu",
+      "_not": "Basinc kaybi sabit degil (250/400/500 Pa), her SKU'da ayri yazildi. diameter_mm MODEL adindaki boyut etiketinden (ör. '315') alindi — ayri bir olcu sutunu degil."
+    },
+    "BVU": {
+      "source": "page_56.png, 'AVenS BVU Siginak Havalandirma Uniteleri' tablosu",
+      "_not": "Sutun basligi 'MAKS. DEBI' (acikca maksimum) — max_delivery_m3h dogru anahtar. Guc degeri MODEL adindaki '-230W/-310W/-430W' etiketinden alindi (ayri sutun yok, isim kendi icinde tasiyor)."
+    },
+    "BVU-LS": {
+      "source": "page_56.png, 'AVenS BVU-LS Opsiyonel Kursun Seperator' tablosu",
+      "_not": "BVU Siginak Havalandirma Unitesi ile birlikte kullanilan aksesuar (kursun/radyasyon seperatoru); kendi debi/guc degeri YOK. UYGUN MODEL sutunu compatible_model olarak tasindi."
+    },
+    "ISI GERI KAZANIM": {
+      "source": "page_68.png, 'AVenS Aluminyum Esanjorlu Isi Geri Kazanim Cihazlari' fiyat tablosu + ayni sayfa alt L/W/H olcu tablosu",
+      "_not": "DEBI sutunu 'MAKS.' demiyor -> nominal_delivery_m3h. 'ELEKTRIKLI ISITICI (Opsiyonel)' sutunu cihazin KENDI motor gucu DEGIL, takilabilecek opsiyonel isitici gucudur -> optional_heater_power_w. 'BAGLANTI AGZI (mm)' kare kanal agzi -> connection_width_mm/connection_height_mm (kare oldugu icin esit). Alt tablodaki L/W/H sutun basliklari AYNEN tasindi (length_mm=L, width_mm=W, height_mm=H); hangi eksenin 'derinlik' oldugu teknik cizimden DOGRULANMADI, sadece sutun etiketi kopyalandi."
+    },
+    "ELEKTRIKLI ISITICI": {
+      "source": "page_69.png, 'Elektrikli Isiticilar' tablosu",
+      "voltage_v": 380,
+      "phase": 3,
+      "frequency_hz": 50,
+      "_not": "Sayfa basligi 'Trifaze 380V, 50Hz' — TUM 6 SKU icin ortak, seri seviyesinde yazildi. DEBI sutunu 'MAKS.' demiyor -> nominal_delivery_m3h. ISITICI GUCU sutunu heating_power_w (kW->W, sutun basligi '(kW)')."
+    },
+    "SULU BATARYA": {
+      "source": "page_69.png, 'Sulu Bataryalar' tablosu",
+      "_not": "Sadece KOD'u DB model_code ile BIREBIR eslesen 2 satir (13050, 13051) buraya yazildi. Diger 6 satir (13052-13057) DB'de YANLIS KOD/AD ile kayitli — bkz. denetim, skus'a YAZILMADI. DEBI sutunu 'MAKS.' demiyor -> nominal_delivery_m3h. Isitici gucu MODEL metnindeki '7 KW/8 KW' etiketinden (heating_power_w); ayni satirdaki Kcal/h sutunu (§11.6 birim listesinde yok) yazilmadi."
+    }
+  },
+  "skus": {
+    "20100": {
+      "series": "HF/FW",
+      "nominal_delivery_m3h": 3400,
+      "max_absorbed_power_w": 1100
+    },
+    "20110": {
+      "series": "HF/FW",
+      "nominal_delivery_m3h": 5000,
+      "max_absorbed_power_w": 1500
+    },
+    "20120": {
+      "series": "HF/FW",
+      "nominal_delivery_m3h": 7000,
+      "max_absorbed_power_w": 2200
+    },
+    "20130": {
+      "series": "HF/FW",
+      "nominal_delivery_m3h": 9500,
+      "max_absorbed_power_w": 3000
+    },
+    "20140": {
+      "series": "HF/FW",
+      "nominal_delivery_m3h": 14000,
+      "max_absorbed_power_w": 4000
+    },
+    "20200": {
+      "series": "HF/S",
+      "nominal_delivery_m3h": 4000,
+      "nominal_static_pressure_pa": 250,
+      "max_absorbed_power_w": 1100,
+      "diameter_mm": 250
+    },
+    "20210": {
+      "series": "HF/S",
+      "nominal_delivery_m3h": 6000,
+      "nominal_static_pressure_pa": 250,
+      "max_absorbed_power_w": 1500,
+      "diameter_mm": 280
+    },
+    "20220": {
+      "series": "HF/S",
+      "nominal_delivery_m3h": 9500,
+      "nominal_static_pressure_pa": 250,
+      "max_absorbed_power_w": 3000,
+      "diameter_mm": 315
+    },
+    "20230": {
+      "series": "HF/S",
+      "nominal_delivery_m3h": 12000,
+      "nominal_static_pressure_pa": 250,
+      "max_absorbed_power_w": 4000,
+      "diameter_mm": 355
+    },
+    "20240": {
+      "series": "HF/S",
+      "nominal_delivery_m3h": 16000,
+      "nominal_static_pressure_pa": 250,
+      "max_absorbed_power_w": 5500,
+      "diameter_mm": 400
+    },
+    "20250": {
+      "series": "HF/S",
+      "nominal_delivery_m3h": 20000,
+      "nominal_static_pressure_pa": 400,
+      "max_absorbed_power_w": 7500,
+      "diameter_mm": 450
+    },
+    "20260": {
+      "series": "HF/S",
+      "nominal_delivery_m3h": 25000,
+      "nominal_static_pressure_pa": 500,
+      "max_absorbed_power_w": 11000,
+      "diameter_mm": 500
+    },
+    "30100": {
+      "series": "BVU",
+      "max_delivery_m3h": 1200,
+      "max_absorbed_power_w": 230
+    },
+    "30101": {
+      "series": "BVU",
+      "max_delivery_m3h": 2000,
+      "max_absorbed_power_w": 310
+    },
+    "30102": {
+      "series": "BVU",
+      "max_delivery_m3h": 3200,
+      "max_absorbed_power_w": 430
+    },
+    "30110": {
+      "series": "BVU-LS",
+      "compatible_model": "BVU 1000"
+    },
+    "30111": {
+      "series": "BVU-LS",
+      "compatible_model": "BVU 2000/3000"
+    },
+    "13010": {
+      "series": "ISI GERI KAZANIM",
+      "nominal_delivery_m3h": 750,
+      "optional_heater_power_w": 3000,
+      "connection_width_mm": 250,
+      "connection_height_mm": 250,
+      "length_mm": 910,
+      "width_mm": 815,
+      "height_mm": 350
+    },
+    "13011": {
+      "series": "ISI GERI KAZANIM",
+      "nominal_delivery_m3h": 1000,
+      "optional_heater_power_w": 3000,
+      "connection_width_mm": 275,
+      "connection_height_mm": 275,
+      "length_mm": 910,
+      "width_mm": 815,
+      "height_mm": 350
+    },
+    "13013": {
+      "series": "ISI GERI KAZANIM",
+      "nominal_delivery_m3h": 2000,
+      "optional_heater_power_w": 6000,
+      "connection_width_mm": 300,
+      "connection_height_mm": 300,
+      "length_mm": 1400,
+      "width_mm": 1025,
+      "height_mm": 500
+    },
+    "13032": {
+      "series": "ELEKTRIKLI ISITICI",
+      "nominal_delivery_m3h": 2000,
+      "heating_power_w": 6000,
+      "compatible_model": "AVenS 1500 - 2000 - 2500"
+    },
+    "13033": {
+      "series": "ELEKTRIKLI ISITICI",
+      "nominal_delivery_m3h": 3000,
+      "heating_power_w": 9000,
+      "compatible_model": "AVenS 3000 - 3500"
+    },
+    "13034": {
+      "series": "ELEKTRIKLI ISITICI",
+      "nominal_delivery_m3h": 4000,
+      "heating_power_w": 12000,
+      "compatible_model": "AVenS 4000"
+    },
+    "13037": {
+      "series": "ELEKTRIKLI ISITICI",
+      "nominal_delivery_m3h": 1000,
+      "heating_power_w": 3000,
+      "compatible_model": "AVenS 750 - 1000"
+    },
+    "13038": {
+      "series": "ELEKTRIKLI ISITICI",
+      "nominal_delivery_m3h": 5000,
+      "heating_power_w": 15000,
+      "compatible_model": "AVenS 5000",
+      "_kaynak_duzeltmesi": "Katalog hucresi '15W' yazar; MODEL adi ('15 KW ELEKTRIKLI ISITICI') ve sutun basligi 'ISITICI GUCU (kW)' ile capraz dogrulanip 15000 W yazildi. Bkz denetim."
+    },
+    "13039": {
+      "series": "ELEKTRIKLI ISITICI",
+      "nominal_delivery_m3h": 5000,
+      "heating_power_w": 18000,
+      "compatible_model": "AVenS 5000",
+      "_kaynak_duzeltmesi": "Katalog hucresi '18W' yazar; MODEL adi ('18 KW ELEKTRIKLI ISITICI') ve sutun basligi 'ISITICI GUCU (kW)' ile capraz dogrulanip 18000 W yazildi. Bkz denetim."
+    },
+    "13050": {
+      "series": "SULU BATARYA",
+      "nominal_delivery_m3h": 750,
+      "heating_power_w": 7000,
+      "compatible_model": "AvenS 750"
+    },
+    "13051": {
+      "series": "SULU BATARYA",
+      "nominal_delivery_m3h": 1000,
+      "heating_power_w": 8000,
+      "compatible_model": "AvenS 1000"
+    },
+    "60006": {
+      "max_current_a": 2.5,
+      "_not": "AVenS 2,5 A Hiz Anahtari — page_27.png Hiz Anahtarlari tablosu, KOD 60006, MAKS. AKIM sutunu."
+    },
+    "01801": {
+      "max_current_a": 5,
+      "_not": "AVenS 5 A Hiz Anahtari — page_27.png Hiz Anahtarlari tablosu, KOD 01801, MAKS. AKIM sutunu."
+    }
+  },
+  "denetim": [
+    {
+      "sku": "AVE-11300",
+      "sorun": "KIMLIK HATASI (sulu batarya ailesi, 6 SKU'luk sistemik desenin 1'i): model_code=11300 aslinda katalogta KOD degil, 'ISITICI GUCU (Kcal/h)' sutunundaki deger; name='AvenS 1500' aslinda 'UYGUN MODEL' sutunu (cihazin takilacagi HRV modeli), urunun kendi adi degil.",
+      "kanit": "page_69.png Sulu Bataryalar tablosu: KOD 13052 | MODEL 'SULU BATARYA 11 KW KANAL TIPI-11300(Kcal/h) 90/70C' | DEBI 1500 m3/h | ISITICI GUCU(Kcal/h) 11300 | UYGUN MODEL 'AvenS 1500'.",
+      "onerilen": "Gercek KOD=13052, gercek ad='SULU BATARYA 11 KW KANAL TIPI-11300(Kcal/h) 90/70C', debi=1500 m3/h, isitici gucu=11 kW (11000 W)."
+    },
+    {
+      "sku": "AVE-20700",
+      "sorun": "Ayni desen: model_code=20700 aslinda Kcal/h degeri; name='AvenS 2000' aslinda UYGUN MODEL.",
+      "kanit": "page_69.png: KOD 13053 | MODEL 'SULU BATARYA 14 KW KANAL TIPI-20700(Kcal/h) 90/70C' | DEBI 2000 m3/h | Kcal/h 20700 | UYGUN MODEL 'AvenS 2000'.",
+      "onerilen": "Gercek KOD=13053, gercek ad='SULU BATARYA 14 KW KANAL TIPI-20700(Kcal/h) 90/70C', debi=2000 m3/h, isitici gucu=14 kW (14000 W)."
+    },
+    {
+      "sku": "AVE-33000",
+      "sorun": "Ayni desen: model_code=33000 aslinda Kcal/h degeri; name='AvenS 3000' aslinda UYGUN MODEL.",
+      "kanit": "page_69.png: KOD 13054 | MODEL 'SULU BATARYA 20 KW KANAL TIPI-33000(Kcal/h) 90/70C' | DEBI 3000 m3/h | Kcal/h 33000 | UYGUN MODEL 'AvenS 3000'.",
+      "onerilen": "Gercek KOD=13054, gercek ad='SULU BATARYA 20 KW KANAL TIPI-33000(Kcal/h) 90/70C', debi=3000 m3/h, isitici gucu=20 kW (20000 W)."
+    },
+    {
+      "sku": "AVE-37400",
+      "sorun": "Ayni desen: model_code=37400 aslinda Kcal/h degeri; name='AvenS 4000' aslinda UYGUN MODEL.",
+      "kanit": "page_69.png: KOD 13055 | MODEL 'SULU BATARYA 28 KW KANAL TIPI-37400(Kcal/h) 90/70C' | DEBI 4000 m3/h | Kcal/h 37400 | UYGUN MODEL 'AvenS 4000'.",
+      "onerilen": "Gercek KOD=13055, gercek ad='SULU BATARYA 28 KW KANAL TIPI-37400(Kcal/h) 90/70C', debi=4000 m3/h, isitici gucu=28 kW (28000 W)."
+    },
+    {
+      "sku": "AVE-42500",
+      "sorun": "Ayni desen (onceki denetimde de bulunmustu, burada dogrulandi): model_code=42500 aslinda Kcal/h degeri; name='AvenS 5000' aslinda UYGUN MODEL.",
+      "kanit": "page_69.png: KOD 13056 | MODEL 'SULU BATARYA 36 KW KANAL TIPI-42500(Kcal/h) 90/70C' | DEBI 5000 m3/h | Kcal/h 42500 | UYGUN MODEL 'AvenS 5000'.",
+      "onerilen": "Gercek KOD=13056, gercek ad='SULU BATARYA 36 KW KANAL TIPI-42500(Kcal/h) 90/70C', debi=5000 m3/h, isitici gucu=36 kW (36000 W)."
+    },
+    {
+      "sku": "AVE-47300",
+      "sorun": "Ayni desen (onceki denetimde de bulunmustu, burada dogrulandi): model_code=47300 aslinda Kcal/h degeri; name='AvenS 5000' aslinda UYGUN MODEL.",
+      "kanit": "page_69.png: KOD 13057 | MODEL 'SULU BATARYA 40 KW KANAL TIPI-47300(Kcal/h) 90/70C' | DEBI 5000 m3/h | Kcal/h 47300 | UYGUN MODEL 'AvenS 5000'.",
+      "onerilen": "Gercek KOD=13057, gercek ad='SULU BATARYA 40 KW KANAL TIPI-47300(Kcal/h) 90/70C', debi=5000 m3/h, isitici gucu=40 kW (40000 W)."
+    },
+    {
+      "sku": "SULU BATARYA ailesi (sistemik)",
+      "sorun": "Yukaridaki 6 kalem tek bir sistemik hatanin ornekleri: ingestion 'KOD' yerine 'ISITICI GUCU (Kcal/h)' sutununu model_code'a, 'UYGUN MODEL' sutununu name'e yazmis — ozellikle bu iki tabloda (Elektrikli Isiticilar VE Sulu Bataryalar) her ikisinde de bir 'UYGUN MODEL' sutunu var ama sadece Sulu Bataryalar tablosunda karisiklik olmus.",
+      "kanit": "page_69.png karsilastirmasi: Elektrikli Isiticilar tablosunda 6/6 satir dogru (KOD sutunu gercekten model_code'a gitmis: 13032,13033,13034,13037,13038,13039). Sulu Bataryalar tablosunda 8 satirdan sadece 2'si (13050,13051) dogru, 6'si (13052-057) Kcal/h+UygunModel karismasiyla yanlis.",
+      "onerilen": "Katalog-alim betiginde (catalog-ingestion, PRICING seridi sahibi) Sulu Bataryalar tablosu icin sutun esleme kurali ayrica denetlenmeli; muhtemelen bu tablonun sutun sirasi (KOD, MODEL, DEBI, ISITICI GUCU(Kcal/h), UYGUN MODEL) diger tablolardan (KOD, MODEL, DEBI, ISITICI GUCU(kW), UYGUN MODEL) farkli parse edilmis olabilir — Kcal/h sutunu kW sutunuyle karistirilmis olabilir."
+    },
+    {
+      "sku": "AVE-13038 / AVE-13039",
+      "sorun": "Katalog KAYNAK HATASI (urun verisi degil, PDF baski hatasi): 'ISITICI GUCU (kW)' sutunu basligi acikca '(kW)' dedigi ve MODEL adi '15 KW ELEKTRIKLI ISITICI' / '18 KW ELEKTRIKLI ISITICI' dedigi halde, hucrelerin kendisi '15W' / '18W' yaziyor (birim W, kW degil).",
+      "kanit": "page_69.png Elektrikli Isiticilar tablosu, KOD 13038 ve 13039 satirlari, ISITICI GUCU(kW) sutunu.",
+      "onerilen": "Ayni satirdaki iki bagimsiz kaynak (MODEL adi + sutun basligi) 15/18 kW'a isaret ediyor; manifestte heating_power_w=15000/18000 olarak DUZELTILEREK yazildi (skus icinde '_kaynak_duzeltmesi' notuyla isaretli). Katalog PDF'in kendisi hatali; gelecekte bu tablo yeniden PDF'ten okunursa ayni tuzaga dusulmemesi icin not birakildi."
+    },
+    {
+      "sku": "SEMANTIK ALAN ADI (26 kalemin tamami)",
+      "sorun": "DB'deki 26 metin-degerli 'max_delivery_m3h' alaninin cogu §11.7'ye gore YANLIS on-ek tasiyor: kaynak sutun basligi sadece 'DEBI' diyorsa (MAKS. demiyorsa) dogru anahtar nominal_delivery_m3h olmalidir; max_ yalniz kaynak acikca 'MAKS. DEBI' diyorsa (BVU ailesi) dogrudur.",
+      "kanit": "page_28.png HF/FW+HF/S sutun basligi 'HAVA DEBISI' (maks degil); page_68.png Isi Geri Kazanim sutun basligi sade 'DEBI'; page_69.png hem Elektrikli Isiticilar hem Sulu Bataryalar sutun basligi sade 'DEBI'. Sadece page_56.png BVU tablosu acikca 'MAKS. DEBI' diyor.",
+      "onerilen": "Duzeltmede: HF/FW(5) + HF/S(7) + Isi Geri Kazanim(3) + Elektrikli Isitici(6) + Sulu Batarya(2 doğru-eşleşen) = 23 SKU icin alan adi max_delivery_m3h -> nominal_delivery_m3h olmali; sadece BVU'nun 3 SKU'su (30100/30101/30102) max_delivery_m3h olarak KALMALI. Bu manifestte skus blogu zaten bu ayrimi uyguluyor."
+    },
+    {
+      "sku": "KOD 20150 (katalogta var, DB'de yok)",
+      "sorun": "AVENS-HF/FW 18/18 5,5K DB'de bulunamadi.",
+      "kanit": "page_28.png HF/FW tablosu 6. satir: KOD 20150, MODEL 'AVENS-HF/FW 18/18 5,5K', HAVA DEBISI 18000 m3/h, BASINÇ KAYBI 350 Pa, FIYAT 2797 Euro.",
+      "onerilen": "PRICING/katalog seridine bildirilmeli — bu urunun DB'ye hic girmemis olmasi olasi."
+    },
+    {
+      "sku": "KOD 13012/13026/13014/13027/13015/13016 (katalogta var, DB'de yok)",
+      "sorun": "Isi Geri Kazanim ailesinde katalogta 9 model var (13010-13016 + 13026 + 13027), DB'de sadece 3'u var (13010, 13011, 13013). 6 model (1500/2500/3000/3500/4000/5000 m3/h kapasiteli cihazlar) DB'de YOK.",
+      "kanit": "page_68.png tam tablo: 13010(750),13011(1000),13012(1500),13013(2000),13026(2500),13014(3000),13027(3500),13015(4000),13016(5000) — DB sorgusu sadece 13010/13011/13013 dondurdu.",
+      "onerilen": "PRICING/katalog seridine bildirilmeli; genis bir kapsam boslugu (9 urunden 6'si eksik)."
+    }
+  ],
+  "olcemedim": [
+    {
+      "sku": "AVE-80141",
+      "konu": "FC-51 - 230V - 0,37kW Frekans Konvertoru (family: avens-davlumbaz-fanlar).",
+      "durum": "Katalogdaki tablo satiri BULUNAMADI. page_27.png Hiz Anahtarlari tablosunda sadece FC 101-1.5kW (KOD 80102) ve FC 101-2.2kW (KOD 80103) var; 'FC-51' / KOD 80141 orada YOK. page_2,3,25,26,29,30 tarandi, davlumbaz fanlari bolumune rastlanmadi (74 sayfalik katalogda kalan ~44 sayfa taranmadi — zaman butcesi asildi).",
+      "sonuc": "AVE-80141 icin manifestte HICBIR alan yazilmadi (technical_specs={} durumu KORUNDU). DB'deki name alani ('FC-51 - 230V - 0,37kW Frekans Konvertörü') kendi icinde tutarli gorunuyor ama katalog tablosuyla CAPRAZ DOGRULANAMADI."
+    }
+  ],
+  "kaldirilacak": {
+    "20100": [
+      "max_delivery_m3h"
+    ],
+    "20110": [
+      "max_delivery_m3h"
+    ],
+    "20120": [
+      "max_delivery_m3h"
+    ],
+    "20130": [
+      "max_delivery_m3h"
+    ],
+    "20140": [
+      "max_delivery_m3h"
+    ],
+    "20200": [
+      "max_delivery_m3h"
+    ],
+    "20210": [
+      "max_delivery_m3h"
+    ],
+    "20220": [
+      "max_delivery_m3h"
+    ],
+    "20230": [
+      "max_delivery_m3h"
+    ],
+    "20240": [
+      "max_delivery_m3h"
+    ],
+    "20250": [
+      "max_delivery_m3h"
+    ],
+    "20260": [
+      "max_delivery_m3h"
+    ],
+    "13010": [
+      "max_delivery_m3h"
+    ],
+    "13011": [
+      "max_delivery_m3h"
+    ],
+    "13013": [
+      "max_delivery_m3h"
+    ],
+    "13032": [
+      "max_delivery_m3h"
+    ],
+    "13033": [
+      "max_delivery_m3h"
+    ],
+    "13034": [
+      "max_delivery_m3h"
+    ],
+    "13037": [
+      "max_delivery_m3h"
+    ],
+    "13038": [
+      "max_delivery_m3h"
+    ],
+    "13039": [
+      "max_delivery_m3h"
+    ],
+    "13050": [
+      "max_delivery_m3h"
+    ],
+    "13051": [
+      "max_delivery_m3h"
+    ]
+  },
+  "kaldirilacak_yerine": {
+    "max_delivery_m3h": "nominal_delivery_m3h"
+  },
+  "_kaldirma_gerekcesi": "§11.7: alan adi bir semantik taahhut tasir. Kaynak sutun basligi sade 'DEBI' diyorsa (MAKS. demiyorsa) deger nominal_'dir. Bu tur ayni bilgiyi DOGRU adla ve SAYI olarak nominal_delivery_m3h'e yaziyor; eski max_delivery_m3h METIN degeri ayni bilginin yanlis adli kopyasi olarak kalirdi ve spec-type kapisini kirmizi tutardi. Kaldirma AYRI bayrak (--allow-remove) ister ve yerine gecen alan dolu degilse ENGELLENIR."
+}

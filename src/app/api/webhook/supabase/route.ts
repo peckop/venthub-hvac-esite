@@ -43,19 +43,100 @@ interface SupabaseWebhookPayload {
 }
 
 /**
- * Aile slug'ı — PDP'nin KANONİK adresi bunun üzerinden kurulur
- * (`/[lang]/products/[family-slug]`). Üç dal (products · inventory_movements ·
- * product_prices) aynı çözümü yaptığı için tek yerde tutulur; ayrı ayrı yazıldığında
- * ikisi ürün slug'ını kullanıp sessizce yanlış yolu tazeliyordu.
+ * T138-VH K6 — SERİ↔MODEL zinciri.
+ *
+ * `product_families.parent_family_id` (2026-08-21 prod'a uygulandı): `NULL` = seri (landing),
+ * `NOT NULL` = model (kart/PDP). Bir MODEL değiştiğinde iki sayfa bayatlar: modelin kendi PDP'si
+ * VE üstündeki SERİ landing'i (seri sayfası model kartını basıyor). Bu yürüyüş ikisini de bulur.
+ *
+ * Hiyerarşi DB'de tek seviyeli garantilenir (`product_families_single_level_guard` tetiği —
+ * bkz. 20260821180000_t138_parent_family_id.sql: bir modelin ebeveyni asla model olamaz). Ama bu
+ * route DB kısıtına KÖR — guard atlatılırsa (manuel UPDATE, ileride şema değişikliği) sonsuz/aşırı
+ * sorguya düşmemek için MAX_FAMILY_CHAIN_HOPS + döngü koruması (seen) savunma katmanı olarak durur.
+ * Sınır aşılırsa SESSİZCE KIRPILMAZ: console.error ile loglanır VE çağıranın `truncated` bayrağı
+ * üzerinden yanıt gövdesinde (`fanoutTruncated`) ölçülebilir sinyale dönüşür.
  */
-async function familySlugById(familyId: string | undefined): Promise<string | null> {
+const MAX_FAMILY_CHAIN_HOPS = 4
+
+interface FamilyChainRow {
+  id: string
+  slug: string | null
+  parent_family_id: string | null
+}
+
+async function familyRowById(familyId: string | undefined): Promise<FamilyChainRow | null> {
   if (!familyId) return null
   const { data } = await supabase
     .from('product_families')
-    .select('slug')
+    .select('id, slug, parent_family_id')
     .eq('id', familyId)
     .single()
-  return data?.slug ?? null
+  return data ?? null
+}
+
+/**
+ * `startId`'den başlayıp ebeveyn zincirini (tek seviyeli hiyerarşide: kendisi + varsa serisi)
+ * yürür. Slug listesini sırayla (kendi önce) ve tekilleştirilmiş döndürür.
+ */
+async function walkFamilyChain(
+  startId: string | undefined
+): Promise<{ slugs: string[]; truncated: boolean }> {
+  const slugs: string[] = []
+  const seen = new Set<string>()
+  let currentId = startId
+  let hops = 0
+  let truncated = false
+
+  while (currentId) {
+    if (hops >= MAX_FAMILY_CHAIN_HOPS) {
+      truncated = true
+      console.error(
+        `[Supabase Webhook] product_families zincir yürüyüşü MAX_FAMILY_CHAIN_HOPS ` +
+        `(${MAX_FAMILY_CHAIN_HOPS}) sınırına ulaştı — startId=${startId}, currentId=${currentId}. ` +
+        'Tek-seviye guard (product_families_single_level_guard) atlatılmış olabilir; DB kontrol edilmeli.'
+      )
+      break
+    }
+    if (seen.has(currentId)) {
+      truncated = true
+      console.error(`[Supabase Webhook] product_families zincirinde DÖNGÜ tespit edildi — id=${currentId}. Yürüyüş durduruldu.`)
+      break
+    }
+    seen.add(currentId)
+
+    const row = await familyRowById(currentId)
+    if (!row) break
+    if (row.slug) slugs.push(row.slug)
+    currentId = row.parent_family_id ?? undefined
+    hops += 1
+  }
+
+  return { slugs: [...new Set(slugs)], truncated }
+}
+
+/**
+ * Bir aile id'si için kendi + (varsa) seri sayfasını tazeler (path + familyTag).
+ * `products` / `inventory_movements` / `product_prices` / `product_images` dallarının
+ * hepsi buradan geçer — böylece "model değişti, serisi bayatladı" boşluğu TEK yerde kapanır.
+ */
+async function revalidateFamilyChain(
+  familyId: string | undefined
+): Promise<{ paths: string[]; tags: string[]; truncated: boolean }> {
+  const { slugs, truncated } = await walkFamilyChain(familyId)
+  const paths: string[] = []
+  const tags: string[] = []
+
+  for (const slug of slugs) {
+    for (const lang of ['tr', 'en'] as const) {
+      const p = `/${lang}/products/${slug}`
+      revalidatePath(p)
+      paths.push(p)
+    }
+    revalidateTag(familyTag(slug))
+    tags.push(familyTag(slug))
+  }
+
+  return { paths, tags, truncated }
 }
 
 /** Kategori yolu çözmek için gereken minimum satır (slug + metadata). */
@@ -182,6 +263,9 @@ export async function POST(request: NextRequest) {
     // PS-042: products UPDATE'inde alan-bazlı karşılaştırma yapılıp yapılamadığını
     // (old_record var mı) yanıtta raporlamak için.
     let discoveryComparisonSkipped = false
+    // T138-VH K6: seri↔model zincir yürüyüşü üst sınırı aştıysa (bkz. walkFamilyChain)
+    // burada toplanır ve yanıt gövdesinde görünür olur — sessizce kırpma YOK.
+    let fanoutTruncated = false
 
     // PS-042: keşif (discovery) tag'leri yalnız keşfi etkileyen değişimde tetiklenir.
     // products UPDATE'inde bu, duyarlı alan (status/family_id/category_id/subcategory_id/
@@ -217,13 +301,15 @@ export async function POST(request: NextRequest) {
        * yol aile slug'ı olduğu için o çağrı VAR OLMAYAN bir yolu geçersiz kılıyordu, yani
        * ürün güncellemesi PDP'yi hiç tazelemiyordu. Sessiz bir kaçaktı; 2026-08-15 denetimi
        * yakaladı. `family_id` payload'da zaten var (`to_jsonb(NEW)`), ek sorgu gerekmez.
+       *
+       * T138-VH K6: aile MODEL ise (parent_family_id dolu) üstündeki SERİ sayfası da bayatlar —
+       * `revalidateFamilyChain` bunu tek sorgu farkıyla (yalnız model ise ek hop) kapsar.
        */
-      const familySlug = await familySlugById(activeRecord.family_id as string | undefined)
-      if (familySlug) {
-        revalidatePath(`/tr/products/${familySlug}`)
-        revalidatePath(`/en/products/${familySlug}`)
-        revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
-      }
+      const { paths: familyChainPaths, tags: familyChainTags, truncated: productFanoutTruncated } =
+        await revalidateFamilyChain(activeRecord.family_id as string | undefined)
+      revalidatedPaths.push(...familyChainPaths)
+      revalidatedTags.push(...familyChainTags)
+      if (productFanoutTruncated) fanoutTruncated = true
 
       if (shouldRevalidateDiscovery) {
         revalidateTag(PRODUCTS_DISCOVERY_TAG)
@@ -290,13 +376,13 @@ export async function POST(request: NextRequest) {
 
         if (product) {
           // Ürün slug'ı DEĞİL aile slug'ı — PDP aile kanoniktir; eskisi var olmayan yolu
-          // tazeliyordu (stok hareketi PDP'yi hiç yenilemiyordu).
-          const familySlug = await familySlugById(product.family_id ?? undefined)
-          if (familySlug) {
-            revalidatePath(`/tr/products/${familySlug}`)
-            revalidatePath(`/en/products/${familySlug}`)
-            revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
-          }
+          // tazeliyordu (stok hareketi PDP'yi hiç yenilemiyordu). T138-VH K6: aile MODEL ise
+          // üstündeki SERİ sayfası da tazelenir (revalidateFamilyChain).
+          const { paths: invFamilyPaths, tags: invFamilyTags, truncated: invFanoutTruncated } =
+            await revalidateFamilyChain(product.family_id ?? undefined)
+          revalidatedPaths.push(...invFamilyPaths)
+          revalidatedTags.push(...invFamilyTags)
+          if (invFanoutTruncated) fanoutTruncated = true
 
           // If product is linked to a category, revalidate category path too
           if (product.category_id) {
@@ -318,6 +404,7 @@ export async function POST(request: NextRequest) {
     // 4. Table: product_families (YENİ — PS-042)
     else if (table === 'product_families') {
       const familySlug = activeRecord.slug as string | undefined
+      const parentFamilyId = activeRecord.parent_family_id as string | undefined
 
       // Aile değişikliği keşif listelerini de etkileyebilir (aile bazlı gruplama/filtreleme)
       revalidateTag(HOME_DATA_TAG)
@@ -338,6 +425,25 @@ export async function POST(request: NextRequest) {
         revalidateTag(familyTag(familySlug))
         revalidatedTags.push(familyTag(familySlug))
       }
+
+      /**
+       * T138-VH K6: bu satır MODEL ise (parent_family_id dolu), üstündeki SERİ landing'i de
+       * bayatlar — seri sayfası model kartını basıyor. `parent_family_id` payload'da zaten var
+       * (`to_jsonb(NEW)`/`to_jsonb(OLD)`), ek okuma gerekmeden ayrım burada yapılır; yalnız
+       * ebeveyn VARSA `walkFamilyChain` ile (savunma amaçlı üst-sınırlı) çözülür.
+       */
+      if (parentFamilyId) {
+        const { slugs: seriesSlugs, truncated: seriesFanoutTruncated } =
+          await walkFamilyChain(parentFamilyId)
+        for (const slug of seriesSlugs) {
+          revalidatePath(`/tr/products/${slug}`)
+          revalidatePath(`/en/products/${slug}`)
+          revalidatedPaths.push(`/tr/products/${slug}`, `/en/products/${slug}`)
+          revalidateTag(familyTag(slug))
+          revalidatedTags.push(familyTag(slug))
+        }
+        if (seriesFanoutTruncated) fanoutTruncated = true
+      }
     }
 
     // 5. Table: product_prices (YENİ — fiyat değişimi → yalnız ilgili ürünün AİLE PDP yolu)
@@ -351,12 +457,12 @@ export async function POST(request: NextRequest) {
           .eq('id', productId)
           .single()
 
-        const familySlug = await familySlugById(product?.family_id ?? undefined)
-        if (familySlug) {
-          revalidatePath(`/tr/products/${familySlug}`)
-          revalidatePath(`/en/products/${familySlug}`)
-          revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
-        }
+        // T138-VH K6: aile MODEL ise üstündeki SERİ PDP yolu da tazelenir.
+        const { paths: priceFamilyPaths, tags: priceFamilyTags, truncated: priceFanoutTruncated } =
+          await revalidateFamilyChain(product?.family_id ?? undefined)
+        revalidatedPaths.push(...priceFamilyPaths)
+        revalidatedTags.push(...priceFamilyTags)
+        if (priceFanoutTruncated) fanoutTruncated = true
       }
 
       // PS-042: fiyat değişimi keşif (home-data/products-discovery) tag'lerini
@@ -384,12 +490,12 @@ export async function POST(request: NextRequest) {
           .eq('id', productId)
           .single()
 
-        const familySlug = await familySlugById(product?.family_id ?? undefined)
-        if (familySlug) {
-          revalidatePath(`/tr/products/${familySlug}`)
-          revalidatePath(`/en/products/${familySlug}`)
-          revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
-        }
+        // T138-VH K6: aile MODEL ise üstündeki SERİ PDP yolu da tazelenir.
+        const { paths: imgFamilyPaths, tags: imgFamilyTags, truncated: imgFanoutTruncated } =
+          await revalidateFamilyChain(product?.family_id ?? undefined)
+        revalidatedPaths.push(...imgFamilyPaths)
+        revalidatedTags.push(...imgFamilyTags)
+        if (imgFanoutTruncated) fanoutTruncated = true
       }
 
       // Görsel keşif yüzeyinde GÖRÜNÜR (kart görseli) — fiyattan farklı olarak burada
@@ -464,6 +570,9 @@ export async function POST(request: NextRequest) {
       // PS-042: products UPDATE'inde old_record yoksa alan-bazlı karşılaştırma yapılamadı —
       // bu durumda mevcut davranış (her zaman keşif tag'i tetikle) korunur.
       discoveryComparisonSkipped,
+      // T138-VH K6: seri↔model zincir yürüyüşü MAX_FAMILY_CHAIN_HOPS'u aştıysa (ya da döngü
+      // bulduysa) burada true olur — sessizce kırpılmaz, ölçülebilir sinyal.
+      fanoutTruncated,
       timestamp: new Date().toISOString()
     })
   } catch (error: unknown) {

@@ -31,6 +31,8 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const BASELINE_PATH = path.join(__dirname, 'catalog-integrity-baseline.json')
+/** scripts/db/checks -> depo koku (uc seviye yukari). Kaynak tarayan kontroller buradan yurur. */
+const REPO_KOK = path.join(__dirname, '..', '..', '..')
 
 /**
  * Her kontrol bir anahtar kümesi üretir. Anahtar = ihlalin KİMLİĞİ; taban bu anahtarları tutar.
@@ -72,6 +74,45 @@ const CHECKS = [
     key: (r) => `orphan:${r.sku}`,
     detail: (r) => r.name,
   },
+  /* ──────────────────────────────────────────────────────────────────────────
+   * T159 — `orphan`'in TERS YONU (2026-08-23).
+   *
+   * `orphan` ailesiz URUNU bekcilerdi. Ters yon — urunsuz AILE ve yaprak
+   * kategorisi olmayan URUN — hic bekcilenmiyordu. Bedeli olculdu: 08-21'de bir
+   * aile ayrismasi 12 urunu alti yeni aileye tasidi ve eski semsiye aileyi
+   * BOS birakti; sayfa canlida HTTP 200 donuyor, sitemap'te TR+EN duruyor, ama
+   * vitrinde hicbir yerden baglantisi yok. Iki gun boyunca hicbir kapi gormedi.
+   * ────────────────────────────────────────────────────────────────────────── */
+  {
+    id: 'family-empty',
+    title: 'Dogrudan urunu olmayan aile',
+    why: 'Aile URL kanonik adrestir; dogrudan urunu olmayan aile canli bir adres uretir ama gosterecek urunu yoktur. DETAY cocuk aile sayisini soyler ve bu ayrim KRITIKTIR: cocugu OLMAYAN aile olu kabuktur (silinir), cocugu OLAN aile bir hiyerarsi ebeveynidir (silinemez — silinirse alti aile sahipsiz kalir; karar tasarim isidir, temizlik degil). Bu iki hali ayni sayan bir okuma 2026-08-23 gunu yanlis silme karari uretti ve son anda durduruldu.',
+    sql: `select f.slug, f.name,
+                 (select count(*) from public.products p where p.family_id = f.id and p.deleted_at is null)::int as urun,
+                 (select count(*) from public.product_families c where c.parent_family_id = f.id)::int as cocuk
+          from public.product_families f
+          where not exists (
+            select 1 from public.products p where p.family_id = f.id and p.deleted_at is null
+          )`,
+    key: (r) => `family-empty:${r.slug}`,
+    detail: (r) => `"${r.name}" — dogrudan urun 0, cocuk aile ${r.cocuk} (${r.cocuk > 0 ? 'HIYERARSI EBEVEYNI: silme, tasarim karari' : 'OLU KABUK: silinebilir'})`,
+  },
+  {
+    id: 'product-no-subcategory',
+    title: 'Yaprak kategorisi olmayan urun',
+    // Anahtar AILE bazinda: tek bir ingestion adimi bir ailenin tamamini ayni sekilde
+    // birakiyor; SKU bazli taban 27 gerekcesiz satir olurdu ve kimse okumazdi.
+    // (spec-unit / spec-type ile ayni desen.)
+    why: 'Vitrindeki yaprak kategori sayfalari urunleri `subcategory_id` uzerinden toplar (ailenin `category_id`si UST kategoridir, ayri kademe). `subcategory_id` bos olan urun hicbir yaprak kategori sayfasinda GORUNEMEZ — urun aktif, adresi var, arama bulur, ama kategori gezinmesiyle ulasilamaz. Bos alan burada "eksik veri" degil, GORUNMEZ URUN demektir.',
+    sql: `select coalesce(f.slug, '(ailesiz)') as family_slug, count(*)::int as n,
+                 (array_agg(p.sku order by p.sku))[1] as sample_sku
+          from public.products p
+          left join public.product_families f on f.id = p.family_id
+          where p.deleted_at is null and p.subcategory_id is null
+          group by f.slug`,
+    key: (r) => `product-no-subcategory:${r.family_slug}`,
+    detail: (r) => `${r.n} urun (or. ${r.sample_sku}) yaprak kategorisiz — kategori gezinmesinde gorunmez`,
+  },
   {
     id: 'brand-mix',
     title: 'Aile içinde marka karışımı',
@@ -86,7 +127,185 @@ const CHECKS = [
     key: (r) => `brand-mix:${r.family_name}`,
     detail: (r) => r.brand_list,
   },
+  /* ──────────────────────────────────────────────────────────────────────────
+   * T140 — BİRİM SÖZLEŞMESİ (2026-08-21). Cetvel: product-schema-standard §11.6.
+   *
+   * Ölçüm: `max_absorbed_power_w` alanı SEAT'te 0,06–7,5 arası değer taşıyor,
+   * Vortice'te 4–10230. Yani aynı alan, aynı tablo, markaya göre FARKLI BİRİM
+   * (kW vs W). Bu "boş alan"dan tehlikelidir: boş alan görünür, yanlış birim
+   * DOLU ve makul görünür. Karşılaştırma, sıralama, filtreleme ve hesaplayıcı
+   * yüzeylerinin hepsi bu alanda yanlış sonuç verir, hiçbiri kırmızı vermez.
+   *
+   * ⚠️ YANLIŞ-KIRMIZI TUZAKLARI (ölçülüp ELENDİ — kural yazmadan ÖNCE bakıldı):
+   *   • `blade_diameter_mm` 3000–7000: GERÇEK veri. NORDIK HVLS HYPERBLADE
+   *     tavan fanları 3–7 METRE kanatlı. "Şüpheli büyük sayı" kuralı yazsaydık
+   *     7 doğru satırı kırmızı yapardı.
+   *   • `frequency_hz = 0`: BRA.VO S1–S4, 5 V'luk DC cihazlar; 0 Hz orada
+   *     anlamlı. Bu bir birim hatası değil, alan-uygunluğu konusu.
+   * Bu yüzden kapsam, KESİN olarak ölçülebilen iki sınıfla sınırlı tutuldu.
+   * ────────────────────────────────────────────────────────────────────────── */
+  {
+    id: 'spec-unit',
+    title: 'Birim kayması: alan adının ima ettiği birimle bağdaşmayan değer',
+    why: 'Alan adı birimi TAAHHÜT eder. Bir HVAC fanının/sürücüsünün çektiği güç 1 W altında olamaz; 1 W altındaki bir `max_absorbed_power_w` değeri oraya kW yazıldığı anlamına gelir. Değer dolu ve makul göründüğü için hiçbir yüzey şikâyet etmez, ama karşılaştırma ve hesap yanlış olur.',
+    // Anahtar SKU bazında DEĞİL, alan|marka bazında: tek bir ingestion hatası 81 ürüne
+    // yayıldığı için SKU bazlı taban 191 gerekçesiz satır olurdu ve kimse okumazdı.
+    // Sınıf bazlı taban, "bu marka bu alanda hâlâ yanlış birimde" der ve marka
+    // düzeltilince TEK satır silinir. (dup-name'in grup bazlı anahtarıyla aynı desen.)
+    sql: `select b.name as brand, count(*)::int as n,
+                 min((p.technical_specs->>'max_absorbed_power_w')::numeric) as min_value,
+                 max((p.technical_specs->>'max_absorbed_power_w')::numeric) as max_value,
+                 (array_agg(p.sku order by p.sku))[1] as sample_sku
+          from public.products p
+          join public.product_families f on f.id = p.family_id
+          join public.brands b on b.id = f.brand_id
+          where p.deleted_at is null
+            and p.technical_specs->>'max_absorbed_power_w' ~ '^[0-9]+(\\.[0-9]+)?$'
+            and (p.technical_specs->>'max_absorbed_power_w')::numeric < 1
+          group by b.name`,
+    key: (r) => `spec-unit:max_absorbed_power_w|${r.brand}`,
+    detail: (r) => `${r.n} kayıt · ${r.min_value}–${r.max_value} (1 W altı = kW yazılmış) · ör. ${r.sample_sku}`,
+  },
+  /* ──────────────────────────────────────────────────────────────────────────
+   * T158 — SONEK KAPSAMI OLCULEREK GENISLETILDI (2026-08-23).
+   *
+   * Kural yeni DEGIL; kapsami dardi. Onceki sonek kumesi dokuz kalemdi
+   * (v|m3h|w|pa|kg|mm|a|ls|pct) ve cetvelin K1 listesiyle ORTUSMUYORDU: adi
+   * birim tasiyan bes alan kapinin gormedigi yerdeydi. Canli DB'de
+   * technical_specs'in TUM anahtar sonekleri sayildi (374 aktif urun, 34 ayri
+   * sonek) ve birim olanlarla olmayanlar ELLE ayrildi:
+   *   · BIRIM (kapsama alindi): _c (2 anahtar) · _l (1) · _ms (2) · _hz (1)
+   *     · _db (1) · _kw (1) · _24h (1)
+   *   · BIRIM DEGIL (KASTEN disarida): _sensor · _curve · _type · _rating
+   *     · _class(es) · _marking · _model · _size · _code · _poles · _blades
+   *     · _speeds · _timer · _bypass · _humidistat · _compliant · _max
+   * Ikinci kumeyi eklemek kapiyi gurultuye bogar ve kapi kapatilir.
+   *
+   * Genisletmenin OLCULEN bedeli: bir tek yeni sinif — operating_temperature_c
+   * (Vortice, 3 kayit, "5 - 32"). Yani sonek kumesini 9'dan 16'ya cikarmak
+   * SIFIR yanlis-kirmizi uretti; tabana gerekcesiyle yazildi.
+   * ────────────────────────────────────────────────────────────────────────── */
+  {
+    id: 'spec-type',
+    title: 'Birimli sayısal alanda metin değer',
+    why: 'Adı bir SI birimiyle biten alan sayı taşımak zorundadır (spec-axis-standard §K1). "380 V" gibi birimi metne gömülü bir değer sıralanamaz, filtrelenemez, karşılaştırılamaz; aynı alanın bazı satırda sayı bazı satırda metin olması bu üç yüzeyi de sessizce bozar.',
+    // Anahtar alan|marka bazında — gerekçesi yukarıdaki `spec-unit` ile aynı.
+    sql: `select k.key, b.name as brand, count(*)::int as n,
+                 (array_agg(p.technical_specs->>k.key order by p.sku))[1] as sample_value,
+                 (array_agg(p.sku order by p.sku))[1] as sample_sku
+          from public.products p
+          join public.product_families f on f.id = p.family_id
+          join public.brands b on b.id = f.brand_id
+          cross join lateral jsonb_object_keys(p.technical_specs) k(key)
+          where p.deleted_at is null
+            and p.technical_specs is not null
+            and k.key ~ '_(v|m3h|w|pa|kg|mm|a|ls|pct|c|l|ms|hz|db|kw|24h)$'
+            and (p.technical_specs->>k.key) is not null
+            and (p.technical_specs->>k.key) <> ''
+            and (p.technical_specs->>k.key) !~ '^[0-9]+(\\.[0-9]+)?$'
+          group by k.key, b.name`,
+    key: (r) => `spec-type:${r.key}|${r.brand}`,
+    detail: (r) => `${r.n} kayıt · ör. "${r.sample_value}" (${r.sample_sku}) — sayı değil`,
+  },
+  {
+    id: 'slug-unresolved',
+    title: 'Kaynak koda gömülü kategori slug\'ı canlı taksonomide çözülmüyor',
+    why: 'Vitrindeki bazı kategori bağlantıları ve bölüm koşulları DB\'den değil, koda yazılmış sabit dizeden kurulur. Böyle bir dize hiçbir kategoriye karşılık gelmediğinde ne tip hatası ne kırmızı test doğar: bağlantı kullanıcıyı boş sayfaya götürür, koşul hiç açılmaz ve kodu okuyan "bu bölüm var" sanır. Kusur tek tek satırlarda değil, sabit slug yazılabilmesinde ve doğruluğunun HİÇ ölçülmemesinde.',
+    // SQL DEĞİL, KAYNAK TARAR: bu yüzden `sql` yerine `collect` taşır (koşucu ikisini de bilir).
+    collect: async (client) => {
+      const { rows: catRows } = await client.query(
+        `select slug,
+                metadata->'slug'->>'tr' as tr_slug,
+                metadata->'slug'->>'en' as en_slug
+         from public.categories`,
+      )
+      const cozulur = new Set()
+      for (const r of catRows) for (const s of [r.slug, r.tr_slug, r.en_slug]) if (s) cozulur.add(s)
+
+      // Kapının kendi ön koşulu: taksonomi boş dönerse HER literal "çözülmüyor" görünür ve kapı
+      // toptan yanlış-kırmızı verir. Ölçemeyen kapı ne yeşil ne kırmızı demeli — ölçülemedi demeli.
+      if (cozulur.size === 0) {
+        throw new Error('slug-unresolved: categories tablosu BOS dondu — taksonomi okunamadi, OLCULEMEDI')
+      }
+
+      return scanSourceSlugLiterals()
+        .filter((b) => !cozulur.has(b.slug))
+        .map((b) => ({ ...b, taksonomi_boyutu: cozulur.size }))
+    },
+    key: (r) => `slug-unresolved:${r.file}|${r.slug}`,
+    detail: (r) => `${r.file}:${r.line} — "${r.slug}" (${r.pattern}); canli taksonomide ${r.taksonomi_boyutu} slug var, bu yok`,
+  },
 ]
+
+/**
+ * `src/` altında KATEGORİ slug'ı olduğu KESİN olan sabit dizeleri toplar.
+ *
+ * Desenler bilerek DAR: yalnız kategori rotası kuran ve kategori slug'ı karşılaştıran biçimler.
+ * `.includes('...')` gibi parça eşleşmeleri ve ürün/marka/aile slug'ları KAPSAM DIŞI — geniş bir
+ * tarama, kategori olmayan dizeleri "çözülmedi" diye kırmızıya çevirir, kapı gürültüye boğulur ve
+ * kapatılır. Dar kapı, kapatılan kapıdan iyidir.
+ *
+ * Testler HARİÇ: test dosyaları KASTEN var olmayan slug taşır (sabotaj fikstürleri, kayıtlı
+ * karar-bekleyenler). Onları saymak, kapıyı kendi kanıtıyla çelişkiye düşürürdü.
+ */
+function scanSourceSlugLiterals() {
+  const SRC = path.join(REPO_KOK, 'src')
+  const DESENLER = [
+    { ad: "Routes.category('X')", re: /Routes\.category\(\s*'([a-z0-9-]+)'/g , ornek: "Routes.category('kanarya-slug')"},
+    // Ilk argumanda IC ICE CAGRI olmamali. `Routes.category(getLocalizedCategorySlug(cat, 'tr'))`
+    // gibi bir ifadede eski desen ic fonksiyonun DIL argumanini ('tr') alt-slug saniyordu —
+    // sitemap.ts iki yanlis-kirmizi uretti. Ilk argumani tanimlayici/uye ifadesiyle sinirlamak
+    // `Routes.category(categoryUrlSlug, 'elektrikli-isitici')` gercek isabetini korur.
+    { ad: "Routes.category(_, 'X')", re: /Routes\.category\(\s*(?:'[a-z0-9-]+'|[A-Za-z_$][\w$.]*)\s*,\s*'([a-z0-9-]+)'/g , ornek: "Routes.category(ustSlug, 'kanarya-slug')"},
+    // Alici ADIYLA sinirli: `b.slug === 'nicotra-gebhardt'` bir MARKA slug'idir ve genel
+    // `.slug === 'X'` deseni onu kategori sanip yanlis-kirmizi uretmisti. Ayni alan adi farkli
+    // varliklarda yasiyor; kapi hangi varligi olctugunu bilmek zorunda.
+    { ad: "category.slug === 'X'", re: /(?:category|subCategory|mainCategory|subcategory)\.slug\s*===\s*'([a-z0-9-]+)'/g , ornek: "category.slug === 'kanarya-slug'"},
+    { ad: "categorySlug: 'X'", re: /\bcategorySlug\s*:\s*'([a-z0-9-]+)'/g , ornek: "categorySlug: 'kanarya-slug'"},
+    { ad: "subSlug: 'X'", re: /\bsubSlug\s*:\s*'([a-z0-9-]+)'/g , ornek: "subSlug: 'kanarya-slug'"},
+  ]
+
+  // ── DESEN KANARYASI ────────────────────────────────────────────────────────
+  // Her desen, tanidigini iddia ettigi bicimi GERCEKTEN taniyor mu? Bu blok bir
+  // paranoya degil, yasanmis bir kusurun panzehiri: 2026-08-23'te desenlerden birinin
+  // basina gorunmez bir BACKSPACE (U+0008) karakteri sizdi (kabuk \b kacisini yedi).
+  // Regex sorunsuz derlendi, .source ekranda DOGRU gorundu, ve HICBIR SEYLE eslesmedi.
+  // Kapi yesil donuyordu; oysa o desen kordu ve iki gercek ihlali hic gormuyordu.
+  // Kor desen, olmayan desenden TEHLIKELIDIR: varligi guvence sanilir.
+  for (const desen of DESENLER) {
+    const eslesme = desen.ornek.match(desen.re)
+    desen.re.lastIndex = 0
+    if (!eslesme) {
+      throw new Error(
+        `slug-unresolved: "${desen.ad}" deseni KENDI ORNEGINI tanimiyor — desen bozuk, tarama KOR. ` +
+        `ornek: ${desen.ornek} · desen: ${desen.re.source}`,
+      )
+    }
+  }
+
+  const bulgular = []
+  const gez = (dizin) => {
+    for (const girdi of fs.readdirSync(dizin, { withFileTypes: true })) {
+      const tam = path.join(dizin, girdi.name)
+      if (girdi.isDirectory()) {
+        if (girdi.name === '__tests__' || girdi.name === 'node_modules') continue
+        gez(tam)
+        continue
+      }
+      if (!/\.tsx?$/.test(girdi.name) || /\.test\.tsx?$/.test(girdi.name)) continue
+      const icerik = fs.readFileSync(tam, 'utf8')
+      const goreli = path.relative(REPO_KOK, tam).replace(/\\/g, '/')
+      for (const desen of DESENLER) {
+        for (const eslesme of icerik.matchAll(desen.re)) {
+          const satir = icerik.slice(0, eslesme.index).split('\n').length
+          bulgular.push({ file: goreli, line: satir, slug: eslesme[1], pattern: desen.ad })
+        }
+      }
+    }
+  }
+  gez(SRC)
+  return bulgular
+}
 
 /**
  * TLS ayarı — doğrulama DAİMA açık.
@@ -144,7 +363,11 @@ async function collectFromDatabase(connectionString) {
   const found = new Map()
   try {
     for (const check of CHECKS) {
-      const { rows } = await client.query(check.sql)
+      // Iki tur kontrol var: `sql` tasiyanlar dogrudan sorgulanir, `collect` tasiyanlar kendi
+      // olcumunu yapar (or. kaynak kodu tarayip DB ile karsilastiran `slug-unresolved`).
+      const rows = await (check.collect
+        ? check.collect(client)
+        : client.query(check.sql).then((r) => r.rows))
       for (const row of rows) found.set(check.key(row), { check, detail: check.detail(row) })
     }
   } finally {

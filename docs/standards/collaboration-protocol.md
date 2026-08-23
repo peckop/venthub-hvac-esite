@@ -128,6 +128,16 @@ iş/brief → Worker üretir → push → DURUR
   worker **kendi izole dalında** (master değil) + **master-merge yetkisi worker'da DEĞİL** (branch protection) +
   Controller gate'i geçmeden master'a hiçbir şey girmez + girdiyse **revert**. Yani "durmaması" felaket değil, sadece gürültü.
 
+### 2.1 YÖNTEM satırı — iş emrinde görünür yürütme kararı (T144-VH, 2026-08-21)
+
+Her iş emrinde **KAYNAK/CETVEL** bloğunun yanında bir **`YÖNTEM:`** satırı bulunur: önerilen yürütme
+yöntemi (şerit / alt-ajan ×N / Workflow / maestro / agy-orchestrate / tekil skill / elle) + bir cümle
+gerekçe. Karar tablosu → `execution-method-standard.md`. **Satır öneridir, dayatma değil:** şerit
+sahibi ölçüp başka yöntem seçebilir, ama sapmayı işbaşı/pano notuna *"YÖNTEM: X yerine Y, çünkü …"*
+diye yazar. Yazılmamış yöntem = eksik emir; yazılmamış sapma = hata. (Niçin: 08-21'e kadar yöntem
+seçimi hiçbir yerde yazılı değildi ve varsayılan hep "elle yap" oldu; Workflow gibi araçlar kullanıcı
+opt-in'i ister, cümle emirde yoksa kilitli kalır.)
+
 ---
 
 ## 3. Deterministik Kapı (şerit-sahibi Controller vurur)
