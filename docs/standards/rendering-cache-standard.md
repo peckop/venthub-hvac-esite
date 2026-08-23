@@ -54,24 +54,33 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 
 | Tablo | Tetik | Handler | Ne tazelenir |
 |---|---|---|---|
-| `products` | `on_products_change` | var | **aile** PDP yolu + (alan-duyarlı) keşif tag'leri |
+| `products` | `on_products_change` | var | **aile** PDP yolu + (varsa) **ailenin SERİSİ** + (alan-duyarlı) keşif tag'leri |
 | `categories` | `on_categories_change` | var | kategori yolları |
-| `inventory_movements` | `on_inventory_movements_change` | var | **aile** PDP yolu + kategori yolu (**keşif'e dokunmaz** — PS-042) |
-| `product_families` | `on_product_families_change` | var | aile PDP yolu + keşif tag'leri |
-| `product_prices` | `on_product_prices_ins_del` + `on_product_prices_upd` (`WHEN`) | var | **yalnız** o ürünün aile PDP yolu — keşif tag'lerine DOKUNMAZ (PS-042) |
-| `product_images` | `on_product_images_change` | var | **aile** PDP yolu + keşif tag'leri + `/sitemap.xml` — ⚠️ tablo bugün **0 satır**; zincir T069 görsel yüklemesinden ÖNCE yerinde olmalı (sonra kurulursa görseller girer, hiçbir sayfa tazelenmez) |
+| `inventory_movements` | `on_inventory_movements_change` | var | **aile** PDP yolu + (varsa) **ailenin SERİSİ** + kategori yolu (**keşif'e dokunmaz** — PS-042) |
+| `product_families` | `on_product_families_change` | var | aile PDP yolu + keşif tag'leri + (bu satır MODEL ise) **üstündeki SERİ** PDP yolu/tag'i |
+| `product_prices` | `on_product_prices_ins_del` + `on_product_prices_upd` (`WHEN`) | var | **yalnız** o ürünün aile PDP yolu + (varsa) **ailenin SERİSİ** — keşif tag'lerine DOKUNMAZ (PS-042) |
+| `product_images` | `on_product_images_change` | var | **aile** PDP yolu + (varsa) **ailenin SERİSİ** + keşif tag'leri + `/sitemap.xml` — ⚠️ tablo bugün **0 satır**; zincir T069 görsel yüklemesinden ÖNCE yerinde olmalı (sonra kurulursa görseller girer, hiçbir sayfa tazelenmez) |
 | `brands` | `on_brands_change` | var | markanın **tüm ailelerinin** PDP yolları + keşif tag'leri |
 | `price_lists` | `on_price_lists_change` | var | **tüm** ailelerin PDP yolları — keşif'e DOKUNMAZ (fiyat yalnız PDP'de görünür, `product_prices` ile aynı gerekçe). ⚠️ **FAN-OUT SINIRI:** aile sayısı kadar yol tazelenir (ölçüm 2026-08-17: **32 aile → 64 çağrı**). Birkaç yüz aileye çıkıldığında tag tabanlı çözüme geçilmeli — sınır burada **sayıyla** yazılı ki sessizce yavaşlamasın |
 
 > **PDP AİLE KANONİKTİR** (`/[lang]/products/[family-slug]`). Yol tazelenirken **ürün** slug'ı
 > kullanmak sessiz bir kaçaktır: prerender edilmiş yol aile slug'ı olduğu için var olmayan bir
 > yol geçersiz kılınır ve sayfa hiç yenilenmez. `products` ve `inventory_movements` dalları tam
-> bunu yapıyordu (2026-08-15 denetimi yakaladı); üçü de artık tek yardımcıdan (`familySlugById`)
-> çözüyor.
+> bunu yapıyordu (2026-08-15 denetimi yakaladı); dört dal (`products`/`inventory_movements`/
+> `product_prices`/`product_images`) artık tek yardımcıdan (`revalidateFamilyChain`) çözüyor.
 >
 > **`revalidateTag` yalnız o tag'i tüketen bir `unstable_cache` varsa iş görür.** `familyTag`'in
 > tüketicisi yoktu → çağrı sessiz no-op'tu. PDP verisi `React.cache()` ile sarılı olduğundan
 > PDP için etkili olan **`revalidatePath`**'tir.
+>
+> **T138-VH K6 (2026-08-21) — SERİ↔MODEL fan-out.** `product_families.parent_family_id` (`NULL`
+> = seri/landing, `NOT NULL` = model/kart+PDP) prod'a girdikten sonra bir MODEL değiştiğinde İKİ
+> sayfa bayatlar: modelin kendi PDP'si VE üstündeki SERİ landing'i (seri sayfası model kartını
+> basıyor). `route.ts`'teki `walkFamilyChain`/`revalidateFamilyChain` bu zinciri yürür — hiyerarşi
+> DB'de tek seviyeli garantilense de (`product_families_single_level_guard` tetiği) route buna
+> KÖR, bu yüzden savunma amaçlı `MAX_FAMILY_CHAIN_HOPS` üst sınırı + döngü koruması vardır. Sınır
+> aşılırsa SESSİZCE KIRPILMAZ: `console.error` + yanıt gövdesinde `fanoutTruncated: true`.
+> Kapı: `route.tags.test.ts` içindeki `K6-a`/`K6-a2`/`K6-b`/`K6-c` testleri (sabotajla kanıtlandı).
 
 Tetik fonksiyonu `public.handle_supabase_webhook()` jeneriktir (`TG_TABLE_NAME` ile tabloyu
 kendi okur) — yeni tablo eklemek yalnız `create trigger` demektir.

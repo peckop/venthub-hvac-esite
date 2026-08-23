@@ -65,9 +65,26 @@ const others = hepsi.filter(c => c.sid !== sid)
 // SESSİZLİK KURALINA EK (T085-VH): şerit almamış TAZE oturum, pano boş olsa bile loop
 // hatırlatmasını almalı — Recep'in sabah "günaydın" yazıp başka hiçbir şey yazmaması için
 // komutu İNSAN değil bu kanca taşıyor. Şerit alınınca hatırlatma kendiliğinden kapanır.
-if (others.length === 0 && notes.length === 0 && seritAldiMi) process.exit(0)
+
+// MEKANIZMA SATIRI (T115-VH) — sessizlik kuralindan ONCE olculur ve ONA TABI DEGILDIR.
+// Nicin: 2026-08-20 sabahi dort oturum panoya sagir kaldi ve sagirlik SESSIZ oldugu icin
+// hicbir satir uretmedi. Sessizligi "sakin gun" sanan bir brifing, tam da olcmesi gereken
+// arizayi susarak gecirir. Gozcu kanitli DEGILSE bu satir HER TURDA basilir.
+let mekanizmaSatiri = null
+try {
+  const durum = board.gozcuDurumu ? board.gozcuDurumu(sid, Date.now()) : 'KANITSIZ'
+  if (durum !== 'CANLI') {
+    mekanizmaSatiri =
+      'MEKANIZMA: gozcun KANITLANMADI (' + durum + '). Panoyu okudugun kanitli degil — adresli ' +
+      'emir sana ULASMAYABILIR. Kur ve KANITLA: node scripts/board/mechanism-setup.cjs plan ' +
+      '--sid ' + sid + ' --serit <SERIT>  (sonra: prob, dogrula)'
+  }
+} catch { /* olcum aracinin kendisi patlarsa brifing yine aksin (fail-open) */ }
+
+if (others.length === 0 && notes.length === 0 && seritAldiMi && !mekanizmaSatiri) process.exit(0)
 
 const lines = []
+if (mekanizmaSatiri) lines.push(mekanizmaSatiri)
 if (others.length > 0) {
   lines.push('PANO: ' + others.map(c => {
     const bayat = c.bayat ? ` ⚠BAYAT ${c.yasDk}dk atış yok, bırakılmadı` : ''
@@ -81,6 +98,9 @@ if (!seritAldiMi) {
     '(dakika 0/30 dışı). Şerit talep edince bu satır kendiliğinden susar.',
   )
 }
+// YÖNTEM işareti (T144-VH): yalnız pano konuştuğunda (sessizlik kuralına tabi) tek satır —
+// ajan kafasını panoya çevirdiğinde cetvelin yerini görsün; tam metin SessionStart'ta.
+lines.push('YÖNTEM: emirde YÖNTEM: satırı (öneri; sapmayı yaz) — cetvel docs/standards/execution-method-standard.md')
 if (notes.length > 0) {
   lines.push('NOT: ' + notes.map(n => `${String(n.sid).slice(0, 8)}→${n.to || 'herkes'} "${n.text}"`).join(' | '))
   try { board.markSeen(sid, notes) } catch { /* işaretlenemedi: not tekrar gelir, zararsız */ }
