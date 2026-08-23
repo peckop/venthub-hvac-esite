@@ -78,8 +78,26 @@ sessizce düşer). Hafızaya yazan, girdi saymaz **bayt ölçer**.
 4. **Gürültü kapağı:** Faz 2'de dört olay dışında hiçbir Orion olayı panoya düşmez
    (sabotaj: task-completed yayını eklenir → sınav KIRMIZI).
 
+## 4.5 Nöbetçi — oturum-dışı sessizlik dedektörü (AUTH fikri, 2026-08-23)
+
+**Yapısal boşluk (üç şeritte aynı gün ölçüldü):** üçlü mekanizmanın üç ayağı da oturuma
+bağlı; oturum ölünce üçü birden gider ve **"oturumun kendisi öldü" olayını görebilen hiçbir
+katman yok** — bugün bunu sistem değil Recep fark etti.
+
+**Çözüm — iki adım, ucuz olan önce:**
+- **Adım 1 (NÖBETÇİ):** Windows Görev Zamanlayıcı'ya bağlı, diske kayıtlı küçük betik.
+  YALNIZ ÖLÇER ve HABER VERİR: panoyu okur, "X şeridi N dakikadır atış yapmıyor VE claim'i
+  PARK değil" gerçeğini panoya yazar / Recep'e bildirir. Oturum başlatmaz, kota yakmaz,
+  geri alınamaz hiçbir şey yapmaz. **Önkoşul: Faz 0'ın PARK durumu** — nöbetçi "sessiz ama
+  park" ile "sessiz ve sahipsiz"i ancak pano bu durumu taşıyorsa ayırt eder.
+- **Adım 2 (UYANDIRICI, varsayılan KAPALI):** başsız oturum başlatma (`claude -p`).
+  **Doğrulanmamış varsayım** — kurulmadan önce bir kez gerçekten koşulup kanıtlanır;
+  ayrıca dışarıdan oturum başlatmak görünmez kota yakar → **yalnız Recep açıkça isterse.**
+- **Nöbetçinin kendi canlılık kanıtı:** kendi nabzını panoya yazar; N dakikadır yazmıyorsa
+  o da sinyaldir ("her şey öldüğünde çalışan" bileşen sessizce ölürse kimse fark etmez).
+
 ## 5. Uygulama sırası
 
 T011 (faz kapısı, ORION) → **K2** (MCP stabil kopya + restart, OPS) → venthub roadmap
 kurulumu (OPS) → **Faz 1 köprü** (ORION iş emri) → **Faz 0** pano işleri (ALTYAPI, uyanınca)
-→ bir hafta gözlem → **Faz 2**.
+→ **Nöbetçi Adım 1** (Faz 0 sonrası; sahip ALTYAPI/OPS) → bir hafta gözlem → **Faz 2**.
