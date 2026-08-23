@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider'
+import { hazirlaUrunSatirlari, type KategoriSecenegi } from '@/lib/admin/csvProductMapping'
 import { splitByExistingSku } from '@/lib/data/csvImportGuard'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
@@ -8,13 +9,8 @@ import type { Database } from '../../../types/database.types'
 import { adminButtonPrimaryClass, adminButtonSecondaryClass, adminCardClass } from '../../../utils/adminUi'
 
 
-interface CategoryOpt {
-    id: string
-    name: string
-}
-
 interface ProductCsvImportProps {
-    categories: CategoryOpt[]
+    categories: KategoriSecenegi[]
     onSuccess: () => void
 }
 
@@ -92,32 +88,35 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
         }
 
         setIsProcessing(true)
-        const mapCategorySlugToId = (slug: string) => {
-            const s = (slug || '').toLowerCase().trim()
-            const found = categories.find(c => c.name.toLowerCase() === s)
-            return found?.id || null
-        }
+        /**
+         * Eşleme ve satır hazırlama SAF modülde (src/lib/admin/csvProductMapping.ts).
+         *
+         * NİÇİN TAŞINDI: burada, bir tıklama işleyicisinin gövdesinde yaşarken davranışı
+         * hiçbir kapı ölçemiyordu — kapı ancak dosyada geçen kelimelere bakabiliyordu.
+         * Nitekim ilk yazdığım kapı tam bu yüzden kör kaldı: reddetme dalını silen sabotaj
+         * kelimeler yerinde durduğu için YEŞİL geçti. Saf hâlde sabotaj davranışı bozar.
+         *
+         * SÖZLEŞME: kategori değeri var ama canlı DB'de karşılığı yoksa satır payloads'a
+         * GİRMEZ, reddedilen'e düşer (ERR_SLUG_NOT_IN_DB — sessiz null YOK).
+         */
+        const { payloads, reddedilen } = hazirlaUrunSatirlari(importRows, categories)
 
-        const payloads: Database['public']['Tables']['products']['Insert'][] = []
-
-        for (const r of importRows) {
-            if (!r['sku'] || !r['name']) continue
-            const p: Database['public']['Tables']['products']['Insert'] = {
-                sku: r['sku'].trim(),
-                name: r['name'].trim(),
-                slug: r['name'].trim().toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
-                brand: r['brand']?.trim() || 'Generic' 
-            }
-            if (r['model_code']) p.model_code = r['model_code'].trim()
-            else if (r['model']) p.model_code = r['model'].trim()
-            if (r['brand']) p.brand = r['brand'].trim()
-            if (r['status']) p.status = (r['status'].trim() as Database['public']['Tables']['products']['Insert']['status'])
-            if (r['price']) p.price = Number(r['price'])
-            if (r['stock_qty']) p.stock_qty = Number(r['stock_qty'])
-            if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
-            if (r['category_id']) p.category_id = r['category_id'] || null
-            else if (r['category_slug'] || r['category']) p.category_id = mapCategorySlugToId(r['category_slug'] || r['category'])
-            payloads.push(p)
+        /* Kategorisi çözülemeyen satır varsa YAZIM YAPILMAZ. Kısmi yazım burada en kötü
+         * seçenek olurdu: dosyanın bir kısmı içeri girer, geri kalanı girmez ve kullanıcı
+         * hangi hâlde olduğunu bilemez. Karar kullanıcıya gider — CSV düzeltilip yeniden
+         * yüklenir (bilinmeyen SKU korumasının kalıbıyla aynı). */
+        if (reddedilen.length > 0) {
+            const ornekler = [...new Set(reddedilen.map(x => x.deger))].slice(0, 5).join(', ')
+            setNotice({
+                tone: 'error',
+                text: [
+                    t('admin.products.import.unknownCategoryTitle', { count: reddedilen.length }),
+                    t('admin.products.import.unknownCategoryHelp'),
+                    t('admin.products.import.unknownCategoryExamples', { skus: ornekler }),
+                ].join(' ')
+            })
+            setIsProcessing(false)
+            return
         }
 
         if (payloads.length === 0) {
