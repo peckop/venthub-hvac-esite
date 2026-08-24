@@ -467,6 +467,46 @@ ucu ya da kimlikli bir izleyici gerekir. **Ürün kararı — Recep'te.**
 
 ---
 
+### 3.12 Paylaşılan girdiye dokunan değişiklik, prod'u **master'a karşı ölçmeden** inmez
+
+`supabase/config.toml` ve `supabase/functions/_shared/**` **paylaşılan girdilerdir**: biri
+değişince `scripts/edge/select-functions.mjs` **tüm** uçları seçer ve merge 27+ fonksiyonu
+yeniden dağıtır. Ölçüldü (2026-08-23, #794'ün dosya listesi seçiciye verildi): **28 fonksiyon
+seçildi.**
+
+Toplu yeniden dağıtım, prod'da master'dan **sapmış** bir uç varsa onu **sessizce ezer**.
+Bu deponun bu bedeli ödediği kayıtlı: 19 fonksiyon aylarca donmuş kaldı, repoda kapatılmış
+dört kimlik-doğrulamasız açık prod'da CANLI kaldı; ters yönde de bir fonksiyonun repo sürümü
+prod'dakinden fakirdi ve körlemesine deploy **regresyon** olurdu.
+
+**KURAL:** paylaşılan girdiye dokunan her PR'da CI, prod'u **master'a karşı** ölçer
+(`scripts/edge/drift-check.mjs`). Sapma varsa iş **KIRMIZI**, merge durur; bulgu panoya
+yazılır ve kararı Recep verir (ezmek mi, önce prod'u incelemek mi).
+
+**Niçin dağıtım işindeki sapma dedektörü YETMEZ.** `deploy-functions.yml` içindeki drift işi
+`needs: [deploy]` ile tanımlıdır — prod **zaten ezildikten sonra** koşar. Orada yeşil olması
+kaçınılmazdır; ölçtüğü şey *"dağıtım eksiksiz oturdu mu"*, *"önceden sapma var mıydı"* değil.
+İkincisi yalnız merge'den **önce** sorulabilir ve cevabı merge'den sonra **artık ölçülemez**.
+(2026-08-23'te tam bu yaşandı: #794 merge edildikten sonra istenen sapma ölçümü geçersizleşti;
+kurtaran şey 04:53'teki **dağıtımsız** zamanlanmış koşumdu — 27/27, sapma 0 — yani şanstı.)
+
+**Niçin BEYAN değil ÖLÇÜM.** İlk tarif *"PR gövdesinde `DRIFT:` bloğu bulunsun; rapor 24
+saatten eskiyse tazele"* idi ve iki kusuru vardı: (1) gövdede bir kelimenin bulunması raporun
+okunduğunu da doğru olduğunu da kanıtlamaz — **beyan mekanizma değildir**; (2) *"24 saat"*
+**zamanla kayan** bir ölçüdür, aynı kanıt on dakika sonra geçersiz sayılır. Kapı ölçümü PR
+anında yaptığı için tazelik sorusu ortadan kalkar.
+
+**İnce nokta — niçin `ref: master`.** `drift-check.mjs` prod'u **çalışma ağacıyla**
+karşılaştırır. PR dalında koşarsa PR'ın kendi değişikliği "sapma" görünür ve **yanlış kırmızı**
+verir. Bu yüzden checkout PR head'ine değil master'a yapılır: sorulan soru *"prod şu an master
+ile aynı mı"* — PR'ın içeriğinden bağımsız.
+
+**Sır yoksa ATLANIR, yeşil DÖNMEZ.** Fork PR'ında `SUPABASE_ACCESS_TOKEN`/`PROJECT_REF`
+bulunmaz; ön-yoklama işi kapıyı atlatır ve `::warning` basar. **Atlanmış iş başarılı değildir.**
+
+Uygulama: `.github/workflows/edge-shared-input-drift.yml` · kapı: `INV-EDGE-DRIFT-1`
+(bağlanma testi: `src/__tests__/conformance/edge-shared-input-drift.test.ts`).
+
 ## 4. Doğrulama — kaynağa bakarak değil, **ÇAĞIRARAK**
 
 **KURAL.** Bir fonksiyonun güvenli olduğu, kodunu okuyarak değil **prod'a istek atarak** kanıtlanır.
@@ -523,6 +563,7 @@ sonra R7/R8/R9/R10/R11 de tek tek bozuldu — R10 hem **yeni-ihlal** hem **bayat
 | **E12-C** | §3.9 `tenant_id` **sıralaması** | tüm edge kaynakları | doğrulanmamış `tenant_id` okuması `getUser()`'dan **önce** (ya da `getUser` hiç yok) | **CANLI — R11-C** (baseline BOŞ, T026-VH ile kapandı) |
 | **E12-B** | §3.9 **yapısal kilit** | `_shared/tenant*.ts` | dosya `Request`/`req.`/`headers.get`/`searchParams`/`atob(` içeriyor (yorum dahil) | **CANLI — R11-B** (baseline BOŞ) |
 | **E12-D** | §3.9 **sınıf (b) kapısı** | `tenantFromServiceBody` çağıran her dosya | aynı dosyada service_role karşılaştırması yok | **CANLI — R11-D** (baseline BOŞ) |
+| **E15** | §3.12 paylaşılan girdi → prod≠master | `supabase/config.toml`, `functions/_shared/**` dokunan PR | `drift-check.mjs` **master checkout'uyla** sapma > 0 | **CANLI — INV-EDGE-DRIFT-1** (2026-08-23; ölçülen süre 27 fn / 11 sn) |
 
 > **E12 niçin üçe bölündü (2026-08-15).** Tek kural sıralamaya bakıyordu ve T026'daki
 > gerçek açığı **göremedi**: `_shared/tenant_config.ts` modülü `?tenant_id=` okuyordu,
