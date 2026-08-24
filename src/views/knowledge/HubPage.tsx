@@ -8,6 +8,7 @@ import React, { useMemo,useState } from 'react'
 
 import Seo from '../../components/Seo'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes';
+import { foldForSearch } from '../../i18n/case'
 import { useI18n } from '../../i18n/I18nProvider'
 
 
@@ -22,7 +23,7 @@ const TAGS: { key: TopicSlug | 'all'; labelKey: string }[] = [
 ]
 
 const HubPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const Routes = useLocalizedRoutes()
   const [q, setQ] = useState('')
   const [activeTag, setActiveTag] = useState<TopicSlug | 'all'>('all')
@@ -39,13 +40,13 @@ const HubPage: React.FC = () => {
   }), [t])
 
   const filtered = useMemo(() => {
-    const text = q.trim().toLowerCase()
+    const text = foldForSearch(q.trim(), lang)
     return topics.filter((tpc) => {
-      const matchesText = !text || `${tpc.title} ${tpc.summary}`.toLowerCase().includes(text)
+      const matchesText = !text || foldForSearch(`${tpc.title} ${tpc.summary}`, lang).includes(text)
       const matchesTag = activeTag === 'all' || tpc.slug === activeTag
       return matchesText && matchesTag
     })
-  }, [q, topics, activeTag])
+  }, [q, topics, activeTag, lang])
 
   return (
     <div className="min-h-screen bg-white">

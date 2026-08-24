@@ -106,6 +106,8 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 - `CONTEXT.md` — uçtan uca kapsamlı referans (mimari, DB, akışlar, kurallar). **İlk buraya bak.**
 - `docs/README.md` — doküman sistemi haritası ("hangi soru → hangi dosya"). `docs/standards/` = cetveller (admin/bayi standartları, blueprint), `docs/audits/` = ölçümler, `docs/plans/` = roadmap.
 - `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` — canlı "neredeyiz" + **şerit panosu**.
+- `docs/standards/execution-method-standard.md` — **iş hangi yöntemle koşar** (şerit / alt-ajan / Workflow / maestro /
+  skill / elle): karar tablosu + emirde `YÖNTEM:` satırı (öneri; sapma yazılır). Yöntemsiz emir eksik emirdir.
 - `docs/standards/rendering-cache-standard.md` — **hangi sayfa nasıl üretilir, veri değişince ne
   tazelenir, fiyat hangi yüzeyde görünür.** Statik vitrin sayfasında görünen HER tablonun DB tetiği +
   webhook handler dalı olmalı (yoksa veri değişir, sayfa değişmez ve hiçbir test görmez).

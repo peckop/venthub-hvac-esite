@@ -1,6 +1,6 @@
 import { cache } from 'react'
 
-import { getFamilyDetail } from '@/lib/services/family.service'
+import { getFamilyDetail, getSeriesLanding } from '@/lib/services/family.service'
 import { getProductBySlug } from '@/lib/services/product.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 
@@ -15,14 +15,35 @@ export const getCachedProductBySlug = cache(async (slug: string) => {
 /**
  * F5-B W2.2 — PDP kanonik çözümü: AİLE detayı (aile + aktif varyantlar).
  * RSC ağacında generateMetadata + Page aynı veriyi ister; React.cache tekilleştirir.
+ *
+ * T138 K1: bu sarmalayıcı hatayı YUTAR (null döner) ve bu, metadata için doğrudur —
+ * başlık üretilemedi diye sayfa patlamamalı. Ama ROTA KARARI için yanlıştır: yutulmuş
+ * hata "aile yok" gibi görünür ve zincirin sonunda 404'e dönüşür; yani geçici bir RPC
+ * arızası kalıcı bir yokluk beyanı üretir. Rota katmanı bu yüzden `fetchFamilyDetail`i
+ * (fırlatan sürüm) kullanır — aynı React.cache anahtarı, tek RPC çağrısı.
  */
+const fetchFamilyDetail = cache(async (slug: string, lang: string) => {
+  return getFamilyDetail(supabase, slug, lang)
+})
+
 export const getCachedFamilyDetail = cache(async (slug: string, lang: string) => {
   try {
-    return await getFamilyDetail(supabase, slug, lang)
+    return await fetchFamilyDetail(slug, lang)
   } catch (e) {
     console.warn('getCachedFamilyDetail error:', e)
     return null
   }
+})
+
+/** Rota zinciri için: hata YUTULMAZ (bkz. `productRoute.ts` → `unavailable`). */
+export const getFamilyDetailForRoute = fetchFamilyDetail
+
+/**
+ * T138 K1 — seri landing verisi (seri + model kartları). Hata yutulmaz;
+ * `resolveProductRoute` onu `unavailable` sınıfına çevirir.
+ */
+export const getCachedSeriesLanding = cache(async (slug: string) => {
+  return getSeriesLanding(supabase, slug)
 })
 
 /**

@@ -12,6 +12,7 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import Iyzipay from "npm:iyzipay";
 import { tenantFromRow } from '../_shared/tenant.ts'
 import { buildAllowedOrigins, isAllowedRedirectTarget, normalizeOrigin } from '../_shared/origins.ts'
+import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 
 // Minimal types to avoid `any` while keeping integration flexible
 type CheckoutRetrieveResponse = {
@@ -171,12 +172,16 @@ Deno.serve(async (req) => {
     // Kardeşleri env'den okuyor (iyzico-payment:232, iyzico-refund:53) — yalnız callback sabitti.
     // Etki: prod anahtarları konulduğu an ödeme PROD'da başlar ama callback retrieve'i
     // SANDBOX'a sorar → para çekilir, sipariş DOĞRULANAMAZ. Aynı desene çekildi.
-    const baseUrl = Deno.env.get("IYZICO_BASE_URL") || "https://sandbox-api.iyzipay.com";
+    // T100-VH: yukaridaki T022-VH yorumu tehlikeyi ADIYLA anlatiyor ama o duzeltme sabit-kodu
+    // env'e tasirken SANDBOX VARSAYILANINI korumustu — sinif kapanmamis, yer degistirmisti.
+    // Simdi adres de asagidaki fail-CLOSED bloga KATILIYOR: dort deger neyse, adres de o.
+    // Ayri bir kontrol icat edilmiyor; ayni blok, ayni bicim, ayni cevap.
+    const iyzicoCfg = resolveIyzicoBase({ IYZICO_BASE_URL: Deno.env.get("IYZICO_BASE_URL") });
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
-    if (!apiKey || !secretKey || !supabaseUrl || !serviceRoleKey) {
+    if (!apiKey || !secretKey || !supabaseUrl || !serviceRoleKey || !iyzicoCfg) {
       return new Response(
         JSON.stringify({
           error: { code: "CONFIG_ERROR", message: "Environment değişkenleri eksik" },
@@ -194,6 +199,7 @@ Deno.serve(async (req) => {
       };
     };
     const IyziCb = Iyzipay as unknown as IyziCtorCb;
+    const baseUrl = iyzicoCfg.base;
     const sdk = new IyziCb({ apiKey, secretKey, uri: baseUrl });
 
     const retrieveReq: { locale: string; token: string; conversationId?: string } = {
