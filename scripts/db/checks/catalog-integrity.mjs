@@ -84,6 +84,10 @@ const CHECKS = [
    * vitrinde hicbir yerden baglantisi yok. Iki gun boyunca hicbir kapi gormedi.
    * ────────────────────────────────────────────────────────────────────────── */
   {
+    // T162 (2026-08-23): SILINMIS aile sayilmaz. Bir aile kapatildiginda (deleted_at)
+    // artik canli adres uretmez; onu "urunsuz aile" diye raporlamak, TEMIZLIGIN KENDISINI
+    // ihlal gibi gosterirdi — yani kapi, kendi kuralini uygulayan isi kirmiziya dusururdu.
+    // Bugun etkisi SIFIR olcuuldu (silinmis aile sayisi 0); filtre ILERI donuk korumadir.
     id: 'family-empty',
     title: 'Dogrudan urunu olmayan aile',
     why: 'Aile URL kanonik adrestir; dogrudan urunu olmayan aile canli bir adres uretir ama gosterecek urunu yoktur. DETAY cocuk aile sayisini soyler ve bu ayrim KRITIKTIR: cocugu OLMAYAN aile olu kabuktur (silinir), cocugu OLAN aile bir hiyerarsi ebeveynidir (silinemez — silinirse alti aile sahipsiz kalir; karar tasarim isidir, temizlik degil). Bu iki hali ayni sayan bir okuma 2026-08-23 gunu yanlis silme karari uretti ve son anda durduruldu.',
@@ -91,11 +95,46 @@ const CHECKS = [
                  (select count(*) from public.products p where p.family_id = f.id and p.deleted_at is null)::int as urun,
                  (select count(*) from public.product_families c where c.parent_family_id = f.id)::int as cocuk
           from public.product_families f
-          where not exists (
-            select 1 from public.products p where p.family_id = f.id and p.deleted_at is null
-          )`,
+          where f.deleted_at is null
+            and not exists (
+              select 1 from public.products p where p.family_id = f.id and p.deleted_at is null
+            )`,
     key: (r) => `family-empty:${r.slug}`,
     detail: (r) => `"${r.name}" — dogrudan urun 0, cocuk aile ${r.cocuk} (${r.cocuk > 0 ? 'HIYERARSI EBEVEYNI: silme, tasarim karari' : 'OLU KABUK: silinebilir'})`,
+  },
+  /* ──────────────────────────────────────────────────────────────────────────
+   * T160 — KATALOG DERINLIGI (2026-08-23). Cetvel: catalog-depth-standard §K1.
+   *
+   * Kural bir tasarim tercihi degil, bir CELISKININ olcumunden dogdu: ayni
+   * katalogda, ayni hafta, ayni soruya iki farkli cevap verilmis.
+   *   · air-curtains  : 8 urun TEK ailede; aile sayfasindan disari cikan urun
+   *                     baglantisi 0 -> musteri anlatidan sepete IKI sayfada variyor.
+   *   · inline-duct-fans: ayni buyuklukteki 12 urun ALTI aileye bolunmus, ustlerinde
+   *                     dogrudan urunu olmayan bir semsiye -> UC kademe.
+   * Ayni soruya iki cevap = kuralin hic yazilmamis oldugunun kaniti.
+   *
+   * K1: derinlik IKI kademedir (kategori -> aile[tum varyantlar] -> urun adresi
+   * yalnizca satinalma ucu). Ucuncu GEZINME kademesi ancak AILE HIYERARSISIYLE
+   * dogar; bu yuzden makine kapisi tam olarak onu olcer.
+   *
+   * Bu kural katalogun COGUNLUK davranisini yaziya cevirir, yeni sey dayatmaz:
+   * 38 ailenin 37'si tek katmanli; iki katmanli olan TEK ornek 08-21'deki aile
+   * ayrismasindan kalmistir ve o gun bu olcut yaziliydi degildi.
+   * ────────────────────────────────────────────────────────────────────────── */
+  {
+    // T162: hem cocuk hem EBEVEYN icin deleted_at filtresi. Silinmis bir cocuk gezinme
+    // kademesi uretmez; ebeveyni silinmis bir cocuk ise zaten sahipsizdir (ayri sinif).
+    id: 'family-nested',
+    title: 'Aile hiyerarsisi — ailenin ust ailesi var',
+    why: 'Vitrin derinligi IKI kademedir (catalog-depth-standard §K1): kategori -> aile (tum varyantlar tek sayfada) -> urun adresi yalnizca satinalma ucu. Ucuncu bir GEZINME kademesi aile hiyerarsisiyle dogar ve musteriyi ayni urun kumesi icinde bir kez daha sayfa degistirmeye zorlar. Recep kurali: yeni sayfa YALNIZ gercek bir karar noktasinda acilir; sadece bir SAYI degisiyorsa orasi sayfa degil, ayni sayfadaki secicidir. Anahtar EBEVEYN bazindadir: kusur tek tek cocuklarda degil, hiyerarsinin KURULMUS olmasindadir.',
+    sql: `select pf.slug as parent_slug, pf.name as parent_name, count(*)::int as cocuk,
+                 (array_agg(f.slug order by f.slug))[1] as sample_child
+          from public.product_families f
+          join public.product_families pf on pf.id = f.parent_family_id
+          where f.deleted_at is null and pf.deleted_at is null
+          group by pf.slug, pf.name`,
+    key: (r) => `family-nested:${r.parent_slug}`,
+    detail: (r) => `"${r.parent_name}" altinda ${r.cocuk} cocuk aile (or. ${r.sample_child}) — ucuncu gezinme kademesi`,
   },
   {
     id: 'product-no-subcategory',

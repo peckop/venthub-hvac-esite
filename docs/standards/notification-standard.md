@@ -57,6 +57,40 @@ diye yanlış hüküm kuruldu).
 biçiminin beşini de** taramak zorundadır: istemci `invoke` · sunucu→sunucu `fetch` ·
 veritabanı tetiği · webhook · cron. Tek biçimli taramanın sıfırı, yokluğun kanıtı değildir.
 
+#### B2.1.b — DEVREDEN UÇLAR (ikinci sınıf)
+
+Yukarıdaki tablo **e-postayı kendisi gönderen** uçları sayar. Ama gönderimi başka bir uca
+**devreden** uçlar da vardır: kullanıcının gözünden bildirimi başlatan şey onlardır, ve
+sağlayıcı adına (`api.resend.com`) bakan bir ölçü onları **göremez**.
+
+Ölçüm (2026-08-23, 28 ucun tamamı okundu): **6 doğrudan gönderici + 6 devreden.**
+
+| Devreden uç | Tetiklediği gönderici | Nasıl |
+|---|---|---|
+| `admin-update-shipping` | `shipping-notification` | sunucu→sunucu `fetch` |
+| `iyzico-callback` | `order-confirmation` | sunucu→sunucu `fetch` |
+| `order-paid-webhook` | `order-confirmation` | sunucu→sunucu `fetch` |
+| `returns-webhook` | `return-status-notification` | sunucu→sunucu `fetch` |
+| `shipping-webhook` | `delivery-notification` | sunucu→sunucu `fetch` |
+| `stock-alert` | `notification-service` | sunucu→sunucu `fetch` |
+
+`iyzico-payment` de `functions/v1` çağırır ama hedefi `order-validate`'tir — bildirim akışı
+değildir, **kapsam dışıdır**.
+
+> **Zincir vardır, tek adım varsaymayın.** `stock-alert` hem devreden hem hedeftir:
+> `iyzico-callback` → `stock-alert` → `notification-service`. Bu yüzden kural ve kapı
+> **geçişli** çalışır — bir gönderici uca kaç adımda ulaşıldığı fark etmez.
+
+**Kural B2.1.b:** bir gönderici ucu — doğrudan ya da zincirleme — tetikleyen her uç, bu
+cetvelde **adıyla** geçmek zorundadır. Kapsam sağlayıcı adına değil **davranışa** bağlıdır:
+ölçü "Resend'i çağırıyor mu" değil, "bir bildirim akışını başlatıyor mu" sorusudur.
+
+> **Bilinen sınır (dürüstçe):** bu kural çağrı grafiğini **kaynak metinden** okur ve hedef
+> adının sabit metin olmasına dayanır. Bugün 28 ucun hepsinde öyledir
+> (`` `${supabaseUrl}/functions/v1/order-confirmation` `` — birleşen kısım yalnız önek).
+> Hedef adı değişkenden üretilirse tarama körleşir; bu yüzden `INV-NOTIFY-1` böyle bir
+> çağrıyı **kırmızı** sayar (§B8.1). Körlüğü sessizce yaşamak seçenek değildir.
+
 ### B2.2 — Defterler: üç tane var, ÜÇÜ AYNI SORUYU CEVAPLAMIYOR
 
 | Defter | Başarısızlık satır bırakır mı | `tenant_id` | Gönderimden ÖNCE okunuyor mu |
@@ -225,6 +259,23 @@ bu cetvelin **§B2.1 tablosunda** adıyla geçmek zorundadır.
 **Yakaladığı kusur:** yeni bir bildirim ucu eklenir, cetvele işlenmez, ve "bildirimlerimiz
 neler" sorusunun cevabı sessizce eksilir. Bugünkü kusur bunun ta kendisiydi:
 `order-confirmation` hiçbir cetvelde yazılı olmadığı için var olduğu hâlde "yok" sanıldı.
+
+**İkinci kol — DEVREDEN uçlar (2026-08-23 eklendi).** Kapının ilk sürümü kapsamı
+**sağlayıcı adına** bağlıyordu; gönderimi başka bir uca devreden bir uç bu ölçüye görünmez
+oluyordu. Kapı haklı olarak susuyordu ama cetvel "hepsi burada" diyordu — ve değildi.
+Ölçüldüğünde boşluk tek vaka değil, **sistemin yarısı** çıktı (6 gönderici, 6 devreden).
+İkinci kol §B2.1.b kuralını zorlar: bir gönderici ucu **geçişli olarak** tetikleyen her uç
+cetvelde adıyla geçmelidir. Bulgu EDGE'den geldi (`order-paid-webhook`), ölçüm I18N'de.
+
+**Üçüncü kol — körlüğün alarmı.** İkinci kol hedef adını kaynak metinden okur. Hedef
+değişkenden üretilirse tarama **sessizce** körleşir; o yüzden dinamik `functions/v1` çağrısı
+kapıyı **kırmızı** yapar. Bugün böyle bir çağrı yok (28 ucun tamamı ölçüldü) — kol, ileriye
+dönük bir alarmdır: kural kör kalacaksa bunu haber vererek kalsın.
+
+**İki taraflı kanarya:** ikinci kol, devreden uç sayısı **sıfıra düşerse de** kırmızı olur.
+Sıfır, "devreden kalmadı" değil "tarama bozuldu" demektir (geçişli kapanış çöktü ya da çağrı
+biçimi değişti). Kanaryasız bir tarama, hiçbir şey bulamadığı için değil **hiçbir yere
+bakmadığı** için yeşil olabilir.
 
 ### B8.2 — INV-NOTIFY-2 · durum kapsam tablosu tam olmalı
 
