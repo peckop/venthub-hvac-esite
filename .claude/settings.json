@@ -1,5 +1,50 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "permissions": {
+    "allow": [
+      "Bash(gh run *)",
+      "Bash(gh pr *)",
+      "Bash(gh api *)",
+      "Bash(node scripts/board/board.cjs note *)",
+      "Bash(git fetch *)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm vitest *)",
+      "Bash(pnpm type-check *)",
+      "Bash(pnpm lint)",
+      "mcp__claude_ai_Vercel__list_deployments",
+      "mcp__codegraph__codegraph_explore",
+      "mcp__github__get_file_contents",
+      "mcp__orion__orion_durum",
+      "mcp__claude_ai_Vercel__get_deployment_build_logs",
+      "mcp__orion__orion_twin",
+      "mcp__claude_ai_Vercel__list_teams",
+      "mcp__supabase__get_edge_function",
+      "mcp__github__get_pull_request",
+      "mcp__codegraph__codegraph_callers",
+      "mcp__supabase__list_edge_functions",
+      "mcp__claude_ai_Vercel__list_projects",
+      "mcp__claude_ai_Vercel__get_project",
+      "mcp__supabase__query_logs",
+      "mcp__github__get_pull_request_status",
+      "mcp__notebooklm-py__chat_ask",
+      "mcp__notebooklm-py__notebook_list",
+      "mcp__notebooklm-py__notebook_get",
+      "mcp__notebooklm-py__source_list",
+      "mcp__notebooklm-py__chat_list",
+      "mcp__notebooklm-py__chat_get",
+      "mcp__notebooklm-py__server_info",
+      "Bash(git ls-remote *)",
+      "Bash(git push --force-with-lease*)",
+      "mcp__claude_ai_Vercel__search_vercel_documentation",
+      "mcp__claude_ai_Vercel__get_deployment",
+      "mcp__supabase__get_project_url",
+      "mcp__supabase__search_docs",
+      "mcp__supabase__get_publishable_keys",
+      "mcp__supabase__generate_typescript_types",
+      "mcp__supabase__get_advisors",
+      "mcp__codegraph__codegraph_status"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
@@ -14,6 +59,16 @@
             "type": "command",
             "command": "node .claude/hooks/lane-guard.cjs",
             "statusMessage": "lane-guard"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/bash-write-guard.cjs",
+            "statusMessage": "bash-write-guard"
           }
         ]
       }
@@ -62,6 +117,16 @@
             "command": "node .claude/hooks/accumulate-edits.cjs"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/bash-write-audit.cjs",
+            "statusMessage": "bash-write-audit"
+          }
+        ]
       }
     ],
     "Stop": [
@@ -77,11 +142,6 @@
           }
         ]
       }
-    ]
-  },
-  "permissions": {
-    "allow": [
-      "Bash(gh run *)"
     ]
   }
 }

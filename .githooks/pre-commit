@@ -50,4 +50,21 @@ if [ -n "$EKSIK" ]; then
     echo "[ORION-HOOK] Bu bir UYARI — commit engellenmedi (bkz. dosya başındaki gerekçe)."
 fi
 
+# ---------------------------------------------------------------- ŞERİT KAPISI (E1)
+# YUKARIDAKİ companion kontrolü UYARI-ONLY kalır. Aşağıdaki şerit kontrolü BLOKLAR — ve
+# bu, dosyanın başındaki "bloklama eklemek istersen ölçütün deterministik olsun" şartını
+# karşıladığı için meşrudur: aynı staged liste + aynı pano = hep aynı sonuç. Ağ yok, LLM yok.
+#
+# NİÇİN İKİNCİ KATMAN GEREKLİ (ölçüldü, 2026-08-23): PreToolUse kancaları ARACA bakar
+# (Edit/Write/Bash). Ama dosya üçüncü bir yoldan da değişebilir — bir git kancasının
+# çalıştırdığı üreteç. Companion üreteci tam bunu yaptı ve hiçbir PreToolUse kapısı görmedi.
+# pre-commit ARACA değil DOSYA LİSTESİNE bakar; yazının nasıl yapıldığı önemsizdir.
+#
+# Kimlik yoksa FAIL-OPEN çalışır ama SESSİZ DEĞİL: uyarı basar ve panoya iz bırakır.
+node "$REPO_ROOT/scripts/board/lane-precommit.cjs"
+LANE_RC=$?
+if [ $LANE_RC -ne 0 ]; then
+    exit $LANE_RC
+fi
+
 exit 0

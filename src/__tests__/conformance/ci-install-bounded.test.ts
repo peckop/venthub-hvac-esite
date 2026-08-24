@@ -44,8 +44,9 @@ const INDIREN_KOMUTLAR = [/\bapt-get\b/, /\bplaywright\s+install\b/]
  * (Cetvel §3 ile birebir aynı olmalı.)
  */
 const MUAF_DOSYALAR = new Set<string>([
-  // 2026-08-19: PRICING şeridinin claim'inde (T099). O iş kapanınca bu satır SİLİNİR.
-  'db-advisor.yml',
+  // 2026-08-19: `db-advisor.yml` muafiyeti KALDIRILDI — dosya artık kurallara uyuyor
+  // (apt adımı silindi, iş düzeyi zaman sınırı eklendi). Muafiyet listesi BOŞ olmalı;
+  // dolduğu anda "niçin" ve "ne zaman silinecek" birlikte yazılır.
 ])
 
 interface Adim {

@@ -14,6 +14,7 @@ export const menu = {
       inventoryReport: 'Stok Raporu',
       inventorySettings: 'Eşik & Ayarlar',
       returns: 'İadeler',
+      invoices: 'Faturalar',
       users: 'Kullanıcılar',
       logs: 'Kayıtlar',
       errors: 'Hatalar',

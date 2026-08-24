@@ -3,7 +3,11 @@
  * 
  * Fizik tabanlı mühendislik formülleri
  * Kaynaklar: ASHRAE, ISO 27327-1, NFPA 88A, BS 7346-7
+ *
+ * Sürtünme faktörü bu dosyada HESAPLANMAZ: tek kaynak `lib/hvac/ductPressure`
+ * (Colebrook-White, Python `fluids` kütüphanesine karşı doğrulanmış). Bkz. T145-VH.
  */
+import { reynolds, surtunmeFaktoru } from './hvac/ductPressure'
 
 // =============================================================================
 // SABITLER
@@ -231,16 +235,26 @@ function calculateArea(ductType: DuctType, diameter?: number, width?: number, he
 }
 
 /**
- * Basınç kaybı hesaplama (Darcy-Weisbach basitleştirilmiş)
+ * Basınç kaybı hesaplama — Darcy-Weisbach, sürtünme faktörü Colebrook-White ile.
  * ΔP/L = f × (ρ × V²) / (2 × D)
- * f ≈ 0.02 (türbülanslı akış, pürüzsüz kanal)
+ *
+ * DÜZELTİLDİ (T145-VH, 2026-08-23): burada `f = 0,02 + pürüzlülük·0,1` yazıyordu, yani
+ * sürtünme faktörü pratikte SABİTTİ (galvaniz kanalda 0,020015). Ölçtüm: 100 mm galvaniz
+ * kanalda 2 m/s'te gerçek Darcy faktörü **0,0312** — eski formül basınç kaybını üçte bir
+ * eksik veriyor ve fanı olduğundan güçlü gösteriyordu. Kusur beş ay yaşadı çünkü mevcut
+ * testler yalnız HIZI ölçüyordu, basınç kaybına hiç bakmıyordu.
+ *
+ * Artık tek kaynak `lib/hvac/ductPressure`: Colebrook-White'ı gerçekten çözer ve Python
+ * `fluids` kütüphanesine karşı 54 senaryoda doğrulanmıştır. Buraya ikinci bir kopya
+ * YAZILMAZ — sürtünme hesabı tek yerde yaşar.
  */
 function calculatePressureLoss(velocity: number, diameter: number, roughness: number): number {
-    // Reynolds sayısı bazlı basit yaklaşım
     const D = diameter / 1000 // mm → m
-    const f = 0.02 + (roughness / 1000) * 0.1 // Basitleştirilmiş sürtünme faktörü
-    const deltaP = f * (AIR_DENSITY * velocity * velocity) / (2 * D)
-    return deltaP // Pa/m
+    if (D <= 0 || velocity <= 0) return 0
+    // `roughness` bu dosyada mm; ductPressure bağıl pürüzlülük (ε/D, boyutsuz) ister.
+    const bagilPuruzluluk = roughness / 1000 / D
+    const f = surtunmeFaktoru(reynolds(velocity, diameter), bagilPuruzluluk)
+    return (f * (AIR_DENSITY * velocity * velocity)) / (2 * D) // Pa/m
 }
 
 /**

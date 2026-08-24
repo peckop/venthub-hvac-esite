@@ -29,6 +29,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useRole } from '../../hooks/useRole'
 import { useTenant } from '../../hooks/useTenant'
+import { localeUpper } from '../../i18n/case'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes';
 
@@ -72,7 +73,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   const { user, loading: authLoading } = useAuth()
   const { canAccess, loading: roleLoading } = useRole()
   const router = useRouter()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const tenant = useTenant()
   // Vitrin rotası dile göre çözülür (kural 7: manuel `/tr/` öneki yasak).
   const localizedRoutes = useLocalizedRoutes()
@@ -310,7 +311,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
             className="flex h-8 w-8 items-center justify-center rounded-full
               border border-admin-border bg-admin-surface-2 text-sm font-medium text-admin-fg-muted"
           >
-            {(user?.user_metadata?.first_name?.[0] || 'A').toUpperCase()}
+            {localeUpper(user?.user_metadata?.first_name?.[0] || 'A', lang)}
           </div>
         </div>
       </header>

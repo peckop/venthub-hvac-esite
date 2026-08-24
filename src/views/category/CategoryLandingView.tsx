@@ -17,6 +17,7 @@ import {
     TrustSignals,
     TypeComparison,
     VorticeBrand} from '@/components/category/sections'
+import SilentFanWizard from '@/components/category/SilentFanWizard'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
 import FamilyCard from '@/components/products/FamilyCard'
 import type { FamilyListItem } from '@/types/ui-models'
@@ -53,7 +54,13 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     const parentVm = wrapCategory(parentCategory ?? undefined)
     
     const isAirCurtain = category.slug === 'air-curtains'
-    const isSilentFan = category.slug === 'quiet-duct-fans'
+    // Sessiz kanal fanı anlatısı `inline-duct-fans` kategorisine bağlıdır. Kategorinin GÖRÜNEN
+    // adı "Kanal İçi Hayalet Fanlar" ama içeriği tam olarak budur: altındaki ürünlerin HEPSİ
+    // Vortice Lineo Quiet serisidir. Bölüm daha önce hiç var olmamış bir `quiet-duct-fans`
+    // slug'ına bağlıydı; koşul hiçbir zaman açılmadı ve bu beş bileşenlik anlatı kullanıcıya
+    // hiç görünmedi. Kategorinin ADI ile kanonik slug'ı AYRI konulardır — ad değişse de burası
+    // değişmez; slug değişirse `catalog-integrity` kapısı (slug-unresolved) kırmızı verir.
+    const isSilentFan = category.slug === 'inline-duct-fans'
     const isDehumidifier = category.slug === 'dehumidifiers'
 
     // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
@@ -195,18 +202,30 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                 </div>
             </div>
 
+            {/* Sihirbaz iki kategoride de var ama AYNI bileşen değil: hava perdesi kapı ölçüsü
+                sorar, sessiz fan oda hacmi/kanal direnci sorar. Ortak buton, ayrı motor. */}
             <BottomCTA
-                onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
+                onOpenWizard={isAirCurtain || isSilentFan ? () => setWizardOpen(true) : undefined}
                 onShowProducts={handleShowProducts}
-                showWizard={isAirCurtain}
+                showWizard={isAirCurtain || isSilentFan}
                 categoryName={vm?.displayName || t('category.landing.venthubSolution')}
             />
 
-            <EnhancedNeedsWizard
-                isOpen={wizardOpen}
-                onClose={() => setWizardOpen(false)}
-                parentSlug={category.slug}
-            />
+            {isAirCurtain && (
+                <EnhancedNeedsWizard
+                    isOpen={wizardOpen}
+                    onClose={() => setWizardOpen(false)}
+                    parentSlug={category.slug}
+                />
+            )}
+
+            {isSilentFan && (
+                <SilentFanWizard
+                    isOpen={wizardOpen}
+                    onClose={() => setWizardOpen(false)}
+                    categorySlug={category.slug}
+                />
+            )}
         </div>
     )
 }

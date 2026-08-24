@@ -67,12 +67,47 @@ function izlenenDosyalar(): string[] {
   return ham.split('\n').map(s => s.trim()).filter(Boolean)
 }
 
-function dosyaIcerik(yol: string): string {
-  return execFileSync('git', ['show', `HEAD:${yol}`], {
-    encoding: 'utf8',
-    maxBuffer: 40 * 1024 * 1024,
+/**
+ * Birden çok dosyanın HEAD içeriğini **TEK süreçte** okur.
+ *
+ * ⚠ NİÇİN BÖYLE — bu dosyanın YARIM KALAN dersi (2026-08-20 ölçümü): yukarıdaki `git grep`
+ * geçişi tek sürece indirilmişti, ama evals okuması dosya BAŞINA bir `git show` açmaya devam
+ * ediyordu. Kapsamda **58 adet** `evals/evals.json` var → 58 süreç → izole koşumda 8.4 sn,
+ * yüklü makinede 36–59 sn, yani **20 sn'lik test zaman aşımının** üstü.
+ *
+ * Bedeli yalnız yavaşlık değil: zaman aşımı kırmızısı bir İDDİA mesajı taşımaz, yani "hangi
+ * dosya" bilgisi olmadan çıplak kırmızı görünür. Aynı gün ÜÇ ayrı şerit (ALTYAPI, PRICING,
+ * I18N) tam takımda bu testi kırmızı, izole koşumda yeşil gördü ve üçü de önce "kodda kusur
+ * mu?" diye tur harcadı. Süreç sayısı bir bekçinin GÜVENİLİRLİĞİDİR.
+ *
+ * `git cat-file --batch` istenen tüm nesneleri tek süreçte döndürür. Çıktı ikili güvenli
+ * okunur (Buffer): başlık `<sha> <tip> <boyut>\n`, ardından tam olarak `<boyut>` bayt.
+ */
+function dosyaIcerikleriToplu(yollar: readonly string[]): Map<string, string> {
+  const sonuc = new Map<string, string>()
+  if (yollar.length === 0) return sonuc
+
+  const cikti = execFileSync('git', ['cat-file', '--batch'], {
+    input: yollar.map(y => `HEAD:${y}`).join('\n') + '\n',
+    maxBuffer: 80 * 1024 * 1024,
     env: { ...process.env, MSYS_NO_PATHCONV: '1' },
   })
+
+  let ofset = 0
+  for (const yol of yollar) {
+    const nl = cikti.indexOf(0x0a, ofset)
+    if (nl < 0) break
+    const baslik = cikti.toString('utf8', ofset, nl)
+    ofset = nl + 1
+    const parcalar = baslik.split(' ')
+    // "missing"/"ambiguous": HEAD'de yok (henüz commit'lenmemiş) — atlanır, uydurulmaz.
+    if (parcalar.length < 3) continue
+    const boyut = Number(parcalar[2])
+    if (!Number.isFinite(boyut)) continue
+    sonuc.set(yol, cikti.toString('utf8', ofset, ofset + boyut))
+    ofset += boyut + 1 // içerikten sonra bir satır sonu
+  }
+  return sonuc
 }
 
 function muafMi(yol: string): boolean {
@@ -136,11 +171,12 @@ function pprIhlalleri(): Ihlal[] {
     ihlaller.push({ yol, satir: Number(satirNo), metin: metin.trim().slice(0, 160) })
   }
 
+  // TEK GEÇİŞ: 58 evals dosyasının tamamı tek `git cat-file --batch` sürecinde okunur.
+  const evalsIcerikleri = dosyaIcerikleriToplu(evalsYollari)
+
   for (const yol of evalsYollari) {
-    let icerik: string
-    try {
-      icerik = dosyaIcerik(yol)
-    } catch {
+    const icerik = evalsIcerikleri.get(yol)
+    if (icerik === undefined) {
       continue // HEAD'de yok (yeni, henüz commit'lenmemiş) — commit edilince taranır
     }
     // evals dosyaları YAPISAL okunur, satır satır değil.

@@ -155,7 +155,176 @@ CREATE POLICY storage_tenant_isolation ON storage.objects
 
 ---
 
-## 11. Referanslar
+## 11. Ürün KİMLİĞİ — müşteriye hangi ad gösterilir
+
+> **Bekçi:** `src/__tests__/conformance/product-identity-resolver.test.ts` (INV-PRODUCT-IDENTITY)
+> **Çözücü:** `src/utils/productHelpers.ts` — `getProductDisplayName` / `getProductModelLabel`
+
+### 11.1 Kanonik kimlik = `products.name`
+
+Müşteri **aynı ürünün iki farklı adını görmemeli**. Ölçüm (2026-08-19, prod, 374 ürün):
+**374/374 üründe `products.name` aile adından FARKLI.** Ürün detay sayfası yalnız aile
+adını yazdığı için müşteri satın aldığı şeyin adını **ilk kez sepette** görüyordu.
+
+Kanonik kimlik satın alınan satırın adıdır: `products.name`. Sipariş kalemi anlık
+görüntüsü, e-posta ve fatura zaten bunu yazar.
+
+**Aile adı + model birleştirilerek ÜÇÜNCÜ bir ad üretilmez.** Bu, anlık görüntü
+yazarını (Edge fonksiyonu) ve katalog verisini de değiştirmeyi gerektirir; kimlik
+bütünlüğü için yanlış yöndür. Aile adı **seri etiketi** olarak ayrıca gösterilebilir.
+
+### 11.2 Beş yüzey TEK çözücüden beslenir
+
+| Yüzey | Ne gösterir |
+|---|---|
+| Ürün detay (PDP) | `getProductDisplayName` + seri etiketi olarak aile adı |
+| Sepet | aynı çözücü |
+| Sipariş özeti / hesap | `product_name_snapshot` (yazıldığı an çözücüyle aynı değer) |
+| E-posta | aynı snapshot |
+| Yönetim listeleri | aynı çözücü |
+
+Yüzeyin kendi başına ad kurması (`family.name`, `sku`, birleştirme) **yasaktır** —
+kuralın kaç yerde yaşadığını saymadan "düzelttim" demek bu depoda tekrar eden hatadır.
+
+### 11.3 ⚠️ HAM SKU MÜŞTERİYE GÖSTERİLMEZ (bugün "çalışıyor" görünen kural)
+
+Yüzeyde `model_code || sku` biçiminde bir yedek vardı. Ölçüm: **374/374 üründe
+`model_code` DOLU, sıfırında boş** — yani o yedek **bugün hiç çalışmıyor**.
+
+Bu, kuralı gereksiz yapmaz; **tam tersine** tehlikeli yapan şeydir. Katalog hattına
+`model_code`'suz tek bir ürün girdiği an müşteri iç kod (`NIC-11942` gibi) görür ve
+hiçbir kapı bunu görmez. **Latent bir açık, kapalı bir açık değildir** — aynı hafta
+kapatılan `is_admin_user` içindeki ulaşılamaz `user_metadata` dalıyla aynı sınıf.
+
+Kural: `model_code` yoksa **etiket hiç gösterilmez**. `sku`'ya düşmek yasaktır.
+
+### 11.4 Ayırt edicilik neden ada bırakılamaz
+
+Ölçüm: **74 satırda ad, aile içinde başka bir üyeyle çakışıyor.** Yani ad tek başına
+"hangi modeli aldım" sorusunu cevaplamıyor; `model_code` etiketi süs değil, kimliğin
+parçasıdır.
+
+### 11.4.1 Veri tarafı borcu (açık)
+
+Bu cetvel yüzeyi bağlar; **veriyi bağlamaz.** `products.model_code` bugün 374/374 dolu
+ama bunu zorlayan bir kısıt YOK. Doğru kalıcı çözüm katalog alımında zorunlu alan
+(`catalog-ingestion-standard.md`) ya da DB kısıtıdır. Sahibi: katalog hattı (PRICING).
+Bu madde, kuralın **ölçülemez tarafını** adıyla yazar — kapının kapsamını abartmamak için.
+
+## 11.5 MODEL KATMANI — seri / model / varyant (T138-VH, Recep onayi 2026-08-21)
+
+`product_families` iki rol tasir; ayrim **`parent_family_id`** kolonundadir:
+
+| parent_family_id | Rol | Vitrin karsiligi | Ornek |
+|---|---|---|---|
+| NULL | **SERI** | landing sayfasi (tanitim + model kartlari + karsilastirma tablosu) | Lineo Quiet |
+| NOT NULL | **MODEL** | vitrin KARTI + urun sayfasi (fiyat, spec, sepet) | Lineo 100 Quiet |
+
+**Varyant** ayri satir DEGILDIR-kart degildir: `products` satiridir ve model sayfasi icinde
+`?sku=` ile secilir (standart/ES, faz, ATEX). Kural degismedi (Aksiyom-3 Sifir-EAV).
+
+Kurallar:
+1. **Hiyerarsi TEK SEVIYE**: seri -> model. Modelin altina model asilamaz (DB trigger
+   `product_families_single_level`), satir kendi ebeveyni olamaz (check constraint).
+2. **Kart = satin alinan birim = MODEL.** Piyasa olcumu (avensair, seat-ventilation.fr,
+   vortice.com, danfoss.com): alici kapasiteyi arar ("JET 20"), seriyi degil.
+3. **Model turetme SALT ADLA yapilamaz.** Bazi ailelerde varyant ekseni adda degil kodda
+   (M4/T4 faz-kutup) veya `technical_specs`'tedir. Kural: **cap/debi degisiyorsa MODEL,
+   faz/guc/donanim degisiyorsa VARYANT**; her aile icin dry-run raporu insan onayina sunulur.
+   (Olcum 2026-08-21: salt-ad kurali 374 urunu 276 aileye bolerek "kart=urun"e dejenere etti.)
+4. **1:1 aileler mesrudur**: Nicotra/Danfoss/aksiyel gibi yerlerde model = SKU olabilir;
+   kaynak siteler de boyle gosterir. Orada seri landing tasiyici gorevi gorur.
+5. **Eski seri slug'i KORUNUR** — seri satiri silinmez, landing olur (aksi halde eski URL
+   404 verir; olculdu, T141 ajan-2 K1/K3). Varyant slug'lari 308 ile MODEL sayfasina gider.
+6. **SEO kapisi:** her model sayfasinin OZGUN aciklamasi olmali; varyant ayri sayfa degil
+   (`?sku=` + canonical = model sayfasi, INV-CANONICAL-2).
+
+Veri gecisi: `scripts/db/product-data/t138-model-split.mjs` (dry-run varsayilan, envanterli,
+geri alinabilir) + plan `docs/plans/t138-model-katmani-plani-2026-08-21.md`.
+
+## 11.6 BİRİM SÖZLEŞMESİ — `technical_specs` (T140-VH, 2026-08-21)
+
+**Kural: alan adı birimi TAAHHÜT eder.** `technical_specs` anahtarı bir SI birim soneki
+taşıyorsa (`_w`, `_v`, `_a`, `_hz`, `_pa`, `_kg`, `_mm`, `_m3h`, `_ls`, `_pct`, `_c`),
+o alandaki değer **o birimde ve sayı olarak** yazılır.
+
+- ❌ Aynı alanda **çift birim yasak** (kW ile W, m³/h ile L/s). Birim dönüşümü **yükleme
+  anında** yapılır; okuma tarafı dönüşüm varsayamaz.
+- ❌ Birim **metne gömülmez**: `"380 V"` değil `380`. Metne gömülü değer sıralanamaz,
+  filtrelenemez, karşılaştırılamaz.
+- ❌ Bir alan **iki bilgi taşımaz**: gerilimle fazı aynı alana koymak (`"three-phase 400V"`)
+  ikisini de kullanılamaz hâle getirir; faz AYRI alandır.
+- Birim soneki olmayan anahtar (`motor_type`, `ip_rating`, `atex_marking`…) serbest metindir
+  ve bu maddenin kapsamı dışındadır.
+
+**Niçin bu kadar sert:** ölçüm (2026-08-21) `max_absorbed_power_w` alanının SEAT'te 0,06–7,5
+(kW), Vortice'te 4–10230 (W) değer taşıdığını gösterdi. Yanlış birim **boş alandan
+tehlikelidir**: boş alan görünür, yanlış birim *dolu ve makul* görünür. Karşılaştırma,
+sıralama, filtreleme ve hesaplayıcı yüzeylerinin hepsi bu alanda yanlış sonuç verir ve
+**hiçbiri kırmızı vermez**.
+
+**Bekçi:** `scripts/db/checks/catalog-integrity.mjs` → `spec-unit` (alan adının ima ettiği
+birimle bağdaşmayan değer) ve `spec-type` (birimli alanda metin). Circir kuralı geçerlidir:
+bilinen ihlaller `catalog-integrity-baseline.json`'da **gerekçeli** durur, taban yalnız
+küçülür; taban dışındaki her yeni ihlal kırmızıdır.
+
+**⚠️ Kural yazmadan önce ölç — iki yanlış-kırmızı adayı elendi:**
+`blade_diameter_mm` 3000–7000 **gerçek** veridir (NORDIK HVLS tavan fanları 3–7 **metre**
+kanatlı), `frequency_hz = 0` ise 5 V'luk DC cihazlarda (BRA.VO S1–S4) anlamlıdır. "Şüpheli
+büyük/küçük sayı" biçiminde genel bir eşik kuralı bu 11 doğru satırı kırmızı yapardı.
+Bu yüzden kapsam **kesin olarak ölçülebilen** iki sınıfla sınırlı tutuldu.
+
+## 11.7 SEMANTİK SÖZLEŞMESİ — alan adı neyi ölçtüğünü de söyler (T140-VH, 2026-08-21)
+
+§11.6 alan adının **birimini** bağlar. Bu madde **neyi ölçtüğünü** bağlar. İkisi ayrı
+sözleşmedir ve ikincisi olmadan birincisi yetmez: doğru birimde ama **yanlış büyüklüğü**
+ölçen bir değer de "dolu ama yanlış"tır.
+
+**Nereden çıktı (ölçüm, 2026-08-21):** SEAT teknik föylerinde debi/basınç değerleri devir
+başına **nominal bir çalışma noktası**dır — fan eğrisi üzerinde bir nokta, serbest hava
+maksimumu değil. Bu değeri `max_delivery_m3h` alanına yazmak, birim hatasını kapatırken
+**semantik hata** üretirdi.
+
+### Ön ek → anlam
+
+| Ön ek / son ek | Anlamı | Örnek |
+|---|---|---|
+| `max_…` | Üreticinin verdiği çalışma aralığının **üst** sınırı (serbest hava / kapalı kanal ucu) | `max_delivery_m3h` |
+| `min_…` | Aynı aralığın **alt** sınırı. Kaynak aralık veriyorsa **çift olarak** yazılır | `min_delivery_m3h` |
+| `nominal_…` | Eğri üzerinde **belirli bir çalışma noktası** (devir + karşı basınç ile tanımlı) | `nominal_delivery_m3h` |
+| ölçüt son eki | Aynı büyüklüğün birden çok ölçütü varsa ölçüt **ADA girer** | `noise_lpa_3m_db` |
+
+- ❌ Aralığı **tek alana** sıkıştırmak yasak: `min_`/`max_` çifti yazılır. Yalnız üst değeri
+  yazıp aralık olduğunu gizlemek, kullanıcıya "bu fan hep bu debiyi verir" der.
+- ❌ Nominal noktayı `max_` alanına yazmak yasak.
+- ❌ Ölçütü ada koymadan dB yazmak yasak (aşağıya bak).
+
+### Ses: ölçüt ADA girer
+
+Kaynaklar iki ayrı büyüklük veriyor: **LpA** (belirli mesafede ses *basıncı*) ve **LwA**
+(ses *gücü*). Aralarında tipik olarak 15–20 dB fark var. Ölçüm: mevcut `noise_level_db_a`
+alanı Vortice'te 142 kayıtta dolu ve 25–79,5 aralığında (ortalama 50,5) — bu **LpA** ile
+uyumlu, ama alan adı bunu **söylemiyor**. SEAT'e LwA yazsaydık aynı alanda iki farklı
+büyüklük bulunurdu ve karşılaştırma sessizce anlamsızlaşırdı.
+
+**Kural:** yeni yazımlarda ölçüt ada girer — `noise_lpa_3m_db`. Mesafe de ada girer, çünkü
+ses basıncı mesafeye bağlıdır. Eski `noise_level_db_a` alanı **legacy**'dir; taşınana kadar
+"ölçütü belirsiz" sayılır ve yeni marka verisi oraya yazılmaz.
+
+### Gerilim: bir alan bir bilgi
+
+Yıldız-üçgen motorlar kaynakta `400/690` gibi **çift gerilim** taşır. Bu tek bir sayı alanına
+sığmaz ve `"400/690"` yazmak §11.6'yı ihlal eder.
+
+**Kural:** `voltage_v` = **çalışma gerilimi** (tek sayı, ör. `400`) · `wiring` = bağlantı
+tipi (`'star-delta'`, `'direct'`) · `voltage_alt_v` = varsa ikinci gerilim (`690`) ·
+`phase` = `1` veya `3`. Faz bilgisi **asla** gerilim alanına gömülmez.
+
+**Bekçi:** §11.6'nın `spec-type` değişmezi metne gömülü değeri zaten yakalıyor; `min_`/`max_`
+çiftinin tutarlılığı (`min ≤ max`) ve `nominal_` değerinin aralık içinde kalması, veri
+yazımı yapan betiğin ön koşuludur (`scripts/db/product-data/*`), tek tek satırda doğrulanır.
+
+## 12. Referanslar
 
 1.  **Medusa.js v2 Pricing & Attribute Architecture:** [medusajs.com/docs/modules/pricing](https://docs.medusajs.com) (Multi-currency PriceSets and Rule Engines).
 2.  **Shopify Admin API Product/Variant Option Limits:** [shopify.dev/docs/api/admin-graphql/latest/queries/product](https://shopify.dev/docs/api/admin-graphql) (Standardization of selected options).

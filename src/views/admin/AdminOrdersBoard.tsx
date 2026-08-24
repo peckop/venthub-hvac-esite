@@ -341,7 +341,7 @@ export default function AdminOrdersBoard() {
         { id: 'col_new', title: t('admin.orders.board.columns.new'), statuses: ['pending', 'paid'], icon: Clock, colorClass: 'text-admin-warning', bgClass: 'bg-admin-warning-weak ring-admin-warning/30', targetStatus: 'pending' },
         { id: 'col_prep', title: t('admin.orders.board.columns.prep'), statuses: ['confirmed', 'processing'], icon: Package, colorClass: 'text-admin-accent', bgClass: 'bg-admin-accent-weak ring-admin-accent/30', targetStatus: 'confirmed' },
         { id: 'col_shipped', title: t('admin.orders.board.columns.shipped'), statuses: ['shipped'], icon: Truck, colorClass: 'text-admin-accent', bgClass: 'bg-admin-accent-weak ring-admin-accent/30', targetStatus: 'shipped' },
-        { id: 'col_done', title: t('admin.orders.board.columns.done'), statuses: ['delivered', 'completed'], icon: CheckCircle2, colorClass: 'text-admin-success', bgClass: 'bg-admin-success-weak ring-admin-success/30', targetStatus: 'delivered' },
+        { id: 'col_done', title: t('admin.orders.board.columns.done'), statuses: ['delivered'], icon: CheckCircle2, colorClass: 'text-admin-success', bgClass: 'bg-admin-success-weak ring-admin-success/30', targetStatus: 'delivered' },
         { id: 'col_cancel', title: t('admin.orders.board.columns.cancel'), statuses: ['cancelled'], icon: XCircle, colorClass: 'text-admin-danger', bgClass: 'bg-admin-danger-weak ring-admin-danger/30', targetStatus: 'cancelled' },
         { id: 'col_refund', title: t('admin.orders.board.columns.refund'), statuses: ['refunded', 'partial_refunded'], icon: RotateCcw, colorClass: 'text-admin-warning', bgClass: 'bg-admin-warning-weak ring-admin-warning/30', targetStatus: 'refunded' },
     ], [t])

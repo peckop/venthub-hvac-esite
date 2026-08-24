@@ -1,0 +1,6 @@
+{
+  "_aciklama": "INV-RLS-COVERAGE-1 tabani. Anahtar bicimi: 'rol:tablo'. Her satir GEREKCE ve KAPANIS KOSULU tasir; gerekcesiz satir kabul edilmez. Taban YALNIZ kucululur — yeni satir eklemek, kusuru tabana yazip gecmek demektir ve ancak bilincli bir karar olarak, kaydiyla birlikte yapilir.",
+  "_olculdu": "2026-08-20, canli prod semasi (pg_policies + pg_class). Kodda okunan 29 yonetim tablosu ile kesistirildi; kesisimde bulgu YOK. Taban BOS ve bu bos hal OLCULMUS bir sonuctur, bakilmamis bir alan degil - kapi her PR'da kosuyor (db-advisor.yml / rls-role-coverage, INV-RLS-COVERAGE-CI-1 ile sabit).",
+  "entries": {},
+  "_tarihce": "TEK taban satiri olan 'authenticated:client_errors' 2026-08-20 12:41'de SILINDI: kapanis kosulu gerceklesti, #704 ile inen admins_read_client_errors politikasi prod'da dogrulandi (pg_policies: SELECT, roller=[authenticated]). Silme, o migrationun kendi is kalemiydi - ayri bir gune birakilmadi, cunku taban satiri DURDUGU surece ayni tablodaki YENI bir ihlal 'yeni degil' sayilir ve kapi sessiz kalirdi. Bulan: EDGE (belirti+arkeoloji) + LEGAL (canli semadan mekanizma ve kural daraltmasi)."
+}

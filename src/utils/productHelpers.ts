@@ -65,22 +65,69 @@ export const translateSpecKey = (key: string): string => {
  * formatSpecValue('weight_kg', 10) // returns "10 kg"
  * formatSpecValue('voltage_v', null) // returns "-"
  */
+/**
+ * Anahtar son-eki → görünen birim. UZUNDAN KISAYA sıralanır ve sıralama ELLE DEĞİL
+ * MEKANİK kurulur (aşağıdaki `sort`).
+ *
+ * NİÇİN MEKANİK: bu tablonun öncesindeki sürüm sıralı `if` zinciriydi ve `endsWith('_a')`
+ * kontrolü `includes('db_a')` kontrolünden ÖNCE geliyordu. `noise_level_db_a` anahtarının
+ * son iki karakteri `_a` olduğu için ilk kurala takılıyor, dB(A) satırına HİÇ ULAŞMIYORDU.
+ * Sonuç: **142 üründe ses seviyesi "58 A" (amper) olarak basıldı.** Kural yazılmıştı ama
+ * erişilemezdi — kodu okuyan "dB(A) desteği var" diye kaydediyordu. Kusur görünmezliğini
+ * tam da yazılmış olmaktan alıyordu.
+ *
+ * Aynı sınıfın sessiz hâli: `_pa` de `endsWith('_a')` ile eşleşmez (son iki karakter `pa`),
+ * bu yüzden **253 üründe statik basınç birimsiz** çıplak sayı olarak duruyordu.
+ *
+ * Uzunluğa göre sıralama bu sınıfı yapısal olarak kapatır: `_db_a` her zaman `_a`'dan,
+ * `_kw` her zaman `_w`'den, `_pa` her zaman `_a`'dan önce denenir. Yeni bir sonek eklerken
+ * sıralamayı düşünmek GEREKMEZ.
+ */
+const UNIT_SUFFIXES: ReadonlyArray<readonly [string, string]> = (
+  [
+    ['_db_a', 'dB(A)'],
+    ['_m3h', 'm³/h'],
+    ['_pct', '%'],
+    ['_kw', 'kW'],
+    ['_hz', 'Hz'],
+    ['_kg', 'kg'],
+    ['_mm', 'mm'],
+    ['_ms', 'm / s'],
+    ['_ls', 'l/s'],
+    ['_pa', 'Pa'],
+    ['_db', 'dB'],
+    ['_a', 'A'],
+    ['_c', '°C'],
+    ['_l', 'L'],
+    ['_v', 'V'],
+    ['_w', 'W'],
+  ] as ReadonlyArray<readonly [string, string]>
+).slice().sort((a, b) => b[0].length - a[0].length)
+
+/** Son-ek kuralına uymayan tekil anahtarlar. Genel kural uydurmak yerine ADIYLA yazılır. */
+const UNIT_BY_KEY: Readonly<Record<string, string>> = {
+  humidity_removed_l_24h: 'L/24h',
+}
+
 export const formatSpecValue = (key: string, value: unknown): string => {
   if (value === null || value === undefined) return '-';
   const stringValue = String(value);
   const lowerKey = key.toLowerCase();
 
+  // Değer zaten metin ise (ör. 'Class F', '230/400') birim eklemek onu bozar.
   if (/[a-zA-Z]/.test(stringValue)) return stringValue;
 
-  if (lowerKey.endsWith('_mm')) return `${stringValue} mm`;
-  if (lowerKey.endsWith('_kg')) return `${stringValue} kg`;
-  if (lowerKey.endsWith('_v')) return `${stringValue} V`;
-  if (lowerKey.endsWith('_hz')) return `${stringValue} Hz`;
-  if (lowerKey.endsWith('_c')) return `${stringValue} °C`;
-  if (lowerKey.endsWith('_ms')) return `${stringValue} m / s`;
-  if (lowerKey.endsWith('_a')) return `${stringValue} A`;
-  if (lowerKey.endsWith('_m3h')) return `${stringValue} m³/h`;
-  if (lowerKey.endsWith('_w')) return `${stringValue} W`;
+  const exact = UNIT_BY_KEY[lowerKey];
+  if (exact) return `${stringValue} ${exact}`;
+
+  for (const [suffix, unit] of UNIT_SUFFIXES) {
+    if (lowerKey.endsWith(suffix)) return `${stringValue} ${unit}`;
+  }
+
+  // Son-ek tablosundan SONRA gelen İÇERİK kuralları. Sıra burada da anlamlı:
+  // tablo `noise_level_db_a`yı zaten `_db_a` son-ekiyle yakalar; aşağıdaki içerik kuralı
+  // ise ölçüt anahtarın ORTASINDA geçen eski şema anahtarları içindir
+  // (`sound_pressure_level_lp_db_a_2m_max` gibi). İkisi çakışmaz çünkü tablo önce çalışır.
   if (lowerKey.includes('db_a')) return `${stringValue} dB(A)`;
   if (lowerKey.includes('rpm')) return `${stringValue} RPM`;
 
@@ -187,3 +234,77 @@ export const SPEC_SORT_ORDER: Record<string, number> = {
   'height': 23,
   'weight': 24
 };
+
+/* ===========================================================================
+ * ÜRÜN KİMLİĞİNİN TEK ÇÖZÜCÜSÜ (T098/T099 · A-MELEZ kararı)
+ * ===========================================================================
+ *
+ * YAŞANMIŞ KUSUR: müşteri aynı ürünün İKİ farklı adını görüyordu. Ürün detay
+ * sayfası başlıkta AİLE adını basıyor, sepet/sipariş/e-posta ise `products.name`
+ * kullanıyordu. Ölçüm (2026-08-19, prod, 374 ürün): **374/374 üründe ad, aile
+ * adından FARKLI.** Yani müşteri satın aldığı şeyin adını ilk kez sepette görüyordu.
+ *
+ * KANONİK KİMLİK = `products.name` (satın alınan SKU'nun adı). Sipariş, fatura ve
+ * e-posta zaten bunu yazıyor; kimlik bütünlüğü için doğru olan da budur — aile adı
+ * ile modeli birleştirip ÜÇÜNCÜ bir ad biçimi üretmek, anlık görüntü yazarını ve
+ * katalog verisini de değiştirmeyi gerektirirdi.
+ *
+ * ⚠️ HAM SKU MÜŞTERİYE GÖSTERİLMEZ — VE BU KURAL BUGÜN "ÇALIŞIYOR" GÖRÜNÜR:
+ * Yüzeyde `model_code || sku` biçiminde bir yedek vardı. Ölçtüm: 374 ürünün
+ * 374'ünde `model_code` DOLU, sıfırında boş. Yani o yedek bugün HİÇ çalışmıyor —
+ * kusur LATENT. Katalog hattına `model_code`'suz tek bir ürün girdiği an müşteri
+ * iç kod (NIC-11942 gibi) görür ve hiçbir kapı bunu görmez. Bu, aynı hafta
+ * kapatılan `is_admin_user` içindeki ulaşılamaz `user_metadata` dalının kardeşidir:
+ * **latent bir açık, kapalı bir açık değildir.**
+ *
+ * Bekçi: `src/__tests__/conformance/product-identity-resolver.test.ts`
+ * Cetvel: `docs/standards/product-schema-standard.md`
+ */
+
+/** Çözücünün ihtiyaç duyduğu asgari varyant şekli (RPC satırı da, DB satırı da uyar). */
+export type ProductIdentitySource = {
+  name?: string | null
+  model_code?: string | null
+  /** BİLEREK opsiyonel ve BİLEREK kullanılmıyor — bkz. yukarıdaki uyarı. */
+  sku?: string | null
+}
+
+/** Aile şekli — yalnız ad gerekir. */
+export type ProductFamilySource = {
+  name?: string | null
+}
+
+const bosMu = (v: string | null | undefined): boolean => !v || v.trim() === ''
+
+/**
+ * Müşteriye gösterilecek ÜRÜN ADI. Sepete/siparişe/e-postaya düşecek ad ile
+ * AYNI olmalıdır — yüzeyler arası ikinci bir ad üretmez.
+ *
+ * Sıra: varyant adı → aile adı → sözlükten genel etiket. Ham SKU'ya ASLA düşmez.
+ */
+export const getProductDisplayName = (
+  variant: ProductIdentitySource | null | undefined,
+  family?: ProductFamilySource | null,
+  t?: (key: string) => string,
+): string => {
+  if (variant && !bosMu(variant.name)) return variant.name!.trim()
+  if (family && !bosMu(family.name)) return family.name!.trim()
+  // Son çare sözlükten gelir; iç kod YAZILMAZ. `t` yoksa boş dönmek, yanlış bir
+  // kimlik göstermekten iyidir — çağıran boş adı render etmemeyi seçebilir.
+  return t ? t('product.unnamed') : ''
+}
+
+/**
+ * Aile içinde AYIRT EDİCİ etiket (ör. "ADH-200 E2"). Ölçüm: 374 üründen 74'ünde
+ * ad, aile içinde başka bir üyeyle çakışıyor — yani ad tek başına ayırt etmiyor,
+ * etiket gerçekten gerekli.
+ *
+ * `model_code` yoksa **null döner**: etiketi hiç göstermemek, müşteriye iç kod
+ * göstermekten iyidir. `sku`'ya düşmek YASAK.
+ */
+export const getProductModelLabel = (
+  variant: ProductIdentitySource | null | undefined,
+): string | null => {
+  if (!variant || bosMu(variant.model_code)) return null
+  return variant.model_code!.trim()
+}

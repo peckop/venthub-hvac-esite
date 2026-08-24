@@ -1,21 +1,61 @@
 name: DB Advisor
 
+# ⚠️ `push` KASITEN yalnız master (T095/EDGE · 2026-08-19).
+# Eskiden dalsız `push:` yazıyordu ve `pull_request` ile BİRLİKTE ateşliyordu: bir dala
+# push atıldığında AYNI commit için İKİ advisor koşumu doğuyordu. Aşağıdaki apt asılması
+# ile birleşince bu, eşzamanlılık yuvalarını iki katı hızda tüketiyordu — 2026-08-19'da
+# bir günde 34 asılı koşum iptal edildi ve filo üç kez kilitlendi.
+# Kapsam kaybı YOK: dal push'unda `pull_request` koşar, master'da `push` koşar.
+# (Aynı gerekçe `ci.yml` ve `e2e-smoke.yml` içinde de yazılı — ev geleneği bu.)
 on:
   push:
+    branches: [master]
   pull_request:
 
 jobs:
   advisor:
     runs-on: ubuntu-latest
+    # İŞ DÜZEYİ ZAMAN SINIRI — yoktu ve bedeli ağırdı. GitHub varsayılanı ALTI SAAT:
+    # apt asılınca her koşum o kadar süre bir eşzamanlılık yuvası tutuyordu. 2026-08-19'da
+    # aynı anda 19 asılı koşum ölçüldü ve TÜM filonun kapıları kuyruğa girdi.
+    # Sınırsız bir adım yalnız kendi işinin riski değildir; paylaşılan havuzu da yakar.
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Postgres client (psql)
+      # ══════════════════════════════════════════════════════════════════════
+      # apt ADIMI KALDIRILDI (2026-08-19 · ölçüldü, tahmin edilmedi)
+      #
+      # Eski hâli `sudo apt-get update && sudo apt-get install -y postgresql-client`
+      # idi ve bugün filoyu üç kez kilitledi. Sonra BAŞARILI bir koşumun günlüğü açıldı:
+      #
+      #   The following NEW packages will be installed:  postgresql-client
+      #   Need to get 11.6 kB of archives.
+      #
+      # ONBİR KİLOBAYT. Kurulan tek şey `postgresql-client` META paketi — içinde ikili
+      # dosya YOK, yalnız işaretçi. Gerçek istemci (`postgresql-client-16`) koşucu
+      # imajında ZATEN VAR; olmasaydı NEW packages listesinde o da görünürdü.
+      #
+      # Yani 24 dakikalık asılmalar, hiçbir şey kurmayan bir tur için ödeniyordu.
+      #
+      # NİÇİN `continue-on-error` YETMİYORDU: adım işi kırmızı yapmıyordu ama ASILMASI
+      # engellenmiyordu — koşum yine 6 saate kadar yuva tutuyordu. "Hata sayılmıyor"
+      # ile "kaynak yakmıyor" AYNI ŞEY DEĞİLDİR.
+      #
+      # FAIL-CLOSED: imaj bir gün psql'i düşürürse bu adım SESSİZ kalmaz, adıyla düşer.
+      # SSOT: docs/standards/ci-runner-install-standard.md §2.6
+      # ══════════════════════════════════════════════════════════════════════
+      - name: psql var mi (kurulum YOK)
+        timeout-minutes: 2
         run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-        continue-on-error: true
+          set -euo pipefail
+          if ! command -v psql >/dev/null 2>&1; then
+            echo "::error::psql kosucu imajinda YOK — kurulum adimi geri gerekiyor."
+            echo "::error::bkz. docs/standards/ci-runner-install-standard.md bolum 2.6"
+            exit 1
+          fi
+          psql --version
 
       - name: Supabase Advisor (SQL checks)
         env:
@@ -113,6 +153,13 @@ jobs:
         continue-on-error: true
 
   # ---------------------------------------------------------------------------
+  # ON-YOKLAMA IKI KAPIYA HIZMET EDER (2026-08-20, T161-VH - EDGE):
+  # `db-gate-precheck` yalnizca "SUPABASE_DB_URL var mi" diye sorar; INV-CATALOG-1 ve
+  # INV-RLS-COVERAGE-1 ayni cevaba baglidir. Is adi bilerek DEGISTIRILDI: eski ad
+  # `catalog-integrity-precheck` idi ve ikinci kapiyi tasidiginda ad artik yaptigi isi
+  # ANLATMAZ olurdu. (Ayni sinif T135'te olculdu: bir kimlik ikinci bir kurali
+  # gosterdiginde, kimlige bakan okuyucu YANLIS kurali miras alir.)
+  #
   # INV-CATALOG-1 — katalog butunlugu kapisi (T099).
   # Yukaridaki advisor isi TAVSIYE verir (|| true + continue-on-error). Bu is ise
   # gercek bir KAPIDIR: tabanin disinda yeni bir ihlal varsa KIRMIZI olur.
@@ -125,8 +172,13 @@ jobs:
   #
   # Cetvel: docs/standards/catalog-ingestion-standard.md 6.1
   # ---------------------------------------------------------------------------
-  catalog-integrity-precheck:
+  db-gate-precheck:
     runs-on: ubuntu-latest
+    # PRICING'in ACIK IZNIYLE eklendi (2026-08-19, panoda kayitli). Kendi bulgulari:
+    # "benim iki isimde de timeout YOK; is prod DB'ye baglaniyor, havuz asilirsa
+    # GitHub varsayilani 6 saat - bugun onardigimiz kilitlenmenin aynisini benim
+    # isim uretebilirdi." Bu is bir sir yoklamasi, olculen sure 3 saniye.
+    timeout-minutes: 5
     outputs:
       ready: ${{ steps.probe.outputs.ready }}
     steps:
@@ -145,16 +197,18 @@ jobs:
           # ayari sessizce dogrulanmis dosyanin ustune gecerse tam da onardigimiz kusur geri gelir.
           if [ -n "${DB_URL:-}" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
-            echo "INV-CATALOG-1: sirlar tam -> kapi KOSACAK"
+            echo "SUPABASE_DB_URL var -> INV-CATALOG-1 ve INV-RLS-COVERAGE-1 KOSACAK"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning title=INV-CATALOG-1 ATLANDI::SUPABASE_DB_URL yok -> kapi isi ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda katalog butunlugu OLCULMEDI."
+            echo "::warning title=DB KAPILARI ATLANDI::SUPABASE_DB_URL yok -> INV-CATALOG-1 ve INV-RLS-COVERAGE-1 isleri ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda ne katalog butunlugu ne RLS rol kapsami OLCULDU."
           fi
 
   catalog-integrity:
-    needs: catalog-integrity-precheck
-    if: needs.catalog-integrity-precheck.outputs.ready == 'true'
+    needs: db-gate-precheck
+    if: needs.db-gate-precheck.outputs.ready == 'true'
     runs-on: ubuntu-latest
+    # PRICING izniyle (bkz. precheck). Olculen sure dort kosumda 57-65 saniye.
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -200,3 +254,62 @@ jobs:
           echo | openssl s_client -starttls postgres -connect "$HOSTPORT" -showcerts 2>/dev/null             | grep -E "^ *[0-9]+ s:|^ *[0-9]+ i:" || echo "zincir okunamadi"
           echo "depodaki kok:"
           openssl x509 -in scripts/db/checks/supabase-root-2021-ca.pem -noout -subject -fingerprint -sha256
+
+  # ---------------------------------------------------------------------------
+  # INV-RLS-COVERAGE-1 — kodun OKUDUGU ile DB'nin IZIN VERDIGI ayrissin (T161-VH).
+  #
+  # NICIN CI'YA BAGLANIYOR: kapi #712 ile geldi ama HICBIR is onu cagirmiyordu; yalniz
+  # elle kosuluyordu. Elle kosulan kapi, kosulmadigi her gun YOK demektir - ve tam olarak
+  # bu kapinin yakaladigi kusur (client_errors) 2026-06-02'den 2026-08-20'ye kadar
+  # kimsenin gormedigi bir sessiz-bosluk olarak yasadi.
+  #
+  # KAPSAM DURUSTLUGU - "bagli" ile "bloklayan" AYNI SEY DEGIL: master dal korumasinin
+  # zorunlu baglamlari bugun ["ci","admin-smoke","Vercel"]. Bu is de, kardesi
+  # INV-CATALOG-1 de o listede DEGIL; yani kirmizi olduklarinda GORUNURLER ama merge'i
+  # mekanik olarak durdurmazlar. Listeye eklemek depo AYARI degisikligidir (Recep kapisi)
+  # ve bu PR onu YAPMIYOR - bilerek, cunku iki kapinin da canli davranisi once bir sure
+  # gozlenmeli.
+  #
+  # Betik ayrica kendi KORLUGUNU de olcer: kod taramasi bosalirsa (dizinler tasindi vb.)
+  # "ihlal yok" demek yerine cikis 2 ile KIRMIZI doner.
+  #
+  # Cetvel: scripts/db/checks/rls-role-coverage.mjs bas yorumu + docs/standards/ci-runner-install-standard.md
+  # ---------------------------------------------------------------------------
+  rls-role-coverage:
+    needs: db-gate-precheck
+    if: needs.db-gate-precheck.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    # Olculen is: TEK sorgu + yerel kod taramasi. Sinir yine de ILAN EDILIR - sinirsiz
+    # adim yalniz kendi isinin riski degil, paylasilan esszamanlilik havuzunu da yakar
+    # (2026-08-19'da bir gunde 34 asili kosum iptal edildi).
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # Kardes is (catalog-integrity) ile AYNI gerekce: --legacy-peer-deps zorunlu
+      # (depoda onceden var olan react-day-picker/date-fns peer catismasi npm'i patlatir),
+      # --ignore-scripts ise yalnizca surucu gerektigi icin.
+      # ADIM DUZEYINDE zaman siniri: is butcesi 10dk, ama asilan bir kurulum adiminin
+      # kendisi daha once olmelidir (ci-runner-install-standard §2 kural 1).
+      - name: Install pg driver only
+        timeout-minutes: 5
+        run: npm install --no-save --no-audit --no-fund --ignore-scripts --legacy-peer-deps pg@8
+
+      - name: RLS role coverage gate
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          # Kok sertifikanin TEK kaynagi depo dosyasidir (kardes iste gerekcesi yazili).
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          node scripts/db/checks/rls-role-coverage.mjs
+
+      # TLS teshisi BILEREK TEKRARLANMADI: kardes is ayni sunucuya ayni sertifikayla
+      # baglaniyor ve zincir teshisini o basiyor. Ayni teshisi iki yere kopyalamak,
+      # birini guncelleyip digerini unutmanin davetidir.

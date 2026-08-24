@@ -11,6 +11,7 @@ import { dataTable } from './dataTable.en'
 import { errorGroups } from './errorGroups.en'
 import { errors } from './errors.en'
 import { inventory } from './inventory.en'
+import { invoices } from './invoices.en'
 import { logistics } from './logistics.en'
 import { menu } from './menu.en'
 import { movements } from './movements.en'
@@ -42,6 +43,7 @@ export const admin = {
   titles,
   audit,
   inventory,
+  invoices,
   settings,
   products,
   purchasing,
