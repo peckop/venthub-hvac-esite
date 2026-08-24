@@ -6,6 +6,8 @@ import React, { useMemo } from 'react'
 import Pagination from '../components/ui/Pagination'
 import { useCategoryGateway } from '../hooks/useCategoryGateway'
 import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
+import { useI18n } from '../i18n/I18nProvider'
+import { compareText } from '../i18n/sort'
 import type { DomainCategory } from '../lib/type-converters'
 import type { FamilyListItem } from '../types/ui-models'
 
@@ -41,6 +43,8 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
   pageSize = 24,
   initialSubCategories
 }) => {
+  const { lang } = useI18n()
+
   // 1. Pure Data Layer (Gateway) — veri çekmez; kategori/alt kategori bağlamı + görünüm tercihleri
   const {
     category: rawCategory,
@@ -83,10 +87,10 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
     if (filters.sortBy === 'variants') {
       sorted.sort((a, b) => b.variant_count - a.variant_count)
     } else {
-      sorted.sort((a, b) => a.name.localeCompare(b.name))
+      sorted.sort((a, b) => compareText(a.name, b.name, lang))
     }
     return sorted
-  }, [families, filters])
+  }, [families, filters, lang])
 
   const pagination = (
     <React.Suspense fallback={<div className="py-10" />}>

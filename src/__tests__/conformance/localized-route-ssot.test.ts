@@ -85,7 +85,10 @@ const INFRA_ALLOWLIST = new Set<string>([
   'app/auth/signout/route.ts',
   'app/[lang]/category/[categorySlug]/page.tsx',
   'app/[lang]/category/[categorySlug]/[subCategorySlug]/page.tsx',
-  'app/[lang]/products/[slug]/page.tsx',
+  // NOT: `app/[lang]/products/[slug]/page.tsx` 2026-08-21'de LİSTEDEN ÇIKTI (T138 K1).
+  // 308 hedefini elle `/${lang}/...` kurmayı bıraktı; rota kararı `lib/data/productRoute.ts`e
+  // taşındı ve orada dil öneki SSOT'tan (`localizedHref`) geliyor. Muafiyet artık gereksiz —
+  // ve gereksiz muafiyet, o dosyaya yarın yazılacak gerçek bir kaçağı görünmez kılardı.
   // `revalidatePath` literal yol ister (Next sözleşmesi).
   // ⚠️ NOT: bu dosyanın TR yollarını KANONİK slug'la kurması AYRI bir kusurdur
   // (render denetimi K2, Dalga-1'de düzeltilecek). Buradaki muafiyet onu AKLAMAZ,
