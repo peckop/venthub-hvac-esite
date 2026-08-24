@@ -21,6 +21,19 @@ import {
 import { useAuth } from './useAuth'
 import { useCart } from './useCartHook'
 
+/**
+ * Orchestrates the multi-step checkout process by centralizing state management, validation logic, and legal consent checks.
+ * Manages the active step, address selection, invoice profiles, and ensures validation is performed before progressing to payment.
+ *
+ * @returns An object containing all checkout form states, step indicators, address/invoice profiles, and validation handlers.
+ *
+ * @example
+ * const { step, setStep, customerInfo, handleNextStep } = useCheckoutOrchestrator()
+ *
+ * <button onClick={() => handleNextStep(initiatePayment)}>
+ *   {step === 3 ? 'Complete Order' : 'Next Step'}
+ * </button>
+ */
 export const useCheckoutOrchestrator = () => {
   const { user } = useAuth()
   const { t, lang } = useI18n()

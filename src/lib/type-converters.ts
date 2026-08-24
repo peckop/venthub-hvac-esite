@@ -24,7 +24,15 @@ export const isRecord = (value: unknown): value is Record<string, unknown> => {
 
 /**
  * Safely converts a Database Category row to a UI-ready Category model.
- * Centralizes the handling of potential Json/Text mismatches from Supabase.
+ * Centralizes the handling of potential Json/Text mismatches from Supabase, ensuring required strings are not null.
+ *
+ * @param dbCat - The raw category data row from Supabase database
+ * @returns The UI-ready DomainCategory object with resolved strings
+ *
+ * @example
+ * const dbRow = { id: '1', name: 'Fanlar', menu_label: null }
+ * const uiCategory = mapDatabaseCategoryToDomain(dbRow)
+ * // returns { id: '1', name: 'Fanlar', menu_label: 'Fanlar', marketing_title: 'Fanlar', description: '' }
  */
 export const mapDatabaseCategoryToDomain = (dbCat: DbCategory): DomainCategory => {
   return {
@@ -38,6 +46,15 @@ export const mapDatabaseCategoryToDomain = (dbCat: DbCategory): DomainCategory =
 
 /**
  * Safely converts a Database Product row to a UI-ready Product model.
+ * Resolves the localized description from the JSONB column based on Turkish default.
+ *
+ * @param dbProd - The raw product data row from Supabase database
+ * @returns The UI-ready DomainProduct object with resolved names and fallback brand
+ *
+ * @example
+ * const dbRow = { id: 'p1', name: 'Jet Fan', description_i18n: { tr: 'Güçlü jet fan' }, brand: null }
+ * const uiProduct = mapDatabaseProductToDomain(dbRow)
+ * // returns { id: 'p1', name: 'Jet Fan', description: 'Güçlü jet fan', brand: 'Venthub' }
  */
 export const mapDatabaseProductToDomain = (dbProd: DbProduct): DomainProduct => {
   return {

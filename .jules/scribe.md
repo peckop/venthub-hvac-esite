@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2026-08-24 - [TSDoc Type Converters]
+**Learning:** Type converter functions (like `mapDatabaseCategoryToDomain`) that map raw database rows to UI domain models often use implicit defaults (like `||` operators) or JSONB extraction. Adding clear `@example` tags demonstrating how `null` values are resolved makes these functions significantly easier to understand.
+**Action:** When documenting mapping functions, use concrete inputs with `null` fields in the `@example` to show exactly how the fallback logic behaves in practice.
