@@ -70,6 +70,11 @@ interface BoardModule {
   globToRegExp: (glob: string) => RegExp
   toRepoRelative: (filePath: string, repoRoot?: string) => string
   resolveNoteTarget: (rawTo?: string) => { ok: boolean; to?: string; how?: string; reason?: string; valid?: string[] }
+  /**
+   * Kimligin BICIMINI dogrular. resolveNoteTarget HEDEFI (--to) dogruluyordu; bu, GONDERENIN
+   * kimligini (--sid) dogrular — olculmus vaka icin INV-BOARD-3 icindeki BOZUK kimlik kolu.
+   */
+  sidDogrula: (sid: string) => { ok: boolean; tur?: string; sebep?: string; oneri?: string }
 }
 
 /**
@@ -514,6 +519,84 @@ describe('INV-BOARD-3 · kimliksiz yazım yok', () => {
       'talep açıkça verilen kimliğe yazılmadı',
     ).toContain('recep-manual')
   })
+
+  /**
+   * BOZUK KİMLİKLE YAZIM YOK — kimliğin VARLIĞI yetmez, BİÇİMİ de doğrulanır.
+   *
+   * ⚠ ÖLÇÜLMÜŞ VAKA (2026-08-20, 2026-08-23'te TEKRARLADI): bir şeridin `--sid`'ine altı Kiril
+   * harf karıştı. Komut BAŞARILI döndü ve "not bırakıldı" yazdı; ama `sessionFile()` geçersiz
+   * karakterleri `_` ile değiştirdiği için not `events.99fa366e-d8bb-4______61.jsonl` adlı YENİ
+   * bir dosyaya düştü. Gönderen teslim edildiğini sandı, ALICI HİÇ GÖRMEDİ. Aynı sınıf 08-23'te
+   * GÖRSEL şeridinde yeniden yaşandı (`events.*969a`) — yani tek seferlik bir sürçme değil.
+   *
+   * Sınıf: SAHTE-YEŞİL. `--to` için 2026-08-16'da kapatılmıştı (`resolveNoteTarget`); `--sid`
+   * tarafı açık kalmıştı. Kapı VARDI, KAPSAMI eksikti.
+   */
+  it('BOZUK kimlikle YAZAN her fiil reddedilir ve panoya HİÇBİR ŞEY yazmaz', () => {
+    const board = loadBoard(boardDir)
+    // Gerçek vakanın kendisi: latin görünümlü ama Kiril kod noktaları (U+0432 U+0437 U+0430).
+    const bozukSid = '99fa366e-d8bb-4взаимо61'
+    const fiiller = [...board.PANOYA_YAZAN_FIILLER]
+    expect(fiiller.length, 'yazan fiil listesi BOŞ — kapı hiçbir şey ölçmüyor olurdu (vacuous)').toBeGreaterThan(0)
+
+    for (const verb of fiiller) {
+      const r = runCli([verb, '--sid', bozukSid, ...(EK_ARGS[verb] ?? VARSAYILAN_EK_ARGS)])
+
+      expect(
+        r.status,
+        `"${verb}" BOZUK kimlikle koştu ve BAŞARILI döndü — not hayalet dosyaya düşer, gönderen "bırakıldı" cevabı alır, alıcı hiç görmez`,
+      ).not.toBe(0)
+      expect(
+        board.readEvents().length,
+        `"${verb}" reddedildiği HÂLDE panoya yazmış — kısmi yazım en kötüsü: ne teslim edilir ne de gönderen uyarılır`,
+      ).toBe(0)
+    }
+  })
+
+  it('red MESAJI bozuk karakteri KOD NOKTASIYLA gösterir — operatör neyi düzelteceğini görmeli', () => {
+    loadBoard(boardDir)
+    const r = runCli(['note', '--sid', '99fa366e-d8bb-4вм61', '--text', 'hayalete-dusmemeli'])
+
+    // Yalnız "reddedildi" demek yetmez: Kiril "в" ile latin "b" EKRANDA ayırt edilemez.
+    // Kod noktası basılmazsa operatör kimliği tekrar tekrar aynı yanlış biçimde yazar.
+    expect(
+      r.stderr,
+      `red gerekçesi kod noktası içermiyor; görsel olarak ayırt edilemeyen karakteri operatör bulamaz. stderr: ${r.stderr}`,
+    ).toMatch(/U\+04[0-9A-F]{2}/)
+  })
+
+  it('KAÇIŞ KAPISI YOK: hiçbir ek bayrak bozuk kimliği geçiremez', () => {
+    const board = loadBoard(boardDir)
+    // İlk sürümde `--yeni-kimlik` bayrağı vardı ve sabotaj testinde bozuk kimliği GEÇİRDİ —
+    // yani kaçış kapısı, kapının kapattığı deliği aynen geri açıyordu. Bayrak kaldırıldı;
+    // bu test onun geri gelmesini yakalar.
+    for (const bayrak of ['--yeni-kimlik', '--force', '--zorla']) {
+      const r = runCli(['note', '--sid', 'xвx', '--text', 'hayalete-dusmemeli', bayrak])
+      expect(
+        r.status,
+        `"${bayrak}" bayrağı bozuk kimliği GEÇİRDİ — kaçış kapısı kapının varlık sebebini yiyor`,
+      ).not.toBe(0)
+    }
+    expect(board.readEvents().length, 'bayraklı çağrıların biri panoya yazmış').toBe(0)
+  })
+
+  it('KAPI YALNIZ YAZAN FİİLLERDE: "who" bozuk kimlikle de KOŞAR (okuma kapanmaz)', () => {
+    loadBoard(boardDir)
+    const r = runCli(['who', '--sid', '99fa366e-d8bb-4вм61'])
+
+    // Asimetri bilinçli: bozuk kimlik YANLIŞ DOSYAYA YAZAR, ama okumayı bozmaz. Kapıyı
+    // okuyan fiillere de yaymak, kimliği bozulmuş bir şeridi panodan tamamen kör bırakırdı.
+    expect(r.status, '"who" bozuk kimlik yüzünden engellendi — pano okuma gereksiz yere kapatılmış').toBe(0)
+  })
+
+  it('KAPI VACUOUS DEĞİL: geçerli kimlikler GEÇER (hepsini reddeden kapı da "yeşil" görünür)', () => {
+    const board = loadBoard(boardDir)
+
+    expect(board.sidDogrula('ac03ce11-c975-478d-bf30-66afb7c00f15').ok, 'geçerli uuid reddedildi').toBe(true)
+    expect(board.sidDogrula('recep-manual').ok, 'INV-BOARD-3\'ün YAZILI muafiyeti kırıldı — elle kimlik bayraksız çalışmalı').toBe(true)
+    expect(board.sidDogrula('99fa366e-d8bb-4вм61').ok, 'Kiril harfli kimlik KABUL edildi — kapı ölçmüyor').toBe(false)
+  })
+
 
   it('CLAUDE_SESSION_ID dolu ise ikinci basamak çalışmaya devam eder', () => {
     const board = loadBoard(boardDir)
