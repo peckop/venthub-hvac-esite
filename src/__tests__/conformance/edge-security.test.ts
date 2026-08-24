@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 /**
@@ -26,6 +29,12 @@ import { describe, expect, it } from 'vitest'
  *   R7→E7 (config kapsamı) · R8→E9 (admin rol kontrolü) · R9→E10 (webhook fail-closed) ·
  *   R10→E11 (çağıran sınıfı beyanı) · R11→E12 (tenant_id önceliği)
  * (E8 kod değil hat kuralıdır — `scripts/edge/select-functions.mjs` ile karşılanır.)
+ *
+ * §3.11 kuralları AYRI bir kapıdadır (`config-fail-closed.test.ts`, INV-CONFIG-1):
+ *   E13 (healthz ölçemeden yeşil dönemez) · E14 (ortam değiştiren sessiz varsayılan).
+ * **E12 ÖLÜ NUMARADIR** — `E12-B/C/D` ailesinin köküdür ve §3.9'a bağlıdır; yeni bir kurala
+ * verilemez. 2026-08-19'da §3.11 satırı yanlışlıkla E12 olarak yazıldı, cetvel ile buradaki
+ * eşleme çelişti ve hiçbir kapı görmedi. Aşağıdaki R12 kapısı o sınıfı kilitler.
  */
 
 declare global {
@@ -1254,5 +1263,135 @@ describe('R11-D · gövdeden tenant okuyan dosya service_role doğrulaması taş
         '`timingSafeEquals(token, serviceRoleKey)` kapısı koy (bkz. `_shared/caller.ts`), ya da ' +
         'gövdeyi hiç okuma — `tenantFromRow` ile kaynak satırından türet.',
     )
+  })
+})
+
+/* ================================================================== *
+ * R12 — CETVELİN KENDİSİ: E-kimlik ailesi tutarlılığı (INV-EDGE-E-ID)
+ * ================================================================== *
+ *
+ * NİÇİN VAR (2026-08-20, T135-VH — kusur BENDEN çıktı)
+ * ----------------------------------------------------
+ * Cetveldeki her makine-denetimli kural bir E-numarası taşır ve bu dosyanın
+ * başlığındaki R↔E eşlemesi ona atıfta bulunur. 2026-08-15'te E12 ÜÇE BÖLÜNDÜ:
+ * E12-B / E12-C / E12-D, hepsi §3.9 (tenant_id). Yani E12 artık tek başına bir
+ * kural değil, bir AİLENİN KÖKÜ.
+ *
+ * 2026-08-19'da §3.11 kuralını yazarken "sırada boş görünen numara" diye E12'yi
+ * yeniden kullandım. Sonuç: aynı kimlik cetvelde §3.11'i, bu dosyanın başlığında
+ * ise §3.9'u gösterir hâle geldi — SSOT çiftinin iki yarısı birbiriyle çelişti.
+ *
+ * HİÇBİR KAPI GÖRMEDİ, ve görmemesi şaşırtıcı değil: bütün edge kapıları
+ * KAYNAK KODU ölçüyordu. Cetvelin kendisini okuyan bir kapı yoktu. 400 satırlık
+ * bir belgenin kimlik listesini kimse elle saymaz — bu sınıf ("cetvel var, onu
+ * ölçen kapı yok") aynı gün I18N tarafından bağımsız olarak da bulundu.
+ *
+ * NE KİLİTLİYOR
+ * -------------
+ *  1. Aynı sayısal kökü paylaşan TÜM satırlar aynı bölüme bakmak zorunda.
+ *     (E12, E12-B, E12-C, E12-D → hepsi §3.9. E12'yi §3.11'e vermek = KIRMIZI.)
+ *  2. Tam kimlik tekrar edemez (E7 iki kez tanımlanamaz).
+ *
+ * KAPSAM KANARYASI da var: desen bozulursa iki test sessizce yeşile döner —
+ * boş listede ne mükerrer bulunur ne çelişkili aile. Kanarya önce "bakıyor
+ * muyum" sorusunu kırmızı yakar.
+ */
+const CETVEL_YOLU = join(process.cwd(), 'docs', 'standards', 'edge-function-security-standard.md')
+
+interface ESatiri {
+  kimlik: string
+  kok: string
+  bolum: string
+  satir: number
+}
+
+/** Cetvelin E-satırlarını ayıkla. CRLF normalize edilir (bu depoda kanıtlı bir körlük kaynağı). */
+function eSatirlariniAyikla(kaynak: string): ESatiri[] {
+  const out: ESatiri[] = []
+  kaynak
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .forEach((satirMetni, i) => {
+      const m = /^\|\s*\*\*(E\d+(?:-[A-Z])?)\*\*\s*\|\s*§\s*([\d.]+)/.exec(satirMetni.trim())
+      if (!m) return
+      const kimlik = m[1]
+      const kokEsl = /^(E\d+)/.exec(kimlik)
+      if (!kokEsl) return
+      out.push({ kimlik, kok: kokEsl[1], bolum: m[2].replace(/\.$/, ''), satir: i + 1 })
+    })
+  return out
+}
+
+describe('R12 · cetvelin E-kimlikleri tutarlı (INV-EDGE-E-ID)', () => {
+  const HAM = readFileSync(CETVEL_YOLU, 'utf8')
+  const SATIRLAR = eSatirlariniAyikla(HAM)
+
+  it('KAPSAM KANARYASI — ayıklayıcı cetveli GERÇEKTEN okuyor', () => {
+    expect(
+      SATIRLAR.length,
+      'Cetvelden hiç E-satırı ayıklanamadı — kapı ölçmüyor, YEŞİL yanması ANLAMSIZ. ' +
+        'Tablo biçimi değiştiyse eSatirlariniAyikla desenini güncelle.',
+    ).toBeGreaterThan(10)
+    expect(
+      SATIRLAR.filter((r) => r.kok === 'E12').length,
+      'E12 ailesi (E12-B/C/D) hiç görülmedi — ayıklayıcı alt-kimlikleri kaçırıyor.',
+    ).toBeGreaterThan(2)
+  })
+
+  it('aynı sayısal kökü paylaşan satırlar AYNI bölüme bakar', () => {
+    const aileler = new Map<string, ESatiri[]>()
+    for (const r of SATIRLAR) {
+      const liste = aileler.get(r.kok) ?? []
+      liste.push(r)
+      aileler.set(r.kok, liste)
+    }
+    const celiskili: string[] = []
+    for (const [kok, uyeler] of aileler) {
+      if (new Set(uyeler.map((u) => u.bolum)).size > 1) {
+        celiskili.push(
+          kok +
+            ' -> ' +
+            uyeler
+              .map((u) => u.kimlik + ' (satir ' + u.satir + ', bolum ' + u.bolum + ')')
+              .join(' · '),
+        )
+      }
+    }
+    expect(
+      celiskili,
+      'AYNI E-KOKU IKI FARKLI KURALI GOSTERIYOR. Bolunmus bir kimligin koku (or. E12) ' +
+        'ailesine aittir ve YENI bir kurala verilemez; verilirse cetvel ile bu dosyanin ' +
+        'basligindaki esleme birbiriyle celisir ve kimse gormez. COZUM: yeni kurala ' +
+        'kullanilmamis bir numara ver (E12 bilerek olu birakildi) ve cetvelde nicin ' +
+        'atlandigini yaz.\n' + celiskili.join('\n'),
+    ).toEqual([])
+  })
+
+  it('tam E-kimliği tekrar etmiyor', () => {
+    const sayac = new Map<string, number[]>()
+    for (const r of SATIRLAR) {
+      const l = sayac.get(r.kimlik) ?? []
+      l.push(r.satir)
+      sayac.set(r.kimlik, l)
+    }
+    const tekrar = [...sayac.entries()]
+      .filter(([, satirlar]) => satirlar.length > 1)
+      .map(([k, satirlar]) => k + ' (satirlar: ' + satirlar.join(', ') + ')')
+    expect(
+      tekrar,
+      'Ayni E-kimligi cetvelde birden fazla kez tanimlanmis — hangisinin gecerli oldugu ' +
+        'belirsiz.\n' + tekrar.join('\n'),
+    ).toEqual([])
+  })
+
+  it('ayıklayıcı GERÇEK ihlali yakalar (yanlış-yeşil sigortası)', () => {
+    const sabotaj = [
+      '| **E12** | §3.11 ortam degistiren sessiz varsayilan yasak | x | y | z |',
+      '| **E12-B** | §3.9 yapisal kilit | x | y | z |',
+    ].join('\n')
+    const r = eSatirlariniAyikla(sabotaj)
+    expect(r.length).toBe(2)
+    expect(new Set(r.map((x) => x.bolum)).size).toBe(2)
+    expect(new Set(r.map((x) => x.kok)).size).toBe(1)
   })
 })

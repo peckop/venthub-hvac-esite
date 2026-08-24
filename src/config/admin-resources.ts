@@ -11,6 +11,7 @@ import {
   Package,
   PackageSearch,
   Percent,
+  Receipt,
   Settings,
   ShieldCheck,
   ShoppingCart,
@@ -114,6 +115,19 @@ export const ADMIN_RESOURCES: AdminResource[] = [
     requiredAccess: '/admin/returns',
     searchable: true,
     searchHintKey: 'admin.search.returns',
+    inNav: true
+  },
+  {
+    // T132: fatura defteri. `requiredAccess` sayfa yolunun AYNISI — rbac.ts orada
+    // moderator/viewer'i kapatir (order_invoices RLS'i is_admin_user() istiyor), yani
+    // menu ogesi de goremeyecegi bir yere goturmez.
+    key: 'invoices',
+    labelKey: 'admin.menu.invoices',
+    group: 'sales',
+    route: '/admin/invoices',
+    icon: Receipt,
+    requiredAccess: '/admin/invoices',
+    searchable: true,
     inNav: true
   },
   {

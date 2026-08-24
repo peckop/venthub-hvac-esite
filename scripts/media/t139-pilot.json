@@ -1,0 +1,45 @@
+{
+  "comment": "T139-VH urun gorseli pilotu - 5 urun, 5 ayri aile. page_url son parcasi = products.model_code (vortice.com URL kesfi, olcum 2026-08-21). tenant_id canli DB'den olculdu.",
+  "excluded": [
+    {
+      "model_code": "61181",
+      "product_id": "6f810bd3-cccd-4ebe-8ab0-b3266cffa049",
+      "name": "Vortice NORDIK HVLS HYPERBLADE 300/120 M SVT",
+      "page_url": "https://www.vortice.com/en/commercial-industrial/ceiling/61181",
+      "reason": "OLCULDU 2026-08-21: kaynak sayfada urun fotografi HIC yok (yalniz /img/fakeImg.png placeholder + PDF kilavuzlar). 374 olceklemesinde 'kaynakta gorsel yok' sinifinin kanit ornegi - uydurma/zorlama YOK, fail-visible."
+    }
+  ],
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000",
+  "pilots": [
+    {
+      "model_code": "11313",
+      "product_id": "fc43aa37-bf35-4b43-80aa-102330384ae2",
+      "name": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S",
+      "page_url": "https://www.vortice.com/en/residential-ventilation/axial-fans/wall/11313"
+    },
+    {
+      "model_code": "17160",
+      "product_id": "eb5d1303-4767-47ac-9c24-d1e24bfe90b3",
+      "name": "Vortice Lineo 100 Quiet",
+      "page_url": "https://www.vortice.com/en/commercial-ventilation/mixed-flow-fans/in-line/17160"
+    },
+    {
+      "model_code": "65196",
+      "product_id": "2219758a-4e10-4fba-a211-5027b41b357d",
+      "name": "Vortice Air Door AD 1200",
+      "page_url": "https://www.vortice.com/en/air-conditioning/air-curtains/standard-air-curtains/65196"
+    },
+    {
+      "model_code": "12106",
+      "product_id": "7aded34a-507c-4917-9953-341de53462f8",
+      "name": "Vortice Vort HR 350 Avel",
+      "page_url": "https://www.vortice.com/en/wet-and-dry-vacuum-cleaners/residencial-heat-recovery/centralized-for-wall-or-floor/12106"
+    },
+    {
+      "model_code": "11522",
+      "product_id": "203fb046-0c89-4701-9954-31da746ec126",
+      "name": "Vortice Vort Quadro Evo QE 100 LL",
+      "page_url": "https://www.vortice.com/en/residential-ventilation/centrifugal-fans/wall/11522"
+    }
+  ]
+}

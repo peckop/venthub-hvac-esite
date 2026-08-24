@@ -153,6 +153,13 @@ jobs:
         continue-on-error: true
 
   # ---------------------------------------------------------------------------
+  # ON-YOKLAMA IKI KAPIYA HIZMET EDER (2026-08-20, T161-VH - EDGE):
+  # `db-gate-precheck` yalnizca "SUPABASE_DB_URL var mi" diye sorar; INV-CATALOG-1 ve
+  # INV-RLS-COVERAGE-1 ayni cevaba baglidir. Is adi bilerek DEGISTIRILDI: eski ad
+  # `catalog-integrity-precheck` idi ve ikinci kapiyi tasidiginda ad artik yaptigi isi
+  # ANLATMAZ olurdu. (Ayni sinif T135'te olculdu: bir kimlik ikinci bir kurali
+  # gosterdiginde, kimlige bakan okuyucu YANLIS kurali miras alir.)
+  #
   # INV-CATALOG-1 — katalog butunlugu kapisi (T099).
   # Yukaridaki advisor isi TAVSIYE verir (|| true + continue-on-error). Bu is ise
   # gercek bir KAPIDIR: tabanin disinda yeni bir ihlal varsa KIRMIZI olur.
@@ -165,7 +172,7 @@ jobs:
   #
   # Cetvel: docs/standards/catalog-ingestion-standard.md 6.1
   # ---------------------------------------------------------------------------
-  catalog-integrity-precheck:
+  db-gate-precheck:
     runs-on: ubuntu-latest
     # PRICING'in ACIK IZNIYLE eklendi (2026-08-19, panoda kayitli). Kendi bulgulari:
     # "benim iki isimde de timeout YOK; is prod DB'ye baglaniyor, havuz asilirsa
@@ -190,15 +197,15 @@ jobs:
           # ayari sessizce dogrulanmis dosyanin ustune gecerse tam da onardigimiz kusur geri gelir.
           if [ -n "${DB_URL:-}" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
-            echo "INV-CATALOG-1: sirlar tam -> kapi KOSACAK"
+            echo "SUPABASE_DB_URL var -> INV-CATALOG-1 ve INV-RLS-COVERAGE-1 KOSACAK"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning title=INV-CATALOG-1 ATLANDI::SUPABASE_DB_URL yok -> kapi isi ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda katalog butunlugu OLCULMEDI."
+            echo "::warning title=DB KAPILARI ATLANDI::SUPABASE_DB_URL yok -> INV-CATALOG-1 ve INV-RLS-COVERAGE-1 isleri ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda ne katalog butunlugu ne RLS rol kapsami OLCULDU."
           fi
 
   catalog-integrity:
-    needs: catalog-integrity-precheck
-    if: needs.catalog-integrity-precheck.outputs.ready == 'true'
+    needs: db-gate-precheck
+    if: needs.db-gate-precheck.outputs.ready == 'true'
     runs-on: ubuntu-latest
     # PRICING izniyle (bkz. precheck). Olculen sure dort kosumda 57-65 saniye.
     timeout-minutes: 10
@@ -247,3 +254,62 @@ jobs:
           echo | openssl s_client -starttls postgres -connect "$HOSTPORT" -showcerts 2>/dev/null             | grep -E "^ *[0-9]+ s:|^ *[0-9]+ i:" || echo "zincir okunamadi"
           echo "depodaki kok:"
           openssl x509 -in scripts/db/checks/supabase-root-2021-ca.pem -noout -subject -fingerprint -sha256
+
+  # ---------------------------------------------------------------------------
+  # INV-RLS-COVERAGE-1 — kodun OKUDUGU ile DB'nin IZIN VERDIGI ayrissin (T161-VH).
+  #
+  # NICIN CI'YA BAGLANIYOR: kapi #712 ile geldi ama HICBIR is onu cagirmiyordu; yalniz
+  # elle kosuluyordu. Elle kosulan kapi, kosulmadigi her gun YOK demektir - ve tam olarak
+  # bu kapinin yakaladigi kusur (client_errors) 2026-06-02'den 2026-08-20'ye kadar
+  # kimsenin gormedigi bir sessiz-bosluk olarak yasadi.
+  #
+  # KAPSAM DURUSTLUGU - "bagli" ile "bloklayan" AYNI SEY DEGIL: master dal korumasinin
+  # zorunlu baglamlari bugun ["ci","admin-smoke","Vercel"]. Bu is de, kardesi
+  # INV-CATALOG-1 de o listede DEGIL; yani kirmizi olduklarinda GORUNURLER ama merge'i
+  # mekanik olarak durdurmazlar. Listeye eklemek depo AYARI degisikligidir (Recep kapisi)
+  # ve bu PR onu YAPMIYOR - bilerek, cunku iki kapinin da canli davranisi once bir sure
+  # gozlenmeli.
+  #
+  # Betik ayrica kendi KORLUGUNU de olcer: kod taramasi bosalirsa (dizinler tasindi vb.)
+  # "ihlal yok" demek yerine cikis 2 ile KIRMIZI doner.
+  #
+  # Cetvel: scripts/db/checks/rls-role-coverage.mjs bas yorumu + docs/standards/ci-runner-install-standard.md
+  # ---------------------------------------------------------------------------
+  rls-role-coverage:
+    needs: db-gate-precheck
+    if: needs.db-gate-precheck.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    # Olculen is: TEK sorgu + yerel kod taramasi. Sinir yine de ILAN EDILIR - sinirsiz
+    # adim yalniz kendi isinin riski degil, paylasilan esszamanlilik havuzunu da yakar
+    # (2026-08-19'da bir gunde 34 asili kosum iptal edildi).
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # Kardes is (catalog-integrity) ile AYNI gerekce: --legacy-peer-deps zorunlu
+      # (depoda onceden var olan react-day-picker/date-fns peer catismasi npm'i patlatir),
+      # --ignore-scripts ise yalnizca surucu gerektigi icin.
+      # ADIM DUZEYINDE zaman siniri: is butcesi 10dk, ama asilan bir kurulum adiminin
+      # kendisi daha once olmelidir (ci-runner-install-standard §2 kural 1).
+      - name: Install pg driver only
+        timeout-minutes: 5
+        run: npm install --no-save --no-audit --no-fund --ignore-scripts --legacy-peer-deps pg@8
+
+      - name: RLS role coverage gate
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          # Kok sertifikanin TEK kaynagi depo dosyasidir (kardes iste gerekcesi yazili).
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          node scripts/db/checks/rls-role-coverage.mjs
+
+      # TLS teshisi BILEREK TEKRARLANMADI: kardes is ayni sunucuya ayni sertifikayla
+      # baglaniyor ve zincir teshisini o basiyor. Ayni teshisi iki yere kopyalamak,
+      # birini guncelleyip digerini unutmanin davetidir.

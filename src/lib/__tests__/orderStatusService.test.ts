@@ -313,6 +313,16 @@ describe('updateOrderStatus — teslim damgası ve bildirimi (T058-VH)', () => {
     expect(supabase.functions.invoke).toHaveBeenCalledWith('delivery-notification', {
       body: { order_id: 'order-1' },
     })
+    /*
+      TAM OLARAK BIR KEZ. `toHaveBeenCalledWith` tek basina yetmez: iki cagriyla da
+      yesil doner. 2026-08-20'de tam bu bosluktan gecen bir kusur olctu — teslim
+      bildirimi blogu dosyaya AYNEN IKI KEZ yazilmisti (satir 191 ve 210, ardisik ve
+      kosulsuz) ve musteri ayni e-postayi iki kez aliyordu. Ustelik blogun kendi
+      yorumu mukerrer gonderimi ONLEMEK icin yazilmisti; koruma dogruydu, korumali
+      blogun tamami kopyalanmisti. Kapi "gonderildi mi" diye soruyordu, "KAC KEZ"
+      diye sormuyordu.
+    */
+    expect(supabase.functions.invoke).toHaveBeenCalledTimes(1)
   })
 
   it('ZATEN teslim edilmişse bildirim TEKRAR gönderilmez', async () => {

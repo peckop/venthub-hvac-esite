@@ -65,22 +65,69 @@ export const translateSpecKey = (key: string): string => {
  * formatSpecValue('weight_kg', 10) // returns "10 kg"
  * formatSpecValue('voltage_v', null) // returns "-"
  */
+/**
+ * Anahtar son-eki → görünen birim. UZUNDAN KISAYA sıralanır ve sıralama ELLE DEĞİL
+ * MEKANİK kurulur (aşağıdaki `sort`).
+ *
+ * NİÇİN MEKANİK: bu tablonun öncesindeki sürüm sıralı `if` zinciriydi ve `endsWith('_a')`
+ * kontrolü `includes('db_a')` kontrolünden ÖNCE geliyordu. `noise_level_db_a` anahtarının
+ * son iki karakteri `_a` olduğu için ilk kurala takılıyor, dB(A) satırına HİÇ ULAŞMIYORDU.
+ * Sonuç: **142 üründe ses seviyesi "58 A" (amper) olarak basıldı.** Kural yazılmıştı ama
+ * erişilemezdi — kodu okuyan "dB(A) desteği var" diye kaydediyordu. Kusur görünmezliğini
+ * tam da yazılmış olmaktan alıyordu.
+ *
+ * Aynı sınıfın sessiz hâli: `_pa` de `endsWith('_a')` ile eşleşmez (son iki karakter `pa`),
+ * bu yüzden **253 üründe statik basınç birimsiz** çıplak sayı olarak duruyordu.
+ *
+ * Uzunluğa göre sıralama bu sınıfı yapısal olarak kapatır: `_db_a` her zaman `_a`'dan,
+ * `_kw` her zaman `_w`'den, `_pa` her zaman `_a`'dan önce denenir. Yeni bir sonek eklerken
+ * sıralamayı düşünmek GEREKMEZ.
+ */
+const UNIT_SUFFIXES: ReadonlyArray<readonly [string, string]> = (
+  [
+    ['_db_a', 'dB(A)'],
+    ['_m3h', 'm³/h'],
+    ['_pct', '%'],
+    ['_kw', 'kW'],
+    ['_hz', 'Hz'],
+    ['_kg', 'kg'],
+    ['_mm', 'mm'],
+    ['_ms', 'm / s'],
+    ['_ls', 'l/s'],
+    ['_pa', 'Pa'],
+    ['_db', 'dB'],
+    ['_a', 'A'],
+    ['_c', '°C'],
+    ['_l', 'L'],
+    ['_v', 'V'],
+    ['_w', 'W'],
+  ] as ReadonlyArray<readonly [string, string]>
+).slice().sort((a, b) => b[0].length - a[0].length)
+
+/** Son-ek kuralına uymayan tekil anahtarlar. Genel kural uydurmak yerine ADIYLA yazılır. */
+const UNIT_BY_KEY: Readonly<Record<string, string>> = {
+  humidity_removed_l_24h: 'L/24h',
+}
+
 export const formatSpecValue = (key: string, value: unknown): string => {
   if (value === null || value === undefined) return '-';
   const stringValue = String(value);
   const lowerKey = key.toLowerCase();
 
+  // Değer zaten metin ise (ör. 'Class F', '230/400') birim eklemek onu bozar.
   if (/[a-zA-Z]/.test(stringValue)) return stringValue;
 
-  if (lowerKey.endsWith('_mm')) return `${stringValue} mm`;
-  if (lowerKey.endsWith('_kg')) return `${stringValue} kg`;
-  if (lowerKey.endsWith('_v')) return `${stringValue} V`;
-  if (lowerKey.endsWith('_hz')) return `${stringValue} Hz`;
-  if (lowerKey.endsWith('_c')) return `${stringValue} °C`;
-  if (lowerKey.endsWith('_ms')) return `${stringValue} m / s`;
-  if (lowerKey.endsWith('_a')) return `${stringValue} A`;
-  if (lowerKey.endsWith('_m3h')) return `${stringValue} m³/h`;
-  if (lowerKey.endsWith('_w')) return `${stringValue} W`;
+  const exact = UNIT_BY_KEY[lowerKey];
+  if (exact) return `${stringValue} ${exact}`;
+
+  for (const [suffix, unit] of UNIT_SUFFIXES) {
+    if (lowerKey.endsWith(suffix)) return `${stringValue} ${unit}`;
+  }
+
+  // Son-ek tablosundan SONRA gelen İÇERİK kuralları. Sıra burada da anlamlı:
+  // tablo `noise_level_db_a`yı zaten `_db_a` son-ekiyle yakalar; aşağıdaki içerik kuralı
+  // ise ölçüt anahtarın ORTASINDA geçen eski şema anahtarları içindir
+  // (`sound_pressure_level_lp_db_a_2m_max` gibi). İkisi çakışmaz çünkü tablo önce çalışır.
   if (lowerKey.includes('db_a')) return `${stringValue} dB(A)`;
   if (lowerKey.includes('rpm')) return `${stringValue} RPM`;
 

@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\config\admin-resources.ts
-skeleton_hash: c79794c12db90305
+source_path: C:\Users\alize\venthub-wt-legal\src\config\admin-resources.ts
+skeleton_hash: 5a6a23e3891482a0
 entity_hashes:
   func:buildBreadcrumbTrail: e45b24520d27372b
   func:findCurrentResource: abacc39d28d65284
   func:isResourceActive: ba63647dd340162a
   overview: d59e42a983b00846
-generated_at: 2026-08-18T06:45:52Z
+generated_at: 2026-08-20T09:37:14Z
 ---
 
 ## Genel Bakış
@@ -113,34 +113,6 @@ type AdminResourceGroup = | 'main'
 
 ---
 
-### [N2_NASIL] AST Pointer: src/config/admin-resources.ts::findCurrentResource
-- **params**: `pathname: string` — aranacak mevcut URL yolu
-- **ic_degiskenler**:
-  - `matches` — `ADMIN_RESOURCES` içerisinden `inNav` özelliği true olan ve `pathname` ile aktif eşleşen tüm kaynakların filtrelenmiş dizisi
-- **Dict/Subscript Erişimleri**:
-  - `r.inNav` — filtreme sırasında her kaynağın navigasyonda görünüp görünmediğini kontrol eder
-  - `r.route` — `reduce` içinde her kaynağın rotasının uzunluğunu karşılaştırmak için kullanılır
-  - `deepest.route` — şu anki en derin (en uzun rotaya sahip) kaynağın rotası
-- **Dönüş**: `AdminResource | undefined` — pathname ile eşleşen en derin (en uzun rotalı) navigasyon kaynağı; eşleşme yoksa `undefined`
-
----
-
-### [N3_NASIL] AST Pointer: src/config/admin-resources.ts::buildBreadcrumbTrail
-- **params**: `pathname: string` — breadcrumb zincirinin oluşturulacağı URL yolu
-- **ic_degiskenler**:
-  - `current` — `findCurrentResource` ile bulunan mevcut (en derin) kaynak nesnesi
-  - `trail` — `AdminResource[]` dizisi; breadcrumb zincirinin oluşturulduğu başlangıçta `current` ile başlayan yol
-  - `cursor` — döngü içinde backsöz konusu kaynaktan başlayarak üst kaynaklara (parent)走出ilen imleç; başlangıçta `current`'e eşittir
-  - `guard` — `Set<string>` — sonsuz döngüyü önlemek için ziyaret edilen `key`'leri tutar; başlangıçta `current.key` ile başlar
-- **Dict/Subscript Erişimleri**:
-  - `current.key` — mevcut kaynağın benzersiz tanımlayıcısı, `guard` Set'ine eklenir
-  - `cursor.parentKey` — döngü koşulunda kontrol edilen üst kaynağın key'i; `undefined` olduğunda döngü biter
-  - `r.key` — `ADMIN_RESOURCES.find` aramasında her kaynağın key'i eşleştirilir
-  - `parent.key` — bulunan üst kaynağın key'i; `guard` kontrolü ve `guard.add` için kullanılır
-- **Dönüş**: `AdminResource[]` — `current`'ten root'a (en üst ebeveyne) doğru sıralanmış breadcrumb dizisi; `current` bulunamazsa boş dizi `[]`
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -148,8 +120,8 @@ graph TD
     admin-resources_ts__buildBreadcrumbTrail["buildBreadcrumbTrail"]
     admin-resources_ts__findCurrentResource["findCurrentResource"]
     admin-resources_ts__isResourceActive["isResourceActive"]
-    admin-resources_ts__findCurrentResource --> admin-resources_ts__isResourceActive
     admin-resources_ts__buildBreadcrumbTrail --> admin-resources_ts__findCurrentResource
+    admin-resources_ts__findCurrentResource --> admin-resources_ts__isResourceActive
 ```
 
 ## NODE ID STANDARD
