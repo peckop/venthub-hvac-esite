@@ -98,6 +98,9 @@ if (!seritAldiMi) {
     '(dakika 0/30 dışı). Şerit talep edince bu satır kendiliğinden susar.',
   )
 }
+// YÖNTEM işareti (T144-VH): yalnız pano konuştuğunda (sessizlik kuralına tabi) tek satır —
+// ajan kafasını panoya çevirdiğinde cetvelin yerini görsün; tam metin SessionStart'ta.
+lines.push('YÖNTEM: emirde YÖNTEM: satırı (öneri; sapmayı yaz) — cetvel docs/standards/execution-method-standard.md')
 if (notes.length > 0) {
   lines.push('NOT: ' + notes.map(n => `${String(n.sid).slice(0, 8)}→${n.to || 'herkes'} "${n.text}"`).join(' | '))
   try { board.markSeen(sid, notes) } catch { /* işaretlenemedi: not tekrar gelir, zararsız */ }

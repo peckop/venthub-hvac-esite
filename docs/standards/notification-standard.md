@@ -57,11 +57,45 @@ diye yanlış hüküm kuruldu).
 biçiminin beşini de** taramak zorundadır: istemci `invoke` · sunucu→sunucu `fetch` ·
 veritabanı tetiği · webhook · cron. Tek biçimli taramanın sıfırı, yokluğun kanıtı değildir.
 
+#### B2.1.b — DEVREDEN UÇLAR (ikinci sınıf)
+
+Yukarıdaki tablo **e-postayı kendisi gönderen** uçları sayar. Ama gönderimi başka bir uca
+**devreden** uçlar da vardır: kullanıcının gözünden bildirimi başlatan şey onlardır, ve
+sağlayıcı adına (`api.resend.com`) bakan bir ölçü onları **göremez**.
+
+Ölçüm (2026-08-23, 28 ucun tamamı okundu): **6 doğrudan gönderici + 6 devreden.**
+
+| Devreden uç | Tetiklediği gönderici | Nasıl |
+|---|---|---|
+| `admin-update-shipping` | `shipping-notification` | sunucu→sunucu `fetch` |
+| `iyzico-callback` | `order-confirmation` | sunucu→sunucu `fetch` |
+| `order-paid-webhook` | `order-confirmation` | sunucu→sunucu `fetch` |
+| `returns-webhook` | `return-status-notification` | sunucu→sunucu `fetch` |
+| `shipping-webhook` | `delivery-notification` | sunucu→sunucu `fetch` |
+| `stock-alert` | `notification-service` | sunucu→sunucu `fetch` |
+
+`iyzico-payment` de `functions/v1` çağırır ama hedefi `order-validate`'tir — bildirim akışı
+değildir, **kapsam dışıdır**.
+
+> **Zincir vardır, tek adım varsaymayın.** `stock-alert` hem devreden hem hedeftir:
+> `iyzico-callback` → `stock-alert` → `notification-service`. Bu yüzden kural ve kapı
+> **geçişli** çalışır — bir gönderici uca kaç adımda ulaşıldığı fark etmez.
+
+**Kural B2.1.b:** bir gönderici ucu — doğrudan ya da zincirleme — tetikleyen her uç, bu
+cetvelde **adıyla** geçmek zorundadır. Kapsam sağlayıcı adına değil **davranışa** bağlıdır:
+ölçü "Resend'i çağırıyor mu" değil, "bir bildirim akışını başlatıyor mu" sorusudur.
+
+> **Bilinen sınır (dürüstçe):** bu kural çağrı grafiğini **kaynak metinden** okur ve hedef
+> adının sabit metin olmasına dayanır. Bugün 28 ucun hepsinde öyledir
+> (`` `${supabaseUrl}/functions/v1/order-confirmation` `` — birleşen kısım yalnız önek).
+> Hedef adı değişkenden üretilirse tarama körleşir; bu yüzden `INV-NOTIFY-1` böyle bir
+> çağrıyı **kırmızı** sayar (§B8.1). Körlüğü sessizce yaşamak seçenek değildir.
+
 ### B2.2 — Defterler: üç tane var, ÜÇÜ AYNI SORUYU CEVAPLAMIYOR
 
 | Defter | Başarısızlık satır bırakır mı | `tenant_id` | Gönderimden ÖNCE okunuyor mu |
 |---|---|---|---|
-| `order_email_events` | **HAYIR** (yalnız başarı) | **YOK** (canlı DB, 08-20) | **HAYIR** |
+| `order_email_events` | **EVET** (v1.1: `status` + `error`) | **YOK** (canlı DB, 08-20 · v1.1'de de yok) | uç HAYIR · **tetik EVET** |
 | `shipping_email_events` | **HAYIR** (yalnız başarı) | VAR | **HAYIR** |
 | `quote_email_events` | **EVET** (`status in ('sent','failed')` + `error`) | ölçülmedi | **EVET** (damga üzerinden) |
 
@@ -193,13 +227,18 @@ onarılmıyor, hepsi ayrı iş emri ister:
 
 | # | Çelişki | Yer | Sahip şerit |
 |---|---|---|---|
-| 1 | `order-confirmation` mükerrerlik koruması olmadan gönderiyor | `supabase/functions/order-confirmation/index.ts` | EDGE |
+| 1 | ~~`order-confirmation` mükerrerlik koruması olmadan gönderiyor~~ → **`#711` ile çözüldü** (DB damgası + UNIQUE); uç hâlâ kendi başına çağrılırsa korumasız | `order-confirmation/index.ts` | EDGE |
 | 2 | `shipping-notification` ve `delivery-notification` de deftere yazıp okumuyor | aynı klasör | EDGE |
 | 3 | `shipping_idempotency` tablosu **yalnız yazılıyor, hiç okunmuyor** — adı "idempotency" olan tablo sıfır idempotency veriyor (`admin-update-shipping:287-298`, dosyada başka geçiş yok) | EDGE | EDGE |
 | 4 | `order_email_events`'te `tenant_id` yok | canlı DB + migration | EDGE/ALTYAPI |
-| 5 | `order_email_events`/`shipping_email_events` başarısızlığı yazmıyor | canlı DB | EDGE |
-| 6 | `order-confirmation` metinleri gömülü Türkçe | satır 167, 176-183 | I18N (bende) |
+| 5 | ~~`order_email_events` başarısızlığı yazmıyor~~ → **`#711` ile çözüldü** (`status`/`error`/`kind`). `shipping_email_events` için **hâlâ geçerli** | canlı DB | EDGE |
+| 6 | `order-confirmation` metinleri gömülü Türkçe | satır 167, 176-183 | kural I18N · **dosya EDGE** |
 | 7 | `delivery-notification` kaydını kargo defterine yazıyor | satır 162 | EDGE |
+
+**Sahiplik notu:** 6 numaralı kalemin *kuralı* I18N'e (sözlük + CLAUDE.md Kural 7), *dosyası*
+EDGE'e aittir (`supabase/functions/**` EDGE'in şerit talebinde). Onarım tek şeritte bitmez;
+sözlük anahtarlarını I18N verir, uca EDGE işler. Bunu ayrı yazıyorum çünkü tabloda tek bir
+şerit adı yazmak işi yanlış adrese yollar.
 
 **Not:** 3 numaralı bulgu bu cetvelin kapsamının dışında (kargo yazma işlemi, bildirim değil)
 ama **aynı sınıfın** en keskin örneği olduğu için buraya yazıldı: defterin adı korumayı
@@ -220,6 +259,23 @@ bu cetvelin **§B2.1 tablosunda** adıyla geçmek zorundadır.
 **Yakaladığı kusur:** yeni bir bildirim ucu eklenir, cetvele işlenmez, ve "bildirimlerimiz
 neler" sorusunun cevabı sessizce eksilir. Bugünkü kusur bunun ta kendisiydi:
 `order-confirmation` hiçbir cetvelde yazılı olmadığı için var olduğu hâlde "yok" sanıldı.
+
+**İkinci kol — DEVREDEN uçlar (2026-08-23 eklendi).** Kapının ilk sürümü kapsamı
+**sağlayıcı adına** bağlıyordu; gönderimi başka bir uca devreden bir uç bu ölçüye görünmez
+oluyordu. Kapı haklı olarak susuyordu ama cetvel "hepsi burada" diyordu — ve değildi.
+Ölçüldüğünde boşluk tek vaka değil, **sistemin yarısı** çıktı (6 gönderici, 6 devreden).
+İkinci kol §B2.1.b kuralını zorlar: bir gönderici ucu **geçişli olarak** tetikleyen her uç
+cetvelde adıyla geçmelidir. Bulgu EDGE'den geldi (`order-paid-webhook`), ölçüm I18N'de.
+
+**Üçüncü kol — körlüğün alarmı.** İkinci kol hedef adını kaynak metinden okur. Hedef
+değişkenden üretilirse tarama **sessizce** körleşir; o yüzden dinamik `functions/v1` çağrısı
+kapıyı **kırmızı** yapar. Bugün böyle bir çağrı yok (28 ucun tamamı ölçüldü) — kol, ileriye
+dönük bir alarmdır: kural kör kalacaksa bunu haber vererek kalsın.
+
+**İki taraflı kanarya:** ikinci kol, devreden uç sayısı **sıfıra düşerse de** kırmızı olur.
+Sıfır, "devreden kalmadı" değil "tarama bozuldu" demektir (geçişli kapanış çöktü ya da çağrı
+biçimi değişti). Kanaryasız bir tarama, hiçbir şey bulamadığı için değil **hiçbir yere
+bakmadığı** için yeşil olabilir.
 
 ### B8.2 — INV-NOTIFY-2 · durum kapsam tablosu tam olmalı
 
@@ -261,6 +317,49 @@ için değil **hiçbir yere bakmadığı** için yeşil olabilir.
    (damga + başarısızlık yazan defter) ve `supabase/functions/quote-notification-webhook/index.ts`
    (satır 107 oku · 118 vazgeç · 172 damgala).
 
+## B11 — v1.1 kaydı: cetvel kendi konusunda BİR COMMIT BAYAT doğdu
+
+v1.0'ın ölçüm tabanı `57e82a4d` idi. Cetvel `d61f5295` olarak master'a indi — ve **bir önceki
+commit** `d542a1d2` (`#711`, EDGE) tam da bu cetvelin çekirdek konusunu değiştirmişti.
+Yani belge, yayımlandığı anda kendi ana iddiasında güncelliğini yitirmişti.
+
+**`#711` ne getirdi** (canlı DB'den doğrulandı, migration prod'a inmiş):
+
+| Ne | Nerede |
+|---|---|
+| `venthub_orders.paid_at` — **olgu** damgası | `20260820140000_order_paid_notification.sql:52` |
+| `venthub_orders.paid_email_sent_at` — **idempotans** damgası | aynı dosya, satır 55 |
+| `order_email_events.status` · `.error` · `.kind` | satır 88-94 |
+| `uq_order_email_events_sent_once` — kalıcı UNIQUE | satır 150 |
+| `trg_stamp_order_paid_at` · `trg_notify_order_paid` (pg_net) | satır 172, 238 |
+
+Bu, §B3'ün **ilk uygulamasıdır**: veriye bağlı tetik + göndermeden önce okunan kalıcı damga.
+EDGE'in getirdiği ve v1.0'da yalnız ima edilen ayrım şudur ve buraya adıyla alınıyor:
+
+> **Olgu damgası ile idempotans damgası AYNI ŞEY DEĞİLDİR.** `paid_at` "bu sipariş ödendi"
+> der; `paid_email_sent_at` "bunun e-postası gitti" der. Tek kolona ikisini birden yükleyen
+> tasarım, e-posta başarısız olduğunda ya olguyu yalanlar ya da tekrarı açar.
+
+### Bundan çıkan cetvel kuralı
+
+**Bir cetvelin ölçüm tabanı, yayımlandığı andaki master OLMAK ZORUNDA DEĞİLDİR — ama tabanı
+YAZILI olmak ve yayımdan önce SON KEZ kontrol edilmek zorundadır.** Bu belge tabanını yazmıştı
+(§KAYNAK/CETVEL), o yüzden bayatlık *görünür* oldu ve bir saat içinde düzeltilebildi. Tabanı
+yazmayan bir cetvel aynı durumda sessizce yanlış kalırdı.
+
+**Hâlâ geçerli olanlar** (v1.1'de yeniden ölçüldü): `order_email_events`'te `tenant_id` **yok**
+(§B5) · `shipping_idempotency` yalnız yazılıyor, hiç okunmuyor (§B7-3) · `delivery-notification`
+kaydını kargo defterine yazıyor (§B7-7) · `shipping_email_events` başarısızlığı yazmıyor.
+
 ---
 
-**Sürüm:** v1.0 · 2026-08-20 · ölçüm tabanı `origin/master` = `57e82a4d` + canlı Postgres.
+**Sürüm:** v1.1 · 2026-08-20, **iddiaları 2026-08-22'de yeniden ölçüldü** ·
+ölçüm tabanı `origin/master` = `ea316814` + canlı Postgres.
+
+> **Niçin yeniden ölçüldü:** bu düzeltme iki gün gönderilmeden bekledi. "İki gün önce
+> doğruydu" bugün doğru olduğunu göstermez — belgenin kendi §B11'i tam da bunu anlatıyor.
+> Canlı DB'den 08-22'de doğrulandı: `order_email_events` → `status`/`error`/`kind` **var**,
+> `tenant_id` **hâlâ yok**; `uq_order_email_events_sent_once` **var**; `venthub_orders` →
+> `paid_at` ve `paid_email_sent_at` **var**. §B5'teki kiracı boşluğu ve §B7'deki kalemler
+> **aynen geçerli**.
+(v1.0 tabanı `57e82a4d` idi ve **kendi konusunda bir commit bayat doğdu** — bkz. §B11.)

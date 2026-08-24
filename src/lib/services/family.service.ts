@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
+import type { DbCategory } from '../../types/db-rows'
 import type { FamilyListItem } from '../../types/ui-models'
 
 // F5-B W2.x — Aile (product_families) servis katmanı.
@@ -66,6 +67,16 @@ export interface FamilyDetail {
     subcategory_id: string | null
     meta_title: { tr?: string | null; en?: string | null } | null
     meta_description: { tr?: string | null; en?: string | null } | null
+    /**
+     * Breadcrumb kategori basamağı için TAM kategori satırı — `category_id`'nin yanında
+     * bilerek durur. `getSeriesLanding` bunu K7'de zaten yapıyordu; MODEL dalı yapmıyordu,
+     * yani iki dal asimetrikti: seri sayfası kategori ADINI çözebiliyor, ürün sayfası
+     * çözemiyordu. Ad çözümü (`getCategoryDisplayName`) id ile değil SATIRLA çalışır
+     * (translation_key/menu_label/name orada) — id taşımak yetmez.
+     * RPC yalnız id döndürür; satırlar burada tek ek sorguyla gömülür.
+     */
+    category: DbCategory | null
+    subcategory: DbCategory | null
   }
   variants: FamilyVariant[]
   /**
@@ -102,12 +113,233 @@ export async function getFamilyDetail(
   })
 
   if (error) throw error
-  return parseFamilyDetail(data)
+  const detail = parseFamilyDetail(data)
+  if (!detail) return null
+
+  // Kategori SATIRLARINI göm — `getSeriesLanding` ile BİREBİR aynı desen (aşağıda). RPC yalnız
+  // id döndürüyor; ad çözümü (`getCategoryDisplayName`) satır ister. İkisi tek sorguda çekilir;
+  // hiçbiri yoksa hiç sorgu atılmaz.
+  const categoryIds = [detail.family.category_id, detail.family.subcategory_id].filter(
+    (id): id is string => !!id
+  )
+  let categoryById = new Map<string, DbCategory>()
+  if (categoryIds.length > 0) {
+    const { data: categoryRows, error: categoryError } = await supabase
+      .from('categories')
+      .select('*')
+      .in('id', categoryIds)
+      .returns<DbCategory[]>()
+
+    if (categoryError) throw categoryError
+    categoryById = new Map((categoryRows ?? []).map((c) => [c.id, c]))
+  }
+
+  detail.family.category = detail.family.category_id
+    ? (categoryById.get(detail.family.category_id) ?? null)
+    : null
+  detail.family.subcategory = detail.family.subcategory_id
+    ? (categoryById.get(detail.family.subcategory_id) ?? null)
+    : null
+
+  return detail
+}
+
+/**
+ * T138-VH K1 — SERİ LANDING modeli.
+ *
+ * `product_families.parent_family_id` (20260821180000) hiyerarşiyi TEK seviye tutar:
+ * `NULL` = **seri** (landing sayfası), `NOT NULL` = **model** (vitrin kartı).
+ * Seri satırının doğrudan varyantı YOKTUR — bu yüzden `get_product_families_enriched`
+ * onu inner-join ile eler ve `get_family_detail` boş `variants` döndürür. Yani seri
+ * slug'ı bugün PDP zincirinde "ürün bulunamadı" kutusuna düşer (soft-404, HTTP 200).
+ * Bu fonksiyon o boşluğu doldurur: seri + altındaki MODEL kartları.
+ *
+ * Kart modeli KASITLI olarak `FamilyListItem` — vitrin kartı (`FamilyCard`) ile birebir
+ * aynı sözleşme; seri sayfası kendi kart tipini icat etmez.
+ *
+ * Cetvel: docs/standards/product-schema-standard.md §11.5 (MODEL KATMANI).
+ */
+export interface SeriesLanding {
+  series: {
+    id: string
+    name: string
+    slug: string
+    series_code: string | null
+    description: { tr?: string | null; en?: string | null } | null
+    brand_name: string | null
+    category_id: string | null
+    subcategory_id: string | null
+    /**
+     * T138-VH K7 — breadcrumb + JSON-LD hiyerarşisi için gömülü kategori/alt kategori.
+     * `category_id`/`subcategory_id` YALNIZ id taşır; görünen ad (`getCategoryDisplayName`)
+     * ve görünen slug (`getLocalizedCategorySlug`) tam `DbCategory` satırı ister — bu yüzden
+     * ayrı bir sorguyla (aşağıda) doldurulur. İkisi de yoksa `null` (breadcrumb kısalır,
+     * kırılmaz — CategoryLandingView/CategorySeriesView'daki "parentVm yoksa basamak yok"
+     * kuralıyla aynı desen).
+     */
+    category: DbCategory | null
+    subcategory: DbCategory | null
+  }
+  /** Seri altındaki modeller — aktif varyantı olmayan model listeye GİRMEZ (RPC ile aynı kural). */
+  models: FamilyListItem[]
+}
+
+/** PostgREST gömülü tekil ilişkiyi sürüme göre nesne veya tek elemanlı dizi olarak verir. */
+function embeddedBrandName(brands: { name: string } | { name: string }[] | null): string | null {
+  if (!brands) return null
+  return Array.isArray(brands) ? (brands[0]?.name ?? null) : brands.name
+}
+
+function asLocalizedText(value: unknown): { tr?: string | null; en?: string | null } | null {
+  return typeof value === 'object' && value !== null
+    ? (value as { tr?: string | null; en?: string | null })
+    : null
+}
+
+/**
+ * Seri slug'ını landing verisine çevirir. Slug bir seri DEĞİLSE (model, ya da hiç yoksa)
+ * `null` döner — çağıran o zaman kendi zincirine devam eder.
+ *
+ * Modeli olmayan seri de `null` döndürür: içi boş bir landing sayfası SEO çöpüdür ve
+ * "seri kabuğu yaratıldı ama modelleri bağlanmadı" hatasını GÖRÜNÜR kılmak gerekir
+ * (sessiz-boş sınıfı — 404 verir, 200 vermez).
+ */
+export async function getSeriesLanding(
+  supabase: SupabaseClient<Database>,
+  slug: string
+): Promise<SeriesLanding | null> {
+  const { data: series, error } = await supabase
+    .from('product_families')
+    .select(
+      'id,name,slug,series_code,description,category_id,subcategory_id,parent_family_id,brands(name)'
+    )
+    .eq('slug', slug)
+    .is('deleted_at', null)
+    .limit(1)
+    .maybeSingle()
+
+  if (error) throw error
+  // Satır yok → bu slug bir aile değil. Satır var ama parent DOLU → o bir MODEL:
+  // model normal PDP zincirine aittir, landing'e değil.
+  if (!series || series.parent_family_id !== null) return null
+
+  const { data: modelRows, error: modelError } = await supabase
+    .from('product_families')
+    .select(
+      'id,name,slug,series_code,description,category_id,subcategory_id,brands(name),products!inner(sku,product_images(path,sort_order))'
+    )
+    .eq('parent_family_id', series.id)
+    .is('deleted_at', null)
+    // Aktif varyantı olmayan model gizlenir — `get_product_families_enriched`'in
+    // inner-join kuralının PostgREST karşılığı; iki yüzey aynı kuralı uygular.
+    .eq('products.status', 'active')
+    .is('products.deleted_at', null)
+    .order('sort_order', { ascending: true })
+    .order('name', { ascending: true })
+
+  if (modelError) throw modelError
+
+  const rows = modelRows ?? []
+  const models: FamilyListItem[] = rows.map((m) => {
+    // Kapak kuralı RPC ile aynı: sku sırasına göre ilk aktif varyantın ilk görseli.
+    const variants = [...m.products].sort((a, b) => (a.sku < b.sku ? -1 : a.sku > b.sku ? 1 : 0))
+    const coverPath =
+      variants
+        .flatMap((v) => [...v.product_images].sort((x, y) => x.sort_order - y.sort_order))
+        .map((img) => img.path)[0] ?? null
+
+    return {
+      id: m.id,
+      name: m.name,
+      slug: m.slug,
+      series_code: m.series_code,
+      description: asLocalizedText(m.description),
+      brand_name: embeddedBrandName(m.brands),
+      category_id: m.category_id,
+      subcategory_id: m.subcategory_id,
+      cover_image_path: coverPath,
+      variant_count: variants.length,
+      // FamilyCard fiyat BASMAZ (PS-042, Recep kararı 2026-08-15) — buradan fiyat
+      // sızdırmak, motor fiyatı (display_price) yerine ham kolonu göstermek olurdu.
+      min_price: null,
+      total_count: rows.length,
+    }
+  })
+
+  if (models.length === 0) return null
+
+  // T138-VH K7: breadcrumb kategori basamağı için tam kategori satırı (ad + görünen slug).
+  // `category_id`/`subcategory_id` zaten seride var — ayrı sorgu ikisini BİRLİKTE çeker
+  // (tek round-trip; hiçbiri yoksa hiç sorgu atılmaz).
+  const categoryIds = [series.category_id, series.subcategory_id].filter(
+    (id): id is string => !!id
+  )
+  let categoryById = new Map<string, DbCategory>()
+  if (categoryIds.length > 0) {
+    const { data: categoryRows, error: categoryError } = await supabase
+      .from('categories')
+      .select('*')
+      .in('id', categoryIds)
+      .returns<DbCategory[]>()
+
+    if (categoryError) throw categoryError
+    categoryById = new Map((categoryRows ?? []).map((c) => [c.id, c]))
+  }
+
+  return {
+    series: {
+      id: series.id,
+      name: series.name,
+      slug: series.slug,
+      series_code: series.series_code,
+      description: asLocalizedText(series.description),
+      brand_name: embeddedBrandName(series.brands),
+      category_id: series.category_id,
+      subcategory_id: series.subcategory_id,
+      category: series.category_id ? (categoryById.get(series.category_id) ?? null) : null,
+      subcategory: series.subcategory_id
+        ? (categoryById.get(series.subcategory_id) ?? null)
+        : null,
+    },
+    models,
+  }
+}
+
+/**
+ * Seri (parent_family_id IS NULL **ve** en az bir modeli olan) slug'ları.
+ *
+ * Bunlar liste RPC'sinden GELMEZ: RPC aktif varyantı olmayan aileyi eler, seri satırının
+ * ise doğrudan varyantı yoktur. Ayrı çekilmezse seri landing sayfaları ne sitemap'te
+ * ne `generateStaticParams`'ta olur — sessiz boşluk.
+ */
+async function getSeriesSlugs(supabase: SupabaseClient<Database>): Promise<{ slug: string }[]> {
+  const { data: children, error } = await supabase
+    .from('product_families')
+    .select('parent_family_id')
+    .not('parent_family_id', 'is', null)
+    .is('deleted_at', null)
+
+  if (error) throw error
+
+  const parentIds = [
+    ...new Set((children ?? []).map((c) => c.parent_family_id).filter((v): v is string => !!v)),
+  ]
+  if (parentIds.length === 0) return []
+
+  const { data: parents, error: parentError } = await supabase
+    .from('product_families')
+    .select('slug')
+    .in('id', parentIds)
+    .is('deleted_at', null)
+
+  if (parentError) throw parentError
+  return (parents ?? []).map((p) => ({ slug: p.slug }))
 }
 
 /**
  * Sitemap/statik üretim için aile slug listesi — boş aile (aktif varyantsız)
  * RPC tarafından zaten gizlenir; ayrı bir sorgu tutmamak için liste RPC'si kullanılır.
+ * T138 K1: SERİ slug'ları RPC'de görünmediği için ayrıca eklenir (bkz. `getSeriesSlugs`).
  */
 export async function getAllFamilySlugs(
   supabase: SupabaseClient<Database>
@@ -134,6 +366,16 @@ export async function getAllFamilySlugs(
       'getAllFamilySlugs: ' + slugs.length + '/' + total +
         ' aile alinabildi (sayfalama tavani ' + MAX_PAGES * PAGE + ')'
     )
+  }
+
+  // Seri landing slug'ları RPC'de görünmez (yukarıdaki tavan kontrolü RPC toplamına aittir;
+  // bu yüzden birleştirme kontrolden SONRA yapılır, aksi halde eşitlik sahte kırmızı verirdi).
+  const seen = new Set(slugs.map((s) => s.slug))
+  for (const s of await getSeriesSlugs(supabase)) {
+    if (!seen.has(s.slug)) {
+      seen.add(s.slug)
+      slugs.push(s)
+    }
   }
   return slugs
 }
