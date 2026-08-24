@@ -59,6 +59,8 @@ const OFSETLER = {
   LEGAL: '11,31,51',
   PRICING: '13,33,53',
   AUTH: '15,35,55',
+  ORION: '17,37,57',
+  'OPS-AUDIT': '19,39,59',
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
