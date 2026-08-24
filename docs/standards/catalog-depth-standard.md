@@ -98,7 +98,63 @@ mu" sorusunun cevabı üründe değil, **müşterinin kafasındaki soruda** yaş
 
 Paragraf **tek dilde** yazılabiliyor ama diğerinde yazılamıyorsa, o ayrım muhtemelen dile özgü
 bir alışkanlıktır, ürün gerçeği değil. Ayrıca her ayrı aile **iki çeviri** demektir; ölçüt bu
-maliyeti kararın içine koyar. *(I18N eksen katkısı buraya eklenecek.)*
+maliyeti kararın içine koyar.
+
+#### 2.3.1 Test ADA değil PARAGRAFA uygulanır — ölçüldü
+
+> Aile **adının** iki dilde de kulağa doğru gelmesi, ölçütün geçtiği anlamına **gelmez**.
+
+Ölçüm (canlı DB, 2026-08-23, 38 aile): **13 ailenin `name_i18n` değeri TR ve EN'de birebir
+aynı dize.** Hepsi saf marka/model adı — `Danfoss VLT HVAC Basic Drive FC 101`,
+`Vortice Bravo S`, `Vortice Lineo 100/125/150/200/250/315 Quiet`,
+`Vortice Nordik HVLS Hyperblade`, `Vortice VORT Mono / QBK SAL KC Evo / Quadro Evo`.
+Hiçbirinde Türkçe harf ya da Türkçe kelime yok.
+
+Bu **kusur değil** — marka adı çevrilmez, tr = en olması doğrudur. Ama sonucu şudur: bu 13
+ailede **ad, bölme kararı hakkında sıfır bilgi taşır.** Dize zaten dilden bağımsız olduğu için
+"iki dilde de yazılabiliyor" sınaması orada hiçbir şey ölçmez — her zaman geçer. Ölçüt
+§2.1'in dediği gibi **paragrafa** uygulanmalıdır; ada uygulanan hâli **boş bir sınavdır**:
+hep yeşil yanar, hiçbir bölmeyi engellemez.
+
+Uygulama notu: bir bölme önerisi değerlendirilirken "adı iki dilde de düzgün" cümlesi
+gerekçe olarak **kabul edilmez**; iki dilde yazılmış iki paragraf istenir.
+
+#### 2.3.2 "İki çeviri" maliyeti eksik ölçüyor — dört yüzey var
+
+`product_families` tablosunda çeviri taşıyan **dört** alan var (hepsi `jsonb`).
+Bugünkü doluluk (38 aile, silinmemiş):
+
+| yüzey | iki dilde dolu |
+|---|---|
+| `name_i18n` | 38 / 38 |
+| `description` | 38 / 38 |
+| `meta_title` | **0 / 38** |
+| `meta_description` | **0 / 38** |
+
+`meta_title` ve `meta_description` 38 ailenin **hepsinde `NULL`** — boş nesne bile değil,
+hiç yazılmamış. Yani her aile bugün *iki çeviri ödenmiş + iki çeviri ödenmemiş* hâlde yaşıyor
+ve ödenmeyen taraf SEO yüzeyi. Yeni bir aile açmak, **zaten tamamı ödenmemiş** bir borca bir
+kalem daha ekler.
+
+Bu, bölme kararını yasaklamaz; kararın **gerçek fiyatını** görünür kılar. Ölçüt "iki çeviri"
+derken kastedilen alt sınırdır, tavan değil.
+
+> **Kapsam sınırı:** `meta_*` alanlarının boş olması I18N şeridinin bulgusu ama ÜRÜN/SEO
+> alanının işidir. Burada yalnız **maliyet kalemi olarak** kayda geçiyor.
+
+#### 2.3.3 Her yeni aile, bir karışık-dilli dize daha demektir
+
+Aile adları **tek dizede iki dil** taşır: `Vortice Lineo Quiet Kanal Fanları`. Ölçüm
+(2026-08-23): **38 adın 36'sı `i` harfi içeriyor.**
+
+Bunun bedeli `docs/standards/i18n-localization-standard.md` ekseni I'de yazılı ve
+`INV-7` kapısıyla korunuyor: veri kaynaklı özel ada CSS `text-transform: uppercase`
+uygulanamaz, çünkü `uppercase` **dile duyarlıdır** ve `lang="tr"` altında `Vortice → VORTİCE`
+olur. Elemana `lang` vermek de çözmez: dize karışık dilli olduğu için `lang="tr"` markayı,
+`lang="en"` Türkçe kelimeleri bozar.
+
+Yani her yeni aile, kasa/harmanlama kurallarının kapsamına giren **bir dize daha** ekler.
+Aileyi bölmek bu bedeli çoğaltır; birleştirmek azaltır.
 
 ## 3. K3 — Anlatı üç kademelidir
 
