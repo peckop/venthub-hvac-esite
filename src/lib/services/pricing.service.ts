@@ -72,6 +72,18 @@ export interface EffectivePriceInfo {
   taxIncluded: boolean | null
 }
 
+/**
+ * Resolves the currently active, most appropriate price for a specific product based on the user's active price segment.
+ * Includes evaluations of active pricing lists, tax inclusion context, and specific currency requirements.
+ *
+ * @param supabase - The Supabase client instance used to fetch the current user and evaluate pricing rules
+ * @param product - The product entity to determine the active price for
+ * @returns A promise that resolves to an EffectivePriceInfo object detailing the unit price, source list, and tax context
+ *
+ * @example
+ * const priceInfo = await getEffectivePriceInfo(supabase, productData)
+ * if (priceInfo.unitPrice === null) console.log('Request a quote')
+ */
 export async function getEffectivePriceInfo(
   supabase: SupabaseClient<Database>,
   product: Product
@@ -258,6 +270,18 @@ export interface ScopedTarget {
   category_id: string | null
 }
 
+/**
+ * Determines whether a targeted entity (like a pricing rule or policy) successfully matches a given product's profile.
+ * Supports evaluating rules targeted at specific products, entire brands, or deep category hierarchies.
+ *
+ * @param row - The scope targeting definition, containing the scope level and corresponding target IDs
+ * @param product - The specific product object under evaluation
+ * @param categoryAncestors - A set of hierarchical category IDs the product belongs to, used for deep category matching
+ * @returns True if the product fits within the defined scope, false otherwise
+ *
+ * @example
+ * const matched = scopeMatchesProduct({ scope: 1, product_id: 'uuid' }, { id: 'uuid', ... }, new Set())
+ */
 export function scopeMatchesProduct(
   row: ScopedTarget,
   product: PricingProductInput,
@@ -278,7 +302,18 @@ export function scopeMatchesProduct(
   }
 }
 
-/** Kural, ürün hedefine uyar mı? (scope↔hedef; kategori ata-cascade destekler) */
+/**
+ * Evaluates if a given pricing rule is applicable to a specific product by checking its scope matching logic.
+ * This is a specialized wrapper around `scopeMatchesProduct` tailored specifically for pricing rules.
+ *
+ * @param rule - The pricing rule entity to evaluate
+ * @param product - The product entity to check the rule against
+ * @param categoryAncestors - A set of category IDs defining the hierarchy path of the product
+ * @returns True if the pricing rule correctly matches the product, false otherwise
+ *
+ * @example
+ * const applies = ruleMatchesProduct(ruleData, productData, new Set(['cat-id-1', 'cat-id-2']))
+ */
 export function ruleMatchesProduct(
   rule: PricingRuleRow,
   product: PricingProductInput,
@@ -287,7 +322,17 @@ export function ruleMatchesProduct(
   return scopeMatchesProduct(rule, product, categoryAncestors)
 }
 
-/** Cetvel §11 sıralaması: scope ASC → kitap-özgüllüğü → min_quantity DESC → priority DESC → id DESC. */
+/**
+ * Sorts an array of pricing rules to determine their exact evaluation precedence.
+ * Hierarchy follows: specific scope > price list specificity > min quantity required > priority weight > newest ID.
+ *
+ * @param rules - An array of pricing rule objects to be ordered
+ * @param priceBookId - An optional price book ID to boost the rank of rules explicitly linked to it
+ * @returns A new array containing the sorted rules based on prioritization standards
+ *
+ * @example
+ * const orderedRules = sortRules([...availableRules], 'price-list-uuid-1')
+ */
 export function sortRules(rules: PricingRuleRow[], priceBookId: string | null): PricingRuleRow[] {
   const bookRank = (r: PricingRuleRow): number => (r.price_book_id === priceBookId && priceBookId !== null ? 0 : 1)
   return [...rules].sort((a, b) => {

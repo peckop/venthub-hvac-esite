@@ -14,7 +14,7 @@ import type { DbAdminSearchResult } from '@/types/db-rows'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { type BulkAction, BulkBar } from '../../components/admin/data-table/BulkBar'
-import BulkPricePanel from '../../components/admin/data-table/BulkPricePanel'
+import { BulkPricePanel } from '../../components/admin/data-table/BulkPricePanel'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -24,6 +24,7 @@ import ProductFormModal from '../../components/admin/products/ProductFormModal'
 import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
@@ -42,9 +43,17 @@ import {
 // yüzeyinde aynı şeyi yapmak INV-PRICE-1 ihlalidir.
 type ProductRow = DomainProduct & { cover_path?: string; price?: number | null }
 
+/**
+ * NİÇİN slug + metadata DA ÇEKİLİYOR: CSV içe aktarımı kategoriyi SLUG ile eşler
+ * (cetvel: csv-import-export-standard.md §3). Bu sorgu yalnız `id,name` çekerken
+ * bileşene slug hiç ULAŞMIYORDU; eşleşme adla denenip sessizce başarısız oluyordu.
+ * Kanonik slug İngilizcedir; görünen slug `metadata.slug = { tr, en }` içindedir.
+ */
 interface CategoryOpt {
   id: string
   name: string
+  slug?: string | null
+  metadata?: unknown
 }
 
 const PRODUCT_SELECT =
@@ -320,7 +329,7 @@ const ProductsTableBody: React.FC = () => {
     void (async () => {
       const { data, error } = await supabaseBrowserClient
         .from('categories')
-        .select('id,name')
+        .select('id,name,slug,metadata')
         .order('name', { ascending: true })
       if (!cancelled && !error && data) setCats(data as CategoryOpt[])
     })()
@@ -755,14 +764,14 @@ const ProductsTableBody: React.FC = () => {
           hasWriteAccess ? (
             <InlineNumberCell
               value={r.price != null ? String(r.price) : ''}
-              display={r.price != null ? formatCurrency(Number(r.price), lang) : '-'}
+              display={r.price != null ? formatCurrency(Number(r.price), lang, { currency: SYSTEM_CURRENCY }) : '-'}
               widthClass="w-24"
               ariaLabel={t('admin.products.table.price')}
               onSave={(num) => saveInlineEdit(r, 'price', num)}
             />
           ) : (
             <span className="text-sm font-semibold text-admin-fg">
-              {r.price != null ? formatCurrency(Number(r.price), lang) : '-'}
+              {r.price != null ? formatCurrency(Number(r.price), lang, { currency: SYSTEM_CURRENCY }) : '-'}
             </span>
           ),
       },

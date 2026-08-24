@@ -19,12 +19,11 @@ const sb = vi.hoisted(() => {
       status: 'requested',
       created_at: '2026-06-10T08:00:00.000Z',
       updated_at: '2026-06-10T08:00:00.000Z',
-      venthub_orders: {
-        order_number: 'VH-100200',
-        customer_name: 'Ayşe Yılmaz',
-        customer_email: 'ayse@example.com',
-        total_amount: 4500,
-      },
+      /* T090-VH: satır artık view_admin_returns'ten DÜZ gelir — join yok. */
+      order_number: 'VH-100200',
+      customer_name: 'Ayşe Yılmaz',
+      customer_email: 'ayse@example.com',
+      total_amount: 4500,
     },
     {
       id: 'r2',
@@ -35,12 +34,10 @@ const sb = vi.hoisted(() => {
       status: 'approved',
       created_at: '2026-06-09T08:00:00.000Z',
       updated_at: '2026-06-09T08:00:00.000Z',
-      venthub_orders: {
-        order_number: 'VH-100201',
-        customer_name: 'Mehmet Demir',
-        customer_email: 'mehmet@example.com',
-        total_amount: 1200,
-      },
+      order_number: 'VH-100201',
+      customer_name: 'Mehmet Demir',
+      customer_email: 'mehmet@example.com',
+      total_amount: 1200,
     },
   ]
   // client-mode / server-mode zinciri (self-referans → açık tip; any yok)
@@ -49,6 +46,7 @@ const sb = vi.hoisted(() => {
     eq(): SelectChain
     in(): SelectChain
     or(): SelectChain
+    ilike(): SelectChain
     order(): SelectChain
     range(): Promise<Resolved>
     limit(): Promise<Resolved>
@@ -58,6 +56,7 @@ const sb = vi.hoisted(() => {
     eq() { return selectChain },
     in() { return selectChain },
     or() { return selectChain },
+    ilike() { return selectChain },
     order() { return selectChain },
     range() { return Promise.resolve({ data: returnsData, error: null, count: returnsData.length }) },
     limit() { return Promise.resolve({ data: returnsData, error: null }) },
@@ -70,8 +69,10 @@ const sb = vi.hoisted(() => {
       return Promise.resolve({ error: null })
     },
   }
+  const fromCalls: string[] = []
   const client = {
-    from() {
+    from(relation: string) {
+      fromCalls.push(relation)
       return {
         select(projection?: string) {
           if (projection === 'status') {
@@ -98,7 +99,7 @@ const sb = vi.hoisted(() => {
       },
     },
   }
-  return { returnsData, client }
+  return { returnsData, client, fromCalls }
 })
 
 vi.mock('@/lib/supabase/client', () => ({ supabaseBrowserClient: sb.client }))
@@ -127,6 +128,14 @@ describe('AdminReturnsPage (kit göçü) — integration + a11y', () => {
     // client fetcher çözülünce satırlar görünür (düzleştirilmiş join alanları)
     await screen.findByText('Ayşe Yılmaz')
     await screen.findByText('Mehmet Demir')
+
+    /*
+      T090-VH · ÇALIŞMA ANI kanıtı: liste view_admin_returns okumalı.
+      Statik kapı (INV-ADMIN-SEARCH-1) sorguyu ÇALIŞTIRMAZ; burada sayfa gerçekten
+      render edilip fetcher'ın hangi ilişkiye gittiği ölçülüyor. Eski hâlinde
+      venthub_returns + gömülü join okunuyordu ve arama 400 ile düşüyordu.
+    */
+    expect(sb.fromCalls, 'liste view_admin_returns okumuyor').toContain('view_admin_returns')
 
     const headers = screen.getAllByRole('columnheader')
     // initialSort created_at:desc → aktif sıralı başlık aria-sort='descending'

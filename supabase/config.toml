@@ -17,6 +17,12 @@ verify_jwt = false          # iyzico ödeme sağlayıcısı çağırıyor
 [functions."returns-webhook"]
 verify_jwt = false          # kargo/iade firması webhook'u (gövdede HMAC + replay guard var)
 
+[functions."quote-notification-webhook"]
+verify_jwt = false          # DB tetiği (pg_net) çağırıyor — JWT üretemez; gövdede sır + ZORUNLU replay guard var (T068-VH)
+
+[functions."order-paid-webhook"]
+verify_jwt = false          # DB tetiği (pg_net) çağırıyor — JWT üretemez; gövdede sır + ZORUNLU replay guard var (T137-VH)
+
 # --- Admin uçları: src'de tarayıcı çağıranı YOK ya da oturumlu admin çağırıyor.
 # Gövdede tam kimlik+rol kapısı var; kapı JWT bekliyor, dolayısıyla geçit de zorlamalı.
 # 2026-08-14'te dördü de false'tan true'ya alındı (prod'da 4 canlı yetkisiz-erişim vardı). ---
@@ -63,3 +69,22 @@ verify_jwt = true
 
 [functions."tcmb-rates-sync"]
 verify_jwt = false
+
+# --- İzleme ucu (T100-VH · 2026-08-19) ---
+# BU SATIR BİR BEYANDIR, BİR DEĞİŞİKLİK DEĞİL: prod'da ölçülen değer zaten `true`
+# (list_edge_functions, 2026-08-19). Buraya yazılmasının sebebi §3.7 — "config.toml tek
+# kaynaktır": listelenmeyen fonksiyon varsayılanı ÖRTÜK alır ve örtük değer bir gün
+# sessizce kayarsa kimse fark etmez. Beyan edilmiş değer kayarsa diff'te görünür.
+#
+# NİÇİN `true` KALIYOR (ve niçin bunu tek başıma gevşetmiyorum): healthz artık
+# yapılandırma HÜKMÜ döndürüyor (hangi değişken eksik, ödeme ucu hangi ortamda, kanonik
+# konak). Sır DEĞERİ yok ama bu içerik operasyonel bir parmak izidir; kimliksiz açmak
+# ayrı ve bilinçli bir karar olmalı, bir yan etki değil.
+#
+# ⚠️ AÇIK DURUM — ÖLÇÜLDÜ, ÇÖZÜLMEDİ: healthz'in repoda HİÇBİR çağıranı yok (src, .github,
+# scripts tarandı) ve `verify_jwt = true` olduğu için kimliksiz bir uptime probe'u zaten
+# 401 alır. Yani "uptime ucu" diye yazılmış ama o işi yapamıyor — yetenek var, çağıran yok.
+# Doğru çözüm bu uca kapıyı açmak DEĞİL, içerik taşımayan ayrı bir canlılık ucu ya da
+# kimlikli bir izleyici olabilir; bu bir ürün kararıdır ve Recep'e bırakılmıştır.
+[functions."healthz"]
+verify_jwt = true

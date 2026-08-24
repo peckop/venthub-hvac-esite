@@ -16,11 +16,14 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [loading, setLoading] = useState(true);
   const [roleLoading, setRoleLoading] = useState(false);
 
-  const fetchRole = useCallback(async (userId: string, email?: string) => {
+  const fetchRole = useCallback(async (userId: string, _email?: string) => {
     setRoleLoading(true);
     try {
-      // Önce config'deki isAdminByEmail kontrolünü dene (hızlı fallback)
-      const userRole = await getUserRole(userId, email);
+      // T047: rolün TEK otoritesi `user_profiles.role`. Eskiden buraya e-posta da
+      // geçiliyordu ve `getUserRole` DB'den ÖNCE sabit bir e-posta listesine
+      // bakıyordu; o liste kaldırıldı. E-posta artık rol kararına GİRMEZ.
+      // Parametre çağıran imzasını bozmamak için duruyor, bilerek kullanılmıyor.
+      const userRole = await getUserRole(userId);
       setRole(userRole as UserRole);
     } catch (err) {
       console.error('fetchRole error:', err);

@@ -9,11 +9,36 @@ export const pricing = {
       check: "Sorgula",
       checking: "Sorgulaniyor...",
       notFound: "Bu arama ile urun bulunamadi.",
+      // "Sonuc yok" ile "sorgu calismadi" AYRI seylerdir: ikincisini birincisi gibi
+      // gostermek admine yalan soyler ve arizayi gorunmez kilar.
+      failed: "Sorgu calistirilamadi; sonuc GOSTERILEMIYOR. Bu 'urun yok' demek DEGILDIR - tekrar deneyin.",
       locked: "Kilitli - kur degisimi bu urunun fiyatini etkilemez.",
       unlocked: "Kilitli degil - kur degisimi bu urunun fiyatina yansir.",
       winner: "Karari veren kapsam: {{scope}} - dondurulan kur: {{rate}}"
     },
+    form: {
+      titleNew: "Yeni kur kilidi",
+      titleEdit: "Kur kilidini duzenle",
+      lockLabel: "Kur kilidi",
+      lockHelp: "Kilit ACIKKEN kapsamdaki urunler kur degisiminden etkilenmez; kaydederken o anki kur DONDURULUR. Kilit kapaliysa urunler kuru takip eder.",
+      noteLabel: "Not",
+      notePlaceholder: "Bu kilit nicin konuldu? (sonradan okuyacak kisi icin)",
+      activeLabel: "Aktif",
+      priorityLabel: "Oncelik",
+      priorityHelp: "Ayni kapsamda birden cok politika varsa yuksek oncelik kazanir.",
+      save: "Kaydet",
+      checking: "Kapsam olculuyor...",
+      // Kilit ACILIRKEN gosterilen onizleme: admin neyi dondurdugunu KAYDETMEDEN once gorur.
+      freezePreview: "Kapsamda tek para birimi: {{currency}}. Dondurulacak kur: {{rate}} ({{date}}).",
+      reject: {
+        noProducts: "Bu kapsamda aktif urun YOK; kilitlenecek bir sey olmadigi icin kayit yapilmadi.",
+        multiCurrency: "Bu kapsam {{count}} farkli alis para birimi iceriyor ({{currencies}}). Tek bir kur dondurmak urunlerin bir kismini YANLIS kurdan dondururdu, bu yuzden kayit REDDEDILDI. Kapsami daraltin ya da para birimi basina ayri kilit tanimlayin.",
+        rateUnavailable: "{{currency}} icin gecerli bir kur kaydi bulunamadi. Kunyesiz kilit yazilamaz (hangi kurdan dondurdugu bilinmeyen bir kilit denetlenemez)."
+      }
+    },
     table: {
+      historical: "(tarihsel kunye)",
+      historicalHelp: "Kilit KAPALI; asagidaki kur gecmiste dondurulmus bir kayittir, su an uygulanan kur DEGILDIR.",
       target: "Hedef",
       lock: "Kilit",
       locked: "Kilitli",

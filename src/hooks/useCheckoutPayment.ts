@@ -1,8 +1,9 @@
 import type { User } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
-import { useEffect,useState } from 'react'
+import { useCallback,useEffect,useState } from 'react'
 import { toast } from 'sonner'
 
+import { reportError } from '@/lib/errorReporter'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import type { CartItem } from '@/types/cart'
 
@@ -37,6 +38,39 @@ interface UseCheckoutPaymentProps {
 
 /** `PaymentWatcher`'ın okuduğu anahtar — tek kaynak burada tanımlı. */
 export const PENDING_ORDER_KEY = 'vh_pending_order'
+
+/**
+ * Ödeme yüzeyinin GÖRÜNÜR durumu — cetvel §4'ün (yüzey sözleşmesi) kod karşılığı.
+ *
+ * NİÇİN AYRI BİR AŞAMA ALANI (T080-A · 2026-08-18): eskiden görünen şey `loading` ve
+ * `formReady` ikilisinden türetiliyordu ve iki ölümcül kusur vardı:
+ *   1. `setFormReady` **hiçbir yerde çağrılmıyordu** → `formReady` kalıcı `false` → örtünün
+ *      kapanma koşulu hiç yoktu. Form kusursuz render olsa bile üstünü örtmeye devam ederdi.
+ *   2. `loading === false` "bitti", "hiç başlamadı" ve "hata aldı" hâllerinin ÜÇÜNÜ birden
+ *      gösteriyordu; ekran bu yüzden hatayı da "Güvenli form yükleniyor" diye okuyordu.
+ * Sonuç: **arıza ilerlemeden ayırt edilemiyordu.** Aşamalar ayrık olmak zorunda.
+ */
+export type PaymentPhase =
+  /** Henüz başlatılmadı. */
+  | 'idle'
+  /** İstek uçuşta — PSP'den yanıt bekleniyor. */
+  | 'starting'
+  /** Yanıt geldi, form yüzeyi kuruluyor (betik enjekte edildi, render bekleniyor). */
+  | 'formLoading'
+  /** Form GERÇEKTEN ekranda — ölçülerek doğrulandı, varsayılmadı. */
+  | 'ready'
+  /** Başarısız. Kullanıcı hata görür; sessiz bekleme YOK. */
+  | 'error'
+
+/**
+ * Form yüzeyinin belirmesi için tanınan süre. Aşılırsa `error`'a düşülür.
+ *
+ * NİÇİN ZAMAN AŞIMI ŞART: betik enjeksiyonu başarısız olduğunda (CSP reddi, ağ arızası, PSP
+ * tarafı) tarayıcı bize hiçbir olay göndermez — `script.onerror` yalnız DIŞ kaynaklı betikte
+ * ateşler, CSP tarafından engellenen satır-içi betik **sessizce** ölür. Zaman aşımı, o
+ * sessizliği kullanıcıya görünür bir sonuca çeviren tek mekanizmadır.
+ */
+export const FORM_RENDER_TIMEOUT_MS = 15000
 
 /**
  * Sunucu fiyat doğrulaması yapılamadığında fırlatılır.
@@ -85,13 +119,42 @@ export const useCheckoutPayment = ({
   const [paymentUrl, setPaymentUrl] = useState('')
   const [orderId, setOrderId] = useState('')
   const [convId, setConvId] = useState('')
-  const [iyzScriptLoaded] = useState(false)
   const [formReady, setFormReady] = useState(false)
   const [progressPct, setProgressPct] = useState(20)
-  const [paymentFrameContent] = useState('')
+  const [paymentFrameContent, setPaymentFrameContent] = useState('')
+  const [phase, setPhase] = useState<PaymentPhase>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
+
+  /**
+   * Yüzey "form gerçekten çıktı" dediğinde çağrılır — VARSAYIMLA değil ÖLÇÜMLE.
+   * Cetvel K2: başarı yolu boş ekran üretemez.
+   */
+  const markFormReady = useCallback(() => {
+    setFormReady(true)
+    setPhase('ready')
+    setProgressPct(100)
+  }, [])
+
+  /**
+   * Yüzey kurulamadı. Kullanıcıya hata gösterilir ve olay `client_errors`'a düşer.
+   *
+   * NİÇİN RAPORLAMA BURADA: bu dal sessiz kalırsa arıza yalnız kullanıcının ekranında
+   * yaşar ve hiçbir yere iz bırakmaz — T080 tam olarak böyle aylarca görünmez kaldı.
+   */
+  const markFormFailed = useCallback((reason: string) => {
+    setPhase('error')
+    setErrorMessage(t('checkout.errors.paymentFormRender'))
+    reportError(new Error(`PAYMENT_FORM_RENDER_FAILED: ${reason}`), {
+      context: 'useCheckoutPayment.formRender',
+      reason,
+    })
+  }, [t])
 
   const initiatePayment = async () => {
     setLoading(true)
+    setPhase('starting')
+    setErrorMessage('')
+    setFormReady(false)
     try {
       let authoritativeTotal = getCartTotal()
 
@@ -157,11 +220,21 @@ export const useCheckoutPayment = ({
           return
         }
 
-        if (d.token) {
-          setIyzToken(d.token)
+        // Gömülü form (T080 kararı = varyant A). PSP'nin döndürdüğü form parçası
+        // `checkoutFormContent`'tir; formu KURAN betik onun içindedir.
+        //
+        // BUGÜNE KADAR OKUNMUYORDU: uç bu alanı 2026-08-15'ten beri gönderiyor, istemci
+        // yalnız `token`'ı alıp boş bir kap basıyordu. Kabı dolduracak hiçbir şey yoktu —
+        // T080'in kök sebebi buydu. `token` da tutulmaya devam ediyor: PSP bazı akışlarda
+        // içerik yerine yalnız token döndürebiliyor ve kap `data-token` ile çalışıyor.
+        if (d.checkoutFormContent || d.token) {
+          setIyzToken(d.token || '')
+          setPaymentFrameContent(d.checkoutFormContent || '')
           setPaymentUrl(d.paymentPageUrl || '')
           setOrderId(d.orderId || '')
           setConvId(d.conversationId || '')
+          setPhase('formLoading')
+          setProgressPct(60)
           return true
         }
       }
@@ -175,7 +248,18 @@ export const useCheckoutPayment = ({
           ? String((err as { i18nKey: unknown }).i18nKey)
           : null
       const msg = err instanceof Error ? err.message : String(err)
-      toast.error(i18nKey ? t(i18nKey) : (msg || t('checkout.errors.paymentInit')))
+      const shown = i18nKey ? t(i18nKey) : (msg || t('checkout.errors.paymentInit'))
+      toast.error(shown)
+
+      // Ekran da hatayı GÖSTERMELİ. Eskiden yalnız geçici bir toast atılıyordu; toast
+      // sönünce geriye sonsuza kadar "Güvenli form yükleniyor" yazan bir örtü kalıyordu.
+      setPhase('error')
+      setErrorMessage(shown)
+
+      // Ve olay bir yere İZ BIRAKMALI: bu dal bugüne kadar hiçbir kayıt üretmiyordu,
+      // bu yüzden arıza yalnız kullanıcının ekranında yaşıyordu (fail-closed dikiş yeri
+      // alarm ister). `reportError` fire-and-forget'tir, akışı etkilemez.
+      reportError(err, { context: 'useCheckoutPayment.initiatePayment', code: i18nKey ?? 'unknown' })
       return false
     } finally {
       setLoading(false)
@@ -214,10 +298,13 @@ export const useCheckoutPayment = ({
     paymentUrl,
     orderId,
     convId,
-    iyzScriptLoaded,
     formReady,
     progressPct,
     paymentFrameContent,
+    phase,
+    errorMessage,
+    markFormReady,
+    markFormFailed,
     setFormReady,
     setProgressPct,
     initiatePayment

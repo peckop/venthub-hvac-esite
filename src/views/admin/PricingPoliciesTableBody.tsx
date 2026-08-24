@@ -15,17 +15,23 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
+import PricingPolicyFormModal, {
+  type PolicyFormValue,
+} from '../../components/admin/pricing/PricingPolicyFormModal'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { formatDateTime } from '../../i18n/datetime'
 import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import type { Database } from '../../types/database.types'
+import { orIlikeContains } from '../../utils/adminQueryFilters'
 import {
+  adminButtonPrimaryClass,
   adminButtonSecondaryClass,
   adminCardPaddedClass,
   adminInputClass,
   adminSectionTitleClass,
+  adminTableActionClass,
 } from '../../utils/adminUi'
 
 /**
@@ -56,6 +62,8 @@ interface PolicyRow {
   id: string
   scope: number
   scopeKey: ScopeKey
+  /** Duzenleme formuna tasinir; hangi sutunda durdugu `scope`'a baglidir. */
+  targetId: string | null
   targetName: string
   fxLock: boolean
   frozenRate: number | null
@@ -105,6 +113,7 @@ async function policiesFetcher(
     id: p.id,
     scope: p.scope,
     scopeKey: SCOPE_KEYS[p.scope] ?? 'global',
+    targetId: p.brand_id ?? p.category_id ?? p.product_id ?? null,
     targetName:
       p.scope === 2
         ? brandName.get(p.brand_id ?? '') ?? ''
@@ -138,6 +147,9 @@ const EffectiveLockPanel: React.FC = () => {
   const [result, setResult] = useState<
     | { kind: 'notFound' }
     | { kind: 'found'; label: string; decision: FxLockDecision; winnerScope: ScopeKey | null }
+    /* Sorgu ÇALIŞMADI. `notFound` ile aynı kovaya konursa arıza "ürün yok" kılığına
+       girer — sessiz-boş sınıfının en pahalı biçimi, çünkü admin aramayı bırakır. */
+    | { kind: 'failed' }
     | null
   >(null)
 
@@ -147,11 +159,22 @@ const EffectiveLockPanel: React.FC = () => {
     setBusy(true)
     setResult(null)
     try {
-      const { data: products } = await supabaseBrowserClient
+      const { data: products, error: searchError } = await supabaseBrowserClient
         .from('products')
         .select('id, name, sku, brand, category_id')
-        .or(`sku.ilike.%${q}%,name.ilike.%${q}%`)
+        /* Kullanıcı metni filtre GRAMERİNE gömülmez (T078-VH). */
+        .or(orIlikeContains(['sku', 'name'], q))
         .limit(1)
+
+      /* HATA DALI YUTULMUYOR — bu dosyada 2026-08-17'de düzeltildi. Eskiden yalnız
+         `data` alınıyordu; sorgu HATA verse bile `products` null oluyor ve akış
+         "ürün bulunamadı"ya düşüyordu. Yani arıza, admin'e "böyle bir ürün yok"
+         diye YALAN söylüyordu. Boş sonuç ile başarısız sorgu ayrı şeylerdir ve
+         ayrı görünmelidir; kusuru #619'da ben yazmıştım. */
+      if (searchError) {
+        setResult({ kind: 'failed' })
+        return
+      }
 
       const product = products && products.length > 0 ? products[0] : null
       if (!product) {
@@ -221,6 +244,14 @@ const EffectiveLockPanel: React.FC = () => {
         </p>
       )}
 
+      {/* `role="alert"`: "sonuç yok" bir bilgi, "sorgu çalışmadı" bir ARIZADIR;
+          ekran okuyucuya da farklı önemde duyurulmalı. */}
+      {result?.kind === 'failed' && (
+        <p role="alert" className="mt-4 text-sm text-admin-danger">
+          {t('admin.pricing.policies.effective.failed')}
+        </p>
+      )}
+
       {result?.kind === 'found' && (
         <div role="status" className="mt-4 space-y-2 text-sm">
           <p className="text-admin-fg">{result.label}</p>
@@ -262,6 +293,33 @@ const PricingPoliciesTableBody: React.FC = () => {
     initialSort: { key: 'scope', dir: 'asc' },
     syncUrl: true,
   })
+
+  const [formOpen, setFormOpen] = useState(false)
+  const [editing, setEditing] = useState<PolicyFormValue | null>(null)
+
+  const openNew = useCallback(() => {
+    setEditing(null)
+    setFormOpen(true)
+  }, [])
+
+  /**
+   * Satirdan forma gecerken TARIHSEL KUNYE de tasinir: kilit kapaliyken duran
+   * `fx_frozen_rate`, form icinde "su anki kur" gibi gorunmesin diye ayrica
+   * etiketlenir (kararin sahibi bu deger degil, gecmisteki bir olcumdur).
+   */
+  const openEdit = useCallback((row: PolicyRow) => {
+    setEditing({
+      id: row.id,
+      scope: row.scope,
+      targetId: row.targetId,
+      fxLock: row.fxLock,
+      note: row.note ?? '',
+      priority: row.priority,
+      isActive: row.isActive,
+      frozenRate: row.frozenRate,
+    })
+    setFormOpen(true)
+  }, [])
 
   const columns = useMemo<AdminColumn<PolicyRow>[]>(
     () => [
@@ -315,13 +373,33 @@ const PricingPoliciesTableBody: React.FC = () => {
           </span>
         ),
       },
+      {
+        key: 'actions',
+        header: t('admin.common.actions'),
+        cell: (r) => (
+          <button type="button" className={adminTableActionClass} onClick={() => openEdit(r)}>
+            {t('admin.common.edit')}
+          </button>
+        ),
+      },
     ],
-    [t, lang],
+    [t, lang, openEdit],
   )
 
   return (
     <div className="space-y-6 pb-20">
       <EffectiveLockPanel />
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className={adminButtonPrimaryClass}
+          onClick={openNew}
+          disabled={!canWrite('pricing')}
+        >
+          {t('admin.pricing.policies.form.titleNew')}
+        </button>
+      </div>
 
       <DataTableKit
         table={table}
@@ -344,6 +422,13 @@ const PricingPoliciesTableBody: React.FC = () => {
             description={t('admin.pricing.policies.empty.description')}
           />
         }
+      />
+
+      <PricingPolicyFormModal
+        open={formOpen}
+        policy={editing}
+        onClose={() => setFormOpen(false)}
+        onSaved={() => void table.reload()}
       />
     </div>
   )

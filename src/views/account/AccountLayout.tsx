@@ -1,4 +1,4 @@
-import { FileText, FolderKanban, Heart, LayoutDashboard, MapPin, Package, RefreshCcw, Shield,Truck, User } from 'lucide-react'
+import { FileText, FolderKanban, Heart, LayoutDashboard, MapPin, Package, RefreshCcw, Shield, ShieldCheck,Truck, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
@@ -49,6 +49,7 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
         { to: routes.account.addresses(), label: t('account.tabs.addresses') || 'Adreslerim', icon: <MapPin size={18} className="shrink-0" /> },
         { to: routes.account.invoices(), label: t('account.tabs.invoices') || 'Fatura Bilgileri', icon: <FileText size={18} className="shrink-0" /> },
         { to: routes.account.security(), label: t('account.tabs.security') || 'Güvenlik', icon: <Shield size={18} className="shrink-0" /> },
+        { to: routes.account.dataRequests(), label: t('account.tabs.dataRequests'), icon: <ShieldCheck size={18} className="shrink-0" /> },
       ]
     }
   ]

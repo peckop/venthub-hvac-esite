@@ -15,6 +15,7 @@ import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAud
 import { updateOrderStatus } from '@/lib/orderStatusService'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
+import { SYSTEM_CURRENCY } from '../../../i18n/currency'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { useConfirm } from '../overlay/ConfirmProvider'
 
@@ -586,10 +587,10 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                                   {qty}
                                 </td>
                                 <td className="px-4 py-2.5 text-right text-admin-fg font-mono">
-                                  {formatCurrency(unitPrice, lang)}
+                                  {formatCurrency(unitPrice, lang, { currency: SYSTEM_CURRENCY })}
                                 </td>
                                 <td className="px-4 py-2.5 text-right text-admin-accent font-mono">
-                                  {formatCurrency(totalPrice, lang)}
+                                  {formatCurrency(totalPrice, lang, { currency: SYSTEM_CURRENCY })}
                                 </td>
                               </tr>
                             )

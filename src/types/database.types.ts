@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       _migration_ledger: {
@@ -373,12 +398,16 @@ export type Database = {
       }
       contact_messages: {
         Row: {
+          application_area: string | null
+          city: string | null
           company: string | null
+          consent_at: string | null
           created_at: string | null
           department: Database["public"]["Enums"]["contact_department"]
-          email: string
+          email: string | null
           id: string
           ip_address: string | null
+          kvkk_consent: boolean
           message: string
           name: string
           phone: string | null
@@ -386,25 +415,33 @@ export type Database = {
           subject: string
         }
         Insert: {
+          application_area?: string | null
+          city?: string | null
           company?: string | null
+          consent_at?: string | null
           created_at?: string | null
           department?: Database["public"]["Enums"]["contact_department"]
-          email: string
+          email?: string | null
           id?: string
           ip_address?: string | null
+          kvkk_consent?: boolean
           message: string
           name: string
           phone?: string | null
           status?: Database["public"]["Enums"]["contact_status"]
-          subject: string
+          subject?: string
         }
         Update: {
+          application_area?: string | null
+          city?: string | null
           company?: string | null
+          consent_at?: string | null
           created_at?: string | null
           department?: Database["public"]["Enums"]["contact_department"]
-          email?: string
+          email?: string | null
           id?: string
           ip_address?: string | null
+          kvkk_consent?: boolean
           message?: string
           name?: string
           phone?: string | null
@@ -781,6 +818,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "inventory_movements_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "inventory_movements_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
@@ -918,6 +962,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "order_attachments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "order_attachments_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -930,28 +981,37 @@ export type Database = {
         Row: {
           created_at: string
           email_to: string
+          error: string | null
           id: string
+          kind: string | null
           order_id: string
           provider: string
           provider_message_id: string | null
+          status: string | null
           subject: string
         }
         Insert: {
           created_at?: string
           email_to: string
+          error?: string | null
           id?: string
+          kind?: string | null
           order_id: string
           provider?: string
           provider_message_id?: string | null
+          status?: string | null
           subject: string
         }
         Update: {
           created_at?: string
           email_to?: string
+          error?: string | null
           id?: string
+          kind?: string | null
           order_id?: string
           provider?: string
           provider_message_id?: string | null
+          status?: string | null
           subject?: string
         }
         Relationships: [
@@ -974,6 +1034,82 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_email_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_invoices: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_date: string
+          invoice_no: string
+          invoice_type: string | null
+          issued_by: string | null
+          note: string | null
+          order_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_date: string
+          invoice_no: string
+          invoice_type?: string | null
+          issued_by?: string | null
+          note?: string | null
+          order_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_date?: string
+          invoice_no?: string
+          invoice_type?: string | null
+          issued_by?: string | null
+          note?: string | null
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_invoices_issued_by_fkey"
+            columns: ["issued_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "reserved_orders"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -1029,6 +1165,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
           {
@@ -1172,6 +1315,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
           {
@@ -1553,6 +1703,8 @@ export type Database = {
           meta_description: Json | null
           meta_title: Json | null
           name: string
+          name_i18n: Json | null
+          parent_family_id: string | null
           series_code: string | null
           slug: string
           sort_order: number
@@ -1571,6 +1723,8 @@ export type Database = {
           meta_description?: Json | null
           meta_title?: Json | null
           name: string
+          name_i18n?: Json | null
+          parent_family_id?: string | null
           series_code?: string | null
           slug: string
           sort_order?: number
@@ -1589,6 +1743,8 @@ export type Database = {
           meta_description?: Json | null
           meta_title?: Json | null
           name?: string
+          name_i18n?: Json | null
+          parent_family_id?: string | null
           series_code?: string | null
           slug?: string
           sort_order?: number
@@ -1609,6 +1765,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_families_parent_family_id_fkey"
+            columns: ["parent_family_id"]
+            isOneToOne: false
+            referencedRelation: "product_families"
             referencedColumns: ["id"]
           },
           {
@@ -2122,6 +2285,50 @@ export type Database = {
           },
         ]
       }
+      quote_email_events: {
+        Row: {
+          created_at: string
+          email_to: string | null
+          error: string | null
+          id: string
+          provider: string
+          provider_message_id: string | null
+          quote_id: string
+          status: string
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_to?: string | null
+          error?: string | null
+          id?: string
+          provider?: string
+          provider_message_id?: string | null
+          quote_id: string
+          status: string
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_to?: string | null
+          error?: string | null
+          id?: string
+          provider?: string
+          provider_message_id?: string | null
+          quote_id?: string
+          status?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_email_events_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rate_limits: {
         Row: {
           bucket: string
@@ -2209,6 +2416,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "refund_attempts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
           {
@@ -2330,6 +2544,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipping_email_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
           {
@@ -2913,6 +3134,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "venthub_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "venthub_order_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
@@ -2961,6 +3189,8 @@ export type Database = {
           legal_consents: Json | null
           locale: string | null
           order_number: string
+          paid_at: string | null
+          paid_email_sent_at: string | null
           payment_debug: Json | null
           payment_method: string | null
           payment_status: string | null
@@ -2997,6 +3227,8 @@ export type Database = {
           legal_consents?: Json | null
           locale?: string | null
           order_number: string
+          paid_at?: string | null
+          paid_email_sent_at?: string | null
           payment_debug?: Json | null
           payment_method?: string | null
           payment_status?: string | null
@@ -3033,6 +3265,8 @@ export type Database = {
           legal_consents?: Json | null
           locale?: string | null
           order_number?: string
+          paid_at?: string | null
+          paid_email_sent_at?: string | null
           payment_debug?: Json | null
           payment_method?: string | null
           payment_status?: string | null
@@ -3153,6 +3387,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          request_email_sent_at: string | null
           source: string
           source_project_id: string | null
           status: string
@@ -3163,6 +3398,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          request_email_sent_at?: string | null
           source: string
           source_project_id?: string | null
           status?: string
@@ -3173,6 +3409,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          request_email_sent_at?: string | null
           source?: string
           source_project_id?: string | null
           status?: string
@@ -3276,6 +3513,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
           {
@@ -3387,6 +3631,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wizard_selections_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
             referencedColumns: ["id"]
           },
           {
@@ -3554,6 +3805,107 @@ export type Database = {
           },
         ]
       }
+      view_admin_returns: {
+        Row: {
+          admin_notes: string | null
+          approved_at: string | null
+          completed_at: string | null
+          created_at: string | null
+          customer_email: string | null
+          customer_name: string | null
+          description: string | null
+          id: string | null
+          order_id: string | null
+          order_number: string | null
+          processed_at: string | null
+          reason: string | null
+          refund_amount: number | null
+          requested_at: string | null
+          search_text: string | null
+          status: string | null
+          tenant_id: string | null
+          total_amount: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venthub_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "reserved_orders"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "venthub_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_returns_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_returns_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_admin_uninvoiced_orders: {
+        Row: {
+          created_at: string | null
+          customer_email: string | null
+          customer_name: string | null
+          id: string | null
+          invoice_info: Json | null
+          invoice_type: string | null
+          order_number: string | null
+          total_amount: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          id?: string | null
+          invoice_info?: Json | null
+          invoice_type?: string | null
+          order_number?: string | null
+          total_amount?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          id?: string | null
+          invoice_info?: Json | null
+          invoice_type?: string | null
+          order_number?: string | null
+          total_amount?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       _normalize_rls_expr: { Args: { expr: string }; Returns: string }
@@ -3670,6 +4022,8 @@ export type Database = {
           legal_consents: Json | null
           locale: string | null
           order_number: string
+          paid_at: string | null
+          paid_email_sent_at: string | null
           payment_debug: Json | null
           payment_method: string | null
           payment_status: string | null
@@ -3715,6 +4069,8 @@ export type Database = {
           legal_consents: Json | null
           locale: string | null
           order_number: string
+          paid_at: string | null
+          paid_email_sent_at: string | null
           payment_debug: Json | null
           payment_method: string | null
           payment_status: string | null
@@ -3874,6 +4230,20 @@ export type Database = {
         Args: { new_role: string; user_id: string }
         Returns: boolean
       }
+      submit_contact_message: {
+        Args: {
+          p_application_area?: string
+          p_city?: string
+          p_company?: string
+          p_consent?: boolean
+          p_email?: string
+          p_message: string
+          p_name: string
+          p_phone?: string
+          p_subject?: string
+        }
+        Returns: string
+      }
       update_inventory_settings: {
         Args: { p_default_low_stock_threshold: number }
         Returns: undefined
@@ -4011,6 +4381,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       contact_department: ["sales", "support", "consulting"],

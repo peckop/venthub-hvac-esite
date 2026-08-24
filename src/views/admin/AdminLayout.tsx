@@ -23,12 +23,13 @@ import {
   type AdminThemeResolved,
   serializeAdminTheme,
 } from '../../components/admin/shell/themeCookie'
-import { isAdminByEmail } from '../../config/admin'
+import { useAdminThemeBodyScope } from '../../components/admin/shell/useAdminThemeBodyScope'
 import { buildBreadcrumbTrail } from '../../config/admin-resources'
 import { useAuth } from '../../hooks/useAuth'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useRole } from '../../hooks/useRole'
 import { useTenant } from '../../hooks/useTenant'
+import { localeUpper } from '../../i18n/case'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes';
 
@@ -72,7 +73,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   const { user, loading: authLoading } = useAuth()
   const { canAccess, loading: roleLoading } = useRole()
   const router = useRouter()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const tenant = useTenant()
   // Vitrin rotası dile göre çözülür (kural 7: manuel `/tr/` öneki yasak).
   const localizedRoutes = useLocalizedRoutes()
@@ -86,7 +87,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     useState<AdminThemeResolved>(defaultThemeResolved)
 
   const loading = authLoading || roleLoading
-  const isEmailAdmin = user?.email ? isAdminByEmail(user.email) : false
 
   useEffect(() => {
     if (loading) return
@@ -143,6 +143,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     return () => media.removeEventListener('change', apply)
   }, [themePreference, tenant.id])
 
+  /* Portal icerigi tema kapsaminin DISINDA kalir — kanca gerekcesiyle birlikte
+     useAdminThemeBodyScope.ts icinde anlatiliyor. */
+  useAdminThemeBodyScope(themeResolved)
+
   const breadcrumb = React.useMemo(
     () => buildBreadcrumbTrail(pathname ?? ''),
     [pathname]
@@ -164,7 +168,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     )
   }
 
-  if (!isEmailAdmin && !canAccess(pathname ?? '')) {
+  // T047: eskiden burada `!isEmailAdmin &&` vardı ve sabit e-posta listesindeki bir
+  // kullanıcı `rbac.ts` sayfa matrisini TAMAMEN atlıyordu (super_admin'e özel
+  // `/admin/users` dahil). Artık tek karar mercii rol matrisi.
+  if (!canAccess(pathname ?? '')) {
     return (
       <div data-admin-theme={themeResolved}>
         <AccessDenied />
@@ -304,7 +311,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
             className="flex h-8 w-8 items-center justify-center rounded-full
               border border-admin-border bg-admin-surface-2 text-sm font-medium text-admin-fg-muted"
           >
-            {(user?.user_metadata?.first_name?.[0] || 'A').toUpperCase()}
+            {localeUpper(user?.user_metadata?.first_name?.[0] || 'A', lang)}
           </div>
         </div>
       </header>

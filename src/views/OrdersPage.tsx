@@ -9,6 +9,8 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useAuth } from '../hooks/useAuth'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
+import { foldForSearch } from '../i18n/case'
+import { SYSTEM_CURRENCY } from '../i18n/currency'
 import { formatDateTime } from '../i18n/datetime'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
@@ -155,7 +157,7 @@ const OrdersPage: React.FC = () => {
   }
 
   const formatPrice = (price: number) => {
-    return formatCurrency(price, lang, { maximumFractionDigits: 0 })
+    return formatCurrency(price, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })
   }
 
   const getStatusColor = (status: string) => {
@@ -211,8 +213,8 @@ const OrdersPage: React.FC = () => {
   // Derived filtered list
   const filtered = orders.filter(o => {
     if (productFilter) {
-      const q = productFilter.toLowerCase()
-      const match = (o.order_items || []).some(it => (it.product_name || '').toLowerCase().includes(q))
+      const q = foldForSearch(productFilter, lang)
+      const match = (o.order_items || []).some(it => foldForSearch(it.product_name || '', lang).includes(q))
       if (!match) return false
     }
     if (statusFilter !== 'all' && o.status.toLowerCase() !== statusFilter) return false

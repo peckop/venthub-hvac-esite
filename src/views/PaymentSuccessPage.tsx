@@ -10,6 +10,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useCart } from '../hooks/useCartHook'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
+import { SYSTEM_CURRENCY } from '../i18n/currency'
 import { formatDateTime } from '../i18n/datetime'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
@@ -254,7 +255,7 @@ const PaymentSuccessPage: React.FC = () => {
           {typeof orderSummary.amount === 'number' && (
             <div className="flex justify-between text-sm font-semibold text-industrial-gray">
               <span>{t('orders.totalAmount')}</span>
-              <span>{formatCurrency(orderSummary.amount, lang, { maximumFractionDigits: 0 })}</span>
+              <span>{formatCurrency(orderSummary.amount, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })}</span>
             </div>
           )}
         </div>

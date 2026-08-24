@@ -8,6 +8,7 @@ import {
   Recommendations,
   ResultCard,
   ResultGrid} from '../../components/calculators'
+import { useCalculatorUsage } from '../../hooks/useCalculatorUsage'
 import { formatNumber } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
@@ -48,6 +49,18 @@ const JetFanCalcPage: React.FC = () => {
   const [height, setHeight] = useState('3')
   const [carCapacity, setCarCapacity] = useState('100')
   const [trafficFlow, setTrafficFlow] = useState('50')
+
+  // T021-VH · `calculator_used`. Taban çizgisi mount anıdır: girdilerin varsayılan değeri
+  // olduğu için "ilk geçerli sonuçta ateşle" sayfa görüntülemesini ölçerdi. Bkz. hook.
+  useCalculatorUsage('jetfan', {
+    applicationType,
+    ventilationMode,
+    length,
+    width,
+    height,
+    carCapacity,
+    trafficFlow,
+  })
 
   // Gerçek zamanlı hesaplama
   const result = useMemo(() => {

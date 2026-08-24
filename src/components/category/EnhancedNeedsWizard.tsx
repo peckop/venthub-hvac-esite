@@ -10,6 +10,7 @@ import React, { useCallback,useEffect, useState } from 'react'
 import { useI18n } from '@/i18n/I18nProvider';
 import { productImagePlaceholder,resolveProductImageUrl } from '@/lib/images/productImage'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+import { eqValue, orConditions } from '@/utils/adminQueryFilters'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { calculateAirCurtain } from '../../lib/hvacCalculations'
@@ -100,10 +101,29 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
     const matchProducts = useCallback(async () => {
         setLoading(true)
         try {
+            // ONARIM (2026-08-23): burada `contains('category_slugs', [parentSlug])` yazıyordu ve
+            // `category_slugs` diye bir kolon YOK — ne canlı şemada ne arşivde. Sorgu hata
+            // veriyor, aşağıdaki catch yutuyor, kullanıcı boş sonuç ekranı görüyordu. Kırılma
+            // `66ff386f` (2026-03-15): çalışan `category_id` sorgusunu olmayan bir kolona
+            // çevirmiş, beş ay hiçbir kapı görmemişti. Doğru desen `product.service.ts`'te:
+            // kategori slug → id, sonra category_id VEYA subcategory_id.
+            const { data: kategori, error: kategoriHatasi } = await supabase
+                .from('categories')
+                .select('id')
+                .eq('slug', parentSlug)
+                .maybeSingle()
+
+            if (kategoriHatasi) throw kategoriHatasi
+            if (!kategori) {
+                setMatchedProducts([])
+                return
+            }
+
             const { data, error } = await supabase
                 .from('products').select(VARIANT_DETAIL_COLUMNS)
+                .or(orConditions([eqValue('category_id', kategori.id), eqValue('subcategory_id', kategori.id)]))
                 .eq('status', 'active')
-                .contains('category_slugs', [parentSlug])
+                .is('deleted_at', null)
 
             if (error) throw error
 

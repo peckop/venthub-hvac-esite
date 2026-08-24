@@ -19,6 +19,7 @@ import ExportMenu from '../../components/admin/ExportMenu'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { useTenant } from '../../hooks/useTenant'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -290,7 +291,7 @@ const CouponsTableBody: React.FC = () => {
           const response = await supabaseBrowserClient.functions.invoke('admin-create-coupon', {
             body: {
               code: validatedData.code,
-              type: validatedData.type as AllowedCouponType,
+              type: validatedData.type,
               value: validatedData.value,
               starts_at: validatedData.starts_at || null,
               ends_at: validatedData.ends_at || null,
@@ -344,7 +345,7 @@ const CouponsTableBody: React.FC = () => {
         cell: (r) =>
           r.type === 'percent'
             ? `%${r.value}`
-            : formatCurrency(r.value, lang as 'tr' | 'en', { maximumFractionDigits: 0 }),
+            : formatCurrency(r.value, lang as 'tr' | 'en', { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 }),
       },
       {
         key: 'active',
@@ -508,7 +509,9 @@ const CouponsTableBody: React.FC = () => {
                 id="coupon-type"
                 value={form.type as string}
                 onChange={(e) => {
-                  setForm((f) => ({ ...f, type: e.target.value as AllowedCouponType }))
+                  const nextType = e.target.value
+                  if (!isAllowedCouponType(nextType)) return
+                  setForm((f) => ({ ...f, type: nextType }))
                   setErrors((errs) => ({ ...errs, type: '' }))
                 }}
                 className={`${adminSelectClass} ${errors.type ? 'border-admin-danger/30 focus-visible:border-admin-danger/30 focus-visible:ring-admin-danger/30' : ''}`}

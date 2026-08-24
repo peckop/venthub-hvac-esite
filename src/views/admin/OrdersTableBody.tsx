@@ -8,6 +8,8 @@ import type { DateRange } from 'react-day-picker'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { isRefundedPayment,ORDER_DB_STATUSES, type OrderDbStatus } from '@/lib/admin/orderStatusDomain'
+import { orderStatusLabel } from '@/lib/admin/orderStatusLabels'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { invokeShippingUpdate, SharedTrackingDeclinedError } from '@/utils/adminShipping'
 
@@ -24,6 +26,7 @@ import { AdminSidePanel } from '../../components/admin/overlay/AdminSidePanel'
 import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import type { Lang } from '../../i18n/I18nContext'
@@ -46,7 +49,9 @@ import {
 /* ---- model ---- */
 interface AdminOrderRow {
   id: string
-  status: 'pending' | 'paid' | 'confirmed' | 'shipped' | 'cancelled' | 'refunded' | 'partial_refunded' | string
+  /* Sipariş durumu: yalnız venthub_orders_status_check sözlüğü (T111-VH). */
+  status: OrderDbStatus | string
+  payment_status?: string | null
   conversation_id?: string | null
   total_amount?: number | null
   created_at: string
@@ -75,7 +80,7 @@ interface OrderNote {
 const PAGE_SIZE = 50
 
 const ORDER_SELECT =
-  'id,status,conversation_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone'
+  'id,status,payment_status,conversation_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone'
 
 const SORT_COLUMN_MAP: Record<string, string> = {
   created: 'created_at',
@@ -85,20 +90,19 @@ const SORT_COLUMN_MAP: Record<string, string> = {
   amount: 'total_amount',
 }
 
-const ORDER_STATUS_KEYS = [
-  'pending',
-  'paid',
-  'confirmed',
-  'shipped',
-  'delivered',
-  'cancelled',
-  'refunded',
-  'partial_refunded',
-] as const
+/*
+ * Filtre kumesi TURETILIR, kopyalanmaz (T111-VH).
+ *
+ * Eski hali elle yazilmis SEKIZ degerdi ve UCU (paid, refunded,
+ * partial_refunded) ODEME sozlugune aitti - status kolonuna sorgu atildigi
+ * icin o uc filtre HER ZAMAN sifir sonuc donduruyordu. Ayrica processing
+ * EKSIKTI, yani gercek bir durum hic filtrelenemiyordu.
+ */
+const ORDER_STATUS_KEYS = ORDER_DB_STATUSES
 
 /* ---- helper'lar (module-level) ---- */
 function formatAmount(v?: number | null, lang: Lang = 'tr'): string {
-  if (typeof v === 'number') return formatCurrency(v, lang, { maximumFractionDigits: 0 })
+  if (typeof v === 'number') return formatCurrency(v, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })
   return '-'
 }
 
@@ -110,29 +114,13 @@ function safeDate(iso: string, lang: Lang = 'tr'): string {
   }
 }
 
+/**
+ * Durum etiketi. Kume ve ceviri PAYLASILAN moduldedir (T108-VH): burada kopya
+ * bir switch tutmak, bu dosyada tam olarak processing durumunun DUSMESINE ve
+ * ham DB dizesinin ekrana basilmasina yol acmisti.
+ */
 function prettyStatus(s: string, t: (key: string, params?: Record<string, unknown>) => string): string {
-  if (!s) return s
-  const key = s.toLowerCase()
-  switch (key) {
-    case 'pending':
-      return t('admin.orders.statusLabels.pending')
-    case 'paid':
-      return t('admin.orders.statusLabels.paid')
-    case 'confirmed':
-      return t('admin.orders.statusLabels.confirmed')
-    case 'shipped':
-      return t('admin.orders.statusLabels.shipped')
-    case 'delivered':
-      return t('admin.orders.statusLabels.delivered')
-    case 'cancelled':
-      return t('admin.orders.statusLabels.cancelled')
-    case 'refunded':
-      return t('admin.orders.statusLabels.refunded')
-    case 'partial_refunded':
-      return t('admin.orders.statusLabels.partialRefunded')
-    default:
-      return s
-  }
+  return orderStatusLabel(s, t)
 }
 
 function badgeClass(s: string): string {
@@ -146,6 +134,7 @@ function badgeClass(s: string): string {
       return `${base} bg-admin-surface-3 text-admin-fg-muted border-admin-border ring-1 ring-admin-border`
     case 'paid':
       return `${base} bg-admin-success-weak text-admin-success border-admin-success/30 ring-1 ring-admin-success/30`
+    case 'processing':
     case 'confirmed':
       return `${base} bg-admin-accent-weak text-admin-accent border-admin-accent/30 ring-1 ring-admin-accent/30`
     case 'shipped':
@@ -447,10 +436,10 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
                         {qty}
                       </td>
                       <td className="px-4 py-2.5 text-right text-admin-fg font-mono">
-                        {formatCurrency(unitPrice, lang)}
+                        {formatCurrency(unitPrice, lang, { currency: SYSTEM_CURRENCY })}
                       </td>
                       <td className="px-4 py-2.5 text-right text-admin-accent font-mono">
-                        {formatCurrency(totalPrice, lang)}
+                        {formatCurrency(totalPrice, lang, { currency: SYSTEM_CURRENCY })}
                       </td>
                     </tr>
                   )
@@ -1130,7 +1119,17 @@ const OrdersTableBody: React.FC = () => {
         header: t('admin.orders.table.status'),
         sortable: true,
         hideable: true,
-        cell: (r) => <span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span>,
+        cell: (r) => (
+          <span className="inline-flex items-center gap-1.5">
+            <span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span>
+            {/* Iade ODEME kolonundan turer - status kolonu refunded OLAMAZ (T111-VH). */}
+            {isRefundedPayment(r.payment_status) && (
+              <span className={badgeClass(r.payment_status ?? '')}>
+                {prettyStatus(r.payment_status ?? '', t)}
+              </span>
+            )}
+          </span>
+        ),
       },
       {
         key: 'conversation',

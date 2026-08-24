@@ -13,6 +13,7 @@ import type { Product } from '@/types/ui-models'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -174,7 +175,7 @@ export default function OrderDetailPage() {
   }, [user, id, t, router])
 
   const formatDate = (d?: string | null) => (d ? formatDateTime(d, lang) : '-')
-  const formatPrice = (n: number | string) => formatCurrency(Number(n) || 0, lang, { maximumFractionDigits: 0 })
+  const formatPrice = (n: number | string) => formatCurrency(Number(n) || 0, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })
 
   const handleCopy = async (text?: string) => {
     try { if (!text) return; await navigator.clipboard.writeText(text); toast.success(t('orders.copied')) } catch { toast.error(t('orders.copyFailed')) }
@@ -198,11 +199,11 @@ export default function OrderDetailPage() {
       doc.text(`${o.customer_name}`, 350, 58)
       if (o.customer_email) doc.text(`${o.customer_email}`, 350, 72)
       const head = [[t('orders.productCol'), t('orders.qtyCol'), t('orders.unitPriceCol'), t('orders.totalCol')]]
-      const body = (o.order_items || []).map(it => [it.product_name || '-', String(it.quantity ?? 0), formatCurrency(Number(it.unit_price) || 0, lang, { currency: 'TRY' }), formatCurrency(Number(it.total_price) || 0, lang, { currency: 'TRY' })])
+      const body = (o.order_items || []).map(it => [it.product_name || '-', String(it.quantity ?? 0), formatCurrency(Number(it.unit_price) || 0, lang, { currency: SYSTEM_CURRENCY }), formatCurrency(Number(it.total_price) || 0, lang, { currency: SYSTEM_CURRENCY })])
       autoTable(doc, { startY: 100, head, body, styles: { font: 'helvetica', fontSize: 10 }, headStyles: { fillColor: [245, 247, 250], textColor: 20 }, columnStyles: { 1: { halign: 'center' }, 2: { halign: 'right' }, 3: { halign: 'right' } } })
       const after = (doc as { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY || 100
       doc.setFont('helvetica', 'bold'); doc.setFontSize(12)
-      doc.text(`${t('orders.grandTotal')}: ${formatCurrency(o.total_amount, lang, { currency: 'TRY' })}`, 40, after + 24)
+      doc.text(`${t('orders.grandTotal')}: ${formatCurrency(o.total_amount, lang, { currency: SYSTEM_CURRENCY })}`, 40, after + 24)
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100)
       doc.text('Bu belge resmî fatura değildir; bilgilendirme amaçlıdır.', 40, after + 42)
       doc.save(`Proforma-${orderNo}.pdf`)

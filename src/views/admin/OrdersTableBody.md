@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\views\admin\OrdersTableBody.tsx
-skeleton_hash: 54243718a94f31c5
+source_path: C:\Users\alize\venthub-wt-altyapi\src\views\admin\OrdersTableBody.tsx
+skeleton_hash: 010b2c1a91d7e57c
 entity_hashes:
   func:OrderSpecsRow: a865be15b74a12e4
   func:OrdersTableBody: f6fa9129ca876792
@@ -17,7 +17,7 @@ entity_hashes:
   func:safeDate: 8162cc570bcd435b
   overview: abb32d12a031698b
   style_tokens: 08b9ed68ec6b3684
-generated_at: 2026-08-17T18:23:50Z
+generated_at: 2026-08-18T06:53:39Z
 ---
 
 ## Genel Bakış
@@ -397,13 +397,13 @@ graph TD
     OrdersTableBody_tsx__ordersFetcher["ordersFetcher"]
     OrdersTableBody_tsx__prettyStatus["prettyStatus"]
     OrdersTableBody_tsx__safeDate["safeDate"]
-    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__safeDate
-    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__orderLabel
     OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__downloadBlob
     OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__badgeClass
-    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__prettyStatus
-    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__formatAmount
+    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__orderLabel
+    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__safeDate
     OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__generateTrackingUrl
+    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__formatAmount
+    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__prettyStatus
 ```
 
 ## NODE ID STANDARD

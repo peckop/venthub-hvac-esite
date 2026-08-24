@@ -836,6 +836,60 @@ Mevcut `tokens.js` ölçeği korunur ve iki katman eklenir:
 
 ---
 
+### 4.11 Portal ve TEMA KAPSAMI — doğru sınıf yeterli değildir
+
+> 2026-08-18'de kullanıcı iki ayrı belirti bildirdi: admin modallerinin **paneli şeffaftı**
+> (altındaki tablo satırları modalın içinden görünüyor, etiketlerle çakışıyordu) ve **tema
+> menüsünün seçenekleri okunmuyordu** (koyu temada koyu-üstüne-koyu). Ayrı görünüyorlardı;
+> sebep **tekti**.
+
+#### Mekanizma
+
+Admin token'ları `src/index.css`'te **`[data-admin-theme]` seçicisi altında** tanımlıdır ve
+bu öznitelik `AdminLayout`'un `<div>`lerinde yaşar. Radix `Dialog.Portal` /
+`DropdownMenu.Portal` ve `createPortal`, içeriği **`document.body`ye taşır** — yani portal
+ağacı, değişkenlerin tanımlı olduğu kapsamın **dışında** kalır.
+
+`hsl(var(--admin-surface))` **tanımsız** bir değişkenle geçersiz bir renge dönüşür; tarayıcı
+özelliği hiç uygulamaz ve hesaplanmış değer **şeffafa** düşer. Metinde aynısı olur: renk
+uygulanmaz, metin miras alınan renge iner.
+
+**Bu yüzden `class` denetimi bu kusuru göremez.** Sınıflar (`bg-admin-surface`,
+`text-admin-fg`) tamamen doğruydu. Yanlış olan, dayandıkları değişkenlerin o ağaçta
+tanımsız olmasıydı — yani kusur **kodda değil, kapsamda** yaşıyordu.
+
+#### Kural
+
+**Tema kapsamı `document.body`ye de basılır** (`useAdminThemeBodyScope`), admin yüzeyi
+çözülünce geri alınır. Böylece bugünkü ve gelecekteki **her** portal — üçüncü parti olanlar
+dahil — token'ları görür.
+
+Reddedilen alternatifler ve niçin:
+
+| Alternatif | Niçin değil |
+|---|---|
+| Her portal'a `container` prop'u | Her yeni overlay'de tekrar hatırlanması gereken bir disiplin; üçüncü parti portal'ları hiç kapsamaz. Ayrıca içeriği kabuğun içine almak, portal'ın var oluş sebebi olan yığılma bağlamı sorunlarını geri getirir. |
+| Özniteliği `<html>`e basmak | `[data-admin-theme] select option` gibi genel kurallar ve `color-scheme` **vitrine sızar**. |
+| Değişkenleri `:root`ta tanımlamak | Portal daima AÇIK temayı alır; koyu temada panel açık kalır. Kusurun yerini değiştirir, kaldırmaz. |
+
+#### Zorlama — üç katman, üçü de gerekli
+
+| Katman | Ne ölçer | Sınırı |
+|---|---|---|
+| `admin-theme-invariants` (statik) | `AdminLayout` kancayı gerçekten **çağırıyor** mu — yetim kanca kapısı | Kapsamı ölçmez |
+| `useAdminThemeBodyScope.test.tsx` (jsdom) | Gövdeye basılıyor/güncelleniyor/geri alınıyor mu; **portal içeriğinin tema kapsamı taşıyan bir ATASI var mı** | jsdom `index.css`i uygulamaz → hesaplanmış rengi ölçemez |
+| `admin-smoke.e2e.ts` (gerçek tarayıcı) | Açılmış menünün **hesaplanmış** arka planı şeffaf değil | Kimlik bilgisi yoksa **atlanır** (fail-open) — bu yüzden tek başına yeterli sayılmaz |
+
+> Katmanların **hiçbiri tek başına yetmiyor** ve bu tesadüf değil: statik kapı doğru sınıfı
+> görüp yeşil der, jsdom rengi hesaplamaz, e2e her koşuda çalışmaz. Bu tabloyu okumadan
+> "kapı var" demek, §5'in "ölçülemedi ≠ geçti" ilkesini çiğnemektir.
+
+> **Yan ders (ölçüm hijyeni):** kanca bilerek bozulduğunda iki portal testi **yine yeşil**
+> kaldı — çünkü bir önceki test başarısız olup temizliğine ulaşamamış, gövdede bıraktığı
+> öznitelik sonraki testleri kurtarmıştı. Kapı, kendi ürettiği kirli durumla sahte-yeşil
+> veriyordu. Gövde/`document` gibi **paylaşılan durumu** değiştiren her testte
+> `beforeEach` + `afterEach` temizliği zorunludur.
+
 ## 5. CETVEL (ölçüm aracı)
 
 Skor = ✓ / 40. Kabuk maddeleri **kabuk başına bir kez**, sayfa maddeleri **sayfa başına** ölçülür.
@@ -902,6 +956,9 @@ Skor = ✓ / 40. Kabuk maddeleri **kabuk başına bir kez**, sayfa maddeleri **s
 | **INV-ADMIN-OVERLAY-1** | `window.confirm`/`alert`/`prompt` **0**; `<Toaster/>`'ın admin ağacında mount edildiğinin ispatı | statik + render testi |
 | **INV-ADMIN-OVERLAY-2** | Paylaşılan `Modal`/`ConfirmDialog` dışında `fixed inset-0` overlay yasağı; her dialog'da `role` + `aria-modal` + isim bağı; ESC handler'ının odaklanamayan elemana bağlanma yasağı | statik tarama |
 | **INV-ADMIN-OVERLAY-3** | Overlay katmanında ham `z-30/40/50` ve arbitrary `z-[…]` yasağı; token kullanımı | statik tarama |
+| **Portal tema kapsamı** | AdminLayout tema kapsamını gövdeye basmalı (yetim kanca kapısı); portal içeriğinin kapsam taşıyan atası olmalı; gerçek tarayıcıda menü arka planı şeffaf olmamalı | statik + jsdom + e2e |
+| **INV-ADMIN-SEARCH-1** | Üst-düzey `or()` içinde gömülü kaynağa atıf YASAK (sıfır tolerans); iade yüzeyi view üzerinden okur. Ham kullanıcı metni kuralı burada DEĞİL, INV-FILTER-1'de (duplicate-ruler önlemi) | statik tarama |
+| **INV-ADMIN-EXPORT-1** | `components/admin/data-table/` ve `components/admin/overlay/` altında `export default` YASAK; aynı dizinlerden DEFAULT ithal de YASAK (iki kural birbirinin yedeği) | statik tarama |
 | **INV-ADMIN-DESIGN-1** (ratchet) | `font-black`, `uppercase`, `shadow-[…]`, ham `rounded-xl/2xl/3xl`, ham `slate-*`/`gray-*` sayaçları — **yeni kod artıramaz**, dalgalar düşürür | ratchet (INV-5/INV-9 deseni) |
 | **ESLint kaçağı kapatma** | `tailwindcss/no-arbitrary-value` şu an **yalnız literal `className`'i** görüyor; admin'de 38 arbitrary değer sabit/obje içinde kaçıyor (ölçüldü: o dosyalarda eslint 0 hata veriyor). `settings.tailwindcss.callees` + sabit tarama eklenir | lint |
 | **Zoom kapısı** | Playwright: 1280×1024 @ %400 → iki-yönlü scroll yok; %200 metin → kırpılma yok | e2e |
@@ -941,6 +998,132 @@ doğruysa o** — ve genişletme migration ise Recep onayına gider (kural 13).
 > Bu bir *kapı* değil **ölçüm yükümlülüğüdür**: rol dizileri statik taramayla güvenilir
 > eşleştirilemiyor (RLS ifadeleri serbest SQL). Ölçmediğimiz şeyi kapı sanmıyoruz — §5'in
 > "ölçülemedi ≠ geçti" ilkesi burada da geçerli.
+
+### 6.2 Admin liste araması: KULLANICI METNİ SORGU DEĞİLDİR
+
+> Bu bölüm 2026-08-18'de **cetvel yokluğu ölçülerek** yazıldı. `/admin/returns` araması
+> üretimden beri hiç çalışmıyordu ve hiçbir kapı bunu görmedi — çünkü "admin liste araması
+> nasıl kurulur" sorusunun yazılı bir cevabı yoktu. Kural 1'in "cetvel yok geçerli ama
+> bedava değil" maddesi tam bu boşluğu kapatır.
+
+#### Kural A — üst-düzey `or()` GÖMÜLÜ kaynağa atıfta bulunamaz (sıfır tolerans)
+
+PostgREST'te `or=` argümanı **ana kaynağın** kolonları üzerinde tanımlıdır. Gömülü
+(join'lenmiş) bir tabloya `tablo.kolon.ilike.…` diye atıf yapmak ayrıştırılamaz; sorgu
+**400** ile düşer. "Kısmen çalışan" hâli yoktur.
+
+Gömülü kaynağa süzmenin yolu ikinci argümandır:
+
+```ts
+query.or(orIlikeContains(['name', 'sku'], term), { foreignTable: 'products' })
+```
+
+Dikkat: bu süzme **yalnız gömülü kaynağa** uygulanır. Ana tablonun bir kolonuyla (`reason`)
+gömülü kaynağın bir kolonunu (`products.name`) **tek bir OR'da** birleştirmek PostgREST'te
+ifade EDİLEMEZ. İhtiyaç buysa doğru cevap Kural C'dir.
+
+#### Kural B — kullanıcı metni filtre DİLBİLGİSİNE gömülmez
+
+`or()` argümanı bir dilbilgisidir: `,` koşulu, `.` alan/işleç/değer'i, `()` grubu ayırır.
+Kullanıcının yazdığı metin oraya ham girerse terim dilbilgisine karışır — `a,b` yazan admin
+koşul sayısını değiştirir ve sorgu düşer.
+
+`src/utils/adminQueryFilters.ts` yardımcıları kullanılır (`orIlikeContains`, `ilikeContains`,
+`eqValue`, `orConditions`). `%` ve `_` **bilerek kaçırılmaz**: onlar dilbilgisi değil LIKE
+joker karakterleridir, kaçırmak aramanın anlamını sessizce değiştirirdi.
+
+> **Bu kuralın SSOT'u INV-FILTER-1'dir** (EDGE şeridi, T078-VH) — burada tekrarlanmaz.
+> Aynı sınıfa iki cetvel koymak (*duplicate ruler*) zamanla sessizce ayrışan iki taban
+> çizgisi üretir; OPS-AUDIT kararıyla ratchet tek yerde yaşar. Kural A ise INV-FILTER-1'de
+> **yok** ve onun düzelttiği satırları bile yakalar (aşağıda ölçüldü) — ikisi tamamlayıcıdır,
+> eş değil.
+
+**Tek kolon aranıyorsa `or()` hiç kullanılmaz:** `query.ilike('search_text', \`%${term}%\`)`
+deseni ayrı bir sorgu parametresi olarak taşır ve kullanıcı metni dilbilgisine hiç dokunmaz.
+
+#### Kural C — birden çok tabloya yayılan arama VIEW ile çözülür
+
+Aranan alanlar iki tabloya yayılıyorsa (iadede `reason`, siparişte `customer_name`),
+birleştirme **DB tarafında** yapılır: `security_invoker = true` bir view, alanları
+`coalesce(...) || ' ' || ...` ile tek bir `search_text` kolonunda birleştirir; arayüz tek
+kolon arar.
+
+| | |
+|---|---|
+| **Örnekler** | `view_admin_orders` (2026-02-25) · `view_admin_returns` (2026-08-18) |
+| **`security_invoker` ZORUNLU** | View, çağıranın yetkisiyle çalışır; taban tabloların RLS'i aynen uygulanır. Varsayılan (definer) davranış, müşterinin BAŞKASININ kaydını görmesine yol açar. |
+| **JOIN `LEFT` olur** | `INNER` olsaydı RLS ana satırı gizlediği anda çocuk satır da kaybolur ve yetki eksiği "kayıt yok" gibi görünürdü — §6.1'deki sessiz-boş sınıfının aynısı. |
+| **Yalnız `SELECT` grant'i** | View bir OKUMA yüzeyidir. Yazma (statü güncelleme, CAS) taban tabloda kalır; view'a yazma grant'i vermek ikinci bir yazma yolu doğururdu. |
+| **Bilinen tavan** | Hesaplanmış view kolonuna indeks konamaz; `ILIKE` sıralı okumadır. Darlaşırsa yol: taban tabloda materyalize kolon + `pg_trgm` GIN indeksi (eklenti kurulu). |
+
+#### Kural D — sayfa ve komut paleti AYNI kaynağı okur
+
+Aynı varlık iki yüzeyden aranır: liste sayfası ve komut paleti (`resourceSearchers.ts`).
+İkisi ayrı sorgu kurarsa aynı terim için farklı sonuç verebilir ve hangisinin doğru olduğu
+ölçülemez. **Tek kaynak = tek cevap.**
+
+> Bu maddenin bedeli ölçüldü: iade araması komut paletinde de kırıktı (aynı Kural A ihlali),
+> ama sayfa kırık olduğu için kimse ikisini karşılaştıramamıştı bile.
+
+#### Zorlama
+
+| Kural | Kapı | Sertlik |
+|---|---|---|
+| A — gömülü atıf | **INV-ADMIN-SEARCH-1** | sıfır tolerans |
+| B — ham kullanıcı metni | **INV-FILTER-1** (EDGE) | ratchet, taban adlı |
+| C/D — view + tek kaynak | **INV-ADMIN-SEARCH-1** | iade yüzeyinde bağlı |
+
+**Tamamlayıcılık ÖLÇÜLDÜ, iddia değil.** INV-FILTER-1'in ürettiği şu satır kaçış açısından
+doğrudur ama gömülü atfı korur, yani sorgu hâlâ 400 döner — üstelik yardımcıyı kullandığı
+için **düzelmiş görünür**:
+
+```ts
+orIlikeContains(['reason', 'venthub_orders.order_number'], query)
+```
+
+Kural A'nın dedektör öz-testi tam bu satırı (ve stok hareketleri karşılığını) **kalıcı vaka**
+olarak taşır; yanlış-KIRMIZI vakaları da aynı testtedir, çünkü her şeyi işaretleyen bir
+dedektör de "çalışıyor" görünür.
+
+Kapı ayrı sabotajlarla kanıtlandı; her sabotaj **farklı** bir testi düşürür.
+
+Kapının ölçmediği, **adıyla**: sorgu çalıştırılmaz (sonucun doğruluğu ölçülmez); yorum
+ayıklama yalnız tam-satır yorumlarını atar (satır-sonu yorumu yanlış-KIRMIZI verebilir,
+yanlış-yeşil veremez).
+
+---
+
+### 6.4 Paylaşılan admin bileşeni TEK KAPIDAN girer (2026-08-19, T103-VH)
+
+**Kural:** `src/components/admin/data-table/` ve `src/components/admin/overlay/` altındaki her
+bileşen **yalnız NAMED** export edilir. `export default` yasaktır, bu dizinlerden default ithal
+de yasaktır. Muafiyet **adla** yazılır; şu an muafiyet yok.
+
+**Niçin — tercih değil, ölçüm.** 2026-08-19 taraması: bu iki dizindeki sekiz bileşenin hepsi hem
+named hem default export ediyordu. Sekiz default kapının **altısı hiçbir yerden kullanılmıyordu**
+(ölü), kalan ikisi tek çağrı-yerindeydi. Ve `BulkBar` aynı depoda **iki farklı kapıdan** giriyordu:
+`AdminLogisticsTableBody` default, diğer yedi dosya named.
+
+İki kapı kendi başına çökme üretmez — ürettiği şey **sessiz ayrışmadır**: yeniden adlandırma yalnız
+bir kapıyı takip eder, arama yalnız bir biçimi bulur, ve ölü-kod ölçümleri (knip) ölü kapıyı canlı
+sanar. Yani kusur bir yazım tercihi değil, **ölçülebilirliği bozan** bir kusurdur; bu cetvelin geri
+kalanı ölçüme dayandığı için buraya aittir.
+
+**Zorlayan kapı:** INV-ADMIN-EXPORT-1 — `src/__tests__/conformance/admin-export-hygiene.test.ts`.
+
+Kapı **üç ayrı sabotajla** kanıtlandı ve her sabotaj **farklı** bir testi düşürdü:
+
+1. `BulkBar.tsx` dosyasına `export default BulkBar` geri kondu → **kural A** kırmızı.
+2. `AdminLogisticsTableBody` default ithale döndürüldü → **kural B** kırmızı (kural A yeşilken).
+   Bu, iki kuralın birbirinin yedeği olduğunu gösterir: biri diğerini gereksiz kılmaz.
+3. Kapsam dizini var olmayan bir adla değiştirilerek tarama **kör edildi** → **stale-guard**
+   kırmızı. Bu üçüncüsü olmasa, dizin yeniden adlandırıldığı gün kapı sessizce hiçbir şeyi ölçmez
+   olur ve yeşil kalırdı — yani kapı kendi ön koşulunu da doğrular.
+
+**Kapının ölçmediği, adıyla:** hiçbir modül çalıştırılmaz — "named export gerçekten var mı"
+sorusunu `tsc` yanıtlar, bu kapı değil. `export * from` yeniden-ihracatı izlenmez (kapsanan
+dizinlerde böyle bir kullanım yok, ölçüldü). Yorum ayıklama yalnız tam-satır yorumlarını atar:
+satır-sonu yorumundaki örnek kod yanlış-KIRMIZI verebilir, yanlış-yeşil veremez.
 
 ---
 
