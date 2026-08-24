@@ -24,7 +24,16 @@
 const fs = require('fs')
 const path = require('path')
 
-const PANO = process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+/**
+ * IKI AD, TEK KAVRAM — OLCULMUS KUSUR (2026-08-23): bu dosya VENTHUB_PANO_DIR okuyordu,
+ * board.cjs ise VENTHUB_BOARD_DIR (board.cjs:28). Panoyu bir kopyaya yonlendirip kanarya
+ * kosturdugumda yonlendirme YARIM uygulandi: OKUMA kopyadan yapildi, YAZMA gercek panoya
+ * gitti ve canli bir seride kanarya notu dustu. Yonlendirme "calisti" gorunuyordu cunku
+ * yarisi tasinmisti — sessiz sizinti, cunku hicbir hata olusmadi.
+ * Bu yuzden ikisi de kabul edilir ve board.cjs in okudugu ad ONCELIKLIDIR: tek bir degisken
+ * ayarlamak butun katmani birlikte tasir.
+ */
+const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
 
 const arg = (ad) => {
   const i = process.argv.indexOf(ad)
@@ -99,14 +108,32 @@ const imlecYaz = () => {
 // ---------------------------------------------------------------- tarama
 const panoDosyasiMi = (d) => d.startsWith('events.') && d.endsWith('.jsonl')
 
+/**
+ * OLCULMUS KUSUR (2026-08-23): kirpma siniri 400 karakterdi ve KIRPILDIGI SOYLENMIYORDU.
+ * Panodaki 2027 notun 1904'u (%93.9) bu siniri asiyor; medyan not 1130, en uzunu 6138 karakter.
+ * Yani gozcu, notlarin yarisindan azini gosterip TAM gostermis gibi basiyordu. Sessiz kirpma
+ * "yanlis veri yayinlama" sinifinin en sinsi hali, cunku cikti DOGRU GORUNUR. Bir emir
+ * cumlesinin sonu kesilirse anlam TERSINE donebilir ("... merge ETME" -> "... merge").
+ * Yeni sinir 3000: notlarin %96.4'u TAM gecer; gecmeyen, DUSEN KARAKTER SAYISIYLA soyler.
+ */
+const KIRPMA_SINIRI = 3000
+
 const notSatiri = (o) => {
   const kim = o.lane || (o.sid ? String(o.sid).slice(0, 8) : '?')
   const kime = o.to ? String(o.to).slice(0, 8) : 'HERKESE'
-  const metin = String(o.text || '').replace(/[\r\n]+/g, ' ').slice(0, 400)
+  const ham = String(o.text || '').replace(/[\r\n]+/g, ' ')
+  const metin =
+    ham.length > KIRPMA_SINIRI
+      ? ham.slice(0, KIRPMA_SINIRI) +
+        ' ...[KIRPILDI: ' + (ham.length - KIRPMA_SINIRI) + ' karakter daha var; tamami panodaki jsonl dosyasinda]'
+      : ham
   return kim + ' -> ' + kime + ' :: ' + metin
 }
 
 function tara() {
+  // Esik taramanin BASINDA donduruluyor: asagida imlec.sonTarama guncelleniyor,
+  // dongu icinde okunsaydi dosyadan dosyaya kayardi.
+  const esik = imlec.sonTarama
   let dosyalar = []
   try {
     dosyalar = fs.readdirSync(PANO).filter(panoDosyasiMi)
@@ -123,10 +150,22 @@ function tara() {
     let st
     try {
       st = fs.statSync(tam)
-    } catch {
+    } catch (e) {
+      // SESSIZ ATLAMA YOK: burada susmak, o seridi duymadigimi duymamak demekti.
+      yaz('GOZCU-UYARI: ' + d + ' stat edilemedi (' + (e.code || e.message) + ') - BU TURDA BU SERIDI DUYMUYORUM; sessizlik degil KORLUK.')
       continue
     }
 
+    // OLCULMUS TUZAK 4 (2026-08-23): imlecte OLMAYAN bir pano dosyasi (filoda yeni bir oturum
+    // acilinca olusur) offset 0dan okunur ve o dosyanin TUM GECMISI "yeni not" diye yayinlanir.
+    // URUN'un ayni gun yasadigi kirilmanin (on gunluk arsivi yeni sanip basmak) BASKA BIR
+    // MEKANIZMADAN gelen esi. Olctum: onarim aninda panoda imlecte olmayan 1 dosya vardi
+    // (events.probe-admin-6cc7f2d3.jsonl) - yani latent degil, SIRADAKI ates.
+    // Care URUN'un caresiyle ayni: ZAMAN DAMGASI. Bilinmeyen dosyada yalniz esikten SONRAKI
+    // olaylar yayinlanir; bastirilanlarin SAYISI basilir (sessizlik = basari DEGIL).
+    const bilinenDosya = Object.prototype.hasOwnProperty.call(imlec.ofsetler, d)
+    let bastirilan = 0
+    let bozukSatir = 0
     let onceki = Number(imlec.ofsetler[d] || 0)
     if (st.size < onceki) onceki = 0 // dosya kısaldı/döndürüldü
 
@@ -160,11 +199,27 @@ function tara() {
       try {
         o = JSON.parse(satir)
       } catch {
+        bozukSatir++
         continue
       }
       if (!o || o.type !== 'note') continue
       if (o.sid && String(o.sid).startsWith(kisaSid)) continue
+      if (!bilinenDosya && esik && o.ts && String(o.ts) <= esik) {
+        bastirilan++
+        continue
+      }
       yaz(notSatiri(o))
+    }
+
+    if (bozukSatir) {
+      yaz('GOZCU-UYARI: ' + d + ' icinde ' + bozukSatir + ' satir JSON olarak cozulemedi - sessizce dusurulmedi, bildiriliyor (o satirlardaki notlar KAYIP olabilir).')
+    }
+
+    if (!bilinenDosya) {
+      yaz(
+        'GOZCU-YENI-DOSYA: ' + d + ' imlecte yoktu; ' + bastirilan +
+        ' eski olay BASTIRILDI (esik ' + (esik || 'yok') + '). Bastirilanlar arsivdir, kayip degil.',
+      )
     }
   }
 
