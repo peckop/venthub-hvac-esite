@@ -47,7 +47,22 @@ yaşar. Bu faturayı köprü öder; ödemiyorsa köprü eksiktir.
   merge-indi (PR → SHA + dokunulan globlar) · kapı-kırmızı (hangi kapı, hangi commit) ·
   öncül-düzeltmesi / karar geri alma · GO kayıtları (kim, neye, hangi kapsamla).
 
-### Faz 2 — Ters yön: Orion → pano (Faz 1 bir hafta sorunsuz koştuktan sonra)
+### Faz 2 — Ters yön: Orion → pano (Faz 1 ölçüt tuttuktan sonra)
+
+⭐**Önkoşul ZAMAN DEĞİL SAYIDIR.** Eski metin "bir hafta sorunsuz koştuktan sonra"
+diyordu; bu, `kapi-tasarim-standardi.md` §12'nin yasakladığı zamana dayalı eşiktir —
+makine kapalı kalırsa hafta dolar ama hiçbir şey ölçülmemiş olur.
+
+**Faz 2'yi açan ölçüt — arka arkaya 30 taşıyıcı koşumu, üçü birden:**
+
+1. **Çökme 0.** Her koşum çıkış kodu 0 ile bitmeli.
+2. **Yanlış hayalet reddi 0.** `hayalet_sidler` listesindeki HER sid'in pano
+   geçmişinin TAMAMINDA sıfır `claim`'i olmalı. Liste boş olmak zorunda DEĞİL —
+   gerçek hayaletler reddedilmeye devam eder.
+3. **Korunum kimliği her koşumda tutmalı:**
+   `yazilan + mukerrer + reddedilen_hayalet + kapsam_disi_tur == okunan`
+   Okunan her olay tam olarak bir kovaya düşer; eşitlik kırılırsa bir olay
+   **sessizce düşmüş** demektir.
 - **Yalnız dört olay:** görev BLOCKED (+bloke eden) · kapı açıldı/kapandı · faz tamamlandı
   (sıradaki hazır) · karar `active` oldu.
 - **Ölçüt (ORION):** *"Bu olayı görmeyen bir şerit yanlış iş yapar mı? Hayırsa panoya düşmez."*
@@ -101,7 +116,7 @@ katman yok** — bugün bunu sistem değil Recep fark etti.
 T011 (faz kapısı, ORION) → **K2** (MCP stabil kopya + restart, OPS) → venthub roadmap
 kurulumu (OPS) → **Faz 0** (ALTYAPI uyanınca; Faz 1'i BLOKLAMAZ — köprü hayalet-sid'e karşı
 kendi sınavıyla korunur, Bölüm 4/2) ∥ **Faz 1 köprü** (ORION iş emri) → **Nöbetçi Adım 1**
-(Faz 0'ın PARK durumu indikten sonra; sahip ALTYAPI/OPS) → bir hafta gözlem → **Faz 2**.
+(Faz 0'ın PARK durumu indikten sonra; sahip ALTYAPI/OPS) → 30 koşumluk ölçüt → **Faz 2**.
 
 Not: Faz 0 "önkoşul"dur ama sıkı-sıralı değil: sid-RET/rotasyon Faz 1 ile paralel inebilir;
 yalnız **PARK durumu, Nöbetçi'nin** ve **Faz 2'nin** sert önkoşuludur.
