@@ -14,7 +14,7 @@
  */
 const fs = require('fs')
 const path = require('path')
-const { spawn } = require('child_process')
+const { spawn, execFileSync } = require('child_process')
 
 function readStdin() {
   try { return fs.readFileSync(0, 'utf8') } catch { return '' }
@@ -25,6 +25,41 @@ try { input = JSON.parse(readStdin() || '{}') } catch { input = {} }
 
 const sid = input.session_id || ''
 if (!sid) process.exit(0)
+
+/**
+ * KİMLİK DOSYASI — `pre-commit` şerit kapısı (E1) için tek kimlik kaynağı.
+ *
+ * NİÇİN GEREKLİ: `pre-commit`i git çalıştırır; ortada `session_id` YOKTUR. Kimlik olmadan
+ * "bu dosya BAŞKASININ şeridinde mi" sorusu sorulamaz.
+ *
+ * BASİT GÖRÜNEN ALTERNATİF ÖLÇÜLDÜ VE ÇÜRÜTÜLDÜ — dal önekinden şerit türetmek: son 40 uzak
+ * dalın 36'sı `önek/konu` kalıbına uyuyor AMA önekler şerit adı DEĞİL
+ * (`fix/inv-quote-1-content-scope` AUTH'un, `docs/t116-payment-ledger-standard` PRICING'in).
+ * Kullansaydık, yanlış şerit adına karar veren bir kapı kurmuş olurduk.
+ *
+ * ⚠ WORKTREE-YEREL YAZILIR, ORTAK DİZİNE DEĞİL — ölçüldü:
+ *     git rev-parse --absolute-git-dir → …/.git/worktrees/venthub-wt-altyapi  (şeride ÖZEL)
+ *     git rev-parse --git-common-dir   → …/.git                               (HEPSİNDE ORTAK)
+ * Ortak dizine yazsaydık bütün şeritler AYNI kimliği okurdu ve kapı her şeritte yanlış sahibi
+ * gösterirdi — bir şerit kapısı için düşünülebilecek en kötü arıza.
+ *
+ * BOOTSTRAP: dosya ancak bir şeridin BİR SONRAKİ oturum açılışında oluşur. O ana kadar E1
+ * fail-open çalışır ve GÖRÜNÜR uyarı basar (sessizlik kanıt sayılmasın).
+ */
+try {
+  const gitDir = execFileSync('git', ['rev-parse', '--absolute-git-dir'], {
+    cwd: input.cwd || process.cwd(),
+    encoding: 'utf8',
+    timeout: 10000,
+  }).trim()
+  if (gitDir) fs.writeFileSync(path.join(gitDir, 'venthub-sid'), sid + '\n', 'utf8')
+} catch (e) {
+  // Sessiz geçmeyiz: kimlik yoksa E1 fail-open olur ve sebebinin bilinmesi gerekir.
+  process.stderr.write(
+    '[session-board] kimlik dosyasi yazilamadi (' + (e && (e.code || e.message)) +
+      ') — E1 serit kapisi bu worktree de KIMLIKSIZ calisir.\n',
+  )
+}
 
 // SessionStart 'source': startup | resume | clear | compact | fork (Claude Code 2.1.234, hooks-guide).
 // 08-22 dersi (docs/audits/platform-capability-audit-2026-08-22.md): makine ~24s kapandi, acilinca

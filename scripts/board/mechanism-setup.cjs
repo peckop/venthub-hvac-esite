@@ -29,7 +29,16 @@
 const fs = require('fs')
 const path = require('path')
 
-const PANO = process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+/**
+ * IKI AD, TEK KAVRAM — OLCULMUS KUSUR (2026-08-23): bu dosya VENTHUB_PANO_DIR okuyordu,
+ * board.cjs ise VENTHUB_BOARD_DIR (board.cjs:28). Panoyu bir kopyaya yonlendirip kanarya
+ * kosturdugumda yonlendirme YARIM uygulandi: OKUMA kopyadan yapildi, YAZMA gercek panoya
+ * gitti ve canli bir seride kanarya notu dustu. Yonlendirme "calisti" gorunuyordu cunku
+ * yarisi tasinmisti — sessiz sizinti, cunku hicbir hata olusmadi.
+ * Bu yuzden ikisi de kabul edilir ve board.cjs in okudugu ad ONCELIKLIDIR: tek bir degisken
+ * ayarlamak butun katmani birlikte tasir.
+ */
+const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
 
 const arg = (ad) => {
   const i = process.argv.indexOf(ad)
