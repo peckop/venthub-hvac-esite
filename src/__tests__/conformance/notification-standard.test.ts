@@ -28,17 +28,99 @@ function cetvelMetni(): string {
   return readFileSync(CETVEL, 'utf8')
 }
 
-/** api.resend.com'a gönderim yapan uç dizinlerinin adları. */
-function resendGonderenUclar(): string[] {
-  const bulunan: string[] = []
+/** Her uç dizininin `index.ts` metni: ad → kaynak. */
+function ucKaynaklari(): Map<string, string> {
+  const harita = new Map<string, string>()
   for (const ad of readdirSync(UCLAR_KOK)) {
     const dizin = join(UCLAR_KOK, ad)
     if (!statSync(dizin).isDirectory()) continue
     const giris = join(dizin, 'index.ts')
     if (!existsSync(giris)) continue
-    if (readFileSync(giris, 'utf8').includes('api.resend.com')) bulunan.push(ad)
+    harita.set(ad, readFileSync(giris, 'utf8'))
+  }
+  return harita
+}
+
+/** api.resend.com'a gönderim yapan uç dizinlerinin adları. */
+function resendGonderenUclar(): string[] {
+  return [...ucKaynaklari().entries()]
+    .filter(([, kaynak]) => kaynak.includes('api.resend.com'))
+    .map(([ad]) => ad)
+    .sort()
+}
+
+/**
+ * DEVREDEN UÇ: kendisi Resend'i çağırmaz ama `functions/v1/<ad>` ile — doğrudan ya da
+ * ZİNCİRLEME — bir gönderici ucu tetikler.
+ *
+ * NİÇİN VAR (2026-08-23; EDGE getirdi, I18N ölçtü): INV-NOTIFY-1'in ilk sürümü kapsamı
+ * SAĞLAYICI ADINA (`api.resend.com`) bağlıyordu. Bir uç gönderimi başka bir uca devrederse
+ * o ölçüye GÖRÜNMEZ olur — kapı haklı olarak susar, ama cetvel "hepsi burada" der ve
+ * değildir. Ölçüm: 6 doğrudan gönderici + 5 devreden; yani sistemin yarısı ölçünün
+ * dışındaydı. Kapsamı ADA (sağlayıcı) değil DAVRANIŞA (bir bildirim akışını başlatıyor mu)
+ * bağlamak gerekiyordu.
+ *
+ * NİÇİN GEÇİŞLİ, tek adım DEĞİL: ölçüm sırasında zincir bulundu —
+ *   `iyzico-callback` → `stock-alert` → `notification-service` (gönderici)
+ * `stock-alert` hem devreden hem hedef. Tek adıma bakan bir kural, YALNIZCA `stock-alert`
+ * üzerinden gönderen bir ucu kaçırır ve yine "hepsi burada" derdi. Kapsamı davranışın BİR
+ * ADIMINA bağlamak, davranışa bağlamak değildir.
+ */
+function devredenUclar(): string[] {
+  const kaynaklar = ucKaynaklari()
+  const gonderenler = resendGonderenUclar()
+  const ulasan = new Set(gonderenler)
+  // Sabit nokta: küme büyümeyi durdurana kadar tekrarla (zincir derinliği sınırsız).
+  let degisti = true
+  while (degisti) {
+    degisti = false
+    for (const [ad, kaynak] of kaynaklar) {
+      if (ulasan.has(ad)) continue
+      for (const hedef of ulasan) {
+        if (kaynak.includes(`functions/v1/${hedef}`)) {
+          ulasan.add(ad)
+          degisti = true
+          break
+        }
+      }
+    }
+  }
+  return [...ulasan].filter((ad) => !gonderenler.includes(ad)).sort()
+}
+
+/**
+ * Hedef adı DEĞİŞKENDEN üretilen `functions/v1` çağrıları.
+ *
+ * Bugün ölçüldü: 27 ucun tamamında hedef adı SABİT metin (`${supabaseUrl}/functions/v1/x`) —
+ * birleşen kısım yalnız önek. Yani yukarıdaki tarama bugün TAM kapsıyor. Ama hedef adı
+ * dinamik yazılırsa tarama SESSİZCE kör kalır. Körlüğü sessiz yaşamak yerine ALARM
+ * yapıyoruz: böyle bir çağrı doğduğu gün bu kapı kırmızı olur ve kural yeniden düşünülür.
+ */
+function dinamikHedefliCagrilar(): string[] {
+  const bulunan: string[] = []
+  for (const [ad, kaynak] of ucKaynaklari()) {
+    if (/functions\/v1\/(?:\$\{|['"`]\s*\+)/.test(kaynak)) bulunan.push(ad)
   }
   return bulunan.sort()
+}
+
+/**
+ * Cetvelin BİR BÖLÜMÜNÜ döndürür (başlıktan bir sonraki aynı/üst düzey başlığa kadar).
+ *
+ * NİÇİN VAR — 2026-08-23'te SABOTAJ YAKALADI, kapı SAHTE YEŞİL verdi:
+ * İlk sürüm "ad cetvelde geçiyor mu" diye BELGENİN TAMAMINA bakıyordu. `order-paid-webhook`
+ * satırını §B2.1.b tablosundan sildim ve kapı YEŞİL geçti — çünkü adı §B8.1'in gerekçe
+ * metninde de yazılıydı. Yani kapı "envanterde kayıtlı mı" değil "bu kelime dosyada var mı"
+ * ölçüyordu; envanter boşalsa bile bir anma cümlesi onu yeşil tutardı.
+ * Ders (bugün filo genelinde üç kez çıktı): kapsamı ADA değil, adın BULUNMASI GEREKEN YERE
+ * bağla. Kapının kendi sabotajı olmasaydı bu kusur kapının içinde yaşardı.
+ */
+function cetvelBolumu(baslikDeseni: RegExp): string {
+  const metin = cetvelMetni()
+  const parcalar = metin.split(baslikDeseni)
+  if (parcalar.length < 2) return ''
+  // Bölüm, bir sonraki `#`-başlığında biter (aynı ya da üst düzey).
+  return parcalar[1].split(/^#{1,4}\s/m)[0]
 }
 
 /**
@@ -95,15 +177,61 @@ describe('INV-NOTIFY-1 · bildirim envanteri cetvelde tam', () => {
     // degil, "hicbir yere bakmadim" demektir.
     expect(uclar.length).toBeGreaterThan(0)
 
-    const metin = cetvelMetni()
-    const eksik = uclar.filter((ad) => !metin.includes(`\`${ad}\``))
+    // KAPSAM BELGENIN TAMAMI DEGIL, §B2.1 TABLOSU. "Adi bir yerde geciyor" yeterli
+    // sayilirsa bir anma cumlesi envanteri yesil tutar (sabotajla olculdu, bkz. cetvelBolumu).
+    const bolum = cetvelBolumu(/^###\s+B2\.1\s/m)
+    expect(bolum.length, '§B2.1 bolumu cetvelde BULUNAMADI — baslik degismis olabilir.').toBeGreaterThan(0)
+    const eksik = uclar.filter((ad) => !bolum.includes(`\`${ad}\``))
 
     expect(
       eksik,
-      `Bu uclar e-posta gonderiyor ama docs/standards/notification-standard.md icinde ` +
-        `hic gecmiyor: ${eksik.join(', ')}. Yeni bir bildirim ucu eklediyseniz once ` +
+      `Bu uclar e-posta gonderiyor ama docs/standards/notification-standard.md §B2.1 ` +
+        `tablosunda gecmiyor: ${eksik.join(', ')}. Yeni bir bildirim ucu eklediyseniz once ` +
         `cetvelin B2.1 tablosuna satir ekleyin — "bildirimlerimiz neler" sorusunun tek ` +
         `cevabi orasidir.`,
+    ).toEqual([])
+  })
+
+  it('bildirim akisini DEVREDEN her uc da cetvelde adiyla gecmeli', () => {
+    const devreden = devredenUclar()
+
+    // KAPSAM KANARYASI — iki tarafli. Bugun olculen sayi 5; sifire duserse tarama
+    // bozulmustur (zincir hesabi coktu ya da cagri bicimi degisti), "devreden kalmadi"
+    // DEGIL. Sifiri sessizce yesil saymak, bu kapinin kapatmak icin dogdugu kusurun ta
+    // kendisi olurdu.
+    expect(
+      devreden.length,
+      'Devreden uc SIFIR olcusuldu. Bugun 5 taneydi; tarama bozulmus olabilir ' +
+        '(gecisli kapanis ya da functions/v1 cagri bicimi). "Kalmadi" diye okuma.',
+    ).toBeGreaterThan(0)
+
+    // Kapsam: §B2.1.b tablosu. Belgenin tamamina bakmak SAHTE YESIL uretir — olculdu.
+    const bolum = cetvelBolumu(/^####\s+B2\.1\.b\s/m)
+    expect(
+      bolum.length,
+      '§B2.1.b (DEVREDEN UCLAR) bolumu cetvelde BULUNAMADI. Kural yaziliysa basligi ' +
+        'degismis, yazili degilse once cetvele yazilmali — kapi kuralsiz olcemez.',
+    ).toBeGreaterThan(0)
+    const eksik = devreden.filter((ad) => !bolum.includes(`\`${ad}\``))
+
+    expect(
+      eksik,
+      `Bu uclar e-postayi KENDILERI gondermiyor ama functions/v1 ile (dogrudan ya da ` +
+        `zincirleme) bir gonderici ucu tetikliyor; yani kullanicinin gozunden bildirimi ` +
+        `BASLATAN sey onlar. Cetvelde hic gecmiyorlar: ${eksik.join(', ')}. ` +
+        `docs/standards/notification-standard.md §B2.1 tablosuna DEVREDEN UC olarak ` +
+        `satir ekleyin. Kapsam saglayici adina (api.resend.com) degil DAVRANISA baglidir.`,
+    ).toEqual([])
+  })
+
+  it('functions/v1 hedefi DINAMIK uretilmiyor (uretilirse tarama korlesir)', () => {
+    const dinamik = dinamikHedefliCagrilar()
+    expect(
+      dinamik,
+      `Bu uclarda functions/v1 hedefi degiskenden uretiliyor: ${dinamik.join(', ')}. ` +
+        `Devreden-uc taramasi hedef adini KAYNAK METINDEN okur; dinamik ad onu SESSIZCE ` +
+        `kor eder ve envanter yine "hepsi burada" der. Ya hedefi sabit metin yazin, ya da ` +
+        `bu kapinin kuralini yeniden dusunun — korlugu sessizce yasamak secenek degil.`,
     ).toEqual([])
   })
 

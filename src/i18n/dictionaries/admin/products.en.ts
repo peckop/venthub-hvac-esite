@@ -69,6 +69,12 @@ export const products = {
     createNewAction: 'Create as new ({{count}})',
     updateExistingOnly: 'Update existing only ({{count}})',
     updateExistingDone: 'Updated existing products only: {{ok}} rows. Skipped (not in database): {{skipped}} rows.',
+    // Unknown-CATEGORY guard (T146). Deliberately parallel to the unknown-SKU family:
+    // same shape, same three parts. Wording is a ROUTE, not a diagnosis; counts are
+    // interpolated; phrasing stays count-agnostic.
+    unknownCategoryTitle: 'Rows whose category was not found in the database: {{count}}',
+    unknownCategoryHelp: 'The category value on these rows does not match any category in the live database, so nothing was written. The category value in the CSV must match the live category slug exactly (for example: cati-tipi-fan). Fix the values and upload the file again.',
+    unknownCategoryExamples: 'Unmatched value: {{skus}}',
   },
   edit: {
     editing: 'Editing',

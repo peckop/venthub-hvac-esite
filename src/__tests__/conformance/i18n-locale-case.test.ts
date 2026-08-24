@@ -52,7 +52,6 @@ const DONMUS_BORC: ReadonlyArray<readonly [string, number]> = [
   // --- GERÇEK kusur; sahibi kapatacak ---
   ['src/components/admin/CommandPalette.tsx', 2], // GERÇEK · ADMIN · komut araması Türkçe etiketi bulamaz
   ['src/components/admin/dashboard/ActivityHeatmap.tsx', 1], // GERÇEK · ADMIN · gün adı "PAZARTESI"
-  ['src/components/admin/products/ProductCsvImport.tsx', 2], // GERÇEK · ADMIN · kategori eşleşmez + slug kırpılır
   ['src/components/category/sections/BottomCTA.tsx', 1], // GERÇEK · ÜRÜN · MÜŞTERİ EKRANI: "i̇ç ortam fanları"
   ['src/views/admin/AdminInventoryReportPage.tsx', 6], // GERÇEK · ADMIN · ürün adı araması
   ['src/views/admin/AdminUsersTableBody.tsx', 1], // GERÇEK · ADMIN · avatar baş harfi
