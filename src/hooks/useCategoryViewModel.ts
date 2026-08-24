@@ -23,6 +23,15 @@ export interface CategoryViewModel {
  * ADVANCED SCALE VIEWMODEL HOOK
  * 
  * THE ONLY SOURCE OF TRUTH FOR UI REPRESENTATION
+ * Provides a memoized function to translate raw DomainCategory objects into full UI CategoryViewModels.
+ * Handles localization, metadata fallbacks, and display mode resolution.
+ *
+ * @returns An object containing the `wrapCategory` function.
+ *
+ * @example
+ * const { wrapCategory } = useCategoryViewModel()
+ * const viewModel = wrapCategory(rawDbCategory)
+ * console.log(viewModel?.displayName)
  */
 export function useCategoryViewModel() {
   const { t, lang } = useI18n()

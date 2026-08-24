@@ -38,8 +38,14 @@ export interface ValidationResult { ok: boolean; items: ValidationItem[]; mismat
  *
  * DI kuralı (CLAUDE.md §2): istemci parametre olarak alınır, modül düzeyinde import edilmez.
  *
- * @throws Doğrulama yapılamazsa hata fırlatır. **Yutma** — çağıran ödemeyi durdurmalıdır;
- *   sessizce devam etmek, tutarı istemcinin belirlemesi demektir.
+ * @param supabase - Validated SupabaseClient instance
+ * @param input - The payload containing optional cartId and userId
+ * @returns A promise that resolves to the ValidationResult containing verified prices and stock information
+ * @throws {Error} If validation cannot be performed or returns empty. Must not be swallowed by caller.
+ *
+ * @example
+ * const result = await validateServerCart(supabase, { cartId: 'c123', userId: 'u123' })
+ * if (!result.ok) handlePriceMismatches(result.mismatches)
  */
 export async function validateServerCart(
   supabase: SupabaseClient<Database>,

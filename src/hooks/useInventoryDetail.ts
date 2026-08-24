@@ -22,6 +22,21 @@ import type { InventoryRow, ReservedRow } from '../types/inventory'
  * (cetvel: dosya başına tek sorumluluk; 500 satır tavanı).
  *
  * Yazma yolları TEK KAPI'dan geçer: `mutateWithAudit` (K3 yetki + K4 denetim izi).
+ *
+ * @param options - Configuration options for the inventory detail container
+ * @param options.hasWriteAccess - Boolean indicating if the user has RBAC write permissions
+ * @param options.rows - The current rows displayed in the inventory table
+ * @param options.onMutated - Callback to refresh the table after successful mutations
+ * @returns The state and action handlers required for the inventory detail UI drawer
+ *
+ * @example
+ * const detail = useInventoryDetail({
+ *   hasWriteAccess: canWrite('inventory'),
+ *   rows: table.rows,
+ *   onMutated: table.reload
+ * })
+ *
+ * return <Drawer open={!!detail.selected} onClose={detail.close} />
  */
 
 /** Son hareketin geri alınabildiği pencere (prod davranışıyla birebir). */
