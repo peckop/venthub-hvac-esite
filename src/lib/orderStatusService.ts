@@ -349,19 +349,7 @@ async function restoreStockForOrder(
     reason: 'order_cancel' | 'order_refund',
 ): Promise<{ ok: boolean; error?: string }> {
     try {
-        /*
-          TIP KÖPRÜSÜ — `process_order_stock_restore` henüz `database.types.ts`e
-          ÜRETİLMEDİ (migration bu depoya yeni girdi). `any` yasak olduğu için
-          köprü `unknown` üzerinden ve YALNIZ bu çağrının imzasını tanımlıyor.
-          `pnpm supabase:gen` koşulduğunda bu blok SİLİNMELİ — kalırsa gerçek
-          şemadaki bir değişikliği tsc'den gizler.
-        */
-        type StockRestoreRpc = (
-            fn: 'process_order_stock_restore',
-            args: { p_order_id: string; p_reason: string },
-        ) => Promise<{ data: unknown; error: { message: string } | null }>
-
-        const { data, error } = await (supabase.rpc as unknown as StockRestoreRpc)(
+        const { data, error } = await supabase.rpc(
             'process_order_stock_restore',
             { p_order_id: orderId, p_reason: reason },
         )
