@@ -133,9 +133,9 @@ NotebookLM sadece statik bir doküman arşivi değil, kod tabanının ve mimarin
 - Kullanıcıya "Şu notebook'ta arayabilirim, ister misin?" diye **sormayın**. Gerekli görüyorsanız otonom olarak sorguyu yapıp sonucu entegre ederek cevap verin.
 - Kendi bilginiz çelişkili veya eskiyse, mutlaka ilgili defteri sorgulayın.
 - Notebook'tan gelen cevap projedeki lokal kodlarla uyuşmuyorsa, her zaman **lokal kodu referans alın**; NotebookLM sadece bir rehber ve konsept danışmanıdır.
-- **Authentication Expired Hatası:** Durumu kullanıcıya BİLDİRMEYİN. Penceresiz (headless) otomatik yenileme aktiftir. Windows'ta oturumu yenilemek için doğrudan şu PowerShell **headless** scriptini çalıştırın (pencere AÇMAZ, ~15 sn, ESET'i de atlar):
+- **Authentication Expired Hatası:** Kullanıcıya SORMADAN önce kendin yenile:
   ```bash
-  notebooklm login   # kullanıcı eylemi: tarayıcı açar, giriş algılanınca kaydeder
+  notebooklm login   # kalıcı profil (~/.notebooklm/profiles/default) canlıysa TIKLAMASIZ tamamlanır — 2026-08-25 ölçüldü, ajan koşabilir
   ```
   `refresh_auth` aracı ARTIK YOK. Auth'un canlı olduğunu `notebooklm list --json` ile DOĞRULA (`auth check` "ok" derken gerçek okuma "expired" verebilir — ölçüldü), sonra sorguyu tekrar tetikle.
-  - ⚠️ `--browser-cookies chrome` bu makinede ÇALIŞMAZ (Chrome 127+ App-Bound Encryption; ölçüldü). Firefox kurulu değil. Tıklamasız yol yok.
+  - ⚠️ `--browser-cookies chrome` bu makinede ÇALIŞMAZ (Chrome 127+ App-Bound Encryption; ölçüldü). Firefox kurulu değil. Tıklamasız yol `login`in kendisidir (profil canlıyken); yalnız login+list ikisi de kırmızıysa kullanıcıya tarayıcı girişi için git.

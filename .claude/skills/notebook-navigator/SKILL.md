@@ -109,9 +109,11 @@ NotebookLM sadece statik bir doküman arşivi değil, kod tabanının ve mimarin
     ⚠️ **TEK BAŞINA GÜVENME.** 2026-08-17'de ölçüldü: `auth check` **"ok"** dedi ve `psidts`i
     2027'ye geçerli gösterdi, ama gerçek okuma (`notebooklm list`) *"Authentication expired or
     invalid"* verdi. Statik dosya kontrolü oturumun canlılığını ölçmüyor. **Kanıt = gerçek çağrı.**
-  - **Yenileme:** `notebooklm login` — tarayıcı penceresi açar, giriş algılanınca kendisi kaydeder,
-    terminalde bir şey yazmak gerekmez. **Bu KULLANICININ eylemidir** (tıklama gerekir); ajan
-    olarak sen çalıştırıp bekleyemezsin — kullanıcıya söyle.
+  - **Yenileme: ÖNCE KENDİN KOŞ, SORMA.** `notebooklm login` — kalıcı profildeki
+    (`~/.notebooklm/profiles/default/`) Google oturumu canlıysa **TIKLAMASIZ tamamlanır** ve kaydeder.
+    **2026-08-25 ÖLÇÜLDÜ:** ajan terminalden koştu, kullanıcı eylemi gerekmedi, `list` kanıt verdi.
+    (Eski "kullanıcının eylemidir" iddiası profil ölüyken alınmış 08-17 ölçümünün aşırı
+    genellemesiydi.) Login sonrası `list` HÂLÂ kırmızıysa — ancak o zaman — kullanıcıya git.
   - **Tıklamasız yol (bu makinede ÇALIŞMAZ, deneme):** `notebooklm login --browser-cookies chrome`
     → Chrome 127+ ve Edge çerez veritabanını **App-Bound Encryption** ile koruyor, harici hiçbir
     süreç okuyamıyor, bayrakla aşılmıyor (ölçüldü). Firefox olsaydı çalışırdı (düz SQLite) — kurulu değil.
