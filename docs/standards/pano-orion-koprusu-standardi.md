@@ -120,3 +120,36 @@ kendi sınavıyla korunur, Bölüm 4/2) ∥ **Faz 1 köprü** (ORION iş emri) �
 
 Not: Faz 0 "önkoşul"dur ama sıkı-sıralı değil: sid-RET/rotasyon Faz 1 ile paralel inebilir;
 yalnız **PARK durumu, Nöbetçi'nin** ve **Faz 2'nin** sert önkoşuludur.
+
+## 6. Bağlama kovaları: iki kolun gerekçesi (2026-08-25 kararı, PR orion#36)
+
+K3 korunumu **beş not-kovası** üzerinden tutar:
+`islenen_not = baglanan + kismi + belirsiz + referanssiz + cozunmeyen`
+ve ayrıca **referans düzeyinde** ayrı bir korunum vardır:
+`islenen_referans = baglanan_ref + cozunmeyen_ref + belirsiz_ref`
+(not düzeyi tutarken referans düzeyi kırılabilir; tek kimlik iki düzeyi ölçemez).
+
+İki kolun gerekçesi AYRI AYRI yazılır — biri diğerinden türetilemez:
+
+- **Belirsizlik kolu (değişmedi):** bir referans 2+ adaya çözünüyorsa o notun HİÇBİR
+  referansı bağlanmaz. Gerekçe K1'dir: iki adaydan birini seçmek tahmini olgu üretir;
+  tek ve kendinden emin eşleşme de yanlış olabilir ("belirsiz olanı bağlama" kuralı
+  "yanlış olanı bağlama"yı garanti etmez — kapı tasarım ilkesi). Ölçülen bedel hedefe
+  bağlıdır: Linear'da kimlikler tekil olduğundan 2026-08-25 ölçümünde `belirsiz_ref = 0`
+  (bedel şimdilik sıfır); registry'de çarpışma var (T017-OR onarımı sonrası yeniden ölçülür).
+- **Çözünmezlik kolu (2026-08-25'te değişti):** sıfır aday belirsizlik DEĞİL, yokluktur.
+  Kısmen çözünen notun tamamını düşürmek hiçbir tahmini önlemez, yalnız geçerli bağı
+  kaybettirir. Ölçülen bedel: 109 aday notun 71'i (%65), 129 eşleşen referansın 88'i (%68)
+  düşüyordu. Karar: çözünen referansların bağı KURULUR, not **kısmi** kovasına girer;
+  çözünmeyen referansları `cozunmeyen_ref` sayacında görünür kalır.
+
+Kanıt yükümlülükleri (bu bölüm değiştirilirken de geçerli):
+- Pozitif kontrol **sentetik olamaz** — canlı panodan birebir alıntı bir karma-referanslı
+  not kullanılır (2026-08-25'te 71 gerçek örnek vardı).
+- Sabotaj seti en az: kısmi kovayı öldür → kırmızı; belirsiz referansı bağla → kırmızı.
+- **Etkisiz sabotaj ≠ kör kapı:** 0 kırmızı veren sabotajın önce kendisi ölçülür
+  (değişiklik gerçekten davranış değiştiriyor mu); ikisi aynı görünür ve karıştırılırsa
+  sağlam kapı "kör" diye raporlanır (2026-08-25 S6 vakası).
+- Ders (2026-08-25): eski davranışın %68'lik bedelini HİÇBİR test korumuyordu — mevcut
+  testlerin tüm notları tek referanslıydı. Kova önceliği değişen her PR, karma-referans
+  vakası içeren en az bir test taşımak zorundadır.
