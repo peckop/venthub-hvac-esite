@@ -89,7 +89,7 @@ Bu modül, bir görsel keşfetme-indirme-dönütüme (discover → download → 
 
 ### extractImages
 **Ne yapar**: Verilen HTML metni içindeki, belirli bir ürüne ait medya görsellerinin URL'lerini çıkarır ve kategorilere göre sınıflandırarak sıralı bir liste oluşturur.
-**Nasıl yapar**: Bir正则 biểutımı ile HTML'deki `.png`, `.jpg`, `.jpeg` uzantılı görsel URL'lerini tarar. URL'leri normalize eder (ters bölüleri düzeltir, göreli ise mutlak yapar). Yalnızca dosya adında `_{modelCode}_` kalıbını içeren URL'leri kabul eder (ürün görselleri için). Benzersiz URL'leri bir `Set` kullanarak filtreler. Her URL'yi `ambiente`, `Foto_WEB`, `Foto_Pubblicita` gibi anahtar kelimelere göre `gallery`, `environment`, `technical` veya `other` kategorisine atar. `other` kategorisindeki görselleri (logo/banner riski nedeniyle) filtreler. Son olarak kategori sırasına (`gallery` > `environment` > `technical`) ve ardından alfabetik sıraya göre sıralanmış, `{url, kind}` nesnelerinden oluşan bir dizi döndürür.
+**Nasıl yapar**: Bir düzenli ifade (regex) ile HTML'deki `.png`, `.jpg`, `.jpeg` uzantılı görsel URL'lerini tarar. URL'leri normalize eder (ters bölüleri düzeltir, göreli ise mutlak yapar). Yalnızca dosya adında `_{modelCode}_` kalıbını içeren URL'leri kabul eder (ürün görselleri için). Benzersiz URL'leri bir `Set` kullanarak filtreler. Her URL'yi `ambiente`, `Foto_WEB`, `Foto_Pubblicita` gibi anahtar kelimelere göre `gallery`, `environment`, `technical` veya `other` kategorisine atar. `other` kategorisindeki görselleri (logo/banner riski nedeniyle) filtreler. Son olarak kategori sırasına (`gallery` > `environment` > `technical`) ve ardından alfabetik sıraya göre sıralanmış, `{url, kind}` nesnelerinden oluşan bir dizi döndürür.
 **Parametreler**:
 - html: string — Görsellerin aranacağı ham HTML içeriği.
 - modelCode: string — Ürün model kodu; yalnızca bu kodu içeren görseller dahil edilir.
@@ -103,7 +103,7 @@ Bu modül, bir görsel keşfetme-indirme-dönütüme (discover → download → 
 
 ### discover
 **Ne yapar**: Tanımlı ürün listesindeki (`pilot.pilots`) her bir ürün için web sayfasını ziyaret ederek ilgili görselleri keşfeder ve uygulama durumunu (`state`) günceller.
-**Nasıl yapar**: Her pilot ürünü için `politeFetch` ile sayfa HTML'ini indirir. `extractImages` fonksiyonunu kullanarak ürünün görsellerini bulur. Görsel bulunamazsa bir hata fırlatır. Bulunan görselleri, sıralama numarası, kategori, kaynak URL ve alternatif metin (`alt`) bilgileriyle birlikte `state.products` nesnesine ekler. İşlem完成后 `save()` çağırarak durumu kaydeder.
+**Nasıl yapar**: Her pilot ürünü için `politeFetch` ile sayfa HTML'ini indirir. `extractImages` fonksiyonunu kullanarak ürünün görsellerini bulur. Görsel bulunamazsa bir hata fırlatır. Bulunan görselleri, sıralama numarası, kategori, kaynak URL ve alternatif metin (`alt`) bilgileriyle birlikte `state.products` nesnesine ekler. İşlem bitince `save()` çağırarak durumu kaydeder.
 **Parametreler**: Parametre almaz.
 **Dönüş**: Promise<void> — Asenkron işlemleri başlatır, değer döndürmez.
 
