@@ -2,61 +2,55 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\inboxCounts.ts
-skeleton_hash: 0b8c5ffe627e5061
+source_path: C:\tmp\wt-supurme\src\lib\admin\inboxCounts.ts
+skeleton_hash: 59e096981ef05cc6
 entity_hashes:
   func:fetchInboxCounts: 87c45c5352b61223
   overview: 4445631b0879c94f
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-25T07:27:48Z
 ---
 
 ## Genel Bakış
-Bu modül, admin panelinin gelen kutusu bileşenleri için gerekli sayısal verileri (okunmamış mesaj, toplam mesaj vb.) tek bir asenkron çağrı ile Supabase veritabanından çeken veri erişim katmanıdır. Modül tek bir fonksiyondan oluşur ve bağımlılığını (Supabase client) doğrudan parametre olarak alarak test edilebilirlik ve esneklik sağlar.
+
+Bu modül, Supabase veritabanından gelen kutusu sayılarını (inbox counts) çekmeye yarayan tek bir asenkron fonksiyon içerir. Modülün sorumluluğu dar ve nettir: bir Supabase istemcisi alıp ilgili tablolardan sayısal verileri sorgulayarak `InboxCounts` tipinde bir sonuç döndürmek.
 
 ## Fonksiyon Grupları
-### Inbox Verisi Çekme
-Bu grup, admin panelinin gelen kutusu durumu hakkında istatistiksel bilgi sağlayan tek bir fonksiyonu içerir.
-- `fetchInboxCounts`: Verilen Supabase istemcisi kullanarak ilgili inbox sayılarını veritabanından sorgular ve yapılandırılmış bir sayısal nesne olarak döndürür.
+
+### Gelen Kutusu Sayılarını Getirme
+
+Supabase veritabanına bağlanarak kullanıcının gelen kutusundaki öğe sayılarını sorgular ve yapılandırılmış bir InboxCounts nesnesi olarak döndürür.
+
+- fetchInboxCounts
+
+## Bağımlılıklar
+
+- **Dış bağımlılık:** Supabase istemcisi (`SupabaseClient<Database>`) parametre olarak alınır; bu modül kendi başına bir bağlantı kurmaz.
+- **Dinamik/lazy yükleme:** Modülde böyle bir yapı bulunmamaktadır.
+- **Mimari önem:** Tek bir sorumluluğa sahip ince bir veri erişim katmanıdır; üst katmanlar tarafından gelen kutusu bilgisi gerektiğinde çağrılır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için imza tabanlı mimari varsayımlar aşağıdadır:
-
----
-
-**[Aksiyom 1]:** Eğer `supabase` parametresi `SupabaseClient<Database>` tipinde geçerli bir Supabase istemcisi değilse veya veritabanı bağlantısı kopuksa, fonksiyon hata ile reject eden bir Promise döner.
-
-**[Aksiyom 2]:** Eğer Supabase bağlantısı başarılı ancak inbox ile ilgili tablolar (örn: inbox, notifications, messages vb.) veritabanında mevcut değilse veya RLS (Row Level Security) politikaları erişimi engelliyorsa, fonksiyon varsayılan sıfır değerlerle dolu bir `InboxCounts` nesnesi döner.
-
-**[Aksiyom 3]:** Eğer `InboxCounts` tipi tanımlı değilse veya beklenen alanları içermiyorsa (örn: `total`, `unread`, `urgent` vb. — bilinmiyor), TypeScript derleme zamanı hatası oluşur.
-
-**[Aksiyom 4]:** Fonksiyon `async` olarak tanımlıdır; bu nedenle herhangi bir hata durumunda Promise reject edilebilir ve调用 tarafının bu Promise'i `try/catch` veya `.catch()` ile ele alması gerekir. Eğer hata yakalanmazsa,Promise rejection handle edilmemiş olur (unhandled promise rejection).
-
-**[Aksiyom 5]:** Fonksiyonun `Database` generic parametresi, Supabase şemasının doğru tip karşılıklarını içermelidir; aksi halde tip uyumsuzluğu hatası oluşur.
-
----
-
-> **Not:** Fonksiyon gövdesi (implementasyon) paylaşılmadığı için, veritabanı sorgu detayları, filtreleme mantığı, dönüş nesnesinin alanı ve iş kuralları (eşik değerleri vb.) hakkında kesin aksiyom üretilememektedir. Yukarıdaki varsayımlar yalnızca fonksiyon imzasından çıkarılabilecek mimari zorunlulukları yansıtmaktadır.
+Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesinden türetilen aksiyom tanımlanamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### fetchInboxCounts
-**Ne yapar**: Yönetici panelinde "dikkat gerektiren" başlıkları için gerekli olan sayısal verileri paralel olarak hesaplar ve bir nesne içinde döndürür. Bu başlıklar; bekleyen iadeler, gönderilmemiş siparişler, düşük stoklu ürünler ve çözülmemiş hata gruplarıdır.
+**Ne yapar**: Admin panelinde "dikkat gerektiren" öğelerin sayılarını toplayan paralel aggregation sorgusu çalıştırır. Dört farklı veritabanı tablosundan gerekli sayıları eş zamanlı olarak çeker ve bir InboxCounts nesnesi olarak döndürür.
 
-**Nasıl yapar**: Fonksiyon, dependency injection deseniyle bir Supabase istemcisi alır. Dört adet bağımsız veritabanı sorgusunu `Promise.allSettled` ile eşzamanlı olarak çalıştırır. Bu sayede bir sorgu başarısız olsa bile diğerleri tamamlanabilir. Sorguların sonuçları üzerinde `status === 'fulfilled'` kontrolü yapılarak hata durumları yönetilir ve her bir sayaç sıfırlanmamışsa sonuç değeri alınır. Ürünler tablosundaki düşük stok kontrolü, her bir ürün satırı için `stock_qty` değerinin `low_stock_threshold` değerine eşit veya daha küçük olup olmadığı döngü ile kontrol edilerek sayılır.
+**Nasıl yapar**: Fonksiyon, bağımlılık enjeksiyonu (dependency injection) prensibiyle çalışır; modül seviyesinde statik bir Supabase istemcisi import etmez, bunun yerine istemciyi parametre olarak alır. `Promise.allSettled` kullanarak dört bağımsız sorguyu paralel olarak yürütür. Bu yöntem, herhangi bir sorgu başarısız olsa bile diğerlerinin çalışmasını engellemez ve sonuçları güvenli bir şekilde işler. Her sorgu sonucu için `status === 'fulfilled'` ve `!value.error` kontrolleri yapılır; hata durumunda ilgili sayaç varsayılan olarak 0 değerini alır. Düşük stoklu ürünleri belirlemek için, products tablosundan alınan ham veriler üzerinde bir döngü ile `stock_qty <= low_stock_threshold` koşulu kontrol edilir ve eşleşen ürün sayısı hesaplanır.
 
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemlerini yürütmek için kullanılmak üzere enjekte edilmiş, `Database` tipiyle genelleştirilmiş bir Supabase istemcisi örneği. Modül seviyesinde statik bir import yerine bu parametre ile bağımlılık enjeksiyonu yapılmıştır.
+- supabase: SupabaseClient<Database> — Veritabanı işlemlerini gerçekleştirmek için kullanılan Supabase istemci nesnesi. Dependency injection ile sağlanır, böylece fonksiyon modül seviyesinde bir istemciye bağlı kalmaz.
 
-**Dönüş**: `Promise<InboxCounts>` — Dört adet sayaç alanını içeren bir nesne döndürür:
-- `pendingReturnsCount: number` — Durumu 'requested' veya 'approved' olan iade taleplerinin toplam sayısı.
-- `pendingShipmentsCount: number` — Durumu 'confirmed' veya 'processing' olan ve henüz gönderilmemiş (`shipped_at` null) siparişlerin sayısı.
-- `lowStockAlarmsCount: number` — `stock_qty` değerinin `low_stock_threshold` değerine eşit veya daha küçük olduğu ürünlerin sayısı.
-- `unresolvedErrorsCount: number` — Durumu 'resolved' olmayan hata gruplarının sayısı.
+**Dönüş**: Promise<InboxCounts> — Asenkron olarak döndürülen InboxCounts tipinde bir Promise nesnesi. Bu nesne şu alanları içerir:
+- `pendingReturnsCount`: Durumu 'requested' veya 'approved' olan iade taleplerinin sayısı (sayı).
+- `pendingShipmentsCount`: Durumu 'confirmed' veya 'processing' olan ve henüz kargoya verilmemiş (shipped_at null) siparişlerin sayısı (sayı).
+- `lowStockAlarmsCount`: Stok miktarı (stock_qty) düşük stok eşiğine (low_stock_threshold) eşit veya altında olan ürünlerin sayısı (sayı). Eşik değeri null veya sayısal değilse varsayılan olarak 5 kullanılır.
+- `unresolvedErrorsCount`: Durumu 'resolved' olmayan hata gruplarının sayısı (sayı).
 
 ---
 
@@ -79,37 +73,29 @@ Bu modül için imza tabanlı mimari varsayımlar aşağıdadır:
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/admin/inboxCounts.ts::fetchInboxCounts
-- **params**: `(supabase: SupabaseClient<Database>)` — Supabase istemcisi, veritabanı sorguları için kullanılır
+- **params**: `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
 - **ic_degiskenler**:
-  - `returnsRes` — Promise.allSettled'den dönen birinci sonuç, venthub_returns tablosundaki bekleyen iade isteklerinin sayısını tutar
-  - `shipRes` — Promise.allSettled'den dönen ikinci sonuç, venthub_orders tablosundaki bekleyen kargoların sayısını tutar
-  - `productsRes` — Promise.allSettled'den dönen üçüncü sonuç, products tablosundaki ürün verisini tutar
-  - `errorsRes` — Promise.allSettled'den dönen dördüncü sonuç, error_groups tablosundaki çözülmemiş hata gruplarını tutar
-  - `pendingReturnsCount` — `returnsRes.status === 'fulfilled' && !returnsRes.value.error ? (returnsRes.value.count ?? 0) : 0` hesaplamasından elde edilen bekleyen iade isteklerinin toplam sayısı
-  - `pendingShipmentsCount` — `shipRes.status === 'fulfilled' && !shipRes.value.error ? (shipRes.value.count ?? 0) : 0` hesaplamasından elde edilen bekleyen kargoların toplam sayısı
-  - `lowStockAlarmsCount` — Düşük stok alarmı olan ürünlerin sayacı, başlangıçta 0 olarak tanımlanır
-  - `rawProducts` — `productsRes.value.data` değerinden gelen ham ürün listesi dizisi
-  - `i` — for döngüsü için sayaç indeksi, 0'dan rawProducts uzunluğuna kadar iterasyon yapar
-  - `p` — `rawProducts[i]` erişimiyle döngüdeki mevcut ürün nesnesi
-  - `stockQty` — `typeof p.stock_qty === 'number' ? p.stock_qty : 0` hesaplamasından elde edilen ürünün stok miktarı
-  - `lowStockThreshold` — `typeof p.low_stock_threshold === 'number' ? p.low_stock_threshold : 5` hesaplamasından elde edilen ürünün düşük stok eşiği (varsayılan 5)
-  - `unresolvedErrorsCount` — `errorsRes.status === 'fulfilled' && !errorsRes.value.error ? (errorsRes.value.count ?? 0) : 0` hesaplamasından elde edilen çözülmemiş hata gruplarının toplam sayısı
-- **Dict Erisimleri**:
-  - `returnsRes.status`, `returnsRes.value.error`, `returnsRes.value.count` — iade sorgusu sonucu kontrolleri
-  - `shipRes.status`, `shipRes.value.error`, `shipRes.value.count` — kargo sorgusu sonucu kontrolleri
-  - `productsRes.status`, `productsRes.value.error`, `productsRes.value.data` — ürün sorgusu sonucu kontrolleri ve veri erişimi
-  - `errorsRes.status`, `errorsRes.value.error`, `errorsRes.value.count` — hata sorgusu sonucu kontrolleri
-  - `p.stock_qty`, `p.low_stock_threshold` — ürün nesnesi özellik erişimleri
-- **Subscript Erisimleri**:
-  - `rawProducts[i]` — döngüde dizinin i. indeksindeki ürün nesnesine erişim
-- **Dönüş**: `Promise<InboxCounts>` — `{ pendingReturnsCount, pendingShipmentsCount, lowStockAlarmsCount, unresolvedErrorsCount }` özelliklerini içeren nesne; 4 adet paralel Supabase sorgusunu çalıştırarak inbox sayaç bilgilerini toplar
+  - `returnsRes` — Promise.allSettled'dan dönen ilk sonuç; venthub_returns tablosundan status'u 'requested' veya 'approved' olan kayıtların sayısını sorgular
+  - `shipRes` — Promise.allSettled'dan dönen ikinci sonuç; venthub_orders tablosundan shipped_at null olan ve status'u 'confirmed' veya 'processing' olan kayıtların sayısını sorgular
+  - `productsRes` — Promise.allSettled'dan dönen üçüncü sonuç; products tablosundan stock_qty ve low_stock_threshold alanlarını seçer
+  - `errorsRes` — Promise.allSettled'dan dönen dördüncü sonuç; error_groups tablosundan status'u 'resolved' olmayan kayıtların sayısını sorgular
+  - `pendingReturnsCount` — returnsRes başarılı ve hatasız ise value.count değeri, aksi halde 0
+  - `pendingShipmentsCount` — shipRes başarılı ve hatasız ise value.count değeri, aksi halde 0
+  - `lowStockAlarmsCount` — düşük stoklu ürün sayacı, başlangıçta 0; döngüde koşulu sağlayan her ürün için artırılır
+  - `rawProducts` — productsRes.value.data, products tablosundan gelen ham ürün dizisi
+  - `i` — for döngüsü sayacı, 0'dan rawProducts.length'e kadar iterasyon yapar
+  - `p` — döngüdeki mevcut ürün nesnesi, rawProducts[i]
+  - `stockQty` — p.stock_qty değeri; number değilse 0 olarak kullanılır
+  - `lowStockThreshold` — p.low_stock_threshold değeri; number değilse 5 olarak kullanılır
+  - `unresolvedErrorsCount` — errorsRes başarılı ve hatasız ise value.count değeri, aksi halde 0
+- **Dönüş**: InboxCounts — `{ pendingReturnsCount, pendingShipmentsCount, lowStockAlarmsCount, unresolvedErrorsCount }` alanlarını içeren nesne
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\lib\admin\inboxCounts.ts
-  function: src\lib\admin\inboxCounts.ts::fetchInboxCounts
+  file: inboxCounts.ts
+  function: inboxCounts.ts::fetchInboxCounts
 
 ---
 

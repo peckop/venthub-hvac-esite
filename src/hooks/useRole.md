@@ -2,52 +2,58 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useRole.ts
-skeleton_hash: fc1011af39009897
+source_path: C:\tmp\wt-supurme\src\hooks\useRole.ts
+skeleton_hash: cba8bff2feceafcc
 entity_hashes:
   func:useRole: 86c3bf52308dd229
   overview: 90cbd0f7f32b7b04
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-25T07:27:08Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinde React uygulaması için tasarlanmış özel bir hook olup, kullanıcının oturum açmış rolünü ve buna bağlı erişim izinlerini yönetir. Uygulama genelinde yetkilendirme kontrolleri için standart bir arayüz sunar ve bileşenlerin rol tabanlı mantık yazmasını kolaylaştırır.
+
+`useRole.ts` modülü, `useRole` adında tek bir fonksiyon içeren bir modüldür. Modül adındaki "use" ön eki ve dosya uzantısı, bunun bir React özel kancası (custom hook) olduğunu gösterir. Modülün sorumluluğu, rol bilgisine erişim sağlamaktır; ancak fonksiyonun dahili çalışma detayları verilen kaynakta yer almamaktadır.
 
 ## Fonksiyon Grupları
-### Rol Bilgisi Sağlama Hook'u
-Mevcut kullanıcının rol bilgisini alarak, bileşenlere yetki denetimi için gerekli izin ve erişim durumlarını hesaplar ve sunar.
+
+### Rol Yönetimi
+Bu grup, rol bilgisini sağlayan tek bir fonksiyondan oluşur. Modülün tüm sorumluluğu bu fonksiyon üzerinde toplanmıştır.
 - useRole
+
+## Bağımlılıklar ve Mimari Notlar
+
+- **İç bağımlılıklar:** Tek fonksiyon bulunduğu için modül içi çağrı ilişkisi yoktur.
+- **Dış bağımlılıklar:** Kaynak kodu verilmediği için hangi dış modüllere bağlı olduğu bilinmiyor.
+- **Dinamik/lazy yükleme:** Bilinmiyor.
+- **Mimari önem:** Modül, adından anlaşılacağı üzere rol tabanlı bir mekanizmanın parçasıdır; ancak bu mekanizmanın kapsamı ve diğer modüllerle nasıl etkileştiği hakkında kaynakta bilgi bulunmamaktadır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için verilen bilgiler (fonksiyon gövdesi kodu) yetersiz olduğundan, yalnızca fonksiyon imzasından çıkarılabilecek minimum varsayımlar listelenmektedir.
 
-[Aksiyom 1]: Eğer `useRole()` hook'u bir React bileşeni dışında调用edilirse (örn: düz bir fonksiyon içinde), React kuralı ihlali olur ve hata fırlatılır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 2]: Eğer hook'un bağlı olduğu React bileşeni bileşen hiyerarşisinde bir React.Provider (context) içinde yer almıyorsa, hook'un bağımlı olduğu context değeri (`undefined` veya `null`) olur.
-
-[Aksiyom 3]: Eğer `useRole()` fonksiyonu parametre almıyorsa, fonksiyon çağrılırken herhangi bir argüman geçilirse TypeScript derleme hatası olur.
+**Neden:** Fonksiyon gövdesi verilmediğinden, modülün doğru çalışması için gerekli koşullar belirlenememektedir. Yalnızca fonksiyon imzası (`useRole()`, parametresiz) mevcuttur; gövde içeriği bilinmediğinden hangi bağımlılıklara, durumlara veya eşik değerlerine ihtiyaç duyulduğu tespit edilemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### useRole
-**Ne yapar**: Mevcut kullanıcının Rol Tabanlı Erişim Kontrolü (RBAC) izinlerini değerlendiren özel bir React hook'udur. `useAuth` hook'undan ham rol bilgisini alır ve uygulamanın izin matrisiyle (`src/lib/rbac.ts`) birleştirerek kullanıma hazır, bağlı izin kontrol fonksiyonları içeren bir nesne döner.
+**Ne yapar**: Mevcut kullanıcının Rol Tabanlı Erişim Kontrolü (RBAC) izinlerini değerlendiren özel bir React hook'udur. `useAuth`'tan gelen ham rol bilgisini, uygulamanın izin matrisi (`src/lib/rbac.ts`) ile birleştirerek erişim kontrol fonksiyonları üretir ve tüketen bileşenlere sunar.
 
-**Nasıl yapar**: `useAuth` hook'unu çağırarak mevcut kullanıcının `role` değerini ve yükleme durumlarını (`authLoading`, `roleLoading`) alır. `useCallback` hook'unu kullanarak `canAccess` ve `canWrite` fonksiyonlarını, bağımlılık dizisi olarak yalnızca `role` değerini vererek stabilize eder. Bu optimizasyon, fonksiyonların referans eşitliğini koruyarak tüketici bileşenlerdeki gereksiz yeniden render'ları ve potansiyel sonsuz döngüleri engeller. Son olarak, `useMemo` ile tüm dönüş nesnesini, bağımlılık dizisindeki değerler (`role`, `loading`, `roleLoading`, `canAccess`, `canWrite`) değiştikçe yeniden hesaplar.
+**Nasıl yapar**: Öncelikle `useAuth` hook'undan `role`, `authLoading` (kodda `loading` olarak yeniden adlandırılmış) ve `roleLoading` değerlerini alır. Yükleme durumunu bu iki loading değerinin mantıksel OR'u olarak hesaplar. Ardından `canAccess` ve `canWrite` fonksiyonlarını `useCallback` ile sarar; bu sayede `role` değeri değişmediği sürece bu fonksiyonların referansları sabit kalır. Koddaki kritik yoruma göre bu stabilite zorunludur çünkü tüketen bileşenler (CommandPalette, AdminRealtimeNotifications gibi) bu fonksiyonları `useMemo`/`useCallback`/`useEffect` bağımlılıklarında kullanmaktadır; her render'da yeni referans dönülmesi sonsuz render döngüsüne yol açar. Son olarak tüm değerleri `useMemo` ile sarılmış bir nesne olarak döndürür; bu nesne yalnızca bağımlılıklar (`role`, `loading`, `roleLoading`, `canAccess`, `canWrite`) değiştiğinde yeniden oluşturulur.
 
 **Parametreler**:
-Bu fonksiyon herhangi bir parametre almaz.
+- Bu fonksiyon parametre almaz.
 
-**Dönüş**: Aşağıdaki alanları içeren bir nesne döner:
-- `role` — Kullanıcının mevcut rolü (string veya tanımsız olabilir, `useAuth`'tan gelir).
-- `loading` — Kimlik doğrulama veya rol yükleme işlemlerinden herhangi birinin devam edip etmediğini belirten boolean değer. Hem `authLoading` hem de `roleLoading` true ise true olur.
-- `roleLoading` — Sadece rol bilgisinin yüklenip yüklenmediğini belirten boolean değer.
-- `canAccess` — `canAccessPage(role, path)` fonksiyonuna bağlı bir kontrol fonksiyonu. Verilen bir URL yolunun (`path`), kullanıcının mevcut rolüyle erişilebilir olup olmadığını kontrol eder.
-- `canWrite` — `canWriteRbac(role, entity)` fonksiyonuna bağlı bir kontrol fonksiyonu. Verilen bir varlığın (`entity`, örneğin 'user', 'report'), kullanıcının mevcut rolüyle yazılıp yazılamayacağını kontrol eder.
-- `isReadOnly` — `isReadOnly(role)` fonksiyonunun sonucu. Kullanıcının rolünün salt okunur olup olmadığını belirten boolean değer.
+**Dönüş**: `useMemo` ile sarılmış bir nesne döndürür. Kesin TypeScript dönüş tipi kaynak kodda belirtilmemiştir (bilinmiyor). Dönen nesne şu alanları içerir:
+- `role`: `useAuth`'tan gelen kullanıcının mevcut rolü
+- `loading`: `authLoading` ile `roleLoading` değerlerinin mantıksal OR'u; herhangi bir yükleme süreci devam ederken `true` olur
+- `roleLoading`: `useAuth`'tan gelen rol yükleme durumu
+- `canAccess`: `(path: string) => boolean` — verilen yol (path) için sayfa erişim izni olup olmadığını kontrol eden fonksiyon; `canAccessPage` fonksiyonunu `role` ile bağlayarak çalışır
+- `canWrite`: `(entity: string) => boolean` — verilen varlık (entity) için yazma izni olup olmadığını kontrol eden fonksiyon; `canWriteRbac` fonksiyonunu `role` ile bağlayarak çalışır
+- `isReadOnly`: `isReadOnly(role)` çağrısının sonucu; kullanıcının salt okunup modda olup olmadığını belirtir
 
 ---
 
@@ -66,20 +72,20 @@ Bu fonksiyon herhangi bir parametre almaz.
 ### [N1_NASIL] AST Pointer: src/hooks/useRole.ts::useRole
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `role` — `useAuth()` hookundan destructured, kullanıcının mevcut RBAC rolü
-  - `authLoading` — `useAuth()` hookundan destructured (`loading` alias'ı ile), authentication durumunun yüklenme flag'i
-  - `roleLoading` — `useAuth()` hookundan destructured, rol verisinin yüklenme flag'i
-  - `loading` — `authLoading || roleLoading` birleşik yükleme durumu; herhangi bir auth veya rol yüklemesi devam ediyorsa `true`
-  - `canAccess` — `useCallback` ile sarılmış memoize fonksiyon; verilen bir `path` string'i için `canAccessPage(role, path)` çağırarak kullanıcının o sayfaya erişebilip erişemeyeceğini kontrol eder. `[role]` bağımlılığı ile stabilite sağlanır
-  - `canWrite` — `useCallback` ile sarılmış memoize fonksiyon; verilen bir `entity` string'i için `canWriteRbac(role, entity)` çağırarak kullanıcının o varlığa yazma izni olup olmadığını kontrol eder. `[role]` bağımlılığı ile stabilite sağlanır
-- **Dönüş**: `useMemo` ile sarılmış obje — `{ role, loading, roleLoading, canAccess, canWrite, isReadOnly }` formatında. `isReadOnly` doğrudan `isReadOnly(role)` çağrısı ile hesaplanır (sadece okuma izni varsa `true`). Bağımlılık dizisi: `[role, loading, roleLoading, canAccess, canWrite]`. Dönüş tipi React hook nesnesi; yan etki olarak bileşenlere rol tabanlı erişim kontrol fonksiyonları ve yükleme durumları sağlar
+  - `role` — `useAuth()` fonksiyonundan destructure edilen kullanıcı rolü; `canAccess`, `canWrite` callback'lerinde ve dönüş objesindeki `isReadOnly` hesaplamasında bağımlılık olarak kullanılır
+  - `authLoading` — `useAuth()` fonksiyonundan destructure edilen kimlik doğrulama yükleme durumu (kaynakta `loading` olarak yeniden adlandırılmış); `loading` hesaplamasında kullanılır
+  - `roleLoading` — `useAuth()` fonksiyonundan destructure edilen rol yükleme durumu; `loading` hesaplamasında ve dönüş objesinde kullanılır
+  - `loading` — `authLoading || roleLoading` ifadesinin sonucu; dönüş objesinde kullanılır
+  - `canAccess` — `useCallback` ile sarılmış fonksiyon; `path` parametresi alır ve `canAccessPage(role, path)` çağrısını yapar; bağımlılık dizisi `[role]`
+  - `canWrite` — `useCallback` ile sarılmış fonksiyon; `entity` parametresi alır ve `canWriteRbac(role, entity)` çağrısını yapar; bağımlılık dizisi `[role]`
+- **Dönüş**: `useMemo` ile sarılmış obje `{ role, loading, roleLoading, canAccess, canWrite, isReadOnly: isReadOnly(role) }`; bağımlılık dizisi `[role, loading, roleLoading, canAccess, canWrite]`
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\hooks\useRole.ts
-  function: src\hooks\useRole.ts::useRole
+  file: useRole.ts
+  function: useRole.ts::useRole
 
 ---
 

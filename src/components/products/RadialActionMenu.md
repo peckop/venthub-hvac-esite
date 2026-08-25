@@ -2,82 +2,76 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\RadialActionMenu.tsx
-skeleton_hash: df870f368d2b5426
+source_path: C:\tmp\wt-supurme\src\components\products\RadialActionMenu.tsx
+skeleton_hash: 5e3ca13a8316793b
 entity_hashes:
   func:RadialActionMenu: 0b7a99200882ee32
   func:getItemPosition: fe5533094bc4f10c
   func:getSubcategoryPosition: baca01aa62eeaa95
   overview: d9d0bbf865eea128
   style_tokens: 398c177ac8f627cc
-generated_at: 2026-06-19T20:47:27Z
+generated_at: 2026-08-25T07:26:16Z
 ---
 
 ## Genel Bakış
-Bu modül, ürünler sayfasında kategori ve alt kategorileri dairesel (radyal) bir açılır menü formatında sunan bir React bileşenini içerir. Menü, dışarıdan kontrol edilen durum, konum ve kategori verileriyle çalışarak, her bir öğeyi belirli bir yarıçapta ve açısal konumda konumlandırır. Bileşen, ana işlevselliğinin yanı sıra, menü öğelerinin fiziksel yerleşimini hesaplayan yardımcı fonksiyonlara dayanır.
+
+RadialActionMenu modülü, kullanıcıya dairesel (radyal) bir düzenle sunulan bir aksiyon menüsü bileşeni sağlar. Menü, belirli bir kategoriye ait alt kategorileri dairesel formatta konumlandırarak kullanıcıya sunar. Yardımcı fonksiyonlar, menü öğelerinin ve alt kategorilerin ekrandaki pozisyonlarını geometrik hesaplamalarla belirler.
 
 ## Fonksiyon Grupları
-### Ana Menü Bileşeni
-Bileşenin temel kullanıcı arayüzünü ve mantığını yöneten ana React bileşenidir. Dışarıdan alınan tüm durum ve veri prop'larını işleyerek menüyü render eder ve kapanma gibi etkileşimleri kontrol eder.
+
+### Ana Bileşen
+Menünün açılıp kapatılmasını, ekrandaki konumunu ve görüntülenecek alt kategorileri yönetir. isOpen ve onClose ile menü görünürlüğünü kontrol eder, position ile ekran üzerindeki yerini belirler, categoryId ve subcategories ile hangi verilerin gösterileceğini belirtir.
 - RadialActionMenu
 
-### Konum Hesaplama Yardımcı Fonksiyonları
-Menüdeki her bir öğenin (hem ana menü öğelerinin hem de alt kategorilerin) dairesel düzlemde ekranda alacağı koordinatları hesaplayan yardımcı fonksiyonlardır. Bu hesaplamalar, menünün radyal yerleşim mantığının temelini oluşturur.
+### Konum Hesaplama Yardımcıları
+Dairesel menüdeki öğelerin ve alt kategorilerin ekrandaki piksel konumlarını hesaplar. Her iki fonksiyon da öğe indeksi ve toplam öğe sayısına göre dairesel dağılım pozisyonlarını matematiksel olarak belirler; getItemPosition ek olarak bir yarıçap parametresi alır.
 - getItemPosition, getSubcategoryPosition
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, radyal (dairesel) menü yerleşimi hesaplayan matematiksel yardımcı fonksiyonlara ve dış kontrollü durum Props'larına dayanır.
+RadialActionMenu, dairesel bir aksiyon menüsü bileşenidir. Alt kategorilerin dairesel düzen içinde konumlandırılması ve menü açma/kapama davranışının yönetilmesi için gerekli varsayımlar:
 
-[Aksiyom 1]: Eğer `getItemPosition` fonksiyonuna `total` parametresi olarak `0` verilirse, açı hesaplamasında sıfıra bölünme hatası oluşur.
+**[Aksiyom 1]**: Eğer `isOpen` parametresi yoksa, menünün görünür olup olmadığı kontrol edilemez ve bileşen render kararı veremez.
 
-[Aksiyom 2]: Eğer `getItemPosition` fonksiyonuna `radius` parametresi olarak `0` verilirse, tüm menü öğeleri merkez noktasında üst üste biner ve görünmez hale gelir.
+**[Aksiyom 2]**: Eğer `onClose` fonksiyonu yoksa, kullanıcı menüyü kapatamaz; menü bir kez açıldıktan sonra sonsuza kadar açık kalır.
 
-[Aksiyom 3]: Eğer `getSubcategoryPosition` fonksiyonuna `total` parametresi olarak `0` verilirse, açı hesaplamasında sıfıra bölünme hatası oluşur.
+**[Aksiyom 3]**: Eğer `position` değeri yoksa, menünün ekranda nerede görüntüleneceği belirlenemez.
 
-[Aksiyom 4]: Eğer `RadialActionMenu` bileşenine `onClose` callback'i sağlanmazsa, menü açıldıktan sonra kullanıcı tarafından kapatılamaz.
+**[Aksiyom 4]**: Eğer `categoryId` yoksa, menünün hangi kategoriye ait olduğu bilinemez.
 
-[Aksiyom 5]: Eğer `RadialActionMenu` bileşenine `position` (menü konumu) sağlanmazsa, menünün ekranda hangi noktada açılacağı belirsiz olur.
+**[Aksiyom 5]**: Eğer `subcategories` dizisi yoksa, menüde gösterilecek alt kategori öğeleri bulunamaz; menü boş kalır.
 
-[Aksiyom 6]: Eğer `RadialActionMenu` bileşenine `subcategories` boş bir dizi olarak verilirse, menüde gösterilecek alt kategori öğesi olmaz.
+**[Aksiyom 6]**: `getItemPosition` fonksiyonunda eğer `total` değeri 0 ise, öğeler arası dairesel dağılım hesaplanamaz; bölme hatası oluşur.
 
-[Aksiyom 7]: Eğer `getSubcategoryPosition` fonksiyonu `radius` parametresi almıyorsa (fonksiyon imzasında yok), alt kategori yerleşimi için sabit bir yarıçap değeri kullanılır — bu değerin ne olduğu fonksiyon gövdesinden doğrulanmalıdır.
+**[Aksiyom 7]**: `getSubcategoryPosition` fonksiyonunda eğer `total` değeri 0 ise, alt kategori pozisyonu hesaplanamaz; bölme hatası oluşur.
 
-[Aksiyom 8]: Eğer `isOpen` `false` ise ve `position`/`categoryId`/`subcategories` değerleri geçersiz veya tanımsızsa, bileşen render sırasında hata vermemek için bu değerleri yok saymalıdır.
+**[Aksiyom 8]**: `getItemPosition` fonksiyonu `radius` parametresi alırken, `getSubcategoryPosition` fonksiyonu almaz; bu durumda alt kategori pozisyonu için kullanılan yarıçap değeri bilinmiyor (fonksiyon gövdesinde tanımlı olmalı).
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### RadialActionMenu
-**Ne yapar**: VentHub HVAC projesinin ürünler sayfasında kullanılan, iki seviyeli çalışan dairesel aksiyon menüsü bileşenidir. Seviye 1'de ana menü seçenekleri (Alt Kategoriler, Ürünleri Gör, Teklif Al) barındırır, Seviye 2'de dinamik olarak yüklenen alt kategori seçeneklerini kullanıcıya sunar. Kullanıcıların kategoriler ve ürünler hakkında hızlı aksiyonlar almasını sağlayan açılır menü işlevi görür.
-**Nasıl yapar**: Aldığı prop'lar ile menünün tüm temel işlevlerini yönetir. `isOpen` değeri ile menünün görünürlüğünü kontrol eder, `onClose` callback'i ile menü kapatma tetiklemelerini yönetir. `position` prop'u ile menünün sayfa üzerindeki yerini ayarlar, `categoryId` ve `subcategories` verileri ile menünün içeriğini ilgili kategoriye özel olarak dinamik şekilde oluşturur. İki seviyeli menü yapısını destekleyerek ana menüden alt kategori menüsüne geçişi sorunsuz şekilde yönetir.
+**Ne yapar**: Dairesel (radial) yapıda bir aksiyon menüsü bileşeni oluşturur. İki seviyeli menü yapısı sunar: Seviye 1'de ana menü öğeleri (Alt Kategoriler, Ürünleri Gör, Teklif Al), Seviye 2'de ise dinamik alt kategoriler yer alır. Alt kategori desteği sayesinde hiyerarşik gezinme imkânı sağlar.
+
+**Nasıl yapar**: Bileşen, isOpen prop'u ile açılıp kapatılır. position prop'u ile menünün ekrandaki konumu belirlenir. categoryId ve subcategories prop'ları aracılığıyla hangi kategoriye ait alt kategorilerin gösterileceği belirlenir. onClose fonksiyonu menü kapatıldığında tetiklenir. Framer Motion kütüphanesinin `motion.button` ve `motion.div` bileşenleriyle animasyonlu geçişler (scale, opacity, x/y pozisyon) kullanılır. Spring tabanlı animasyonlar (damping: 12, stiffness: 200) ile öğeler dairesel olarak konumlandırılır ve her öğe arasında 0.05 saniyelik gecikme (delay) uygulanarak sıralı açılma efekti elde edilir.
+
 **Parametreler**:
-- isOpen: boolean — Menünün açık olup olmadığını belirten boolean değer, true olduğunda menü görünür, false olduğunda gizlenir
-- onClose: function — Menü kapatıldığında tetiklenen callback fonksiyonu, kullanıcının menüyü kapatma eylemi gerçekleştirdiğinde çalışır
-- position: any — Menünün sayfadaki konumunu tanımlayan nesne, menünün doğru koordinatlarda görüntülenmesini sağlar
-- categoryId: string | number — Menünün bağlı olduğu ana kategorinin benzersiz kimliği, içeriğin ilgili kategoriye özel üretilmesini sağlar
-- subcategories: array — Menünün ikinci seviyesinde gösterilecek dinamik alt kategori listesi, alt kategori menüsünün içeriğini oluşturur
-**Dönüş**: RadialActionMenuProps tipinde prop'lar alan bir React fonksiyonel bileşeni döndürür, proje içerisindeki React uygulamalarında kullanılmak üzere tasarlanmıştır.
+- isOpen: boolean — Menünün açık olup olmadığını belirten durum değişkeni
+- onClose: () => void — Menü kapatıldığında çağrılacak geri çağırma fonksiyonu
+- position: bilinmiyor — Menünün ekrandaki konumunu belirleyen değer (kaynakta tip bilgisi verilmemiş)
+- categoryId: bilinmiyor — İlgili kategorinin kimlik bilgisi (kaynakta tip bilgisi verilmemiş)
+- subcategories: bilinmiyor — Alt kategori listesi; her bir alt kategorinin `slug` ve `label` alanlarına sahip olduğu görülmektedir (kaynakta tam tip bilgisi verilmemiş)
+
+**Dönüş**: `React.FC<RadialActionMenuProps>` — RadialActionMenuProps tipinde props alan bir React fonksiyonel bileşeni döndürür.
 
 ### getItemPosition
-**Ne yapar**: Radial menüde yer alan her bir menü öğesinin dairesel düzlem üzerindeki konumunu hesaplar. Tüm menü öğelerinin eşit aralıklarla daire üzerine yayılmasını sağlayarak düzenli, okunabilir bir menü görünümü oluşturur. Menü öğelerinin üst üste binmesini veya yanlış konumda görüntülenmesini engeller.
-**Nasıl yapar**: Hedef öğenin indeksi, toplam öğe sayısı ve menünün yarıçap değerini kullanarak matematiksel hesaplamalarla her öğe için x ve y koordinatlarını üretir. Toplam öğe sayısına göre aradaki açı aralığını hesaplayarak her öğenin sırayla doğru konuma yerleşmesini sağlar.
-**Parametreler**:
-- index: number — Konumu hesaplanacak menü öğesinin listedeki sıralı indeks değeri, her öğe için benzersiz sıra numarasıdır
-- total: number — Radial menüde yer alan toplam menü öğesi sayısı, öğeler arasındaki açı aralığını hesaplamak için kullanılır
-- radius: number — Dairesel menünün merkezinden dış kenarına kadar olan yarıçap değeri, konum koordinatlarının ölçeklenmesini sağlar
-**Dönüş**: Fonksiyonun dönüş tipi belirtilmemiştir, hesapladığı menü öğesi konumunu ilgili görüntüleme katmanına iletmek üzere tasarlanmıştır.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getSubcategoryPosition
-**Ne yapar**: Radial menünün ikinci seviyesinde yer alan alt kategori menüsü öğelerinin dairesel düzlem üzerindeki konumunu hesaplar. Alt kategori öğelerinin de düzenli bir şekilde daire üzerine yayılmasını sağlayarak ana menü ile uyumlu bir görüntüleme deneyimi sunar.
-**Nasıl yapar**: Hedef alt kategori öğesinin indeksi ve toplam alt kategori sayısını kullanarak alt kategori menüsü için tanımlanmış sabit yarıçap değeri üzerinden konum hesaplaması yapar. Ana menü öğelerinin konumlandırma mantığına benzer şekilde alt kategoriler için özel olarak uyarlanmış koordinatlar üretir.
-**Parametreler**:
-- index: number — Konumu hesaplanacak alt kategori öğesinin listedeki sıralı indeks değeri, alt kategori listesindeki sıra numarasıdır
-- total: number — İkinci seviye menüde yer alan toplam alt kategori öğesi sayısı, öğeler arasındaki açı aralığını belirlemek için kullanılır
-**Dönüş**: Fonksiyonun dönüş tipi belirtilmemiştir, hesapladığı alt kategori konumunu menünün görüntüleme katmanına iletmek üzere tasarlanmıştır.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -124,135 +118,130 @@ Bu modül, radyal (dairesel) menü yerleşimi hesaplayan matematiksel yardımcı
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: RadialActionMenu.tsx::useEffect_resetState
-- **params**: () — anonim callback (useEffect içinde)
+### [N1_NASIL] AST Pointer: RadialActionMenu.tsx::useEffect (menü açılış reset)
+- **params**: yok (arrow function, useEffect callback)
 - **ic_degiskenler**:
-  - `isOpen` — menünün açık olup olmadığını belirtir, true ise state sıfırlanır
-  - `categoryId` — mevcut kategorinin ID'si,open durumunda kontrol edilir
-  - `setSubcategories` — alt kategorileri başlangıç değerine sıfırlar
-  - `initialSubcategories` — alt kategorilerin başlangıç/taze listesi
-  - `setShowSubcategories` — alt kategori panelinin görünürlüğünü false yapar, her açılışta ana menüden başlamak için kullanılır
-- **Dönüş**: yok (side-effect: state sıfırlar)
-
-### [N2_NASIL] AST Pointer: RadialActionMenu.tsx::useEffect_keyboardListener
-- **params**: () — anonim callback (useEffect içinde)
-- **ic_degiskenler**:
-  - `handleKeyDown` — `(e: KeyboardEvent) => void` tipinde local fonksiyon; Escape tuşu basıldığında menüyü kapatır
-    - `e.key` — basılan tuşun değeri, `'Escape'` kontrolü yapılır
-    - `showSubcategories` — alt kategori paneli açıksa önce onu kapatır
-    - `setShowSubcategories(false)` — alt kategori panelini kapatır
-    - `onClose` — ana menüyü kapatır
-  - `isOpen` — menü açıksa event listener eklenir
-  - `document.addEventListener` — keydown event'ini DOM'a ekler
-  - `document.removeEventListener` — cleanup'ta event listener'ı kaldırır
-- **Dönüş**: () => void — cleanup fonksiyonu (event listener kaldırma)
-
-### [N3_NASIL] AST Pointer: RadialActionMenu.tsx::handleKeyDown
-- **params**: `(e: KeyboardEvent)` — klavye olayı nesnesi
-- **ic_degiskenler**:
-  - `e.key` — basılan tuşun string değeri, `'Escape'` ile kontrol edilir
-  - `showSubcategories` — alt kategori paneli durumu, true ise sadece alt paneli kapatır
-  - `setShowSubcategories(false)` — alt kategori panelini kapatır
-  - `onClose` — alt kategori paneli kapalıyken Escape basılırsa tüm menüyü kapatır
+  - `isOpen` — menü açık mı kontrolü; true ise reset işlemi tetiklenir
+  - `categoryId` — kategori kimliği; truthy ise alt kategoriler yüklenir
+  - `initialSubcategories` — başlangıç alt kategori listesi; `setSubcategories`'a argüman olarak geçilir
+  - `setSubcategories` — alt kategori state setter'ı; `initialSubcategories` ile güncellenir
+  - `setShowSubcategories` — alt kategori görünümü state setter'ı; `false` yapılır (ana menüye dönülür)
 - **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: RadialActionMenu.tsx::handleBackdropClick
-- **params**: `(e: React.MouseEvent)` — fare tıklama olayı nesnesi
+### [N2_NASIL] AST Pointer: RadialActionMenu.tsx::useEffect (klavye olay dinleyici)
+- **params**: yok (arrow function, useEffect callback)
 - **ic_degiskenler**:
-  - `e.target` — tıklanan en iç DOM elementi
-  - `e.currentTarget` — event handler'ın bağlı olduğu element (backdrop自身)
-  - `onClose` — sadece backdrop'un kendisine tıklandığında menüyü kapatır (child elementlere tıklanmayı engeller)
+  - `handleKeyDown` — Escape tuşu için tanımlanmış olay işleyici fonksiyon
+  - `isOpen` — menü açık mı kontrolü; true ise `document.addEventListener` eklenir
+  - `document.addEventListener` — `'keydown'` olayı dinlenmeye başlanır
+  - `document.removeEventListener` — cleanup fonksiyonunda `'keydown'` dinleyici kaldırılır
+- **Dönüş**: cleanup fonksiyonu (removeEventListener çağıran arrow function)
+
+### [N3_NASIL] AST Pointer: RadialActionMenu.tsx::handleKeyDown
+- **params**: `e` — KeyboardEvent nesnesi
+- **ic_degiskenler**:
+  - `e.key` — basılan tuş; `'Escape'` ile eşleşme kontrolü yapılır
+  - `showSubcategories` — alt kategori görünümü açık mı kontrolü; true ise `setShowSubcategories(false)` çağrılır
+  - `setShowSubcategories` — alt kategori görünümü kapatılır
+  - `onClose` — alt kategori görünümü kapalı iken Escape basılırsa menüyü kapatır
+- **Dönüş**: yok
+
+### [N4_NASIL] AST Pointer: RadialActionMenu.tsx::handleOverlayClick
+- **params**: `e` — React.MouseEvent nesnesi
+- **ic_degiskenler**:
+  - `e.target` — tıklanan hedef element
+  - `e.currentTarget` — olayı taşıyan element (overlay div)
+  - `onClose` — tıklama doğrudan overlay üzerinde ise menüyü kapatır
 - **Dönüş**: yok
 
 ### [N5_NASIL] AST Pointer: RadialActionMenu.tsx::handleShowSubcategories
-- **params**: () — parametresiz
+- **params**: yok
 - **ic_degiskenler**:
-  - `subcategories` — mevcut alt kategoriler dizisi, `length > 0` ise panel açılır
-  - `setShowSubcategories(true)` — alt kategori panelini görünür yapar
+  - `subcategories` — alt kategori dizisi; `length > 0` kontrolü yapılır
+  - `setShowSubcategories` — alt kategori görünümü açılır (`true` yapılır)
 - **Dönüş**: yok
 
 ### [N6_NASIL] AST Pointer: RadialActionMenu.tsx::handleHideSubcategories
-- **params**: () — parametresiz
+- **params**: yok
 - **ic_degiskenler**:
-  - `setShowSubcategories(false)` — alt kategori panelini gizler, ana menüye dönüş sağlar
+  - `setShowSubcategories` — alt kategori görünümü kapatılır (`false` yapılır)
 - **Dönüş**: yok
 
-### [N7_NASIL] AST Pointer: RadialActionMenu.tsx::handleSelectProducts
-- **params**: () — parametresiz
+### [N7_NASIL] AST Pointer: RadialActionMenu.tsx::onSelectProducts callback
+- **params**: yok (arrow function)
 - **ic_degiskenler**:
-  - `onSelectProducts` — ürünler seçildiğinde çağrılan prop callback'i, ürün seçim eylemini tetikler
-  - `onClose` — seçim sonrası menüyü kapatır
-- **Dönüş**: yok (side-effect: onSelectProducts ve onClose çağırır)
+  - `onSelectProducts` — ürün seçimi işlevi çağrılır
+  - `onClose` — işlem sonrası menü kapatılır
+- **Dönüş**: yok
 
-### [N8_NASIL] AST Pointer: RadialActionMenu.tsx::handleSelectQuote
-- **params**: () — parametresiz
+### [N8_NASIL] AST Pointer: RadialActionMenu.tsx::onSelectQuote callback
+- **params**: yok (arrow function)
 - **ic_degiskenler**:
-  - `onSelectQuote` — teklif seçildiğinde çağrılan prop callback'i, teklif seçim eylemini tetikler
-  - `onClose` — seçim sonrası menüyü kapatır
-- **Dönüş**: yok (side-effect: onSelectQuote ve onClose çağırır)
+  - `onSelectQuote` — teklif seçimi işlevi çağrılır
+  - `onClose` — işlem sonrası menü kapatılır
+- **Dönüş**: `{ x: number, y: number }` — dairesel konum nesnesi (x ve y koordinatları)
 
 ### [N9_NASIL] AST Pointer: RadialActionMenu.tsx::getItemPosition
-- **params**: `(index: number, total: number, radius: number = 120)` — item indeksi, toplam item sayısı, yarıçap (varsayılan 120)
+- **params**: `index` (number), `total` (number), `radius` (number, varsayılan 120)
 - **ic_degiskenler**:
-  - `startAngle` — `-90` sabiti, açı hesaplamasının üst noktadan (12 yönü) başlamasını sağlar
-  - `angleStep` — `360 / total`, her item arasındaki açısal fark (derece)
-  - `angle` — `(startAngle + index * angleStep) * (Math.PI / 180)`, item'in radyan cinsinden açısı
-  - `Math.cos(angle) * radius` — x koordinatı, birim çember kosinüsü ile yarıçapın çarpımı
-  - `Math.sin(angle) * radius` — y koordinatı, birim çember sinüsü ile yarıçapın çarpımı
-  - `index` — mevcut item'in sırası
-  - `total` — toplam item sayısı
-  - `radius` — daire yarıçapı, varsayılan 120px
-- **Dönüş**: `{ x: number, y: number }` — item'in_mutlak_pozisyon_koordinatları
+  - `startAngle` — başlangıç açısı; `-90` derece (üstten başlama)
+  - `angleStep` — her öğe arasındaki açı farkı; `360 / total`
+  - `angle` — hesaplanan radyan açı; `(startAngle + index * angleStep) * (Math.PI / 180)`
+  - `Math.cos(angle)` — x ekseni bileşeni; `radius` ile çarpılır
+  - `Math.sin(angle)` — y ekseni bileşeni; `radius` ile çarpılır
+- **Dönüş**: `{ x: number, y: number }` — hesaplanmış dairesel konum
 
 ### [N10_NASIL] AST Pointer: RadialActionMenu.tsx::getSubcategoryPosition
-- **params**: `(index: number, total: number)` — subcategory indeksi, toplam subcategory sayısı
+- **params**: `index` (number), `total` (number)
 - **ic_degiskenler**:
-  - `radius` — `Math.min(100 + total * 8, 150)`, dinamik yarıçap: toplam sayıyla artar ama 150px'i geçmez
-  - `index` — mevcut alt kategorinin sırası
-  - `total` — toplam alt kategori sayısı
-- **Dönüş**: `{ x: number, y: number }` — getItemPosition çağrısıyla hesaplanan pozisyon (dolaylı)
+  - `radius` — dinamik yarıçap; `Math.min(100 + total * 8, 150)` ile hesaplanır
+  - `getItemPosition` — `index`, `total`, `radius` argümanlarıyla çağrılır
+- **Dönüş**: `{ x: number, y: number }` — getItemPosition dönüş değeri
 
-### [N11_NASIL] AST Pointer: RadialActionMenu.tsx::renderMainMenuItem
-- **params**: `(item, index)` — menü öğesi nesnesi ve indeksi
+### [N11_NASIL] AST Pointer: RadialActionMenu.tsx::mainMenuItems map render
+- **params**: `item` (menü öğesi nesnesi), `index` (number)
 - **ic_degiskenler**:
-  - `pos` — `getItemPosition(index, mainMenuItems.length)` çağrısıyla elde edilen `{x, y}` pozisyonu, button'un animasyon hedefi
-  - `mainMenuItems` — ana menü öğeleri dizisi, toplam sayısını yarıçap hesaplaması için kullanır
-  - `isDisabled` — `item.id === 'subcategories' && subcategories.length === 0` koşulu ile hesaplanır, alt kategori yoksa subcategories butonu devre dışıdır
-  - `item.id` — öğenin benzersiz tanımlayıcısı, `'subcategories'` kontrolü yapılır
-  - `item.onClick` — öğenin tıklama handler'ı, devre dışı değilse çağrılır
-  - `item.color` — gradient renk sınıfı (ör: `from-blue-500 to-blue-600`)
-  - `item.glowColor` — hover/glow efekti için gölge rengi sınıfı
-  - `item.icon` — öğe ikonu (React elementi)
-  - `item.label` — öğe metin etiketi
-  - `subcategories` — alt kategoriler dizisi, length kontrolü ile isDisabled belirlenir
-- **Dönüş**: `JSX.Element` — `motion.button` ile sarılmış menü öğesi
+  - `pos` — `getItemPosition(index, mainMenuItems.length)` ile hesaplanan konum
+  - `mainMenuItems` — ana menü öğeleri dizisi; `length` özelliği kullanılır
+  - `isDisabled` — `item.id === 'subcategories' && subcategories.length === 0` koşulu; alt kategori yoksa devre dışı
+  - `item.id` — öğe kimliği; `'subcategories'` ile eşleşme kontrolü
+  - `item.color` — gradyan renk sınıfı
+  - `item.glowColor` — glow/gölge renk sınıfı
+  - `item.icon` — öğe ikonu JSX elemanı
+  - `item.label` — öğe etiket metni
+  - `item.onClick` — öğe tıklama işlevi
+  - `subcategories` — alt kategori dizisi; `length` kontrolü
+  - `index * 0.08` — animasyon gecikme süresi
+- **Dönüş**: JSX (motion.button elemanı)
 
-### [N12_NASIL] AST Pointer: RadialActionMenu.tsx::handleMainItemClick
-- **params**: `(e)` — React click event nesnesi (anonymous, button onClick içinde)
+### [N12_NASIL] AST Pointer: RadialActionMenu.tsx::mainMenuItem onClick handler
+- **params**: `e` (React.MouseEvent)
 - **ic_degiskenler**:
-  - `e.stopPropagation()` — click event'in üst elementlere yayılmasını engeller
-  - `isDisabled` — outer scope'tan gelen devre dışı durumu, true ise nothing yap
-  - `item.onClick` — öğe devre dışı değilse öğe tıklama handler'ı çağrılır
+  - `e.stopPropagation()` — olayın üst elemanlara yayılması engellenir
+  - `isDisabled` — öğe devre dışı mı kontrolü
+  - `item.onClick` — öğe devre dışı değilse tıklama işlevi çağrılır
 - **Dönüş**: yok
 
-### [N13_NASIL] AST Pointer: RadialActionMenu.tsx::renderSubcategoryItem
-- **params**: `(sub, index)` — alt kategori nesnesi ve indeksi
+### [N13_NASIL] AST Pointer: RadialActionMenu.tsx::subcategories map render
+- **params**: `sub` (alt kategori nesnesi), `index` (number)
 - **ic_degiskenler**:
-  - `pos` — `getSubcategoryPosition(index, subcategories.length)` ile hesaplanan `{x, y}` pozisyonu
-  - `subcategories` — alt kategoriler dizisi, toplam sayısı pozisyon hesabında kullanılır
-  - `sub.slug` — alt kategorinin URL dostu tanımlayıcısı, React key ve onClick parametresi olarak kullanılır
-  - `sub.label` — alt kategorinin görüntülenen adı
-  - `onSelectSubcategory` — prop callback, tıklandığında `sub.slug` ile çağrılır
-  - `onClose` — seçim sonrası menüyü kapatır
-- **Dönüş**: `JSX.Element` — `motion.button` ile sarılmış alt kategori öğesi
+  - `pos` — `getSubcategoryPosition(index, subcategories.length)` ile hesaplanan konum
+  - `subcategories` — alt kategori dizisi; `length` özelliği kullanılır
+  - `sub.slug` — alt kategori slug'ı; key ve tıklama işlevi için kullanılır
+  - `sub.label` — alt kategori etiket metni
+  - `onSelectSubcategory` — alt kategori seçim işlevi; `sub.slug` argümanı ile çağrılır
+  - `onClose` — seçim sonrası menü kapatılır
+  - `Package` — lucide-react ikonu; alt kategori ikonu olarak kullanılır
+  - `index * 0.05` — animasyon gecikme süresi
+- **Dönüş**: JSX (motion.button elemanı)
 
-### [N14_NASIL] AST Pointer: RadialActionMenu.tsx::handleSubcategoryClick
-- **params**: `(e)` — React click event nesnesi (anonymous, button onClick içinde)
+### [N14_NASIL] AST Pointer: RadialActionMenu.tsx::subcategory onClick handler
+- **params**: `e` (React.MouseEvent)
 - **ic_degiskenler**:
-  - `e.stopPropagation()` — click event'in üst elementlere yayılmasını engeller
-  - `sub.slug` — outer scope'tan gelen alt kategori slug'ı, `onSelectSubcategory`'a传递 edilir
-  - `onSelectSubcategory` — outer scope prop callback, `sub.slug` parametresiyle çağrılır
-  - `onClose` — outer scope prop, tıklama sonrası menüyü kapatır
+  - `e.stopPropagation()` — olayın üst elemanlara yayılması engellenir
+  - `onSelectSubcategory` — alt kategori seçim işlevi; `sub.slug` argümanı ile çağrılır
+  - `sub.slug` — seçilen alt kategori slug'ı
+  - `onClose` — işlem sonrası menü kapatılır
 - **Dönüş**: yok
 
 ---
@@ -264,16 +253,16 @@ graph TD
     RadialActionMenu_tsx__RadialActionMenu["RadialActionMenu"]
     RadialActionMenu_tsx__getItemPosition["getItemPosition"]
     RadialActionMenu_tsx__getSubcategoryPosition["getSubcategoryPosition"]
-    RadialActionMenu_tsx__RadialActionMenu --> RadialActionMenu_tsx__getSubcategoryPosition
     RadialActionMenu_tsx__RadialActionMenu --> RadialActionMenu_tsx__getItemPosition
+    RadialActionMenu_tsx__RadialActionMenu --> RadialActionMenu_tsx__getSubcategoryPosition
 ```
 
 ## NODE ID STANDARD
 
-  file: src\components\products\RadialActionMenu.tsx
-  function: src\components\products\RadialActionMenu.tsx::RadialActionMenu
-  function: src\components\products\RadialActionMenu.tsx::getItemPosition
-  function: src\components\products\RadialActionMenu.tsx::getSubcategoryPosition
+  file: RadialActionMenu.tsx
+  function: RadialActionMenu.tsx::RadialActionMenu
+  function: RadialActionMenu.tsx::getItemPosition
+  function: RadialActionMenu.tsx::getSubcategoryPosition
 
 ---
 

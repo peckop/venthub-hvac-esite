@@ -2,143 +2,82 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-legal\src\lib\services\orderInvoice.service.ts
-skeleton_hash: f9bd89feb8318fe5
+source_path: C:\tmp\wt-supurme\src\lib\services\orderInvoice.service.ts
+skeleton_hash: 591f94b8331509fb
 entity_hashes:
-  func:createInvoice: 272e0ef685a27ac0
-  func:faturaSatiri: 232dcb3b6eff2b9f
-  func:faturasizSatir: a251156ce0d283e9
-  func:listInvoices: 9fa9ba6d83cad61c
-  func:listInvoicesForOrder: 36d92668a287e137
-  func:listUninvoicedPaidOrders: 684a99956e83d3ec
-  func:metin: aac6319de4eabcf5
-  func:metinVeyaBos: bff2657350511426
-  func:sayiVeyaBos: a909e3bef4a10558
+  func:createInvoice: 2478534b19d58457
+  func:faturaSatiri: 0eb38488588a89e0
+  func:faturasizSatir: a0ca5a70f5bfa493
+  func:listInvoices: a3e2eca361203b36
+  func:listInvoicesForOrder: b1440c2815333240
+  func:listUninvoicedPaidOrders: e74b5890102d073b
+  func:metin: a1199f18f87f1552
+  func:metinVeyaBos: 8451a7adcacdeb26
+  func:sayiVeyaBos: adc4133d79ec119d
   overview: 30bb771da643e091
-generated_at: 2026-08-20T08:59:15Z
+generated_at: 2026-08-25T07:28:56Z
 ---
 
 ## Genel Bakış
 
-Bu modül, sipariş faturalarıyla ilgili tüm veri erişim ve dönüşüm işlemlerini merkezi olarak yönetir. Supabase üzerinden fatura kayıtlarının listelenmesi, siparişe ait faturaların sorgulanması, faturasız ödenmiş siparişlerin bulunması ve yeni fatura oluşturma gibi temel CRUD ve sorgulama operasyonlarını sunar. Modül, ham veriyi tip güvenceli TypeScript nesnelerine dönüştürmek için helpers ve mapper fonksiyonları ile fatura alanlarına erişim için utility fonksiyonları da içerir.
+Bu modül, sipariş-fatura ilişkilerini yöneten bir servis katmanıdır. Supabase veritabanı üzerinden fatura listeleme, belirli bir siparişe ait faturaları getirme, faturasız kalmış ödenmiş siparişleri tespit etme ve yeni fatura oluşturma işlemlerini gerçekleştirir. Ham veritabanı kayıtlarını tip güvenli nesnelere dönüştüren yardımcı fonksiyonlar da içerir.
 
 ## Fonksiyon Grupları
 
-### Veri Yardımcı Fonksiyonları (Utility Helpers)
-Ham kayıt nesnelerinden güvenli alan çıkışı sağlayan senkron yardımcı fonksiyonlardır. Alan mevcut değilse varsayılan değer veya null döndürerek null-safe bir erişim katmanı sunar.
-- `metin`, `metinVeyaBos`, `sayiVeyaBos`
+### Veri Dönüştürme ve Alan Çıkarma
 
-### Satır Dönüştürücü Fonksiyonları (Row Mappers)
-Ham bilinmeyen tipteki veriyi tip güvenli sipariş faturası veya faturasız sipariş satır nesnelerine dönüştüren factory fonksiyonlarıdır. Veritabanından gelen raw veriyi uygulama katmanının kullanabileceği yapılandırılmış türlere haritalandırır.
-- `faturaSatiri`, `faturasizSatir`
+Ham veritabanı kayıtlarından güvenli biçimde alan çıkaran ve ham satır verilerini tip güvenli nesnelere dönüştüren yardımcı fonksiyonlardır. Bu fonksiyonlar, servis katmanındaki asenkron fonksiyonlar tarafından ham veriyi işlerken kullanılır.
 
-### Veri Erişim Fonksiyonları (Data Access / Repository)
-Supabase istemcisi aracılığıyla fatura ve sipariş verilerini sorgulayan, listeleyen ve oluşturan asenkron servis fonksiyonlarıdır. Sayfalama, filtreleme ve tekil kaynak sorgulama gibi veritabanı işlemlerini üstlenir.
-- `listInvoices`, `listInvoicesForOrder`, `listUninvoicedPaidOrders`, `createInvoice`
+- metin, metinVeyaBos, sayiVeyaBos, faturaSatiri, faturasizSatir
+
+### Fatura Sorgulama ve Yönetim
+
+Supabase istemcisi aracılığıyla veritabanına erişen asenkron fonksiyonlardır. Faturaları sayfalı olarak listeleme, belirli bir siparişe ait faturaları getirme, faturasız kalmış ödenmiş siparişleri sorgulama ve yeni fatura kaydı oluşturma sorumluluklarını üstlenir. `faturaSatiri` ve `faturasizSatir` fonksiyonlarını çağırarak dönen ham verileri dönüştürür.
+
+- listInvoices, listInvoicesForOrder, listUninvoicedPaidOrders, createInvoice
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, sipariş fatura yönetimi için Supabase veritabanı ile çalışan bir servis katmanıdır. Yardımcı fonksiyonlar (metin, sayiVeyaBos vb.) ham veri kayıtlarından tip güvenli değerler çıkarır.
-
----
-
-**[Aksiyom 1]:** Eğer `metin()` fonksiyonuna verilen `kayit` içinde `alan` parametresiyle eşleşen bir alan yoksa veya değeri tanımlanmamışsa, fonksiyonun davranışı tanımsızdır (dökümanda belirtilmemiştir).
-
-**[Aksiyom 2]:** Eğer `metinVeyaBos()` fonksiyonuna verilen `kayit` içinde `alan` parametresiyle eşleşen bir alan yoksa, `null` döner.
-
-**[Aksiyom 3]:** Eğer `sayiVeyaBos()` fonksiyonuna verilen `kayit` içinde `alan` parametresiyle eşleşen bir alan yoksa veya alan sayısal bir değere dönüştürülemiyorsa, `null` döner.
-
-**[Aksiyom 4]:** Eğer `faturaSatiri()` veya `faturasizSatir()` fonksiyonlarına verilen `ham` veri, beklenen alanları (tipi ve yapısı) içermiyorsa, fonksiyonun davranışı tanımsızdır (runtime hatası oluşabilir).
-
-**[Aksiyom 5]:** Eğer `listInvoices()` veya `listInvoicesForOrder()` veya `listUninvoicedPaidOrders()` veya `createInvoice()` fonksiyonlarına verilen `supabase` client'ı geçerli bir Veritabanı bağlantısı (Database generic tipiyle) içermiyorsa, veritabanı sorguları başarısız olur.
-
-**[Aksiyom 6]:** Eğer `listInvoicesForOrder()` fonksiyonuna verilen `orderId` boş string (`""`) ise veya veritabanında var olmayan bir sipariş ID'sine karşılık geliyorsa, boş bir dizi (`[]`) döner.
-
-**[Aksiyom 7]:** Eğer `listInvoices()` fonksiyonuna `opts.limit` veya `opts.offset` negatif bir değer olarak verilirse, fonksiyonun davranışı tanımsızdır.
-
-**[Aksiyom 8]:** Eğer `listUninvoicedPaidOrders()` fonksiyonuna `opts.limit` negatif bir değer olarak verilirse, fonksiyonun davranışı tanımsızdır.
-
-**[Aksiyom 9]:** Eğer `createInvoice()` fonksiyonuna verilen `input` (`CreateInvoiceInput`), veritabanı şemasının beklediği zorunlu alanları (sipariş ID, fatura detayları vb.) içermiyorsa, veritabanı insert işlemi başarısız olur.
-
-**[Aksiyom 10]:** `createInvoice()` fonksiyonu çağrıldığında, ilgili siparişin faturasız ve ödenmiş olması beklenir; aksi takdirde iş mantığı seviyesinde hata oluşabilir (fonksiyon imzasından çıkarılamayan bir iş kuralı).
-
-**[Aksiyom 11]:** `listUninvoicedPaidOrders()` sadece ödenmiş (`paid`) durumunda olan ve henüz faturalanmamış siparişleri döndürür; bu filtreleme veritabanı tarafında veya servis mantığında yapılır (fonksiyon imzasından çıkarılamayan bir iş kuralı).
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### metin
-**Ne yapar**: Verilen kayıt nesnesinde belirtilen alanı zorunlu olarak string olarak döndürür. Alanın değeri geçerli bir string değilse veya boşsa bir hata fırlatır.
-**Nasıl yapar**: Fonksiyon, `kayit` nesnesinden `alan` anahtarının değerini alır. `typeof` kontrolü ile değerin bir `string` olup olmadığını ve boş (`''`) olup olmadığını test eder. Eğer her iki koşul da sağlanırsa (geçerli ve boş olmayan bir string) değeri döndürür, aksi takdirde `null` döndürür. Ancak verilen dokümantasyonda "hata verir" denilmişken kodda `null` döndürmektedir, bu bir tutarsızlık göstergesidir.
+**Ne yapar**: Verilen kayıt nesnesinden zorunlu bir metin alanını çıkarır. Alan bulunamazsa veya boş string ise hata verir; sessizce boş dizeye düşmez.
+**Nasıl yapar**: Kayıt nesnesinden belirtilen anahtarla değeri alır. Değerin `typeof` kontrolüyle string olup olmadığına ve boş string olmadığına bakar. Her iki koşul da sağlanırsa değeri döndürür, aksi halde `null` döner. Docstring'e göre zorunlu alan tanımı yapılmıştır ancak gövde `metinVeyaBos` ile aynı davranışı sergilemektedir.
 **Parametreler**:
-- `kayit`: `Record<string, unknown>` — Alanların aranacağı anahtar-değer çiftlerinden oluşan nesne.
-- `alan`: `string` — Kayıt nesnesinden istenen alanın anahtarı (adı).
-**Dönüş**: `string` — Alanın doğrulanmış ve boş olmayan string değeri. Geçerli değilse `null`.
+- `kayit`: `Record<string, unknown>` — Alan adı-değer çiftlerinden oluşan nesne. Genellikle veritabanından gelen ham satır verisidir.
+- `alan`: `string` — Kayıt içinden çıkarılacak alanın adı (anahtar).
+**Dönüş**: `string` — Koşulları sağlayan metin değeri. Docstring'e göre alan zorunlu olduğundan bulunamaz durumda hata fırlatması beklenir.
 
 ### metinVeyaBos
-**Ne yapar**: Verilen kayıt nesnesinde belirtilen alanı opsiyonel olarak (varsa ve geçerli bir string ise) döndürür, aksi takdirde `null` döndürür.
-**Nasıl yapar**: Fonksiyon, `kayit` nesnesinden `alan` anahtarının değerini alır. Değerin bir `string` olup olmadığını ve boş (`''`) olup olmadığını test eder. Her iki koşul da sağlanırsa (geçerli ve boş olmayan bir string) değeri döndürür, aksi takdirde `null` döndürür. Bu, `metin` fonksiyonunun aksine alanı zorunlu tutmayan, sessiz bir düşüş stratejisidir.
-**Parametreler**:
-- `kayit`: `Record<string, unknown>` — Alanların aranacağı anahtar-değer çiftlerinden oluşan nesne.
-- `alan`: `string` — Kayıt nesnesinden istenen alanın anahtarı (adı).
-**Dönüş**: `string | null` — Alanın geçerli string değeri veya bulunamayan/geçersiz durumda `null`.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### sayiVeyaBos
-**Ne yapar**: Verilen kayıt nesnesinde belirtilen alanı opsiyonel olarak bir sayıya dönüştürerek döndürür, dönüştürülemezse `null` döndürür.
-**Nasıl yapar**: Fonksiyon, `kayit` nesnesinden `alan` anahtarının değerini alır. Öncelikle değerin `number` tipinde olup olmadığını kontrol eder, eğer öyleyse doğrudan döndürür. Değer bir `string` ise, `trim()` ile boşlukları temizler, boş olmayıp `Number()` ile parse edilebilir ve `Number.isFinite()` ile sonsuz olmayan bir sayıya dönüştürülebilir olup olmadığını test eder. Tüm koşullar sağlanırsa number değerini döndürür, aksi takdirde `null` döndürür.
-**Parametreler**:
-- `kayit`: `Record<string, unknown>` — Alanların aranacağı anahtar-değer çiftlerinden oluşan nesne.
-- `alan`: `string` — Kayıt nesnesinden istenen alanın anahtarı (adı).
-**Dönüş**: `number | null` — Alanın number değerine dönüştürülmüş hali veya dönüştürülemez/geçersiz durumda `null`.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### faturaSatiri
-**Ne yapar**: Ham ve tanımsız (`unknown`) tipteki bir fatura verisini, tip güvenli `OrderInvoiceRow` nesnesine dönüştürür.
-**Nasıl yapar**: Fonksiyon, ham veriyi (`ham`) bir `Record<string, unknown>` nesnesine dönüştürmek için `as` ile tip ataması yapar. Eğer ham veri `null` veya `undefined` ise boş bir nesne `{}` kullanır. Ardından, `OrderInvoiceRow` arayüzünün alanlarını tek tek doldurmak için `metin` ve `metinVeyaBos` yardımcı fonksiyonlarını çağırarak, ham nesneden gerekli alanları安全 olarak çeker. Bu işlem, veri kaynağının yapısındaki olası tutarsızlıkları gidererek tutarlı bir veri yapısı sunar.
-**Parametreler**:
-- `ham`: `unknown` — Ham fatura verisi, bir nesne olması beklenir ancak garanti edilmez.
-**Dönüş**: `OrderInvoiceRow` — Doldurulmuş ve tip güvenli fatura satırı nesnesi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### faturasizSatir
-**Ne yapar**: Ham ve tanımsız (`unknown`) tipteki bir sipariş verisini, faturalanmamış siparişleri temsil eden tip güvenli `UninvoicedOrderRow` nesnesine dönüştürür.
-**Nasıl yapar**: Fonksiyon, ham veriyi (`ham`) bir `Record<string, unknown>` nesnesine dönüştürmek için `as` ile tip ataması yapar. Eğer ham veri `null` veya `undefined` ise boş bir nesne `{}` kullanır. Ardından, `UninvoicedOrderRow` arayüzünün alanlarını tek tek doldurmak için `metin`, `metinVeyaBos` ve `sayiVeyaBos` yardımcı fonksiyonlarını çağırarak, ham nesneden gerekli alanları安全 olarak çeker. Bu, özellikle API cevapları veya veritabanı sorgularından gelen verilerin işlenmesinde güvenilir bir yapı oluşturur.
-**Parametreler**:
-- `ham`: `unknown` — Ham sipariş verisi, bir nesne olması beklenir ancak garanti edilmez.
-**Dönüş**: `UninvoicedOrderRow` — Doldurulmuş ve tip güvenli, faturalanmamış sipariş satırı nesnesi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### listInvoices
-**Ne yapar**: Sistemdeki tüm fatura kayıtlarını, en yeniden en eskiye doğru sıralanmış olarak listeler. Sayfalama seçeneklerini destekler.
-**Nasıl yapar**: Fonksiyon, `supabase` istemcisini kullanarak `DEFTER` adlı tablodan (`as never` ile tip ihlali yaparak) tüm (`'*'`) sütunları seçer. `opts.limit` ve `opts.offset` değerleri varsa bunları sorguya ekler (bu típik sayfalama ) ve `created_at` sütununa göre azalan (`ascending: false`) sıralama uygular. Sorgu hatası oluşursa bir `error` fırlatır. Başarılı olursa, ham veri dizisini (`data`) `faturaSatiri` fonksiyonu ile işleyerek `OrderInvoiceRow` dizisine dönüştürür. Sonuç olarak, satırların dizisi ve toplam kayıt sayısını (`count`) içeren bir nesne döndürür.
-**Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemleri için kullanılacak Supabase istemcisi.
-- `opts`: `{ limit?: number; offset?: number }` — Sayfalama seçenekleri. `limit` sayfa başına kayıt sayısını, `offset` ise atlanacak kayıt sayısını belirtir.
-**Dönüş**: `Promise<{ rows: OrderInvoiceRow[]; count: number | null }>` — Promise çözümü, `rows` alanı fatura satırlarının dizisi, `count` alanı ise toplam kayıt sayısını (veya bilinemiyorsa `null`) içerir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### listInvoicesForOrder
-**Ne yapar**: Belirli bir siparişe ait tüm fatura kayıtlarını listeler.
-**Nasıl yapar**: Fonksiyon, `supabase` istemcisini kullanarak `DEFTER` tablosundan (`as never` ile tip ihlali yaparak) tüm (`'*'`) sütunları seçer. `order_id` sütunu `orderId` parameresine eşit olacak şekilde filtreler (`.eq('order_id', orderId)`) ve `created_at` sütununa göre azalan sıralama uygular. Bu, faturaların eklenme sırasıyla (en son eklenen önce) getirilmesini sağlar. Sorgu hatası oluşursa bir `error` fırlatır. Başarılı olursa, ham veri dizisini (`data`) `faturaSatiri` fonksiyonu ile işleyerek `OrderInvoiceRow` dizisine dönüştürür.
-**Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemleri için kullanılacak Supabase istemcisi.
-- `orderId`: `string` — Faturaların getirileceği siparişin benzersiz kimliği.
-**Dönüş**: `Promise<OrderInvoiceRow[]>` — Promise çözümü, ilgili siparişe ait fatura satırlarının (`OrderInvoiceRow`) dizisi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### listUninvoicedPaidOrders
-**Ne yapar**: Ödemesi tamamlanmış ancak henüz faturalanmamış siparişleri listeler.
-**Nasıl yapar**: Fonksiyon, `supabase` istemcisini kullanarak `FATURASIZ_VIEW` adlı veritabanı görünümünden (`as never` ile tip ihlali yaparak) tüm (`'*'`) sütunları seçer. Sorguya `created_at` sütununa göre artan (`ascending: true`) bir sıralama ve `opts.limit` değerine (varsayılan 200) göre bir `limit` ekler. Sorgu hatası oluşursa bir `error` fırlatır. Başarılı olursa, ham veri dizisini (`data`) `faturasizSatir` fonksiyonu ile işleyerek `UninvoicedOrderRow` dizisine dönüştürür. Filtrelemenin veritabanı görünümünde (`view`) yapılması, istemci tarafında yapılacak sayfalama ile tutarsız sonuçların önüne geçer.
-**Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemleri için kullanılacak Supabase istemcisi.
-- `opts`: `{ limit?: number }` — İsteğe bağlı seçenekler. `limit`, getirilecek maksimum sipariş sayısını belirtir (varsayılan 200).
-**Dönüş**: `Promise<UninvoicedOrderRow[]>` — Promise çözümü, faturalanmamış sipariş satırlarının (`UninvoicedOrderRow`) dizisi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### createInvoice
-**Ne yapar**: Verilen bilgilerle yeni bir fatura kaydı oluşturarak ilgili siparişi "faturalanmış" durumuna getirir.
-**Nasıl yapar**: Fonksiyon, önce `input.invoiceNo` değerini `trim()` ile temizler ve boş olup olmadığını kontrol eder; boşsa hata fırlatır. Ardından, `supabase.auth.getUser()` ile mevcut kullanıcının kimliğini alır. Sonra `supabase` istemcisini kullanarak `DEFTER` tablosuna (`as never` ile tip ihlali yaparak) yeni bir satır ekler (`insert`). Ekleme verisi, `input` nesnesinden (`orderId`, `invoiceNo`, `invoiceDate`, vb.) ve kimlik bilgisi (`issued_by`) ile not (`note`) alanlarından oluşturulur. `not` alanı boşsa `null` olarak eklenir. `.single()` ile tek bir satırın eklendiği ve o satırın geri döndürüldüğünü belirtir. Sorgu hatası oluşursa bir `error` fırlatır. Başarılı olursa, eklenen ham veriyi `faturaSatiri` fonksiyonu ile işleyerek tip güvenli `OrderInvoiceRow` nesnesine dönüştürür ve döndürür.
-**Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemleri için kullanılacak Supabase istemcisi.
-- `input`: `CreateInvoiceInput` — Oluşturulacak fatura için gerekli verileri içeren nesne.
-**Dönüş**: `Promise<OrderInvoiceRow>` — Promise çözümü, başarıyla oluşturulmuş ve veritabanına kaydedilmiş fatura satırının (`OrderInvoiceRow`) nesnesi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -182,67 +121,67 @@ Fatura defteri servisi (T132-VH · Fatura v1). Cetvel: docs/standards/legal-comp
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/services/orderInvoice.service.ts::metin
-- **params**: `(kayit: Record<string, unknown>, alan: string)`
+- **params**: `kayit` (Record<string, unknown>), `alan` (string)
 - **ic_degiskenler**:
-  - `deger` — kayit nesnesinden alan parametresi ile erişilen değerin string olup olmadığını kontrol eden ve decoğrulan değeri tutar
-- **Dönüş**: `string` (değer string değilse veya boşsa Error fırlatır)
+  - `deger` — `kayit[alan]` erişimiyle elde edilen ham değer; typeof kontrolü yapılarak string ve boş olmadığı doğrulanır, aksi halde hata fırlatılır
+- **Dönüş**: string
 
 ### [N2_NASIL] AST Pointer: src/lib/services/orderInvoice.service.ts::metinVeyaBos
-- **params**: `(kayit: Record<string, unknown>, alan: string)`
+- **params**: `kayit` (Record<string, unknown>), `alan` (string)
 - **ic_degiskenler**:
-  - `deger` — kayit nesnesinden alan parametresi ile erişilen değerin string olup olmadığını ve boş olup olmadığını kontrol eden değişken
-- **Dönüş**: `string | null` (geçerli string ise değeri, değilse null döner)
+  - `deger` — `kayit[alan]` erişimiyle elde edilen ham değer; string ve boş değilse kendisi, değilse null döner
+- **Dönüş**: string | null
 
 ### [N3_NASIL] AST Pointer: src/lib/services/orderInvoice.service.ts::sayiVeyaBos
-- **params**: `(kayit: Record<string, unknown>, alan: string)`
+- **params**: `kayit` (Record<string, unknown>), `alan` (string)
 - **ic_degiskenler**:
-  - `deger` — kayit nesnesinden alan parametresi ile erişilen değerin number veya number'a çevrilebilir string olup olmadığını kontrol eden değişken
-- **Dönüş**: `number | null` (geçerli number ise değeri, değilse null döner)
+  - `deger` — `kayit[alan]` erişimiyle elde edilen ham değer; number ise doğrudan, string ise `Number()` ile sayıya çevrilip `Number.isFinite` kontrolü yapılarak döner, diğer durumlarda null
+- **Dönüş**: number | null
 
 ### [N4_NASIL] AST Pointer: src/lib/services/orderInvoice.service.ts::faturaSatiri
-- **params**: `(ham: unknown)`
+- **params**: `ham` (unknown)
 - **ic_degiskenler**:
-  - `kayit` — ham parametresinin null-safe olarak Record<string, unknown> tipine cast edilmiş hali
-- **Dönüş**: `OrderInvoiceRow` (metin, metinVeyaBos fonksiyonlarını kullanarak OrderInvoiceRow objesi oluşturur)
+  - `kayit` — `ham ?? {}` ifadesiyle null/undefined koruması yapılarak `Record<string, unknown>` tipine cast edilen nesne; tüm alanlar bu nesne üzerinden `metin` ve `metinVeyaBos` çağrılarıyla okunur
+- **Dönüş**: OrderInvoiceRow (id, order_id, invoice_no, invoice_date, invoice_type, issued_by, note, created_at alanlarını içerir)
 
 ### [N5_NASIL] AST Pointer: src/lib/services/orderInvoice.service.ts::faturasizSatir
-- **params**: `(ham: unknown)`
+- **params**: `ham` (unknown)
 - **ic_degiskenler**:
-  - `kayit` — ham parametresinin null-safe olarak Record<string, unknown> tipine cast edilmiş hali
-- **Dönüş**: `UninvoicedOrderRow` (metin, metinVeyaBos, sayiVeyaBos fonksiyonlarını kullanarak UninvoicedOrderRow objesi oluşturur)
+  - `kayit` — `ham ?? {}` ifadesiyle null/undefined koruması yapılarak `Record<string, unknown>` tipine cast edilen nesne; tüm alanlar bu nesne üzerinden `metin`, `metinVeyaBos` ve `sayiVeyaBos` çağrılarıyla okunur
+- **Dönüş**: UninvoicedOrderRow (id, order_number, created_at, total_amount, customer_name, customer_email, invoice_type alanlarını içerir)
 
 ### [N6_NASIL] AST Pointer: src/lib/services/orderInvoice.service.ts::listInvoices
-- **params**: `(supabase: SupabaseClient<Database>, opts: { limit?: number; offset?: number } = {})`
+- **params**: `supabase` (SupabaseClient<Database>), `opts` ({ limit?: number; offset?: number })
 - **ic_degiskenler**:
-  - `limit` — opts.limit değerinin default olarak 50 alındığı değişken
-  - `offset` — opts.offset değerinin default olarak 0 alındığı değişken
-  - `data` — Supabase sorgusundan dönen satır verisi
-  - `error` — Supabase sorgusundan dönen hata nesnesi
-  - `count` — Supabase sorgusundan dönen toplam satır sayısı
-- **Dönüş**: `Promise<{ rows: OrderInvoiceRow[]; count: number | null }>` (sayfalanmış fatura listesi ve toplam sayı)
+  - `limit` — `opts.limit ?? 50` ile varsayılan 50 değeri atanır
+  - `offset` — `opts.offset ?? 0` ile varsayılan 0 değeri atanır
+  - `data` — `supabase.from(DEFTER as never).select('*', { count: 'exact' }).order('invoice_date', { ascending: false }).order('created_at', { ascending: false }).range(offset, offset + limit - 1)` sorgusundan dönen veri dizisi
+  - `error` — sorgu sonucu oluşan hata; varsa throw ile fırlatılır
+  - `count` — sorgu sonucu dönen toplam kayıt sayısı
+- **Dönüş**: { rows: OrderInvoiceRow[]; count: number | null } — `data` dizisi `faturaSatiri` ile map'lenir, `count` null ise null döner
 
 ### [N7_NASIL] AST Pointer: src/lib/services/orderInvoice.service.ts::listInvoicesForOrder
-- **params**: `(supabase: SupabaseClient<Database>, orderId: string)`
+- **params**: `supabase` (SupabaseClient<Database>), `orderId` (string)
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen satır verisi
-  - `error` — Supabase sorgusundan dönen hata nesnesi
-- **Dönüş**: `Promise<OrderInvoiceRow[]>` (belirli siparişe ait fatura listesi)
+  - `data` — `supabase.from(DEFTER as never).select('*').eq('order_id', orderId).order('created_at', { ascending: false })` sorgusundan dönen veri dizisi
+  - `error` — sorgu sonucu oluşan hata; varsa throw ile fırlatılır
+- **Dönüş**: OrderInvoiceRow[] — `data` dizisi `faturaSatiri` ile map'lenir
 
 ### [N8_NASIL] AST Pointer: src/lib/services/orderInvoice.service.ts::listUninvoicedPaidOrders
-- **params**: `(supabase: SupabaseClient<Database>, opts: { limit?: number } = {})`
+- **params**: `supabase` (SupabaseClient<Database>), `opts` ({ limit?: number })
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen satır verisi
-  - `error` — Supabase sorgusundan dönen hata nesnesi
-- **Dönüş**: `Promise<UninvoicedOrderRow[]>` (faturasız ödenmiş siparişlerin listesi)
+  - `data` — `supabase.from(FATURASIZ_VIEW as never).select('*').order('created_at', { ascending: true }).limit(opts.limit ?? 200)` sorgusundan dönen veri dizisi
+  - `error` — sorgu sonucu oluşan hata; varsa throw ile fırlatılır
+- **Dönüş**: UninvoicedOrderRow[] — `data` dizisi `faturasizSatir` ile map'lenir
 
 ### [N9_NASIL] AST Pointer: src/lib/services/orderInvoice.service.ts::createInvoice
-- **params**: `(supabase: SupabaseClient<Database>, input: CreateInvoiceInput)`
+- **params**: `supabase` (SupabaseClient<Database>), `input` (CreateInvoiceInput)
 - **ic_degiskenler**:
-  - `invoiceNo` — input.invoiceNo değerinin trim edilmiş hali
-  - `authData` — supabase.auth.getUser() ile elde edilen kullanıcı verisi
-  - `data` — Supabase insert sorgusundan dönen eklenen satır verisi
-  - `error` — Supabase insert sorgusundan dönen hata nesnesi
-- **Dönüş**: `Promise<OrderInvoiceRow>` (yeni oluşturulan fatura satırı)
+  - `invoiceNo` — `input.invoiceNo.trim()` ile boşluklardan arındırılmış fatura numarası; boş ise hata fırlatılır
+  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi; `authData?.user?.id` ile kullanıcı ID'si alınır
+  - `data` — `supabase.from(DEFTER as never).insert({ order_id: input.orderId, invoice_no: invoiceNo, invoice_date: input.invoiceDate, invoice_type: input.invoiceType ?? null, issued_by: authData?.user?.id ?? null, note: input.note?.trim() || null } as never).select('*').single()` sorgusundan dönen tekil kayıt
+  - `error` — sorgu sonucu oluşan hata; varsa throw ile fırlatılır
+- **Dönüş**: OrderInvoiceRow — `data` `faturaSatiri` ile dönüştürülerek döner
 
 ---
 
@@ -259,26 +198,26 @@ graph TD
     orderInvoice_service_ts__metin["metin"]
     orderInvoice_service_ts__metinVeyaBos["metinVeyaBos"]
     orderInvoice_service_ts__sayiVeyaBos["sayiVeyaBos"]
-    orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__metinVeyaBos
-    orderInvoice_service_ts__faturaSatiri --> orderInvoice_service_ts__metin
     orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__sayiVeyaBos
+    orderInvoice_service_ts__faturaSatiri --> orderInvoice_service_ts__metin
     orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__metin
     orderInvoice_service_ts__createInvoice --> orderInvoice_service_ts__faturaSatiri
     orderInvoice_service_ts__faturaSatiri --> orderInvoice_service_ts__metinVeyaBos
+    orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__metinVeyaBos
 ```
 
 ## NODE ID STANDARD
 
-  file: src\lib\services\orderInvoice.service.ts
-  function: src\lib\services\orderInvoice.service.ts::metin
-  function: src\lib\services\orderInvoice.service.ts::metinVeyaBos
-  function: src\lib\services\orderInvoice.service.ts::sayiVeyaBos
-  function: src\lib\services\orderInvoice.service.ts::faturaSatiri
-  function: src\lib\services\orderInvoice.service.ts::faturasizSatir
-  function: src\lib\services\orderInvoice.service.ts::listInvoices
-  function: src\lib\services\orderInvoice.service.ts::listInvoicesForOrder
-  function: src\lib\services\orderInvoice.service.ts::listUninvoicedPaidOrders
-  function: src\lib\services\orderInvoice.service.ts::createInvoice
+  file: orderInvoice.service.ts
+  function: orderInvoice.service.ts::metin
+  function: orderInvoice.service.ts::metinVeyaBos
+  function: orderInvoice.service.ts::sayiVeyaBos
+  function: orderInvoice.service.ts::faturaSatiri
+  function: orderInvoice.service.ts::faturasizSatir
+  function: orderInvoice.service.ts::listInvoices
+  function: orderInvoice.service.ts::listInvoicesForOrder
+  function: orderInvoice.service.ts::listUninvoicedPaidOrders
+  function: orderInvoice.service.ts::createInvoice
 
 ---
 

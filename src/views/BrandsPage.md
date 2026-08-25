@@ -2,43 +2,52 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx
-skeleton_hash: bbdc152371d7327d
+source_path: C:\tmp\wt-supurme\src\views\BrandsPage.tsx
+skeleton_hash: 48d807cf5a39178b
 entity_hashes:
   func:BrandsPage: 7fe8abffb7e6dbf9
   overview: 3003d757bf1d8636
   style_tokens: 583cff7322941abd
-generated_at: 2026-06-19T20:50:29Z
+generated_at: 2026-08-25T07:29:18Z
 ---
 
 ## Genel Bakış
-BrandsPage, Venthub HVAC platformunda markaları listleyen tek bileşenli bir React sayfa modülüdür. Sayfa, markaları görsel ve interaktif bir arayüzle kullanıcılara sunarak navigasyon ve keşif deneyimini destekler. Uluslararasılaştırma, erişilebilirlik ve performans optimizasyonları gibi modern web standartlarına uygun olarak tasarlanmıştır.
+
+BrandsPage, `src/views` klasöründe yer alan bir React sayfa bileşenidir. Modül, tek bir dışa aktarılan bileşen içerir ve markalarla ilgili bir görünüm sayfası olarak tanımlanmıştır.
 
 ## Fonksiyon Grupları
-### Marka Sayfası Görünümü
-Modülün tek bileşeni olan BrandsPage, markaların listelendiği premium seviye arayüzü render eder.
+
+### Sayfa Bileşeni
+Bu modülün tek bileşeni olan BrandsPage, markalar sayfasının görünümünü ve davranışını tanımlar. React fonksiyonel bileşeni olarak dışa aktarılır.
 - BrandsPage
+
+## Bağımlılıklar ve Mimari Notlar
+
+- Modülde yalnızca tek bir fonksiyon (bileşen) bulunduğu için iç fonksiyon çağrı ilişkisi bulunmamaktadır.
+- `src/views` klasöründe konumlanması, bu bileşenin uygulamanın üst düzey sayfa bileşenlerinden biri olduğunu gösterir.
+- Dış bağımlılıklar ve alt bileşen kullanımı hakkında verilen listede bilgi bulunmamaktadır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** `BrandsPage` fonksiyonunun gövdesi verilmemiştir. Fonksiyon imzası yalnızca parametre almayan ve `React.FC` döndüren bir bileşen olduğunu gösterir. Modül sabitleri ve eski doküman da bulunmadığından, fonksiyon gövdesi olmadan bu bileşenin doğru çalışması için hangi koşulların var olması gerektiğine dair bilgi çıkarılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### BrandsPage
-**Ne yapar**: BrandsPage, uygulamanın premium seviyede tasarlanmış "Markalar" sayfasını render eden bir React bileşenidir. Bu sayfa, kullanıcıya markaları görsel ve interaktif bir biçimde sunar. Bileşen, modern web standartlarına uygun olarak uluslararasılaştırma (i18n), erişilebilirlik (A11y) ve performans optimizasyonları ile donatılmıştır.
+**Ne yapar**: Premium "Markalar" sayfasını oluşturan bir React bileşenidir. Bileşen, i18n (çoklu dil desteği), A11y (erişilebilirlik) ve performans optimizasyonları ile modernize edilmiştir.
 
-**Nasıl yapar**: Fonksiyon, bir React fonksiyonel bileşeni (FC) olarak tanımlanmıştır. Bileşen, marka verilerini ve sayfa düzenini oluşturarak JSX olarak döndürür. Dahili mantığı, i18n modülleri ile çoklu dil desteği, A11y standartları ile ekran okuyucu ve klavye navigasyonu uyumluluğu ve performans optimizasyon techniques ile hızlı yükleme ve akıcı kullanıcı deneyimi sağlamak üzere yapılandırılmıştır.
+**Nasıl yapar**: `BrandsPage` adlı fonksiyon, herhangi bir parametre almadan çağrılır ve bir React fonksiyon bileşeni (`React.FC`) döndürür. Docstring bilgisine göre bileşen, uluslararasılaştırma (i18n), erişilebilirlik standartları (A11y) ve performans iyileştirmeleri uygulanmış şekilde tasarlanmıştır. Fonksiyonun iç mantığı ve hangi alt bileşenleri veya hook'ları kullandığı verilen kaynakta belirtilmemiştir.
 
 **Parametreler**:
-- Fonksiyona ait açıkça belirtilmiş herhangi bir parametre yoktur. Bileşen, props almayan veya varsayılan değerlerle çalışan bağımsız bir sayfa yapısıdır.
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: `React.FC` — Bileşen, React'ın Functional Component tipinde bir JSX yapısı döndürür. Bu yapı, Markalar sayfasının tamamını temsil eden kullanıcı arayüzünü içerir.
+**Dönüş**: `React.FC` — React fonksiyon bileşeni döndürür. Bu, JSX elementi üreten ve bir sayfa bileşeni olarak render edilebilen bir bileşendir.
 
 ---
 
@@ -58,24 +67,28 @@ Modülün tek bileşeni olan BrandsPage, markaların listelendiği premium seviy
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx::BrandsPage
+### [N1_NASIL] AST Pointer: src/views/BrandsPage.tsx::BrandsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; sayfa içindeki tüm metinleri lokalize etmek için kullanılır.
-  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota nesnesi; marka sayfası URL'lerini lokalize olarak oluşturur (örn. `Routes.brand(brand.slug)`).
-  - `brands` — `HVAC_BRANDS` sabitinden atanan, tüm HVAC markalarını içeren dizi; harita içinde dönülerek her marka kartı oluşturulur.
-  - `heroBadgeRef` — Hero bölümündeki badge elemanı için React ref; `useScrollAnimation` hook'una bağlanarak scroll animasyonu tetiklemek için kullanılır.
-  - `heroBadgeVisible` — Hero badge'in görünürlük durumu布尔; scroll animasyonu için belirlenen eşik değer (0.2) aşıldığında `true` olur ve animasyon sınıflarını tetikler.
-  - `brandsGridRef` — Brands grid bölümü için React ref; `useScrollAnimation` hook'una bağlanarak scroll animasyonu tetiklemek için kullanılır.
-  - `brandsGridVisible` — Brands grid'in görünürlük durumu布尔; scroll animasyonu için belirlenen eşik değer (0.05) aşıldığında `true` olur ve animasyon sınıflarını tetikler.
-- **Dönüş**: JSX elemanı (React.FC); tüm sayfa yapısını (hero, marka gridi, güven bölümü) içeren bir React bileşeni.
+  - `t` — `useI18n()` hook'undan destruct edilen çeviri fonksiyonu; sayfa içindeki tüm metinleri (`brands.pageTitle`, `brands.seoDesc`, `brands.sectionTitle`, `brands.eyebrow`, `brands.pageSubtitle`, `brands.aboutBrand`, `brands.exploreBrand`, `brands.trust.eyebrow`, `brands.trust.title`, `brands.trust.description`, `brands.trust.original`, `brands.trust.standard`, `brands.trust.imageAlt`, `brands.page.statGlobal`) yerelleştirmek için kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rotalar nesnesi; `Routes.brand(brand.slug)` çağrısıyla her markanın detay sayfasına yönlendirme URL'i üretmek için kullanılır
+  - `brands` — `HVAC_BRANDS` sabitinden atanan marka dizisi; `.map()` ile dönülerek her marka için kart bileşeni oluşturulur. Her eleman `brand.slug`, `brand.name`, `brand.country`, `brand.specialty`, `brand.description` alanlarına sahiptir
+  - `heroBadgeRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })` hook'undan dönen ref; hero bölümündeki badge `<div>` öğesine `ref` prop'u olarak atanır, kaydırma animasyonu tetikleme noktasını belirler
+  - `heroBadgeVisible` — `useScrollAnimation` hook'undan dönen boolean; hero badge'in görünür olup olmadığını belirtir, `scrollAnimationClasses.fadeUp(heroBadgeVisible)` ile CSS sınıfı seçiminde kullanılır
+  - `brandsGridRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.05 })` hook'undan dönen ref; markalar grid'inin `<div>` öğesine `ref` prop'u olarak atanır
+  - `brandsGridVisible` — `useScrollAnimation` hook'undan dönen boolean; markalar grid'inin görünür olup olmadığını belirtir, `scrollAnimationClasses.fadeUp(brandsGridVisible)` ile CSS sınıfı seçiminde kullanılır
+  - `brand` — `brands.map()` içindeki her marka nesnesi; `brand.slug` (Link href ve key), `brand.name` (BrandIcon ve h2 başlık), `brand.country` (ülke etiketi), `brand.specialty` (uzmanlık alanı), `brand.description` (açıklama paragrafı) alanlarına erişilir
+  - `index` — `brands.map()` içindeki döngü indeksi; `scrollAnimationClasses.staggerChild(index)` çağrısında gecikmeli animasyon stili hesaplamak için kullanılır
+  - `word` — `t('brands.eyebrow').split(' ').map()` içindeki her kelime; üçüncü kelime (i === 2) kalın italik stil ile, diğerleri normal metin olarak render edilir
+  - `i` — `t('brands.eyebrow').split(' ').map()` içindeki kelime indeksi; `i === 2` kontrolüyle üçüncü kelimeye özel stil uygulanır, ayrıca `React.Fragment`'a `key` prop'u olarak atanır
+- **Dönüş**: JSX elementi — `<div className="min-h-screen bg-white">` kök elemanı içinde `<Seo>`, hero bölümü, markalar grid bölümü ve güven/ağ bölümü olmak üzere dört ana bölüm render eder
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\BrandsPage.tsx
-  function: src\views\BrandsPage.tsx::BrandsPage
+  file: BrandsPage.tsx
+  function: BrandsPage.tsx::BrandsPage
 
 ---
 

@@ -2,84 +2,72 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\lib\services\quoteService.ts
-skeleton_hash: cb31595bd379abb2
+source_path: C:\tmp\wt-supurme\src\lib\services\quoteService.ts
+skeleton_hash: 5b2229e6ba5be8cf
 entity_hashes:
-  func:createQuoteRequest: c534bc17ef0527bd
-  func:decideQuote: 959f5be4002a69b9
-  func:getQuoteDetail: d4af7bdc2b90a8a4
-  func:listMyQuotes: 592412cbc2203bb0
-  overview: a5589c6d2957e18f
-generated_at: 2026-08-17T11:09:03Z
+  func:createQuoteRequest: 0526cf1c9875b9b7
+  func:decideQuote: 7bc8e35d98813b40
+  func:getQuoteDetail: 6039e8643547210f
+  func:listMyQuotes: 37719d65071bbc37
+  overview: 328240015257680c
+generated_at: 2026-08-25T07:28:30Z
 ---
 
 ## Genel Bakış
-Bu modül, müşteri tekliflerinin (quote) tüm yaşam döngüsünü yöneten temel servis katmanıdır. Teklif taleplerinin oluşturulmasından, kullanıcıya özel listelenmesinden, detaylarının getirilmesinden ve nihai kabul/red kararlarının uygulanmasına kadar tüm iş akışlarını merkezi olarak sağlar. Fonksiyonlar, iş mantığını doğrudan veritabanı istemcisi (Supabase) üzerinden yürütür ve modül, uygulamanın teklif领域ındaki tüm veri işlemlerinden sorumludur.
+
+Bu modül, teklif (quote) nesnelerinin yaşam döngüsünü yönetir. Supabase veritabanı üzerinden teklif oluşturma, kullanıcıya ait teklifleri listeleme, tekil teklif detayını getirme ve teklife kabul veya red kararı verme işlemlerini sunar. Tüm fonksiyonlar ortak olarak `SupabaseClient<Database>` bağımlılığı alır ve veritabanı etkileşimini bu istemci üzerinden gerçekleştirir.
 
 ## Fonksiyon Grupları
-### Teklif Oluşturma
-Bu grup, yeni bir teklif talebinin iş mantığına uygun şekilde (en az bir kalem içerecek şekilde) başlatılmasını ve veritabanına yazılmasını sağlar.
-- `createQuoteRequest`
 
-### Teklif Sorgulama ve Güncelleme
-Bu grup, mevcut tekliflerin listelenmesi, detaylarının getirilmesi ve durumlarının (kabul/red) değiştirilmesi işlemlerini kapsar; okuma ve güncelleme odaklıdır.
-- `listMyQuotes`, `getQuoteDetail`, `decideQuote`
+### Teklif Oluşturma
+Yeni bir teklif isteği oluşturur ve veritabanına kaydeder. Oluşturulan teklif kaydını döndürür.
+- createQuoteRequest
+
+### Teklif Sorgulama
+Kullanıcıya ait teklifleri listeler veya belirli bir teklifin detaylı bilgisini (ilişkili kalemler dahil) getirir. `getQuoteDetail` bulunamayan durumda null döndürür.
+- listMyQuotes, getQuoteDetail
+
+### Teklif Karar Verme
+Mevcut bir teklifin durumunu kabul veya red olarak günceller. Fonksiyon, teklif kimliğini ve mevcut durumunu alır; yalnızca `accepted` veya `rejected` değerlerinden birini uygular.
+- decideQuote
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, teklif yaşam döngüsünü yönetir; tüm veri işlemleri authenticated Supabase istemcisi üzerinden gerçekleştirilir.
+**[Aksiyom 1]**: Eğer `quoteId` ile eşleşen bir teklif kaydı yoksa, `getQuoteDetail` fonksiyonu `null` döner.
 
-[Aksiyom 1]: Eğer Supabase istemcisi (`supabase`) geçerli ve authenticated bir oturum içermiyorsa, `listMyQuotes` fonksiyonu kullanıcıya ait teklifleri listelemez (boş liste veya hata döner).
+**[Aksiyom 2]**: Eğer `decision` parametresi `'accepted'` veya `'rejected'` dışında bir değer içeriyorsa, `decideQuote` fonksiyonu çağrılamaz; TypeScript derleme aşamasında tip hatası oluşur.
 
-[Aksiyom 2]: Eğer `createQuoteRequest` için verilen `input` parametresi `CreateQuoteRequestInput` şemasına uymuyorsa, teklif oluşturulamaz (validasyon hatası fırlatılır veya kayıt başarısız olur).
+**[Aksiyom 3]**: Eğer `decideQuote` fonksiyonuna verilen `quote` nesnesi `'id'` ve `'status'` alanlarını içermiyorsa, fonksiyon çağrılamaz; TypeScript derleme aşamasında tip hatası oluşur.
 
-[Aksiyom 3]: Eğer `getQuoteDetail` fonksiyonuna verilen `quoteId` ile eşleşen bir teklif veritabanında mevcut değilse, fonksiyon `null` döner.
+**[Aksiyom 4]**: Eğer `createQuoteRequest` fonksiyonuna geçerli bir `CreateQuoteRequestInput` sağlanmazsa, fonksiyon çağrılamaz; TypeScript derleme aşamasında tip hatası oluşur.
 
-[Aksiyom 4]: Eğer `decideQuote` fonksiyonuna verilen `quote.id` ile eşleşen teklif mevcut değilse veya teklifin mevcut durumu (`status`) karar verilebilir bir durumda değilse, karar uygulanamaz (hata fırlatılır).
-
-[Aksiyom 5]: Eğer `decideQuote` fonksiyonuna verilen `decision` parametresi `'accepted'` veya `'rejected'` değerlerinden biri değilse, fonksiyon TypeError fırlatır (TypeScript derleme zamanı garantisi).
-
-[Aksiyom 6]: Eğer `decideQuote` fonksiyonuna verilen `quote` nesnesinin `status` alanı, teklifin veritabanındaki gerçek durumuyla uyuşmuyorsa (örn:Race condition), karar uygulanamaz veya tutarsız durum oluşur.
-
-[Aksiyom 7]: Eğer `listMyQuotes` fonksiyonu çağrıldığında Supabase istemcisi üzerinde RLS (Row Level Security) politikaları aktif değilse, kullanıcı tüm teklifleri görebilir (veri sızıntısı riski).
+**[Aksiyom 5]**: Eğer `supabase` istemcisi geçerli bir oturumla yapılandırılmamışsa, `listMyQuotes` fonksiyonunun hangi kullanıcıya ait teklifleri döndüreceği belirlenemez; bu bilgi fonksiyon gövdesinden çıkarılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### createQuoteRequest
-**Ne yapar**: Yeni bir teklif talebi (başlık) ve ilişkili teklif kalemlerini oluşturur. Bu, süreçteki ilk adımdır; kalemsiz bir talep oluşturamaz.
-**Nasıl yapar**: Fonksiyon, gelen `input` nesnesindeki `items` dizisinin boş olup olmadığını kontrol eder; boşsa hata fırlatır. Ardından `venthub_quotes` tablosuna ana kaydı ekler ve `select().single()` ile oluşturulan satırı geri döner. Başarılı ekleme sonrası, `venthub_quote_items` tablosuna her bir kalem için bir satır ekler. Kalem ekleme işlemi başarısız olursa hata yükseltilir; bu durumda yarı-kalmış bir başlık kaydı (`requested` durumunda) oluşmuş olur, ancak bu kasıtlı bir "fail-closed" (hata durumunda güvenli kapanış) tasarım kararıdır ve usersyenin tekrar denemesine olanak tanır.
+**Ne yapar**: Yeni bir teklif talebi oluşturur. Başlık bilgisini ve en az bir kalem (ürün kalemi) snapshot'ını veritabanına kaydeder. Cetvel Q1 kuralı gereği içerik kopyalanır, ancak kaynak satır ID'leri kopyalanmaz. Kalemsiz teklif talebi oluşturulamaz; bu durumda hata fırlatılır.
+
+**Nasıl yapar**: Fonksiyon önce `input.items` dizisinin boş olup olmadığını kontrol eder; boşsa `'quote request needs at least one item'` hatası fırlatır. Ardından `venthub_quotes` tablosuna başlık satırını (`user_id`, `source`, `source_project_id`) ekler ve eklenen satırı geri döndürür. `sourceProjectId` tanımsızsa `null` olarak kaydedilir. Başlık başarıyla oluşturulduktan sonra `venthub_quote_items` tablosuna her bir kalem için (`quote_id`, `product_id`, `product_name`, `qty`, `note`) satırları toplu olarak eklenir. Kalem yazımı başarısız olursa hata yükseltilir; yarım başlık veritabanında kalır (ticari kayıt silinmez politikası gereği DELETE politikası bilinçli olarak yoktur) ve kullanıcıdan yeniden denemesi istenir. Bu davranış fail-closed prensibinin görünür bir uygulamasıdır.
+
 **Parametreler**:
-- supabase: `SupabaseClient<Database>` — Veritabanı işlemleri için Supabase istemcisi örneği.
-- input: `CreateQuoteRequestInput` — Teklif talebinin başlık ve kalem verilerini içeren giriş nesnesi (userId, source, sourceProjectId ve items alanlarını barındırır).
-**Dönüş**: `Promise<QuoteRow>` — Yeni oluşturulan teklif başlık satırını döner.
+- `supabase`: `SupabaseClient<Database>` — Supabase istemci nesnesi; veritabanı işlemlerini yürütür.
+- `input`: `CreateQuoteRequestInput` — Teklif talebinin tüm verilerini içeren girdi nesnesi. `userId` (talebi oluşturan kullanıcı), `source` (kaynak bilgisi), `sourceProjectId` (opsiyonel kaynak proje ID'si) ve `items` (ürün kalemleri dizisi; her biri `productId`, `productName`, `qty`, `note` alanlarını içerir) alanlarını barındırır.
+
+**Dönüş**: `Promise<QuoteRow>` — Oluşturulan teklif başlık satırını temsil eden `QuoteRow` nesnesi. Kalem bilgileri bu dönüş değerinde yer almaz; yalnızca başlık satırı döndürülür.
 
 ### listMyQuotes
-**Ne yapar**: Oturum açmış kullanıcının tüm tekliflerini, her birinin ilgili kalemleriyle birlikte, en yeniden en eskiye doğru sıralı olarak listeler.
-**Nasıl yapar**: İki ayrı Supabase sorgusu kullanır. İlk sorguda `venthub_quotes` tablosundan kullanıcının tüm tekliflerini (RLS politikaları tarafından filtrelenerek) `created_at` alanına göre azalan sırada çeker. İkinci sorguda, birinci sorgudaki tüm teklif ID'lerini (`quote_id`) içeren `venthub_quote_items` kayıtlarını çekip `created_at`艺术ına göre artan sırada sıralar. Son olarak, elde edilen kalem listesini `quote_id` alanına göre bir haritada gruplayarak her teklif nesnesine `items` dizisini ekler ve sonucu döner.
-**Parametreler**:
-- supabase: `SupabaseClient<Database>` — Veritabanı işlemleri için Supabase istemcisi örneği.
-**Dönüş**: `Promise<QuoteWithItems[]>` — Her biri `items` alanını içeren teklif nesnelerinden oluşan diziyi döner.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getQuoteDetail
-**Ne yapar**: Belirli bir teklifin detaylı bilgisini, tüm kalemleriyle birlikte getirir. Eğer belirtilen ID ile eşleşen bir kayıt yoksa veya satır düzeyindeki güvenlik (RLS) politikası kaydı filtreliyorsa `null` döner.
-**Nasıl yapar**: İlk olarak `venthub_quotes` tablosunda `id` alanı verilen `quoteId` ile eşleşen kaydı `maybeSingle()` kullanarak çeker. Kayıt bulunamazsa `null` döner. Kayıt bulunursa, `venthub_quote_items` tablosunda `quote_id` alanı bu teklife ait olan kalemleri `created_at`艺术ına göre artan sırada çeker ve teklif nesnesinin `items` alanına ekleyerek sonucu döner.
-**Parametreler**:
-- supabase: `SupabaseClient<Database>` — Veritabanı işlemleri için Supabase istemcisi örneği.
-- quoteId: `string` — Detayları getirilecek teklifin benzersiz tanımlayıcısı.
-**Dönüş**: `Promise<QuoteWithItems | null>` — Bulunan teklif detayı veya `null`.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### decideQuote
-**Ne yapar**: Müşteri tarafında bir teklife yönelik nihai kararı (kabul veya ret) kaydeder ve teklifin durumunu buna göre günceller.
-**Nasıl yapar**: İlk olarak mevcut durumdan hedef duruma geçişin iş kurallarına uygun olup olmadığını kontrol eder (`allowedCustomerQuoteActions` fonksiyonuyla). Uygunsa, `venthub_quotes` tablosunda ilgili teklifin `id` alanını eşleştirerek `status` alanını yeni karar (`accepted` veya `rejected`) ile günceller. Geçiş kuralı ihlal edilirse hata fırlatır. Bu kontrol, veritabanı seviyesindeki tetikleyiciler ve RLS politikalarıyla sunucu tarafında da uygulanır.
-**Parametreler**:
-- supabase: `SupabaseClient<Database>` — Veritabanı işlemleri için Supabase istemcisi örneği.
-- quote: `Pick<QuoteRow, 'id' | 'status'>` — Güncellenecek teklifin `id` ve mevcut `status` alanlarını içeren nesne. Bu, fonksiyonun mevcut durumu doğrulaması için gereklidir.
-- decision: `Extract<QuoteStatus, 'accepted' | 'rejected'>` — Müşterinin vereceği karar; sadece 'accepted' veya 'rejected' değerlerinden biri olabilir.
-**Dönüş**: `Promise<void>` — İşlem başarılıysa herhangi bir değer dönmez; hata oluşursa bir hata fırlatır.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -131,37 +119,53 @@ type QuoteSource = 'pdp' | 'cart' | 'project'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/services/quoteService.ts::createQuoteRequest
-- **params**: (supabase: SupabaseClient<Database>, input: CreateQuoteRequestInput)
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `input` — CreateQuoteRequestInput tipinde, teklif talebi girdisi
 - **ic_degiskenler**:
-    - `quote` — supabase.from('venthub_quotes').insert().select().single() ile oluşturulan teklif satırı (QuoteRow), returned
-    - `error` — quote insert işleminde oluşan hata nesnesi
-    - `itemsError` — venthub_quote_items insert işleminde oluşan hata nesnesi
-- **Dönüş**: QuoteRow (quote)
+  - `input.items.length` — gelen kalemlerin sayısı; 0 ise "quote request needs at least one item" hatası fırlatılır
+  - `input.userId` — venthub_quotes tablosuna yazılacak kullanıcı kimliği
+  - `input.source` — venthub_quotes tablosuna yazılacak kaynak bilgisi
+  - `input.sourceProjectId` — venthub_quotes tablosuna yazılacak kaynak proje kimliği; null ise `null` olarak gönderilir (`?? null`)
+  - `quote` — venthub_quotes tablosuna insert sonrası `.select().single()` ile dönen tekil satır (QuoteRow)
+  - `error` — venthub_quotes insert işlemi sonrası oluşan hata; varsa fırlatılır
+  - `itemsError` — venthub_quote_items toplu insert işlemi sonrası oluşan hata; varsa fırlatılır (başlık silinmez, yarım kayıt 'requested' durumunda kalır)
+  - `item` — `input.items.map()` içindeki her bir kalem öğesi
+  - `item.productId` — kalem ürün kimliği, venthub_quote_items.product_id alanına yazılır
+  - `item.productName` — kalem ürün adı, venthub_quote_items.product_name alanına yazılır
+  - `item.qty` — kalem miktarı, venthub_quote_items.qty alanına yazılır
+  - `item.note` — kalem notu; null ise `null` olarak gönderilir (`?? null`), venthub_quote_items.note alanına yazılır
+  - `quote.id` — oluşturulan başlık satırının kimliği, her kalemin quote_id alanına atanır
+- **Dönüş**: `quote` (QuoteRow) — oluşturulan teklif başlık satırı
 
 ### [N2_NASIL] AST Pointer: src/lib/services/quoteService.ts::listMyQuotes
-- **params**: (supabase: SupabaseClient<Database>)
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
 - **ic_degiskenler**:
-    - `quotes` — supabase.from('venthub_quotes').select().order() ile çekilen tüm teklif satırları dizisi (QuoteRow[])
-    - `error` — quotes sorgusunda oluşan hata nesnesi
-    - `items` — supabase.from('venthub_quote_items').select().in().order() ile çekilen teklif kalemleri dizisi (QuoteItemRow[])
-    - `itemsError` — items sorgusunda oluşan hata nesnesi
-    - `byQuote` — quote_id bazında kalemleri gruplayan Map (Map<string, QuoteItemRow[]>)
-- **Dönüş**: QuoteWithItems[] (quotes.map ile oluşturulur, her quote'a items eklenir)
+  - `quotes` — venthub_quotes tablosundan `.select()` ile gelen tüm satırlar; `created_at` alanına göre azalan sıralanır
+  - `error` — quotes sorgusu sonrası oluşan hata; varsa fırlatılır
+  - `items` — venthub_quote_items tablosundan `.select()` ile gelen kalemler; `quotes` içindeki tüm `q.id` değerlerine eşleşenler (`.in('quote_id', ...)`) alınır, `created_at` alanına göre artan sıralanır
+  - `itemsError` — items sorgusu sonrası oluşan hata; varsa fırlatılır
+  - `byQuote` — `Map<string, QuoteItemRow[]>` tipinde, `quote_id` anahtarıyla gruplanmış kalem listeleri haritası
+  - `item` — `items ?? []` döngüsündeki her bir kalem satırı
+  - `item.quote_id` — kalem satırının ait olduğu teklif kimliği; Map anahtarı olarak kullanılır
+  - `list` — `byQuote.get(item.quote_id)` sonucu; yoksa boş dizi `[]` ile başlatılır, kalem eklenip Map'e geri yazılır
+  - `q` — `quotes.map()` içindeki her bir teklif satırı
+  - `q.id` — teklif satırının kimliği; Map'ten kalem listesi almak için kullanılır
+- **Dönüş**: `quotes.map((q) => ({ ...q, items: byQuote.get(q.id) ?? [] }))` — her teklif satırına `items` alanı eklenmiş QuoteWithItems dizisi; kalemsiz teklifler boş dizi alır
 
 ### [N3_NASIL] AST Pointer: src/lib/services/quoteService.ts::getQuoteDetail
-- **params**: (supabase: SupabaseClient<Database>, quoteId: string)
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `quoteId` — string tipinde, sorgulanacak teklif kimliği
 - **ic_degiskenler**:
-    - `quote` — supabase.from('venthub_quotes').select().eq().maybeSingle() ile çekilen tek teklif satırı (QuoteRow | null)
-    - `error` — quote sorgusunda oluşan hata nesnesi
-    - `items` — supabase.from('venthub_quote_items').select().eq().order() ile çekilen teklif kalemleri dizisi (QuoteItemRow[])
-    - `itemsError` — items sorgusunda oluşan hata nesnesi
-- **Dönüş**: QuoteWithItems | null (quote ve items birleştirilerek döner, quote yoksa null)
+  - `quote` — venthub_quotes tablosundan `.eq('id', quoteId).maybeSingle()` ile gelen tekil satır; bulunamazsa `null`
+  - `error` — quote sorgusu sonrası oluşan hata; varsa fırlatılır
+  - `items` — venthub_quote_items tablosundan `.eq('quote_id', quoteId)` ile gelen kalemler; `created_at` alanına göre artan sıralanır
+  - `itemsError` — items sorgusu sonrası oluşan hata; varsa fırlatılır
+- **Dönüş**: `{ ...quote, items: items ?? [] }` (QuoteWithItems) — teklif satırına `items` alanı eklenmiş nesne; quote bulunamazsa `null`
 
 ### [N4_NASIL] AST Pointer: src/lib/services/quoteService.ts::decideQuote
-- **params**: (supabase: SupabaseClient<Database>, quote: Pick<QuoteRow, 'id' | 'status'>, decision: Extract<QuoteStatus, 'accepted' | 'rejected'>)
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `quote` — Pick<QuoteRow, 'id' | 'status'> tipinde, mevcut teklif durumu; `decision` — Extract<QuoteStatus, 'accepted' | 'rejected'> tipinde, verilen karar
 - **ic_degiskenler**:
-    - `error` — supabase.from('venthub_quotes').update().eq() işleminde oluşan hata nesnesi
-- **Dönüş**: void (sadece yan etki: quote.status güncellenir)
+  - `allowedCustomerQuoteActions(quote.status)` — mevcut duruma izin verilen geçiş aksiyonlarını döndüren fonksiyon çağrısı; `decision` bu listede yoksa "invalid customer quote transition" hatası fırlatılır
+  - `error` — venthub_quotes tablosunda `.update({ status: decision }).eq('id', quote.id)` sonrası oluşan hata; varsa fırlatılır
+- **Dönüş**: yok (void) — yan etki olarak venthub_quotes tablosundaki ilgili satırın `status` alanı `decision` değerine güncellenir
 
 ---
 
@@ -177,11 +181,11 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: src\lib\services\quoteService.ts
-  function: src\lib\services\quoteService.ts::createQuoteRequest
-  function: src\lib\services\quoteService.ts::listMyQuotes
-  function: src\lib\services\quoteService.ts::getQuoteDetail
-  function: src\lib\services\quoteService.ts::decideQuote
+  file: quoteService.ts
+  function: quoteService.ts::createQuoteRequest
+  function: quoteService.ts::listMyQuotes
+  function: quoteService.ts::getQuoteDetail
+  function: quoteService.ts::decideQuote
 
 ---
 

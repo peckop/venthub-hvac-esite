@@ -2,23 +2,23 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\types\database.ts
-skeleton_hash: 36c44056b6c26a54
+source_path: C:\tmp\wt-supurme\src\types\database.ts
+skeleton_hash: 90019bd1d8766b4d
 entity_hashes:
   overview: 60fe8414ff851e26
-generated_at: 2026-06-19T20:48:16Z
+generated_at: 2026-08-25T07:28:28Z
 ---
 
 ## Genel Bakış
-`src/types/database.ts`, projenin veritabanı şeması için merkezi TypeScript tip erişimi sağlayan纯 typoloji modülüdür. Dosya, yalnızca `./database.types` modülünden `Database` tipini yeniden export ederek tüm projenin bu türe tutarlı ve tip-güvenli bir şekilde erişmesini garanti altına alır. Çalıştırılabilir kod, fonksiyon veya ortam değişkeni içermeyen bu modül, veritabanı tabloları ve ilişkileri hakkında derleyiciye bilgi sağlayarak Servisler, Hook'lar ve ORM katmanları arasında tip uyumsuzluğunun önüne geçer.
+Bu modül, veritabanı ile ilgili TypeScript tip tanımlarını içe aktaran bir tip modülüdür. './database.types' dosyasından `Database` tipini import ederek projenin diğer bölümlerinin kullanımına sunar. Modülde fonksiyon, sabit veya değişken bulunmaz; yalnızca tip içe aktarma işlemi gerçekleştirilir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, yalnızca TypeScript tip tanımları içeren纯 (pure) bir yeniden dışa aktarma (re-export) modülüdür. Çalıştırılabilir kod, fonksiyon gövdesi veya sabit değer içermediğinden, fonksiyon gövdesinden türetilebilecek mimari aksiyom bulunmamaktadır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Bu modül için özel aksiyom tanımlanmamıştır.**
+**Neden:** Modülde fonksiyon tanımları ve modül sabitleri bulunmamaktadır. Aksiyomlar yalnızca fonksiyon gövdelerinden üretildiğinden, bu dosyadan çıkarılacak mimari varsayım bulunmamaktadır. Dosya büyük olasılıkla yalnızca tip tanımları (interface, type alias vb.) içermektedir; ancak bu bilgi fonksiyon gövdesinden gelmediği için aksiyom olarak yazılmamıştır.
 
 ---
 
@@ -77,17 +77,13 @@ type Project = Tables<'user_projects'>
 
 ## AST POINTERS
 
-Bu dosyada fonksiyon bulunmamaktadır.
-
-**Dosya:** `C:\Users\alize\venthub-hvac\src\types\database.ts`
-
-**İçerik:** Dosya sadece `./database.types` modülünden `Database` tipini import etmektedir. Herhangi bir fonksiyon, sabit veya sınıf tanımı içermemektedir. Bu bir type definition dosyasıdır.
+Bu dosyada (`src/types/database.ts`) tanımlı fonksiyon bulunmamaktadır. Dosya yalnızca `Database` tipini `./database.types` modülünden içe aktaran bir `import` ifadesi içermektedir.
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\types\database.ts
+  file: database.ts
 
 ---
 

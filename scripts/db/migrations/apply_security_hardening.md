@@ -2,47 +2,68 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\scripts\db\migrations\apply_security_hardening.js
-skeleton_hash: 286dac39d6297c4c
+source_path: C:\tmp\wt-supurme\scripts\db\migrations\apply_security_hardening.js
+skeleton_hash: b81257f935961570
 entity_hashes:
-  func:loadEnv: cdc6628f011fa912
-  func:run: fd679bba8501db22
+  func:loadEnv: 2234574fdca17aba
+  func:run: af6aeb54f3a087c5
   overview: af39be0dd406e441
-generated_at: 2026-06-02T07:48:34Z
+generated_at: 2026-08-25T07:22:54Z
 ---
 
 ## Genel Bakış
-Bu modül, veritabanı güvenliğini artırmak için gerekli olan yapılandırma ve izin ayarlarını otomatik olarak uygulayan bir migrasyon scriptidir. Ortam değişkenlerini yükleyerek veritabanı bağlantısını kurar ve güvenlik sertleştirme adımlarını sırasıyla çalıştırır.
+
+Bu modül, veritabanı güvenlik sertleştirme (security hardening) işlemlerini otomatik olarak uygulamak için kullanılan bir migration scriptidir. Ortam değişkenlerini yükleyerek yapılandırmayı okur ve veritabanı üzerinde güvenlik ayarlarını çalıştırmak üzere tasarlanmıştır.
 
 ## Fonksiyon Grupları
-### Ortam Yönetimi
-Veritabanı bağlantısı ve other configurations için gerekli ortam değişkenlerinin yüklenmesini sağlar.
+
+### Ortam Yapılandırması
+
+Modülün çalışması için gerekli ortam değişkenlerini ve yapılandırma değerlerini yükler. Bu fonksiyon, güvenlik sertleştirme parametrelerinin doğru kaynaktan okunmasını sağlar.
+
 - loadEnv
 
-### Güvenlik Uygulama
-Güvenlik sertleştirme işlemlerini asenkron olarak yürütür ve veritabanı üzerindeki izin, rol veya yapılandırma değişikliklerini hayata geçirir.
+### Güvenlik Sertleştirme Uygulaması
+
+Asenkron olarak çalışan ana işlevsellik. Veritabanı üzerinde güvenlik sertleştirme adımlarını sırasıyla uygular ve işlemi tamamlar.
+
 - run
+
+## Bağımlılıklar
+
+**İç Bağımlılıklar:** `run` fonksiyonu, ortam değişkenlerini kullanabilmek için `loadEnv` fonksiyonuna bağlıdır.
+
+**Dış Bağımlılıklar:** Veritabanı bağlantısı ve ortam değişken dosyası (.env benzeri) gerektirir. Modül adından anlaşıldığı üzere, `scripts/db/migrations` dizininde konumlandığı için proje genelindeki veritabanı migration altyapısıyla uyumlu çalışır.
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### loadEnv
-**Ne yapar**: Projenin kök dizinindeki `.env` dosyasını okuyarak ortam değişkenlerini bir JavaScript nesnesine dönüştürür. Dosya mevcut değilse boş bir nesne döner, böylece çağrııcı tarafında güvenli bir şekilde kullanılabilir.
+**Ne yapar**: Projenin kök dizinindeki `.env` dosyasını okuyarak ortam değişkenlerini bir nesne (obje) olarak yükler. Dosya mevcut değilse boş bir nesne döndürür.
 
-**Nasıl yapar**: `.env` dosyasını UTF-8 olarak okuduktan sonra satır satır ayrıştırır. Her satırda önce `\r` karakterlerini temizler, ardından `#` ile başlayan yorum satırlarını atlar. Boş olmayan satırlarda `=` karakterine göre anahtar-değer ayrımı yapar; değerin başındaki ve sonundaki tekli veya çiftli tırnak işaretlerini kaldırır. Bu sayede `"value"`, `'value'` veya `value` formatındaki tüm değerler düzgün şekilde ayrıştırılır. Eşittir karakteri içeren değerlerde (örn. connection string'ler) `parts.slice(1).join('=')` yaklaşımı ile değer portionunun tamamı korunur.
+**Nasıl yapar**: Öncelikle `rootDir` ve `.env` dosya yolunu birleştirir. Dosya mevcut değilse (`fs.existsSync` ile kontrol) boş nesne döndürerek işlemi sonlandırır. Dosya mevcutsa, içeriğini UTF-8 formatında okur. Her satırı tek tek işlerken önce satır sonu karakterlerini (`\r`) temizler, ardından `#` işaretinden sonrasını yorum olarak kabul edip atar. Kalan temiz satırı `=` işaretine göre böler. İlk parça anahtar (key), geri kalan parçalar `=` ile birleştirilerek değer (value) olarak atanır. Değerin başındaki ve sonundaki tek/çift tırnak işaretleri kaldırılır. Sonuçta elde edilen anahtar-değer çiftleri bir nesneye eklenir ve bu nesne döndürülür.
 
 **Parametreler**:
-Bu fonksiyon herhangi bir parametre almaz.
+- Bu fonksiyon parametre almaz.
 
-**Dönüş**: `Object` — `.env` dosyasındaki anahtar-değer çiftlerini içeren bir nesne. Dosya yoksa `{}` boş nesne döner.
+**Dönüş**: `env` — `.env` dosyasındaki anahtar-değer çiftlerini içeren bir nesne (object). Dosya bulunamazsa boş nesne (`{}`) döner.
 
 ### run
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: fs::fs
+- import: path::path
+- import: pg::pg
+- import: url::fileURLToPath
 
 ---
 
@@ -58,45 +79,40 @@ Bu fonksiyon herhangi bir parametre almaz.
 ### [N1_NASIL] AST Pointer: scripts/db/migrations/apply_security_hardening.js::loadEnv
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `envPath` — `.env` dosyasının tam dosya yolu (`rootDir` ile `path.join` ile birleştirilmiş)
-  - `envContent` — `.env` dosyasının `utf8` olarak okunmuş ham string içeriği
-  - `env` — parse edilmiş environment değişkenlerini `{key: value}` formatında tutan boş obje
-  - `line` — `envContent.split('\n')` ile elde edilen her bir satır (forEach callback parametresi)
-  - `cleanLine` — `\r` karakterleri temizlenmiş, `#` ile başlayan yorum kısımları çıkarılmış, trimmed edilmiş satır
-  - `parts` — `cleanLine.split('=')` ile `=` karakterine göre bölünmüş array; `parts[0]` key, `parts[1..]` value katmanları
-  - `key` — `parts[0].trim()` ile elde edilen environment değişkeninin adı
-  - `value` — `parts.slice(1).join('=').trim()` ile birleştirilmiş, baştaki/sondaki tırnak işaretleri `replace(/^['"]|['"]$/g, '')` ile kaldırılmış değişken değeri
-- **Dönüş**: `env` objesi — `{key: value}` çiftlerinden oluşan parse edilmiş environment sözlüğü; `.env` dosyası yoksa boş obje `{}` döner
-
----
+  - `envPath` — `.env` dosyasının tam yolu
+  - `envContent` — `.env` dosyasının okunan ham içeriği
+  - `env` — ortam değişkenlerini tutan nesne
+  - `line` — `.env` dosyasındaki her bir satır
+  - `cleanLine` — yorumlardan (`#`) ve satır sonu karakterlerinden (`\r`) arındırılmış satır
+  - `parts` — satırın `=` karakteriyle bölünmüş hali
+  - `key` — ortam değişkeni adı
+  - `value` — ortam değişkeni değeri (tırnak işaretleri temizlenmiş)
+- **Dönüş**: `env` nesnesi (anahtar-değer çiftlerini içerir)
 
 ### [N2_NASIL] AST Pointer: scripts/db/migrations/apply_security_hardening.js::run
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `env` — `loadEnv()` çağrı sonucu dönen environment değişkenleri sözlüğü
-  - `connectionString` — `env.DATABASE_URL` erişimi ile elde edilen PostgreSQL bağlantı URL'si; `env` dict subscript access
-  - `tryConnect` — iç içe tanımlanmış async fonksiyon; parametresi `url`, veritabanı bağlantısı denemesi yapar, başarılıysa `client` nesnesi, başarısızsa `null` döner
-    - *tryConnect内部変数*:
-      - `url` — tryConnect parametresi, bağlanılacak veritabanı URL'si
-      - `maskedUrl` — `url.replace(/:([^:@]+)@/, ':****@')` ile parolası maskelenmiş URL (loglama amaçlı)
-      - `client` — `new Client({connectionString: url, ssl: {rejectUnauthorized: false}, connectionTimeoutMillis: 15000})` ile oluşturulmuş `pg.Client` nesnesi
-      - `err` — `client.connect()` sırasında yakalanan hata nesnesi
-  - `client` — `tryConnect(connectionString)` çağrı sonucu; başarılıysa `pg.Client` nesnesi, başarısızsa `null`
-  - `directUrl` — pooler bağlantısı başarısızsa denenen alternatif URL; `:6543` → `:5432`, `.pooler.` → `.`, `?pgbouncer=true` → kaldırılmış hali
-  - `comUrl` — `.supabase.co` başarısızsa denenen `.supabase.com` varyasyonu
-  - `migrationFile` — `'supabase/migrations/20260602080000_security_hardening_fixes.sql'` sabit string, uygulanacak SQL dosyasının göreli yolu
-  - `sqlPath` — `path.join(rootDir, migrationFile)` ile elde edilen migration dosyasının tam yolu
-  - `sql` — `fs.readFileSync(sqlPath, 'utf8')` ile okunmuş SQL migration içeriği
-  - `err` — `client.query(sql)` veya `tryConnect` içinde yakalanan hata nesnesi
-- **Dönüş**: yok — fonksiyon success durumunda migration'ı çalıştırıp sessizce biter; hata durumunda `process.exit(1)` ile sürecin sonlanmasını tetikler (yan etkiler: DB bağlantısı, SQL migration yürütülmesi, konsol loglama)
+  - `env` — `loadEnv()` fonksiyonundan dönen ortam değişkenleri nesnesi
+  - `connectionString` — `env.DATABASE_URL`'den alınan veritabanı bağlantı dizesi
+  - `tryConnect` — verilen URL ile bağlantı denemesi yapan async fonksiyon
+  - `client` — veritabanı bağlantısı için `pg.Client` nesnesi
+  - `directUrl` — pooler içeren URL'den türetilen doğrudan bağlantı URL'si (port 5432)
+  - `comUrl` — `.supabase.co` uzantısını `.supabase.com` ile değiştiren URL
+  - `migrationFile` — çalıştırılacak SQL migration dosyasının yolu
+  - `sqlPath` — SQL dosyasının tam yolu
+  - `sql` — okunan SQL dosyasının içeriği
+  - `url` — `tryConnect` fonksiyonuna parametre olarak verilen bağlantı URL'si
+  - `maskedUrl` — parola kısmı maskelenmiş URL (günlük amaçlı)
+  - `err` — yakalanan hata nesnesi
+- **Dönüş**: yok (yan etki: veritabanına bağlanır, SQL migration çalıştırır, bağlantıyı kapatır)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: scripts\db\migrations\apply_security_hardening.js
-  function: scripts\db\migrations\apply_security_hardening.js::loadEnv
-  function: scripts\db\migrations\apply_security_hardening.js::run
+  file: apply_security_hardening.js
+  function: apply_security_hardening.js::loadEnv
+  function: apply_security_hardening.js::run
 
 ---
 

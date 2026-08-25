@@ -2,57 +2,51 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\pdfAssets.ts
-skeleton_hash: 36cb34f8803d1e9d
+source_path: C:\tmp\wt-supurme\src\lib\pdfAssets.ts
+skeleton_hash: 0bd969c579540042
 entity_hashes:
   func:getAbsoluteAssetUrl: 96c03e7f744b3527
   func:getBase64ImageFromUrl: ca8a45fdefa4e7ed
   overview: 4faa1d63c142f598
-generated_at: 2026-06-19T20:48:09Z
+generated_at: 2026-08-25T07:27:53Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinde PDF belgeleri oluşturulurken ihtiyaç duyulan görsel ve medya asset'lerinin yönetilmesinden sorumludur. Modül, göreli yolları mutlak URL'lere çevirerek ve görselleri PDF uyumlu base64 formatına dönüştürerek içerik hazırlama sürecini kolaylaştırır.
+Bu modül, PDF oluşturma sürecinde kullanılan görsel varlıkların (asset) yönetimiyle ilgilenir. Görsel yollarını mutlak URL'lere dönüştürme ve görselleri base64 formatına çevirme gibi temel yardımcı işlemleri sağlar.
 
 ## Fonksiyon Grupları
-### URL ve Asset Normalizasyonu
-Belirtilen göreli veya kısmi yolları, PDF belgelerinin doğru kaynaklara erişebilmesi için tam ve mutlak URL formatına dönüştürür.
+
+### URL Dönüştürme
+Verilen bir görsel yolunu mutlak (absolute) bir URL'ye dönüştürerek, görselin doğru kaynaktan erişilebilir olmasını sağlar.
 - getAbsoluteAssetUrl
 
-### Görsel Dönüştürme
-Harici URL adreslerindeki görselleri PDF içeriklerine doğrudan gömülebilecek base64 kodlu formatına dönüştürerek format uyumsuzluklarını engeller.
+### Görsel Base64 Dönüştürme
+Bir görsel URL'sini asenkron olarak alıp, görselin base64 kodlanmış halini döndürür. Bu sayede görsel verisi doğrudan PDF içeriğine gömülebilir.
 - getBase64ImageFromUrl
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, PDF belgeleri için medya varlıklarını getirip dönüştürürken temel girdilerin varlığına ve internet erişimine bağımlıdır.
-
-[Aksiyom 1]: Eğer `getAbsoluteAssetUrl` fonksiyonuna geçilen `path` parametresi geçerli bir dosya yolu veya URL parçası değilse, fonksiyon geçerli bir mutlak URL döndüremez.
-[Aksiyom 2]: Eğer `getBase64ImageFromUrl` fonksiyonuna geçilen `imageUrl` parametresi geçerli bir URL değilse veya o URL'deki görsel sunucu tarafından erişilemez durumdaysa (404, 5xx hatası, timeout), fonksiyon hata fırlatır veya geçerli bir Base64 dizesi döndüremez.
-[Aksiyom 3]: Eğer `getBase64ImageFromUrl` fonksiyonu başarıyla çalışırsa, döndürülen Base64 dizesi bir PDF sayfasına doğrudan gömülmeye uygun format (ör. data URI scheme) içermelidir; aksi takdirde PDF oluşturulan dosya bozulur.
-[Aksiyom 4]: Eğer `PDF_FONTS` veya `PDF_COLORS` sabitleri modül tarafından kullanılıyorsa (ör. fonksiyon gövdesinde referans veriliyorsa), bu nesnelerin gerekli yapıda ve erişilebilir olması gerekir;否则, fonksiyonlar beklenen işlevselliği gösteremez.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### getAbsoluteAssetUrl
-**Ne yapar**: Bu fonksiyon, verilen göreceli bir dosya yolunu, uygulamanın çalıştığı taraftan (tarayıcı veya sunucu) bağımsız olarak, geçerli bir mutlak URL dizesine dönüştürür. Temel amacını, PDF oluşturma süreçlerinde veya varlık referanslarında dinamik ve kesin URL'ler üretmek olarak tanımlayabiliriz.
+**Ne yapar**: Verilen bir yol (path) parametresini mutlak (absolute) bir URL'ye dönüştürür. PDF oluşturma işlemleri için kullanılan varlıkların ve sabitlerin doğru adreslerle erişilmesini sağlar.
 
-**Nasıl yapar**: Fonksiyon首先, tarayıcı ortamında (client-side) çalışıp çalışmadığını kontrol eder. Eğer pencere nesnesi ve konum özelliği mevcutsa, tarayıcının mevcut kök URL'sini (`window.location.origin`) temel olarak kullanır. Aksi takdirde, derleme zamanında tanımlı statik bir `SITE_URL` sabitini temel olarak alır. Ardından, verilen göreceli `path` parametresini bu temel URL ile birleştirerek, standart bir URL nesnesi oluşturur ve bunu bir dizeye dönüştürerek geri döner.
+**Nasıl yapar**: Öncelikle tarayıcı ortamında olup olmadığını kontrol eder. Eğer `window` nesnesi tanımlıysa ve `window.location` mevcutsa, temel URL olarak `window.location.origin` değerini kullanır. Aksi takdirde, sunucu tarafı ortamlarında kullanılmak üzere tanımlı olan `SITE_URL` sabitini temel olarak alır. Ardından JavaScript'in yerleşik `URL` sınıfının yapıcı metodunu kullanarak verilen `path` parametresini bu temel URL ile birleştirip tam bir URL oluşturur ve `toString()` metoduyla string olarak döndürür.
 
 **Parametreler**:
-- `path`: string — Mutlak URL'ye dönüştürülecek olan göreceli dosya yolu veya kaynak belirteci (örn: `"/assets/logo.png"` veya `"images/chart.pdf"`).
+- path: string — Mutlak URL'ye dönüştürülecek göreli yol (relative path) değeri.
 
-**Dönüş**: string — Verilen yolun, belirli bir kök URL ile birleştirilmesiyle elde edilen tam ve geçerli mutlak URL dizesi.
+**Dönüş**: string — Oluşturulan mutlak URL'nin string temsili.
 
 ### getBase64ImageFromUrl
-**Ne yapar**: Bir görsel URL'sini PDF içerisine gömülmek üzere Base64 formatlı stringe dönüştürür. Kaynak görsel WEBP, PNG gibi herhangi bir raster formatta olsa bile çıktıyı %100 PDF ile uyumlu JPEG formatında sunar. Tüm kaynak formatları tek bir standarta getirerek PDF oluşturma sürecinde oluşabilecek uyumsuzlukların önüne geçer.
-**Nasıl yapar**: Canvas API kullanarak kaynak URL'den alınan görseli bir canvas elementine yükler, ardından canvas üzerinden standart JPEG formatında dışa aktarım gerçekleştirir. Bu yöntemle kaynak görselin orijinal formatından bağımsız olarak her zaman PDF ile sorunsuz çalışan bir JPEG çıktısı elde edilir.
-**Parametreler**:
-- name: imageUrl, type: string — Base64 kodlu stringe dönüştürülecek hedef görselin tam, erişilebilir URL adresi. Görselin yüklenmesi ve işlenmesi bu adres üzerinden gerçekleştirilir.
-**Dönüş**: Promise<string> — İşlem başarılı şekilde tamamlandığında PDF uyumlu JPEG formatındaki Base64 kodlu stringini çözümleyen, işlem sırasında oluşan herhangi bir hatada reddeden bir asenkron promise nesnesi döndürür.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -75,18 +69,31 @@ Bu modül, PDF belgeleri için medya varlıklarını getirip dönüştürürken 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/pdfAssets.ts::getAbsoluteAssetUrl
-- **params**: `path: string` — URL yolunu temsil eder
+- **params**: `path` (string) — mutlak URL'e dönüştürülecek göreli yol
 - **ic_degiskenler**:
-  - `base` — Tarayıcı ortamındaysa `window.location.origin`, değilse `SITE_URL` kullanılarak hesaplanan temel URL
-- **Dönüş**: `string` — path ve base birleştirilerek oluşturulmuş tam URL
+  - `base` — tarayıcı ortamında `window.location.origin` değeri; tarayıcı dışında `SITE_URL` sabiti kullanılır. URL çözümlemesinde temel adres olarak görev yapar.
+- **Dönüş**: `string` — `new URL(path, base).toString()` ile üretilen mutlak URL
+
+### [N2_NASIL] AST Pointer: src/lib/pdfAssets.ts::getBase64ImageFromUrl
+- **params**: `imageUrl` (string) — base64'e dönüştürülecek görselin URL'i
+- **ic_degiskenler**:
+  - `response` — `fetch(imageUrl)` çağrısından dönen Response nesnesi
+  - `blob` — `response.blob()` ile elde edilen ikili görsel verisi
+  - `objectUrl` — `URL.createObjectURL(blob)` ile oluşturulan geçici blob URL'i; Image nesnesine atama yapılır, işlem bitince `URL.revokeObjectURL` ile iptal edilir
+  - `img` — `new Image()` ile oluşturulan HTMLImageElement; `objectUrl` kaynağı atanır, yükleme tamamlanınca canvas'a çizim yapılır
+  - `canvas` — `document.createElement('canvas')` ile oluşturulan HTMLCanvasElement; genişliği `img.width`, yüksekliği `img.height` olarak ayarlanır
+  - `ctx` — `canvas.getContext('2d')` ile elde edilen CanvasRenderingContext2D; null ise hata fırlatılır
+  - `dataURL` — `canvas.toDataURL('image/jpeg', 0.95)` ile üretilen JPEG formatında base64 data URL; kalite parametresi 0.95
+  - `error` — `catch` bloğunda yakalanan hata nesnesi; `console.error` ile konsola yazdırılır
+- **Dönüş**: `Promise<string>` — başarılı durumda JPEG base64 data URL (`dataURL`); `imageUrl` boşsa veya hata oluşursa boş string (`''`)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\lib\pdfAssets.ts
-  function: src\lib\pdfAssets.ts::getAbsoluteAssetUrl
-  function: src\lib\pdfAssets.ts::getBase64ImageFromUrl
+  file: pdfAssets.ts
+  function: pdfAssets.ts::getAbsoluteAssetUrl
+  function: pdfAssets.ts::getBase64ImageFromUrl
 
 ---
 

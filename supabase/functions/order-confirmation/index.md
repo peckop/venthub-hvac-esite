@@ -2,82 +2,79 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\order-confirmation\index.ts
-skeleton_hash: 973a0eafa78986cd
+source_path: C:\tmp\wt-supurme\supabase\functions\order-confirmation\index.ts
+skeleton_hash: e4a2f6ec62f2dba1
 entity_hashes:
-  func:callerFailure: 86e71a59bf4b25a1
-  func:loadTemplate: aed3696182ae3642
+  func:callerFailure: c2855766de0bfe8b
+  func:loadTemplate: 9bc4b1ff28af1df3
   func:order-confirmation_handler: 52ce43dfb5d8480d
-  func:renderTemplate: 403190e13eb3a722
-  overview: 568d3ec340668453
-generated_at: 2026-08-15T09:05:02Z
+  func:renderTemplate: 598e7353aec8e680
+  overview: f37144b7f3a3d49b
+generated_at: 2026-08-25T07:33:41Z
 ---
 
 ## Genel Bakış
-Bu modül, sipariş onayı e-postası gönderimi için tasarlanmış bir Supabase Edge Function'dur. Gelen HTTP isteklerini alarak sipariş bilgilerini işler, e-posta şablonunu yükleyip dinamik verilerle doldurur ve uygun HTTP yanıtını döndürür.
+
+Bu modül, Supabase Edge Function olarak çalışan bir sipariş onay işleyicisidir. Gelen HTTP isteklerini alır, bir şablon yükleyip veriyle render ederek yanıt üretir. Hata durumlarını yakalayıp uygun HTTP durum kodu ve hata mesajıyla sonuçlandıran bir yapıya sahiptir.
 
 ## Fonksiyon Grupları
-### Şablon Yönetimi
-E-posta gönderimi için kullanılacak HTML şablonlarının yüklenmesi ve dinamik veri alanlarıyla doldurulması işlemlerini yürütür.
+
+### Ana İşleyici
+
+Gelen HTTP isteğini karşılayan, şablon yükleme ve işleme adımlarını sırayla çalıştırarak sonucu Response olarak döndüren ana giriş noktasıdır.
+
+- order-confirmation_handler
+
+### Şablon İşleme
+
+Şablon dosyasını yükleyen ve yüklenen şablonu verilen veriyle birlikte işleyerek çıktı üreten fonksiyonları içerir. `loadTemplate` şablonu asenkron olarak okur, `renderTemplate` ise şablon ve veri alarak sonuç string üretir.
+
 - loadTemplate, renderTemplate
 
-### İstek İşleme ve Hata Yönetimi
-HTTP isteklerini karşılayan ana handler fonksiyonu ile hata durumlarında tutarlı yanıt üretimi sağlayan yardımcı işlevleri kapsar.
-- order-confirmation_handler, callerFailure
+### Hata Yönetimi
+
+Hata durumlarını değerlendirip uygun HTTP durum kodu ve hata mesajı içeren bir nesne döndüren yardımcı fonksiyondur. Hata çözümlenemezse null değer döndürür.
+
+- callerFailure
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, sipariş onayı e-postası gönderimi için HTML şablon işleme ve HTTP istek yönetimi sağlayan bir Supabase Edge Function'dır.
+[Aksiyom 1]: Eğer `loadTemplate` null döndürürse, sipariş onay e-postası gönderilemez çünkü template dosyası yüklenememiştir.
 
-**[Aksiyom 1]:** Eğer `loadTemplate()` çağrıldığında geçerli bir şablon dosyası diskte mevcut değilse, `Promise<string | null>` olarak `null` döner ve e-posta gönderimi gerçekleştirilemez.
+[Aksiyom 2]: Eğer `callerFailure` null döndürürse, istemciye hata bilgisi döndürülemez çünkü hata response'u oluşturulamamıştır.
 
-**[Aksiyom 2]:** Eğer `renderTemplate()` fonksiyonuna boş veya geçersiz bir `tpl` string'i传递 edilirse, string dönüşümü hatalı veya boş bir çıktı üretilir (fonksiyonun `Record<string, unknown>` veri parametresiyle birlikte çalışması beklenir).
+[Aksiyom 3]: `renderTemplate` fonksiyonu her zaman string döndürür; null dönmez. Eğer template ve veri sağlanmışsa, render işlemi başarısız olmaz.
 
-**[Aksiyom 3]:** Eğer `callerFailure()` hatasız bir durum için çağrılırsa (yani işlem başarıyla tamamlandıysa), `null` döner; aksi halde `{ status: number; error: string }` yapısında bir hata nesnesi döner.
+[Aksiyom 4]: `order-confirmation_handler` fonksiyonu her zaman bir Response nesnesi döndürmelidir; null veya undefined dönemez.
 
-**[Aksiyom 4]:** Eğer `order-confirmation_handler` fonksiyonuna geçersiz veya eksik bir HTTP istek nesnesi (`req`)传递 edilse, yanıt üretilmesinde hata oluşur ve `callerFailure` aracılığıyla hata yanıtı döndürülür.
+[Aksiyom 5]: Eğer `loadTemplate` başarılı olursa (null olmayan string dönerse), bu template `renderTemplate` fonksiyonuna birinci parametre olarak verilebilir.
 
-**[Aksiyom 5]:** Eğer `renderTemplate()` fonksiyonuna传递 edilen `_data` parametresi şablon içindeki dinamik alanları karşılamıyorsa (eksik anahtarlar içeriyorsa), şablondaki bazı alanlar doldurulmamış olarak kalır; bu durum fonksiyon imzasından hata fırlatmayacak şekilde sessizce gerçekleşir.
+[Aksiyom 6]: Eğer `callerFailure` null olmayan bir değer döndürürse, bu değer `{ status: number; error: string }` formatındadır ve doğrudan Response oluşturmak için kullanılabilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### callerFailure
-**Ne yapar**: Çağrıci (caller) kaynaklı hataları HTTP durum kodlarına ve anlamlı hata mesajlarına dönüştürerek API yanıt formatına uygun hale getirir. TenantMismatchError, CallerConfigError ve CallerLookupError gibi özel hata türlerini birebir HTTP karşılıklarına eşler.
+**Ne yapar**: Kapı katmanında oluşan hataları HTTP durum kodlarına eşleyen bir hata haritalama fonksiyonudur. Üç farklı hata türünü tanımlı HTTP yanıtlarına dönüştürür; bilinmeyen hata türlerinde `null` döner. Docstring'e göre bu eşleme, beş bildirim ucunda birebir aynı şekilde kullanılmaktadır.
 
-**Nasıl yapar**: Fonksiyon, parametre olarak aldığı `error` nesnesinin hangi özel hata sınıfına ait olduğunu `instanceof` operatörü ile sırasıyla kontrol eder. TenantMismatchError ise 403 (Forbidden), CallerConfigError ise 500 (Internal Server Error), CallerLookupError ise 503 (Service Unavailable) durum kodu ile birlikte tanımlı bir hata dizesi döndürür. Hiçbir eşleşme sağlanamazsa null değeri döner, böylece çağrıci dışındaki hatalar üst katman tarafından ayrıca işlenir.
+**Nasıl yapar**: Gelen `error` parametresinin `instanceof` kontrolüyle türü belirlenir. `TenantMismatchError` durumunda 403 (claim ile profil çelişiyor; kullanıcı o tenant'a ait değil), `CallerConfigError` durumunda 500 (ortam değişkeni eksik — bizim hatamız, çağıranın değil), `CallerLookupError` durumunda 503 durum kodu döner. Hiçbiri eşleşmezse `null` döndürülür.
 
 **Parametreler**:
-- `error`: unknown — Kontrol edilecek hata nesnesi; herhangi bir türde olabilir, `instanceof` kontrolleri ile türü belirlenir
+- error: unknown — eşlenecek hata nesnesi; türü bilinmeyen bir değer olarak kabul edilir
 
-**Dönüş**: `{ status: number; error: string } | null` — Eşleşme sağlanırsa HTTP durum kodu ve hata mesajı içeren nesne, aksi halde null döner. `status` alanı HTTP yanıt kodunu (403, 500 veya 503), `error` alanı ise API tarafında tanımlı hata tanımını (tenant_mismatch, CONFIG_MISSING veya profile_lookup_failed) temsil eder.
+**Dönüş**: `{ status: number; error: string } | null` — Eşleşen hata varsa HTTP durum kodu ve hata anahtarını içeren nesne; eşleşme yoksa `null`
 
 ### renderTemplate
-**Ne yapar**: Verilen bir şablon string'indeki dinamik marker'ları (Handlebars benzeri {{değişken}} ve {{#if koşul}} bloklarını) belirli veri nesnesindeki değerlerle değiştirerek, dolu bir HTML veya metin çıktısı üretir. Bu fonksiyon, e-posta şablonlarının içeriklerini kişiselleştirmek için basit bir şablon motoru görevi görür.
-
-**Nasıl yapar**: Fonksiyon, iki aşamalı bir regex tabanlı işleme uygular. İlk olarak `{{#if anahtar}}...{{/if}}` koşullu bloklarını tarar; eğer ilgili anahtar veri nesnesinde tanımlı ve "truthy" bir değere sahipse, bloğun içeriğini korur, aksi takdirde bloğu tamamen kaldırır. İkinci adımda, kalan `{{anahtar}}` ifadelerini tarar ve bunları veri nesnesindeki karşılıklarıyla (null veya undefined ise boş string, aksi takdirde string'e dönüştürülmüş haliyle) değiştirir.
-
-**Parametreler**:
-- `tpl`: `string` — İşlenecek şablon metni. İçerisinde `{{anahtar}}` ve `{{#if anahtar}}...{{/if}}` marker'ları bulunur.
-- `_data`: `Record<string, unknown>` — Şablon marker'larının yerine konacak değerlerin bulunduğu anahtar-değer çiftlerinden oluşan nesne. Değerlerin herhangi bir tipte olmasına izin verilir.
-
-**Dönüş**: `string` — Tüm marker'ların verilen verilerle değiştirildiği veya kaldırılmış olduğu işlenmiş şablon metni.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### loadTemplate
-**Ne yapar**: Dosya sisteminden veya uzaktan bir kaynaktan şablon dosyasını asenkron olarak okur ve içeriğini string olarak döndürür.  
-**Nasıl yapar**: Promise tabanlı bir I/O operasyonu başlatır; dosya bulunamazsa `null` döner.  
-**Parametreler**: *Yok*  
-**Dönüş**: Promise<string | null> — Başarılı okuma durumunda şablon içeriği string, bulunamama durumunda `null`.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### order-confirmation_handler
-**Ne yapar**: HTTP isteklerini alır, sipariş onayı şablonunu yükler, verileri şablona uygular ve yanıt olarak HTML içeriği döner.  
-**Nasıl yapar**: Gelen `req` nesnesinden gerekli sipariş bilgilerini çıkarır, `loadTemplate` ile şablonu getirir, `renderTemplate` ile şablonu doldurur ve bir `Response` nesnesi oluşturur; hata durumunda uygun hata yanıtı üretir.  
-**Parametreler**:
-- req: any — HTTP istek nesnesi, içinde sipariş verileri ve diğer istek bilgileri bulunur.  
-**Dönüş**: Response — HTTP yanıtı, genellikle `text/html` içerik tipinde ve doldurulmuş şablon metnini barındırır.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -91,10 +88,79 @@ Bu modül, sipariş onayı e-postası gönderimi için HTML şablon işleme ve H
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: order-confirmation/index.ts::callerFailure
+### [N1_NASIL] AST Pointer: callerFailure
 - **params**: `error: unknown`
-- **ic_degiskenler**: (yok — parametre doğrudan kontrol edilir)
-- **Dönüş**: `{ status: number; error: string } | null` — Hata türüne göre statik hata nesnesi veya null döner
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ status: number; error: string } | null` — `TenantMismatchError` ise 403/tenant_mismatch, `CallerConfigError` ise 500/CONFIG_MISSING, `CallerLookupError` ise 503/profile_lookup_failed, diğer durumda `null`
+
+### [N2_NASIL] AST Pointer: renderTemplate
+- **params**: `tpl: string`, `_data: Record<string, unknown>`
+- **ic_degiskenler**:
+  - `_m` — regex eşleşmesinin tam metni (kullanılmaz, atlanır)
+  - `key` — `{{#if key}}` veya `{{key}}` bloğundaki değişken adı
+  - `inner` — `{{#if}}` bloğunun içeriği (koşul sağlanırsa korunur)
+  - `v` — `_data[key]` ile elde edilen değer
+  - `truthy` — `v`'nin truthy olup olmadığını gösteren boolean; string ise kendisi, değilse `!!v` ile dönüştürülür
+- **Dönüş**: `string` — `{{#if key}}...{{/if}}` blokları truthy ise inner, değilse boş string; `{{key}}` yerleri `v`'nin string karşılığı veya boş string ile değiştirilmiş tpl
+
+### [N3_NASIL] AST Pointer: loadTemplate
+- **params**: yok
+- **ic_degiskenler**:
+  - `url` — `import.meta.url`'e göre `./templates/email/order_confirmation.html` yolunun tam URL'si
+- **Dönüş**: `Promise<string | null>` — dosya okunursa HTML string, hata olursa `null`
+
+### [N4_NASIL] AST Pointer: order-confirmation_handler
+- **params**: `req` (serve dekoratörü ile)
+- **ic_degiskenler**:
+  - `requestOrigin` — `req.headers.get('origin')` ile alınan istek kökeni, yoksa boş string
+  - `allowedOrigins` — `Deno.env.get('ALLOWED_ORIGINS')` virgülle ayrılmış, trimlenmiş, boş olmayan dizi
+  - `originAllowed` — `allowedOrigins` boşsa true, değilse `requestOrigin`'in listede olup olmadığı
+  - `corsHeaders` — `getCorsHeaders(req)` ile üretilen CORS başlıkları
+  - `_text` — `req.text()` ile okunan ham istek gövdesi
+  - `parsed` — `_text`'in JSON.parse sonucu, boşsa `{}`, parse hatasında `{}`
+  - `order_id` — IIFE ile `parsed['order_id']`'den çıkarılan trimlenmiş string veya `null`
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` veya boş string
+  - `serviceKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` veya boş string
+  - `ctx` — `resolveCaller(req, parsed)` ile dönen `CallerContext`
+  - `failure` — `callerFailure(err)` sonucu; null değilse hata yanıtı döndürülür
+  - `tenantId` — `ctx.tenantId` ile doğrulanmış tenant kimliği
+  - `branding` — `getTenantBranding(tenantId)` ile alınan tenant marka bilgileri
+  - `resendApiKey` — `Deno.env.get('RESEND_API_KEY')` veya boş string
+  - `emailFrom` — `branding.emailFrom` başlangıç değeri; domain doğrulama hatasında `onboarding@resend.dev`'e düşer
+  - `testMode` — `Deno.env.get('EMAIL_TEST_MODE')`'in `'true'` olup olmadığını gösteren boolean
+  - `testTo` — `Deno.env.get('EMAIL_TEST_TO')` veya `'delivered@resend.dev'`
+  - `bccList` — `Deno.env.get('SHIP_EMAIL_BCC')` virgülle ayrılmış, trimlenmiş, boş olmayan dizi
+  - `brandName` — `branding.brandName`
+  - `brandPrimary` — `branding.brandPrimaryColor`
+  - `brandLogoUrl` — `branding.brandLogoUrl`
+  - `customer_email` — siparişten veya auth.users'dan alınan müşteri e-postası, `null` olabilir
+  - `customer_name` — siparişten veya auth.users.user_metadata'dan alınan müşteri adı, `null` olabilir
+  - `order_number` — sipariş numarası, `null` olabilir
+  - `o` — `venthub_orders` tablosuna fetch sonucu Response
+  - `arr` — `o.json()` sonucu dizi, parse hatasında `[]`
+  - `arr[0]` — sipariş satırı objesi veya `null`
+  - `row` — `arr[0]` ile aynı; `order_number`, `customer_email`, `customer_name`, `user_id` alanlarına erişilir
+  - `uid` — `row.user_id` veya `null`; müşteri bilgisi eksikse auth.users sorgusu tetikler
+  - `u` — `auth/v1/admin/users/{uid}` fetch sonucu Response
+  - `uj` — `u.json()` sonucu `UserResponse | null`; `email`, `user_metadata.full_name`, `user_metadata.name` alanlarına erişilir
+  - `metaName` — `uj.user_metadata.full_name` veya `uj.user_metadata.name` veya `null`
+  - `toList` — alıcı e-posta dizisi; test modunda `testTo`, değilse `customer_email`; ikisi de yoksa `bccList[0]`'dan taşınır
+  - `bcc` — `bccList`'in kopyası; `toList` boşsa ilk elemanı taşındıktan sonra kısaltılır
+  - `prettyOrderNo` — `order_number` varsa `#` + tire sonrasındaki kısım, yoksa `order_id`'nin son 8 karakteri büyük harf
+  - `subject` — `"${brandName} | Siparişiniz alındı - ${prettyOrderNo}"`
+  - `html` — `loadTemplate()` + `renderTemplate()` ile üretilen HTML; template yoksa inline fallback HTML
+  - `tpl` — `loadTemplate()` sonucu template string veya `null`
+  - `resp` — `send()` sonucu Resend API Response; ilk deneme başarısızsa domain doğrulama hatası kontrolü ile yeniden denenir
+  - `txt` — başarısız `resp.text()` sonucu; domain doğrulama tetikleyicisi olarak kullanılır
+  - `result` — başarılı `resp.json()` sonucu; `id` veya `data.id` alanına erişilir
+  - `_e` — yakalanan hata; `sentryCaptureException`'a gönderilir
+  - `msg` — `_e.message` veya `String(_e)`
+- **Dönüş**: `Response` — 200/success, 400/missing_fields, 401/unauthorized, 403/forbidden, 403/forbidden_origin, 405/method_not_allowed, 500/CONFIG_MISSING, 500/send_failed, 500/unexpected
+
+### [N5_NASIL] AST Pointer: send (iç fonksiyon)
+- **params**: yok
+- **ic_degiskenler**: yok (dış scope değişkenlerini kullanır: `resendApiKey`, `emailFrom`, `toList`, `bcc`, `subject`, `html`)
+- **Dönüş**: `Promise<Response>` — `https://api.resend.com/emails` POST sonucu Response
 
 ---
 
@@ -110,11 +176,11 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: supabase\functions\order-confirmation\index.ts
-  function: supabase\functions\order-confirmation\index.ts::callerFailure
-  function: supabase\functions\order-confirmation\index.ts::renderTemplate
-  function: supabase\functions\order-confirmation\index.ts::loadTemplate
-  function: supabase\functions\order-confirmation\index.ts::order-confirmation_handler
+  file: index.ts
+  function: index.ts::callerFailure
+  function: index.ts::renderTemplate
+  function: index.ts::loadTemplate
+  function: index.ts::order-confirmation_handler
 
 ---
 

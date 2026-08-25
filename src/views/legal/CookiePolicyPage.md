@@ -2,62 +2,62 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\CookiePolicyPage.tsx
-skeleton_hash: c394dcb4ff6f133c
+source_path: C:\tmp\wt-supurme\src\views\legal\CookiePolicyPage.tsx
+skeleton_hash: d81d7d3340723c36
 entity_hashes:
   func:CookiePolicyPage: 39fe3c926a47f80a
-  func:t: 64c0ae8b8eb87b5a
-  overview: 96d79391266869b9
+  func:t: 3df1611ede2c4a10
+  overview: 090c864bfdb77cc7
   style_tokens: 06829f9d93bd4397
-generated_at: 2026-06-19T20:51:03Z
+generated_at: 2026-08-25T07:47:15Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin çerez politikası sayfasını sunan statik bir React bileşenidir. Temel amacı, kullanıcıları çerez kullanımı konusunda yasal olarak bilgilendirmek ve uygulamanın gizlilik yükümlülüklerini yerine getirmesine katkıda bulunmaktır. Modül, karmaşık bir iş mantığına sahip olmayıp salt görüntüleme odaklıdır.
+Bu modül, çerez politikası sayfasını görüntüleyen bir React bileşenidir. Kullanıcının seçtiği dile göre sayfa içeriğini çevirmek için bir çeviri yardımcısı içerir. Modül, yasal/zorunlu bilgilendirme sayfalarından biri olarak uygulamanın yasal uyumluluk katmanında yer alır.
 
 ## Fonksiyon Grupları
+
 ### Sayfa Bileşeni
-Modülün temel ve tek bileşenidir; çerez politikasının tüm statik içeriğini ve yapısını kullanıcı arayüzünde render etmekten sorumludur.
+Çerez politikası sayfasının tamamını render eder. Dışarıdan `lang` parametresi alır ve bu dile uygun içeriği kullanıcıya sunar.
 - CookiePolicyPage
 
-### Yardımcı Fonksiyonlar
-Sayfa içindeki metinlerin çoklu dil desteği için çevrilmesini sağlayan basit bir yardımcı fonksiyondur.
+### Çeviri Yardımcısı
+Verilen bir anahtar (`key`) karşılığında o anki dile ait çevrilmiş metni döndürür. Sayfa bileşeni tarafından içerik metinlerini elde etmek için kullanılır.
 - t
+
+## Bağımlılıklar
+- **Dış bağımlılıklar:** React kütüphanesi; muhtemelen bir uluslararasılaştırma (i18n) çözümü `t` fonksiyonunun arkasında yer alır.
+- **İç bağımlılıklar:** Belirtilmemiş. Modülün `views/legal` dizininde konumlanması, uygulamanın yasal sayfalar grubuna ait olduğunu gösterir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, dil parametresine bağımlı bir gösterim bileşeni olduğu için temel mimari varsayımlar aşağıdadır.
 
-[Aksiyom 1]: Eğer `lang` parametresi bileşene geçirilmezse, sayfa içeriği hangi dilde render edileceği belirsiz olacağından, `t()` fonksiyonu doğru çevirileri döndüremeyebilir ve sayfa eksik veya hatalı içerik gösterebilir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarım yapılabilmektedir. Modülün doğru çalışması için gerekli koşulları belirleyecek yeterli bilgi bulunmamaktadır.
 
-[Aksiyom 2]: Eğer `t()` çeviri fonksiyonu çağrılmadan önce modül bağlamında tanımlı değilse veya bu bileşenin erişim alanında bulunmuyorsa, çerez politikası metinleri görüntülenemeyebilir ve bileşen render hata ile karşılaşabilir.
+[Aksiyom 1]: Eğer `lang` prop'u sağlanmazsa, bileşen hangi dili kullanacağını bilemez; davranış bilinmiyor.
 
-[Aksiyom 3]: Eğer `lang` geçerli bir dil kodu (örneğin `"tr"`, `"en"`) içermiyorsa, `t()` fonksiyonu ilgili dil dosyasındaki anahtarları bulamayacağından, sayfa內容u çevrilmemiş ham anahtar metinleri veya boş değerler döndürebilir.
+[Aksiyom 2]: Eğer `t` fonksiyonu mevcut değilse, bileşen metinleri gösteremez; davranış bilinmiyor.
+
+[Aksiyom 3]: Eğer `t` fonksiyonuna verilen `key` değerleri için karşılık gelen çeviri metinleri yoksa, bileşen ne gösterir bilinmiyor.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### CookiePolicyPage
-**Ne yapar**: Bu fonksiyon, belirli bir dil seçeneğine (`lang`) göre bir "Çerez Politikası" sayfasını oluşturan ve döndüren bir React fonksiyonel bileşenidir. Sayfa, kullanıcının tercih ettiği dilde (Türkçe veya İngilizce) hukuki içeriği, başlık ve uyarılarla birlikte sunar.
-
-**Nasıl yapar**: Fonksiyon, `lang` prop değerini kullanarak içinde bir `t` adlı tercüme fonksiyonu ve sözlük nesnesi (`dict`) oluşturur. `t` fonksiyonu, `getDictValue` yardımcı fonksiyonunu çağırarak verilen anahtar (`key`) karşılığındaki çeviri metnini sözlükten getirir. Return ifadesinde, sayfa yapısını (başlık, uyarı kutusu, içerik ve sorumluluk reddi) JSX ile döndürür. İçerik bölümü, `lang` değerine bağlı olarak `CookiePolicyContentEn` veya `CookiePolicyContentTr` bileşenlerinden birini koşullu olarak render eder.
-
+**Ne yapar**: Çerez politikası sayfasını render eden React fonksiyonel bileşenidir. Kullanıcının dil tercihine göre Türkçe veya İngilizce içerik gösterir ve yasal içerik hazır değilse uyarı mesajı görüntüler.
+**Nasıl yapar**: Bileşen, `lang` parametresine göre uygun dil sözlüğünü (`en` veya `tr`) seçer ve çeviri fonksiyonu `t`'yi oluşturur. Sayfa başlığı, taslak uyarısı, çerez politikası içeriği ve sorumluluk reddi bölümlerini sırasıyla render eder. `isLegalContentReady()` fonksiyonu false döndürüğünde sarı renkli uyarı kutusu gösterilir. Dil seçimine göre `CookiePolicyContentEn` veya `CookiePolicyContentTr` bileşeni conditional rendering ile görüntülenir.
 **Parametreler**:
-- lang: string — Sayfanın gösterileceği dili belirten ISO dil kodu (örn: 'en', 'tr'). Bu değer, içeriğin ve tercümelerin dil seçiminin temelini oluşturur.
-
-**Dönüş**: `React.FC<{ lang: string }>` tipinde bir React fonksiyonel bileşeni. Bu bileşen, dil ayarına göre düzenlenmiş tam HTML yapısını (başlık, uyarılar, yasal metin) içeren JSX'i döndürür.
+- lang: string — Sayfanın görüntüleneceği dili belirten parametre. 'en' veya 'tr' değerlerinden birini alır.
+**Dönüş**: React.FC<{ lang: string }> — `lang` prop'u alan bir React fonksiyonel bileşeni döndürür.
 
 ### t
-**Ne yapar**: CookiePolicyPage bileşeni içinde tanımlanmış bir helper fonksiyondur. Verilen bir metin anahtarını (`key`), bileşenin bulunduğu bağlama (context) göre seçilmiş olan (`en` veya `tr`) sözlük nesnesinden değerini alarak bir çeviri (lokalizasyon) işlemi yapar.
-
-**Nasıl yapar**: Bileşenin üst seviyesinde belirlenen `dict` (sözlük) nesnesini kullanır. `getDictValue` yardımcı fonksiyonunu çağırarak, verilen `key` parametresinin (`'legal.cookieTitle'` gibi) `dict` nesnesindeki karşılığını递归 olarak (recursive) arar ve ilgili metni döndürür. Bu fonksiyon, bileşenin JSX'indeki tüm harici metinleri (başlıklar, uyarılar vb.) dinamik olarak dil之间 geçiş yapmak için kullanılır.
-
+**Ne yapar**: Dil sözlüğünden anahtar-değer eşleştirmesi yaparak çeviri metnini döndüren yardımcı fonksiyondur. Bileşen içinde tanımlı bir closure'dır ve dışarıdan erişilemez.
+**Nasıl yapar**: `lang` parametresine göre seçilen sözlük (`dict`) ve verilen `key` parametresi ile `getDictValue` fonksiyonunu çağırır. Bu fonksiyon, sözlük yapısı içinde ilgili anahtara karşılık gelen çeviri metnini bulup döndürür.
 **Parametreler**:
-- `key: string` — Sözlük içinden çekilecek değerin noktalı yolu (dot notation path).
-
-**Dönüş**: `string` — Seçilen sözlükteki `key` değerine karşılık gelen lokalize metin.
+- key: string — Sözlükten getirilecek çeviri metninin anahtarı. Nokta notasyonu ile iç içe geçmiş anahtarları destekler (örneğin: 'legal.cookieTitle').
+**Dönüş**: Bilinmiyor — Kaynak kodda dönüş tipi açıkça belirtilmemiştir. `getDictValue` fonksiyonunun dönüş tipine bağlıdır.
 
 ---
 
@@ -67,6 +67,7 @@ Bu modül, dil parametresine bağımlı bir gösterim bileşeni olduğu için te
 - import: ../../i18n/getDictValue::getDictValue
 - import: ./components/en/CookiePolicyContent::CookiePolicyContentEn
 - import: ./components/tr/CookiePolicyContent::CookiePolicyContentTr
+- import: @/config/legal::isLegalContentReady
 - import: react::React
 
 ---
@@ -74,31 +75,24 @@ Bu modül, dil parametresine bağımlı bir gösterim bileşeni olduğu için te
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/CookiePolicyPage.tsx::CookiePolicyPage
-- **params**: `{ lang }` — sayfanın dilini belirler ('en' veya 'tr')
+- **params**: ({ lang }) (lang: string)
 - **ic_degiskenler**:
-  - `dict` — `lang` parametresine göre `en` veya `tr` sözlük nesnesini seçer; dil tercihine bağlı olarak İngilizce veya Türkçe sözlük referansını tutar
-  - `t` — bir iç fonksiyon; verilen `key` string'ini `getDictValue(dict, key)` çağrısıyla sözlükten çevirerek yerelleştirilmiş metni döndürür
-- **JSX içinde erişilen değerler**:
-  - `t('legal.cookieTitle')` — sayfa başlığını döndürür
-  - `t('legal.draftWarning')` — draft uyarı banner metnini döndürür
-  - `t('legal.disclaimer')` — sayfa altındaki yasal sorumluluk reddi metnini döndürür
-  - `lang === 'en'` — dil kontrolü; İngilizce ise `CookiePolicyContentEn`, değilse `CookiePolicyContentTr` bileşenini render eder
-  - `CookiePolicyContentEn` — İngilizce cookie politikası detay içeriği bileşeni; `lang` prop'u ile çağrılır
-  - `CookiePolicyContentTr` — Türkçe cookie politikası detay içeriği bileşeni; `lang` prop'u ile çağrılır
-- **Dönüş**: JSX — dil-destekli tam cookie politikası sayfa yapısı; başlık, draft uyarısı, içerik bileşeni ve disclaimer'dan oluşan React elementi
+  - `dict` — `lang` parametresinin değerine göre `en` veya `tr` sözlük nesnesini seçer.
+  - `t` — `getDictValue` fonksiyonunu, seçilen `dict` sözlüğü ile birlikte kullanarak verilen `key` parametresine karşılık gelen çeviri değerini döndüren bir fonksiyon.
+- **Dönüş**: JSX elementi (bir `div` kapsayıcısı) döndürür.
 
 ### [N2_NASIL] AST Pointer: src/views/legal/CookiePolicyPage.tsx::t
-- **params**: `key: string` — sözlük içinde erişilecek çevirinin anahtarı
+- **params**: (key: string)
 - **ic_degiskenler**: yok
-- **Dönüş**: `getDictValue(dict, key)` sonucu — outer scope'taki `dict` ve parametre olarak alınan `key` ile sözlükten çözümlenmiş yerelleştirilmiş metin stringi
+- **Dönüş**: yok
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\legal\CookiePolicyPage.tsx
-  function: src\views\legal\CookiePolicyPage.tsx::CookiePolicyPage
-  function: src\views\legal\CookiePolicyPage.tsx::t
+  file: CookiePolicyPage.tsx
+  function: CookiePolicyPage.tsx::CookiePolicyPage
+  function: CookiePolicyPage.tsx::t
 
 ---
 

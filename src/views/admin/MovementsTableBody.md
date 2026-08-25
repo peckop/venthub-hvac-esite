@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\MovementsTableBody.tsx
-skeleton_hash: e9fb09d0d031fe72
+source_path: C:\tmp\wt-supurme\src\views\admin\MovementsTableBody.tsx
+skeleton_hash: d66639578dc2bcaf
 entity_hashes:
   func:MovementsTableBody: c49854650ab5cda4
   func:downloadBlob: 3edab0b221bec487
@@ -11,71 +11,64 @@ entity_hashes:
   func:movementsFetcher: 0f73a1caca0237de
   func:reasonLabel: 9e7dd108ffbcbff7
   overview: fda770b8f0842a6b
-  style_tokens: d4dea36e6ab6eb93
-generated_at: 2026-06-19T20:50:09Z
+  style_tokens: 03a300a2dabb02a4
+generated_at: 2026-08-25T07:31:12Z
 ---
 
 ## Genel Bakış
-
-Bu modül, admin panelindeHVAC ekipman hareketlerinin (sevk, kurulum, bakım vb.) tabloda listelenmesinden sorumludur. Supabase üzerinden ham veriyi çeker, ilişkisel veri yapısını düzleştirerek bileşenlerin kullanabileceği forma dönüştürür ve yerelleştirilmiş etiketlerle birlikte satır bazlı olarak sunar.
+Bu modül, admin panelinde hareket verilerini listeleyen bir tablo bileşeni sağlar. Veritabanından hareket verilerini çeker, dönüştürür ve kullanıcıya sunar. Ayrıca verileri dışa aktarma işlevi sunar.
 
 ## Fonksiyon Grupları
-
 ### Veri Çekme ve Dönüştürme
-Bu grup, Supabase'den hareket kayıtlarını çeker ve birleşik (join) satır yapısını düz, tablo dostu forma dönüştürür.
-- `movementsFetcher` — Supabase istemcisi ve filtre parametrelerini alarak hareket verilerini asenkron olarak çeker, sayfalama metadata'sı ile birlikte sonuç döndürür.
-- `flatten` — İlişkisel olarak zenginleştirilmiş MovementJoinRow yapısını, tabloda doğrudan kullanılabilecek daha basit MovementRow yapısına dönüştürür.
+Veritabanından ham hareket verilerini alır ve tabloda gösterilmek üzere daha basit bir forma dönüştürür.
+- movementsFetcher, flatten
 
-### Sunum ve Bileşen
-Bu grup, veriyi tarayıcıda kullanıcıya görsel olarak sunan React bileşenini kapsar.
-- `MovementsTableBody` — Admin tablosunun gövde kısmını render eden ana React bileşenidir; satırları haritalandırarak hücreleri oluşturur.
+### Yardımcı Fonksiyonlar
+Hareket nedenlerini insan tarafından okunabilir etiketlere dönüştürür ve verilerin dosya olarak indirilmesini sağlar.
+- reasonLabel, downloadBlob
 
-### Yardımcı Araçlar
-Bu grup, yerelleştirme ve dosya indirme gibi destekleyen küçük yardımcı fonksiyonları barındırır.
-- `reasonLabel` — Hareket sebebi anahtarlarını (ör. "maintenance", "transfer") çeviri fonksiyonu ile birlikte insan okunabilir etiketlere dönüştürür.
-- `downloadBlob` — Blob nesnesini tarayıcıda belirtilen dosya adıyla kullanıcıya indirilir hale getirir (muhtemelen dışa aktarma işlevi için).
+### Ana Bileşen
+Tablonun gövdesini oluşturur, diğer fonksiyonları kullanarak veriyi çeker, dönüştürür ve görüntüler.
+- MovementsTableBody
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, hareket kayıtlarının (movements) gösterimi, filtrelenmesi ve dışa aktarılmasını sağlayan bir admin tablosu bileşenidir.
+[Aksiyom 1]: Eğer `supabase` istemcisi yoksa, `movementsFetcher` fonksiyonu veritabanından hareket verilerini çekemez ve `FetchResult<MovementRow>` üretilmez.
+
+[Aksiyom 2]: Eğer `params` (FetchParams) yoksa, `movementsFetcher` fonksiyonu hangi hareket kayıtlarının getirileceğini bilemez ve sorgu oluşturulamaz.
+
+[Aksiyom 3]: Eğer `MovementJoinRow` tipinde geçerli bir satır yoksa, `flatten` fonksiyonu düzleştirilmiş `MovementRow` üretemez.
+
+[Aksiyom 4]: Eğer `t` çeviri fonksiyonu yoksa, `reasonLabel` fonksiyonu neden etiketlerini kullanıcı diline çeviremez.
+
+[Aksiyom 5]: Eğer `ALL_REASONS` sabiti yoksa, `reasonLabel` fonksiyonu bilinen neden anahtarlarını eşleştirecek bir başvuru kaynağına sahip olmaz.
+
+[Aksiyom 6]: Eğer `blob` nesnesi yoksa, `downloadBlob` fonksiyonu indirilecek dosya içeriğine erişemez ve dosya indirme işlemi gerçekleştirilemez.
+
+[Aksiyom 7]: Eğer `filename` parametresi yoksa, `downloadBlob` fonksiyonu indirilen dosyaya bir ad veremez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### reasonLabel
-**Ne yapar**: Bir envanter hareketi sebebi anahtarını (örn: 'sale', 'po_receipt'), kullanıcının anlayabileceği uluslararasılaştırılmış (i18n) bir etikete dönüştürür. Bu, UI tablosunda "Sebep" sütununda gösterilecek metni üretir.
+**Ne yapar**: Stok hareketi neden kodunu (reason key) alır ve uluslararasılaştırma (i18n) fonksiyonu aracılığıyla kullanıcıya gösterilecek Türkçe/yerelleştirilmiş etiket metnine dönüştürür. Geçerli bir eşleşme bulunamadığında tire (`-`) karakteri döndürür.
 
-**Nasıl yapar**: Fonksiyon, bir `key` string'i ve bir çeviri fonksiyonu `t` alır. Öncelikle `key`'yi boş bir string'e çevirir. Eğer bu string `'undo'` ile başlıyorsa doğrudan ilgili çeviri anahtarını döner. Aksi halde, `switch` yapısıyla belirli sebep anahtarlarını kontrol eder ve karşılık gelen çeviri anahtarını `t()` fonksiyonuna gönderir. Eşleşme bulunamazsa varsayılan olarak '-' döner.
+**Nasıl yapar**: Gelen `key` değeri önce `String()` ile metne dönüştürülür; `null` veya `undefined` gelirse boş string elde edilir. Eğer değer `undo` ile başlıyorsa, `switch` bloğuna girmeden doğrudan `admin.movements.reasons.undo` anahtarının çevirisini döndürür. Aksi halde `switch` yapısıyla `sale`, `po_receipt`, `manual_in`, `manual_out`, `adjust`, `return_in`, `transfer_out`, `transfer_in` değerleri tek tek kontrol edilir ve eşleşen durum için karşılık gelen i18n anahtarı `t` fonksiyonuna gönderilir. Hiçbir case eşleşmezse `default` dalı çalışır ve `-` döndürülür.
 
 **Parametreler**:
-- `key`: `string | null | undefined` — Dönüştürülecek envanter hareketi sebebi anahtarı. Null veya undefined olabilir, bu durumda boş string olarak işlenir.
-- `t`: `(k: string) => string` — Belirtilen bir çeviri anahtarını, o dildeki metne çeviren i18n fonksiyonu (örn: react-i18next `useTranslation` hook'unun `t` fonksiyonu).
+- key: `string | null | undefined` — Hareket nedenini temsil eden kod. `null` veya `undefined` olabilir; bu durumda boş string olarak işlenir.
+- t: `(k: string) => string` — Uluslararasılaştırma (i18n) çeviri fonksiyonu. Verilen anahtar string'ini alır ve yerelleştirilmiş metin döndürür.
 
-**Dönüş**: `string` — Verilen sebep anahtarının localized etiketi veya tanınamazsa '-'.
+**Dönüş**: `string` — Karşılık gelen i18n etiketi ya da eşleşme bulunamadığında `-` karakteri.
 
 ### flatten
-**Ne yapar**: Supabase'den `inventory_movements` tablosunu `products` tablosuyla birleştiren (JOIN) satır verisini (`MovementJoinRow`), uygulamanın içinde kullandığı düz (`MovementRow`) veri yapısına dönüştürür. Bu, veriyi işleyen bileşenlerin daha basit bir yapıya erişmesini sağlar.
-
-**Nasıl yapar**: Fonksiyon, girdi olarak alınan `row` nesnesinin belirli alanlarını (`id`, `product_id`, `delta`, vb.) doğrudan kullanarak yeni bir nesne oluşturur. Kritik dönüşüm, birleşik tablodan gelen `products` (ürün) verisinin, hedef nesnede `product` adıyla eşlenmesidir.
-
-**Parametreler**:
-- `row`: `MovementJoinRow` — Supabase sorgusundan dönen ve `products` tablosunu içeren birleşik (joined) satır verisi.
-
-**Dönüş**: `MovementRow` — Uygulamanın UI katmanında kullanacağı düzleştirilmiş, sadece gerekli alanları içeren hareket satırı nesnesi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### movementsFetcher
-**Ne yapar**: Supabase istemcisini kullanarak `inventory_movements` tablosundan sayfalanmış, sıralanmış, filtrelenmiş ve aranmış verileri çeker. Bu, bir admin tablosu için ana veri getirme (fetching) fonksiyonudur.
-
-**Nasıl yapar**: Fonksiyon, `supabase` istemcisi ve `params` (sayfalama, sıralama, arama ve filtre parametreleri) alır. İlk olarak `inventory_movements` tablosunu, ilgili `products` alanlarıyla (`id`, `name`, `sku`, `category_id`) birleştirerek bir sorgu başlatır ve toplam eşleşen kayıt sayısını (`count: 'exact'`) ister. Ardından sıralama (`order`) parametresine göre sorguyu düzenler; `'product'` sıralama anahtarı özel olarak `products` tablosunun `name` alanına göre sıralama yapar. Arama (`query`) varsa, `products` tablosundaki `name` ve `sku` alanlarında `ILIKE` kullanarak eşleşen kayıtları filtreler. Kategori (`category`), sebep (`reason`), tarih aralığı (`from`, `to`) ve parti ID'si (`batch`) filtrelerini sorguya ekler. Son olarak `range` metodunu kullanarak sayfalama yapar ve hata yönetimi sonrası, ham JOIN verisini `flatten` fonksiyonuyla dönüştürerek sonuç döner.
-
-**Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemleri için yapılandırılmış Supabase istemcisi.
-- `params`: `FetchParams` — İsteğe bağlı sıralama, sayfalama, arama sorgusu ve filtreleri içeren parametre nesnesi.
-
-**Dönüş**: `Promise<FetchResult<MovementRow>>` — Bir `Promise` olarak, `rows` (dönüşmüş `MovementRow` dizisi) ve `totalMatched` (tüm filtrelemeye rağmen toplam eşleşen kayıt sayısı) alanlarını içeren sonuç nesnesi. Sorgu hatası oluşursa bir `error` fırlatır.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### MovementsTableBody
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -166,68 +159,172 @@ Kit'in kullandığı düzleştirilmiş satır (cell'ler product.name/sku okur).
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::reasonLabel
-- **params**: `key: string | null | undefined` — hareket sebebi anahtarı (örn: 'sale', 'manual_in'), `t: (k: string) => string` — i18n çeviri fonksiyonu
+- **params**: `key` (string | null | undefined), `t` ((k: string) => string)
 - **ic_degiskenler**:
-  - `val` — key'in null/undefined olma durumunu güvenlik altına alan, boş string'e fallback edilmiş string karşılığı
-- **Dönüş**: `string` — verilen key'e karşılık gelen lokalize edilmiş insan-okunabilir sebep etiketi; bilinmeyen keyler için `'-'`
-
----
+  - `val` — `key` parametresini string'e dönüştürür, boşsa `''` kullanılır; `startsWith('undo')` kontrolü ve `switch` ifadesinde eşleştirme için kullanılır
+- **Dönüş**: string — çevrilmiş reason etiketi veya eşleşme yoksa `'-'`
 
 ### [N2_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::flatten
-- **params**: `row: MovementJoinRow` — Supabase'den `products!inner` join ile çekilmiş, products nesnesini içeren hammadde satır verisi
-- **ic_degiskenler**: (yok — inline object literal döndürür)
-- **Dönüş**: `MovementRow` — join edilmiş satırı düzleştirilmiş, product alanını `row.products` referansıyla eşlemiş MovementRow objesine dönüştürür
-
----
+- **params**: `row` (MovementJoinRow)
+- **ic_degiskenler**: yok
+- **Dönüş**: MovementRow — `row.id`, `row.product_id`, `row.delta`, `row.reason`, `row.order_id`, `row.created_at`, `row.batch_id` alanlarını doğrudan aktarır; `row.products` alanını `product` anahtarıyla eşler
 
 ### [N3_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::movementsFetcher
-- **params**: `supabase: SupabaseClient<Database>` — Supabase istemci实例, `params: FetchParams` — sayfalama, sıralama, arama ve filtre parametrelerini taşıyan nesne
+- **params**: `supabase` (SupabaseClient<Database>), `params` (FetchParams)
 - **ic_degiskenler**:
-  - `query` — `inventory_movements` tablosu üzerinde zincirleme filtre/sıralama uygulanan Supabase sorgu builder nesnesi
-  - `sortKey` — sıralama için kullanılacak前端 anahtarı; `params.sort?.key` veya varsayılan `'date'`
-  - `ascending` — sıralama yönü boolean'ı; `params.sort?.dir === 'asc'` karşılaştırmasından türetilir
-  - `colMap` — frontend sıralama anahtarlarını (`date`, `delta`, `reason`, `ref`) veritabanı kolon adlarına (`created_at`, `delta`, `reason`, `order_id`) eşleyen harita
-  - `like` — ürün adı/SKU araması için `%query%` formatında SQL LIKE kalıbı
-  - `category` — kategori filtresinin ilk değeri (`params.filters.category?.[0]`), undefined ise filtre uygulanmaz
-  - `reasons` — çoklu sebep filtresi dizisi (`params.filters.reason ?? []`), boş değilse `query.in` ile uygulanır
-  - `from` — tarih aralığı başlangıcı (`params.filters.from?.[0]`), ISO string formatında
-  - `to` — tarih aralığı bitişi (`params.filters.to?.[0]`), ISO string formatında
-  - `batch` — parti (batch) deep-link filtresi değeri (`params.filters.batch?.[0]`)
-  - `offset` — sayfalama offset'i; `(params.page - 1) * params.pageSize` hesaplamasıyla elde edilir
-  - `joinRows` — Supabase yanıtının `data` alanından türetilen `MovementJoinRow[]` dizisi; null ise boş diziye fallback edilir
-- **Dönüş**: `Promise<FetchResult<MovementRow>>` — `rows` (düzleştirilmiş satırlar) ve `totalMatched` (toplam eşleşme sayısı) içeren sonuç nesnesi; Supabase hataları `throw` ile yükseltilir
+  - `query` — `supabase.from('inventory_movements').select(...)` ile oluşturulan sorgu zinciri; sıralama, filtreleme ve arama eklemeleri bu değişken üzerinden yapılır
+  - `sortKey` — `params.sort?.key` değeri, tanımsızsa `'date'` kullanılır; hangi alana göre sıralama yapılacağını belirler
+  - `ascending` — `params.sort?.dir === 'asc'` sonucu boolean; sıralama yönünü belirler
+  - `colMap` — `date`→`created_at`, `delta`→`delta`, `reason`→`reason`, `ref`→`order_id` eşleştirmelerini içeren Record; `sortKey`'i veritabanı sütun adına çevirir
+  - `like` — `params.query` etrafına `%` eklenerek oluşturulmuş arama deseni; `name.ilike` ve `sku.ilike` filtrelerinde kullanılır
+  - `category` — `params.filters.category?.[0]` değeri; tanımlıysa `products.category_id` üzerinden eşitlik filtresi ekler
+  - `reasons` — `params.filters.reason ?? []` dizisi; boş değilse `reason` alanı üzerinde `in` filtresi uygular
+  - `from` — `params.filters.from?.[0]` değeri; tanımlıysa `created_at` için `gte` filtresi ekler
+  - `to` — `params.filters.to?.[0]` değeri; tanımlıysa `created_at` için `lte` filtresi ekler
+  - `batch` — `params.filters.batch?.[0]` değeri; tanımlıysa `batch_id` için `eq` filtresi ekler
+  - `offset` — `(params.page - 1) * params.pageSize` hesaplaması; sayfalama için aralık başlangıcı
+  - `data` — sorgu sonucu dönen satırlar dizisi
+  - `error` — sorgu sırasında oluşan hata; tanımlıysa throw edilir
+  - `count` — eşleşen toplam satır sayısı
+  - `joinRows` — `data ?? []` ataması; `MovementJoinRow[]` tipinde ham satırlar
+- **Dönüş**: Promise<FetchResult<MovementRow>> — `rows` (joinRows.map(flatten)) ve `totalMatched` (count veya 0) alanlarını içerir
 
----
-
-### [N4_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody
-- **params**: (yok — React functional component, props almaz)
-- **ic_degiskenler** (closure'lardan çıkarılan):
-  - `batchParam` — URL search parametrelerinden gelen batch filtresi değeri; varsa `filters` nesnesine `batch` alanı olarak eklenir
-  - `filters` — aktif filtrelerin tutulduğu state nesnesi (from, to, category, reason, batch alanları içerir)
-  - `setFilter` — filters state'ini güncelleyen setter fonksiyonu; belirli bir filtre anahtarını yeni değerle yazar
-  - `setQuery` — arama sorgusu state'ini güncelleyen setter fonksiyonu
-  - `categories` — Supabase'den çekilmiş kategori satırları dizisi (`CategoryRow[]`); toolbar'da kategori dropdown'ını besler
-  - `setCategories` — categories state'ini güncelleyen setter fonksiyonu
-  - `supabaseBrowserClient` — tarayıcı tarafı Supabase istemcisi; kategori listesini çekmek için kullanılır
-  - `table` — DataTableKit tarafından sağlanan tablo kontrol nesnesi; `fetchAllForExport()` ile tüm veriyi dışa aktarma için çeker
-  - `exportHeaders` — CSV/XLS dışa aktarımında kullanılacak sütun başlıkları dizisi (t() ile çevrilmiş)
-  - `buildExportRows` — `MovementRow[]` dizisini dışa aktarım formatına (date, product, sku, delta, reason, ref) dönüştüren mapper fonksiyonu
-  - `formatDateTime` — ISO tarih stringlerini lokalize edilmiş insan-okunabilir formata dönüştüren yardımcı fonksiyon
-  - `lang` — mevcut dil kodu (`'tr'` veya `'en'`); `formatDateTime` ve sıralama tercihlerine paslanır
-  - `t` — i18n çeviri fonksiyonu; tüm UI etiketlerini ve başlıkları çevirir
-  - `activeReasons` — aktif/seçili sebep filtrelerinin dizisi; reason toggle'larında okunup yazılır
-  - `cancelled` — useEffect cleanup flag'i; async kategori çekme işleminin bileşen unmount sonrası state güncellemesini engeller
-  - `dateRange` — filtrelerden türetilen DateRange objesi (from/to); react-day-picker bileşenine bağlanır
-- **Dönüş**: `React.FC` — admin panelinde envanter hareketlerini tablo halinde gösteren, filtre/sıralama/sayfalama/dışa aktarma özellikli React bileşeni
-
----
-
-### [N5_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::downloadBlob
-- **params**: `blob: Blob` — indirilecek dosyanın Blob nesnesi (CSV veya HTML içeriği), `filename: string` — kullanıcının dosya sistemine kaydedilecek dosya adı (örn: 'inventory_movements.csv')
+### [N4_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::downloadBlob
+- **params**: `blob` (Blob), `filename` (string)
 - **ic_degiskenler**:
-  - `url` — Blob nesnesinden oluşturulan geçici object URL'i; tarayıcı tarafında dosyaya erişim sağlar
-  - `link` — programatik olarak oluşturulan `<a>` DOM elemanı; `href` ve `download` öznitelikleri ayarlanıp otomatik tıklanır
-- **Dönüş**: yok (void) — dosya indirmeyi tetikler, `URL.revokeObjectURL` ile object URL'i temizler; yan etki olarak tarayıcıya dosya kaydetme diyaloğu açtırır
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici URL; indirme bağlantısının hedefi
+  - `link` — `document.createElement('a')` ile oluşturulan DOM öğesi; `href`, `download` özellikleri atanır ve `click()` ile tetiklenir
+- **Dönüş**: yok — yan etki olarak dosya indirme iletişim kutusunu açar, ardından `URL.revokeObjectURL(url)` ile geçici URL'yi temizler
+
+### [N5_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (filters objesi oluşturma)
+- **params**: yok
+- **ic_degiskenler**:
+  - `f` — boş `Record<string, string[]>` olarak başlatılır; `batchParam` tanımlıysa `f.batch = [batchParam]` atanır
+  - `batchParam` — kapsamdan erişilen değer; tanımlıysa filters objesine eklenir
+- **Dönüş**: Record<string, string[]> — filtre objesi
+
+### [N6_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (useEffect kategori yükleme)
+- **params**: yok
+- **ic_degiskenler**:
+  - `cancelled` — boolean, bileşen unmount olduğunda true yapılır; asenkron yanıt geldiğinde state güncellemesini engellemek için kullanılır
+  - `data` — `supabaseBrowserClient.from('categories').select('id,name').order('name', { ascending: true })` sorgusundan dönen kategori satırları
+  - `error` — sorgu sırasında oluşan hata
+- **Dönüş**: () => void — cleanup fonksiyonu, `cancelled = true` atar
+
+### [N7_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (async kategori yükleme)
+- **params**: yok
+- **ic_degiskenler**:
+  - `data` — `supabaseBrowserClient.from('categories').select('id,name').order('name', { ascending: true })` sorgusundan dönen kategori satırları
+  - `error` — sorgu sırasında oluşan hata
+- **Dönüş**: Promise<void> — `cancelled` false ve `error` yoksa `setCategories(data as CategoryRow[])` çağrısı yapar
+
+### [N8_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (cleanup fonksiyonu)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `cancelled = true` ataması yapar
+
+### [N9_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (dateRange hesaplama)
+- **params**: yok
+- **ic_degiskenler**:
+  - `from` — `filters.from?.[0]` değeri; ISO tarih string'i
+  - `to` — `filters.to?.[0]` değeri; ISO tarih string'i
+- **Dönüş**: DateRange | undefined — `from` ve `to` yoksa undefined; varsa `{ from: new Date(from), to: new Date(to) }` objesi döner
+
+### [N10_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (tarih aralığı setter)
+- **params**: `range` (DateRange, opsiyonel)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `setFilter('from', ...)` ve `setFilter('to', ...)` çağrısı yapar; `range.from` varsa ISO string dizisi, yoksa boş dizi; `range.to` varsa `endOfDay(range.to).toISOString()` ile bitiş günü hesaplanır
+
+### [N11_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (reset fonksiyonu)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `setQuery('')` ve tüm filtreleri (`category`, `reason`, `from`, `to`, `batch`) boş diziye sıfırlar
+
+### [N12_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (buildExportRows)
+- **params**: `rows` (MovementRow[])
+- **ic_degiskenler**: yok
+- **Dönüş**: Array<{ date, product, sku, delta, reason, ref }> — her satırı dışa aktarım formatına dönüştürür; `date` için `formatDateTime(m.created_at, lang)`, `product` için `m.product?.name || m.product_id`, `sku` için `m.product?.sku || ''`, `delta` için `m.delta`, `reason` için `reasonLabel(m.reason, t)`, `ref` için `m.order_id` varsa son 8 karakteri büyük harf
+
+### [N13_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (satır map fonksiyonu)
+- **params**: `m` (MovementRow)
+- **ic_degiskenler**: yok
+- **Dönüş**: { date, product, sku, delta, reason, ref } — dışa aktarım satırı formatı
+
+### [N14_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (exportHeaders)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: string[] — `t('admin.movements.export.headers.date')`, `t('admin.movements.export.headers.product')`, `t('admin.movements.export.headers.sku')`, `t('admin.movements.export.headers.delta')`, `t('admin.movements.export.headers.reason')`, `t('admin.movements.export.headers.ref')` çevirileri
+
+### [N15_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (CSV export)
+- **params**: yok
+- **ic_degiskenler**:
+  - `data` — `buildExportRows(await table.fetchAllForExport())` sonucu dışa aktarım satırları
+  - `escape` — her hücredeki çift tırnakları `""` ile escape eden, null/undefined değerleri `''` ile değiştiren fonksiyon
+  - `lines` — her satırı virgülle birleştirilmiş escape edilmiş hücreler dizisi
+  - `csv` — BOM (`﻿`) + başlık satırı + veri satırları; `text/csv;charset=utf-8;` MIME tipiyle Blob oluşturur
+- **Dönüş**: Promise<void> — `downloadBlob` çağrısı ile `inventory_movements.csv` dosyasını indirir
+
+### [N16_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (Excel export)
+- **params**: yok
+- **ic_degiskenler**:
+  - `data` — `buildExportRows(await table.fetchAllForExport())` sonucu dışa aktarım satırları
+  - `head` — `<th>` etiketleriyle sarılmış başlık hücreleri HTML string'i
+  - `body` — `<tr><td>` etiketleriyle sarılmış veri hücreleri HTML string'i
+  - `html` — tam HTML belgesi; `application/vnd.ms-excel` MIME tipiyle Blob oluşturur
+- **Dönüş**: Promise<void> — `downloadBlob` çağrısı ile `inventory_movements.xls` dosyasını indirir
+
+### [N17_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (columns tanımı)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: Array<{ key, header, sortable, hideable?, align?, cell }> — tablo sütun tanımları dizisi; her sütun `key` (sıralama anahtarı), `header` (çevrilmiş başlık), `sortable` (true), opsiyonel `hideable` ve `align`, `cell` (satır render fonksiyonu) içerir
+
+### [N18_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (date cell)
+- **params**: `m` (MovementRow)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element — `formatDateTime(m.created_at, lang)` ile biçimlendirilmiş tarih, `text-admin-fg-muted text-xs` sınıflarıyla
+
+### [N19_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (product cell)
+- **params**: `m` (MovementRow)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element — ürün adı (`m.product?.name || m.product_id`) ve varsa SKU (`m.product.sku`) gösteren iki satırlı düzen
+
+### [N20_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (delta cell)
+- **params**: `m` (MovementRow)
+- **ic_degiskenler**:
+  - `deltaText` — `m.delta > 0` ise `+${m.delta}`, değilse `${m.delta}` string'i
+- **Dönüş**: JSX.Element — pozitif/negatif/sıfır durumuna göre renkli badge; `ArrowUpRight` veya `ArrowDownRight` ikonu ekler
+
+### [N21_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (reason cell)
+- **params**: `m` (MovementRow)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX.Element — `reasonLabel(m.reason, t)` ile çevrilmiş reason etiketi, solunda küçük turuncu nokta
+
+### [N22_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (ref cell)
+- **params**: `m` (MovementRow)
+- **ic_degiskenler**:
+  - `orderRef` — `m.order_id` varsa `#${m.order_id.slice(-8).toUpperCase()}`, yoksa `''`
+- **Dönüş**: JSX.Element — `m.order_id` varsa monospace fontlu badge, yoksa `-` metni
+
+### [N23_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (reasonOptions)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: Array<{ key, label, active, onToggle }> — `ALL_REASONS` dizisi üzerinde map; her reason için `reasonLabel` ile etiket, `activeReasons.includes(r)` ile aktif durumu, `onToggle` ile filtre ekleme/çıkarma fonksiyonu
+
+### [N24_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (reason option map)
+- **params**: `r` (string — ALL_REASONS elemanı)
+- **ic_degiskenler**: yok
+- **Dönüş**: { key: string, label: string, active: boolean, onToggle: () => void }
+
+### [N25_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (onToggle)
+- **params**: yok
+- **ic_degiskenler**:
+  - `next` — `activeReasons.includes(r)` true ise `r` çıkarılmış dizi, false ise `r` eklenmiş dizi
+- **Dönüş**: yok — `setFilter('reason', next)` çağrısı yapar
+
+### [N26_NASIL] AST Pointer: src/views/admin/MovementsTableBody.tsx::MovementsTableBody (categoryOptions)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: Array<{ value: string, label: string }> — ilk eleman `{ value: '', label: t('admin.movements.toolbar.allCategories') }`, ardından `categories.map(c => ({ value: c.id, label: c.name }))` dizisi
 
 ---
 
@@ -240,18 +337,18 @@ graph TD
     MovementsTableBody_tsx__flatten["flatten"]
     MovementsTableBody_tsx__movementsFetcher["movementsFetcher"]
     MovementsTableBody_tsx__reasonLabel["reasonLabel"]
-    MovementsTableBody_tsx__MovementsTableBody --> MovementsTableBody_tsx__downloadBlob
     MovementsTableBody_tsx__MovementsTableBody --> MovementsTableBody_tsx__reasonLabel
+    MovementsTableBody_tsx__MovementsTableBody --> MovementsTableBody_tsx__downloadBlob
 ```
 
 ## NODE ID STANDARD
 
-  file: src\views\admin\MovementsTableBody.tsx
-  function: src\views\admin\MovementsTableBody.tsx::reasonLabel
-  function: src\views\admin\MovementsTableBody.tsx::flatten
-  function: src\views\admin\MovementsTableBody.tsx::movementsFetcher
-  function: src\views\admin\MovementsTableBody.tsx::MovementsTableBody
-  function: src\views\admin\MovementsTableBody.tsx::downloadBlob
+  file: MovementsTableBody.tsx
+  function: MovementsTableBody.tsx::reasonLabel
+  function: MovementsTableBody.tsx::flatten
+  function: MovementsTableBody.tsx::movementsFetcher
+  function: MovementsTableBody.tsx::MovementsTableBody
+  function: MovementsTableBody.tsx::downloadBlob
 
 ---
 
@@ -272,7 +369,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-tight`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500`, `bg-cyan-500/50`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-white/5`, `border-amber-500/20`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `text-amber-400`, `text-brand-cyan`, `text-emerald-400`, `text-rose-500`, `text-slate-400`, `text-slate-500`
-- **Layout:** `flex`, `flex-col`, `gap-0.5`, `gap-1`, `gap-2`, `h-1`, `h-1.5`, `inline-flex`, `items-center`, `justify-between`, `p-4`, `w-1`, `w-1.5`, `w-fit`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger-weak`, `bg-admin-success-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-warning`, `border-admin-border`, `border-admin-danger/30`, `border-admin-success/30`, `border-admin-warning/30`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-success`, `text-admin-warning`
+- **Layout:** `flex`, `flex-col`, `flex-wrap`, `gap-0.5`, `gap-1`, `gap-2`, `h-1`, `h-1.5`, `inline-flex`, `items-center`, `justify-between`, `justify-end`, `p-4`, `w-1`, `w-1.5`
 - **Varyant/Responsive:** `:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminTableActionWarningClass`, `0`, `:`, `<`, `>`, `animate-pulse`, `border`, `font-black`, `font-bold`, `font-mono`, `glass-strong`, `m.delta`, `ml-1`, `px-2`
+- **Yardımcı Sınıflar:** `$`, `${adminTableActionWarningClass`, `0`, `:`, `<`, `>`, `animate-pulse`, `border`, `font-bold`, `font-mono`, `font-semibold`, `m.delta`, `ml-1`, `px-2`, `px-3`

@@ -2,54 +2,44 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\views\CartPage.tsx
-skeleton_hash: 846e3c07a9e30be3
+source_path: C:\tmp\wt-supurme\src\views\CartPage.tsx
+skeleton_hash: a80bc5fe1c94a392
 entity_hashes:
   func:CartPage: 47b501309afc6903
   overview: 6afbfcbb29c27c31
   style_tokens: 089647e604d32b73
-generated_at: 2026-08-16T10:23:00Z
+generated_at: 2026-08-25T07:29:34Z
 ---
 
 ## Genel Bakış
-CartPage, alışveriş sayfası görünümünü sunan tek bileşenli bir React modülüdür. Bu bileşen,.sepetteki ürünlerin listelenmesi, miktar yönetimi ve sipariş süreci için gerekli arayüz ve etkileşimleri sağlar.
+CartPage.tsx modülü, alışveriş sepeti sayfasını temsil eden bir React bileşeni içerir. `CartPage` fonksiyonu bir React fonksiyon bileşeni olarak tanımlanmıştır. Modül, sepet sayfasının kullanıcı arayüzünü sunmaktan sorumludur.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Görünümü
-Modülün tek ve merkezi bileşeni olan CartPage, sepet sayfasının tüm arayüz yapısını, veri akışını ve kullanıcı etkileşimlerini yöneten kök React bileşenidir.
-- CartPage
+### Sayfa Bileşeni
+Alışveriş sepeti sayfasının ana bileşenini tanımlar ve render eder.
+- `CartPage`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, parametresiz bir React bileşenidir; dış veri bağımlılıkları fonksiyon imzasından türetilememektedir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1]:** Eğer CartPage bileşeni çağrıldığında erişilmesi gereken external state (global store, context provider vb.) mevcut değilse, bileşen çalışırken runtime hatası oluşur veya boş/sepet verisi olmayan bir sayfa render edilir.
-
-**[Aksiyom 2]:** Eğer CartPage, React bileşen ağacında uygun provider'lar (context, store provider vb.) ile sarılmamışsa, bileşen içindeki hook çağrıları (varsa useContext, useStore vb.) başarısız olur ve uygulama çöker.
-
-**[Aksiyom 3]:** Fonksiyon imzası `CartPage() -> React.FC` biçimindedir ve parametre almaz; dolayısıyla bileşen, sepetteki verileri props aracılığıyla değil, internal hook'lar veya global state üzerinden almak zorundadır — bu bağımlılığın hangi mekanizma ile sağlandığı bilinmiyor.
-
----
-
-> **Not:** Fonksiyon gövdesi paylaşılmadığı için, bileşenin hangi hook'ları kullandığı, hangi context'e bağlandığı veya hangi state management çözümünü tercih ettiği hakkında kesin aksiyom üretilememektedir. Yukarıdaki varsayımlar, yalnızca fonksiyon imzasının (parametresiz çağrı, React.FC dönüşü) yapısal analizinden türetilmiştir.
+**Neden:** Modüle ait yalnızca fonksiyon imzası (`CartPage() -> React.FC`) mevcuttur. Fonksiyon gövdesi, iç mantık, bağımlılıklar veya kontrol akışı hakkında bilgi bulunmadığından, modülün doğru çalışması için hangi koşulların varolması gerektiğine dair güvenilir bir çıkarım yapılamaz. Bilinmeyen hakkında hüküm vermek, hüküm vermemekten daha zararlıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### CartPage
+**Ne yapar**: React fonksiyonel bileşeni olarak tanımlanmış bir sayfa bileşenidir. Fonksiyon adı, bir alışveriş sepeti (cart) sayfası olduğunu göstermektedir ancak docstring boş bırakıldığı için kesin görev tanımı belirtilmemiştir.
 
-**Ne yapar**: Sepet sayfasını görüntüleyen React bileşenidir. Kullanıcıların alışveriş sepetlerini görüntülemesini ve yönetmesini sağlayan ana sayfa görünümüdür.
-
-**Nasıl yapar**: Bu bileşen, React functional component olarak tanımlanmıştır. Kaynak dosya yolundan (src/views/CartPage.tsx) anlaşılacağı üzere, uygulamanın "views" katmanında yer alan ve.sepetime ait sayfa görünümünü render eden bir bileşendir.
+**Nasıl yapar**: Fonksiyon, herhangi bir parametre almaz ve `React.FC` (React Functional Component) tipinde bir bileşen döndürür. İç mantığı hakkında verilen kaynakta bilgi bulunmamaktadır.
 
 **Parametreler**:
-Bu bileşen için belgelenmiş parametre bulunmamaktadır.
+- Bu fonksiyon herhangi bir parametre almamaktadır.
 
-**Dönüş**: 
-- React.FC — React Functional Component türünde bir bileşen döndürür. Sepet sayfasının tüm görünüm yapısını içeren JSX elementini render eder.
+**Dönüş**: `React.FC` — React fonksiyonel bileşen tipinde bir değer döndürür. Bu, JSX elementi üreten ve React bileşen ağacında kullanılabilen bir fonksiyonel bileşen anlamına gelir.
 
 ---
 
@@ -73,42 +63,42 @@ Bu bileşen için belgelenmiş parametre bulunmamaktadır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/CartPage.tsx`::CartPage
-- **params**: (yok — React fonksiyon bileşeni, parametre almaz)
+### [N1_NASIL] AST Pointer: src/views/CartPage.tsx::CartPage
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `items` — `useCart()` hook'undan gelen sepet öğesi dizisi; her öğe `id`, `product`, `unitPrice`, `quantity` içerir
-  - `updateQuantity` — `useCart()` hook'undan gelen; bir ürünün miktarını artıran/azaltan fonksiyon; `updateQuantity(productId, newQty)` çağrılır
-  - `removeFromCart` — `useCart()` hook'undan gelen; sepetten bir ürünü tamamen çıkaran fonksiyon; `removeFromCart(productId)` çağrılır
-  - `clearCart` — `useCart()` hook'undan gelen; sepeti tamamen boşaltan fonksiyon; `clearCart()` çağrılır
-  - `getCartTotal` — `useCart()` hook'undan gelen; sepetteki fiyatlı kalemlerin toplamını döndüren fonksiyon; `getCartTotal()` çağrılır
-  - `getCartCount` — `useCart()` hook'undan gelen; sepetteki toplam ürün sayısını döndüren fonksiyon; `getCartCount()` çağrılır
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; `t('cart.emptyTitle')`, `t('cart.countLabel', { count })` vb. çağrımlarla metinler alınır
-  - `lang` — `useI18n()` hook'undan gelen geçerli dil kodu; `formatCurrency`'ye para birimi biçimlendirme için geçilir
-  - `Routes` — `useLocalizedRoutes()` hook'undan gelen lokalize rota üretici nesne; `Routes.home()`, `Routes.product(slug)`, `Routes.checkout()` methodları kullanılır
-  - `hasUnpricedItems` — boolean; `items.some(...)` ile hesaplanır, `unitPrice` number olmayan veya `Finite` olmayan kalem varsa `true` olur; fiyat teklifi bekleyen kalem olup olmadığını belirler, sepet özetinde uyarı ve checkout engelleme mantığını kontrol eder
-- **Dönüş**: JSX — boş sepet durumunda alışverişe başlama ekranı, dolu sepet durumunda ürün listesi + sipariş özeti + ödeme butonu döner
+  - `items` — `useCart()` hook'undan dönen sepet kalemleri dizisi; `items.length` ile boşluk kontrolü yapılır, `.some()` ile fiyat kontrolü yapılır, `.map()` ile kalem bileşenleri oluşturulur, `.filter()` ile fiyatlandırılmamış kalemler süzülür
+  - `updateQuantity` — `useCart()` hook'undan gelen fonksiyon; `item.product.id` ve yeni miktar (`item.quantity - 1` veya `item.quantity + 1`) parametreleriyle çağrılır
+  - `removeFromCart` — `useCart()` hook'undan gelen fonksiyon; `item.product.id` parametresiyle çağrılır, ürünü sepetten kaldırır
+  - `clearCart` — `useCart()` hook'undan gelen fonksiyon; parametre almadan çağrılır, sepeti tamamen boşaltır
+  - `getCartTotal` — `useCart()` hook'undan gelen fonksiyon; parametre almadan çağrılır, sepet toplam fiyatını sayı olarak döndürür; alt toplam, KDV hesabı ve toplam gösteriminde kullanılır
+  - `getCartCount` — `useCart()` hook'undan gelen fonksiyon; parametre almadan çağrılır, sepet kalem sayısını döndürür; `t('cart.countLabel', { count: getCartCount() })` içinde kullanılır
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; `t('cart.emptyTitle')`, `t('cart.emptyDesc')`, `t('cart.startShopping')`, `t('cart.title')`, `t('cart.countLabel', ...)`, `t('common.requestQuote')`, `t('cart.itemTotal')`, `t('cart.decreaseQty')`, `t('cart.increaseQty')`, `t('cart.removeItem')`, `t('cart.clearCart')`, `t('cart.summary')`, `t('cart.subtotal')`, `t('cart.shipping')`, `t('cart.free')`, `t('cart.vatIncluded')`, `t('cart.total')`, `t('cart.quoteItemsNotice')`, `t('cart.checkout')`, `t('cart.continueShopping')`, `t('cart.securePayment')` anahtarlarıyla çağrılır
+  - `lang` — `useI18n()` hook'undan gelen mevcut dil kodu; `formatCurrency` çağrılarında birinci argüman olarak kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan gelen rotalar nesnesi; `Routes.home()`, `Routes.product(item.product.slug!)`, `Routes.checkout()` metotlarıyla çağrılır
+  - `hasUnpricedItems` — `items.some((item) => typeof item.unitPrice !== 'number' || !Number.isFinite(item.unitPrice))` ifadesiyle hesaplanan boolean; fiyatlandırılmamış (unitPrice sayı olmayan veya sonlu olmayan) kalem varsa `true` olur; boş sepet ekranı dışında koşullu render'da, uyarı mesajında, `QuoteRequestButton` gösteriminde ve ödeme butonunun devre dışı bırakılmasında kullanılır
+- **Dönüş**: JSX elementi (React.ReactNode); `items.length === 0` ise boş sepet ekranı, aksi takdirde dolu sepet ekranı döndürür
 
 ---
 
-### [N2_NASIL] AST Pointer: `src/views/CartPage.tsx`::CartPage → items.map callback
-- **params**: `item` — sepet dizisindeki tek bir öğe nesnesi; `item.id`, `item.product` (brand, name, sku, slug, id içerir), `item.unitPrice`, `item.quantity` alanlarına erişilir
+### [N2_NASIL] AST Pointer: src/views/CartPage.tsx::items.map callback
+- **params**: `item` — sepet kalem nesnesi; `item.id`, `item.unitPrice`, `item.quantity`, `item.product.brand`, `item.product.slug`, `item.product.name`, `item.product.sku` alanlarına erişilir
 - **ic_degiskenler**:
-  - `unitPrice` — number veya null; `item.unitPrice` bir `number` ve `Number.isFinite` ise o değer, aksi halde `null`; fiyat çözülemeyen kalemde "Teklif Alın" gösterilmesini, fiyat olan kalemlerde ise TL tutarın yazılmasını sağlar
-- **Dönüş**: JSX — tek bir sepet kalem kartı; ürün görseli (`BrandIcon`), ürün bilgisi (isim, marka, SKU, fiyat/teklif), miktar artır/azalt butonları (`Minus`, `Plus`), sil butonu (`Trash2`) döner
+  - `unitPrice` — `typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice)` koşulu sağlanırsa `item.unitPrice` değeri, sağlanmazsa `null`; fiyat gösterimi ve kalem toplamı hesabında kullanılır; `null` olduğunda "Teklif Alın" metni gösterilir
+- **Dönüş**: JSX elementi (React.ReactNode); tek bir sepet kalemi kartını temsil eden `<div>` döndürür
 
 ---
 
-### [N3_NASIL] AST Pointer: `src/views/CartPage.tsx`::CartPage → QuoteRequestButton items prop map callback
-- **params**: `item` — `items` dizisinden filtrelenmiş, fiyatı olmayan sepet öğesi; `item.product.id`, `item.product.name`, `item.quantity` alanları kullanılır
-- **ic_degiskenler**: (yok — doğrudan obje literal döndürür)
-- **Dönüş**: `{ productId: item.product.id, productName: item.product.name, qty: item.quantity }` — `QuoteRequestButton` bileşenine传递 edilecek teklif talebi kalemi nesnesi
+### [N3_NASIL] AST Pointer: src/views/CartPage.tsx::items.filter().map callback
+- **params**: `item` — sepet kalem nesnesi; `item.product.id`, `item.product.name`, `item.quantity` alanlarına erişilir
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `{ productId: item.product.id, productName: item.product.name, qty: item.quantity }` nesnesi; `QuoteRequestButton` bileşeninin `items` prop'una aktarılır
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\CartPage.tsx
-  function: src\views\CartPage.tsx::CartPage
+  file: CartPage.tsx
+  function: CartPage.tsx::CartPage
 
 ---
 

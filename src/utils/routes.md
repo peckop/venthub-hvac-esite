@@ -2,63 +2,51 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\utils\routes.ts
-skeleton_hash: 29f794b5abdfd830
+source_path: C:\tmp\wt-supurme\src\utils\routes.ts
+skeleton_hash: 15798fbb1ec3f765
 entity_hashes:
   func:assertProductSlug: 7cc00756c332a6af
   func:localizedHref: e1a2d461bb32d4d4
   overview: 8cbb4744a23035a6
-generated_at: 2026-08-16T11:27:50Z
+generated_at: 2026-08-25T07:59:27Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin rota yönetimi altyapısını destekleyen yardımcı bir modüldür. Ürün rotalarının temel yapısını ve bütünlüğünü korumak için rota sabitlerini merkezi olarak tanımlar, ürün tanımlayıcılarının (slug) doğrulanması ve çok dilli rotaların oluşturulması gibi kritik rota işlemleri sağlar. Mimari olarak, uygulama genelinde tutarlı rota yapısının sürdürülmesi ve rota ile ilgili hataların önlenmesi için kritik bir katman görevi görür.
+Bu modül, ürün rotaları ve çok dilli URL oluşturma ile ilgili yardımcı fonksiyonları içerir. Ürün slug'larının geçerliliğini kontrol eder ve dil duyarlı bağlantılar üretir.
 
 ## Fonksiyon Grupları
-### Ürün Slug Doğrulama İşlevleri
-Rotalarda kullanılan ürün benzersiz tanımlayıcılarının (slug) geçerliliğini ve bütünlüğünü kontrol etmekle sorumludur. Bu işlev, rota yapısını korumak için gerekli temel doğrulama adımlarını gerçekleştirir.
+### Slug Doğrulama
+Ürün slug'larının belirli bir formata uygun olup olmadığını kontrol eder ve geçerli bir slug döndürür.
 - assertProductSlug
 
-### Yerelleştirilmiş Rota Oluşturma İşlevleri
-Çok dilli uygulama yapısında, dil koduna göre rota adreslerini (URL'leri) dinamik olarak oluşturmak veya dönüştürmekle sorumludur.
+### Çok Dilli URL Oluşturma
+Verilen bir URL'yi ve dili alarak, o dile uygun bir rota nesnesi oluşturur.
 - localizedHref
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, uygulama rotalarında kullanılan ürün tanımlayıcılarının doğruluğunu sağlamak ve dil bazlı rota URL'leri üretmek için çalışır.
-
-**[Aksiyom 1 - Slug Doğrulama Zorunluluğu]:** Eğer `assertProductSlug` fonksiyonuna geçirilen `slug` parametresi geçersiz bir ürün tanımlayıcısı Formatındaysa veya rota kurallarına uymuyorsa, fonksiyon bir hata fırlatır — aksi durumda standartlaştırılmış slug döner.
-
-**[Aksiyom 2 - Dil Kodu Gereksinimi]:** Eğer `localizedHref` fonksiyonuna geçirilen `lang` parametresi geçerli bir dil kodu değilse veya desteklenen diller arasında yer almıyorsa, beklenmeyen bir rota sonucu oluşur.
-
-**[Aksiyom 3 - URL Bütünlüğü]:** Eğer `localizedHref` fonksiyonuna geçirilen `url` parametresi geçerli bir rota yolu formatında değilse, oluşturulan `Route` nesnesi geçersiz bir hedefe işaret eder.
-
-**[Aksiyom 4 - Routes Sabit Tanımlılığı]:** Eğer `Routes` objesi modül içerisinde tanımlı değilse veya rota tanımları eksikse, uygulama içi navigasyon işlevleri çalışamaz hale gelir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, gövdeden çıkarım yapılabilecek aksiyom tanımlanamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### assertProductSlug
-**Ne yapar**: Ürün slug değerinin geçerliliğini doğrulayan bir kontrol fonksiyonudur. Gelen tanımlayıcının geçerli bir ürün slug'ı olup olmadığını denetler, eğer gelen değer ID veya UUID formatındaysa çalıştığı ortama özel aksiyonlar alır. Hem geliştirme sürecinde hızlı hata yakalama sağlamak hem de canlı üretim ortamında servis sürekliliğini korumak amacıyla tasarlanmıştır.
-**Nasıl yapar**: İlk olarak aldığı string değerinin ID veya UUID formatında olup olmadığını tespit eder, ardından çalıştığı ortamı (geliştirme/üretim) ortam değişkenleri üzerinden okur. Geliştirme (Development) ortamında doğrulama başarısız olursa fail-fast prensibi gereği hemen hata fırlatarak geliştiricinin sorunu erken aşamada fark etmesini sağlar. Üretim (Production) ortamında ise sistemi kesintiye uğratmamak için hatalı durumu sadece loglar, orijinal değeri Middleware'in entegre 308 kalıcı yönlendirme mekanizmasını kullanabilmesi için olduğu gibi geri döndürür.
+**Ne yapar**: Ürün slug değerini doğrular. Gelen değerin bir UUID olup olmadığını kontrol eder ve ortama göre farklı bir hata işleme stratejisi uygular.
+**Nasıl yapar**: Fonksiyon, öncelikle boş bir `slug` girdisi alırsa boş bir dize döndürür. Ardından, gelen `slug` değerinin bir UUID formatına uyup uymadığını bir regex ile test eder. Eğer değer bir UUID ise, `process.env.NODE_ENV` değişkeninin değerine göre hareket eder. Development (geliştirme) ortamında, performans ve SEO sorunlarına yol açabileceğinden dolayı bir hata fırlatarak hızlıca durumu bildirir (fail-fast). Production (canlı) ortamında ise, kullanıcı arayüzünde bir hata ekranı göstermemek için hatayı yalnızca konsola yazar ve gelen UUID değerini olduğu gibi geri döndürür. Bu sayede, bir Edge Middleware'in bu UUID'yi yakalayıp kalıcı (308) yönlendirme yapabilmesine olanak tanır. Eğer değer bir UUID değilse, doğrudan gelen `slug` değerini geri döndürür.
 **Parametreler**:
-- name: slug, type: string — Doğrulanması gereken ürün odaklı URL tanımlayıcısı (slug) değeri; hatalı kullanım durumunda ID veya UUID formatında da fonksiyona iletilebilir.
-**Dönüş**: string tipi değer döndürür. Doğrulama başarılı olursa orijinal geçerli slug değerini her ortamda iletir. Doğrulama başarısız olsa bile üretim ortamında orijinal gelen değeri, Middleware'in yönlendirme mekanizmasını tetikleyebilmesi için geri iletir.
+- slug: string — Doğrulanacak ürün slug değeri.
+**Dönüş**: string — Doğrulanmış veya hata durumunda (production) olduğu gibi bırakılmış slug değerini döndürür.
 
 ### localizedHref
-
-**Ne yapar**: Dilsiz bir taban URL'e aktif dil önekini ekleyen saf (pure) fonksiyondur. `useLocalizedRoutes` proxy'sinin sunucu-güvenli (React Server Component) çekirdeğini oluşturur; böylece hook kullanamayan Server Component'ler, route handler'lar ve paylaşılan render bileşenleri (ör. Breadcrumb) tarafından dil öneki eklenmesi için kullanılır.
-
-**Nasıl yapar**: Fonksiyon, gelen URL'in durumuna göre üç aşamalı bir karar süreci izler. Öncelikle `/admin` veya `/api` ile başlayan yolları hiçbir dönüşüme uğratmadan doğrudan `Route` tipine dönüştürerek geri döner — çünkü bu yollar dil öneki gerektirmez. Ardından URL'in zaten bir dil öneki içerip içermediğini kontrol eder; bunu yaparken yalnızca tam segment eşleşmeleri (`/tr`, `/en`, `/tr/...`, `/en/...`) dikkate alınır. Burada `startsWith('/tr')` tek başına kullanılmaz; çünkü bu durumda `/trends` gibi tamamen farklı yollar yanlışlıkla localize-dışı kalmaz, ancak localizer-dışı da kalmaz — sorun şudur ki `startsWith('/tr')` kullanılsaydı `/trends` gibi yolların localize edilmesi engellenemezdi. Kontrollerin hiçbirisi eşleşmediğinde ise `/${lang}` önekini URL'in başına ekler; eğer URL `/` ise yalnızca dil öneki döner, aksi halde dil önekinin ardından orijinal URL eklenir. Dönüş değeri her durumda `Route` tipine (`as Route`) dönüştürülür.
-
+**Ne yapar**: Dilsiz bir taban URL'e, verilen dile ait öneki ekleyerek lokalize edilmiş bir yol (route) oluşturur. Bu fonksiyon, `useLocalizedRoutes` proxy'sinin sunucu tarafında (RSC) kullanılan saf (side-effect-free) çekirdeğidir.
+**Nasıl yapar**: Fonksiyon, gelen `url` parametresini kontrol eder. Eğer URL `/admin` veya `/api` ile başlıyorsa, bu yolların lokalizasyona ihtiyacı olmadığı varsayılarak URL olduğu gibi `Route` tipine dönüştürülerek geri döndürür. Ardından, URL'in zaten bir dil önekine (`/tr`, `/en` veya bunlarla başlayan yollar) sahip olup olmadığını kontrol eder. Bu kontrolde, `/tr` gibi kısa bir önekin yanlışlıkla `/trends` gibi bir yolu lokalize-dışı bırakmaması için tam segment kontrolü (`startsWith('/tr/')` gibi) yapılır. Eğer URL zaten lokalize ise, yine olduğu gibi döndürülür. Diğer tüm durumlarda, URL'in kök (`/`) olup olmadığına bağlı olarak `/${lang}` veya `/${lang}${url}` formatında bir dize oluşturur ve bunu `Route` tipine dönüştürerek geri döndürür.
 **Parametreler**:
-- `url`: `string` — Dilsiz taban URL. Örneğin `/`, `/dashboard`, `/admin/settings`, `/api/health` gibi değerler alabilir. Fonksiyon bu URL'e göre dil öneki eklenip eklenmeyeceğine karar verir.
-- `lang`: `string` — Aktif dil kodu. Fonksiyonun URL başına ekleyeceği dil öneki olarak kullanılır (ör. `"tr"`, `"en"`). Zaten lokalize edilmiş URL'lerde kullanılmaz因为 kontrollerden erken dönüş yapılır.
-
-**Dönüş**: `Route` — Dil öneki eklenmiş (veya gerekli durumlarda aynen bırakılmış) tam URL string'i. Return type olarak `Route` tipi belirtilmiştir ve her dönüş değerinde `as Route` ile tip güvenliği sağlanmıştır. Fonksiyon saf olduğundan (same input → same output), herhangi bir yan etkisi yoktur.
+- url: string — Dil öneki eklenecek taban URL.
+- lang: string — Eklenecek dil öneki (örneğin: 'tr', 'en').
+**Dönüş**: Route — Dil öneki eklenmiş veya eklenmemiş (gerekli durumlarda) lokalize edilmiş yol.
 
 ---
 
@@ -77,22 +65,67 @@ Bu modül, uygulama rotalarında kullanılan ürün tanımlayıcılarının doğ
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `utils/routes.ts::assertProductSlug`
-- **params**: `(slug: string)`
+### [N1_NASIL] AST Pointer: src/utils/routes.ts::assertProductSlug
+- **params**: `slug: string`
 - **ic_degiskenler**:
-  - `uuidRegex` — UUID formatını eşleştiren RegExp nesnesi (`/^[0-9a-f]{8}-...$/i`), slug'ın geçerli bir UUID olup olmadığını test etmek için kullanılır
-- **Dis erisimleri**:
-  - `process.env.NODE_ENV` — Ortam değişkeni, production olup olmadığını kontrol eder; production dışıysa hata fırlatır, production'daysa graceful fallback yapar
-- **Yan etkiler**: Production dışı ortamda `throw new Error(...)` ile istisna fırlatır; production'da `console.error(...)` ile log basar
-- **Dönüş**: `string` — slug'ı olduğu gibi veya boş string döner
+  - `uuidRegex` — UUID formatını test etmek için kullanılan regex pattern (`/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i`)
+- **Dönüş**: `string` — slug'ın kendisi veya boş string
+
+### [N2_NASIL] AST Pointer: src/utils/routes.ts::Routes anonim fonksiyonu (slug, sku)
+- **params**: `slug: string`, `sku?: string`
+- **ic_degiskenler**:
+  - `validSlug` — `assertProductSlug(slug)` çağrısından dönen doğrulanmış slug değeri
+  - `base` — `/products/${encodeURIComponent(validSlug)}` ile oluşturulan temel URL
+- **Dönüş**: `Route` — sku varsa query string eklenmiş, yoksa sadece base URL
+
+### [N3_NASIL] AST Pointer: src/utils/routes.ts::Routes anonim fonksiyonu (params)
+- **params**: `params?: { brand?: string, limit?: number }`
+- **ic_degiskenler**:
+  - `query` — `new URLSearchParams()` ile oluşturulan, brand ve limit parametrelerini tutan nesne
+  - `qs` — `query.toString()` ile elde edilen query string
+- **Dönüş**: `Route` — query string varsa `/products?${qs}`, yoksa `/products`
+
+### [N4_NASIL] AST Pointer: src/utils/routes.ts::Routes anonim fonksiyonu (idOrSlug)
+- **params**: `idOrSlug: string`
+- **ic_degiskenler**: yok
+- **Dönüş**: `Route` — boşsa `/products`, değilse `/products/${encodeURIComponent(idOrSlug)}`
+
+### [N5_NASIL] AST Pointer: src/utils/routes.ts::Routes anonim fonksiyonu (slug, subSlug)
+- **params**: `slug: string`, `subSlug?: string`
+- **ic_degiskenler**: yok
+- **Dönüş**: `Route` — subSlug varsa ve slug'dan farklıysa alt kategori URL'i, değilse sadece kategori URL'i
+
+### [N6_NASIL] AST Pointer: src/utils/routes.ts::Routes anonim fonksiyonu (slug)
+- **params**: `slug: string`
+- **ic_degiskenler**: yok
+- **Dönüş**: `Route` — `/brands/${encodeURIComponent(slug)}`
+
+### [N7_NASIL] AST Pointer: src/utils/routes.ts::Routes anonim fonksiyonu (orderId, status)
+- **params**: `orderId?: string`, `status?: string`
+- **ic_degiskenler**:
+  - `query` — `new URLSearchParams()` ile oluşturulan, orderId ve status parametrelerini tutan nesne
+- **Dönüş**: `Route` — orderId yoksa `/payment-success`, varsa query string eklenmiş ödeme başarı URL'i
+
+### [N8_NASIL] AST Pointer: src/utils/routes.ts::Routes anonim fonksiyonu (redirect, error)
+- **params**: `redirect?: string`, `error?: string`
+- **ic_degiskenler**:
+  - `url` — `/auth/login` sabit login sayfası yolu
+  - `params` — `new URLSearchParams()` ile oluşturulan, redirect ve error parametrelerini tutan nesne
+  - `qs` — `params.toString()` ile elde edilen query string
+- **Dönüş**: `Route` — query string varsa `${url}?${qs}`, yoksa sadece `url`
+
+### [N9_NASIL] AST Pointer: src/utils/routes.ts::localizedHref
+- **params**: `url: string`, `lang: string`
+- **ic_degiskenler**: yok
+- **Dönüş**: `Route` — url `/admin` veya `/api` ile başlıyorsa olduğu gibi, zaten `/tr` veya `/en` ile başlıyorsa olduğu gibi, değilse `/${lang}` öneki eklenmiş URL
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\utils\routes.ts
-  function: src\utils\routes.ts::assertProductSlug
-  function: src\utils\routes.ts::localizedHref
+  file: routes.ts
+  function: routes.ts::assertProductSlug
+  function: routes.ts::localizedHref
 
 ---
 

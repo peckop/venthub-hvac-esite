@@ -2,44 +2,42 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\components\tr\KvkkContent.tsx
-skeleton_hash: 7a74413e5544aac2
+source_path: C:\tmp\wt-supurme\src\views\legal\components\tr\KvkkContent.tsx
+skeleton_hash: 1b73a8efd8260b09
 entity_hashes:
   func:KvkkContentTr: ce8aa32329dc415e
   overview: 9ac8e2b6eeaddd22
-  style_tokens: 06e3f7beac6824a2
-generated_at: 2026-06-19T20:51:04Z
+  style_tokens: 93d28fc913e27f7d
+generated_at: 2026-08-25T07:32:16Z
 ---
 
 ## Genel Bakış
-`KvkkContent.tsx` modülü, VentHub platformunda KVKK (Kişisel Verilerin Korunması Kanunu) aydınlatma metninin Türkçe karşılığını sunan bir React bileşenidir. Statik yasal içeriği JSX yapısı ile render ederek kullanıcıya kişisel verilerin işlenmesine ilişkin bilgilendirmeyi sunar. Bileşen herhangi bir iş mantığı veya durum yönetimi içermez; yalnızca presentational bir rol üstlenir.
+Bu modül, Türkçe KVKK (Kişisel Verilerin Korunması Kanunu) metnini kullanıcı arayüzünde görüntülemek için kullanılan bir React bileşeni içerir. Modül, yasal içerik sunumunu tek bir bileşen üzerinden gerçekleştirir ve dil parametresi alarak çalışır.
 
 ## Fonksiyon Grupları
-### KVKK İçerik Gösterimi
-KVKK kanun metninin Türkçe versiyonunu JSX olarak render eden bileşeni barındırır. Divider, paragraf ve liste gibi alt bileşenlerle okunabilir bir yasal metin düzeni oluşturulur.
-- `KvkkContentTr`
+### Ana Bileşen
+KVKK yasal metnini render eden ve dil parametresine göre içerik sunan ana bileşendir.
+- KvkkContentTr
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### KvkkContentTr
+**Ne yapar**: Docstring boş bırakılmıştır. Fonksiyon adı ve dosya yolu (`src\views\legal\components\tr\KvkkContent.tsx`) bir React fonksiyonel bileşeni olduğunu gösterir. Bileşenin `lang` adında bir prop aldığı ve yine `lang: string` tipinde prop alan bir React fonksiyonel bileşeni döndürdüğü belirtilmiştir.
 
-**Ne yapar**: Bu fonksiyon, KVKK (Kişisel Verilerin Korunması Kanunu) yasal metninin Türkçe içeriğini render eden bir React fonksiyonel bileşenidir. VentHub HVAC uygulamasının yasal sayfalarında Türkçe dil seçeneği için KVKK metnini görüntülemek amacıyla kullanılır.
-
-**Nasıl yapar**: Fonksiyon, bir React fonksiyonel bileşen olarak tanımlanmıştır. `lang` prop'unu alarak dil bilgisini işler ve Türkçe KVKK içeriğini döndürür. `React.FC` generic tipi ile tiplendirilmiş olup, dil parametresinin string tipinde olmasını zorunlu tutar.
+**Nasıl yapar**: İç mantık hakkında verilen kaynakta bilgi bulunmamaktadır. Docstring boş olduğundan uygulama detayı bilinmemektedir.
 
 **Parametreler**:
-- `lang`: `string` — Bileşenin hangi dilde içerik göstereceğini belirten dil kodu parametresidir. Türkçe içerik sunulacağı durumlarda uygun dil değeri iletilmelidir.
+- lang: string — Bileşenin aldığı prop. Destructuring ile alınır. Detaylı açıklama verilmemiştir.
 
-**Dönüş**: `React.FC<{ lang: string }>` — Türkçe KVKK yasal içeriğini渲染 eden bir React fonksiyonel bileşeni döndürür.
+**Dönüş**: `React.FC<{ lang: string }>` — `lang` prop'u alan bir React fonksiyonel bileşeni döndürür.
 
 ---
 
@@ -55,20 +53,37 @@ KVKK kanun metninin Türkçe versiyonunu JSX olarak render eden bileşeni barın
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/components/tr/KvkkContent.tsx::KvkkContentTr
-- **params**: `{ lang }` — Dili belirten string parametresi (TR/EN vb.)
+- **params**: `lang` — bileşen prop'u; `localizedHref` fonksiyonuna ikinci argüman olarak geçilir, dil duyarlı URL üretiminde kullanılır
 - **ic_degiskenler**:
-  - `lang` — Fonksiyon parametresi olarak alınan dil kodu, localizedHref fonksiyonuna argüman olarak传递
-  - `legalConfig` — Import edilen yasal yapılandırma nesnesi, KVKK metnindeki tüm yasal bilgileri (şirket adı, adres, e-posta, telefon, vergi bilgileri, süreler vb.) sağlar
-  - `localizedHref` — Import edilen fonksiyon, verilen rotayı ve dili kullanarak lokalize URL oluşturur (Çerez Politikası linki için kullanılır)
-  - `Routes` — Import edilen rota sabitleri nesnesi, `Routes.legal.cerez()` yolu ile çerez politikası rotasını tanımlar
-- **Dönüş**: React.FC<{ lang: string }> — JSX içeriği döndürür, KVKK aydınlatma metninin Türkçe versiyonunu render eder
+  - `legalConfig` — `@/config/legal` modülünden varsayılan olarak import edilen yapılandırma nesnesi; KVKK aydınlatma metnindeki tüm şirket bilgileri ve saklama süreleri bu nesneden okunur
+  - `legalConfig.sellerTitle` — veri sorumlusu şirket unvanı; "1) Veri Sorumlusunun Kimliği" bölümünde `<strong>` içinde gösterilir
+  - `legalConfig.sellerAddress` — şirket posta adresi; kimlik bölümünde ve "10) Başvuru Yöntemi" bölümünde ıslak imzalı başvuru adresi olarak gösterilir
+  - `legalConfig.sellerPhone` — şirket telefon numarası; kimlik bölümünde gösterilir
+  - `legalConfig.sellerEmail` — şirket e-posta adresi; kimlik bölümünde ve "8) Ticari Elektronik İleti ve İYS" bölümünde ret bildirim adresi olarak gösterilir
+  - `legalConfig.kepAddress` — şirket KEP (Kayıtlı Elektronik Posta) adresi; kimlik bölümünde ve başvuru yöntemi bölümünde gösterilir
+  - `legalConfig.mersis` — MERSİS numarası; kimlik bölümünde gösterilir
+  - `legalConfig.taxOffice` — vergi dairesi adı; kimlik bölümünde `legalConfig.taxNumber` ile birlikte gösterilir
+  - `legalConfig.taxNumber` — vergi numarası; kimlik bölümünde `legalConfig.taxOffice` ile birlikte gösterilir
+  - `legalConfig.verbisNo` — VERBİS kayıt numarası; kimlik bölümünde gösterilir
+  - `legalConfig.cargoCompanies` — kargo firması adları; "5) Aktarım Yapılan Taraflar" bölümünde lojistik hizmet sağlayıcı olarak gösterilir
+  - `legalConfig.retentionOrders` — sipariş ve faturalandırma kayıtları için saklama süresi; "7) Saklama Süreleri" bölümünde gösterilir
+  - `legalConfig.retentionSupport` — müşteri destek yazışmaları için saklama süresi; saklama süreleri bölümünde gösterilir
+  - `legalConfig.retentionMarketing` — pazarlama izin ve kayıtları için saklama süresi; saklama süreleri bölümünde gösterilir
+  - `legalConfig.retentionLogs` — log ve güvenlik kayıtları için saklama süresi; saklama süreleri bölümünde gösterilir
+  - `legalConfig.iysBrandCode` — İleti Yönetim Sistemi marka kodu; "8) Ticari Elektronik İleti ve İYS" bölümünde gösterilir
+  - `legalConfig.applicationEmail` — KVKK başvuru e-posta adresi; "10) Başvuru Yöntemi" bölümünde gösterilir
+  - `legalConfig.lastUpdated` — aydınlatma metninin son güncelleme tarihi; "13) Yürürlük" bölümünde gösterilir
+  - `localizedHref` — `@/utils/routes` modülünden import edilen fonksiyon; `Routes.legal.cerez()` ve `lang` argümanlarıyla çağrılarak çerez politikası sayfasının dile duyarlı URL'sini üretir
+  - `Routes` — `@/utils/routes` modülünden import edilen rota tanımları nesnesi; `Routes.legal.cerez()` erişimi ile çerez politikası sayfasının yolunu alır
+  - `Link` — `next/link` modülünden import edilen bileşen; çerez politikası bağlantısını oluşturmak için kullanılır
+- **Dönüş**: React JSX — `<>...</>` fragment içinde 13 adet `<section>` elementinden oluşan KVKK aydınlatma metni içeriği
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\legal\components\tr\KvkkContent.tsx
-  function: src\views\legal\components\tr\KvkkContent.tsx::KvkkContentTr
+  file: KvkkContent.tsx
+  function: KvkkContent.tsx::KvkkContentTr
 
 ---
 
@@ -86,7 +101,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-industrial-gray`, `text-primary-navy`, `text-xl`, `text-xs`
+- **Renkler:** `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`, `text-xs`
 - **Layout:** (yok)
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `mt-2`, `pl-6`, `space-y-1`, `underline`

@@ -2,45 +2,51 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\_shared\tenant_config.ts
-skeleton_hash: 865a8d4b605a94c6
+source_path: C:\tmp\wt-supurme\supabase\functions\_shared\tenant_config.ts
+skeleton_hash: 6b5012826ca17b3c
 entity_hashes:
-  func:getTenantBranding: 6ae9f5f873d6872c
+  func:getTenantBranding: bde2d3819c7904af
   overview: 727819c400487687
-generated_at: 2026-08-15T09:05:28Z
+generated_at: 2026-08-25T07:34:07Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase edge fonksiyonları arasında kiracıya (tenant) özel yapılandırma bilgilerini sağlamak için paylaşımlı yardımcı fonksiyonlar sunar. Temel olarak, HTTP isteklerinden kiracı tanımlayıcısının çıkarılması ve bu tanımlayıcıya karşılık gelen kiracının marka bilgilerinin merkezi olarak getirilmesi işlemlerini yönetir.
+
+Bu modül, çok kiracılı (multi-tenant) mimaride kiracıya özel yapılandırma bilgilerini sağlayan bir yardımcı modüldür. Supabase Edge Functions paylaşımlı (_shared) alanında yer alır ve kiracı kimliğine göre marka bilgilerini getirme işlevini üstlenir. Modül, dış sistemlerden veya veritabanından kiracı yapılandırmasını okuyarak üst katmanlara sunar.
 
 ## Fonksiyon Grupları
-### Kiracı Kimlik Yönetimi
-HTTP isteklerinden kiracı tanımlayıcısını analiz edip standart bir biçime dönüştürerek, sistem genelinde kullanılabilir hale getirir.
-- resolveTenantId
 
-### Kiracı Marka Bilgisi Sağlama
-Belirli bir kiracı tanımlayıcısına ait marka ve görsel yapılandırma bilgilerini asenkron olarak getirerek, kiracıya özel arayüzlerin dinamik olarak oluşturulmasını destekler.
+### Kiracı Marka Bilgisi Erişimi
+
+Verilen bir kiracı kimliğine (tenantId) karşılık gelen marka bilgilerini (TenantBranding) asenkron olarak getirir. Bu fonksiyon, kiracıya özel tema, logo, renk gibi marka ayarlarını dış dünyaya açan tek erişim noktasıdır.
+
 - getTenantBranding
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için **fonksiyon gövdesi (function body) paylaşılmamıştır**. Axiom'lar sadece fonksiyon gövdesinden üretilebilir.
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Neden:** Fonksiyon gövdesi verilmemiştir. Yalnızca fonksiyon imzası (`getTenantBranding(tenantId: string) -> Promise<TenantBranding>`) mevcuttur. Mimari varsayımlar yalnızca fonksiyon gövdesinden türetilir; imzadan aksiyom çıkarımı yapılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### getTenantBranding
-**Ne yapar**: Belirli bir kiracıya (tenant) ait marka yapılandırmasını (branding) asenkron olarak getirir. İşlem, veritabanı yapılandırması, ortam değişkenleri ve sabit kodlanmış varsayılan değerler之间ında kademeli bir fallback mekanizması uygular.
+**Ne yapar**: Verilen `tenantId` için marka (branding) yapılandırma değerlerini dinamik olarak getirir. Sıralı bir geri dönüş (fallback) mekanizması kullanır: önce kiracının veritabanındaki yapılandırmasına bakar, bulamazsa Deno ortam değişkenlerine başvurur, orada da yoksa sabit sistem varsayılanlarını döndürür.
 
-**Nasıl yapar**: Fonksiyon, Supabase service role anahtarı ile bir istemci oluşturarak veritabanından kiracının `config` alanını çeker. Elde edilen veritabanı yapılandırması (hem `snake_case` hem de `camelCase` anahtarlarla kontrol edilir) önceliklidir. Eğer veritabanında değer bulunamazsa, sırasıyla Deno ortam değişkenleri (`BRAND_NAME`, `BRAND_LOGO_URL`, vb.) ve en son olarak sabit kodlanmış VentHub varsayılan değerleri kullanılır. Bu fallback zinciri, her bir marka özelliği için ayrı ayrı uygulanır.
+**Nasıl yapar**: Fonksiyon önce `SUPABASE_URL` ve `SUPABASE_SERVICE_ROLE_KEY` ortam değişkenlerini okur. Eğer bu değerler ve `tenantId` mevcutsa, `persistSession: false` seçeneğiyle bir Supabase istemcisi oluşturur ve `tenants` tablosundan ilgili kiracının `config` alanını sorgular. Sorgu başarılı olursa elde edilen yapılandırma `dbConfig` değişkenine atanır; hata oluşursa `console.warn` ile uyarı mesajı yazdırılır. Try-catch bloğu içinde yakalanan beklenmedik hatalar ise `console.error` ile loglanır. Ardından her bir marka değeri (`brandName`, `brandLogoUrl`, `brandPrimaryColor`, `emailFrom`) için hiyerarşik çözümleme yapılır: önce `dbConfig` içindeki snake_case varyantı, sonra camelCase varyantı, ardından ilgili Deno ortam değişkeni, en sonunda da sabit varsayılan değer kullanılır. Bu sayede kiracıya özel yapılandırma, sistem geneli yapılandırma ve varsayılan değerler arasında esnek bir öncelik sırası oluşturulur.
 
 **Parametreler**:
-- `tenantId`: `string` — Marka yapılandırması getirilecek kiracının benzersiz tanımlayıcısı.
+- `tenantId`: `string` — Marka yapılandırması getirilecek kiracının benzersiz kimlik numarası. Boş veya tanımsız olursa veritabanı sorgusu atlanır ve doğrudan ortam değişkenleri veya varsayılan değerlere geçilir.
 
-**Dönüş**: `Promise<TenantBranding>` — Kiracının resolved edilmiş marka yapılandırmasını içeren bir nesne döndürür. `TenantBranding` tipinin şu özelliklere sahip olduğu varsayılır: `brandName: string`, `brandLogoUrl: string`, `brandPrimaryColor: string`, `emailFrom: string`.
+**Dönüş**: `Promise<TenantBranding>` — Aşağıdaki dört alanı içeren bir nesne döndürür:
+- `brandName`: Marka adı. Veritabanında `brand_name` veya `brandName` anahtarı, ortam değişkeninde `BRAND_NAME`, varsayılan olarak `'VentHub'`.
+- `brandLogoUrl`: Marka logosunun URL adresi. Veritabanında `brand_logo_url` veya `brandLogoUrl` anahtarı, ortam değişkeninde `BRAND_LOGO_URL`, varsayılan olarak `'https://venthub-hvac-esite.vercel.app/images/logo.png'`.
+- `brandPrimaryColor`: Markanın birincil renk kodu. Veritabanında `brand_primary_color` veya `brandPrimaryColor` anahtarı, ortam değişkeninde `BRAND_PRIMARY_COLOR`, varsayılan olarak `'#2563eb'`.
+- `emailFrom`: E-posta gönderici adresi ve görünen adı. Veritabanında `email_from` veya `EMAIL_FROM` anahtarı, ortam değişkeninde `EMAIL_FROM`, varsayılan olarak `'VentHub <onboarding@resend.dev>'`.
 
 ---
 
@@ -61,27 +67,28 @@ Bu modül için **fonksiyon gövdesi (function body) paylaşılmamıştır**. Ax
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: _shared/tenant_config.ts::getTenantBranding
-- **params**: (tenantId: string)
+### [N1_NASIL] AST Pointer: supabase/functions/_shared/tenant_config.ts::getTenantBranding
+- **params**: `tenantId` — string tipinde, kiraci (tenant) kimligi
 - **ic_degiskenler**:
-    - `supabaseUrl` — Supabase proje URL'si, environment variable'dan alınır, Supabase istemcisi oluşturmada kullanılır
-    - `serviceKey` — Supabase servis rolü anahtarı, environment variable'dan alınır, yetkilendirme için kullanılır
-    - `dbConfig` — Tenant yapılandırması için boş bir nesne olarak başlatılır, veritabanından yüklenen config verisi burada saklanır
-    - `supabase` — createClient fonksiyonu ile oluşturulan Supabase istemcisi, veritabanı sorguları yapmak için kullanılır
-    - `data` — Supabase sorgusundan dönen veri, tenant'ın config alanını içerir (başarılı olursa)
-    - `error` — Supabase sorgusundan dönen hata nesnesi (başarısız olursa)
-    - `brandName` — Marka adı, dbConfig'den veya environment variable'dan çözümlenir, fallback olarak 'VentHub' kullanılır
-    - `brandLogoUrl` — Marka logo URL'si, dbConfig'den veya environment variable'dan çözümlenir, varsayılan VentHub logosu kullanılır
-    - `brandPrimaryColor` — Marka birincil rengi, dbConfig'den veya environment variable'dan çözümlenir, varsayılan '#2563eb' kullanılır
-    - `emailFrom` — E-posta gönderen adresi, dbConfig'den veya environment variable'dan çözümlenir, varsayılan VentHub adresi kullanılır
-- **Dönüş**: TenantBranding nesnesi (brandName, brandLogoUrl, brandPrimaryColor, emailFrom alanlarını içerir)
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile alinan ortam degiskeni; bos string ile fallback'lenir
+  - `serviceKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile alinan ortam degiskeni; bos string ile fallback'lenir
+  - `dbConfig` — `Record<string, string>` tipinde, veritabanindan gelen kiraci konfigurasyonunu tutan nesne; baslangicta bos obje olarak tanimlanir
+  - `supabase` — `createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })` ile olusturulan Supabase istemcisi; oturum kaldirilmasi devre disi
+  - `data` — `supabase.from('tenants').select('config').eq('id', tenantId).single()` sorgusundan donen veri; `data?.config` ile `config` alanina erisilir ve `dbConfig`'a atanir
+  - `error` — ayni sorgudan donen hata nesnesi; hata varsa `console.warn` ile uyarisi yazdirilir
+  - `err` — `catch` blokunda yakalanan genel hata; `console.error` ile yazdirilir
+  - `brandName` — hiyerarsik cozumleme: once `dbConfig.brand_name`, sonra `dbConfig.brandName`, sonra `Deno.env.get('BRAND_NAME')`, en son `'VentHub'` varsayilan degeri
+  - `brandLogoUrl` — hiyerarsik cozumleme: once `dbConfig.brand_logo_url`, sonra `dbConfig.brandLogoUrl`, sonra `Deno.env.get('BRAND_LOGO_URL')`, en son `'https://venthub-hvac-esite.vercel.app/images/logo.png'` varsayilan degeri
+  - `brandPrimaryColor` — hiyerarsik cozumleme: once `dbConfig.brand_primary_color`, sonra `dbConfig.brandPrimaryColor`, sonra `Deno.env.get('BRAND_PRIMARY_COLOR')`, en son `'#2563eb'` varsayilan degeri
+  - `emailFrom` — hiyerarsik cozumleme: once `dbConfig.email_from`, sonra `dbConfig.EMAIL_FROM`, sonra `Deno.env.get('EMAIL_FROM')`, en son `'VentHub <onboarding@resend.dev>'` varsayilan degeri
+- **Dönüş**: `TenantBranding` tipinde nesne — `{ brandName, brandLogoUrl, brandPrimaryColor, emailFrom }` alanlarini icerir
 
 ---
 
 ## NODE ID STANDARD
 
-  file: supabase\functions\_shared\tenant_config.ts
-  function: supabase\functions\_shared\tenant_config.ts::getTenantBranding
+  file: tenant_config.ts
+  function: tenant_config.ts::getTenantBranding
 
 ---
 

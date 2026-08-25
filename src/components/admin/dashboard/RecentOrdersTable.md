@@ -2,68 +2,64 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\RecentOrdersTable.tsx
-skeleton_hash: 9e10cb2ca8227901
+source_path: C:\tmp\wt-supurme\src\components\admin\dashboard\RecentOrdersTable.tsx
+skeleton_hash: 36270baa464da816
 entity_hashes:
   func:RecentOrdersTable: 74faabf4e70dfa3a
   func:getStatusLabel: 2edd561db46db1dc
   func:getStatusStyles: 419f18093a05eeeb
-  overview: 42e11c3335b98d9f
-  style_tokens: ec5c1233acb1b783
-generated_at: 2026-06-19T20:46:51Z
+  overview: 1e3b923c1a9c6959
+  style_tokens: a8137575ec78dd18
+generated_at: 2026-08-25T07:24:32Z
 ---
 
 ## Genel Bakış
-RecentOrdersTable modülü, yönetim panelinde son siparişleri tablo formatında gösteren bir React bileşenidir. Bileşen, bir sipariş listesi ve başlık alarak verileri düzenler ve her bir siparişin durumuna uygun görsel stil ve etiketleri otomatik olarak üretir.
+Bu modül, admin dashboard'unda son siparişleri listeleyen bir React bileşeni ve bu bileşenin kullandığı yardımcı fonksiyonları içerir. Modülün temel amacı, sipariş verilerini tablo formatında görüntülemek ve her siparişin durumunu kullanıcıya anlaşılır bir etiket ve stil ile sunmaktır.
 
 ## Fonksiyon Grupları
-### Ana Bileşen (Tablo Oluşturucu)
-Sipariş dizisini alır, tablo yapısını ve satırlarını oluşturarak arayüze sunan ana React bileşenidir.
+### Ana Bileşen
+Bu grup, modülün ana kullanıcı arayüzü bileşenini ve onun temel yapılandırmasını sağlar. Bileşen, dışarıdan gelen sipariş verilerini ve bir başlığı alarak bir tablo oluşturur.
 - RecentOrdersTable
 
-### Durum Görselleştirme Yardımcıları
-Sipariş durum metnine göre tablodaki ilgili hücre için uygun CSS stilsını ve okunabilir etiket metnini döndürerek tutarlı bir görünüm sağlar.
+### Durum Biçimlendirme Yardımcıları
+Bu grup, sipariş durumu bilgisini kullanıcı arayüzünde göstermek için gerekli stil ve metin dönüşümlerini gerçekleştirir. Ana bileşen, bu fonksiyonları kullanarak durum bilgisini biçimlendirir.
 - getStatusStyles, getStatusLabel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-RecentOrdersTable modülü, sipariş listesini tablo formatında gösteren bir React bileşeni olup durum görselleştirme yardımcı fonksiyonları kullanır. Bu modülün doğru çalışması için aşağıdaki varsayımlar geçerlidir:
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Neden:** Fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan aksiyom üretilemez. İmzalardan (`orders`, `title`, `status`, `s` parametreleri) çıkarım yapmak, değişken isimlerinden bilgi çıkarmak anlamına gelir ve bu kurallar gereği yasaktır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### RecentOrdersTable
-**Ne yapar**: Son siparişleri gösteren bir tablo bileşenidir. Verilen sipariş listesini, istenen başlıkla birlikte düzenli bir arayüzde sunar.
-**Nasıl yapar**: `orders` prop'undan gelen diziye haritalama yaparak her sipariş için bir tablo satırı (`tr`) oluşturur. Her satırda siparişin kimliği, tarih, toplam tutar, müşteri adı ve durumu gibi bilgileri gösterir. Durum gösterimi için `getStatusStyles` ve `getStatusLabel` yardımcı fonksiyonlarını kullanarak duruma özel stil ve etiketler uygular.
+**Ne yapar**: Son siparişlerin görüntülendiği bir React bileşenidir. Sipariş listesini ve bir başlık bilgisini alarak kullanıcı arayüzünde bir tablo oluşturur.
+**Nasıl yapar**: Kaynak dosya adı `RecentOrdersTable.tsx` olup `admin/dashboard` klasöründe yer alır. Bileşen, aldığı `orders` verisini tablo formatında render eder. Bileşen içinde `getStatusStyles` ve `getStatusLabel` yardımcı fonksiyonlarını kullanarak sipariş durumlarına göre görsel stiller ve etiketler belirler. Fonksiyon `React.FC<RecentOrdersTableProps>` tipinde bir bileşen döndürür.
 **Parametreler**:
-- orders: `Order[]` — Görüntülenecek sipariş nesneleri dizisi. Her nesne sipariş detaylarını içerir.
-- title: `string` — Tablonun üzerinde gösterilecek başlık metni.
-**Dönüş**: `React.FC<RecentOrdersTableProps>` — JSX ile oluşturulmuş, `<table>` elementi içeren React bileşeni.
+- orders: bilinmiyor — Sipariş verilerini içeren koleksiyon. Tip bilgisi `RecentOrdersTableProps` tanımında belirtilmiştir ancak kaynakta detay verilmemiştir.
+- title: bilinmiyor — Bileşenin görüntüleyeceği tablo başlığı. Tip bilgisi `RecentOrdersTableProps` tanımında belirtilmiştir ancak kaynakta detay verilmemiştir.
+**Dönüş**: `React.FC<RecentOrdersTableProps>` — `RecentOrdersTableProps` arayüzüne uygun props alan bir React fonksiyonel bileşeni döndürür.
 
 ### getStatusStyles
-**Ne yapar**: Bir sipariş durumuna karşılık gelen CSS stil sınıfı nesnesini döndürür.
-**Nasıl yapar**: `status` parametresiyle gelen durum dizesine göre (ör. "pending", "processing", "shipped", "delivered", "cancelled") önceden tanımlanmış stil sınıflarını içeren bir nesneyi döndürür. Bu nesne, ilgili durum göstergesine (badge) uygulanarak arka plan rengi, metin rengi gibi görsel özellikleri belirler.
-**Parametreler**:
-- status: `string` — Stillendirilecek sipariş durumunu belirten dize (ör. "pending", "shipped").
-**Dönüş**: `object` — `{ className: string }` formatında, belirli CSS sınıflarını içeren nesne. Örneğin, `pending` durumu için `{ className: 'bg-yellow-100 text-yellow-800' }` gibi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getStatusLabel
-**Ne yapar**: Bir sipariş durumu kodunu, kullanıcıya gösterilecek okunabilir etikete dönüştürür.
-**Nasıl yapar**: `s` parametresiyle gelen durum dizesini (ör. "processing") alır ve bunu önceden tanımlanmış bir eşleme (mapping) kullanarak daha anlaşılır bir metne (ör. "İşleniyor") dönüştürür. Bu sayede arka uçtaki teknik durum kodları, arayüzde kullanıcı dostu biçimde sunulur.
-**Parametreler**:
-- s: `string` — Çevrilecek sipariş durum kodu.
-**Dönüş**: `string` — Görüntülenecek insan tarafından okunabilir etiket metni. Durum eşleşmesi bulunamazsa, büyük harflerle düzenlenmiş ham durum dizesini döndürür.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../../hooks/useDragScroll::useDragScroll
 - import: ../../../i18n/I18nProvider::useI18n
+- import: ../../../i18n/currency::SYSTEM_CURRENCY
 - import: ../../../i18n/datetime::formatDateTime
 - import: ../../../i18n/format::formatCurrency
+- import: ../../../lib/admin/orderStatusLabels::orderStatusLabel
 - import: ../../../utils/routes::Routes
 - import: ../AdminEmptyState::AdminEmptyState
 - import: lucide-react::ChevronRight
@@ -91,46 +87,34 @@ RecentOrdersTable modülü, sipariş listesini tablo formatında gösteren bir R
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: components/admin/dashboard/RecentOrdersTable.tsx::RecentOrdersTable
-- **params**: `{ orders, title }`
+### [N1_NASIL] AST Pointer: RecentOrdersTable.tsx::RecentOrdersTable
+- **params**: `orders`, `title`
 - **ic_degiskenler**:
-  - `lang` — useI18n() hook'undan gelen dil bilgisi, formatDateTime ve formatCurrency fonksiyonlarına parametre olarak gönderilir
-  - `dragScrollRef` — useDragScroll<HTMLDivElement>() hook'undan dönen ref nesnesi, sürükleme ile yatay kaydırma için tablo container'ına bağlanır
-  - `getStatusStyles` — inner function, status parametresine göre Tailwind CSS stil sınıfı döndürür
-  - `getStatusLabel` — inner function, status parametresine göre Türkçe durum etiketi döndürür
-- **JSX İçi Erişimler**:
-  - `title` — bileşen başlığı olarak <h3> içinde render edilir
-  - `orders` — sipariş dizisi, length kontrolü ve map iterasyonu için kullanılır
-  - `r.id` — her siparişin benzersiz kimliği, key prop'u ve link href'inde kullanılır
-  - `r.order_number` — sipariş numarası, order_number yoksa fallback olarak id kullanılır, son 8 karakter truncate edilir
-  - `r.created_at` — sipariş oluşturma tarihi, formatDateTime fonksiyonuna gönderilir
-  - `r.total_amount` — sipariş tutarı, formatCurrency fonksiyonuna gönderilir
-  - `r.status` — sipariş durumu, getStatusStyles ve getStatusLabel fonksiyonlarına gönderilir
-  - `index` — map iterasyonu indeksi, animasyon gecikmesi için (index * 50) ms hesaplanır
-- **Dönüş**: JSX (React.ReactNode) — sipariş tablosu layout'u
+  - `lang` — `useI18n()` hook'undan destructure edilen dil kodu; `formatDateTime` ve `formatCurrency` çağrılarına ikinci argüman olarak geçilir
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; tablo başlıklarını, boş durum metinlerini ve buton etiketlerini yerelleştirmek için kullanılır
+  - `dragScrollRef` — `useDragScroll<HTMLDivElement>()` hook'undan dönen ref; tablo kapsayıcısının `ref` prop'una atanarak yatay sürükleme-kaydırma davranışı sağlar
+  - `getStatusStyles` — sipariş durum string'ine göre Tailwind CSS sınıf dizesi döndüren iç fonksiyon (ayrı bkz. N2_NASIL)
+  - `getStatusLabel` — `orderStatusLabel` fonksiyonunu `t` ile birlikte sararak durum etiketi döndüren iç fonksiyon
+  - `orderNo` — her satır için `r.order_number` yoksa `r.id` değerinin son 8 karakteri alınıp büyük harfe çevrilerek önüne `#` eklenerek oluşturulan sipariş numarası dizesi (map callback'i içinde tanımlı)
+  - `r` — `orders` dizisinin her bir elemanı; `r.id`, `r.order_number`, `r.created_at`, `r.total_amount`, `r.status` alanlarına erişilir
+  - `index` — `orders.map` callback'indeki dizi indeksi; animasyon gecikmesini hesaplamak için `index * 50` ms olarak kullanılır
+- **Dönüş**: JSX (sipariş tablosu içeren `div` ağacı)
 
-### [N2_NASIL] AST Pointer: components/admin/dashboard/RecentOrdersTable.tsx::getStatusStyles
-- **params**: `(status: string)`
-- **ic_degiskenler**: yok
-- **Dönüş**: string — duruma göre Tailwind CSS stil sınıfı (örn: 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/30' için 'completed')
+### [N2_NASIL] AST Pointer: RecentOrdersTable.tsx::getStatusStyles
+- **params**: `status`
+- **ic_degiskenler**: yok (yalnızca switch-case dalları)
+- **Dönüş**: string — duruma karşılık gelen Tailwind CSS sınıf dizesi; `'paid'` ve `'delivered'` → success, `'pending'`/`'shipped'`/`'refunded'`/`'partial_refunded'` → warning, `'confirmed'`/`'processing'` → accent, `'cancelled'` → danger, diğer tüm değerler → varsayılan yüzey rengi
 
-### [N3_NASIL] AST Pointer: components/admin/dashboard/RecentOrdersTable.tsx::getStatusLabel
-- **params**: `(s: string)`
+### [N3_NASIL] AST Pointer: RecentOrdersTable.tsx::getStatusLabel
+- **params**: `s`
 - **ic_degiskenler**: yok
-- **Dönüş**: string — duruma göre Türkçe etiket (örn: 'completed' → 'Tamamlandı', 'pending' → 'Teklif/Bekleniyor')
+- **Dönüş**: `orderStatusLabel(s, t)` çağrısının dönüşü — insan tarafından okunabilir durum etiketi (çevrilmiş string)
 
-### [N4_NASIL] AST Pointer: components/admin/dashboard/RecentOrdersTable.tsx::orders.map callback
-- **params**: `(r, index)` — r: sipariş nesnesi, index: dizi indeksi
-- **ic_degiskenler**: yok
-- **Kullanılan erişimler**:
-  - `r.id` — key prop'u ve detay link href'i için kullanılır
-  - `r.order_number` — sipariş numarası gösterimi (|| ile fallback olarak r.id kullanılır)
-  - `r.created_at` — formatDateTime(r.created_at, lang) çağrısında tarih formatlaması için kullanılır
-  - `r.total_amount` — formatCurrency(r.total_amount, lang) çağrısında para birimi formatlaması için kullanılır
-  - `r.status` — getStatusStyles(r.status) ve getStatusLabel(r.status) çağrılarında kullanılır
-  - `index` — animationDelay hesaplaması için kullanılır: `${index * 50}ms`
-  - `lang` — parent scope'dan闭包 ile erişilen dil bilgisi, formatDateTime ve formatCurrency'e gönderilir
-- **Dönüş**: JSX (<tr> elementi) — tek bir sipariş tablosu satırı
+### [N4_NASIL] AST Pointer: RecentOrdersTable.tsx::orders.map callback
+- **params**: `r`, `index`
+- **ic_degiskenler**:
+  - `orderNo` — `r.order_number` varsa onu, yoksa `r.id`yi alıp `.toString().slice(-8).toUpperCase()` ile son 8 haneyi büyük harfe çevirip başına `#` ekleyerek oluşturulan sipariş numarası dizesi
+- **Dönüş**: JSX (`<tr>` satır elementi; sipariş numarası, tarih, tutar, durum etiketi ve detay bağlantısı sütunlarını içerir)
 
 ---
 
@@ -147,10 +131,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: src\components\admin\dashboard\RecentOrdersTable.tsx
-  function: src\components\admin\dashboard\RecentOrdersTable.tsx::RecentOrdersTable
-  function: src\components\admin\dashboard\RecentOrdersTable.tsx::getStatusStyles
-  function: src\components\admin\dashboard\RecentOrdersTable.tsx::getStatusLabel
+  file: RecentOrdersTable.tsx
+  function: RecentOrdersTable.tsx::RecentOrdersTable
+  function: RecentOrdersTable.tsx::getStatusStyles
+  function: RecentOrdersTable.tsx::getStatusLabel
 
 ---
 
@@ -165,10 +149,10 @@ graph TD
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-current`, `bg-cyan-500`, `bg-cyan-500/0`, `bg-cyan-500/5`, `bg-white/2`, `bg-white/5`, `border-collapse`, `border-white/5`, `group-hover/row:bg-cyan-500`, `group-hover/row:bg-white/10`, `group-hover/row:text-white`, `group-hover/table:text-cyan-400`, `hover:bg-cyan-500`, `hover:bg-white/3`, `hover:text-surface-deep`
-- **Layout:** `-right-24`, `-top-24`, `absolute`, `backdrop-blur-md`, `custom-scrollbar`, `flex`, `flex-col`, `gap-2`, `gap-3`, `h-0.5`, `h-1.5`, `h-48`, `h-6`, `h-full`, `inline-flex`
+- **Renkler:** `bg-admin-accent`, `bg-admin-accent-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-current`, `border-admin-border`, `border-collapse`, `group-hover/row:bg-admin-accent`, `group-hover/row:bg-admin-surface-3`, `group-hover/row:text-admin-fg`, `group-hover/table:text-admin-accent`, `hover:bg-admin-accent`, `hover:bg-admin-surface-2`, `hover:text-admin-accent-fg`, `text-admin-accent`
+- **Layout:** `-right-24`, `-top-24`, `absolute`, `custom-scrollbar`, `flex`, `flex-col`, `gap-2`, `gap-3`, `h-0.5`, `h-1.5`, `h-48`, `h-6`, `h-full`, `inline-flex`, `items-center`
 - **Varyant/Responsive:** `active:`, `first:`, `group-hover/btn:`, `group-hover/link:`, `group-hover/row:`, `group-hover/table:`, `hover:`, `last:` önekleri
-- **Yardımcı Sınıflar:** `${adminTableCellClass`, `${adminTableContainerClass`, `${adminTableHeadCellClass`, `${getStatusStyles(r.status`, `-ml-8`, `active:scale-95`, `animate-in`, `animate-pulse`, `blur-100`, `border`, `divide-white/5`, `divide-y`, `duration-300`, `duration-500`, `fade-in`
+- **Yardımcı Sınıflar:** `${adminTableCellClass`, `${adminTableContainerClass`, `${adminTableHeadCellClass`, `${getStatusStyles(r.status`, `-ml-8`, `active:scale-95`, `animate-in`, `animate-pulse`, `blur-100`, `border`, `divide-admin-border`, `divide-y`, `duration-300`, `duration-500`, `fade-in`

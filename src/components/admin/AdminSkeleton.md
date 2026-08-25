@@ -2,56 +2,56 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\AdminSkeleton.tsx
-skeleton_hash: a34791c328f8d809
+source_path: C:\tmp\wt-supurme\src\components\admin\AdminSkeleton.tsx
+skeleton_hash: 10a5598cfbfacede
 entity_hashes:
-  func:AdminSkeleton: 586d38b8378960eb
-  overview: d5fffe3d7ed9f7eb
-  style_tokens: 9ebeaa83a2aaeb97
-generated_at: 2026-06-19T20:46:39Z
+  func:AdminSkeleton: 77330e168e73e66f
+  overview: f3781a370e1b4261
+  style_tokens: 9e8ea6f4cb9e6a4c
+generated_at: 2026-08-25T07:24:24Z
 ---
 
 ## Genel Bakış
-`AdminSkeleton` bileşeni, yönetim panelinde veri yüklenme süreçlerinde kullanıcıya görsel geri bildirim sunan yer tutucu arayüzleri oluşturur. Tablo, kart veya form gibi farklı varyasyonlara göre adapte olabilen esnek bir skeleton şablonu sağlar. Bu sayede sayfa düzeni nihai veriler yüklenmeden önce kullanıcıya kabaca gösterilir.
+Bu modül, admin panelinde veri yüklenirken gösterilen iskelet (skeleton) yükleme bileşenini içerir. Tek bir bileşenden oluşur ve `variant`, `rows`, `count`, `fields` gibi özellikleri alarak farklı admin ekranlarına uyum sağlayacak şekilde yapılandırılabilir. Yükleme sırasında kullanıcılara görsel bir geri bildirim sunmak amacıyla kullanılır.
 
 ## Fonksiyon Grupları
-### Skeleton Oluşturma ve Yer Tutucu Üretimi
-Verilen parametrelere göre satır, alan ve tekrar sayısını hesaplayarak tekrarlayan placeholder elemanlarını oluşturur.
+
+### Skeleton Yükleme Bileşeni
+Admin panelinin çeşitli görünümlerinde veri yüklenirken gösterilen iskelet/placeholder arayüzü oluşturur. `variant` özelliğiyle farklı ekran türlerine, `rows`, `count` ve `fields` özellikleriyle ise satır sayısı, öğe sayısı ve alan sayısı gibi detaylara göre özelleştirilebilir bir yükleme durumu sunar.
 - AdminSkeleton
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için temel mimari varsayımlar fonksiyonun parametrelerine dayanır.
 
-**[Aksiyom 1]:** Eğer `variant` parametresi `null` veya `undefined` ise, bileşen doğru bir skeleton varyantı (ör. `table`, `card`, `form`) oluşturamaz ve uygun bir stil uygulanamaz.
+[Aksiyom 1]: Eğer `variant` prop'u sağlanmazsa, bileşenin davranışı bilinmiyor (fonksiyon gövdesi mevcut değil, zorunlu prop olarak tanımlanmıştır).
 
-**[Aksiyom 2]:** Eğer `rows`, `count` veya `fields` parametrelerinden herhangi biri negatif veya sıfır ise, bileşen anlamsız veya görünmez placeholder elemanlar üretir; skeleton yapısının bozulmasına yol açar.
+[Aksiyom 2]: Eğer `rows` prop'u sağlanmazsa, varsayılan değer olarak 5 kullanılır.
 
-**[Aksiyom 3]:** Fonksiyonun `rows`, `count` ve `fields` değerlerini **pozitif tamsayı** olarak kabul ettiği varsayılır (default değerleri sırasıyla 5, 4 ve 6'dır). Bu değerlerin UI'da tekrarlayan elemanların sayısını doğrudan belirlediği kabul edilir.
+[Aksiyom 3]: Eğer `count` prop'u sağlanmazsa, varsayılan değer olarak 4 kullanılır.
+
+[Aksiyom 4]: Eğer `fields` prop'u sağlanmazsa, varsayılan değer olarak 6 kullanılır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminSkeleton
+**Ne yapar**: Admin panelindeki farklı sayfa düzenlerinin (tablo, kartlar, form) yükleme sırasında gösterilecek iskelet (skeleton) bileşenlerini oluşturur. Kullanıcıya içeriğin yüklendiğini gösteren animasyonlu yer tutucular render eder.
 
-**Ne yapar**: AdminSkeleton, admin panelinin yükleme durumlarında (loading state) kullanılacak iskelet/skeleton gösterimini oluşturur. variant propuna bağlı olarak tablo, kart veya form tipinde animasyonlu placeholder bileşenleri render eder. Veri yüklenene kadar kullanıcıya sayfanın yapısını görsel olarak hissettirmeyi amaçlar.
-
-**Nasıl yapar**: Fonksiyon, `variant` parametresinin değerine göre üç farklı JSX yapısı döndürür. `'table'` seçildiğinde başlık satırı ve belirli satır/sütun sayısına sahip bir tablo iskeleti, `'cards'` seçildiğinde grid düzeninde kart iskeletleri,否则 varsayılan olarak form alanlarından oluşan bir iskelet render eder. Her bir varyantta `animate-pulse` sınıfı ile animasyon efekti, `glassStrongClass` ile cam efektli arka plan ve `border-white/5` gibi transparan kenarlıklar kullanılarak modern bir loading görseli oluşturulur. `rows`, `count` ve `fields` parametreleri ile dinamik olarak eleman sayısı kontrol edilir.
+**Nasıl yapar**: `variant` parametresinin değerine göre üç farklı JSX yapısından birini döndürür. `'table'` varyantında, sabit 5 sütunlu bir tablo başlığı ve `rows` parametresi kadar veri satırı oluşturur; her hücre `animate-pulse` sınıfıyla yanıp sönen gri kutucuklar içerir. `'cards'` varyantında, `count` parametresi kadar yan yana (responsive grid ile) kart skeleton'u üretir; her kartta küçük bir etiket ve büyük bir sayı alanı ile sağda bir ikon alanı bulunur. Diğer tüm durumlarda (form varyantı), `fields` parametresi kadar form alanı skeleton'u oluşturur; üstte bir başlık, ortada iki sütunlu grid içinde etiket ve input alanları, altta ise iptal ve kaydet butonlarının skeleton'larını render eder. Her varyantta `bg-admin-surface`, `border-admin-border`, `rounded-admin-lg` gibi Tailwind CSS sınıflarıyla tutarlı bir admin teması uygulanır.
 
 **Parametreler**:
-- `variant`: `'table' | 'cards' | string` (varsayılan: `'form'` olarak davranır) — Skeleton tipini belirler. `'table'` tablo, `'cards'` kart düzeni, diğer değerler form varyantını aktif eder
-- `rows`: `number` — `'table'` varyantında tablonun satır sayısını belirler (varsayılan: 5)
-- `count`: `number` — `'cards'` varyantında gösterilecek kart sayısını belirler (varsayılan: 4)
-- `fields`: `number` — Varsayılan form varyantında alan sayısını belirler (varsayılan: 6)
+- `variant`: `'table' | 'cards' | string` — Hangi skeleton düzeninin gösterileceğini belirler. `'table'` tablo iskeleti, `'cards'` kart iskeleti, diğer değerler form iskeleti render eder.
+- `rows`: `number` (varsayılan: `5`) — Tablo varyantında oluşturulacak veri satırı sayısıdır.
+- `count`: `number` (varsayılan: `4`) — Kart varyantında oluşturulacak kart sayısıdır.
+- `fields`: `number` (varsayılan: `6`) — Form varyantında oluşturulacak form alanı sayısıdır.
 
-**Dönüş**: `JSX.Element` — Seçilen varyanta göre animasyonlu skeleton yapısını temsil eden React JSX bileşeni döndürür. Her varyant farklı bir layout yapısına sahiptir: tablo varyantı `<div>` içinde `<table>` yapısı, kart varyantı grid düzeninde çoklu `<div>` kartları, form varyantı ise input alanlarını simüle eden çoklu `<div>` blokları içerir.
+**Dönüş**: Belirtilmemiş. Kaynak kodda dönüş tipi açıkça tanımlanmamıştır; React fonksiyonel bileşeni olarak JSX yapısı döndürür ancak kesin TypeScript dönüş tipi bilinmiyor.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../utils/adminUi::glassStrongClass
 - import: react::React
 
 ---
@@ -69,16 +69,26 @@ Bu modülün doğru çalışması için temel mimari varsayımlar fonksiyonun pa
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/AdminSkeleton.tsx::AdminSkeleton
-- **params**: `variant`, `rows = 5`, `count = 4`, `fields = 6`
-- **ic_degiskenler**: `variant` — Skeleton gösterim modunu belirler (table, cards veya form). Fonksiyon içinde `variant` değeri kontrol edilerek farklı JSX yapıları döndürülür.
-- **Dönüş**: `JSX.Element` — `variant` değerine bağlı olarak farklı loading skeleton yapısı döndürür. Table modunda tablo loading, cards modunda kart grid'i, form modunda form loading skeleton'ı render eder.
+- **params**:
+  - `variant` — hangi skeleton çeşidinin gösterileceğini belirler; `'table'`, `'cards'` veya form (varsayılan) değerlerinden birini alır
+  - `rows` — varsayılan değeri `5`; `variant === 'table'` olduğunda tablodaki satır sayısını belirler
+  - `count` — varsayılan değeri `4`; `variant === 'cards'` olduğunda gösterilecek kart sayısını belirler
+  - `fields` — varsayılan değeri `6`; form varyantında gösterilecek form alanlarının sayısını belirler
+- **ic_degiskenler**:
+  - `_` — `[...Array(...)].map((_, i) => ...)` callback'inde kullanılan, dizi elemanının kendisini temsil eden ama işlenmeyen değişken
+  - `i` — map callback'inde dizi index'i; `key` prop'u olarak kullanılır (tablo başlıkları, tablo satırları, kartlar, form alanları)
+  - `j` — tablo varyantında iç içe map'te sütun index'i; `key` prop'u olarak kullanılır ve 5 sütunlu `<td>` öğelerini oluşturur
+- **Dönüş**: JSX (React.ReactNode) — `variant` değerine göre üç farklı skeleton yapısı döndürür:
+  - `'table'`: 5 sütun başlığı + `rows` kadar satırdan oluşan tablo skeleton'u
+  - `'cards'`: `count` kadar kart skeleton'u (grid düzeninde)
+  - form (varsayılan): `fields` kadar form alanı + buton skeleton'u içeren form yapısı
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\admin\AdminSkeleton.tsx
-  function: src\components\admin\AdminSkeleton.tsx::AdminSkeleton
+  file: AdminSkeleton.tsx
+  function: AdminSkeleton.tsx::AdminSkeleton
 
 ---
 
@@ -93,10 +103,10 @@ Bu modülün doğru çalışması için temel mimari varsayımlar fonksiyonun pa
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `rounded-hvac-xl`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400/10`, `bg-cyan-500/5`, `bg-gradient-to-br`, `bg-transparent`, `bg-white/10`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-b`, `border-cyan-400/20`, `border-t`, `border-white/5`, `from-cyan-500/5`, `text-left`, `to-transparent`
-- **Layout:** `absolute`, `flex`, `from-cyan-500/5`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `h-10`, `h-12`, `h-14`, `h-3`, `h-32`, `h-4`, `h-6`
-- **Varyant/Responsive:** `group-hover:`, `lg:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `${glassStrongClass`, `animate-pulse`, `blur-3xl`, `border`, `divide-white/5`, `divide-y`, `group`, `group-hover:opacity-100`, `inset-0`, `mb-10`, `ml-1`, `mt-10`, `opacity-0`, `pt-8`, `rounded-2xl`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-surface-3`, `bg-transparent`, `border-admin-accent/30`, `border-admin-border`, `border-b`, `border-t`, `text-left`
+- **Layout:** `flex`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `h-10`, `h-12`, `h-14`, `h-3`, `h-4`, `h-6`, `h-8`, `items-center`, `justify-between`
+- **Varyant/Responsive:** `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `animate-pulse`, `border`, `divide-admin-border`, `divide-y`, `group`, `mb-10`, `ml-1`, `mt-10`, `pt-8`, `rounded-admin-lg`, `rounded-admin-md`, `rounded-full`, `space-y-3`, `space-y-4`, `space-y-8`

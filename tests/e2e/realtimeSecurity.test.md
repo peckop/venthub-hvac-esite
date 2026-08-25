@@ -2,61 +2,58 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\tests\e2e\realtimeSecurity.test.ts
-skeleton_hash: 23c6e2d67e906b13
+source_path: C:\tmp\wt-supurme\tests\e2e\realtimeSecurity.test.ts
+skeleton_hash: 2340b703c7e7437a
 entity_hashes:
-  func:MockRealtimeChannel:constructor: 4a549f43247680e1
-  func:MockRealtimeChannel:on: 809c58a25ba920c3
-  func:MockRealtimeChannel:subscribe: 24415cc02953448c
-  func:MockRealtimeClient:channel: 4e08d2ff6943b1bb
-  func:MockRealtimeClient:constructor: 487186c9ad21f70e
-  func:RealtimeServerMock:broadcastDatabaseChange: 1fe6b22c04a483b8
-  func:RealtimeServerMock:getActiveSubscriptionsCount: 96aaa5e5f92c61d3
-  func:RealtimeServerMock:reset: 17b6170f90b31d4e
-  func:RealtimeServerMock:subscribe: 6e43551da04779fb
+  func:MockRealtimeChannel:constructor: 0cf813d11a989075
+  func:MockRealtimeChannel:on: 4dc430d0383adfa8
+  func:MockRealtimeChannel:subscribe: e8a160c78132b308
+  func:MockRealtimeClient:channel: e1c6f33efb8e55c6
+  func:MockRealtimeClient:constructor: a1da1df18792c9ad
+  func:RealtimeServerMock:broadcastDatabaseChange: cde6b49718085054
+  func:RealtimeServerMock:getActiveSubscriptionsCount: e44cbdc280e7ee3e
+  func:RealtimeServerMock:reset: 8f8da4cc8f268833
+  func:RealtimeServerMock:subscribe: c5a2cae8f40c510d
   overview: 46e4ba2da30aeb1d
-generated_at: 2026-06-07T14:04:22Z
+generated_at: 2026-08-25T07:34:54Z
 ---
 
 ## Genel Bakış
-
-Bu modül, gerçek zamanlı (realtime) güvenlik senaryolarını test etmek için kullanılan mock sınıflar içermektedir. WebSocket veya SSE tabanlı pub/sub sisteminin sunucu tarafını simüle ederek, yetkilendirme, abonelik kontrolü ve veritabanı değişiklik yayını gibi işlevlerin doğru çalıştığını doğrulamayı amaçlar.
+Bu modül, gerçek zamanlı güvenlik testleri için sunucu, kanal ve istemci davranışlarını simüle eden mock sınıflarını içerir. Test senaryolarında, abonelik yönetimi, olay dinleme ve veritabanı değişikliklerinin yayınlanması gibi gerçek zamanlı işlemlerin güvenlik kontrollerini doğrulamak amacıyla kullanılır. Modül, bağımsız ve kontrollü bir test ortamı sağlar.
 
 ## Fonksiyon Grupları
+### Gerçek Zamanlı Sunucu Mock'u
+Gerçek zamanlı sunucunun temel işlevlerini simüle eder; abonelikleri yönetir, veritabanı değişikliklerini yayınlar ve aktif abonelik sayılarını takip eder.
+- reset, subscribe, broadcastDatabaseChange, getActiveSubscriptionsCount
 
-### Sunucu Simülasyonu
+### Gerçek Zamanlı Kanal Mock'u
+Bir gerçek zamanlı kanalın davranışını taklit eder; olayları dinlemek ve abonelikleri yönetmek için arayüz sağlar.
+- constructor, on, subscribe
 
-Gerçek zamanlı sunucu davranışını taklit ederek abonelik yönetimini ve veri değişimlerini merkezi olarak kontrol eder.
-
-- `reset()`, `subscribe()`, `broadcastDatabaseChange()`, `getActiveSubscriptionsCount()`
-
-### Kanal Yönetimi
-
-İstemcilerin sunucuya bağlı olduğu sanal kanalları temsil eder ve olay dinleyicilerinin kaydedilmesini sağlar.
-
-- `MockRealtimeChannel` sınıfı (constructor, `on()`, `subscribe()`)
-
-### İstemci Simülasyonu
-
-JWT claims ve token durumlarıyla yapılandırılmış sahte istemciler oluşturur; bu istemciler aracılığıyla kanallara erişim sağlanır.
-
-- `MockRealtimeClient` sınıfı (constructor, `channel()`)
+### Gerçek Zamanlı İstemci Mock'u
+Gerçek zamanlı bir istemcinin temel davranışını simüle eder; belirli bir kanal nesnesi oluşturmak için fabrika metodu sunar.
+- constructor, channel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, gerçek zamanlı güvenlik testleri için mock nesneler ve sunucu simülasyonu sağlar. Aşağıdaki varsayımlar, testlerin doğru çalışabilmesi için gereklidir.
+
+[Aksiyom 1]: Eğer `RealtimeTokenClaims` yapısına uygun bir nesne yoksa, `MockRealtimeClient` nesnesi oluşturulamaz.
+[Aksiyom 2]: Eğer `isTokenTampered` parametresi yoksa, `MockRealtimeClient` nesnesi oluşturulamaz.
+[Aksiyom 3]: Eğer `channelName` ve geçerli bir `MockRealtimeClient` nesnesi yoksa, `MockRealtimeChannel` nesnesi oluşturulamaz.
+[Aksiyom 4]: Eğer `channelName`, `client`, `eventFilter` ve `callback` parametreleri yoksa, `RealtimeServerMock.subscribe` fonksiyonu çağrılamaz
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### RealtimeServerMock.reset
-**Ne yapar**: Mock sunucu üzerindeki tüm aktif realtime abonelikleri temizler. Test senaryoları arasında durum sıfırlamak için kullanılır.
-**Nasıl yapar**: `subscriptions` Map'indeki tüm頻道 ve abonelik kayıtlarını `clear()` metodu ile siler.
+### reset
+**Ne yapar**: `RealtimeServerMock` sınıfının tüm aktif aboneliklerini temizler. Sunucu durumunu sıfırlayarak test ortamını başlangıç durumuna getirir.
+**Nasıl yapar**: `this.subscriptions` koleksiyonundaki tüm kayıtları temizleyen `clear()` metodunu çağırır. Bu işlem, tüm kanallardaki tüm abonelikleri kaldırır.
 **Parametreler**: Yok
-**Dönüş**: `void` — dönüş değeri yoktur.
+**Dönüş**: Return tipi belirtilmemiş
 
 ### subscribe
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -84,6 +81,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: vitest::beforeEach
+- import: vitest::describe
+- import: vitest::expect
+- import: vitest::it
+
+---
+
 ## INTERFACES
 
 ### RealtimeTokenClaims
@@ -102,52 +107,56 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ### [N1_NASIL] AST Pointer: tests/e2e/realtimeSecurity.test.ts::RealtimeServerMock.reset
 - **params**: (parametre yok)
-- **ic_degiskenler**: 
-- **Dönüş**: yok (subscription listesini temizler)
+- **ic_degiskenler**: (iç değişken yok)
+- **Dönüş**: yok — `this.subscriptions` Map'inin tüm elemanlarını temizler
 
 ### [N2_NASIL] AST Pointer: tests/e2e/realtimeSecurity.test.ts::RealtimeServerMock.subscribe
-- **params**: `(channelName: string, client: MockRealtimeClient, eventFilter: any, callback: (payload: any) => void)`
-- **ic_degiskenler**: 
-  - `adminChannelMatch` — channelName'in regex ile eşleşip eşleşmediğini ve secure admin kanalı pattern'ini kontrol eder
-  - `targetTenantId` — regex eşleşmesinden çıkartılan tenant ID'si (eğer secure admin kanalı ise)
-- **Dönüş**: `{ status: string; error?: string }` (SUBSCRIBED veya CHANNEL_ERROR döner)
+- **params**: `channelName: string`, `client: MockRealtimeClient`, `eventFilter: any`, `callback: (payload: any) => void`
+- **ic_degiskenler**:
+  - `adminChannelMatch` — `channelName.match(/^admin-(?:orders|stock)-realtime-(.+)$/)` sonucu; admin kanal deseniyle eşleşip eşleşmediğini tutar, eşleşmezse null
+  - `targetTenantId` — `adminChannelMatch[1]` değeri; regex yakalama grubundan çıkarılan hedef tenant ID'si
+- **Dönüş**: `{ status: string; error?: string }` — başarılıysa `{ status: 'SUBSCRIBED' }`, başarısızsa `{ status: 'CHANNEL_ERROR', error: '...' }` döner
 
 ### [N3_NASIL] AST Pointer: tests/e2e/realtimeSecurity.test.ts::RealtimeServerMock.broadcastDatabaseChange
-- **params**: `(tableName: string, eventType: 'INSERT' | 'UPDATE' | 'DELETE', rowData: any)`
-- **ic_degiskenler**: 
-  - `rowTenantId` — rowData objesinden alınan tenant_id değeri (broadcast RLS filtresi için kullanılır)
-- **Dönüş**: yok (subscribe olan tüm client'lara callback tetikler)
+- **params**: `tableName: string`, `eventType: 'INSERT' | 'UPDATE' | 'DELETE'`, `rowData: any`
+- **ic_degiskenler**:
+  - `rowTenantId` — `rowData.tenant_id` değeri; yayınlanan satırın ait olduğu tenant kimliği
+  - `subs` — `this.subscriptions.forEach` döngüsündeki her kanalın abonelik dizisi
+  - `_channelName` — `this.subscriptions.forEach` döngüsündeki kanal adı (kullanılmıyor)
+  - `sub` — `subs.forEach` döngüsündeki her abonelik nesnesi; `client`, `callback`, `eventFilter` alanlarını içerir
+  - `isAuthorized` — `sub.client.role === 'super_admin'` veya `rowTenantId && sub.client.tenantId === rowTenantId` koşullarının sonucu; abonenin olayı almaya yetkili olup olmadığını belirler
+- **Dönüş**: yok — yan etki olarak yetkili abonelerin `callback` fonksiyonlarını `{ schema, table, commit_timestamp, eventType, new, old }` payload'uyla çağırır
 
 ### [N4_NASIL] AST Pointer: tests/e2e/realtimeSecurity.test.ts::RealtimeServerMock.getActiveSubscriptionsCount
-- **params**: `(channelName: string)`
-- **ic_degiskenler**: 
-- **Dönüş**: `number` (belirtilen kanaldaki aktif subscription sayısı)
+- **params**: `channelName: string`
+- **ic_degiskenler**: (iç değişken yok)
+- **Dönüş**: `number` — `this.subscriptions.get(channelName)?.length || 0`; belirtilen kanalın aktif abonelik sayısını döner
 
 ### [N5_NASIL] AST Pointer: tests/e2e/realtimeSecurity.test.ts::MockRealtimeChannel.constructor
-- **params**: `(channelName: string, client: MockRealtimeClient)`
-- **ic_degiskenler**: 
-- **Dönüş**: yok (instance properties'leri atar)
+- **params**: `channelName: string`, `client: MockRealtimeClient`
+- **ic_degiskenler**: (iç değişken yok)
+- **Dönüş**: yok — `this.channelName` ve `this.client` alanlarına atama yapar
 
 ### [N6_NASIL] AST Pointer: tests/e2e/realtimeSecurity.test.ts::MockRealtimeChannel.on
-- **params**: `(type: string, filter: any, callback: (payload: any) => void)`
-- **ic_degiskenler**: 
-- **Dönüş**: `this` (MockRealtimeChannel instance'ı, zincirleme kullanım için)
+- **params**: `type: string`, `filter: any`, `callback: (payload: any) => void`
+- **ic_degiskenler**: (iç değişken yok)
+- **Dönüş**: `this` (MockRealtimeChannel) — `type === 'postgres_changes'` ise `this.postgresCallback` ve `this.eventFilter` alanlarını atar, zincirleme çağrıya izin verir
 
 ### [N7_NASIL] AST Pointer: tests/e2e/realtimeSecurity.test.ts::MockRealtimeChannel.subscribe
-- **params**: `(statusCallback?: (status: string, err?: any) => void)`
-- **ic_degiskenler**: 
-  - `res` — serverMock.subscribe çağırmasının sonucu (status ve error bilgisi içerir)
-- **Dönüş**: `this` (MockRealtimeChannel instance'ı)
+- **params**: `statusCallback?: (status: string, err?: any) => void`
+- **ic_degiskenler**:
+  - `res` — `serverMock.subscribe(this.channelName, this.client, this.eventFilter, ...)` çağrısının dönüş değeri; `{ status: string; error?: string }` tipinde
+- **Dönüş**: `this` (MockRealtimeChannel) — `this.client.isTokenTampered` true ise `statusCallback`'a `'CHANNEL_ERROR'` ve `Error('401: Invalid signature/token verification failed')` gönderir, `serverMock.subscribe` çağırmaz. Aksi halde `res.status`'a göre `statusCallback`'a `'SUBSCRIBED'` veya `'CHANNEL_ERROR'` gönderir
 
 ### [N8_NASIL] AST Pointer: tests/e2e/realtimeSecurity.test.ts::MockRealtimeClient.constructor
-- **params**: `(claims: RealtimeTokenClaims, isTokenTampered = false)`
-- **ic_degiskenler**: 
-- **Dönüş**: yok (instance properties'leri claims'ten atar)
+- **params**: `claims: RealtimeTokenClaims`, `isTokenTampered: boolean` (varsayılan: `false`)
+- **ic_degiskenler**: (iç değişken yok)
+- **Dönüş**: yok — `this.tenantId = claims.tenant_id`, `this.role = claims.role`, `this.userId = claims.sub`, `this.isTokenTampered = isTokenTampered` atamalarını yapar
 
 ### [N9_NASIL] AST Pointer: tests/e2e/realtimeSecurity.test.ts::MockRealtimeClient.channel
-- **params**: `(name: string)`
-- **ic_degiskenler**: 
-- **Dönüş**: `new MockRealtimeChannel` (yeni bir MockRealtimeChannel instance'ı oluşturur)
+- **params**: `name: string`
+- **ic_degiskenler**: (iç değişken yok)
+- **Dönüş**: `MockRealtimeChannel` — `new MockRealtimeChannel(name, this)` örneği döner
 
 ---
 
@@ -166,10 +175,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: tests\e2e\realtimeSecurity.test.ts
-  class: tests\e2e\realtimeSecurity.test.ts::RealtimeServerMock
-  class: tests\e2e\realtimeSecurity.test.ts::MockRealtimeChannel
-  class: tests\e2e\realtimeSecurity.test.ts::MockRealtimeClient
+  file: realtimeSecurity.test.ts
+  class: realtimeSecurity.test.ts::RealtimeServerMock
+  class: realtimeSecurity.test.ts::MockRealtimeChannel
+  class: realtimeSecurity.test.ts::MockRealtimeClient
 
 ---
 

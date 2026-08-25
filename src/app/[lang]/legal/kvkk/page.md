@@ -2,57 +2,59 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\kvkk\page.tsx
-skeleton_hash: db1c502cc9757f4b
+source_path: C:\tmp\wt-supurme\src\app\[lang]\legal\kvkk\page.tsx
+skeleton_hash: 871091e899426f74
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: 5fe3924512d7505c
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-16T11:52:23Z
+generated_at: 2026-08-25T07:23:50Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasında KVKK (Kişisel Verilerin Korunması Kanunu) yasal metnini sunan statik bir Next.js sayfasıdır. Modül, dil bazlı erişim sağlamak için gerekli parametreleri önceden hesaplar ve ilgili yasal içeriği, bağımlı olduğu bileşen aracılığıyla kullanıcıya sunar.
+Bu modül, Next.js App Router yapısında `[lang]` dinamik segmenti altında yer alan KVKK (Kişisel Verilerin Korunması Kanunu) yasal sayfasını tanımlar. Çoklu dil desteğiyle statik olarak üretilecek yasal içerik sayfasının yapılandırmasını ve render mantığını içerir.
 
 ## Fonksiyon Grupları
-### Statik Yol Parametreleri
-Modülün dil destekli erişimini sağlamak için gerekli dinamik segmentleri (ör. dil kodları) üretir.
+
+### Statik Üretim Yapılandırması
+Desteklenen diller için statik sayfa yollarını tanımlar; Next.js'in derleme aşamasında hangi dil varyantlarının oluşturulacağını belirler.
 - generateStaticParams
 
 ### Sayfa Bileşeni
-KVKK yasal içeriğini düzenleyerek ve dil parametresini işleyerek kullanıcıya sunan üst seviye sayfa giriş noktasıdır.
+KVKK yasal sayfasının içeriğini render eder; URL'den gelen dil parametresine göre uygun dili kullanarak sayfayı görüntüler.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, statik olarak oluşturulmuş çoklu dilde KVKK bilgilendirme sayfalarını sunar.
 
-[Aksiyom 1]: Eğer `generateStaticParams()` fonksiyonu, desteklenen dil kodlarını (`lang`) içeren geçerli bir parametre listesi döndürmezse, ilgili dildeki statik sayfa (örneğin `/tr/kvkk` veya `/en/kvkk`) oluşturulamaz.
-[Aksiyom 2]: Eğer `Page` fonksiyonuna传递 edilen `params` nesnesi içindeki `lang` değeri, uygulama tarafında tanımlanmış geçerli bir dil kodu (örneğin 'tr', 'en') değilse veya params sözleşmeye uygun hazırlanmamışsa, sayfa bileşeni doğru içeriği render edemeyebilir veya hata verebilir.
+Bu modül, Next.js App Router yapısında `[lang]` dinamik segmenti altında yer alan bir KVKK yasal sayfasıdır. Fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çıkarılabilecek varsayımlar belirlenebilir.
+
+[Aksiyom 1]: Eğer `generateStaticParams()` fonksiyonu yoksa veya boş bir dizi döndürüyorsa, statik sayfa üretimi gerçekleşmez ve sayfa istek üzerine render edilir.
+
+[Aksiyom 2]: Eğer `params` içinde `lang` değeri yoksa, sayfa bileşeni çalışamaz çünkü `lang` parametresi zorunlu olarak tanımlanmıştır.
+
+[Aksiyom 3]: Eğer `params` bir Promise olarak çözümlenmezse (await edilmezse), `lang` değerine erişilemez çünkü `params` tipi `Promise<{ lang: string }>` olarak tanımlanmıştır.
+
+[Aksiyom 4]: Eğer `generateStaticParams()` tarafından döndürülen `lang` değerleri ile uygulama genelinde desteklenen diller arasında uyumsuzluk varsa, bazı diller için 404 hatası oluşur. Desteklenen dillerin listesi bilinmiyor.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### generateStaticParams
-**Ne yapar**: Next.js uygulaması için statik olarak oluşturulacak sayfaların parametrelerini (dil kodları) belirler. Bu fonksiyon, build zamanında çalışarak uygulamanın hangi dil sürümlerinin (tr ve en) statik olarak önbelleğe alınacağını tanımlar.
+**Ne yapar**: Bu fonksiyon, statik olarak oluşturulacak sayfa yollarının parametrelerini tanımlar. İki farklı dil için (`tr` ve `en`) statik sayfa üretilmesini sağlar.
 
-**Nasıl yapar**: Fonksiyon asenkron (`async`) olarak tanımlanmıştır ancak içinde herhangi bir bekleme işlemi (await) yapmaz. Doğrudan sabit bir dizin döndürür. Bu dizi, her biri `lang` anahtarına sahip birer nesne içerir ve bu anahtarın değeri `'tr'` veya `'en'` olarak atanmıştır. Next.js bu çıktıyı kullanarak ilgili dil sürümleri için statik HTML dosyaları üretir.
-
-**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
-**Dönüş**: `{ lang: 'tr' } | { lang: 'en' }` formatında bir nesne dizisi döndürür. Her nesne, uygulamanın desteklediği bir dil kodunu temsil eder.
-
-### Page
-**Ne yapar**: Next.js uygulamasının `/[lang]/legal/kvkk` rotasındaki sayfa bileşenini asenkron olarak oluşturur ve render eder. Bu bileşen, dinamik bir `lang` parametresine bağlı olarak farklı dil sürümlerinde KVKK (Kişisel Verilerin Korunması Kanunu) sayfasını gösterir.
-
-**Nasıl yapar**: Fonksiyon asenkron (`async`) bir bileşendir. `params` prop'u olarak bir `Promise` alır. Fonksiyon içinde `await` operatörü kullanarak bu promise'ın çözülmesini bekler ve `lang` değerini çıkarır. Ardından, çıkarılan `lang` değerini `PageComponent` adlı alt bileşenine prop olarak geçirerek JSX'ini döndürür. Bu yapı, Next.js App Router'daki dinamik segmentlerin asenkron olarak ele alınmasının standart bir yoludur.
+**Nasıl yapar**: Async bir fonksiyon olarak tanımlanmıştır. Gövdesinde doğrudan bir dizi döndürür. Bu dizi, her biri `lang` alanına sahip iki nesneden oluşur: biri Türkçe (`'tr'`), diğeri İngilizce (`'en'`) değeri taşır. Next.js'in statik site üretim sürecinde bu fonksiyon çağrılarak hangi dil yollarının önceden oluşturulacağı belirlenir.
 
 **Parametreler**:
-- `params`: `Promise<{ lang: string }>` — Next.js tarafından otomatik olarak sağlanan, URL'deki dinamik segmentleri (bu durumda dil kodunu) içeren bir promise nesnesi. `await` ile çözüldüğünde `{ lang: string }` formatında bir nesneye dönüşür.
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: `<PageComponent lang={lang} />` formatında bir React JSX'ini döndürür. Döndürülen JSX, `lang` prop'u aracılığıyla istenen dil sürümü için gerekli içeriği gösteren bileşendir.
+**Dönüş**: `Array<{ lang: string }>` — Her elemanı `lang` anahtarına sahip nesne olan bir dizi döndürür. Dizi iki eleman içerir: `{ lang: 'tr' }` ve `{ lang: 'en' }`.
+
+### Page
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -63,24 +65,24 @@ Bu modül, statik olarak oluşturulmuş çoklu dilde KVKK bilgilendirme sayfalar
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/app/[lang]/legal/kvkk/page.tsx`::generateStaticParams
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `{ lang: string }[]` — Statik olarak `[ 'tr' ]` ve `[ 'en' ]` dilleri için sayfa oluşturur.
+### [N1_NASIL] AST Pointer: src/app/[lang]/legal/kvkk/page.tsx::generateStaticParams
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `[{ lang: 'tr' }, { lang: 'en' }]` — statik olarak oluşturulacak dil parametrelerini içeren array; her eleman `lang` anahtarına sahip nesne
 
-### [N2_NASIL] AST Pointer: `src/app/[lang]/legal/kvkk/page.tsx`::Page
-- **params**: `{ params: Promise<{ lang: string }> }`
+### [N2_NASIL] AST Pointer: src/app/[lang]/legal/kvkk/page.tsx::Page
+- **params**: `params` — Promise<{ lang: string }> tipinde; Next.js dynamic route segmentinden gelen ve `lang` bilgisini içeren Promise nesnesi
 - **ic_degiskenler**:
-  - `lang` — `params` promise'inden çözülen dil kodu (string). Sayfanın görüntüleme dilini belirler.
-- **Dönüş**: `JSX.Element` — `PageComponent` bileşenini `lang` prop'u ile birlikte döndürür.
+  - `lang` — `await params` ile Promise çözümlendikten sonra destructuring ile elde edilen dil kodu string değeri; `PageComponent` bileşenine prop olarak aktarılır
+- **Dönüş**: `<PageComponent lang={lang} />` — `../../../../views/legal/KVKKPage` yolundan import edilen `PageComponent` bileşenine `lang` prop'u geçirilerek oluşturulan JSX elementi
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\[lang]\legal\kvkk\page.tsx
-  function: src\app\[lang]\legal\kvkk\page.tsx::generateStaticParams
-  function: src\app\[lang]\legal\kvkk\page.tsx::Page
+  file: page.tsx
+  function: page.tsx::generateStaticParams
+  function: page.tsx::Page
 
 ---
 

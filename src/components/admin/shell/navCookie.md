@@ -2,65 +2,65 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\shell\navCookie.ts
-skeleton_hash: c3b5675adc1fdad3
+source_path: C:\tmp\wt-supurme\src\components\admin\shell\navCookie.ts
+skeleton_hash: b94a2f7431e005bc
 entity_hashes:
-  func:navCookieName: 8c2f093215264277
+  func:navCookieName: 8a86dcbe310f0bfe
   overview: 0ea1a0c140fc2427
-generated_at: 2026-08-15T11:55:34Z
+generated_at: 2026-08-25T07:25:02Z
 ---
 
 ## Genel Bakış
-Bu modül, admin panelinin navigasyon sistemi için çerez (cookie) adı yönetimini sağlamakla sorumludur. Temel işlevi, çoklu kiracı (multi-tenant) ortamında her bir kiracıya (tenant) özgü, benzersiz ve öngörülebilir bir çerez ismi üretmektir. Bu, farklı kiracı oturumlarının tarayıcı seviyesinde çakışmasını önleyerek güvenlik ve veri izolasyonu sağlar.
+
+Bu modül, navigasyon ile ilişkili çerez (cookie) adının oluşturulmasıyla ilgilenen küçük bir yardımcı modüldür. Tenant bazlı cookie adı üretme sorumluluğunu üstlenir.
 
 ## Fonksiyon Grupları
-### Çerez Kimlik Üretimi
-Bu grup, navigasyon durumunu saklamak için kullanılan çerezin adını, sistemdeki benzersiz kiracı tanımlayıcısını kullanarak oluşturur.
+
+### Cookie Adı Üretimi
+Tenant kimliğine dayalı olarak navigasyon çerezinin adını dize (string) olarak döndürür. Modülün tek fonksiyonu olan `navCookieName`, bu işlevi yerine getirir.
+
 - navCookieName
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için tanımlanmış fonksiyon imzasından çıkarılabilen minimal mimari varsayımlar aşağıdadır. Fonksiyon gövdesi ve implementasyon detayları paylaşılmadığı için, varsayımlar salt imza bilgisine dayanmaktadır.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan çıkarılabilecek varsayımlar belirlenebilir.
 
-**[Aksiyom 1]:** Eğer `tenantId` parametresi `string` tipinde değilse veya sağlanmamışsa, fonksiyon beklenmeyen bir çıktı üretir veya hata oluşur.
+[Aksiyom 1]: Eğer `tenantId` parametresi yoksa, fonksiyon çağrılamaz; imzası zorunlu bir parametre olarak tanımlanmıştır.
 
----
-
-**Not:** Bu modül sadece tek bir ham fonksiyon imzasından ibarettir (`navCookieName(tenantId: string) -> string`). Fonksiyon gövdesi, modül sabitleri veya implementasyon detayları paylaşılmadığından, daha fazla domain-specific aksiyom (eşik değerleri, validasyon kuralları, cookie formatı vb.) **bilinmiyor** olarak belirtilmelidir. Ek varsayımlar üretilmemiştir.
+[Aksiyom 2]: Fonksiyon gövdesi verilmediğinden, döndürülen cookie adının nasıl oluşturulduğu, hangi formata sahip olduğu ve hangi kurallara tabi olduğu bilinmiyor.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### navCookieName
+**Ne yapar**: Sol navigasyon durumunun (sidebar açık/kapalı) saklandığı çerezin adını oluşturur. Bu çerez adı hem istemci tarafında hem de sunucu tarafında aynı fonksiyon aracılığıyla üretildiğinden, taraflar arasında tutarlılık sağlanır. Çerez kullanılma sebebi, localStorage'un sunucu tarafında okunamamasıdır; aksi halde RSC (React Server Component) layout bileşeni başlangıç değerini bilemeyeceği için SSR (Server-Side Rendering) her zaman yanlış varsayılanla render eder ve ilk boyama anında menü zıplaması yaşanır. shadcn/ui Sidebar kütüphanesi de aynı gerekçeyle çerez tercih etmektedir.
 
-**Ne yapar**: Verilen tenant kimliğine özel, sol navigasyon menüsünün durumunu saklamak için kullanılan çerez adını (cookie name) üretir. Bu çerez adı, istemci tarafında (tarayıcı) ve sunucu tarafında (RSC/SSR) aynı yerden okunarak navigasyon durumunun her iki ortamda da tutarlı olmasını sağlar.
-
-**Nasıl yapar**: Fonksiyon, parametre olarak aldığı `tenantId` değerini bir string'e dönüştürdükten sonra, RFC 6265 standardına aykırı olan tüm token dışı karakterleri (`A-Za-z0-9_-` karakter kümesi dışındaki her şey) bir regex ile temizler. Ardından temizlenmiş safe değerini `vh_admin_nav_` ön ekine ekleyerek benzersiz bir çerez adı döndürür. Çerez kullanılmasının temel nedeni, `localStorage`'ın sunucu tarafında okunamıyor olmasıdır; bu durum React Server Components (RSC) layout bileşeninin başlangıç değerini bilememesine ve SSR sırasında menünün yanlış varsayılan değerle render edilerek ilk boyamada görsel bir "zıplamaya" (layout shift) neden olmasına yol açar. shadcn/ui Sidebar bileşeni de aynı sebeple çerez tabanlı bir yaklaşım benimsemiştir.
+**Nasıl yapar**: Fonksiyon, aldığı `tenantId` parametresini string'e dönüştürür ve ardından RFC 6265 standardına uygun olmayan karakterleri (harf, rakam, alt çizgi ve tire dışındaki her şeyi) regex ile boş string ile değiştirerek temizler. Elde edilen güvenli string'in önüne `vh_admin_nav_` sabit öneki eklenerek tam çerez adı oluşturulur. Bu sayede her tenant için benzersiz ve geçerli bir çerez adı üretilmiş olur.
 
 **Parametreler**:
-- `tenantId`: `string` — Kiracı (tenant) tanımlayıcısı. Bu değer, çerez adının kiracıya özgü olmasını sağlamak için kullanılır. İçerisindeki RFC 6265'e uygun olmayan karakterler otomatik olarak temizlenir.
+- `tenantId`: `string` — Çerez adının tenant'a özgü olması için kullanılan kiracı tanımlayıcısı. Fonksiyon içinde `String()` ile zorla string'e dönüştürüldüğünden, sayı gibi farklı tipte değerler de kabul edilir ancak tip imzası string olarak belirtilmiştir.
 
-**Dönüş**: `string` — Oluşturulan çerez adı. Format: `vh_admin_nav_{safeTenantId}` şeklinde, örneğin `vh_admin_nav_tenantABC123`. Dönüş değeri her zaman RFC 6265 standardına uygun bir cookie-name formatındadır, çünkü token dışı karakterler fonksiyon içinde filtrelenir.
+**Dönüş**: `string` — RFC 6265'e uygun, `vh_admin_nav_` önekiyle başlayan ve ardından temizlenmiş `tenantId` değerinin geldiği tam çerez adı. Örneğin `tenantId` değeri `"abc-123"` ise dönüş `"vh_admin_nav_abc-123"` olacaktır.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/shell/navCookie.ts::navCookieName
-- **params**: `(tenantId: string)`
+- **params**: `tenantId` — tenant (kiracı) kimlik bilgisi, string olarak alınır
 - **ic_degiskenler**:
-  - `safe` — `String(tenantId)` değerinden RFC 6265 çerez adı kurallarına aykırı tüm karakterlerin (`[^A-Za-z0-9_-]`) boşluk ile değiştirilmesiyle elde edilen, çerez adında kullanılabilir hale getirilmiş temiz metin.
-- **Dönüş**: `vh_admin_nav_${safe}` — Çerez adı前缀'i (`vh_admin_nav_`) ile temizlenmiş `tenantId`'nin birleşiminden oluşan, tam bir çerez adı stringi.
+  - `safe` — `tenantId` değerinin `String()` ile metne dönüştürülüp, regex `/[^A-Za-z0-9_-]/g` ile RFC 6265 cookie-name standardına uygun olmayan tüm karakterlerin boş dizeyle değiştirilmesi sonucu elde edilen güvenli çerez adı parçası
+- **Dönüş**: `string` — `vh_admin_nav_` sabit ön eki ile `safe` değişkeninin template literal ile birleştirilmesinden oluşan çerez adı
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\admin\shell\navCookie.ts
-  function: src\components\admin\shell\navCookie.ts::navCookieName
+  file: navCookie.ts
+  function: navCookie.ts::navCookieName
 
 ---
 

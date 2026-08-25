@@ -2,54 +2,52 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
-skeleton_hash: d56564d6385ab917
+source_path: C:\tmp\wt-supurme\src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
+skeleton_hash: 267e09361eb28321
 entity_hashes:
   func:SilentFanTypeComparison: d3f5f980a16f61d9
   func:tr: b282b53f03d688a5
   overview: bed9a48986deb76b
   style_tokens: fb4db20eff738486
-generated_at: 2026-06-14T21:00:26Z
+generated_at: 2026-08-25T07:25:19Z
 ---
 
 ## Genel Bakış
-Bu modül, sessiz fan türlerini karşılaştıran bir bileşeni tanımlar ve içerikte kullanılan metinlerin çevirisi için yardımcı bir işlev sağlar. Bileşen, kullanıcıya farklı fan tiplerinin özelliklerini gösterirken, çeviri fonksiyonu arayüzdeki metinlerin dinamik olarak değiştirilmesini mümkün kılar.
+Bu modül, sessiz fan türlerinin karşılaştırılmasını görselleştiren bir React bileşeni sunar. Bileşen, kullanıcı arayüzünde farklı fan tiplerinin özelliklerini yan yana sergiler. Metin içerikleri çeviri desteğiyle sunulur.
 
 ## Fonksiyon Grupları
-### Görüntüleme ve Kullanıcı Arayüzü
-Bileşenin ana işlevi, sessiz fan türlerinin karşılaştırılmasını sunan bir React bileşeni oluşturmaktır.
+
+### Ana Bileşen
+Sessiz fan tür karşılaştırma ekranını oluşturur ve render eder. Kullanıcıya farklı fan tiplerinin özelliklerini karşılaştırmalı olarak gösteren arayüzün tamamından sorumludur.
 - SilentFanTypeComparison
 
-### Çeviri ve Yerelleştirme
-Arayüzdeki sabit metinlerin farklı dillere çevrilmesini sağlayan basit bir yardımcı işlevi içerir.
+### Yardımcı Fonksiyonlar
+Bileşen içinde kullanılan metinlerin çevirisini sağlar. Verilen bir anahtar değeri karşılık gelen yerelleştirilmiş metinle eşleştirir.
 - tr
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün fonksiyon imzalara dayalı aksiyomları aşağıda verilmiştir.
 
-**SilentFanTypeComparison()**: Eğer fonksiyona bir veya daha fazla argüman geçirilirse, TypeScript tip hatası oluşur (fonksiyon imzası parametre beklememektedir).
-
-**tr(key: string)**: Eğer `key` parametresi string türünde değilse veya eksik verilirse, TypeScript tip hatası olur (fonksiyon zorunlu bir `string` tipinde `key` parametresi bekler).
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan aksiyom üretilemez. Aksiyomlar yalnızca fonksiyon gövdelerinden türetilir; çıkarım yapılmaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### SilentFanTypeComparison
-**Ne yapar**: React functional component olarak, silent fan türlerinin karşılaştırılmasını gösteren bir kullanıcı arayüzü oluşturur.  
-**Nasıl yapar**: Bileşen içeriğinde JSX döndürerek, fan türlerinin özelliklerini (örneğin ses seviyesi, verimlilik, fiyat) listeleyen veya tablo halinde sunulan öğeleri renderlar.  
-**Parametreler**:  
-- (parametre yok)  
-**Dönüş**: React.FC tipinde bir işlev döndürür; bu işlev render edildiğinde ekrana JSX çıktısı üretir.
+**Ne yapar**: Sessiz fan türlerinin karşılaştırmasını gösteren bir React bileşeni oluşturur. React.FC tipinde bir fonksiyon döndürür.
+**Nasıl yapar**: Kaynak dosyada fonksiyonun iç mantığı hakkında bilgi verilmemiştir. Bir React fonksiyonel bileşeni olarak tanımlanmıştır ve `React.FC` tipinde bir bileşen döndürür.
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz.
+**Dönüş**: `React.FC` — React fonksiyonel bileşeni döndürür.
 
 ### tr
-**Ne yapar**: Verilen string anahtarıyla ilgili bir işlem gerçekleştirir; fonksiyonun amacı ve iç detayları belgelenmemiştir.  
-**Nasıl yapar**: `key` parametresini alır ve bu anahtar üzerinden bir değer elde eder veya bir eylem gerçekleştirir; dönüş tipi belirtilmemiş olduğu için net bir sonuç açıklaması yapılamaz.  
-**Parametreler**:  
-- key: string — işleme konu olan anahtar metni  
-**Dönüş**: Belirtilmemiş (void veya bilinmeyen tip); dönüş değeri dokümantasyonda net olarak tanımlanmamıştır.
+**Ne yapar**: Verilen anahtar (key) değeriyle ilişkili çeviri/metin işleme işlevi gerçekleştirir.
+**Nasıl yapar**: Kaynak dosyada fonksiyonun iç mantığı hakkında bilgi verilmemiştir. Muhtemelen bir çeviri (translation) yardımcısıdır; verilen key parametresine karşılık gelen metni işler.
+**Parametreler**:
+- key: `string` — İşlenecek metin anahtarı
+**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir; bilinmiyor.
 
 ---
 
@@ -66,50 +64,46 @@ Bu modülün fonksiyon imzalara dayalı aksiyomları aşağıda verilmiştir.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanTypeComparison.tsx::SilentFanTypeComparison
+### [N1_NASIL] AST Pointer: SilentFanTypeComparison.tsx::SilentFanTypeComparison
 - **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `t` — çeviri fonksiyonu, i18n'den gelen t kullanılarak anahtarları çevirir.
-  - `dict` — i18n sağladığı çeviri sözlüğü nesnesi; categorySilentFan.comparison.features gibi verilere erişim sağlar.
-  - `sectionRef` — section elementi için React ref; useScrollAnimation ile görünürlük animasyonu bağlanır.
-  - `isVisible` — useScrollAnimation tarafından döndürülen boolean; section görünür olduğunda true, aksi takdirde false.
-  - `tr` — yerel çeviri助手 fonksiyonu; anahtar ön ekini categorySilentFan.comparison. olarak ekleyerek t'yi çağırır.
-  - `features` — dict.categorySilentFan.comparison.features dizisi; karşılaştırılacak özelliklerin listesi, boş dizi varsayılanıyla.
-- **Dönüş**: JSX.Element (section elementi)
+- **ic_degiskenler**:
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu; metin anahtarlarını çevirmek için kullanılır
+  - `dict` — useI18n hook'undan gelen sözlük nesnesi; çeviri verilerine erişmek için kullanılır
+  - `sectionRef` — useScrollAnimation hook'undan gelen HTMLElement ref'i; section DOM elemanına bağlanır
+  - `isVisible` — useScrollAnimation hook'undan gelen boolean; scroll animasyonunun tetiklenip tetiklenmediğini belirtir
+  - `tr` — yerel çeviri yardımcısı fonksiyonu; `categorySilentFan.comparison.` öneki ile anahtarları t fonksiyonuna aktarır
+  - `features` — `dict.categorySilentFan.comparison.features` dizisi; karşılaştırma özelliklerini içerir, yoksa boş dizi atanır
+  - `f` — features.map callback'inde kullanılan tekil feature nesnesi; `f.label`, `f.standard`, `f.quiet` alanlarına erişilir
+  - `i` — features.map callback'inde kullanılan sayısal indeks; key prop'u olarak kullanılır
+- **Dönüş**: JSX elementi (section bileşeni)
 
-### [N2_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanTypeComparison.tsx::tr
-- **params**: `key` — çevrilecek i18n anahtarı (string)
+### [N2_NASIL] AST Pointer: SilentFanTypeComparison.tsx::tr
+- **params**: `key: string`
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok (void) – t fonksiyonunun döndürdüğü çevrilmiş string'i döndürür, ancak bileşende doğrudan JSX içinde kullanılır.
+- **Dönüş**: yok (t fonksiyonunun dönüş değerini döndürür)
 
-### [N3_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanTypeComparison.tsx::(f, i: number) => ... (first map)
-- **params**: `f` — özellik objesi (label, standard, quiet alanları içerir); `i` — map içindeki indis (number)
-- **ic_degiskenler**: 
-  - `f` — her bir özellik nesnesi; `f.label` özelliği gösterilen başlık için kullanılır.
-  - `i` — her öğenin dizin indeksi; React anahtarı olarak `key={i}` ile kullanılır.
-- **Dönüş**: JSX.Element (özellik başlığını gösteren <div>)
+### [N3_NASIL] AST Pointer: SilentFanTypeComparison.tsx::features.map callback (orta sütun)
+- **params**: `f`, `i: number`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi (div; `f.label` görüntüler)
 
-### [N4_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanTypeComparison.tsx::(f, i: number) => ... (floating cards map)
-- **params**: `f` — özellik objesi (standard ve quiet alanları); `i` — map indis
-- **ic_degiskenler**: 
-  - `f` — özellik nesnesi; `f.standard` ve `f.quiet` değerleri sırasıyla standart ve sessiz sütunlarda gösterilir.
-  - `i` — her öğenin dizin indeksi; React anahtarı olarak `key={i}` kullanılır.
-- **Dönüş**: JSX.Element (standart ve sessiz değerlerini yan yana gösteren <div>)
+### [N4_NASIL] AST Pointer: SilentFanTypeComparison.tsx::features.map callback (masaüstü kartlar)
+- **params**: `f`, `i: number`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi (div; `f.standard` ve `f.quiet` görüntüler)
 
-### [N5_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanTypeComparison.tsx::(f, i: number) => ... (mobile view map)
-- **params**: `f` — özellik objesi (label, standard, quiet); `i` — map indis
-- **ic_degiskenler**: 
-  - `f` — özellik nesnesi; `f.label` başlık, `f.standard` standart değer, `f.quiet` sessiz değer olarak kullanılır.
-  - `i` — her öğenin dizin indeksi; React anahtarı olarak `key={i}` kullanılır.
-- **Dönüş**: JSX.Element (mobil görünümde özellik detayını gösteren <div>)
+### [N5_NASIL] AST Pointer: SilentFanTypeComparison.tsx::features.map callback (mobil görünüm)
+- **params**: `f`, `i: number`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi (div; `f.label`, `f.standard`, `f.quiet` görüntüler)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
-  function: src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx::SilentFanTypeComparison
-  function: src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx::tr
+  file: SilentFanTypeComparison.tsx
+  function: SilentFanTypeComparison.tsx::SilentFanTypeComparison
+  function: SilentFanTypeComparison.tsx::tr
 
 ---
 

@@ -2,68 +2,58 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\core\VentHubCanvas.tsx
-skeleton_hash: 02455380f4066940
+source_path: C:\tmp\wt-supurme\src\components\products\3d\core\VentHubCanvas.tsx
+skeleton_hash: 2efbbd39878c079c
 entity_hashes:
   func:VentHubCanvas: 4908f485b830ec98
   overview: 17c94d72d1b419fe
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-20T05:02:44Z
+generated_at: 2026-08-25T07:26:32Z
 ---
 
 ## Genel Bakış
-
-VentHubCanvas, VentHub ürün kataloğu için 3D modelleme ve görselleştirme ortamını sağlayan temel bileşendir. Bu bileşen, HVAC ürünlerinin interaktif 3D önizlemelerini sunmak için gerekli canvas altyapısını oluşturur. Farklı kullanım senaryolarına göre önceden tanımlanmış ayarlar ve ortam yapılandırmaları ile esnek bir 3D rendering deneyimi sunar.
+VentHubCanvas, 3D ürün görselleştirme için kullanılan bir React bileşenidir. Modül, `VentHubCanvasProps` arayüzüyle tanımlanan yapılandırma seçenekleri alır ve çocuk bileşenleri bir 3D canvas ortamında render eder. `preset` parametresi varsayılan olarak `'product'` değerine sahiptir.
 
 ## Fonksiyon Grupları
 
-### Bileşen Tanımı
-Tek ana bileşen olarak, 3D canvas ortamını yapılandırarak child bileşenleri için render alanı oluşturur.
-
-- **VentHubCanvas** — Çocuk bileşenleri sarmalayan, 3D sahne ve ortam ayarlarını yöneten ana canvas bileşeni
-
-## Bağımlılıklar ve Mimari Notlar
-
-Bu bileşen muhtemelen Three.js tabanlı bir kütüphane (React Three Fiber vb.) üzerine inşa edilmiş olup, şu dinamik bağımlılıklara sahip olabilir:
-
-- **Ortam yapılandırıcıları** (environment prop'u ile)
-- **Ürün ön ayarları** (preset prop'u ile — `product` varsayılan)
-- **Kiracı bazlı konfigürasyonlar** (tenantId ile çoklu mağaza desteği)
-- **Render döngüsü kontrolü** (frameloop ile performans optimizasyonu)
-
-Bu modül, 3D ürün gösterimi için üst düzey bir konteyner görevi görerek, alt bileşenlere standart bir canvas ortamı sunar.
+### Ana Bileşen
+VentHubCanvas, 3D canvas alanını oluşturan ve yapılandırılabilir bir ortam sağlayan temel bileşendir. `children`, `preset`, `environment`, `tenantId` ve `frameloop` parametrelerini kabul eder.
+- VentHubCanvas
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, verilen fonksiyon imzası ve sabitlere dayanan temel mimari varsayımlara sahiptir.
 
-[Aksiyom 1]: Eğer `PRESET_ENV` nesnesi, `preset` prop'u ile aynı isimde bir içermiyorsa, bileşen geçerli bir 3D ortam yapılandırması yükleyemez ve doğru çalışması için gerekli olan ortam verileri (`environment`) eksik kalır.
-[Aksiyom 2]: Eğer `environment` prop'u verilmemişse ve bu değer `PRESET_ENV` nesnesinden otomatik olarak türetilemiyorsa, bileşen 3D sahneyi (sahne, ışıklandırma, kamera vb.) başlatmak için gerekli olan temel verilere sahip olmaz ve render süreci başarısız olur.
-[Aksiyom 3]: Eğer `tenantId` prop'u verilmemişse, bileşen kiracıya özgü kaynakları (örn: özel modeller, metinler, fiyatlandırma) yükleyemez ve evrensel içeriği göstermek zorunda kalır veya veri eksikliği hatası verir.
-[Aksiyom 4]: Eğer `frameloop` prop'u geçerli bir `"always"`, `"demand"` veya `"never"` değeri içermiyorsa, Three.js animasyon döngüsü beklenmedik şekilde çalışır ve bu performans sorunlarına veya tarayıcı kaynaklarının aşırı tüketimine yol açar.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan ve sabitlerden çıkarılabilecek varsayımlar belirlenmiştir.
+
+[Aksiyom 1]: Eğer `preset` parametresi çağrıda belirtilmezse, varsayılan olarak `'product'` değeri kullanılır.
+
+[Aksiyom 2]: Eğer `PRESET_ENV` sabitinde `preset` değerine karşılık gelen bir `environment` eşlemesi yoksa, hangi environment'ın kullanılacağı bilinmiyor.
+
+[Aksiyom 3]: Eğer `VentHubCanvasProps` tipinde beklenen `frameloop` parametresi sağlanmazsa, bileşenin nasıl davranacağı fonksiyon gövdesi verilmediğinden bilinmiyor.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### VentHubCanvas
-**Ne yapar**: VentHubCanvas, uygulamanın 3D sahneleri için temel, dayanıklı ve standartlaştırılmış bir `<Canvas>` kabuğu sağlar. Tek ve merkezi nokta olarak,其他 yerde ham `<Canvas>` kullanımını yasaklayarak (INV-3D-2/4) tüm 3D içeriğin güvenilir bir şekilde sunulmasını ve kurtarılmasını garanti altına alır.
 
-**Nasıl yapar**: Fonksiyon, gelen prop'ları kullanarak `ResilientCanvasBoundary` ile sarmalanmış, yapılandırılmış bir React Three Fiber `<Canvas>` bileşeni döndürür. `onCreated` callback'i içinde, WebGL bağlamı (renderer) için kritik renk uzayı (sRGB) ve ton haritalama (ACESFilmic) ayarlarını merkezi olarak yapar. İçeriği (`children`) `TenantSceneProvider` ile sararak kiracılara özgü sahne yapılandırılmasını ve `SceneLightingRig` ile ortam aydınlatmasını uygular. `ContextLossRecovery` bileşeni, GPU bağlamı kaybı senaryolarında otomatik kurtarma mekanizması sunar.
+**Ne yapar**: Uygulamanın tek geçerli 3D Canvas/renderer dayanıklılık kabuğudur. SSOT §1 / A5 kapsamında tanımlanmıştır. Ham `<Canvas>` bileşeninin başka bir yerde kullanılması YASAKTIR (INV-3D-2/4). Belirtilen katman sırası load-bearing (yük taşıyıcı) niteliğindedir ve sırasıyla: `ResilientCanvasBoundary` (DOM, Canvas-DIŞI) > `Canvas` > `ContextLossRecovery` + prosedürel `SceneLightingRig` (dosya YOK) + `TenantSceneProvider` > `children` şeklindedir.
+
+**Nasıl yapar**: Fonksiyon, aldığı props'lardan `dpr` değerini `useDeviceDpr` hook'u ile hesaplar. `environment` parametresi verilmezse `PRESET_ENV` haritasından `preset` anahtarıyla eşleştirilen değer kullanılır. `tenantId` verilmezse `DEFAULT_TENANT_ID` sabiti devreye girer. Dıştan içe doğru katmanlı bir yapı kurar: En dışta `ResilientCanvasBoundary` bileşeni DOM seviyesinde hata yakalama sağlar; bu bileşenin `fallback` prop'u verilmezse varsayılan olarak `<Static3DFallback />` kullanılır. İçeride `Canvas` bileşeni `shadows="percentage"`, `frameloop`, `dpr`, `camera`, `className` props'larını alır. WebGL bağlamı `alpha: true`, `powerPreference: 'high-performance'`, `failIfMajorPerformanceCaveat: false` seçenekleriyle yapılandırılır. `onCreated` callback'inde sRGB çıktı ve ACESFilmic ton mapping tek bir merkezi noktadan ayarlanır (C2 standardı); ACES'in sahneyi koyulaştırma etkisini telafi etmek için `toneMappingExposure` 1.35 değerine sabitlenir (standart §C2 aralığı: 1.3–1.5; önceki varsayılan 1.0 sahnenin kök karanlık olmasına sebep oluyordu). Canvas içinde sırasıyla `ContextLossRecovery`, `SceneLightingRig` ve `TenantSceneProvider` bileşenleri render edilir; `children` en iç katmanda `TenantSceneProvider` tarafından sarılır.
 
 **Parametreler**:
-- children: `React.ReactNode` — Canvas içinde render edilecek 3D sahne içeriği ve bileşenleri.
-- preset: `'product' | 'viewer' | string` — Önceden tanımlı sahne/ortam yapılandırma şablonu adı. Varsayılanı `'product'`.
-- environment: `string | null` — Ortam haritası anahtarı. Belirtilmezse `preset` değerine karşılık gelen `PRESET_ENV` sözlüğünden çözülür.
-- tenantId: `string | null` — Kiracı (tenant) tanımlayıcısı. Belirtilmezse `DEFAULT_TENANT_ID` sabiti kullanılır.
-- frameloop: `'demand' | 'always' | 'never'` — Render döngüsünün çalışma modu. Varsayılanı `'demand'` (ihtiyaç üzerine).
-- camera: `Partial<CameraProps>` — Three.js kamera nesnesi için yapılandırma seçenekleri.
-- dprCap: `number` — Cihaz piksel oranı (DPR) için uygulanacak üst limit.
-- className: `string` — Canvas DOM elemanına eklenecek CSS sınıf adı.
-- fallback: `React.ReactNode` — Canvas yüklenirken veya hata oluşunda gösterilecek yedek bileşen. Belirtilmezse `Static3DFallback` kullanılır.
+- children: React.ReactNode — Canvas içinde render edilecek alt bileşenler. `TenantSceneProvider` tarafından sarılarak tenant bağlamı sağlanır.
+- preset: string — Ortam ön ayarı anahtarı. Varsayılan değeri `'product'`. `environment` parametresi verilmediğinde `PRESET_ENV` haritasından bu değerle eşleştirilen ortam anahtarı kullanılır.
+- environment: string | undefined — Açıkça belirtilen ortam anahtarı. Verilmezse `preset` üzerinden çözümlenir.
+- tenantId: string | undefined — Kiracı tanımlayıcısı. Verilmezse `DEFAULT_TENANT_ID` sabiti kullanılır.
+- frameloop: VentHubCanvasProps'tan türü türetilir — Canvas'ın çerçeve döngüsü modu. Varsayılan değeri `'demand'`.
+- camera: VentHubCanvasProps'tan türü türetilir — Three.js kamera yapılandırması. Doğrudan `Canvas` bileşeninin `camera` prop'una aktarılır.
+- dprCap: VentHubCanvasProps'tan türü türetilir — Cihaz piksel oranı (device pixel ratio) üst sınırı. `useDeviceDpr` hook'u tarafından `dpr` hesaplamasında kullanılır.
+- className: VentHubCanvasProps'tan türü türetilir — Canvas bileşenine uygulanacak CSS sınıf adı.
+- fallback: React.ReactNode — `ResilientCanvasBoundary` hata yakalama sınırı çöktüğünde gösterilecek yedek bileşen. Verilmezse `<Static3DFallback />` kullanılır.
 
-**Dönüş**: `React.JSX.Element` — Yapılandırılmış ve dayanıklılık katmanlarıyla sarılmış bir Canvas bileşeni döndürür.
+**Dönüş**: JSX.Element — Katmanlı hata yakalama sınırları, WebGL Canvas, sahne ışıklandırması, tenant bağlamı ve alt bileşenlerden oluşan bir React bileşen ağacı döndürür.
 
 ---
 
@@ -119,20 +109,34 @@ type CanvasProps = React.ComponentProps<typeof Canvas>
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: VentHubCanvas.tsx::VentHubCanvas
-- **params**: (children, preset, environment, tenantId, frameloop, camera, dprCap, className, fallback)
+### [N1_NASIL] AST Pointer: src/components/products/3d/core/VentHubCanvas.tsx::VentHubCanvas
+- **params**:
+  - `children` — Canvas içine yerleştirilecek alt bileşenler (React node)
+  - `preset` — Ortam ön ayarı anahtarı, varsayılan değeri `'product'`; `PRESET_ENV` objesinde indeks olarak kullanılır
+  - `environment` — Ortam anahtarı; verilmezse `PRESET_ENV[preset]` ile çözümlenir
+  - `tenantId` — Kiracı kimliği; verilmezse `DEFAULT_TENANT_ID` kullanılır
+  - `frameloop` — Canvas kare döngüsü modu, varsayılan değeri `'demand'`
+  - `camera` — Three.js kamera yapılandırması
+  - `dprCap` — Cihaz piksel oranı üst sınırı; `useDeviceDpr` hook'una iletilir
+  - `className` — Canvas kapsayıcısına uygulanacak CSS sınıfı
+  - `fallback` — Canvas yüklenemezken gösterilecek yedek bileşen
 - **ic_degiskenler**:
-  - `dpr` — useDeviceDpr hook'undan elde edilen, cihazın maksimum pixel ratio değerini sınırlayan DPR cap'i.
-  - `envKey` — Sahne ortam haritası (environment map) anahtarı; environment prop'u verilmemişse PRESET_ENV[preset] nesnesinden preset anahtarına göre çözümlenir.
-  - `resolvedTenantId` — Kiracı (tenant) tanımlayıcısı; tenantId prop'u verilmemişse DEFAULT_TENANT_ID sabitini kullanır.
-- **Dönüş**: JSX yapısı — ResilientCanvasBoundary ile sarılmış, gölgeler, ton haritalama ve ortam aydınlatması yapılandırılmış bir Canvas bileşeni. Canvas içinde ContextLossRecovery, SceneLightingRig ve TenantSceneProvider_children bileşenlerini döndürür.
+  - `dpr` — `useDeviceDpr(dprCap)` hook çağrısından dönen cihaz piksel oranı; Canvas'ın `dpr` prop'una atanır
+  - `envKey` — `environment ?? PRESET_ENV[preset]` ifadesiyle çözümlenen ortam anahtarı; `environment` parametresi tanımlıysa onu kullanır, değilse `PRESET_ENV` objesinden `preset` anahtarıyla alınan değeri kullanır; `SceneLightingRig` bileşeninin `env` prop'una iletilir
+  - `resolvedTenantId` — `tenantId ?? DEFAULT_TENANT_ID` ifadesiyle çözümlenen kiracı kimliği; `tenantId` parametresi tanımlıysa onu kullanır, değilse `DEFAULT_TENANT_ID` sabitini kullanır; `TenantSceneProvider` bileşeninin `tenantId` prop'una iletilir
+  - `state` — `onCreated` callback parametresi; Canvas oluşturma anındaki durum nesnesi
+  - `state.gl` — `state` nesnesinin WebGL renderer alanı
+  - `state.gl.toneMapping` — Ton eşleme modu; `ACESFilmicToneMapping` sabitine atanır
+  - `state.gl.outputColorSpace` — Çıktı renk alanı; `SRGBColorSpace` sabitine atanır
+  - `state.gl.toneMappingExposure` — Ton eşleme pozlama değeri; `1.35` sabitine atanır (ACES'in sahneyi koyulaştırmasını telafi etmek için)
+- **Dönüş**: JSX — `ResilientCanvasBoundary` ile sarılmış `Canvas` bileşeni; `fallback` prop'u verilmezse `<Static3DFallback />` kullanılır. Canvas içinde `ContextLossRecovery`, `SceneLightingRig` ve `TenantSceneProvider` bileşenleri yer alır; `children` `TenantSceneProvider` içine yerleştirilir.
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\core\VentHubCanvas.tsx
-  function: src\components\products\3d\core\VentHubCanvas.tsx::VentHubCanvas
+  file: VentHubCanvas.tsx
+  function: VentHubCanvas.tsx::VentHubCanvas
 
 ---
 

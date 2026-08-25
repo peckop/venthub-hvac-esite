@@ -2,74 +2,55 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminMovementsPage.tsx
-skeleton_hash: 6c2543ff27d35a7f
+source_path: C:\tmp\wt-supurme\src\views\admin\AdminMovementsPage.tsx
+skeleton_hash: a5583dcc150ffea6
 entity_hashes:
   func:AdminMovementsPage: 1f83a4be333ac82c
-  overview: 19839cf14aa3d647
+  overview: f79fd144fc0bf6c1
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-19T20:48:51Z
+generated_at: 2026-08-25T07:29:51Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yönetim platformunun yönetici panelindeki "Hareketler" sayfasını oluşturan React bileşenidir. Tüm hareket kayıtlarını bir tabloda listeleyerek sıralama, filtreleme ve verileri dışa aktarma (CSV/Excel) gibi temel yönetim işlevlerini sunar. Modül, yerelleştirme (çok dillilik) ve dinamik veri yükleme mantığını da içerir.
+
+Bu modül, admin panelindeki hareketler (movements) sayfasını temsil eden bir React bileşenidir. `src/views/admin` dizininde yer alması, uygulamanın yönetici arayüzüne ait bir görünüm katmanı olduğunu gösterir. Modül tek bir ana bileşenden oluşur ve sayfa düzeyinde bir sorumluluk üstlenir.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni (Koordinasyon)
-Sayfa düzeyindeki tüm düzeni, durum yönetimini (state) ve alt bileşenlerin yaşam döngüsünü koordine eder. Veri çekme, filtreleme ve sıralama gibi üst düzey iş akışlarını yönetir.
+
+### Sayfa Bileşeni
+
+Ana sayfa bileşeni olarak hareketler ekranını render eder. Admin kullanıcılarına yönelik hareket verilerinin görüntülendiği veya yönetildiği arayüzü sunar.
+
 - AdminMovementsPage
-
-### Veri Görüntüleme ve Yerelleştirme
-Ham veri değerlerini (hareket nedeni gibi) kullanıcıya gösterilebilir ve okunabilir yerelleştirilmiş etiketlere dönüştürür. API'den gelen anahtarları本地化 bir metne eşler.
-- reasonLabel
-
-### Tablo Etkileşim ve Sıralama
-Tabloda sıralama yapıldığında ilgili durumu (artan/azalan) günceller ve sıralama durumunu gösterge olarak gösterir. Kullanıcı etkileşimiyle sıralama kriterini değiştirir.
-- toggleSort, sortIndicator
-
-### Veri Dışa Aktarma
-Tablodaki güncel veri setini alır ve belirli bir dosya formatına (CSV veya Excel) dönüştürerek kullanıcıya sunar. Bu işlem genellikle istemci tarafında dosya oluşturmayı tetikler.
-- exportCsv, exportXls
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, AdminMovementsPage React bileşeninin doğru çalışması için aşağıdaki mimari varsayımları içerir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer hareket kayıtları (movements) verisi yüklenemez veya boş gelirse, tablo içeriği gösterilemez ve kullanıcıya boş bir tablo sunulur.
-
-[Aksiyom 2]: Eğer `toggleSort` fonksiyonu sıralama durumunu (sort state) doğru güncelleyemezse, `sortIndicator` geçerli sıralama yönünü gösteremez ve tablo varsayılan sıralama ile kalır.
-
-[Aksiyom 3]: Eğer `reasonLabel` fonksiyonu için geçerli bir hareket nedeni (reason) değeri yoksa veya tanımsız bir reason gönderilirse, etiket olarak "bilinmiyor" veya varsayılan bir gösterim döner.
-
-[Aksiyom 4]: Eğer `exportCsv` veya `exportXls` fonksiyonları çağrıldığında tablodaki veri boşsa, oluşturulan dosya içeriği boş olur veya dışa aktarma işlemi anlamsız sonuç verir.
-
-[Aksiyom 5]: Eğer sıralama sütunu (`sortBy`) ve sıralama yönü (`sortDirection`) eşleşmeyen veya tabloda olmayan bir alan olarak ayarlanırsa, veri doğru sıralanamaz.
-
-[Aksiyom 6]: Eğer bileşen props almıyorsa (fonksiyon imzası parametresiz), veri akışı tamamen bileşen içi state yönetimi (useEffect, useState vb.) ile sağlanmalıdır; dış kaynaklı prop verisi beklenmez.
+**Neden:** Modülün fonksiyon gövdesi verilmemiştir. Yalnızca `AdminMovementsPage` fonksiyonunun imzası (`() -> React.FC`) ve prop almadığı bilgisi mevcuttur. Fonksiyon gövdesi olmadan, bileşenin doğru çalışması için hangi koşulların gerekli olduğunu belirlemek mümkün değildir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminMovementsPage
-**Ne yapar**: Admin panelinde envanter hareketlerini (inventory_movements) görüntülemek için kullanılan salt okunur (READ-ONLY) bir sayfa bileşenidir. Bu bileşen, DataTableKit mimarisine göç edilmiş ve server-mode'da çalışan bir veri tablosu sayfası oluşturarak envanter hareketlerinin listelenmesini sağlar.
+**Ne yapar**: Envanter hareketlerini (`inventory_movements`) görüntülemek için bir yönetici sayfası oluşturur. DataTableKit bileşenine göç edilmiş sunucu tarafı (server-mode) modunda çalışır. Sayfa salt okunur (READ-ONLY) olarak tasarlanmıştır; mutasyon, seçim veya toplu işlem (bulk) desteği yoktur.
 
-**Nasıl yapar**: Sayfa, başlık bölümü ve Suspense ile sarılmış bir ana içerik alanından oluşur. Veri çekme, URL senkronizasyonu ve filtre state yönetimi gibi tüm durum işlemleri `MovementsTableBody` bileşeni tarafından `useAdminTable` hook'u aracılığıyla yürütülür. Arama, sıralama ve kategori filtresi gibi işlemler embedded inner-join sorguları ile sunucu tarafında (server-side) çözülerek performanslı bir veri getirme mekanizması sunar. Bileşen üzerinde herhangi bir mutasyon, seçim veya bulk işlem yetkisi bulunmamaktadır.
+**Nasıl yapar**: Sayfa yapısı bir başlık ve `Suspense` bileşeninden oluşur. Arama, sıralama ve kategori filtresi işlemleri, sunucu tarafında embedded inner-join ile çözümlenir; istemci tarafında filtreleme yapılmaz. Veri yönetimi, URL senkronizasyonu ve filtre durumu `MovementsTableBody` bileşeni tarafından `useAdminTable` kancası aracılığıyla taşınır ve yönetilir.
 
 **Parametreler**:
-Bu bileşen `React.FC` tipi ile tanımlanmış olup herhangi bir props parametresi almamaktadır. Boş bir props nesnesi (`{}`) ile çağrılır.
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: `React.FC` tipinde bir React functional component'i olup, JSX elementi (React.ReactNode) döndürür. Sayfa yapısını oluşturan başlık ve Suspense içindeki tablo bileşenlerini içeren bir React bileşen ağacı 반환ır.
+**Dönüş**: `React.FC` — React fonksiyonel bileşen döndürür. Bu bileşen, envanter hareketlerinin listelendiği yönetici sayfasını render eder.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./MovementsTableBody::MovementsTableBody
 - import: react::React
 - import: react::Suspense
@@ -79,17 +60,17 @@ Bu bileşen `React.FC` tipi ile tanımlanmış olup herhangi bir props parametre
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::AdminMovementsPage
-- **params**: () — parametre almaz
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('admin.titles.movements')` ve `t('admin.movements.subtitle')` çağrılarıyla sayfa başlık ve alt başlık metinleri lokalize edilir
-- **Dönüş**: `JSX.Element` — Admin hareketleri sayfasını render eden React bileşeni; `<div>` sarmalayıcısı içinde `<header>` (h1 başlık + p alt başlık) ve `<Suspense>` sarmalayıcısında `<MovementsTableBody />` bileşeni bulunur; Suspense yüklenme durumunda fallback olarak `<AdminSkeleton variant="table" count={5} rows={8} />` gösterilir
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('admin.titles.movements')` ile sayfa başlığı, `t('admin.movements.subtitle')` ile alt başlık metinlerini çözmek için kullanılır
+- **Dönüş**: JSX elementi — dış sarmalayıcı `div` (className `"space-y-6 pb-20"`) içinde `AdminPageHeader` bileşeni (title ve description prop'ları ile) ve `Suspense` ile sarmalanmış `MovementsTableBody` bileşeni döner; `Suspense` yüklenme sırasında `AdminSkeleton` (variant `"table"`, count `5`, rows `8`) fallback gösterir
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\admin\AdminMovementsPage.tsx
-  function: src\views\admin\AdminMovementsPage.tsx::AdminMovementsPage
+  file: AdminMovementsPage.tsx
+  function: AdminMovementsPage.tsx::AdminMovementsPage
 
 ---
 

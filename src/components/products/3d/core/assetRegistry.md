@@ -2,51 +2,41 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\core\assetRegistry.ts
-skeleton_hash: 05c08df6bc6524f4
+source_path: C:\tmp\wt-supurme\src\components\products\3d\core\assetRegistry.ts
+skeleton_hash: f37d67e03152c9b0
 entity_hashes:
   func:resolveAsset: af5d0cb4d33e6314
   overview: 43e3553e501ef7c3
-generated_at: 2026-06-20T04:59:51Z
+generated_at: 2026-08-25T07:26:04Z
 ---
 
 ## Genel Bakış
-Bu modül, 3D ürün bileşenleri için merkezi bir varlık kaydı (asset registry) işlevi görerek, sistem genelindeki 3D varlıkların (modeller, dokular, materyaller vb.) organize edilmesini ve erişilebilirliğini sağlar. Temel sorumluluğu, belirli bir anahtar ile varlık girdilerini çözüp (resolve) sunmaktır.
+Bu modül, varlık (asset) kayıtlarını çözümlemekten sorumludur. Tek bir fonksiyon barındırır ve verilen bir anahtar (key) ile eşleşen varlık kaydını döndürür; eşleşme bulunamazsa `undefined` döner.
 
 ## Fonksiyon Grupları
-### Varlık Çözümleme (Asset Resolution)
-Bu grup, 3D varlık envanterinden belirli bir varlığın bilgilerini anahtar tabanlı olarak getirmekten sorumludur. Fonksiyon, çoklu kiracılı (multi-tenant) yapıyı destekleyerek opsiyonel bir kiracı kimliği ile farklı kiracılara ait varlık sürümlerini ayırt edebilir.
-- resolveAsset
+### Varlık Çözümleme
+Verilen bir anahtar değeri kullanarak kayıtlı varlık girişlerini arar ve çözümlemiş sonucu döndürür. İsteğe bağlı olarak kiracı kimliği (`_tenantId`) parametresi alır.
+- `resolveAsset`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için minimum sayıda aksiyom tanımlanmıştır; yalnızca fonksiyon imzasından doğrudan çıkarılabilir varsayımlar dahil edilmiştir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1]**: Eğer `key` parametresi geçerli bir `string` değer içermiyorsa, fonksiyon anlamlı bir varlık çözümlemesi yapamaz.
-
-**[Aksiyom 2]**: Eğer bir asset anahtarı (`key`) kayıtlı asset havuzunda (registry) mevcut değilse, fonksiyon `undefined` döner ve çağrıcının bu durumu ele alması (null-check) gerekir; aksi halde kullanım noktasında runtime hatası oluşur.
-
-**[Aksiyom 3]**: Eğer `_tenantId` parametresi sağlanmazsa (isteğe bağlı olduğundan), fonksiyon tenant-bağımsız (default) bir çözümleme davranışı sergilemelidir; aksi halde zorunlu olmayan parametrenin eksikliği fonksiyonun bozulmasına yol açar.
-
-**[Aksiyom 4]**: Fonksiyonun dönüş tipi `AssetEntry | undefined` olduğundan, çağrı tarafında herhangi bir `_tenantId` kombinasyonu için `undefined` sonucu mümkünse, çağrııcının dönüş değerini doğrudan tip-güvenli (type-safe) biçimde ele alması gerekir; aksi halde TypeScript derleme/runtime döneminde hata oluşur.
+**Gerekçe:** Fonksiyon gövdesi sağlanmadığından, gövde içeriğinden aksiyom üretmek mümkün değildir. Yalnızca fonksiyon imzası (`resolveAsset(key: string, _tenantId?: string) -> AssetEntry | undefined`) mevcuttur; imzadan aksiyom çıkarma bu çalışmanın kapsamı dışındadır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### resolveAsset
-
-**Ne yapar**: Bu fonksiyon, verilen bir anahtar (key) ile kayıtlı bir dijital varlığı (asset) arar ve ilgili AssetEntry nesnesini veya bulunamadığında `undefined` değerini döndürerek varlığın çözümlemesini sağlar.
-
-**Nasıl yapar**: Fonksiyon, modülün bir parçası olan `ASSET_REGISTRY` sözlüğünde (veya哈希映射inde) doğrudan bir arama yaparak `key` parametresine karşılık gelen değeri döndürür. Yorum satırında belirtildiği üzere, bu arama işlemi tenant-scoped bir yol izler ve `assetBasePath` yapısıyla data-bleeding izolasyonunu (D2 modülünün bir parçası olarak) uygulamayı amaçlar.
-
+**Ne yapar**: Verilen bir anahtar (key) ile ASSET_REGISTRY içindeki bir varlık girişini (AssetEntry) çözer ve döndürür. Bu işlem, tenant'a özel yol çözümlemesi yaparak farklı kiracılar arasında veri sızıntısı (data-bleeding) olmasını engelleyen bir izolasyon mekanizması sağlar.
+**Nasıl yapar**: Fonksiyon, aldığı `key` parametresini doğrudan `ASSET_REGISTRY` nesnesinde indeks olarak kullanır ve eşleşen `AssetEntry` değerini döndürür. Eğer belirtilen anahtar kayıt defterinde mevcut değilse `undefined` döner. Gövdedeki yorumda belirtildiği üzere, bu mekanizma `assetBasePath` üzerinden tenant kapsamındaki yolları çözümleyerek D2 seviyesinde veri izolasyonu hedefler.
 **Parametreler**:
-- `key`: `string` — Aranacak varlığın benzersiz tanımlayıcısı veya anahtarı.
-- `_tenantId`: `string | undefined` — (Opsiyonel) Kiracı (tenant) identifikasyonu. Fonksiyon gövdesinde doğrudan kullanılmamakla birlikte, gelecekte tenant-scoped arama mantığını genişletmek için ayrılmıştır. Underscore前缀'i, parametrenin şu an için pasif olduğunu işaret eder.
-
-**Dönüş**: `AssetEntry | undefined` — Bulunan varlığın detaylarını içeren bir `AssetEntry` nesnesi veya verilen `key` ile eşleşen bir kayıt yoksa `undefined`.
+- key: string — Çözümlenecek varlığın kayıt defterindeki benzersiz tanımlayıcı anahtarı.
+- _tenantId?: string — (Opsiyonel) Tenant tanımlayıcısı. Parametre adının alt çizgi (_) ile başlaması ve fonksiyon gövdesinde kullanılmaması, bu bilginin yalnızca arayüz uyumluluğu veya gelecekteki kullanım için tutulduğunu gösterir.
+**Dönüş**: AssetEntry | undefined — Belirtilen anahtarla eşleşen bir varlık girişi varsa `AssetEntry` tipinde nesne, aksi takdirde `undefined` döner.
 
 ---
 
@@ -73,18 +63,16 @@ type AssetType = 'glb' | 'hdr' | 'procedural'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/products/3d/core/assetRegistry.ts::resolveAsset
-- **params**: `key: string` — lookup anahtarı; `ASSET_REGISTRY` dictionary'sinde erişim için kullanılır, `_tenantId?: string` — opsiyonel kiracı identifier'ı; fonksiyon gövdesinde kullanılmamaktadır (underscore prefix ile işaretli)
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde yerel değişken tanımlanmamıştır)
-- **Dönüş**: `AssetEntry | undefined` — `ASSET_REGISTRY[key]` erişiminin sonucu; anahtar registry'de mevcutsa ilgili `AssetEntry`, mevcut değilse `undefined` döner
-- **Yan etkiler**: yok (pure lookup)
-- **Dış bağımlılıklar**: `ASSET_REGISTRY` — modül seviyesinde tanımlı sözlük yapısı; `[key]` subscript erişimi ile okunur
+- **params**: `key` (string) — erişilecek varlığın anahtar değeri; `ASSET_REGISTRY` sözlüğünde arama yapmak için kullanılır; `_tenantId` (string, opsiyonel) — kiracı kimliği, fonksiyon gövdesinde KULLANILMAZ, yalnızca imzada tanımlıdır
+- **ic_degiskenler**: yok — fonksiyon gövdesinde tanımlanmış iç değişken bulunmaz
+- **Dönüş**: `ASSET_REGISTRY[key]` — `AssetEntry | undefined`; dışarıdan erişilen `ASSET_REGISTRY` sözlüğünde `key` parametresiyle yapılan subscript erişiminin sonucu. Yorumda belirtildiği üzere tenant-scoped path ile data-bleeding izolasyonu (D2, P2) amaçlıdır
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\core\assetRegistry.ts
-  function: src\components\products\3d\core\assetRegistry.ts::resolveAsset
+  file: assetRegistry.ts
+  function: assetRegistry.ts::resolveAsset
 
 ---
 

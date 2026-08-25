@@ -2,44 +2,52 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\support\ShippingPage.tsx
-skeleton_hash: 3d36f2d960a8c9ee
+source_path: C:\tmp\wt-supurme\src\views\support\ShippingPage.tsx
+skeleton_hash: 8f55c1e6ffb341aa
 entity_hashes:
   func:ShippingPage: 321c885e2ea88a49
   overview: 2fb078273ffdbcdc
   style_tokens: f66481541679296a
-generated_at: 2026-06-19T20:51:03Z
+generated_at: 2026-08-25T07:32:06Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun destek bölümünde yer alan kargo işlemleri sayfasını uygulayan React tabanlı bir görünüm modülüdür. Platform kullanıcılarının destek süreçleri kapsamındaki kargo ile ilgili işlemleri görüntülemesi ve yönetmesi için gereken kullanıcı arayüzünü tek bir ana bileşen üzerinden sunar.
+
+ShippingPage, kargo ve sevkiyat işlemlerine ait kullanıcı arayüzünü sunan bir React bileşenidir. Modül tek bir ana bileşenden oluşur ve dışarıya varsayılan sayfa bileşeni olarak dışa aktarılır.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Modülün temel sorumluluğu olan kargo yönetimi sayfasının tüm görünüm ve mantığını üstlenen tek ana React bileşenidir. Tüm sayfa içeriğini ve gerekli kullanıcı etkileşimlerini yöneterek hedeflenen arayüzü ziyaretçilere sunar.
+
+### Sayfa Bileşeni
+Ana sayfa bileşeni olarak kullanıcıya kargo/sevkiyat ile ilgili arayüzü render eder. Modülde yalnızca bu tek bileşen bulunduğu için fonksiyonlar arası çağrı ilişkisi bulunmamaktadır.
 - ShippingPage
+
+## Bağımlılıklar ve Mimari Notlar
+
+- Modül tek bir bileşenden oluştuğu için iç bağımlılık yoktur.
+- Dış bağımlılıklar (hangi kütüphane veya modüllerin import edildiği) verilen kaynak bilgiden tespit edilememiştir.
+- Dinamik veya lazy yüklenen bir alt modül bilgisi mevcut değildir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi, parametre veya sabit değeri verilmediğinden dolayı, modüle özgü mimari aksiyom çıkarılamamıştır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Not:** `ShippingPage()` fonksiyon imzası parametresizdir ve modül sabitleri tanımlı değildir. Fonksiyon gövdesi paylaşılmadığı için çalışması için gerekli koşullar belirlenememiştir.
+**Gerekçe:** Fonksiyon gövdesi verilmemiştir; yalnızca `ShippingPage()` imzası ve `React.FC` dönüş tipi mevcuttur. Modül sabitleri ve eski doküman da bulunmadığından, fonksiyon gövdesinden türetilebilecek modüle özgü bir varsayım üretilememektedir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### ShippingPage
-**Ne yapar**: `ShippingPage`, projenin destek/yardım bölümünde yer alan kargo ve gönderim süreciyle ilgili bilgilerin sunulduğu bir React bileşenidir. Kullanıcılara sevk bilgileri, teslimat süreleri, kargo şirketleriyle ilgili politikalar gibi konularda yardımcı olmak amacıyla tasarlanmış bir sayfa yapısı sunar.
+**Ne yapar**: Kargo/teslimat sayfasını temsil eden bir React fonksiyon bileşeni döndüren bir üst düzey fonksiyondur. Dosya yolu `src/views/support/ShippingPage.tsx` konumunda yer aldığından, uygulamanın destek/support bölümündeki kargoyla ilgili görünümü oluşturur.
 
-**Nasıl yapar**: Fonksiyonel bir React bileşeni olarak, JSX (JavaScript XML) kullanarak bir sayfa düzeni (layout) oluşturur. Bu düzen muhtemelen başlık, açıklama metinleri, olası bir iletişim formu veya bilgi kartları gibi bileşenleri içerebilir. Bileşen kendi içinde durum (state) yönetimi veya yan etkiler (side effects) kullanmayan, saf bir sunum (presentational) bileşeni olarak karşımıza çıkmaktadır.
+**Nasıl yapar**: Fonksiyon, herhangi bir parametre almadan çağrıldığında bir `React.FC` (React Fonksiyon Bileşeni) döndürür. Docstring alanı boş bırakıldığından, fonksiyonun iç mantığı, kullandığı durum yönetimi (state), yan etkiler (effects) veya alt bileşenler hakkında kaynakta bilgi bulunmamaktadır.
 
 **Parametreler**:
-- Bu bileşen herhangi bir props (özellik) almaz.
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: JSX elementini (`JSX.Element`) döndürür. Sayfa yapısını temsil eden bir React bileşeni ağacı (React component tree)返回 eder.
+**Dönüş**: `React.FC` — React fonksiyon bileşeni türünde bir değer döndürür. Bu bileşen, kargo/teslimat sayfasının kullanıcı arayüzünü render eder.
 
 ---
 
@@ -53,19 +61,19 @@ Bu modül için fonksiyon gövdesi, parametre veya sabit değeri verilmediğinde
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/support/ShippingPage.tsx`::ShippingPage
+### [N1_NASIL] AST Pointer: src/views/support/ShippingPage.tsx::ShippingPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `router` — useRouter() hook'undan dönen router nesnesi, sayfa navigasyonu için kullanılır (örn: `router.back()`)
-  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, çok dilli metinleri getirmek için kullanılır (örn: `t('auth.back')`)
-- **Dönüş**: JSX element (React bileşeni) — destek sayfası için nakliye bilgilerini gösteren React bileşeni
+  - `router` — `useRouter()` hook'undan dönen Next.js yönlendirme nesnesi; `router.back()` çağrısıyla bir önceki sayfaya geri dönmek için kullanılır
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('auth.back')`, `t('support.links.shipping')`, `t('support.shipping.desc1')`, `t('support.shipping.desc2')` anahtarlarıyla yerelleştirilmiş metinleri almak için kullanılır
+- **Dönüş**: JSX elementi — kargo bilgi sayfasını gösteren bir `<div>` yapısı; geri butonu, başlık ve açıklama paragraflarını içerir
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\support\ShippingPage.tsx
-  function: src\views\support\ShippingPage.tsx::ShippingPage
+  file: ShippingPage.tsx
+  function: ShippingPage.tsx::ShippingPage
 
 ---
 

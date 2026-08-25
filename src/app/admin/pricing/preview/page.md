@@ -2,48 +2,44 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\pricing\preview\page.tsx
-skeleton_hash: df1c2ad06e0a3ad3
+source_path: C:\tmp\wt-supurme\src\app\admin\pricing\preview\page.tsx
+skeleton_hash: 38186a30694c64b5
 entity_hashes:
   func:Page: 38a14b07f492add8
   overview: f2c812d7ee2b06e8
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-14T09:12:03Z
+generated_at: 2026-08-25T07:23:42Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js uygulamasının "admin/pricing/preview" rotasını temsil eden bir sayfa bileşenidir. Tek bir React bileşeni (Page) içerir ve定价 preview (önizleme) sayfasının arayüzünü sunar. Sayfa büyük olasılıkla sunucu taraflı render (SSR) veya statik site üretimi (SSG) kullanılarak oluşturulur.
+Bu modül, yönetici panelindeki fiyatlandırma bölümünde yer alan önizleme sayfasını tanımlar. Next.js'in dosya tabanlı yönlendirme yapısı gereği `admin/pricing/preview` yoluna karşılık gelen sayfa bileşenini dışa aktarır. Modül yalnızca tek bir bileşenden oluşur ve fiyatlandırma verilerinin yönetici tarafından önizlenmesini sağlar.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni (Render)
-Modülün temel ve tek sorumluluğu,定价 preview sayfasının içeriğini ve yapısını oluşturmaktır.
-- `Page` (Bileşeni)
+
+### Sayfa Bileşeni
+Fiyatlandırma önizleme sayfasının kullanıcı arayüzünü oluşturur ve ilgili alt bileşenleri bir araya getirerek sayfanın tamamını render eder.
+- Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için fonksiyon gövdesi verilmediği için detaylı mimari varsayımlar üretilememektedir. Sadece fonksiyon imzasından çıkarılabilecek minimal aksiyomlar aşağıdadır:
-
-**[Aksiyom 1]:** Eğer `metadata` nesnesi yoksa, sayfa bileşeni varsayılan veya boş metadata ile çalışır (bu durum SEO ve sayfa bilgi yönetimi açısından eksik kalabilir).
-
-**[Aksiyom 2]:** Eğer `Page()` fonksiyonu bağımlılık enjeksiyonu (parametre) almıyorsa, modül kendi içindeki sabitler veya global state üzerinden veriye erişmek zorundadır; dışarıdan bağımsızdır.
-
-> ⚠️ **Not:** Fonksiyon gövdesi (implementation body) paylaşılmadığı için, veri kaynakları, API çağrıları, hata yönetimi, render koşulları gibi kritik mimari varsayımlar **bilinmiyor** olarak işaretlenmiştir. Daha kesin aksiyomlar için fonksiyon gövdesinin paylaşılması gerekmektedir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Bu fonksiyon, bir React sayfa bileşenidir. Asıl amacı, uygulamanın admin fiyat önizleme sayfasının bileşenini render etmektir.
+**Ne yapar**: Bu fonksiyon, admin fiyat önizleme sayfasının ana bileşenidir. Next.js'in dosya tabanlı yönlendirme sistemi tarafından otomatik olarak bir sayfa bileşeni olarak tanınır ve ilgili rota ziyaret edildiğinde render edilir.
 
-**Nasıl yapar**: Fonksiyon, doğrudan `AdminPricePreviewPage` adlı bir React bileşenini döndürür. Bu, bir "kapaklayıcı" veya yönlendirici bir bileşen olup, asıl sayfa mantığını ve arayüzünü başka bir yerde tanımlanmış olan `AdminPricePreviewPage` bileşenine devreder. Fonksiyonun gövdesinde başka bir mantık veya hesaplama bulunmaz.
+**Nasıl yapar**: Fonksiyon, herhangi bir ek mantık veya durum yönetimi içermez. Doğrudan `AdminPricePreviewPage` bileşenini döndüren bir sarmalayıcı (wrapper) olarak çalışır. Sayfa seviyesindeki bu soyutlama, Next.js'in dosya tabanlı rota yapısının gerektirdiği dışa aktarım kuralını karşılar ve asıl sayfa mantığını `AdminPricePreviewPage` bileşenine devreder.
 
 **Parametreler**:
-- Parametre almaz.
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: `<AdminPricePreviewPage />` JSX elementi. Bu, React tarafından render edilecek bir bileşen yapısıdır.
+**Dönüş**: `JSX.Element` — `AdminPricePreviewPage` bileşeninin render çıktısını döndürür.
 
 ---
 
@@ -61,17 +57,17 @@ Bu modül için fonksiyon gövdesi verilmediği için detaylı mimari varsayıml
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Page
-- **params**: (yok)
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde herhangi bir değişken tanımı veya erişimi bulunmuyor)
-- **Dönüş**: JSX elementi (<AdminPricePreviewPage />) döndürür; bileşen, AdminPricePreviewPage bileşenini render eden bir sayfa sarmalayıcısıdır.
+### [N1_NASIL] AST Pointer: src/app/admin/pricing/preview/page.tsx::Page
+- **params**: yok
+- **ic_degiskenler**: yok — fonksiyon gövdesinde hiçbir değişken tanımlanmamış, doğrudan JSX dönüşü yapılır
+- **Dönüş**: `<AdminPricePreviewPage />` — `../../../../views/admin/AdminPricePreviewPage` yolundan import edilen `AdminPricePreviewPage` bileşeninin render edilmiş JSX çıktısı
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\admin\pricing\preview\page.tsx
-  function: src\app\admin\pricing\preview\page.tsx::Page
+  file: page.tsx
+  function: page.tsx::Page
 
 ---
 

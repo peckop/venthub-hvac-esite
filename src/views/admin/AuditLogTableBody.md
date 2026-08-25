@@ -2,82 +2,63 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AuditLogTableBody.tsx
-skeleton_hash: 5a256f48933f7a2b
+source_path: C:\tmp\wt-supurme\src\views\admin\AuditLogTableBody.tsx
+skeleton_hash: e0272e6144d454a4
 entity_hashes:
   func:AuditLogTableBody: f2050a1564244cb7
-  func:auditFetcher: aa6d40cc3bb6c8b9
-  overview: a55893ff85a3f719
-  style_tokens: 8e3bff93edb3a9ff
-generated_at: 2026-06-19T20:49:43Z
+  func:auditFetcher: 15cf2cdb6832e2e8
+  overview: 3f8c6404d0e8090a
+  style_tokens: 6e2907e7b7287d77
+generated_at: 2026-08-25T07:30:31Z
 ---
 
 ## Genel Bakış
-Bu modül, admin paneli için denetim kayıtlarının (audit logs) tabloda görüntülenmesini sağlayan bir React bileşenidir. Supabase veritabanından kullanıcı faaliyetlerini çekerek, yöneticilerin sistemi izlemesine ve denetlemesine olanak tanır. Modül, veri çekme ve arayüz sunumu gibi iki temel sorumluluğu bir arada yönetir.
+AuditLogTableBody modülü, admin panelinde denetim günlüğü (audit log) kayıtlarının tablo içinde görüntülenmesinden sorumludur. Supabase veritabanından denetim kayıtlarını çeken bir veri erişim fonksiyonu ve bu kayıtları tablo gövdesinde sunan bir React bileşeni içerir.
 
 ## Fonksiyon Grupları
-### Veri Erişimi (Data Access)
-Supabase istemcisi kullanarak denetim kayıtlarını asenkron olarak veritabanından çeken ve sayfalama/filtreleme parametrelerine göre yapılandırılmış sonuçlar döndüren mantıksal katman.
-- `auditFetcher` — Veritabanı bağlantısı alarak denetim satırlarını getirir ve standart bir fetch sonucu formatında sunar.
+### Veri Erişim
+Supabase veritabanından denetim günlüğü kayıtlarını asenkron olarak çeker ve sonuç formatında döndürür.
+- auditFetcher
 
-### Bileşen Sunumu (Component Presentation)
-Çekilen denetim verisini kullanıcıya tablo satırları halinde dinamik olarak gösteren, React tabanlı arayüz bileşeni.
-- `AuditLogTableBody` — Tablonun gövde bölümünü oluşturarak her bir denetim kaydını satır olarak render eder.
+### Bileşen
+Denetim günlüğü tablosunun gövde kısmını render eden React bileşenidir. Çekilen verileri tablo yapısı içinde görüntüler.
+- AuditLogTableBody
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Supabase üzerinden denetim kayıtlarını çekerek tablo formatında gösteren bir admin bileşenidir.
+[Aksiyom 1]: Eğer `supabase` parametresi olarak geçerli bir `SupabaseClient<Database>` nesnesi yoksa, `auditFetcher` veritabanı sorgusunu gerçekleştiremez.
 
-**[Aksiyom 1]**: Eğer `auditFetcher` için geçerli bir `SupabaseClient<Database>` bağlantısı yoksa, veri çekme işlemi başarısız olur veya hata fırlatır.
+[Aksiyom 2]: Eğer `params` parametresi olarak geçerli bir `FetchParams` nesnesi yoksa, `auditFetcher` hangi verilerin çekileceğini belirleyemez.
 
-**[Aksiyom 2]**: Eğer `FetchParams` parametresi sağlanması gereken sayfalama/filtreleme bilgilerini içermiyorsa, beklenmeyen veya boş sonuçlar döner.
+[Aksiyom 3]: Eğer `auditFetcher` fonksiyonu düzgün çalışmazsa, `AuditLogTableBody` bileşeni görüntülenecek denetim kayıtlarını alamaz.
 
-**[Aksiyom 3]**: Eğer Supabase veritabanında `audit_logs` tablosu (veya denetim kayıtlarını tutan karşılıklı tablo) erişilebilir değilse, `auditFetcher` Promise'ı reddedilir.
-
-**[Aksiyom 4]**: Eğer `AuditLogTableBody` bileşeni bileşen ağacında bir `AuditRow[]` verisi veya buna erişim sağlayan bir context/provider olmadan kullanılırsa, tablo boş görünür veya hata verir.
-
-**[Aksiyom 5]**: Eğer Supabase bağlantısı kesilir veya zaman aşımına uğrarsa (timeout), asenkron veri çekme süreci askıda kalır.
-
-**[Aksiyom 6]**: Eğer `Database` tipi ile tanımlanan şema yapısı (audit logs tablosu ve sütunları) değiştirilirse, `AuditRow` tipi tutarsızlaşır ve çalışma zamanı hataları oluşur.
+[Aksiyom 4]: Eğer Supabase veritabanında `AuditRow` yapısına uygun veriler yoksa, `auditFetcher` boş veya hatalı bir `FetchResult` döndürür.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### auditFetcher
+**Ne yapar**: Supabase veritabanındaki `admin_audit_log` tablosundan denetim kayıtlarını filtreleyerek, sıralayarak ve sayfalayarak getiren asenkron veri çekme fonksiyonudur. Audit günlüğü tablosu için veri sağlayıcı (data fetcher) olarak kullanılır.
 
-**Ne yapar**: Supabase veritabanındaki admin_audit_log tablosundan denetim kayıtlarını filtreleme, sıralama ve sayfalama desteğiyle çeker. Admin kullanıcılarının yaptığı değişiklikleri izlemek için kullanılır.
-
-**Nasıl yapar**: Fonksiyon, Supabase client üzerinden admin_audit_log tablosuna bir sorgu oluşturur. Önce temel select işlemini tanımlar, ardından `params.sort` parametresine göre sıralama belirler (varsayılan olarak 'at' sütununu kullanır). Filtre parametreleri sırasıyla uygulanır: tarih aralığı filtresi (gte/lte ile), action tipi filtresi (eq ile), serbest metin arama filtresi (ilike ile OR operatöründe table_name, row_pk ve comment alanlarında), ve batch filtresi (JSONB alanı olan after->>batch_id veya comment içindeki arama ile). Son olarak offset hesaplanarak range ile sayfalama uygulanır ve sonuç {rows, totalMatched} formatında döndürülür.
+**Nasıl yapar**: Fonksiyon, gelen `params` nesnesindeki filtre, sıralama ve sayfa bilgilerini kullanarak Supabase sorgusu oluşturur. Sorguya `from`, `to`, `action` ve `batch` filtrelerini koşullu olarak ekler. `params.query` değeri varsa, `table_name`, `row_pk` ve `comment` alanlarında arama yapar — ancak bu arama doğrudan sorgu gramerine gömülmez (T078-VH referansı). `batch` parametresi URL filtre parametresinden gelir ve `after->>batch_id` alanı ile `comment` alanında eşleşme arar. Sıralama anahtarı belirtilmemişse varsayılan olarak `at` alanına göre sıralar. Sayfalama için `offset` ve `pageSize` hesaplanarak `range` metoduyla veri aralığı belirlenir. Hata oluşursa hata fırlatır, başarılı olursa satırları ve toplam eşleşen kayıt sayısını döndürür.
 
 **Parametreler**:
-- supabase: `SupabaseClient<Database>` — Veritabanı bağlantısı sağlayan Supabase istemcisi, Database tipi ile tip güvenliği sağlanmış yapıda
-- params: `FetchParams` — Filtreleme, sıralama ve sayfalama parametrelerini içeren nesne. İçerisinde şu alanlar bulunur:
-  - filters.from: `string[] | undefined` — Başlangıç tarih filtresi, ISO formatında tarih (örn: "2024-01-15")
-  - filters.to: `string[] | undefined` — Bitiş tarih filtresi, ISO formatında tarih
-  - filters.action: `string[] | undefined` — İşlem tipi filtresi (örn: "INSERT", "UPDATE", "DELETE")
-  - filters.batch: `string[] | undefined` — Toplu işlem ID'si filtresi
-  - sort.key: `string | undefined` — Sıralama yapılacak sütun adı, varsayılan 'at'
-  - sort.dir: `'asc' | 'desc' | undefined` — Sıralama yönü
-  - query: `string | undefined` — Serbest metin arama terimi, tablo adı, satır ID'si ve yorum alanlarında aranır
-  - page: `number` — Mevcut sayfa numarası (1'den başlar)
-  - pageSize: `number` — Sayfa başına gösterilecek kayıt sayısı
+- `supabase`: `SupabaseClient<Database>` — Supabase veritabanı istemcisi. Veritabanı şeması tipiyle birlikte gelir.
+- `params`: `FetchParams` — Filtre, sıralama, sayfa ve arama bilgilerini içeren parametre nesnesi. İçerisinde `filters` (from, to, action, batch), `sort` (key, dir), `page`, `pageSize` ve `query` alanları bulunur.
 
-**Dönüş**: `Promise<FetchResult<AuditRow>>` — Asenkron olarak dönen sonuç nesnesi. İçeriği:
-  - rows: `AuditRow[]` — Sorgu sonucunda elde edilen denetim kayıtları dizisi
-  - totalMatched: `number` — Filtreleme sonucunda eşleşen toplam kayıt sayısı (sayfalama için gerekli)
+**Dönüş**: `Promise<FetchResult<AuditRow>>` — Asenkron olarak çözülen, `rows` (AuditRow dizisi) ve `totalMatched` (toplam eşleşen kayıt sayısı, sayısal değer veya 0) alanlarını içeren sonuç nesnesi.
 
 ### AuditLogTableBody
-**Ne yapar**: `auditFetcher` fonksiyonunu kullanarak denetim loglarını çeken, sayfalayan, filtreleyen ve arayüzde bir HTML tablosu içinde gösteren React fonksiyonel bileşenidir. Kullanıcı etkileşimlerine (sıralama, filtreleme, sayfa değiştirme) tepki verir ve yükleme durumlarını yönetir.
+**Ne yapar**: Denetim günlüğü tablosunun gövde bileşenini oluşturan React fonksiyonel bileşenidir. Audit log tablosunun satırlarını render etmekten sorumludur.
 
-**Nasıl yapar**: `useState` ile sayfa, filtre ve veri durumlarını tutar. `useEffect` ile `auditFetcher` fonksiyonunu, `filters`, `sort`, `page` ve `query` parametreleri değiştiğinde yeniden çağırarak verileri getirir. Veri çekme işlemi sırasında `loading` durumunu yönetir ve hata oluşursa hata mesajını gösterir. `TablePagination` bileşenini kullanarak sayfalama kontrollerini sunar. `AuditLogTableHeader` bileşeni ile tablonun başlığını ve sıralama düğmelerini oluşturur. Her bir `AuditRow` nesnesi için `AuditLogTableRow` bileşenini bir `map` döngüsü ile render ederek satırları oluşturur. Toplam satır sayısını ve toplam eşleşen sayıyı gösterir. `AuditLogTableRow`'a gerekli verileri ve `expanded` durumunu aktarır.
+**Nasıl yapar**: Fonksiyonun gövdesi verilen kaynak kodda belirtilmemiştir. Bu nedenle iç mantığı hakkında bilgi verilemez.
 
-**Parametreler**:
-- Fonksiyon本身i parametre almaz. (`() -> React.FC` olarak tanımlanmış).
+**Parametreler**: Parametre bilgisi verilen kaynak kodda yer almamaktadır.
 
-**Dönüş**: `React.FC` — React Fonksiyonel Bileşeni. Denetim kayıtlarını gösteren tablo gövdesini (başlık, satırlar, pagination) içeren JSX döndürür.
+**Dönüş**: `React.FC` — React fonksiyonel bileşeni döndürür.
 
 ---
 
@@ -104,6 +85,7 @@ Bu modül, Supabase üzerinden denetim kayıtlarını çekerek tablo formatında
 - import: react::React
 - import: react::useCallback
 - import: react::useMemo
+- import: sonner::toast
 
 ---
 
@@ -124,50 +106,77 @@ Bu modül, Supabase üzerinden denetim kayıtlarını çekerek tablo formatında
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/admin/AuditLogTableBody.tsx`::auditFetcher
-- **params**: `(supabase: SupabaseClient<Database>, params: FetchParams)`
+### [N1_NASIL] AST Pointer: src/views/admin/AuditLogTableBody.tsx::auditFetcher
+- **params**: `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi; `params` — FetchParams tipinde, filtreleme/sayfalama/sıralama parametreleri
 - **ic_degiskenler**:
-  - `from` — `params.filters.from?.[0]` aracılığıyla alınan başlangıç tarihi filtresi; `gte` sorgusunda kullanılır
-  - `to` — `params.filters.to?.[0]` aracılığıyla alınan bitiş tarihi filtresi; `lte` sorgusunda kullanılır
-  - `action` — `params.filters.action?.[0]` aracılığıyla alınan aksiyon filtresi (INSERT/UPDATE/DELETE vb.); `eq` sorgusunda kullanılır
-  - `batch` — `params.filters.batch?.[0]` aracılığıyla alınan batch ID filtresi; `or` sorgusunda `after->>batch_id` ve `comment` üzerinde arama yapılır
-  - `query` — Supabase `from('admin_audit_log')` ile başlayan zincirlenebilir sorgu nesnesi; `select`, `order`, `gte`, `lte`, `eq`, `or`, `range` metodlarıyla inşa edilir
-  - `sortKey` — `params.sort?.key ?? 'at'` ile belirlenen sıralama anahtarı varsayılan olarak `'at'`; `query.order()` içinde kullanılır
-  - `like` — `` `%${params.query}%` `` deseni; `or()` sorgusunda `table_name`, `row_pk`, `comment` alanlarında LIKE araması için kullanılır
-  - `offset` — `(params.page - 1) * params.pageSize` hesaplamasıyla elde edilen sayfalama başlangıç indeksi; `query.range()` içinde kullanılır
-  - `data` — `await query.range(...)` çağrısından dönen sorgu satırları dizisi
-  - `error` — `await query.range(...)` çağrısından dönen hata nesnesi; truthy ise `throw error` ile fırlatılır
-  - `count` — `select`'te `count: 'exact'` ile istenen toplam eşleşen kayıt sayısı; `totalMatched` dönüş değerine yazılır
-- **Dönüş**: `Promise<FetchResult<AuditRow>>` — `{ rows: AuditRow[], totalMatched: number }` nesnesi
+  - `from` — params.filters.from?.[0] değeri, tarih filtresi başlangıcı (YYYY-MM-DD formatında)
+  - `to` — params.filters.to?.[0] değeri, tarih filtresi bitişi (YYYY-MM-DD formatında)
+  - `action` — params.filters.action?.[0] değeri, işlem tipi filtresi (INSERT, UPDATE, DELETE, CUSTOM)
+  - `batch` — params.filters.batch?.[0] değeri, toplu işlem (batch) filtresi
+  - `query` — supabase.from('admin_audit_log').select(...) ile oluşturulan Supabase sorgu nesnesi; select edilen alanlar: id, at, actor, table_name, row_pk, action, comment, before, after; count: 'exact'
+  - `sortKey` — params.sort?.key değeri, yoksa varsayılan 'at'; sıralama alanı belirler
+  - `offset` — (params.page - 1) * params.pageSize hesaplaması; sayfalama ofseti
+  - `data` — await query.range(offset, offset + params.pageSize - 1) sonucu dönen satırlar dizisi
+  - `error` — sorgu sonucu oluşan hata nesnesi; varsa throw ile fırlatılır
+  - `count` — sorgu sonucu dönen toplam eşleşen kayıt sayısı (exact count)
+- **Dönüş**: Promise<FetchResult<AuditRow>> — rows (AuditRow[]) ve totalMatched (number) alanlarını içeren nesne
 
 ---
 
-### [N2_NASIL] AST Pointer: `src/views/admin/AuditLogTableBody.tsx`::AuditLogTableBody
-- **params**: yok
+### [N2_NASIL] AST Pointer: src/views/admin/AuditLogTableBody.tsx::AuditLogTableBody
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; tüm UI metinlerinde (`t('admin.audit.colDate')` vb.) kullanılır
-  - `lang` — `useI18n()` hook'undan dönen dil kodu (`'tr'` | `'en'`); `formatDateTime` çağrısına `lang as 'tr' | 'en'` olarak iletilir
-  - `table` — `useAdminTable<AuditRow>({...})` hook'undan dönen tablo state nesnesi; `filtering`, `fetchAllForExport`, `totalMatched`, `sorting` gibi alanları içerir; `paginationMode: 'server'`, `sortMode: 'server'`, `syncUrl: true` ile yapılandırılır
-  - `setFilter` — `table.filtering` destructuring'inden alınan filtre setter fonksiyonu; `setFilter('action', [])`, `setFilter('from', [...])`, `setFilter('batch', [])` çağrılarıyla filtreler değiştirilir
-  - `setQuery` — `table.filtering` destructuring'inden alınan arama sorgusu setter fonksiyonu; `setQuery('')` ile arama temizlenir, `AdminToolbar`'a `onChange` olarak bağlanır
-  - `filters` — `table.filtering.filters` referansı; mevcut tüm filtrelerin Record nesnesi
-  - `actionVal` — `filters.action?.[0] ?? ''` ile alınan mevcut aksiyon filtresi değeri; `AdminToolbar` `select` prop'una `value` olarak bağlanır
-  - `fromVal` — `filters.from?.[0] ?? ''` ile alınan başlangıç tarihi filtresi değeri; `<input type="date">` `value` prop'una bağlanır
-  - `toVal` — `filters.to?.[0] ?? ''` ile alınan bitiş tarihi filtresi değeri; `<input type="date">` `value` prop'una bağlanır
-  - `batchVal` — `filters.batch?.[0] ?? ''` ile alınan batch filtresi değeri; batch bilgi banner'ının koşullu gösteriminde (`{batchVal && ...}`) ve `href` query string'inde (`/admin/movements?batch=${batchVal}`) kullanılır
-  - `resetFilters` — `useCallback` ile memoize edilmiş fonksiyon; `setQuery('')` ve dört `setFilter` çağrısıyla tüm filtreleri sıfırlar; `AdminToolbar` `onClear` prop'una bağlanır; bağımlılıklar: `[setQuery, setFilter]`
-  - `clearBatch` — `useCallback` ile memoize edilmiş fonksiyon; `setFilter('batch', [])` ile yalnızca batch filtresini temizler; batch banner'ındaki "Temizle" butonunun `onClick` handler'ıdır; bağımlılıklar: `[setFilter]`
-  - `exportCsv` — `useCallback` ile memoize edilmiş async fonksiyon; `table.fetchAllForExport()` ile tüm filtrelenmiş satırları çeker, CSV başlık satırını `t()` çevirileriyle oluşturur, `rows.map()` ile her satırı CSV formatına dönüştürür (`r.id`, `r.at`, `r.actor`, `r.action`, `r.table_name`, `r.row_pk`, `r.comment` alanları); BOM (`\ufeff`) ekleyerek `Blob` oluşturur, `URL.createObjectURL` ile indirme URL'i üretir, geçici `<a>` elementi oluşturup `a.click()` ile tetikler, ardından `URL.revokeObjectURL` ile temizler; bağımlılıklar: `[table, t]`
-  - `columns` — `useMemo<AdminColumn<AuditRow>[]>` ile memoize edilmiş kolon tanımları dizisi; beş kolon: `at` (tarih, `formatDateTime` ile formatlanır, `sortable: true`), `action` (aksiyon badge'i, renk kodlamalı koşullu className ile, `sortable: true`), `table_name`, `row_pk`, `comment`; her kolon `cell: (r) => JSX` callback'ine sahiptir; bağımlılıklar: `[t, lang]`
-- **Dönüş**: JSX — `<div className="space-y-6">` sarmalayıcısı içinde; koşullu batch bilgi banner'ı (`batchVal` truthy ise); `DataTableKit` bileşeni (`columns`, `table`, `rowId`, `persistKey`, `emptyState`, `filterEmptyState`, `errorLabel`, `expandLabel`, `renderExpandedRow` (`JsonDiffViewer` ile `r.before`/`r.after` gösterimi), `toolbarSlot` (`AdminToolbar` ile arama, aksiyon select, tarih input'ları, `ExportMenu`))
+  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
+  - `lang` — useI18n() hook'undan gelen mevcut dil kodu
+  - `table` — useAdminTable<AuditRow>({...}) ile oluşturulan tablo nesnesi; resource: 'audit', rowId: (r) => r.id, fetcher: auditFetcher, paginationMode: 'server', sortMode: 'server', initialSort: { key: 'at', dir: 'desc' }, syncUrl: true
+  - `setFilter` — table.filtering.setFilter fonksiyonu; filtre değerlerini ayarlar
+  - `setQuery` — table.filtering.setQuery fonksiyonu; arama metnini ayarlar
+  - `filters` — table.filtering.filters nesnesi; mevcut tüm filtreler
+  - `actionVal` — filters.action?.[0] ?? ''; action filtresinin mevcut değeri
+  - `fromVal` — filters.from?.[0] ?? ''; tarih başlangıç filtresinin mevcut değeri
+  - `toVal` — filters.to?.[0] ?? ''; tarih bitiş filtresinin mevcut değeri
+  - `batchVal` — filters.batch?.[0] ?? ''; batch filtresinin mevcut değeri
+  - `resetFilters` — useCallback ile sarılı fonksiyon; setQuery('') ve tüm filtreleri boş diziye sıfırlar, bağımlılıkları: [setQuery, setFilter]
+  - `clearBatch` — useCallback ile sarılı fonksiyon; sadece setFilter('batch', []) çağırır, bağımlılıkları: [setFilter]
+  - `exportCsv` — useCallback ile sarılı async fonksiyon; table.fetchAllForExport() ile tüm filtrelenmiş veriyi çeker, CSV formatında Blob oluşturur ve tarayıcıda indirme tetikler; hata durumunda toast.error gösterir, bağımlılıkları: [table, t]
+  - `columns` — useMemo ile sarılı AdminColumn<AuditRow>[] dizisi; 5 sütun tanımlar: at (sortable, formatDateTime ile), action (sortable, renkli etiket), table_name, row_pk, comment; bağımlılıkları: [t, lang]
+- **Dönüş**: JSX.Element — space-y-6 div'i içinde batchVal varsa uyarı banner'ı, DataTableKit bileşeni (columns, table, rowId, persistKey: 'audit', hasWriteAccess: false, emptyState, filterEmptyState, errorLabel, columnsButtonLabel, totalLabel, expandLabel, renderExpandedRow ile JsonDiffViewer, toolbarSlot ile AdminToolbar)
+
+---
+
+### [N3_NASIL] AST Pointer: src/views/admin/AuditLogTableBody.tsx::resetFilters
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — dışarıdan kapatılan setQuery ve setFilter fonksiyonlarını çağırır)
+- **Dönüş**: void — setQuery('') çağırır, setFilter('action', []), setFilter('from', []), setFilter('to', []), setFilter('batch', []) çağırarak tüm filtreleri sıfırlar
+
+---
+
+### [N4_NASIL] AST Pointer: src/views/admin/AuditLogTableBody.tsx::clearBatch
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — dışarıdan kapatılan setFilter fonksiyonunu çağırır)
+- **Dönüş**: void — setFilter('batch', []) çağırarak batch filtresini temizler
+
+---
+
+### [N5_NASIL] AST Pointer: src/views/admin/AuditLogTableBody.tsx::exportCsv
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `rows` — table.fetchAllForExport() sonucu; Awaited<ReturnType<typeof table.fetchAllForExport>> tipinde; tüm filtrelenmiş satırlar
+  - `header` — 7 sütun başlığını virgülle birleştiren string: id, at, actor, action, tableName, rowPk, comment (t ile çevrilmiş)
+  - `lines` — rows dizisi üzerinde map ile üretilen CSV satırları dizisi; her satırda r.id, r.at, r.actor (çift tırnak escape ile), r.action, r.table_name, r.row_pk (çift tırnak escape ile), r.comment (çift tırnak escape ile) virgülle birleştirilir
+  - `csv` — '\ufeff' BOM + header + lines birleştirilmiş tam CSV metni
+  - `blob` — new Blob([csv], { type: 'text/csv;charset=utf-8;' }); CSV verisini içeren Blob nesnesi
+  - `url` — URL.createObjectURL(blob); Blob için geçici URL
+  - `a` — document.createElement('a'); indirme bağlantısı elementi; a.href = url, a.download = t('admin.audit.export.filename')
+- **Dönüş**: Promise<void> — yan etki olarak tarayıcıda CSV dosyası indirme tetikler; hata durumunda toast.error(t('admin.audit.export.failed')) gösterir ve return ile erken çıkar
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\admin\AuditLogTableBody.tsx
-  function: src\views\admin\AuditLogTableBody.tsx::auditFetcher
-  function: src\views\admin\AuditLogTableBody.tsx::AuditLogTableBody
+  file: AuditLogTableBody.tsx
+  function: AuditLogTableBody.tsx::auditFetcher
+  function: AuditLogTableBody.tsx::AuditLogTableBody
 
 ---
 
@@ -183,10 +192,10 @@ Bu modül, Supabase üzerinden denetim kayıtlarını çekerek tablo formatında
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500/5`, `bg-cyan-500/10`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-surface-deep/60`, `border-amber-500/20`, `border-cyan-500/20`, `border-emerald-500/20`, `border-rose-500/20`, `border-slate-500/20`, `border-white/5`, `hover:bg-amber-500/10`, `text-amber-500`, `text-cyan-400`
-- **Layout:** `!h-8`, `block`, `flex`, `gap-2`, `gap-3`, `gap-4`, `items-center`, `justify-between`, `max-w-xs`, `p-1`, `p-4`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger-weak`, `bg-admin-success-weak`, `bg-admin-surface`, `bg-admin-surface-3`, `bg-admin-warning-weak`, `bg-surface-deep/60`, `border-admin-accent/30`, `border-admin-border`, `border-admin-danger/30`, `border-admin-success/30`, `border-admin-warning/30`, `hover:bg-admin-warning-weak`, `text-admin-accent`, `text-admin-danger`
+- **Layout:** `!h-8`, `block`, `flex`, `flex-wrap`, `gap-2`, `gap-3`, `gap-4`, `items-center`, `justify-between`, `justify-end`, `max-w-xs`, `p-1`, `p-4`
 - **Varyant/Responsive:** `:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `!px-3`, `$`, `${adminButtonSecondaryClass`, `:`, `===`, `DELETE`, `INSERT`, `UPDATE`, `border`, `font-black`, `font-mono`, `glass-strong`, `mb-4`, `px-2`, `py-0.5`
+- **Yardımcı Sınıflar:** `!px-3`, `$`, `${adminButtonSecondaryClass`, `:`, `===`, `DELETE`, `INSERT`, `UPDATE`, `border`, `font-mono`, `font-semibold`, `mb-4`, `px-2`, `py-0.5`, `r.action`

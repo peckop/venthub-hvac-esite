@@ -2,108 +2,145 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\NicotraFanModel.tsx
-skeleton_hash: 33d856cd0c07caf7
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\NicotraFanModel.tsx
+skeleton_hash: 5ee9180432bca418
 entity_hashes:
   func:NicotraFanModel: 2bdd08e329a67558
-  overview: a1f2c486ca700a3e
+  overview: a978abdd718e5dd3
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:47:22Z
+generated_at: 2026-08-25T07:27:00Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC projesindeki 3D ürün görselleştirme altyapısının bir parçası olarak Nicotra marka fanlara ait üç boyutlu modeli React bileşeni olarak sunar. Parametre almayan, sabit bir 3D model gösteren bağımsız bir bileşendir ve ürün sayfalarında kullanılmak üzere dışa aktarılır.
+Bu modül, Nicotra marka fanların 3D görselleştirmesini sağlayan bir React fonksiyonel bileşenini tanımlar. Ürün kataloğu içindeki 3D ürün tipleri altında konumlanan bu bileşen, fan modelinin üç boyutlu olarak görüntülenmesinden sorumludur.
 
 ## Fonksiyon Grupları
-### 3D Fan Modeli Bileşeni
-Projedeki Nicotra marka fanın três boyutlu modelini React ortamında render eden temel bileşendir. Bileşen, harici yapılandırma veya prop almadan sabit bir 3D model sunar.
-
+### 3D Model Bileşeni
+Nicotra fan modelinin 3D sahne içinde render edilmesini üstlenen ana bileşendir. Ürün tipi olarak diğer fan modelleriyle aynı klasör yapısında yer alır ve modüler bir yapı sunar.
 - NicotraFanModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, parametresiz ve modül sabitssiz bir React fonksiyonel bileşenidir; fonksiyon gövdesine erişilemediğinden çalışma koşulları ve bağımlılıklar çıkarılamamıştır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1]:** Eğer NicotraFanModel bileşeni çağrıldığında gerekli Three.js / React Three Fiber ortamı (Canvas, renderer) mevcut değilse, bileşen render hatası verir.
-
-**[Aksiyom 2]:** Eğer bileşenin içerde yüklemesi beklenen 3D model dosyası (örn: `.glb`, `.gltf`) erişilebilir konumda değilse, model gösterimi boş veya hatalı olur.
-
-**[Aksiyom 3]:** Eğer bileşen挂bir React ağaç içinde kullanılmıyorsa (örn: Canvas bağlamı dışında), Three.js bileşenleri bağlam hatası verir.
-
----
-
-> **Not:** Fonksiyon imzası `NicotraFanModel()` olarak parametresiz tanımlanmış olup, fonksiyon gövdesine erişilmediği için bağımlılık listesi, prop gereksinimleri ve içsel koşullar **bilinmiyor** durumdadır. Yukarıdaki aksiyomlar, dosya uzantısından (.tsx) ve eski doküman bağlamından çıkarılabilecek minimum yapısal çıkarımları yansıtmaktadır.
+**Neden:** Fonksiyon gövdesi sağlanmadığından, modülün iç mantığından herhangi bir varsayım çıkarılamamaktadır. Yalnızca imza bilgisi (`NicotraFanModel() -> React.FC`) mevcut olup, bu imzadan modüle özgü bir davranış kuralı üretilememektedir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### NicotraFanModel
-**Ne yapar**: Venthub HVAC projesinin ürünler bölümünde yer alan 3B modelleme bileşenleri ailesinden biridir, yalnızca Nicotra marka fanlara ait 3B modeli React tabanlı uygulama içinde sunmak üzere tasarlanmış fonksiyonel bir React bileşenidir. Proje içindeki tüm fan 3B modelleri için belirlenen standart entegrasyon kurallarına uygun olarak çalışır.
-**Nasıl yapar**: React'in fonksiyonel bileşen mimarisini kullanır, içerisinde projenin 3B sahne altyapısıyla uyumlu geometri, malzeme ve konumlandırma tanımlarını barındırır, uygulama içindeki 3B görüntüleme motoruyla entegre olarak modelin doğru şekilde sahne üzerinde render edilmesini sağlar.
+**Ne yapar**: Nicotra markasına ait bir fan modelini temsil eden bir React fonksiyon bileşeni döndüren üst düzey bir fonksiyondur. Dosya konumu (`src/components/products/3d/types`) göz önüne alındığında, bu fonksiyon 3D ürün tipleri arasında Nicotra fan modelinin tanımını sağlar.
+
+**Nasıl yapar**: Fonksiyonun iç mantığı verilen kaynakta belirtilmemiştir. `React.FC` tipinde bir bileşen döndürdüğü bilinmektedir. Docstring boş bırakılmıştır; bu nedenle fonksiyonun nasıl bir uygulama mantığı izlediğine dair kaynakta bilgi bulunmamaktadır.
+
 **Parametreler**:
-- NicotraFanModel fonksiyonuna tanımlı özel bir parametre aktarılmamaktadır, standart React.FC sözleşmesine uygun olarak React tarafından genel amaçlı sunulan children, style gibi yaygın bileşen prop'larını isteğe bağlı olarak kabul edebilir.
-**Dönüş**: React.FC tipi, yani React uygulamasının JSX ağacında kullanılabilecek, Nicotra marka fana ait 3B modelini içeren bir React fonksiyonel bileşeni döndürür.
+- Fonksiyonun herhangi bir parametre alıp almadığı verilen kaynakta belirtilmemiştir.
+
+**Dönüş**: `React.FC` — React fonksiyon bileşeni (Function Component) tipinde bir değer döndürür. Bu, JSX elementi render edebilen bir bileşen anlamına gelir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../core::useResolveMaterials
+- import: @react-three/fiber::useFrame
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: three::BoxGeometry
+- import: three::CylinderGeometry
+- import: three::ExtrudeGeometry
+- import: three::Path
+- import: three::Shape
+- import: three::type { Group }
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: NicotraFanModel.tsx::NicotraFanModel
-- **params**: ()
+### [N1_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::NicotraFanModel
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials() hookundan dönen malzeme objesi; galvanizedSteel, matteBlack, industrialSteel, ral5010 gibi malzemeleri içerir
-  - `fanRef` — useRef<Group>(null) ile oluşturulan referans; rotor grubuna bağlanır, useFrame callback'inde rotation.x güncellenerek fan döndürülür
-  - `sideShape` — useMemo ile hesaplanan logaritmik spiral profilli Shape nesnesi; salyangoz gövdenin yan sac şeklini tanımlar
-- **Dönüş**: JSX elementi (`<group>` ile sarılmış tüm 3D model ağacı)
+  - `materials` — `useResolveMaterials()` hook'undan dönen malzeme nesnesi; JSX içinde `materials.galvanizedSteel`, `materials.matteBlack`, `materials.industrialSteel`, `materials.ral5010` olarak erişilir
+  - `fanRef` — `useRef<Group>(null)` ile oluşturulmuş Three.js Group referansı; `useFrame` callback'inde `fanRef.current.rotation.x` güncellenerek rotor animasyonu sağlanır
+  - `sideShape` — `useMemo` ile oluşturulan `Shape` nesnesi; logaritmik spiral profil ve dairesel delik içerir, `sideShapeGeometry` hesaplamasında kullanılır
+  - `baseFrameGeometry` — `useMemo` ile oluşturulan `BoxGeometry(1.0, 0.05, 1.0)`; X-şasi (taban çerçevesi) mesh'inde kullanılır
+  - `vibrationMountGeometry` — `useMemo` ile oluşturulan `BoxGeometry(0.1, 0.05, 0.1)`; titreşim takozları mesh'lerinde kullanılır
+  - `sideShapeGeometry` — `useMemo` ile oluşturulan `ExtrudeGeometry(sideShape, { depth: 0.02, bevelEnabled: false })`; yan saclar mesh'lerinde kullanılır
+  - `scrollWrapperGeometry` — `useMemo` ile oluşturulan `CylinderGeometry(0.6, 0.6, 0.6, 32, 1, true, 0, 4.5)`; sırt sacı (wrapper) mesh'inde kullanılır
+  - `dischargeGeometry` — `useMemo` ile oluşturulan `BoxGeometry(0.5, 0.02, 0.64)`; atış ağzı mesh'inde kullanılır
+  - `wheelGeometry` — `useMemo` ile oluşturulan `CylinderGeometry(0.38, 0.38, 0.58, 32, 1, true)`; sık kanatlı çark mesh'inde kullanılır
+  - `bladeGeometry` — `useMemo` ile oluşturulan `BoxGeometry(0.02, 0.58, 0.1)`; 24 adet kanat mesh'inde kullanılır
+  - `motorGeometry` — `useMemo` ile oluşturulan `CylinderGeometry(0.18, 0.18, 0.3, 32)`; motor mesh'inde kullanılır
+- **Dönüş**: JSX — `<group scale={[0.7, 0.7, 0.7]} rotation={[0, Math.PI / 4, 0]}>` ile başlayan, X-şasi, salyangoz gövde, rotor ve motor alt gruplarını içeren React elementi
 
-### [N2_NASIL] AST Pointer: NicotraFanModel.tsx::useFrame callback
-- **params**: (state, delta)
-  - `state` — React Three Fiber frame state objesi (bu fonksiyonda kullanılmıyor)
-  - `delta` — iki frame arasındaki zaman farkı (saniye); dönüş hızını kontrol eder
+---
+
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::useFrame callback
+- **params**: `state`, `delta`
 - **ic_degiskenler**:
-  - `fanRef.current` — fanRef'in mevcut değeri; null değilse rotorun X ekseninde döndürülmesi için kullanılır
-- **Dönüş**: yok (yan etki: fanRef.current.rotation.x değerini `delta * 15` kadar azaltır)
+  - `fanRef.current` — üst kapsamdan erişilen `Group` referansı; `null` kontrolü yapıldıktan sonra `rotation.x` özelliği `delta * 15` kadar azaltılır (X ekseninde sürekli dönüş animasyonu)
+- **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: NicotraFanModel.tsx::useMemo callback (sideShape)
-- **params**: ()
+---
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::sideShape useMemo callback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `shape` — new Shape() ile oluşturulan boş shape nesnesi; logaritmik spiral ve delik tanımları için kullanılır
-  - `segments` — spiral çizgi parçalarının sayısı; 48 olarak sabitlenmiştir
-  - `th` — her iterasyondaki açı değeri (radyan); `(i / segments) * Math.PI * 2.2` ile hesaplanır
-  - `r` — her açıdaki yarıçap; `0.3 + (th / (Math.PI * 2)) * 0.4` ile logaritmik olarak büyür
-  - `shape` üzerinde hesaplanan `x` — cosinus ile hesaplanan x koordinatı: `Math.cos(th) * r`
-  - `shape` üzerinde hesaplanan `y` — sinus ile hesaplanan y koordinatı: `Math.sin(th) * r`
-  - `hole` — new Path() ile oluşturulan merkez deliği yolu; `absarc` ile 0.28 yarıçaplı daire çizilir
-- **Dönüş**: Shape nesnesi (sideShape değişkenine atanır)
+  - `shape` — `new Shape()` ile oluşturulan nesne; logaritmik spiral profil noktaları ve atış ağzı çizgileri eklenir
+  - `segments` — `48` sabit değeri; spiral profil için döngü segment sayısı
+  - `i` — `for` döngü sayacı; `0`'dan `segments`'e kadar iterasyon
+  - `th` — `(i / segments) * Math.PI * 2.2` formülüyle hesaplanan açı (radyan); spiral profil için polar koordinat açısı
+  - `r` — `0.3 + (th / (Math.PI * 2)) * 0.4` formülüyle hesaplanan yarıçap; logaritmik spiral mesafesi
+  - `x` — `Math.cos(th) * r` hesaplaması; profil noktasının X koordinatı
+  - `y` — `Math.sin(th) * r` hesaplaması; profil noktasının Y koordinatı
+  - `hole` — `new Path()` ile oluşturulan nesne; `hole.absarc(0, 0, 0.28, 0, Math.PI * 2, true)` ile dairesel delik tanımlanır ve `shape.holes` dizisine eklenir
+- **Dönüş**: `Shape` — logaritmik spiral profilli, dairesel delikli ve atış ağzı çizgili şekil nesnesi
 
-### [N4_NASIL] AST Pointer: NicotraFanModel.tsx::titleşak map callback (x)
-- **params**: (x)
-  - `x` — titreşim takozlarının x koordinatı; `[0.4, -0.4]` dizisinden gelir
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementleri (z mapped mesh'lerin dizisi)
+---
 
-### [N5_NASIL] AST Pointer: NicotraFanModel.tsx::iç map callback (z)
-- **params**: (z)
-  - `z` — titreşim takozlarının z koordinatı; `[0.4, -0.4]` dizisinden gelir
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::useEffect cleanup factory
+- **params**: (parametre yok)
 - **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (matteBlack malzemeli boxGeometry mesh)
+- **Dönüş**: cleanup fonksiyonu — `baseFrameGeometry.dispose()`, `vibrationMountGeometry.dispose()`, `sideShapeGeometry.dispose()`, `scrollWrapperGeometry.dispose()`, `dischargeGeometry.dispose()`, `wheelGeometry.dispose()`, `bladeGeometry.dispose()`, `motorGeometry.dispose()` çağrılır
 
-### [N6_NASIL] AST Pointer: NicotraFanModel.tsx::kanat map callback
-- **params**: (_, i)
-  - `_` — Array(24).fill(0) elemanı (kullanılmıyor)
-  - `i` — kanat indeksi (0-23 arası); her kanadın rotasyon açısı `(i / 24) * Math.PI * 2` olarak hesaplanır
+---
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::useEffect inner cleanup
+- **params**: (parametre yok)
 - **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (galvanizedSteel malzemeli boxGeometry mesh — tek bir kanat)
+- **Dönüş**: yok — sekiz geometri nesnesinin `dispose()` metodu çağrılarak bellek temizliği yapılır
+
+---
+
+### [N6_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::vibration mount outer map
+- **params**: `x`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX array — `[0.4, -0.4].map(z => ...)` ile iki titreşim takozu mesh'i döndürülür
+
+---
+
+### [N7_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::vibration mount inner map
+- **params**: `z`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `<mesh key={...} position={[x, -0.05, z]} geometry={vibrationMountGeometry} material={materials.matteBlack} />` elementi; üst kapsamdan `x` ve `vibrationMountGeometry` kullanılır
+
+---
+
+### [N8_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::blade map
+- **params**: `_`, `i`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `<mesh key={i} rotation={[0, (i / 24) * Math.PI * 2, 0]} position={[0.36, 0, 0]} geometry={bladeGeometry} material={materials.galvanizedSteel} />` elementi; `i` indeksine göre 24 kanat eşit açılarla yerleştirilir
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\NicotraFanModel.tsx
-  function: src\components\products\3d\types\NicotraFanModel.tsx::NicotraFanModel
+  file: NicotraFanModel.tsx
+  function: NicotraFanModel.tsx::NicotraFanModel
 
 ---
 

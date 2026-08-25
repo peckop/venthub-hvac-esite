@@ -2,26 +2,30 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\types\media.types.ts
-skeleton_hash: 5efcacfd36f33ae3
+source_path: C:\tmp\wt-supurme\src\types\media.types.ts
+skeleton_hash: 8d40d07321f51666
 entity_hashes:
   overview: c22dcf353dfe0240
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-25T07:28:31Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinde medya varlıklarıyla ilgili standart TypeScript tip ve arayüz tanımlarını içeren, yalnızca derleme zamanında tip güvenliği sağlamak için kullanılan bir tür modülüdür. Çalışma zamanında herhangi bir kod çalıştırmaz, dış bağımlılık içermez ve medya yönetimi ile ilgili tüm bileşenler tarafından referans alınarak veri bütünlüğü ile tür uyumsuzluklarını önler.
 
-## Modülün Amacı ve Kullanım Ortamı
-Modülün temel amacı, medya nesneleri (örneğin videolar) için merkezi ve tutarlı tip tanımları sunarak projedeki veri yapısını standartlaştırmaktır. Ortam değişkenleri, harici API çağrıları veya veritabanı sorguları içermez; tamamen yerel ve静sel tip tanımlarıyla çalışır. Tip tanımları, medya yükleme, depolama ve görüntüleme süreçlerinde kullanılacak arayüzleri ve yardımcı tipleri kapsar.
+Bu modül, `src\types` klasöründe yer alan bir TypeScript tip tanımlama dosyasıdır. Dosyada fonksiyon, dışa aktarılan sabit veya değişken bulunmamaktadır. Modül, medya ile ilgili TypeScript arayüzlerini, tip tanımlarını veya tip birleşimlerini barındırmak amacıyla oluşturulmuştur.
+
+Dosya adından anlaşıldığı üzere, `media.types.ts` medya varlıklarına (görsel, video, ses vb.) ilişkin veri yapılarını tanımlayan tip bildirimleri içerir. Bu tipler, projenin diğer bölümlerinde medya verilerinin tip güvenli bir şekilde kullanılmasını sağlar.
+
+## Fonksiyon Grupları
+
+Bu dosyada fonksiyon bulunmadığından fonksiyon gruplandırması yapılmamıştır. Modül yalnızca tip tanımları içerir; dolayısıyla çalıştırılabilir bir mantık barındırmaz.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül yalnızca TypeScript tip tanımları (type/interface) içeren, çalıştırılabilir kod barındırmayan saf bir tür modülüdür. Fonksiyon gövdesi, modül sabiti veya varsayılan değerli imza bulunmadığından, fonksiyon tabanlı mimari varsayım üretilememektedir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Bu modül için aksiyom tanımlanamaz.**
+**Gerekçe:** `media.types.ts` dosyası yalnızca tip tanımları (type, interface, enum) içeren bir TypeScript modülüdür. Fonksiyon gövdesi, modül sabitleri veya çalıştırılabilir kod bulunmadığından, fonksiyon gövdesinden türetilecek mimari varsayım üretilememektedir.
 
 ---
 
@@ -86,13 +90,13 @@ type MediaMetadata = VideoMetadata | ThreeDMetadata | TechnicalDrawingMetadata
 
 ## AST POINTERS
 
-Bu dosya (`media.types.ts`) tip tanımı dosyasıdır — **hiçbir fonksiyon gövdesi içermemektedir**. Dosya yalnızca TypeScript type/interface/enum tanımlarından ibarettir. Dolayısıyla AST Pointer üretilecek fonksiyon bulunmamaktadır.
+Bu dosya (`src\types\media.types.ts`) bir TypeScript tip tanımlama dosyasıdır. Dosyada fonksiyon gövdesi bulunmadığından AST Pointer oluşturulacak fonksiyon yoktur.
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\types\media.types.ts
+  file: media.types.ts
 
 ---
 

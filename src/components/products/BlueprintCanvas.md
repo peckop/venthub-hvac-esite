@@ -2,63 +2,59 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\BlueprintCanvas.tsx
-skeleton_hash: 82bf90319b4b4675
+source_path: C:\tmp\wt-supurme\src\components\products\BlueprintCanvas.tsx
+skeleton_hash: 607d86de4a3e9980
 entity_hashes:
   func:BlueprintCanvas: b871a8b848648d7b
   func:CinematicCard: 7fb3fd44dcd5e71f
   overview: 4cbade83072ab96e
   style_tokens: 31f4acfd42638e52
-generated_at: 2026-06-19T20:47:32Z
+generated_at: 2026-08-25T07:26:03Z
 ---
 
 ## Genel Bakış
-Bu modül, ürünlerin görsel sunumunu güçlendirmek için kullanılan iki bağımsız ve odaklı React bileşenini içerir. Birincil amacı, ürün görsellerini farklı bağlamlarda görsel olarak çekici ve etkileşimli bir şekilde sunmaktır. Modül, bağımsız işlevsellikler sunan iki temel bileşenden oluşur ve ürün vitrini ile promosyon alanlarında estetik bir deneyim yaratmayı hedefler.
+
+BlueprintCanvas modülü, ürün görsellerini sergilemek için kullanılan React bileşenlerini içerir. Modül, sinematik bir kart görünümü sunan alt bileşen ve ana canvas bileşeni olmak üzere iki bileşenden oluşur. Her iki bileşen de görsel girdisi alarak görüntüleme işlemini gerçekleştirir.
 
 ## Fonksiyon Grupları
-### Etkileşimsel Vurgu Kartı
-Ürün görsellerini veya promosyon görsellerini, 3D derinlik, animasyon ve holografik efektlerle zenginleştirerek öne çıkaran ve estetik bir vurgu yapan yardımcı bileşendir. Kullanıcı etkileşimlerine (örneğin, üzerine gelme) tepki vererek sinematik bir deneyim sunar.
-- CinematicCard
 
-### Odaklanmış Ürün Görseli Bileşeni
-Ürünün ana görselini veya teknik çizimini, genellikle ürün detay sayfalarında büyük ve temiz bir şekilde sergilemek için kullanılan temel bileşendir. Görseli öne çıkararak bilgilendirici ve odaklanmış bir sunum sağlar.
-- BlueprintCanvas
+### Görüntüleme Bileşenleri
+
+Bu grup, ürün görsellerini kullanıcı arayüzünde göstermekten sorumludur. Bileşenler görsel girdisi alarak render işlemi yapar.
+
+- CinematicCard, BlueprintCanvas
+
+### Notlar
+
+- CinanticCard, sinematik bir kart görünümü sağlayan yardımcı bir bileşendir
+- BlueprintCanvas, ana bileşen olup BlueprintProps tipinde yapılandırma alır
+- Her iki bileşen de image parametresi aracılığıyla görsel girdisi kabul eder
+- Modül React kütüphanesine bağımlıdır
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için, sunulan fonksiyon imzaları ve belgeye dayalı olarak, modülün doğru çalışması için aşağıdaki mimari varsayımlar tanımlanmıştır. Varsayımlar, yalnızca verilen fonksiyon imzaları ve referans alınan modül yapısından (eski belge) çıkarılabilecek temel gereksinimlere odaklanır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1]:** Eğer `BlueprintCanvas` veya `CinematicCard` bileşenine iletilen `image` parametresi geçerli bir metin (string) değilse (örn. `null`, `undefined`, boş dize veya yanlış tipte bir değer), bileşen görüntüyü doğru şekilde render edemez veya hata verir.
-
-**[Aksiyom 2]:** Eğer `CinematicCard` bileşeni, eski dokümanda belirtildiği şekilde 3D derinlik ve holografik efektler için `HolographicMaterial` bileşenini kullanıyorsa, bu materyalin veya benzer bir render mekanizmasının uygulama ortamında (ör. Three.js, WebGL desteği) bulunmaması veya çağrının başarısız olması durumunda, bileşenin görsel efektleri bozulur veya bileşen hata verir.
-
-**[Aksiyom 3]:** Modül, iki bağımsız bileşen (`BlueprintCanvas` ve `CinematicCard`) içermektedir. Eğer bu bileşenlerin bağımsız çalışması için gerekli olan alt bileşenler veya yardımcı modüller (ör. `HolographicMaterial` veya benzeri) bağımsız olarak dışarıdan sağlanmıyorsa (içe aktarılmıyorsa), modül derleme veya çalışma zamanı hatası ile karşılaşır.
+**Neden:** Fonksiyon gövdeleri verilmediğinden, modülün doğru çalışması için gerekli koşullar belirlenememektedir. Yalnızca fonksiyon imzaları (`CinematicCard`, `BlueprintCanvas`) ve bir sabit (`HolographicMaterial`) mevcut olup, gövde mantığı bilinmemektedir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### CinematicCard
-**Ne yapar**: Bu fonksiyon, verilen bir görseli derinlik efekti, süzülme animasyonu ve holografik overlay (katman) ile sinematik bir 3D kart formatında render eder. Kullanıcıya interaktif ve görsel olarak zengin bir bileşen sunmayı amaçlar.
+**Ne yapar**: Sinematik 3D kart bileşenidir. Verilen görseli derinlik efekti, süzülme animasyonu ve holografik katman ile birlikte render eder. Üç boyutlu bir kart görünümü oluşturarak görseli öne çıkarır.
 
-**Nasıl yapar**: Fonksiyon, React functional component yapısında tasarlanmıştır. `image` prop'u alarak başlar. İç mantığında, CSS transform ve animation özelliklerini (perspective, rotateX, rotateY, translateZ vb.) kullanarak 3D derinlik hissi yaratır. Hover veya其他 etkileşimlerle süzülme (floating) animasyonunu tetikleyebilir. Son olarak, yarı saydam bir holografik overlay efektini görselin üzerine bindirerek sinematik görünümü tamamlar.
+**Nasıl yapar**: Bileşen, aldığı `image` prop'u aracılığıyla bir görsel URL'si alır ve bu görseli sinematik bir 3D kart içinde görüntüler. Kart, derinlik hissi veren gölgelendirme ve perspektif efektleri, sürekli süzülme (floating) animasyonu ve holografik bir katman (holographic overlay) ile zenginleştirilmiştir. Bu efektler birlikte çalışarak kartın fiziksel dünyada var olan üç boyutlu bir nesne gibi görünmesini sağlar.
 
 **Parametreler**:
-- image: string — 3D kart içinde gösterilecek görselin URL'si veya kaynak yolu.
+- image: string — Kart üzerinde gösterilecek görselin URL adresi
 
-**Dönüş**: `React.FC<{ image: string }>` tipinde bir React functional component döndürür.
+**Dönüş**: React.FC<{ image: string }> — `image` prop'u alan bir React fonksiyonel bileşeni döndürür.
 
 ### BlueprintCanvas
-**Ne yapar**: Bu fonksiyon, bir mühendislik veya mimari plan (blueprint) görselini interaktif bir tuval (canvas) üzerinde göstermek ve muhtemelen üzerinde çizim veya vurgulama işlemleri yapmak için kullanılır.
-
-**Nasıl yapar**: Fonksiyon, `BlueprintCanvasProps` arayüzünden türetilmiş prop'ları alır. Temel olarak bir `image` prop'u kullanarak arka planda bir mühendislik planı görseli yükler. Bu görseli bir `<canvas>` veya benzeri bir React bileşeni içinde render ederek, kullanıcının üzerinde yakınlaştırma, kaydırma veya çizim yapabilmesini sağlayacak interaktif bir alan oluşturur.
-
-**Parametreler**:
-- image: string — Blueprint tuvalinde arka plan olarak görüntülenecek mühendislik planı görselinin URL'si veya yolu.
-
-**Dönüş**: `React.FC<BlueprintCanvasProps>` tipinde bir React functional component döndürür. `BlueprintCanvasProps` arayüzünün tam tanımı dış kaynakta yer almaktadır.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -97,29 +93,40 @@ Bu modül için, sunulan fonksiyon imzaları ve belgeye dayalı olarak, modülü
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/products/BlueprintCanvas.tsx::CinematicCard
-- **params**: ({ image })
+- **params**: `{ image }` — kart üzerinde gösterilecek görselin dosya yolu veya URL'si
 - **ic_degiskenler**:
-  - `texture` — `useTexture(image)` ile yüklenen Three.js texture nesnesi, holografik materyale uygulanır
-  - `meshRef` — `useRef<Mesh>(null)` ile oluşturulan referans, mesh elemanına erişim sağlar
-  - `state` — `useFrame` callback parametresi, frame güncellemelerinde mouse ve clock verilerini sağlar
-  - `x` — `state.mouse` destructuring'inden gelen mouse X koordinatı, mesh rotasyonunu etkiler
-  - `y` — `state.mouse` destructuring'inden gelen mouse Y koordinatı, mesh rotasyonunu etkiler
-  - `material` — `meshRef.current.material` ifadesinden ShaderMaterial'a cast edilen materyal, uniform güncellemeleri için kullanılır
-- **Dönüş**: JSX elemanı (Float ile sarılmış 3D sahne)
+  - `texture` — `useTexture(image)` ile yüklenen Three.js Texture nesnesi; `holographicMaterial` bileşeninin `uTexture` prop'una aktarılır
+  - `meshRef` — `useRef<Mesh>(null)` ile oluşturulan referans; ana kart mesh'ine atanır ve `useFrame` içinde rotasyon güncellemeleri için kullanılır
+- **Dönüş**: JSX — `<Float>` bileşeni içinde `<group>`; bu group iki `<mesh>` içerir: birincisi `planeGeometry` + `holographicMaterial` ile ana kart, ikincisi `planeGeometry` + `meshBasicMaterial` ile arka plan ambient glow
 
-### [N2_NASIL] AST Pointer: src/components/products/BlueprintCanvas.tsx::BlueprintCanvas
-- **params**: ({ image })
+### [N2_NASIL] AST Pointer: src/components/products/BlueprintCanvas.tsx::CinematicCard::useFrame callback
+- **params**: `(state)` — `@react-three/fiber`'ın `useFrame` hook'u tarafından her karede sağlanan state nesnesi
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan elde edilen çeviri fonksiyonu, ürün metinlerini uluslararası dilde döndürür
-- **Dönüş**: JSX elemanı (VentHubCanvas içinde CinematicCard barındıran tam sayfa bileşeni)
+  - `state` — frame state nesnesi; `mouse` ve `clock` alt nesnelerini içerir
+  - `state.mouse` — fare pozisyonunu tutan nesne
+  - `x` — `state.mouse.x` değerinden destructured edilen yatay fare koordinatı; `meshRef.current.rotation.y` hesaplamasında kullanılır
+  - `y` — `state.mouse.y` değerinden destructured edilen dikey fare koordinatı; `meshRef.current.rotation.x` hesaplamasında kullanılır
+  - `meshRef.current` — mevcut mesh referansı; null kontrolü yapıldıktan sonra rotasyon ve materyal erişimi için kullanılır
+  - `meshRef.current.rotation.x` — mesh'in X ekseni rotasyonu; `MathUtils.lerp` ile `-y * 0.2` hedef değerine yumuşak geçişle güncellenir
+  - `meshRef.current.rotation.y` — mesh'in Y ekseni rotasyonu; `MathUtils.lerp` ile `x * 0.2` hedef değerine yumuşak geçişle güncellenir
+  - `material` — `meshRef.current.material` değerinin `ShaderMaterial` tipine cast edilmiş hali
+  - `material.uniforms` — shader uniform değişkenleri nesnesi
+  - `material.uniforms.uTime` — shader zaman uniform'u; `state.clock.getElapsedTime()` değeriyle güncellenir
+- **Dönüş**: yok — yan etki: her karede mesh rotasyonunu parallax etkisiyle günceller ve shader zaman uniform'unu ilerletir
+
+### [N3_NASIL] AST Pointer: src/components/products/BlueprintCanvas.tsx::BlueprintCanvas
+- **params**: `{ image }` — 3D sahnedeki CinematicCard bileşenine aktarılacak görsel kaynağı
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; `'products.blueprint.scanning'`, `'products.blueprint.objectReference'` ve `'products.blueprint.cinematicMode'` anahtarlarıyla UI metinlerini yerelleştirmek için kullanılır
+- **Dönüş**: JSX — `div` kapsayıcı içinde: koyu arka plan grid deseni, `VentHubCanvas` bileşeni (`preset="showcase"`, `frameloop="always"`, `camera={{ position: [0, 0, 5], fov: 45 }}`) içinde `Suspense` ile sarılmış `CinematicCard`, sol üst köşede tarama göstergesi, sol alt köşede nesne referans etiketi, sağ alt köşede sinematik mod etiketi ve dekoratif çizgi elemanları, en üstte inset gölge overlay'i
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\products\BlueprintCanvas.tsx
-  function: src\components\products\BlueprintCanvas.tsx::CinematicCard
-  function: src\components\products\BlueprintCanvas.tsx::BlueprintCanvas
+  file: BlueprintCanvas.tsx
+  function: BlueprintCanvas.tsx::CinematicCard
+  function: BlueprintCanvas.tsx::BlueprintCanvas
 
 ---
 

@@ -2,47 +2,55 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\checkout\SecurePaymentOverlay.tsx
-skeleton_hash: 85f100f9701faee6
+source_path: C:\tmp\wt-supurme\src\views\checkout\SecurePaymentOverlay.tsx
+skeleton_hash: cc3a2247b73d603d
 entity_hashes:
   func:SecurePaymentOverlay: 2034f9e5c072e96b
   overview: abfd0850fbcc2e8a
   style_tokens: 5b40eb77343c895c
-generated_at: 2026-06-14T17:51:42Z
+generated_at: 2026-08-25T07:31:50Z
 ---
 
 ## Genel Bakış
-VentHub HVAC ödeme akışında kullanılan güvenli ödeme kaplama bileşenidir. Ödeme işlemi sırasında kullanıcıya geçici bir ekran sunarak sürecin görünürlüğünü, hangi adımda olduğunu ve tamamlanma oranını gösterir.Uluslararasılaştırma desteği ile çok dilli arayüz sağlar.
+
+SecurePaymentOverlay modülü, ödeme süreci sırasında kullanıcıya gösterilen güvenli ödeme katmanını (overlay) oluşturan bir React bileşenidir. Bileşen, ödeme adımını, ilerleme yüzdesini ve görünürlük durumunu dışarıdan aldığı proplar aracılığıyla kontrol eder. Uluslararasılaştırma desteği sağlanmış olup `t` fonksiyonu aracılığıyla metinlerin çevrilmesine olanak tanır.
 
 ## Fonksiyon Grupları
-### Ödeme Kaplama Bileşeni
-Ödeme süreci boyunca kullanıcıya sunulan kaplama ekranının tüm durumlarını ve görünümünü yöneten ana React bileşenidir.
+
+### Bileşen
+
+Tek bir bileşenden oluşan modül, ödeme akışı sırasında ekrana binen overlay katmanını yönetir. Görünürlük durumu, mevcut ödeme adımı ve yüzdeler bazlı ilerleme bilgisi gibi dışsal durumları props olarak alır ve buna göre kullanıcı arayüzünü render eder.
+
 - SecurePaymentOverlay
+
+## Bağımlılıklar
+
+Modül, dışsal bir bağımlılık listesi verilmemiştir. Ancak `t` prop'u uluslararasılaştırma (i18n) katmanına işaret ettiğinden, üst bileşenin bir çeviri sağlayıcısından beslenmesi beklenir. Bileşenin kendisi durumsuz (stateless) görünmektedir; tüm durum bilgisi dışarıdan props aracılığıyla gelir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı güvenli ödeme kaplama bileşeni, üst bileşen tarafından传递 edilen prop'ların geçerliliğine ve tutarlılığına bağlıdır. Eğer prop'lar eksik, null/undefined veya beklenmeyen türde ise, bileşenin render edilmesi veya doğru çalışması garanti edilemez.
 
-[Aksiyom 1]: Eğer `overlayVisible` prop'u verilmemiş veya geçerli bir boolean (true/false) değilse, bileşenin görünürlüğü kontrol
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Neden:** Fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzası mevcuttur. Aksiyomlar yalnızca fonksiyon gövdesindeki mantıksal bağımlılıklardan türetilebilir. Props tanımları tek başına bir bileşenin iç davranışını belirlemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### SecurePaymentOverlay
+**Ne yapar**: Güvenli ödeme işlemini gösteren bir React bileşeni oluşturur. Bileşen, ödeme sürecinin görünürlüğünü, mevcut adımını, ilerleme yüzdesini ve çeviri fonksiyonunu props olarak alır ve buna uygun bir ödeme arayüzü render eder.
 
-**Ne yapar**: Güvenli ödeme sürecinde kullanıcıya adım adım ilerleyen bir overlay (yer kaplayan üst panel) bileşenidir. Ödeme işleminin farklı aşamalarında (hazırlık, doğrulama, sonuç) kullanıcıya görsel geri bildirim sunar.
-
-**Nasıl yapar**: Bileşen, `overlayVisible` durumuna göre ekranda görünür olup olmadığını kontrol eder. `overlayStep` prop'u ile mevcut ödeme adımını belirler ve her adıma karşılık gelen farklı içeriği render eder. `overlayPercent` değeri ile işlem ilerleme yüzdesini gösteren bir progress bar sunar. `t` fonksiyonu ile çok dilli çeviri desteği sağlar, böylece farklı dil kullanıcılarına yerelleştirilmiş mesajlar gösterir.
+**Nasıl yapar**: Fonksiyon, props parametrelerini destructuring yöntemiyle ayırır ve `React.FC<SecurePaymentOverlayProps>` tipinde bir fonksiyonel bileşen döndürür. Bileşen, `overlayVisible` prop'u ile kontrol edilen bir overlay (katman) yapısı kullanarak ödeme sürecinin farklı adımlarını ve ilerleme durumunu kullanıcıya sunar. `overlayStep` mevcut ödeme adımını, `overlayPercent` ise işlemin tamamlanma yüzdesini belirtir. `t` fonksiyonu aracılığıyla çoklu dil desteği sağlanır.
 
 **Parametreler**:
-- `overlayVisible` — `boolean` — Overlay'ın ekranda görünüp görünmeyeceğini kontrol eden mantıksal değer. `true` olduğunda overlay aktif olarak gösterilir, `false` olduğunda gizlenir.
-- `overlayStep` — `string | number` — Mevcut ödeme işleminin hangi aşamada olduğunu belirtir. Bu değere bağlı olarak overlay içinde farklı içerik ve mesajlar render edilir.
-- `overlayPercent` — `number` — Ödeme işleminin tamamlanma yüzdesini (0-100 aralığında) temsil eder. Genellikle bir ilerleme çubuğu (progress bar) bileşenine bağlanarak görsel geri bildirim sağlar.
-- `t` — `(key: string) => string` — Çeviri fonksiyonu. Bileşen içindeki tüm kullanıcıya dönük metinlerin, bu fonksiyon aracılığıyla ilgili dil dosyasından çekilmesini sağlar. Örneğin `t('payment.processing')` çağrısı ile o anki dile göre "İşleniyor..." gibi bir metin döner.
+- overlayVisible: bilinmiyor — Ödeme overlay'inin görünür olup olmadığını kontrol eden değer
+- overlayStep: bilinmiyor — Ödeme sürecinin mevcut adımını belirten değer
+- overlayPercent: bilinmiyor — Ödeme işleminin tamamlanma yüzdesini gösteren değer
+- t: bilinmiyor — Çoklu dil desteği için çeviri fonksiyonu
 
-**Dönüş**: `React.FC<SecurePaymentOverlayProps>` — Bileşen, JSX elementi döndüren bir React fonksiyonel bileşenidir. Verilen prop değerlerine göre koşullu olarak overlay arayüzünü render eder veya `null` döner.
+**Dönüş**: `React.FC<SecurePaymentOverlayProps>` — SecurePaymentOverlayProps tipinde props alan bir React fonksiyonel bileşeni döndürür.
 
 ---
 
@@ -64,21 +72,26 @@ Bu React tabanlı güvenli ödeme kaplama bileşeni, üst bileşen tarafından�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: SecurePaymentOverlay.tsx::SecurePaymentOverlay
-- **params**: (overlayVisible, overlayStep, overlayPercent, t)
-- **ic_degiskenler**: 
-  - `overlayVisible` — Ödeme overlay'ının görünür olup olmadığını belirler (boolean), false ise null döner
-  - `overlayStep` — Overlay'ın hangi adımda olduğunu belirler (1, 2, 3), başlık ve adım renklerini kontrol eder
-  - `overlayPercent` — İlerleme çubuğunun yüzdesini belirler, CSS width stilinde kullanılır
-  - `t` — Çeviri fonksiyonu, tüm UI metinlerini lokalize etmek için kullanılır (checkout.overlay.* key'leri)
-- **Dönüş**: JSX.Element | null (overlayVisible false ise null, değilse React bileşeni)
+### [N1_NASIL] AST Pointer: src/views/checkout/SecurePaymentOverlay.tsx::SecurePaymentOverlay
+- **params**:
+  - `overlayVisible` — overlay'in gösterilip gösterilmeyeceğini belirten boolean değer
+  - `overlayStep` — ödeme aşamasını gösteren sayı (1, 2 veya 3 değerleriyle koşullu render yapılır)
+  - `overlayPercent` — ilerleme çubuğunun yüzde genişliği olarak kullanılan sayısal değer
+  - `t` — çeviri fonksiyonu, `t('checkout.overlay.dialogLabel')` gibi anahtarlarla metinleri getirir
+- **ic_degiskenler**:
+  - `overlayVisible` — `if (!overlayVisible) return null` koşulunda kontrol edilir; false ise fonksiyon null döner
+  - `overlayStep` — header kısmında `overlayStep === 1`, `overlayStep === 2`, `overlayStep === 3` koşullarıyla durum metni seçilir; body kısmında `overlayStep >= 1`, `overlayStep >= 2`, `overlayStep >= 3` koşullarıyla aşama göstergelerinin stili belirlenir
+  - `overlayPercent` — `style={{ width: \`${overlayPercent}%\` }}` ifadesinde ilerleme çubuğunun genişliği olarak kullanılır
+  - `t` — `t('checkout.overlay.dialogLabel')`, `t('checkout.overlay.header')`, `t('checkout.overlay.starting')`, `t('checkout.overlay.secureForm')`, `t('checkout.overlay.bank3d')`, `t('checkout.securePayment.brand')`, `t('checkout.securePayment.iyzicoSecure')`, `t('checkout.overlay.stageInit')`, `t('checkout.overlay.stageForm')`, `t('checkout.overlay.stageBank')`, `t('checkout.overlay.dontClose')` çağrılarıyla çeviri metinleri alınır
+  - `Lock` — `lucide-react`'ten import edilen ikon bileşeni; header içinde `<Lock className="text-primary-navy" size={18} />` olarak render edilir
+- **Dönüş**: `overlayVisible` false ise `null`, aksi halde tam sayfa overlay JSX yapısı (dialog bileşeni, spinner, ilerleme çubuğu ve aşama göstergeleri içerir)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\checkout\SecurePaymentOverlay.tsx
-  function: src\views\checkout\SecurePaymentOverlay.tsx::SecurePaymentOverlay
+  file: SecurePaymentOverlay.tsx
+  function: SecurePaymentOverlay.tsx::SecurePaymentOverlay
 
 ---
 
