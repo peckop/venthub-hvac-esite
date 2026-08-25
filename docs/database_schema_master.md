@@ -1,7 +1,7 @@
-# Veritabani Semasi — venthub-hvac
+# Veritabani Semasi — wt-master
 
 ---
-compiled_at: 2026-08-13T08:29:51.679196+00:00
+compiled_at: 2026-08-25T08:25:50.825850+00:00
 tables: 41
 policies: 0
 functions: 41
