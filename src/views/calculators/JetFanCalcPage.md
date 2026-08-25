@@ -2,75 +2,67 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\calculators\JetFanCalcPage.tsx
-skeleton_hash: 8f65ba8be1d48fa0
+source_path: C:\tmp\wt-supurme\src\views\calculators\JetFanCalcPage.tsx
+skeleton_hash: 8c1fc45645cb2d1f
 entity_hashes:
   func:JetFanCalcPage: b83a7ef4e6b81401
   func:getACHStatus: e2c951766a2e003c
   func:reset: 16764b441f7bc7b6
-  overview: 2910f25a5a1861f0
+  overview: 72eb88bbbe4cd630
   style_tokens: 614f0725ca061dc9
-generated_at: 2026-06-19T20:50:35Z
+generated_at: 2026-08-25T07:31:38Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesi kapsamında jet fan havalandırma hesaplamaları yapan tek sayfalık bir React bileşenidir. Kullanıcıların parametreleri girerek hava değişim sayısını hesaplamasını, formu sıfırlamasını ve sonucun performans seviyesini (ACH durumunu) gerçek zamanlı olarak görmesini sağlar. Modül, arayüz oluşturımı, durum yönetimi ve hesaplama sonuçlarının yorumlanmasını tek bir yapıda merkezileştirir.
+
+JetFanCalcPage modülü, jet fan hesaplamalarının yapıldığı bir React sayfa bileşenidir. Kullanıcıya jet fan boyutlandırma ve hava değişim oranı (ACH) hesaplama arayüzü sunar. Hesaplama sonuçlarını saatlik hava değişim sayısına göre sınıflandırarak kullanıcıya durum bilgisi sağlar.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Tüm jet fan hesaplayıcı arayüzünü, form alanlarını, hesaplama mantığını ve sonuç gösterimini yöneten ana React bileşenidir. Kullanıcı etkileşimini ve modülün genel akışını kontrol eder.
 
+### Sayfa Bileşeni
+Ana bileşen fonksiyonu olup jet fan hesaplama sayfasının tüm arayüzünü ve mantığını oluşturur. Alt fonksiyonları ve durum yönetimini içerir.
 - JetFanCalcPage
 
-### Yardımcı İşlevler
-Sayfa içindeki belirli görevleri yerine getiren yardımcı fonksiyonlardır. Formun sıfırlanması ve hesaplanan hava değişim sayısının (ACH) performans durumunun (örneğin: optimal, kabul edilebilir) belirlenmesi gibi işlemleri desteklerler.
+### Durum Yönetimi
+Hesaplama formundaki tüm girdileri ve hesaplanmış değerleri başlangıç durumuna döndürerek formu sıfırlar.
+- reset
 
-- reset, getACHStatus
+### Durum Değerlendirme
+Saatlik hava değişim sayısını (ACH) alarak durumu optimal, acceptable, warning veya critical olarak sınıflandırır. Bu sınıflandırma kullanıcıya havalandırma yeterliliği hakkında geri bildirim sağlar.
+- getACHStatus
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi mevcut olmadığı için sadece fonksiyon imzalarından ve parametre tiplerinden çıkarılabilecek sınırlı mimari varsayımlar tanımlanmıştır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1]**: `getACHStatus` fonksiyonuna iletilen `ach` parametresi, hesaplanmış bir sayısal değer olmalıdır. Eğer geçerli bir sayısal değer (number) yoksa, fonksiyon beklenmedik bir davranış sergileyebilir veya "optimal", "acceptable", "warning", "critical" değerlerinden uygun birini döndüremeyebilir.
-
-**[Aksiyom 2]**: `getACHStatus` fonksiyonunun döndürebileceği değerler sabit ve kapalı bir kümedir: `{'optimal', 'acceptable', 'warning', 'critical'}`. Eğer fonksiyon imzasında belirtilen bu değerlerden farklı bir değer döndürmeye yönelik bir mantık varsa, bu durum tip güvenliğini ihlal eder ve istemci tarafında hatalara yol açar.
-
-**[Aksiyom 3]**: `JetFanCalcPage` React bileşeni olarak render edilmeli ve React runtime ortamında (tarayıcı veya React-native ortamı) çalışmalıdır. Eğer React ortamı (veya ReactFC'yi destekleyen bir ortam) yoksa, bileşen oluşturulamaz.
-
-**[Aksiyom 4]**: `reset` fonksiyonu, bileşenin iç durumunu (state) ve/veya form alanlarını başlangıç değerlerine döndürmelidir. Eğer bu fonksiyon bileşenin durum yönetim sistemiyle (örn. useState, useRef) doğrudan veya dolaylı olarak entegre değilse, form alanları beklenen şekilde sıfırlanamaz.
+**Neden:** Fonksiyon gövdeleri verilmemiştir. Mimari aksiyomlar yalnızca fonksiyon gövdelerinden türetilir; fonksiyon imzaları tek başına davranışsal çıkarım için yeterli değildir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### JetFanCalcPage
-**Ne yapar**: Jet Fan hesaplama sayfasının ana React bileşenidir. HVAC (Isıtma, Havalandırma ve Klima) sistemi için jet fan hesaplamalarını kullanıcı arayüzünde sunar. Bu bileşen, hesaplama formunu, sonuçları ve ilgili durum göstergelerini yönetir.
+**Ne yapar**: Jet fan hesaplama sayfasını oluşturan ana React bileşenidir. Bu fonksiyon, bir jet fan hesaplama arayüzünü render eden bir React.FC (React Fonksiyon Bileşeni) döndürür. Bileşen, dosya adından anlaşılacağı üzere `calculators` (hesaplayıcılar) görünümü altında yer alır ve jet fan ile ilgili hesaplamaların yapıldığı bir sayfa sunar.
 
-**Nasıl yapar**: Fonksiyon bir React fonksiyonel bileşenidir (React.FC). İçerisinde hesaplama mantığını, form durumunu (state) ve kullanıcı etkileşimlerini yönetir. Jet fan sistemi için gerekli parametreleri (hava debisi, kanal boyutları, ACH değeri vb.) işleyerek hesaplama sonuçlarını oluşturur ve sayfada gösterir. Kullanıcının değerleri girip hesaplayabilmesini sağlar.
+**Nasıl yapar**: Fonksiyonel bir React bileşeni olarak tanımlanmıştır. Bileşen içinde durum yönetimi (state), hesaplama mantığı ve kullanıcı arayüzü elemanları barındırır. `reset` ve `getACHStatus` gibi yardımcı fonksiyonlar bu bileşen kapsamında tanımlanmıştır. Bileşen, jet fan hesaplama formunu ve sonuçlarını kullanıcıya gösterir.
 
 **Parametreler**:
-Bu fonksiyon parametre almaz, çünkü bir React bileşenidir ve props üzerinden veri alması beklenir (ancak bu spesifikasyonda props tanımlanmamıştır).
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: `React.FC` tipinde bir JSX bileşeni döndürür. Bu, React Functional Component anlamına gelir ve hesaplama sayfasının tüm arayüzünü render eder.
+**Dönüş**: `React.FC` — React fonksiyonel bileşeni döndürür. Bu bileşen, jet fan hesaplama sayfasının tüm arayüzünü ve mantığını kapsar.
 
 ### reset
-**Ne yapar**: JetFanCalcPage sayfasındaki tüm kullanıcı girişlerini, mevcut hesaplama sonuçlarını ve sayfa durum değerlerini varsayılan ilk hallerine döndüren sıfırlama fonksiyonudur. Kullanıcının mevcut hesaplamasını sıfırlayarak tamamen yeni bir hesaplama süreci başlatmasını mümkün kılar. Formdaki tüm doldurulmuş alanları temizleyerek hata veya yanlış giriş durumlarında kolayca sıfırlama imkanı sunar.
-**Nasıl yapar**: JetFanCalcPage bileşeni içinde yönetilen state nesnesindeki tüm form değerlerini, hesaplanmış performans verilerini ve tüm uyarı/hata mesajlarını ilk yükleme durumundaki varsayılan değerlerle günceller. Sayfa içindeki tüm durum bilgilerini sıfırlayarak kullanıcının baştan hesaplama yapmasına imkan tanır.
-**Parametreler**: Bu fonksiyon herhangi bir giriş parametresi almaz.
-**Dönüş**: Herhangi bir değer döndürmez, yalnızca sayfa içi durumu değiştirmek üzere çalışan void işlevidir, tanımında dönüş tipi belirtilmemiştir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getACHStatus
-**Ne yapar**: Hesaplanan saatlik hava değişim sayısı (ACH - Air Change per Hour) değerine göre sistemin hava değişim performansını dört farklı risk kategorisinden birine sınıflandıran yardımcı doğrulama fonksiyonudur. Elde edilen durum değeri, kullanıcı arayüzünde uygun görsel ipuçları veya bilgilendirme mesajları ile kullanıcıya sunulmak üzere kullanılır. HVAC sistemlerinin yeterli hava değişimi sağlamasını kontrol etmek için temel bir kontrol mekanizmasıdır.
-**Nasıl yapar**: Girdi olarak aldığı sayısal ach değerini önceden tanımlanmış endüstri standartlarındaki eşik değerlerle karşılaştırır, karşılaştırma sonucunda performansın hangi kategoriye ait olduğunu belirler. Belirlenen durum metni, arayüzde uygun renk, ikon veya uyarı metni ile gösterilerek kullanıcının sistem durumunu kolayca anlamasını sağlar.
-**Parametreler**:
-- name: ach — type: number — Sınıflandırma yapılacak temel girdi olan hesaplanmış saatlik hava değişim sayısını temsil eden sayısal değer, performans seviyesini belirlemek için eşiklerle karşılaştırılır.
-**Dönüş**: Sadece dört farklı string değerden birini döndürür: 'optimal', 'acceptable', 'warning' veya 'critical'. Bu değerler sırasıyla mükemmel, kabul edilebilir, dikkat gerektiren ve kritik düzeyde hava değişim performansını ifade eder.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useCalculatorUsage::useCalculatorUsage
 - import: ../../i18n/I18nProvider::useI18n
 - import: ../../i18n/format::formatNumber
 - import: lucide-react::ArrowDownUp
@@ -87,31 +79,41 @@ Bu fonksiyon parametre almaz, çünkü bir React bileşenidir ve props üzerinde
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: JetFanCalcPage.tsx::匿名計算函數
-- **params**: ()
+### [N1_NASIL] AST Pointer: JetFanCalcPage.tsx::hesaplama_fonksiyonu
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `lenVal` — `length` state'inin parseFloat ile sayısal değerine dönüştürülmüş hali; hesaplama için uzunluk değeri olarak kullanılır
-  - `widVal` — `width` state'inin parseFloat ile sayısal değerine dönüştürülmüş hali; hesaplama için genişlik değeri olarak kullanılır
-  - `heiVal` — `height` state'inin parseFloat ile sayısal değerine dönüştürülmüş hali; hesaplama için yükseklik değeri olarak kullanılır
-  - `carVal` — `carCapacity` state'inin parseFloat ile sayısal değerine dönüştürülmüş hali; otopark uygulaması için araç kapasitesi değeri
-  - `trafficVal` — `trafficFlow` state'inin parseFloat ile sayısal değerine dönüştürülmüş hali; saatlik trafik akışı değeri
-- **Dönüş**: `calculateJetFan(...)` çağrı sonucu veya `null` (geçersiz girdi durumunda)
+  - `lenVal` — `length` değerinin `parseFloat` ile sayıya çevrilmesi sonucu; geçersizse `0` atanır
+  - `widVal` — `width` değerinin `parseFloat` ile sayıya çevrilmesi sonucu; geçersizse `0` atanır
+  - `heiVal` — `height` değerinin `parseFloat` ile sayıya çevrilmesi sonucu; geçersizse `0` atanır
+  - `carVal` — `carCapacity` değerinin `parseFloat` ile sayıya çevrilmesi sonucu; geçersizse `0` atanır
+  - `trafficVal` — `trafficFlow` değerinin `parseFloat` ile sayıya çevrilmesi sonucu; geçersizse `0` atanır
+  - `applicationType` — uygulama tipi; `'parking'` olduğunda `carVal` kontrolü yapılır
+  - `ventilationMode` — havalandırma modu; `calculateJetFan` fonksiyonuna doğrudan aktarılır
+- **Dönüş**: `lenVal`, `widVal` veya `heiVal` sıfırsa `null`; `applicationType === 'parking'` ve `carVal` sıfırsa `null`; aksi halde `calculateJetFan` fonksiyonunun dönüşü
 
 ### [N2_NASIL] AST Pointer: JetFanCalcPage.tsx::reset
-- **params**: ()
-- **ic_degiskenler**: (yok — tüm satırlar state setter çağrılarıdır)
-- **Dönüş**: yok (yan etki: tüm form state'lerini varsayılan değerlere sıfırlar)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `setApplicationType` — state setter; `'parking'` değerine sıfırlar
+  - `setVentilationMode` — state setter; `'normal'` değerine sıfırlar
+  - `setLength` — state setter; `'100'` değerine sıfırlar
+  - `setWidth` — state setter; `'30'` değerine sıfırlar
+  - `setHeight` — state setter; `'3'` değerine sıfırlar
+  - `setCarCapacity` — state setter; `'100'` değerine sıfırlar
+  - `setTrafficFlow` — state setter; `'50'` değerine sıfırlar
+- **Dönüş**: yok
 
 ### [N3_NASIL] AST Pointer: JetFanCalcPage.tsx::getACHStatus
-- **params**: `(ach: number)`
-- **ic_degiskenler**: (yok — sadece parametre `ach` kullanılır)
-- **Dönüş**: `'optimal' | 'acceptable' | 'warning'` (string literal — `applicationType`'a bağlı mantıksal dallanma ile dönen durum etiketi)
-
-### [N4_NASIL] AST Pointer: JetFanCalcPage.tsx::匿名SVG_map_callback
-- **params**: `(_, i)` — `_` kullanılmayan ilk parametre (eleman), `i` harita indeksi
+- **params**: `ach` — hava değişim sayısı (number)
 - **ic_degiskenler**:
-  - `x` — her fan görseli için `40 + (i * 28)` formülüyle hesaplanan yatay koordinat; SVG içinde fan çizimlerinin x konumunu belirler
-- **Dönüş**: JSX `<g>` elemanı (içinde `<ellipse>` ve `<line>` bulunan SVG grubu)
+  - `applicationType` — uygulama tipi; `'parking'` ise park yeri eşikleri, değilse tünel eşikleri kullanılır
+- **Dönüş**: `'optimal'` | `'acceptable'` | `'warning'` | `'critical'` — `applicationType === 'parking'` olduğunda: `ach` 6–10 arasıysa `'optimal'`, 4–12 arasıysa `'acceptable'`, diğer durumlarda `'warning'`; tünel olduğunda: `ach >= 20` ise `'optimal'`, `ach >= 15` ise `'acceptable'`, diğer durumlarda `'warning'`
+
+### [N4_NASIL] AST Pointer: JetFanCalcPage.tsx::JSX_dongu_fonksiyonu
+- **params**: `_` — kullanılmayan ilk parametre (muhtemelen dizi elemanı), `i` — dizi indeksi (number)
+- **ic_degiskenler**:
+  - `x` — `40 + (i * 28)` hesaplaması; SVG elemanlarının yatay konumunu belirler
+- **Dönüş**: JSX `<g>` elementi — içinde `cx={x}`, `cy="40"` konumunda dolu mavi elips (`#0EA5E9`) ve `y1="46"` ile `y2="75"` arasında kesikli çizgi (`strokeDasharray="4,2"`) içerir
 
 ---
 
@@ -127,10 +129,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: src\views\calculators\JetFanCalcPage.tsx
-  function: src\views\calculators\JetFanCalcPage.tsx::JetFanCalcPage
-  function: src\views\calculators\JetFanCalcPage.tsx::reset
-  function: src\views\calculators\JetFanCalcPage.tsx::getACHStatus
+  file: JetFanCalcPage.tsx
+  function: JetFanCalcPage.tsx::JetFanCalcPage
+  function: JetFanCalcPage.tsx::reset
+  function: JetFanCalcPage.tsx::getACHStatus
 
 ---
 

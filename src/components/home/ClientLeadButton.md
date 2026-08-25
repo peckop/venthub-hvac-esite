@@ -2,47 +2,46 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\ClientLeadButton.tsx
-skeleton_hash: 60d29a8f84354f11
+source_path: C:\tmp\wt-supurme\src\components\home\ClientLeadButton.tsx
+skeleton_hash: d99740799fda0413
 entity_hashes:
   func:ClientLeadButton: 8f87f454fa733cb3
   overview: 5fd9adef525bec13
   style_tokens: 3a5eed4082aa65a0
-generated_at: 2026-06-19T20:47:08Z
+generated_at: 2026-08-25T07:25:41Z
 ---
 
 ## Genel Bakış
-Bu modül, ana eyleme yönelik müşteri yönlendirme (lead) butonunu tanımlayan bir React bileşenidir. Buton, özelleştirilebilir bir metin ve tıklama olayı alarak, teklif alma gibi bir müşteri etkileşimini başlatmak için arayüzde bir çağrı‑eylem (CTA) sunar.
+
+Bu modül, müşteri adaylarına yönelik birincil eylem butonunu tanımlayan bir React bileşenidir. Bileşen, teklif alma gibi birincil çağrı-aksiyon (CTA) işlemini tetikler ve dışarıdan sağlanan geri çağırma fonksiyonu aracılığıyla tıklama olayını üst bileşene iletir.
 
 ## Fonksiyon Grupları
+
 ### Ana Bileşen
-Bileşenin temel görünümünü ve tıklama davranışını tanımlar; gerekli metin, stil ve olay işleyicisi parametrelerini alarak etkileşimli bir buton oluşturur.
+Kullanıcı arayüzünde müşteri adayı etkileşimini sağlayan buton bileşenini oluşturur ve yapılandırır. Bileşen, birincil CTA içeriğini, tıklama olayını ve isteğe bağlı CSS sınıfını dışarıdan alarak esnek bir yapı sunar.
 - ClientLeadButton
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-[Bu modül, birincil çağrı-eylem metni ve tıklama işleyicisi ile bir buton oluşturan React bileşenidir.]
 
-[Aksiyom 1]: Eğer **primaryCta** prop'u (string türünde) sağlanmazsa, butonun görünür içeriği boş olur veya hata oluşur.
-[Aksiyom 2]: Eğer **onQuoteClick** prop'u (fonksiyon türünde) sağlanmazsa, butona tıklandığında herhangi bir tetikleme eylemi çalışmaz veya hata oluşur.
-[Aksiyom 3]: Eğer **className** prop'u sağlanmazsa, butona varsayılan veya stil tanımsız bir görünüm uygulanır.
+Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesinden türetilen özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### ClientLeadButton
-**Ne yapar**: HVAC proje lead formuna yönlendiren, özelleştirilebilir bir.call-to-action butonu bileşenidir. Kullanıcıları teklif talep sayfasına yönlendirmek için ana sayfada veya promotional alanlarda kullanılır.
+**Ne yapar**: Bir React fonksiyonel bileşenidir. Bileşen adından ("ClientLeadButton") ve prop isimlerinden ("primaryCta", "onQuoteClick") anlaşılacağı üzere, istemci tarafında bir çağrıya yönlendirme (lead) butonu oluşturmak için kullanılır. Ancak bileşenin docstring'i boş bırakılmıştır, bu nedenle kesin görev tanımı kaynak kodda belirtilmemiştir.
 
-**Nasıl yapar**: Bileşen, verilen props'ları kullanarak bir buton render eder. `primaryCta` prop'u butonun metin içeriğini belirlerken, `onQuoteClick` event handler'ı butona tıklandığında tetiklenir. `className` prop'u ile dışarıdan stillendirme (override veya ekleme) yapılabilir.
+**Nasıl yapar**: Bileşen, aldığı prop'lara göre bir buton render eder. `primaryCta` prop'u buton üzerinde gösterilecek birincil çağrı-metni (call-to-action) metnini taşır. `onQuoteClick` prop'u, butona tıklandığında çağrılacak olan geri çağırma (callback) fonksiyonunu temsil eder. `className` prop'u ise bileşenin kök elemanına uygulanacak ek CSS sınıf adlarını belirtir. Bileşenin iç mantığı ve render ettiği JSX yapısı verilen kaynak bilgide yer almamaktadır.
 
 **Parametreler**:
-- `primaryCta`: string — Buton üzerinde görüntülenen ana metin/çağrı-ifadesi (ör: "Teklif Al", "İletişime Geç")
-- `onQuoteClick`: () => void — Kullanıcı butona tıkladığında çalışacak olan回调 fonksiyonu; genellikle teklif sayfasına yönlendirme veya form açma işlemini tetikler
-- `className`: string — Bileşene uygulanacak ek CSS sınıfı; mevcut stilleri override etmek veya üzerine eklemek için kullanılır
+- primaryCta: bilinmiyor — Bileşenin birincil çağrı-metni (CTA) içeriğini taşıyan prop. Tip bilgisi verilen kaynakta belirtilmemiştir.
+- onQuoteClick: bilinmiyor — Butona tıklandığında tetiklenecek olan geri çağırma fonksiyonu. Tip bilgisi verilen kaynakta belirtilmemiştir.
+- className: bilinmiyor — Bileşenin kök elemanına eklenecek isteğe bağlı CSS sınıf adı. Tip bilgisi verilen kaynakta belirtilmemiştir.
 
-**Dönüş**: `React.FC<ClientLeadButtonProps>` — JSX element döndürür; render edilmiş bir React buton bileşeni.
+**Dönüş**: `React.FC<ClientLeadButtonProps>` — React fonksiyonel bileşeni döndürür. `ClientLeadButtonProps` arayüzü, yukarıda listelenen `primaryCta`, `onQuoteClick` ve `className` prop'larını tanımlayan bir tip ipucudur. Bu arayüzün tam yapısı verilen kaynak bilgide ayrıntılı olarak belirtilmemiştir.
 
 ---
 
@@ -62,24 +61,27 @@ Bileşenin temel görünümünü ve tıklama davranışını tanımlar; gerekli 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: ClientLeadButton.tsx::ClientLeadButton
-- **params**: `{ primaryCta, onQuoteClick, className }` — primaryCta: buton metni; onQuoteClick: tıklama callback fonksiyonu; className: opsiyonel CSS sınıfı
-- **ic_degiskenler**: (yok — sadece prop'lar kullanılır, hiçbir local değişken tanımlanmamıştır)
-- **Dönüş**: JSX (`<button>` elemanı; içinde `<span>` ve `<div>` içeren animasyonlu buton yapısı)
+### [N1_NASIL] AST Pointer: src/components/home/ClientLeadButton.tsx::ClientLeadButton
+- **params**: `primaryCta`, `onQuoteClick`, `className`
+- **ic_degiskenler**:
+  - `primaryCta` — buton içindeki `<span>` etiketinde gösterilen birincil çağrı metni
+  - `onQuoteClick` — butona tıklandığında çağrılacak opsiyonel fonksiyon; tanımlıysa onClick handler'ı bu fonksiyonu çağırır, tanımlı değilse `window.openLeadModal` denenir
+  - `className` — butonun CSS sınıfı; tanımlıysa kullanılır, tanımlı değilse varsayılan bir CSS sınıf dizesi atanır (`"group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-xs tracking-hvac-normal rounded-2xl overflow-hidden transition-colors hover:shadow-white-glow"`)
+- **Dönüş**: JSX — bir `<button>` elementi; içinde `<span>` (metin) ve `<div>` (hover animasyon katmanı) alt elemanları barındırır
 
-### [N2_NASIL] AST Pointer: ClientLeadButton.tsx::onClick (arrow function)
-- **params**: (yok)
-- **ic_degiskenler**: (yok — sadece closure'dan `onQuoteClick` ve global `window` kullanılır)
-  - `onQuoteClick` — üst scope'tan gelen callback, varsa çağrılır
-  - `window` — tarayıcı ortam kontrolü sonrası `window.openLeadModal` fonksiyonu aranır
-- **Dönüş**: yok (yan etki: `onQuoteClick()` veya `window.openLeadModal()` çağrısı)
+### [N2_NASIL] AST Pointer: src/components/home/ClientLeadButton.tsx::ClientLeadButton::onClick
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `onQuoteClick` — closure ile dışarıdan gelen fonksiyon; tanımlı ve truthy ise çağrılır
+  - `window` — global nesne; `typeof window !== "undefined"` kontrolü ile tarayıcı ortamı doğrulanır, ardından `'openLeadModal' in window` ve `typeof window.openLeadModal === 'function'` kontrolleri yapılır; her ikisi de geçerliyse `window.openLeadModal()` çağrılır
+- **Dönüş**: yok (void) — yan etki olarak `onQuoteClick()` veya `window.openLeadModal()` çağrısı yapar
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\home\ClientLeadButton.tsx
-  function: src\components\home\ClientLeadButton.tsx::ClientLeadButton
+  file: ClientLeadButton.tsx
+  function: ClientLeadButton.tsx::ClientLeadButton
 
 ---
 

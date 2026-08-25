@@ -2,36 +2,22 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\supabase\client.ts
-skeleton_hash: 49185df368b7acd2
+source_path: C:\tmp\wt-supurme\src\lib\supabase\client.ts
+skeleton_hash: 84661defa15293fe
 entity_hashes:
   overview: 34e9332f051f8980
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-25T07:28:28Z
 ---
 
 ## Genel Bakış
-
-Bu modül, istemci tarafında (tarayıcıda) Supabase bağlantısı kurmak için kullanılır. Ortam değişkenlerinden (`SUPABASE_URL`, `SUPABASE_ANON_KEY`) yapılandırma bilgilerini alarak типize edilmiş bir Supabase tarayıcı istemcisi oluşturur. Bu istemci, uygulama genelinde veritabanı sorguları ve kimlik doğrulama işlemleri için kullanılabilir.
-
-## Modül İçeriği
-
-Bu dosya fonksiyon içermez; yalnızca aşağıdaki bileşenleri tanımlar:
-
-- **Ortam Değişkenleri**: Supabase proje URL'si ve anon anahtarı sabit olarak tanımlanır
-- **Tarayıcı İstemcisi**: `@supabase/ssr` paketindeki `createBrowserClient` kullanılarak tip güvenli bir istemci oluşturulur
-- **Tip Desteği**: Veritabanı şeması `Database` tipi ile import edilerek sorgularda tip tamamlama (autocomplete) ve derleme zamanı kontrolü sağlanır
+Bu modül, Supabase veritabanı bağlantısı için bir tarayıcı istemcisi oluşturur. `@supabase/ssr` kütüphanesinden `createBrowserClient` fonksiyonunu kullanarak `SUPABASE_URL` ve `SUPABASE_ANON_KEY` ortam değişkenleriyle bir istemci örneği üretir ve `supabaseBrowserClient` değişkeni aracılığıyla dışa aktarır. Modül ayrıca `../../types/database.types` dosyasından `Database` tipini içe aktararak TypeScript için veritabanı şeması tanımlar.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, Supabase istemcisini yapılandıran ve dışa aktaran bir başlatma (initialization) modülüdür.
-
-[Aksiyom 1]: Eğer `SUPABASE_URL` sabiti tanımlı veya erişilebilir değilse, tarayıcı istemcisi (`supabaseBrowserClient`) geçersiz bir URL ile oluşturulur ve tüm Supabase istekleri bağlantı hatası ile başarısız olur.
-
-[Aksiyom 2]: Eğer `SUPABASE_ANON_KEY` sabiti tanımlı veya erişilebilir değilse, tarayıcı istemcisi (`supabaseBrowserClient`) yetkilendirme anahtarı olmadan oluşturulur ve tüm kimlik doğrulama gerektiren istekler reddedilir.
-
-[Aksiyom 3]: Eğer `supabaseBrowserClient` oluşturulamazsa (örn: `SUPABASE_URL` veya `SUPABASE_ANON_KEY` eksik/bozuksa), bu modülü import eden tüm modüller geçersiz bir istemci nesnesi kullanır ve Supabase ile olan tüm iletişim kesilir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -57,28 +43,13 @@ Bu modül, Supabase istemcisini yapılandıran ve dışa aktaran bir başlatma (
 
 ## AST POINTERS
 
-> **Not**: Bu dosya (`src/lib/supabase/client.ts`) modül düzeyinde sabitler ve istemci başlatma içerir; tanımlı fonksiyon bulunmamaktadır.
-
-### [M1] AST Pointer: client.ts (Modül Düzeyi)
-
-- **Import Edilenler**:
-  - `createBrowserClient` — `@supabase/ssr` paketinden, tarayıcı tarafı Supabase istemcisi oluşturan fonksiyon
-  - `Database` — `../../types/database.types` dosyasından, Supabase veritabanı şema tiplerini tanımlayan tip
-
-- **Sabitler (Modül Düzeyi)**:
-  - `SUPABASE_URL` — Supabase projesi URL adresi (binary_expression ile tanımlanmış, büyük olasılıkla `process.env.NEXT_PUBLIC_SUPABASE_URL`)
-  - `SUPABASE_ANON_KEY` — Supabase anon (genel) anahtarı (binary_expression ile tanımlanmış, büyük olasılıkla `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY`)
-
-- **İstemci Değişkeni (Modül Düzeyi)**:
-  - `supabaseBrowserClient` — `createBrowserClient()` çağrısı ile oluşturulan, tipi `Database` olarak parametreleştirilmiş Supabase tarayıcı istemcisi; uygulama genelinde kullanılmak üzere export edilir
-
-- **Dönüş**: Yok (modül sonu; dosya sadece istemci örneğini export eder)
+Bu dosyada (`src/lib/supabase/client.ts`) tanımlı fonksiyon bulunmamaktadır. Dosya yalnızca modül düzeyinde sabit tanımları (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `supabaseBrowserClient`) ve import deyimleri içermektedir. Analiz edilecek fonksiyon gövdesi olmadığından AST Pointer üretilmemiştir.
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\lib\supabase\client.ts
+  file: client.ts
 
 ---
 

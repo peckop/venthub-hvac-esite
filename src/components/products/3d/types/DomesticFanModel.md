@@ -2,73 +2,116 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\DomesticFanModel.tsx
-skeleton_hash: 18dc1a68bf51d789
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\DomesticFanModel.tsx
+skeleton_hash: e792783b88913a8b
 entity_hashes:
   func:DomesticFanModel: c93fddd365c3092d
-  overview: f5e11a1dadb240ae
+  overview: 65a1eab25cd13393
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:44:14Z
+generated_at: 2026-08-25T07:26:39Z
 ---
 
 ## Genel Bakış
-Bu modül, 3D ürün görselleştirme sistemi içinde ev tipi tavan fanı modelini temsil eden bir React bileşeni tanımlar. Bileşen, fanın üç boyutlu geometrisini ve malzemelerini oluşturarak UI'da statik veya etkileşimli bir şekilde render edilmesini sağlar.
+
+Bu modül, ev tipi vantilatörün 3D modelini temsil eden bir React bileşeni içerir. `src/components/products/3d/types` dizininde yer alır ve ürünün 3D görselleştirme katmanında tip bazlı ayrıştırmanın bir parçasıdır.
 
 ## Fonksiyon Grupları
-### Bileşen Tanımı
-Modülün temel ve tek yapı taşını oluşturur; ev tipi fanın 3D modelinin dış görünüşünü ve temel yapısını tanımlayan React fonksiyonel bileşeni içerir.
+
+### 3D Ürün Bileşeni
+
+Ev tipi vantilatör modelinin görsel sunumundan sorumludur. Modül, tek bir fonksiyonel bileşen olarak tanımlanmıştır.
+
 - DomesticFanModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için belirgin fonksiyon gövdesi (code body) paylaşılmadığından, sadece fonksiyon imzası ve dosya uzantısına dayalı temel mimari varsayımlar çıkarılabilir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Genel Varsayım**: `DomesticFanModel()` parametresiz bir React fonksiyonel bileşenidir (.tsx).
-
----
-
-**[Aksiyom 1]**: Eğer React çalışma ortamı (React runtime / DOM) yoksa, bileşen render edilemez ve hata oluşur.
-
-**[Aksiyom 2]**: Eğer 3D render管kütüphanesi (örn: Three.js, @react-three/fiber) bağımlılığı yoksa veya yüklü değilse, bileşenin 3D model gösterim işlevi çalıştırılamaz.
-
-**[Aksiyom 3]**: Eğer bileşen çağrılmadan önce uygun bir React Context veya Props aracılığıyla gerekli veriler sağlanmamışsa (fonksiyon imzasında parametre tanımlı olmadığından), bileşenin model verilerine erişimi bilinmiyor olur ve varsayılan/boş bir durum gösterir.
-
----
-
-> **Not**: Fonksiyon gövdesi paylaşılmadığından, iç bileşen bağımlılıkları, eşik değerleri veya kabul kriterleri hakkında kesin çıkarım yapılamamıştır. Daha ayrıntılı aksiyomlar için `DomesticFanModel` fonksiyonunun gövde kodunun (return bloğu, hook çağrıları, import'lar) sağlanması gerekmektedir.
+**Gerekçe:** `DomesticFanModel` fonksiyonunun gövdesi verilmemiştir; yalnızca imzası (`() -> React.FC`) mevcuttur. Fonksiyon gövdesi olmadan bu bileşenin doğru çalışması için hangi koşulların var olması gerektiğini belirlemek mümkün değildir. İmzadan çıkarılabilecek bilgiler (parametre almıyor, bir React bileşeni döndürüyor) genel React varsayımlarıdır, bu modüle özgü değildir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### DomesticFanModel
-**Ne yapar**: Bu fonksiyon, ev tipi fanların 3D modelini göstermek için kullanılan bir React fonksiyonel bileşenini tanımlar. Bileşen, ilgili görsel ve etkileşimli öğeleri render ederek kullanıcıya fan modelini sunar.  
-**Nasıl yapar**: `DomesticFanModel` fonksiyonu, içeriğinde JSX döndürerek temel yapıyı oluşturur; gerekli stilleri ve dış bağımlılıkları (örneğin model veri veya üçüncü parti görüntüleme kütüphaneleri) kapsam dışından alır ve bunları render sürecinde kullanır. Props almadığı için dışarıdan veri beklemez, sadece statik veya varsayılan bir görüntü sağlar.  
-**Parametreler**:  
-- Bu fonksiyon hiçbir parametre almaz.  
-**Dönüş**: `React.FC` türünde bir fonksiyonel bileşen döndürür; bu bileşen render edildiğinde JSX çıktısı üretir ve React tarafından DOM’a monte edilir.
+**Ne yapar**: Ev tipi fanın 3D modelini temsil eden bir React fonksiyonel bileşeni döndüren bir üst düzey fonksiyondur. Bileşen adı ve dosya yolu (`src\components\products\3d\types\DomesticFanModel.tsx`) bu fonksiyonun 3D ürün modelleme katmanında ev tipi fan modelini tanımlamak için kullanıldığını göstermektedir.
+
+**Nasıl yapar**: Fonksiyon çağrıldığında bir `React.FC` (React Functional Component) döndürmektedir. Docstring boş olduğundan, iç mantığı hakkında doğrudan bilgi bulunmamaktadır. Fonksiyonun gövdesinde hangi 3D geometri, materyal veya animasyon mantığının uygulandığı bilinmiyor.
+
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almamaktadır (boş parantez ile tanımlıdır).
+
+**Dönüş**: `React.FC` — React fonksiyonel bileşen tipi. Döndürülen bileşen, ev tipi fanın 3D görselleştirmesini render etmek için kullanılmaktadır. Bileşenin kendisinin kabul ettiği props'lar hakkında verilen kaynakta bilgi bulunmamaktadır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../core::useResolveMaterials
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: three::BoxGeometry
+- import: three::CylinderGeometry
+- import: three::InstancedMesh
+- import: three::Object3D
+- import: three::PlaneGeometry
+- import: three::type { Group }
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: DomesticFanModel.tsx::DomesticFanModel
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: src/components/products/3d/types/DomesticFanModel.tsx::DomesticFanModel
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `materials` — `useFanMaterials()` hook'undan elde edilen, modelin farklı parçaları için kullanılacak (fırçalanmış alüminyum, mat siyah, endüstriyel çelik vb.) materyaller nesnesi
-  - `fanRef` — `useRef<Group>(null)` ile oluşturulan, JSX'teki `<group>` elemanına referans veren React ref nesnesi
-  - `panelSize` — Fansız panelin boyutunu tanımlayan sabit (1.0 birim kare)
-  - `panelThickness` — Fansız panelin kalınlığını tanımlayan sabit (0.08 birim)
-- **Dönüş**: `React.FC` — 3D banyo fanı modelini (ön panel, ızgara, arka gövde ve markalama) oluşturan React fonksiyonel bileşeni
+  - `materials` — `useResolveMaterials()` hook'undan dönen materyal koleksiyonu; JSX içinde `materials.brushedAluminum`, `materials.matteBlack`, `materials.industrialSteel`, `materials.ral7035`, `materials.zincGray` olarak erişilir
+  - `fanRef` — `useRef<Group>(null)` ile oluşturulmuş Three.js Group referansı; JSX'teki ana `<group>` elementine `ref` olarak bağlanır
+  - `gridRef` — `useRef<InstancedMesh>(null)` ile oluşturulmuş InstancedMesh referansı; JSX'teki `<instancedMesh>` elementine `ref` olarak bağlanır
+  - `panelSize` — sabit değer `1.0`; ön panel boyutu olarak kullanılır, diğer geometrilerin boyutlarını da orantılar
+  - `panelThickness` — sabit değer `0.08`; ön panel kalınlığı, `panel` geometrisinin Z eksenindeki derinliği ve grup pozisyonlamasında kullanılır
+  - `panel` — `useMemo(() => new BoxGeometry(panelSize, panelSize, panelThickness), [panelSize, panelThickness])` ile oluşturulmuş kutu geometrisi; ön panel çerçevesi mesh'inde `geometry` prop'u olarak kullanılır
+  - `background` — `useMemo(() => new PlaneGeometry(panelSize * 0.85, panelSize * 0.85), [panelSize])` ile oluşturulmuş düzlem geometrisi; ızgara arkaplanı mesh'inde `geometry` prop'u olarak kullanılır
+  - `gridBoxGeo` — `useMemo(() => new BoxGeometry(panelSize * 0.05, panelSize * 0.05, 0.005), [panelSize])` ile oluşturulmuş küçük kutu geometrisi; ızgara deliklerini temsil eden `instancedMesh`'in `args` dizisinin ilk elemanı olarak kullanılır
+  - `cylinder` — `useMemo(() => new CylinderGeometry(0.35, 0.35, 0.4, 32), [])` ile oluşturulmuş silindir geometrisi; arka gövde mesh'inde `geometry` prop'u olarak kullanılır
+  - `plane` — `useMemo(() => new PlaneGeometry(0.15, 0.05), [])` ile oluşturulmuş düzlem geometrisi; markalama mesh'inde `geometry` prop'u olarak kullanılır
+  - `tempObject3D` — `useMemo(() => new Object3D(), [])` ile oluşturulmuş geçici Object3D; useEffect içinde instancedMesh matrislerini ayarlamak için konum ve matris aracı olarak kullanılır
+- **Dönüş**: JSX — `<group>` elementi döndürür (scale `[0.25, 0.25, 0.25]`); içinde dört alt mesh grubu barındırır: ön panel çerçevesi, ızgara alanı (arkaplan + instancedMesh), arka gövde silindiri, markalama düzlemi
+
+---
+
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/DomesticFanModel.tsx::useEffect (grid oluşturma)
+- **params**: (parametre yok — useEffect callback)
+- **ic_degiskenler**:
+  - `index` — sayaç değişkeni, `0`'dan başlar; her döngü iterasyonunda artırılarak instancedMesh matris indisini belirler
+  - `row` — dış döngü değişkeni, `0`'dan `12`'ye kadar (dahil değil) iterasyon yapar
+  - `col` — iç döngü değişkeni, `0`'dan `12`'ye kadar (dahil değil) iterasyon yapar
+  - `x` — `(col - 5.5) * (panelSize * 0.07)` hesaplaması ile elde edilen yatay konum değeri; `tempObject3D.position.set`'in ilk parametresi olarak kullanılır
+  - `y` — `(row - 5.5) * (panelSize * 0.07)` hesaplaması ile elde edilen dikey konum değeri; `tempObject3D.position.set`'in ikinci parametresi olarak kullanılır
+- **Dönüş**: yok — yan etki olarak `gridRef.current` InstancedMesh'inin 144 instance matrisini 12×12 ızgara düzeninde konumlandırır ve `instanceMatrix.needsUpdate = true` yapar
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/DomesticFanModel.tsx::useEffect (temizleme)
+- **params**: (parametre yok — useEffect callback)
+- **ic_degiskenler**: yok
+- **Dönüş**: temizleme fonksiyonu döndürür — bileşen unmount olduğunda çağrılır
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/DomesticFanModel.tsx::temizleme fonksiyonu (useEffect return)
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `panel.dispose()`, `background.dispose()`, `gridBoxGeo.dispose()`, `cylinder.dispose()`, `plane.dispose()` çağrılarıyla VRAM belleğini serbest bırakır
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\DomesticFanModel.tsx
-  function: src\components\products\3d\types\DomesticFanModel.tsx::DomesticFanModel
+  file: DomesticFanModel.tsx
+  function: DomesticFanModel.tsx::DomesticFanModel
 
 ---
 

@@ -2,44 +2,46 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-legal\src\lib\validation\taxIdentity.ts
-skeleton_hash: 31da013c1079f394
+source_path: C:\tmp\wt-supurme\src\lib\validation\taxIdentity.ts
+skeleton_hash: dc42de9f3e295dc8
 entity_hashes:
-  func:isValidTckn: 7ec7d15674d2771b
-  func:isValidVkn: ac71f2b99077b21a
+  func:isValidTckn: 57058047dbe03513
+  func:isValidVkn: d10e78946293210b
   overview: 73a3a50bbf3ac748
-generated_at: 2026-08-16T05:32:43Z
+generated_at: 2026-08-25T07:28:20Z
 ---
 
 ## Genel Bakış
-Bu modül, Türkiye'ye özgü iki önemli kimlik doğrulama numarasının geçerlilik kontrolünü sağlar: TCKN (TC Kimlik Numarası) ve VKN (Vergi Kimlik Numarası). Modül, form validasyon süreçlerinde ve kullanıcı girişi doğrulama akışlarında kullanılmak üzere temel doğrulama mantığını içeren bağımsız bir yardımcı modüldür.
+
+Bu modül, Türkiye'ye özgü vergi ve kimlik numaralarının geçerliliğini doğrulamak için kullanılan iki bağımsız doğrulama fonksiyonu içerir. Modül, `validation` alt yapısı içinde konumlanır ve kimlik doğrulama alanında tek bir sorumluluğa sahiptir: TCKN ve VKN formatlarının algoritma bazlı kontrolü.
 
 ## Fonksiyon Grupları
+
 ### Kimlik Numarası Doğrulama
-Bireysel ve kurumsal kullanıcılar için Türkiye Cumhuriyeti tarafından verilen resmi kimlik numaralarının format ve algoritma bazlı doğrulamasını yapar.
+
+Bu grup, Türkiye Cumhuriyeti vatandaşlarına ve kurumlara ait resmi kimlik numaralarının biçim ve algoritma kurallarına uygunluğunu denetler. Her iki fonksiyon da bağımsız çalışır; birbirlerini çağırmazlar ve dış bağımlılıkları bulunmaz.
+
 - `isValidTckn`, `isValidVkn`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için fonksiyon gövdeleri sağlanmadığından, gövdeden türetilebilecek özel bir aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### isValidTckn
+**Ne yapar**: Verilen bir string değerinin geçerli bir T.C. Kimlik Numarası (TCKN) olup olmadığını doğrular. TCKN'nin 11 haneli, yalnızca rakamlardan oluşan, ilk hanesi 0 olmayan ve belirli bir algoritmayla hesaplanan kontrol hanelerini taşıyan bir numara olması gerektiğini kontrol eder.
 
-**Ne yapar**: T.C. Kimlik Numarasının (11 haneli) resmi algoritmaya uygun olarak geçerli olup olmadığını doğrular. Türkiye Cumhuriyeti vatandaşlarının kimlik numaralarının resmi format ve kontrol hane kurallarını doğrulayan bir validasyon fonksiyonudur.
-
-**Nasıl yapar**: Fonksiyon öncelikle regex deseni (`/^[1-9][0-9]{10}$/`) ile değerin tam olarak 11 haneden oluştuğunu ve ilk hanenin 0 olmadığını kontrol eder. Geçerli format onaylandıktan sonra, rakamlar bir diziye dönüştürülür ve tek/çift pozisyondaki hanelerin toplamları ayrı ayrı hesaplanır. 10. hane kontrolü için `((tekler × 7 − çiftler) % 10)` formülü uygulanır; JavaScript'te modulus operatörünün negatif değerlerde beklenmedik sonuçlar verebileceği考虑 edilerek `+10` ile normalizasyon yapılır. Son olarak 11. hane, ilk 10 hanenin aritmetik toplamının 10'a göre modu ile doğrulanır.
+**Nasıl yapar**: Fonksiyon önce düzenli ifade (regex) ile temel format kontrolü yapar; değer `1` ile `9` arasında başlayan ve ardından 10 rakam daha içeren 11 haneli bir dize olmalıdır. Format uygunsa, dize karakterlerine ayrılıp sayısal diziye dönüştürülür. Ardından TCKN algoritmasına göre tek indeksli hanelerin (0, 2, 4, 6, 8) toplamı ile çift indeksli hanelerin (1, 3, 5, 7) toplamı hesaplanır. 10. hane kontrolü için `(tekler × 7 − çiftler) mod 10` formülü uygulanır; JavaScript'te mod operatörünün negatif sonuç verebilmesi nedeniyle sonuç `+10` ile normalize edilir. Son olarak ilk 10 hanenin toplamının 10'a bölümünden kalanın 11. hane ile eşleşip eşleşmediği kontrol edilir.
 
 **Parametreler**:
-- `value`: `string` — Doğrulanacak T.C. Kimlik Numarası (11 haneli, rakamlardan oluşan dize)
+- value: string — Doğrulanacak T.C. Kimlik Numarası değerini temsil eden 11 haneli string.
 
-**Dönüş**: `boolean` — Geçerli bir T.C. Kimlik Numarası ise `true`, aksi halde `false` döner.
+**Dönüş**: boolean — Girilen değer geçerli bir TCKN ise `true`, aksi halde `false` döner.
 
 ### isValidVkn
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -49,31 +51,30 @@ Bireysel ve kurumsal kullanıcılar için Türkiye Cumhuriyeti tarafından veril
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/validation/taxIdentity.ts::isValidTckn
-- **params**: `(value: string)`
+- **params**: `value` — doğrulanacak TCKN string değeri
 - **ic_degiskenler**:
-  - `d` — value stringinin her karakterini Number'a çevirerek oluşturulan rakam dizisi (ör. "12345678901" → [1,2,3,...])
-  - `tekler` — d[0], d[2], d[4], d[6], d[8] indislerindeki rakamların toplamı, TCKN checksum hesabında tek pozisyon rakamları
-  - `ciftler` — d[1], d[3], d[5], d[7] indislerindeki rakamların toplamı, TCKN checksum hesabında çift pozisyon rakamları
-  - `onuncu` — ((tekler * 7 - ciftler) % 10 + 10) % 10 formülüyle hesaplanan 10. rakam adayı, d[9] ile karşılaştırılır
-  - `ilkOnToplam` — d.slice(0,10) ile elde edilen ilk 10 hanenin reduce ile toplamı, 11. haneyi doğrulamak için kullanılır
-- **Dönüş**: `boolean` — format uygunluğu, 10. hane ve 11. hane checksum doğrulamasını geçerse `true`
+  - `d` — `value` stringinin her karakterini sayıya dönüştüren dizi (ör. `"123"` → `[1, 2, 3]`)
+  - `tekler` — `d` dizisindeki tek indeksli (0, 2, 4, 6, 8) elemanların toplamı
+  - `ciftler` — `d` dizisindeki çift indeksli (1, 3, 5, 7) elemanların toplamı
+  - `onuncu` — `(tekler * 7 - ciftler) % 10` formülüyle hesaplanan, negatif çıkma durumunu önlemek için `+10` ile normalize edilen 10. basamak kontrol değeri
+  - `ilkOnToplam` — `d` dizisinin ilk 10 elemanının (0–9 indeksleri) `reduce` ile toplamı
+- **Dönüş**: `boolean` — TCKN geçerliyse `true`, değilse `false`
 
 ### [N2_NASIL] AST Pointer: src/lib/validation/taxIdentity.ts::isValidVkn
-- **params**: `(value: string)`
+- **params**: `value` — doğrulanacak VKN string değeri
 - **ic_degiskenler**:
-  - `d` — value stringinin her karakterini Number'a çevirerek oluşturulan rakam dizisi (10 haneli VKN rakamları)
-  - `toplam` — döngü boyunca biriken checksum toplamı, her hanenin ağırlıklı değeri eklenerekhesaplanır
-  - `t` — her döngü adımında (d[i] + 9 - i) % 10 formülüyle hesaplanan ara değer
-  - `i` — for döngüsü sayacı, 0'dan 8'e kadar (ilk 9 haneyi dolaşır)
-- **Dönüş**: `boolean` — (10 - (toplam % 10)) % 10 sonucu d[9] (10. haneye) eşitse `true`
+  - `d` — `value` stringinin her karakterini sayıya dönüştüren dizi
+  - `toplam` — döngüde biriken kontrol toplamı (başlangıçta `0`)
+  - `t` — her iterasyonda `(d[i] + 9 - i) % 10` formülüyle hesaplanan geçici değer; `t === 9` ise doğrudan `9`, değilse `(t * Math.pow(2, 9 - i)) % 9` olarak `toplam`'a eklenir
+- **Dönüş**: `boolean` — VKN geçerliyse `true`, değilse `false`
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\lib\validation\taxIdentity.ts
-  function: src\lib\validation\taxIdentity.ts::isValidTckn
-  function: src\lib\validation\taxIdentity.ts::isValidVkn
+  file: taxIdentity.ts
+  function: taxIdentity.ts::isValidTckn
+  function: taxIdentity.ts::isValidVkn
 
 ---
 

@@ -2,44 +2,23 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\types\database.types.ts
-skeleton_hash: 067e4acdd662f151
+source_path: C:\tmp\wt-supurme\src\types\database.types.ts
+skeleton_hash: c2471dd70110decd
 entity_hashes:
   overview: ce3fb4ce44f2949f
-generated_at: 2026-08-14T07:20:04Z
+generated_at: 2026-08-25T07:30:14Z
 ---
 
 ## Genel Bakış
-Bu TypeScript dosyası, VentHub projesinin veritabanı şemasını ve tür yapılarını tanımlayan statik bir yapılandırma modülüdür. Modül, harici bir API veya işlevsunmaz; yerine, veritabanı tabloları, sütunları ve ilişkileri için tanımlı türleri (tipleri) ve olası sabit değerleri merkezi olarak depolar. Genellikle veri erişim katmanı (ör. Supabase istemcisi) ve iş mantığı tarafından içe aktarılarak, tip güvenliğini sağlamak ve veritabanı yapısının tek bir kaynaktan (SSOT) yönetilmesini sağlamak amacıyla kullanılır.
-
-## Modülün Amacı ve Yapısı
-Bu modül, fonksiyon veya metot içermeyen, yalnızca modül düzeyinde tanımlamalar (types/interfaces) ve sabitler içeren bir TypeScript tanım dosyasıdır. Temel rolü, proje genelinde veritabanı ile etkileşime girilecek her noktada kullanılacak olan **veri yapı şemasını** tanımlamaktır. Bu, veritabanı tablolarına karşılık gelen satır tiplerini, sütun isimlerini ve ilişkili veri türlerini kapsar.
-
-## Bağımlılıklar ve Kullanım
-- **Dış Bağımlılığı Yoktur:** Dosya, dışarıdan herhangi bir modülü import etmez; tamamen bağımsızdır.
-- **İçe Aktaranlar (Bağımlıları):** Proje içindeki veritabanı istemcisi (servisleri), veri alanları (repo'lar) veya API rotaları tarafından import edilerek, query sonuçlarının veya parametrelerinin tip kontrolünde kullanılır.
-- **Ortam Değişkeni veya API Kullanımı:** Doğrudan değildir. Ancak, burada tanımlanan tablo ve sütun isimleri, projedeki gerçek veritabanı yapılandırmasına ve API uçlarına (ör. `/rest/v1/...`) karşılık gelir.
-- **Mimari Önemi:** Uygulama ile veritabanı arasındaki sözleşme katmanını oluşturur. Veritabanı şemasında yapılacak bir değişiklik (tablo ekleme, sütun değiştirme) bu dosyada güncellenerek tüm tip hatalarının编译 zamanında yakalanmasını sağlar, böylece runtime hatalarını önler.
+Bu modül, veritabanı ile ilgili tip tanımlamalarını ve sabitleri içerir. Dosyada fonksiyon bulunmaz; sadece modül seviyesinde kod (script/top-level statements) yer alır. İçerisinde `Constants` adında sabitler/değişkenler tanımlıdır. Modülün hangi ortam değişkenlerini kullandığı veya hangi API'leri/tabloları sorguladığı bilinmiyor.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, veritabanı şeması için TypeScript tip tanımları içeren saf bir tip/sabit modülüdür.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `as_expression` sabiti veritabanı şemasındaki bir ifadeyi temsil etmiyorsa, tip uyumsuzlukları oluşur.
-
-[Aksiyom 2]: Eğer bu dosyadaki tip tanımları ile veritabanı şeması eş zamanlı güncellenmezse, veri erişim hataları meydana gelir.
-
-[Aksiyom 3]: Eğer bu modül kaldırılırsa veya içeriği boşaltılırsa, onu import eden tüm modüllerde derleme hataları oluşur.
-
-## AST POINTERS
-
-(Dışa açılan çağrılabilir öğe yok — sabit tanımı; AST işaretçisi gerektiren fonksiyon/metot yok.)
-
-## NODE ID STANDARD
-
-file: C:\Users\alize\venthub-hvac\src\types\database.types.ts
+**Gerekçe:** Modül yalnızca tip tanımları ve `as_expression` sabitleri içermektedir; fonksiyon gövdesi bulunmadığından aksiyom üretilememiştir.
 
 ---
 
@@ -65,7 +44,7 @@ type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "1
+    PostgrestVersion
 ```
 
 ### DatabaseWithoutInternals
@@ -84,7 +63,7 @@ type Tables = <
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameO
+  TableName extends DefaultSchemaTableN
 ```
 
 ### TablesInsert
@@ -94,7 +73,7 @@ type TablesInsert = <
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    sche
+   
 ```
 
 ### TablesUpdate
@@ -104,7 +83,7 @@ type TablesUpdate = <
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    sche
+   
 ```
 
 ### Enums
@@ -114,7 +93,7 @@ type Enums = <
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: 
+    sch
 ```
 
 ### CompositeTypes
@@ -123,7 +102,7 @@ type CompositeTypes = <
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions 
+  CompositeTypeName extends PublicCompositeTypeNameOrOpti
 ```
 
 ---
@@ -135,19 +114,13 @@ type CompositeTypes = <
   },
   public: {
     Enums: {
-      cont...`
-
----
-
-## AST POINTERS
-
-Bu dosyada (`src/types/database.types.ts`) herhangi bir fonksiyon gövdesi, metot veya çalıştırılabilir blok bulunmamaktadır. Dosya yalnızca TypeScript tür tanımlamaları (type/interface) ve sabit bildirimlerinden oluşmaktadır.
+    ...`
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\types\database.types.ts
+  file: database.types.ts
 
 ---
 

@@ -2,67 +2,55 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx
-skeleton_hash: 831331e270b305dc
+source_path: C:\tmp\wt-supurme\src\views\admin\AdminProductsPage.tsx
+skeleton_hash: 932e1a5d4d27d29f
 entity_hashes:
   func:AdminProductsPage: c722f6b673f81dbe
-  overview: cbed9cc55e7501a7
+  overview: 20b1fe71a28f1bf8
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-19T20:49:19Z
+generated_at: 2026-08-25T07:29:54Z
 ---
 
 ## Genel Bakış
-AdminProductsPage, yönetici panelinde ürün kataloğunun kapsamlı bir şekilde yönetildiği ana bileşendir. Tekil ve toplu ürün CRUD işlemlerinin yanı sıra sıralama, seçim ve satır içi düzenleme gibi interaktif özelliklerin merkezi yönetimini sağlar. Teknik özellik modalleri, durum göstergeleri ve fiyat ayarlama gibi işlevsel araçları bir arada sunar.
+AdminProductsPage, admin panelindeki ürünler yönetim sayfasını temsil eden bir React fonksiyonel bileşenidir. Modül, tek bir bileşen fonksiyonundan oluşur ve ürün listeleme, düzenleme veya silme gibi admin işlemlerinin gerçekleştirildiği arayüzü sunar.
 
 ## Fonksiyon Grupları
 
-### Sayfa Temeli ve Seçim Yönetimi
-Ana bileşeni oluşturarak sayfa yaşam döngüsünü yönetir; ürün seçim durumlarını, sıralama tercihlerini ve satır genişleme/küçültme akışlarını kontrol eder.
-- AdminProductsPage, toggleSelect, toggleSelectAll, toggleSort, toggleExpand, sortIndicator, statusBadge
+### Sayfa Bileşeni
+Admin ürünler sayfasının ana bileşenini tanımlar. Bu bileşen, admin kullanıcıların ürün verilerini görüntülemesine ve yönetmesine olanak sağlayan kullanıcı arayüzünü render eder.
+- AdminProductsPage
 
-### Tekil Ürün İşlemleri
-Bireysel ürünler için oluşturma, düzenleme, satır içi kayıt ve silme işlemlerini başlatır; modal başarı回调'larını ve teknik özellik yükleme mantığını yönetir.
-- handleCreate, handleEdit, handleModalSuccess, saveInlineEdit, remove, loadTechSpecs
-
-### Toplu İşlemler
-Birden fazla seçili ürün üzerinde eş zamanlı durum değiştirme, öne çıkarma, fiyat ayarlama ve silme gibi toplu veri operasyonlarını yürütür.
-- bulkStatusChange, bulkFeatureToggle, bulkPriceAdjust, bulkDelete
+## Bağımlılıklar
+Modül, React kütüphanesine bağlıdır (React.FC tipi kullanılmaktadır). Kaynakta başka iç veya dış bağımlılığa dair bilgi bulunmamaktadır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için verilen fonksiyon gövdesi ve detaylı implementasyon bilgisi mevcut olmadığından, mimari varsayımlar sınırlıdır. Sadece fonksiyon imzasından türetilen çıkarımlar yapılmıştır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1]**: Eğer `AdminProductsPage` bir React.FC olarak tanımlıysa, bu modülün bir React bileşeni olarak render edilmesi beklenir; React runtime ortamının mevcut olması zorunludur.
-
-**[Aksiyom 2]**: Eğer `AdminProductsPage` parametresiz (`()`) tanımlıysa, bileşenin props almadığı ve kendi iç state'i ile veri yönettiği varsayılır.
-
-**[Aksiyom 3]**: Eğer bileşen `React.FC` dönüş tipine sahipse, JSX döndürmesi veya null döndürmesi gerekir; geçersiz dönüş türü hata üretir.
+**Gerekçe:** Fonksiyon gövdesi sağlanmadığından, yalnızca `AdminProductsPage` fonksiyon imzasından (`() -> React.FC`) modüle özgü bir çıkarım yapılamamaktadır. Mimari varsayımlar yalnızca fonksiyon gövdesinden üretilebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminProductsPage
+**Ne yapar**: Ürünler yönetim sayfasını oluşturan React fonksiyon bileşenidir. Projedeki en karmaşık liste görünümüdür ve DataTableKit altyapısına göç edilmiş bir "thin-page" (ince sayfa) olarak tasarlanmıştır. Sayfa, ürün verilerinin görüntülenmesi, düzenlenmesi ve yönetilmesi için gerekli tüm arayüzü sunar.
 
-**Ne yapar**: Ürünler yönetim sayfasını render eder. Bu bileşen, admin panelindeki en karmaşık veri tablosu olan ürün listesini sunar. Sayfa, DataTableKit yapısına göç edilmiş "thin-page" mimarisiyle yalnızca başlık ve Suspense sarıcısını barındırır; tüm karmaşık mantık alt bileşenlere devredilmiştir.
-
-**Nasıl yapar**: Bileşen minimal bir "thin-page" (ince sayfa) yapısına sahiptir; sunum mantığını mümkün olduğunca alt bileşenlere aktarmıştır. Sayfa yapısı temel olarak iki bölümden oluşur: üst kısımda yer alan sayfa başlığı ve alt kısımda Suspense sarıcısı içinde sarılmış `ProductsTableBody` bileşeni. `ProductsTableBody`, `useAdminTable` hook'unu kullanarak sunucu tarafı (server-mode) çalışan bir tabloyu yönetir. Bu hook içinde veri çekme işlemleri, hibrit full-text search (FTS) ve query parametrelerini birleştiren arama mantığı, sıralama (sort), filtreleme (filter), satır içi düzenleme (inline-edit), genişletilebilir satırlar (expand) ve toplu işlemler (bulk) gibi tüm interaktif özellikler merkezileştirilmiştir. Ayrıca 6 farklı yazma kapısı (create, update, delete vb.) bu yapı üzerinden yönlendirilir. Sayfa, "Yeni Ürün" butonu ile ürün ekleme akışını başlatır ve `ProductFormModal` bileşeniyle modal tabanlı bir form sunar. Ek olarak CSV import (içe aktarma) işlevselliği de sayfa seviyesinde erişilebilir durumdadır.
+**Nasıl yapar**: Sayfa kendisi minimal bir yapıdadır; başlık ve bir `Suspense` sınırı içerir. Veri getirme (fetch), hibrit tam metin arama (FTS) ve sorgu tabanlı arama, sıralama, filtreleme, satır içi düzenleme (inline-edit), satır genişletme (expand), toplu işlemler (bulk) ve 6 yazma kapısı gibi tüm karmaşık işlevsellik, `ProductsTableBody` bileşeni içerisine taşınmıştır. Bu bileşen `useAdminTable` kancasını kullanarak sunucu tarafı modunda (server-mode) çalışır. Sayfa ayrıca "Yeni Ürün" butonu, `ProductFormModal` bileşeni ve CSV ile ilgili bir özellik (docstring kesilmiş olduğundan tam işlevi belirsizdir) içerir.
 
 **Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz. React fonksiyon bileşeni olarak tanımlanmış olup, props belirtilmemiştir.
 
-Bileşen props almaz (React.FC tanımı ile parametresiz bir functional component olarak tanımlanmıştır).
-
-**Dönüş**: `React.FC` — İşlevsel React bileşeni. Ürünler yönetim sayfasının JSX yapısını döndürür; sayfa başlığı, Suspense ile sarılmış `ProductsTableBody`, "Yeni Ürün" tetikleyici butonu, `ProductFormModal` ve CSV import bileşenlerini içeren bir arayüz yapısı oluşturur.
+**Dönüş**: `React.FC` — React fonksiyon bileşeni döndürür. Bu bileşen, ürünler yönetim sayfasının tamamını render eder.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./ProductsTableBody::ProductsTableBody
 - import: react::React
 - import: react::Suspense
@@ -71,18 +59,18 @@ Bileşen props almaz (React.FC tanımı ile parametresiz bir functional componen
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::AdminProductsPage
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: src/views/admin/AdminProductsPage.tsx::AdminProductsPage
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, UI stringlerini çevirir
-- **Dönüş**: JSX elementi — Admin ürünleri sayfasını header ve Suspense ile birlikte render eder
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('admin.titles.products')` ve `t('admin.products.subtitle')` çağrılarında kullanılır
+- **Dönüş**: JSX element — `div.space-y-6.pb-20` kapsayıcısı içinde `AdminPageHeader` ve `Suspense` ile sarılmış `ProductsTableBody` bileşenlerini döndürür. `Suspense` bileşeninin `fallback` prop'unda `AdminSkeleton` bileşeni `variant="table"`, `count={10}`, `rows={5}` özellikleriyle kullanılır.
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\admin\AdminProductsPage.tsx
-  function: src\views\admin\AdminProductsPage.tsx::AdminProductsPage
+  file: AdminProductsPage.tsx
+  function: AdminProductsPage.tsx::AdminProductsPage
 
 ---
 

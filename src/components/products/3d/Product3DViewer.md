@@ -2,104 +2,84 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\Product3DViewer.tsx
-skeleton_hash: f105483000067d11
+source_path: C:\tmp\wt-supurme\src\components\products\3d\Product3DViewer.tsx
+skeleton_hash: 3225a0ef1cba6d03
 entity_hashes:
   func:ErrorBoundary:constructor: 7de390ca1471a8c5
   func:ErrorBoundary:getDerivedStateFromError: 55b37af114c0da98
   func:ErrorBoundary:render: d1b28a5536b042f6
   func:Loader: 7d9f8e9183b1d56a
-  func:ModelRotator: 945ea12b428e9a61
+  func:ModelRotator: 702ed22580432321
   func:Product3DViewer: 6adac65ce4a11e86
   func:handleViewChange: ea99a6a2d5d89bd3
-  overview: 2769d8a94fb30e5c
+  overview: 96c5060b69dd73c2
   style_tokens: d2e480f938f25b44
-generated_at: 2026-06-14T22:51:00Z
+generated_at: 2026-08-25T07:26:22Z
 ---
 
 ## Genel Bakış
-Bu modül, ürünlerin üç boyutlu modellerinin tarayıcıda interaktif olarak görüntülenmesini sağlamak için tasarlanmış bir React bileşen setidir. Temel olarak, 3D modelin yüklenme sürecini yöneten, farklı kamera açılarından görüntülemeyi sağlayan ve modelin döndürülmesini kontrol eden mantığı bir araya getirir. Ayrıca, 3D sahne oluşturma sırasında oluşabilecek kritik hataları yakalayarak uygulamanın çökmesini önleyen bir hata yönetimi katmanı içerir.
+Bu modül, ürünlerin 3D modellerini görüntülemek için kullanılan bir React bileşeni sunar. Kullanıcının modeli farklı açılardan (ön, üst, sağ, arka, alt, sol, izometrik) incelemesine olanak tanır. Tam ekran desteği, otomatik döndürme ve hata yakalama gibi özellikleri içerir.
 
 ## Fonksiyon Grupları
-### Görüntüleme Motoru ve Etkileşim
-Bu grup, 3D sahnenin temel yaşam döngüsünü ve kullanıcının modelle etkileşimini yöneten bileşenlerden oluşur. Ana görüntüleyiciyi başlatır, yüklenme durumunu görsel olarak temsil eder, modelin döndürülmesini kontrol eder ve tanımlı kamera açıları arasında geçiş yapar.
-- Product3DViewer, ModelRotator, Loader, handleViewChange
 
-### Hata Kalkanı
-Bu grup, 3D sahne oluşturulurken veya model yüklenirken ortaya çıkabilecek beklenmedik hataları yakalayarak uygulamanın genel stabilitesini korur. Hata durumunda bileşen ağacını durdurur ve kullanıcıya hata hakkında bilgilendirici bir alternatif arayüz sunar.
-- ErrorBoundary sınıfı (constructor, getDerivedStateFromError, render)
+### Ana Görüntüleyici
+Ürünün 3D modelini görüntülemek için ana bileşeni sağlar. Slug ve model tipi gibi parametrelerle hangi modelin yükleneceğini belirler; tam ekran modu ve kapatma fonksiyonu gibi kullanıcı etkileşimlerini yönetir.
+- Product3DViewer
+
+### Model Kontrolü ve Görünüm Yönetimi
+3D modelin döndürülmesini ve farklı açılardan görüntülenmesini sağlar. ModelRotator bileşeni modeli otomatik veya manuel olarak döndürürken, handleViewChange fonksiyonu ön, üst, sağ, arka, alt, sol ve izometrik görünümler arasında geçiş yapar.
+- ModelRotator, handleViewChange
+
+### Yükleme ve Hata Yönetimi
+Model yüklenirken kullanıcıya yükleme durumu gösterir ve 3D işleme sırasında oluşabilecek hataları yakalayarak kullanıcıya anlamlı hata mesajları sunar. ErrorBoundary sınıfı, React bileşen ağacındaki hataları yakalar ve çökme yerine hata ekranı gösterir.
+- Loader, ErrorBoundary (constructor, getDerivedStateFromError, render)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, 3D ürün modeli görüntüleme bileşenlerinden oluşur. Aşağıdaki mimari varsayımlar, yalnızca fonksiyon imzalarından (parametre tipleri, zorunluluk ve default değerler) çıkarılmıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### Loader
-**Ne yapar**: Yüklenme durumunu gösteren basit bir bileşen render eder.  
-**Nasıl yapar**: Fonksiyon parametre almaz ve doğrudan JSX döndürür; bu JSX, metin stilini ve arka planını tanımlayan bir `<div>` öğesini içerir.  
-**Parametreler**:  
-- Parametre yok  
-**Dönüş**: `<Html center><div className="text-primary-navy font-bold text-sm bg-white/80 px-2 py-1 rounded">…</div>` şeklinde bir JSX elemanı.
+**Ne yapar**: 3D model yükleme işleminin ilerleme yüzdesini ekranda gösteren bir bileşendir. Kullanıcıya modelin ne kadarının yüklendiğini yüzde olarak bildirir.
+
+**Nasıl yapar**: `useProgress` kancasından `progress` değerini alır. Bu değeri `toFixed(0)` ile ondalıksız tam sayıya çevirerek ekrana yansıtır. `Html` bileşeni kullanılarak Three.js sahnesi üzerine HTML içeriği yerleştirilir ve ortalanmış bir şekilde görüntülenir. Metin, koyu lacivert renkte, yarı saydam beyaz arka plan üzerinde yuvarlatılmış köşeli bir kutu içinde sunulur.
+
+**Parametreler**:
+- Bu fonksiyon parametre almaz.
+
+**Dönüş**: JSX elementi döndürür. `Html` bileşeni içinde yüzde değerini gösteren bir `div` elementi içerir.
 
 ### ModelRotator
-**Ne yapar**: 3D bir modelin_children_ elemanlarını saran ve etkinleştirildiğinde fare sürüklemeyle döndürülmesine olanak tanıyan bir React bileşenidir.
-**Nasıl yapar**: Bileşen, Three.js'in `useThree` hook'undan canvas ve kamera referanslarını alır. `useEffect` içinde, canvas'a `pointerdown` ve pencereye `pointerup` ile `pointermove` olay dinleyicileri ekler. Sürükleme hareketi algılandığında, fare kayma miktarlarını (dx, dy) kameranın世界 eksenlerine göre hesaplanan hız çarpanıyla çarpıp, `rotationRef`'teki Three.js nesnesi üzerinde `rotateOnWorldAxis` yöntemini kullanarak modeli döndürür. Olay dinleyicileri bileşenin bağlantı kesilmesi durumunda temizlenir.
-**Parametreler**:
-- `children`: React.ReactNode — Döndürülecek olan 3D model veya model grubu.
-- `enabled`: boolean — Fare ile döndürme etkinleştirilmiş mi değil mi belirler. `false` olduğunda sürükleme hareketleri işlenmez.
-- `rotationRef`: React.MutableRefObject<Group | null> — Döndürme işleminin uygulanacağı Three.js `Group` nesnesine bir referans. Bu ref, bileşenin dışından da erişilebilir olmalıdır.
-**Dönüş**: `<group ref={rotationRef}>{children}</group>` — Çocuklarını saran ve döndürme referansını atayan bir Three.js `group` JSX elemanı döner.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### Product3DViewer
-**Ne yapar**: Belirtilen ürünün 3D modelini görüntüleyen bir bileşen render eder; tam ekran modu ve kapatma işlevi için props kabul eder.  
-**Nasıl yapar**: `slug`, `modelType`, `isFullscreen` (varsayılan false) ve `onClose` props'larını alır; bu bilgilere dayalı olarak 3D görüntüleyiciyi oluşturur ve gerekirse tam ekran veya kapatma kontrollerini sağlar.  
-**Parametreler**:  
-- slug: string — Görüntülenecek ürünün benzersiz tanımlayıcısı  
-- modelType: string — Kullanılacak 3D modelinin türü veya formatı  
-- isFullscreen: boolean (varsayılan: false) — Bileşenin tam ekran olarak görüntülenip görüntülenmeyeceği  
-- onClose: function — Bileşen kapatıldığında çağrılacak geri çağırım fonksiyonu  
-**Dönüş**: `React.FC<Product3DViewerProps>` türünde bir fonksiyon bileşeni.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### handleViewChange
-**Ne yapar**: Kamera veya görünüme belirli bir yön (ön, üst, sağ, arka, alt, sol, izometrik) ayarlar.  
-**Nasıl yapar**: `view` parametresi olarak kabul edilen litéral birleşim türünden bir değer alır ve bu değere göre iç durum veya görüntüleme matrisini günceller (detaylı uygulama sağlanmadı).  
-**Parametreler**:  
-- view: 'front' | 'top' | 'right' | 'back' | 'bottom' | 'left' | 'iso' — Uygulanacak görünüme yön  
-**Dönüş**: Bilinmiyor (verilen bilgiye göre `void` veya dönüş değeri yoktur).
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
-### ErrorBoundary.constructor
-**Ne yapar**: `ErrorBoundary` sınıf bileşeninin kurucusudur ve bileşenin ilk durumunu (state) başlatır.
-**Nasıl yapar**: Üst sınıfın (`React.Component`) kurucusunu `super(props)` çağrısıyla çalıştırır ve `this.state` nesnesini `{ hasError: false, error: null }` olarak ayarlayarak hiçbir hata olmadığını ve henüz yakalanmış bir hata nesnesi bulunduğunu belirtir.
-**Parametreler**:
-- `props`: `{ children: React.ReactNode, t: (key: string) => string }` — Bileşenin props'ları. `children`, hata oluşmadığında render edilecek elemanları içerir. `t`, hata mesajlarını uluslararasılaştırmak için kullanılan bir çeviri fonksiyonudur.
-**Dönüş**: void — Kurucu bir değer dönmez.
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
-### ErrorBoundary.getDerivedStateFromError
-**Ne yapar**: Bir alt bileşenin Render aşamasında bir hata fırlattığında, ErrorBoundary'nin durumunu güncellenmesi için çağrılan bir yaşam döngüsü methodudur.
-**Nasıl yapar**: Statik bir yöntem olarak, fırlatılan `error` nesnesini parametre olarak alır ve bileşenin durumunu `{ hasError: true, error }` olarak güncelleyerek bir sonraki render döngüsünde `render` metodunun hata gösteren dalı çalışmasını sağlar.
-**Parametreler**:
-- `error`: Error — Yakalanan JavaScript hata nesnesi.
-**Dönüş**: `{ hasError: true, error }` — Bileşenin durumunu güncellemek için kullanılacak olan nesne.
+### getDerivedStateFromError
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
-### ErrorBoundary.render
-**Ne yapar**: `ErrorBoundary` bileşeninin JSX çıktısını oluşturur. Hata oluştuysa hata mesajını gösterir, oluşmadıysa çocuk elemanları doğrudan render eder.
-**Nasıl yapar**: Öncelikle `this.state.hasError` durumunu kontrol eder. Eğer `true` ise, Three.js'in `Html` bileşenini kullanarak ekrana ortalanmış, kırmızı arka planlı bir hata kutucuğu render eder. Bu kutucuk, uluslararasılaştırılmış bir başlık (`t('product3d.loadError')`) ve hata mesajının ilk 100 karakterini gösterir. `hasError` durumu `false` ise, `this.props.children` doğrudan döner.
-**Parametreler**:
-- Bu method herhangi bir parametre almaz. `this.props` ve `this.state` erişimindedir.
-**Dönüş**: JSX.Element — Hata durumunda bir `Html` bileşeni, normal durumda ise `this.props.children` döner.
+### render
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../../i18n/I18nProvider::useI18n
 - import: ../../../utils/3dModelOffsets::getModelPlacement
-- import: ./FanRenderer::FanRenderer
-- import: @react-three/fiber::Canvas
+- import: ./ProductModelRenderer::ProductModelRenderer
+- import: ./core::VentHubCanvas
 - import: @react-three/fiber::useThree
 - import: react::React
 - import: react::Suspense
@@ -123,74 +103,87 @@ Bu modül, 3D ürün modeli görüntüleme bileşenlerinden oluşur. Aşağıdak
 
 ---
 
+## SABİTLER
+- **_camRight** (new_expression) — `new Vector3()`
+- **_camUp** (new_expression) — `new Vector3()`
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/products/3d/Product3DViewer.tsx::Loader
-- **params**: []
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `progress` — useProgress() hook'undan gelen yükleme yüzdesi (0-100 arası)
-- **Dönüş**: JSX elementi, Html center içinde progress yüzdesini gösterir
+  - `progress` — `useProgress()` hook'undan gelen yükleme ilerleme yüzdesi (sayı)
+- **Dönüş**: JSX elementi — yükleme yüzdesini gösteren Html bileşeni
 
 ### [N2_NASIL] AST Pointer: src/components/products/3d/Product3DViewer.tsx::ModelRotator
-- **params**: (children: React.ReactNode, enabled: boolean, rotationRef: React.MutableRefObject<Group | null>)
+- **params**: `children` (React.ReactNode), `enabled` (boolean), `rotationRef` (React.MutableRefObject<Group | null>)
 - **ic_degiskenler**:
-  - `gl` — useThree() hook'undan gelen WebGL renderer nesnesi
-  - `camera` — useThree() hook'undan gelen camera nesnesi
-  - `isDragging` — useRef ile oluşturulan, sürükleme durumunu tutan boolean ref
-  - `previousMouse` — useRef ile oluşturulan, önceki fare pozisyonunu {x, y} olarak tutan ref
-  - `canvas` — gl.domElement'den alınan HTML canvas elementi
-  - `handlePointerDown` — fare basma olayı için handler fonksiyonu
-  - `handlePointerUp` — fare bırakma olayı için handler fonksiyonu
-  - `handlePointerMove` — fare hareketi olayı için handler fonksiyonu
-  - `dx` — fare hareketinin x ekseni farkı
-  - `dy` — fare hareketinin y ekseni farkı
+  - `gl` — `useThree()` hook'undan gelen Three.js renderer nesnesi
+  - `camera` — `useThree()` hook'undan gelen Three.js kamera nesnesi
+  - `isDragging` — useRef ile oluşturulan sürükleme durumu boolean referansı
+  - `previousMouse` — useRef ile oluşturulan önceki mouse pozisyonu referansı ({x, y})
+  - `canvas` — `gl.domElement` erişimi ile elde edilen canvas DOM elementi
+  - `handlePointerDown` — pointer basıldığında çağrılan fonksiyon; sürükleme başlatır ve mouse pozisyonunu kaydeder
+  - `handlePointerUp` — pointer bırakıldığında çağrılan fonksiyon; sürüklemeyi sonlandırır
+  - `handlePointerMove` — pointer hareket ettiğinde çağrılan fonksiyon; model rotasyonunu uygular
+  - `dx` — yatay mouse hareket farkı (`e.clientX - previousMouse.current.x`)
+  - `dy` — dikey mouse hareket farkı (`e.clientY - previousMouse.current.y`)
   - `speed` — rotasyon hızı sabiti (0.005)
-  - `camRight` — kameranın sağ vektörü, Vector3(1,0,0) kamera kuanterneyonu ile çarpılmış
-  - `camUp` — kameranın yukarı vektörü, Vector3(0,1,0) kamera kuanternyonu ile çarpılmış
-- **Dönüş**: JSX elementi, group elementi içinde children render eder
+  - `_camRight` — kameranın sağ vektörü (modül seviyesinde tanımlı sabit)
+  - `_camUp` — kameranın yukarı vektörü (modül seviyesinde tanımlı sabit)
+- **Dönüş**: JSX elementi — `rotationRef` ile bağlanmış `group` bileşeni
 
 ### [N3_NASIL] AST Pointer: src/components/products/3d/Product3DViewer.tsx::Product3DViewer
-- **params**: (slug: string, modelType: string, isFullscreen: boolean = false, onClose: () => void)
+- **params**: `slug` (string), `modelType` (string), `isFullscreen` (boolean, varsayılan: false), `onClose` (fonksiyon, opsiyonel)
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
-  - `showGrid` — useState ile oluşturulan, ızgara görünürlüğünü tutan boolean state
-  - `autoRotate` — useState ile oluşturulan, otomatik döndürme modunu tutan boolean state
-  - `showViewMenu` — useState ile oluşturulan, görünüm menüsünün açılış durumunu tutan boolean state
-  - `rotationMode` — useState ile oluşturulan, rotasyon modunu ('orbit' veya 'free') tutan state
-  - `controlsRef` — useRef ile oluşturulan, OrbitControls referansını tutan ref
-  - `modelGroupRef` — useRef ile oluşturulan, model grubu referansını tutan ref
-  - `tb` — isFullscreen durumuna göre toolbar stil parametrelerini tutan nesne (icon, font, pad, minW, div, top)
-  - `handleReset` — useCallback ile oluşturulan, tüm ayarları sıfırlayan callback fonksiyonu
-  - `handleViewChange` — görünüm değişikliği için callback fonksiyonu
-  - `handleKeyDown` — useEffect içindeki tuş olayı handler fonksiyonu
-  - `placement` — getModelPlacement() fonksiyonundan gelen model pozisyon ve rotasyon bilgisi
-- **Dönüş**: JSX elementi, 3D model görüntüleyici UI'ını render eder
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu
+  - `showGrid` — grid çizgilerinin görünürlük durumunu tutan state (boolean)
+  - `autoRotate` — otomatik rotasyon durumunu tutan state (boolean)
+  - `showViewMenu` — görünüm menüsünün açık/kapalı durumunu tutan state (boolean)
+  - `rotationMode` — rotasyon modu state'i ('orbit' | 'free')
+  - `controlsRef` — useRef ile oluşturulan OrbitControls bileşen referansı
+  - `modelGroupRef` — useRef ile oluşturulan Group nesnesi referansı
+  - `tb` — `isFullscreen` durumuna göre toolbar stilleri nesnesi (icon, font, pad, minW, div, top)
+  - `handleReset` — useCallback ile oluşturulan sıfırlama fonksiyonu; rotasyon modunu, grid durumunu sıfırlar ve kontrolleri/resetler
+  - `handleViewChange` — kamera görünümünü değiştiren fonksiyon (front, top, right, back, bottom, left, iso)
+  - `placement` — `getModelPlacement(modelType, slug, 'grounded')` çağrısından dönen model konumlandırma verisi (position, rotation)
+  - `handleKeyDown` — useEffect içinde tanımlanan klavye olay dinleyicisi; 'g' tuşu grid'i, 'r' tuşu reset'i tetikler
+  - `dist` — handleViewChange içinde kullanılan kamera mesafesi sabiti (3.5)
+  - `cam` — handleViewChange içinde `controlsRef.current.object` erişimi ile elde edilen kamera nesnesi
+  - `view` — handleViewChange fonksiyonuna gelen görünüm tipi parametresi
+  - `v` — görünüm menüsü butonlarını oluşturmak için kullanılan döngü değişkeni (key, label)
+- **Dönüş**: JSX elementi — 3D ürün görüntüleyici bileşeni (VentHubCanvas, toolbar, logo)
 
 ### [N4_NASIL] AST Pointer: src/components/products/3d/Product3DViewer.tsx::handleViewChange
-- **params**: (view: 'front' | 'top' | 'right' | 'back' | 'bottom' | 'left' | 'iso')
+- **params**: `view` ('front' | 'top' | 'right' | 'back' | 'bottom' | 'left' | 'iso')
 - **ic_degiskenler**:
   - `dist` — kamera mesafesi sabiti (3.5)
-  - `cam` — controlsRef.current.object'den gelen kamera nesnesi
-- **Dönüş**: yok (void), kamera pozisyonunu ve yönünü ayarlar
+  - `cam` — `controlsRef.current.object` erişimi ile elde edilen kamera nesnesi
+  - `controlsRef.current` — OrbitControls bileşen referansı (null kontrolü yapılır)
+  - `modelGroupRef.current` — Group nesnesi referansı (rotasyon sıfırlanır)
+- **Dönüş**: yok — kamera pozisyonunu ve rotasyonunu değiştirir
 
 ### [N5_NASIL] AST Pointer: src/components/products/3d/Product3DViewer.tsx::ErrorBoundary.constructor
-- **params**: (props: { children: React.ReactNode, t: (key: string) => string })
-- **ic_degiskenler**: yok
-- **Dönüş**: yok, super(props) çağırarak state'i {hasError: false, error: olarak başlatır
+- **params**: `props` ({ children: React.ReactNode, t: (key: string) => string })
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — `this.state`'i `{ hasError: false, error: null }` olarak başlatır
 
 ### [N6_NASIL] AST Pointer: src/components/products/3d/Product3DViewer.tsx::ErrorBoundary.getDerivedStateFromError
-- **params**: (error: Error)
-- **ic_degiskenler**: yok
-- **Dönüş**: {hasError: true, error} state nesnesi
+- **params**: `error` (Error)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `{ hasError: true, error }` — hata durumunu state'e yansıtır
 
 ### [N7_NASIL] AST Pointer: src/components/products/3d/Product3DViewer.tsx::ErrorBoundary.render
-- **params**: []
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `this.state.hasError` — hata durumunu tutan state boolean'ı
-  - `this.state.error` — hata nesnesi
-  - `this.props.children` — child componentler
-  - `this.props.t` — çeviri fonksiyonu
-- **Dönüş**: JSX elementi, hata durumunda hata mesajı, normalde children render eder
+  - `this.state.hasError` — hata oluşup oluşmadığını gösteren boolean
+  - `this.props.t` — çeviri fonksiyonu (`'product3d.loadError'` anahtarı kullanılır)
+  - `this.state.error` — yakalanan hata nesnesi
+  - `this.state.error?.message` — hata mesajı (ilk 100 karakteri gösterilir)
+  - `this.props.children` — hata olmadığında render edilecek alt bileşenler
+- **Dönüş**: JSX elementi — hata durumunda Html içinde hata mesajı, yoksa `this.props.children`
 
 ---
 
@@ -210,12 +203,12 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\Product3DViewer.tsx
-  function: src\components\products\3d\Product3DViewer.tsx::Loader
-  function: src\components\products\3d\Product3DViewer.tsx::ModelRotator
-  function: src\components\products\3d\Product3DViewer.tsx::Product3DViewer
-  function: src\components\products\3d\Product3DViewer.tsx::handleViewChange
-  class: src\components\products\3d\Product3DViewer.tsx::ErrorBoundary
+  file: Product3DViewer.tsx
+  function: Product3DViewer.tsx::Loader
+  function: Product3DViewer.tsx::ModelRotator
+  function: Product3DViewer.tsx::Product3DViewer
+  function: Product3DViewer.tsx::handleViewChange
+  class: Product3DViewer.tsx::ErrorBoundary
 
 ---
 

@@ -2,56 +2,63 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\core\SceneLightingRig.tsx
-skeleton_hash: b19a37140ae44e77
+source_path: C:\tmp\wt-supurme\src\components\products\3d\core\SceneLightingRig.tsx
+skeleton_hash: 5776515bb7637252
 entity_hashes:
   func:SceneLightingRig: 0b8be391d9cf4aa9
   overview: c682b535a83680d7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-20T05:01:25Z
+generated_at: 2026-08-25T07:26:15Z
 ---
 
 ## Genel Bakış
-SceneLightingRig, 3D sahne ortamında farklı kullanım senaryolarına göre ışıklandırma düzenini kuran bir React bileşenidir. Ortam parametresiyle (örneğin ürün gösterimi veya genel kullanım) farklı ışıklandırma presetlerini aktif ederek sahnenin aydınlık ve gölge koşullarını belirler.
+Bu modül, 3D ürün sahnesinin aydınlatma düzenini oluşturan bir React bileşenidir. Farklı ortam önayarlarına göre ışıklandırma yapılandırmasını yönetir. `src/components/products/3d/core` altında konumlandığından, 3D ürün görüntüleme sisteminin çekirdek altyapısının bir parçasıdır.
 
 ## Fonksiyon Grupları
-### Sahne Işıklandırma Bileşeni
-Sahne için gerekli ışık kaynaklarını ve ortam ayarlarını tanımlayan merkezi React bileşenidir.
+
+### Sahne Aydınlatma Bileşeni
+Ortam önayarı parametresine (`env`) bağlı olarak 3D sahne için aydınlatma düzenini tanımlar ve render eder. Varsayılan ortam değeri `'product'` olarak belirlenmiştir; `EnvPresetKey` tipiyle desteklenen diğer ortam değerleri farklı aydınlatma konfigürasyonlarına karşılık gelir.
 - SceneLightingRig
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için aksiyonlar, fonksiyon imzası ve modül sabitleri üzerinden çıkarılmıştır.
+Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca imzadan çıkarılabilen varsayımlar belirlenebilir.
 
-**[Aksiyom 1]:** Eğer `env` parametresi `EnvPresetKey` tipinde bir değer değilse (geçersiz bir key girilirse), modülün hangi ışıklandırma preset'ini kullanacağı bilinmiyor olur.
+[Aksiyom 1]: Eğer `EnvPresetKey` tipi tanımlı değilse, bileşen derleme hatası verir.
 
-**[Aksiyom 2]:** Eğer `env` parametresi geçirilmezse, bileşen `'product'` değerini varsayılan olarak kullanır ve ürün odaklı ışıklandırma düzeni (rig) ile çalışır.
+[Aksiyom 2]: Eğer `RIG_INTENSITY` sabiti modül kapsamında mevcut değilse, bileşen çalışamaz.
 
-**[Aksiyom 3]:** Eğer `RIG_INTENSITY` objesi tanımlı değilse veya beklenen yapıda (obje) değilse, ışıklandırma intensite değerlerine erişilemez ve sahne aydınlığı hatalı çalışır.
-
-**[Aksiyom 4]:** Eğer `RIG_INTENSITY` objesinin içinde `env` parametresine karşılık gelen bir key yoksa, intensite değeri bilinmiyor olur ve ışıklandırma düzgün ayarlanamaz.
-
----
-
-**Not:** Bu modül bir React bileşeni (TSX) olduğundan, doğru çalışması için bir 3D sahne ortamının (muhtemelen Three.js / React Three Fiber) mevcut olması gerekir; ancak bu bileşen imzasından çıkarılamadığı için aksiyom olarak listelenmemiştir.
+[Aksiyom 3]: Eğer `env` parametresi sağlanmazsa, değer `'product'` olarak varsayılır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### SceneLightingRig
+**Ne yapar**: 3B sahne için gerçek zamanlı bir ışıklandırma donanımı (lighting rig) oluşturur. Ortam ışığı, anahtar (KEY), dolgu (FILL) ve görüntü tabanlı aydınlatma (IBL) katmanlarını bir araya getirerek ürün görselleştirmede dengeli, parlak ve gölgeleri doldurulmuş bir aydınlatma sağlar. Farklı ortam önayarlarına (`env`) göre ışık şiddetleri ölçeklenir.
 
-**Ne yapar**: Verilen ortam (environment) ön ayarına göre 3D sahne için çok katmanlı bir aydınlatma düzeneği kurar. Ambient, key directional, fill directional, IBL environment ve birden fazla lightformer içeren复合 bir ışık sistemi oluşturarak hem mat hem metal yüzeylerin doğru aydınlatılmasını sağlar.
+**Nasıl yapar**: Fonksiyon, `RIG_INTENSITY` sabit nesnesinden verilen `env` parametresine karşılık gelen bir katsayı (`k`) okur. Bu katsayı, sahnedeki tüm ışık şiddetlerine çarpılarak ortam önayarına göre parlaklık ayarlaması yapılır. Dört katmanlı bir ışıklandırma mimarisi kurulur:
 
-**Nasıl yapar**: Fonksiyon, `RIG_INTENSITY` adlı bir sözlükten ortam adına karşılık gelen intensity çarpanını (`k`) okur. Ardından JSX içinde sırasıyla: genel ortam aydınlatması (`ambientLight`), ana anahtar ışık (`directionalLight` — ön-merkez, hafif sağ-üst konumlu, gölge yayan), dolgu ışığı (`directionalLight` — sol-ön konumlu, gölge yüzünü dolduran) ve prosedürel stüdyo ortamı (`Environment` içine gömülü dört `Lightformer`) oluşturur. Her bir ışık intensity değeri `k` çarpanıyla çarpılarak farklı ortam presetlerinde farklı parlaklık seviyeleri elde edilir. JSDoc yorumlarında belirtildiği üzere, bu düzenleme v5 ve v6.iterasyonlarda mat yüzeylerin yeterince aydınlatılmaması sorununu çözmek için ambient değerinin artırılması (0.55→0.85), key ışığın konumunun ve gücünün ayarlanması ve gerçek ikinci bir fill directional eklenmesiyle geliştirilmiştir.
+1. **Ambient ışık** (`ambientLight`): Genel ortam aydınlatması sağlar; mat ürünlerin karanlıkta kalmaması için belirgin düzeyde yüksek tutulur (şiddet: `0.85 * k`).
+
+2. **KEY ışığı** (`directionalLight`, birinci): Ön-merkezden, hafif sağ-üstten gelen ana ışık kaynağıdır. Ürünün kameraya bakan ön yüzünü aydınlatır. Gölge oluşturur (`castShadow`), gölge haritası boyutu 1024 pikseldir. Pozisyon `[3, 5, 12]` ile önden ve hafif yandan gelir; tepeden gelen ışığın ön yüzü gölgede bırakma sorunu bu konumlandırma ile giderilmiştir. Şiddet: `1.8 * k`.
+
+3. **FILL ışığı** (`directionalLight`, ikinci): Sol-ön taraftan gelen dolgu ışığıdır. Gölge oluşturmaz (maliyet düşük); ürünün gölge kalan yüzünü gerçek ışıkla doldurur. IBL'in mat yüzeyleri aydınlatamayacağı belirtildiğinden bu gerçek ışık kaynağı gereklidir. Şiddet: `1.0 * k`.
+
+4. **IBL / Environment** (`Environment` bileşeni): Prosedürel bir stüdyo ortamı oluşturur; yalnızca metalik yüzeylerde yansıma ve parlaklık (pop) sağlar, mat aydınlatma yukarıdaki gerçek ışıklardan gelir. Çözünürlük 512, kare sayısı 1'dir. İçinde dört `Lightformer` tanımlıdır:
+   - **KEY env**: Ön-sağda, hafif sıcak renkli (`#fff4e6`) dikdörtgen; şiddet `2.0 * k`, konum `[5, 4, 9]`, ölçek `[10, 10, 1]`.
+   - **FILL env**: Ön-solda, soğuk renkli (`#dbeafe`) dikdörtgen; şiddet `1.6 * k`, konum `[-6, 2, 6]`, ölçek `[8, 8, 1]`.
+   - **RIM/BACK**: Arkadan-üstten hafif kenar ışığı sağlayan beyaz dikdörtgen; şiddet `1.2 * k`, konum `[0, 6, -6]`, ölçek `[6, 2.5, 1]`.
+   - **TOP**: Tepeden yumuşak, genel ortam aydınlatması sağlayan beyaz daire; şiddet `1.0 * k`, konum `[0, 8, 0]`, ölçek `[6, 6, 1]`.
+
+Tüm bu bileşenler bir React fragment (`<>...</>`) içinde döndürülür.
 
 **Parametreler**:
+- `env`: `EnvPresetKey` — Ortam önayar anahtarı. `RIG_INTENSITY` nesnesinden bu anahtarla eşleşen katsayı okunur ve tüm ışık şiddetlerine çarpılır. Varsayılan değeri `'product'`'dur. Opsiyoneldir.
 
-- `env`: `EnvPresetKey` (opsiyonel, varsayılan: `'product'`) — Sahne için kullanılacak ortam aydınlatma ön ayarının anahtarı. Bu değer `RIG_INTENSITY` sözlüğünde aranarak tüm ışık kaynaklarının yoğunluğu için bir çarpan (`k`) elde edilir; böylece farklı ürün sahne türleri için aydınlatma profili tek parametreyle değiştirilebilir.
-
-**Dönüş**: Bileşen JSX döndürür — `React.ReactNode` (React fragment içinde ambientLight, iki adet directionalLight ve Environment/Lightformer bileşenleri).
+**Dönüş**: JSX elementi (React fragment). İçinde `ambientLight`, iki `directionalLight` ve bir `Environment` bileşeni (dört `Lightformer` ile birlikte) barındıran bir fragment döndürür.
 
 ---
 
@@ -83,29 +90,17 @@ type EnvPresetKey = 'product' | 'showcase' | 'nav' | 'authority'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: SceneLightingRig.tsx::SceneLightingRig
-- **params**: (`{ env = 'product' }: { env?: EnvPresetKey }`)
-  - `env` — Ortam preset anahtarı (varsayılan: 'product')
+- **params**: `env` (varsayılan: `'product'`, tip: `EnvPresetKey`)
 - **ic_degiskenler**:
-  - `k` — `RIG_INTENSITY[env]` erişiminden elde edilen ışık yoğunluk çarpanı
-- **Dönüş**: JSX (React Three Fiber sahne ışıklandırma bileşeni)
-  - Ortam parametresine göre ölçeklenmiş ambient, key, fill ışıkları ve Environment/Lightformer JSX yapısını döndürür
-- **API Kullanımları**:
-  - `RIG_INTENSITY[env]` — Sabit objeden env parametresine göre yoğunluk değeri alınır
-  - `Environment` — @react-three/drei'den import edilen ortam ışıklandırma bileşeni
-  - `Lightformer` — @react-three/drei'den import edilen özel ışık forming bileşeni
-- **JSX Yapısı**:
-  - `<ambientLight>` — Ortam ışığı (0.85 * k yoğunluğunda)
-  - `<directionalLight position={[3,5,12]}>` — Key ışığı (1.8 * k, gölgeli)
-  - `<directionalLight position={[-7,4,9]}>` — Fill ışığı (1.0 * k)
-  - `<Environment resolution={512} frames={1}>` — Prosedürel stüdyo ortamı
-    - `<Lightformer>` — Key, fill, rim/back ve top ışıkları için 4 adet rect/circle lightformer
+  - `k` — `RIG_INTENSITY[env]` değerini tutar, tüm ışık şiddetlerinin çarpanı olarak kullanılır.
+- **Dönüş**: JSX (React elementi)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\core\SceneLightingRig.tsx
-  function: src\components\products\3d\core\SceneLightingRig.tsx::SceneLightingRig
+  file: SceneLightingRig.tsx
+  function: SceneLightingRig.tsx::SceneLightingRig
 
 ---
 

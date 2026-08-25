@@ -2,70 +2,55 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\utils\adminShipping.ts
-skeleton_hash: 73d29b87f343f56e
+source_path: C:\tmp\wt-supurme\src\utils\adminShipping.ts
+skeleton_hash: d9db2383d8a60915
 entity_hashes:
   func:SharedTrackingDeclinedError:constructor: 0da9cec1646cf6c1
   func:invokeShippingUpdate: c7a81a79ab7e135c
   func:isSharedTrackingConflict: 7ea7741c5087f777
   overview: 4609d8f90089ab87
-generated_at: 2026-08-18T06:50:34Z
+generated_at: 2026-08-25T07:28:55Z
 ---
 
 ## Genel Bakış
-Bu modül, gönderi güncelleme işlemlerindeki temel yardımcı fonksiyonları ve hat管理体系ını içerir. Paylaşımlı takip numarası çatışmalarını yönetmek ve gönderi güncelleme isteklerini güvenli bir şekilde tetiklemekten sorumludur.
+Bu modül, admin panelinden gerçekleştirilen kargo güncelleme işlemlerini yönetir. Paylaşımlı takip numarası çakışmalarını tespit eder ve bu durumlarda özel hata mekanizması sunar. Supabase üzerinden kargo güncelleme çağrısı yaparken karşılaşılabilen hata durumlarını ele alır.
 
 ## Fonksiyon Grupları
-### Takip Numarası Çatışma Yönetimi
-Gönderi güncellemeleri sırasında oluşabilecek paylaşımlı takip numarası çatışmalarını tespit eder ve yönetir.
-- isSharedTrackingConflict, SharedTrackingDeclinedError
 
-### Gönderi Güncelleme İşlemi
-Supabase veritabanı bağlantısıyla gönderi durumu güncellemelerini merkezi olarak tetikler.
+### Kargo Güncelleme Çağrısı
+Supabase fonksiyon host'u üzerinden kargo güncelleme isteği gönderir ve sonucu döndürür. Paylaşımlı takip numarasına izin verilip verilmediği parametreyle kontrol edilir.
 - invokeShippingUpdate
+
+### Hata Tespiti ve Yönetimi
+Paylaşımlı takip numarası çakışması durumunu tanımlar ve tespit eder. `SharedTrackingDeclinedError` özel hata sınıfı, bu tür çakışmalarda fırlatılmak üzere tanımlanmıştır; `isSharedTrackingConflict` ise verilen bir hata nesnesinin bu çakışma türüne ait olup olmadığını kontrol eder.
+- isSharedTrackingConflict, SharedTrackingDeclinedError (constructor)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Gerekçe:** Sunulan fonksiyon imzaları (özellikle `isSharedTrackingConflict`, `invokeShippingUpdate` ve `SharedTrackingDeclinedError.constructor`) bilinmeyen tiplere (`ShippingFunctionsHost`, `ShippingUpdateBody`, `ShippingInvokeOutcome`) bağımlıdır. Fonksiyon gövdeleri verilmediğinden, doğru çalışmalarına yönelik zorunlu koşullar (örn. `supabase` objesinin hangi metotları içermesi gerektiği, `body`'de hangi alanların bulunması gerektiği, `allowSharedTracking` boolean'ının ne zaman `True`/`False` olması gerektiği vb.)uniq emperik veriye dayalı olarak çıkarılamamaktadır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### isSharedTrackingConflict
-**Ne yapar**: Verilen bir hata nesnesinin, `supabase-js` kütüphanesinden kaynaklanan bir "paylaşılan takip numarası çatışması" (409 Conflict) hatası olup olmadığını kontrol eder ve bunu boolean olarak döndürür.
+**Ne yapar**: Verilen hata nesnesinin bir "paylaşılan takip numarası" reddi (409 Conflict) olup olmadığını tespit eder. `supabase-js` kütüphanesi, Edge Function 2xx dışı bir durum kodu döndürüğünde `FunctionsHttpError` üretir; bu hata nesnesinin `context` alanı ham `Response` nesnesini taşır ve hata mesajı yalnızca "Edge Function returned a non-2xx status code" ifadesini içerir. Hangi 409 hatası olduğunu anlamak için yanıt gövdesindeki `error` kodunun okunması gerekir.
 
-**Nasıl yapar**: Fonksiyon, hata nesnesinin `context` özelliğinin bir `Response` nesnesi olup olmadığını ve bu yanıtın durum kodunun 409 olup olmadığını kontrol eder. Eğer koşullar sağlanırsa, yanıt gövdesini (body) bir klon üzerinden (`clone()` metodu ile) JSON olarak parse eder ve içeriğin `error` alanının `SHARED_TRACKING_CONFLICT` sabitine eşit olup olmadığını doğrular. `clone()` kullanımı, gövdenin orijinal akışını (stream) tüketmeden başa bir okuma yapılması için gereklidir.
+**Nasıl yapar**: İlk olarak `error` nesnesinin `context` özelliğini kontrol eder. `context` bir `Response` nesnesi değilse veya `status` değeri 409 değilse `false` döner. 409 durumunda yanıt gövdesini `clone()` metoduyla klonlayarak okur; bu klonlama, gövdenin tek kullanımlık olmasını önlemek içindir — çağıran aynı `Response` nesnesini loglamak için tekrar okumak isteyebilir. Gövde içindeki `error` alanının değeri `SHARED_TRACKING_CONFLICT` sabitiyle eşleşiyorsa `true`, aksi halde `false` döner. JSON ayrıştırma sırasında oluşan herhangi bir hata durumunda da `false` döner.
 
 **Parametreler**:
-- error: unknown — Supabase Edge Function çağrısından dönen hata nesnesi. Bu nesnenin `context` özelliğinin bir `Response` olması beklenir.
+- error: unknown — kontrol edilecek hata nesnesi; `supabase-js` tarafından üretilen `FunctionsHttpError` olabilir
 
-**Dönüş**: Promise<boolean> — Hata, tanımlanan paylaşılan takip numarası çatışmasıysa `true`, aksi halde `false` döner.
+**Dönüş**: `Promise<boolean>` — hata bir paylaşılan takip numarası reddiyse `true`, değilse `false`
 
 ### invokeShippingUpdate
-**Ne yapar**: `supabase-js` client'ı kullanarak `admin-update-shipping` adlı Supabase Edge Function'ı çağırır ve sonucu yapılandırılmış bir çıktı nesnesi olarak döndürür. Çağrı, isteğe bağlı olarak "paylaşılan takip numarası" kuralını devre dışı bırakabilir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
-**Nasıl yapar**: Fonksiyon, `allowSharedTracking` parametresi `true` ise `body` nesnesine `allow_shared_tracking: true` özelliği ekleyerek bir payload oluşturur. Ardından `supabase.functions.invoke` metodunu kullanarak Edge Function'ı çağırır. Çağrı başarılı olursa `{ ok: true, conflict: false }` döner. Bir hata oluşursa, hatayı `isSharedTrackingConflict` fonksiyonuyla analiz ederek hatanın bir çatışma (conflict) durumu olup olmadığını belirler ve `{ ok: false, conflict: boolean, error: FunctionsHttpError }` yapısındaki nesneyi döndürür.
-
-**Parametreler**:
-- supabase: ShippingFunctionsHost — Supabase Edge Function'ları çağırmak için kullanılan, `functions.invoke` metoduna sahip client nesnesi.
-- body: ShippingUpdateBody — Edge Function'a gönderilecek kargo güncelleme verilerini içeren nesne.
-- allowSharedTracking: boolean (varsayılan: false) — Eğer `true` geçilirse, sunucu tarafında benzersiz takip numarası kısıtlaması atlanır. Varsayılan olarak `false`dır, böylece sunucunun varsayılan koruma mekanizması aktif kalır.
-
-**Dönüş**: Promise<ShippingInvokeOutcome> — Çağrının başarı durumunu (`ok`), bir çatışma hatası olup olmadığını (`conflict`) ve varsa ham hata nesnesini (`error`) içeren bir nesne döndürür.
-
-### SharedTrackingDeclinedError.constructor
-**Ne yapar**: `SharedTrackingDeclinedError` özel hata sınıfının constructor metodudur ve nesne oluşturulurken temel ayarları yapar.
-
-**Nasıl yapar**: Bu bir sınıf constructor'ıdır. `super()` çağrısı ile üst sınıfın (`Error`) constructor'ını, “Paylaşılan takip numarası onaylanmadı; kargo bilgisi yazılmadı.” hata mesajıyla çağırır. Ardından, hata nesnesinin `name` özelliğini `'SharedTrackingDeclinedError'` olarak ayarlar. Bu, hata yakalandığında hata türünün tanımlanmasını kolaylaştırır.
-
-**Parametreler**: Bu constructor metodu herhangi bir parametre almaz.
-
-**Dönüş**: void (belirtilmemiş). Sınıf constructor'ları doğrudan bir değer döndürmez; yerine, `new` anahtar kelimesi ile oluşturulan sınıf örneğini döndürürler.
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -103,27 +88,23 @@ type ShippingInvokeOutcome = | { ok: true; conflict: false }
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/utils/adminShipping.ts::isSharedTrackingConflict
-- **params**: `(error: unknown)` — kontrol edilecek hata nesnesi
+- **params**: `error: unknown`
 - **ic_degiskenler**:
-  - `context` — `error` objesinden optional chaining ile çıkarılan Response nesnesi; tip dönüşümü `(error as { context?: unknown } | null)?.context` kullanılır, Response instance değilse `false` dönülür
-  - `body` — `context.clone().json()` ile asenkron olarak okunan Response gövdesi; `clone()` kullanma nedeni gövdenin tek kullanımlık olması ve orijinal Response'un consumed olmamasıdır
-- **Dönüş**: `Promise<boolean>` — error içinde `context.status === 409` ve gövde JSON'unda `error === SHARED_TRACKING_CONFLICT` eşleşmesi varsa `true`, aksi halde `false`
+  - `context` — `error` nesnesinin `context` özelliği; optional chaining (`?.`) ile güvenli erişim sağlanır, ardından `null` kontrolü yapılır
+  - `body` — `context`'in `clone().json()` ile ayrıştırılan yanıt gövdesi; `clone()` çağrısı, orijinal `Response` nesnesinin tüketilmesini engellemek için yapılır
+- **Dönüş**: `Promise<boolean>` — `context` bir `Response` örneği değilse, `status` 409 değilse veya `json()` ayrıştırması başarısız olursa `false` döner; gövde içindeki `error` alanı `SHARED_TRACKING_CONFLICT` sabitine eşitse `true` döner
 
 ### [N2_NASIL] AST Pointer: src/utils/adminShipping.ts::invokeShippingUpdate
-- **params**:
-  - `supabase: ShippingFunctionsHost` — Supabase Edge Functions çağırmak için kullanılan istemci nesnesi
-  - `body: ShippingUpdateBody` — güncelleme için gönderilecek kargo bilgisi verisi
-  - `allowSharedTracking = false` — paylaşılan takip numarasına izin verilip verilmeyeceği; varsayılan `false`
+- **params**: `supabase: ShippingFunctionsHost`, `body: ShippingUpdateBody`, `allowSharedTracking` (varsayılan değer: `false`)
 - **ic_degiskenler**:
-  - `payload` — `allowSharedTracking` true ise `body` üzerine `allow_shared_tracking: true` eklenmiş genişletilmiş kopya, false ise orijinal `body`'nin kendisi
-  - `error` — `supabase.functions.invoke('admin-update-shipping', ...)` çağrısından dönen hata nesnesi; başarılıysa `undefined`
-- **Dönüş**: `Promise<ShippingInvokeOutcome>` — `{ ok: true, conflict: false }` (başarılı) veya `{ ok: false, conflict: boolean, error }` (hatalı; `conflict` değeri `isSharedTrackingConflict` ile belirlenir)
+  - `payload` — `allowSharedTracking` true ise `body` nesnesine `allow_shared_tracking: true` alanı eklenmiş genişletilmiş kopyası (`{ ...body, allow_shared_tracking: true }`); false ise `body`'nin kendisi
+  - `error` — `supabase.functions.invoke('admin-update-shipping', { body: payload })` çağrısından dönen hata nesnesi; destructuring ile alınır
+- **Dönüş**: `Promise<ShippingInvokeOutcome>` — hata yoksa `{ ok: true, conflict: false }` döner; hata varsa `{ ok: false, conflict: <isSharedTrackingConflict sonucu>, error }` döner
 
 ### [N3_NASIL] AST Pointer: src/utils/adminShipping.ts::SharedTrackingDeclinedError.constructor
-- **params**: (yok — parametresiz constructor)
-- **ic_degiskenler**:
-  - `this.name` — hata nesnesinin `name` özelliğine `'SharedTrackingDeclinedError'` atanır
-- **Dönüş**: yok — yan etki olarak `super('Paylaşılan takip numarası onaylanmadı; kargo bilgisi yazılmadı.')` çağrısıyla Error base class'ı başlatılır ve `this.name` ayarlanır
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — `super()` çağrısı ile üst sınıfın constructor'ı `'Paylaşılan takip numarası onaylanmadı; kargo bilgisi yazılmadı.'` mesajıyla başlatılır; `this.name` `'SharedTrackingDeclinedError'` değerine atanır
 
 ---
 
@@ -139,10 +120,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: src\utils\adminShipping.ts
-  function: src\utils\adminShipping.ts::isSharedTrackingConflict
-  function: src\utils\adminShipping.ts::invokeShippingUpdate
-  class: src\utils\adminShipping.ts::SharedTrackingDeclinedError
+  file: adminShipping.ts
+  function: adminShipping.ts::isSharedTrackingConflict
+  function: adminShipping.ts::invokeShippingUpdate
+  class: adminShipping.ts::SharedTrackingDeclinedError
 
 ---
 

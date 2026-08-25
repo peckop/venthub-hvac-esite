@@ -2,53 +2,60 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\data-table\FacetedFilter.tsx
-skeleton_hash: 9fff6e6e5122a218
+source_path: C:\tmp\wt-supurme\src\components\admin\data-table\FacetedFilter.tsx
+skeleton_hash: acaab1978f17b5cf
 entity_hashes:
-  func:FacetedFilter: 03176f4a9f27a70c
+  func:FacetedFilter: 49c4b53ab33910e8
   overview: d3bf186543b0d057
-  style_tokens: 66a24146db2b557f
-generated_at: 2026-06-19T20:47:00Z
+  style_tokens: 0c0078156433b2eb
+generated_at: 2026-08-25T07:24:54Z
 ---
 
 ## Genel Bakış
-FacetedFilter, Admin panelindeki veri tablolarında kullanılan çok boyutlu (çoklu seçim) filtreleme bileşenidir. Kullanıcının belirli bir faceted (yüzey/boyut) kategori için birden fazla seçenek seçip seçimsizleştirmesini sağlar; ayrıca tüm seçimleri temizleyen bir "clear" butonu sunar.
+
+FacetedFilter, admin veri tablosu bileşenleri arasında yer alan ve çoklu değerli filtreleme (facet-based filtering) işlevi sunan bir React bileşenidir. Belirli bir facet (özellik/kategori) için seçili değerleri yönetir ve kullanıcı seçimlerinde dışarıya bildirimde bulunur. `clearLabel` prop'u aracılığıyla temizleme butonunun metni özelleştirilebilir.
 
 ## Fonksiyon Grupları
-### Filtre Seçenekleri Yönetimi
-Bir faceted filtrenin başlığını, mevcut seçeneklerini, her seçenek için seçili durum sayısını ve toplam sayıyı hesaplayarak filtre panelini oluşturur. Seçeneklerin tıklanmasıyla seçili/kaldırma durumlarını `onChange` aracılığıyla üst bileşene iletir.
+
+### Filtre Bileşeni
+
+Verilen bir facet tanımına göre filtre arayüzünü oluşturur, kullanıcının birden fazla değer seçmesine olanak tanır ve seçim değişikliklerini `onChange` geri çağırımıyla dışarı bildirir. `selected` prop'u ile mevcut seçili durumu alır; `clearLabel` ile temizleme eyleminin etiketini belirler.
+
 - FacetedFilter
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzasına dayalı minimum mimari varsayımlar tanımlanabilir.
+Fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzasından çıkarılabilecek varsayımlar belirlenebilir.
 
-[Aksiyom 1]: Eğer `facet` parametresi `undefined` veya `null` olarak iletilirse, bileşen filtreleme seçeneklerini.render edemez (props tipi `FacetedFilterProps` olarak tanımlı olmasına rağmen, gövde içeriği bilinmediğinden `facet` yapısının içeriği bilinmiyor).
+[Aksiyom 1]: Eğer `facet` prop'u sağlanmazsa, bileşenin hangi filtre seçeneklerini göstereceği bilinmiyor; fonksiyon gövdesi görülmediğinden hata verip vermeyeceği belirlenemez.
 
-[Aksiyom 2]: Eğer `selected` parametresi (`FacetedFilterProps.selected`) geçerli bir değerler kümesi/objesi olarak sağlanmazsa, bileşen hangi filtrelerin aktif olduğunu bilemez ve durum göstergesi (ör. işaretli checkbox) hatalı render edilir.
+[Aksiyom 2]: Eğer `onChange` prop'u sağlanmazsa, kullanıcı bir filtre seçimi yaptığında bileşenin bu değişikliği üst bileşene nasıl bildireceği bilinmiyor.
 
-[Aksiyom 3]: Eğer `onChange` callback fonksiyonu (`(value: ...) => void`) olarak sağlanmazsa, kullanıcı bir filtre seçtiğinde/çıkardığında üst bileşene bildirim gönderilemez ve filtre seçimi değişmez.
+[Aksiyom 3]: Eğer `selected` prop'u sağlanmazsa, bileşenin hangi filtre değerlerinin seçili olduğunu nasıl belirleyeceği bilinmiyor.
 
-[Aksiyom 4]: Eğer `clearLabel` parametresi sağlanmazsa (default değer belirtilmemiştir — `clearLabel` imza içinde default değer olarak gelmemektedir), "temizle" butonu için kullanılacak metin bilinmiyor; bileşen bu但onu `undefined` label ile render edebilir.
+[Aksiyom 4]: Eğer `clearLabel` prop'u sağlanmazsa, temizleme işleminde kullanıcıya gösterilecek metnin ne olacağı bilinmiyor.
+
+**Not:** Bu bileşenin iç çalışma mantığı, hata yönetimi, render davranışı ve alt bileşen kullanımı hakkında kesin bilgi verilemez çünkü fonksiyon gövdesi sağlanmamıştır. Yukarıdaki varsayımlar yalnızca prop imzasından çıkarılan minimum gereksinimlerdir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### FacetedFilter
-**Ne yapar**: Bir facet (örneğin kategori, marka, durum) filtreleme arayüzü sunar; kullanıcının belirli bir facet grubu için birden fazla seçeneği aynı anda açıp kapatmasına olanak tanır. Filtreleme durumu üst bileşen tarafından kontrol edilir.
 
-**Nasıl yapar**: Fonksiyon, bir `Popover` (açılır kutu) içinde filtreleme seçeneklerini listeler. Her bir seçenek bir toggle butonu olarak çalışır: seçenek zaten seçiliyse listeden kaldırılır, değilse listeye eklenir. Bu durum `onChange` callback'i aracılığıyla üst bileşene bildirilir. Seçeneklerin her biri için bir checkbox görseli (`Check` ikonu ile) ve seçenek sayısını (`count`) gösteren bir rozet oluşturulur. Seçili seçenek sayısı, tetikleyici buton üzerinde bir rozet olarak görüntülenir. Seçili filtre varsa, filtreleri temizleme butonu (`X` ikonu ile) görünür hale gelir. `Popover.Root`, `Popover.Trigger`, `Popover.Portal` ve `Popover.Content` bileşenleri, erişilebilirlik ve portal tabanlı konumlandırma için Radix UI Popover bileşenlerini kullanır.
+**Ne yapar**: Çoklu seçimli (faceted) bir filtre bileşeni oluşturur. Kullanıcının bir popover (açılır pencere) içindeki seçenekler listesinden birden fazla değer seçip kaldırmasına olanak tanır. Seçili öğe sayısı bir badge ile gösterilir ve tüm seçimleri temizleme işlevi sunar.
+
+**Nasıl yapar**: Radix UI `Popover` bileşenlerini (`Popover.Root`, `Popover.Trigger`, `Popover.Portal`, `Popover.Content`) kullanarak bir tetikleyici buton ve açılır içerik oluşturur. İç mantıkta tanımlanan `toggle` fonksiyonu, `selected` dizisi içinde verilen değer varsa onu çıkarır (`filter` ile), yoksa diziye ekler (`spread` ile). Her `facet.options` elemanı için bir buton render edilir; bu butonlar `selected.includes(option.value)` kontrolüyle seçili durumu belirler ve `aria-pressed` özniteliğiyle erişilebilirlik sağlar. Seçili durumda bir onay ikonu (`Check`) ve renk değişimi gösterilir. Seçili öğe sayısı sıfırdan büyükse, tetikleyici buton üzerinde bir sayı badge'i ve içerik altında tüm seçimleri temizleyen bir buton (`clearLabel` etiketli, `onChange([])` çağıran) görüntülenir.
 
 **Parametreler**:
-- facet: `{ label: string; options: { value: string; label: string; count: number }[] }` — Filtrelenecek facet grubunun tanımı. `label`, filtre grubunun başlığını; `options` ise içindeki seçeneklerin (değer, etiket, sayı) dizisini tutar.
-- selected: `string[]` — Üst bileşen tarafından yönetilen, o facet grubu için halihazırda seçili olan seçenek değerlerinin dizisi.
-- onChange: `(selected: string[]) => void` — Seçili seçenekler dizisi güncellendiğinde çağrılan callback fonksiyonu. Yeni seçili değerler dizisini parametre olarak alır.
-- clearLabel: `string` — Filtreleri temizleme butonunda görüntülenecek metin (ör. "Temizle", "Tümünü kaldır").
+- `facet`: FacetedFilterProps'tan gelen nesne — Filtrenin etiketini (`label`) ve mevcut seçenekler listesini (`options`) içerir. Her seçenek bir `value`, `label` ve `count` alanına sahiptir.
+- `selected`: FacetedFilterProps'tan gelen dizi — Şu anda seçili olan değerlerin listesidir.
+- `onChange`: FacetedFilterProps'tan gelen fonksiyon — Seçili değerler listesi değiştiğinde çağrılır; yeni seçili değerler dizisini parametre olarak alır.
+- `clearLabel`: FacetedFilterProps'tan gelen string — Tüm seçimleri temizleme butonunda görünen metin ve `aria-label` değeri olarak kullanılır.
 
-**Dönüş**: `ReactNode` — Bileşen, Radix UI Popover içinde filtreleme arayüzünü oluşturan React JSX elemanlarını döndürür.
+**Dönüş**: `ReactNode` — Radix UI Popover yapısıyla oluşturulmuş, tetikleyici buton ve açılır filtre içeriğinden oluşan bir React bileşeni döndürür.
 
 ---
 
@@ -75,23 +82,35 @@ Bu modül için fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzasına
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/components/admin/data-table/FacetedFilter.tsx::FacetedFilter`
-- **params**:
-  - `facet` — `DataTableFacet` tipinde nesne; `.label` filtre başlığını, `.options` filtre seçeneklerini (value, label, count) içerir
-  - `selected` — `string[]` tipinde dizi; şu an seçili olan filtre değerlerini tutar
-  - `onChange` — `(values: string[]) => void` callback fonksiyonu; seçili değerler güncellendiğinde çağrılır
-  - `clearLabel` — `string`; temizle butonunun gösterilecek metin etiketidir
+### [N1_NASIL] AST Pointer: src/components/admin/data-table/FacetedFilter.tsx::FacetedFilter
+- **params**: `facet` (DataTableFacet tipinde, filtre seçeneklerini içerir), `selected` (string dizisi, seçili değerler), `onChange` (fonksiyon, seçili değerler değiştiğinde çağrılır), `clearLabel` (string, temizleme butonu etiketi)
 - **ic_degiskenler**:
-  - `toggle` — inner arrow function `(value: string) => void`; bir değerin seçili diziden eklenmesini veya çıkarılmasını sağlar. `selected` dizisini `includes` ile kontrol eder, varsa `filter` ile kaldırır, yoksa spread ile ekler; her durumda `onChange`'i çağırır
-  - `checked` — `boolean`; `map` iterasyonu içinde her `option` için hesaplanır; `selected.includes(option.value)` sonucu, ilgili seçeneğin işaretli (checkbox) olup olmadığını belirler
-- **Dönüş**: `ReactNode` — Radix UI `Popover` bileşeniyle sarılmış JSX; tetikleyici buton, filtre seçenek listesi ve (seçim varsa) temizle butonunu içeren popup filtre arayüzü render eder
+  - `toggle` — aldığı `value` string parametresini `selected` dizisinde kontrol eder; varsa `selected.filter((v) => v !== value)` ile çıkarır, yoksa `[...selected, value]` ile ekler ve `onChange` çağırır
+  - `checked` — `.map()` callback içinde her `option` için `selected.includes(option.value)` sonucunu tutar; butonun stil sınıfını ve `aria-pressed` niteliğini belirler
+- **Dönüş**: ReactNode (Popover.Root ile sarmalanmış JSX ağacı)
+
+### [N2_NASIL] AST Pointer: src/components/admin/data-table/FacetedFilter.tsx::toggle
+- **params**: `value` (string, eklenip çıkarılacak değer)
+- **ic_degiskenler**:
+  - `selected` — üst kapsamdan yakalanan closure değişkeni; `includes` ile `value` içeriyor mu kontrol edilir
+  - `v` — `filter` callback parametresi; `value` ile eşit olmayan elemanları tutar
+- **Dönüş**: yok (void — yan etki olarak `onChange` çağırır)
+
+### [N3_NASIL] AST Pointer: src/components/admin/data-table/FacetedFilter.tsx::option_map_callback
+- **params**: `option` (facet.options dizisinin tek elemanı; `.value`, `.label`, `.count` alanlarına sahip)
+- **ic_degiskenler**:
+  - `checked` — `selected.includes(option.value)` sonucu; butonun renk sınıfını (`text-admin-accent` / `text-admin-fg`), onay kutusunun arka planını ve `Check` ikonunun görünürlüğünü kontrol eder
+  - `option.value` — butonun `key` niteliği ve `toggle` çağrısına argüman olarak kullanılır
+  - `option.label` — butonun `aria-label` niteliği ve metin içeriği olarak kullanılır
+  - `option.count` — sağ taraftaki sayaç baloncuğunda görüntülenen sayı
+- **Dönüş**: JSX element (tek bir `button` öğesi)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\admin\data-table\FacetedFilter.tsx
-  function: src\components\admin\data-table\FacetedFilter.tsx::FacetedFilter
+  file: FacetedFilter.tsx
+  function: FacetedFilter.tsx::FacetedFilter
 
 ---
 
@@ -107,10 +126,10 @@ Bu modül için fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzasına
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `shadow-glow-sm`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-white/5`, `border-b`, `border-cyan-400`, `border-white/10`, `border-white/5`, `group-hover:bg-white/10`, `hover:bg-white/5`, `hover:text-white`, `stroke-4`, `text-cyan-400`, `text-slate-300`, `text-slate-400`, `text-slate-500`, `text-surface-deep`
+- **Renkler:** `bg-admin-accent`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-accent`, `border-admin-border`, `border-b`, `group-hover:bg-admin-surface-3`, `hover:bg-admin-surface-2`, `hover:text-admin-fg`, `stroke-4`, `text-admin-accent`, `text-admin-accent-fg`, `text-admin-fg`, `text-admin-fg-muted`, `text-xs`
 - **Layout:** `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `h-12`, `h-4`, `h-5`, `h-px`, `inline-flex`, `items-center`, `justify-between`, `justify-center`, `max-h-300px`, `min-w-240px`, `min-w-5`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `${checked`, `:`, `animate-in`, `border`, `cursor-pointer`, `duration-200`, `fade-in`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/40`, `focus-visible:ring-white/10`, `font-black`, `font-bold`, `glass-strong`, `group`, `mb-2`
+- **Yardımcı Sınıflar:** `${checked`, `:`, `animate-in`, `border`, `cursor-pointer`, `duration-200`, `fade-in`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `focus-visible:ring-admin-border`, `font-semibold`, `group`, `mb-2`, `my-3`, `outline-none`

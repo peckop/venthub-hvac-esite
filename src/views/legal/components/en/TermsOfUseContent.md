@@ -2,27 +2,38 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\components\en\TermsOfUseContent.tsx
-skeleton_hash: 798add011f73e53a
+source_path: C:\tmp\wt-supurme\src\views\legal\components\en\TermsOfUseContent.tsx
+skeleton_hash: 901c2fcd180664d0
 entity_hashes:
-  func:TermsOfUseContentEn: fa6bb0a6f0f85b35
-  overview: 964d7e1b007c0dbd
-  style_tokens: 6460a848de07bdf3
-generated_at: 2026-06-19T20:50:36Z
+  func:TermsOfUseContentEn: 2d425a97c4f30297
+  overview: 55f2a6482c0be2a4
+  style_tokens: c2df28d44e819ffd
+generated_at: 2026-08-25T07:48:22Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasının yasal belgeleri arasındaki "Kullanım Koşulları" (Terms of Use) metninin İngilizce versiyonunu sunan bir React bileşenidir. Tek bir amaca hizmet eder: belirli bir dil parametresiyle (örn. 'en') istenen yasal içeriği tarayıcıda görüntülemek.
+
+Bu modül, İngilizce dilindeki Kullanım Şartları (Terms of Use) sayfasının içeriğini görüntülemekten sorumlu bir React bileşeni içerir. `src/views/legal/components/en/` yolunda yer alması, yasal sayfaların dile göre ayrılmış bir yapıda organize edildiğini gösterir. Modül, dışarıdan bir `lang` parametresi alarak dil bağlamında içerik sunar.
 
 ## Fonksiyon Grupları
-### Yasal İçerik Görüntüleme
-Bu grup, uygulamanın yasal metinlerini ve zorunlu koşullarını kullanıcıya sunan temel UI bileşenini barındırır.
+
+### İçerik Görüntüleme Bileşeni
+
+Kullanım Şartları metninin İngilizce versiyonunu kullanıcı arayüzünde render eder. Tek bir bileşenden oluşan modül, yasal içerik sunumunda kullanılan temel yapı taşıdır.
+
 - TermsOfUseContentEn
+
+## Bağımlılıklar
+
+**Dış Bağımlılıklar:** React kütüphanesi (bileşen tipi tanımı için kullanılır).
+
+**İç Bağımlılıklar:** Modülün kendi içinde çağrılan başka bir fonksiyon bulunmuyor.
+
+**Dinamik/Lazy Yüklenen Modüller:** Kaynakta bu yönde bir bilgi yer almıyor.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
 Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
@@ -30,36 +41,58 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### TermsOfUseContentEn
-**Ne yapar**: Bu fonksiyon, uygulamanın Kullanım Koşulları içeriğini, belirli bir dile göre dinamik olarak render eden bir React işlevsel bileşenini (functional component) tanımlar ve döndürür. Fonksiyon, bir dil kodu parametresi alarak içeriğin farklı dil sürümlerini (örneğin İngilizce) sunmasına olanak tanır.
 
-**Nasıl yapar**: Fonksiyon, React.FC (Functional Component) türünde bir bileşen oluşturur. Bu bileşen, `lang` adında bir string prop'u kabul eder. Alınan dil bilgisini kullanarak, ilgili dildeki Kullanım Koşulları metinlerini, maddelerini ve yapısal düzenlemeleri (örneğin段落 başlıkları, listeler) bir JSX yapısı içinde döndürür. Bileşenin içeriği büyük olasılıkla bir dizeler nesnesi (string object) veya modülden import edilen çeviri dosyalarından beslenir.
+**Ne yapar**: İngilizce dilindeki Kullanım Koşulları (Terms of Use) sayfasının içeriğini görüntüleyen bir React fonksiyonel bileşenidir. Bileşen, dil bilgisini parametre olarak alır ve kullanım koşulları metnini kullanıcı arayüzünde sunar.
+
+**Nasıl yapar**: Fonksiyon, destructuring yöntemiyle aldığı `lang` parametresini kullanarak İngilizce kullanım koşulları içeriğini render eder. Bileşenin iç render mantığı ve hangi alt bileşenleri kullandığı kaynakta belirtilmemiştir.
 
 **Parametreler**:
-- `lang`: `string` — Bileşenin render edeceği içeriğin dilini belirtir (örneğin "en", "tr"). Bu değer, bileşenin hangi dil sürümünü göstereceğini kontrol eden anahtardır.
+- lang: string — Bileşenin çalışacağı dili belirten dil kodu. Destructuring ile doğrudan props nesnesinden çıkarılır.
 
-**Dönüş**: `React.FC<{ lang: string }>` — Bu fonksiyon, `lang` prop'unu alan ve Kullanım Koşullarını ilgili dilde döndüren, React işlevsel bileşeninin kendisini döndürür. Bileşen, bir JSX (ReactElement) yapısı render eder.
+**Dönüş**: `React.FC<{ lang: string }>` — `lang` prop'u alan bir React fonksiyonel bileşeni döndürür. `React.FC` (Function Component) tipi, bu fonksiyonun bir React bileşeni olduğunu ve `{ lang: string }` tipinde props beklediğini belirtir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: @/config/legal::legalConfig
+- import: @/config/legal::legalConfigEn
+- import: @/utils/routes::Routes
+- import: @/utils/routes::localizedHref
+- import: next/link::Link
 - import: react::React
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\legal\components\en\TermsOfUseContent.tsx::TermsOfUseContentEn
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde herhangi bir değişken tanımı yapılmamıştır)
-- **Dönüş**: React JSX fragment — yasal kullanım koşullarını 7 bölüm halinde İngilizce olarak gösteren React bileşeni JSX yapısı. Fonksiyon, `legalConfig` modülünden alınan `websiteUrl`, `sellerTitle` ve `lastUpdated` değerlerini dinamik olarak JSX içinde kullanarak yasal metni render eder.
+### [N1_NASIL] AST Pointer: src/views/legal/components/en/TermsOfUseContent.tsx::TermsOfUseContentEn
+- **params**: `lang` — dil kodu, `localizedHref` çağrılarında URL yerelleştirme için kullanılır
+- **ic_degiskenler**:
+  - `legalConfig` — `@/config/legal` dosyasından import edilen `legalConfigEn` nesnesi; satıcı bilgileri ve yapılandırma değerleri sağlar
+  - `legalConfig.websiteUrl` — web sitesi alan adı; `<h2>` başlığında "www.{legalConfig.websiteUrl}" şeklinde gösterilir
+  - `legalConfig.sellerTitle` — satıcı unvanı; hizmet sağlayıcı bölümünde ve fikri mülkiyet bölümünde `<strong>` içinde gösterilir
+  - `legalConfig.sellerAddress` — satıcı adresi; iletişim bilgisi olarak `<strong>` içinde gösterilir
+  - `legalConfig.sellerEmail` — satıcı e-posta adresi; iletişim bilgisi olarak ve yetkisiz kullanım bildirimi yönlendirmesinde `<strong>` içinde gösterilir
+  - `legalConfig.sellerPhone` — satıcı telefon numarası; iletişim bilgisi olarak `<strong>` içinde gösterilir
+  - `legalConfig.mersis` — MERSIS numarası; iletişim bilgisi olarak `<strong>` içinde gösterilir
+  - `legalConfig.tradeRegistryNo` — ticaret sicil numarası; iletişim bilgisi olarak `<strong>` içinde gösterilir
+  - `legalConfig.etbisNo` — ETBIS kayıt numarası; iletişim bilgisi olarak `<strong>` içinde gösterilir
+  - `legalConfig.lastUpdated` — son güncelleme tarihi; değişiklikler bölümünde `<strong>` içinde gösterilir
+  - `localizedHref` — `@/utils/routes` dosyasından import edilen fonksiyon; rota ve dil parametresi alarak yerelleştirilmiş URL üretir
+  - `localizedHref(Routes.legal.mesafeliSatis(), lang)` — Mesafeli Satış Sözleşmesi sayfasının yerelleştirilmiş URL'si; `<Link>` bileşeninin `href` prop'una atanır
+  - `localizedHref(Routes.legal.onBilgilendirme(), lang)` — Ön Bilgilendirme Formu sayfasının yerelleştirilmiş URL'si; `<Link>` bileşeninin `href` prop'una atanır
+  - `localizedHref(Routes.legal.kvkk(), lang)` — KVKK Aydınlatma Metni sayfasının yerelleştirilmiş URL'si; `<Link>` bileşeninin `href` prop'una atanır
+  - `localizedHref(Routes.legal.gizlilik(), lang)` — Gizlilik Politikası sayfasının yerelleştirilmiş URL'si; `<Link>` bileşeninin `href` prop'una atanır
+  - `Routes` — `@/utils/routes` dosyasından import edilen rota tanımları nesnesi; `Routes.legal.mesafeliSatis()`, `Routes.legal.onBilgilendirme()`, `Routes.legal.kvkk()`, `Routes.legal.gizlilik()` metotlarına erişilir
+  - `Link` — `next/link` paketinden import edilen bileşen; hukuki belgelere yönlendirme bağlantılarında kullanılır
+  - `React` — `react` paketinden import edilen modül; JSX dönüşü için kullanılır
+- **Dönüş**: `React.ReactNode` — bir React Fragment (`<>...</>`) içinde 11 adet `<section>` bileşeni döndürür; kullanım koşulları maddelerini (hizmet sağlayıcı, hizmet kapsamı, üyelik, ürün bilgisi, fiyatlandırma, fikri mülkiyet, yasaklı kullanım, sorumluluk reddi, kişisel veriler, uyuşmazlık çözümü, değişiklikler) İngilizce olarak render eder
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\legal\components\en\TermsOfUseContent.tsx
-  function: src\views\legal\components\en\TermsOfUseContent.tsx::TermsOfUseContentEn
+  file: TermsOfUseContent.tsx
+  function: TermsOfUseContent.tsx::TermsOfUseContentEn
 
 ---
 
@@ -77,7 +110,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-industrial-gray`, `text-xl`
+- **Renkler:** `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`
 - **Layout:** (yok)
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `pl-6`, `space-y-1`
+- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `mt-2`, `pl-6`, `space-y-1`, `underline`

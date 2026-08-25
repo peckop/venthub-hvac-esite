@@ -2,48 +2,42 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\RuleScopeTargetPicker.tsx
-skeleton_hash: b1935d9f1f895f0f
+source_path: C:\tmp\wt-supurme\src\components\admin\pricing\RuleScopeTargetPicker.tsx
+skeleton_hash: e267c406eaf62bd0
 entity_hashes:
   func:RuleScopeTargetPicker: f4ade92279a11a9a
   overview: 2f50bfc7ddc59a2a
-  style_tokens: 28af80a09e6e7523
-generated_at: 2026-08-14T09:14:32Z
+  style_tokens: 44e70660b758686a
+generated_at: 2026-08-25T07:25:11Z
 ---
 
 ## Genel Bakış
-RuleScopeTargetPicker, fiyatlandırma kurallarının hangi kapsam (scope) hedeflerine uygulanacağını seçen bir React bileşenidir. Seçilen kapsam türüne göre dinamik bir arayüz sunarak, kullanıcıya kuralların hedef kitlesini (örn. tüm ürünler, belirli bir kategori veya ürün grubu) tanımlama imkanı verir.
+
+RuleScopeTargetPicker, bir fiyatlandırma kuralının kapsam ve hedef seçimini sağlayan bir React bileşenidir. Bileşen, kapsam bilgisine göre uygun hedef seçeneklerini sunar ve kullanıcı seçimini `onChange` geri çağırma fonksiyonu aracılığıyla üst bileşene iletir. Devre dışı bırakma ve hata gösterme desteği de içerir.
 
 ## Fonksiyon Grupları
-### Kapsam Hedefi Seçim Arayüzü
-Bileşen, üst seviyeden gelen kapsam türüne (scope) bağlı olarak uygun hedef seçici arayüzünü (örneğin dropdown, çoklu seçim listesi) oluşturur ve kullanıcının seçtiği hedefi yönetir.
-- RuleScopeTargetPicker
 
-### Bileşen Durumu ve İletişim Yönetimi
-Bileşen, kontrollü (controlled) bir bileşen olarak çalışır; üst bileşenden gelen değer ve durum bilgilerini (seçili değer, devre dışı bırakma, hata) yönetir ve seçim değişimlerini üst bileşene bildirir.
-- scope, value, onChange, disabled, error parametreleri bu yönetim için kullanılır.
+### Bileşen Tanımı
+
+Tek bir bileşenden oluşan modül, kural kapsam-hedef seçimi için kullanıcı arayüzü sağlar. `scope` prop'una bağlı olarak hedef seçeneklerini belirler, `value` ile mevcut seçimi görüntüler ve kullanıcı etkileşimlerini `onChange` üzerinden bildirir. `disabled` ve `error` prop'ları ile erişilebilirlik ve doğrulama desteği sunar.
+
+- RuleScopeTargetPicker
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, bir React bileşeni olup `scope`, `value` ve `onChange` zorunlu props'larına dayanır. Aşağıdaki varsayımlar fonksiyon imzasından türetilmiştir.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan çıkarım yapılabilmektedir.
 
----
+[Aksiyom 1]: Eğer `scope` prop'u sağlanmazsa, bileşen hangi tür hedef seçimi yapacağını bilemez — bileşenin doğru çalışması beklenemez.
 
-**[Aksiyom 1 – Zorunlu Prop Bağımlılığı]:** Eğer `scope` prop'u sağlanmazsa, bileşen hangi kapsam hedeflerini göstereceğini bilemez ve doğru render edilemez.
+[Aksiyom 2]: Eğer `value` prop'u sağlanmazsa, bileşen mevcut seçimi gösteremez — controlled component davranışı bozulur.
 
-**[Aksiyom 2 – Zorunlu Prop Bağımlılığı]:** Eğer `value` prop'u sağlanmazsa, bileşen hangi değerin seçili olduğunu bilemez ve kontrolsüz (uncontrolled) bir bileşen haline gelir; bu durum bileşenin amacına aykırıdır.
+[Aksiyom 3]: Eğer `onChange` prop'u sağlanmazsa, kullanıcı seçimi değiştirdiğinde üst bileşene bildirim yapılamaz — bileşen salt okunur hale gelir.
 
-**[Aksiyom 3 – Callback Bağımlılığı]:** Eğer `onChange` prop'u sağlanmazsa, kullanıcı hedef seçimini değiştirdiğinde üst bileşene bildirim yapılamaz; bileşen işlevsel olarak izole kalır.
+[Aksiyom 4]: Eğer `disabled` true olarak ayarlanmazsa, bileşen varsayılan olarak etkileşimlidir (default: `false`).
 
-**[Aksiyom 4 – Disabled Varsayılanı]:** `disabled` prop'u açıkça `true` olarak verilmediği sürece (`false` varsayılanı ile), bileşen etkileşime açık olarak çalışır.
-
-**[Aksiyom 5 – Error Gösterim Koşulu]:** `error` prop'u `null` (varsayılan) olmadığında, bileşen hata durumunu görsel olarak göstermelidir; `null` olduğunda hata gösterimi yapılmaz.
-
----
-
-> **Not:** Bileşenin gövdesi (function body) paylaşılmadığından, hangi `scope` değerlerinin desteklendiği, `value`'nun beklenen veri tipi veya iç mantık hakkında kesin çıkarım yapılamamıştır. Yukarıdaki aksiyomlar yalnızca fonksiyon imzasından türetilen minimum zorunlulukları ifade eder.
+[Aksiyom 5]: Eğer `error` null'dan farklı bir değer sağlanırsa, bileşen hata durumunu kullanıcıya gösterir — null olduğunda hata gösterilmez (default: `null`).
 
 ---
 
@@ -51,18 +45,18 @@ Bu modül, bir React bileşeni olup `scope`, `value` ve `onChange` zorunlu props
 
 ### RuleScopeTargetPicker
 
-**Ne yapar**: Admin pricing modülünde bir fiyatlandırma kuralının (pricing rule) kapsam hedefinin (scope target) seçilmesini sağlayan React bileşenidir. Kullanıcının mevcut kapsam türüne göre uygun hedefleri seçmesine olanak tanır.
+**Ne yapar**: Kuralların (rules) kapsam ve hedef seçimi için kullanılan bir React bileşenidir. Kullanıcıya belirli bir kapsam (scope) bağlamında hedef değer seçtiren bir arayüz sunar. Fiyatlandırma kurallarının hangi alanlara uygulanacağını belirlemek amacıyla kullanılır.
 
-**Nasıl yapar**: Fonksiyonel bir React bileşenidir (React.FC). Props olarak aldığı `scope` değerine bağlı olarak hangi hedeflerin sunulacağını belirler. Seçim değişikliklerini üst bileşene `onChange` callback'i aracılığıyla iletir. `disabled` prop'u ile pasif duruma getirilebilir, `error` prop'u ile validasyon hataları gösterilebilir.
+**Nasıl yapar**: Bileşen, aldığı `scope` prop'una bağlı olarak uygun seçim arayüzünü render eder. `value` prop'u ile mevcut seçili değeri görüntüler, `onChange` callback'i aracılığıyla kullanıcı seçim yaptığında üst bileşeni bilgilendirir. `disabled` prop'u true olduğunda bileşen etkileşime kapatılır. `error` prop'u dolu bir string olarak geldiğinde hata mesajını kullanıcıya gösterir. Varsayılan olarak `disabled` false, `error` null değerindedir.
 
 **Parametreler**:
-- `scope` — Seçili kapsam türünü belirten değer. Kapsam türüne bağlı olarak bileşen内部hangi hedef seçeneklerin sunulacağını kontrol eder.
-- `value` — Bileşenin controlled olarak yönettiği mevcut seçili hedef değeri.
-- `onChange` — Kullanıcı yeni bir hedef seçtiğinde çağrılan geri çağırma fonksiyonu (callback). Seçilen yeni değeri üst bileşene iletir.
-- `disabled` — `boolean` türünde, varsayılan değeri `false`. Bileşenin etkileşim dışı bırakılıp bırakılmayacağını belirler. `true` olduğunda kullanıcı bileşen üzerinde seçim yapamaz.
-- `error` — `string | null` türünde, varsayılan değeri `null`. Bileşen altında gösterilecek hata mesajını taşır. `null` olduğunda hata gösterilmez.
+- scope: `RuleScope` (veya ilgili kapsam tipi) — Kuralın uygulanacağı kapsam türünü belirtir. Seçilebilir hedeflerin bu kapsama göre filtrelenmesini sağlar.
+- value: `RuleScopeTarget` (veya ilgili hedef tipi) — Seçili olan mevcut hedef değeri temsil eder.
+- onChange: `(value: RuleScopeTarget) => void` — Kullanıcı yeni bir hedef seçtiğinde çağrılan callback fonksiyonudur. Seçilen yeni değeri parametre olarak alır.
+- disabled: `boolean` — Bileşenin etkileşim dışı bırakılıp bırakılmayacağını kontrol eder. Varsayılan değeri `false`'dur.
+- error: `string | null` — Gösterilecek hata mesajını içerir. Varsayılan değeri `null`'dur; null veya boş olmadığında hata mesajı kullanıcıya görüntülenir.
 
-**Dönüş**: `React.FC<RuleScopeTargetPickerProps>` — Tipi tanımlanmış React fonksiyonel bileşeni. Bileşen, kapsam türüne göre filtrelenmiş hedef seçim arayüzü render eder.
+**Dönüş**: `React.FC<RuleScopeTargetPickerProps>` — `RuleScopeTargetPickerProps` arayüzüne uygun props alan bir React fonksiyonel bileşeni döndürür.
 
 ---
 
@@ -109,126 +103,80 @@ Kural kapsamının HEDEF seçicisi (scope ↔ hedef DB CHECK'inin UI karşılı�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::RuleScopeTargetPicker
-- **params**: (scope, value, onChange, disabled = false, error = null)
+### [N1_NASIL] AST Pointer: src/components/admin/pricing/RuleScopeTargetPicker.tsx::RuleScopeTargetPicker
+- **params**: `scope`, `value`, `onChange`, `disabled` (varsayılan: `false`), `error` (varsayılan: `null`)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan dönen çeviri fonksiyonu
-  - `brands` — useState: Marka listesi state'i (BrandOption[]), scope 2 için supabase'den yüklenir
-  - `categories` — useState: Kategori listesi state'i (CategoryOption[]), scope 3 için supabase'den yüklenir
-  - `term` — useState: Ürün arama terimi input değeri
-  - `results` — useState: Arama sonuçları listesi (ProductOption[])
-  - `searching` — useState: Arama devam ediyor mu flag'i (boolean)
-  - `selectedProduct` — useState: Seçili ürün nesnesi veya null (ProductOption | null)
-  - `errorText` — Hata mesajını JSX olarak formatlayan değişken; error prop'u varsa `<p>` elemanı, yoksa null
-- **Dönüş**: JSX — scope değerine göre koşullu render:
-  - `scope === 4`: null (hiçbir şey render etmez)
-  - `scope === 2`: Marka select dropdown UI
-  - `scope === 3`: Kategori select dropdown UI
-  - `scope === 0` veya `1`: Ürün arama input + sonuç listesi UI
+  - `t` — `useI8n()` kancasından alınan çeviri fonksiyonu; UI metinlerini yerelleştirmek için kullanılır
+  - `brands` — `useState<BrandOption[]>([])` ile oluşturulan durum; marka listesini tutar
+  - `setBrands` — `brands` durumunu güncelleyici fonksiyon
+  - `categories` — `useState<CategoryOption[]>([])` ile oluşturulan durum; kategori listesini tutar
+  - `setCategories` — `categories` durumunu güncelleyici fonksiyon
+  - `term` — `useState('')` ile oluşturulan durum; ürün arama terimini tutar
+  - `setTerm` — `term` durumunu güncelleyici fonksiyon
+  - `results` — `useState<ProductOption[]>([])` ile oluşturulan durum; ürün arama sonuçlarını tutar
+  - `setResults` — `results` durumunu güncelleyici fonksiyon
+  - `searching` — `useState(false)` ile oluşturulan durum; arama yapılıp yapılmadığını gösteren boolean
+  - `setSearching` — `searching` durumunu güncelleyici fonksiyon
+  - `selectedProduct` — `useState<ProductOption | null>(null)` ile oluşturulan durum; seçili ürünü tutar
+  - `setSelectedProduct` — `selectedProduct` durumunu güncelleyici fonksiyon
+  - `alive` — useEffect cleanup fonksiyonu içinde bileşen hâlâ aktif mi diye kontrol eden boolean; asenkron işlemlerin iptalini sağlar
+  - `data` — Supabase sorgularından dönen veri; marka, kategori veya ürün bilgilerini içerir
+  - `needle` — `term.trim()` sonucu; arama teriminin boşluklardan arındırılmış hali
+  - `pattern` — `needle`'dan türetilen LIKE deseni; `%` ve `,` karakterleri temizlenip `%` ile çevrelenir
+  - `timer` — `setTimeout` ile oluşturulan zamanlayıcı kimliği; debounce mekanizması için kullanılır
+  - `errorText` — `error` prop'u varsa hata mesajını gösteren JSX elementi, yoksa `null`
+  - `b` — `brands.map()` içindeki her marka nesnesi; `b.id` ve `b.name` kullanılır
+  - `c` — `categories.map()` içindeki her kategori nesnesi; `c.id` ve `c.name` kullanılır
+  - `p` — `results.map()` içindeki her ürün nesnesi; `p.id`, `p.name` ve `p.sku` kullanılır
+- **Dönüş**: `scope` değerine göre farklı JSX elementleri; `scope === 4` ise `null`, `scope === 2` ise marka seçici, `scope === 3` ise kategori seçici, diğer durumlarda ürün arama bileşeni
 
-### [N2_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[scope-2-brands]
-- **params**: () => cleanup fonksiyonu
+### [N2_NASIL] AST Pointer: src/components/admin/pricing/RuleScopeTargetPicker.tsx::useEffect (marka listesi)
+- **params**: (yok — useEffect callback'i)
 - **ic_degiskenler**:
-  - `alive` — Cleanup flag'i: bileşen unmount edildiğinde state güncellemesini engeller
-- **Dönüş**: cleanup fonksiyonu (alive = false)
+  - `alive` — bileşen hâlâ aktif mi diye kontrol eden boolean; cleanup fonksiyonu `false` yapar
+  - `data` — `supabase.from('brands').select('id, name').order('name')` sorgusundan dönen marka verisi
+- **Dönüş**: cleanup fonksiyonu (`() => { alive = false }`)
 
-### [N3_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[scope-2-brands]::async
-- **params**: () => Promise<void>
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — supabase'den brands tablosunu çeker, `setBrands(data)` ile state'i günceller
-
-### [N4_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[scope-2-brands]::cleanup
-- **params**: () => void
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — alive flag'ini false yapar
-
-### [N5_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[scope-3-categories]
-- **params**: () => cleanup fonksiyonu
+### [N3_NASIL] AST Pointer: src/components/admin/pricing/RuleScopeTargetPicker.tsx::useEffect (kategori listesi)
+- **params**: (yok — useEffect callback'i)
 - **ic_degiskenler**:
-  - `alive` — Cleanup flag'i: bileşen unmount edildiğinde state güncellemesini engeller
-- **Dönüş**: cleanup fonksiyonu (alive = false)
+  - `alive` — bileşen hâlâ aktif mi diye kontrol eden boolean; cleanup fonksiyonu `false` yapar
+  - `data` — `supabase.from('categories').select('id, name').order('name')` sorgusundan dönen kategori verisi
+- **Dönüş**: cleanup fonksiyonu (`() => { alive = false }`)
 
-### [N6_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[scope-3-categories]::async
-- **params**: () => Promise<void>
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — supabase'den categories tablosunu çeker, `setCategories(data)` ile state'i günceller
-
-### [N7_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[scope-3-categories]::cleanup
-- **params**: () => void
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — alive flag'ini false yapar
-
-### [N8_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[scope-0-1-selectedProduct]
-- **params**: () => cleanup fonksiyonu
+### [N4_NASIL] AST Pointer: src/components/admin/pricing/RuleScopeTargetPicker.tsx::useEffect (ürün geri yükleme)
+- **params**: (yok — useEffect callback'i)
 - **ic_degiskenler**:
-  - `alive` — Cleanup flag'i: bileşen unmount edildiğinde state güncellemesini engeller
-- **Dönüş**: cleanup fonksiyonu (alive = false)
+  - `alive` — bileşen hâlâ aktif mi diye kontrol eden boolean; cleanup fonksiyonu `false` yapar
+  - `data` — `supabase.from('products').select('id, name, sku').eq('id', value).maybeSingle()` sorgusundan dönen ürün verisi
+- **Dönüş**: cleanup fonksiyonu (`() => { alive = false }`)
 
-### [N9_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[scope-0-1-selectedProduct]::async
-- **params**: () => Promise<void>
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — supabase'den products tablosunda value ID'li ürünü çeker, `setSelectedProduct(data)` ile state'i günceller
-
-### [N10_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[scope-0-1-selectedProduct]::cleanup
-- **params**: () => void
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — alive flag'ini false yapar
-
-### [N11_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[search-debounce]
-- **params**: () => cleanup fonksiyonu
+### [N5_NASIL] AST Pointer: src/components/admin/pricing/RuleScopeTargetPicker.tsx::useEffect (ürün araması)
+- **params**: (yok — useEffect callback'i)
 - **ic_degiskenler**:
-  - `needle` — term'in trim edilmiş hali: arama terimi
-  - `alive` — Cleanup flag'i: timer callback'inde state güncellemesini engeller
-  - `timer` — setTimeout ID'si: debounce için zamanlayıcı referansı
-- **Dönüş**: cleanup fonksiyonu (alive = false, clearTimeout(timer))
+  - `needle` — `term.trim()` sonucu; arama teriminin boşluklardan arındırılmış hali
+  - `alive` — bileşen hâlâ aktif mi diye kontrol eden boolean; cleanup fonksiyonu `false` yapar
+  - `timer` — `setTimeout` ile oluşturulan zamanlayıcı kimliği; 300ms gecikme için kullanılır
+  - `pattern` — `needle`'dan türetilen LIKE deseni; `%` ve `,` karakterleri temizlenip `%` ile çevrelenir
+  - `data` — `supabase.from('products').select('id, name, sku').is('deleted_at', null).or(...).order('name').limit(SEARCH_LIMIT)` sorgusundan dönen ürün verisi
+- **Dönüş**: cleanup fonksiyonu (`() => { alive = false; clearTimeout(timer) }`)
 
-### [N12_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[search-debounce]::timeoutCallback
-- **params**: () => void
+### [N6_NASIL] AST Pointer: src/components/admin/pricing/RuleScopeTargetPicker.tsx::pickProduct
+- **params**: `product` (tip: `ProductOption`)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: void — async arama işlemini başlatır
+- **Dönüş**: yok — `selectedProduct` durumunu `product` yapar, `term`'ü boşaltır, `results`'u boşaltır, `onChange(product.id)` çağırır
 
-### [N13_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[search-debounce]::asyncSearch
-- **params**: () => Promise<void>
-- **ic_degiskenler**:
-  - `pattern` — ILIKE sorgusu için wildcards eklenmiş arama deseni (örn: "%iphone%")
-- **Dönüş**: void — supabase'den products tablosunda name/sku alanlarında arama yapar, `setResults(data ?? [])` ve `setSearching(false)` ile state'leri günceller
-
-### [N14_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::useEffect[search-debounce]::cleanup
-- **params**: () => void
+### [N7_NASIL] AST Pointer: src/components/admin/pricing/RuleScopeTargetPicker.tsx::clearProduct
+- **params**: (yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: void — alive flag'ini false yapar ve timer'ı temizler
-
-### [N15_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::pickProduct
-- **params**: (product: ProductOption)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — selectedProduct state'ini product'a, term'i boş string'e, results'ı boş array'e set eder; onChange(product.id) çağırarak üst bileşene bildirir
-
-### [N16_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::clearProduct
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — selectedProduct'ı null'a, term'i boş string'e, results'ı boş array'e set eder; onChange(null) çağırarak seçimi temizler
-
-### [N17_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::mapBrands
-- **params**: (b: BrandOption)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX `<option>` elemanı — b.id value, b.name görünür metin olarak marka seçeneği render eder
-
-### [N18_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::mapCategories
-- **params**: (c: CategoryOption)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX `<option>` elemanı — c.id value, c.name görünür metin olarak kategori seçeneği render eder
-
-### [N19_NASIL] AST Pointer: RuleScopeTargetPicker.tsx::mapResults
-- **params**: (p: ProductOption)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX `<li>` elemanı — p.name ve pSKU bilgileri ile arama sonucu satırı render eder, pickProduct(p) onClick handler'ı bağlar
+- **Dönüş**: yok — `selectedProduct` durumunu `null` yapar, `term`'ü boşaltır, `results`'u boşaltır, `onChange(null)` çağırır
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\admin\pricing\RuleScopeTargetPicker.tsx
-  function: src\components\admin\pricing\RuleScopeTargetPicker.tsx::RuleScopeTargetPicker
+  file: RuleScopeTargetPicker.tsx
+  function: RuleScopeTargetPicker.tsx::RuleScopeTargetPicker
 
 ---
 
@@ -246,7 +194,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400/5`, `border-cyan-400/20`, `border-white/10`, `focus-visible:bg-white/5`, `hover:bg-white/10`, `hover:bg-white/5`, `hover:text-white`, `text-cyan-400`, `text-left`, `text-rose-400`, `text-slate-400`, `text-slate-500`, `text-sm`, `text-white`, `text-xs`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-surface`, `border-admin-accent/30`, `border-admin-border`, `focus-visible:bg-admin-surface-2`, `hover:bg-admin-surface-2`, `hover:bg-admin-surface-3`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-left`, `text-sm`, `text-xs`
 - **Layout:** `absolute`, `block`, `custom-scrollbar`, `flex`, `gap-3`, `items-center`, `left-4`, `max-h-60`, `overflow-y-auto`, `p-1`, `relative`, `right-4`, `top-1/2`, `w-full`
 - **Varyant/Responsive:** `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `-translate-y-1/2`, `animate-spin`, `border`, `divide-white/5`, `divide-y`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/40`, `font-black`, `font-bold`, `font-mono`, `glass`, `leading-relaxed`, `ml-auto`, `mt-1`
+- **Yardımcı Sınıflar:** `-translate-y-1/2`, `animate-spin`, `border`, `divide-admin-border`, `divide-y`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-bold`, `font-mono`, `font-semibold`, `leading-relaxed`, `ml-auto`, `mt-1`, `px-4`

@@ -2,61 +2,44 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\__tests__\conformance\localized-route-ssot.test.ts
-skeleton_hash: 5f632b805c00b271
+source_path: C:\tmp\wt-supurme\src\__tests__\conformance\localized-route-ssot.test.ts
+skeleton_hash: 24e14938ce6603b7
 entity_hashes:
-  func:stripComments: 93ad94a6946c3886
-  func:toRelPath: 5935533af5852617
+  func:stripComments: 5898506cb94c3dd3
+  func:toRelPath: af61e4aa40b87630
   overview: 856c01d5ddeac4b0
-generated_at: 2026-06-15T17:01:08Z
+generated_at: 2026-08-25T07:49:56Z
 ---
 
 ## Genel Bakış
-Bu modül, lokalize edilmiş rotaların tutarlılığını doğrulayan konformance testleri için yardımcı fonksiyonlar içerir. İki basit yardımcı işlev, test senaryolarında kullanılan kaynak kod analizi ve dosya yolu dönüştürme işlemlerini gerçekleştirir.
+Bu modül, localized-route-ssot (tek doğru kaynak) ile ilgili testleri barındıran bir test dosyasıdır. Dosya kapsamında iki yardımcı fonksiyon tanımlıdır ve bu fonksiyonlar test senaryolarında veri hazırlama/dönüştürme işlemleri için kullanılır.
 
 ## Fonksiyon Grupları
-### Yardımcı Fonksiyonlar (Test Utilities)
-Test senaryolarında veri hazırlama ve dönüştürme işlemleri için kullanılan iki yardımcı fonksiyondan oluşur.
+
+### Test Yardımcıları
+Test süreçlerinde girdi verilerini dönüştürmek ve hazırlamak için kullanılan yardımcı fonksiyonlardır. Bu fonksiyonlar, test mantığını destekleyerek kaynak metinlerden yorum temizleme ve glob anahtarlarını göreceli dosya yollarına çevirme işlevlerini yerine getirir.
 - stripComments, toRelPath
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, yerelleştirilmiş rotaların kaynak doğruluğunu (SSoT) test eden yardımcı fonksiyonlar ve sabitler içerir. Aşağıdaki mimari varsayımlar yalnızca fonksiyon imzaları ve modül sabitlerinden çıkarılmıştır:
-
----
-
-**[Aksiyom 1]:** Eğer `stripComments`'e verilen `source` parametresi geçerli bir metin içermiyorsa, fonksiyon tanımsız davranış gösterir.
-
-**[Aksiyom 2]:** Eğer `toRelPath`'e verilen `globKey` parametresi beklenen glob anahtar formatına uymuyorsa (örn. geçerli bir path deseni içermiyorsa), dönüş değeri anlamsız veya boş bir yol olur.
-
-**[Aksiyom 3]:** Eğer `SOURCES` bir çağrı (call) olarak tanımlıysa, modülün çalışması için bu kaynağın erişilebilir ve döndürdüğü verinin işlenebilir formatta olması gerekir; aksi halde kaynak analizi başarısız olur.
-
-**[Aksiyom 4]:** Eğer `MANUAL_LANG_PREFIX` regex'i dil ön eklerini eşleştirecek şekilde tanımlıysa, test edilen dosya yollarının bu deseni destekleyen yapıda olması gerekir; aksi halde manuel dil önekleri tespit edilemez.
-
-**[Aksiyom 5]:** Eğer `HARDCODED_APP_PATH` regex'i sabit uygulama yollarını eşleştirecek şekilde tanımlıysa, test edilen kaynaklarda bu desenle uyuşmayan hardcoded yollar tespit edilemez.
-
-**[Aksiyom 6]:** Eğer `stripComments` işlevi tek kaynak doğruluğu (SSoT) testi için kullanılıyorsa, fonksiyonun yorum satırlarını tutarlı ve eksiksiz olarak kaldırması gerekir; aksi halde yorum içeren kod blokları yanlış pozitif/negatif sonuçlara yol açar.
-
----
-
-> **Not:** Bu aksiyomlar yalnızca fonksiyon imzaları ve sabit bildirimlerinden türetilmiştir. Fonksiyon gövdelerinin içeriği bilinmediğinden, içsel algoritma varsayımları dahil edilmemiştir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### stripComments
+**Ne yapar**: Kaynak kod metnindeki JavaScript/TypeScript yorumlarını kaldırır. Amaç, açıklayıcı yorumlardaki örnek desenlerin bekçi (guard) mantığını tetiklemesini önlemektir.
 
-**Ne yapar**: TypeScript/JavaScript kaynak kodu içindeki blok ve satır yorumlarını kaldırarak temiz bir metin elde eder. Bu işlev, test senaryolarında açıklayıcı yorumlardaki örnek desenlerin bekçi (guard) mekanizmasını yanlış tetiklemesini önlemek için kullanılır.
-
-**Nasıl yapar**: İki aşamalı regex dönüşümü uygular. Önce `/\*[\s\S]*?\*\//` kalıbı ile çok satırlı blok yorumlarını (`/* ... */`)贪婪 olmayan (non-greedy) eşleşme ile bulup kaldırır. Ardından `/(^|[^:])\/\/.*$/gm` kalıbı ile tek satır yorumlarını silerken, `[^:]` negatif karakter sınıfı sayesinde `http://` gibi protokol belirtecini ve benzeri URL yapılarını koruma altına alır.
+**Nasıl yapar**: İki aşamalı regex değiştirme uygular. İlk olarak `/* ... */` biçimindeki blok yorumları, `[\s\S]*?` ile çok satırlı olacak şekilde ve mümkün olduğunca kısa eşleşecek (lazy) biçimde boş dizeyle değiştirir. İkinci olarak `//` ile başlayan satır içi yorumları kaldırırken, `http://` gibi URL şemalarını korumak amacıyla `//` öncesinde `:` olmayan durumları hedefler; eşleşmenin başındaki yakalanan grubu (`$1`) koruyarak şema işaretini silmez.
 
 **Parametreler**:
-- `source` : `string` — Yorumları kaldırılacak ham kaynak kodu metni
+- source: string — Yorumları kaldırılacak kaynak kod metni
 
-**Dönüş**: `string` — Yorumlardan arındırılmış, temiz kaynak kodu metni
+**Dönüş**: string — Yorumlardan arındırılmış kaynak kod metni
 
 ### toRelPath
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -73,57 +56,83 @@ Bu modül, yerelleştirilmiş rotaların kaynak doğruluğunu (SSoT) test eden y
 ## SABİTLER
 - **SOURCES** (call) — `import.meta.glob('/src/**/*.{ts,tsx}', {
   query: '?raw',
-  import: 'default'...`
+  import: 'defaul...`
+- **LITERAL_LANG_PREFIX** (regex) — `/['"`]\/(?:tr|en)\//`
+- **INFRA_ALLOWLIST** (new_expression) — `new Set<string>([
+  // Dil önekini KURAN altyapının kendisi.
+  'utils/route...`
 - **MANUAL_LANG_PREFIX** (regex) — `/\/\$\{\s*(?:lang|locale)\s*\}/`
 - **HARDCODED_APP_PATH** (regex) — `/\b(?:href|to)\s*[:=]\s*\{?\s*['"`]\/(?:category|products|account|legal|brand...`
+- **RAW_ROUTES_IMPORT** (regex) — `/import\s*\{[^}]*\bRoutes\b[^}]*\}\s*from\s*['"][^'"]*utils\/routes['"]/`
+- **HAS_LOCALIZER** (regex) — `/\b(?:localizedHref|useLocalizedRoutes)\b/`
+- **RAW_ROUTES_ALLOWLIST** (array) — `[
+  'components/admin/',
+  'views/admin/',
+  'components/products/BentPlan...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `__tests__/conformance/localized-route-ssot.test.ts`::stripComments
-- **params**: `(source: string)`
-- **ic_degiskenler**:
-  - `source` — Fonksiyona giren ham kaynak kodu metni.
-- **Dönüş**: `string` — Yorumlardan arındırılmış kaynak kodu.
+### [N1_NASIL] AST Pointer: src/__tests__/conformance/localized-route-ssot.test.ts::stripComments
+- **params**: `source: string` — yorumlardan arındırılacak kaynak kod metni
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — blok yorumları (`/* ... */`) ve satır yorumları (`// ...`) kaldırılmış kaynak kod; `http://` gibi URL şemalarındaki `//` korunur
 
-### [N2_NASIL] AST Pointer: `__tests__/conformance/localized-route-ssot.test.ts`::toRelPath
-- **params**: `(globKey: string)`
+### [N2_NASIL] AST Pointer: src/__tests__/conformance/localized-route-ssot.test.ts::toRelPath
+- **params**: `globKey: string` — dosya glob anahtarı (tam yol)
 - **ic_degiskenler**:
-  - `globKey` — Tam dosya yolu veya glob anahtarı.
-  - `marker` — `'/src/'` literal'i; yolunreedaksiyonu için başlangıç noktasını belirtir.
-  - `idx` — `globKey` içinde `marker`'ın ilk geçtiği indeks, bulunamazsa `-1`.
-- **Dönüş**: `string` — `marker`'dan itibaren `/src/` önekli, ters eğik çizgileri (`\`) düz eğik çizgiye (`/`) dönüştürülmüş göreli yol.
+  - `marker` — `/src/` string sabiti; globKey içinde aranacak yol ayırıcı işaretçi
+  - `idx` — `globKey.indexOf(marker)` sonucu; marker'ın globKey içindeki karakter pozisyonu (-1 ise bulunamadı)
+- **Dönüş**: `string` — globKey'ten `/src/` sonrası çıkarılmış, ters eğik çizgiler (`\`) düz eğik çizgiye (`/`) dönüştürülmüş göreceli dosya yolu
 
-### [N3_NASIL] AST Pointer: `__tests__/conformance/localized-route-ssot.test.ts`::() (ilk test bloğu)
-- **params**: `(yok)`
+### [N3_NASIL] AST Pointer: src/__tests__/conformance/localized-route-ssot.test.ts::(anonim — birinci `it` callback: navigasyon URL'leri SSOT ile localize edilmeli)
+- **params**: yok
 - **ic_degiskenler**:
-  - `manualPrefix` — Elle eklenen dil öneki bulunan dosya yollarını toplayan dizi.
-  - `hardcodedPath` — Sabit app-yolu içeren dosya yollarını toplayan dizi.
-  - `key` — Döngüdeki mevcut `SOURCES` sözlük anahtarı (tam dosya yolu).
-  - `source` — Döngüdeki mevcut `SOURCES` sözlük değeri (kaynak kodu metni).
-  - `rel` — `toRelPath(key)` ile hesaplanmış göreli yol.
-  - `clean` — `stripComments(source)` ile yorumlar temizlenmiş kaynak kodu.
-- **Dönüş**: `void` — Yan etki: `expect` ile test doğrulaması yapar; `manualPrefix` ve `hardcodedPath` dizilerini doldurarak hata mesajı üretir.
+  - `manualPrefix` — `string[]`; `MANUAL_LANG_PREFIX` regex'ine uyan dosya yollarını toplar (elle dil öneki kullanan dosyalar)
+  - `hardcodedPath` — `string[]`; `HARDCODED_APP_PATH` regex'ine uyan dosya yollarını toplar (sabit app-yolu kullanan dosyalar)
+  - `key` — `Object.entries(SOURCES)` döngüsündeki dosya glob anahtarı
+  - `source` — `Object.entries(SOURCES)` döngüsündeki dosya kaynak kodu
+  - `rel` — `toRelPath(key)` sonucu; dosyanın göreceli yolu
+  - `clean` — `stripComments(source)` sonucu; yorumlardan arındırılmış kaynak kod
+- **Dönüş**: yok — `expect({ manualPrefix, hardcodedPath }).toEqual({ manualPrefix: [], hardcodedPath: [] })` ile assertion yapar
 
-### [N4_NASIL] AST Pointer: `__tests__/conformance/localized-route-ssot.test.ts`::() (ikinci test bloğu)
-- **params**: `(yok)`
+### [N4_NASIL] AST Pointer: src/__tests__/conformance/localized-route-ssot.test.ts::(anonim — ikinci `it` callback: altyapı katmanında elle dil öneki yalnız ADLA muaf dosyalarda olabilir)
+- **params**: yok
 - **ic_degiskenler**:
-  - `manualPrefix` — Elle eklenen dil öneki bulunan dosya yollarını toplayan dizi.
-  - `hardcodedPath` — Sabit app-yolu içeren dosya yollarını toplayan dizi.
-  - `key` — Döngüdeki mevcut `SOURCES` sözlük anahtarı (tam dosya yolu).
-  - `source` — Döngüdeki mevcut `SOURCES` sözlük değeri (kaynak kodu metni).
-  - `rel` — `toRelPath(key)` ile hesaplanmış göreli yol.
-  - `clean` — `stripComments(source)` ile yorumlar temizlenmiş kaynak kodu.
-- **Dönüş**: `void` — Yan etki: `expect` ile test doğrulaması yapar; `manualPrefix` ve `hardcodedPath` dizilerini doldurarak hata mesajı üretir.
+  - `offenders` — `string[]`; `INFRA_SCOPE` kapsamına girip `INFRA_ALLOWLIST`'te bulunmayan ve `MANUAL_LANG_PREFIX` veya `LITERAL_LANG_PREFIX` regex'ine uyan dosya yollarını toplar
+  - `key` — `Object.entries(SOURCES)` döngüsündeki dosya glob anahtarı
+  - `source` — `Object.entries(SOURCES)` döngüsündeki dosya kaynak kodu
+  - `rel` — `toRelPath(key)` sonucu; dosyanın göreceli yolu
+  - `clean` — `stripComments(source)` sonucu; yorumlardan arındırılmış kaynak kod
+- **Dönüş**: yok — `expect(offenders).toEqual([])` ile assertion yapar
+
+### [N5_NASIL] AST Pointer: src/__tests__/conformance/localized-route-ssot.test.ts::(anonim — üçüncü `it` callback: INFRA_ALLOWLIST bayat değil)
+- **params**: yok
+- **ic_degiskenler**:
+  - `stale` — `string[]`; bayat (artık geçerli olmayan) muafiyet kayıtlarını toplar
+  - `allowed` — `INFRA_ALLOWLIST` set'indeki her bir muaf dosya göreceli yolu
+  - `entry` — `Object.entries(SOURCES).find(([k]) => toRelPath(k) === allowed)` sonucu; eşleşen `[key, source]` çifti veya `undefined` (dosya artık yoksa)
+  - `clean` — `stripComments(entry[1])` sonucu; yorumlardan arındırılmış kaynak kod
+- **Dönüş**: yok — `expect(stale).toEqual([])` ile assertion yapar
+
+### [N6_NASIL] AST Pointer: src/__tests__/conformance/localized-route-ssot.test.ts::(anonim — dördüncü `it` callback: client/RSC nav bileşeni ham Routes değil localize SSOT kullanmalı)
+- **params**: yok
+- **ic_degiskenler**:
+  - `offenders` — `string[]`; `SCOPE` kapsamına girip `RAW_ROUTES_ALLOWLIST`'te bulunmayan ve `RAW_ROUTES_IMPORT` regex'ine uyan ama `HAS_LOCALIZER` regex'ine uymayan dosya yollarını toplar
+  - `key` — `Object.entries(SOURCES)` döngüsündeki dosya glob anahtarı
+  - `source` — `Object.entries(SOURCES)` döngüsündeki dosya kaynak kodu
+  - `rel` — `toRelPath(key)` sonucu; dosyanın göreceli yolu
+  - `clean` — `stripComments(source)` sonucu; yorumlardan arındırılmış kaynak kod
+- **Dönüş**: yok — `expect(offenders).toEqual([])` ile assertion yapar
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\__tests__\conformance\localized-route-ssot.test.ts
-  function: src\__tests__\conformance\localized-route-ssot.test.ts::stripComments
-  function: src\__tests__\conformance\localized-route-ssot.test.ts::toRelPath
+  file: localized-route-ssot.test.ts
+  function: localized-route-ssot.test.ts::stripComments
+  function: localized-route-ssot.test.ts::toRelPath
 
 ---
 

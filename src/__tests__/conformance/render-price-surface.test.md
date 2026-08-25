@@ -2,78 +2,60 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\__tests__\conformance\render-price-surface.test.ts
-skeleton_hash: 693a0525a7b86293
+source_path: C:\tmp\wt-supurme\src\__tests__\conformance\render-price-surface.test.ts
+skeleton_hash: 451dc0cf1a01084f
 entity_hashes:
-  func:isForbidden: 2ca9b18affed37b8
-  func:normalize: 1e38e13211150a91
+  func:isForbidden: db65f648feccfd64
+  func:normalize: b6698a8944680c7d
   overview: d4039c9c30c7b0eb
-generated_at: 2026-08-15T06:32:35Z
+generated_at: 2026-08-25T07:32:53Z
 ---
 
 ## Genel Bakış
-Bu modül, fiyat yüzeyi (price surface) bileşeninin conformance testlerini destekleyen yardımcı fonksiyonlar içerir. Test senaryolarında kullanılan veri normalizasyonu ve yasaklı içerik kontrolü gibi temel yardımcı işlevleri sağlar.
+
+Bu modül, fiyat yüzeyi (price surface) oluşturma işleminin uygunluk testlerini barındıran bir test dosyasıdır. Dosya kapsamında tanımlanan iki yardımcı fonksiyon, test senaryolarında yol (path) değerlerini düzenlemek ve denetlemek için kullanılır.
 
 ## Fonksiyon Grupları
-### Yardımcı Fonksiyonlar (Test Helpers)
-Test süreçlerinde kullanılan evrensel yardımcı işlevleri tanımlar. Bu fonksiyonlar, test senaryolarının tutarlı ve güvenli bir şekilde çalışmasını sağlamak için veri doğrulama ve dönüştürme işlemleri yapar.
+
+### Yol Düzenleme ve Denetim Yardımcıları
+
+Test senaryolarında kullanılan yol işleme yardımcılarıdır. Birincisi verilen yolu standart bir biçime getirir, ikincisi verilen yolun yasaklı olup olmadığını belirler.
+
 - normalize, isForbidden
+
+### Notlar
+
+- Bu fonksiyonlar arasındaki çağrı ilişkisi kaynakta belirtilmemiştir; birbirlerini çağırıp çağırmadıkları bilinmiyor.
+- Modülün dış bağımlılıkları (hangi modüllerden import ettiği) verilen kaynakta yer almamaktadır.
+- Her iki fonksiyon da test dosyası kapsamında yerel (local) yardımcılar olarak tanımlıdır; dışarıya ihraç edilip edilmedikleri bilinmiyor.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, dosya yollarının normalize edilmesi ve yasak kontrolünden geçirilmesiyle ilgili kuralları tanımlar.
+Bu modül, `normalize` ve `isForbidden` fonksiyonlarını ve ilgili sabit listeleri test eden bir sınama dosyasıdır. Modülün doğru çalışabilmesi için sınanan fonksiyonların ve sabitlerin var olması gerekir.
 
----
-
-[Aksiyom 1 – Normalizasyon Girdisi]: `normalize(p: string)` fonksiyonu yalnızca geçerli bir dosya yolu dizgisi (string) alır.
-→ Eğer `p` geçerli bir dosya yolu formatında değilse, beklenmeyen bir sonuç döner.
-
-[Aksiyom 2 – Normalizasyon Çıktısı]: `normalize` fonksiyonunun çıktısı her zaman bir string olmalıdır.
-→ Eğer normalize edilmiş yol string'e dönüştürülemezse, hata oluşur.
-
-[Aksiyom 3 – Yasak Kontrol Girdisi]: `isForbidden(p: string)` fonksiyonu yalnızca normalize edilmiş bir dosya yolu ile çağrılmalıdır.
-→ Eğer normalize edilmemiş bir yol verilirse, yanlış yasak kararı verilebilir.
-
-[Aksiyom 4 – Yasak Dosya Tanımlı Olmalı]: `FORBIDDEN_FILES` sabiti boş olmamalıdır.
-→ Eğer `FORBIDDEN_FILES` boşsa, hiçbir dosya yasaklanamaz ve `isForbidden` her zaman `false` döner.
-
-[Aksiyom 5 – İzin Listesi Tutarlılığı]: `ALLOWLIST_FILES` ve `ALLOWLIST_PREFIXES` ile `FORBIDDEN_FILES` arasında çakışma olmamalıdır.
-→ Eğer bir dosya hem allowlist'te hem forbidden listesinde yer alırsa, çelişkili karar üretir.
-
-[Aksiyom 6 – Kaynak Tarafı]: `SRC_SOURCES` fonksiyonu yalnızca geçerli bir kaynak listesi döndürmelidir.
-→ Eğer kaynak listesi boşsa, `ALL_PATHS` çağrılamaz ve test verisi üretilmez.
-
-[Aksiyom 7 – Tüm Yolların Üretimi]: `ALL_PATHS` fonksiyonu, `SRC_SOURCES` tarafından sağlanan kaynaklardan yollar üretmelidir.
-→ Eğer kaynaklar geçerli formatта değilse, ALL_PATHS boş veya hatalı sonuç döner.
-
-[Aksiyom 8 – Domain Specific – AllowedPrefix Önceliği]: `ALLOWLIST_PREFIXES`, `FORBIDDEN_FILES`'ı override edebilir.
-→ Bir yol bir allowed prefix ile başlıyorsa, forbidden listesinde olsa bile izin verilir.
+[Aksiyom 1]: Eğer `normalize` fonksiyonu yoksa, bu fonksiyonun davranışını doğrulayan testler çalışamaz.
+[Aksiyom 2]: Eğer `isForbidden` fonksiyonu yoksa, bu fonksiyonun davranışını doğrulayan testler çalışamaz.
+[Aksiyom 3]: Eğer `SRC_SOURCES` ve `ALL_PATHS` çağrıları yoksa, testlerde kullanılacak kaynak ve yol verileri üretilemez.
+[Aksiyom 4]: Eğer `FORBIDDEN_FILES`, `ALLOWLIST_FILES` ve `ALLOWLIST_PREFIXES` dizileri yoksa, `isForbidden` fonksiyonunun sınanması için gerekli referans verileri eksik kalır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### normalize
-**Ne yapar**: Bir dosya yolundaki ters eğik çizgileri (/) ileri eğik çizgilere dönüştürür ve yolun başındaki tüm eğik çizgileri kaldırarak yolu normalize eder.
+**Ne yapar**: Verilen dosya yolunu normalize ederek platform bağımsız standart bir formata dönüştürür. Windows tarzı ters eğik çizgileri (`\`) düz eğik çizgiye (`/`) çevirir ve yolun başındaki gereksiz eğik çizgileri kaldırır.
 
-**Nasıl yapar**: Fonksiyon iki aşamalı bir string dönüşümü gerçekleştirir. Önce `replace` metodu ile tüm ters eğik çizgi (`\`) karakterlerini ileri eğik çizgi (`/`) ile değiştirir, ardından regex `^/+` kalıbı ile yolun başındaki bir veya birden fazla eğik çizgiyi (`/`) boşluk ile değiştirerek kaldırır. Bu sayede Windows ve Unix tabanlı sistemlerde farklılık gösteren yol formatları tek bir standart forma getirilir.
+**Nasıl yapar**: İlk olarak `replace` metodu ile tüm ters eğik çizgileri (`\`) düz eğik çizgiye (`/`) dönüştürür. Ardından RegExp kalıbı `/^\/+/` kullanarak yolun başındaki bir veya daha fazla eğik çizgiyi boş string ile değiştirir. Bu sayede hem platform farkları ortadan kalkar hem de göreli yollar elde edilir.
 
 **Parametreler**:
-- `p`: `string` — Normalize edilecek dosya yolu dizgesi. Windows tarzı ters eğik çizgiler veya baştaki fazla eğik çizgiler içerebilir.
+- p: string — Normalize edilecek dosya yolu string'i
 
-**Dönüş**: `string` — Normalize edilmiş, ileri eğik çizgiler kullanılan ve baştaki fazla eğik çizgilerden arındırılmış temiz dosya yolu.
+**Dönüş**: string — Normalize edilmiş, ters eğik çizgilerden arındırılmış ve baştaki eğik çizgileri kaldırılmış dosya yolu
 
 ### isForbidden
-**Ne yapar**: Verilen dosya yolunun yasaklanan dosyalar listesinde veya yasaklanan ön eklerle başlayıp başlamadığını kontrol eder.
-
-**Nasıl yapar**: Fonksiyon iki ayrı kontrol gerçekleştirir. İlk olarak `FORBIDDEN_FILES` adlı dizide (dışarıda tanımlı sabit) yer alan dosya isimleriyle doğrudan eşleşme olup olmadığını `includes` metodu ile kontrol eder. Eşleşme bulunursa hemen `true` döner. Eşleşme bulunmazsa `FORBIDDEN_PREFIXES` adlı dizideki (dışarıda tanımlı sabit) her bir ön eki sırasıyla `startsWith` metodu ile yolun başında olup olmadığını test eder. Herhangi bir ön ek ile başlayan bir eşleşme bulunursa `true`, aksi halde `false` döner. Fonksiyon kısa devre mantığı (short-circuit) ile çalışarak ilk eşleşmede durur.
-
-**Parametreler**:
-- `p`: `string` — Kontrol edilecek dosya yolu veya dosya adı dizgesi.
-
-**Dönüş**: `boolean` — Dosya yolu yasaklıysa `true`, yasaklı değilse `false`.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -87,103 +69,74 @@ Bu modül, dosya yollarının normalize edilmesi ve yasak kontrolünden geçiril
 ## SABİTLER
 - **SRC_SOURCES** (call) — `import.meta.glob(
   '/src/**/*.{ts,tsx}',
-  { query: '?raw', import: 'default...`
+  { query: '?raw', import: 'defau...`
 - **ALL_PATHS** (call) — `Object.keys(SRC_SOURCES).map(normalize)`
 - **FORBIDDEN_FILES** (array) — `[
   'src/components/products/FamilyCard.tsx',
-  'src/views/ProductsDiscoveryV...`
+  'src/views/ProductsDiscover...`
 - **ALLOWLIST_FILES** (array) — `[
   'src/app/_components/ProductDetailPageView.tsx',
-  'src/components/produc...`
+  'src/components/prod...`
 - **ALLOWLIST_PREFIXES** (array) — `[
   'src/views/checkout/',
-  // `src/components/cart/**` bu kod tabanında hen...`
+  // `src/components/cart/**` bu kod tabanında h...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\__tests__\conformance\render-price-surface.test.ts::normalize
-- **params**: (p: string)
-- **ic_degiskenler**:
-- **Dönüş**: string — Windows backslash'larını forward slash'a çevirip baştaki slash'leri temizler
+### [N1_NASIL] AST Pointer: render-price-surface.test.ts::normalize
+- **params**: `p` — normalize edilecek dosya yolu (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: string — ters eğik çizgileri düz eğik çizgiye dönüştürülmüş ve baştaki eğik çizgileri kaldırılmış dosya yolu
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\__tests__\conformance\render-price-surface.test.ts::isForbidden
-- **params**: (p: string)
-- **ic_degiskenler**:
-- **Dönüş**: boolean — Verilen yasaklı dosya listesi ve yasaklı prefix listesi ile kontrol eder
+### [N2_NASIL] AST Pointer: render-price-surface.test.ts::isForbidden
+- **params**: `p` — kontrol edilecek dosya yolu (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: boolean — `p` değeri `FORBIDDEN_FILES` dizisinde varsa veya `FORBIDDEN_PREFIXES` dizisindeki herhangi bir önek ile başlıyorsa `true`, aksi halde `false`
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\__tests__\conformance\render-price-surface.test.ts::test_callback_1
-- **params**: () 
+### [N3_NASIL] AST Pointer: render-price-surface.test.ts::(anonim — stale-guard testleri)
+- **params**: yok
 - **ic_degiskenler**:
-  - `f` — Döngüdeki mevcut yasaklı dosya adı, ALL_PATHS'de olup olmadığı kontrol edilir
-  - `prefix` — Döngüdeki mevcut yasaklı prefix, ALL_PATHS'de en az bir dosya başlatıp başlatmadığı kontrol edilir
-  - `f` (ALLOWLIST_FILES döngüsü) — Döngüdeki mevcut izinli dosya adı
-  - `prefix` (ALLOWLIST_PREFIXES döngüsü) — Döngüdeki mevcut izinli prefix
-  - `offenders` — formatCurrency() çağrısı bulunan yasaklı yüzey dosyalarını toplar
-  - `file` — Object.entries(SRC_SOURCES) döngüsündeki dosya adı anahtarı
-  - `source` — Object.entries(SRC_SOURCES) döngüsündeki dosya içeriği değeri
-  - `p` — normalize(file) ile normalize edilmiş dosya yolu
-  - `offenders` (Set ile tekrarlar kaldırılmış) — Benzersiz ihlal eden dosya listesi
-- **Dönüş**: yok — Test asertifleri ile yasaklı/izinli listelerin güncelliğini ve fiyat gösterim kurallarını doğrular
+  - `f` — `FORBIDDEN_FILES` dizisinin her elemanı (döngü değişkeni)
+  - `prefix` — `FORBIDDEN_PREFIXES` dizisinin her elemanı (döngü değişkeni)
+- **Dönüş**: yok — yan etki olarak `expect` çağrılarıyla yasak liste elemanlarının `ALL_PATHS` içinde varlığını doğrular
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\__tests__\conformance\render-price-surface.test.ts::test_callback_2
-- **params**: ()
+### [N4_NASIL] AST Pointer: render-price-surface.test.ts::(anonim — izin listesi stale-guard)
+- **params**: yok
 - **ic_degiskenler**:
-  - `f` — Döngüdeki mevcut yasaklı dosya adı
-  - `prefix` — Döngüdeki mevcut yasaklı prefix
-- **Dönüş**: yok — Sadece FORBIDDEN_FILES ve FORBIDDEN_PREFIXES listelerinin güncelliğini doğrular
+  - `f` — `ALLOWLIST_FILES` dizisinin her elemanı (döngü değişkeni)
+  - `prefix` — `ALLOWLIST_PREFIXES` dizisinin her elemanı (döngü değişkeni)
+- **Dönüş**: yok — yan etki olarak `expect` çağrılarıyla izin listesi elemanlarının `ALL_PATHS` içinde varlığını doğrular
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\__tests__\conformance\render-price-surface.test.ts::test_callback_3
-- **params**: ()
+### [N5_NASIL] AST Pointer: render-price-surface.test.ts::(anonim — formatCurrency kaçak taraması)
+- **params**: yok
 - **ic_degiskenler**:
-  - `f` — Döngüdeki mevcut izinli dosya adı
-  - `prefix` — Döngüdeki mevcut izinli prefix
-- **Dönüş**: yok — Sadece ALLOWLIST_FILES ve ALLOWLIST_PREFIXES listelerinin güncelliğini doğrular
+  - `offenders` — yasak yüzeylerde `formatCurrency(` çağrısı bulunan dosya yollarını toplayan dizi (string[])
+  - `file` — `SRC_SOURCES` nesnesinin anahtarları (döngü değişkeni, dosya yolu)
+  - `source` — `SRC_SOURCES` nesnesinin değerleri (döngü değişkeni, dosya içeriği)
+  - `p` — `normalize(file)` sonucu, normalize edilmiş dosya yolu
+- **Dönüş**: yok — yan etki olarak yasak yüzeylerde `formatCurrency(...)` çağrısı bulunmamasını doğrular
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\__tests__\conformance\render-price-surface.test.ts::test_callback_4
-- **params**: ()
+### [N6_NASIL] AST Pointer: render-price-surface.test.ts::(anonim — ProductCard hidePrice kontrolü)
+- **params**: yok
 - **ic_degiskenler**:
-  - `offenders` — formatCurrency() çağrısı bulunan yasaklı yüzey dosyalarını toplar
-  - `file` — Object.entries(SRC_SOURCES) döngüsündeki dosya adı anahtarı
-  - `source` — Object.entries(SRC_SOURCES) döngüsündeki dosya içeriği değeri
-  - `p` — normalize(file) ile normalize edilmiş dosya yolu
-  - `offenders` (Set ile tekrarlar kaldırılmış) — Benzersiz ihlal eden dosya listesi
-- **Dönüş**: yok — Yasaklı yüzeylerde formatCurrency() kullanımını kontrol eder
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\__tests__\conformance\render-price-surface.test.ts::test_callback_5
-- **params**: ()
-- **ic_degiskenler**:
-  - `offenders` — hidePrice prop'u geçmeyen ProductCard çağrılarını toplar
-  - `callsiteCount` — Bulunan toplam ProductCard çağrı yeri sayısı
-  - `file` — Object.entries(SRC_SOURCES) döngüsündeki dosya adı anahtarı
-  - `source` — Object.entries(SRC_SOURCES) döngüsündeki dosya içeriği değeri
-  - `p` — normalize(file) ile normalize edilmiş dosya yolu
-  - `re` — ProductCard etiketlerini eşleştiren regex deseni
-  - `m` — source.matchAll(re) ile bulunan her bir regex eşleşmesi
-  - `offenders` (Set ile tekrarlar kaldırılmış) — Benzersiz ihlal eden dosya listesi
-- **Dönüş**: yok — Tüm ProductCard çağrılarının hidePrice prop'unu geçtiğini doğrular
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\__tests__\conformance\render-price-surface.test.ts::test_callback_6
-- **params**: ()
-- **ic_degiskenler**:
-  - `offenders` — hidePrice prop'u geçmeyen ProductCard çağrılarını toplar
-  - `callsiteCount` — Bulunan toplam ProductCard çağrı yeri sayısı
-  - `file` — Object.entries(SRC_SOURCES) döngüsündeki dosya adı anahtarı
-  - `source` — Object.entries(SRC_SOURCES) döngüsündeki dosya içeriği değeri
-  - `p` — normalize(file) ile normalize edilmiş dosya yolu
-  - `re` — ProductCard etiketlerini eşleştiren regex deseni
-  - `m` — source.matchAll(re) ile bulunan her bir regex eşleşmesi
-  - `offenders` (Set ile tekrarlar kaldırılmış) — Benzersiz ihlal eden dosya listesi
-- **Dönüş**: yok — Sadece ProductCard çağrılarının hidePrice prop'unu geçtiğini doğrular (aynı test, farklı kapsam)
+  - `offenders` — `hidePrice` prop'u geçirilmeyen `ProductCard` çağıran dosya yollarını toplayan dizi (string[])
+  - `callsiteCount` — bulunan toplam `ProductCard` çağrı yeri sayısı (number)
+  - `file` — `SRC_SOURCES` nesnesinin anahtarları (döngü değişkeni, dosya yolu)
+  - `source` — `SRC_SOURCES` nesnesinin değerleri (döngü değişkeni, dosya içeriği)
+  - `p` — `normalize(file)` sonucu, normalize edilmiş dosya yolu
+  - `re` — `<ProductCard` JSX açılış etiketini yakalayan regex deseni
+  - `m` — `source.matchAll(re)` sonucu yakalanan eşleşme (döngü değişkeni)
+- **Dönüş**: yok — yan etki olarak `PRODUCT_CARD_CALLSITE_EXEMPT` hariç tüm `ProductCard` çağıranların `hidePrice` prop'u geçirdiğini doğrular; ayrıca hiç çağrı yeri bulunamaması durumunda testi başarısız kılar
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\__tests__\conformance\render-price-surface.test.ts
-  function: src\__tests__\conformance\render-price-surface.test.ts::normalize
-  function: src\__tests__\conformance\render-price-surface.test.ts::isForbidden
+  file: render-price-surface.test.ts
+  function: render-price-surface.test.ts::normalize
+  function: render-price-surface.test.ts::isForbidden
 
 ---
 

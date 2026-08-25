@@ -2,96 +2,73 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\shell\AdminSidebar.tsx
-skeleton_hash: 2872ee61e5a8e971
+source_path: C:\tmp\wt-supurme\src\components\admin\shell\AdminSidebar.tsx
+skeleton_hash: f6d6b0b8f97bec54
 entity_hashes:
-  func:AdminMobileNav: 45e2662b9e86fcab
-  func:AdminSidebar: c4e2cb2739adbf73
-  func:NavList: 8231bce5e6ac03eb
-  overview: a322d7df5940602e
-  style_tokens: febe6b3c011e8575
-generated_at: 2026-08-15T11:54:24Z
+  func:AdminMobileNav: 2796687b9805241d
+  func:AdminSidebar: 56939624b9898a40
+  func:NavList: 26f7e965010c847c
+  overview: a33b54ba73b627ed
+  style_tokens: bc5af71be1a20afb
+generated_at: 2026-08-25T07:25:24Z
 ---
 
 ## Genel Bakış
 
-Bu modül, admin panelinin sidebar navigasyon yapısını oluşturur. Masaüstü ve mobil olmak üzere iki farklı navigasyon deneyimi sunar ve kullanıcı izinlerine göre menü öğelerinin görünürlüğünü kontrol eder. Modül, collapsed (daraltılmış) mod, yol tabanlı aktif durum belirleme ve navigasyon yönlendirme gibi temel sidebar davranışlarını yönetir.
+Bu modül, admin panelinin yan menü (sidebar) navigasyonunu yönetir. Masaüstü ve mobil olmak üzere iki farklı görünüm sunar ve kullanıcının yetkilerine göre erişilebilir menü öğelerini filtreler. `NavList` bileşeni her iki görünümde de ortak navigasyon listesini render eder.
 
 ## Fonksiyon Grupları
 
-### Paylaşılan Navigasyon Listesi
-Ortak navigasyon menü yapısını ve izin kontrolü ile filtrelenmiş menü öğelerini render eder. Hem masaüstü hem mobil sidebar tarafından kullanılan temel bileşendir.
-- `NavList`
+### Navigasyon Listesi
+Ortak navigasyon öğelerini listeleyen ve kullanıcı etkileşimlerini üst bileşene ileten yardımcı bileşendir. Masaüstü ve mobil görünümler bu bileşeni ortak olarak kullanır.
+- NavList
 
-### Masaüstü Sidebar
-Genişletilmiş ve daraltılmış olmak üzere iki durumda çalışan masaüstü navigasyon panelini yönetir. Sayfa yoluna göre aktif menü öğesini belirler.
-- `AdminSidebar`
-
-### Mobil Navigasyon
-Açılır/kapanır yaprak menü (drawer) formatında mobil navigasyon deneyimini sunar. Dışarıdan kontrol edilen açık/kapalı durumu ile birlikte aynı izin tabanlı menü yapısını kullanır.
-- `AdminMobileNav`
+### Ana Görünüm Bileşenleri
+Admin panelinin masaüstü sidebar'ını ve mobil navigasyon menüsünü oluşturan üst düzey bileşenlerdir. Her ikisi de mevcut sayfa yolunu (`pathname`), yetki durumunu (`canAccess`) alır; mobil bileşen ayrıca menü açıklık durumunu (`open`) ve değişim yardımcısını (`onOpenChange`) parametre olarak kabul eder.
+- AdminSidebar, AdminMobileNav
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, admin paneli navigasyon yapısını (sidebar, mobil navigasyon) ve erişim kontrolünü yönetir. Aşağıdaki mimari varsayımlar fonksiyon imzalarından türetilmiştir.
+Fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çıkarılabilecek sınırlı varsayımlar mevcuttur.
 
----
+[Aksiyom 1]: Eğer `pathname` prop'u sağlanmazsa, `NavList`, `AdminSidebar` ve `AdminMobileNav` bileşenlerinin hangi rotada olduğunu belirleyemez; navigasyon vurgulama (active state) davranışı tanımsız kalır.
 
-**[Aksiyom 1]:** Eğer `canAccess` fonksiyonu (`(key: string) => boolean`) sağlanmazsa, navigasyon öğelerinin kullanıcı için erişilebilir olup olmadığı belirlenemez ve tüm menü öğeleri ya tamamen görünür ya da tamamen gizli olur.
+[Aksiyom 2]: Eğer `canAccess` prop'u sağlanmazsa, `NavList`, `AdminSidebar` ve `AdminMobileNav` bileşenlerinin erişim kontrolü yapılamaz; hangi menü öğelerinin gösterileceği belirlenemez.
 
-**[Aksiyom 2]:** Eğer `pathname` (`string`) sağlanmazsa veya geçerli bir rota yolu içermemezse, aktif/sayfada bulunulan navigasyon öğesi vurgulanamaz (highlight edilemez).
+[Aksiyom 3]: Eğer `collapsed` prop'u sağlanmazsa, `NavList` ve `AdminSidebar` bileşenlerinin daraltılmış/genişletilmiş durumu bilinemez; görünüm davranışı tanımsız kalır.
 
-**[Aksiyom 3]:** Eğer `collapsed` (`boolean`) `AdminSidebar` bileşenine iletilmezse, sidebar'ın geniş/dar durumu belirsizleşir ve `NavList` bileşeni ikon-only (dar) mı yoksa ikon+etiket (geniş) mı gösterileceğini bilemez.
+[Aksiyom 4]: Eğer `onNavigate` prop'u sağlanmazsa, `NavList` bileşeni tıklama olaylarını üst bileşene iletemez; navigasyon tetiklenemez.
 
-**[Aksiyom 4]:** Eğer `onNavigate` (`() => void`) `NavList` bileşenine sağlanmazsa, kullanıcı navigasyon öğelerine tıkladığında herhangi bir rota değişikliği tetiklenemez.
+[Aksiyom 5]: Eğer `open` prop'u sağlanmazsa, `AdminMobileNav` bileşeninin açık/kapalı durumu bilinemez; mobil menü görünürlüğü tanımsız kalır.
 
-**[Aksiyom 5]:** Eğer `open` (`boolean`) ve `onOpenChange` (`(open: boolean) => void`) `AdminMobileNav` bileşenine sağlanmazsa, mobil navigasyon panelinin açılıp kapanması kontrol edilemez — panel ya hep açık ya da hep kapalı kalır.
+[Aksiyom 6]: Eğer `onOpenChange` prop'u sağlanmazsa, `AdminMobileNav` bileşeni açık/kapalı durum değişikliğini üst bileşene bildiremez; mobil menü kapatılamaz.
 
-**[Aksiyom 6]:** Eğer `NAV_ITEM_BASE` sabiti (`binary_expression`) tanımsız veya bozuksa, navigasyon öğelerinin temel yapılandırma şablonu (ortalama: ikon, etiket, rota, izin anahtarı) oluşturulamaz ve menü listesi render edilemez.
+[Aksiyom 7]: `NAV_ITEM_BASE` sabiti tanımlı değilse, menü öğelerinin temel stil/özellik ataması yapılamaz; görünüm davranışı tanımsız kalır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### NavList
-**Ne yapar**: Yönetim paneli navigasyon menüsünü oluşturarak kullanıcıya yetkili kaynakları gruplanmış ve filtrelenmiş şekilde sunar. Mevcut rotayı belirleyerek aktif ve atalar menü öğelerini görsel olarak vurgular.
+**Ne yapar**: Admin panelinin navigasyon menüsünü oluşturan bileşendir. RBAC (Role-Based Access Control) yetkilendirme kontrolü uygulayarak, kullanıcının erişim yetkisi olmayan kaynakları listeden tamamen gizler. Görünür bir link gösterip ardından AccessDenied ekranı sunma yaklaşımı reddedilmiştir (kaynakta §2.4 / denetim bulgusu D8 olarak belirtilmiştir).
 
-**Nasıl yapar**: `useI18n()` hook'u ile çeviri fonksiyonunu alır. `React.useMemo` ile pathname'e göre mevcut kaynağı belirler. `ADMIN_NAV_GROUPS` dizisini iterate ederek her grup için `ADMIN_RESOURCES` içinden `inNav` ve `group` filtresi uygulanır, ardından `canAccess` fonksiyonu ile RBAC katmanı kontrolü yapılır (§2.4 referansı ile). Boş gruplar filtrelenir. `renderItem` fonksiyonu her kaynak için Link bileşeni oluşturur, `aria-current` ve `data-active-ancestor` özellikleri ile erişilebilirlik sağlar. Daraltma durumunda (collapsed) sadece ikon görünür, etiketler `sr-only` sınıfı ile gizlenir.
+**Nasıl yapar**: `useI18n` kancasıyla uluslararasılaştırma desteği alır. `React.useMemo` ile mevcut rotayı (`pathname`) hesaplar ve `ADMIN_NAV_GROUPS` dizisindeki her grubu, `ADMIN_RESOURCES` filtresinden geçirir. Filtreleme kriterleri: kaynağın `inNav` özelliği true olmalı, grubun `key` değeri eşleşmeli ve `canAccess` fonksiyonu o kaynağın `requiredAccess` değeriyle çağrıldığında true dönmelidir. Hiç öğesi kalmayan gruplar da listeden çıkarılır. `renderItem` fonksiyonu her kaynak için bir `<li>` içinde `<Link>` oluşturur; mevcut rota eşleşiyorsa `aria-current="page"` atanır, ata kaynaklar için `data-active-ancestor="true"` atanır (MDN yönergesine göre yalnız yaprak öğe `aria-current` alır, ata sadece görsel vurgu alır). `collapsed` durumuna göre ikon-only görünüm veya etiketli görünüm sağlanır; CSS sınıf isimleri (`NAV_ITEM_BASE`, `NAV_ITEM_ACTIVE`, `NAV_ITEM_ANCESTOR`, `NAV_ITEM_IDLE`) kaynak kodda tanımlı sabitlerdir.
 
 **Parametreler**:
-- pathname: string — Mevcut URL rotası, aktif menü öğesini belirlemek için kullanılır
-- collapsed: boolean — Sidebar'ın daraltılıp daraltılmadığını belirler, true olduğunda menü sadece ikonları gösterir
-- canAccess: (access: string) => boolean — RBAC kontrolü yapan fonksiyon, kullanıcının belirli bir kaynağa erişim izni olup olmadığını döndürür
-- onNavigate: () => void — Menü öğesine tıklandığında çağrılan回调 fonksiyonu, mobilde drawer'ı kapatmak için kullanılır
+- pathname: string — Mevcut URL yolu; hangi kaynağın aktif olduğunu belirlemek için kullanılır.
+- collapsed: boolean — Kenar çubuğunun daraltılmış durumda olup olmadığını belirtir; true olduğunda yalnız ikonlar gösterilir, etiketler `sr-only` sınıfıyla gizlenir.
+- canAccess: (access: string) => boolean — RBAC yetki kontrol fonksiyonu; verilen erişim anahtarına sahip olup olmadığını boolean olarak döndürür.
+- onNavigate: () => void — Navigasyon linklerine tıklandığında çağrılan geri çağırım fonksiyonu.
 
-**Dönüş**: React JSX elementi — Gruplandırılmış ve filtrelenmiş navigasyon listesini içeren div yapısı döndürür
+**Dönüş**: Belirtilmemiş. React bileşeni olduğundan JSX ağacı üretir.
 
 ### AdminSidebar
-**Ne yapar**: Masaüstü cihazlarda (≥768px) sabit sol navigasyon panelini oluşturur, mobil cihazlarda tamamen gizlidir. Daraltılabilir yapı ile hem tam genişlik hem de dar modda çalışır.
-
-**Nasıl yapar**: `useI18n()` hook'u ile çeviri fonksiyonunu alır. `collapsed` prop'una göre genişlik sınıfını (`w-admin-rail` veya `w-admin-nav`) belirler. Ana container `relative hidden md:block` sınıfları ile sadece masaüstünde görünür hale gelir. İki katmanlı yapı kullanır: akıştaki yer tutucu div (daralan kutu) ve fixed pozisyonlu gerçek navigasyon paneli. `data-state` özelliği ile durum bilgisini taşır. `transition-width` sınıfı ile genişlik değişimlerini animasyonlu yapar. `overflow-y-auto` ile içeriğin taşması durumunda kaydırma çubuğu ekler.
-
-**Parametreler**:
-- pathname: string — Mevcut URL rotası, NavList bileşenine iletilir
-- collapsed: boolean — Sidebar'ın daraltılıp daraltılmadığını belirler, genişlik ve animasyon sınıflarını etkiler
-- canAccess: (access: string) => boolean — RBAC kontrolü yapan fonksiyon, NavList bileşenine iletilir
-
-**Dönüş**: React JSX elementi — Sabit pozisyonlu, daraltılabilir navigasyon paneli döndürür. Masaüstü cihazlarda görünür, mobilde gizlidir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### AdminMobileNav
-**Ne yapar**: Mobil cihazlarda (<768px) overlay drawer yapısında navigasyon menüsünü sunar. Radix Dialog kullanarak erişilebilirlik özelliklerini (focus trap, ESC tuşu, body scroll lock) otomatik sağlar.
-
-**Nasıl yapar**: `Dialog.Root` bileşeni ile kontrol edilen overlay yapısı oluşturur. `Dialog.Portal` içinde `Dialog.Overlay` (siyah yarı saydam backdrop) ve `Dialog.Content` (ana drawer paneli) bulunur. `aria-modal="true"` özelliği elle eklenir (Radix'in otomatik eklemediği belirtilmiş). `Dialog.Title` ve `Dialog.Description` bileşenleri `sr-only` sınıfı ile ekran okuyuculara bilgi verirken görselde gizlidir. NavList bileşenini `collapsed={false}` olarak çağırır, `onNavigate` callback'i drawer'ı kapatmak için `onOpenChange(false)` fonksiyonunu tetikler. `md:hidden` sınıfı ile sadece mobil cihazlarda görünür.
-
-**Parametreler**:
-- open: boolean — Drawer'ın açık olup olmadığını kontrol eder
-- onOpenChange: (open: boolean) => void — Drawer durumu değiştiğinde çağrılan callback, açma/kapatma işlemlerini yönetir
-- pathname: string — Mevcut URL rotası, NavList bileşenine iletilir
-- canAccess: (access: string) => boolean — RBAC kontrolü yapan fonksiyon, NavList bileşenine iletilir
-
-**Dönüş**: React JSX elementi — Mobil cihazlar için overlay drawer navigasyon yapısı döndürür. Radix Dialog ile erişilebilirlik özellikleri otomatik olarak sağlanır.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -132,31 +109,31 @@ Bu modül, admin paneli navigasyon yapısını (sidebar, mobil navigasyon) ve er
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: components/admin/shell/AdminSidebar.tsx::NavList
-- **params**: (`pathname`: mevcut rota yolu, `collapsed`: sidebar daralmış durum mu, `canAccess`: RBAC erişim kontrol fonksiyonu, `onNavigate`: navigasyon tıklama handler'ı)
+### [N1_NASIL] AST Pointer: src/components/admin/shell/AdminSidebar.tsx::NavList
+- **params**: `pathname` (string — mevcut URL yolu), `collapsed` (boolean — sidebar daraltılmış mı), `canAccess` (fonksiyon — RBAC erişim kontrolü), `onNavigate` (fonksiyon — tıklama callback'i, opsiyonel)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çevirme fonksiyonu
-  - `current` — pathname'e göre aktif kaynak objesi (React.useMemo ile memoize edilmiş)
-  - `groups` — ADMIN_NAV_GROUPS dizisinin canAccess filtresinden geçirilmiş, gruplandırılmış ve boş grupları filtrelenmiş hali (React.useMemo ile memoize edilmiş)
-  - `renderItem` — her AdminResource için JSX render fonksiyonu
-  - `isCurrent` — resource.key'nin current?.key'e eşit olup olmadığı (mevcut sayfa kontrolü)
-  - `isAncestor` — resource'un mevcut sayfanın atası olup olmadığı (görsel vurgu için)
-  - `label` — resource.labelKey'in çevirilmiş metni
-  - `Icon` — resource.icon bileşeni
-- **Dönüş**: JSX (navigasyon listesi)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `resource.labelKey` ve `group.labelKey` anahtarlarını yerel metne çevirir
+  - `current` — `React.useMemo` ile hesaplanan, `findCurrentResource(pathname)` çağrısının sonucu; mevcut rotaya karşılık gelen `AdminResource` nesnesi (veya `undefined`)
+  - `groups` — `React.useMemo` ile hesaplanan dizi; `ADMIN_NAV_GROUPS` elemanlarını `ADMIN_RESOURCES` ile birleştirip `canAccess(r.requiredAccess)` ile yetkisiz kaynakları eler, boş grupları da `filter` ile düşürür
+  - `renderItem` — `(resource: AdminResource) => JSX.Element` fonksiyonu; tek bir navigasyon öğesini `<li>` içinde `<Link>` olarak render eder
+  - `isCurrent` — `current?.key === resource.key` karşılaştırması; öğenin mevcut rota olup olmadığını belirler, `aria-current="page"` attribute'u buna bağlıdır
+  - `isAncestor` — `!isCurrent && isResourceActive(resource, pathname)` koşulu; üst kategori öğesinin aktif olup olmadığını belirler, `data-active-ancestor` attribute'u buna bağlıdır
+  - `label` — `t(resource.labelKey)` sonucu; öğenin görünen metni, `title` attribute'unda ve `<span>` içinde kullanılır
+  - `Icon` — `resource.icon` bileşeni; 18px boyutunda ikon render eder
+- **Dönüş**: JSX.Element — `div` içinde `groups` dizisini `.map` ile dolaşarak her grup için başlık (`<h3>`, collapsed değilse) ve öğe listesi (`<ul>`) render eder
 
-### [N2_NASIL] AST Pointer: components/admin/shell/AdminSidebar.tsx::AdminSidebar
-- **params**: (`pathname`: mevcut rota yolu, `collapsed`: sidebar daralmış durum mu, `canAccess`: RBAC erişim kontrol fonksiyonu)
+### [N2_NASIL] AST Pointer: src/components/admin/shell/AdminSidebar.tsx::AdminSidebar
+- **params**: `pathname` (string — mevcut URL yolu), `collapsed` (boolean — sidebar daraltılmış mı), `canAccess` (fonksiyon — RBAC erişim kontrolü)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çevirme fonksiyonu
-  - `width` — collapsed durumuna göre genişlik sınıfı ('w-admin-rail' veya 'w-admin-nav')
-- **Dönüş**: JSX (masaüstü sidebar)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `aria-label` için `'admin.a11y.mainNavigation'` anahtarını çevirir
+  - `width` — collapsed durumuna göre `'w-admin-rail'` (dar) veya `'w-admin-nav'` (geniş) CSS sınıfı; hem akıştaki yer tutucu `<div>` hem de görünen `<nav>` üzerinde kullanılır
+- **Dönüş**: JSX.Element — `relative hidden md:block` sınıfına sahip kök `<div>` içinde iki çocuk: akıştaki genişlik yer tutucusu (`aria-hidden` div) ve `fixed` konumlu `<nav>` bileşeni (içinde `NavList` render edilir)
 
-### [N3_NASIL] AST Pointer: components/admin/shell/AdminSidebar.tsx::AdminMobileNav
-- **params**: (`open`: modal açık mı, `onOpenChange`: modal durumu değiştirme handler'ı, `pathname`: mevcut rota yolu, `canAccess`: RBAC erişim kontrol fonksiyonu)
+### [N3_NASIL] AST Pointer: src/components/admin/shell/AdminSidebar.tsx::AdminMobileNav
+- **params**: `open` (boolean — diyalog açık mı), `onOpenChange` (fonksiyon — diyalog açık/kapalı durumu değişim callback'i), `pathname` (string — mevcut URL yolu), `canAccess` (fonksiyon — RBAC erişim kontrolü)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çevirme fonksiyonu
-- **Dönüş**: JSX (mobil navigasyon drawer'ı, Radix Dialog ile sarılmış)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `Dialog.Title` ve `Dialog.Description` içinde `'admin.a11y.mainNavigation'` anahtarını çevirir
+- **Dönüş**: JSX.Element — Radix `Dialog.Root` ile mobil navigasyon diyalogu render eder; `Dialog.Portal` içinde overlay (`bg-black/60`), content paneli (`w-admin-drawer`, `aria-modal="true"` manuel eklenmiş) ve `NavList` (`collapsed={false}`, `onNavigate={() => onOpenChange(false)}`) bulunur
 
 ---
 
@@ -171,10 +148,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: src\components\admin\shell\AdminSidebar.tsx
-  function: src\components\admin\shell\AdminSidebar.tsx::NavList
-  function: src\components\admin\shell\AdminSidebar.tsx::AdminSidebar
-  function: src\components\admin\shell\AdminSidebar.tsx::AdminMobileNav
+  file: AdminSidebar.tsx
+  function: AdminSidebar.tsx::NavList
+  function: AdminSidebar.tsx::AdminSidebar
+  function: AdminSidebar.tsx::AdminMobileNav
 
 ---
 
@@ -196,7 +173,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-surface-deep`, `border-r`, `border-white/10`, `text-white/40`, `text-xs`
+- **Renkler:** `bg-admin-bg`, `bg-black/60`, `border-admin-border`, `border-r`, `text-admin-fg-muted`, `text-xs`
 - **Layout:** `bottom-0`, `fixed`, `flex`, `flex-col`, `gap-0.5`, `gap-6`, `hidden`, `justify-center`, `left-0`, `md:block`, `md:hidden`, `overflow-y-auto`, `relative`, `top-admin-header`, `w-admin-drawer`
 - **Varyant/Responsive:** `:`, `md:` önekleri
 - **Yardımcı Sınıflar:** `$`, `${NAV_ITEM_BASE`, `${collapsed`, `${width`, `:`, `NAV_ITEM_ACTIVE`, `NAV_ITEM_ANCESTOR`, `NAV_ITEM_IDLE`, `duration-200`, `ease-linear`, `font-medium`, `inset-0`, `inset-y-0`, `isAncestor`, `isCurrent`

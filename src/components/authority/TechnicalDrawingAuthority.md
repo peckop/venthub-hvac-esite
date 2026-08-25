@@ -2,40 +2,44 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\authority\TechnicalDrawingAuthority.tsx
-skeleton_hash: e636671401ecbace
+source_path: C:\tmp\wt-supurme\src\components\authority\TechnicalDrawingAuthority.tsx
+skeleton_hash: 30c0fb3816dcc3ca
 entity_hashes:
   func:TechnicalDrawingAuthority: 9e9ee1c4c520dae4
   overview: 644a3bf371af42f4
   style_tokens: b07a83f8b2a17b2b
-generated_at: 2026-06-14T22:51:00Z
+generated_at: 2026-08-25T07:25:27Z
 ---
 
 ## Genel Bakış
-`TechnicalDrawingAuthority` modülü, bir dizi teknik çizim verisini alarak bunları依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然
+Bu modül, teknik çizimlerin yetki/otorite görünümünü sağlayan bir React bileşeni içerir. Bileşen, `drawings` ve `className` olmak üzere iki prop alır ve varsayılan olarak boş bir className değeri kullanır.
+
+## Fonksiyon Grupları
+### Ana Bileşen
+Teknik çizim verilerini alıp yetki/otorite bağlamında bir arayüz sunan bileşendir.
+- TechnicalDrawingAuthority
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki varsayımlar zorunludur.
-
-[Aksiyom 1]: `drawings` parametresi传入edilmelidir. Eğer `drawings` parametresi yoksa, bileşen render işlemi başarısız olur.
-
-[Aksiyom 2]: `drawings` parametresi, `formatColors` sabit nesnesindeki anahtarlar ile uyumlu veri yapısına sahip olmalıdır. Eğer drawings verisi formatColors ile eşleşmeyen değerler içeriyorsa, çizim renklendirmesi eksik veya hatalı olur.
-
-[Aksiyom 3]: `formatColors` sabit nesnesi tanımlı ve geçerli bir nesne olmalıdır. Eğer `formatColors` nesnesi yoksa veya boşsa, çizimler için renk formatlaması uygulanamaz.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### TechnicalDrawingAuthority
-**Ne yapar**: Teknik çizim ve doküman listesini, belirli bir otorite standartlarına uygun, animasyonlu ve interaktif bir grid (ızgara) formatında gösterir. Her çizim için format bazlı renk kodlaması, versiyon takibi ve indirme bağlantısı sunar.
-**Nasıl yapar**: Gelen `drawings` dizisini haritalayarak her bir çizimi bir `motion.div` (animasyonlu div) içinde render eder. Her çizim kartı, sol tarafta format ikonu ve bilgileri, sağ tarafta ise indirme butonu içerir. `formatColors` nesnesi kullanılarak dosya formatına göre (PDF, DWG vb.) dinamik arka plan ve kenarlık renkleri uygulanır. Animasyonlar için `framer-motion` kütüphanesinin `motion` bileşeni ve `initial`, `animate`, `transition` prop'ları kullanılarak kademeli giriş efekti sağlanır.
+**Ne yapar**: Teknik doküman ve çizimlerin otorite standartlarında sergilenmesini sağlayan React fonksiyonel bileşenidir. Her dokümanı animasyonlu bir kart yapısında sunar, format bazlı görsel ayrıştırma ve versiyon takibi içerir. Grid düzeninde responsive bir liste oluşturur.
+
+**Nasıl yapar**: Bileşen, aldığı `drawings` dizisini `.map()` ile iterasyona uğratarak her doküman için bir `motion.div` (Framer Motion) kartı oluşturur. Her kart, sıralı gecikmeli (`delay: idx * 0.05`) bir açılma animasyonu ile ekrana gelir. Kartın sol tarafında doküman bilgileri (kategori, başlık, format, son güncelleme tarihi, versiyon numarası) yer alır; sağ tarafında ise indirme butonu bulunur. Format bilgisine göre `formatColors` nesnesinden renk sınıfı çekilir, eşleşme yoksa varsayılan gri tonları kullanılır. Versiyon bilgisi mevcutsa `VERSION_PREFIX` sabiti ile birlikte gösterilir. Son güncelleme tarihi mevcutsa saat ikonuyla birlikte görüntülenir.
+
 **Parametreler**:
-- drawings: `Array<{id: string, title: string, format: string, url: string, category?: string, version?: string, lastUpdated?: string}>` — Görselleştirilecek teknik çizimlerin veya dokümanların dizisi. Her nesne benzersiz bir `id`, `title` ve indirme `url`'si içermelidir. `format` (ör. "pdf", "dwg"), opsiyonel `category`, `version` ve `lastUpdated` alanları zengin bilgi gösterimi için kullanılır.
-- className: `string` — Bileşenin dış sarıcı `div`'ine eklenecek ek CSS sınıfı. Varsayılan değeri boş stringdir.
-**Dönüş**: `JSX.Element` — Teknik çizimlerin grid içinde listelendiği, animasyonlu React bileşeni (JSX) döndürür.
+- drawings: `TechnicalDrawingAuthorityProps['drawings']` — Gösterilecek teknik doküman ve çizimlerin listesi. Her elemanda `id`, `format`, `category`, `version`, `title`, `lastUpdated`, `url` alanları bulunduğu kod yapısından anlaşılmaktadır.
+- className: `string` — Bileşenin kök `div` elementine eklenecek ek CSS sınıf adı. Varsayılan değeri boş string (`''`) olarak atanmıştır.
+
+**Dönüş**: JSX elementi döndürür. Kök eleman, Tailwind CSS sınıflarıyla stilize edilmiş bir `div` olup içinde `motion.div` kartlarından oluşan bir grid yapısı barındırır. Grid yapısı tek sütunlu (`grid-cols-1`) başlayıp orta ve üzeri ekran genişliklerinde iki sütunlu (`md:grid-cols-2`) düzene geçer.
 
 ---
 
@@ -67,27 +71,30 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar zorunludur.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
-- **params**: (drawings: TechnicalDrawingMetadata[], className: string = '')
+### [N1_NASIL] AST Pointer: src/components/authority/TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
+- **params**:
+  - `drawings` — `TechnicalDrawingMetadata` dizisi; her eleman bir teknik resmi temsil eder
+  - `className` — opsiyonel CSS sınıfı string'i, varsayılan boş string `''`
 - **ic_degiskenler**:
-  - `doc` — drawings.map() içindeki her bir çizim metadata nesnesi (id, format, category, version, title, url, lastUpdated özelliklerine sahip)
-  - `idx` — drawings.map() içindeki her bir çizimin indeksi, geç animasyon gecikmesi için kullanılır
-- **Dönüş**: JSX elementi (çizim kartlarının grid yapısını render eder)
-
-**Notlar:**
-- `formatColors` sabit nesnesi, `doc.format` değerine göre CSS sınıflarını belirler
-- `VERSION_PREFIX` sabiti, `doc.version` ile birlikte kullanılarak versiyon etiketi oluşturur
-- `doc.id` anahtar olarak kullanılır
-- `doc.url` indirme bağlantısı olarak kullanılır
-- `doc.category`, `doc.format.toUpperCase()`, `doc.lastUpdated` gösterim amaçlı kullanılır
-- Animasyon: `initial={{ opacity: 0, y: 10 }}` → `animate={{ opacity: 1, y: 0 }}` dönüşümü, gecikme: `idx * 0.05`
+  - `doc` — `drawings.map()` içindeki her eleman; tek bir teknik resim metadata nesnesi
+  - `idx` — `drawings.map()` içindeki döngü indeksi; animasyon gecikmesi (`delay: idx * 0.05`) hesaplamak için kullanılır
+  - `formatColors` — dış sabit (dosya üstünde tanımlı); `doc.format` anahtarına karşılık gelen CSS sınıf string'ini döndürür; eşleşme yoksa `'bg-slate-50 text-slate-600 border-slate-100'` kullanılır
+  - `VERSION_PREFIX` — dış sabit; `doc.version` varsa önüne eklenen ön ek string'i
+  - `doc.id` — benzersiz tanımlayıcı; `motion.div` bileşeninin `key` prop'u olarak kullanılır
+  - `doc.format` — dosya formatı bilgisi; `formatColors[doc.format]` ile renk seçimi ve `.toUpperCase()` ile üst harf gösterimi için kullanılır
+  - `doc.category` — kategori etiketi; üst harf stilinde (`uppercase`) gösterilir
+  - `doc.version` — versiyon numarası (opsiyonel); varsa `VERSION_PREFIX` ile birlikte etiket olarak gösterilir
+  - `doc.title` — teknik resim başlığı; `h4` içinde gösterilir
+  - `doc.lastUpdated` — son güncelleme tarihi (opsiyonel); varsa saat ikonu ile birlikte gösterilir
+  - `doc.url` — indirme URL'si; `a` etiketinin `href` prop'una atanır
+- **Dönüş**: JSX elementi (React fonksiyon bileşeni); `drawings` dizisini `.map()` ile döngüye alarak her teknik resim için animasyonlu kart listesi render eder; her kartta format ikonu, kategori, versiyon, başlık, format bilgisi, tarih ve indirme butonu bulunur
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\authority\TechnicalDrawingAuthority.tsx
-  function: src\components\authority\TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
+  file: TechnicalDrawingAuthority.tsx
+  function: TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
 
 ---
 

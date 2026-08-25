@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\tests\e2e\helpers\mockDb.ts
-skeleton_hash: c500eb535bf09f23
+source_path: C:\tmp\wt-supurme\tests\e2e\helpers\mockDb.ts
+skeleton_hash: fd6f126e9e458d1b
 entity_hashes:
   func:MockDatabaseEngine:clearTable: 1b97d440bae7828b
   func:MockDatabaseEngine:createClient: 5e76be93a8deb12f
@@ -22,154 +22,128 @@ entity_hashes:
   func:MockQueryBuilder:then: 275aefaa14d86ced
   func:MockQueryBuilder:update: 41ec9373d6bd3c71
   overview: e113c01000da429f
-generated_at: 2026-05-30T20:35:43Z
+generated_at: 2026-08-25T07:35:02Z
 ---
 
 ## Genel Bakış
-Bu modül, e2e testlerinde gerçek bir veritabanı bağlantısı olmadan veritabanı işlemlerini simüle etmek için bir mock veritabanı motoru ve sorgu oluşturucu sağlar. Modül, bellek içi tablo verileri tutarak ve sorguları uygulayarak test senaryolarında izole ve tekrarlanabilir veri erişimi sağlar.
+
+Bu modül, E2E testlerinde Supabase benzeri bir veritabanı istemcisini taklit eden bir mock altyapısı sağlar. `MockQueryBuilder` sınıfı zincirleme (fluent) bir API ile sorgu oluşturma imkânı tanırken, `MockDatabaseEngine` sınıfı bellek içi tablo verilerini yönetir ve sorguları çalıştırır. Modül, test senaryolarında gerçek veritabanı bağlantısı olmadan CRUD işlemlerinin simüle edilmesini amaçlar.
 
 ## Fonksiyon Grupları
-### Sorgu Oluşturma
-Test senaryolarında veritabanı sorgularını tanımlamak için zincirleme bir arayüz sağlar.
-- `constructor`, `select`, `insert`, `update`, `delete`, `eq`, `single`, `maybeSingle`
 
-### Veri Yönetimi
-Bellek içi tablo verilerinin ayarlanması, alınması ve temizlenmesini yöneterek test başlangıç ve bitiş durumlarını kontrol eder.
-- `setTableData`, `getTableData`, `clearTable`
+### Sorgu Oluşturma ve Çalıştırma
+Zincirleme yöntemlerle sorgu tanımlar ve `then` metodu aracılığıyla sorguyu `MockDatabaseEngine` üzerinde çalıştırır. `select`, `insert`, `update`, `delete` ile işlem türü belirlenir; `eq` ile satır filtreleri eklenir; `single` ve `maybeSingle` ile tek kayıt dönüş davranışı ayarlanır.
+- constructor, select, insert, update, delete, eq, single, maybeSingle, then
 
-### Sorgu Çalıştırma
-Oluşturulan sorgu yapısını alır, belirli tablo verileri üzerinde CRUD işlemlerini uygular ve filtreleme yaparak sonuçları döndürür.
-- `createClient`, `executeQuery`, `then`
+### Tablo Veri Yönetimi
+Bellek içi tablo verilerini ayarlamaya, okumaya ve temizlemeye yarar. Testlerin başlangıcında sahte veri yüklemek veya testler arası temizlik yapmak için kullanılır.
+- setTableData, getTableData, clearTable
 
-### Güvenlik Bağlamı
-Testler için sahte kullanıcı ve güvenlik bağlamlarını yöneterek farklı roller ve izinler simüle eder.
-- `setSecurityContext`, `getSecurityContext`
+### Sorgu Yürütme Motoru
+`MockQueryBuilder` tarafından oluşturulan sorgu tanımını alır, ilgili tablo verisini okur, filtreleri uygular ve sonucu döndürür. Modülün tüm CRUD mantığını tek bir noktada toplayan merkezi metottur.
+- executeQuery
+
+### Güvenlik Bağlamı ve İstemci Oluşturma
+Test ortamında kimlik doğrulama ve yetkilendirme bağlamını simüle etmek için güvenlik bağlamını ayarlar ve okur. `createClient` ise Supabase benzeri bir istemci nesnesi üretir.
+- setSecurityContext, getSecurityContext, createClient
+
+### Bağımlılıklar ve Mimari Notlar
+- `MockQueryBuilder`, `MockDatabaseEngine` örneğini constructor aracılığıyla alır ve `then` metodu içinde `executeQuery` çağırır; bu ilişki sorgu tanımlama ile yürütme arasındaki temel bağı oluşturur.
+- `executeQuery`, `getTableData` ve `setTableData` gibi tablo veri yönetimi metotlarını kullanarak okuma ve yazma işlemlerini gerçekleştirir.
+- Modül, `tests/e2e/helpers` yolunda yer aldığından yalnızca test ortamında yüklenir; üretim koduna dahil değildir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-MockQueryBuilder ve MockDatabaseEngine sınıfları, test ortamında veritabanı işlemlerini simüle etmek için birlikte çalışmalıdır.
 
-[Aksiyom 1]: Eğer MockQueryBuilder.instance'ı oluşturulurken geçerli bir MockDatabaseEngine instance'ı (`db` parametresi) verilmemişse, sorgu çalıştırma (then ile tetikleme) aşamasında hata oluşur veya beklenen veri dönmez.
+Bu modül, test ortamında bir veritabanı motorunu ve sorgu oluşturucuyu taklit eden yardımcı bir modüldür. Doğru çalışması için aşağıdaki koşulların sağlanması gerekir.
 
-[Aksiyom 2]: Eğer MockQueryBuilder.then() metodu çağrılmazsa (yani query bir promise gibi resolve/reject edilmezse), ilgili select/insert/update/delete işlemi hiç gerçekleşmez ve mock veritabanında değişiklik yapılmaz veya veri dönmez.
+[Aksiyom 1]: Eğer `MockQueryBuilder` örneği oluşturulurken bir `MockDatabaseEngine` referansı verilmezse, sorgular çalıştırılamaz ve `then` fonksiyonu hata döndürür.
 
-[Aksiyom 3]: Eğer MockDatabaseEngine-tabanlı bir sorguda `tableName` olarak veritabanında bulunmayan bir tablo adı kullanılıyorsa, executeQuery() metodu çalıştığında hata oluşur veya boş sonuç döner (tablonun varlığı şarttır).
+[Aksiyom 2]: Eğer `MockQueryBuilder` örneği oluşturulurken bir `tableName` verilmezse, hangi tablo üzerinde işlem yapılacağı bilinmez ve sorgu çalıştırılamaz.
 
-[Aksiyom 4]: Eğer MockQueryBuilder.select() ile sorgu yapılırken `columns` parametresi belirtilmemişse, tüm sütunların (`*`) seçildiği varsayılır.
+[Aksiyom 3]: Eğer `MockDatabaseEngine` üzerinde `setTableData` ile bir tablo için veri ayarlanmamışsa, o tabloya yönelik `select` sorguları boş veri (`data: []` veya `data: null`) döndürür.
 
-[Aksiyom 5]: Eğer MockQueryBuilder.insert() ile birden fazla kayıt eklenmek isteniyorsa, `payload` parametresinin bir array (nesne listesi) olması zorunludur; aksi halde tek kayıt ekleme davranışı sergiler.
-
-[Aksiyom 6]: Eğer MockQueryBuilder.eq() ile filtre eklenmemişse, select/update/delete işlemleri tablodaki TÜM satırları etkiler (toplu işlem).
-
-[Aksiyom 7]: Eğer MockQueryBuilder.single() veya maybeSingle() çağrılmışsa, executeQuery'de `isSingle` veya `isMaybeSingle` flagları true olmalıdır; aksi halde sonuç tek kayıt olarak işlenmez.
-
-[Aksiyom 8]: Eğer MockDatabaseEngine.setSecurityContext() ile bir güvenlik bağlamı ayarlanmamışsa, executeQuery() içindeki sorgu filtreleme (RLS simülasyonu) güvenlik bağlamına bağlı filtreleri uygulamaz.
-
-[Aksiyom 9]: Eğer MockDatabaseEngine.clearTable() ile bir tablo temizlenirse, o tablodaki tüm veriler silinir ve sonraki insert işlemlerine hazır hale gelir; tablo yapısı (shema) korunur.
-
-[Aksiyom 10]: Eğer MockDatabaseEngine.executeQuery() metoduna iletilen `query` nesnesinde `queryType` alan değeri 'select', 'insert', 'update' veya 'delete' dışındaysa, metot geçersiz sorgu hatası üretir.
+[Aksiyom 4]: Eğer `MockQueryBuilder` üzerinde bir sorgu tipi (`select`, `insert`, `update`, `
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### constructor
-**Ne yapar**: MockQueryBuilder sınıfının kurucu metodudur ve yeni bir sorgu oluşturucusu (builder) örneği başlatır. Bu, tüm sorgu zincirleme (chain)��作larının temelini oluşturur.
-**Nasıl yapar**: Verilen tablo adını ve veritabanı motoru referansını sınıf instance'ının ilgili alanlarına atayarak nesneyi başlatır. Bu sayede oluşturulan sorgu, hangi tablo üzerinde işlem yapılacağını ve veritabanı bağlantısını bilir.
+**Ne yapar**: `MockQueryBuilder` sınıfının yapıcı metodudur. Yeni bir sorgu oluşturucu örneği başlatırken tablo adını ve veritabanı referansını atar.
+**Nasıl yapar**: Parametre olarak gelen `tableName` değerini sınıfın `tableName` özelliğine, `db` değerini ise `db` özelliğine atayarak örneği yapılandırır. Bu iki temel referans olmadan sorgu oluşturucu çalışamaz.
 **Parametreler**:
-- tableName: string — Sorgunun hedef aldığı tablonun adı.
-- db: MockDatabaseEngine — Sorgunun sonunda Execute edileceği mock veritabanı motoru nesnesi.
-**Dönüş**: void (Kurucu metodun dönüş tipi yoktur, sadece instance başlatır).
+- tableName: string — Sorgunun hedefleneceği veritabanı tablosunun adı
+- db: MockDatabaseEngine — Sorguların yürütüleceği sahte veritabanı motoru örneği
+**Dönüş**: void — Yapıcı metotlar değer döndürmez.
 
 ### select
-**Ne yapar**: Sorgu türünü "select" olarak ayarlar ve bir seçim (projection) işlemi başlatır. Bu çağrı genellikle zincirlemenin ilk halkasıdır.
-**Nasıl yapar**: Sınıfın `queryType` alanını 'select' değerine set eder ve instance'ı geri döndürerek diğer metodların zincirleme olarak çağrılmasına olanak tanır. Kolon parametresi opsiyoneldir ve specimende kullanılmamaktadır.
-**Parametreler**:
-- columns?: string — Seçilecek kolonları belirtir (şu an için kullanılmıyor, opsiyonel).
-**Dönüş**: this (Mevcut MockQueryBuilder instance'ını geri döndürerek zincirlemeye imkan tanır).
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### insert
-**Ne yapar**: Sorgu türünü "insert" olarak ayarlar ve bir ekleme işlemi için veri yükünü (payload) depolar.
-**Nasıl yapar**: `queryType` alanını 'insert' olarak değiştirir, verilen payload'ı (tekil veya dizi olabilir) `payload` alanına kaydeder ve instance'ı döndürür. Bu, daha sonra `then` metodunda bu verinin tabloya ekleneceğini belirtir.
-**Parametreler**:
-- payload: any | any[] — Eklenecek tek bir nesne veya nesne dizisi. MockDB tarafında dizi olarak işlenir.
-**Dönüş**: this (Zincirlemeye devam etmek için mevcut instance).
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### update
-**Ne yapar**: Sorgu türünü "update" olarak ayarlar ve güncellenecek veri yükünü saklar.
-**Nasıl yapar**: `queryType` alanını 'update' değerine atar, güncelleme verilerini (partial bir nesne) `payload` alanına kaydeder ve instance'ı döndürür. Güncelleme, daha sonraki `then` adımında filtrelerle birlikte uygulanacaktır.
-**Parametreler**:
-- payload: Partial<any> — Güncellenecek alanları içeren kısmi bir nesne. Tüm alanları sağlamaya gerek yoktur.
-**Dönüş**: this (Zincirleme işlem için aynı instance).
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### delete
-**Ne yapar**: Sorgu türünü "delete" olarak ayarlayarak silme işlemi başlatır.
-**Nasıl yapar**: `queryType` alanını 'delete' değerine set eder ve instance'ı döndürür. Silme işlemi, zincirleme eklenen filtreler (`eq` vb.) ile belirlenen satırlara uygulanacaktır.
-**Parametreler**: Parametre almaz.
-**Dönüş**: this (Zincirlemeye devam etmek için instance).
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### eq
-**Ne yapar**: Sorguya bir eşitlik filtresi ekler. Bu,_where_ koşulu oluşturmak için kullanılır.
-**Nasıl yapar**: Verilen sütun adı ve değeriyle bir filtre fonksiyonu oluşturur ve bu fonksiyonu sınıfın `filters` dizisine push eder. Bu filtreler, sorgu çalıştırıldığında (`then` adımında) tablodaki her satır için kontrol edilir. Sadece `row[column] === value` koşulunu sağlayan satırlar dahil edilir.
-**Parametreler**:
-- column: string — Filtre uygulanacak sütunun adı.
-- value: any — Sütunda aranan değer.
-**Dönüş**: this (Ek filtre ile birlikte zincirlemeye devam).
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### single
-**Ne yapar**: Sorgunun sonucunun tek bir satır olmasını ve hata vermemesini sağlar. Beklenmeyen çoklu sonuç durumunda hata fırlatılmasını belirler.
-**Nasıl yapar**: `isSingle` bayrağını true olarak ayarlar. Bu, `then` metodunda sonuç kümesinin yalnızca bir eleman olup olmadığını doğrular; birden fazla satır gelirse bir hata nesnesi ile sonuç döner.
-**Parametreler**: Parametre almaz.
-**Dönüş**: this (Tekil sonuç modunda instance).
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### maybeSingle
-**Ne yapar**: Sorgunun sonucunun sıfır veya bir satır olabileceğini belirtir. Sonuç bulunamazsa `data` alanının `null` olmasını, tek satır bulunursa o satırı döndürür. Birden fazla satır bulunursa hata verir.
-**Nasıl yapar**: `isMaybeSingle` bayrağını true yapar. `then` metodu bu bayrağı kontrol ederek sonuç kümesinin uzunluğuna göre davranışı belirler (0 -> null data, 1 -> veri, >1 -> hata).
-**Parametreler**: Parametre almaz.
-**Dönüş**: this (Opsiyonel tekil sonuç modunda instance).
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### then
-**Ne yapar**: Asenkron sorgu ejecitonunu ve sonuç şeklini (PromiseLike) başlatır. Bu metod çağrıldığında, biriken tüm bilgiler (tablo, sorgu tipi, filtreler, payload) kullanılarak mock veritabanı üzerinde işlem gerçekleştirilir ve standart bir `{ data, error }` yapısı döndürülür.
-**Nasıl yapar**: Sınıf bir PromiseLike olduğu için `then` metodu çağrıldığında sorgu çalıştırılır. İçeride, MockDatabaseEngine üzerindeki ilgili tabloya erişir, `filters` dizisindeki fonksiyonları kullanarak satırları filtreler, sorgu tipine (`select`, `insert`, `update`, `delete`) göre ilgili işlemi yapar ve sonucu `{ data: ..., error: null }` veya `{ data: null, error: {...} }` formatında bir Promise ile resolve/reject eder. Bu yapı, Supabase client'ın kullanım alışkanlıklarını taklit eder.
-**Parametreler**:
-- onfulfilled?: ((value: { data: any; error: any }) => TResult1 | PromiseLike<TResult1>) | undefined | null — Promise başarılı olduğunda çalışacak callback.
-- onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null — Promise reddedildiğinde çalışacak callback.
-**Dönüş**: Promise<any> — İşlem sonucunu içeren, `{ data, error }` yapısına sahip bir Promise.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### setTableData
-**Ne yapar**: MockDatabaseEngine içinde belirli bir tablonun tüm verisini ayarlar veya tamamen değiştirir. Test senaryolarının başlangıç durumunu oluşturmak için kullanılır.
-**Nasıl yapar**: Verilen tablo adı ve veri dizisi ile `tables` haritasını (Map) günceller. Veri dizisi, referans sorunlarını önlemek ve testler arasında izolasyon sağlamak amacıyla derin bir kopyası (`JSON.parse(JSON.stringify(...))`) alınarak saklanır.
-**Parametreler**:
-- tableName: string — Verisi ayarlanacak tablonun adı.
-- data: any[] — Tabloya yerleştirilecek satırların dizisi.
-**Dönüş**: void (Doğrudan internal state'i değiştirir, bir şey döndürmez).
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getTableData
-
-**Ne yapar**: Belirtilen tablonun tüm verilerini döndürür. Mock veritabanındaki bir tablonun tüm satırlarını (kayıtlarını) getirerek test ortamında erişilebilir hale getirir.
-
-**Nasıl yapar**: Dahili `this.tables` Map yapısında tablo adına karşılık gelen değeri arar. Tablo mevcutsa tüm satırlar dizisi döner, tablo bulunamazsa boş bir dizi döner. Bu sayede null kontrolü yapılmasına gerek kalmadan güvenli bir şekilde iterasyon yapılabilir.
-
+**Ne yapar**: Verilen isimdeki tablonun verilerini döndürür. Eğer böyle bir tablo yoksa boş bir dizi döndürür.
+**Nasıl yapar**: `this.tables` adlı Map yapısından `tableName` anahtarına karşılık gelen değeri alır. Eğer bu anahtar Map'te yoksa `||` operatörü sayesinde boş bir dizi (`[]`) döndürür.
 **Parametreler**:
-- `tableName: string` — Verisi getirilecek tablonun adı. Mock veritabanında daha önce eklenmiş olmalıdır.
-
-**Dönüş**: `any[]` — Tablonun tüm satırlarını içeren dizi. Tablo boşsa veya mevcut değilse boş dizi döner.
+- tableName: string — Verileri alınacak tablonun adı.
+**Dönüş**: any[] — İlgili tablodaki satırları içeren bir dizi. Tablo mevcut değilse boş dizi.
 
 ### clearTable
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Belirtilen tablonun tüm verilerini temizler, yani tabloyu sıfırlar.
+**Nasıl yapar**: `this.tables` Map'inde `tableName` anahtarının değerini boş bir dizi (`[]`) olarak ayarlar. Bu işlem, tablodaki tüm mevcut satırları siler ve tabloyu boş bir duruma getirir.
+**Parametreler**:
+- tableName: string — Temizlenecek tablonun adı.
+**Dönüş**: bilinmiyor — Fonksiyon gövdesinde bir `return` ifadesi yoktur.
 
 ### setSecurityContext
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Mevcut güvenlik bağlamını (security context) günceller veya ayarlar.
+**Nasıl yapar**: Parametre olarak verilen `context` nesnesini, mevcut `this.securityContext` nesnesiyle birleştirir (spread operatörü `...` kullanılarak). Bu işlem, mevcut bağlamı korurken, parametrede sağlanan yeni veya değiştirilmiş özellikleri üzerine yazar.
+**Parametreler**:
+- context: Partial<SecurityContext> — Güvenlik bağlamını güncellemek için kullanılacak, `SecurityContext` tipinin tüm veya bazı özelliklerini içeren bir nesne.
+**Dönüş**: bilinmiyor — Fonksiyon gövdesinde bir `return` ifadesi yoktur.
 
 ### getSecurityContext
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Mevcut güvenlik bağlamını (security context) döndürür.
+**Nasıl yapar**: Doğrudan `this.securityContext` özelliğinin referansını döndürür.
+**Parametreler**: Bu fonksiyon parametre almaz.
+**Dönüş**: SecurityContext — Nesnenin o anki güvenlik bağlamını temsil eden `SecurityContext` tipinde nesne.
 
 ### createClient
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Veritabanı istemcisi oluşturur ve bu istemci üzerinden sorgu oluşturucuya (query builder) erişim sağlayan bir nesne döndürür.
+**Nasıl yapar**: Yeni bir nesne döndürür. Bu nesnenin `from` metodu, verilen `tableName` için `MockQueryBuilder` sınıfının bir örneğini oluşturur ve bu örneğe `this` (yani `MockDatabaseEngine` örneği) referansını aktarır. Bu sayede oluşturulan sorgu oluşturucu, ana veritabanı motoruyla iletişim kurabilir.
+**Parametreler**: Bu fonksiyon parametre almaz.
+**Dönüş**: `{ from: (tableName: string) => MockQueryBuilder }` — `from` adında bir metot içeren bir nesne. `from` metodu bir tablo adı alır ve o tablo için bir `MockQueryBuilder` örneği döndürür.
 
 ### executeQuery
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Verilen sorgu tanımını asenkron olarak işler ve sonucu döndürür. `select`, `insert`, `update` ve `delete` gibi farklı sorgu tiplerini destekler ve Row Level Security (RLS) politikalarını uygular.
+**Nasıl yapar**: Sorgu tipine göre farklı mantık dallarına ayrılır. Tüm dallarda, güvenlik bağlamındaki (`securityContext`) `tenantId` ve `userRole` bilgilerini kullanarak satır bazlı erişim kontrolü (RLS) uygular. `select` için filtreleri uygular ve `isSingle`/`isMaybeSingle` bayraklarına göre tekil veya çoğul sonuç döndürür. `insert` için yeni satırlar oluşturur, gerekirse birincil anahtar (`id`) üretir ve RLS kurallarını kontrol eder. `update` için filtrelerle eşleşen satırları bulur, günceller ve RLS ihlali olup olmadığını denetler. `delete` için filtrelerle eşleşen satırları siler. Her durumda, başarılı veya hatalı sonucu standart bir `{ data, error }` nesnesi içinde döndürür.
+**Parametreler**:
+- query: `{ tableName: string; queryType: 'select' | 'insert' | 'update' | 'delete'; payload: any; filters: Array<(row: any) => boolean>; isSingle: boolean; isMaybeSingle: boolean }` — İşlenecek sorgunun tüm detaylarını içeren nesne. `tableName` hedef tabloyu, `queryType` işlem türünü, `payload` insert/update için veriyi, `filters` satırları filtrelemek için fonksiyon dizisini, `isSingle` ve `isMaybeSingle` ise select sorgularında beklenen sonuç sayısını belirtir.
+**Dönüş**: `Promise<{ data: any; error: any }>` — Asenkron bir işlemi temsil eden Promise. Çözüldüğünde, başarılı durumda `data` alanında sonuç verisini (tek nesne veya dizi), hata durumunda `error` alanında hata detaylarını içeren bir nesne döndürür.
 
 ---
 
@@ -183,136 +157,110 @@ MockQueryBuilder ve MockDatabaseEngine sınıfları, test ortamında veritabanı
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: mockDb.ts::MockQueryBuilder.constructor
-- **params**: `(tableName: string, db: MockDatabaseEngine)`
-- **ic_degiskenler**:
-  - `this.tableName` — query'nin hedef tablo adını saklar
-  - `this.db` — sorguları çalıştıracak MockDatabaseEngine referansını saklar
-- **Dönüş**: yok (constructor)
-
-### [N2_NASIL] AST Pointer: mockDb.ts::MockQueryBuilder.select
-- **params**: `(columns?: string)`
-- **ic_degiskenler**: yok (parametre `columns` fonksiyon gövdesinde kullanılmıyor)
-- **Dönüş**: `this` (zincirleme çağrı için)
-
-### [N3_NASIL] AST Pointer: mockDb.ts::MockQueryBuilder.insert
-- **params**: `(payload: any | any[])`
-- **ic_degiskenler**:
-  - `this.queryType` — sorgu türünü `'insert'` olarak ayarlar
-  - `this.payload` — eklenecek satır veya satırları saklar
-- **Dönüş**: `this` (zincirleme çağrı için)
-
-### [N4_NASIL] AST Pointer: mockDb.ts::MockQueryBuilder.update
-- **params**: `(payload: Partial<any>)`
-- **ic_degiskenler**:
-  - `this.queryType` — sorgu türünü `'update'` olarak ayarlar
-  - `this.payload` — güncellenecek alan değerlerini saklar
-- **Dönüş**: `this` (zincirleme çağrı için)
-
-### [N5_NASIL] AST Pointer: mockDb.ts::MockQueryBuilder.delete
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `this.queryType` — sorgu türünü `'delete'` olarak ayarlar
-- **Dönüş**: `this` (zincirleme çağrı için)
-
-### [N6_NASIL] AST Pointer: mockDb.ts::MockQueryBuilder.eq
-- **params**: `(column: string, value: any)`
-- **ic_degiskenler**:
-  - `this.filters` — filtre fonksiyonları dizisine `row[column] === value` koşulu eklenir
-- **Dönüş**: `this` (zincirleme çağrı için)
-
-### [N7_NASIL] AST Pointer: mockDb.ts::MockQueryBuilder.single
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `this.isSingle` — tek satır beklenildiğini işaretler (`true`)
-- **Dönüş**: `this` (zincirleme çağrı için)
-
-### [N8_NASIL] AST Pointer: mockDb.ts::MockQueryBuilder.maybeSingle
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `this.isMaybeSingle` — tek satır veya boş sonuç beklenildiğini işaretler (`true`)
-- **Dönüş**: `this` (zincirleme çağrı için)
-
-### [N9_NASIL] AST Pointer: mockDb.ts::MockQueryBuilder.then
-- **params**: `(onfulfilled?, onrejected?)`
-- **ic_degiskenler**:
-  - `result` — `this.db.executeQuery()` çağrısının döndüğü `{ data, error }` nesnesi
-  - `this.tableName` — executeQuery'ye tablo adı olarak geçirilir
-  - `this.queryType` — executeQuery'ye sorgu türü olarak geçirilir
-  - `this.payload` — executeQuery'ye payload olarak geçirilir
-  - `this.filters` — executeQuery'ye filtre dizisi olarak geçirilir
-  - `this.isSingle` — executeQuery'ye tek satır modu olarak geçirilir
-  - `this.isMaybeSingle` — executeQuery'ye maybeSingle modu olarak geçirilir
-  - `err` — yakalanan hata nesnesi
-- **Dönüş**: `Promise<any>` (onfulfilled/onrejected dönüşü veya result)
-
-### [N10_NASIL] AST Pointer: mockDb.ts::MockDatabaseEngine.setTableData
-- **params**: `(tableName: string, data: any[])`
-- **ic_degiskenler**:
-  - `this.tables` — tablo adlarını ve satır dizilerini tutan Map, `tableName` anahtarına deep copy olarak kaydedilir (`JSON.parse(JSON.stringify(data))`)
+### [N1_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockQueryBuilder.constructor
+- **params**: `tableName: string`, `db: MockDatabaseEngine`
+- **ic_degiskenler**: yok — sadece `this.tableName` ve `this.db` alanlarına atama yapılır
 - **Dönüş**: yok
 
-### [N11_NASIL] AST Pointer: mockDb.ts::MockDatabaseEngine.getTableData
-- **params**: `(tableName: string)`
-- **ic_degiskenler**:
-  - `this.tables` — Map'ten `tableName` anahtarına karşılık gelen satır dizisi alınır; yoksa boş dizi döner
-- **Dönüş**: `any[]` (tablodaki satırlar veya boş dizi)
-
-### [N12_NASIL] AST Pointer: mockDb.ts::MockDatabaseEngine.clearTable
-- **params**: `(tableName: string)`
-- **ic_degiskenler**:
-  - `this.tables` — `tableName` anahtarının değerini boş dizi `[]` olarak ayarlar
-- **Dönüş**: yok
-
-### [N13_NASIL] AST Pointer: mockDb.ts::MockDatabaseEngine.setSecurityContext
-- **params**: `(context: Partial<SecurityContext>)`
-- **ic_degiskenler**:
-  - `this.securityContext` — mevcut security context ile yeni context'i spread operatörü ile birleştirir
-- **Dönüş**: yok
-
-### [N14_NASIL] AST Pointer: mockDb.ts::MockDatabaseEngine.getSecurityContext
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `this.securityContext` — mevcut güvenlik bağlamını (`tenantId`, `userRole` içeren nesne) döner
-- **Dönüş**: `SecurityContext`
-
-### [N15_NASIL] AST Pointer: mockDb.ts::MockDatabaseEngine.createClient
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockQueryBuilder.select
+- **params**: `columns?: string` (opsiyonel, gövdede kullanılmaz)
 - **ic_degiskenler**: yok
-- **Dönüş**: `{ from: (tableName: string) => new MockQueryBuilder(tableName, this) }` nesnesi — Supabase client arayüzünü taklit eder
+- **Dönüş**: `this` (MockQueryBuilder örneği — zincirleme çağrıya olanak tanır)
 
-### [N16_NASIL] AST Pointer: mockDb.ts::MockDatabaseEngine.executeQuery
-- **params**: `(query: { tableName, queryType, payload, filters, isSingle, isMaybeSingle })`
+### [N3_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockQueryBuilder.insert
+- **params**: `payload: any | any[]`
+- **ic_degiskenler**: yok — `this.payload` alanına atama yapılır
+- **Dönüş**: `this` (MockQueryBuilder örneği)
+
+### [N4_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockQueryBuilder.update
+- **params**: `payload: Partial<any>`
+- **ic_degiskenler**: yok — `this.payload` alanına atama yapılır
+- **Dönüş**: `this` (MockQueryBuilder örneği)
+
+### [N5_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockQueryBuilder.delete
+- **params**: yok
+- **ic_degiskenler**: yok — `this.queryType` `'delete'` olarak ayarlanır
+- **Dönüş**: `this` (MockQueryBuilder örneği)
+
+### [N6_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockQueryBuilder.eq
+- **params**: `column: string`, `value: any`
+- **ic_degiskenler**: yok — `this.filters` dizisine bir arrow fonksiyon eklenir; bu fonksiyon `row[column] === value` koşulunu değerlendirir
+- **Dönüş**: `this` (MockQueryBuilder örneği)
+
+### [N7_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockQueryBuilder.single
+- **params**: yok
+- **ic_degiskenler**: yok — `this.isSingle` `true` yapılır
+- **Dönüş**: `this` (MockQueryBuilder örneği)
+
+### [N8_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockQueryBuilder.maybeSingle
+- **params**: yok
+- **ic_degiskenler**: yok — `this.isMaybeSingle` `true` yapılır
+- **Dönüş**: `this` (MockQueryBuilder örneği)
+
+### [N9_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockQueryBuilder.then
+- **params**: `onfulfilled?: ((value: { data: any; error: any }) => TResult1 | PromiseLike<TResult1>) | undefined | null`, `onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null`
 - **ic_degiskenler**:
-  - `tableName` — query nesnesinden destructured tablo adı
-  - `queryType` — query nesnesinden destructured sorgu türü (`'select'` | `'insert'` | `'update'` | `'delete'`)
-  - `payload` — query nesnesinden destructured eklenecek/güncellenecek veri
-  - `filters` — query nesnesinden destructured filtre fonksiyonları dizisi
-  - `isSingle` — query nesnesinden destructured tek satır modu bayrağı
-  - `isMaybeSingle` — query nesnesinden destructured belki tek satır modu bayrağı
-  - `data` — `this.getTableData(tableName)` ile alınan tablo satırları dizisi
-  - `tenantId` — `this.securityContext.tenantId`, mevcut kiracının tenant ID'si
-  - `userRole` — `this.securityContext.userRole`, mevcut kullanıcının rolü
-  - `hasTenantIdColumn` — tablodaki satırlarda `tenant_id` sütunu olup olmadığını belirten boolean
-  - `isTenantAuthorized` — anonim fonksiyon, bir satırın Row Level Security kapsamında yetkilendirilip yetkilendirilmediğini kontrol eder
-  - `filtered` — (select) RLS ve programatik filtreler uygulandıktan sonra kalan satırlar
-  - `filtered[0]` — (select single/maybeSingle) filtrelenmiş ilk satır
-  - `rowsToInsert` — (insert) payload dizi değilse diziye çevrilmiş eklenecek satırlar
-  - `inserted` — (insert) başarıyla eklenen satırların tutulduğu dizi
-  - `row` — (insert döngüsü) eklenecek tek bir satır
-  - `newRow` — (insert) `row`'un shallow copy'si, üzerinde `id`, `tenant_id` düzenlemeleri yapılır
-  - `returnData` — (insert) payload dizi ise tüm inserted dizisi, değilse inserted[0]
-  - `affectedIndices` — (update) güncellenecek satırların indekslerini tutan dizi
-  - `row` — (update döngüsü) kontrol edilen mevcut satır
-  - `matches` — (update) satırın tüm filtre koşullarını karşılayıp karşılamadığını belirten boolean
-  - `updatedRow` — (update) payload ile birleştirilmiş güncellenmiş satır
-  - `updatedRows` — (update) başarıyla güncellenen satırların tutulduğu dizi
-  - `updatedRows[0]` — (update single) ilk güncellenen satır
-  - `remaining` — (delete) silinmeyen, kalan satırlar
-  - `deleted` — (delete) silinen satırlar
-  - `isTarget` — (delete) satırın silinme hedefi olup olmadığını belirten boolean, IIFE ile hesaplanır
-  - `isTarget` içindeki anonim fonksiyon — satırın yetkilendirme ve filtre koşullarını test eder
-- **Dönüş**: `Promise<{ data: any; error: any }>` — sorgu sonucu veriyi ve olası hata nesnesini içerir
+  - `result` — `this.db.executeQuery(...)` çağrısından dönen `{ data: any; error: any }` sonucu; `this.tableName`, `this.queryType`, `this.payload`, `this.filters`, `this.isSingle`, `this.isMaybeSingle` alanlarından oluşan sorgu nesnesi ile tetiklenir
+  - `err` — `try` bloğunda yakalanan hata; `onrejected` varsa ona iletilir, yoksa yeniden fırlatılır
+- **Dönüş**: `Promise<any>` — başarılıysa `onfulfilled(result)` veya `result`, hata durumunda `onrejected(err)` veya hata fırlatılır
+
+### [N10_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockDatabaseEngine.setTableData
+- **params**: `tableName: string`, `data: any[]`
+- **ic_degiskenler**: yok — `this.tables` Map'ine `JSON.parse(JSON.stringify(data))` ile derin kopya eklenir
+- **Dönüş**: yok
+
+### [N11_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockDatabaseEngine.getTableData
+- **params**: `tableName: string`
+- **ic_degiskenler**: yok
+- **Dönüş**: `any[]` — `this.tables.get(tableName)` sonucu; bulunamazsa boş dizi `[]` döner
+
+### [N12_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockDatabaseEngine.clearTable
+- **params**: `tableName: string`
+- **ic_degiskenler**: yok — `this.tables` Map'inde ilgili anahtar boş dizi `[]` ile ayarlanır
+- **Dönüş**: yok
+
+### [N13_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockDatabaseEngine.setSecurityContext
+- **params**: `context: Partial<SecurityContext>`
+- **ic_degiskenler**: yok — `this.securityContext` mevcut değer ile `context` spread edilerek birleştirilir
+- **Dönüş**: yok
+
+### [N14_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockDatabaseEngine.getSecurityContext
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `SecurityContext` — `this.securityContext` doğrudan döner
+
+### [N15_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockDatabaseEngine.createClient
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ from: (tableName: string) => MockQueryBuilder }` — `from` metodu verilen `tableName` ve `this` (MockDatabaseEngine örneği) ile yeni bir `MockQueryBuilder` oluşturur
+
+### [N16_NASIL] AST Pointer: tests\e2e\helpers\mockDb.ts::MockDatabaseEngine.executeQuery
+- **params**: `query: { tableName: string, queryType: 'select' | 'insert' | 'update' | 'delete', payload: any, filters: Array<(row: any) => boolean>, isSingle: boolean, isMaybeSingle: boolean }`
+- **ic_degiskenler**:
+  - `tableName` — destructuring ile `query.tableName`'den alınan tablo adı
+  - `queryType` — destructuring ile `query.queryType`'dan alınan sorgu türü
+  - `payload` — destructuring ile `query.payload`'dan alınan veri yükü
+  - `filters` — destructuring ile `query.filters`'dan alınan satır filtre fonksiyonları dizisi
+  - `isSingle` — destructuring ile `query.isSingle`'dan alınan tek satır bayrağı
+  - `isMaybeSingle` — destructuring ile `query.isMaybeSingle`'dan alınan opsiyonel tek satır bayrağı
+  - `data` — `this.getTableData(tableName)` ile elde edilen tablo satırları dizisi
+  - `tenantId` — `this.securityContext.tenantId`'den alınan kiracı kimliği
+  - `userRole` — `this.securityContext.userRole`'den alınan kullanıcı rolü
+  - `hasTenantIdColumn` — `data.length > 0 && 'tenant_id' in data[0]` koşuluyla belirlenen boolean; tablonun `tenant_id` sütunu içerip içermediğini gösterir
+  - `isTenantAuthorized` — arrow fonksiyon; parametre olarak `row: any` alır. `hasTenantIdColumn` doğruysa ve satırda `tenant_id` varsa: `userRole` `'super_admin'` ise `true` döner, aksi halde `row.tenant_id === tenantId` kontrolü yapar. `tenant_id` yoksa `true` döner
+  - `filtered` — (select dalı) `data.filter(isTenantAuthorized)` ile RLS sınırları uygulanmış satırlar, ardından `filters` dizisindeki her filtre fonksiyonu ile tekrar filtrelenir
+  - `rowsToInsert` — (insert dalı) `Array.isArray(payload)` kontrolüyle belirlenen; `payload` dizi ise kendisi, değilse `[payload]` sarmalı
+  - `inserted` — (insert dalı) eklenen satırları toplayan dizi
+  - `newRow` — (insert dalı döngüsü) `{ ...row }` ile oluşturulan kopya satır; RLS kontrolü ve `id` üretimi bu nesne üzerinde yapılır
+  - `affectedIndices` — (update dalı) filtre ve RLS koşullarını sağlayan satırların indekslerini tutan dizi
+  - `updatedRows` — (update dalı) güncellenmiş satırları toplayan dizi
+  - `row` — (update dalı döngüsü) `data[i]` ile erişilen mevcut satır
+  - `idx` — (update dalı döngüsü) `affectedIndices` dizisinden alınan satır indeksi
+  - `updatedRow` — (update dalı döngüsü) `{ ...row, ...payload }` ile mevcut satırın üzerine payload uygulanarak oluşturulan yeni satır
+  - `remaining` — (delete dalı) silinmeyen satırları toplayan dizi
+  - `deleted` — (delete dalı) silinen satırları toplayan dizi
+  - `isTarget` — (delete dalı döngüsü) IIFE arrow fonksiyonu; `isTenantAuthorized(row)` ve tüm `filters` koşullarını sağlayan satırlar için `true` döner
+- **Dönüş**: `Promise<{ data: any; error: any }>` — select'te filtrelenmiş satırlar (tek/çoklu), insert'te eklenen satırlar, update'te güncellenen satırlar, delete'te silinen satırlar; hata durumunda uygun hata nesnesi
 
 ---
 
@@ -340,9 +288,9 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: tests\e2e\helpers\mockDb.ts
-  class: tests\e2e\helpers\mockDb.ts::MockQueryBuilder
-  class: tests\e2e\helpers\mockDb.ts::MockDatabaseEngine
+  file: mockDb.ts
+  class: mockDb.ts::MockQueryBuilder
+  class: mockDb.ts::MockDatabaseEngine
 
 ---
 

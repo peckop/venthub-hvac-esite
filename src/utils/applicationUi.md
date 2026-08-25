@@ -2,68 +2,70 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\applicationUi.tsx
-skeleton_hash: 857b9dfeb4799369
+source_path: C:\tmp\wt-supurme\src\utils\applicationUi.tsx
+skeleton_hash: bd34ea6485556e69
 entity_hashes:
   func:accentOverlayClass: d8ef037541c09389
   func:iconFor: 8ef77854d85af42b
   overview: bbb9266e1effc225
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-25T07:28:57Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulaması genelinde tutarlı bir kullanıcı arayüzü deneyimi sağlamak için temel UI yardımcı fonksiyonlarını merkezi olarak sunar. İkonların boyutlandırılmasına ve vurgu renkleri için CSS sınıflarının dinamik oluşturulmasına ilişkin standart işlevleri içererek, farklı bileşenlerdeki tekrarlanan UI mantığını önler.
+
+Bu modül, uygulama arayüzünde kullanılan ikon ve renk vurgusu (accent) ile ilgili yardımcı fonksiyonları içerir. `utils` klasöründe konumlanan modül, UI bileşenlerinin ikon ve stil ihtiyaçlarını karşılayan küçük bir yardımcı katman sunar.
 
 ## Fonksiyon Grupları
-### İkon Yönetim Fonksiyonları
-Uygulamadaki standart ikonların, verilen boyut parametresine göre doğru şekilde render edilmesini ve gösterilmesini sağlar.
+
+### İkon Yardımcıları
+Uygulama ikonlarının belirli bir boyuta göre elde edilmesini sağlar.
 - iconFor
 
-### Vurgu Rengi Stili Üretim Fonksiyonları
-Uygulama temasındaki belirli vurgu renkleri için gerekli CSS sınıflarını, bileşenlerde kullanılacak şekilde dinamik olarak üretir.
+### Stil Yardımcıları
+Uygulama accent rengine göre CSS sınıf adının belirlenmesini sağlar.
 - accentOverlayClass
+
+## Bağımlılıklar
+
+**Dış Bağımlılıklar:**
+- `ApplicationIcon` tipi (ikon tanımları için)
+- `ApplicationAccent` tipi (renk vurgusu tanımları için)
+
+Bu iki tip muhtemelen başka bir modülden import edilmektedir; ancak kaynakta bu bilgi doğrulanamaz.
+
+**İç Bağımlılıklar:**
+- Modülde tanımlı iki fonksiyon birbirini çağırmaz; bağımsız çalışırlar.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, VentHub HVAC uygulamasında ikon gösterimi ve vurgu rengi CSS sınıfı üretimi için merkezi UI yardımcı fonksiyonları sunar.
+Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çıkarılabilen bağımlılık temelli varsayımlar tanımlanabilir.
 
-**[Aksiyom 1]:** Eğer `Svg` objesi (modül sabiti) tanımlı değilse veya içeriği eksikse, `iconFor` fonksiyonu istenen ikonu render edemez ve ikon gösterimi başarısız olur.
+**[Aksiyom 1]**: Eğer `ApplicationIcon` tipi tanımlı değilse, `iconFor` fonksiyonu çağrılamaz.
 
-**[Aksiyom 2]:** Eğer `icon` parametresi geçerli bir `ApplicationIcon` değeri değilse, `iconFor` fonksiyonu eşleşen SVG kaynağı bulamaz ve ikon gösterilemez.
+**[Aksiyom 2]**: Eğer `ApplicationAccent` tipi tanımlı değilse, `accentOverlayClass` fonksiyonu çağrılamaz.
 
-**[Aksiyom 3]:** Eğer `size` parametresi `iconFor` fonksiyonuna geçirilmezse, ikon için varsayılan bir boyut kullanılacağı varsayılır (değer bilinmiyor — default parametre değeri imzada belirtilmemiş).
-
-**[Aksiyom 4]:** Eğer `accent` parametresi geçerli bir `ApplicationAccent` değeri değilse, `accentOverlayClass` fonksiyonu eşleşen CSS sınıfı üretemez ve vurgu rengi stili uygulanamaz.
-
-**[Aksiyom 5]:** Eğer `accentOverlayClass` fonksiyonu tarafından üretilen CSS sınıf adı, uygulamanın global stil tanımlarında (örn: Tailwind, CSS modülleri) tanımlı değilse, vurgu rengi görsel olarak uygulanmaz.
+**[Aksiyom 3]**: Eğer `Svg` sabiti mevcut değilse, bu modüldeki SVG tabanlı ikon işleme gerçekleştirilemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### iconFor
-**Ne yapar**: Verilen `ApplicationIcon`枚ger değerine karşılık gelen SVG vektör grafiğini, belirtilen boyutta oluşturur ve döndürür. Bu fonksiyon, uygulamadaki ikonları standart bir şekilde göstermek için kullanılır.
+**Ne yapar**: Verilen `ApplicationIcon` tipindeki ikon adına karşılık gelen SVG bileşenini belirtilen boyutla birlikte döndüren bir ikon çözümleme fonksiyonudur. Eşleşen bir ikon bulunamazsa `null` değerini döndürür.
 
-**Nasıl yapar**: Fonksiyon, `icon` parametresinin değerine göre bir `switch` yapısı kullanır. Her durum, belirli bir ikon adı için ilgili `Svg` modülünden bir bileşeni (`Svg.building`, `Svg.wind` vb.) çağırarak, `size` parametresiyle boyutlandırılmış bir SVG döndürür. Tanınmayan bir ikon gelirse `default` dalında `null` değerini döndürür.
+**Nasıl yapar**: Fonksiyon, `icon` parametresi üzerinde bir `switch` ifadesi kullanarak her bir ikon adını (`'building'`, `'wind'`, `'layers'`, `'factory'`) kontrol eder. Eşleşen durumda, `Svg` nesnesi üzerindeki ilgili metodu (örneğin `Svg.building`) çağırarak `size` parametresini argüman olarak iletir ve dönen SVG bileşenini döndürür. Hiçbir durum eşleşmezse `default` dalı çalışır ve `null` döndürülür.
 
 **Parametreler**:
-- icon: `ApplicationIcon` — Hangi ikonun gösterileceğini belirten枚ger tipindeki değer (örn. 'building', 'wind').
-- size: `number` (Varsayılan: 18) — İkonun piksel cinsinden yüksekliği ve genişliği.
+- icon: `ApplicationIcon` — Çözümlenecek ikonun adını temsil eder. `'building'`, `'wind'`, `'layers'`, `'factory'` gibi değerler alabilir.
+- size: `number` — SVG ikonunun piksel cinsinden boyutunu belirtir. Parametre verilmezse varsayılan olarak `18` değerini alır.
 
-**Dönüş**: `React.ReactElement | null` — Belirtilen boyut ve türde bir SVG React bileşeni veya geçersiz ikon durumunda `null`.
+**Dönüş**: Eşleşen ikon durumunda ilgili `Svg` metodunun dönüş değeri (SVG bileşeni), eşleşme bulunamazsa `null`.
 
 ### accentOverlayClass
-**Ne yapar**: Verilen `ApplicationAccent`枚ger değerine karşılık gelen, bir arka plan rengi için użylabilecek CSS gradyan sınıf adını döndürür. Bu sınıf adları, bir üzerine bindirme (overlay) efekti oluşturmak için Tailwind CSS stilleri ile kullanılır.
-
-**Nasıl yapar**: Fonksiyon, `accent` parametresinin değerine göre bir `switch` yapısı kullanarak, her vurgu rengi için önceden tanımlanmış bir Tailwind CSS gradyan sınıf dizesini (`'from-secondary-blue/10'` gibi) eşler. Tanınmayan bir renk geldiğinde varsayılan olarak gri tona sahip bir gradyan sınıfını döndürür.
-
-**Parametreler**:
-- accent: `ApplicationAccent` — Hangi vurgu renginin gradyanının seçileceğini belirten枚ger tipindeki değer (örn. 'blue', 'navy', 'emerald').
-
-**Dönüş**: `string` — Seçilen renge karşılık gelen, opaklığı ayarlanmış bir Tailwind CSS gradyan başlangıç sınıf adı.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -83,22 +85,26 @@ Bu modül, VentHub HVAC uygulamasında ikon gösterimi ve vurgu rengi CSS sını
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/utils/applicationUi.tsx::iconFor
-- **params**: (icon: ApplicationIcon, size = 18)
-- **ic_degiskenler**: Yok
-- **Dönüş**: React elementi (Svg objesinden alınan SVG bileşeni) veya null
+- **params**: `icon: ApplicationIcon`, `size: number` (varsayılan değer: 18)
+- **ic_degiskenler**:
+  - `icon` — switch-case kontrolü yapılan parametre; hangi SVG ikonunun döndürüleceğini belirler ('building', 'wind', 'layers', 'factory')
+  - `size` — SVG ikonunun genişlik ve yükseklik değeri; `Svg` objesinin ilgili metoduna argüman olarak geçilir
+  - `Svg` — modül seviyesinde tanımlı sabit obje; her bir ikon için `size` parametresiyle çağrılan metodlar içerir (`Svg.building`, `Svg.wind`, `Svg.layers`, `Svg.factory`)
+- **Dönüş**: `Svg.building(size)` | `Svg.wind(size)` | `Svg.layers(size)` | `Svg.factory(size)` (JSX element) veya `null` (eşleşme bulunamazsa)
 
 ### [N2_NASIL] AST Pointer: src/utils/applicationUi.tsx::accentOverlayClass
-- **params**: (accent: ApplicationAccent)
-- **ic_degiskenler**: Yok
-- **Dönüş**: string (Tailwind CSS gradient class adı)
+- **params**: `accent: ApplicationAccent`
+- **ic_degiskenler**:
+  - `accent` — switch-case kontrolü yapılan parametre; hangi Tailwind CSS gradient class'ının döndürüleceğini belirler ('blue', 'navy', 'emerald', 'gray')
+- **Dönüş**: string — Tailwind CSS class değeri: eşleşen `accent` değerine göre `'from-secondary-blue/10'` | `'from-primary-navy/10'` | `'from-emerald-500/10'` | `'from-gray-400/10'` veya varsayılan olarak `'from-gray-300/10'`
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\utils\applicationUi.tsx
-  function: src\utils\applicationUi.tsx::iconFor
-  function: src\utils\applicationUi.tsx::accentOverlayClass
+  file: applicationUi.tsx
+  function: applicationUi.tsx::iconFor
+  function: applicationUi.tsx::accentOverlayClass
 
 ---
 

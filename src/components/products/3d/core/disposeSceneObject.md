@@ -2,62 +2,51 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\core\disposeSceneObject.ts
-skeleton_hash: 20333ddc2f25a683
+source_path: C:\tmp\wt-supurme\src\components\products\3d\core\disposeSceneObject.ts
+skeleton_hash: effdd69655ea8ad1
 entity_hashes:
   func:disposeSceneObject: 09e4bce0d362eb1f
   func:isTexture: 5d5045b574da62d2
   overview: 7c948c72d891b333
-generated_at: 2026-06-20T05:00:40Z
+generated_at: 2026-08-25T07:26:11Z
 ---
 
 ## Genel Bakış
-Bu modül, Three.js tabanlı 3D sahnelerde nesne hiyerarşilerinin ve bağlı kaynakların (texture, geometri, malzeme) bellek yönetimini sağlar. Temel amacı, sahne temizleme işlemlerini merkezi olarak yöneterek olası bellek sızıntılarını önlemektir.
+Bu modül, Three.js tabanlı 3D sahne nesnelerinin ve bunlara bağlı kaynakların (texture, geometri, materyal vb.) bellekten düzgün şekilde serbest bırakılmasını sağlar. Sahne temizleme işlemleri sırasında kullanılan yardımcı kontrol fonksiyonlarını ve ana temizleme mantığını içerir.
 
 ## Fonksiyon Grupları
-### Kaynak Kontrol ve Doğrulama Fonksiyonları
-Sahne nesnelerinin işlenmesi sırasında kaynakların türünü doğru bir şekilde belirlemeye yardımcı olan yardımcı kontrol fonksiyonları.
+
+### Yardımcı Kontrol Fonksiyonları
+Verilen bir değerin texture olup olmadığını tespit ederek temizleme sırasında doğru işlem yapılmasını sağlar.
 - isTexture
 
-### Sahne Nesnesi İmha Fonksiyonları
-Bir Object3D nesnesini ve tüm alt elemanlarını递归 olarak serbest bırakan ana temizlik fonksiyonu. İlgili texture, geometri ve malzeme kaynaklarını güvenli bir şekilde imha eder.
+### Kaynak Temizleme Fonksiyonları
+Verilen bir 3D nesneyi ve bu nesneye bağlı tüm alt nesneleri, materyalleri, geometrileri ve texture'ları bellekten serbest bırakır.
 - disposeSceneObject
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, Three.js sahne nesnelerinin (`Object3D`) bellek yönetimi ve temizleme işlemlerini gerçekleştirir.
-
-**[Aksiyom 1]**: Eğer `disposeSceneObject` fonksiyonuna verilen `object` parametresi geçerli bir Three.js `Object3D` instance'ı değilse (örn. `null`, `undefined` veya farklı bir tipte bir nesne ise), fonksiyon hata verir veya beklenmeyen davranış gösterir.
-
-**[Aksiyom 2]**: Eğer `isTexture` fonksiyonuna verilen `value` parametresi, Three.js `Texture` instance'ı ile karşılaştırılabilir bir yapıda değilse, fonksiyon `false` değeri döndürür.
-
-**[Aksiyom 3]**: Eğer `disposeSceneObject` fonksiyonu成功 ile çalışırsa, verilen `object` ve ona bağlı tüm alt nesneler (child'lar), materyaller (materials) ve texture'lar bellekten serbest bırakılır; böylece WebGL kaynakları sızıntıya uğramaz.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### isTexture
-**Ne yapar**: Verilen bir değerin, Three.js `Texture` nesnesi olup olmadığını belirleyen tür daraltma (type narrowing) fonksiyonudur. Fonksiyon true döndüğünde, TypeScript derleyicisi parametrenin `Texture` olduğunu bilir.
+**Ne yapar**: Verilen bilinmeyen tipdeki değerin Three.js Texture nesnesi olup olmadığını denetler. TypeScript type guard fonksiyonu olarak çalışır; bu fonksiyonun true döndürdüğü durumlarda TypeScript, parametre olan `value` değişkenini `Texture` tipiyle daraltır (type narrowing).
 
-**Nasıl yapar**: Fonksiyon, gelen değerin nesne olup olmadığını kontrol eder. Ardından, nesnenin `isTexture` adlı bir özelliğinin `true` değerine sahip olup olmadığını ve bir `dispose` metodu içerip içermediğini doğrular. Bu kontroller, Three.js texture nesnelerinin belirgin özelliklerini hedef alarak güvenli bir tespit sağlar. Fonksiyonun dönüş tipi `value is Texture` olarak belirtilmiştir; bu, TypeScript'te bir tür koruma (type guard) işlevi görür.
+**Nasıl yapar**: Dört koşulu AND operatörüyle birleştirerek kontrol eder. İlk olarak değerin bir nesne olup olmadığına (`typeof value === 'object'`), ardından null olmadığına bakar. Sonrasında değerin `isTexture` özelliğinin `true` olup olmadığını kontrol eder — bu, Three.js Texture nesnelerinin standart bir özellik bayrağıdır. Son olarak değerin `dispose` adında bir fonksiyon tipinde özelliğe sahip olup olmadığını denetler. Dört koşulun tamamı sağlandığında true döner, aksi halde false döner.
 
 **Parametreler**:
-- value: unknown — Kontrol edilecek ham değer. Herhangi bir tipte olabilir.
+- value: unknown — Texture olup olmadığı denetlenecek bilinmeyen türde değer
 
-**Dönüş**: `value is Texture` — Değer bir texture nesnesiyse `true`, değilse `false` döner. TypeScript'te bu tür, fonksiyonun çağrıldığı bağlamda parametrenin `Texture` olarak yeniden yazılmasını (narrows) sağlar.
+**Dönüş**: value is Texture — TypeScript type guard dönüşü. Fonksiyon true döndüğünde çağrılan kapsamda `value` parametresi `Texture` tipi olarak güvenle kullanılabilir hale gelir.
 
 ### disposeSceneObject
-**Ne yapar**: Three.js `Object3D` nesnesini (ve tüm alt nesnelerini) VRAM'den temizleyerek bellek sızıntılarını önleyen bir temizlik fonksiyonudur. R3F (React Three Fiber) gibideclaratif frameworksler otomatik temizlik yapsa da, `<primitive>` veya `useGLTF` gibi bileşenlerden elde edilen veya global cache'te tutulan nesneler için bu manuel temizlik zorunludur.
-
-**Nasıl yapar**: Fonksiyon, verilen `object` üzerinde `traverse` metodunu kullanarak tüm alt ağaçta gezinir. Gezilen her `child` nesnesi bir `Mesh`_instance'ı ise; önce onun `geometry`'sini, sonra da `material`'ını (veya materyal dizisindeki her bir materyali) `dispose` ederek serbest bırakır. Her materyal serbest bırakılırken, materyalin tüm değerleri arasından `isTexture` fonksiyonu ile tespit edilen texture nesneleri de ayrıca `dispose` edilerek GPU belleğinden (VRAM) temizlenir. Bu işlem, sahne nesnelerinin tüm grafik kaynaklarını kapsamlı bir şekilde serbest bırakır.
-
-**Parametreler**:
-- object: Object3D — Temizlenecek olan 3D sahne nesnesi. Bu nesne ve tüm alt nesneleri işlenecektir.
-
-**Dönüş**: void — Fonksiyon herhangi bir değer döndürmez; doğrudan nesne üzerinde temizlik işlemi gerçekleştirir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -70,27 +59,28 @@ Bu modül, Three.js sahne nesnelerinin (`Object3D`) bellek yönetimi ve temizlem
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/products/3d/core/disposeSceneObject.ts::isTexture
-- **params**: (value: unknown)
+- **params**: `value: unknown`
 - **ic_degiskenler**:
-  - `value` — Kontrol edilecek nesne, bilinmeyen tipte bir değer olabilir
-- **Dönüş**: value is Texture (tip koruyucu – value如果是Texture ise true, değilse false döner)
+  - `value` — kontrol edilen nesne; `typeof` ile object olup olmadığı, null olup olmadığı, `isTexture` özelliğinin `true` olup olmadığı ve `dispose` özelliğinin function olup olmadığı kontrol edilir
+- **Dönüş**: `boolean` (TypeScript type guard — `value is Texture`)
 
 ### [N2_NASIL] AST Pointer: src/components/products/3d/core/disposeSceneObject.ts::disposeSceneObject
-- **params**: (object: Object3D)
+- **params**: `object: Object3D`
 - **ic_degiskenler**:
-  - `child` — traverse() callback'inin parametresi, sahne grafiğindeki her bir çocuk nesneyi temsil eder
-  - `materials` — child.material'ın dizi olup olmadığına göre normalize edilmiş materyal dizisi; dizi değilse tek elemanlı diziye sarılır
-  - `material` — materials dizisi içindeki her bir materyal, döngü değişkeni
-  - `value` — Object.values(material) ile elde edilen her bir materyal değeri, texture kontrolü için kullanılır
-- **Dönüş**: void (yan etki: object ve tüm çocuklarının geometri, materyal ve texture'larını VRAM'den temizler)
+  - `object` — sahne nesnesi; `traverse` metodu ile tüm alt nesneleri dolaşmak için kullanılır
+  - `child` — `traverse` callback parametresi; her alt nesneyi temsil eder, `instanceof Mesh` ile kontrol edilir
+  - `materials` — `child.material` dizisi ise kendisi, tek materyal ise tek elemanlı diziye dönüştürülmüş hali
+  - `material` — `materials` dizisi üzerindeki for-of döngüsü değişkeni; her materyali temsil eder, null kontrolü yapılır ve `dispose()` ile temizlenir
+  - `value` — `Object.values(material)` ile elde edilen materyal özelliklerinin her biri; `isTexture` ile texture olup olmadığı kontrol edilir, texture ise `dispose()` ile VRAM'den temizlenir
+- **Dönüş**: `void`
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\core\disposeSceneObject.ts
-  function: src\components\products\3d\core\disposeSceneObject.ts::isTexture
-  function: src\components\products\3d\core\disposeSceneObject.ts::disposeSceneObject
+  file: disposeSceneObject.ts
+  function: disposeSceneObject.ts::isTexture
+  function: disposeSceneObject.ts::disposeSceneObject
 
 ---
 

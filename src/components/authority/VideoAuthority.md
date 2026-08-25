@@ -2,46 +2,49 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\authority\VideoAuthority.tsx
-skeleton_hash: 8ba1ac187536ac0b
+source_path: C:\tmp\wt-supurme\src\components\authority\VideoAuthority.tsx
+skeleton_hash: 6e7afa0385d107da
 entity_hashes:
-  func:VideoAuthority: b3456356a0303fff
+  func:VideoAuthority: b42d8a27d95a4ea9
   overview: 931e142b761ac254
   style_tokens: ee9eb5151ad04adf
-generated_at: 2026-06-14T22:18:04Z
+generated_at: 2026-08-25T07:25:24Z
 ---
 
 ## Genel Bakış
-VideoAuthority, farklı video sağlayıcılarından gelen içeriklerin tek bir standart arayüzde görüntülenmesini sağlayan merkezi bir bileşendir. Video meta verilerini alarak uygun oynatıcıyı oluşturur ve opsiyonel stil sınıflarıyla dışarıdan gelen görünüm özelleştirmelerini destekler.
+
+VideoAuthority, video içeriğine ilişkin yetki bilgisini görüntülemek için kullanılan bir React bileşenidir. `metadata` ve `className` olmak üzere iki prop alır; `className` varsayılan olarak boş string değerine sahiptir. Bileşen, `src/components/authority/` klasörü altında konumlanmıştır.
 
 ## Fonksiyon Grupları
-### Video Oluşturma ve Stil Yönetimi
-Bu grup, video bileşeninin temel amacını karşılar: gelen meta verileri ayrıştırarak tutarlı bir video oynatıcı arayüzü oluşturmak ve dışarıdan sağlanan CSS sınıflarını uygulamak.
+
+### Ana Bileşen
+
+Tek bileşenden oluşan bu modülde, video yetki bilgisinin sunumunu üstlenen bir React bileşeni yer alır. Bileşen, aldığı metadata verisine göre yetki görselleştirmesini gerçekleştirir.
+
 - VideoAuthority
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Not:** Modül yalnızca fonksiyon imzası (`VideoAuthority({ metadata, className = '' })`) düzeyinde bilgi içermekte olup, fonksiyon gövdesi sağlanmadığı için davranışsal çıkarım yapılamamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### VideoAuthority
+**Ne yapar**: Farklı video sağlayıcılarından (Cloudflare, YouTube) gelen videoları tek bir standartta render eden merkezi video yönetim bileşenidir. P01-012 kapsamında tanımlanmıştır. Sağlayıcıya göre uygun iframe'i oluşturur, yükleme durumunu takip eder, thumbnail fallback gösterir ve standartlaştırılmış overlay kontrolleri sunar.
 
-**Ne yapar**: Merkezi video yönetim bileşenidir. Cloudflare Stream ve YouTube gibi farklı video sağlayıcılarından gelen videoları tek bir standart arayüzde render eder. Bileşen, video oynatıcı, kük önizleme (thumbnail) fallback mekanizması ve hover ile görünen kontroller panelini sunar.
-
-**Nasıl yapar**: Fonksiyon, gelen `metadata.provider` alanına göre bir `switch` yapısıyla (`renderPlayer` iç fonksiyonu) ilgili sağlayıcıya ait iframe URL'sini dinamik olarak oluşturur. Her sağlayıcı için embed URL parametreleri (autoplay, muted, loop, controls) metadata nesnesinden okunarak URL query string'ine dönüştürülür. `useState` hook'ları ile video yüklenme durumu (`isLoaded`) ve sessizlik durumu (`isMuted`) yönetilir. `isLoaded` başlangıçta `false` olduğundan, iframe'in `onLoad` eventi tetiklenene kadar `metadata.thumbnailUrl` değerinden bulanık bir thumbnail gösterilir. `useI18n` hook'u ile yerelleştirilmiş metinler (`t(...)`) kullanılır. Framer Motion kütüphanesinden gelen `motion.div` bileşeni, container'ın giriş animasyonunu (opacity ve scale geçişi) sağlar. `group-hover` Tailwind sınıfı ile fare overldığında kontroller paneli (`opacity-0 → opacity-100`) görünür hale gelir. Sessizlik butonuna tıklandığında `isMuted` state'i tersine çevrilir ve iframe URL'si buna göre yeniden render edilir.
+**Nasıl yapar**: Bileşen, `useI18n` hook'u ile uluslararasılaştırma desteği alır ve iki durum yönetir: videonun yüklenip yüklenmediğini (`isLoaded`) ve sesin açık/kapalı olduğunu (`isMuted`). `metadata.provider` değerine göre bir `switch` yapısı ile `renderPlayer` fonksiyonu çalıştırılır; `cloudflare` durumunda Cloudflare Stream iframe'i, `youtube` durumunda YouTube embed iframe'i, diğer durumlarda ise desteklenmeyen sağlayıcı uyarısı gösterilir. Her iframe'in `onLoad` olayı `isLoaded` durumunu `true` yapar. Dış sarmalayıcı `motion.div` ile başlangıçta opaklığı 0 ve ölçeği 0.98 olan bir animasyonla açılır. `isLoaded` false iken ve `metadata.thumbnailUrl` mevcutken, bulanık ve yarı saydam bir thumbnail resmi (`Image` bileşeni) gösterilir. Video container'ının üzerine, fare üzerine geldiğinde (`group-hover:opacity-100`) görünen bir overlay katmanı eklenir; bu katmanda video başlığı, play ikonu ve ses açma/kapama butonu bulunur. Container'ın en-boy oranı `metadata.aspectRatio` değerine göre `9/16` (dikey) veya `16/9` (varsayılan/yatay) olarak ayarlanır.
 
 **Parametreler**:
+- metadata: VideoAuthorityProps — Video meta bilgilerini içerir. Bu nesne içinde `provider` (sağlayıcı türü: `'cloudflare'` veya `'youtube'`), `id` (video kimliği), `title` (video başlığı), `thumbnailUrl` (thumbnail resim URL'i), `aspectRatio` (en-boy oranı: `'vertical'` veya diğer), `options` (video oynatma seçenekleri: `muted`, `autoPlay`, `loop`, `controls` alanlarını içeren opsiyonel nesne) bulunur.
+- className: string — Bileşenin dış sarmalayıcısına ek CSS sınıfı eklemek için kullanılır. Varsayılan değeri boş string `''`dir.
 
-- `metadata`: `VideoAuthorityProps['metadata']` — Video meta bilgilerini içeren nesne. `provider` (sağlayıcı tipi: `'cloudflare' | 'youtube'`), `id` (video kimliği), `title` (video başlığı), `thumbnailUrl` (önizleme görseli URL'i), `aspectRatio` (en-boy oranı: `'vertical'` veya diğer), ve `options` (opsiyonel: `autoPlay`, `muted`, `loop`, `controls` boolean değerleri) alanlarını barındırır.
-- `className`: `string` — Bileşenin kök `motion.div` elemanına eklenecek ek CSS sınıf isimleri. Varsayılan değeri boş stringdir (`''`).
-
-**Dönüş**: `JSX.Element` — Render edilmiş video bileşeninin JSX yapısı. Bileşenin return tipi React fonksiyonel bileşen standartlarına göre JSX döndürür; `motion.div` sarmalayıcısı içinde thumbnail fallback, iframe video player ve overlay kontroller bölümünü içerir.
+**Dönüş**: JSX elementi döndürür. Dış sarmalayıcı `motion.div` olup içinde thumbnail fallback, video player iframe'i ve overlay kontrolleri katmanları bulunur. Bileşenin dönüş tipi kaynak kodda açıkça belirtilmemiştir.
 
 ---
 
@@ -68,53 +71,39 @@ Bu grup, video bileşeninin temel amacını karşılar: gelen meta verileri ayr�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: components/authority/VideoAuthority.tsx::VideoAuthority
-- **params**: `{ metadata, className = '' }` — VideoAuthorityProps tipinde video metadata bilgisi ve opsiyonel CSS class adı
+### [N1_NASIL] AST Pointer: src/components/authority/VideoAuthority.tsx::VideoAuthority
+- **params**: `metadata` (VideoMetadata tipinde video meta verisi), `className` (opsiyonel string, varsayılan `''`)
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu, UI metinlerini lokalize eder (örn: `t('pdp.videoAuthority.unsupportedProvider')`)
-  - `isLoaded` — useState ile yönetilen boolean, videonun iframe içinde yüklenip yüklenmediğini takip eder; true olduğunda thumbnail fallback gizlenir
-  - `isMuted` — useState ile yönetilen boolean, videonun sessiz olup olmadığını tutar; `metadata.options?.muted ?? true` ile başlangıç değeri alınır, ses butonu ile toggle edilir
-  - `renderPlayer` — iç fonksiyon, `metadata.provider` değerine göre ('cloudflare', 'youtube' veya diğer) uygun iframe player JSX'ini döndürür
-- **Dönüş**: JSX — `<motion.div>` ile animasyonlu video container'ı; thumbnail fallback, renderPlayer() çıktıları ve overlay kontrolleri (başlık, ses butonu) döndürülür
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('pdp.videoAuthority.unsupportedProvider')` gibi anahtarlarla yerelleştirilmiş metin almak için kullanılır
+  - `isLoaded` — `useState(false)` ile tanımlanan boolean state; videonun iframe'i yüklenip yüklenmediğini takip eder, `false` iken thumbnail fallback gösterilir
+  - `setIsLoaded` — `isLoaded` state'ini güncelleyen setter fonksiyonu; iframe'in `onLoad` olayında `true` olarak çağrılır
+  - `isMuted` — `useState(metadata.options?.muted ?? true)` ile tanımlanan boolean state; videonun sessiz durumunu tutar, başlangıç değeri `metadata.options?.muted` varsa onu kullanır, yoksa `true`
+  - `setIsMuted` — `isMuted` state'ini güncelleyen setter fonksiyonu; overlay'deki ses butonuna tıklandığında `!isMuted` değeriyle çağrılır
+  - `renderPlayer` — `metadata.provider` değerine göre uygun video iframe'ini döndüren arrow fonksiyon; `'cloudflare'`, `'youtube'` veya `default` (desteklenmeyen sağlayıcı uyarısı) durumlarını switch ile işler
+  - `metadata.provider` — video sağlayıcısını belirten string; `'cloudflare'` veya `'youtube'` olabilir, switch-case ile dallanma sağlar
+  - `metadata.title` — video başlığı; iframe `title` özelliğinde ve overlay'de gösterilir, yoksa fallback string kullanılır
+  - `metadata.id` — video kimliği; Cloudflare ve YouTube iframe URL'lerinde kullanılır
+  - `metadata.options?.autoPlay` — otomatik oynatma seçeneği; Cloudflare'de `'true'`/`'false'`, YouTube'da `1`/`0` olarak URL'e eklenir
+  - `metadata.options?.muted` — başlangıç sessiz durumu; `isMuted` state'inin başlangıç değerini belirler
+  - `metadata.options?.loop` — döngü seçeneği; sadece YouTube provider'da URL parametresi olarak eklenir
+  - `metadata.options?.controls` — kontrol çubuğu gösterme seçeneği; sadece YouTube provider'da URL parametresi olarak eklenir
+  - `metadata.thumbnailUrl` — thumbnail resim URL'i; video yüklenene kadar blur ve yarı saydam `Image` bileşeni olarak gösterilir
+  - `metadata.aspectRatio` — en-boy oranı; `'vertical'` ise `9/16`, diğer durumlarda `16/9` olarak `style` prop'una uygulanır
+  - `process.env.NEXT_PUBLIC_CLOUDFLARE_STREAM_DOMAIN` — Cloudflare Stream domain'i; ortam değişkeninden okunur, yoksa `'customer-XXXXX.cloudflarestream.com'` fallback kullanılır
+  - `className` — dışarıdan gelen CSS sınıfı; `motion.div`'in className'ine eklenir
+- **Dönüş**: JSX elementi (`motion.div`); animasyonlu bir video oynatıcı konteyneri, thumbnail fallback, video iframe'i ve hover'da görünen overlay kontrolleri (Play ikonu, başlık, ses açma/kapama butonu) içerir
 
-### [N2_NASIL] AST Pointer: components/authority/VideoAuthority.tsx::renderPlayer (iç fonksiyon)
-- **params**: (parametre yok — üst kapsam闭包 ile erişir)
-- **ic_degiskenler**:
-  - `metadata.provider` — switch/ifadesi tarafından kontrol edilen string; 'cloudflare', 'youtube' veya default dal seçimi yapar
-  - `metadata.id` — iframe src URL'inde video yolu olarak kullanılan identifier
-  - `metadata.title` — iframe title attribute'unda fallback ile birlikte kullanılır
-  - `metadata.options?.autoPlay` — boolean, autoplay parametresini URL'ye bağlamak için kullanılır
-  - `metadata.options?.loop` — boolean, sadece youtube dalında loop parametresi olarak kullanılır
-  - `metadata.options?.controls` — boolean, sadece youtube dalında controls parametresi olarak kullanılır
-  - `isMuted` — üst kapsamdan闭包 ile erişilen boolean, muted parametresini URL'ye bağlamak için kullanılır
-  - `setIsLoaded` — üst kapsamdan闭包 ile erişilen state setter'ı; onLoad callback'inde tetiklenir
-  - `process.env.NEXT_PUBLIC_CLOUDFLARE_STREAM_DOMAIN` — cloudflare dalında iframe src domain'i; fallback `'customer-XXXXX.cloudflarestream.com'`
-  - `t` — üst kapsamdan闭包 ile erişilen çeviri fonksiyonu; default dalında desteklenmeyen provider mesajını localize eder
-- **Dönüş**: JSX — provider'a göre Cloudflare/YouTube iframe'i veya fallback mesaj div'i; her iframe onLoad ile `setIsLoaded(true)` çağrısı yapar
-
-### [N3_NASIL] AST Pointer: components/authority/VideoAuthority.tsx::() => setIsLoaded(true) (onLoad callback, cloudflare)
-- **params**: (parametre yok — SyntheticEvent alınır ama kullanılmaz)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — `setIsLoaded(true)` ile `isLoaded` state'ini true yapar; thumbnail fallback Image bileşenini devre dışı bırakır
-
-### [N4_NASIL] AST Pointer: components/authority/VideoAuthority.tsx::() => setIsLoaded(true) (onLoad callback, youtube)
-- **params**: (parametre yok — SyntheticEvent alınır ama kullanılmaz)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — `setIsLoaded(true)` ile `isLoaded` state'ini true yapar; thumbnail fallback Image bileşenini devre dışı bırakır
-
-### [N5_NASIL] AST Pointer: components/authority/VideoAuthority.tsx::() => setIsMuted(!isMuted) (onClick callback, ses butonu)
-- **params**: (parametre yok — MouseEvent alınır ama kullanılmaz)
-- **ic_degiskenler**:
-  - `isMuted` — üst kapsamdan闭包 ile erişilen boolean mevcut ses durumunu tutar
-  - `setIsMuted` — üst kapsamdan闭包 ile erişilen state setter'ı
-- **Dönüş**: void — ses durumunu toggle eder; iframe URL'lerindeki muted parametresi yeniden hesaplanır, ses ikonu `VolumeX` ↔ `Volume2` arasında geçiş yapar
+### [N2_NASIL] AST Pointer: src/components/authority/VideoAuthority.tsx::renderPlayer
+- **params**: yok
+- **ic_degiskenler**: yok — dış scope'daki `metadata`, `isMuted`, `setIsLoaded`, `t` değişkenlerini kullanır
+- **Dönüş**: JSX elementi; `metadata.provider` değerine göre `'cloudflare'` durumunda Cloudflare Stream iframe'i, `'youtube'` durumunda YouTube embed iframe'i, diğer durumlarda desteklenmeyen sağlayıcı uyarısı (`div` içinde `p` etiketi) döndürür
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\authority\VideoAuthority.tsx
-  function: src\components\authority\VideoAuthority.tsx::VideoAuthority
+  file: VideoAuthority.tsx
+  function: VideoAuthority.tsx::VideoAuthority
 
 ---
 

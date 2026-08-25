@@ -2,49 +2,50 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\UndecidedUserCTA.tsx
-skeleton_hash: 8ddd3877b270cc03
+source_path: C:\tmp\wt-supurme\src\components\UndecidedUserCTA.tsx
+skeleton_hash: 3ecd27f7ef8a142c
 entity_hashes:
   func:UndecidedUserCTA: e9ab9b6769bffef9
   overview: fcf28800e004a782
   style_tokens: d1dc68fb1553bbf5
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-25T07:24:06Z
 ---
 
 ## Genel Bakış
-UndecidedUserCTA, platformunda henüz karar vermemiş veya belirli bir eyleme geçmemiş "kararsız" kullanıcıları hedefleyen bir React bileşenidir. Kullanıcıları platformdaki olası adımlar konusunda bilgilendirmeyi ve onları harekete geçmeye yönlendirmeyi amaçlayan, proje genelinde yeniden kullanılabilir bir CTA (Harekete Geçirme Çağrısı) modülüdür.
+Bu modül, kararsız kullanıcılar için bir harekete geçirici mesaj (CTA) bileşeni tanımlayan bir React bileşen moduludur. Modul, tek bir fonksiyonel bileşen içerir ve kullanıcı etkileşimini artırmaya yönelik bir arayüz elemanı sunar.
 
 ## Fonksiyon Grupları
-### Kararsız Kullanıcı Yönlendirme Bileşeni
-Platforma henüz tam olarak entegre olamamış veya hangi adımı atacağına karar verememiş kullanıcılar için eyleme çağrı içeriğini ekrana render eden bağımsız bir sunum bileşeni. Props almadan çalışarak kendi içinde sabit veya state tabanlı bir içerik sunar.
+
+### Bileşen
+Kararsız kullanıcıya yönelik bir CTA arayüzü oluşturan fonksiyonel bileşendir. React.FC tipinde bir bileşen döndürerek kullanıcıya eylem çağrısı gösterir.
 - UndecidedUserCTA
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, parametresiz olarak çağrılan ve JSX döndüren bir React bileşenidir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer React çalışma zamanı (render context) yoksa, bileşen hata fırlatır veya hiçbir çıktı üretmez.
+**Neden:** Fonksiyon gövdesi verilmediğinden, bileşenin çalışma mantığı, bağımlılıkları, durum yönetimi veya render davranışına dair çıkarım yapılamaz. Yalnızca fonksiyon imzası (`UndecidedUserCTA() -> React.FC`) mevcut olup, bu imzadan yalnızca şunlar bilinir:
 
-[Aksiyom 2]: Eğer bileşen bir React bileşen ağacı (component tree) içine yerleştirilmezse, kullanıcıya herhangi bir CTA mesajı gösterilmez.
+- Bileşen herhangi bir prop almaz.
+- Bileşen bir React fonksiyon bileşeni döndürür.
 
-[Aksiyom 3]: Eğer bileşen dışarıdan herhangi bir prop almıyorsa, gösterdiği içeriği yalnızca kendi içinde tanımlı statik verilerden veya hardcoded değerlerden üretir.
-
-[Aksiyom 4]: Eğer bileşen bağımsız (stateless ve propsless) çalışıyorsa,不同 kullanıcılara farklı içerik gösterme yeteneği yoktur; tüm kararsız kullanıcılara aynı mesajı sunar.
-
-[Aksiyom 5]: Eğer bileşen bir React projesinde `import` edilip `<UndecidedUserCTA />` olarak kullanılmazsa, hedef kitleye yönlendirme mesajı iletilemez.
+Bunlar genel React varsayımları kapsamına girdiğinden (kural gereği yazılmaz) ve fonksiyon gövdesine dair bilgi bulunmadığından (kural gereği çıkarım yapılmaz), modüle özgü aksiyom üretilememiştir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### UndecidedUserCTA
-**Ne yapar**: VentHub HVAC projesinin kullanıcı arayüzünde, henüz herhangi bir işlem yapmamış veya karar vermemiş kararsız kullanıcılar için harekete geçirme çağrısı (CTA) sunan bir React fonksiyonel bileşenidir. Kullanıcıları ilgili aksiyonlara yönlendiren içerikler ve etkileşimli öğeler barındıran, projenin genelinde yeniden kullanılabilir bir arayüz katmanı oluşturur.
-**Nasıl yapar**: Projenin src/components klasöründe konumlanan, yeniden kullanılabilir React bileşi standartlarında yapılandırılmıştır. Kendi iç yapısını bağımsız olarak yönetir, gerekli kullanıcı arayüzü öğelerini import ederek kararsız kullanıcı profiline özel içerikleri ekranda render eder. Herhangi bir harici durum bağımlılığı olmadan, çağrıldığı her yerde tutarlı bir CTA deneyimi sunar.
+**Ne yapar**: Bilinmiyor. Kaynakta bu fonksiyonun görevini açıklayan bir docstring veya yorum bulunmamaktadır.
+
+**Nasıl yapar**: Bilinmiyor. Kaynak kodunun içeriği verilmediğinden uygulama mantığı belirlenememektedir.
+
 **Parametreler**:
-- Bu fonksiyon herhangi bir giriş parametresi almaz, bağımsız çalışacak şekilde tasarlanmıştır.
-**Dönüş**: React.FC türünde bir React fonksiyonel bileşeni döndürür. Döndürülen bu bileşen, tarayıcıda kullanıcıya görünür şekilde render edilebilen, kararsız kullanıcıları yönlendiren tüm CTA öğelerini içeren React node'larını barındırır. Proje içindeki tüm ilgili sayfalarda bu dönüş değeri kullanılarak bileşen ilgili yere yerleştirilir.
+- Fonksiyon tanımlanışında parametre almamaktadır (boş parantez).
+
+**Dönüş**: `React.FC` — React fonksiyonel bileşen (Functional Component) döndürür. Bu, JSX elementi üreten ve isteğe bağlı olarak props kabul eden bir fonksiyon tipidir. Ancak bu fonksiyonun hangi props'u kabul ettiği verilen bilgiden anlaşılamamaktadır.
 
 ---
 
@@ -61,19 +62,18 @@ Bu modül, parametresiz olarak çağrılan ve JSX döndüren bir React bileşeni
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/UndecidedUserCTA.tsx::UndecidedUserCTA
-- **params**: () — parametre yok (React functional component)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `t('undecidedUserCta.title')`, `t('undecidedUserCta.description')`, `t('undecidedUserCta.buttonText')` çağrılarında kullanılır
-  - `Routes` — `useLocalizedRoutes()` hook'undan dönen.localized rota nesnesi; `Routes.contact('consulting')` çağrısı ile danışmanlık iletişim linki üretilir
-- **Dönüş**: JSX element — kararsız kullanıcılar için CTA (Call-to-Action) kartı; gradient arka planlı, ikonlu başlık/açıklama bölümü ve `Link` ile sarılı danışmanlık butonu içeren React bileşeni
-- **Side-effect**: Herhangi bir state güncellemesi veya yan etki yok; saf render bileşeni
+  - `t` — `useI18n()` hook'undan destructuring ile alınan çeviri fonksiyonu; `t('undecidedUserCta.title')`, `t('undecidedUserCta.description')`, `t('undecidedUserCta.buttonText')` çağrılarıyla metinleri lokalize eder
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen nesne; `Routes.contact('consulting')` çağrısıyla iletişim sayfasının lokalize edilmiş URL'ini üretir
+- **Dönüş**: JSX — Karar vermemiş kullanıcıyı hedefleyen CTA (Call To Action) bileşeni. Gradient arka planlı kart içinde `MessageSquare` ikonu, başlık (`undecidedUserCta.title`), açıklama (`undecidedUserCta.description`) ve `Link` bileşeniyle sarılı buton (`undecidedUserCta.buttonText` + `ArrowRight` ikonu) içerir. Dekoratif arka plan daireleri (`bg-white/10`) mutlak konumlandırılmıştır. Buton `Routes.contact('consulting')` rotasına yönlendirir.
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\UndecidedUserCTA.tsx
-  function: src\components\UndecidedUserCTA.tsx::UndecidedUserCTA
+  file: UndecidedUserCTA.tsx
+  function: UndecidedUserCTA.tsx::UndecidedUserCTA
 
 ---
 

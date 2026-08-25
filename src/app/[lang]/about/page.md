@@ -2,51 +2,60 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\about\page.tsx
-skeleton_hash: 5b26b94087063b88
+source_path: C:\tmp\wt-supurme\src\app\[lang]\about\page.tsx
+skeleton_hash: f0da2bf968e8f6b7
 entity_hashes:
-  func:Page: 32fe3fdb17787a5b
-  func:generateStaticParams: 6d1b3e72f8b2da9f
+  func:Page: 6f033064b6e4463f
+  func:generateStaticParams: 8c98a454509d7f36
   overview: 8dff6fca298bde81
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:27Z
+generated_at: 2026-08-25T07:23:39Z
 ---
 
 ## Genel Bakış
-Bu modül, çoklu dil desteği sunan "Hakkında" sayfasını oluşturur. Next.js App Router yapısında `[lang]/about` rotasına karşılık gelir ve hem statik sayfa yapılandırmasını hem de sayfa içeriğinin render edilmesini yönetir.
+
+Bu modül, Next.js App Router yapısında uluslararasılaştırma destekli bir "Hakkımızda" sayfasını tanımlar. `[lang]` yol parametresini kullanarak çok dilli statik sayfa oluşturma işlevselliği sağlar. `generateStaticParams` fonksiyonu, desteklenen diller için statik yollar üretir ve bu yollar `Page` bileşenine `params` olarak aktarılır.
 
 ## Fonksiyon Grupları
-### Statik Sayfa Yapılandırması
-Bu grup, sayfanın hangi dil varyantları için önceden oluşturulacağını belirler.
-- generateStaticParams
 
-### Sayfa Renderlama
-Bu grup, dil parametresine göre sayfa içeriğini JSX olarak üretir ve kullanıcıya sunar.
+### Sayfa Bileşeni
+Ana sayfa bileşenini tanımlar ve gelen yol parametrelerini kullanarak içeriği render eder.
 - Page
+
+### Statik Yol Üretimi
+Desteklenen diller için statik olarak oluşturulacak sayfa yollarını belirler; bu sayede derleme anında tüm dil varyantları hazır hale gelir.
+- generateStaticParams
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Next.js App Router yapısında çoklu dil destekli "Hakkında" sayfasını yöneten bir sayfa bileşenidir. Aşağıdaki varsayımlar fonksiyon imzalarından çıkarılmıştır.
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** Fonksiyon gövdeleri verilmemiştir. Yalnızca `Page` ve `generateStaticParams` fonksiyon imzaları mevcuttur. Fonksiyon gövdesi olmadan modülün doğru çalışması için hangi koşulların varolması gerektiğini belirleyecek yeterli bilgi bulunmamaktadır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### Page
+**Ne yapar**: Next.js uygulamasında "about" sayfasının ana bileşenini oluşturan asenkron fonksiyondur. URL'den gelen dil parametresini alır ve ilgili dil için sayfa bileşenini render eder.
 
-**Ne yapar**: Bu fonksiyon, Next.js uygulamasındaki "/about" sayfasının ana sayfa bileşenidir. Dinamik dil parametresini alarak ilgili dilde About sayfasını render eder.
-
-**Nasıl yapar**: Fonksiyon, `params` prop'unu await ederek asenkron olarak dil parametrelerini çıkarır. Elde edilen `lang` değerini `PageComponent` bileşenine prop olarak geçirir ve sayfanın ilgili dilde görüntülenmesini sağlar. Bu yapı, Next.js App Router'ın dinamik rotaları için standart bir yaklaşımdır.
+**Nasıl yapar**: Fonksiyon `PageProps` tipinde bir parametre alır ve bu parametre içindeki `params` nesnesini `await` ile çözümleyerek `lang` değerini elde eder. Ardından `PageComponent` bileşenini `lang` prop'u ile birlikte döndürür. Bu yapı Next.js'in dinamik rotalar ve statik site oluşturma (SSG) özelliklerini kullanır.
 
 **Parametreler**:
-- `params` : `PageProps` — Sayfanın dinamik parametrelerini içeren nesne. `{ lang: string }` yapısına sahiptir ve URL segmentinden gelen dil kodunu barındırır.
+- params: PageProps — Sayfa özelliklerini içeren nesne. `params` alt nesnesi URL'den gelen yol parametrelerini içerir ve `lang` değerini barındırır.
 
-**Dönüş**: JSX elementi döndürür. `PageComponent` bileşeninin `lang` prop'u ile birlikte render edilmiş halini返回 eder.
+**Dönüş**: JSX elementi — `PageComponent` bileşeninin `lang` prop'u ile render edilmiş hali.
 
 ### generateStaticParams
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Next.js'in statik site oluşturma (SSG) sürecinde kullanılacak statik parametreleri tanımlayan asenkron fonksiyondur. Bu fonksiyon, uygulamanın hangi dil yolları için statik sayfalar oluşturacağını belirler.
+
+**Nasıl yapar**: Fonksiyon herhangi bir parametre almaz ve sabit bir dizi döndürür. Dizi içinde iki nesne bulunur: biri Türkçe (`tr`) diğeri İngilizce (`en`) dil kodlarını içerir. Next.js bu dönüş değerini kullanarak `/tr/about` ve `/en/about` yolları için statik sayfalar oluşturur.
+
+**Parametreler**: Yok — fonksiyon parametre almaz.
+
+**Dönüş**: Array<{ lang: string }> — `lang` özelliğine sahip nesnelerden oluşan dizi. Dizi şu iki elemanı içerir: `{ lang: 'tr' }` ve `{ lang: 'en' }`.
 
 ---
 
@@ -64,25 +73,24 @@ Bu modül, Next.js App Router yapısında çoklu dil destekli "Hakkında" sayfas
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/app/[lang]/about/page.tsx`::Page
-- **params**: `{ params }: PageProps` — Next.js route params objesi, `lang` parametresini içerir
+### [N1_NASIL] AST Pointer: src/app/[lang]/about/page.tsx::Page
+- **params**: `params` — PageProps tipinde, async olarak await edilen route parametreleri nesnesi
 - **ic_degiskenler**:
-  - `lang` — `params` objesinden `await` ile çözülüp destructure edilen dil kodu (ör. `'tr'` veya `'en'`); `PageComponent`'e prop olarak iletilir
-- **Dönüş**: JSX — `<PageComponent lang={lang} />` bileşeni döner
+  - `lang` — `await params` sonucu destruct edilen dil parametresi (params.lang karşılığı)
+- **Dönüş**: `<PageComponent lang={lang} />` — AboutPage view bileşenini `lang` prop'u ile render eden JSX elementi
 
-### [N2_NASIL] AST Pointer: `src/app/[lang]/about/page.tsx`::generateStaticParams
-- **params**: (yok)
-- **ic_degiskenler**:
-  - (yok)
-- **Dönüş**: `Array<{ lang: string }>` — `[ { lang: 'tr' }, { lang: 'en' } ]` statik olarak oluşturulmuş dil parametreleri listesi; Next.js'in statik site oluşturmada hangi `[lang]` değerleri için sayfa üretileceğini tanımlar
+### [N2_NASIL] AST Pointer: src/app/[lang]/about/page.tsx::generateStaticParams
+- **params**: (parametre yok)
+- **ic_degiskenler**: (iç değişken yok)
+- **Dönüş**: `[{ lang: 'tr' }, { lang: 'en' }]` — iki statik route parametre seti içeren dizi; her eleman `lang` alanına sahip nesne
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\[lang]\about\page.tsx
-  function: src\app\[lang]\about\page.tsx::Page
-  function: src\app\[lang]\about\page.tsx::generateStaticParams
+  file: page.tsx
+  function: page.tsx::Page
+  function: page.tsx::generateStaticParams
 
 ---
 

@@ -2,60 +2,60 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\__tests__\conformance\hook-referential-stability.test.ts
-skeleton_hash: 07b764b85c53d356
+source_path: C:\tmp\wt-supurme\src\__tests__\conformance\hook-referential-stability.test.ts
+skeleton_hash: ad2917b62c07d06d
 entity_hashes:
-  func:findViolations: 539ebba210624667
-  func:isHookName: fc6afa94b07b04af
-  func:isMemoCall: c2c5579dbb0472be
-  func:literalHasInlineFn: ee26727003a28d14
-  func:unwrap: 32ee12c66752acc1
+  func:findViolations: 9bce309c68468670
+  func:isHookName: c67838c61491a7b6
+  func:isMemoCall: 5923d9be0bd21c36
+  func:literalHasInlineFn: daab72480660bcfb
+  func:unwrap: 070c0d14b9acba73
   overview: fec64131d3d20f8a
-generated_at: 2026-06-19T06:51:17Z
+generated_at: 2026-08-25T07:49:06Z
 ---
 
 ## Genel Bakış
-Bu modül, React hook'larının referans kararlılığını test etmek için kullanılan yardımcı fonksiyonlar ve bir ihlal tespit fonksiyonu içerir. TypeScript AST üzerinde çalışarak, hook isimlerini doğrular, memoize çağrılarını ve inline fonksiyonları analiz eder. Modülün temel amacı, verilen bir kaynak kodunda hook'ların yanlış kullanımını (örneğin, bağımlılık dizilerindeki eksiklikleri veya gereksiz yeniden oluşturmaları) otomatik olarak tespit etmektir.
+Bu modül, React hook'larının referans kararlılığını (referential stability) denetleyen bir uyumluluk testidir. TypeScript AST analizi yaparak, hook çağrılarında veya bağımlılık dizilerinde her render'da yeni referans üreten kalıpları tespit eder ve ihlalleri raporlar.
 
 ## Fonksiyon Grupları
-### AST Analiz ve Manipülasyon Fonksiyonları
-Bu grup, TypeScript AST ifadelerini analiz etmek, dönüştürmek ve hook ile ilgili kalıpları tanımak için yardımcı fonksiyonlar içerir. Fonksiyonlar, bir ifadenin yapısını inceleyerek memoize edilmiş çağrıları, inline fonksiyonları ve hook isimlerini doğrular.
+
+### AST Yardımcı Fonksiyonları
+TypeScript sözdizim ağacı düğümlerini çözümlemek ve sınıflandırmak için kullanılan düşük seviyeli yardımcı fonksiyonlardır. Sarılı ifadeleri açar, memo çağrılarını tanır, satır içi fonksiyon tanımlarını tespit eder ve hook isimlerini doğrular.
 - unwrap, isMemoCall, literalHasInlineFn, isHookName
 
-### İhlal Tespiti Fonksiyonu
-Bu grup, modülün ana sorumluluğunu üstlenen fonksiyondur. Belirli bir dosya adı ve kaynak kodu alarak, hook'ların referans kararlılığı ile ilgili olası ihlalleri (örneğin, eksik bağımlılıklar veya değişken referanslar) tarar ve bunları bir ihlal listesi olarak döndürür. Bu fonksiyon, yukarıdaki analiz fonksiyonlarını kullanarak kapsamlı bir tarama yapar.
+### İhlal Tespiti
+Verilen kaynak kodda hook referans kararlılığı ihlallerini bulan ana test fonksiyonudur. Dosya adı ve kaynak kodu alır, AST üzerinde gezinerek kararlılık ihlali oluşturan kalıpları tespit eder ve ihlal açıklamalarını dizi olarak döndürür.
 - findViolations
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, TypeScript AST üzerinde React hook'larının referansal kararlılık ihlallerini tespit eden bir kural motorudur.
+Bu modül, TypeScript AST düğümleri üzerinde çalışır ve hook referans kararlılığını denetler.
 
-**[Aksiyom 1]**: Eğer `unwrap` fonksiyonuna geçilen `ts.Expression` geçerli bir AST düğümü değilse, fonksiyon tanımsız davranış gösterir veya hata fırlatır.
+[Aksiyom 1]: Eğer `ts` modülü (TypeScript AST kütüphanesi) mevcut değilse, hiçbir fonksiyon çalışamaz çünkü tüm fonksiyonlar `ts.Expression` tipiyle çalışır.
 
-**[Aksiyom 2]**: Eğer `isMemoCall` test edilen ifade bir `CallExpression` değilse, fonksiyon `false` döner.
+[Aksiyom 2]: Eğer `HOOK_SOURCES` sabiti tanımlı değilse, hook kaynak tespiti yapılamaz.
 
-**[Aksiyom 3]**: Eğer `isHookName` fonksiyonuna `undefined` değer verilirse, fonksiyon `false` döner.
+[Aksiyom 3]: Eğer `findViolations` fonksiyonuna geçerli bir `fileName` ve `source` sağlanmazsa, ihlal listesi üretilemez.
 
-**[Aksiyom 4]**: Eğer `findViolations` fonksiyonuna geçilen `source` string'i geçerli bir TypeScript/JavaScript kodu değilse, fonksiyon boş dizi döner veya hata fırlatır.
+[Aksiyom 4]: Eğer `isHookName` fonksiyonuna `undefined` değer verilirse, fonksiyon `false` döndürmelidir (parametre tipi `string | undefined` olarak tanımlıdır).
 
-**[Aksiyom 5]**: Eğer `literalHasInlineFn` ifadesi bir obje/array literal içermiyorsa, fonksiyon `false` döner.
-
-**[Aksiyom 6]**: `HOOK_SOURCES` sabiti, hook'ların hangi kaynaklardan geldiği bilgisini tutar; bu sabit boş olamaz, en az bir kaynak içermelidir.
-
-**[Aksiyom 7]**: Eğer `findViolations` fonksiyonuna geçilen `fileName` parametresi geçersiz bir dosya yoluysa, fonksiyon tanımsız davranış gösterir.
-
-**[Aksiyom 8]**: `unwrap` fonksiyonu, `CallExpression` iç içe geçmiş ifadeleri递归 olarak açmalıdır; aksi halde iç içe ifadeler düzgün analiz edilemez.
-
-**[Aksiyom 9]**: Eğer `isHookName` tarafından tanınan bir hook ismi, `HOOK_SOURCES` listesinde tanımlı değilse, bu hook referansal kararlılık açısından analiz dışı kalır.
+[Aksiyom 5]: Eğer `unwrap` fonksiyonuna geçerli bir `ts.Expression` verilmezse, AST çözümleme zinciri kırılır ve `isMemoCall` ile `literalHasInlineFn` fonksiyonları doğru sonuç üretemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### unwrap
-**Ne yapar**: Verilen TypeScript ifadesinin dışındaki parantezler遞递 olarak açar ve içsel ifadeyi döndürür. Parantez içine alınmış (`(expr)`) ifadeleri递递递归 olarak çözerek gerçek ifadeye递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递递
+**Ne yapar**: Parantez içinde sarılmış bir TypeScript ifadesini (expression) en dıştaki parantez katmanlarından arındırarak özgün ifadeyi döndürür. Parantezli ifadelerin (parenthesized expression) içine doğru yürüyerek parantez olmayan ilk alt düğüme ulaşır.
+
+**Nasıl yapar**: Gelen ifadeyi bir döngü içinde `ts.isParenthesizedExpression` kontrolüne tabi tutar. Eğer ifade parantezli bir ifade ise, `.expression` özelliği aracılığıyla bir alt seviyeye iner ve döngüye devam eder. Parantezli olmayan bir ifadeye ulaşıldığında döngü sonlanır ve o düğüm döndürülür.
+
+**Parametreler**:
+- e: ts.Expression — Parantez katmanlarından arındırılmak istenen kaynak ifade düğümü.
+
+**Dönüş**: ts.Expression — Parantez katmanlarından arındırılmış, en dıştaki parantezli olmayan ifade düğümü.
 
 ### isMemoCall
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -82,73 +82,59 @@ Bu modül, TypeScript AST üzerinde React hook'larının referansal kararlılık
 ## SABİTLER
 - **HOOK_SOURCES** (call) — `import.meta.glob('/src/hooks/use*.{ts,tsx}', {
   query: '?raw',
-  import: 'de...`
+  import: '...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/__tests__/conformance/hook-referential-stability.test.ts::unwrap
-- **params**: (e: ts.Expression)
+### [N1_NASIL] AST Pointer: hook-referential-stability.test.ts::unwrap
+- **params**: `e` — ts.Expression tipinde, parantez içinde sarılmış olabilen bir ifade
 - **ic_degiskenler**:
-  - `cur` — Unwrap işleminin ilerlediği mevcut ifade, parantez içindeki ifadeleri çözerek ilerler
-- **Dönüş**: ts.Expression — Çözülmüş (parantezsiz) ifade
+  - `cur` — while döngüsü boyunca ilerletilen geçici değişken; başlangıçta `e` parametresine eşitlenir, her iterasyonda parantez içi ifade (`cur.expression`) ile güncellenir
+- **Dönüş**: ts.Expression — parantez katmanları kaldırılmış ham ifade
 
-### [N2_NASIL] AST Pointer: src/__tests__/conformance/hook-referential-stability.test.ts::isMemoCall
-- **params**: (e: ts.Expression)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: boolean — İfadenin useMemo veya useCallback çağrısı olup olmadığı
+### [N2_NASIL] AST Pointer: hook-referential-stability.test.ts::isMemoCall
+- **params**: `e` — ts.Expression tipinde, kontrol edilecek ifade düğümü
+- **ic_degiskenler**: yok
+- **Dönüş**: boolean — ifade bir `useMemo` veya `useCallback` çağrısı ise `true`, değilse `false`
 
-### [N3_NASIL] AST Pointer: src/__tests__/conformance/hook-referential-stability.test.ts::literalHasInlineFn
-- **params**: (expr: ts.Expression)
+### [N3_NASIL] AST Pointer: hook-referential-stability.test.ts::literalHasInlineFn
+- **params**: `expr` — ts.Expression tipinde, kontrol edilecek ifade düğümü
 - **ic_degiskenler**:
-  - `e` — Çözülmüş ifade (unwrap ile elde edilir)
-  - `(p) => { ... }` (nesne literal içindeki) — Her bir özelliğin (property) işleyicisi
-  - `v` — Özellik değerinin çözülmüş hali (p.initializer için unwrap sonucu)
-  - `(el) => { ... }` (dizi literal içindeki) — Her bir elemanın işleyicisi
-  - `v` — Elemanın çözülmüş hali (el için unwrap sonucu)
-- **Dönüş**: boolean — İfadenin nesne/dizi literal olup içinde inline fonksiyon içerip içermediği
+  - `e` — `unwrap(expr)` sonucu; parantez katmanları kaldırılmış ifade
+  - `p` — ObjectLiteralExpression durumunda `.properties` dizisi üzerinde iterasyon yapılan her bir özellik düğümü
+  - `v` — PropertyAssignment durumunda `unwrap(p.initializer)` sonucu; parantez katmanları kaldırılmış özellik değeri
+  - `el` — ArrayLiteralExpression durumunda `.elements` dizisi üzerinde iterasyon yapılan her bir eleman düğümü
+  - `v` — (ikinci kapsam) `unwrap(el)` sonucu; parantez katmanları kaldırılmış eleman değeri
+- **Dönüş**: boolean — obje/dizi literal içinde ok fonksiyonu (`ts.isArrowFunction`), fonksiyon ifadesi (`ts.isFunctionExpression`) veya metot bildirimi (`ts.isMethodDeclaration`) varsa `true`, yoksa `false`
 
-### [N4_NASIL] AST Pointer: src/__tests__/conformance/hook-referential-stability.test.ts::findViolations
-- **params**: (fileName: string, source: string)
+### [N4_NASIL] AST Pointer: hook-referential-stability.test.ts::findViolations
+- **params**: `fileName` — string tipinde, taranacak dosya adı/bilgisi; hata konumlarını raporlamada kullanılır; `source` — string tipinde, taranacak kaynak kodu
 - **ic_degiskenler**:
-  - `sf` — Kaynak kod stringinden oluşturulan TypeScript kaynak dosyası
-  - `hits` — Bulunan ihlallerin (satır numaraları) listesi
-  - `checkBody` — Hook gövdesini kontrol eden iç fonksiyon
-  - `walk` — AST düğümlerini recursive olarak dolaşan iç fonksiyon
-  - `visit` — Kaynak dosyasını ziyaret eden üst düzey iç fonksiyon
-- **Dönüş**: string[] — İhlal satırlarının "dosya:satır" formatında listesi
+  - `sf` — `ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)` sonucu; kaynak kodun AST temsili
+  - `hits` — string[] tipinde; ihlal bulunan satır konumlarını tutan dizi
+- **Dönüş**: string[] — ihlal bulunan satırların `"dosyaAdı:satırNumarası"` formatındaki listesi
 
-### [N5_NASIL] AST Pointer: src/__tests__/conformance/hook-referential-stability.test.ts::checkBody
-- **params**: (body: ts.Node)
+### [N5_NASIL] AST Pointer: hook-referential-stability.test.ts::checkBody
+- **params**: `body` — ts.Node tipinde; incelenecek fonksiyon gövdesi düğümü
 - **ic_degiskenler**:
-  - `e` — Body'nin block olmadığında (arrow implicit-return) çözülmüş ifadesi
-  - `walk` — Recursive AST traversal yapan iç fonksiyon
-- **Dönüş**: yok (yan etki: hits array'ini doldurur)
+  - `e` — `unwrap(body as ts.Expression)` sonucu; parantez katmanları kaldırılmış ifade (ok fonksiyonu durumunda)
+  - `node` — `walk` içinde ts.forEachChild ile dolaşılan her bir alt düğüm
+  - `e` — (walk kapsamı) `unwrap(node.expression)` sonucu; return ifadesinin parantez katmanları kaldırılmış hali
+- **Dönüş**: yok — yan etki olarak `hits` dizisine ihlal konumlarını ekler
 
-### [N6_NASIL] AST Pointer: src/__tests__/conformance/hook-referential-stability.test.ts::walk
-- **params**: (node: ts.Node)
+### [N6_NASIL] AST Pointer: hook-referential-stability.test.ts::walk
+- **params**: `node` — ts.Node tipinde; dolaşılacak düğüm
 - **ic_degiskenler**:
-  - `e` — Return ifadesinin çözülmüş hali
-- **Dönüş**: yok (yan etki: hits array'ine ihlal satırlarını ekler)
+  - `e` — `unwrap(node.expression)` sonucu; return ifadesinin parantez katmanları kaldırılmış hali
+- **Dönüş**: yok — yan etki olarak `hits` dizisine ihlal konumlarını ekler; iç içe fonksiyon gövdelerine girmez
 
-### [N7_NASIL] AST Pointer: src/__tests__/conformance/hook-referential-stability.test.ts::visit
-- **params**: (node: ts.Node)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: AST'yi dolaşıp checkBody çağırır)
-
-### [N8_NASIL] AST Pointer: src/__tests__/conformance/hook-referential-stability.test.ts::(test-case-1)
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: HOOK_SOURCES sayısının 15'ten fazla olduğunu doğrular)
-
-### [N9_NASIL] AST Pointer: src/__tests__/conformance/hook-referential-stability.test.ts::(test-case-2)
-- **params**: (yok)
+### [N7_NASIL] AST Pointer: hook-referential-stability.test.ts::visit
+- **params**: `node` — ts.Node tipinde; ziyaret edilecek düğüm
 - **ic_degiskenler**:
-  - `violations` — Tüm hook kaynaklarında bulunan ihlallerin listesi
-  - `path` — Object.entries döngüsünden gelen dosya yolu
-  - `source` — Object.entries döngüsünden gelen kaynak kod stringi
-- **Dönüş**: yok (yan etki: violations listesinin boş olduğunu doğrular)
+  - `d` — VariableStatement durumunda `.declarationList.declarations` dizisi üzerinde iterasyon yapılan her bir bildirim düğümü
+- **Dönüş**: yok — yan etki olarak hook fonksiyon gövdelerini `checkBody`'ye gönderir; ts.forEachChild ile AST'yi özyinelemeli dolaşır
 
 ---
 
@@ -162,20 +148,20 @@ graph TD
     hook-referential-stability_test_ts__literalHasInlineFn["literalHasInlineFn"]
     hook-referential-stability_test_ts__unwrap["unwrap"]
     hook-referential-stability_test_ts__findViolations --> hook-referential-stability_test_ts__isHookName
-    hook-referential-stability_test_ts__findViolations --> hook-referential-stability_test_ts__isMemoCall
-    hook-referential-stability_test_ts__findViolations --> hook-referential-stability_test_ts__literalHasInlineFn
     hook-referential-stability_test_ts__findViolations --> hook-referential-stability_test_ts__unwrap
     hook-referential-stability_test_ts__literalHasInlineFn --> hook-referential-stability_test_ts__unwrap
+    hook-referential-stability_test_ts__findViolations --> hook-referential-stability_test_ts__literalHasInlineFn
+    hook-referential-stability_test_ts__findViolations --> hook-referential-stability_test_ts__isMemoCall
 ```
 
 ## NODE ID STANDARD
 
-  file: src\__tests__\conformance\hook-referential-stability.test.ts
-  function: src\__tests__\conformance\hook-referential-stability.test.ts::unwrap
-  function: src\__tests__\conformance\hook-referential-stability.test.ts::isMemoCall
-  function: src\__tests__\conformance\hook-referential-stability.test.ts::literalHasInlineFn
-  function: src\__tests__\conformance\hook-referential-stability.test.ts::isHookName
-  function: src\__tests__\conformance\hook-referential-stability.test.ts::findViolations
+  file: hook-referential-stability.test.ts
+  function: hook-referential-stability.test.ts::unwrap
+  function: hook-referential-stability.test.ts::isMemoCall
+  function: hook-referential-stability.test.ts::literalHasInlineFn
+  function: hook-referential-stability.test.ts::isHookName
+  function: hook-referential-stability.test.ts::findViolations
 
 ---
 

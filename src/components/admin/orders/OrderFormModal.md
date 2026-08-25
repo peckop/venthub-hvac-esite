@@ -2,109 +2,91 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\orders\OrderFormModal.tsx
-skeleton_hash: aca8ef2e3632bb15
+source_path: C:\tmp\wt-supurme\src\components\admin\orders\OrderFormModal.tsx
+skeleton_hash: 272516b5c45ae867
 entity_hashes:
+  func:FieldError: 73ce29b5cf8d764a
   func:OrderFormModal: dfc366e8224d3a5a
-  func:handleClose: b985b474034243a8
+  func:buildOrderFormSchema: d38694943a934bc3
+  func:focusFirstInvalid: 95b5e0552679b237
+  func:handleClose: 179f5fcb5f1d26fb
   func:handleOpenChange: b7949752bd032233
   func:isStatusTransitionAllowed: 1ef3dddfbfa2cf57
   func:onSubmit: 1b223598d4c15756
-  overview: 35854364cd5ee97e
-  style_tokens: 7adecce3d1ad5282
-generated_at: 2026-06-19T13:28:39Z
+  overview: a2fe9d03e11078fe
+  style_tokens: 24ef268b91606a4a
+generated_at: 2026-08-25T07:25:23Z
 ---
 
 ## Genel Bakış
-Bu modül, admin paneli için sipariş oluşturma ve düzenleme işlemlerini yöneten bir React modal form bileşenidir. Ana sorumlulukları, form durumunu (açık/kapalı) kontrol etmek, geçerli sipariş verilerini toplamak ve sunucuya göndermektir. Ayrıca sipariş durumu geçişlerinin geçerliliğini doğrulama gibi yardımcı bir işlevi de barındırır.
+Bu modül, sipariş verilerini düzenlemek için kullanılan bir modal form bileşenini içerir. Formun doğrulama şemasını oluşturur, durum geçişlerinin izin verilip verilmediğini kontrol eder ve form gönderimi ile modal yönetimini sağlar.
 
 ## Fonksiyon Grupları
-### Ana Bileşen ve Yapılandırma
-Bu grup, modalın temel yapısını, kabul ettiği özelliklerini (props) ve bileşenin genel yaşam döngüsünü tanımlar. Tüm diğer işlevleri barındıran üst düzey konteynırdır.
-- `OrderFormModal`
+### Form Yapılandırması ve Doğrulama
+Formun yapısını ve doğrulama kurallarını tanımlar, form hatalarında odaklanma ve sipariş durumu geçişlerinin kurallarını uygular.
+- buildOrderFormSchema, focusFirstInvalid, isStatusTransitionAllowed
 
-### Durum Yönetimi ve Etkileşim
-Bu grup, kullanıcının modal ile etkileşimini (açma/kapama) ve formun gönderiminden sonraki iş akışını (başarı/hata durumlarını) yönetir. Modalın akış kontrolü bu fonksiyonlar tarafından sağlanır.
-- `handleClose`, `handleOpenChange`, `onSubmit`
+### UI Bileşenleri
+Form alanlarındaki hata mesajlarını kullanıcıya göstermek için kullanılan bir bileşen sağlar.
+- FieldError
 
-### Yardımcı Doğruluk Kontrolü
-Bu grup, iş mantığına ait bir kuralı doğrulayan saf bir yardımcı fonksiyondur. Sipariş durumunun geçerli bir hedefe dönüştürülüp dönüştürülemeyeceğini kontrol ederek form verisi hazırlığına veya kullanıcı bildirimine yardımcı olabilir.
-- `isStatusTransitionAllowed`
+### Modal Yönetimi
+Modalın kapatılması ve açık/kapalı durumunun değiştirilmesi gibi kullanıcı etkileşimlerini yönetir.
+- handleClose, handleOpenChange
+
+### Form İşleme
+Form başarıyla gönderildiğinde çalışacak olan asenkron işlemi ve sunucu tarafı etkileşimini yönetir.
+- onSubmit
+
+### Ana Bileşen
+Tüm diğer fonksiyonları ve bileşenleri bir araya getirerek sipariş düzenleme modalını oluşturan ana bileşendir.
+- OrderFormModal
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, admin sipariş yönetimi için bir modal form bileşeni olup, durum geçiş doğrulaması ve form gönderimi işlevlerini içerir.
-
-**[Aksiyom 1]**: Eğer `STATUS_FLOW` sabiti tanımlı veya dolu değilse, hiçbir durum geçişi izin verilmez (`isStatusTransitionAllowed` her zaman `false` döner).
-
-**[Aksiyom 2]**: Eğer `TERMINAL_STATUSES` sabiti tanımlı değilse, terminal durumdaki siparişlerin durum değişikliği kontrolü yapılamaz ve geçiş hatalı şekilde izin verilebilir.
-
-**[Aksiyom 3]**: Eğer `current` durumu `TERMINAL_STATUSES` içinde yer alıyorsa, herhangi bir `target` durumuna geçiş yapılamaz (`isStatusTransitionAllowed` `false` döner).
-
-**[Aksiyom 4]**: Eğer `current` -> `target` geçişi `STATUS_FLOW` yapısında tanımlı değilse, o geçiş izin verilmez.
-
-**[Aksiyom 5]**: Eğer `onOpenChange` callback'i sağlanmıyorsa, modal'ın open durumu bileşen dışında güncellenemez ve modal kapanamaz.
-
-**[Aksiyom 6]**: Eğer `onSuccess` callback'i sağlanmıyorsa, başarılı form gönderiminden sonra dış listede yenileme/tefid tetiklenemez.
-
-**[Aksiyom 7]**: Eğer `orderFormSchema` geçersiz veya tanımsızsa, form doğrulaması başarısız olur ve gönderim engellenir.
-
-**[Aksiyom 8]**: Eğer `orderId` değeri `null`/`undefined` ise, modal yeni sipariş oluşturma modunda çalışır;否则 mevcut sipariş düzenleme moduna geçer.
-
-**[Aksiyom 9]**: Eğer `open` prop'u `false` ise, modal render edilmez veya görünmez durumda olur.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### isStatusTransitionAllowed
-**Ne yapar**: Sipariş statü geçişlerinin izin verilip verilmediğini belirler. Mevcut statü ile hedef statü arasındaki geçişin iş kurallarına uygun olup olmadığını kontrol ederek, geçersiz statü değişimlerini engeller. Bu fonksiyon sipariş yönetim sisteminde durum makinesi (state machine) mantığını uygular.
-
-**Nasıl yapar**: Fonksiyon öncelikle aynı statüye geçiş durumunu (current === target) kontrol ederek başlar ve bu durumda her zaman izin verir. Ardından hem mevcut hem de hedef statünün `TERMINAL_STATUSES` (terminal/kapanış statüleri, örneğin iptal ve iade) kümesinde yer alıp almadığını belirler. Terminal durumdan aktif (non-terminal) bir duruma geçişin kesinlikle yasak olduğunu kontrol eder — bu, iptal veya iade işleminden sonra siparişin tekrar aktif hale getirilmesini önleyerek para ve stok kayıtlarının tutarlılığını korur. İki terminal statü arasındaki geçiş (örneğin iptal → iade veya kısmi iade → tam iade) serbesttir. Aktif bir durumdan herhangi bir terminal duruma geçiş her zaman izin verilir (müşteri iptal/iade talebi). Son olarak, aktif durumlar arasındaki geçişler için `STATUS_FLOW` dizisindeki sıralamayı kullanarak yalnızca ileri yönlü (happy-path) geçişlere izin verir; geriye doğru geçiş yasaktır.
-
+### buildOrderFormSchema
+**Ne yapar**: Sipariş formunun doğrulama şemasını oluşturur. Form alanlarının geçerlilik kurallarını tanımlayan bir Zod (veya benzeri) şema nesnesi üretir.
+**Nasıl yapar**: Parametre olarak aldığı çeviri fonksiyonu `t` aracılığıyla hata mesajlarını yerelleştirir. Gövde içinde `buildOrderFormSchema(t)` çağrılarak şema oluşturulur; bu, şema üretiminin ayrı bir yardımcı fonksiyona devredildiğini gösterir.
 **Parametreler**:
-- current: string — Siparişin o anki mevcut durumunu (statü) temsil eder. `STATUS_FLOW` veya `TERMINAL_STATUSES` listelerinde yer alan geçerli bir statü değeri olmalıdır (örn: "pending", "confirmed", "cancelled", "refunded" gibi).
-- target: string — Siparişin geçilmek istenen hedef durumunu (statü) temsil eder. Yine geçerli bir statü değeri olmalıdır ve mevcut durumdan bu duruma geçişin iş kurallarına uygunluğu kontrol edilir.
+- t: (key: string) => string — Uluslararasılaştırma (i18n) için çeviri anahtarlarını çözümleyen fonksiyon. Şema doğrulama hata mesajlarında kullanılır.
+**Dönüş**: Belirtilmemiş (bilinmiyor).
 
-**Dönüş**: boolean — `true` dönerse geçiş izinlidir ve statü güncellenebilir. `false` dönerse geçiş iş kurallarına aykırıdır ve engellenmelidir. Terminal statüler `TERMINAL_STATUSES` olarak readonly string[] cast edilerek kontrol edilir; statü akış sıralaması `STATUS_FLOW` readonly string[] dizisi üzerinden belirlenir.
+### FieldError
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### focusFirstInvalid
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### isStatusTransitionAllowed
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### OrderFormModal
-**Ne yapar**: Sipariş formunu açıp düzenleyen modal bileşenidir. Yeni bir sipariş oluşturmak veya mevcut bir siparişi düzenlemek için bir form gösterir ve yönetici arayüzünden formun açılıp kapanmasını kontrol eder.
-**Nasıl yapar**: `open` prop'una bağlı olarak modalı görüntüler. `orderId` prop'u ile mevcut bir siparişin verilerini yükler. Form提交后 `onSuccess` callback'ini çağırarak ana bileşene başarıyı bildirir. İçerisindeki `handleClose`, `handleOpenChange` ve `onSubmit` yardımcı fonksiyonlarını kullanarak form akışını yönetir.
-**Parametreler**:
-- open: boolean — Modalın açık olup olmadığını belirten durum.
-- onOpenChange: (open: boolean) => void — Modalın durumunu güncellemek için çağrılan geri çağırma fonksiyonu.
-- orderId?: string | number — Düzenlenecek siparişin benzersiz tanımlayıcısı. Yeni sipariş oluştururken geçilmeyebilir.
-- onSuccess?: () => void — Form başarıyla gönderildiğinde çağrılan geri çağırma fonksiyonu.
-**Dönüş**: React.FC<OrderFormModalProps> — Tipi belirtilmiş bir React fonksiyonel bileşeni.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### handleClose
-**Ne yapar**: Modalın kapatılma işlemini yöneten içerdek bir fonksiyondur. Sadece modal kapalı olduğunda ilgili temizlik veya kapatma mantığını uygular.
-**Nasıl yapar**: Fonksiyon, bir `openVal` boolean parametresi alır. Eğer bu değer `false` (modal kapatılmak isteniyorsa) ise, kendi içinde tekrar `handleClose` çağrısı yaparak kapanma işlemini tetikler. Eğer değer `true` ise, `onOpenChange(true)` çağrısı ile modalın açık kalmasını sağlar. Bu yapı, modalın kapanma sürecini kontrol eden bir durum makinesi mantığına benzer.
-**Parametreler**:
-- openVal: boolean — Modalın hedef durumu (açık veya kapalı).
-**Dönüş**: void — Fonksiyon doğrudan bir değer döndürmez.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### handleOpenChange
-**Ne yapar**: Modalın açık/kapalı durumunu güncellemek için kullanılan bir yardımcı fonksiyondur. Genellikle bir state setter (örn. `setOpen`) olarak atanır.
-**Nasıl yapar**: Doğrudan bir mantık içermez, sadece prop olarak gelen `onOpenChange` callback'ini çağırarak üst bileşenin state'ini günceller. Bu sayede modalın durumu üst bileşen tarafından yönetilir.
-**Parametreler**:
-- openVal: boolean — Modalın ayarlanacak yeni durumu (açıksa true, kapalıysa false).
-**Dönüş**: void — Fonksiyon doğrudan bir değer döndürmez.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### onSubmit
-**Ne yapar**: Form gönderimini işleyen asenkron fonksiyondur. Geçerli form verilerini alır, bir API isteği gönderir ve sonuca göre başarı veya hata yönetimi yapar.
-**Nasıl yapar**: `OrderFormValues` tipli `values` parametresini alır. Fonksiyon `async` olduğu için içinde `await` ile asenkron işlemler (örn. API çağrısı) yapılabilir. İşlem başarılı olursa `onSuccess` callback'ini çağırır, başarısız olursa hata yönetimi yapar. Genellikle bir form kütüphanesinin (örn. React Hook Form) submit handler'ı olarak kullanılır.
-**Parametreler**:
-- values: OrderFormValues — Doğrulanmış form verilerini içeren nesne.
-**Dönüş**: Promise<void> — Asenkron bir işlem başlatır, doğrudan anlamlı bir değer döndürmez.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../../../i18n/currency::SYSTEM_CURRENCY
 - import: ../../../utils/adminUi::adminButtonPrimaryClass
+- import: ../overlay/ConfirmProvider::useConfirm
 - import: @/hooks/useRole::useRole
 - import: @/i18n/I18nProvider::useI18n
 - import: @/i18n/format::formatCurrency
@@ -118,6 +100,7 @@ Bu modül, admin sipariş yönetimi için bir modal form bileşeni olup, durum g
 - import: lucide-react::Loader2
 - import: lucide-react::Save
 - import: lucide-react::X
+- import: react-hook-form::type { FieldErrors }
 - import: react-hook-form::useForm
 - import: react::React
 - import: react::useEffect
@@ -173,15 +156,15 @@ Bu modül, admin sipariş yönetimi için bir modal form bileşeni olup, durum g
 
 ### OrderFormValues
 ```typescript
-type OrderFormValues = z.infer<typeof orderFormSchema>
+type OrderFormValues = z.infer<ReturnType<typeof buildOrderFormSchema>>
 ```
 
 ---
 
 ## SABİTLER
-- **orderFormSchema** (call) — `z.object({
-  status: z.string().min(1, 'Durum zorunludur'),
-  customer_name...`
+- **FIELD_FOCUS_ORDER** (array) — `[
+  { name: 'customer_name', id: 'order-customer-name' },
+  { name: 'custom...`
 - **STATUS_FLOW** (as_expression) — `['pending', 'paid', 'confirmed', 'shipped', 'delivered'] as const`
 - **TERMINAL_STATUSES** (as_expression) — `['cancelled', 'refunded', 'partial_refunded'] as const`
 
@@ -189,64 +172,75 @@ type OrderFormValues = z.infer<typeof orderFormSchema>
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::isStatusTransitionAllowed
-- **params**: (current: string, target: string)
+### [N1_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::buildOrderFormSchema
+- **params**: `t` — çeviri fonksiyonu, anahtar alır ve yerelleştirilmiş string döndürür
 - **ic_degiskenler**:
-  - `currentTerminal` — Mevcut durumun terminal (iptal/iade) durumu olup olmadığını belirler
-  - `targetTerminal` — Hedef durumun terminal (iptal/iade) durumu olup olmadığını belirler
-  - `ci` — Mevcut durumun STATUS_FLOW dizisindeki indeksi
-  - `ti` — Hedef durumun STATUS_FLOW dizisindeki indeksi
-- **Dönüş**: boolean (durum geçişinin izin verilip verilmediğini belirler)
+  - `z.object({...})` — Zod şema nesnesi; `status`, `customer_name`, `customer_email`, `customer_phone`, `carrier`, `tracking_number`, `shipping_method` alanlarını tanımlar
+  - `status` — z.string(), min 1 karakter, boş olamaz
+  - `customer_name` — z.string(), min 1 karakter, boş olamaz
+  - `customer_email` — z.string(), email formatı zorunlu, min 1 karakter
+  - `customer_phone` — z.string(), opsiyonel ve nullable
+  - `carrier` — z.string(), opsiyonel ve nullable
+  - `tracking_number` — z.string(), opsiyonel ve nullable
+  - `shipping_method` — z.string(), opsiyonel ve nullable
+- **Dönüş**: z.object Zod şeması
 
-### [N2_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::OrderFormModal
-- **params**: ({ open, onOpenChange, orderId, onSuccess })
+### [N2_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::FieldError
+- **params**: `id` — string, hata mesajının DOM id'si; `message` — string (opsiyonel), gösterilecek hata mesajı
 - **ic_degiskenler**:
-  - `orderId` — Düzenlenecek siparişin benzersiz tanımlayıcısı
-  - `open` — Modal'ın açık olup olmadığını belirleyen boolean state
-  - `onOpenChange` — Modal durumunu güncelleyen callback fonksiyon
-  - `onSuccess` — Başarılı kayıt sonrası çağrılan callback fonksiyon
-  - `order` — Yüklenen sipariş verisini tutan state (DetailOrder tipinde)
-  - `loadingOrder` — Sipariş yüklenirken loading durumunu gösteren boolean state
-  - `saving` — Kaydetme işlemi sırasında loading durumunu gösteren boolean state
-  - `hasWriteAccess` — Kullanıcının yazma izni olup olmadığını belirleyen boolean
-  - `form` — react-hook-form form instance'ı (OrderFormValues tipinde)
-  - `handleClose` — Modal kapatma mantığını içeren fonksiyon
-  - `handleOpenChange` — Modal açma/kapatma mantığını içeren fonksiyon
-  - `onSubmit` — Form gönderme işlemini yöneten async fonksiyon
-  - `t` —Uluslararasılaştırma fonksiyonu
-  - `lang` —Mevcut dil ayarı
-  - `supabase` —Supabase client instance'ı
-- **Dönüş**: React.FC<OrderFormModalProps> (React bileşen dönüşü)
+  - `message` — koşul: truthy ise `<p>` etiketi render edilir, falsy ise null döner
+  - `id` — `<p>` etiketinin `id` ve `aria-describedby` bağlamında kullanılan kimliği
+- **Dönüş**: JSX elementi (`<p>`) veya `null`
 
-### [N3_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::handleClose
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::focusFirstInvalid
+- **params**: `errs` — `FieldErrors<OrderFormValues>`, form hatalarını içeren nesne
 - **ic_degiskenler**:
-  - `form.formState.isDirty` — Formda kaydedilmemiş değişiklik olup olmadığını kontrol eder
-  - `onOpenChange` — Modal durumunu güncelleyen callback fonksiyonu
-- **Dönüş**: yok (yan etki: modal'ı kapatır veya onay penceresi gösterir)
+  - `first` — `FIELD_FOCUS_ORDER` dizisi üzerinde `.find()` ile bulunan, `errs[name]` değeri truthy olan ilk öğe; bulunamazsa fonksiyon erken döner
+  - `first.id` — bulunan öğenin `id` değeri; `document.getElementById()` ile DOM elemanı seçilir ve `.focus()` ile odaklanılır
+- **Dönüş**: void
 
-### [N4_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::handleOpenChange
-- **params**: (openVal: boolean)
+### [N4_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::isStatusTransitionAllowed
+- **params**: `current` — mevcut durum string'i; `target` — hedef durum string'i
 - **ic_degiskenler**:
-  - `openVal` — Modal'ın yeni durumu (true/false)
-  - `handleClose` — Modal kapatma mantığını içeren fonksiyon
-  - `onOpenChange` — Modal durumunu güncelleyen callback fonksiyon
-- **Dönüş**: yok (yan etki: handleClose veya onOpenChange çağırır)
+  - `currentTerminal` — `TERMINAL_STATUSES` dizisi içinde `current` var mı kontrolü sonucu (boolean)
+  - `targetTerminal` — `TERMINAL_STATUSES` dizisi içinde `target` var mı kontrolü sonucu (boolean)
+  - `ci` — `STATUS_FLOW` dizisinde `current` öğesinin indeksi; bulunamazsa -1
+  - `ti` — `STATUS_FLOW` dizisinde `target` öğesindeki indeksi; bulunamazsa -1
+- **Dönüş**: boolean — geçiş izinli ise `true`, değilse `false`
 
-### [N5_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::onSubmit
-- **params**: (values: OrderFormValues)
+### [N5_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::handleClose
+- **params**: yok
 - **ic_degiskenler**:
-  - `order` — Mevcut sipariş verisi (DetailOrder tipinde)
-  - `values` — Form verileri (OrderFormValues tipinde)
-  - `isStatusTransitionAllowed` — Durum geçişinin izin verilip verilmediğini kontrol eden fonksiyon
-  - `setSaving` — Saving state'ini güncelleyen fonksiyon
-  - `mutateWithAudit` — Audit korumalı veri güncelleme fonksiyonu
-  - `hasWriteAccess` — Kullanıcının yazma izni olup olmadığını belirleyen boolean
-  - `supabase` —Supabase client instance'ı
-  - `updateOrderStatus` — Sipariş durumunu güncelleyen servis fonksiyonu
-  - `statusRes` — updateOrderStatus sonucu (ok ve error alanları)
-  - `error` — Hata nesnesi (unknown tipinde)
-- **Dönüş**: yok (yan etki: toast mesajları gösterir, onSuccess ve onOpenChange çağırır)
+  - `form.formState.isDirty` — formda değişiklik olup olmadığını gösteren boolean; dirty değilse `onOpenChange(false)` çağrılır
+  - `ok` — `confirm()` fonksiyonundan dönen boolean; kullanıcı onay verirse `onOpenChange(false)` çağrılır
+- **Dönüş**: yok (async, yan etki: modal kapatma)
+
+### [N6_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::handleOpenChange
+- **params**: `openVal` — boolean, modal'ın yeni açık/kapalı durumu
+- **ic_degiskenler**:
+  - `openVal` — false ise `handleClose()` çağrılır, true ise `onOpenChange(true)` çağrılır
+- **Dönüş**: yok
+
+### [N7_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::onSubmit
+- **params**: `values` — `OrderFormValues` tipinde, form verileri
+- **ic_degiskenler**:
+  - `order` — mevcut sipariş nesnesi; yoksa fonksiyon erken döner
+  - `values.status` — formdaki yeni durum; `order.status` ile karşılaştırılır
+  - `statusRes` — `updateOrderStatus()` servisinden dönen sonuç nesnesi; `.ok` değeri false ise hata fırlatılır
+  - `statusRes.error` — hata durumunda fırlatılan hata mesajı
+  - `error` — `supabase.from('venthub_orders').update()` sonucu; hata varsa fırlatılır
+  - `mutateWithAudit` — denetimli güncelleme fonksiyonu; `resource`, `canWrite`, `action`, `rowPk`, `before`, `after`, `auditedByEdge`, `fn` parametreleri alır
+  - `hasWriteAccess` — yazma yetkisi olup olmadığını gösteren boolean
+  - `order.id` — sipariş kimliği, güncelleme sorgusunda kullanılır
+  - `order.user_id` — kullanıcı kimliği, `updateOrderStatus`'a gönderilir
+  - `order.status` — eski durum, `before` ve `oldStatus` olarak kullanılır
+  - `order.customer_name`, `order.customer_email`, `order.customer_phone`, `order.carrier`, `order.tracking_number`, `order.shipping_method` — eski değerler, `before` nesnesinde kullanılır
+  - `values.customer_name`, `values.customer_email`, `values.customer_phone`, `values.carrier`, `values.tracking_number`, `values.shipping_method` — yeni değerler, `after` nesnesinde ve `update` sorgusunda kullanılır
+  - `error` (catch bloğu) — yakalanan hata; `AdminPermissionError` ise yetki hatası mesajı, değilse genel hata mesajı gösterilir
+  - `setSaving` — yükleme durumunu ayarlayan fonksiyon; try başında true, finally'de false
+  - `onSuccess` — başarılı kayıt sonrası çağrılan callback
+  - `onOpenChange` — modal kapatma fonksiyonu; başarılı kayıt sonrası `false` ile çağrılır
+- **Dönüş**: yok (async, yan etki: veritabanı güncelleme, toast mesajı, modal kapatma)
 
 ---
 
@@ -254,28 +248,38 @@ type OrderFormValues = z.infer<typeof orderFormSchema>
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    OrderFormModal_tsx__FieldError["FieldError"]
     OrderFormModal_tsx__OrderFormModal["OrderFormModal"]
+    OrderFormModal_tsx__buildOrderFormSchema["buildOrderFormSchema"]
+    OrderFormModal_tsx__focusFirstInvalid["focusFirstInvalid"]
     OrderFormModal_tsx__handleClose["handleClose"]
     OrderFormModal_tsx__handleOpenChange["handleOpenChange"]
     OrderFormModal_tsx__isStatusTransitionAllowed["isStatusTransitionAllowed"]
     OrderFormModal_tsx__onSubmit["onSubmit"]
-    OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__isStatusTransitionAllowed
+    OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__buildOrderFormSchema
     OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__handleClose
+    OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__isStatusTransitionAllowed
 ```
 
 ## NODE ID STANDARD
 
-  file: src\components\admin\orders\OrderFormModal.tsx
-  function: src\components\admin\orders\OrderFormModal.tsx::isStatusTransitionAllowed
-  function: src\components\admin\orders\OrderFormModal.tsx::OrderFormModal
-  function: src\components\admin\orders\OrderFormModal.tsx::handleClose
-  function: src\components\admin\orders\OrderFormModal.tsx::handleOpenChange
-  function: src\components\admin\orders\OrderFormModal.tsx::onSubmit
+  file: OrderFormModal.tsx
+  function: OrderFormModal.tsx::buildOrderFormSchema
+  function: OrderFormModal.tsx::FieldError
+  function: OrderFormModal.tsx::focusFirstInvalid
+  function: OrderFormModal.tsx::isStatusTransitionAllowed
+  function: OrderFormModal.tsx::OrderFormModal
+  function: OrderFormModal.tsx::handleClose
+  function: OrderFormModal.tsx::handleOpenChange
+  function: OrderFormModal.tsx::onSubmit
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: FieldError
   export: OrderFormModal
+  export: buildOrderFormSchema
+  export: focusFirstInvalid
   export: isStatusTransitionAllowed
 
 ---
@@ -289,7 +293,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-surface-deep`, `bg-white/1`, `bg-white/2`, `bg-white/3`, `border-b`, `border-b-2`, `border-t`, `border-transparent`, `border-white/10`, `border-white/5`, `data-[state=active]:border-cyan-400`, `data-[state=active]:text-cyan-400`, `focus-visible:border-cyan-500/50`, `focus:bg-white/5`
-- **Layout:** `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `grid`, `grid-cols-2`, `items-center`, `justify-between`, `justify-center`, `left-1/2`
-- **Varyant/Responsive:** `data-[state=active]:`, `focus-visible:`, `focus:`, `group-hover:`, `hover:`, `placeholder:` önekleri
-- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-in`, `animate-spin`, `appearance-none`, `border`, `cursor-pointer`, `divide-white/2`, `divide-white/5`, `divide-y`, `fade-in`, `focus-visible:outline-none`, `font-black`, `font-bold`
+- **Renkler:** `bg-admin-bg`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-black/60`, `border-admin-border`, `border-b`, `border-b-2`, `border-t`, `border-transparent`, `data-[state=active]:border-admin-accent`, `data-[state=active]:text-admin-accent`, `focus-visible:bg-admin-surface-2`, `focus-visible:border-admin-accent/30`, `hover:bg-admin-surface-2`, `hover:bg-admin-surface-3`
+- **Layout:** `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `grid`, `grid-cols-2`, `items-center`, `justify-between`, `justify-center`, `left-1/2`, `max-h-90vh`
+- **Varyant/Responsive:** `:`, `data-[state=active]:`, `focus-visible:`, `group-hover:`, `hover:`, `placeholder:` önekleri
+- **Yardımcı Sınıflar:** `!border-admin-danger`, `${adminButtonPrimaryClass`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `animate-in`, `animate-spin`, `appearance-none`, `border`, `cursor-pointer`, `cursor-pointer${statusError`, `divide-admin-border`, `divide-y`, `fade-in`, `focus-visible:outline-none`
