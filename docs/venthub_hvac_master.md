@@ -2,12 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T09:03:24.744674+00:00
+compiled_at: 2026-08-26T14:11:36.614917+00:00
 total_compiled_files: 654
+source_commit: cba02389
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-26T09:03:24.744674+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-26T14:11:36.614917+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -10340,7 +10341,7 @@ entity_hashes:
   func:BuildTag: 33fa67732a403b49
   overview: 5afd4a9c8d0105c9
   style_tokens: 9c295aa26dd24226
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-06-14T22:16:15Z
 ---
 
 ## Genel Bakış
@@ -10889,7 +10890,7 @@ entity_hashes:
   func:WhatsAppIcon: e7d41d76023d8693
   overview: dff8b3ed99dcf496
   style_tokens: 3b0534c287cddb44
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-06-14T22:50:17Z
 ---
 
 ## Genel Bakış
@@ -13482,7 +13483,7 @@ entity_hashes:
   func:SecurityRibbon: a7c5f379d943c103
   overview: 08117376b2a86eee
   style_tokens: 3e379506fde07599
-generated_at: 2026-06-19T20:47:34Z
+generated_at: 2026-06-14T22:16:29Z
 ---
 
 ## Genel Bakış
@@ -17730,7 +17731,7 @@ entity_hashes:
   func:BlockEditor: 214d29bf0d4fb6bd
   overview: 451c6f0d8f51e9a4
   style_tokens: bc113824a6724140
-generated_at: 2026-06-19T20:46:43Z
+generated_at: 2026-06-16T10:18:09Z
 ---
 
 ## Genel Bakış
@@ -23932,7 +23933,7 @@ entity_hashes:
   func:SpecsBlock: 02f28da6bc471010
   overview: d1ce42a9320b0273
   style_tokens: c2dd5bfa6feb94e3
-generated_at: 2026-06-19T20:47:05Z
+generated_at: 2026-06-14T22:16:54Z
 ---
 
 ## Genel Bakış
@@ -26022,7 +26023,7 @@ entity_hashes:
   func:handleSelection: be5cfa5ce36fcdb3
   overview: 61691ddf4217f489
   style_tokens: 4b1fcd41d2094d58
-generated_at: 2026-06-19T20:47:07Z
+generated_at: 2026-06-14T20:59:46Z
 ---
 
 ## Genel Bakış
@@ -27043,7 +27044,7 @@ entity_hashes:
   func:ProblemSection: 8fcd7b70f98a256d
   overview: b61cb8f6c12ac577
   style_tokens: a37a5e86138e5e96
-generated_at: 2026-06-19T20:47:07Z
+generated_at: 2026-06-14T20:13:13Z
 ---
 
 ## Genel Bakış
@@ -27144,7 +27145,7 @@ entity_hashes:
   func:TrustSignals: 91fe7d8aaf9157d4
   overview: bc5a93987b260832
   style_tokens: d8ec8f7dddeaa270
-generated_at: 2026-06-19T20:47:07Z
+generated_at: 2026-06-14T21:00:26Z
 ---
 
 ## Genel Bakış
@@ -27375,7 +27376,7 @@ entity_hashes:
   func:VorticeBrand: a8d2715dd40c7de5
   overview: 0819e90fcacb5fea
   style_tokens: 751231d1b5ff9e5b
-generated_at: 2026-06-19T20:47:07Z
+generated_at: 2026-06-14T21:00:26Z
 ---
 
 ## Genel Bakış
@@ -27759,7 +27760,7 @@ entity_hashes:
   func:tr: b282b53f03d688a5
   overview: c3d80f54b946782d
   style_tokens: 3b3553271e7a0f67
-generated_at: 2026-06-19T20:47:07Z
+generated_at: 2026-06-14T21:00:26Z
 ---
 
 ## Genel Bakış
@@ -29968,7 +29969,7 @@ entity_hashes:
   func:CookieConsent: a5f102228e57f333
   overview: a960efeee3d27963
   style_tokens: 20b5f371d2cf3ccf
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-06-15T17:03:21Z
 ---
 
 ## Genel Bakış
@@ -31992,7 +31993,7 @@ entity_hashes:
   func:AddToProjectModal: 27f66ff6372a1fa9
   overview: 4ec0a41f38191057
   style_tokens: 49ec4d1f3ff40796
-generated_at: 2026-06-19T20:47:15Z
+generated_at: 2026-06-14T22:19:48Z
 ---
 
 ## Genel Bakış
@@ -45667,7 +45668,7 @@ entity_hashes:
   func:createLocalizedProxy: b213c316ec0c2854
   func:useLocalizedRoutes: d8dba6cf829a1dea
   overview: 9cb31a2460306030
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-06-15T17:03:48Z
 ---
 
 ## Genel Bakış
@@ -46583,7 +46584,7 @@ skeleton_hash: c3659edf855e64a7
 entity_hashes:
   func:useSettings: caf0b25f3b0d5fb3
   overview: 094819e02d799328
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-06-19T11:49:28Z
 ---
 
 ## Genel Bakış
@@ -47513,7 +47514,7 @@ skeleton_hash: 5dd3501554501d6b
 entity_hashes:
   func:getDictValue: 8458c9d7ff2daa26
   overview: 3ad66d5b97f51555
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-06-15T11:41:12Z
 ---
 
 ## Genel Bakış
@@ -71928,7 +71929,7 @@ entity_hashes:
   func:AccountSecurityPage: f71c4639f75e785f
   overview: 075ea80a94c87d0f
   style_tokens: ac89c7eeea9aa372
-generated_at: 2026-06-19T20:48:28Z
+generated_at: 2026-06-14T17:24:02Z
 ---
 
 ## Genel Bakış
@@ -73818,7 +73819,7 @@ entity_hashes:
   func:AdminDashboardPage: d9f200a1ae3a63e1
   overview: 98a75f3d9ee8aa18
   style_tokens: 12dd6d905c26f46b
-generated_at: 2026-06-19T20:48:41Z
+generated_at: 2026-06-19T07:57:44Z
 ---
 
 ## Genel Bakış
@@ -84791,7 +84792,7 @@ entity_hashes:
   func:AddressSelectModal: adfcf435f03c2db9
   overview: 55656091e9138090
   style_tokens: 0a79973eb6842aa3
-generated_at: 2026-06-19T20:50:27Z
+generated_at: 2026-06-14T17:51:41Z
 ---
 
 ## Genel Bakış
@@ -85039,7 +85040,7 @@ entity_hashes:
   func:InvoiceProfileModal: de25b37c1a2260e8
   overview: 9a64ef3b1c56eb7b
   style_tokens: 7ba01f3f33eb1def
-generated_at: 2026-06-19T20:50:27Z
+generated_at: 2026-06-14T17:51:42Z
 ---
 
 ## Genel Bakış
@@ -85157,7 +85158,7 @@ entity_hashes:
   func:OrderSummarySidebar: d1d455540c8e8d0c
   overview: ce3348034c2766ed
   style_tokens: ed45dfd73f706270
-generated_at: 2026-06-19T20:50:27Z
+generated_at: 2026-06-14T17:51:42Z
 ---
 
 ## Genel Bakış
@@ -85446,7 +85447,7 @@ entity_hashes:
   func:ReviewSummary: 5797ed029cce22ed
   overview: 34cecab9410c7f0c
   style_tokens: e50d4f5a19398e9d
-generated_at: 2026-06-19T20:50:27Z
+generated_at: 2026-06-19T09:04:41Z
 ---
 
 ## Genel Bakış
@@ -85822,7 +85823,7 @@ entity_hashes:
   func:StepCustomerInfo: 2698d0acd17fa1de
   overview: 3962b33f58fa703d
   style_tokens: 61f2a39b43a19a77
-generated_at: 2026-06-19T20:50:27Z
+generated_at: 2026-06-19T09:05:04Z
 ---
 
 ## Genel Bakış
@@ -87511,7 +87512,7 @@ entity_hashes:
   func:PreInformationContentEn: 44e34e2e52c333aa
   overview: e15ed899a460c834
   style_tokens: 5c1748e6c54f7f63
-generated_at: 2026-06-19T20:50:36Z
+generated_at: 2026-06-16T11:55:32Z
 ---
 
 ## Genel Bakış
@@ -87622,7 +87623,7 @@ entity_hashes:
   func:PrivacyPolicyContentEn: 0b9028540cd295ad
   overview: 20980fb4e6c9124c
   style_tokens: 4e890ff82c62079d
-generated_at: 2026-06-19T20:50:36Z
+generated_at: 2026-06-16T11:55:52Z
 ---
 
 ## Genel Bakış
@@ -88357,7 +88358,7 @@ entity_hashes:
   func:TermsOfUseContentTr: eed63a486a457bcd
   overview: c8c962c36de42ed3
   style_tokens: 6460a848de07bdf3
-generated_at: 2026-06-19T20:50:47Z
+generated_at: 2026-06-16T11:57:51Z
 ---
 
 ## Genel Bakış
