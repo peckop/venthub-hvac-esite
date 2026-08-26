@@ -3,35 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\PaymentIframeContainer.tsx
-skeleton_hash: b4adceabfe9b242d
+skeleton_hash: a895c4e763aa0925
 entity_hashes:
   func:PaymentIframeContainer: a26b3523d4f0ca84
-  overview: 63cea4293d180d15
-  style_tokens: aa1cb9d92aed5506
-generated_at: 2026-06-19T20:50:27Z
+  overview: 06c7c6530c379380
+  style_tokens: a68f98e81d24e9bc
+generated_at: 2026-08-26T07:19:25Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunda ödeme sürecinde Iyzico tabanlı güvenli ödeme altyapısını entegre eden bir React konteyner bileşenidir. Temel olarak, gerekli güvenlik token'ı ve ödeme içeriği ile donatılmış bir iframe'i sayfaya yerleştirerek ödeme formunun güvenli bir şekilde sunulmasını sağlar. Ayrıca, ödeme sayfasındaki yardım paneli gibi ek arayüz elemanlarının görünürlük durumunu da dışarıdan kontrol edilebilir şekilde yönetir.
+Bu modül, ödeme sürecinde güvenli bir ödeme formu sunmak için kullanılan bir React bileşenini içerir. Bileşen, dışarıdan sağlanan bir ödeme token'ı ve iframe içeriği ile güvenli bir ödeme arayüzü oluşturur. Ayrıca, bir yardım panelinin görünürlük durumunu dışarıdan kontrol edilebilir şekilde yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Ödeme Iframe Konteyner Bileşeni
-Modülün tek ve temel bileşeni olup, dışarıdan gelen parametrelerle (güvenlik token'ı, iframe içeriği, görünürlük durumu) güvenli ödeme arayüzünü render eder ve ilgili durum değişimlerini üst bileşenlere bildirir.
+Modülün tek bileşeni olup, dışarıdan gelen ödeme token'ı, iframe içeriği ve yardım paneli görünürlük durumu ile güvenli ödeme arayüzünü oluşturur ve ilgili durum değişimlerini üst bileşenlere bildirir.
 - PaymentIframeContainer
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için, sadece fonksiyon gövdesinden (bu durumda prop imzasından) çıkarılabilecek net, kanıtlanabilir mimari aksiyomlar sınırlıdır. Aşağıdaki aksiyomlar, bileşenin doğru çalışması için zorunlu olan koşulları belirtir.
-
-[Aksiyom 1]: Eğer `iyzToken` prop'u verilmezse veya geçersiz/boş bir değer (null, undefined) ise, bileşenin ödeme işlemini başlatmak için gerekli olan oturum/b kimlik doğrulaması yapılamaz, bu durum ödeme iframe'inin güvenli bir şekilde oluşturulmasını veya içerik yüklenmesini engeller.
-
-[Aksiyom 2]: Eğer `paymentFrameContent` prop'u verilmezse veya geçersiz/boş bir değer ise, bileşenin iframe içinde göstereceği güvenli ödeme sayfası içeriği olmaz, bu durum kullanıcının ödeme formunu görememesine ve işlem yapamamasına yol açar.
-
-[Aksiyom 3]: Eğer `showHelp` ve `setShowHelp` prop'ları verilmezse, bileşenin yardım panelinin görünürlük durumunu okuması veya bu durumu kullanıcı etkileşimiyle değiştirip üst bileşene bildirmesi mümkün olmaz; bu durum arayüzdeki ilgili kontrollerin işlevsiz kalmasına neden olur.
-
-[Aksiyom 4]: Bileşen, `paymentFrameContent`'i bir iframe kaynak içeriği olarak kullanmak üzere tasarlanmıştır. Eğer `paymentFrameContent`, XSS saldırılarına açık veya doğrulanmamış bir kaynaktan geliyorsa, uygulamanın güvenliği tehlikeye girer.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -53,6 +46,11 @@ Bu modül için, sadece fonksiyon gövdesinden (bu durumda prop imzasından) ç�
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useCheckoutPayment::FORM_RENDER_TIMEOUT_MS
+- import: ../../hooks/useCheckoutPayment::type { PaymentPhase }
+- import: ./injectCheckoutForm::hasRenderedSurface
+- import: ./injectCheckoutForm::injectCheckoutForm
+- import: lucide-react::AlertTriangle
 - import: lucide-react::CheckCircle
 - import: lucide-react::CreditCard
 - import: lucide-react::Lock
@@ -69,23 +67,46 @@ Bu modül için, sadece fonksiyon gövdesinden (bu durumda prop imzasından) ç�
 - `setShowHelp: (v: boolean | ((p: boolean) => boolean)) => void`
 - `progressPct: number`
 - `overlayStep: number`
+- `phase: PaymentPhase`
+- `errorMessage: string`
+- `onFormReady: () => void`
+- `onFormFailed: (reason: string) => void`
+- `onRetry?: () => void`
 - `t: (key: string, params?: Record<string, unknown>) => string`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/checkout/PaymentIframeContainer.tsx::PaymentIframeContainer
-- **params**: `iyzToken`, `paymentFrameContent`, `showHelp`, `setShowHelp`, `progressPct`, `overlayStep`, `t`
+### [N1_NASIL] AST Pointer: PaymentIframeContainer.tsx::PaymentIframeContainer
+- **params**: `iyzToken`, `paymentFrameContent`, `showHelp`, `setShowHelp`, `progressPct`, `overlayStep`, `phase`, `errorMessage`, `onFormReady`, `onFormFailed`, `onRetry`, `t`
 - **ic_degiskenler**:
-  - `iyzToken` — iyzico ödeme token'ı; varsa checkout formunu `data-token` attribute'una bağlar, yoksa alternatif yollara yönelir
-  - `paymentFrameContent` — iyzico'dan dönen HTML iframe içeriği; `dangerouslySetInnerHTML` ile doğrudan render edilir
-  - `showHelp` — boolean flag; SMS yardım ipuçlarının açılıp kapanmasını kontrol eder
-  - `setShowHelp` — state setter; butona tıklanınca `v => !v` ile toggling yapar
-  - `progressPct` — yüzde bazlı ilerleme değeri; progress bar'ın `style={{ width }}`'ine bind edilir
-  - `overlayStep` — overlay adım numarası (1, 2 veya 3); ternary zincir ile hangi msg gösterileceğini belirler: `overlayStep === 1 → starting`, `overlayStep === 2 → secureForm`, diğer → bank3d
-  - `t` — i18n çeviri fonksiyonu; `t('checkout.paymentSectionTitle')`, `t('checkout.securePaymentBrand', { brand: 'Venthub HVAC' })`, `t('checkout.securePaymentProvider', { provider: 'iyzico' })`, `t('checkout.paymentLoading')`, `t('checkout.formPreparing')`, `t('checkout.help.smsTitle')`, `t('checkout.help.tip1')`, `t('checkout.help.tip2')`, `t('checkout.help.tip3')`, `t('checkout.overlay.starting')`, `t('checkout.overlay.secureForm')`, `t('checkout.overlay.bank3d')` çağrıları yapılır
-- **Dönüş**: JSX — `{space-y-6}` wrapper div içinde: CreditCard ikonlu başlık, `Lock` ikonlu secure payment header (progress bar + overlayStep mesajı), koşullu render bloğu (`iyzToken` varsa div + `iyzipay-checkout-form` id'li container / `paymentFrameContent` varsa `dangerouslySetInnerHTML` div / ikisi de yoksa `CheckCircle` animasyonlu "form hazırlanıyor" skeleton), toggle butonu ile `showHelp` durumuna göre SMS yardım paneli
+  - `formHostRef` — `React.useRef<HTMLDivElement | null>(null)` ile oluşturulmuş DOM referansı; ödeme formunun yerleştirileceği `<div>` elemanına bağlanır
+- **Dönüş**: JSX element (React.FC)
+
+### [N2_NASIL] AST Pointer: PaymentIframeContainer.tsx::useEffect callback
+- **params**: yok
+- **ic_degiskenler**:
+  - `host` — `formHostRef.current` değeri; ödeme formunun enjekte edileceği DOM kabının referansı, null ise erken çıkış yapılır
+  - `cleanupInjection` — `injectCheckoutForm(host, paymentFrameContent).cleanup` dönüşü; form enjeksiyonunun temizleme fonksiyonu, `paymentFrameContent` yoksa veya hata oluşursa `null` kalır
+  - `observer` — `new MutationObserver(...)` ile oluşturulmuş DOM gözlemcisi; `host` elemanında çocuk öğe veya alt ağaç değişikliklerini izler, yüzey belirdiğinde `onFormReady` çağırır
+  - `timer` — `window.setTimeout(...)` ile oluşturulan zamanlayıcı; `FORM_RENDER_TIMEOUT_MS` süresi dolduğunda `onFormFailed('render_timeout')` çağırır
+- **Dönüş**: cleanup fonksiyonu (`observer.disconnect()`, `window.clearTimeout(timer)`, `cleanupInjection?.()` çağırır) veya `undefined`
+
+### [N3_NASIL] AST Pointer: PaymentIframeContainer.tsx::MutationObserver callback
+- **params**: yok
+- **ic_degiskenler**: yok (dış kapsamdan `host`, `observer`, `timer`, `onFormReady` erişilir)
+- **Dönüş**: yok
+
+### [N4_NASIL] AST Pointer: PaymentIframeContainer.tsx::setTimeout callback
+- **params**: yok
+- **ic_degiskenler**: yok (dış kapsamdan `observer`, `onFormFailed` erişilir)
+- **Dönüş**: yok
+
+### [N5_NASIL] AST Pointer: PaymentIframeContainer.tsx::useEffect cleanup
+- **params**: yok
+- **ic_degiskenler**: yok (dış kapsamdan `observer`, `timer`, `cleanupInjection` erişilir)
+- **Dönüş**: yok
 
 ---
 
@@ -110,7 +131,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/20`, `bg-gradient-to-r`, `bg-light-gray/80`, `bg-primary-navy`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-primary-navy/30`, `from-primary-navy`, `hover:text-secondary-blue`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-white`
-- **Layout:** `flex`, `flex-col`, `from-primary-navy`, `gap-2`, `gap-3`, `h-2`, `h-full`, `items-center`, `justify-between`, `min-h-520px`, `overflow-hidden`, `p-2`, `p-3`, `p-4`, `shadow-lg`
-- **Varyant/Responsive:** `hover:` önekleri
-- **Yardımcı Sınıflar:** `animate-pulse`, `border`, `font-semibold`, `mb-2`, `mt-2`, `mt-3`, `mt-4`, `responsive`, `ring-1`, `ring-black/5`, `rounded-full`, `rounded-lg`, `rounded-xl`, `space-x-3`, `space-y-1`
+- **Renkler:** `bg-air-blue/20`, `bg-danger-red/5`, `bg-gradient-to-r`, `bg-light-gray/80`, `bg-primary-navy`, `bg-white`, `bg-white/90`, `border-danger-red/40`, `border-light-gray`, `border-primary-navy/30`, `from-primary-navy`, `hover:text-secondary-blue`, `text-danger-red`, `text-industrial-gray`, `text-primary-navy`
+- **Layout:** `flex`, `flex-col`, `from-primary-navy`, `gap-2`, `gap-3`, `h-2`, `h-full`, `items-center`, `items-start`, `justify-between`, `min-h-520px`, `overflow-hidden`, `p-2`, `p-3`, `p-4`
+- **Varyant/Responsive:** `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `animate-pulse`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/30`, `font-semibold`, `mb-2`, `mt-0.5`, `mt-2`, `mt-3`, `mt-4`, `responsive`, `ring-1`, `ring-black/5`, `rounded`
