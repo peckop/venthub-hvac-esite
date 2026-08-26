@@ -9,7 +9,43 @@ notebook_id: "235043eb-970f-4a52-9f39-1d02b2621e9c"
 # master derleyicinin format kapısından düşer, yani standalone olmadıkları sürece ikize HİÇ girmez.
 standalone_files: [README.md, CONTEXT.md, CHANGELOG.md, RECOMMENDATIONS.md, VISION.md, CLAUDE.md, PROJECT.md, docs/audits/operasyon-dongusu-denetimi-2026-08-15.md, docs/audits/render-stratejisi-denetimi-2026-08-16.md, docs/audits/vibe-coding-20-madde-v2-2026-08-16.md, docs/database_schema_master.md, docs/design_system_config.md, docs/venthub_skills_master.md, docs/standards/admin-standard.md, docs/standards/admin-capabilities.md, docs/standards/dealer-network-standard.md, docs/standards/dealer-module-blueprint.md, docs/audits/dealer-data-ground-truth-2026-06-11.md, docs/reference/supabase/row-level-security.md, docs/reference/supabase/custom-claims-and-role-based-access-control-rbac.md, docs/reference/supabase/auth-hooks.md, docs/reference/supabase/realtime-authorization.md, docs/plans/faz0-kit-contract-2026-06-13.md, docs/plans/faz1-migration-playbook-2026-06-13.md, docs/plans/seo-transition-blueprint.md, docs/standards/analytics-standard.md, docs/standards/i18n-localization-standard.md, docs/standards/collaboration-protocol.md, docs/standards/category-taxonomy-standard.md, docs/standards/3d-webgl-standard.md, docs/standards/3d-scene-lighting-research.md, docs/standards/3d-showroom-ux-research.md, docs/standards/SOURCES.md, docs/standards/pricing-standard.md, docs/standards/catalog-ingestion-standard.md, docs/standards/csv-import-export-standard.md, docs/standards/work-tracking-ssot-standard.md, docs/plans/saas-funding-and-packaging-2026-06.md, docs/audits/product-schema-ground-truth-2026-06-21.md, docs/standards/product-schema-standard.md, docs/plans/catalog-commerce-pipeline-master-2026-06-20.md, docs/plans/slug-localization-2026-08-10.md, docs/plans/product-schema-master-implementation-plan.md, docs/standards/migration-safety-standard.md, docs/standards/rendering-cache-standard.md, docs/standards/multi-session-coordination-standard.md, docs/standards/storefront-design-standard.md, docs/standards/edge-function-security-standard.md, docs/standards/admin-design-standard.md]
 skip_dirs: [__pycache__, .git, .agent, .venv, venv, mcp-env, node_modules, tests, __tests__, .pytest_cache, .ruff_cache, build, dist, egg-info, registry]
-skip_files: [venthub_hvac_master.md, system_tree.md, supabase_functions_master.md, database_schema_master.md, CHANGELOG.md, next-env.d.ts, index.ts, HowItWorks.test.tsx, tokens.d.ts, brand.ts, three-setup.ts, setup.d.ts, env.d.ts, imagetools.d.ts, isomorphic-dompurify.d.ts, vitest-axe.d.ts, iyzico-real.ts, postcss.config.js, make_graph.cjs, vitest.setup.ts, vitest.config.ts, vitest-setup.tsx]
+# README.md ve uretilen master'lar buradadir: kok README'si AYRI kaynak olarak
+# yuklenir (standalone_files), master supurmesine de girerse ikiz ayni belgeyi
+# IKI kaynakta gorur ve hangisinin taze oldugunu bilemez (T020-OR).
+skip_files: [README.md, venthub_hvac_master.md, system_tree.md,
+  standards_master.md, kayitlar_master.md, supabase_functions_master.md, database_schema_master.md, CHANGELOG.md, next-env.d.ts, index.ts, HowItWorks.test.tsx, tokens.d.ts, brand.ts, three-setup.ts, setup.d.ts, env.d.ts, imagetools.d.ts, isomorphic-dompurify.d.ts, vitest-axe.d.ts, iyzico-real.ts, postcss.config.js, make_graph.cjs, vitest.setup.ts, vitest.config.ts, vitest-setup.tsx]
 
-extra_masters: [{name: "supabase_functions_master.md", source_dirs: "supabase/functions", output: "docs/supabase_functions_master.md"}]
+# KUME MASTER'LARI (T020-OR, 2026-08-26)
+#
+# NICIN: defterde 96 AYRI kaynak vardi — her cetvel, her denetim, her plan tekil
+# yukleniyordu. Iki bedeli vardi: (a) defter sisiyor, tam senkron uzuyordu;
+# (b) asagidaki `standalone_files` listesi ELLE bakildigi icin KAPSAM DUSUKTU —
+# 2026-08-26 olcumu: diskte 40 denetim + 49 plan varken listede 5 + 7 kalem vardi,
+# yani 77 belge ikizde HIC YOKTU.
+#
+# Kume master'i ikisini birden cozer: dizin OTOMATIK taranir (kapsam tam) ve TEK
+# dosya yuklenir (kaynak sayisi duser). Yeni bir cetvel eklendiginde buraya bir
+# sey YAZMAK GEREKMEZ.
+#
+# EMILIM OTOMATIKTIR: bir kume master'ina giren dosya `standalone_files`'ta kalsa
+# bile AYRI yuklenmez (docs_tree.emilenleri_suz). Boylece ikiz ayni belgeyi iki
+# surumde gormez ve "listeden cikarmayi unutma" diye elle bakim kalmaz.
+#
+# include_files ADIYLA istenen dosyalardir ve BULUNAMAZSA KOSUM PATLAR — sessizce
+# atlanan bir dosya, ikizde VAR SANILAN ama OLMAYAN bir belge dogururdu.
+extra_masters:
+  - name: "supabase_functions_master.md"
+    source_dirs: "supabase/functions"
+    output: "docs/supabase_functions_master.md"
+  - name: "standards_master.md"
+    source_dirs: ["docs/standards", "docs/reference"]
+    output: "docs/standards_master.md"
+  - name: "kayitlar_master.md"
+    source_dirs: ["docs/audits", "docs/plans"]
+    # docs/system_tree.md BURADA: defterdeki "System Tree" kaynagi 2026-06-02'de
+    # kalmisti ve hicbir sey onu tazelemiyordu (boru hattinda KODA GOMULU olarak
+    # master supurmesinden atlaniyor). Kume master'ina alinca her senkronda
+    # yeniden uretilen GUNCEL agac ikize girer; "bayat mi, hic mi" ikilemi kalkar.
+    include_files: ["CONTEXT.md", "PROJECT.md", "VISION.md", "RECOMMENDATIONS.md", "CHANGELOG.md", "docs/README.md", "docs/DURUM-TAKIP.md", "docs/system_tree.md"]
+    output: "docs/kayitlar_master.md"
 
