@@ -2,49 +2,49 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\views\admin\quotes\AdminQuotesPage.tsx
-skeleton_hash: ae905171fd6a573d
+source_path: C:\tmp\wt-supurme\src\views\admin\quotes\AdminQuotesPage.tsx
+skeleton_hash: 1a87f71a21feb147
 entity_hashes:
   func:AdminQuotesPage: 8f282793cec53879
   overview: ed62e4d1f35d7caa
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-08-16T11:36:10Z
+generated_at: 2026-08-25T07:30:46Z
 ---
 
 ## Genel Bakış
 
-Bu modül, admin panelindeki tekliflerin (quotes) yönetim sayfasını sunan üst düzey bir React bileşenidir. Kullanıcılara tekliflerin listelenmesini, görüntülenmesini ve yönetimini sağlayan bir arayüz sağlar. Sayfa, teklif verilerini çekerek admin kullanıcılarının süreçleri izlemesine ve manipüle etmesine olanak tanır.
+Bu modül, yönetici panelinde tekliflerin (quotes) yönetimine ilişkin sayfa bileşenini tanımlar. Tek bir bileşen fonksiyonu içerir ve React fonksiyonel bileşeni olarak uygulanmıştır. Modül, admin kullanıcılarına teklif verilerini görüntüleme ve yönetme arayüzü sunar.
 
 ## Fonksiyon Grupları
 
-### Teklif Yönetim Sayfası
-
-Tek sayfalık bir bileşendir; admin panelindeki quotes bölümünün tamamını yöneten ana konteyner olarak görev yapar.
-
+### Sayfa Bileşeni
+Ana sayfa bileşenini oluşturur; admin teklifler sayfasının tüm görünüm ve davranışını tek bir fonksiyonel bileşen altında toplar.
 - AdminQuotesPage
+
+## Notlar
+
+- Modül yalnızca tek bir dışa aktarılan bileşen içerdiğinden, iç fonksiyonlar arası çağrı ilişkisi bulunmamaktadır.
+- Dış bağımlılıklar ve dinamik yüklenen alt modüller hakkında kaynakta bilgi yer almamaktadır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için belirtilen fonksiyon imzasında (AdminQuotesPage() -> React.FC) ve verilen modül sabitlerinde herhangi bir parametrik giriş, zorunlu bağımlılık veya iş mantığı koşulu tanımlanmamıştır. Dolayısıyla, bu modül için fonksiyonel veya mimari aksiyom üretmek için yeterli yapısal bilgi mevcut değildir. Modülün doğru çalışması için gerekli koşullar, fonksiyon imzasında belirtilmemiştir.
-
-Aksiyomlar, modülün iç yapısının (bileşenlerin birbirine bağlanma biçimi, state yönetimi, API çağrıları, vb.) ne olduğu bilinmeden, sadece dışsal imza bilgisinden türetilemez. Bu durumda, modülün kendi içinde bağımsız bir “sayfa” (page) olduğu ve React.FC arayüzünü uyguladığı dışında, daha spesifik bir mimari varsayım tanımlanamaz.
-
-Bu nedenle, bu modül için özel aksiyom tanımlanmamıştır. Mimari varsayımların üretilmesi için, modülün内部 yapısının (bileşenlerin, hookların, servislerin vb.) analiz edilmesi gerekmektedir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminQuotesPage
-**Ne yapar**: AdminQuotesPage, teklif kuyruğu sayfasını (T067-VH, cetvel Q7) oluşturan üst düzey React fonksiyonel bileşenidir. Sayfa yapısı olarak bir başlık ve Suspense sarımı içinde ana içerik bölgesi sunar.
+**Ne yapar**: Teklif kuyruğu yönetim sayfasını oluşturur. T067-VH (cetvel Q7) kapsamında tanımlanmış bu sayfa, admin panelindeki teklif listeleme ve yönetim arayüzünü sunar. Sayfa yapısı başlık bileşeni ve veri yüklemesini yöneten bir `Suspense` sarmalayıcıdan oluşur.
 
-**Nasıl yapar**: Fonksiyon, sayfa düzenini iki temel bölümden oluşan basit bir yapıda render eder: bir başlık kısmı ve veri yükleme durumunu yöneten React Suspense sarmalı. `useSearchParams` hook'u doğrudan bu bileşen içinde çağrılmaz; bunun yerine, bu hook'u tüketen mantık (veri, URL ve filtre state yönetimi) tamamen alt bileşen olan `QuotesTableBody` içinde, orada kullanılan `useAdminTable` custom hook'u tarafından taşınır. Bu mimari tercih, `useSearchParams`'ı Suspense sınırları içinde tüketmek zorunluluğuna (CLAUDE.md Kural 5 / K2) uymak için yapılmıştır; böylece asenkron veri yükleme süreçleri Suspense bileşeni tarafından şeffaf bir şekilde yönetilir.
+**Nasıl yapar**: Sayfa bileşeni, üst düzeyde bir başlık ve ardından `<Suspense>` ile sarılmış bir içerik alanı render eder. `Suspense` ile sarma işlemi, `useSearchParams` tüketicisinin asenkron veri yükleme sırasında kullanıcıya kesintisiz bir deneyim sunmasını sağlar; bu uygulama CLAUDE.md Kural 5 ve K2 kurallarına uygun şekilde gerçekleştirilir. Veri yönetimi, URL parametreleri ve filtre durumu doğrudan bu bileşende tutulmaz; bu sorumluluk alt bileşen olan `QuotesTableBody`'ye devredilir. `QuotesTableBody` bileşeni, `useAdminTable` kancasını kullanarak tablo verisini, sıralama ve filtreleme gibi yönetim mantığını kendi bünyesinde barındırır.
 
-**Parametreler**: Bu fonksiyon, bir React fonksiyonel bileşeni olarak harici prop almaz.
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: `React.FC` (React.FunctionComponent) tipinde bir JSX döndürür.
+**Dönüş**: `React.FC` — React fonksiyonel bileşen döndürür. Dönen bileşen, teklif kuyruğu sayfasının tamamını; başlık bölümünü ve `Suspense` ile sarılmış tablo gövdesini içerir.
 
 ---
 
@@ -62,19 +62,17 @@ Bu nedenle, bu modül için özel aksiyom tanımlanmamıştır. Mimari varsayım
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/quotes/AdminQuotesPage.tsx::AdminQuotesPage
-- **params**: (parametre yok — arrow function, boş())
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'unun dönüşünden destructured çeviri fonksiyonu; `t('quotes.admin.title')` ve `t('quotes.admin.subtitle')` çağrılarda başlık ve alt başlık metinlerini i18n anahtarlarından getirir
-- **Dönüş**: JSX — `<div>` sarmalayan container içinde `<header>` (başlık + alt başlık) ve `<Suspense>` içinde `<QuotesTableBody />` bileşeni döndürür
-
-**Not**: `adminSectionTitleClass`, `adminSubtitleClass`, `AdminSkeleton`, `QuotesTableBody`, `Suspense` — bunlar import'tan gelen referanslardır, fonksiyon gövdesinde yerel değişken olarak tanımlanmaz; doğrudan JSX içinde kullanılır.
+  - `t` — `useI18n()` hook'undan destructuring ile alınan çeviri fonksiyonu; JSX içinde `t('quotes.admin.title')` ve `t('quotes.admin.subtitle')` çağrılarıyla metinleri yerelleştirir
+- **Dönüş**: JSX elementi — `<div className="space-y-6 pb-20">` kök elemanı içinde `<header>` (başlıkta `adminSectionTitleClass` ile `t('quotes.admin.title')`, alt başlıkta `adminSubtitleClass` ile `t('quotes.admin.subtitle')`) ve `<Suspense>` (yedek içerik olarak `AdminSkeleton` bileşenine `variant="table"`, `count={6}`, `rows={6}` props'ları iletilir) içinde `QuotesTableBody` bileşenini render eder
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\admin\quotes\AdminQuotesPage.tsx
-  function: src\views\admin\quotes\AdminQuotesPage.tsx::AdminQuotesPage
+  file: AdminQuotesPage.tsx
+  function: AdminQuotesPage.tsx::AdminQuotesPage
 
 ---
 

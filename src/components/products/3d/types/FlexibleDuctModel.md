@@ -2,103 +2,179 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\FlexibleDuctModel.tsx
-skeleton_hash: 31aa6bb1046bed18
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\FlexibleDuctModel.tsx
+skeleton_hash: be3af2fd6b58aab1
 entity_hashes:
-  func:FlexibleDuctModel: 022fe00ec2478f53
-  overview: e0034256dd24c9f4
+  func:FlexibleDuctModel: 3bca0ec1b35809a5
+  func:updateWaveCurve: 6edc25976d31416d
+  overview: 7399efaa6127c9e1
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:45:55Z
+generated_at: 2026-08-25T07:27:07Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformu için esnek havalandırma kanallarının 3 boyutlu (3D) modellerini temsil eden bir React bileşenini tanımlar. Esnek kanalın geometrisini ve animasyonunu sahneye bağlayarak, ürünün 3D vitrinde görselleştirilmesini sağlar.
+Bu modül, 3B esnek kanal modelini temsil eden bir React bileşeni ve bu modele ait dalga eğrisini güncelleyen bir yardımcı fonksiyon içerir. Bileşen, modelin görsel sunumunu sağlarken, yardımcı fonksiyon animasyon veya dinamik güncellemeler için hesaplama işlemlerini gerçekleştirir.
 
 ## Fonksiyon Grupları
-### 3D Model Bileşeni
-Esnek havalandırma kanalının 3D geometrisini, temel parametrelerini ve etkileşim mantığını yöneterek, ana sahneye entegre edilebilir bir bileşen halinde sunar.
+### Bileşen
+Esnek kanal modelinin 3B görünümünü render eden ana bileşendir.
 - FlexibleDuctModel
+
+### Yardımcı Fonksiyonlar
+Dalga eğrisinin zaman ve nokta havuzuna göre güncellenmesini sağlayan hesaplama fonksiyonlarını içerir.
+- updateWaveCurve
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çıkarılabilecek sınırlı varsayımlar belirlenebilir.
+
+[Aksiyom 1]: Eğer `updateWaveCurve` fonksiyonuna `pointsPool` parametresi verilmezse, fonksiyonun davranışı bilinmiyor (gövde mevcut değil).
+
+[Aksiyom 2]: Eğer `updateWaveCurve` fonksiyonuna `waveTime` parametresi verilmezse, fonksiyonun davranışı bilinmiyor (gövde mevcut değil).
+
+[Aksiyom 3]: Eğer `pointsPool` dizisi boş bir dizi olarak verilirse, fonksiyonun nasıl bir sonuç üreteceği bilinmiyor (gövde mevcut değil).
+
+[Aksiyom 4]: `FlexibleDuctModel` fonksiyonu parametre almaz; eğer bağımlı olduğu harici durum (state, context, store) mevcut değilse, bileşenin nasıl render edeceği bilinmiyor (gövde mevcut değil).
+
+---
+
+**Not:** Fonksiyon gövdeleri sağlanmadığından, bu modülün çalışması için gerekli kesin koşullar (eşik değerleri, null kontrolü, hata senaryoları vb.) belirlenememektedir. Daha doğru aksiyomlar için kaynak kodun gövde içeriklerinin sağlanması gerekmektedir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### FlexibleDuctModel
+### updateWaveCurve
+**Ne yapar**: Animasyonlu dalga eğrisi noktalarını yerinde günceller. Verilen zaman parametresine bağlı olarak sinüs dalgası formunda 31 adet noktayı (0'dan 30'a kadar indeks) hesaplar ve bu noktaları doğrudan `pointsPool` dizisi üzerindeki `Vector3` nesnelerine yazar. Her çağrıda mevcut noktaların üzerine yazar; yeni dizi oluşturmaz.
 
-**Ne yapar**: Meksika dalgası animasyonlu, fiziksel tabanlı esnek hava kanalı modeli oluşturur. Three.js kütüphanesi kullanarak gerçek zamanlı animasyonlu 3B bir boru geometrisi ve spiral halka yapısı render eder.
-
-**Nasıl yapar**: Her karede `useFrame` hook'u ile saat zamanına bağlı olarak sinüs dalgası içeren bir Catmull-Rom eğrisi hesaplanır. Bu eğri, `TubeGeometry` kullanılarak boru gövdesine dönüştürülür ve eski geometri atılarak yenisiyle değiştirilir. Ayrıca 20 adet torus halkası, eğrinin farklı noktalarına ve teğet yönüne hizalanarak spiral tel yapısı simüle edilir. `useMemo` ile başlangıç eğrisi önbelleklenir, `useFanMaterials` hook'u ile fan malzeme özellikleri alınır.
+**Nasıl yapar**: 30 segmentlik bir eğri üzerinde döngü kurar. Her segment için `t` değeri 0 ile 1 arasında normalize edilir. X ekseni `(t - 0.5) * 2.4` formülüyle -1.2 ile +1.2 arasında konumlandırılır. Dalga fazı `t * Math.PI * 2 - waveTime` ile hesaplanır; `waveTime` arttıkça dalga kayar (animasyon etkisi). Dalga genliği `Math.sin(t * Math.PI) * 0.3` ile hesaplanır; bu sayede eğrinin ortasında genlik maksimumken uçlarda sıfıra yaklaşır. Y ekseni bu genlik ile sinüs fazının çarpımıdır. Z ekseni her zaman 0'dır.
 
 **Parametreler**:
+- `waveTime: number` — Dalga animasyonunun zaman fazını belirler. Her karede artırılarak dalga kaydırma hareketi sağlanır.
+- `pointsPool: Vector3[]` — Güncellenecek nokta havuzu. En az 31 eleman içermesi beklenir. Her elemanın `set()` metodu çağrılarak x, y, z değerleri atanır.
 
-Bu fonksiyon parametre almaz. Boş bir React bileşenidir.
+**Dönüş**: Belirtilmemiş. Fonksiyon gövdesinde `return` ifadesi yoktur; yan etkiyle çalışır (parametre olarak verilen `pointsPool` dizisini yerinde değiştirir).
 
-**Dönüş**: JSX elementi (`JSX.Element`). `group` elemanı içinde 1.2x ölçeklendirilmiş iki ana alt eleman döner:
-- Ana kanal gövdesi: renk `#b8c4ce`, `roughness: 0.2`, `metalness: 0.88` ile metalik bir `meshStandardMaterial` kullanır.
-- Dış tel/spiro yapısı: 20 adet torus halkasından oluşan `group`, renk `#64748b`, `roughness: 0.5`, `metalness: 0.6` ile render edilir.
+### FlexibleDuctModel
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../core::useResolveMaterials
+- import: @react-three/fiber::useFrame
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: three::CatmullRomCurve3
+- import: three::Quaternion
+- import: three::TorusGeometry
+- import: three::TubeGeometry
+- import: three::Vector3
+- import: three::type { Group, Mesh }
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::FlexibleDuctModel
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::updateWaveCurve
+- **params**: `waveTime: number`, `pointsPool: Vector3[]`
 - **ic_degiskenler**:
-  - `_materials` — useFanMaterials() hook'undan dönen fan malzeme seti, bu bileşende doğrudan JSX'te kullanılmıyor ancak bileşen içinde erişilebilir tutuluyor
-  - `meshRef` — useRef<Mesh>(null), ana kanal gövdesi olan `<mesh>` elementine referans; useFrame içinde geometrisini güncellemek için kullanılır
-  - `spiralRef` — useRef<Group>(null), spiral halkaların bulunduğu `<group>` elementine referans; useFrame içinde çocuklarının pozisyon/yönlendirme bilgilerini güncellemek için kullanılır
-  - `createWaveCurve` — inner arrow function, verilen time parametresine göre sinüs dalga eğrisi (CatmullRomCurve3) oluşturan fonksiyon
-  - `initialCurve` — useMemo(() => createWaveCurve(0), []) ile oluşturulmuş başlangıç eğrisi; JSX'te `<tubeGeometry>` argümanı olarak kullanılır
-  - `spiralCount` — spiral halka adedi, sabit 20; JSX'te Array(spiralCount).fill(0).map ile halka mesh'lerini oluşturmak için kullanılır
-- **Dönüş**: JSX (React Element) — scale=[1.2,1.2,1.2] boyutunda bir `<group>` içinde animasyonlu tubular kanal ve 20 adet torus spiral halka döner
+  - `segments` — dalga eğrisinin kaç parçaya bölüneceğini belirten sabit değer (30)
+  - `i` — döngü sayacı, 0'dan segments'e kadar iterasyon
+  - `t` — normalize edilmiş parametre (`i / segments`), 0 ile 1 arasında değer alır
+  - `x` — noktanın x koordinatı (`(t - 0.5) * 2.4`), -1.2 ile 1.2 aralığında
+  - `wavePhase` — dalga fazı (`t * Math.PI * 2 - waveTime`), zamanla kayan sinüs fazı
+  - `waveAmplitude` — dalga genliği (`Math.sin(t * Math.PI) * 0.3`), uçlarda sıfır ortada maksimum
+  - `y` — noktanın y koordinatı (`Math.sin(wavePhase) * waveAmplitude`), dalga yüksekliği
+- **Dönüş**: yok (void) — `pointsPool` dizisindeki Vector3 nesnelerini yerinde (in-place) günceller
 
-### [N2_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::createWaveCurve
-- **params**: `time` — number, animasyon zamanı (saniye cinsinden geçen süre)
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::FlexibleDuctModel
+- **params**: yok (React bileşeni, props almaz)
 - **ic_degiskenler**:
-  - `points` — Vector3[] dizisi, CatmullRomCurve3'e verilecek eğri kontrol noktalarını tutar
-  - `segments` — number, eğri分割 sayısı, sabit 30; döngüde 31 nokta (0 dahil) oluşturulur
-  - `t` — number, for döngüsü içinde normalized parametre (0.0 - 1.0 arası), eğri üzerindeki konumu belirler
-  - `x` — number, t değerinden türetilen x koordinatı; (t - 0.5) * 2.4 ile [-1.2, 1.2] aralığında değer alır
-  - `wavePhase` — number, dalga faz açısı; t * Math.PI * 2 - time * 2 ile zamanla kaydırılmış dalga periyodu
-  - `waveAmplitude` — number, dalga genliği; Math.sin(t * Math.PI) * 0.3 ile ortada maksimum, uçlarda sıfıra giden zarf
-  - `y` — number, wavePhase ve waveAmplitude kullanılarak hesaplanan y koordinatı; sinüs dalgasının düşey sapması
-- **Dönüş**: CatmullRomCurve3 — points dizisinden türetilmiş Catmull-Rom interpolasyon eğrisi
+  - `brushedAluminum` — `useResolveMaterials()` dönüşünden destructure edilen materyal, ana kanal gövdesinin materyali
+  - `castBladeMat` — `useResolveMaterials()` dönüşünden destructure edilen materyal, spiral halkaların materyali
+  - `meshRef` — `useRef<Mesh>(null)`, ana kanal mesh'ine referans, geometri mutasyonu için kullanılır
+  - `spiralRef` — `useRef<Group>(null)`, spiral halkaları içeren group elementine referans
+  - `timeRef` — `useRef(0)`, kümülatif zaman takibi, her frame'de `delta * 2` kadar artar
+  - `pool` — `useMemo` ile oluşturulan nesne havuzu, bellek tahsislerini önlemek için kullanılır:
+    - `pool.points` — 31 adet `Vector3`'ten oluşan dizi, eğri noktalarını tutar
+    - `pool.curve` — `CatmullRomCurve3` eğri nesnesi, `pool.points` üzerinden oluşturulur
+    - `pool.point` — geçici `Vector3`, `getPoint` çağrılarında hedef olarak kullanılır
+    - `pool.tangent` — geçici `Vector3`, `getTangent` çağrılarında hedef olarak kullanılır
+    - `pool.quaternion` — geçici `Quaternion`, spiral halka rotasyonları için kullanılır
+    - `pool.up` — `Vector3(0, 0, 1)`, yukarı vektörü, `setFromUnitVectors` referansı
+  - `initialTubeGeo` — `useMemo` ile oluşturulan `TubeGeometry`, başlangıç tüp geometrisi (64 segment, 0.28 yarıçap, 24 radial segment, açık değil)
+  - `torusGeo` — `useMemo` ile oluşturulan `TorusGeometry`, spiral halka geometrisi (0.29 ana yarıçap, 0.018 tüp yarıçapı, 8 tubular segment, 24 radial segment)
+  - `spiralCount` — spiral halka sayısı sabiti (20)
+- **Dönüş**: JSX — `<group scale={[1.2, 1.2, 1.2]}>` içinde ana kanal mesh'i ve spiral halkaları içeren group döndürür
 
-### [N3_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::useFrame_callback
-- **params**: `state` — R3F frame state objesi; state.clock.elapsedTime ile geçen süreye erişilir
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::pool useMemo callback
+- **params**: yok
 - **ic_degiskenler**:
-  - `time` — number, state.clock.elapsedTime'dan alınan toplam geçen süre (saniye), dalga animasyonu için zaman girdisi
-  - `curve` — CatmullRomCurve3, createWaveCurve(time) çağrısı ile o anki zamana göre oluşturulmuş dinamik eğri
-  - `newGeometry` — TubeGeometry, curve eğrisi üzerine inşa edilmiş tüp geometrisi (radyal segments=64, tubular segments=24, yarıçap=0.28)
-  - `spiralCount` — number, spiralRef.current.children.length ile elde edilen gerçek çocuk (halka) sayısı
-  - `t` — number, for döngüsü içinde normalized parametre (0.0 - 1.0), eğri üzerindeki konu
-  - `point` — Vector3, curve.getPoint(t) ile eğri üzerindeki t konumundaki 3D nokta; spiral halkanın pozisyonu olarak kullanılır
-  - `tangent` — Vector3, curve.getTangent(t) ile eğri üzerindeki t konumundaki teğet vektörü; quaternion hesaplamak için kullanılır
-  - `child` — Object3D, spiralRef.current.children[i] ile erişilen mevcut spiral halka mesh nesnesi; position ve quaternion'u güncellenir
-  - `quaternion` — Quaternion, yeni Quaternion() ile oluşturulmuş sıfır döndürme; setFromUnitVectors ile Z ekseni (0,0,1) teğet vektörüne hizalanır
-- **Dönüş**: yok (her frame çağrıldığında meshRef ve spiralRef üzerindeki geometri/pozisyon/yönlendirme değerlerini yan etki olarak günceller)
+  - `pointsArray` — boş `Vector3[]` dizisi, döngüde 31 adet `new Vector3()` ile doldurulur
+  - `i` — döngü sayacı, 0'dan 30'a kadar iterasyon
+- **Dönüş**: `{ points: Vector3[], curve: CatmullRomCurve3, point: Vector3, tangent: Vector3, quaternion: Quaternion, up: Vector3 }` — nesne havuzu
 
-### [N4_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::JSX_map_callback
-- **params**: `_` — unused, Array.map'in ilk parametresi (değer), kullanılmıyor; `i` — number, dizge içindeki indeks, mesh key'i olarak kullanılır
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX — `<mesh>` elementi içinde `<torusGeometry args={[0.29, 0.018, 8, 24]}>` (dış yarıçap=0.29, tüp yarıçapı=0.018, 8×24 segment) ve `<meshStandardMaterial color="#64748b" roughness={0.5} metalness={0.6}>` ile oluşturulmuş bir torus (halka) mesh'i
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::initialTubeGeo useMemo callback
+- **params**: yok
+- **ic_degiskenler**: yok (dışarıdaki `pool` değişkenine erişir)
+- **Dönüş**: `TubeGeometry` — `updateWaveCurve(0, pool.points)` çağrısıyla eğri noktaları sıfır zamanda hesaplanır, ardından `new TubeGeometry(pool.curve, 64, 0.28, 24, false)` ile tüp geometrisi oluşturulur
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::torusGeo useMemo callback
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `TorusGeometry` — `new TorusGeometry(0.29, 0.018, 8, 24)` ile spiral halka geometrisi
+
+### [N6_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::useEffect cleanup factory
+- **params**: yok
+- **ic_degiskenler**: yok (dışarıdaki `initialTubeGeo` ve `torusGeo` değişkenlerine erişir)
+- **Dönüş**: cleanup fonksiyonu — `initialTubeGeo.dispose()` ve `torusGeo.dispose()` çağırarak GPU kaynaklarını serbest bırakır
+
+### [N7_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::useFrame callback
+- **params**: `_` (üçüncü taraf kamera/state, kullanılmıyor), `delta` (frame'ler arası geçen süre saniye)
+- **ic_degiskenler**:
+  - `geom` — `meshRef.current.geometry`, tüp geometrisi referansı, vertex pozisyonları buradan okunur/yazılır
+  - `pos` — `geom.attributes.position`, geometrinin pozisyon buffer attribute'u
+  - `posArray` — `pos.array as Float32Array`, ham vertex pozisyon verisi, doğrudan mutasyona uğratılır
+  - `i` — outer döngü sayacı (0-64), tüpün uzunlamasına segmentlerini iterasyonlar
+  - `u` — normalize edilmiş eğri parametresi (`i / 64`), 0 ile 1 arasında
+  - `bx` — teğet vektörünün y bileşeni (`pool.tangent.y`), ikinci taban vektörü hesabında kullanılır
+  - `by` — teğet vektörünün x bileşeninin negatifi (`-pool.tangent.x`), ikinci taban vektörü hesabında kullanılır
+  - `bl` — ikinci taban vektörünün uzunluğu (`Math.hypot(bx, by) || 1`), normalize etmek için
+  - `e2x` — normalize edilmiş ikinci taban vektörünün x bileşeni (`bx / bl`)
+  - `e2y` — normalize edilmiş ikinci taban vektörünün y bileşeni (`by / bl`)
+  - `j` — inner döngü sayacı (0-24), tüpün çevresel segmentlerini iterasyonlar
+  - `v` — açı parametresi (`j / 24 * Math.PI * 2`), 0'dan 2π'ye
+  - `c` — negatif kosinüs (`-Math.cos(v)`), three.js TubeGeometry convention'ı
+  - `s` — sinüs (`Math.sin(v)`)
+  - `idx` — vertex dizisi içindeki başlangıç indeksi (`(i * 25 + j) * 3`), her vertex 3 float (x,y,z)
+  - `spiralCount` — `spiralRef.current.children.length`, spiral halka sayısı
+  - `t` — spiral halka için normalize eğri parametresi (`i / (spiralCount - 1)`)
+  - `child` — `spiralRef.current.children[i]`, tek bir spiral halka mesh'i, pozisyon ve rotasyonu güncellenir
+- **Dönüş**: yok (void) — her frame'de tüp geometrisinin vertex pozisyonlarını ve spiral halkaların transformlarını günceller; yan etkiler: `pos.needsUpdate = true`, `geom.computeVertexNormals()`, `geom.computeBoundingBox()`, `geom.computeBoundingSphere()`
+
+### [N8_NASIL] AST Pointer: src/components/products/3d/types/FlexibleDuctModel.tsx::Array.map callback
+- **params**: `_` (dizinin elemanı, kullanılmıyor), `i` (indeks)
+- **ic_degiskenler**: yok (dışarıdaki `torusGeo` ve `castBladeMat` değişkenlerine erişir)
+- **Dönüş**: JSX — `<mesh key={i} geometry={torusGeo} material={castBladeMat} />` elementi
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\FlexibleDuctModel.tsx
-  function: src\components\products\3d\types\FlexibleDuctModel.tsx::FlexibleDuctModel
+  file: FlexibleDuctModel.tsx
+  function: FlexibleDuctModel.tsx::updateWaveCurve
+  function: FlexibleDuctModel.tsx::FlexibleDuctModel
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FlexibleDuctModel
+  export: updateWaveCurve
 
 ---
 

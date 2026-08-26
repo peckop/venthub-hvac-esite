@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\TiltCard.tsx
-skeleton_hash: 5e75a79e673d1227
+source_path: C:\tmp\wt-supurme\src\components\TiltCard.tsx
+skeleton_hash: e464bc12b052721a
 entity_hashes:
   func:TiltCard: bfd1d2a43ccba8c3
   func:clamp: 6b6f2a3bb4b3c92e
@@ -12,79 +12,68 @@ entity_hashes:
   func:onMove: 855a2394d5f31485
   overview: 49812a020a38dab5
   style_tokens: 9c70068ed275c69c
-generated_at: 2026-06-19T20:47:39Z
+generated_at: 2026-08-25T07:24:24Z
 ---
 
 ## Genel Bakış
-TiltCard, fare etkileşimleriyle üç boyutlu eğilme efekti sunan interaktif bir React kart bileşenidir. Kullanıcı faresini kart üzerinde hareket ettirdiğinde, kart真实世界'deki bir nesne gibi eğilerek modern ve dinamik bir görsel deneyim yaratır. Maksimum eğilme açısı dışarıdan özelleştirilebilir.
+
+TiltCard, fare hareketlerine tepki vererek kart benzeri bir bileşene üç boyutlu eğim efekti uygulayan bir React bileşenidir. Kullanıcının fare konumuna göre bileşenin X ve Y eksenlerinde belirli bir dereceye kadar (varsayılan 18) eğilmesini sağlar. Bu tür etkileşim, genellikle kart tabanlı arayüzlerde derinlik hissi ve görsel geri bildirim oluşturmak için kullanılır.
 
 ## Fonksiyon Grupları
-### Ana Bileşen
-TiltCard'ın temel yapısını oluşturarak içeriği sarar ve eğilme efekti için yapılandırma parametrelerini tanımlar. Bu grup, bileşenin dışarıya açılan arayüzünü ve yaşam döngüsünü yönetir.
-- TiltCard
 
-### Fare Etkileşim Yöneticileri
-Kullanıcının kart üzerindeki fare hareketlerini yakalayarak eğilme hesaplamalarını tetikler. Fare kart üzerine geldiğinde, hareket ettiğinde ve ayrıldığında分别 ilgili efekt başlangıç, güncelleme ve bitiş işlemlerini yürütür.
+### Yardımcı Fonksiyonlar
+Sayısal değerlerin belirli bir aralıkta kalmasını sağlayan temel yardımcı işlemler.
+- clamp
+
+### Fare Olay İşleyicileri
+Bileşen üzerindeki fare hareketlerini izleyerek eğim efektini tetikleyen, duraklatan ve sıfırlayan olay yöneticileri. `onMove` fare konumunu hesaplayarak eğim değerlerini günceller, `onEnter` efekti aktif hale getirir, `onLeave` bileşeni varsayılan durumuna döndürür.
 - onMove, onEnter, onLeave
 
-### Değer Sınırlandırma Aracı
-Eğilme açısı gibi hesaplanan sayısal değerleri tanımlı minimum ve maksimum aralıkta tutarak efektin kontrollü çalışmasını garanti eder. Aşırı değerlerin önüne geçerek görsel tutarlılığı korur.
-- clamp
+### Ana Bileşen
+Tüm alt fonksiyonları bir araya getirerek çocuk bileşenleri sarar ve eğim efektini uygular. `maxTilt` parametresi ile maksimum eğim derecesi özelleştirilebilir.
+- TiltCard
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, fare hareketleriyle 3D eğilme efekti yaratan bir React bileşeni olduğundan, aşağıdaki mimari varsayımlar modülün doğru çalışması için zorunludur.
 
-[Aksiyom 1]: Eğer `clamp` fonksiyonu için `min` parametresi, `max` parametresinden büyükse, fonksiyon beklenmedik sonuçlar döndürür veya başarısız olur.
-[Aksiyom 2]: Eğer `TiltCard` bileşeni için `maxTilt` parametresi negatif bir sayı olarak sağlanırsa, eğilme açısı hesaplamaları anlamsız hale gelir ve bileşen düzgün çalışmaz.
-[Aksiyom 3]: Eğer `onMove`, `onEnter` veya `onLeave` olay işleyicileri bir React olay nesnesi (örn. `React.MouseEvent`) içermeyen farklı bir argümanla çağrılırsa, bileşenin iç durumu tutarsız hale gelir ve eğilme efekti bozulur.
-[Aksiyom 4]: Eğer modül, React'ın bileşen yaşam döngüsü ve durum yönetimi (useState, useEffect) mekanizmalarından yoksun bir ortamda çalıştırılmaya çalışılırsa, bileşen işlevsel olmaz.
-[Aksiyom 5]: Eğer `TiltCard` bileşeni fare olaylarını (`mousemove`, `mouseenter`, `mouseleave`) tetikleyemeyen bir ortamda (örn. dokunmatik cihazlar) kullanılırsa, eğilme efekti tetiklenemez; ancak bileşen statik olarak görüntülenebilir.
+[Aksiyom 1]: Eğer `maxTilt` parametresi sağlanmazsa, varsayılan değer 18 olarak kullanılır.
+
+[Aksiyom 2]: Eğer `clamp` fonksiyonu yoksa, `maxTilt` değeri ve hesaplanan eğim değerleri uygun aralıkta tutulamaz; bileşen beklenmedik dönüş açıları üretebilir.
+
+[Aksiyom 3]: Eğer `children` prop'u yoksa, `TiltCard` bileşeni eğim efekti uygulayacak bir içerik öğesi alamaz; bileşen içeriği boş render edilir.
+
+[Aksiyom 4]: Eğer fare olayları (`onMove`, `onEnter`, `onLeave`) bağlı oldukları DOM öğesine doğru şekilde atanmazsa, eğim efekti tetiklenemez.
+
+[Aksiyom 5]: Eğer `onLeave` fonksiyonu parametre almıyorsa, fare bileşenden ayrıldığında eğim durumunu sıfırlamak için ek bir referansa (state veya ref) ihtiyaç duyar; bu referans yoksa sıfırlama yapılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### clamp
-**Ne yapar**: Bir sayısal değeri, belirtilen minimum ve maximum sınırlar arasında sıkıştırır (clipping). Değer aralık dışındaysa en yakın sınaira sabitlenir.
+**Ne yapar**: Verilen bir sayısal değeri belirli bir alt ve üst sınır arasında sınırlayan yardımcı fonksiyondur. Değerin belirlenen aralığın dışına çıkmasını engelleyerek, UI bileşenlerinde hesaplanan eğim veya dönüş değerlerinin makul sınırlar içinde kalmasını sağlar.
 
-**Nasıl yapar**: Fonksiyon, verilen `v` değerini `min` ve `max` değerleri ile karşılaştırır. `v`, `min` değerinden küçükse `min` değerini, `max` değerinden büyükse `max` değerini, aksi halde `v` değerinin kendisini döndürür. Bu, genellikle mouse hareketi veya animasyon hesaplamalarında değerin kontrollü kalmasını sağlamak için kullanılır.
+**Nasıl yapar**: Fonksiyonun iç mantığı verilen kaynakta belirtilmemiştir. Parametre olarak aldığı `v` değerini `min` ve `max` arasında bir değere dönüştürmesi beklenir.
 
 **Parametreler**:
-- v: number — Sınırlanacak olan sayısal değer
-- min: number — İzin verilen değer aralığının alt sınırı
-- max: number — İzin verilen değer aralığının üst sınırı
+- v: number — Sınırlandırılacak sayısal değer
+- min: number — İzin verilen alt sınır değeri
+- max: number — İzin verilen üst sınır değeri
 
-**Dönüş**: Fonksiyonun dönüş tipi sağlanan bilgide açıkça belirtilmemiştir. Ancak bu tür clamp fonksiyonları genellikle number tipinde değer döndürür.
+**Dönüş**: Return tipi kaynakta açıkça belirtilmemiştir; bilinmiyor.
 
 ### TiltCard
-**Ne yapar**: Fare hareketlerine göre eğme (tilt) efekti uygulayan, tekrarlanabilir bir React bileşenidir. İçerisindeki tüm çocuk içerikleri sarmalayarak, kullanıcı kartla etkileşime girdiğinde 3D benzeri eğim efekti sunar. Maksimum eğme açısı dışarıdan yapılandırılabilir, varsayılan bir değerle kullanıma hazırdır.
-**Nasıl yapar**: Kendi bünyesinde fare olaylarını izleyen onMove, onEnter, onLeave işleyicilerini barındırır, bu işleyicileri ana kapsayıcı div elementine bağlar. Eğme hesaplamalarında clamp fonksiyonunu kullanarak açının sınırları aşmasını engeller, aldığı maxTilt değerini tüm eğme hesaplamalarında temel alır. İçerisine gelen children prop'unu kendi içindeki kapsayıcıda render ederek efekti içeriğe uygular.
-**Parametreler**:
-- name: children — type: React.ReactNode — Bileşen içerisinde gösterilecek, eğme efekti uygulanacak tüm içerik, her türlü React tarafından desteklenen iç öğe olabilir.
-- name: maxTilt — type: number — Kartın uygulayabileceği maksimum eğme açısı, isteğe bağlı olarak dışarıdan değer geçirilebilir, varsayılan olarak 18 derece olarak ayarlanmıştır.
-**Dönüş**: React.FC<React.PropsWithChildren<{ maxTilt?: number }>> tipinde bir React bileşeni döndürür, çocuklu yapıyı destekler, maxTilt prop'unu opsiyonel olarak kabul eden tür yapısına sahiptir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### onMove
-**Ne yapar**: TiltCard bileşeninin alanı üzerinde fare hareket ettiğinde tetiklenen olay işleyicisidir, anlık fare konumuna göre kartın eğme miktarını hesaplayıp günceller. Kullanıcının fare hareketlerini eğme açısına dönüştürerek akıcı bir 3D efekti sağlar.
-**Nasıl yapar**: Fare olayından gelen konum verilerini alır, TiltCard'ın boyutlarını ve sayfa üzerindeki konumunu hesaplar, elde edilen koordinatları eğme açısına çevirir. Hesaplanan açının maxTilt sınırını aşmasını clamp fonksiyonuyla engeller, sürekli güncellenen değerle kartın eğimini akıcı bir şekilde değiştirir.
-**Parametreler**:
-- name: e — type: React.MouseEvent<HTMLDivElement> — Tetiklenen fare hareketi olayının tüm detaylarını içeren nesne, fare konumu, hedef element gibi tüm gerekli verilere erişim sağlar.
-**Dönüş**: HTMLDivElement elementleri için uyumlu React.MouseEventHandler<HTMLDivElement> tipinde bir olay işleyicisi döndürür, fare hareketi olaylarını yakalayıp işlemek üzere yapılandırılmıştır.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### onEnter
-**Ne yapar**: TiltCard bileşeninin kapsama alanına fare ilk girdiğinde tetiklenen olay işleyicisidir, eğme efektinin başlatılmasını ve gerekli tüm başlangıç durumlarının ayarlanmasını sağlar. Kullanıcının kartla etkileşime geçtiğini algılayarak efekti aktif hale getirir.
-**Nasıl yapar**: Fare kartın alanına girdiğinde animasyon geçişlerini aktif eder, eğme hesaplamaları için gereken ilk konum ve durum değerlerini ayarlar, olası gecikmeleri önlemek için gerekli ön yüklemeleri yapar, kullanıcının ilk etkileşimini algılayarak efektin sorunsuz başlamasını sağlar.
-**Parametreler**:
-- name: e — type: React.MouseEvent<HTMLDivElement> — Fare giriş olayının tüm detaylarını içeren, hedef element ve olay metriklerini barındıran React fare olay nesnesi.
-**Dönüş**: HTMLDivElement elementleri için uyumlu React.MouseEventHandler<HTMLDivElement> tipinde bir olay işleyicisi döndürür, fare element alanına giriş olayını yakalamak üzere yapılandırılmıştır.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### onLeave
-**Ne yapar**: TiltCard bileşeninin kapsama alanından fare çıkış yaptığında tetiklenen olay işleyicisidir, eğme efektinin sonlandırılıp kartın orijinal varsayılan konumuna dönmesini sağlar. Kullanıcının kartla etkileşimini bitirdiğini algılayarak tüm geçici durumları temizler.
-**Nasıl yapar**: Fare kartın alanından çıktığında mevcut eğme açılarını sıfırlar, animasyonlu bir geçişle kartın orijinal konumuna dönmesini sağlar, etkileşim sırasında oluşturulan tüm geçici durum değerlerini temizler, bir sonraki etkileşime hazır hale getirir.
-**Parametreler**: Herhangi bir harici parametre almaz, iç mantığında olay nesnesini kullanarak işlemlerini gerçekleştirir.
-**Dönüş**: HTMLDivElement elementleri için uyumlu React.MouseEventHandler<HTMLDivElement> tipinde bir olay işleyicisi döndürür, fare element alanından çıkış olayını yakalamak üzere yapılandırılmıştır.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -98,9 +87,54 @@ Bu modül, fare hareketleriyle 3D eğilme efekti yaratan bir React bileşeni old
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: TiltCard.tsx::clamp
-- **params**: `(v: number, min: number, max: number)`
-- **ic_degiskenler**: (fonksiyon gövdesi verilmemiş, çağrı侧dan çağrılmış)
-- **Dönüş**: number — v değerini min ve max arasında sıkıştırılmış olarak döndürür
+- **params**: `v` (number), `min` (number), `max` (number)
+- **ic_degiskenler**: (gövde verilmemiş)
+- **Dönüş**: yok
+
+### [N2_NASIL] AST Pointer: TiltCard.tsx::TiltCard
+- **params**: `children` (React.ReactNode), `maxTilt` (number, varsayılan 18)
+- **ic_degiskenler**:
+  - `wrapperRef` — `useRef<HTMLDivElement | null>(null)` ile oluşturulmuş; dış sarmalayıcı div'e referans tutar
+  - `innerRef` — `useRef<HTMLDivElement | null>(null)` ile oluşturulmuş; 3B dönüş uygulanan iç div'e referans tutar
+  - `mounted` — `useState(false)` ile oluşturulmuş boolean; bileşenin monte edilip edilmediğini belirtir
+  - `setMounted` — `mounted` durumunu güncelleyen setter fonksiyonu
+  - `hover` — `useState(false)` ile oluşturulmuş boolean; fare öğenin üzerindeyken true olur
+  - `setHover` — `hover` durumunu güncelleyen setter fonksiyonu
+  - `supportsTilt` — `mounted && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches` ifadesiyle hesaplanan boolean; cihazın tilt desteğini belirtir
+  - `prefersReduced` — `mounted && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches` ifadesiyle hesaplanan boolean; kullanıcının azaltılmış hareket tercihini belirtir
+  - `shouldSkip` — `!supportsTilt || prefersReduced` ifadesiyle hesaplanan boolean; tilt efektinin atlanıp atlanmayacağını belirler
+  - `onMove` — fare hareket olayını işleyen `React.MouseEventHandler<HTMLDivElement>`; imleç pozisyonuna göre 3B dönüş ve gölge uygular
+  - `onEnter` — fare giriş olayını işleyen `React.MouseEventHandler<HTMLDivElement>`; `setHover(true)` çağırır ve `onMove`'u tetikler
+  - `onLeave` — fare çıkış olayını işleyen `React.MouseEventHandler<HTMLDivElement>`; `setHover(false)` çağırır ve dönüşü sıfırlar
+- **Dönüş**: `shouldSkip` true ise `<div className="relative group">{children}</div>`, aksi halde `wrapperRef`'li sarmalayıcı div, `innerRef`'li iç div ve shine overlay içeren JSX
+
+### [N3_NASIL] AST Pointer: TiltCard.tsx::onMove
+- **params**: `e` (fare olayı — `React.MouseEvent<HTMLDivElement>`)
+- **ic_degiskenler**:
+  - `container` — `wrapperRef.current`; dış sarmalayıcı div elementi, null ise fonksiyon erken döner
+  - `el` — `innerRef.current`; 3B dönüş uygulanan iç div elementi, null ise fonksiyon erken döner
+  - `rect` — `container.getBoundingClientRect()` sonucu; sarmalayıcının ekran üzerindeki konum ve boyut bilgisi
+  - `x` — `(e.clientX - rect.left) / rect.width` ifadesiyle hesaplanan number; imlecin yatayda 0-1 arası normalize pozisyonu
+  - `y` — `(e.clientY - rect.top) / rect.height` ifadesiyle hesaplanan number; imlecin dikeyde 0-1 arası normalize pozisyonu
+  - `rx` — `clamp((0.5 - y) * maxTilt, -maxTilt, maxTilt)` ifadesiyle hesaplanan number; X ekseni etrafında dönüş açısı (derece)
+  - `ry` — `clamp((x - 0.5) * maxTilt, -maxTilt, maxTilt)` ifadesiyle hesaplanan number; Y ekseni etrafında dönüş açısı (derece)
+  - `sx` — `(x - 0.5) * 16` ifadesiyle hesaplanan number; gölgenin yatay ofseti (piksel)
+  - `sy` — `(y - 0.5) * 16` ifadesiyle hesaplanan number; gölgenin dikey ofseti (piksel)
+- **Dönüş**: yok
+- **Yan etkiler**: `container.style.setProperty('--px', ...)` ve `container.style.setProperty('--py', ...)` ile CSS özel değişkenleri ayarlanır; `el.style.transform` ile 3B dönüş ve ölçekleme uygulanır; `el.style.boxShadow` ile gölge uygulanır
+
+### [N4_NASIL] AST Pointer: TiltCard.tsx::onEnter
+- **params**: `e` (fare olayı — `React.MouseEvent<HTMLDivElement>`)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok
+- **Yan etkiler**: `setHover(true)` çağırarak `hover` durumunu true yapar; ardından `onMove(e)` çağırarak anında dönüş efektini tetikler
+
+### [N5_NASIL] AST Pointer: TiltCard.tsx::onLeave
+- **params**: yok
+- **ic_degiskenler**:
+  - `el` — `innerRef.current`; 3B dönüş uygulanan iç div elementi, null ise fonksiyon erken döner
+- **Dönüş**: yok
+- **Yan etkiler**: `setHover(false)` çağırarak `hover` durumunu false yapar; `el.style.transform` sıfırlanır (`perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0) scale(1)`); `el.style.boxShadow` sıfırlanır (`0 0 0 rgba(0,0,0,0)`)
 
 ---
 
@@ -113,18 +147,18 @@ graph TD
     TiltCard_tsx__onEnter["onEnter"]
     TiltCard_tsx__onLeave["onLeave"]
     TiltCard_tsx__onMove["onMove"]
-    TiltCard_tsx__TiltCard --> TiltCard_tsx__clamp
     TiltCard_tsx__TiltCard --> TiltCard_tsx__onMove
+    TiltCard_tsx__TiltCard --> TiltCard_tsx__clamp
 ```
 
 ## NODE ID STANDARD
 
-  file: src\components\TiltCard.tsx
-  function: src\components\TiltCard.tsx::clamp
-  function: src\components\TiltCard.tsx::TiltCard
-  function: src\components\TiltCard.tsx::onMove
-  function: src\components\TiltCard.tsx::onEnter
-  function: src\components\TiltCard.tsx::onLeave
+  file: TiltCard.tsx
+  function: TiltCard.tsx::clamp
+  function: TiltCard.tsx::TiltCard
+  function: TiltCard.tsx::onMove
+  function: TiltCard.tsx::onEnter
+  function: TiltCard.tsx::onLeave
 
 ---
 

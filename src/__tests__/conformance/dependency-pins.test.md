@@ -2,53 +2,47 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\__tests__\conformance\dependency-pins.test.ts
-skeleton_hash: 11719f479b98c0a9
+source_path: C:\tmp\wt-supurme\src\__tests__\conformance\dependency-pins.test.ts
+skeleton_hash: 5b2bae40a61f62d6
 entity_hashes:
   func:isFloating: 5add3b10596b93e9
   overview: 7dc0df13dce57515
-generated_at: 2026-08-15T13:52:41Z
+generated_at: 2026-08-25T07:33:21Z
 ---
 
 ## Genel Bakış
-Bu modül, bağımlılık versiyon pinleme kurallarının uygunluğunu test eden bir conformance test modülüdür. Bağımlılıkların doğru şekilde sabitlenip sabitlenmediğini doğrulamak için versiyon aralıklarının "floating" (belirsiz/yüzen) olup olmadığını tespit eden yardımcı fonksiyonlar içerir.
+Bu modül, bağımlılık versiyon sabitlemelerinin (dependency pins) uyumluluğunu test eden bir test dosyasıdır. Proje genelinde kullanılan bağımlılık versiyon aralıklarının sabitlenmiş (pinlenmiş) olup olmadığını doğrulamayı amaçlar.
 
 ## Fonksiyon Grupları
-### Yardımcı Fonksiyonlar
-Test senaryolarında kullanılan yardımcı fonksiyonları tanımlar. Bu fonksiyonlar, versiyon aralıklarının belirsiz (floating) olup olmadığını belirleyerek test mantığını destekler.
+
+### Yardımcı Test Fonksiyonları
+Verilen bir bağımlılık versiyon aralığının sabitlenmiş olup olmadığını belirleyen yardımcı fonksiyonları içerir. Bu fonksiyon, test senaryolarında versiyon aralıklarının "floating" (sabitlenmemiş, hareketli) yapıda olup olmadığını saptamak için kullanılır.
 - isFloating
+
+## Bağımlılıklar
+- **İç bağımlılıklar**: Bilinmiyor — modülde yalnızca tek bir fonksiyon tanımlı olup, bu fonksiyonun başka bir yerden çağrılıp çağrılmadığı verilen kaynaktan anlaşılamıyor.
+- **Dış bağımlılıklar**: Bilinmiyor — dış modül import'larına dair bilgi verilmemiştir.
+- **Dinamik/lazy yüklenen modül**: Bilinmiyor.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, bağımlılık sürüm aralıklarının "floating" (belirsiz/sabitlenmemiş) olup olmadığını tespit eder.
-
-**[Aksiyom 1]:** `isFloating` fonksiyonu `range` parametresi olarak bir `string` alır. Eğer `range` parametresi bir `string` değilse, fonksiyonun davranışı tanımsız olur.
-
-**[Aksiyom 2]:** `FLOATING` sabiti bir `new_expression` ile oluşturulur. Bu ifadenin, geçerli bir regex pattern olarak derlenebilir olması gerekir; eğer `FLOATING` geçerli bir regex oluşturmayan bir değerden türetilmişse, `isFloating` her çağrıda hata verir.
-
-**[Aksiyom 3]:** `NON_RANGE_PROTOCOLS` bir regex olarak tanımlıdır. Bu regex, sürüm aralığı içermeyen protokol前缀lerini (örn. `file:`, `git:`, `http:` vb.) eşleştirmelidir. Eğer bir `range` string'i bu regex ile eşleşiyorsa, bu aralık "floating" olarak değerlendirilmemelidir — protokol tabanlı kaynaklar sürüm aralığı formatına uymaz.
-
-**[Aksiyom 4]:** `PKG_FILES` ve `EDGE_SOURCES` çağrı ile (fonksiyon olarak) invok edilir. Bu fonksiyonların, test edilmesi gereken bağımlılık dosyaları ve kenar kaynakları hakkında bilgi döndürmesi gerekir; eğer bu çağrılar başarısız olursa veya boş/yanlış tipte veri döndürürse, bağımlılık pin conformans kontrolü çalışamaz.
-
-**[Aksiyom 5]:** `isFloating` fonksiyonu, `range` string'inin `FLOATING` ifadesiyle eşleşip eşleşmediğine göre `boolean` döndürür. Fonksiyon sadece `True`/`False` döndürebilir; başka bir değer döndürmesi beklenmez.
-
-**[Aksiyom 6]:** `NON_RANGE_PROTOCOLS` regex'i `isFloating` kontrolünden *önce* uygulanmalıdır. Eğer bu filtreleme yapılmazsa, protokol前fixli aralıklar (örn. `git://...`) yanlışlıkla "floating" olarak işaretlenir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### isFloating
-**Ne yapar**: Bu fonksiyon, verilen bir version aralığı (range) dizgesinin zamana bağlı (floating) olup olmadığını belirler. Zamana bağlı aralıklar, zaman ilerledikçe otomatik olarak değişen veya güncellenen aralıklar olarak tanımlanır.
+**Ne yapar**: Verilen bir versiyon aralığı (range) string'inin "yüzen" (floating) olup olmadığını belirler. Yüzen aralıklar, zamanla değişebilecek sonuçlar üreten, üst sınırı belirsiz veya sabit bir versiyona bağlı olmayan aralıklardır.
 
-**Nasıl yapar**: Fonksiyon, girdi dizgesindeki boşlukları temizleyerek başlar. Ardından, `NON_RANGE_PROTOCOLS` adlı bir regular expression ile test edilir; bu test eşleşirse, aralık zamana bağlı değildir ve `false` döner. Daha sonra, `FLOATING` adlı bir Set yapısında bu değer aranır; eğer bulunursa `true` döner. Ek olarak, `"^>=?\s*\d"` kalıbı ile test yapılarak, örneğin `">=2.0.0"` gibi belirli bir sürümün üzerindeki tüm sürümleri kapsayan üst sınırsız aralıkların da zamana bağlı olduğu kabul edilir ve `true` döner. Hiçbir koşul sağlanmazsa, aralık sabittir ve `false` değerini döndürür.
+**Nasıl yapar**: Fonksiyon öncelikle girdi string'ini baştaki ve sondaki boşluklardan arındırır. Ardından üç aşamalı bir kontrol uygular: İlk olarak `NON_RANGE_PROTOCOLS` deseni ile eşleşme kontrolü yapılır; bu desene uyan protokoller aralık olarak değerlendirilmediğinden false döner. İkinci olarak `FLOATING` kümesinde aranır; bu küme içinde tanımlı değerler doğrudan yüzen aralık kabul edilir ve true döner. Üçüncü olarak `>=?` regex deseni ile eşleşme kontrolü yapılır; `>=2.0.0` gibi üst sınırsız aralıklar da zamana bağlı olduğundan true döner. Bu kontrollerin hiçbiri eşleşmezse fonksiyon false döner.
 
 **Parametreler**:
-- `range`: string — Kontrol edilecek version aralığı dizgesi. Bu aralık, semver formatında olabilir veya özel protokoller içerebilir.
+- range: string — Yüzen aralık olup olmadığı kontrol edilecek versiyon aralığı ifadesi. Örneğin `">=2.0.0"` veya `"^1.0.0"` gibi değerler alabilir.
 
-**Dönüş**: boolean — Fonksiyon, aralığın zamana bağlı olup olmadığını belirten bir boolean değer döndürür. `true` dönüşü, aralığın zaman içinde değişebileceğini; `false` dönüşü ise aralığın sabit ve değişmez olduğunu gösterir.
+**Dönüş**: boolean — Verilen aralık yüzen (zamana bağlı/değişken) ise `true`, sabit bir versiyona bağlı veya aralık dışı bir protokol ise `false` döner.
 
 ---
 
@@ -74,71 +68,62 @@ Bu modül, bağımlılık sürüm aralıklarının "floating" (belirsiz/sabitlen
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `__tests__/conformance/dependency-pins.test.ts::isFloating`
-- **params**: `(range: string)` — test edilecek versiyon aralığı stringi
+### [N1_NASIL] AST Pointer: src\__tests__\conformance\dependency-pins.test.ts::isFloating
+- **params**: `range: string`
 - **ic_degiskenler**:
-  - `v` — `range.trim()` ile baş/son boşlukları temizlenmiş versiyon aralığı
-- **Dönüş**: `boolean` — aralığın-floating (zamana bağlı/sürümü belli olmayan) olup olmadığı
+  - `v` — `range.trim()` sonucu, baştaki ve sondaki boşlukları temizlenmiş versiyon aralığı string'i; `NON_RANGE_PROTOCOLS` regex'ine ve `FLOATING` set'ine karşı test edilir
+- **Dönüş**: boolean — aralık "yüzen" (zamana bağlı) ise `true`, sabitlenmiş ise `false`
+- **sabit_baglantilari**: `NON_RANGE_PROTOCOLS` (regex, `.test(v)` ile kullanılır), `FLOATING` (Set, `.has(v)` ile kullanılır)
+- **dahili_regex**: `/^>=?\s*\d/` — `>=` veya `>` ile başlayan, ardından opsiyonel boşluk ve rakam gelen üst-sınırsız aralıkları yakalar
 
----
-
-### [N2_NASIL] AST Pointer: `__tests__/conformance/dependency-pins.test.ts::describe_callback` (anonim, `beforeAll` + `it` bloklarını barındırır)
-- **params**: `()` — parametre yok
+### [N2_NASIL] AST Pointer: src\__tests__\conformance\dependency-pins.test.ts::anonim (it callback — "package.json okunabiliyor")
+- **params**: yok
 - **ic_degiskenler**:
-  - `pkgPath` — `Object.keys(PKG_FILES)[0]` ile elde edilen ilk package.json dosya yolu; globbdan dönen dosya listesinin ilk elemanı
-  - `pkgRaw` — `pkgPath` varsa `PKG_FILES[pkgPath]` değerinden okunan package.json ham string içeriği; yoksa `undefined`
-- **Dönüş**: yok — yan etki olarak `pkgPath` ve `pkgRaw` değişkenlerini tanımlar, alt `it` bloklarının kapanış alanı tarafından erişilir
+  - `pkgPath` — `Object.keys(PKG_FILES)[0]` ile alınan ilk dosya yolu anahtarı; `PKG_FILES` dict'inin ilk key'i
+  - `pkgRaw` — `PKG_FILES[pkgPath]` değeri; dosya ham içeriği veya `pkgPath` yoksa `undefined`
+- **Dönüş**: yok (test bloğu; `expect(pkgRaw).toBeTruthy()` çağrısı yapar)
+- **sabit_baglantilari**: `PKG_FILES` (dict, `Object.keys()` ve indeks erişimi ile kullanılır)
 
----
-
-### [N3_NASIL] AST Pointer: `__tests__/conformance/dependency-pins.test.ts::it_packageJsonOkunabiliyor` (anonim)
-- **params**: `()` — parametre yok
-- **ic_degiskenler**: (değişken yok — doğrudan `expect` çağrısı)
-- **Dönüş**: yok — `expect(pkgRaw).toBeTruthy()` ile glob ile okunan package.json'ın varlığını doğrular; başarısız olursa test hatası fırlatır
-
----
-
-### [N4_NASIL] AST Pointer: `__tests__/conformance/dependency-pins.test.ts::it_suruSablonlari` (anonim)
-- **params**: `()` — parametre yok
+### [N3_NASIL] AST Pointer: src\__tests__\conformance\dependency-pins.test.ts::anonim (it callback — "hiçbir bağımlılık latest/*/üst-sınırsız aralık kullanmaz")
+- **params**: yok
 - **ic_degiskenler**:
-  - `pkg` — `JSON.parse(pkgRaw as string)` ile parse edilmiş package.json nesnesi; `dependencies`, `devDependencies`, `optionalDependencies` alanlarını opsiyonel olarak barındırır
-  - `offenders` — `string[]` dizisi; floating (zamana bağlı) aralığa sahip bağımlılıkların `"alan.isim = \"aralık\""` formatında listelendiği toplama dizisi
-  - `field` — döngüde sırasıyla `'dependencies'`, `'devDependencies'`, `'optionalDependencies'` değerini alan `const` dizesi
-  - `block` — `pkg[field]` erişiminden elde edilen bağımlılık bloğu (isim→aralık mapping'i); `undefined` olabilir, `continue` ile atlanır
-  - `name` — `Object.entries(block)` döngüsünden gelen bağımlılık paket ismi (ör. `"express"`)
-  - `range` — `Object.entries(block)` döngüsünden gelen bağımlılık versiyon aralığı (ör. `"^4.18.0"`); `isFloating(range)` ile test edilir
-- **Dönüş**: yok — `expect(offenders).toEqual([])` ile hiçbir bağımlılığın floating aralık kullanmadığını doğrular
+  - `pkg` — `JSON.parse(pkgRaw as string)` sonucu; `dependencies`, `devDependencies`, `optionalDependencies` alanları olan nesne
+  - `offenders` — ihlal eden bağımlılıkları toplayan boş `string[]` dizisi; her ihlalde `"${field}.${name} = \"${range}\"" formatında eleman eklenir
+  - `field` — `for` döngüsündeki alan adı; `'dependencies'`, `'devDependencies'`, `'optionalDependencies'` değerlerini alır
+  - `block` — `pkg[field]` değeri; mevcut bağımlılık bloğu (`Record<string, string>`) veya tanımsız
+  - `name` — `Object.entries(block)` döngüsündeki bağımlılık paket adı
+  - `range` — `Object.entries(block)` döngüsündeki versiyon aralığı string'i; `isFloating(range)` ile test edilir
+- **Dönüş**: yok (test bloğu; `expect(offenders).toEqual([])` çağrısı yapar)
+- **sabit_baglantilari**: yok (sadece `isFloating` fonksiyonu çağrılır)
 
----
-
-### [N5_NASIL] AST Pointer: `__tests__/conformance/dependency-pins.test.ts::it_edgeCdnImportlari` (anonim)
-- **params**: `()` — parametre yok
+### [N4_NASIL] AST Pointer: src\__tests__\conformance\dependency-pins.test.ts::anonim (it callback — "edge CDN importları tam sürüm taşır")
+- **params**: yok
 - **ic_degiskenler**:
-  - `offenders` — `string[]` dizisi; tam sürüm içermeyen edge CDN importlarının `"dosya: url"` formatında listelendiği toplama dizisi
-  - `cdnImport` — `/from\s+['"`](https:\/\/(?:esm\.sh|cdn\.skypack\.dev|deno\.land\/x)\/[^'"`]+)['"`]/g` global regex'i; edge kaynaklarındaki CDN import ifadelerini eşler
-  - `file` — `Object.entries(EDGE_SOURCES)` döngüsünden gelen kaynak dosya adı/anahtarı
-  - `src` — `Object.entries(EDGE_SOURCES)` döngüsünden gelen kaynak dosyanın içeriği (kod stringi)
-  - `m` — `src.matchAll(cdnImport)` iterator'ünden dönen tek bir regex eşleşme sonucu (match object)
-  - `url` — `m[1]` erişiminden elde edilen CDN URL'si (1. yakalama grubu); eşleşen import'un kaynak adresi
-  - `hasFullVersion` — `boolean`; URL'de `@digit.digit.digit` veya `@v.digit.digit.digit` kalıbı olup olmadığını gösteren bayrak
-- **Dönüş**: yok — `expect(offenders).toEqual([])` ile tüm edge CDN importlarının tam sürüm pin'i içerdiğini doğrular
+  - `offenders` — pinsiz CDN importlarını toplayan boş `string[]` dizisi; her ihlalde `"${file}: ${url}"` formatında eleman eklenir
+  - `cdnImport` — CDN import pattern'ini yakalayan global regex (`/from\s+['"`](https:\/\/(?:esm\.sh|cdn\.skypack\.dev|deno\.land\/x)\/[^'"`]+)['"`]/g`)
+  - `file` — `Object.entries(EDGE_SOURCES)` döngüsündeki dosya adı anahtarı
+  - `src` — `Object.entries(EDGE_SOURCES)` döngüsündeki dosya kaynak içeriği string'i
+  - `m` — `src.matchAll(cdnImport)` döngüsündeki regex eşleşme sonucu
+  - `url` — `m[1]` değeri; eşleşen CDN URL'si
+  - `hasFullVersion` — `url` içinde tam sürüm damgası olup olmadığını gösteren boolean; `/@\d+\.\d+\.\d+/` veya `/@v\d+\.\d+\.\d+/` regex'lerinden biriyle test edilir
+- **Dönüş**: yok (test bloğu; `expect(offenders).toEqual([])` çağrısı yapar)
+- **sabit_baglantilari**: `EDGE_SOURCES` (dict, `Object.entries()` ile kullanılır)
 
----
-
-### [N6_NASIL] AST Pointer: `__tests__/conformance/dependency-pins.test.ts::itKendiKendiniDogrular` (anonim)
-- **params**: `()` — parametre yok
+### [N5_NASIL] AST Pointer: src\__tests__\conformance\dependency-pins.test.ts::anonim (it callback — "kendi kendini doğrular")
+- **params**: yok
 - **ic_degiskenler**:
-  - `pinsiz` — backtick string; `"latest"` veya `"@2"` gibi tam sürüm içermeyen sahte bir edge CDN import ifadesi (test düzeltme/koruma amaçlı)
-  - `pinli` — backtick string; `"@2.45.4"` gibi tam sürüm içeren sahte bir edge CDN import ifadesi (test düzeltme/koruma amaçlı)
-  - `re` — `/@\d+\.\d+\.\d+/` regex'i; URL'de tam sürüm damgası olup olmadığını test eden kalıp; `pinsiz` üzerinde `false`, `pinli` üzerinde `true` dönmeli
-- **Dönüş**: yok — sentetik örneklerle `isFloating` ve CDN regex'inin yanlış negative vermediğini doğrular; `expect(...).toBe(true/false)` ile 6 adet `isFloating` çağrısı, 2 adet regex testi ve `EDGE_SOURCES` uzunluk doğrulaması yapar
+  - `pinsiz` — pinsiz CDN import örneği string'i (`"import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'"`)
+  - `pinli` — pinli CDN import örneği string'i (`"import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'"`)
+  - `re` — tam sürüm pattern'ini yakalayan regex (`/@\d+\.\d+\.\d+/`); `pinsiz` ve `pinli` üzerinde `.test()` ile kullanılır
+- **Dönüş**: yok (test bloğu; `isFloating` ve `re.test` ile sentetik doğrulamalar, `expect(Object.keys(EDGE_SOURCES).length).toBeGreaterThan(20)` çağrısı yapar)
+- **sabit_baglantilari**: `EDGE_SOURCES` (dict, `Object.keys()` ile kullanılır), `isFloating` fonksiyonu (çeşitli string'lerle çağrılır)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\__tests__\conformance\dependency-pins.test.ts
-  function: src\__tests__\conformance\dependency-pins.test.ts::isFloating
+  file: dependency-pins.test.ts
+  function: dependency-pins.test.ts::isFloating
 
 ---
 

@@ -2,54 +2,44 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\SalesChart.tsx
-skeleton_hash: da532f9cfab326b1
+source_path: C:\tmp\wt-supurme\src\components\admin\dashboard\SalesChart.tsx
+skeleton_hash: 22bee1a1ee1294f2
 entity_hashes:
   func:SalesChart: 81798fe6d2553ef7
   overview: b9d1d9a412f73b23
-  style_tokens: d6e6bd2ac73e7719
-generated_at: 2026-06-19T20:47:01Z
+  style_tokens: eb6fa1f854f0685b
+generated_at: 2026-08-25T07:24:37Z
 ---
 
 ## Genel Bakış
-SalesChart bileşeni, yönetim panelinde satış verilerini görselleştiren temel bir React grafik bileşenidir. Dışarıdan sağlanan veri seti ve başlık bilgisiyle, kullanıcının satış performansını hızlıca analiz etmesine olanak tanıyan bir grafik oluşturur.
+Bu modül, admin panelindeki dashboard alanında satış verilerini grafiksel olarak gösteren bir React bileşeni içerir. Bileşen, dışarıdan aldığı veri ve başlık bilgisiyle satış grafiğini oluşturur ve render eder. Modül tek bir bileşenden oluşur ve bağımsız bir görselleştirme birimi olarak çalışır.
 
 ## Fonksiyon Grupları
-### Grafik Görselleştirme
-Bu grup, yönetici arayüzünde satış verilerini grafik olarak sunan bileşenin temel yapısını ve render mantığını barındırır. Bileşen, gelen verileri alır ve anlamlı bir grafik çıktısı üretir.
+
+### Satış Grafiği Bileşeni
+Kullanıcıya satış verilerini grafik biçiminde sunar. Dışarıdan sağlanan veri kümesini ve grafik başlığını alarak ilgili grafiği ekrana çizer.
 - SalesChart
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React bileşeninin çalışması için外界den sağlanan props'ların varlığına bağlıdır.
 
-**[Aksiyom 1]**: Eğer `data` prop'u sağlanmamışsa, bileşen grafik verisini görselleştiremez ve boş/hatalı bir grafik render edilir.
-
-**[Aksiyom 2]**: Eğer `title` prop'u sağlanmamışsa, grafik başlığı gösterilmez veya grafik başlıksız render edilir.
-
-**[Aksiyom 3]**: Eğer `data` prop'u boş dizi (`[]`) olarak verilmişse, grafik alanında veri noktaları gösterilmez (sıfır yükseklikli veya boş bir chart alanı oluşur).
-
-**[Aksiyom 4]**: Eğer `data` prop'u grafik kütüphanesinin beklediği formatta (tarih/sayısal değer çiftleri vb.) değilse, grafik render hatası oluşur.
-
-**[Aksiyom 5]**: Eğer `title` prop'u boş string (`""`) olarak verilmişse, grafik başlık alanı görünür ancak içeriği boş olur.
-
-**[Aksiyom 6]**: Bu bileşen yönetici paneli (admin dashboard) bağlamında kullanılmalıdır — yetkisiz sayfalarda render edilmesi durumunda veri gizliliği ihlali riski oluşur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### SalesChart
-**Ne yapar**: Bu React fonksiyonel bileşeni, yönetici panosu (admin dashboard) arayüzünde satış verilerini görselleştiren bir grafik bileşeni oluşturur. Kendisine iletilen `data` ve `title` prop'larını kullanarak kullanıcıya anlamlı bir satış raporu sunar.
+**Ne yapar**: Admin dashboard alanında satış verilerini görselleştirmek üzere kullanılan bir React fonksiyon bileşenidir. Bileşen, dışarıdan sağlanan veri ve başlık bilgisiyle bir satış grafiği görüntüler.
 
-**Nasıl yapar**: `React.FC<SalesChartProps>` tipi ile tanımlanan bir fonksiyonel bileşendir. Gelen props nesnesini JavaScript destructuring yöntemiyle `data` ve `title` değişkenlerine ayırır. Bu değişkenleri kullanarak bir grafik JSX yapısı oluşturur ve render edilmek üzere döndürür. Bileşenin iç mantığı, tip güvenliği sağlayan `SalesChartProps` arayüzüne dayanır.
+**Nasıl yapar**: Bileşen, fonksiyon bileşeni (functional component) olarak tanımlanmıştır. Props parametreleri destructuring yöntemiyle (`{ data, title }`) alınır. `React.FC<SalesChartProps>` tipi ile tanımlanmış olup, `SalesChartProps` arayüzüne uygun props kabul eder. Bileşenin iç mantığı hakkında verilen kaynakta ek bilgi bulunmamaktadır.
 
 **Parametreler**:
-- `data: SalesChartProps['data']` — Grafikte görüntülenecek olan satış verilerini içeren prop'tur. İçeriği ve yapısı `SalesChartProps` arayüzü tarafından belirlenir ve üst bileşen tarafından sağlanır.
-- `title: SalesChartProps['title']` — Grafiğin üst kısmında görüntülenecek başlık metnini belirten string değerdir. Kullanıcı arayüzünde grafiğin bağlamını açıklamak için kullanılır.
+- data: `SalesChartProps` içinde tanımlı tip — Grafiğe beslenecek satış verilerini temsil eder. Kesin tip bilgisi verilen kaynakta belirtilmemiştir.
+- title: `SalesChartProps` içinde tanımlı tip — Grafiğin başlığını temsil eder. Kesin tip bilgisi verilen kaynakta belirtilmemiştir.
 
-**Dönüş**: `React.FC<SalesChartProps>` — Fonksiyonun kendisi bir React Fonksiyonel Bileşeni döndürür. Bu bileşenin bir örneği JSX içerisinde çağrıldığında (`<SalesChart ... />`) bir `ReactElement` ya da `null` döndürür.
+**Dönüş**: `React.FC<SalesChartProps>` — `SalesChartProps` arayüzünü kabul eden bir React fonksiyon bileşeni döndürür. Bileşen, JSX elemanı olarak render edilebilir.
 
 ---
 
@@ -69,10 +59,40 @@ Bu React bileşeninin çalışması için外界den sağlanan props'ların varlı
 
 ---
 
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/admin/dashboard/SalesChart.tsx::SalesChart
+- **params**: `{ data, title }` — `data` grafik veri dizisi, `title` grafik başlık metni
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; grafik etiketleri, başlık ve açıklamalar için metinleri yerelleştirir
+  - `data` — props'tan gelen dizi; `data.length` ile boş durum kontrolü yapılır, `data.length > 20` ile Brush bileşeni koşullu gösterimi belirlenir, `AreaChart` bileşenine `data` prop'u olarak aktarılır
+  - `title` — props'tan gelen metin; grafik panelinin üst kısmındaki `h3` etiketinde başlık olarak render edilir
+  - `TrendingUp` — lucide-react'ten import edilen ikon; `data.length === 0` durumunda `AdminEmptyState` bileşeninin `icon` prop'una aktarılır
+  - `AdminEmptyState` — boş durum bileşeni; veri yokken `icon`, `title`, `description`, `compact` prop'ları ile gösterilir
+  - `t('admin.dashboard.charts.operationalPerformanceTrend')` — grafik alt başlık açıklaması
+  - `t('admin.dashboard.charts.order')` — sipariş serisi etiketi ve legend metni
+  - `t('admin.dashboard.charts.return')` — iade serisi etiketi ve legend metni
+  - `t('admin.dashboard.charts.noDataTitle')` — boş durum başlığı
+  - `t('admin.dashboard.charts.noDataDesc')` — boş durum açıklaması
+  - `ResponsiveContainer` — recharts bileşeni; grafik konteynerini responsive yapar
+  - `AreaChart` — recharts bileşeni; `data` ve `margin` prop'ları ile alan grafiğini oluşturur
+  - `CartesianGrid` — recharts bileşeni; yatay çizgili ızgara çizer
+  - `XAxis` — recharts bileşeni; `dataKey="date"` ile tarih ekseni, stil ve konumlandırma ayarları
+  - `YAxis` — recharts bileşeni; değer ekseni, stil ve konumlandırma ayarları
+  - `Tooltip` — recharts bileşeni; `contentStyle`, `labelStyle`, `itemStyle`, `cursor` prop'ları ile özel tooltip stili
+  - `Area` (sipariş) — recharts bileşeni; `dataKey="orders"`, cyan renk, `fill="url(#colorOrders)"`, animasyonlu
+  - `Area` (iade) — recharts bileşeni; `dataKey="returns"`, kırmızı renk, kesikli çizgi, `fill="url(#colorReturns)"`
+  - `Brush` — recharts bileşeni; `data.length > 20` koşuluyla gösterilir, tarih ekseni üzerinde kaydırma/filtreleme sağlar
+  - `linearGradient#colorOrders` — sipariş alanı için cyan gradyan tanımı
+  - `linearGradient#colorReturns` — iade alanı için kırmızı gradyan tanımı
+- **Dönüş**: JSX elementi — `div.flex.flex-col` kök elemanı içinde başlık paneli ve koşullu olarak boş durum veya AreaChart gösteren React bileşeni
+
+---
+
 ## NODE ID STANDARD
 
-  file: src\components\admin\dashboard\SalesChart.tsx
-  function: src\components\admin\dashboard\SalesChart.tsx::SalesChart
+  file: SalesChart.tsx
+  function: SalesChart.tsx::SalesChart
 
 ---
 
@@ -87,10 +107,10 @@ Bu React bileşeninin çalışması için外界den sağlanan props'ların varlı
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `h-hvac-panel`, `shadow-glow-md`, `tracking-hvac-relaxed`
+- `h-hvac-panel`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-rose-500`, `border-l`, `border-white/10`, `border-white/5`, `group-hover/chart:text-cyan-400`, `hover:bg-white/5`, `text-slate-300`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
-- **Layout:** `backdrop-blur-2xl`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `h-2.5`, `items-center`, `justify-between`, `justify-center`, `min-h-0`, `p-1.5`, `p-8`, `shadow-2xl`, `w-2.5`
+- **Renkler:** `bg-admin-accent`, `bg-admin-danger`, `bg-admin-surface`, `border-admin-border`, `border-l`, `group-hover/chart:text-admin-accent`, `hover:bg-admin-surface-2`, `text-admin-fg`, `text-admin-fg-muted`, `text-xl`, `text-xs`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `h-2.5`, `items-center`, `justify-between`, `justify-center`, `min-h-0`, `p-1.5`, `p-8`, `shadow-admin-lg`, `w-2.5`, `w-full`
 - **Varyant/Responsive:** `group-hover/chart:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `-ml-8`, `border`, `font-black`, `glass`, `group/chart`, `italic`, `leading-none`, `mb-10`, `mt-3`, `opacity-60`, `px-4`, `py-2`, `rounded-2xl`, `rounded-full`, `rounded-xl`
+- **Yardımcı Sınıflar:** `-ml-8`, `border`, `font-semibold`, `group/chart`, `italic`, `leading-none`, `mb-10`, `mt-3`, `opacity-60`, `px-4`, `py-2`, `rounded-admin-lg`, `rounded-admin-md`, `rounded-full`, `tracking-tighter`

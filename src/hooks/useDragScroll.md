@@ -2,44 +2,51 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useDragScroll.ts
-skeleton_hash: 2a55c71344021da6
+source_path: C:\tmp\wt-supurme\src\hooks\useDragScroll.ts
+skeleton_hash: f543371fbdfe6cc5
 entity_hashes:
   func:useDragScroll: 285567f9f95bbe2e
   overview: 65551040518f5649
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-25T07:27:13Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesindeki kaydırılabilir içerik alanları için geliştirilmiş özel bir React kancasıdır. Kullanıcıların fare veya dokunmatik girişlerle sürükleme hareketi yaparak yatay kaydırma gerçekleştirmesini sağlar, böylece ürün listeleri veya görsel galeriler gibi geniş içerik alanlarında doğal bir etkileşim deneyimi sunar.
+
+Bu modül, sürükleme tabanlı kaydırma (drag scroll) işlevselliği sağlayan bir React hook'u içerir. Modül, `useDragScroll` adında tek bir dışa aktarılan fonksiyondan oluşur. Modülün amacı, kullanıcıların fare veya dokunma hareketleriyle içerik kaydırma işlemini gerçekleştirmesini sağlamaktır.
 
 ## Fonksiyon Grupları
-### Sürüklemeli Kaydırma İşlevi
-Tek bileşenli modülün tüm sorumluluğunu üstlenen ana kancadır. Sürükleme başlangıç noktalarını takip eder, hareket mesafesini hesaplar ve hedef DOM elemanının kaydırma konumunu buna göre günceller.
-- `useDragScroll`
+
+### Ana Hook
+
+Modülün tek ve ana fonksiyonudur. Sürükleme ile kaydırma davranışını yöneten bir React hook'u olarak tanımlanmıştır.
+
+- useDragScroll
+
+---
+
+**Not:** Kaynak kodu incelenmediğinden, fonksiyonun döndürdüğü değerler, kabul ettiği parametreler ve iç işleyişi hakkında detaylı bilgi verilememektedir. Detaylı bilgi için kaynak dosyanın incelenmesi gerekir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu hook parametresiz olarak çağrılmalıdır; hiçbir bağımsız değişken kabul etmez.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `useDragScroll` bir React component içinde调用edilmezse, hook kuralları ihlal edilir ve React zamanlayıcı hatası oluşur.
-
-[Aksiyom 2]: Eğer hook'un döndürdüğü DOM referansı (ref) bir kaydırılabilir DOM öğesine bağlanmazsa, sürükleme kaydırma işlevselliği çalışmaz.
-
-> **Not:** Fonksiyon gövdesi sağlandığında bu aksiyomlar güncellenecektir. Mevcut bilgi sadece fonksiyon imzasına (`useDragScroll()`) dayanmaktadır.
+**Gerekçe:** Fonksiyon gövdesi sağlanmadığından, `useDragScroll` fonksiyonunun çalışma koşulları, bağımlılıkları ve davranışları hakkında fonksiyon gövdesine dayalı bir çıkarım yapılamamaktadır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### useDragScroll
-**Ne yapar**: Kaydırılabilir bir konteyner elementine eklendiğinde yatay sürükleerek kaydırma (drag-to-scroll) işlevselliği sağlayan bir callback referansı sunar. Fare etkileşimlerini kullanarak dokunmatik cihazlardaki kaydırma (panning) deneyimini masaüstü ortamında simüle eder, ayrıca sürükleme işlemi sırasında kazara tıklama tetiklenmesini önlemek için bir hareket eşik değeri kullanır.
-**Nasıl yapar**: İlgili DOM konteynerine fare basma, fare hareketi ve fare bırakma olaylarını dinleyerek çalışır. Kullanıcı fareyi tıklayıp basılı tuttuğunda başlangıç imleç konumunu ve konteynerin mevcut yatay kaydırma değerini kaydeder. Fare hareket ettikçe başlangıç konumu ile anlık imleç konumu arasındaki farkı hesaplar ve bu farkı kullanarak konteynerin kaydırma konumunu günceller. Tanımlı hareket eşiği aşılmadan gerçekleştirilen kısa tıklama hareketlerinde kazara kaydırma veya tıklama çakışmalarını engelleyen mantık çalıştırır.
+**Ne yapar**: Bir kapsayıcı öğeye yatay sürükleme ile kaydırma (drag-to-scroll) işlevselliği sağlayan bir callback ref döndürür. Fare olaylarını yöneterek dokunmatik ekran benzeri kaydırma deneyimi simüle eder ve sürükleme sırasında kazara tıklamaları önlemek için bir eşik (threshold) mekanizması içerir.
+
+**Nasıl yapar**: Fonksiyon, React'in `useRef` ve `useCallback` hook'larını kullanarak bir callback ref oluşturur. Bu callback ref, DOM öğesine bağlandığında (`node` parametresi null değilse) fare olaylarını dinlemeye başlar. Fare aşağısına basıldığında (`mousedown`) sürükleme durumu başlatılır ve başlangıç pozisyonu kaydedilir. Fare hareket ettikçe (`mousemove`), basılı tutuluyorsa ve belirlenen eşik değeri (`DRAG_THRESHOLD = 5` piksel) aşılmışsa, öğenin `scrollLeft` değeri güncellenerek yatay kaydırma gerçekleştirilir. Kaydırma hızı, hareket miktarının 1.5 katı ile çarpılarak ayarlanır. Eşik değeri aşıldığında `hasDragged` bayrağı true yapılır ve bu durumda `click` olayı engellenerek kazara tıklamalar önlenir. Fare bırakıldığında (`mouseup`) veya öğeden çıktığında (`mouseleave`) sürükleme durumu sıfırlanır ve stiller eski haline döner. Fonksiyon, her yeni `node` bağlandığında önceki olay dinleyicilerini temizleyerek bellek sızıntısını önler. `cleanupRef` kullanılarak bileşenUnmount olduğunda veya yeni bir öğe bağlandığında tüm olay dinleyicileri kaldırılır.
+
 **Parametreler**:
-- Bu fonksiyon herhangi bir giriş parametresi kabul etmez.
-**Dönüş**: Kaydırılabilir konteyner DOM elementine atanmak üzere tasarlanmış bir callback referansı döndürür. Bu referans, drag-scroll işlevselliğinin ilgili elemente tanımlanmasını sağlar ve tüm fare olay dinleyicilerini işlevselliğin kullanıldığı element ile ilişkilendirir.
+- Fonksiyon parametre almaz. Ancak döndürülen callback ref'in generic tipi `T extends HTMLElement = HTMLDivElement` ile belirlenir; bu, ref'in varsayılan olarak `HTMLDivElement` öğelerine atanacağını, ancak `HTMLElement`'i genişleten herhangi bir öğe tipiyle de kullanılabileceğini gösterir.
+
+**Dönüş**: `T` tipindeki bir DOM öğesine atanabilen bir callback ref döndürür. Bu ref, `useCallback` ile sarılmış olup bağımlılık dizisi boş (`[]`) olduğundan sadece bir kez oluşturulur. Ref, öğeye bağlandığında sürükleme olay dinleyicilerini ekler, null olarak çağrıldığında (örneğin öğe DOM'dan kaldırıldığında) ise mevcut temizleme fonksiyonunu çalıştırarak tüm olay dinleyicilerini kaldırır.
 
 ---
 
@@ -51,74 +58,69 @@ Bu hook parametresiz olarak çağrılmalıdır; hiçbir bağımsız değişken k
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: useDragScroll.ts::useDragScroll
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/hooks/useDragScroll.ts::useDragScroll
+- **params**: ()
 - **ic_degiskenler**:
-  - `cleanupRef` — useRef tarafından yönetilen, temizleme işlevini tutan referans. Mevcut temizleme işlevi varsa çağrılır ve sıfırlanır, yoksa node yoksa çıkılır.
-  - `callbackRef` — useCallback ile sarılmış, düğüm referansı alarak sürükleme kaydırma (drag scroll) özelliklerini ayarlayan asıl işlev. Boş bağımlılık dizisi ile sadece bir kez oluşturulur.
-- **Dönüş**: callbackRef (React.RefCallback<T>)
+  - `cleanupRef` — useRef ile oluşturulmuş ref; önceki bağlanmış DOM node'un temizleme fonksiyonunu saklar, yeni bağlama yapıldığında eski temizleme çalıştırılır
+  - `callbackRef` — useCallback ile oluşturulmuş, bağımlılık dizisi boş []; DOM node'u bağlandığında sürükleme olaylarını ekleyen ref callback fonksiyonu
+- **Dönüş**: callbackRef (ref callback fonksiyonu)
 
-### [N1_NASIL] AST Pointer: useDragScroll.ts::(node: T | null) => { ... } (callbackRef içindeki işlev)
-- **params**: `node: T | null` — sürükleme kaydırmanın uygulanacağı HTML elementi veya null
+### [N2_NASIL] AST Pointer: src/hooks/useDragScroll.ts::callbackRef (useCallback içindeki fonksiyon)
+- **params**: `node: T | null` — bağlanan DOM elementi veya null
 - **ic_degiskenler**:
-  - `cleanupRef` — outer scope'tan referansla erişilen, temizleme işlevini tutan ref
-  - `el` — parametreden gelen node, event listener'ların ekleneceği element
-  - `isDown` — mouse basılı durumunu takip eden boolean
-  - `startX` — sürükleme başladığında mouse'un sayfadaki X pozisyonu minus elementin offset lefti
-  - `scrollLeft` — sürükleme başladığında elementin mevcut scrollLeft değeri
-  - `hasDragged` — sürükleme eşiği aşılıp aşılmadığını (sürüklenme olduğunu) gösteren boolean
-  - `DRAG_THRESHOLD` — sürüklenme olarak sayılacak minimum piksel mesafesi (5px)
-  - `startClientX` — sürükleme başladığında mouse'un sayfadaki pageX değeri
-  - `handleMouseDown` — mouse basma olayını yöneten iç işlev
-  - `handleMouseLeave` - mouse elementten ayrıldığında çalışan iç işlev
-  - `handleMouseUp` - mouse bırakma olayını yöneten (global window'dan dinlenen) iç işlev
-  - `handleMouseMove` - mouse hareketini yöneten, kaydırmayı hesaplayan iç işlev
-  - `handleClick` - tıklama olayını yöneten, sürükleme sonrası tıklamayı engelleyen iç işlev
-- **Dönüş**: yok (yan etki: elemente event listener ekler, temizleme işlevini ref'e kaydeder)
+  - `el` — node parametresinin kendisi; üzerinde stil değişiklikleri yapılan ve olay dinleyicileri eklenen DOM elementi
+  - `isDown` — boolean; fare tuşunun basılı olup olmadığını izler, sürükleme sırasında true olur
+  - `startX` — number; sürükleme başlangıcında `e.pageX - el.offsetLeft` hesaplanan X pozisyonu
+  - `scrollLeft` — number; sürükleme başlangıcındaki `el.scrollLeft` değeri
+  - `hasDragged` — boolean; sürükleme eşik değerini aşıp aşmadığını izler, click olayını engellemek için kullanılır
+  - `DRAG_THRESHOLD` — sabit 5; sürükleme sayılması için gereken minimum piksel mesafesi
+  - `startClientX` — number; fare tıklama başlangıcındaki `e.pageX` değeri, eşik kontrolü için kullanılır
+  - `handleMouseDown` — mousedown olay yöneticisi; sürükleme durumunu başlatır, stilleri günceller
+  - `handleMouseLeave` — mouseleave olay yöneticisi; fare elementten çıkarsa sürükleme durumunu sıfırlar
+  - `handleMouseUp` — mouseup olay yöneticisi; fare tuşu bırakıldığında sürükleme durumunu sıfırlar
+  - `handleMouseMove` — mousemove olay yöneticisi; sürükleme sırasında scrollLeft hesaplar ve uygular
+  - `handleClick` — click olay yöneticisi (capture: true); sürükleme gerçekleştiyse click'i engeller
+- **Dönüş**: yok (undefined)
 
-### [N1_NASIL] AST Pointer: useDragScroll.ts::handleMouseDown(e: MouseEvent)
-- **params**: `e: MouseEvent` — mouse basma olayı
-- **ic_degiskenler**:
-  - `e.button` — olayın hangi mouse tuşuyla tetiklendiğini belirtir (0 = sol tuş)
-  - `e.pageX` — mouse'un sayfadaki yatay pozisyonu
-  - `el` — outer scope'tan referansla erişilen element
-  - `isDown`, `hasDragged`, `startClientX`, `startX`, `scrollLeft` — outer scope'tan referansla erişilen değişkenler
-- **Dönüş**: yok (yan etki: durum değişkenlerini ayarlar, element stillerini değiştirir)
+### [N3_NASIL] AST Pointer: src/hooks/useDragScroll.ts::handleMouseDown
+- **params**: `e: MouseEvent` — fare tıklama olayı
+- **ic_degiskenler**: yok (dış scope değişkenlerini kullanır: isDown, hasDragged, startClientX, startX, scrollLeft, el)
+- **Dönüş**: yok
 
-### [N1_NASIL] AST Pointer: useDragScroll.ts::handleMouseLeave()
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `isDown`, `el` — outer scope'tan referansla erişilen değişkenler
-- **Dönüş**: yok (yan etki: isDown'ı false yapar, elementin cursor ve userSelect stillerini sıfırlar)
+### [N4_NASIL] AST Pointer: src/hooks/useDragScroll.ts::handleMouseLeave
+- **params**: ()
+- **ic_degiskenler**: yok (dış scope değişkenlerini kullanır: isDown, el)
+- **Dönüş**: yok
 
-### [N1_NASIL] AST Pointer: useDragScroll.ts::handleMouseUp()
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `isDown`, `el` — outer scope'tan referansla erişilen değişkenler
-- **Dönüş**: yok (yan etki: isDown'ı false yapar, elementin cursor ve userSelect stillerini sıfırlar)
+### [N5_NASIL] AST Pointer: src/hooks/useDragScroll.ts::handleMouseUp
+- **params**: ()
+- **ic_degiskenler**: yok (dış scope değişkenlerini kullanır: isDown, el)
+- **Dönüş**: yok
 
-### [N1_NASIL] AST Pointer: useDragScroll.ts::handleMouseMove(e: MouseEvent)
-- **params**: `e: MouseEvent` — mouse hareket olayı
+### [N6_NASIL] AST Pointer: src/hooks/useDragScroll.ts::handleMouseMove
+- **params**: `e: MouseEvent` — fare hareket olayı
 - **ic_degiskenler**:
-  - `e.pageX` — mouse'un mevcut sayfadaki yatay pozisyonu
-  - `el`, `isDown`, `startX`, `scrollLeft`, `hasDragged`, `startClientX`, `DRAG_THRESHOLD` — outer scope'tan referansla erişilen değişkenler
-  - `x` — elementin sol kenarına göre mouse'un yatay pozisyonu (e.pageX - el.offsetLeft)
-  - `walk` — kaydırma miktarı (x - startX) çarpanıyla hesaplanır
-  - `distance` — sürükleme başlangıcından itibaren yatay mesafe (Math.abs ile mutlak değer)
-- **Dönüş**: yok (yan etki: elementin scrollLeft değerini değiştirerek kaydırma yapar, hasDragged ve e.preventDefault ile sürükleme durumunu yönetir)
+  - `x` — `e.pageX - el.offsetLeft` hesaplanan güncel fare X pozisyonu
+  - `walk` — `(x - startX) * 1.5` hesaplanan kaydırma mesafesi, 1.5x çarpanıyla
+  - `distance` — `Math.abs(e.pageX - startClientX)` hesaplanan fare hareket mesafesi, eşik kontrolü için
+- **Dönüş**: yok (dış scope değişkenlerini kullanır: isDown, startX, startClientX, DRAG_THRESHOLD, hasDragged, scrollLeft, el)
 
-### [N1_NASIL] AST Pointer: useDragScroll.ts::handleClick(e: MouseEvent)
-- **params**: `e: MouseEvent` — tıklama olayı
-- **ic_degiskenler**:
-  - `hasDragged` — outer scope'tan referansla erişilen, sürükleme olup olmadığını gösteren değişken
-- **Dönüş**: yok (yan etki: sürükleme olmuşsa e.preventDefault ve e.stopPropagation ile tıklamayı engeller)
+### [N7_NASIL] AST Pointer: src/hooks/useDragScroll.ts::handleClick
+- **params**: `e: MouseEvent` — click olayı
+- **ic_degiskenler**: yok (dış scope değişkenini kullanır: hasDragged)
+- **Dönüş**: yok
+
+### [N8_NASIL] AST Pointer: src/hooks/useDragScroll.ts::cleanupRef.current (temizleme fonksiyonu)
+- **params**: ()
+- **ic_degiskenler**: yok (dış scope değişkenlerini kullanır: el, handleMouseDown, handleMouseUp, handleMouseLeave, handleMouseMove, handleClick)
+- **Dönüş**: yok; tüm olay dinleyicilerini (mousedown, mouseup, mouseleave, mousemove, click) kaldırır
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\hooks\useDragScroll.ts
-  function: src\hooks\useDragScroll.ts::useDragScroll
+  file: useDragScroll.ts
+  function: useDragScroll.ts::useDragScroll
 
 ---
 

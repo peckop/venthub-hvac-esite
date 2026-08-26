@@ -2,73 +2,84 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\analytics.ts
-skeleton_hash: 7c0f7517f6c55f7a
+source_path: C:\tmp\wt-supurme\src\utils\analytics.ts
+skeleton_hash: 3c46058e15fdcdf5
 entity_hashes:
-  func:trackEvent: a39f838e00080681
-  overview: 6ae77f9a934c8a05
-generated_at: 2026-06-19T20:48:17Z
+  func:trackEvent: 561450afbdac10ee
+  overview: 34daeb673bd862b6
+generated_at: 2026-08-25T07:28:51Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesindeki analiz utility modülüdür. Tek bir merkezi fonksiyonla tüm uygulama içi olayların harici analiz servislerine veya geliştirme modunda konsola kaydedilmesini sağlar.
+
+Bu modül, uygulama genelinde olay takibi (event tracking) için kullanılan bir yardımcı araçtır. Dış dünyaya yalnızca tek bir fonksiyon sunar ve analitik verilerin merkezi bir noktadan iletilmesini sağlar.
 
 ## Fonksiyon Grupları
+
 ### Olay Takibi
-Uygulamadaki tüm analiz olaylarını standart bir arayüz üzerinden harici servislere veya konsola yönlendirerek merkezi veri toplama sorumluluğunu üstlenir.
+Uygulama içinde gerçekleşen kullanıcı eylemlerini veya sistem olaylarını ad ve parametre bilgisiyle birlikte kaydeder.
 - trackEvent
+
+## Bağımlılıklar
+
+Modülün dış bağımlılıkları verilen kaynak bilgiden tespit edilememiştir. Dinamik veya lazy yüklenen bir alt modül bilgisi de mevcut değildir. Mimari açıdan bu modül, uygulamanın analitik altyapısının giriş noktasıdır; diğer modüller olay takibi gerektiğinde bu modülü çağırır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, uygulama içi olayları harici analiz servislerine (GA4/GTM) iletmek üzere tasarlanmıştır; servis mevcut değilse konsol fallback'i kullanılır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer çalışma ortamında geçerli bir analitik servis (Google Analytics 4 veya Google Tag Manager) yapılandırılmamışsa, `trackEvent` çağrısı konsola loglama fallback'ine yönelir.
-
-[Aksiyom 2]: Eğer `params` parametresindeki değerler JSON serileştirilebilir (JSON-serializable) olmadığında, analitik servise iletim sırasında sessiz hata oluşur veya olay kaybolur.
-
-[Aksiyom 3]: Eğer `name` parametresi boş string (`""`) olarak verildiğinde, servise tanımsız bir olay adı iletilir ve analitik panelinde anlamsız veri birikir.
+**Gerekçe:** Fonksiyon gövdesi verilmediği için `trackEvent` fonksiyonunun doğru çalışması için hangi koşulların var olması gerektiğini belirleyecek bilgi bulunmamaktadır. Yalnızca fonksiyon imzası (`name: string, params: Record<string, unknown>`) mevcuttur; bu imza tek başına bir aksiyom üretmek için yeterli değildir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### trackEvent
-**Ne yapar**: Bu fonksiyon, bir analitik (analytics) olayını güvenli bir şekilde izlemeyi sağlar. Görevi, belirtilen olay adı ve ilişkili parametreleri, mevcut bir analitik servisine (Google Analytics 4 veya Google Tag Manager) iletir. Eğer böyle bir servis yoksa sessizce işlevsiz kalır veya geliştirme ortamında bir log mesajı basarak hata vermeden çalışmaya devam eder.
+**Ne yapar**: Analitik olaylarını güvenli bir şekilde takip eder. GA4 (`gtag`) veya GTM (`dataLayer`) sistemlerine olay gönderir; her ikisi de mevcut değilse sessizce başarısız olur veya geliştirme/hata ayıklama modlarında konsola log düşer. Analitik rızası olmayan kullanıcılar için hiçbir veri gönderilmez — rızası olmayan kullanıcı da "rıza vermemiş" sayılır (opt-in); sessiz kabul yoktur.
 
-**Nasıl yapar**: Fonksiyon首先, tarayıcı ortamında olup olmadığını kontrol eder. Ardından, `window.gtag` fonksiyonunun varlığına bakarak GA4'e, yoksa `window.dataLayer` dizisinin varlığına bakarak GTM'ye olayı göndermeyi dener. Herhangi bir servise olay iletilememişse ve ortam geliştirme (development) modundaysa, `DEBUG_ANALYTICS` bayrağı aktifse konsola bilgilendirici bir uyarı loglar. Tüm işlem bir `try-catch` bloğu içinde gerçekleşir; olası analitik hataları yakalanarak ana uygulamanın çökmesi engellenir.
+**Nasıl yapar**: Fonksiyon öncelikle sunucu tarafı render (SSR) ortamında olup olmadığını kontrol eder; `window` tanımlı değilse hemen çıkar. Ardından `hasConsent('analytics')` fonksiyonu ile analitik rızası kontrolü yapar; rıza yoksa olay gönderilmez, yalnızca `window.DEBUG_ANALYTICS` true ise konsola uyarı logu düşer. Rıza mevcutsa, öncelikle `window.gtag` fonksiyonu aranır; bulunursa GA4 formatında (`gtag('event', name, params)`) olay gönderilir. `gtag` yoksa `window.dataLayer` array olup olmadığı kontrol edilir; uygunsa GTM formatında (`dataLayer.push({ event: name, ...params })`) gönderilir. Her iki durumda da `delivered` değişkeni true yapılır. `window.DEBUG_ANALYTICS` true olduğunda tüm olaylar konsola loglanır. Geliştirme ortamında (`process.env.NODE_ENV === 'development'`) GA/GTM mevcut değilse ve debug açıksa, `analytics:dev-fallback` etiketiyle ek log düşülür. Tüm işlem bir `try-catch` bloğu içinde sarılıdır; oluşan hatalar yutularak uygulama çökmesi önlenir.
 
 **Parametreler**:
-- `name`: `string` — İzlenecek olayın adıdır. Örneğin 'add_to_cart', 'page_view' gibi bir string olmalıdır.
-- `params`: `Record<string, unknown>` — Olaya ilişkilendirilecek ek parametreler veya meta verileri temsil eder. Nesne formatındadır ve fonksiyon çağrısında belirtilmezse boş bir nesne (`{}`) olarak atanır.
+- `name`: `string` — Takip edilecek olayın adı (örneğin `'add_to_cart'`).
+- `params`: `Record<string, unknown>` — Olay için ek parametreler ve meta veriler. Varsayılan değeri boş bir objedir (`{}`).
 
-**Dönüş**: Fonksiyon herhangi bir değer dönmez (`void`). Sadece bir yan etki (analitik servise olay gönderme veya konsola log yazma) oluşturur.
+**Dönüş**: `void` — Fonksiyon herhangi bir değer döndürmez.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/consent::hasConsent
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/utils/analytics.ts::trackEvent
-- **params**: 
-  - `name: string` - Takip edilecek analitik olayının benzersiz ismi
-  - `params: Record<string, unknown>` - Olayla ilişkili ek verileri içeren nesne, varsayılan olarak boş nesne atanır
+- **params**:
+  - `name` — gönderilecek analitik olayın adı (string)
+  - `params` — olayla birlikte gönderilecek ek parametreler; varsayılan değeri boş nesne `{}` (Record<string, unknown>)
 - **ic_degiskenler**:
-  - `delivered` - Analitik olayın gtag veya dataLayer takip sistemlerinden herhangi birine başarıyla iletilip iletilmediğini takip eden boolean bayrak
-  - `typeof window` - Kodun sunucu tarafında mı çalıştığını tespit etmek için tarayıcı pencere nesnesinin varlığını kontrol eden ifade
-  - `window.gtag` - Google Analytics entegrasyonu varsa mevcut olan global gtag fonksiyonu, olay göndermek için çalıştırılır
-  - `window.dataLayer` - Google Tag Manager entegrasyonu varsa mevcut olan global veri dizisi, gtag mevcut değilse olay bu diziye eklenir
-  - `window.DEBUG_ANALYTICS` - Analitik olaylarının konsola loglanıp loglanmayacağını kontrol eden global boolean bayrak
-  - `process.env.NODE_ENV` - Uygulamanın çalışma ortamını (geliştirme/üretim) belirten ortam değişkeni, geliştirme ortamında düşük iletilen olaylar için ek loglama yapılır
-  - `console.warn` - Tarayıcı konsoluna uyarı logu yazdırmak için kullanılan API, debug modunda olay detaylarını yazdırır
-- **Dönüş**: yok (void), herhangi bir değer döndürmez, sadece yan etki olarak analitik olayları gönderir, loglar; oluşan hataları yutarak uygulamanın çökmesini engeller
+  - `delivered` — olayın GA/GTM sistemine başarıyla iletilip iletilmediğini izleyen boolean bayrak; başlangıçta `false`, `window.gtag` veya `window.dataLayer` üzerinden gönderim başarılıysa `true` yapılır
+- **Dönüş**: yok (void)
+
+**Yan etkiler ve davranış:**
+- `typeof window === 'undefined' ise` fonksiyon sessizce çıkar (SSR koruması).
+- `hasConsent('analytics')` çağrısı ile rıza kontrolü yapılır; rıza yoksa (`!hasConsent('analytics')`) hiçbir veri gönderilmez ve fonksiyondan çıkılır. Karar verilmemiş kullanıcı da rıza vermemiş sayılır (opt-in modeli).
+- Rıza reddedildiğinde ve `window.DEBUG_ANALYTICS` truthy ise `console.warn('[analytics:blocked-no-consent]', name)` ile uyarı basılır.
+- `window.gtag` bir fonksiyon ise `window.gtag('event', name, params)` çağrısı yapılır ve `delivered` `true` olur.
+- `window.gtag` yoksa ve `window.dataLayer` bir dizi ise `window.dataLayer.push({ event: name, ...params })` ile olay gönderilir ve `delivered` `true` olur.
+- `window.DEBUG_ANALYTICS` truthy ise her durumda `console.warn('[analytics]', name, params)` ile debug logu basılır.
+- `delivered` hâlâ `false` ise ve `process.env.NODE_ENV === 'development'` ise ve `window.DEBUG_ANALYTICS` truthy ise `console.warn('[analytics:dev-fallback]', name, params)` ile geliştirme ortamı uyarısı basılır.
+- Tüm gövde `try-catch` ile sarılıdır; oluşan hatalar yutulur (uygulama çökmesi engellenir).
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\utils\analytics.ts
-  function: src\utils\analytics.ts::trackEvent
+  file: analytics.ts
+  function: analytics.ts::trackEvent
 
 ---
 

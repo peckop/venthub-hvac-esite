@@ -2,49 +2,47 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\admin-create-coupon\index.ts
-skeleton_hash: 6032379d786e47a1
+source_path: C:\tmp\wt-supurme\supabase\functions\admin-create-coupon\index.ts
+skeleton_hash: 5b8fe91e8f0455cf
 entity_hashes:
   func:admin-create-coupon_handler: 72913923d4da4715
   overview: cd57faa16c1d1db9
-generated_at: 2026-08-15T09:05:02Z
+generated_at: 2026-08-25T07:32:52Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase Edge Function olarak çalışan bir HTTP endpoint'idir. Tek bir işleyici fonksiyon aracılığıyla, yöneticilerin yeni indirim kuponu oluşturma isteklerini alır, doğrular ve veritabanına kaydederek uygun HTTP yanıtını döndürür.
+
+Bu modül, Supabase Edge Function altyapısı üzerinde çalışan bir yönetici kupon oluşturma uç noktasıdır. Gelen HTTP isteklerini `Deno.serve` aracılığıyla dinler ve yönetici yetkisine sahip kullanıcıların yeni kupon kayıtları oluşturmasına olanak tanır. Modül tek bir işlevden oluşur ve bağımsız bir servis olarak çalışır.
 
 ## Fonksiyon Grupları
-### Kupon Oluşturma İşleyicisi
-Tek bir endpoint olarak, tüm HTTP isteklerini yöneten kapsamlı bir işleyici fonksiyonu barındırır. Yetkilendirme kontrolü, istek doğrulama, veritabanına yazma ve yanıt oluşturma adımlarını tek bir akışta gerçekleştirir.
+
+### Ana İşleyici
+
+Gelen HTTP isteğini karşılayıp yönetici kuponu oluşturma işlemini yürüten tek sorumlu işlevdir. Supabase'in `serve` dekoratörü ile dış dünyaya açılan bu fonksiyon, istek gövdesini çözümleyip kupon verisini işler ve sonuç olarak bir HTTP yanıtı döndürür.
+
 - admin-create-coupon_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, bir HTTP isteği alıp yanıt döndüren bir Edge Function handler'ıdır. Fonksiyon gövdesi paylaşılmadığı için somut implementasyon detaylarına dayalı aksiyomlar üretilememektedir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Bilinenler:**
-- Fonksiyon imzası: `admin-create-coupon_handler(req: Request) -> Response`
-
-**Eğer [geçerli bir HTTP Request nesnesi] yoksa, [fonksiyon uygun bir hata yanıtı veya istisna döndürür] olur.**
+**Gerekçe:** Fonksiyon gövdesi sağlanmadığından, yalnızca `admin-create-coupon_handler(req: Request) -> Response` imzası mevcuttur. Aksiyomlar yalnızca fonksiyon gövdesinden üretilebilir; gövde verilmediği için modüle özgü bir varsayımda bulunulamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### admin-create-coupon_handler
+**Ne yapar**: Fonksiyonun görevi belirtilmemiştir. Docstring boş olduğundan ne iş yaptığı bilinmiyor.
 
-**Ne yapar**: Bu fonksiyon, administrative panel üzerinden yeni bir kupon oluşturma işlemini yöneten HTTP isteklerini işler. Supabase Edge Function yapısında yer alan bu handler, admin kullanıcılarının kupon sistemine yeni kayıtlar eklemesini sağlar.
-
-**Nasıl yapar**: Fonksiyon, gelen HTTP Request nesnesini kabul eder ve ilgili isteği işleyerek bir Response döndürür. Supabase Edge Functions mimarisinde çalışır ve TypeScript tabanlıdır. İşlevin detaylı iç mantığı dokümanda belirtilmemiştir.
+**Nasıl yapar**: `@serve(Deno.serve)` dekoratörü ile tanımlanmıştır. Bu dekoratör, fonksiyonu Deno'nun yerleşik HTTP sunucusuna bağlayarak bir Supabase Edge Function olarak çalışmasını sağlar. Fonksiyon asenkron (`async`) olarak tanımlanmıştır. İç mantığı hakkında docstring veya kaynak kod bilgisi bulunmadığından detay bilinmiyor.
 
 **Parametreler**:
-- `req`: Request — İşlenecek HTTP istek nesnesi. İstek gövdesinde kupon verileri ve authentication bilgileri bulunmaktadır.
+- req: Request — Gelen HTTP isteğini temsil eden nesne. Detaylı alan bilgisi verilmemiştir.
 
-**Dönüş**: Response — İşlem sonucunu içeren HTTP yanıt nesnesi. Başarılı oluşturma durumunda onay, hata durumunda ise uygun hata mesajını döndürür.
-
-**Not**: Fonksiyon docstring'i boş bırakılmış olup, detaylı iç mantık ve implementasyon bilgileri kaynak kodda mevcuttur. Belgeleme için kaynak kod incelenerek parametre şeması, validasyon kuralları ve hata yönetimi detayları eklenmelidir.
+**Dönüş**: Response — HTTP yanıtını temsil eden nesne döndürür. Yanıtın içeriği ve yapısı hakkında bilgi verilmemiştir.
 
 ---
 
@@ -58,48 +56,46 @@ Bu modül, bir HTTP isteği alıp yanıt döndüren bir Edge Function handler'ı
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `supabase/functions/admin-create-coupon/index.ts`::`admin-create-coupon_handler`
-
-- **params**:
-  - `req: Request` — gelen HTTP istek nesnesi; method, headers ve JSON body içerir
-
+### [N1_NASIL] AST Pointer: supabase/functions/admin-create-coupon/index.ts::admin-create-coupon_handler
+- **params**: `req: Request` — gelen HTTP isteği
 - **ic_degiskenler**:
-  - `corsHeaders` — `getCorsHeaders(req)` çağrısıyla elde edilen CORS başlıkları nesnesi, tüm Response'lara eklenir
-  - `SUPABASE_URL` — `Deno.env.get('SUPABASE_URL')` ile okunan ortam değişkeni; Supabase proje URL'i
-  - `SUPABASE_ANON_KEY` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan ortam değişkeni; Supabase anonim anahtarı
-  - `SUPABASE_SERVICE_ROLE_KEY` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan ortam değişkeni; Supabase servis rolü anahtarı, admin izinleriyle istemci oluşturmak için kullanılır
-  - `authHeader` — `req.headers.get('Authorization')` ile istek başlığından okunan Bearer token
-  - `supabaseUser` — `createClient(SUPABASE_URL, SUPABASE_ANON_KEY, ...)` ile oluşturulan Supabase istemcisi; kullanıcının kendi tokenıyla Yetkilendirme istekleri yapar (getUser)
-  - `supabaseAdmin` — `createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)` ile oluşturulan Supabase admin istemcisi; servis rolüyle veritabanı sorguları ve insert işlemleri yapar
-  - `userRes` — `supabaseUser.auth.getUser(...)` çağrısının `data` alanından destructure edilen kullanıcı sonucu; `userRes.user` içinde authenticated kullanıcı bilgisi tutulur
-  - `userErr` — `supabaseUser.auth.getUser(...)` çağrısının `error` alanından destructure edilen hata nesnesi
-  - `userId` — `userRes.user.id`; doğrulanmış kullanıcının UUID'isi, profil sorgusu ve payload.created_by için kullanılır
-  - `profile` — `supabaseAdmin.from('user_profiles').select('role, tenant_id').eq('id', userId).maybeSingle()` sorgusunun `data` sonucu; kullanıcının rolü ve tenant_id bilgisi tutulur
-  - `profErr` — aynı sorgunun `error` sonucu
-  - `userRole` — `profile?.role` değerinden türetilen kullanıcı rolü; `'user'` fallback'li string, `['admin', 'superadmin']` kontrolü için kullanılır
-  - `tenantId` — `tenantFromVerifiedUser({ id: userId, app_metadata: userRes.user.app_metadata ?? null }, profile)` çağrısıyla elde edilen kiracı UUID'isi; `TenantMismatchError` fırlatılabilir, `payload.tenant_id` için kullanılır
-  - `body` — `req.json()` ile parse edilen request body; `CouponBody` arayüzüne cast edilmiş nesne
-  - `code` — `body.code` değerinden `String(...).trim()` ile temizlenmiş kupon kodu; 3-50 karakter arası olmalı
-  - `type` — `body.type` değerinden elde edilen indirim türü; `'percent'` veya `'fixed'` olmalı
-  - `value` — `Number(body.value)` ile parse edilen indirim miktarı; 0'dan büyük olmalı
-  - `starts_at` — `body.starts_at` varsa `String(...)` ile string'e çevrilmiş geçerlilik başlangıç tarihi, yoksa `null`
-  - `ends_at` — `body.ends_at` varsa `String(...)` ile string'e çevrilmiş geçerlilik bitiş tarihi, yoksa `null`
-  - `is_active` — `Boolean(body.active ?? true)` ile belirlenen aktiflik durumu; varsayılan `true`
-  - `usage_limit` — `body.usage_limit`'tenparse edilen maksimum kullanım sayısı; `null`, geçersiz veya <1 ise `null`落とす
-  - `ul` — `usage_limit` hesaplama içinde `Number(body.usage_limit)` ile elde edilen geçici numeric değer
-  - `errs` — validasyon hatalarını toplayan `string[]` dizisi; hatalı alan isimleri eklenir
-  - `payload` — `coupons` tablosuna insert edilecek veri objesi; `code`, `discount_type`, `discount_value`, `valid_from`, `valid_until`, `is_active`, `usage_limit`, `used_count`, `created_by`, `tenant_id` alanlarını içerir
-  - `data` — `supabaseAdmin.from('coupons').insert(payload).select(...).single()` çağrısının `data` sonucu; inserted kuponun tüm alanlarıyla birlikte dönendir
-  - `insErr` — insert çağrısının `error` sonucu
-
-- **Dönüş**: `Response` — Success: `200` ile insert edilmiş kupon objesi JSON; Hata durumlarına göre `405` (method_not_allowed), `500` (missing_env, profile_error, internal), `401` (unauthenticated, unauthorized), `403` (forbidden: admin_only veya tenant_mismatch), `400` (bad_request: validasyon hataları veya insert_failed). Try-catch `_e` yakalayıp `500 internal` dönerek tüm yakalanmamış istisnaları yönetir.
+  - `corsHeaders` — `getCorsHeaders(req)` çağrısından dönen CORS başlıkları; tüm yanıtlarda kullanılır
+  - `SUPABASE_URL` — `Deno.env.get('SUPABASE_URL')` ile alınan ortam değişkeni; Supabase proje URL'si
+  - `SUPABASE_ANON_KEY` — `Deno.env.get('SUPABASE_ANON_KEY')` ile alınan ortam değişkeni; anonim erişim anahtarı
+  - `SUPABASE_SERVICE_ROLE_KEY` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile alınan ortam değişkeni; yönetici erişim anahtarı
+  - `authHeader` — `req.headers.get('Authorization')` ile alınan yetkilendirme başlığı; yoksa 401 döner
+  - `supabaseUser` — `createClient(SUPABASE_URL, SUPABASE_ANON_KEY, ...)` ile oluşturulan Supabase istemcisi; kullanıcı oturumunu doğrulamak için `authHeader` başlığıyla yapılandırılır
+  - `supabaseAdmin` — `createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)` ile oluşturulan Supabase istemcisi; yönetici ayrıcalıklarıyla veritabanı işlemleri yapar
+  - `userRes` — `supabaseUser.auth.getUser(authHeader.replace(...))` sonucundaki `data`; doğrulanmış kullanıcı bilgisini içerir
+  - `userErr` — `supabaseUser.auth.getUser(...)` sonucundaki hata; varsa 401 döner
+  - `userId` — `userRes.user.id`; doğrulanmış kullanıcının benzersiz kimliği
+  - `profile` — `supabaseAdmin.from('user_profiles').select('role, tenant_id').eq('id', userId).maybeSingle()` sonucundaki `data`; kullanıcının rolü ve kiracı kimliğini içerir
+  - `profErr` — profil sorgusu hatası; varsa 500 döner
+  - `userRole` — `profile?.role` değeri, string olarak atanır; yoksa `'user'` varsayılır. `['admin', 'super_admin']` içinde değilse 403 döner
+  - `tenantId` — `tenantFromVerifiedUser(...)` fonksiyonundan dönen `tenantId`; doğrulanmış kullanıcı ve profil bilgisinden çıkarılan kiracı kimliği. `TenantMismatchError` yakalanırsa 403 döner
+  - `tenantErr` — `tenantFromVerifiedUser(...)` çağrısında oluşan hata; `TenantMismatchError` türünde ise 403, diğer durumlarda yeniden fırlatılır
+  - `body` — `req.json().catch(() => ({}))` ile parse edilen istek gövdesi; `CouponBody` arayüzüne uygun
+  - `code` — `String(body.code || '').trim()` ile elde edilen kupon kodu; 3–50 karakter arası olmalı
+  - `type` — `String(body.type || '')` ile elde edilen kupon tipi; `'percent'` veya `'fixed'` olmalı
+  - `value` — `Number(body.value)` ile elde edilen kupon değeri; sıfırdan büyük olmalı
+  - `starts_at` — `body.starts_at` varsa `String(body.starts_at)`, yoksa `null`; kupon geçerlilik başlangıcı
+  - `ends_at` — `body.ends_at` varsa `String(body.ends_at)`, yoksa `null`; kupon geçerlilik bitişi
+  - `is_active` — `Boolean(body.active ?? true)` ile elde edilen kupon aktiflik durumu
+  - `usage_limit` — kullanım limiti; `body.usage_limit` null/undefined/boş ise `null`, aksi halde `Number(body.usage_limit)` sonucu. Sonuç sonlu değilse veya 1'den küçükse `null` atanır
+  - `ul` — `Number(body.usage_limit)` sonucu; geçerlilik kontrolünde kullanılır
+  - `errs` — validasyon hatalarını toplayan `string[]` dizi; boş değilse 400 döner
+  - `payload` — veritabanına eklenecek kupon kaydı objesi; `code`, `discount_type`, `discount_value`, `valid_from`, `valid_until`, `is_active`, `usage_limit`, `used_count` (0), `created_by` (userId), `tenant_id` alanlarını içerir
+  - `data` — `supabaseAdmin.from('coupons').insert(payload).select(...).single()` sonucundaki `data`; eklenen kuponun seçili alanlarını içerir
+  - `insErr` — insert işlemi hatası; varsa 400 döner
+  - `_e` — `catch` bloğundaki yakalanan hata; `Error` türünde ise `message`, aksi halde `String(_e)` ile mesaj çıkarılır
+- **Dönüş**: `Response` — duruma göre: 200 (başarılı kupon oluşturma, `data` JSON), 204 (OPTIONS), 400 (validasyon/insert hatası), 401 (yetkisiz), 403 (yasak), 405 (yanlış metod), 500 (sunucu/ortam hatası)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: supabase\functions\admin-create-coupon\index.ts
-  function: supabase\functions\admin-create-coupon\index.ts::admin-create-coupon_handler
+  file: index.ts
+  function: index.ts::admin-create-coupon_handler
 
 ---
 

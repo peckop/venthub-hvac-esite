@@ -100,7 +100,7 @@ Bu modül, pilot görselleri Supabase'e yükleyen bir medya yükleme betiğidir.
 ### [N2_NASIL] AST Pointer: scripts/media/upload-pilot-images.mjs::saveInv
 - **params**: (parametre yok)
 - **ic_degiskenler**: (gövde sağlanmadı; modül üst düzeyinde şu değişkenler mevcut)
-  - `outDir` — (call)拍照输出目录
+  - `outDir` — çekim çıktı dizini
   - `rollback` — (call) geri alma/rollback değeri
   - `supabase` — (call) `createClient(url, key)` ile oluşturulan Supabase istemcisi
   - `manifestPath` — (call) manifest dosyasının tam yolu

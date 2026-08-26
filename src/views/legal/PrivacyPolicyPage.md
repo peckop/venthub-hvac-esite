@@ -2,46 +2,51 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\PrivacyPolicyPage.tsx
-skeleton_hash: 377e9cca9977bcde
+source_path: C:\tmp\wt-supurme\src\views\legal\PrivacyPolicyPage.tsx
+skeleton_hash: fd756394efd70a1a
 entity_hashes:
   func:PrivacyPolicyPage: c82dbca369d2aee7
-  func:t: 4b4dfa7ec1fe2176
-  overview: 9b802c60549e6f19
+  func:t: f826c9f8cb44ae84
+  overview: 280fbf878bf55295
   style_tokens: 06829f9d93bd4397
-generated_at: 2026-06-19T20:51:01Z
+generated_at: 2026-08-25T07:47:51Z
 ---
 
 ## Genel Bakış
-Bu modül, web uygulamasının yasal gereklilikler kapsamında yer alan gizlilik politikası sayfasını temsil eden bir React bileşenidir. Temel amacı, kullanıcıya gizlilik politikasına dair metinsel ve görsel içeriği sunmaktır.
+Bu modül, bir gizlilik politikası sayfasını görüntülemek için kullanılan bir React bileşeni içerir. Bileşen, dil parametresi alarak sayfayı o dilde render eder. Ayrıca, metinleri çevirmek için bir yardımcı fonksiyon sağlar.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni
-Bu grup, gizlilik politikası sayfasının tamamını oluşturan ve tarayıcıda render edilen ana React bileşenini ve ona destek olan bir yardımcı fonksiyonu içerir.
-- PrivacyPolicyPage, t
+### Ana Sayfa Bileşeni
+Gizlilik politikası sayfasının ana yapısını ve içeriğini oluşturur. Dil parametresine göre sayfayı render eder.
+- PrivacyPolicyPage
+
+### Çeviri Yardımcısı
+Verilen anahtar kelimeye göre çevrilmiş metni döndürerek dil desteğini sağlar.
+- t
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, gizlilik politikası sayfasının dil destekli içeriğini sunan bir React bileşenidir.
 
-[Aksiyom 1]: Eğer `lang` parametresi sağlanmazsa, bileşen sayfayı doğru dilde gösteremez ve varsayılan veya eksik dil ile render edilerek hatalı içerik gösterebilir.
+Bu modül, gizlilik politikası sayfasını belirli bir dilde sunmak için `lang` parametresine ve çeviri fonksiyonuna bağımlıdır.
 
-[Aksiyom 2]: Eğer `t` (çeviri) fonksiyonu调用edilmezse veya `t` fonksiyonu geçerli bir çeviri sağlayamazsa, bileşen metin içeriğini doğru şekilde gösteremez ve anahtarı (key) ham olarak ekrana basabilir.
+[Aksiyom 1]: Eğer `lang` parametresi sağlanmazsa, bileşen hangi dili kullanacağını bilemez ve sayfa içeriği gösterilemez.
+
+[Aksiyom 2]: Eğer `t` fonksiyonu tanımlı değilse, çeviri anahtarları çözümlenemez ve sayfada metin içerik görüntülenemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### PrivacyPolicyPage
-**Ne yapar**: Bu fonksiyon, bir React fonksiyonel bileşeni (React.FC) döndürür. Fonksiyonun spesifik işlevi ve içeriği kod içinde açıklanmadığı için yalnızca bir bileşen üretmekle sınırlı olduğu söylenebilir.  
+**Ne yapar**: Kullanıcının seçtiği dile göre gizlilik politikası sayfasını render eden bir React fonksiyonel bileşenidir. Sayfa başlığı, yasal içerik ve sorumluluk reddi beyanını görüntüler; ayrıca yasal içerik henüz hazır değilse kullanıcıyı bilgilendiren bir uyarı mesajı gösterir.
 
-**Nasıl yapar**: Fonksiyon, içinde tanımlı bir React bileşenini oluşturur ve bu bileşeni geri döndürür. İç mantığı ve render edilen JSX yapısı kodda belirtilmediği için detaylandırılamaz.  
+**Nasıl yapar**: Bileşen, `lang` parametresine bağlı olarak bir sözlük nesnesi (`en` veya `tr`) seçer ve bu sözlükten çeviri değerlerini almak için içinde `t` adında bir fonksiyon tanımlar. Sayfa yapısı olarak bir kapsayıcı `div` içinde başlık, koşullu uyarı alanı, dil bazlı içerik bileşeni ve sorumluluk reddi paragrafı yer alır. `isLegalContentReady()` fonksiyonu false döndürüğünde sarı renkli bir uyarı kutusu gösterilir. Ana içerik alanı, `lang` değeri `'en'` ise `PrivacyPolicyContentEn` bileşenini, aksi halde `PrivacyPolicyContentTr` bileşenini render eder.
 
 **Parametreler**:
-- (Parametre yok) — Fonksiyon hiçbir girdi almaz.
+- lang: string — Sayfanın görüntüleneceği dili belirten parametre. `'en'` veya `'tr'` değerlerinden birini alır ve hangi sözlüğün kullanılacağını belirler.
 
-**Dönüş**: React.FC — Fonksiyon, bir React fonksiyonel bileşeni tipinde değer döndürür.
+**Dönüş**: JSX elementi döndüren bir React fonksiyonel bileşeni. Dönen yapı, gizlilik politikası sayfasının tam HTML/JSX yapısını içerir.
 
 ### t
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -54,33 +59,32 @@ Bu modül, gizlilik politikası sayfasının dil destekli içeriğini sunan bir 
 - import: ../../i18n/getDictValue::getDictValue
 - import: ./components/en/PrivacyPolicyContent::PrivacyPolicyContentEn
 - import: ./components/tr/PrivacyPolicyContent::PrivacyPolicyContentTr
+- import: @/config/legal::isLegalContentReady
 - import: react::React
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: views/legal/PrivacyPolicyPage.tsx::PrivacyPolicyPage
-- **params**: `{ lang }` — sayfanın dilini belirleyen string parametresi ('en' veya 'tr')
+### [N1_NASIL] AST Pointer: src/views/legal/PrivacyPolicyPage.tsx::PrivacyPolicyPage
+- **params**: `{lang}` — bileşen prop'u; sayfa dilini belirler
 - **ic_degiskenler**:
-  - `dict` — `lang` değerine göre İngilizce (`en`) veya Türkçe (`tr`) sözlük nesnesini seçer;三元 оператор ile belirlenir
-  - `t` — `getDictValue(dict, key)` çağrısını sarmalayan çeviri fonksiyonu; verilen anahtar ile sözlükten çeviriyi getirir
-- **Dönüş**: JSX bileşeni — `max-w-4xl` genişliğinde merkezlenmiş, başlık (`legal.privacyTitle`), taslak uyarısı (`legal.draftWarning`), dil bazlı içerik (`PrivacyPolicyContentEn` veya `PrivacyPolicyContentTr`) ve feragatname (`legal.disclaimer`) içeren sayfa düzeni
+  - `dict` — `lang === 'en'` koşulu sağlanırsa `en` sözlüğü, sağlanmazsa `tr` sözlüğü atanır; çeviri anahtarlarının çözümlemesinde kullanılır
+  - `t` — `key` parametresi alan arrow function; `getDictValue(dict, key)` çağrısı yaparak sözlükten değer döndürür; JSX içinde `t('legal.privacyTitle')`, `t('legal.draftWarning')`, `t('legal.disclaimer')` çağrılarıyla kullanılır
+- **Dönüş**: JSX elementi — `div` kök elemanı; içinde `h1` başlık, `isLegalContentReady()` false ise uyarı `div`'i, `lang` değerine göre `PrivacyPolicyContentEn` veya `PrivacyPolicyContentTr` bileşeni ve `p` sorumluluk reddi içerir
 
----
-
-### [N2_NASIL] AST Pointer: views/legal/PrivacyPolicyPage.tsx::t
-- **params**: `(key: string)` — sözlükten çevrilecek anahtar kelime
+### [N2_NASIL] AST Pointer: src/views/legal/PrivacyPolicyPage.tsx::t
+- **params**: `key: string` — sözlükte aranacak çeviri anahtarı
 - **ic_degiskenler**: yok
-- **Dönüş**: `getDictValue(dict, key)` çağrısının dönüş değeri — sözlük nesnesindeki karşılık gelen çeviri stringi
+- **Dönüş**: `getDictValue(dict, key)` fonksiyonunun dönüş değeri; `dict` kapsam dışındaki `PrivacyPolicyPage` fonksiyonu içinde tanımlanan sözlük değişkenidir
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\legal\PrivacyPolicyPage.tsx
-  function: src\views\legal\PrivacyPolicyPage.tsx::PrivacyPolicyPage
-  function: src\views\legal\PrivacyPolicyPage.tsx::t
+  file: PrivacyPolicyPage.tsx
+  function: PrivacyPolicyPage.tsx::PrivacyPolicyPage
+  function: PrivacyPolicyPage.tsx::t
 
 ---
 

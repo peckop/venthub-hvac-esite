@@ -2,52 +2,52 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\AdminEmptyState.tsx
-skeleton_hash: 1e2d88f61e876a8e
+source_path: C:\tmp\wt-supurme\src\components\admin\AdminEmptyState.tsx
+skeleton_hash: 50b2a7d404cdb102
 entity_hashes:
-  func:AdminEmptyState: 0a5636f5d0d24f8e
+  func:AdminEmptyState: 5a155dec87c91466
   overview: a8e9e23763cc1b0a
-  style_tokens: 18a94c8091a667ca
-generated_at: 2026-06-19T20:46:38Z
+  style_tokens: 8ca6f8dd6c625d35
+generated_at: 2026-08-25T07:24:16Z
 ---
 
 ## Genel Bakış
-`AdminEmptyState`, yönetim panelinde veri bulunmadığında veya sayfa içeriği boş olduğunda kullanıcıya bilgilendirici bir mesaj sunan bir React bileşenidir. İkon, başlık, açıklama ve opsiyonel aksiyon butonunu bir araya getirerek tutarlı ve yönlendirici bir boş durum (empty state) arayüzü oluşturur. Bileşen, farklı yerleşim ihtiyaçlarına cevap verebilmek için `compact` moduyla daha sade bir görünüm de sunabilir.
+
+AdminEmptyState, admin panelinde içerik bulunmadığında kullanıcıya gösterilen boş durum ekranıdır. İkon, başlık, açıklama ve isteğe bağlı bir aksiyon butonu gibi sunum bileşenlerini bir arada sunan bir arayüz bileşenidir. `compact` prop'u ile kompakt ve geniş olmak üzere iki farklı görünüm arasında geçiş yapabilir.
 
 ## Fonksiyon Grupları
-### Boş Durum Görünümü
-Bu grup, veri olmadığında gösterilecek bilgilendirici arayüzü oluşturur; temel unsurları (ikon, başlık, açıklama ve eylem butonunu) bir araya getirir ve kullanıcıya durumu açıklar.
+
+### Boş Durum Görüntüleme Bileşeni
+
+AdminEmptyState, verilen ikon, başlık, açıklama ve aksiyon bilgilerini alıp kullanıcıya boş durum ekranını render eder. `compact` prop'u aracılığıyla görünüm yoğunluğu kontrol edilir.
+
 - AdminEmptyState
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi (implementation body) verilmemiştir; dolayısıyla çalışma zamanı davranışına ilişkin mimari varsayımlar çıkarılamamıştır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Bilinen yapısal gözlem (fonksiyon imzasından):**
-
-- `icon: Parametre`, bir React bileşeni olarak geçirilmektedir (büyük harfle başlaması nedeniyle).
-
-Ancak bu parametrelerin zorunlu olup olmadığı, hangi durumlarda hata fırlatıldığı veya hangi koşullarda farklı render dalına geçildiği **bilinmiyor** çünkü fonksiyon gövdesi paylaşılmamıştır.
+**Gerekçe:** Fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzası (`AdminEmptyState`) mevcuttur. Aksiyomlar yalnızca fonksiyon gövdesinden üretilebildiğinden, gövde olmadan mimari varsayımda bulunulamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminEmptyState
-**Ne yapar**: Admin panelinde veri bulunamadığında veya boş bir durum gösterilmesi gerektiğinde kullanılan, iki farklı boyut seçeneğine sahip bir React bileşenidir. Kullanıcıya ikonlu, başlıklı ve açıklamalı bir boş durum mesajı sunar, opsiyonel bir eylem butonu içerebilir.
+**Ne yapar**: Admin panelinde veri olmadığında veya boş durum senaryolarında gösterilen bir yer tutucu (placeholder) bileşendir. Kullanıcıya görsel bir ikon, açıklayıcı metin ve opsiyonel bir aksiyon butonu sunarak boş durumu kullanıcı dostu biçimde bildirir. `compact` prop'una bağlı olarak iki farklı boyut ve stil varyasyonu sunar.
 
-**Nasıl yapar**: Fonksiyon, `compact` prop'unun değerine göre iki farklı JSX yapısı döndürür. `compact` true ise daha küçük boyutlarda, sınırlı dolgu alanına ve daha minimal bir görünüme sahip bir div oluşturur. Aksi takdirde, daha geniş bir dolgu alanına, cam efektine (`glass-strong`), fare üzerine gelme efektine sahip, gradyan arka plan ve daha belirgin gölgelendirmeler içeren tam boyutlu bir boş durum bileşeni render eder. Her iki durumda da `icon`, `title` ve `description` prop'ları kullanılarak temel içerik oluşturulur; `action` prop'u sağlanmışsa, belirtilen metin ve tıklama işleviyle bir buton eklenir.
+**Nasıl yapar**: Bileşen, `compact` prop'unun değerine göre koşullu render yapar. `compact` true olduğunda daha küçük, minimal bir görünüm (py-8 px-4 padding, 14x14 ikon kutusu, text-xs başlık) oluşturur. `compact` false veya tanımsız olduğunda daha geniş, vurgulu bir görünüm (py-20 px-6 padding, dashed border, 20x20 ikon kutusu, text-lg başlık) render eder. Normal modda, hover sırasında bir gradyan arka plan efekti (`from-admin-accent-weak to-transparent`) ve ikon üzerinde ölçeklendirme animasyonu (`group-hover:scale-110`) uygulanır. `action` prop'u tanımlıysa, her iki modda da tıklanabilir bir buton gösterilir; buton `action.onClick` olayını tetikler ve `action.label` metnini görüntüler.
 
 **Parametreler**:
-- `icon`: React Bileşeni (Icon tipinde) — Boş durum alanının üst kısmında büyük bir ikon olarak görüntülenecek React bileşenidir. Bileşen `size` ve `strokeWidth` prop'larını desteklemelidir.
-- `title`: string — Boş durumun üst başlığıdır, genellikle büyük harflerle ve kalın font ile görüntülenir.
-- `description`: string — Başlığın altında yer alan açıklayıcı metindir. Kullanıcıya durum hakkında daha fazla bilgi verir.
-- `action`: object (opsiyonel) — Boş durumun altında bir eylem butonu oluşturulmasını sağlar. `onClick` (butona tıklandığında çağrılacak fonksiyon) ve `label` (butonda görüntülenecek metin) özelliklerini içermelidir.
-- `compact`: boolean (opsiyonel) — `true` olduğunda, bileşen daha kompakt ve küçük bir görünümle render edilir. Varsayılan olarak `false` veya tanımsız kabul edilerek tam boyutlu görünüm gösterilir.
+- icon: `Icon` — Bileşen olarak kullanılacak ikon bileşenidir. JSX içinde `<Icon size={...} strokeWidth={1.5}}` şeklinde çağrılır. Compact modda size=24, normal modda size=36 olarak kullanılır.
+- title: `string` — Boş durumun başlık metnidir. Compact modda `text-xs`, normal modda `text-lg` font boyutuyla gösterilir.
+- description: `string` — Boş durumun açıklayıcı alt metnidir. Her iki modda da `text-xs` boyutunda, `text-admin-fg-muted` renginde gösterilir. Compact modda `max-w-200px`, normal modda `max-sm` genişlik sınırı uygulanır.
+- action: `{ onClick: () => void; label: string }` (opsiyonel) — Tanımlı olduğunda bir aksiyon butonu render edilir. `onClick` buton tıklama olayını, `label` buton üzerindeki metni belirler. Tanımsızsa buton gösterilmez.
+- compact: `boolean` (opsiyonel) — true olduğunda bileşen daha küçük ve kompakt bir varyasyonda render edilir. false veya tanımsız olduğunda tam boyutlu, animasyonlu varyasyon kullanılır.
 
-**Dönüş**: JSX.Element — Bileşen, her iki durumda (compact veya normal) da bir React JSX yapısı döndürür ve doğrudan bir React bileşeni olarak kullanılabilir.
+**Dönüş**: JSX elementi döndürür. React fonksiyonel bileşeni olarak çalışır; iki farklı boyut varyasyonundan birini render eder.
 
 ---
 
@@ -71,21 +71,28 @@ Ancak bu parametrelerin zorunlu olup olmadığı, hangi durumlarda hata fırlat�
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/AdminEmptyState.tsx::AdminEmptyState
-- **params**: `{ icon: Icon, title, description, action, compact }` — AdminEmptyStateProps türünde destructured nesne
-  - `icon` — LucideIcon türünde, boş durum ikonu olarak `<Icon size={24|36} strokeWidth={1.5}>` şeklinde kullanılır
-  - `title` — string, boş durum başlığını `<h3>` içinde büyük harflerle gösterir
-  - `description` — string, boş durum açıklamasını `<p>` içinde küçük harflerle gösterir
-  - `action` — opsiyonel nesne, `{ onClick: () => void, label: string }` yapısında; buton olarak render edilir ve `action.onClick` ile tıklama, `action.label` ile buton metni kullanılır
-  - `compact` — boolean, kompakt (`compact=true`) ve normal (`compact=false`) görünüm arasında seçim yapar
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX elementi — `compact` prop'una göre iki farklı düzen döndürür; `true` ise küçük kompakt görünüm, `false` ise daha geniş normal görünüm返回。
+- **params**:
+  - `icon` (destructured olarak `Icon` atanır) — LucideIcon tipinde, ikon bileşeni; JSX'te `<Icon size={...} strokeWidth={...} />` olarak render edilir
+  - `title` — string, başlık metni; `<h3>` etiketi içinde `{title}` olarak render edilir
+  - `description` — string, açıklama metni; `<p>` etiketi içinde `{description}` olarak render edilir
+  - `action` — opsiyonel nesne, buton aksiyonu; `{onClick, label}` alanlarını içerir
+  - `compact` — boolean, kompakt görünüm kontrolü; `true` ise küçük boyutlu layout, `false`/yok ise büyük boyutlu layout döner
+- **ic_degiskenler**:
+  - `compact` — koşul kontrolü; `if (compact)` ile iki farklı JSX layout arasında geçiş yapar
+  - `Icon` — parametre `icon`'un yeniden adlandırılmış hali; compact modda `size={24}`, normal modda `size={36}` ve `strokeWidth={1.5}` ile render edilir
+  - `title` — compact modda `text-xs`, normal modda `text-lg` font boyutuyla `<h3>` içinde gösterilir
+  - `description` — compact modda `max-w-200px`, normal modda `max-sm` genişlik sınırıyla `<p>` içinde gösterilir
+  - `action` — truthy ise buton render edilir; `action.onClick` tıklama handler'ı, `action.label` buton metni olarak kullanılır
+  - `action.onClick` — `<button onClick={action.onClick}>` olarak atanır; tıklama olayını tetikler
+  - `action.label` — `<button>` etiketi içinde `{action.label}` olarak render edilir
+- **Dönüş**: JSX element (React.ReactNode); `compact` true ise küçük boyutlu, değilse büyük boyutlu bir boş durum bileşeni döner
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\admin\AdminEmptyState.tsx
-  function: src\components\admin\AdminEmptyState.tsx::AdminEmptyState
+  file: AdminEmptyState.tsx
+  function: AdminEmptyState.tsx::AdminEmptyState
 
 ---
 
@@ -100,10 +107,10 @@ Ancak bu parametrelerin zorunlu olup olmadığı, hangi durumlarda hata fırlat�
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `shadow-glow-lg`, `shadow-glow-md`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-gradient-to-b`, `bg-white/5`, `border-dashed`, `border-white/10`, `border-white/20`, `from-cyan-400/3`, `hover:bg-cyan-300`, `hover:bg-white/10`, `hover:text-white`, `text-center`, `text-cyan-400`, `text-lg`, `text-slate-300`, `text-slate-400`
-- **Layout:** `absolute`, `flex`, `flex-col`, `from-cyan-400/3`, `h-14`, `h-20`, `items-center`, `justify-center`, `max-w-200px`, `max-w-sm`, `overflow-hidden`, `relative`, `shadow-cyan-400/20`, `shadow-xl`, `w-14`
+- **Renkler:** `bg-admin-accent`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-gradient-to-b`, `border-admin-border`, `border-dashed`, `from-admin-accent-weak`, `hover:bg-admin-accent-hover`, `hover:bg-admin-surface-3`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-accent-fg`, `text-admin-fg`, `text-admin-fg-muted`, `text-center`
+- **Layout:** `absolute`, `flex`, `flex-col`, `from-admin-accent-weak`, `h-14`, `h-20`, `items-center`, `justify-center`, `max-w-200px`, `max-w-sm`, `overflow-hidden`, `relative`, `shadow-admin-sm`, `w-14`, `w-20`
 - **Varyant/Responsive:** `active:`, `group-hover:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `active:scale-95`, `border`, `duration-500`, `duration-700`, `font-black`, `font-bold`, `glass-strong`, `group`, `group-hover:opacity-100`, `group-hover:scale-110`, `hover:-translate-y-0.5`, `inset-0`, `leading-relaxed`, `mb-2`, `mb-3`
+- **Yardımcı Sınıflar:** `active:scale-95`, `border`, `duration-500`, `duration-700`, `font-semibold`, `group`, `group-hover:opacity-100`, `group-hover:scale-110`, `hover:-translate-y-0.5`, `inset-0`, `leading-relaxed`, `mb-2`, `mb-3`, `mb-4`, `mb-6`

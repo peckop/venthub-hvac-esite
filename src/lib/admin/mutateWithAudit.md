@@ -2,57 +2,70 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\mutateWithAudit.ts
-skeleton_hash: 4d7787902789d7fe
+source_path: C:\tmp\wt-supurme\src\lib\admin\mutateWithAudit.ts
+skeleton_hash: 1bbef8d128a791ff
 entity_hashes:
-  func:AdminPermissionError:constructor: f2c82c82a313c617
-  func:mutateWithAudit: 6fd7e78effa72486
+  func:AdminPermissionError:constructor: 6bdb0294b4ca977f
+  func:mutateWithAudit: e6e4bf4f5f88c365
   overview: f4a791bb090e6115
-generated_at: 2026-06-19T20:47:59Z
+generated_at: 2026-08-25T07:27:53Z
 ---
 
 ## Genel Bakış
-Bu modül, admin işlemleri için veritabanı yazma (mutasyon) operasyonlarını sarmalar ve her değişikliği denetim kaydı (audit) ile birlikte gerçekleştirir. Supabase istemcisini alarak yetkilendirme kontrolü yapar, işlemi yürütür ve eğer izin yoksa özel bir hata fırlatır.
+
+Bu modül, veritabanı mutasyon işlemlerini denetim (audit) kaydı eşliğinde gerçekleştiren bir yardımcı fonksiyon ve bu süreçte oluşabilecek yetkilendirme hataları için özel bir hata sınıfı içerir. Supabase istemcisi üzerinden çalışan modül, mutasyon argümanlarını alıp sonuç döndüren genel bir yapı sunar.
 
 ## Fonksiyon Grupları
-### Mutasyon ve Denetim İşlemleri
-Veritabanı yazma işlemlerini denetim bilgileriyle zenginleştirerek yürütür ve sürecin bütünlüğünü sağlar.
-- `mutateWithAudit`
 
-### Hata ve İzin Yönetimi
-Yönetici yetki hatalarını temsil eden özel durum sınıfını tanımlar.
-- `AdminPermissionError` (sınıf)
+### Veritabanı Mutasyon İşlemleri
+Veritabanında değişiklik (mutasyon) gerçekleştirirken denetim kaydı tutulmasını sağlayan ana işlevsellik.
+- mutateWithAudit
+
+### Hata Yönetimi
+Yönetici (admin) yetkilendirme hatalarını temsil eden özel hata sınıfını tanımlar. Sınıf, etkilenen kaynağı belirten bir parametre alır.
+- AdminPermissionError (constructor)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül veritabanı mutation işlemlerini audit (denetim) kaydıyla birlikte yürütür. Aşağıdaki varsayımlar fonksiyon imzalarına dayanarak çıkarılmıştır.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarım yapılabilmektedir. Gövde bilgisi olmadan kesin aksiyom üretilemez.
+
+[Aksiyom 1]: Eğer `supabase` parametresi olarak geçerli bir `SupabaseClient<Database>` nesnesi yoksa, `mutateWithAudit` fonksiyonu çalışamaz.
+
+[Aksiyom 2]: Eğer `args` parametresi olarak `MutateWithAuditArgs<R>` tipinde bir değer yoksa, `mutateWithAudit` fonksiyonu çalışamaz.
+
+[Aksiyom 3]: Eğer `resource` parametresi verilmezse, `AdminPermissionError` örneği oluşturulamaz.
+
+**Not:** Fonksiyon gövdeleri (iç implementasyon) sağlanmadığından, audit (denetim) işleminin nasıl yapıldığı, hangi koşullarda `AdminPermissionError` fırlatıldığı, hata yönetimi ve transaction davranışları gibi kritik mimari detaylar bilinmemektedir. Daha kesin aksiyomlar için fonksiyon gövdesinin incelenmesi gerekmektedir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### mutateWithAudit
-**Ne yapar**: Admin arayüzünden yapılan tüm yazma操作larının (oluşturma, güncelleme, silme) merkeziyetçi olarak geçmek zorunda olduğu asenkron fonksiyondur. Bu fonksiyon, yetkilendirme doğrulaması, iş mantığının yürütülmesi ve denetim kaydı tutma süreçlerini tek bir kapıda (single gate) orkestra ederek tutarlılık ve güvenlik sağlar.
+**Ne yapar**: Admin yazma işlemleri için yetki kontrolü ve audit loglama sağlayan merkezi fonksiyondur. K3 (yetki) ve K4 (audit) katmanları için tek kapı işlevi görür; tüm admin yazma yollarının bu fonksiyondan geçmesi gereklidir.
 
-**Nasıl yapar**: Fonksiyon, öncelikle `canWrite` argümanı aracılığıyla bir RBAC kontrolü yapar; eğer yazma izni yoksa `AdminPermissionError` fırlatır. İzin varsa, `args.fn()` callback'ini çalıştırarak asıl veritabanı işlemini (örn: insert, update) yürütür. İşlem başarıyla tamamlandıktan sonra, `auditedByEdge` flag'i `true` değilse, `logAdminAction` fonksiyonunu çağırarak bu eylemi denetim günlüğüne kaydeder. Denetim günlüğü yazma işlemi hata verse bile bu, ana işlemin sonucunu **engellemez**; hata sadece `console.error`'a yazılır ve "en iyi çabayı göster" (best-effort) prensibiyle hareket edilir.
-
-**Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemleri için kullanılan Supabase istemcisi nesnesi. `Database` generic parametresi ile şema tipi güvence altına alınmıştır.
-- `args`: `MutateWithAuditArgs<R>` — Fonksiyonun tüm parametrelerini ve iş mantığını içeren nesne. Bu nesne içinde `canWrite` (izin bayrağı), `fn` (gerçekleşecek veritabanı işlemini döndüren fonksiyon), `auditedByEdge` (denetimin başka bir katmanda yapılıp yapılmadığını belirten flag), `resource` (işlem yapılan kaynak tablo adı), `rowPk` (satır birincil anahtarı), `action` (eylem türü), `before` (işlem öncesi veri), `after` (işlem sonrası veri) ve `comment` (yorum) gibi bilgiler bulunur. Generic `R` tipi, `fn()` fonksiyonunun dönüş tipini temsil eder.
-
-**Dönüş**: `Promise<R>` — `args.fn()` fonksiyonunun başarıyla çalışması durumunda döndürdüğü değeri `Promise` içinde sararak geri döner.
-
-### AdminPermissionError.constructor
-**Ne yapar**: `AdminPermissionError` özel hata sınıfının kurucu (constructor) metodudur. Görevi, bir yetkilendirme hatası oluştuğunda anlamlı ve standart bir hata nesnesi oluşturmaktır.
-
-**Nasıl yapar**: JavaScript'in `Error` sınıfını `super()` çağrısıyla genişleterek (extend ederek) temel hata yapısını kurar. Kendisine parametre olarak gelen `resource` dizgesini, kullanıcıya anlamlı bir hata mesajı oluşturmak için bir dizeye gömer. Ek olarak, hata nesnesinin `name` özelliğini 'AdminPermissionError' olarak ayarlar, böylece hata yakalandığında hata türü kolayca tanımlanabilir.
+**Nasıl yapar**: Fonksiyon üç aşamalı bir süreç izler. İlk olarak `args.canWrite` değeri kontrol edilir; eğer `false` ise `AdminPermissionError` fırlatılarak işlem durdurulur. Yetki kontrolü geçildikten sonra `args.fn()` çalıştırılarak asıl yazma işlemi gerçekleştirilir. Son olarak `args.auditedByEdge` değeri `false` ise audit loglama yapılır; bu aşamada `args.afterFrom` fonksiyonu varsa `result` parametresiyle çağrılarak `after` değeri elde edilir, başarısız olursa `args.after` değerine geri dönülür ve hata `console.error`'a yazılır. Audit loglama işlemi `logAdminAction` fonksiyonu aracılığıyla gerçekleştirilir ve bu işlemde oluşan hatalar `fn()` sonucunu **bloklamaz**; yalnızca `console.error`'a yazılır (best-effort yaklaşımı). Docstring'e göre asıl yetki kapısı sunucudaki **RLS**'tir.
 
 **Parametreler**:
-- `resource`: `string` — Yazma yetkisi olmayan kaydın (örn: tablonun) adı. Bu bilgi, hata mesajında kullanıcıya hangi kaynakta yetki problemi olduğu açıkça belirtilmesini sağlar.
+- supabase: SupabaseClient<Database> — Supabase veritabanı istemcisi
+- args: MutateWithAuditArgs<R> — İşlem parametrelerini içeren nesne; şu alanları içerir:
+  - canWrite: boolean — Yazma yetkisi olup olmadığını belirten değer
+  - resource: string — Kaynak adı (hata mesajında kullanılır)
+  - fn: () => Promise<R> — Gerçekleştirilecek asenkron yazma fonksiyonu
+  - auditedByEdge: boolean — Edge tarafından audit loglanıp loglanmayacağını belirten değer
+  - afterFrom: ((result: R) => unknown) | undefined — Sonuçtan `after` değerini çıkaran fonksiyon (opsiyonel)
+  - after: unknown — `afterFrom` yoksa veya başarısız olursa kullanılacak değer
+  - rowPk: string — Satır birincil anahtarı
+  - action: string — Gerçekleştirilen işlem türü
+  - before: unknown — İşlem öncesi durum
+  - comment: string | undefined — Opsiyonel yorum
 
-**Dönüş**: Yok (yapısal bir sınıftır, doğrudan değer döndürmez).
+**Dönüş**: Promise<R> — `args.fn()` fonksiyonunun dönüş değeri
+
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -72,6 +85,7 @@ Bu modül veritabanı mutation işlemlerini audit (denetim) kaydıyla birlikte y
 - `rowPk: string | null`
 - `before: Record<string, unknown> | null`
 - `after: Record<string, unknown> | null`
+- `afterFrom?: (result: R) => Record<string, unknown> | null`
 - `comment?: string`
 - `auditedByEdge?: boolean`
 - `fn: () => Promise<R>`
@@ -91,18 +105,36 @@ type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/admin/mutateWithAudit.ts::AdminPermissionError.constructor
-- **params**: `(resource: string)` — hata ile ilgili kaynağın adı
+- **params**: `resource: string`
 - **ic_degiskenler**:
-  - *(yok — sadece super çağrısı ve this.name ataması var)*
-- **Dönüş**: yok *(constructor — instance döndürür)*
+  - `resource` — Hata mesajında kullanılacak kaynak adı. `super` çağrısına `'${resource}'` olarak iletilir.
+- **Dönüş**: yok
+
+### [N2_NASIL] AST Pointer: src/lib/admin/mutateWithAudit.ts::mutateWithAudit
+- **params**: `supabase: SupabaseClient<Database>`, `args: MutateWithAuditArgs<R>`
+- **ic_degiskenler**:
+  - `args.canWrite` — Yazma izni olup olmadığını kontrol eden boolean değer. `false` ise `AdminPermissionError` fırlatılır.
+  - `args.resource` — Hata fırlatma ve denetim günlüğü için kullanılan kaynak adı.
+  - `args.fn` — Çağrılacak ve sonucu döndürülecek mutasyon fonksiyonu.
+  - `args.auditedByEdge` — Denetim günlüğünün kenar (edge) tarafından yazılıp yazılmadığını gösteren boolean. `true` ise denetim günlüğü atlanır.
+  - `args.after` — Denetim günlüğü için mutasyon sonrası durumu temsil eden veri.
+  - `args.afterFrom` — Mutasyon sonucundan (`result`) denetim günlüğü için sonrası durumu çıkaran fonksiyon. Varsa kullanılır, başarısız olursa `args.after` kullanılır.
+  - `args.rowPk` — Denetim günlüğü için satır birincil anahtarı.
+  - `args.action` — Denetim günlüğü için gerçekleştirilen eylem.
+  - `args.before` — Denetim günlüğü için mutasyon öncesi durumu temsil eden veri.
+  - `args.comment` — Denetim günlüğü için yorum.
+  - `result` — `args.fn()` çağrısının döndürdüğü mutasyon sonucu.
+  - `after` — Denetim günlüğüne yazılacak nihai sonrası durum verisi. Önce `args.afterFrom` ile hesaplanır, başarısız olursa `args.after` kullanılır.
+  - `e` — `args.afterFrom` veya `logAdminAction` çağrılarındaki hataları yakalamak için kullanılan hata nesnesi.
+- **Dönüş**: `Promise<R>` — Mutasyon fonksiyonunun (`args.fn`) döndürdüğü sonuç.
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\lib\admin\mutateWithAudit.ts
-  function: src\lib\admin\mutateWithAudit.ts::mutateWithAudit
-  class: src\lib\admin\mutateWithAudit.ts::AdminPermissionError
+  file: mutateWithAudit.ts
+  function: mutateWithAudit.ts::mutateWithAudit
+  class: mutateWithAudit.ts::AdminPermissionError
 
 ---
 

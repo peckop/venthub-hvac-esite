@@ -2,70 +2,61 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminPricingSettingsPage.tsx
-skeleton_hash: e1e5c3477ef449b0
+source_path: C:\tmp\wt-supurme\src\views\admin\AdminPricingSettingsPage.tsx
+skeleton_hash: 4d67079e27e00c17
 entity_hashes:
   func:AdminPricingSettingsPage: 7b17b7472ba422a3
   func:isPricingCurrencyArray: f3e407c6f7c7c97c
   func:openModal: 56d5f744f446dcc1
   overview: 4724b5b6bdd27e03
-  style_tokens: feff70234dfec725
-generated_at: 2026-08-14T09:18:33Z
+  style_tokens: 00041ff73bf3ebb3
+generated_at: 2026-08-25T07:30:06Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelinde fiyatlandırma ayarlarının görüntülendiği ve düzenlendiği bir React sayfa bileşenidir. Sayfa, fiyatlandırma verilerinin formatını doğrulayan yardımcı fonksiyonlar ve modal pencere açma gibi etkileşim işlevleri içerir.
+Bu modül, yönetici panelindeki fiyatlandırma ayarlarını görüntülemek ve düzenlemek için kullanılan bir sayfa bileşenidir. Para birimi verilerinin doğrulanması ve kullanıcı etkileşimi için modal açılması gibi temel işlevleri içerir.
 
 ## Fonksiyon Grupları
-### Yardımcı Doğrulama Fonksiyonları
-Veri doğrulama ve tip kontrolü için kullanılan pure fonksiyonları barındırır.
+
+### Tip Doğrulama
+Verilen değerin geçerli bir fiyatlandırma para birimi dizisi olup olmadığını kontrol eden yardımcı fonksiyonu içerir. Bu fonksiyon, veri yükleme veya kullanıcı girdisi sırasında veri bütünlüğünü sağlamak amacıyla kullanılır.
 - isPricingCurrencyArray
 
-### Ana Sayfa Bileşeni
-Fiyatlandırma ayarlarının ana arayüzünü ve mantığını yöneten, state ve effect'leri barındıran React bileşenidir.
-- AdminPricingSettingsPage
-
-### Kullanıcı Etkileşim İşlevleri
-Sayfadaki belirli kullanıcı eylemlerini (örn: modal açma) tetikleyen, genellikle olay işleyicileri içinde kullanılan fonksiyonlardır.
-- openModal
+### Bileşen ve Etkileşim
+Ana sayfa bileşenini ve kullanıcı arabirimi etkileşimlerini yönetir. Sayfa bileşeni, fiyatlandırma ayarlarını görüntülerken; modal açma fonksiyonu, düzenleme veya detay işlemleri için kullanıcıya bir pencere sunar.
+- AdminPricingSettingsPage, openModal
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için yalnızca fonksiyon imzaları mevcut olup, gövde implementasyonu verilmemiştir. Aşağıdaki varsayımlar imzalar ve modül yapısından çıkarılabilecek en düşük seviyeli çıkarımlardır:
-
-[Aksiyom 1]: Eğer `value` parametresi `unknown` tipinde verilmezse veya `isPricingCurrencyArray` çağrılmazsa, pricing currency verilerinin tipi doğrulanamaz ve geçersiz veri UI'a taşınabilir.
-
-[Aksiyom 2]: Eğer `AdminPricingSettingsPage` bir React fonksiyonel bileşeni (FC) olarak çalışmıyorsa, pricing ayarları sayfası render edilemez.
-
-[Aksiyom 3]: Eğer `openModal()` modül içinde erişilebilir bir modal state/signal'ı manipüle etmiyorsa, modal açılamaz veya beklenen UI bileşeni gösterilmez.
-
-[Aksiyom 4]: `isPricingCurrencyArray` fonksiyonu bir **type guard** olarak imzalanmıştır; eğer bu fonksiyon `unknown` input için doğru `boolean` sonucunu döndürmüyorsa, TypeScript runtime'da tip güvenliği sağlanamaz.
-
----
-
-> **Not:** Fonksiyon gövdeleri (implementation bodies) verilmediği için, dependenci'ler (state management, API çağrıları, prop'lar, context kullanımı vb.) hakkında kesin çıkarım yapılamamıştır. Daha detaylı aksiyonlar için modül kaynak kodu gereklidir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### isPricingCurrencyArray
-**Ne yapar**: Bu fonksiyon, verilen bir değerin pricing currency (fiyatlandırma para birimi) nesneleri dizisi olup olmadığını doğrulayan bir tip koruma (type guard) fonksiyonudur. TypeScript ortamında运行时 tip güvenliğini sağlamak için kullanılır.
-
-**Nasıl yapar**: Bilinmeyen (unknown) tipteki girdiyi alır ve bu değerin pricing currency objeleri içeren bir dizi olup olmadığını kontrol eder. Bu tür fonksiyonlar genellikle Array.isArray() kontrolü ile birlikte dizi elemanlarının belirli bir şemaya uyup uymadığını doğrulayarak çalışır. TypeScript'te `value is PricingCurrency[]` şeklinde bir return type annotation kullanarak tip daraltma (type narrowing) sağlar.
-
+**Ne yapar**: Verilen değerin fiyatlandırma para birimi dizisi olup olmadığını kontrol eden bir doğrulama fonksiyonudur. Fonksiyon adından, bir type guard (tip koruyucu) işlevi gördüğü anlaşılmaktadır.
+**Nasıl yapar**: Kaynak kodda docstring bulunmadığından iç mantığı bilinmiyor. `unknown` tipinde bir değer alarak, bu değerin beklenen fiyatlandırma para birimi yapısına uygun olup olmadığını denetlediği düşünülmektedir; ancak kesin doğrulama kriterleri kaynakta belirtilmemiştir.
 **Parametreler**:
-- value: unknown — Kontrol edilecek değer. Herhangi bir tipte olabilir, bu yüzden `unknown` olarak belirtilmiştir.
-
-**Dönüş**: `value is PricingCurrency[]` — boolean döndürür ancak TypeScript tip sisteminde return type olarak kullanıldığında parametrenin `PricingCurrency[]` tipinde olduğunu garanti altına alır.
+- value: unknown — Doğrulanacak değer. Herhangi bir tipte olabilir; fonksiyon bu değerin geçerli bir fiyatlandırma para birimi dizisi olup olmadığını sınar.
+**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir. Bilinmiyor.
 
 ### AdminPricingSettingsPage
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Admin panelindeki fiyatlandırma ayarları sayfasını oluşturan bir React bileşenidir. Dosya yolu (`src/views/admin/AdminPricingSettingsPage.tsx`) bu bileşenin admin görünüm katmanında yer aldığını göstermektedir.
+**Nasıl yapar**: Kaynak kodda docstring bulunmadığından bileşenin iç yapısı ve hangi alt bileşenleri, durum yönetimini veya yan etkileri kullandığı bilinmiyor. `React.FC` tipinde bir fonksiyonel bileşen olarak tanımlanmıştır; bu, bir React elementi döndüren fonksiyonel bileşen anlamına gelir.
+**Parametreler**:
+- (Parametre almıyor) — Fonksiyon tanımında herhangi bir parametre belirtilmemiştir.
+**Dönüş**: `React.FC` — React fonksiyonel bileşeni. JSX elementi döndürür.
 
 ### openModal
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Fiyatlandırma ayarları sayfasında bir modal (açılır pencere/diyalog) açma işlemini gerçekleştiren fonksiyondur. Fonksiyon adı, kullanıcı etkileşimiyle tetiklenen bir modal gösterme eylemini ifade eder.
+**Nasıl yapar**: Kaynak kodda docstring bulunmadığından hangi modal'ı açtığı, modal'ın içeriğinin ne olduğu ve nasıl bir durum değişikliği tetiklediği bilinmiyor. `AdminPricingSettingsPage` bileşeni içinde tanımlanmış bir yardımcı fonksiyon olduğu anlaşılmaktadır.
+**Parametreler**:
+- (Parametre almıyor) — Fonksiyon tanımında herhangi bir parametre belirtilmemiştir.
+**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir. Bilinmiyor.
 
 ---
 
@@ -85,43 +76,47 @@ Bu modül için yalnızca fonksiyon imzaları mevcut olup, gövde implementasyon
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/admin/AdminPricingSettingsPage.tsx`::isPricingCurrencyArray
-- **params**: `(value: unknown)`
-- **ic_degiskenler**:
-  - `value` — Fonksiyona geçirilen argüman, `PricingSettingsValues['enabled_currencies']` tipine ait olup olmadığının kontrol edildiği ham veri
-  - `v` — `value.every()` iterator callback parametresi; dizi elemanlarını temsil eder, `'TRY'`, `'EUR'` veya `'USD'` olup olmadığı kontrol edilir
-- **Dönüş**: `value is PricingSettingsValues['enabled_currencies']` — TypeScript type guard; argümanın geçerli bir pricing currency dizisi olup olmadığını boolean olarak döner
+### [N1_NASIL] AST Pointer: src/views/admin/AdminPricingSettingsPage.tsx::isPricingCurrencyArray
+- **params**: `value: unknown`
+- **ic_degiskenler**: (yok — doğrudan parametre üzerinde işlem yapılır)
+- **Dönüş**: `value is PricingSettingsValues['enabled_currencies']` — TypeScript type guard; `value` dizisi `PricingSettingsValues` tipindeki `enabled_currencies` alanına uygunsa `true` döner. Kontrol: `Array.isArray(value)` ve `value.length > 0` ve her eleman `'TRY'` veya `'EUR'` veya `'USD'` olmalı.
 
 ---
 
-### [N2_NASIL] AST Pointer: `src/views/admin/AdminPricingSettingsPage.tsx`::AdminPricingSettingsPage
-- **params**: (parametre yok — React functional component)
+### [N2_NASIL] AST Pointer: src/views/admin/AdminPricingSettingsPage.tsx::AdminPricingSettingsPage
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; tüm UI metinleri (`t('admin.titles.pricing')`, `t('admin.common.edit')` vb.) bu fonksiyonla render edilir
-  - `canWrite` — `useRole()` hook'undan destructure edilen yetki kontrol fonksiyonu; belirli modüller için yazma izni sorgulanır
-  - `hasWriteAccess` — `canWrite('pricing')` çağrısının boolean sonucu; modal açma butonunun `disabled` durumunu belirler
-  - `loading` — `useState(true)` ile oluşturulan state; Supabase veri yükleme sırasında `true`, tamamlandığında `false` olur; skeleton gösterimini kontrol eder
-  - `setLoading` — `loading` state setter'ı; `fetchSettings` içinde `true`/`false` olarak ayarlanır
-  - `error` — `useState<string | null>(null)` ile oluşturulan state; fetch sırasında oluşan hata mesajını tutar, hata banner'ında render edilir
-  - `setError` — `error` state setter'ı; `fetchSettings` içinde hata oluştuğunda mesaj yazılır, sıfırlandığında `null` olur
-  - `values` — `useState<PricingSettingsValues | null>(null)` ile oluşturulan state; `site_settings` tablosundan çekilen fiyatlandırma ayarları (base_currency, enabled_currencies, default_vat_rate_pct vb.); JSX'te `values?.base_currency`, `values?.enabled_currencies`, `values?.default_vat_rate_pct`, `values?.default_price_is_vat_inclusive`, `values?.default_round_to`, `values?.default_charm_ending`, `values?.display_spread_pct` olarak okunur
-  - `setValues` — `values` state setter'ı; `fetchSettings` içinde supabase yanıtından dönüştürülen değerler yazılır
-  - `modalOpen` — `useState(false)` ile oluşturulan state; `PricingSettingsFormModal`'in açık/kapalı durumunu kontrol eder; JSX'te `{modalOpen && (<PricingSettingsFormModal open={modalOpen} .../>)}` koşulunda kullanılır
-  - `setModalOpen` — `modalOpen` state setter'ı; `openModal` callback'inde `true` yapılır, `PricingSettingsFormModal`'in `onOpenChange` prop'una verilir
-  - `fetchSettings` — `useCallback(async () => {...}, [])` ile tanımlanan memoized async fonksiyon; `supabase.from('site_settings').select('key, value').eq('key', 'pricing').maybeSingle()` sorgusuyla veriyi çeker, `data?.value` yanıtını `raw` değişkenine (`Partial<PricingSettingsValues>`) cast eder, `raw.enabled_currencies`'i `isPricingCurrencyArray` ile doğrular, `raw.default_vat_rate_pct`, `raw.default_price_is_vat_inclusive`, `raw.default_round_to`, `raw.default_charm_ending`, `raw.display_spread_pct` alanlarını tip kontrolü ile `DEFAULT_PRICING_SETTINGS` fallback'leriyle birlikte `setValues`'e yazar; `fetchError` fırlatılır, yakalanan `err` `console.error` ile loglanır ve `setError`'e yazılır; finally bloğunda `setLoading(false)` çağrılır
-  - `openModal` — Arrow function callback; `setModalOpen(true)` çağrısıyla modal'ı açar; JSX'te butonun `onClick` handler'ına bağlanır
-  - `data` — `supabase` sorgusundan dönen `{ data, error: fetchError }` destructured yanıtı; `data?.value` erişimiyle ham pricing ayarları alınır
-  - `fetchError` — `supabase` sorgusundan dönen hata nesnesi; `if (fetchError) throw fetchError` ile fırlatılır
-  - `raw` — `data?.value || {}` ifadesinin `Partial<PricingSettingsValues>` tipine cast edilmiş hali; `enabled_currencies`, `default_vat_rate_pct`, `default_price_is_vat_inclusive`, `default_round_to`, `default_charm_ending`, `display_spread_pct` alanları okunur
-  - `err` — `catch` bloğu yakalama parametresi (`unknown` tipinde); `instanceof Error` kontrolü ile `err.message` veya `String(err)` olarak `setError`'e yazılır
-- **Dönüş**: JSX (React.ReactNode) — `loading` true iken skeleton grid, false iken pricing ayarları kartı + `CurrencyRatesCard` + `PricingSettingsFormModal` render eden React bileşen JSX'i döner; `error` durumunda rose renkli hata banner'ı eklenir
+  - `t` — `useI18n()` kancasından gelen çeviri fonksiyonu; UI metinlerini yerelleştirmek için kullanılır
+  - `canWrite` — `useRole()` kancasından gelen yetki kontrol fonksiyonu; belirli bir modül için yazma izni olup olmadığını döner
+  - `hasWriteAccess` — `canWrite('pricing')` çağrısının sonucu; fiyatlandırma ayarlarını düzenleme butonunun `disabled` durumunu belirler
+  - `loading` — `useState(true)` ile tanımlı durum; veri yükleniyor mu bilgisini tutar, `true` iken iskelet (skeleton) ekranı gösterilir
+  - `setLoading` — `loading` durumunu güncelleyen setter fonksiyonu
+  - `error` — `useState<string | null>(null)` ile tanımlı durum; yükleme sırasında oluşan hata mesajını tutar, `null` ise hata yok
+  - `setError` — `error` durumunu güncelleyen setter fonksiyonu
+  - `values` — `useState<PricingSettingsValues | null>(null)` ile tanımlı durum; Supabase'den çekilen fiyatlandırma ayarlarını tutar
+  - `setValues` — `values` durumunu güncelleyen setter fonksiyonu
+  - `modalOpen` — `useState(false)` ile tanımlı durum; düzenleme modalının açık/kapalı bilgisini tutar
+  - `setModalOpen` — `modalOpen` durumunu güncelleyen setter fonksiyonu
+  - `fetchSettings` — `useCallback` ile sarılı async fonksiyon; Supabase'den `site_settings` tablosunda `key='pricing'` olan kaydı çeker, `data?.value` alanını `PricingSettingsValues` tipine dönüştürerek `setValues` ile state'e yazar. Hata durumunda `setError` ile hata mesajını kaydeder. `finally` bloğunda `setLoading(false)` çağırır. Bağımlılık dizisi boş `[]` olduğundan yalnızca bir kez oluşur.
+  - `data` — Supabase sorgusundan dönen veri; `data?.value` alanı `Partial<PricingSettingsValues>` tipinde fiyatlandırma ayarlarını içerir
+  - `fetchError` — Supabase sorgusundan dönen hata nesnesi; varsa `throw` ile yakalanır
+  - `raw` — `data?.value || {}` ifadesinin `Partial<PricingSettingsValues>` tipine cast edilmiş hali; ayarların ham halini temsil eder
+  - `raw.enabled_currencies` — ham verideki etkin para birimleri dizisi; `isPricingCurrencyArray` ile doğrulanır, geçersizse `DEFAULT_PRICING_SETTINGS.enabled_currencies` kullanılır
+  - `raw.default_vat_rate_pct` — ham verideki varsayılan KDV oranı; `typeof` ile `number` kontrolü yapılır, geçersizse `DEFAULT_PRICING_SETTINGS.default_vat_rate_pct` kullanılır
+  - `raw.default_price_is_vat_inclusive` — ham verideki KDV dahil fiyat bayrağı; `!!` ile boolean'a dönüştürülür
+  - `raw.default_round_to` — ham verideki varsayılan yuvarlama değeri; `typeof` ile `number` kontrolü yapılır, geçersizse `DEFAULT_PRICING_SETTINGS.default_round_to` kullanılır
+  - `raw.default_charm_ending` — ham verideki cazip fiyat bitiş değeri; `typeof` ile `number` kontrolü yapılır, geçersizse `null` atanır
+  - `raw.display_spread_pct` — ham verideki görüntüleme spread yüzdesi; `typeof` ile `number` kontrolü yapılır, geçersizse `DEFAULT_PRICING_SETTINGS.display_spread_pct` kullanılır
+  - `err` — `catch` bloğundaki hata; `instanceof Error` kontrolü ile `err.message` veya `String(err)` olarak `setError`'ye aktarılır, ayrıca `console.error` ile loglanır
+  - `openModal` — `setModalOpen(true)` çağrısı yapan fonksiyon; düzenleme butonunun `onClick` handler'ı olarak kullanılır
+- **Dönüş**: `React.FC` — loading durumunda iskelet ekranı, aksi halde fiyatlandırma ayarlarını gösteren tam sayfa JSX döner. Sayfa içinde `CurrencyRatesCard` bileşeni ve `modalOpen` true olduğunda `PricingSettingsFormModal` bileşeni render edilir.
 
 ---
 
-### [N3_NASIL] AST Pointer: `src/views/admin/AdminPricingSettingsPage.tsx`::openModal
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — doğrudan `setModalOpen(true)` çağrısı yapar)
-- **Dönüş**: `void` — yan etki olarak `modalOpen` state'ini `true` yapar ve modal'ın açılmasını tetikler
+### [N3_NASIL] AST Pointer: src/views/admin/AdminPricingSettingsPage.tsx::openModal
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — `setModalOpen(true)` çağırarak `modalOpen` durumunu `true` yapar; yan etki olarak modal açılmasını tetikler.
 
 ---
 
@@ -137,10 +132,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: src\views\admin\AdminPricingSettingsPage.tsx
-  function: src\views\admin\AdminPricingSettingsPage.tsx::isPricingCurrencyArray
-  function: src\views\admin\AdminPricingSettingsPage.tsx::AdminPricingSettingsPage
-  function: src\views\admin\AdminPricingSettingsPage.tsx::openModal
+  file: AdminPricingSettingsPage.tsx
+  function: AdminPricingSettingsPage.tsx::isPricingCurrencyArray
+  function: AdminPricingSettingsPage.tsx::AdminPricingSettingsPage
+  function: AdminPricingSettingsPage.tsx::openModal
 
 ---
 
@@ -159,7 +154,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400/10`, `bg-cyan-500/5`, `bg-rose-500/10`, `border-b`, `border-cyan-400/20`, `border-rose-500/20`, `border-t`, `border-white/5`, `group-hover:bg-cyan-500/10`, `hover:bg-cyan-400`, `hover:text-slate-950`, `text-cyan-400`, `text-lg`, `text-rose-500`, `text-slate-300`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger-weak`, `border-admin-accent/30`, `border-admin-border`, `border-admin-danger/30`, `border-b`, `border-t`, `hover:bg-admin-accent`, `hover:text-admin-fg-subtle`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-lg`, `text-sm`
 - **Layout:** `block`, `flex`, `flex-col`, `gap-3`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `justify-between`, `lg:grid-cols-2`, `lg:p-10`, `md:flex-row`, `md:items-end`
-- **Varyant/Responsive:** `disabled:`, `group-hover:`, `hover:`, `lg:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `${adminBlurBlobClass`, `${adminCardClass`, `animate-in`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-300`, `duration-700`, `fade-in`, `font-black`, `font-bold`, `font-semibold`, `group`, `pb-20`, `pb-4`
+- **Varyant/Responsive:** `disabled:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${adminCardClass`, `animate-in`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-300`, `duration-700`, `fade-in`, `font-bold`, `font-semibold`, `group`, `pb-20`, `pb-4`, `pt-6`, `py-3`

@@ -2,79 +2,75 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\scripts\setup_webhooks.js
-skeleton_hash: 812a0c37369b7968
+source_path: C:\tmp\wt-supurme\scripts\setup_webhooks.js
+skeleton_hash: c5d545235573b629
 entity_hashes:
-  func:main: 9f0d7b3b1ba5bbd7
+  func:main: 21d8c4d454a4f668
   func:parseEnv: 3a18851b9f2b7450
   func:updateEnvFile: 2beb941c71e8f6b1
-  overview: 7d7977df6e7416bc
-generated_at: 2026-05-30T21:53:04Z
+  overview: 6404ba9472a7c2bb
+generated_at: 2026-08-25T07:23:07Z
 ---
 
 ## Genel Bakış
-Bu modül, webhooks kurulumu için gerekli ortam değişkenlerini .env dosyasından okuma ve güncelleme işlemlerini yönetir. Temel olarak dosya tabanlı yapılandırma yönetimini ve kurulum akışını koordine eder.
+Bu modül, webhook kurulumu sürecinde ortam yapılandırma dosyasını (.env) yönetmekle sorumludur. Ortam dosyasını okuyup mevcut değerleri ayrıştırır ve webhook ile ilgili anahtar-değer çiftlerini dosyaya ekler ya da günceller.
 
 ## Fonksiyon Grupları
-### Ortam Dosyası İşlemleri
-Bu grup, .env dosyasının içeriğini okuma ve belirli anahtarları güncelleme gibi düşük seviyeli dosya sistemi etkileşimlerinden sorumludur.
+
+### Ortam Dosyası Yönetimi
+.env dosyasını okuyarak mevcut ortam değişkenlerini ayrıştırır ve dosyadaki belirli bir anahtarın değerini güncelleme işlemini gerçekleştirir.
 - parseEnv, updateEnvFile
 
-### Ana Akış Koordinasyonu
-Bu grup, webhook kurulumunun tüm adımlarını sıraya koyarak ve gerekli ortam değişkenlerinin mevcudiyetini kontrol ederek procesi yönetir.
+### Ana İş Akışı
+Modülün asenkron ana iş akışını yönetir; ortam dosyası okuma ve güncelleme gibi işlemleri yürütür.
 - main
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül bir .env dosyasını okuyarak ve güncelleyerek webhook kurulumlarını yönetir. Aksiyonlar, yalnızca fonksiyon imzalarından çıkarılabilen minimal gereksinimleri yansıtır.
 
-[Aksiyom 1]: Eğer `parseEnv(filePath)` çağrıldığında `filePath` parametresi bir `string` tipinde değilse,fonksiyon beklenmeyen bir davranış gösterebilir veya hata fırlatabilir.
+Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çıkarılabilecek sınırlı aksiyomlar belirlenebilir.
 
-[Aksiyom 2]: Eğer `updateEnvFile(filePath, key, value)` çağrıldığında `key` parametresi bir `string` tipinde değilse, dosya içindeki eşleşme araması başarısız olur veya veri bozulması oluşur.
+[Aksiyom 1]: Eğer `parseEnv` fonksiyonuna verilen `filePath` dosyası mevcut değilse, fonksiyonun davranışı bilinmiyor (gövde verilmemiş).
 
-[Aksiyom 3]: Eğer `updateEnvFile(filePath, key, value)` çağrıldığında `value` parametresi bir `string` tipinde değilse, dosyaya yazılan değer beklenmeyen formatta olur.
+[Aksiyom 2]: Eğer `updateEnvFile` fonksiyonuna verilen `filePath` dosyası yazılabilir değilse, fonksiyonun davranışı bilinmiyor (gövde verilmemiş).
 
-[Aksiyom 4]: Eğer `main()` fonksiyonu çalıştırıldığında modülün çalışması için gerekli dış bağımlılıklar (örn: `pg` sabiti) erişilebilir durumda değilse, ana iş akışı tamamlanamaz.
+[Aksiyom 3]: Eğer `pg` sabiti tanımlı değilse, bu sabiti kullanan kod parçaları çalışamaz.
 
-[Aksiyom 5]: Eğer `filePath` olarak belirtilen dosya mevcut değilse veya okunabilir/yazılabilir izinlere sahip değilse, `parseEnv` veya `updateEnvFile` fonksiyonları düzgün çalışamaz.
+[Aksiyom 4]: Eğer `main` fonksiyonu bir `async` fonksiyon olarak çağrıldığında `await` ile beklenmezse, Promise çözümlenmeden devam edilir.
+
+---
+
+**Not:** Fonksiyon gövdeleri sağlanmadığı için, bu fonksiyonların hangi hata durumlarını ele aldığı, hangi dosya formatını beklediği, `pg` sabitinin nasıl kullanıldığı ve `main` fonksiyonunun akışı hakkında kesin aksiyom üretilememektedir. Daha detaylı mimari varsayımlar için fonksiyon gövdelerinin sağlanması gerekmektedir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### parseEnv
+**Ne yapar**: Verilen dosya yolundaki `.env` biçimindeki dosyayı okuyarak anahtar-değer çiftlerinden oluşan bir nesne döndürür. Dosya mevcut değilse boş nesne döndürür.
 
-**Ne yapar**: Belirtilen dosya yolundaki `.env` formatlı bir dosyayı okur ve içindeki tüm anahtar-değer çiftlerini bir JavaScript nesnesine dönüştürür. Dosya mevcut değilse boş bir nesne döner.
-
-**Nasıl yapar**: Dosya varlığını `fs.existsSync` ile kontrol eder, ardından dosya içeriğini okur ve satır satır işler. Her satırda boş satırları ve yorum satırlarını (`#` ile başlayan) atlar. Geçerli satırlarda `key=value` eşleşmesini regex ile yakalar. Değerlerin çift tırnak (`"`) veya tek tırnak (`'`) ile sarılı olup olmadığını kontrol eder ve varsa bu tırnakları kaldırarak temiz bir değer elde eder. Sonuç olarak anahtar ve değerleri bir nesneye ekleyip döndürür.
+**Nasıl yapar**: Dosya mevcut olup olmadığını `fs.existsSync` ile kontrol eder; mevcut değilse boş nesne döndürür. Dosyayı UTF-8 olarak okur, satırlara böler ve her satırı işler. Boş satırlar ve `#` ile başlayan yorum satırları atlanır. Her geçerli satır için `^([^=]+)=(.*)$` düzenli ifadesiyle anahtar ve değer ayrıştırılır. Değerin başındaki ve sonundaki boşluklar temizlenir; ardından değer tek tırnak (`'`) veya çift tırnak (`"`) ile çevrelenmişse bu tırnak işaretleri kaldırılır. Sonuç nesne döndürülür.
 
 **Parametreler**:
-- `filePath`: `string` — Okunacak `.env` dosyasının tam dosya yolu
+- `filePath`: string — Okunacak `.env` dosyasının dosya yolu.
 
-**Dönüş**: `object` — Anahtar olarak env değişken adlarını, değer olarak ise temizlenmiş string değerleri içeren bir nesne. Dosya mevcut değilse `{}` boş nesne döner.
+**Dönüş**: `env` — Anahtar-değer çiftlerini içeren düz bir nesne (object). Dosya mevcut değilse boş nesne döner.
 
 ### updateEnvFile
-**Ne yapar**: Belirtilen `.env` dosyasında belirli bir anahtarın değerini günceller veya anahtar yoksa dosyaya yeni bir satır olarak ekler.
-
-**Nasıl yapar**: Dosya mevcut değilse doğrudan dosyayı oluşturup `key=value` formatında yazar. Dosya mevcutsa tüm satırları okur, `key=` ile başlayan satırı bulup değeri günceller. Anahtar dosyada hiç yoksa satırların sonuna yeni `key=value` satırı ekler. Değişiklikleri dosyaya geri yazar. Dosyanın sonuna yeni satır eklerken eski satırların arasında boşluk kalabilir, bu bir yan etkidir.
-
-**Parametreler**:
-- `filePath`: string — Güncellenecek `.env` dosyasının mutlak veya göreli dosya yolu
-- `key`: string — Eklenecek veya güncellenecek değişkenin anahtarı (örn: `SUPABASE_WEBHOOK_SECRET`)
-- `value`: string — Anahtar için atanacak değer
-
-**Dönüş**: Yok (`void`). İşlem sonucunda dosya disk üzerinde değiştirilir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### main
-**Ne yapar**: Supabase webhook kurulumunu otomatik olarak gerçekleştiren asenkron bir orkestrasyon fonksiyonudur. Webhook secret üretir/günceller, veritabanına bağlanır, pg_net eklentisini etkinleştirir ve belirli tablolara asenkron HTTP bildirim tetikleyicileri kurar.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
-**Nasıl yapar**: İlk olarak `.env` ve `.env.local` dosyalarından mevcut ortam değişkenlerini `parseEnv` ile okur. `SUPABASE_WEBHOOK_SECRET` değişkeni yoksa kriptografik olarak güvenli bir secret üretir ve her iki env dosyasına da `updateEnvFile` ile kaydeder. Ardından Supabase PostgreSQL veritabanına bağlanmak için birden fazla şifre ve port kombinasyonunu dener (farklı şifreler ve port 5432/6543). Başarılı bir bağlantı elde ettikten sonra pg_net eklentisini aktif eder, `handle_supabase_webhook()` adlı PL/pgSQL fonksiyonunu oluşturur ve `products`, `categories`, `inventory_movements` tablolarına AFTER INSERT/UPDATE/DELETE tetikleyicileri bağlar. Son olarak tetikleyicilerin `information_schema.triggers` üzerinden kurulumunu doğrular. Bağlantı kurulamazsa `process.exit(1)` ile scripti sonlandırır.
+---
 
-**Parametreler**:
-- Yok — Fonksiyon hiçbir parametre almaz.
-
-**Dönüş**: Yok (`void`). Konsola detaylı durum mesajları yazdırır. Kritik bir hata oluşursa (`process.exit(1)`) scripti sonlandırır.
+## İTHALATLAR (IMPORTS)
+- import: crypto::crypto
+- import: fs::fs
+- import: node:url::fileURLToPath
+- import: path::path
+- import: pg::pg
 
 ---
 
@@ -86,61 +82,55 @@ Bu modül bir .env dosyasını okuyarak ve güncelleyerek webhook kurulumların�
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: scripts/setup_webhooks.js::parseEnv
-- **params**: `(filePath)` — .env dosyasının dosya yolu
+- **params**: `filePath`
 - **ic_degiskenler**:
-  - `content` — `fs.readFileSync(filePath, 'utf8')` ile okunan dosyanın tam utf8 string içeriği
-  - `env` — parse edilmiş key-value çiftlerini tutan boş obje; return edilen değer
-  - `line` — `content.split('\n').forEach` callback parametresi, dosyanın her bir satırını temsil eder
-  - `trimmed` — `line.trim()` ile elde edilen, başlangıç ve bitiş boşlukları temizlenmiş satır
-  - `match` — `trimmed.match(/^([^=]+)=(.*)$/)` ile elde edilen regex eşleşme sonucu; `match[1]` key, `match[2]` value portion
-  - `val` — `match[2].trim()` ile elde edilen değer; tırnak işaretleri (`"` veya `'`) varsa `slice(1, -1)` ile temizlenir
-- **Dönüş**: `{}` (boş obje) veya `env` objesi — key-value çiftlerinden oluşan parsed environment map
-
----
+  - `content` — `filePath` yolundaki dosyanın UTF-8 formatında okunan tüm içeriği
+  - `env` — dosyadan ayrıştırılan anahtar-değer çiftlerini tutan boş nesne, fonksiyon sonunda döndürülür
+  - `line` — `content`'in satırlara bölünmesiyle oluşan her bir satır
+  - `trimmed` — `line`'ın baş ve sonundaki boşluklardan arındırılmış hali
+  - `match` — `trimmed` satırının `^([^=]+)=(.*)$` regex deseniyle eşleştirilmesinden elde edilen sonuç dizisi
+  - `val` — `match[2]`'den alınan, baş ve son tırnak işaretlerinden arındırılmış değer
+- **Dönüş**: `env` nesnesi (anahtar-değer çiftleri)
 
 ### [N2_NASIL] AST Pointer: scripts/setup_webhooks.js::updateEnvFile
-- **params**: `(filePath, key, value)` — dosya yolu, güncellenecek anahtar, atanacak değer
+- **params**: `filePath`, `key`, `value`
 - **ic_degiskenler**:
-  - `content` — `fs.readFileSync(filePath, 'utf8')` ile okunan dosyanın tam utf8 string içeriği
-  - `lines` — `content.split('\n')` ile elde edilen, her bir satırı dizi elemanı olan string dizisi
-  - `found` — boolean bayrak; `key=` ile başlayan satır bulunup bulunmadığını takip eder
-  - `updatedLines` — `lines.map()` ile üretilen güncellenmiş satır dizisi; eşleşen satır `key=value` formatıyla değiştirilir
-  - `line` — `lines.map` callback parametresi, her bir satır
-  - `trimmed` — `line.trim()` ile temizlenmiş satır; `key=` prefix'i ile karşılaştırılır
-- **Dönüş**: yok — dosyayı `fs.writeFileSync` ile yan etki olarak yazar
-
----
+  - `content` — `filePath` yolundaki dosyanın UTF-8 formatında okunan tüm içeriği
+  - `lines` — `content`'in satırlara bölünmesiyle oluşan dizi
+  - `found` — `key` anahtarının mevcut satırlarda bulunup bulunmadığını gösteren boolean
+  - `updatedLines` — `lines` dizisinin her elemanını işleyerek oluşan güncellenmiş satırlar dizisi
+  - `line` — `lines` dizisindeki her bir satır
+  - `trimmed` — `line`'ın baş ve sonundaki boşluklardan arındırılmış hali
+- **Dönüş**: yok
 
 ### [N3_NASIL] AST Pointer: scripts/setup_webhooks.js::main
-- **params**: yok
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `envPath` — `path.resolve(process.cwd(), '.env')` ile hesaplanan .env dosyasının mutlak yolu
-  - `envLocalPath` — `path.resolve(process.cwd(), '.env.local')` ile hesaplanan .env.local dosyasının mutlak yolu
-  - `env` — `parseEnv(envPath)` ve `parseEnv(envLocalPath)` spread ile birleştirilmiş tüm environment değişkenlerini tutan obje
-  - `webhookPrefix` — `'whsec_'` sabit string; yeni secret üretirken prefix olarak kullanılır
-  - `secret` — `env.SUPABASE_WEBHOOK_SECRET` veya `process.env.SUPABASE_WEBHOOK_SECRET` değerinden alınan; yoksa `crypto.randomBytes(16).toString('hex')` ile üretilen webhook secret
-  - `possibleUrls` — denenecek tüm PostgreSQL bağlantı yapılandırmalarını tutan dizi; her eleman `{user, password, host, port, database, desc}` objesidir
-  - `user` — PostgreSQL kullanıcı adı, sabit: `'postgres.tnofewwkwlyjsqgwjjga'`
-  - `host` — PostgreSQL host adresi, sabit: `'aws-1-eu-central-1.pooler.supabase.com'`
-  - `database` — PostgreSQL veritabanı adı, sabit: `'postgres'`
-  - `passwords` — `env.SUPABASE_DB_PASSWORD` değerini içeren dizi; `filter(Boolean)` ile boş değerler çıkarılmış
-  - `dbUrl` — `env.DATABASE_URL` veya `process.env.DATABASE_URL` değerinden alınan connection string
-  - `match` — `dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@/)` ile elde edilen regex eşleşme; `match[2]` parola değerini tutar
-  - `uniquePasswords` — `Array.from(new Set(passwords))` ile tekrarlardan arındırılmış şifre listesi
-  - `ports` — `[5432, 6543]` sabit dizi; denenecek PostgreSQL portları
-  - `pw` — `for (const pw of uniquePasswords)` döngü değişkeni; her iterasyonda bir şifre
-  - `config` — `for (const config of possibleUrls)` döngü değişkeni; her iterasyonda bir bağlantı yapılandırması objesi
-  - `client` — `new Client({...})` ile oluşturulan `pg.Client` instance'ı; veritabanı bağlantısı ve sorgular için kullanılır
-  - `connected` — boolean bayrak; başarılı veritabanı bağlantısı sağlanıp sağlanmadığını takip eder
-  - `err` — connection attempt catch bloğundaki hata objesi
-  - `e` — `client.end()` catch bloğundaki hata objesi; bağlantı kapatma hatası
-  - `sql` — `client.query()` ile çalıştırılacak, webhook fonksiyonu ve trigger'ları oluşturan büyük SQL string'i; içinde `secret` string interpolation ile插入 edilir
-  - `verificationRes` — `client.query(...)` ile `information_schema.triggers` sorgusunun sonucu; `.rows` dizisi içinde trigger bilgileri tutulur
-  - `row` — `verificationRes.rows.forEach` callback parametresi; her bir trigger satırı objesi
-  - `row.event_object_table` — trigger'ın bağlı olduğu tablo adı (products, categories, inventory_movements)
-  - `row.trigger_name` — trigger adı (on_products_change, vb.)
-  - `row.event_manipulation` — trigger olay türü (INSERT, UPDATE, DELETE)
-- **Dönüş**: yok — async fonksiyon; yan etkiler: dosya yazımı, veritabanı bağlantısı, SQL sorguları çalıştırma, `process.exit(1)` ile çıkış
+  - `envPath` — `import.meta.url`'e göreli `../.env` dosyasının mutlak yolu
+  - `envLocalPath` — `import.meta.url`'e göreli `../.env.local` dosyasının mutlak yolu
+  - `env` — `parseEnv(envPath)` ve `parseEnv(envLocalPath)` sonuçlarının birleştirilmesiyle oluşan nesne
+  - `webhookPrefix` — `'whsec_'` sabit string değeri
+  - `secret` — `env.SUPABASE_WEBHOOK_SECRET` veya `process.env.SUPABASE_WEBHOOK_SECRET`'dan alınan, yoksa üretilen webhook gizli anahtarı
+  - `possibleUrls` — olası veritabanı bağlantı yapılandırmalarını tutan dizi
+  - `user` — `'postgres.tnofewwkwlyjsqgwjjga'` sabit veritabanı kullanıcı adı
+  - `host` — `'aws-1-eu-central-1.pooler.supabase.com'` sabit veritabanı sunucu adresi
+  - `database` — `'postgres'` sabit veritabanı adı
+  - `passwords` — `env.SUPABASE_DB_PASSWORD` değerini filtreleyerek oluşturan dizi
+  - `dbUrl` — `env.DATABASE_URL` veya `process.env.DATABASE_URL`'dan alınan veritabanı bağlantı URL'si
+  - `match` — `dbUrl`'den `postgresql://([^:]+):([^@]+)@` regex deseniyle çıkarılan eşleşme dizisi
+  - `uniquePasswords` — `passwords` dizisindeki tekrarları kaldırarak oluşan benzersiz şifreler dizisi
+  - `ports` — `[5432, 6543]` sabit port numaraları dizisi
+  - `pw` — `uniquePasswords` dizisi üzerinde döngüdeki her bir şifre
+  - `port` — `ports` dizisi üzerinde döngüdeki her bir port numarası
+  - `config` — `possibleUrls` dizisindeki her bir bağlantı yapılandırması nesnesi
+  - `client` — `pg.Client` nesnesi, veritabanı bağlantısı için kullanılır
+  - `connected` — başarılı bir veritabanı bağlantısı kurulup kurulmadığını gösteren boolean
+  - `setupSqlPath` — `import.meta.url`'e göreli `webhook_setup.sql` dosyasının mutlak yolu
+  - `sql` — `setupSqlPath`'den okunan ve `REPLACE_WITH_ENV_SECRET` yerine `secret` değeri yerleştirilen SQL sorgusu
+  - `verificationRes` — tetikleyici durumunu doğrulamak için `information_schema.triggers` tablosundan sorgu sonucu
+  - `row` — `verificationRes.rows` dizisindeki her bir tetikleyici kaydı
+  - `err` — `try` bloğunda yakalanan hata nesnesi
+- **Dönüş**: yok
 
 ---
 
@@ -151,16 +141,16 @@ graph TD
     setup_webhooks_js__main["main"]
     setup_webhooks_js__parseEnv["parseEnv"]
     setup_webhooks_js__updateEnvFile["updateEnvFile"]
-    setup_webhooks_js__main --> setup_webhooks_js__updateEnvFile
     setup_webhooks_js__main --> setup_webhooks_js__parseEnv
+    setup_webhooks_js__main --> setup_webhooks_js__updateEnvFile
 ```
 
 ## NODE ID STANDARD
 
-  file: scripts\setup_webhooks.js
-  function: scripts\setup_webhooks.js::parseEnv
-  function: scripts\setup_webhooks.js::updateEnvFile
-  function: scripts\setup_webhooks.js::main
+  file: setup_webhooks.js
+  function: setup_webhooks.js::parseEnv
+  function: setup_webhooks.js::updateEnvFile
+  function: setup_webhooks.js::main
 
 ---
 

@@ -2,47 +2,45 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToast.tsx
-skeleton_hash: df3d9a7b91ba0e22
+source_path: C:\tmp\wt-supurme\src\components\AddToCartToast.tsx
+skeleton_hash: 025fdc0eea708e0b
 entity_hashes:
   func:AddToCartToast: 581f14d900d31bb4
   overview: 4631aecdd4e1b7b7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:34Z
+generated_at: 2026-08-25T07:23:59Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı sepete bir ürün eklediğinde kısa süreli bir bildirim (toast) gösteren tek bir React bileşenini içerir. Bileşen, bildirimin zamanlamasını, otomatik kaybolmasını ve kapatma eylemini kendi içinde yönetir.
+AddToCartToast modülü, sepete ürün ekleme işleminde kullanıcıya gösterilen bildirim (toast) bileşenini tanımlar. Modül tek bir dışa aktarılan bileşenden oluşur ve bir React fonksiyonel bileşeni olarak çalışır.
 
 ## Fonksiyon Grupları
-### Sepete Ekleme Bildirimi
-Modül, sepete ekleme işlemi sonrasında kullanıcıya kısa süreli bir bildirim gösteren ana (ve tek) bileşeni tanımlar.
+
+### Bileşen
+Sepete ekleme işleminin sonucunu kullanıcıya görsel bildirim olarak sunar. Modülde yalnızca bu tek bileşen yer alır; iç veya dış fonksiyon çağrıları, alt yardımcılar ya da ek bağımlılıklar bulunmaz.
 - AddToCartToast
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için mimari varsayımlar, yalnızca sağlanan fonksiyon imzaları ve modül sabitlerine dayanılarak çıkarılmıştır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1]:** `AddToCartToast()` fonksiyonu parametresiz olarak çağrılmalıdır. Eğer geçerli bir React bileşen referansı (fonksiyon) olarak çağrılmazsa, React Rendering Engine hata fırlatır.
-
-**[Aksiyom 2]:** Modül sabit tanımlaması (module-level constant) bulunmamaktadır. Eğer modül genelinde paylaşılan yapılandırma sabitleri gerekliyse, bunlar ayrı bir konfigürasyon kaynağından (örn: ortam değişkenleri, context) sağlanmalıdır; aksi takdirde bileşen sabit değerlerle çalışır.
-
-**[Aksiyom 3]:** Fonksiyon imzasında任何对外接口 (public API) parametresi tanımlanmamıştır. Eğer bileşenin dışarıdan veri alması (örn: ürün adı, eklendi sayısı) gerekiyorsa, bu veriler React Context, Redux, veya prop drilling dış mekanizması ile sağlanmalıdır; aksi takdirde bileşen dış girdi olmadan çalışır.
-
-**[Aksiyom 4]:** Fonksiyon imzasında default değer tanımlanmamıştır. Eğer bileşen varsayılan davranışları (örn: otomatik kapanma süresi, bildirim metni) konfigure edilebilir olacaksa, bunlar bileşen içi sabit değerler veya dış kaynaklardan gelmelidir.
+**Not:** Fonksiyon gövdesi sağlanmadığından, bileşenin çalışma koşulları belirlenememektedir. Yalnızca imzadan `AddToCartToast` fonksiyonunun parametre almadığı ve bir React bileşeni (`React.FC`) döndürdüğü tespit edilebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AddToCartToast
-**Ne yapar**: Sepete ekleme işlemi sonrası kullanıcıya gösterilen bir bildirim (toast) bileşenini oluşturur. Bu bildirim, kullanıcının sepete bir ürün eklediğini görsel olarak onaylar.
-**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanmıştır ve muhtemelen bir UI kütüphanesinden (örneğin, Chakra UI, Material UI) toast mekanizmasını kullanarak bildirim mesajını ve stilini yönetir. İçerisinde sepete eklenen ürünle ilgili kısa bir bilgi veya başarılı ekleme mesajı barındırabilir.
+**Ne yapar**: Sepete ürün ekleme işleminde kullanıcıya gösterilen bir bildirim (toast) bileşeni tanımlayan fonksiyondur. Bileşenin adı, sepete ekleme eylemiyle ilişkili bir toast/arayüz elemanı olduğunu gösterir.
+
+**Nasıl yapar**: Fonksiyonun iç mantığı verilen kaynakta belirtilmemiştir. Bir React fonksiyonel bileşeni (`React.FC`) döndürdüğü bilinmektedir. Docstring alanı boş olduğundan, bileşenin hangi görsel öğeleri render ettiği, hangi durumları yönettiği veya hangi yan etkileri tetiklediği kaynakta açıklanmamıştır.
+
 **Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz.
-**Dönüş**: React.FC — Sepete ekleme bildirimini temsil eden bir React fonksiyonel bileşeni döndürür.
+- Kaynakta fonksiyonun aldığı parametreler belirtilmemiştir. Parametre listesi bilinmiyor.
+
+**Dönüş**: `React.FC` — React fonksiyonel bileşeni döndürür. Bu, JSX elemanı üreten ve isteğe bağlı olarak props alan bir fonksiyon tipidir.
 
 ---
 
@@ -57,17 +55,50 @@ Bu modül için mimari varsayımlar, yalnızca sağlanan fonksiyon imzaları ve 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast
-- **params**: (yok)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: null — saf controller, DOM döndürmez
+
+---
+
+### [N2_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (useEffect callback)
+- **params**: yok
 - **ic_degiskenler**:
-  (dış scope'ta doğrudan değişken yok — tüm mantık `useEffect` içinde)
-- **Dönüş**: `null` — Saf controller bileşeni, DOM döndürmez; sadece event listener yönetimi yapar
+  - `onAdded` — olay dinleyici fonksiyonu; `EVENT` adlı custom event'i dinler, ürün bilgisi varsa toast gösterir
+- **Dönüş**: cleanup fonksiyonu — `window.removeEventListener` ile `onAdded` dinleyicisini kaldırır
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (onAdded)
+- **params**:
+  - `e` — Event nesnesi; CustomEvent'e cast edilir
+- **ic_degiskenler**:
+  - `customEvent` — `e`'nin `CustomEvent<{ product?: Product }>` tipine cast edilmiş hali; TypeScript derleyicisini tatmin etmek ve zero-any sağlamak için
+  - `detail` — `customEvent.detail`; opsiyonel `product` alanı taşır
+  - `product` — `detail.product`; koşullu olarak atanır, `detail?.product` truthy ise kullanılır
+- **Dönüş**: yok — yan etki olarak `toast.custom` çağırır
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (toast.custom callback)
+- **params**:
+  - `id` — Sonner tarafından sağlanan benzersiz toast kimliği
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `<AddToCartToastContent product={product} onClose={() => toast.dismiss(id)} />` bileşeni
+
+---
+
+### [N5_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (cleanup)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `window.removeEventListener(EVENT, onAdded as EventListener)` çağırır
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\AddToCartToast.tsx
-  function: src\components\AddToCartToast.tsx::AddToCartToast
+  file: AddToCartToast.tsx
+  function: AddToCartToast.tsx::AddToCartToast
 
 ---
 

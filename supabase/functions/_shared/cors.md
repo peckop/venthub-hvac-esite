@@ -2,65 +2,68 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\_shared\cors.ts
-skeleton_hash: f5323f7621d54120
+source_path: C:\tmp\wt-supurme\supabase\functions\_shared\cors.ts
+skeleton_hash: d21db1e6bd4f3091
 entity_hashes:
   func:getCorsHeaders: 73642dabf029645c
   overview: 8eaad34e6f15ad7c
-generated_at: 2026-08-14T13:19:43Z
+generated_at: 2026-08-25T07:33:46Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase edge function'ları arasında paylaşılan CORS (Cross-Origin Resource Sharing) yönetimi sağlar. Farklı kaynaklardan gelen HTTP istekleri için uygun erişim başlıklarını oluşturarak, API'lerin güvenli bir şekilde çapraz kaynak taleplerine izin vermesini mümkün kılar.
+Bu modül, Cross-Origin Resource Sharing (CORS) politikalarını uygulamak için gerekli HTTP başlıklarını yönetir. Modül, gelen isteklere göre uygun CORS başlıklarını oluşturarak çapraz kaynak erişimlerini kontrol eder. Tek bir fonksiyonla bu sorumluluğu yerine getirir.
 
 ## Fonksiyon Grupları
-### CORS Başlık Yönetimi
-HTTP isteklerine göre CORS politikalarını uygulayan başlık setini oluşturur. Bu başlıklar, isteklerin hangi kaynaklardan gelmesine izin verileceğini ve hangi HTTP metodlarının kullanılabileceğini belirler.
+### CORS Başlık Üretimi
+Bu grup, gelen HTTP isteğini analiz ederek tarayıcının çapraz kaynak isteklerini kabul etmesi için gerekli başlıkları üretir.
 - getCorsHeaders
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, HTTP istekleri için CORS başlıkları döndüren bir fonksiyon içerir. Aşağıda, fonksiyonun doğru çalışması için gerekli temel mimari varsayımlar listelen
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** Fonksiyon gövdesi sağlanmadığından, `getCorsHeaders` fonksiyonunun çalışma mantığı bilinmemektedir. Aksiyomlar yalnızca fonksiyon gövdesinden üretilebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### getCorsHeaders
+**Ne yapar**: Gelen HTTP isteğinin `Origin` başlığını kontrol ederek uygun CORS (Cross-Origin Resource Sharing) başlıklarını oluşturan ve döndüren bir fonksiyondur. İzin verilen kaynaklardan gelen isteklerde gerçek origin kullanılırken, diğer kaynaklardan gelen istekler için varsayılan bir Vercel domain adresi atanır.
 
-**Ne yapar**: HTTP isteklerine yanıt olarak Cross-Origin Resource Sharing (CORS) politika başlıklarını dinamik olarak oluşturur. Fonksiyon, gelen isteğin kaynak adresine (Origin) göre izin verilen domain listesini belirler ve standart CORS başlıklarını içeren bir nesne döndürür. Bu sayede frontend uygulamaları farklı bir domain'den API isteklerini güvenli bir şekilde gerçekleştirebilir.
-
-**Nasıl yapar**: Fonksiyon, HTTP isteğinin `Origin` başlığını çıkararak başlar. Bu değeri kullanarak üç temel kontrol gerçekleştirir: kaynağın `localhost` ile başlayıp başlamadığını (geliştirme ortamı), `.vercel.app` ile bitip bitmediğini (Vercel deployment ortamı), ve her iki koşulun da sağlanıp sağlanmadığını kontrol eder. Kaynak izin listesinde yer alıyorsa, `Access-Control-Allow-Origin` başlığını isteğin kendi Origin değeriyle döndürür; aksi halde_prodüksiyon URL'ini (`https://venthub-hvac-esite.vercel.app`) kullanır. Ek olarak, izin verilen HTTP yöntemlerini, başlıkları ve preflight isteklerinin önbellek süresini (86400 saniye) ayarlar.
+**Nasıl yapar**: Fonksiyon öncelikle isteğin `Origin` başlığını okur; başlık yoksa boş string kullanır. Ardından bu origin'in `http://localhost:` ile başlayıp başlamadığını (`isLocal`) ve `.vercel.app` ile bitip bitmediğini (`isVercel`) kontrol eder. Bu iki koşuldan herhangi biri sağlanırsa origin izinli kabul edilir ve `Access-Control-Allow-Origin` olarak gerçek origin değeri atanır; sağlanmazsa sabit değer `https://venthub-hvac-esite.vercel.app` kullanılır. Ayrıca sabit CORS başlıkları olarak `authorization, x-client-info, apikey, content-type` izin verilen başlıklar, `POST, GET, OPTIONS, PUT, DELETE` izin verilen HTTP metodları ve `86400` saniye (24 saat) önbellek süresi tanımlanır.
 
 **Parametreler**:
-- `req: Request` — CORS başlıklarının çıkarılacağı HTTP istek nesnesi. Standart Fetch API Request nesnesi olup, `headers` özelliği üzerinden HTTP başlıklarına erişim sağlar
+- `req`: `Request` — CORS başlıklarının belirlenmesi için kullanılan gelen HTTP isteği nesnesi. Fonksiyon bu nesnenin `headers` özelliğinden `Origin` başlığını okur.
 
-**Dönüş**: `Record<string, string>` — Dört anahtar-değer çiftinden oluşan CORS başlık nesnesi döndürür:
-- `Access-Control-Allow-Origin`: İzin verilen kaynak domain (dinamik veya sabit prodüksiyon URL'i)
-- `Access-Control-Allow-Headers`: İzin verilen istek başlıkları listesi (authorization, x-client-info, apikey, content-type)
-- `Access-Control-Allow-Methods`: İzin verilen HTTP yöntemleri (POST, GET, OPTIONS, PUT, DELETE)
-- `Access-Control-Max-Age`: Preflight isteklerinin tarayıcı tarafından önbelleğe alınma süresi (saniye cinsinden 86400)
+**Dönüş**: Dört anahtar-değer çiftinden oluşan bir nesne döndürür. Bu nesne; `Access-Control-Allow-Origin`, `Access-Control-Allow-Headers`, `Access-Control-Allow-Methods` ve `Access-Control-Max-Age` CORS başlıklarını içerir. Dönüş tipi kod üzerinde açıkça belirtilmemiştir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: _shared/cors.ts::getCorsHeaders
-- **params**: (req: Request)
+### [N1_NASIL] AST Pointer: supabase/functions/_shared/cors.ts::getCorsHeaders
+- **params**:
+  - `req` — Request nesnesi; tarayıcıdan gelen HTTP isteğini temsil eder
 - **ic_degiskenler**:
-  - `origin` — Request'ten alınan Origin header değeri; mevcut değilse boş string kullanılır
-  - `isLocal` — origin'in `http://localhost:` ile başlayıp başlamadığını kontrol eder;本地 geliştirme ortamı tespiti için kullanılır
-  - `isVercel` — origin'in `.vercel.app` ile bitip bitmediğini kontrol eder; Vercel deploy ortamı tespiti için kullanılır
-  - `allowed` — isLocal veya isVercel değerlerinin OR mantığı ile sonuçlanan布尔 değişken; istek yapan origin'in izinli olup olmadığını belirler
-- **Dönüş**: `{ 'Access-Control-Allow-Origin': string, 'Access-Control-Allow-Headers': string, 'Access-Control-Allow-Methods': string, 'Access-Control-Max-Age': string }` — CORS header nesnesi döndürür; allowed true ise gelen origin'e izin verir, false ise sabit Vercel URL'ine izin verir
+  - `origin` — `req.headers.get('Origin')` ile alınan istek kaynağının Origin header değeri; header yoksa boş string atanır
+  - `isLocal` — `origin` değişkeninin `http://localhost:` ile başlayıp başlamadığını kontrol eden boolean; yerel geliştirme ortamından gelen istekleri belirler
+  - `isVercel` — `origin` değişkeninin `.vercel.app` ile bitip bitmediğini kontrol eden boolean; Vercel üzerindeki deployment'lardan gelen istekleri belirler
+  - `allowed` — `isLocal` veya `isVercel` değerlerinden herhangi biri true ise true olan boolean; istek kaynağının izin verilen bir origin olup olmadığını belirler
+- **Dönüş**: Obje — CORS header'larını içeren bir nesne döndürür:
+  - `Access-Control-Allow-Origin` — `allowed` true ise gelen `origin` değeri, false ise sabit `'https://venthub-hvac-esite.vercel.app'` atanır
+  - `Access-Control-Allow-Headers` — sabit değer: `'authorization, x-client-info, apikey, content-type'`
+  - `Access-Control-Allow-Methods` — sabit değer: `'POST, GET, OPTIONS, PUT, DELETE'`
+  - `Access-Control-Max-Age` — sabit değer: `'86400'`
 
 ---
 
 ## NODE ID STANDARD
 
-  file: supabase\functions\_shared\cors.ts
-  function: supabase\functions\_shared\cors.ts::getCorsHeaders
+  file: cors.ts
+  function: cors.ts::getCorsHeaders
 
 ---
 

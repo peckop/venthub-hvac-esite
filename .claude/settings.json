@@ -59,6 +59,20 @@
             "type": "command",
             "command": "node .claude/hooks/lane-guard.cjs",
             "statusMessage": "lane-guard"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/sensitive-path-guard.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/bash-write-guard.cjs",
+            "statusMessage": "bash-write-guard"
           }
         ]
       },
@@ -133,6 +147,10 @@
       {
         "matcher": "*",
         "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/son-soz-gate.cjs"
+          },
           {
             "type": "command",
             "command": "node .claude/hooks/verify-on-stop.cjs",

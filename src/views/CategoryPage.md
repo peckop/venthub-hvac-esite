@@ -2,61 +2,59 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\CategoryPage.tsx
-skeleton_hash: b8953d96c057712b
+source_path: C:\tmp\wt-supurme\src\views\CategoryPage.tsx
+skeleton_hash: f4818ad1e5e0f37e
 entity_hashes:
-  func:CategoryPage: 58a326ade322bfe1
-  overview: 4a1165b4bde9da1a
+  func:CategoryPage: b9c874f6f0ad842f
+  overview: e1bc718689213f84
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:50:27Z
+generated_at: 2026-08-25T07:29:20Z
 ---
 
 ## Genel Bakış
-CategoryPage modülü, Venthub HVAC platformunda dinamik kategori sayfalarının görüntülenmesinden sorumlu bir React view bileşenidir. Kategori, alt kategori ve ürün verilerini üst bileşenden alarak sayfanın temel yapısını oluşturur ve tüm iş mantığı ile sunum süreçlerini CategoryMasterView bileşenine devrederek sayfayı render eder.
+
+CategoryPage modülü, bir kategoriye ait ürün ailelerinin listelendiği sayfa bileşenini tanımlar. Bileşen, sunucu tarafından sağlanan başlangıç verilerini (kategori bilgisi, aile listesi, alt kategoriler ve sayfalama bilgileri) alır ve kullanıcıya görüntüler.
 
 ## Fonksiyon Grupları
-### Kategori Sayfası Görünümü
-Modülün tek bileşeni olarak kategori sayfasının dışa açılan giriş noktasıdır. Başlangıç verilerini (kategori bilgisi, ürünler, alt kategoriler) üst bileşenden alır, doğrular ve Unified Category Shell yapısıyla sayfanın tamamını oluşturma sorumluluğunu CategoryMasterView bileşenine aktarır.
+
+### Sayfa Bileşeni
+
+Kategori sayfasının tamamını render etmekten sorumludur. Gelen `initialCategory`, `families`, `total`, `page`, `pageSize` ve `initialSubCategories` props değerlerini kullanarak kategori detaylarını, ürün ailelerini ve sayfalama bilgisini kullanıcıya sunar.
+
 - CategoryPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu bir React view bileşeni olup, fonksiyon gövdesi verilmediğinden yalnızca fonksiyon imzasından çıkarılabilen minimum mimari varsayımlar tanımlanmıştır.
 
-[Aksiyom 1]: Eğer parent bileşen `initialCategory` prop'u sağlamazsa, bileşen undefined değerle çalışır ve beklenmeyen davranış oluşur (hiçbir default değer tanımlı değildir).
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 2]: Eğer parent bileşen `initialProducts` prop'u sağlamazsa, bileşen undefined değerle çalışır ve ürün listesi oluşturulamaz (hiçbir default değer tanımlı değildir).
-
-[Aksiyom 3]: Eğer parent bileşen `initialSubCategories` prop'u sağlamazsa, bileşen undefined değerle çalışır ve alt kategori listesi oluşturulamaz (hiçbir default değer tanımlı değildir).
-
-[Aksiyom 4]: Eğer `initialCategory`, `initialProducts` veya `initialSubCategories` geçerli bir React prop'undan (obje/liste) farklı bir tipte gelirse, bileşen içeriği doğru şekilde render edilemez.
-
-[Aksiyom 5]: Eğer bileşen içeriği sunmak için这三个 prop'un iç yapı alanlarına (örn: `initialCategory.name`, `initialProducts[].id` gibi) erişiyorsa ve bu alanlar mevcut değilse, runtime hatası oluşur.
-
-**Not:** Fonksiyon gövdesi verilmediğinden, bileşenin hangi alt alanlara eriştiği ve hangi iç mantığı uyguladığı **bilinmiyor** olup, yalnızca imzada belirtilen üç prop'un varlığının zorunluluğu belirlenebilmiştir.
+**Gerekçe:** Fonksiyon gövdesi sağlanmadığından, yalnızca imzadan (`CategoryPage({ initialCategory, families, total, page, pageSize, initialSubCategories })`) aksiyom üretilemez. Mimari varsayımlar, fonksiyon gövdesindeki mantıksal dallanmalar, hata kontrolü, eşik değerleri ve veri akışı üzerinden çıkarılır; imzadaki parametre adları ve tipleri ise yalnızca bilgi amaçlıdır ve davranışsal bir hüküm içermez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### CategoryPage
+**Ne yapar**: Dinamik Kategori Sayfası'nın giriş noktası olan bir React fonksiyonel bileşenidir. Bileşen, kategori sayfasının tüm mantık ve sunum işlevlerini merkezi bir yapı olan Unified Category Shell (CategoryMasterView) bileşenine delege eder. Kendisi bir sarmalayıcı (wrapper) olarak çalışır ve gelen verileri bu merkezi bileşene aktarır.
 
-**Ne yapar**: Dinamik kategori sayfasının giriş noktası olarak görev yapan React bileşenidir. Kullanıcılar bir kategoriye tıkladığında bu bileşen yüklenerek ilgili kategorinin ürünlerini ve alt kategorilerini görüntüler.
-
-**Nasıl yapar**: Bu bileşen bir "Controller" veya "Entry Point" mantığıyla çalışır. Kendisi doğrudan UI render etmez; bunun yerine tüm iş mantığını ve sunum katmanını Unified Category Shell (CategoryMasterView) bileşenine delege eder. Bu sayede sorumluluklar ayrışmış ve bileşen yeniden kullanılabilir hale gelmiştir.
+**Nasıl yapar**: Bileşen, aldığı altı parametreyi destructuring yöntemiyle ayırır ve bu verileri doğrudan CategoryMasterView bileşenine aktararak tüm iş mantığını ve görsel sunumu ona devreder. Docstring'te yer alan `@page` ve `@description` dekoratörleri, bu bileşenin bir sayfa seviyesinde giriş noktası olduğunu ve dinamik kategori sayfası olarak tanımlandığını belirtir. Bileşenin kendisi herhangi bir iş mantığı içermez; yalnızca veri aktarım ve yönlendirme görevi üstlenir.
 
 **Parametreler**:
-- `initialCategory` — Kategorinin başlangıç verisi. Sayfa yüklendiğinde görüntülenecek kategori bilgisini içerir
-- `initialProducts` — Başlangıç ürün listesi. İlgili kategorideki ürünlerin önceden yüklenmiş halini tutar
-- `initialSubCategories` — Başlangıç alt kategorileri. Kategori hiyerarşisindeki alt kategorilerin verisini barındırır
+- initialCategory: bilinmiyor — Bileşenin aldığı props nesnesinden destructuring ile çıkarılan parametre; docstring'te tip bilgisi verilmemiştir.
+- families: bilinmiyor — Bileşenin aldığı props nesnesinden destructuring ile çıkarılan parametre; docstring'te tip bilgisi verilmemiştir.
+- total: bilinmiyor — Bileşenin aldığı props nesnesinden destructuring ile çıkarılan parametre; docstring'te tip bilgisi verilmemiştir.
+- page: bilinmiyor — Bileşenin aldığı props nesnesinden destructuring ile çıkarılan parametre; docstring'te tip bilgisi verilmemiştir.
+- pageSize: bilinmiyor — Bileşenin aldığı props nesnesinden destructuring ile çıkarılan parametre; docstring'te tip bilgisi verilmemiştir.
+- initialSubCategories: bilinmiyor — Bileşenin aldığı props nesnesinden destructuring ile çıkarılan parametre; docstring'te tip bilgisi verilmemiştir.
 
-**Dönüş**: `React.FC<CategoryPageProps>` — CategoryPageProps tipinde tanımlı props'ları kabul eden fonksiyonel bir React bileşeni döndürür.
+**Dönüş**: `React.FC<CategoryPageProps>` — React fonksiyonel bileşeni döndürür. `CategoryPageProps` arayüzü, bu bileşenin kabul ettiği props yapısını tanımlar; ancak bu arayüzün ayrıntıları verilen kaynakta yer almamaktadır.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../lib/type-converters::type { DomainCategory, DomainProduct }
+- import: ../lib/type-converters::type { DomainCategory }
+- import: ../types/ui-models::type { FamilyListItem }
 - import: ./CategoryMasterView::CategoryMasterView
 - import: react::React
 
@@ -66,7 +64,10 @@ Bu bir React view bileşeni olup, fonksiyon gövdesi verilmediğinden yalnızca 
 
 ### CategoryPageProps
 - `initialCategory?: DomainCategory | null`
-- `initialProducts?: DomainProduct[]`
+- `families?: FamilyListItem[]`
+- `total?: number`
+- `page?: number`
+- `pageSize?: number`
 - `initialSubCategories?: DomainCategory[]`
 
 ---
@@ -75,18 +76,21 @@ Bu bir React view bileşeni olup, fonksiyon gövdesi verilmediğinden yalnızca 
 
 ### [N1_NASIL] AST Pointer: CategoryPage.tsx::CategoryPage
 - **params**:
-  - `initialCategory` — başlangıç kategori verisi, `CategoryMasterView`'e prop olarak iletilir
-  - `initialProducts` — başlangıç ürün listesi, `CategoryMasterView`'e prop olarak iletilir
-  - `initialSubCategories` — başlangıç alt kategori listesi, `CategoryMasterView`'e prop olarak iletilir
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `JSX.Element` — `CategoryMasterView` bileşenini, gelen prop'ları doğrudan aktararak döndürür (proxy/composition pattern)
+  - `initialCategory` — DomainCategory tipinde; sayfanın görüntülediği ana kategori nesnesi
+  - `families` — FamilyListItem tipinde dizi; kategoriye ait aile listesi
+  - `total` — number; toplam kayıt sayısı (sayfalama bilgisi)
+  - `page` — number; mevcut sayfa numarası (sayfalama bilgisi)
+  - `pageSize` — number; sayfa başına gösterilecek kayıt sayısı (sayfalama bilgisi)
+  - `initialSubCategories` — alt kategori verisi; tip bilgisi verilmemiş
+- **ic_degiskenler**: yok — fonksiyon gövdesinde hiçbir iç değişken tanımlanmamış; tüm parametreler doğrudan `CategoryMasterView` bileşenine prop olarak aktarılır
+- **Dönüş**: JSX element (`CategoryMasterView` bileşeni); tüm props birebir geçirilerek render edilir
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\CategoryPage.tsx
-  function: src\views\CategoryPage.tsx::CategoryPage
+  file: CategoryPage.tsx
+  function: CategoryPage.tsx::CategoryPage
 
 ---
 

@@ -2,56 +2,69 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\StatCard.tsx
-skeleton_hash: 9cf0d06b5caf4b52
+source_path: C:\tmp\wt-supurme\src\components\admin\dashboard\StatCard.tsx
+skeleton_hash: c2ff1a98196483d7
 entity_hashes:
   func:StatCard: 42faa1e1d38b732c
-  overview: d5fe2f564e9e4393
-  style_tokens: 3b396ad8fb25d2f9
-generated_at: 2026-06-19T20:47:00Z
+  overview: cd8b364f9dc61291
+  style_tokens: fe92468c4406b452
+generated_at: 2026-08-25T07:36:55Z
 ---
 
 ## Genel Bakış
-`StatCard` bileşeni, yönetim panelinde tek bir istatistiği görselleştirmek için kullanılan yeniden kullanılabilir bir kart bileşenidir. Başlık, alt başlık, değer, yükleme durumu, para birimi biçimlendirmesi ve çok dilli metin desteği gibi farklı ihtiyaçları tek bir arayüzde toplar.
+
+StatCard, yönetim paneli (admin dashboard) arayüzünde kullanılan bir React bileşenidir. Tek bir bileşenden oluşan bu modül, istatistiksel bir değeri kart formatında görüntüler. Yükleme durumu, para birimi formatlaması ve çoklu dil desteği gibi özellikleri destekler.
 
 ## Fonksiyon Grupları
-### UI Render Grubu
-Kartın dış yapısını, tipografisini ve düzenini oluşturur; gelen prop’ların görsel bileşenlerle eşlenmesini sağlar.
+
+### Ana Bileşen
+
+Bu modülde yalnızca tek bir bileşen yer alır. Yönetim panelindeki istatistik kartlarını oluşturmak için kullanılır; başlık, alt başlık ve değer bilgisini kullanıcıya sunar.
+
 - StatCard
 
-### Veri ve Durum İşleme Grubu
-Değerlerin para birimi formatında gösterilmesi, yükleme durumuna göre ekranın güncellenmesi ve metinlerin dil ayarına göre çevrilmesi gibi mantıksal işlemleri yürütür.
-- StatCard
+**Parametreler ve sorumluluklar:**
+
+- `title`: Kartın başlık metnini belirtir.
+- `subtitle`: Kartın alt başlık metnini belirtir.
+- `value`: Kartta gösterilecek istatistiksel değeri taşır.
+- `loading`: Veri yüklenme durumunu kontrol eder; yükleme sırasında farklı bir görünüm sağlanır.
+- `isCurrency`: Değerin para birimi olarak biçimlendirilip biçimlendirilmeyeceğini belirler.
+- `lan`: Çoklu dil desteği için dil parametresini alır.
+
+**Dış bağımlılıklar:** Modül, React kütüphanesine bağlıdır. Bileşen `React.FC<StatCardProps>` tipiyle tanımlanmıştır; bu da `StatCardProps` arabirimini gerektirir. Para birimi biçimlendirme ve dil desteği gibi işlemlerin hangi yardımcı modüllerden sağlandığı bu kaynak dosyadan anlaşılamamaktadır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için özel aksiyom tanımlanamamıştır.
+
+**Gerekçe:** Fonksiyon gövdesi verilmemiştir. Aksiyomlar yalnızca fonksiyon gövdesinden üretilir; gövde olmadan `title`, `subtitle`, `value`, `loading`, `isCurrency` veya `lan` props'larından herhangi biri sağlanmadığında bileşenin nasıl davrandığı belirlenemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### StatCard
+**Ne yapar**: Admin paneli dashboard alanında kullanılan istatistik kartı bileşenini oluşturan fonksiyondur. Verilen başlık, alt başlık ve değer bilgilerini görsel bir kart yapısı içinde sunar. Para birimi formatlaması ve yükleme durumu gibi durumları destekler.
 
-**Ne yapar**: Admin panelinin dashboard bölümünde istatistik verilerini görsel olarak sunan bir kart bileşenidir. Başlık, alt başlık, değer ve para birimi formatlama seçenekleriyle birlikte yüklenme durumu animasyonu da destekler.
-
-**Nasıl yapar**: Bileşen, verilen parametreleri kullanarak bir kart yapısı oluşturur. `loading` parametresi `true` olduğunda, değer yerine bir iskelet (skeleton) animasyonu göstererek kullanıcıya verinin yüklendiği hissini verir. `isCurrency` parametresi `true` olarak ayarlandığında, `value` değerini para birimi formatına dönüştürerek hiển thị eder. `lan` parametresi ile dil ayarlarına göre para birimi simgesi ve formatlaması değiştirilebilir.
+**Nasıl yapar**: Gelen parametreleri kullanarak bir React fonksiyonel bileşeni (`React.FC<StatCardProps>`) döndürür. `loading` parametresiyle yükleme durumunu, `isCurrency` parametresiyle değerin para birimi olarak formatlanıp formatlanmayacağını kontrol eder. `lan` parametresi aracılığıyla dil/yerelleştirme desteği sağlar. Bileşen, `StatCardProps` tip arayüzüne uygun şekilde yapılandırılmıştır.
 
 **Parametreler**:
+- title: belirtilmemiş — Kartın ana başlığını temsil eder
+- subtitle: belirtilmemiş — Kartın alt başlığını veya açıklayıcı bilgisini temsil eder
+- value: belirtilmemiş — Kartta gösterilecek istatistiksel değeri temsil eder
+- loading: belirtilmemiş — Veri yüklenme durumunu belirten bayrak; yükleme sırasında farklı bir görsel durum gösterilmesini sağlar
+- isCurrency: belirtilmemiş — Değerin para birimi olarak formatlanıp formatlanmayacağını belirten bayrak
+- lan: belirtilmemiş — Dil/yerelleştirme tercihini belirten parametre
 
-- `title`: `string` — Kartın üst kısmında görünen ana başlık metni. Örneğin "Toplam Gelir" veya "Aktif Kullanıcılar" gibi istatistik kategorisini belirtir.
-- `subtitle`: `string | undefined` — Kartın başlık altında görünen opsiyonel alt başlık bilgisi. Başlığı destekleyen ek açıklama veya detay metnini taşır.
-- `value`: `string | number` — Kartın orta bölgesinde büyük puntolarla gösterilen temel istatistik değeri. Sayısal veya metin formatında olabilir.
-- `loading`: `boolean` — Bileşenin yükleme durumunu belirler. `true` değeri alırsa gerçek değerler yerine skeleton placeholder animasyonu gösterilir, böylece veri henüz yüklenmemişken kullanıcı arayüzünün bozulması engellenir.
-- `isCurrency`: `boolean` — Değerin para birimi olarak formatlanıp formatlanmayacağını belirler. `true` olduğunda `value` parametresi para birimi sembolü ve binlik ayraçlarıyla birlikte gösterilir.
-- `lan`: `string` — Para birimi formatlamasında kullanılacak dil ve bölge ayarını belirler. `Intl.NumberFormat` içinde dil kodu olarak kullanılır, örneğin `"tr-TR"` Türkçe format veya `"en-US"` İngilizce format için.
-
-**Dönüş**: `React.FC<StatCardProps>` — JSX elementi döndürür. StatCardProps arayüzüne uygun olarak yapılandırılmış bir React fonksiyonel bileşenidir.
+**Dönüş**: `React.FC<StatCardProps>` — `StatCardProps` tip arayüzünü kabul eden bir React fonksiyonel bileşeni döndürür. Bileşen, admin dashboard üzerinde istatistik kartı olarak render edilmek üzere kullanılır.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../../../i18n/currency::SYSTEM_CURRENCY
 - import: ../../../i18n/format::formatCurrency
 - import: next/link::Link
 - import: react::React
@@ -76,32 +89,32 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: components/admin/dashboard/StatCard.tsx::StatCard
+### [N1_NASIL] AST Pointer: src/components/admin/dashboard/StatCard.tsx::StatCard
 - **params**:
-  - `title` — Kartın başlık metni, üst kısımda `text-xs` ile gösterilir
-  - `subtitle` — Kartın alt başlık/etiket metni, isteğe bağlı olarak `italic` stilinde gösterilir
-  - `value` — Kartta gösterilecek asıl değer (sayı veya string olabilir), null ise '-' gösterilir
-  - `loading` — Yüklenme durumu flag'i, true ise displayValue '…' olur ve trend/subtitle gizlenir
-  - `isCurrency` — value'nin para birimi olarak formatlanıp formatlanmayacağını belirler, true ise `formatCurrency()` çağrılır
-  - `lang` — Para birimi formatı dili, varsayılan `'tr'`, `'tr' | 'en'` olarak `formatCurrency`'e传递 edilir
-  - `href` — Link yönlendirme URL'si, tanımlı ise kart `<Link>` ile sarılır
-  - `icon` — Kartta gösterilecek React icon elemanı, `React.cloneElement` ile `size:24, strokeWidth:2.5` olarak clone edilir
-  - `trend` — Trend bilgisi nesnesi, `.value` property'si ile yüzde değişim gösterilir (pozitif yeşil ↑, negatif kırmızı ↓)
-  - `accent` — Renk teması adı, varsayılan `'navy'`, `accents` objesindeki key olarak kullanılır
+  - `title` — kart başlığı, JSX'te truncate edilerek gösterilir
+  - `subtitle` — kart alt başlığı, loading değilse ve truthy ise gösterilir
+  - `value` — gösterilecek değer; null ise "-", loading ise "…", isCurrency true ve number ise formatCurrency ile para birimi formatında gösterilir
+  - `loading` — yükleme durumu; true ise value yerine "…" gösterilir, trend ve subtitle gizlenir
+  - `isCurrency` — value'nun para birimi olarak formatlanıp formatlanmayacağını belirten boolean
+  - `lang` — dil kodu, varsayılan `'tr'`; formatCurrency fonksiyonuna `'tr' | 'en' tipinde iletilir
+  - `href` — opsiyonel bağlantı URL'i; truthy ise kart Link bileşeni olarak render edilir, yoksa div olarak render edilir
+  - `icon` — opsiyonel React ikon elementi; React.cloneElement ile size: 24 ve strokeWidth: 2.5 prop'ları eklenerek yeniden oluşturulur
+  - `trend` — opsiyonel trend verisi; `.value` özelliği pozitifse yukarı ok ve yeşil, negatifse aşağı ok ve kırmızı renkli yüzde etiketi gösterilir
+  - `accent` — renk teması anahtarı, varsayılan `'navy'`; `accents` haritasından CSS class grubu seçilir
 - **ic_degiskenler**:
-  - `accents` — 7 farklı renk temasının (navy, emerald, amber, rose, violet, sky, orange) CSS class'larını tutan sabit obje; her tema için border, accent, iconBg, glow, text değerleri tanımlıdır
-  - `currentAccent` — `accents[accent]` ile elde edilen aktif renk teması objesi, kartın border rengi, icon arkaplanı, accent rengi gibi stiller için kullanılır
-  - `displayValue` — Kartta gösterilecek formatlanmış değer; loading=true ise `'…'`, value==null ise `'-'`, isCurrency ve number ise `formatCurrency(value, lang)` çağrısı ile para birimi formatına çevrilir, aksi halde ham value kullanılır
-  - `content` — JSX elemanı; kartın içeriğini (başlık, displayValue, trend yüzdesi, subtitle, icon) barındıran ana yapı, hem Link içine hem de plain div içine yerleştirilir
-  - `baseClass` — Kartın temel CSS class string'i; `glass-strong`, padding, border, shadow ve hover geçiş stillerini içerir, `currentAccent.border` ile dinamik border rengi eklenir
-- **Dönüş**: JSX elemanı (`React.ReactNode`) — `href` tanımlı ise `<Link>` ile sarılmış kart, değilse `<div>` içine sarılmış kart döndürür; her iki durumda da `content` JSX'i render edilir
+  - `accents` — her accent anahtarı (`navy`, `emerald`, `amber`, `rose`, `violet`, `sky`, `orange`) için `border`, `accent`, `iconBg`, `glow`, `text` CSS class'larını içeren nesne
+  - `currentAccent` — `accents[accent]` erişimiyle seçilen tema nesnesi; border, accent, iconBg, glow, text class'larına erişim sağlar
+  - `displayValue` — koşullu hesaplanan gösterim değeri: loading true ise `'…'`, value null ise `'-'`, isCurrency true ve typeof value `'number'` ise `formatCurrency(value, lang as 'tr' | 'en', { currency: SYSTEM_CURRENCY })` sonucu, aksi halde `value`'nun kendisi
+  - `content` — kartın ana içeriğini oluştaran JSX elementi; title, displayValue, trend etiketi, subtitle ve icon'u içerir
+  - `baseClass` — kartın kök elemanına uygulanan temel CSS class string'i; `bg-admin-surface`, padding, overflow, transition, shadow, border ve hover:border class'larını birleştirir
+- **Dönüş**: `React.ReactNode` — `href` truthy ise `Link` bileşeni (className ile hover:-translate-y-2 animasyonu, dekoratif gradient ve accent çizgisi ile birlikte), aksi halde `div` elementi (dekoratif gradient ile birlikte); her iki durumda da `content` JSX'i dahil edilir
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\components\admin\dashboard\StatCard.tsx
-  function: src\components\admin\dashboard\StatCard.tsx::StatCard
+  file: StatCard.tsx
+  function: StatCard.tsx::StatCard
 
 ---
 
@@ -116,10 +129,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `shadow-glow-md`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-400/10`, `bg-gradient-to-br`, `bg-rose-400/10`, `border-white/5`, `from-white/5`, `group-hover:text-slate-400`, `lg:text-4xl`, `text-3xl`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-white`, `text-xs`, `to-transparent`
+- **Renkler:** `bg-admin-danger-weak`, `bg-admin-success-weak`, `bg-gradient-to-br`, `border-admin-border`, `from-white/5`, `group-hover:text-admin-fg-muted`, `lg:text-4xl`, `text-3xl`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-success`, `text-xs`, `to-transparent`
 - **Layout:** `-right-12`, `-top-12`, `absolute`, `block`, `bottom-0`, `flex`, `flex-1`, `flex-wrap`, `from-white/5`, `gap-0.5`, `gap-2`, `group-hover:shadow-hvac-stat-card-hover`, `h-1`, `h-14`, `h-48`
 - **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `lg:` önekleri
-- **Yardımcı Sınıflar:** `${baseClass`, `${currentAccent.accent`, `${currentAccent.iconBg`, `${trend.value`, `0`, `:`, `>=`, `border`, `duration-1000`, `duration-500`, `duration-700`, `font-black`, `group-hover:rotate-6`, `group-hover:scale-105`, `group-hover:scale-110`
+- **Yardımcı Sınıflar:** `${baseClass`, `${currentAccent.accent`, `${currentAccent.iconBg`, `${trend.value`, `0`, `:`, `>=`, `border`, `duration-1000`, `duration-500`, `duration-700`, `font-semibold`, `group-hover:rotate-6`, `group-hover:scale-105`, `group-hover:scale-110`

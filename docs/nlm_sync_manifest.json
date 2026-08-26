@@ -1,0 +1,276 @@
+{
+  "beklenen": [
+    "3d-scene-lighting-research.md",
+    "3d-showroom-ux-research.md",
+    "3d-webgl-standard.md",
+    "CHANGELOG.md",
+    "CLAUDE.md",
+    "CONTEXT.md",
+    "PROJECT.md",
+    "README.md",
+    "RECOMMENDATIONS.md",
+    "SOURCES.md",
+    "VISION.md",
+    "admin-capabilities.md",
+    "admin-design-standard.md",
+    "admin-standard.md",
+    "analytics-standard.md",
+    "auth-account-standard.md",
+    "auth-hooks.md",
+    "canonical-url-standard.md",
+    "catalog-commerce-pipeline-master-2026-06-20.md",
+    "catalog-depth-standard.md",
+    "catalog-ingestion-standard.md",
+    "category-taxonomy-standard.md",
+    "checkout-payment-standard.md",
+    "ci-runner-install-standard.md",
+    "collaboration-protocol.md",
+    "commerce-domain-map-standard.md",
+    "companion-doc-standard.md",
+    "crm-standard.md",
+    "csp-standard.md",
+    "csv-import-export-standard.md",
+    "custom-claims-and-role-based-access-control-rbac.md",
+    "customer-account-standard.md",
+    "database_schema_master.md",
+    "db-grant-hygiene-standard.md",
+    "dealer-data-ground-truth-2026-06-11.md",
+    "dealer-module-blueprint.md",
+    "dealer-network-standard.md",
+    "dependency-integrity-standard.md",
+    "deploy-build-skip-standard.md",
+    "design_system_config.md",
+    "edge-function-security-standard.md",
+    "erp-workspace-design-standard.md",
+    "execution-method-standard.md",
+    "faz0-kit-contract-2026-06-13.md",
+    "faz1-migration-playbook-2026-06-13.md",
+    "fleet-mechanism-standard.md",
+    "form-submission-standard.md",
+    "i18n-localization-standard.md",
+    "kayitlar_master.md",
+    "legal-compliance-standard.md",
+    "measurement-discipline-standard.md",
+    "migration-safety-standard.md",
+    "mockup-gelisim-hatti-standardi.md",
+    "multi-session-coordination-standard.md",
+    "notification-standard.md",
+    "operasyon-dongusu-denetimi-2026-08-15.md",
+    "pano-orion-koprusu-standardi.md",
+    "payment-ledger-standard.md",
+    "pricing-standard.md",
+    "product-image-standard.md",
+    "product-schema-ground-truth-2026-06-21.md",
+    "product-schema-master-implementation-plan.md",
+    "product-schema-standard.md",
+    "purchasing-standard.md",
+    "quote-standard.md",
+    "realtime-authorization.md",
+    "render-stratejisi-denetimi-2026-08-16.md",
+    "rendering-cache-standard.md",
+    "row-level-security.md",
+    "runtime-version-alignment-standard.md",
+    "saas-funding-and-packaging-2026-06.md",
+    "seo-transition-blueprint.md",
+    "session-loop-ritual.md",
+    "settled-work-standard.md",
+    "slug-localization-2026-08-10.md",
+    "spec-axis-standard.md",
+    "standards_master.md",
+    "storefront-design-standard.md",
+    "storefront-reflow-standard.md",
+    "subagent-delegation-standard.md",
+    "supabase_functions_master.md",
+    "venthub_hvac_master.md",
+    "venthub_skills_master.md",
+    "vibe-coding-20-madde-v2-2026-08-16.md",
+    "work-tracking-ssot-standard.md"
+  ],
+  "defterde": [
+    {
+      "baslik": "CLAUDE.md",
+      "id": "be4012a8-bad9-47f9-ba5b-412808d5cc96"
+    },
+    {
+      "baslik": "README.md",
+      "id": "5589474c-0a8e-4522-bae2-c3c49b8a2625"
+    },
+    {
+      "baslik": "SaaS Master Roadmap (4 Faz)",
+      "id": "5bf385e3-997f-47c0-b82b-c0ef49d579d4"
+    },
+    {
+      "baslik": "Supabase Resmi Next.js 15 SSR Client Olusturma Kilavuzu",
+      "id": "27a4acf2-e26e-439d-940c-9154678d4ac7"
+    },
+    {
+      "baslik": "System Tree (Proje Yapisi)",
+      "id": "09d78d9a-545d-4439-9751-f51a46566d59"
+    },
+    {
+      "baslik": "Typography - Fluid Typography",
+      "id": "a7cf62a2-8a9c-4261-a10a-71575aac198c"
+    },
+    {
+      "baslik": "Typography - Font Loading",
+      "id": "bda348ea-4c65-48f1-8387-930945d6a424"
+    },
+    {
+      "baslik": "Typography - Internationalization",
+      "id": "742940f3-eb80-4e6e-b009-08e0e71695b2"
+    },
+    {
+      "baslik": "Typography - Masters Reference",
+      "id": "dc4f0d95-97db-49a1-948d-a4458a49d9f6"
+    },
+    {
+      "baslik": "Typography - OpenType Features",
+      "id": "9f97e87f-ebb7-4de6-830e-9c9a52116f51"
+    },
+    {
+      "baslik": "Typography - Tailwind Integration",
+      "id": "ecc968f0-68c1-4e7f-b426-227b8a71df6a"
+    },
+    {
+      "baslik": "Typography - Variable Fonts",
+      "id": "7da073a5-4aa3-4e50-81c0-0a9e784259e7"
+    },
+    {
+      "baslik": "VentHub project-dna.yaml (2026-06-06)",
+      "id": "63568886-d7eb-4870-8d6e-4b828e9cf28d"
+    },
+    {
+      "baslik": "admin-cetvel-scores-2026-06-17.md",
+      "id": "c94d38ca-a148-4b77-9cf8-ab3875fbbd1c"
+    },
+    {
+      "baslik": "database_schema_master.md",
+      "id": "1710d4e2-c14d-46c1-8933-ee213ffc577d"
+    },
+    {
+      "baslik": "design_system_config.md",
+      "id": "eacd406d-5a87-4121-af8e-88d0cb539078"
+    },
+    {
+      "baslik": "kayitlar_master.md",
+      "id": "efe906c5-a5ad-4e49-b98f-8b4e6f7a624e"
+    },
+    {
+      "baslik": "spec_kit_final_research.md",
+      "id": "941d21fd-b2b5-4c57-9ee5-04ae9ef142b2"
+    },
+    {
+      "baslik": "standards_master.md",
+      "id": "1b15c89c-cad4-4d05-9dda-433e26412d62"
+    },
+    {
+      "baslik": "supabase_functions_master.md",
+      "id": "2fa7e281-d47c-4e00-8ca5-7a7225e04be9"
+    },
+    {
+      "baslik": "venthub_hvac_master.md",
+      "id": "9ead3488-2b79-41f5-bba9-d9eac0b83864"
+    },
+    {
+      "baslik": "venthub_skills_master.md",
+      "id": "0ba4e4e5-b4bf-41cb-a12b-e20dc8353344"
+    }
+  ],
+  "eksik": [
+    "3d-scene-lighting-research.md",
+    "3d-showroom-ux-research.md",
+    "3d-webgl-standard.md",
+    "CHANGELOG.md",
+    "CONTEXT.md",
+    "PROJECT.md",
+    "RECOMMENDATIONS.md",
+    "SOURCES.md",
+    "VISION.md",
+    "admin-capabilities.md",
+    "admin-design-standard.md",
+    "admin-standard.md",
+    "analytics-standard.md",
+    "auth-account-standard.md",
+    "auth-hooks.md",
+    "canonical-url-standard.md",
+    "catalog-commerce-pipeline-master-2026-06-20.md",
+    "catalog-depth-standard.md",
+    "catalog-ingestion-standard.md",
+    "category-taxonomy-standard.md",
+    "checkout-payment-standard.md",
+    "ci-runner-install-standard.md",
+    "collaboration-protocol.md",
+    "commerce-domain-map-standard.md",
+    "companion-doc-standard.md",
+    "crm-standard.md",
+    "csp-standard.md",
+    "csv-import-export-standard.md",
+    "custom-claims-and-role-based-access-control-rbac.md",
+    "customer-account-standard.md",
+    "db-grant-hygiene-standard.md",
+    "dealer-data-ground-truth-2026-06-11.md",
+    "dealer-module-blueprint.md",
+    "dealer-network-standard.md",
+    "dependency-integrity-standard.md",
+    "deploy-build-skip-standard.md",
+    "edge-function-security-standard.md",
+    "erp-workspace-design-standard.md",
+    "execution-method-standard.md",
+    "faz0-kit-contract-2026-06-13.md",
+    "faz1-migration-playbook-2026-06-13.md",
+    "fleet-mechanism-standard.md",
+    "form-submission-standard.md",
+    "i18n-localization-standard.md",
+    "legal-compliance-standard.md",
+    "measurement-discipline-standard.md",
+    "migration-safety-standard.md",
+    "mockup-gelisim-hatti-standardi.md",
+    "multi-session-coordination-standard.md",
+    "notification-standard.md",
+    "operasyon-dongusu-denetimi-2026-08-15.md",
+    "pano-orion-koprusu-standardi.md",
+    "payment-ledger-standard.md",
+    "pricing-standard.md",
+    "product-image-standard.md",
+    "product-schema-ground-truth-2026-06-21.md",
+    "product-schema-master-implementation-plan.md",
+    "product-schema-standard.md",
+    "purchasing-standard.md",
+    "quote-standard.md",
+    "realtime-authorization.md",
+    "render-stratejisi-denetimi-2026-08-16.md",
+    "rendering-cache-standard.md",
+    "row-level-security.md",
+    "runtime-version-alignment-standard.md",
+    "saas-funding-and-packaging-2026-06.md",
+    "seo-transition-blueprint.md",
+    "session-loop-ritual.md",
+    "settled-work-standard.md",
+    "slug-localization-2026-08-10.md",
+    "spec-axis-standard.md",
+    "storefront-design-standard.md",
+    "storefront-reflow-standard.md",
+    "subagent-delegation-standard.md",
+    "vibe-coding-20-madde-v2-2026-08-16.md",
+    "work-tracking-ssot-standard.md"
+  ],
+  "fazla": [
+    "SaaS Master Roadmap (4 Faz)",
+    "Supabase Resmi Next.js 15 SSR Client Olusturma Kilavuzu",
+    "System Tree (Proje Yapisi)",
+    "Typography - Fluid Typography",
+    "Typography - Font Loading",
+    "Typography - Internationalization",
+    "Typography - Masters Reference",
+    "Typography - OpenType Features",
+    "Typography - Tailwind Integration",
+    "Typography - Variable Fonts",
+    "VentHub project-dna.yaml (2026-06-06)",
+    "admin-cetvel-scores-2026-06-17.md",
+    "spec_kit_final_research.md"
+  ],
+  "notebook_id": "235043eb-970f-4a52-9f39-1d02b2621e9c",
+  "olculdu": "2026-08-26T09:54:13+00:00",
+  "olcum_basarili": true,
+  "surum": 1
+}

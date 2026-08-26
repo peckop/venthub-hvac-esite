@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\tenantServer.ts
-skeleton_hash: 69eb81e10061f69f
+skeleton_hash: d8a9297cf2031ecb
 entity_hashes:
   overview: 5ef2b4c70f7b5fe7
-generated_at: 2026-06-19T20:48:40Z
+generated_at: 2026-08-24T12:50:47Z
 ---
 
 ## Genel Bakış
@@ -46,9 +46,6 @@ Modül, `next/headers` paketinden gelen `headers` fonksiyonu ile HTTP istek bağ
 - `is_active: boolean`
 - `features: {`
 - `styles: {`
-
-### SupabaseClientOverride
-- `from: (table: string) => {`
 
 ---
 

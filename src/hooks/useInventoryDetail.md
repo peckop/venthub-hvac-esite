@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\hooks\useInventoryDetail.ts
-skeleton_hash: ea70fcdd2ce69378
+source_path: C:\Users\alize\venthub-hvac\src\hooks\useInventoryDetail.ts
+skeleton_hash: fa74620e6ff72d0e
 entity_hashes:
-  func:useInventoryDetail: 8772b4d5485a8593
+  func:useInventoryDetail: 6339f8150a38b023
   overview: 4c4c791d580870aa
-generated_at: 2026-08-15T18:26:23Z
+generated_at: 2026-08-24T12:47:22Z
 ---
 
 ## Genel Bakış
@@ -30,40 +30,38 @@ Bu modül için minimum bilgi ile üretilen varsayımlar aşağıdadır. Fonksiy
 
 ---
 
-**[Aksiyom 1]**: Eğer `options` parametresi geçerli bir `UseInventoryDetailOptions` nesnesi olarak sağlanmazsa, hook beklenmeyen davranış sergiler veya hata fırlatır.
-
-> **Gerekçe:** Fonksiyon imzası `options` parametresini zorunlu olarak alır (default değer yoktur).
-
----
-
-**[Aksiyom 2]**: Eğer `UNDO_WINDOW_MS` sabiti hesaplanamaz veya geçerli bir sayısal (milisaniye) değere sahip olmazsa, geri alma (undo) penceresi mekanizması çalışamaz.
-
-> **Gerekçe:** Sabit bir `binary_expression` olarak tanımlanmıştır; adı zaman penceresine işaret eder. Tam değeri bilinmiyor, ancak pozitif bir milisaniye değeri olması beklenir.
-
----
-
-**[Aksiyom 3]**: Bu hook bir React bileşeninin veya özel hook'un içinde kullanımına yöneliktir; React hook kurallarına (conditional call yasak) uyulmazsa hata oluşur.
-
-> **Gerekçe:** Dosya uzantısı `.ts` ve fonksiyon adı `useInventoryDetail` — React hook convention'ına uyar.
-
----
-
-**Not:** `UseInventoryDetailOptions` ve `UseInventoryDetailResult` tiplerinin iç yapısı bu verilerde mevcut değildir. Bu tiplerin hangi alanları zorunlu kıldığı **bilinmiyor**.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### useInventoryDetail
+**Ne yapar**: Envanter detaylarını yöneten bir React custom hook'udur. Bir envanter satırının detayını açma/kapama, stok hareketlerini ve rezerve siparişleri yükleme, eşik değerini kaydetme, stok düzeltme ve son hareketi geri alma gibi işlemleri sağlar. Hook, bileşenin ihtiyaç duyduğu tüm durum değişkenlerini ve eylem fonksiyonlarını tek bir noktadan dışarıya sunar.
 
-**Ne yapar**: Envanter detay panelinin tüm durum yönetimini tek bir custom React hook'ta merkezileştirir. Seçili ürünün detay gösterimi, hareket geçmişi, rezervasyon listesi, eşik değeri kaydetme, stok ayarlama ve son hareketi geri alma işlevlerini bir arada sunar. Bu hook, envanter tablosundaki satırlara tıklandığında detay panelinin açılmasından kapanmasına kadar tüm yaşam döngüsünü yönetir.
-
-**Nasıl yapar**: `UseInventoryDetailOptions` parametresinden `hasWriteAccess`, `rows` ve `onMutated` değerlerini alır. `useRef` ile rows ve onMutated referanslarını tutarak asenkron callback'lerin her zaman güncel değerlere erişmesini sağlar. `openTokenRef` mekanizması ile hızlı satır değişimlerinde geç gelen fetch isteklerini yutar (yarış koruması). `useEffect` ile bileşen mount olduğunda `inventory_settings` tablosundan `default_low_stock_threshold` değerini çekerek global varsayılan eşiği yükler. `useCallback` ile sarılmış tüm iç fonksiyonları, dışarıya hem durum (state) değerlerini hem de bu fonksiyonları birlikte döner. `mutateWithAudit` çağrıları ile veritabanı değişikliklerini denetim kaydıyla birlikte yapar.
+**Nasıl yapar**: Hook, `options` parametresinden yazma yetkisi (`hasWriteAccess`), satır listesi (`rows`) ve mutasyon sonrası tetiklenecek geri çağırma (`onMutated`) alır. `useI18n` ile uluslararasılaştırma desteği ekler. `rowsRef` ve `onMutatedRef` referansları, useCallback bağımlılık döngülerine girmeden güncel değerlere erişmek için kullanılır. `openTokenRef`, hızlı satır değişimlerinde yarış koşullarını önlemek amacıyla açık satırın kimliğini tutar — bir fetch tamamlandığında bu token eşleşmiyorsa sonuç yutulur. `useEffect` ile bileşen yüklendiğinde `inventory_settings` tablosundan global varsayılan düşük stok eşiği çekilir. `loadMovements` ve `loadReserved` useCallback fonksiyonları sırasıyla `inventory_movements` ve `reserved_orders` tablolarından veri çeker. `open` fonksiyonu bir satırı seçer, ilgili hareketleri ve rezerve siparişleri paralel olarak yükler ve yarış koruması uygular. `saveThreshold` fonksiyonu `mutateWithAudit` ile denetimli şekilde eşik değerini günceller. `adjustStock` fonksiyonu `adjust_stock` RPC'si aracılığıyla stok düzeltmesi yapar ve hareket geçmişini yeniler. `undoLastMovement` fonksiyonu son hareketi geri alır; ancak "undo" ile başlayan hareketler tekrar geri alınamaz (sonsuz salınım engeli) ve belirli bir zaman penceresi (`UNDO_WINDOW_MS`) geçmişse işlem reddedilir.
 
 **Parametreler**:
-- options: `UseInventoryDetailOptions` — Hook'un yapılandırma seçeneklerini içeren nesne. İçinde `hasWriteAccess: boolean` (yazma yetkisi olup olmadığı), `rows: InventoryRow[]` (envanter satırları dizisi), `onMutated: () => Promise<void>` (veri değişikliği sonrası tetiklenecek callback) bulunur.
+- options: UseInventoryDetailOptions — Hook'un yapılandırma seçeneklerini içerir. Bileşenin yazma yetkisi, mevcut satır listesi ve veri mutasyonu sonrası çağrılacak geri çağırma fonksiyonunu taşır.
 
-**Dönüş**: `UseInventoryDetailResult` — Seçili satır, detay yükleme durumu, hareket listesi, rezervasyonlar, seçili stok miktarı, eşik değerleri, various loading flag'leri, eşiği kaydetme/stock ayarlama/geri alma fonksiyonları gibi envanter detay panelinin ihtiyacı olan tüm durum ve eylemleri içeren nesne.
+**Dönüş**: UseInventoryDetailResult — Aşağıdaki alanları içeren bir nesne döndürür:
+- selected: InventoryRow | null — Şu anda detayı açık olan envanter satırı; yoksa null.
+- open: (row: InventoryRow) => void — Verilen satırın detayını açar, stok hareketlerini ve rezerve siparişleri yükler.
+- close: () => void — Açık detayı kapatır, tüm ilgili durumları sıfırlar.
+- detailLoading: boolean — Detaya ait verilerin yüklenip yüklenmediğini gösterir.
+- movements: Movement[] — Seçili ürüne ait son stok hareketlerini içerir (en fazla 5 kayıt, yeniden eskiye sıralı).
+- reservedOrders: ReservedRow[] — Seçili ürüne ait rezerve siparişleri içerir.
+- selectedStock: number | null — Seçili ürünün güncel fiziksel stok miktarı.
+- selectedThreshold: number | '' — Seçili ürünün düşük stok eşiği; boş string ise varsayılan kullanılır.
+- setSelectedThreshold: (value: number | '') => void — Düşük stok eşiğini ayarlar.
+- defaultThreshold: number | null — Sistem genelindeki varsayılan düşük stok eşiği.
+- effectiveThreshold: (productId: string) => number | null — Verilen ürün için geçerli eşiği hesaplar; ürünün kendi eşiği varsa onu, yoksa global varsayılanı döndürür.
+- saving: boolean — Eşik kaydetme işleminin devam edip etmediğini gösterir.
+- moving: boolean — Stok düzeltme işleminin devam edip etmediğini gösterir.
+- undoing: boolean — Geri alma işleminin devam edip etmediğini gösterir.
+- printingQr: boolean — QR kod yazdırma işleminin devam edip etmediğini gösterir.
+- setPrintingQr: (value: boolean) => void — QR kod yazdırma durumunu ayarlar.
+- moveQty: number — Stok hareketi için varsayılan miktar; başlangıç değeri 1.
+- setMoveQty: (value: number) => void — Stok hareketi miktarını ayarlar.
+- saveThreshold: (productId: string) => void — Seçili ürünün düşük stok eşiğini denetimli (audit) şekilde kaydeder.
+- adjustStock: (productId: string, delta: number, reason: string) => void — Seçili ürünün stok miktarını belirtilen delta kadar artırır/azaltır; hareket nedeniyle birlikte kaydeder.
+- undoLastMovement: () => void — Seçili ürünün son stok hareketini geri alır; "undo" ile başlayan hareketler veya zaman penceresi dışındaki hareketler geri alınamaz.
 
 ---
 
@@ -126,177 +124,183 @@ Tablodan gelen satır — eşik kolonu view'de yok, `products`'tan eşleştirili
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::useInventoryDetail
-- **params**: (options: UseInventoryDetailOptions)
+- **params**: `options` (UseInventoryDetailOptions)
 - **ic_degiskenler**:
-  - `hasWriteAccess` — options'dan destructure edilen, stok ayarlarını kaydetme/silme yetkisi boolean'ı
-  - `rows` — inventory tablosu satırlarının dizi referansı
-  - `onMutated` — veri değişikliği sonrası çağrılan callback fonksiyonu
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
-  - `rowsRef` — rows'un ref içinde tutulduğu değişmez referans
-  - `onMutatedRef` — onMutated callback'ini ref içinde tutan referans
-  - `selected` — seçili inventory satırı state'i (InventoryRow | null)
-  - `detailLoading` — detay yükleme durumu boolean state'i
-  - `movements` — ürün hareket geçmişi dizisi state'i (Movement[])
-  - `reservedOrders` — ürün için rezerve edilmiş siparişler dizisi state'i (ReservedRow[])
-  - `selectedStock` — seçili ürünün fiziksel stok miktarı state'i (number | null)
-  - `selectedThreshold` — seçili ürünün özel düşük stok eşiği state'i (number | '')
-  - `defaultThreshold` — inventory_settings tablosundan çekilen global düşük stok eşiği state'i (number | null)
-  - `saving` — eşik kaydetme işlemi devam ediyor mu boolean state'i
-  - `moving` — stok ayarlama/hareket ekleme işlemi devam ediyor mu boolean state'i
-  - `undoing` — son hareketi geri alma işlemi devam ediyor mu boolean state'i
-  - `printingQr` — QR kod yazdırma durumu boolean state'i
-  - `moveQty` — hareket miktarı state'i (number, varsayılan 1)
-  - `openTokenRef` — açık satır kimliğini tutan ref, yarış koruması için (string | null)
-- **Dönüş**: UseInventoryDetailResult (seçili satır, aç/kapat fonksiyonları, yükleme durumları, stok/eşik değerleri, hareket verileri, rezerve siparişler, kaydet/ayarla/geri alma fonksiyonları dahil bir nesne)
+  - `hasWriteAccess` — options'dan destructured, yazma yetkisi olup olmadığını belirten boolean
+  - `rows` — options'dan destructured, envanter satırları dizisi
+  - `onMutated` — options'dan destructured, mutasyon sonrası çağrılacak callback fonksiyonu
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu
+  - `rowsRef` — useRef ile oluşturulan, rows değerinin güncel halini tutan ref
+  - `onMutatedRef` — useRef ile oluşturulan, onMutated fonksiyonunun güncel halini tutan ref
+  - `selected` — useState ile tutulan, şu an seçili olan InventoryRow veya null
+  - `detailLoading` — useState ile tutulan, detay verilerinin yüklenme durumu boolean'ı
+  - `movements` — useState ile tutulan, seçili ürüne ait stok hareket geçmişi dizisi
+  - `reservedOrders` — useState ile tutulan, seçili ürüne ait rezerve siparişler dizisi
+  - `selectedStock` — useState ile tutulan, seçili ürünün fiziksel stok miktarı veya null
+  - `selectedThreshold` — useState ile tutulan, seçili ürünün eşik değeri (number) veya boş string ('')
+  - `defaultThreshold` — useState ile tutulan, inventory_settings tablosundan çekilen global varsayılan eşik değeri veya null
+  - `saving` — useState ile tutulan, eşik kaydetme işlemi sırasında true olan boolean
+  - `moving` — useState ile tutulan, stok hareketi (adjustStock) işlemi sırasında true olan boolean
+  - `undoing` — useState ile tutulan, son hareketi geri alma işlemi sırasında true olan boolean
+  - `printingQr` — useState ile tutulan, QR kod yazdırma işlemi sırasında true olan boolean
+  - `moveQty` — useState ile tutulan, hareket miktarı (varsayılan 1)
+  - `openTokenRef` — useRef ile oluşturulan, açık satırın product_id'sini tutan ref; hızlı satır değişiminde geç gelen fetch'i yutmak için yarış koruması sağlar
+  - `effectiveThreshold` — useCallback ile memoize edilen, bir productId için etkili eşik değerini döndüren fonksiyon
+  - `loadMovements` — useCallback ile memoize edilen, bir productId için son 5 stok hareketini Supabase'den çeken async fonksiyon
+  - `loadReserved` — useCallback ile memoize edilen, bir productId için rezerve siparişleri Supabase'den çeken async fonksiyon
+  - `open` — useCallback ile memoize edilen, bir InventoryRow satırını seçen ve detay verilerini yükleyen fonksiyon
+  - `close` — useCallback ile memoize edilen, seçili satırı temizleyip detayları kapatan fonksiyon
+  - `describeError` — useCallback ile memoize edilen, hata nesnesini kullanıcıya anlaşılır mesaja çeviren fonksiyon
+  - `saveThreshold` — useCallback ile memoize edilen, seçili eşik değerini products tablosuna audit log ile kaydeden fonksiyon
+  - `adjustStock` — useCallback ile memoize edilen, adjust_stock RPC ile stok miktarını değiştiren fonksiyon
+  - `undoLastMovement` — useCallback ile memoize edilen, son stok hareketini ters çevirerek geri alan fonksiyon
+- **Dönüş**: UseInventoryDetailResult (selected, open, close, detailLoading, movements, reservedOrders, selectedStock, selectedThreshold, setSelectedThreshold, defaultThreshold, effectiveThreshold, saving, moving, undoing, printingQr, setPrintingQr, moveQty, setMoveQty, saveThreshold, adjustStock, undoLastMovement)
 
-### [N2_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::useEffect (defaultThreshold yükleme)
-- **params**: () (boş parametre, useEffect callback'i)
+### [N2_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::useEffect callback (inventory_settings)
+- **params**: yok (useEffect callback)
 - **ic_degiskenler**:
-  - `active` — cleanup fonksiyonunda false yapılan flag, component unmount edildiğinde state güncellemesini engeller (boolean)
-  - `data` — supabase sorgusundan dönen inventory_settings satırı (varsayılan eşik değerini içerir)
-  - `error` — supabase sorgusundan dönen hata nesnesi
-  - `default_low_stock_threshold` — data içindeki düşük stok eşiği değeri, null olabilir
-- **Dönüş**: void (yan etki: defaultThreshold state'ini günceller)
+  - `active` — bileşen mount durumunu takip eden boolean flag; cleanup'ta false yapılır
+  - `data` — supabaseBrowserClient.from('inventory_settings').select('default_low_stock_threshold').maybeSingle() sorgusundan dönen veri
+  - `error` — aynı sorgudan dönen hata nesnesi
+- **Dönüş**: cleanup fonksiyonu (active = false yapan)
 
-### [N3_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::async (defaultThreshold yükleme asenkron kısmı)
-- **params**: () (boş parametre)
+### [N3_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::useEffect cleanup
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (active değişkenini false yapar)
+
+### [N4_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::useEffect inner async
+- **params**: yok
 - **ic_degiskenler**:
-  - `data` — supabase sorgusundan dönen inventory_settings satırı
-  - `error` — supabase sorgusundan dönen hata nesnesi
-  - `default_low_stock_threshold` — data içindeki düşük stok eşiği değeri
-- **Dönüş**: Promise<void>
-
-### [N4_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::cleanup (useEffect return)
-- **params**: () (boş parametre)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (yan etki: active flag'ini false yapar)
+  - `data` — inventory_settings tablosundan çekilen default_low_stock_threshold alanını içeren veri
+  - `error` — sorgu hatası; varsa setDefaultThreshold çağrılmaz
+- **Dönüş**: yok (void)
 
 ### [N5_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::effectiveThreshold
-- **params**: (productId: string)
+- **params**: `productId` (string)
 - **ic_degiskenler**:
-  - `row` — rowsRef içindeki productId eşleşen satır (InventoryRow | undefined)
-  - `own` — satırın kendi düşük stok eşiği değeri (number | undefined)
-- **Dönüş**: number | null (ürünün özel eşiği varsa o, yoksa global defaultThreshold)
+  - `row` — rowsRef.current içinde product_id'si eşleşen InventoryRow satırı; bulunamazsa undefined
+  - `own` — row.low_stock_threshold; ürünün kendi eşik değeri
+- **Dönüş**: number | null (ürünün kendi eşik değeri varsa onu, yoksa defaultThreshold'u döndürür)
 
 ### [N6_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::loadMovements
-- **params**: (productId: string)
+- **params**: `productId` (string)
 - **ic_degiskenler**:
-  - `data` — inventory_movements tablosundan dönen ham satırlar dizisi
-  - `error` — supabase sorgusundan dönen hata nesnesi
-  - `m` — map içindeki her bir ham hareket satırı
-- **Dönüş**: Promise<Movement[]> (hareket geçmişi dizisi, hata olursa boş dizi)
+  - `data` — inventory_movements tablosundan product_id filtresiyle, created_at azalan sırayla, 5 kayıt limitiyle çekilen veri
+  - `error` — sorgu hatası; varsa boş Movement[] döndürülür
+- **Dönüş**: Movement[] (id, delta, reason, created_at alanlarını içeren dizi)
 
-### [N7_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::map (loadMovements içinde)
-- **params**: (m)
-- **ic_degiskenler**: (yok, m parametresi kullanılıyor)
-- **Dönüş**: Movement nesnesi (id, delta, reason, created_at alanlarını içerir)
+### [N7_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::loadMovements inner map
+- **params**: `m` (inventory_movements tablosundan gelen tek kayıt)
+- **ic_degiskenler**: yok
+- **Dönüş**: { id: m.id, delta: m.delta, reason: m.reason, created_at: m.created_at }
 
 ### [N8_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::loadReserved
-- **params**: (productId: string)
+- **params**: `productId` (string)
 - **ic_degiskenler**:
-  - `data` — reserved_orders tablosundan dönen ham satırlar dizisi
-  - `error` — supabase sorgusundan dönen hata nesnesi
-  - `r` — map içindeki her bir ham rezerve satırı
-- **Dönüş**: Promise<ReservedRow[]> (rezerve siparişler dizisi, hata olursa boş dizi)
+  - `data` — reserved_orders tablosundan product_id filtresiyle, created_at azalan sırayla çekilen veri
+  - `error` — sorgu hatası; varsa boş ReservedRow[] döndürülür
+- **Dönüş**: ReservedRow[] (order_id, created_at, status, payment_status, quantity alanlarını içeren dizi)
 
-### [N9_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::map (loadReserved içinde)
-- **params**: (r)
-- **ic_degiskenler**: (yok, r parametresi kullanılıyor)
-- **Dönüş**: ReservedRow nesnesi (order_id, created_at, status, payment_status, quantity alanlarını içerir)
+### [N9_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::loadReserved inner map
+- **params**: `r` (reserved_orders tablosundan gelen tek kayıt)
+- **ic_degiskenler**: yok
+- **Dönüş**: { order_id: r.order_id ?? '', created_at: r.created_at ?? new Date().toISOString(), status: r.status ?? 'pending', payment_status: r.payment_status ?? null, quantity: r.quantity ?? 0 }
 
 ### [N10_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::open
-- **params**: (row: InventoryRow)
+- **params**: `row` (InventoryRow)
 - **ic_degiskenler**:
-  - `openTokenRef.current` — şu anki açık satırın product_id'si, yarış koruması için (string)
-  - `own` — rowsRef içindeki row.product_id eşleşen satırın kendi düşük stok eşiği (number | undefined)
-- **Dönüş**: void (yan etki: selected, selectedStock, selectedThreshold, movements, reservedOrders, detailLoading state'lerini günceller)
+  - `own` — rowsRef.current içinde row.product_id eşleşen satırın low_stock_threshold değeri; bulunamazsa undefined
+  - `mv` — loadMovements(row.product_id) sonucu, stok hareket geçmişi
+  - `ro` — loadReserved(row.product_id) sonucu, rezerve siparişler
+- **Dönüş**: yok (openTokenRef.current'ı row.product_id olarak ayarlar, selected/selectedStock/selectedThreshold state'lerini günceller, movements ve reservedOrders'ı yükler; yarış koruması ile openTokenRef.current değişmişse geç gelen cevabı yutar)
 
-### [N11_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::async (open içinde asenkron kısım)
-- **params**: () (boş parametre)
+### [N11_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::open inner async
+- **params**: yok
 - **ic_degiskenler**:
-  - `mv` — loadMovements sonucu hareket dizisi (Movement[])
-  - `ro` — loadReserved sonucu rezerve siparişler dizisi (ReservedRow[])
-- **Dönüş**: Promise<void>
+  - `mv` — Promise.all ile paralel çekilen loadMovements sonucu
+  - `ro` — Promise.all ile paralel çekilen loadReserved sonucu
+- **Dönüş**: yok (void; openTokenRef.current !== row.product_id kontrolü yapar, eşleşmiyorsa return eder)
 
 ### [N12_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::close
-- **params**: () (boş parametre)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (yan etki: openTokenRef, selected, movements, reservedOrders, detailLoading state'lerini sıfırlar)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (openTokenRef.current'ı null yapar, selected/movements/reservedOrders state'lerini sıfırlar, detailLoading'i false yapar)
 
 ### [N13_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::describeError
-- **params**: (e: unknown)
-- **ic_degiskenler**: (yok, sadece parametre kullanılıyor)
-- **Dönüş**: string (hatanın kullanıcıya gösterilecek açıklaması)
+- **params**: `e` (unknown)
+- **ic_degiskenler**: yok
+- **Dönüş**: string (AdminPermissionError ise t('admin.inventory.settings.noPermission'), Error ise e.message, diğer durumlarda t('admin.common.error'))
 
 ### [N14_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::saveThreshold
-- **params**: (productId: string)
+- **params**: `productId` (string)
 - **ic_degiskenler**:
-  - `isDefault` — seçilen eşik boş string mi, yani varsayılan mı (boolean)
-  - `row` — rowsRef içindeki productId eşleşen satır (InventoryRow | undefined)
-  - `before` — güncelleme öncesi nesne (low_stock_threshold alanını içerir)
-  - `after` — güncelleme sonrası nesne (low_stock_threshold ve low_stock_override alanlarını içerir)
-  - `e` — try-catch içinde yakalanan hata nesnesi
-- **Dönüş**: void (yan etki: saving state'ini, selectedThreshold'ı sıfırlar, toast mesajı gösterir, onMutatedRef.current() çağırır)
+  - `isDefault` — selectedThreshold === '' kontrolü; boşsa varsayılan eşik kullanılır
+  - `row` — rowsRef.current içinde product_id eşleşen satır
+  - `before` — güncelleme öncesi { low_stock_threshold: row?.low_stock_threshold ?? null }
+  - `after` — güncelleme sonrası { low_stock_threshold: isDefault ? null : Number(selectedThreshold), low_stock_override: !isDefault }
+  - `e` — catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: yok (mutateWithAudit ile products tablosunu günceller, başarılıysa toast.success gösterir ve onMutatedRef.current()'ı çağırır; hata olursa toast.error ile describeError sonucunu gösterir; finally'de setSaving(false) yapar)
 
-### [N15_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::async (saveThreshold içinde asenkron kısım)
-- **params**: () (boş parametre)
+### [N15_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::saveThreshold inner async
+- **params**: yok
 - **ic_degiskenler**:
-  - `isDefault` — selectedThreshold boş string mi (boolean)
-  - `row` — rowsRef içindeki productId eşleşen satır
-  - `before` — güncelleme öncesi nesne
-  - `after` — güncelleme sonrası nesne
-  - `e` — try-catch içinde yakalanan hata nesnesi
-- **Dönüş**: Promise<void>
+  - `isDefault` — selectedThreshold === '' kontrolü
+  - `row` — rowsRef.current içinde productId eşleşen satır
+  - `before` — güncelleme öncesi low_stock_threshold değeri
+  - `after` — güncelleme sonrası low_stock_threshold ve low_stock_override değerleri
+  - `e` — catch bloğunda yakalanan hata
+- **Dönüş**: yok (void)
 
-### [N16_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::async (saveThreshold fn içinde)
-- **params**: () (boş parametre)
+### [N16_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::saveThreshold inner fn
+- **params**: yok
 - **ic_degiskenler**:
-  - `error` — supabase güncelleme sorgusundan dönen hata nesnesi
-- **Dönüş**: Promise<void>
+  - `error` — supabaseBrowserClient.from('products').update(after).eq('id', productId) sorgusundan dönen hata; varsa throw edilir
+- **Dönüş**: yok (void; hata varsa throw error)
 
 ### [N17_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::adjustStock
-- **params**: (productId: string, delta: number, reason: string)
+- **params**: `productId` (string), `delta` (number), `reason` (string)
 - **ic_degiskenler**:
-  - `e` — try-catch içinde yakalanan hata nesnesi
-- **Dönüş**: void (yan etki: moving state'ini, selectedStock ve movements state'lerini günceller, toast mesajı gösterir, onMutatedRef.current() çağırır)
+  - `e` — catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: yok (delta 0 ise return eder; mutateWithAudit ile adjust_stock RPC çağrısı yapar; başarılıysa selectedStock'u günceller, movements'ı yeniden yükler, toast.success gösterir ve onMutatedRef.current()'ı çağırır; hata olursa toast.error ile describeError sonucunu gösterir; finally'de setMoving(false) yapar)
 
-### [N18_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::async (adjustStock içinde asenkron kısım)
-- **params**: () (boş parametre)
+### [N18_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::adjustStock inner async
+- **params**: yok
 - **ic_degiskenler**:
-  - `e` — try-catch içinde yakalanan hata nesnesi
-- **Dönüş**: Promise<void>
+  - `e` — catch bloğunda yakalanan hata
+- **Dönüş**: yok (void)
 
-### [N19_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::async (adjustStock fn içinde)
-- **params**: () (boş parametre)
+### [N19_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::adjustStock inner fn
+- **params**: yok
 - **ic_degiskenler**:
-  - `error` — supabase rpc sorgusundan dönen hata nesnesi
-- **Dönüş**: Promise<void>
+  - `error` — supabaseBrowserClient.rpc('adjust_stock', { p_product_id, p_delta, p_reason }) çağrısından dönen hata; varsa throw edilir
+- **Dönüş**: yok (void; hata varsa throw error)
 
 ### [N20_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::undoLastMovement
-- **params**: () (boş parametre)
+- **params**: yok
 - **ic_degiskenler**:
-  - `target` — şu anki seçili ürün satırı (InventoryRow | null)
-  - `last` — movements[0], en son hareket (Movement | undefined)
-  - `inverse` — son hareketin tersi işareti ile miktarı (number)
-  - `reason` — geri alma nedeni string'i (undo:XXX formatında)
-  - `e` — try-catch içinde yakalanan hata nesnesi
-- **Dönüş**: void (yan etki: undoing state'ini, selectedStock ve movements state'lerini günceller, toast mesajı gösterir, onMutatedRef.current() çağırır)
+  - `target` — selected state; seçili InventoryRow veya null
+  - `last` — movements[0]; son stok hareketi kaydı
+  - `inverse` — -Number(last.delta || 0); son hareketin tersi
+  - `reason` — `undo:${String(last.id).slice(0, 8)}`; undo hareketinin nedeni
+  - `e` — catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: yok (target veya last yoksa return eder; last.reason 'undo' ile başlıyorsa undoNotAllowed hatası gösterir; UNDO_WINDOW_MS geçmişse undoTimePassed hatası gösterir; inverse 0 ise return eder; mutateWithAudit ile adjust_stock RPC çağrısı yapar; başarılıysa selectedStock'u günceller, movements'ı yeniden yükler, toast.success gösterir ve onMutatedRef.current()'ı çağırır; hata olursa toast.error ile undoFailed mesajını gösterir; finally'de setUndoing(false) yapar)
 
-### [N21_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::async (undoLastMovement içinde asenkron kısım)
-- **params**: () (boş parametre)
+### [N21_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::undoLastMovement inner async
+- **params**: yok
 - **ic_degiskenler**:
-  - `target` — selected state'inden gelen seçili satır (InventoryRow | null)
-  - `last` — movements[0], en son hareket (Movement | undefined)
-  - `inverse` — son hareketin tersi (number)
-  - `reason` — geri alma nedeni (string)
-  - `e` — try-catch içinde yakalanan hata nesnesi
-- **Dönüş**: Promise<void>
+  - `target` — selected state
+  - `last` — movements[0]
+  - `inverse` — -Number(last.delta || 0)
+  - `reason` — `undo:${String(last.id).slice(0, 8)}`
+  - `e` — catch bloğunda yakalanan hata
+- **Dönüş**: yok (void)
 
-### [N22_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::async (undoLastMovement fn içinde)
-- **params**: () (boş parametre)
+### [N22_NASIL] AST Pointer: src/hooks/useInventoryDetail.ts::undoLastMovement inner fn
+- **params**: yok
 - **ic_degiskenler**:
-  - `error` — supabase rpc sorgusundan dönen hata nesnesi
-- **Dönüş**: Promise<void>
+  - `error` — supabaseBrowserClient.rpc('adjust_stock', { p_product_id: target.product_id, p_delta: inverse, p_reason: reason }) çağrısından dönen hata; varsa throw edilir
+- **Dönüş**: yok (void; hata varsa throw error)
 
 ---
 

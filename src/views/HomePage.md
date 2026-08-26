@@ -2,46 +2,52 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\HomePage.tsx
-skeleton_hash: 6c0011202735a2cd
+source_path: C:\tmp\wt-supurme\src\views\HomePage.tsx
+skeleton_hash: db7856abd6c3d51b
 entity_hashes:
   func:HomePage: 942e6678a2c90194
   overview: c60416d7c16e0ad1
   style_tokens: 481a957f2fef5bcd
-generated_at: 2026-06-15T17:05:10Z
+generated_at: 2026-08-25T07:29:22Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun ana sayfa görünümünü oluşturan üst düzey React bileşenini tanımlar. Sayfa, sunucu tarafında hazırlanmış kategori ve ürün verilerini giriş olarak alarak kullanıcıya dinamik ve veriye dayalı bir arayüz sunar. Genel olarak, uygulamanın giriş noktasını ve temel navigasyon ile vitrin bölümlerini yapılandırmaktan sorumludur.
+
+Bu modül, uygulamanın ana sayfasını oluşturan bir React bileşenidir. Bileşen, dışarıdan sağlanan kategori ve ürün verilerini alarak ana sayfa görünümünü render eder. Üç adet varsayılan değere sahip prop ile çalışır: `initialCategories`, `rawCategories` ve `initialProducts`.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Görünümü
-Ana sayfa arayüzünün tüm bileşenlerini ve düzenini oluşturmaktan sorumlu temel fonksiyon grubudur. Veri akışını yöneterek kategori ve ürün bölümlerinin doğru şekilde render edilmesini sağlar.
+
+### Ana Sayfa Bileşeni
+Ana sayfanın tüm görünümünden ve içeriğinden sorumludur. Dışarıdan sağlanan kategori listeleri ve ürün verilerini kullanarak sayfa düzenini oluşturur.
 - HomePage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzasından çıkarım yapılabilir.
+
+[Aksiyom 1]: Eğer `initialCategories` prop'u sağlanmazsa, boş bir dizi (`[]`) kullanılır.
+[Aksiyom 2]: Eğer `rawCategories` prop'u sağlanmazsa, boş bir dizi (`[]`) kullanılır.
+[Aksiyom 3]: Eğer `initialProducts` prop'u sağlanmazsa, boş bir dizi (`[]`) kullanılır.
+
+**Not:** Fonksiyon gövdesi verilmediği için, bu props'ların bileşen içinde nasıl kullanıldığı, hangi alt bileşenlere aktarıldığı veya hangi iş mantığını tetiklediğine dair aksiyom üretilememiştir. Üç props da varsayılan değerlerle opsiyonel olarak tanımlanmıştır; bu nedenle bileşen eksik prop ile çağrıldığında hata vermez, boş veri setleriyle çalışır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### HomePage
+**Ne yapar**: HomePage, bir React fonksiyon bileşenidir. Adından anlaşılacağı üzere ana sayfa (home page) bileşeni olarak görev yapar. Varsayılan olarak boş dizilerle başlatılan kategori ve ürün verilerini alarak ana sayfa görünümünü oluşturur.
 
-**Ne yapar**: Ana sayfa bileşenidir. E-ticaret veya ürün kataloğu uygulamasının ilk kullanıcıya gösterilen sayfasını render eder. Kategorileri ve ürünleri alarak ana sayfa düzenini oluşturur.
-
-**Nasıl yapar**: Bir React fonksiyonel bileşeni (React.FC) olarak tanımlanmıştır. Üç props alır ve her biri için boş dizi (`[]`) varsayılan değerleri tanımlanmıştır. Bu sayede props传递 yapılmadığında bile bileşen hata vermeden çalışabilir. `initialCategories` işlenmiş kategori listesini, `rawCategories` ham kategori verisini (muhtemelen mehrarbeit veya dönüşüm bekleyen veri), `initialProducts` ise başlangıç ürün listesini kabul eder. Bileşen bu verileri kullanarak ana sayfa düzenini oluşturur.
+**Nasıl yapar**: Fonksiyon, destructuring yöntemiyle aldığı üç parametre ile çalışır. initialCategories, rawCategories ve initialProducts parametrelerinin her biri varsayılan olarak boş dizi (`[]`) değerine sahiptir. Fonksiyon, `React.FC<HomePageProps>` tipinde bir bileşen döndürür; bu, HomePageProps arayüzüne uygun props alan bir React fonksiyon bileşeni olduğunu gösterir. Docstring belirtilmediğinden iç mantık detayları bilinmemektedir.
 
 **Parametreler**:
-- `initialCategories` — `Category[]` (varsayılan: `[]`) — Daha önce işlenmiş ve formatlanmış kategori nesnelerinden oluşan dizi. Kategori filtreleme, navigasyon veya kart gösterimi için kullanılır.
-- `rawCategories` — `RawCategory[]` (varsayılan: `[]`) — Ham biçimdeki kategori verisi. Dönüştürme işlemi henüz uygulanmamış, işlenmemiş kategori bilgilerini içerir. Bileşen içinde ayrıca işleme tabi tutulabilir.
-- `initialProducts` — `Product[]` (varsayılan: `[]`) — Ana sayfada gösterilecek başlangıç ürün listesi. Popüler, öne çıkan veya varsayılan filtreyle gelen ürünleri barındırır.
+- initialCategories: `[]` (varsayılan) — Başlangıç kategorilerini içeren dizi. Tip bilgisi verilmemiştir, varsayılan değer boş dizi olarak atanmıştır.
+- rawCategories: `[]` (varsayılan) — Ham kategori verilerini içeren dizi. Tip bilgisi verilmemiştir, varsayılan değer boş dizi olarak atanmıştır.
+- initialProducts: `[]` (varsayılan) — Başlangıç ürünlerini içeren dizi. Tip bilgisi verilmemiştir, varsayılan değer boş dizi olarak atanmıştır.
 
-**Dönüş**: `React.FC<HomePageProps>` — React fonksiyonel bileşeni döndürür. JSX yapısı ile ana sayfa arayüzünü render eder.
+**Dönüş**: `React.FC<HomePageProps>` — HomePageProps arayüzüne uygun props alan bir React fonksiyon bileşeni döndürür. HomePageProps tipinin yapısı bu kaynakta belirtilmemiştir.
 
 ---
 
@@ -77,31 +83,29 @@ Ana sayfa arayüzünün tüm bileşenlerini ve düzenini oluşturmaktan sorumlu 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/HomePage.tsx`::HomePage
+### [N1_NASIL] AST Pointer: src/views/HomePage.tsx::HomePage
 - **params**:
-  - `initialCategories` — Sunucu tarafında hazırlanmış hafif kategori listesi, varsayılan `[]`; `GuidedCategoryDiscovery` bileşenine `displayCategories` olarak aktarılır
-  - `rawCategories` — Ham kategori verisi, varsayılan `[]`; `FeaturedCommercialBlocks` bileşenine `initialCategories` prop'u olarak aktarılır
-  - `initialProducts` — Sunucu tarafında hazırlanmış ürün listesi, varsayılan `[]`; `FeaturedCommercialBlocks` bileşenine `initialProducts` olarak aktarılır
-  - `dictionary` — Sayfa için çok dilli sözlük nesnesi; alt bileşenlere parça parça aktarılır
-  - `lang` — Aktif dil kodu; `ApplicationSolutions` ve `KnowledgeBlock` bileşenlerine iletilir
-- **ic_degiskenler**: (fonksiyon gövdesinde `const`/`let`/`var` ile tanımlanmış değişken yoktur — doğrudan JSX döner)
-- **Prop erişimleri (dictionary alt yolları)**:
-  - `dictionary.applicationSolutions` — `ApplicationSolutions` bileşenine sözlük olarak verilir
-  - `dictionary.trustProof` — `TrustProofSection` bileşenine sözlük olarak verilir
-  - `dictionary.hero.trustStrip` — `TrustProofSection` bileşenine `trustStripDict` olarak verilir
-  - `dictionary.strategicBrands` — `StrategicBrands` bileşenine sözlük olarak verilir
-  - `dictionary.knowledge` — `KnowledgeBlock` bileşenine sözlük olarak verilir
-  - `dictionary.finalCta` — `KnowledgeBlock` bileşenine `finalCtaDict` olarak verilir
-  - `dictionary.stats?.yearsExperience` — `KnowledgeBlock` bileşenine `statsExperience` olarak verilir, değer tanımsızsa boş string (`''`) fallback kullanılır
-- **Kullanılan alt bileşenler**: `ScrollObserver`, `HomePageClientWrapper`, `HomeSinevizyon`, `GuidedCategoryDiscovery`, `CinematicProductShowcase`, `ApplicationSolutions`, `TrustProofSection`, `FeaturedCommercialBlocks`, `StrategicBrands`, `KnowledgeBlock`, `RevealSection`
-- **Dönüş**: JSX — tam sayfa düzeni içeren React element ağacı (`<div className="min-h-screen ...">` kök elementi)
+  - `initialCategories` — varsayılan değeri `[]` olan dizi; `GuidedCategoryDiscovery` bileşenine `displayCategories` prop'u olarak geçilir
+  - `rawCategories` — varsayılan değeri `[]` olan dizi; `FeaturedCommercialBlocks` bileşenine `initialCategories` prop'u olarak geçilir
+  - `initialProducts` — varsayılan değeri `[]` olan dizi; `FeaturedCommercialBlocks` bileşenine `initialProducts` prop'u olarak geçilir
+  - `dictionary` — sözlük nesnesi; alt alanları birden çok bileşene prop olarak dağıtılır
+  - `lang` — dil bilgisi; `ApplicationSolutions` ve `KnowledgeBlock` bileşenlerine `lang` prop'u olarak geçilir
+- **ic_degiskenler**:
+  - `dictionary.applicationSolutions` — `ApplicationSolutions` bileşenine `dictionary` prop'u olarak geçilir
+  - `dictionary.trustProof` — `TrustProofSection` bileşenine `dictionary` prop'u olarak geçilir
+  - `dictionary.hero.trustStrip` — `TrustProofSection` bileşenine `trustStripDict` prop'u olarak geçilir
+  - `dictionary.strategicBrands` — `StrategicBrands` bileşenine `dictionary` prop'u olarak geçilir
+  - `dictionary.knowledge` — `KnowledgeBlock` bileşenine `dictionary` prop'u olarak geçilir
+  - `dictionary.finalCta` — `KnowledgeBlock` bileşenine `finalCtaDict` prop'u olarak geçilir
+  - `dictionary.stats?.yearsExperience` — opsiyonel chaining ile erişilir; mevcutsa `yearsExperience` değeri, aksi halde `''` (boş string) olarak `KnowledgeBlock` bileşenine `statsExperience` prop'u olarak geçilir
+- **Dönüş**: JSX elementi — `div` kök elemanı içinde `ScrollObserver`, `HomePageClientWrapper`, `HomeSinevizyon`, `GuidedCategoryDiscovery`, `RevealSection`, `CinematicProductShowcase`, `ApplicationSolutions`, `TrustProofSection`, `FeaturedCommercialBlocks`, `StrategicBrands`, `KnowledgeBlock` bileşenlerini içeren bir React bileşeni (`React.FC<HomePageProps>`)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\HomePage.tsx
-  function: src\views\HomePage.tsx::HomePage
+  file: HomePage.tsx
+  function: HomePage.tsx::HomePage
 
 ---
 

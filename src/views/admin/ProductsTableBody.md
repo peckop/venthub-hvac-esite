@@ -2,71 +2,52 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\views\admin\ProductsTableBody.tsx
-skeleton_hash: 7c6375689ac1c098
+source_path: C:\tmp\wt-supurme\src\views\admin\ProductsTableBody.tsx
+skeleton_hash: dec20944438a4eb4
 entity_hashes:
   func:InlineNumberCell: d033e807ea0843b7
   func:ProductSpecsRow: 534f71d107499f23
   func:ProductsTableBody: 66aafd451a9eea35
-  func:attachCovers: 61bc3986dbbe4e08
-  func:productsFetcher: 44e6549fbd97ce20
-  overview: 0b76cb9cb58ec509
-  style_tokens: 425e7b568b559cc7
-generated_at: 2026-08-15T15:16:30Z
+  func:attachCovers: be36d7c3168c822e
+  func:productsFetcher: 2be746ff94fd0243
+  overview: dac07c4dbab7a985
+  style_tokens: 22ccdd0adc5ca261
+generated_at: 2026-08-25T07:58:17Z
 ---
 
 ## Genel Bakış
-Bu modül, admin panelindeki ürün tablosunun gövde bölümünü ve ilişkili veri gösterim mantığını yöneten React bileşenleri ile Supabase veri çekme yardımcı fonksiyonlarını içerir. Ürünlerin paginasyonlu olarak getirilmesi, kapak görsellerinin eklenmesi, satırlar arası genişletilebilir özellik gösterimi ve satır içi düzenlenebilir hücrelerin sunulması ana sorumluluklarıdır.
+Bu modül, admin panelinde ürünlerin listelendiği bir tablonun gövdesini oluşturur. Ürünlerin veritabanından çekilmesi, satırlara kapak (cover) eklenerek zenginleştirilmesi ve tablo içinde satır içi düzenleme yapılmasını sağlar.
 
 ## Fonksiyon Grupları
-### Veri Getirme ve Zenginleştirme
-Bu grup, Supabase istemcisini kullanarak ürün verilerinin asenkron olarak çekilmesini ve kapak görselleriyle zenginleştirilmesini yönetir. Sayfalama parametrelerinin işlenmesi ve sonuç kümesinin formatlanması bu işlevlerde gerçekleştirilir.
-- productsFetcher, attachCovers
+### Veri Erişim ve İşleme
+Ürün verilerini veritabanından çeker ve satırlara kapak ekleyerek zenginleştirir.
+- attachCovers, productsFetcher
 
-### Tablo Gövde ve Hücre Bileşenleri
-Bu grup, ürünler tablosunun ana gövde bileşenini ve satır içinde kullanılan yardımcı bileşenleri kapsar. Her bir ürün satırının gösterilmesi, satır genişletildiğinde detay özelliklerin sunulması ve düzenlenebilir hücrelerin render edilmesi bu bileşenlerin sorumluluğundadır.
-- ProductsTableBody, ProductSpecsRow, InlineNumberCell
+### Arayüz Bileşenleri
+Ürün tablosunun gövdesini ve alt bileşenlerini oluşturur, satır içi düzenleme imkanı sunar.
+- ProductSpecsRow, InlineNumberCell, ProductsTableBody
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, Supabase tabanlı ürün verisi çekme, görsel zenginleştirme ve düzenlenebilir tablo gövdesi bileşenlerini kapsar.
-
-[Aksiyom 1]: Eğer `SupabaseClient<Database>` geçerli bir bağlantı içermiyorsa, `productsFetcher` fonksiyonu veri çekme işlemini başarısızlığa uğratır.
-
-[Aksiyom 2]: Eğer `PRODUCT_SELECT` sabiti tanımlı değilse veya geçerli bir Supabase select sorgusu içermiyorsa, `productsFetcher` beklenen `ProductRow` yapısını döndüremez.
-
-[Aksiyom 3]: Eğer `params: FetchParams` içinde geçerli sayfalama bilgisi (offset/limit veya eşdeğeri) yoksa, `productsFetcher` sonucu tam veya tutarsız ürün listesi döndürür.
-
-[Aksiyom 4]: Eğer `attachCovers` fonksiyonuna verilen `rows: ProductRow[]` boş bir dizi ise, sonuç yine boş bir dizi olarak döner; kapak görseli zenginleştirme işlemi anlamsız olur.
-
-[Aksiyom 5]: Eğer `ProductSpecsRow` bileşenine geçerli bir `productId` sağlanmıyorsa, ilgili satır için özellik detayları gösterilemez veya hatalı veri çekilir.
-
-[Aksiyom 6]: Eğer `InlineNumberCell` bileşenine `onSave` callback'i sağlanmıyorsa, kullanıcı hücrede düzenleme yapamaz veya düzenleme sonucu üst bileşene iletilemez.
-
-[Aksiyom 7]: Eğer `SORT_COLUMN_MAP` sabiti tanımlı değilse veya mevcut sütun adlarını Supabase alanlarıyla eşleştirmiyorsa, tabloda yapılan sıralama isteği yanlış alanlara veya hatalı sorgulara yol açar.
-
-[Aksiyom 8]: Eğer `STATUS_KEYS` ifadesi tanımlı değilse, ürün durum filtreleme ve gösterimi beklenen şekilde çalışmaz.
-
-[Aksiyom 9]: Eğer `ProductRow` tipi (`supabase` sorgu sonucu ile uyumlu değilse, `productsFetcher` dönüş tipi ile `attachCovers` giriş tipi arasında uyumsuzluk oluşur ve tip hatası meydana gelir.
-
-[Aksiyom 10]: Eğer `attachCovers` fonksiyonu asenkron olarak tamamlanmadan `ProductsTableBody` bileşeni render edilirse, kapak görselleri henüz hazır olmadan kullanıcıya gösterilir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### attachCovers
-**Ne yapar**: Verilen ürün satırlarına ait kapak görsellerini (cover image) Supabase veritabanından toplu olarak çeker ve her satırın `cover_path` alanını doldurarak güncellenmiş satır listesini döndürür.
+**Ne yapar**: Verilen ürün satırlarının her birine, `product_images` tablosundan gelen kapak görselinin yolunu (`cover_path`) ekler. Görsel bulunamayan ürünler orijinal haliyle döndürülür.
 
-**Nasıl yapar**: Fonksiyon önce tüm satırların ID'lerini çıkarır ve boş bir liste gelirse doğrudan orijinal satırları döndürür. Ardından ID'leri 20'şerli gruplara (chunk) böler ve `Promise.all` kullanarak her chunk için `product_images` tablosuna eş zamanlı sorgular. Her sorguda `sort_order` alanına göre artan sıralama yapılarak en düşük sıraya sahip görsel (yani kapak görseli) elde edilir. Sonuçlar bir eşleme (map) yapısında `product_id -> path` şeklinde saklanır ve her satır `cover_path` alanı eklenmiş olarak spread operatörü ile kopyalanarak döndürülür. Hata oluşursa konsola uyarı yazdırılır ve orijinal satırlar değişiklik yapılmadan döndürülerek hata işleme (non-fatal) sağlanır.
+**Nasıl yapar**: Önce tüm satırların `id` değerlerini toplar. Eğer hiç ürün yoksa orijinal diziyi aynen döndürür. Ürün kimliklerini 20'lik parçalara (chunk) böler ve her parça için `product_images` tablosundan `product_id`, `path` ve `sort_order` alanlarını çeker. Çekilen sonuçlar `sort_order`'a göre artan sırayla sıralanır. Her ürün için yalnızca ilk bulunan görselin yolu alınır (yani `map[r.product_id] == null` kontrolü sayesinde aynı ürüne ait birden fazla görsel varsa en düşük `sort_order`'a sahip olanı seçilir). Son olarak her satıra `cover_path` alanı eklenerek yeni bir dizi oluşturulur. Görsel çekme sırasında hata oluşursa konsola uyarı yazdırılır ve orijinal satırlar `cover_path` eklenmeden döndürülür — hata fırlatılmaz.
 
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemlerini yürütmek için kullanılan Supabase istemci nesnesi; TypeScript泛型 ile `Database` tipi ile tip güvenliği sağlar
-- `rows`: `ProductRow[]` — Kapak görseli eklenecek ürün satırlarının dizisi; her elemanın `id` alanı ile veritabanında eşleştirme yapılır
+- supabase: `SupabaseClient<Database>` — Veritabanı bağlantısını temsil eden Supabase istemcisi.
+- rows: `ProductRow[]` — Kapak görseli eklenecek ürün satırları dizisi.
 
-**Dönüş**: `Promise<ProductRow[]>` — Kapak görseli bilgisi (`cover_path` alanı) eklenmiş ürün satırlarının dizisi; hata durumunda orijinal satırlar aynen döndürülür
+**Dönüş**: `Promise<ProductRow[]>` — Her satıra `cover_path` alanı eklenmiş ürün satırları dizisi. Görsel bulunamayan satırlarda `cover_path` tanımsız olabilir. Hata durumunda orijinal `rows` dizisi aynen döndürülür.
 
 ### productsFetcher
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -85,8 +66,10 @@ Bu modül, Supabase tabanlı ürün verisi çekme, görsel zenginleştirme ve d�
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminEmptyState::AdminEmptyState
 - import: ../../components/admin/AdminToolbar::AdminToolbar
-- import: ../../components/admin/BulkActionToolbar::BulkActionToolbar
 - import: ../../components/admin/ExportMenu::ExportMenu
+- import: ../../components/admin/data-table/BulkBar::BulkBar
+- import: ../../components/admin/data-table/BulkBar::type BulkAction
+- import: ../../components/admin/data-table/BulkPricePanel::BulkPricePanel
 - import: ../../components/admin/data-table/DataTableKit::DataTableKit
 - import: ../../components/admin/data-table/types::type { AdminColumn }
 - import: ../../components/admin/overlay/ConfirmProvider::useConfirm
@@ -98,6 +81,7 @@ Bu modül, Supabase tabanlı ürün verisi çekme, görsel zenginleştirme ve d�
 - import: ../../hooks/useAdminTable::useAdminTable
 - import: ../../hooks/useRole::useRole
 - import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/currency::SYSTEM_CURRENCY
 - import: ../../i18n/format::formatCurrency
 - import: ../../lib/ensureSessionFresh::ensureSessionFresh
 - import: ../../lib/type-converters::toUIProductList
@@ -128,8 +112,11 @@ Bu modül, Supabase tabanlı ürün verisi çekme, görsel zenginleştirme ve d�
 ## INTERFACES
 
 ### CategoryOpt
+NİÇİN slug + metadata DA ÇEKİLİYOR: CSV içe aktarımı kategoriyi SLUG ile eşler (cetvel: csv-import-export-standard.md §3). Bu sorgu yalnız `id,name` çekerken bileşene slug hiç ULAŞMIYORDU; eşleşme adla denenip sessizce başarısız oluyordu. Kanonik slug İngilizcedir; görünen slug `metadata.slug = { tr
 - `id: string`
 - `name: string`
+- `slug?: string | null`
+- `metadata?: unknown`
 
 ### ProductSpecsRowProps
 - `productId: string`
@@ -161,128 +148,148 @@ type ProductRow = DomainProduct & { cover_path?: string; price?: number | null }
   sku: 'sku',
   status: 'status',
   price: 'price',
-  stock...`
+  ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ProductsTableBody.tsx::attachCovers
-- **params**: (supabase: SupabaseClient<Database>, rows: ProductRow[])
+### [N1_NASIL] AST Pointer: src/views/admin/ProductsTableBody.tsx::attachCovers
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `rows` — ProductRow[] tipinde, kapak görseli eklenecek ürün satırları dizisi
 - **ic_degiskenler**:
-  - `ids` — rows dizisindeki her elemanın id değerlerini içeren string dizisi
-  - `chunkSize` — id'leri parçalara ayırmak için kullanılan sabit boyut (20)
-  - `chunks` — ids dizisinin parçalara bölünmüş hali
-  - `results` — her chunk için paralel olarak yapılan Supabase sorgularının sonuçları
-  - `map` — product_id'yi cover_path'e eşleyen sözlük yapısı
-  - `r` — map oluşturma sürecinde her bir sorgu sonucu elemanı
-  - `err` — catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: Promise<ProductRow[]> — cover_path bilgisi eklenmiş product row dizisi
+  - `ids` — `rows.map((r) => r.id)` ile satırlardan çıkarılan ürün ID'lerinden oluşan dizi
+  - `chunkSize` — 20 değerinde sabit; Supabase `.in()` sorgusunun parçalara bölünme boyutu
+  - `chunks` — `string[][]` tipinde; `ids` dizisinin `chunkSize` boyutunda parçalara bölünmüş hali
+  - `results` — `Promise.all` ile paralel olarak çalıştırılan Supabase sorgularının (product_images tablosu, product_id, path, sort_order alanları, sort_order'a göre artan sıralama) sonuçlarını tutan dizi
+  - `map` — `Record<string, string>` tipinde; her `product_id` için ilk bulunan `path` değerini saklayan sözlük
+  - `data` — `results` içindeki her sorgu sonucundan çıkarılan veri; `{ product_id: string; path: string; sort_order: number }[]` tipinde
+  - `r` — `data` dizisi içindeki her bir kayıt; `r.product_id` ve `r.path` alanlarına erişilir
+- **Dönüş**: `Promise<ProductRow[]>` — her satıra `cover_path` alanı eklenmiş ProductRow dizisi; hata durumunda orijinal `rows` döner
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ProductsTableBody.tsx::productsFetcher
-- **params**: (supabase: SupabaseClient<Database>, params: FetchParams)
+### [N2_NASIL] AST Pointer: src/views/admin/ProductsTableBody.tsx::productsFetcher
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `params` — FetchParams tipinde, sayfalama, filtre, sorgu ve sıralama parametreleri
 - **ic_degiskenler**:
-  - `category` — params.filters.category dizisinin ilk elemanı (tek kategori filtresi)
-  - `featured` — params.filters.featured'in ilk elemanı '1' ise true olan boolean değer
-  - `statuses` — params.filters.status dizisi veya boş dizi
-  - `term` — params.query değerinin trimlenmiş hali (arama terimi)
-  - `offset` — sayfalama için hesaplanan başlangıç indeksi
-  - `results` — adminSearchProducts fonksiyonunun dönüş değeri (FTS araması)
-  - `filtered` — durum ve öne çıkan filtreleri uygulanmış sonuçlar
-  - `rows` — DbAdminSearchResult[] dizisinin ProductRow[] formatına dönüştürülmüş hali
-  - `totalMatched` — toplam eşleşen ürün sayısı
-  - `withCovers` — cover image'leri eklenmiş satırlar
-  - `query` — Supabase sorgu nesnesi
-  - `sortKey` — params.sort?.key sıralama anahtarı
-  - `col` — SORT_COLUMN_MAP ile eşleşen sütun adı
-  - `ascending` — sıralama yönü (true ise artan)
-  - `data` — Supabase sorgusunun data dönüşü
-  - `error` — Supabase sorgusunun error dönüşü
-  - `count` — Supabase sorgusunun exact count dönüşü
-- **Dönüş**: Promise<FetchResult<ProductRow>> — satır listesi ve toplam eşleşme sayısı
+  - `category` — `params.filters.category?.[0]` ile filtre dizisinin ilk elemanı; kategori ID'si
+  - `featured` — `params.filters.featured?.[0] === '1'` ile belirlenen boolean; ürünün öne çıkarılıp çıkarılmadığı
+  - `statuses` — `params.filters.status ?? []` ile alınan durum filtresi dizisi
+  - `term` — `params.query.trim()` ile boşlukları temizlenmiş arama terimi
+  - `offset` — `(params.page - 1) * params.pageSize` ile hesaplanan sayfa başlangıç indeksi
+  - `results` — `adminSearchProducts` fonksiyonundan dönen tam metin arama sonuçları (DbAdminSearchResult[])
+  - `filtered` — `results` dizisinin `statuses` ve `featured` kriterlerine göre filtrelenmiş hali
+  - `rows` — `toUIProductList(filtered)` ile UI formatına dönüştürülmüş ve `as ProductRow` ile tip ataması yapılmış satırlar
+  - `totalMatched` — `results[0].total_count` veya `results.length` ile belirlenen toplam eşleşme sayısı; FTS yolunda yaklaşık değer olabilir
+  - `withCovers` — `attachCovers(supabase, rows)` ile kapak görselleri eklenmiş satırlar
+  - `query` — `supabase.from('products').select(PRODUCT_SELECT, { count: 'exact' })` ile başlatılan Supabase sorgu nesnesi
+  - `sortKey` — `params.sort?.key` ile alınan sıralama anahtarı
+  - `col` — `sortKey ? SORT_COLUMN_MAP[sortKey] : undefined` ile sıralama sütun adı
+  - `ascending` — `params.sort?.dir === 'asc'` ile belirlenen sıralama yönü
+  - `data` — `query.range()` sonucundan dönen ürün verileri (DbProduct[])
+  - `error` — sorgu hatası; varsa `throw error` ile fırlatılır
+  - `count` — `query` sonucundan dönen toplam kayıt sayısı (exact count)
+- **Dönüş**: `Promise<FetchResult<ProductRow>>` — `{ rows: withCovers, totalMatched }` nesnesi
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ProductsTableBody.tsx::ProductSpecsRow
-- **params**: ({ productId })
+### [N3_NASIL] AST Pointer: src/views/admin/ProductsTableBody.tsx::ProductSpecsRow
+- **params**: `productId` — ürünün benzersiz kimliği
 - **ic_degiskenler**:
-  - `specs` — ürünün teknik özelliklerini tutan state (Record<string, unknown> | null)
-  - `setSpecs` — specs state'ini güncellemek için fonksiyon
-  - `active` — useEffect cleanup fonksiyonu için bayrak
-  - `data` — Supabase sorgusunun dönüşü (teknik özellikler)
-  - `entries` — specs objesinin [key, value] çiftlerinden oluşan dizisi
-- **Dönüş**: React.FC — ürün teknik özelliklerini gösteren JSX bileşeni
+  - `t` — `useI18n()` hook'undan çıkarılan çeviri fonksiyonu
+  - `specs` — `useState<Record<string, unknown> | null>(null)` ile tanımlanan durum; ürünün teknik özelliklerini tutar
+  - `setSpecs` — `specs` durumunu güncelleyen setter fonksiyonu
+  - `active` — `useEffect` içinde tanımlanan boolean bayrak; bileşen unmount olduğunda `false` yapılır, erken dönüş kontrolü sağlar
+  - `data` — `supabaseBrowserClient.from('products').select('technical_specs').eq('id', productId).maybeSingle()` sorgusundan dönen veri
+  - `entries` — `specs ? Object.entries(specs) : []` ile teknik özelliklerin `[key, val]` çiftlerine dönüştürülmüş hali
+  - `key` — `entries.map` içindeki her özelliğin anahtar adı
+  - `val` — `entries.map` içindeki her özelliğin değeri; `String(val)` ile metne dönüştürülür
+- **Dönüş**: JSX.Element — teknik özellikleri grid düzeninde gösteren bileşen; boşsa "empty" mesajı gösterir
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ProductsTableBody.tsx::InlineNumberCell
-- **params**: ({ value, display, widthClass, low, ariaLabel, onSave })
+### [N4_NASIL] AST Pointer: src/views/admin/ProductsTableBody.tsx::InlineNumberCell
+- **params**: `value` — mevcut sayısal değerin string gösterimi; `display` — buton modunda gösterilecek biçimlendirilmiş değer; `widthClass` — input genişlik sınıfı; `low` — boolean; stok düşükse true, buton arka plan rengini değiştirir; `ariaLabel` — erişilebilirlik etiketi; `onSave` — async fonksiyon; sayısal değer kaydedildiğinde çağrılır
 - **ic_degiskenler**:
-  - `editing` — hücrenin düzenleme modunda olup olmadığını tutan state
-  - `draft` — düzenleme modunda girilen geçici değeri tutan state
-  - `inputRef` — input elementine referans
-  - `num` — commit fonksiyonu içinde draft değerinin parse edilmiş hali
-- **Dönüş**: React.FC — düzenlenebilir sayısal hücre bileşeni
+  - `editing` — `useState(false)` ile tanımlanan boolean; düzenleme modunun açık/kapalı durumu
+  - `setEditing` — `editing` durumunu güncelleyen setter fonksiyonu
+  - `draft` — `useState(value)` ile tanımlanan string; düzenleme sırasında input alanındaki geçici değer
+  - `setDraft` — `draft` durumunu güncelleyen setter fonksiyonu
+  - `inputRef` — `useRef<HTMLInputElement>(null)` ile tanımlanan referans; input elemanına odaklanmak için kullanılır
+  - `num` — `parseFloat(draft)` ile `draft` değerinden dönüştürülen sayısal değer
+  - `commit` — `useCallback` ile tanımlanan async fonksiyon; `draft` değerini sayıya çevirir, `onSave` çağrılır, hata durumunda `draft` eski `value` değerine geri alınır
+  - `e` — `onKeyDown` olayındaki klavye olayı nesnesi; `e.key` ile 'Enter' ve 'Escape' tuşları kontrol edilir
+- **Dönüş**: JSX.Element — düzenleme modunda input alanı, değilse tıklanabilir buton gösterir
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ProductsTableBody.tsx::ProductsTableBody
-- **params**: () (parametre yok)
+### [N5_NASIL] AST Pointer: src/views/admin/ProductsTableBody.tsx::ProductsTableBody
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
-  - `cats` — kategoriler listesi (CategoryOpt[])
-  - `setCats` — cats state'ini güncellemek için fonksiyon
+  - `t` — `useI18n()` hook'undan çıkarılan çeviri fonksiyonu
+  - `supabaseBrowserClient` — import edilen Supabase tarayıcı istemcisi
+  - `table` — admin tablo hook'undan çıkarılan tablo nesnesi; `table.selection.selectedIds`, `table.selection.clear()`, `table.reload()`, `table.fetchAllForExport()` metotlarını içerir
+  - `hasWriteAccess` — boolean; kullanıcının yazma yetkisi olup olmadığını belirtir
+  - `confirm` — onay dialogu fonksiyonu; `description`, `confirmLabel`, `tone` parametreleri alır
+  - `cats` — `useState` ile tanımlanan kategori listesi (CategoryOpt[])
+  - `setCats` — `cats` durumunu güncelleyen setter fonksiyonu
+  - `cancelled` — `useEffect` cleanup bayrağı; bileşen unmount olduğunda `true` yapılır
+  - `data` — `supabaseBrowserClient.from('categories').select('id,name,slug,metadata').order('name')` sorgusundan dönen kategori verileri
+  - `error` — kategori sorgu hatası
+  - `catsMap` — `useMemo` ile oluşturulan `Map<string, string>`; kategori ID'sinden kategori adına eşleme haritası
+  - `c` — `cats` dizisindeki her kategori nesnesi; `c.id` ve `c.name` alanlarına erişilir
+  - `editingId` — `useState` ile tanımlanan string|null; düzenlenen ürünün ID'si
+  - `setEditingId` — `editingId` durumunu güncelleyen setter fonksiyonu
+  - `isModalOpen` — `useState` ile tanımlanan boolean; modal açık/kapalı durumu
+  - `setIsModalOpen` — `isModalOpen` durumunu güncelleyen setter fonksiyonu
   - `activeStatuses` — aktif durum filtrelerini tutan dizi
-  - `setFilter` — filtre değerlerini güncellemek için fonksiyon
-  - `cancelled` — useEffect cleanup fonksiyonu için bayrak
-  - `data` — Supabase'den gelen kategori verisi
-  - `error` — Supabase sorgusu hatası
-  - `editingId` — düzenlenecek ürünün ID'si
-  - `setEditingId` — editingId state'ini güncellemek için fonksiyon
-  - `isModalOpen` — modal'ın açık olup olmadığını tutan state
-  - `setIsModalOpen` — isModalOpen state'ini güncellemek için fonksiyon
-  - `table` — useTable hook'undan gelen tablo kontrol nesnesi
-  - `hasWriteAccess` — yazma izni olup olmadığını tutan boolean değer
-  - `confirm` — ConfirmDialog fonksiyonu (dialog onay bekler)
-  - `toast` — sonner toast bildirim fonksiyonu
-  - `removeSingle` — tek ürün silme fonksiyonu
-  - `handleBulkStatusChange` — toplu durum değiştirme fonksiyonu
-  - `handleBulkFeaturedChange` — toplu öne çıkan değiştirme fonksiyonu
-  - `handleBulkDelete` — toplu silme fonksiyonu
-  - `handleBulkPriceChange` — toplu fiyat değiştirme fonksiyonu
-  - `saveInlineEdit` — satır içi düzenleme kaydetme fonksiyonu
-  - `statusBadge` — durum rozeti oluşturma fonksiyonu
-  - `columns` — tablo sütun tanımları
-  - `statusFilter` — durum filtresi seçenekleri
-  - `categoryOptions` — kategori seçenekleri
-  - `resetFilters` — filtreleri sıfırlama fonksiyonu
-  - `exportCSV` — CSV dışa aktarma fonksiyonu
-  - `activeStatuses.includes(s)` — durum filtresinde aktif olan durum kontrolü
-  - `next` — güncellenmiş durum filtresi dizisi
-  - `ok` — onay dialog sonucu
-  - `r` — tekil silme, durum değiştirme gibi işlemlerde mevcut ürün satırı
-  - `ids` — toplu işlemlerde seçili satırların ID'leri
-  - `status` — değiştirilmek istenen durum değeri
-  - `featured` — öne çıkan durumu (true/false)
-  - `mode` — fiyat değiştirme modu ('percent' veya 'fixed')
-  - `value` — fiyat değiştirme değeri
-  - `products` — fiyat güncellemesi için çekilen ürün listesi
-  - `fetchErr` — fiyat güncellemesi sırasındaki hata
-  - `updates` — güncellenecek ürün listesi
-  - `currentPrice` — mevcut ürün fiyatı
-  - `newPrice` — hesaplanan yeni fiyat
-  - `results` — fiyat güncelleme sorgularının sonuçları
-  - `errorResult` — hata içeren sonuç
-  - `prev` — güncelleme öncesi değer (price veya stock_qty)
-  - `payload` — güncelleme için kullanılacak veri nesnesi
-  - `field` — güncellenen alan ('price' veya 'stock_qty')
-  - `raw` — ham değer (string veya number)
-  - `num` — parse edilmiş sayısal değer
-  - `v` — durum değerinin küçük harfli hali
-  - `baseClass` — durum rozeti için temel CSS sınıfı
-  - `s` — durum parametresi (s?: string | null)
-  - `a` — CSV dışa aktarma için oluşturulan DOM linki
-  - `blob` — CSV dosyası için Blob nesnesi
-  - `url` — Blob URL'si
-  - `csv` — oluşturulmuş CSV string'i
-  - `header` — CSV sütun başlıkları
-  - `lines` — CSV satırları
-  - `cols` — dışa aktarılacak sütun isimleri
-- **Dönüş**: React.FC — ürün tablosu gövdesini ve ilgili kontrolleri gösteren bileşen
+  - `setQuery` — sorgu metnini güncelleyen setter fonksiyonu
+  - `setFilter` — filtre güncelleyen fonksiyon; `setFilter('status', next)`, `setFilter('category', [])` gibi çağrılarla kullanılır
+  - `lang` — mevcut dil kodu
+  - `formatCurrency` — para birimi biçimlendirme fonksiyonu
+  - `SYSTEM_CURRENCY` — sistem para birimi sabiti
+  - `adminTableActionClass` — tablo aksiyon butonlarının CSS sınıfı
+  - `adminTableActionDangerClass` — tehlikeli aksiyon butonlarının CSS sınıfı
+  - `ProductHealthBadge` — ürün sağlık rozeti bileşeni; `stockQty`, `threshold`, `status`, `isFeatured` props alır
+  - `BulkPricePanel` — toplu fiyat düzenleme paneli bileşeni; `onApply`, `onClose` props alır
+  - `VentImage` — görsel bileşeni; `src`, `alt`, `fallbackType`, `className` props alır
+  - `statusBadge` — `(s?: string | null) => JSX.Element` fonksiyonu; durum string'ine göre renkli rozet döndürür
+  - `openEdit` — `(id: string) => void` fonksiyonu; `setEditingId(id)` ve `setIsModalOpen(true)` çağırır
+  - `removeSingle` — `async (r: ProductRow) => void` fonksiyonu; onay dialogu gösterir, `mutateWithAudit` ile ürünü siler, `table.reload()` çağırır
+  - `r` — `removeSingle` içindeki ProductRow parametresi; `r.id` ile ürün kimliğine erişilir
+  - `ok` — `confirm()` dialogundan dönen boolean; kullanıcı onay verdiyse true
+  - `e` — catch bloğundaki hata nesnesi; `AdminPermissionError` kontrolü yapılır
+  - `bulkStatusChange` — `async (status: string) => void` fonksiyonu; seçili ürünlerin durumunu toplu değiştirir
+  - `ids` — `table.selection.selectedIds` ile seçili ürün ID'leri
+  - `bulkFeatureToggle` — `async (featured: boolean) => void` fonksiyonu; seçili ürünlerin öne çıkarma durumunu toplu değiştirir
+  - `bulkDelete` — `async () => void` fonksiyonu; seçili ürünleri toplu siler
+  - `bulkPriceAdjust` — `async (mode: 'percent' | 'fixed', value: number) => void` fonksiyonu; seçili ürünlerin fiyatlarını toplu ayarlar
+  - `products` — `bulkPriceAdjust` içinde `supabaseBrowserClient.from('products').select('id,price').in('id', ids)` sorgusundan dönen veri
+  - `fetchErr` — fiyat sorgu hatası
+  - `updates` — `products` dizisinden hesaplanan yeni fiyat güncellemeleri; `{ id: string; price: number }` nesneleri
+  - `p` — `updates.map` içindeki her ürün; `p.id` ve `p.price` alanlarına erişilir
+  - `currentPrice` — `p.price ?? 0` ile mevcut fiyat; null ise 0 kabul edilir
+  - `newPrice` — `mode` parametresine göre yüzde veya sabit artışla hesaplanan yeni fiyat; `Math.max(0, newPrice)` ile negatif değer engellenir
+  - `results` — paralel fiyat güncelleme sorgularının sonuçları
+  - `errorResult` — `results.find((r) => r.error)` ile bulunan hatalı sonuç
+  - `saveInlineEdit` — `async (r: ProductRow, field: 'price' | 'stock_qty', raw: string | number) => void` fonksiyonu; satır içi düzenleme kaydı yapar
+  - `num` — `saveInlineEdit` içinde `parseFloat(String(raw))` ile dönüştürülen sayısal değer
+  - `prev` — `field === 'price' ? r.price : r.stock_qty` ile düzenlenen alanın önceki değeri
+  - `payload` — `field === 'price' ? { price: num } : { stock_qty: num }` ile güncelleme verisi
+  - `s` — `statusBadge` fonksiyonundaki durum parametresi; `toLowerCase()` ile küçük harfe dönüştürülür
+  - `v` — `(s || '').toLowerCase()` ile normalize edilmiş durum string'i
+  - `baseClass` — rozet bileşeninin temel CSS sınıfı
+  - `columns` — `useMemo` ile oluşturulan tablo sütun tanımları dizisi; her sütun `key`, `header`, `sortable`, `hideable`, `align`, `cell` alanlarını içerir
+  - `r` — `cell` fonksiyonlarındaki ProductRow parametresi; `r.cover_path`, `r.name`, `r.brand`, `r.sku`, `r.model_code`, `r.category_id`, `r.status`, `r.stock_qty`, `r.low_stock_threshold`, `r.is_featured`, `r.price` alanlarına erişilir
+  - `low` — stok sütununda `Number(r.stock_qty) < (r.low_stock_threshold || 10)` ile hesaplanan boolean; stok düşükse true
+  - `num` — `InlineNumberCell` onSave callback'indeki sayısal parametre
+  - `statusOptions` — `STATUS_KEYS.map` ile oluşturulan durum filtre seçenekleri dizisi
+  - `s` — `statusOptions` map'indeki her STATUS_KEYS elemanı
+  - `next` — `activeStatuses.includes(s)` durumuna göre hesaplanan sonraki filtre dizisi
+  - `categoryOptions` — kategori filtre seçenekleri dizisi; boş seçenek ve `cats.map` ile oluşturulur
+  - `c` — `categoryOptions` map'indeki her kategori nesnesi
+  - `resetFilters` — tüm filtreleri sıfırlayan fonksiyon; `setQuery('')` ve `setFilter` çağrılarını yapar
+  - `exportCsv` — `async () => void` fonksiyonu; ürünleri CSV formatında dışa aktarır
+  - `rows` — `exportCsv` içinde `table.fetchAllForExport()` ile alınan tüm satırlar
+  - `cols` — CSV sütun adları dizisi: ['id', 'name', 'sku', 'category_id', 'status', 'price', 'stock_qty']
+  - `header` — `cols.join(',')` ile oluşturulan CSV başlık satırı
+  - `lines` — `rows.map` ile her satırdan oluşturulan CSV satırları
+  - `csv` — BOM karakteri ve başlık+satırların birleşimi; `'﻿' + [header, ...lines].join('\n')`
+  - `blob` — `new Blob([csv], { type: 'text/csv;charset=utf-8;' })` ile oluşturulan dosya nesnesi
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici URL
+  - `a` — `document.createElement('a')` ile oluşturulan indirme bağlantısı elemanı
+- **Dönüş**: JSX.Element — ürün tablosunu, araç çubuğunu, filtreleri ve modal'ı içeren ana bileşen
 
 ---
 
@@ -300,12 +307,12 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: src\views\admin\ProductsTableBody.tsx
-  function: src\views\admin\ProductsTableBody.tsx::attachCovers
-  function: src\views\admin\ProductsTableBody.tsx::productsFetcher
-  function: src\views\admin\ProductsTableBody.tsx::ProductSpecsRow
-  function: src\views\admin\ProductsTableBody.tsx::InlineNumberCell
-  function: src\views\admin\ProductsTableBody.tsx::ProductsTableBody
+  file: ProductsTableBody.tsx
+  function: ProductsTableBody.tsx::attachCovers
+  function: ProductsTableBody.tsx::productsFetcher
+  function: ProductsTableBody.tsx::ProductSpecsRow
+  function: ProductsTableBody.tsx::InlineNumberCell
+  function: ProductsTableBody.tsx::ProductsTableBody
 
 ---
 
@@ -324,10 +331,10 @@ graph TD
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-relaxed`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-surface-deep`, `bg-white/3`, `bg-white/5`, `border-2`, `border-cyan-400/50`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `group-hover/btn:text-cyan-400`, `group-hover/spec:text-cyan-400/70`
+- **Renkler:** `bg-admin-accent`, `bg-admin-accent-weak`, `bg-admin-bg`, `bg-admin-danger-weak`, `bg-admin-success-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-surface-3`, `border-2`, `border-admin-accent/30`, `border-admin-border`, `border-admin-danger/30`, `border-admin-success/30`, `group-hover/btn:text-admin-accent`, `group-hover/spec:text-admin-accent`
 - **Layout:** `flex`, `flex-col`, `flex-wrap`, `gap-0.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-0.5`, `h-12`, `h-full`, `inline-block`, `items-center`, `items-end`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover/btn:`, `group-hover/spec:`, `group-hover:`, `hover:`, `lg:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminButtonPrimaryClass`, `${baseClass`, `${low`, `${widthClass`, `:`, `animate-in`, `border`, `duration-300`, `duration-500`, `duration-700`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-4`, `focus-visible:ring-cyan-400/10`
+- **Yardımcı Sınıflar:** `$`, `${adminButtonPrimaryClass`, `${baseClass`, `${low`, `${widthClass`, `:`, `animate-in`, `border`, `duration-300`, `duration-500`, `duration-700`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-4`, `focus-visible:ring-admin-accent/30`

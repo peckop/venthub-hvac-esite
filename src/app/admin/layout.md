@@ -2,69 +2,79 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\layout.tsx
-skeleton_hash: 08532cbef7ed49e5
+source_path: C:\tmp\wt-supurme\src\app\admin\layout.tsx
+skeleton_hash: 2be9462bf62a55e3
 entity_hashes:
-  func:Layout: 835aeffc7f64a977
-  overview: e7251b7df76c3216
+  func:Layout: ba5a2fa47c4a3578
+  overview: 2c0f6861ff270d4c
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:27Z
+generated_at: 2026-08-25T07:23:24Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim paneli (admin) bölümleri için üst düzey düzen bileşenini tanımlar. Tüm admin sayfalarının ortak bir çerçeve ve arayüz yapısı içinde görüntülenmesini sağlayarak tutarlılık oluşturur.
+
+Bu modül, admin panelinin kök düzen (layout) bileşenini tanımlar. Next.js'in yerleşik layout mekanizması aracılığıyla çalışır ve admin altındaki tüm sayfaların ortak yapısını belirler. Bileşen, kendisine aktarılan alt bileşenleri (`children`) sararak admin sayfalarına paylaşılan bir çerçeve sağlar.
 
 ## Fonksiyon Grupları
-### Düzen Bileşeni
-Yönetim paneli sayfalarını sarmalayan ana layout bileşenini içerir. Sayfalar arasında paylaşılan arayüz yapısını (sidebar, header vb.) tanımlayarak alt içeriklerin doğru konumda görüntülenmesini sağlar.
+
+### Admin Düzen Bileşeni
+
+Admin bölümünün üst düzey düzen yapısını oluşturur. Bu bileşen, admin altındaki tüm sayfalar tarafından otomatik olarak sarılır ve sayfalara ortak bir konteyner veya navigasyon yapısı kazandırır.
+
 - Layout
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-[NOT: Bu modül bir React layout bileşeni olup, fonksiyon gövdesinde (sadece `return` ifadesi) herhangi bir mantıksal koşul veya varsayım içermemektedir. Bileşen, sadece `children` prop'unu alıp JSX yapısı içinde yerleştiren saf bir sunum bileşenidir. Dolayısıyla, fonksiyon gövdesinden türetilebilecek mimari varsayım bulunmamaktadır.]
+Bu modül için fonksiyon gövdesi verilmediğinden, gövdeden türetilen özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### Layout
+**Ne yapar**: Admin panelinin kök düzen (layout) bileşenini oluşturur. Sunucu tarafında tenant yapılandırmasını, navigasyon collapse tercihini ve tema ayarını okuyarak bu değerleri alt bileşenlere sağlar. Bu fonksiyon, Next.js'in sunucu bileşeni (server component) olarak çalışır ve çocukların `TenantProvider` ile `LayoutComponent` tarafından sarmalanmasını sağlar.
 
-**Ne yapar**: Admin panelinin üst seviye layout bileşenidir. Tenant (kiracı) yapılandırmasını sunucu tarafında asenkron olarak yükler ve tüm admin sayfalarını bu yapılandırma ile sararak çocuk bileşenleri render eder.
-
-**Nasıl yapar**: Fonksiyon asenkron çalışır ve önce `getTenantConfig()` çağrısı ile geçerli tenant yapılandırmasını sunucu tarafında alır. Ardından bu yapılandırma değerini `TenantProvider` bileşenine prop olarak geçer ve `LayoutComponent` içinde孩子.children bileşenlerini sarmalayarak render eder. Bu sayede tüm alt sayfalar tenant bilgisine erişebilir.
+**Nasıl yapar**: Fonksiyon öncelikle `getTenantConfig()` ile geçerli kiracı yapılandırmasını asenkron olarak alır. Ardından `cookies()` fonksiyonu ile sunucu tarafında çerez deposu okunur — bu okumanın sunucu tarafında yapılması kritiktir; aksi takdirde istemci tarafında çözümlenirse koyu tema seçen kullanıcı her yüklemede bir kare beyaz ekran görürdü. Navigasyon collapse durumu, `navCookieName(tenantConfig.id)` ile elde edilen çerez adından okunur ve `NAV_COLLAPSED_VALUE` değeriyle karşılaştırılarak boolean'a dönüştürülür. Tema bilgisi de aynı şekilde sunucu tarafında okunur; `parseAdminTheme` fonksiyonu bozuk veya eksik çerezleri sessizce varsayılan değere (AÇIK) düşürür. Son olarak JSX döndürülür: `TenantProvider` ile kiracı yapılandırması sağlanır, `LayoutComponent` bileşenine varsayılan navigasyon collapse durumu, tema tercihi ve çözümlenmiş tema değeri prop olarak geçilir, çocuklar bu yapının içine yerleştirilir.
 
 **Parametreler**:
-- children: React.ReactNode — Admin panelinde render edilecek sayfa içeriği ve alt bileşenler. Bu parametre, layout içinde görüntülenecek tüm çocuk React elemanlarını temsil eder.
+- children: `{ children: React.ReactNode }` — Bu layout bileşeninin içine yerleştirilecek alt bileşenler. Next.js'in layout yapısı gereği, bu parametre alt rotaların veya sayfaların içeriğini temsil eder.
 
-**Dönüş**: JSX.Element — TenantProvider ile sarılmış LayoutComponent içinde child'ları barındıran React bileşeni döndürür. Tenant yapılandırması tüm alt bileşenlere context aracılığıyla dağıtılır.
+**Dönüş**: JSX.Element — Fonksiyon, `TenantProvider` ve `LayoutComponent` ile sarmalanmış bir JSX ağacı döndürür. Kesin TypeScript dönüş tipi kaynakta belirtilmemiştir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/shell/navCookie::NAV_COLLAPSED_VALUE
+- import: ../../components/admin/shell/navCookie::navCookieName
+- import: ../../components/admin/shell/themeCookie::adminThemeCookieName
+- import: ../../components/admin/shell/themeCookie::parseAdminTheme
 - import: ../../hooks/useTenant::TenantProvider
 - import: ../../utils/tenantServer::getTenantConfig
 - import: ../../views/admin/AdminLayout::LayoutComponent
+- import: next/headers::cookies
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/app/admin/layout.tsx`::Layout
+### [N1_NASIL] AST Pointer: src/app/admin/layout.tsx::Layout
 - **params**:
-  - `children` — React.ReactNode tipinde, layout bileşeninin içinde render edilecek alt bileşenler
+  - `children` — `React.ReactNode` tipinde, alt bileşenleri temsil eder
 - **ic_degiskenler**:
-  - `tenantConfig` — `await getTenantConfig()` asenkron çağrısıyla elde edilen kiralayan (tenant) yapılandırma nesnesi; TenantProvider'a value olarak iletilir
-- **Dönüş**: JSX (React element) — `TenantProvider` ile sarılmış, `LayoutComponent` içinde `children`'ı barındıran layout yapısı döner; ayrıca `TenantProvider` yan etkisiyle `tenantConfig` context'e enjekte edilir
+  - `tenantConfig` — `await getTenantConfig()` çağrısıyla elde edilen tenant yapılandırması nesnesi; `tenantConfig.id` alanına erişilerek çerez adları oluşturulur ve `TenantProvider`'a `value` prop'u olarak geçilir
+  - `cookieStore` — `await cookies()` çağrısıyla elde edilen Next.js sunucu tarafı çerez deposu; `.get()` metoduyla belirli çerezler okunur
+  - `navCollapsed` — `cookieStore.get(navCookieName(tenantConfig.id))?.value === NAV_COLLAPSED_VALUE` ifadesiyle hesaplanan boolean değer; sol navigasyon panelinin varsayılan olarak daraltılıp daraltılmadığını belirler
+  - `theme` — `parseAdminTheme(cookieStore.get(adminThemeCookieName(tenantConfig.id))?.value)` çağrısıyla elde edilen tema nesnesi; `.preference` ve `.resolved` alt alanlarına erişilir
+- **Dönüş**: JSX — `TenantProvider` ile sarılmış `LayoutComponent` bileşeni; `defaultNavCollapsed`, `defaultThemePreference`, `defaultThemeResolved` prop'ları ve `children` geçilir
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\admin\layout.tsx
-  function: src\app\admin\layout.tsx::Layout
+  file: layout.tsx
+  function: layout.tsx::Layout
 
 ---
 

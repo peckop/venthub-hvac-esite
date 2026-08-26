@@ -2,54 +2,45 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\PaymentSuccessPage.tsx
-skeleton_hash: c07ee8d1ff5cc59e
+source_path: C:\tmp\wt-supurme\src\views\PaymentSuccessPage.tsx
+skeleton_hash: 1bec43a9d884913e
 entity_hashes:
   func:PaymentSuccessPage: 1b3614ca0faf5f01
-  overview: ca5e4f6b72a3747d
+  overview: af5b78ab3c363714
   style_tokens: dcab201fde8662b7
-generated_at: 2026-06-19T20:51:27Z
+generated_at: 2026-08-25T07:29:55Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunda ödeme işleminin başarıyla tamamlanmasının ardından kullanıcıya gösterilen onay sayfasını oluşturur. Tek bir React bileşeni aracılığıyla, ödeme başarılı durumunu kullanıcıya iletir ve olası ileri adımlar için yönlendirme seçenekleri sunar. Modül, React ve React Router (useSearchParams) ve uluslararasılaştırma (i18n) kütüphanelerine bağımlıdır ve sayfa, uygulamanın ödeme akışının son aşamasında yer alır.
+PaymentSuccessPage modülü, ödeme işlemi başarıyla tamamlandığında kullanıcıya gösterilen sayfa bileşenini içerir. Modül, tek bir React fonksiyonel bileşeninden oluşur.
 
 ## Fonksiyon Grupları
-### Ödeme Sonrası Görünüm
-Bu grup, ödeme sürecinin sonunda kullanıcıya başarı mesajı ve durum bildirimini sunan sayfa düzeyindeki görünümü yönetir. Tüm sayfa arayüzü ve temel etkileşimler tek bileşen tarafından kontrol edilir.
+
+### Sayfa Bileşeni
+Ödeme başarı durumunu kullanıcıya sunan ana bileşeni tanımlar.
 - PaymentSuccessPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için verilen bilgiler (fonksiyon gövdesi içeriği) yetersiz olduğundan, yalnızca fonksiyon imzasından türetilebilecek minimum aksiyomlar aşağıdadır:
+Bu modül için özel aksiyom tanımlanmamıştır.
 
----
-
-[Aksiyom 1]: Eğer React ortamı (React kütüphanesi) yoksa, bileşen derlenemez/executed edilemez olur.
-
-[Aksiyom 2]: Eğer bileşen çağrılmadan önce ödeme başarı durumu (payment success state)_Global state'de veya context'te) set edilmemişse, sayfa yanlış bilgi gösterebilir veya boş kalır olur.
-
-[Aksiyom 3]: Eğer bileşen React Router veya benzeri bir yönlendirme sistemi içinde render edilmemişse, navigasyon但tonları (örn: "anasayfaya dön", "siparişleri gör") çalışmaz olur.
-
----
-
-**Not:** Fonksiyon gövdesi içeriği paylaşılmadığı için, component'in hangi context/state'i tükettiği, hangi alt bileşenleri render ettiği ve hangi servislere bağımlı olduğu **bilinmiyor** olarak belirlenmiştir.
+**Gerekçe:** Fonksiyon gövdesi verilmediğinden (yalnızca imza `PaymentSuccessPage() -> React.FC` mevcut), modül sabitleri bulunmadığından ve eski doküman olmadığından, fonksiyon gövdesinden türetilebilecek mimari varsayım üretilememektedir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### PaymentSuccessPage
+**Ne yapar**: `React.FC` tipinde bir React fonksiyonel bileşeni döndüren bir üst düzey fonksiyondur. Fonksiyon adı, ödeme başarılı sayfası bileşeni olduğunu ima etmektedir ancak docstring boş bırakıldığı için kesin işlevi kaynakta belirtilmemiştir.
 
-**Ne yapar**: PaymentSuccessPage, ödeme işleminin başarılı bir şekilde tamamlanmasını gösteren bir React sayfa bileşenidir. Kullanıcının ödeme sürecini tamamlamasının ardından yönlendirildiği onay sayfasını render eder.
+**Nasıl yapar**: Kaynakta bu fonksiyonun iç mantığına dair herhangi bir bilgi verilmemiştir. Docstring alanı boş olduğundan uygulama detayları bilinmemektedir.
 
-**Nasıl yapar**: Fonksiyon, bir React fonksiyonel bileşeni (FC) olarak tanımlanmıştır ve JSX ile render edilecek bir React elementi döndürür. Sayfa bileşeni olarak ödeme başarılı durumunu kullanıcıya sunar.
+**Parametreler**:
+- Kaynakta herhangi bir parametre tanımı belirtilmemiştir.
 
-**Parametreler**: Bu bileşen herhangi bir prop almaz.
-
-**Dönüş**: `React.FC` — Render edilecek bir React fonksiyonel bileşeni döndürür.
+**Dönüş**: `React.FC` — React fonksiyonel bileşen tipinde bir değer döndürür. `React.FC`, React kütüphanesinde fonksiyonel bileşen tanımlamak için kullanılan genel tip ipucudur.
 
 ---
 
@@ -57,6 +48,7 @@ Bu modül için verilen bilgiler (fonksiyon gövdesi içeriği) yetersiz olduğu
 - import: ../hooks/useCartHook::useCart
 - import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
+- import: ../i18n/currency::SYSTEM_CURRENCY
 - import: ../i18n/datetime::formatDateTime
 - import: ../i18n/format::formatCurrency
 - import: ../lib/errorReporter::reportError
@@ -86,62 +78,58 @@ type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: str
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/PaymentSuccessPage.tsx::PaymentSuccessPage
-- **params**: ()
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `searchParams` — Next.js useSearchParams hook'undan URL arama parametrelerini alır
-  - `t` — useI18n hook'undan çeviri fonksiyonu
-  - `lang` — useI18n hook'undan mevcut dil kodu
-  - `Routes` — useLocalizedRoutes hook'undan lokalize edilmiş rota nesnesi
-  - `clearCart` — useCart hook'undan sepeti temizleme fonksiyonu
-  - `status` — useState hook'undan yükleme durumu: 'loading', 'success' veya 'error'
-  - `paymentInfo` — useState hook'undan ödeme bilgileri nesnesi (conversationId, token, errorMessage)
-  - `orderSummary` — useState hook'undan sipariş özeti (amount, items, createdAt)
-  - `conversationId` — searchParams.get('conversationId') ile URL'den alınan konuşma ID'si
-  - `token` — searchParams.get('token') ile URL'den alınan token
-  - `errorMessage` — searchParams.get('errorMessage') ile URL'den alınan hata mesajı
-  - `orderId` — searchParams.get('orderId') ile URL'den alınan sipariş ID'si
-  - `statusParam` — searchParams.get('status') ile URL'den alınan durum parametresi
-  - `fetchOrderDetails` — iç fonksiyon: Supabase'den sipariş detaylarını çeken async fonksiyon
-  - `verify` — iç fonksiyon: Ödeme doğrulamasını yapan async fonksiyon
-  - `data` — supabase.from('venthub_orders').select() çağrısından dönen veri
-  - `error` — supabase.from('venthub_orders').select() çağrısından dönen hata
-  - `items` — data.venthub_order_items'dan sipariş kalemleri dizisi
-  - `count` — items dizisinin quantity değerlerinin toplamı (ürün adedi)
-  - `e` — catch bloğundan yakalanan hata nesnesi
-  - `err` — e değişkeninin message özelliği için tip dönüşümü
-  - `msg` — data?.iyzico?.errorMessage veya t('payment.failedGeneric') hata mesajı
-- **Dönüş**: React.FC (JSX elementi - duruma göre farklı JSX döndürür)
+  - `searchParams` — `useSearchParams()` hook'undan dönen URL arama parametreleri nesnesi; `conversationId`, `token`, `errorMessage`, `orderId`, `status` gibi query string değerlerini okumak için kullanılır
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; UI metinlerini yerelleştirmek için kullanılır
+  - `lang` — `useI18n()` hook'undan dönen dil kodu; tarih/saat ve para birimi formatlamasına iletilir
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen yönlendirme fonksiyonları nesnesi; `Routes.checkout()`, `Routes.cart()`, `Routes.account.orderDetail()` gibi metotlarla sayfa bağlantıları oluşturulur
+  - `clearCart` — `useCart()` hook'undan dönen sepet temizleme fonksiyonu; ödeme başarıyla doğrulandığında `{ silent: true }` argümanıyla çağrılır
+  - `status` — `useState<'loading' | 'success' | 'error'>('loading')` ile tutulan ödeme doğrulama durumu; bileşenin hangi JSX bloğunu render edeceğini belirler
+  - `setStatus` — `status` state'ini güncelleyen setter fonksiyonu; `'loading'`, `'success'` veya `'error'` değerlerine set edilir
+  - `paymentInfo` — `useState<PaymentInfo | null>(null)` ile tutulan ödeme bilgisi nesnesi; `conversationId`, `token` veya `errorMessage` alanlarını içerir
+  - `setPaymentInfo` — `paymentInfo` state'ini güncelleyen setter fonksiyonu; başarılı durumda `{ conversationId, token }`, hata durumunda `{ errorMessage }` atanır
+  - `orderSummary` — `useState<{ amount?: number, items?: number, createdAt?: string }>({})` ile tutulan sipariş özeti; veritabanından çekilen toplam tutar, kalem sayısı ve oluşturulma tarihini barındırır
+  - `setOrderSummary` — `orderSummary` state'ini güncelleyen setter fonksiyonu; `fetchOrderDetails` içinde veritabanı sonucundan beslenir
+- **Dönüş**: JSX elementi — `status` değerine göre üç farklı görünüm döndürür: `'loading'` durumunda yükleme spinner'ı, `'error'` durumunda hata mesajı ve yeniden deneme bağlantıları, `'success'` durumunda sipariş özeti ve sipariş detay bağlantısı
 
-### [N2_NASIL] AST Pointer: src/views/PaymentSuccessPage.tsx::PaymentSuccessPage::fetchOrderDetails
-- **params**: `oid?: string` — Sipariş ID'si, opsiyonel parametre
+### [N2_NASIL] AST Pointer: src/views/PaymentSuccessPage.tsx::useEffect callback (anonim)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — Supabase'den dönen sipariş verisi (total_amount, created_at, venthub_order_items)
-  - `error` — Supabase sorgusundan dönen hata nesnesi
-  - `items` — data.venthub_order_items'dan sipariş kalemleri dizisi
-  - `count` — items dizisinin quantity değerlerinin toplamı
-- **Dönüş**: void (doğrudan state güncelleme yapar)
+  - `conversationId` — `searchParams?.get('conversationId')` ile URL'den okunan ödeme konuşma tanımlayıcısı; `undefined` ise atanır, `verify` içinde `paymentInfo.conversationId` olarak kullanılır
+  - `token` — `searchParams?.get('token')` ile URL'den okunan iyzico ödeme token'ı; `undefined` ise atanır, `verify` içinde iyzico callback fonksiyonuna gönderilir
+  - `errorMessage` — `searchParams?.get('errorMessage')` ile URL'den okunan hata mesajı; `undefined` ise atanır, `verify` içinde hata durumunda kullanıcıya gösterilir
+  - `orderId` — `searchParams?.get('orderId')` ile URL'den okunan sipariş tanımlayıcısı; `undefined` ise atanır, `verify` içinde veritabanı sorgusu ve callback tetikleme için kullanılır
+  - `statusParam` — `searchParams?.get('status')` ile URL'den okunan durum parametresi; `'success'` değeri varsa doğrudan başarı kabul edilir
+  - `fetchOrderDetails` — `oid` parametresiyle çağrılan async iç fonksiyon; `venthub_orders` tablosundan `total_amount`, `created_at` ve ilişkili `venthub_order_items(quantity)` verilerini çekip `setOrderSummary` ile state'i günceller
+  - `verify` — async iç fonksiyon; ödeme doğrulama akışını yürütür (statusParam kontrolü → token doğrulama → orderId ile veritabanı kontrolü → hata işleme)
+- **Dönüş**: yok — yan etki odaklıdır; `status` ve `paymentInfo` state'lerini günceller, sepeti temizler, localStorage anahtarlarını yönetir, toast bildirimleri gösterir
 
-### [N3_NASIL] AST Pointer: src/views/PaymentSuccessPage.tsx::PaymentSuccessPage::verify
-- **params**: ()
+### [N3_NASIL] AST Pointer: src/views/PaymentSuccessPage.tsx::fetchOrderDetails
+- **params**: `oid` — opsiyonel string; sipariş ID'si, `undefined` ise fonksiyon erken döner
 - **ic_degiskenler**:
-  - `conversationId` — üst kapsamdan gelen konuşma ID'si
-  - `token` — üst kapsamdan gelen token
-  - `errorMessage` — üst kapsamdan gelen hata mesajı
-  - `orderId` — üst kapsamdan gelen sipariş ID'si
-  - `statusParam` — üst kapsamdan gelen durum parametresi
-  - `data` — Supabase fonksiyon çağrısından dönen veri
-  - `error` — Supabase fonksiyon çağrısından dönen hata
-  - `e` — catch bloğundan yakalanan genel hata nesnesi
-  - `err` — e değişkeninin message özelliği için tip dönüşümü
-  - `msg` — data?.iyzico?.errorMessage veya t('payment.failedGeneric') hata mesajı
-- **Dönüş**: void (doğrudan state güncelleme ve localStorage işlemleri yapar)
+  - `data` — `supabase.from('venthub_orders').select(...).eq('id', oid).maybeSingle()` sorgusundan dönen satır; `total_amount`, `created_at` ve `venthub_order_items` alanlarını içerir
+  - `error` — Supabase sorgusundan dönen hata nesnesi; `null` ise sorgu başarılı
+  - `items` — `data.venthub_order_items` alanından alınan sipariş kalemleri dizisi; her eleman `quantity` alanını içerir
+  - `count` — `items` dizisinin `reduce` ile hesaplanan toplam kalem sayısı; `items` dizi değilse `undefined` olur
+- **Dönüş**: yok (Promise<void>) — yan etki olarak `setOrderSummary` ile `{ amount, createdAt, items }` state'ini günceller
+
+### [N4_NASIL] AST Pointer: src/views/PaymentSuccessPage.tsx::verify
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `data` — `supabase.functions.invoke('iyzico-callback', ...)` çağrısından dönen yanıt verisi; `data.status` ve `data.iyzico?.errorMessage` / `data.iyzico?.conversationId` alanları okunur
+  - `error` — `supabase.functions.invoke` çağrısından dönen hata nesnesi; `error.message` ile hata mesajı alınır
+  - `msg` — `data?.iyzico?.errorMessage` veya `t('payment.failedGeneric')` ile belirlenen hata mesajı string'i; `setPaymentInfo` ve `toast.error`'a iletilir
+  - `e` — `catch` bloğunda yakalanan `unknown` tipinde hata; `reportError`'a iletilir
+  - `err` — `e` değerinin `{ message?: string }` tipine cast edilmiş hali; `err?.message` ile hata mesajı çıkarılır
+- **Dönüş**: yok (Promise<void>) — yan etki olarak `setStatus` ile durum güncellenir, `setPaymentInfo` ile ödeme bilgisi atanır, `clearCart({ silent: true })` ile sepet temizlenir, localStorage anahtarları yönetilir (`venthub-cart`, `venthub-cart-version`, `venthub-cart-owner`, `vh_pending_order` silinir; `vh_last_order_status` ve `vh_clear_server_cart_once` set edilir), `toast.success` veya `toast.error` ile bildirim gösterilir, `fetchOrderDetails` ile sipariş detayları çekilir
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\PaymentSuccessPage.tsx
-  function: src\views\PaymentSuccessPage.tsx::PaymentSuccessPage
+  file: PaymentSuccessPage.tsx
+  function: PaymentSuccessPage.tsx::PaymentSuccessPage
 
 ---
 

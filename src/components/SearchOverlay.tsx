@@ -14,6 +14,7 @@ import { supabaseBrowserClient } from '../lib/supabase/client'
 import type { DbCategory } from '../types/db-rows'
 import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
+import { localizedHref } from '../utils/routes'
 import { highlightMatch } from '../utils/searchHighlight'
 
 interface SearchOverlayProps {
@@ -153,6 +154,32 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next))
   }
 
+  /**
+   * Öneriden hedefe git — TEK YER (klavye Enter'ı da fare tıklaması da buradan geçer).
+   *
+   * NİÇİN DEĞİŞTİ (2026-08-26, canlı ölçüm): `get_search_suggestions` RPC'si DİL ÖNEKSİZ
+   * adres döndürüyor (`/products/<uuid>`). Bu adres ham hâlde `router.push`'a verilince
+   * önek olmadığı için middleware dili SAYFADAN değil TARAYICI `Accept-Language`'inden
+   * çözüyordu; TÜRKÇE gezen müşteri öneriye tıklayınca İNGİLİZCE sayfaya düşüyordu.
+   * Canlı kanıt: /tr → "lineo" → öneri → 307 `/products/<uuid>` → 308 `/en/products/<uuid>`
+   * → 308 `/en/products/vortice-lineo-100-quiet-17160` → 200 `/en/products/vortice-lineo-quiet`.
+   * Aynı sayfadaki normal ürün bağlantıları `/tr/...` taşıyordu; fark yalnız bu yoldaydı.
+   *
+   * Çözüm SSOT'a bağlanmaktır: dil öneki `localizedHref` ile eklenir (kural 7 — elle
+   * `/${lang}/` birleştirme yasak). `localizedHref` idempotenttir, RPC ileride önekli
+   * adres döndürmeye başlarsa mükerrer önek OLUŞMAZ.
+   *
+   * Adresi olmayan öneri için eskiden `'#'` push ediliyordu — bu, sayfayı değiştirmeden
+   * geçmişe çöp kayıt bırakıyordu; artık yalnızca katman kapanır.
+   */
+  const goToSuggestion = (s: SearchSuggestion, term: string) => {
+    if (s.url) {
+      router.push(localizedHref(s.url, lang))
+    }
+    addToRecent(term)
+    handleClose()
+  }
+
   const performFullSearch = async (term: string) => {
     if (!term.trim()) return
     setLoading(true)
@@ -188,9 +215,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       if (activeIndex > -1) {
         if (viewState === 'SUGGESTING') {
           const s = suggestions[activeIndex]
-          router.push((s.url || '#') as import('next').Route)
-          addToRecent(s.label || '')
-          handleClose()
+          goToSuggestion(s, s.label || '')
         } else if (viewState === 'RESULTS') {
           const res = results[activeIndex]
           goToResult(res)
@@ -225,11 +250,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       <button
         key={`${s.type}-${Math.random()}`} // Avoid strict index mapping issues
         onMouseEnter={() => setActiveIndex(idx)}
-        onClick={() => {
-          router.push((s.url || '#') as import('next').Route)
-          addToRecent(q)
-          handleClose()
-        }}
+        onClick={() => goToSuggestion(s, q)}
         className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-transform duration-200 group outline-none hover:scale-101 hover:shadow-md hover:z-10 relative ${isActive ? 'bg-air-blue/10 ring-inset ring-2 ring-primary-navy/20 shadow-sm' : 'hover:bg-gray-50'}`}
       >
         <div className={`p-2 rounded-lg border transition-colors flex items-center justify-center ${isActive ? 'bg-white border-primary-ocean/30 shadow-sm' : 'bg-gray-50 border-transparent group-hover:bg-white group-hover:border-gray-200'}`}>

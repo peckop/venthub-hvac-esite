@@ -2,53 +2,61 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminLogisticsPage.tsx
-skeleton_hash: 6b068c68f2787d80
+source_path: C:\tmp\wt-supurme\src\views\admin\AdminLogisticsPage.tsx
+skeleton_hash: a9cdcc5a65c56d6c
 entity_hashes:
-  func:AdminLogisticsPage: 2871b566ee0ce6bc
-  overview: 4c991985914ec49b
+  func:AdminLogisticsPage: d344f4347f39c68a
+  overview: dbf543cfd48e7219
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-19T20:49:07Z
+generated_at: 2026-08-25T07:29:41Z
 ---
 
 ## Genel Bakış
-AdminLogisticsPage modülü, VentHub HVAC yönetici panelinde lojistik süreçlerin merkezi olarak yönetildiği React bileşenidir. Sipariş takibi, stok yönetimi ve teslimat süreçleri gibi lojistik operasyonların görüntülenmesi ve kontrolü için yönetici arayüzü sunar. Modül, useI18n, useRole, useDragScroll ve usePathname gibi hook'lara ve Supabase Edge Function'a bağımlıdır; dinamik yükleme içermez ve mimari olarak lojistik yönetiminin tek erişim noktası olarak kritik öneme sahiptir.
+
+AdminLogisticsPage, admin panelindeki lojistik yönetim sayfasını temsil eden bir React bileşenidir. `views/admin` klasöründe konumlanan bu modül, tek bir sayfa bileşeninden oluşur ve lojistik ile ilgili yönetim işlemlerinin gerçekleştirildiği arayüzü sunar.
 
 ## Fonksiyon Grupları
-### Lojistik Yönetim Bileşeni
-Lojistik verilerinin sunumunu, filtrelenmesini ve kargo güncelleme işlemlerini tek bir bileşen üzerinde yoğunlaştıran ana React bileşenidir.
+
+### Sayfa Bileşeni
+
+AdminLogisticsPage, admin kullanıcısına lojistik yönetim arayüzünü render eden ana sayfa bileşenidir. Modülde tanımlı tek fonksiyondur ve sayfanın tüm görünüm ile etkileşiminden sorumludur.
+
 - AdminLogisticsPage
+
+## Bağımlılıklar ve Mimari Notlar
+
+- Modülde yalnızca bir bileşen tanımlıdır; iç fonksiyon çağrısı veya alt bileşen ayrıştırması bu kaynakta görünmemektedir.
+- Dış bağımlılıklar (örneğin kullanılan UI kitleri, routing katmanı, API servisleri) bu fonksiyon listesinde yer almadığından burada belirtilmemiştir.
+- Dinamik veya lazy yüklenen bir alt modül bilgisi mevcut değildir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için fonksiyon gövdesine dayalı çıkarılabilen özel bir mimari aksiyom tanımlanmamıştır.
 
-[Not: Verilen fonksiyon imzası (`AdminLogisticsPage()`) parametresizdir ve modülün bir React bileşeni olduğu dış dokümandan anlaşılmaktadır. Ancak, mimari varsayımlar **yalnızca fonksiyon gövdesinden** üretilmelidir. Fonksiyon gövdesinin içeriği sağlanmadığı için, bu modüle özgü somut bir koşul (örn: bağımlılıklar, state yapısı, render prerequisite) tespit edilememiştir.]
+Bu modül için özel aksiyom tanımlanamamıştır.
+
+**Gerekçe:** Fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon gövdesinden üretilebilen aksiyomlar çıkarılamamaktadır. Dosya adı (`AdminLogisticsPage.tsx`) ve fonksiyon adı (`AdminLogisticsPage`) üzerinden çıkarım yapılması kural gereği yasaktır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminLogisticsPage
+**Ne yapar**: Admin panelinin lojistik yönetim sayfasını oluşturan bir React fonksiyonel bileşenidir. Sayfa başlığı, açıklama metni ve lojistik verilerini gösteren tabloyu içeren bir düzen sağlar.
 
-**Ne yapar**: Admin panelinde lojistik yönetim sayfasını render eden React fonksiyonel bileşenidir. Sayfa başlığını, alt başlığını ve lojistik veri tablosunu kullanıcıya sunar. Bu bileşen, admin panelinin lojistik yönetim arayüzünün üst seviye konteynerıdır.
-
-**Nasıl yapar**: `useI18n()` hook'u ile çoklu dil desteği sağlar ve `t` fonksiyonu aracılığıyla çeviri anahtarlarından yerelleştirilmiş metinleri çeker. Sayfa yapısını bir `<div>` konteyneri içinde sıralı olarak oluşturur: önce `<header>` bölümünde başlık ve alt başlık yer alır, ardından `React.Suspense` bileşeni ile sarılmış `AdminLogisticsTableBody` tablosu render edilir. `Suspense` bileşeni, tablonun lazy loading (tembel yükleme) ile yüklendiğini belirtir ve henüz hazır olmadığında `AdminSkeleton` bileşenini `table` varyantında 10 satır ve 5 sütun olacak şekilde fallback olarak gösterir.
+**Nasıl yapar**: `useI18n()` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t`'yi alır. Sayfa yapısını oluştururken `AdminPageHeader` bileşenine `t('admin.logistics.title')` ve `t('admin.logistics.subtitle')` anahtarlarıyla çevrilmiş başlık ve açıklama metinlerini prop olarak aktarır. Lojistik tablosu için `AdminLogisticsTableBody` bileşenini kullanır ve React'ın `Suspense` bileşeni ile sararak asenkron yükleme sırasında `AdminSkeleton` fallback bileşenini gösterir; bu fallback bileşeni `variant="table"`, `count={10}` ve `rows={5}` prop'larıyla yapılandırılmıştır. Ana kapsayıcı `div` elemanı `space-y-6` ve `pb-20` CSS sınıflarıyla stilize edilmiştir.
 
 **Parametreler**:
+- Bu fonksiyon parametre almaz.
 
-Bu fonksiyon parametre almamaktadır. Props'sız (stateless) bir fonksiyonel React bileşenidir.
-
-**Dönüş**: `JSX.Element` tipinde React bileşeni döndürür. Lojistik yönetiminin tam sayfa düzenini (header ve Suspense ile sarılmış tablo gövdesi) içeren bir JSX yapısı 반환 eder.
+**Dönüş**: JSX.Element — Sayfanın arayüz yapısını tanımlayan JSX ağacını döndürür.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./AdminLogisticsTableBody::AdminLogisticsTableBody
 - import: react::React
 - import: react::Suspense
@@ -57,20 +65,18 @@ Bu fonksiyon parametre almamaktadır. Props'sız (stateless) bir fonksiyonel Rea
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/admin/AdminLogisticsPage.tsx`::AdminLogisticsPage
+### [N1_NASIL] AST Pointer: src/views/admin/AdminLogisticsPage.tsx::AdminLogisticsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `t('admin.logistics.title')` ve `t('admin.logistics.subtitle')` çağrılarıyla sayfa başlığını ve alt başlığını çok dilli olarak render eder
-- **Dönüş**: JSX element döndürür — `<div>` sarmalayıcı içinde `<header>` (başlık + alt başlık) ve `<Suspense>` sarılı `<AdminLogisticsTableBody />` bileşenini içeren tam sayfa görünümü
-
-**Yan etkiler**: `useI18n()` hook'u ile bağlam bağlamında dil bağlamına erişir; `<Suspense fallback={<AdminSkeleton variant="table" count={10} rows={5} />}>` ile asenkron yükleme sırasında 10 satırlık iskelet tablo gösterir; `<AdminLogisticsTableBody />` asenkron olarak yüklenen lojistik tablo gövdesini render eder.
+  - `t` — `useI18n()` hook'undan destructuring ile alınan çeviri fonksiyonu; `t('admin.logistics.title')` ve `t('admin.logistics.subtitle')` çağrılarıyla sayfa başlığı ve açıklamasının metinlerini getirir
+- **Dönüş**: JSX element — üst seviyede `className="space-y-6 pb-20"` olan bir `<div>` kapsayıcısı; içinde `<AdminPageHeader>` (title ve description prop'ları `t()` ile beslenir) ve `<Suspense>` (fallback olarak `<AdminSkeleton variant="table" count={10} rows={5} />` kullanır) ile sarılmış `<AdminLogisticsTableBody />` bileşeni döndürülür
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\admin\AdminLogisticsPage.tsx
-  function: src\views\admin\AdminLogisticsPage.tsx::AdminLogisticsPage
+  file: AdminLogisticsPage.tsx
+  function: AdminLogisticsPage.tsx::AdminLogisticsPage
 
 ---
 

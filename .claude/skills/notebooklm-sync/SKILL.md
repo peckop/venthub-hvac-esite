@@ -77,8 +77,13 @@ verdi. Statik dosya kontrolü oturumun canlılığını ölçmüyor. **Gerçek �
 notebooklm list --json      # defter listesi geliyorsa auth GERÇEKTEN canlı
 ```
 
-Auth düştüyse: **`notebooklm login`** — tarayıcı açar, giriş algılanınca kendisi kaydeder.
-Bu **kullanıcının eylemidir** (tıklama gerekir); ajan olarak çalıştırıp bekleme, kullanıcıya söyle.
+Auth düştüyse: **ÖNCE KENDİN KOŞ, SORMA** — `notebooklm login`. Kalıcı profildeki
+(`~/.notebooklm/profiles/default/`) Google oturumu canlıysa **TIKLAMASIZ tamamlanır** ve
+`storage_state.json`'a kaydeder. **2026-08-25 ÖLÇÜLDÜ:** ajan terminalden koştu, kullanıcı
+eylemi gerekmedi, `list` kanıt verdi. (Eski "login = kullanıcı eylemi, ajan koşamaz" iddiası
+2026-08-17'de profil ölüyken alınmış ölçümün aşırı genellemesiydi — platform kısıt iddiaları
+bayatlar, her seferinde yeniden ölç.) Login SONRASI `notebooklm list` HÂLÂ kırmızıysa profil
+oturumu tamamen ölmüştür — **ancak o zaman** kullanıcıya tarayıcı girişi için git.
 `--browser-cookies chrome` bu makinede ÇALIŞMAZ (Chrome 127+ App-Bound Encryption; ölçüldü).
 > (İsteğe bağlı) CLI tazeliği: `uv tool upgrade notebooklm-py`.
 
@@ -157,7 +162,8 @@ kaynak olarak yüklenir; sorgu/citation'da temiz görünür.
 
 ### "Authentication expired"
 Adım 0'ı çalıştır: `notebooklm list --json` ile GERÇEKTEN öldüğünü doğrula (`auth check` yalan
-söyleyebilir), ölüyse kullanıcıdan `notebooklm login` istemesini bekle, sonra komutu tekrarla.
+söyleyebilir), ölüyse `notebooklm login`i KENDİN koş (tıklamasız yenilenir — bkz. Adım 0),
+`list` ile kanıtla, sonra komutu tekrarla. Kullanıcıya yalnız login+list İKİSİ DE kırmızıysa git.
 `refresh_auth` diye bir MCP aracı ARTIK YOK — auth tamamen CLI tarafında.
 
 ### `orion doc tree` → "0 MD NLM'e birlestirilecek"
@@ -173,7 +179,9 @@ kalanları `orion doc single --py-file <dosya>` ile tek tek → son çare elle y
 - **A1:** `standalone_files` master'a dahil edilmez (dupe önlemi).
 - **A2:** Twin'de 3 master (frontend/functions/schema) + standalone set + elle-eklenenler bulunur.
 - **A3:** Sync ÖNCESİ Adım 1 (all/batch/schema) çalışmalı — yoksa eski `.md` yüklenir.
-- **A4:** Auth düşünce `notebooklm login` (kullanıcı eylemi) — otomatik headless script YOK.
+- **A4:** Auth düşünce `notebooklm login`i AJAN KENDİSİ koşar (kalıcı profil üzerinden tıklamasız
+  yenilenir; 2026-08-25 ölçüldü) ve `list` ile kanıtlar. Kullanıcıya yalnız login+list ikisi de
+  kırmızıysa gidilir. Otomatik headless ps1 scripti YOK — komutun kendisi yeterli.
   Durumu `auth check` DEĞİL gerçek bir okuma (`notebooklm list`) ile ölç.
 - **A5:** Sync MILESTONE eylemidir; her commit'te DEĞİL. post-commit hook artık yerel-only.
 - **A6:** Sync'i DOĞRULAMADAN (Adım 3) "tamamlandı" deme — sessiz-kaçırma ancak query ile yakalanır.

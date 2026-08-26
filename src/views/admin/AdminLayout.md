@@ -2,61 +2,50 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\views\admin\AdminLayout.tsx
-skeleton_hash: 55da8cf5b3383522
+source_path: C:\tmp\wt-supurme\src\views\admin\AdminLayout.tsx
+skeleton_hash: 1808d3b25055cd3a
 entity_hashes:
-  func:AdminLayout: bbd2f949c1664063
-  overview: 6b294d3e492cf313
-  style_tokens: 70db08602c5d37ec
-generated_at: 2026-08-15T15:11:14Z
+  func:AdminLayout: 3672368aae604677
+  overview: 17bc6946654c7feb
+  style_tokens: 56cdd112a4e87a83
+generated_at: 2026-08-25T07:29:55Z
 ---
 
 ## Genel Bakış
-VentHub projesinin yönetici paneli için temel düzen yapısını sağlayan React bileşenidir. Admin sayfalarının ortak iskeletini oluşturarak, her bir sayfa içeriğini tutarlı bir arayüz çerçevesinde sunar. Bu sayede yönetici panelinin tüm sayfalarında birlik ve düzen korunur.
+AdminLayout, admin panelinin ana sayfa düzenini sağlayan bir React bileşenidir. Bileşen, alt bileşenleri (children) sarmalayarak yönetici arayüzüne çerçeve ve yapı kazandırır. Navigasyon durumu ve tema tercihi gibi ayarlar varsayılan değerlerle başlatılabilir.
 
 ## Fonksiyon Grupları
-### Admin Paneli Düzen Bileşeni
-Yönetici panelinin tüm sayfalarında paylaşılan ortak düzen yapısını tanımlar. Çocuk bileşenleri kendi içerisine yerleştirerek sayfalara özgü içerikleri sabit bir iskelet içinde render eder.
+
+### Ana Düzen Bileşeni
+Admin panelinin genel sayfa yapısını oluşturur ve alt bileşenleri bu yapı içinde konumlandırır. Navigasyon panelinin daraltılmış durumu ve tema tercihi gibi yönetici arayüzü ayarlarını varsayılan değerlerle alır.
+
 - AdminLayout
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, admin panelinin ortak düzenini sağlamakla tek başına sorumludur; yetkilendirme veya rota yönetimi gibi konulara girmez.
+[Aksiyom 1]: Eğer `defaultNavCollapsed` parametresi sağlanmazsa, navigasyon varsayılan olarak açık (collapsed değil) durumda başlatılır.
 
-**[Aksiyom 1]:** `children` prop'u sağlanmazsa bileşen, içeriği boş olarak güvenli bir şekilde render eder.
+[Aksiyom 2]: Eğer `defaultThemePreference` parametresi sağlanmazsa, tema tercihi `ADMIN` değeriyle başlatılır.
 
-**[Aksiyom 2]:** Bileşen, admin rotaları dışında kullanıldığında kendi başına erişim kontrolü uygulamaz; bu sorumluluk üst katmandadır.
-
----
-
-## AXIOMS – Mimari Varsayımlar
-
-Bu modül, admin panelinin ortak düzen yapısını sağlayan bir React layout bileşenidir.
-
-[Aksiyom 1]: Eğer `children` prop'u sağlanmazsa veya `undefined`/`null` gelirse, AdminLayout bileşeni boş bir düzen (header/sidebar alanları görünür ancak içerik bölgesi boş) render eder.
-
-[Aksiyom 2]: Eğer `defaultNavCollapsed` prop'u传递edilmezse, sidebar navigasyonu varsayılan olarak geniş (expanded) durumda (`false`) açılır.
-
-[Aksiyom 3]: Eğer `NAV_COOKIE_MAX_AGE` sabiti hesaplanamazsa veya geçersiz bir değer üretirse, sidebar durumu cookie'de saklanamaz ve her sayfa yüklenmesinde `defaultNavCollapsed` değerine geri dönülür.
-
-[Aksiyom 4]: Eğer cookie tabanlı sidebar durumu okunamazsa (örn: cookie mevcut değilse), `defaultNavCollapsed` parametresi ile belirlenen başlangıç durumu kullanılır.
+[Aksiyom 3]: Eğer `NAV_COOKIE_MAX_AGE` sabiti tanımlı değilse, navigasyon durumu (collapsed/open) için çerez süresi bilinmiyor — sabitin değeri bir binary expression olarak tanımlanmış ancak kesin değer kaynakta belirtilmemiştir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminLayout
-**Ne yapar**: AdminLayout, yönetici panelinin ana iskelet yapısını oluşturan bir React fonksiyonel bileşenidir. Children prop'u aracılığıyla içeriğin render edilmesini sağlar ve navigasyon menüsünün başlangıç durumunu yapılandırır.
+**Ne yapar**: Admin paneli için ana düzen (layout) bileşenidir. Bu bileşen, admin arayüzünün genel yapısını oluşturur; navigasyon paneli, tema ayarları ve içerik alanı gibi bölümleri bir araya getirerek alt bileşenlere (`children`) yapılandırılmış bir görünüm sağlar.
 
-**Nasıl yapar**: Bileşen, React.FC generic tipini kullanarak AdminLayoutProps tipindeki prop'ları kabul eder. `children` prop'u ile alt bileşenleri render ederken, `defaultNavCollapsed` prop'u ile sidebar navigasyonunun başlangıçta açılık/kapalı durumunu belirler. Varsayılan olarak navigasyon menüsü geniş (açık) durumda başlar.
+**Nasıl yapar**: Bileşen, aldığı `defaultNavCollapsed` ve `defaultThemePreference` parametrelerini kullanarak navigasyon panelinin varsayılan daraltılmış durumunu ve tema tercihini belirler. `children` prop'u aracılığıyla alt bileşenleri render eder. `ADMIN` sabiti, varsayılan tema tercihi olarak kullanılır. Bileşen, `AdminLayoutProps` arayüzüne uygun şekilde tip tanımlaması yapılmış bir React fonksiyon bileşeni (`React.FC`) olarak tanımlanmıştır.
 
 **Parametreler**:
-- children: React.ReactNode — AdminLayout bileşeninin içinde render edilecek alt React bileşenleri ve içerik elemanları. Sayfa içeriği buraya yerleştirilir.
-- defaultNavCollapsed: boolean — Varsayılan değeri `false` olan bu prop, admin paneli sidebar navigasyon menüsünün başlangıç durumunu belirler. `true` değeri verildiğinde menü başlangıçta dar (collapsed) modda açılır.
+- `children`: `React.ReactNode` — Admin layout içinde gösterilecek alt bileşenlerdir. Admin sayfasının asıl içeriğini temsil eder.
+- `defaultNavCollapsed`: `boolean` — Navigasyon panelinin varsayılan olarak daraltılmış (collapsed) olup olmayacağını belirler. Varsayılan değeri `false`'dur; yani panel başlangıçta açık konumdadır.
+- `defaultThemePreference`: `ADMIN` — Admin panelinin varsayılan tema tercihini belirler. Varsayılan değeri `ADMIN` sabitidir.
 
-**Dönüş**: React.FC<AdminLayoutProps> — AdminLayoutProps arayüzünü tanımlayan prop'ları alan bir React fonksiyonel bileşeni döndürür. Bu bileşen, admin panelinin layout yapısını (header, sidebar, main content area) sarmalayan bir wrapper bileşendir.
+**Dönüş**: `React.FC<AdminLayoutProps>` — `AdminLayoutProps` arayüzünde tanımlı propları alan bir React fonksiyon bileşeni döndürür. Bu bileşen, admin düzeninin tamamını render eder.
 
 ---
 
@@ -67,14 +56,16 @@ Bu modül, admin panelinin ortak düzen yapısını sağlayan bir React layout b
 - import: ../../components/admin/overlay/ConfirmProvider::ConfirmProvider
 - import: ../../components/admin/shell/AdminSidebar::AdminMobileNav
 - import: ../../components/admin/shell/AdminSidebar::AdminSidebar
+- import: ../../components/admin/shell/AdminThemeToggle::AdminThemeToggle
 - import: ../../components/admin/shell/navCookie::navCookieName
+- import: ../../components/admin/shell/useAdminThemeBodyScope::useAdminThemeBodyScope
 - import: ../../config/admin-resources::buildBreadcrumbTrail
-- import: ../../config/admin::isAdminByEmail
 - import: ../../hooks/useAuth::useAuth
 - import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../hooks/useRole::useRole
 - import: ../../hooks/useTenant::useTenant
 - import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/case::localeUpper
 - import: ../../utils/routes::Routes
 - import: lucide-react::ChevronRight
 - import: lucide-react::Menu
@@ -97,6 +88,8 @@ Bu modül, admin panelinin ortak düzen yapısını sağlayan bir React layout b
 ### AdminLayoutProps
 - `children?: React.ReactNode`
 - `defaultNavCollapsed?: boolean`
+- `defaultThemePreference?: AdminThemePreference`
+- `defaultThemeResolved?: AdminThemeResolved`
 
 ---
 
@@ -107,57 +100,82 @@ Bu modül, admin panelinin ortak düzen yapısını sağlayan bir React layout b
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\AdminLayout.tsx::AdminLayout
-- **params**: (children, defaultNavCollapsed = false)
+### [N1_NASIL] AST Pointer: src/views/admin/AdminLayout.tsx::(anonim — useEffect guard)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `pathname` — Mevcut URL yolunu döndüren usePathname hook'unun değeri; breadcrumb oluşturma, yetkilendirme kontrolü ve sidebar/mobil nav'a iletim için kullanılır
-  - `user` — useAuth() hook'undan dönen kullanıcı nesnesi; kimlik doğrulama durumu, email ve user_metadata alanlarını içerir
-  - `authLoading` — useAuth() hook'undan dönen loading durumu; authentication sürecinin devam edip etmediğini belirtir
-  - `canAccess` — useRole() hook'undan dönen erişim kontrol fonksiyonu; pathname tabanlı rol bazlı erişim izni verir
-  - `roleLoading` — useRole() hook'undan dönen loading durumu; rol kontrol sürecinin devam edip etmediğini belirtir
-  - `router` — useRouter() hook'undan dönen Next.js router nesnesi; programlı navigasyon (router.replace) için kullanılır
-  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu; labelKey'leri yerelleştirilmiş metinlere dönüştürür
-  - `tenant` — useTenant() hook'undan dönen tenant nesnesi; tenant.id çerez isimlendirmesinde kullanılır
-  - `localizedRoutes` — useLocalizedRoutes() hook'undan dönen yerelleştirilmiş rota üretici fonksiyonları nesnesi
-  - `siteHomeHref` — localizedRoutes.home() çağrısından elde edilen ana sayfa URL'i; "Siteye dön" linkinin href'i
-  - `navCollapsed` — useState ile yönetilen boolean değer; masaüstü sidebar'ın daraltılmış/ Genişletilmiş durumunu tutar
-  - `setNavCollapsed` — navCollapsed durumunu güncelleyen setter fonksiyonu; toggleNav callback'inde çağrılır
-  - `mobileNavOpen` — useState ile yönetilen boolean değer; mobil navigasyon panelinin açık/kapalı durumunu tutar
-  - `setMobileNavOpen` — mobileNavOpen durumunu güncelleyen setter fonksiyonu; mobil tetikleyici butona ve AdminMobileNav onOpenChange'e bağlanır
-  - `loading` — authLoading veya roleLoading herhangi biri true ise true dönen derived boolean; yükleme ekranının gösterilip gösterilmeyeceğini belirler
-  - `isEmailAdmin` — user.email varsa isAdminByEmail() ile hesaplanan boolean; email tabanlı admin kontrolü yapar
-  - `breadcrumb` — React.useMemo ile pathname'den üretilen breadcrumb trail dizisi; her item key, labelKey ve route alanlarını içerir
-- **Dönüş**: ConfirmProvider wrapper içinde JSX — sticky header, desktop sidebar, main content area, mobile nav, CommandPalette ve Toaster bileşenlerini içeren tam admin layout yapısı
+  - `loading` — yükleme durumunu gösteren boolean; true ise fonksiyon erken döner
+  - `user` — oturum açmış kullanıcı nesnesi; yoksa (falsy) ana sayfaya yönlendirme yapılır
+  - `router` — Next.js useRouter sonucu; `replace` ile `'/'` rotasına yönlendirme yapar
+- **Dönüş**: yok (void)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\AdminLayout.tsx::useEffect callback
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: loading bitip user yoksa router.replace('/' as Route) çağrısı ile ana sayfaya yönlendirme)
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\AdminLayout.tsx::toggleNav
-- **params**: ()
+### [N2_NASIL] AST Pointer: src/views/admin/AdminLayout.tsx::(anonim — nav toggle handler)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `prev` — setNavCollapsed'ın callback parametresi; bir önceki navCollapsed durumu
-  - `next` — prev'in tersi olarak hesaplanan boolean; yeni nav durumu
-- **Dönüş**: next boolean değeri (setNavCollapsed callback'inin dönüşü); ayrıca document.cookie ile NAV_COOKIE_MAX_AGE ve navCookieName(tenant.id) kullanarak tercihi çereze yazar
+  - `setNavCollapsed` — React state setter; boolean değer alır, yan panelin açık/kapalı durumunu günceller
+  - `prev` — setter callback parametresi; mevcut navCollapsed boolean değeri
+  - `next` — `!prev` ile hesaplanan ters boolean; yeni navCollapsed durumu
+  - `document` — tarayıcı document nesnesi; typeof kontrolü ile SSR güvenliği sağlanır
+  - `navCookieName` — fonksiyon; `tenant.id` parametresiyle cookie adı üretir
+  - `tenant` — kiracı nesnesi; `tenant.id` ile cookie adı oluşturulur
+  - `NAV_COOKIE_MAX_AGE` — sabit; cookie'nin yaşam süresi (saniye)
+- **Dönüş**: yok (void)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\AdminLayout.tsx::breadcrumb.map callback
-- **params**: (item, index)
+### [N3_NASIL] AST Pointer: src/views/admin/AdminLayout.tsx::(anonim — nav setter callback)
+- **params**:
+  - `prev` — mevcut boolean durum (navCollapsed)
 - **ic_degiskenler**:
-  - `item` — breadcrumb dizisinin mevcut elemanı; key, labelKey ve route alanlarını içerir
-  - `item.key` — JSX key olarak kullanılan benzersiz tanımlayıcı
-  - `item.labelKey` — t() fonksiyonuna geçirilen çeviri anahtarı
-  - `item.route` — Link component'inin href'ine atanan rota değeri (Route tipine cast edilmiş)
-  - `index` — döngü indeksi; mevcut elemanın dizideki pozisyonu
-  - `isLast` — index === breadcrumb.length - 1 kontrolü ile hesaplanan boolean; son eleman olup olmadığını belirler
-- **Dönüş**: JSX li elementi — ChevronRight ikonu ve koşullu olarak span (son eleman) veya Link (diğer elemanlar) içeren breadcrumb öğesi
+  - `next` — `!prev` ile hesaplanan ters boolean değer
+  - `document` — typeof kontrolü ile SSR güvenliği sağlanır; cookie yazımı için kullanılır
+  - `navCookieName` — fonksiyon; `tenant.id` ile cookie adı döndürür
+  - `tenant` — kiracı nesnesi; `tenant.id` erişimi yapılır
+  - `NAV_COOKIE_MAX_AGE` — sabit; cookie max-age değeri
+- **Dönüş**: boolean (`next` — yeni navCollapsed durumu)
+
+### [N4_NASIL] AST Pointer: src/views/admin/AdminLayout.tsx::(anonim — tema useEffect)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `media` — `window.matchMedia('(prefers-color-scheme: dark)')` sonucu; sistem tema tercihini dinler
+  - `apply` — iç fonksiyon; tema çözümlemesi yapar, state günceller, cookie yazar
+  - `themePreference` — `'system'` | `'dark'` | `'light'`; kullanıcının tema tercihi
+  - `setThemeResolved` — React state setter; çözümlenmiş tema değerini (`AdminThemeResolved`) günceller
+  - `adminThemeCookieName` — fonksiyon; `tenant.id` ile tema cookie adı üretir
+  - `tenant` — kiracı nesnesi; `tenant.id` erişimi yapılır
+  - `serializeAdminTheme` — fonksiyon; `themePreference` ve `resolved` değerlerini cookie string'ine dönüştürür
+  - `ADMIN_THEME_COOKIE_MAX_AGE` — sabit; tema cookie'sinin yaşam süresi
+- **Dönüş**: cleanup function (`() => media.removeEventListener('change', apply)`) veya undefined (themePreference `'system'` değilse)
+
+### [N5_NASIL] AST Pointer: src/views/admin/AdminLayout.tsx::(anonim — apply tema fonksiyonu)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `resolved` — `AdminThemeResolved` tipinde; themePreference `'system'` ise `media.matches`'e göre `'dark'`/`'light'`, aksi halde themePreference'ın kendisi
+  - `themePreference` — tema tercihi; `'system'` kontrolü yapılır
+  - `media` — `window.matchMedia` sonucu; `.matches` ile karanlık mod durumu okunur
+  - `setThemeResolved` — React state setter; `resolved` değeri ile güncellenir
+  - `document` — cookie yazımı için kullanılır
+  - `adminThemeCookieName` — fonksiyon; `tenant.id` ile tema cookie adı üretir
+  - `tenant` — kiracı nesnesi; `tenant.id` erişimi yapılır
+  - `serializeAdminTheme` — fonksiyon; `themePreference` ve `resolved` parametreleriyle cookie değeri üretir
+  - `ADMIN_THEME_COOKIE_MAX_AGE` — sabit; cookie max-age değeri
+- **Dönüş**: yok (void)
+
+### [N6_NASIL] AST Pointer: src/views/admin/AdminLayout.tsx::(anonim — breadcrumb map callback)
+- **params**:
+  - `item` — breadcrumb öğesi; `.key`, `.labelKey`, `.route` alanlarına erişilir
+  - `index` — mevcut öğenin dizindeki sırası (number)
+- **ic_degiskenler**:
+  - `isLast` — `index === breadcrumb.length - 1` sonucu boolean; son öğe olup olmadığını belirler
+  - `breadcrumb` — breadcrumb dizisi; `.length` ile son indeks hesaplanır
+  - `t` — çeviri fonksiyonu; `item.labelKey` parametresiyle yerelleştirilmiş metin döndürür
+  - `ChevronRight` — lucide-react ikon bileşeni; ayırıcı olarak kullanılır (size=14)
+  - `Link` — Next.js Link bileşeni; son öğe değilse `item.route` rotasına bağlantı oluşturur
+- **Dönüş**: JSX element (`<li>` — breadcrumb öğesini render eder)
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\views\admin\AdminLayout.tsx
-  function: src\views\admin\AdminLayout.tsx::AdminLayout
+  file: AdminLayout.tsx
+  function: AdminLayout.tsx::AdminLayout
 
 ---
 
@@ -175,7 +193,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-surface-deep`, `bg-surface-deep/95`, `bg-white/5`, `border-b`, `border-b-2`, `border-cyan-400`, `border-t`, `border-white/10`, `focus:bg-cyan-400`, `focus:text-sm`, `focus:text-surface-deep`, `hover:bg-white/10`, `hover:text-white`, `text-base`, `text-cyan-300`
-- **Layout:** `backdrop-blur`, `flex`, `flex-1`, `focus:fixed`, `focus:left-4`, `focus:top-4`, `focus:z-toast`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `h-10`, `h-8`, `h-9`, `h-admin-header`
-- **Varyant/Responsive:** `focus-visible:`, `focus:`, `hover:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `animate-spin`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/60`, `focus:font-medium`, `focus:not-sr-only`, `focus:px-4`, `focus:py-2`, `focus:rounded-admin-sm`, `font-medium`, `font-sans`, `font-semibold`, `md:px-4`, `md:px-6`
+- **Renkler:** `bg-admin-bg`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-accent`, `border-admin-border`, `border-b`, `border-b-2`, `border-t`, `focus-visible:bg-admin-accent`, `focus-visible:text-admin-accent-fg`, `focus-visible:text-sm`, `hover:bg-admin-surface-2`, `hover:text-admin-fg`, `text-admin-fg`, `text-admin-fg-muted`
+- **Layout:** `flex`, `flex-1`, `focus-visible:fixed`, `focus-visible:left-4`, `focus-visible:top-4`, `focus-visible:z-toast`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `h-10`, `h-8`, `h-9`, `h-admin-header`, `hidden`
+- **Varyant/Responsive:** `focus-visible:`, `hover:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `animate-spin`, `border`, `focus-visible:font-medium`, `focus-visible:not-sr-only`, `focus-visible:outline-none`, `focus-visible:px-4`, `focus-visible:py-2`, `focus-visible:ring-2`, `focus-visible:ring-admin-ring`, `focus-visible:rounded-admin-sm`, `font-medium`, `font-sans`, `font-semibold`, `md:px-4`, `md:px-6`

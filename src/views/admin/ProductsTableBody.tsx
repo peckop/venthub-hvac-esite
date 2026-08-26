@@ -43,9 +43,17 @@ import {
 // yüzeyinde aynı şeyi yapmak INV-PRICE-1 ihlalidir.
 type ProductRow = DomainProduct & { cover_path?: string; price?: number | null }
 
+/**
+ * NİÇİN slug + metadata DA ÇEKİLİYOR: CSV içe aktarımı kategoriyi SLUG ile eşler
+ * (cetvel: csv-import-export-standard.md §3). Bu sorgu yalnız `id,name` çekerken
+ * bileşene slug hiç ULAŞMIYORDU; eşleşme adla denenip sessizce başarısız oluyordu.
+ * Kanonik slug İngilizcedir; görünen slug `metadata.slug = { tr, en }` içindedir.
+ */
 interface CategoryOpt {
   id: string
   name: string
+  slug?: string | null
+  metadata?: unknown
 }
 
 const PRODUCT_SELECT =
@@ -321,7 +329,7 @@ const ProductsTableBody: React.FC = () => {
     void (async () => {
       const { data, error } = await supabaseBrowserClient
         .from('categories')
-        .select('id,name')
+        .select('id,name,slug,metadata')
         .order('name', { ascending: true })
       if (!cancelled && !error && data) setCats(data as CategoryOpt[])
     })()

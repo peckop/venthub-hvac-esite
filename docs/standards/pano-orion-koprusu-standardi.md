@@ -47,7 +47,22 @@ yaşar. Bu faturayı köprü öder; ödemiyorsa köprü eksiktir.
   merge-indi (PR → SHA + dokunulan globlar) · kapı-kırmızı (hangi kapı, hangi commit) ·
   öncül-düzeltmesi / karar geri alma · GO kayıtları (kim, neye, hangi kapsamla).
 
-### Faz 2 — Ters yön: Orion → pano (Faz 1 bir hafta sorunsuz koştuktan sonra)
+### Faz 2 — Ters yön: Orion → pano (Faz 1 ölçüt tuttuktan sonra)
+
+⭐**Önkoşul ZAMAN DEĞİL SAYIDIR.** Eski metin "bir hafta sorunsuz koştuktan sonra"
+diyordu; bu, `kapi-tasarim-standardi.md` §12'nin yasakladığı zamana dayalı eşiktir —
+makine kapalı kalırsa hafta dolar ama hiçbir şey ölçülmemiş olur.
+
+**Faz 2'yi açan ölçüt — arka arkaya 30 taşıyıcı koşumu, üçü birden:**
+
+1. **Çökme 0.** Her koşum çıkış kodu 0 ile bitmeli.
+2. **Yanlış hayalet reddi 0.** `hayalet_sidler` listesindeki HER sid'in pano
+   geçmişinin TAMAMINDA sıfır `claim`'i olmalı. Liste boş olmak zorunda DEĞİL —
+   gerçek hayaletler reddedilmeye devam eder.
+3. **Korunum kimliği her koşumda tutmalı:**
+   `yazilan + mukerrer + reddedilen_hayalet + kapsam_disi_tur == okunan`
+   Okunan her olay tam olarak bir kovaya düşer; eşitlik kırılırsa bir olay
+   **sessizce düşmüş** demektir.
 - **Yalnız dört olay:** görev BLOCKED (+bloke eden) · kapı açıldı/kapandı · faz tamamlandı
   (sıradaki hazır) · karar `active` oldu.
 - **Ölçüt (ORION):** *"Bu olayı görmeyen bir şerit yanlış iş yapar mı? Hayırsa panoya düşmez."*
@@ -101,7 +116,74 @@ katman yok** — bugün bunu sistem değil Recep fark etti.
 T011 (faz kapısı, ORION) → **K2** (MCP stabil kopya + restart, OPS) → venthub roadmap
 kurulumu (OPS) → **Faz 0** (ALTYAPI uyanınca; Faz 1'i BLOKLAMAZ — köprü hayalet-sid'e karşı
 kendi sınavıyla korunur, Bölüm 4/2) ∥ **Faz 1 köprü** (ORION iş emri) → **Nöbetçi Adım 1**
-(Faz 0'ın PARK durumu indikten sonra; sahip ALTYAPI/OPS) → bir hafta gözlem → **Faz 2**.
+(Faz 0'ın PARK durumu indikten sonra; sahip ALTYAPI/OPS) → 30 koşumluk ölçüt → **Faz 2**.
 
 Not: Faz 0 "önkoşul"dur ama sıkı-sıralı değil: sid-RET/rotasyon Faz 1 ile paralel inebilir;
 yalnız **PARK durumu, Nöbetçi'nin** ve **Faz 2'nin** sert önkoşuludur.
+
+## 6. Bağlama kovaları: iki kolun gerekçesi (2026-08-25 kararı, PR orion#36)
+
+K3 korunumu **beş not-kovası** üzerinden tutar:
+`islenen_not = baglanan + kismi + belirsiz + referanssiz + cozunmeyen`
+ve ayrıca **referans düzeyinde** ayrı bir korunum vardır:
+`islenen_referans = baglanan_ref + cozunmeyen_ref + belirsiz_ref`
+(not düzeyi tutarken referans düzeyi kırılabilir; tek kimlik iki düzeyi ölçemez).
+
+İki kolun gerekçesi AYRI AYRI yazılır — biri diğerinden türetilemez:
+
+- **Belirsizlik kolu (değişmedi):** bir referans 2+ adaya çözünüyorsa o notun HİÇBİR
+  referansı bağlanmaz. Gerekçe K1'dir: iki adaydan birini seçmek tahmini olgu üretir;
+  tek ve kendinden emin eşleşme de yanlış olabilir ("belirsiz olanı bağlama" kuralı
+  "yanlış olanı bağlama"yı garanti etmez — kapı tasarım ilkesi). Ölçülen bedel hedefe
+  bağlıdır: Linear'da kimlikler tekil olduğundan 2026-08-25 ölçümünde `belirsiz_ref = 0`
+  (bedel şimdilik sıfır); registry'de çarpışma var (T017-OR onarımı sonrası yeniden ölçülür).
+- **Çözünmezlik kolu (2026-08-25'te değişti):** sıfır aday belirsizlik DEĞİL, yokluktur.
+  Kısmen çözünen notun tamamını düşürmek hiçbir tahmini önlemez, yalnız geçerli bağı
+  kaybettirir. Ölçülen bedel: 109 aday notun 71'i (%65), 129 eşleşen referansın 88'i (%68)
+  düşüyordu. Karar: çözünen referansların bağı KURULUR, not **kısmi** kovasına girer;
+  çözünmeyen referansları `cozunmeyen_ref` sayacında görünür kalır.
+
+Kanıt yükümlülükleri (bu bölüm değiştirilirken de geçerli):
+- Pozitif kontrol **sentetik olamaz** — canlı panodan birebir alıntı bir karma-referanslı
+  not kullanılır (2026-08-25'te 71 gerçek örnek vardı).
+- Sabotaj seti en az: kısmi kovayı öldür → kırmızı; belirsiz referansı bağla → kırmızı.
+- **Etkisiz sabotaj ≠ kör kapı:** 0 kırmızı veren sabotajın önce kendisi ölçülür
+  (değişiklik gerçekten davranış değiştiriyor mu); ikisi aynı görünür ve karıştırılırsa
+  sağlam kapı "kör" diye raporlanır (2026-08-25 S6 vakası).
+- Ders (2026-08-25): eski davranışın %68'lik bedelini HİÇBİR test korumuyordu — mevcut
+  testlerin tüm notları tek referanslıydı. Kova önceliği değişen her PR, karma-referans
+  vakası içeren en az bir test taşımak zorundadır.
+
+## 7. İçe almanın zamanlanması ve canlılığı (2026-08-26, T016-OR)
+
+1. **Zamanlama:** Faz 1 içe alması oturumdan BAĞIMSIZ koşar (Windows Görev Zamanlayıcı,
+   görev adı `OrionBoardSync`, kadans 15 dk, pencere `--days 3`). Oturum-bağlı hiçbir
+   mekanizma (cron, kanca, açılış ritüeli) bu işi karşılamaz: oturum ölünce ölür.
+   Kod STABİL KOPYADAN koşar (`PYTHONPATH=orion-stable`), çalışma ağacından DEĞİL.
+2. **Canlılık ölçümünün kaynağı:** içe almanın sağlığı `MAX(ingested_at)` ile ölçülür —
+   yani VERİNİN GERÇEKTEN TAŞINDIĞI. Görevin kayıtlı olması (`Get-ScheduledTask`) yalnızca
+   yapılandırıldığını, son koşum sonucu (`LastTaskResult`) yalnızca sürecin koştuğunu
+   gösterir; ikisi de "veri taşındı" demek değildir (yanlış kök yoluyla çıkış 0 mümkündür).
+   Bu ikisi, alarm kırmızı yanınca NİÇİN sorusunu cevaplayan TEŞHİS girdileridir; alarmın
+   kaynağı olamazlar.
+3. **Eşik:** bayatlık eşiği kadansın en az ÜÇ KATI olur (bugün 45 dk). Tek atlanan koşum
+   alarm değildir; üç ardışık kayıp desendir. Her titremede öten alarm okunmaz hale gelir
+   ve okunmayan alarm, olmayan alarmla aynı şeydir.
+4. **Hiç koşmamış = BAYAT:** içe alma hiç olmamışsa durum BAYAT'tır, "bilinmiyor" DEĞİL.
+   Boş duruma "ölçülemedi, geçelim" demek, bu maddenin doğduğu arızanın ta kendisidir
+   (taşıyıcı 3 gün kurulmadan kaldı ve hiçbir şey kırmızı yanmadı).
+5. **İki ayrı kapı, iki ayrı gerekçe — birleştirilmez:**
+   (a) BAYATLIK ALARMI içe almanın sessizce durmasını yakalar; gerekçesi "durmuş içe alma
+   ile taşınacak şey olmaması dışarıdan AYNI görünür".
+   (b) RUNBOOK KONFORMANSI, bir belgenin "kuruldu/koşuyor" DEDİĞİ mekanizmanın sistemde
+   karşılığı olmasını şart koşar; gerekçesi doc-committed-not-work-done. Belge "kurulmadı"
+   diyorsa konformans TUTAR ve o vakayı yalnız (a) yakalar. Tek gerekçeyle iki kol kurmak,
+   kör bir kapıyı sağlam sanmaktır.
+6. **Park fişi kuralı:** bir iş birinin onayına park ediliyorsa fişin SAHİBİ ve TARİHİ
+   yazılır. Sahipsiz ve tarihsiz park edilen iş park edilmiş değil KAYBEDİLMİŞTİR
+   (ölçüldü: kayıt "Recep onayına" bırakıldı, kimse sormadı, 3 gün kimse fark etmedi).
+7. **Kabul ölçütü:** bu madde, bilerek bayatlatılarak KIRMIZI verdirilebilen bir alarm
+   İSTER; alarmı olmayan bir alarm sessizce hep-yeşildir. (Uygulama: `orion board health`,
+   5 sabotajla kanıtlı, 2026-08-26. UTC tuzağı: `ingested_at` UTC ve damgasız — yerel
+   saatle karşılaştıran alarm eksi yaş hesaplar ve sonsuza dek yeşil kalır; eksi yaş
+   sıfıra yuvarlanmaz, KUSUR olarak işaretlenir.)

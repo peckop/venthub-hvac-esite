@@ -2,63 +2,57 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\.agent\skills\venthub-auditor\scripts\run_audit.py
-skeleton_hash: 2f9d9badff22741e
+source_path: C:\tmp\wt-supurme\.claude\skills\venthub-auditor\scripts\run_audit.py
+skeleton_hash: ad9c225d14a08fb7
 entity_hashes:
   func:run_audit: 74a6b6574710854f
   overview: 978262b0b7b8a41f
-generated_at: 2026-06-08T18:33:54Z
+generated_at: 2026-08-25T07:22:58Z
 ---
 
 ## Genel Bakış
 
-Bu modül, VentHub projesinin kod kalitesi ve standartlara uygunluk denetimini (audit) başlatmak için tasarlanmış tek fonksiyonlu bir araçtır. Verilen hedef dizindeki kaynak kodları tarayarak denetim sonuçlarını üretir.
+Bu modül, belirtilen bir dizinde denetim (audit) işlemi yürütmekten sorumludur. Modül, tek bir dışa açık fonksiyon içerir ve varsayılan olarak `src` dizinini hedef alır. Modülün amacı, projenin kaynak kodunun belirli kurallara uygunluğunun otomatik olarak denetlenmesini sağlamaktır.
 
 ## Fonksiyon Grupları
 
 ### Denetim Çalıştırma
-Tek sorumluluğu, belirtilen hedef dizin varsayılan olarak "src" olmak üzere, projenin denetim sürecini başlatmaktır.
+
+Hedef dizini parametre olarak alıp denetim sürecini başlatan ana işlevi sağlar. Varsayılan hedef dizin `src` olarak belirlenmiştir; bu sayede parametre verilmeden çağrıldığında kaynak kod dizinini otomatik olarak denetler.
+
 - run_audit
+
+## Bağımlılıklar ve Mimari Notlar
+
+Modülün iç ve dış bağımlılıkları hakkında verilen kaynakta ayrıntılı bilgi bulunmamaktadır. Modülün hangi denetim kurallarını uyguladığı, hangi alt modülleri veya araçları kullandığı bilinmiyor. Tek fonksiyonlu ve basit bir yapıya sahip olması, bu modülün bir giriş noktası (entry point) veya orkestratör olarak görev yaptığını düşündürmektedir; ancak kesin mimari rolü yalnızca kaynak kod incelenerek doğrulanabilir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, belirtilen bir dizindeki HVAC kaynak kodunu denetlemek için kurallar listesi üzerinde bir audit (denetim) işlemi yürütür.
-
-[Aksiyom 1]: Eğer `target_dir` parametresi geçerli bir dizin yolunu temsil etmiyorsa veya belirtilen dizin mevcut değilse, audit işlemi başarısızlıkla sonuçlanır veya beklenmeyen davranışlar gözlemlenebilir.
-
-[Aksiyom 2]: Eğer `AUDIT_RULES` sabiti tanımlanmamış, boş bir liste ise veya beklenen formatta (geçerli audit kuralları içeren) değilse, denetim işlemi anlamlı sonuçlar üretmez veya hiç kural çalıştırılamaz.
-
-[Aksiyom 3]: Eğer `target_dir` içinde递归 olarak taranacak kaynak dosyalar (örneğin `.py` dosyaları) bulunamıyorsa, hiçbir kural uygulanamaz ve audit sonucu boş veya anlamsız olur.
-
-[Aksiyom 4]: Eğer `AUDIT_RULES` içindeki kurallar, hedef dizindeki dosya tipleriyle uyumlu değilse (örneğin Python dışı dosyaları tarayan kurallar Python dosyalarına uygulanmaya çalışılırsa), kural ihlalleri yanlış tespit edilebilir veya kural çalışmaz.
-
-[Aksiyom 5]: Eğer audit sırasında dosya okuma/erişim izinleri yetersizse, ilgili dosyalar denetlenemez ve eksik raporlar oluşur.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### run_audit
+**Ne yapar**: Belirtilen dizindeki TypeScript ve TSX dosyalarını tarayarak teknik borç denetimi gerçekleştirir. Tespit edilen sorunları dosya adı, satır numarası, kural adı, önem derecesi ve kod parçası bilgileriyle birlikte raporlar. Hiçbir sorun bulunamazsa başarılı mesajı görüntüler, aksi halde bulunan sorunları önem derecesine göre sıralayarak konsola yazdırır.
 
-**Ne yapar**: Verilen hedef dizindeki TypeScript ve TSX dosyalarını tarayarak teknik borç (technical debt) sorunlarını tespit eder ve konsola detaylı bir rapor oluşturur.
-
-**Nasıl yapar**: Fonksiyon `os.walk` ile dizin ağacını dolaşarak sadece `.tsx` ve `.ts` uzantılı dosyaları işler. Her dosyanın içeriği okunarak `AUDIT_RULES` listesinde tanımlı düzenli ifadeler (regex) ile eşleştirilir. Eşleşmelerden elde edilen satır numaraları, kural adları, ciddiyet seviyeleri ve kod snippetleri bir results listesinde toplanır. Bulunan sonuçlar ciddiyet seviyelerine göre azalan sırada sıralanarak dosya bazlı gruplanmış şekilde konsola yazdırılır. Dosya okuma sırasında oluşan hatalar yakalanır ve hata mesajı ile devam edilir.
+**Nasıl yapar**: `os.walk` ile `target_dir` dizinini özyinelemeli olarak dolaşır ve `.tsx` ile `.ts` uzantılı dosyaları filtreler. Her dosyayı UTF-8 kodlamasıyla okuyup içeriğini satırlara böler. Modül seviyesinde tanımlı `AUDIT_RULES` listesindeki her kural için `re.finditer` ile regex eşleştirmesi yapar. Eşleşmenin bulunduğu satır numarasını, eşleşme pozisyonundan önceki yeni satır karakterlerini sayarak hesaplar. Her eşleşme için dosya yolu, satır numarası, kural adı, önem derecesi ve ilgili satırın kırpılmış metnini içeren bir sözlük oluşturup `results` listesine ekler. Dosya okuma sırasında oluşan herhangi bir hata yakalanır ve konsola hata mesajı olarak yazdırılır, işlem diğer dosyalarla devam eder. Tarama tamamlandığında sonuçlar önem derecesine (`severity`) göre azalan sırada sıralanır ve dosya bazlı gruplanarak konsola raporlanır. Her dosya başlığının altında ilgili satırların bilgileri ve kod parçalarının ilk 80 karakteri görüntülenir.
 
 **Parametreler**:
-- target_dir: string (varsayılan: "src") — Taranacak hedef dizinin yolu, alt dizinler dahil recursive olarak işlenir
+- `target_dir`: `str` — Taranacak kök dizin yolu. Varsayılan değeri `"src"` olarak atanmıştır.
 
-**Dönüş**: None — Fonksiyon doğrudan konsola rapor yazdırır, herhangi bir değer döndürmez
+**Dönüş**: Fonksiyon açıkça bir değer döndürmez. Yan etki olarak konsola denetim bilgilendirme mesajlarını, tespit edilen sorunların detaylı listesini ya da sorun bulunamadığına dair başarılı mesajını yazdırır.
 
-**Kullanılan Dış Bağımlılıklar**:
-- `AUDIT_RULES`: Regex tabanlı denetim kuralları içeren liste (dışarıdan tanımlı)
-- `os`, `re`: Python standart kütüphane modülleri
+---
 
-**Notlar**:
-- Ciddiyet seviyeleri string olarak karşılaştırılır (alfabetik sıralama: "high" > "low" > "medium")
-- Her buluntu için maksimum 80 karakterlik kod snippeti gösterilir
-- Dosya başına birden fazla ihlal bulunabilir
+## İTHALATLAR (IMPORTS)
+- import: os
+- import: re
+- import: sys
 
 ---
 
@@ -70,32 +64,34 @@ Bu modül, belirtilen bir dizindeki HVAC kaynak kodunu denetlemek için kurallar
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: scripts/run_audit.py::run_audit
-- **params**: `target_dir` — Tarama yapılacak dizin yolu, varsayılan "src"
+- **params**:
+  - `target_dir` — varsayılan değeri `"src"`; denetlenecek kök dizin yolu
 - **ic_degiskenler**:
-  - `results` — Bulunan denetim sorunlarını tutan sözlük listesi
-  - `root` — os.walk'un döndürdüğü mevcut dizin yolu
-  - `file` — os.walk'un döndürdüğü dosya adı
-  - `file_path` — os.path.join ile oluşturulmuş tam dosya yolu
-  - `f` — open() ile açılmış dosya nesnesi
-  - `content` — Dosyanın tüm metin içeriği
-  - `lines` — content.splitlines() ile oluşturulmuş satır listesi
-  - `rule` — AUDIT_RULES listesinden iterasyonla alınan kural sözlüğü
-  - `matches` — re.finditer ile content içinde bulunan eşleşme iterator'ı
-  - `match` — re.finditer Iterator'ın döndürdüğü mevcut eşleşme nesnesi
-  - `line_no` — match.start() konumundan hesaplanan satır numarası (1-bazlı)
-  - `snippet` — lines[line_no - 1].strip() ile elde edilmiş temiz satır metni
-  - `e` — except bloğunda yakalanmış Exception nesnesi
-  - `results.sort(key=lambda x: x["severity"], reverse=True)` — severity anahtarına göre azalan sıralama (yan etki)
-  - `current_file` — Raporlama döngüsünde bir önceki dosyayı tutan izleme değişkeni
-  - `r` — results listesinin raporlama döngüsündeki mevcut sözlük elemanı
-- **Dönüş**: yok (yan etki: konsola denetim raporu yazdırır)
+  - `results` — boş liste olarak başlatılır; bulunan tüm sorun kayıtlarını toplar
+  - `root` — `os.walk(target_dir)` döngüsünden gelen mevcut dizin yolu
+  - `_` — `os.walk` döngüsünden gelen alt dizin listesi; kullanılmaz
+  - `files` — `os.walk` döngüsünden gelen mevcut dizindeki dosya adları listesi
+  - `file` — `files` listesindeki tek tek dosya adı
+  - `file_path` — `os.path.join(root, file)` ile oluşturulan tam dosya yolu
+  - `f` — `open(file_path, 'r', encoding='utf-8')` ile açılan dosya nesnesi (context manager)
+  - `content` — `f.read()` ile okunan dosya içeriği (string)
+  - `lines` — `content.splitlines()` ile elde edilen satır listesi
+  - `rule` — `AUDIT_RULES` listesindeki her bir kural sözlüğü; `"pattern"`, `"name"`, `"severity"` anahtarlarına sahip
+  - `matches` — `re.finditer(rule["pattern"], content)` ile üretilen regex eşleşmeleri iterator'ı
+  - `match` — iterator'dan gelen tek bir regex eşleşme nesnesi; `match.start()` kullanılır
+  - `line_no` — `content.count('\n', 0, match.start()) + 1` ile hesaplanan eşleşmenin satır numarası
+  - `snippet` — `lines[line_no - 1].strip()` ile alınan eşleşen satırın metni
+  - `e` — `except Exception` ile yakalanan hata nesnesi
+  - `r` — `results` listesindeki her bir sonuç sözlüğü; `"file"`, `"line"`, `"rule"`, `"severity"`, `"snippet"` anahtarlarına sahip
+  - `current_file` — raporlama döngüsünde dosya gruplaması için kullanılan mevcut dosya yolu takipçisi; başlangıçta boş string
+- **Dönüş**: yok (None); yan etki olarak konsola denetim raporu yazar, dosya sistemi üzerinde `os.walk` ve `open` ile salt okuma yapar
 
 ---
 
 ## NODE ID STANDARD
 
-  file: .agent\skills\venthub-auditor\scripts\run_audit.py
-  function: .agent\skills\venthub-auditor\scripts\run_audit.py::run_audit
+  file: run_audit.py
+  function: run_audit.py::run_audit
 
 ---
 

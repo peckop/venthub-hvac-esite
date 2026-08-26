@@ -2,53 +2,54 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\returns\page.tsx
-skeleton_hash: dd5db32d712b3c61
+source_path: C:\tmp\wt-supurme\src\app\[lang]\account\returns\page.tsx
+skeleton_hash: e5cc6f7b5589d0c3
 entity_hashes:
   func:Page: 9c08060caeb88969
   overview: 9db8b446a5775015
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-25T07:23:44Z
 ---
 
 ## Genel Bakış
-Bu modül, çok dilli hesap bölümündeki iade yönetimi sayfasının giriş noktasıdır. Sayfa bileşeni, gerekli alt bileşenleri bir araya getirerek kullanıcıya iadelerini görüntüleyebilecekleri bir arayüz sunar. Tüm iş mantığı ve veri yönetimi, alt bileşenlere devredilmiştir.
+
+Bu modül, Next.js App Router yapısında bir sayfa bileşenidir. Kullanıcının hesap bölümündeki iade taleplerini görüntülediği sayfayı oluşturur. Uluslararasılaştırma desteği için `[lang]` dinamik yol parametresi kullanılır.
 
 ## Fonksiyon Grupları
-### Sayfa Giriş Noktası
-Sayfanın üst düzey yapısını oluşturur ve içeriği sağlayan bileşenleri render eder.
+
+### Sayfa Bileşeni
+Bu modülde yalnızca tek bir dışa aktarılan fonksiyon bulunur. Sayfanın tamamını render etmekten sorumludur; üst bileşenlerden gelen dil parametresine göre doğru içerikle kullanıcıya sunulur.
 - Page
+
+## Bağımlılıklar ve Mimari Notlar
+
+- **İç bağımlılıklar:** Modülde tanımlı başka fonksiyon bulunmadığından, `Page` fonksiyonunun çağıracağı alt bileşenler ve yardımcı fonksiyonlar kaynak kodda belirtilmemiştir. Bilinmiyor.
+- **Dış bağımlılıklar:** Next.js framework'üne ait sayfa sözleşme kurallarına bağlıdır (varsayılan dışa aktarım). `[lang]` parametresi, üst dizin yapısından gelen dinamik rota segmentidir.
+- **Dinamik/lazy yükleme:** Kaynakta bu yönde bir bilgi bulunmamaktadır.
+- **Mimari önem:** Bu dosya, uygulamanın kullanıcı hesap akışındaki iade sayfasının giriş noktasıdır. Tek sorumluluk ilkesi doğrultusunda yalnızca sayfa kabuğu oluşturması; iş mantığı ve veri çekme işlemlerinin alt bileşenlere veya yardımcı modüllere devredilmesi beklenir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, bir React sayfası bileşenidir ve temel olarak JSX ağacını döndürür.
 
-[Aksiyom 1]: Eğer React kütüphanesi (ve JSX derleyici ortamı) yoksa, `Page` bileşeni bileşen olarak tanımlanamaz veya çalıştırılamaz ve bir render hatası oluşur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 2]: Eğer `Page` bileşeni çağrılmadan önce, uygulamanın çok dilli yapısı için gerekli olan `lang` parametresi (`params.lang` olarak erişildiği varsayılmaktadır) sağlanmamış veya geçersizse, bileşen内da dil bazlı içeriği doğru gösteremez ve beklenmeyen bir davranış veya hata oluşur.
-
-[Aksiyom 3]: Eğer `Page` bileşeni, içeriğini sağlayan `PageComponent` veya benzeri bir alt bileşeni içermiyorsa (veya bu alt bileşen bulunamıyorsa), sayfa boş bir alan render eder ve iade sayfasının ana içeriği gösterilmez.
+**Gerekçe:** Fonksiyon gövdesi sağlanmadığından (`Page` yalnızca imzasıyla verilmiştir), gövdeden çıkarım yapılabilecek bir koşul bulunmamaktadır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Sayfa yüklenirken Suspense sarmalayıcı kullanarak asıl sayfa içeriğinin (PageComponent) yüklenmesini bekler ve bu bekleme süresinde kullanıcıya animasyonlu bir yüklenme göstergesi sunar.
 
-**Nasıl yapar**: React Suspense bileşenini kullanarak lazy loading veya asenkron veri yüklemesi yapan `PageComponent`'i sarar. Suspense henüz çözülmemişse (yani PageComponent yüklenirken) `fallback` prop'unda tanımlanan JSX'i render eder — bu JSX, tam ekran ortalanmış, dönen border animasyonlu bir yükleme spinner'ıdır. Suspense çözüldüğünde ise `PageComponent` render edilir.
+**Ne yapar**: Bu fonksiyon, bir sayfa bileşeni olarak görev yapar. Asıl içerik bileşeni olan `PageComponent`'i React'ın `Suspense` mekanizması ile sararak, bileşen yüklenirken kullanıcıya bir yükleme animasyonu gösterir. Next.js'in dosya tabanlı yönlendirme sistemi altında, `page.tsx` dosyasında tanımlanan varsayılan dışa aktarım (default export) olarak bu sayfanın ana bileşeni olarak kullanılır.
+
+**Nasıl yapar**: Fonksiyon, JSX içinde `Suspense` bileşenini kullanır. `Suspense`, alt bileşenlerinden herhangi biri henüz hazır olmadığında (örneğin veri yüklenirken veya bileşen lazy loading ile çağrıldığında) `fallback` prop'unda tanımlanan içeriği gösterir. Burada `fallback` olarak, ekranın ortasında dönen bir yükleme ikonu (spinner) tanımlanmıştır: `min-h-screen` ile tam ekran yüksekliği, `flex items-center justify-center` ile yatay ve dikey ortalama, `animate-spin` ile döndürme animasyonu, `rounded-full` ile daire şekli, `h-12 w-12` ile boyut ve `border-b-2 border-primary-navy` ile renkli alt kenarlık uygulanmıştır. `Suspense`'in içine sarılan `PageComponent` bileşeni hazır olduğunda ise yükleme ikonu yerine asıl içerik görüntülenir.
 
 **Parametreler**:
-Bu fonksiyon herhangi bir parametre almamaktadır.
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: JSX elementi döndürür. Suspense sarmalayıcısı içinde `PageComponent` veya fallback yükleme göstergesi şeklinde bir React node döner.
-
-**Notlar**:
-- Dosya yolu (`app/[lang]/account/returns/page.tsx`) göz önüne alındığında bu fonksiyonun Next.js App Router yapısında yer alan bir sayfa bileşeni olduğu anlaşılır.
-- `min-h-screen` sınıfı fallback ekranının tüm viewport yüksekliğini kaplamasını sağlar.
-- `border-primary-navy` ve `border-b-2` sınıfları yüklenme spinner'ının alt kısmında renkli border animasyonu oluşturur.
-- `animate-spin` sınıfı CSS tabanlı sürekli döndürme animasyonu uygular.
+**Dönüş**: JSX elementi döndürür. Dönüş yapısı, `Suspense` bileşeni ile sarılmış bir `PageComponent` bileşeninden oluşur. Kesin dönüş tipi belirtilmemiştir; TypeScript/React ortamında bu tipik olarak `JSX.Element` veya `React.ReactElement` olur.
 
 ---
 
@@ -64,15 +65,16 @@ Bu fonksiyon herhangi bir parametre almamaktadır.
 ### [N1_NASIL] AST Pointer: src/app/[lang]/account/returns/page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  *(fonksiyon gövdesinde herhangi bir değişken bildirimi yoktur)*
-- **Dönüş**: JSX — `<Suspense>` sarmalayıcısı içinde `<PageComponent />` bileşenini render eder; fallback olarak animasyonlu spinner gösterir
+  - `fallback` — Suspense bileşeninin `fallback` prop'u; yükleme sırasında gösterilen spinner div'i. Tailwind sınıflarıyla (`min-h-screen`, `flex`, `items-center`, `justify-center`) ortalanmış bir kapsayıcı ve içinde `animate-spin`, `rounded-full`, `h-12`, `w-12`, `border-b-2`, `border-primary-navy` sınıflarıyla dönen bir yükleme ikonu içerir
+  - `PageComponent` — `../../../../views/account/AccountReturnsPage` yolundan varsayılan olarak import edilen bileşen; Suspense içinde sarılarak render edilir
+- **Dönüş**: JSX elementi — `Suspense` bileşeni ile sarılmış `PageComponent` bileşeni döndürür; `Suspense` asenkron yüklenme sırasında `fallback` prop'undaki spinner'ı gösterir
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\app\[lang]\account\returns\page.tsx
-  function: src\app\[lang]\account\returns\page.tsx::Page
+  file: page.tsx
+  function: page.tsx::Page
 
 ---
 

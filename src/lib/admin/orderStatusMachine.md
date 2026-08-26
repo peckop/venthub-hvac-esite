@@ -2,81 +2,67 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\lib\admin\orderStatusMachine.ts
-skeleton_hash: 51582b8e8d32543b
+source_path: C:\tmp\wt-supurme\src\lib\admin\orderStatusMachine.ts
+skeleton_hash: a47068840509eb87
 entity_hashes:
-  func:allowedNextOrderStatuses: 221ca6e8684b547c
-  func:canTransitionOrder: 8a458e539fece6a8
+  func:allowedNextOrderStatuses: aeafdd7e384021d1
+  func:canTransitionOrder: b9d35825d6dc47f6
   overview: 94cd02ee81a21baa
-generated_at: 2026-08-16T05:20:38Z
+generated_at: 2026-08-25T07:27:46Z
 ---
 
 ## Genel Bakış
-Bu modül, sipariş durumu makinelerinin (state machine) geçiş kurallarını yönetmek için temel yardımcı fonksiyonlar sunar. Amacı, bir siparişin bulunduğu mevcut durumdan izin verilen sonraki durumları belirlemek ve belirli bir durum geçişinin geçerliliğini kontrol etmektir. Bu, sipariş yönetim akışının tutarlı ve kurallara uygun şekilde ilerlemesini sağlayan merkezi bir bileşendir.
+Bu modül, sipariş durumları arasındaki geçiş kurallarını tanımlayan bir durum makinesi (state machine) yapısıdır. Siparişlerin hangi durumdan hangi duruma geçebileceğini kontrol eder ve geçiş izinlerini doğrular. Modül, sipariş yaşam döngüsünde geçerli durum akışını güvence altına alır.
 
 ## Fonksiyon Grupları
-### Sipariş Durumu Geçiş Kuralları
-Bu grup, sipariş durumları arasındaki izin verilen geçişleri tanımlar ve doğrular.
+
+### Durum Geçiş Kontrolü
+Sipariş durum geçişlerinin geçerliliğini sorgulayan fonksiyonları içerir. Mevcut bir durumdan yapılabilecek geçişleri listeler ve belirli bir geçişin izinli olup olmadığını denetler.
 - allowedNextOrderStatuses, canTransitionOrder
+
+---
+
+**Notlar:**
+- `OrderBoardStatus` tipi bu modülün dışından tanımlanmış olup, geçerli sipariş durumlarını temsil eder.
+- `canTransitionOrder` fonksiyonunun, `allowedNextOrderStatuses` fonksiyonunu çağırarak çalışıp çalışmadığı kaynak kodda belirtilmemiştir; bu nedenle ikisi arasındaki kesin ilişki bilinmemektedir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, sipariş durumları arası geçiş kurallarını yöneten bir durum makinesi (state machine) içerir.
+Bu modül, sipariş durumları arasındaki geçişleri tanımlayan bir durum makinesi uygular. Fonksiyonların doğru çalışması için `TRANSITIONS` sabitinin tanımlı ve doğru yapılandırılmış olması gerekir.
 
----
+[Aksiyom 1]: Eğer `TRANSITIONS` sabiti yoksa veya tanımlı değilse, `allowedNextOrderStatuses` ve `canTransitionOrder` fonksiyonları çalışamaz.
 
-**[Aksiyom 1]:** `current` parametresi olarak verilen string, `TRANSITIONS` objesinde tanımlı bir durum anahtarı olmalıdır.
-**Eğer** `current` değeri `TRANSITIONS` objesinde bir key olarak mevcut değilse, `allowedNextOrderStatuses` boş bir dizi döndürür veya tanımsız davranış oluşur.
+[Aksiyom 2]: Eğer `current` parametresi `TRANSITIONS` objesinde tanımlı bir anahtar değilse, `allowedNextOrderStatuses` fonksiyonu geçerli bir `OrderBoardStatus[]` dizisi döndüremez.
 
-**[Aksiyom 2]:** `TRANSITIONS` objesi, her bir durum için izin verilen bir sonraki durumların listesini içermelidir.
-**Eğer** `TRANSITIONS` tanımlı değilse veya bir durum anahtarı eksikse, geçiş kontrolü tutarsız sonuçlar üretir.
-
-**[Aksiyom 3]:** `canTransitionOrder(current, next)` fonksiyonu, `TRANSITIONS[current]` içinde `next` değerinin varlığını kontrol eder.
-**Eğer** `next` değeri `TRANSITIONS[current]` listesinde bulunmuyorsa, `false` döner.
-
-**[Aksiyom 4]:** `allowedNextOrderStatuses` fonksiyonu sadece `TRANSITIONS` objesindeki tanımlı durumlar için anlamlı sonuç döner.
-**Eğer** tanımsız bir durum字符串i girilirse, boş dizi (`[]`) veya beklenmeyen sonuç döner.
-
-**[Aksiyom 5]:** `OrderBoardStatus` tipi ile `TRANSITIONS` objesinde kullanılan durum stringleri aynı domain'de olmalıdır.
-**Eğer** tip ile runtime değerleri uyuşmazsa, TypeScript derleme zamanında hata vermez ama runtime'da tutarsızlık oluşur.
-
----
-
-> **Not:** Bu aksiyomlar sadece fonksiyon imzaları ve `TRANSITIONS` sabit yapısından türetilmiştir. Belirli durum isimleri (örn: "pending", "shipped") veya geçiş kuralları modül içeriğinden çıkarılmamıştır.
+[Aksiyom 3]: Eğer `current` veya `next` parametreleri `TRANSITIONS` objesindeki geçerli durum anahtarlarıyla eşleşmiyorsa, `canTransitionOrder` fonksiyonu geçişin yapılıp yapılamayacağını doğru şekilde belirleyemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### allowedNextOrderStatuses
-**Ne yapar**: Verilen bir sipariş durumundan (current) izin verilen sonraki durumların listesini döndürür. Eğer verilen durum bilinmiyor veya tanımsız ise, geçiş izni verilmeyen (kilitli) durumu temsil eden boş bir dizi döner.
-
-**Nasıl yapar**: Fonksiyon, dışarıda tanımlı bir `TRANSITIONS` haritasını kullanır. `current` parametrelerini bir `OrderBoardStatus` türüne dönüştürerek bu haritada bir anahtar olarak arar. Haritada karşılık gelen bir değer varsa, o değer bir dizi içinde döndürülür; `??` (nullish coalescing) operatörü ile haritada anahtar bulunamazsa boş bir dizi (`[]`) kullanılır. Döndürülen dizi, orijinal `TRANSITIONS` değerinin bir kopyasıdır, böylece dışarıdan değiştirilmesi engellenir.
-
+**Ne yapar**: Verilen bir sipariş durumundan (`current`) geçiş yapılabilecek izin verilen sonraki durumların listesini döndürür. Bilinmeyen veya tanımlanmamış bir durum verilmesi durumunda, boş bir dizi döndürerek geçişleri kilitler.
+**Nasıl yapar**: Fonksiyon, `TRANSITIONS` adlı önceden tanımlanmış bir sabit nesneyi kullanır. Verilen `current` parametresini `OrderBoardStatus` tipine dönüştürerek bu nesnede arar. Eğer `current` için bir geçiş listesi tanımlıysa, o listeyi kopyalayarak döndürür; tanımlı değilse (`?? []` operatörü ile) boş bir dizi döndürür.
 **Parametreler**:
-- `current`: `string` — Sorgulanan mevcut sipariş durumunu temsil eden metin dizesi. Fonksiyon içinde `OrderBoardStatus` türüne zorunlu dönüşüm (`as`) yapılarak kullanılır.
-
-**Dönüş**: `OrderBoardStatus[]` — `current` durumundan izin verilen sonraki durumların dizisi. Tanımsız bir durum sorgulanırsa boş dizi döner.
+- current: string — Geçiş yapılmak istenen mevcut sipariş durumu.
+**Dönüş**: `OrderBoardStatus[]` — Mevcut durumdan geçiş yapılabilecek izin verilen sonraki durumların bir dizisi. Bilinen bir durum için tanımlı geçişlerin kopyası, bilinmeyen bir durum için boş dizi.
 
 ### canTransitionOrder
-**Ne yapar**: Belirli bir mevcut durumdan (`current`) hedef duruma (`next`) geçişin izinli olup olmadığını kontrol eder. Genellikle sürükle-bırak arayüzündeki geçiş kapılarını doğrulamak ve veri mutasyonları öncesi güvenlik kontrolleri için kullanılır.
-
-**Nasıl yapar**: `allowedNextOrderStatuses` fonksiyonunu `current` parametresiyle çağırarak izin verilen sonraki durumların listesini alır. Ardından, `next` parametresini `OrderBoardStatus` türüne dönüştürerek (dizeyi tür güvenli bir değere çevirir) bu listede (`includes` metoduyla) olup olmadığını kontrol eder. Sonuç olarak bir mantıksal değer (`true`/`false`) döner.
-
+**Ne yapar**: İki sipariş durumu arasındaki geçişin (`current`'dan `next`'e) izinli olup olmadığını kontrol eder. Panonun sürükle-bırak arayüzü ve veri mutasyonu koruması gibi yerlerde geçiş izni sorgulamak için kullanılır.
+**Nasıl yapar**: `allowedNextOrderStatuses` fonksiyonunu çağırarak mevcut durumdan (`current`) izin verilen tüm sonraki durumların listesini alır. Ardından, hedef durumu (`next`) bu listenin içerip içermediğini kontrol eder ve sonucu boolean olarak döndürür.
 **Parametreler**:
-- `current`: `string` — Geçişin başlatıldığı mevcut sipariş durumunu temsil eden metin dizesi.
-- `next`: `string` — Hedeflenen veya gidilmek istenen sipariş durumunu temsil eden metin dizesi. Fonksiyon içinde `OrderBoardStatus` türüne zorunlu dönüşüm (`as`) yapılarak kullanılır.
-
-**Dönüş**: `boolean` — Geçiş izinliyse `true`, izin verilmeyen veya tanımsız bir geçiş ise `false` döner.
+- current: string — Mevcut sipariş durumu.
+- next: string — Geçiş yapılmak istenen hedef sipariş durumu.
+**Dönüş**: `boolean` — Geçiş izinli ise `true`, izinli değilse `false` döndürür.
 
 ---
 
 ## TYPE ALIASES
 
 ### OrderBoardStatus
-Kanban'ın kullandığı efektif statüler (DB status + ödeme kaynaklı türevler).
+Kanban'ın kullandığı **efektif** statüler. ⚠ BU BİR SSOT DEĞİL, **BİRLEŞİMDİR** (T111-VH ile açıkça yazıldı). Aşağıdaki dokuz değer İKİ AYRI DB kolonundan gelir: · `venthub_orders.status`         → pending · confirmed · processing · shipped · delivered · cancelled · `venthub_orders.payment_status` →
 ```typescript
 type OrderBoardStatus = | 'pending'
   | 'paid'
@@ -93,33 +79,36 @@ type OrderBoardStatus = | 'pending'
 
 ## SABİTLER
 - **TRANSITIONS** (object) — `{
-  pending: ['confirmed', 'cancelled'],
-  paid: ['confirmed', 'cancelled'],
-...`
+  pending: ['confirmed', 'cancelled', 'refunded', 'partial_refunded'],
+  ...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/admin/orderStatusMachine.ts::allowedNextOrderStatuses
-- **params**: `current: string` — geçerli sipariş durumu anahtarı
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde yerel değişken tanımlanmamış)
-- **Kullanım**: `TRANSITIONS[current as OrderBoardStatus]` — TRANSITIONS nesnesinde mevcut duruma karşılık gelen izin verilen sonraki durumlar dizisi alınır; `??` operatörü ile `undefined`/`null` durumunda boş dizi fallback yapılır; spread (`...`) ile kopyalanarak yeni dizi döndürülür
-- **Dönüş**: `OrderBoardStatus[]` — current durumundan geçilebilecek izin verilen durumların dizisi
+- **params**: `current: string` — mevcut sipariş durumu
+- **ic_degiskenler**:
+  - `TRANSITIONS` — modül seviyesinde tanımlı sabit nesne; `current` parametresi `OrderBoardStatus` tipine cast edilerek anahtar olarak kullanılır
+  - `current as OrderBoardStatus` — `current` parametresinin `OrderBoardStatus` tipine daraltılması; `TRANSITIONS` nesnesinde geçerli bir anahtar olmasını sağlar
+  - `?? []` — nullish coalescing operatörü; `TRANSITIONS[current]` değeri `undefined` veya `null` ise boş dizi kullanılır
+  - `[...]` — spread operatörü; bulunan diziyi kopyalayarak yeni bir dizi oluşturur
+- **Dönüş**: `OrderBoardStatus[]` — izin verilen bir sonraki sipariş durumlarının dizisi
 
 ### [N2_NASIL] AST Pointer: src/lib/admin/orderStatusMachine.ts::canTransitionOrder
-- **params**: `current: string` — geçerli sipariş durumu anahtarı, `next: string` — hedeflenen sipariş durumu anahtarı
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde yerel değişken tanımlanmamış)
-- **Kullanım**: `allowedNextOrderStatuses(current)` — mevcut durumdan izin verilen sonraki durumlar alınır; `.includes(next as OrderBoardStatus)` — hedef durumun izin verilenler listesinde olup olmadığı kontrol edilir
-- **Dönüş**: `boolean` — current'dan next'e geçişin izinli olup olmadığı
+- **params**: `current: string` — mevcut sipariş durumu, `next: string` — hedef sipariş durumu
+- **ic_degiskenler**:
+  - `allowedNextOrderStatuses(current)` — aynı modüldeki fonksiyon çağrısı; `current` durumundan geçiş yapılabilecek durumların listesini döndürür
+  - `next as OrderBoardStatus` — `next` parametresinin `OrderBoardStatus` tipine daraltılması; `.includes()` ile karşılaştırmada kullanılır
+- **Dönüş**: `boolean` — `next` durumuna geçiş yapılabiliyorsa `true`, yapılamıyorsa `false`
 
 ---
 
 ## NODE ID STANDARD
 
-  file: src\lib\admin\orderStatusMachine.ts
-  function: src\lib\admin\orderStatusMachine.ts::allowedNextOrderStatuses
-  function: src\lib\admin\orderStatusMachine.ts::canTransitionOrder
+  file: orderStatusMachine.ts
+  function: orderStatusMachine.ts::allowedNextOrderStatuses
+  function: orderStatusMachine.ts::canTransitionOrder
 
 ---
 

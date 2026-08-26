@@ -2,52 +2,50 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\lib\orderStatusService.ts
-skeleton_hash: 50cd2e46588c95ea
+source_path: C:\Users\alize\venthub-hvac\src\lib\orderStatusService.ts
+skeleton_hash: b1e72bfe3697ffe8
 entity_hashes:
   func:isReturnStatus: b72fd60a31916058
   func:resolveDbFields: bb3f04ce63170b18
-  func:restoreStockForOrder: 47390fe85340bd62
-  func:syncOrderFromReturn: def4e517f5ee096b
+  func:restoreStockForOrder: 177f2e7d416f911d
+  func:syncOrderFromReturn: 5f75c93f308453f5
   func:syncReturnsRecord: dc5a56e469e899d4
-  func:updateOrderStatus: 2d9081ebb190cdb7
-  overview: db3f9f8f046b864c
-generated_at: 2026-08-16T05:21:33Z
+  func:updateOrderStatus: b743f322bfcde089
+  overview: 9db0fdcde6bd771e
+generated_at: 2026-08-24T12:49:42Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformundaki sipariş yaşam döngüsü yönetimi için geliştirilmiş merkezi bir sipariş durumu servisidir. UI'dan gelen durum taleplerini veritabanı uyumlu formatlara dönüştürür, temel sipariş durumu güncellemelerini yönetir, iade süreçlerini tüm ilgili kayıtlarla senkronize eder ve iade edilen siparişler için stok geri yükleme işlemlerini yürütür. Tüm durum değişikliklerini tek noktadan yöneterek sistemdeki sipariş, stok ve iade kayıtları arasındaki tutarlılığı garanti eder.
+Bu modül, VentHub HVAC platformundaki sipariş yaşam döngüsü yönetimini sağlayan merkezi bir sipariş durumu servisidir. UI katmanından gelen durum taleplerini veritabanı uyumlu formatlara dönüştürür, sipariş durumu güncellemelerini yönetir, iade süreçlerini tüm ilgili kayıtlarla senkronize eder ve iptal/iade edilen siparişler için stok geri yükleme işlemlerini yürütür. Tüm durum değişikliklerini tek noktadan yöneterek sipariş, stok ve iade kayıtları arasındaki tutarlılığı garanti altına alır.
 
 ## Fonksiyon Grupları
 ### Yardımcı Durum İşleme Fonksiyonları
-UI ve veritabanı arasındaki durum formatı uyumsuzluklarını gideren, durum türlerini teyit eden temel yardımcı işlemleri barındırır.
+UI ve veritabanı arasındaki durum formatı uyumsuzluklarını gideren, durum türlerini teyit eden temel yardımcı işlemleri barındırır. Bu fonksiyonlar diğer servis fonksiyonları tarafından çağrılarak durum dönüşümü ve sınıflandırma desteği sağlar.
 - resolveDbFields, isReturnStatus
 
 ### Ana Sipariş Durumu Güncelleme Servisi
-Tüm sipariş durumu değişikliklerinin temel iş akışını yöneten, asenkron olarak güncelleme işlemlerini gerçekleştiren ana servis fonksiyonunu içerir.
+Tüm sipariş durumu değişikliklerinin temel iş akışını yöneten, asenkron olarak güncelleme işlemlerini gerçekleştiren ana servis fonksiyonunu içerir. Sipariş yaşam döngüsündeki tüm durum geçişlerinin merkezi noktasıdır.
 - updateOrderStatus
 
 ### İade Süreci Senkronizasyon İşlemleri
-İade modülünden gelen durum değişikliklerini ana sipariş kayıtlarıyla eşleştirir, iade ile ilgili tüm sistem kayıtlarının güncel ve tutarlı kalmasını sağlar.
+İade modülünden gelen durum değişikliklerini ana sipariş kayıtlarıyla eşleştirir, iade ile ilgili tüm sistem kayıtlarının güncel ve tutarlı kalmasını sağlar. İade durumu değişikliklerinin sipariş ve iade tablolarına tutarlı şekilde yansımasını koordine eder.
 - syncOrderFromReturn, syncReturnsRecord
 
 ### Stok Entegrasyon Fonksiyonları
-İade edilen veya iptal edilen siparişler için sistem envanterindeki stok miktarlarını geri yükleyerek envanter tutarlılığını koruyan entegrasyon işlemini barındırır.
+İade edilen veya iptal edilen siparişler için sistem envanterindeki stok miktarlarını geri yükleyerek envanter tutarlılığını koruyan entegrasyon işlemini barındırır. Sipariş iptali ve iade senaryolarında stok hareketlerini yönetir.
 - restoreStockForOrder
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, sistemdeki siparişlerin durum yönetimi, iade işlemleriyle sipariş durumlarının senkronizasyonu ve iade edilen siparişler için stok geri yükleme işlemlerini gerçekleştirmek üzere modül içindeki statü sabitlerinin geçerliliği, harici veritabanı ve servis erişimlerinin varlığını zorunlu kılar.
 
-[Aksiyom 1]: Eğer RETURN_STATUSES veya VALID_ORDER_STATUSES modül sabitleri tanımlı değilse, iade statüsü tespiti, tüm statü validasyonları ve durum güncelleme işlemleri çalışmaz, modül hiçbir temel işlevini yerine getiremez.
-[Aksiyom 2]: Eğer sipariş verilerini tutan veritabanına modülün erişimi yoksa, resolveDbFields ile veritabanı alanı çözümleme, updateOrderStatus ile durum güncelleme işlemleri başarısız olur, sistemde tutarsız sipariş durumları oluşur.
-[Aksiyom 3]: Eğer RETURN_STATUSES sabiti içindeki değerler sistemdeki gerçek geçerli iade statüleriyle eşleşmiyorsa, isReturnStatus ile iade statüsü tespiti ve tüm iade senkronizasyon işlemleri yanlış çalışır, gerektiğinde stok geri yüklenmez veya yanlış siparişlerde stok işlemi tetiklenir.
-[Aksiyom 4]: Eğer iade kayıtlarını tutan servise/veritabanına modülün erişimi yoksa, syncOrderFromReturn ile sipariş-iade durumu senkronizasyonu ve syncReturnsRecord ile iade kaydı güncelleme işlemleri başarısız olur, sipariş ve iade durumları arasında kalıcı uyumsuzluk oluşur.
-[Aksiyom 5]: Eğer stok yönetimi servisine modülün iletişim kurma imkanı yoksa, restoreStockForOrder ile iade edilen siparişler için stok geri yükleme işlemi gerçekleştirilemez, sistem stok envanteri tutarsız hale gelir.
-[Aksiyom 6]: Eğer UI'dan gelen statü değerleri ile veritabanı tarafından kullanılan statü değerleri arasındaki eşleşme haritası tanımlı değilse, resolveDbFields fonksiyonu geçersiz veritabanı alanı değeri döndürür, tüm durum güncelleme işlemleri veritabanı hatalarına neden olur.
-[Aksiyom 7]: Eğer senkronizasyon veya işlem yapılmak istenen orderId sistemde mevcut bir siparişe ait değilse, tüm sipariş durumu güncelleme, iade senkronizasyonu ve stok geri yükleme işlemleri başarısız olur, kayıpsız veri güncellemesi garantilenemez.
-[Aksiyom 8]: Eğer VALID_ORDER_STATUSES sabiti sistemdeki tüm geçerli sipariş statülerini tam olarak içermiyorsa, sipariş durum güncellemelerinde geçersiz statülerin sisteme kaydedilmesi engellenemez, sipariş yaşam döngüsünün bütünlüğü bozulur.
+Bu modül, sipariş durumu yönetiminde `RETURN_STATUSES` ve `VALID_ORDER_STATUSES` sabitlerine ve veritabanı erişimine dayanır.
+
+[Aksiyom 1]: Eğer `RETURN_STATUSES` sabiti yoksa, `isReturnStatus`, `syncOrderFromReturn` ve `syncReturnsRecord` fonksiyonları iade durumlarını tanımlayamaz ve doğru çalışamaz.
+[Aksiyom 2]: Eğer `VALID_ORDER_STATUSES` sabiti yoksa, `resolveDbFields` fonksiyonu UI durumlarını geçerli veritabanı durumlarına eşleyemez.
+[Aksiyom 3]: Eğer veritabanı bağlantısı veya gerekli tablolar (siparişler, iadeler, stok) yoksa, `updateOrderStatus`, `syncOrderFromReturn`, `syncReturnsRecord` ve `restoreStockForOrder` fonksiyonları çalışamaz.
+[Aksiyom 4]: Eğer `restoreStockForOrder` fonksiyonuna verilen `reason` parametresi `'order_cancel'` veya `'order_refund'` değerlerinden biri değilse, fonksiyon stok geri yükleme işlemini gerçekleştirmez.
+[Aksiyom 5]: Eğer `updateOrderStatus` veya `syncOrderFromReturn` fonksiyonuna verilen `orderId` veritabanında mevcut bir siparişe karşılık gelmiyorsa, güncelleme işlemi başarısız olur.
 
 ---
 
@@ -61,34 +59,22 @@ Bu modül, sistemdeki siparişlerin durum yönetimi, iade işlemleriyle sipariş
 **Dönüş**: { status: string; payment_status?: string } — Veritabanı kullanımına uyarlanmış, zorunlu sipariş statüsü alanı ve opsiyonel ödeme durumu alanını içeren nesne. İşlem sonucu her zaman geçerli bir nesne olarak döndürülür.
 
 ### updateOrderStatus
+**Ne yapar**: Merkezi sipariş statüsü güncelleme fonksiyonudur. Siparişin durumunu değiştirir, teslim zaman damgası ekler, iade/iptal durumlarında stok geri verme işlemini tetikler, teslim bildirimi gönderir ve audit log kaydı oluşturur. Tüm bu işlemleri tek bir atomik akışta yönetir.
 
-**Ne yapar**: Merkezi sipariş statüsü güncelleme fonksiyonudur. Siparişin durumunu veritabanında ileri yönlü olarak günceller, teslim zaman damgası yazar, iade/iptal senaryolarında stok restorasyonu ve returns senkronizasyonu yapar, teslim durumunda müşteriye bildirim e-postası gönderir ve tüm değişiklikleri audit log'a kaydeder. Tek bir merkezi noktadan tüm sipariş yaşam döngüsü yönetimini koordine eder.
-
-**Nasıl yapar**: Fonksiyon çalışma zamanında (runtime) Several adımlı bir pipeline izler:
-
-1. **Monotonluk Kapısı**: `canTransitionOrder` yardımcı fonksiyonunu çağırarak geçişin geçerliliğini kontrol eder. `oldStatus` verilmemişse (senkronizasyon çağrıları durumu) kontrol atlanır. Geçersiz geçiş tespit edilirse fonksiyon erken döner ve hata mesajı döndürür.
-2. **Statü Güncellemesi**: `resolveDbFields` ile yeni statüye karşılık gelen veritabanı alanlarını çözümler. Eğer statü `delivered` ise `delivered_at` alanını mevcut zaman damgasıyla yazar — ancak `is('delivered_at', null)` koşuluyla idempotent davranışı sağlar (zaten damgalanmış kayıtları ezmez). Damga ilk kez yazıldıysa `deliveredNow` flag'i true olur; aksi halde yalnızca statü alanını hizalar.
-3. **İade/İptal Senkronizasyonu**: `isReturnStatus` ile yeni statünün iade/iptal olup olmadığını kontrol eder. İade durumunda `syncReturnsRecord` ile `venthub_returns` tablosunu senkronize eder ve eğer önceki statü iade/iptal değilse `restoreStockForOrder` ile stokları iade eder.
-4. **Teslim Bildirimi**: Yalnızca `deliveredNow` true olduğunda (ilk teslim anında) `supabase.functions.invoke` ile `delivery-notification` edge function'ını çağırır. Hata durumunda yutulur (best-effort).
-5. **Audit Log**: `logAdminAction` ile değişikliği kaydeder. Audit log hatası da sessizce yutularak UI'ın bloklanması engellenir.
-
-`skipReturnsSync` ve `skipOrdersSync` bayrakları ile ilgili senkronizasyon adımları atlanabilir. Bu, senkronizasyon çağrılarının kendi içlerinde tekrar tetikleme döngüsüne girmesini engeller.
+**Nasıl yapar**: Fonksiyon öncelikle monotonluk kapısı kontrolü yapar — `oldStatus` verilmişse ve `skipOrdersSync` false ise `canTransitionOrder` fonksiyonuyla geçişin geçerli olup olmadığını denetler; geçersiz geçişlerde hata döndürür. Ardından sipariş statüsünü günceller: `skipOrdersSync` false ise `resolveDbFields` ile veritabanı alanlarını çözer ve Supabase'e güncelleme gönderir. Teslim durumunda (`delivered`) `delivered_at` zaman damgası yalnızca daha önce yazılmamışsa eklenir (idempotent); damga zaten varsa sadece statü hizalanır ve tekrar teslim e-postası gönderilmesi engellenir. İade/iptal durumlarında (`skipReturnsSync` false ve `isReturnStatus(newStatus)` true ise) `syncReturnsRecord` ile returns tablosu senkronize edilir ve eğer eski statü iade/iptal değilse `restoreStockForOrder` ile stoklar geri verilir; stok geri verme başarısız olursa hata yutulmaz ama statü geri alınmaz, bunun yerine kullanıcıya uyarı olarak bildirilir. Teslim bildirimi yalnızca `delivered_at` damgasının ilk kez yazıldığı çağrıda tetiklenir; `supabase.functions.invoke('delivery-notification')` ile gönderilir ve hata durumunda sessizce yutulur. Son olarak audit log kaydı oluşturulur; bu hata da UI'ı bloklamaması için sessizce yutulur. Tüm süreç try-catch ile sarılıdır; yakalanan hatalar konsola yazılır ve `{ ok: false, error }` döndürülür.
 
 **Parametreler**:
+- input: `UpdateOrderStatusInput` — Güncelleme işleminin tüm parametrelerini içeren nesne. Aşağıdaki alanları içerir:
+  - orderId: string — Güncellenecek siparişin benzersiz kimliği.
+  - newStatus: string — Siparişin taşınacağı yeni statü değeri.
+  - oldStatus: string — Siparişin mevcut statü değeri. Verilmediğinde monotonluk kontrolü atlanır; bu yol yalnızca senkronizasyon çağrılarında kullanılır.
+  - userId: string — İşlemi gerçekleştiren kullanıcının kimliği.
+  - reason: string — Statü değişikliğinin sebebi.
+  - auditComment: string — Audit log kaydına eklenecek yorum metni.
+  - skipReturnsSync: boolean — İade/iptal senkronizasyonunu atlamak için kullanılır. Varsayılan değeri `false`'tur.
+  - skipOrdersSync: boolean — Orders tablosu güncellemesini atlamak için kullanılır. Varsayılan değeri `false`'tur.
 
-- `input`: `UpdateOrderStatusInput` — Fonksiyona giren tüm parametreleri taşıyan nesne. Aşağıdaki alanları içerir:
-  - `orderId`: `string` — Güncellenecek siparişin benzersiz tanımlayıcısı.
-  - `newStatus`: `string` — Hedeflenen yeni statü değeri.
-  - `oldStatus`: `string | undefined` — Mevcut (eski) statü değeri. Tanımlanmadığında monotonluk kontrolü atlanır; bu durum yalnızca senkronizasyon çağrılarında kullanılır.
-  - `userId`: `string` — İşlemi yapan kullanıcının tanımlayıcısı; iade senkronizasyonunda kaydedilir.
-  - `reason`: `string | undefined` — Statü değişikliğinin nedeni; iade/iptal senkronizasyonunda kullanılır.
-  - `auditComment`: `string | undefined` — Audit log'a yazılacak özel yorum. Tanımlanmazsa `status → ${newStatus}` formatında varsayılan mesaj üretilir.
-  - `skipReturnsSync`: `boolean` — Varsayılan `false`. `true` olduğunda iade/iptal senkronizasyonu ve stok restorasyonu adımları atlanır.
-  - `skipOrdersSync`: `boolean` — Varsayılan `false`. `true` olduğunda veritabanı statü güncellemesi ve monotonluk kontrolü atlanır.
-
-**Dönüş**: `Promise<UpdateOrderStatusResult>` — İşlemin sonucunu temsil eden nesne. İki olası durum döner:
-- `{ ok: true }` — İşlem başarıyla tamamlandı.
-- `{ ok: false, error: string }` — İşlem başarısız oldu; `error` alanında insan tarafından okunabilir hata mesajı bulunur. Monotonluk kuralı ihlali durumunda "`Geçersiz statü geçişi: {old} → {new} (sipariş durumu yalnız ileri taşınabilir)`" formatında hata döner. Veritabanı hatalarında "`Sipariş güncellenemedi: {hata_detayı}`" formatında hata döner. Yakalanan tüm hatalar `console.error` ile loglanır ve `{ ok: false, error: mesaj }` olarak zarif biçimde kullanıcıya iletilir; function asla exception fırlatmaz.
+**Dönüş**: `Promise<UpdateOrderStatusResult>` — İşlem sonucunu içeren nesne. Başarılı durumda `{ ok: true }` veya stok uyarısı varsa `{ ok: true, warning: string }` döner. Başarısız durumda `{ ok: false, error: string }` döner.
 
 ### syncOrderFromReturn
 **Ne yapar**: İade (Returns) tablosundaki statü değişikliklerini ana sipariş (Orders) tablosuna yansıtan iki yönlü senkronizasyonun iadeden siparişe doğru olan ayağını gerçekleştirir. İki tablo arasındaki veri tutarlılığını korumak için kullanılır, iade işlemlerindeki tüm değişikliklerin ana sipariş kaydına da yansımasını sağlar.
@@ -126,6 +112,7 @@ Bu modül, sistemdeki siparişlerin durum yönetimi, iade işlemleriyle sipariş
 
 ## İTHALATLAR (IMPORTS)
 - import: ../types/database.types::type { Database }
+- import: ./admin/orderStatusMachine::canTransitionOrder
 - import: ./audit::logAdminAction
 - import: ./supabase::supabase
 
@@ -146,6 +133,14 @@ Bu modül, sistemdeki siparişlerin durum yönetimi, iade işlemleriyle sipariş
 ### UpdateOrderStatusResult
 - `ok: boolean`
 - `error?: string`
+- `warning?: string`
+
+### StockRestoreResult
+RPC'nin döndürdüğü zarf — `success` bayrağı HTTP durumundan ayrı okunur.
+- `success?: boolean`
+- `error?: string`
+- `restored_count?: number`
+- `restored_units?: number`
 
 ---
 
@@ -158,69 +153,64 @@ Bu modül, sistemdeki siparişlerin durum yönetimi, iade işlemleriyle sipariş
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/orderStatusService.ts::resolveDbFields
-- **params**: (uiStatus: string)
-- **ic_degiskenler**: 
-  - `uiStatus` — Girilen UI statüsü, DB alanlarına dönüştürülecek değer
-- **Dönüş**: { status: string; payment_status?: string }
+- **params**: `uiStatus` — string; UI'dan gelen sipariş durumu etiketi
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ status: string; payment_status?: string }` — veritabanına yazılacak alan çifti; `uiStatus` `'refunded'` ise `{ status: 'cancelled', payment_status: 'refunded' }`, `'partial_refunded'` ise `{ status: 'cancelled', payment_status: 'partial_refunded' }`, `VALID_ORDER_STATUSES` içinde varsa `{ status: uiStatus }`, aksi halde güvenli varsayılan olarak `{ status: 'cancelled' }`
 
 ### [N2_NASIL] AST Pointer: src/lib/orderStatusService.ts::updateOrderStatus
-- **params**: (input: UpdateOrderStatusInput)
+- **params**: `input` — `UpdateOrderStatusInput` türünde; sipariş kimliği, yeni/eski durum, kullanıcı, sebep, audit yorumu ve senkron atlama bayraklarını içerir
 - **ic_degiskenler**:
-  - `input` — Sipariş güncelleme girdisi, içeriği destructuring ile ayrıştırılır
-  - `orderId` — Güncellenecek siparişin ID'si
-  - `newStatus` — Hedeflenen yeni sipariş statüsü
-  - `oldStatus` — Siparişin mevcut statüsü, geçiş kontrolü için kullanılır
-  - `userId` — İşlemi yapan kullanıcının ID'si (audit log için)
-  - `reason` — Statü değişikliği nedeni (iade/iptal kaydı için)
-  - `auditComment` — Audit log için özel yorum metni
-  - `skipReturnsSync` — Returns tablosu senkronizasyonunu atla bayrağı (varsayılan false)
-  - `skipOrdersSync` — Orders tablosu güncellemesini atla bayrağı (varsayılan false)
-  - `deliveredNow` — Teslimatın ilk kez yapılıp yapılmadığını belirten boolean flag
-  - `dbFields` — UI statüsünden DB alanlarına dönüştürülmüş değerler
-  - `updatePayload` — venthub_orders tablosuna gönderilecek güncelleme nesnesi
-  - `stamped` — Teslimat zaman damgası yazılan satır verisi (ID döner)
-  - `deliverErr` — Teslimat zaman damgası yazma hatası
-  - `alignErr` — Teslimat alanını hizalama hatası
-  - `orderErr` — Sipariş statüsü güncelleme hatası
-- **Dönüş**: Promise<UpdateOrderStatusResult>
+  - `orderId` — `input.orderId`; güncellenecek siparişin birincil anahtarı
+  - `newStatus` — `input.newStatus`; hedef sipariş durumu
+  - `oldStatus` — `input.oldStatus`; mevcut (kaynak) sipariş durumu; monotoni kontrolü için kullanılır
+  - `userId` — `input.userId`; işlemi yapan admin kullanıcısı
+  - `reason` — `input.reason`; durum değişikliğinin sebebi
+  - `auditComment` — `input.auditComment`; audit log'a yazılacak yorum
+  - `skipReturnsSync` — `input.skipReturnsSync`; varsayılan `false`; iade senkronizasyonunu atlamak için bayrak
+  - `skipOrdersSync` — `input.skipOrdersSync`; varsayılan `false`; sipariş tablosu güncellemesini atlamak için bayrak
+  - `stockWarning` — `string | undefined`; stok geri verme başarısız olursa buraya uyarı mesajı atanır
+  - `deliveredNow` — `boolean`; `delivered_at` damgasının bu çağrıda ilk kez yazılıp yazılmadığını tutar; `supabase` sorgusundan dönen satır sayısına göre belirlenir
+  - `dbFields` — `resolveDbFields(newStatus)` dönüşü; veritabanına yazılacak `status` ve opsiyonel `payment_status` alanları
+  - `updatePayload` — `Database['public']['Tables']['venthub_orders']['Update']`; `venthub_orders` tablosuna gönderilecek güncelleme nesnesi
+  - `stamped` — `supabase` `.update(...).eq('id', orderId).is('delivered_at', null).select('id')` sorgusundan dönen `data`; damga ilk kez yazıldığında dolu dizi döner
+  - `deliverErr` — teslim damgası sorgusundaki hata; fırlatılırsa fonksiyon `catch` bloğuna düşer
+  - `alignErr` — damga zaten varken sadece statü hizalama güncellemesindeki hata
+  - `orderErr` — teslim dışı durum güncellemelerindeki hata
+  - `restore` — `restoreStockForOrder(orderId, ...)` dönüşü; `{ ok: boolean; error?: string }`
+  - `err` — üst `catch` bloğundaki yakalanan hata
+  - `message` — `err`'den çıkarılan hata mesajı string'i
+- **Dönüş**: `Promise<UpdateOrderStatusResult>` — başarılıysa `{ ok: true }` veya `{ ok: true, warning: stockWarning }`, başarısızsa `{ ok: false, error: message }`
 
 ### [N3_NASIL] AST Pointer: src/lib/orderStatusService.ts::syncOrderFromReturn
-- **params**: (orderId: string, returnStatus: string)
+- **params**: `orderId` — string; sipariş birincil anahtarı; `returnStatus` — string; iade kaydının yeni durumu
 - **ic_degiskenler**:
-  - `orderId` — Senkronize edilecek siparişin ID'si
-  - `returnStatus` — İade/iptal durumu
-  - `orderStatusMap` — Return statülerini Order statülerine eşleyen harita
-  - `mapped` — Seçilen returnStatus'a karşılık gelen order mapping
-  - `updatePayload` — venthub_orders tablosuna gönderilecek güncelleme nesnesi
-  - `error` — Veritabanı güncelleme hatası
-- **Dönüş**: Promise<UpdateOrderStatusResult>
+  - `orderStatusMap` — `Record<string, { status: string; payment_status?: string }>`; iade durumunu sipariş durumuna eşleyen sabit harita; anahtarlar: `refunded`, `cancelled`, `approved`, `rejected`, `received`
+  - `mapped` — `orderStatusMap[returnStatus]`; eşleşen hedef durum nesnesi; tanımsızsa fonksiyon erken döner
+  - `updatePayload` — `Database['public']['Tables']['venthub_orders']['Update']`; `mapped.status` ve opsiyonel `mapped.payment_status` alanlarını içerir
+  - `error` — `supabase` `.update(...).eq('id', orderId)` sorgusundaki hata
+  - `err` — üst `catch` bloğundaki yakalanan hata
+- **Dönüş**: `Promise<UpdateOrderStatusResult>` — başarılıysa `{ ok: true }`, başarısızsa `{ ok: false, error: (err as Error).message }`
 
 ### [N4_NASIL] AST Pointer: src/lib/orderStatusService.ts::isReturnStatus
-- **params**: (status: string)
-- **ic_degiskenler**:
-  - `status` — Kontrol edilen statü değeri
-- **Dönüş**: boolean
+- **params**: `status` — string; kontrol edilecek durum etiketi
+- **ic_degiskenler**: yok
+- **Dönüş**: `boolean` — `RETURN_STATUSES` sabit dizisi `status`'ı içeriyorsa `true`, aksi halde `false`
 
 ### [N5_NASIL] AST Pointer: src/lib/orderStatusService.ts::syncReturnsRecord
-- **params**: (orderId: string, newStatus: string, userId?: string | null, reason?: string)
+- **params**: `orderId` — string; sipariş birincil anahtarı; `newStatus` — string; iade kaydının hedef durumu; `userId` — `string | null | undefined`; iadeyi başlatan kullanıcı; `reason` — `string | undefined`; iade sebebi
 - **ic_degiskenler**:
-  - `orderId` — İlgili siparişin ID'si
-  - `newStatus` — Yeni return statüsü
-  - `userId` — Kullanıcı ID'si (yeni kayıt oluşturulurken kullanılır)
-  - `reason` — İade/iptal nedeni (yeni kayıt oluşturulurken kullanılır)
-  - `existing` — Mevcut venthub_returns kaydı (ID döner, varsa güncelleme yapılır)
-  - `defaultReason` — Reason parametresi verilmediğinde kullanılacak varsayılan metin
-- **Dönüş**: Promise<void> (yan etki: venthub_returns tablosuna insert/update)
+  - `existing` — `supabase` `.from('venthub_returns').select('id').eq('order_id', orderId).maybeSingle()` sorgusundan dönen `data`; mevcut iade kaydı varsa `{ id }` nesnesi, yoksa `null`
+  - `defaultReason` — `string`; `reason` verilmediğinde kullanılacak varsayılan metin; `newStatus === 'cancelled'` ise `'Sipariş İptal Edildi'`, aksi halde `'Sipariş İade Edildi'`
+- **Dönüş**: `Promise<void>` — yan etki: `venthub_returns` tablosunda kayıt yoksa insert, varsa status update yapılır
 
 ### [N6_NASIL] AST Pointer: src/lib/orderStatusService.ts::restoreStockForOrder
-- **params**: (orderId: string)
+- **params**: `orderId` — string; sipariş birincil anahtarı; `reason` — `'order_cancel' | 'order_refund'`; stok geri verme sebebi
 - **ic_degiskenler**:
-  - `orderId` — Stokları iade edilecek siparişin ID'si
-  - `items` — Sipariş kalemleri ve ilişkili ürün verileri (product_id, quantity, products relation)
-  - `updates` — Ürün stok güncelleme listesi (her eleman: {id, stock_qty})
-  - `movements` — Envanter hareket kayıtları listesi (her eleman: {product_id, delta, reason, order_id})
-  - `groupedItems` — Ürün bazında gruplandırılmış sipariş kalemleri {product_id: {quantity, currentStock}}
-- **Dönüş**: Promise<void> (yan etki: products tablosunda stock_qty güncelleme, inventory_movements tablosuna insert)
+  - `data` — `supabase.rpc('process_order_stock_restore', { p_order_id: orderId, p_reason: reason })` çağrısından dönen yanıt gövdesi
+  - `error` — RPC çağrısındaki hata; varsa `{ ok: false, error: error.message }` döner
+  - `result` — `(data ?? null) as StockRestoreResult | null`; RPC yanıtının tip dönüşümü; `result.success !== true` ise başarısız sayılır
+  - `err` — üst `catch` bloğundaki yakalanan hata
+- **Dönüş**: `Promise<{ ok: boolean; error?: string }>` — RPC başarılı ve `result.success === true` ise `{ ok: true }`, aksi halde `{ ok: false, error: ... }`
 
 ---
 
@@ -235,8 +225,8 @@ graph TD
     orderStatusService_ts__syncReturnsRecord["syncReturnsRecord"]
     orderStatusService_ts__updateOrderStatus["updateOrderStatus"]
     orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__isReturnStatus
-    orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__syncReturnsRecord
     orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__restoreStockForOrder
+    orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__syncReturnsRecord
     orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__resolveDbFields
 ```
 

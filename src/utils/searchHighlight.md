@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\searchHighlight.tsx
-skeleton_hash: bc185a9476eba1ec
+skeleton_hash: d0885af7ae2aacf0
 entity_hashes:
-  func:highlightMatch: 6d9d01916ecad5ec
-  overview: 57ecd39f68f023ec
+  func:highlightMatch: bf63ff75bf4f9ff9
+  overview: 9e26f4040beaf132
   style_tokens: 9f79124e858dad58
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-24T11:56:38Z
 ---
 
 ## Genel Bakış
@@ -16,34 +16,41 @@ VentHub HVAC uygulamasının yardımcı modüllerinden biri olan bu React odakl�
 
 ## Fonksiyon Grupları
 ### Arama Eşleşmesi Vurgulama İşlevleri
-Modülün tek temel sorumluluğunu yerine getiren, metin ve arama sorgusunu alarak eşleşen bölgeleri görsel olarak ayırt edilebilir hale getiren temel işlevi barındırır.
+Modülün tek temel sorumluluğunu yerine getiren bu grup, metin ve arama sorgusunu alarak eşleşen bölgeleri görsel olarak ayırt edilebilir hale getiren temel işlevi barındırır. Dil parametresi aracılığıyla farklı dillerdeki metin işleme davranışını destekler.
 - highlightMatch
+
+## Bağımlılıklar ve Mimari Notlar
+- **Dış bağımlılıklar**: Modül, React kütüphanesine bağlıdır; döndürülen değer `ReactNode` türündedir ve JSX sözdizimi gerektirir.
+- **Dinamik/lazy yükleme**: Modülde dinamik yükleme mekanizması bulunmamaktadır.
+- **Mimari önem**: Uygulama genelinde arama sonuçlarının kullanıcıya sunulmasında merkezi bir yardımcı rol üstlenir; arama arayüzüne sahip tüm bileşenler tarafından kullanılabilir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu TSX modülü, React tabanlı projelerde verilen metin içindeki arama sorgusu ile eşleşen kısımları vurgulamak için tasarlanmıştır, doğru çalışması için girdi parametrelerinin belirlenen türlerde iletilmesi ve çalıştırma ortamının JSX sözdizimini desteklemesi zorunludur.
-
-[Aksiyom 1]: Eğer highlightMatch fonksiyonuna iletilen text parametresi string türünde değilse, metin içindeki eşleşmeler taranamaz ve vurgulama işlemi hiç gerçekleştirilemez.
-[Aksiyom 2]: Eğer highlightMatch fonksiyonuna iletilen query parametresi string türünde değilse, hiçbir metin segmenti ile eşleşme kurulamaz, tüm metin vurgulanmadan döndürülür.
-[Aksiyom 3]: Eğer modülün çalıştığı ortam JSX sözdizimini desteklemiyorsa, vurgulanan eşleşmeler için oluşturulan etiketler işlenemez ve metin ekrana hatalı şekilde yansıtılır.
-[Aksiyom 4]: Eğer fonksiyona iletilen geçerli, eşleşme yaratabilecek uzunlukta bir sorgu (query) yoksa, hiçbir metin segmenti vurgulanamaz, tüm ham metin olduğu gibi döndürülür.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### highlightMatch
-**Ne yapar**: Belirtilen ana metin içinde arama sorgusundaki terimi büyük-küçük harf farkı gözetmeksizin (case-insensitive) bulur ve bulunan tüm eşleşmeleri HTML <mark> etiketi ile sararak vurgular. Eğer arama sorgusu boşsa veya metin içinde eşleşme tespit edilemezse orijinal metni olduğu gibi döndürür, sonuç olarak React uygulamalarında doğrudan görüntülenebilecek bir içerik sunar.
-**Nasıl yapar**: Öncelikle geçerli bir arama sorgusu olup olmadığını kontrol eder, sorgunun boş veya sadece boşluk karakterlerinden oluşması durumunda doğrudan orijinal metni iletir. Geçerli sorgu durumunda metin ve sorguyu ortak bir harf formatına getirerek case-insensitive eşleşmeleri doğru bir şekilde tespit eder, ana metni parçalara ayırarak eşleşen kısımları <mark> etiketi ile sarmalar ve tüm parçaları birleştirerek React tarafından işlenebilir formda sunar.
+**Ne yapar**: Belirli bir metin içinde aranan terimi bulup `<mark>` etiketiyle vurgular. Eşleştirme dile duyarlı ve aksan duyarsızdır; `foldForSearch` fonksiyonu sayesinde kullanıcı "siginak" yazdığında "Sığınak Fanı" içindeki terim de vurgulanır. Eski sürüm `String.prototype.toLowerCase()` ve `RegExp` `i` bayrağı kullanıyordu; ikisi de aksan duyarsız eşleme sağlayamıyordu.
+
+**Nasıl yapar**: Fonksiyon önce arama terimini ve ana metni `foldForSearch` ile aksan duyarsız hale getirir (katlar). Katlama işlemi tek-tek harf eşlemesi kurar; ancak bazı girdilerde (örneğin `ß` → `ss` gibi) katlanan metin uzunluğu orijinal metin uzunluğundan farklı olabilir. Bu durumda indeksler kayacağından yanlış aralık işaretlenebilir; bu nedenle uzunluk uyuşmazlığında fonksiyon vurgulama yapmadan orijinal metni aynen döndürür. Yanlış vurgu, vurgu yokluğundan daha kötüdür ilkesiyle hareket eder. Uzunluklar eşleşiyorsa katlanmış metin üzerinde `indexOf` ile iteratif arama yapar, bulunan her eşleşme noktasında metni parçalara böler ve eşleşen kısımları `<mark>`, eşleşmeyen kısımları `<span>` etiketleriyle sararak bir ReactNode ağacı oluşturur.
+
 **Parametreler**:
-- text: string — Vurgulama işleminin uygulanacağı ana metin, arama teriminin üzerinde aranacağı ve eşleşmelerin vurgulanacağı temel içerik
-- query: string — Metin içinde aranacak olan terim, eşleşmelerin bu değere göre belirlenmesini sağlayan arama sorgusu
-**Dönüş**: ReactNode — React uygulamalarında doğrudan görüntülenebilecek işlenmiş metin. Arama terimiyle eşleşen kısımlar <mark> etiketi ile vurgulanmış olarak sunulur, eşleşme olmaması veya geçersiz sorgu durumunda orijinal metin olduğu gibi döndürülür.
+- text: string — Vurgulama yapılacak ana metin
+- query: string — Aranan terim
+- lang: string — Aktif dil (varsayılan `'tr'` — vitrinin birincil dili)
+
+**Dönüş**: `ReactNode` — Arama terimiyle eşleşen kısımları `<mark>` etiketiyle (sarı arka plan, lacivert yazı, yarı kalın, yuvarlatılmış köşe ve yatay dolgu ile) vurgulanmış, geri kalan kısımları `<span>` ile sarılmış metin parçalarından oluşan bir React bileşen ağacı. Arama terimi boşsa veya katlama sonrası uzunluk uyuşmazlığı varsa orijinal metin aynen döndürülür. Eşleşme bulunamaması durumunda da orijinal metin döndürülür.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../i18n/case::foldForSearch
 - import: react::React
 - import: react::ReactNode
 
@@ -51,32 +58,18 @@ Bu TSX modülü, React tabanlı projelerde verilen metin içindeki arama sorgusu
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\searchHighlight.tsx::highlightMatch
-- **params**: (text: string, query: string)
+### [N1_NASIL] AST Pointer: src/utils/searchHighlight.tsx::highlightMatch
+- **params**: `text` (string), `query` (string), `lang` (string, varsayılan `'tr'`)
 - **ic_degiskenler**:
-  - `query.trim()` — Sorgudaki baştaki/sondaki boşlukları temizleyen metod, sorgunun boş olup olmadığını kontrol etmek için kullanılır
-  - `escapeRegExp` — Regex özel karakterlerini escape etmek için tanımlanan iç içe fonksiyon
-  - `parts` — Orijinal metnin arama sorgusuna göre bölünmüş parçalarını tutan dizi
-  - `new RegExp(\`(${escapeRegExp(query)})\`, 'gi') — Metni bölmek için oluşturulan, global, case-insensitif çalışan regex nesnesi
-- **Dönüş**: ReactNode (eşleşen kısımları <mark> etiketiyle vurgulanan, sarmalanmış JSX metin elementi)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\searchHighlight.tsx::highlightMatch içi::escapeRegExp
-- **params**: (string: string)
-- **ic_degiskenler**:
-  - `/[.*+?^${}()|[\]\\]/g` — Regex'de özel anlam taşıyan tüm karakterleri eşleştiren regex deseni
-  - `'\\$&'` — Replace işleminde eşleşen tüm metni referans gösteren replacement string'i
-  - `string.replace()` — Giriş stringindeki özel karakterleri escape etmek için kullanılan string metodu
-- **Dönüş**: string (tüm regex özel karakterleri güvenli şekilde escape edilmiş string)
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\searchHighlight.tsx::highlightMatch içi::parts.map callback
-- **params**: (part: string, i: number)
-- **ic_degiskenler**:
-  - `part.toLowerCase()` — Mevcut metin parçasını küçük harfe dönüştüren metod, case-insensitif eşleşme kontrolü için kullanılır
-  - `query.toLowerCase()` — Arama sorgusunu küçük harfe dönüştüren metod, eşleşme karşılaştırması için kullanılır
-  - `<mark key={i} className="bg-yellow-100 text-primary-navy font-semibold rounded-sm px-0.5">` — Eşleşme durumunda render edilen vurgulama etiketi, tanımlı stillere sahip
-  - `<span key={i}>{part}</span>` — Eşleşme olmadığında normal metni sarmalamak için kullanılan JSX etiketi
-  - `parts.map()` — Tüm metin parçalarını dönerek her biri için uygun JSX elementi oluşturan dizi metodu
-- **Dönüş**: ReactNode (her metin parçası için eşleşme durumuna göre oluşturulmuş uygun JSX elementi)
+  - `aranan` — `query.trim()` ile elde edilen, baştaki ve sondaki boşluklardan arındırılmış arama terimi
+  - `katliMetin` — `foldForSearch(text, lang)` ile elde edilen, büyük/küçük harf duyarsız hale getirilmiş metin
+  - `katliAranan` — `foldForSearch(aranan, lang)` ile elde edilen, büyük/küçük harf duyarsız hale getirilmiş arama terimi
+  - `parcalar` — `{ metin: string; vurgulu: boolean }[]` tipinde, metnin eşleşen ve eşleşmeyen parçalarını tutan dizi
+  - `imlec` — `number` tipinde, `katliMetin` içinde arama yapılmaya devam edilecek konumu gösteren işaretçi
+  - `bulundu` — `katliMetin.indexOf(katliAranan, imlec)` ile elde edilen, arama teriminin `katliMetin` içinde bulunduğu indeks; `-1` ise eşleşme yok demektir
+  - `p` — `.map()` döngüsündeki her bir parça nesnesi (`{ metin: string; vurgulu: boolean }`)
+  - `i` — `.map()` döngüsündeki mevcut elemanın indeksi
+- **Dönüş**: `ReactNode` — eşleşme bulunamazsa düz `text` döner; eşleşme varsa `<span>` içinde vurgulanan kısımları `<mark>` (CSS sınıfları: `bg-yellow-100 text-primary-navy font-semibold rounded-sm px-0.5`), diğer kısımları `<span>` olarak döndüren JSX ağacı döner
 
 ---
 

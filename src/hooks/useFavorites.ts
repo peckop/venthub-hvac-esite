@@ -9,6 +9,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
  *
  * Senkron: aynı sekmedeki bileşenler CUSTOM_EVENT ile, diğer sekmeler tarayıcının
  * 'storage' olayıyla güncellenir. İlk değer SSR uyumu için boş başlar, mount'ta okunur.
+ *
+ * @returns An object containing the array of favorite product IDs and methods to check or mutate favorites.
+ *
+ * @example
+ * const { favorites, toggleFavorite, isFavorite } = useFavorites()
+ *
+ * return <button onClick={() => toggleFavorite(product.id)}>
+ *   {isFavorite(product.id) ? 'Remove' : 'Add to Favorites'}
+ * </button>
  */
 const STORAGE_KEY = 'venthub:favorites:v1'
 const CHANGE_EVENT = 'venthub:favorites-changed'

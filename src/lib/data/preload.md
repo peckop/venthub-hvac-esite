@@ -2,62 +2,60 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\data\preload.ts
-skeleton_hash: cb1cc3612d6dbaef
+source_path: C:\tmp\wt-supurme\src\lib\data\preload.ts
+skeleton_hash: 1ecde0090d80f049
 entity_hashes:
-  func:preloadCategory: 5c31b78ecaccbf15
-  func:preloadProduct: ffb09955ca2af5e6
-  overview: 429cab0c1f1eaff7
-generated_at: 2026-06-19T20:48:09Z
+  func:preloadCategory: c41a63f5591b9705
+  func:preloadFamily: 88b4c30632a4f69a
+  func:preloadProduct: fd0b3bb92f6ab3aa
+  overview: 291aab3ad1b06ceb
+generated_at: 2026-08-25T07:28:08Z
 ---
 
 ## Genel Bakış
-Bu modül, tarayıcı tarafında performans optimizasyonu sağlamak için temel veri varlıklarının (ürün ve kategoriler) önceden yüklenmesini tetikleme sorumluluğuna sahiptir. Fonksiyonlar, sayfa geçişleri sırasında verilerin zaten hazırlanmış olmasını sağlayarak kullanıcı deneyimini iyileştirir.
+
+Bu modül, uygulamanın ihtiyaç duyduğu temel veri varlıklarının (aile, ürün, kategori) önceden yüklenmesini sağlayan fonksiyonları içerir. Her fonksiyon, ilgili veri türünün slug bilgisini alarak veriyi hazır hale getirir. Modül, `lib/data` altında konumlanmıştır ve veri erişim katmanının bir parçası olarak çalışır.
 
 ## Fonksiyon Grupları
-### Veri Önbellekleme Tetikleyicileri
-Bu grup, belirli bir varlık tanımlayıcısı (slug) ile çağrıldığında, ilgili veri setinin arka planda tarayıcı önbelleğine alınmasını başlatan fonksiyonları içerir. Fonksiyonlar doğrudan veri sağlamaz, yalnızca yükleme işlemini başlatarak sonraki navigasyonları hızlandırır.
-- preloadProduct, preloadCategory
+
+### Veri Ön Yükleme İşlemleri
+
+Bu üç fonksiyon da aynı amaca hizmet eder: belirtilen slug'a sahip veri kaydını önceden yükleyerek uygulamanın ilerleyen adımlarda bu veriye hızlı erişimini sağlamak. Üçü de benzer bir desen izler; ancak `preloadFamily` fonksiyonu ek olarak bir dil parametresi alır ve çok dilli içerik desteği sunar.
+
+- `preloadFamily`, `preloadProduct`, `preloadCategory`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, ürünlerin ve kategorilerin tarayıcı tarafında önceden yüklenmesini sağlayan iki fonksiyondan oluşur. Aşağıdaki varsayımlar, fonksiyon imzaları ve modül sabitlerinden türetilmiştir.
-
-[Aksiyom 1]: Eğer `preloadProduct` çağrısında `slug` parametresi verilmezse,fonksiyon doğru çalışamaz — çünkü `slug: string` zorunlu bir parametredir ve varsayılan bir değer tanımı yoktur.
-
-[Aksiyom 2]: Eğer `preloadCategory` çağrısında `slug` parametresi verilmezse, fonksiyon doğru çalışamaz — çünkü `slug: string` zorunlu bir parametredir ve varsayılan bir değer tanımı yoktur.
-
-[Aksiyom 3]: Eğer `getCachedProductBySlug` fonksiyonu modülde tanımlı olmasaydı, `preloadProduct`'ın önceden yükleme yaptığı verilerin sonradan erişilebilir olacağı bir mekanizma bulunmazdı — bu iki fonksiyon arasında dolaylı bir bağımlılık vardır.
-
-[Aksiyom 4]: Eğer `getCachedCategoryData` fonksiyonu modülde tanımlı olmasaydı, `preloadCategory`'in önceden yükleme yaptığı verilerin sonradan erişilebilir olacağı bir mekanizma bulunmazdı — bu iki fonksiyon arasında dolaylı bir bağımlılık vardır.
-
-[Aksiyom 5]: Eğer verilen `slug` değeri geçersiz veya var olmayan bir kaydı referans alıyorsa, bu durum fonksiyon imzasından anlaşılamaz — fonksiyon imzası slug'ın geçerliliğini zorlamaz, bu kontrolün önbellekleme katmanında (`getCachedProductBySlug` / `getCachedCategoryData`) veya veri sağlayıcıda yapılması beklenir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### preloadProduct
-**Ne yapar**: Belirli bir ürünün verilerini, potansiyel bir kullanıcı navigasyonu için önceden yükler (preload eder).
-**Nasıl yapar**: Fonksiyon, gelen `slug` parametresini kullanarak `getCachedProductBySlug` fonksiyonunu çağırır. Çağrının sonucu `void` ile atıldığı için, mevcut durumda返回值 doğrudan kullanılmaz; temel amaç, tarayıcıda o ürüne ait verilerin önbelleğe alınmasını tetiklemektir.
+### preloadFamily
+**Ne yapar**: Aile verisini önceden yüklemek için `getCachedFamilyDetail` fonksiyonunu çağırır. Çağrının sonucu kullanılmaz; yalnızca yan etki (side effect) amaçlı tetikleme yapılır.
+**Nasıl yapar**: `getCachedFamilyDetail` fonksiyonunu `slug` ve `lang` parametreleriyle çağırır. JavaScript'te `void` operatörü ifadeyi değerlendirir ancak sonucu `undefined` olarak atar; bu sayede fonksiyonun dönüş değeri göz ardı edilir. Bu yapı, bir fonksiyonun yalnızca yan etkilerini (örneğin cache'e yazma) tetiklemek amacıyla kullanılır.
 **Parametreler**:
-- slug: string — Yüklenmek istenen ürünün benzersiz, URL-dostu tanımlayıcısı (friendly identifier).
-**Dönüş**: void
+- slug: string — Aile verisinin benzersiz tanımlayıcısı (URL slug'ı)
+- lang: string — Dil kodu
+**Dönüş**: Fonksiyonda açık bir `return` ifadesi bulunmamaktadır; bu nedenle `undefined` döner. TypeScript tarafında dönüş tipi belirtilmemiştir.
+
+### preloadProduct
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### preloadCategory
-**Ne yapar**: Belirli bir kategoriye ait verileri, olası bir sonraki sayfa yüklemesi için tarayıcı tarafında önceden yükler.
-**Nasıl yapar**: Fonksiyon, verilen `slug` parametresiyle `getCachedCategoryData` fonksiyonunu çağırır. Bu çağrı, ilgili kategori verilerinin istemci tarafında önbelleğe alınmasını veya hazırlanmasını sağlar, böylece kullanıcı o kategori sayfasına geçiş yaptığında veriler hemen kullanılabilir olur.
-**Parametreler**:
-- slug: string — Yüklenmek istenen kategorinin URL yapısındaki benzersiz tanımlayıcısı.
-**Dönüş**: void
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../types/db-rows::type { AuthorityContent,CategoryMetadata, DbCategory }
 - import: ../type-converters::mapDatabaseCategoryToDomain
+- import: @/lib/services/family.service::getFamilyDetail
+- import: @/lib/services/family.service::getSeriesLanding
 - import: @/lib/services/product.service::getProductBySlug
 - import: @/lib/supabase/static::supabaseStaticClient
 - import: react::cache
@@ -68,38 +66,104 @@ Bu modül, ürünlerin ve kategorilerin tarayıcı tarafında önceden yüklenme
 - **getCachedProductBySlug** (call) — `cache(async (slug: string) => {
   return getProductBySlug(supabase, slug)
 })`
+- **fetchFamilyDetail** (call) — `cache(async (slug: string, lang: string) => {
+  return getFamilyDetail(supab...`
+- **getCachedFamilyDetail** (call) — `cache(async (slug: string, lang: string) => {
+  try {
+    return await fetc...`
+- **fetchFamilyDetail** (unknown)
+- **getCachedSeriesLanding** (call) — `cache(async (slug: string) => {
+  return getSeriesLanding(supabase, slug)
+})`
+- **getCachedFamilySlugById** (call) — `cache(async (familyId: string) => {
+  const { data, error } = await supabase...`
+- **SAFE_SLUG** (regex) — `/^[a-zA-Z0-9._~-]+$/`
 - **getCachedCategoryData** (call) — `cache(async (slug: string) => {
-  const { data, error } = await supabase
-    ...`
+  const query = supabase.from('categories')....`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/lib/data/preload.ts::preloadProduct
-- **params**: `slug: string` — ön yüklenecek ürünün URL slug'ı
-- **ic_degiskenler**:
-  - (yok — doğrudan `void getCachedProductBySlug(slug)` çağrısı yapılır, ara değişken yoktur)
-- **Dönüş**: yok (`void`) —fonksiyon bir değer döndürmez, yalnızca `getCachedProductBySlug` çağrısının yan etkisiyle (cache'e yazma) çalışır
+### [N1_NASIL] AST Pointer: src/lib/data/preload.ts::preloadFamily
+- **params**: `slug` (string), `lang` (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (void)
 
-### [N2_NASIL] AST Pointer: src/lib/data/preload.ts::preloadCategory
-- **params**: `slug: string` — ön yüklenecek kategorinin URL slug'ı
+### [N2_NASIL] AST Pointer: src/lib/data/preload.ts::preloadProduct
+- **params**: `slug` (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (void)
+
+### [N3_NASIL] AST Pointer: src/lib/data/preload.ts::preloadCategory
+- **params**: `slug` (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (void)
+
+### [N4_NASIL] AST Pointer: src/lib/data/preload.ts::getCachedProductBySlug
+- **params**: `slug` (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: `getProductBySlug(supabase, slug)` çağrısının dönüşü (Promise)
+
+### [N5_NASIL] AST Pointer: src/lib/data/preload.ts::fetchFamilyDetail
+- **params**: `slug` (string), `lang` (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: `getFamilyDetail(supabase, slug, lang)` çağrısının dönüşü (Promise)
+
+### [N6_NASIL] AST Pointer: src/lib/data/preload.ts::getCachedFamilyDetail
+- **params**: `slug` (string), `lang` (string)
 - **ic_degiskenler**:
-  - (yok — doğrudan `void getCachedCategoryData(slug)` çağrısı yapılır, ara değişken yoktur)
-- **Dönüş**: yok (`void`) — fonksiyon bir değer döndürmez, yalnızca `getCachedCategoryData` çağrısının yan etkisiyle (cache'e yazma) çalışır
+  - `e` — catch bloğunda yakalanan hata nesnesi; `console.warn` ile loglanır
+- **Dönüş**: `fetchFamilyDetail(slug, lang)` başarılıysa onun dönüşü, hata durumunda `null`
+
+### [N7_NASIL] AST Pointer: src/lib/data/preload.ts::getCachedSeriesLanding
+- **params**: `slug` (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: `getSeriesLanding(supabase, slug)` çağrısının dönüşü (Promise)
+
+### [N8_NASIL] AST Pointer: src/lib/data/preload.ts::getCachedFamilySlugById
+- **params**: `familyId` (string)
+- **ic_degiskenler**:
+  - `data` — `supabase.from('product_families').select('slug').eq('id', familyId).limit(1).maybeSingle()` sorgusundan dönen veri; `data.slug` olarak erişilir
+  - `error` — aynı sorgudan dönen hata; varsa `null` dönülür
+- **Dönüş**: `data.slug` (string) veya hata/veri yoksa `null`
+
+### [N9_NASIL] AST Pointer: src/lib/data/preload.ts::getCachedCategoryData
+- **params**: `slug` (string)
+- **ic_degiskenler**:
+  - `query` — `supabase.from('categories').select(CATEGORY_COLUMNS)` sorgu nesnesi
+  - `rows` — sorgu sonucu dönen satırlar dizisi (`data` olarak destructure edilir); `rows[0]` veya slug eşleşeni seçilir
+  - `error` — sorgudan dönen hata; varsa `null` dönülür
+  - `data` — `rows` içinden `row.slug === slug` koşulunu sağlayan satır, bulunamazsa `rows[0]`; `mapDatabaseCategoryToDomain` fonksiyonuna `name`, `menu_label`, `marketing_title`, `translation_key`, `description`, `metadata`, `authority_content` alanlarıyla birlikte gönderilir
+- **Dönüş**: `mapDatabaseCategoryToDomain(...)` çağrısının dönüşü veya hata/veri yoksa `null`
 
 ---
 
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    preload_ts__preloadCategory["preloadCategory"]
+    preload_ts__preloadFamily["preloadFamily"]
+    preload_ts__preloadProduct["preloadProduct"]
+```
+
 ## NODE ID STANDARD
 
-  file: src\lib\data\preload.ts
-  function: src\lib\data\preload.ts::preloadProduct
-  function: src\lib\data\preload.ts::preloadCategory
+  file: preload.ts
+  function: preload.ts::preloadFamily
+  function: preload.ts::preloadProduct
+  function: preload.ts::preloadCategory
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: fetchFamilyDetail
   export: getCachedCategoryData
+  export: getCachedFamilyDetail
+  export: getCachedFamilySlugById
   export: getCachedProductBySlug
+  export: getCachedSeriesLanding
   export: preloadCategory
+  export: preloadFamily
   export: preloadProduct
