@@ -37,6 +37,75 @@ interface DeliveryRequest {
   tenant_id?: string
 }
 
+/**
+ * TESLİMAT E-POSTASI DEFTERİ (T118 · Ref REC-74).
+ *
+ * Bu uç kaydını eskiden `shipping_email_events`'e yazıyordu. O defter KARGO biçimli:
+ * `carrier`/`tracking_number` taşır ama **tür sütunu yoktur** — teslimat e-postası ile kargo
+ * e-postası aynı kovaya, ayırt edilmeden düşüyordu. Sonuç: "teslimat e-postası kaç kez gitti"
+ * sorusu ancak `subject` metnine bakarak, yani i18n'e bağlı kırılgan bir vekille cevaplanabiliyordu.
+ *
+ * Yeni defter `order_email_events` — `kind` + `status` + `error` taşır ve üzerinde ŞU KISIT CANLI:
+ *     uq_order_email_events_sent_once = UNIQUE (order_id, kind) WHERE status = 'sent'
+ * Yani ikinci `sent` satırını **veritabanı** reddeder; tekillik uygulama disiplinine bırakılmaz.
+ * Kısıt T137'de ödeme onayı için kurulmuştu; TÜR bazlı olduğu için teslimat bedavaya yararlanır —
+ * bu yüzden bu iş migration İSTEMEZ.
+ *
+ * `shipping_email_events` yazımı KALDIRILMADI: kargo alanları orada anlamlı. İki defter iki ayrı
+ * soruyu cevaplıyor, karıştırmak yerine her biri kendi sorusunda bırakıldı.
+ */
+const EMAIL_KIND = 'delivery'
+
+/** Bu sipariş için `sent` damgalı teslimat kaydı var mı? (gönderimden ÖNCE sorulur) */
+async function alreadySent(supabaseUrl: string, serviceKey: string, orderId: string): Promise<boolean> {
+  const url = `${supabaseUrl}/rest/v1/order_email_events`
+    + `?order_id=eq.${encodeURIComponent(orderId)}`
+    + `&kind=eq.${EMAIL_KIND}&status=eq.sent&select=id&limit=1`
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey } })
+  if (!r.ok) return false
+  const rows = await r.json().catch(() => [])
+  return Array.isArray(rows) && rows.length > 0
+}
+
+/** Gönderim denemesini deftere yazar; satır id'sini döndürür (yazamazsa null). */
+async function denemeYaz(supabaseUrl: string, serviceKey: string, orderId: string, emailTo: string, subject: string): Promise<string | null> {
+  if (!supabaseUrl || !serviceKey) return null
+  try {
+    const r = await fetch(`${supabaseUrl}/rest/v1/order_email_events`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey,
+        Prefer: 'return=representation',
+      },
+      body: JSON.stringify({ order_id: orderId, kind: EMAIL_KIND, status: 'attempt', email_to: emailTo, subject, provider: 'resend' }),
+    })
+    if (!r.ok) return null
+    const rows = await r.json().catch(() => [])
+    return Array.isArray(rows) && rows[0]?.id ? String(rows[0].id) : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Deneme satırını sonuçla damgalar. Dönüş: 'tamam' | 'catisma' | 'yazilamadi'.
+ * 'catisma' = benzersizlik kısıtı reddetti (PostgREST 409) → başka bir çağrı zaten `sent` yazmış.
+ */
+async function damgala(supabaseUrl: string, serviceKey: string, satirId: string | null, durum: 'sent' | 'failed', providerMessageId: string | null, hata: string | null): Promise<'tamam' | 'catisma' | 'yazilamadi'> {
+  if (!supabaseUrl || !serviceKey || !satirId) return 'yazilamadi'
+  try {
+    const r = await fetch(`${supabaseUrl}/rest/v1/order_email_events?id=eq.${encodeURIComponent(satirId)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, Prefer: 'return=minimal' },
+      body: JSON.stringify({ status: durum, provider_message_id: providerMessageId, error: hata }),
+    })
+    if (r.status === 409) return 'catisma'
+    return r.ok ? 'tamam' : 'yazilamadi'
+  } catch {
+    return 'yazilamadi'
+  }
+}
+
 function render(tpl: string, _data: Record<string, unknown>) {
   return tpl.replace(/{{(\w+)}}/g, (_m, k) => String(_data[k] ?? ''))
 }
@@ -99,6 +168,16 @@ serve(async (req) => {
 
     if (!order_id) return new Response(JSON.stringify({ error: 'missing_fields', missing: ['order_id'] }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
+    // TEKİLLEŞTİRME KAPISI (T118). Bu ucu İKİ ayrı yol tetikliyor ve eskiden yalnız biri korunuyordu:
+    //   (a) `orderStatusService.ts` — `delivered_at` damgası İLK yazıldığında çağırır (korumalıydı)
+    //   (b) `shipping-webhook/index.ts` — taşıyıcı webhook'undan doğrudan çağırır (KORUMASIZDI)
+    // Yani taşıyıcı "teslim edildi" derken admin de statüyü çevirirse müşteriye İKİ e-posta gidiyordu
+    // ve defter türü ayırt etmediği için bunu kimse göremiyordu. Kapı artık uçta, iki yolun da
+    // arkasında: kaynağı ne olursa olsun ikinci çağrı e-posta GÖNDERMEZ.
+    if (supabaseUrl && serviceKey && await alreadySent(supabaseUrl, serviceKey, order_id)) {
+      return new Response(JSON.stringify({ ok: true, order_id, skipped: 'already_sent' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    }
+
     // Derive info if missing
     if ((!customer_email || !customer_name || !order_number) && supabaseUrl && serviceKey) {
       const o = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=order_number,customer_name,customer_email`, {
@@ -145,6 +224,10 @@ serve(async (req) => {
       return new Response(JSON.stringify({ disabled: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
+    // DENEME SATIRI — gönderimden ÖNCE yazılır. Sıra kasıtlı: gönderim başarılı olup kayıt
+    // düşerse "gitti mi" sorusu cevapsız kalır. Önce niyet yazılır, sonra sonuç damgalanır.
+    const denemeId = await denemeYaz(supabaseUrl, serviceKey, order_id, customer_email, subject)
+
     const resp = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
@@ -152,9 +235,20 @@ serve(async (req) => {
     })
     if (!resp.ok) {
       const t = await resp.text().catch(()=> '')
+      // Başarısızlık artık YUTULMUYOR: defterde `failed` + hata metni kalır. Eskiden gönderim
+      // hatası yalnız HTTP cevabında yaşıyordu ve çağıran (shipping-webhook) onu yutuyordu.
+      await damgala(supabaseUrl, serviceKey, denemeId, 'failed', null, t.slice(0, 500))
       return new Response(JSON.stringify({ error: 'send_failed', body: t }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
     const result = await resp.json().catch(()=>({}))
+
+    // BAŞARI DAMGASI. Bu yazma `uq_order_email_events_sent_once` kısıtına çarparsa (23505) o an
+    // BAŞKA bir çağrı aynı siparişe `sent` yazmış demektir — yarış durumunu veritabanı çözer,
+    // biz sonucu okuruz. Cevap yine 200'dür: e-posta gerçekten gitti, tekil olan DAMGA.
+    const damgaSonucu = await damgala(supabaseUrl, serviceKey, denemeId, 'sent', result?.id || null, null)
+    if (damgaSonucu === 'catisma') {
+      return new Response(JSON.stringify({ ok: true, order_id, subject, duplicate_send: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    }
 
     // Audit
     try {
