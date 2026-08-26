@@ -23,7 +23,8 @@ import { createQuoteRequest, type QuoteSource } from '../../lib/services/quoteSe
  */
 
 export interface QuoteRequestModalItem {
-  productId: string | null
+  /** v2: kalem gerçek bir ürün kimliği taşır (cetvel §3.2 — pasif ürün kararı). */
+  productId: string
   productName: string
   qty: number
 }
@@ -37,6 +38,16 @@ interface QuoteRequestModalProps {
   /** PDP tek-kalem akışında adet modal içinde değiştirilebilir. */
   qtyEditable?: boolean
 }
+
+/**
+ * Form alanı sınıfları TEK yerde. Üç alan (ad, telefon, not) aynı görünümü
+ * paylaşıyor; sınıf dizesini kopyalamak INV-9 ham-gri sayacını her kopyada
+ * yeniden artırırdı — çırçır "yeni kod sayacı ARTIRAMAZ" diyor ve haklı:
+ * kopyalanan stil, token'a geçişi her seferinde biraz daha pahalı yapar.
+ */
+const ALAN_ETIKET_SINIFI = 'block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5'
+const ALAN_GIRDI_SINIFI =
+  'w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors'
 
 const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
   open,
@@ -53,12 +64,20 @@ const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
   const [qtys, setQtys] = useState<number[]>(() => items.map((i) => i.qty))
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  // Muhatap kimliği (cetvel §2.5) — DB'de NOT NULL, yani boş bırakılamaz.
+  // E-posta oturumdan gelir ve GÜVENİLİRDİR; ad ve telefon profilde NULL
+  // olabildiği için (ölçüldü: user_profiles.full_name/phone nullable) burada
+  // TOPLANIR — "profilden doldururum" varsayımı o hesaplarda kırılırdı.
+  const [contactName, setContactName] = useState('')
+  const [contactPhone, setContactPhone] = useState('')
 
   // Modal yeniden açıldığında formu tazele (önceki talebin kalıntısı taşınmasın).
   useEffect(() => {
     if (open) {
       setQtys(items.map((i) => i.qty))
       setNote('')
+      setContactName('')
+      setContactPhone('')
       setSubmitted(false)
     }
   }, [open, items])
@@ -70,10 +89,20 @@ const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
       toast.error(t('quotes.request.loginRequired'))
       return
     }
+    // Kimliksiz teklif OLMAZ (§2.5). Kapı DB'de NOT NULL olarak da duruyor; burası
+    // kullanıcıya anlaşılır hata vermek için, DB kapısının yerine geçmek için değil.
+    const ad = contactName.trim()
+    const telefon = contactPhone.trim()
+    const eposta = (user.email ?? '').trim()
+    if (!ad || !telefon || !eposta) {
+      toast.error(t('quotes.request.contactRequired'))
+      return
+    }
     try {
       setSubmitting(true)
       await createQuoteRequest(supabaseBrowserClient, {
         userId: user.id,
+        contact: { name: ad, email: eposta, phone: telefon },
         source,
         sourceProjectId: sourceProjectId ?? null,
         items: items.map((item, idx) => ({
@@ -174,8 +203,47 @@ const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
                 </ul>
               </div>
 
+              {/* Muhatap kimliği (cetvel §2.5) — kimliksiz teklif olmaz. */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="quote-request-contact-name" className={ALAN_ETIKET_SINIFI}>
+                    {t('quotes.request.contactName')}
+                  </label>
+                  <input
+                    id="quote-request-contact-name"
+                    type="text"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    required
+                    autoComplete="name"
+                    placeholder={t('quotes.request.contactNamePh')}
+                    className={ALAN_GIRDI_SINIFI}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="quote-request-contact-phone" className={ALAN_ETIKET_SINIFI}>
+                    {t('quotes.request.contactPhone')}
+                  </label>
+                  <input
+                    id="quote-request-contact-phone"
+                    type="tel"
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                    required
+                    autoComplete="tel"
+                    placeholder={t('quotes.request.contactPhonePh')}
+                    className={ALAN_GIRDI_SINIFI}
+                  />
+                </div>
+              </div>
+
+              {/* E-posta oturumdan gelir; kullanıcı yazmaz — kanıt zinciri hesaba bağlı. */}
+              <p className="text-xs font-medium text-industrial-gray">
+                {t('quotes.request.contactEmailNote')}: <span className="font-bold text-primary-navy">{user?.email ?? ''}</span>
+              </p>
+
               <div>
-                <label htmlFor="quote-request-note" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                <label htmlFor="quote-request-note" className={ALAN_ETIKET_SINIFI}>
                   {t('quotes.request.note')}
                 </label>
                 <textarea
@@ -184,7 +252,7 @@ const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
                   onChange={(e) => setNote(e.target.value)}
                   rows={4}
                   placeholder={t('quotes.request.notePh')}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors resize-none"
+                  className={`${ALAN_GIRDI_SINIFI} resize-none`}
                 />
               </div>
             </div>

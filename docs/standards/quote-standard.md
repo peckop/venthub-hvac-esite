@@ -137,7 +137,7 @@ bağlanır: isim, e-posta, telefon.
 | `root_quote_id` | uuid → `venthub_quotes(id)` | Zincir başı; portalda gruplama | türetildi |
 | `superseded_by` | uuid → `venthub_quotes(id)` | Yerine geçen revizyon; **NULL = güncel** | türetildi |
 | `valid_until` | timestamptz | Belge düzeyinde süre (Ç7) | Odoo/PandaDoc |
-| `currency` | char(3), NOT NULL | Para birimi **türetilmez** | INV-CURRENCY-1 |
+| `currency` | char(3), **NULLABLE** (şart tetikte) | Para birimi **türetilmez** | INV-CURRENCY-1 |
 | `total_amount` | numeric | Belge toplamı (kalemlerden türetilir, snapshot'lanır) | fatura hattı |
 | `user_id` | uuid → `auth.users`, **NULLABLE** | Hesapsız (prospect) muhatap; hesap açılınca dolar (§2.5) | Recep 08-20 |
 | `contact_name` · `contact_email` · `contact_phone` | text, **NOT NULL** | Kimlik üçlüsü; kimliksiz teklif olmaz (§2.5) | Recep 08-20 |
@@ -506,6 +506,23 @@ terminaller, sahiplik+tenant, fiyat kolonlarına müşteri yazamaz, rota↔sayfa
 | R16 | `contact_name`/`contact_email`/`contact_phone` NOT NULL; kimliksiz teklif satırı oluşamaz | §2.5 — kimlik ekseni |
 | R17 | Hesapsız teklif hiçbir müşteri SELECT politikasından dönmez | §3.3 — sahiplik yüklemi NULL ile eşleşmemeli |
 
+**⚠ R9'un İKİ ŞARTI HENÜZ POLİTİKADA DEĞİL — adıyla, gizlenmeden (2026-08-26).**
+`accept_ip` ve `accept_declaration_version` NOT NULL şartı `quotes_update_customer_decision`
+politikasına **yazılmadı**. Gerekçe ölçüldü, tercih değil: bu iki alanı yazabilecek tek
+taraf istemcidir (kolon-grant `authenticated`'a verilir), ve **istemciden gelen IP kanıt
+değil BEYANdır**. Şartı koymak kanıt üretmez; istemciyi değer uydurmaya zorlar ve ortaya
+*kanıt gibi görünen* bir alan çıkarır — bu, hiç alan olmamasından daha tehlikelidir.
+Doğru çözüm **sunucu tarafında damgalayan bir kabul ucu**dur (RPC/Edge) ve o **ayrı bir
+kalemdir**. O uç inene kadar R9 üç şartla koşar (`superseded_by is null`,
+`valid_until >= now()`, `accept_recorded_by is null` + kanal/revizyon pini) ve bu satır
+eksiğin **bitiş kriteridir**: sunucu damgalı uç indiği gün iki şart politikaya girer ve
+bu paragraf silinir.
+
+**⚠ §3.1 `currency` hücresi ile R10 arasındaki fark bilinçlidir.** Kolon NULLABLE'dır;
+NOT NULL şartı `draft → quoted` geçişinde tetiktedir. Kolon düzeyinde NOT NULL, DEFAULT
+gerektirirdi ve DEFAULT bir **türetmedir** — INV-CURRENCY-1'in yasakladığı şey. DEFAULT'suz
+NOT NULL ise canlı RFQ yazma yolunu kırardı (ölçüldü: `quoteService.ts` currency göndermiyor).
+
 **Ölçüm biçimi zorunlu:** kurallar **etki** ölçer, metin değil. R9/R12 için ayırt edici kol
 şarttır — yalnız ret gözlemi "kanal kapalı" hâlinden ayırt edilemez; **kabul eden bir kol**
 da denenmelidir. R15 için kabul eden kol: `user_id` dolduruldu → AYNI geçiş **geçmeli**;
@@ -525,7 +542,12 @@ sonra **tek bir migration** olarak iner:
 4. Kalem alanları (§3.2) + `product_id` NOT NULL'a çekilir
 5. RLS: admin INSERT politikaları (Ç1/Ç2), müşteri kabul politikasının sertleştirilmesi (§7.2),
    Satış Projesi izolasyonu (§2/3)
-6. Expiry cron işi (§6, kapı 1)
+6. Expiry cron işi (§6, kapı 1) — ⚠ **AYRI ONAYLA KURULUR, bu migration'ın parçası
+   DEĞİLDİR.** Karar OPS/AUTH 2026-08-26: cron kurulduğu an **periyodik prod yazımı**
+   başlar; bu, tek seferlik bir şema değişikliğinden farklı bir risk sınıfıdır ve
+   kendi Recep onayını hak eder. Şemayı kuran migration cron'suz iner; §6'nın
+   **kapı 2'si** (kabul anındaki `valid_until >= now()` şartı) zaten tetikte ve
+   politikada olduğu için süresi geçmiş teklif cron hiç koşmasa bile kabul edilemez
 7. **Muhatap kimliği (§2.5):** `user_id` NULLABLE'a çekilir; `contact_name`/`contact_email`/
    `contact_phone` NOT NULL eklenir; muhatap kilidi `enforce_quote_status_transition` içine yazılır
 

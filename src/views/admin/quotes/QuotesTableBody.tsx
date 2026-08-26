@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
-import { allowedAdminQuoteActions, isQuoteStatus } from '@/lib/quotes/quoteStatusMachine'
+import { allowedAdminQuoteActions, isQuoteStatus, QUOTE_STATUSES } from '@/lib/quotes/quoteStatusMachine'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../../components/admin/AdminEmptyState'
@@ -40,7 +40,13 @@ interface QuoteAdminRow extends QuoteRow {
   customerLookupFailed: boolean
 }
 
-const STATUS_VALUES = ['requested', 'quoted', 'accepted', 'rejected', 'expired'] as const
+/**
+ * Süzgeç seçenekleri SSOT'tan TÜRETİLİR, elle yazılmaz (INV-QUOTE-1 R1d).
+ * Eskiden burada beş elemanlı bir dizi vardı; harita v2'de dokuza çıkınca
+ * draft/cancelled/superseded/converted teklifler bu süzgeçte sessizce görünmez
+ * olurdu ve hiçbir kapı kırmızı vermezdi (ad-bazlı R1b onu görmüyordu).
+ */
+const STATUS_VALUES = QUOTE_STATUSES
 const SOURCE_VALUES = ['pdp', 'cart', 'project'] as const
 const EMPTY_DASH = '—'
 
@@ -146,16 +152,18 @@ async function quotesFetcher(
     itemsByQuote.set(item.quote_id, list)
   }
 
+  // v2 (§2.5): `user_id` NULL olabilir — hesapsız (prospect) muhatap. Hesap araması
+  // yalnız hesaplı satırlar için yapılır; kimlik zaten BELGEDE (contact_*) yazılıdır.
   const { map: customers, failed } = await fetchCustomerMap(
     supabase,
-    [...new Set(quotes.map((q) => q.user_id))],
+    [...new Set(quotes.map((q) => q.user_id).filter((id): id is string => id !== null))],
   )
 
   const rows: QuoteAdminRow[] = quotes.map((q) => ({
     ...q,
     items: itemsByQuote.get(q.id) ?? [],
-    customer_name: customers.get(q.user_id)?.name ?? null,
-    customer_email: customers.get(q.user_id)?.email ?? null,
+    customer_name: q.user_id ? customers.get(q.user_id)?.name ?? null : null,
+    customer_email: q.user_id ? customers.get(q.user_id)?.email ?? null : null,
     customerLookupFailed: failed,
   }))
 
@@ -479,14 +487,25 @@ const QuotesTableBody: React.FC = () => {
         cell: (r) => (
           <div className="flex flex-col gap-0.5">
             <span className="font-semibold text-admin-fg tracking-tight">
-              {r.customer_name ?? `#${r.user_id.slice(-8).toUpperCase()}`}
+              {/* Kimlik otoritesi BELGEDİR (§2.5): contact_* her satırda doludur ve
+                  profil sonradan değişse bile teklifin muhatabı sabit kalır. Hesap
+                  araması yalnız ek bilgidir. */}
+              {r.contact_name || r.customer_name || (r.user_id ? `#${r.user_id.slice(-8).toUpperCase()}` : EMPTY_DASH)}
             </span>
             <span
               className="text-xs text-admin-fg-muted font-bold"
               title={r.customerLookupFailed ? t('quotes.admin.emailUnavailable') : undefined}
             >
-              {r.customer_email ?? (r.customerLookupFailed ? t('quotes.admin.emailUnavailable') : EMPTY_DASH)}
+              {r.contact_email || r.customer_email || (r.customerLookupFailed ? t('quotes.admin.emailUnavailable') : EMPTY_DASH)}
             </span>
+            {/* Hesapsız muhatap: kabul/dönüşüm yönü DB'de kilitli (§2.5 muhatap
+                kilidi). Admin bunu ekranda görmezse "niye kabul edilemiyor" sorusu
+                sessiz kalır — kilidi görünür kılmak kapının yerine geçmez, onu okunur yapar. */}
+            {r.user_id === null && (
+              <span className="text-xs font-bold text-admin-warning">
+                {t('quotes.admin.prospectBadge')}
+              </span>
+            )}
           </div>
         ),
       },

@@ -2363,6 +2363,12 @@ export const tr = {
       title: 'Teklif İste',
       itemsTitle: 'Talep Kalemleri',
       qty: 'Adet',
+      contactName: 'Ad Soyad',
+      contactNamePh: 'Teklifin düzenleneceği kişi',
+      contactPhone: 'Telefon',
+      contactPhonePh: '05xx xxx xx xx',
+      contactEmailNote: 'Teklif bu e-posta adresine iletilecek',
+      contactRequired: 'Ad soyad ve telefon zorunludur — teklif belgesinde muhatap yazmalıdır',
       note: 'Not (opsiyonel)',
       notePh: 'Projeniz/ihtiyacınız hakkında kısa not (opsiyonel)',
       submit: 'Teklif Talebi Gönder',
@@ -2399,11 +2405,15 @@ export const tr = {
       project: 'Proje'
     },
     statusLabels: {
+      draft: 'Taslak',
       requested: 'Talep Alındı',
       quoted: 'Teklif Verildi',
       accepted: 'Kabul Edildi',
       rejected: 'Reddedildi',
-      expired: 'Süresi Doldu'
+      expired: 'Süresi Doldu',
+      cancelled: 'İptal Edildi',
+      superseded: 'Yerine Yenisi Geçti',
+      converted: 'Siparişe Dönüştü'
     },
     admin: {
       title: 'Teklif Kuyruğu',
@@ -2415,6 +2425,7 @@ export const tr = {
       emptyDescription: 'Müşteriler fiyatı görünmeyen ürünlerde teklif istediğinde burada listelenir.',
       filterEmptyDescription: 'Filtrelerinize uyan teklif talebi bulunamadı.',
       emailUnavailable: 'e-posta gösterilemiyor',
+      prospectBadge: 'hesapsız muhatap — kabul kilitli',
       table: {
         customer: 'Müşteri',
         items: 'Kalemler',
