@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T18:54:10.945196+00:00
+compiled_at: 2026-08-26T19:13:41.865067+00:00
 total_compiled_files: 98
-source_commit: ee52aa4e
+source_commit: f63425af
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -2832,13 +2832,27 @@ PS-001→PS-046 kodlu **46 bulgu**, hepsi sorgu, görsel, NLM planı veya kaynak
 | 🗑 GEREKSİZ | 7 | Kapat (çöp/mükerrer) |
 | ❓ BELİRSİZ | 19 | Derin ölçüm bende; itirazın olan satırı işaretle |
 
+## ⚠ Düzeltme günlüğü
+
+- **08-26 akşamı — çıkarım sınıfı bulundu (ÜRÜN şeridi ölçtü, Recep işaret etti):** "pilot X'i
+  kanıtladı → gerisi eksik" cümlesi ölçüm değil ÇIKARIMDIR; pilot kapsamı bir ilerleme ölçüsü
+  değildir. Bu belgede bu desenle yazılmış satırlar asıl kaynağa (canlı DB / canlı yüzey) karşı
+  yeniden ölçülmeden güvenilmez. Düzeltilen: T003-VH, T069-VH (görsel kapsamı 374→35 ürün).
+  Şüpheli desen taşıyan satırlar (örn. T036-VH %25 ilerleme, T002-VH "tarama yok") kendi
+  şeritlerince ölçülecek; düzeltmeler bu günlüğe eklenir.
+- **08-26 akşamı — tarama sonuçları:** T002-VH DOĞRU çıktı (görsel regresyon kapısı gerçekten yok).
+  T036-VH ŞİŞİKTİ (yüzde alanı inşa ilerlemesi sanılmış; kapsam %100, kalan iş kalite — satır
+  düzeltildi). T104-VH hükmü YANLIŞTI (kanıt yalnız PR atfıydı; istemci ayağı hiç inmemiş — satır
+  düzeltildi, ardıl REC-80). İki yeni ders: **birimsiz yüzde yanıltır** (sayının yanına "neyin
+  yüzdesi" yazılır) ve **iş bitti ≠ iş erişilebilir** (kanıt davranıştan, atıftan değil).
+
 ## 🔧 YAPILMALI — hâlâ değerli, Linear'a taşınacak (40)
 
 | # | Kimlik | Başlık | Gerekçe/Kanıt |
 |---|---|---|---|
 | 1 | T001-OC | server.py hardcoded yollar (satır 15-16) | server.py:9 hâlâ Path("C:/Users/alize/orion-cortex/logs") hardcoded; DB path kısmen fixlenmiş |
 | 2 | T002-VH | INV-9 stil-conformance + screenshot taraması | Statik ratchet var (storefront-style-ratchet.test.ts, INV-9) ama e2e/screenshot görsel tarama parçası hâlâ yok |
-| 3 | T003-VH | Görsel temini (187 ürün görseli) | T139 pilotu yalnız 5 ürün/28 görseli kanıtladı; 187'nin büyük kısmı hâlâ eksik |
+| 3 | T003-VH | Görsel temini (187 ürün görseli) | ⚠ DÜZELTİLDİ 08-26 akşamı: kapsam iddiası BAYATTI. Canlı DB ölçümü (ÜRÜN şeridi, Recep işaret etti): 374 aktif ürünün 339'u görselli (%91, 1042 görsel); eksik **35 ürün / 6 küme**. Eski "187'nin büyük kısmı eksik" cümlesi ölçülmeden pilot sayısından çıkarımdı. |
 | 4 | T004-OC | Veritabanı İndeks Optimizasyonu | Kaynakta hiç CREATE INDEX yok; status "active" ama uygulanmış kanıt yok |
 | 5 | T005-OR | F3: Otonomi Gradyanı, Çapraz Tozlaşma, Öğrenen Dispatcher | task_engine.py'de dispatcher/model-tahsis mantığı var (kısmi); progress 60 aktif, tam kapsam yok. |
 | 6 | T005-VH | PageKit göçü (storefront) | src'de PageKit dosyası hiç yok; storefront göçü henüz başlamamış, backlog geçerli. |
@@ -2846,13 +2860,13 @@ PS-001→PS-046 kodlu **46 bulgu**, hepsi sorgu, görsel, NLM planı veya kaynak
 | 8 | T012-VH | Güvenlik sertleştirme (auth/webhook/tenant/rol) | CHANGELOG'da RBAC+audit+HMAC webhook kanıtı var ama %45 aktif, tamamlanmamış. |
 | 9 | T018-OR | Orion yazım raporu sayaç kırılımı hedefle tutmuyor | 08-25 tarihli, ölçümle desteklenmiş güncel aktif görev; kabul ölçütü net, sayaç doğruluğu değerli |
 | 10 | T019-OR | Orion depo geneli zaman aşımsız dış çağrı taraması | Bugün açılan güncel iş; orion'da 145 subprocess.run çağrısından çoğu genel sarmalayıcısız, konformans testi yok |
-| 11 | T036-VH | 3D görsel kalite fazı (ışık rig, framing, normalizasyon) | SceneLightingRig.tsx var ama status=open, progress=25; görsel onay/framing işi bitmemiş. |
+| 11 | T036-VH | 3D görsel kalite fazı (ışık rig, framing, normalizasyon) | ⚠ DÜZELTİLDİ 08-26 akşamı (ÜRÜN ölçtü): "progress=25" İNŞA yüzdesi DEĞİL. 3D ürün başına GLB değil, kategori `model_type` ile parametrik model; canlı ölçüm: 25/31 kategori atanmış, 3D açılan aktif ürün 374/374 = **%100 kapsam**. Kalan iş KALİTE/cila (ışık rig, framing). Kalem "3D kapsama" değil "3D sunum kalitesi" olarak okunmalı. |
 | 12 | T038-VH | registry-sync GitHub merge'lerinde çalışmıyor | .github/workflows/ listesinde registry-sync Action yok; post-merge kancası hâlâ yalnız yerel |
 | 13 | T039-VH | Supabase leaked password protection kapalı | Dashboard-only ayar, repodan doğrulanamaz; güvenlik değeri yüksek, Recep'e atanmış basit iş |
 | 14 | T045-VH | Ödeme doğrulama fail-closed — 2 açık ayak | order-validate için sentetik yoklama/health cron .github/workflows'ta yok; docs/standards'ta karar hâlâ yazılı değil |
 | 15 | T049-VH | Admin UX elden geçirme Faz 0-5+N1-N4 | PR #525/526/541/543/544 merge doğrulandı (Faz 0-2b bitti); Faz 3-6 (görsel kalibrasyon, kapılar, N1-N4) hâlâ açık |
 | 16 | T054-VH | Kargo ücreti: sabit "Ücretsiz" yerine gerçek politika | cart.free hâlâ hardcoded (CartPage.tsx, OrderSummarySidebar.tsx); shipping_cost repoda yok. |
-| 17 | T069-VH | Ürün görseli edinme hattı | Yalnız 5 ürünlük pilot yapılmış (scripts/media/vortice-image-pilot.mjs, T139-VH); 374 ürünlük tam kapsama hâlâ eksik. |
+| 17 | T069-VH | Ürün görseli edinme hattı | ⚠ DÜZELTİLDİ 08-26 akşamı: "374 ürünlük tam kapsama eksik" iddiası YANLIŞTI — pilot betiği 5 üründe kalmış olsa da görseller başka yollarla büyük oranda tamamlanmış. Canlı ölçüm: eksik 35 ürün / 6 küme (bkz. T003-VH satırı). Kalan iş T003 ile birleşik yürür. |
 | 18 | T071-VH | 20-madde v2 güvenlik denetimi (40 ajan) | Rapor PR #586 merge oldu ama M1-M6 CONFIRMED-MED düzeltmeleri ayrı iş; progress hâlâ %20 |
 | 19 | T073-VH | İKİ-LEDGER tehlikesi — migration ledger | supabase-migrate.yml ledger-parite mantığı doğrulandı (parça 1+2 merge); backfill (parça 3) hâlâ Recep kapısında |
 | 20 | T074-VH | Ana-dizin kaza önlemi yapısal katman | pre-commit incelendi: yalnız lane-guard (E1) var, ana-dizin/master park uyarısı yok |
@@ -2933,7 +2947,7 @@ PS-001→PS-046 kodlu **46 bulgu**, hepsi sorgu, görsel, NLM planı veya kaynak
 | 26 | T099-VH | Sepete yanlış ürün düşüyor | fix(pdp): T099 yüzey (#670) + INV-CATALOG-1 aile/içerik bütünlüğü kapısı (#666) ile kapatılmış. |
 | 27 | T100-VH | Prod secret bayatlık sınıfı — pozitif öz-denetim | config_audit.ts başlığında doğrudan "T100-VH · 2026-08-19" referansı; ok/eksik/tutarsız hüküm sistemi kurulu. |
 | 28 | T101-VH | View yetki standardizasyonu (REVOKE ALL+GRANT) | docs/standards/db-grant-hygiene-standard.md + 20260819103000_view_grant_hygiene.sql deseni standartlaştırmış |
-| 29 | T104-VH | LeadModal sahte-başarı | feat(form): T104-VH (#680) contact_messages+submit_contact_message RPC ile veri artık gerçekten kaydediliyor. |
+| 29 | T104-VH | LeadModal sahte-başarı | ⚠ HÜKÜM DÜZELTİLDİ 08-26 akşamı (EDGE davranışla ölçtü): "yapılmış" hükmü YALNIZ PR/merge atfına dayanıyordu. Gerçek: RPC + yetkiler prod'da VAR ama İSTEMCİ HİÇ BAĞLANMAMIŞ — ContactPage.tsx başarı ekranı gösterip hiçbir şey yazmıyor; contact_messages toplam 0 satır. Sınıf: **iş bitti ≠ iş erişilebilir**. KVKK ağırlığı var (girilen kişisel veri kaydedilmiyor, kullanıcı "gönderildi" görüyor). Ardıl: Linear REC-80. |
 | 30 | T109-VH | commerce-domain-map cetveli | docs/standards/commerce-domain-map-standard.md repoda mevcut. |
 | 31 | T110-VH | commerce-domain-map cetveli | docs/standards/commerce-domain-map-standard.md var, quote-standard.md v2 §5'te referans alınıyor. |
 | 32 | T113-VH | Peer-dependency ayrışmaları (react-day-picker/eslint) | peer-dependency-integrity.test.ts: MUAFİYETLER listesi boş, her iki ihlal de v9/hizalama ile çözülmüş yazılı |
