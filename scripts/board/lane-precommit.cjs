@@ -51,6 +51,44 @@ try {
 
 if (!staged.length) process.exit(0)
 
+/**
+ * MERGE COMMITI MUAF — olculmus tasarim hatasi (2026-08-26, ADMIN bloke oldu).
+ *
+ * E1 staged DOSYA LISTESINE bakar ve "baska seridin claim inde mi" diye sorar. Bu soru SEN
+ * yazdiginda dogrudur. Merge commit inde ise ANLAMSIZDIR: git merge origin/master, master in
+ * getirdigi HER dosyayi staged yapar — uretilmis docs/*_master.md ve artefakt_manifest.json
+ * dahil. Onlari serit YAZMADI, ENTEGRE ediyor. Kapi boylece yazari degil TASIYICIYI cezalandirir.
+ *
+ * OLCULEN SONUC: 2026-08-26 aksami ADMIN in 'git merge origin/master' i bloklandi, merge yarim
+ * kaldi. Bu kapinin ONARMAYA calistigi seyin tam tersi: serit taban tazeleyemeyince BAYAT tabanda
+ * calisir ve asil catisma o zaman uretilir.
+ *
+ * NICIN ATLAMAK GUVENLI: merge in getirdigi icerik zaten master a girmis, yani baska bir seridin
+ * KENDI kapisindan gecmis demektir. Burada ikinci kez sorgulamak koruma eklemez.
+ *
+ * NICIN SESSIZ DEGIL: atlama GORUNUR satir basar. Sessiz atlama bu depoda defalarca olculmus bir
+ * ariza bicimi — 'kapi kostu' ile 'kapi atladi' ayirt edilemez hale gelir.
+ */
+const birlestirmeHali = (() => {
+  for (const ad of ['MERGE_HEAD', 'CHERRY_PICK_HEAD', 'REVERT_HEAD']) {
+    try {
+      if (fs.existsSync(path.join(gitDir, ad))) return ad
+    } catch {
+      /* okunamadi -> asil kola dus, fail-open degil fail-normal */
+    }
+  }
+  return null
+})()
+
+if (birlestirmeHali) {
+  uyar(
+    '[lane-precommit] MERGE/PICK COMMITI (' + birlestirmeHali + ') — serit kontrolu ATLANDI. ' +
+      staged.length + ' staged dosya; bunlar entegre edilen icerik, bu seridin YAZDIGI is degil.',
+  )
+  process.exit(0)
+}
+
+
 let board = null
 try {
   board = require(path.join(__dirname, 'board.cjs'))
