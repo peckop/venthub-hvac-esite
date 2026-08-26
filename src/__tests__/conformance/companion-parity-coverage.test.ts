@@ -67,7 +67,7 @@ const YAS_ESIGI_GUN = 7
  *   · yeni bir commit companion'ını bayat bırakırsa 7 gün sonra KIRMIZI (asıl amaç korundu)
  *   · tabanlar SIFIR olur — ratchet'in en güçlü hâli, sessiz bütçe yok
  */
-const KAPI_BASLANGIC = '2026-08-18'
+const KAPI_BASLANGIC = '2026-08-19'
 
 // Tabanlar SIFIR: kapı yalnız KAPI_BASLANGIC sonrası dokunulan kaynakları denetliyor, yani
 // tarihsel borç kapsam dışı. Bu sayılar HEDEF değil TAVAN ve YÜKSELTİLEMEZ — yükseltmek
