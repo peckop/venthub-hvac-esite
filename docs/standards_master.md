@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T20:45:56.172353+00:00
+compiled_at: 2026-08-26T21:24:43.393244+00:00
 total_compiled_files: 62
-source_commit: 43897302
+source_commit: 9d879977
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -4139,6 +4139,50 @@ ref'te bırakılmaz** (`git log --all -- <dosya>` ile boş olduğu doğrulanır)
 
 > ⚠ Bu **ara önlem**. Kalıcı çözüm bot yapılandırmasında (bilinçli-kırmızı PR'ları onarım
 > kapsamı dışında tutmak) ve Recep kararına bağlı.
+
+**K8 — `--globs` AYIRICISI VİRGÜL; boşluklu değer REDDEDİLİR (2026-08-26 ölçümü).**
+`board.cjs claim --globs` değerini **yalnız virgülle** ayırır. Boşluk ayırmalı tek dize verildiğinde
+eski hâl **hata VERMİYORDU**: dizeyi aynen geri basar, "talep alındı" der ve **TEK bir dev glob**
+saklardı. O glob hiçbir yolla eşleşmez — yani **claim VAR görünür, koruma YOKTUR**; pano "çakışma yok"
+der ve şerit kapısı **YEŞİL** yanar. Sahte-yeşil ailesinin pano biçimi.
+
+Ölçüm (8 canlı şerit, 154 glob): **3 şeritte** (EDGE, ALTYAPI, URUN) boşluklu dev glob vardı. Claim
+birleştirdiği için çoğu parça başka bir girdiyle kapsanıyordu; **gerçekten korumasız kalan 5 yol** çıktı
+ve ikisi **Bash yazma kapısının kendi kaynak dosyalarıydı** (`bash-write-guard.cjs`,
+`bash-write-audit.cjs`) — kapıyı yaz, kapıyı claim etmeyi kaçır.
+
+- Doğru kullanım: `--globs "scripts/board/**,docs/standards/x.md"`
+- Boşluklu değer artık **exit 1** verir, **hiçbir şey yazmaz** ve doğru komutu **basar**.
+- **Niçin "boşluktan da ayır" değil de RED:** sessizce yeniden yorumlamak, boşluk içeren gerçek bir
+  yolu iki globa bölerek **çok geniş** bir claim üretirdi — aynı sınıfın öteki yönü. Fail-closed
+  davranış deterministiktir ve doğru komutu öğretir.
+- **"talep alındı" çıktısı kanıt DEĞİLDİR.** Kanıt, yolun `liveClaims()` içinde **tek başına bir girdi**
+  olarak durmasıdır:
+  `node -e "const b=require('./scripts/board/board.cjs');console.log(b.liveClaims().find(c=>c.sid===SID).globs)"`
+- Bekçi: `src/__tests__/conformance/board-invariants.test.ts` → `INV-BOARD-6`
+  (biri red kolu, biri **yanlış-pozitif** kolu — kapının fazla geniş yazılması da arızadır; ilk yazımda
+  boşluk deseni kabuk katmanlarında bozuldu ve dosyaya "harf s arayan" bir kontrol düştü, `scripts/**`
+  gibi masum her glob'u reddedecekti).
+
+**K9 — DARALTMA `claim --exact` iledir; `release` ile DEĞİL (kıdem bedeli).**
+`claim` **birleştirir** (K2'deki "genişleteyim" hareketi eskisini sessizce bırakmasın diye). Bunun bedeli:
+bir şeridi **daraltmanın yolu yoktu**. İki şerit aynı cetvel dosyasını meşru sebeplerle talep ettiğinde
+(2026-08-26: ALTYAPI `lang-metadata`/`instruction-surface` için, I18N INV kural metni için — aynı dosya)
+ayrışma yalnız **sözle** mümkündü, mekanik değil.
+
+`release` bir çözüm **DEĞİL** ve niçin olmadığı ölçüldü: `release` oturumu haritadan siler, sonraki
+`claim` **YENİ bir `ts`** alır ve şerit **bütün ortak yollarda kıdemsiz** düşer (`findConflict`,
+"en erken kazanır" — K2/§3). Yani *bir dosyayı bırakmak* istemek, **başka her yerde kapıyı aleyhine
+çevirmek** anlamına geliyordu.
+
+- Daraltma: `--globs "<kesin liste>" --exact` → verilen liste **KESİN** olur, **kıdem KORUNUR**.
+- Genişletme: `--exact` **verilmez** → birleştirir (varsayılan davranış değişmedi).
+- Bekçiler (`INV-BOARD-6`): daraltma kolu · **kıdem koruma** kolu (ayrı, çünkü daraltma doğru olup
+  kıdem kaybedilebilir) · **karşıt kanıt** kolu (`release`+`claim` kıdemi gerçekten sıfırlıyor mu —
+  sıfırlamıyorsa `--exact`'in gerekçesi çökmüştür ve bu sessizce yeşile çevrilmemelidir).
+- **SÜRÜKLENME KAPISI:** claim indirgeme mantığı `board.cjs` içinde **iki kez** yazılıdır
+  (`liveClaims` ve `tumTalepler`). Birine dokunup ötekini unutmak panonun iki yüzünü farklı gerçeklere
+  böler ve hiçbir kapı görmez; `INV-BOARD-6` ikisinin **aynı glob kümesini** verdiğini ölçer.
 
 ---
 
