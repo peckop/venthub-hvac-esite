@@ -2,44 +2,42 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\views\ContactPage.tsx
-skeleton_hash: f0abe85fd597d1ce
+source_path: C:\tmp\vh-rec80\src\views\ContactPage.tsx
+skeleton_hash: 6da6f6200d810df4
 entity_hashes:
   func:ArrowRight: 1546741fbe749202
   func:ContactPage: a5b3030a0864a814
-  func:handleSubmit: 460293fdfa9263b6
-  overview: 060d74556606246c
-  style_tokens: 21b7b2d66d6de05a
-generated_at: 2026-08-18T06:51:24Z
+  func:handleSubmit: 95200638b7a8d648
+  overview: 4bedca8cde6e58ef
+  style_tokens: 9d39e82e06c400aa
+generated_at: 2026-08-26T19:28:58Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub uygulamasının iletişim sayfasını temsil eden tek bir React bileşeninden oluşur. Temel amacı, kullanıcıdan iletişim formu verilerini (e-posta, telefon, mesaj) toplayarak bu bilgileri sunucuya göndermektir.
+
+Bu modül, VentHub uygulamasının iletişim sayfasını oluşturan bir React bileşenidir. Kullanıcıdan e-posta, telefon ve mesaj gibi iletişim bilgilerini toplayan bir form içerir ve form gönderim işlemini yönetir. Modül, ana sayfa bileşeni, form gönderme işleyicisi ve yardımcı bir ok ikonu bileşeninden oluşur.
 
 ## Fonksiyon Grupları
+
 ### Ana Sayfa Bileşeni
-Modülün ana yapısını ve kullanıcı arayüzünü oluşturur; form alanlarını, başlığı ve gönderme butonunu render eder.
+İletişim sayfasının tüm kullanıcı arayüzünü oluşturur; form alanlarını, başlığı ve gönderme butonunu render eder. Diğer fonksiyonları ve yardımcı bileşenleri bir araya getirir.
 - ContactPage
 
-### Form Veri İşleme
-Kullanıcı formu gönderdiğinde tetiklenen mantıksal akışı yönetir; form verilerini toplar, doğrular ve bir eylem (örn. sunucuya gönderme) başlatır.
+### Form Gönderme İşleyicisi
+Kullanıcı formu gönderdiğinde tetiklenir; form verilerini toplar ve sunucuya gönderme işlemini başlatır. Form olayının varsayılan davranışını engelleyerek sayfanın yeniden yüklenmesini önler.
 - handleSubmit
 
-### Yardımcı UI Bileşenleri
-Sayfa içinde tekrar kullanılabilen, küçük ve tek sorumlu görsel öğeleri sağlar.
+### Yardımcı UI Bileşeni
+Sayfa içinde tekrar kullanılabilen bir ok ikonu sağlar. Varsayılan boyutu 16 pikseldir ancak farklı bağlamlarda kullanılabilmesi için boyut parametresi alır.
 - ArrowRight
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon gövdeleri erişime açık değildir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1]**: Eğer `handleSubmit` fonksiyonu `React.FormEvent` parametresi almıyorsa, form gönderim olayı doğru yakalanamaz ve kullanıcı girişleri işlenemez.
-
-**[Aksiyom 2]**: Eğer `ArrowRight` bileşeni `size` parametresi desteklemiyorsa, bileşen farklı bağlamda (buton, başlık vb.) kullanıldığında boyut ayarlanamaz ve tutarsız render oluşur.
-
-**[Aksiyom 3]**: Eğer `ContactPage` bileşeni bir React form elemanı içermiyorsa, `handleSubmit` hiçbir zaman tetiklenemez ve sayfa işlevsiz kalır.
+**Neden:** Fonksiyon gövdeleri sağlanmadığı için, yalnızca imzalardan (`ContactPage`, `handleSubmit`, `ArrowRight`) mimari varsayımlar üretilememektedir. İmzalar davranışsal koşul içermez; aksiyom üretimi için fonksiyon gövdesindeki mantıksal dallanma, hata kontrolü, eşik değerleri veya bağımlılık kontrolleri gereklidir.
 
 ---
 
@@ -56,14 +54,14 @@ Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon g
 **Dönüş**: React.FC — bir React fonksiyonel bileşeni.
 
 ### handleSubmit
-**Ne yapar**: handleSubmit, iletişim formu gönderildiğinde tetiklenen bir olay işleyicisidir. Form verilerini toplar, doğrulama adımlarını başlatabilir ve gönderim sürecini yönetir. İşlem tamamlandığında sayfa yenilenmesi veya başka bir UI güncellemesi yapılabilir.  
+**Ne yapar**: İletişim formunun gönderilmesi işlemini yöneten asenkron fonksiyondur. Form gönderildiğinde tetiklenir ve müşteriye "iletildi" mesajı gösterir; ancak form verilerini hiçbir veritabanına veya harici hizmete kaydetmez. Kaynak kodda bu fonksiyonun gövdesinde yalnızca bir yorum satırı bulunur: "Form submission logic using supabase would go here". Yani asıl gönderim mantığı hiç uygulanmamıştır.
 
-**Nasıl yapar**: Fonksiyon, React.FormEvent tipinde bir olay nesnesi alır ve bu nesnenin `preventDefault()` metodunu çağırarak tarayıcının varsayılan form gönderimini engeller. Ardından, form alanlarından değerler okunur ve gerekli iş mantığı (ör. API çağrısı) yürütülür.  
+**Nasıl yapar**: Fonksiyonun iç mantığı kaynakta mevcut değildir — gövdede gerçek bir işlem yerine yalnızca gelecekteki implementasyonu ima eden bir yorum satırı bırakılmıştır. `form-submission-standard.md` belgesinin §7 maddesi, yazma işlemi yerine geçen bu tür yorumları adıyla yasaklamaktadır. Üretim ortamında `contact_messages` tablosuna kayıt yapılmadığı ölçülmüştür.
 
-**Parametreler**:  
-- e: React.FormEvent — Form gönderim olayını temsil eden nesne; olayın detaylerine ve hedef form elemanlarına erişim sağlar.  
+**Parametreler**:
+- `e`: `React.FormEvent` — Formun gönderilme olayını temsil eden event nesnesi. Form submit davranışını kontrol etmek (varsayılan davranışı engellemek gibi) amacıyla kullanılır.
 
-**Dönüş**: Belirtilmemiş; genellikle `void` (geri dönüş değeri yok) olarak kullanılır.
+**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir. Bilinmiyor.
 
 ### ArrowRight
 **Ne yapar**: ArrowRight, sağa yön gösteren bir ikon bileşenidir ve UI içinde ok işareti olarak kullanılabilir. Varsayılan olarak 16 piksel boyutunda render edilir, ancak `size` parametresi ile farklı boyutlar ayarlanabilir. Bu bileşen, ikonun stil ve renk özelliklerini dışarıdan gelen props ile özelleştirmeye olanak tanır.  
@@ -80,15 +78,20 @@ Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon g
 ## İTHALATLAR (IMPORTS)
 - import: ../components/HVACIcons::WhatsAppIcon
 - import: ../components/Seo::Seo
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../hooks/useScrollAnimation::scrollAnimationClasses
 - import: ../hooks/useScrollAnimation::useScrollAnimation
 - import: ../i18n/I18nProvider::useI18n
+- import: ../lib/errorReporter::reportError
+- import: ../lib/services/contactMessageService::submitContactMessage
+- import: ../lib/supabase/client::supabaseBrowserClient
 - import: ../utils/whatsapp::getSupportLink
 - import: lucide-react::CheckCircle
 - import: lucide-react::Clock
 - import: lucide-react::Mail
 - import: lucide-react::MapPin
 - import: lucide-react::Phone
+- import: next/link::Link
 - import: react::React
 - import: react::useState
 
@@ -96,31 +99,74 @@ Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon g
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: ContactPage.tsx::ContactPage
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: src/views/ContactPage.tsx::ContactPage
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
-  - `formSubmitted` — form gönderim durumunu tutan state değişkeni
-  - `setFormSubmitted` — formSubmitted state'ini güncelleyen setter fonksiyonu
-  - `whatsappLink` — getSupportLink() ile oluşturulan WhatsApp destek bağlantısı
-  - `heroBadgeRef` — Hero badge bölümü için ref nesnesi
-  - `heroBadgeVisible` — Hero badge bölümünün görünür olup olmadığını belirten boolean
-  - `contactGridRef` — İletişim kartları grid'i için ref nesnesi
-  - `contactGridVisible` — İletişim kartlarının görünür olup olmadığını belirten boolean
-  - `formSuccessRef` — Form başarı mesajı bölümü için ref nesnesi
-  - `formSuccessVisible` — Form başarı mesajının görünür olup olmadığını belirten boolean
-  - `contactCards` — İletişim bilgilerini tutan dizi (Phone, Mail, MapPin ikonları ile)
-- **Dönüş**: React.JSX.Element (sayfa yapısı)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; sayfa metinlerini yerelleştirmek için kullanılır
+  - `lang` — `useI18n()` hook'undan dönen geçerli dil kodu; `getSupportLink` çağrısına iletilir
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen yönlendirme nesnesi; KVKK linkinde `Routes.legal.kvkk()` olarak erişilir
+  - `formSubmitted` — `useState(false)` ile oluşturulan boolean durum; form başarıyla gönderildiğinde `true` olur ve başarı ekranını gösterir
+  - `setFormSubmitted` — `formSubmitted` durumunu güncelleyen setter fonksiyonu
+  - `name` — `useState('')` ile oluşturulan string; formdaki isim input alanının kontrol edilen değeri
+  - `setName` — `name` durumunu güncelleyen setter fonksiyonu
+  - `email` — `useState('')` ile oluşturulan string; formdaki e-posta input alanının kontrol edilen değeri
+  - `setEmail` — `email` durumunu güncelleyen setter fonksiyonu
+  - `subject` — `useState('')` ile oluşturulan string; formdaki konu input alanının kontrol edilen değeri
+  - `setSubject` — `subject` durumunu güncelleyen setter fonksiyonu
+  - `message` — `useState('')` ile oluşturulan string; formdaki mesaj textarea alanının kontrol edilen değeri
+  - `setMessage` — `message` durumunu güncelleyen setter fonksiyonu
+  - `consent` — `useState(false)` ile oluşturulan boolean; KVKK rıza kutusunun işaretlenip işaretlenmediğini tutar
+  - `setConsent` — `consent` durumunu güncelleyen setter fonksiyonu
+  - `submitting` — `useState(false)` ile oluşturulan boolean; form gönderilirken `true` olur, butonu devre dışı bırakır
+  - `setSubmitting` — `submitting` durumunu güncelleyen setter fonksiyonu
+  - `formError` — `useState('')` ile oluşturulan string; form hata mesajını tutar, boşsa hata gösterilmez
+  - `setFormError` — `formError` durumunu güncelleyen setter fonksiyonu
+  - `whatsappLink` — `getSupportLink(t('common.whatsapp.supportMessageDefault'), lang)` çağrısından dönen WhatsApp destek URL'si
+  - `heroBadgeRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })` hook'undan dönen DOM referansı; hero rozet elementine bağlanır
+  - `heroBadgeVisible` — aynı hook'tan dönen boolean; hero rozeti görünür olduğunda `true` olur, animasyon sınıfını tetikler
+  - `contactGridRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })` hook'undan dönen DOM referansı; iletişim kartları ızgarasına bağlanır
+  - `contactGridVisible` — aynı hook'tan dönen boolean; ızgara görünür olduğunda `true` olur
+  - `formSuccessRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })` hook'undan dönen DOM referansı; başarı ekranına bağlanır
+  - `formSuccessVisible` — aynı hook'tan dönen boolean; başarı ekranı görünür olduğunda `true` olur
+  - `contactCards` — üç elemanlı dizi; her eleman `icon`, `title`, `value`, `href`, `label` alanlarından oluşur (telefon, e-posta, ofis adresi kartları)
+  - `handleSubmit` — içe tanımlı async fonksiyon; form gönderimini yönetir, `submitContactMessage` servisini çağırır
+- **Dönüş**: JSX — tam sayfa iletişim bileşeni (hero, iletişim kartları ızgarası, WhatsApp CTA, form veya başarı ekranı)
 
-### [N2_NASIL] AST Pointer: ContactPage.tsx::handleSubmit
-- **params**: (e: React.FormEvent)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (formSubmitted state'ini true yapar)
+### [N2_NASIL] AST Pointer: src/views/ContactPage.tsx::handleSubmit
+- **params**: `e` — `React.FormEvent` türünde form olayı nesnesi; `e.preventDefault()` ile varsayılan form davranışı engellenir
+- **ic_degiskenler**:
+  - `consent` — üst kapsamdan (ContactPage) gelen boolean; KVKK rıza kutusunun durumunu temsil eder, `false` ise fonksiyon erken döner
+  - `t` — üst kapsamdan gelen çeviri fonksiyonu; hata ve rıza uyarı mesajlarını almak için kullanılır
+  - `setFormError` — üst kapsamdan gelen setter fonksiyonu; rıza eksikse veya gönderim başarısızsa hata mesajını ayarlar
+  - `setSubmitting` — üst kapsamdan gelen setter fonksiyonu; gönderim başlarken `true`, bittiğinde `false` yapılır
+  - `submitContactMessage` — import edilen servis fonksiyonu; `supabaseBrowserClient` ve form verileriyle çağrılır
+  - `supabaseBrowserClient` — üst kapsamdan gelen Supabase istemci nesnesi; `submitContactMessage`'e birinci argüman olarak iletilir
+  - `name` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `message` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `email` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `subject` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `setFormSubmitted` — üst kapsamdan gelen setter fonksiyonu; başarılı gönderim sonrası `true` yapılır
+  - `err` — `catch` bloğunda yakalanan hata nesnesi; `reportError` fonksiyonuna iletilir
+  - `reportError` — import edilen hata raporlama fonksiyonu; `err` ve `{ source: 'ContactPage.handleSubmit'}` bağlamıyla çağrılır
+- **Dönüş**: yok (void) — yan etki olarak form durumunu günceller, Supabase'e veri yazar
 
-### [N3_NASIL] AST Pointer: ContactPage.tsx::ArrowRight
-- **params**: ({ size = 16 })
-- **ic_degiskenler**: (yok)
-- **Dönüş**: React.JSX.Element (SVG ok ikonu)
+### [N3_NASIL] AST Pointer: src/views/ContactPage.tsx::ArrowRight
+- **params**: `size` — number, varsayılan değeri `16`; SVG ikonunun genişlik ve yükseklik değerini belirler
+- **ic_degiskenler**:
+  - `size` — SVG elementinin `width` ve `height` attribute'larına atanır
+- **Dönüş**: JSX — ok ikonu SVG elementi (`<svg>` içinde `<path d="M5 12h14M12 5l7 7-7 7" />`)
+
+### [N4_NASIL] AST Pointer: src/views/ContactPage.tsx::contactCards.map callback
+- **params**: `card` — `contactCards` dizisinden gelen nesne (`icon`, `title`, `value`, `href`, `label` alanları), `i` — number, dizi indeksi
+- **ic_degiskenler**:
+  - `card.href` — `<a>` elementinin `href` attribute'una atanır
+  - `card.icon` — bileşen referansı; `<card.icon size={24} strokeWidth={1.5} />` olarak render edilir
+  - `card.title` — kart başlık metni; `<h3>` içinde gösterilir
+  - `card.value` — kart değer metni; telefon numarası, e-posta veya adres
+  - `card.label` — kart etiket metni; ok ikonuyla birlikte gösterilir
+  - `contactGridVisible` — üst kapsamdan gelen boolean; `scrollAnimationClasses.fadeUp(contactGridVisible)` ile CSS sınıfını belirler
+  - `i` — `scrollAnimationClasses.staggerChild(i)` ile animasyon gecikmesi hesaplanır; ayrıca `key` prop'u olarak kullanılır
+- **Dönüş**: JSX — tekil iletişim kartı `<a>` elementi (ikon, başlık, değer, etiket ve ok ikonu içerir)
 
 ---
 
@@ -161,7 +207,7 @@ graph TD
 - `rounded-hvac-2xl`, `rounded-hvac-3xl`, `tracking-hvac-loose`, `tracking-hvac-wide`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-slate-100`, `group-hover:bg-cyan-500`, `group-hover:text-white`, `hover:bg-cyan-400`
-- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `h-12`, `h-2`, `h-20`, `h-500px`, `inline-flex`
-- **Varyant/Responsive:** `active:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `active:scale-95`, `active:scale-98`, `animate-pulse`, `blur-120`, `border`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-cyan-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `group`, `hover:underline`
+- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-red-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-red-200`, `border-slate-100`, `border-slate-300`
+- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `h-12`, `h-2`, `h-20`, `h-4`, `h-500px`
+- **Varyant/Responsive:** `active:`, `disabled:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `active:scale-95`, `active:scale-98`, `animate-pulse`, `blur-120`, `border`, `cursor-pointer`, `disabled:opacity-60`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-cyan-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`
