@@ -75,16 +75,6 @@
             "statusMessage": "bash-write-guard"
           }
         ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/bash-write-guard.cjs",
-            "statusMessage": "bash-write-guard"
-          }
-        ]
       }
     ],
     "SessionStart": [
