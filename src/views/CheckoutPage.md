@@ -11,7 +11,7 @@ entity_hashes:
   func:onNextStep: 3e6b3d1f38e13467
   overview: c81a7524fbfb8b66
   style_tokens: 71bc3e57c5f9a6e4
-generated_at: 2026-06-19T09:04:41Z
+generated_at: 2026-08-26T07:14:40Z
 ---
 
 ## Genel Bakış
