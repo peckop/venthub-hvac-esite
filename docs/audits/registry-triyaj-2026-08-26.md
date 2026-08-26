@@ -17,6 +17,11 @@
   yeniden ölçülmeden güvenilmez. Düzeltilen: T003-VH, T069-VH (görsel kapsamı 374→35 ürün).
   Şüpheli desen taşıyan satırlar (örn. T036-VH %25 ilerleme, T002-VH "tarama yok") kendi
   şeritlerince ölçülecek; düzeltmeler bu günlüğe eklenir.
+- **08-26 akşamı — tarama sonuçları:** T002-VH DOĞRU çıktı (görsel regresyon kapısı gerçekten yok).
+  T036-VH ŞİŞİKTİ (yüzde alanı inşa ilerlemesi sanılmış; kapsam %100, kalan iş kalite — satır
+  düzeltildi). T104-VH hükmü YANLIŞTI (kanıt yalnız PR atfıydı; istemci ayağı hiç inmemiş — satır
+  düzeltildi, ardıl REC-80). İki yeni ders: **birimsiz yüzde yanıltır** (sayının yanına "neyin
+  yüzdesi" yazılır) ve **iş bitti ≠ iş erişilebilir** (kanıt davranıştan, atıftan değil).
 
 ## 🔧 YAPILMALI — hâlâ değerli, Linear'a taşınacak (40)
 
@@ -32,7 +37,7 @@
 | 8 | T012-VH | Güvenlik sertleştirme (auth/webhook/tenant/rol) | CHANGELOG'da RBAC+audit+HMAC webhook kanıtı var ama %45 aktif, tamamlanmamış. |
 | 9 | T018-OR | Orion yazım raporu sayaç kırılımı hedefle tutmuyor | 08-25 tarihli, ölçümle desteklenmiş güncel aktif görev; kabul ölçütü net, sayaç doğruluğu değerli |
 | 10 | T019-OR | Orion depo geneli zaman aşımsız dış çağrı taraması | Bugün açılan güncel iş; orion'da 145 subprocess.run çağrısından çoğu genel sarmalayıcısız, konformans testi yok |
-| 11 | T036-VH | 3D görsel kalite fazı (ışık rig, framing, normalizasyon) | SceneLightingRig.tsx var ama status=open, progress=25; görsel onay/framing işi bitmemiş. |
+| 11 | T036-VH | 3D görsel kalite fazı (ışık rig, framing, normalizasyon) | ⚠ DÜZELTİLDİ 08-26 akşamı (ÜRÜN ölçtü): "progress=25" İNŞA yüzdesi DEĞİL. 3D ürün başına GLB değil, kategori `model_type` ile parametrik model; canlı ölçüm: 25/31 kategori atanmış, 3D açılan aktif ürün 374/374 = **%100 kapsam**. Kalan iş KALİTE/cila (ışık rig, framing). Kalem "3D kapsama" değil "3D sunum kalitesi" olarak okunmalı. |
 | 12 | T038-VH | registry-sync GitHub merge'lerinde çalışmıyor | .github/workflows/ listesinde registry-sync Action yok; post-merge kancası hâlâ yalnız yerel |
 | 13 | T039-VH | Supabase leaked password protection kapalı | Dashboard-only ayar, repodan doğrulanamaz; güvenlik değeri yüksek, Recep'e atanmış basit iş |
 | 14 | T045-VH | Ödeme doğrulama fail-closed — 2 açık ayak | order-validate için sentetik yoklama/health cron .github/workflows'ta yok; docs/standards'ta karar hâlâ yazılı değil |
@@ -119,7 +124,7 @@
 | 26 | T099-VH | Sepete yanlış ürün düşüyor | fix(pdp): T099 yüzey (#670) + INV-CATALOG-1 aile/içerik bütünlüğü kapısı (#666) ile kapatılmış. |
 | 27 | T100-VH | Prod secret bayatlık sınıfı — pozitif öz-denetim | config_audit.ts başlığında doğrudan "T100-VH · 2026-08-19" referansı; ok/eksik/tutarsız hüküm sistemi kurulu. |
 | 28 | T101-VH | View yetki standardizasyonu (REVOKE ALL+GRANT) | docs/standards/db-grant-hygiene-standard.md + 20260819103000_view_grant_hygiene.sql deseni standartlaştırmış |
-| 29 | T104-VH | LeadModal sahte-başarı | feat(form): T104-VH (#680) contact_messages+submit_contact_message RPC ile veri artık gerçekten kaydediliyor. |
+| 29 | T104-VH | LeadModal sahte-başarı | ⚠ HÜKÜM DÜZELTİLDİ 08-26 akşamı (EDGE davranışla ölçtü): "yapılmış" hükmü YALNIZ PR/merge atfına dayanıyordu. Gerçek: RPC + yetkiler prod'da VAR ama İSTEMCİ HİÇ BAĞLANMAMIŞ — ContactPage.tsx başarı ekranı gösterip hiçbir şey yazmıyor; contact_messages toplam 0 satır. Sınıf: **iş bitti ≠ iş erişilebilir**. KVKK ağırlığı var (girilen kişisel veri kaydedilmiyor, kullanıcı "gönderildi" görüyor). Ardıl: Linear REC-80. |
 | 30 | T109-VH | commerce-domain-map cetveli | docs/standards/commerce-domain-map-standard.md repoda mevcut. |
 | 31 | T110-VH | commerce-domain-map cetveli | docs/standards/commerce-domain-map-standard.md var, quote-standard.md v2 §5'te referans alınıyor. |
 | 32 | T113-VH | Peer-dependency ayrışmaları (react-day-picker/eslint) | peer-dependency-integrity.test.ts: MUAFİYETLER listesi boş, her iki ihlal de v9/hizalama ile çözülmüş yazılı |
