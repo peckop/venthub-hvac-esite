@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutOrchestrator.ts
-skeleton_hash: 72f54dc5d3bb3c5f
+skeleton_hash: 72543d19f0a3b8cf
 entity_hashes:
-  func:useCheckoutOrchestrator: 6b4ccd36fef055f6
-  overview: ac952b0f8fb06046
-generated_at: 2026-06-19T20:47:53Z
+  func:useCheckoutOrchestrator: 27abaa56edfb49c9
+  overview: d20540bc22d68feb
+generated_at: 2026-08-24T12:45:18Z
 ---
 
 ## Genel Bakış
@@ -24,27 +24,34 @@ Satın alma işleminin tüm adımlarını — bilgi toplama, ödeme doğrulama v
 
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Neden:** Verilen bilgilerde fonksiyon gövdesi (implementation body) bulunmamaktadır. Mimari aksiyomlar **sadece fonksiyon gövdesinden** üretilebilir; docstring'lerden, genel bakış açıklamalarından veya değişken isimlerinden bilgi çıkarılamaz.
+**Neden:** Fonksiyon gövdesi verilmediğinden, `useCheckoutOrchestrator` fonksiyonunun çalışması için gerekli koşullar kaynaktan çıkarılamamaktadır. Yalnızca fonksiyon imzası (`def useCheckoutOrchestrator()`) mevcut olup parametre, sabit veya gövde bilgisi bulunmamaktadır. Aksiyomlar yalnızca fonksiyon gövdesinden üretilebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### useCheckoutOrchestrator
-**Ne yapar**: VentHub HVAC projesinin satın alma (checkout) akışını tek merkezden koordine eden React özel hook'udur. Tüm ödeme ve teslimat sürecindeki adım yönetimi, durum takibi, hata yönetimi ve ilgili servis entegrasyonlarının sorumluluğunu üstlenir, satın alma sürecinin farklı bileşenleri arasında tutarlı bir iletişim ve veri akışı sağlar. Kullanıcıların sepet içeriğiyle başlayıp siparişin başarıyla tamamlanmasına kadar geçen tüm adımlarda merkezi bir yönetim noktası olarak çalışır, proje içindeki tekrar eden kod kullanımını ortadan kaldırır.
-**Nasıl yapar**: Proje kaynak kodlarında belirtilen `C:\Users\alize\venthub-hvac\src\hooks\` dizininde tanımlanan React özel hook'u olarak çalışır. İçerisinde sepet yönetimi, kullanıcı oturum servisi, ödeme ağ geçidi entegrasyonu ve adres doğrulama servisi gibi proje içindeki temel servisleri entegre ederek süreci adım adım ilerletir. Her adımda ilgili bilgilerin geçerliliğini (sepet ürünlerinin stokta olup olmadığı, teslimat adresinin geçerli olması, ödeme yönteminin sorunsuz çalışması gibi) kontrol ederek sonraki adıma geçiş izni verir, oluşan tüm hataları merkezi olarak kaydederek kullanıcıya uygun geri bildirimlerin gösterilmesini tetikler.
+**Ne yapar**: Çok adımlı ödeme (checkout) sürecini orkestre eden bir React hook'udur. State yönetimini, doğrulama mantığını ve yasal onay kontrollerini tek bir merkezde toplayarak sürecin koordinasyonunu sağlar. Aktif adımı, adres seçimini ve fatura profillerini yönetir; ödeme adımına geçmeden önce doğrulama yapılmasını garanti altına alır.
+
+**Nasıl yapar**: Checkout sürecinin tüm bileşenlerini tek bir hook altında birleştirerek merkezi bir yönetim sağlar. Çok adımlı yapıda hangi adımın aktif olduğunu takip eder, adres ve fatura profilleriyle ilgili state'i yönetir. Kullanıcının bir sonraki adıma geçebilmesi için gerekli doğrulama kontrollerini çalıştırır ve yasal onay (legal consent) kontrollerini gerçekleştirir. Bu sayede bileşenler arası state senkronizasyonu ve geçiş mantığı tek noktadan kontrol edilir.
+
 **Parametreler**:
-- Bu hook herhangi bir giriş parametresi almamaktadır, doğrudan import edildiği yerde çağrılarak kullanılır.
-**Dönüş**: Resmi olarak tanımlanmış bir dönüş tipi bulunmamaktadır. İçerisinde yönettiği tüm checkout sürecine ait durum değişkenleri, adım geçiş işleyicileri, hata yönetimi fonksiyonları ve servis entegrasyon metotlarını hook'u kullanan tüm bileşenlere erişime sunar, böylece checkout akışına dahil olan her alt bileşen bu merkezi yönetim araçlarını sorunsuz bir şekilde kullanabilir.
+- Bu fonksiyon parametre almaz.
+
+**Dönüş**: Checkout form state'lerini, adım göstergelerini (step indicators), adres ve fatura profillerini (address/invoice profiles) ile doğrulama handler'larını (validation handlers) içeren bir obje döndürür. Detaylı dönüş tipi belirtilmemiştir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../i18n/I18nProvider::useI18n
+- import: ../i18n/format::formatCurrency
 - import: ../lib/services/invoice.service::listInvoiceProfiles
 - import: ./useAuth::useAuth
+- import: ./useCartHook::useCart
+- import: @/config/legal::legalConfig
 - import: @/lib/services/address.service::listAddresses
 - import: @/lib/supabase/client::supabaseBrowserClient
+- import: @/lib/validation/invoiceIdentity::checkInvoiceIdentity
 - import: @/types/ui-models::type { InvoiceProfile,UserAddress }
 - import: react::useCallback
 - import: react::useEffect
@@ -67,116 +74,127 @@ type CheckoutOrchestrator = ReturnType<typeof useCheckoutOrchestrator>
 ### [N1_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `user` — useAuth() hook'undan gelen mevcut kullanıcı nesnesi
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
-  - `step` — Checkout sürecindeki mevcut adım (1,2,3,4)
-  - `setStep` — step state'ini güncellemek için setter fonksiyonu
-  - `customerInfo` — Müşteri bilgilerini tutan CheckoutCustomerInfo nesnesi
-  - `setCustomerInfo` — customerInfo state'ini güncellemek için setter fonksiyonu
-  - `shippingAddress` — Kargo adresi bilgilerini tutan CheckoutAddressInfo nesnesi
-  - `setShippingAddress` — shippingAddress state'ini güncellemek için setter fonksiyonu
-  - `billingAddress` — Fatura adresi bilgilerini tutan CheckoutAddressInfo nesnesi
-  - `setBillingAddress` — billingAddress state'ini güncellemek için setter fonksiyonu
-  - `invoiceType` — Fatura türü ('individual' veya 'corporate')
-  - `setInvoiceType` — invoiceType state'ini güncellemek için setter fonksiyonu
-  - `invoiceInfo` — Fatura detaylarını tutan CheckoutInvoiceInfo nesnesi
-  - `setInvoiceInfo` — invoiceInfo state'ini güncellemek için setter fonksiyonu
-  - `legalConsents` — Yasal onayları tutan CheckoutLegalConsents nesnesi
-  - `setLegalConsents` — legalConsents state'ini güncellemek için setter fonksiyonu
-  - `sameAsShipping` — Fatura adresinin kargo adresiyle aynı olup olmadığını belirten boolean
-  - `setSameAsShipping` — sameAsShipping state'ini güncellemek için setter fonksiyonu
-  - `shippingMethod` — Kargo yöntemi ('standard' veya 'express')
-  - `setShippingMethod` — shippingMethod state'ini güncellemek için setter fonksiyonu
-  - `showHelp` — Yardım panelinin görünürlüğünü tutan boolean
-  - `setShowHelp` — showHelp state'ini güncellemek için setter fonksiyonu
-  - `savedAddresses` — Kayıtlı adreslerin listesini tutan UserAddress[]
-  - `setSavedAddresses` — savedAddresses state'ini güncellemek için setter fonksiyonu
-  - `showAddressModal` — Adres seçim modalının görünürlüğünü tutan boolean
-  - `setShowAddressModal` — showAddressModal state'ini güncellemek için setter fonksiyonu
-  - `addressPickTarget` — Hangi adresin seçileceğini tutan ('shipping' veya 'billing')
-  - `setAddressPickTarget` — addressPickTarget state'ini güncellemek için setter fonksiyonu
-  - `savedInvoiceProfiles` — Kayıtlı fatura profillerinin listesini tutan InvoiceProfile[]
-  - `setSavedInvoiceProfiles` — savedInvoiceProfiles state'ini güncellemek için setter fonksiyonu
-  - `showInvoiceModal` — Fatura profili seçim modalının görünürlüğünü tutan boolean
-  - `setShowInvoiceModal` — showInvoiceModal state'ini güncellemek için setter fonksiyonu
-- **Dönüş**: {
-    step, setStep, customerInfo, setCustomerInfo, shippingAddress, setShippingAddress,
-    billingAddress, setBillingAddress, invoiceType, setInvoiceType, invoiceInfo, setInvoiceInfo,
-    legalConsents, setLegalConsents, sameAsShipping, setSameAsShipping, shippingMethod,
-    setShippingMethod, showHelp, setShowHelp, savedAddresses, setSavedAddresses,
-    showAddressModal, setShowAddressModal, addressPickTarget, setAddressPickTarget,
-    savedInvoiceProfiles, setSavedInvoiceProfiles, showInvoiceModal, setShowInvoiceModal,
-    handleSelectInvoiceProfile, validateCustomerInfo, validateAddress, handleNextStep
-  }
+  - `user` — `useAuth()` hook'undan dönen kullanıcı nesnesi; useEffect bağımlılıklarında kullanıcı oturumunu kontrol etmek için kullanılır
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; hata ve başarı mesajlarını yerelleştirmek için kullanılır
+  - `lang` — `useI18n()` hook'undan dönen dil kodu; `formatCurrency` çağrısında para birimi biçimlendirmesinde kullanılır
+  - `getCartTotal` — `useCart()` hook'undan dönen fonksiyon; fatura kimliği doğrulamasında sepet toplamını okumak için kullanılır
+  - `step` — useState ile tutulan mevcut adım numarası (1-4 arası); ödeme akışının hangi aşamasında olunduğunu belirtir
+  - `setStep` — step state'ini güncelleyen setter fonksiyonu
+  - `customerInfo` — useState ile tutulan müşteri bilgileri nesnesi (name, firstName, lastName, email, phone, identityNumber alanları)
+  - `setCustomerInfo` — customerInfo state'ini güncelleyen setter fonksiyonu
+  - `shippingAddress` — useState ile tutulan teslimat adresi nesnesi (full_name, phone, full_address, fullAddress, city, district, postalCode, postal_code alanları)
+  - `setShippingAddress` — shippingAddress state'ini güncelleyen setter fonksiyonu
+  - `billingAddress` — useState ile tutulan fatura adresi nesnesi (shippingAddress ile aynı alan yapısına sahip)
+  - `setBillingAddress` — billingAddress state'ini güncelleyen setter fonksiyonu
+  - `invoiceType` — useState ile tutulan fatura tipi; `'individual'` veya `'corporate'` değerlerinden birini alır
+  - `setInvoiceType` — invoiceType state'ini güncelleyen setter fonksiyonu
+  - `invoiceInfo` — useState ile tutulan fatura bilgileri nesnesi (type, tckn, companyName, taxOffice, taxNumber alanları)
+  - `setInvoiceInfo` — invoiceInfo state'ini güncelleyen setter fonksiyonu
+  - `legalConsents` — useState ile tutulan yasal onay durumları nesnesi (kvkk, sales_agreement, privacy_policy, distanceSales, preInfo, orderConfirm, marketing alanları)
+  - `setLegalConsents` — legalConsents state'ini güncelleyen setter fonksiyonu
+  - `sameAsShipping` — useState ile tutulan boolean; fatura adresinin teslimat adresiyle aynı olup olmadığını belirtir
+  - `setSameAsShipping` — sameAsShipping state'ini güncelleyen setter fonksiyonu
+  - `shippingMethod` — useState ile tutulan kargo yöntemi; `'standard'` veya `'express'` değerlerinden birini alır
+  - `setShippingMethod` — shippingMethod state'ini güncelleyen setter fonksiyonu
+  - `showHelp` — useState ile tutulan boolean; yardım panelinin görünürlüğünü kontrol eder
+  - `setShowHelp` — showHelp state'ini güncelleyen setter fonksiyonu
+  - `savedAddresses` — useState ile tutulan kayıtlı adresler dizisi (UserAddress tipinde)
+  - `setSavedAddresses` — savedAddresses state'ini güncelleyen setter fonksiyonu
+  - `showAddressModal` — useState ile tutulan boolean; adres seçme modalının görünürlüğünü kontrol eder
+  - `setShowAddressModal` — showAddressModal state'ini güncelleyen setter fonksiyonu
+  - `addressPickTarget` — useState ile tutulan hedef; adres seçiminde `'shipping'` mi yoksa `'billing'` mi hedefleneceğini belirtir
+  - `setAddressPickTarget` — addressPickTarget state'ini güncelleyen setter fonksiyonu
+  - `savedInvoiceProfiles` — useState ile tutulan kayıtlı fatura profilleri dizisi (InvoiceProfile tipinde)
+  - `setSavedInvoiceProfiles` — savedInvoiceProfiles state'ini güncelleyen setter fonksiyonu
+  - `showInvoiceModal` — useState ile tutulan boolean; fatura profili seçme modalının görünürlüğünü kontrol eder
+  - `setShowInvoiceModal` — showInvoiceModal state'ini güncelleyen setter fonksiyonu
+  - `handleSelectInvoiceProfile` — useCallback ile sarılmış fonksiyon; seçilen fatura profilini state'e yazar ve modalı kapatır
+  - `validateCustomerInfo` — useCallback ile sarılmış fonksiyon; müşteri bilgilerini doğrular, eksikse hata toast'u gösterir
+  - `validateAddress` — useCallback ile sarılmış fonksiyon; adres bilgilerini doğrular, eksikse hata toast'u gösterir
+  - `validateInvoiceInfo` — useCallback ile sarılmış fonksiyon; fatura kimliğini `checkInvoiceIdentity` ile doğrular
+  - `validateLegalConsents` — useCallback ile sarılmış fonksiyon; zorunlu yasal onayların işaretlenip işaretlenmediğini kontrol eder
+  - `handleNextStep` — useCallback ile sarılmış async fonksiyon; adım geçişlerini yönetir ve ödeme başlatma fonksiyonunu çağırır
+- **Dönüş**: object — tüm state'ler, setter'lar ve handler fonksiyonlarını içeren nesne
 
-### [N2_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator::useEffect::1
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useEffect (user dependency)
+- **params**: (parametre yok — useEffect callback)
 - **ic_degiskenler**:
-  - `user` — useAuth() hook'undan gelen mevcut kullanıcı nesnesi (closure'dan)
-  - `fullName` — Kullanıcının tam adı (user.user_metadata.full_name)
-  - `parts` — Tam adın boşluk ile bölünmüş hali (dizi)
+  - `user` — dış kapsamdan erişilen kullanıcı nesnesi; varlığında müşteri bilgilerini ön doldurma yapılır
+  - `fullName` — `user.user_metadata?.full_name` değerinden okunan tam ad; boşsa `''` atanır
+  - `parts` — fullName'ın boşlukla split edilmesiyle oluşan dizi; ad ve soyadı ayırmak için kullanılır
 - **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator::useEffect::2
+### [N3_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::loadInvoiceProfiles
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `user` — useAuth() hook'undan gelen mevcut kullanıcı nesnesi (closure'dan)
-  - `loadInvoiceProfiles` — Fatura profillerini yükleyen async fonksiyon
+  - `user` — dış kapsamdan erişilen kullanıcı nesnesi; yoksa fonksiyon erken döner
+  - `rows` — `listInvoiceProfiles(supabaseBrowserClient)` çağrısından dönen fatura profilleri dizisi
+  - `defProfile` — `rows` içinde `is_default` true olan profil; bulunamazsa `rows[0]` kullanılır
+  - `pType` — `defProfile.profile_type` değerine göre `'corporate'` veya `'individual'` olarak belirlenen fatura tipi
+- **Dönüş**: yok (async fonksiyon, Promise<void>)
+
+### [N4_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::handleSelectInvoiceProfile
+- **params**:
+  - `p` — InvoiceProfile tipinde; seçilen fatura profili nesnesi
+- **ic_degiskenler**:
+  - `pType` — `p.profile_type` değerine göre `'corporate'` veya `'individual'` olarak belirlenen fatura tipi
 - **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator::useEffect::2::loadInvoiceProfiles
+### [N5_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::loadAddresses
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `user` — useAuth() hook'undan gelen mevcut kullanıcı nesnesi (closure'dan)
-  - `rows` — listInvoiceProfiles(supabaseBrowserClient) çağrısından dönen InvoiceProfile dizisi
-  - `defProfile` — Varsayılan veya ilk fatura profili (rows.find ile bulunan)
-  - `pType` — Profil türünü temsil eden string ('individual' veya 'corporate')
-- **Dönüş**: Promise<void> (async fonksiyon)
+  - `user` — dış kapsamdan erişilen kullanıcı nesnesi; yoksa fonksiyon erken döner
+  - `rows` — `listAddresses(supabaseBrowserClient)` çağrısından dönen adresler dizisi
+  - `defShip` — `rows` içinde `is_default_shipping` true olan adres; bulunamazsa undefined kalır
+  - `addr` — `defShip` adresinden oluşturulan CheckoutAddressInfo nesnesi (full_address, city, district, postalCode, full_name, phone alanları)
+- **Dönüş**: yok (async fonksiyon, Promise<void>)
 
-### [N5_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator::handleSelectInvoiceProfile
-- **params**: (p: InvoiceProfile)
-- **ic_degiskenler**:
-  - `pType` — Seçilen profilin türünü temsil eden string ('individual' veya 'corporate')
-- **Dönüş**: void
-
-### [N6_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator::useEffect::3
+### [N6_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::validateCustomerInfo
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `user` — useAuth() hook'undan gelen mevcut kullanıcı nesnesi (closure'dan)
-  - `loadAddresses` — Adresleri yükleyen async fonksiyon
-  - `sameAsShipping` — Fatura adresinin kargo adresiyle aynı olup olmadığını belirten boolean (closure'dan)
-- **Dönüş**: yok
+  - `customerInfo` — dış kapsamdan erişilen müşteri bilgileri nesnesi; name, email, phone alanları doğrulanır
+  - `t` — dış kapsamdan erişilen çeviri fonksiyonu; hata mesajlarını yerelleştirmek için kullanılır
+- **Dönüş**: boolean — doğrulama başarılıysa `true`, aksi halde `false`
 
-### [N7_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator::useEffect::3::loadAddresses
+### [N7_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::validateAddress
+- **params**:
+  - `address` — CheckoutAddressInfo tipinde; doğrulanacak adres nesnesi
+- **ic_degiskenler**:
+  - `full` — `address.full_address` veya `address.fullAddress` değerinden okunan ve trim edilen tam adres stringi; boşsa hata gösterilir
+  - `t` — dış kapsamdan erişilen çeviri fonksiyonu; hata mesajlarını yerelleştirmek için kullanılır
+- **Dönüş**: boolean — doğrulama başarılıysa `true`, aksi halde `false`
+
+### [N8_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::validateInvoiceInfo
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `user` — useAuth() hook'undan gelen mevcut kullanıcı nesnesi (closure'dan)
-  - `rows` — listAddresses(supabaseBrowserClient) çağrısından dönen UserAddress dizisi
-  - `defShip` — Varsayılan kargo adresi (rows.find ile bulunan)
-  - `addr` — CheckoutAddressInfo formatında adres nesnesi (defShip'den dönüştürülen)
-  - `sameAsShipping` — Fatura adresinin kargo adresiyle aynı olup olmadığını belirten boolean (closure'dan)
-- **Dönüş**: Promise<void> (async fonksiyon)
+  - `invoiceType` — dış kapsamdan erişilen fatura tipi; `'individual'` veya `'corporate'`
+  - `invoiceInfo` — dış kapsamdan erişilen fatura bilgileri nesnesi; tckn, t_c_id, companyName, company_name, vkn, taxNumber, tax_number, taxOffice, tax_office alanlarından okuma yapılır
+  - `getCartTotal` — dış kapsamdan erişilen fonksiyon; sepet toplamını döndürür
+  - `t` — dış kapsamdan erişilen çeviri fonksiyonu; hata mesajlarını yerelleştirmek için kullanılır
+  - `lang` — dış kapsamdan erişilen dil kodu; `formatCurrency` çağrısında kullanılır
+  - `sorun` — `checkInvoiceIdentity` fonksiyonundan dönen hata kodu stringi; yoksa doğrulama başarılıdır
+- **Dönüş**: boolean — doğrulama başarılıysa `true`, aksi halde `false`
 
-### [N8_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator::validateCustomerInfo
+### [N9_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::validateLegalConsents
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yerel değişken yok, closure'dan müşteri bilgilerini kullanır)
-- **Dönüş**: boolean
-
-### [N9_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator::validateAddress
-- **params**: (address: CheckoutAddressInfo)
 - **ic_degiskenler**:
-  - `full` — Tam adres satırı (address.full_address veya address.fullAddress'in trim edilmiş hali)
-- **Dönüş**: boolean
+  - `required` — zorunlu onay anahtarlarını içeren dizi: `['kvkk', 'distanceSales', 'preInfo', 'orderConfirm']`
+  - `legalConsents` — dış kapsamdan erişilen yasal onay durumları nesnesi; required dizisindeki anahtarlar kontrol edilir
+  - `t` — dış kapsamdan erişilen çeviri fonksiyonu; hata mesajını yerelleştirmek için kullanılır
+- **Dönüş**: boolean — tüm zorunlu onaylar işaretliyse `true`, aksi halde `false`
 
-### [N10_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::useCheckoutOrchestrator::handleNextStep
-- **params**: (initiatePayment: () => Promise<boolean | undefined>)
+### [N10_NASIL] AST Pointer: src/hooks/useCheckoutOrchestrator.ts::handleNextStep
+- **params**:
+  - `initiatePayment` — `() => Promise<boolean | undefined>` tipinde; ödeme başlatma fonksiyonu
 - **ic_degiskenler**:
-  - `step` — Checkout sürecindeki mevcut adım (closure'dan)
-  - `validateCustomerInfo` — Müşteri bilgilerini doğrulayan fonksiyon (closure'dan)
-  - `shippingAddress` — Kargo adresi bilgileri (closure'dan)
-  - `validateAddress` — Adres doğrulama fonksiyonu (closure'dan)
-  - `success` — Ödeme başlatma sonucu (step 3'te initiatePayment() çağrısından dönen değer)
-- **Dönüş**: Promise<void> (async fonksiyon)
+  - `step` — dış kapsamdan erişilen mevcut adım numarası; hangi doğrulamaların yapılacağını belirler
+  - `shippingAddress` — dış kapsamdan erişilen teslimat adresi nesnesi; adım 2'de doğrulanır
+  - `validateCustomerInfo` — dış kapsamdan erişilen fonksiyon; adım 1'de müşteri bilgilerini doğrular
+  - `validateAddress` — dış kapsamdan erişilen fonksiyon; adım 2'de adresi doğrular
+  - `validateInvoiceInfo` — dış kapsamdan erişilen fonksiyon; adım 2 ve 3'te fatura kimliğini doğrular
+  - `validateLegalConsents` — dış kapsamdan erişilen fonksiyon; adım 2 ve 3'te yasal onayları doğrular
+  - `success` — `initiatePayment()` çağrısından dönen boolean; ödeme başarılıysa adım 4'e geçilir
+- **Dönüş**: yok (async fonksiyon, Promise<void>)
 
 ---
 

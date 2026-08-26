@@ -3,43 +3,50 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\inventoryReport.service.ts
-skeleton_hash: 4171272a6310e53d
+skeleton_hash: fb9f50ae8dd5b2a8
 entity_hashes:
-  func:getInventoryMovements: 83ca042894e9a1fe
-  overview: d0f434ef60ccbc24
-generated_at: 2026-06-19T20:48:28Z
+  func:getInventoryMovements: 07db97961f2a156e
+  func:movementQueryFn: 2f48e11557ce3e37
+  overview: 100075d17225ac3b
+generated_at: 2026-08-24T12:50:12Z
 ---
 
 ## Genel Bakış
-Stok hareketlerini tarih aralığına göre sorgulamak ve raporlama amaçlı veri sağlamakla sorumludur. Modül, depo/havuz bazlı stok hareket kayıtlarını dış kaynak (Supabase) üzerinden çekerek raporlama ve izleme süreçlerine temel veri besler. Mimari olarak veri erişim katmanında, servis katmanının en alt halkasında konumlanır.
+Stok hareketlerini tarih aralığına göre sorgulamak ve raporlama amaçlı veri sağlamakla sorumlu bir servis modülüdür. Depo/havuz bazlı stok hareket kayıtlarını dış veri kaynağı (Supabase) üzerinden çekerek raporlama ve izleme süreçlerine ham veri besler. Mimari olarak veri erişim katmanında, servis katmanının en alt halkasında konumlanır.
 
 ## Fonksiyon Grupları
 
 ### Stok Hareket Sorgulama
-Belirtilen tarih aralığındaki tüm stok hareketlerini (giriş, çıkış, transfer vb.) dış veri tabanından çekerek raporlama için ham veri sağlar.
-- `getInventoryMovements`
+Belirtilen tarih aralığındaki stok hareketlerini dış veri tabanından çekerek raporlama için ham veri sağlar. Sorgu oluşturma ve veri çekme işlevlerini içerir.
+- movementQueryFn, getInventoryMovements
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu fonksiyon imzasından çıkarılabilecek mimari varsayımlar:
+[Aksiyom 1]: Eğer `supabase` parametresi verilmezse, fonksiyon çağrılamaz; bu parametre zorunludur ve default değeri yoktur.
 
-[Aksiyom 1]: Eğer `supabase` parametresi geçerli bir SupabaseClient<Database> bağlantısı değilse, fonksiyon çağrı hatası ile karşılaşır.
+[Aksiyom 2]: Eğer `params` nesnesinde `from` ve `to` alanları verilmezse, sorgunun hangi tarih aralığını kapsayacağı bilinmiyor; fonksiyon gövdesindeki davranış görülmedi.
 
-[Aksiyom 2]: Eğer `params.from` ve `params.to` değerleri hiç verilmezse, fonksiyonun varsayılan davranışının ne olacağı **bilinmiyor** (tüm hareketleri mi döner, belirli bir varsayılan aralık mı kullanır — fonksiyon gövdesi olmadan belirlenemez).
+[Aksiyom 3]: Eğer `supabase` parametresi `SupabaseClient<Database>` tipinde değilse, derleme zamanında tip uyumsuzluğu hatası oluşur.
 
-[Aksiyom 3]: Eğer `params.from` > `params.to` şeklinde geçerli olmayan bir tarih aralığı verilirse, fonksiyonun davranışı **bilinmiyor** (boş dizi mi döner, hata mı fırlatır — fonksiyon gövdesi olmadan belirlenemez).
+[Aksiyom 4]: Eğer veritabanında `InventoryMovementRow` yapısına karşılık gelen tablo veya görünüm mevcut değilse, sorgu çalışma zamanında hata döndürür.
 
-[Aksiyom 4]: Eğer veritabanında `inventory_movements` tablosu veya ilgili view'ı mevcut değilse, fonksiyon Supabase tarafında sorgu hatası ile karşılaşır.
-
----
-
-**Not:** Fonksiyon gövdesi (gövde kodu) paylaşılmadığı için, iç mantık, filtreleme koşulları, sıralama ve hata yönetimiyle ilgili aksiyomlar üretilememiştir.
+[Aksiyom 5]: Eğer `movementQueryFn` fonksiyonu `supabase` parametresi olmadan çağrılırsa, çalıştırılamaz; bu fonksiyon da zorunlu parametre alır ve default değeri yoktur.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### movementQueryFn
+**Ne yapar**: Veritabanı sorgu nesnesi oluşturur ve döndürür. Envanter hareketlerini sorgulamak için temel sorgu yapılandırmasını hazırlayan yardımcı fonksiyondur.
+
+**Nasıl yapar**: Parametre olarak aldığı Supabase istemcisi üzerinden bir sorgu nesnesi oluşturur ve bu nesneyi döndürür. Fonksiyonun iç yapısı bu kaynak dosyada yer almamaktadır; muhtemelen başka bir modülde tanımlıdır ve buraya import edilmiştir.
+
+**Parametreler**:
+- supabase: SupabaseClient<Database> — Supabase veritabanı istemcisi nesnesi. Generic parametre olarak `Database` tipini alır ve tip güvenli sorgular yapılmasını sağlar.
+
+**Dönüş**: Bilinmiyor. Kaynakta dönüş tipi açıkça belirtilmemiştir.
 
 ### getInventoryMovements
 **Ne yapar**: Bu fonksiyon, veritabanındaki envanter hareketlerini (stok giriş/çıkış kayıtlarını) belirli bir tarih aralığına göre sorgulayarak döndürür. Her bir hareket kaydı, ilgili ürünün adını da içerecek şekilde zenginleştirilmiş (joined) olarak getirilir. Fonksiyon, hareketlerin ne zaman gerçekleştiğine göre azalan sırada sıralanmış bir liste sunar.
@@ -56,37 +63,42 @@ Bu fonksiyon imzasından çıkarılabilecek mimari varsayımlar:
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../types/database.types::type { Database }
-- import: @supabase/supabase-js::type { SupabaseClient }
+- import: @supabase/supabase-js::type { QueryData, SupabaseClient }
 
 ---
 
-## INTERFACES
+## TYPE ALIASES
 
 ### InventoryMovementRow
-- `id: string`
-- `delta: number`
-- `reason: string`
-- `created_at: string`
-- `product_id: string`
-- `products: {`
+```typescript
+type InventoryMovementRow = QueryData<ReturnType<typeof movementQueryFn>>[number]
+```
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\services\inventoryReport.service.ts::getInventoryMovements
-- **params**: (supabase: SupabaseClient<Database>, params: { from?: Date; to?: Date })
+### [N1_NASIL] AST Pointer: inventoryReport.service.ts::movementQueryFn
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+- **ic_degiskenler**: yok
+- **Dönüş**: Supabase query builder — `inventory_movements` tablosundan `id`, `delta`, `reason`, `created_at`, `product_id` ve `products(name)` alanlarını seçer, `created_at` alanına göre azalan sıralar
+
+### [N2_NASIL] AST Pointer: inventoryReport.service.ts::getInventoryMovements
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `params` — `{ from?: Date; to?: Date }` tipinde, tarih aralığı filtresi
 - **ic_degiskenler**:
-  - `query` — Supabase sorgu oluşturucu nesnesi; inventory_movements tablosundan belirli sütunları seçen ve created_at'e göre azalan sırayla sıralayan başlangıç sorgusu, ardından params.from ve params.to değerlerine göre tarih aralığı filtresi eklenerek güncellenir
-  - `data` — Sorgudan dönen_successful verilerin tutulduğu değişken (InventoryMovementRow[] dizisi veya null)
-  - `error` — Sorgu sırasında oluşabilecek hata nesnesi; varsa fırlatılır
-- **Dönüş**: Promise<InventoryMovementRow[]> — inventory_movements tablosundaki hareket kayıtlarını (product bilgileriyle birlikte) tarih aralığına göre filtrelenmiş şekilde döndürür; hata oluşursa exception fırlatır, veri yoksa boş dizi döner
+  - `query` — `movementQueryFn(supabase)` çağrısının döndürdüğü sorgu nesnesi, filtreleme işlemleri bunun üzerinde zincirleme yapılır
+  - `params.from` — opsiyonel başlangıç tarihi, varsa `created_at` alanına `gte` (büyük veya eşit) filtresi uygulanır; `toISOString()` ile string'e dönüştürülür
+  - `params.to` — opsiyonel bitiş tarihi, varsa `created_at` alanına `lte` (küçük veya eşit) filtresi uygulanır; `toISOString()` ile string'e dönüştürülür
+  - `data` — sorgu sonucu dönen satırlar, hata yoksa döndürülen veri
+  - `error` — sorgu sırasında oluşan hata nesnesi, varsa `throw` ile fırlatılır
+- **Dönüş**: `Promise<InventoryMovementRow[]>` — hareket kayıtlarını içeren dizi; hata durumunda hata fırlatılır, veri yoksa boş dizi döner
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\lib\services\inventoryReport.service.ts
+  function: src\lib\services\inventoryReport.service.ts::movementQueryFn
   function: src\lib\services\inventoryReport.service.ts::getInventoryMovements
 
 ---
@@ -94,3 +106,4 @@ Bu fonksiyon imzasından çıkarılabilecek mimari varsayımlar:
 ## DISA AKTARILANLAR (EXPORTS)
   export: InventoryMovementRow
   export: getInventoryMovements
+  export: movementQueryFn
