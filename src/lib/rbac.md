@@ -2,46 +2,45 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\lib\rbac.ts
-skeleton_hash: e1581e665a2b1d85
+source_path: C:\Users\alize\venthub-hvac\src\lib\rbac.ts
+skeleton_hash: b6e28f3dccf14a94
 entity_hashes:
-  func:canAccessPage: 8cf66bde9646819e
+  func:canAccessPage: 502373e4fa126e0a
   func:canWrite: 289f50aba94e238a
   func:isReadOnly: 4b13d0168f4b164b
-  overview: e7f0da41b26e494f
-generated_at: 2026-08-16T10:21:25Z
+  overview: f1352d33dc973192
+generated_at: 2026-08-24T11:56:00Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun kaynak kodunda yer alan bu RBAC (Rol Tabanlı Erişim Kontrolü) modülü, uygulamadaki tüm erişim yetkisi kontrollerini tek merkezden yönetmek üzere tasarlanmıştır. Kullanıcının sahip olduğu role göre sayfa gezintisi, sistem varlıklarını düzenleme gibi farklı platform işlevlerine erişim hakkını doğrulayan yardımcı fonksiyonlar barındırır. Tüm yetki kontrollerini merkezi hale getirerek platform genelinde güvenlik tutarlılığı sağlar.
+VentHub HVAC platformunun RBAC (Rol Tabanlı Erişim Kontrolü) modülü, kullanıcı rollerine göre erişim yetkilerini merkezi olarak doğrulayan yardımcı fonksiyonlar sunar. Sayfa gezintisi izni, varlık düzenleme hakkı ve salt okunur durum kontrolü gibi temel güvenlik denetimlerini tek noktadan yöneterek platform genelinde tutarlı erişim kontrolü sağlar.
 
 ## Fonksiyon Grupları
 ### Rol Bazlı Yetki Doğrulama Fonksiyonları
-Kullanıcının mevcut rolü bazında farklı platform kaynaklarına erişim hakkı, yazma izni ve salt okunur durumunu kontrol eden temel erişim denetimi işlemlerini gerçekleştirir.
+Kullanıcının sahip olduğu role göre sayfa erişimi, varlık yazma izni ve salt okunur durumunu kontrol eden temel erişim denetimi işlemlerini gerçekleştirir. Tüm fonksiyonlar UserRole tipinde role parametresi alır ve boolean değer döndürür.
 - canAccessPage, canWrite, isReadOnly
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu rol tabanlı erişim kontrolü (RBAC) modülünün doğru ve güvenli çalışması için, erişim kurallarını tutan sabit nesnelerin tanımlı, bütünlüğünün korunmuş ve tüm giriş parametrelerinin beklenen formatta olması zorunludur.
-
-[Aksiyom 1]: Eğer ROLE_PAGE_ACCESS sabit nesnesi tanımlı değilse veya tüm roller için geçerli sayfa erişim izinlerini içermiyorsa, canAccessPage fonksiyonu doğru erişim kontrolü yapamaz, yetkisiz sayfa erişimi veya yetkili kullanıcıların erişememesi sorunu oluşur.
-[Aksiyom 2]: Eğer ROLE_WRITE_ACCESS sabit nesnesi tanımlı değilse veya tüm roller için geçerli varlık yazma izinlerini içermiyorsa, canWrite ve isReadOnly fonksiyonları hatalı izin kontrolleri üretir, güvenlik zaafleri ortaya çıkar.
-[Aksiyom 3]: Eğer tüm erişim kontrolü fonksiyonlarına giriş olarak verilen role parametresi, tanımlı UserRole değerlerinden, null veya undefined dışında bir değer alırsa, hiçbir fonksiyon güvenilir izin sonucu üretemez, erişim kontrolleri tamamen devre dışı kalır.
-[Aksiyom 4]: Eğer canAccessPage fonksiyonuna iletilen path parametresi geçerli bir string değeri değilse, ROLE_PAGE_ACCESS içindeki sayfa eşleşme kuralları çalışmaz, sayfa erişim kontrolü başarısız olur.
-[Aksiyom 5]: Eğer canWrite fonksiyonuna iletilen entity parametresi, ROLE_WRITE_ACCESS nesnesinde tanımlı varlık isimleriyle eşleşmeyen bir değer alırsa, yazma izni kontrolü yapılamaz, yetkisiz yazma erişimi veya yetkili kullanıcıların yazamaması sorunu oluşur.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### canAccessPage
-**Ne yapar**: Verilen kullanıcı rolünün, belirtilen sayfa yoluna erişim yetkisine sahip olup olmadığını kontrol eder. Kullanıcının ilgili sayfaya girme izninin olup olmadığını net bir boolean sonuçla döndürür, sistemdeki erişim güvenliğinin temel kontrol adımlarından birini oluşturur.
-**Nasıl yapar**: Sistemde önceden tanımlanmış rol bazlı sayfa erişim yetkileri haritasını referans alarak, gelen rol ve path değerlerini bu yetki listesiyle karşılaştırır. Oturum açmamış yani rolü null veya undefined olan misafir kullanıcılar için varsayılan genel izinleri uygular, yetki eşleşmesi durumunda true, aksi halde false döndürür.
+**Ne yapar**: Verilen kullanıcı rolünün belirtilen sayfa yoluna (path) erişim izni olup olmadığını kontrol eder. Rol-tabanlı erişim kontrolü (RBAC) sisteminin temel kapı fonksiyonudur; sayfa navigasyonunda ve rota korumasında kullanılır.
+
+**Nasıl yapar**: Fonksiyon çok katmanlı bir erişim kontrolü uygular. İlk olarak rol tanımsızsa veya `'user'` ise doğrudan `false` döner — anonim ve normal kullanıcılar admin paneline erişemez. Ardından üç özel yol için katı kontroller uygulanır: `/admin/users` yolu yalnızca `'super_admin'` rolüne açıktır; `/admin/data-requests` ve `/admin/invoices` yolları ise yalnızca `'admin'` ve `'super_admin'` rollerine açıktır — bu kontroller, ilgili RLS politikalarının `is_admin_user()` fonksiyonuna bağlı olması nedeniyle eklenmiştir ve yorumlarda belirtildiği üzere kemer-askı (belt-and-suspenders) yaklaşımı olarak bilerek korunmaktadır. Özel kontrolleri geçen roller için `ROLE_PAGE_ACCESS` sabitinden rolün izinli yolları alınır; eğer listede `'*'` varsa erişim doğrudan onaylanır. Son aşamada yol eşleştirmesi yapılır: tam eşleşme kontrolü ve alt yol kontrolü uygulanır. T134 düzeltmesiyle birlikte `ADMIN_ROOT` sabiti artık ön ek eşleştirmesinden hariç tutulur — eski mantıkta `/admin` listede ön ek olarak yer aldığından tüm alt yollar erişilebilir hale geliyordu ve bu bir güvenlik açığıydı.
+
 **Parametreler**:
-- role: UserRole | null | undefined — Yetkisi kontrol edilecek kullanıcının rolü, oturum açmamış misafir kullanıcılar için null veya undefined değeri alabilir
-- path: string — Erişilmek istenen sayfanın yolunu tutan string ifade, sistemdeki sayfa erişim kontrollerinde kullanılan benzersiz tanımlayıcıdır
-**Dönüş**: boolean — Kullanıcının ilgili sayfaya erişim yetkisi tam olarak mevcutsa true, herhangi bir nedenle erişim izni yoksa false değerini döndürür
+- role: `UserRole | null | undefined` — Erişim kontrolü yapılacak kullanıcının rolü. `null` veya `undefined` değerleri anonim/oturum açmamış kullanıcıyı temsil eder ve erişim reddedilir.
+- path: `string` — Erişimi kontrol edilecek sayfanın URL yolu (örneğin `/admin/users`, `/admin/invoices`).
+
+**Dönüş**: `boolean` — Rolün belirtilen yola erişim izni varsa `true`, yoksa `false` döner.
 
 ### canWrite
 **Ne yapar**: Verilen kullanıcı rolünün, belirtilen sistem varlığında (entity) yazma, düzenleme, silme gibi tüm değişiklik işlemlerini yapıp yapamayacağını kontrol eder. Varlık bazlı yazma izinlerini doğrulayarak yetkisiz değişikliklerin önüne geçilmesini sağlar.
@@ -76,30 +75,37 @@ type UserRole = 'super_admin' | 'admin' | 'moderator' | 'warehouse' | 'sales' | 
 - **ROLE_WRITE_ACCESS** (object) — `{
     super_admin: ['*'],
     admin: ['orders', 'logistics', 'returns', 'qu...`
+- **ENTITY_TO_RESOURCE** (object) — `{
+    orders: 'orders',
+    logistics: 'logistics',
+    returns: 'returns'...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\lib\rbac.ts::canAccessPage
-- **params**: role: UserRole | null | undefined, path: string
+### [N1_NASIL] AST Pointer: src/lib/rbac.ts::canAccessPage
+- **params**: `role` — UserRole tipinde kullanıcı rolü (null veya undefined olabilir); `path` — erişilmek istenen sayfanın URL yolu
 - **ic_degiskenler**:
-  - `ROLE_PAGE_ACCESS` — global tanımlı, rollerin sayfa erişim izinlerini saklayan nesne, ilgili role ait izinli path listesini çekmek için kullanılır
-  - `allowedPaths` — ROLE_PAGE_ACCESS'ten mevcut role için alınan izinli path'lerin listesi, role için kayıt yoksa varsayılan boş dizi atanır
-  - `p` — allowedPaths dizisi üzerinde some metodu çalışırken kullanılan iterasyon öğesi, mevcut kontroldeki path değeri
-- **Dönüş**: boolean
+  - `role` — fonksiyonun başında null/undefined kontrolü yapılır; ardından `'user'` rolü için doğrudan false dönülür. `'super_admin'` dışındaki rollerin `/admin/users` yolu engellenir. `'admin'` ve `'super_admin'` dışındaki rollerin `/admin/data-requests` ve `/admin/invoices` yolları engellenir. Son olarak `ROLE_PAGE_ACCESS[role as UserRole]` ile eşleştirilir.
+  - `path` — üst üste gelen `startsWith` kontrolleriyle belirli admin alt yollarına erişim kısıtlanır; son `some` kapanışında her bir `p` ile karşılaştırılır.
+  - `allowedPaths` — `ROLE_PAGE_ACCESS[role as UserRole]` erişimi sonucu elde edilen dizi; rol bulunamazsa boş dizi atanır. `'*'` içeriyorsa doğrudan true dönülür.
+  - `p` — `allowedPaths.some()` callback'indeki her bir izinli yol elemanı. `path === p` ise tam eşleşme sağlanır; `p === ADMIN_ROOT` ise false dönülür (admin kök yolu tek başına eşleşmez); aksi halde `path.startsWith(p + '/')` ile alt yol kontrolü yapılır.
+- **Dönüş**: boolean — kullanıcının belirtilen sayfaya erişim izni varsa `true`, yoksa `false`
 
-### [N2_NASIL] AST Pointer: src\lib\rbac.ts::canWrite
-- **params**: role: UserRole | null | undefined, entity: string
+### [N2_NASIL] AST Pointer: src/lib/rbac.ts::canWrite
+- **params**: `role` — UserRole tipinde kullanıcı rolü (null veya undefined olabilir); `entity` — yazma işlemi yapılmak istenen varlık adı
 - **ic_degiskenler**:
-  - `ROLE_WRITE_ACCESS` — global tanımlı, rollerin yazma erişim izinlerini saklayan nesne, ilgili role ait izinli varlık listesini çekmek için kullanılır
-  - `allowedEntities` — ROLE_WRITE_ACCESS'ten mevcut role için alınan yazma izni verilen varlıkların listesi, role için kayıt yoksa varsayılan boş dizi atanır
-- **Dönüş**: boolean
+  - `role` — fonksiyonun başında null/undefined kontrolü yapılır. `'admin'` rolü ve `entity === 'users'` kombinasyonunda false dönülür (admin kullanıcı varlığını değiştiremez). Son olarak `ROLE_WRITE_ACCESS[role]` ile eşleştirilir.
+  - `entity` — admin-users kısıtı kontrolünde ve `allowedEntities.includes(entity)` son eşleştirmesinde kullanılır.
+  - `allowedEntities` — `ROLE_WRITE_ACCESS[role]` erişimi sonucu elde edilen dizi; rol bulunamazsa boş dizi atanır. `'*'` içeriyorsa doğrudan true dönülür.
+- **Dönüş**: boolean — kullanıcının belirtilen varlık üzerinde yazma izni varsa `true`, yoksa `false`
 
-### [N3_NASIL] AST Pointer: src\lib\rbac.ts::isReadOnly
-- **params**: role: UserRole | null | undefined
-- **ic_degiskenler**: (yok)
-- **Dönüş**: boolean
+### [N3_NASIL] AST Pointer: src/lib/rbac.ts::isReadOnly
+- **params**: `role` — UserRole tipinde kullanıcı rolü (null veya undefined olabilir)
+- **ic_degiskenler**:
+  - `role` — null veya undefined ise doğrudan `true` dönülür. `'viewer'` veya `'user'` ise `true`, diğer roller için `false` dönülür.
+- **Dönüş**: boolean — rol salt-okunur ise `true`, değilse `false`
 
 ---
 
@@ -122,6 +128,7 @@ graph TD
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: ENTITY_TO_RESOURCE
   export: UserRole
   export: canAccessPage
   export: canWrite

@@ -3,8 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts
-skeleton_hash: d8f538a61314b672
+skeleton_hash: b24fef132eec349c
 entity_hashes:
+  func:_movementQueryFn: a6e6ecbab9529862
+  func:_velocityQueryFn: 42a2402d1f1ce214
   func:searchAudit: d2a9963a87a7f43a
   func:searchCategories: 0826bda8c886e580
   func:searchCoupons: 5b41f23b1919c12b
@@ -15,51 +17,59 @@ entity_hashes:
   func:searchProducts: ecaf9e1bd8dbe30b
   func:searchReturns: 821955f70c7c4d56
   func:searchUsers: be44fc325c9a7016
-  overview: 9cd2e836272eaa71
-generated_at: 2026-06-19T20:48:46Z
+  overview: 2c3ae4e9b1596f22
+generated_at: 2026-08-24T12:48:21Z
 ---
 
 ## Genel Bakış
 
-Bu modül, admin panelinde farklı kaynak türleri üzerinde arama yapılması için gerekli fonksiyonları içerir. Her fonksiyon belirli bir kaynak türüne (ürün, sipariş, kullanıcı vb.) optimize edilmiş sorgulama mantığını barındırır ve tutarlı bir arama sonucu formatı (AdminSearcher) döndürür. Modül, Supabase veritabanı bağlantısı üzerinden çalışarak merkezi bir arama altyapısı sunar.
+Bu modül, admin panelinde farklı kaynak türleri (ürün, sipariş, kullanıcı vb.) için optimize edilmiş arama fonksiyonlarını içerir. Her fonksiyon, belirli bir veri kaynağına yönelik sorgulama mantığını barındırır ve tutarlı bir arama sonucu formatı (`AdminSearcher`) döndürür. Modül, Supabase veritabanı bağlantısı üzerinden çalışarak merkezi bir arama altyapısı sunar ve üst seviye bir arama koordinatörünün kaynak bağımsız çalışmasına olanak tanır.
 
 ## Fonksiyon Grupları
 
 ### Ticari Varlık Aramaları
-Ürün kataloğu ve satış süreçleriyle ilişkili temel ticari verilerin aranmasını sağlar.
+Ürün kataloğu, satış işlemleri ve stok yönetimiyle ilgili temel ticari verilerin aranmasını sağlar.
 - searchProducts, searchOrders, searchReturns, searchCategories, searchInventory
 
 ### Kullanıcı ve Promosyon Aramaları
-Sistem kullanıcıları ve pazarlama araçlarıyla ilgili arama işlevlerini yönetir.
+Sistem kullanıcılarını ve pazarlama amaçlı kuponları sorgulama işlevlerini yönetir.
 - searchUsers, searchCoupons
 
 ### Sistem ve İzleme Aramaları
-Operasyonel takip, hata yönetimi ve denetim amaçlı verilerin sorgulanmasını sağlar.
+Operasyonel hareketler, hata kümeleri ve denetim kayıtları gibi sistem izleme verilerinin sorgulanmasını sağlar.
 - searchMovements, searchErrorGroups, searchAudit
+
+### Yardımcı Sorgu Fonksiyonları
+Belirli arama fonksiyonları tarafından kullanılan, daha spesifik sorgu mantıklarını barındıran yardımcı fonksiyonlardır.
+- _movementQueryFn, _velocityQueryFn
 
 ## Mimari Notlar
 
-Modül, **Adapter/Strategy pattern** benimseyerek farklı kaynak türleri için tutarlı bir arama arayüzü sunar. Tüm fonksiyonlar aynı parametre yapısına (supabase bağlantısı, sorgu metni, sonuç limiti) sahiptir, bu da üst seviye arama koordinatörünün kaynak bağımlı olmadan çalışmasını mümkün kılar. Fonksiyonlar arasında doğrudan çağrı ilişkisi yoktur; her biri bağımsız olarak ilgili veritabanı tablosuna yönelir.
+Modül, **Adapter/Strategy pattern** benimseyerek farklı kaynak türleri için tutarlı bir arama arayüzü sunar. Tüm dışa açık arama fonksiyonları aynı parametre yapısına (supabase bağlantısı, sorgu metni, sonuç limiti) sahiptir. Fonksiyonlar arasında doğrudan bir çağrı ilişkisi belirtilmemiştir; her biri bağımsız bir arama stratejisi olarak çalışır. Modül, `SupabaseClient` ve `Database` tipi gibi dış bağımlılıklara sahiptir. Dinamik veya lazy yüklenen bir modül olduğuna dair bilgi bulunmamaktadır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, admin panelinde farklı kaynak türleri (ürünler, siparişler, iadeler, vb.) üzerinde arama yapan fonksiyonlar koleksiyonudur. Fonksiyon gövdeleri verilmediğinden, sadece fonksiyon imzalarından çıkarılabilecek yapısal varsayımlar tanımlanmıştır.
-
-**[Aksiyom 1]:** Eğer `supabase` istemcisi geçerli, bağlanmış ve ilgili kaynak tablolarına erişim izni varsa, arama sorgusu çalıştırılabilir. Aksi takdirde veritabanı sorgusu başarısız olur.
-
-**[Aksiyom 2]:** Eğer `query` parametresi arama yapılabilecek uygun bir metin değeriyse, ilgili kaynak tablosunda eşleşen kayıtlar bulunabilir. Aksi takdirde boş veya hatalı sonuç döner.
-
-**[Aksiyom 3]:** Eğer `limit` parametresi pozitif bir tamsayıysa, sonuç kümesi o kadar veya daha az kayıt ile sınırlanır. Aksi takdirde beklenmeyen davranış oluşur.
-
-**[Aksiyom 4]:** Her bir `search*` fonksiyonunun arama yaptığı tablonun, `query` parametresi ile filtrelenmeye uygun bir metin/sütuna sahip olması gerekir. Aksi takdirde arama anlamasız sonuçlar üretir.
-
-**[Aksiyom 5]:** Tüm `search*` fonksiyonları `async` olarak tanımlıdır; bu nedenle `await` ile çağrılmazsa fonksiyon sonucu awaited bir coroutine nesnesi olarak döner ve arama çalışmaz.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### _movementQueryFn
+**Ne yapar**: Supabase istemcisini alıp, hareket (movement) kayıtlarında ürün adına veya SKU'ya göre arama yapan asenkron bir sorgu fonksiyonu döndüren üst düzey bir fonksiyondur (currying/artial application). Arama sonuçlarını, admin panelindeki hareketler sayfasında kullanılmak üzere standart bir formata dönüştürür.
+
+**Nasıl yapar**: İlk çağrıda `supabase` parametresini yakalayan bir fonksiyon döndürür. Bu dönen fonksiyon çağrıldığında, öncelikle sorgu metninin boş olup olmadığını ve en az 2 karakter uzunluğunda olup olmadığını kontrol eder; koşul sağlanmazsa boş dizi döner. Sorgu oluşturulurken `orIlikeContains` yardımcı fonksiyonu ile `name` ve `sku` alanlarında arama yapılır; bu arama `foreignTable: 'products'` seçeneğiyle gömülü `products` tablosuna yönelik gerçekleştirilir. Kaynak kodundaki açıklamaya göre, üst düzey `or` içinde doğrudan `products.name` yazmak PostgREST'te 400 hatasına neden oluyordu; bu nedenle `foreignTable` yaklaşımı kullanılmıştır. Ayrıca `reason` alanı bilinçli olarak arama dışı tutulmuştur, çünkü hem ana tabloyu hem gömülü kaynağı tek sorguda OR'lamak PostgREST'te ifade edilemez ve ilgili sayfa zaten yalnızca ürün adı/SKU araması yapmaktadır. Sonuçlar `limit` parametresiyle sınırlandırılır. Gelen veri üzerinde `map` işlemi uygulanarak her kayıt için `resourceKey`, `id`, `title`, `subtitle` ve `route` alanlarından oluşan bir nesne üretilir. `products` ilişkisi dizi veya tekil nesne olabilir; dizi ise ilk eleman alınır.
+
+**Parametreler**:
+- supabase: `SupabaseClient<Database>` — Supabase veritabanı istemcisi nesnesi. Sorguların yürütülmesi için kullanılır.
+
+**Dönüş**: Bilinmiyor. Kaynak kodunda açık bir dönüş tipi belirtilmemiştir. Dönen fonksiyonun kendisi `(supabase, query, limit) => {...}` şeklinde asenkron bir fonksiyondur ve bu iç fonksiyon, her biri `resourceKey`, `id`, `title`, `subtitle`, `route` alanlarını içeren nesnelerden oluşan bir dizi döndürür.
+
+### _velocityQueryFn
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### searchProducts
 **Ne yapar**: Verilen sorgu dizesine göre ürün veritabanında asenkron bir arama gerçekleştirir ve sonuçları `AdminSearcher` yapısında döndürür. Bu fonksiyon, admin panelinde ürünleri hızlıca bulmak için kullanılır.
@@ -156,7 +166,9 @@ Bu modül, admin panelinde farklı kaynak türleri (ürünler, siparişler, iade
 ## İTHALATLAR (IMPORTS)
 - import: @/lib/services/product.service::adminSearchProducts
 - import: @/types/database.types::type { Database }
+- import: @/utils/adminQueryFilters::orIlikeContains
 - import: @supabase/supabase-js::SupabaseClient
+- import: @supabase/supabase-js::type QueryData
 
 ---
 
@@ -168,26 +180,6 @@ Bu modül, admin panelinde farklı kaynak türleri (ürünler, siparişler, iade
 - `title: string`
 - `subtitle?: string`
 - `route: string`
-
-### VenthubReturnJoinedRow
-- `id: string`
-- `reason: string`
-- `status: string`
-- `venthub_orders: { order_number: string | null; customer_name: string | null } | { order_number: string | null; customer_`
-
-### InventoryMovementJoinedRow
-- `id: string`
-- `reason: string`
-- `delta: number`
-- `products: { name: string; sku: string } | { name: string; sku: string }[] | null`
-
-### InventoryVelocityRow
-- `product_id: string`
-- `name: string | null`
-- `physical_stock: number | null`
-- `available_stock: number | null`
-- `warehouse_location: string | null`
-- `supplier_name: string | null`
 
 ---
 
@@ -202,95 +194,113 @@ type AdminSearcher = (
 ) => Promise<CommandResult[]>
 ```
 
+### InventoryMovementJoinedRow
+```typescript
+type InventoryMovementJoinedRow = QueryData<ReturnType<typeof _movementQueryFn>>[number]
+```
+
+### InventoryVelocityRow
+```typescript
+type InventoryVelocityRow = QueryData<ReturnType<typeof _velocityQueryFn>>[number]
+```
+
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/lib/admin/search/resourceSearchers.ts::searchProducts
-- **params**: `supabase` (SupabaseClient instance), `query` (search string), `limit` (maximum results)
-- **ic_degiskenler**:
-  - `data` — `adminSearchProducts` API çağrısından dönen ürün verisi dizisi
-  - `p` — map callback parametresi, her bir ürün nesnesini temsil eder
-- **Dönüş**: AdminSearcher dizisi (resourceKey: 'products', id, title, subtitle, route)
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::_movementQueryFn
+- **params**: `supabase` — SupabaseClient<Database> türünde, veritabanı bağlantısı
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (fonksiyon gövdesinde return ifadesi yok)
 
-### [N2_NASIL] AST Pointer: src/lib/admin/search/resourceSearchers.ts::searchOrders
-- **params**: `supabase` (SupabaseClient instance), `query` (search string), `limit` (maximum results)
-- **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen sipariş verisi dizisi (view_admin_orders tablosundan)
-  - `error` — Supabase sorgusundaki olası hata nesnesi
-  - `o` — map callback parametresi, her bir sipariş nesnesini temsil eder
-- **Dönüş**: AdminSearcher dizisi (resourceKey: 'orders', id, title, subtitle, route)
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::_velocityQueryFn
+- **params**: `supabase` — SupabaseClient<Database> türünde, veritabanı bağlantısı
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (fonksiyon gövdesinde return ifadesi yok)
 
-### [N3_NASIL] AST Pointer: src/lib/admin/search/resourceSearchers.ts::searchReturns
-- **params**: `supabase` (SupabaseClient instance), `query` (search string), `limit` (maximum results)
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::searchProducts
+- **params**: `supabase`, `query`, `limit`
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen iade verisi dizisi (venthub_returns tablosu ile inner join)
-  - `error` — Supabase sorgusundaki olası hata nesnesi
-  - `rows` — `data` dizisinin VenthubReturnJoinedRow[] tipine cast edilmiş hali
-  - `r` — map callback parametresi, her bir iade satırını temsil eder
-  - `order` — `r.venthub_orders` alanından çıkarılan sipariş nesnesi (dizi ise ilk eleman)
-  - `orderNum` — sipariş numarası stringi, boş ise '' alınır
-- **Dönüş**: AdminSearcher dizisi (resourceKey: 'returns', id, title, subtitle, route)
+  - `data` — `adminSearchProducts` fonksiyonundan dönen ürün verisi
+- **Dönüş**: AdminSearcher[] (resourceKey, id, title, subtitle, route alanlarından oluşan nesne dizisi)
 
-### [N4_NASIL] AST Pointer: src/lib/admin/search/resourceSearchers.ts::searchCategories
-- **params**: `supabase` (SupabaseClient instance), `query` (search string), `limit` (maximum results)
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::searchOrders
+- **params**: `supabase`, `query`, `limit`
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen kategori verisi dizisi (categories tablosundan)
-  - `error` — Supabase sorgusundaki olası hata nesnesi
-  - `c` — map callback parametresi, her bir kategori nesnesini temsil eder
-- **Dönüş**: AdminSearcher dizisi (resourceKey: 'categories', id, title, subtitle, route)
+  - `data` — `view_admin_orders` tablosundan çekilen sipariş verisi
+  - `error` — Supabase sorgu hatası
+  - `o` — map içindeki her sipariş nesnesi
+- **Dönüş**: AdminSearcher[] (resourceKey, id, title, subtitle, route alanlarından oluşan nesne dizisi)
 
-### [N5_NASIL] AST Pointer: src/lib/admin/search/resourceSearchers.ts::searchUsers
-- **params**: `supabase` (SupabaseClient instance), `query` (search string), `limit` (maximum results)
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::searchReturns
+- **params**: `supabase`, `query`, `limit`
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen kullanıcı profili verisi dizisi (user_profiles tablosundan)
-  - `error` — Supabase sorgusundaki olası hata nesnesi
-  - `u` — map callback parametresi, her bir kullanıcı profil nesnesini temsil eder
-- **Dönüş**: AdminSearcher dizisi (resourceKey: 'users', id, title, subtitle, route)
+  - `data` — `view_admin_returns` tablosundan çekilen iade verisi
+  - `error` — Supabase sorgu hatası
+  - `r` — map içindeki her iade nesnesi
+  - `orderNum` — `r.order_number` değeri, sipariş numarası
+- **Dönüş**: AdminSearcher[] (resourceKey, id, title, subtitle, route alanlarından oluşan nesne dizisi)
 
-### [N6_NASIL] AST Pointer: src/lib/admin/search/resourceSearchers.ts::searchCoupons
-- **params**: `supabase` (SupabaseClient instance), `query` (search string), `limit` (maximum results)
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::searchCategories
+- **params**: `supabase`, `query`, `limit`
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen kupon verisi dizisi (coupons tablosundan)
-  - `error` — Supabase sorgusundaki olası hata nesnesi
-  - `c` — map callback parametresi, her bir kupon nesnesini temsil eder
-- **Dönüş**: AdminSearcher dizisi (resourceKey: 'coupons', id, title, subtitle, route)
+  - `data` — `categories` tablosundan çekilen kategori verisi
+  - `error` — Supabase sorgu hatası
+  - `c` — map içindeki her kategori nesnesi
+- **Dönüş**: AdminSearcher[] (resourceKey, id, title, subtitle, route alanlarından oluşan nesne dizisi)
 
-### [N7_NASIL] AST Pointer: src/lib/admin/search/resourceSearchers.ts::searchMovements
-- **params**: `supabase` (SupabaseClient instance), `query` (search string), `limit` (maximum results)
+### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::searchUsers
+- **params**: `supabase`, `query`, `limit`
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen stok hareket verisi dizisi (inventory_movements tablosu ile inner join)
-  - `error` — Supabase sorgusundaki olası hata nesnesi
-  - `rows` — `data` dizisinin InventoryMovementJoinedRow[] tipine cast edilmiş hali
-  - `m` — map callback parametresi, her bir stok hareket satırını temsil eder
-  - `prod` — `m.products` alanından çıkarılan ürün nesnesi (dizi ise ilk eleman)
-  - `prodName` — ürün adı stringi, boş ise '' alınır
-- **Dönüş**: AdminSearcher dizisi (resourceKey: 'movements', id, title, subtitle, route)
+  - `data` — `user_profiles` tablosundan çekilen kullanıcı verisi
+  - `error` — Supabase sorgu hatası
+  - `u` — map içindeki her kullanıcı nesnesi
+- **Dönüş**: AdminSearcher[] (resourceKey, id, title, subtitle, route alanlarından oluşan nesne dizisi)
 
-### [N8_NASIL] AST Pointer: src/lib/admin/search/resourceSearchers.ts::searchErrorGroups
-- **params**: `supabase` (SupabaseClient instance), `query` (search string), `limit` (maximum results)
+### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::searchCoupons
+- **params**: `supabase`, `query`, `limit`
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen hata grubu verisi dizisi (error_groups tablosundan)
-  - `error` — Supabase sorgusundaki olası hata nesnesi
-  - `eg` — map callback parametresi, her bir hata grubu nesnesini temsil eder
-- **Dönüş**: AdminSearcher dizisi (resourceKey: 'error_groups', id, title, subtitle, route)
+  - `data` — `coupons` tablosundan çekilen kupon verisi
+  - `error` — Supabase sorgu hatası
+  - `c` — map içindeki her kupon nesnesi
+- **Dönüş**: AdminSearcher[] (resourceKey, id, title, subtitle, route alanlarından oluşan nesne dizisi)
 
-### [N9_NASIL] AST Pointer: src/lib/admin/search/resourceSearchers.ts::searchAudit
-- **params**: `supabase` (SupabaseClient instance), `query` (search string), `limit` (maximum results)
+### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::searchMovements
+- **params**: `supabase`, `query`, `limit`
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen denetim kaydı verisi dizisi (admin_audit_log tablosundan)
-  - `error` — Supabase sorgusundaki olası hata nesnesi
-  - `a` — map callback parametresi, her bir denetim kaydı nesnesini temsil eder
-- **Dönüş**: AdminSearcher dizisi (resourceKey: 'audit', id, title, subtitle, route)
+  - `q` — `_movementQueryFn` fonksiyonundan dönen sorgu nesnesi
+  - `data` — sorgu sonucu çekilen hareket verisi
+  - `error` — Supabase sorgu hatası
+  - `rows` — `data` veya boş dizi
+  - `m` — map içindeki her hareket nesnesi
+  - `prod` — `m.products` değeri, ürün ilişkisi (dizi veya tek nesne)
+  - `prodName` — `prod?.name` değeri, ürün adı
+- **Dönüş**: AdminSearcher[] (resourceKey, id, title, subtitle, route alanlarından oluşan nesne dizisi)
 
-### [N10_NASIL] AST Pointer: src/lib/admin/search/resourceSearchers.ts::searchInventory
-- **params**: `supabase` (SupabaseClient instance), `query` (search string), `limit` (maximum results)
+### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::searchErrorGroups
+- **params**: `supabase`, `query`, `limit`
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen envanter hız verisi dizisi (inventory_velocity tablosundan, 'as never' ile tip bypass)
-  - `error` — Supabase sorgusundaki olası hata nesnesi
-  - `rows` — `data` dizisinin InventoryVelocityRow[] tipine cast edilmiş hali
-  - `i` — map callback parametresi, her bir envanter satırını temsil eder
-- **Dönüş**: AdminSearcher dizisi (resourceKey: 'inventory', id, title, subtitle, route)
+  - `data` — `error_groups` tablosundan çekilen hata grubu verisi
+  - `error` — Supabase sorgu hatası
+  - `eg` — map içindeki her hata grubu nesnesi
+- **Dönüş**: AdminSearcher[] (resourceKey, id, title, subtitle, route alanlarından oluşan nesne dizisi)
+
+### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::searchAudit
+- **params**: `supabase`, `query`, `limit`
+- **ic_degiskenler**:
+  - `data` — `admin_audit_log` tablosundan çekilen denetim kaydı verisi
+  - `error` — Supabase sorgu hatası
+  - `a` — map içindeki her denetim kaydı nesnesi
+- **Dönüş**: AdminSearcher[] (resourceKey, id, title, subtitle, route alanlarından oluşan nesne dizisi)
+
+### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts::searchInventory
+- **params**: `supabase`, `query`, `limit`
+- **ic_degiskenler**:
+  - `data` — `_velocityQueryFn` fonksiyonundan dönen sorgu sonucu envanter verisi
+  - `error` — Supabase sorgu hatası
+  - `rows` — `data` veya boş dizi
+  - `i` — map içindeki her envanter nesnesi
+- **Dönüş**: AdminSearcher[] (resourceKey, id, title, subtitle, route alanlarından oluşan nesne dizisi)
 
 ---
 
@@ -298,6 +308,8 @@ type AdminSearcher = (
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    resourceSearchers_ts___movementQueryFn["_movementQueryFn"]
+    resourceSearchers_ts___velocityQueryFn["_velocityQueryFn"]
     resourceSearchers_ts__searchAudit["searchAudit"]
     resourceSearchers_ts__searchCategories["searchCategories"]
     resourceSearchers_ts__searchCoupons["searchCoupons"]
@@ -308,11 +320,15 @@ graph TD
     resourceSearchers_ts__searchProducts["searchProducts"]
     resourceSearchers_ts__searchReturns["searchReturns"]
     resourceSearchers_ts__searchUsers["searchUsers"]
+    resourceSearchers_ts__searchInventory --> resourceSearchers_ts___velocityQueryFn
+    resourceSearchers_ts__searchMovements --> resourceSearchers_ts___movementQueryFn
 ```
 
 ## NODE ID STANDARD
 
   file: src\lib\admin\search\resourceSearchers.ts
+  function: src\lib\admin\search\resourceSearchers.ts::_movementQueryFn
+  function: src\lib\admin\search\resourceSearchers.ts::_velocityQueryFn
   function: src\lib\admin\search\resourceSearchers.ts::searchProducts
   function: src\lib\admin\search\resourceSearchers.ts::searchOrders
   function: src\lib\admin\search\resourceSearchers.ts::searchReturns
@@ -329,6 +345,8 @@ graph TD
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminSearcher
   export: CommandResult
+  export: InventoryMovementJoinedRow
+  export: InventoryVelocityRow
   export: searchAudit
   export: searchCategories
   export: searchCoupons

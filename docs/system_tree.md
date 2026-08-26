@@ -2,15 +2,18 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-25T08:52:35.610540+00:00
+compiled_at: 2026-08-26T07:10:53.872152+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-25T08:52:35.610540+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-26T07:10:53.872152+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
 📂 venthub-hvac/
+├── 📂 ** .agents/**
+│   └── 📂 **explorer_m4_1_gen2/**
+│       └── ⚠️ `handoff.md`
 ├── ⚪ `CHANGELOG.md`
 ├── ⚪ `CLAUDE.md`
 ├── ⚪ `CONTEXT.md`
@@ -21,6 +24,7 @@ Bu belge, otonom derleyici tarafından 2026-08-25T08:52:35.610540+00:00 tarihind
 ├── ⚠️ `TEST_INFRA.md`
 ├── ⚠️ `TEST_READY.md`
 ├── ⚪ `VISION.md`
+├── 📂 **cache/**
 ├── 📂 **docs/**
 │   ├── ⚪ `DURUM-TAKIP.md`
 │   ├── ⚪ `README.md`
@@ -215,6 +219,8 @@ Bu belge, otonom derleyici tarafından 2026-08-25T08:52:35.610540+00:00 tarihind
 │   ├── ✅ `admin-smoke.e2e.ts`
 │   ├── ✅ `checkout-smoke.e2e.ts`
 │   └── ✅ `reflow.e2e.ts`
+├── 📂 **explorer_m2_3/**
+│   └── ⚠️ `analysis.md`
 ├── ⚠️ `implementation_plan.md`
 ├── 📂 **memory-engine/**
 │   └── ⚪ `README.md`
@@ -637,7 +643,8 @@ Bu belge, otonom derleyici tarafından 2026-08-25T08:52:35.610540+00:00 tarihind
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
 │   │   │   ├── ✅ `RichTextRenderer.tsx`
-│   │   │   └── ✅ `VariantSelector.tsx`
+│   │   │   ├── ✅ `VariantSelector.tsx`
+│   │   │   └── 📂 **visual-models/**
 │   │   ├── 📂 **quotes/**
 │   │   │   ├── ✅ `QuoteRequestButton.tsx`
 │   │   │   └── ✅ `QuoteRequestModal.tsx`
@@ -1084,9 +1091,11 @@ Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut.
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
+- [⚠️] ` .agents\explorer_m4_1_gen2\handoff.md`
 - [⚠️] `ORIGINAL_REQUEST.md`
 - [⚠️] `TEST_INFRA.md`
 - [⚠️] `TEST_READY.md`
+- [⚠️] `explorer_m2_3\analysis.md`
 - [⚠️] `implementation_plan.md`
 - [⚠️] `next.config.md`
 
