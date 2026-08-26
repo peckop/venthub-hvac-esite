@@ -52,6 +52,7 @@ const yaz = (s) => process.stdout.write(Buffer.from(String(s) + '\n', 'utf8'))
  * yazımı aynı ana yığılır. Bu tablo hatırdan yazılmaz, buradan okunur.
  */
 const OFSETLER = {
+  URUN: '1,21,41',
   I18N: '5,25,45',
   EDGE: '3,23,43',
   ADMIN: '7,27,47',
