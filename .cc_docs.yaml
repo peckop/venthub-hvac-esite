@@ -42,6 +42,10 @@ extra_masters:
     output: "docs/standards_master.md"
   - name: "kayitlar_master.md"
     source_dirs: ["docs/audits", "docs/plans"]
-    include_files: ["CONTEXT.md", "PROJECT.md", "VISION.md", "RECOMMENDATIONS.md", "CHANGELOG.md", "docs/README.md", "docs/DURUM-TAKIP.md"]
+    # docs/system_tree.md BURADA: defterdeki "System Tree" kaynagi 2026-06-02'de
+    # kalmisti ve hicbir sey onu tazelemiyordu (boru hattinda KODA GOMULU olarak
+    # master supurmesinden atlaniyor). Kume master'ina alinca her senkronda
+    # yeniden uretilen GUNCEL agac ikize girer; "bayat mi, hic mi" ikilemi kalkar.
+    include_files: ["CONTEXT.md", "PROJECT.md", "VISION.md", "RECOMMENDATIONS.md", "CHANGELOG.md", "docs/README.md", "docs/DURUM-TAKIP.md", "docs/system_tree.md"]
     output: "docs/kayitlar_master.md"
 
