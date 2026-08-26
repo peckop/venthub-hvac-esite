@@ -218,9 +218,9 @@ const ContactPage: React.FC = () => {
                     <input
                       id="contact-consent" type="checkbox" checked={consent}
                       onChange={(e) => setConsent(e.target.checked)}
-                      className="mt-1 w-4 h-4 rounded border-slate-300 text-cyan-600 focus-visible:ring-2 focus-visible:ring-cyan-500"
+                      className="mt-1 w-4 h-4 rounded text-cyan-600 focus-visible:ring-2 focus-visible:ring-cyan-500"
                     />
-                    <label htmlFor="contact-consent" className="text-xs text-slate-500 leading-relaxed cursor-pointer">
+                    <label htmlFor="contact-consent" className="text-xs text-steel-gray leading-relaxed cursor-pointer">
                       <Link href={Routes.legal.kvkk()} className="text-cyan-600 hover:underline font-medium" target="_blank" rel="noopener noreferrer">
                         {t('legalLinks.kvkk')}
                       </Link>{' '}
@@ -230,7 +230,7 @@ const ContactPage: React.FC = () => {
 
                   {/* Yazma hatası — cetvel §2: form açık kalır, girdiler korunur. */}
                   {formError && (
-                    <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4">
+                    <div role="alert" className="rounded-hvac-md border border-red-200 bg-red-50 px-5 py-4">
                       <p className="text-xs text-red-600">{formError}</p>
                     </div>
                   )}
