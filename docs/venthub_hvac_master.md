@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T20:44:44.370473+00:00
-total_compiled_files: 654
-source_commit: 12a06e1d
+compiled_at: 2026-08-26T21:13:02.310353+00:00
+total_compiled_files: 656
+source_commit: 9521444c
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-26T20:44:44.370473+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-26T21:13:02.310353+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -19466,13 +19466,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\data-table\DataTableKit.tsx
-skeleton_hash: f3b0ebf28a23834d
+source_path: C:\tmp\ops-836\src\components\admin\data-table\DataTableKit.tsx
+skeleton_hash: aedd99408b21479b
 entity_hashes:
-  func:DataTableKit: e714f69d9f2449b2
-  overview: a2c088a7cccc7fb9
-  style_tokens: 5a324826484cf67f
-generated_at: 2026-08-25T07:26:28Z
+  func:DataTableKit: 9d029f93373fe873
+  overview: b868e3edab37a5c7
+  style_tokens: db6fc579bfa7b43f
+generated_at: 2026-08-26T20:51:16Z
 ---
 
 ## Genel Bakış
@@ -19498,42 +19498,48 @@ Veri tablosunun ana render sorumluluğunu üstlenir. Generic tip parametresi say
 
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Gerekçe:** Fonksiyon gövdesi verilmediğinden, gövdeden çıkarım yapılabilecek bir koşul bulunmamaktadır. Yalnızca fonksiyon imzası (`DataTableKit(props: DataTableKitProps<T>) -> ReactNode`) mevcut olup, imza tek başına çalıştırılabilir bir aksiyom üretmez.
+**Gerekçe:** Fonksiyon gövdesi verilmediğinden, gövdenin çalıştırılabilir bir aksiyom üretmesi mümkün değildir. Yalnızca fonksiyon imzası mevcut olup, imza tek başına çalıştırılabilir bir aksiyom üretmez.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için fonksiyon gövdesi verilmediğinden, gövdeden türetilen özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### DataTableKit
-**Ne yapar**: Veri tablosu bileşeninin tüm yönetim mantığını tek bir "kit" (set) altında birleştiren üst düzey React fonksiyonudur. Kolon görünürlüğü, yoğunluk (density), satır genişletme, sayfalama, seçim, sıralama ve erişim denetimi gibi tablonun tüm durumlarını koordine eder; toolbar, toplu işlem çubuğu, tablo başlığı, satır gövdesi ve durum ekranlarını (boş, filtre boş, hata, yetki reddi) bir arada render eder.
+**Ne yapar**: Genel amaçlı bir veri tablosu kit bileşenidir. Kolon görünürlüğü, yoğunluk (density), satır genişletme, seçim, sayfalama ve sıralama gibi masaüstü veri tablosu yönetimini tek bir bileşen altında birleştirir. Okuma/yazma yetkilerine göre farklı durumlar (erişim reddi, hata, boş durum) gösterir.
 
-**Nasıl yapar**: Props'tan gelen `table` nesnesi üzerinden sıralama (`table.sorting`), seçim (`table.selection`), sayfalama (`table.pagination`), filtreleme (`table.filtering`) ve yükleme durumu (`table.isLoading`) gibi alt modüllere erişir. Kolon görünürlüğü ve yoğunluk tercihleri `persistKey` ile `localStorage`'a yazılır ve okunur; `useEffect` bağımlılıkları sayesinde her değişiklikte otomatik kaydedilir. `useMemo` ile görünür kolon anahtarları ve kolon toggle listesi hesaplanır; `hideable` olmayan kolonlar her zaman görünürdür, `defaultHidden` olanlar varsayılan olarak gizlidir. Satır genişletme durumu `expanded` adlı bir `Set<string>` ile yönetilir; `toggleExpand` fonksiyonu bu seti günceller. `hasReadAccess === false` olduğunda bileşen erken dönüş yaparak `accessDeniedState` görüntüler. Tablo gövdesinde üç durum ele alınır: yükleme sırasında iskelet (skeleton), satır yokken boş durum (filtre aktifse `filterEmptyState`, değilse `emptyState`), ve satırlar varken satır haritalama. Her satırda seçim kutusu (`selectable`), genişletme butonu (`expandable`) ve görünür kolonlar sırayla render edilir. İlk görünür kolonun hücresi `rowHref` tanımlıysa bir `Link` bileşeniyle sarmalanır. Sayfalama kontrolleri `pageCount > 1` koşulunda gösterilir; `renderPageLabel` prop'u ile sayfa etiketi özelleştirilebilir. `ColumnsMenu` bileşeni kolon görünürlük anahtarlarını ve yoğunluk seçimini sunar. `useI18n` hook'u ile uluslararasılaştırma desteği sağlanır; i18n etiketleri (`selectAllLabel`, `rowSelectLabel`, `expandLabel`, `totalLabel`) prop olarak geçilmezse sözlükten (`t()`) varsayılan değerler alınır — bu, eski sürümdeki ham Türkçe dizgi sorununu çözmek için tasarlanmıştır.
+**Nasıl yapar**: Bileşen, `props` parametresinden gelen yapılandırma değerlerini ayrıştırarak başlar. `useI18n` hook'u ile uluslararasılaştırma desteği sağlar; etiketler için önce prop değeri, ardından sözlük (`t()`) kullanılır (nullish coalescing `??` operatörü ile). Kolon görünürlüğü ve yoğunluk durumları `persistKey` ile yerel depolamaya kaydedilir ve yüklenir; bu sayede kullanıcı tercihleri oturumlar arası korunur. `defaultVisibility` hesaplaması, `columns` dizisindeki `hideable` ve `defaultHidden` alanlarına göre yapılır. Görünür kolonlar, `visibleCols` durumu ile `columns` dizisinin birleşiminden hesaplanır. `columnToggles` dizisi, `ColumnsMenu` bileşenine aktarılmak üzere her gizlenebilir kolon için bir toggle yapılandırması oluşturur. Satır genişletme durumu `expanded` adlı bir `Set<string>` ile yönetilir; `toggleExpand` fonksiyonu satır kimliğine göre açma/kapama işlemi yapar. `selectable` durumu `hasWriteAccess`'e, `expandable` durumu `renderExpandedRow` fonksiyonunun varlığına bağlıdır. `colSpan` değeri görünür kolon sayısı artı seçim ve genişletme sütunlarının varlığına göre hesaplanır. Okuma yetkisi (`hasReadAccess`) `false` ise `accessDeniedState` render edilir ve erken dönüş yapılır. Tablo gövdesinde dört durum ele alınır: yükleme sırasında iskelet (skeleton), filtre aktifken boş durum, filtresiz boş durum ve satırların render'ı. Her satır için seçim checkbox'ı, genişletme butonu ve görünür kolon hücreleri render edilir. `rowHref` tanımlıysa ilk görünür kolonun içeriği bir `Link` bileşeni ile sarılır. `onRowClick` tanımlıysa satır tıklanabilir hale gelir; klavye erişilebilirliği için `Enter` ve `Space` tuşları da işlenir. Sayfalama bileşeni (`DataTablePagination`) tablonun altında, `admin-standard.md §3/4` standardına uygun olarak konumlandırılır. `toolbarSlot` ve `bulkBarSlot` slotları sırasıyla üst ve alt kısımlara yerleştirilir.
 
 **Parametreler**:
-- props: DataTableKitProps\<T\> — Tablonun tüm yapılandırma ve davranış tanımlarını içeren tek props nesnesi. Aşağıdaki alanlar bu nesneden destruct edilir:
-  - columns: ColumnDef\<T\>[] — Tablonun tanımlı kolon dizisi. Her kolon `key`, `header`, `cell`, `hideable`, `defaultHidden`, `align`, `cellClassName` gibi alanlar içerir.
-  - table: TableState\<T\> — Tablonun tüm durum nesnesi. `rows`, `totalMatched`, `isLoading`, `error`, `pagination` (`page`, `pageCount`, `setPage`), `sorting` (`sort`, `toggleSort`), `selection` (`isSelected`, `toggle`, `allSelected`, `toggleAll`), `filtering` (`hasActiveFilters`) alt nesnelerini barındırır.
-  - rowId: (row: T) => string — Her satırı benzersiz şekilde tanımlayan kimlik üreten fonksiyon.
-  - persistKey: string — Kolon görünürlüğü ve yoğunluk tercihlerinin `localStorage`'da saklanacağı anahtar.
-  - hasWriteAccess: boolean — Yazma yetkisi olup olmadığını belirtir; `true` olduğunda satır seçim kutuları ve toplu işlem desteği aktif olur.
-  - hasReadAccess: boolean — Okuma yetkisi olup olmadığını belirtir; `false` olduğunda `accessDeniedState` gösterilir. Varsayılan değeri `true`'dur.
-  - emptyState: ReactNode — Tabloda hiç satır yokken ve filtre aktif değilken gösterilecek bileşen.
-  - filterEmptyState: ReactNode — Tabloda hiç satır yokken ve filtre aktifken gösterilecek bileşen.
-  - accessDeniedState: ReactNode — Okuma yetkisi reddedildiğinde gösterilecek bileşen.
-  - errorLabel: string — Tablo hata durumunda gösterilecek metin; geçilmezse sözlükten `admin.dataTable.states.error` anahtarıyla alınır.
-  - rowHref: ((row: T) => string) | undefined — Satırın ilk görünür hücresini tıklanabilir bağlantıya dönüştüren fonksiyon; tanımlıysa `Link` bileşeniyle sarmalanır.
-  - onRowClick: ((row: T) => void) | undefined — Satıra tıklandığında çağrılan fonksiyon; tanımlıysa satır `cursor-pointer` ve `role="button"` ile erişilebilir hale gelir, Enter ve Space tuşlarıyla tetiklenebilir.
-  - renderExpandedRow: ((row: T) => ReactNode) | undefined — Genişletilmiş satırın içeriğini üreten fonksiyon; tanımlıysa her satırda genişletme butonu gösterilir.
-  - toolbarSlot: ReactNode — Tablonun üstüne yerleştirilecek özel toolbar içeriği.
-  - bulkBarSlot: ReactNode — Tablonun altına yerleştirilecek toplu işlem çubuğu içeriği.
-  - columnsButtonLabel: string — Kolon menüsü butonunun etiketi.
-  - selectAllLabel: string — Tablo başlığındaki "tümünü seç" onay kutusunun erişilebilirlik etiketi; geçilmezse sözlükten `admin.dataTable.labels.selectAll` anahtarıyla alınır.
-  - rowSelectLabel: string — Her satırdaki seçim onay kutusunun erişilebilirlik etiketi; geçilmezse sözlükten `admin.dataTable.labels.rowSelect` anahtarıyla alınır.
-  - expandLabel: string — Her satırdaki genişletme butonunun erişilebilirlik etiketi; geçilmezse sözlükten `admin.dataTable.labels.expand` anahtarıyla alınır.
-  - totalLabel: string — Sayfalama alanında gösterilen toplam kayıt etiketi; geçilmezse sözlükten `admin.dataTable.pagination.total` anahtarıyla alınır.
-  - renderPageLabel: ((page: number, pageCount: number) => ReactNode) | undefined — Sayfa göstergesini özel olarak biçimlendiren fonksiyon; geçilmezse `"{page} / {pageCount}"` biçimi kullanılır.
+- props: `DataTableKitProps<T>` — Bileşenin tüm yapılandırmasını içeren generic props nesnesi. Aşağıdaki alt alanları içerir:
+  - columns: `Column<T>[]` — Tablo kolon tanımları dizisi. Her kolon `key`, `header`, `cell`, `hideable`, `defaultHidden`, `align`, `cellClassName` gibi alanlar içerir.
+  - table: `TableState` — Tablo durumu nesnesi. `pagination` (page, pageCount, setPage), `sorting` (sort, toggleSort), `selection` (isSelected, toggle, allSelected, toggleAll), `filtering` (hasActiveFilters), `rows`, `totalMatched`, `isLoading`, `error` gibi alt nesneler içerir.
+  - rowId: `(row: T) => string` — Her satır için benzersiz kimlik döndüren fonksiyon.
+  - persistKey: `string` — Kolon görünürlüğü ve yoğunluk tercihlerinin yerel depolamada saklanması için kullanılan benzersiz anahtar.
+  - hasWriteAccess: `boolean` — Yazma yetkisi olup olmadığını belirler; `true` ise satır seçim checkbox'ları gösterilir.
+  - hasReadAccess: `boolean` — Okuma yetkisi olup olmadığını belirler; varsayılan değeri `true`'dur. `false` olduğunda `accessDeniedState` gösterilir.
+  - emptyState: `ReactNode` — Tabloda filtre aktif değilken ve satır yokken gösterilecek bileşen.
+  - filterEmptyState: `ReactNode` — Tabloda filtre aktifken ve sonuç yokken gösterilecek bileşen.
+  - accessDeniedState: `ReactNode` — Okuma yetkisi olmadığında gösterilecek bileşen.
+  - errorLabel: `string` — Tablo hata durumunda gösterilecek metin; tanımlı değilse sözlükten `admin.dataTable.states.error` anahtarı ile alınır.
+  - rowHref: `((row: T) => string) | undefined` — Satır için bağlantı URL'i döndüren fonksiyon; tanımlıysa ilk görünür kolonun hücre içeriği bağlantı olarak render edilir.
+  - onRowClick: `((row: T) => void) | undefined` — Satıra tıklandığında çağrılacak fonksiyon; tanımlıysa satır `cursor-pointer` ve `role="button"` ile render edilir.
+  - renderExpandedRow: `((row: T) => ReactNode) | undefined` — Genişletilmiş satır içeriğini render eden fonksiyon; tanımlıysa her satırın yanında genişletme butonu gösterilir.
+  - toolbarSlot: `ReactNode` — Tablo üstüne yerleştirilecek araç çubuğu bileşeni.
+  - bulkBarSlot: `ReactNode` — Tablo altına yerleştirilecek toplu işlem çubuğu bileşeni.
+  - columnsButtonLabel: `string` — Kolon menüsü butonunun etiketi.
+  - selectAllLabel: `string` — "Tümünü seç" checkbox'ının erişilebilirlik etiketi; tanımlı değilse sözlükten `admin.dataTable.labels.selectAll` anahtarı ile alınır.
+  - rowSelectLabel: `string` — Satır seçim checkbox'ının erişilebilirlik etiketi; tanımlı değilse sözlükten `admin.dataTable.labels.rowSelect` anahtarı ile alınır.
+  - expandLabel: `string` — Satır genişletme butonunun erişilebilirlik etiketi; tanımlı değilse sözlükten `admin.dataTable.labels.expand` anahtarı ile alınır.
+  - totalLabel: `string` — Toplam kayıt sayısı etiketi; tanımlı değilse sözlükten `admin.dataTable.pagination.total` anahtarı ile alınır.
+  - renderPageLabel: `(page: number) => string` — Sayfa numarası butonlarının erişilebilirlik etiketini oluşturan fonksiyon.
 
-**Dönüş**: ReactNode — Tablonun tüm alt bileşenlerini (toolbar, tablo konteyneri, hata bandı, sayfalama, tablo başlığı, satırlar, toplu işlem çubuğu) içeren bir React ağacı döndürür. `hasReadAccess === false` olduğunda doğrudan `accessDeniedState` döndürülür.
+**Dönüş**: `ReactNode` — Tablo bileşeninin render edilmiş JSX ağacı. Okuma yetkisi yoksa `accessDeniedState`, aksi halde araç çubuğu, tablo (başlık, gövde, sayfalama) ve toplu işlem çubuğunu içeren bir `div` döndürür.
 
 ---
 
@@ -19544,6 +19550,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - import: ../ColumnsMenu::ColumnsMenu
 - import: ../ColumnsMenu::type ColumnToggle
 - import: ./DataTableHead::DataTableHead
+- import: ./DataTablePagination::DataTablePagination
 - import: ./persist::loadColumnVisibility
 - import: ./persist::loadDensity
 - import: ./persist::saveColumnVisibility
@@ -19591,8 +19598,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: DataTableKit.tsx
-  function: DataTableKit.tsx::DataTableKit
+  file: src\components\admin\data-table\DataTableKit.tsx
+  function: src\components\admin\data-table\DataTableKit.tsx::DataTableKit
 
 ---
 
@@ -19611,10 +19618,129 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger`, `bg-admin-danger-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-border`, `border-b`, `hover:bg-admin-surface-2`, `hover:text-admin-accent`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg-muted`, `text-center`, `text-xs`
-- **Layout:** `block`, `custom-scrollbar`, `flex`, `flex-wrap`, `gap-2`, `gap-3`, `h-1.5`, `h-4`, `h-6`, `h-8`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `overflow-x-auto`
-- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminTableCellClass`, `${alignClass`, `${cellPad`, `${clickable`, `${col.cellClassName`, `:`, `border`, `content-auto-table`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-30`, `divide-admin-border`, `divide-y`, `duration-300`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger`, `bg-admin-danger-weak`, `bg-admin-surface-2`, `border-admin-border`, `border-b`, `hover:bg-admin-surface-2`, `hover:text-admin-accent`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg-muted`, `text-center`, `text-xs`
+- **Layout:** `block`, `custom-scrollbar`, `flex`, `flex-wrap`, `gap-2`, `gap-3`, `h-1.5`, `h-4`, `h-6`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `overflow-x-auto`, `p-0`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${adminTableCellClass`, `${alignClass`, `${cellPad`, `${clickable`, `${col.cellClassName`, `:`, `content-auto-table`, `cursor-pointer`, `divide-admin-border`, `divide-y`, `duration-300`, `focus-visible:ring-admin-accent/30`, `focus-visible:ring-offset-0`, `font-bold`
+
+---
+# FILE: src\components\admin\data-table\DataTablePagination.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\tmp\ops-836\src\components\admin\data-table\DataTablePagination.tsx
+skeleton_hash: 04b72290cf32014e
+entity_hashes:
+  func:DataTablePagination: c8e912b4df860174
+  overview: e792b3a403037aca
+  style_tokens: 7ccdec5abbb098cb
+generated_at: 2026-08-26T20:52:18Z
+---
+
+## Genel Bakış
+Bu modül, admin panelindeki veri tablosu bileşenlerinin sayfalama (pagination) arayüzünü sağlayan bir React bileşenidir. `DataTablePaginationProps` tipindeki özellikleri alarak sayfalama kontrollerini render eder. Modül, `src/components/admin/data-table` alt yapısının bir parçası olarak konumlanmıştır.
+
+## Fonksiyon Grupları
+
+### Sayfalama Bileşeni
+Veri tablosunun alt kısmında yer alan sayfalama navigasyonunu oluşturur. Kullanıcının sayfalar arasında gezinmesini sağlayan arayüz elemanlarını render eder.
+- DataTablePagination
+
+## Bağımlılıklar
+
+### İç Bağımlılıklar
+Tek bir fonksiyon içerdiğinden modül içi çağrı ilişkisi bulunmamaktadır.
+
+### Dış Bağımlılıklar
+- `DataTablePaginationProps` tipi: Bileşenin aldığı özellikleri tanımlayan dış tip tanımı. Bu tipin hangi modülden geldiği bu kaynak dosyada belirtilmemiştir.
+
+### Mimari Not
+Modül, `admin/data-table` alt yapısının bir parçasıdır ve muhtemelen ana veri tablosu bileşeni tarafından çağrılır. Tek bir dışa aktarılan bileşenden oluştuğu için modülün kapsamı dar ve odaklıdır.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** Fonksiyon gövdesi verilmediğinden, `DataTablePagination` bileşeninin çalışma koşulları ve davranışsal varsayımları belirlenememektedir. İmzadan yalnızca bir React bileşeni olduğu ve `DataTablePaginationProps` tipinde props aldığı çıkarılabilir; ancak bu genel React varsayımlarıdır ve modüle özgü aksiyom niteliği taşımaz.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### DataTablePagination
+**Ne yapar**: Tablonun altında tek bir blok olarak görüntülenen sayfalama denetimlerini oluşturur. Bileşen, `docs/standards/admin-standard.md` dosyasının §3 numaralı bölümündeki (Resource Index bileşim sırası) dördüncü maddeye uygun olarak konumlandırılmıştır; bu madde "Sayfalama — altta; ~50 öğeden sonra zorunlu." kuralını belirtir. Kural yazılı olmasına rağmen daha önce yalnızca üst araç çubuğunda uygulanmıştı.
+
+**Nasıl yapar**: Bileşen, gelen `props` içindeki `pageCount` değerini kontrol eder. Eğer `pageCount` 1 veya daha küçükse, denetimler görüntülenmez ve `null` döndürür; çünkü tıklanamaz iki ok bilgi taşımaz ve gürültü yapar. Aksi takdirde, bir üst kenarlık ve arka plan rengine sahip bir kapsayıcı (`div`) içinde üç ana eleman oluşturur: bir önceki sayfa butonu, sayfa bilgisini gösteren bir etiket ve bir sonraki sayfa butonu. Önceki sayfa butonu, `setPage` fonksiyonunu çağırarak mevcut sayfayı 1 azaltır (ancak 1'in altına düşmesini engeller) ve ilk sayfadayken devre dışıdır. Sonraki sayfa butonu, mevcut sayfayı 1 artırır (ancak `pageCount`'u aşmasını engeller) ve son sayfadayken devre dışıdır. Sayfa etiketi, `renderPageLabel` fonksiyonu sağlanmışsa bu fonksiyonu kullanarak özel bir etiket oluşturur; sağlanmamışsa varsayılan olarak "mevcutSayfa / toplamSayfa" biçiminde görüntülenir. Butonlar, erişilebilirlik için `aria-label` özelliğine sahiptir ve ChevronRight ikonu kullanır; önceki sayfa butonundaki ikon 180 derece döndürülmüştür.
+
+**Parametreler**:
+- props: DataTablePaginationProps — Bileşenin davranışını ve görünümünü yapılandıran özellikleri içerir. Bu özellikler arasında mevcut sayfa numarası (`page`), toplam sayfa sayısı (`pageCount`), sayfa değiştirme fonksiyonu (`setPage`), önceki ve sonraki butonlar için etiket metinleri (`previousLabel`, `nextLabel`) ve isteğe bağlı olarak özel sayfa etiketi oluşturma fonksiyonu (`renderPageLabel`) bulunur.
+
+**Dönüş**: ReactNode — Bileşen, bir React düğümü döndürür. `pageCount` 1 veya daha küçükse `null` döndürerek hiçbir şey görüntülemez. Aksi takdirde, sayfalama denetimlerini içeren bir JSX yapısı döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: lucide-react::ChevronRight
+- import: react::type { ReactNode }
+
+---
+
+## INTERFACES
+
+### DataTablePaginationProps
+- `page: number`
+- `pageCount: number`
+- `setPage: (page: number) => void`
+- `previousLabel: string`
+- `nextLabel: string`
+- `renderPageLabel?: (page: number, pageCount: number) => ReactNode`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: DataTablePagination.tsx::DataTablePagination
+- **params**: `props: DataTablePaginationProps`
+- **ic_degiskenler**:
+  - `page` — `props`'tan çıkarılan mevcut sayfa numarası; `setPage` çağrılarında ve butonların `disabled` durumlarında kullanılır
+  - `pageCount` — `props`'tan çıkarılan toplam sayfa sayısı; tek sayfa kontrolünde ve sonraki butonun `disabled` durumunda kullanılır
+  - `setPage` — `props`'tan çıkarılan sayfa değiştirme fonksiyonu; önceki buton `onClick`'inde `Math.max(1, page - 1)`, sonraki buton `onClick`'inde `Math.min(pageCount, page + 1)` ile çağrılır
+  - `previousLabel` — `props`'tan çıkarılan önceki butonun `aria-label` değeri
+  - `nextLabel` — `props`'tan çıkarılan sonraki butonun `aria-label` değeri
+  - `renderPageLabel` — `props`'tan çıkarılan opsiyonel özel sayfa etiketi render fonksiyonu; varsa `renderPageLabel(page, pageCount)` şeklinde çağrılır, yoksa `` `${page} / ${pageCount}` `` template literal kullanılır
+- **Dönüş**: `pageCount <= 1` ise `null`, aksi halde `ReactNode` (sayfalama denetimi içeren `<div>` JSX'i)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\admin\data-table\DataTablePagination.tsx
+  function: src\components\admin\data-table\DataTablePagination.tsx::DataTablePagination
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: DataTablePagination
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-border`, `border-t`, `hover:text-admin-fg`, `text-admin-fg-muted`, `text-center`, `text-xs`
+- **Layout:** `flex`, `flex-wrap`, `gap-2`, `h-8`, `items-center`, `justify-center`, `justify-end`, `p-4`, `w-8`
+- **Varyant/Responsive:** `disabled:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `border`, `disabled:cursor-not-allowed`, `disabled:opacity-30`, `font-semibold`, `px-3`, `py-1.5`, `rotate-180`, `rounded-admin-md`, `tracking-tighter`, `transition-colors`
 
 ---
 # FILE: src\components\admin\data-table\FacetedFilter.md
@@ -47735,11 +47861,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts
-skeleton_hash: cb85a85e8d45db0d
+source_path: C:\tmp\vh-rec80\src\i18n\dictionaries\en.ts
+skeleton_hash: 761178315be27aad
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-24T11:54:07Z
+generated_at: 2026-08-26T19:38:59Z
 ---
 
 ## Genel Bakış
@@ -47798,11 +47924,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
-skeleton_hash: 100b21dc23104fef
+source_path: C:\tmp\vh-rec80\src\i18n\dictionaries\tr.ts
+skeleton_hash: 0f425846c1a7eb72
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-08-24T11:54:09Z
+generated_at: 2026-08-26T19:39:02Z
 ---
 
 ## Genel Bakış
@@ -57622,6 +57748,118 @@ Bu modül için aksiyomlar, yalnızca fonksiyon imzasından çıkarılabilen ko�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: getCategories
+
+---
+# FILE: src\lib\services\contactMessageService.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\tmp\vh-rec80\src\lib\services\contactMessageService.ts
+skeleton_hash: 7132a939a872ee42
+entity_hashes:
+  func:submitContactMessage: 0d8bdfa3ae2bec82
+  overview: e4c082f3ad81112f
+generated_at: 2026-08-26T19:27:53Z
+---
+
+## Genel Bakış
+
+Bu modül, iletişim mesajlarının gönderilmesiyle ilgilenen bir servis katmanıdır. Supabase veritabanı istemcisini kullanarak kullanıcıdan gelen iletişim mesajı verilerini işler. Modül tek bir asenkron fonksiyondan oluşur ve bir sonuç değeri döndürür.
+
+## Fonksiyon Grupları
+
+### İletişim Mesajı Gönderme
+
+Kullanıcıdan alınan iletişim mesajı verisini Supabase veritabanına kaydeder ve işlemin sonucunu döndürür.
+
+- submitContactMessage
+
+## Bağımlılıklar
+
+- **Dış bağımlılık:** SupabaseClient ve Database türleri (Supabase kütüphanesi)
+- **Dış bağımlılık:** ContactMessageInput türü (muhtemelen aynı projede tanımlı bir arayüz veya tip)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Neden:** Fonksiyon gövdesi verilmediğinden, `submitContactMessage` fonksiyonunun çalışma mantığı, hangi tabloya yazdığı, hangi doğrulama kontrollerini yaptığı veya hangi hata senaryolarını ele aldığı bilinmemektedir. Yalnızca fonksiyon imzası (`supabase: SupabaseClient<Database>`, `input: ContactMessageInput`, dönüş tipi `Promise<string>`) mevcuttur; bu bilgiler fonksiyonun davranışını belirlemek için yeterli değildir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### submitContactMessage
+**Ne yapar**: İletişim mesajını veritabanına kaydeder ve kaydedilen satırın kimliğini döndürür. Hata durumunda fırlatır — sessiz yutma yoktur. Başarı kanıtlanamıyorsa (RPC hata vermez ama kimlik de dönmezse) bu durum da hata olarak değerlendirilir.
+
+**Nasıl yapar**: Supabase istemcisi üzerinden `submit_contact_message` adlı sunucu tarafı (RPC) fonksiyonunu çağırır. Girdi nesnesindeki tüm alanları bu RPC fonksiyonuna parametre olarak aktarır. Çağrı tamamlandıktan sonra iki kontrol yapılır: Birincisi, `error` değişkeni doluysa bu hata doğrudan fırlatılır. İkincisi, `data` değişkeni boşsa (yani RPC hata vermeden çalıştı ama bir kimlik dönmediyse) bu durum "yazma kanıtlanamadı" anlamına geldiği için açık bir `Error` fırlatılarak çağıranın başarı ekranını göstermesi engellenir. Her iki kontrol de geçilirse `data` değeri (yazılan satırın kimliği) döndürülür.
+
+**Parametreler**:
+- supabase: `SupabaseClient<Database>` — Supabase veritabanı istemcisi. RPC çağrısını gerçekleştirmek için kullanılır.
+- input: `ContactMessageInput` — İletişim formundan gelen girdi verisi. İçinde şu alanları barındırır: `name` (ad), `message` (mesaj), `email` (e-posta), `phone` (telefon), `company` (şirket), `city` (şehir), `applicationArea` (uygulama alanı), `subject` (konu), `consent` (onay).
+
+**Dönüş**: `Promise<string>` — Başarılı kayıt durumunda veritabanına yazılan satırın kimliğini (string) döndürür. Hata durumunda bu Promise rejection ile sonuçlanır (hata fırlatılır).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/types/database.types::type { Database }
+- import: @supabase/supabase-js::type { SupabaseClient }
+
+---
+
+## INTERFACES
+
+### ContactMessageInput
+MÜŞTERİ-YÜZÜ FORM YAZMA KATMANI — `docs/standards/form-submission-standard.md` §6. NİÇİN SERVİS: bileşen doğrudan `supabase.from(...)` çağırmaz; yazma DI'lı bir servisten geçer (CLAUDE.md §2 — ilk parametre `supabase`). Ev deseni: `createQuoteRequest`. NİÇİN RPC, DOĞRUDAN TABLO DEĞİL — cetvel §6'da 
+- `name: string`
+- `message: string`
+- `email?: string`
+- `phone?: string`
+- `company?: string`
+- `city?: string`
+- `applicationArea?: string`
+- `subject?: string`
+- `consent: boolean`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: contactMessageService.ts::submitContactMessage
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı istemcisi
+  - `input` — ContactMessageInput tipinde, iletişim formu verilerini taşır
+- **ic_degiskenler**:
+  - `data` — `supabase.rpc('submit_contact_message', {...})` çağrısından dönen sonuç; RPC fonksiyonu başarılıysa oluşturulan kaydın kimliğini (string) içerir, başarısızsa null olabilir
+  - `error` — `supabase.rpc('submit_contact_message', {...})` çağrısından dönen hata nesnesi; hata yoksa null/falsy
+  - `input.name` — RPC parametresi `p_name` olarak gönderilir, kullanıcının adı
+  - `input.message` — RPC parametresi `p_message` olarak gönderilir, mesaj içeriği
+  - `input.email` — RPC parametresi `p_email` olarak gönderilir, e-posta adresi
+  - `input.phone` — RPC parametresi `p_phone` olarak gönderilir, telefon numarası
+  - `input.company` — RPC parametresi `p_company` olarak gönderilir, şirket adı
+  - `input.city` — RPC parametresi `p_city` olarak gönderilir, şehir
+  - `input.applicationArea` — RPC parametresi `p_application_area` olarak gönderilir, uygulama alanı
+  - `input.subject` — RPC parametresi `p_subject` olarak gönderilir, konu
+  - `input.consent` — RPC parametresi `p_consent` olarak gönderilir, onay durumu
+- **Dönüş**: `Promise<string>` — RPC fonksiyonundan dönen kimlik (data); hata varsa veya data null ise hata fırlatır, aksi takdirde data string olarak döner
+
+---
+
+## NODE ID STANDARD
+
+  file: src\lib\services\contactMessageService.ts
+  function: src\lib\services\contactMessageService.ts::submitContactMessage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: ContactMessageInput
+  export: submitContactMessage
 
 ---
 # FILE: src\lib\services\dataSubjectRequest.service.md
@@ -69149,44 +69387,42 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\views\ContactPage.tsx
-skeleton_hash: f0abe85fd597d1ce
+source_path: C:\tmp\vh-rec80\src\views\ContactPage.tsx
+skeleton_hash: 6da6f6200d810df4
 entity_hashes:
   func:ArrowRight: 1546741fbe749202
   func:ContactPage: a5b3030a0864a814
-  func:handleSubmit: 460293fdfa9263b6
-  overview: 060d74556606246c
-  style_tokens: 21b7b2d66d6de05a
-generated_at: 2026-08-18T06:51:24Z
+  func:handleSubmit: 95200638b7a8d648
+  overview: 4bedca8cde6e58ef
+  style_tokens: 9d39e82e06c400aa
+generated_at: 2026-08-26T19:28:58Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub uygulamasının iletişim sayfasını temsil eden tek bir React bileşeninden oluşur. Temel amacı, kullanıcıdan iletişim formu verilerini (e-posta, telefon, mesaj) toplayarak bu bilgileri sunucuya göndermektir.
+
+Bu modül, VentHub uygulamasının iletişim sayfasını oluşturan bir React bileşenidir. Kullanıcıdan e-posta, telefon ve mesaj gibi iletişim bilgilerini toplayan bir form içerir ve form gönderim işlemini yönetir. Modül, ana sayfa bileşeni, form gönderme işleyicisi ve yardımcı bir ok ikonu bileşeninden oluşur.
 
 ## Fonksiyon Grupları
+
 ### Ana Sayfa Bileşeni
-Modülün ana yapısını ve kullanıcı arayüzünü oluşturur; form alanlarını, başlığı ve gönderme butonunu render eder.
+İletişim sayfasının tüm kullanıcı arayüzünü oluşturur; form alanlarını, başlığı ve gönderme butonunu render eder. Diğer fonksiyonları ve yardımcı bileşenleri bir araya getirir.
 - ContactPage
 
-### Form Veri İşleme
-Kullanıcı formu gönderdiğinde tetiklenen mantıksal akışı yönetir; form verilerini toplar, doğrular ve bir eylem (örn. sunucuya gönderme) başlatır.
+### Form Gönderme İşleyicisi
+Kullanıcı formu gönderdiğinde tetiklenir; form verilerini toplar ve sunucuya gönderme işlemini başlatır. Form olayının varsayılan davranışını engelleyerek sayfanın yeniden yüklenmesini önler.
 - handleSubmit
 
-### Yardımcı UI Bileşenleri
-Sayfa içinde tekrar kullanılabilen, küçük ve tek sorumlu görsel öğeleri sağlar.
+### Yardımcı UI Bileşeni
+Sayfa içinde tekrar kullanılabilen bir ok ikonu sağlar. Varsayılan boyutu 16 pikseldir ancak farklı bağlamlarda kullanılabilmesi için boyut parametresi alır.
 - ArrowRight
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon gövdeleri erişime açık değildir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1]**: Eğer `handleSubmit` fonksiyonu `React.FormEvent` parametresi almıyorsa, form gönderim olayı doğru yakalanamaz ve kullanıcı girişleri işlenemez.
-
-**[Aksiyom 2]**: Eğer `ArrowRight` bileşeni `size` parametresi desteklemiyorsa, bileşen farklı bağlamda (buton, başlık vb.) kullanıldığında boyut ayarlanamaz ve tutarsız render oluşur.
-
-**[Aksiyom 3]**: Eğer `ContactPage` bileşeni bir React form elemanı içermiyorsa, `handleSubmit` hiçbir zaman tetiklenemez ve sayfa işlevsiz kalır.
+**Neden:** Fonksiyon gövdeleri sağlanmadığı için, yalnızca imzalardan (`ContactPage`, `handleSubmit`, `ArrowRight`) mimari varsayımlar üretilememektedir. İmzalar davranışsal koşul içermez; aksiyom üretimi için fonksiyon gövdesindeki mantıksal dallanma, hata kontrolü, eşik değerleri veya bağımlılık kontrolleri gereklidir.
 
 ---
 
@@ -69203,14 +69439,14 @@ Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon g
 **Dönüş**: React.FC — bir React fonksiyonel bileşeni.
 
 ### handleSubmit
-**Ne yapar**: handleSubmit, iletişim formu gönderildiğinde tetiklenen bir olay işleyicisidir. Form verilerini toplar, doğrulama adımlarını başlatabilir ve gönderim sürecini yönetir. İşlem tamamlandığında sayfa yenilenmesi veya başka bir UI güncellemesi yapılabilir.  
+**Ne yapar**: İletişim formunun gönderilmesi işlemini yöneten asenkron fonksiyondur. Form gönderildiğinde tetiklenir ve müşteriye "iletildi" mesajı gösterir; ancak form verilerini hiçbir veritabanına veya harici hizmete kaydetmez. Kaynak kodda bu fonksiyonun gövdesinde yalnızca bir yorum satırı bulunur: "Form submission logic using supabase would go here". Yani asıl gönderim mantığı hiç uygulanmamıştır.
 
-**Nasıl yapar**: Fonksiyon, React.FormEvent tipinde bir olay nesnesi alır ve bu nesnenin `preventDefault()` metodunu çağırarak tarayıcının varsayılan form gönderimini engeller. Ardından, form alanlarından değerler okunur ve gerekli iş mantığı (ör. API çağrısı) yürütülür.  
+**Nasıl yapar**: Fonksiyonun iç mantığı kaynakta mevcut değildir — gövdede gerçek bir işlem yerine yalnızca gelecekteki implementasyonu ima eden bir yorum satırı bırakılmıştır. `form-submission-standard.md` belgesinin §7 maddesi, yazma işlemi yerine geçen bu tür yorumları adıyla yasaklamaktadır. Üretim ortamında `contact_messages` tablosuna kayıt yapılmadığı ölçülmüştür.
 
-**Parametreler**:  
-- e: React.FormEvent — Form gönderim olayını temsil eden nesne; olayın detaylerine ve hedef form elemanlarına erişim sağlar.  
+**Parametreler**:
+- `e`: `React.FormEvent` — Formun gönderilme olayını temsil eden event nesnesi. Form submit davranışını kontrol etmek (varsayılan davranışı engellemek gibi) amacıyla kullanılır.
 
-**Dönüş**: Belirtilmemiş; genellikle `void` (geri dönüş değeri yok) olarak kullanılır.
+**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir. Bilinmiyor.
 
 ### ArrowRight
 **Ne yapar**: ArrowRight, sağa yön gösteren bir ikon bileşenidir ve UI içinde ok işareti olarak kullanılabilir. Varsayılan olarak 16 piksel boyutunda render edilir, ancak `size` parametresi ile farklı boyutlar ayarlanabilir. Bu bileşen, ikonun stil ve renk özelliklerini dışarıdan gelen props ile özelleştirmeye olanak tanır.  
@@ -69227,15 +69463,20 @@ Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon g
 ## İTHALATLAR (IMPORTS)
 - import: ../components/HVACIcons::WhatsAppIcon
 - import: ../components/Seo::Seo
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../hooks/useScrollAnimation::scrollAnimationClasses
 - import: ../hooks/useScrollAnimation::useScrollAnimation
 - import: ../i18n/I18nProvider::useI18n
+- import: ../lib/errorReporter::reportError
+- import: ../lib/services/contactMessageService::submitContactMessage
+- import: ../lib/supabase/client::supabaseBrowserClient
 - import: ../utils/whatsapp::getSupportLink
 - import: lucide-react::CheckCircle
 - import: lucide-react::Clock
 - import: lucide-react::Mail
 - import: lucide-react::MapPin
 - import: lucide-react::Phone
+- import: next/link::Link
 - import: react::React
 - import: react::useState
 
@@ -69243,31 +69484,74 @@ Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon g
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: ContactPage.tsx::ContactPage
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: src/views/ContactPage.tsx::ContactPage
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
-  - `formSubmitted` — form gönderim durumunu tutan state değişkeni
-  - `setFormSubmitted` — formSubmitted state'ini güncelleyen setter fonksiyonu
-  - `whatsappLink` — getSupportLink() ile oluşturulan WhatsApp destek bağlantısı
-  - `heroBadgeRef` — Hero badge bölümü için ref nesnesi
-  - `heroBadgeVisible` — Hero badge bölümünün görünür olup olmadığını belirten boolean
-  - `contactGridRef` — İletişim kartları grid'i için ref nesnesi
-  - `contactGridVisible` — İletişim kartlarının görünür olup olmadığını belirten boolean
-  - `formSuccessRef` — Form başarı mesajı bölümü için ref nesnesi
-  - `formSuccessVisible` — Form başarı mesajının görünür olup olmadığını belirten boolean
-  - `contactCards` — İletişim bilgilerini tutan dizi (Phone, Mail, MapPin ikonları ile)
-- **Dönüş**: React.JSX.Element (sayfa yapısı)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; sayfa metinlerini yerelleştirmek için kullanılır
+  - `lang` — `useI18n()` hook'undan dönen geçerli dil kodu; `getSupportLink` çağrısına iletilir
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen yönlendirme nesnesi; KVKK linkinde `Routes.legal.kvkk()` olarak erişilir
+  - `formSubmitted` — `useState(false)` ile oluşturulan boolean durum; form başarıyla gönderildiğinde `true` olur ve başarı ekranını gösterir
+  - `setFormSubmitted` — `formSubmitted` durumunu güncelleyen setter fonksiyonu
+  - `name` — `useState('')` ile oluşturulan string; formdaki isim input alanının kontrol edilen değeri
+  - `setName` — `name` durumunu güncelleyen setter fonksiyonu
+  - `email` — `useState('')` ile oluşturulan string; formdaki e-posta input alanının kontrol edilen değeri
+  - `setEmail` — `email` durumunu güncelleyen setter fonksiyonu
+  - `subject` — `useState('')` ile oluşturulan string; formdaki konu input alanının kontrol edilen değeri
+  - `setSubject` — `subject` durumunu güncelleyen setter fonksiyonu
+  - `message` — `useState('')` ile oluşturulan string; formdaki mesaj textarea alanının kontrol edilen değeri
+  - `setMessage` — `message` durumunu güncelleyen setter fonksiyonu
+  - `consent` — `useState(false)` ile oluşturulan boolean; KVKK rıza kutusunun işaretlenip işaretlenmediğini tutar
+  - `setConsent` — `consent` durumunu güncelleyen setter fonksiyonu
+  - `submitting` — `useState(false)` ile oluşturulan boolean; form gönderilirken `true` olur, butonu devre dışı bırakır
+  - `setSubmitting` — `submitting` durumunu güncelleyen setter fonksiyonu
+  - `formError` — `useState('')` ile oluşturulan string; form hata mesajını tutar, boşsa hata gösterilmez
+  - `setFormError` — `formError` durumunu güncelleyen setter fonksiyonu
+  - `whatsappLink` — `getSupportLink(t('common.whatsapp.supportMessageDefault'), lang)` çağrısından dönen WhatsApp destek URL'si
+  - `heroBadgeRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })` hook'undan dönen DOM referansı; hero rozet elementine bağlanır
+  - `heroBadgeVisible` — aynı hook'tan dönen boolean; hero rozeti görünür olduğunda `true` olur, animasyon sınıfını tetikler
+  - `contactGridRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })` hook'undan dönen DOM referansı; iletişim kartları ızgarasına bağlanır
+  - `contactGridVisible` — aynı hook'tan dönen boolean; ızgara görünür olduğunda `true` olur
+  - `formSuccessRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })` hook'undan dönen DOM referansı; başarı ekranına bağlanır
+  - `formSuccessVisible` — aynı hook'tan dönen boolean; başarı ekranı görünür olduğunda `true` olur
+  - `contactCards` — üç elemanlı dizi; her eleman `icon`, `title`, `value`, `href`, `label` alanlarından oluşur (telefon, e-posta, ofis adresi kartları)
+  - `handleSubmit` — içe tanımlı async fonksiyon; form gönderimini yönetir, `submitContactMessage` servisini çağırır
+- **Dönüş**: JSX — tam sayfa iletişim bileşeni (hero, iletişim kartları ızgarası, WhatsApp CTA, form veya başarı ekranı)
 
-### [N2_NASIL] AST Pointer: ContactPage.tsx::handleSubmit
-- **params**: (e: React.FormEvent)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (formSubmitted state'ini true yapar)
+### [N2_NASIL] AST Pointer: src/views/ContactPage.tsx::handleSubmit
+- **params**: `e` — `React.FormEvent` türünde form olayı nesnesi; `e.preventDefault()` ile varsayılan form davranışı engellenir
+- **ic_degiskenler**:
+  - `consent` — üst kapsamdan (ContactPage) gelen boolean; KVKK rıza kutusunun durumunu temsil eder, `false` ise fonksiyon erken döner
+  - `t` — üst kapsamdan gelen çeviri fonksiyonu; hata ve rıza uyarı mesajlarını almak için kullanılır
+  - `setFormError` — üst kapsamdan gelen setter fonksiyonu; rıza eksikse veya gönderim başarısızsa hata mesajını ayarlar
+  - `setSubmitting` — üst kapsamdan gelen setter fonksiyonu; gönderim başlarken `true`, bittiğinde `false` yapılır
+  - `submitContactMessage` — import edilen servis fonksiyonu; `supabaseBrowserClient` ve form verileriyle çağrılır
+  - `supabaseBrowserClient` — üst kapsamdan gelen Supabase istemci nesnesi; `submitContactMessage`'e birinci argüman olarak iletilir
+  - `name` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `message` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `email` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `subject` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `setFormSubmitted` — üst kapsamdan gelen setter fonksiyonu; başarılı gönderim sonrası `true` yapılır
+  - `err` — `catch` bloğunda yakalanan hata nesnesi; `reportError` fonksiyonuna iletilir
+  - `reportError` — import edilen hata raporlama fonksiyonu; `err` ve `{ source: 'ContactPage.handleSubmit'}` bağlamıyla çağrılır
+- **Dönüş**: yok (void) — yan etki olarak form durumunu günceller, Supabase'e veri yazar
 
-### [N3_NASIL] AST Pointer: ContactPage.tsx::ArrowRight
-- **params**: ({ size = 16 })
-- **ic_degiskenler**: (yok)
-- **Dönüş**: React.JSX.Element (SVG ok ikonu)
+### [N3_NASIL] AST Pointer: src/views/ContactPage.tsx::ArrowRight
+- **params**: `size` — number, varsayılan değeri `16`; SVG ikonunun genişlik ve yükseklik değerini belirler
+- **ic_degiskenler**:
+  - `size` — SVG elementinin `width` ve `height` attribute'larına atanır
+- **Dönüş**: JSX — ok ikonu SVG elementi (`<svg>` içinde `<path d="M5 12h14M12 5l7 7-7 7" />`)
+
+### [N4_NASIL] AST Pointer: src/views/ContactPage.tsx::contactCards.map callback
+- **params**: `card` — `contactCards` dizisinden gelen nesne (`icon`, `title`, `value`, `href`, `label` alanları), `i` — number, dizi indeksi
+- **ic_degiskenler**:
+  - `card.href` — `<a>` elementinin `href` attribute'una atanır
+  - `card.icon` — bileşen referansı; `<card.icon size={24} strokeWidth={1.5} />` olarak render edilir
+  - `card.title` — kart başlık metni; `<h3>` içinde gösterilir
+  - `card.value` — kart değer metni; telefon numarası, e-posta veya adres
+  - `card.label` — kart etiket metni; ok ikonuyla birlikte gösterilir
+  - `contactGridVisible` — üst kapsamdan gelen boolean; `scrollAnimationClasses.fadeUp(contactGridVisible)` ile CSS sınıfını belirler
+  - `i` — `scrollAnimationClasses.staggerChild(i)` ile animasyon gecikmesi hesaplanır; ayrıca `key` prop'u olarak kullanılır
+- **Dönüş**: JSX — tekil iletişim kartı `<a>` elementi (ikon, başlık, değer, etiket ve ok ikonu içerir)
 
 ---
 
@@ -69308,10 +69592,10 @@ graph TD
 - `rounded-hvac-2xl`, `rounded-hvac-3xl`, `tracking-hvac-loose`, `tracking-hvac-wide`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-slate-100`, `group-hover:bg-cyan-500`, `group-hover:text-white`, `hover:bg-cyan-400`
-- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `h-12`, `h-2`, `h-20`, `h-500px`, `inline-flex`
-- **Varyant/Responsive:** `active:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `active:scale-95`, `active:scale-98`, `animate-pulse`, `blur-120`, `border`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-cyan-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `group`, `hover:underline`
+- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-red-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-red-200`, `border-slate-100`, `border-slate-300`
+- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `h-12`, `h-2`, `h-20`, `h-4`, `h-500px`
+- **Varyant/Responsive:** `active:`, `disabled:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `active:scale-95`, `active:scale-98`, `animate-pulse`, `blur-120`, `border`, `cursor-pointer`, `disabled:opacity-60`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-cyan-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`
 
 ---
 # FILE: src\views\ForgotPasswordPage.md

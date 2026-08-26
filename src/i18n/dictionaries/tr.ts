@@ -1000,6 +1000,9 @@ export const tr = {
       subjectPlaceholder: 'Örn: Otopark Jet Fan Projesi',
       messagePlaceholder: 'İhtiyaçlarınızı buraya yazın...',
       submitButton: 'Talebi Gönder',
+      consentText: 'okudum ve kabul ediyorum.',
+      consentRequired: 'KVKK metnini onaylamalısınız',
+      submitFailed: 'Mesajınız gönderilemedi. Lütfen tekrar deneyin; sorun sürerse bize doğrudan ulaşın.',
     },
     title: 'İletişim',
     subtitle: 'Size her konuda yardımcı olmaktan mutluluk duyarız.',
@@ -2491,7 +2494,8 @@ export const tr = {
     errors: {
       name: 'Ad Soyad zorunludur',
       contact: 'E-posta veya telefon numarası girmelisiniz',
-      consent: 'KVKK metnini onaylamalısınız'
+      consent: 'KVKK metnini onaylamalısınız',
+      submitFailed: 'Talebiniz kaydedilemedi. Lütfen tekrar deneyin; sorun sürerse bize doğrudan ulaşın.'
     },
     defaultMessage: '{{productName}} için detaylı teknik teklif...',
   },
