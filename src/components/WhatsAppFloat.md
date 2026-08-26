@@ -8,7 +8,7 @@ entity_hashes:
   func:WhatsAppFloat: 594fe2409e378878
   overview: 27f525e3029fcecb
   style_tokens: fb346cbde40036cb
-generated_at: 2026-06-19T20:47:48Z
+generated_at: 2026-08-26T07:12:34Z
 ---
 
 ## Genel Bakış
