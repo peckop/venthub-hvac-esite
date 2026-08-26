@@ -74,6 +74,14 @@ describe('INV-BUILD-SKIP · ignore-build betiği pozitif mantıkla karar verir',
       ['TANIMADIĞI bir uzantı (varsayılan güvenli taraf)', ['src/content/a.mdx']],
       ['ada benzeyen ama farklı dizin', ['docsfake/a.ts']],
       ['kök yapılandırma dosyası', ['.gitignore']],
+      // --- KAPSAM DARLIĞI (2026-08-26, scripts/board + .githooks eklenirken) ---
+      // Bu dört kol, EKLENEN sınıfın GENİŞLEMEDİĞİNİ kanıtlar. Olmasalardı
+      // `scripts/*` ya da `.githooks*` yazmak da kapıyı yeşil bırakırdı ve
+      // atlama sınıfı sessizce büyürdü — "kapıyı açmak yeni tehlike doğurur".
+      ['ignore-build betiğinin KENDİSİ (scripts/ tümü atlanmaz)', ['scripts/vercel-ignore-build.sh']],
+      ['kancaları KURAN betik (koşan dosya bu, kancalar değil)', ['scripts/setup-hooks.mjs']],
+      ['board ADINA benzeyen ama farklı yol', ['scripts/boardfake.ts']],
+      ['githooks ADINA benzeyen ama farklı dizin', ['.githooksfake/pre-commit']],
     ]
 
     for (const [ad, dosyalar] of buildGerektiren) {
@@ -89,6 +97,9 @@ describe('INV-BUILD-SKIP · ignore-build betiği pozitif mantıkla karar verir',
       ['companion doküman (src ağacının içinde ama .md)', ['src/views/CartPage.md']],
       ['ajan yetenek ağacı', ['.claude/skills/x/SKILL.md']],
       ['CI yapılandırması', ['.github/workflows/ci.yml']],
+      ['şerit panosu aracı', ['scripts/board/board.cjs']],
+      ['panonun alt dizini (yıldız `/` de yutar)', ['scripts/board/lib/x.cjs']],
+      ['git kancasının kendisi', ['.githooks/pre-commit']],
     ]
 
     for (const [ad, dosyalar] of atlanabilir) {
