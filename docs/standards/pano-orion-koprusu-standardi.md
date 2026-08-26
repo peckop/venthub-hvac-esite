@@ -153,3 +153,37 @@ Kanıt yükümlülükleri (bu bölüm değiştirilirken de geçerli):
 - Ders (2026-08-25): eski davranışın %68'lik bedelini HİÇBİR test korumuyordu — mevcut
   testlerin tüm notları tek referanslıydı. Kova önceliği değişen her PR, karma-referans
   vakası içeren en az bir test taşımak zorundadır.
+
+## 7. İçe almanın zamanlanması ve canlılığı (2026-08-26, T016-OR)
+
+1. **Zamanlama:** Faz 1 içe alması oturumdan BAĞIMSIZ koşar (Windows Görev Zamanlayıcı,
+   görev adı `OrionBoardSync`, kadans 15 dk, pencere `--days 3`). Oturum-bağlı hiçbir
+   mekanizma (cron, kanca, açılış ritüeli) bu işi karşılamaz: oturum ölünce ölür.
+   Kod STABİL KOPYADAN koşar (`PYTHONPATH=orion-stable`), çalışma ağacından DEĞİL.
+2. **Canlılık ölçümünün kaynağı:** içe almanın sağlığı `MAX(ingested_at)` ile ölçülür —
+   yani VERİNİN GERÇEKTEN TAŞINDIĞI. Görevin kayıtlı olması (`Get-ScheduledTask`) yalnızca
+   yapılandırıldığını, son koşum sonucu (`LastTaskResult`) yalnızca sürecin koştuğunu
+   gösterir; ikisi de "veri taşındı" demek değildir (yanlış kök yoluyla çıkış 0 mümkündür).
+   Bu ikisi, alarm kırmızı yanınca NİÇİN sorusunu cevaplayan TEŞHİS girdileridir; alarmın
+   kaynağı olamazlar.
+3. **Eşik:** bayatlık eşiği kadansın en az ÜÇ KATI olur (bugün 45 dk). Tek atlanan koşum
+   alarm değildir; üç ardışık kayıp desendir. Her titremede öten alarm okunmaz hale gelir
+   ve okunmayan alarm, olmayan alarmla aynı şeydir.
+4. **Hiç koşmamış = BAYAT:** içe alma hiç olmamışsa durum BAYAT'tır, "bilinmiyor" DEĞİL.
+   Boş duruma "ölçülemedi, geçelim" demek, bu maddenin doğduğu arızanın ta kendisidir
+   (taşıyıcı 3 gün kurulmadan kaldı ve hiçbir şey kırmızı yanmadı).
+5. **İki ayrı kapı, iki ayrı gerekçe — birleştirilmez:**
+   (a) BAYATLIK ALARMI içe almanın sessizce durmasını yakalar; gerekçesi "durmuş içe alma
+   ile taşınacak şey olmaması dışarıdan AYNI görünür".
+   (b) RUNBOOK KONFORMANSI, bir belgenin "kuruldu/koşuyor" DEDİĞİ mekanizmanın sistemde
+   karşılığı olmasını şart koşar; gerekçesi doc-committed-not-work-done. Belge "kurulmadı"
+   diyorsa konformans TUTAR ve o vakayı yalnız (a) yakalar. Tek gerekçeyle iki kol kurmak,
+   kör bir kapıyı sağlam sanmaktır.
+6. **Park fişi kuralı:** bir iş birinin onayına park ediliyorsa fişin SAHİBİ ve TARİHİ
+   yazılır. Sahipsiz ve tarihsiz park edilen iş park edilmiş değil KAYBEDİLMİŞTİR
+   (ölçüldü: kayıt "Recep onayına" bırakıldı, kimse sormadı, 3 gün kimse fark etmedi).
+7. **Kabul ölçütü:** bu madde, bilerek bayatlatılarak KIRMIZI verdirilebilen bir alarm
+   İSTER; alarmı olmayan bir alarm sessizce hep-yeşildir. (Uygulama: `orion board health`,
+   5 sabotajla kanıtlı, 2026-08-26. UTC tuzağı: `ingested_at` UTC ve damgasız — yerel
+   saatle karşılaştıran alarm eksi yaş hesaplar ve sonsuza dek yeşil kalır; eksi yaş
+   sıfıra yuvarlanmaz, KUSUR olarak işaretlenir.)
