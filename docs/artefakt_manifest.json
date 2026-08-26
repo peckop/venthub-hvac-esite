@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "c1dfd46cf56c916e91701031edc9a24bb2a01fb9e5d00f8e6424a5af717826d3",
+      "icerik_sha256": "647a74504b14fdc33aeaf8a3c2ca70e97584923433874abe31a22e1db7940dc6",
       "kaynak": {
         "dosya_sayisi": 98,
         "dosyalar": {
@@ -108,7 +108,7 @@
         "izlenmeyen": [],
         "ozet": "13aca04c7a35256389064f212cccbf532b90b069fc40fe29bd8e467c6c22e036"
       },
-      "kaynak_commit": "b408111191b198c55e9e334f1b26fc910d78c887",
+      "kaynak_commit": "59f8905acef9820b14c8d15e4b5b7c8110fde87e",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +125,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "eade4464066502dd19d6d3e9b993de39f3bd92ca7ed047afeb73feb5d2db3545",
+      "icerik_sha256": "28c5979613ce42f829417e4fbeca4a7cf1ecd015da1028c4b19fc2739854dc16",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -144,12 +144,12 @@
           "docs/standards/analytics-standard.md": "690a337fb84183f677c2c56bed6c9550a7a075b4",
           "docs/standards/auth-account-standard.md": "06fac0bcc55d7406119c54b54c670a02285e0707",
           "docs/standards/canonical-url-standard.md": "8f85ad5b532688183d8e88f672e1fd18d6c5f993",
-          "docs/standards/catalog-depth-standard.md": "27d858fdeb29c0385c5b25c9c614edcfa85d8cc7",
+          "docs/standards/catalog-depth-standard.md": "cfff5f43ad4065f7dbd94ea95ff7302e42edaf37",
           "docs/standards/catalog-ingestion-standard.md": "9e01ae21e1a09b4fa46e8d5db29c7c343963094d",
           "docs/standards/category-taxonomy-standard.md": "a3709f534676c877eea3cca93bd2b5de5fd848dd",
           "docs/standards/checkout-payment-standard.md": "2838d0999cefa00548d83057930a56b81dd4b9d2",
           "docs/standards/ci-runner-install-standard.md": "dc37f4c5e08a22d03f34ff82c87775de858ffba4",
-          "docs/standards/collaboration-protocol.md": "43c53762e58c6f9a1b435d90ef3129881729a732",
+          "docs/standards/collaboration-protocol.md": "0296f2c284624b51e89d8b70fa7d4da20ee79f9e",
           "docs/standards/commerce-domain-map-standard.md": "205440e349935c2ca7cfa28cabfe2ff81d023f8b",
           "docs/standards/companion-doc-standard.md": "3851ea8f8d8a3062b7da7d57c6eae50014116479",
           "docs/standards/crm-standard.md": "1fc10cba5e0fc3f3915ea20e2b4679729f59b70d",
@@ -180,7 +180,7 @@
           "docs/standards/product-image-standard.md": "7144db1142e1b44905bd4cf0b9ada9c5a6963b34",
           "docs/standards/product-schema-standard.md": "5fe179d4b6dbed80b910f7c1c4a55b7525ac9a6f",
           "docs/standards/purchasing-standard.md": "aa9b0aa0c25e105df4dfed59c24653d369dee1a6",
-          "docs/standards/quote-standard.md": "fb8586ae89535ef9df40620f12c036b87866b234",
+          "docs/standards/quote-standard.md": "dcd2ec9cd656d5eaf9a740c9dc0622c9c5a531c7",
           "docs/standards/rendering-cache-standard.md": "a025df588c34c1d572b10ae09e78f280c2e386da",
           "docs/standards/runtime-version-alignment-standard.md": "5e1d1ebbf84268f2b2d4fbcbdb893e0fc8e52855",
           "docs/standards/session-loop-ritual.md": "32bcc5c0e9aad0f8ed6f59a18c6ff1a8f30b8e8a",
@@ -193,9 +193,9 @@
           "docs/standards/work-tracking-ssot-standard.md": "6a00f894fbc818c9e927e2ced965936c6162475e"
         },
         "izlenmeyen": [],
-        "ozet": "1b29009355ab6092622a06e54cd05682799a9d4c722739e4e44790c69d2640f5"
+        "ozet": "fea671947a70b3d11c0870c610247a1e544ac37c6269fdf2645f5a38f13ce30e"
       },
-      "kaynak_commit": "b408111191b198c55e9e334f1b26fc910d78c887",
+      "kaynak_commit": "59f8905acef9820b14c8d15e4b5b7c8110fde87e",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +204,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "e69cb79e9748cea60125d1de772673041b47a835ded3a2d47d857cdf73b24c20",
+      "icerik_sha256": "f720f63ad0813cb5b58b152c33c5790fce3d45f634b2aece8995a50102fd66c3",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +251,7 @@
         "izlenmeyen": [],
         "ozet": "5f668b0cb06f66330209b3db479b057b3af56f993ecfc0ab19343995d55e72a2"
       },
-      "kaynak_commit": "b408111191b198c55e9e334f1b26fc910d78c887",
+      "kaynak_commit": "59f8905acef9820b14c8d15e4b5b7c8110fde87e",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,7 +259,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "9a09e18a45456575e28216e103e5f9535fc59c565f33a455cd6115134dcbc0e7",
+      "icerik_sha256": "5a799e31fbda46d6be87b1e80d6ef7a72642f31f71105111e3f10459b4311203",
       "kaynak": {
         "dosya_sayisi": 655,
         "dosyalar": {
@@ -378,7 +378,7 @@
           "src/components/ScrollLinkedProcess.md": "fa9cb636971b5f56b1fb84bac55cb92f9247a320",
           "src/components/ScrollReveal.md": "4a933e922560a67e0a50194ea2097630f572cfbd",
           "src/components/ScrollToTop.md": "4b6d4e9b0dec849a016813ad1d105f527f9013c5",
-          "src/components/SearchOverlay.md": "134e919afad5c94f2b491d8c8ee3dc215a80c7a8",
+          "src/components/SearchOverlay.md": "4d4594539f2f7370cede350eff8e6594efe427ca",
           "src/components/SecurityRibbon.md": "93949953d580db827090f6befe88922d1eea6db0",
           "src/components/Seo.md": "cbcac2b42362932ade91ec9f3e6d483be1eeb2ef",
           "src/components/SpotlightHeroOverlay.md": "88bae357f6b1507b5c4b4cff6e4ce78af2e7a544",
@@ -920,9 +920,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "297c7d1ed8a4f91c7a4a65c79c13e371599e7ec51f27c76f0faae91dd4f6d1a8"
+        "ozet": "60907cc753118998a216ec2b84c1f9a932cdfcf86b5fa40660d58068081ea772"
       },
-      "kaynak_commit": "b408111191b198c55e9e334f1b26fc910d78c887",
+      "kaynak_commit": "59f8905acef9820b14c8d15e4b5b7c8110fde87e",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -931,7 +931,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-26T21:15:41.272495+00:00",
-  "kaynak_commit": "b408111191b198c55e9e334f1b26fc910d78c887",
+  "derlendi": "2026-08-26T21:53:03.840775+00:00",
+  "kaynak_commit": "59f8905acef9820b14c8d15e4b5b7c8110fde87e",
   "surum": 1
 }
