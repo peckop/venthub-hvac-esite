@@ -140,10 +140,17 @@ Diğer her yüzey ondan **türer**; hiçbiri bağımsız bir yetki kaynağı de�
 
 | Kaynak | Karar | Niçin |
 |---|---|---|
-| `public.user_profiles.role` | ✅ **TEK OTORİTE** | `trg_enforce_role_change` korur (kendi rolünü değiştirme kilidi + rol whitelist'i) |
+| `public.user_profiles.role` | ✅ **TEK OTORİTE** | `trg_enforce_role_change` korur — **INSERT ve UPDATE'te** (v2, 2026-08-26): rol whitelist'i · kendi rolünü değiştirme kilidi · **`super_admin` vermeyi yalnız `super_admin` yapar** · oturumsuz bağlamda ayrıcalıklı rol yalnız `service_role` ile ve **`admin_audit_log`'a iz bırakarak** |
 | `claims.user_role` / `claims.app_metadata.user_role` | ✅ **türev** | `custom_access_token_hook` her oturum açmada profilden yazar; kural 12'nin istediği yer |
 | Kullanıcı meta rolü (`user_metadata.role`) | ⛔ **YASAK** | Kullanıcı `auth.updateUser({ data })` ile kendisi yazabilir → kendi rolünü yükseltir |
 | Kodda sabit e-posta listesi | ⛔ **YASAK** | Depo PUBLIC; rol değişimi deploy gerektirir; liste **kayıtsız** adreslere önceden yetki verir |
+
+**Kapının KAPSAMADIĞI (v2, adıyla — "kapattık" demiyoruz).** `trg_enforce_role_change`
+yalnız `super_admin` **vermeyi** kısıtlar: bir `admin`, başkasını **`admin`** yapabilir.
+`rbac.ts` `/admin/users` yüzeyini `super_admin`'e kapattığı için ürün kuralı "admin, admin
+üretemez" der — **DB hâlâ izin verir.** Ayrıca yetki **düşürme** anında etkili değildir:
+`is_admin_user()` önce JWT claim'ini okur, jeton hâlâ `admin` iddia ettiği sürece `true`
+döner (çözüm bu tetikte değil, jeton ömrü / oturum sonlandırma kararında).
 
 **Ölçülmüş kusur (bu maddenin doğuş sebebi).** 2026-08-18'de dört kaynak canlı
 olarak çelişiyordu: allowlist `super_admin`, profil `admin`, kullanıcı-meta
