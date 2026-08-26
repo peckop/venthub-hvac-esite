@@ -2,8 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-25T08:55:22.388982+00:00
+compiled_at: 2026-08-26T09:03:25.452769+00:00
 total_compiled_files: 39
+source_commit: b8df0561
 source: supabase/functions
 ---
 
@@ -5063,21 +5064,13 @@ type RefundAttemptState = 'in_flight' | 'succeeded' | 'failed'
 ### RefundAttemptRow
 ```typescript
 type RefundAttemptRow = {
-
   id: string
-
   order_id: string
-
   idempotency_key: string
-
   kind: 'cancel' | 'refund'
-
   amount: number
-
   state: RefundAttemptState
-
   psp_reference: string | null
-
   failure_code: string | nul
 ```
 
@@ -5312,7 +5305,6 @@ type ReturnStatus = (typeof RETURN_STATUSES)[number]
 ### TransitionVerdict
 ```typescript
 type TransitionVerdict = | { allowed: true }
-
   | { allowed: false; reason: 'terminal' | 'not_allowed' | 'unknown_current' | 'unknown_next' }
 ```
 
@@ -5320,22 +5312,14 @@ type TransitionVerdict = | { allowed: true }
 
 ## SABİTLER
 - **RETURN_STATUSES** (as_expression) — `[
-
   'requested',
-
   'approved',
-
   'rejected',
-
   'in_transit',
-
   'received...`
 - **CARRIER_ALLOWED_TRANSITIONS** (object) — `{
-
   requested: ['cancelled'],
-
   approved: ['in_transit', 'cancelled'],
-
   i...`
 
 ---
@@ -5484,15 +5468,10 @@ Fonksiyon gövdesi verilmediğinden, çalışma mantığı hakkında kesin hük�
 ### RevenueAlarmInput
 ```typescript
 type RevenueAlarmInput = {
-
   /** Kesintiye uğrayan işlev, ör. `iyzico-payment`. */
-
   fn: string
-
   /** Makine-okunur sebep, ör. `VALIDATION_UNAVAILABLE`. Gruplama bunun üzerinden yapılır. */
-
   code: string
-
   /** İnsan içi
 ```
 

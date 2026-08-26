@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T07:10:53.872152+00:00
+compiled_at: 2026-08-26T10:15:58.308875+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-26T07:10:53.872152+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -88,6 +88,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T07:10:53.872152+00:00 tarihind
 │   │   └── ⚪ `yetki-katmani-denetimi-2026-08-15.md`
 │   ├── ⚪ `database_schema_master.md`
 │   ├── ⚪ `design_system_config.md`
+│   ├── ⚪ `kayitlar_master.md`
 │   ├── 📂 **legal/**
 │   │   └── ⚪ `en-yasal-ceviri-inceleme-2026-06-16.md`
 │   ├── 📂 **plans/**
@@ -193,6 +194,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T07:10:53.872152+00:00 tarihind
 │   │   ├── ⚪ `legal-compliance-standard.md`
 │   │   ├── ⚪ `measurement-discipline-standard.md`
 │   │   ├── ⚪ `migration-safety-standard.md`
+│   │   ├── ⚪ `mockup-gelisim-hatti-standardi.md`
 │   │   ├── ⚪ `multi-session-coordination-standard.md`
 │   │   ├── ⚪ `notification-standard.md`
 │   │   ├── ⚪ `pano-orion-koprusu-standardi.md`
@@ -211,6 +213,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T07:10:53.872152+00:00 tarihind
 │   │   ├── ⚪ `storefront-reflow-standard.md`
 │   │   ├── ⚪ `subagent-delegation-standard.md`
 │   │   └── ⚪ `work-tracking-ssot-standard.md`
+│   ├── ⚪ `standards_master.md`
 │   ├── ⚪ `supabase_functions_master.md`
 │   ├── ⚪ `system_tree.md`
 │   ├── ⚪ `venthub_hvac_master.md`
