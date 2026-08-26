@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T09:03:25.606865+00:00
-total_compiled_files: 60
-source_commit: b8df0561
+compiled_at: 2026-08-26T14:11:37.291701+00:00
+total_compiled_files: 61
+source_commit: cba02389
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -12859,6 +12859,220 @@ Bu cetvel bir **süreç** cetvelidir; kodu değil davranışı yönetir, bu yüz
 otomatik test **yoktur** ve olmaması bilinçlidir. Uygulanmasının tek ölçüsü, devredilen her
 işin §5 şablonuna ve §6 kabul kuralına göre denetlenebilmesidir. Bir devir bu cetvele
 uymuyorsa, sonucu **ölçülmemiş** sayılır.
+
+
+---
+# FILE: docs\standards\uretilmis-artefakt-standard.md
+
+# Üretilmiş Artefakt Standardı
+
+> **Kapsam:** boru hattının ÜRETTİĞİ her dosya — master `.md`'ler, küme
+> master'ları, companion `.md`'ler, artefakt manifesti.
+> **Niçin ayrı cetvel:** kural companion'a özel değil. Aynı kusur 2026-08-26'da
+> hem companion'larda hem master'larda ölçüldü.
+> **SSOT:** bu dosya. Kapılar: `src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts`
+> (INV-DOC-3, INV-DOC-4) ve yerel `orion doc durum` (Kapı B).
+
+## AXIOM 1 — Üretilen artefakt, depoya girene kadar ÜRETİLMEMİŞ sayılır
+
+Diskte duran bir dosya hiçbir soruya cevap vermez: CI onu göremez, ikiz onu
+bilmez, ekip arkadaşı onu bulamaz. "Ürettim" ile "teslim ettim" ayrı fiillerdir.
+
+**Niçin bu aksiyom var (ölçülmüş olay, 2026-08-26):**
+PR #821 `.cc_docs.yaml`'a iki küme master'ı tanımladı — 40 satırlık ayar. Üretilen
+dosyalar geçici bir worktree'de doğdu, dijital ikize oradan yüklendi, worktree
+silinince yerel kopyalar öldü. Depoda hiç görünmediler. **Kusuru bir kapı değil,
+kullanıcı fark etti** ("bu yeni master dosyalarını göremedim"). Ölçüldü: dosyalar
+depoya ancak `de0b4a52` ile, sorudan **sonra** girdi.
+
+Aynı sınıf companion'larda da yaşıyordu: `post-commit` kancası diske yazar,
+C4/C5 kapıları `git log` okur; arada kalan dosyayı hiçbir şey saymaz.
+
+## AXIOM 2 — Tarif ile ürün AYNI PR'da yolculuk eder
+
+Bir PR artefaktın **nasıl üretileceğini** değiştiriyorsa (`.cc_docs.yaml` kapsamı,
+derleyici davranışı, kaynak dosyalar), o PR **üretilmiş hâlini de taşımak
+zorundadır**.
+
+### ⭐İŞ AKIŞI BEDELİ — AÇIKÇA KABUL EDİLDİ
+
+Bu kural bir bedel getirir ve bedel **yazılı olmalıdır**:
+
+> `docs/standards/`, `docs/reference/`, `docs/audits/`, `docs/plans/` veya
+> `supabase/functions/` altına dokunan **her PR**, aynı PR'da `orion doc build`
+> çıktısını da taşır.
+
+Pratikte iki komut:
+
+```
+orion doc build
+git add docs/*_master.md docs/artefakt_manifest.json
+```
+
+**Niçin bedeli yazıyoruz:** yazılmayan bedel, kırmızıyı atlatma alışkanlığı
+doğurur. Bu depo o filmi gördü — rastgele patlayan `pre-commit`, tüm filoda
+`--no-verify` alışkanlığı doğurdu (T033). Bu yüzden **her kırmızı mesaj,
+koşulacak tam komutu basar**: ne yapacağını söylemeyen kapı atlatılmayı davet
+eder.
+
+## AXIOM 3 — Üretilen dosya ELLE düzenlenmez
+
+Üretilen artefakt bir **çıktıdır**, kaynak değildir. Elle yapılan düzeltme bir
+sonraki derlemede sessizce silinir ve arada geçen sürede ikiz yanlış bilgiyi
+doğru sanar.
+
+Düzeltme kaynağa yapılır, sonra yeniden üretilir.
+
+Kapı A bu ihlali `icerik_sha256` ile yakalar (aşağıda).
+
+## AXIOM 4 — Ölçülemedi, GEÇTİ demek değildir
+
+Manifest yoksa, git geçmişi sığsa, kaynak kümesi boşsa — kapı **kırmızı** yanar.
+"Ölçemedim, o hâlde geçtim" (fail-open) bu depoda yasaktır: ölçülemeyen bir kapı,
+geçen bir kapı değil **YOK olan** bir kapıdır.
+
+Bu, boş listeyi "sorun yok" diye okumayı da kapsar. Boş kaynak kümesi bir ölçüm
+değil, ölçümün **yokluğudur**.
+
+## AXIOM 5 — Worktree yasak değildir; GÖRÜNMEZLİĞİ yasaktır
+
+Worktree normal iş akışımızdır (çok-şeritli çalışmanın izolasyon aracı). T020
+kazasının kökü worktree kullanmak değil, **çıktının o ağaçta kalıp kimseye
+görünmeden ölmesiydi**.
+
+Bu yüzden:
+- Manifest, derlemenin hangi ağaçta yapıldığını (`calisma_agaci`) kaydeder.
+- Worktree'de koşan derleme, sonunda **açık uyarı** basar: *"çıktılar &lt;yol&gt;
+  içine yazıldı; commit etmezsen ağaç silindiğinde bu dosyalar da ölür."*
+- Depo içi kapılar (A ve C) PR üzerinde CI'da koşar; ölçtükleri şey **birleşme
+  hedefinin geçmişidir** ve koşumun hangi ağaçta yapıldığından bağımsızdır.
+
+## AXIOM 6 — Yıkıcı adım, onarıcı adımın yapılabilirliği ölçülmeden koşmaz
+
+Senkron **önce siler sonra yükler**. Yükleme kaynağı yoksa defter boşalır.
+
+2026-08-26'da tam bu oldu: çalışma ağacı koşum ortasında yok oldu, silme adımı
+83 kaynağı sildi, yükleme adımı hiçbir dosya bulamadı, defter 96 → 13'e düştü.
+
+Tetikleyici (ağacın silinmesi) tesadüfiydi; **kusur sıradaydı**. Aynı sonuç disk
+dolsa, izin düşse, yol yanlış verilse de olurdu. Bu yüzden kapı "worktree var mı"
+diye değil, **"yüklenecek her şey ELDE mi"** diye sorar.
+
+---
+
+## Kapılar — üç ayrı soru
+
+| Kapı | Nerede | Soru | Kimlik |
+|---|---|---|---|
+| **A — Tazelik** | venthub CI | Depodaki artefakt manifestteki özetle eşleşiyor mu? | INV-DOC-4 |
+| **B — Ayrışma** | yerel `pre-push` | Diskte üretilmiş ama depoya girmemiş artefakt var mı? | `orion doc durum` |
+| **C — Tarif↔Ürün** | venthub CI | yaml'ın ilan ettiği artefakt depoda var mı? | INV-DOC-3 |
+
+### ⭐Niçin B yerelde, A ve C CI'da
+
+**CI geliştiricinin diskini GÖREMEZ.** "Üretildi ama commit'lenmedi" durumu tanım
+gereği yalnız yerel makinede vardır — PR'a giren şey zaten commit'lenmiştir. O
+soruyu CI'da sormak, hiç kırmızı yanmayacak bir kapı kurmak olurdu; yani
+dekoratif kapı.
+
+Tersi de doğru: "depodaki artefakt kaynağıyla tutarlı mı" sorusunu yerelde sormak
+yetmez, çünkü kimse koşmayı unutabilir. O yüzden A ve C zorunlu CI kapısıdır.
+
+### ⭐Niçin B `pre-push`, `pre-commit` değil
+
+Companion üretimi `post-commit`te **asenkrondur**. `pre-commit`te sormak, henüz
+üretilmemiş dosyayı "eksik" sayar → yanlış-kırmızı. `pre-push` anında üretim
+çoktan oturmuştur.
+
+Kurulum: `orion doc install-push-hook`. Kurulum `core.hooksPath`'e **saygı duyar**
+— ayar varsa git `.git/hooks`'a hiç bakmaz ve oraya yazılan kanca hiç koşmaz;
+kapı var sanılır, yoktur.
+
+### Kapı A'nın iki ayağı ve niçin ikisi de gerekli
+
+1. **İçerik özeti** (`icerik_sha256`) — ürün elle bozuldu mu?
+2. **Kaynak değişimi** — kaynak, derlemeden sonra değişti mi?
+
+Ata-soy/kaynak-değişimi ayağı, kaynak **hiç değişmeden** ürünün bozulduğu vakayı
+göremez. Özet ayağı ucuzdur ve o körü kapatır. Birini diğerinin yerine koymak
+kör nokta bırakır.
+
+### ⭐Satır sonu SİNYAL DEĞİL GÜRÜLTÜDÜR
+
+Üretim Windows'ta olur ve metin modu yazımı dosyayı CRLF yapar; `core.autocrlf=true`
+commit'te LF'e çevirir; CI Linux'ta LF iner.
+
+Ham bayt özeti karşılaştırılsaydı **kapı daha kurulmadan kalıcı kırmızı olurdu** —
+yani artefaktın içeriğini değil **taşıma katmanını** ölçerdi. Kalıcı kırmızı kapı
+görmezden gelinir.
+
+Bu yüzden **her iki uç da** (orion üretici tarafı ve venthub kapı tarafı)
+özet almadan önce CRLF → LF normalizasyonu yapar. İki uç aynı soruyu sormazsa
+karşılaştırma anlamsızdır.
+
+Normalizasyon kapıyı zayıflatmaz: tek karakterlik gerçek fark hâlâ özeti
+değiştirir.
+
+---
+
+## Kapı tasarımı — bu işte öğrenilen üç ders
+
+### 1. Bir kapı ÜÇ ayrı soru sorar
+
+| Soru | Aleti |
+|---|---|
+| Fonksiyon doğru mu? | birim test |
+| DOĞRU YERDE mi? | AST — yıkıcı çağrıya göre konum |
+| ULAŞILABİLİR mi? | AST — saran koşul sabit değil ve ölçüme bakıyor |
+
+Üçüncüsü sabotajla doğdu: `if _eksikler:` → `if False:` yapıldığında yükseltme
+kaynakta duruyordu, sırası doğruydu, ve AST kapısı **yeşil yandı**. Kapı "yazılı
+mı" diye bakıyordu, "koşulur mu" diye değil.
+
+### 2. Karar vermek ile kararı DIŞARI VEREBİLMEK ayrı sorulardır
+
+`orion doc durum` komutunun FAIL dalında `sys` import edilmemişti: kapı doğru
+ölçüyor, doğru karar veriyor, ve tam kırmızı yanacağı anda çöküyordu. Test yine
+de yeşildi çünkü `CliRunner` **çöken bir komutu da** `exit_code=1` sayar.
+
+Çıkış kodu da kapının bir parçasıdır; testi `SystemExit`'i **adıyla** sormalıdır.
+
+### 3. Kapının en sık karşılaşacağı durum, testin en az temsil ettiği durum olabilir
+
+`git status --porcelain` çıktısına `.strip()` uygulamak **ilk satırın baştaki
+boşluğunu** yiyor; değiştirilmiş-izlenen dosya (" M yol") bir karakter kayıp
+hiçbir şeyle eşleşmiyordu. Bütün birim testler yeşildi çünkü hepsi **izlenmeyen**
+dosya kullanıyordu ("?? yol" boşlukla başlamaz).
+
+Sentetik girdi gerçek çıktıyı taklit etmiyorsa test yeşil yalan söyler.
+
+### ⭐Yeşil kalan sabotaj "kapı kör" demek DEĞİLDİR
+
+Sebebi **ayrıca** ölçülür. 2026-08-26'da üç yeşil sabotajın:
+- ikisi **etkisizdi** (biri ölü koddu ve kaldırıldı),
+- biri **testin kendi körlüğüydü** (yukarıdaki `CliRunner` vakası).
+
+Ölü kodu "önlem" diye bırakmak, okuyana **var olmayan bir koruma** vaat eder.
+
+---
+
+## İhlal hâlinde ne yapılır
+
+| Kırmızı | Anlamı | Çözüm |
+|---|---|---|
+| INV-DOC-3 | yaml ürünü ilan ediyor, ürün depoda yok | `orion doc build` + `git add <artefaktlar>` |
+| INV-DOC-4 özet uyuşmuyor | ürün elle bozuldu **ya da** manifest bayat | kaynağı düzelt → `orion doc build` |
+| INV-DOC-4 manifest yok | ölçüm yapılamıyor | `orion doc build` + `git add docs/artefakt_manifest.json` |
+| Kapı B (yerel) | üretildi, commit'lenmedi | kırmızının bastığı `git add` komutu |
+
+**Tabanı yükselterek susturmak YASAKTIR.** Kırmızıyı susturmak için eşik
+büyütmek, kapıyı sökmektir.
+
+---
+
+İlgili: `companion-doc-standard.md` (C4/C5 — eksik ve bayat companion) ·
+`measurement-discipline-standard.md` · `collaboration-protocol.md` ·
+tasarım kaydı: orion `docs/t021-artefakt-tazelik-kapisi-tasarim.md` (PR #42)
 
 
 ---
