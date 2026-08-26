@@ -4,6 +4,9 @@ import React, { useState } from 'react'
 
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
+import { reportError } from '../lib/errorReporter'
+import { submitContactMessage } from '../lib/services/contactMessageService'
+import { supabaseBrowserClient } from '../lib/supabase/client'
 
 const CONTACT_EMAIL = 'info@venthub.com.tr'
 
@@ -51,24 +54,55 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
     return e
   }
 
-  const submit = (e: React.FormEvent) => {
+  /**
+   * NİÇİN BU HÂLE GELDİ — 2026-08-26'da ölçüldü, kusur CANLIYDI.
+   *
+   * Eskiden burada `setTimeout(1200ms)` vardı ve yorumu aynen şuydu:
+   * *"Simulate API Call for better UX instead of mailto"*. Yani ana sayfadaki ve her ürün
+   * sayfasındaki talep formu müşteriye "aldık" derken **hiçbir yere yazmıyordu**.
+   * Kanıt üç ayrıydı: dosyada tek bir yazma yolu yoktu; prod'da `contact_messages`
+   * tablosunda **0 kayıt** vardı (tablo 19 Ağustos'ta kurulmuştu); ve bileşen
+   * `HomePageClientWrapper` ile `ProductDetailPageView` üzerinden canlı mount ediliyordu.
+   * Kaybedilen yalnız talep değil, **KVKK rızasının kendisiydi** — rızayı toplayıp
+   * saklamamak, cetvel §3'e göre rıza almamış olmakla aynı kapıya çıkar.
+   *
+   * Cetvel: `docs/standards/form-submission-standard.md` §1 (başarı ekranı KANITA bağlı),
+   * §2 (dürüst hata yolu), §6 (yazma DI'lı servisten). Bekçi: INV-FORM-1.
+   */
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     const v = validate()
     setErrors(v)
     if (Object.keys(v).length > 0) return
 
     setSubmitted(true)
-
-    // Simulate API Call for better UX instead of "mailto"
-    setTimeout(() => {
+    try {
+      // Dönen kimlik başarı ekranının TEK dayanağı (§1). Kullanılmayan dönüş,
+      // kanıtlanmamış yazmadır.
+      await submitContactMessage(supabaseBrowserClient, {
+        name,
+        message,
+        email,
+        phone,
+        company,
+        city,
+        applicationArea: appArea,
+        subject: productName ? `lead:${productName}` : 'lead',
+        consent,
+      })
       setIsSuccess(true)
       setSubmitted(false)
-
       // Auto close after success
       setTimeout(() => {
         handleClose()
       }, 3000)
-    }, 1200)
+    } catch (err) {
+      // §2: form AÇIK kalır, girdiler korunur, kullanıcıya insanca cümle çıkar;
+      // teknik gövde yalnız teşhis kaydına gider. Sessiz yutma yasak.
+      reportError(err, { source: 'LeadModal.submit' })
+      setSubmitted(false)
+      setErrors({ submit: t('lead.errors.submitFailed') })
+    }
   }
 
   const handleClose = () => {
@@ -284,6 +318,14 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                     className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors h-32"
                   />
                 </div>
+
+                {/* Yazma hatası — cetvel §2: form AÇIK kalır, girdiler korunur, metin
+                    sözlükten gelir, teknik gövde ekrana ÇIKMAZ. */}
+                {errors.submit && (
+                  <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                    <p className="text-xs text-red-600">{errors.submit}</p>
+                  </div>
+                )}
 
                 <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 mt-auto">
                   {/* KVKK Onay */}

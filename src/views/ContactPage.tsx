@@ -1,17 +1,32 @@
 'use client'
 
 import { CheckCircle,Clock, Mail, MapPin, Phone } from 'lucide-react'
+import Link from 'next/link'
 import React, { useState } from 'react'
 
 import { WhatsAppIcon } from '../components/HVACIcons'
 import Seo from '../components/Seo'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import { useI18n } from '../i18n/I18nProvider'
+import { reportError } from '../lib/errorReporter'
+import { submitContactMessage } from '../lib/services/contactMessageService'
+import { supabaseBrowserClient } from '../lib/supabase/client'
 import { getSupportLink } from '../utils/whatsapp'
 
 const ContactPage: React.FC = () => {
   const { t, lang } = useI18n()
+  const Routes = useLocalizedRoutes()
   const [formSubmitted, setFormSubmitted] = useState(false)
+  // Girdiler KONTROLLÜ olmak zorunda: eskiden hiçbir alanın değeri okunmuyordu, çünkü
+  // gönderim zaten hiçbir yere yazmıyordu. Yazma gerçek olunca değer de gerçek olmalı.
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [subject, setSubject] = useState('')
+  const [message, setMessage] = useState('')
+  const [consent, setConsent] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [formError, setFormError] = useState('')
   const whatsappLink = getSupportLink(t('common.whatsapp.supportMessageDefault'), lang)
   const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
   const [contactGridRef, contactGridVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })
@@ -41,10 +56,41 @@ const ContactPage: React.FC = () => {
     }
   ]
 
+  /**
+   * NİÇİN BU HÂLE GELDİ — burada tek satır yorum vardı: *"Form submission logic using
+   * supabase would go here"*. Yani iletişim formu müşteriye "iletildi" derken hiçbir yere
+   * yazmıyordu. `form-submission-standard.md` §7 bunu adıyla yasaklıyor (yazma yerine
+   * geçen yorum). Ölçüm: prod'da `contact_messages` tablosu 19 Ağustos'tan beri **boş**.
+   *
+   * KVKK RIZASI EKLENDİ, ZORUNLU OLDUĞU İÇİN: `submit_contact_message` `p_consent` true
+   * değilse satır YAZMAZ. Rızayı sabit `true` göndermek hukuki bir kaydı uydurmak olurdu;
+   * bu yüzden kutu forma eklendi ve değeri kullanıcıdan geliyor (cetvel §3).
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Form submission logic using supabase would go here
-    setFormSubmitted(true)
+    setFormError('')
+    if (!consent) {
+      setFormError(t('contactPage.form.consentRequired'))
+      return
+    }
+    setSubmitting(true)
+    try {
+      // Dönen kimlik, başarı ekranının TEK dayanağı (§1).
+      await submitContactMessage(supabaseBrowserClient, {
+        name,
+        message,
+        email,
+        subject,
+        consent,
+      })
+      setFormSubmitted(true)
+    } catch (err) {
+      // §2: form açık kalır, girdiler korunur, kullanıcıya insanca cümle çıkar.
+      reportError(err, { source: 'ContactPage.handleSubmit' })
+      setFormError(t('contactPage.form.submitFailed'))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -150,22 +196,46 @@ const ContactPage: React.FC = () => {
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-2">{t('contactPage.form.labelName')}</label>
-                      <input required type="text" className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors" placeholder="John Doe" />
+                      <input required type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors" placeholder="John Doe" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-2">{t('contactPage.form.labelEmail')}</label>
-                      <input required type="email" className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors" placeholder="name@company.com" />
+                      <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors" placeholder="name@company.com" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-2">{t('contactPage.form.labelSubject')}</label>
-                    <input required type="text" className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors" placeholder={t('contactPage.form.subjectPlaceholder')} />
+                    <input required type="text" value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors" placeholder={t('contactPage.form.subjectPlaceholder')} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-2">{t('contactPage.form.labelMessage')}</label>
-                    <textarea required rows={4} className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors resize-none" placeholder={t('contactPage.form.messagePlaceholder')} />
+                    <textarea required rows={4} value={message} onChange={(e) => setMessage(e.target.value)} className="w-full bg-slate-50 border-none rounded-2xl p-5 text-sm focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors resize-none" placeholder={t('contactPage.form.messagePlaceholder')} />
                   </div>
-                  <button className="w-full bg-slate-950 text-white py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-600 transition-transform shadow-xl active:scale-98">
+
+                  {/* KVKK rızası — RPC `p_consent` true değilse satır YAZMIYOR (cetvel §3).
+                      Kutu yoktu; sabit `true` göndermek hukuki kaydı uydurmak olurdu. */}
+                  <div className="flex items-start gap-3">
+                    <input
+                      id="contact-consent" type="checkbox" checked={consent}
+                      onChange={(e) => setConsent(e.target.checked)}
+                      className="mt-1 w-4 h-4 rounded text-cyan-600 focus-visible:ring-2 focus-visible:ring-cyan-500"
+                    />
+                    <label htmlFor="contact-consent" className="text-xs text-steel-gray leading-relaxed cursor-pointer">
+                      <Link href={Routes.legal.kvkk()} className="text-cyan-600 hover:underline font-medium" target="_blank" rel="noopener noreferrer">
+                        {t('legalLinks.kvkk')}
+                      </Link>{' '}
+                      {t('contactPage.form.consentText')}
+                    </label>
+                  </div>
+
+                  {/* Yazma hatası — cetvel §2: form açık kalır, girdiler korunur. */}
+                  {formError && (
+                    <div role="alert" className="rounded-hvac-md border border-red-200 bg-red-50 px-5 py-4">
+                      <p className="text-xs text-red-600">{formError}</p>
+                    </div>
+                  )}
+
+                  <button type="submit" disabled={submitting} className="w-full bg-slate-950 text-white py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-600 transition-transform shadow-xl active:scale-98 disabled:opacity-60">
                     {t('contactPage.form.submitButton')}
                   </button>
                 </form>
