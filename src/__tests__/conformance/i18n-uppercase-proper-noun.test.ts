@@ -1,3 +1,4 @@
+import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
 /**
@@ -31,8 +32,56 @@ import { describe, expect, it } from 'vitest'
  * sayfanın diliyle zaten aynıdır. Kusur, metnin dili ile elemanın dili AYRILDIĞINDA doğar.
  *
  * NOT: bu kapı KOD tarar. Kök `<html lang="tr">`'nin rotadan gelmesi AYRI bir kusurdur
- * (`src/app/layout.tsx`, Altyapı alanı) ve bu kapı onu GÖREMEZ — göremediğini gizlemiyoruz.
- * ─────────────────────────────────────────────────────────────────────────────
+ * (`src/app/layout.tsx`, çoklu-kök restructure) ve bu kapı onu GÖREMEZ — göremediğini
+ * gizlemiyoruz.
+ *
+ * ═════════════════════════════════════════════════════════════════════════════
+ * NİÇİN AST — metin penceresi İKİ YÖNDE DE yanılıyordu (2026-08-26'da ölçüldü)
+ *
+ * İlk sürüm satır tabanlıydı: `uppercase` geçen satır + sonraki 3 satır bir "pencere"
+ * yapılıp içinde veri interpolasyonu aranıyordu. Pencere **eleman sınırını tanımıyor**,
+ * ve bu iki ayrı kusur üretiyordu:
+ *
+ *   YANLIŞ POZİTİF — pencere KOMŞU elemana taşıyor. `VariantSelector.tsx`:
+ *       237 | <span className="... uppercase ...">     ← uppercase BURADA
+ *       238 |   {variantLabel(v)}
+ *       239 | </span>                                   ← eleman BURADA BİTİYOR
+ *       240 | <span className="... font-medium ...">{v.name}</span>   ← uppercase YOK
+ *   Kapı 240'taki `{v.name}` yüzünden ihlal sayıyordu. Aynı sınıf `LeadModal.tsx`
+ *   (uppercase `<label>`, komşu `<input value={name}>`), `EnhancedNeedsWizard.tsx` ve
+ *   `CategorySeriesView.tsx`'te de vardı — üçü de tamamen HAYALETMİŞ, ölçüldü.
+ *
+ *   YANLIŞ NEGATİF — pencere KISA. `ProductDetailPageView.tsx`:
+ *       419 | <nav className="... uppercase ...">
+ *       441 |   {family.name}          ← 22 satır sonra, pencere GÖREMİYOR
+ *       443 | </nav>
+ *   Gerçek ihlal, kapının kör noktasında yaşıyordu.
+ *
+ * AST bu iki kusuru da YAPISAL olarak kapatır: `uppercase` taşıyan elemanın KENDİ ALT
+ * AĞACI taranır — ne eksik ne fazla. `text-transform` miras alındığı için çocuklar
+ * kapsamdadır; bir çocuk `normal-case`/`lowercase`/`capitalize` ile EZERSE o dal kesilir.
+ *
+ * NİÇİN NİTELİKLER KAPSAM DIŞI — ölçüldü, ilk AST sürümüm burada yanlış pozitif verdi:
+ * `VariantSelector.tsx:205` bir `<button key={v.sku} onClick={() => onSelect(v.sku)}>`.
+ * Bunlar EKRANA BASILMAZ; `text-transform` yalnız metin düğümlerini etkiler. `alt`,
+ * `title`, `aria-label` gibi basılıyormuş gibi duranlar da CSS'ten etkilenmez.
+ *
+ * NİÇİN YEREL YARDIMCI FONKSİYON ÇÖZÜLÜR — kapının en tehlikeli körlüğü buydu:
+ *       function variantLabel(v) { return v.model_code || v.sku }
+ *       <span className="... uppercase ...">{variantLabel(v)}</span>
+ * İfadenin kendisinde hiçbir veri-alanı kelimesi YOK; eski kapı bunu göremezdi ve
+ * `uppercase` altında basılan GERÇEK veri kör noktada kalıyordu.
+ *
+ * NİÇİN ALAN LİSTESİ SET, REGEX DEĞİL: eski desen `\bmodel\b` idi ve `_` bir kelime
+ * karakteri olduğu için **`model_code` ile HİÇ eşleşmiyordu** — yani `{v.model_code}`
+ * doğrudan yazılsa bile kapı görmezdi. AST bize özellik adını tam olarak verir; küme
+ * üyeliği bu sınıf hatayı yapısal olarak imkânsız kılar.
+ *
+ * CANLI ZARAR ÖLÇÜMÜ (prod, 2026-08-26): 374 aktif ürünün `coalesce(model_code, sku)`
+ * değerinde `i`/`I` geçen kayıt **sıfır**. Yani `variantLabel` kusuru bugün müşteriye
+ * yanlış karakter GÖSTERMİYOR — **LATENT**. İlk `i` taşıyan tedarikçi kodu girdiği gün
+ * görünür olur. Kapı bu yüzden onarıldı: kusur uyurken kapatmak, uyandığında aramaktan ucuz.
+ * ═════════════════════════════════════════════════════════════════════════════
  */
 
 declare global {
@@ -53,17 +102,110 @@ const SOURCES: Record<string, string> = import.meta.glob('/src/**/*.tsx', {
 const isTestFile = (p: string) => p.includes('__tests__') || p.includes('.test.')
 
 const UPPERCASE = /\buppercase\b/
-/** Veri kaynaklı özel ad taşıyan alan adları. */
-const ALAN = 'name|brand|brand_name|displayName|series_code|sku|model|country|specialty|headquarters'
+/** Kasa dönüşümünü EZEN Tailwind sınıfları — bu dalda miras kesilir. */
+const EZME = /\b(?:normal-case|lowercase|capitalize)\b/
+
 /**
- * `{...alan...}` interpolasyonu — AMA `t(` içerenler HARİÇ.
- * `{t('pdp.labels.sku')}` sözlük metnidir, veri değil; kapsam dışı (bkz. başlık açıklaması).
+ * Veri kaynaklı özel ad taşıyan alan adları. KÜME — regex değil (bkz. başlık: `\bmodel\b`
+ * `model_code`'u gizliyordu). AST özellik adını tam verdiği için üyelik testi yeterli.
  */
-const VERI_INTERP = new RegExp(`\\{(?![^}]*\\bt\\()[^}]*\\b(?:${ALAN})\\b[^}]*\\}`)
+const ALANLAR = new Set([
+  'name', 'brand', 'brand_name', 'displayName', 'series_code', 'sku',
+  'model', 'model_code', 'country', 'specialty', 'headquarters',
+])
+
+/** Yerel yardımcı çözümünde döngü/aşırı derinlik koruması. */
+const AZAMI_DERINLIK = 3
 
 interface Bulgu {
   yer: string
   ornek: string
+}
+
+/** Elemanın `className` niteliğinin HAM metni (dize, şablon ya da koşullu — hepsi metin). */
+function sinifMetni(acilis: ts.JsxOpeningElement | ts.JsxSelfClosingElement): string {
+  for (const oz of acilis.attributes.properties) {
+    if (!ts.isJsxAttribute(oz) || oz.name.getText() !== 'className') continue
+    return oz.initializer ? oz.initializer.getText() : ''
+  }
+  return ''
+}
+
+const acilisiniAl = (n: ts.Node): ts.JsxOpeningElement | ts.JsxSelfClosingElement | null =>
+  ts.isJsxElement(n) ? n.openingElement : ts.isJsxSelfClosingElement(n) ? n : null
+
+/** Dosyadaki yerel fonksiyonlar: ad → gövde (bildirim + ok fonksiyonlu `const`). */
+function yerelFonksiyonlar(kaynak: ts.SourceFile): Map<string, ts.Node> {
+  const harita = new Map<string, ts.Node>()
+  const gez = (n: ts.Node): void => {
+    if (ts.isFunctionDeclaration(n) && n.name) harita.set(n.name.getText(), n)
+    if (
+      ts.isVariableDeclaration(n) && n.initializer &&
+      (ts.isArrowFunction(n.initializer) || ts.isFunctionExpression(n.initializer))
+    ) {
+      harita.set(n.name.getText(), n.initializer)
+    }
+    ts.forEachChild(n, gez)
+  }
+  gez(kaynak)
+  return harita
+}
+
+/** İfade veri alanına dokunuyor mu? Yerel fonksiyon çağrısıysa İÇİNE bakar. */
+function veriTasiyorMu(ifade: ts.Node, fonksiyonlar: Map<string, ts.Node>, derinlik = 0): string | null {
+  if (derinlik > AZAMI_DERINLIK) return null
+  let bulunan: string | null = null
+
+  const gez = (n: ts.Node): void => {
+    if (bulunan) return
+    // `t('...')` sözlük metnidir — o dal bilerek kapsam dışı.
+    if (ts.isCallExpression(n) && n.expression.getText() === 't') return
+    if (ts.isPropertyAccessExpression(n) && ALANLAR.has(n.name.getText())) {
+      bulunan = n.getText()
+      return
+    }
+    if (ts.isIdentifier(n) && ALANLAR.has(n.getText())) {
+      bulunan = n.getText()
+      return
+    }
+    // Adı veri kelimesi taşımayan yerel yardımcı, veri DÖNDÜREBİLİR (bkz. `variantLabel`).
+    if (ts.isCallExpression(n) && ts.isIdentifier(n.expression)) {
+      const hedef = fonksiyonlar.get(n.expression.getText())
+      if (hedef) {
+        const ic = veriTasiyorMu(hedef, fonksiyonlar, derinlik + 1)
+        if (ic) {
+          bulunan = `${n.expression.getText()}() -> ${ic}`
+          return
+        }
+      }
+    }
+    ts.forEachChild(n, gez)
+  }
+  gez(ifade)
+  return bulunan
+}
+
+/** `uppercase` elemanının alt ağacı; nitelikler hariç, ezen çocukta dal kesilir. */
+function altAgactaVeri(eleman: ts.Node, fonksiyonlar: Map<string, ts.Node>): string | null {
+  let bulunan: string | null = null
+  const gez = (n: ts.Node, kok: boolean): void => {
+    if (bulunan) return
+    if (ts.isJsxAttributes(n) || ts.isJsxAttribute(n)) return // ekrana basılmaz
+    if (!kok) {
+      const acilis = acilisiniAl(n)
+      if (acilis && EZME.test(sinifMetni(acilis))) return // bu dal kasa ezmesi taşıyor
+    }
+    if (ts.isJsxExpression(n) && n.expression) {
+      const v = veriTasiyorMu(n.expression, fonksiyonlar)
+      if (v) {
+        bulunan = v
+        return
+      }
+    }
+    ts.forEachChild(n, (c: ts.Node) => gez(c, false))
+  }
+  gez(eleman, true)
+  return bulunan
 }
 
 function tara(): { bulgular: Bulgu[]; tarananDosya: number } {
@@ -72,49 +214,60 @@ function tara(): { bulgular: Bulgu[]; tarananDosya: number } {
   for (const [path, raw] of Object.entries(SOURCES)) {
     if (isTestFile(path)) continue
     tarananDosya++
-    const satirlar = raw.split('\n')
-    satirlar.forEach((ln, i) => {
-      if (!UPPERCASE.test(ln)) return
-      // aynı satır + sonraki 3 satır: JSX çok satırlı yazılabiliyor
-      const pencere = satirlar.slice(i, i + 4).join('\n')
-      const m = pencere.match(VERI_INTERP)
-      if (m) {
-        bulgular.push({ yer: `${path.replace(/^\//, '')}:${i + 1}`, ornek: m[0].slice(0, 44) })
+    const kaynak = ts.createSourceFile(path, raw, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+    const fonksiyonlar = yerelFonksiyonlar(kaynak)
+
+    const elemanTara = (n: ts.Node): void => {
+      const acilis = acilisiniAl(n)
+      if (acilis && UPPERCASE.test(sinifMetni(acilis))) {
+        const vurus = altAgactaVeri(n, fonksiyonlar)
+        if (vurus) {
+          const satir = kaynak.getLineAndCharacterOfPosition(n.getStart()).line + 1
+          bulgular.push({ yer: `${path.replace(/^\//, '')}:${satir}`, ornek: vurus.slice(0, 60) })
+        }
       }
-    })
+      ts.forEachChild(n, elemanTara)
+    }
+    elemanTara(kaynak)
   }
   return { bulgular, tarananDosya }
 }
 
 /**
- * DONMUŞ BORÇ — 2026-08-23 ölçümü: **14 dosya / 21 ihlal**.
+ * DONMUŞ BORÇ — **11 dosya / 20 ihlal**, 2026-08-26'da ONARILMIŞ dedektörle yeniden ölçüldü.
+ *
+ * BU LİSTE MANDALIN İHLALİ DEĞİL, TABANIN YENİDEN TÜRETİLMESİDİR. Eski liste (14 dosya /
+ * 21 ihlal) bozuk bir dedektörün çıktısıydı; sayıları taşımak hem hayaletleri ebedileştirir
+ * hem gerçek ihlalleri gizlerdi. Değişimin tamamı ÖLÇÜLDÜ ve tek tek gözle doğrulandı:
+ *
+ *   DÜŞEN (hayaletmiş — `uppercase` elemanı KOMŞU, içeren değil):
+ *     LeadModal.tsx 1→0 · category/EnhancedNeedsWizard.tsx 1→0 ·
+ *     category/CategorySeriesView.tsx 1→0 · BrandDetailPage.tsx 2→1
+ *   ARTAN (gerçek ihlal, eski kapı KÖRDÜ):
+ *     ProductDetailPageView.tsx 2→3 (`family.name`, uppercase `<nav>`'ın 22 satır içinde)
+ *     SeriesLandingView.tsx 2→3 (`series.brand_name`)
+ *     VariantSelector.tsx 2→3 (üçü de `variantLabel() -> v.model_code`; eskiden
+ *       İKİSİ hayaletti ve gerçek olan üçü de görünmüyordu)
  *
  * NİÇİN DOSYA→SAYI, `dosya:satır` DEĞİL — 2026-08-23'te ÖLÇÜLDÜ, master KIRMIZI verdi:
- * İlk sürüm satır numarası donduruyordu. ÜRÜN `src/views/category/**` ve
- * `src/components/category/**` dosyalarını düzenleyince satırlar kaydı ve bu kapı,
- * KOD BOZULMADIĞI HALDE üç kolundan kırmızı verdi — aynı 14 dosya, aynı 21 ihlal,
- * yalnız numaralar farklıydı. Satır-tabanlı kayıt **yanlış kırmızı üretir** ve o kırmızı
- * bütün şeritlerin CI'ını bloklar. Dosya→sayı bu sürüklenmeden bağışıktır: dosya içinde
- * satır kaysa bile sayı değişmez; YENİ bir ihlal eklenirse sayı büyür ve kapı görür.
+ * İlk sürüm satır numarası donduruyordu. ÜRÜN komşu dosyaları düzenleyince satırlar kaydı
+ * ve bu kapı, KOD BOZULMADIĞI HALDE kırmızı verdi. Dosya→sayı bu sürüklenmeden bağışıktır.
  *
- * Ratchet: liste yalnız KÜÇÜLEBİLİR. Dosyaların çoğu ÜRÜN/GÖRSEL şeridinde; bu kapı
- * cetveli koyar, düzeltmeyi sahibi yapar ve liste küçülür. Yeni ihlal KIRMIZI.
+ * Ratchet: liste yalnız KÜÇÜLEBİLİR. Dosyaların çoğu ÜRÜN şeridinde; bu kapı cetveli koyar,
+ * düzeltmeyi sahibi yapar. Yeni ihlal KIRMIZI.
  */
 const DONMUS_BORC: ReadonlyArray<readonly [string, number]> = [
-  ['src/app/_components/ProductDetailPageView.tsx', 2], // {family.brand_name} · {selectedVariant.sku}
-  ['src/components/BrandsShowcase.tsx', 1], // {brand.name}
+  ['src/app/_components/ProductDetailPageView.tsx', 3], // family.name · family.brand_name · selectedVariant.sku
+  ['src/components/BrandsShowcase.tsx', 1], // brand.name
   ['src/components/HVACIcons.tsx', 1], // {brand}
-  ['src/components/LeadModal.tsx', 1], // {name}
-  ['src/components/ProductCard.tsx', 2], // {product.brand}
-  ['src/components/category/EnhancedNeedsWizard.tsx', 1], // {p.name}
-  ['src/components/products/AddToProjectModal.tsx', 1], // {product.brand}
-  ['src/components/products/FamilyCard.tsx', 2], // {family.brand_name}
-  ['src/components/products/VariantSelector.tsx', 2], // {v.name} · {v.sku}
-  ['src/views/BrandDetailPage.tsx', 2], // {brand.country} · {brand.headquarters}
-  ['src/views/BrandsPage.tsx', 2], // {brand.country} · {brand.specialty}
-  ['src/views/category/CategoryLandingView.tsx', 1], // {vm?.displayName}
-  ['src/views/category/CategorySeriesView.tsx', 1], // {vm?.displayName || category.name}
-  ['src/views/category/SeriesLandingView.tsx', 2], // {series.series_code} · {series.name}
+  ['src/components/ProductCard.tsx', 2], // product.brand ×2
+  ['src/components/products/AddToProjectModal.tsx', 1], // product.brand
+  ['src/components/products/FamilyCard.tsx', 2], // family.brand_name ×2
+  ['src/components/products/VariantSelector.tsx', 3], // variantLabel() -> v.model_code ×3
+  ['src/views/BrandDetailPage.tsx', 1], // brand.country
+  ['src/views/BrandsPage.tsx', 2], // brand.country · brand.specialty
+  ['src/views/category/CategoryLandingView.tsx', 1], // vm?.displayName
+  ['src/views/category/SeriesLandingView.tsx', 3], // brand_name · series_code · name
 ]
 
 /**
@@ -122,8 +275,7 @@ const DONMUS_BORC: ReadonlyArray<readonly [string, number]> = [
  * Recep'in 2026-08-23'te CANLI vitrinde gördüğü kusurun TA KENDİSİ. Kapı bunları
  * göremiyorsa kod değil KAPI bozuktur.
  *
- * SATIRA DEĞİL İÇERİĞE bağlı: satır numarası komşu şeridin her düzenlemesinde kayar ve
- * kanaryayı yanlış yere kırmızı verdirir — bu kapı tam bunu yaşadı.
+ * SATIRA DEĞİL İÇERİĞE bağlı: satır numarası komşu şeridin her düzenlemesinde kayar.
  */
 const KANARYA: ReadonlyArray<readonly [string, string]> = [
   ['src/views/category/SeriesLandingView.tsx', 'series.name'],
@@ -137,8 +289,17 @@ const MESAJ_YENI =
 
 const MESAJ_KANARYA =
   "Recep 2026-08-23'te bu iki yerdeki kusuru CANLI vitrinde gördü (VORTİCE/LİNEO). " +
-  'Kapı göremiyorsa desen bozulmuştur: `uppercase` sınıfı ile veri interpolasyonu ' +
-  'farklı satırlara düşmüş ya da alan adı listesi eksik olabilir.'
+  'Kapı göremiyorsa desen bozulmuştur: alan adı listesi eksilmiş ya da AST yürüyüşü ' +
+  'elemanın alt ağacını taramaz olmuş olabilir.'
+
+const MESAJ_YARDIMCI =
+  'YEREL YARDIMCI ÇÖZÜMÜ ÖLDÜ. `variantLabel(v)` ifadesi hiçbir veri-alanı kelimesi ' +
+  'taşımaz ama `v.model_code || v.sku` DÖNDÜRÜR; çözüm koşmazsa `uppercase` altında ' +
+  'basılan gerçek veri kapının kör noktasına düşer. Kapının en tehlikeli körlüğü buydu.'
+
+const MESAJ_NITELIK =
+  'NİTELİKLER YİNE SAYILIYOR. `key={v.sku}` / `onClick={() => onSelect(v.sku)}` ekrana ' +
+  'basılmaz ve text-transform onları etkilemez; sayılırlarsa kapı hayalet borç üretir.'
 
 const MESAJ_BAYAT =
   "Bu dosyalarda ihlal AZALDI. DONMUS_BORC'u gerçek sayıya indir (0 olduysa satırı SİL) — " +
@@ -163,6 +324,26 @@ describe('INV-7: veri kaynaklı özel ad CSS uppercase ile basılmaz', () => {
       ([dosya, parca]) => !bulgular.some((b) => b.yer.startsWith(`${dosya}:`) && b.ornek.includes(parca)),
     ).map(([dosya, parca]) => `${dosya} içinde "${parca}"`)
     expect(gorulmeyen, MESAJ_KANARYA).toEqual([])
+  })
+
+  it('YARDIMCI KANARYASI: `variantLabel` üzerinden veri GÖRÜLMELİ', () => {
+    // Ayrı kol: yukarıdaki kanarya doğrudan interpolasyonu ölçer, bu kol ÇÖZÜMLEMEYİ.
+    // İkisi ayrı ayrı ölür; tek kolda birleştirilirse biri diğerini maskeler.
+    const cozulen = bulgular.filter(
+      (b) => b.yer.startsWith('src/components/products/VariantSelector.tsx:') &&
+        b.ornek.includes('variantLabel()') && b.ornek.includes('model_code'),
+    )
+    expect(cozulen.length, MESAJ_YARDIMCI).toBeGreaterThan(0)
+  })
+
+  it('NİTELİK KAPSAM DIŞI: `key`/`onClick` içindeki veri ihlal SAYILMAZ', () => {
+    // VariantSelector'ın üç bulgusunun ÜÇÜ DE yardımcı çözümünden gelmeli. Nitelikler
+    // yeniden sayılmaya başlarsa `v.sku` ham hâliyle listeye sızar ve sayı şişer.
+    const nitelikten = bulgular.filter(
+      (b) => b.yer.startsWith('src/components/products/VariantSelector.tsx:') &&
+        !b.ornek.includes('variantLabel()'),
+    ).map((b) => `${b.yer} -> ${b.ornek}`)
+    expect(nitelikten, MESAJ_NITELIK).toEqual([])
   })
 
   it('Donmuş listede OLMAYAN hiçbir dosya ihlal etmiyor', () => {
