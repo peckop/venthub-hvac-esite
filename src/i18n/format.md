@@ -3,48 +3,53 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\format.ts
-skeleton_hash: bf4c7a43c3f640fd
+skeleton_hash: b1f270d844a80806
 entity_hashes:
-  func:formatCurrency: a5c5acb7b633147a
+  func:formatCurrency: c74424c786c4ea7f
   func:formatNumber: 0816f48e81145d1c
-  overview: cd7da0082c9ccc54
-generated_at: 2026-06-19T20:48:10Z
+  overview: cad42f6789244c28
+generated_at: 2026-08-26T07:14:40Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin uluslararasılaştırma (i18n) altyapısının temel bir parçasıdır ve sayısal değerlerin farklı diller ve bölgeler için uygun formatta gösterilmesini sağlar. Tarayıcının yerleşik `Intl.NumberFormat` API'ini kullanarak para birimi ve genel sayı formatları için uygulama genelinde tutarlı, kullanıcıya özel çıktılar üretir.
+Bu modül, sayısal değerlerin farklı diller ve bölgeler için uygun formatta gösterilmesini sağlayan uluslararasılaştırma (i18n) yardımcı fonksiyonlarını içerir. Tarayıcının yerleşik `Intl.NumberFormat` API'ini kullanarak para birimi ve genel sayı formatlaması yapar. Modül, `Lang` tipi ve `Intl.NumberFormatOptions` arayüzü ile çalışır.
 
 ## Fonksiyon Grupları
-### Para Birimi ve Sayı Formatlama İşlevleri
-Modülün temel sorumluluğu, ham sayı veya metin değerlerini belirtilen dil ve bölgesel ayarlara göre standart formata dönüştürmektir; para birimi ve genel sayısal gösterimler için tutarlı ve yerelleştirilmiş çıktılar sağlar.
+### Sayı ve Para Birimi Formatlama
+Bu grup, ham sayı veya metin değerlerini belirtilen dil ayarlarına göre yerelleştirilmiş biçime dönüştürmekten sorumludur. `formatCurrency` para birimi gösterimi için, `formatNumber` ise genel sayısal gösterim için kullanılır; her ikisi de `Intl.NumberFormatOptions` yapılandırması alır.
 - formatCurrency, formatNumber
+
+## Bağımlılıklar
+- **Dış Bağımlılık**: Tarayıcı ortamına ait `Intl.NumberFormat` API'i
+- **İç Bağımlılık**: `Lang` tipi (başka bir modülden tanımlı)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, tarayıcı ortamında `Intl.NumberFormat` API'sine güvenerek para birimi ve sayı formatlaması yapar. Fonksiyonların doğru çalışması için aşağıdaki koşulların var olması gerekir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarılabilecek varsayımlar listelenmiştir. Gövde tabanlı aksiyom üretilemez.
 
-[Aksiyom 1]: Eğer `lang` parametresi geçerli bir BCP 47 dil etiketi (örneğin `'en-US'`, `'tr-TR'`) yoksa, `Intl.NumberFormat` nesnesi oluşturulamaz veya beklenmeyen bir hata fırlatılır.
+[Aksiyom 1]: Eğer `formatCurrency` çağrılırken `options` parametresinde `currency` alanı yoksa, TypeScript derleme hatası oluşur; çünkü imza `Intl.NumberFormatOptions & { currency: string }` olarak tanımlanmıştır ve `currency` zorunlu kılınmıştır.
 
-[Aksiyom 2]: Eğer `value` parametresi, `Intl.NumberFormat` tarafından parse edilebilen geçerli bir sayısal bir string veya number değilse, fonksiyon `NaN` veya geçersiz bir formatlanmış değer döndürür.
+[Aksiyom 2]: Eğer `lang` parametresi geçerli bir `Lang` değerini içermiyorsa, `Intl.NumberFormat` yapıcısı beklenen biçimlendirme çıktısını üretemez; çünkü `lang` değeri `Intl.NumberFormat`'a locale olarak aktarılır.
 
-[Aksiyom 3]: Eğer `options` parametresi, `Intl.NumberFormat` yapıcısının kabul ettiği geçerli bir `Intl.NumberFormatOptions` nesnesi (örneğin `{ style: 'currency', currency: 'TRY' }`) değilse, tarayıcı varsayılan değerleri kullanır ve bu da beklenmeyen bir para birimi formatına yol açabilir.
-
-[Aksiyom 4]: Eğer modül, tarayıcı API'si (`Intl.NumberFormat`) desteklenmeyen bir ortamda (örneğin bazı Node.js sürümleri) çalıştırılırsa, `formatCurrency` ve `formatNumber` fonksiyonları doğrudan hata fırlatır veya`undefined` döndürür.
+[Aksiyom 3]: Eğer `value` parametresi hem `string` hem de `number` tipi dışındaysa, fonksiyonun nasıl davrandığı bilinmiyor; çünkü imza yalnızca `string | number` kabul edecek şekilde tanımlanmıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### formatCurrency
-**Ne yapar**: venthub-hvac projesinin i18n modülü içerisinde yer alan, gönderilen para değerini belirtilen dil ayarları ve özel biçimlendirme seçenekleri doğrultusunda uluslararası standartlara uygun para birimi formatına dönüştüren yardımcı bir fonksiyondur. Tüm uygulama genelinde tutarlı para biçimlendirmesi sağlamak amacıyla kullanılır, uluslararasılaştırma ihtiyaçlarını karşılamak için tasarlanmıştır.
-**Nasıl yapar**: TypeScript/JavaScript ortamlarında yerleşik olarak bulunan Intl.NumberFormat API'sinden faydalanarak biçimlendirme işlemini gerçekleştirir. Giriş olarak alınan değeri önce işlenebilir formata dönüştürür, ardından parametre olarak alınan dil ve biçimlendirme seçeneklerini ilgili API'ye ileterek bölgesel ayarlara uygun, doğru formatlanmış bir para değeri oluşturur.
+**Ne yapar**: Parasal bir değeri kullanıcının dil tercihine göre formatlar. Dil, kullanıcının okuma tercihidir; para birimi ise verinin bir olgusudur — bu ayrımı korur. Dilden para birimi türetmez; çağıranın belirttiği `currency` değerini kullanır.
+
+**Nasıl yapar**: `lang` parametresinden bir locale türetir: `tr` ise `tr-TR`, aksi halde `en-US`. `style` ve `currency`ağını en sona yerleştirir; böylece çağıranın geçirdiği `maximumFractionDigits` gibi biçim ayarları korunur ama para birimi kazara ezilemez. Sayısal dönüşüm başarısız olsa bile (`isNaN`), doğru birimde sıfır değerini formatlar. `Intl.NumberFormat` geçersiz bir birim kodu nedeniyle hata fırlatırsa, dile göre simge uydurmaz — birimi olduğu gibi ham metin olarak yazar; yanlış para birimi göstermektense biçimsiz göstermeyi yeğler.
+
 **Parametreler**:
-- name: value, type: string | number — Biçimlendirilmek istenen para değeri, hem string formatında metin olarak hem de doğrudan sayısal değer olarak giriş kabul edilir.
-- name: lang, type: Lang — Uygulama tarafından desteklenen dilleri temsil eden özel tanımlı tipte dil parametresi, biçimlendirmenin uyum sağlayacağı bölgesel dili belirler.
-- name: options, type: Intl.NumberFormatOptions — Yerleşik Intl.NumberFormat API'sinin kabul ettiği tüm özel biçimlendirme ayarlarını içeren nesne; para birimi kodu, ondalık basamak sayısı, para birimi simgesinin görüntülenme şekli gibi ayarları barındırır.
-**Dönüş**: Fonksiyonun dönüş tipi tanımlarda net olarak belirtilmemiştir, void olabileceği ifade edilmiştir, herhangi bir standart geri dönüş değeri için resmi bir tanımlama yapılmamıştır.
+- `value`: `string | number` — Formatlanacak parasal değer. String olarak geldiğinde `Number()` ile sayıya dönüştürülür.
+- `lang`: `Lang` — Kullanıcının dil tercihi. `tr` değeri `tr-TR` locale'ine, diğer değerler `en-US` locale'ine eşlenir.
+- `options`: `Intl.NumberFormatOptions & { currency: string }` — `Intl.NumberFormat` seçenekleri ile birlikte zorunlu `currency` alanını içerir. `currency` alanı para birimi kodunu belirtir (örneğin `TRY`, `USD`). Çağıran bu alanı sağlamak zorundadır; aksi halde fonksiyon para birimini belirleyemez.
+
+**Dönüş**: Bilinmiyor. Kaynakta return tipi açıkça belirtilmemiştir. Fonksiyon, `Intl.NumberFormat.format()` sonucunu veya hata durumunda ham metin (`${Math.round(Number(value) || 0)} ${currency}`) döndürür.
 
 ### formatNumber
 
@@ -71,22 +76,26 @@ Bu modül, tarayıcı ortamında `Intl.NumberFormat` API'sine güvenerek para bi
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/i18n/format.ts::formatCurrency
-- **params**: `(value: string | number, lang: Lang, options: Intl.NumberFormatOptions = {})`
+- **params**:
+  - `value` — `string | number` tipinde, biçimlendirilecek sayısal değer
+  - `lang` — `Lang` tipinde, dil seçimi ('tr' veya diğer)
+  - `options` — `Intl.NumberFormatOptions & { currency: string }` tipinde, biçimlendirme seçenekleri ve zorunlu `currency` alanı
 - **ic_degiskenler**:
-  - `v` — `value`'nun number karşılığı; string gelirse `Number(value)` ile parse edilir, number ise doğrudan kullanılır
-  - `locale` — `lang` değerine göre Intl locale stringi; `'tr'` ise `'tr-TR'`, diğer durumlarda `'en-US'`
-  - `currency` — para birimi kodu; `options.currency` varsa onu kullanır, yoksa dile göre fallback (`en` → `'USD'`, `tr` → `'TRY'`)
-  - `symbol` — catch bloğunda para birimi sembolü; `lang === 'en'` ise `'$'`, aksi halde `'₺'` — formatlama hata verdiğinde fallback çıktı için kullanılır
-- **Dönüş**: `string` — formatlanmış para birimi stringi (örn. `"1.234,56 ₺"`, `"$1,234.56"`) veya hata/durum fallback'leri (`"0 ₺"`, `"$0"`, `"$1234"`)
-
----
+  - `currency` — `options` objesinden çıkarılan para birimi kodu (destructuring ile)
+  - `locale` — `lang === 'tr'` koşuluna göre `'tr-TR'` veya `'en-US'` değerini alan yerel ayar string'i
+  - `intlOptions` — `Intl.NumberFormatOptions` tipinde, `maximumFractionDigits: 2` varsayılanı üzerine `options` yayılıp ardından `style: 'currency'` ve `currency` alanlarının en sona yazıldığı nihai seçenekler objesi
+  - `v` — `value` parametresinin `typeof` kontrolüyle sayıya dönüştürülmüş hali; string ise `Number(value)`, değilse doğrudan `value`
+- **Dönüş**: `string` — `Intl.NumberFormat` ile biçimlendirilmiş para birimi string'i; `isNaN(v)` ise sıfırın biçimlendirilmiş hali; `try` bloğu hata fırlatırsa `${Math.round(Number(value) || 0)} ${currency}` fallback string'i
 
 ### [N2_NASIL] AST Pointer: src/i18n/format.ts::formatNumber
-- **params**: `(value: string | number, lang: Lang, options: Intl.NumberFormatOptions = {})`
+- **params**:
+  - `value` — `string | number` tipinde, biçimlendirilecek sayısal değer
+  - `lang` — `Lang` tipinde, dil seçimi ('tr' veya diğer)
+  - `options` — `Intl.NumberFormatOptions` tipinde, varsayılanı `{}` olan biçimlendirme seçenekleri
 - **ic_degiskenler**:
-  - `v` — `value`'nun number karşılığı; string gelirse `Number(value)` ile parse edilir, number ise doğrudan kullanılır
-  - `locale` — `lang` değerine göre Intl locale stringi; `'tr'` ise `'tr-TR'`, diğer durumlarda `'en-US'`
-- **Dönüş**: `string` — formatlanmış sayı stringi (örn. `"1.234,56"`, `"1,234.56"`) veya hata/durum fallback'leri (`"0"`, value'nun string karşılığı)
+  - `v` — `value` parametresinin `typeof` kontrolüyle sayıya dönüştürülmüş hali; string ise `Number(value)`, değilse doğrudan `value`
+  - `locale` — `lang === 'tr'` koşuluna göre `'tr-TR'` veya `'en-US'` değerini alan yerel ayar string'i
+- **Dönüş**: `string` — `isNaN(v)` ise `'0'`; aksi halde `Intl.NumberFormat` ile biçimlendirilmiş sayı string'i; `try` bloğu hata fırlatırsa `String(value)` fallback string'i
 
 ---
 

@@ -2,49 +2,60 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\shell\AdminThemeToggle.tsx
-skeleton_hash: e2b2cb0dd23011fc
+source_path: C:\Users\alize\venthub-hvac\src\components\admin\shell\AdminThemeToggle.tsx
+skeleton_hash: 9befd2f13575812f
 entity_hashes:
-  func:AdminThemeToggle: e27d349beb646303
-  overview: 533c54235c34a80a
+  func:AdminThemeToggle: f21b10a6ba1e52f0
+  overview: dedcbc8c954b1cae
   style_tokens: 7643397d069ce23f
-generated_at: 2026-08-15T19:08:10Z
+generated_at: 2026-08-26T07:13:16Z
 ---
 
 ## Genel Bakış
-AdminThemeToggle, admin panelinde tema tercihini (açık/koyu mod) yönetmek için kullanılan bir React bileşenidir. Bileşen, dışarıdan gelen mevcut tercihi gösterir ve kullanıcı etkileşimiyle yeni tercihi üst bileşene geri çağırarak tema değişimini tetikler. Salt sunum (pure presentational) bir yapıya sahiptir.
+AdminThemeToggle, admin panelinde tema tercihini (açık/koyu mod) yönetmek için kullanılan bir React bileşenidir. Bileşen, dışarıdan gelen mevcut tercihi gösterir ve kullanıcı etkileşimiyle yeni tercihi üst bileşene geri çağırarak tema değişimini tetikler. Salt sunum (pure presentational) bir yapıya sahiptir ve kendi içinde durum tutmaz.
 
 ## Fonksiyon Grupları
 ### Tema Seçimi ve Etkileşim
-Mevcut tema durumunu (açık veya koyu) görsel bir anahtar/düğme aracılığıyla sunar ve kullanıcı tıklaması ile tercih değiştirme işlemini üst bileşene iletir.
+Mevcut tema durumunu (açık veya koyu) görsel bir arayüz elemanı aracılığıyla sunar ve kullanıcı etkileşimiyle tercih değiştirme işlemini üst bileşene iletir.
 - AdminThemeToggle
+
+## Bağımlılıklar ve Mimari Önem
+### İç Bağımlılıklar
+Modül tek bir bileşenden oluştuğu için iç bağımlılık bulunmamaktadır.
+
+### Dış Bağımlılıklar
+Bileşen, React kütüphanesine ve muhtemelen bazı temel UI bileşenlerine (detay verilmemiş) bağlıdır. Ayrıca, çalışması için üst bileşen tarafından sağlanan `preference` ve `onPreferenceChange` prop'larına ihtiyaç duyar.
+
+### Dinamik/Lazy Yüklenen Modüller
+Bu modül için dinamik veya lazy yükleme bilgisi bulunmamaktadır.
+
+### Mimari Önem
+Admin panelinin kullanıcı deneyimini doğrudan etkileyen tema yönetimini sağlayan temel bir sunum bileşenidir. Salt sunum yapısı sayesinde kolayca test edilebilir ve yeniden kullanılabilir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için temel aksiyomlar fonksiyon imzasından ve modül sabitlerinden çıkarılmıştır.
+[Aksiyom 1]: Eğer `preference` prop'u sağlanmazsa, bileşen mevcut tema durumunu (açık/koyu) görsel olarak gösteremez; hangi seçeneğin aktif olduğu belirlenemez.
 
-[Aksiyom 1]: Eğer `onPreferenceChange` fonksiyonu verilmemiş veya çağrılamıyorsa, kullanıcı tema tercihi değiştirdiğinde üst bileşene bildirim yapılamaz ve tema geçişi gerçekleşmez.
+[Aksiyom 2]: Eğer `onPreferenceChange` callback'i sağlanmazsa, kullanıcı bir tema seçeneğine tıkladığında yeni tercih üst bileşene iletilemez; tema değişimi tetiklenemez.
 
-[Aksiyom 2]: Eğer `preference` değeri `OPTIONS` dizisindeki geçerli bir değerle eşleşmiyorsa, bileşen hangi temanın aktif olduğunu bilemez ve tutarsız bir görünüm oluşturulur.
-
-[Aksiyom 3]: Eğer `OPTIONS` dizisi boş veya tanımsızsa, bileşen kullanıcıya sunulacak geçerli tema seçenekleri olmadığından düzgün şekilde render edilemez.
+[Aksiyom 3]: Eğer `OPTIONS` sabiti tanımlı değilse, bileşenin sunacağı tema seçenekleri (açık/koyu mod) belirlenemez; render edilecek düğme/anahtar listesi oluşturulamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminThemeToggle
-**Ne yapar**: Bu bileşen, yöneticilerin kullanım arayüzü temasını (ör. açık, koyu veya sistem tercihi) tercih etmelerini sağlayan bir tema seçici arayüz sunar. Tercihin mevcut durumunu görüntüler ve kullanıcı etkileşimiyle yeni bir tercih seçildiğinde üst bileşene bildirimde bulunur.
+**Ne yapar**: Bu fonksiyon, yönetici arayüzünde tema (örneğin koyu veya açık mod) tercihini değiştirmek için kullanılan bir React bileşeni tanımlar. Bileşen, mevcut tema tercihini görüntüler ve kullanıcının bu tercihi değiştirmesine olanak tanır.
 
-**Nasıl yapar**: Bileşen, `preference` prop'undan mevcut tema tercihini okur ve bunu arayüzde (muhtemelen bir açılır menü, radyo butonları veya geçiş anahtarı olarak) görüntüler. Kullanıcı etkileşimi sonucunda (ör. bir butona tıklama) `onPreferenceChange` callback fonksiyonunu çağırarak seçilen yeni tercihi (`'light'`, `'dark'` veya `'system'` gibi bir değer) üst bileşene iletir. Bu, kontrollü (controlled) bir bileşen modeliyle çalışır; bileşen kendi iç durumunu yönetmez, tüm durum üst bileşen tarafından sağlanır ve güncellenir. JSX ile interaktif bir arayüz döndürür.
+**Nasıl yapar**: Fonksiyon, bir React fonksiyonel bileşeni olarak çalışır. Bileşen, `preference` prop'u aracılığıyla mevcut tema tercihini alır ve `onPreferenceChange` prop'u aracılığıyla tercih değişikliklerini üst bileşene bildirir. Bileşenin iç mantığı ve kullanıcı arayüzü detayları kaynak kodda belirtilmemiştir.
 
 **Parametreler**:
-- preference: `string | undefined` — Bileşenin şu an görüntülemesi gereken aktif tema tercihini belirtir. Geçerli değerler projenin tema yapılandırmasına bağlı olarak genellikle `'light'`, `'dark'` veya `'system'` gibi string'lerdir. Undefined olması, henüz bir tercihin seçilmediği anlamına gelebilir.
-- onPreferenceChange: `(preference: string) => void` — Kullanıcı tarafından yeni bir tema tercihi seçildiğinde çağrılan callback fonksiyonu. Fonksiyon, seçilen yeni tercihi (bir string) parametre olarak alır ve bunu üst bileşene iletir. Bu, durumun (state) üst bileşende güncellenmesini sağlar.
+- preference: bilinmiyor — Bileşenin görüntüleyeceği ve kullanıcının değiştirebileceği mevcut tema tercihini temsil eder. Tip bilgisi verilmemiştir.
+- onPreferenceChange: bilinmiyor — Kullanıcı tema tercihini değiştirdiğinde çağrılacak olan geri çağırma (callback) fonksiyonudur. Tip bilgisi verilmemiştir.
 
-**Dönüş**: `React.FC<AdminThemeToggleProps>` — Bu bir React fonksiyonel bileşenidir. Verilen `AdminThemeToggleProps` tipindeki özelliklere (prop) sahip bir JSX yapısı (arayüz) döndürür. Bileşen, tercih gösterimi ve etkileşim için gerekli HTML ve/veya UI kütüphanesi bileşenlerini oluşturur.
+**Dönüş**: `React.FC<AdminThemeToggleProps>` — Fonksiyon, `AdminThemeToggleProps` arayüzünü (interface) kullanan bir React fonksiyonel bileşeni döndürür. Bu arayüzün yapısı kaynakta tanımlanmamıştır.
 
 ---
 
@@ -72,7 +83,7 @@ TEMA SEÇİCİ — açık / koyu / sistem Neden üç seçenek ve neden açılır
 ## SABİTLER
 - **OPTIONS** (array) — `[
   { value: 'light', labelKey: 'admin.theme.light', Icon: Sun },
-  { value: ...`
+  { value...`
 
 ---
 
@@ -80,22 +91,22 @@ TEMA SEÇİCİ — açık / koyu / sistem Neden üç seçenek ve neden açılır
 
 ### [N1_NASIL] AST Pointer: src/components/admin/shell/AdminThemeToggle.tsx::AdminThemeToggle
 - **params**:
-  - `preference` — mevcut tema tercihi (AdminThemePreference), hangi ikonun aktif olduğunu belirler
-  - `onPreferenceChange` — tema tercihi değiştiğinde çağrılan callback fonksiyonu
+  - `preference` — mevcut tema tercihi (`AdminThemePreference` tipinde); hangi ikonun aktif gösterileceğini ve radyo grubunda hangi seçeneğin seçili olacağını belirler
+  - `onPreferenceChange` — tema tercihi değiştiğinde çağrılan geri çağırma fonksiyonu; `DropdownMenu.RadioGroup`'un `onValueChange` içinde `v as AdminThemePreference` ile tür dönüşümü yapılarak çağrılır
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; UI metinlerini lokalize eder (`t('admin.theme.label')`, `t(labelKey)` çağrılarında kullanılır)
-  - `ActiveIcon` — `OPTIONS.find()` ile `preference` değerine karşılık gelen `Icon` bileşenini bulur; eşleşme yoksa `Sun` ikonuna fallback yapar; buton içinde render edilir
-- **Dönüş**: JSX — `DropdownMenu.Root` içine yerleştirilmiş tam bir dropdown menü yapısı; buton tetikleyici, portal içeriği ve radio group içerir
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `aria-label` ve menü öğesi etiketlerini yerelleştirmek için kullanılır
+  - `ActiveIcon` — `OPTIONS` dizisinde `o.value === preference` koşulunu sağlayan öğenin `Icon` özelliği; eşleşme bulunamazsa `Sun` ikonuna düşer (nullish coalescing `??`); düğme içinde `<ActiveIcon size={18} />` olarak render edilir
+- **Dönüş**: JSX — `DropdownMenu.Root` ile sarılmış bir dropdown menü ağacı; tetikleyici olarak `data-testid="admin-theme-toggle"` ve `aria-label` taşıyan bir `<button>`, içerik olarak `OPTIONS` dizisi üzerinde `.map()` ile üretilmiş radyo öğeleri listesi
 
 ---
 
-### [N2_NASIL] AST Pointer: src/components/admin/shell/AdminThemeToggle.tsx::(OPTIONS.map callback)
+### [N2_NASIL] AST Pointer: src/components/admin/shell/AdminThemeToggle.tsx::OPTIONS.map callback
 - **params**:
-  - `value` — seçeneğin değeri (light/dark/system gibi AdminThemePreference union üyesi); `DropdownMenu.RadioItem`'a `value` olarak bağlanır
-  - `labelKey` — çeviriden geçirilecek metin anahtarı; `t(labelKey)` ile ekranda gösterilir
-  - `Icon` — seçeneğin ikon bileşeni (Sun/Moon/Laptop); RadioItem içinde 15px boyutla render edilir
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX — `DropdownMenu.RadioItem`; ikon, çevrilmiş etiket ve aktif işareti (`Check`) içeren tek bir menü satırı
+  - `value` — `OPTIONS` dizisindeki bir öğenin tema değeri; `DropdownMenu.RadioItem`'ın `key` ve `value` prop'larına atanır
+  - `labelKey` — `OPTIONS` dizisindeki bir öğenin çeviri anahtarı; `t(labelKey)` ile yerelleştirilmiş etiket metni elde edilir
+  - `Icon` — `OPTIONS` dizisindeki bir öğenin lucide-react ikon bileşeni; `<Icon size={15} />` olarak render edilir
+- **ic_degiskenler**: yok — fonksiyon gövdesinde yalnızca JSX üretimi yapılır, ek değişken tanımlanmaz
+- **Dönüş**: JSX — tek bir `DropdownMenu.RadioItem` öğesi; içinde ikon (`Icon`), yerelleştirilmiş etiket (`t(labelKey)`) ve seçili durum göstergesi (`DropdownMenu.ItemIndicator` içinde `Check` ikonu) barındırır
 
 ---
 
