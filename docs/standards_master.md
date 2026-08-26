@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T21:41:14.482344+00:00
+compiled_at: 2026-08-26T21:53:03.313801+00:00
 total_compiled_files: 62
-source_commit: aec4a858
+source_commit: 59f8905a
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -3299,6 +3299,71 @@ K2 için makine kapısı **yoktur ve olmamalıdır** — "bu ayrım paragraf hak
 ölçülemez. Bunun yerine kapı K2'nin **sonucunu** ölçer: paragrafı olmayan bir aile kademe 1
 anlatısı taşıyorsa, o anlatı ya yazılmamıştır ya da yazılamayan bir ayrımı anlatmaya
 çalışmaktadır.
+
+## 4b. K4 — Görünüm modu veriye bağlıdır, tercihe değil (2026-08-26)
+
+### 4b.1 Niçin bu madde eklendi
+
+Bu cetvel şimdiye kadar **derinliği** yönetiyordu (kaç kademe sayfa olur), **görünüm modunu**
+yönetmiyordu (o sayfa neyi listeler). O boşlukta canlı bir müşteri kaybı yaşadı ve **hiçbir
+kapı görmedi** — CLAUDE.md kural 1'in tarif ettiği durumun ta kendisi.
+
+**Ölçüm (2026-08-26, prod, tarayıcıda, ana içerik bölgesi sayıldı — footer hariç):**
+
+| adres | mod | alt kategori | aktif ürün | ileriye giden bağlantı |
+|---|---|---|---|---|
+| `/tr/category/isi-geri-kazanim` | showcase | 0 | 16 | **0** |
+| `/tr/category/endustriyel-tavan-vantilatorleri` | showcase | 0 | 7 | **0** |
+| `/tr/category/endustriyel-havalandirma` | showcase | 7 | 225 | 7 alt kategori kartı |
+| `/tr/category/aksiyel-sanayi-fanlari` | series | 0 | 16 | 1 aile kartı |
+
+Sebep: `CategoryShowcaseView` yalnız `subCategories` alır, `families` **almaz**; showcase'te
+sayfalama da kapalıdır. Yani alt kategorisi olmayan bir showcase kategorisi **hiçbir şey**
+listelemez. Bileşen bozuk değildi — **veri yokken boşa düşüyordu.** Etkilenen: 27 aktif ürün.
+
+Not: metin taraması bu kusuru göremez. Sözlük dizeleri RSC yüküne serileştiği için her iki
+görünüme özgü ibareler **her sayfada** geçer; gösterge iki durumu ayırt etmez. Ölçüm ancak
+tarayıcıda **yapısal** olarak (render edilmiş bağlantı sayımı) yapılabilir.
+
+### 4b.2 Kural
+
+> **Bir kategori sayfası, ileriye giden en az bir yol göstermek zorundadır** — ya alt kategori
+> kartı, ya aile/ürün kartı. Hiçbir mod, sayfayı çıkışsız bırakmayı meşrulaştırmaz.
+
+Bunun sonucu olarak **görünüm modu tek başına bir tercih değildir; verinin onu taşıyıp
+taşımadığıyla birlikte geçerlidir**:
+
+| mod | ne gösterir | veri şartı |
+|---|---|---|
+| `showcase` | alt kategori kartları + anlatı | **en az 1 alt kategori** |
+| `landing` | aile kartları + karar anlatısı | en az 1 aile |
+| `series` | aile kartları (teknik) | en az 1 aile |
+
+Şart sağlanmıyorsa mod **düşer**: `showcase` → `series`. Düşme sessiz bir çare değil,
+**kuralın kendisidir** — `display_mode` sütunu bir niyet beyanıdır, sayfanın çıkışsız
+kalmasına izin veren bir yetki değil.
+
+### 4b.3 Yürürlük noktası ve bekçi
+
+Kuralın koddaki karşılığı tek bir fonksiyondur:
+`src/views/CategoryMasterView.tsx` → `etkinGorunumModu(displayMode, altKategoriSayisi)`.
+
+Mod **iki yerde** tüketilir: hangi görünümün çizileceği ve sayfalamanın gösterilip
+gösterilmeyeceği. İkisi ayrı hesaplanırsa sessizce ayrışır — bu dosyada zaten bir kez ayrıştı.
+Bu yüzden kural **tek kaynak** olarak yazılır ve bekçi bunu da kilitler.
+
+Bekçi: `src/__tests__/conformance/category-view-reach.test.ts` (INV-CATEGORY-REACH-1).
+Sabotaj **üç yönde** kırmızı verir: (1) düşme kuralı sökülünce, (2) aşırı düzeltilip her
+showcase düşürülünce, (3) sayfalama ham modu yeniden okuyunca.
+
+### 4b.4 Kapsam dışı — ayrı kalemler
+
+- **Boş kategoriler.** `parking-jet-fan` ana kategorisinin 0 alt kategorisi ve 0 ürünü var;
+  `hygiene-sanitizer`, `summer-ventilation`, `air-conditioning` de boş. Bu bir **veri**
+  kararıdır (gizle / doldur / sil) ve bu cetvelin konusu değildir.
+- **Ölü kod.** `CategoryMasterView`'in `switch` `default:` dalı ve `CategoryGridView`
+  ulaşılamaz: `useCategoryViewModel` `'grid'` değerini `'series'`e çevirir ve sütunda 0 adet
+  `'grid'` vardır. `knip` bunu yakalayamaz çünkü dosya **import ediliyor**.
 
 ## 5. Ölçülmüş durum (2026-08-23, canlı DB)
 
