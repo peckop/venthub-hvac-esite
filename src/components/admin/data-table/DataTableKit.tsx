@@ -13,6 +13,7 @@ import { adminTableCellClass, adminTableContainerClass } from '../../../utils/ad
 import AdminSkeleton from '../AdminSkeleton'
 import ColumnsMenu, { type ColumnToggle } from '../ColumnsMenu'
 import { DataTableHead } from './DataTableHead'
+import { DataTablePagination } from './DataTablePagination'
 import { loadColumnVisibility, loadDensity, saveColumnVisibility, saveDensity } from './persist'
 import type { AdminColumn } from './types'
 
@@ -196,31 +197,10 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
               onDensityChange={setDensity}
               buttonLabel={columnsButtonLabel}
             />
-            {pageCount > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setPage(Math.max(1, page - 1))}
-                  disabled={page <= 1}
-                  aria-label={t('admin.dataTable.pagination.previous')}
-                  className="w-8 h-8 flex items-center justify-center rounded-admin-md bg-admin-surface border border-admin-border text-admin-fg-muted hover:text-admin-fg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight size={16} className="rotate-180" />
-                </button>
-                <span className="text-xs font-semibold text-admin-fg-muted bg-admin-surface-2 px-3 py-1.5 rounded-admin-md border border-admin-border text-center tracking-tighter">
-                  {renderPageLabel ? renderPageLabel(page, pageCount) : `${page} / ${pageCount}`}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setPage(Math.min(pageCount, page + 1))}
-                  disabled={page >= pageCount}
-                  aria-label={t('admin.dataTable.pagination.next')}
-                  className="w-8 h-8 flex items-center justify-center rounded-admin-md bg-admin-surface border border-admin-border text-admin-fg-muted hover:text-admin-fg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </>
-            )}
+            {/*
+              Sayfalama BURADA DEĞİL: cetvel (admin-standard.md §3/4) onu tablonun ALTINA
+              koyuyor. Denetimler `DataTablePagination` içinde, tablodan SONRA.
+            */}
           </div>
         </div>
 
@@ -351,6 +331,16 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
             </tbody>
           </table>
         </div>
+
+        {/* Cetvel admin-standard.md §3/4: "Sayfalama — altta". Tek blok, tablodan SONRA. */}
+        <DataTablePagination
+          page={page}
+          pageCount={pageCount}
+          setPage={setPage}
+          previousLabel={t('admin.dataTable.pagination.previous')}
+          nextLabel={t('admin.dataTable.pagination.next')}
+          renderPageLabel={renderPageLabel}
+        />
       </div>
 
       {bulkBarSlot}
