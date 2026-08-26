@@ -882,6 +882,9 @@ export const en: typeof tr = {
       subjectPlaceholder: 'e.g. Car Park Jet Fan Project',
       messagePlaceholder: 'Write your requirements here...',
       submitButton: 'Submit Request',
+      consentText: 'I have read and agree.',
+      consentRequired: 'You must accept the KVKK text',
+      submitFailed: 'We could not send your message. Please try again; if the problem persists, contact us directly.',
     },
     title: 'Contact',
     subtitle: 'Contact us for your project or product questions. We will get back to you as soon as possible.',
@@ -2524,7 +2527,8 @@ export const en: typeof tr = {
     errors: {
       name: 'Full Name is required',
       contact: 'You must provide an email or phone number',
-      consent: 'You must accept the KVKK text'
+      consent: 'You must accept the KVKK text',
+      submitFailed: 'We could not save your request. Please try again; if the problem persists, contact us directly.'
     },
     defaultMessage: 'Detailed technical quote for {{productName}}...',
   },
