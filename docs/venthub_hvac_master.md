@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T21:13:02.310353+00:00
-total_compiled_files: 656
-source_commit: 9521444c
+compiled_at: 2026-08-26T21:25:41.351712+00:00
+total_compiled_files: 655
+source_commit: 9d879977
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-26T21:13:02.310353+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-26T21:25:41.351712+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -19466,13 +19466,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\ops-836\src\components\admin\data-table\DataTableKit.tsx
-skeleton_hash: aedd99408b21479b
+source_path: C:\tmp\wt-supurme\src\components\admin\data-table\DataTableKit.tsx
+skeleton_hash: f3b0ebf28a23834d
 entity_hashes:
-  func:DataTableKit: 9d029f93373fe873
-  overview: b868e3edab37a5c7
-  style_tokens: db6fc579bfa7b43f
-generated_at: 2026-08-26T20:51:16Z
+  func:DataTableKit: e714f69d9f2449b2
+  overview: a2c088a7cccc7fb9
+  style_tokens: 5a324826484cf67f
+generated_at: 2026-08-25T07:26:28Z
 ---
 
 ## Genel Bakış
@@ -19498,48 +19498,42 @@ Veri tablosunun ana render sorumluluğunu üstlenir. Generic tip parametresi say
 
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Gerekçe:** Fonksiyon gövdesi verilmediğinden, gövdenin çalıştırılabilir bir aksiyom üretmesi mümkün değildir. Yalnızca fonksiyon imzası mevcut olup, imza tek başına çalıştırılabilir bir aksiyom üretmez.
-
----
-
-## AXIOMS – Mimari Varsayımlar
-
-Bu modül için fonksiyon gövdesi verilmediğinden, gövdeden türetilen özel aksiyom tanımlanmamıştır.
+**Gerekçe:** Fonksiyon gövdesi verilmediğinden, gövdeden çıkarım yapılabilecek bir koşul bulunmamaktadır. Yalnızca fonksiyon imzası (`DataTableKit(props: DataTableKitProps<T>) -> ReactNode`) mevcut olup, imza tek başına çalıştırılabilir bir aksiyom üretmez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### DataTableKit
-**Ne yapar**: Genel amaçlı bir veri tablosu kit bileşenidir. Kolon görünürlüğü, yoğunluk (density), satır genişletme, seçim, sayfalama ve sıralama gibi masaüstü veri tablosu yönetimini tek bir bileşen altında birleştirir. Okuma/yazma yetkilerine göre farklı durumlar (erişim reddi, hata, boş durum) gösterir.
+**Ne yapar**: Veri tablosu bileşeninin tüm yönetim mantığını tek bir "kit" (set) altında birleştiren üst düzey React fonksiyonudur. Kolon görünürlüğü, yoğunluk (density), satır genişletme, sayfalama, seçim, sıralama ve erişim denetimi gibi tablonun tüm durumlarını koordine eder; toolbar, toplu işlem çubuğu, tablo başlığı, satır gövdesi ve durum ekranlarını (boş, filtre boş, hata, yetki reddi) bir arada render eder.
 
-**Nasıl yapar**: Bileşen, `props` parametresinden gelen yapılandırma değerlerini ayrıştırarak başlar. `useI18n` hook'u ile uluslararasılaştırma desteği sağlar; etiketler için önce prop değeri, ardından sözlük (`t()`) kullanılır (nullish coalescing `??` operatörü ile). Kolon görünürlüğü ve yoğunluk durumları `persistKey` ile yerel depolamaya kaydedilir ve yüklenir; bu sayede kullanıcı tercihleri oturumlar arası korunur. `defaultVisibility` hesaplaması, `columns` dizisindeki `hideable` ve `defaultHidden` alanlarına göre yapılır. Görünür kolonlar, `visibleCols` durumu ile `columns` dizisinin birleşiminden hesaplanır. `columnToggles` dizisi, `ColumnsMenu` bileşenine aktarılmak üzere her gizlenebilir kolon için bir toggle yapılandırması oluşturur. Satır genişletme durumu `expanded` adlı bir `Set<string>` ile yönetilir; `toggleExpand` fonksiyonu satır kimliğine göre açma/kapama işlemi yapar. `selectable` durumu `hasWriteAccess`'e, `expandable` durumu `renderExpandedRow` fonksiyonunun varlığına bağlıdır. `colSpan` değeri görünür kolon sayısı artı seçim ve genişletme sütunlarının varlığına göre hesaplanır. Okuma yetkisi (`hasReadAccess`) `false` ise `accessDeniedState` render edilir ve erken dönüş yapılır. Tablo gövdesinde dört durum ele alınır: yükleme sırasında iskelet (skeleton), filtre aktifken boş durum, filtresiz boş durum ve satırların render'ı. Her satır için seçim checkbox'ı, genişletme butonu ve görünür kolon hücreleri render edilir. `rowHref` tanımlıysa ilk görünür kolonun içeriği bir `Link` bileşeni ile sarılır. `onRowClick` tanımlıysa satır tıklanabilir hale gelir; klavye erişilebilirliği için `Enter` ve `Space` tuşları da işlenir. Sayfalama bileşeni (`DataTablePagination`) tablonun altında, `admin-standard.md §3/4` standardına uygun olarak konumlandırılır. `toolbarSlot` ve `bulkBarSlot` slotları sırasıyla üst ve alt kısımlara yerleştirilir.
+**Nasıl yapar**: Props'tan gelen `table` nesnesi üzerinden sıralama (`table.sorting`), seçim (`table.selection`), sayfalama (`table.pagination`), filtreleme (`table.filtering`) ve yükleme durumu (`table.isLoading`) gibi alt modüllere erişir. Kolon görünürlüğü ve yoğunluk tercihleri `persistKey` ile `localStorage`'a yazılır ve okunur; `useEffect` bağımlılıkları sayesinde her değişiklikte otomatik kaydedilir. `useMemo` ile görünür kolon anahtarları ve kolon toggle listesi hesaplanır; `hideable` olmayan kolonlar her zaman görünürdür, `defaultHidden` olanlar varsayılan olarak gizlidir. Satır genişletme durumu `expanded` adlı bir `Set<string>` ile yönetilir; `toggleExpand` fonksiyonu bu seti günceller. `hasReadAccess === false` olduğunda bileşen erken dönüş yaparak `accessDeniedState` görüntüler. Tablo gövdesinde üç durum ele alınır: yükleme sırasında iskelet (skeleton), satır yokken boş durum (filtre aktifse `filterEmptyState`, değilse `emptyState`), ve satırlar varken satır haritalama. Her satırda seçim kutusu (`selectable`), genişletme butonu (`expandable`) ve görünür kolonlar sırayla render edilir. İlk görünür kolonun hücresi `rowHref` tanımlıysa bir `Link` bileşeniyle sarmalanır. Sayfalama kontrolleri `pageCount > 1` koşulunda gösterilir; `renderPageLabel` prop'u ile sayfa etiketi özelleştirilebilir. `ColumnsMenu` bileşeni kolon görünürlük anahtarlarını ve yoğunluk seçimini sunar. `useI18n` hook'u ile uluslararasılaştırma desteği sağlanır; i18n etiketleri (`selectAllLabel`, `rowSelectLabel`, `expandLabel`, `totalLabel`) prop olarak geçilmezse sözlükten (`t()`) varsayılan değerler alınır — bu, eski sürümdeki ham Türkçe dizgi sorununu çözmek için tasarlanmıştır.
 
 **Parametreler**:
-- props: `DataTableKitProps<T>` — Bileşenin tüm yapılandırmasını içeren generic props nesnesi. Aşağıdaki alt alanları içerir:
-  - columns: `Column<T>[]` — Tablo kolon tanımları dizisi. Her kolon `key`, `header`, `cell`, `hideable`, `defaultHidden`, `align`, `cellClassName` gibi alanlar içerir.
-  - table: `TableState` — Tablo durumu nesnesi. `pagination` (page, pageCount, setPage), `sorting` (sort, toggleSort), `selection` (isSelected, toggle, allSelected, toggleAll), `filtering` (hasActiveFilters), `rows`, `totalMatched`, `isLoading`, `error` gibi alt nesneler içerir.
-  - rowId: `(row: T) => string` — Her satır için benzersiz kimlik döndüren fonksiyon.
-  - persistKey: `string` — Kolon görünürlüğü ve yoğunluk tercihlerinin yerel depolamada saklanması için kullanılan benzersiz anahtar.
-  - hasWriteAccess: `boolean` — Yazma yetkisi olup olmadığını belirler; `true` ise satır seçim checkbox'ları gösterilir.
-  - hasReadAccess: `boolean` — Okuma yetkisi olup olmadığını belirler; varsayılan değeri `true`'dur. `false` olduğunda `accessDeniedState` gösterilir.
-  - emptyState: `ReactNode` — Tabloda filtre aktif değilken ve satır yokken gösterilecek bileşen.
-  - filterEmptyState: `ReactNode` — Tabloda filtre aktifken ve sonuç yokken gösterilecek bileşen.
-  - accessDeniedState: `ReactNode` — Okuma yetkisi olmadığında gösterilecek bileşen.
-  - errorLabel: `string` — Tablo hata durumunda gösterilecek metin; tanımlı değilse sözlükten `admin.dataTable.states.error` anahtarı ile alınır.
-  - rowHref: `((row: T) => string) | undefined` — Satır için bağlantı URL'i döndüren fonksiyon; tanımlıysa ilk görünür kolonun hücre içeriği bağlantı olarak render edilir.
-  - onRowClick: `((row: T) => void) | undefined` — Satıra tıklandığında çağrılacak fonksiyon; tanımlıysa satır `cursor-pointer` ve `role="button"` ile render edilir.
-  - renderExpandedRow: `((row: T) => ReactNode) | undefined` — Genişletilmiş satır içeriğini render eden fonksiyon; tanımlıysa her satırın yanında genişletme butonu gösterilir.
-  - toolbarSlot: `ReactNode` — Tablo üstüne yerleştirilecek araç çubuğu bileşeni.
-  - bulkBarSlot: `ReactNode` — Tablo altına yerleştirilecek toplu işlem çubuğu bileşeni.
-  - columnsButtonLabel: `string` — Kolon menüsü butonunun etiketi.
-  - selectAllLabel: `string` — "Tümünü seç" checkbox'ının erişilebilirlik etiketi; tanımlı değilse sözlükten `admin.dataTable.labels.selectAll` anahtarı ile alınır.
-  - rowSelectLabel: `string` — Satır seçim checkbox'ının erişilebilirlik etiketi; tanımlı değilse sözlükten `admin.dataTable.labels.rowSelect` anahtarı ile alınır.
-  - expandLabel: `string` — Satır genişletme butonunun erişilebilirlik etiketi; tanımlı değilse sözlükten `admin.dataTable.labels.expand` anahtarı ile alınır.
-  - totalLabel: `string` — Toplam kayıt sayısı etiketi; tanımlı değilse sözlükten `admin.dataTable.pagination.total` anahtarı ile alınır.
-  - renderPageLabel: `(page: number) => string` — Sayfa numarası butonlarının erişilebilirlik etiketini oluşturan fonksiyon.
+- props: DataTableKitProps\<T\> — Tablonun tüm yapılandırma ve davranış tanımlarını içeren tek props nesnesi. Aşağıdaki alanlar bu nesneden destruct edilir:
+  - columns: ColumnDef\<T\>[] — Tablonun tanımlı kolon dizisi. Her kolon `key`, `header`, `cell`, `hideable`, `defaultHidden`, `align`, `cellClassName` gibi alanlar içerir.
+  - table: TableState\<T\> — Tablonun tüm durum nesnesi. `rows`, `totalMatched`, `isLoading`, `error`, `pagination` (`page`, `pageCount`, `setPage`), `sorting` (`sort`, `toggleSort`), `selection` (`isSelected`, `toggle`, `allSelected`, `toggleAll`), `filtering` (`hasActiveFilters`) alt nesnelerini barındırır.
+  - rowId: (row: T) => string — Her satırı benzersiz şekilde tanımlayan kimlik üreten fonksiyon.
+  - persistKey: string — Kolon görünürlüğü ve yoğunluk tercihlerinin `localStorage`'da saklanacağı anahtar.
+  - hasWriteAccess: boolean — Yazma yetkisi olup olmadığını belirtir; `true` olduğunda satır seçim kutuları ve toplu işlem desteği aktif olur.
+  - hasReadAccess: boolean — Okuma yetkisi olup olmadığını belirtir; `false` olduğunda `accessDeniedState` gösterilir. Varsayılan değeri `true`'dur.
+  - emptyState: ReactNode — Tabloda hiç satır yokken ve filtre aktif değilken gösterilecek bileşen.
+  - filterEmptyState: ReactNode — Tabloda hiç satır yokken ve filtre aktifken gösterilecek bileşen.
+  - accessDeniedState: ReactNode — Okuma yetkisi reddedildiğinde gösterilecek bileşen.
+  - errorLabel: string — Tablo hata durumunda gösterilecek metin; geçilmezse sözlükten `admin.dataTable.states.error` anahtarıyla alınır.
+  - rowHref: ((row: T) => string) | undefined — Satırın ilk görünür hücresini tıklanabilir bağlantıya dönüştüren fonksiyon; tanımlıysa `Link` bileşeniyle sarmalanır.
+  - onRowClick: ((row: T) => void) | undefined — Satıra tıklandığında çağrılan fonksiyon; tanımlıysa satır `cursor-pointer` ve `role="button"` ile erişilebilir hale gelir, Enter ve Space tuşlarıyla tetiklenebilir.
+  - renderExpandedRow: ((row: T) => ReactNode) | undefined — Genişletilmiş satırın içeriğini üreten fonksiyon; tanımlıysa her satırda genişletme butonu gösterilir.
+  - toolbarSlot: ReactNode — Tablonun üstüne yerleştirilecek özel toolbar içeriği.
+  - bulkBarSlot: ReactNode — Tablonun altına yerleştirilecek toplu işlem çubuğu içeriği.
+  - columnsButtonLabel: string — Kolon menüsü butonunun etiketi.
+  - selectAllLabel: string — Tablo başlığındaki "tümünü seç" onay kutusunun erişilebilirlik etiketi; geçilmezse sözlükten `admin.dataTable.labels.selectAll` anahtarıyla alınır.
+  - rowSelectLabel: string — Her satırdaki seçim onay kutusunun erişilebilirlik etiketi; geçilmezse sözlükten `admin.dataTable.labels.rowSelect` anahtarıyla alınır.
+  - expandLabel: string — Her satırdaki genişletme butonunun erişilebilirlik etiketi; geçilmezse sözlükten `admin.dataTable.labels.expand` anahtarıyla alınır.
+  - totalLabel: string — Sayfalama alanında gösterilen toplam kayıt etiketi; geçilmezse sözlükten `admin.dataTable.pagination.total` anahtarıyla alınır.
+  - renderPageLabel: ((page: number, pageCount: number) => ReactNode) | undefined — Sayfa göstergesini özel olarak biçimlendiren fonksiyon; geçilmezse `"{page} / {pageCount}"` biçimi kullanılır.
 
-**Dönüş**: `ReactNode` — Tablo bileşeninin render edilmiş JSX ağacı. Okuma yetkisi yoksa `accessDeniedState`, aksi halde araç çubuğu, tablo (başlık, gövde, sayfalama) ve toplu işlem çubuğunu içeren bir `div` döndürür.
+**Dönüş**: ReactNode — Tablonun tüm alt bileşenlerini (toolbar, tablo konteyneri, hata bandı, sayfalama, tablo başlığı, satırlar, toplu işlem çubuğu) içeren bir React ağacı döndürür. `hasReadAccess === false` olduğunda doğrudan `accessDeniedState` döndürülür.
 
 ---
 
@@ -19550,7 +19544,6 @@ Bu modül için fonksiyon gövdesi verilmediğinden, gövdeden türetilen özel 
 - import: ../ColumnsMenu::ColumnsMenu
 - import: ../ColumnsMenu::type ColumnToggle
 - import: ./DataTableHead::DataTableHead
-- import: ./DataTablePagination::DataTablePagination
 - import: ./persist::loadColumnVisibility
 - import: ./persist::loadDensity
 - import: ./persist::saveColumnVisibility
@@ -19598,8 +19591,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, gövdeden türetilen özel 
 
 ## NODE ID STANDARD
 
-  file: src\components\admin\data-table\DataTableKit.tsx
-  function: src\components\admin\data-table\DataTableKit.tsx::DataTableKit
+  file: DataTableKit.tsx
+  function: DataTableKit.tsx::DataTableKit
 
 ---
 
@@ -19618,129 +19611,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger`, `bg-admin-danger-weak`, `bg-admin-surface-2`, `border-admin-border`, `border-b`, `hover:bg-admin-surface-2`, `hover:text-admin-accent`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg-muted`, `text-center`, `text-xs`
-- **Layout:** `block`, `custom-scrollbar`, `flex`, `flex-wrap`, `gap-2`, `gap-3`, `h-1.5`, `h-4`, `h-6`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `overflow-x-auto`, `p-0`
-- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminTableCellClass`, `${alignClass`, `${cellPad`, `${clickable`, `${col.cellClassName`, `:`, `content-auto-table`, `cursor-pointer`, `divide-admin-border`, `divide-y`, `duration-300`, `focus-visible:ring-admin-accent/30`, `focus-visible:ring-offset-0`, `font-bold`
-
----
-# FILE: src\components\admin\data-table\DataTablePagination.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\tmp\ops-836\src\components\admin\data-table\DataTablePagination.tsx
-skeleton_hash: 04b72290cf32014e
-entity_hashes:
-  func:DataTablePagination: c8e912b4df860174
-  overview: e792b3a403037aca
-  style_tokens: 7ccdec5abbb098cb
-generated_at: 2026-08-26T20:52:18Z
----
-
-## Genel Bakış
-Bu modül, admin panelindeki veri tablosu bileşenlerinin sayfalama (pagination) arayüzünü sağlayan bir React bileşenidir. `DataTablePaginationProps` tipindeki özellikleri alarak sayfalama kontrollerini render eder. Modül, `src/components/admin/data-table` alt yapısının bir parçası olarak konumlanmıştır.
-
-## Fonksiyon Grupları
-
-### Sayfalama Bileşeni
-Veri tablosunun alt kısmında yer alan sayfalama navigasyonunu oluşturur. Kullanıcının sayfalar arasında gezinmesini sağlayan arayüz elemanlarını render eder.
-- DataTablePagination
-
-## Bağımlılıklar
-
-### İç Bağımlılıklar
-Tek bir fonksiyon içerdiğinden modül içi çağrı ilişkisi bulunmamaktadır.
-
-### Dış Bağımlılıklar
-- `DataTablePaginationProps` tipi: Bileşenin aldığı özellikleri tanımlayan dış tip tanımı. Bu tipin hangi modülden geldiği bu kaynak dosyada belirtilmemiştir.
-
-### Mimari Not
-Modül, `admin/data-table` alt yapısının bir parçasıdır ve muhtemelen ana veri tablosu bileşeni tarafından çağrılır. Tek bir dışa aktarılan bileşenden oluştuğu için modülün kapsamı dar ve odaklıdır.
-
----
-
-## AXIOMS – Mimari Varsayımlar
-
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Gerekçe:** Fonksiyon gövdesi verilmediğinden, `DataTablePagination` bileşeninin çalışma koşulları ve davranışsal varsayımları belirlenememektedir. İmzadan yalnızca bir React bileşeni olduğu ve `DataTablePaginationProps` tipinde props aldığı çıkarılabilir; ancak bu genel React varsayımlarıdır ve modüle özgü aksiyom niteliği taşımaz.
-
----
-
-## FONKSİYON DETAYLARI
-
-### DataTablePagination
-**Ne yapar**: Tablonun altında tek bir blok olarak görüntülenen sayfalama denetimlerini oluşturur. Bileşen, `docs/standards/admin-standard.md` dosyasının §3 numaralı bölümündeki (Resource Index bileşim sırası) dördüncü maddeye uygun olarak konumlandırılmıştır; bu madde "Sayfalama — altta; ~50 öğeden sonra zorunlu." kuralını belirtir. Kural yazılı olmasına rağmen daha önce yalnızca üst araç çubuğunda uygulanmıştı.
-
-**Nasıl yapar**: Bileşen, gelen `props` içindeki `pageCount` değerini kontrol eder. Eğer `pageCount` 1 veya daha küçükse, denetimler görüntülenmez ve `null` döndürür; çünkü tıklanamaz iki ok bilgi taşımaz ve gürültü yapar. Aksi takdirde, bir üst kenarlık ve arka plan rengine sahip bir kapsayıcı (`div`) içinde üç ana eleman oluşturur: bir önceki sayfa butonu, sayfa bilgisini gösteren bir etiket ve bir sonraki sayfa butonu. Önceki sayfa butonu, `setPage` fonksiyonunu çağırarak mevcut sayfayı 1 azaltır (ancak 1'in altına düşmesini engeller) ve ilk sayfadayken devre dışıdır. Sonraki sayfa butonu, mevcut sayfayı 1 artırır (ancak `pageCount`'u aşmasını engeller) ve son sayfadayken devre dışıdır. Sayfa etiketi, `renderPageLabel` fonksiyonu sağlanmışsa bu fonksiyonu kullanarak özel bir etiket oluşturur; sağlanmamışsa varsayılan olarak "mevcutSayfa / toplamSayfa" biçiminde görüntülenir. Butonlar, erişilebilirlik için `aria-label` özelliğine sahiptir ve ChevronRight ikonu kullanır; önceki sayfa butonundaki ikon 180 derece döndürülmüştür.
-
-**Parametreler**:
-- props: DataTablePaginationProps — Bileşenin davranışını ve görünümünü yapılandıran özellikleri içerir. Bu özellikler arasında mevcut sayfa numarası (`page`), toplam sayfa sayısı (`pageCount`), sayfa değiştirme fonksiyonu (`setPage`), önceki ve sonraki butonlar için etiket metinleri (`previousLabel`, `nextLabel`) ve isteğe bağlı olarak özel sayfa etiketi oluşturma fonksiyonu (`renderPageLabel`) bulunur.
-
-**Dönüş**: ReactNode — Bileşen, bir React düğümü döndürür. `pageCount` 1 veya daha küçükse `null` döndürerek hiçbir şey görüntülemez. Aksi takdirde, sayfalama denetimlerini içeren bir JSX yapısı döndürür.
-
----
-
-## İTHALATLAR (IMPORTS)
-- import: lucide-react::ChevronRight
-- import: react::type { ReactNode }
-
----
-
-## INTERFACES
-
-### DataTablePaginationProps
-- `page: number`
-- `pageCount: number`
-- `setPage: (page: number) => void`
-- `previousLabel: string`
-- `nextLabel: string`
-- `renderPageLabel?: (page: number, pageCount: number) => ReactNode`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: DataTablePagination.tsx::DataTablePagination
-- **params**: `props: DataTablePaginationProps`
-- **ic_degiskenler**:
-  - `page` — `props`'tan çıkarılan mevcut sayfa numarası; `setPage` çağrılarında ve butonların `disabled` durumlarında kullanılır
-  - `pageCount` — `props`'tan çıkarılan toplam sayfa sayısı; tek sayfa kontrolünde ve sonraki butonun `disabled` durumunda kullanılır
-  - `setPage` — `props`'tan çıkarılan sayfa değiştirme fonksiyonu; önceki buton `onClick`'inde `Math.max(1, page - 1)`, sonraki buton `onClick`'inde `Math.min(pageCount, page + 1)` ile çağrılır
-  - `previousLabel` — `props`'tan çıkarılan önceki butonun `aria-label` değeri
-  - `nextLabel` — `props`'tan çıkarılan sonraki butonun `aria-label` değeri
-  - `renderPageLabel` — `props`'tan çıkarılan opsiyonel özel sayfa etiketi render fonksiyonu; varsa `renderPageLabel(page, pageCount)` şeklinde çağrılır, yoksa `` `${page} / ${pageCount}` `` template literal kullanılır
-- **Dönüş**: `pageCount <= 1` ise `null`, aksi halde `ReactNode` (sayfalama denetimi içeren `<div>` JSX'i)
-
----
-
-## NODE ID STANDARD
-
-  file: src\components\admin\data-table\DataTablePagination.tsx
-  function: src\components\admin\data-table\DataTablePagination.tsx::DataTablePagination
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: DataTablePagination
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-border`, `border-t`, `hover:text-admin-fg`, `text-admin-fg-muted`, `text-center`, `text-xs`
-- **Layout:** `flex`, `flex-wrap`, `gap-2`, `h-8`, `items-center`, `justify-center`, `justify-end`, `p-4`, `w-8`
-- **Varyant/Responsive:** `disabled:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `border`, `disabled:cursor-not-allowed`, `disabled:opacity-30`, `font-semibold`, `px-3`, `py-1.5`, `rotate-180`, `rounded-admin-md`, `tracking-tighter`, `transition-colors`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger`, `bg-admin-danger-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-border`, `border-b`, `hover:bg-admin-surface-2`, `hover:text-admin-accent`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg-muted`, `text-center`, `text-xs`
+- **Layout:** `block`, `custom-scrollbar`, `flex`, `flex-wrap`, `gap-2`, `gap-3`, `h-1.5`, `h-4`, `h-6`, `h-8`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `overflow-x-auto`
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${adminTableCellClass`, `${alignClass`, `${cellPad`, `${clickable`, `${col.cellClassName`, `:`, `border`, `content-auto-table`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-30`, `divide-admin-border`, `divide-y`, `duration-300`
 
 ---
 # FILE: src\components\admin\data-table\FacetedFilter.md
