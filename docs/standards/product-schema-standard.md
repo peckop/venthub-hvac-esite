@@ -200,16 +200,43 @@ Kural: `model_code` yoksa **etiket hiç gösterilmez**. `sku`'ya düşmek yasakt
 
 ### 11.4 Ayırt edicilik neden ada bırakılamaz
 
-Ölçüm: **74 satırda ad, aile içinde başka bir üyeyle çakışıyor.** Yani ad tek başına
-"hangi modeli aldım" sorusunu cevaplamıyor; `model_code` etiketi süs değil, kimliğin
-parçasıdır.
+Ölçüm (**2026-08-27, canlı DB, 374 aktif ürün**): **72 satırda ad, aile içinde başka bir
+üyeyle çakışıyor**; çakışan farklı ad sayısı **20**. Yani ad tek başına "hangi modeli
+aldım" sorusunu cevaplamıyor; `model_code` etiketi süs değil, kimliğin parçasıdır.
 
-### 11.4.1 Veri tarafı borcu (açık)
+> Ölçüt (yeniden koşulabilir olsun diye yazılı):
+> `count(*) OVER (PARTITION BY family_id, name) > 1`, `deleted_at IS NULL`.
+> Yumuşak silinmiş satır dahil edilse de sonuç değişmiyor (silinmiş = 0).
+
+**Düzeltme kaydı:** bu madde 2026-08-21'de **74** diyordu; bugün aynı sorgu **72** veriyor.
+Sayı yanlış yazılmamıştı, **veri değişti** (`products.updated_at` en son 2026-08-23).
+Ders, ölçümden daha kalıcı: *bir cetvele yazılan sayı, ölçütü ve tarihi olmadan
+doğrulanamaz.* Bundan sonra bu bölümdeki her sayı ölçütüyle ve tarihiyle yazılır.
+
+### 11.4.1 Veri tarafı borcu — ayırt edici BULUNDU (2026-08-27)
 
 Bu cetvel yüzeyi bağlar; **veriyi bağlamaz.** `products.model_code` bugün 374/374 dolu
 ama bunu zorlayan bir kısıt YOK. Doğru kalıcı çözüm katalog alımında zorunlu alan
 (`catalog-ingestion-standard.md`) ya da DB kısıtıdır. Sahibi: katalog hattı (PRICING).
-Bu madde, kuralın **ölçülemez tarafını** adıyla yazar — kapının kapsamını abartmamak için.
+
+⭐ **Borcun "çözülemez" tarafı kapandı.** 72 çakışmanın tamamı tek bir seride
+(SEAT/STORM/JET, 81 model / 29 farklı ad). Ayırt edici veri **kaynakta zaten var**:
+AVenS 2026 fiyat listesinin teknik sütunlu sürümünde `spec_rpm`, `spec_power_kw`,
+`spec_voltage` 81 kaydın 81'inde dolu ve kodlar DB ile 81/81 eşleşiyor.
+
+| Ayırt etme ölçütü | Benzersiz | Ayırt edilemeyen satır |
+|---|---|---|
+| yalnız `name` | 29 / 81 | **72** |
+| `name` + devir + güç + gerilim | **81 / 81** | **0** |
+
+SKU'nun kendisi de yapılı ve bu üç ekseni kodluyor: hat ön eki (51=SEAT · 61=STORM ·
+71=JET), üçüncü hane devir kademesi (1=950 · 2=1400 · 3=2800 d/dk), sonek gerilim/sertifika
+(`000`=380V · `010`=220V · `003`=ATEX). Yani kimlik SKU'da vardı, **ada hiç taşınmamıştı**.
+
+Bu, §11.4'ün kuralını değiştirmez (`model_code` etiketi hâlâ kimliğin parçası) ama
+kapsamını daraltır: ad, üç eksen eklendiğinde **tek başına ayırt edici olabiliyor**.
+Kalan iş veri tarafında ve onay bekliyor — ölçüm ve öneri
+`docs/plans/` yerine tek sayfada toplandı (URUN şeridi, 2026-08-27 teslimi).
 
 ## 11.5 MODEL KATMANI — seri / model / varyant (T138-VH, Recep onayi 2026-08-21)
 
