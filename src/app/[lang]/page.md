@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\ops-t165\src\app\[lang]\page.tsx
-skeleton_hash: fa13207f4aa45982
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx
+skeleton_hash: 61356cfd1e65f41e
 entity_hashes:
   func:RootPage: 8ad4b4fd1a8c654d
   func:generateMetadata: 507857aa921043d5
@@ -11,7 +11,7 @@ entity_hashes:
   func:getCachedHomeData: 3cdedf9dace01d81
   overview: 721a34f597b2222e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T06:53:29Z
+generated_at: 2026-08-24T11:50:02Z
 ---
 
 ## Genel Bakış
@@ -122,6 +122,59 @@ type Props = {
 - **params**: yok
 - **ic_degiskenler**: yok
 - **Dönüş**: `Array<{ lang: string }>` — `'tr'` ve `'en'` değerlerini içeren statik yol parametreleri dizisi
+
+---
+
+### [N2_NASIL] AST Pointer: src/app/[lang]/page.tsx::generateMetadata
+- **params**: `{ params }: Props` — `params` nesnesi `await` ile açılır
+- **ic_degiskenler**:
+  - `lang` — `await params` sonucu elde edilen dil kodu (`'tr'` veya `'en'`)
+  - `dict` — `lang === 'en'` ise `en`, değilse `tr` sözlük nesnesi
+  - `siteUrl` — `SITE_URL` sabiti; site kök URL'si
+  - `canonical` — `` `${siteUrl}/${lang}` `` ifadesiyle oluşturulan canonical URL
+- **Dönüş**: `Promise<Metadata>` — Next.js `Metadata` nesnesi; `title`, `description`, `alternates`, `openGraph`, `twitter`, `robots` alanlarını içerir
+
+---
+
+### [N3_NASIL] AST Pointer: src/app/[lang]/page.tsx::getCachedHomeData
+- **params**: `lang: string`, `tenantId: string`
+- **ic_degiskenler**:
+  - `catData` — `getCategories(supabaseStaticClient)` çağrısından dönen kategori verisi
+  - `prodData` — `getProducts(supabaseStaticClient, 12)` çağrısından dönen ürün verisi (12 ürün)
+  - `countRes` — `supabaseStaticClient.rpc('get_category_counts')` çağrısından dönen RPC sonucu
+  - `productCounts` — `Record<string, number>` tipinde; her kategori kimliğine karşılık ürün sayısını tutar
+  - `row` — `countRes.data ?? []` dizisi üzerinde `for...of` ile iterasyon yapılan her satır
+  - `row.category_id` — satırdaki kategori kimliği; `productCounts` sözlüğünün anahtarı olarak kullanılır
+  - `row.product_count` — satırdaki ürün sayısı; `?? 0` ile varsayılan değer atanır
+- **Dönüş**: `{ catData, prodData, productCounts }` — `unstable_cache` ile sarılmış; `['home-page-data', lang, tenantId]` cache anahtarı ve `[HOME_DATA_TAG, homeDataTag(tenantId)]` tag'leri ile `revalidate: 3600` süresi tanımlıdır
+
+---
+
+### [N4_NASIL] AST Pointer: src/app/[lang]/page.tsx::RootPage
+- **params**: `{ params }: Props` — `params` nesnesi `await` ile açılır
+- **ic_degiskenler**:
+  - `lang` — `await params` sonucu elde edilen dil kodu
+  - `dict` — `lang === 'en'` ise `en`, değilse `tr` sözlük nesnesi
+  - `tenantConfig` — `getTenantConfig()` çağrısından dönen yapılandırma nesnesi
+  - `tenantId` — `tenantConfig.id`; kiracı kimliği
+  - `categories` — `DomainCategory[]` tipinde; `try` bloğu içinde `toUICategoryList(data.catData)` ile atanır, hata durumunda boş dizi
+  - `products` — `Product[]` tipinde; `try` bloğu içinde `(data.prodData as Product[]) || []` ile atanır, hata durumunda boş dizi
+  - `productCounts` — `Record<string, number>` tipinde; `try` bloğu içinde `data.productCounts` ile atanır, hata durumunda boş nesne
+  - `data` — `getCachedHomeData(lang, tenantId)` çağrısından dönen önbelleklenmiş veri
+  - `error` — `catch` bloğunda yakalanan hata; `console.warn` ile loglanır
+  - `t` — `(key: string) => getDictValue(dict, key)` fonksiyonu; sözlükten değer okumak için çeviri yardımcısı
+  - `displayCategories` — `CategoryViewModelLite[]` tipinde; `categories` dizisinden filtrelenmiş, sıralanmış ve dönüştürülmüş kategori listesi
+  - `c` — `.filter` ve `.map` zincirindeki her kategori nesnesi
+  - `c.parent_id` — üst kategori kimliği; `!c.parent_id` ile üst kategorisi olmayanlar filtrelenir
+  - `c.id` — kategori kimliği; `productCounts[c.id]` ile ürün sayısı kontrol edilir
+  - `c.name` — kategori adı; `compareText` ile sıralamada kullanılır
+  - `c.description` — kategori açıklaması; boşsa `''` atanır
+  - `c.image_url` — kategori görsel URL'si
+  - `siteUrl` — `SITE_URL` sabiti
+  - `jsonLds` — `Array<object>` tipinde; `WebSite` ve `Organization` olmak üzere iki JSON-LD yapı verisi
+  - `ld` — `jsonLds.map` döngüsündeki her JSON-LD nesnesi
+  - `i` — `jsonLds.map` döngüsündeki indeks; `key` prop'u olarak kullanılır
+- **Dönüş**: JSX — `TenantProvider` ile sarılmış; `jsonLds` dizisi üzerinden `<script type="application/ld+json">` etiketleri ve `<HomePage>` bileşeni render edilir. `HomePage`'ye `initialCategories`, `rawCategories`, `initialProducts`, `dictionary`, `lang` prop'ları iletilir
 
 ---
 

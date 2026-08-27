@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\ops-t165\src\lib\services\purchasing.service.ts
-skeleton_hash: 269552d1bf645d35
+source_path: C:\Users\alize\venthub-hvac\src\lib\services\purchasing.service.ts
+skeleton_hash: 8475a4e916232174
 entity_hashes:
   func:createPurchaseOrder: 97040d46ea3b6919
   func:createSupplier: 99bf4fe1fd2ef785
@@ -16,7 +16,7 @@ entity_hashes:
   func:setPurchaseOrderStatus: c384754a09944d6e
   func:updateSupplier: c7d283c93e01b4aa
   overview: f4e8cc60f7907c8c
-generated_at: 2026-08-27T07:05:24Z
+generated_at: 2026-08-25T08:45:32Z
 ---
 
 ## Genel Bakış
@@ -206,6 +206,120 @@ type GoodsReceiptRow = Database['public']['Tables']['goods_receipts']['Row']
   - `data` — sorgu sonucu dönen satırlar dizisi
   - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
 - **Dönüş**: `Promise<SupplierRow[]>` — tedarikçi satırları dizisi; veri yoksa boş dizi döner
+
+---
+
+### [N2_NASIL] AST Pointer: purchasing.service.ts::createSupplier
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `input` — SupplierInsert tipinde, oluşturulacak tedarikçi verisi
+- **ic_degiskenler**:
+  - `data` — insert işlemi sonrası dönen tekil tedarikçi satırı
+  - `error` — insert sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<SupplierRow>` — oluşturulan tedarikçi satırı; ayrıca `logAdminAction` ile `suppliers` tablosuna yapılan INSERT işlemi audit kaydı oluşturulur
+
+---
+
+### [N3_NASIL] AST Pointer: purchasing.service.ts::updateSupplier
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `id` — string tipinde, güncellenecek tedarikçinin birincil anahtarı
+  - `patch` — SupplierUpdate tipinde, güncellenecek alanlar
+- **ic_degiskenler**:
+  - `data` — update işlemi sonrası dönen tekil tedarikçi satırı
+  - `error` — update sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<SupplierRow>` — güncellenen tedarikçi satırı; ayrıca `logAdminAction` ile `suppliers` tablosuna yapılan UPDATE işlemi audit kaydı oluşturulur
+
+---
+
+### [N4_NASIL] AST Pointer: purchasing.service.ts::listPurchaseOrders
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `opts` — `{ status?: string }` tipinde, opsiyonel; varsayılan değeri boş nesne `{}`
+- **ic_degiskenler**:
+  - `q` — supabase sorgu nesnesi; önce `purchase_orders` tablosundan tüm alanları seçer ve `created_at` alanına göre azalan sıralar; `opts.status` tanımlı ise `status` alanına eşitlik filtresi uygulanır
+  - `data` — sorgu sonucu dönen satınalma siparişi satırları dizisi
+  - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<PurchaseOrderRow[]>` — satınalma siparişi satırları dizisi; veri yoksa boş dizi döner
+
+---
+
+### [N5_NASIL] AST Pointer: purchasing.service.ts::getPurchaseOrder
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `id` — string tipinde, getirilecek satınalma siparişinin birincil anahtarı
+- **ic_degiskenler**:
+  - `data` — sorgu sonucu dönen satınalma siparişi satırı (ilişkili kalemlerle birlikte) veya null
+  - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<PurchaseOrderWithItems | null>` — satınalma siparişi ve ilişkili kalemler; bulunamazsa null döner
+
+---
+
+### [N6_NASIL] AST Pointer: purchasing.service.ts::createPurchaseOrder
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `input` — PurchaseOrderInput tipinde, oluşturulacak sipariş verisi (satırlar dahil)
+- **ic_degiskenler**:
+  - `po` — `purchase_orders` tablosuna insert sonrası dönen tekil sipariş satırı
+  - `poError` — sipariş insert sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+  - `items` — `purchase_order_items` tablosuna insert sonrası dönen kalem satırları dizisi
+  - `itemsError` — kalem insert sırasında oluşan hata nesnesi; varsa önce oluşturulan sipariş silinir (rollback), sonra throw ile fırlatılır
+  - `l` — `input.lines` dizisinin her elemanı; map içinde kullanılır; `l.product_id`, `l.qty_ordered`, `l.unit_cost`, `l.currency`, `l.tax_rate` alanlarına erişilir
+- **Dönüş**: `Promise<PurchaseOrderWithItems>` — oluşturulan sipariş ve kalemleri; ayrıca `logAdminAction` ile `purchase_orders` tablosuna yapılan INSERT işlemi audit kaydı oluşturulur
+
+---
+
+### [N7_NASIL] AST Pointer: purchasing.service.ts::setPurchaseOrderStatus
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `poId` — string tipinde, durumu değiştirilecek siparişin birincil anahtarı
+  - `next` — string tipinde, hedef durum değeri
+  - `opts` — `{ closeNote?: string }` tipinde, opsiyonel; varsayılan değeri boş nesne `{}`
+- **ic_degiskenler**:
+  - `current` — mevcut sipariş satırı (`id` ve `status` alanları seçilir); bulunamazsa hata fırlatılır
+  - `readError` — mevcut siparişi okuma sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+  - `patch` — güncelleme nesnesi; `status` ve `updated_at` alanlarını içerir; `opts.closeNote` tanımlı ise `close_note` alanı da eklenir
+  - `data` — update işlemi sonrası dönen tekil sipariş satırı
+  - `error` — update sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<PurchaseOrderRow>` — güncellenen sipariş satırı; ayrıca `logAdminAction` ile `purchase_orders` tablosuna yapılan UPDATE işlemi audit kaydı oluşturulur. Geçiş `isManualPoTransitionAllowed` ile doğrulanır; `partially_received` → `closed` geçişinde `closeNote` zorunludur
+
+---
+
+### [N8_NASIL] AST Pointer: purchasing.service.ts::parseGoodsReceiptResult
+- **params**:
+  - `data` — `Json | null` tipinde, RPC yanıt verisi
+- **ic_degiskenler**:
+  - `data.success` — boolean olarak kontrol edilir; `true` ise `success: true` atanır
+  - `data.error` — string olarak kontrol edilir; string ise `error` alanına atanır
+  - `data.receipt_id` — string olarak kontrol edilir; string ise `receipt_id` alanına atanır
+  - `data.processed_count` — number olarak kontrol edilir; number ise `processed_count` alanına atanır
+  - `data.received_units` — number olarak kontrol edilir; number ise `received_units` alanına atanır
+  - `data.po_status` — string olarak kontrol edilir; string ise `po_status` alanına atanır
+- **Dönüş**: `GoodsReceiptResult` — `success`, `error`, `receipt_id`, `processed_count`, `received_units`, `po_status` alanlarını içeren nesne; `data` null veya geçersiz tipte ise `{ success: false, error: 'unexpected RPC response shape' }` döner
+
+---
+
+### [N9_NASIL] AST Pointer: purchasing.service.ts::processGoodsReceipt
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `args` — `{ poId: string; documentNo: string; lines: GoodsReceiptLineInput[]; note?: string }` tipinde, mal kabul işlemi girdileri
+- **ic_degiskenler**:
+  - `data` — `process_goods_receipt` RPC çağrısı sonucu dönen veri
+  - `error` — RPC çağrısı sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+  - `result` — `parseGoodsReceiptResult` fonksiyonu ile ayrıştırılmış mal kabul sonucu nesnesi
+  - `l` — `args.lines` dizisinin her elemanı; map içinde kullanılır; `l.product_id`, `l.qty`, `l.unit_cost` alanlarına erişilir
+- **Dönüş**: `Promise<GoodsReceiptResult>` — mal kabul işlemi sonucu; `result.success` true ise `logAdminAction` ile `goods_receipts` tablosuna audit kaydı oluşturulur
+
+---
+
+### [N10_NASIL] AST Pointer: purchasing.service.ts::listGoodsReceipts
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `poId` — string tipinde, mal kabul kayıtlarının filtreleneceği satınalma siparişinin birincil anahtarı
+- **ic_degiskenler**:
+  - `data` — sorgu sonucu dönen mal kabul satırları dizisi
+  - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<GoodsReceiptRow[]>` — mal kabul satırları dizisi; veri yoksa boş dizi döner
 
 ---
 
