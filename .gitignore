@@ -112,3 +112,9 @@ docs/screenshots/*.png
 # Sir taramasi ham ciktisi (scripts/security/secret-scan.py). TAM token degerleri
 # icerir — repoda ASLA yeri yok. Konsol ciktisi zaten maskelidir.
 TAM-RAPOR.txt
+
+# Playwright MCP oturum yakalamalari (page-*.yml, console-*.log). ARAC URETIR, kaynak DEGIL:
+# her tarayici oturumunda ana dizine yeni dosya birakir. 2026-08-27'de ana dizinde 31 dosya
+# birikmisti (658K) ve porcelain'de TEK satira katlandigi icin sayacta 1 gorunuyor, VS Code
+# dosya listesinde 31 satir doldurup gercek degisiklikleri goze bogduruyordu.
+.playwright-mcp/
