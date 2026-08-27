@@ -283,6 +283,33 @@ konunca yeşil. (İlk sabotaj denemem yalnız birinci denemeyi kapatmıştı ve 
 kaldı; "sabotaj sonuç değiştirmedi" demek yerine sabotajın kendisini ölçtüm, eksik
 olan oydu. Sabotaj, sınanan yeteneği GERÇEKTEN kaldırmalıdır.)
 
+### ⚠D8.3 — BİLİNEN BİLİNMEYEN: atlama çalışınca zorunlu `Vercel` check'i ne olur?
+
+**Bu soru bugüne kadar hiç ortaya çıkmadı, çünkü atlama hiç çalışmadı.** D8.1'den sonra
+çalışacak — ve o an yeni bir risk doğuyor. TEMİZLİK sordu, ölçmeye çalışıldı:
+
+- `master` dal koruması **zorunlu check** listesi: `["ci", "admin-smoke", "Vercel"]` (ölçüldü, `gh api .../branches/master/protection`).
+- Vercel dokümanı `ignoreCommand` exit 0 durumunda dağıtımın **CANCELED**'a geçtiğini yazıyor; **GitHub commit-status'a ne yazıldığını yazmıyor**.
+- **ÖNCÜL-ÖLÇÜM: ÖLÇÜLEMEZ** — ne depoda emsal var (atlama hiç koşmadı), ne vendor dokümanında cevap. Tek yol canlı deney.
+
+**RİSK, AÇIKÇA:** atlanan dağıtım zorunlu `Vercel` check'ini asla SUCCESS yapmazsa,
+salt-doküman PR'ları **merge edilemez** hale gelir. Bu, bir kilidi başka kilitle
+değiştirmek olur — kota duvarı kalkar, check duvarı doğar.
+
+**DENEY VE GERİ ALMA PLANI (D8.1 indikten sonra, merge ETMEDEN önce ölçülür):**
+
+1. Salt-`.md` bir dal açılır, push edilir.
+2. Ölçülür: `gh pr checks` → `Vercel` bağlamı SUCCESS mi, yok mu, FAILURE mı;
+   ve `gh pr view --json mergeStateStatus`.
+3. **SUCCESS ya da check hiç oluşmuyor + merge mümkün** → atlama sağlıklı, devam.
+4. **Check takılı kalıyor / FAILURE** → iki seçenek, ikisi de yazılı:
+   - `Vercel`i zorunlu listeden çıkarmak **ÖNERİLMEZ** (kapı "vitrin derleniyor mu"yu sorar);
+   - onun yerine atlama listesi **daraltılır** ya da atlama tamamen geri alınır
+     (`git revert`), kota sorunu Pro planla çözülür.
+
+Bu bölüm, "çözüm işe yaradı" denmeden önce **hangi ölçümün yapılacağını** yazar.
+Yazılmayan deney yapılmaz; yapılmayan deneyin yerini varsayım alır.
+
 **HÜKÜM:** taban çözümündeki her başarısız deneme, **adı ve sebebiyle** günlüğe yazılır.
 Bir adımın sessizce düşmesi yasaktır. Kapı bunu `taban çözülemediğinde SEBEP günlüğe
 yazılır` koluyla zorlar; kol bilerek bozularak kanıtlanmıştır (görünürlük satırları
