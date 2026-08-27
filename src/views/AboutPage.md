@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\AboutPage.tsx
-skeleton_hash: 7655e1f15f9c8027
+source_path: C:\tmp\venthub-wt-t131\src\views\AboutPage.tsx
+skeleton_hash: 9afa4d5d831498c3
 entity_hashes:
   func:AboutPage: 7a07cf459964f7ab
   func:t: 8da2dfcaf5ec007a
   overview: a4565203100aa81b
   style_tokens: 61db62d111d1a9a7
-generated_at: 2026-08-25T07:40:06Z
+generated_at: 2026-08-27T07:07:48Z
 ---
 
 ## Genel Bakış
@@ -101,9 +101,9 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan 
 
 ## NODE ID STANDARD
 
-  file: AboutPage.tsx
-  function: AboutPage.tsx::AboutPage
-  function: AboutPage.tsx::t
+  file: src\views\AboutPage.tsx
+  function: src\views\AboutPage.tsx::AboutPage
+  function: src\views\AboutPage.tsx::t
 
 ---
 

@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T07:10:10.526868+00:00
+compiled_at: 2026-08-27T08:56:47.356169+00:00
 total_compiled_files: 62
-source_commit: 11411411
+source_commit: 32b26661
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -7707,6 +7707,104 @@ Bu cetveli zorlayan her kol **bilerek bozularak** kanıtlanmıştır (2026-08-20
 
 Kanıtlanmamış bir kapı, kapı değildir.
 
+## 9. Kanca yazım kuralları — KÖK, KİMLİK ve KOPARILMIŞ SÜREÇ
+
+Bu bölüm 2026-08-27'de yazıldı. Niçin o gün: `bash-write-guard` ve `bash-write-audit`
+kancalarının ikisi de **yanlış ağacı ölçüyordu** ve bunu söyleyen tek bir satır cetvel yoktu
+(grep ile ölçüldü: `docs/standards/` altında kanca kök çözümünden bahseden hiçbir yer yok).
+Kural yazılı olmadığı için iki kanca aynı hatayı bağımsız olarak yaptı — el kitabı
+"hatırlanan" değil "yazılan" şey olmalı.
+
+### 9.1 `cwd` KÖK DEĞİLDİR
+
+**Kural: bir kanca çalışma ağacını `girdi.cwd` / `process.cwd()`'den ÇÖZMEZ.**
+
+Ölçüm: bu ortamda Bash cwd'si sessizce **ana çalışma dizinine resetlenir** — araç çıktısının
+sonunda `Shell cwd was reset to …` satırı basılır (PRICING ve EDGE bağımsız ölçtü). Şerit
+kendi worktree'sinde çalışırken kancaya gelen `cwd` ana depoyu gösterir. Sonuç iki kancada da
+aynı oldu: kapı **koştu**, sadece **başka bir ağacı** ölçtü, ve hiçbir test bunu göstermedi.
+Ana depoda 5 kirli yol vardı, şeridin ağacında 40+.
+
+Yerine ne kullanılır — **girdinin türüne göre değişir, ve bu tutarsızlık değildir:**
+
+| kancanın girdisi | kök nasıl çözülür | örnek |
+|---|---|---|
+| **yol verilmiş** (komut metninde hedef var) | her hedefin kökü **kendi git deposundan** sorulur: `git -C <hedefin dizini> rev-parse --show-toplevel` | `bash-write-guard.cjs`, `board.cjs repoRootFor` |
+| **yol verilmemiş** ("ne değişti" sorusu) | önce **ağaç kimliği** çözülür: sid → `venthub-sid` dosyaları → ağaç(lar) | `bash-write-audit.cjs` |
+
+İkinci satırda hedef yoktur, dolayısıyla "hedefin deposu" diye bir şey de yoktur; soru
+sorulabilmesi için **hangi ağaç** olduğunun önce bilinmesi gerekir.
+
+**VentHub'a ait mi?** `git rev-parse --git-common-dir` ile ölçülür: bütün VentHub
+worktree'leri **aynı** ortak dizini paylaşır, başka bir depo (orion, orion-registry,
+corpus-callosum) paylaşmaz. Bu ölçüm aynı zamanda korumayı ayakta tutar: pano dizini
+(`C:/tmp/venthub-board`), scratchpad ve `/dev/null` bir VentHub deposu içinde değildir, o
+yüzden atlanır — **bunları bloklamak panoyu öldürür ve filo birbirini duymaz hâle gelir.**
+
+### 9.2 KİMLİK: `venthub-sid` — ve sid TEKİL DEĞİLDİR
+
+`session-board.cjs` her oturum açılışında sid'i `<absolute-git-dir>/venthub-sid` dosyasına
+yazar (worktree-yerel; ortak dizine yazılsa bütün şeritler aynı kimliği okurdu). Kimlikten
+ağaca giden okuma iki kaynağı tarar:
+
+- `<ortak>/worktrees/<ad>/venthub-sid` → ağaç = `<ad>/gitdir` içeriğinin dizini
+- `<ortak>/venthub-sid` → ağaç = ana depo
+
+**Kural: sid'in tekil olduğunu VARSAYMA.** Ölçüm (2026-08-27): `e033dc3e` **üç** worktree'de
+(vh-comp, vh-inv7, vh-rec80), `4397deef` **iki** worktree'de kayıtlıydı; ayrıca ana deponun
+kimlik dosyası bir şeridin sid'ini taşıyordu. Belirsizlikte davranış:
+
+1. **Sessizce birini SEÇME.** Seçim, onarmaya çalıştığımız "yanlış ağacı ölçtü ve yeşil
+   göründü" arızasını aynen geri getirir.
+2. **GÖRÜNÜR uyarı bas** ve **eşleşen bütün ağaçları** denetle.
+3. Hiç eşleşme yoksa `cwd`'ye düşmek meşrudur ama **sessiz olamaz**: düşüşün kendisi ve
+   sebebi yazılır. "Hiçbir şey bulamadı" ile "hiçbir yere bakmadı" ayırt edilebilir olmalı.
+
+**Ağaç nitelikli anahtar:** aynı bağıl yol iki ağaçta birden kirli olabilir. Kanca durumu
+dosyada tutuyorsa anahtar `<ağaç>::<bağıl yol>` olmalı; nitelenmemiş anahtar ikinci ağacı
+sessizce "zaten bildirildi" sayar. Anahtar biçimi değişirse eski taban **doğrudan
+karşılaştırılmaz** (her yol "yeni" görünür, tek turda onlarca sahte alarm düşer) — taban
+yeniden kurulur ve o turda alarmın bastırıldığı **yazılır**.
+
+### 9.3 `git status` ile ölçen kanca `-uall` KULLANIR
+
+Varsayılan `--untracked-files=normal`, **yeni bir dizin** altındaki izlenmeyen dosyaları tek
+satırda dizin olarak toplar: `?? zzz-audit-sinavi/`. O satır bir dosya yolu değildir, hiçbir
+claim glob'una (`.../**`) uymaz ve kapı **sessizce ötmez**. Yani "başka şeridin ağacına YENİ
+dosya eklemek" — en tipik ihlal biçimi — tam da görünmeyen hâldi. Bu kusuru
+`INV-BASH-WRITE-2`'nin körlük kolu yakaladı; kapı yazılmadan önce kimse fark etmemişti.
+
+### 9.4 Koparılmış süreç: `windowsHide: true` ZORUNLU
+
+Windows'ta `spawn(..., { detached: true })` ile başlatılan çocuk süreç, `windowsHide`
+verilmezse kendi konsolunu alır ve bir `conhost.exe` **penceresi açılıp kapanır**.
+`stdio: 'ignore'` bunu **önlemez** — çıktıyı yutar, pencereyi değil.
+
+Ölçülmüş vaka: Recep "her oturum açılışında pencereler yanıp sönüyor" diye bildirdi; o gün
+sayılan 18 pencerenin 1'i `session-board.cjs`'in registry senkron süreciydi (kalan 17
+Antigravity MCP config'inden geliyordu: `npx` ve çıplak komut adları Windows'ta `.cmd`
+kabuğuna çözülür → `cmd.exe` + `conhost.exe`; ayrı olarak onarıldı). **Tam yol ile başlatılan
+`node` / `python.exe` süreçleri pencere açmaz** — Claude Code'un kendi MCP config'i böyledir ve
+66 node + 22 python sürecinin görünür penceresi yoktu.
+
+### 9.5 Bu bölümün kanıtı
+
+`INV-BASH-WRITE-2` (`src/__tests__/conformance/bash-write-audit-tree.test.ts`) beş kollu ve
+her kolu **sabotajla** kanıtlandı; sağlam sürüme dönüş `sha256` ile doğrulandı:
+
+| sabotaj | düşen kol sayısı |
+|---|---|
+| ağaç yine `cwd`'den çözülsün (eski hâli) | 3 |
+| `git status -uall` kaldırılsın | 3 |
+| sid belirsizliği sessiz geçilsin | 1 |
+| "kimlik çözülemedi" uyarısı susturulsun | 1 |
+| taban biçim-geçişi koruması kaldırılsın | 1 |
+
+⚠ Sabotaj ölçümünün **kendisi** ilk turda kördü: `--reporter=basic` (vitest 4'te yok) koşumu
+çökertti, hiçbir test koşmadı ve beş sabotaj da "fark edilmedi" göründü. Bu yüzden ölçüm
+betiği artık **ön koşul olarak `geçen > 0`** doğruluyor: `düşen = 0` ancak araç gerçekten bir
+şey okuduysa kanıttır.
+
 
 ---
 # FILE: docs\standards\form-submission-standard.md
@@ -11675,6 +11773,50 @@ Canlı `quotes_update_customer_decision` politikası (`quoted` → `accepted|rej
 Bu, `legal-compliance-standard.md` §3.6'daki **iki-kapı** deseninin birebir uygulamasıdır:
 satır kapısı sahipliği, değer kapısı süreç alanlarını bağlar. O bölümün ölçülmüş dersi burada
 da geçerlidir: **kolon-GRANT bir kapı değildir**, kısıt politikanın `with check` bloğuna yazılır.
+
+### 7.2.1 Kalem tablosunun korunması — **tek bacaklı ve o bacak artık kapılı** (T164-VH)
+
+Yukarıdaki §7.2 **başlık** tablosunu bağlar. **Kalem** tablosu (`venthub_quote_items`)
+farklı bir mekanizmayla korunur ve bu fark yazılmazsa sessizce kaybolur.
+
+**Ölçüm (canlı prod, 2026-08-27):** `authenticated` rolünün kalem tablosundaki UPDATE
+kolon yetkisi **8 kolondur** ve içinde `unit_price, currency, discount_rate, tax_rate,
+line_total` **vardır**. Grant'in geniş olması **zorunludur**: admin de `authenticated`'tır,
+yani kolon yetkisi admin'e ve müşteriye aynı anda verilir (bkz. migration §8 yorumu).
+
+O hâlde müşterinin bugün teklif tutarını değiştirememesinin **tek** sebebi şudur:
+
+> Kalem tablosunda UPDATE politikası yalnızca `quote_items_update_admin`'dir ve
+> `is_admin_user()` şartı taşır. Admin şartı taşımayan UPDATE politikası sayısı **0**.
+
+**DEĞİŞMEZ:** `venthub_quote_items` **asla** müşterinin sağlayabileceği bir UPDATE
+politikası kazanmayacak.
+
+Bu değişmez daha önce hiçbir kapı tarafından tutulmuyordu. Biri "müşteri kendi
+`requested` kalemlerini düzeltebilsin" diye bir politika eklerse fiyat kolonları **aynı
+anda** yazılabilir olur — grant katmanı zaten açıktır ve §7.2'nin `with check` deseni
+burada **işe yaramaz**, çünkü eski değere referans veremez.
+
+**Niçin mevcut R5 yetmez:** R5 *koddaki* fiyat-kolonu yazımını yasaklar; buradaki tehlike
+kod değil **politika eklenmesi**. Farklı yüzey, farklı kapı.
+
+**Çözüm grant'i daraltmak DEĞİLDİR** (bilinçli kapsam dışı): daraltmak admin fiyat
+girişini kırar. Mesele grant değil politika disiplinidir.
+
+**Bekçi:** `src/__tests__/conformance/quote-items-policy-guard.test.ts` — bütün
+migration'lar okunur (seçim **ada değil içeriğe** bağlı, R2'nin T134 dersi), `create` ve
+`alter policy` blokları çıkarılır, `for update`/`for all` olan her blokta `is_admin_user()`
+aranır. SQL yorumları CRLF-güvenli sıyrılır: `-- is_admin_user()` yazan bir yorum kapıyı
+yeşil tutardı. Ayrıca **boş evren koruması** vardır — hiç politika bulunamazsa bu "ihlal
+yok" değil "ölçüm yok" demektir ve bekçi yeşile kaçmaz, kırmızı verir.
+
+**Kanıt (sabotaj, üç kol):** admin şartsız politika → **kırmızı** · aynı politikaya şart
+eklendi → admin kolu **yeşil** (kabul kolu; ret gözlemi tek başına kanıt değildir) ·
+şart yalnız **yorumda** → **kırmızı kaldı**.
+
+**Bu bekçinin ölçmediği (adıyla):** politikanın *çalıştığını* değil, *yazıldığını* ölçer.
+Davranışsal kanıt gerçek JWT bağlamı ister; ayrıcalıklı bağlantı §15'in dediği gibi
+yanlış yeşil üretir.
 
 ### 7.3 Eşik — mekanizma otonom, değer config
 

@@ -6,7 +6,7 @@ source_path: C:\tmp\venthub-wt-t131\src\types\database.types.ts
 skeleton_hash: da220289893389ca
 entity_hashes:
   overview: ce3fb4ce44f2949f
-generated_at: 2026-08-27T04:30:18Z
+generated_at: 2026-08-27T07:07:29Z
 ---
 
 ## Genel Bakış

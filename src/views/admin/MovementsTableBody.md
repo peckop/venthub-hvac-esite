@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\MovementsTableBody.tsx
-skeleton_hash: d66639578dc2bcaf
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\MovementsTableBody.tsx
+skeleton_hash: 01094d4d6155e059
 entity_hashes:
   func:MovementsTableBody: c49854650ab5cda4
   func:downloadBlob: 3edab0b221bec487
@@ -12,7 +12,7 @@ entity_hashes:
   func:reasonLabel: 9e7dd108ffbcbff7
   overview: fda770b8f0842a6b
   style_tokens: 03a300a2dabb02a4
-generated_at: 2026-08-25T07:31:12Z
+generated_at: 2026-08-27T07:26:23Z
 ---
 
 ## Genel Bakış
@@ -337,18 +337,18 @@ graph TD
     MovementsTableBody_tsx__flatten["flatten"]
     MovementsTableBody_tsx__movementsFetcher["movementsFetcher"]
     MovementsTableBody_tsx__reasonLabel["reasonLabel"]
-    MovementsTableBody_tsx__MovementsTableBody --> MovementsTableBody_tsx__reasonLabel
     MovementsTableBody_tsx__MovementsTableBody --> MovementsTableBody_tsx__downloadBlob
+    MovementsTableBody_tsx__MovementsTableBody --> MovementsTableBody_tsx__reasonLabel
 ```
 
 ## NODE ID STANDARD
 
-  file: MovementsTableBody.tsx
-  function: MovementsTableBody.tsx::reasonLabel
-  function: MovementsTableBody.tsx::flatten
-  function: MovementsTableBody.tsx::movementsFetcher
-  function: MovementsTableBody.tsx::MovementsTableBody
-  function: MovementsTableBody.tsx::downloadBlob
+  file: src\views\admin\MovementsTableBody.tsx
+  function: src\views\admin\MovementsTableBody.tsx::reasonLabel
+  function: src\views\admin\MovementsTableBody.tsx::flatten
+  function: src\views\admin\MovementsTableBody.tsx::movementsFetcher
+  function: src\views\admin\MovementsTableBody.tsx::MovementsTableBody
+  function: src\views\admin\MovementsTableBody.tsx::downloadBlob
 
 ---
 

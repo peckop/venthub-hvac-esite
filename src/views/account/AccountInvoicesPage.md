@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\account\AccountInvoicesPage.tsx
-skeleton_hash: eec7700ab6f5a5e2
+source_path: C:\tmp\venthub-wt-t131\src\views\account\AccountInvoicesPage.tsx
+skeleton_hash: 89f17dadafaa44e6
 entity_hashes:
   func:AccountInvoicesPage: f5f2f51606b21a99
   overview: d0d3eb909783a960
   style_tokens: e9dde5d26cd429fb
-generated_at: 2026-08-25T07:29:58Z
+generated_at: 2026-08-27T07:10:05Z
 ---
 
 ## Genel Bakış
@@ -160,8 +160,8 @@ type InvoiceProfileType = 'individual' | 'corporate'
 
 ## NODE ID STANDARD
 
-  file: AccountInvoicesPage.tsx
-  function: AccountInvoicesPage.tsx::AccountInvoicesPage
+  file: src\views\account\AccountInvoicesPage.tsx
+  function: src\views\account\AccountInvoicesPage.tsx::AccountInvoicesPage
 
 ---
 

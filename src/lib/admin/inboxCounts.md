@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\admin\inboxCounts.ts
-skeleton_hash: 59e096981ef05cc6
+source_path: C:\tmp\ops-t165\src\lib\admin\inboxCounts.ts
+skeleton_hash: 7b4b1e16c5b89dcc
 entity_hashes:
   func:fetchInboxCounts: 87c45c5352b61223
   overview: 4445631b0879c94f
-generated_at: 2026-08-25T07:27:48Z
+generated_at: 2026-08-27T06:56:48Z
 ---
 
 ## Genel Bakış
@@ -94,8 +94,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesinden tür
 
 ## NODE ID STANDARD
 
-  file: inboxCounts.ts
-  function: inboxCounts.ts::fetchInboxCounts
+  file: src\lib\admin\inboxCounts.ts
+  function: src\lib\admin\inboxCounts.ts::fetchInboxCounts
 
 ---
 

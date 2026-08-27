@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\FamilyCard.tsx
-skeleton_hash: f6c399db53421a29
+source_path: C:\tmp\vh-urun-comp\src\components\products\FamilyCard.tsx
+skeleton_hash: 85ebc11af9eb39df
 entity_hashes:
   overview: 562328f4a587a923
   style_tokens: 421f8d9da05ee333
-generated_at: 2026-08-15T06:32:18Z
+generated_at: 2026-08-27T07:30:18Z
 ---
 
 ## Genel Bakış

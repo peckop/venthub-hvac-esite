@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\supabase\functions\_shared\tenant_config.ts
-skeleton_hash: 6b5012826ca17b3c
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\tenant_config.ts
+skeleton_hash: 5206c89ec698fe34
 entity_hashes:
   func:getTenantBranding: bde2d3819c7904af
   overview: 727819c400487687
-generated_at: 2026-08-25T07:34:07Z
+generated_at: 2026-08-27T07:09:58Z
 ---
 
 ## Genel Bakış
@@ -87,8 +87,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: tenant_config.ts
-  function: tenant_config.ts::getTenantBranding
+  file: supabase\functions\_shared\tenant_config.ts
+  function: supabase\functions\_shared\tenant_config.ts::getTenantBranding
 
 ---
 

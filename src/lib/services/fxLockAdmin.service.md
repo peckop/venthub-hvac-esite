@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\fxLockAdmin.service.ts
-skeleton_hash: 842677c912721fd8
+source_path: C:\tmp\ops-t165\src\lib\services\fxLockAdmin.service.ts
+skeleton_hash: f1cd687398ea61af
 entity_hashes:
   func:resolveFxLockFreeze: 1ce8633abb6e16a1
   overview: 094880244f3a70bb
-generated_at: 2026-08-25T08:44:36Z
+generated_at: 2026-08-27T07:00:07Z
 ---
 
 ## Genel Bakış

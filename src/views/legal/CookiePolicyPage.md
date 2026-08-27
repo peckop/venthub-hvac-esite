@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\legal\CookiePolicyPage.tsx
-skeleton_hash: d81d7d3340723c36
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\CookiePolicyPage.tsx
+skeleton_hash: bfc6bcdaa165af6e
 entity_hashes:
   func:CookiePolicyPage: 39fe3c926a47f80a
   func:t: 3df1611ede2c4a10
   overview: 090c864bfdb77cc7
   style_tokens: 06829f9d93bd4397
-generated_at: 2026-08-25T07:47:15Z
+generated_at: 2026-08-27T07:33:51Z
 ---
 
 ## Genel Bakış
@@ -90,9 +90,9 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan 
 
 ## NODE ID STANDARD
 
-  file: CookiePolicyPage.tsx
-  function: CookiePolicyPage.tsx::CookiePolicyPage
-  function: CookiePolicyPage.tsx::t
+  file: src\views\legal\CookiePolicyPage.tsx
+  function: src\views\legal\CookiePolicyPage.tsx::CookiePolicyPage
+  function: src\views\legal\CookiePolicyPage.tsx::t
 
 ---
 

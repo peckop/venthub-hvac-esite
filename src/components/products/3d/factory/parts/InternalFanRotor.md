@@ -2,42 +2,28 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\InternalFanRotor.tsx
-skeleton_hash: e86dc5a160b53977
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\factory\parts\InternalFanRotor.tsx
+skeleton_hash: a726589210709963
 entity_hashes:
   func:InternalFanRotor: ac57944d86aa281e
-  overview: 256aaa04411e9436
+  overview: 28c39b6b8851f9c0
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-12T10:20:40Z
+generated_at: 2026-08-27T07:06:50Z
 ---
 
 ## Genel Bakış
-Bu modül, 3B bir iç fan rotoru (InternalFanRotor) React bileşenini tanımlar. Bileşen, fan rotorunun geometrik ve dönme özelliklerini (yarıçap, hız, konum, rotasyon) alarak 3B sahnesinde render eden bir fabrika parçasıdır.
+Bu modül, 3B bir iç fan rotoru bileşeni tanımlar. Bileşen, yarıçap, dönme hızı ve konum gibi özellikleri girdi olarak alarak 3B sahnesinde bir fan rotoru render eder. Fonksiyon imzası kesik (truncated) olduğundan, bileşenin tam parametre listesi bilinmiyor.
 
 ## Fonksiyon Grupları
 ### Bileşen Tanımı
-Bu grup, modülün tek bileşeni olan InternalFanRotor'u tanımlar. Fonksiyon, girdi olarak aldığı boyut, hız ve konum özellikleriyle 3B fan rotorunu oluşturan ve döndüren bir React bileşeni döndürür.
+Modülün tek bileşenini tanımlar. Girdi olarak aldığı boyut, hız ve konum özellikleriyle 3B fan rotorunu oluşturan ve döndüren bir React bileşeni döndürür.
 - InternalFanRotor
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, 3D bir iç fan rotoru bileşenidir ve Three.js/React Three Fiber benzeri bir 3D renderlama ortamında çalışır.
-
-[Aksiyom 1]: Eğer 3D renderlama bağlamı (Three.js Canvas/Scene) yoksa, bileşen düzgün render edilmez ve görünmez olur.
-
-[Aksiyom 2]: Eğer `position` parametresi 3 elemanlı bir dizi [x, y, z] formatında değilse, bileşenin 3D sahnedeki konumu tanımsız olur.
-
-[Aksiyom 3]: Eğer `radius` parametresi 0 veya negatif bir değer olarak verilirse, fan rotor geometrisi oluşmaz veya çöker.
-
-[Aksiyom 4]: Eğer `spinSpeed` parametresi 0 olarak ayarlanırsa, rotor dönmeyecektir; negatif değer yön değişikliğine neden olur (bu beklenen bir davranış olabilir veya olmayabilir, bilinmiyor).
-
-[Aksiyom 5]: Fonksiyon imzası `rotat...` ile kesilmiş olduğundan, bileşenin tam parametre listesi bilinmiyor — olası ek parametreler (rotation, color, material vb.) olabilir.
-
----
-
-**Not**: Bu aksiyomlar yalnızca fonksiyon imzasından türetilmiştir. Docstring ve yorumlardan bilgi çıkarılmamıştır. Fonksiyon imzası kesik (truncated) olduğu için bileşenin tam sözleşme gereksinimleri belirsizdir.
+Bu modül için fonksiyon gövdesi verilmediğinden, gövdedeki mantıktan türetilen aksiyom üretilemez. Yalnızca fonksiyon imzası mevcuttur; imzadan davranışsal çıkarım yapılmaz.
 
 ---
 
@@ -58,6 +44,20 @@ Bu modül, 3D bir iç fan rotoru bileşenidir ve Three.js/React Three Fiber benz
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../core::useResolveMaterials
+- import: @react-three/fiber::useFrame
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: three::BoxGeometry
+- import: three::CylinderGeometry
+- import: three::SphereGeometry
+- import: three::type { Group }
+
+---
+
 ## INTERFACES
 
 ### InternalFanRotorProps
@@ -75,23 +75,64 @@ Bu modül, 3D bir iç fan rotoru bileşenidir ve Three.js/React Three Fiber benz
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: InternalFanRotor.tsx::InternalFanRotor
-- **params**:
-  - `radius` — fan rotor yarıçapı, varsayılan `0.25`
-  - `spinSpeed` — dönme hızı, varsayılan `10`
-  - `position` — THREE.js group pozisyonu, varsayılan `[0, 0, 0]`
-  - `rotation` — THREE.js group rotasyonu, varsayılan `[0, 0, 0]`
-  - `isSelected` — seçili durum flag'i, blade rengini belirler
-  - `isIsolated` — izolasyon durumu flag'i, `false` ise gizlenir
-  - `isHidden` — gizlilik flag'i, `true` ise `null` döner
-  - `onClick` — tıklama callback fonksiyonu
-  - `explode` — blade patlama mesafesi, varsayılan `0`
+### [N1_NASIL] AST Pointer: src/components/products/3d/factory/parts/InternalFanRotor.tsx::InternalFanRotor
+- **params**: `radius` (varsayılan 0.25), `spinSpeed` (varsayılan 10), `position` (varsayılan [0,0,0]), `rotation` (varsayılan [0,0,0]), `isSelected`, `isIsolated`, `isHidden`, `onClick`, `explode` (varsayılan 0)
 - **ic_degiskenler**:
-  - `groupRef` — THREE.js `Group` referansı, `useRef` ile oluşturulur, `useFrame` içinde döndürme yapılır
-  - `materials` — `useFanMaterials()` hook'undan dönen material nesnesi (`matteBlack`, `safetyOrange`, `vorticeGreen` içerir)
-  - `bladeCount` — sabit `6`, kanat sayısı
-  - `bladeMaterial` — `isSelected` durumuna göre `materials.safetyOrange` veya `materials.vorticeGreen` seçilir
-- **Dönüş**: `JSX.Element | null` — JSX grubu veya erken `null` dönüşü
+  - `groupRef` — `useRef<Group>(null)` ile oluşturulan referans; dönen kanat grubunun DOM erişimi için kullanılır
+  - `materials` — `useResolveMaterials()` hook'undan dönen malzeme nesnesi; `materials.matteBlack`, `materials.safetyOrange`, `materials.vorticeGreen` alanlarına erişilir
+  - `bladeCount` — sabit değer 6; kanat sayısını belirler
+  - `geometries` — `useMemo` ile üretilen geometri nesnesi; `cylinderGeo`, `sphereGeo`, `boxGeo` alanlarını içerir
+  - `bladeMaterial` — `isSelected` true ise `materials.safetyOrange`, değilse `materials.vorticeGreen` olarak atanan malzeme
+- **Dönüş**: JSX `<group>` elementi; `position` ve `rotation` prop'larıyla konumlandırılmış, içinde dönen kanat grubu bulunan React node. `isHidden` true veya `isIsolated === false` ise `null` döner
+
+### [N2_NASIL] AST Pointer: src/components/products/3d/factory/parts/InternalFanRotor.tsx::useFrame callback
+- **params**: `_` (unused, clock nesnesi), `delta` (frame'ler arası geçen süre)
+- **ic_degiskenler**:
+  - `groupRef.current` — dönen grubun Three.js Group referansı; `rotation.y` değeri artırılır
+  - `isHidden` — dışarıdan gelen prop; true ise animasyon durdurulur
+  - `isIsolated` — dışarıdan gelen prop; `false` ise animasyon durdurulur
+  - `isSelected` — dışarıdan gelen prop; true ise `spinSpeed` yerine 0 kullanılır (dönüş durur)
+  - `spinSpeed` — dışarıdan gelen prop; dönüş hızı olarak `delta` ile çarpılır
+- **Dönüş**: yok (yan etki: `groupRef.current.rotation.y` değerini günceller)
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/factory/parts/InternalFanRotor.tsx::useMemo callback
+- **params**: yok
+- **ic_degiskenler**:
+  - `radius` — dışarıdan gelen prop; geometri boyutlarını hesaplamak için çarpan olarak kullanılır
+  - `cylinderGeo` — `new CylinderGeometry(radius * 0.22, radius * 0.22, 0.08, 16)` ile oluşturulan silindir geometrisi
+  - `sphereGeo` — `new SphereGeometry(radius * 0.22, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2)` ile oluşturulan yarım küre geometrisi
+  - `boxGeo` — `new BoxGeometry(radius * 0.75, 0.012, radius * 0.35)` ile oluşturulan kutu geometrisi (kanatlar için)
+- **Dönüş**: `{ cylinderGeo, sphereGeo, boxGeo }` nesnesi
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/factory/parts/InternalFanRotor.tsx::useEffect callback
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: cleanup fonksiyonu (VRAM temizleme için)
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/factory/parts/InternalFanRotor.tsx::useEffect cleanup
+- **params**: yok
+- **ic_degiskenler**:
+  - `geometries` — `Object.values()` ile değerleri alınan geometri nesnesi; her bir geo üzerinde `dispose()` çağrılır
+  - `geo` — `forEach` döngüsündeki her geometri nesnesi; `dispose()` metodu çağrılarak VRAM'den temizlenir
+- **Dönüş**: yok (yan etki: tüm geometrilerin VRAM belleğini serbest bırakır)
+
+### [N6_NASIL] AST Pointer: src/components/products/3d/factory/parts/InternalFanRotor.tsx::onClick handler
+- **params**: `e` (Three.js click event nesnesi)
+- **ic_degiskenler**:
+  - `e` — event nesnesi; `stopPropagation()` metodu çağrılarak üst elementlere yayılım engellenir
+  - `onClick` — dışarıdan gelen prop; opsiyonel chaining (`?.`) ile çağrılır
+- **Dönüş**: yok (yan etki: event yayılımını durdurur ve `onClick` varsa çağırır)
+
+### [N7_NASIL] AST Pointer: src/components/products/3d/factory/parts/InternalFanRotor.tsx::map callback
+- **params**: `_` (unused, array elemanı), `i` (döngü indeksi)
+- **ic_degiskenler**:
+  - `i` — kanat indeksi (0-5 arası); her kanat için `rotation` hesaplamasında `(i * Math.PI * 2) / bladeCount` formülüyle kullanılır
+  - `bladeCount` — dışarıdan erişilen sabit değer 6
+  - `radius` — dışarıdan gelen prop; `radius * 0.58` ile kanat pozisyonu hesaplanır
+  - `explode` — dışarıdan gelen prop; `explode * 0.1` ile kanat pozisyonuna ek ofset eklenir
+  - `geometries.boxBox` — useMemo'dan dönen kutu geometrisi; kanat mesh'inde kullanılır
+  - `bladeMaterial` — `isSelected` durumuna göre seçilen malzeme; kanat mesh'inde kullanılır
+- **Dönüş**: JSX `<group>` elementi; her kanat için döndürme ve konum bilgisiyle `<mesh>` içerir
 
 ---
 

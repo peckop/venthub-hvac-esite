@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\return_transitions.ts
-skeleton_hash: c63b4abc90537b5f
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\return_transitions.ts
+skeleton_hash: da1baae346bd8120
 entity_hashes:
   func:canCarrierTransition: 319f7f80006cd5c4
   func:isTerminalReturnStatus: b970cffbe2eea904
   overview: e4a16fc5919e804b
-generated_at: 2026-08-25T08:46:54Z
+generated_at: 2026-08-27T07:09:18Z
 ---
 
 ## Genel Bakış

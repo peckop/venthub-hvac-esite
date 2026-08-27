@@ -2,54 +2,32 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx
-skeleton_hash: a679c2496167ab09
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminErrorGroupsPage.tsx
+skeleton_hash: 683dee81511b7798
 entity_hashes:
   func:AdminErrorGroupsPage: 8cf21adc3f3ff52a
-  overview: 74c77915b531bc1a
+  overview: cea17ff09b28a9db
   style_tokens: a7fe3ab3ca0c1259
-generated_at: 2026-06-19T20:48:41Z
+generated_at: 2026-08-27T07:43:49Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelindeki hata gruplarını görüntülemek ve yönetmek için kullanılan bir React sayfasıdır. Hata gruplarının filtrelenmesi, sıralanması, bireysel veya toplu olarak durum güncellenmesi, sorumlu atanması ve not eklenmesi gibi işlemleri tek bir arayüzden sunar. Modül, hata yönetim sürecini verimli hale getirmek için toplu işlem desteği ve detaylı hata kaydı yükleme imkânı sağlar.
+Bu modül, yönetici panelinde hata gruplarını görüntülemek ve yönetmek için kullanılan bir React sayfa bileşenidir. Hata gruplarının listelenmesi, filtrelenmesi, durum güncellenmesi, sorumlu atanması ve toplu işlem yapılması gibi hata yönetim görevlerini tek bir arayüzde sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Yapısı ve Liste Yönetimi
-Ana bileşeni oluşturarak sayfanın temel yapısını kurar ve hata gruplarının sıralama ile seçim durumlarını yönetir.
-- AdminErrorGroupsPage, toggleSort, toggleSelect
+### Sayfa Bileşeni ve Durum Yönetimi
+Ana sayfa bileşenini oluşturarak hata gruplarının listelenmesi, sıralanması, seçilmesi ve bireysel/toplu işlemlerin koordinasyonunu sağlar.
+- AdminErrorGroupsPage
 
-### Bireysel Hata Grubu İşlemleri
-Belirli bir hata grubu üzerinde durum değişikliği, sorumlu atama, not güncelleme ve detaylı hata kayıtlarını yükleme gibi operasyonları gerçekleştirir.
-- updateStatus, updateAssignedTo, updateNotes, loadLatestClientErrors
-
-### Toplu İşlemler
-Birden fazla seçili hata grubuna aynı anda durum değişikliği uygulayarak verimli toplu yönetim sağlar.
-- bulkApplyStatus
+## Bağımlılıklar ve Mimari Notlar
+- Modül, bir hata verisi kaynağına (API veya veri katmanı) bağımlıdır; bu kaynak olmadan hata grupları listelenemez.
+- Toplu işlem desteği, kullanıcı seçimi yapılmış kayıtlar üzerinde çalışır; seçim yoksa toplu durum değişikliği uygulanamaz.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, yönetici panelinde hata gruplarını yönetmek için kullanılan bir React sayfa bileşenidir. Aşağıdaki varsayımlar, yalnızca fonksiyon imzalarından türetilmiştir.
-
-**[Aksiyom 1]:** Eğer `loadLatestClientErrors` fonksiyonu çalıştırılacaksa, modülün erişebileceği bir hata verisi kaynağı (API endpoint veya benzeri bir veri katmanı) mevcut olmalıdır.
-Eğer veri kaynağı yoksa, hata grupları listelenemez ve sayfa boş veya hatalı durumda kalır.
-
-**[Aksiyom 2]:** Eğer `bulkApplyStatus` fonksiyonu çağrılacaksa, en az bir hata kaydının seçili (`toggleSelect` aracılığıyla) olması gerekir.
-Eğer seçili hata kaydı yoksa, toplu durum güncellemesi hedeflenemeyebilir (davranış implementasyona bağlıdır — bilinmiyor).
-
-**[Aksiyom 3]:** Eğer `updateStatus`, `updateAssignedTo` veya `updateNotes` fonksiyonları çalıştırılacaksa, hedef hata kaydının geçerli bir tanımlayıcıya (ID) sahip olması gerekir.
-Eğer geçerli bir hata kaydı tanımlayıcısı yoksa, güncelleme işlemi başarısız olur veya beklenmeyen davranışa neden olur.
-
-**[Aksiyom 4]:** Eğer `toggleSort` fonksiyonu çalıştırılacaksa, sıralanabilir alanların (alan adları/tanımlayıcıları) bilinmesi gerekir.
-Eğer sıralanabilir alan tanımları bilinmiyorsa, sıralama işlevi uygulanamaz.
-
-**[Aksiyom 5]:** Modül, bileşen düzeyinde state yönetimi gerektirir — seçim durumu (`toggleSelect`), sıralama durumu (`toggleSort`) ve muhtemelen filtre durumu için.
-Eğer state yönetimi doğru kurulmazsa, kullanıcı arayüzündeki durum tutarsızlıkları oluşur.
-
-**[Aksiyom 6]:** Modülün bir React sayfası (`React.FC`) olarak çalışabilmesi için React ortamının ve ilgili routing altyapısının erişilebilir olması gerekir.
-Eğer React ortamı veya routing altyapısı yoksa, bileşen render edilemez.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -69,9 +47,8 @@ Bu bileşen `React.FC` tipi ile tanımlanmıştır ve herhangi bir props almamak
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./ErrorGroupsTableBody::ErrorGroupsTableBody
 - import: react::React
 - import: react::Suspense
@@ -81,10 +58,10 @@ Bu bileşen `React.FC` tipi ile tanımlanmıştır ve herhangi bir props almamak
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminErrorGroupsPage.tsx::AdminErrorGroupsPage
-- **params**: parametre yok
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan elde edilen çevirme fonksiyonu, JSX içinde `t('admin.titles.errorGroups')` ve `t('admin.errorGroups.subtitle')` çağrılarıyla kullanılır
-- **Dönüş**: JSX elemanı döndürür; `<div>` sarmalayıcısı içinde `<header>` ve `<Suspense>` ile sarılmış `<ErrorGroupsTableBody />` bileşenini içeren bir React bileşeni yapısı
+  - `t` — `useI18n()` hook'undan çıkarılan çeviri fonksiyonu. `t('admin.titles.errorGroups')` ve `t('admin.errorGroups.subtitle')` çağrılarında kullanılıyor.
+- **Dönüş**: JSX elementi (React.ReactNode) — bir `div` kapsayıcısı içinde `AdminPageHeader` ve `Suspense` ile sarılmış `ErrorGroupsTableBody` bileşenlerini render eder.
 
 ---
 

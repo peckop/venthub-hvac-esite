@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\csvProductMapping.ts
-skeleton_hash: 7ef94559dd3cb641
+source_path: C:\tmp\ops-t165\src\lib\admin\csvProductMapping.ts
+skeleton_hash: 9398fe8f1886bf11
 entity_hashes:
   func:hazirlaUrunSatirlari: 499631139b430177
   func:kategoriIdBul: 39ac7a650db7a3fe
@@ -12,7 +12,7 @@ entity_hashes:
   func:slugAnahtari: 5862670ce51cb575
   func:urunSlugUret: 5952d0a7efa5241d
   overview: f7655cb8d9cfeb74
-generated_at: 2026-08-24T11:55:32Z
+generated_at: 2026-08-27T06:56:46Z
 ---
 
 ## Genel Bakış
@@ -177,12 +177,12 @@ graph TD
     csvProductMapping_ts__metadataSluglari["metadataSluglari"]
     csvProductMapping_ts__slugAnahtari["slugAnahtari"]
     csvProductMapping_ts__urunSlugUret["urunSlugUret"]
-    csvProductMapping_ts__urunSlugUret --> csvProductMapping_ts__slugAnahtari
-    csvProductMapping_ts__kategoriIdBul --> csvProductMapping_ts__slugAnahtari
     csvProductMapping_ts__kategoriIdBul --> csvProductMapping_ts__metadataSluglari
     csvProductMapping_ts__metadataSluglari --> csvProductMapping_ts__kayitMi
-    csvProductMapping_ts__hazirlaUrunSatirlari --> csvProductMapping_ts__urunSlugUret
+    csvProductMapping_ts__urunSlugUret --> csvProductMapping_ts__slugAnahtari
     csvProductMapping_ts__hazirlaUrunSatirlari --> csvProductMapping_ts__kategoriIdBul
+    csvProductMapping_ts__kategoriIdBul --> csvProductMapping_ts__slugAnahtari
+    csvProductMapping_ts__hazirlaUrunSatirlari --> csvProductMapping_ts__urunSlugUret
 ```
 
 ## NODE ID STANDARD

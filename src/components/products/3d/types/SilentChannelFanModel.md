@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\3d\types\SilentChannelFanModel.tsx
-skeleton_hash: fcfbc207da8f4248
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\SilentChannelFanModel.tsx
+skeleton_hash: f376b5a702de2200
 entity_hashes:
   func:EdgeOverlay: 48aefc8964111cb4
   func:InteractivePart: d4921a7aaa094ed5
@@ -11,7 +11,7 @@ entity_hashes:
   func:SilentChannelFanModel: b7fc8a29182f8b00
   overview: 85f8b8a2bb8148b8
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:27:09Z
+generated_at: 2026-08-27T07:22:57Z
 ---
 
 ## Genel Bakış
@@ -175,11 +175,11 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: SilentChannelFanModel.tsx
-  function: SilentChannelFanModel.tsx::EdgeOverlay
-  function: SilentChannelFanModel.tsx::MountingChassis
-  function: SilentChannelFanModel.tsx::InteractivePart
-  function: SilentChannelFanModel.tsx::SilentChannelFanModel
+  file: src\components\products\3d\types\SilentChannelFanModel.tsx
+  function: src\components\products\3d\types\SilentChannelFanModel.tsx::EdgeOverlay
+  function: src\components\products\3d\types\SilentChannelFanModel.tsx::MountingChassis
+  function: src\components\products\3d\types\SilentChannelFanModel.tsx::InteractivePart
+  function: src\components\products\3d\types\SilentChannelFanModel.tsx::SilentChannelFanModel
 
 ---
 

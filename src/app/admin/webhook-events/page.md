@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\admin\webhook-events\page.tsx
-skeleton_hash: 54f68cba14a6500d
+source_path: C:\tmp\ops-t165\src\app\admin\webhook-events\page.tsx
+skeleton_hash: 66cb33c6cc6e8492
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: 03bf0c7eea267025
   overview: 5b1a16aab3aba293
   style_tokens: 08b1938b3f3a81d8
-generated_at: 2026-08-25T07:23:41Z
+generated_at: 2026-08-27T06:55:49Z
 ---
 
 ## Genel Bakış
@@ -61,7 +61,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **AdminWebhookEventsPage** (call) — `nextDynamic(
-  () => import('../../../views/admin/AdminWebhookEventsPage'),...`
+  () => import('../../../views/admin/AdminWebhookEventsPage'),...`
 
 ---
 
@@ -82,9 +82,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::Loading
-  function: page.tsx::Page
+  file: src\app\admin\webhook-events\page.tsx
+  function: src\app\admin\webhook-events\page.tsx::Loading
+  function: src\app\admin\webhook-events\page.tsx::Page
 
 ---
 

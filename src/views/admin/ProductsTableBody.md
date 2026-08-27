@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\ProductsTableBody.tsx
-skeleton_hash: dec20944438a4eb4
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\ProductsTableBody.tsx
+skeleton_hash: 39f2d8aaae53d995
 entity_hashes:
   func:InlineNumberCell: d033e807ea0843b7
   func:ProductSpecsRow: 534f71d107499f23
@@ -12,7 +12,7 @@ entity_hashes:
   func:productsFetcher: 2be746ff94fd0243
   overview: dac07c4dbab7a985
   style_tokens: 22ccdd0adc5ca261
-generated_at: 2026-08-25T07:58:17Z
+generated_at: 2026-08-27T07:30:19Z
 ---
 
 ## Genel Bakış
@@ -307,12 +307,12 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: ProductsTableBody.tsx
-  function: ProductsTableBody.tsx::attachCovers
-  function: ProductsTableBody.tsx::productsFetcher
-  function: ProductsTableBody.tsx::ProductSpecsRow
-  function: ProductsTableBody.tsx::InlineNumberCell
-  function: ProductsTableBody.tsx::ProductsTableBody
+  file: src\views\admin\ProductsTableBody.tsx
+  function: src\views\admin\ProductsTableBody.tsx::attachCovers
+  function: src\views\admin\ProductsTableBody.tsx::productsFetcher
+  function: src\views\admin\ProductsTableBody.tsx::ProductSpecsRow
+  function: src\views\admin\ProductsTableBody.tsx::InlineNumberCell
+  function: src\views\admin\ProductsTableBody.tsx::ProductsTableBody
 
 ---
 

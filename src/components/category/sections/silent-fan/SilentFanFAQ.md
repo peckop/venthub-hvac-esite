@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanFAQ.tsx
-skeleton_hash: 403265d46c0abcf5
+source_path: C:\tmp\vh-urun-comp\src\components\category\sections\silent-fan\SilentFanFAQ.tsx
+skeleton_hash: 619db7b2059f588d
 entity_hashes:
   func:SilentFanFAQ: 514de334aa5d1d84
   func:tr: b282b53f03d688a5
   overview: b16446a0ec91f7da
   style_tokens: 325897ca39ea7e85
-generated_at: 2026-06-19T20:47:07Z
+generated_at: 2026-08-27T07:00:29Z
 ---
 
 ## Genel Bakış

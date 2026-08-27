@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\JetFanModel.tsx
-skeleton_hash: c298291b50e6a753
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\JetFanModel.tsx
+skeleton_hash: b4ee918076d4726a
 entity_hashes:
   func:FlexibleCable: 7422952d69466487
   func:JetFanModel: b12c8fa3c1846be6
-  overview: 036f18c566d2c82f
+  overview: 492d48d9f7958885
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:46:54Z
+generated_at: 2026-08-27T07:43:23Z
 ---
 
 ## Genel Bakış
@@ -21,24 +21,20 @@ Modülün dışarıya açılan temel bileşeni; jet fanın ana 3B geometrisini, 
 - JetFanModel
 
 ### Yardımcı Alt Bileşenler
-Ana modelin yapısı içinde yer alan, belirli bir parça veya özellik için kullanıma özel, yeniden kullanılabilir görsel bileşenleri içerir.
+Ana modelin yapısı içinde yer alan, belirli bir parça veya özellik için kullanıma özel, yeniden kullanılabilir görsel bileşenleri içerir. `FlexibleCable` bileşeni zorunlu olarak `materials` parametresi alır ve bu parametre `FanMaterials` tipinde olmalıdır; parametre verilmezse bileşen düzgün render edilemez.
 - FlexibleCable
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, jet fan tipi 3D görselleştirme bileşenlerinden oluşmaktadır.
+Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çıkarılabilen varsayımlar listelenmiştir.
 
-**[Aksiyom 1]:** Eğer `FlexibleCable` bileşeni `materials` parametresi olmadan çağrılırsa, bileşen düzgün render edilemez veya derleme hatası oluşur. `materials` parametresi zorunludur ve `FanMaterials` tipinde olmalıdır.
+[Aksiyom 1]: Eğer `FanMaterials` tipi tanımlı değilse, `FlexibleCable` bileşeni derleme aşamasında hata verir; çünkü `materials` prop'u bu tipe bağlıdır.
 
-**[Aksiyom 2]:** Eğer `FanMaterials` tipi tanımlı değilse veya geçerli bir yapıda değilse, `FlexibleCable` bileşeninin malzeme özellikleri eksik kalır ve 3D modelde malzeme gösterimi hatalı olur.
+[Aksiyom 2]: Eğer `FlexibleCable` bileşenine `materials` prop'u sağlanmazsa, bileşen eksik veriyle render edilir; prop zorunlu olarak tanımlanmıştır (varsayılan değer yoktur).
 
-**[Aksiyom 3]:** Eğer `JetFanModel` ana 3D sahneye yerleştirilmezse, jet fan modeli görsel olarak görünmez olur.
-
----
-
-**Not:** Bu modül için fonksiyon gövdesi detayları paylaşılmadığından, sadece fonksiyon imzalarından türeyen zorunluluklar (parametre gereksinimleri) aksiyom olarak belirlenmiştir. Fonksiyon iç mantığına ilişkin ek varsayımlar, gövde kodu incelendikten sonra eklenebilir.
+[Aksiyom 3]: Eğer `JetFanModel` bileşeni bir React ortamında kullanılmıyorsa (örneğin Three.js sahne bağlamı yoksa), bileşen düzgün çalışmaz; çünkü 3B model görselleştirme React tabanlı bir 3B kütüphane altyapısına bağlıdır.
 
 ---
 
@@ -59,94 +55,76 @@ Bu modül, jet fan tipi 3D görselleştirme bileşenlerinden oluşmaktadır.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../core::useResolveMaterials
+- import: ../materials/useFanMaterials::type FanMaterials
+- import: @react-three/fiber::useFrame
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: three::type { Group }
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::JetFanModel
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: JetFanModel.tsx::JetFanModel
+- **params**: yok
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials hook'unun dönüş değeri; tüm 3D model malzemelerini (jetOrange, greyBox, matteBlack, cableGrey, brushedAluminum) içerir
-  - `fanRef` — useRef<Group>(null) ile oluşturulan React ref; iç pervaneyi (rotor) referans alır, useFrame içinde döndürmek için kullanılır
-- **Dönüş**: JSX (React.FC) — 3B jet fan modelini oluşturan React Three Fiber group elemanı
+  - `materials` — `useResolveMaterials()` hook'undan dönen malzeme nesnesi; `materials.jetOrange`, `materials.greyBox`, `materials.matteBlack`, `materials.cableGrey`, `materials.brushedAluminum` alanlarına erişilir
+  - `fanRef` — `useRef<Group>(null)` ile oluşturulan Three.js Group referansı; `useFrame` içinde `fanRef.current.rotation.y` güncellenerek pervane animasyonu sağlanır
+  - `geometries` — `useMemo` ile oluşturulan geometri nesneleri objesi; `cylinder032`, `cylinder034`, `cylinder028`, `cylinderPin`, `cylinderRakor`, `cylinderBolt`, `cylinderRotor`, `torus032`, `torusRings`, `innerBladeGeos`, `boxMazgal`, `boxGrey`, `boxMountVert`, `boxMountHoriz`, `boxRotorBlade` anahtarlarını içerir
+- **Dönüş**: JSX (React.FC)
 
----
+### [N2_NASIL] AST Pointer: JetFanModel.tsx::useFrame callback
+- **params**: `state`, `delta`
+- **ic_degiskenler**: yok
+- **Dönüş**: yok; yan etki olarak `fanRef.current.rotation.y` değerini `delta * 25` kadar azaltır
 
-### [N2_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::useFrame_callback
-- **params**: `(state, delta)` — state: Three.js state objesi (kullanılmıyor), delta: son frame ile geçen süre (saniye)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — fanRef.current.rotation.y değerini delta * 25 kadar azaltarak pervaneyi döndürür (yan etki)
-
----
-
-### [N3_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_sol_kanatlar
-- **params**: `(xVal, k)` — xVal: kanat pozisyonu (0, -0.12, -0.22), k: index anahtarı
+### [N3_NASIL] AST Pointer: JetFanModel.tsx::useMemo callback (geometries)
+- **params**: yok
 - **ic_degiskenler**:
-  - `r` — sabit yarıçap değeri 0.31; silindirik gövde yarıçapını temsil eder
-  - `w` — hesaplanmış genişlik; `2 * Math.sqrt(Math.max(0, r*r - xVal*xVal))` formülüyle xVal konumundaki daire kirişi genişliğini hesaplar
-- **Dönüş**: JSX mesh elemanı — sol taraftaki yatay iç kanat
+  - `cylinder032` — `CylinderGeometry(0.32, 0.32, 0.8, 64, 1, true)`; açık uçlu büyük çaplı silindir geometrisi
+  - `cylinder034` — `CylinderGeometry(0.34, 0.34, 0.03, 64)`; flanş geometrisi
+  - `cylinder028` — `CylinderGeometry(0.28, 0.28, 0.5, 64, 1, true)`; açık uçlu küçük çaplı silindir geometrisi
+  - `cylinderPin` — `CylinderGeometry(0.006, 0.006, 0.012, 8)`; pin geometrisi
+  - `cylinderRakor` — `CylinderGeometry(0.02, 0.025, 0.06, 16)`; kablo giriş rakoru geometrisi
+  - `cylinderBolt` — `CylinderGeometry(0.008, 0.008, 0.015, 8)`; cıvata geometrisi
+  - `cylinderRotor` — `CylinderGeometry(0.12, 0.12, 0.1, 32)`; rotor gövde geometrisi
+  - `torus032` — `TorusGeometry(0.32, 0.006, 8, 64)`; silindir uç kenar yuvarlatma geometrisi
+  - `torusRings` — `[0.12, 0.2, 0.28]` yarıçaplarıyla oluşturulmuş `TorusGeometry` dizisi; mazgal ızgara halkaları
+  - `innerBladeGeos` — `[0, -0.12, -0.22]` xVal değerleriyle hesaplanmış `BoxGeometry` dizisi; iç kanat geometrileri
+  - `boxMazgal` — `BoxGeometry(0.64, 0.01, 0.006)`; mazgal ızgara çubuğu geometrisi
+  - `boxGrey` — `BoxGeometry(0.16, 0.14, 0.10)`; gri elektrik kutusu geometrisi
+  - `boxMountVert` — `BoxGeometry(0.08, 0.12, 0.015)`; dikey montaj ayağı geometrisi
+  - `boxMountHoriz` — `BoxGeometry(0.08, 0.015, 0.08)`; yatay montaj ayağı geometrisi
+  - `boxRotorBlade` — `BoxGeometry(0.20, 0.012, 0.06)`; rotor kanat geometrisi
+- **Dönüş**: geometri nesneleri objesi
 
----
-
-### [N4_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_mazgal_tel
-- **params**: `(_, k)` — _ : kullanılmayan index, k: tel çubuk indexi (0-7)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX mesh elemanı — dairesel mazgal ızgaranın tek bir tel çubuğu
-
----
-
-### [N5_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_mazgal halka
-- **params**: `(radius, j)` — radius: halka yarıçapı (0.12, 0.2, 0.28), j: index anahtarı
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX mesh elemanı — mazgal ızgaranın tek bir dairesel halkası
-
----
-
-### [N6_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_elektrik_bx
-- **params**: `bx` — X ekseninde vida pozisyonu (0.065, -0.065)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: Nested map sonucu JSX — elektrik kutusu vidalarının bir satırı
-
----
-
-### [N7_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_elektrik_by
-- **params**: `by` — Y ekseninde vida pozisyonu (0.05, -0.05)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX mesh elemanı — tek bir vida (matteBlack silindir)
-
----
-
-### [N8_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_montaj_xPos
-- **params**: `xPos` — X ekseninde montaj ayağı pozisyonu (-0.35, 0.35)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX group elemanı — bir montaj ayağı çifti (zPos map'i içinde 2 ayak)
-
----
-
-### [N9_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_montaj_zPos
-- **params**: `zPos` — Z ekseninde montaj ayağı pozisyonu (-0.22, 0.22)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX group elemanı — tek bir montaj ayağı (dikey plaka + yatay taban + somun)
-
----
-
-### [N10_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_pervane
-- **params**: `(_, i)` — _ : kullanılmayan index, i: kanat indexi (0-7)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX mesh elemanı — pervanenin tek bir kanadı (cableGrey malzemeli kutu)
-
----
-
-### [N11_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::FlexibleCable
-- **params**: `{ materials }` — FanMaterials tipinde; materials.cableGrey kullanılır
+### [N4_NASIL] AST Pointer: JetFanModel.tsx::innerBladeGeos map callback
+- **params**: `xVal`
 - **ic_degiskenler**:
-  - `path` — useMemo ile memoize edilmiş CatmullRomCurve3 nesnesi; 4 noktadan oluşan kablo eğrisi yolu
-- **Dönüş**: JSX mesh elemanı — tubeGeometry ile oluşturulmuş 3B kablo modeli
+  - `r` — 0.31 sabit değeri; iç kanat yarıçapı
+  - `w` — `2 * Math.sqrt(Math.max(0, r * r - xVal * xVal))` formülüyle hesaplanan kanat genişliği
+- **Dönüş**: BoxGeometry
 
----
+### [N5_NASIL] AST Pointer: JetFanModel.tsx::useEffect cleanup (geometries)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: cleanup fonksiyonu; `geometries` objesindeki tüm geometrilerin `.dispose()` metodunu çağırır
 
-### [N12_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::useMemo_callback_FlexibleCable
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `CatmullRomCurve3` — 4 Vector3 noktasından (0,0,0 → 0,0.04,0.05 → 0,0.06,0.12 → 0,0.06,0.175) oluşan Catmull-Rom spline eğrisi
+### [N6_NASIL] AST Pointer: JetFanModel.tsx::FlexibleCable
+- **params**: `{ materials }` — `FanMaterials` tipinde; `materials.cableGrey` alanına erişilir
+- **ic_degiskenler**:
+  - `path` — `useMemo` ile oluşturulan `CatmullRomCurve3` eğrisi; `[new Vector3(0, 0, 0), new Vector3(0, 0.04, 0.05), new Vector3(0, 0.06, 0.12), new Vector3(0, 0.06, 0.175)]` noktalarıyla tanımlı kablo yolu
+  - `tubeGeo` — `useMemo` ile oluşturulan `TubeGeometry`; `path` eğrisi, 20 segment, 0.012 tüp yarıçapı, 8 radial segment, kapalı değil
+- **Dönüş**: JSX (mesh); `materials.cableGrey` malzemesi ve `tubeGeo` geometrisiyle render edilen kablo mesh'i
+
+### [N7_NASIL] AST Pointer: JetFanModel.tsx::FlexibleCable useEffect cleanup
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: cleanup fonksiyonu; `tubeGeo.dispose()` çağrısı yapar
 
 ---
 

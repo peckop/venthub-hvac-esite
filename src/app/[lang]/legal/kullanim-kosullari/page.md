@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\kullanim-kosullari\page.tsx
-skeleton_hash: 3d46a45450b5913b
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\kullanim-kosullari\page.tsx
+skeleton_hash: 303f1d6b98cb4244
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: 5231a61d2c38b252
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:33Z
+generated_at: 2026-08-27T06:53:23Z
 ---
 
 ## Genel Bakış
@@ -29,16 +29,6 @@ Kullanım Koşulları sayfasının React bileşenini oluşturur ve sunucu taraf�
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, çok dilli (i18n) bir Next.js sayfasıdır. Aksiyonlar fonksiyon imzalarından ve dosya yolu yapısından çıkarılmıştır.
-
----
-
-[Aksiyom 1]: Eğer `generateStaticParams()` fonksiyonu `{ lang: string }` formatında bir dizi döndürmezse, statik sayfa oluşturma (build) aşamasında hata oluşur ve sayfalar önceden derlenemez.
-
-[Aksiyom 2]: Eğer `Page` bileşenine geçirilen `params` promise'i `{ lang: string }` yapısında çözümlenmezse (resolve/reject olursa), bileşen geçerli dil parametresine erişemez ve sayfa içeriği doğru dille gösterilemez.
-
-[Aksiyom 3]: Eğer `lang` parametresi uygulamanın desteklediği dil listesinde (örn: 'tr', 'en') yer almıyorsa, sayfa geçersiz bir dil ile oluşturulur veya 404 hatası döndürülür.
-
-[Aksiyom 4]: Eğer `Page` bileşeni geçerli bir JSX/React elementi (`React.ReactNode`) döndürmezse veya `undefined`/`null` döndürse, tarayıcıda boş sayfa veya React hata sınırı (error boundary) tetiklenir.
 
 ---
 

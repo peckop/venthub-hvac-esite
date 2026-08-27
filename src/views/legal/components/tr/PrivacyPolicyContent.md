@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\components\tr\PrivacyPolicyContent.tsx
-skeleton_hash: 1bc648a0cf64b837
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\components\tr\PrivacyPolicyContent.tsx
+skeleton_hash: ef64838bcc52c247
 entity_hashes:
   func:PrivacyPolicyContentTr: 6b0fd40aa0eb2227
   overview: 2458658c904596d0
-  style_tokens: 4e890ff82c62079d
-generated_at: 2026-06-19T20:50:47Z
+  style_tokens: c2df28d44e819ffd
+generated_at: 2026-08-27T07:40:31Z
 ---
 
 ## Genel Bakış
@@ -99,7 +99,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-industrial-gray`, `text-primary-navy`, `text-xl`
+- **Renkler:** `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`
 - **Layout:** (yok)
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `pl-6`, `space-y-1`, `underline`
+- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `mt-2`, `pl-6`, `space-y-1`, `underline`

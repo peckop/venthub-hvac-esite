@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\InfiniteProductsShowcase.tsx
-skeleton_hash: f36a4436aa69980a
+source_path: C:\tmp\vh-urun-comp\src\components\products\InfiniteProductsShowcase.tsx
+skeleton_hash: a6902d8273610d2d
 entity_hashes:
   func:InfiniteProductsShowcase: 085e1a5c6ded015b
   func:ProductCard: 9a7014f633ef56b4
@@ -12,7 +12,7 @@ entity_hashes:
   func:handleClick: bffc3b12eebc550c
   overview: 32bb22db8a615444
   style_tokens: 6568addf96368125
-generated_at: 2026-08-25T07:26:11Z
+generated_at: 2026-08-27T07:30:18Z
 ---
 
 ## Genel Bakış
@@ -170,12 +170,12 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: InfiniteProductsShowcase.tsx
-  function: InfiniteProductsShowcase.tsx::getOptimizedImageUrl
-  function: InfiniteProductsShowcase.tsx::ProductCard
-  function: InfiniteProductsShowcase.tsx::handleClick
-  function: InfiniteProductsShowcase.tsx::SceneContent
-  function: InfiniteProductsShowcase.tsx::InfiniteProductsShowcase
+  file: src\components\products\InfiniteProductsShowcase.tsx
+  function: src\components\products\InfiniteProductsShowcase.tsx::getOptimizedImageUrl
+  function: src\components\products\InfiniteProductsShowcase.tsx::ProductCard
+  function: src\components\products\InfiniteProductsShowcase.tsx::handleClick
+  function: src\components\products\InfiniteProductsShowcase.tsx::SceneContent
+  function: src\components\products\InfiniteProductsShowcase.tsx::InfiniteProductsShowcase
 
 ---
 

@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\orders\page.tsx
-skeleton_hash: 6253cab314739e1e
+source_path: C:\tmp\ops-t165\src\app\admin\orders\page.tsx
+skeleton_hash: dc1137c535e089b3
 entity_hashes:
   func:Loading: 657ee72781ec51d8
-  func:Page: d710ec3bcbfd4e2f
+  func:Page: 460322f3b21c41ac
   overview: 84e62d35617899bd
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:43Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:55:10Z
 ---
 
 ## Genel Bakış
@@ -32,20 +32,6 @@ Bu modül, Next.js App Router yapısında bir sayfa bileşenidir. Aşağıdaki m
 
 ---
 
-**[Aksiyom 1 - Sayfa Bileşeni Zorunluluğu]:** Eğer `Page()` fonksiyonu geçerli bir React elementi (JSX) döndürmüyorsa, Next.js bu rotada hata sayfası gösterir veya derleme hatası oluşur.
-
-**[Aksiyom 2 - Yükleme Durumu Zorunluluğu]:** Eğer `Loading()` fonksiyonu tanımlı değilse veya geçerli bir React elementi döndürmüyorsa, sayfa yüklenirken Suspense fallback görüntülenemez ve kullanıcı loading durumunu göremez.
-
-**[Aksiyom 3 - Modül Export Zorunluluğu]:** Eğer `AdminOrdersPage` export edilmemişse, modül dışarıdan erişilemez hale gelir ve Next.js router bileşeni olarak kullanılamaz.
-
-**[Aksiyom 4 - Parametresiz Çalışma]:** Her iki fonksiyon da (`Page()` ve `Loading()`) parametresiz olarak tanımlanmıştır. Fonksiyon gövdesi verilmediği için, bu fonksiyonların hangi verileri tüketip ürettiği bilinmemektedir.
-
-**[Aksiyom 5 - Bağımlılık Bilinmezliği]:** Fonksiyon gövdesi verilmediği için, modülün hangi harici servislere, context'lere veya veri kaynaklarına bağımlı olduğu bilinmemektedir. Dolayısıyla harici bağımlılık aksiyomları tanımlanamamıştır.
-
-**[Aksiyom 6 - Veri Kaynağı Bilinmezliği]:** Fonksiyon gövdesi verilmediği için, modülün verileri nereden çektiği (API, static data, database vb.) bilinmemektedir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### Loading
@@ -59,10 +45,14 @@ Bu modül, Next.js App Router yapısında bir sayfa bileşenidir. Aşağıdaki m
 **Dönüş**: `JSX.Element` veya `React.ReactNode` tipinde bir React bileşeni döndürür. Return tipi kaynak kodda açıkça belirtilmemiş olup, Next.js loading convention gereği geçerli bir JSX yapısı döndürmesi beklenmektedir.
 
 ### Page
-**Ne yapar**: Bu bileşen, yönetici siparişleri sayfasının ana giriş noktası olarak görev yapar. Uluslararasılaştırma desteği entegre eder ve içerik yüklenirken kullanıcıya görsel bir geri bildirim sağlar.
-**Nasıl yapar**: `useI18n` kancasından (hook) elde edilen çeviri fonksiyonunu kullanarak metinleri yerelleştirir. Asıl içeriği oluşturan `AdminOrdersPage` bileşenini, `fallback` özelliği ile yükleniyor animasyonu içeren bir `Suspense` yapısı içinde sarmalayarak render eder.
-**Parametreler**: Yok
-**Dönüş**: JSX.Element — `Suspense` bileşeni ile sarılmış sayfa yapısını döndürür.
+**Ne yapar**: Admin siparişler sayfasını render eden bir React fonksiyon bileşenidir. Uluslararasılaştırma desteğiyle birlikte, bileşen yüklenirken kullanıcıya yükleme göstergesi sunar.
+
+**Nasıl yapar**: `useI18n()` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t`'yi alır. Ardından `AdminOrdersPage` bileşenini React'in `Suspense` bileşeni ile sarar. `Suspense`, alt bileşen ağacı henüz hazır olmadığında `fallback` prop'unda tanımlanmış yükleme arayüzünü gösterir. Bu fallback, Tailwind CSS sınıflarıyla (`p-8`, `text-center`, `text-admin-fg-muted`, `animate-pulse`) biçimlendirilmiş bir `div` öğesidir ve `t('common.loading')` çağrısıyla yerelleştirilmiş bir yükleme metni görüntüler. Bileşen hazır olduğunda `Suspense`, fallback'i kaldırıp `AdminOrdersPage` bileşenini kullanıcıya sunar.
+
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**: JSX öğesi döndürür; `Suspense` ile sarılmış bir React ağacı üretir. Kesin dönüş tipi kaynakta belirtilmemiştir.
 
 ---
 
@@ -83,16 +73,16 @@ Bu modül, Next.js App Router yapısında bir sayfa bileşenidir. Aşağıdaki m
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/admin/orders/page.tsx::Loading
-- **params**: (yok)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `t('admin.common.loading')` çağrılarak admin sayfasına özel loading metni çevrilir
-- **Dönüş**: JSX — `div` elemanı (`p-8 text-center text-slate-400 animate-pulse` class'ları ile loading animasyonu gösteren bir placeholder); `AdminOrdersPage` bileşeni yüklenene kadar Suspense fallback olarak kullanılır
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `'admin.common.loading'` anahtarıyla yükleniyor metni elde etmek için kullanılır
+- **Dönüş**: JSX `<div>` elementi — `className="p-8 text-center text-admin-fg-muted animate-pulse"` ile stil uygulanmış, `t('admin.common.loading')` metni içeren yükleniyor göstergesi
 
 ### [N2_NASIL] AST Pointer: src/app/admin/orders/page.tsx::Page
-- **params**: (yok)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `t('common.loading')` çağrılarak ortak loading metni çevrilir
-- **Dönüş**: JSX — `<Suspense>` sarmalayıcısı içinde `<AdminOrdersPage />` bileşenini döndürür; `fallback` prop'u olarak loading spinner/div'i verilir; `AdminOrdersPage` dinamik import ile `next/dynamic` kullanılarak lazy yüklenen ana sipariş yönetim bileşenidir
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `'common.loading'` anahtarıyla Suspense fallback metni elde etmek için kullanılır
+- **Dönüş**: JSX `<Suspense>` elementi — `fallback` prop'unda `t('common.loading')` metni içeren `<div>` yükleniyor göstergesi, çocuk olarak `<AdminOrdersPage />` bileşeni render edilir
 
 ---
 
@@ -119,7 +109,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`

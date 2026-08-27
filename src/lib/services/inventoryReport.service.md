@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\inventoryReport.service.ts
-skeleton_hash: fb9f50ae8dd5b2a8
+source_path: C:\tmp\ops-t165\src\lib\services\inventoryReport.service.ts
+skeleton_hash: 1c3a4525f60ec199
 entity_hashes:
   func:getInventoryMovements: 07db97961f2a156e
   func:movementQueryFn: 2f48e11557ce3e37
   overview: 100075d17225ac3b
-generated_at: 2026-08-24T12:50:12Z
+generated_at: 2026-08-27T07:00:10Z
 ---
 
 ## Genel Bakış

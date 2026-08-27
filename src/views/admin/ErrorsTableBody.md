@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\ErrorsTableBody.tsx
-skeleton_hash: fe489845647f19bb
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\ErrorsTableBody.tsx
+skeleton_hash: 852a87c7ba1f57e7
 entity_hashes:
   func:ErrorsTableBody: ba1ec68351d28cea
   func:errorsFetcher: acba757800739598
   overview: 80765db41011b973
   style_tokens: 83e951750a6d0ee0
-generated_at: 2026-08-26T07:20:57Z
+generated_at: 2026-08-27T07:24:35Z
 ---
 
 ## Genel Bakış

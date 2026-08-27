@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\3d\core\ContextLossRecovery.tsx
-skeleton_hash: e867245a0654391c
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\core\ContextLossRecovery.tsx
+skeleton_hash: fc59270232a8dc42
 entity_hashes:
   func:ContextLossRecovery: 4d21632035775208
   overview: 8a94f0c75220a1b4
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:26:01Z
+generated_at: 2026-08-27T07:05:32Z
 ---
 
 ## Genel Bakış
@@ -92,8 +92,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: ContextLossRecovery.tsx
-  function: ContextLossRecovery.tsx::ContextLossRecovery
+  file: src\components\products\3d\core\ContextLossRecovery.tsx
+  function: src\components\products\3d\core\ContextLossRecovery.tsx::ContextLossRecovery
 
 ---
 

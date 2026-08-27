@@ -314,6 +314,50 @@ Bu, `legal-compliance-standard.md` §3.6'daki **iki-kapı** deseninin birebir uy
 satır kapısı sahipliği, değer kapısı süreç alanlarını bağlar. O bölümün ölçülmüş dersi burada
 da geçerlidir: **kolon-GRANT bir kapı değildir**, kısıt politikanın `with check` bloğuna yazılır.
 
+### 7.2.1 Kalem tablosunun korunması — **tek bacaklı ve o bacak artık kapılı** (T164-VH)
+
+Yukarıdaki §7.2 **başlık** tablosunu bağlar. **Kalem** tablosu (`venthub_quote_items`)
+farklı bir mekanizmayla korunur ve bu fark yazılmazsa sessizce kaybolur.
+
+**Ölçüm (canlı prod, 2026-08-27):** `authenticated` rolünün kalem tablosundaki UPDATE
+kolon yetkisi **8 kolondur** ve içinde `unit_price, currency, discount_rate, tax_rate,
+line_total` **vardır**. Grant'in geniş olması **zorunludur**: admin de `authenticated`'tır,
+yani kolon yetkisi admin'e ve müşteriye aynı anda verilir (bkz. migration §8 yorumu).
+
+O hâlde müşterinin bugün teklif tutarını değiştirememesinin **tek** sebebi şudur:
+
+> Kalem tablosunda UPDATE politikası yalnızca `quote_items_update_admin`'dir ve
+> `is_admin_user()` şartı taşır. Admin şartı taşımayan UPDATE politikası sayısı **0**.
+
+**DEĞİŞMEZ:** `venthub_quote_items` **asla** müşterinin sağlayabileceği bir UPDATE
+politikası kazanmayacak.
+
+Bu değişmez daha önce hiçbir kapı tarafından tutulmuyordu. Biri "müşteri kendi
+`requested` kalemlerini düzeltebilsin" diye bir politika eklerse fiyat kolonları **aynı
+anda** yazılabilir olur — grant katmanı zaten açıktır ve §7.2'nin `with check` deseni
+burada **işe yaramaz**, çünkü eski değere referans veremez.
+
+**Niçin mevcut R5 yetmez:** R5 *koddaki* fiyat-kolonu yazımını yasaklar; buradaki tehlike
+kod değil **politika eklenmesi**. Farklı yüzey, farklı kapı.
+
+**Çözüm grant'i daraltmak DEĞİLDİR** (bilinçli kapsam dışı): daraltmak admin fiyat
+girişini kırar. Mesele grant değil politika disiplinidir.
+
+**Bekçi:** `src/__tests__/conformance/quote-items-policy-guard.test.ts` — bütün
+migration'lar okunur (seçim **ada değil içeriğe** bağlı, R2'nin T134 dersi), `create` ve
+`alter policy` blokları çıkarılır, `for update`/`for all` olan her blokta `is_admin_user()`
+aranır. SQL yorumları CRLF-güvenli sıyrılır: `-- is_admin_user()` yazan bir yorum kapıyı
+yeşil tutardı. Ayrıca **boş evren koruması** vardır — hiç politika bulunamazsa bu "ihlal
+yok" değil "ölçüm yok" demektir ve bekçi yeşile kaçmaz, kırmızı verir.
+
+**Kanıt (sabotaj, üç kol):** admin şartsız politika → **kırmızı** · aynı politikaya şart
+eklendi → admin kolu **yeşil** (kabul kolu; ret gözlemi tek başına kanıt değildir) ·
+şart yalnız **yorumda** → **kırmızı kaldı**.
+
+**Bu bekçinin ölçmediği (adıyla):** politikanın *çalıştığını* değil, *yazıldığını* ölçer.
+Davranışsal kanıt gerçek JWT bağlamı ister; ayrıcalıklı bağlantı §15'in dediği gibi
+yanlış yeşil üretir.
+
 ### 7.3 Eşik — mekanizma otonom, değer config
 
 T134/4: hiçbir üründe insan-tanımsız eşik yok; mekanizma platform sabiti, değer admin config.

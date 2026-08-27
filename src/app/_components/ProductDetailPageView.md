@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\_components\ProductDetailPageView.tsx
-skeleton_hash: 28bc69703d47401f
+source_path: C:\tmp\vh-urun-comp\src\app\_components\ProductDetailPageView.tsx
+skeleton_hash: 696171e81f07b205
 entity_hashes:
   func:PdpSkuBridge: 7eb9545f35ab0fb2
   func:ProductDetailBody: 678d999364789e47
@@ -17,7 +17,7 @@ entity_hashes:
   func:toggleSpecSection: aca256fdc4d20ecb
   overview: 590be9a86b563f9f
   style_tokens: e157cb22f5459ba5
-generated_at: 2026-08-25T07:24:42Z
+generated_at: 2026-08-27T06:54:02Z
 ---
 
 ## Genel Bakış
@@ -328,24 +328,24 @@ graph TD
     ProductDetailPageView_tsx__openQuoteRequest["openQuoteRequest"]
     ProductDetailPageView_tsx__pickLang["pickLang"]
     ProductDetailPageView_tsx__toggleSpecSection["toggleSpecSection"]
-    ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__toggleSpecSection
     ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__pickLang
+    ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__toggleSpecSection
     ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__mapSlugToTopic
 ```
 
 ## NODE ID STANDARD
 
-  file: ProductDetailPageView.tsx
-  function: ProductDetailPageView.tsx::pickLang
-  function: ProductDetailPageView.tsx::ProductDetailBody
-  function: ProductDetailPageView.tsx::toggleSpecSection
-  function: ProductDetailPageView.tsx::handleAddToCart
-  function: ProductDetailPageView.tsx::openQuoteRequest
-  function: ProductDetailPageView.tsx::handleDownloadPdf
-  function: ProductDetailPageView.tsx::handleShare
-  function: ProductDetailPageView.tsx::mapSlugToTopic
-  function: ProductDetailPageView.tsx::PdpSkuBridge
-  function: ProductDetailPageView.tsx::ProductDetailPage
+  file: src\app\_components\ProductDetailPageView.tsx
+  function: src\app\_components\ProductDetailPageView.tsx::pickLang
+  function: src\app\_components\ProductDetailPageView.tsx::ProductDetailBody
+  function: src\app\_components\ProductDetailPageView.tsx::toggleSpecSection
+  function: src\app\_components\ProductDetailPageView.tsx::handleAddToCart
+  function: src\app\_components\ProductDetailPageView.tsx::openQuoteRequest
+  function: src\app\_components\ProductDetailPageView.tsx::handleDownloadPdf
+  function: src\app\_components\ProductDetailPageView.tsx::handleShare
+  function: src\app\_components\ProductDetailPageView.tsx::mapSlugToTopic
+  function: src\app\_components\ProductDetailPageView.tsx::PdpSkuBridge
+  function: src\app\_components\ProductDetailPageView.tsx::ProductDetailPage
 
 ---
 

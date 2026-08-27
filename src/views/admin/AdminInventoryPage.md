@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventoryPage.tsx
-skeleton_hash: edf06943a608f33b
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminInventoryPage.tsx
+skeleton_hash: cb310a480da8ac0f
 entity_hashes:
   func:AdminInventoryPage: 66c4abfcbc4634eb
   overview: 116f551d87e89286
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-19T20:48:41Z
+generated_at: 2026-08-27T07:14:49Z
 ---
 
 ## Genel Bakış

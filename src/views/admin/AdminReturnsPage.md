@@ -2,17 +2,17 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminReturnsPage.tsx
-skeleton_hash: e63890bd7a53e9a0
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminReturnsPage.tsx
+skeleton_hash: 2d15100808a47a98
 entity_hashes:
   func:AdminReturnsPage: cbbe5a033114e25a
-  overview: 31f520fe97f78c88
+  overview: 39146c10068c54db
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-19T20:49:04Z
+generated_at: 2026-08-27T07:21:18Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC admin panelinde iade yönetimi için kullanılan tek bir React bileşeninden oluşur. Bileşen, kimlik doğrulama ve yetkilendirme kontrollerinin ardından iade kayıtlarını yönetir; filtreleme, sıralama ve durum güncelleme gibi işlemleri destekler. Supabase veritabanına bağımlı olup, denetim günlüğü oluşturma, e-posta bildirimi gönderme ve harici ödeme simülasyonları gibi dış servislerle etkileşime girer.
+Bu modül, VentHub HVAC admin panelinde iade yönetimi sayfasını oluşturan tek bir React bileşeninden oluşur. Bileşen, iade kayıtlarının görüntülenmesi ve yönetimine ilişkin arayüz ile iş mantığını tek bir yapıda barındırır. Eski dokümana göre Supabase veritabanına bağımlı olup kimlik doğrulama ve yetkilendirme kontrolleri içerir.
 
 ## Fonksiyon Grupları
 ### Admin İade Yönetimi Sayfası Bileşeni
@@ -21,19 +21,12 @@ Tek bileşen yapısında iade yönetimi ile ilgili tüm arayüz ve iş mantığ�
 
 ---
 
+**Not:** Fonksiyon gövdesi verilmediğinden, bileşenin iç yapısı, kullandığı alt bileşenler, hook'lar, durum değişkenleri ve dış servis çağrılarına ilişkin ayrıntılı mimari çıkarım yapılamamıştır. Detaylı analiz için AdminReturnsPage bileşeninin kaynak koduna ihtiyaç vardır.
+
+---
+
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için fonksiyon gövdesi verilmediğinden, mimari varsayımlar çıkarılamamıştır. Aksiyom üretimi için AdminReturnsPage fonksiyonunun/g bileşeninin gövde koduna ihtiyaç vardır.
-
-[Aksiyom 1]: Eğer fonksiyon gövdesi (bileşen implementasyonu) yoksa, mimari varsayımlar üretilemez.
-
-[Aksiyom 2]: Eğer bileşen içinde API çağrıları (örn: iade listesi getirme) varsa ve API endpoint'i tanımlı değilse, veri getirme işlemleri başarısız olur.
-
-[Aksiyom 3]: Eğer bileşen içinde kimlik doğrulama kontrolü (auth guard) varsa ve auth token mevcut değilse, kullanıcı iade yönetim sayfasına erişemez.
-
-[Aksiyom 4]: Eğer bileşen içinde admin rol kontrolü varsa ve kullanıcı admin rolüne sahip değilse, sayfa erişimi engellenir.
-
-> **Not:** Bu aksiyomlar, eski dokümandan (Genel Bakış bölümünden) çıkarılan genel nitelikli varsayımlardır. Kesin ve doğrulanmış mimari varsayımlar için **AdminReturnsPage fonksiyonunun/bileşeninin gövde kodunun** sağlanması gerekmektedir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -54,9 +47,8 @@ Bu bileşen parametre almaz.
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./ReturnsTableBody::ReturnsTableBody
 - import: react::React
 - import: react::Suspense
@@ -68,8 +60,8 @@ Bu bileşen parametre almaz.
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminReturnsPage.tsx::AdminReturnsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan destructuring ile alınan çeviri fonksiyonu; admin başlıkları ve alt başlıkları için t('admin.titles.returns') ve t('admin.returns.subtitle') çağrılarında kullanılır
-- **Dönüş**: JSX — admin iade sayfasının tamamını oluşturan React bileşeni; başlık, alt başlık ve Suspense ile sarılmış ReturnsTableBody bileşenini render eder
+  - `t` — `useI18n()` hook'undan destruct edilen çeviri fonksiyonu; `t('admin.titles.returns')` ve `t('admin.returns.subtitle')` çağrılarıyla sayfa başlığı ve alt başlık metinlerini yerelleştirir
+- **Dönüş**: JSX element — `className="space-y-6 pb-20"` ile sarılmış bir `<div>`; içinde `AdminPageHeader` bileşeni (title ve description prop'ları `t()` ile çevrilmiş değerler alır) ve `fallback` olarak `AdminSkeleton` (variant="table", count=7, rows=6) kullanılan `<Suspense>` sargısı içinde `<ReturnsTableBody />` bileşeni render edilir.
 
 ---
 

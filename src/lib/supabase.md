@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\supabase.ts
-skeleton_hash: d0b01bf4098a6681
+source_path: C:\tmp\ops-t165\src\lib\supabase.ts
+skeleton_hash: 60ed5cf7146f77ea
 entity_hashes:
   overview: 8a47b4c00ad1c0ec
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:07:34Z
 ---
 
 ## Genel Bakış

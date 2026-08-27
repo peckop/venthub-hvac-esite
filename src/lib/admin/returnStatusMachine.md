@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\admin\returnStatusMachine.ts
-skeleton_hash: 5ce707b066c93a43
+source_path: C:\tmp\ops-t165\src\lib\admin\returnStatusMachine.ts
+skeleton_hash: 906a940d2991e98c
 entity_hashes:
   func:allowedNextStatuses: c5a64be7cb890a38
   overview: eb1dc3e13feb0c1b
-generated_at: 2026-08-25T07:27:50Z
+generated_at: 2026-08-27T06:57:20Z
 ---
 
 ## Genel Bakış
@@ -86,8 +86,8 @@ type ReturnStatus = | 'requested'
 
 ## NODE ID STANDARD
 
-  file: returnStatusMachine.ts
-  function: returnStatusMachine.ts::allowedNextStatuses
+  file: src\lib\admin\returnStatusMachine.ts
+  function: src\lib\admin\returnStatusMachine.ts::allowedNextStatuses
 
 ---
 

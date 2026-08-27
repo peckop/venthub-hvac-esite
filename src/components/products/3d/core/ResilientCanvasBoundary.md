@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\core\ResilientCanvasBoundary.tsx
-skeleton_hash: b89f8e9b645b0f89
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\core\ResilientCanvasBoundary.tsx
+skeleton_hash: 695c546d907a6c73
 entity_hashes:
   func:ResilientCanvasBoundary:componentDidCatch: 77eebb86b07563ff
   func:ResilientCanvasBoundary:getDerivedStateFromError: bde8b48e4da18d08
@@ -11,7 +11,7 @@ entity_hashes:
   func:Static3DFallback: b2ce76cecd8cb60f
   overview: bf5c11c0f58fb796
   style_tokens: efe3cb23b056f20a
-generated_at: 2026-06-20T05:01:08Z
+generated_at: 2026-08-27T07:06:01Z
 ---
 
 ## Genel Bakış
@@ -51,7 +51,14 @@ Bu fonksiyon parametre almaz.
 **Dönüş**: JSX elementi (`React.JSX.Element`) döndürür — merkezi hizalanmış, soluk ikonlu, radial gradyan arka planlı bir `<div>` yapısı.
 
 ### getDerivedStateFromError
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: React'ın hata yakalama mekanizmasının bir parçası olarak, bir alt bileşende oluşan hatayı tespit ettiğinde bileşenin state'ini günceller. Bu statik metod, render sırasında oluşan hataları yakalamak için React tarafından otomatik olarak çağrılır ve bileşeni hata durumuna geçirir.
+
+**Nasıl yapar**: React, alt bileşen ağacında bir hata yakaladığında bu statik metodu çağırır. Metot, `hasError` alanını `true` olarak ayarlayan yeni bir state nesnesi döndürür. Bu state değişikliği sayesinde bileşenin `render` metodu hata durumunu algılayabilir ve buna göre farklı bir çıktı üretebilir.
+
+**Parametreler**:
+- Bu fonksiyon parametre almaz.
+
+**Dönüş**: `State` tipinde bir nesne döndürür. Dönen nesne `{ hasError: true }` şeklindedir ve bileşenin state'ine birleştirilir.
 
 ### componentDidCatch
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -80,42 +87,31 @@ Bu fonksiyon parametre almaz.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: ResilientCanvasBoundary.tsx::Static3DFallback
+### [N1_NASIL] AST Pointer: src/components/products/3d/core/ResilientCanvasBoundary.tsx::Static3DFallback
 - **params**: (parametre yok)
-- **ic_degiskenler**: (değişken tanımlanmamış — doğrudan JSX döndürür)
-- **Dönüş**: JSX element — `div` içinde `Box` icon'u; 3D yüklensenemediğinde gösterilen statik fallback UI'ı üretir
+- **ic_degiskenler**:
+  - `Box` — lucide-react'ten import edilen ikon bileşeni; 48 boyutunda, strokeWidth 1.5, opacity-40 ve text-steel-gray sınıfıyla kullanılır, aria-hidden="true" ile erişilebilirlikten gizlenir
+- **Dönüş**: JSX element — `div` kapsayıcı (flex, h-full, w-full, items-center, justify-center, rounded-xl, bg-product-3d-radial sınıflarıyla) içinde `Box` ikonu barındırır
 
----
-
-### [N2_NASIL] AST Pointer: ResilientCanvasBoundary.tsx::ResilientCanvasBoundary.getDerivedStateFromError
-- **params**: (parametre yok — static metod, React tarafından çağrılır)
-- **ic_degiskenler**: (yok — literal obje döndürür)
-- **Dönüş**: `State` nesnesi — `{ hasError: true }` döndürerek bileşenin hata durumuna geçmesini sağlar
-
----
-
-### [N3_NASIL] AST Pointer: ResilientCanvasBoundary.tsx::ResilientCanvasBoundary.componentDidCatch
-- **params**: `error` — React tarafından fırlatılan Error nesnesi, 3D bileşenin çökme sebebini içerir
+### [N2_NASIL] AST Pointer: src/components/products/3d/core/ResilientCanvasBoundary.tsx::ResilientCanvasBoundary.getDerivedStateFromError
+- **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok — yan etki olarak `console.error` ile hata loglanır: `'[VentHubCanvas] 3D yüzeyi yüklenemedi, sayfa ayakta kalıyor:'` prefix'i ile `error` nesnesi yazdırılır
+- **Dönüş**: State nesnesi — `{ hasError: true }` döndürür; hata yakalandığında state'i günceller
 
----
+### [N3_NASIL] AST Pointer: src/components/products/3d/core/ResilientCanvasBoundary.tsx::ResilientCanvasBoundary.componentDidCatch
+- **params**:
+  - `error: Error` — yakalanan hata nesnesi
+- **ic_degiskenler**:
+  - `error` — `console.error`'a ikinci argüman olarak geçirilir; '[VentHubCanvas] 3D yüzeyi yüklenemedi, sayfa ayakta kalıyor:' mesajıyla birlikte loglanır
+- **Dönüş**: yok — yan etki olarak `console.error` ile hata loglar
 
-### [N4_NASIL] AST Pointer: ResilientCanvasBoundary.tsx::ResilientCanvasBoundary.render
+### [N4_NASIL] AST Pointer: src/components/products/3d/core/ResilientCanvasBoundary.tsx::ResilientCanvasBoundary.render
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok — koşullu terim doğrudan döndürülür)
-- **Dönüş**: JSX — `this.state.hasError === true` ise `this.props.fallback`, aksi halde `this.props.children` döndürülür
-
----
-
-### Değişken Referans Tablosu (class-level)
-
-| Referans | Tanım |
-|---|---|
-| `this.state` | `{ hasError: boolean }` — `getDerivedStateFromError` tarafından yönetilen hata durumu |
-| `this.state.hasError` | Boolean bayrak, `true` olduğunda fallback gösterilir |
-| `this.props.fallback` | Error boundary tetiklendiğinde render edilecek fallback JSX |
-| `this.props.children` | Normal durumda render edilecek çocuk bileşenler |
+- **ic_degiskenler**:
+  - `this.state.hasError` — boolean; hata durumunu kontrol eder
+  - `this.props.fallback` — hata durumunda gösterilecek bileşen
+  - `this.props.children` — hata olmadığında gösterilecek alt bileşenler
+- **Dönüş**: JSX element — `this.state.hasError` true ise `this.props.fallback`, false ise `this.props.children` döndürür
 
 ---
 
