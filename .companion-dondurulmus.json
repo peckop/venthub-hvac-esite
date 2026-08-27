@@ -123,6 +123,14 @@
       "sebep": "uretec-sembol-kaybi",
       "kayit": "REC-83",
       "serit": "ALTYAPI"
+    },
+    {
+      "yol": "src/components/products/3d/types/DuctFanModel.md",
+      "gercek_sembol": 2,
+      "kaynak": "90aa2b29",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "URUN"
     }
   ]
 }

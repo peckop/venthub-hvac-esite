@@ -12,6 +12,8 @@ entity_hashes:
 generated_at: 2026-08-25T07:26:52Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=90aa2b29 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, 3D ürün görselleştirme katmanında yer alan kanal fan (duct fan) model bileşenlerini tanımlar. Dikdörtgen kesitli kanal fanının 3D modelini sunan bileşenleri içerir. Modül, ürünlerin üç boyutlu görselleştirilmesinde kullanılan tip bazlı bileşen yapısının bir parçasıdır.
 

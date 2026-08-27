@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T13:57:50.374660+00:00
+compiled_at: 2026-08-27T17:47:33.466719+00:00
 total_compiled_files: 62
-source_commit: 5c245d25
+source_commit: 829d6493
 source: ['docs/standards', 'docs/reference']
 ---
 
