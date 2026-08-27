@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\ColumnsMenu.tsx
-skeleton_hash: 55890a95487cfde8
+source_path: C:\tmp\vh-comp\src\components\admin\ColumnsMenu.tsx
+skeleton_hash: ecb7794a4594e153
 entity_hashes:
   func:ColumnsMenu: acb58bb1e295bcab
   overview: b2310e22f90d9a39
-  style_tokens: f68608c28260c039
-generated_at: 2026-06-19T20:46:46Z
+  style_tokens: 55aa40fbb3085fe8
+generated_at: 2026-08-27T04:09:03Z
 ---
 
 ## Genel Bakış
@@ -97,10 +97,10 @@ type ColumnToggle = { key: string; label: string; checked: boolean; onChange: (v
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `shadow-glow-sm`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-surface-deep`, `bg-white/5`, `border-b`, `border-cyan-400`, `border-white/10`, `border-white/5`, `data-[state=checked]:text-cyan-400`, `hover:bg-white/5`, `hover:text-white`, `stroke-4`, `text-cyan-400`, `text-slate-300`, `text-slate-500`, `text-surface-deep`
+- **Renkler:** `bg-admin-accent`, `bg-admin-bg`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-accent`, `border-admin-border`, `border-b`, `data-[highlighted]:bg-admin-surface-2`, `data-[state=checked]:text-admin-accent`, `hover:bg-admin-surface-2`, `hover:text-admin-fg`, `stroke-4`, `text-admin-accent`, `text-admin-accent-fg`, `text-admin-fg`
 - **Layout:** `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `h-1.5`, `h-12`, `h-4`, `h-px`, `items-center`, `justify-between`, `justify-center`, `max-h-300px`, `min-w-140px`, `min-w-240px`, `overflow-y-auto`
-- **Varyant/Responsive:** `:`, `data-[state=checked]:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `${col.checked`, `${density`, `:`, `===`, `animate-in`, `border`, `comfortable`, `compact`, `cursor-pointer`, `duration-200`, `fade-in`, `font-black`, `font-bold`, `glass-strong`, `group`
+- **Varyant/Responsive:** `:`, `data-[highlighted]:`, `data-[state=checked]:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${col.checked`, `${density`, `:`, `===`, `animate-in`, `border`, `comfortable`, `compact`, `cursor-pointer`, `data-[highlighted]:ring-2`, `data-[highlighted]:ring-admin-ring`, `data-[highlighted]:ring-inset`, `duration-200`, `fade-in`, `font-semibold`

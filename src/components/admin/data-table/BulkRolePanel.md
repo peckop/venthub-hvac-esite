@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\data-table\BulkRolePanel.tsx
-skeleton_hash: 04ee874694770959
+source_path: C:\tmp\vh-comp\src\components\admin\data-table\BulkRolePanel.tsx
+skeleton_hash: 48ef6e64fff50b61
 entity_hashes:
-  func:BulkRolePanel: f7696c1db3be77ff
+  func:BulkRolePanel: 763d83337d350373
   overview: 372bee1e944a5f3b
-  style_tokens: edbcc92fba425fac
-generated_at: 2026-08-15T16:41:47Z
+  style_tokens: 812d28b6d25e760f
+generated_at: 2026-08-27T04:10:39Z
 ---
 
 ## Genel Bakış
@@ -31,15 +31,15 @@ Bileşenin ana sorumluluğu, kullanıcılara seçili satırlar için geçerli ro
 ## FONKSİYON DETAYLARI
 
 ### BulkRolePanel
-**Ne yapar**: Bu fonksiyon, toplu kullanıcı rolü değiştirme işlemini başlatmak için kullanıcının seçebileceği bir rol listesini içeren bir panel bileşenini (React component) döndürür. Amacı, yöneticinin bir veya birden fazla kullanıcıya aynı anda yeni bir rol atamasını kolaylaştıran bir arayüz sağlamaktır.
+**Ne yapar**: Toplu kullanıcı rolü değiştirme işleminde kullanılan bir panel bileşenidir. Kullanıcılara mevcut rol seçeneklerini butonlar halinde sunar ve seçilen rolü üst bileşene bildirerek paneli kapatır.
 
-**Nasıl yapar**: Fonksiyon, `useI18n` hook'unu kullanarak çoklu dil desteğini (`t` fonksiyonu) sağlar. `ROLE_KEYS` adlı bir dizide tanımlı tüm mevcut rol anahtarlarını (`targetRole`) döngüyle (`.map`) işler. Her bir rol için, üzerine tıklandığında tetiklenecek bir buton oluşturur. Butona tıklandığında, önce üst bileşenden gelen `onRoleChange` callback fonksiyonunu seçilen rol ile çağırarak değişikliği bildirir, ardından `onClose` callback fonksiyonunu çağırarak panelin kendisini kapatmasını tetikler. Butonun içeriği, ilgili rol için tanımlanmış bir ikonu (`ROLE_BUTTON_ICON`) ve çevirisi yapılmış rol adını gösterir. Tüm arayüz, `glass-strong` ve `rounded-xl` gibi modern CSS sınıfları ile stilize edilmiştir.
+**Nasıl yapar**: `useI18n()` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t`'yi alır. `ROLE_KEYS` dizisi üzerinde `map` ile her bir rol için bir buton oluşturur. Her buton tıklandığında `onRoleChange` fonksiyonuna ilgili `targetRole` değerini gönderir ve ardından `onClose` fonksiyonunu çağırarak paneli kapatır. Butonların yanında `ROLE_BUTTON_ICON` nesnesinden alınan ikonlar ve `t` fonksiyonu ile çevrilmiş rol adları görüntülenir. Bileşen, yönetici arayüzüne uygun CSS sınıflarıyla (`bg-admin-bg`, `text-admin-fg`, `rounded-admin-md` vb.) stilize edilmiştir.
 
 **Parametreler**:
-- onRoleChange: `(role: string) => void` — Kullanıcı listeden bir rol seçtiğinde çağrılan geri çağırma fonksiyonu. Parametre olarak seçilen rol anahtarını (string) alır.
-- onClose: `() => void` — Panelin kapatılması gerektiğinde çağrılan geri çağırma fonksiyonu. Parametre almaz.
+- `onRoleChange`: `(role: string) => void` — Kullanıcının seçtiği rolün üst bileşene bildirilmesini sağlayan geri çağırma fonksiyonu. `ROLE_KEYS` dizisindeki herhangi bir rol değeri parametre olarak iletilir.
+- `onClose`: `() => void` — Rol seçimi tamamlandıktan sonra panelin kapatılmasını sağlayan geri çağırma fonksiyonu.
 
-**Dönüş**: `React.ReactNode` — Bileşenin render ettiği JSX yapısını (seçim paneli) döndürür.
+**Dönüş**: `React.ReactNode` — Yönetici panelindeki toplu rol değiştirme arayüzünü oluşturan JSX yapısı döndürür. Yapı, bir dış sarmalayıcı `div`, başlık metni ve `ROLE_KEYS` dizisindeki her rol için oluşturulmuş butonlardan oluşan bir liste içerir.
 
 ---
 
@@ -77,17 +77,22 @@ type UserRoleCode = 'user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | '
 - **ROLE_BUTTON_ICON** (object) — `{
   super_admin: <Crown size={14} />,
   admin: <Shield size={14} />,
-  wareho...`
+  war...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/data-table/BulkRolePanel.tsx::BulkRolePanel
-- **params**: ({ onRoleChange, onClose })
-- **ic_degiskenler**: 
-  `t` — useI18n() hook'undan dönen çeviri fonksiyonu, farklı dillere göre metinleri getirir
-- **Dönüş**: React.ReactNode (JSX döndürür, bir rol seçim menüsü bileşeni)
+- **params**:
+  - `onRoleChange` — `BulkRolePanelProps` tipinden destructured, rol seçildiğinde çağrılan callback fonksiyonu
+  - `onClose` — `BulkRolePanelProps` tipinden destructured, rol seçimi sonrası paneli kapatmak için çağrılan callback fonksiyonu
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan destructured çeviri fonksiyonu; `t('admin.users.bulk.selectRole')` ile başlık metni, `t(`roles.${targetRole}`)` ile her rolün görünen adı çevrilir
+  - `targetRole` — `ROLE_KEYS.map()` callback parametresi; her yinelemede mevcut roller dizisinden bir rol anahtarını temsil eder
+  - `ROLE_KEYS` — modül seviyesinde tanımlı sabit (gövdede doğrudan referans yok, ancak `.map()` çağrısında kullanılır); tüm rol anahtarlarını içeren dizi
+  - `ROLE_BUTTON_ICON` — modül seviyesinde tanımlı sabit; `ROLE_BUTTON_ICON[targetRole]` ile her role karşılık gelen ikon bileşenine erişilir (lucide-react ikonları: Crown, Eye, Package, Shield, Tag, Users)
+- **Dönüş**: `React.ReactNode` — yönetici paneli arka planı, kenarlığı ve gölgesiyle stilize edilmiş bir dış `div`; içinde başlık metni ve `ROLE_KEYS` dizisi üzerinden `.map()` ile üretilmiş buton listesi döndürülür. Her butonun `onClick` handler'ı `onRoleChange(targetRole)` ve `onClose()` sırasıyla çağırır.
 
 ---
 
@@ -114,7 +119,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-surface-deep`, `border-white/10`, `hover:bg-white/5`, `hover:text-white`, `text-cyan-400`, `text-left`, `text-slate-200`, `text-slate-300`, `text-slate-400`, `text-xs`
-- **Layout:** `flex`, `flex-col`, `gap-1.5`, `gap-2`, `items-center`, `min-w-240px`, `p-4`, `shadow-2xl`
+- **Renkler:** `bg-admin-bg`, `bg-admin-surface`, `border-admin-border`, `hover:bg-admin-surface-2`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-fg`, `text-admin-fg-muted`, `text-left`, `text-xs`
+- **Layout:** `flex`, `flex-col`, `gap-1.5`, `gap-2`, `items-center`, `min-w-240px`, `p-4`, `shadow-admin-lg`
 - **Varyant/Responsive:** `hover:` önekleri
-- **Yardımcı Sınıflar:** `border`, `font-black`, `font-bold`, `glass-strong`, `mb-3`, `px-3`, `py-2.5`, `rounded-xl`, `shrink-0`, `tracking-widest`, `transition-colors`, `uppercase`
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `font-semibold`, `mb-3`, `px-3`, `py-2.5`, `rounded-admin-md`, `shrink-0`, `transition-colors`
