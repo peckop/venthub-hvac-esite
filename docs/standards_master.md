@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T13:28:22.638887+00:00
+compiled_at: 2026-08-27T13:34:04.089512+00:00
 total_compiled_files: 62
-source_commit: 377bf536
+source_commit: 89282690
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -4812,6 +4812,26 @@ dosyayı geri alır**. O zaman liste bir **optimizasyon** olur (boşuna üretim 
 Üreteç o dosyada artık sembol kaybetmiyorsa kayıt **silinir** ve companion yeniden üretilir.
 Kaydın gereksiz kalması, düzelmiş bir üretecin önünde kalıcı duvar olur — dondurma bir çözüm
 değil, üreteç kusurunun faturasıdır.
+
+### C8.6 Bu maddenin kanıtı
+
+`INV-DOC-5` (`src/__tests__/conformance/companion-dondurulmus.test.ts`) altı kollu: **beşi
+fixture** üzerinde (sembol düşüşü · işaretin silinmesi · bozuk işaret · liste-işaret ayrışması ·
+yanlış-pozitif yokluğu), **biri** gerçek listeye uygulanır.
+
+Gerçek kolun boş geçmediği **sabotajla** kanıtlandı; her turdan sonra sağlam sürüme dönüş
+`sha256` ile doğrulandı ve ön koşul olarak `geçen > 0` arandı:
+
+| sabotaj | düşen kol |
+|---|---|
+| companion'dan işaret silinsin (yeniden üretim benzetimi) | 1 |
+| companion'dan bir sembol silinsin | 1 |
+| listedeki sayı yükseltilsin (liste ↔ işaret ayrışması) | 1 |
+
+⚠ Fixture kolları **sabotaja gerek bırakmadan** ayırt edicidir: her biri belirli bir ihlal
+sınıfını üretip yakalandığını gösterir. Gerçek kol ise ayrı kanıt ister, çünkü liste bir gün
+haklı olarak boşalabilir (üreteç düzelirse kayıtlar silinir) ve o hâlde **hiçbir şey ölçmeden
+yeşil** görünürdü — ölçüm aracının kendi körlüğü sınıfı (bkz. `fleet-mechanism-standard.md` §9.6).
 
 
 ---
