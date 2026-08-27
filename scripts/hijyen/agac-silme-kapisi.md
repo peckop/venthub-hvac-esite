@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-temizlik\scripts\hijyen\agac-silme-kapisi.cjs
-skeleton_hash: 75d3e2545d5222e7
+skeleton_hash: c07aa3c8b43ecc2a
 entity_hashes:
   func:agaclar: 1a9033aa23101f3c
   func:anaAgac: 4d792f0fd216bc38
@@ -15,7 +15,7 @@ entity_hashes:
   func:ilanOku: 00614b21477fe427
   func:kimlikYolu: 010fbd853594e3f9
   overview: f75637a12f2db8fc
-generated_at: 2026-08-27T18:45:25Z
+generated_at: 2026-08-27T18:54:09Z
 ---
 
 ## Genel Bakış
@@ -105,6 +105,7 @@ Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imza ve sabit l
 - **ILAN** (call) — `(deger('--ilan') || '').split(',').map((s) => s.trim()).filter(Boolean)`
 - **SUZ** (call) — `(deger('--agac') || '').split(',').map((s) => s.trim()).filter(Boolean)`
 - **ILAN_YOLU** (call) — `path.join(__dirname, 'silme-ilani.json')`
+- **SAHIPLIK** (call) — `deger('--sahiplik')`
 - **ortakGitDir** (call) — `path.resolve(git(['rev-parse', '--path-format=absolute', '--git-common-dir'])...`
 - **ana** (call) — `anaAgac()`
 - **ilan** (call) — `ilanOku()`
@@ -191,8 +192,8 @@ graph TD
     agac-silme-kapisi_cjs__kimlikYolu["kimlikYolu"]
     agac-silme-kapisi_cjs__agaclar --> agac-silme-kapisi_cjs__git
     agac-silme-kapisi_cjs__degerlendir --> agac-silme-kapisi_cjs__git
-    agac-silme-kapisi_cjs__degerlendir --> agac-silme-kapisi_cjs__ilanDurumu
     agac-silme-kapisi_cjs__anaAgac --> agac-silme-kapisi_cjs__git
+    agac-silme-kapisi_cjs__degerlendir --> agac-silme-kapisi_cjs__ilanDurumu
     agac-silme-kapisi_cjs__degerlendir --> agac-silme-kapisi_cjs__kimlikYolu
 ```
 
