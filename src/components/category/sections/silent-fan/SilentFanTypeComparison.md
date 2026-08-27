@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
-skeleton_hash: 267e09361eb28321
+source_path: C:\tmp\vh-urun-comp\src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
+skeleton_hash: a8e884a695e1fe9a
 entity_hashes:
   func:SilentFanTypeComparison: d3f5f980a16f61d9
   func:tr: b282b53f03d688a5
   overview: bed9a48986deb76b
   style_tokens: fb4db20eff738486
-generated_at: 2026-08-25T07:25:19Z
+generated_at: 2026-08-27T07:00:29Z
 ---
 
 ## Genel Bakış
@@ -101,9 +101,9 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan 
 
 ## NODE ID STANDARD
 
-  file: SilentFanTypeComparison.tsx
-  function: SilentFanTypeComparison.tsx::SilentFanTypeComparison
-  function: SilentFanTypeComparison.tsx::tr
+  file: src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
+  function: src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx::SilentFanTypeComparison
+  function: src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx::tr
 
 ---
 

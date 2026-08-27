@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\WallMountedCompactFanModel.tsx
-skeleton_hash: 10e06c5262b0c3ce
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\WallMountedCompactFanModel.tsx
+skeleton_hash: 8be519a0377ed21f
 entity_hashes:
   func:WallMountedCompactFanModel: 500276a0a7bacf11
   overview: 1626429cee72660d
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-27T07:27:54Z
 ---
 
 ## Genel Bakış

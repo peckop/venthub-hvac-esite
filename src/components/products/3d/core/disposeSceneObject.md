@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\3d\core\disposeSceneObject.ts
-skeleton_hash: effdd69655ea8ad1
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\core\disposeSceneObject.ts
+skeleton_hash: fa0d4ab893b0d9dd
 entity_hashes:
   func:disposeSceneObject: 09e4bce0d362eb1f
   func:isTexture: 5d5045b574da62d2
   overview: 7c948c72d891b333
-generated_at: 2026-08-25T07:26:11Z
+generated_at: 2026-08-27T07:06:05Z
 ---
 
 ## Genel Bakış
@@ -78,9 +78,9 @@ Verilen bir 3D nesneyi ve bu nesneye bağlı tüm alt nesneleri, materyalleri, g
 
 ## NODE ID STANDARD
 
-  file: disposeSceneObject.ts
-  function: disposeSceneObject.ts::isTexture
-  function: disposeSceneObject.ts::disposeSceneObject
+  file: src\components\products\3d\core\disposeSceneObject.ts
+  function: src\components\products\3d\core\disposeSceneObject.ts::isTexture
+  function: src\components\products\3d\core\disposeSceneObject.ts::disposeSceneObject
 
 ---
 

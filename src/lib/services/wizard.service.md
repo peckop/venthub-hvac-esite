@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\wizard.service.ts
-skeleton_hash: dc893ad90319548e
+source_path: C:\tmp\vh-urun-comp\src\lib\services\wizard.service.ts
+skeleton_hash: 451818ca10dc2c37
 entity_hashes:
   func:getWizardCandidates: aae9dee5aed73d85
   func:satiriAdayaCevir: d0442318772de7a0
   func:sayiOku: 8639d203fda03c7d
   overview: 12992ade3afe0d87
-generated_at: 2026-08-25T08:45:02Z
+generated_at: 2026-08-27T07:34:30Z
 ---
 
 ## Genel Bakış

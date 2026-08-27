@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\family.service.ts
-skeleton_hash: 9a28ab41c556774a
+source_path: C:\tmp\vh-urun-comp\src\lib\services\family.service.ts
+skeleton_hash: 3d44e3cf47b5c772
 entity_hashes:
   func:asLocalizedText: 7bacebe5cb54e872
   func:embeddedBrandName: 05580cb47abb7984
@@ -14,7 +14,7 @@ entity_hashes:
   func:getSeriesSlugs: 4505fed29d97a3fe
   func:parseFamilyDetail: a991ca64b73b3dd3
   overview: b2575dae095eff7c
-generated_at: 2026-08-25T08:45:05Z
+generated_at: 2026-08-27T07:34:30Z
 ---
 
 ## Genel Bakış
@@ -246,10 +246,10 @@ graph TD
     family_service_ts__getSeriesLanding["getSeriesLanding"]
     family_service_ts__getSeriesSlugs["getSeriesSlugs"]
     family_service_ts__parseFamilyDetail["parseFamilyDetail"]
-    family_service_ts__getSeriesLanding --> family_service_ts__asLocalizedText
-    family_service_ts__getFamilyDetail --> family_service_ts__parseFamilyDetail
-    family_service_ts__getAllFamilySlugs --> family_service_ts__getFamiliesEnriched
     family_service_ts__getSeriesLanding --> family_service_ts__embeddedBrandName
+    family_service_ts__getAllFamilySlugs --> family_service_ts__getFamiliesEnriched
+    family_service_ts__getFamilyDetail --> family_service_ts__parseFamilyDetail
+    family_service_ts__getSeriesLanding --> family_service_ts__asLocalizedText
     family_service_ts__getAllFamilySlugs --> family_service_ts__getSeriesSlugs
 ```
 

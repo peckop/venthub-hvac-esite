@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\VorticeBrand.tsx
-skeleton_hash: 2a3c160b85303f52
+source_path: C:\tmp\vh-urun-comp\src\components\category\sections\VorticeBrand.tsx
+skeleton_hash: 090b821e260552dd
 entity_hashes:
   func:VorticeBrand: a8d2715dd40c7de5
   overview: 0819e90fcacb5fea
   style_tokens: 751231d1b5ff9e5b
-generated_at: 2026-06-14T21:00:26Z
+generated_at: 2026-08-27T07:00:29Z
 ---
 
 ## Genel Bakış

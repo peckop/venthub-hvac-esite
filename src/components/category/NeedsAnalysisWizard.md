@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\NeedsAnalysisWizard.tsx
-skeleton_hash: efd340c374ff7881
+source_path: C:\tmp\vh-urun-comp\src\components\category\NeedsAnalysisWizard.tsx
+skeleton_hash: e4b34be54b4a7114
 entity_hashes:
   func:NeedsAnalysisWizard: 21824b9940ba2474
   func:handleSelection: be5cfa5ce36fcdb3
   overview: 61691ddf4217f489
   style_tokens: 4b1fcd41d2094d58
-generated_at: 2026-06-14T20:59:46Z
+generated_at: 2026-08-27T07:00:10Z
 ---
 
 ## Genel Bakış

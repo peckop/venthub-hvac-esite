@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\TrustSignals.tsx
-skeleton_hash: 19301e7b73166cb6
+source_path: C:\tmp\vh-urun-comp\src\components\category\sections\TrustSignals.tsx
+skeleton_hash: 4e5def79e8776352
 entity_hashes:
   func:TrustSignals: 91fe7d8aaf9157d4
   overview: bc5a93987b260832
   style_tokens: d8ec8f7dddeaa270
-generated_at: 2026-06-14T21:00:26Z
+generated_at: 2026-08-27T07:00:29Z
 ---
 
 ## Genel Bakış

@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\core\useDeviceDpr.ts
-skeleton_hash: f2522f8b03b35dcf
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\core\useDeviceDpr.ts
+skeleton_hash: 6a1f17df76983996
 entity_hashes:
   func:useDeviceDpr: 012742c3009a2a83
   overview: 342ae1b608f7779b
-generated_at: 2026-06-20T05:03:09Z
+generated_at: 2026-08-27T07:06:05Z
 ---
 
 ## Genel Bakış

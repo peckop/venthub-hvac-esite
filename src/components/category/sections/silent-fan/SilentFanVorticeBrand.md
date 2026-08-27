@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanVorticeBrand.tsx
-skeleton_hash: 0a921b4267d5feb0
+source_path: C:\tmp\vh-urun-comp\src\components\category\sections\silent-fan\SilentFanVorticeBrand.tsx
+skeleton_hash: 9b79813ce6d7a4ef
 entity_hashes:
   func:SilentFanVorticeBrand: e07a3a521f52112d
   func:tr: b282b53f03d688a5
   overview: 754a28961314bbb7
   style_tokens: 40e58eb2e4f109bb
-generated_at: 2026-06-19T20:47:07Z
+generated_at: 2026-08-27T07:00:29Z
 ---
 
 ## Genel Bakış

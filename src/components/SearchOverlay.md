@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-rec79\src\components\SearchOverlay.tsx
-skeleton_hash: 8f421614d69395ad
+source_path: C:\tmp\vh-urun-comp\src\components\SearchOverlay.tsx
+skeleton_hash: 6da8f69d2cb3fb27
 entity_hashes:
   func:SearchOverlay: 5877a83b84daa2a4
   func:addToRecent: af5ac74b08af9d79
@@ -18,7 +18,7 @@ entity_hashes:
   func:renderSuggestions: 8f7a31a904a04209
   overview: 017dfdb544329b86
   style_tokens: dd6869457e23a7f7
-generated_at: 2026-08-26T19:10:23Z
+generated_at: 2026-08-27T06:54:02Z
 ---
 
 ## Genel Bakış
@@ -279,15 +279,15 @@ graph TD
     SearchOverlay_tsx__renderResults["renderResults"]
     SearchOverlay_tsx__renderSuggestion["renderSuggestion"]
     SearchOverlay_tsx__renderSuggestions["renderSuggestions"]
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__goToResult
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__goToResult
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__goToSuggestion
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
 ```
 
 ## NODE ID STANDARD

@@ -2,36 +2,34 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx
-skeleton_hash: 24a998d3a25d1846
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\CentrifugalFanModel.tsx
+skeleton_hash: 0bb20c2e782fcbe0
 entity_hashes:
   func:CentrifugalFanModel: 2ca1d8ced8088e61
-  overview: 6444af53b2b5ccbf
+  overview: ed08f0a7a06a9648
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-12T10:21:42Z
+generated_at: 2026-08-27T07:13:55Z
 ---
 
 ## Genel Bakış
-Bu modül, santrifüj tip fanın (salyangoz fan) three.js tabanlı üç boyutlu modelini render eden bağımsız bir React bileşenini tanımlar. Bileşen, fanın ana yapı taşlarını (tahrik motoru, spiral konaklama ve radyal kanatlı pervane) statik bir şekilde 3D ortamında görselleştirerek etkileşimli bir ürün gösterimi sunar.
+Bu modül, santrifüj tip fanın (salyangoz fan) three.js tabanlı üç boyutlu modelini render eden bağımsız bir React bileşenini tanımlar. Bileşen, fanın ana yapı taşlarını (tahrik motoru, spiral konaklama ve radyal kanatlı pervane) statik bir şekilde 3D ortamında görselleştirerek etkileşimli bir ürün gösterimi sunar. Props almayan bu bileşen, tüm konfigürasyon değerlerini kendi içinde sabit olarak barındırır.
 
 ## Fonksiyon Grupları
 ### 3D Fan Modeli Bileşen Tanımı
-Santrifüj fanın three.js geometrisini ve malzemelerini oluşturarak sahneye yerleştiren, props almayan tek bir React bileşenini içerir.
+Santrifüj fanın three.js geometrisini ve malzemelerini oluşturarak sahneye yerleştiren, dışarıdan yapılandırma almayan tek bir React bileşenini içerir. Bileşen, three.js sahne, kamera ve ışıklandırma gibi bağımlılıklarını kendi içinde yönetir.
 - CentrifugalFanModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca fonksiyon imzasından çıkarılabilecek sınırlı varsayımlar tanımlanabilmektedir.
+Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca fonksiyon imzasına dayalı aksiyom üretilememektedir.
 
-[Aksiyom 1]: Eğer `CentrifugalFanModel` fonksiyonu parametre almıyorsa, bileşenin tüm konfigürasyon değerlerinin (fan boyutları, malzeme özellikleri, döndürme hızı vb.) fonksiyon gövdesi içinde sabit olarak tanımlı olması gerekir; aksi halde bileşen esnek bir şekilde özelleştirilemez.
+[Aksiyom 1]: Eğer `CentrifugalFanModel` bileşeni bir React ortamında (React renderer) çalıştırılmazsa, three.js tabanlı 3D sahne oluşturulamaz ve bileşen render edilemez.
 
-[Aksiyom 2]: Eğer `CentrifugalFanModel` bir React bileşeniyse ve props almıyorsa, bileşenin dış bağımlılıklarını (three.js sahne, kamera, ışıklandırma) kendi içinde oluşturup yönetmesi gerekir; aksi halde bileşen çalışamaz.
+[Aksiyom 2]: Eğer three.js kütüphanesi (veya kullanılan 3D renderer bağımlılığı) proje bağımlılıklarında mevcut değilse, 3D geometri ve malzeme nesneleri oluşturulamaz ve bileşen hata verir.
 
----
-
-> **Not:** Fonksiyon gövdesi (implementation) sağlanmadığı için, bileşenin iç yapısı, kullandığı three.js nesneleri, geometri türleri ve render zinciri hakkında kesin aksiyomlar üretilememektedir. Detaylı aksiyomlar için fonksiyon gövdesinin paylaşılması gereklidir.
+[Aksiyom 3]: Eğer bileşenin props olarak herhangi bir girdi almadığı doğruysa (fonksiyon imzası `() -> React.FC` şeklinde), bileşen tamamen statik bir model sunar; dışarıdan yapılandırma veya dinamik parametre ile davranış değiştirilemez.
 
 ---
 
@@ -49,59 +47,100 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca fonksiyon imz
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../core::useResolveMaterials
+- import: @react-three/fiber::useFrame
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: three::type { Group }
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: CentrifugalFanModel.tsx::CentrifugalFanModel
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials() hook'undan gelen 3D malzeme nesneleri (industrialBlue, industrialSteel, galvanizedSteel, darkGrey, motorSilver, logoRed, bladeBlack, matteBlack)
-  - `impellerRef` — useRef<Group>(null) ile oluşturulan ref; dönen impeller grubuna referans verir, useFrame içinde rotation.z ayarı için kullanılır
-  - `impellerBladeGeometry` — useMemo ile hesaplanan ExtrudeGeometry; 12 adet geriye kıvrımlı santrifüj kanatın 3D geometrisini oluşturur
-  - `scrollShape` — useMemo ile hesaplanan Shape; spiral (salyangoz) housing profilini tanımlar, extrudeGeometry ile 3D'ye dönüştürülür
-- **Dönüş**: JSX — 3D santrifüj fan modeli (motor grubu, spiral housing, dönen impeller, koruma ızgarası)
+  - `materials` — `useResolveMaterials()` hook'undan dönen malzeme nesnesi; tüm mesh'lerde `materials.industrialBlue`, `materials.darkGrey`, `materials.industrialSteel`, `materials.galvanizedSteel`, `materials.matteBlack`, `materials.motorSilver`, `materials.logoRed`, `materials.bladeBlack` olarak erişilir
+  - `impellerRef` — `useRef<Group>(null)` ile oluşturulan ref; impeller grubunun `<group ref={impellerRef}>` ile bağlanır, `useFrame` içinde `impellerRef.current.rotation.z` üzerinden döndürme animasyonu uygulanır
+  - `impellerBladeGeometry` — `useMemo` ile oluşturulan `ExtrudeGeometry`; 12 adet kanat mesh'inde `geometry={impellerBladeGeometry}` olarak kullanılır
+  - `scrollShape` — `useMemo` ile oluşturulan `Shape` nesnesi; spiral salyangoz profilini tanımlar, `scrollGeom` hesaplamasında bağımlılık olarak kullanılır
+  - `scrollGeom` — `useMemo` ile oluşturulan `ExtrudeGeometry`; `scrollShape` bağımlılığıyla hesaplanır, ana spiral gövde mesh'inde `geometry={scrollGeom}` olarak kullanılır
+  - `motorBodyGeom` — `useMemo` ile oluşturulan `CylinderGeometry(0.14, 0.14, 0.35, 32)`; motor gövdesi mesh'inde kullanılır
+  - `coolingFinGeom` — `useMemo` ile oluşturulan `BoxGeometry(0.012, 0.33, 0.32)`; 16 adet soğutma kanatı mesh'inde kullanılır
+  - `klemensBoxGeom` — `useMemo` ile oluşturulan `BoxGeometry(0.12, 0.10, 0.12)`; klemens kutusu mesh'inde kullanılır
+  - `basePlateGeom1` — `useMemo` ile oluşturulan `BoxGeometry(0.28, 0.06, 0.28)`; üst taban plakası mesh'inde kullanılır
+  - `basePlateGeom2` — `useMemo` ile oluşturulan `BoxGeometry(0.34, 0.02, 0.34)`; alt taban plakası mesh'inde kullanılır
+  - `inletCylinderGeom` — `useMemo` ile oluşturulan `CylinderGeometry(0.20, 0.18, 0.06, 64, 1, true)`; emiş ağzı silindir mesh'inde kullanılır
+  - `inletRingGeom` — `useMemo` ile oluşturulan `RingGeometry(0.18, 0.20, 64)`; emiş ağzı halka mesh'inde kullanılır
+  - `outletBoxGeom1` — `useMemo` ile oluşturulan `BoxGeometry(0.26, 0.30, 0.20)`; atış ağzı ana kutu mesh'inde kullanılır
+  - `outletBoxGeom2` — `useMemo` ile oluşturulan `BoxGeometry(0.015, 0.36, 0.24)`; atış ağzı yan kutu mesh'inde kullanılır
+  - `outletVoidGeom` — `useMemo` ile oluşturulan `BoxGeometry(0.28, 0.24, 0.16)`; çıkış boşluğu mesh'inde kullanılır
+  - `impellerHubGeom` — `useMemo` ile oluşturulan `CylinderGeometry(0.10, 0.10, 0.08, 32)`; impeller göbek mesh'inde kullanılır
+  - `logoGeom` — `useMemo` ile oluşturulan `CircleGeometry(0.05, 32)`; marka logosu mesh'inde kullanılır
+  - `torusGeoms` — `useMemo` ile oluşturulan `TorusGeometry[]` dizisi; `[0.06, 0.10, 0.14, 0.18]` yarıçaplarıyla 4 adet torus geometrisi, koruma ızgarası halkalarında kullanılır
+  - `wireGeom` — `useMemo` ile oluşturulan `BoxGeometry(0.36, 0.005, 0.005)`; koruma ızgarası tel mesh'lerinde kullanılır
+- **Dönüş**: JSX (React element — `<group>` kök elemanı)
 
 ### [N2_NASIL] AST Pointer: CentrifugalFanModel.tsx::useFrame callback
-- **params**: `state` — useFrame tarafından sağlanan frame state objesi (kullanılmıyor), `delta` — geçen süre (saniye cinsinden, rotasyon hızı hesaplamada kullanılır)
-- **ic_degiskenler**:
-  - (yok — doğrudan impellerRef.current.rotation.z üzerine yazılır)
-- **Dönüş**: yok (yan etki: impellerRef.current.rotation.z -= delta * 12 ile pervaneyi her frame döndürür)
+- **params**: `_state` (kullanılmaz), `delta` (frame'ler arası geçen süre, saniye)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok; yan etki olarak `impellerRef.current.rotation.z` değerini `delta * 12` kadar azaltır (pervaneyi döndürür)
 
 ### [N3_NASIL] AST Pointer: CentrifugalFanModel.tsx::impellerBladeGeometry useMemo callback
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `shape` — new Shape() ile oluşturulan 2D kanat profili; moveTo, quadraticCurveTo, lineTo ile dış kenardan iç kenara kıvrımlı profil çizimi
-  - `extrudeSettings` — ExtrudeGeometry için ayarlar nesnesi; depth: 0.03 (kalınlık), bevelEnabled: true, bevelThickness: 0.004, bevelSize: 0.004, bevelSegments: 1
-- **Dönüş**: ExtrudeGeometry — şekillendirilmiş 3D kanat geometrisi
+  - `shape` — `new Shape()` ile oluşturulan 2D şekil nesnesi; `moveTo(0, 0.12)` ile başlayarak iki adet `quadraticCurveTo` ve bir `lineTo` ile geriye kıvrımlı kanat profilini tanımlar
+  - `extrudeSettings` — extrüzyon ayarlarını içeren nesne; `depth: 0.03`, `bevelEnabled: true`, `bevelThickness: 0.004`, `bevelSize: 0.004`, `bevelSegments: 1` değerlerini taşır
+- **Dönüş**: `ExtrudeGeometry`
 
 ### [N4_NASIL] AST Pointer: CentrifugalFanModel.tsx::scrollShape useMemo callback
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `shape` — new Shape() ile oluşturulan 2D spiral housing profili; moveTo, lineTo, quadraticCurveTo ile salyangoz formu çizimi
-- **Dönüş**: Shape — spiral housing'in 2D profili
+  - `shape` — `new Shape()` ile oluşturulan 2D şekil nesnesi; `moveTo(0, 0.40)` ile başlayarak `lineTo` ve `quadraticCurveTo` çağrılarıyla spiral salyangoz profilini tanımlar
+- **Dönüş**: `Shape`
 
-### [N5_NASIL] AST Pointer: CentrifugalFanModel.tsx::soğutma kanatları map callback
-- **params**: `_` — doldurma elemanı (kullanılmıyor), `i` — dizi indeksi (0-15 arası, her kanat için açı hesaplamada kullanılır)
-- **ic_degiskenler**:
-  - (yok — params içindeki i kullanılır)
-- **Dönüş**: JSX mesh — tek bir soğutma kanadı; rotation [0, 0, i * (Math.PI / 8)] ile 16 kanat eşit aralıklarla yerleştirilir
+### [N5_NASIL] AST Pointer: CentrifugalFanModel.tsx::scrollGeom useMemo callback
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok; dışarıdan `scrollShape` kullanılır)
+- **Dönüş**: `ExtrudeGeometry` — `scrollShape` ve `{ depth: 0.20, bevelEnabled: false }` ayarlarıyla oluşturulur
 
-### [N6_NASIL] AST Pointer: CentrifugalFanModel.tsx::impeller kanatları map callback
-- **params**: `_` — doldurma elemanı (kullanılmıyor), `i` — dizi indeksi (0-11 arası, kanat açısını belirler)
-- **ic_degiskenler**:
-  - (yok — params içindeki i kullanılır; impellerBladeGeometry closure'dan erişilir)
-- **Dönüş**: JSX group — tek bir kanat grubu; rotation [0, 0, (i / 12) * Math.PI * 2] ile 12 kanat eşit açılarla yerleştirilir
+### [N6_NASIL] AST Pointer: CentrifugalFanModel.tsx::torusGeoms useMemo callback
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok; inline `[0.06, 0.10, 0.14, 0.18].map(r => ...)` kullanılır)
+- **Dönüş**: `TorusGeometry[]` — her eleman `new TorusGeometry(r, 0.002, 8, 64)` ile oluşturulur
 
-### [N7_NASIL] AST Pointer: CentrifugalFanModel.tsx::koruma ızgarası halka map callback
-- **params**: `r` — torus yarıçapı değeri (0.06, 0.10, 0.14 veya 0.18 — her bir halkanın yarıçapı), `i` — dizi indeksi (0-3 arası, benzersiz key üretimi için)
-- **ic_degiskenler**:
-  - (yok — params içindeki r ve i kullanılır)
-- **Dönüş**: JSX mesh — tek bir koruma halkası; torusGeometry ile r yarıçapında oluşturulur
+### [N7_NASIL] AST Pointer: CentrifugalFanModel.tsx::useEffect cleanup-returning callback
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: cleanup fonksiyonu (`() => void`) — bileşen unmount olduğunda tüm geometrilerin `.dispose()` metodunu çağırır
 
-### [N8_NASIL] AST Pointer: CentrifugalFanModel.tsx::koruma ızgarası tel map callback
-- **params**: `angle` — tel açısı derece cinsinden (0, 60, 120, 180, 240 veya 300 — her telin döndürme açısı), `i` — dizi indeksi (0-5 arası, benzersiz key üretimi için)
-- **ic_degiskenler**:
-  - (yok — params içindeki angle ve i kullanılır)
-- **Dönüş**: JSX mesh — tek bir koruma teli; rotation [0, 0, angle * Math.PI / 180] ile radyana çevrilerek yerleştirilir
+### [N8_NASIL] AST Pointer: CentrifugalFanModel.tsx::useEffect cleanup function
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok; dışarıdan `impellerBladeGeometry`, `scrollGeom`, `motorBodyGeom`, `coolingFinGeom`, `klemensBoxGeom`, `basePlateGeom1`, `basePlateGeom2`, `inletCylinderGeom`, `inletRingGeom`, `outletBoxGeom1`, `outletBoxGeom2`, `outletVoidGeom`, `impellerHubGeom`, `logoGeom`, `torusGeoms`, `wireGeom` erişilir)
+- **Dönüş**: yok; yan etki olarak tüm geometri nesnelerinin `.dispose()` metodunu çağırarak VRAM temizliği yapar, `torusGeoms` üzerinde `forEach(g => g.dispose())` uygulanır
+
+### [N9_NASIL] AST Pointer: CentrifugalFanModel.tsx::coolingFin map callback
+- **params**: `_` (kullanılmaz), `i` (dizi indeksi, 0–15)
+- **ic_degiskenler**: (yok; dışarıdan `coolingFinGeom` ve `materials.industrialBlue` kullanılır)
+- **Dönüş**: JSX — `<mesh>` elementi; `rotation={[0, 0, i * (Math.PI / 8)]}` ile her kanat 22.5° döndürülür
+
+### [N10_NASIL] AST Pointer: CentrifugalFanModel.tsx::impellerBlade map callback
+- **params**: `_` (kullanılmaz), `i` (dizi indeksi, 0–11)
+- **ic_degiskenler**: (yok; dışarıdan `impellerBladeGeometry` ve `materials.bladeBlack` kullanılır)
+- **Dönüş**: JSX — `<group>` içinde `<mesh>` elementi; `rotation={[0, 0, (i / 12) * Math.PI * 2]}` ile her kanat eşit açıyla dağıtılır
+
+### [N11_NASIL] AST Pointer: CentrifugalFanModel.tsx::torusGeoms map callback
+- **params**: `geom` (tekil `TorusGeometry` nesnesi), `i` (dizi indeksi)
+- **ic_degiskenler**: (yok; dışarıdan `materials.industrialBlue` kullanılır)
+- **Dönüş**: JSX — `<mesh>` elementi; `key={`ring-${i}`}` ile benzersiz anahtar atanır
+
+### [N12_NASIL] AST Pointer: CentrifugalFanModel.tsx::wireAngles map callback
+- **params**: `angle` (derece cinsinden açı: 0, 60, 120, 180, 240, 300), `i` (dizi indeksi)
+- **ic_degiskenler**: (yok; dışarıdan `wireGeom` ve `materials.industrialBlue` kullanılır)
+- **Dönüş**: JSX — `<mesh>` elementi; `rotation={[0, 0, angle * Math.PI / 180]}` ile radyana dönüştürülerek döndürülür, `key={`wire-${i}`}` ile benzersiz anahtar atanır
 
 ---
 

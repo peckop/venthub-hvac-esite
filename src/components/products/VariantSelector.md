@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\VariantSelector.tsx
-skeleton_hash: 2c12a4141ba254b4
+source_path: C:\tmp\vh-urun-comp\src\components\products\VariantSelector.tsx
+skeleton_hash: df7c3225eaa51cfa
 entity_hashes:
   func:VariantSelector: 68b3fbc47aea9bae
   func:distinguishingSpecKeys: 4c5d26e363ac2f9f
   func:variantLabel: 9fcdb27fbab14a2f
   overview: 0f25f2cc44902573
   style_tokens: 8ad3aed57606636f
-generated_at: 2026-08-25T08:43:54Z
+generated_at: 2026-08-27T07:32:08Z
 ---
 
 ## Genel Bakış
@@ -181,8 +181,8 @@ graph TD
     VariantSelector_tsx__VariantSelector["VariantSelector"]
     VariantSelector_tsx__distinguishingSpecKeys["distinguishingSpecKeys"]
     VariantSelector_tsx__variantLabel["variantLabel"]
-    VariantSelector_tsx__VariantSelector --> VariantSelector_tsx__variantLabel
     VariantSelector_tsx__VariantSelector --> VariantSelector_tsx__distinguishingSpecKeys
+    VariantSelector_tsx__VariantSelector --> VariantSelector_tsx__variantLabel
 ```
 
 ## NODE ID STANDARD
