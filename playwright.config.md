@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\playwright.config.ts
-skeleton_hash: c2a3f634c02b669d
+source_path: C:\tmp\vh-t088\playwright.config.ts
+skeleton_hash: a4548073e05f0914
 entity_hashes:
   overview: e72aa38ff0954fb5
-generated_at: 2026-06-19T20:51:03Z
+generated_at: 2026-08-27T13:04:03Z
 ---
 
 ## Genel Bakış

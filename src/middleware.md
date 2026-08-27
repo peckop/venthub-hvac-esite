@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\middleware.ts
-skeleton_hash: 8e898fad767b847f
+source_path: C:\tmp\vh-t088\src\middleware.ts
+skeleton_hash: 5e65c9cd5d3a2482
 entity_hashes:
-  func:detectLocale: 5c19d05a4ba76afe
-  func:middleware: 40d52344cd7722d0
+  func:detectLocale: 25418ec7d07f6d80
+  func:middleware: b40999d29f07691e
   overview: 94128ae24c53fc1c
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T13:26:07Z
 ---
 
 ## Genel Bakış
@@ -50,15 +50,14 @@ Bu modül, dil tespiti ve yönlendirme ile UUID tabanlı URL eşleme ve erişim 
 ## FONKSİYON DETAYLARI
 
 ### detectLocale
+**Ne yapar**: Gelen HTTP isteğinden kullanıcının tercih ettiği dili tespit eder ve `'tr'` ya da `'en'` olarak döndürür. Cookie öncelikli, ardından `accept-language` başlığı kontrol edilir; hiçbir eşleşme bulunamazsa varsayılan olarak Türkçe (`'tr'`) seçilir.
 
-**Ne yapar**: HTTP isteğinden kullanıcı tercihine uygun dil kodunu (`tr` veya `en`) tespit eder. Sırasıyla cookie değerini, ardından `Accept-Language` header'ını kontrol eder; hiçbir eşleşme bulunamazsa varsayılan olarak `'tr'` döner.
-
-**Nasıl yapar**: Öncelikle `NEXT_LOCALE` adlı cookie'den bir dil tercihi okumaya çalışır. Eğer cookie `'tr'` veya `'en'` değerlerinden birine sahipse doğrudan o değeri döner. Cookie'de geçerli bir değer yoksa `Accept-Language` header'ının küçük harfe çevrilmiş halinde `'en'` alt dizesi aranır; bulunursa `'en'`, aksi halde `'tr'` döner. Bu stratejiyle hem tercih bildiren hem de bildirmeyen kullanıcılar için makul bir dil belirlenir.
+**Nasıl yapar**: Önce isteğin cookie'leri arasından `NEXT_LOCALE` adlı çerezin değerini okur. Eğer bu değer `'tr'` veya `'en'` ise doğrudan o değeri döndürür. Cookie geçerli bir dil içermiyorsa, HTTP istek başlıklarından `accept-language` başlığını alır ve küçük harfe çevirerek `'en'` içerip içermediğini kontrol eder; içeriyorsa `'en'` döndürür. Hiçbir koşul sağlanmazsa varsayılan olarak `'tr'` döner.
 
 **Parametreler**:
-- `request`: NextRequest — Üzerinden cookie ve header değerlerine erişilen Next.js HTTP istek nesnesi. Fonksiyon bu nesnenin `cookies` ve `headers` API'lerini kullanarak dil bilgisini çıkarır.
+- request: NextRequest — Dil tespiti yapılacak olan gelen HTTP isteği nesnesi. Cookie ve başlık bilgilerine erişim sağlar.
 
-**Dönüş**: `string` — Tespit edilen dil kodu. Geçerli değerler `'tr'` veya `'en'` formatındadır.
+**Dönüş**: string — Tespit edilen dil kodu. `'tr'` veya `'en'` değerlerinden birini alır.
 
 ### middleware
 
@@ -87,7 +86,7 @@ Bu modül, dil tespiti ve yönlendirme ile UUID tabanlı URL eşleme ve erişim 
 ## SABİTLER
 - **config** (object) — `{
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|images|fonts|.*...`
+    '/((?!_next/static|_next/image|favicon.ico|images|fonts|...`
 - **UUID_REGEX** (regex) — `/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i`
 - **ADMIN_ROLES** (new_expression) — `new Set(['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'])`
 - **LOCALES** (as_expression) — `['tr', 'en'] as const`
@@ -97,44 +96,68 @@ Bu modül, dil tespiti ve yönlendirme ile UUID tabanlı URL eşleme ve erişim 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/middleware.ts::detectLocale
-- **params**: (request: NextRequest)
-- **ic_degiskenler**: 
-  - `cookieLocale` — `request.cookies.get('NEXT_LOCALE')?.value` ifadesinden elde edilen dil tercihi değeridir. 'tr' veya 'en' ise doğrudan kullanılır.
-  - `acceptLang` — `request.headers.get('accept-language')` header'ından gelen dil tercihi stringidir, yoksa boş string olarak alınır.
-- **Dönüş**: string (hangi dilin kullanılacağını belirler)
+- **params**: `request: NextRequest`
+- **ic_degiskenler**:
+  - `cookieLocale` — `request.cookies.get('NEXT_LOCALE')?.value` ile alınan çerez değeri; `'tr'` veya `'en'` ise doğrudan döndürülür
+  - `acceptLang` — `request.headers.get('accept-language') || ''` ile alınan Accept-Language başlığı; `'en'` içeriyorsa `'en'` döndürülür
+- **Dönüş**: `string` — `'tr'` veya `'en'`
 
 ### [N2_NASIL] AST Pointer: src/middleware.ts::middleware
-- **params**: (request: NextRequest)
-- **ic_degiskenler**: 
-  - `host` — `request.headers.get('host')` ifadesinden alınan HTTP host header'ı, tenant çözümleme için kullanılır.
-  - `tenantId` — `resolveTenant(host)` çağrısı ile elde edilen kiracı identifier'ı, istek header'ına ve cookie'ye eklenir.
-  - `response` — `NextResponse.next()` ile oluşturulan temel yanıt nesnesi, middleware süreç boyunca modificar edilir.
-  - `setTenantCookie` — Inner function, `response` nesnesine `tenant_id` cookie'sini ekler ve yanıt döner.
-  - `redirectResponse` — Inner function, `createRedirectResponse` kullanarak yönlendirme yanıtını oluşturur, önce `setTenantCookie` çağırır.
-  - `pathname` — `request.nextUrl.pathname` ifadesinden alınan isteğin URL path'i, yönlendirme mantığında kullanılır.
-  - `segments` — `pathname.split('/').filter(Boolean)` ile oluşturulmuş path segmentleri dizisi.
-  - `firstSegment` — `segments[0]` ifadesinden elde edilen ilk path segmenti, dil kontrolü ve yönlendirme için kullanılır.
-  - `locale` — Varsayılan dil (`DEFAULT_LOCALE`) olarak başlatılır, path'te dil belirtilmişse güncellenir.
-  - `effectiveSegments` — `segments` dizisinin kopyası, dil segmenti kaldırılmış hali (gerekirse).
-  - `isLocaleInPath` — `firstSegment`'in `LOCALES` dizisi içinde olup olmadığını kontrol eden boolean.
-  - `isAuthApi` — `auth/callback` veya `auth/signout` rotası olup olmadığını belirleyen boolean.
-  - `isSpecialRoute` — `admin`, `api`, auth API'leri veya statik dosyalar (sitemap.xml, robots.txt) için boolean.
-  - `detectedLocale` — `detectLocale(request)` çağrısı ile tespit edilen dil, locale enjeksiyonu için kullanılır.
-  - `supabaseUrl` — `process.env.NEXT_PUBLIC_SUPABASE_URL` ortam değişkeninden alınan Supabase URL'i.
-  - `anonKey` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` ortam değişkeninden alınan Supabase anonim anahtarı.
-  - `identifier` — `effectiveSegments[1]` ifadesinden elde edilen ürün identifikatörü (UUID kontrolü yapılır).
-  - `data` — Supabase `products` tablosundan `slug` alanını seçen sorgudan dönen veri (UUID→SEO slug yönlendirmesi için).
-  - `error` — UUID slug lookup sırasında oluşan hata, yakalanıp loglanır.
-  - `isDev` — `process.env.NODE_ENV === 'development'` kontrolünden elde edilen boolean.
-  - `isLocalhost` — `host`'un `localhost` veya `127.0.0.1` ile başlayıp başlamadığını kontrol eden boolean.
-  - `secret` — `process.env.JWT_CLAIMS_COOKIE_SECRET` veya `anonKey` kullanılarak oluşturulan JWT gizli anahtarı.
-  - `claims` — `resolveUserClaims()` çağrısı ile elde edilen kullanıcı claim'leri (role bilgisi içerir).
-  - `error` — `resolveUserClaims()` çağrısından dönen hata nesnesi.
-  - `jwtRole` — `claims?.user_role` ifadesinden elde edilen kullanıcı rolü (string veya undefined).
-  - `roleString` — `jwtRole`'ün string olduğundan emin olmak için dönüştürülmüş hali.
-  - `loginUrl` — Yetki hatası durumunda yönlendirilecek giriş sayfası URL'i.
-  - `homeUrl` — Yetkisiz erişim durumunda yönlendirilecek ana sayfa URL'i.
-- **Dönüş**: yok (NextResponse nesnesi yan etki olarak döner)
+- **params**: `request: NextRequest`
+- **ic_degiskenler**:
+  - `host` — `request.headers.get('host') || ''` ile alınan Host başlığı; kiracı çözümleme ve localhost kontrolü için kullanılır
+  - `tenantId` — `resolveTenant(host)` çağrısından dönen kiracı kimliği; `x-tenant-id` başlığına ve `tenant_id` çerezine yazılır
+  - `response` — `NextResponse.next({ request: { headers: request.headers } })` ile oluşturulan temel yanıt nesnesi; çerez ve başlık eklemelerinde kullanılır
+  - `setTenantCookie` — `(res: NextResponse) => NextResponse` tipinde iç fonksiyon; verilen yanıt nesnesine `tenant_id` çrezi ekler (`path: '/'`, `sameSite: 'lax'`, `secure` ortama bağlı)
+  - `redirectResponse` — `(url: URL | string, status: number) => NextResponse` tipinde iç fonksiyon; önce `setTenantCookie` çağırır, ardından `createRedirectResponse` ile yönlendirme yanıtı üretir
+  - `pathname` — `request.nextUrl.pathname` ile alınan URL yolu
+  - `segments` — `pathname.split('/').filter(Boolean)` ile elde edilen yol parçaları dizisi
+  - `firstSegment` — `segments[0]` ile alınan ilk yol parçası
+  - `locale` — dil değişkeni; `DEFAULT_LOCALE` ile başlatılır, yol içinde dil öneki varsa `firstSegment` atanır
+  - `effectiveSegments` — `[...segments]` ile oluşturulan kopya dizi; dil öneki varsa `segments.slice(1)` atanır
+  - `isLocaleInPath` — `LOCALES.includes(firstSegment)` ile hesaplanan boolean; yolun geçerli bir dil öneki içerip içermediğini belirtir
+  - `isAuthApi` — `firstSegment === 'auth' && (segments[1] === 'callback' || segments[1] === 'signout')` koşulu; auth API rotalarını tanımlar
+  - `isSpecialRoute` — `firstSegment === 'admin' || firstSegment === 'api' || isAuthApi || pathname.endsWith('sitemap.xml') || pathname.endsWith('robots.txt')` koşulu; dil yönlendirmesi atlanacak özel rotaları belirtir
+  - `detectedLocale` — `detectLocale(request)` çağrısından dönen dil değeri; dil öneki olmayan rotalarda yönlendirme için kullanılır
+  - `url` — `request.nextUrl.clone()` ile oluşturulan klonlanmış URL nesnesi; yönlendirme hedefi olarak kullanılır (birden fazla yerde yeniden atanır)
+  - `supabaseUrl` — `process.env.NEXT_PUBLIC_SUPABASE_URL!` ile alınan Supabase proje URL'si
+  - `anonKey` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!` ile alınan anonim anahtar
+  - `identifier` — `effectiveSegments[1]` ile alınan ürün tanımlayıcısı; UUID ise slug'a yönlendirme yapılır
+  - `supabase` — `createServerClient(supabaseUrl, anonKey, { cookies: { getAll, setAll } })` ile oluşturulan Supabase istemcisi; cookie yönetimi `request.cookies` ve `response` üzerinden yapılır
+  - `data` — `supabase.from('products').select('slug').eq('id', identifier).single()` sorgusundan dönen veri; `data?.slug` varsa 308 yönlendirmesi yapılır
+  - `isDev` — `process.env.NODE_ENV === 'development'` kontrolü
+  - `isLocalhost` — `host.startsWith('localhost') || host.startsWith('127.0.0.1')` kontrolü; yerel geliştirme ortamında auth bypass için kullanılır
+  - `claimsSecret` — `process.env.JWT_CLAIMS_COOKIE_SECRET` ile alınan JWT çerez sırrı; üretim ortamında tanımlı değilse admin erişimi reddedilir (fail-closed)
+  - `secret` — `claimsSecret || 'dev-only-insecure-claims-cache-key'` ile belirlenen nihai sır; `resolveUserClaims`'e iletilir
+  - `claims` — `resolveUserClaims(request, response, supabase, secret)` çağrısından dönen kullanıcı talepleri nesnesi
+  - `error` — `resolveUserClaims` çağrısından dönen hata; varsa login sayfasına `reason=expired` parametresiyle yönlendirilir
+  - `jwtRole` — `claims?.user_role` ile alınan kullanıcı rolü değeri
+  - `roleString` — `typeof jwtRole === 'string' ? jwtRole : ''` ile elde edilen rol dizesi; `ADMIN_ROLES` setinde kontrol edilir
+  - `loginUrl` — `request.nextUrl.clone()` ile oluşturulan giriş sayfası URL'si; `/{detectedLocale}/auth/login` yoluna `from` ve opsiyonel `reason` parametreleri eklenir
+  - `detectedLocale` — admin rotasında `detectLocale(request)` ile algılanan dil; login yönlendirmesi için kullanılır
+  - `homeUrl` — `request.nextUrl.clone()` ile oluşturulan ana sayfa URL'si; yetkisiz erişimde `'/'` yoluna `auth_error=unauthorized` parametresi eklenir
+  - `misconfigUrl` — `request.nextUrl.clone()` ile oluşturulan yapılandırma hatası URL'si; `'/'` yoluna `auth_error=server_misconfigured` parametresi eklenir
+- **Dönüş**: yok — yan etkilerle çalışır: `response` nesnesine çerezler ve başlıklar ekler, `NextResponse.redirect` döndürür veya `setTenantCookie(response)` ile devam eder
+
+### [N3_NASIL] AST Pointer: src/middleware.ts::setAll (UUID→Slug bloğundaki Supabase cookie callback)
+- **params**: `cookiesToSet`, `headers`
+- **ic_degiskenler**:
+  - `name` — `cookiesToSet.forEach` içindeki her çerez nesnesinin adı
+  - `value` — `cookiesToSet.forEach` içindeki her çerez nesnesinin değeri
+  - `options` — `cookiesToSet.forEach` içindeki her çerez nesnesinin seçenekleri
+  - `key` — `Object.entries(headers)` içindeki başlık anahtarı
+  - `value` — `Object.entries(headers)` içindeki başlık değeri
+- **Dönüş**: yok — `request.cookies` ve `response` nesneleri üzerinde çerez/başlık eklemesi yapar
+
+### [N4_NASIL] AST Pointer: src/middleware.ts::setAll (Admin RBAC bloğundaki Supabase cookie callback)
+- **params**: `cookiesToSet`, `headers`
+- **ic_degiskenler**:
+  - `name` — `cookiesToSet.forEach` içindeki her çerez nesnesinin adı
+  - `value` — `cookiesToSet.forEach` içindeki her çerez nesnesinin değeri
+  - `options` — `cookiesToSet.forEach` içindeki her çerez nesnesinin seçenekleri
+  - `key` — `Object.entries(headers)` içindeki başlık anahtarı
+  - `value` — `Object.entries(headers)` içindeki başlık değeri
+- **Dönüş**: yok — `request.cookies` ve `response` nesneleri üzerinde çerez/başlık eklemesi yapar
 
 ---
 

@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T13:08:47.033419+00:00
-total_compiled_files: 655
-source_commit: 582e5eb5
+compiled_at: 2026-08-27T13:35:59.642418+00:00
+total_compiled_files: 656
+source_commit: 49945b8f
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T13:08:47.033419+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T13:35:59.642418+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -19,13 +19,13 @@ Bu belge, otonom derleyici tarafından 2026-08-27T13:08:47.033419+00:00 tarihind
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\middleware.ts
-skeleton_hash: 8e898fad767b847f
+source_path: C:\tmp\vh-t088\src\middleware.ts
+skeleton_hash: 5e65c9cd5d3a2482
 entity_hashes:
-  func:detectLocale: 5c19d05a4ba76afe
-  func:middleware: 40d52344cd7722d0
+  func:detectLocale: 25418ec7d07f6d80
+  func:middleware: b40999d29f07691e
   overview: 94128ae24c53fc1c
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T13:26:07Z
 ---
 
 ## Genel Bakış
@@ -67,15 +67,14 @@ Bu modül, dil tespiti ve yönlendirme ile UUID tabanlı URL eşleme ve erişim 
 ## FONKSİYON DETAYLARI
 
 ### detectLocale
+**Ne yapar**: Gelen HTTP isteğinden kullanıcının tercih ettiği dili tespit eder ve `'tr'` ya da `'en'` olarak döndürür. Cookie öncelikli, ardından `accept-language` başlığı kontrol edilir; hiçbir eşleşme bulunamazsa varsayılan olarak Türkçe (`'tr'`) seçilir.
 
-**Ne yapar**: HTTP isteğinden kullanıcı tercihine uygun dil kodunu (`tr` veya `en`) tespit eder. Sırasıyla cookie değerini, ardından `Accept-Language` header'ını kontrol eder; hiçbir eşleşme bulunamazsa varsayılan olarak `'tr'` döner.
-
-**Nasıl yapar**: Öncelikle `NEXT_LOCALE` adlı cookie'den bir dil tercihi okumaya çalışır. Eğer cookie `'tr'` veya `'en'` değerlerinden birine sahipse doğrudan o değeri döner. Cookie'de geçerli bir değer yoksa `Accept-Language` header'ının küçük harfe çevrilmiş halinde `'en'` alt dizesi aranır; bulunursa `'en'`, aksi halde `'tr'` döner. Bu stratejiyle hem tercih bildiren hem de bildirmeyen kullanıcılar için makul bir dil belirlenir.
+**Nasıl yapar**: Önce isteğin cookie'leri arasından `NEXT_LOCALE` adlı çerezin değerini okur. Eğer bu değer `'tr'` veya `'en'` ise doğrudan o değeri döndürür. Cookie geçerli bir dil içermiyorsa, HTTP istek başlıklarından `accept-language` başlığını alır ve küçük harfe çevirerek `'en'` içerip içermediğini kontrol eder; içeriyorsa `'en'` döndürür. Hiçbir koşul sağlanmazsa varsayılan olarak `'tr'` döner.
 
 **Parametreler**:
-- `request`: NextRequest — Üzerinden cookie ve header değerlerine erişilen Next.js HTTP istek nesnesi. Fonksiyon bu nesnenin `cookies` ve `headers` API'lerini kullanarak dil bilgisini çıkarır.
+- request: NextRequest — Dil tespiti yapılacak olan gelen HTTP isteği nesnesi. Cookie ve başlık bilgilerine erişim sağlar.
 
-**Dönüş**: `string` — Tespit edilen dil kodu. Geçerli değerler `'tr'` veya `'en'` formatındadır.
+**Dönüş**: string — Tespit edilen dil kodu. `'tr'` veya `'en'` değerlerinden birini alır.
 
 ### middleware
 
@@ -104,7 +103,7 @@ Bu modül, dil tespiti ve yönlendirme ile UUID tabanlı URL eşleme ve erişim 
 ## SABİTLER
 - **config** (object) — `{
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|images|fonts|.*...`
+    '/((?!_next/static|_next/image|favicon.ico|images|fonts|...`
 - **UUID_REGEX** (regex) — `/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i`
 - **ADMIN_ROLES** (new_expression) — `new Set(['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'])`
 - **LOCALES** (as_expression) — `['tr', 'en'] as const`
@@ -114,44 +113,68 @@ Bu modül, dil tespiti ve yönlendirme ile UUID tabanlı URL eşleme ve erişim 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/middleware.ts::detectLocale
-- **params**: (request: NextRequest)
-- **ic_degiskenler**: 
-  - `cookieLocale` — `request.cookies.get('NEXT_LOCALE')?.value` ifadesinden elde edilen dil tercihi değeridir. 'tr' veya 'en' ise doğrudan kullanılır.
-  - `acceptLang` — `request.headers.get('accept-language')` header'ından gelen dil tercihi stringidir, yoksa boş string olarak alınır.
-- **Dönüş**: string (hangi dilin kullanılacağını belirler)
+- **params**: `request: NextRequest`
+- **ic_degiskenler**:
+  - `cookieLocale` — `request.cookies.get('NEXT_LOCALE')?.value` ile alınan çerez değeri; `'tr'` veya `'en'` ise doğrudan döndürülür
+  - `acceptLang` — `request.headers.get('accept-language') || ''` ile alınan Accept-Language başlığı; `'en'` içeriyorsa `'en'` döndürülür
+- **Dönüş**: `string` — `'tr'` veya `'en'`
 
 ### [N2_NASIL] AST Pointer: src/middleware.ts::middleware
-- **params**: (request: NextRequest)
-- **ic_degiskenler**: 
-  - `host` — `request.headers.get('host')` ifadesinden alınan HTTP host header'ı, tenant çözümleme için kullanılır.
-  - `tenantId` — `resolveTenant(host)` çağrısı ile elde edilen kiracı identifier'ı, istek header'ına ve cookie'ye eklenir.
-  - `response` — `NextResponse.next()` ile oluşturulan temel yanıt nesnesi, middleware süreç boyunca modificar edilir.
-  - `setTenantCookie` — Inner function, `response` nesnesine `tenant_id` cookie'sini ekler ve yanıt döner.
-  - `redirectResponse` — Inner function, `createRedirectResponse` kullanarak yönlendirme yanıtını oluşturur, önce `setTenantCookie` çağırır.
-  - `pathname` — `request.nextUrl.pathname` ifadesinden alınan isteğin URL path'i, yönlendirme mantığında kullanılır.
-  - `segments` — `pathname.split('/').filter(Boolean)` ile oluşturulmuş path segmentleri dizisi.
-  - `firstSegment` — `segments[0]` ifadesinden elde edilen ilk path segmenti, dil kontrolü ve yönlendirme için kullanılır.
-  - `locale` — Varsayılan dil (`DEFAULT_LOCALE`) olarak başlatılır, path'te dil belirtilmişse güncellenir.
-  - `effectiveSegments` — `segments` dizisinin kopyası, dil segmenti kaldırılmış hali (gerekirse).
-  - `isLocaleInPath` — `firstSegment`'in `LOCALES` dizisi içinde olup olmadığını kontrol eden boolean.
-  - `isAuthApi` — `auth/callback` veya `auth/signout` rotası olup olmadığını belirleyen boolean.
-  - `isSpecialRoute` — `admin`, `api`, auth API'leri veya statik dosyalar (sitemap.xml, robots.txt) için boolean.
-  - `detectedLocale` — `detectLocale(request)` çağrısı ile tespit edilen dil, locale enjeksiyonu için kullanılır.
-  - `supabaseUrl` — `process.env.NEXT_PUBLIC_SUPABASE_URL` ortam değişkeninden alınan Supabase URL'i.
-  - `anonKey` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` ortam değişkeninden alınan Supabase anonim anahtarı.
-  - `identifier` — `effectiveSegments[1]` ifadesinden elde edilen ürün identifikatörü (UUID kontrolü yapılır).
-  - `data` — Supabase `products` tablosundan `slug` alanını seçen sorgudan dönen veri (UUID→SEO slug yönlendirmesi için).
-  - `error` — UUID slug lookup sırasında oluşan hata, yakalanıp loglanır.
-  - `isDev` — `process.env.NODE_ENV === 'development'` kontrolünden elde edilen boolean.
-  - `isLocalhost` — `host`'un `localhost` veya `127.0.0.1` ile başlayıp başlamadığını kontrol eden boolean.
-  - `secret` — `process.env.JWT_CLAIMS_COOKIE_SECRET` veya `anonKey` kullanılarak oluşturulan JWT gizli anahtarı.
-  - `claims` — `resolveUserClaims()` çağrısı ile elde edilen kullanıcı claim'leri (role bilgisi içerir).
-  - `error` — `resolveUserClaims()` çağrısından dönen hata nesnesi.
-  - `jwtRole` — `claims?.user_role` ifadesinden elde edilen kullanıcı rolü (string veya undefined).
-  - `roleString` — `jwtRole`'ün string olduğundan emin olmak için dönüştürülmüş hali.
-  - `loginUrl` — Yetki hatası durumunda yönlendirilecek giriş sayfası URL'i.
-  - `homeUrl` — Yetkisiz erişim durumunda yönlendirilecek ana sayfa URL'i.
-- **Dönüş**: yok (NextResponse nesnesi yan etki olarak döner)
+- **params**: `request: NextRequest`
+- **ic_degiskenler**:
+  - `host` — `request.headers.get('host') || ''` ile alınan Host başlığı; kiracı çözümleme ve localhost kontrolü için kullanılır
+  - `tenantId` — `resolveTenant(host)` çağrısından dönen kiracı kimliği; `x-tenant-id` başlığına ve `tenant_id` çerezine yazılır
+  - `response` — `NextResponse.next({ request: { headers: request.headers } })` ile oluşturulan temel yanıt nesnesi; çerez ve başlık eklemelerinde kullanılır
+  - `setTenantCookie` — `(res: NextResponse) => NextResponse` tipinde iç fonksiyon; verilen yanıt nesnesine `tenant_id` çrezi ekler (`path: '/'`, `sameSite: 'lax'`, `secure` ortama bağlı)
+  - `redirectResponse` — `(url: URL | string, status: number) => NextResponse` tipinde iç fonksiyon; önce `setTenantCookie` çağırır, ardından `createRedirectResponse` ile yönlendirme yanıtı üretir
+  - `pathname` — `request.nextUrl.pathname` ile alınan URL yolu
+  - `segments` — `pathname.split('/').filter(Boolean)` ile elde edilen yol parçaları dizisi
+  - `firstSegment` — `segments[0]` ile alınan ilk yol parçası
+  - `locale` — dil değişkeni; `DEFAULT_LOCALE` ile başlatılır, yol içinde dil öneki varsa `firstSegment` atanır
+  - `effectiveSegments` — `[...segments]` ile oluşturulan kopya dizi; dil öneki varsa `segments.slice(1)` atanır
+  - `isLocaleInPath` — `LOCALES.includes(firstSegment)` ile hesaplanan boolean; yolun geçerli bir dil öneki içerip içermediğini belirtir
+  - `isAuthApi` — `firstSegment === 'auth' && (segments[1] === 'callback' || segments[1] === 'signout')` koşulu; auth API rotalarını tanımlar
+  - `isSpecialRoute` — `firstSegment === 'admin' || firstSegment === 'api' || isAuthApi || pathname.endsWith('sitemap.xml') || pathname.endsWith('robots.txt')` koşulu; dil yönlendirmesi atlanacak özel rotaları belirtir
+  - `detectedLocale` — `detectLocale(request)` çağrısından dönen dil değeri; dil öneki olmayan rotalarda yönlendirme için kullanılır
+  - `url` — `request.nextUrl.clone()` ile oluşturulan klonlanmış URL nesnesi; yönlendirme hedefi olarak kullanılır (birden fazla yerde yeniden atanır)
+  - `supabaseUrl` — `process.env.NEXT_PUBLIC_SUPABASE_URL!` ile alınan Supabase proje URL'si
+  - `anonKey` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!` ile alınan anonim anahtar
+  - `identifier` — `effectiveSegments[1]` ile alınan ürün tanımlayıcısı; UUID ise slug'a yönlendirme yapılır
+  - `supabase` — `createServerClient(supabaseUrl, anonKey, { cookies: { getAll, setAll } })` ile oluşturulan Supabase istemcisi; cookie yönetimi `request.cookies` ve `response` üzerinden yapılır
+  - `data` — `supabase.from('products').select('slug').eq('id', identifier).single()` sorgusundan dönen veri; `data?.slug` varsa 308 yönlendirmesi yapılır
+  - `isDev` — `process.env.NODE_ENV === 'development'` kontrolü
+  - `isLocalhost` — `host.startsWith('localhost') || host.startsWith('127.0.0.1')` kontrolü; yerel geliştirme ortamında auth bypass için kullanılır
+  - `claimsSecret` — `process.env.JWT_CLAIMS_COOKIE_SECRET` ile alınan JWT çerez sırrı; üretim ortamında tanımlı değilse admin erişimi reddedilir (fail-closed)
+  - `secret` — `claimsSecret || 'dev-only-insecure-claims-cache-key'` ile belirlenen nihai sır; `resolveUserClaims`'e iletilir
+  - `claims` — `resolveUserClaims(request, response, supabase, secret)` çağrısından dönen kullanıcı talepleri nesnesi
+  - `error` — `resolveUserClaims` çağrısından dönen hata; varsa login sayfasına `reason=expired` parametresiyle yönlendirilir
+  - `jwtRole` — `claims?.user_role` ile alınan kullanıcı rolü değeri
+  - `roleString` — `typeof jwtRole === 'string' ? jwtRole : ''` ile elde edilen rol dizesi; `ADMIN_ROLES` setinde kontrol edilir
+  - `loginUrl` — `request.nextUrl.clone()` ile oluşturulan giriş sayfası URL'si; `/{detectedLocale}/auth/login` yoluna `from` ve opsiyonel `reason` parametreleri eklenir
+  - `detectedLocale` — admin rotasında `detectLocale(request)` ile algılanan dil; login yönlendirmesi için kullanılır
+  - `homeUrl` — `request.nextUrl.clone()` ile oluşturulan ana sayfa URL'si; yetkisiz erişimde `'/'` yoluna `auth_error=unauthorized` parametresi eklenir
+  - `misconfigUrl` — `request.nextUrl.clone()` ile oluşturulan yapılandırma hatası URL'si; `'/'` yoluna `auth_error=server_misconfigured` parametresi eklenir
+- **Dönüş**: yok — yan etkilerle çalışır: `response` nesnesine çerezler ve başlıklar ekler, `NextResponse.redirect` döndürür veya `setTenantCookie(response)` ile devam eder
+
+### [N3_NASIL] AST Pointer: src/middleware.ts::setAll (UUID→Slug bloğundaki Supabase cookie callback)
+- **params**: `cookiesToSet`, `headers`
+- **ic_degiskenler**:
+  - `name` — `cookiesToSet.forEach` içindeki her çerez nesnesinin adı
+  - `value` — `cookiesToSet.forEach` içindeki her çerez nesnesinin değeri
+  - `options` — `cookiesToSet.forEach` içindeki her çerez nesnesinin seçenekleri
+  - `key` — `Object.entries(headers)` içindeki başlık anahtarı
+  - `value` — `Object.entries(headers)` içindeki başlık değeri
+- **Dönüş**: yok — `request.cookies` ve `response` nesneleri üzerinde çerez/başlık eklemesi yapar
+
+### [N4_NASIL] AST Pointer: src/middleware.ts::setAll (Admin RBAC bloğundaki Supabase cookie callback)
+- **params**: `cookiesToSet`, `headers`
+- **ic_degiskenler**:
+  - `name` — `cookiesToSet.forEach` içindeki her çerez nesnesinin adı
+  - `value` — `cookiesToSet.forEach` içindeki her çerez nesnesinin değeri
+  - `options` — `cookiesToSet.forEach` içindeki her çerez nesnesinin seçenekleri
+  - `key` — `Object.entries(headers)` içindeki başlık anahtarı
+  - `value` — `Object.entries(headers)` içindeki başlık değeri
+- **Dönüş**: yok — `request.cookies` ve `response` nesneleri üzerinde çerez/başlık eklemesi yapar
 
 ---
 
@@ -10829,44 +10852,41 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\Footer.tsx
-skeleton_hash: b13b185bbf96a807
+source_path: C:\tmp\vh-t088\src\components\Footer.tsx
+skeleton_hash: 9e3c24656b757e33
 entity_hashes:
   func:Footer: 1e0192e85e1f6373
   overview: a3368ce4cddcd9ef
   style_tokens: 266d0ec5d4b33045
-generated_at: 2026-08-27T07:54:41Z
+generated_at: 2026-08-27T13:06:02Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın altbilgi (footer) bölümünü oluşturan React fonksiyonel bileşenini tanımlar. Bileşen, çeviri desteğiyle birlikte telif hakkı metni, kategori bağlantıları ve diğer altbilgi öğelerini render eder. Kategori verisini `CategoryContext`'ten, metinleri ise `I18nProvider`'dan alır.
+Bu modül, uygulamanın alt kısmında görünecek olan Footer bileşenini tanımlar. Tek bir fonksiyonel bileşen olarak uygulanmış olup, uluslararasılaştırma desteği, kategori verileri ve yönlendirme bilgileriyle birlikte altbilgi içeriğini render eder.
 
 ## Fonksiyon Grupları
 ### Bileşen Tanımı
-Uygulamanın altbilgi bölümünü render etmekten sorumludur. `useCategories` ve `useI18n` hook'larından aldığı verileri kullanarak, `mainCategories` gibi memoize edilmiş türev veriler üretir ve bunları JSX içinde sayfa düzenine dönüştürür.
+Footer bileşeninin oluşturulması ve dışa aktarılması sorumluluğundadır. Uluslararasılaştırma hook'u ile çeviri desteği sağlar, kategori context'inden veri çeker ve Next.js Link bileşenini kullanarak yönlendirmeleri yönetir.
 - Footer
 
 ## Bağımlılıklar
-**Dış Bağımlılıklar:**
-- `CategoryContext` — `useCategories` hook'u aracılığıyla global kategori listesini sağlar.
-- `I18nProvider` — `useI18n` hook'u aracılığıyla çeviri fonksiyonu `t` nesnesini sağlar.
-- `Routes` — Sayfa yönlendirme bağlantıları için kullanılır.
-- `BuildTag` — Yapı bilgisi etiketi olarak altbilgiye eklenir.
-- `Link` (next/link) — Next.js bağlantı bileşeni olarak kullanılır.
-- `React` — Temel React bağımlılığı.
+### Dış Bağımlılıklar
+- `useCategories` — CategoryContext'ten alınan kategori verileri, footer içindeki kategori listesi ve bölümlerde kaynak olarak kullanılır
+- `useI18n` — I18nProvider'dan gelen `t` çeviri fonksiyonu, footer üzerindeki tüm metinlerin uluslararasılaştırılması için kullanılır
+- `Routes` — utils/routes modülünden alınan yönlendirme tanımları
+- `Link` — Next.js bağlantı bileşeni
+- `React` — temel React kütüphanesi
 
-**Dinamik/Lazy Yüklenen Modül:**
-Bilgi yok — mevcut kaynakta bu tür bir yükleme stratejisine dair bir işaret bulunmuyor.
+### İç Bağımlılıklar
+- `BuildTag` — footer içinde kullanılan alt bileşen
 
-## Mimari Notlar
-- Modül tek bir fonksiyonel bileşenden oluşur; sunum katmanında yer alan basit bir UI bileşenidir.
-- `mainCategories` değişkeni `React.useMemo` ile memoize edilmiştir; bu, üst bileşenin her render'ında kategori listesinin yeniden hesaplanmasını önler.
-- Çeviri ve kategori verisi doğrudan context hook'larından çekilir; bileşen kendi başına veri üretmez veya depolamaz.
+### Mimari Notlar
+- Dinamik veya lazy yükleme bilgisi mevcut değil
+- `mainCategories` değişkeni `React.useMemo` ile memoize edilmiş olup `parent_id` alanına göre filtrelenmiş kategorileri tutar; bu sayede gereksiz yeniden render'lar önlenir
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
 Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
@@ -10898,30 +10918,35 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### [N1_NASIL] AST Pointer: src/components/Footer.tsx::Footer
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; metinleri anahtarla çağırmak için kullanılır
-  - `lang` — `useI18n()` hook'undan dönen geçerli dil kodu; `getLocalizedCategorySlug` fonksiyonuna iletilir
-  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rotalar objesi; `Routes.home()`, `Routes.products()`, `Routes.brands()`, `Routes.about()`, `Routes.contact()`, `Routes.destek.home()`, `Routes.destek.sss()`, `Routes.destek.iadeDegisim()`, `Routes.destek.teslimatKargo()`, `Routes.destek.garantiServis()`, `Routes.category()`, `Routes.legal.kvkk()`, `Routes.legal.mesafeliSatis()`, `Routes.legal.onBilgilendirme()`, `Routes.legal.cerez()`, `Routes.legal.gizlilik()`, `Routes.legal.kullanimKosullari()` metotları çağrılarak Link bileşenlerinin href'leri oluşturulur
-  - `globalCategories` — `useCategories()` hook'undan destructure edilen kategori dizisi; `mainCategories` hesaplamasında filtrelenmek üzere kullanılır
-  - `mainCategories` — `React.useMemo` ile hesaplanan, `globalCategories` dizisinden `parent_id` değeri olmayan kategorilerin ilk 8 tanesi; kategori bölümünde `.slice(0, 6)` ile altı tanesi listelenir
-  - `FOOTER_ICON_ADDRESS` — adres ikonu JSX'i; iletişim bölümünde adres satırının solunda gösterilir
-  - `FOOTER_ICON_PHONE` — telefon ikonu JSX'i; iletişim bölümünde telefon satırının solunda gösterilir
-  - `FOOTER_ICON_MAIL` — e-posta ikonu JSX'i; iletişim bölümünde e-posta satırının solunda gösterilir
-  - `WEEKDAY_HOURS` — hafta içi çalışma saatleri metni; çalışma saatleri kutusunda gösterilir
-  - `SATURDAY_HOURS` — cumartesi çalışma saatleri metni; çalışma saatleri kutusunda gösterilir
-  - `HVAC_SUFFIX` — alt bilgi bandında telif hakkı satırında marka adından sonra eklenen sonek metin
-- **Dönüş**: JSX — `<footer>` elementi; şirket bilgisi, hızlı bağlantılar, kategoriler, iletişim bilgileri ve alt bilgi bandı içeren responsive footer düzeni
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu, footer metinlerini yerelleştirmek için kullanılır
+  - `lang` — useI18n hook'undan dönen dil kodu, kategori slug'larının yerelleştirilmesinde kullanılır
+  - `Routes` — useLocalizedRoutes hook'undan dönen rotalar objesi; Routes.home(), Routes.products(), Routes.brands(), Routes.about(), Routes.contact(), Routes.destek.home(), Routes.destek.sss(), Routes.destek.iadeDegisim(), Routes.destek.teslimatKargo(), Routes.destek.garantiServis(), Routes.category(), Routes.legal.kvkk(), Routes.legal.mesafeliSatis(), Routes.legal.onBilgilendirme(), Routes.legal.cerez(), Routes.legal.gizlilik(), Routes.legal.kullanimKosullari() metodları Link href'lerinde kullanılır
+  - `globalCategories` — useCategories hook'undan destructure edilen kategoriler dizisi (`categories` olarak alınıp `globalCategories` adıyla kullanılır)
+  - `mainCategories` — useMemo ile hesaplanan, parent_id'si olmayan üst kategorilerin ilk 8 tanesi; kategori listesi bölümünde .slice(0, 6) ile ilk 6'sı render edilir
+  - `FOOTER_ICON_ADDRESS` — adres ikonu, iletişim bilgileri bölümünde kullanılır
+  - `FOOTER_ICON_PHONE` — telefon ikonu, iletişim bilgileri bölümünde kullanılır
+  - `FOOTER_ICON_MAIL` — e-posta ikonu, iletişim bilgileri bölümünde kullanılır
+  - `WEEKDAY_HOURS` — hafta içi çalışma saatleri metni, çalışma saatleri kutusunda kullanılır
+  - `SATURDAY_HOURS` — cumartesi çalışma saatleri metni, çalışma saatleri kutusunda kullanılır
+  - `HVAC_SUFFIX` — telif hakkı satırında `new Date().getFullYear()` ile birlikte kullanılan son ek metni
+- **Dönüş**: React.FC (footer JSX elementi)
 
 ### [N2_NASIL] AST Pointer: src/components/Footer.tsx::useMemo callback
-- **params**: (parametre yok; `globalCategories` dış kapsamdan erişilir)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `c` — `.filter()` callback parametresi; her bir kategori nesnesini temsil eder, `c.parent_id` değeri falsy olanlar (ana kategoriler) tutulur
-- **Dönüş**: Dizi — `parent_id` değeri olmayan kategorilerin en fazla 8 tanesi
+  - `c` — globalCategories dizisindeki her bir kategori objesi; `c.parent_id` değeri falsy olanlar filtrelenir
+- **Dönüş**: Kategori dizisi (parent_id'si olmayan ilk 8 kategori)
 
-### [N3_NASIL] AST Pointer: src/components/Footer.tsx::map callback (kategoriler)
-- **params**:
-  - `category` — dizideki tek bir kategori nesnesi; `category.slug` anahtar olarak, `getLocalizedCategorySlug(category, lang)` ile yerelleştirilmiş slug, `getCategoryDisplayName(category, t)` ile görünen ad elde edilir
-- **ic_degiskenler**: (yok; `category` doğrudan JSX'te kullanılır)
-- **Dönüş**: JSX — `<li>` elementi içinde `<Link>` bileşeni; `Routes.category()` ile kategori sayfasına yönlendirme sağlar
+### [N3_NASIL] AST Pointer: src/components/Footer.tsx::map callback
+- **params**: `category` — mainCategories.slice(0, 6) dizisindeki her bir kategori objesi
+- **ic_degiskenler**:
+  - `category.slug` — kategorinin benzersiz slug'ı, li elementinin key prop'u olarak kullanılır
+  - `Routes.category()` — kategori sayfasına yönlendiren rota fonksiyonu, href prop'unda kullanılır
+  - `getLocalizedCategorySlug(category, lang)` — kategori slug'ının dile göre yerelleştirilmiş hali, Routes.category() parametresi olarak kullanılır
+  - `getCategoryDisplayName(category, t)` — kategorinin dile göre görünen adı, Link içeriği olarak kullanılır
+  - `lang` — closure'dan gelen dil kodu, getLocalizedCategorySlug fonksiyonuna parametre olarak geçilir
+  - `t` — closure'dan gelen çeviri fonksiyonu, getCategoryDisplayName fonksiyonuna parametre olarak geçilir
+- **Dönüş**: JSX (li elementi içinde Link bileşeni)
 
 ---
 
@@ -12403,48 +12428,59 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\PaymentWatcher.tsx
-skeleton_hash: 90f59405bec9d434
+source_path: C:\tmp\vh-t088\src\components\PaymentWatcher.tsx
+skeleton_hash: 46f9d1c3d77ead53
 entity_hashes:
   func:PaymentWatcher: 50650d649c0e5bdb
   overview: 933db85f944b5101
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T09:05:23Z
+generated_at: 2026-08-27T13:06:38Z
 ---
 
 ## Genel Bakış
-PaymentWatcher modülü, ödeme durumunu arka planda sürekli olarak izleyen ve kullanıcıya arayüz göstermeden çalışan bir React bileşenidir. Belirli aralıklarla ödeme durumunu kontrol ederek ilgili durumlarda otomatik yönlendirmeler veya durum güncellemeleri yapar. Modül, React Runtime, geçerli bir state kaynağı ve tarayıcı ortamı gerektirir; bu ortamlar sağlanamazsa bileşen işlevselliğini yerine getirmez.
+PaymentWatcher modülü, uygulama genelinde ödeme durumunu arka planda sürekli olarak izleyen bir React bileşenidir. Kullanıcıya herhangi bir arayüz göstermeden, belirli aralıklarla ödeme durumunu kontrol ederek ilgili durumlarda otomatik yönlendirmeler veya durum güncellemeleri yapar. VentHub HVAC projesinde ödeme süreçlerinin takip edilmesini ve gerekli durum güncellemelerinin yapılmasını sağlar.
 
 ## Fonksiyon Grupları
 ### Bileşen Tanımı ve İzleme Mantığı
-Modülün temel yapısını ve periyodik izleme mekanizmasını tanımlayan ana bileşen fonksiyonunu içerir. Bileşen, ödeme ile ilgili değişiklikleri izleyerek ilgili bileşenlere veya servislere bildirimlerde bulunur.
+Modülün temel yapısını ve periyodik izleme mekanizmasını tanımlayan ana bileşen fonksiyonunu içerir. Ödeme ile ilgili değişiklikleri izleyerek ilgili bileşenlere veya servislere bildirimlerde bulunur.
 - PaymentWatcher
 
 ## Bağımlılıklar ve Mimari Notlar
-- **İç bağımlılıklar**: Tek fonksiyonlu modül olduğundan iç bağımlılık bulunmuyor.
-- **Dış bağımlılıklar**: React Runtime, React Context veya global state kaynağı (Redux, Zustand vb.) ve tarayıcı ortamı (React DOM) gerektirir.
-- **Dinamik/lazy yükleme**: Kaynakta belirtilmemiş.
-- **Mimari önem**: Uygulama genelinde ödeme süreçlerinin takibini sağlayan altyapı bileşenidir; ödeme durumu değişikliklerini yakalayıp sistemin geri kalanını bilgilendirir.
+
+**Dış Bağımlılıklar:**
+- React kütüphanesi ve bileşen hiyerarşisi (React Runtime) — yoksa bileşen doğru şekilde render edilmez
+- React Context veya global state kaynağı (Redux, Zustand vb.) — yoksa izlenecek ödeme siparişlerine erişim sağlanamaz ve işlevselliği çalışmaz
+- Tarayıcı ortamı (veya React DOM/SSR ortamı) — yoksa bileşen DOM'a bağlanamaz ve periyodik izleme döngüsü başlatılamaz
+
+**İç Bağımlılıklar:**
+- Modül tek bir fonksiyondan oluştuğundan iç bağımlılık bulunmuyor
+
+**Dinamik/Lazy Yükleme:**
+- Kaynakta bu yönde bir bilgi yer almıyor
+
+**Mimari Önem:**
+- Kullanıcıya görünmez (headless) bir bileşendir; arayüz sunmaz, yalnızca arka plan izleme işlevi görür
+- Uygulama genelinde ödeme durumu yönetiminin merkezi noktasıdır; ödeme akışının sağlıklı ilerlemesi bu bileşenin çalışmasına bağlıdır
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden türetilebilecek mimari varsayımlar belirlenememiştir.
+Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesine dayalı özel bir aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### PaymentWatcher
-**Ne yapar**: 3DS ödeme doğrulama penceresinden dönemeyen müşterileri kurtaran bir güvenlik ağı bileşenidir. Ödeme sürecinde müşterinin 3DS sayfasından başarıyla dönemediği durumlarda, bekleyen sipariş durumunu kontrol ederek müşteriyi kurtarmayı amaçlar.
+**Ne yapar**: 3DS ödeme doğrulama penceresinden dönemeyen müşterileri kurtaran bir güvenlik ağı bileşenidir. Ödeme sürecinde kullanıcı 3DS doğrulama sayfasına yönlendirildiğinde ve çeşitli nedenlerle (tarayıcı kapanması, bağlantı kesilmesi vb.) ana uygulamaya geri dönemediğinde, bekleyen sipariş durumunu kontrol ederek kullanıcının kaybolmasını önlemeyi amaçlar.
 
-**Nasıl yapar**: Bileşen, `vh_pending_order` anahtarını localStorage'dan okuyarak çalışır. Ancak kaynakta belirtildiği üzere, bu bileşen 2026-08-15 tarihine kadar hiç çalışmadı — iki bağımsız sebeple: (1) Tetikleyicisi yoktu; `vh_pending_order` anahtarını kodun hiçbir yeri yazmıyordu (dokuz kullanımın hepsi `getItem`/`removeItem` idi), bu nedenle `raw` daima `null` oluyordu ve bileşen erken çıkış yapıyordu. Bileşen bir React fonksiyon bileşeni olarak tanımlanmıştır.
+**Nasıl yapar**: Bileşen, `vh_pending_order` anahtarını kontrol ederek bekleyen bir sipariş olup olmadığını sorgular. Ancak kaynakta belirtildiği üzere bu bileşen 2026-08-15 tarihine kadar HİÇ çalışmadı. Bunun birinci sebebi tetikleyicisinin olmamasıdır: `vh_pending_order` anahtarını kodun hiçbir yerine YAZMIYORDU; dokuz kullanımın hepsi yalnızca `getItem` ve `removeItem` çağrılarından oluşuyordu. Bu durum `raw` değişkeninin daima `null` olmasına ve dolayısıyla erken çıkış yapılmasına neden oluyordu. Bileşen bir React fonksiyonel bileşeni (`React.FC`) olarak tanımlanmıştır.
 
 **Parametreler**:
-- Bu fonksiyon parametre almaz.
+- Bu fonksiyon parametre almaz (boş parantez ile çağrılmıştır).
 
-**Dönüş**: `React.FC` — React fonksiyon bileşeni döndürür. Bileşen, 3DS ödeme sürecinde güvenlik ağı görevi görerek müşterilerin kaybolmasını önlemeyi amaçlar.
+**Dönüş**: `React.FC` — React fonksiyonel bileşeni döndürür. Bu bileşen, ödeme akışında güvenlik ağı görevi görerek 3DS sürecinden dönemeyen kullanıcıların sipariş durumlarının korunmasını sağlar.
 
 ---
 
@@ -12464,36 +12500,47 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden 
 ### [N1_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::PaymentWatcher
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `router` — `useRouter()` ile alınan Next.js router nesnesi; sayfa yönlendirmelerinde kullanılır
-  - `checkingRef` — `useRef(false)` ile oluşturulan boolean ref; `checkOnce` fonksiyonunun eşzamanlı olarak birden fazla kez çalışmasını engellemek için kilit bayrağı olarak kullanılır
-  - `timerRef` — `useRef<number | null>(null)` ile oluşturulan number|null ref; `setInterval` ile dönen timer kimliğini tutar, temizleme işleminde kullanılır
-  - `pathname` — `usePathname()` ile alınan mevcut URL yolu; useEffect bağımlılığında yer alır
-  - `checkOnce` — `useCallback` ile oluşturulan async fonksiyon; bekleyen siparişin ödeme durumunu kontrol eder
-- **Dönüş**: `null` — React bileşeni olarak ekrana bir şey render etmez
+  - `router` — `useRouter()` ile elde edilen Next.js router nesnesi; ödeme durumuna göre sayfa yönlendirmelerinde kullanılır
+  - `checkingRef` — `useRef(false)` ile oluşturulan boolean referans; aynı anda birden fazla kontrol çalışmasını engellemek için kilit bayrağı olarak kullanılır
+  - `timerRef` — `useRef<number | null>(null)` ile oluşturulan interval ID referansı; periyodik kontrol zamanlayıcısının temizlenmesi için saklanır
+  - `pathname` — `usePathname()` ile elde edilen mevcut URL yolu; useEffect bağımlılığında kullanılır
+  - `checkOnce` — `useCallback` ile sarılmış async fonksiyon; bekleyen siparişin ödeme durumunu Supabase üzerinden kontrol eder
+- **Dönüş**: `null` — React bileşeni olarak hiçbir UI öğesi üretmez, yalnızca yan etki (side effect) çalıştırır
 
 ### [N2_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::checkOnce
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `raw` — `localStorage.getItem(PENDING_ORDER_KEY)` ile alınan ham string; bekleyen sipariş verisini içerir, yoksa fonksiyondan çıkılır
+  - `raw` — `localStorage.getItem(PENDING_ORDER_KEY)` ile okunan ham string; bekleyen sipariş verisini temsil eder, yoksa fonksiyondan çıkılır
   - `data` — `JSON.parse(raw || '{}')` ile parse edilen nesne; `{ orderId?: string, conversationId?: string }` tipindedir
-  - `orderId` — `data.orderId` alanından okunan sipariş numarası; yoksa fonksiyondan çıkılır
-  - `supabase` — `await import('../lib/supabase/client')` ile dinamik olarak yüklenen `supabaseBrowserClient` nesnesi; veritabanı sorguları için kullanılır
-  - `row` — `supabase.from('venthub_orders').select('payment_status').eq('id', orderId).maybeSingle()` sorgusundan dönen veri satırı; `payment_status` alanını içerir
-  - `error` — aynı supabase sorgusundan dönen hata nesnesi; hata yoksa null/undefined olur
-- **Dönüş**: yok — yan etki olarak `localStorage.removeItem(PENDING_ORDER_KEY)` çağrısı yapar ve `router.push` ile sayfa yönlendirmesi gerçekleştirir
+  - `orderId` — `data.orderId` alanından alınan sipariş numarası stringi; yoksa fonksiyondan çıkılır
+  - `supabase` — `await import('../lib/supabase/client')` ile lazy yüklenen `supabaseBrowserClient`; Supabase veritabanı sorguları için kullanılır
+  - `row` — `supabase.from('venthub_orders').select('payment_status').eq('id', orderId).maybeSingle()` sorgusundan dönen veri nesnesi
+  - `error` — aynı Supabase sorgusundan dönen hata nesnesi; yoksa ödeme durumu kontrolü yapılır
+  - `row.payment_status` — siparişin ödeme durumu stringi; `'paid'` ise başarı sayfasına, `'failed'` ise hata sayfasına yönlendirilir
+- **Dönüş**: yok (void) — yan etki olarak localStorage temizliği ve `router.push` ile sayfa yönlendirmesi yapar
 
 ### [N3_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::useEffect callback
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `onFocus` — `window` nesnesinin `focus` olayına eklenen callback fonksiyonu; pencere odaklandığında `checkOnce()` çağrısı yapar
-  - `onVisibility` — `document` nesnesinin `visibilitychange` olayına eklenen callback fonksiyonu; `document.visibilityState === 'visible'` olduğunda `checkOnce()` çağrısı yapar
-  - `raw` — `localStorage.getItem(PENDING_ORDER_KEY)` ile alınan ham string; bekleyen sipariş varsa periyodik kontrol interval'ı başlatmak için kontrol edilir
-- **Dönüş**: cleanup fonksiyonu — `window.removeEventListener('focus', onFocus)`, `document.removeEventListener('visibilitychange', onVisibility)` ve `window.clearInterval(timerRef.current)` işlemlerini gerçekleştirir
+  - `onFocus` — `window` üzerindeki `focus` olayını dinleyen arrow fonksiyon; pencere odaklandığında `checkOnce()` çağırır
+  - `onVisibility` — `document` üzerindeki `visibilitychange` olayını dinleyen arrow fonksiyon; `document.visibilityState === 'visible'` olduğunda `checkOnce()` çağırır
+  - `raw` — `localStorage.getItem(PENDING_ORDER_KEY)` ile okunan ham string; bekleyen sipariş varsa periyodik interval kurulur
+- **Dönüş**: cleanup fonksiyonu — `focus` ve `visibilitychange` event listener'larını kaldırır, `timerRef.current` varsa `window.clearInterval` ile zamanlayıcıyı temizler
 
-### [N4_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::useEffect cleanup
+### [N4_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::onFocus
 - **params**: (parametre yok)
-- **ic_degiskenler**: yok — dışarıdan erişilen `onFocus`, `onVisibility` ve `timerRef` kullanılır
-- **Dönüş**: yok — yan etki olarak `window.removeEventListener('focus', onFocus)`, `document.removeEventListener('visibilitychange', onVisibility)` ve koşullu olarak `window.clearInterval(timerRef.current)` çağrısı yapar
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `checkOnce()` çağrısını tetikler
+
+### [N5_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::onVisibility
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `document.visibilityState === 'visible'` koşulu sağlanırsa `checkOnce()` çağrısını tetikler
+
+### [N6_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::useEffect cleanup
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `window.removeEventListener('focus', onFocus)`, `document.removeEventListener('visibilitychange', onVisibility)` ve `timerRef.current` varsa `window.clearInterval(timerRef.current)` işlemlerini gerçekleştirir
 
 ---
 
@@ -57926,8 +57973,8 @@ type VariantSelection = <T extends VariantLike>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductFanSelection.ts
-skeleton_hash: cf67fad21ac874be
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductFanSelection.ts
+skeleton_hash: d25b597f76ec7fa0
 entity_hashes:
   func:calismaNoktasi: 477178de8115d130
   func:degerlendir: f750568727981b71
@@ -57936,7 +57983,7 @@ entity_hashes:
   func:secimYap: 4647312ff1acd1ac
   func:sistemKatsayisi: 04ecc41bc675abb4
   overview: 1ad4e3445b46e669
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:57Z
 ---
 
 ## Genel Bakış
@@ -58087,23 +58134,15 @@ type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
 
 ## SABİTLER
 - **MAHAL_KURALLARI** (object) — `{
-
   bathroom: { ach: 8, minimumM3h: 85 },
-
   kitchen: { ach: 15, minimumM3h:...`
 - **GUZERGAH_GEOMETRISI** (object) — `{
-
   short: { uzunlukM: 3, dirsek90: 1, dirsek45: 0 },
-
   medium: { uzunlukM:...`
 - **SESSIZLIK_AGIRLIGI** (object) — `{
-
   normal: 0.2,
-
   important: 0.4,
-
   critical: 0.6,
-
 }`
 
 ---
@@ -58196,11 +58235,11 @@ graph TD
     ductFanSelection_ts__parsePQCurve["parsePQCurve"]
     ductFanSelection_ts__secimYap["secimYap"]
     ductFanSelection_ts__sistemKatsayisi["sistemKatsayisi"]
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
 ```
 
 ## NODE ID STANDARD
@@ -58243,8 +58282,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductPressure.ts
-skeleton_hash: a0b705802650fa34
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductPressure.ts
+skeleton_hash: 1579ba7b4e3d68fe
 entity_hashes:
   func:akisHizi: a87413c22f69c858
   func:dinamikBasinc: 4288bc94c70c6d78
@@ -58252,7 +58291,7 @@ entity_hashes:
   func:reynolds: d87c6fd9c4af1b38
   func:surtunmeFaktoru: 20425e5a77455729
   overview: 1dd122290e85a03e
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:34Z
 ---
 
 ## Genel Bakış
@@ -58349,23 +58388,15 @@ type KanalMalzemesi = keyof typeof PURUZLULUK_M
 
 ## SABİTLER
 - **PURUZLULUK_M** (as_expression) — `{
-
   galvanized: 0.00015,
-
   pvc: 0.00001,
-
   flex: 0.003,
-
 } as const`
 - **FITTING_K** (as_expression) — `{
-
   /** 90° yuvarlak dirsek, eğrilik yarıçapı = 1,5·D (tipik hazır dirsek). ...`
 - **TERMINAL_K** (as_expression) — `{
-
   /** İç mahal egzoz menfezi/ızgarası. */
-
   menfez: 2.5,
-
   /** Geri-akış...`
 - **TERMINAL_K_TOPLAM** (binary_expression) — `TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur`
 
@@ -58429,8 +58460,8 @@ graph TD
     ductPressure_ts__kanalBasincKaybi["kanalBasincKaybi"]
     ductPressure_ts__reynolds["reynolds"]
     ductPressure_ts__surtunmeFaktoru["surtunmeFaktoru"]
-    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
+    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__akisHizi
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__dinamikBasinc
 ```
@@ -91963,6 +91994,77 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** `border`, `font-bold`, `lg:px-8`, `mb-4`, `mb-6`, `mr-1`, `mx-auto`, `px-4`, `py-10`, `rounded-xl`, `sm:px-6`, `space-y-4`, `transition-colors`
 
 ---
+# FILE: eslint.config.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\tmp\vh-t088\eslint.config.cjs
+skeleton_hash: 2b04658e3d0438f3
+entity_hashes:
+  overview: f404047b54d190b2
+generated_at: 2026-08-27T12:14:58Z
+---
+
+## Genel Bakış
+Bu modül, bir ESLint konfigürasyon dosyasıdır (`eslint.config.cjs`). Dosya yalnızca modül-seviyesi kod içerir; tanımlanmış herhangi bir fonksiyon yoktur. Konfigürasyon, `js`, `tailwindcss`, `reactCompiler`, `simpleImportSort`, `unusedImports`, `compat`, `sharedJsxRestrictions` ve `hexJsxRestrictions` adlı sabitler/değişkenler aracılığıyla muhtemelen çeşitli ESLint eklentilerini ve kurallarını yapılandırmaktadır. Dosyanın hangi ortam değişkenlerini kullandığı veya harici API'leri sorguladığı bilinmemektedir.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** Verilen kaynakta fonksiyon tanımları (fonksiyon imzaları) bulunmadığından, fonksiyon gövdelerinden mimari varsayım üretilememektedir. Modül sabitleri (`js`, `tailwindcss`, `reactCompiler`, `simpleImportSort`, `unusedImports`, `compat`, `sharedJsxRestrictions`, `hexJsxRestrictions`) mevcut olup, bunlar bir ESLint konfigürasyon dosyasının yapı taşlarını göstermektedir; ancak aksiyom üretimi yalnızca fonksiyon gövdelerinden yapılabildiğinden, bu sabitlerden davranışsal çıkarım yapılmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+---
+
+## SABİTLER
+- **js** (call) — `require("@eslint/js")`
+- **tailwindcss** (call) — `require("eslint-plugin-tailwindcss")`
+- **reactCompiler** (call) — `require("eslint-plugin-react-compiler")`
+- **simpleImportSort** (call) — `require("eslint-plugin-simple-import-sort")`
+- **unusedImports** (call) — `require("eslint-plugin-unused-imports")`
+- **compat** (new_expression) — `new FlatCompat({
+  baseDirectory: __dirname,
+  recommendedConfig: js.config...`
+- **sharedJsxRestrictions** (array) — `[
+  {
+    selector: "TSAsExpression > TSAsExpression",
+    message: "Enter...`
+- **hexJsxRestrictions** (array) — `[
+  {
+    selector: "JSXAttribute > Literal[value=/^#[0-9a-fA-F]{3,8}$/]",...`
+
+---
+
+## AST POINTERS
+
+Bu dosyada (`eslint.config.cjs`) fonksiyon tanımı bulunmamaktadır. Dosya yalnızca sabit tanımları ve plugin yapılandırmaları içermektedir:
+
+- `js` — çağrı (call)
+- `tailwindcss` — çağrı (call)
+- `reactCompiler` — çağrı (call)
+- `simpleImportSort` — çağrı (call)
+- `unusedImports` — çağrı (call)
+- `compat` — new_expression
+- `sharedJsxRestrictions` — array
+- `hexJsxRestrictions` — array
+
+Analiz edilecek fonksiyon gövdesi olmadığından AST Pointer üretilmemiştir.
+
+---
+
+## NODE ID STANDARD
+
+  file: eslint.config.cjs
+
+---
 # FILE: next-env.d.md
 
 ---
@@ -92088,11 +92190,11 @@ olmadan altısı da 404 verirdi. Ürünler kaybolmadı — hepsi kanonik aile sa
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\playwright.config.ts
-skeleton_hash: c2a3f634c02b669d
+source_path: C:\tmp\vh-t088\playwright.config.ts
+skeleton_hash: a4548073e05f0914
 entity_hashes:
   overview: e72aa38ff0954fb5
-generated_at: 2026-06-19T20:51:03Z
+generated_at: 2026-08-27T13:04:03Z
 ---
 
 ## Genel Bakış
