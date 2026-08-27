@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "096a71d5cf4728204cb83d016a0928034bfcca80cf93241689bf2f5ecb0654b6",
+      "icerik_sha256": "4ca268f97c9f8f6b5753845bfbcc033f1cea272e5c3388188c54ace96878bcac",
       "kaynak": {
         "dosya_sayisi": 98,
         "dosyalar": {
@@ -108,7 +108,7 @@
         "izlenmeyen": [],
         "ozet": "13aca04c7a35256389064f212cccbf532b90b069fc40fe29bd8e467c6c22e036"
       },
-      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
+      "kaynak_commit": "377bf53677a074b54dc1519e72d9fa056bd6486e",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +125,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "0f7bc51183deba6b7009d0d8328c484f8ecab459dd691963c08b6a67a3bc6caa",
+      "icerik_sha256": "3a2f5b7f5e81c0bbf55120278fb527ac25094059be324ced1e9c9b66d7a3f591",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -151,7 +151,7 @@
           "docs/standards/ci-runner-install-standard.md": "dc37f4c5e08a22d03f34ff82c87775de858ffba4",
           "docs/standards/collaboration-protocol.md": "0296f2c284624b51e89d8b70fa7d4da20ee79f9e",
           "docs/standards/commerce-domain-map-standard.md": "205440e349935c2ca7cfa28cabfe2ff81d023f8b",
-          "docs/standards/companion-doc-standard.md": "3851ea8f8d8a3062b7da7d57c6eae50014116479",
+          "docs/standards/companion-doc-standard.md": "f2df46ffe65fc8f5ae15e40cea7f5e70b8dbe3b2",
           "docs/standards/crm-standard.md": "1fc10cba5e0fc3f3915ea20e2b4679729f59b70d",
           "docs/standards/csp-standard.md": "7e9af1554f091a48314fa3e1e52aaabf9664b5be",
           "docs/standards/csv-import-export-standard.md": "900f8e1d17224c5323f954e3803481d797ec2c52",
@@ -193,9 +193,9 @@
           "docs/standards/work-tracking-ssot-standard.md": "6a00f894fbc818c9e927e2ced965936c6162475e"
         },
         "izlenmeyen": [],
-        "ozet": "e35f56e68357b6d4b50f6817406f18d3dd8762d03ac6b03ecdae01ba6af21697"
+        "ozet": "cc408bc644704bcb405cd6e96eceff328e735ebd01083c1bd477fa309ea6972d"
       },
-      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
+      "kaynak_commit": "377bf53677a074b54dc1519e72d9fa056bd6486e",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +204,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "7ae84cf4da671a5a79b3000da897854006a9958c9116e7fbcdddac6af4d2f4f9",
+      "icerik_sha256": "cc9ac24a1dbcc4271a73d9a6d93164ad214caab7adf96735247e49b64659f85e",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +251,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
+      "kaynak_commit": "377bf53677a074b54dc1519e72d9fa056bd6486e",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,7 +259,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "800ba301b36c3a06fef39b0aa4e1451d1698aa0237e01e57aa0f29653c5ca50f",
+      "icerik_sha256": "77f7820b9e93592fe137eeb2084b4d9a98b2c7b54b385d25faba06fd79216614",
       "kaynak": {
         "dosya_sayisi": 655,
         "dosyalar": {
@@ -361,7 +361,7 @@
           "src/components/BrandsShowcase.md": "79646355aeffebdde97f4483af96e0d34a760482",
           "src/components/BuildTag.md": "29375f672e7155a609fa4e06833c4cbb3a6c456b",
           "src/components/CaseStudySection.md": "486bcdc35d1211fc22d10870d24af43e4818219a",
-          "src/components/ErrorBoundary.md": "f7b50890f6df76d71f43e31e86ddef9e17961ee2",
+          "src/components/ErrorBoundary.md": "79197320763807eabadbeb20e4acf9aafdedb66d",
           "src/components/Footer.md": "bea0d37e4157b3718df2a208fd83b4f757add1aa",
           "src/components/HVACIcons.md": "76d796281e86598aeacc697a38e8a78e762f71f7",
           "src/components/ImageGallery.md": "99eb4c8328bf19b8caedf3ebf6004bdcfbffca16",
@@ -404,17 +404,17 @@
           "src/components/admin/InventoryQrLabel.md": "a0fdf57c7a00a321f7fcee7512f4deeb57a2473b",
           "src/components/admin/InventoryReservedTable.md": "b945ffacfad31c93da36be3215cae9c0c53b2220",
           "src/components/admin/InventoryStockAdjust.md": "f63824f9986c1c26b7401ee3a419d2bb3bd2b0cc",
-          "src/components/admin/InventoryTable.md": "11a5f615273a0ff2669543e80b7821a91eab292e",
+          "src/components/admin/InventoryTable.md": "e497383c8fdae2ae63bbbb19c609156b16676502",
           "src/components/admin/JsonDiffViewer.md": "43104466c93ce330acab395fa6cc32ded1903464",
           "src/components/admin/authority-builder/AuthorityBuilder.md": "4c2745ff6fee532d80ea35b49bbabccdfc395601",
           "src/components/admin/authority-builder/BlockEditor.md": "e3a817af499cde5c2faca121531ef7f56fa035d9",
           "src/components/admin/categories/CategoryFormModal.md": "bdd2981a6ccfc201adcd092346f1c1558edd2225",
           "src/components/admin/dashboard/AbcPieChart.md": "e5e88b633c088d7b4b91bd3750449f34360d6159",
-          "src/components/admin/dashboard/ActivityHeatmap.md": "11c38260a862c58f9329849a856e54a4cf947e0b",
+          "src/components/admin/dashboard/ActivityHeatmap.md": "4b35a85919ad4ad3e338d81043cf4d2eb23f57cc",
           "src/components/admin/dashboard/RecentOrdersTable.md": "97cb46ec4d8239718cff601be51fd22e10087298",
           "src/components/admin/dashboard/SalesChart.md": "3b1fb6bac3e17e7e3e2481913882db822eefd1cf",
           "src/components/admin/dashboard/StatCard.md": "ea95374cdb9e3deba4ecd7a7fd4ca6303f35ec23",
-          "src/components/admin/data-table/BulkBar.md": "2919a4dfd8af08f0d0ea81ff0d625eae7e07018e",
+          "src/components/admin/data-table/BulkBar.md": "d6d2d25a0d8079d46e6d6e67157585411a386ae7",
           "src/components/admin/data-table/BulkPricePanel.md": "ad4d6821aa25e8f507d4c81fbd8090a55cb3a4cf",
           "src/components/admin/data-table/BulkRolePanel.md": "843b2197aefa53115f4cc1333a65c8a06109d815",
           "src/components/admin/data-table/DataTableHead.md": "44245dfc2d55f60837b7aa543760ffa80fe3a91b",
@@ -429,7 +429,7 @@
           "src/components/admin/pricing/CostRefreshModal.md": "171e4de50f507a6e110b9f0ae97fda758f869018",
           "src/components/admin/pricing/CurrencyRatesCard.md": "97bf8c56f37072dfa31f2d2cebcacc295169792f",
           "src/components/admin/pricing/MaterializePricesModal.md": "06a01940d4ddf98eecad6e725eba20896724c2e3",
-          "src/components/admin/pricing/PricingPolicyFormModal.md": "769dc89d9a3b4a67dddddf0e7854fe9ac4d38e74",
+          "src/components/admin/pricing/PricingPolicyFormModal.md": "56fa84c74549f4622ecb75cc46a7abde530dc0e8",
           "src/components/admin/pricing/PricingRuleFormModal.md": "1389118b590eec21144e8f4ca94e59149a089350",
           "src/components/admin/pricing/PricingSettingsFormModal.md": "c3fdda39b1abc1edced89711da8a1fc7d38d1c45",
           "src/components/admin/pricing/RuleScopeTargetPicker.md": "f2145d3a4fb3a82754e0599636ce658061d3399e",
@@ -440,9 +440,9 @@
           "src/components/admin/settings/SettingsFormModal.md": "6e9ba06aeb9e082b878c801f5fcccb984dd8b271",
           "src/components/admin/shell/AdminPageHeader.md": "9e7415a6c699954204a688045b230ca125f96cd4",
           "src/components/admin/shell/AdminSidebar.md": "9f2bfc1c99446a003a1a4d9389a959da74333547",
-          "src/components/admin/shell/AdminThemeToggle.md": "b3eb681eca4c125f729262fa8daf2f3c4ae7f041",
+          "src/components/admin/shell/AdminThemeToggle.md": "f9e809da97e41dc5c8d46bc43818bf3bb0ef9114",
           "src/components/admin/shell/navCookie.md": "53dca9aa87ae3052e849cbcc36ce56cc64b4c665",
-          "src/components/admin/shell/themeCookie.md": "ef03403d1eeeba365d7f3fa35ec386c6b50942ad",
+          "src/components/admin/shell/themeCookie.md": "99f47ff92beb94ee333a50845e15b4d4e6697fb2",
           "src/components/admin/shell/useAdminThemeBodyScope.md": "ee30cc0f21d255b5e79ea8ee6c34a0628bf7344b",
           "src/components/analytics/ConsentGatedAnalytics.md": "0871365672684b609619d5b5cdeec8b957663160",
           "src/components/authority/AuthorityRenderer.md": "63ae972ae0ebd54f0ec61f565936a8836f41cc91",
@@ -481,7 +481,7 @@
           "src/components/home/ApplicationSolutions.md": "c22a58aa57ca83f1074616230e51fa1adfb19d7e",
           "src/components/home/CinematicProductShowcase.md": "36e8a48648e317771854c65a15f55d1492a1f8c3",
           "src/components/home/ClientLeadButton.md": "424e7925d6e34160a09f853bc4bbfbef0b0973cc",
-          "src/components/home/FeaturedCommercialBlocks.md": "2749070d44f149174b1c1eb3b6032f9f5341db14",
+          "src/components/home/FeaturedCommercialBlocks.md": "74fa2b0390c72e50751b9421a01876e1ad3e7f7c",
           "src/components/home/GuidedCategoryDiscovery.md": "3db90f3f9745bf23951c2679fac3c8c3ac98f1ba",
           "src/components/home/HomePageClientWrapper.md": "4ac0628ec3d008eaf8913ac833f52bd74056cffb",
           "src/components/home/HomeSinevizyon.md": "36c45009b8722c57a0718954d6854a1ea7f9946e",
@@ -747,7 +747,7 @@
           "src/lib/validation/taxIdentity.md": "675fbb7bbea3f382c75ffbb4659647e49f562a6c",
           "src/middleware.md": "1b9ed1ff26350917726be5359e75f3497e4f5545",
           "src/next-env.d.md": "e148f05f3129f59020bf279c5ef4231d3a49f147",
-          "src/providers/SupabaseProvider.md": "67d7884014e5c2bc0a3f0aa4257be51afa4ab643",
+          "src/providers/SupabaseProvider.md": "87e7fbbbf36da7fdac6161b7e860bd7088c80549",
           "src/test/setup.d.md": "122b8b7c366ea4c127c8e370fbcd23284ca984a4",
           "src/types/admin-shared.md": "84c53c13fabb4f37e3274d02bf9b0e5a07556440",
           "src/types/authority.md": "7dfe49b064234a265d03c9fb4b10220d076f4528",
@@ -920,9 +920,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "4b52ff14fd29fdea186bee29a2179d77eea9d1d510fc68922482001a8ca94064"
+        "ozet": "67c914f4d12115e1e6b1412d5b5ac87e946913d74224d5aa9a36cfa8aa6d4a6a"
       },
-      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
+      "kaynak_commit": "377bf53677a074b54dc1519e72d9fa056bd6486e",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -931,7 +931,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-27T13:08:48.126888+00:00",
-  "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
+  "derlendi": "2026-08-27T13:28:23.133672+00:00",
+  "kaynak_commit": "377bf53677a074b54dc1519e72d9fa056bd6486e",
   "surum": 1
 }

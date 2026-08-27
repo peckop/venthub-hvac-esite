@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T13:08:47.033419+00:00
+compiled_at: 2026-08-27T13:28:22.012180+00:00
 total_compiled_files: 655
-source_commit: 582e5eb5
+source_commit: 377bf536
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T13:08:47.033419+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T13:28:22.012180+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -10615,6 +10615,8 @@ entity_hashes:
 generated_at: 2026-08-15T06:35:03Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=8 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, React uygulamalarında beklenmeyen hataları yakalayan bir ErrorBoundary bileşenidir. Uygulamanın tamamen çökmesini önleyerek kullanıcıya uygun bir hata arayüzü sunar ve hataları loglama veya raporlama için işler.
 
@@ -17558,88 +17560,59 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx
-skeleton_hash: d63c221ac89c815d
-entity_hashes:
-  func:InventoryTable: 5588b8e97a6e44fb
-  overview: 0718ce22af046921
-  style_tokens: 4bf1cdbb52b9f224
-generated_at: 2026-06-16T10:18:09Z
+skeleton_hash: b542cdd2cde6050b
+generated_at: 2026-05-23T21:54:53Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=6 · kaynak=8172fdc9 · sebep=uretec-sembol-kaybi-tarihsel · kayit=REC-83 -->
+
 ## Genel Bakış
-InventoryTable, yönetim panelinde envanter verilerini düzenli bir tablo formatında sergileyen React bileşenidir. Yüklenme, hata ve boş veri durumlarını akıllıca yöneterek kullanıcıya kesintisiz bir deneyim sunar ve satır seçimleri ile sütun görünürlüğü üzerinden etkileşim imkanı sağlar.
+`InventoryTable` bileşeni, yönetim panelindeki envanter verilerini tablo biçiminde sunar; veri yükleme, hata durumu, satır seçimi ve sütun görünürlüğü gibi durumları yöneterek kullanıcıya dinamik ve etkileşimli bir tablo deneyimi sağlar. Props aracılığıyla dışarıdan gelen veri, yükleme bayrağı, hata bilgisi, seçili satırlar ve görünür sütun listesi alınır ve bu bilgilere göre tablo içeriği, yükleme göstergeleri, hata mesajları ve seçili öğelerin vurgulanması render edilir.
 
 ## Fonksiyon Grupları
-### Veri Görselleştirme ve Tablo Yapısı
-Gelen envanter satırlarını ve görünür sütun tanımlarını alarak tablo başlıklarını, satır satırlarını ve hücre düzenini oluşturur. Temel render sorumluluğu bu grup tarafından üstlenilir.
+### Veri ve Durum İşleme
+Bileşen, gelen `rows`, `loading` ve `error` verilerini işleyerek tabloya gösterilecek içeriği hazırlar ve yükleme veya hata durumlarında uygun yedek görüntüler sunar.  
 - InventoryTable
 
-### Durum Yönetimi ve Koşullu Gösterim
-Yüklenme süreci, hata oluşumu veya verinin hiç bulunmaması gibi durumları kontrol ederek uygun arayüz mesajlarını veya göstergelerini tablonun önüne veya yerine render eder.
+### Görünüm ve Sütun Yönetimi
+`visibleCols` prop’u kullanılarak hangi sütunların görüneceği belirlenir; bu sayede sadece seçilen sütunların başlıkları ve hücreleri render edilerek gereksiz gösterimlerden kaçınılır.  
 - InventoryTable
 
-### Etkileşim Koordinasyonu
-Kullanıcı tarafından yapılan satır seçimlerini ve sütun görünürlük tercihlerini üst bileşenlere iletmek üzere yönetir; bu sayede tablonun durumu uygulama geneliyle senkronize kalır.
+### Seçim ve Etkileşim
+Kullanıcının satır seçimi yapabilmesi için `selected` durumu takip edilir; seçili satırlar vurgulanarak görsel geri bildirim sağlanır ve seçimin dışarıya iletilmesi sağlanır.  
+- InventoryTable
+
+### Başlık ve Hücre Oluşturma
+Tablo başlıkları ve her bir satırın hücreleri, gelen veri ve görünür sütun bilgilerine göre dinamik olarak üretilir; bu sayede veri yapısındaki değişikliklere uygun bir gösterim elde edilir.  
 - InventoryTable
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu bir React bileşeni (InventoryTable) olup, belirli prop'ların varlığı ve tipleri üzerine kuruludur. Aşağıdaki aksiyomlar, fonksiyon imzasından çıkarılmıştır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `rows` prop'u verilmemiş veya `undefined` ise, bileşen tabloyu hiçbir satır göstermeden render eder veya `loading`/`error` durumuna göre davranır.
-[Aksiyom 2]: Eğer `loading` prop'u `true` değilse (veya `undefined` ise), bileşen yükleme göstergesini render etmez.
-[Aksiyom 3]: Eğer `error` prop'u `undefined` veya `null` ise, bileşen hata mesajını göstermez.
-[Aksiyom 4]: Eğer `selected` prop'u bir `Set` veya `Array` içermiyorsa (veya `undefined` ise), bileşen hiçbir satırı seçili olarak işaretleyemez.
-[Aksiyom 5]: Eğer `visibleCols` prop'u geçerli bir sütun listesi içermiyorsa (veya `undefined` ise), bileşen tüm potansiyel sütunları (veri yapısından çıkarılarak) veya hiçbirini gösteremeyebilir.
-[Aksiyom 6]: Eğer `den` prop'u `InventoryTableProps` arayüzüne uymayan bir değer ise, TypeScript çalışma zamanında hata verebilir veya bileşen beklenmedik davranış sergileyebilir.
+[Aksiyom 1]: Eğer **rows** prop'u verilmezse, tablo içinde gösterilecek veri bulunamadığından boş bir tablo veya hata durumu ortaya çıkar.  
+[Aksiyom 2]: Eğer **loading** prop'u `true` ise, bileşen veri yükleniyor göstergesi (spinner, skeleton vb.) render eder; `false` ise bu gösterge gösterilmez.  
+[Aksiyom 3]: Eğer **error** prop'u dolu bir değer (null/undefined dışında) içeriyorsa, bileşen hata mesajını kullanıcıya gösterir; boşsa hata gösterimi yapılmaz.  
+[Aksiyom 4]: Eğer **selected** prop'u verilmezse veya `undefined` ise, hiçbir satır seçili değil kabul edilir ve seçim stilini uygulanmaz.  
+[Aksiyom 5]: Eğer **visibleCols** prop'u verilmezse, hangi sütunların görüneceği belirlenemez; bu durumda bileşen varsayılan davranışını (tüm sütunları göster veya hiçbirini göster) bilmediği için bu konuda bir varsayım yapılamaz (bilinmiyor).  
+[Aksiyom 6]: Eğer **den** prop'u (`InventoryTableProps` tipi) eksik veya geçersizse, bileşen beklenen yapıyı alamaz ve prop kullanımında çalışma zamanı hatası yaşayabilir.
 
 ---
 
-## FONKSİYON DETAYLARI
+## FONKSIYON DETAYLARI
 
 ### InventoryTable
-**Ne yapar**: Envanter tablosunu gösteren ana React bileşenidir. Stok verilerini, sıralama, gruplama, durum gösterimi ve düzenleme yetkisine göre düzenlenebilir hücrelerle birlikte sunar.
-**Nasıl yapar**: `InventoryTableProps` aracılığıyla aldığı parametreleri kullanarak, tablonun başlığını ve gövdesini oluşturur. `useI18n` hook'u ile uluslararasılaştırma sağlar. `useDragScroll` hook'u ile yatay sürükleme yeteneği ekler. `density` parametresine göre sıkışık veya normal yoğunlukta hücre dolguları ayarlar. `sortIndicator` ve `statusBadge` yardımcı fonksiyonlarını kullanarak sıralama göstergeleri ve durum rozetleri oluşturur. `visibleCols` parametresine göre hangi sütunların görüneceğini belirler. `hasWriteAccess` durumuna göre düzenlenebilir hücreleri (`EditableCell`) veya salt okunur metinleri gösterir. `groupByCategory` ve `groupedRows` kullanarak kategorilere göre gruplanmış satırlar veya düz satırlar gösterir. Yüklenme durumunda `AdminSkeleton`, hata durumunda hata mesajı, boş durumda `AdminEmptyState` gösterir.
+**Ne yapar**: InventoryTable adlı React bileşeni, envanter verilerini tablo formatında görüntüler.  
+**Nasıl yapar**: rows, loading, error, selected, visibleCols ve den props'larını kullanarak tabloyu render eder; yükleme ve hata durumlarını kontrol eder, seçili satırları vurgular ve görünür sütunları filtreler.  
 **Parametreler**:
-- rows: `InventoryRow[]` — Görüntülenecek envanter satırları dizisi.
-- loading: `LoadState` — Veri yükleme durumunu belirten enum değeri (ör. `LoadState.Loading`).
-- error: `string` — Hata durumunda gösterilecek hata mesajı.
-- selected: `InventoryRow | null` — Seçili satır nesnesi; seçili satırın vurgulanmasını sağlar.
-- visibleCols: `Record<string, boolean>` — Hangi sütunların görüneceğini belirten bir nesne (ör. `{ name: true, physical: false }`).
-- density: `'compact' | 'normal'` — Hücre yoğunluğu; sıkışık modda daha az dolgu uygulanır.
-- sortKey: `SortKey` — Aktif sıralama sütununu belirten anahtar.
-- sortDir: `'asc' | 'desc'` — Sıralama yönü (artan veya azalan).
-- groupByCategory: `boolean` — Kategorilere göre gruplama yapılsın mı?
-- groupedRows: `GroupedRows[]` — Kategorilere göre gruplanmış satırlar dizisi; her grup bir `_c_id`, `name` ve `items` içerir.
-- onSort: `(key: SortKey) => void` — Sütun başlığına tıklandığında çağrılan sıralama işlevi.
-- onSelect: `(row: InventoryRow) => void` — Satır seçildiğinde çağrılan işlev.
-- onUpdateLocation: `(productId: string, value: string) => void` — Depo konumu düzenlendiğinde çağrılan işlev.
-- onUpdateSupplier: `(productId: string, value: string) => void` — Tedarikçi adı düzenlendiğinde çağrılan işlev.
-- hasWriteAccess: `boolean` — Kullanıcının yazma yetkisi olup olmadığını belirtir; düzenleme hücrelerinin etkinliğini kontrol eder.
-- thresholdMap: `Record<string, number>` — Ürün kimliğine göre eşik değerlerini eşleyen harita.
-- defaultThreshold: `number` — Eşik haritasında bulunmayan ürünler için varsayılan eşik değeri.
-- effectiveThreshold: `(productId: string) => number | null` — Ürün için geçerli eşik değerini hesaplayan fonksiyon; ürün kimliğini alır ve eşik değerini veya null döndürür.
-**Dönüş**: `JSX.Element` — Envanter tablosunu içeren React bileşeni (bir `<div>` ve içinde `<table>` yapısı).
-
----
-
-## İTHALATLAR (IMPORTS)
-- import: ../../hooks/useDragScroll::useDragScroll
-- import: ../../types/inventory::Density
-- import: ../../types/inventory::InventoryRow
-- import: ../../types/inventory::LoadState
-- import: ../../types/inventory::SortKey
-- import: ../../types/inventory::VisibleCols
-- import: ../../utils/adminUi::adminTableCellClass
-- import: ../../utils/adminUi::adminTableHeadCellClass
-- import: ./AdminEmptyState::AdminEmptyState
-- import: ./AdminSkeleton::AdminSkeleton
-- import: ./EditableCell::EditableCell
-- import: ./InfoTooltip::InfoTooltip
-- import: @/i18n/I18nProvider::useI18n
-- import: lucide-react::SearchX
-- import: react::React
+- rows: any — Envanter satırlarının listesi (tipi belirsiz)  
+- loading: boolean — Veri yükleme durumunu gösterir  
+- error: any — Olası hata nesnesi veya mesajı  
+- selected: any — Seçili satır(lar)ın kimlikleri veya verileri  
+- visibleCols: any — Görünür olacak sütunların listesi veya tanımları  
+- den: InventoryTableProps — Bileşenin ekstra özelliklerini taşıyan tip tanımlı props nesnesi  
+**Dönüş**: void — Bileşen JSX döndürür ancak TypeScript'te dönüş tipi açıkça belirtilmemiş (void veya bilinmiyor olarak belirtildi).
 
 ---
 
@@ -17669,35 +17642,44 @@ Bu bir React bileşeni (InventoryTable) olup, belirli prop'ların varlığı ve 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: InventoryTable.tsx::InventoryTable
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx::InventoryTable
 - **params**: rows, loading, error, selected, visibleCols, density, sortKey, sortDir, groupByCategory, groupedRows, onSort, onSelect, onUpdateLocation, onUpdateSupplier, hasWriteAccess, thresholdMap, defaultThreshold, effectiveThreshold
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, metinleri dil için kullanılır
-  - `dragScrollRef` — useDragScroll hook'undan gelen ref, sürükleme ile yatay kaydırma için kullanılır
-  - `headPad` — density compact ise tablo başlık hücresi için padding className'i
-  - `cellPad` — density compact ise tablo gövde hücresi için padding className'i
-  - `sortIndicator` — iç fonksiyon, sortKey ve sortDir'e göre sıralama göstergesi döndürür
-  - `statusBadge` — iç fonksiyon, InventoryRow'a göre durum rozeti döndürür
-  - `TableRow` — iç bileşen, tek bir tablo satırını render eder
-- **Dönüş**: JSX element (tablo yapısı)
+  - `dragScrollRef` — ref returned by `useDragScroll<HTMLDivElement>()`, attached to the outer div to enable horizontal drag scrolling.
+  - `headPad` — Tailwind class string for table header padding; `'px-2 py-2'` when `density === 'compact'`, otherwise empty string.
+  - `cellPad` — Tailwind class string for table cell padding; same logic as `headPad`.
+  - `sortIndicator` — function that returns a visual sort indicator (`'▲'`, `'▼'`, or `''`) based on the current `sortKey` and `sortDir`.
+  - `statusBadge` — function that returns a badge `<span>` indicating stock status (Tükendi, Kriti̇k, Rezervli, Uygun) for a given inventory row.
+  - `TableRow` — component that renders a single `<tr>` for an inventory row, conditionally rendering cells according to `visibleCols` and row data.
+- **Dönüş**: JSX element (the complete table UI wrapped in a scrollable `<div>`).
 
-### [N2_NASIL] AST Pointer: InventoryTable.tsx::sortIndicator
-- **params**: key
-- **ic_degiskenler**: (yok)
-- **Dönüş**: string (sıralama göstergesi karakteri veya boş string)
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx::sortIndicator
+- **params**: key: SortKey
+- **ic_degiskenler**: (yok) — uses outer `sortKey` and `sortDir` only.
+- **Dönüş**: string — `''` if `key !== sortKey`; otherwise `'▲'` when `sortDir === 'asc'`, else `'▼'`.
 
-### [N3_NASIL] AST Pointer: InventoryTable.tsx::statusBadge
-- **params**: r
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx::statusBadge
+- **params**: r: InventoryRow
 - **ic_degiskenler**:
-  - `net` — Ürünün mevcut stok miktarı (r.available_stock)
-  - `th` — Ürün için eşik değeri (effectiveThreshold fonksiyonu ile hesaplanır)
-  - `base` — Rozet için ortak CSS className'i
-- **Dönüş**: JSX element (span içinde durum rozeti)
+  - `net` — `r.available_stock`, the available stock quantity for the row.
+  - `th` — `effectiveThreshold(r.product_id)`, the threshold value for the product (may be `null`).
+  - `base` — shared Tailwind class string `"px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border shadow-sm transition-all"` applied to all badge variants.
+- **Dönüş**: JSX `<span>` element representing the stock status badge (with appropriate background/text colors and optional pulse animation).
 
-### [N4_NASIL] AST Pointer: InventoryTable.tsx::TableRow
-- **params**: r
-- **ic_degiskenler**: (yok, sadece parametre ve closure değişkenleri kullanılır)
-- **Dönüş**: JSX element (tr içinde tek satır)
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx::TableRow
+- **params**: { r }: { r: InventoryRow }
+- **ic_degiskenler**: (yok) — accesses `r`, `visibleCols`, `hasWriteAccess`, `thresholdMap`, `defaultThreshold`, `onSelect`, `onUpdateLocation`, `onUpdateSupplier`, etc., from the outer scope.
+- **Dönüş**: JSX `<tr>` element representing a table row with interactive cells (name, stock numbers, location, supplier, ABC class, days until empty, status badge).
+
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx::groupedRows mapper
+- **params**: g (group object with `_c_id`, `name`, `items`)
+- **ic_degiskenler**: (yok) — uses `g`, `density`, and the `TableRow` component from outer scope.
+- **Dönüş**: `React.Fragment` containing a group header `<tr>` (with category name and item count) followed by `<TableRow>` elements for each item in `g.items`.
+
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx::rows mapper
+- **params**: r: InventoryRow
+- **ic_degiskenler**: (yok) — uses `r` and the `TableRow` component from outer scope.
+- **Dönüş**: JSX `TableRow` element for the given inventory row.
 
 ---
 
@@ -17716,16 +17698,20 @@ Bu bir React bileşeni (InventoryTable) olup, belirli prop'ların varlığı ve 
 ## STİL TOKENLERİ
 
 ### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
+- **shadow:** `shadow-[0_0_10px_rgba(34,211,238,0.5)]`
+- **height:** (yok)
+- **width:** `max-w-[120px]`, `min-w-[1000px]`
+- **spacing:** (yok)
+- **diğer:** `tracking-[0.2em]`, `tracking-[0.3em]`
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `shadow-glow-sm`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500/10`, `bg-blue-500/10`, `bg-cyan-400`, `bg-cyan-500/5`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-transparent`, `bg-white/2`, `border-amber-500/20`, `border-b`, `border-b-0`, `border-blue-500/20`, `border-emerald-500/20`, `border-rose-500/20`
-- **Layout:** `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `gap-1`, `gap-3`, `h-4`, `h-6`, `inline-flex`, `items-center`, `justify-center`, `justify-end`, `max-w-120px`, `min-w-1000px`, `overflow-x-auto`
-- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `last:` önekleri
-- **Yardımcı Sınıflar:** `${base`, `${density`, `${r.abc_class`, `${r.days_until_empty`, `7`, `:`, `<=`, `===`, `A`, `B`, `animate-pulse`, `border`, `compact`, `content-auto-table`, `cursor-pointer`
+- **Renkler:** `bg-amber-500/10`, `bg-blue-500/10`, `bg-cyan-400`, `bg-cyan-500/[0.05]`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-transparent`, `bg-white/[0.02]`, `border-amber-500/20`, `border-b`, `border-b-0`, `border-blue-500/20`, `border-emerald-500/20`, `border-rose-500/20`
+- **Layout:** `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `gap-1`, `gap-3`, `group-hover:text-cyan-400`, `h-4`, `h-6`, `inline-flex`, `items-center`, `justify-center`, `justify-end`, `overflow-x-auto`, `p-0`
+- **Responsive:** (yok)
+
 
 ---
 # FILE: src\components\admin\JsonDiffViewer.md
@@ -18596,6 +18582,8 @@ entity_hashes:
 generated_at: 2026-06-19T20:47:14Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, yönetim paneli dashboard'unun bir parçası olarak aktivite verilerini görselleştirmek için tasarlanmış, takvim tabanlı bir ısı haritası bileşenidir. Dışarıdan sağlanan veri setini, yoğunluk bilgisini renk kodlarıyla gösteren interaktif bir arayüze dönüştürür ve kullanıcı etkileşimlerini zenginleştirmek için özel bir bilgi baloncuğu (tooltip) içerir.
 
@@ -19186,6 +19174,8 @@ entity_hashes:
   style_tokens: 7264340c3de4adfc
 generated_at: 2026-08-25T07:24:53Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=3 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 BulkBar, bir veri tablosunda seçili öğelerin sayısını gösteren ve bu öğeler üzerinde toplu işlem gerçekleştirilmesini sağlayan bir React bileşenidir. Admin panelindeki veri tablosu arayüzünde, kullanıcı seçim yaptıktan sonra görünür hale gelen bir aksiyon çubuğu olarak çalışır.
@@ -21852,6 +21842,8 @@ entity_hashes:
 generated_at: 2026-08-25T08:43:23Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, yönetim panelinde fiyat politikası oluşturma ve düzenleme işlemlerini gerçekleştiren bir modal form bileşenidir. Bileşen, dışarıdan aldığı `open`, `policy`, `onClose` ve `onSaved` parametreleriyle açılış/kapanış durumunu ve veri akışını yönetir. Form alanı varsayılan değerlerini, tarih bilgisini ve hedef sütun yapılandırmalarını hazırlayan yardımcı fonksiyonlar içerir.
 
@@ -24152,6 +24144,8 @@ entity_hashes:
 generated_at: 2026-08-26T07:13:16Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 AdminThemeToggle, admin panelinde tema tercihini (açık/koyu mod) yönetmek için kullanılan bir React bileşenidir. Bileşen, dışarıdan gelen mevcut tercihi gösterir ve kullanıcı etkileşimiyle yeni tercihi üst bileşene geri çağırarak tema değişimini tetikler. Salt sunum (pure presentational) bir yapıya sahiptir ve kendi içinde durum tutmaz.
 
@@ -24365,6 +24359,8 @@ entity_hashes:
   overview: aa8fce602e3b1c9d
 generated_at: 2026-08-15T18:15:44Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=3 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 Bu modül, admin panelinin tema tercihlerinin (örneğin koyu/aydınlık mod, renk vurgusu) tarayıcı çerezleri (cookies) üzerinden saklanması ve okunması için gerekli yardımcı fonksiyonları içerir. Temelde, çerez adını oluşturmayı, tema tercihlerini depolanabilir bir metin formatına dönüştürmeyi ve bu metinden tercihleri yeniden yapılandırmayı sağlar. Modül, admin shell bileşenleri tarafından tema yönetimi süreçlerinde bağımsız bir yardımcı (utility) katman olarak kullanılır.
@@ -29590,41 +29586,59 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx
-skeleton_hash: 05cfca4fb86aaf84
+skeleton_hash: 4c35b083d08a3617
 entity_hashes:
   func:FeaturedCommercialBlocks: 1889811721e866db
-  overview: a6f2b84b89640427
-  style_tokens: ff89a6880a24812d
-generated_at: 2026-08-15T06:32:06Z
+  func:normalizeImageUrl: e7ff2d52e57ce97b
+  overview: e2b71b884b394ef9
+  style_tokens: 0fba0ab3cddfc2f6
+generated_at: 2026-06-06T21:54:49Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=5 · kaynak=a013f342 · sebep=uretec-sembol-kaybi-tarihsel · kayit=REC-83 -->
+
 ## Genel Bakış
-`FeaturedCommercialBlocks`, ana sayfada öne çıkan ticari HVAC ürünlerini (klima, havalandırma üniteleri vb.) görselleri ve temel bilgileriyle birlikte sergileyen bir React bileşenidir. Verilen ürün listesini işleyerek eksik veya geçersiz görselleri temizler ve kullanıcılara düzenli bir görünüm sunar.
+Bu modül, ana sayfada öne çıkan ticari ürünlere ait görsel ve bilgi bloklarını sergileyen bir React bileşenini tanımlar. Görsel URL'lerinin güvenli bir şekilde işlenmesini sağlayan bir yardımcı fonksiyon ile birlikte, ürün listesini alıp kullanıcıya düzenli bir şekilde sunar.
 
 ## Fonksiyon Grupları
-### Öne Çıkan Ürünler Görünümü
-Ana sayfada ticari ürün bloklarını grid veya kart düzeninde listeler; ürün verisi sağlanmazsa boş liste ile çalışarak bileşenin stabil kalmasını sağlar.
+### Yardımcı İşlevler
+Görsel adreslerinin boş veya geçersiz olma durumlarını temizleyerek, kullanıma hazır standart bir URL formatı üretir.
+- normalizeImageUrl
+
+### Ana Bileşen
+Ürün verisini alarak, öne çıkan ticari ürünleri görsel ve ilgili bilgileriyle birlikte düzenler ve ekranda render eder; başlangıç verisi eksikse varsayılan boş bir liste kullanır.
 - FeaturedCommercialBlocks
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için temel mimari varsayımlar, fonksiyon imzasından ve bileşenin doğasından türetilmiştir.
+Bu modül için, yalnızca fonksiyon imzasından türetilebilen mimari varsayımlar aşağıdadır.
 
-[Aksiyom 1]: Eğer `initialProducts` parametresi sağlanmazsa, bileşen boş bir dizi (`[]`) ile çalışır ve gösterilecek ürün bulunmadığında uygun boş durum (empty state) render etmelidir.
+**[Aksiyom 1]**: Eğer `normalizeImageUrl` fonksiyonuna `null` veya `undefined` değeri verilirse, fonksiyon geçerli bir görsel URL'si döndüremeyebilir — bu durumda çağrının bir fallback mekanizması (örn: varsayılan bir görsel) kullanması beklenir.
 
-[Aksiyom 2]: Eğer `initialProducts` içindeki herhangi bir ürün nesnesi geçerli bir görsel URL'si içermiyorsa, o ürün için görsel temizleme/yardımcı işlev devreye girerek geçersiz görseller filtrelenmeli veya varsayılan bir görsel ile değiştirilmelidir.
+**[Aksiyom 2]**: Eğer `FeaturedCommercialBlocks` bileşeni `initialProducts` parametresi olmadan çağrılırsa, bileşen boş bir dizi (`[]`) ile çalışacak şekilde varsayılan değer kullanır.
 
-[Aksiyom 3]: Eğer `initialProducts` bir dizi değilse (örn: `null`, `undefined`, veya farklı bir tipteyse), bileşen hata vermemeli; fonksiyon imzasındaki varsayılan değer (`[]`) devreye girerek stabil kalmalıdır.
+**[Aksiyom 3]**: Eğer `FeaturedCommercialBlocks` bileşenine geçersiz veya bozuk bir `initialProducts` verisi (örn: `null`, `undefined`, veya dizi olmayan bir değer) aktarılırsa, bileşen hata verebilir veya beklenmeyen davranış gösterebilir.
 
 ---
 
-**Not:** Bu modül için belirtilen fonksiyon imzası dışında, eşik değerleri veya ek kabul kriterlerine dair sayısal/alan-spesifik bilgi mevcut değildir. Görsel işleme mantığı fonksiyon gövdesinde tanımlı olup, burada yalnızca component seviyesindeki mimari varsayımlar belirtilmiştir.
+**Not:** Modül sabitleri kısmında herhangi bir sabit tanımlı değildir. Eski dokümandaki domain-specific bilgiler (eşik değerleri, kabul kriterleri vb.) bu aksiyomlara dahil edilmemiştir, çünkü bu bilgiler fonksiyon gövdesinden türetilememektedir.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### normalizeImageUrl
+
+**Ne yapar**: Verilen URL değerini standart ve kullanılabilir bir forma dönüştürür. Boş, undefined veya geçersiz URL durumlarında varsayılan bir placeholder görsel döndürerek bileşenlerin hata almasını engeller.
+
+**Nasıl yapar**: Fonksiyon, gelen url parametresinin null veya undefined olup olmadığını kontrol eder. Eğer geçerli bir URL varsa bunu doğrudan döndürür. Boş veya tanımsız durumlarda ise önceden tanımlanmış varsayılan bir görsel yolunu string olarak geri verir.
+
+**Parametreler**:
+- `url`: `string | null | undefined` — Normalize edilecek görsel URL'si. Null veya undefined olabilir.
+
+**Dönüş**: `string` — Normalize edilmiş geçerli bir görsel URL'si döndürür.
 
 ### FeaturedCommercialBlocks
 **Ne yapar**: Başlangıç ürün listesi ile öne çıkan ticari blokları gösteren bir React bileşenidir.  
@@ -29632,23 +29646,6 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzasından ve bileşenin d
 **Parametreler**:  
 - initialProducts: [] — Gösterilecek ürünlerin listesi; varsayılan değer boş dizidir.  
 **Dönüş**: React.FC<FeaturedCommercialBlocksProps> — Özellikleri alarak UI'ı oluşturan fonksiyonel bileşen.
-
----
-
-## İTHALATLAR (IMPORTS)
-- import: ../../i18n/I18nProvider::useI18n
-- import: ../ProductCard::ProductCard
-- import: @/hooks/useLocalizedRoutes::useLocalizedRoutes
-- import: @/lib/images/productImage::resolveProductImageUrl
-- import: @/types/ui-models::type { Category, Product }
-- import: @/utils/imageUtils::normalizeImageUrl
-- import: framer-motion::AnimatePresence
-- import: framer-motion::motion
-- import: next/image::Image
-- import: next/link::Link
-- import: react::React
-- import: react::useMemo
-- import: react::useState
 
 ---
 
@@ -29671,51 +29668,52 @@ type CommercialTab = 'featured' | 'newArrivals' | 'bestSellers'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `FeaturedCommercialBlocks.tsx`::FeaturedCommercialBlocks
-- **params**: `{ initialProducts = [] }` — başlangıç ürünleri dizisi, varsayılan olarak boş dizi
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::normalizeImageUrl
+- **params**: (url: string | null | undefined)
 - **ic_degiskenler**:
-  - `t` — i18n çeviri fonksiyonu, `useI18n()` hook'undan alınır, tüm metinler buna bağlıdır
-  - `Routes` — lokalize edilmiş rota builder'ları, `useLocalizedRoutes()` hook'undan alınır; `Routes.products()` gibi çağrılar yapar
-  - `activeTab` — `useState<CommercialTab>` ile yönetilen aktif sekme durumu, `'featured'` varsayılır; `setActiveTab` ile güncellenir
-  - `productsByTab` — `useMemo` ile hesaplanan `{ featured, newArrivals, bestSellers }` objesi; her sekme için ayrı ürün listesi tutar
-  - `activeProducts` — `productsByTab[activeTab]` erişimiyle elde edilen mevcut sekmedeki ürünler dizisi; hem kart grid'inde hem sidebar görselinde kullanılır
-- **Dönüş**: JSX — bölüm header'ı, sekme navigasyonu, ürün kartı grid'i ve contextual sidebar içeren React section elementi
+  - `trimmedUrl` — URL parametresinin boşlukları temizlenmiş hali;startsWith kontrolleri için kullanılır
+- **Dönüş**: string — normalize edilmiş URL (başına '/' eklenmiş veya doğrudan kullanılmış)
 
----
-
-### [N2_NASIL] AST Pointer: `FeaturedCommercialBlocks.tsx`::productsByTab useMemo callback
-- **params**: yok
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::FeaturedCommercialBlocks
+- **params**: ({ initialProducts = [] }) — başlangıç ürünleri listesi, varsayılan boş dizi
 - **ic_degiskenler**:
-  - `featured` — `initialProducts` dizisinden `p.is_featured` filtresiyle ilk 4 ürün; boşsa `initialProducts.slice(0, 4)` fallback
-  - `newArrivals` — `initialProducts` dizisinin kopyası, `created_at` alanına göre azalan sırada sıralanıp ilk 4 ürün
-  - `bestSellers` — `initialProducts.slice(4, 8)` ile 5-8. ürünler; boşsa `initialProducts.slice(0, 4)` fallback
-- **Dönüş**: `{ featured, newArrivals, bestSellers }` — her sekme için filtrelenmiş/sıralanmış ürün listelerini içeren obje
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, Tüm metinler için kullanılır
+  - `activeTab` — useState hook'u ile oluşturulan aktif sekme durumu (commercial tab tipinde)
+  - `productsByTab` — useMemo hook'u ile hesaplanan sekelere göre gruplandırılmış ürünler nesnesi
+  - `activeProducts` — productsByTab nesnesinden activeTab anahtarına erişilerek elde edilen aktif ürün listesi
+- **Dönüş**: React.FC bileşeni (JSX)
 
----
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::productsByTab useMemo callback
+- **params**: () — parametre yok (useMemo callback'i)
+- **ic_degiskenler**:
+  - `featured` — is_featured flag'i olan veya ilk 4 üründen fallback yapılan öne çıkan ürünler dizisi
+  - `newArrivals` — created_at tarihine göre sıralanmış yeni gelen ürünler dizisi (en fazla 4)
+  - `bestSellers` — en çok satanlar için fallback ürün listesi (dizinin 4-8 arası veya ilk 4'ü)
+- **Dönüş**: { featured: Product[], newArrivals: Product[], bestSellers: Product[] }
 
-### [N3_NASIL] AST Pointer: `FeaturedCommercialBlocks.tsx`::tabOrder.map callback
-- **params**: `tab` — mevcut sekme tanımlayıcı string'i (ör. `'featured'`, `'new'`, `'bestsellers'`)
-- **ic_degiskenler**: yok (closure'dan `activeTab`, `t`, `setActiveTab` kullanılır)
-- **Dönüş**: JSX — `role="tab"` nitelikli `<button>` elementi; aktif sekme ise `motion.div` ile animasyonlu arka plan glow efekti eklenir
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::tabButton render callback
+- **params**: (tab) — sekmeyi temsil eden string
+- **ic_degiskenler**: yok — sadece parametre ve dış scope değişkenleri kullanılır
+- **Dönüş**: JSX — tekil tab butonu elementi
 
----
-
-### [N4_NASIL] AST Pointer: `FeaturedCommercialBlocks.tsx`::activeProducts.map callback
-- **params**: `product` — `Product` tipinde ürün nesnesi; `product.id`, `product.name`, `product.is_featured`, `product.created_at` alanlarına erişilir, `ProductCard`'a geçirilir; `idx` — dizi indeksi, animasyon gecikme hesabında `idx * 0.1` olarak kullanılır
-- **ic_degiskenler**: yok (closure'dan `ProductCard`, `motion.div` kullanılır)
-- **Dönüş**: JSX — `motion.div` sarmalayıcısı içinde `<ProductCard product={product} compact hidePrice />` component'i; `key={product.id}`, `delay: idx * 0.1` animasyonu ile
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx::productCard render callback
+- **params**: (product: Product, idx: number) — ürün nesnesi ve indeks
+- **ic_degiskenler**: yok — sadece parametreler ve dış scope bileşenleri kullanılır
+- **Dönüş**: JSX — animasyonlu ürün kartı wrapper elementi
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\components\home\FeaturedCommercialBlocks.tsx
+  function: src\components\home\FeaturedCommercialBlocks.tsx::normalizeImageUrl
   function: src\components\home\FeaturedCommercialBlocks.tsx::FeaturedCommercialBlocks
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: FeaturedCommercialBlocks
+  export: normalizeImageUrl
 
 ---
 
@@ -29731,7 +29729,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Renkler:** `bg-cyan-400`, `bg-cyan-500/10`, `bg-slate-200/50`, `bg-slate-900`, `bg-slate-950`, `bg-white`, `bg-white/5`, `border-cyan-500/10`, `border-slate-200`, `border-white/10`, `border-white/5`, `hover:bg-cyan-400`, `hover:text-slate-900`, `sm:text-6xl`, `text-4xl`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `flex`, `flex-col`, `gap-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `grid-cols-2`, `h-1.5`, `h-32`
 - **Varyant/Responsive:** `:`, `active:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `$`, `:`, `===`, `active:scale-95`, `activeTab`, `animate-pulse`, `aspect-square`, `blur-3xl`, `border`, `content-auto-showcase`, `duration-500`, `duration-700`, `font-black`, `font-bold`, `font-light`
+- **Yardımcı Sınıflar:** `$`, `:`, `===`, `active:scale-95`, `activeTab`, `animate-pulse`, `aspect-square`, `blur-3xl`, `border`, `duration-500`, `duration-700`, `font-black`, `font-bold`, `font-light`, `grayscale`
 
 ---
 # FILE: src\components\home\GuidedCategoryDiscovery.md
@@ -57926,8 +57924,8 @@ type VariantSelection = <T extends VariantLike>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductFanSelection.ts
-skeleton_hash: cf67fad21ac874be
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductFanSelection.ts
+skeleton_hash: d25b597f76ec7fa0
 entity_hashes:
   func:calismaNoktasi: 477178de8115d130
   func:degerlendir: f750568727981b71
@@ -57936,7 +57934,7 @@ entity_hashes:
   func:secimYap: 4647312ff1acd1ac
   func:sistemKatsayisi: 04ecc41bc675abb4
   overview: 1ad4e3445b46e669
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:57Z
 ---
 
 ## Genel Bakış
@@ -58087,23 +58085,15 @@ type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
 
 ## SABİTLER
 - **MAHAL_KURALLARI** (object) — `{
-
   bathroom: { ach: 8, minimumM3h: 85 },
-
   kitchen: { ach: 15, minimumM3h:...`
 - **GUZERGAH_GEOMETRISI** (object) — `{
-
   short: { uzunlukM: 3, dirsek90: 1, dirsek45: 0 },
-
   medium: { uzunlukM:...`
 - **SESSIZLIK_AGIRLIGI** (object) — `{
-
   normal: 0.2,
-
   important: 0.4,
-
   critical: 0.6,
-
 }`
 
 ---
@@ -58196,11 +58186,11 @@ graph TD
     ductFanSelection_ts__parsePQCurve["parsePQCurve"]
     ductFanSelection_ts__secimYap["secimYap"]
     ductFanSelection_ts__sistemKatsayisi["sistemKatsayisi"]
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
 ```
 
 ## NODE ID STANDARD
@@ -58243,8 +58233,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductPressure.ts
-skeleton_hash: a0b705802650fa34
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductPressure.ts
+skeleton_hash: 1579ba7b4e3d68fe
 entity_hashes:
   func:akisHizi: a87413c22f69c858
   func:dinamikBasinc: 4288bc94c70c6d78
@@ -58252,7 +58242,7 @@ entity_hashes:
   func:reynolds: d87c6fd9c4af1b38
   func:surtunmeFaktoru: 20425e5a77455729
   overview: 1dd122290e85a03e
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:34Z
 ---
 
 ## Genel Bakış
@@ -58349,23 +58339,15 @@ type KanalMalzemesi = keyof typeof PURUZLULUK_M
 
 ## SABİTLER
 - **PURUZLULUK_M** (as_expression) — `{
-
   galvanized: 0.00015,
-
   pvc: 0.00001,
-
   flex: 0.003,
-
 } as const`
 - **FITTING_K** (as_expression) — `{
-
   /** 90° yuvarlak dirsek, eğrilik yarıçapı = 1,5·D (tipik hazır dirsek). ...`
 - **TERMINAL_K** (as_expression) — `{
-
   /** İç mahal egzoz menfezi/ızgarası. */
-
   menfez: 2.5,
-
   /** Geri-akış...`
 - **TERMINAL_K_TOPLAM** (binary_expression) — `TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur`
 
@@ -58429,8 +58411,8 @@ graph TD
     ductPressure_ts__kanalBasincKaybi["kanalBasincKaybi"]
     ductPressure_ts__reynolds["reynolds"]
     ductPressure_ts__surtunmeFaktoru["surtunmeFaktoru"]
-    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
+    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__akisHizi
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__dinamikBasinc
 ```
@@ -65179,6 +65161,8 @@ entity_hashes:
   style_tokens: dd5ed8d0f58dcf57
 generated_at: 2026-06-19T20:48:28Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 Bu modül, Supabase istemcisini React uygulaması genelinde paylaşmak için bir bağlam (context) sağlar. SupabaseProvider bileşeni, istemciyi oluşturarak ve bağlam aracılığıyla ileterek alt bileşenlerin Supabase veritabanı veya kimlik doğrulama hizmetlerine erişmesini kolaylaştırır. useSupabaseClient hook'u ise bu bağlamdan istemciyi tüketmek için kullanılır.
