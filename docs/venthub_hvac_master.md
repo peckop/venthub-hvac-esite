@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T17:47:32.841968+00:00
+compiled_at: 2026-08-27T19:35:08.150391+00:00
 total_compiled_files: 656
-source_commit: 829d6493
+source_commit: 4d4db1de
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T17:47:32.841968+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T19:35:08.150391+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -57991,8 +57991,8 @@ type VariantSelection = <T extends VariantLike>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductFanSelection.ts
-skeleton_hash: cf67fad21ac874be
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductFanSelection.ts
+skeleton_hash: d25b597f76ec7fa0
 entity_hashes:
   func:calismaNoktasi: 477178de8115d130
   func:degerlendir: f750568727981b71
@@ -58001,7 +58001,7 @@ entity_hashes:
   func:secimYap: 4647312ff1acd1ac
   func:sistemKatsayisi: 04ecc41bc675abb4
   overview: 1ad4e3445b46e669
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:57Z
 ---
 
 ## Genel Bakış
@@ -58152,23 +58152,15 @@ type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
 
 ## SABİTLER
 - **MAHAL_KURALLARI** (object) — `{
-
   bathroom: { ach: 8, minimumM3h: 85 },
-
   kitchen: { ach: 15, minimumM3h:...`
 - **GUZERGAH_GEOMETRISI** (object) — `{
-
   short: { uzunlukM: 3, dirsek90: 1, dirsek45: 0 },
-
   medium: { uzunlukM:...`
 - **SESSIZLIK_AGIRLIGI** (object) — `{
-
   normal: 0.2,
-
   important: 0.4,
-
   critical: 0.6,
-
 }`
 
 ---
@@ -58261,11 +58253,11 @@ graph TD
     ductFanSelection_ts__parsePQCurve["parsePQCurve"]
     ductFanSelection_ts__secimYap["secimYap"]
     ductFanSelection_ts__sistemKatsayisi["sistemKatsayisi"]
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
 ```
 
 ## NODE ID STANDARD
@@ -58308,8 +58300,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductPressure.ts
-skeleton_hash: a0b705802650fa34
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductPressure.ts
+skeleton_hash: 1579ba7b4e3d68fe
 entity_hashes:
   func:akisHizi: a87413c22f69c858
   func:dinamikBasinc: 4288bc94c70c6d78
@@ -58317,7 +58309,7 @@ entity_hashes:
   func:reynolds: d87c6fd9c4af1b38
   func:surtunmeFaktoru: 20425e5a77455729
   overview: 1dd122290e85a03e
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:34Z
 ---
 
 ## Genel Bakış
@@ -58414,23 +58406,15 @@ type KanalMalzemesi = keyof typeof PURUZLULUK_M
 
 ## SABİTLER
 - **PURUZLULUK_M** (as_expression) — `{
-
   galvanized: 0.00015,
-
   pvc: 0.00001,
-
   flex: 0.003,
-
 } as const`
 - **FITTING_K** (as_expression) — `{
-
   /** 90° yuvarlak dirsek, eğrilik yarıçapı = 1,5·D (tipik hazır dirsek). ...`
 - **TERMINAL_K** (as_expression) — `{
-
   /** İç mahal egzoz menfezi/ızgarası. */
-
   menfez: 2.5,
-
   /** Geri-akış...`
 - **TERMINAL_K_TOPLAM** (binary_expression) — `TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur`
 
@@ -58494,8 +58478,8 @@ graph TD
     ductPressure_ts__kanalBasincKaybi["kanalBasincKaybi"]
     ductPressure_ts__reynolds["reynolds"]
     ductPressure_ts__surtunmeFaktoru["surtunmeFaktoru"]
-    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
+    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__akisHizi
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__dinamikBasinc
 ```
