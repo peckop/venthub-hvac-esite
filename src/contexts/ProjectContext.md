@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\contexts\ProjectContext.tsx
-skeleton_hash: 59a9172118b3d007
+source_path: C:\tmp\venthub-wt-t131\src\contexts\ProjectContext.tsx
+skeleton_hash: 2bf7ab77df4a76ac
 entity_hashes:
   overview: f1d38a9d20d9fa96
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış

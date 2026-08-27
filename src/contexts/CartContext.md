@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\contexts\CartContext.tsx
-skeleton_hash: 9b6e17e844b96d03
+source_path: C:\tmp\venthub-wt-t131\src\contexts\CartContext.tsx
+skeleton_hash: 9f888870eafcb44b
 entity_hashes:
   overview: 5c2e2a3fcb9d0dde
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
@@ -52,7 +52,7 @@ Bu modül, yalnızca bir React Context tanımı içererek alışveriş sepeti du
 - `clearCart: (opts?: { silent?: boolean }) => void`
 - `getCartTotal: () => number`
 - `getCartCount: () => number`
-- `applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void`
+- `applyServerPricing: (items: { product_id: string, unit_price: number | null }[]) => void`
 
 ---
 

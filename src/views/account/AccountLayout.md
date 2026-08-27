@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\account\AccountLayout.tsx
-skeleton_hash: 9648c984d7a1bea3
+source_path: C:\tmp\venthub-wt-t131\src\views\account\AccountLayout.tsx
+skeleton_hash: 9f2e77cc37fa3add
 entity_hashes:
   func:AccountLayout: a90ed56764b85b28
   overview: c9fc556dd386a0a0
   style_tokens: cca55516cfe981ad
-generated_at: 2026-08-25T07:31:37Z
+generated_at: 2026-08-27T06:50:17Z
 ---
 
 ## Genel Bakış
@@ -69,10 +69,32 @@ type TabGroup = { label: string; items: TabItem[] }
 
 ---
 
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/views/account/AccountLayout.tsx::AccountLayout
+- **params**: `children` — React.ReactNode tipinde, opsiyonel; layout bileşeninin içeriğini temsil eder
+- **ic_degiskenler**:
+  - `router` — `useRouter()` hook'undan dönen Next.js router nesnesi; sayfa yönlendirmelerinde kullanılır
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; metinlerin yerelleştirilmesinde kullanılır
+  - `routes` — `useLocalizedRoutes()` hook'undan dönen localize edilmiş rotalar proxy nesnesi; dil-önekli URL'lerin oluşturulmasında kullanılır
+  - `user` — `useAuth()` hook'undan dönen kullanıcı bilgisi; oturum durumunun kontrolünde kullanılır
+  - `loading` — `useAuth()` hook'undan dönen yükleme durumu; auth işleminin tamamlanıp tamamlanmadığını belirtir
+  - `pathname` — `usePathname()` hook'undan dönen mevcut URL yolu; aktif sekme kontrolünde kullanılır
+  - `navGroups` — TabGroup tipinde dizi; sidebar navigasyon yapısını tanımlar, her grup `label` ve `items` alanlarından oluşur
+  - `shouldRender` — boolean; geliştirme modunda veya kullanıcı oturum açmışsa true, aksi halde false; bileşenin render edilip edilmeyeceğini belirler
+  - `active` — useEffect içinde tanımlanan boolean bayrak; bileşen unmount olduğunda false yapılır, yönlendirme işleminin iptalinde kullanılır
+  - `group` — navGroups.map callback'indeki her bir TabGroup nesnesi; `label` ve `items` alanlarına erişilir
+  - `gi` — navGroups.map callback'indeki grup indeksi; key prop'u olarak kullanılır
+  - `tab` — group.items.map callback'indeki her bir sekme nesnesi; `to`, `label`, `icon` alanlarına erişilir
+  - `isActive` — boolean; `pathname === tab.to` karşılaştırmasıyla belirlenir; sekmenin aktif olup olmadığını belirler, CSS sınıflarının seçiminde kullanılır
+- **Dönüş**: JSX elementi (React.ReactNode); sidebar ve main content alanını içeren layout yapısı, `shouldRender` false ise null döner
+
+---
+
 ## NODE ID STANDARD
 
-  file: AccountLayout.tsx
-  function: AccountLayout.tsx::AccountLayout
+  file: src\views\account\AccountLayout.tsx
+  function: src\views\account\AccountLayout.tsx::AccountLayout
 
 ---
 

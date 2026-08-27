@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\quotes\AdminQuotesPage.tsx
-skeleton_hash: 1a87f71a21feb147
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\quotes\AdminQuotesPage.tsx
+skeleton_hash: 603a3f3b881f2c38
 entity_hashes:
   func:AdminQuotesPage: 8f282793cec53879
   overview: ed62e4d1f35d7caa
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-08-25T07:30:46Z
+generated_at: 2026-08-27T06:51:24Z
 ---
 
 ## Genel Bakış
@@ -71,8 +71,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: AdminQuotesPage.tsx
-  function: AdminQuotesPage.tsx::AdminQuotesPage
+  file: src\views\admin\quotes\AdminQuotesPage.tsx
+  function: src\views\admin\quotes\AdminQuotesPage.tsx::AdminQuotesPage
 
 ---
 

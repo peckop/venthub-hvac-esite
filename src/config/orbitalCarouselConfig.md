@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\config\orbitalCarouselConfig.ts
-skeleton_hash: 42378e633ba440af
+source_path: C:\tmp\venthub-wt-t131\src\config\orbitalCarouselConfig.ts
+skeleton_hash: fae0de3c5b40011e
 entity_hashes:
   overview: eca02fed19b4de2a
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
