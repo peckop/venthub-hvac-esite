@@ -117,9 +117,16 @@ function kur(onek: string, opts: { scopeKopyala?: boolean } = {}): Repo {
   dosyaYaz(`${yol}/.venv/bin/python`, SAHTE_PYTHON)
   calistirilabilirYap(`${yol}/.venv/bin/python`)
 
-  // İkinci commit: KAPSAMDA iki dosya, KAPSAM DIŞI iki dosya.
+  // İkinci commit: KAPSAMDA üç dosya, KAPSAM DIŞI iki dosya.
   dosyaYaz(`${yol}/src/lib/gercek.ts`, 'export const a = 1\n')
   dosyaYaz(`${yol}/next.config.mjs`, 'export default {}\n')
+  // `src` DIŞI ama skip_dirs'te de OLMAYAN bir kaynak — ÖLÇÜLMÜŞ REGRESYON KORUMASI:
+  // ilk süzgecim kapsamı "src/** + kök seviyesi" ile sınırlamıştı ve master'da TRACKED duran
+  // 46 gerçek companion'ı (supabase/functions/**, e2e/, scripts/**, .claude/hooks) sessizce
+  // dışarıda bırakıyordu. `post-commit`in eski hâli yol kısıtı KOYMUYORDU — yani daraltmayı
+  // bu iş emri sırasında BEN ekledim ve indikten sonra ölçüp geri aldım. Bu kol o daraltmanın
+  // sessizce geri gelmesini engeller.
+  dosyaYaz(`${yol}/supabase/functions/_shared/kritik.ts`, 'export const s = 1\n')
   dosyaYaz(`${yol}/src/__tests__/conformance/sahte.test.ts`, 'export const t = 1\n')
   dosyaYaz(`${yol}/src/lib/index.ts`, 'export * from "./gercek"\n')
   execFileSync('git', ['-C', yol, 'add', '-A'])
@@ -172,6 +179,11 @@ describe('INV-HOOKS-2 · companion kapsam süzgeci TEK uygulama', () => {
     )
     expect(
       cikti,
+      'src DISI kaynak hedeflenmedi — kapsam yol derinligiyle daraltilmis demektir; masterda ' +
+        'TRACKED duran 46 gercek companion tam bu yuzden uretilmeyecekti',
+    ).toContain('supabase/functions/_shared/kritik.ts')
+    expect(
+      cikti,
       'TEST DOSYASI hedeflendi — post-merge süzgeci hâlâ post-commit ile aynı değil; bu tam olarak ' +
         'filo genelinde "başkası dosyamı kirletti" alarmlarını yağdıran davranış',
     ).not.toContain('sahte.test.ts')
@@ -185,6 +197,7 @@ describe('INV-HOOKS-2 · companion kapsam süzgeci TEK uygulama', () => {
 
     expect(cikti).toContain('src/lib/gercek.ts')
     expect(cikti).toContain('next.config.mjs')
+    expect(cikti, 'post-commit src disi kaynagi hedeflemedi').toContain('supabase/functions/_shared/kritik.ts')
     expect(cikti, 'post-commit test dosyasını hedefledi').not.toContain('sahte.test.ts')
     expect(cikti, 'post-commit skip_files dosyasını hedefledi').not.toContain('src/lib/index.ts')
   }, 60_000)
