@@ -2399,6 +2399,12 @@ export const en: typeof tr = {
       title: 'Request Quote',
       itemsTitle: 'Requested Items',
       qty: 'Qty',
+      contactName: 'Full name',
+      contactNamePh: 'Person the quote will be issued to',
+      contactPhone: 'Phone',
+      contactPhonePh: '+90 5xx xxx xx xx',
+      contactEmailNote: 'The quote will be sent to this email address',
+      contactRequired: 'Full name and phone are required — a quote must name its recipient',
       note: 'Note (optional)',
       notePh: 'A short note about your project/needs (optional)',
       submit: 'Send Quote Request',
@@ -2435,11 +2441,15 @@ export const en: typeof tr = {
       project: 'Project'
     },
     statusLabels: {
+      draft: 'Draft',
       requested: 'Requested',
       quoted: 'Quoted',
       accepted: 'Accepted',
       rejected: 'Rejected',
-      expired: 'Expired'
+      expired: 'Expired',
+      cancelled: 'Cancelled',
+      superseded: 'Superseded',
+      converted: 'Converted to order'
     },
     admin: {
       title: 'Quote Queue',
@@ -2451,6 +2461,7 @@ export const en: typeof tr = {
       emptyDescription: 'When customers request quotes for unpriced products, they are listed here.',
       filterEmptyDescription: 'No quote requests match your filters.',
       emailUnavailable: 'email unavailable',
+      prospectBadge: 'no account — acceptance locked',
       table: {
         customer: 'Customer',
         items: 'Items',

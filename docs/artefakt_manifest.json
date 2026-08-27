@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "647a74504b14fdc33aeaf8a3c2ca70e97584923433874abe31a22e1db7940dc6",
+      "icerik_sha256": "686ab36236f64dd37781405b3e225fa03fa7f2d0297317506da50f685c5c25d0",
       "kaynak": {
         "dosya_sayisi": 98,
         "dosyalar": {
@@ -108,7 +108,7 @@
         "izlenmeyen": [],
         "ozet": "13aca04c7a35256389064f212cccbf532b90b069fc40fe29bd8e467c6c22e036"
       },
-      "kaynak_commit": "59f8905acef9820b14c8d15e4b5b7c8110fde87e",
+      "kaynak_commit": "b9d8a168995f25a13726d8a5e5ff43df785946ee",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +125,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "28c5979613ce42f829417e4fbeca4a7cf1ecd015da1028c4b19fc2739854dc16",
+      "icerik_sha256": "f6ceeed6c41c21ae0cc875c8b512714b16b366e90382bdfd98200df119bd7c1d",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -180,7 +180,7 @@
           "docs/standards/product-image-standard.md": "7144db1142e1b44905bd4cf0b9ada9c5a6963b34",
           "docs/standards/product-schema-standard.md": "5fe179d4b6dbed80b910f7c1c4a55b7525ac9a6f",
           "docs/standards/purchasing-standard.md": "aa9b0aa0c25e105df4dfed59c24653d369dee1a6",
-          "docs/standards/quote-standard.md": "dcd2ec9cd656d5eaf9a740c9dc0622c9c5a531c7",
+          "docs/standards/quote-standard.md": "fb8586ae89535ef9df40620f12c036b87866b234",
           "docs/standards/rendering-cache-standard.md": "a025df588c34c1d572b10ae09e78f280c2e386da",
           "docs/standards/runtime-version-alignment-standard.md": "5e1d1ebbf84268f2b2d4fbcbdb893e0fc8e52855",
           "docs/standards/session-loop-ritual.md": "32bcc5c0e9aad0f8ed6f59a18c6ff1a8f30b8e8a",
@@ -193,9 +193,9 @@
           "docs/standards/work-tracking-ssot-standard.md": "6a00f894fbc818c9e927e2ced965936c6162475e"
         },
         "izlenmeyen": [],
-        "ozet": "fea671947a70b3d11c0870c610247a1e544ac37c6269fdf2645f5a38f13ce30e"
+        "ozet": "70a27e4ae05202e2d71e593dd78f3178d5aa2324354ac58de120e214ee82c84b"
       },
-      "kaynak_commit": "59f8905acef9820b14c8d15e4b5b7c8110fde87e",
+      "kaynak_commit": "b9d8a168995f25a13726d8a5e5ff43df785946ee",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +204,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "f720f63ad0813cb5b58b152c33c5790fce3d45f634b2aece8995a50102fd66c3",
+      "icerik_sha256": "f6ba5061ae7eaaa12e6fb809af21777d000f7706c114e4050e211d919d4dd8db",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +251,7 @@
         "izlenmeyen": [],
         "ozet": "5f668b0cb06f66330209b3db479b057b3af56f993ecfc0ab19343995d55e72a2"
       },
-      "kaynak_commit": "59f8905acef9820b14c8d15e4b5b7c8110fde87e",
+      "kaynak_commit": "b9d8a168995f25a13726d8a5e5ff43df785946ee",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,7 +259,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "5a799e31fbda46d6be87b1e80d6ef7a72642f31f71105111e3f10459b4311203",
+      "icerik_sha256": "a8a0c594be6ad5233b1446ffb14a34fca73d8d2a233a8276418dec3ea11c61e9",
       "kaynak": {
         "dosya_sayisi": 655,
         "dosyalar": {
@@ -922,7 +922,7 @@
         "izlenmeyen": [],
         "ozet": "60907cc753118998a216ec2b84c1f9a932cdfcf86b5fa40660d58068081ea772"
       },
-      "kaynak_commit": "59f8905acef9820b14c8d15e4b5b7c8110fde87e",
+      "kaynak_commit": "b9d8a168995f25a13726d8a5e5ff43df785946ee",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -931,7 +931,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-26T21:53:03.840775+00:00",
-  "kaynak_commit": "59f8905acef9820b14c8d15e4b5b7c8110fde87e",
+  "derlendi": "2026-08-26T22:06:58.232155+00:00",
+  "kaynak_commit": "b9d8a168995f25a13726d8a5e5ff43df785946ee",
   "surum": 1
 }

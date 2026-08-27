@@ -3306,12 +3306,17 @@ export type Database = {
         Row: {
           created_at: string
           currency: string | null
+          discount_rate: number | null
+          group_label: string | null
           id: string
+          line_no: number | null
+          line_total: number | null
           note: string | null
-          product_id: string | null
+          product_id: string
           product_name: string
           qty: number
           quote_id: string
+          tax_rate: number | null
           tenant_id: string
           unit_price: number | null
           updated_at: string
@@ -3320,12 +3325,17 @@ export type Database = {
         Insert: {
           created_at?: string
           currency?: string | null
+          discount_rate?: number | null
+          group_label?: string | null
           id?: string
+          line_no?: number | null
+          line_total?: number | null
           note?: string | null
-          product_id?: string | null
+          product_id: string
           product_name: string
           qty: number
           quote_id: string
+          tax_rate?: number | null
           tenant_id?: string
           unit_price?: number | null
           updated_at?: string
@@ -3334,12 +3344,17 @@ export type Database = {
         Update: {
           created_at?: string
           currency?: string | null
+          discount_rate?: number | null
+          group_label?: string | null
           id?: string
+          line_no?: number | null
+          line_total?: number | null
           note?: string | null
-          product_id?: string | null
+          product_id?: string
           product_name?: string
           qty?: number
           quote_id?: string
+          tax_rate?: number | null
           tenant_id?: string
           unit_price?: number | null
           updated_at?: string
@@ -3385,37 +3400,115 @@ export type Database = {
       }
       venthub_quotes: {
         Row: {
+          accept_channel: string | null
+          accept_confirmed_at: string | null
+          accept_confirmed_by: string | null
+          accept_declaration_version: string | null
+          accept_evidence_ref: string | null
+          accept_ip: unknown
+          accept_recorded_by: string | null
+          accepted_at: string | null
+          accepted_revision_no: number | null
+          amended_from: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          converted_order_id: string | null
           created_at: string
+          currency: string | null
           id: string
+          party_role: string | null
+          quote_no: string | null
           request_email_sent_at: string | null
+          revision_no: number
+          root_quote_id: string | null
+          sales_project_id: string | null
+          sent_at: string | null
           source: string
           source_project_id: string | null
           status: string
+          superseded_by: string | null
           tenant_id: string
+          total_amount: number | null
           updated_at: string
-          user_id: string
+          user_id: string | null
+          valid_until: string | null
         }
         Insert: {
+          accept_channel?: string | null
+          accept_confirmed_at?: string | null
+          accept_confirmed_by?: string | null
+          accept_declaration_version?: string | null
+          accept_evidence_ref?: string | null
+          accept_ip?: unknown
+          accept_recorded_by?: string | null
+          accepted_at?: string | null
+          accepted_revision_no?: number | null
+          amended_from?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          converted_order_id?: string | null
           created_at?: string
+          currency?: string | null
           id?: string
+          party_role?: string | null
+          quote_no?: string | null
           request_email_sent_at?: string | null
+          revision_no?: number
+          root_quote_id?: string | null
+          sales_project_id?: string | null
+          sent_at?: string | null
           source: string
           source_project_id?: string | null
           status?: string
+          superseded_by?: string | null
           tenant_id?: string
+          total_amount?: number | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
+          valid_until?: string | null
         }
         Update: {
+          accept_channel?: string | null
+          accept_confirmed_at?: string | null
+          accept_confirmed_by?: string | null
+          accept_declaration_version?: string | null
+          accept_evidence_ref?: string | null
+          accept_ip?: unknown
+          accept_recorded_by?: string | null
+          accepted_at?: string | null
+          accepted_revision_no?: number | null
+          amended_from?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string
+          converted_order_id?: string | null
           created_at?: string
+          currency?: string | null
           id?: string
+          party_role?: string | null
+          quote_no?: string | null
           request_email_sent_at?: string | null
+          revision_no?: number
+          root_quote_id?: string | null
+          sales_project_id?: string | null
+          sent_at?: string | null
           source?: string
           source_project_id?: string | null
           status?: string
+          superseded_by?: string | null
           tenant_id?: string
+          total_amount?: number | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
+          valid_until?: string | null
         }
         Relationships: [
           {
