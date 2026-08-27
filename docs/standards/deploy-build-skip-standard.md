@@ -41,6 +41,8 @@ tetikler**; yalnız §D3'te ADIYLA sayılan sınıf atlanır.
 | `.github/**` | CI yapılandırması; Vercel çıktısını etkilemez |
 | `registry/**` | İş emri kayıtları |
 | `LICENSE` | Metin |
+| `scripts/board/**` | Şerit panosu araçları. Ölçüldü (2026-08-26): `package.json`, `next.config.mjs`, `vercel.json`, `.github/workflows/*` içinde `scripts/board` geçen **tek bir referans yok**. Pozitif kontrolle doğrulandı — aynı arama `scripts/setup-hooks` için referans **buluyor**. → D3.1 |
+| `.githooks/**` | Git kancalarının **kendisi** (kancaları kuran betik değil). Derleme hattıyla dolaylı bağı VAR ama üç ölçülmüş sebeple atlanabilir. → D3.1 |
 
 **Bilerek DIŞARIDA (build tetikler):** `supabase/migrations/**` — build'i doğrudan
 etkilemez, ama önizleme dağıtımı migration'ın vitrine yansımasını görmenin **tek**
@@ -50,6 +52,48 @@ yoludur ve bu depoda migration merge'i prod'a **otomatik** uygulanır. Ayrıca
 **Listeye ekleme kuralı:** yeni bir sınıf eklemek isteyen, "bu dosya türü derlemeye
 girmiyor" iddiasını **ölçerek** kanıtlar (import taraması + yapılandırma kontrolü) ve
 INV-BUILD-SKIP'e o sınıf için bir assert ekler. Gerekçesiz satır eklenmez.
+
+### D3.1 — `scripts/board/**` ve `.githooks/**` (2026-08-26, Ref REC-76)
+
+İki sınıf eklendi. Gerekçeleri **aynı ağırlıkta değil** ve bunu açıkça yazmak gerekiyor:
+birincisi temiz, ikincisi **kabul edilmiş bir artık riski** taşıyor.
+
+**`scripts/board/**` — temiz.** Derleme hattında sıfır referans. Ölçüm, aramanın
+gerçekten aradığını gösteren bir **pozitif kontrolle** yapıldı: aynı komut
+`scripts/setup-hooks` için `package.json:10`'u buluyor. Bulmayan bir arama ile
+"referans yok" demek, ölçüm değil sessizliktir.
+
+**`.githooks/**` — bağı VAR, yine de atlanabilir.** `package.json`'da
+`"prepare": "node scripts/setup-hooks.mjs"` var ve Vercel `pnpm install` koştuğu için
+prepare de koşar. Buna rağmen atlanabilir olmasının üç ölçülmüş sebebi:
+
+1. **Koşan dosya `scripts/setup-hooks.mjs`, `.githooks/**` değil.** O betik kancaları
+   *okur*. Betiğin kendisi listede DEĞİL — ona dokunmak build'i tetikler.
+2. **`setup-hooks.mjs` fail-safe.** Kancalar bozuk ya da yokken sessizce `exit 0`
+   veriyor (kaynakta `catch → process.exit(0)`). Bozuk bir kanca `pnpm install`i
+   düşürmüyor.
+3. **Dağıtılan çıktıya hiçbir şey yazmıyor** — kancalar `.git/hooks`a kopyalanır.
+
+**ARTIK RİSK ve neden kabul edilebilir:** atlarsak, bir `.githooks` değişikliğinin
+Vercel'in install adımını bozup bozmadığını **o dağıtımda öğrenemeyiz**. Bu boşluğu CI
+kapatıyor: `.github/workflows/ci.yml`'de **yol filtresi yok** (ölçüldü), yani her PR'da
+`pnpm install` zaten koşuyor ve bozuk bir prepare orada kırmızı verir. Atlama, hiçbir
+conformance kapısını **körleştirmiyor**. Bu cümle bir varsayım değil, kapının
+kaldırılması hâlinde yeniden ölçülmesi gereken bir **ön koşul**: `ci.yml`'e yol filtresi
+eklenirse bu satır geçersizleşir.
+
+**KAPSAM DAR TUTULUR — desen yazarken iki tuzak:**
+
+| Yanlış | Niçin tehlikeli |
+|---|---|
+| `scripts/*` | `scripts/vercel-ignore-build.sh`'ı da atlar — kapı **kendi değişikliğini** doğrulayamaz hâle gelir. `scripts/setup-hooks.mjs` de atlanır ve (2) numaralı gerekçe çöker. |
+| `.githooks*` (sondaki `/` düşerse) | `.githooksfake/…` gibi yollar sessizce atlama sınıfına girer. |
+
+INV-BUILD-SKIP bu iki tuzağı **adıyla** ölçer (`scripts/vercel-ignore-build.sh → BUILD`,
+`scripts/setup-hooks.mjs → BUILD`, `scripts/boardfake.ts → BUILD`,
+`.githooksfake/pre-commit → BUILD`). Sabotaj sınavı **5/5**: kapsamı `scripts/*`'a
+genişletmek, eğik çizgiyi düşürmek, eklenen satırı sökmek ve ölçüm aracını körleştirmek
+— dördü de kırmızı verdi; bozulmamış hâl yeşil kaldı (sınav vacuous değil).
 
 ## D4 — Karşılaştırma tabanı `VERCEL_GIT_PREVIOUS_SHA`, `HEAD^` DEĞİL
 
