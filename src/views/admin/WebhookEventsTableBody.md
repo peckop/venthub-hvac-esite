@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\admin\WebhookEventsTableBody.tsx
-skeleton_hash: bf3030ebf0703097
+source_path: C:\Users\alize\venthub-hvac\src\views\admin\WebhookEventsTableBody.tsx
+skeleton_hash: 281e943f1b76ab3b
 entity_hashes:
   func:WebhookEventsTableBody: 08758a783f258c2e
   func:webhookEventsFetcher: 6dbdd61167243534
   overview: ef1b01ec610a06ac
-  style_tokens: 50d31b5dea60eb93
-generated_at: 2026-08-27T07:32:34Z
+  style_tokens: b14d0e3316338d3b
+generated_at: 2026-06-19T20:50:29Z
 ---
 
 ## Genel Bakış
@@ -116,6 +116,45 @@ Bu modül, webhook olaylarının veritabanından çekilmesi ve tablo gövdesi ol
 
 ---
 
+### [N2_NASIL] AST Pointer: `src/views/admin/WebhookEventsTableBody.tsx`::`WebhookEventsTableBody`
+- **params**: (yok — parametresiz React fonksiyonel bileşeni)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('admin.webhooks.eventType')` gibi anahtarlarla çeviri metinleri alınır
+  - `lang` — `useI18n()` hook'undan dönen dil kodu (`'tr' | 'en'`); `formatDateTime` fonksiyonuna passed
+  - `selectedEvent` — `useState<DbWebhookEvent | null>(null)` ile oluşturulan state; tıklanan webhook olayını tutar, sağ panelde detay göstermek için kullanılır
+  - `setSelectedEvent` — `selectedEvent` state'ini güncelleyen setter fonksiyonu
+  - `table` — `useAdminTable<DbWebhookEvent>({...})` hook'undan dönen tablo controller nesnesi; `table.filtering`, `table.selection`, `table.totalMatched`, `table.fetchAllForExport()` erişimleri yapılır
+    - `resource: 'webhook_events'` — Supabase tablo adı
+    - `rowId: (r) => r.id` — her satırın benzersiz tanımlayıcısı
+    - `fetcher: webhookEventsFetcher` — veri çekme fonksiyonu referansı
+    - `paginationMode: 'server'` — sunucu taraflı sayfalama
+    - `sortMode: 'server'` — sunucu taraflı sıralama
+    - `pageSize: 50` — sayfa başına satır sayısı
+    - `initialSort: { key: 'created_at', dir: 'desc' }` — varsayılan sıralama
+    - `syncUrl: true` — URL parametreleri ile senkronizasyon
+  - `setQuery` — `table.filtering.setQuery`; arama sorgusunu günceller
+  - `setFilter` — `table.filtering.setFilter`; filtre değerlerini günceller; `setFilter('status', next)` çağrılır
+  - `filters` — `table.filtering.filters`; mevcut filtre durumu nesnesi; `filters.status` erişimi yapılır
+  - `activeStatuses` — `useMemo()` ile türetilen, o anda aktif olan durum filtresi değerleri dizisi; `filters.status ?? []` hesaplanır
+  - `onRowClick` — `useCallback()` ile sarılı satır tıklama işleyicisi; parametre olarak `row: DbWebhookEvent` alır, `setSelectedEvent(row)`, `table.selection.clear()`, `table.selection.toggle(row.id)` çağırır
+  - `exportCsv` — `useCallback()` ile sarılı asfonksiyon; CSV dışa aktarma işlemini yürütür
+    - `rows` — `await table.fetchAllForExport()` ile çekilen tüm filtrelenmiş satırlar
+    - `header` — CSV başlık satırı; `t('admin.webhooks.export.headers.id')` vb. ile 6 sütun başlığı `join(',')` ile birleştirilir
+    - `lines` — `rows.map((r) => ...)` ile her satırın CSV satırına dönüştürülmüş hali; `r.id`, `r.event_type`, `r.provider`, `r.status`, `r.created_at`, `r.error_message` alanları kullanılır; `r` map callback parametresidir; string alanlar `'"'` escape'li formatlanır
+    - `csv` — BOM (`\ufeff`) ile başlayan tam CSV metni; `[header, ...lines].join('\n')`
+    - `blob` — `new Blob([csv], { type: 'text/csv;charset=utf-8;' })` ile oluşturulan dosya nesnesi
+    - `url` — `URL.createObjectURL(blob)` ile oluşturulan indirme URL'i
+    - `a` — `document.createElement('a')` ile oluşturulan görünmez link elemanı; `a.href = url`, `a.download = t('admin.webhooks.export.filename')`, `a.click()`, `URL.revokeObjectURL(url)` ile tetiklenir
+  - `columns` — `useMemo<AdminColumn<DbWebhookEvent>[]>(...)` ile tanımlanan sütun dizisi; 4 sütun içerir:
+    - `e` — her sütunun `cell` callback parametresi; `e.event_type`, `e.provider`, `e.status`, `e.created_at` alanlarına erişilir
+    - `formatDateTime` — `e.created_at` ve `lang` parametreleri ile tarih formatlama fonksiyonu çağrısı
+  - `statusChips` — `useMemo()` ile tanımlanan durum filtre çipi yapılandırma dizisi; 3 çip (`'processed'`, `'failed'`, `'pending'`) içerir
+    - `next` — her `onToggle` callback içinde hesaplanan bir sonraki durum filtresi dizisi; `activeStatuses.includes(x)` kontrolü ile ekleme/çıkarma yapılır
+  - `resetFilters` — `useCallback()` ile sarılı; `setQuery('')` ve `setFilter('status', [])` çağrısı ile tüm filtreleri sıfırlar
+- **Dönüş**: JSX — sol tarafta `DataTableKit` (tablo + toolbar + filtreler + boş durum state'leri + dışa aktarma menüsü) ve sağ tarafta seçili olayın payload JSON'unu ve hata mesajını gösteren detay paneli içeren React elementi
+
+---
+
 ## NODE ID STANDARD
 
   file: src\views\admin\WebhookEventsTableBody.tsx
@@ -139,7 +178,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-admin-danger-weak`, `bg-admin-success-weak`, `bg-admin-surface-2`, `bg-admin-warning-weak`, `border-admin-border`, `border-admin-danger/30`, `border-admin-success/30`, `border-admin-warning/30`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-success`, `text-admin-warning`, `text-center`
+- **Renkler:** `bg-amber-500/10`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-slate-950/80`, `border-amber-500/20`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `text-amber-400`, `text-center`, `text-cyan-300`, `text-cyan-400`, `text-emerald-400`, `text-lg`, `text-rose-300`
 - **Layout:** `flex`, `gap-1.5`, `gap-2`, `gap-6`, `grid`, `grid-cols-1`, `items-center`, `lg:col-span-2`, `lg:grid-cols-3`, `overflow-x-auto`, `p-4`, `w-fit`
 - **Varyant/Responsive:** `lg:` önekleri
-- **Yardımcı Sınıflar:** `border`, `font-bold`, `font-medium`, `font-mono`, `font-semibold`, `italic`, `mb-2`, `mb-4`, `px-2.5`, `py-1.5`, `py-20`, `rounded-admin-lg`, `rounded-admin-md`, `space-y-4`, `tracking-tight`
+- **Yardımcı Sınıflar:** `border`, `font-black`, `font-bold`, `font-medium`, `font-mono`, `italic`, `mb-2`, `mb-4`, `px-2.5`, `py-1.5`, `py-20`, `rounded-2xl`, `rounded-xl`, `space-y-4`, `tracking-tight`

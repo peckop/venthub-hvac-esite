@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\RegisterPage.tsx
-skeleton_hash: 51eff386aed7cd70
+source_path: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx
+skeleton_hash: 4b87a54e9a311eb5
 entity_hashes:
   func:RegisterPage: 595595bc145e81ea
   func:handleChange: c35710484665a43c
@@ -11,7 +11,7 @@ entity_hashes:
   func:validateForm: 35d7413c1db3ab00
   overview: c7a082fe60195496
   style_tokens: b4142733c6599819
-generated_at: 2026-08-27T07:09:59Z
+generated_at: 2026-06-19T20:51:31Z
 ---
 
 ## Genel Bakış
@@ -103,6 +103,73 @@ Kullanıcı girdilerini yakalayarak form verisini güncelleyen, bu verilerin do�
   - `signUp` — `useAuth()` hook'undan dönen kayıt fonksiyonu
   - `router` — `useLocalizedRoutes()` hook'undan dönen yönlendirme objesi
 - **Dönüş**: JSX — Register sayfası (form, şifre gücü göstergesi, kurallar listesi, onay ekranı)
+
+---
+
+### [N2_NASIL] AST Pointer: src/views/RegisterPage.tsx::handleChange
+- **params**: `(e: React.ChangeEvent<HTMLInputElement>)`
+- **ic_degiskenler**:
+  - `formData` — mevcut form state'i, spread ile kopyalanıp güncellenir (`...formData`)
+  - `e.target.name` — değişen input'un name attribute'u (dynamic key olarak kullanılır: `[e.target.name]: e.target.value`)
+  - `e.target.value` — değişen input'un yeni değeri
+- **Dönüş**: yok (doğrudan `setFormData` ile state günceller)
+
+---
+
+### [N3_NASIL] AST Pointer: src/views/RegisterPage.tsx::validateForm
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `formData.name` — kullanıcının girdiği isim, `trim()` ile boşluk kontrolü yapılır
+  - `formData.email` — kullanıcının girdiği email, `includes('@')` ile format kontrolü yapılır
+  - `passedRules` — şifre güvenlik kurallarından kaçının geçildiği sayacı, `passedRules < 4` kontrolü ile tüm kuralların zorunlu olduğunu doğrular
+  - `formData.password` — kullanıcının girdiği şifre, passedRules kontrolünde kullanılır
+  - `formData.confirmPassword` — şifre tekrar alanı, `formData.password !== formData.confirmPassword` eşleşme kontrolü yapılır
+  - `t` — çeviri fonksiyonu, hata mesajları için kullanılır
+  - `toast.error` —Sonner toast kütüphanesinden hata bildirim gösterir
+- **Dönüş**: `true` (tüm kontroller geçildi) veya `false` (validation hatası, toast ile kullanıcıya bildirim gösterilir)
+
+---
+
+### [N4_NASIL] AST Pointer: src/views/RegisterPage.tsx::handleSubmit
+- **params**: `(e: React.FormEvent)`
+- **ic_degiskenler**:
+  - `e.preventDefault()` — form submit'in default browser davranışını engeller
+  - `validateForm()` — form validasyonu çağrılır, false dönerse fonksiyon erken return ile çıkar
+  - `setLoading(true)` — yükleme durumunu aktif eder
+  - `pwned` — `hibpPwnedCount(formData.password)` async çağrısından dönen sayı; bilinen veri sızıntılarında şifrenin kaç kez geçtiğini tutar. `pwned > 0` ise engellenir
+  - `formData.password` — HIBP kontrolü ve `signUp` çağrısı için kullanılır
+  - `hibpPwnedCount` — `../utils/passwordSecurity` modülünden import edilmiş k-Anonymity tabanlı şifre sızıntı kontrol fonksiyonu
+  - `signUp` — `useAuth()` hook'undan gelen Supabase auth kayıt fonksiyonu, `(formData.email, formData.password, formData.name)` ile çağrılır
+  - `error` — `signUp` dönüşündeki `{ error }` destructured objesi; `error.message` içinde `'already registered'` veya `'Password should be at least'` substring kontrolü yapılır
+  - `formData.email` — signUp için email parametresi
+  - `formData.name` — signUp için name parametresi
+  - `setRegistrationComplete(true)` — başarılı kayıt sonrası email onay ekranına geçişi tetikler
+  - `t` — çeviri fonksiyonu, hata/başarı mesajları için kullanılır
+  - `toast` — Sonner toast kütüphanesi (`.error` ve `.success` metodları)
+  - `console.error` — catch bloğunda registration error loglaması yapar
+- **Dönüş**: yok (yan etkiler: toast bildirimleri, state güncellemeleri, Supabase auth çağrısı)
+
+---
+
+### [N5_NASIL] AST Pointer: src/views/RegisterPage.tsx::(render: strengthBar iterator)
+- **params**: `(i: number)` — strength bar segmentlerinin index'i
+- **ic_degiskenler**:
+  - `passedRules` — kaç kuralın geçildiği sayacı, `i <= passedRules` koşulu ile segmentin dolu mu boş mu olacağını belirler
+  - `strengthColor` — geçilen kural sayısına göre dinamik arka plan rengi (Tailwind class)
+  - `className` — ternary ile `strengthColor` veya `'bg-light-gray'` atanır
+- **Dönüş**: JSX `<div>` — `flex-1 rounded-full` stilli, `transition-colory` animasyonlu bar segmenti
+
+---
+
+### [N6_NASIL] AST Pointer: src/views/RegisterPage.tsx::(render: ruleItem iterator)
+- **params**: `(rule)` — `{ key, test, label }` shape'inde şifre kuralı objesi
+- **ic_degiskenler**:
+  - `rule.test(formData.password)` — kuralın mevcut şifre üzerindeki test fonksiyonu çağrısı, boolean döner
+  - `formData.password` — test edilen şifre değeri
+  - `rule.key` — React key identifier olarak kullanılır
+  - `rule.label` — kural açıklaması, JSX içinde `<li>` içeriğinde render edilir
+  - `rule.test(formData.password)` sonucuna göre ternary: `'✓'` veya `'○'` ikonu ve `text-green-600` / `text-steel-gray` renk class'ı atanır
+- **Dönüş**: JSX `<li>` — her şifre kuralı için onay/başarısız göstergeli liste elemanı
 
 ---
 

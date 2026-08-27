@@ -2,38 +2,39 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\admin\CategoryBuilderView.tsx
-skeleton_hash: dfe789809755ae7d
+source_path: C:\Users\alize\venthub-hvac\src\views\admin\CategoryBuilderView.tsx
+skeleton_hash: 1fa308bf3ff5eb56
 entity_hashes:
   func:CategoryBuilderView: c538d4ad7085f51d
-  func:handleBack: ad06032b6ddb9b9e
+  func:handleBack: 7a67af4e5dfa77e4
   func:onSubmit: c1bb6fdd37c1f2b9
-  overview: 144935d97f6e1bcd
-  style_tokens: abac386ed816f26b
-generated_at: 2026-08-27T07:24:31Z
+  overview: c6922c81cdc13586
+  style_tokens: 7edf3ba9710a3cbe
+generated_at: 2026-06-19T20:50:04Z
 ---
 
 ## Genel Bakış
-VentHub HVAC admin panelinde kategorilerin oluşturulmasını ve düzenlenmesini sağlayan bir React görünüm bileşenidir. Yeni kategori ekleme veya mevcut kategoriyi güncelleme iş akışlarını tek bir bileşen üzerinden yönetir. Bileşen, aldığı `categoryId` prop'una göre çalışma modunu belirler ve form gönderimi ile navigasyon kontrolü gibi asenkron işlemleri içerir.
+VentHub HVAC admin panelinde kategorilerin oluşturulmasını ve düzenlenmesini sağlayan React görünüm bileşenidir. Tek bir bileşen üzerinden yeni kategori ekleme veya mevcut kategoriyi yeniden yapılandırma süreçlerini koordine eder.
 
 ## Fonksiyon Grupları
-
 ### Ana Görünüm Bileşeni
-Kullanıcıya kategori düzenleme arayüzünü sunar ve bileşenin yaşam döngüsünü yönetir. `categoryId` prop'una bağlı olarak yeni kategori ekleme veya mevcut kategoriyi düzenleme modunda çalışır.
+Kullanıcıya kategori verilerini düzenleyebileceği interaktif bir arayüz sunar ve bileşenin yaşam döngüsünü yönetir.
 - CategoryBuilderView
 
 ### Navigasyon Kontrolü
-Kullanıcının kategori düzenleme sayfasından önceki sayfaya güvenli bir şekilde dönmesini sağlar.
+Kullanıcının kategori düzenleme sayfasından önceki sayfaya veya listeye güvenli bir şekilde dönmesini sağlar.
 - handleBack
 
 ### Veri Kaydetme İşleyicisi
-Formda düzenlenen kategori bilgilerinin sunucuya gönderilerek veritabanında kalıcı hale getirilmesini sağlar. `CategoryFormValues` tipinde form değerlerini alır.
+Formda düzenlenen kategori bilgilerinin doğrulanmasını ve sunucuya gönderilerek veritabanında kalıcı hale getirilmesini sağlar.
 - onSubmit
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için fonksiyon gövdeleri sağlanmadığından mimari varsayımlar üretilememektedir. Aksiyomlar yalnızca fonksiyon gövdelerinden türetilebilir; imza, docstring veya değişken isimlerinden çıkarım yapılmaz.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -47,14 +48,14 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından mimari varsayımlar ü
 **Dönüş**: React.FC<CategoryBuilderViewProps> tipinde geçerli bir React bileşeni döndürür. Bu bileşen admin paneli içerisinde kategori işlemleri için tüm gerekli arayüz öğelerini barındırır.
 
 ### handleBack
-**Ne yapar**: Formda kaydedilmemiş (kirli) değişiklikler varsa kullanıcıdan kapatma onayı isteyen bir guard fonksiyonudur. Kullanıcının sayfadan çıkarken bilinçli bir şekilde değişiklikleri atmayı kabul edip etmediğini kontrol eder. Değişikliklerin geri alınamaz şekilde kaybolacağı konusunda kullanıcıyı uyarır.
+**Ne yapar**: Kategori oluşturucu sayfasında kullanıcının bir önceki sayfaya veya listings sayfasına geri dönmesini sağlar.
 
-**Nasıl yapar**: Eskiden `window.confirm` ile senkron bir şekilde bloklama yaparak onay alıyordu; artık ConfirmDialog bileşeni kullanılarak asenkron bir akış izlenir. Kapatma isteği önce yakalanır, ardından kullanıcıya bir ConfirmDialog gösterilir ve onay beklenir. Kullanıcı onay verirse kapatma işlemi gerçekten gerçekleştirilir. Dialog'ta `tone: 'danger'` ayarı kullanılır çünkü form değişikliklerini atmak geri alınamaz bir işlemdir ve kullanıcıya bu durumun ciddiyeti vurgulanır. Fonksiyon `async` olarak tanımlanmıştır çünkü ConfirmDialog'un kullanıcı yanıtını beklemesi gerekir.
+**Nasıl yapar**: React Router'ın navigasyon metodlarını kullanarak kullanıcıyı bir önceki sayfaya yönlendirir. Genellikle browser history'sindeki bir önceki konuma gitmek veya belirli bir rotaya yönlendirme yapmak için kullanılır. Bu fonksiyon bir event handler olarak buton tıklamalarında tetiklenir.
 
 **Parametreler**:
-- Bu fonksiyon parametre almaz.
+Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: Dönüş tipi belirtilmemiştir. Fonksiyon `async` olduğundan bir Promise döndürmesi beklenir ancak kesin dönüş değeri kaynakta tanımlı değildir.
+**Dönüş**: void — Fonksiyon herhangi bir değer döndürmez, sadece navigasyon side-effect'i gerçekleştirir.
 
 ### onSubmit
 **Ne yapar**: Kategori formu doldurulduktan sonra form verilerini alır ve yeni bir kategori kaydı oluşturmak için API isteği gönderir.
@@ -70,7 +71,6 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından mimari varsayımlar ü
 
 ## İTHALATLAR (IMPORTS)
 - import: @/components/admin/authority-builder/AuthorityBuilder::AuthorityBuilder
-- import: @/components/admin/overlay/ConfirmProvider::useConfirm
 - import: @/components/authority/AuthorityRenderer::AuthorityRenderer
 - import: @/hooks/useRole::useRole
 - import: @/i18n/I18nProvider::useI18n
@@ -110,62 +110,118 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından mimari varsayımlar ü
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/CategoryBuilderView.tsx::CategoryBuilderView
-- **params**: `{ categoryId }` — düzenleme yapılan kategorinin ID'si
+### [N1_NASIL] AST Pointer: CategoryBuilderView.tsx::formSchema
+- **params**: none
 - **ic_degiskenler**:
-  - `fetchParents` — useEffect içinde tanımlanan async fonksiyon; üst kategorileri (parent_id null olan) supabase'den çeker ve `setParentIdOptions` ile state'e yazar
-  - `handleBeforeUnload` — beforeunload event handler; `isFormDirty` true ise sayfadan çıkış engellenir, `e.preventDefault()` çağrılır ve `e.returnValue` boş string olarak ayarlanır
-  - `cleanup` — useEffect return fonksiyonu; `window.removeEventListener('beforeunload', handleBeforeUnload)` çağrısıyla event listener temizlenir
-  - `handleBack` — async fonksiyon; form kirliyse confirm dialog gösterir, onaylanırsa `router.back()` ile geri gider
-  - `onSubmit` — async fonksiyon; form değerlerini alır, yazma yetkisi kontrolü yapar, `mutateWithAudit` ile kategori kaydını günceller
-  - `initialBlocks` — useEffect içinde; `cat.authority_content`'ten türetilen `AuthorityBlock[]` dizisi, boşsa legacy migration çalışır
-  - `legacyBlocks` — legacy migration sırasında oluşturulan `AuthorityBlock[]` dizisi; eski açıklama ve metrikleri blok formatına dönüştürür
-  - `meta` — `cat.metadata`'dan türetilen `CategoryMetadata | null`; metric1 ve metric2 alanlarını kontrol eder
-  - `rows` — `SpecsBlock['content']['rows']` tipinde dizi; meta.metric1 ve meta.metric2 label/value çiftlerinden oluşur
-  - `updatedCategory` — onSubmit içinde; mevcut category ile form değerlerinin birleşimiyle oluşturulan `DbCategory` nesnesi
-  - `data` — fetchParents içinde; supabase sorgu sonucu dönen üst kategori listesi (id, name)
-  - `error` — onSubmit içindeki mutateWithAudit fn fonksiyonunda; supabase update hatası
-- **Dönüş**: `React.FC<CategoryBuilderViewProps>`
+  - `t` — i18n çeviri fonksiyonu, zod hata mesajları için kullanılır (ör: `t('admin.categories.nameRequired')`)
+- **Dönüş**: `z.object({ name, slug, parent_id, sort_order, description, is_active })` — form validasyon şeması döner
 
-### [N2_NASIL] AST Pointer: src/views/admin/CategoryBuilderView.tsx::handleBack
-- **params**: yok
+---
+
+### [N2_NASIL] AST Pointer: CategoryBuilderView.tsx::useEffect_fetchParents_callback
+- **params**: none
 - **ic_degiskenler**:
-  - `ok` — `confirm()` fonksiyonundan dönen boolean; kullanıcının değişiklikleri atmayı onaylayıp onaylamadığını belirtir
-- **Dönüş**: yok
+  - `fetchParents` — supabase'den parent_id'si null olan ve mevcut kategoriden farklı kategorileri çeken async fonksiyon
+  - `supabase` — Supabase istemcisi, `.from('categories').select('id, name')` sorgusu çalıştırır
+  - `categoryId` — props'tan gelen mevcut kategori ID'si, `.neq('id', categoryId)` ile dışlanır
+  - `data` — supabase sorgusundan dönen kategori listesi, `setParentIdOptions(data)` ile state'e yazılır
+  - `setParentIdOptions` — üst kategori seçeneklerini tutan state setter'ı
+- **Dönüş**: yok (yan etki: state günceller, fetch çağırır)
 
-### [N3_NASIL] AST Pointer: src/views/admin/CategoryBuilderView.tsx::onSubmit
-- **params**: `values: CategoryFormValues` — form alanları (name, slug, parent_id, sort_order, description, is_active)
+---
+
+### [N3_NASIL] AST Pointer: CategoryBuilderView.tsx::fetchParents
+- **params**: none
 - **ic_degiskenler**:
-  - `updatedCategory` — `DbCategory` tipinde nesne; mevcut category ile form değerlerinin ve blocks'un birleşimi
-  - `error` — mutateWithAudit fn içinde; supabase update sorgu hatası
-- **Dönüş**: yok
+  - `data` — supabase `.from('categories').select('id, name').is('parent_id', null).neq('id', categoryId)` sorgusundan dönen satırlar, `{ id, name }` yapısında
+- **Dönüş**: yok (yan etki: `setParentIdOptions(data)` çağırarak parent listesini günceller)
 
-### [N4_NASIL] AST Pointer: src/views/admin/CategoryBuilderView.tsx::fetchParents
-- **params**: yok
+---
+
+### [N4_NASIL] AST Pointer: CategoryBuilderView.tsx::useEffect_loadCategory
+- **params**: none
 - **ic_degiskenler**:
-  - `data` — supabase sorgu sonucu; `categories` tablosundan `parent_id` null olan ve `id` categoryId'ye eşit olmayan kayıtlar (id, name alanları)
-- **Dönüş**: yok
+  - `data` — supabase'den tek kategori kaydını seçen sorgu sonucu (tüm alanlar: `id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content`)
+  - `error` — supabase sorgu hatası, `throw error` ile yakalanır
+  - `cat` — `data`'nın `DbCategory` tipine cast edilmiş hali, `setCategory(cat)` ile state'e yazılır
+  - `form` — react-hook-form instance'ı, `form.reset(...)` ile form alanları doldurulur
+  - `initialBlocks` — `cat.authority_content`'ten türetilen `AuthorityBlock[]` dizisi, yoksa boş dizi
+  - `legacyBlocks` — eski veri yapısından yeni blok formatına dönüştürülen `AuthorityBlock[]` dizisi
+  - `meta` — `cat.metadata`'nın `CategoryMetadata` tipine cast edilmiş hali, `metric1` ve `metric2` alanlarını tutar
+  - `rows` — `SpecsBlock['content']['rows']` tipinde teknik özet satırları dizisi, `meta.metric1` ve `meta.metric2`'den doldurulur
+  - `e` — catch bloğundaki hata nesnesi
+- **Dönüş**: yok (yan etki: `setLoading`, `setCategory`, `form.reset`, `setBlocks`, `toast.success/error` çağırır)
 
-### [N5_NASIL] AST Pointer: src/views/admin/CategoryBuilderView.tsx::handleBeforeUnload
-- **params**: `e: BeforeUnloadEvent` — tarayıcı unload event nesnesi
-- **ic_degiskenler**: yok
-- **Dönüş**: `string` (boş string) veya `undefined`
+---
 
-### [N6_NASIL] AST Pointer: src/views/admin/CategoryBuilderView.tsx::cleanup
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N7_NASIL] AST Pointer: src/views/admin/CategoryBuilderView.tsx::mutateWithAudit_fn
-- **params**: yok
+### [N5_NASIL] AST Pointer: CategoryBuilderView.tsx::useEffect_beforeunload_setup
+- **params**: none
 - **ic_degiskenler**:
-  - `error` — supabase `.update().eq()` sorgu sonucu oluşan hata; varsa throw ile fırlatılır
-- **Dönüş**: yok
+  - `handleBeforeUnload` — `beforeunload` olayı için handler fonksiyonu, form kirliyse tarayıcı çıkışını engeller
+  - `e` — `BeforeUnloadEvent` parametresi, `e.preventDefault()` ve `e.returnValue = ''` ile doğrulama kutusu gösterir
+- **Dönüş**: cleanup fonksiyonu döner — `window.removeEventListener('beforeunload', handleBeforeUnload)` çağırarak event listener'ı temizler
 
-### [N8_NASIL] AST Pointer: src/views/admin/CategoryBuilderView.tsx::option_render
-- **params**: `p` — üst kategori nesnesi (id ve name alanlarına sahip)
-- **ic_degiskenler**: yok
-- **Dönüş**: `JSX.Element` — `<option>` elementi; `key={p.id}`, `value={p.id}`, className="bg-admin-bg", içeriği `{p.name}`
+---
+
+### [N6_NASIL] AST Pointer: CategoryBuilderView.tsx::handleBeforeUnload
+- **params**: `(e: BeforeUnloadEvent)`
+- **ic_degiskenler**:
+  - `e` — BeforeUnloadEvent, `e.preventDefault()` ve `e.returnValue = ''` ile tarayıcı native onay kutusu tetiklenir
+  - `isFormDirty` — boolean, formda kaydedilmemiş değişiklik olup olmadığını kontrol eder
+- **Dönüş**: string `''` veya yok (yan etki: `e.preventDefault()` çağırır)
+
+---
+
+### [N7_NASIL] AST Pointer: CategoryBuilderView.tsx::beforeunload_cleanup
+- **params**: none
+- **ic_degiskenler**:
+  - `handleBeforeUnload` — kaldırılacak event handler referansı, closure'dan gelir
+- **Dönüş**: yok (yan etki: `window.removeEventListener` çağırarak listener temizler)
+
+---
+
+### [N8_NASIL] AST Pointer: CategoryBuilderView.tsx::handleBack
+- **params**: none
+- **ic_degiskenler**:
+  - `isFormDirty` — boolean, formda kaydedilmemiş değişiklik varsa `window.confirm` ile onay ister
+  - `router` — Next.js useRouter hook'undan dönen instance, `router.back()` ile önceki sayfaya gider
+  - `t` — i18n çeviri fonksiyonu, `t('admin.categories.unsavedChangesConfirm')` onay mesajı için kullanılır
+- **Dönüş**: yok (yan etki: `router.back()` çağırarak navigasyon yapar)
+
+---
+
+### [N9_NASIL] AST Pointer: CategoryBuilderView.tsx::onSubmit
+- **params**: `(values: CategoryFormValues)` — formdan gelen değerler: `name, slug, parent_id, sort_order, description, is_active`
+- **ic_degiskenler**:
+  - `hasWriteAccess` — boolean, kullanıcının yazma izni olup olmadığını kontrol eder; yoksa `toast.error` ile hata gösterir ve fonksiyon erken döner
+  - `mutateWithAudit` — audit logging ile birlikte supabase mutation yapan fonksiyon, `resource: 'categories'`, `action: 'UPDATE'`, `rowPk: categoryId` parametreleriyle çağrılır
+  - `categoryId` — props'tan gelen kategori ID'si, `before` ve `after` kayıtlarında `rowPk` olarak, `.eq('id', categoryId)` filtresinde kullanılır
+  - `category` — mevcut kategori state'i, `before` objesinde eski değerler (`name, slug, parent_id, sort_order, description, is_active, authority_content`) için referans olarak kullanılır
+  - `blocks` — `AuthorityBlock[]` state'i, hem `after.authority_content` hem de supabase update'in `authority_content` alanına `blocks as DbJson` cast ile yazılır
+  - `values` — parametre, `after` objesinde ve supabase `.update({...})` çağrısında güncel form değerleri olarak kullanılır
+  - `updatedCategory` — `category`'yi spread edip güncel `values` ve `blocks` ile merge eden `DbCategory` nesnesi, `setCategory(updatedCategory)` ile state güncellenir
+  - `form` — react-hook-form instance'ı, `form.reset(values)` ile form durumu kaydedilen değerlerle senkronize edilir
+  - `e` — catch bloğundaki hata nesnesi
+- **Dönüş**: yok (yan etki: `setSaving`, `mutateWithAudit`, `setCategory`, `form.reset`, `toast.success/error` çağırır)
+
+---
+
+### [N10_NASIL] AST Pointer: CategoryBuilderView.tsx::onSubmit_fn_supabaseUpdate
+- **params**: none
+- **ic_degiskenler**:
+  - `values` — closure'dan gelen `CategoryFormValues`, supabase `.update({...})` içinde `name, slug, parent_id, sort_order, description, is_active` alanlarına yazılır
+  - `blocks` — closure'dan gelen `AuthorityBlock[]`, `authority_content: blocks as DbJson` cast ile supabase'e yazılır
+  - `categoryId` — props'tan gelen kategori ID'si, `.eq('id', categoryId)` filtresinde kullanılır
+  - `error` — supabase `.update()` sonucundaki hata, varsa `throw error` ile fırlatılır
+- **Dönüş**: yok (yan etki: supabase `categories` tablosunu günceller)
+
+---
+
+### [N11_NASIL] AST Pointer: CategoryBuilderView.tsx::parentOption_render
+- **params**: `(p)` — `{ id: string; name: string }` yapısında üst kategori nesnesi
+- **ic_degiskenler**:
+  - `p` — tek bir üst kategori objesi, `p.id` `<option>`'un `value` ve `key`'i, `p.name` option metni olarak kullanılır
+- **Dönüş**: `JSX.Element` — `<option>` JSX elementi döner, `className="bg-surface-deep"` ile stillendirilir
 
 ---
 
@@ -198,10 +254,10 @@ graph TD
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `tracking-hvac-loose`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-admin-accent`, `bg-admin-bg`, `bg-admin-success`, `bg-admin-success-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-surface-3`, `bg-black/40`, `bg-white`, `border-4`, `border-admin-accent/30`, `border-admin-border`, `border-admin-success/30`, `border-b`, `border-l`
-- **Layout:** `custom-scrollbar-light`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `h-1.5`, `h-12`, `h-14`, `h-4`, `h-5`
-- **Varyant/Responsive:** `:`, `active:`, `disabled:`, `focus-visible:`, `group-hover:`, `hover:`, `md:`, `placeholder:` önekleri
+- **Renkler:** `bg-black/40`, `bg-cyan-500`, `bg-emerald-500`, `bg-emerald-500/10`, `bg-slate-950`, `bg-surface-darkest`, `bg-surface-deep`, `bg-white`, `bg-white/10`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-4`, `border-b`, `border-cyan-400/20`
+- **Layout:** `custom-scrollbar`, `custom-scrollbar-light`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `h-1.5`, `h-12`, `h-14`, `h-16`
+- **Varyant/Responsive:** `:`, `active:`, `disabled:`, `focus-visible:`, `focus:`, `group-hover:`, `hover:`, `md:`, `placeholder:` önekleri
 - **Yardımcı Sınıflar:** `${adminContentMaxWidthClass`, `${adminSidebarWidthClass`, `${previewMode`, `${showPreview`, `:`, `===`, `active:scale-95`, `animate-in`, `animate-pulse`, `animate-spin`, `appearance-none`, `border`, `cursor-pointer`, `desktop`, `disabled:opacity-50`
