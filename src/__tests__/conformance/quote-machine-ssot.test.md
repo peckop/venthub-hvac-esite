@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\__tests__\conformance\quote-machine-ssot.test.ts
-skeleton_hash: 0a09106f2c2a7226
+source_path: C:\tmp\venthub-wt-t131\src\__tests__\conformance\quote-machine-ssot.test.ts
+skeleton_hash: fb74358e5b0cb9e7
 entity_hashes:
   func:migrationSource: 758f5f02b3669ddf
   func:parseMigrationTransitions: 401e5d44901cfa5e
@@ -12,7 +12,7 @@ entity_hashes:
   func:stripTsComments: bba13cd0d66f3914
   func:touchesQuotes: 9d78bfbd8e8ab264
   overview: 8e56976f17cf2cb3
-generated_at: 2026-08-24T11:47:46Z
+generated_at: 2026-08-27T04:24:46Z
 ---
 
 ## Genel Bakış
@@ -167,3 +167,33 @@ graph TD
   export: stripSqlComments
   export: stripTsComments
   export: touchesQuotes
+
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+NİÇİN AYRI BİR MADDE: R1b AD-BAZLI. Yalnız QUOTE_TRANSITIONS ve kardeşlerinin
+adını arıyor. T131'de ölçüldü ki admin kuyruğunda `STATUS_VALUES` adıyla İKİNCİ
+bir durum listesi yaşıyordu ve R1b onu GÖRMÜYORDU — harita beşten dokuza
+çıktığında dört yeni durum admin süzgecinde sessizce görünmez olurdu. Kusur
+R1b'nin engellemek istediği şeydi; sadece adı tutmuyordu.
+
+KAPSAM BİLİNÇLİ DAR: yalnız TEKLİF yüzeyleri. `venthub_returns` kendi durum
+kümesini taşıyor ve 'requested'/'rejected'/'cancelled' sözcükleri ORTAK —
+depo geneline açılan bir desen İADE şeridinin listesini yanlış-pozitif
+suçlardı. Kapı başka şeridin işini suçlayamaz.
+```
+
+```text
+NICIN AYRI BIR MADDE: R4 yalniz venthub_quotes / venthub_quote_items'a bakiyor.
+Ama kapsam icerige baglandiginda quote adli BASKA tablolar da gorunur oldu ve
+ilkinde gercek bir bosluk cikti. Kapi bunu ya olcer ya gizler; gizlemesin.
+
+MUAF LISTE, "gecis modu" DEGIL: kusuru GORUNUR kilar. Onarim migration ister,
+migration Recep kapisidir; o gelene kadar kusurun ADI burada yazili durur.
+Grace mode kusuru gizler, bu liste ISIMLENDIRIR — fark budur.
+```
