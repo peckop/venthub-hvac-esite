@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T12:03:13.229968+00:00
+compiled_at: 2026-08-27T12:20:24.746666+00:00
 total_compiled_files: 655
-source_commit: 843c4e66
+source_commit: 2b86722a
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T12:03:13.229968+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T12:20:24.746666+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -11849,49 +11849,63 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\components\LeadModal.tsx
-skeleton_hash: e17640613f7b7de8
+source_path: C:\Users\alize\venthub-wt-quote\src\components\LeadModal.tsx
+skeleton_hash: 499c5e0afbe64842
 entity_hashes:
   func:LeadModal: d62325f85f800f09
-  func:handleClose: 63d7dd03089c88aa
-  func:submit: 524cec536455da2d
-  func:validate: 986ff306b233d4e4
-  overview: e6fd6a1ce6c238d0
-  style_tokens: 01d5bdbc603763a7
-generated_at: 2026-08-27T06:50:24Z
+  func:handleClose: 0cc370a6edc1c061
+  func:submit: 57ac99ffc1840be0
+  func:validate: 4db8fe8dea658f52
+  overview: 99ab56de684b2e03
+  style_tokens: 671fc429a274af0c
+generated_at: 2026-08-17T13:18:14Z
 ---
 
 ## Genel Bakış
-Bu modül, potansiyel müşteri (lead) bilgilerini toplamak için kullanılan bir modal form bileşeni içerir. Bileşen, formun doğrulamasını, gönderilmesini ve modalın açılıp kapanma kontrolünü yöneterek kullanıcı verilerini sisteme kaydetme işlemini gerçekleştirir.
+`LeadModal` bileşeni, potansiyel müşteri (lead) bilgilerini toplamak için kullanılan modal tabanlı bir form penceresidir. Bileşen, form alanlarının doğrulamasını, gönderim işlemini ve modalın açılıp kapanma kontrollerini yöneterek kullanıcı iletişim verilerini sisteme kaydeder.
 
 ## Fonksiyon Grupları
 ### Modal Kontrol ve Render
-Modalın açılıp kapanma durumunu kontrol eder, prop'lar aracılığıyla görünürlüğü yönetir ve form alanlarını içeren arayüzü oluşturur.
+Modalın açılıp kapanmasını kontrol eder, prop'lar aracılığıyla görünürlüğü yönetir ve form alanlarını içeren JSX yapısını render eder.
 - LeadModal
 
 ### Form Doğrulama
-Kullanıcı tarafından girilen form verilerinin geçerliliğini kontrol eder; zorunlu alanların doluluğunu ve veri formatını doğrular.
+Kullanıcı tarafından doldurulan form alanlarının geçerliliğini kontrol eder; zorunlu alanların doluluğunu ve veri formatlarını doğrular.
 - validate
 
 ### Form İşleme
-Form gönderim olayını yakalayarak doğrulama çalıştırır, başarılı ise veriyi işler; ayrıca modalı kapatma ve ilgili geri çağırma fonksiyonunu tetikleme işlemini yönetir.
+Form gönderim olayını yakalayarak doğrulama çalıştırır, başarılı ise lead verisini işler; ayrıca modal kapatma işlemini ve ilgili callback çağrısını yönetir.
 - submit, handleClose
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-[Aksiyom 1]: Eğer `open` prop'u sağlanmazsa, modalın açık/kapalı durumu belirlenemez ve bileşen render edilse bile görünür olup olmadığı kontrol edilemez.
+Bu modül, ürün ile ilgili potansiyel müşteri bilgilerini toplayan kontrollü bir modal form bileşenidir. Aşağıdaki varsayımlar fonksiyon imzaları ve yapısal ipuçlarından türetilmiştir.
 
-[Aksiyom 2]: Eğer `onClose` prop'u sağlanmazsa, kullanıcı modalı kapatamaz; handleClose fonksiyonu kapatma işlemini tetikleyecek bir callback bulamaz.
+---
 
-[Aksiyom 3]: Eğer `productName` prop'u sağlanmazsa, formda ürün adı gösterilemez; hangi ürün için lead toplandığı kullanıcıya bildirilemez.
+**[Aksiyom 1]:** Eğer `onClose` callback'i sağlanmazsa, modal bileşeni kendi kendini kontrollü modo kapatabilir (`open` prop'u false yapabilir) ancak üst bileşen durumunu güncelleyemez ve modal kalıcı olarak açık kalır.
 
-[Aksiyom 4]: Eğer validate fonksiyonu submit öncesinde çağrılmazsa, geçersiz veya eksik form verileriyle gönderim yapılabilir.
+**[Aksiyom 2]:** Eğer `open` prop'u `boolean` türünde (veya truthy/falsy dönüştürülebilir) değilse, modalın render edilip edilmeyeceği belirlenemez ve bileşen beklenmedik davranışı gösterir.
 
-[Aksiyom 5]: Eğer submit fonksiyonu bir FormEvent almazsa, formun varsayılan davranışı (sayfa yenileme) engellenemez.
+**[Aksiyom 3]:** Eğer `productName` değeri sağlanmazsa, toplanan lead bilgileri hangi ürüne ait olduğu belirsiz olacağından, form gönderiminde ürün bağlamı eksik olur.
 
-[Aksiyom 6]: Eğer handleClose fonksiyonu onClose prop'unu çağırmazsa, modal kapatıldığında üst bileşen durumdan haberdar olamaz ve modal tekrar açılamaz hale gelebilir.
+**[Aksiyom 4]:** Eğer `validate()` fonksiyonu `submit()` invokasyonundan önce çağrılmazsa, geçersiz form verileri sunucuya gönderilebilir; bu nedenle validasyon submit iş akışının zorunlu bir ön koşuludur.
+
+**[Aksiyom 5]:** Eğer `submit()` fonksiyonu `React.FormEvent` parametresi almazsa (örn: çağrıcı event'i iletmezse), form default submit davranışını (`page reload`) engelleyemez.
+
+**[Aksiyom 6]:** `_productId` prop'u (`__productId` olarak yeniden adlandırılmış) sağlanmazsa, lead kaydının hangi ürün ID'sine bağlı olacağı belirsiz olur; bu değerin form submission payload'ında gerekli olduğu varsayılır.
+
+---
+
+### Domain-Specific Kurallar
+
+| Kural | Açıklama |
+|---|---|
+| **Zorunlu alan doğrulaması** | `validate()`, tüm zorunlu form alanlarının doluluğunu kontrol etmelidir; boş alan bırakılamaz. |
+| **Kontrollü bileşen paterni** | Modal görünürlüğü `open` prop'u ile dışarıdan yönetilir; bileşen içinden `open` state'i doğrudan mutate edilmez. |
+| **Eşik değer** | Tanımlanmamıştır — form alanı sayısına veya zorunlu alan koşullarına ilişkin eşik değer kodda belirlenmemiştir. |
 
 ---
 
@@ -11908,33 +11922,37 @@ Form gönderim olayını yakalayarak doğrulama çalıştırır, başarılı ise
 **Dönüş**: React.FC\<LeadModalProps\> — Tanımlı prop tipleriyle bir React fonksiyonel bileşeni döndürür.
 
 ### validate
-**Ne yapar**: Form gönderiminden önce form alanlarının doğrulama işlemini tetikler ve doğrulama hatalarını state'e kaydeder. Form geçerliyse gönderim sürecini başlatır.
-**Nasıl yapar**: Asenkron bir arrow function olarak tanımlanmıştır ve `React.FormEvent` parametresi alır. Önce `e.preventDefault()` ile formun varsayılan tarayıcı davranışını (sayfa yenileme) engeller. Ardından dışarıdan tanımlı `validate()` fonksiyonunu çağırarak doğrulama sonuçlarını alır ve `setErrors` ile hata state'ine atar. Eğer hata nesnesinde anahtar varsa (yani doğrulama başarısızsa) fonksiyondan erken çıkış yapar. Doğrulama başarılıysa `setSubmitted(true)` ile gönderim durumunu aktif eder ve `submitContactMessage` fonksiyonunu `supabaseBrowserClient` ile birlikte çağırır. Gönderilen veriler arasında `name`, `message`, `email`, `phone`, `company`, `city`, `applicationArea` (appArea'dan), `subject` (productName varsa `lead:${productName}`, yoksa `lead` olarak) ve `consent` alanları bulunur. Başarı durumunda `setIsSuccess(true)` ve `setSubmitted(false)` çağrıları yapılır, ardından 3000 milisaniye gecikmeyle `handleClose()` çağrılarak modal otomatik kapatılır. Hata durumunda `reportError` ile hata raporlanır (kaynak: `LeadModal.submit`), `setSubmitted(false)` yapılır ve kullanıcıya çevrilmiş bir hata mesajı (`t('lead.errors.submitFailed')`) `setErrors` aracılığıyla gösterilir. Hata durumunda form açık kalır ve kullanıcı girdileri korunur; teknik hata detayı yalnızca teşhis kaydına gider.
+**Ne yapar**: Bu fonksiyon, bir formun gönderilmeden önce (submit) içeriğinin geçerliliğini kontrol eder. Tüm form alanlarının doğruluğunu değerlendirir ve bulunan hataları bir nesne olarak döndürür. Hata yoksa boş bir nesne döner.
+
+**Nasıl yapar**: Fonksiyon, bir React form olay işleyicisi içinde `e.preventDefault()` ile varsayılan form gönderme işlemini engelledikten hemen sonra çağrılır. Çağrının ardından, döndürülen hata nesnesi `setErrors` aracılığıyla bileşenin state'ine kaydedilir. Eğer hata anahtarı varsa (hata bulunuyorsa) fonksiyon erken bir `return` ile işlemi sonlandırır, böylece başarılı gönderim (API çağrısı simülasyonu) sadece hata yokken çalıştırılır.
+
 **Parametreler**:
-- e: React.FormEvent — Form gönderilme olayı nesnesi; varsayılan davranışı engellemek için kullanılır
-**Dönüş**: Bilinmiyor (return tipi belirtilmemiş)
+- Bu fonksiyonun tanımında herhangi bir parametre listelenmemiştir. Ancak çağrı yapılan bağlamda (`validate()`) boş olarak çağrıldığı görülmektedir. Fonksiyonun ihtiyaç duyduğu form verilerine, muhtemelen bileşenin kendi state'inden veya bir bağlam (context) üzerinden eriştiği varsayılmaktadır.
+
+**Dönüş**: Belirtilmemiştir. Ancak kullanımından, hata durumlarını içeren bir nesne veya boş bir nesne döndüreceği anlaşılmaktadır.
 
 ### submit
-**Ne yapar**: Form gönderimini simüle eden ve geçmişte kusurlu bir yapıya sahip olan fonksiyon. Dokümantasyon notuna göre bu fonksiyon, 2026-08-26 tarihinde ölçülen canlı bir kusuru belgelemektedir.
-**Nasıl yapar**: Fonksiyon gövdesi verilmemiştir, yalnızca docstring bilgisi mevcuttur. Docstring'e göre eskiden bu fonksiyonun içinde `setTimeout(1200ms)` bulunuyordu ve yorumu "Simulate API Call for better UX instead of mailto" şeklindeydi. Yani ana sayfadaki ve her ürün sayfasındaki talep formu müşteriye "aldık" mesajı gösterirken hiçbir yere veri yazmıyordu. Bu kusur üç ay boyunca canlı ortamda tespit edilememiş ve 2026-08-26'da ölçülmüştür. Mevcut durumda fonksiyonun nasıl çalıştığına dair gövde bilgisi verilmemiştir.
+**Ne yapar**: Form gönderildiğinde çalıştırılan ana işlem akışını yönetir.  
+**Nasıl yapar**: `e.preventDefault()` ile formun doğal gönderimini durdurur, `validate()` ile doğrulama yapar, hatalar varsa işlemi sonlandırır; hatasız ise `setSubmitted(true)` ile gönderim durumunu işaretler, ardından API taklidi için gecikmeli bir `setTimeout` içinde başarı durumunu ayarlar, modalı otomatik kapatmak için ikinci bir gecikme başlatır.  
 **Parametreler**:
-- e: React.FormEvent — Form gönderilme olayı nesnesi
-**Dönüş**: Bilinmiyor (return tipi belirtilmemiş)
+- `e`: React.FormEvent — Form submit olay nesnesi.  
+**Dönüş**: Bilinmiyor (fonksiyon içinde yan etkiler vardır, dönüş değeri belirtilmemiştir).
 
 ### handleClose
-**Ne yapar**: Modal penceresini kapatma işlemini tetikler.
-**Nasıl yapar**: Arrow function olarak tanımlanmıştır. Gövdesinde yalnızca `handleClose()` çağrısı bulunmaktadır. Bu, muhtemelen üst bileşenden veya bir context/prop aracılığıyla gelen kapatma fonksiyonunu çağırır. Fonksiyonun kendisi bir sarmalayıcı (wrapper) işlevi görür.
-**Parametreler**: Belirtilmemiş
-**Dönüş**: Bilinmiyor (return tipi belirtilmemiş)
+**Ne yapar**: Bu fonksiyon, bir modal veya açılır pencere bileşeninin kapanmasını tetikler. Genellikle bir başarı durumu gösterildikten sonra veya kullanıcı "kapat" butonuna tıkladığında çağrılır.
+
+**Nasıl yapar**: Fonksiyon, kapanış işlemini yöneten bir durumu (state) veya prop'u günceller. Sağlanan gövde kodunda, callback fonksiyonu içinde kendisini (`handleClose()`) çağırmaktadır. Bu, genellikle bir `useState` hook'u ile yönetilen `isOpen` veya benzeri bir boolean'ı `false` yaparak modalı görünmez kılan bir eylemdir. Başarılı form gönderimi sonrasında da otomatik kapanma için belirli bir gecikmeyle (3 saniye) bu fonksiyon çağrılır.
+
+**Parametreler**:
+- Bu fonksiyonun tanımında herhangi bir parametre listelenmemiştir. Çağrıldığında boş olarak çağrılır (`handleClose()`).
+
+**Dönüş**: Belirtilmemiştir, ancak bir durum güncelleme eylemi gerçekleştirdiği için doğrudan bir değer döndürmez (void/undefined).
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
-- import: ../lib/errorReporter::reportError
-- import: ../lib/services/contactMessageService::submitContactMessage
-- import: ../lib/supabase/client::supabaseBrowserClient
 - import: next/link::Link
 - import: react::React
 - import: react::useState
@@ -11953,48 +11971,41 @@ Form gönderim olayını yakalayarak doğrulama çalıştırır, başarılı ise
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: LeadModal.tsx::validate
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/LeadModal.tsx::validate
+- **params**: ()
 - **ic_degiskenler**:
-  - `e` — hataları toplayan boş `Record<string, string>` nesnesi; koşullar sağlanmazsa `name`, `contact`, `consent` anahtarlarıyla hata mesajı eklenir
-  - `name` — dış kapsamdan gelen form alanı; `trim()` ile boşluk kontrolü yapılır
-  - `email` — dış kapsamdan gelen form alanı; `trim()` ile boşluk kontrolü yapılır
-  - `phone` — dış kapsamdan gelen form alanı; `trim()` ile boşluk kontrolü yapılır
-  - `consent` — dış kapsamdan gelen onay boolean'ı; falsy ise hata eklenir
-  - `t` — dış kapsamdan gelen çeviri fonksiyonu; hata mesajlarını yerelleştirmek için kullanılır
-- **Dönüş**: `Record<string, string>` — doğrulama hatalarını içeren nesne; hata yoksa boş nesne döner
+  - `e` — Form validasyon hatalarını tutan bir nesne. Başlangıçta boş bir `Record<string, string>` olarak oluşturulur ve hata mesajlarıyla doldurulur.
+- **Dönüş**: `e` — Hataları içeren bir nesne (`Record<string, string>`).
 
-### [N2_NASIL] AST Pointer: LeadModal.tsx::submit
-- **params**: `e` — `React.FormEvent` tipinde form gönderim olayı
+### [N2_NASIL] AST Pointer: src/components/LeadModal.tsx::submit
+- **params**: (`e: React.FormEvent`)
 - **ic_degiskenler**:
-  - `v` — `validate()` çağrısının dönüşü; doğrulama hatalarını tutar
-  - `name` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `message` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `email` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `phone` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `company` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `city` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `appArea` — dış kapsamdan gelen form alanı; `applicationArea` anahtarıyla `submitContactMessage` payload'ına gönderilir
-  - `productName` — dış kapsamdan gelen prop; varsa `subject` değeri `"lead:{productName}"` olarak, yoksa `"lead"` olarak ayarlanır
-  - `consent` — dış kapsamdan gelen onay boolean'ı; `submitContactMessage` payload'ında kullanılır
-  - `err` — `catch` bloğunda yakalanan hata nesnesi; `reportError` ile teşhis kaydına gönderilir
-  - `supabaseBrowserClient` — dış kapsamdan gelen Supabase istemcisi; `submitContactMessage` fonksiyonuna birinci argüman olarak geçilir
-- **Dönüş**: yok (async void)
+  - `v` — `validate()` fonksiyonunun döndürdüğü validasyon sonuçlarını (hatalar) tutan nesne.
+- **Dönüş**: yok (yan etki: formu submit eder, durumları değiştirir, başarı durumunu tetikler)
 
-### [N3_NASIL] AST Pointer: LeadModal.tsx::handleClose
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose
+- **params**: ()
 - **ic_degiskenler**:
-  - `onClose` — dış kapsamdan gelen kapatma callback'i; modal kapatma işlemini tetikler
-  - `productName` — dış kapsamdan gelen prop; `productName` varsa `t('lead.defaultMessage', { productName })` ile varsayılan mesaj oluşturulur, yoksa boş string atanır
-  - `t` — dış kapsamdan gelen çeviri fonksiyonu; varsayılan mesajı yerelleştirmek için kullanılır
-- **Dönüş**: yok (yan etki: `onClose()` çağrılır, 300ms sonra tüm form state'leri sıfırlanır)
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; dışarıdan gelen `onClose`, `setIsSuccess`, `setName`, vb. state setter'ları kullanılır)
+- **Dönüş**: yok (yan etki: modalı kapatır, form alanlarını sıfırlar)
 
-### [N4_NASIL] AST Pointer: LeadModal.tsx::handleClose (setTimeout callback)
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose (iç kapanış fonksiyonu)
+- **params**: ()
 - **ic_degiskenler**:
-  - `productName` — dış kapsamdan gelen prop; varsa `t('lead.defaultMessage', { productName })` ile varsayılan mesaj oluşturulur, yoksa boş string atanır
-  - `t` — dış kapsamdan gelen çeviri fonksiyonu; varsayılan mesajı yerelleştirmek için kullanılır
-- **Dönüş**: yok (yan etki: `isSuccess`, `name`, `company`, `email`, `phone`, `city`, `appArea`, `consent`, `message`, `errors` state'leri sıfırlanır)
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; sadece `handleClose()` çağrısı yapılır)
+- **Dönüş**: yok (yan etki: ana kapanış fonksiyonunu çağırır)
+
+### [N5_NASIL] AST Pointer: src/components/LeadModal.tsx::resetForm
+- **params**: ()
+- **ic_degiskenler**:
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; dışarıdan gelen `onClose`, `setIsSuccess`, `setName`, `setCompany`, `setEmail`, `setPhone`, `setCity`, `setAppArea`, `setConsent`, `setMessage`, `setErrors` state setter'ları ve `productName`, `t` fonksiyonu kullanılır)
+- **Dönüş**: yok (yan etki: modalı kapatır, tüm form alanlarını başlangıç değerlerine sıfırlar)
+
+### [N6_NASIL] AST Pointer: src/components/LeadModal.tsx::resetForm (iç sıfırlama fonksiyonu)
+- **params**: ()
+- **ic_degiskenler**:
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; dışarıdan gelen `setIsSuccess`, `setName`, `setCompany`, `setEmail`, `setPhone`, `setCity`, `setAppArea`, `setConsent`, `setMessage`, `setErrors` state setter'ları ve `productName`, `t` fonksiyonu kullanılır)
+- **Dönüş**: yok (yan etki: form alanlarını başlangıç değerlerine sıfırlar)
 
 ---
 
@@ -12034,7 +12045,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-br`, `bg-gray-100`, `bg-gray-50`, `bg-gray-50/50`, `bg-green-100`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue/80`, `bg-white`, `bg-white/10`, `border-2`, `border-gray-100`, `border-gray-200`, `border-gray-300`, `border-red-200`
+- **Renkler:** `bg-gradient-to-br`, `bg-gray-100`, `bg-gray-50`, `bg-gray-50/50`, `bg-green-100`, `bg-primary-navy`, `bg-secondary-blue/80`, `bg-white`, `bg-white/10`, `border-2`, `border-gray-100`, `border-gray-200`, `border-gray-300`, `border-red-400`, `border-t`
 - **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `flex-1`, `flex-col`, `from-blue-600/20`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `grid`
 - **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `focus:`, `group-hover:`, `hover:`, `md:`, `sm:` önekleri
 - **Yardımcı Sınıflar:** `${errors.name`, `-mt-2`, `:`, `animate-bounce`, `animate-in`, `animate-spin`, `border`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-70`, `duration-300`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-gray-300`
@@ -43019,57 +43030,78 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\config\admin.ts
-skeleton_hash: 7935dad8af4131d7
+source_path: C:\Users\alize\venthub-hvac\src\config\admin.ts
+skeleton_hash: 2cc0382d2782b947
 entity_hashes:
-  func:getUserRole: 2c200fb867d424aa
+  func:checkAdminAccess: 0195cef58edf96a2
+  func:getUserRole: 638c917cdcbbb2e5
+  func:isAdminByEmail: 97d57e6b9c4cf9a2
+  func:isDevAdmin: 527f404e6ee96806
   func:listAdminUsers: d933c96b85d7b147
   func:setUserAdminRole: 8d3b86f7b7baaf3b
-  overview: 5893087b4e779eea
-generated_at: 2026-08-27T04:31:52Z
+  overview: 3d7af3e502cf1294
+generated_at: 2026-06-19T20:48:16Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı rollerinin sorgulanması, atanması ve yönetici kullanıcıların listelenmesi işlemlerini merkezi olarak yönetir. Tüm fonksiyonlar asenkron yapıda olup dış bir veri kaynağına erişerek yönetici rol bilgilerini okur ve günceller.
+Bu modül, HVAC yönetim platformu VentHub'un konfigürasyon katmanında yer alarak yönetici erişim ve rol yönetimi süreçlerini tek merkezde toplar. Kullanıcı kimlik bilgilerine göre yönetici yetkilerini doğrular, kullanıcı rolleri üzerinde düzenleme ve sorgulama işlemleri yapar, sistemdeki tüm yönetici kullanıcılarını listeleme imkanı sunar.
 
 ## Fonksiyon Grupları
 ### Kullanıcı Rol Yönetimi
-Belirli bir kullanıcının mevcut rolünü sorgulama, kullanıcıya yönetici rolü atama ve sistemdeki tüm yönetici kullanıcıları listeleme gibi temel rol yönetim işlemlerini gerçekleştirir.
+Kullanıcı rollerini getirme, yeni yönetici rolü atama ve sistemdeki kayıtlı tüm yönetici kullanıcılarının listesini alma gibi temel rol yönetimi işlemlerini gerçekleştirir.
 - getUserRole, setUserAdminRole, listAdminUsers
 
-## Bağımlılıklar ve Mimari Notlar
-- Tüm fonksiyonlar asenkron (async) yapıdadır ve Promise döndürür; bu durum modülün dış bir veri deposu veya servise bağlı olduğunu gösterir.
-- Fonksiyonlar arasında doğrudan bir çağrı ilişkisi belirlenmemiştir; her biri bağımsız olarak dış sisteme erişir.
-- `setUserAdminRole` fonksiyonu boolean değer döndürerek işlemin başarılı olup olmadığını bildirir.
-- `listAdminUsers` fonksiyonu `AdminUser` tipinde bir dizi döndürür; bu tipin tanımı modül dışındadır.
+### Yönetici Erişim Doğrulama
+Farklı senaryolara göre kullanıcıların yönetici erişimine sahip olup olmadığını kontrol eden güvenlik kontrollerini sunar, yerel geliştirici statüsünden e-posta ve kullanıcı meta verilerine kadar birçok kriteri baz alır.
+- isAdminByEmail, isDevAdmin, checkAdminAccess
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, VentHub HVAC sisteminin yönetici erişim kontrolünü ve rol yönetimini gerçekleştirmek üzere tasarlanmıştır, tüm fonksiyonların doğru çalışması için giriş parametrelerinin, sabit tanımlı yönetici listelerinin ve kullanıcı meta verilerinin eksiksiz ve güvenilir olması zorunludur.
 
-Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarılabilecek varsayımlar belirlenmiştir.
-
-[Aksiyom 1]: Eğer `userId` parametresi geçerli bir kullanıcı kimliği içermiyorsa, `getUserRole` ve `setUserAdminRole` fonksiyonları beklenen sonucu üretemez.
-
-[Aksiyom 2]: Eğer `setUserAdminRole` fonksiyonunda verilen `role` değeri sistem tarafından tanınan geçerli bir rol değilse, fonksiyon `false` döndürür.
-
-[Aksiyom 3]: Eğer sistemde kayıtlı yönetici kullanıcısı yoksa, `listAdminUsers` fonksiyonu boş bir dizi (`[]`) döndürür.
-
-[Aksiyom 4]: Eğer `getUserRole` fonksiyonuna verilen `userId` sistemde kayıtlı değilse, fonksiyon hata fırlatır veya boş/varsayılan bir string değer döndürür — hangi davranışın uygulandığı fonksiyon gövdesinden bilinmiyor.
+[Aksiyom 1]: Eğer FALLBACK_ADMIN_EMAILS sabiti tanımsız veya boş bir dizi ise, e-posta tabanlı temel yönetici erişim kontrolleri çalışmaz, tanımlı yedek yönetici hesapları sisteme erişemez.
+[Aksiyom 2]: Eğer checkAdminAccess fonksiyonuna iletilen kullanıcı nesnesi (user) hem email hem de user_metadata.role alanlarından yoksun ise, hiçbir kullanıcıya yönetici erişimi tanımlanamaz, tüm yönetici paneli erişim istekleri reddedilir.
+[Aksiyom 3]: Eğer getUserRole veya setUserAdminRole fonksiyonlarına iletilen userId parametresi boş veya geçersiz string ise, kullanıcı rolü ne sorgulanabilir ne de atanabilir, rol tabanlı tüm erişim kontrolleri başarısız olur.
+[Aksiyom 4]: Eğer setUserAdminRole fonksiyonuna iletilen role parametresi sistemde tanımsız bir string ise, rol veri tabanına kaydedilse dahi erişim kontrolleri tarafından tanınmaz, ilgili kullanıcıya yönetici erişimi sağlanamaz.
+[Aksiyom 5]: Eğer isDevAdmin() fonksiyonunun çalışması için gereken ortam spesifik işaretçi tanımsız ise, geliştirici yönetici erişimi gerektiren tüm işlemler devre dışı kalır.
+[Aksiyom 6]: Eğer listAdminUsers fonksiyonunun eriştiği sistemdeki tüm kullanıcı verisi erişilemez ise, fonksiyon eksik veya hatalı yönetici listesi döndürür, yetkisiz hesapların tespiti yapılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### getUserRole
-**Ne yapar**: Veritabanından belirtilen kullanıcının rol bilgisini getirir. Rol bilgisinin tek yetkili kaynağı `user_profiles` tablosundaki `role` alanıdır. Fonksiyon, hata durumunda veya profil satırı bulunamadığında varsayılan olarak `'user'` döndürür.
 
-**Nasıl yapar**: Fonksiyon öncelikle çalışma ortamını tespit eder; `window` tanımlıysa tarayıcı ortamında olduğunu anlar ve `supabaseBrowserClient` istemcisini, aksi halde sunucu/statik ortamda olduğunu anlar ve `supabaseStaticClient` istemcisini dinamik olarak (`await import`) içe aktarır. Seçilen Supabase istemcisi üzerinden `user_profiles` tablosuna gidilir, `role` alanı seçilir ve `id` alanı `userId` parametresiyle eşleşen satır `maybeSingle()` ile sorgulanır. Sorgu sonucunda hata oluşursa konsola uyarı yazdırılır ve `'user'` döndürülür. Veri başarıyla gelirse `data.role` değeri döndürülür. Profil satırı hiç yoksa (veri null ise) yine `'user'` döndürülür. Dokümanda belirtildiği üzere, eski sürümde profil satırı olmayan kullanıcılar için e-posta listesi üzerinden `'admin'` döndüren bir yol varmış; ancak bu yol kaldırılmıştır çünkü profili olmayan birine yetki vermek yerine doğru akışın önce profil satırını oluşturmak olduğu belirtilmiştir. Fonksiyonun kendisi bir `try-catch` bloğu ile sarılıdır; yakalanan herhangi bir exception durumunda konsola uyarı yazdırılır ve `'user'` döndürülür.
+**Ne yapar**: Verilen kullanıcı ID'sine ait rol bilgisini Supabase veritabanından asenkron olarak çeker. Kullanıcı veritabanında kayıtlı değilse veya bir hata oluşursa, opsiyonel olarak verilen email adresi üzerinden fallback mekanizmasıyla rol belirleme yapar.
+
+**Nasıl yapar**: Fonksiyon öncelikle opsiyonel `userEmail` parametresini kontrol eder ve bu email'in hardcoded superadmin listesinde (`recep.varlik@gmail.com`, `recepvarlk@gmail.com`) olup olmadığına bakar; bu listeye uyan email'ler için `'super_admin'`, `isAdminByEmail()` yardımcısı tarafından tanımlanan diğer admin email'leri için `'admin'` rolünü doğrudan döndürerek veritabanı sorgusunu atlatabilir. Ardından `window` nesnesinin varlığına göre tarayıcı taraflı (`supabaseBrowserClient`) veya statik taraflı (`supabaseStaticClient`) Supabase istemcisini dinamik import ile yükler ve `user_profiles` tablosundan ilgili kullanıcının `role` alanını `maybeSingle()` ile çeker. Sorgu başarılı olup `data.role` mevcutsa bu değer döndürülür; veritabanında kayıt bulunamaması durumunda tekrar email fallback kontrolü yapılarak admin olup olmadığı kontrol edilir. Herhangi bir hata veya istisna durumunda `console.warn` ile log yazdırarak varsayılan `'user'` rolünü döndürür.
 
 **Parametreler**:
-- `userId`: `string` — Kullanıcının benzersiz kimlik numarası. Bu değer `user_profiles` tablosundaki `id` alanı ile eşleştirilerek sorgulama yapılır.
+- `userId`: `string` — Sorgulanacak kullanıcının benzersiz tanımlayıcısı. `user_profiles` tablosundaki `id` alanıyla eşleşir.
+- `userEmail`: `string | undefined` — Opsiyonel. Kullanıcının email adresi. Veritabanı sorgusu başarısız olduğunda veya kayıt bulunamadığında rol belirleme için fallback olarak kullanılır.
 
-**Dönüş**: `Promise<string>` — Asenkron olarak çözülen bir Promise döndürür. Çözüldüğünde kullanıcının rol bilgisini içeren bir string değer verir. Başarılı sorgularda veritabanındaki `role` değeri (örneğin `'admin'`), hata veya bulunamama durumlarında ise `'user'` döndürülür.
+**Dönüş**: `Promise<string>` — Kullanıcının rolünü temsil eden dize. Olası değerler: `'super_admin'`, `'admin'`, `'user'`. Veritabanı hatası, istisna veya tanımsız durumlarda varsayılan olarak `'user'` döner.
+
+### isAdminByEmail
+**Ne yapar**: E-posta adresi bazlı olarak kullanıcının admin yetkisine sahip olup olmadığını kontrol eden senkron fallback kontrol fonksiyonudur. Genellikle ana rol sorgusu çalışmadığında veya önbellekte rol bilgisi bulunamadığında yetki doğrulamak için kullanılır.
+**Nasıl yapar**: Sistemde önceden tanımlanmış yetkili admin e-postaları listesi ile girilen e-posta adresini karşılaştırır. Eğer eşleşme tespit edilirse kullanıcının admin olduğu kabul edilir, eğer hiç e-posta adresi sağlanmazsa otomatik olarak yetkisiz olarak değerlendirilir.
+**Parametreler**:
+- email?: string — Admin yetkisi kontrol edilmek istenen kullanıcının opsiyonel e-posta adresi
+**Dönüş**: boolean — Kullanıcının admin olup olmadığını belirten boolean değer, admin ise true, aksi halde false döndürür
+
+### isDevAdmin
+**Ne yapar**: Sadece uygulamanın geliştirme ortamında çalıştığı durumlarda kullanılmak üzere kullanıcının geliştirici statüsündeki admin olup olmadığını kontrol eder, üretim ortamında hiçbir şekilde çalışmaz. Yerel geliştirme süreçlerinde test amaçlı yetki vermek için kullanılır.
+**Nasıl yapar**: Uygulamanın çalıştığı ortamı tanımlayan ortam değişkenlerini kontrol eder, eğer ortam geliştirme olarak tanımlıysa sisteme kayıtlı geliştirici kullanıcı bilgileriyle eşleştirme yapar, herhangi bir ortamda eşleşme sağlanmazsa false döndürür.
+**Parametreler**: Herhangi bir parametre almaz
+**Dönüş**: boolean — Geliştirme ortamında yetki doğrulanırsa true, tüm diğer durumlarda (üretim ortamı, yetkisiz kullanıcı vb.) false döndürür
+
+### checkAdminAccess
+**Ne yapar**: Önbellekte tutulan önceki kimlik doğrulama durumu verilerini kullanarak senkron şekilde kullanıcının admin erişimine sahip olup olmadığını kontrol eder, anlık yetki sorguları için optimize edilmiş cache tabanlı bir kontroldür.
+**Nasıl yapar**: Öncelikle girdi olarak aldığı kullanıcı nesnesinin user_metadata alanında yer alan rol bilgisini kontrol eder, eğer geçerli bir rol bilgisi varsa bu bilgiye göre yetkiyi belirler. Eğer kullanıcı nesnesinde rol bilgisi bulunamazsa fallback olarak kullanıcının e-posta adresiyle admin kontrolü gerçekleştirir. Eğer kullanıcı nesnesi null olarak gelirse otomatik olarak yetkisiz olarak değerlendirir.
+**Parametreler**:
+- user: { email?: string; user_metadata?: { role?: string } } | null — Admin erişimi kontrol edilmek istenen kullanıcı nesnesi, null olabilir, içeriğinde opsiyonel e-posta ve yine opsiyonel olarak kullanıcı meta verilerinde rol bilgisini barındırır
+**Dönüş**: boolean — Kullanıcının admin erişimine sahip olması durumunda true, aksi halde false döndürür
 
 ### setUserAdminRole
 **Ne yapar**: Sadece istemci tarafında kullanılmak üzere belirtilen kullanıcıya admin rolü atar, bu işlem sadece yerel istemci verilerini günceller, kalıcı bir veritabanı değişikliği yapmaz. Gerçek veritabanı güncellemesi için ayrı bir admin paneli işlemi yapılması zorunludur.
@@ -43101,44 +43133,67 @@ Admin user interface for type safety
 
 ---
 
+## SABİTLER
+- **FALLBACK_ADMIN_EMAILS** (array) — `[
+  'admin@venthub.com',
+  'info@venthub.com',
+  'alize@venthub.com',
+  '...`
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/config/admin.ts::getUserRole
-- **params**: `userId` — string, kullanıcının benzersiz kimliği
+- **params**: `userId: string`, `userEmail?: string`
 - **ic_degiskenler**:
-  - `supabaseBrowserClient` — tarayıcı ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/client` modülünden alınır
-  - `supabaseStaticClient` — statik/sunucu ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/static` modülünden alınır
-  - `supabase` — ortam tespitiyle seçilen Supabase istemcisi; `typeof window !== 'undefined'` koşulu sağlanırsa `supabaseBrowserClient`, sağlanmazsa `supabaseStaticClient` atanır
-  - `data` — `user_profiles` tablosundan `role` alanını seçen sorgunun sonucu; `.maybeSingle()` ile tek satır veya null döner
-  - `error` — Supabase sorgusunda oluşan hata nesnesi; varsa `console.warn` ile loglanır ve `'user'` döndürülür
-  - `error` (catch bloğu) — `try` bloğu içinde yakalanan genel istisna; `console.warn` ile loglanır ve `'user'` döndürülür
-- **Dönüş**: `Promise<string>` — kullanıcının rolü; `data?.role` varsa o değer, hata durumunda veya profil satırı yoksa `'user'`
+  - `supabase` — Ortam koşuluna göre browser veya static supabase client; `typeof window !== 'undefined'` kontrolü ile seçilir
+  - `supabaseBrowserClient` — Dinamik import ile yüklenen tarayıcı tarafı supabase istemcisi (`'../lib/supabase/client'`)
+  - `supabaseStaticClient` — Dinamik import ile yüklenen statik/sunucu tarafı supabase istemcisi (`'../lib/supabase/static'`)
+  - `data` — `user_profiles` tablosundan `role` alanı ile getirilen satır sonucu
+  - `error` — Supabase sorgusu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: `Promise<string>` — Kullanıcının rolü (`'super_admin'`, `'admin'` veya `'user'`)
 
-### [N2_NASIL] AST Pointer: src/config/admin.ts::setUserAdminRole
-- **params**:
-  - `userId` — string, rolü değiştirilecek kullanıcının benzersiz kimliği
-  - `role` — string, atanacak yeni rol değeri
-- **ic_degiskenler**:
-  - `supabaseBrowserClient` — tarayıcı ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/client` modülünden alınır
-  - `supabaseStaticClient` — statik/sunucu ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/static` modülünden alınır
-  - `supabase` — ortam tespitiyle seçilen Supabase istemcisi; `typeof window !== 'undefined'` koşulu sağlanırsa `supabaseBrowserClient`, sağlanmazsa `supabaseStaticClient` atanır
-  - `data` — `set_user_admin_role` RPC çağrısının dönüş değeri; `true` ise rol atama başarılı
-  - `error` — RPC çağrısında oluşan hata nesnesi; varsa `console.error` ile loglanır ve `false` döndürülür
-  - `error` (catch bloğu) — `try` bloğu içinde yakalanan genel istisna; `console.error` ile loglanır ve `false` döndürülür
-- **Dönüş**: `Promise<boolean>` — rol atama başarılıysa `true`, hata durumunda `false`
+### [N2_NASIL] AST Pointer: src/config/admin.ts::isAdminByEmail
+- **params**: `email?: string`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `boolean` — E-posta adresi `FALLBACK_ADMIN_EMAILS` listesinde küçük harfe çevrilmiş haliyle varsa `true`
 
-### [N3_NASIL] AST Pointer: src/config/admin.ts::listAdminUsers
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/config/admin.ts::isDevAdmin
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `ensureSessionFresh` — oturum tazeliğini sağlayan fonksiyon, dinamik import ile `../lib/ensureSessionFresh` modülünden alınır; RPC çağrısından önce `await` ile çalıştırılır
-  - `supabaseBrowserClient` — tarayıcı ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/client` modülünden alınır
-  - `supabaseStaticClient` — statik/sunucu ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/static` modülünden alınır
-  - `supabase` — ortam tespitiyle seçilen Supabase istemcisi; `typeof window !== 'undefined'` koşulu sağlanırsa `supabaseBrowserClient`, sağlanmazsa `supabaseStaticClient` atanır
-  - `rpcRes` — `admin_list_users` RPC çağrısının ham sonucu; `error` ve `data` alanlarını içerir
-  - `rpcErr` — `rpcRes` nesnesinden çıkarılan hata değeri; varsa `console.error` ile loglanır ve boş dizi döndürülür
-  - `rpcData` — `rpcRes` nesnesinden çıkarılan veri dizisi; null veya undefined ise boş diziye düşülür, `AdminUser[]` tipine cast edilir
-  - `error` (catch bloğu) — `try` bloğu içinde yakalanan genel istisna; `console.error` ile loglanır ve boş dizi döndürülür
-- **Dönüş**: `Promise<AdminUser[]>` — admin kullanıcı listesi; hata durumunda boş dizi `[]`
+  - `isDev` — `process.env.NODE_ENV === 'development'` kontrolü ile development ortamında olunduğunu belirtir
+  - `isLocalhost` — `window.location.hostname === 'localhost'` kontrolü ile yerel sunucuda olunduğunu belirtir
+- **Dönüş**: `boolean` — Hem development ortamı hem localhost ise `true`
+
+### [N4_NASIL] AST Pointer: src/config/admin.ts::checkAdminAccess
+- **params**: `user: { email?: string; user_metadata?: { role?: string } } | null`
+- **ic_degiskenler**:
+  - `lowerEmail` — `user.email` değerinin küçük harfe çevrilmiş hali; email karşılaştırmalarında kullanılır
+  - `metadataRole` — Supabase user metadata'sından okunan `role` alanı; izin verilen roller listesinde (`super_admin`, `admin`, `moderator`, `warehouse`, `sales`, `viewer`) kontrol edilir
+- **Dönüş**: `boolean` — Kullanıcının admin erişimine sahip olup olmadığı; email fallback, metadata rol veya local dev fallback ile belirlenir
+
+### [N5_NASIL] AST Pointer: src/config/admin.ts::setUserAdminRole
+- **params**: `userId: string`, `role: string`
+- **ic_degiskenler**:
+  - `supabase` — Ortam koşuluna göre browser veya static supabase client; `typeof window !== 'undefined'` kontrolü ile seçilir
+  - `supabaseBrowserClient` — Dinamik import ile yüklenen tarayıcı tarafı supabase istemcisi (`'../lib/supabase/client'`)
+  - `supabaseStaticClient` — Dinamik import ile yüklenen statik/sunucu tarafı supabase istemcisi (`'../lib/supabase/static'`)
+  - `data` — `set_user_admin_role` RPC çağrısının dönüş değeri; `true` ise atama başarılı
+  - `error` — RPC çağrısı sırasında oluşabilecek hata nesnesi
+- **Dönüş**: `Promise<boolean>` — Rol ataması başarılıysa `true`, hata oluşursa `false`
+
+### [N6_NASIL] AST Pointer: src/config/admin.ts::listAdminUsers
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `ensureSessionFresh` — Dinamik import ile yüklenen oturum tazeleme fonksiyonu (`'../lib/ensureSessionFresh'`); çağrılarak session'un güncel olmasını sağlar
+  - `supabase` — Ortam koşuluna göre browser veya static supabase client; `typeof window !== 'undefined'` kontrolü ile seçilir
+  - `supabaseBrowserClient` — Dinamik import ile yüklenen tarayıcı tarafı supabase istemcisi (`'../lib/supabase/client'`)
+  - `supabaseStaticClient` — Dinamik import ile yüklenen statik/sunucu tarafı supabase istemcisi (`'../lib/supabase/static'`)
+  - `rpcRes` — `admin_list_users` RPC çağrısınınham sonucu; `.data` ve `.error` alanları ayrıştırılır
+  - `rpcErr` — RPC sonucundaki `.error` alanı; hata varsa `true` döner ve boş dizi döner
+  - `rpcData` — RPC başarıyla döndüğünde `AdminUser[]` tipindeki kullanıcı listesi; `data` alanı `null` olabilir, bu durumda boş dizi kullanılır
+- **Dönüş**: `Promise<AdminUser[]>` — Admin kullanıcıların listesi; hata durumunda boş dizi `[]` döner
 
 ---
 
@@ -43146,22 +43201,34 @@ Admin user interface for type safety
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    admin_ts__checkAdminAccess["checkAdminAccess"]
     admin_ts__getUserRole["getUserRole"]
+    admin_ts__isAdminByEmail["isAdminByEmail"]
+    admin_ts__isDevAdmin["isDevAdmin"]
     admin_ts__listAdminUsers["listAdminUsers"]
     admin_ts__setUserAdminRole["setUserAdminRole"]
+    admin_ts__checkAdminAccess --> admin_ts__isDevAdmin
+    admin_ts__getUserRole --> admin_ts__isAdminByEmail
+    admin_ts__checkAdminAccess --> admin_ts__isAdminByEmail
 ```
 
 ## NODE ID STANDARD
 
   file: src\config\admin.ts
   function: src\config\admin.ts::getUserRole
+  function: src\config\admin.ts::isAdminByEmail
+  function: src\config\admin.ts::isDevAdmin
+  function: src\config\admin.ts::checkAdminAccess
   function: src\config\admin.ts::setUserAdminRole
   function: src\config\admin.ts::listAdminUsers
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: checkAdminAccess
   export: getUserRole
+  export: isAdminByEmail
+  export: isDevAdmin
   export: listAdminUsers
   export: setUserAdminRole
 
@@ -45410,12 +45477,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\hooks\useAuth.ts
-skeleton_hash: b0a16f598c5f2e77
+source_path: C:\Users\alize\venthub-hvac\src\hooks\useAuth.ts
+skeleton_hash: 8bee269d3e6af457
 entity_hashes:
   func:useAuth: d77303020f71d360
   overview: 71c8310fd4b630c4
-generated_at: 2026-08-27T08:34:18Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -45461,15 +45528,10 @@ Bu modül için fonksiyon gövdesi verilmediği için mimari aksiyom üretilemem
 
 ## SABİTLER
 - **AUTH_FALLBACK** (object) — `{
-
   user: null,
-
   session: null,
-
   role: null,
-
   loading: false,
-
   roleL...`
 
 ---
@@ -50661,16 +50723,28 @@ Bu dosyada fonksiyon tanımlanmamıştır. Yalnızca `dataTable` adında bir obj
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\en.ts
-skeleton_hash: 52acb6a97b3323f4
+source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\en.ts
+skeleton_hash: 458261091768abac
 entity_hashes:
-  overview: d20c765ec6eb43b4
-generated_at: 2026-08-27T06:50:42Z
+  overview: 4b1e1c79283931d3
+generated_at: 2026-08-15T19:08:10Z
 ---
 
 ## Genel Bakış
+Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturarak erişilebilirlik, denetim, otorite, kategoriler, ortak metinler, kontrol paneli, veri tablosu ve kuponlar gibi farklı modüllerin çeviri kaynaklarını tek bir `admin` nesnesi altında birleştirir. Uygulama genelinde tutarlı dil kullanımı sağlamak ve çeviri yönetimini merkezileştirmek amacıyla yapılandırılmış statik bir veri dosyasıdır. Dosya herhangi bir fonksiyon, ortam değişkeni veya API çağrısı içermez; yalnızca import edilmiş alt sözlükleri bir araya getirerek dışa aktarır.
 
-Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturmak amacıyla farklı modüllere ait çeviri kaynaklarını tek bir `admin` nesnesi altında birleştirir. a11y, audit, authority, categories, common, confirm, coupons ve dashboard gibi alt sözlükleri import ederek dışa aktarır. Dosya herhangi bir fonksiyon, ortam değişkeni veya API çağrısı içermez; yalnızca statik çeviri verilerini merkezileştiren bir birleştirme modülüdür.
+## Modül Yapısı
+Bu dosya fonksiyon içermediğinden "Fonksiyon Grupları" bölümü yerine modülün yapısı aşağıda özetlenmiştir.
+
+### İçe Aktarılan Alt Sözlükler
+Modül, farklı alanlara ait çeviri dosyalarını import ederek tek bir `admin` nesnesi altında birleştirir. Her bir import, ilgili domain'e ait anahtar-değer çiftlerini taşır.
+- a11y (erişilebilirlik), audit (denetim), authority (otorite), categories (kategoriler), common (ortak metinler), confirm (onay metinleri), coupons (kuponlar), dashboard (kontrol paneli), dataTable (veri tablosu), errorGroups (hata grupları), errors (hatalar), inventory (envanter), logistics (lojistik), menu (menü), movements (hareketler), orders (siparişler), pricing (fiyatlandırma), products (ürünler), returns (iadeler), search (arama), settings (ayarlar), titles (başlıklar), toolbar (araç çubuğu), ui (arayüz), users (kullanıcılar), webhooks
+
+### Dışa Aktarılan Sabitler
+Modülün tek çıktısı olan `admin` nesnesi, tüm alt sözlükleri bir araya getirerek uygulama genelinde çeviri erişimi sağlar.
+
+### Bağımlılıklar
+Dosya yalnızca yerel çeviri dosyalarına bağımlıdır; dış API, ortam değişkeni veya dinamik yükleme (lazy import) içermez. Tüm bağımlılıklar statik ve derleme zamanında çözümlenir.
 
 ---
 
@@ -50694,19 +50768,16 @@ Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturmak ama
 - import: ./confirm.en::confirm
 - import: ./coupons.en::coupons
 - import: ./dashboard.en::dashboard
-- import: ./dataRequests.en::dataRequests
 - import: ./dataTable.en::dataTable
 - import: ./errorGroups.en::errorGroups
 - import: ./errors.en::errors
 - import: ./inventory.en::inventory
-- import: ./invoices.en::invoices
 - import: ./logistics.en::logistics
 - import: ./menu.en::menu
 - import: ./movements.en::movements
 - import: ./orders.en::orders
 - import: ./pricing.en::pricing
 - import: ./products.en::products
-- import: ./purchasing.en::purchasing
 - import: ./returns.en::returns
 - import: ./search.en::search
 - import: ./settings.en::settings
@@ -50725,21 +50796,68 @@ Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturmak ama
   common,
   confirm,
   coupons,
-  dataRequests,
-  dataTabl...`
+  dataTable,
+  dashboard,...`
 
 ---
 
 ## AST POINTERS
 
-Bu dosyada (`C:\tmp\vh-comp\src\i18n\dictionaries\admin\en.ts`) fonksiyon tanımlanmamıştır.
+### [N1_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::a11y
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `a11y` nesnesi (erişilebilirlik çevirileri içerir)
 
-Dosya yalnızca aşağıdaki bileşenlerden oluşur:
+### [N2_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::theme
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `theme` nesnesi (tema/renk çevirileri içerir)
 
-- **İçe Aktarımlar**: `a11y`, `audit`, `authority`, `categories`, `common`, `confirm`, `coupons`, `dashboard`, `dataRequests`, `dataTable` — her biri kendi `.en` modülünden tekil export olarak alınır.
-- **Sabit**: `admin` — object türünde bir sabit; muhtemelen yukarıdaki tüm içe aktarımları tek bir çatı altında birleştiren sözlük (dictionary) nesnesi.
+### [N3_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::audit
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `audit` nesnesi (denetim/logging çevirileri içerir)
 
-Fonksiyon gövdesi bulunmadığından AST Pointer üretilecek birim yoktur.
+### [N4_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::authority
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `authority` nesnesi (yetki/izin çevirileri içerir)
+
+### [N5_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::categories
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `categories` nesnesi (kategori çevirileri içerir)
+
+### [N6_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::common
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `common` nesnesi (genel ortak çevirileri içerir)
+
+### [N7_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::confirm
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `confirm` nesnesi (onay/pencere çevirileri içerir)
+
+### [N8_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::coupons
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `coupons` nesnesi (kupon çevirileri içerir)
+
+### [N9_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::dashboard
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `dashboard` nesnesi (gösterge paneli çevirileri içerir)
+
+### [N10_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::dataTable
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `dataTable` nesnesi (veri tablosu çevirileri içerir)
+
+### [N11_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::admin
+- **params**: (parametre yok)
+- **ic_degiskenler**: 
+  - `admin` — Tüm import edilen çeviri modüllerini (a11y, theme, audit, authority, categories, common, confirm, coupons, dashboard, dataTable) birleştiren ve export edilen ana İngilizce sözlük nesnesi
+- **Dönüş**: `admin` nesnesi (tüm admin alanı çevirilerini birleştiren ana sözlük)
 
 ---
 
@@ -74738,17 +74856,17 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\views\account\OrderDetailPage.tsx
-skeleton_hash: 2b6661c0a71b96df
+source_path: C:\Users\alize\venthub-wt-altyapi\src\views\account\OrderDetailPage.tsx
+skeleton_hash: 884bfc2dd0c01b0e
 entity_hashes:
-  func:OrderDetailPage: 85c6f615024b92fd
-  overview: a5cc962f9daa7e69
+  func:OrderDetailPage: dfa1eb0c67bb7d37
+  overview: c0f73db07d5be692
   style_tokens: 2d7ff3d6e2a546ab
-generated_at: 2026-08-27T04:15:16Z
+generated_at: 2026-08-18T06:53:36Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcının hesap panelinden eriştiği belirli bir siparişin detaylı görünümünü sunan tek bir React sayfa bileşeninden oluşur. Sipariş özeti, ürünler, kargo takibi ve fatura bilgilerini sekmeler halinde düzenler ve sipariş durumunu adım adım gösteren bir ilerleme çubuğu ile yeniden sipariş verme gibi eylemler sunar. Bileşen, URL'den sipariş kimliğini alır, kimlik doğrulamasını kontrol eder ve Supabase veritabanından sipariş verilerini ilişkisel sorguyla çeker.
+Bu modül, kullanıcı hesap panelinden erişilen tek bir siparişin tüm detaylarını görüntüleyen React sayfa bileşenidir. Sipariş özeti, ürünler, ödeme bilgileri ve teslimat durumunu düzenli bir arayüzde sunarak kullanıcıya siparişinin tamamını tek bir sayfada inceleme imkânı sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
@@ -74758,21 +74876,22 @@ Modülün tek ve merkezi bileşeni olup, sipariş verisini alarak sayfa düzenin
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden türetilen özel aksiyom tanımlanmamıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### OrderDetailPage
-**Ne yapar**: Sipariş detay sayfasını oluşturan React bileşenidir. URL'den alınan sipariş kimliğine göre veritabanından sipariş verilerini çeker, sipariş kalemlerini eşler ve kullanıcıya sipariş özeti, ürünler, kargo takibi ve fatura bilgilerini sekmeli bir arayüzde sunar. Kimlik doğrulama yapılmamış kullanıcıları giriş sayfasına yönlendirir.
+**Ne yapar**: Kullanıcının belirli bir siparişinin detaylı görünümünü sunan React bileşenidir. Sipariş özeti, ürünler, kargo takibi ve fatura olmak üzere dört sekmede bilgi görüntüler; sipariş durumunu adım adım gösteren bir ilerleme çubuğu ve yeniden sipariş verme gibi eylemler sunar.
 
-**Nasıl yapar**: Bileşen önce `useSearchParams` ile URL'deki `id` parametresini alır. `useAuth` ile kullanıcı oturum durumunu kontrol eder; oturum açılmamışsa `useRouter` ile giriş sayfasına yönlendirir. `useI18n` ve `useLocalizedRoutes` ile çoklu dil desteği ve yerelleştirilmiş rotaları kullanır. `useCart` ile sepete ekleme fonksiyonuna erişir. İlk `useEffect` kimlik doğrulama kontrolü yapar. İkinci `useEffect` içinde tanımlanan `load` fonksiyonu, Supabase üzerinden `venthub_orders` tablosundan sipariş ana verilerini ve ilişkili `venthub_order_items` kalemlerini tek bir sorguda çeker (ilişkisel sorgu optimizasyonu). Çekilen kalemler `*_snapshot` sütunlarından okunur; canlı katalogtan değil, sipariş anındaki anlık değerlerden — bu bir fatura görünümüdür ve ürün adı ya da fiyatı sonradan değişse bile müşterinin gördüğü kayıt değişmemelidir. Yedek (fallback) bilerek yoktur çünkü bu alanlar veritabanında NOT NULL olarak tanımlıdır ve "boşsa eski kolona düş" davranışı sessiz bozulmaya yol açardı. Görünen müşteri adı yedeği sözlükten gelir; ham Türkçe dizge EN kullanıcıya da gösteriyordu (I18N-SWEEP bildirdi; anahtar ortak sözlükte). Durum renkleri ve metinleri için `getStatusColor` ve `getStatusText` yardımcı fonksiyonları kullanılır. İlerleme çubuğu için `'confirmed'` durumu `'paid'` olarak normalize edilir. Sekme yapısı `'overview'`, `'items'`, `'shipping'`, `'invoice'` olmak üzere dört bölümden oluşur. Yükleme sırasında spinner gösterilir.
+**Nasıl yapar**: `useSearchParams` hook'u ile URL'den sipariş ID'sini alır. `useAuth` hook'u ile kimlik doğrulaması kontrol eder; kullanıcı giriş yapmamışsa `useRouter` ile login sayfasına yönlendirme yapar. `useEffect` içindeki `load` asenkron fonksiyonu ile Supabase veritabanından `venthub_orders` tablosuna ilişkisel sorgu (`.select` ile `venthub_order_items` join'i) göndererek tek bir sorguda sipariş ana verilerini ve kalemleri çeker. Ham verileri `Order` ve `OrderItem` tiplerine dönüştürürken `*_snapshot` kolonlarından (`product_name_snapshot`, `unit_price_snapshot`, `product_sku_snapshot`) okuma yaparak sipariş anındaki fiyat ve ürün bilgisini korur (W2b-2 snapshot prensibi). `handleInvoicePdf` fonksiyonunda `jsPDF` ve `jspdf-autotable` paketlerini `Promise.all` ile dinamik import ederek proforma PDF'i oluşturur ve indirir. `handleReorder` fonksiyonunda sipariş kalemlerinden ürünleri sorgulayarak sepete ekler. `useI18n` hook'u ile çoklu dil desteği, `useCart` hook'u ile sepet yönetimi sağlar.
 
-**Parametreler**:
-- Parametre almaz (fonksiyon bileşeni).
+**Parametreler**: Parametre almaz (React bileşeni, props’suz fonksiyonel bileşendir).
 
-**Dönüş**: Bilinmiyor (tip belirtilmemiş).
+**Dönüş**: JSX.Element — Sipariş detay sayfasını oluşturan React JSX'i; yükleme durumunda spinner, sipariş hazır olduğunda tam sayfa arayüzü döndürür.
 
 ---
 
@@ -74781,7 +74900,6 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden 
 - import: ../../hooks/useCartHook::useCart
 - import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../i18n/currency::SYSTEM_CURRENCY
 - import: ../../i18n/datetime::formatDateTime
 - import: ../../i18n/format::formatCurrency
 - import: ../../lib/services/product.columns::VARIANT_DETAIL_COLUMNS
@@ -74847,226 +74965,182 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::useEffect (auth kontrol)
-- **params**: yok
+### [N1_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::authRedirectEffect
+- **params**: (yok — anonim arrow fonksiyon)
 - **ic_degiskenler**:
-  - `authLoading` — kimlik doğrulama yüklenme durumu; true ise kontrol yapılmaz
-  - `user` — giriş yapmış kullanıcı nesnesi; yoksa login sayfasına yönlendirilir
-  - `router` — Next.js router nesnesi; sayfa yönlendirmesi için kullanılır
-  - `Routes` — rota sabitleri nesnesi; `Routes.auth.login()` ve `Routes.account.orderDetail()` fonksiyonları çağrılır
-  - `id` — sipariş ID'si; login sonrası geri dönüş URL'inde kullanılır
-- **Dönüş**: yok
+  - `authLoading` — useAuth hook'undan gelen yükleme durumu bayrağı
+  - `user` — useAuth hook'undan gelen oturum açmış kullanıcı nesnesi
+  - `router` — useRouter() navigasyon nesnesi
+  - `id` — useSearchParams'dan gelen sipariş URL parametresi
+  - `Routes.auth.login(...)` — login sayfası rotası, argüman olarak orderDetail rotası verilir
+  - `Routes.account.orderDetail(id)` — mevcut sipariş detay rotası
+- **Dönüş**: yok (yan etki: `router.push` ile login sayfasına yönlendirme)
 
-### [N2_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::useEffect (sipariş yükleme)
-- **params**: yok
-- **ic_degiskenler**:
-  - `user` — giriş yapmış kullanıcı nesnesi; yoksa yükleme yapılmaz
-  - `id` — sipariş ID'si; yoksa yükleme yapılmaz
-  - `setLoading` — yükleme durumunu güncelleyen state setter fonksiyonu
-  - `supabase` — Supabase istemcisi; veritabanı sorguları için kullanılır
-  - `setOrder` — sipariş verisini güncelleyen state setter fonksiyonu
-  - `toast` — bildirim gösterme fonksiyonu; hata durumunda `toast.error()` çağrılır
-  - `t` — çeviri fonksiyonu; hata mesajı anahtarı için kullanılır
-  - `console.error` — hata günlüğü; yakalanan hataları konsola yazar
-- **Dönüş**: yok
+---
 
-### [N3_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::load
-- **params**: yok
+### [N2_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::loadEffect
+- **params**: (yok — anonim arrow fonksiyon, useEffect callback)
 - **ic_degiskenler**:
-  - `user` — giriş yapmış kullanıcı nesnesi; yoksa fonksiyon erken döner
-  - `id` — sipariş ID'si; Supabase sorgusunda `.eq('id', id)` filtresi olarak kullanılır
-  - `setLoading` — yükleme durumunu güncelleyen state setter; try bloğunda true, finally'de false yapılır
-  - `supabase` — Supabase istemcisi; `venthub_orders` tablosundan veri çeker
-  - `orderData` — Supabase sorgusundan dönen sipariş verisi; ilişkisel sorgu ile `venthub_order_items` dahil çekilir
-  - `orderError` — Supabase sorgu hatası; varsa throw edilir
-  - `rawItems` — `orderData.venthub_order_items` dizisi; `Record<string, unknown>[]` tipinde, yoksa boş dizi atanır
-  - `mappedItems` — `rawItems` dizisinin `OrderItem` tipine dönüştürülmüş hali; `rawItems.map()` ile oluşturulur
-  - `mappedOrder` — `Order` tipinde nesne; `orderData` alanlarından dönüştürülerek oluşturulur
-  - `setOrder` — `mappedOrder`'ı state'e kaydeden setter fonksiyonu
-  - `toast` — bildirim fonksiyonu; hata durumunda `toast.error()` çağrılır
-  - `t` — çeviri fonksiyonu; `t('orders.unexpectedError')` ve `t('common.userFallback')` anahtarları için kullanılır
-  - `console.error` — hata günlüğü; `'Order load error:'` mesajıyla yakalanan hatayı yazar
-  - `e` — catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: yok
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi; load içinde koruma kontrolü yapılır
+  - `id` — useSearchParams'dan gelen sipariş ID'si; load içinde koruma kontrolü yapılır
+  - `load` — effectscope içinde tanımlı asenkron yardımcı fonksiyon; veri çekme işlemini yürütür ve ardından hemen çağrılır
+- **Dönüş**: yok (yan etki: asenkron veri yükleme, state güncellemeleri)
 
-### [N4_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::mappedItems map callback
-- **params**: `it` — ham sipariş kalemi nesnesi; `Record<string, unknown>` tipinde
-- **ic_degiskenler**:
-  - `it.unit_price_snapshot` — birim fiyat snapshot alanı; `Number()` ile sayıya dönüştürülür, yoksa 0 atanır
-  - `it.quantity` — miktar alanı; `Number()` ile sayıya dönüştürülür, yoksa 0 atanır
-  - `unit` — dönüştürülmüş birim fiyat; `Number(it.unit_price_snapshot) || 0`
-  - `qty` — dönüştürülmüş miktar; `Number(it.quantity) || 0`
-  - `it.id` — kalemin ID'si; `String()` ile dönüştürülür
-  - `it.product_id` — ürün ID'si; varsa `String()` ile dönüştürülür, yoksa `undefined`
-  - `it.product_name_snapshot` — ürün adı snapshot; `String()` ile dönüştürülür
-  - `it.product_sku_snapshot` — ürün SKU snapshot; varsa `String()` ile dönüştürülür, yoksa `undefined`
-  - `it.product_image_url` — ürün görsel URL'si; varsa `String()` ile dönüştürülür, yoksa `null`
-- **Dönüş**: `OrderItem` nesnesi — `id`, `product_id`, `product_name`, `product_sku`, `quantity`, `unit_price`, `total_price`, `product_image_url` alanlarını içerir
+---
 
-### [N5_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::copyToClipboard
-- **params**: `text` — kopyalanacak metin; opsiyonel string
+### [N3_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::load
+- **params**: (yok — `async function load()`)
 - **ic_degiskenler**:
-  - `text` — kopyalanacak metin; yoksa fonksiyon erken döner
-  - `navigator.clipboard.writeText` — panoya yazma API'si; `text` parametresini panoya kopyalar
-  - `toast` — bildirim fonksiyonu; başarılı kopyalamada `toast.success()`, hata durumunda `toast.error()` çağrılır
-  - `t` — çeviri fonksiyonu; `t('orders.copied')` ve `t('orders.copyFailed')` anahtarları için kullanılır
-- **Dönüş**: yok
+  - `orderData` — `supabase.from('venthub_orders').select(...).eq('id', id).single()` sorgusundan dönen sipariş ve ilişkili kalemler verisi (ilişkisel sorgu ile tek seferde çekilen ana + detay verisi)
+  - `orderError` — Supabase sorgu sonucundan destructuring ile alınan hata nesnesi; throw ile yukarı fırlatılır
+  - `rawItems` — `orderData.venthub_order_items` alanının `Record<string, unknown>[]` tipine cast edilmiş ham kalem dizisi; `|| []` ile boş dizi fallback'i
+  - `mappedItems` — `rawItems.map(...)` çağrısı ile `OrderItem[]` formatına dönüştürülmüş sipariş kalemleri dizisi
+  - `mappedOrder` — Tüm sipariş alanlarının `Order` tipine dönüştürülmüş tam nesne; snapshot kolonları, fallback değerler ve `user` nesnesinden türetilen alanlar dahil
+  - `e` — try-catch yakalama değişkeni; `console.error` ve `toast.error` ile işlenir
+- **Dönüş**: yok (yan etki: `setOrder(mappedOrder)`, `setLoading(false)`, `toast.error`)
+- **API Çağrıları**: `supabase.from('venthub_orders').select(relationalQuery).eq('id', id).single()`
+- **Dict Erişimleri**: `orderData.id`, `orderData.total_amount`, `orderData.status`, `orderData.payment_status`, `orderData.created_at`, `orderData.customer_name`, `orderData.customer_email`, `orderData.shipping_address`, `orderData.order_number`, `orderData.conversation_id`, `orderData.carrier`, `orderData.tracking_number`, `orderData.tracking_url`, `orderData.shipped_at`, `orderData.delivered_at`, `orderData.shipping_method`, `orderData.invoice_type`, `orderData.invoice_info`, `orderData.legal_consents`, `orderData.venthub_order_items`, `user?.user_metadata?.full_name`, `user?.email`
 
-### [N6_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::downloadProforma
-- **params**: `o` — proforma oluşturulacak `Order` nesnesi
-- **ic_degiskenler**:
-  - `jsPDF` — jsPDF kütüphanesinin default export'u; dinamik import ile yüklenir
-  - `autoTable` — jspdf-autotable eklentisinin default export'u; dinamik import ile yüklenir
-  - `doc` — jsPDF belge nesnesi; `new jsPDF({ unit: 'pt', format: 'a4' })` ile oluşturulur
-  - `o.order_number` — sipariş numarası; varsa `'-'` ile bölünerek ikinci parça alınır
-  - `o.id` — sipariş ID'si; `order_number` yoksa son 8 karakteri büyük harfle kullanılır
-  - `orderNo` — proforma numarası; `o.order_number` veya `o.id` türetilir
-  - `o.created_at` — sipariş oluşturulma tarihi; `formatDateTime()` ile biçimlendirilir
-  - `lang` — dil parametresi; tarih ve para birimi biçimlendirmede kullanılır
-  - `o.customer_name` — müşteri adı; PDF'de gösterilir
-  - `o.customer_email` — müşteri e-postası; varsa PDF'de gösterilir
-  - `head` — tablo başlık satırı; çeviri fonksiyonu ile oluşturulur
-  - `o.order_items` — sipariş kalemleri dizisi; tablo gövdesi için dönüştürülür
-  - `body` — tablo gövdesi; her kalem için `[ürün_adı, miktar, birim_fiyat, toplam_fiyat]` dizisi
-  - `formatCurrency` — para birimi biçimlendirme fonksiyonu; fiyatlar için kullanılır
-  - `SYSTEM_CURRENCY` — sistem para birimi sabiti; `formatCurrency`'ye iletilir
-  - `after` — autoTable bitiş Y koordinatı; `doc.lastAutoTable.finalY` veya 100
-  - `o.total_amount` — sipariş toplam tutarı; grand total satırında gösterilir
-  - `t` — çeviri fonksiyonu; `t('orders.grandTotal')` anahtarı için kullanılır
-  - `e` — catch bloğunda yakalanan hata nesnesi
-  - `toast` — bildirim fonksiyonu; hata durumunda `toast.error()` çağrılır
-- **Dönüş**: yok
+---
 
-### [N7_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::reorder
-- **params**: `o` — yeniden sipariş verilecek `Order` nesnesi
+### [N4_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::mapOrderItem
+- **params**: `(it)` — Ham sipariş kalemi satırı (`Record<string, unknown>`)
 - **ic_degiskenler**:
-  - `o.order_items` — sipariş kalemleri dizisi; ürün ID'leri ve isimleri çıkarılır
-  - `ids` — benzersiz ürün ID'leri dizisi; `Set` ile tekrarlar kaldırılır, boş olmayan `product_id` değerleri filtrelenir
-  - `names` — benzersiz ürün adları dizisi; `product_id` olmayan ama `product_name` olan kalemlerden çıkarılır
-  - `productMap` — ürün haritası; `Record<string, Product>` tipinde, ID ve isim anahtarlarıyla ürünleri saklar
-  - `supabase` — Supabase istemcisi; `products` tablosundan veri çeker
-  - `VARIANT_DETAIL_COLUMNS` — ürün sütun seçimi sabiti; Supabase select sorgusunda kullanılır
-  - `data` — Supabase sorgusundan dönen ürün verisi; `Product[]` tipine dönüştürülür
-  - `error` — Supabase sorgu hatası; varsa throw edilir
-  - `added` — sepete eklenen toplam miktar; sayaç olarak kullanılır
-  - `it` — döngüdeki sipariş kalemi; `product_id` veya `product_name` ile eşleştirilir
-  - `prod` — eşleştirilen `Product` nesnesi; `productMap`'ten ID veya isimle aranır
-  - `addToCart` — sepete ekleme fonksiyonu; `prod` ve `it.quantity` ile çağrılır
-  - `toast` — bildirim fonksiyonu; başarılı durumda `toast.success()`, hata durumunda `toast.error()` çağrılır
-  - `t` — çeviri fonksiyonu; `t('orders.reorderedToast')`, `t('orders.reorderNotFound')`, `t('orders.reorderError')` anahtarları için kullanılır
-  - `router` — Next.js router nesnesi; sepet sayfasına yönlendirme için kullanılır
-  - `Routes` — rota sabitleri nesnesi; `Routes.cart()` fonksiyonu çağrılır
-  - `e` — catch bloğunda yakalanan hata nesnesi
-  - `console.error` — hata günlüğü; yakalanan hatayı konsola yazar
-- **Dönüş**: yok
+  - `unit` — `Number(it.unit_price_snapshot) || 0` hesaplaması ile elde edilen birim fiyat (sayısal, snapshot kolonundan okunur, canlı katalogdan değil)
+  - `qty` — `Number(it.quantity) || 0` hesaplaması ile elde edilen ürün miktarı (sayısal)
+- **Dönüş**: `OrderItem` nesnesi — `id`, `product_id`, `product_name`, `product_sku`, `quantity`, `unit_price`, `total_price` (`unit * qty`), `product_image_url` alanlarını içerir
+- **Dict Erişimleri**: `it.unit_price_snapshot`, `it.quantity`, `it.id`, `it.product_id`, `it.product_name_snapshot`, `it.product_sku_snapshot`, `it.product_image_url`
 
-### [N8_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::getStatusColor
-- **params**: `status` — sipariş durumu string'i
-- **ic_degiskenler**:
-  - `status` — sipariş durumu; `toLowerCase()` ile küçük harfe dönüştürülerek eşleştirilir
-- **Dönüş**: string — Tailwind CSS renk sınıfı; duruma göre `bg-yellow-100 text-yellow-800`, `bg-blue-100 text-blue-800`, `bg-purple-100 text-purple-800`, `bg-green-100 text-green-800`, `bg-red-100 text-red-800` veya `bg-gray-100 text-gray-800`
+---
 
-### [N9_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::getStatusText
-- **params**: `status` — sipariş durumu string'i
+### [N5_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::copyToClipboard
+- **params**: `(text?: string)` — Kopyalanacak metin dizgesi (opsiyonel)
 - **ic_degiskenler**:
-  - `status` — sipariş durumu; `toLowerCase()` ile küçük harfe dönüştürülerek eşleştirilir
-  - `t` — çeviri fonksiyonu; durum metinleri için `t('orders.pending')`, `t('orders.paid')`, `t('orders.shipped')`, `t('orders.delivered')`, `t('orders.failed')`, `t('orders.cancelled')`, `t('orders.refunded')` anahtarları kullanılır
-- **Dönüş**: string — çevrilmiş durum metni veya eşleşme yoksa orijinal `status` değeri
+  - (yok — parametre ve API çağrıları dışında yerel değişken yok)
+- **Dönüş**: yok (yan etki: `navigator.clipboard.writeText(text)`, `toast.success` veya `toast.error`)
+- **API Çağrıları**: `navigator.clipboard.writeText(text)`
 
-### [N10_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::step render callback
-- **params**: `s` — adım durumu string'i, `idx` — adım indeksi numarası
-- **ic_degiskenler**:
-  - `s` — adım durumu; `getStatusText(s)` ile çevrilerek gösterilir
-  - `idx` — adım indeksi; 0'dan başlar, aktif adım kontrolünde kullanılır
-  - `activeIdx` — aktif adım indeksi; `idx <= activeIdx` kontrolüyle adım durumu belirlenir
-  - `steps` — adımlar dizisi; son adım kontrolünde `steps.length - 1` ile karşılaştırılır
-  - `getStatusText` — durum metni fonksiyonu; `s` parametresiyle çağrılır
-- **Dönüş**: JSX element — adım göstergesi (daire + metin + çizgi)
+---
 
-### [N11_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::tab render callback
-- **params**: `tt` — sekme adı string'i
+### [N6_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::generatePDF
+- **params**: `(o: Order)` — PDF'i oluşturulacak sipariş nesnesi
 - **ic_degiskenler**:
-  - `tt` — sekme adı; `'overview'`, `'items'`, `'shipping'`, `'invoice'` değerlerinden biri
-  - `setTab` — sekme state setter fonksiyonu; tıklama olayında `setTab(tt)` çağrılır
-  - `tab` — aktif sekme; `tab === tt` kontrolüyle aktif stil belirlenir
-  - `t` — çeviri fonksiyonu; `t('orders.tabs.overview')`, `t('orders.tabs.items')`, `t('orders.tabs.shipping')`, `t('orders.tabs.invoice')` anahtarları için kullanılır
-- **Dönüş**: JSX element — sekme butonu
+  - `jsPDF` — `import('jspdf')` dinamik import'undan gelen varsayılan dışa aktarım; PDF belge sınıfı
+  - `autoTable` — `import('jspdf-autotable')` dinamik import'undan gelen varsayılan dışa aktarım; tablo ekleme fonksiyonu
+  - `doc` — `new jsPDF({ unit: 'pt', format: 'a4' })` ile oluşturulan PDF belge nesnesi
+  - `orderNo` — Proforma numarası; `o.order_number` varsa `'-'` ile bölünüp ikinci parça alınır, yoksa `o.id.slice(-8).toUpperCase()` fallback'i
+  - `head` — Tablo başlık satırı dizisi: `[t('orders.productCol'), t('orders.qtyCol'), t('orders.unitPriceCol'), t('orders.totalCol')]`
+  - `body` — `o.order_items.map(...)` ile oluşturulan tablo gövde satırları; her satır `[ürünAdı, miktar, birimFiyat, toplamFiyat]` formatında
+  - `after` — Tablonun bittiği Y koordinatı; `(doc as ...).lastAutoTable?.finalY || 100` ile hesaplanır
+  - `e` — try-catch yakalama değişkeni
+- **Dönüş**: yok (yan etki: `doc.save(...)` ile PDF dosyası indirilir, `toast.error` hata durumunda)
+- **Dinamik Importlar**: `import('jspdf')`, `import('jspdf-autotable')`
+- **Dict Erişimleri**: `o.order_number`, `o.created_at`, `o.customer_name`, `o.customer_email`, `o.order_items`, `o.total_amount`
 
-### [N12_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::adres render callback
-- **params**: yok
-- **ic_degiskenler**:
-  - `order` — sipariş nesnesi; `order.shipping_address` alanına erişilir
-  - `addr` — `order.shipping_address`'in `ShippingAddress` tipine dönüştürülmüş hali
-  - `addr.fullAddress` — tam adres; `addr.street`'e fallback olarak kullanılır
-  - `addr.street` — sokak adresi; `line1`'e atanır
-  - `addr.city` — şehir; `line2`'ye eklenir
-  - `addr.district` — ilçe; `addr.state`'e fallback olarak kullanılır, `line2`'ye eklenir
-  - `addr.state` — eyalet/il; `addr.district` yoksa kullanılır
-  - `addr.postalCode` — posta kodu; `addr.postal_code`'a fallback olarak kullanılır
-  - `addr.postal_code` — posta kodu (alternatif alan adı); `line3`'e atanır
-  - `line1` — birinci adres satırı; `addr.fullAddress || addr.street`
-  - `line2` — ikinci adres satırı; `[addr.city, addr.district || addr.state].filter(Boolean).join(', ')`
-  - `line3` — üçüncü adres satırı; `addr.postalCode || addr.postal_code`
-- **Dönüş**: JSX element — adres bilgisi div'i
+---
 
-### [N13_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::sipariş kalemi render callback
-- **params**: `item` — sipariş kalemi nesnesi
+### [N7_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::reorder
+- **params**: `(o: Order)` — Tekrar sipariş verilecek sipariş nesnesi
 - **ic_degiskenler**:
-  - `item.id` — kalem ID'si; `key` prop'u olarak kullanılır
-  - `item.product_id` — ürün ID'si; varsa `Routes.legacyProduct(item.product_id)` ile ürün sayfasına link oluşturulur
-  - `item.product_name` — ürün adı; tablo hücresinde gösterilir
-  - `item.product_sku` — ürün SKU'su; varsa `t('orders.skuLabel', { sku: item.product_sku })` ile gösterilir
-  - `item.product_image_url` — ürün görsel URL'si; varsa `VentImage` bileşeniyle gösterilir
-  - `item.quantity` — miktar; tablo hücresinde gösterilir
-  - `item.unit_price` — birim fiyat; `formatPrice(item.unit_price)` ile biçimlendirilir
-  - `item.total_price` — toplam fiyat; `formatPrice(item.total_price)` ile biçimlendirilir
-  - `Routes` — rota sabitleri nesnesi; `Routes.legacyProduct()` fonksiyonu çağrılır
-  - `Link` — Next.js Link bileşeni; ürün sayfasına yönlendirme için kullanılır
-  - `VentImage` — özel görsel bileşeni; ürün görseli için kullanılır
-  - `t` — çeviri fonksiyonu; `t('orders.skuLabel')` ve `t('orders.noImage')` anahtarları için kullanılır
-  - `formatPrice` — fiyat biçimlendirme fonksiyonu; birim ve toplam fiyatlar için kullanılır
-- **Dönüş**: JSX element — tablo satırı (`<tr>`)
+  - `ids` — `o.order_items` içindeki `product_id` alanlarının benzersiz, null/undefined filtreli string dizisi; `Array.from(new Set(...))` ile elde edilir
+  - `names` — `product_id`'si olmayan kalemlerin `product_name` değerlerinin benzersiz dizisi; products tablosunda isim ile arama için kullanılır
+  - `productMap` — `Record<string, Product>` sözlüğü; ürün ID'si veya adına göre `Product` nesnesini eşler
+  - `data` — `supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('id', ids)` sorgusundan dönen ürün verisi
+  - `error` — IDs tabanlı Supabase sorgu hatası
+  - `p` — `forEach` callback parametresi; `Product` nesnesi; `productMap[p.id]` veya `productMap[p.name]` olarak kaydedilir
+  - `added` — Sepete eklenen toplam ürün adedi sayacı
+  - `it` — `for...of` döngü değişkeni; `o.order_items` içindeki her sipariş kalemi
+  - `prod` — Mevcut kaleme karşılık gelen `Product` nesnesi; önce `productMap[it.product_id]`, sonra fallback olarak `productMap[it.product_name]` ile bulunur
+  - `e` — try-catch yakalama değişkeni
+- **Dönüş**: yok (yan etki: `addToCart(prod, it.quantity)`, `toast.success`/`toast.error`, `router.push(Routes.cart())`)
+- **API Çağrıları**: `supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('id', ids)`, `supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('name', names)`
+- **Dict Erişimleri**: `productMap[p.id]`, `productMap[p.name]`, `productMap[it.product_id]`, `productMap[it.product_name]`, `it.product_id`, `it.product_name`, `it.quantity`
 
-### [N14_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::fatura bilgisi render callback
-- **params**: yok
-- **ic_degiskenler**:
-  - `order` — sipariş nesnesi; `order.invoice_info` ve `order.invoice_type` alanlarına erişilir
-  - `info` — `order.invoice_info`'nun `Record<string, unknown>` tipine dönüştürülmüş hali
-  - `iv` — fatura alanı okuma fonksiyonu; `info?.[k]` değerini string'e dönüştürür, yoksa `'-'` döner
-  - `order.invoice_type` — fatura tipi; `'corporate'` ise kurumsal, değilse bireysel gösterilir
-  - `info.companyName` — şirket adı; kurumsal faturada gösterilir
-  - `info.vkn` — vergi kimlik numarası; kurumsal faturada gösterilir
-  - `info.taxOffice` — vergi dairesi; kurumsal faturada gösterilir
-  - `info.tckn` — T.C. kimlik numarası; bireysel faturada gösterilir
-  - `t` — çeviri fonksiyonu; `t('account.orderDetail.companyTitleLabel')`, `t('account.orderDetail.vknLabel')`, `t('account.orderDetail.taxOfficeLabel')`, `t('account.orderDetail.tcknLabel')` anahtarları için kullanılır
-- **Dönüş**: JSX element — fatura bilgisi div'i
+---
 
-### [N15_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::yasal onay render callback
-- **params**: yok
+### [N8_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::getStatusColor
+- **params**: `(status: string)` — Sipariş veya ödeme durumu dizgesi
 - **ic_degiskenler**:
-  - `order` — sipariş nesnesi; `order.legal_consents` alanına erişilir
-  - `cons` — `order.legal_consents`'in `Record<string, { accepted?: boolean; ts?: string | null }>` tipine dönüştürülmüş hali
-  - `row` — onay satırı render fonksiyonu; `label` ve `k` parametreleriyle çağrılır
-  - `formatDateTime` — tarih biçimlendirme fonksiyonu; onay tarihi için kullanılır
-  - `lang` — dil parametresi; tarih biçimlendirmede kullanılır
-  - `t` — çeviri fonksiyonu; `t('account.orderDetail.consentDistanceSales')`, `t('account.orderDetail.consentPreInfo')`, `t('account.orderDetail.consentOrderConfirm')`, `t('account.orderDetail.consentMarketing')` anahtarları için kullanılır
-- **Dönüş**: JSX element — yasal onay listesi
+  - (yok — parametre dışında yerel değişken yok)
+- **Dönüş**: `string` — Tailwind CSS class adı (ör. `'bg-yellow-100 text-yellow-800'`, `'bg-blue-100 text-blue-800'`); durum değerine göre `switch/case` ile belirlenir; `'pending'`, `'paid'`/`'confirmed'`, `'shipped'`, `'delivered'`, `'failed'`/`'cancelled'` ve default kolları vardır
 
-### [N16_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::row (yasal onay satırı)
-- **params**: `label` — onay etiketi string'i, `k` — onay anahtarı string'i
+---
+
+### [N9_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::getStatusText
+- **params**: `(status: string)` — Sipariş veya ödeme durumu dizgesi
 - **ic_degiskenler**:
-  - `cons` — yasal onaylar nesnesi; `cons?.[k]` ile belirli onay bilgisine erişilir
-  - `c` — belirli onay nesnesi; `cons?.[k]`'dan alınır
-  - `c.accepted` — onay durumu boolean'ı; `!!c?.accepted` ile dönüştürülür
-  - `c.ts` — onay tarihi string'i; varsa `formatDateTime(c.ts, lang)` ile biçimlendirilir
-  - `ok` — onaylanmış mı boolean'ı; `!!c?.accepted`
-  - `ts` — biçimlendirilmiş onay tarihi; `c.ts` varsa `formatDateTime(c.ts, lang)`, yoksa `'-'`
-  - `label` — onay etiketi; `<span>` içinde gösterilir
-  - `k` — onay anahtarı; `key` prop'u olarak kullanılır
-  - `formatDateTime` — tarih biçimlendirme fonksiyonu; `c.ts` ve `lang` parametreleriyle çağrılır
-  - `lang` — dil parametresi; tarih biçimlendirmede kullanılır
-  - `t` — çeviri fonksiyonu; `t('account.orderDetail.consentAccepted')` ve `t('account.orderDetail.consentNone')` anahtarları için kullanılır
-- **Dönüş**: JSX element — onay satırı div'i
+  - (yok — parametre dışında yerel değişken yok)
+- **Dönüş**: `string` — `t()` uluslararasılaştırma fonksiyonu ile çevrilmiş durum metni (ör. `t('orders.pending')`); `'refunded'` durumu ek olarak ele alınır; bilinmeyen durumlarda ham `status` dizgesi döner
+
+---
+
+### [N10_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderStep
+- **params**: `(s, idx)` — `s`: adım durumu dizgesi, `idx`: adımın sırası (0-tabanlı indeks)
+- **ic_degiskenler**:
+  - (yok — yerel değişken yok; JSX içinde doğrudan hesaplama)
+- **Dönüş**: JSX `React.Fragment` — Sipariş takip adımını gösteren daire + çizgi bloğu; `idx <= activeIdx` koşulu ile aktif/pasif renklendirme; `getStatusText(s)` ile durum metni; `steps.length - 1` kontrolü ile son adımda çizgi gizlenir
+- **Dict Erişimleri**: `idx <= activeIdx` (dış kapsam değişkeni `activeIdx`)
+
+---
+
+### [N11_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderTabButton
+- **params**: `(tt)` — Sekme identifier dizgesi (ör. `'overview'`, `'items'`, `'shipping'`, `'invoice'`)
+- **ic_degiskenler**:
+  - (yok — yerel değişken yok)
+- **Dönüş**: JSX `button` elementi — `onClick={() => setTab(tt)}` ile aktif sekme değiştirilir; `tab === tt` koşulu ile aktif/pasif stil uygulanır; her `tt` değeri için `t()` ile çevrilmiş sekme başlığı gösterilir
+- **Dict Erişimleri**: `tab === tt` (dış kapsam değişkeni `tab`)
+
+---
+
+### [N12_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderShippingAddress
+- **params**: (yok — anonim arrow fonksiyon)
+- **ic_degiskenler**:
+  - `addr` — `order.shipping_address` alanının `ShippingAddress` tipine cast edilmiş hali; kargo adresi nesnesi
+  - `line1` — Tam adres satırı; `addr.fullAddress` varsa o alınır, yoksa `addr.street` fallback'i
+  - `line2` — İlçe/İl bilgisi; `addr.city` ve `addr.district || addr.state` değerlerinin `', '` ile birleşimi; `filter(Boolean)` ile boş değerler temizlenir
+  - `line3` — Posta kodu; `addr.postalCode || addr.postal_code` ile iki farklı isimlendirme desteklenir
+- **Dönüş**: JSX `div` elementi — Adres satırlarını (`line1`, `line2`, `line3`) koşullu olarak gösteren `<p>` blokları
+- **Dict Erişimleri**: `order.shipping_address`, `addr.fullAddress`, `addr.street`, `addr.city`, `addr.district`, `addr.state`, `addr.postalCode`, `addr.postal_code`
+
+---
+
+### [N13_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderOrderItemRow
+- **params**: `(item)` — Tek bir sipariş kalemi nesnesi (`OrderItem`); `product_id`, `product_name`, `product_sku`, `quantity`, `unit_price`, `total_price`, `product_image_url` alanlarını içerir
+- **ic_degiskenler**:
+  - (yok — yerel değişken yok; JSX içinde doğrudan parametre erişimi)
+- **Dönüş**: JSX `tr` elementi — Ürün adı (`item.product_name`), SKU etiketi (`item.product_sku`), ürün görseli (`item.product_image_url` ile `VentImage`), miktar (`item.quantity`), birim fiyat (`item.unit_price` ile `formatPrice`), toplam fiyat (`item.total_price` ile `formatPrice`); `item.product_id` varsa ürün adına `Link` ile tıklanabilir bağlantı eklenir
+- **Dict Erişimleri**: `item.product_id`, `item.product_name`, `item.product_sku`, `item.product_image_url`, `item.quantity`, `item.unit_price`, `item.total_price`
+
+---
+
+### [N14_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderInvoiceInfo
+- **params**: (yok — anonim arrow fonksiyon)
+- **ic_degiskenler**:
+  - `info` — `order.invoice_info` alanının `Record<string, unknown>` tipine cast edilmiş fatura bilgisi sözlüğü; `|| {}` ile boş nesne fallback'i
+  - `iv` — İç helper fonksiyon `(k: string) => string`; `info?.[k]` erişimi ile belirli bir anahtarın değerini `String()` ile döner, yoksa `'-'` döner
+- **Dönüş**: JSX element — `order.invoice_type` `'corporate'` ise kurumsal fatura bilgileri (`companyName`, `vkn`, `taxOffice`); değilse bireysel fatura bilgisi (`tckn`); her alan `iv()` helper'ı ile okunur
+- **Dict Erişimleri**: `order.invoice_info`, `order.invoice_type`, `info?.[k]`, `info[k]`
+
+---
+
+### [N15_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderLegalConsents
+- **params**: (yok — anonim arrow fonksiyon)
+- **ic_degiskenler**:
+  - `cons` — `order.legal_consents` alanının `Record<string, { accepted?: boolean; ts?: string | null }>` tipine cast edilmiş yasal onay sözlüğü; `|| {}` ile boş nesne fallback'i
+  - `row` — İç helper fonksiyon `(label: string, k: string) => JSX`; belirli bir onay kaydının etiketini, kabul durumunu ve zaman damgasını gösterir; `[N16_NASIL]` fonksiyonunun aynısıdır
+- **Dönüş**: JSX fragment — Beş onay satırı: `'kvkk'`, `'distanceSales'`, `'preInfo'`, `'orderConfirm'`, `'marketing'`; her biri `row()` helper'ı ile render edilir
+- **Dict Erişimleri**: `order.legal_consents`, `cons?.[k]`
+
+---
+
+### [N16_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderConsentRow
+- **params**: `(label: string, k: string)` — `label`: Görünen etiket metni, `k`: Onay kaydının sözlük anahtarı
+- **ic_degiskenler**:
+  - `c` — `cons?.[k]` erişimi ile elde edilen tekil onay nesnesi (`{ accepted?: boolean; ts?: string | null }`)
+  - `ok` — `!!c?.accepted` ile hesaplanan boolean; onayın verilip verilmediğini gösterir
+  - `ts` — `c?.ts ? formatDateTime(c.ts, lang) : '-'` ile formatlanmış zaman damgası dizgesi
+- **Dönüş**: JSX `div` elementi — Sol tarafta etiket, sağ tarafta zaman damgası ve onay durumu rozeti (`accepted` ise yeşil, değilse gri); `formatDateTime(c.ts, lang)` ile tarih formatlanır
+- **Dict Erişimleri**: `cons?.[k]`, `c?.accepted`, `c?.ts`
 
 ---
 
@@ -85653,8 +85727,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\views\calculators\AirCurtainCalcPage.tsx
-skeleton_hash: 06eef9a89ff8c512
+source_path: C:\Users\alize\venthub-hvac\src\views\calculators\AirCurtainCalcPage.tsx
+skeleton_hash: 021e5baddf9ce963
 entity_hashes:
   func:AirCurtainCalcPage: bdec5c3fc5c7251e
   func:canProceed: bc4e4a8101ac93b2
@@ -85662,34 +85736,49 @@ entity_hashes:
   func:nextStep: 092152293cace343
   func:prevStep: ac646de7f0306b72
   func:reset: 16764b441f7bc7b6
-  overview: 8f204952dbebe9ee
+  overview: cb9aae03024cedc0
   style_tokens: 310141484625a6c4
-generated_at: 2026-08-27T04:22:29Z
+generated_at: 2026-08-14T06:44:54Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformu için hava perdesi hesaplama arayüzünü sunan bir React sayfasıdır. Çok adımlı bir sihirbaz (wizard) yapısıyla kullanıcıdan gerekli bilgileri toplar ve adım geçişlerini yönetir. Hesaplama sonucunda elde edilen verimlilik değerini kullanıcıya anlamlı durum kategorileriyle geri bildirir.
+Bu modül, VentHub HVAC platformu için hava perdesi hesaplama arayüzünü sunan React sayfasıdır. Kullanıcılara adım adım bilgi girmelerini ve hesaplama yapmalarını sağlayan çok adımlı bir süreç yönetir. Hesaplanan verimlilik değerlerini arayüzde anlamlı durum kategorilerine dönüştürerek kullanıcıya geri bildirim sunar.
 
 ## Fonksiyon Grupları
 
 ### Ana Sayfa Bileşeni
-Modülün giriş noktasıdır. Tüm hesaplama sayfasının arayüzünü, durum yönetimini ve alt fonksiyonların kullanımını bir arada barındıran üst düzey React bileşenidir.
-- AirCurtainCalcPage
+Modülün giriş noktası olan ana React bileşenidir. Tüm hesaplama sayfasının arayüzünü, durum yönetimini ve iş mantığını bir arada barındırır.
+- `AirCurtainCalcPage`
 
 ### Adım Yönetimi
-Çok adımlı hesaplama sürecinde kullanıcının ileri-geri gezinmesini, sonraki adıma geçiş koşullarının denetlenmesini ve tüm sürecin başlangıç durumuna sıfırlanmasını sağlar. `canProceed` fonksiyonu, geçerli adımın zorunlu girdileri sağlanmadığı sürece `True` dönmez; bu sayede eksik bilgiyle ilerleme engellenir.
-- canProceed, nextStep, prevStep, reset
+Çok adımlı hesaplama sürecinde kullanıcının ileri veya geri gitmesini, sonraki adıma geçiş yapabilme koşullarını kontrol etmesini ve gerektiğinde tüm süreci başlangıç değerlerine döndürmesini sağlar. Fonksiyonlar birbirini tamamlayarak tutarlı bir gezinme akışı sunar.
+- `canProceed`, `nextStep`, `prevStep`, `reset`
 
 ### Verimlilik Değerlendirme
-Hesaplama sonucu ortaya çıkan verimlilik oranını, arayüzde gösterilecek kabul edilebilirlik seviyelerine (optimal, acceptable, warning) sınıflandırır. Kullanıcıya sonuçların kalitesi hakkında net ve anında geri bildirim sunar.
-- getEfficiencyStatus
+Hesaplama sonucunda ortaya çıkan verimlilik oranını, arayüzde gösterilmek üzere kabul edilebilirlik seviyelerine sınıflandırır. Bu sayede kullanıcıya sonuçların kalitesi hakkında net bir geri bildirim verilir.
+- `getEfficiencyStatus`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, çok adımlı bir hava perdesi hesaplama sihirbazını (wizard) yöneten React bileşenidir. Aşağıdaki varsayımlar fonksiyon imzalarından çıkarılmıştır.
+
+[Aksiyom 1]: Eğer `canProceed()` çağrıldığında geçerli adımın tüm zorunlu girdileri sağlanmamışsa, `True` dönmez (kullanıcı bir sonraki adıma geçemez).
+
+[Aksiyom 2]: Eğer `nextStep()` çağrıldığında zaten son adımda olunuyorsa, adım ilerlemez (modül durumu değiştirmez).
+
+[Aksiyom 3]: Eğer `prevStep()` çağrıldığında ilk adımda olunuyorsa, adım geri gitmez (modül durumu değiştirmez).
+
+[Aksiyom 4]: Eğer `getEfficiencyStatus()` fonksiyonuna `undefined` değer girdiyse, `'optimal'` veya `'acceptable'` veya `'warning'` değerlerinden biri döner (hangisinin döndüğü bilinmiyor — eşik değerleri fonksiyon gövdesinde tanımlıdır).
+
+[Aksiyom 5]: Eğer `getEfficiencyStatus()` fonksiyonuna `string` tipinde bir `eff` parametresi girdiyse, geçerli bir verimlilik aralığının dışındaysa `'warning'`, kabul edilebilir aralıktaysa `'acceptable'`, optimal aralıktaysa `'optimal'` döner (kesin eşik değerleri bilinmiyor — fonksiyon gövdesinden çıkarılmalıdır).
+
+[Aksiyom 6]: Eğer `reset()` fonksiyonu çağrılırsa, modülün tüm adım durumu ve girilen veriler sıfırlanır.
+
+---
+
+**Not:** Fonksiyon gövdesi kodu paylaşılmadığı için eşik değerler (örn. verimlilik oranı %85 ise `'optimal'` döner gibi) belirlenememiştir. Bu değerler `getEfficiencyStatus` gövdesinden çıkarılmalıdır.
 
 ---
 
@@ -85740,7 +85829,6 @@ Hesaplama sonucu ortaya çıkan verimlilik oranını, arayüzde gösterilecek ka
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../hooks/useCalculatorUsage::useCalculatorUsage
 - import: ../../i18n/I18nProvider::useI18n
 - import: lucide-react::ArrowLeft
 - import: lucide-react::ArrowRight
@@ -85761,84 +85849,62 @@ Hesaplama sonucu ortaya çıkan verimlilik oranını, arayüzde gösterilecek ka
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::AirCurtainCalcPage
-- **params**: yok
-- **ic_degiskenler**:
-  - `t` — i18n çeviri fonksiyonu, metinleri yerelleştirir
-  - `router` — Next.js useRouter ile alınan navigasyon nesnesi
-  - `pathname` — usePathname ile alınan mevcut URL yolu
-  - `searchParams` — useSearchParams ile alınan URL sorgu parametreleri
-  - `currentStep` — useState ile tutulan mevcut adım numarası (1-4 arası)
-  - `setCurrentStep` — currentStep state'ini güncelleyen setter fonksiyonu
-  - `doorWidth` — useState ile tutulan kapı genişliği değeri (varsayılan '1.5')
-  - `setDoorWidth` — doorWidth state'ini güncelleyen setter fonksiyonu
-  - `doorHeight` — useState ile tutulan kapı yüksekliği değeri (varsayılan '2.5')
-  - `setDoorHeight` — doorHeight state'ini güncelleyen setter fonksiyonu
-  - `application` — useState ile tutulan uygulama tipi ('comfort', 'insect', 'coldRoom')
-  - `setApplication` — application state'ini güncelleyen setter fonksiyonu
-  - `windCondition` — useState ile tutulan rüzgar koşulu ('none', 'light', 'moderate', 'strong')
-  - `setWindCondition` — windCondition state'ini güncelleyen setter fonksiyonu
-  - `trafficIntensity` — useState ile tutulan trafik yoğunluğu ('low', 'medium', 'high')
-  - `setTrafficIntensity` — trafficIntensity state'ini güncelleyen setter fonksiyonu
-  - `result` — useState ile tutulan hesaplama sonucu nesnesi
-  - `setResult` — result state'ini güncelleyen setter fonksiyonu
-  - `steps` — useMemo ile oluşturulan adım tanımları dizisi (id, label, description)
-  - `applicationsOptions` — useMemo ile oluşturulan uygulama seçenekleri dizisi (value, label, description, icon)
-  - `windOptions` — useMemo ile oluşturulan rüzgar koşulu seçenekleri dizisi (value, label, description)
-  - `trafficOptions` — useMemo ile oluşturulan trafik yoğunluğu seçenekleri dizisi (value, label, description)
-  - `updateURL` — URL sorgu parametrelerini güncelleyen fonksiyon
-  - `canProceed` — mevcut adımın geçiş kriterlerini kontrol eden fonksiyon
-  - `nextStep` — bir sonraki adıma geçiş yapan fonksiyon
-  - `prevStep` — bir önceki adıma geçiş yapan fonksiyon
-  - `reset` — tüm form state'lerini varsayılan değerlere sıfırlayan fonksiyon
-  - `getEfficiencyStatus` — verimlilik durumu string'ini güvenli tipe dönüştüren fonksiyon
-  - `useCalculatorUsage` — hesaplama kullanımını takip eden hook
-- **Dönüş**: React.FC (JSX elementi)
+### [N1_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getSteps
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of { id: number, label: string, description: string }
 
-### [N2_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::canProceed
-- **params**: yok
-- **ic_degiskenler**:
-  - `currentStep` — kontrol edilen mevcut adım numarası (1, 2, 3 veya diğer)
-  - `doorWidth` — parseFloat ile sayıya dönüştürülen kapı genişliği string'i
-  - `doorHeight` — parseFloat ile sayıya dönüştürülen kapı yüksekliği string'i
-  - `w` — parseFloat(doorWidth) sonucu, kapı genişliğinin sayısal değeri
-  - `h` — parseFloat(doorHeight) sonucu, kapı yüksekliğinin sayısal değeri
-  - `application` — uygulama tipi, 2. adımda varlığı kontrol edilir
-  - `windCondition` — rüzgar koşulu, 3. adımda varlığı kontrol edilir
-  - `trafficIntensity` — trafik yoğunluğu, 3. adımda varlığı kontrol edilir
-- **Dönüş**: boolean — adım kriterleri sağlanıyorsa true, sağlanmıyorsa false
+### [N2_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getApplicationOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of { value: string, label: string, description: string, icon: JSX.Element }
 
-### [N3_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::nextStep
-- **params**: yok
-- **ic_degiskenler**:
-  - `currentStep` — mevcut adım numarası, setCurrentStep ile artırılır
-  - `setCurrentStep` — currentStep state'ini güncelleyen setter fonksiyonu
-- **Dönüş**: yok
+### [N3_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getWindConditions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of { value: string, label: string, description: string }
 
-### [N4_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::prevStep
-- **params**: yok
-- **ic_degiskenler**:
-  - `currentStep` — mevcut adım numarası, setCurrentStep ile azaltılır
-  - `setCurrentStep` — currentStep state'ini güncelleyen setter fonksiyonu
-- **Dönüş**: yok
+### [N4_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getTrafficOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of { value: string, label: string, description: string }
 
-### [N5_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::reset
-- **params**: yok
+### [N5_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::syncUrlParams
+- **params**: ()
 - **ic_degiskenler**:
-  - `setCurrentStep` — currentStep'i 1'e sıfırlayan setter fonksiyonu
-  - `setDoorWidth` — doorWidth'i '1.5' değerine sıfırlayan setter fonksiyonu
-  - `setDoorHeight` — doorHeight'i '2.5' değerine sıfırlayan setter fonksiyonu
-  - `setApplication` — application'ı 'comfort' değerine sıfırlayan setter fonksiyonu
-  - `setWindCondition` — windCondition'ı 'none' değerine sıfırlayan setter fonksiyonu
-  - `setTrafficIntensity` — trafficIntensity'ı 'medium' değerine sıfırlayan setter fonksiyonu
-  - `setResult` — result'ı null'a sıfırlayan setter fonksiyonu
-- **Dönüş**: yok
+  - `params` — URL sorgu parametrelerini tutmak ve güncellemek için oluşturulan URLSearchParams nesnesi
+  - `query` — params nesnesinin string karşılığı, URL'e eklenecek kısım
+- **Dönüş**: yok (yan etki: URL'i günceller)
 
-### [N6_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getEfficiencyStatus
-- **params**: `eff` — string | undefined tipinde verimlilik durumu değeri
+### [N6_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::performCalculation
+- **params**: ()
 - **ic_degiskenler**:
-  - `eff` — 'optimal', 'acceptable' veya undefined olabilen girdi parametresi
-- **Dönüş**: 'optimal' | 'acceptable' | 'warning' — eff 'optimal' ise 'optimal', 'acceptable' ise 'acceptable', diğer tüm durumlarda 'warning' döner
+  - `width` — parseFloat(doorWidth) ile elde edilen kapı genişliği numerik değeri
+  - `height` - parseFloat(doorHeight) ile elde edilen kapı yüksekliği numerik değeri
+  - `calculationResult` - calculateAirCurtain fonksiyonu ile hesaplanan sonuç nesnesi
+- **Dönüş**: yok (yan etki: setResult ile sonucu günceller)
+
+### [N7_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::canProceed
+- **params**: ()
+- **ic_degiskenler**:
+  - `w` — parseFloat(doorWidth) ile elde edilen kapı genişliği numerik değeri (case 1 içinde)
+  - `h` — parseFloat(doorHeight) ile elde edilen kapı yüksekliği numerik değeri (case 1 içinde)
+- **Dönüş**: boolean (adımın devam edip edemeyeceğini belirler)
+
+### [N8_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::resetForm
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: tüm form state'lerini başlangıç değerlerine sıfırlar)
+
+### [N9_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getEfficiencyStatus
+- **params**: (eff: string | undefined)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: 'optimal' | 'acceptable' | 'warning'
+
+### [N10_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::renderGraphTick
+- **params**: (x, i)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element (grafik ekseni çizgi ve ok işaretini render eden bileşen)
 
 ---
 
@@ -86062,32 +86128,33 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\views\calculators\HRVCalcPage.tsx
-skeleton_hash: eb3ddc9355b10956
+source_path: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx
+skeleton_hash: dc14c1431beef43c
 entity_hashes:
   func:HRVCalcPage: f6b36b28ed5f44cd
   func:reset: 16764b441f7bc7b6
-  overview: 477df472883f5208
+  overview: f4b47809b44ad2d8
   style_tokens: 27adff48ed74fee3
-generated_at: 2026-08-27T04:31:52Z
+generated_at: 2026-08-14T06:44:54Z
 ---
 
 ## Genel Bakış
-Bu modül, Isı Geri Kazanımlı Havalandırma (HRV) cihazları için bir hesaplama sayfası sunan React tabanlı bir bileşendir. Kullanıcıların HRV sistemiyle ilgili parametreleri girip sonuçları görüntülemesini sağlar ve sayfa durumunu sıfırlama işlevi sunar.
+Bu modül, Isı Geri Kazanımlı Havalandırma (HRV) cihazları için hesaplama işlemlerini sunan React tabanlı bir sayfa bileşenidir. Kullanıcıların HRV sistemiyle ilgili parametreleri girerek hesaplama yapmasını ve sonuçları görüntülemesini sağlar.
 
 ## Fonksiyon Grupları
+
 ### Ana Sayfa Bileşeni
-HRV hesaplama sayfasının tüm kullanıcı arayüzünü, state yönetimini ve hesaplama mantığını barındıran ana bileşendir. Bu bileşen, kullanıcı etkileşimlerini yönetir ve hesaplama sonuçlarını görüntüler.
+HRV hesaplayıcı sayfasının tüm kullanıcı arayüzünü, state yönetimini ve hesaplama mantığını barındıran ana bileşendir.
 - HRVCalcPage
 
 ### Yardımcı İşlevler
-Kullanıcının form değerlerini veya hesaplama durumunu başlangıç noktalarına döndürmek için kullanılan destekleyici işlevleri içerir. Bu işlev, ana bileşen içinde çağrılarak sayfanın sıfırlanmasını sağlar.
+Kullanıcının form değerlerini veya hesaplama durumunu başlangıç noktalarına döndirmek için kullanılan destekleyici işlevleri içerir.
 - reset
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için, verilen fonksiyon gövdeleri temel alınarak türetilebilecek spesifik mimari varsayımlar bulunmamaktadır.
 
 ---
 
@@ -86113,7 +86180,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../hooks/useCalculatorUsage::useCalculatorUsage
 - import: ../../i18n/I18nProvider::useI18n
 - import: next/navigation::usePathname
 - import: next/navigation::useRouter
@@ -86127,101 +86193,43 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: HRVCalcPage.tsx::HRVCalcPage
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu; etiket ve açıklamaları yerelleştirmek için kullanılır
-  - `recoveryType` — useState ile tutulan durum; ısı geri kazanım tipi ('hrv' veya 'erv')
-  - `buildingType` — useState ile tutulan durum; bina tipi ('residential', 'office', 'commercial')
-  - `climateZone` — useState ile tutulan durum; iklim bölgesi ('cold', 'temperate', 'hot')
-  - `area` — useState ile tutulan durum; alan değeri (metre kare, varsayılan '100')
-  - `occupancy` — useState ile tutulan durum; kişi sayısı (varsayılan '10')
-  - `operatingHours` — useState ile tutulan durum; çalışma saati (varsayılan '10')
-  - `sensibleEfficiency` — useState ile tutulan durum; duyulur verimlilik yüzdesi (varsayılan '75')
-  - `latentEfficiency` — useState ile tutulan durum; gizli verimlilik yüzdesi (varsayılan '65')
-  - `electricityCost` — useState ile tutulan durum; elektrik birim fiyatı (varsayılan '3.5')
-  - `pathname` — usePathname hook'undan gelen mevcut URL yolu
-  - `router` — useRouter hook'undan gelen Next.js yönlendirici nesnesi
-  - `searchParams` — useSearchParams hook'undan gelen mevcut URL parametreleri
-  - `calculateHRV` — HRV hesaplama fonksiyonu; dışarıdan import edilen hesaplama mantığı
-  - `useCalculatorUsage` — hesaplama kullanımını izleyen hook
-- **Dönüş**: React.FC (JSX elementi)
+### [N1_NASIL] AST Pointer: HRVCalcPage.tsx::recoveryTypeOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of objects with `value`, `label`, `description`, `icon` properties
 
-### [N2_NASIL] AST Pointer: HRVCalcPage.tsx::useMemo_1 (HRV tipi seçenekleri)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n'den gelen çeviri fonksiyonu; 'calculators.hrv.form.hrv', 'calculators.hrv.form.hrvDesc', 'calculators.hrv.form.erv', 'calculators.hrv.form.ervDesc' anahtarlarını çözümlemek için kullanılır
-  - `value` — her seçeneğin benzersiz tanımlayıcı değeri ('hrv' veya 'erv')
-  - `label` — t() ile çevrilmiş görünen etiket
-  - `description` — t() ile çevrilmiş açıklama metni
-  - `icon` — ThermometerSun (hrv için) veya Snowflake (erv için) lucide-react ikonu, 24px boyutunda
-- **Dönüş**: Array<{value: string, label: string, description: string, icon: JSX.Element}>
+### [N2_NASIL] AST Pointer: HRVCalcPage.tsx::buildingTypeOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of objects with `value`, `label`, `description` properties
 
-### [N3_NASIL] AST Pointer: HRVCalcPage.tsx::useMemo_2 (bina tipi seçenekleri)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n'den gelen çeviri fonksiyonu; 'common.homeLabel', 'calculators.hrv.form.office', 'calculators.hrv.form.commercial' anahtarlarını çözümlemek için kullanılır
-  - `value` — her seçeneğin benzersiz tanımlayıcı değeri ('residential', 'office', 'commercial')
-  - `label` — t() ile çevrilmiş görünen etiket
-  - `description` — sabit İngilizce açıklama metni ('Domestic', 'Workplace', 'Retail/Mall')
-- **Dönüş**: Array<{value: string, label: string, description: string}>
+### [N3_NASIL] AST Pointer: HRVCalcPage.tsx::climateZoneOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of objects with `value`, `label`, `description` properties
 
-### [N4_NASIL] AST Pointer: HRVCalcPage.tsx::useMemo_3 (iklim bölgesi seçenekleri)
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: HRVCalcPage.tsx::syncUrlWithState
+- **params**: ()
 - **ic_degiskenler**:
-  - `t` — useI18n'den gelen çeviri fonksiyonu; 'calculators.hrv.form.cold', 'calculators.hrv.form.temperate', 'calculators.hrv.form.hot' anahtarlarını çözümlemek için kullanılır
-  - `value` — her seçeneğin benzersiz tanımlayıcı değeri ('cold', 'temperate', 'hot')
-  - `label` — t() ile çevrilmiş görünen etiket
-  - `description` — sabit İngilizce açıklama metni ('North/Mountain', 'Central', 'South/Coast')
-- **Dönüş**: Array<{value: string, label: string, description: string}>
+  - `params` — URLSearchParams nesnesi, URL query string'ini oluşturmak için kullanılır
+  - `query` — `params`'ın string karşılığı, URL'ye eklenecek query string
+- **Dönüş**: yok (yan etki: `router.replace` ile URL güncellenir)
 
-### [N5_NASIL] AST Pointer: HRVCalcPage.tsx::useEffect_1 (URL senkronizasyonu)
-- **params**: (parametre yok)
+### [N5_NASIL] AST Pointer: HRVCalcPage.tsx::calculateResults
+- **params**: ()
 - **ic_degiskenler**:
-  - `window` — typeof kontrolü ile SSR ortamında çalışıp çalışmadığını belirler; 'undefined' ise erken dönüş yapar
-  - `params` — new URLSearchParams() ile oluşturulan boş parametre nesnesi
-  - `recoveryType` — durum değişkeni; 'hrv' değilse URL'ye eklenir
-  - `buildingType` — durum değişkeni; 'office' değilse URL'ye eklenir
-  - `climateZone` — durum değişkeni; 'temperate' değilse URL'ye eklenir
-  - `area` — durum değişkeni; '100' değilse URL'ye eklenir
-  - `occupancy` — durum değişkeni; '10' değilse URL'ye eklenir
-  - `operatingHours` — durum değişkeni; '10' değilse URL'ye eklenir
-  - `sensibleEfficiency` — durum değişkeni; '75' değilse URL'ye eklenir
-  - `latentEfficiency` — durum değişkeni; '65' değilse URL'ye eklenir
-  - `electricityCost` — durum değişkeni; '3.5' değilse URL'ye eklenir
-  - `query` — params.toString() ile oluşturulan URL sorgu dizesi
-  - `router` — useRouter'dan gelen nesne; router.replace() ile URL'yi günceller
-  - `pathname` — usePathname'dan gelen mevcut yol; sorgu dizesi ile birleştirilir
-- **Dönüş**: yok (yan etki: tarayıcı URL'sini scroll:false ile günceller)
+  - `areaVal` — `area` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `occVal` — `occupancy` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `hoursVal` — `operatingHours` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `sensEff` — `sensibleEfficiency` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `latEff` — `latentEfficiency` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `elecCost` — `electricityCost` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+- **Dönüş**: `calculateHRV` fonksiyonunun dönüş değeri veya geçersiz parametrelerde `null`
 
-### [N6_NASIL] AST Pointer: HRVCalcPage.tsx::useMemo_4 (HRV hesaplama)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `areaVal` — parseFloat(area) sonucu; geçersiz ise 0, alan değeri (metre kare)
-  - `occVal` — parseFloat(occupancy) sonucu; geçersiz ise 0, kişi sayısı
-  - `hoursVal` — parseFloat(operatingHours) sonucu; geçersiz ise 0, günlük çalışma saati
-  - `sensEff` — parseFloat(sensibleEfficiency) sonucu; geçersiz ise 0, duyulur verimlilik yüzdesi
-  - `latEff` — parseFloat(latentEfficiency) sonucu; geçersiz ise 0, gizli verimlilik yüzdesi
-  - `elecCost` — parseFloat(electricityCost) sonucu; geçersiz ise 0, elektrik birim fiyatı (kWh başına)
-  - `recoveryType` — durum değişkeni; ısı geri kazanım tipi
-  - `buildingType` — durum değişkeni; bina tipi
-  - `climateZone` — durum değişkeni; iklim bölgesi
-  - `calculateHRV` — dışarıdan gelen hesaplama fonksiyonu; nesne argümanı alır
-- **Dönüş**: areaVal <= 0, occVal < 0, hoursVal <= 0 veya sensEff <= 0 ise null; aksi halde calculateHRV() dönüş değeri
-
-### [N7_NASIL] AST Pointer: HRVCalcPage.tsx::reset
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setRecoveryType` — useState setter; 'hrv' değerine sıfırlar
-  - `setBuildingType` — useState setter; 'office' değerine sıfırlar
-  - `setClimateZone` — useState setter; 'temperate' değerine sıfırlar
-  - `setArea` — useState setter; '100' değerine sıfırlar
-  - `setOccupancy` — useState setter; '10' değerine sıfırlar
-  - `setOperatingHours` — useState setter; '10' değerine sıfırlar
-  - `setSensibleEfficiency` — useState setter; '75' değerine sıfırlar
-  - `setLatentEfficiency` — useState setter; '65' değerine sıfırlar
-  - `setElectricityCost` — useState setter; '3.5' değerine sıfırlar
-- **Dönüş**: yok (yan etki: tüm form durum değişkenlerini varsayılan değerlerine döndürür)
+### [N6_NASIL] AST Pointer: HRVCalcPage.tsx::resetForm
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: tüm state'leri varsayılan değerlere sıfırlar)
 
 ---
 
