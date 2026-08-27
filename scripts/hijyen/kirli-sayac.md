@@ -3,30 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-temizlik\scripts\hijyen\kirli-sayac.cjs
-skeleton_hash: 323ac2e19dddc664
+skeleton_hash: 68fa17537f8d7eec
 entity_hashes:
   func:agacDurumu: e9bf390aa69257d3
   func:agaclar: ca5d380168d074a5
   func:bayrak: 0819525966f5da98
+  func:bilesimHesapla: 2c171ab8efa2038c
   func:deger: e18d32068a862ae8
   func:git: 0d4d1d490df115c3
   func:tabanOku: d1f938c944884779
-  overview: 02fa10768df5d9d4
-generated_at: 2026-08-27T18:37:07Z
+  overview: 566715221e2102ea
+generated_at: 2026-08-27T19:50:39Z
 ---
 
 ## Genel Bakış
 
-Bu modül, Git working tree'lerindeki kirli (değiştirilmemiş olmayan) dosyaları saymak ve durumlarını raporlamak için kullanılan bir hijyen denetim aracıdır. Komut satırı bayraklarını okuyarak çalışır ve birden fazla working tree üzerinde kirli dosya sayımı gerçekleştirir.
+Bu modül, Git working tree'lerindeki kirli (değiştirilmiş) dosyaları saymak ve durumlarını eşik değerine göre raporlamak için kullanılan bir hijyen denetim aracıdır. Komut satırı bayraklarını okuyarak çalışır, birden fazla working tree üzerinde kirli dosya sayımı gerçekleştirir ve sonuçları bir bileşim halinde hesaplar.
 
 ## Fonksiyon Grupları
 
 ### Komut Satırı ve Yapılandırma
-Kullanıcıdan gelen bayrak ve değerleri okuyarak modülün davranışını belirler.
+Kullanıcıdan gelen bayrak ve değerleri okuyarak modülün çalışma parametrelerini belirler.
 - bayrak, deger
 
 ### Git Komutları
-Alt süreç olarak Git komutlarını çalıştırır ve çıktılarını döndürür; diğer fonksiyonlar için temel altyapı sağlar.
+Alt süreç olarak Git komutlarını çalıştırır ve çıktılarını döndürür; working tree listeleme ve durum sorgulama gibi işlemler için temel altyapı sağlar.
 - git
 
 ### Working Tree Yönetimi
@@ -34,34 +35,38 @@ Working tree'leri listeler ve her birinin kirli dosya durumunu kontrol eder; `gi
 - agaclar, agacDurumu
 
 ### Temel Veri Erişimi
-Modülün çalışması için gerekli temel okuma işlemlerini gerçekleştirir.
+Modülün çalışması için gerekli temel okuma ve dosya erişim işlemlerini gerçekleştirir.
 - tabanOku
+
+### Hesaplama ve Bileşim
+Working tree durumlarından gelen verileri işleyerek kirli dosya sayılarını hesaplar ve bir bileşim oluşturur.
+- bilesimHesapla
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Git working tree'lerindeki kirli dosyaları saymak ve eşik değerine göre durum raporlamak için çalışır.
+Bu modül, Git working tree'lerindeki kirli dosyaları saymak ve hijyen denetimi yapmak için komut satırı bayraklarını kullanarak çalışır.
 
-[Aksiyom 1]: Eğer `git` fonksiyonu çalıştırılabilir bir Git kurulumuna erişemezse, `agaclar` ve `agacDurumu` fonksiyonları working tree listesini ve durum bilgisini alamaz.
+[Aksiyom 1]: Eğer sistemde `git` komutu bulunamazsa, `git(args, cwd)` fonksiyonu alt süreç çalıştırma hatası verir ve modül hiç working tree durumu raporlayamaz.
 
-[Aksiyom 2]: Eğer `agaclar` fonksiyonu geçerli bir working tree listesi dönmezse, `agacDurumu` fonksiyonuna işlenecek öğe kalmaz ve kirli dosya sayılamaz.
+[Aksiyom 2]: Eğer `agaclar()` fonksiyonu çalıştırılabilir bir Git repository'si içinde değilse (`.git` dizini yoksa), working tree listesi boş döner ve kirli dosya sayımı yapılamaz.
 
-[Aksiyom 3]: Eğer `agacDurumu(wt)` fonksiyonuna geçersiz veya erişilemez bir working tree yolu verilirse, o working tree için kirli dosya sayısı hesaplanamaz.
+[Aksiyom 3]: Eğer `agacDurumu(wt)` fonksiyonuna geçilen working tree yolu (`wt`) geçerli bir Git working tree değilse, o working tree için durum bilgisi alınamaz.
 
-[Aksiyom 4]: Eğer `bayrak` ve `deger` fonksiyonları komut satırı argümanlarını (`argv`) okuyamazlarsa, `DETAY`, `JSON_CIKTI`, `ONLY` gibi davranış bayrakları belirlenemez.
+[Aksiyom 4]: Eğer `tabanOku()` fonksiyonu `TABAN_YOLU` sabitinde tanımlı dosyayı okuyamazsa (dosya yoksa veya erişim izni yoksa), taban değer hesaplanamaz ve `delta` ile trend karşılaştırması yapılamaz.
 
-[Aksiyom 5]: Eğer `ONLY` bayrağı tanımlıysa, `secili` değişkeni yalnızca belirtilen working tree'leri filtreler; tanımlı değilse `hepsi` kullanılır.
+[Aksiyom 5]: Eğer `bilesimHesapla(satirlar)` fonksiyonuna geçilen `satirlar` boş diziyse, bileşim değeri hesaplanamaz veya sıfır olarak değerlendirilir.
 
-[Aksiyom 6]: Eğer `ESIK` değeri tanımlı değilse, kirli dosya sayısının kabul edilebilir olup olmadığı belirlenemez.
+[Aksiyom 6]: Eğer `ESIK` sabitinin koşulu sağlanmıyorsa (ternary_expression sonucu), eşik değeri farklı bir değer alır ve kirli dosya sayısının kabul edilebilirlik değerlendirmesi buna göre yapılır.
 
-[Aksiyom 7]: Eğer `tabanOku` fonksiyonu taban dosyasını okuyamazsa, `TABAN_YOLU` üzerinden referans noktası alınamaz ve `delta` hesaplanamaz.
+[Aksiyom 7]: Eğer `secili` sabitinin koşulu sağlanmıyorsa (ternary_expression sonucu), modül sadece belirli working tree'ler yerine `hepsi` sabitinde tanımlı tüm working tree'leri işler.
 
-[Aksiyom 8]: Eğer `TABAN_YAZ` bayrağı aktifse, mevcut kirli dosya sayıları taban dosyasına yazılır; bu işlem için dosya sistemi yazma izni gerekir.
+[Aksiyom 8]: Eğer `bayrak(ad)` fonksiyonu ile istenen bayrak `argv` içinde tanımlı değilse, o bayrak için varsayılan davranış uygulanır (bayrağın varlığı boolean olarak false döner).
 
-[Aksiyom 9]: Eğer `fs` modülü dosya sistemi işlemlerini gerçekleştiremezse, taban okuma ve yazma işlemleri başarısız olur.
+[Aksiyom 9]: Eğer `deger(ad)` fonksiyonu ile istenen değer `argv` içinde tanımlı değilse, o parametre için varsayılan değer kullanılır veya undefined döner.
 
-[Aksiyom 10]: Eğer `path` modülü yol birleştirme ve çözümleme işlemlerini yapamazsa, working tree yolları ve taban dosya yolu doğru oluşturulamaz.
+[Aksiyom 10]: Eğer `TABAN_YAZ` sabiti aktifse ve dosya yazma izni yoksa, taban değeri dosyaya kaydedilemez; ancak modül çalışmasına devam eder.
 
 ---
 
@@ -97,6 +102,16 @@ Bu modül, Git working tree'lerindeki kirli dosyaları saymak ve eşik değerine
 ### agacDurumu
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
+### bilesimHesapla
+**Ne yapar**: Verilen satırlardaki dosya yollarını dört sınıfa (md, arsivEol, systemTree, diger) ayırarak bileşim hesaplar. "Bu sayı NEDEN bu kadar?" sorusunun cevabını üretir; örneğin toplam 521 sayısının 384'ünün companion `.md` churn'ünden, 120'sinin `.archive` EOL fantomundan, 16'sının `system_tree`'den geldiğini gösterir. Docstring'e göre bu bileşim, çoğu zaman asıl cevaptır ve toplam sayıdan daha anlamlıdır.
+
+**Nasıl yapar**: Fonksiyon iki nesne oluşturarak başlar: `sinifSay` (her sınıf için sayaç) ve `sinifAgac` (her sınıf için hangi ağaçlardan geldiğini tutan `Set` nesneleri). Dış döngüde her satır nesnesini iterasyona alır; `erisilemedi` özelliği `true` olanları `continue` ile atlar. Her satır nesnesinin `agac` özelliğinden `path.basename` ile dosya adını çıkarır ve `ad` değişkenine atar. İç döngüde her satırın ilk 3 karakterini atıp kalan kısmı `trim`leyerek dosya yolunu elde eder. Yol içeriğine göre sınıflandırma yapar: `.archive/legacy_superpowers_artifacts` içeriyorsa `arsivEol`, `docs/system_tree.md` ile bitiyorsa `systemTree`, `.md` ile bitiyorsa `md`, diğer durumlarda `diger` olarak etiketler. Her sınıflandırmada ilgili sayaç bir artırılır ve ilgili `Set`'e ağaç adı eklenir (bu sayede aynı ağaçtan birden fazla satır gelse bile `Set` tekrarları önler).
+
+**Parametreler**:
+- satirlar: Array — Her elemanı bir nesne olan dizi. Her nesne `agac` (string, ağacın dosya yolu), `satirlar` (Array, her biri string olan satırlar; ilk 3 karakteri atılarak dosya yolu okunur) ve `erisilemedi` (boolean, `true` ise bu nesne tamamen atlanır) özelliklerini içerir.
+
+**Dönüş**: Object — `{ sinifSay, sinifAgac }` şeklinde bir nesne döner. `sinifSay` nesnesi `md`, `arsivEol`, `systemTree` ve `diger` anahtarlarına sahip olup her biri o sınıfa ait toplam satır sayısını (number) tutar. `sinifAgac` nesnesi aynı anahtarlara sahip olup her biri o sınıfa ait benzersiz ağaç adlarını (string) içeren bir `Set` nesnesi tutar.
+
 ---
 
 ## SABİTLER
@@ -119,53 +134,75 @@ Bu modül, Git working tree'lerindeki kirli dosyaları saymak ve eşik değerine
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: scripts/hijyen/kirli-sayac.cjs::bayrak
-- **params**: `ad` — komut satırında aranacak bayrak adı
+### [N1_NASIL] AST Pointer: kirli-sayac.cjs::bayrak
+- **params**: `ad`
 - **ic_degiskenler**:
-  - `i` — `argv.indexOf(ad)` sonucu; bayrağın `argv` dizisindeki indeksi
-- **Dönüş**: `argv[i + 1]` değeri (bayraktan sonraki argüman) veya `null`; bayrak yoksa, sonraki argüman yoksa ya da sonraki argüman `--` ile başlıyorsa `null` döner
+  - `i` — `argv` dizisinde `ad` parametresinin bulunduğu indeks; `argv.indexOf(ad)` ile hesaplanır
+- **Dönüş**: `argv[i + 1]` değeri (string) veya `null`; `i >= 0` ve sonraki eleman `--` ile başlamıyorsa o elemanı döndürür, aksi halde `null`
 
-### [N2_NASIL] AST Pointer: scripts/hijyen/kirli-sayac.cjs::tabanOku
+### [N2_NASIL] AST Pointer: kirli-sayac.cjs::tabanOku
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `fs.readFileSync(TABAN_YOLU, 'utf8')` sonucunun `JSON.parse` ile ayrıştırılmış hali
-  - `e` — `catch` bloğundaki hata nesnesi; `e.code` veya `String(e)` ile sebep metni üretilir
-- **Dönüş**: `t` nesnesi (başarılıysa) veya `{ yok: true, sebep: 'agaclar alani yok ya da bozuk' }` (`t` yoksa ya da `t.agaclar` nesne değilse/null ise) veya `{ yok: true, sebep: ... }` (dosya okuma/JSON ayrıştırma hatasında)
+  - `t` — `TABAN_YOLU` dosyasından `fs.readFileSync` ile okunup `JSON.parse` edilen nesne
+  - `e` — `catch` bloğunda yakalanan hata nesnesi; `e.code` veya `String(e)` ile sebep açıklaması üretilir
+- **Dönüş**: `t` (JSON nesnesi) başarılıysa; `{ yok: true, sebep: ... }` nesnesi hata durumunda. `t.agaclar` alanı yoksa veya bozuksa da `{ yok: true, sebep: 'agaclar alani yok ya da bozuk' }` döner
 
-### [N3_NASIL] AST Pointer: scripts/hijyen/kirli-sayac.cjs::git
-- **params**:
-  - `args` — `git` alt komutu argümanları dizisi
-  - `cwd` — çalışma dizini; belirtilmezse `process.cwd()` kullanılır
-- **ic_degiskenler**: (yok — `execFileSync` doğrudan return ifadesinde çağrılır)
-- **Dönüş**: `execFileSync` sonucu; `encoding: 'utf8'` ile string döner
+### [N3_NASIL] AST Pointer: kirli-sayac.cjs::git
+- **params**: `args`, `cwd`
+- **ic_degiskenler**: yok
+- **Dönüş**: `execFileSync('git', args, ...)` sonucu (string); `cwd` belirtilmemişse `process.cwd()` kullanılır, `maxBuffer` 64 MB, `windowsHide: true`, `encoding: 'utf8'`
 
-### [N4_NASIL] AST Pointer: scripts/hijyen/kirli-sayac.cjs::agaclar
+### [N4_NASIL] AST Pointer: kirli-sayac.cjs::agaclar
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `cikti` — `git(['worktree', 'list', '--porcelain'])` çağrısının dönüşü (string)
-  - `liste` — toplanan worktree yollarını tutan dizi
-  - `satir` — `cikti.split('\n')` sonucundaki her bir satır; `for...of` döngüsü değişkeni
-  - `e` — `catch` bloğundaki hata nesnesi; yakalanırsa hata mesajı basılıp `process.exit(2)` ile çıkılır
-- **Dönüş**: `liste` dizisi (worktree yolları); hata durumunda fonksiyon `process.exit(2)` ile sonlanır, dönüş gerçekleşmez
+  - `cikti` — `git(['worktree', 'list', '--porcelain'])` çağrısının döndürdüğü ham metin
+  - `e` — `catch` bloğunda yakalanan hata; hata olursa `console.error` ile mesaj yazdırıp `process.exit(2)` ile çıkılır
+  - `liste` — bulunan worktree yollarının toplandığı dizi
+  - `satir` — `cikti.split('\n')` ile elde edilen her bir satır; `startsWith('worktree ')` ile başlayanlar filtrelenir
+- **Dönüş**: `liste` (string dizisi); her eleman bir worktree yolu
 
-### [N5_NASIL] AST Pointer: scripts/hijyen/kirli-sayac.cjs::agacDurumu
-- **params**:
-  - `wt` — worktree dizin yolu; `git` fonksiyonuna `cwd` olarak iletilir
+### [N5_NASIL] AST Pointer: kirli-sayac.cjs::agacDurumu
+- **params**: `wt`
 - **ic_degiskenler**:
-  - `kisa` — `git(['status', '--porcelain'], wt)` çağrısının dönüşü (kısa durum çıktısı, string)
-  - `tam` — `git(['status', '--porcelain', '--untracked-files=all'], wt)` çağrısının dönüşü (tam durum çıktısı, string)
-  - `kisaSatir` — `kisa.split('\n')` sonucunun boş olmayan satırlara göre filtrelenmiş hali
-  - `tamSatir` — `tam.split('\n')` sonucunun boş olmayan satırlara göre filtrelenmiş hali
-  - `izlenmeyen` — `kisaSatir` içinden `??` ile başlayan satırların filtrelenmiş hali
-  - `e` — `catch` bloğundaki hata nesnesi
-- **Dönüş**: `{ erisilemedi: false, rozet: kisaSatir.length, dosya: tamSatir.length, izlenenKirli: kisaSatir.length - izlenmeyen.length, izlenmeyen: izlenmeyen.length, satirlar: tamSatir }` nesnesi; hata durumunda `{ erisilemedi: true }`
+  - `kisa` — `git(['status', '--porcelain'], wt)` çağrısının döndürdüğü ham metin
+  - `tam` — `git(['status', '--porcelain', '--untracked-files=all'], wt)` çağrısının döndürdüğü ham metin
+  - `e` — `catch` bloğunda yakalanan hata; hata olursa `{ erisilemedi: true }` döner
+  - `kisaSatir` — `kisa` metninin boş olmayan satırları (filtrelenmiş dizi)
+  - `tamSatir` — `tam` metninin boş olmayan satırları (filtrelenmiş dizi)
+  - `izlenmeyen` — `kisaSatir` içinden `??` ile başlayan satırlar (izlenmeyen dosyalar)
+  - `s` — filtre fonksiyonundaki her bir satır; `trim().length > 0` kontrolü uygulanır
+- **Dönüş**: `{ erisilemedi: false, rozet: kisaSatir.length, dosya: tamSatir.length, izlenenKirli: kisaSatir.length - izlenmeyen.length, izlenmeyen: izlenmeyen.length, satirlar: tamSatir }` veya hata durumunda `{ erisilemedi: true }`
 
-### [N6_NASIL] AST Pointer: scripts/hijyen/kirli-sayac.cjs::isimsiz_arrow_fonksiyonu
-- **params**:
-  - `s` — worktree durum nesnesi; `.agac` ve `.satirlar` alanlarına erişilir
+### [N6_NASIL] AST Pointer: kirli-sayac.cjs::bilesimHesapla
+- **params**: `satirlar`
 - **ic_degiskenler**:
-  - `isim` — `path.basename(s.agac)` sonucu; worktree dizin yolunun son bileşeni
-- **Dönüş**: `{ ...s, satirlar: DETAY ? s.satirlar : undefined, fark: delta.has(isim) ? delta.get(isim) : null, yeni: yeniAgac.some((y) => y.isim === isim) || undefined }` nesnesi; `DETAY` true ise `satirlar` korunur, false ise `undefined` olur; `delta` Map'inde `isim` varsa `fark` değeri alınır; `yeniAgac` dizisinde eşleşen `isim` varsa `yeni` true olur
+  - `sinifSay` — kategorilere göre dosya sayılarını tutan nesne; anahtarlar: `md`, `arsivEol`, `systemTree`, `diger` (hepsi başlangıçta 0)
+  - `sinifAgac` — kategorilere göre benzersiz ağaç adlarını tutan nesne; her anahtar bir `Set` nesnesi
+  - `s` — `satirlar` dizisindeki her bir öğe; `s.erisilemedi` true ise atlanır
+  - `ad` — `path.basename(s.agac)` ile elde edilen worktree temel adı
+  - `satir` — `s.satirlar` dizisindeki her bir satır
+  - `yol` — `satir.slice(3).trim()` ile elde edilen dosya yolu (ilk 3 karakter atılır)
+  - `k` — `yol` değerine göre belirlenen sınıflandırma anahtarı; `.archive/legacy_superpowers_artifacts` içeriyorsa `arsivEol`, `docs/system_tree.md` ile bitiyorsa `systemTree`, `.md` ile bitiyorsa `md`, diğerleri `diger`
+- **Dönüş**: `{ sinifSay, sinifAgac }`
+
+### [N7_NASIL] AST Pointer: kirli-sayac.cjs::anonim_arrow_1
+- **params**: `s`
+- **ic_degiskenler**:
+  - `isim` — `path.basename(s.agac)` ile elde edilen worktree temel adı
+- **Dönüş**: `{ ...s, satirlar: DETAY ? s.satirlar : undefined, fark: delta.has(isim) ? delta.get(isim) : null, yeni: yeniAgac.some((y) => y.isim === isim) || undefined }` nesnesi; `DETAY` true ise `satirlar` korunur, false ise `undefined` olur; `delta` Map'inde `isim` varsa fark değeri eklenir; `yeniAgac` dizisinde eşleşen varsa `yeni: true` olur
+
+### [N8_NASIL] AST Pointer: kirli-sayac.cjs::anonim_arrow_2
+- **params**: `adlar`
+- **ic_degiskenler**:
+  - `ad` — `[...adlar]` dizisindeki her bir eleman (spread ile kopyalanmış)
+  - `s` — `satirlar` dizisinde `!x.erisilemedi && path.basename(x.agac) === ad` koşulunu sağlayan öğe; bulunamazsa `null` döner
+- **Dönüş**: `{ ad, geride }` nesnelerinden oluşan dizi; `geride` `git(['rev-list', '--count', 'HEAD..origin/master'], s.agac)` sonucunun `Number()` ile sayıya çevrilmiş hata durumunda `null`; dizi `geride` değerine göre azalan sırayla sıralanır ve `null` olmayanlar filtrelenir
+
+### [N9_NASIL] AST Pointer: kirli-sayac.cjs::anonim_arrow_3
+- **params**: `ad`
+- **ic_degiskenler**:
+  - `s` — `satirlar` dizisinde `!x.erisilemedi && path.basename(x.agac) === ad` koşulunu sağlayan öğe; bulunamazsa `null` döner
+- **Dönüş**: `{ ad, geride }` nesnesi; `geride` `git(['rev-list', '--count', 'HEAD..origin/master'], s.agac)` sonucunun `Number()` ile sayıya çevrilmiş hali; hata durumunda `{ ad, geride: null }`
 
 ---
 
@@ -176,11 +213,12 @@ graph TD
     kirli-sayac_cjs__agacDurumu["agacDurumu"]
     kirli-sayac_cjs__agaclar["agaclar"]
     kirli-sayac_cjs__bayrak["bayrak"]
+    kirli-sayac_cjs__bilesimHesapla["bilesimHesapla"]
     kirli-sayac_cjs__deger["deger"]
     kirli-sayac_cjs__git["git"]
     kirli-sayac_cjs__tabanOku["tabanOku"]
-    kirli-sayac_cjs__agacDurumu --> kirli-sayac_cjs__git
     kirli-sayac_cjs__agaclar --> kirli-sayac_cjs__git
+    kirli-sayac_cjs__agacDurumu --> kirli-sayac_cjs__git
 ```
 
 ## NODE ID STANDARD
@@ -192,6 +230,7 @@ graph TD
   function: scripts\hijyen\kirli-sayac.cjs::git
   function: scripts\hijyen\kirli-sayac.cjs::agaclar
   function: scripts\hijyen\kirli-sayac.cjs::agacDurumu
+  function: scripts\hijyen\kirli-sayac.cjs::bilesimHesapla
 
 ---
 
@@ -199,6 +238,7 @@ graph TD
   export: agacDurumu
   export: agaclar
   export: bayrak
+  export: bilesimHesapla
   export: deger
   export: git
   export: tabanOku
