@@ -179,6 +179,20 @@ for (const wt of secili) {
  * çünkü fantomu taşıyan üç ağaç sırasıyla 3, 73 ve 193 commit geride kalmıştı. Etkinin
  * göründüğü yer merge ANI değil, ADOPSİYON EĞRİSİdir. Bu yüzden bileşim raporu sınıfın
  * yanında "kaç ağaçta ve o ağaçlar ne kadar geride" bilgisini de basar.
+ *
+ * ⛔ AMA "GERİDE" DEMEK "REBASE ET" DEMEK DEĞİL — bu satır önce öyle okunuyordu ve YANLIŞ
+ * YÖNLENDİRİYORDU; ALTYAPI ölçtü, düzeltildi. İki sınıfın da KİLİDİ var ve ikisi de
+ * temizlikle/tazelemeyle açılmıyor:
+ *   · `.archive` EOL: dal KİRLİ olduğu için `merge origin/master` reddedilir, master'ı
+ *     almadığı için de kirli kalır — kısır döngü. `checkout -- `, `stash push` ve
+ *     `add --renormalize` ÜÇÜ DE denendi, üçü de fantomu yeniden üretti. Tek çıkış taze
+ *     master'dan YENİ dal + cherry-pick, o da AÇIK PR'ı olan dalda PR'ı koparır.
+ *   · companion `.md` (baskın sınıf): frontmatter'ın `source_path` alanı MUTLAK AĞAÇ YOLU
+ *     tutuyor — dosyayı en son hangi ağaç ürettiyse onun adını yazıyor. N ağaç varsa dosya
+ *     N farklı değer arasında salınır; alan YAPISI GEREĞİ yakınsamaz. `generated_at` aynı
+ *     sınıf. Çözüm üreteçte (depo-göreli yol + damgayı kapının okumadığı alana), sahibi
+ *     ALTYAPI. Bu sınıfı "temizlemek" tanım gereği imkânsızdır. (URUN ölçtü.)
+ * Rapor bu iki kilidi de EKRANA basar: sayacı okuyan kişi çıkmaz bir yola sapmasın.
  */
 function bilesimHesapla(satirlar) {
   const sinifSay = { md: 0, arsivEol: 0, systemTree: 0, diger: 0 }
@@ -387,6 +401,30 @@ if (JSON_CIKTI) {
             gk.map((x) => x.ad + ' ' + (x.geride === null ? '?' : '-' + x.geride)).join(' · ')
         )
       }
+      if (k === 'arsivEol') {
+        console.log('           ⛔ "rebase et" DEME — ALTYAPI olctu, bu sinifta KILIT var:')
+        console.log('              dal KIRLI oldugu icin merge REDDEDILIR, master i almadigi')
+        console.log('              icin de kirli kalir. checkout/stash/renormalize UCU DE')
+        console.log('              fantomu yeniden uretti. Tek cikis: TAZE master dan YENI')
+        console.log('              dal + cherry-pick — ama bu ACIK PR i olan dalda PR i KOPARIR.')
+      }
+      if (k === 'systemTree') {
+        console.log('           ℹ Bu sinifta .archive KILIDI YOK — karistirma (olctum, gunde')
+        console.log('              onlarca kez): "git checkout -- docs/system_tree.md" temizler.')
+        console.log('              Sorun temizlenememesi DEGIL, her commit te YENIDEN dogmasi:')
+        console.log('              dosya URETILDIGI AGACIN arizi dosya kumesini kodluyor, yani')
+        console.log('              hicbir worktree den MESRU commit edilemez. Kalici cozum')
+        console.log('              uretimin agactan bagimsiz olmasi — ALTYAPI #873.')
+      }
+    }
+    if (k === 'md') {
+      console.log('           ⛔ Bu sinif TEMIZLENEREK kapanmaz — URUN kok sebebi olctu:')
+      console.log('              companion frontmatter i source_path i MUTLAK AGAC YOLU tutuyor,')
+      console.log('              yani dosyayi en son hangi agac urettiyse onun adini yaziyor.')
+      console.log('              N agac = N farkli deger; alan YAPISI GEREGI yakinsamaz.')
+      console.log('              generated_at ayni sinif (her kosumda degisir).')
+      console.log('              Cozum uretecte: source_path DEPO-GORELI + generated_at kapinin')
+      console.log('              okumadigi alana. Sahibi ALTYAPI (kanca/uretec).')
     }
   }
   console.log('    ⭐Bir sinifin onarimi master a inince bu sayi HEMEN dusmez: rozet AGAC')
