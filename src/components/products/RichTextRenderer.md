@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\RichTextRenderer.tsx
-skeleton_hash: 8cca6770e365ed7f
+source_path: C:\tmp\vh-urun-comp\src\components\products\RichTextRenderer.tsx
+skeleton_hash: 67639a27a42afe26
 entity_hashes:
   func:RichTextRenderer: 827584ed75053437
   overview: c7751cfdcd10bdc7
   style_tokens: 95b6c3607cdf0117
-generated_at: 2026-06-19T20:47:27Z
+generated_at: 2026-08-27T07:32:08Z
 ---
 
 ## Genel Bakış

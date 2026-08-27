@@ -2,41 +2,35 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\CategoryFilters.tsx
-skeleton_hash: 8c83e5f2ab7475c1
+source_path: C:\tmp\vh-urun-comp\src\components\category\CategoryFilters.tsx
+skeleton_hash: 0b55a88598103948
 entity_hashes:
   func:CategoryFilters: 420d76bf670f1cf8
   func:toggleBrand: 67afbe53ea415719
-  overview: e7958b385edc9e41
-  style_tokens: 57cd966a2983f774
-generated_at: 2026-06-08T10:08:47Z
+  overview: b617ffd977ae6c1c
+  style_tokens: 85fd3dcc5d8fb2bc
+generated_at: 2026-08-27T07:03:19Z
 ---
 
 ## Genel Bakış
-`CategoryFilters` bileşeni, ürün kategorileri, alt‑kategoriler ve marka seçenekleri üzerinden filtreleme arayüzünü sunar. Kullanıcı etkileşimlerini (ör. marka seçimi) yönetmek için yardımcı fonksiyonlar içerir.
+`CategoryFilters` bileşeni, bir ürün kategorisi için filtreleme arayüzünü oluşturur. Kullanıcının marka seçimi gibi etkileşimlerini yönetmek için `toggleBrand` fonksiyonunu içerir ve bu fonksiyon bileşen içinde çağrılır.
 
 ## Fonksiyon Grupları
 ### UI Oluşturma
-Bu grup, filtre panelinin görsel yapısını ve ilgili props’ları alarak JSX döndürmekle sorumludur.  
+Bu grup, filtre panelinin görsel yapısını oluşturur ve gerekli props'ları alarak JSX döndürmekle sorumludur.
 - CategoryFilters
 
 ### Etkileşim ve Durum Yönetimi
-Kullanıcı eylemlerini yakalar, ilgili filtre durumunu günceller ve UI’nın yeniden render edilmesini tetikler.  
-- toggleBrand  
+Kullanıcı eylemlerini yakalar, ilgili filtre durumunu günceller ve arayüzün yeniden render edilmesini tetikler.
+- toggleBrand
 
 *İlişki:* `CategoryFilters` içinde, marka seçimi olayına yanıt olarak `toggleBrand` çağrılır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu CategoryFilters React componenti, kategori ve marka bazlı ürün filtreleme arayüzünün sorunsuz çalışması için parent component'ten iletilen tüm zorunlu prop ve fonksiyonların eksiksiz ve doğru şekilde iletilmesine bağlıdır.
 
-[Aksiyom 1]: Eğer component'e iletilen `category` prop'u yoksa, ana kategori bazlı filtreleme arayüzü doğru şekilde başlatılamaz, tüm filtreleme işlemleri geçersiz kalır.
-[Aksiyom 2]: Eğer component'e iletilen `parentCategory` prop'u yoksa, kategori hiyerarşisine dayalı ilişkilendirme yapılamaz, alt kategori filtreleri üst kategori ile eşleştirilemez.
-[Aksiyom 3]: Eğer component'e iletilen `subCategories` prop'u yoksa, alt kategori seçenekleri kullanıcıya sunulamaz, alt kategoriye özel filtreleme işlemleri gerçekleştirilemez.
-[Aksiyom 4]: Eğer component'e iletilen `availableBrands` prop'u yoksa, marka bazlı filtre seçenekleri ekranda gösterilemez, marka seçimi ve filtreleme işlemleri yapılamaz.
-[Aksiyom 5]: Eğer marka seçimini yöneten `toggleBrand` fonksiyonu component'e iletilmemişse, kullanıcı marka filtresi ekleme/çıkarma işlemleri yapamaz, filtre state'i hiçbir şekilde güncellenemez.
-[Aksiyom 6]: Eğer component'e iletilen mevcut aktif filtreleri tutan `filte` prop'u yoksa, kullanıcının daha önce seçtiği filtreler arayüze yüklenemez, filtre arayüzü varsayılan boş state ile başlatılamaz.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, davranışsal aksiyom üretilememektedir.
 
 ---
 
@@ -62,6 +56,19 @@ Bu CategoryFilters React componenti, kategori ve marka bazlı ürün filtreleme 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useCategoryGateway::type { CategoryFilters
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../lib/type-converters::type { DomainCategory }
+- import: ../../utils/categoryHelpers::getCategoryDisplayName
+- import: ../../utils/categoryHelpers::getLocalizedCategorySlug
+- import: lucide-react::Filter
+- import: next/link::Link
+- import: react::React
+
+---
+
 ## INTERFACES
 
 ### CategoryFiltersProps
@@ -79,17 +86,18 @@ Bu CategoryFilters React componenti, kategori ve marka bazlı ürün filtreleme 
 ### [N1_NASIL] AST Pointer: src/components/category/CategoryFilters.tsx::CategoryFilters
 - **params**: `category`, `parentCategory`, `subCategories`, `availableBrands`, `filters`, `onUpdateFilters`
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook’den dönen çeviri fonksiyonu, metinleri yerelleştirmek için kullanılır.
-  - `lang` — `useI18n()` hook’den dönen dil kodu, para birimi formatlamada (`formatCurrency`) kullanılır.
-  - `toggleBrand` — iç fonksiyon, bir markanın seçili olup olmadığını tersine çevirir ve `onUpdateFilters` aracılığıyla filtre durumunu günceller.
-- **Dönüş**: React bileşeni JSX döner; yan etkisi yoktur, sadece UI render eder.
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `'category.filters'`, `'category.localSearchPlaceholder'`, `'category.subcategories'`, `'category.brands'` anahtarlarıyla metinleri yerelleştirir
+  - `lang` — `useI18n()` hook'undan dönen dil kodu; `getLocalizedCategorySlug()` çağrılarında ikinci argüman olarak kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rotalar nesnesi; `Routes.category()` ile alt kategori bağlantılarının URL'lerini oluşturur
+  - `toggleBrand` — içinde tanımlanan yardımcı fonksiyon; bir markanın `filters.selectedBrands` dizisindeki seçim durumunu tersine çevirir
+- **Dönüş**: JSX (React element) — kategori filtre paneli arayüzü
 
 ### [N2_NASIL] AST Pointer: src/components/category/CategoryFilters.tsx::toggleBrand
-- **params**: `brand` (string) — seçilen/çıkartılan marka adı.
+- **params**: `brand` (string)
 - **ic_degiskenler**:
-  - `filters` — dışarıdan gelen filtre durumu, `selectedBrands` dizisini içerir.
-  - `onUpdateFilters` — dışarıdan gelen callback, filtre durumunu günceller.
-- **Dönüş**: `yok` (fonksiyon bir değer döndürmez, sadece `onUpdateFilters` çağrısı yapar).
+  - `filters.selectedBrands` — dış kapsamdan erişilen seçili markalar dizisi; `brand` parametresinin dizide bulunup bulunmadığını kontrol eder
+  - `onUpdateFilters` — dış kapsamdan erişilen filtre güncelleme fonksiyonu; güncellenmiş `selectedBrands` dizisi ile çağrılır
+- **Dönüş**: yok (void)
 
 ---
 
@@ -115,7 +123,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `accent-primary-ocean`, `bg-slate-50`, `bg-white`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-300`, `checked:bg-primary-ocean`, `checked:border-primary-ocean`, `focus-visible:border-primary-ocean`, `group-hover:text-slate-900`, `hover:bg-slate-50`, `hover:text-primary-navy`, `placeholder:text-slate-300`, `placeholder:text-slate-400`
-- **Layout:** `absolute`, `block`, `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `h-3`, `h-5`, `items-center`, `justify-between`, `justify-center`, `max-h-48`, `overflow-y-auto`, `p-6`, `relative`
+- **Renkler:** `bg-slate-50`, `bg-white`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-300`, `checked:bg-primary-ocean`, `checked:border-primary-ocean`, `focus-visible:border-primary-ocean`, `group-hover:text-slate-900`, `hover:bg-slate-50`, `hover:text-primary-navy`, `placeholder:text-slate-400`, `text-primary-ocean`, `text-slate-500`
+- **Layout:** `absolute`, `block`, `custom-scrollbar`, `flex`, `gap-3`, `h-3`, `h-5`, `items-center`, `justify-center`, `max-h-48`, `overflow-y-auto`, `p-6`, `relative`, `shadow-sm`, `w-3`
 - **Varyant/Responsive:** `checked:`, `focus-visible:`, `group-hover:`, `hover:`, `peer-checked:`, `placeholder:` önekleri
-- **Yardımcı Sınıflar:** `appearance-none`, `border`, `cursor-pointer`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-ocean/20`, `font-black`, `font-bold`, `font-medium`, `font-semibold`, `group`, `mb-2`, `mb-3`, `mb-6`, `mb-8`
+- **Yardımcı Sınıflar:** `appearance-none`, `border`, `cursor-pointer`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-ocean/20`, `font-black`, `font-bold`, `font-medium`, `group`, `mb-3`, `mb-6`, `mb-8`, `opacity-0`, `pb-4`

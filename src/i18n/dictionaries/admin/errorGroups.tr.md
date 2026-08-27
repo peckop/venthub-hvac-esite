@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\errorGroups.tr.ts
-skeleton_hash: dfcf2527d8350dc0
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\errorGroups.tr.ts
+skeleton_hash: 6f5244de043f0865
 entity_hashes:
   overview: 38d648bd807c5d10
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -30,7 +30,7 @@ Bu modül, yönetimsel hata gruplarının Türkçe çevirilerini tutan bir ulusl
 
 ## SABİTLER
 - **errorGroups** (object) — `{
-      subtitle: 'Toplanmış istemci hatalarını izleyin, atayın ve durumların...`
+      subtitle: 'Toplanmış istemci hatalarını izleyin, atayın ve durumları...`
 
 ---
 

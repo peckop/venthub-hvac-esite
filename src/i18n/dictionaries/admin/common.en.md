@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\common.en.ts
-skeleton_hash: 5391b6d4f15735b3
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\common.en.ts
+skeleton_hash: 025255f30e9969f5
 entity_hashes:
   overview: 43c6db6003831046
-generated_at: 2026-08-25T07:27:17Z
+generated_at: 2026-08-27T06:50:26Z
 ---
 
 ## Genel Bakış
@@ -46,7 +46,7 @@ Bu dosyada (`src/i18n/dictionaries/admin/common.en.ts`) fonksiyon tanımlanmamı
 
 ## NODE ID STANDARD
 
-  file: common.en.ts
+  file: src\i18n\dictionaries\admin\common.en.ts
 
 ---
 

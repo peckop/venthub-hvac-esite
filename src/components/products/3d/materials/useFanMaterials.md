@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\materials\useFanMaterials.ts
-skeleton_hash: 6466d4ac50f77cff
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\materials\useFanMaterials.ts
+skeleton_hash: c5495657bd1ff2b1
 entity_hashes:
   func:useFanMaterials: 61fbb447cfb5105d
   overview: 6254e91c186b694f
-generated_at: 2026-06-19T20:47:11Z
+generated_at: 2026-08-27T07:07:46Z
 ---
 
 ## Genel Bakış

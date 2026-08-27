@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\BoxAndBase.tsx
-skeleton_hash: da95a04dbfd26fb3
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\factory\parts\BoxAndBase.tsx
+skeleton_hash: f6f0663515ec080d
 entity_hashes:
   func:BoxAndBase: af353be0b7cd10d8
   overview: 1776944b67282716
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:11Z
+generated_at: 2026-08-27T07:06:06Z
 ---
 
 ## Genel Bakış

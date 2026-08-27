@@ -11,7 +11,7 @@ entity_hashes:
   func:validate: 986ff306b233d4e4
   overview: e6fd6a1ce6c238d0
   style_tokens: 01d5bdbc603763a7
-generated_at: 2026-08-27T04:27:31Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -159,8 +159,8 @@ graph TD
     LeadModal_tsx__handleClose["handleClose"]
     LeadModal_tsx__submit["submit"]
     LeadModal_tsx__validate["validate"]
-    LeadModal_tsx__LeadModal --> LeadModal_tsx__handleClose
     LeadModal_tsx__LeadModal --> LeadModal_tsx__validate
+    LeadModal_tsx__LeadModal --> LeadModal_tsx__handleClose
 ```
 
 ## NODE ID STANDARD

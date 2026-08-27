@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\sort.ts
-skeleton_hash: 0d08d9eaf8b957f7
+source_path: C:\tmp\vh-comp\src\i18n\sort.ts
+skeleton_hash: 36df3c55ef9e9f65
 entity_hashes:
   func:byText: a6f3e4b7650ab66d
   func:collator: afec8bbed0857fb0
   func:compareText: 0247c751341efd4d
   func:harmanlamaDileDuyarliMi: 677e528ae0f4cfe1
   overview: e8a9fb1052b55aa7
-generated_at: 2026-08-24T11:54:43Z
+generated_at: 2026-08-27T06:51:14Z
 ---
 
 ## Genel Bakış
@@ -117,9 +117,9 @@ graph TD
     sort_ts__collator["collator"]
     sort_ts__compareText["compareText"]
     sort_ts__harmanlamaDileDuyarliMi["harmanlamaDileDuyarliMi"]
-    sort_ts__compareText --> sort_ts__collator
-    sort_ts__harmanlamaDileDuyarliMi --> sort_ts__compareText
     sort_ts__byText --> sort_ts__collator
+    sort_ts__harmanlamaDileDuyarliMi --> sort_ts__compareText
+    sort_ts__compareText --> sort_ts__collator
 ```
 
 ## NODE ID STANDARD

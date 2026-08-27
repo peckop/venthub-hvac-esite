@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\titles.en.ts
-skeleton_hash: 7d36c92b6143fcde
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\titles.en.ts
+skeleton_hash: 1d0684bc838218dc
 entity_hashes:
   overview: 92aa8036d07ad320
-generated_at: 2026-08-25T07:27:26Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -43,7 +43,7 @@ Bu dosyada (`src/i18n/dictionaries/admin/titles.en.ts`) tanımlı fonksiyon bulu
 
 ## NODE ID STANDARD
 
-  file: titles.en.ts
+  file: src\i18n\dictionaries\admin\titles.en.ts
 
 ---
 

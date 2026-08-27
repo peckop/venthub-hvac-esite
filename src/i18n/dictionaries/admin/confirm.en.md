@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\confirm.en.ts
-skeleton_hash: 5fd88297cb217354
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\confirm.en.ts
+skeleton_hash: 3630d41a1e66293a
 entity_hashes:
   overview: a909ef0d4730a50e
-generated_at: 2026-08-15T15:08:18Z
+generated_at: 2026-08-27T06:50:26Z
 ---
 
 ## Genel Bakış
@@ -37,7 +37,7 @@ Bu modül için bir JavaScript/TypeScript modülü olup, dışarıya bir `confir
 ## SABİTLER
 - **confirm** (object) — `{
       defaultTitle: 'Are you sure?',
-      // Button labels summarise the o...`
+      // Button labels summarise the...`
 
 ---
 
@@ -46,18 +46,6 @@ Bu modül için bir JavaScript/TypeScript modülü olup, dışarıya bir `confir
 Bu dosya (`confirm.en.ts`) bir i18n sözlük/dictionary dosyasıdır. Fonksiyon içermez, sadece `confirm` adında bir export edilen nesne sabiti bulunur. Fonksiyon gövdesi tanımlı değildir.
 
 **Sonuç:** Fonksiyon olmadığı için AST Pointer oluşturulamaz.
-
----
-
-**Not:** Dosya yapısı itibarıyla bu bir **sabit nesne tanımı** dosyasıdır — tipik olarak şu formatta olacaktır:
-
-```ts
-export const confirm = {
-  // key-value çiftleri (çeviri stringleri)
-};
-```
-
-Fonksiyon gövdeleri mevcut olmadığından, `params`, `ic_degiskenler` ve `Dönüş` bilgileri üretilemez.
 
 ---
 

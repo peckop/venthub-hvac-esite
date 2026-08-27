@@ -88,3 +88,45 @@ değiştirmeden önce oku. Özeti:
 
 (1), (3) ve (4) elle hatırlamaya bırakılmadı — `src/__tests__/conformance/githooks-integrity.test.ts`
 üçünü de zorlar.
+
+## Companion kapsamı: süzgeç TEK yerde yazılır
+
+**Kural: hangi dosyalar için companion üretileceğine karar veren süzgeç `.githooks/` içinde
+BİR kez yazılır — `lib/doc-scope.cjs` — ve companion üreten her kanca ona sorar. Kancanın
+içine ikinci bir `grep` zinciri yazmak yasaktır.**
+
+Ölçülmüş vaka (2026-08-27, T166-VH). İki kanca aynı işi yapıyordu ama süzgeç iki yerde ayrı
+yazılmıştı:
+
+```
+post-commit : grep -E '\.(ts|tsx|mjs|cjs)$' | grep -v '\.test\.' | grep -v '__tests__'
+post-merge  : grep -E '^src/.*\.(ts|tsx)$'          <-- test/skip süzgeci YOK
+```
+
+Ayırt edici kanıt üç şeritten bağımsız geldi: merge biter bitmez kapsam dışı bir
+`*.test.md` companion'ı belirdi ve **mtime'ı merge commit'inin saniyesiydi**; o dakikada
+hiçbir toplu üretim çağrısı koşmamıştı. `grep -v` sayımı: post-commit 1, post-merge 0.
+
+Bedeli tek dosya değildi: o gün filo genelinde patlayan *"başkası dosyamı kirletti"*
+alarmlarının büyük kısmının gerçek yazarı post-merge'dü — her merge'de değişen tüm `src`
+kaynakları için, başka şeritlerin claim'indekiler dahil, companion üretiyordu.
+
+**Niçin "aynı grep'i iki yere yaz" çözüm değil:** bugün post-commit öğrendi, post-merge
+öğrenmedi. İki uygulama olduğu sürece biri düzeltilirken öteki geride kalır — sürüklenme
+kaçınılmazdır, sadece zamanı belirsizdir.
+
+Süzgecin kuralları:
+
+- **Kapsamın SSOT'u `.cc_docs.yaml`** (`skip_dirs`, `skip_files`). Kanca kapsamı taklit
+  etmez, dosyadan okur.
+- SSOT okunamazsa (ör. yaml çok satırlı biçimde yeniden üretilirse) **muhafazakâr yedeğe
+  düşülür ve bu GÖRÜNÜR biçimde loglanır**. Sessizce boş küme dönmek en kötüsüdür: companion
+  üretimi durur ve kimse fark etmez (2026-08-13'te tam bu oldu, 284 bayat companion).
+- **Süzgeç dosyası yoksa kanca companion ÜRETMEZ** ve sebebini loglar. Canlı kanca
+  `$ROOT/.githooks/<ad>` çalıştırdığı için davranış **dala bağlıdır**; süzgeci içermeyen eski
+  bir dalda süzgeçsiz üretmek, onarılan arızanın aynısıdır.
+
+Kalıcı bekçi: `src/__tests__/conformance/githooks-doc-scope.test.ts` (`INV-HOOKS-2`).
+Metin taramasıyla yetinmez — scratch repoda **gerçek kancaları** koşturur, `python` yerine
+argümanlarını loglayan sahte bir çalıştırılabilir koyar ve hangi dosyaların hedeflendiğini
+okur. Beş kolun beşi de sabotajla kırmızıya düşürülerek doğrulandı.

@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\tr.ts
-skeleton_hash: 6959dc6ee42c1cd6
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\tr.ts
+skeleton_hash: ea01cf62748a6526
 entity_hashes:
   overview: db9fc58164f2ef61
-generated_at: 2026-08-25T07:27:26Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -86,7 +86,7 @@ Fonksiyon gövdesi bulunmadığından AST Pointer üretilmemiştir.
 
 ## NODE ID STANDARD
 
-  file: tr.ts
+  file: src\i18n\dictionaries\admin\tr.ts
 
 ---
 

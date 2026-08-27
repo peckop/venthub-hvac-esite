@@ -2,57 +2,82 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\products\page.tsx
-skeleton_hash: 9f5bef9cd7a1d5bc
+source_path: C:\tmp\vh-urun-comp\src\app\[lang]\products\page.tsx
+skeleton_hash: 0e3e167294d5113a
 entity_hashes:
-  func:Page: 92a39fc420a9c185
-  func:getCachedProducts: 13bd3816d5356001
-  overview: 21dc1b0e4ca1a720
+  func:Page: a366d3e6b2604189
+  func:getCachedFamilies: 3d8cb598b9d0365b
+  func:parsePageParam: 478b1488bab262a0
+  overview: 421275b5c3244580
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:54:02Z
 ---
 
 ## Genel Bakış
 
-Bu modül, Next.js uygulamasında dil bazlı dinamik bir ürün listesi sayfasını sunucu tarafında yönetir. Temel işlevi, istenen dile göre önbellekten ürün verileri çekerek sayfanın HTML çıktısını oluşturmaktır.
+Bu modül, Next.js uygulamasında dil bazlı dinamik bir ürün aileleri listesi sayfasını sunucu tarafında yönetir. Sayfa parametrelerini ayrıştırarak istenen dile ve sayfa numarasına karşılık gelen verileri önbellekten çeker ve sayfanın HTML çıktısını oluşturur.
 
 ## Fonksiyon Grupları
 
+### Parametre Ayrıştırma
+URL'den gelen ham sayfa parametresini güvenli bir şekilde sayısal değere dönüştürmekten sorumludur. Geçersiz veya eksik değerler için varsayılan davranış sağlar.
+- parsePageParam
+
 ### Dil-Bazlı Veri Sağlama
-Belirli bir dil parametresine karşılık gelen ürün verilerini sunucu tarafında önbellekten almak ve performans sağlamakla sorumludur.
-- getCachedProducts
+Belirli bir dil, kiracı ve sayfa numarasına karşılık gelen ürün ailelerini sunucu tarafında önbellekten almak ve performans sağlamakla sorumludur.
+- getCachedFamilies
 
 ### Sayfa Oluşturma ve Bileşen Birleştirme
-İsteği işleyerek dil parametresini çıkarır, gerekli verileri getirir ve sayfanın tüm React bileşenlerini birleştirip son HTML çıktısını üretir.
+İsteği işleyerek dil ve sayfa parametrelerini çıkarır, gerekli verileri getirir ve sayfanın tüm React bileşenlerini birleştirip son HTML çıktısını üretir. Hem `params` hem de `searchParams` Promise olarak alınır ve resolve edilir.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Next.js dil bazlı ürün listesi sayfasını sunucu tarafında yönetmek üzere tasarlanmıştır. Aşağıdaki mimari varsayımlar fonksiyon imzalarından türetilmiştir.
+**[Aksiyom 1]:** Eğer `getCachedFamilies` çağrısında `lang` parametresi sağlanmazsa, aile verileri ilgili dil için önbellekten alınamaz ve çağrı başarısız olur.
 
-**[Aksiyom 1]:** Eğer `getCachedProducts` çağrısında `lang` parametresi sağlanmazsa, ürün verileri ilgili dil için önbellekten retrieve edilemez ve çağrı başarısız olur.
-
-**[Aksiyom 2]:** Eğer `getCachedProducts` çağrısında `tenantId` parametresi sağlanmazsa, hangi kiracıya (tenant) ait ürünlerin getirileceği belirsizleşir ve çağrı başarısız olur.
+**[Aksiyom 2]:** Eğer `getCachedFamilies` çağrısında `tenantId` parametresi sağlanmazsa, hangi kiracıya ait ailelerin getirileceği belirsizleşir ve çağrı başarısız olur.
 
 **[Aksiyom 3]:** Eğer `Page` bileşeninin `params` argümanı bir `Promise<{ lang: string }>` olarak resolve olmazsa, sayfa hangi dilde render edileceğini bilemez ve HTML çıktısı oluşturulamaz.
 
-**[Aksiyom 4]:** Eğer `Page` bileşeninin `params` Promise'i içindeki `lang` alanı eksik veya `string` tipinde değilse, dil parametresi `getCachedProducts` fonksiyonuna geçersiz aktarılır ve sayfa hatalı çalışır.
+**[Aksiyom 4]:** Eğer `Page` bileşeninin `params` Promise'i içindeki `lang` alanı eksik veya `string` tipinde değilse, dil parametresi `getCachedFamilies` fonksiyonuna geçersiz aktarılır ve sayfa hatalı çalışır.
 
-**[Aksiyom 5]:** Eğer `getCachedProducts` fonksiyonuna geçerli `lang` ve `tenantId` değerleri sağlanmazsa, sayfa oluşturma sürecinde ürün verisi bulunamaz ve bileşen birleştirme (component composition) aşamasında veri eksikliği oluşur.
+**[Aksiyom 5]:** Eğer `parsePageParam` fonksiyonuna geçersiz bir ham değer (sayı olmayan string, undefined vb.) aktarılırsa, fonksiyon varsayılan bir sayısal değer döndürerek sayfanın çökmesini engeller.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+[Aksiyom 1]: Eğer `lang` parametresi yoksa, `getCachedFamilies` fonksiyonu çalışamaz; dolayısıyla `Page` bileşeni ürün ailesi verisini gösteremez.
+
+[Aksiyom 2]: Eğer `tenantId` parametresi yoksa, `getCachedFamilies` fonksiyonu hangi kiracıya ait verileri çekeceğini bilemez; veri erişimi gerçekleşmez.
+
+[Aksiyom 3]: Eğer `page` parametresi yoksa, `getCachedFamilies` fonksiyonu hangi sayfayı getireceğini bilemez; sayfalama yapılamaz.
+
+[Aksiyom 4]: Eğer `params` Promise'i çözümlenemezse (resolve olmazsa), `Page` bileşeni `lang` değerine erişemez ve render süreci başlayamaz.
+
+[Aksiyom 5]: Eğer `searchParams` Promise'i çözümlenemezse, `Page` bileşeni `page` sorgu parametresine erişemez; bu durumda `parsePageParam` fonksiyonuna `undefined` değer geçer.
+
+[Aksiyom 6]: Eğer `parsePageParam` fonksiyonuna geçilen `raw` değeri `undefined` ise, fonksiyon bu durumu işleyerek sayısal bir değer döndürmelidir; aksi takdirde `getCachedFamilies`'e geçilecek `page` değeri belirsiz kalır.
+
+[Aksiyom 7]: Eğer `parsePageParam` fonksiyonuna geçilen `raw` değeri bir dizi (`string[]`) ise, fonksiyon bu çoklu değerden tek bir sayısal sayfa numarası çıkarmalıdır; aksi takdirde `getCachedFamilies` beklenen `number` tipinde parametre alamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### getCachedProducts
-**Ne yapar**: Belirtilen dil ve kiracı ID'si için önbelleğe alınmış ürünleri getirir.
-**Nasıl yapar**: Fonksiyon, verilen `lang` ve `tenantId` parametrelerini kullanarak önbellekteki ürünleri alır. İç mantığı tam olarak bilinmiyor ancak adından da anlaşılacağı üzere bir önbellekleme mekanizması kullanarak ürün verilerini hızlıca erişilebilir hale getirir.
+### getCachedFamilies
+**Ne yapar**: Belirtilen dil, kiracı kimliği ve sayfa numarasına göre ürün ailelerini önbellekten getirir. Sayfalama destekli bir veri çekme işlemi gerçekleştirir.
+**Nasıl yapar**: Fonksiyonun iç mantığı verilen kaynak kodda mevcut değildir. Üç parametre alır ve çağrıldığı yerden (`Page` fonksiyonu) `items` ve `total` alanlarını içeren bir nesne döndürdüğü anlaşılmaktadır. Önbellekleme mekanizmasının nasıl çalıştığı kaynakta belirtilmemiştir.
 **Parametreler**:
-- lang: string — Ürünlerin getirileceği dil kodu.
-- tenantId: string — Kiracının benzersiz tanımlayıcısı.
-**Dönüş**: Bilinmiyor. Fonksiyonun return tipi açıkça belirtilmemiş.
+- lang: string — İstek yapılan dil kodu (örneğin `'en'`, `'tr'`)
+- tenantId: string — Kiracı (tenant) kimlik bilgisi
+- page: number — İstenen sayfa numarası
+**Dönüş**: Kaynakta dönüş tipi açıkça belirtilmemiştir. `Page` fonksiyonundaki kullanımına bakıldığında `{ items, total }` yapısında bir nesne döndürdüğü görülmektedir; ancak kesin tip tanımı bilinmiyor.
+
+### parsePageParam
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### Page
 
@@ -69,12 +94,13 @@ Bu modül, Next.js dil bazlı ürün listesi sayfasını sunucu tarafında yöne
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../../hooks/useTenant::TenantProvider
-- import: ../../../lib/type-converters::type { DomainProduct }
+- import: ../../../lib/cache/tags::PRODUCTS_DISCOVERY_TAG
+- import: ../../../lib/cache/tags::discoveryTag
 - import: ../../../utils/tenantServer::getTenantConfig
 - import: ../../../views/CategoryMasterView::CategoryMasterView
 - import: @/i18n/dictionaries/en::en
 - import: @/i18n/dictionaries/tr::tr
-- import: @/lib/services/product.service::getProductsEnriched
+- import: @/lib/services/family.service::getFamiliesEnriched
 - import: @/lib/supabase/static::supabaseStaticClient
 - import: next/cache::unstable_cache
 - import: react::React
@@ -83,38 +109,77 @@ Bu modül, Next.js dil bazlı ürün listesi sayfasını sunucu tarafında yöne
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `[lang]/products/page.tsx`::getCachedProducts
-- **params**: `(lang: string, tenantId: string)`
-- **ic_degiskenler**: (govde tek bir ifade — explicit değişken yok)
-  - `unstable_cache`'e verilen **cache key**: `['products-discovery', lang, tenantId]` — cache lookup'ta kullanılan benzersiz anahtar
-  - `unstable_cache`'e verilen **options.tags**: `['products-discovery', `products-discovery-${tenantId}`]` — revalidation/purge için tag dizisi
-  - `unstable_cache`'e verilen **options.revalidate**: `false` — cache'in otomatik yenilenmemesi gerektiğini belirtir
-  - `getProductsEnriched(supabaseStaticClient, { limit: 100 })` — asıl veri sağlayan servis çağrısı, supabaseStaticClient üzerinden max 100 ürün döner
-- **Dönüş**: `getProductsEnriched`'in DomainProduct[] sonucu (unstable_cache ile sarılmış)
-
-### [N2_NASIL] AST Pointer: `[lang]/products/page.tsx`::Page
-- **params**: `{ params: Promise<{ lang: string }> }`
+### [N1_NASIL] AST Pointer: src/app/[lang]/products/page.tsx::getCachedFamilies
+- **params**: `lang` (string), `tenantId` (string), `page` (number)
 - **ic_degiskenler**:
-  - `lang` — `await params`'dan destructured dil kodu (`"en"` veya `"tr"`), sözlük seçimi ve cache key için kullanılır
-  - `tenantConfig` — `await getTenantConfig()` çağrısının sonucu; kiracı yapılandırma nesnesi, `id` ve `TenantProvider`'a verilen value olarak kullanılır
-  - `tenantId` — `tenantConfig.id`'den çıkarılan kiracı tanımlayıcısı stringi, `getCachedProducts` çağrısına ve cache tag'ine parametre olarak verilir
-  - `products` — `DomainProduct[]` türünde, `await getCachedProducts(lang, tenantId)` ile getirilen zenginleştirilmiş ürün listesi, `CategoryMasterView`'a `initialProducts` olarak aktarılır
-  - `dict` — `lang === 'en' ? en : tr` koşuluyla seçilen sözlük nesnesi; JSX içinde `dict.common.loading` erişimi ile loading fallback metni sağlanır
-- **Dönüş**: JSX — `<React.Suspense>` içeren `CategoryMasterView` bileşeni (`initialCategory={null}`, `initialProducts={products}`) ile `TenantProvider` sarmalı
+  - `unstable_cache` — next/cache'den import edilen fonksiyon; verilen fonksiyonu önbelleğe alır, `tags` ve `revalidate` seçenekleriyle yapılandırır
+  - `getFamiliesEnriched` — family.service'den import edilen fonksiyon; `supabaseStaticClient` ve opsiyon nesnesiyle çağrılır
+  - `supabaseStaticClient` — supabase/static'den import edilen Supabase istemcisi; `getFamiliesEnriched`'e birinci argüman olarak geçilir
+  - `PAGE_SIZE` — kodda kullanılan sabit; `limit` ve `offset` hesaplamasında kullanılır (kaynakta tanımlı değil)
+  - `offset` — `(page - 1) * PAGE_SIZE` formülüyle hesaplanır; sayfalama ofsetini belirtir
+  - `PRODUCTS_DISCOVERY_TAG` — cache/tags'den import edilen sabit; önbellek etiketleri dizisinde birinci eleman
+  - `discoveryTag` — cache/tags'den import edilen fonksiyon; `tenantId` argümanıyla çağrılır, önbellek etiketleri dizisinde ikinci eleman
+  - `revalidate: 3600` — önbelleğin 3600 saniye (1 saat) sonra otomatik yeniden doğrulanması
+- **Dönüş**: `unstable_cache(...)(())` çağrısının sonucu (Promise); `getFamiliesEnriched` fonksiyonunun dönüş değerini resolve eder
 
 ---
+
+### [N2_NASIL] AST Pointer: src/app/[lang]/products/page.tsx::parsePageParam
+- **params**: `raw` (string | string[] | undefined)
+- **ic_degiskenler**:
+  - `value` — `Array.isArray(raw)` kontrolüyle belirlenir; `raw` dizi ise `raw[0]`, değilse `raw` kendisi atanır
+  - `parsed` — `Number.parseInt(value ?? '1', 10)` ile elde edilen tamsayı; `value` undefined/null ise `'1'` varsayılan değeri kullanılır
+  - `Number.isFinite(parsed) && parsed > 1` — dönüş kararını belirleyen koşul; `parsed` sonlu ve 1'den büyükse `parsed`, aksi halde `1` döner
+- **Dönüş**: number
+
+---
+
+### [N3_NASIL] AST Pointer: src/app/[lang]/products/page.tsx::Page
+- **params**: `params` (Promise\<{ lang: string }\>), `searchParams` (Promise\<{ page?: string | string[] }\>)
+- **ic_degiskenler**:
+  - `lang` — `await params` ile çözümlenen nesneden destructure edilen dil kodu (string)
+  - `pageParam` — `await searchParams` ile çözümlenen nesneden destructure edilen ham sayfa parametresi (string | string[] | undefined)
+  - `page` — `parsePageParam(pageParam)` çağrısının dönüşü; sayısal sayfa numarası (number)
+  - `tenantConfig` — `await getTenantConfig()` çağrısının dönüşü; kiracı yapılandırma nesnesi
+  - `tenantId` — `tenantConfig.id`; kiracı kimliği (string)
+  - `families` — `await getCachedFamilies(lang, tenantId, page)` çağrısının dönüşünden destructure edilen `items` alanı; aile listesi
+  - `total` — `await getCachedFamilies(lang, tenantId, page)` çağrısının dönüşünden destructure edilen `total` alanı; toplam kayıt sayısı
+  - `dict` — `lang === 'en' ? en : tr` koşuluyla seçilen sözlük nesnesi; `en` ve `tr` i18n sözlüklerinden import edilir
+  - `dict.common.loading` — `React.Suspense`'ın `fallback` prop'unda kullanılan yükleme mesajı
+  - `tenantConfig` — `TenantProvider`'ın `value` prop'una geçirilen kiracı yapılandırması
+  - `families` — `CategoryMasterView`'ın `families` prop'una geçirilen aile listesi
+  - `total` — `CategoryMasterView`'ın `total` prop'una geçirilen toplam sayı
+  - `page` — `CategoryMasterView`'ın `page` prop'una geçirilen sayfa numarası
+  - `PAGE_SIZE` — `CategoryMasterView`'ın `pageSize` prop'una geçirilen sabit (kaynakta tanımlı değil)
+  - `initialCategory={null}` — `CategoryMasterView`'a geçirilen sabit null değer; yorumda belirtildiği gibi Discovery modunu tetikler
+- **Dönüş**: JSX (React element); `React.Suspense` ile sarılı `TenantProvider` ve `CategoryMasterView` bileşenlerini içerir
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    page_tsx__Page["Page"]
+    page_tsx__getCachedFamilies["getCachedFamilies"]
+    page_tsx__parsePageParam["parsePageParam"]
+    page_tsx__Page --> page_tsx__getCachedFamilies
+    page_tsx__Page --> page_tsx__parsePageParam
+```
 
 ## NODE ID STANDARD
 
   file: src\app\[lang]\products\page.tsx
-  function: src\app\[lang]\products\page.tsx::getCachedProducts
+  function: src\app\[lang]\products\page.tsx::getCachedFamilies
+  function: src\app\[lang]\products\page.tsx::parsePageParam
   function: src\app\[lang]\products\page.tsx::Page
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
-  export: getCachedProducts
+  export: getCachedFamilies
+  export: parsePageParam
 
 ---
 

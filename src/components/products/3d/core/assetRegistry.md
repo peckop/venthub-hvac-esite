@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\3d\core\assetRegistry.ts
-skeleton_hash: f37d67e03152c9b0
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\core\assetRegistry.ts
+skeleton_hash: 2eaf0ee6cc6c462b
 entity_hashes:
   func:resolveAsset: af5d0cb4d33e6314
   overview: 43e3553e501ef7c3
-generated_at: 2026-08-25T07:26:04Z
+generated_at: 2026-08-27T07:06:05Z
 ---
 
 ## Genel Bakış
@@ -71,8 +71,8 @@ type AssetType = 'glb' | 'hdr' | 'procedural'
 
 ## NODE ID STANDARD
 
-  file: assetRegistry.ts
-  function: assetRegistry.ts::resolveAsset
+  file: src\components\products\3d\core\assetRegistry.ts
+  function: src\components\products\3d\core\assetRegistry.ts::resolveAsset
 
 ---
 
