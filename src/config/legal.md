@@ -2,29 +2,50 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\config\legal.ts
-skeleton_hash: ec3878e5030a15dd
+source_path: C:\tmp\venthub-wt-t131\src\config\legal.ts
+skeleton_hash: aedbecc50234519f
 entity_hashes:
-  overview: 841e450a0e8713fb
-generated_at: 2026-06-19T20:47:53Z
+  func:hasUnfilledLegalPlaceholders: 4a122d30f4dbb8d6
+  func:isLegalContentReady: 996792c12ebfcfec
+  func:unfilledLegalFields: 9ee6759caeb27178
+  overview: 77dd7ad1bf704224
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin `src/config/legal.ts` modülü, platformun yasal süreçleriyle ilgili tüm yapılandırma değerlerini merkezi olarak tutan statik bir yapılandırma dosyasıdır. Sadece projenin temel site adresini `./siteUrl` modülünden import ederek, kullanım koşulları, gizlilik politikası, çerez politikası gibi standart yasal içeriklerin tüm erişim ve ayar değerlerini `legalConfig` adındaki sabit değişken altında toplar. Herhangi bir dinamik mantık veya çalıştırılabilir fonksiyon barındırmayan bu modül, uygulama genelinde kullanılmak üzere sadece sabit yasal yapılandırmaları dışa aktarır.
+VentHub HVAC projesinin `src/config/legal.ts` modülü, platformun yasal yapılandırma değerlerini merkezi olarak tutar ve bu yapılandırmanın eksiksizliğini doğrulayan yardımcı fonksiyonlar sağlar. Modül, hem statik yasal ayarları barındırır hem de uygulamanın yasal içerik sunumuna hazır olup olmadığını kontrol eden bir arayüz sunar.
+
+## Fonksiyon Grupları
+### Yapılandırma Doğrulama
+Bu grup, verilen bir yasal yapılandırma nesnesinin durumunu analiz ederek eksik veya hazır olup olmadığını sorgulayan fonksiyonları içerir. Bu fonksiyonlar, uygulamanın yasal uyumluluk gereksinimlerini karşılayıp karşılamadığını programatik olarak denetler.
+- unfilledLegalFields, hasUnfilledLegalPlaceholders, isLegalContentReady
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC platformunun yasal uyumluluk süreçlerinde kullanılan sabit yasal konfigürasyon değerlerini barındırır, çalışmasının temeli modül içindeki legalConfig nesnesinin bütünlüğü ve tüm tüketen bileşenler tarafından erişilebilir olmasıdır.
-
-[Aksiyom 1]: Eğer modül içerisindeki legalConfig nesnesi tanımlı değilse, bu modülü içe aktaran tüm ön yüz ve arka yüz bileşenleri yasal konfigürasyon değerlerine erişemez, uygulama içindeki zorunlu yasal bildirimler hiç gösterilemez.
-[Aksiyom 2]: Eğer legalConfig nesnesi içindeki zorunlu yasal konfigürasyon alanları (gizlilik politikası bağlantısı, kullanım şartları sürümü, yerel mevzuat uyumluluk bayrakları vb.) eksik kalırsa, kullanıcılara sunulması gereken yasal metinler hatalı veya eksik gösterilir, hukuki uyumsuzluk riski oluşur.
-[Aksiyom 3]: Eğer bu modül, uygulamanın yasal metinleri, giriş akışı koşulları gibi değerleri kullanan tüm temel bileşenleri tarafından erişilebilir değilse, kullanıcı platform erişimi, hesap yönetimi gibi temel akışlar kesintiye uğrar, uygulama kısmen veya tamamen işlevsiz kalır.
-[Aksiyom 4]: Eğer legalConfig içindeki aktif kullanılan yasal değerler (bağlantılar, sürüm numaraları, uyumluluk bayrakları) güncel değilse, uygulama güncel olmayan yerel regülasyonlara uygun olmayan içerik sunar, hukuki sorumluluk riski ortaya çıkar.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### unfilledLegalFields
+**Ne yapar**: Verilen `LegalConfig` yapılandırmasında henüz doldurulmamış (placeholder içeren) alanların adlarını bir dizi olarak döndürür. Dizi boşsa, metinlerin veri olarak hazır olduğu anlamına gelir.
+
+**Nasıl yapar**: `Object.entries` ile config nesnesinin tüm anahtar-değer çiftlerini bir diziye dönüştürür. Ardından `filter` ile her bir değerin tipini kontrol eder: değer bir `string` ise ve `PLACEHOLDER_PATTERN` ile eşleşiyorsa bu alan henüz doldurulmamış kabul edilir. Son olarak `map` ile sadece eşleşen anahtar (alan adı) değerlerini içeren bir dizi üretir. Varsayılan parametre olarak `legalConfig` kullanılır; böylece parametre verilmezse modül seviyesindeki varsayılan yapılandırma devreye girer.
+
+**Parametreler**:
+- config: `LegalConfig` — Hukuki metinlerin alan adlarını ve değerlerini içeren yapılandırma nesnesi. Varsayılan değeri modül kapsamındaki `legalConfig` değişkenidir.
+
+**Dönüş**: `string[]` — Placeholder kalıbıyla eşleşen (henüz doldurulmamış) alanların adlarından oluşan bir dizi. Dizi boşsa tüm alanların doldurulmuş olduğu anlaşılır.
+
+### hasUnfilledLegalPlaceholders
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### isLegalContentReady
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -35,20 +56,33 @@ Bu modül, VentHub HVAC platformunun yasal uyumluluk süreçlerinde kullanılan 
 
 ## INTERFACES
 
-### LegalConfig
+### LegalSellerInfo
+Şirket kimliğine dair, Recep tarafından doldurulacak metin alanları.
 - `sellerTitle: string`
 - `sellerAddress: string`
 - `sellerEmail: string`
 - `sellerPhone: string`
+- `kepAddress: string`
 - `taxOffice: string`
 - `taxNumber: string`
 - `mersis: string`
+- `tradeRegistryNo: string`
+- `chamberOfCommerce: string`
+- `etbisNo: string`
+- `iysBrandCode: string`
+- `verbisNo: string`
 - `websiteUrl: string`
 - `deliveryTime: string`
 - `shippingFee: string`
 - `returnAddress: string`
 - `cargoCompanies: string`
+- `returnShippingBearer: string`
 - `refundTime: string`
+- `warrantyPeriod: string`
+- `usefulLife: string`
+- `afterSalesService: string`
+- `invoiceDeliveryTime: string`
+- `invoiceIdentityThreshold: number`
 - `retentionOrders: string`
 - `retentionSupport: string`
 - `retentionMarketing: string`
@@ -56,28 +90,73 @@ Bu modül, VentHub HVAC platformunun yasal uyumluluk süreçlerinde kullanılan 
 - `applicationEmail: string`
 - `lastUpdated: string`
 
+### LegalConfig extends LegalSellerInfo
+- `legalReviewCompleted: boolean`
+
 ---
 
 ## SABİTLER
 - **legalConfig** (object) — `{
-  sellerTitle: '[SATICI_UNVAN]',
-  sellerAddress: '[SATICI_ADRES]',
-  se...`
+  // ── Şirket kimliği (BOŞ — Recep dolduracak) ──────────────────────────...`
+- **EN_OVERRIDES** (object) — `{
+  deliveryTime: '1-5 business days',
+  shippingFee: 'Shown in the order s...`
+- **PLACEHOLDER_PATTERN** (regex) — `/^\[[A-Z0-9_]+\]$/`
 
 ---
 
 ## AST POINTERS
-C:\Users\alize\venthub-hvac\src\config\legal.ts dosyasında analiz edilebilir herhangi bir fonksiyon, sınıf veya metod tanımı bulunmamaktadır. Dosyadaki kayıtlı öğeler:
-- `SITE_URL` — `./siteUrl` modülünden import edilen sabit site adresi değeri
-- `legalConfig` — dosyada tanımlanan yasal yapılandırma nesnesi
+
+### [N1_NASIL] AST Pointer: src/config/legal.ts::unfilledLegalFields
+- **params**: `config` — LegalConfig türünde yapılandırma nesnesi, varsayılan değer `legalConfig` sabiti
+- **ic_degiskenler**:
+  - `config` — Object.entries() ile anahtar-değer çiftlerine ayrılır; her çiftin `value` (ikinci eleman) değeri string türünde ve `PLACEHOLDER_PATTERN` regex'ine uyuyorsa filtrelenir
+  - `PLACEHOLDER_PATTERN` — dışarıdan tanımlı regex sabiti; value üzerinde .test() ile eşleşme kontrolü yapar
+  - `key` — filtrelenen çiftlerin birinci elemanı (alan adı); map ile diziye dönüştürülür
+- **Dönüş**: `string[]` — placeholder kalıbı içeren alan adlarının listesi
+
+### [N2_NASIL] AST Pointer: src/config/legal.ts::hasUnfilledLegalPlaceholders
+- **params**: `config` — LegalConfig türünde yapılandırma nesnesi, varsayılan değer `legalConfig` sabiti
+- **ic_degiskenler**:
+  - `config` — `unfilledLegalFields` fonksiyonuna doğrudan aktarılır
+- **Dönüş**: `boolean` — `unfilledLegalFields(config).length > 0` ifadesinin sonucu; doldurulmamış placeholder içeren alan varsa `true`, yoksa `false`
+
+### [N3_NASIL] AST Pointer: src/config/legal.ts::isLegalContentReady
+- **params**: `config` — LegalConfig türünde yapılandırma nesnesi, varsayılan değer `legalConfig` sabiti
+- **ic_degiskenler**:
+  - `config` — `config.legalReviewCompleted` alanına doğrudan erişilir ve `hasUnfilledLegalPlaceholders` fonksiyonuna aktarılır
+- **Dönüş**: `boolean` — `config.legalReviewCompleted` truthy VE `hasUnfilledLegalPlaceholders(config)` falsy ise `true`; aksi halde `false`
 
 ---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    legal_ts__hasUnfilledLegalPlaceholders["hasUnfilledLegalPlaceholders"]
+    legal_ts__isLegalContentReady["isLegalContentReady"]
+    legal_ts__unfilledLegalFields["unfilledLegalFields"]
+    legal_ts__isLegalContentReady --> legal_ts__hasUnfilledLegalPlaceholders
+    legal_ts__hasUnfilledLegalPlaceholders --> legal_ts__unfilledLegalFields
+```
 
 ## NODE ID STANDARD
 
   file: src\config\legal.ts
+  function: src\config\legal.ts::unfilledLegalFields
+  function: src\config\legal.ts::hasUnfilledLegalPlaceholders
+  function: src\config\legal.ts::isLegalContentReady
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LegalConfig
+  export: LegalSellerInfo
+  export: hasUnfilledLegalPlaceholders
+  export: isLegalContentReady
+  export: unfilledLegalFields
+
+---
+
+## BILEŞIM (CONTAINS)
+  contains: LegalSellerInfo

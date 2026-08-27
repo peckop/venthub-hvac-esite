@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\contexts\AuthContextDefinition.ts
-skeleton_hash: 1a3aacb930b82ccf
+source_path: C:\tmp\venthub-wt-t131\src\contexts\AuthContextDefinition.ts
+skeleton_hash: 0d71386b0f531624
 entity_hashes:
   overview: f2f5edb4e854ff35
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış

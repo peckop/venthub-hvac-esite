@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\types\authority.ts
-skeleton_hash: 79d2675712b4ef49
+source_path: C:\tmp\venthub-wt-t131\src\types\authority.ts
+skeleton_hash: 9c039906ccd5b1c0
 entity_hashes:
   overview: 08381c41a177b637
-generated_at: 2026-06-19T20:48:16Z
+generated_at: 2026-08-27T06:55:18Z
 ---
 
 ## Genel Bakış
@@ -42,39 +42,39 @@ Bu modül, VentHub HVAC projesinde yetki (authority) sistemiyle ilgili TypeScrip
 - `id: string`
 - `type: AuthorityBlockType`
 - `order: number`
-- `config?: {`
+- `config?: {`
 
 ### HeroBlock extends BaseAuthorityBlock
 - `type: 'hero'`
-- `content: {`
+- `content: {`
 
 ### SpecsBlock extends BaseAuthorityBlock
 - `type: 'specs'`
-- `content: {`
+- `content: {`
 
 ### MediaBlock extends BaseAuthorityBlock
 - `type: 'media'`
-- `content: {`
+- `content: {`
 
 ### PerformanceBlock extends BaseAuthorityBlock
 - `type: 'performance'`
-- `content: {`
+- `content: {`
 
 ### RichTextBlock extends BaseAuthorityBlock
 - `type: 'rich-text'`
-- `content: {`
+- `content: {`
 
 ### FeaturesGridBlock extends BaseAuthorityBlock
 - `type: 'features-grid'`
-- `content: {`
+- `content: {`
 
 ### ComparisonBlock extends BaseAuthorityBlock
 - `type: 'comparison'`
-- `content: {`
+- `content: {`
 
 ### CtaBannerBlock extends BaseAuthorityBlock
 - `type: 'cta-banner'`
-- `content: {`
+- `content: {`
 
 ---
 
