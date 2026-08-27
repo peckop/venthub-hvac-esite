@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\revenue_alarm.ts
-skeleton_hash: 4354b9f10aea862c
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\revenue_alarm.ts
+skeleton_hash: 45e6b9644b93d093
 entity_hashes:
   func:raiseRevenueAlarm: 583400307b182d35
   overview: ed4be68d95228a99
-generated_at: 2026-08-25T08:46:49Z
+generated_at: 2026-08-27T07:09:20Z
 ---
 
 ## Genel Bakış

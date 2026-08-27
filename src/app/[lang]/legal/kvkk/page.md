@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\[lang]\legal\kvkk\page.tsx
-skeleton_hash: 871091e899426f74
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\kvkk\page.tsx
+skeleton_hash: bb212cc11d3dd91d
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: 5fe3924512d7505c
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:50Z
+generated_at: 2026-08-27T06:53:24Z
 ---
 
 ## Genel Bakış
@@ -80,9 +80,9 @@ Bu modül, Next.js App Router yapısında `[lang]` dinamik segmenti altında yer
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::generateStaticParams
-  function: page.tsx::Page
+  file: src\app\[lang]\legal\kvkk\page.tsx
+  function: src\app\[lang]\legal\kvkk\page.tsx::generateStaticParams
+  function: src\app\[lang]\legal\kvkk\page.tsx::Page
 
 ---
 

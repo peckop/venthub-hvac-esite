@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\mesafeli-satis-sozlesmesi\page.tsx
-skeleton_hash: 05c1042723e61e07
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\mesafeli-satis-sozlesmesi\page.tsx
+skeleton_hash: a1e3194eab8f878c
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: 0f7f79057de13ae8
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:26Z
 ---
 
 ## Genel Bakış

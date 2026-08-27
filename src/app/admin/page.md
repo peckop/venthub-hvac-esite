@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\page.tsx
-skeleton_hash: 2e439699c68b18a2
+source_path: C:\tmp\ops-t165\src\app\admin\page.tsx
+skeleton_hash: 40eb95e7d5283fd2
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: e310741650765783
   overview: 5b1a16aab3aba293
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:51Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:55:11Z
 ---
 
 ## Genel Bakış
@@ -104,7 +104,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`

@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\orderStatusService.ts
-skeleton_hash: b1e72bfe3697ffe8
+source_path: C:\tmp\ops-t165\src\lib\orderStatusService.ts
+skeleton_hash: 2afed7d0bf88078b
 entity_hashes:
   func:isReturnStatus: b72fd60a31916058
   func:resolveDbFields: bb3f04ce63170b18
@@ -12,7 +12,7 @@ entity_hashes:
   func:syncReturnsRecord: dc5a56e469e899d4
   func:updateOrderStatus: b743f322bfcde089
   overview: 9db0fdcde6bd771e
-generated_at: 2026-08-24T12:49:42Z
+generated_at: 2026-08-27T06:57:39Z
 ---
 
 ## Genel Bakış
@@ -225,9 +225,9 @@ graph TD
     orderStatusService_ts__syncReturnsRecord["syncReturnsRecord"]
     orderStatusService_ts__updateOrderStatus["updateOrderStatus"]
     orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__isReturnStatus
+    orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__resolveDbFields
     orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__restoreStockForOrder
     orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__syncReturnsRecord
-    orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__resolveDbFields
 ```
 
 ## NODE ID STANDARD

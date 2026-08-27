@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\displayPrice.service.ts
-skeleton_hash: d3b4f015e5924efb
+source_path: C:\tmp\ops-t165\src\lib\services\displayPrice.service.ts
+skeleton_hash: 31ca049f2a475149
 entity_hashes:
-  func:attachDisplayPrices: edb7bdd96283fd3b
-  func:fetchDisplayPrices: 41610a811dbd6e55
-  func:withDisplayPrices: e6e948c43ee9994a
+  func:attachDisplayPrices: 036996666f9ba667
+  func:fetchDisplayPrices: 6496b06cad7ad65e
+  func:withDisplayPrices: 219174d395855717
   overview: 9bf72b47d700eb31
-generated_at: 2026-08-25T08:49:35Z
+generated_at: 2026-08-27T07:00:06Z
 ---
 
 ## Genel Bakış
@@ -47,15 +47,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### fetchDisplayPrices
-**Ne yapar**: Ürün kimliklerine göre vitrin fiyatlarını çeker. Fiyatı olmayan ürün haritada yer almaz — null yerine yokluk söz konusudur. Bu sayede çağıran taraf "fiyat yok" ile "sıfır fiyat"ı karıştıramaz.
+**Ne yapar**: Ürün kimliklerine göre vitrin fiyatlarını çeker. Fiyatı olmayan ürün haritada yer almaz — null yerine yokluk kullanılır, böylece çağıran taraf "fiyat yok" ile "sıfır fiyat"ı karıştıramaz.
 
-**Nasıl yapar**: Önce `productIds` dizisindeki tekrar eden ve geçersiz (string olmayan veya boş) kimlikleri eler. Kalan benzersiz kimlikleri `PRICE_LOOKUP_CHUNK` boyutunda parçalara bölerek her parça için Supabase'in `get_display_prices` RPC fonksiyonunu çağırır. RPC hatası oluşursa veya veri dönmezse o parçayı atlar, sayfayı düşürmez — vitrin bu durumda "Teklif Alın" gösterir. Dönen her satır için `display_price` değerini sayıya çevirir; sonucu sonlu ve pozitifse haritaya ekler. `tax_included` alanı tam olarak `true` ise vergi dahil bilgisini `true` olarak kaydeder.
+**Nasıl yapar**: Önce gelen `productIds` dizisini benzersiz ve geçerli (boş olmayan string) kimliklere filtreler. Ardından bu kimlikleri `PRICE_LOOKUP_CHUNK` sabitine göre parçalara (chunk) bölerek her parça için Supabase'in `get_display_prices` RPC fonksiyonunu çağırır. RPC'den dönen her satır için `display_price` değeri sonlu pozitif bir sayıya dönüştürülebilirse haritaya eklenir; dönüştürülemezse o satır atlanır. Hata durumunda sayfa düşürülmez, sadece o chunk atlanır ve vitrin "Teklif Alın" gösterir.
 
 **Parametreler**:
-- supabase: `SupabaseClient<Database>` — Veritabanı bağlantısı. Supabase istemcisi üzerinden RPC çağrısı yapılır.
-- productIds: `string[]` — Vitrin fiyatı sorgulanacak ürünlerin kimliklerini içeren dizi.
+- supabase: `SupabaseClient<Database>` — Veritabanı bağlantısını temsil eden Supabase istemcisi
+- productIds: `string[]` — Vitrin fiyatı sorgulanacak ürün kimliklerinin dizisi
 
-**Dönüş**: `Promise<Map<string, DisplayPriceInfo>` — Anahtar olarak `product_id`, değer olarak `DisplayPriceInfo` (içinde `amount` ve `taxIncluded` alanları) içeren bir Map. Fiyatı bulunamayan veya geçersiz fiyatlı ürünler bu haritada yer almaz.
+**Dönüş**: `Promise<Map<string, DisplayPriceInfo>>` — Ürün kimliğini anahtar, vitrin fiyat bilgisini (`amount` ve `taxIncluded` alanlarını içeren nesne) değer olarak tutan Map. Fiyatı bulunamayan ürünler bu haritada yer almaz.
 
 ### attachDisplayPrices
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -92,37 +92,31 @@ type WithDisplayPrice = <T>
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: displayPrice.service.ts::fetchDisplayPrices
-- **params**:
-  - `supabase` — Supabase istemcisi (SupabaseClient<Database> tipinde)
-  - `productIds` — Ürün kimliklerini içeren dizi (string[])
+### [N1_NASIL] AST Pointer: src/lib/services/displayPrice.service.ts::fetchDisplayPrices
+- **params**: `supabase` — SupabaseClient<Database> tipinde veritabanı istemcisi; `productIds` — string[] tipinde ürün id dizisi
 - **ic_degiskenler**:
-  - `result` — Sonuç olarak döndürülecek boş Map<string, DisplayPriceInfo> nesnesi; her başarılı fiyat çözümlemesinde ürün kimliği ile fiyat bilgisi eşleştirilerek doldurulur
-  - `unique` — `productIds` dizisinden tekrar eden elemanları, string olmayanları ve boş stringleri filtreleyerek elde edilen benzersiz geçerli ürün kimliklerinin dizisi
-  - `i` — `unique` dizisini `PRICE_LOOKUP_CHUNK` boyutunda parçalara ayırmak için kullanılan döngü sayacı
-  - `chunk` — `unique` dizisinden `i` indeksinden itibaren `PRICE_LOOKUP_CHUNK` uzunluğunda dilimlenen ürün kimlikleri alt kümesi
-  - `data` — `supabase.rpc('get_display_prices', { p_product_ids: chunk })` çağrısından dönen veri; her elemanı `product_id`, `display_price`, `tax_included` alanlarını içerir
-  - `error` — `supabase.rpc('get_display_prices', ...)` çağrısından dönen hata; mevcutsa veya `data` yoksa o chunk atlanır
-  - `row` — `data` dizisindeki her bir satır; `row.display_price` ve `row.product_id` ve `row.tax_included` alanlarına erişilir
-  - `amount` — `row.display_price` değerinin `Number()` ile sayıya dönüştürülmüş hali; sonlu ve sıfırdan büyükse `result` Map'ine eklenir
-- **Dönüş**: `Promise<Map<string, DisplayPriceInfo>>` — ürün kimliğini fiyat bilgisine eşleyen Map
+  - `result` — Map<string, DisplayPriceInfo> tipinde, döndürülecek fiyat haritası; başlangıçta boş oluşturulur
+  - `unique` — productIds dizisinden filtrelenmiş, boş olmayan string elemanlardan oluşan benzersiz id dizisi; `new Set` ile tekrarlar kaldırılır
+  - `i` — for döngüsü sayaç değişkeni; PRICE_LOOKUP_CHUNK aralıklarıyla artırılır
+  - `chunk` — unique dizisinden i indisinden itibaren PRICE_LOOKUP_CHUNK uzunluğunda dilimlenmiş id alt kümesi
+  - `data` — `supabase.rpc('get_display_prices', { p_product_ids: chunk })` çağrısından dönen fiyat satırları; hata varsa veya null ise atlanır
+  - `error` — `supabase.rpc` çağrısından dönen hata nesnesi; truthy ise mevcut chunk atlanır
+  - `row` — data dizisindeki her bir fiyat satırı
+  - `amount` — `row.display_price` değerinin `Number()` ile sayıya çevrilmiş hali; sonlu ve pozitif değilse o satır atlanır
+- **Dönüş**: `Promise<Map<string, DisplayPriceInfo>>` — ürün id'lerini fiyat bilgisine eşleyen harita
 
-### [N2_NASIL] AST Pointer: displayPrice.service.ts::attachDisplayPrices
-- **params**:
-  - `rows` — `id` alanına sahip nesneler dizisi (T[])
-  - `prices` — `fetchDisplayPrices` fonksiyonundan dönen fiyat haritası (Map<string, DisplayPriceInfo>)
+### [N2_NASIL] AST Pointer: src/lib/services/displayPrice.service.ts::attachDisplayPrices
+- **params**: `rows` — T[] tipinde, `{ id: string }` arayüzüne uyan nesne dizisi; `prices` — Map<string, DisplayPriceInfo> tipinde fiyat haritası
 - **ic_degiskenler**:
-  - `row` — `rows` dizisindeki her bir eleman; `row.id` ile `prices` Map'inde arama yapılır
-  - `info` — `prices.get(row.id)` sonucu; eşleşme varsa `info.amount` ve `info.taxIncluded` alanlarına erişilir, yoksa `null` atanır
-- **Dönüş**: `WithDisplayPrice<T>[]` — her satıra `displayPrice` (amount veya null) ve `displayPriceTaxIncluded` (taxIncluded veya null) alanları eklenmiş dizi
+  - `row` — rows.map içindeki her bir eleman; `row.id` ile prices haritasından eşleşme aranır
+  - `info` — `prices.get(row.id)` sonucu; eşleşme varsa DisplayPriceInfo, yoksa undefined
+- **Dönüş**: `WithDisplayPrice<T>[]` — her satıra `displayPrice` (info.amount veya null) ve `displayPriceTaxIncluded` (info.taxIncluded veya null) alanları eklenmiş yeni dizi
 
-### [N3_NASIL] AST Pointer: displayPrice.service.ts::withDisplayPrices
-- **params**:
-  - `supabase` — Supabase istemcisi (SupabaseClient<Database> tipinde)
-  - `rows` — `id` alanına sahip nesneler dizisi (T[])
+### [N3_NASIL] AST Pointer: src/lib/services/displayPrice.service.ts::withDisplayPrices
+- **params**: `supabase` — SupabaseClient<Database> tipinde veritabanı istemcisi; `rows` — T[] tipinde, `{ id: string }` arayüzüne uyan nesne dizisi
 - **ic_degiskenler**:
-  - `prices` — `fetchDisplayPrices(supabase, rows.map(r => r.id))` çağrısından dönen fiyat haritası; `rows` dizisindeki tüm `r.id` değerleri ile fiyatlar çekilir
-- **Dönüş**: `Promise<WithDisplayPrice<T>[]>` — fiyat bilgileri eklenmiş satır dizisi; `rows` boşsa boş dizi döner
+  - `prices` — `fetchDisplayPrices(supabase, rows.map(r => r.id))` çağrısından dönen Map<string, DisplayPriceInfo> haritası; rows dizisi boşsa bu çağrı yapılmaz
+- **Dönüş**: `Promise<WithDisplayPrice<T>[]>` — rows dizisine fiyat bilgileri eklenmiş yeni dizi; rows boşsa boş dizi döner
 
 ---
 
@@ -133,8 +127,8 @@ graph TD
     displayPrice_service_ts__attachDisplayPrices["attachDisplayPrices"]
     displayPrice_service_ts__fetchDisplayPrices["fetchDisplayPrices"]
     displayPrice_service_ts__withDisplayPrices["withDisplayPrices"]
-    displayPrice_service_ts__withDisplayPrices --> displayPrice_service_ts__fetchDisplayPrices
     displayPrice_service_ts__withDisplayPrices --> displayPrice_service_ts__attachDisplayPrices
+    displayPrice_service_ts__withDisplayPrices --> displayPrice_service_ts__fetchDisplayPrices
 ```
 
 ## NODE ID STANDARD

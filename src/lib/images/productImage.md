@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\images\productImage.ts
-skeleton_hash: 59c91508988fcc5e
+source_path: C:\tmp\ops-t165\src\lib\images\productImage.ts
+skeleton_hash: 7ff610225a97ec18
 entity_hashes:
   func:productImagePlaceholder: a344f93ff9be3970
   func:resolveProductImageUrl: c7799fa1912841a5
   func:storagePathToUrl: 3a9b7073128d0db3
   overview: fb7b1d367d7bbbed
-generated_at: 2026-08-25T08:44:18Z
+generated_at: 2026-08-27T06:57:36Z
 ---
 
 ## Genel Bakış

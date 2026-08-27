@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\validation\taxIdentity.ts
-skeleton_hash: dc42de9f3e295dc8
+source_path: C:\tmp\ops-t165\src\lib\validation\taxIdentity.ts
+skeleton_hash: ddd129a27b7e7320
 entity_hashes:
   func:isValidTckn: 57058047dbe03513
   func:isValidVkn: d10e78946293210b
   overview: 73a3a50bbf3ac748
-generated_at: 2026-08-25T07:28:20Z
+generated_at: 2026-08-27T07:08:15Z
 ---
 
 ## Genel Bakış
@@ -72,9 +72,9 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, gövdeden türetilebi
 
 ## NODE ID STANDARD
 
-  file: taxIdentity.ts
-  function: taxIdentity.ts::isValidTckn
-  function: taxIdentity.ts::isValidVkn
+  file: src\lib\validation\taxIdentity.ts
+  function: src\lib\validation\taxIdentity.ts::isValidTckn
+  function: src\lib\validation\taxIdentity.ts::isValidVkn
 
 ---
 

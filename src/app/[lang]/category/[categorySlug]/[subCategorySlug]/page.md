@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx
-skeleton_hash: 8989f94f0cfb0c58
+source_path: C:\tmp\ops-t165\src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx
+skeleton_hash: 1f355d984cd1c1a7
 entity_hashes:
   func:Page: 3f194a51738b081b
   func:generateMetadata: 374cf14702a129ba
@@ -13,7 +13,7 @@ entity_hashes:
   func:resolveLocalizedSegments: 606c139694573527
   overview: a95554f4a816ca75
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-08-25T07:24:07Z
+generated_at: 2026-08-27T06:52:57Z
 ---
 
 ## Genel Bakış
@@ -198,21 +198,21 @@ graph TD
     page_tsx__getCachedFamilies["getCachedFamilies"]
     page_tsx__parsePageParam["parsePageParam"]
     page_tsx__resolveLocalizedSegments["resolveLocalizedSegments"]
-    page_tsx__generateMetadata --> page_tsx__resolveLocalizedSegments
     page_tsx__Page --> page_tsx__getCachedFamilies
-    page_tsx__Page --> page_tsx__parsePageParam
     page_tsx__Page --> page_tsx__resolveLocalizedSegments
+    page_tsx__generateMetadata --> page_tsx__resolveLocalizedSegments
+    page_tsx__Page --> page_tsx__parsePageParam
 ```
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::getCachedFamilies
-  function: page.tsx::parsePageParam
-  function: page.tsx::generateStaticParams
-  function: page.tsx::resolveLocalizedSegments
-  function: page.tsx::generateMetadata
-  function: page.tsx::Page
+  file: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::getCachedFamilies
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::parsePageParam
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::generateStaticParams
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::resolveLocalizedSegments
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::generateMetadata
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::Page
 
 ---
 

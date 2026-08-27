@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\auth\callback\route.ts
-skeleton_hash: 18a7638a8c3b289a
+source_path: C:\tmp\ops-t165\src\app\auth\callback\route.ts
+skeleton_hash: 28f31014b513feb5
 entity_hashes:
   func:GET: 87f900e6676c777d
   overview: cceb50975600e00b
-generated_at: 2026-08-25T08:43:06Z
+generated_at: 2026-08-27T06:56:12Z
 ---
 
 ## Genel Bakış

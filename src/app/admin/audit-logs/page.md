@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\audit-logs\page.tsx
-skeleton_hash: db6a2fa39f599ed7
+source_path: C:\tmp\ops-t165\src\app\admin\audit-logs\page.tsx
+skeleton_hash: c9fedc7b956214a5
 entity_hashes:
   func:Loading: 657ee72781ec51d8
-  func:Page: fd2706f7cd85c29f
+  func:Page: 5d73985a9b37dcd4
   overview: ad893d1e0e0b6ff3
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:27Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:53:52Z
 ---
 
 ## Genel Bakış
@@ -45,14 +45,13 @@ Bu modül, React/Next.js ortamında bir bileşen (component) olarak çalışır.
 **Dönüş**: Return tipi `void veya bilinmiyor` olarak belirtilmiştir. React bileşeni olması sebebiyle muhtemelen bir `JSX.Element` döndürmektedir, ancak kesin dönüş tipi verilen bilgiler dahilinde doğrulanamamaktadır.
 
 ### Page
-**Ne yapar**: Bu fonksiyon, admin denetim kayıtları (audit logs) sayfasının üst seviye React bileşenidir. Asıl sayfa içeriğini Suspense ile sararak yükleme durumunda kullanıcıya animasyonlu bir loading göstergesi sunar.
+**Ne yapar**: Admin denetim günlükleri (audit logs) sayfasını oluşturan üst düzey sayfa bileşenidir. Uluslararasılaştırma desteğiyle birlikte asenkron yüklenen alt bileşeni bir yükleme durumu göstergesiyle çevreleyerek kullanıcıya sunar.
 
-**Nasıl yapar**: Fonksiyon, `useI18n` hook'u aracılığıyla çoklu dil desteği sağlayan çeviri fonksiyonunu alır. Ardından React'in `Suspense` bileşenini kullanarak `AdminAuditLogsPage` bileşenini sarar. Veri yüklenirken fallback olarak animasyonlu bir loading div'i gösterir; bu div, `animate-pulse` sınıfı sayesinde soluk bir animasyon efekti oluşturur ve `common.loading` çeviri anahtarı ile kullanıcının diline uygun "Yükleniyor" mesajını display eder.
+**Nasıl yapar**: `useI18n` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t` elde edilir. Ardından `AdminAuditLogsPage` bileşeni React'ın `Suspense` bileşeni ile sarılır; böylece alt bileşen yüklenene kadar kullanıcıya bir yükleme göstergesi (`fallback`) sunulur. Fallback içeriğinde `t('common.loading')` çağrısıyla yerelleştirilmiş bir yükleme metni, `animate-pulse` animasyonu ve `text-admin-fg-muted` renk sınıfı ile görüntülenir.
 
-**Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz. Next.js App Router yapısında otomatik olarak sayfa bileşeni olarak yüklenir.
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: `JSX.Element` — Suspense sarmalayıcısı içinde sarılmış `AdminAuditLogsPage` bileşenini döndürür. Yükleme sırasında fallback UI (animasyonlu loading div'i) render edilir.
+**Dönüş**: Kaynakta açık bir dönüş tipi belirtilmemiştir. Fonksiyon gövdesi JSX yapısı döndürmektedir.
 
 ---
 
@@ -73,17 +72,17 @@ Bu modül, React/Next.js ortamında bir bileşen (component) olarak çalışır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/audit-logs/page.tsx::Loading
-- **params**: ()
+### [N1_NASIL] AST Pointer: C:\tmp\ops-t165\src\app\admin\audit-logs\page.tsx::Loading
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `t('admin.common.loading')` ve `t('common.loading')` çağrılarında kullanılır
-- **Dönüş**: JSX element — `div` içeren loading placeholder, `animate-pulse` ile sallantılı animasyonlu slate-400 renkli "Yükleniyor" göstergesi
+  - `t` — `useI18n()` hook'undan destructuring ile alınan çeviri fonksiyonu; `'admin.common.loading'` anahtarının karşılığını döndürmek için kullanılır
+- **Dönüş**: JSX — `className="p-8 text-center text-admin-fg-muted animate-pulse"` özellikli bir `<div>` elementi; içeriği `t('admin.common.loading')` çağrısının sonucu
 
-### [N2_NASIL] AST Pointer: src/app/admin/audit-logs/page.tsx::Page
-- **params**: ()
+### [N2_NASIL] AST Pointer: C:\tmp\ops-t165\src\app\admin\audit-logs\page.tsx::Page
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `Suspense` fallback'inde `t('common.loading')` çağrısında kullanılır
-- **Dönüş**: JSX element — `<Suspense>` sarmalayıcısı içinde `<AdminAuditLogsPage />` component'ini render eder; fallback olarak loading placeholder gösterir
+  - `t` — `useI18n()` hook'undan destructuring ile alınan çeviri fonksiyonu; `'common.loading'` anahtarının karşılığını döndürmek için kullanılır
+- **Dönüş**: JSX — `<Suspense>` bileşeni; `fallback` prop'u olarak `className="p-8 text-center text-admin-fg-muted animate-pulse"` özellikli bir `<div>` (içeriği `t('common.loading')`) alır; çocuk olarak `<AdminAuditLogsPage />` bileşenini render eder
 
 ---
 
@@ -110,7 +109,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`

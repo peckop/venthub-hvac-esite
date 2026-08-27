@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\category\[categorySlug]\page.tsx
-skeleton_hash: 61cc4647bd19285b
+source_path: C:\tmp\ops-t165\src\app\[lang]\category\[categorySlug]\page.tsx
+skeleton_hash: 6cae321984279fa6
 entity_hashes:
   func:Page: 12913f4fb306f591
   func:generateMetadata: 191280413c5aca03
@@ -12,7 +12,7 @@ entity_hashes:
   func:parsePageParam: 478b1488bab262a0
   overview: e37d7f83fc7d9b78
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-08-15T06:32:39Z
+generated_at: 2026-08-27T06:52:59Z
 ---
 
 ## Genel Bakış
@@ -162,108 +162,6 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzalarında belirtilen par
 
 ---
 
-### [N2_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::parsePageParam
-- **params**: `raw: string | string[] | undefined`
-- **ic_degiskenler**:
-  - `value` — raw array ise `raw[0]`, değilse raw'un kendisi; parseInt'e girecek ham string
-  - `parsed` — `Number.parseInt(value ?? '1', 10)` sonucu; geçersizse `NaN` döner
-- **Dönüş**: `number` — geçerli ve >1 ise parsed değeri, aksi halde `1`
-
----
-
-### [N3_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::generateStaticParams
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `data` — `supabase.from('categories').select('slug, metadata').eq('is_active', true)` sonucu; tüm aktif kategorilerin slug ve metadata alanları
-  - `categoriesList` — `data`'nın `(data || [])` ile garanti altına alınmış hali; tipi `{ slug: string | null, metadata: unknown }[]`
-- **Dönüş**: `Array<{ lang: 'tr' | 'en', categorySlug: string }>` — her kategori için TR ve EN olmak üzere 2 statik parametre
-
----
-
-### [N4_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::generateStaticParams.flatMap_callback
-- **params**: `c` — `{ slug: string | null, metadata: unknown }` tipinde tek bir kategori satırı
-- **ic_degiskenler**: (yok)
-- **Kullanilan dis kaynaklar**:
-  - `getLocalizedCategorySlug(c, 'tr')` — kategorinin Türkçe lokalize slug'ını döner
-  - `getLocalizedCategorySlug(c, 'en')` — kategorinin İngilizce lokalize slug'ını döner
-- **Dönüş**: `Array<{ lang: 'tr' | 'en', categorySlug: string }>` — tek kategoriden üretilen 2 parametre çifti
-
----
-
-### [N5_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::generateMetadata
-- **params**: `params: Promise<{ categorySlug: string, lang: string }>`
-- **ic_degiskenler**:
-  - `categorySlug` — `await params` destructuring'inden gelen kategori slug'ı (URL parçası)
-  - `lang` — `await params` destructuring'inden gelen dil kodu (`'tr'` veya `'en'`)
-  - `category` — `getCachedCategoryData(categorySlug)` ile cache'lenmiş kategori verisi; bulunamazsa `null`
-  - `dict` — aktif dilin sözlük nesnesi; `lang === 'en'` ise `en`, değilse `tr`
-  - `t` — `(key: string) => getDictValue(dict, key)` fonksiyonu; sözlükten çeviri değeri çeker
-  - `displayName` — `getCategoryDisplayName(category, t)` ile çözülen kategorinin görnen adı
-  - `desc` — SEO meta description; dile göre farklı şablon ile üretilir
-  - `trUrl` — Türkçe canonical URL; `${SITE_URL}/tr/category/${getLocalizedCategorySlug(category, 'tr')}`
-  - `enUrl` — İngilizce canonical URL; `${SITE_URL}/en/category/${getLocalizedCategorySlug(category, 'en')}`
-  - `canonicalUrl` — aktif dile göre `enUrl` veya `trUrl`
-- **Kullanilan dis sabitler**: `SITE_URL`
-- **Yan etkiler**: `preloadCategory(categorySlug)` — veriyi erken prefetch/prime eder
-- **Dönüş**: `Metadata` nesnesi — `title`, `description`, `alternates` (canonical, hreflang), `openGraph`
-
----
-
-### [N6_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::Page
-- **params**: `params: Promise<{ categorySlug: string, lang: string }>`, `searchParams: Promise<{ page?: string | string[] }>`
-- **ic_degiskenler**:
-  - `categorySlug` — `await params` destructuring'inden gelen URL slug'ı
-  - `lang` — `await params` destructuring'inden gelen dil kodu
-  - `pageParam` — `await searchParams` destructuring'inden gelen sayfa parametresi (`string | string[] | undefined`)
-  - `page` — `parsePageParam(pageParam)` sonucu; geçerli pozitif integer veya `1`
-  - `category` — `getCachedCategoryData(categorySlug)` ile çekilmiş kategori nesnesi; `null` olabilir
-  - `expectedSlug` — `getLocalizedCategorySlug(category, lang)` ile hesaplanan dil-specific slug; yönlendirme kontrolü için
-  - `dict` — aktif dilin sözlük nesnesi (`en` veya `tr`)
-  - `t` — `(key: string) => getDictValue(dict, key)` fonksiyonu
-  - `displayName` — `getCategoryDisplayName(category, t)` sonucu; `null/empty` ise `categorySlug` fallback kullanılır
-  - `families` — `FamilyListItem[]`; varsayılan boş dizi; kategori varsa `familiesPage.items` ile doldurulur
-  - `total` — `number`; kategori varsa `familiesPage.total` ile doldurulur
-  - `subCategories` — `DomainCategory[]`; varsayılan boş dizi; kategori varsa filtrelenmiş ve map edilmiş alt kategoriler
-  - `tenantId` — `await getTenantConfig()` sonucunun `.id` alanı; cache key ve API çağrıları için
-  - `subsData` — `supabase.from('categories')...eq('parent_id', category.id)...` sonucunun `data` alanı; ham alt kategori satırları
-  - `countsData` — `supabase.rpc('get_category_counts')` sonucunun `data` alanı; `{ category_id, product_count }` satırları
-  - `countMap` — `Map<string, number>`; `countsData`'dan doldurulan `category_id → product_count` eşleme haritası
-  - `categoriesArray` — `subsData`'nın `(subsData || []) as DbCategory[]` ile tip güvenliği sağlanmış hali
-  - `categoryIds` — `[category.id, ...subCategories.map(s => s.id)]`; ana kategori + tüm geçerli alt kategori ID'leri
-  - `familiesPage` — `getCachedFamilies(lang, tenantId, category.id, page, categoryIds)` sonucu; `{ items, total }`
-  - `jsonLd` — `buildCategoryJsonLd({...})` ile üretilen JSON-LD nesnesi; SEO structured data
-- **Kullanilan dis sabitler**: `SITE_URL`, `PAGE_SIZE`
-- **Kullanilan dis fonksiyonlar**: `preloadCategory`, `getCachedCategoryData`, `getLocalizedCategorySlug`, `getCategoryDisplayName`, `getDictValue`, `getTenantConfig`, `mapDatabaseCategoryToDomain`, `getCachedFamilies`, `buildCategoryJsonLd`, `assertNoUuid`, `permanentRedirect`
-- **Yan etkiler**: `preloadCategory(categorySlug)` prefetch; `permanentRedirect(...)` 308 yönlendirme (koşullu)
-- **Dönüş**: JSX — `<script type="application/ld+json">` + `<React.Suspense>` içinde `<PageComponent>`
-
----
-
-### [N7_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::Page.mapDatabaseCategoryToDomain_callback
-- **params**: `s` — `DbCategory` tipinde ham veritabanı satırı (tüm category alanlarını içerir)
-- **ic_degiskenler**: (yok — inline spread ve map)
-- **Alan dönüşümleri**:
-  - `s.name` → `name: s.name || ''` (null/undefined koruması)
-  - `s.menu_label` → `menu_label: s.menu_label as string | null`
-  - `s.marketing_title` → `marketing_title: s.marketing_title as string | null`
-  - `s.translation_key` → `translation_key: s.translation_key as string | null`
-  - `s.description` → `description: s.description as string | null`
-  - `s.metadata` → `metadata: s.metadata as CategoryMetadata | null`
-  - `s.authority_content` → `authority_content: s.authority_content as AuthorityContent | null`
-  - Diğer alanlar (`id`, `parent_id`, `slug`, `is_active`, `sort_order`, `level`, `image_url`, `seo_title`, `seo_desc`, `created_at`, `updated_at`, `display_mode`, `is_featured`) spread ile doğrudan kopyalanır
-- **Dönüş**: `DomainCategory` — `mapDatabaseCategoryToDomain()` ile dönüştürülmüş kategori nesnesi
-
----
-
-### [N8_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::getCategoryData
-- **params**: `id: string` — kategori UUID'si
-- **ic_degiskenler**: (yok)
-- **Kullanilan dis kaynaklar**: `supabase` (static client)
-- **Sorgu**: `supabase.from('categories').select('*').eq('id', id).single()`
-- **Dönüş**: `Promise<SupabaseResponse>` — tek kategori satırı; bulunamazsa `data: null`
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -273,8 +171,8 @@ graph TD
     page_tsx__generateStaticParams["generateStaticParams"]
     page_tsx__getCachedFamilies["getCachedFamilies"]
     page_tsx__parsePageParam["parsePageParam"]
-    page_tsx__Page --> page_tsx__parsePageParam
     page_tsx__Page --> page_tsx__getCachedFamilies
+    page_tsx__Page --> page_tsx__parsePageParam
 ```
 
 ## NODE ID STANDARD

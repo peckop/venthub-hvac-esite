@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\pricingPolicy.service.ts
-skeleton_hash: 324478aa89374921
+source_path: C:\tmp\ops-t165\src\lib\services\pricingPolicy.service.ts
+skeleton_hash: 5f1426c804e747cd
 entity_hashes:
   func:buildCategoryAncestors: 4e4191b37dfe153f
   func:fetchActivePolicies: 3360e7a8109a3d8d
@@ -11,7 +11,7 @@ entity_hashes:
   func:resolveFxLocks: dc07618c268da34d
   func:sortPolicies: 4c21c5723215a593
   overview: aefd41fe88bee720
-generated_at: 2026-08-25T08:44:59Z
+generated_at: 2026-08-27T07:04:14Z
 ---
 
 ## Genel Bakış
@@ -165,8 +165,8 @@ graph TD
     pricingPolicy_service_ts__resolveFxLocks["resolveFxLocks"]
     pricingPolicy_service_ts__sortPolicies["sortPolicies"]
     pricingPolicy_service_ts__resolveFxLocks --> pricingPolicy_service_ts__resolveFxLockWithPolicies
-    pricingPolicy_service_ts__resolveFxLocks --> pricingPolicy_service_ts__fetchActivePolicies
     pricingPolicy_service_ts__resolveFxLocks --> pricingPolicy_service_ts__buildCategoryAncestors
+    pricingPolicy_service_ts__resolveFxLocks --> pricingPolicy_service_ts__fetchActivePolicies
     pricingPolicy_service_ts__resolveFxLockWithPolicies --> pricingPolicy_service_ts__sortPolicies
 ```
 

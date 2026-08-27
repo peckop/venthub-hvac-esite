@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\supabase\client.ts
-skeleton_hash: 84661defa15293fe
+source_path: C:\tmp\ops-t165\src\lib\supabase\client.ts
+skeleton_hash: 7049eed0f21a19ec
 entity_hashes:
   overview: 34e9332f051f8980
-generated_at: 2026-08-25T07:28:28Z
+generated_at: 2026-08-27T07:07:37Z
 ---
 
 ## Genel Bakış
@@ -49,7 +49,7 @@ Bu dosyada (`src/lib/supabase/client.ts`) tanımlı fonksiyon bulunmamaktadır. 
 
 ## NODE ID STANDARD
 
-  file: client.ts
+  file: src\lib\supabase\client.ts
 
 ---
 

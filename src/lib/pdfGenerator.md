@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\pdfGenerator.ts
-skeleton_hash: 9a0d463b06abe5e4
+source_path: C:\tmp\ops-t165\src\lib\pdfGenerator.ts
+skeleton_hash: 043aa06516120779
 entity_hashes:
   func:arrayBufferToBase64: ac0cb07b30bf5c01
   func:generateProductDatasheet: eac5e07d950d7a2e
   overview: 8f2e14b413976ba5
-generated_at: 2026-06-19T20:48:09Z
+generated_at: 2026-08-27T06:57:43Z
 ---
 
 ## Genel Bakış

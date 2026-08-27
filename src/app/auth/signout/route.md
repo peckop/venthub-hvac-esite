@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\auth\signout\route.ts
-skeleton_hash: be6286006ba44974
+source_path: C:\tmp\ops-t165\src\app\auth\signout\route.ts
+skeleton_hash: cb5712fc44153c68
 entity_hashes:
-  func:POST: c85301a22b3fe20e
+  func:POST: 9db1e564185a6ae3
   overview: fa888e32d3000f25
-generated_at: 2026-06-19T20:46:34Z
+generated_at: 2026-08-27T06:56:43Z
 ---
 
 ## Genel Bakış
@@ -33,15 +33,14 @@ Bu modül, kullanıcı oturumunu sonlandıran bir API endpoint'idir.
 ## FONKSİYON DETAYLARI
 
 ### POST
+**Ne yapar**: Kullanıcının mevcut oturumunu sonlandırır ve kullanıcıyı dil tercihine göre login sayfasına yönlendirir. Bu fonksiyon, Next.js App Router yapısında bir API route olarak tanımlanmıştır ve HTTP POST isteklerini işler.
 
-**Ne yapar**: Kullanıcının oturumunu sonlandırır (sign-out) ve login sayfasına yönlendirme yapar. Bu fonksiyon, bir HTTP POST isteği geldiğinde tetiklenen bir Next.js App Router rotasıdır.
-
-**Nasıl yapar**: Önce Supabase sunucu istemcisi oluşturarak kullanıcının mevcut oturum claims'lerini kontrol eder. Eğer geçerli claims'ler varsa `signOut()` metodunu çağırarak oturumu sonlandırır. Ardından tüm sayfa önbelleğini temizlemek için `revalidatePath` ile layout seviyesinde revalidation yapar. Kullanıcının tercih ettiği dil bilgisini (`NEXT_LOCALE` cookie'sinden) okur ve bu dile göre login sayfasına 302 yönlendirmesi oluşturur. Son olarak claims cache cookie'sini temizleyerek önbellekteki yetkilendirme verilerinin kalıcı olarak silinmesini sağlar.
+**Nasıl yapar**: Fonksiyon önce `createSupabaseServerClient` ile bir Supabase sunucu istemcisi oluşturur. Ardından `supabase.auth.getClaims()` ile kullanıcının mevcut kimlik bilgilerini (claims) kontrol eder. Eğer `data?.claims` mevcutsa (kullanıcı giriş yapmışsa), `supabase.auth.signOut()` çağrılarak oturum sonlandırılır. Sonrasında `revalidatePath('/', 'layout')` ile kök dizin için layout seviyesindeki veri önbelleği geçersiz kılınır. İstek URL'si parse edilir, çerez deposundan `NEXT_LOCALE` çerezi okunarak dil tercihi belirlenir (bulunamazsa varsayılan olarak `'tr'` kullanılır). Kullanıcı, belirlenen dil önekiyle birlikte `/{lang}/auth/login` yoluna 302 geçici yönlendirme ile gönderilir. Yönlendirme yanıtı oluşturulduktan sonra `clearClaimsCacheCookie` çağrılarak claims önbellek çerezi temizlenir ve yanıt döndürülür.
 
 **Parametreler**:
-- `request`: Request — Next.js tarafından sağlanan HTTP istek nesnesi, isteğin URL bilgisini ve diğer header verilerini içerir
+- request: Request — Gelen HTTP isteğini temsil eden nesne. İsteğin URL bilgisini (`request.url`) içerir ve yönlendirme hedefinin belirlenmesinde kullanılır.
 
-**Dönüş**: `NextResponse` — Kullanıcıyı `/{lang}/auth/login` adresine yönlendiren 302 HTTP yanıt döner. Yanıt aynı zamanda claims cache cookie'sini temizleme işlemini de içerir.
+**Dönüş**: NextResponse — 302 durum koduyla birlikte `/{lang}/auth/login` yoluna yönlendirme yapan HTTP yanıt nesnesi döndürür. Yanıt nesnesi, `clearClaimsCacheCookie` fonksiyonu aracılığıyla claims önbellek çerezinin temizlenmesi için kullanılır.
 
 ---
 
@@ -57,15 +56,18 @@ Bu modül, kullanıcı oturumunu sonlandıran bir API endpoint'idir.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/auth/signout/route.ts::POST
-- **params**: `(request: Request)`
+- **params**: `request` — `Request` tipinde, gelen HTTP isteğini temsil eder
 - **ic_degiskenler**:
-  - `supabase` — `createSupabaseServerClient()` ile oluşturulan Supabase istemcisi; auth işlemleri (getClaims, signOut) için kullanılır
-  - `data` — `supabase.auth.getClaims()` çağrısından dönen `{ data }` destructuring ile elde edilen claims nesnesi; mevcut claim'lerin olup olmadığını kontrol eder
-  - `requestUrl` — `request.url` string'inden `new URL()` ile oluşturulan URL nesnesi; redirect için `origin` bilgisini sağlamak üzere kullanılır
-  - `cookieStore` — `cookies()` ile elde edilen cookie deposu; tarayıcıdaki `NEXT_LOCALE` cookie'sine erişim sağlar
-  - `lang` — `cookieStore.get('NEXT_LOCALE')?.value || 'tr'` ifadesinden elde edilen dil kodu; login yönlendirme URL'inde path olarak kullanılır (`/${lang}/auth/login`); cookie yoksa `'tr'` varsayılır
-  - `response` — `NextResponse.redirect()` ile oluşturulan 302 redirect yanıtı; login sayfasına yönlendirme yapar ve `clearClaimsCacheCookie` ile temizlenip döndürülür
-- **Dönüş**: `NextResponse` — login sayfasına (`/${lang}/auth/login`) 302 redirect yanıtı döndürür; yan etkileri: supabase auth signOut çağırır, revalidatePath ile layout cache'ini temizler, claims cache cookie'sini siler
+  - `supabase` — `createSupabaseServerClient()` ile oluşturulan Supabase sunucu istemcisi; kimlik doğrulama ve oturum işlemleri için kullanılır
+  - `data` — `supabase.auth.getClaims()` sonucundan destructuring ile elde edilen nesne; kullanıcının claims bilgisini içerir
+  - `data.claims` — `data` nesnesi içindeki claims alanı; varlığı kontrol edilerek kullanıcının oturum açmış olup olmadığı belirlenir
+  - `requestUrl` — `request.url` kullanılarak oluşturulan `URL` nesnesi; yönlendirme URL'lerinde origin bilgisi için kullanılır
+  - `cookieStore` — `cookies()` ile elde edilen çerez deposu; çerez okuma işlemleri için kullanılır
+  - `lang` — `cookieStore.get('NEXT_LOCALE')?.value` ile elde edilen dil değeri; çerez yoksa `'tr'` varsayılan değerini alır
+  - `response` — `NextResponse.redirect()` ile oluşturulan 302 yönlendirme yanıtı; `/{lang}/auth/login` adresine yönlendirir
+- **Dönüş**: `NextResponse` — `response` değişkeni, 302 durum koduyla login sayfasına yönlendirme yanıtı döndürür
+
+**Yan etkiler**: `supabase.auth.getClaims()` ile claims kontrolü yapılır; claims varsa `supabase.auth.signOut()` ile oturum sonlandırılır. `revalidatePath('/', 'layout')` ile kök yoldaki layout önbelleği geçersiz kılınır. `clearClaimsCacheCookie(response)` ile yanıt üzerindeki claims önbellek çerezi temizlenir.
 
 ---
 

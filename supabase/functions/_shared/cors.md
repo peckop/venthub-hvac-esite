@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\supabase\functions\_shared\cors.ts
-skeleton_hash: d21db1e6bd4f3091
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\cors.ts
+skeleton_hash: 77b5503d4a2f1053
 entity_hashes:
   func:getCorsHeaders: 73642dabf029645c
   overview: 8eaad34e6f15ad7c
-generated_at: 2026-08-25T07:33:46Z
+generated_at: 2026-08-27T07:09:10Z
 ---
 
 ## Genel Bakış
@@ -62,8 +62,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: cors.ts
-  function: cors.ts::getCorsHeaders
+  file: supabase\functions\_shared\cors.ts
+  function: supabase\functions\_shared\cors.ts::getCorsHeaders
 
 ---
 

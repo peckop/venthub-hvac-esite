@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\supabase\functions\_shared\rate_limit.ts
-skeleton_hash: 2ab7b0772d2c4b01
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\rate_limit.ts
+skeleton_hash: ab4c12eebd37adf1
 entity_hashes:
   func:checkRateLimit: eb2ddca9002ea24b
   func:rateLimitHeaders: 8e57db019805fbe0
   overview: 2d23853bbec3dccf
-generated_at: 2026-08-25T07:33:59Z
+generated_at: 2026-08-27T07:09:15Z
 ---
 
 ## Genel Bakış
@@ -88,9 +88,9 @@ type RateLimitResult = { allowed: boolean; remaining: number; resetAt: string }
 
 ## NODE ID STANDARD
 
-  file: rate_limit.ts
-  function: rate_limit.ts::checkRateLimit
-  function: rate_limit.ts::rateLimitHeaders
+  file: supabase\functions\_shared\rate_limit.ts
+  function: supabase\functions\_shared\rate_limit.ts::checkRateLimit
+  function: supabase\functions\_shared\rate_limit.ts::rateLimitHeaders
 
 ---
 
