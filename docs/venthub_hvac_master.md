@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T13:35:59.642418+00:00
+compiled_at: 2026-08-27T13:57:49.727675+00:00
 total_compiled_files: 656
-source_commit: 49945b8f
+source_commit: 5c245d25
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T13:35:59.642418+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T13:57:49.727675+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -10638,6 +10638,8 @@ entity_hashes:
 generated_at: 2026-08-15T06:35:03Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=8 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, React uygulamalarında beklenmeyen hataları yakalayan bir ErrorBoundary bileşenidir. Uygulamanın tamamen çökmesini önleyerek kullanıcıya uygun bir hata arayüzü sunar ve hataları loglama veya raporlama için işler.
 
@@ -17613,6 +17615,8 @@ entity_hashes:
 generated_at: 2026-06-16T10:18:09Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 InventoryTable, yönetim panelinde envanter verilerini düzenli bir tablo formatında sergileyen React bileşenidir. Yüklenme, hata ve boş veri durumlarını akıllıca yöneterek kullanıcıya kesintisiz bir deneyim sunar ve satır seçimleri ile sütun görünürlüğü üzerinden etkileşim imkanı sağlar.
 
@@ -18643,6 +18647,8 @@ entity_hashes:
 generated_at: 2026-06-19T20:47:14Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, yönetim paneli dashboard'unun bir parçası olarak aktivite verilerini görselleştirmek için tasarlanmış, takvim tabanlı bir ısı haritası bileşenidir. Dışarıdan sağlanan veri setini, yoğunluk bilgisini renk kodlarıyla gösteren interaktif bir arayüze dönüştürür ve kullanıcı etkileşimlerini zenginleştirmek için özel bir bilgi baloncuğu (tooltip) içerir.
 
@@ -19233,6 +19239,8 @@ entity_hashes:
   style_tokens: 7264340c3de4adfc
 generated_at: 2026-08-25T07:24:53Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 BulkBar, bir veri tablosunda seçili öğelerin sayısını gösteren ve bu öğeler üzerinde toplu işlem gerçekleştirilmesini sağlayan bir React bileşenidir. Admin panelindeki veri tablosu arayüzünde, kullanıcı seçim yaptıktan sonra görünür hale gelen bir aksiyon çubuğu olarak çalışır.
@@ -21899,6 +21907,8 @@ entity_hashes:
 generated_at: 2026-08-25T08:43:23Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, yönetim panelinde fiyat politikası oluşturma ve düzenleme işlemlerini gerçekleştiren bir modal form bileşenidir. Bileşen, dışarıdan aldığı `open`, `policy`, `onClose` ve `onSaved` parametreleriyle açılış/kapanış durumunu ve veri akışını yönetir. Form alanı varsayılan değerlerini, tarih bilgisini ve hedef sütun yapılandırmalarını hazırlayan yardımcı fonksiyonlar içerir.
 
@@ -24199,6 +24209,8 @@ entity_hashes:
 generated_at: 2026-08-26T07:13:16Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=1 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 AdminThemeToggle, admin panelinde tema tercihini (açık/koyu mod) yönetmek için kullanılan bir React bileşenidir. Bileşen, dışarıdan gelen mevcut tercihi gösterir ve kullanıcı etkileşimiyle yeni tercihi üst bileşene geri çağırarak tema değişimini tetikler. Salt sunum (pure presentational) bir yapıya sahiptir ve kendi içinde durum tutmaz.
 
@@ -24412,6 +24424,8 @@ entity_hashes:
   overview: aa8fce602e3b1c9d
 generated_at: 2026-08-15T18:15:44Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=3 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 Bu modül, admin panelinin tema tercihlerinin (örneğin koyu/aydınlık mod, renk vurgusu) tarayıcı çerezleri (cookies) üzerinden saklanması ve okunması için gerekli yardımcı fonksiyonları içerir. Temelde, çerez adını oluşturmayı, tema tercihlerini depolanabilir bir metin formatına dönüştürmeyi ve bu metinden tercihleri yeniden yapılandırmayı sağlar. Modül, admin shell bileşenleri tarafından tema yönetimi süreçlerinde bağımsız bir yardımcı (utility) katman olarak kullanılır.
@@ -29644,6 +29658,8 @@ entity_hashes:
   style_tokens: ff89a6880a24812d
 generated_at: 2026-08-15T06:32:06Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=1 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 `FeaturedCommercialBlocks`, ana sayfada öne çıkan ticari HVAC ürünlerini (klima, havalandırma üniteleri vb.) görselleri ve temel bilgileriyle birlikte sergileyen bir React bileşenidir. Verilen ürün listesini işleyerek eksik veya geçersiz görselleri temizler ve kullanıcılara düzenli bir görünüm sunar.
@@ -65210,6 +65226,8 @@ entity_hashes:
   style_tokens: dd5ed8d0f58dcf57
 generated_at: 2026-06-19T20:48:28Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 Bu modül, Supabase istemcisini React uygulaması genelinde paylaşmak için bir bağlam (context) sağlar. SupabaseProvider bileşeni, istemciyi oluşturarak ve bağlam aracılığıyla ileterek alt bileşenlerin Supabase veritabanı veya kimlik doğrulama hizmetlerine erişmesini kolaylaştırır. useSupabaseClient hook'u ise bu bağlamdan istemciyi tüketmek için kullanılır.

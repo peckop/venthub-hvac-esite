@@ -11,6 +11,8 @@ entity_hashes:
 generated_at: 2026-08-26T07:13:16Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=1 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 AdminThemeToggle, admin panelinde tema tercihini (açık/koyu mod) yönetmek için kullanılan bir React bileşenidir. Bileşen, dışarıdan gelen mevcut tercihi gösterir ve kullanıcı etkileşimiyle yeni tercihi üst bileşene geri çağırarak tema değişimini tetikler. Salt sunum (pure presentational) bir yapıya sahiptir ve kendi içinde durum tutmaz.
 

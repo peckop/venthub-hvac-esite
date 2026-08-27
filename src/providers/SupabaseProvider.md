@@ -12,6 +12,8 @@ entity_hashes:
 generated_at: 2026-06-19T20:48:28Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, Supabase istemcisini React uygulaması genelinde paylaşmak için bir bağlam (context) sağlar. SupabaseProvider bileşeni, istemciyi oluşturarak ve bağlam aracılığıyla ileterek alt bileşenlerin Supabase veritabanı veya kimlik doğrulama hizmetlerine erişmesini kolaylaştırır. useSupabaseClient hook'u ise bu bağlamdan istemciyi tüketmek için kullanılır.
 

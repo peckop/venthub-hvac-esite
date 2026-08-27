@@ -1,0 +1,128 @@
+{
+  "_niçin": [
+    "BILEREK BAYAT BIRAKILMIS companion'larin SSOT'u. Uretec bazi dosyalarda sembol KAYBEDIYOR",
+    "(REC-83). O dosyalarda 'bayat ama TAM' surumu, 'taze ama EKSIK' olana tercih ettik.",
+    "SORUN: bir supurme aracina bakildiginda 'bayat' ile 'bilerek dondurulmus' AYNI goruntu.",
+    "I18N 2026-08-27'de bunu olctu ve bir supurme dokuz dosyalik onarimi geri alacakti.",
+    "",
+    "NICIN AYRI DOSYA VE AYNI ZAMANDA DOSYA ICI ISARET — ikisi birden, gerekcesiyle:",
+    "  · YALNIZ dosya ici isaret yetmez: yeniden uretim dosyayi EZER, isaret de silinir,",
+    "    kapi kor kalir. Kaybi tam da kaybi olcecek sey ile birlikte kaybederdik.",
+    "  · YALNIZ liste yetmez: liste ile gercek AYRISIR. Bugun tam bu yasandi — dokuz dosyalik",
+    "    listeyi elle kopyalayan iki taraf da birer dosyayi yanlis sayd.",
+    "  · COZUM: liste 'hangi dosyalar dondurulmus' sorusunun SSOT'udur (kalici, gozden gecirilir);",
+    "    dosya ici isaret onun insan-gorunur yankisidir. KAPI IKISINI KARSILASTIRIR: listede olan",
+    "    bir dosyada isaret YOKSA, o dosya yeniden uretilmis demektir -> KIRMIZI.",
+    "",
+    "ISARET BICIMI (companion'in ilk 40 satirinda, tek satir):",
+    "  <!-- ORION-DONDURULMUS: gercek-sembol=<N> · kaynak=<sha> · sebep=<slug> · kayit=<REC-nn> -->",
+    "",
+    "gercek-sembol OLCUTU (v4) — ONCEKI IKI OLCUT DE YANLISTI, TERS YONLERDE:",
+    "  · 'sonu ) ile bitmeyen baslik gercektir' (filo capinda benimsenmisti): SISIRIYOR.",
+    "    Boslukla yazilmis sozde basliklari gercek sayiyor — ':: productsByTab useMemo callback',",
+    "    ':: tabOrder.map callback' — ve parantezle BASLAYIP '}' ile biten isimsiz arrow'lari da",
+    "    ':: (d) => { return {...} }'. FeaturedCommercialBlocks'ta 4 sanilan sayi gercekte 1.",
+    "  · 'sadece duz tanimlayici olsun' (benim ilk duzeltmem): AZALTIYOR. Noktali metot adlarini",
+    "    dusuruyor — ErrorBoundary'nin 8 sembolunun 6'si 'ErrorBoundary.render' bicimindedir.",
+    "  ⭐v4: ':: 'den sonrasi NOKTALI TANIMLAYICI YOLU olmali. Bosluk YOK, parantez YOK.",
+    "    gecerli : Foo · Foo.bar · ErrorBoundary.getDerivedStateFromError · _x$",
+    "    gecersiz: 'Foo (useEffect callback)' · 'productsByTab useMemo callback' · '(d) => {...}'",
+    "  EK GECERLILIK TESTI (AUTH): tanimlayicinin KOK parcasi bugunku kaynakta geciyor mu?",
+    "    Sozde semboller kaynakta tanimlayici olarak GECMEZ; bayat semboller de gecmez.",
+    "    Ikisi birlikte hem sozdeligi hem yanlisligi tek hamlede ayikliyor.",
+    "  OLCULDU: bu duzeltme dokuz kaydin BESINI degistirdi (ActivityHeatmap 4->2, BulkBar 3->2,",
+    "  AdminThemeToggle 2->1, InventoryTable 4->2, FeaturedCommercialBlocks 4->1).",
+    "  SISMIS ESIK KAPIYI GEVSETIR: gercek bir kayipta bile 'sembol >= esik' tutabilir.",
+    "",
+    "⚠ DEGER 'TARIHSEL EN YUKSEK' DEGILDIR — bu kural ONCE BOYLE YAZILDI ve OLCUMLE CURUTULDU",
+    "(AUTH itiraz etti, I18N kendi onerisini geri aldi, ben iki dosyada kendim olctum):",
+    "eski bir companion surumu O GUNUN kaynagini belgeliyor. Kaynak degistiyse geri yukleme",
+    "BUGUN OLMAYAN semboller anlatan bir dosya uretir. Olculdu: InventoryTable'in 6 sembollu",
+    "surumunde 4 sembol (sortIndicator, TableRow, groupedRows, rows) bugunku .tsx'te YOK;",
+    "FeaturedCommercialBlocks'un 5 sembollu surumunde 2 sembol (tabButton, productCard) YOK.",
+    "EKSIK companion'dan kotusu YANLIS companion'dir: okuyan var sanip arar.",
+    "",
+    "DOGRU KURAL: deger, sembolleri BUGUNKU KAYNAKTA hala var olan en yuksek sayidir.",
+    "Olcut I18N'in: tarihsel surumdeki tanimlayici bugunku kaynak dosyada geciyor mu?",
+    "'Kaynak o gunden beri N commit degismis' olcutu VEKILDIR — surukelenme olcer, YANLISLIK",
+    "olcmez (AUTH bunu kendi one surdu ve kendi geri aldi).",
+    "",
+    "KALDIRMA: uretec o dosyada artik sembol kaybetmiyorsa kayit SILINIR ve companion yeniden",
+    "uretilir. Kaydin kalmasi, duzelmis bir uretecin onunde gereksiz duvar olur."
+  ],
+  "surum": 1,
+  "kayitlar": [
+    {
+      "yol": "src/components/ErrorBoundary.md",
+      "gercek_sembol": 8,
+      "kaynak": "4f542c31",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "ALTYAPI"
+    },
+    {
+      "yol": "src/components/admin/dashboard/ActivityHeatmap.md",
+      "gercek_sembol": 2,
+      "kaynak": "4f542c31",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "ALTYAPI"
+    },
+    {
+      "yol": "src/components/admin/data-table/BulkBar.md",
+      "gercek_sembol": 2,
+      "kaynak": "4f542c31",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "ALTYAPI"
+    },
+    {
+      "yol": "src/components/admin/pricing/PricingPolicyFormModal.md",
+      "gercek_sembol": 4,
+      "kaynak": "4f542c31",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "ALTYAPI"
+    },
+    {
+      "yol": "src/components/admin/shell/AdminThemeToggle.md",
+      "gercek_sembol": 1,
+      "kaynak": "4f542c31",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "ALTYAPI"
+    },
+    {
+      "yol": "src/components/admin/shell/themeCookie.md",
+      "gercek_sembol": 3,
+      "kaynak": "4f542c31",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "ALTYAPI"
+    },
+    {
+      "yol": "src/providers/SupabaseProvider.md",
+      "gercek_sembol": 2,
+      "kaynak": "4f542c31",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "ALTYAPI"
+    },
+    {
+      "yol": "src/components/admin/InventoryTable.md",
+      "gercek_sembol": 2,
+      "kaynak": "4f542c31",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "ALTYAPI"
+    },
+    {
+      "yol": "src/components/home/FeaturedCommercialBlocks.md",
+      "gercek_sembol": 1,
+      "kaynak": "4f542c31",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "ALTYAPI"
+    }
+  ]
+}

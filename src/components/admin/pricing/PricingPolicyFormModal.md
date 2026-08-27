@@ -14,6 +14,8 @@ entity_hashes:
 generated_at: 2026-08-25T08:43:23Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, yönetim panelinde fiyat politikası oluşturma ve düzenleme işlemlerini gerçekleştiren bir modal form bileşenidir. Bileşen, dışarıdan aldığı `open`, `policy`, `onClose` ve `onSaved` parametreleriyle açılış/kapanış durumunu ve veri akışını yönetir. Form alanı varsayılan değerlerini, tarih bilgisini ve hedef sütun yapılandırmalarını hazırlayan yardımcı fonksiyonlar içerir.
 
