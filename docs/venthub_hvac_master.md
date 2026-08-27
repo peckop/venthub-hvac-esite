@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T08:10:32.138817+00:00
+compiled_at: 2026-08-27T08:16:07.234133+00:00
 total_compiled_files: 655
-source_commit: 3e670cfa
+source_commit: e0eb33bd
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T08:10:32.138817+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T08:16:07.234133+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -1924,14 +1924,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\ops-t165\src\app\admin\logistics\page.tsx
-skeleton_hash: db0cb3476b3e1a64
+source_path: C:\Users\alize\venthub-hvac\src\app\admin\logistics\page.tsx
+skeleton_hash: 326d930023ab4cf3
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:LogisticsPage: 70696f052bf11390
   overview: 1341488ff93bac5c
-  style_tokens: 08b1938b3f3a81d8
-generated_at: 2026-08-27T06:54:47Z
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-06-19T20:46:40Z
 ---
 
 ## Genel Bakış
@@ -2008,6 +2008,14 @@ Bu modül, Next.js App Router yapısında çalışan bir admin sayfası olup, lo
 
 ---
 
+### [N2_NASIL] AST Pointer: src/app/admin/logistics/page.tsx::LogisticsPage
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - (yok — gövde herhangi bir değişken bildirmez)
+- **Dönüş**: `<AdminLogisticsPage />` — `next/dynamic` ile import edilmiş ve `call` değişkeni olarak işaretlenmiş lazy-loaded `AdminLogisticsPage` bileşeninin doğrudan render edilmesi; sayfa bileşeni olarak dinamik import'ın tetiklendiği nokta
+
+---
+
 ## NODE ID STANDARD
 
   file: src\app\admin\logistics\page.tsx
@@ -2031,7 +2039,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-admin-fg-muted`, `text-center`
+- **Renkler:** `text-center`, `text-slate-400`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -3202,14 +3210,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\ops-t165\src\app\admin\users\page.tsx
-skeleton_hash: ccccd306281ccb7b
+source_path: C:\Users\alize\venthub-hvac\src\app\admin\users\page.tsx
+skeleton_hash: 40f2846223fe5a83
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: c68e4a7cc2b89422
   overview: 5b1a16aab3aba293
-  style_tokens: 08b1938b3f3a81d8
-generated_at: 2026-08-27T06:55:48Z
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-06-19T20:46:46Z
 ---
 
 ## Genel Bakış
@@ -3220,6 +3228,24 @@ Next.js App Router yapısında yer alan kullanıcı yönetimi sayfasının giri�
 ### Sayfa Bileşenleri
 Rota karşılama ve durum göstergesi sorumluluklarını üstlenen temel sayfa bileşenleridir.
 - Page, Loading
+
+---
+
+## Mimari Notlar
+
+**Bağımlılıklar:**
+- AdminUsersPage bileşeni (dinamik import ile yüklenen dış bağımlılık)
+
+**Mimari Önemi:**
+- `/admin/users` rotasının tekil giriş noktası
+- SSR yerine istemci tarafı dinamik yükleme stratejisi benimsemiş
+- Loading bileşeni ile Suspense uyumlu yükleme durumu sunuyor
+
+**Aksiyomlar:**
+- AdminUsersPage modülü mevcut değilse sayfa çalışmaz
+- Next.js App Router yapısı bu dosyayı tanımıyorsa rota erişilemez olur
+- Dynamic import mekanizması bozuksa ana içerik render edilmez
+- Page varsayılan export ile dışa aktarılmazsa Next.js bileşeni tanıyamaz
 
 ---
 
@@ -3283,6 +3309,13 @@ Bu modül, Next.js App Router yapısında tanımlanmış minimal bir sayfa giri�
 
 ---
 
+### [N2_NASIL] AST Pointer: admin/users/page.tsx::Page
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `<AdminUsersPage />` JSX componenti
+
+---
+
 ## NODE ID STANDARD
 
   file: src\app\admin\users\page.tsx
@@ -3306,7 +3339,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-admin-fg-muted`, `text-center`
+- **Renkler:** `text-center`, `text-slate-400`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -4107,8 +4140,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\ops-t165\src\app\[lang]\page.tsx
-skeleton_hash: fa13207f4aa45982
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx
+skeleton_hash: 61356cfd1e65f41e
 entity_hashes:
   func:RootPage: 8ad4b4fd1a8c654d
   func:generateMetadata: 507857aa921043d5
@@ -4116,7 +4149,7 @@ entity_hashes:
   func:getCachedHomeData: 3cdedf9dace01d81
   overview: 721a34f597b2222e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T06:53:29Z
+generated_at: 2026-08-24T11:50:02Z
 ---
 
 ## Genel Bakış
@@ -4227,6 +4260,59 @@ type Props = {
 - **params**: yok
 - **ic_degiskenler**: yok
 - **Dönüş**: `Array<{ lang: string }>` — `'tr'` ve `'en'` değerlerini içeren statik yol parametreleri dizisi
+
+---
+
+### [N2_NASIL] AST Pointer: src/app/[lang]/page.tsx::generateMetadata
+- **params**: `{ params }: Props` — `params` nesnesi `await` ile açılır
+- **ic_degiskenler**:
+  - `lang` — `await params` sonucu elde edilen dil kodu (`'tr'` veya `'en'`)
+  - `dict` — `lang === 'en'` ise `en`, değilse `tr` sözlük nesnesi
+  - `siteUrl` — `SITE_URL` sabiti; site kök URL'si
+  - `canonical` — `` `${siteUrl}/${lang}` `` ifadesiyle oluşturulan canonical URL
+- **Dönüş**: `Promise<Metadata>` — Next.js `Metadata` nesnesi; `title`, `description`, `alternates`, `openGraph`, `twitter`, `robots` alanlarını içerir
+
+---
+
+### [N3_NASIL] AST Pointer: src/app/[lang]/page.tsx::getCachedHomeData
+- **params**: `lang: string`, `tenantId: string`
+- **ic_degiskenler**:
+  - `catData` — `getCategories(supabaseStaticClient)` çağrısından dönen kategori verisi
+  - `prodData` — `getProducts(supabaseStaticClient, 12)` çağrısından dönen ürün verisi (12 ürün)
+  - `countRes` — `supabaseStaticClient.rpc('get_category_counts')` çağrısından dönen RPC sonucu
+  - `productCounts` — `Record<string, number>` tipinde; her kategori kimliğine karşılık ürün sayısını tutar
+  - `row` — `countRes.data ?? []` dizisi üzerinde `for...of` ile iterasyon yapılan her satır
+  - `row.category_id` — satırdaki kategori kimliği; `productCounts` sözlüğünün anahtarı olarak kullanılır
+  - `row.product_count` — satırdaki ürün sayısı; `?? 0` ile varsayılan değer atanır
+- **Dönüş**: `{ catData, prodData, productCounts }` — `unstable_cache` ile sarılmış; `['home-page-data', lang, tenantId]` cache anahtarı ve `[HOME_DATA_TAG, homeDataTag(tenantId)]` tag'leri ile `revalidate: 3600` süresi tanımlıdır
+
+---
+
+### [N4_NASIL] AST Pointer: src/app/[lang]/page.tsx::RootPage
+- **params**: `{ params }: Props` — `params` nesnesi `await` ile açılır
+- **ic_degiskenler**:
+  - `lang` — `await params` sonucu elde edilen dil kodu
+  - `dict` — `lang === 'en'` ise `en`, değilse `tr` sözlük nesnesi
+  - `tenantConfig` — `getTenantConfig()` çağrısından dönen yapılandırma nesnesi
+  - `tenantId` — `tenantConfig.id`; kiracı kimliği
+  - `categories` — `DomainCategory[]` tipinde; `try` bloğu içinde `toUICategoryList(data.catData)` ile atanır, hata durumunda boş dizi
+  - `products` — `Product[]` tipinde; `try` bloğu içinde `(data.prodData as Product[]) || []` ile atanır, hata durumunda boş dizi
+  - `productCounts` — `Record<string, number>` tipinde; `try` bloğu içinde `data.productCounts` ile atanır, hata durumunda boş nesne
+  - `data` — `getCachedHomeData(lang, tenantId)` çağrısından dönen önbelleklenmiş veri
+  - `error` — `catch` bloğunda yakalanan hata; `console.warn` ile loglanır
+  - `t` — `(key: string) => getDictValue(dict, key)` fonksiyonu; sözlükten değer okumak için çeviri yardımcısı
+  - `displayCategories` — `CategoryViewModelLite[]` tipinde; `categories` dizisinden filtrelenmiş, sıralanmış ve dönüştürülmüş kategori listesi
+  - `c` — `.filter` ve `.map` zincirindeki her kategori nesnesi
+  - `c.parent_id` — üst kategori kimliği; `!c.parent_id` ile üst kategorisi olmayanlar filtrelenir
+  - `c.id` — kategori kimliği; `productCounts[c.id]` ile ürün sayısı kontrol edilir
+  - `c.name` — kategori adı; `compareText` ile sıralamada kullanılır
+  - `c.description` — kategori açıklaması; boşsa `''` atanır
+  - `c.image_url` — kategori görsel URL'si
+  - `siteUrl` — `SITE_URL` sabiti
+  - `jsonLds` — `Array<object>` tipinde; `WebSite` ve `Organization` olmak üzere iki JSON-LD yapı verisi
+  - `ld` — `jsonLds.map` döngüsündeki her JSON-LD nesnesi
+  - `i` — `jsonLds.map` döngüsündeki indeks; `key` prop'u olarak kullanılır
+- **Dönüş**: JSX — `TenantProvider` ile sarılmış; `jsonLds` dizisi üzerinden `<script type="application/ld+json">` etiketleri ve `<HomePage>` bileşeni render edilir. `HomePage`'ye `initialCategories`, `rawCategories`, `initialProducts`, `dictionary`, `lang` prop'ları iletilir
 
 ---
 
@@ -6558,8 +6644,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\ops-t165\src\app\[lang]\category\[categorySlug]\page.tsx
-skeleton_hash: 6cae321984279fa6
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\category\[categorySlug]\page.tsx
+skeleton_hash: 61cc4647bd19285b
 entity_hashes:
   func:Page: 12913f4fb306f591
   func:generateMetadata: 191280413c5aca03
@@ -6568,7 +6654,7 @@ entity_hashes:
   func:parsePageParam: 478b1488bab262a0
   overview: e37d7f83fc7d9b78
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-08-27T06:52:59Z
+generated_at: 2026-08-15T06:32:39Z
 ---
 
 ## Genel Bakış
@@ -6718,6 +6804,108 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzalarında belirtilen par
 
 ---
 
+### [N2_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::parsePageParam
+- **params**: `raw: string | string[] | undefined`
+- **ic_degiskenler**:
+  - `value` — raw array ise `raw[0]`, değilse raw'un kendisi; parseInt'e girecek ham string
+  - `parsed` — `Number.parseInt(value ?? '1', 10)` sonucu; geçersizse `NaN` döner
+- **Dönüş**: `number` — geçerli ve >1 ise parsed değeri, aksi halde `1`
+
+---
+
+### [N3_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::generateStaticParams
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `data` — `supabase.from('categories').select('slug, metadata').eq('is_active', true)` sonucu; tüm aktif kategorilerin slug ve metadata alanları
+  - `categoriesList` — `data`'nın `(data || [])` ile garanti altına alınmış hali; tipi `{ slug: string | null, metadata: unknown }[]`
+- **Dönüş**: `Array<{ lang: 'tr' | 'en', categorySlug: string }>` — her kategori için TR ve EN olmak üzere 2 statik parametre
+
+---
+
+### [N4_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::generateStaticParams.flatMap_callback
+- **params**: `c` — `{ slug: string | null, metadata: unknown }` tipinde tek bir kategori satırı
+- **ic_degiskenler**: (yok)
+- **Kullanilan dis kaynaklar**:
+  - `getLocalizedCategorySlug(c, 'tr')` — kategorinin Türkçe lokalize slug'ını döner
+  - `getLocalizedCategorySlug(c, 'en')` — kategorinin İngilizce lokalize slug'ını döner
+- **Dönüş**: `Array<{ lang: 'tr' | 'en', categorySlug: string }>` — tek kategoriden üretilen 2 parametre çifti
+
+---
+
+### [N5_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::generateMetadata
+- **params**: `params: Promise<{ categorySlug: string, lang: string }>`
+- **ic_degiskenler**:
+  - `categorySlug` — `await params` destructuring'inden gelen kategori slug'ı (URL parçası)
+  - `lang` — `await params` destructuring'inden gelen dil kodu (`'tr'` veya `'en'`)
+  - `category` — `getCachedCategoryData(categorySlug)` ile cache'lenmiş kategori verisi; bulunamazsa `null`
+  - `dict` — aktif dilin sözlük nesnesi; `lang === 'en'` ise `en`, değilse `tr`
+  - `t` — `(key: string) => getDictValue(dict, key)` fonksiyonu; sözlükten çeviri değeri çeker
+  - `displayName` — `getCategoryDisplayName(category, t)` ile çözülen kategorinin görnen adı
+  - `desc` — SEO meta description; dile göre farklı şablon ile üretilir
+  - `trUrl` — Türkçe canonical URL; `${SITE_URL}/tr/category/${getLocalizedCategorySlug(category, 'tr')}`
+  - `enUrl` — İngilizce canonical URL; `${SITE_URL}/en/category/${getLocalizedCategorySlug(category, 'en')}`
+  - `canonicalUrl` — aktif dile göre `enUrl` veya `trUrl`
+- **Kullanilan dis sabitler**: `SITE_URL`
+- **Yan etkiler**: `preloadCategory(categorySlug)` — veriyi erken prefetch/prime eder
+- **Dönüş**: `Metadata` nesnesi — `title`, `description`, `alternates` (canonical, hreflang), `openGraph`
+
+---
+
+### [N6_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::Page
+- **params**: `params: Promise<{ categorySlug: string, lang: string }>`, `searchParams: Promise<{ page?: string | string[] }>`
+- **ic_degiskenler**:
+  - `categorySlug` — `await params` destructuring'inden gelen URL slug'ı
+  - `lang` — `await params` destructuring'inden gelen dil kodu
+  - `pageParam` — `await searchParams` destructuring'inden gelen sayfa parametresi (`string | string[] | undefined`)
+  - `page` — `parsePageParam(pageParam)` sonucu; geçerli pozitif integer veya `1`
+  - `category` — `getCachedCategoryData(categorySlug)` ile çekilmiş kategori nesnesi; `null` olabilir
+  - `expectedSlug` — `getLocalizedCategorySlug(category, lang)` ile hesaplanan dil-specific slug; yönlendirme kontrolü için
+  - `dict` — aktif dilin sözlük nesnesi (`en` veya `tr`)
+  - `t` — `(key: string) => getDictValue(dict, key)` fonksiyonu
+  - `displayName` — `getCategoryDisplayName(category, t)` sonucu; `null/empty` ise `categorySlug` fallback kullanılır
+  - `families` — `FamilyListItem[]`; varsayılan boş dizi; kategori varsa `familiesPage.items` ile doldurulur
+  - `total` — `number`; kategori varsa `familiesPage.total` ile doldurulur
+  - `subCategories` — `DomainCategory[]`; varsayılan boş dizi; kategori varsa filtrelenmiş ve map edilmiş alt kategoriler
+  - `tenantId` — `await getTenantConfig()` sonucunun `.id` alanı; cache key ve API çağrıları için
+  - `subsData` — `supabase.from('categories')...eq('parent_id', category.id)...` sonucunun `data` alanı; ham alt kategori satırları
+  - `countsData` — `supabase.rpc('get_category_counts')` sonucunun `data` alanı; `{ category_id, product_count }` satırları
+  - `countMap` — `Map<string, number>`; `countsData`'dan doldurulan `category_id → product_count` eşleme haritası
+  - `categoriesArray` — `subsData`'nın `(subsData || []) as DbCategory[]` ile tip güvenliği sağlanmış hali
+  - `categoryIds` — `[category.id, ...subCategories.map(s => s.id)]`; ana kategori + tüm geçerli alt kategori ID'leri
+  - `familiesPage` — `getCachedFamilies(lang, tenantId, category.id, page, categoryIds)` sonucu; `{ items, total }`
+  - `jsonLd` — `buildCategoryJsonLd({...})` ile üretilen JSON-LD nesnesi; SEO structured data
+- **Kullanilan dis sabitler**: `SITE_URL`, `PAGE_SIZE`
+- **Kullanilan dis fonksiyonlar**: `preloadCategory`, `getCachedCategoryData`, `getLocalizedCategorySlug`, `getCategoryDisplayName`, `getDictValue`, `getTenantConfig`, `mapDatabaseCategoryToDomain`, `getCachedFamilies`, `buildCategoryJsonLd`, `assertNoUuid`, `permanentRedirect`
+- **Yan etkiler**: `preloadCategory(categorySlug)` prefetch; `permanentRedirect(...)` 308 yönlendirme (koşullu)
+- **Dönüş**: JSX — `<script type="application/ld+json">` + `<React.Suspense>` içinde `<PageComponent>`
+
+---
+
+### [N7_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::Page.mapDatabaseCategoryToDomain_callback
+- **params**: `s` — `DbCategory` tipinde ham veritabanı satırı (tüm category alanlarını içerir)
+- **ic_degiskenler**: (yok — inline spread ve map)
+- **Alan dönüşümleri**:
+  - `s.name` → `name: s.name || ''` (null/undefined koruması)
+  - `s.menu_label` → `menu_label: s.menu_label as string | null`
+  - `s.marketing_title` → `marketing_title: s.marketing_title as string | null`
+  - `s.translation_key` → `translation_key: s.translation_key as string | null`
+  - `s.description` → `description: s.description as string | null`
+  - `s.metadata` → `metadata: s.metadata as CategoryMetadata | null`
+  - `s.authority_content` → `authority_content: s.authority_content as AuthorityContent | null`
+  - Diğer alanlar (`id`, `parent_id`, `slug`, `is_active`, `sort_order`, `level`, `image_url`, `seo_title`, `seo_desc`, `created_at`, `updated_at`, `display_mode`, `is_featured`) spread ile doğrudan kopyalanır
+- **Dönüş**: `DomainCategory` — `mapDatabaseCategoryToDomain()` ile dönüştürülmüş kategori nesnesi
+
+---
+
+### [N8_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::getCategoryData
+- **params**: `id: string` — kategori UUID'si
+- **ic_degiskenler**: (yok)
+- **Kullanilan dis kaynaklar**: `supabase` (static client)
+- **Sorgu**: `supabase.from('categories').select('*').eq('id', id).single()`
+- **Dönüş**: `Promise<SupabaseResponse>` — tek kategori satırı; bulunamazsa `data: null`
+
+---
+
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -6727,8 +6915,8 @@ graph TD
     page_tsx__generateStaticParams["generateStaticParams"]
     page_tsx__getCachedFamilies["getCachedFamilies"]
     page_tsx__parsePageParam["parsePageParam"]
-    page_tsx__Page --> page_tsx__getCachedFamilies
     page_tsx__Page --> page_tsx__parsePageParam
+    page_tsx__Page --> page_tsx__getCachedFamilies
 ```
 
 ## NODE ID STANDARD
@@ -61948,8 +62136,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\ops-t165\src\lib\services\purchasing.service.ts
-skeleton_hash: 269552d1bf645d35
+source_path: C:\Users\alize\venthub-hvac\src\lib\services\purchasing.service.ts
+skeleton_hash: 8475a4e916232174
 entity_hashes:
   func:createPurchaseOrder: 97040d46ea3b6919
   func:createSupplier: 99bf4fe1fd2ef785
@@ -61962,7 +62150,7 @@ entity_hashes:
   func:setPurchaseOrderStatus: c384754a09944d6e
   func:updateSupplier: c7d283c93e01b4aa
   overview: f4e8cc60f7907c8c
-generated_at: 2026-08-27T07:05:24Z
+generated_at: 2026-08-25T08:45:32Z
 ---
 
 ## Genel Bakış
@@ -62152,6 +62340,120 @@ type GoodsReceiptRow = Database['public']['Tables']['goods_receipts']['Row']
   - `data` — sorgu sonucu dönen satırlar dizisi
   - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
 - **Dönüş**: `Promise<SupplierRow[]>` — tedarikçi satırları dizisi; veri yoksa boş dizi döner
+
+---
+
+### [N2_NASIL] AST Pointer: purchasing.service.ts::createSupplier
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `input` — SupplierInsert tipinde, oluşturulacak tedarikçi verisi
+- **ic_degiskenler**:
+  - `data` — insert işlemi sonrası dönen tekil tedarikçi satırı
+  - `error` — insert sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<SupplierRow>` — oluşturulan tedarikçi satırı; ayrıca `logAdminAction` ile `suppliers` tablosuna yapılan INSERT işlemi audit kaydı oluşturulur
+
+---
+
+### [N3_NASIL] AST Pointer: purchasing.service.ts::updateSupplier
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `id` — string tipinde, güncellenecek tedarikçinin birincil anahtarı
+  - `patch` — SupplierUpdate tipinde, güncellenecek alanlar
+- **ic_degiskenler**:
+  - `data` — update işlemi sonrası dönen tekil tedarikçi satırı
+  - `error` — update sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<SupplierRow>` — güncellenen tedarikçi satırı; ayrıca `logAdminAction` ile `suppliers` tablosuna yapılan UPDATE işlemi audit kaydı oluşturulur
+
+---
+
+### [N4_NASIL] AST Pointer: purchasing.service.ts::listPurchaseOrders
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `opts` — `{ status?: string }` tipinde, opsiyonel; varsayılan değeri boş nesne `{}`
+- **ic_degiskenler**:
+  - `q` — supabase sorgu nesnesi; önce `purchase_orders` tablosundan tüm alanları seçer ve `created_at` alanına göre azalan sıralar; `opts.status` tanımlı ise `status` alanına eşitlik filtresi uygulanır
+  - `data` — sorgu sonucu dönen satınalma siparişi satırları dizisi
+  - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<PurchaseOrderRow[]>` — satınalma siparişi satırları dizisi; veri yoksa boş dizi döner
+
+---
+
+### [N5_NASIL] AST Pointer: purchasing.service.ts::getPurchaseOrder
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `id` — string tipinde, getirilecek satınalma siparişinin birincil anahtarı
+- **ic_degiskenler**:
+  - `data` — sorgu sonucu dönen satınalma siparişi satırı (ilişkili kalemlerle birlikte) veya null
+  - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<PurchaseOrderWithItems | null>` — satınalma siparişi ve ilişkili kalemler; bulunamazsa null döner
+
+---
+
+### [N6_NASIL] AST Pointer: purchasing.service.ts::createPurchaseOrder
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `input` — PurchaseOrderInput tipinde, oluşturulacak sipariş verisi (satırlar dahil)
+- **ic_degiskenler**:
+  - `po` — `purchase_orders` tablosuna insert sonrası dönen tekil sipariş satırı
+  - `poError` — sipariş insert sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+  - `items` — `purchase_order_items` tablosuna insert sonrası dönen kalem satırları dizisi
+  - `itemsError` — kalem insert sırasında oluşan hata nesnesi; varsa önce oluşturulan sipariş silinir (rollback), sonra throw ile fırlatılır
+  - `l` — `input.lines` dizisinin her elemanı; map içinde kullanılır; `l.product_id`, `l.qty_ordered`, `l.unit_cost`, `l.currency`, `l.tax_rate` alanlarına erişilir
+- **Dönüş**: `Promise<PurchaseOrderWithItems>` — oluşturulan sipariş ve kalemleri; ayrıca `logAdminAction` ile `purchase_orders` tablosuna yapılan INSERT işlemi audit kaydı oluşturulur
+
+---
+
+### [N7_NASIL] AST Pointer: purchasing.service.ts::setPurchaseOrderStatus
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `poId` — string tipinde, durumu değiştirilecek siparişin birincil anahtarı
+  - `next` — string tipinde, hedef durum değeri
+  - `opts` — `{ closeNote?: string }` tipinde, opsiyonel; varsayılan değeri boş nesne `{}`
+- **ic_degiskenler**:
+  - `current` — mevcut sipariş satırı (`id` ve `status` alanları seçilir); bulunamazsa hata fırlatılır
+  - `readError` — mevcut siparişi okuma sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+  - `patch` — güncelleme nesnesi; `status` ve `updated_at` alanlarını içerir; `opts.closeNote` tanımlı ise `close_note` alanı da eklenir
+  - `data` — update işlemi sonrası dönen tekil sipariş satırı
+  - `error` — update sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<PurchaseOrderRow>` — güncellenen sipariş satırı; ayrıca `logAdminAction` ile `purchase_orders` tablosuna yapılan UPDATE işlemi audit kaydı oluşturulur. Geçiş `isManualPoTransitionAllowed` ile doğrulanır; `partially_received` → `closed` geçişinde `closeNote` zorunludur
+
+---
+
+### [N8_NASIL] AST Pointer: purchasing.service.ts::parseGoodsReceiptResult
+- **params**:
+  - `data` — `Json | null` tipinde, RPC yanıt verisi
+- **ic_degiskenler**:
+  - `data.success` — boolean olarak kontrol edilir; `true` ise `success: true` atanır
+  - `data.error` — string olarak kontrol edilir; string ise `error` alanına atanır
+  - `data.receipt_id` — string olarak kontrol edilir; string ise `receipt_id` alanına atanır
+  - `data.processed_count` — number olarak kontrol edilir; number ise `processed_count` alanına atanır
+  - `data.received_units` — number olarak kontrol edilir; number ise `received_units` alanına atanır
+  - `data.po_status` — string olarak kontrol edilir; string ise `po_status` alanına atanır
+- **Dönüş**: `GoodsReceiptResult` — `success`, `error`, `receipt_id`, `processed_count`, `received_units`, `po_status` alanlarını içeren nesne; `data` null veya geçersiz tipte ise `{ success: false, error: 'unexpected RPC response shape' }` döner
+
+---
+
+### [N9_NASIL] AST Pointer: purchasing.service.ts::processGoodsReceipt
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `args` — `{ poId: string; documentNo: string; lines: GoodsReceiptLineInput[]; note?: string }` tipinde, mal kabul işlemi girdileri
+- **ic_degiskenler**:
+  - `data` — `process_goods_receipt` RPC çağrısı sonucu dönen veri
+  - `error` — RPC çağrısı sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+  - `result` — `parseGoodsReceiptResult` fonksiyonu ile ayrıştırılmış mal kabul sonucu nesnesi
+  - `l` — `args.lines` dizisinin her elemanı; map içinde kullanılır; `l.product_id`, `l.qty`, `l.unit_cost` alanlarına erişilir
+- **Dönüş**: `Promise<GoodsReceiptResult>` — mal kabul işlemi sonucu; `result.success` true ise `logAdminAction` ile `goods_receipts` tablosuna audit kaydı oluşturulur
+
+---
+
+### [N10_NASIL] AST Pointer: purchasing.service.ts::listGoodsReceipts
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+  - `poId` — string tipinde, mal kabul kayıtlarının filtreleneceği satınalma siparişinin birincil anahtarı
+- **ic_degiskenler**:
+  - `data` — sorgu sonucu dönen mal kabul satırları dizisi
+  - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `Promise<GoodsReceiptRow[]>` — mal kabul satırları dizisi; veri yoksa boş dizi döner
 
 ---
 

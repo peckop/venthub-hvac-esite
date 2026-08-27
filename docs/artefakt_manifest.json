@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "4d20b141546c9841f3490b93517db377695aa310326e4d3915c082788d6306cf",
+      "icerik_sha256": "4d78927ef4424b40908dedd4d404c19f2430160865944cc360c8d2a88d371da0",
       "kaynak": {
         "dosya_sayisi": 98,
         "dosyalar": {
@@ -108,7 +108,7 @@
         "izlenmeyen": [],
         "ozet": "13aca04c7a35256389064f212cccbf532b90b069fc40fe29bd8e467c6c22e036"
       },
-      "kaynak_commit": "3e670cfa369df2f8e63d70c41c093cf03ec09828",
+      "kaynak_commit": "e0eb33bde5fe9ebb14653e4a0412e04bb1d56546",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +125,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "90fdb204e76b5c440ebd49ec59d51c38ae2d4dbe1f7fb91e96734d7d0b924942",
+      "icerik_sha256": "1f2387d988306f47cd05b96b000941045a9d5d34a63a21986b24641406ae88d5",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -195,7 +195,7 @@
         "izlenmeyen": [],
         "ozet": "45dd8fe63707cfc89e2d61bf73acdd1a21bd51f64772520f983eeb5c5d9516c6"
       },
-      "kaynak_commit": "3e670cfa369df2f8e63d70c41c093cf03ec09828",
+      "kaynak_commit": "e0eb33bde5fe9ebb14653e4a0412e04bb1d56546",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +204,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "bd9e658c2a071ec53f44ba80cce2bd1968d15bc1997b65749e3010edd2582ec4",
+      "icerik_sha256": "54f17572aeaecdeccd64f589e1a2308056ad6a311ab82325ed83cbd0debb383e",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +251,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "3e670cfa369df2f8e63d70c41c093cf03ec09828",
+      "kaynak_commit": "e0eb33bde5fe9ebb14653e4a0412e04bb1d56546",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,7 +259,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "1a22ad4b6b0fd1bc7142b3b3e158751db305e5ff83ddb246e1d11055187802c6",
+      "icerik_sha256": "0a0d1fe1e191f4a1f0163e7fdf4ed123d5f7576d31c18a9c8dd2c06d91af591a",
       "kaynak": {
         "dosya_sayisi": 655,
         "dosyalar": {
@@ -295,7 +295,7 @@
           "src/app/[lang]/brands/page.md": "8e389ceeecfc2c2ef4802b0bce8c4d04ac1219f0",
           "src/app/[lang]/cart/page.md": "ffa2c1dfae461e67caeddff27cd8dcb5b17dd10a",
           "src/app/[lang]/category/[categorySlug]/[subCategorySlug]/page.md": "bc7d5a2fb58034a2f127c967593c5971df1bd0e1",
-          "src/app/[lang]/category/[categorySlug]/page.md": "73cbffafd207204a6f37da795eb54a66a046c6f3",
+          "src/app/[lang]/category/[categorySlug]/page.md": "e4a7a11c3df19ab6ef4f00044049b4bf713cf9be",
           "src/app/[lang]/checkout/page.md": "09edfaab5ff6efd27f2cca67e4a709e40ace747c",
           "src/app/[lang]/contact/page.md": "296c8148e0cf51895148b7a7f529062c52faa9ad",
           "src/app/[lang]/destek/garanti-servis/page.md": "e8e6fbc5042b24ed3a1cbc0d4c0dd031bd44c212",
@@ -315,7 +315,7 @@
           "src/app/[lang]/legal/kvkk/page.md": "2ff000c58d8a2da63700de9eec2642aa56ae191d",
           "src/app/[lang]/legal/mesafeli-satis-sozlesmesi/page.md": "5d921cb558298f4d58d2c5f832832e16f7167bdc",
           "src/app/[lang]/legal/on-bilgilendirme-formu/page.md": "3a6a323118aca9c95cb58ebf14d893a665a05500",
-          "src/app/[lang]/page.md": "73c9c73d3f2e33e917a1148719fb1d41ad9adaa9",
+          "src/app/[lang]/page.md": "674287187f5fad0dab345c6532e212e8735bfc42",
           "src/app/[lang]/payment-success/page.md": "4e9db4cacf8177d00a1eef9709164a1ce187f2ed",
           "src/app/[lang]/products/[slug]/page.md": "2319eacb805af8ac87f99d2dbc7e001f1e7d002c",
           "src/app/[lang]/products/page.md": "ca4744f0c7f48f44eebccc8d04433035eacc5b8e",
@@ -332,7 +332,7 @@
           "src/app/admin/inventory/settings/page.md": "a096d67bfeb56038195244d23b4778a1feeec8e0",
           "src/app/admin/invoices/page.md": "db1e0d70e9172581afaed619ef4d7d43b1b7b11a",
           "src/app/admin/layout.md": "96003aec3621d3aebf37837f4124208b3794ab8c",
-          "src/app/admin/logistics/page.md": "476050c0d5e861660730a33a2a0962f2d5dd07ea",
+          "src/app/admin/logistics/page.md": "899a9e2651b2f7361ee06f2d8e25e5a1e3fd817d",
           "src/app/admin/movements/page.md": "ddb5329ccc38e4113ec071f02a0080ca9aaa132f",
           "src/app/admin/orders/page.md": "b5b2bc0843e25f083183ec52f934d7ffc9bc0508",
           "src/app/admin/page.md": "004487d5c1b1dcc7b0ad39d0eacf5a335c49c761",
@@ -345,7 +345,7 @@
           "src/app/admin/quotes/page.md": "832adb3f9bbd5b7df946f2ca8882459221b788f4",
           "src/app/admin/returns/page.md": "3e914157db05a5f9f4b0d70289b94db5a2b5d8af",
           "src/app/admin/settings/page.md": "cb79329f2ae223b593ff9038874bbe851f329a6d",
-          "src/app/admin/users/page.md": "f5d0d3df682b29af975fdaf6662eb3e92800ea7d",
+          "src/app/admin/users/page.md": "84fa77a5555cd72a4fc1d9ba3ea65a2b8016ace9",
           "src/app/admin/webhook-events/page.md": "792d5ec6959b37d7aba579247af244ff8eb274dd",
           "src/app/api/health/route.md": "7c2461b23ad68c52e0cc671c92a2ca21266a201f",
           "src/app/api/webhook/supabase/route.md": "7b376e6ddbfe9405c7d31747e5c4b31fa4836b9e",
@@ -732,7 +732,7 @@
           "src/lib/services/product.columns.md": "df16b2d3aa352798f35134924791e9489fca383c",
           "src/lib/services/product.service.md": "0a95406346be100276899cb1a939ed023e4588c9",
           "src/lib/services/project.service.md": "77399dfc70d5c888a9810d5badeae98dbb8a78ef",
-          "src/lib/services/purchasing.service.md": "964bcd259f99b8389cfd53ef011a0455c43a7358",
+          "src/lib/services/purchasing.service.md": "fb2cefaa5d0a18d09e77240938045634829e9aaa",
           "src/lib/services/quoteService.md": "986a34d15825b4764b5e58e720fd7f140dbff8b4",
           "src/lib/services/registry.md": "ceadaaf87f38f69f47063c87eef8e27a0c8a5d4b",
           "src/lib/services/wizard.service.md": "5930394bfa216d0d36b054d39cbb0333e7dbbe79",
@@ -920,9 +920,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "f684d5d0e98ee04d0e9be949c4ca2c4f3b5c75bbd037bd0654aee2db38b15e01"
+        "ozet": "a24346cc8309321b6855e6acc66935584ce92a0cef597af72ee2f302cb1c7b3f"
       },
-      "kaynak_commit": "3e670cfa369df2f8e63d70c41c093cf03ec09828",
+      "kaynak_commit": "e0eb33bde5fe9ebb14653e4a0412e04bb1d56546",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -931,7 +931,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-27T08:10:33.284865+00:00",
-  "kaynak_commit": "3e670cfa369df2f8e63d70c41c093cf03ec09828",
+  "derlendi": "2026-08-27T08:16:08.560171+00:00",
+  "kaynak_commit": "e0eb33bde5fe9ebb14653e4a0412e04bb1d56546",
   "surum": 1
 }
