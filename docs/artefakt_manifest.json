@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "5ce2559dea54a09cefc617378715f5359241aa77763debdd3d51a73977c0d322",
+      "icerik_sha256": "096a71d5cf4728204cb83d016a0928034bfcca80cf93241689bf2f5ecb0654b6",
       "kaynak": {
         "dosya_sayisi": 98,
         "dosyalar": {
@@ -108,7 +108,7 @@
         "izlenmeyen": [],
         "ozet": "13aca04c7a35256389064f212cccbf532b90b069fc40fe29bd8e467c6c22e036"
       },
-      "kaynak_commit": "a52dfd1a34e7075039ff115bf5579ecf68720a29",
+      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +125,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "156085b27591072c944172ad6adffdf4cd712bff87641a304f3e2f128b2a1e1b",
+      "icerik_sha256": "0f7bc51183deba6b7009d0d8328c484f8ecab459dd691963c08b6a67a3bc6caa",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -145,7 +145,7 @@
           "docs/standards/auth-account-standard.md": "06fac0bcc55d7406119c54b54c670a02285e0707",
           "docs/standards/canonical-url-standard.md": "8f85ad5b532688183d8e88f672e1fd18d6c5f993",
           "docs/standards/catalog-depth-standard.md": "cfff5f43ad4065f7dbd94ea95ff7302e42edaf37",
-          "docs/standards/catalog-ingestion-standard.md": "9e01ae21e1a09b4fa46e8d5db29c7c343963094d",
+          "docs/standards/catalog-ingestion-standard.md": "5945516cea60f70c676ab321858839fbdcdb0cec",
           "docs/standards/category-taxonomy-standard.md": "a3709f534676c877eea3cca93bd2b5de5fd848dd",
           "docs/standards/checkout-payment-standard.md": "2838d0999cefa00548d83057930a56b81dd4b9d2",
           "docs/standards/ci-runner-install-standard.md": "dc37f4c5e08a22d03f34ff82c87775de858ffba4",
@@ -193,9 +193,9 @@
           "docs/standards/work-tracking-ssot-standard.md": "6a00f894fbc818c9e927e2ced965936c6162475e"
         },
         "izlenmeyen": [],
-        "ozet": "8c3d978353e77a431ecb3c7341a6f314d0e29a94d7e504552485a8e37bb99f56"
+        "ozet": "e35f56e68357b6d4b50f6817406f18d3dd8762d03ac6b03ecdae01ba6af21697"
       },
-      "kaynak_commit": "a52dfd1a34e7075039ff115bf5579ecf68720a29",
+      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +204,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "23aca686e26cb6ce003f3bb1860d48fe59d4e33b7ff918ce198ba1e65c1fd0f3",
+      "icerik_sha256": "7ae84cf4da671a5a79b3000da897854006a9958c9116e7fbcdddac6af4d2f4f9",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +251,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "a52dfd1a34e7075039ff115bf5579ecf68720a29",
+      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,7 +259,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "c3472f2d5b3b0f2d67e46f5aa533ebae0d0937ced2182c767b1ef11a5c7994e1",
+      "icerik_sha256": "800ba301b36c3a06fef39b0aa4e1451d1698aa0237e01e57aa0f29653c5ca50f",
       "kaynak": {
         "dosya_sayisi": 655,
         "dosyalar": {
@@ -534,7 +534,7 @@
           "src/components/products/3d/types/AirPurifierModel.md": "1948569bbf4eaaa14784ee40f515ce7e80a98d71",
           "src/components/products/3d/types/AxialFanModel.md": "4e0acc4ac52a348c6c92352b6103444b9dc630c9",
           "src/components/products/3d/types/CentrifugalFanModel.md": "b776628bed9c000a389cfbefb928198e311885c8",
-          "src/components/products/3d/types/DehumidifierModel.md": "05acf72d65f248c02a76aac7067b900027d3172f",
+          "src/components/products/3d/types/DehumidifierModel.md": "c12554435736a44bd0dd1bca08d0b4f0cf806fb8",
           "src/components/products/3d/types/DomesticFanModel.md": "ca4a343a5f689115116d64d7f87448544e0eb758",
           "src/components/products/3d/types/DuctFanModel.md": "b3aa70e0646520c4bd9125868e938a45ceaa6184",
           "src/components/products/3d/types/ExproofFanModel.md": "d1f53c8fe2c6d1cad57bbe192532fd51950b2e74",
@@ -547,7 +547,7 @@
           "src/components/products/3d/types/RoundDuctFanModel.md": "f26b6a1addd3557a548364e3c7216295c6b39d00",
           "src/components/products/3d/types/SilentChannelFanModel.md": "07f48ca296423845516721ba78fc9086d54ea026",
           "src/components/products/3d/types/SmokeExhaustFanModel.md": "8d496ad2e7e38270b01f162acda568624595696e",
-          "src/components/products/3d/types/SnailFanModel.md": "431917dcde123418bdbe4cc5515e1b805039e623",
+          "src/components/products/3d/types/SnailFanModel.md": "4ac06912d015642534a59a6ff9f7b76a66b76989",
           "src/components/products/3d/types/SpeedControlModel.md": "4b6f963d20436d7c4fd2c369fd679718533c87f5",
           "src/components/products/3d/types/WallMountedCompactFanModel.md": "001dce4418204cf6eba897356aad4a9bcf2daaa7",
           "src/components/products/AddToProjectModal.md": "893c1ff1b35ed0c67d37735678e091d1d9e716a7",
@@ -920,9 +920,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "85368f911da518be4cd99fd9c6bfadf748d6488e9c0a056053f625d520430e70"
+        "ozet": "4b52ff14fd29fdea186bee29a2179d77eea9d1d510fc68922482001a8ca94064"
       },
-      "kaynak_commit": "a52dfd1a34e7075039ff115bf5579ecf68720a29",
+      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -931,7 +931,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-27T12:53:19.165890+00:00",
-  "kaynak_commit": "a52dfd1a34e7075039ff115bf5579ecf68720a29",
+  "derlendi": "2026-08-27T13:08:48.126888+00:00",
+  "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
   "surum": 1
 }
