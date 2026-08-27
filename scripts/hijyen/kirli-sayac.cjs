@@ -165,6 +165,42 @@ for (const wt of secili) {
 }
 
 /**
+ * BİLEŞİM — "bu sayı NEDEN bu kadar?" sorusunun cevabı, ve ÇOĞU ZAMAN ASIL CEVAP BUDUR.
+ *
+ * NİÇİN VAR (2026-08-27, aynı gün ÜÇ KEZ elle hesapladım): Recep "hâlâ 521?" diye sordu.
+ * Doğru cevap toplam değil bileşimdi — 521'in 384'ü companion `.md` churn'ü, 120'si
+ * `.archive` EOL fantomu, 16'sı `system_tree`. Yani sayı "birikmiş çöp" değil, kancaların
+ * SÜREKLİ ÜRETTİĞİ churn'dü ve elle temizlikle düşmezdi. Bu ayrımı görmeden verilen her
+ * cevap ("temizledim", "az kaldı") yanıltıcı oluyordu.
+ *
+ * ⚠ VE BİR DÜZELTME DAHA, aynı gün ölçüldü: bir sınıfın onarımı master'a inince bu sayı
+ * HEMEN düşmez. Rozet AĞAÇLARIN TOPLAMIDIR; her ağaç kendi tabanıyla durur ve düzeltmeyi
+ * ancak tabanını tazeleyince alır. #871 (.archive onarımı) indi, sayı 521'den 524'e ÇIKTI —
+ * çünkü fantomu taşıyan üç ağaç sırasıyla 3, 73 ve 193 commit geride kalmıştı. Etkinin
+ * göründüğü yer merge ANI değil, ADOPSİYON EĞRİSİdir. Bu yüzden bileşim raporu sınıfın
+ * yanında "kaç ağaçta ve o ağaçlar ne kadar geride" bilgisini de basar.
+ */
+function bilesimHesapla(satirlar) {
+  const sinifSay = { md: 0, arsivEol: 0, systemTree: 0, diger: 0 }
+  const sinifAgac = { md: new Set(), arsivEol: new Set(), systemTree: new Set(), diger: new Set() }
+  for (const s of satirlar) {
+    if (s.erisilemedi) continue
+    const ad = path.basename(s.agac)
+    for (const satir of s.satirlar) {
+      const yol = satir.slice(3).trim()
+      let k
+      if (yol.includes('.archive/legacy_superpowers_artifacts')) k = 'arsivEol'
+      else if (yol.endsWith('docs/system_tree.md')) k = 'systemTree'
+      else if (yol.endsWith('.md')) k = 'md'
+      else k = 'diger'
+      sinifSay[k]++
+      sinifAgac[k].add(ad)
+    }
+  }
+  return { sinifSay, sinifAgac }
+}
+
+/**
  * TREND. `--only` verildiğinde toplam karşılaştırması KASTEN yapılmaz: taban tüm ağaçların
  * fotoğrafıdır, süzülmüş bir toplamla kıyaslamak "170 düştü" gibi sahte bir kazanç basardı.
  * Ağaç başı deltalar süzgeçle de anlamlı olduğu için onlar korunur.
@@ -314,6 +350,49 @@ if (JSON_CIKTI) {
     console.log('    ⭐Toplama degil BUYUYEN satirina bak: toplam ters gideni gizler.')
     console.log('    Tabani tazelemek TRENDI SIFIRLAR; bilerek yap: --taban-yaz')
   }
+  const { sinifSay, sinifAgac } = bilesimHesapla(satirlar)
+  const gerideKalan = (adlar) =>
+    [...adlar]
+      .map((ad) => {
+        const s = satirlar.find((x) => !x.erisilemedi && path.basename(x.agac) === ad)
+        if (!s) return null
+        try {
+          return { ad, geride: Number(git(['rev-list', '--count', 'HEAD..origin/master'], s.agac).trim()) }
+        } catch {
+          return { ad, geride: null }
+        }
+      })
+      .filter(Boolean)
+      .sort((a, b) => (b.geride || 0) - (a.geride || 0))
+
+  console.log('  == BILESIM — "bu sayi NEDEN bu kadar" (cogu zaman ASIL cevap budur) ==')
+  const sinifAd = {
+    md: 'companion .md churn (kancalar her commit te URETIR)',
+    arsivEol: '.archive EOL fantomu',
+    systemTree: 'docs/system_tree.md (agac-yerel, commit EDILEMEZ)',
+    diger: 'diger',
+  }
+  for (const k of ['md', 'arsivEol', 'systemTree', 'diger']) {
+    if (!sinifSay[k]) continue
+    const pay = Math.round((sinifSay[k] / toplamRozet) * 100)
+    console.log(
+      '    ' + String(sinifSay[k]).padStart(4) + ' (%' + String(pay).padStart(2) + ')  ' +
+        sinifAd[k] + '  — ' + sinifAgac[k].size + ' agacta'
+    )
+    if (k === 'arsivEol' || k === 'systemTree') {
+      const gk = gerideKalan(sinifAgac[k]).filter((x) => x.geride === null || x.geride > 0)
+      if (gk.length) {
+        console.log(
+          '           ⚠ onarim master da olsa bu agaclar ALMAMIS (taban geride): ' +
+            gk.map((x) => x.ad + ' ' + (x.geride === null ? '?' : '-' + x.geride)).join(' · ')
+        )
+      }
+    }
+  }
+  console.log('    ⭐Bir sinifin onarimi master a inince bu sayi HEMEN dusmez: rozet AGAC')
+  console.log('      TOPLAMIDIR, her agac duzeltmeyi TABANINI TAZELEYINCE alir. Etkinin')
+  console.log('      gorundugu yer merge ANI degil ADOPSIYON EGRISIDIR (08-27 olculdu:')
+  console.log('      #871 indi, sayi 521 -> 524 CIKTI; uc agac 3/73/193 commit gerideydi).')
   console.log('')
   console.log('  Recep in rozetiyle karsilastirilacak sayi ROZET sutunudur.')
   console.log('  Rozet YALNIZ VS Code ta ACIK olan kokleri toplar; burada TUM agaclar var.')
