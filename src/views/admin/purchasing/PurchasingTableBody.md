@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\purchasing\PurchasingTableBody.tsx
-skeleton_hash: 950726f00b86c4aa
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\purchasing\PurchasingTableBody.tsx
+skeleton_hash: 44b43d79278c80bf
 entity_hashes:
   func:PurchasingTableBody: 10eccfe22d93ec03
   func:purchasingFetcher: 4f3c5d644184676d
   overview: e454d7750c0fb8eb
   style_tokens: fbefabc584f01f12
-generated_at: 2026-08-25T08:48:21Z
+generated_at: 2026-08-27T07:32:37Z
 ---
 
 ## Genel Bakış

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\AdminLogisticsPage.tsx
-skeleton_hash: a9cdcc5a65c56d6c
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminLogisticsPage.tsx
+skeleton_hash: 646f2359382abc14
 entity_hashes:
   func:AdminLogisticsPage: d344f4347f39c68a
   overview: dbf543cfd48e7219
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-08-25T07:29:41Z
+generated_at: 2026-08-27T07:17:37Z
 ---
 
 ## Genel Bakış
@@ -75,8 +75,8 @@ Bu modül için özel aksiyom tanımlanamamıştır.
 
 ## NODE ID STANDARD
 
-  file: AdminLogisticsPage.tsx
-  function: AdminLogisticsPage.tsx::AdminLogisticsPage
+  file: src\views\admin\AdminLogisticsPage.tsx
+  function: src\views\admin\AdminLogisticsPage.tsx::AdminLogisticsPage
 
 ---
 

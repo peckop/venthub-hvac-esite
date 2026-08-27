@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx
-skeleton_hash: 3cfbdf84abb3aa03
+source_path: C:\tmp\venthub-wt-t131\src\views\checkout\AddressFormModal.tsx
+skeleton_hash: c667b84f7fa31aff
 entity_hashes:
   func:AddressFormModal: 22dcfc4163aec036
   func:handleSave: 51987ec8847e1d2c
   overview: d6c90c44e9a5f962
   style_tokens: 4fa16246087d5121
-generated_at: 2026-06-19T20:50:27Z
+generated_at: 2026-08-27T07:32:41Z
 ---
 
 ## Genel Bakış

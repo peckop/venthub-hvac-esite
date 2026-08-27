@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\checkout\injectCheckoutForm.ts
-skeleton_hash: 3680d879d09d2c4a
+source_path: C:\tmp\venthub-wt-t131\src\views\checkout\injectCheckoutForm.ts
+skeleton_hash: eea1f00557d6ad1d
 entity_hashes:
   func:hasRenderedSurface: f652f4301252e2a3
   func:injectCheckoutForm: 4d386bb5d9f526cf
   func:isScript: 8553be32b25e4861
   func:reviveScript: 1209031a2aeda03e
   overview: 6ba63efad2b3f3df
-generated_at: 2026-08-25T08:45:55Z
+generated_at: 2026-08-27T07:33:48Z
 ---
 
 ## Genel Bakış
@@ -80,39 +80,6 @@ Enjeksiyon sonucu — çağıran temizliği ve ölçümü buradan yapar.
 
 ---
 
-### [N2_NASIL] AST Pointer: injectCheckoutForm.ts::reviveScript
-- **params**: `doc: Document`, `original: HTMLScriptElement`
-- **ic_degiskenler**:
-  - `revived` — `doc.createElement('script')` ile oluşturulan yeni script elementi; original'ın öznitelikleri ve içeriği buna kopyalanır
-  - `attr` — `Array.from(original.attributes)` üzerinden for-of döngüsüyle tek tek gezilen her bir öznitelik nesnesi
-  - `attr.name` — kopyalanacak özniteliğin adı; `revived.setAttribute(attr.name, attr.value)` çağrısında birinci argüman olarak kullanılır
-  - `attr.value` — kopyalanacak özniteliğin değeri; `revived.setAttribute(attr.name, attr.value)` çağrısında ikinci argüman olarak kullanılır
-- **Dönüş**: `HTMLScriptElement`
-
----
-
-### [N3_NASIL] AST Pointer: injectCheckoutForm.ts::injectCheckoutForm
-- **params**: `container: HTMLElement`, `html: string`
-- **ic_degiskenler**:
-  - `doc` — `container.ownerDocument` erişimiyle elde edilen belge nesnesi; template ve script oluşturma işlemlerinde kullanılır
-  - `cleanup` — `() => { container.replaceChildren() }` şeklinde tanımlanan ok fonksiyonu; container'ın tüm alt düğümlerini temizler, dönüş değerinde `{ scriptCount, cleanup }` içinde döndürülür
-  - `template` — `doc.createElement('template')` ile oluşturulan template elementi; `template.innerHTML = html` ile ayrıştırma yapılır
-  - `scriptCount` — `0` başlatılan sayaç; her canlandırılan script için `+= 1` artırılır, dönüş değerinde `{ scriptCount, cleanup }` içinde döndürülür
-  - `node` — `Array.from(template.content.childNodes)` üzerinden for-of döngüsüyle tek tek gezilen her bir alt düğüm
-  - `element` — `node.nodeType === 1` koşulu sağlandığında `node as Element` ile cast edilen element düğümü; `element.querySelectorAll('script')` ile iç içe scriptler aranır
-  - `nested` — `element.querySelectorAll('script')` ile bulunan her bir script elementi; `nested.replaceWith(reviveScript(doc, nested))` ile canlandırılır
-- **Dönüş**: `InjectionResult` — `{ scriptCount, cleanup }` yapısında nesne
-
----
-
-### [N4_NASIL] AST Pointer: injectCheckoutForm.ts::hasRenderedSurface
-- **params**: `container: HTMLElement`
-- **ic_degiskenler**:
-  - `el` — `Array.from(container.children)` üzerinden `.some()` geri çağrısında tek tek işlenen her bir alt element; `el.tagName.toLowerCase() !== 'script'` koşuluyla script olmayan bir element olup olmadığı denetlenir
-- **Dönüş**: `boolean`
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -121,8 +88,8 @@ graph TD
     injectCheckoutForm_ts__injectCheckoutForm["injectCheckoutForm"]
     injectCheckoutForm_ts__isScript["isScript"]
     injectCheckoutForm_ts__reviveScript["reviveScript"]
-    injectCheckoutForm_ts__injectCheckoutForm --> injectCheckoutForm_ts__reviveScript
     injectCheckoutForm_ts__injectCheckoutForm --> injectCheckoutForm_ts__isScript
+    injectCheckoutForm_ts__injectCheckoutForm --> injectCheckoutForm_ts__reviveScript
 ```
 
 ## NODE ID STANDARD

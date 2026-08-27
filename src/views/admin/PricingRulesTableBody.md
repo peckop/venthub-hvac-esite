@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\PricingRulesTableBody.tsx
-skeleton_hash: 1fe3d8c902971a7f
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\PricingRulesTableBody.tsx
+skeleton_hash: 59f550bbd6da8eb6
 entity_hashes:
   func:PricingRulesTableBody: 812c9bf97543d2da
   func:deriveStatus: 4a2473aac1292e82
@@ -11,7 +11,7 @@ entity_hashes:
   func:pricingRulesFetcher: ee3ea2c96d78ae7c
   overview: 422e93914eecac4d
   style_tokens: a7db7d920cdcbe94
-generated_at: 2026-08-25T07:30:58Z
+generated_at: 2026-08-27T07:30:17Z
 ---
 
 ## Genel Bakış
@@ -181,51 +181,6 @@ type RuleStatus = 'active' | 'scheduled' | 'expired'
 
 ---
 
-### [N2_NASIL] AST Pointer: PricingRulesTableBody.tsx::deriveStatus
-- **params**: `rule` (PricingRuleRow) — fiyat kuralı satırı, `today` (string) — YYYY-MMAA-DD formatında günün tarihi
-- **ic_degiskenler**: yok
-- **Dönüş**: RuleStatus — `rule.valid_to` null değil ve `today`'den küçükse `'expired'`; `rule.valid_from` null değil ve `today`'den büyükse `'scheduled'`; aksi halde `'active'`
-
----
-
-### [N3_NASIL] AST Pointer: PricingRulesTableBody.tsx::pricingRulesFetcher
-- **params**: `supabase` (SupabaseClient<Database>) — Supabase istemcisi, `_params` (FetchParams) — kullanılmayan sayfalama/arama parametreleri
-- **ic_degiskenler**:
-  - `rules` — `listPricingRules(supabase)` ile çekilen ham fiyat kuralı dizisi
-  - `brands` — `supabase.from('brands').select('id, name')` sorgusundan dönen `data` alanı; marka listesi
-  - `categories` — `supabase.from('categories').select('id, name')` sorgusundan dönen `data` alanı; kategori listesi
-  - `productIds` — `rules` dizisindeki `product_id` alanlarından null olmayan benzersiz değerlerin Set'ten diziye dönüştürülmüş hali
-  - `products` — `productIds` boş değilse `supabase.from('products').select('id, name, sku').in('id', productIds)` sorgusunun `data`'sı, boşsa boş dizi
-  - `brandName` — `brands` dizisinden `[b.id, b.name]` çiftleriyle oluşturulan Map; marka ID → marka adı eşlemesi
-  - `categoryName` — `categories` dizisinden `[c.id, c.name]` çiftleriyle oluşturulan Map; kategori ID → kategori adı eşlemesi
-  - `productName` — `products` dizisinden `[p.id, '${p.name} (${p.sku})']` çiftleriyle oluşturulan Map; ürün ID → "ürün adı (SKU)" eşlemesi
-  - `today` — `new Date().toISOString().slice(0, 10)` ile elde edilen YYYY-MM-DD formatındaki günün tarihi
-  - `rows` — `rules.map((rule) => { ... })` ile her kuraldan türetilen RuleRow dizisi; her satırda `scopeKey` (SCOPE_KEYS[rule.scope] ?? 'global'), `targetName` (scope'a göre brandName/categoryName/productName'den çekilen hedef ad), `method`, `supported` (method 'cost_plus' veya 'fixed' ise true), `marginPct` (rule.margin_pct), `fixedPrice` (rule.fixed_price), `vatInclusive` (rule.price_is_vat_inclusive), `priority`, `validFrom` (rule.valid_from), `validTo` (rule.valid_to), `status` (deriveStatus(rule, today) sonucu), `productId` (rule.product_id), `raw` (ham rule nesnesi) alanları bulunur
-- **Dönüş**: Promise<FetchResult<RuleRow>> — `{ rows, totalMatched: rows.length }` nesnesi
-
----
-
-### [N4_NASIL] AST Pointer: PricingRulesTableBody.tsx::PricingRulesTableBody
-- **params**: yok
-- **ic_degiskenler**:
-  - `scopeCount` — Map<string, number>; `table.allRows` üzerinde döngüyle her satırın `scopeKey`'ine göre sayaç tutar
-  - `methodCount` — Map<string, number>; `table.allRows` üzerinde döngüyle her satırın `method`'una göre sayaç tutar
-  - `statusCount` — Map<string, number>; `table.allRows` üzerinde döngüyle her satırın `status`'una göre sayaç tutar
-  - `scopeOptions` — ScopeKey[] sabiti: `['variant', 'product', 'brand', 'category', 'global']`
-  - `methodOptions` — string[] sabiti: `['cost_plus', 'fixed', 'percent_off_list']`
-  - `statusOptions` — RuleStatus[] sabiti: `['active', 'scheduled', 'expired']`
-  - `openCreate` — useCallback; `setEditing(null)` ve `setModalOpen(true)` çağırarak yeni kural oluşturma modalını açar
-  - `openEdit` — useCallback; parametre olarak `row` (RuleRow) alır, `setEditing(row.raw)` ve `setModalOpen(true)` çağırarak düzenleme modalını açar
-  - `removeRule` — useCallback(async); parametre olarak `row` (RuleRow) alır; `confirm()` ile silme onayı ister, onaylanırsa `mutateWithAudit(supabaseBrowserClient, ...)` ile `deletePricingRule(supabaseBrowserClient, row.id)` çağırır, başarılıysa `toast.success` ve `table.reload()`, hata olursa `AdminPermissionError` kontrolüyle `toast.error` gösterir
-  - `bulkDelete` — useCallback(async); `table.selection.selectedIds`'i alır, boşsa döner; `confirm()` ile toplu silme onayı ister, onaylanırsa `mutateWithAudit(supabaseBrowserClient, ...)` ile `deletePricingRules(supabaseBrowserClient, ids)` çağırır, başarılıysa `table.selection.clear()`, `toast.success` ve `table.reload()`, hata olursa `toast.error` gösterir
-  - `columns` — useCallback; tablo sütun tanımlarını döndüren fonksiyon; her sütun için `key`, `header`, `sortable`, `align`, `hideable`, `cell` özellikleri tanımlar; `cell` render fonksiyonları `methodLabel`, `formatNumber`, `marginPctToCoefficient`, `formatCurrency`, `formatDate` yardımcılarını ve `t` çeviri fonksiyonunu kullanır
-  - `facets` — useCallback; filtre facet tanımlarını döndüren fonksiyon; `scopeKey`, `method`, `status` için facet nesneleri oluşturur, her birinde `options` dizisi (value, label, count) bulunur
-  - `bulkActions` — useCallback; toplu işlem tanımlarını döndüren fonksiyon; `delete` anahtarıyla `bulkDelete`'i çağıran `onRun`'lı bir nesne döndürür
-  - `exportToCsv` — useCallback(async); `table.fetchAllForExport()` ile tüm satırları çeker, CSV sütun başlıkları (`id`, `scope`, `target`, `method`, `margin_pct`, `fixed_price`, `priority`, `valid_from`, `valid_to`) ve satır verilerini oluşturur, BOM ekleyerek Blob oluşturur, `URL.createObjectURL` ile indirme bağlantısı yaratır, `<a>` elementiyle `pricing-rules.csv` dosyasını indirir, ardından URL'yi temizler
-- **Dönüş**: React.FC — fiyatlandırma kuralları tablosu bileşeni
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -234,17 +189,17 @@ graph TD
     PricingRulesTableBody_tsx__deriveStatus["deriveStatus"]
     PricingRulesTableBody_tsx__methodLabel["methodLabel"]
     PricingRulesTableBody_tsx__pricingRulesFetcher["pricingRulesFetcher"]
-    PricingRulesTableBody_tsx__pricingRulesFetcher --> PricingRulesTableBody_tsx__deriveStatus
     PricingRulesTableBody_tsx__PricingRulesTableBody --> PricingRulesTableBody_tsx__methodLabel
+    PricingRulesTableBody_tsx__pricingRulesFetcher --> PricingRulesTableBody_tsx__deriveStatus
 ```
 
 ## NODE ID STANDARD
 
-  file: PricingRulesTableBody.tsx
-  function: PricingRulesTableBody.tsx::methodLabel
-  function: PricingRulesTableBody.tsx::deriveStatus
-  function: PricingRulesTableBody.tsx::pricingRulesFetcher
-  function: PricingRulesTableBody.tsx::PricingRulesTableBody
+  file: src\views\admin\PricingRulesTableBody.tsx
+  function: src\views\admin\PricingRulesTableBody.tsx::methodLabel
+  function: src\views\admin\PricingRulesTableBody.tsx::deriveStatus
+  function: src\views\admin\PricingRulesTableBody.tsx::pricingRulesFetcher
+  function: src\views\admin\PricingRulesTableBody.tsx::PricingRulesTableBody
 
 ---
 

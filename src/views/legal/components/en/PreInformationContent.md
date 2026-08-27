@@ -2,38 +2,44 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\components\en\PreInformationContent.tsx
-skeleton_hash: 1e751f03f4af479b
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\components\en\PreInformationContent.tsx
+skeleton_hash: 027cc9e937e701aa
 entity_hashes:
-  func:PreInformationContentEn: 44e34e2e52c333aa
-  overview: e15ed899a460c834
-  style_tokens: 5c1748e6c54f7f63
-generated_at: 2026-06-16T11:55:32Z
+  func:PreInformationContentEn: 6f74928625bb225d
+  overview: 6e28e54b80fc7693
+  style_tokens: 4878090f8d777cca
+generated_at: 2026-08-27T07:37:54Z
 ---
 
 ## Genel Bakış
 
-Bu modül, VentHub platformunun yasal bilgilendirme sayfası için İngilizce içerik sunan tek bileşenli bir React modülüdür. Kullanıcılara hizmet koşulları, gizlilik politikası veya benzeri yasal metinleri okunabilir formatta sunmayı amaçlar. "en" klasöründe yer alması, modülün çok dilli yapıda olduğunu ve her dil için ayrı bileşenler bulunduğunu gösterir.
+Bu modül, VentHub platformunun yasal ön bilgilendirme sayfası için İngilizce içerik sunan sunumsal bir React bileşenidir. Statik JSX içeriği döndürür; durum yönetimi, API çağrısı veya koşullu mantık içermez. "en" klasöründe konumlanması, modülün çok dilli yapıda olduğunu ve her dil için ayrı bileşenler bulunduğunu gösterir.
 
 ## Fonksiyon Grupları
 
 ### Yasal İçerik Bileşeni
-PreInformation sayfasının İngilizce versiyonunu render eden üst düzey React bileşeni. Sadece dil prop'u alarak ilgili yasal metinleri ekrana yansıtır.
+PreInformation sayfasının İngilizce versiyonunu render eden üst düzey React bileşeni. `lang` prop'u alır; ancak bileşen gövdesinde yalnızca İngilizce statik içerik döndürür.
 - PreInformationContentEn
+
+## Bağımlılıklar ve Mimari Notlar
+
+**İç bağımlılıklar:** Bilinmiyor — verilen kaynakta başka modüllere yönelik import bilgisi yer almıyor.
+
+**Dış bağımlılıklar:** React kütüphanesi (bileşen yapısı gereği). Ayrıca bileşenin düzgün biçimlendirilmiş görünmesi için ilgili CSS modül dosyasının (`PreInformationContent.module.css` veya karşılıklı import edilen stil dosyası) mevcut olması gerekir; aksi halde içerik okunaksız görünür.
+
+**Dinamik/lazy yükleme:** Bilinmiyor — verilen kaynakta bu yönde bir bilgi yer almıyor.
+
+**Mimari önem:** Bu bileşen, düzenleyici uyumluluk açısından kritik bir role sahiptir. İlan yayınlama akışı gibi zorunlu yasal ön bilgilendirme gerektiren sayfalarda çağrılmaması durumunda kullanıcıya yasal metin ulaşmaz ve uyumluluk riski doğar.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, statik yasal bilgilendirme içeriği gösteren sunumsal bir React bileşenidir. Mimari varsayımlar minimal düzeydedir.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan çıkarım yapılabilir. Gövdedeki mantıksal bağımlılıklar bilinmediği için kapsamlı aksiyom üretilemez.
 
-[Aksiyom 1]: Eğer bileşenin bulunduğu sayfa kapsamında gerekli CSS stilleri (`src/views/legal/components/en/PreInformationContent.module.css` veya karşılıklı import edilen stil dosyası) yoksa, içerik düzgün biçimlendirilmemiş ve okunaksız görünür.
+[Aksiyom 1]: Eğer `lang` parametresi yoksa, bileşen hangi dili kullanacağını belirleyemez — ancak parametre kullanımının gövdede nasıl işlendiği bilinmiyor.
 
-[Aksiyom 2]: Eğer `lang` prop'u bir üst bileşen tarafından sağlanmazsa, bileşen React tarafında bir hata fırlatır; ancak mevcut gövdede `lang` prop'u kullanılmadığı için işlevsel etkisi bilinmiyor — bileşen yalnızca İngilizce statik içerik döndürür.
-
-[Aksiyom 3]: Eğer bileşen, yasal metnin gösterilmesi gereken bir sayfada (örn: ilan yayınlama akışı) çağrılmazsa, kullanıcıya zorunlu yasal ön bilgilendirme ulaşmaz ve düzenleyici uyumluluk riski doğar — bu, işlevsel değil süreçsel bir varsayımdır.
-
-> **Not:** Bu bileşen tamamen statik JSX içeriği döndüren sunumsal bir bileşendir; durum yönetimi, API çağrısı, koşullu mantık veya hesaplama içermez. Dolayısıyla fonksiyon gövdesinden türetilebilecek ek mimari varsayım bulunmamaktadır.
+[Aksiyom 2]: Eğer döndürülen değer geçerli bir React bileşeni değilse, render süreci başarısız olur — ancak bu bileşenin hangi alt bileşenleri veya içeriği kullandığı bilinmiyor.
 
 ---
 
@@ -41,42 +47,61 @@ Bu modül, statik yasal bilgilendirme içeriği gösteren sunumsal bir React bil
 
 ### PreInformationContentEn
 
-**Ne yapar**: İngilizce dilinde ön bilgilendirme içeriğini render eden bir React fonksiyonel bileşenidir. Kullanıcıya yasal bilgilendirme metinlerini İngilizce olarak sunar.
+**Ne yapar**: İngilizce dilinde ön bilgilendirme içeriğini görüntüleyen bir React bileşenidir. `legal` (yasal) görünüm katmanı altında yer alan bu bileşen, yasal ön bilgilendirme metninin İngilizce versiyonunu kullanıcıya sunar.
 
-**Nasıl yapar**: Fonksiyonel bir React bileşeni olarak tanımlanmıştır. `React.FC<{ lang: string }>` generic tipi ile dil parametresi alan bir fonksiyonel bileşen döndürür. Bileşen, `lang` prop'unu alarak İngilizce dil içeriğini koşullu olarak göstermek veya dil seçimine göre içerik render etmek için kullanılır. Dosya yolundaki `en` uzantısı, bu bileşenin İngilizce versiyon olduğunu belirtir.
+**Nasıl yapar**: Bileşen, aldığı `lang` parametresini kullanarak dil bazlı içerik gösterimi gerçekleştirir. Fonksiyon adındaki `En` soneki, bu bileşenin İngilizce içeriğe özel olduğunu gösterir. Bileşen, `React.FC<{ lang: string }>` tipinde bir fonksiyonel bileşen döndürür. Kaynak dosya yapısına göre `views/legal/components/en/` dizininde konumlanmıştır; bu da bileşenin yasal metinlerin İngilizce alt kategorisinde yer aldığını gösterir.
 
 **Parametreler**:
-- `lang`: `string` — Bileşenin hangi dilde içerik göstereceğini belirten dil kodu parametresidir. İngilizce içerik gösterimi için kullanılır.
+- lang: string — Bileşenin çalışacağı dili belirten parametre. Bileşen bu değeri alarak dil uygunluğunu sağlar.
 
-**Dönüş**: `React.FC<{ lang: string }>` — Dil parametresi alan, React fonksiyonel bileşeni tipinde dönüş sağlar. Bileşen, verilen lang prop değerine göre İngilizce ön bilgilendirme içeriğini JSX olarak render eder.
+**Dönüş**: `React.FC<{ lang: string }>` — `lang` parametresi alan bir React fonksiyonel bileşeni döndürür. Döndürülen bileşen, dışarıdan çağrıldığında kendi `lang` prop'unu bekler.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: @/config/legal::legalConfig
+- import: @/config/legal::legalConfigEn
+- import: @/utils/routes::Routes
+- import: @/utils/routes::localizedHref
+- import: next/link::Link
 - import: react::React
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\legal\components\en\PreInformationContent.tsx::PreInformationContentEn
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  (Değişken yok — fonksiyon gövdesinde herhangi bir değişken tanımı yapılmamıştır)
-- **Dönüş**: JSX element döndürür (React.FC<{ lang: string }> tipinde, ancak `lang` prop'u fonksiyon gövdesinde kullanılmamıştır)
-
-**Not:** Fonksiyon gövdesinde `legalConfig` import'u kullanılarak şu özelliklere erişilmiştir:
-- `legalConfig.sellerTitle` — Satıcı unvanı
-- `legalConfig.sellerAddress` — Satıcı adresi
-- `legalConfig.sellerEmail` — Satıcı e-posta adresi
-- `legalConfig.sellerPhone` — Satıcı telefon numarası
-- `legalConfig.taxOffice` — Vergi dairesi
-- `legalConfig.taxNumber` — Vergi numarası
-- `legalConfig.deliveryTime` — Teslimat süresi
-- `legalConfig.shippingFee` — Kargo ücreti
-- `legalConfig.returnAddress` — İade adresi
-- `legalConfig.lastUpdated` — Son güncelleme tarihi
+### [N1_NASIL] AST Pointer: src/views/legal/components/en/PreInformationContent.tsx::PreInformationContentEn
+- **params**:
+  - `lang` — dil kodu; `localizedHref` fonksiyonuna iletilerek Link bileşenlerinin href'lerinin yerelleştirilmesinde kullanılır
+- **ic_degiskenler**:
+  - `legalConfig` — `@/config/legal` dosyasından import edilen `legalConfigEn` nesnesi; satıcı bilgileri, kargo, garanti, iade gibi yasal metin verilerini taşır. Aşağıdaki alanlara erişilir:
+    - `legalConfig.sellerTitle` — satıcı ticari unvanı
+    - `legalConfig.sellerAddress` — satıcı adresi
+    - `legalConfig.sellerPhone` — satıcı telefon numarası
+    - `legalConfig.sellerEmail` — satıcı e-posta adresi
+    - `legalConfig.kepAddress` — kayıtlı elektronik posta (KEP) adresi
+    - `legalConfig.mersis` — MERSIS numarası
+    - `legalConfig.tradeRegistryNo` — ticaret sicil numarası
+    - `legalConfig.chamberOfCommerce` — ticaret odası bilgisi
+    - `legalConfig.taxOffice` — vergi dairesi adı
+    - `legalConfig.taxNumber` — vergi numarası
+    - `legalConfig.etbisNo` — ETBIS kayıt numarası
+    - `legalConfig.websiteUrl` — web sitesi URL'si
+    - `legalConfig.shippingFee` — kargo/teslimat ücreti
+    - `legalConfig.deliveryTime` — tahmini kargoya verilme süresi
+    - `legalConfig.cargoCompanies` — anlaşmalı kargo firması
+    - `legalConfig.returnAddress` — iade gönderim adresi
+    - `legalConfig.returnShippingBearer` — iade kargo masrafını üstlenen taraf
+    - `legalConfig.refundTime` — iade ödeme süresi
+    - `legalConfig.warrantyPeriod` — garanti süresi
+    - `legalConfig.usefulLife` — mevzuata göre faydalı ömür
+    - `legalConfig.afterSalesService` — yetkili servis / satış sonrası iletişim
+    - `legalConfig.lastUpdated` — formun son güncelleme tarihi
+  - `localizedHref` — `@/utils/routes` dosyasından import edilen fonksiyon; Routes nesnesinden alınan yolu ve `lang` parametresini alarak yerelleştirilmiş href üretir
+  - `Routes` — `@/utils/routes` dosyasından import edilen rota tanımları nesnesi; şu metotlara erişilir:
+    - `Routes.legal.kvkk()` — KVKK Aydınlatma Metni sayfasının yolunu döndürür
+    - `Routes.legal.gizlilik()` — Gizlilik Politikası sayfasının yolunu döndürür
+  - `Link` — `next/link` paketinden import edilen bileşen; KVKK ve gizlilik sayfalarına yönlendirme bağlantıları oluşturmak için kullanılır
+- **Dönüş**: `React.FC` — Fragment (`<>...</>`) içinde 15 adet `<section>` elementi döndüren JSX ağacı; İngilizce Ön Bilgi Formu'nun tüm bölümlerini (satıcı bilgisi, şikayet, malın özellikleri, fiyat, ödeme, teslimat, cayma hakkı, iade masrafları, cayma istisnaları, cayma formu, garanti, uyuşmazlık çözümü, sözleşme saklama, kişisel veriler, yürürlük tarihi) içerir
 
 ---
 
@@ -101,7 +126,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-industrial-gray`, `text-xl`
-- **Layout:** (yok)
+- **Renkler:** `bg-gray-50`, `border-light-gray`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`
+- **Layout:** `p-4`
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `mt-2`, `pl-6`, `space-y-1`
+- **Yardımcı Sınıflar:** `border`, `font-semibold`, `list-disc`, `mb-2`, `mb-3`, `mt-2`, `pl-6`, `rounded-lg`, `space-y-1`, `underline`

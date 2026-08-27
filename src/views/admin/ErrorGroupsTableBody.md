@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\ErrorGroupsTableBody.tsx
-skeleton_hash: 272f1168b83e2820
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\ErrorGroupsTableBody.tsx
+skeleton_hash: 166b7bbf2348f0b6
 entity_hashes:
   func:ErrorGroupExpandedRow: 73dbe783ba9bebc7
   func:ErrorGroupsTableBody: 1655c4825361675b
@@ -12,8 +12,8 @@ entity_hashes:
   func:topN: 42c201e999c284f3
   func:userLabel: efb0992ed65ed686
   overview: d3c36da9ae173c2b
-  style_tokens: 834c1e16e5eac9b8
-generated_at: 2026-06-19T20:49:53Z
+  style_tokens: 1b401d875fd492d3
+generated_at: 2026-08-27T07:24:34Z
 ---
 
 ## Genel Bakış
@@ -263,9 +263,9 @@ graph TD
     ErrorGroupsTableBody_tsx__isErrorStatus["isErrorStatus"]
     ErrorGroupsTableBody_tsx__topN["topN"]
     ErrorGroupsTableBody_tsx__userLabel["userLabel"]
-    ErrorGroupsTableBody_tsx__ErrorGroupsTableBody --> ErrorGroupsTableBody_tsx__isErrorStatus
     ErrorGroupsTableBody_tsx__ErrorGroupExpandedRow --> ErrorGroupsTableBody_tsx__topN
     ErrorGroupsTableBody_tsx__ErrorGroupsTableBody --> ErrorGroupsTableBody_tsx__userLabel
+    ErrorGroupsTableBody_tsx__ErrorGroupsTableBody --> ErrorGroupsTableBody_tsx__isErrorStatus
 ```
 
 ## NODE ID STANDARD
@@ -299,7 +299,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500/10`, `bg-cyan-500/10`, `bg-rose-500/10`, `bg-sky-500/10`, `bg-surface-deep`, `bg-surface-deep/40`, `border-b`, `border-cyan-500/20`, `border-white/5`, `last:border-b-0`, `text-amber-300/80`, `text-amber-400`, `text-cyan-400`, `text-rose-400`, `text-sky-400`
-- **Layout:** `!h-10`, `!h-8`, `block`, `custom-scrollbar`, `flex`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `gap-6`, `grid`, `grid-cols-1`, `h-7`, `inline-flex`, `items-center`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-bg`, `bg-admin-danger-weak`, `bg-admin-surface`, `bg-admin-warning-weak`, `bg-surface-deep/40`, `border-admin-accent/30`, `border-admin-border`, `border-b`, `last:border-b-0`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-warning`
+- **Layout:** `!h-10`, `!h-8`, `block`, `custom-scrollbar`, `flex`, `flex-col`, `flex-wrap`, `gap-1`, `gap-2`, `gap-3`, `gap-6`, `grid`, `grid-cols-1`, `h-7`, `inline-flex`
 - **Varyant/Responsive:** `:`, `last:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `!pl-3`, `!pl-4`, `!py-1`, `!text-xs`, `$`, `${adminButtonPrimaryClass`, `${adminInputClass`, `${adminSelectClass`, `${glassStrongClass`, `:`, `===`, `border`, `break-all`, `break-words`, `cursor-pointer`
+- **Yardımcı Sınıflar:** `!pl-3`, `!pl-4`, `!py-1`, `!text-xs`, `$`, `${adminButtonPrimaryClass`, `${adminInputClass`, `${adminSelectClass`, `:`, `===`, `border`, `break-all`, `break-words`, `cursor-pointer`, `error`

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx
-skeleton_hash: 8328433def0f9477
+source_path: C:\tmp\venthub-wt-t131\src\views\account\AccountReturnsPage.tsx
+skeleton_hash: b560fe5d14e9d886
 entity_hashes:
   func:AccountReturnsPage: 0eaf9a077da6bd84
   overview: 283031ebf7f41a9c
   style_tokens: d5328287ff24abb4
-generated_at: 2026-06-19T20:49:09Z
+generated_at: 2026-08-27T07:10:12Z
 ---
 
 ## Genel Bakış
@@ -30,10 +30,6 @@ Bu modül için fonksiyon gövdesi verilmediğinden, sadece fonksiyon imzasında
 [Aksiyom 2]: Eğer `AccountReturnsPage` çağrıldığında bileşen içi bağımlılıklar (hooks, context providers) sağlanmamışsa, React hata fırlatır.
 
 [Aksiyom 3]: Fonksiyon imzasında parametre yoktur (`def AccountReturnsPage()`); eğer bileşen prop girdisi bekliyorsa, bu imza ile tutarsızlık oluşur.
-
----
-
-**Not:** Fonksiyon gövdesi paylaşılmadığı için, Supabase bağlantısı, kimlik doğrulama, iade veri modeli veya form yönetimi gibi detaylı aksiyomlar türetilmemiştir. Fonksiyon gövdesi sağlandığında kapsamlı aksiyom üretimi yapılabilir.
 
 ---
 

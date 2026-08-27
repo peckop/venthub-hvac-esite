@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\legal\PrivacyPolicyPage.tsx
-skeleton_hash: fd756394efd70a1a
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\PrivacyPolicyPage.tsx
+skeleton_hash: 648f3880244600f4
 entity_hashes:
   func:PrivacyPolicyPage: c82dbca369d2aee7
   func:t: f826c9f8cb44ae84
   overview: 280fbf878bf55295
   style_tokens: 06829f9d93bd4397
-generated_at: 2026-08-25T07:47:51Z
+generated_at: 2026-08-27T07:35:38Z
 ---
 
 ## Genel Bakış
@@ -82,9 +82,9 @@ Bu modül, gizlilik politikası sayfasını belirli bir dilde sunmak için `lang
 
 ## NODE ID STANDARD
 
-  file: PrivacyPolicyPage.tsx
-  function: PrivacyPolicyPage.tsx::PrivacyPolicyPage
-  function: PrivacyPolicyPage.tsx::t
+  file: src\views\legal\PrivacyPolicyPage.tsx
+  function: src\views\legal\PrivacyPolicyPage.tsx::PrivacyPolicyPage
+  function: src\views\legal\PrivacyPolicyPage.tsx::t
 
 ---
 

@@ -2,36 +2,43 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\PreInformationPage.tsx
-skeleton_hash: cbb37270fce40d75
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\PreInformationPage.tsx
+skeleton_hash: d16b7efe3e99f5d5
 entity_hashes:
   func:PreInformationPage: 6c512329d936b02b
-  func:t: 82e524c2f79ad389
-  overview: a88c970a8f2231d2
+  func:t: 2bb1be01cf9cad91
+  overview: 69f1477845d0e283
   style_tokens: 06829f9d93bd4397
-generated_at: 2026-06-19T20:50:49Z
+generated_at: 2026-08-27T07:35:37Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıya yasal ön bilgilendirme içeriğini sunan tek sayfalık bir React bileşenini tanımlar. Modül, çok dilli destek sağlayarak dil bazlı metinlerin gösterilmesini yönetir ve basit bir bilgilendirme sayfası sunar.
+Bu modül, VentHub HVAC uygulamasının yasal ön bilgilendirme sayfasını sunan tek sayfalık bir React bileşeni tanımlar. Çok dilli destek sağlayarak `lang` prop'una bağlı olarak uygun sözlük nesnesini seçer ve dil bazlı çeviri fonksiyonu aracılığıyla metinlerin gösterilmesini yönetir. Sayfa başlığı, sarı uyarı kutusu ve dile göre içerik bileşeni (`PreInformationContentEn` veya `PreInformationContentTr`) gibi alt bileşenleri render eder.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Ana React bileşenini oluşturarak sayfanın tamamını render eder.
+Ana React bileşenini oluşturarak sayfanın tamamını render eder. `lang` prop'unu alır, sözlük nesnesini seçer ve çeviri fonksiyonunu tanımlar.
 - PreInformationPage
 
 ### Yardımcı Fonksiyonlar
-Çeviri ve metin erişimi için kullanılan yardımcı fonksiyonları barındırır.
+Çeviri anahtarlarını kullanarak dile uygun metin erişimi sağlayan yardımcı fonksiyonu barındırır. `PreInformationPage` bileşeni içinde tanımlanır ve kullanılır.
 - t
+
+## Bağımlılıklar ve Mimari Notlar
+- **İç bağımlılık**: `t` fonksiyonu, `PreInformationPage` bileşeni içinde tanımlanır ve bileşenin render sürecinde kullanılır.
+- **Dış bağımlılık**: Dil bazlı içerik bileşenleri (`PreInformationContentEn`, `PreInformationContentTr`) harici modüllerden içe aktarılır.
+- **Dinamik/lazy yükleme**: Kaynakta bu yönde bir bilgi bulunmamaktadır.
+- **Mimari önem**: Bu modül, yasal uyumluluk gereği ön bilgilendirme içeriğini sunan statik bir sayfa bileşenidir; uygulamanın yasal sayfaları arasında yer alır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için, fonksiyon gövdesi paylaşılmadığından, yalnızca imza bilgisinden çıkarılabilecek minimum varsayımlar aşağıdadır.
 
-[Aksiyom 1]: Eğer `lang` prop'u bileşene iletilmezse, bileşen düzgün render edilemeyebilir veya varsayılan/boş bir dil değeri ile çalışabilir.
+[Aksiyom 1]: Eğer `lang` prop'u sağlanmazsa, bileşen hangi dile ait metinleri göstereceğini bilemez ve dil bazlı içerik gösterimi gerçekleşmez.
 
-[Aksiyom 2]: Eğer `t(key: string)` çeviri fonksiyonu çalışması için gerekli çeviri sözlüğü/JSON dosyası yüklenmemişse veya `lang` ile uyumlu çeviri anahtarı (`key`) bulunamazsa, çevrilmemiş ham anahtar dizesi veya boş bir değer dönebilir.
+[Aksiyom 2]: Eğer `t` fonksiyonuna geçerli bir `key` değeri sağlanmazsa, ilgili çeviri metnine erişilemez.
+
+[Aksiyom 3]: Eğer `lang` prop'u ile uyumlu çeviri verileri mevcut değilse, `t` fonksiyonu istenen metni döndüremez.
 
 ---
 
@@ -58,6 +65,7 @@ Bu modül için, fonksiyon gövdesi paylaşılmadığından, yalnızca imza bilg
 - import: ../../i18n/getDictValue::getDictValue
 - import: ./components/en/PreInformationContent::PreInformationContentEn
 - import: ./components/tr/PreInformationContent::PreInformationContentTr
+- import: @/config/legal::isLegalContentReady
 - import: react::React
 
 ---
@@ -65,18 +73,16 @@ Bu modül için, fonksiyon gövdesi paylaşılmadığından, yalnızca imza bilg
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/PreInformationPage.tsx::PreInformationPage
-- **params**: `({ lang })` — dil kodu ('en' veya 'tr') taşıyan React props nesnesi
+- **params**: `lang` (string)
 - **ic_degiskenler**:
-  - `dict` — `lang === 'en'` koşuluna göre `en` ya da `tr` sözlük nesnesini seçer; çeviri anahtarlarının çözülmesinde kullanılır
-  - `t` — `getDictValue(dict, key)` partial uygulamasıyla oluşturulan çeviri fonksiyonu; JSX içinde `t('legal.preInformationTitle')`, `t('legal.draftWarning')`, `t('legal.disclaimer')` çağrılarıyla metinlerin dil bazlı değerlerini döndürür
-- **Kosullu Dal**: `lang === 'en'` olduğunda `<PreInformationContentEn lang={lang} />`, aksi halde `<PreInformationContentTr lang={lang} />` render edilir
-- **Dönüş**: JSX (`<div>` üst öğeli React elemanı) — sayfa yapısını, uyarı kutusunu, içerik bileşenini ve feragatname metnini döndürür
+  - `dict` — `lang` parametresinin değerine göre (`'en'` ise `en`, değilse `tr`) seçilen dil sözlüğü nesnesi.
+  - `t` — `key` parametresi alarak `getDictValue(dict, key)` çağrısı yapan ve sözlükten değer döndüren fonksiyon.
+- **Dönüş**: `React.FC<{ lang: string }>` (bir React bileşeni döndürür)
 
-### [N2_NASIL] src/views/legal/PreInformationPage.tsx::t
-- **params**: `key: string` — sözlükte çözülecek çeviri anahtarı (ör. `'legal.preInformationTitle'`)
-- **ic_degiskenler**:
-  - (yok)
-- **Dönüş**: `getDictValue(dict, key)` sonucu — seçili sözlükteki karşılık gelen çeviri string değeri
+### [N2_NASIL] AST Pointer: src/views/legal/PreInformationPage.tsx::t
+- **params**: `key` (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: `getDictValue(dict, key)` fonksiyonunun dönüş değeri (sözlükten alınan değer)
 
 ---
 

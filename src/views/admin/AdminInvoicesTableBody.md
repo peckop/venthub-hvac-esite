@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInvoicesTableBody.tsx
-skeleton_hash: 01f94f00d2173a85
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminInvoicesTableBody.tsx
+skeleton_hash: 5f381faee77b3956
 entity_hashes:
   func:AdminInvoicesTableBody: 3da0b99bbcdec218
   func:handleSave: 50c55c9056c84636
   func:openForm: 29401481020ab4a7
   overview: ef0f8ed6b99721d5
   style_tokens: 97468e7e8f8879b5
-generated_at: 2026-08-25T08:45:51Z
+generated_at: 2026-08-27T07:17:35Z
 ---
 
 ## Genel Bakış
@@ -184,8 +184,8 @@ graph TD
     AdminInvoicesTableBody_tsx__AdminInvoicesTableBody["AdminInvoicesTableBody"]
     AdminInvoicesTableBody_tsx__handleSave["handleSave"]
     AdminInvoicesTableBody_tsx__openForm["openForm"]
-    AdminInvoicesTableBody_tsx__AdminInvoicesTableBody --> AdminInvoicesTableBody_tsx__handleSave
     AdminInvoicesTableBody_tsx__AdminInvoicesTableBody --> AdminInvoicesTableBody_tsx__openForm
+    AdminInvoicesTableBody_tsx__AdminInvoicesTableBody --> AdminInvoicesTableBody_tsx__handleSave
 ```
 
 ## NODE ID STANDARD

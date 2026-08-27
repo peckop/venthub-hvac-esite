@@ -2,58 +2,88 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\KVKKPage.tsx
-skeleton_hash: 2dde66b0b8678d9d
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\KVKKPage.tsx
+skeleton_hash: d406f13943594ad8
 entity_hashes:
-  func:KVKKPage: aa86d51285a03cb2
-  overview: f3ce89e4fcf51ae6
-  style_tokens: 326833844f2bc7df
-generated_at: 2026-06-08T10:11:02Z
+  func:KVKKPage: c8227669ffe84eef
+  func:t: 74dcb4aee57da53f
+  overview: 4b46a026af25835a
+  style_tokens: 06829f9d93bd4397
+generated_at: 2026-08-27T07:35:06Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin yasal sayfalar bölümüne ait KVKK (Kişisel Verilerin Korunması Kanunu) bilgilendirme sayfasını tanımlayan basit bir React görünüm bileşenidir. Statik yasal içerikleri kullanıcıya sunmak dışında herhangi bir veri işleme veya durum yönetimi içermez.
+Bu modül, VentHub HVAC projesinin yasal sayfalar bölümüne ait KVKK (Kişisel Verilerin Korunması Kanunu) bilgilendirme sayfasını tanımlayan bir React görünüm bileşenidir. Dil parametresine göre Türkçe veya İngilizce statik yasal içerik sunar; herhangi bir veri işleme veya durum yönetimi içermez.
 
 ## Fonksiyon Grupları
+
 ### Sayfa Bileşeni
-Tek başına sayfanın tüm JSX yapısını ve yasal bilgilendirme içeriğini oluşturan görünüm bileşenini barındırır.
+KVKK bilgilendirme sayfasının tüm görünüm yapısını oluşturan ana bileşendir. Dil seçimine göre uygun yasal metni render eder.
 - KVKKPage
+
+### Çeviri Yardımcısı
+Sayfa içindeki metinlerin dile göre doğru karşılığını döndüren yardımcı fonksiyondur.
+- t
+
+## Bağımlılıklar
+
+**Dış Bağımlılıklar:**
+- `KvkkContentTr`: Türkçe KVKK içeriğini sağlayan modül. Tanımlı değilse bileşen hata verir.
+- `KvkkContentEn`: İngilizce KVKK içeriğini sağlayan modül. Tanımlı değilse bileşen hata verir.
+- React kütüphanesi
+
+**İç Bağımlılıklar:**
+- `KVKKPage` bileşeni, `t` fonksiyonunu ve dil bazlı içerik modüllerini çağırır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, KVKK bilgilendirme sayfasını oluşturan minimal bir React bileşenidir. Fonksiyon gövdesinde belirgin bir mantıksal akış veya koşullu işlm yoktur.
 
-[Aksiyom 1]: Eğer `KvkkContentTr` modülde çağrıya uygun (callable) olarak tanımlı değilse, Türkçe KVKK içeriği render edilemez ve bileşen hata verir.
-
-[Aksiyom 2]: Eğer `KvkkContentEn` modülde çağrıya uygun (callable) olarak tanımlı değilse, İngilizce KVKK içeriği render edilemez ve bileşen hata verir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, gövdeden çıkarılacak aksiyom üretilemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### KVKKPage
-**Ne yapar**: VentHub HVAC projesinin yasal içerikler bölümünde yer alan KVKK (Kişisel Verilerin Korunması Kanunu) bilgilendirme sayfasını oluşturan React görünüm bileşenidir. Kullanıcıların platformdaki KVKK ile ilgili yasal metinlere erişmesini sağlayan, projenin legal sayfalar grubundan biri olarak hizmet verir.
-**Nasıl yapar**: Proje kaynak kodunun `C:\Users\alize\venthub-hvac\src\views\legal\KVKKPage.tsx` dosyasında tanımlı saf bir React görünüm bileşeni olarak çalışır. Karmaşık iç iş mantığına veya harici veri işleme süreçlerine sahip olmadan, statik olarak tanımlanmış yasal KVKK içeriklerini kullanıcıya sunmak üzere işlenir.
-**Parametreler**: Bu fonksiyon herhangi bir giriş parametresi almaz.
-**Dönüş**: React.FC tipinde kullanılabilir bir React bileşeni döndürür. Döndürülen bileşen, KVKK ile ilgili yasal bilgilendirme metinlerini kullanıcı arayüzünde görüntülemek üzere işlenebilir JSX içeriği barındırır.
+**Ne yapar**: KVKK (Kişisel Verilerin Korunması Kanunu) sayfasını render eden bir React bileşenidir. Kullanıcının dil tercihine göre Türkçe veya İngilizce içerik gösterir ve yasal içerik hazır değilse taslak uyarısı görüntüler.
+
+**Nasıl yapar**: Bileşen, `lang` parametresine göre uygun dil sözlüğünü (`en` veya `tr`) seçer ve `t` adlı iç fonksiyon tanımlayarak çeviri anahtarlarından metin değerlerini alır. `isLegalContentReady()` fonksiyonunun dönüş değerini kontrol eder; eğer yasal içerik hazır değilse sarı renkli bir uyarı kutusu gösterir. Dil seçimine göre `KvkkContentEn` veya `KvkkContentTr` bileşenlerinden birini render eder. Sayfa yapısı, üstbilgi başlığı, içerik alanı ve altbilgi sorumluluk reddi metni olmak üzere üç ana bölümden oluşur.
+
+**Parametreler**:
+- lang: string — Sayfanın görüntüleneceği dili belirten parametre. `'en'` veya `'tr'` değerlerinden birini alır.
+
+**Dönüş**: React fonksiyonel bileşeni döndürür. JSX yapısı içinde `div`, `h1`, `p` gibi HTML elementleri ve `KvkkContentEn`/`KvkkContentTr` bileşenlerini içerir.
+
+### t
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
-## SABİTLER
-- **KvkkContentTr** (call) — `dynamic(() => import('./components/tr/KvkkContent').then(m => m.KvkkContentTr...`
-- **KvkkContentEn** (call) — `dynamic(() => import('./components/en/KvkkContent').then(m => m.KvkkContentEn...`
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/dictionaries/en::en
+- import: ../../i18n/dictionaries/tr::tr
+- import: ../../i18n/getDictValue::getDictValue
+- import: ./components/en/KvkkContent::KvkkContentEn
+- import: ./components/tr/KvkkContent::KvkkContentTr
+- import: @/config/legal::isLegalContentReady
+- import: react::React
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/KVKKPage.tsx::KVKKPage
-- **params**: (parametre yok)
+- **params**: `lang` — dil seçimi için kullanılan string parametre
 - **ic_degiskenler**:
-  - `lang` — useI18n() hookundan dönen dil kodu (örn: 'tr', 'en'), hangi KVKK içeriğinin gösterileceğini belirler
-  - `t` — useI18n() hookundan dönen çeviri fonksiyonu, anahtar kelimelerle çevrilmiş metinleri getirir
-- **Dönüş**: React.FC (JSX elementi — tüm sayfa yapısını ve dinamik içeriği döndürür)
+  - `dict` — `lang === 'en'` koşuluna göre `en` veya `tr` sözlüğünü seçen değişken
+  - `t` — `getDictValue(dict, key)` çağrısı yapan, sözlükten değer almak için kullanılan fonksiyon
+- **Dönüş**: JSX — KVKK sayfası içeriğini render eden React bileşeni
+
+### [N2_NASIL] AST Pointer: src/views/legal/KVKKPage.tsx::t
+- **params**: `key` — sözlükte aranacak anahtar değeri (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: `getDictValue(dict, key)` fonksiyonunun dönüş değeri
 
 ---
 
@@ -61,6 +91,7 @@ Bu modül, KVKK bilgilendirme sayfasını oluşturan minimal bir React bileşeni
 
   file: src\views\legal\KVKKPage.tsx
   function: src\views\legal\KVKKPage.tsx::KVKKPage
+  function: src\views\legal\KVKKPage.tsx::t
 
 ---
 
@@ -78,7 +109,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-slate-100/50`, `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xs`, `text-yellow-800`
-- **Layout:** `bg-yellow-50`, `border-yellow-200`, `h-96`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
+- **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xs`, `text-yellow-800`
+- **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
 - **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `animate-pulse`, `border`, `dark:prose-invert`, `font-bold`, `lg:px-8`, `mb-6`, `mt-4`, `mx-auto`, `prose`, `px-4`, `py-10`, `rounded-lg`, `rounded-xl`, `sm:px-6`, `space-y-6`
+- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `lg:px-8`, `mb-6`, `mt-4`, `mx-auto`, `prose`, `px-4`, `py-10`, `rounded-lg`, `rounded-xl`, `sm:px-6`, `space-y-6`

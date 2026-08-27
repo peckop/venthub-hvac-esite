@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\ForgotPasswordPage.tsx
-skeleton_hash: 6ea6012ad0441c18
+source_path: C:\tmp\venthub-wt-t131\src\views\ForgotPasswordPage.tsx
+skeleton_hash: 5ae72cf5629480ea
 entity_hashes:
   func:ForgotPasswordPage: 40bcbdf4b0d8dfc1
   func:handleSubmit: 460293fdfa9263b6
   overview: 68b3d66ebfb335b8
   style_tokens: 90202b3fc6cca016
-generated_at: 2026-06-19T20:50:42Z
+generated_at: 2026-08-27T07:08:59Z
 ---
 
 ## Genel Bakış
@@ -37,10 +37,6 @@ Bu modül için verilen bilgiler (fonksiyon imzaları) çok sınırlıdır; fonk
 [Aksiyom 3]: Eğer handleSubmit içerisinde yapılan asenkron işlem (muhtemelen API çağrısı) zaman aşımına uğrar veya network bağlantısı yoksa, kullanıcıya uygun bir hata bildirimi yapılması beklenir ancak bu davranış fonksiyon imzasından doğrulanamaz.
 
 [Aksiyom 4]: Eğer handleSubmit successful bir yanıt aldıktan sonra kullanıcıyı yönlendirecek bir navigasyon mekanizması (örn. useNavigate, window.location) mevcut değilse, kullanıcı şifre sıfırlama sonrası sayfada takılı kalır.
-
----
-
-**Not:** Bu modül için eksiksiz aksiyon üretmek üzere fonksiyon gövdelerinin (`ForgotPasswordPage` ve `handleSubmit` için) tam koduna ihtiyaç vardır. Mevcut çıktı yalnızca fonksiyon imzalarından çıkarılabilecek minimum varsayımları içermektedir.
 
 ---
 
@@ -91,21 +87,6 @@ Bu modül için verilen bilgiler (fonksiyon imzaları) çok sınırlıdır; fonk
   - `Routes` — useLocalizedRoutes() hook'undan alınan, lokalize edilmiş rota nesnesi; `Routes.auth.login()` çağrısı ile login sayfası URL'i üretilir
   - `handleSubmit` — inner async fonksiyon, form submit olayını yönetir
 - **Dönüş**: JSX element — `emailSent` true ise başarı ekranını, false ise form ekranını render eder
-
----
-
-### [N2_NASIL] AST Pointer: ForgotPasswordPage.tsx::handleSubmit
-- **params**: `(e: React.FormEvent)` — form submit olay nesnesi
-- **ic_degiskenler**:
-  - `email` — closure'dan gelen input değeri; boşsa toast hatası ile fonksiyon erken döner
-  - `t` — closure'dan gelen çeviri fonksiyonu; hata ve başarı mesajlarını lokalize eder
-  - `resetPassword` — closure'dan gelen şifre sıfırlama fonksiyonu; `await resetPassword(email)` ile çağrılır
-  - `setLoading` — closure'dan gelen state setter'ı; istek öncesi `true`, finally bloğunda `false` yapılır
-  - `setEmailSent` — closure'dan gelen state setter'ı; hata yoksa `true` yapılır
-  - `error` (try bloğu) — `resetPassword` çağrısından dönen `{ error }` destructured nesne; `error.message` içinde hata açıklaması bulunur
-  - `error` (catch bloğu) — try-catch ile yakalanan beklenmeyen hata nesnesi; `console.error` ile loglanır
-  - `toast` — import edilen sonner toast API'si; `toast.error()`, `toast.success()` ile bildirim gösterir
-- **Dönüş**: yok (void) — yan etkiler: toast bildirimleri gösterir, emailSent ve loading state'lerini değiştirir
 
 ---
 

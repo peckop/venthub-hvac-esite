@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\checkout\PaymentIframeContainer.tsx
-skeleton_hash: a895c4e763aa0925
+source_path: C:\tmp\venthub-wt-t131\src\views\checkout\PaymentIframeContainer.tsx
+skeleton_hash: 0688d7b2bbf8e4ce
 entity_hashes:
   func:PaymentIframeContainer: a26b3523d4f0ca84
   overview: 06c7c6530c379380
   style_tokens: a68f98e81d24e9bc
-generated_at: 2026-08-26T07:19:25Z
+generated_at: 2026-08-27T07:32:48Z
 ---
 
 ## Genel Bakış

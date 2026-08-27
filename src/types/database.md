@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\types\database.ts
-skeleton_hash: 90019bd1d8766b4d
+source_path: C:\tmp\venthub-wt-t131\src\types\database.ts
+skeleton_hash: 5400bd1e74f5ba4e
 entity_hashes:
   overview: 60fe8414ff851e26
-generated_at: 2026-08-25T07:28:28Z
+generated_at: 2026-08-27T07:07:26Z
 ---
 
 ## Genel Bakış
@@ -83,7 +83,7 @@ Bu dosyada (`src/types/database.ts`) tanımlı fonksiyon bulunmamaktadır. Dosya
 
 ## NODE ID STANDARD
 
-  file: database.ts
+  file: src\types\database.ts
 
 ---
 

@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\AuditLogTableBody.tsx
-skeleton_hash: e0272e6144d454a4
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AuditLogTableBody.tsx
+skeleton_hash: 82f0b55def0255aa
 entity_hashes:
   func:AuditLogTableBody: f2050a1564244cb7
   func:auditFetcher: 15cf2cdb6832e2e8
   overview: 3f8c6404d0e8090a
   style_tokens: 6e2907e7b7287d77
-generated_at: 2026-08-25T07:30:31Z
+generated_at: 2026-08-27T07:23:37Z
 ---
 
 ## Genel Bakış
@@ -123,60 +123,11 @@ Denetim günlüğü tablosunun gövde kısmını render eden React bileşenidir.
 
 ---
 
-### [N2_NASIL] AST Pointer: src/views/admin/AuditLogTableBody.tsx::AuditLogTableBody
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
-  - `lang` — useI18n() hook'undan gelen mevcut dil kodu
-  - `table` — useAdminTable<AuditRow>({...}) ile oluşturulan tablo nesnesi; resource: 'audit', rowId: (r) => r.id, fetcher: auditFetcher, paginationMode: 'server', sortMode: 'server', initialSort: { key: 'at', dir: 'desc' }, syncUrl: true
-  - `setFilter` — table.filtering.setFilter fonksiyonu; filtre değerlerini ayarlar
-  - `setQuery` — table.filtering.setQuery fonksiyonu; arama metnini ayarlar
-  - `filters` — table.filtering.filters nesnesi; mevcut tüm filtreler
-  - `actionVal` — filters.action?.[0] ?? ''; action filtresinin mevcut değeri
-  - `fromVal` — filters.from?.[0] ?? ''; tarih başlangıç filtresinin mevcut değeri
-  - `toVal` — filters.to?.[0] ?? ''; tarih bitiş filtresinin mevcut değeri
-  - `batchVal` — filters.batch?.[0] ?? ''; batch filtresinin mevcut değeri
-  - `resetFilters` — useCallback ile sarılı fonksiyon; setQuery('') ve tüm filtreleri boş diziye sıfırlar, bağımlılıkları: [setQuery, setFilter]
-  - `clearBatch` — useCallback ile sarılı fonksiyon; sadece setFilter('batch', []) çağırır, bağımlılıkları: [setFilter]
-  - `exportCsv` — useCallback ile sarılı async fonksiyon; table.fetchAllForExport() ile tüm filtrelenmiş veriyi çeker, CSV formatında Blob oluşturur ve tarayıcıda indirme tetikler; hata durumunda toast.error gösterir, bağımlılıkları: [table, t]
-  - `columns` — useMemo ile sarılı AdminColumn<AuditRow>[] dizisi; 5 sütun tanımlar: at (sortable, formatDateTime ile), action (sortable, renkli etiket), table_name, row_pk, comment; bağımlılıkları: [t, lang]
-- **Dönüş**: JSX.Element — space-y-6 div'i içinde batchVal varsa uyarı banner'ı, DataTableKit bileşeni (columns, table, rowId, persistKey: 'audit', hasWriteAccess: false, emptyState, filterEmptyState, errorLabel, columnsButtonLabel, totalLabel, expandLabel, renderExpandedRow ile JsonDiffViewer, toolbarSlot ile AdminToolbar)
-
----
-
-### [N3_NASIL] AST Pointer: src/views/admin/AuditLogTableBody.tsx::resetFilters
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — dışarıdan kapatılan setQuery ve setFilter fonksiyonlarını çağırır)
-- **Dönüş**: void — setQuery('') çağırır, setFilter('action', []), setFilter('from', []), setFilter('to', []), setFilter('batch', []) çağırarak tüm filtreleri sıfırlar
-
----
-
-### [N4_NASIL] AST Pointer: src/views/admin/AuditLogTableBody.tsx::clearBatch
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — dışarıdan kapatılan setFilter fonksiyonunu çağırır)
-- **Dönüş**: void — setFilter('batch', []) çağırarak batch filtresini temizler
-
----
-
-### [N5_NASIL] AST Pointer: src/views/admin/AuditLogTableBody.tsx::exportCsv
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `rows` — table.fetchAllForExport() sonucu; Awaited<ReturnType<typeof table.fetchAllForExport>> tipinde; tüm filtrelenmiş satırlar
-  - `header` — 7 sütun başlığını virgülle birleştiren string: id, at, actor, action, tableName, rowPk, comment (t ile çevrilmiş)
-  - `lines` — rows dizisi üzerinde map ile üretilen CSV satırları dizisi; her satırda r.id, r.at, r.actor (çift tırnak escape ile), r.action, r.table_name, r.row_pk (çift tırnak escape ile), r.comment (çift tırnak escape ile) virgülle birleştirilir
-  - `csv` — '\ufeff' BOM + header + lines birleştirilmiş tam CSV metni
-  - `blob` — new Blob([csv], { type: 'text/csv;charset=utf-8;' }); CSV verisini içeren Blob nesnesi
-  - `url` — URL.createObjectURL(blob); Blob için geçici URL
-  - `a` — document.createElement('a'); indirme bağlantısı elementi; a.href = url, a.download = t('admin.audit.export.filename')
-- **Dönüş**: Promise<void> — yan etki olarak tarayıcıda CSV dosyası indirme tetikler; hata durumunda toast.error(t('admin.audit.export.failed')) gösterir ve return ile erken çıkar
-
----
-
 ## NODE ID STANDARD
 
-  file: AuditLogTableBody.tsx
-  function: AuditLogTableBody.tsx::auditFetcher
-  function: AuditLogTableBody.tsx::AuditLogTableBody
+  file: src\views\admin\AuditLogTableBody.tsx
+  function: src\views\admin\AuditLogTableBody.tsx::auditFetcher
+  function: src\views\admin\AuditLogTableBody.tsx::AuditLogTableBody
 
 ---
 

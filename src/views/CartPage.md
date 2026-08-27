@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\CartPage.tsx
-skeleton_hash: a80bc5fe1c94a392
+source_path: C:\tmp\venthub-wt-t131\src\views\CartPage.tsx
+skeleton_hash: f750f8daaedb1cc0
 entity_hashes:
   func:CartPage: 47b501309afc6903
   overview: 6afbfcbb29c27c31
   style_tokens: 089647e604d32b73
-generated_at: 2026-08-25T07:29:34Z
+generated_at: 2026-08-27T07:08:54Z
 ---
 
 ## Genel Bakış
@@ -80,25 +80,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: src/views/CartPage.tsx::items.map callback
-- **params**: `item` — sepet kalem nesnesi; `item.id`, `item.unitPrice`, `item.quantity`, `item.product.brand`, `item.product.slug`, `item.product.name`, `item.product.sku` alanlarına erişilir
-- **ic_degiskenler**:
-  - `unitPrice` — `typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice)` koşulu sağlanırsa `item.unitPrice` değeri, sağlanmazsa `null`; fiyat gösterimi ve kalem toplamı hesabında kullanılır; `null` olduğunda "Teklif Alın" metni gösterilir
-- **Dönüş**: JSX elementi (React.ReactNode); tek bir sepet kalemi kartını temsil eden `<div>` döndürür
-
----
-
-### [N3_NASIL] AST Pointer: src/views/CartPage.tsx::items.filter().map callback
-- **params**: `item` — sepet kalem nesnesi; `item.product.id`, `item.product.name`, `item.quantity` alanlarına erişilir
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `{ productId: item.product.id, productName: item.product.name, qty: item.quantity }` nesnesi; `QuoteRequestButton` bileşeninin `items` prop'una aktarılır
-
----
-
 ## NODE ID STANDARD
 
-  file: CartPage.tsx
-  function: CartPage.tsx::CartPage
+  file: src\views\CartPage.tsx
+  function: src\views\CartPage.tsx::CartPage
 
 ---
 

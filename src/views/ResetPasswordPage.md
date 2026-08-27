@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\ResetPasswordPage.tsx
-skeleton_hash: d093de2c696fc95c
+source_path: C:\tmp\venthub-wt-t131\src\views\ResetPasswordPage.tsx
+skeleton_hash: 1b901d6beff87fe3
 entity_hashes:
   func:ResetPasswordPage: fa23efc56611b686
   func:handleSubmit: 460293fdfa9263b6
   overview: 85697f542d82ad5e
   style_tokens: 37c313d043ea26d9
-generated_at: 2026-08-25T08:45:29Z
+generated_at: 2026-08-27T07:10:01Z
 ---
 
 ## Genel Bakış

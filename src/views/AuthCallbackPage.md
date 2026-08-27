@@ -2,46 +2,28 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx
-skeleton_hash: ebef8175645dcf55
+source_path: C:\tmp\venthub-wt-t131\src\views\AuthCallbackPage.tsx
+skeleton_hash: 2cdff1b97b7c5e8a
 entity_hashes:
   func:AuthCallbackPage: b8296e20d27a327c
-  overview: a386b5017e2597f0
+  overview: 9e91c5ec6419b208
   style_tokens: 404ab1f16440192d
-generated_at: 2026-06-19T20:50:36Z
+generated_at: 2026-08-27T07:43:21Z
 ---
 
 ## Genel Bakış
-AuthCallbackPage, kimlik doğrulama süreçlerinin ardından kullanıcıyı karşılayan ve oturum başlatma işlemini tamamlayan bir React bileşenidir. Harici kimlik sağlayıcılardan (OAuth, SSO vb.) dönen yetkilendirme bilgilerini URL parametrelerinden çıkararak kullanıcı oturumunu başlatır ve uygun yönlendirmeyi sağlar.
+AuthCallbackPage, kimlik doğrulama akışının son adımı olan callback sayfasını temsil eden bir React bileşenidir. Harici kimlik sağlayıcılardan dönen yetkilendirme bilgilerini işleyerek kullanıcı oturumunu başlatır ve ardından uygun sayfaya yönlendirir.
 
 ## Fonksiyon Grupları
 ### Kimlik Doğrulama Callback Bileşeni
-Kimlik doğrulama akışının son aşamasında yer alan, callback verilerini işleyerek oturum yönetimi yapan izole sayfa bileşeni.
+Kimlik doğrulama sürecinin callback aşamasında kullanıcıyı karşılayan ve oturum yönetimini gerçekleştiren bileşendir.
 - AuthCallbackPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için mimari aksiyom üretilememektedir. Nedenleri:
-
-1. **Fonksiyon gövdesi mevcut değil**: Verilen bilgilerde bileşenin gerçek uygulama kodu (function body) yer almamaktadır. Sadece imza bilgisi (`AuthCallbackPage() -> React.FC`) verilmiştir.
-
-2. **Kurallar gereği**: Aksiyomlar yalnızca fonksiyon gövdesinden üretilebilir; docstring, yorum satırları veya değişken isimlerinden bilgi çıkarılamaz. Eski dokümanda yer alan "OAuth callback", "URL parametreleri", "oturum başlatma" gibi ifadeler aksiyon üretimi için kullanılamaz.
-
-3. **Varsayılan değer yok**: Fonksiyon imzasında herhangi bir parametre veya default değer bulunmamaktadır.
-
----
-
-**Sonuç:** Fonksiyon gövdesi (implementasyon) paylaşıldığında, aşağıdaki potansiyel alanlardan aksiyomlar çıkarılabilecektir:
-
-- URL parametrelerinin varlık/zorunluluk koşulları
-- Token/alma kodu işleme koşulları
-- Başarısız durum yönetimi gereksinimleri
-- Yönlendirme (redirect) koşulları
-- Hata gösterimi koşulları
-
-> 📌 **Not**: Mimari hakem olarak, **gerçek uygulama kodu olmadan tahmini aksiyon üretmem uygun değildir.** Fonksiyon gövdesi eklendiğinde analiz yapılabilir.
+Bu modül için mimari aksiyom üretilememektedir. Nedeni: fonksiyon gövdesi verilmemiştir; aksiyomlar yalnızca fonksiyon gövdesinden türetilebilir.
 
 ---
 
@@ -67,6 +49,7 @@ Bu bileşen doğrudan prop almamaktadır (parametresiz fonksiyon bileşenidir).
 - import: lucide-react::AlertCircle
 - import: lucide-react::CheckCircle
 - import: next/navigation::useRouter
+- import: next/navigation::useSearchParams
 - import: react::React
 - import: react::useEffect
 - import: react::useState
@@ -76,75 +59,51 @@ Bu bileşen doğrudan prop almamaktadır (parametresiz fonksiyon bileşenidir).
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\AuthCallbackPage.tsx::AuthCallbackPage
-- **params**: (yok — React.FC, props almaz)
+### [N1_NASIL] AST Pointer: src/views/AuthCallbackPage.tsx::AuthCallbackPage
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, tüm UI metinleri bu ile sağlanır
-  - `Routes` — `useLocalizedRoutes()` hook'undan dönen lokalize rota builder nesnesi, `Routes.home()`, `Routes.auth.login()` gibi metodlar barındırır
-  - `status` — `useState<'loading' | 'success' | 'error'>('loading')` ile oluşturulan durum state'i, auth callback sürecinin aşamasını tutar
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; i18n anahtarlarıyla UI metinlerini çözmek için kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota yardımcı objesi; `Routes.home()`, `Routes.auth.login()`, `Routes.auth.resetPassword()` gibi yöntemlerle yönlendirme URL'leri üretir
+  - `status` — `useState<'loading' | 'success' | 'error'>('loading')` ile yönetilen durum state'i; sayfanın yükleme, başarılı veya hatalı olduğunu belirtir
   - `setStatus` — `status` state'ini güncelleyen setter fonksiyonu
-  - `message` — `useState('')` ile oluşturulan mesaj state'i, kullanıcıya gösterilecek metni tutar
+  - `message` — `useState('')` ile yönetilen mesaj state'i; kullanıcıya gösterilecek durum açıklamasını tutar
   - `setMessage` — `message` state'ini güncelleyen setter fonksiyonu
-  - `router` — `useRouter()` hook'undan dönen Next.js yönlendirme nesnesi, `router.push()` ile sayfa yönlendirmesi yapar
-- **Dönüş**: JSX — loading/success/error durumuna göre farklı UI render eden React bileşeni JSX'i döner. `useEffect` içinde `handleAuthCallback` çağrılır, `toast.success()` ile bildirim gösterilir, `setTimeout` ile yönlendirme yapılır.
+  - `router` — `useRouter()` hook'undan dönen Next.js router objesi; `router.push()` ile programatik yönlendirme yapmak için kullanılır
+  - `searchParams` — `useSearchParams()` hook'undan dönen URL arama parametreleri objesi; opsiyonel olabilir (nullish kontrolü yapılır)
+  - `next` — `searchParams?.get('next')` ile URL'den okunan `next` query parametresi değeri; şifre kurtarma akışını belirlemek için kullanılır
+- **Dönüş**: JSX elementi (React.FC) — yükleme, başarı ve hata durumlarına göre koşullu render yapan bir kart bileşeni döndürür
 
----
-
-### [N2_NASIL] AST Pointer: src\views\AuthCallbackPage.tsx::useEffect_callback
-- **params**: (yok — arrow function, deps: `[router, t, Routes]`)
+### [N2_NASIL] AST Pointer: src/views/AuthCallbackPage.tsx::useEffect callback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `handleAuthCallback` — `async function` olarak tanımlanmış, auth callback mantığını yürüten iç fonksiyon, useEffect içinde tanımlanıp hemen çağrılmıştır
-- **Dönüş**: yok — useEffect side-effect callback'idir, `handleAuthCallback()` çağrısı ile auth akışını başlatır
+  - `handleAuthCallback` — useEffect içinde tanımlanan async fonksiyon; Supabase oturum açma callback akışını yürütür
+- **Dönüş**: yok — yan etki olarak `handleAuthCallback()` fonksiyonunu çağırır
 
----
-
-### [N3_NASIL] AST Pointer: src\views\AuthCallbackPage.tsx::handleAuthCallback
-- **params**: (yok — async inner function)
+### [N3_NASIL] AST Pointer: src/views/AuthCallbackPage.tsx::handleAuthCallback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `hashFragment` — `window.location.hash` değerinden alınan URL hash fragment'i, OAuth callback tokenlarının burada bulunup bulunmadığını kontrol eder
-  - `data` — `supabase.auth.getSession()` destructured sonucu `{ data, error }` — mevcut oturum bilgisini tutar, `data.session` varlığı kontrol edilir
-  - `error` — `supabase.auth.getSession()` destructured sonucu `{ data, error }` — oturum alma hatasını tutar
-  - `sessionError` — `supabase.auth.exchangeCodeForSession(window.location.href)` sonucu `{ error: sessionError }` destructured — kod değiştirme (token exchange) hatasını tutar
-  - `newData` — `supabase.auth.getSession()` ikinci çağrısından dönen `{ data: newData, error: newError }` destructured — token exchange sonrası güncel oturum bilgisini tutar
-  - `newError` — `supabase.auth.getSession()` ikinci çağrısından dönen `{ data: newData, error: newError }` destructured — ikinci oturum alma hatasını tutar, varsa `throw` ile fırlatılır
-- **Dönüş**: yok — tüm akış yan etkiler üzerindendir: `setStatus()`, `setMessage()`, `toast.success()`, `router.push(Routes.home())`, `router.push(Routes.auth.login())`
-- **API Çağrıları**: `supabase.auth.getSession()`, `supabase.auth.exchangeCodeForSession(window.location.href)`, `console.error()`, `window.location.hash`, `window.location.href`
-- **Yakalama**: `catch (error: unknown)` bloğu — tüm hataları yakalar, `setStatus('error')` ve `router.push(Routes.auth.login())` ile hata yönetimi yapar
+  - `hashFragment` — `window.location.hash` değerini tutar; implicit akıştaki hash token'ı ve `type=recovery` kontrolü için kullanılır
+  - `hasCode` — `new URL(window.location.href).searchParams.has('code')` sonucu boolean; URL'de PKCE `code` parametresi olup olmadığını belirtir
+  - `isRecovery` — `next === 'reset-password' || hashFragment.includes('type=recovery')` sonucu boolean; şifre kurtarma dönüşü olup olmadığını belirler
+  - `data` — `supabase.auth.getSession()` sonucu destructuring ile alınan veri objesi; `data.session` üzerinden aktif oturum kontrolü yapılır; PKCE ve implicit akış adımlarında tekrar atanır
+  - `exchangeError` — `supabase.auth.exchangeCodeForSession(window.location.href)` sonucu destructuring ile alınan hata objesi; PKCE kod değişiminde oluşan hatayı tutar
+  - `error` — `catch (error: unknown)` bloğunda yakalanan bilinmeyen türde hata; konsola yazdırılır
+- **Dönüş**: yok (void) — yan etkileri: `setStatus()`, `setMessage()` ile state günceller; `router.push()` ile yönlendirme yapar; `toast.success()` ile bildirim gösterir; `console.error()` ile hata loglar
 
----
-
-### [N4_NASIL] AST Pointer: src\views\AuthCallbackPage.tsx::setTimeout_redirect_home_1
-- **params**: (yok — arrow function)
+### [N4_NASIL] AST Pointer: src/views/AuthCallbackPage.tsx::setTimeout callback (successRedirect)
+- **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `setTimeout` callback'idir, 2000ms sonra `router.push(Routes.home())` çağrısı ile anasayfaya yönlendirme yapar; `newData.session` başarılı olduğunda tetiklenir
+- **Dönüş**: yok — yan etki olarak `router.push(Routes.home())` çağırır; 2000ms gecikmeyle ana sayfaya yönlendirir
 
----
-
-### [N5_NASIL] AST Pointer: src\views\AuthCallbackPage.tsx::setTimeout_redirect_login_error
-- **params**: (yok — arrow function)
+### [N5_NASIL] AST Pointer: src/views/AuthCallbackPage.tsx::setTimeout callback (invalidLink)
+- **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `setTimeout` callback'idir, 3000ms sonra `router.push(Routes.auth.login(undefined, error.message))` çağrısı ile hata mesajı ile birlikte giriş sayfasına yönlendirme yapar
+- **Dönüş**: yok — yan etki olarak `router.push(Routes.auth.login(undefined, t('auth.callback.invalidLink')))` çağırır; 3000ms gecikmeyle hata mesajıyla giriş sayfasına yönlendirir
 
----
-
-### [N6_NASIL] AST Pointer: src\views\AuthCallbackPage.tsx::setTimeout_redirect_home_2
-- **params**: (yok — arrow function)
+### [N6_NASIL] AST Pointer: src/views/AuthCallbackPage.tsx::setTimeout callback (unexpectedError)
+- **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `setTimeout` callback'idir, 2000ms sonra `router.push(Routes.home())` çağrısı ile anasayfaya yönlendirme yapar; ilk `data.session` başarılı olduğunda tetiklenir
-
----
-
-### [N7_NASIL] AST Pointer: src\views\AuthCallbackPage.tsx::setTimeout_redirect_login_nosession
-- **params**: (yok — arrow function)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `setTimeout` callback'idir, 3000ms sonra `router.push(Routes.auth.login(undefined, 'No session found'))` çağrısı ile 'No session found' mesajı ile giriş sayfasına yönlendirme yapar; hash fragment mevcut olmayıp hiçbir oturum bulunamadığında tetiklenir
-
----
-
-### [N8_NASIL] AST Pointer: src\views\AuthCallbackPage.tsx::setTimeout_redirect_login_catch
-- **params**: (yok — arrow function)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `setTimeout` callback'idir, 3000ms sonra `router.push(Routes.auth.login())` çağrısı ile çıkış parametresiz giriş sayfasına yönlendirme yapar; `catch` bloğu içinde yakalanan beklenmedik hatalarda tetiklenir
+- **Dönüş**: yok — yan etki olarak `router.push(Routes.auth.login())` çağırır; 3000ms gecikmeyle giriş sayfasına yönlendirir
 
 ---
 

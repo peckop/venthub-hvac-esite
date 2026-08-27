@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\AdminMovementsPage.tsx
-skeleton_hash: a5583dcc150ffea6
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminMovementsPage.tsx
+skeleton_hash: 5dd42a6d404cf439
 entity_hashes:
   func:AdminMovementsPage: 1f83a4be333ac82c
   overview: f79fd144fc0bf6c1
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-08-25T07:29:51Z
+generated_at: 2026-08-27T07:19:42Z
 ---
 
 ## Genel Bakış
@@ -69,8 +69,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: AdminMovementsPage.tsx
-  function: AdminMovementsPage.tsx::AdminMovementsPage
+  file: src\views\admin\AdminMovementsPage.tsx
+  function: src\views\admin\AdminMovementsPage.tsx::AdminMovementsPage
 
 ---
 

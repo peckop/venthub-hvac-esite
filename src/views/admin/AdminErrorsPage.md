@@ -2,17 +2,17 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx
-skeleton_hash: cafa7ed074ccc911
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminErrorsPage.tsx
+skeleton_hash: 4225f5659d041691
 entity_hashes:
   func:AdminErrorsPage: d26af9274e4d56dd
-  overview: 0655495a3be5f695
+  overview: 511e803d5e1695c8
   style_tokens: a7fe3ab3ca0c1259
-generated_at: 2026-06-19T20:48:41Z
+generated_at: 2026-08-27T07:14:48Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yönetici panelindeki hata yönetimi sayfasını oluşturan temel React bileşenini ve tarih formatlama yardımcı fonksiyonunu içerir. Sistemde kaydedilen hata kayıtlarını merkezi bir arayüzde listeleyerek yöneticilerin incelemesini sağlar ve tarihlerin okunabilir biçimde sunulmasını destekler.
+Bu modül, VentHub HVAC yönetici panelindeki hata yönetim sayfasını oluşturan React bileşenini içerir. Sistemde kaydedilen hata kayıtlarını merkezi bir arayüzde listeleyerek yöneticilerin incelemesine olanak tanır. Hata kayıtlarındaki tarih bilgilerinin okunabilir biçimde sunulmasını destekler.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
@@ -23,23 +23,13 @@ Sayfa düzeninin, veri çekme işlemlerinin ve hata kayıtlarının listelenmesi
 Hata kayıtlarındaki tarih nesnelerini, arayüzde gösterilmek üzere okunabilir ve standart bir metin formatına dönüştürmekle sorumlu yardımcı fonksiyondur.
 - fmt
 
-### Fonksiyonlar Arası İlişkiler ve Bağımlılıklar
-`AdminErrorsPage` bileşeni, hata kayıtlarının tarih bilgilerini okunaklı göstermek için `fmt` fonksiyonuna bağımlıdır. Modül, veri çekme işlemleri için dış kaynaklara (React context, global state veya custom hook) ihtiyaç duyar ve bu bağımlılıklar bileşenin yaşam döngüsünde dinamik olarak çözümlenir. Mimari olarak, yönetici panelinin bir alt sayfası olarak yalın ve tek sorumluluklu bir yapıya sahiptir.
+## Fonksiyonlar Arası İlişkiler ve Bağımlılıklar
+`AdminErrorsPage` bileşeni, hata kayıtlarının tarih bilgilerini okunaklı göstermek için `fmt` fonksiyonunu çağırır. Modül, veri çekme işlemleri için dış kaynaklara ihtiyaç duyar ve bu bağımlılıklar bileşenin yaşam döngüsünde çözümlenir. Mimari olarak, yönetici panelinin bir alt sayfası olarak yalın ve tek sorumluluklu bir yapıya sahiptir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için fonksiyon imzalarından çıkarılabilir kesin mimari varsayımlar sınırlıdır; yalnızca imza bilgisine dayalı varsayımlar aşağıda listelenmiştir.
-
-[Aksiyom 1]: Eğer React çalışma ortamı (React runtime/React DOM) yoksa, AdminErrorsPage bileşeni render edilemez ve uygulama hata fırlatır.
-
-[Aksiyom 2]: Eğer fmt fonksiyonu çağrıldığında geçerli bir tarih nesnesi parametre olarak sağlanmazsa, fonksiyonun dönüş değeri bilinmiyor.
-
-[Aksiyom 3]: Eğer AdminErrorsPage bileşeni React component ağacının dışında (örn. doğrudan DOM'a eklenerek) kullanılmaya çalışılırsa, bileşen düzgün çalışmaz.
-
-[Aksiyom 4]: Eğer fmt yardımcı fonksiyonu modül dışından erişilebilir olarak export edilmemişse, modül dışındaki tarih formatlama işlemleri bu fonksiyonu kullanamaz (iç modül bağımlılığı).
-
-[Aksiyom 5]: Eğer React_fc dönüş tipi geçersiz veya bozulmuş bir JSX döndürürse, React hata sınırı tetiklenir veya bileşen render edilemez.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -61,9 +51,8 @@ Bu fonksiyon (React fonksiyonel bileşeni) herhangi bir parametre almaz.
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./ErrorsTableBody::ErrorsTableBody
 - import: react::React
 - import: react::Suspense
@@ -72,11 +61,11 @@ Bu fonksiyon (React fonksiyonel bileşeni) herhangi bir parametre almaz.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hac\src\views\admin\AdminErrorsPage.tsx::AdminErrorsPage
-- **params**: ()
+### [N1_NASIL] AST Pointer: src\views\admin\AdminErrorsPage.tsx::AdminErrorsPage
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, component içindeki metinleri uluslararasılaştırmak için kullanılır.
-- **Dönüş**: React.ReactNode (JSX element) — `<div>` ile sarılmış bir header ve Suspense ile yüklenen ErrorsTableBody componentinden oluşan sayfa yapısı.
+  - `t` — `useI18n()` hook'undan destructuring ile alınan çeviri fonksiyonu; `t('admin.titles.errors')` ve `t('admin.errors.subtitle')` çağrılarıyla sayfa başlığı ve alt başlık metinlerini yerelleştirmek için kullanılır
+- **Dönüş**: JSX element — `className="space-y-4 pb-20"` olan bir `<div>` kapsayıcısı; içinde `<AdminPageHeader>` (title ve description prop'ları ile) ve `<Suspense>` (fallback olarak `<AdminSkeleton variant="table" count={5} rows={6} />` kullanan) ile sarılmış `<ErrorsTableBody />` bileşeni render eder
 
 ---
 

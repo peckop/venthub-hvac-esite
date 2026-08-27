@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInvoicesPage.tsx
-skeleton_hash: 46a81d128aeb705d
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminInvoicesPage.tsx
+skeleton_hash: afcc399154a2b45a
 entity_hashes:
   func:AdminInvoicesPage: c0f0396efd933c45
   overview: e42bbd9fcb9329a9
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-08-25T08:45:20Z
+generated_at: 2026-08-27T07:17:33Z
 ---
 
 ## Genel Bakış
