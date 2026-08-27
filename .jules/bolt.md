@@ -44,3 +44,7 @@
 ## 2025-05-18 - Replacing map-filter chains with reduce
 **Learning:** Sequential `.filter().map()` array operations traverse the data multiple times and allocate intermediate arrays, scaling poorly for large dynamic lists.
 **Action:** Combine them into a single `.reduce()` pass for O(n) complexity and zero intermediate allocations, keeping in mind the trade-off with readability on small lists.
+
+## 2024-08-27 - [Context O(1) Lookup Optimization]
+**Learning:** Using `categories.find()` across components on every re-render scales poorly O(N) when `categories` is a large dataset.
+**Action:** Expose memoized O(1) Hash Maps from the Context Provider (e.g. `getCategoryById` and `getCategoryBySlug`) and use those instead of inline `Array.find()`.

@@ -14,6 +14,7 @@ interface CategoryContextType {
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
+  getCategoryById: (id: string) => DomainCategory | undefined;
   getCategoryBySlug: (slug: string) => DomainCategory | undefined;
   getSubCategories: (_parentId: string) => DomainCategory[];
 }
@@ -80,6 +81,16 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Lookup maps for O(1) access. Slug lookup TAM set üzerinden (allCategories) — boş kategoriye
   // direkt-URL ile gelindiğinde de kategori çözülsün (sayfa boş-durum gösterir, kırılmaz).
+  const categoriesIdMap = useMemo(() => {
+    const map = new Map<string, DomainCategory>();
+    for (const c of allCategories) {
+      if (c.id) {
+        map.set(c.id, c);
+      }
+    }
+    return map;
+  }, [allCategories]);
+
   const categoriesSlugMap = useMemo(() => {
     const map = new Map<string, DomainCategory>();
     for (const c of allCategories) {
@@ -110,6 +121,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return map;
   }, [categories]);
 
+  const getCategoryById = useCallback((id: string) => categoriesIdMap.get(id), [categoriesIdMap]);
   const getCategoryBySlug = useCallback((slug: string) => categoriesSlugMap.get(slug), [categoriesSlugMap]);
   const getSubCategories = useCallback((parentId: string) => categoriesParentMap.get(parentId) || [], [categoriesParentMap]);
 
@@ -119,6 +131,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     loading,
     error,
     refresh: loadCategories,
+    getCategoryById,
     getCategoryBySlug,
     getSubCategories
   }), [
@@ -127,6 +140,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     loading,
     error,
     loadCategories,
+    getCategoryById,
     getCategoryBySlug,
     getSubCategories
   ]);

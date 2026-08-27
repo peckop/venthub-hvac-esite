@@ -116,7 +116,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const { addToCart } = useCart()
   const { isFavorite, toggleFavorite } = useFavorites()
   const { refreshProjects } = useProjectLists()
-  const { categories } = useCategories()
+  const { getCategoryById } = useCategories()
 
   const [relatedFamilies, setRelatedFamilies] = useState<FamilyListItem[]>([])
   const [actionProduct, setActionProduct] = useState<Product | null>(null)
@@ -164,10 +164,10 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   // kategorisiz KISALIR (kopma/boşluk yok).
   const { mainCategory, subCategory } = useMemo(() => {
     if (!family) return { mainCategory: null, subCategory: null }
-    const sc = categories.find((c) => c.id === family.subcategory_id) || null
-    const mc = categories.find((c) => c.id === family.category_id) || null
+    const sc = (family.subcategory_id && getCategoryById(family.subcategory_id)) || null
+    const mc = (family.category_id && getCategoryById(family.category_id)) || null
     return { mainCategory: mc, subCategory: sc }
-  }, [family, categories])
+  }, [family, getCategoryById])
 
   // Fiyatı olmayan varyant (null/0) "Teklif Alın" moduna düşer; kategori bazlı
   // hide_price bayrağı da aynı moda düşürür. quoteMode'da sepete-ekle HİÇ render edilmez.

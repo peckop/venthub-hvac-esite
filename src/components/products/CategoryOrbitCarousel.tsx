@@ -56,7 +56,7 @@ interface CategoryOrbitCarouselProps {
 
 const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: CategoryOrbitCarouselProps) => {
     const router = useRouter()
-    const { categories, loading: categoriesLoading } = useCategories()
+    const { categories, getCategoryBySlug, loading: categoriesLoading } = useCategories()
     const { wrapCategory } = useCategoryViewModel()
     const { t, lang } = useI18n()
     const Routes = useLocalizedRoutes()
@@ -153,7 +153,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
         if (level === 'main') {
             return mainCategories.map(vm => {
                 // SSOT: DB metadata.model_type öncelikli, slug-inference fallback
-                const rawCat = categories.find(c => c.slug === vm.slug)
+                const rawCat = vm.slug ? getCategoryBySlug(vm.slug) : undefined
                 const dbModelType = (rawCat?.metadata as { model_type?: string } | null)?.model_type
                 return {
                     id: vm.slug,
@@ -166,7 +166,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
         } else if (level === 'subcategory') {
             return subcategories.map(vm => {
                 // SSOT: DB metadata.model_type öncelikli, slug-inference fallback
-                const rawCat = categories.find(c => c.slug === vm.slug)
+                const rawCat = vm.slug ? getCategoryBySlug(vm.slug) : undefined
                 const dbModelType = (rawCat?.metadata as { model_type?: string } | null)?.model_type
                 return {
                     id: vm.slug,
@@ -178,7 +178,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
             })
         }
         return []
-    }, [level, mainCategories, subcategories, categories])
+    }, [level, mainCategories, subcategories, getCategoryBySlug])
 
     const handleCardClick = useCallback((itemId: string) => {
         if (level === 'main') {
