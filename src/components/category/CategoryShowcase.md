@@ -2,39 +2,27 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\CategoryShowcase.tsx
-skeleton_hash: 6e859293916635a8
+source_path: C:\tmp\vh-urun-comp\src\components\category\CategoryShowcase.tsx
+skeleton_hash: fddf0fc033224749
 entity_hashes:
   func:CategoryShowcase: 27f451ff64c2aa4f
-  overview: aa513280097fa05a
+  overview: 246937774a458600
   style_tokens: 74c7a2fe586c3948
-generated_at: 2026-06-08T10:08:47Z
+generated_at: 2026-08-27T07:00:10Z
 ---
 
 ## Genel Bakış
-`CategoryShowcase` modülü, bir kategori ve ona bağlı alt kategorileri görsel bir vitrin içinde sunan bir React bileşenidir. Gelen `category`, `subCategories` ve `parentCategory` prop'larını alarak, kategori kartı, alt kategori listesi ve üst kategori navigasyonu gibi UI bileşenlerini oluşturur.
+`CategoryShowcase` modülü, bir kategori ve ona bağlı alt kategorileri görsel bir vitrin içinde sunan bir React bileşenidir. Bileşen, dışarıdan sağlanan `category`, `subCategories` ve `parentCategory` prop'larını alarak kategori kartı, alt kategori listesi ve üst kategori navigasyonu gibi UI bileşenlerini oluşturur. Doğru çalışması için bu prop'ların geçerli ve beklenen tiplerde olması gerekir; aksi takdirde bileşen hatalı render edilir veya hata oluşur.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen – UI Oluşturma
-Bu grup, dışarıdan sağlanan veri prop'larını alıp kullanıcı arayüzüne yansıtır. Bileşen, kategori başlığını, açıklamasını ve görselini gösterir; alt kategorileri haritalayarak kart veya bağlantı listesi üretir; varsa üst kategoriye yönlendiren bir geri bağlantı ekler.
-- CategoryShowcase
+Bu grup, dışarıdan sağlanan ver
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, dışarıdan verilen `category`, `subCategories` ve `parentCategory` prop'larını kullanarak bir kategori vitrini bileşeni oluşturur. Doğru çalışması için bu prop'ların geçerli ve beklenen tiplerde olması gerekir.
 
-[Aksiyom 1]: Eğer `category` prop'u `null` veya `undefined` ise, bileşen ana kategori bilgilerini (başlık, açıklama, görsel) gösteremez veya hatalı render edilir.
-
-[Aksiyom 2]: Eğer `category` prop'u bir nesne (`object`) değilse, bileşen kategori alanlarına (`title`, `description`, `image` vb.) erişemez ve bu alanları okumaya çalışırken hata oluşur.
-
-[Aksiyom 3]: Eğer `subCategories` prop'u `null` veya `undefined` ise, bileşen alt kategori listesini oluşturamaz veya boş bir liste olarak davranır.
-
-[Aksiyom 4]: Eğer `subCategories` prop'u bir dizi (`Array`) değilse, bileşen alt kategorileri haritalayarak kart oluşturma işlemini gerçekleştiremez ve hata oluşur.
-
-[Aksiyom 5]: Eğer `parentCategory` prop'u `null` veya `undefined` ise, bileşen üst kategoriye yönlendiren geri bağlantıyı göstermez.
-
-[Aksiyom 6]: Eğer `parentCategory` prop'u geçerli bir nesne (`object`) içermiyorsa ve bileşen bu nesneden alanlar (`title`, `slug` vb.) okumaya çalışıyorsa, hatalı veya eksik veri ile render olur.
+Bu modül için özel aksiyom tanımlanmamıştır. Fonksiyon gövdesi sağlanmadığından, bileşenin çalışma koşulları hakkında fonksiyon gövdesine dayalı bir varsayımda bulunulamaz.
 
 ---
 
@@ -57,6 +45,24 @@ React.FC<CategoryShowcaseProps> tipinde bir fonksiyon bileşeni döndürür. Bu 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../lib/type-converters::DomainCategory
+- import: ../../utils/breadcrumbUtils::buildCategoryBreadcrumb
+- import: ../../utils/getCategoryIcon::getCategoryIcon
+- import: ../navigation/Breadcrumb::Breadcrumb
+- import: ./EnhancedNeedsWizard::EnhancedNeedsWizard
+- import: ./sections::BottomCTA
+- import: @/components/ui/VentImage::VentImage
+- import: framer-motion::motion
+- import: next/image::Image
+- import: next/link::Link
+- import: react::React
+- import: react::useState
+
+---
+
 ## INTERFACES
 
 ### CategoryShowcaseProps
@@ -68,18 +74,27 @@ React.FC<CategoryShowcaseProps> tipinde bir fonksiyon bileşeni döndürür. Bu 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: CategoryShowcase.tsx::subCategoryRenderCallback
-- **params**:
-  - `sub` — render edilecek alt kategori objesi; `sub.id`, `sub.slug`, `sub.image_url`, `sub.description` özellikleri erişime açıktır
+### [N1_NASIL] AST Pointer: src/components/category/CategoryShowcase.tsx::(sub) => Link
+- **params**: `sub` — alt kategori nesnesi
 - **ic_degiskenler**:
-  (yok — doğrudan JSX döndürür, iç değişken tanımlamaz)
-- **Yan etkilerde erişilen dış kaynaklar**:
-  - `Routes.category(category.slug, sub.slug)` — alt kategori URL'ini oluşturur
-  - `getCategoryDisplayName(sub)` — alt kategorinin gösterilecek adını döndürür
-  - `process.env.NEXT_PUBLIC_SUPABASE_URL` — Supabase depolama URL kökünü alır
-  - `getCategoryIcon(sub.slug, { size: 64, className: "..." })` — slug'a karşılık gelen ikon bileşenini döndürür
-  - `t('category.inspectSeries')` — i18n çeviri anahtarına karşılık gelen metni döndürür
-- **Dönüş**: JSX — `Link` ile sarılmış alt kategori kartı (görsel/ikon, başlık, açıklama, "İncele" butonu)
+  - `sub.id` — Link bileşeninin `key` prop'u olarak kullanılır
+  - `sub.image_url` — koşullu render kontrolü; varsa VentImage ile görsel gösterilir, yoksa getCategoryIcon ile ikon gösterilir
+  - `sub.slug` — getCategoryIcon fonksiyonuna slug parametresi olarak iletilir
+  - `sub.description` — alt kategori açıklaması; p etiketinde gösterilir
+  - `process.env.NEXT_PUBLIC_SUPABASE_URL` — Supabase depolama URL'si; boş string ile fallback yapılır
+  - `Routes.category(categoryUrlSlug, getLocalizedCategorySlug(sub, lang))` — Link'in `href` değeri; dışarıdan gelen `Routes`, `categoryUrlSlug`, `getLocalizedCategorySlug`, `lang` kullanılır
+  - `getCategoryDisplayName(sub)` — alt kategori görünen adı; `alt` attribute ve `h3` içinde kullanılır
+  - `getCategoryIcon(sub.slug, { size: 64, className: "..." })` — görsel yokken gösterilen ikon bileşeni; dışarıdan gelen fonksiyon
+  - `t('category.inspectSeries')` — çeviri anahtarı; "serileri incele" metni; dışarıdan gelen `t` fonksiyonu
+- **Dönüş**: JSX — `<Link>` bileşeni; alt kategori kartı render eder
+
+### [N2_NASIL] AST Pointer: src/components/category/CategoryShowcase.tsx::(feature, i) => div
+- **params**: `feature` — özellik nesnesi, `i` — dizi indeksi
+- **ic_degiskenler**:
+  - `i` — div bileşeninin `key` prop'u olarak kullanılır
+  - `feature.title` — h3 etiketinde gösterilen özellik başlığı
+  - `feature.desc` — p etiketinde gösterilen özellik açıklaması
+- **Dönüş**: JSX — `<div>` bileşeni; özellik kartı render eder
 
 ---
 

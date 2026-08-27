@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\BlueprintCanvas.tsx
-skeleton_hash: 607d86de4a3e9980
+source_path: C:\tmp\vh-urun-comp\src\components\products\BlueprintCanvas.tsx
+skeleton_hash: 74a3a11f44954bf9
 entity_hashes:
   func:BlueprintCanvas: b871a8b848648d7b
   func:CinematicCard: 7fb3fd44dcd5e71f
   overview: 4cbade83072ab96e
   style_tokens: 31f4acfd42638e52
-generated_at: 2026-08-25T07:26:03Z
+generated_at: 2026-08-27T07:28:39Z
 ---
 
 ## Genel Bakış
@@ -124,9 +124,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: BlueprintCanvas.tsx
-  function: BlueprintCanvas.tsx::CinematicCard
-  function: BlueprintCanvas.tsx::BlueprintCanvas
+  file: src\components\products\BlueprintCanvas.tsx
+  function: src\components\products\BlueprintCanvas.tsx::CinematicCard
+  function: src\components\products\BlueprintCanvas.tsx::BlueprintCanvas
 
 ---
 

@@ -2,37 +2,33 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\category\CategoryShowcaseView.tsx
-skeleton_hash: 4a86ea3614b86a02
+source_path: C:\tmp\vh-urun-comp\src\views\category\CategoryShowcaseView.tsx
+skeleton_hash: 4f021d7feadfcc9c
 entity_hashes:
   func:CategoryShowcase: 29e2e90462204c33
-  func:handleSubSelect: 0b68330f2c8fdb75
-  overview: 11de88618c455505
-  style_tokens: 3074af738c3c5317
-generated_at: 2026-06-19T20:50:49Z
+  func:handleSubSelect: 32c9971ae36b2a25
+  overview: 4009627a5befdc70
+  style_tokens: 6b0428f0cf6702bf
+generated_at: 2026-08-27T07:37:45Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunda bir kategorinin vitrin bölümünü sunan React bileşenini tanımlar. Kategori ve alt kategori verilerini alarak kullanıcı arayüzünde görsel bir sergi oluşturur ve alt kategori seçimlerini üst bileşene iletir.
+Bu modül, VentHub HVAC platformunda bir kategorinin vitrin bölümünü sunan React bileşenini tanımlar. Kategori ve alt kategori verilerini alarak kullanıcı arayüzünde görsel bir sergi oluşturur ve alt kategori seçimlerini üst bileşene iletir. Bileşen, dışarıdan sağlanan `category`, `subCategories` ve `onSubcategorySelect` prop'larına bağımlıdır.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Kategori ve alt kategori bilgilerini alarak vitrin görünümünü oluşturan ve kullanıcı etkileşimlerini üst bileşene yönlendiren React bileşeni.
+Kategori ve alt kategori bilgilerini alarak vitrin görünümünü oluşturan ve kullanıcı etkileşimlerini üst bileşene yönlendiren React bileşeni. Bu bileşen, `handleSubSelect` fonksiyonunu içerir ve alt kategori seçimlerini yönetir.
 - CategoryShowcase
 
 ### Kullanıcı Etkileşim İşleyicisi
-Bir alt kategori seçildiğinde tetiklenen ve seçilen alt kategorinin tanımlayıcısını üst bileşene bildiren olay yönetim mekanizması.
+Bir alt kategori seçildiğinde tetiklenen ve seçilen alt kategorinin tanımlayıcısını (`subSlug`) üst bileşene bildiren olay yönetim mekanizması. Bu fonksiyon, `onSubcategorySelect` prop'unu çağırarak üst bileşene bilgi iletir.
 - handleSubSelect
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için, React bileşeninin doğru render edilmesi ve kullanıcı etkileşimlerinin düzgün işlenmesi aşağıdaki dışsal koşullara bağlıdır.
 
-**[Aksiyom 1]:** Eğer `category` prop'u (`{}` veya `undefined`/`null` olmayan bir nesne) sağlanmazsa, bileşen geçerli bir kategori gösterimi yapamaz ve muhtemelen boş/hatalı bir vitrin bölümü render eder.
-**[Aksiyom 2]:** Eğer `subCategories` prop'u bir dizi (`Array`) formatında veya `undefined`/`null` olmayan iterable bir yapıda sağlanmazsa, bileşen alt kategori listesini oluşturamaz ve vitrin bölümünde alt kategori butonları/erişimleri eksik kalır.
-**[Aksiyom 3]:** Eğer `onSubcategorySelect` prop'u çağrılabilir bir fonksiyon (`Function` tipinde) olarak sağlanmazsa, `handleSubSelect` tetiklendiğinde üst bileşene herhangi bir seçim olayı iletilemez ve kullanıcı etkileşimi (`onClick` vb.) sonuçsuz kalır.
-**[Aksiyom 4]:** `handleSubSelect` fonksiyonu çağrıldığında, eğer `subSlug` parametresi geçerli bir string değer (`string` tipinde, boş string `""` hariç) olarak sağlanmazsa, üst bileşene geçersiz veya anlamsız bir alt kategori tanımlayıcısı iletilebilir; bu durum üst bileşenin filtreleme/yonlendirme mantığında beklenmedik sonuçlara yol açabilir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan aksiyom üretilemez. Özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -51,11 +47,14 @@ Bu modül için, React bileşeninin doğru render edilmesi ve kullanıcı etkile
 **Dönüş**: `React.FC<CategoryShowcaseProps>` — JSX bileşenini döndürür
 
 ### handleSubSelect
-**Ne yapar**: CategoryShowcase bileşeni içinde çalışan, alt kategori seçim sürecini yöneten yardımcı işlemci fonksiyonudur. Kullanıcının seçtiği alt kategorinin benzersiz slug değerini alarak, ana bileşene prop olarak iletilen üst düzey geri çağırım fonksiyonunun tetiklenmesini sağlar. Sadece seçim olayının iletim sorumluluğunu üstlenerek ana bileşenin iş yükünü azaltır.
-**Nasıl yapar**: Parametre olarak kendisine iletilen alt kategori slug değerini doğrudan CategoryShowcase propu olarak alınan onSubcategorySelect fonksiyonuna ileterek, seçim olayının üst bileşenlere ulaşmasını sağlar. Ekstra bir veri dönüşümü veya filtreleme yapmadan, aldığı değeri olduğu gibi ilgili geri çağırım fonksiyonuna iletir.
+**Ne yapar**: Alt kategori seçimini işleyen bir fonksiyondur. Çağrıldığında, bir arrow function döndürür; bu arrow function tetiklendiğinde `getLocalizedCategorySlug` fonksiyonunu çağırarak elde edilen yerelleştirilmiş alt kategori slug değerini tekrar `handleSubSelect` fonksiyonuna aktarır.
+
+**Nasıl yapar**: Fonksiyon gövdesinde `() => handleSubSelect(getLocalizedCategorySlug(sub, lang))` ifadesi yer almaktadır. Bu yapı, fonksiyonun kendisini özyinelemeli (recursive) bir şekilde çağıran bir callback ürettiğini gösterir. `sub` ve `lang` değişkenleri bu fonksiyonun kapsama alanından (closure) gelmektedir. `getLocalizedCategorySlug` fonksiyonu, `sub` ve `lang` parametreleriyle çağrılarak yerelleştirilmiş bir kategori slug'ı üretir ve bu değer `handleSubSelect`'e parametre olarak iletilir.
+
 **Parametreler**:
-- subSlug: string — Kullanıcı tarafından seçilen alt kategorinin benzersiz kısa tanımlayıcısı (slug) değeridir, adresleme ve tanımlama işlemlerinde kullanılan benzersiz etikettir
-**Dönüş**: Herhangi bir değer döndürmez, sadece seçim olayını iletmek amacıyla çalıştığından return tipi void niteliğindedir, belirtilen tanıma göre ek bir dönüş değeri tanımlanmamıştır.
+- `subSlug`: `string` — Alt kategoriyi temsil eden slug değeri. Fonksiyonun gövdesinde doğrudan kullanılmamakta olup, döndürülen arrow function içinde `getLocalizedCategorySlug` aracılığıyla dolaylı olarak işlenmektedir.
+
+**Dönüş**: Bilinmiyor. Kaynakta dönüş tipi açıkça belirtilmemiştir. Gövde yapısı bir arrow function döndürdüğü izlenimini vermektedir ancak kesin dönüş tipi hakkında çıkarım yapılmamıştır.
 
 ---
 
@@ -63,6 +62,7 @@ Bu modül için, React bileşeninin doğru render edilmesi ve kullanıcı etkile
 - import: ../../hooks/useCategoryViewModel::useCategoryViewModel
 - import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../lib/type-converters::DomainCategory
+- import: ../../utils/categoryHelpers::getLocalizedCategorySlug
 - import: ../../utils/getCategoryIcon::getCategoryIcon
 - import: @/components/category/EnhancedNeedsWizard::EnhancedNeedsWizard
 - import: @/components/category/sections::BottomCTA
@@ -88,51 +88,53 @@ Bu modül için, React bileşeninin doğru render edilmesi ve kullanıcı etkile
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/category/CategoryShowcaseView.tsx::CategoryShowcase
-- **params**: `category` — mevcut kategori nesnesi (slug, name, metadata, image_url içerir); `subCategories` — alt kategori listesi (dizi); `onSubcategorySelect` — opsiyonel, alt kategori seçildiğinde çağrılan callback
+### [N1_NASIL] AST Pointer: CategoryShowcaseView.tsx::CategoryShowcase
+- **params**: `category`, `subCategories`, `onSubcategorySelect`
 - **ic_degiskenler**:
-  - `router` — `useRouter()` ile alınan Next.js yönlendirme nesnesi, `router.push()` ile programatik navigasyon yapılır
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu, `t('category.showcase.premiumTitle')` gibi anahtarlarla çeviri üretir
-  - `dict` — `useI18n()` hook'undan gelen sözlük nesnesi, `dict.category.showcase.features[i]` ile doğrudan erişim yapılır
-  - `Routes` — `useLocalizedRoutes()` hook'undan gelen lokalize rota oluşturucu, `Routes.category(category.slug, subSlug)` formatında URL üretir
-  - `wrapCategory` — `useCategoryViewModel()` hook'undan gelen fonksiyon, kategori nesnesini view model'e sarar
-  - `wizardOpen` — boolean, artırılmış ihtiyaç sihirbazının açık/kapalı durumunu tutar
-  - `setWizardOpen` — `wizardOpen` durumunu güncelleyen setter fonksiyonu
-  - `vm` — `wrapCategory(category)` sonucu, mevcut kategorinin view model nesnesi (`vm?.displayName`, `vm?.description` erişimleri yapılır)
-  - `isAirCurtain` — boolean, `category.slug.includes('hava-perde')` ile hesaplanır, hava perde kategorisi için wizard butonunu gösterir
-  - `breadcrumbRef` — `useScrollAnimation<HTMLDivElement>()` ile alınan breadcrumb DOM referansı
-  - `breadcrumbVisible` — boolean, breadcrumb'ın scroll animasyonu tetiklenip tetiklenmediğini belirler
-  - `heroBadgeRef` — `useScrollAnimation<HTMLDivElement>()` ile alınan hero badge DOM referansı
-  - `heroBadgeVisible` — boolean, hero badge scroll animasyon durumu
-  - `heroTitleRef` — `useScrollAnimation<HTMLHeadingElement>()` ile alınan hero başlık DOM referansı
-  - `heroTitleVisible` — boolean, hero başlık scroll animasyon durumu
-  - `heroTextRef` — `useScrollAnimation<HTMLParagraphElement>()` ile alınan hero açıklama DOM referansı
-  - `heroTextVisible` — boolean, hero açıklama scroll animasyon durumu
-  - `airCurtainBtnRef` — `useScrollAnimation<HTMLButtonElement>()` ile alınan hava perde butonu DOM referansı
-  - `airCurtainBtnVisible` — boolean, hava perde butonu scroll animasyon durumu
-  - `handleSubSelect` — `(subSlug: string) => void` fonksiyonu, alt kategori seçimini `onSubcategorySelect` prop'u veya `router.push()` ile işler
-  - `breadcrumbItems` — dizi, `[{ label: t('category.breadcrumbHome'), href: '/' }, { label: vm?.displayName || category.name, href: Routes.category(category.slug) }]` formatında breadcrumb öğeleri tutar
-  - `metadata` — `category.metadata` değerinin `CategoryMetadataExtended` tipine cast edilmiş hali, `showcase_images` alanına erişim sağlanır
-  - `showcaseImages` — `metadata?.showcase_images` ile alınan vitrin görselleri dizisi
-  - `heroImage` — string, hero bölümünde kullanılacak görsel URL'i; `showcaseImages?.[0]?.desktop` → `category.image_url` → `/images/industrial_HVAC_air_handling_unit_warehouse.jpg` fallback zinciri ile belirlenir
-- **Dönüş**: JSX — kategori vitrin sayfasının tam HTML yapısı (hero section, breadcrumb, alt kategoriler grid'i, garanti bölümü, BottomCTA ve EnhancedNeedsWizard)
+  - `router` — `useRouter()` çağrısından dönen Next.js router nesnesi; alt kategori seçildiğinde yönlendirme yapmak için kullanılır
+  - `t` — `useI18n()` çağrısından dönen çeviri fonksiyonu; metinlerin dile göre çevrilmesinde kullanılır
+  - `dict` — `useI18n()` çağrısından dönen sözlük nesnesi; `dict.category.showcase.features` ve `dict.category.showcase.whyVenthubTitle` gibi doğrudan erişimlerle yapılandırılmış metin verilerine ulaşmak için kullanılır
+  - `lang` — `useI18n()` çağrısından dönen dil kodu; `getLocalizedCategorySlug` fonksiyonuna parametre olarak aktarılır
+  - `Routes` — `useLocalizedRoutes()` çağrısından dönen rotalar nesnesi; `Routes.category(...)` ile kategori URL'leri üretmek için kullanılır
+  - `wrapCategory` — `useCategoryViewModel()` çağrısından dönen fonksiyon; kategori nesnesini görünüm modeline (`vm`) sarmak için kullanılır
+  - `wizardOpen` — `useState(false)` ile yönetilen boolean durum; `EnhancedNeedsWizard` bileşeninin açık/kapalı durumunu kontrol eder
+  - `setWizardOpen` — `wizardOpen` durumunu güncelleyen setter fonksiyonu; hava perdesi butonuna tıklandığında `true`, sihirbaz kapatıldığında `false` olarak çağrılır
+  - `vm` — `wrapCategory(category)` çağrısının sonucu; `vm?.displayName` ve `vm?.description` erişimleriyle kategori görünen adı ve açıklaması alınır
+  - `isAirCurtain` — `category.slug.includes('hava-perde')` ifadesinin boolean sonucu; hava perdesi kategorisi olup olmadığını belirler, sihirbaz butonu ve `BottomCTA` bileşeninin koşullu gösterimini kontrol eder
+  - `breadcrumbRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })` çağrısından dönen DOM referansı; breadcrumb konteynerine `ref` olarak atanır
+  - `breadcrumbVisible` — `useScrollAnimation` çağrısından dönen boolean; breadcrumb'ın görünür olup olmadığını belirler, animasyon sınıfını kontrol eder
+  - `heroBadgeRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })` çağrısından dönen DOM referansı; hero rozeti konteynerine `ref` olarak atanır
+  - `heroBadgeVisible` — `useScrollAnimation` çağrısından dönen boolean; hero rozeti animasyon durumunu kontrol eder
+  - `heroTitleRef` — `useScrollAnimation<HTMLHeadingElement>({ threshold: 0.2 })` çağrısından dönen DOM referansı; hero başlık `h1` elementine `ref` olarak atanır
+  - `heroTitleVisible` — `useScrollAnimation` çağrısından dönen boolean; hero başlık animasyon durumunu kontrol eder
+  - `heroTextRef` — `useScrollAnimation<HTMLParagraphElement>({ threshold: 0.2 })` çağrısından dönen DOM referansı; hero açıklama paragrafına `ref` olarak atanır
+  - `heroTextVisible` — `useScrollAnimation` çağrısından dönen boolean; hero metin animasyon durumunu kontrol eder
+  - `airCurtainBtnRef` — `useScrollAnimation<HTMLButtonElement>({ threshold: 0.2 })` çağrısından dönen DOM referansı; hava perdesi model bulma butonuna `ref` olarak atanır
+  - `airCurtainBtnVisible` — `useScrollAnimation` çağrısından dönen boolean; hava perdesi butonu animasyon durumunu kontrol eder
+  - `handleSubSelect` — alt kategori seçildiğinde çağrılan iç fonksiyon; `onSubcategorySelect` prop'u varsa onu çağırır, yoksa `router.push` ile yönlendirme yapar
+  - `breadcrumbItems` — breadcrumb navigasyon öğeleri dizisi; her eleman `label` ve `href` alanlarından oluşur, `Breadcrumb` bileşenine prop olarak aktarılır
+  - `metadata` — `category.metadata` değerinin `CategoryMetadataExtended` tipine dönüştürülmüş hali; `showcase_images` alanına erişmek için kullanılır
+  - `showcaseImages` — `metadata?.showcase_images` erişimi; vitrin görselleri dizisini tutar
+  - `heroImage` — `showcaseImages?.[0]?.desktop` değerinin, bulunamazsa `category.image_url`, o da yoksa varsayılan yolun kullanılmasıyla elde edilen hero görsel URL'si; hem hero bölümündeki hem de alt kısım `VentImage` bileşeninde kullanılır
+- **Dönüş**: JSX element (React.FC<CategoryShowcaseProps>)
 
-### [N2_NASIL] AST Pointer: src/views/category/CategoryShowcaseView.tsx::CategoryShowcase::handleSubSelect
-- **params**: `subSlug` — string, seçilen alt kategorinin slug'ı
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `onSubcategorySelect` prop'u varsa onu çağırır, yoksa `router.push(Routes.category(category.slug, subSlug))` ile doğrudan navigasyon yapar
-
-### [N3_NASIL] AST Pointer: src/views/category/CategoryShowcaseView.tsx::CategoryShowcase::subCategories.map_callback
-- **params**: `sub` — mevcut alt kategori nesnesi (id, slug içerir)
+### [N2_NASIL] AST Pointer: CategoryShowcaseView.tsx::handleSubSelect
+- **params**: `subSlug`
 - **ic_degiskenler**:
-  - `subVm` — `wrapCategory(sub)` sonucu, alt kategorinin view model nesnesi (`subVm?.displayName`, `subVm?.description` erişimleri yapılır)
-- **Dönüş**: JSX — her alt kategori için tıklanabilir buton kartı, `getCategoryIcon(sub.slug, { size: 28 })` ile ikon, başlık ve açıklama içerir
+  - *(yok — fonksiyon gövdesinde tanımlı iç değişken bulunmaz; dış scope'daki `onSubcategorySelect`, `router`, `Routes`, `category`, `lang` değişkenlerini kullanır)*
+- **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: src/views/category/CategoryShowcaseView.tsx::CategoryShowcase::features.map_callback
-- **params**: `Icon` — lucide-react icon bileşeni (ShieldCheck, Activity veya Zap); `i` — number, dizi indeksi (0, 1 veya 2)
+### [N3_NASIL] AST Pointer: CategoryShowcaseView.tsx::subCategories.map anonim fonksiyonu
+- **params**: `sub`
 - **ic_degiskenler**:
-  - `item` — `dict.category.showcase.features[i]` ile alınan özellik nesnesi, `item.title` ve `item.desc` alanları erişilir
-- **Dönüş**: JSX — garanti bölümündeki her bir özellik kartı (ikon, başlık ve açıklama)
+  - `subVm` — `wrapCategory(sub)` çağrısının sonucu; `subVm?.displayName` ve `subVm?.description` erişimleriyle alt kategori görünen adı ve açıklaması alınır
+- **Dönüş**: JSX element (button)
+
+### [N4_NASIL] AST Pointer: CategoryShowcaseView.tsx::features.map anonim fonksiyonu
+- **params**: `Icon`, `i`
+- **ic_degiskenler**:
+  - `item` — `dict.category.showcase.features[i]` erişimiyle elde edilen özellik nesnesi; `item.title` ve `item.desc` alanlarıyla başlık ve açıklama metinlerine ulaşılır
+- **Dönüş**: JSX element (div)
 
 ---
 
@@ -159,6 +161,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `bg-cyan-500`, `bg-cyan-500/10`, `bg-gradient-to-b`, `bg-slate-200`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `bg-white/5`, `border-cyan-500/20`, `border-slate-100`, `border-white/10`, `from-transparent`, `group-hover:bg-cyan-500`, `group-hover:text-cyan-600`, `group-hover:text-white`
-- **Layout:** `absolute`, `block`, `bottom-8`, `flex`, `flex-col`, `flex-wrap`, `from-transparent`, `gap-2`, `gap-24`, `gap-3`, `gap-6`, `gap-8`, `grid`, `group-hover:w-12`, `h-12`
-- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `sm:` önekleri
+- **Layout:** `absolute`, `block`, `bottom-8`, `flex`, `flex-col`, `from-transparent`, `gap-2`, `gap-24`, `gap-3`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `group-hover:w-12`, `h-12`
+- **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
 - **Yardımcı Sınıflar:** `-translate-x-1/2`, `animate-bounce`, `animate-pulse`, `aspect-square`, `border`, `brightness-50`, `cursor-pointer`, `duration-500`, `duration-700`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `grayscale`

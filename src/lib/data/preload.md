@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\data\preload.ts
-skeleton_hash: 1ecde0090d80f049
+source_path: C:\tmp\ops-t165\src\lib\data\preload.ts
+skeleton_hash: 39431ced20de9260
 entity_hashes:
   func:preloadCategory: c41a63f5591b9705
   func:preloadFamily: 88b4c30632a4f69a
   func:preloadProduct: fd0b3bb92f6ab3aa
   overview: 291aab3ad1b06ceb
-generated_at: 2026-08-25T07:28:08Z
+generated_at: 2026-08-27T06:57:27Z
 ---
 
 ## Genel Bakış
@@ -150,10 +150,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: preload.ts
-  function: preload.ts::preloadFamily
-  function: preload.ts::preloadProduct
-  function: preload.ts::preloadCategory
+  file: src\lib\data\preload.ts
+  function: src\lib\data\preload.ts::preloadFamily
+  function: src\lib\data\preload.ts::preloadProduct
+  function: src\lib\data\preload.ts::preloadCategory
 
 ---
 

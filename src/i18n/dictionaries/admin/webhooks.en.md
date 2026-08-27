@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\webhooks.en.ts
-skeleton_hash: 2856424cb781d08e
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\webhooks.en.ts
+skeleton_hash: f19f1a2d7ef1ec96
 entity_hashes:
   overview: a695b1bd72d402b4
-generated_at: 2026-08-25T07:27:49Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -43,7 +43,7 @@ Bu dosyada (`src/i18n/dictionaries/admin/webhooks.en.ts`) fonksiyon tanımlanmam
 
 ## NODE ID STANDARD
 
-  file: webhooks.en.ts
+  file: src\i18n\dictionaries\admin\webhooks.en.ts
 
 ---
 

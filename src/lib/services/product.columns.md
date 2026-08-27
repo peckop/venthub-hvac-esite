@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\product.columns.ts
-skeleton_hash: 48841921b454beb5
+source_path: C:\tmp\ops-t165\src\lib\services\product.columns.ts
+skeleton_hash: 5587dba06fe44cc6
 entity_hashes:
   overview: ef888ebf26b7056e
-generated_at: 2026-08-25T08:44:37Z
+generated_at: 2026-08-27T07:04:15Z
 ---
 
 ## Genel Bakış

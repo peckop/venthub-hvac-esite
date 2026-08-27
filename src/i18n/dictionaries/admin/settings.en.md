@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\i18n\dictionaries\admin\settings.en.ts
-skeleton_hash: dad3d2ccb7c95ac5
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\settings.en.ts
+skeleton_hash: 93151926faa8d2da
 entity_hashes:
   overview: a6820ef6861612f2
-generated_at: 2026-08-17T13:20:03Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -37,7 +37,7 @@ Bu modül bir i18n sözlük dosyasıdır (admin/settings.en.ts) ve `settings` ad
 - **settings** (object) — `{
       hoursUnit: 'Hours',
       siteName: 'Site Name',
-      tagline: 'Tagl...`
+      tagline: 'T...`
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\format.ts
-skeleton_hash: b1f270d844a80806
+source_path: C:\tmp\vh-comp\src\i18n\format.ts
+skeleton_hash: 4afe4bc846b54ef5
 entity_hashes:
   func:formatCurrency: c74424c786c4ea7f
   func:formatNumber: 0816f48e81145d1c
   overview: cad42f6789244c28
-generated_at: 2026-08-26T07:14:40Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış

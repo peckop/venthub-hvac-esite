@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\AirPurifierModel.tsx
-skeleton_hash: 20902ac5689a8dc2
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\AirPurifierModel.tsx
+skeleton_hash: e7eac785a5fd2a6a
 entity_hashes:
   func:AirPurifierModel: 93d1bb16d07d8fad
   overview: e95c6e9614a2d036
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:12Z
+generated_at: 2026-08-27T07:11:41Z
 ---
 
 ## Genel Bakış

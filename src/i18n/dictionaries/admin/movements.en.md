@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\movements.en.ts
-skeleton_hash: 2d38ad8579dc90eb
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\movements.en.ts
+skeleton_hash: b648ac28552add5d
 entity_hashes:
   overview: 913c3c44e13878f9
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -32,7 +32,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## SABİTLER
 - **movements** (object) — `{
       subtitle: 'Track, filter and export inventory in/out movements',
-    ...`
+  ...`
 
 ---
 

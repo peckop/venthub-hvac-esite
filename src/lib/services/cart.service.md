@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\services\cart.service.ts
-skeleton_hash: 02209daf527c63bc
+source_path: C:\tmp\ops-t165\src\lib\services\cart.service.ts
+skeleton_hash: 012ab85ea5c7450b
 entity_hashes:
   func:clearCartItems: 56829660b28fad3e
   func:ensureUserProfile: 3b934029dfb6c2d7
@@ -13,7 +13,7 @@ entity_hashes:
   func:removeCartItem: 266d3621f6d5ba34
   func:upsertCartItem: 48510d49ceaa32a2
   overview: 8bbdad4d0c699097
-generated_at: 2026-08-25T07:28:32Z
+generated_at: 2026-08-27T06:58:34Z
 ---
 
 ## Genel Bakış
@@ -161,20 +161,20 @@ graph TD
     cart_service_ts__listCartItemsWithProducts["listCartItemsWithProducts"]
     cart_service_ts__removeCartItem["removeCartItem"]
     cart_service_ts__upsertCartItem["upsertCartItem"]
-    cart_service_ts__listCartItemsWithProducts --> cart_service_ts__listCartItems
     cart_service_ts__getOrCreateShoppingCart --> cart_service_ts__ensureUserProfile
+    cart_service_ts__listCartItemsWithProducts --> cart_service_ts__listCartItems
 ```
 
 ## NODE ID STANDARD
 
-  file: cart.service.ts
-  function: cart.service.ts::ensureUserProfile
-  function: cart.service.ts::getOrCreateShoppingCart
-  function: cart.service.ts::listCartItems
-  function: cart.service.ts::listCartItemsWithProducts
-  function: cart.service.ts::upsertCartItem
-  function: cart.service.ts::removeCartItem
-  function: cart.service.ts::clearCartItems
+  file: src\lib\services\cart.service.ts
+  function: src\lib\services\cart.service.ts::ensureUserProfile
+  function: src\lib\services\cart.service.ts::getOrCreateShoppingCart
+  function: src\lib\services\cart.service.ts::listCartItems
+  function: src\lib\services\cart.service.ts::listCartItemsWithProducts
+  function: src\lib\services\cart.service.ts::upsertCartItem
+  function: src\lib\services\cart.service.ts::removeCartItem
+  function: src\lib\services\cart.service.ts::clearCartItems
 
 ---
 

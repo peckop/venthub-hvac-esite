@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\data\productRoute.ts
-skeleton_hash: 6ba85168e43af72a
+source_path: C:\tmp\ops-t165\src\lib\data\productRoute.ts
+skeleton_hash: ed3e1fcf21773c7e
 entity_hashes:
   func:resolveProductRoute: 69c463e1d31d1e03
   overview: 3ce8abad1f29d75f
-generated_at: 2026-08-25T08:46:28Z
+generated_at: 2026-08-27T06:57:29Z
 ---
 
 ## Genel Bakış
@@ -40,10 +40,6 @@ Bu modül için fonksiyon gövdesi verilmediğinden, davranışsal aksiyom üret
 **[Aksiyom 3]**: Eğer `deps` parametresi sağlanmazsa, fonksiyonun bağımlılıklara (veri erişimi, servisler vb.) erişimi olmaz ve çalışması beklenemez.
 
 **[Aksiyom 4]**: Eğer `ProductRouteDeps` yapısı beklenen üyeleri içermiyorsa, fonksiyonun hangi davranışı sergileyeceği bilinmiyor (fonksiyon gövdesi mevcut değil).
-
----
-
-> **Not**: Fonksiyon gövdesi (`resolveProductRoute` implementasyonu) sağlanmadığı için, `slug` ve `lang` değerlerinin nasıl doğrulandığı, hangi eşik değerlerinin kullanıldığı, hata durumlarının nasıl ele alındığı, `ProductRouteResolution`'ın hangi koşullarda hangi alanları içerdiği gibi davranışsal detaylar belirlenememektedir. Daha kesin aksiyomlar için fonksiyon gövdesi gereklidir.
 
 ---
 

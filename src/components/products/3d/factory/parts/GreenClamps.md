@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\GreenClamps.tsx
-skeleton_hash: 4304705d1ca03ada
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\factory\parts\GreenClamps.tsx
+skeleton_hash: ea301eb9c6788895
 entity_hashes:
   func:GreenClamps: 957b30489f158a33
   overview: 56ea2345484e125a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:11Z
+generated_at: 2026-08-27T07:06:06Z
 ---
 
 ## Genel Bakış

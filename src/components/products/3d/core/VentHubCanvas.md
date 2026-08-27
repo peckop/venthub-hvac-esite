@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\3d\core\VentHubCanvas.tsx
-skeleton_hash: 2efbbd39878c079c
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\core\VentHubCanvas.tsx
+skeleton_hash: 71e305d731ad866f
 entity_hashes:
   func:VentHubCanvas: 4908f485b830ec98
   overview: 17c94d72d1b419fe
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:26:32Z
+generated_at: 2026-08-27T07:06:01Z
 ---
 
 ## Genel Bakış
@@ -135,8 +135,8 @@ type CanvasProps = React.ComponentProps<typeof Canvas>
 
 ## NODE ID STANDARD
 
-  file: VentHubCanvas.tsx
-  function: VentHubCanvas.tsx::VentHubCanvas
+  file: src\components\products\3d\core\VentHubCanvas.tsx
+  function: src\components\products\3d\core\VentHubCanvas.tsx::VentHubCanvas
 
 ---
 

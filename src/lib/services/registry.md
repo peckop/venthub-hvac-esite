@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\registry.ts
-skeleton_hash: 69bd4c2379786328
+source_path: C:\tmp\ops-t165\src\lib\services\registry.ts
+skeleton_hash: adf6f80ec27738e9
 entity_hashes:
   func:AddressService:constructor: 0e35462915cc5372
   func:AddressService:createAddress: 523df76982196318
@@ -51,7 +51,7 @@ entity_hashes:
   func:ProjectService:removeProductFromProject: 267b218308338057
   func:ServiceRegistry:constructor: 0e35462915cc5372
   overview: 938705e66862ef28
-generated_at: 2026-08-13T08:53:50Z
+generated_at: 2026-08-27T07:07:30Z
 ---
 
 ## Genel Bakış
@@ -117,7 +117,11 @@ Bu modül, ServiceRegistry aracılığıyla bir SupabaseClient üzerinden birden
 ## FONKSİYON DETAYLARI
 
 ### constructor
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: ServiceRegistry sınıfının yapıcı metodudur. Sınıf örneği oluşturulurken Supabase istemcisini sınıf içinde kullanıma hazırlar.
+**Nasıl yapar**: Parametre olarak gelen Supabase istemcisini sınıfın private bir özelliği olarak saklar. Bu sayede sınıfın diğer metotları bu istemciyi kullanarak veritabanı işlemlerini gerçekleştirebilir.
+**Parametreler**:
+- supabase: SupabaseClient<Database> — Supabase veritabanı bağlantısını temsil eden istemci nesnesi
+**Dönüş**: Bilinmiyor (gövdede return ifadesi yok)
 
 ### AddressService.listAddresses
 **Ne yapar**: Tüm adres kayıtlarını listeler.
@@ -184,250 +188,183 @@ Bu modül, ServiceRegistry aracılığıyla bir SupabaseClient üzerinden birden
 **Dönüş**: `listCartItemsWithProducts` fonksiyonunun dönüş değeri. Verilen bilgiye göre dönüş tipi belirtilmemiştir.
 
 ### upsertCartItem
-**Ne yapar**: Bir sepete ürün ekler veya mevcut bir ürünün miktarını/parametrelerini günceller (yukarı ekleme-upsert).
-**Nasıl yapar**: Fonksiyon, harici bir `upsertCartItem` modül fonksiyonunu çağırır. Bu modül fonksiyonuna `this.supabase` istemcisini ve verilen `payload` parametresini geçerek veritabanı işlemini başlatır. Bu, sepet öğesi eklemek/güncellemek için merkezi bir mantık uygular.
+**Ne yapar**: Sepet öğesini ekler veya günceller. "Upsert" işlemi, öğe yoksa ekler, varsa günceller.
+**Nasıl yapar**: Bu metot, CartService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini ve gelen payload parametresini alarak harici `upsertCartItem` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
 **Parametreler**:
-- `payload`: `{ cartId: string; _productId: string; quantity: number; unitPrice?: number; priceListId?: string }` — Sepet işleminin tüm gerekli ve opsiyonel verilerini içeren bir nesne. `cartId` hedef sepetin, `_productId` ürünün, `quantity` miktarın, `unitPrice` birim fiyatın (opsiyonel), `priceListId` fiyat listesinin (opsiyonel) kimliğini/değerini tutar.
-**Dönüş**: Fonksiyon, altındaki `upsertCartItem` modül fonksiyonunun Promise olarak döndürdüğü sonucu doğrudan iletir (veritabanı sonucu).
+- payload: { cartId: string; _productId: string; quantity: number; unitPrice?: number; priceListId?: string } — Sepet öğesi bilgilerini içeren nesne. cartId sepet kimliğini, _productId ürün kimliğini, quantity miktarı, unitPrice birim fiyatı (isteğe bağlı), priceListId fiyat listesi kimliğini (isteğe bağlı) temsil eder.
+**Dönüş**: Harici `upsertCartItem` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### removeCartItem
 **Ne yapar**: Belirli bir sepetteki belirli bir ürünü kaldırır.
-**Nasıl yapar**: Fonksiyon, harici bir `removeCartItem` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini, `cartId` ve `productId` parametrelerini geçirerek belirtilen ürünü sepetten silme işlemini başlatır.
+**Nasıl yapar**: Bu metot, CartService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini ve gelen parametreleri alarak harici `removeCartItem` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
 **Parametreler**:
-- `cartId`: `string` — Ürünü kaldırılacak sepetin benzersiz tanımlayıcısı.
-- `productId`: `string` — Kaldırılacak ürünün benzersiz tanımlayıcısı.
-**Dönüş**: Fonksiyon, altındaki `removeCartItem` modül fonksiyonunun Promise olarak döndürdüğü sonucu doğrudan iletir.
+- cartId: string — Ürünün kaldırılacağı sepetin kimliği
+- productId: string — Kaldırılacak ürünün kimliği
+**Dönüş**: Harici `removeCartItem` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### clearCartItems
-**Ne yapar**: Belirtilen sepetin içindeki tüm ürünleri toplu olarak kaldırır (sepeti temizler).
-**Nasıl yapar**: Fonksiyon, harici bir `clearCartItems` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini ve `cartId` parametreterini geçirerek ilgili sepetin tüm öğelerini silme işlemini başlatır.
+**Ne yapar**: Belirli bir sepetin tüm öğelerini temizler.
+**Nasıl yapar**: Bu metot, CartService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini ve gelen parametreyi alarak harici `clearCartItems` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
 **Parametreler**:
-- `cartId`: `string` — İçeriği temizlenecek sepetin benzersiz tanımlayıcısı.
-**Dönüş**: Fonksiyon, altındaki `clearCartItems` modül fonksiyonunun Promise olarak döndürdüğü sonucu doğrudan iletir.
+- cartId: string — Temizlenecek sepetin kimliği
+**Dönüş**: Harici `clearCartItems` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### constructor
-**Ne yapar**: `ServiceRegistry` sınıfının bir örneğini oluşturur ve bağımlılık enjeksiyonu yapar.
-**Nasıl yapar**: Sınıfın bir alanı olan `this.supabase`'i, constructor'a verilen `supabase` parametresiyle başlatır. Bu, servislerin veritabanı bağlantısını almasının temel yoludur. `private` anahtar kelimesi, parametrenin aynı zamanda sınıf alanı olarak da atanmasını sağlar.
+**Ne yapar**: ServiceRegistry sınıfının yapıcı metodudur. Sınıf örneği oluşturulurken Supabase istemcisini sınıf içinde kullanıma hazırlar.
+**Nasıl yapar**: Parametre olarak gelen Supabase istemcisini sınıfın private bir özelliği olarak saklar. Bu sayede sınıfın diğer metotları bu istemciyi kullanarak veritabanı işlemlerini gerçekleştirebilir.
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Bu servislerin kullanacağı, veritabanı şeması (`Database`) ile güçlü tiplendirilmiş Supabase istemcisi örneği.
-**Dönüş**: Fonksiyon bir constructor olduğu için doğrudan bir değer dönmez (geri dönüş tipi `void`).
+- supabase: SupabaseClient<Database> — Supabase veritabanı bağlantısını temsil eden istemci nesnesi
+**Dönüş**: Bilinmiyor (gövdede return ifadesi yok)
 
 ### getCategories
-**Ne yapar**: Veritabanından tüm ürün kategorilerinin listesini getirir.
-**Nasıl yapar**: Fonksiyon, harici bir `getCategories` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini geçirerek kategorilerin okunma (listelenme) işlemini başlatır.
-**Parametreler**: Fonksiyonun herhangi bir parametresi yoktur.
-**Dönüş**: Fonksiyon, altındaki `getCategories` modül fonksiyonunun Promise olarak döndürdüğü kategori listesini (veya sonucunu) doğrudan iletir.
+**Ne yapar**: Kategorileri getirir.
+**Nasıl yapar**: Bu metot, CategoryService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini alarak harici `getCategories` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
+**Parametreler**: Parametre almaz.
+**Dönüş**: Harici `getCategories` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### constructor
-**Ne yapar**: `ServiceRegistry` sınıfının bir örneğini oluşturur ve bağımlılık enjeksiyonu yapar.
-**Nasıl yapar**: Sınıfın bir alanı olan `this.supabase`'i, constructor'a verilen `supabase` parametresiyle başlatır. Bu, servislerin veritabanı bağlantısını almasının temel yoludur. `private` anahtar kelimesi, parametrenin aynı zamanda sınıf alanı olarak da atanmasını sağlar.
+**Ne yapar**: ServiceRegistry sınıfının yapıcı metodudur. Sınıf örneği oluşturulurken Supabase istemcisini sınıf içinde kullanıma hazırlar.
+**Nasıl yapar**: Parametre olarak gelen Supabase istemcisini sınıfın private bir özelliği olarak saklar. Bu sayede sınıfın diğer metotları bu istemciyi kullanarak veritabanı işlemlerini gerçekleştirebilir.
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Bu servislerin kullanacağı, veritabanı şeması (`Database`) ile güçlü tiplendirilmiş Supabase istemcisi örneği.
-**Dönüş**: Fonksiyon bir constructor olduğu için doğrudan bir değer dönmez (geri dönüş tipi `void`).
+- supabase: SupabaseClient<Database> — Supabase veritabanı bağlantısını temsil eden istemci nesnesi
+**Dönüş**: Bilinmiyor (gövdede return ifadesi yok)
 
 ### listInvoiceProfiles
-**Ne yapar**: Mevcut tüm fatura profillerinin bir listesini getirir.
-**Nasıl yapar**: Fonksiyon, harici bir `listInvoiceProfiles` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini geçirerek fatura profillerinin veritabanından okunmasını başlatır.
-**Parametreler**: Fonksiyonun herhangi bir parametresi yoktur.
-**Dönüş**: Fonksiyon, altındaki `listInvoiceProfiles` modül fonksiyonunun Promise olarak döndürdüğü fatura profili listesini doğrudan iletir.
+**Ne yapar**: Fatura profillerini listeler.
+**Nasıl yapar**: Bu metot, InvoiceService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini alarak harici `listInvoiceProfiles` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
+**Parametreler**: Parametre almaz.
+**Dönüş**: Harici `listInvoiceProfiles` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### createInvoiceProfile
-**Ne yapar**: Verilen verilerle yeni bir fatura profili oluşturur.
-**Nasıl yapar**: Fonksiyon, harici bir `createInvoiceProfile` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini ve `payload` parametresini geçirerek veritabanına yeni bir fatura profili ekleme işlemini başlatır.
+**Ne yapar**: Yeni bir fatura profili oluşturur.
+**Nasıl yapar**: Bu metot, InvoiceService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini ve gelen payload parametresini alarak harici `createInvoiceProfile` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
 **Parametreler**:
-- `payload`: `DbInvoiceProfileInsert` — Veritabanına eklenecek yeni fatura profilinin tüm alanlarını içeren veri nesnesi. Bu tip, veritabanı şemasına göre zorunlu ve opsiyonel alanları belirler.
-**Dönüş**: Fonksiyon, altındaki `createInvoiceProfile` modül fonksiyonunun Promise olarak döndürdüğü sonucu (muhtemelen oluşturulan profilin kendisi) doğrudan iletir.
+- payload: DbInvoiceProfileInsert — Oluşturulacak fatura profilinin verilerini içeren nesne
+**Dönüş**: Harici `createInvoiceProfile` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### updateInvoiceProfile
-**Ne yapar**: Belirli bir ID'ye sahip mevcut bir fatura profilini günceller.
-**Nasıl yapar**: Fonksiyon, harici bir `updateInvoiceProfile` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini, güncellenecek profilin `id`'sini ve güncellenecek alanları içeren `payload`'ı geçirerek veritabanı güncelleme işlemini başlatır.
+**Ne yapar**: Mevcut bir fatura profilini günceller.
+**Nasıl yapar**: Bu metot, InvoiceService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini ve gelen parametreleri alarak harici `updateInvoiceProfile` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
 **Parametreler**:
-- `id`: `string` — Güncellenecek fatura profilinin benzersiz tanımlayıcısı.
-- `payload`: `DbInvoiceProfileUpdate` — Güncellenecek alanları ve değerleri içeren veri nesnesi. Bu tip, veritabanı şemasına göre güncellenebilir alanları belirler.
-**Dönüş**: Fonksiyon, altındaki `updateInvoiceProfile` modül fonksiyonunun Promise olarak döndürdüğü sonucu (muhtemelen güncellenen profilin güncel hali) doğrudan iletir.
+- id: string — Güncellenecek fatura profilinin kimliği
+- payload: DbInvoiceProfileUpdate — Güncellenecek fatura profilinin yeni verilerini içeren nesne
+**Dönüş**: Harici `updateInvoiceProfile` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### deleteInvoiceProfile
-**Ne yapar**: Belirli bir ID'ye sahip fatura profilini siler.
-**Nasıl yapar**: Fonksiyon, harici bir `deleteInvoiceProfile` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini ve silinecek profilin `id`'sini geçirerek veritabanından kaydı kaldırma işlemini başlatır.
+**Ne yapar**: Belirtilen kimliğe sahip fatura profilini siler. Bu işlem, `InvoiceService` sınıfı üzerinden yürütülür ve veritabanında ilgili kaydın kaldırılmasını sağlar.
+
+**Nasıl yapar**: Fonksiyon, aldığı `id` parametresini ve sınıfın `this.supabase` bağlantısını harici `deleteInvoiceProfile` fonksiyonuna aktararak silme işlemini gerçekleştirir. İş mantığı bu sınıf içinde değil, dışarıdaki bağımsız fonksiyonda tanımlıdır.
+
 **Parametreler**:
-- `id`: `string` — Silinecek fatura profilinin benzersiz tanımlayıcısı.
-**Dönüş**: Fonksiyon, altındaki `deleteInvoiceProfile` modül fonksiyonunun Promise olarak döndürdüğü sonucu doğrudan iletir.
+- id: string — Silinecek fatura profilinin benzersiz kimlik numarası
+
+**Dönüş**: Harici `deleteInvoiceProfile` fonksiyonunun dönüş değerini aynen iletir. Kesin dönüş tipi belirtilmemiştir.
 
 ### setDefaultInvoiceProfile
-**Ne yapar**: Belirtilen fatura profilini, ilgili kullanıcının veya sistem konfigürasyonunun varsayılan fatura profili olarak ayarlar.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve profil ID'si alır. Bu istemciyi ve ID'yi kullanarak, `setDefaultInvoiceProfile` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, veritabanında ilgili kayıt üzerinde güncelleme işlemi yaparak profile varsayılan statüsünü atar.
-**Parametreler**:
-- id: string — Varsayılan olarak ayarlanacak fatura profilinin benzersiz tanımlayıcısı.
-**Dönüş**: Promise<any> — Harici fonksiyonun döndürdüğü sonucu, muhtemelen işlem durumunu veya güncellenen profil bilgisini içeren bir promise.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### fetchDefaultInvoiceProfile
-**Ne yapar**: Sistemde yapılandırılmış olan veya aktif kullanıcının sahip olduğu varsayılan fatura profilini getirir.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi alır ve bu istemciyi kullanarak `fetchDefaultInvoiceProfile` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, veritabanından varsayılan olarak işaretlenmiş fatura profilini sorgular ve sonucu döndürür.
-**Parametreler**: Bu fonksiyonun parametresi yoktur.
-**Dönüş**: Promise<any> — Harici fonksiyonun döndürdüğü sonucu, muhtemelen fatura profilinin verilerini veya null döndüren bir promise.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: İlgili servis sınıfının bir örneğini oluşturur ve bağımlılık enjeksiyonu yapar.
-**Nasıl yapar**: Bu, bir TypeScript yapıcı metodudur. `private` erişim belirteci ile `supabase` parametresini alır ve bu parametreyi sınıfın bir özel üyesine atar. Bu tasarım, servis metodlarının bu ortak Supabase istemcisini kullanmasını sağlar.
-**Parametreler**:
-- supabase: SupabaseClient<Database> — Servis tarafından kullanılacak Supabase istemcisi.
-**Dönüş**: Bu bir yapıcıdır, doğrudan bir dönüş değeri yoktur.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getEffectiveUnitPrice
-**Ne yapar**: Belirli bir ürün için, varsa indirimler, vergiler veya özel fiyatlandırma kuralları uygulanmış geçerli birim fiyatı hesaplar veya getirir.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve bir `Product` nesnesi alır. Bu bilgileri kullanarak `getEffectiveUnitPrice` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, ürün verilerini ve olası fiyatlandırma mantığını işleyerek nihai birim fiyatı hesaplar.
-**Parametreler**:
-- product: Product — Fiyatı hesaplanacak olan ürün nesnesi. Ürünün temel bilgilerini (örn. temel fiyat, kategori) içerir.
-**Dönüş**: Promise<number | null> — Harici fonksiyonun döndürdüğü sonucu, hesaplanmış geçerli birim fiyatını veya fiyat bulunamazsa null değerini içeren bir promise.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getEffectivePriceInfo
-**Ne yapar**: Belirli bir ürün için, birim fiyatın yanı sıra ilgili tüm fiyatlandırma detaylarını (örn. para birimi, indirim oranı, vergi bilgisi) da içeren kapsamlı bir fiyat bilgi nesnesi getirir.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve bir `Product` nesnesi alır. Bu bilgileri kullanarak `getEffectivePriceInfo` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, ürün ve fiyatlandırma kurallarını analiz ederek zenginleştirilmiş bir fiyat bilgi yapısı oluşturur.
-**Parametreler**:
-- product: Product — Fiyat bilgisi istenen ürün nesnesi.
-**Dönüş**: Promise<PriceInfo | null> — Harici fonksiyonun döndürdüğü sonucu, detaylı fiyat bilgilerini (birim fiyat, para birimi, indirim vb.) içeren bir nesneyi veya bilgi bulunamazsa null değerini içeren bir promise.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: İlgili servis sınıfının bir örneğini oluşturur ve bağımlılık enjeksiyonu yapar.
-**Nasıl yapar**: Bu, bir TypeScript yapıcı metodudur. `private` erişim belirteci ile `supabase` parametresini alır ve bu parametreyi sınıfın bir özel üyesine atar. Bu tasarım, servis metodlarının bu ortak Supabase istemcisini kullanmasını sağlar.
-**Parametreler**:
-- supabase: SupabaseClient<Database> — Servis tarafından kullanılacak Supabase istemcisi.
-**Dönüş**: Bu bir yapıcıdır, doğrudan bir dönüş değeri yoktur.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getSearchSuggestions
-**Ne yapar**: Kullanıcının girdiği kısmi bir arama sorgusuna dayanarak, eşleşen ürün adları veya anahtar kelimelerden oluşan bir öneri listesi döndürür.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi, bir arama dizesi ve opsiyonel bir limit alır. Bu parametreleri kullanarak `getSearchSuggestions` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, veritabanında kısmi eşleşme (örn. LIKE sorgusu) yaparak önerileri bulur ve belirtilen limit kadar sonuç döndürür.
-**Parametreler**:
-- query: string — Arama motoruna girilen kısmi sorgu veya anahtar kelime.
-- limit: number | undefined — Döndürülecek maksimal öneri sayısı. Tanımlanmazsa varsayılan bir değer kullanılır.
-**Dönüş**: Promise<string[]> — Harici fonksiyonun döndürdüğü sonucu, eşleşen arama önerilerini içeren bir dize dizisi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### ftsSearchProducts
-**Ne yapar**: Full-Text Search (FTS) özelliğini kullanarak, belirtilen arama terimine göre ürünleri kapsamlı bir şekilde arar.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi, bir arama terimi ve opsiyonel bir limit alır. Bu parametreleri kullanarak `ftsSearchProducts` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, veritabanında full-text search indekslerini sorgulayarak terimle anlamlı şekilde eşleşen ürünleri bulur ve döndürür.
-**Parametreler**:
-- term: string — Ürünlerde aranacak tam veya kısmi anahtar kelime/cümle.
-- limit: number | undefined — Döndürülecek maksimal sonuç sayısı.
-**Dönüş**: Promise<Product[]> — Harici fonksiyonun döndürdüğü sonucu, arama terimiyle eşleşen ürün nesnelerinden oluşan bir dizi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getProducts
-**Ne yapar**: Belirli bir miktarda ürün listesini, temel bilgileriyle birlikte getirir.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve opsiyonel bir limit alır. Bu parametreleri kullanarak `getProducts` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, veritabanından belirtilen limit kadar kaydı (örn. en son eklenenler veya varsayılan sıralamayla) sorgular ve döndürür.
-**Parametreler**:
-- limit: number | undefined — Getirilecek maksimal ürün sayısı. Tanımlanmazsa tüm ürünler döndürülebilir veya varsayılan bir limit uygulanabilir.
-**Dönüş**: Promise<Product[]> — Harici fonksiyonun döndürdüğü sonucu, ürün nesnelerinden oluşan bir dizi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getAllProducts
-**Ne yapar**: Veritabanında bulunan tüm ürün kayıtlarını, temel bilgileriyle birlikte getirir.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi alır. Bu istemciyi kullanarak `getAllProducts` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, sınırlama olmadan (LIMITsiz) tüm ürünleri sorgular ve döndürür.
-**Parametreler**: Bu fonksiyonun parametresi yoktur.
-**Dönüş**: Promise<Product[]> — Harici fonksiyonun döndürdüğü sonucu, veritabanındaki tüm ürün nesnelerinden oluşan bir dizi.
+**Ne yapar**: ProductService sınıfının tüm ürünleri getiren asenkron metodudur. Ürünlerin tamamını getirmek için üst kapsam fonksiyonu çağırır.
+**Nasıl yapar**: Sınıf içindeki `this.supabase` nesnesini parametre olarak `getAllProducts` fonksiyonuna aktarır ve sonucu doğrudan döndürür. İş mantığı bu metodun içinde değil, çağrılan üst kapsam fonksiyonda yer alır.
+**Parametreler**:
+- Bu metod herhangi bir parametre almaz.
+**Dönüş**: Dönüş tipi belirtilmemiştir, bilinmiyor.
 
 ### getProductsByCategory
-**Ne yapar**: Belirli bir kategoriye (category) ait tüm ürünleri getirir.
-**Nasıl yapar**: `getProductsByCategory` adlı harici (external) bir servis fonksiyonunu, sınıf içinde saklanan `this.supabase` istemcisini ve gelen `categoryId` parametreğini ileterek çağırır. Asenkron bir operasyondur ve sonucu bir Promise olarak döner. Bu yapı, veritabanı erişim mantığını (`getProductsByCategory` fonksiyonu) sınıfın kendi metodundan ayırarak modülerlik sağlar.
-**Parametreler**:
-- categoryId: `string` — Ürünlerin getirilmek istendiği kategorinin benzersiz tanımlayıcısı (ID).
-**Dönüş**: Fonksiyonun kendisi bir `Promise` döner. Dönen değerin tipi, çağrılan `getProductsByCategory` harici fonksiyonunun dönüş tipine bağlıdır; bu durumda bir ürün listesi (örn. `Product[]`) veya hata durumu beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getProductsBySubcategory
-**Ne yapar**: Belirli bir alt kategoriye (subcategory) ait tüm ürünleri getirir.
-**Nasıl yapar**: `getProductsBySubcategory` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisini ve `subcategoryId` parametresini ileterek çağırır. Asenkron bir operasyondur ve sonucu bir Promise olarak döner. Kategori bazlı sorgulamadan daha spesifik bir alt kategori filtresi uygular.
-**Parametreler**:
-- subcategoryId: `string` — Ürünlerin getirilmek istendiği alt kategorinin benzersiz tanımlayıcısı (ID).
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; genellikle bir ürün listesi beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getProductById
-**Ne yapar**: Benzersiz bir tanımlayıcıya (ID) sahip tek bir ürünü getirir.
-**Nasıl yapar**: `getProductById` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisini ve ürünün `id` parametresini ileterek çağırır. Bu, en temel ve spesifik ürün sorgulama metodudur. Sonuç bir Promise içinde döner.
-**Parametreler**:
-- id: `string` — İstenen ürünün benzersiz tanımlayıcısı (ID).
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; bu durumda tek bir ürün nesnesi veya belirtilen ID ile eşleşen ürün bulunamazsa bir hata durumu/boş değer beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getProductBySlugOrId
-**Ne yapar**: Bir ürünün URL-dostu kısa adı (slug) veya benzersiz tanımlayıcısı (ID) ile ürünü getirir.
-**Nasıl yapar**: `getProductBySlugOrId` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisini ve esnek `identifier` parametresini ileterek çağırır. Bu metot, birincil arama anahtarı olarak slug kullanmayı tercih eden, ancak ID ile de erişimi destekleyen bir arama mantığına sahiptir. Sonuç bir Promise içinde döner.
-**Parametreler**:
-- identifier: `string` — Ürünü bulmak için kullanılan esnek tanımlayıcı. Bu değer bir slug (URL-dostu kısa ad) veya bir ID olabilir. Harici fonksiyonun hangi tür değer olduğunu belirleyip arama yapması beklenir.
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; bulunan ürün nesnesi veya eşleşme yoksa hata durumu beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getProductBySlug
-**Ne yapar**: Bir ürünün URL-dostu kısa adı (slug) ile ürünü getirir.
-**Nasıl yapar**: `getProductBySlug` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisi ve ürünün `slug` parametresini ileterek çağırır. Bu, `getProductBySlugOrId` metodundan daha spesifik, sadece slug tabanlı bir arama metodudur. Sonuç bir Promise içinde döner.
-**Parametreler**:
-- slug: `string` — İstenen ürünün URL-dostu kısa adı.
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; belirtilen slug ile eşleşen ürün nesnesi veya eşleşme yoksa hata durumu beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getFeaturedProducts
-**Ne yapar**: Öne çıkan (featured) ürünleri getirir.
-**Nasıl yapar**: `getFeaturedProducts` adlı harici bir servis fonksiyonunu, sadece `this.supabase` istemcisini ileterek çağırır. Bu metot, genellikle ana sayfa veya özel kampanya bölümlerinde gösterilecek, önceden belirlenmiş (örn. veritabanında `is_featured` alanı işaretli) ürünleri sorgular. Parametre almayan bir metottur ve sonucu bir Promise olarak döner.
-**Parametreler**: Parametre almaz.
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; genellikle öne çıkan ürünlerin bir listesi (örn. `Product[]`) beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### adminSearchProducts
-**Ne yapar**: Yönetici (admin) paneli için ürünleri belirli bir sorgu metnine göre arar.
-**Nasıl yapar**: `adminSearchProducts` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisi ve `query` parametresini ileterek çağırır. Bu arama, yöneticinin ürünleri isim, açıklama, SKU gibi alanlarda serbest metin araması yapabilmesini sağlar. Arama sonuçları, yönetici arayüzüne özel olarak formatlanabilir (örn. daha fazla alan içerebilir). Sonuç bir Promise içinde döner.
-**Parametreler**:
-- query: `string` — Ürünlerde yapılacak serbest metin araması için kullanılan anahtar kelime veya cümle.
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; arama kriterlerine uyan ürünlerin bir listesi veya boş bir dizi beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: ServiceRegistry sınıfının (veya türediği sınıfların) başlatıcısı olarak görev yapar. Bu metot, sınıf örneği oluşturulduğunda çağrılır ve bağımlılıkları (dependencies) sınıfa enjekte eder.
-**Nasıl yapar**: `constructor` anahtar kelimesi ile tanımlanmış bir metottur. `private` erişim belirleyicisi ile tanımlanan `supabase` parametresi, bu sınıfın tüm metotları tarafından kullanılacak olan Supabase veritabanı istemcisini (client) temsil eder. TypeScript/JavaScript'deki `private` anahtar kelimesi, bu özelliğin sadece sınıf içinde erişilebilir olduğunu ve aynı zamanda bir class field olarak otomatik olarak atanacağını belirtir. Sınıf dışarıdan bu istemciyi doğrudan değiştiremez.
-**Parametreler**:
-- supabase: `SupabaseClient<Database>` — Bağımlılık olarak enjekte edilen, veritabanı işlemleri için kullanılacak Supabase istemcisi örneği. Generic tipi `Database` olarak belirtilmiştir, bu da veritabanı şemasının (tabloların, enumların vb.) TypeScript'e yansıtılmış tip tanımını ifade eder.
-**Dönüş**: `void` veya belirtilmemiş. Bir constructor metodu olduğu için değer dönmez, sadece nesne başlatma işlemi yapar.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### listUserProjects
-**Ne yapar**: Oturum açmış kullanıcının tüm projelerini listeler.
-**Nasıl yapar**: `listUserProjects` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisini ileterek çağırır. Bu metot, arka planda mevcut kullanıcının oturum bilgisine (authenticated user) erişerek, sadece o kullanıcıya ait projeleri (`user_projects` tablosundan) sorgular. Asenkron bir operasyondur ve sonuçları bir Promise olarak döner.
-**Parametreler**: Parametre almaz.
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; kullanıcının projelerinden oluşan bir dizi (örn. `UserProject[]`) beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### createProject
-**Ne yapar**: Yeni bir kullanıcı projesi oluşturur ve kaydeder.
-**Nasıl yapar**: `createProject` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisi ve `project` parametresini ileterek çağırır. `project` parametresi, veritabanına eklenecek yeni satırın (record) verilerini içeren bir nesnedir. `TablesInsert<'user_projects'>` tipi, `user_projects` tablosuna eklenebilecek geçerli veri yapısını (alan adlarını ve tiplerini) tanımlar. Asenkron operasyon sonucu Promise olarak döner.
+**Ne yapar**: Yeni bir kullanıcı projesi oluşturur. Verilen proje verilerini kullanarak projeyi veritabanına ekler.
+**Nasıl yapar**: `ProjectService` sınıfının bir metodu olarak çalışır. Sınıf içindeki `this.supabase` Supabase istemcisini alır ve dışarıda tanımlı `createProject` fonksiyonuna hem bu istemciyi hem de proje verisini aktararak çağırır. İşin asıl yükü dışarıdaki `createProject` fonksiyonuna devredilir.
 **Parametreler**:
-- project: `TablesInsert<'user_projects'>` — Oluşturulacak yeni projenin verilerini içeren nesne. Bu tip, `user_projects` tablosuna eklenebilecek tüm zorunlu ve opsiyonel alanların bir dökümüdür (örn. `title`, `description`, `user_id` vb.).
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; başarı durumunda oluşturulan yeni proje nesnesi (muhtemelen veritabanı tarafından otomatik eklenen `id`, `created_at` gibi alanları da içerir) veya hata durumu beklenir.
+- project: TablesInsert<'user_projects'> — Oluşturulacak projenin veritabanına eklenecek verilerini içeren nesne. `TablesInsert<'user_projects'>` tipi, `user_projects` tablosuna insert işlemi için gerekli alanları tanımlar.
+**Dönüş**: Dışarıdaki `createProject` fonksiyonunun dönüş değerini aynen iletir. Dönüş tipi bu fonksiyonun tanımına bağlıdır ve kaynakta belirtilmemiştir.
 
 ### deleteProject
-**Ne yapar**: Belirtilen ID'ye sahip projeyi veritabanından siler.
-**Nasıl yapar**: Fonksiyon, sınıf içinde tanımlı olan `deleteProject` import edilmiş fonksiyonunu çağırır. Bu çağrıya, sınıfa ait `this.supabase` istemcisini ve silinecek projenin `id` parametresini iletir. Asenkron bir işlemdir.
+**Ne yapar**: Belirtilen kimliğe sahip kullanıcı projesini siler.
+**Nasıl yapar**: `ProjectService` sınıfının bir metodu olarak çalışır. Sınıf içindeki `this.supabase` Supabase istemcisini alır ve dışarıda tanımlı `deleteProject` fonksiyonuna hem bu istemciyi hem de silinecek projenin kimliğini aktararak çağırır. İşin asıl yükü dışarıdaki `deleteProject` fonksiyonuna devredilir.
 **Parametreler**:
-- `id`: `string` — Silinecek projenin benzersiz tanımlayıcısı.
-**Dönüş**: `Promise<...>` — İçe aktarılan `deleteProject` fonksiyonunun döndürdüğü sonucu döndürür.
+- id: string — Silinecek projenin benzersiz kimlik değeri.
+**Dönüş**: Dışarıdaki `deleteProject` fonksiyonunun dönüş değerini aynen iletir. Dönüş tipi bu fonksiyonun tanımına bağlıdır ve kaynakta belirtilmemiştir.
 
 ### addProductToProject
-**Ne yapar**: Belirli bir projeye bir ürün ekler.
-**Nasıl yapar**: Sınıf içinde tanımlı olan `addProductToProject` import edilmiş fonksiyonunu çağırır. Bu çağrıya, Supabase istemcisi (`this.supabase`), proje ID'si, ürün ID'si ve opsiyonel olarak ürün miktarını iletir. Bu asenkron bir işlemdir.
+**Ne yapar**: Belirtilen projeye bir ürün ekler. İsteğe bağlı olarak ürün miktarı da belirtilebilir.
+**Nasıl yapar**: `ProjectService` sınıfının bir metodu olarak çalışır. Sınıf içindeki `this.supabase` Supabase istemcisini alır ve dışarıda tanımlı `addProductToProject` fonksiyonuna bu istemciyi, proje kimliğini, ürün kimliğini ve opsiyonel miktar bilgisini aktararak çağırır. İşin asıl yükü dışarıdaki `addProductToProject` fonksiyonuna devredilir.
 **Parametreler**:
-- `projectId`: `string` — Ürünün ekleneceği projenin benzersiz tanımlayıcısı.
-- `productId`: `string` — Projeye eklenecek olan ürünün benzersiz tanımlayıcısı.
-- `quantity?`: `number` — Eklenecek ürün miktarı. Belirtilmezse varsayılan bir değer kullanılabilir.
-**Dönüş**: `Promise<...>` — İçe aktarılan `addProductToProject` fonksiyonunun döndürdüğü sonucu döndürür.
+- projectId: string — Ürünün ekleneceği projenin benzersiz kimlik değeri.
+- productId: string — Projeye eklenecek ürünün benzersiz kimlik değeri.
+- quantity?: number — Eklenecek ürünün miktarı. Opsiyonel parametre olup belirtilmezse varsayılan değer kullanılır.
+**Dönüş**: Dışarıdaki `addProductToProject` fonksiyonunun dönüş değerini aynen iletir. Dönüş tipi bu fonksiyonun tanımına bağlıdır ve kaynakta belirtilmemiştir.
 
 ### removeProductFromProject
-**Ne yapar**: Belirli bir projeden bir ürünü kaldırır.
-**Nasıl yapar**: Sınıf içinde tanımlı olan `removeProductFromProject` import edilmiş fonksiyonunu çağırır. Bu çağrıya, Supabase istemcisi (`this.supabase`), proje ID'si ve kaldırılacak ürün ID'sini iletir. Bu asenkron bir işlemdir.
+**Ne yapar**: Belirtilen projeden bir ürünü kaldırır.
+**Nasıl yapar**: `ProjectService` sınıfının bir metodu olarak çalışır. Sınıf içindeki `this.supabase` Supabase istemcisini alır ve dışarıda tanımlı `removeProductFromProject` fonksiyonuna hem bu istemciyi hem de proje ve ürün kimliklerini aktararak çağırır. İşin asıl yükü dışarıdaki `removeProductFromProject` fonksiyonuna devredilir.
 **Parametreler**:
-- `projectId`: `string` — Ürünün kaldırılacağı projenin benzersiz tanımlayıcısı.
-- `productId`: `string` — Projeden kaldırılacak olan ürünün benzersiz tanımlayıcısı.
-**Dönüş**: `Promise<...>` — İçe aktarılan `removeProductFromProject` fonksiyonunun döndürdüğü sonucu döndürür.
+- projectId: string — Ürünün kaldırılacağı projenin benzersiz kimlik değeri.
+- productId: string — Projeden kaldırılacak ürünün benzersiz kimlik değeri.
+**Dönüş**: Dışarıdaki `removeProductFromProject` fonksiyonunun dönüş değerini aynen iletir. Dönüş tipi bu fonksiyonun tanımına bağlıdır ve kaynakta belirtilmemiştir.
 
 ### listProjectItems
-**Ne yapar**: Belirli bir projeye ait tüm ürün kalemlerini listeler.
-**Nasıl yapar**: Sınıf içinde tanımlı olan `listProjectItems` import edilmiş fonksiyonunu çağırır. Bu çağrıya, Supabase istemcisi (`this.supabase`) ve listelenecek projenin ID'sini iletir. Bu asenkron bir işlemdir.
+**Ne yapar**: Belirtilen projeye ait tüm öğeleri listeler.
+**Nasıl yapar**: `ProjectService` sınıfının bir metodu olarak çalışır. Sınıf içindeki `this.supabase` Supabase istemcisini alır ve dışarıda tanımlı `listProjectItems` fonksiyonuna hem bu istemciyi hem de proje kimliğini aktararak çağırır. İşin asıl yükü dışarıdaki `listProjectItems` fonksiyonuna devredilir.
 **Parametreler**:
-- `projectId`: `string` — Ürünlerin listeleneceği projenin benzersiz tanımlayıcısı.
-**Dönüş**: `Promise<...>` — İçe aktarılan `listProjectItems` fonksiyonunun döndürdüğü sonucu döndürür.
+- projectId: string — Öğeleri listelenecek projenin benzersiz kimlik değeri.
+**Dönüş**: Dışarıdaki `listProjectItems` fonksiyonunun dönüş değerini aynen iletir. Dönüş tipi bu fonksiyonun tanımına bağlıdır ve kaynakta belirtilmemiştir.
 
 ### constructor
-**Ne yapar**: `ServiceRegistry` sınıfının bir örneğini başlatır ve bağımlılıklarını enjekte eder.
-**Nasıl yapar**: `ServiceRegistry` sınıfının yapıcı (constructor) metodudur. TypeScript'in `private` erişim belirteci kullanılarak, gelen `supabase` parametresini sınıfın `_supabase` private üyesine atar. Bu, sınıfın tüm metotlarının (örneğin, `deleteProject`, `addProductToProject` vb.) bu Supabase istemcisini kullanmasını sağlar.
+**Ne yapar**: `ServiceRegistry` sınıfını başlatır ve sınıf içinde kullanılacak Supabase istemcisini tanımlar.
+**Nasıl yapar**: TypeScript constructor sözdizimi kullanılarak `supabase` parametresi doğrudan sınıfın özel (private) özelliği olarak atanır. `private` anahtar kelimesi, bu özelliğin yalnızca sınıf içinden erişilebilir olduğunu belirtir. Bu sayede sınıfın diğer metotları `this.supabase` üzerinden veritabanı işlemlerini gerçekleştirebilir.
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı bağlantısı için kullanılan ve yapılandırılmış bir Supabase istemci nesnesi.
-**Dönüş**: Yok (`void`).
+- supabase: SupabaseClient<Database> — Veritabanı bağlantısını ve işlemlerini yöneten Supabase istemci nesnesi. `Database` genel tipi, veritabanı şemasının TypeScript tarafındaki tip tanımlarını temsil eder.
+**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir.
 
 ---
 
@@ -444,277 +381,321 @@ Bu modül, ServiceRegistry aracılığıyla bir SupabaseClient üzerinden birden
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: registry.ts::AddressService.listAddresses
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `listAddresses` fonksiyonunun dönüşü; kullanıcının tüm adres listesini döndürür
-
----
-
-### [N2_NASIL] AST Pointer: registry.ts::AddressService.createAddress
-- **params**: (`payload`: DbUserAddressInsert — oluşturulacak adres verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve payload ile çağrılmış bağımsız `createAddress` fonksiyonunun dönüşü; yeni oluşturulan kaydı döndürür
-
----
-
-### [N3_NASIL] AST Pointer: registry.ts::AddressService.updateAddress
-- **params**: (`id`: string — güncellenecek adresin ID'si, `payload`: DbUserAddressUpdate — güncelleme verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, id, payload ile çağrılmış bağımsız `updateAddress` fonksiyonunun dönüşü; güncellenen kaydı döndürür
-
----
-
-### [N4_NASIL] AST Pointer: registry.ts::AddressService.deleteAddress
-- **params**: (`id`: string — silinecek adresin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve id ile çağrılmış bağımsız `deleteAddress` fonksiyonunun dönüşü; silme işleminin sonucunu döndürür
-
----
-
-### [N5_NASIL] AST Pointer: registry.ts::AddressService.setDefaultAddress
-- **params**: (`kind`: 'shipping' | 'billing' — adres türü, `id`: string — varsayılan yapılacak adresin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, kind, id ile çağrılmış bağımsız `setDefaultAddress` fonksiyonunun dönüşü; varsayılan adres güncelleme sonucunu döndürür
-
----
-
-### [N6_NASIL] AST Pointer: registry.ts::CartService.getOrCreateShoppingCart
-- **params**: (`userId`: string — kullanıcının ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve userId ile çağrılmış bağımsız `getOrCreateShoppingCart` fonksiyonunun dönüşü; mevcut veya yeni oluşturulan sepet nesnesini döndürür
-
----
-
-### [N7_NASIL] AST Pointer: registry.ts::CartService.listCartItems
-- **params**: (`cartId`: string — sepetin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve cartId ile çağrılmış bağımsız `listCartItems` fonksiyonunun dönüşü;.sepetteki ürün kalemleri listesini döndürür
-
----
-
-### [N8_NASIL] AST Pointer: registry.ts::CartService.listCartItemsWithProducts
-- **params**: (`cartId`: string — sepetin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve cartId ile çağrılmış bağımsız `listCartItemsWithProducts` fonksiyonunun dönüşü; ürün detaylarıyla zenginleştirilmiş sepet kalemlerini döndürür
-
----
-
-### [N9_NASIL] AST Pointer: registry.ts::CartService.upsertCartItem
-- **params**: (`payload`: { cartId: string; _productId: string; quantity: number; unitPrice?: number; priceListId?: string } — sepet kalemi ekleme/güncelleme verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve payload ile çağrılmış bağımsız `upsertCartItem` fonksiyonunun dönüşü; eklenen/güncellenen sepet kalemini döndürür
-
----
-
-### [N10_NASIL] AST Pointer: registry.ts::CartService.removeCartItem
-- **params**: (`cartId`: string — sepetin ID'si, `productId`: string — kaldırılacak ürünün ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, cartId, productId ile çağrılmış bağımsız `removeCartItem` fonksiyonunun dönüşü; kaldırma işleminin sonucunu döndürür
-
----
-
-### [N11_NASIL] AST Pointer: registry.ts::CartService.clearCartItems
-- **params**: (`cartId`: string — sepetin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve cartId ile çağrılmış bağımsız `clearCartItems` fonksiyonunun dönüşü; sepetin tüm kalemlerini temizleme sonucunu döndürür
-
----
-
-### [N12_NASIL] AST Pointer: registry.ts::CategoryService.getCategories
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `getCategories` fonksiyonunun dönüşü; kategori listesini döndürür
-
----
-
-### [N13_NASIL] AST Pointer: registry.ts::InvoiceService.listInvoiceProfiles
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `listInvoiceProfiles` fonksiyonunun dönüşü; fatura profilleri listesini döndürür
-
----
-
-### [N14_NASIL] AST Pointer: registry.ts::InvoiceService.createInvoiceProfile
-- **params**: (`payload`: DbInvoiceProfileInsert — oluşturulacak fatura profili verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve payload ile çağrılmış bağımsız `createInvoiceProfile` fonksiyonunun dönüşü; yeni oluşturulan fatura profilini döndürür
-
----
-
-### [N15_NASIL] AST Pointer: registry.ts::InvoiceService.updateInvoiceProfile
-- **params**: (`id`: string — güncellenecek fatura profilinin ID'si, `payload`: DbInvoiceProfileUpdate — güncelleme verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, id, payload ile çağrılmış bağımsız `updateInvoiceProfile` fonksiyonunun dönüşü; güncellenen fatura profilini döndürür
-
----
-
-### [N16_NASIL] AST Pointer: registry.ts::InvoiceService.deleteInvoiceProfile
-- **params**: (`id`: string — silinecek fatura profilinin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve id ile çağrılmış bağımsız `deleteInvoiceProfile` fonksiyonunun dönüşü; silme işleminin sonucunu döndürür
-
----
-
-### [N17_NASIL] AST Pointer: registry.ts::InvoiceService.setDefaultInvoiceProfile
-- **params**: (`id`: string — varsayılan yapılacak fatura profilinin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve id ile çağrılmış bağımsız `setDefaultInvoiceProfile` fonksiyonunun dönüşü; varsayılan fatura profilini ayarlama sonucunu döndürür
-
----
-
-### [N18_NASIL] AST Pointer: registry.ts::InvoiceService.fetchDefaultInvoiceProfile
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `fetchDefaultInvoiceProfile` fonksiyonunun dönüşü; varsayılan fatura profilini döndürür
-
----
-
-### [N19_NASIL] AST Pointer: registry.ts::PricingService.getEffectiveUnitPrice
-- **params**: (`product`: Product — birim fiyat hesaplanacak ürün nesnesi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve product ile çağrılmış bağımsız `getEffectiveUnitPrice` fonksiyonunun dönüşü; geçerli birim fiyatı (sayı) döndürür
-
----
-
-### [N20_NASIL] AST Pointer: registry.ts::PricingService.getEffectivePriceInfo
-- **params**: (`product`: Product — fiyat bilgisi hesaplanacak ürün nesnesi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve product ile çağrılmış bağımsız `getEffectivePriceInfo` fonksiyonunun dönüşü; detaylı fiyat bilgisini döndürür
-
----
-
-### [N21_NASIL] AST Pointer: registry.ts::ProductService.getSearchSuggestions
-- **params**: (`query`: string — arama sorgusu, `limit?`: number — maksimum sonuç sayısı)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, query, limit ile çağrılmış bağımsız `getSearchSuggestions` fonksiyonunun dönüşü; arama önerileri listesini döndürür
-
----
-
-### [N22_NASIL] AST Pointer: registry.ts::ProductService.ftsSearchProducts
-- **params**: (`term`: string — full-text arama terimi, `limit?`: number — maksimum sonuç sayısı)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, term, limit ile çağrılmış bağımsız `ftsSearchProducts` fonksiyonunun dönüşü; full-text arama sonuçlarını döndürür
-
----
-
-### [N23_NASIL] AST Pointer: registry.ts::ProductService.getProducts
-- **params**: (`limit?`: number — maksimum ürün sayısı)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve limit ile çağrılmış bağımsız `getProducts` fonksiyonunun dönüşü; ürün listesini döndürür
-
----
-
-### [N24_NASIL] AST Pointer: registry.ts::ProductService.getAllProducts
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `getAllProducts` fonksiyonunun dönüşü; tüm ürünleri döndürür
-
----
-
-### [N25_NASIL] AST Pointer: registry.ts::ProductService.getProductsByCategory
-- **params**: (`categoryId`: string — kategori ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve categoryId ile çağrılmış bağımsız `getProductsByCategory` fonksiyonunun dönüşü; belirli kategorideki ürünleri döndürür
-
----
-
-### [N26_NASIL] AST Pointer: registry.ts::ProductService.getProductsBySubcategory
-- **params**: (`subcategoryId`: string — alt kategori ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve subcategoryId ile çağrılmış bağımsız `getProductsBySubcategory` fonksiyonunun dönüşü; belirli alt kategorideki ürünleri döndürür
-
----
-
-### [N27_NASIL] AST Pointer: registry.ts::ProductService.getProductById
-- **params**: (`id`: string — ürün ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve id ile çağrılmış bağımsız `getProductById` fonksiyonunun dönüşü; tek bir ürünü döndürür
-
----
-
-### [N28_NASIL] AST Pointer: registry.ts::ProductService.getProductBySlugOrId
-- **params**: (`identifier`: string — ürün slug'ı veya ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve identifier ile çağrılmış bağımsız `getProductBySlugOrId` fonksiyonunun dönüşü; slug veya ID ile bulunan tek ürünü döndürür
-
----
-
-### [N29_NASIL] AST Pointer: registry.ts::ProductService.getProductBySlug
-- **params**: (`slug`: string — ürün slug'ı)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve slug ile çağrılmış bağımsız `getProductBySlug` fonksiyonunun dönüşü; slug ile bulunan tek ürünü döndürür
-
----
-
-### [N30_NASIL] AST Pointer: registry.ts::ProductService.getFeaturedProducts
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `getFeaturedProducts` fonksiyonunun dönüşü; öne çıkan ürünleri döndürür
-
----
-
-### [N31_NASIL] AST Pointer: registry.ts::ProductService.adminSearchProducts
-- **params**: (`query`: string — admin arama sorgusu)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve query ile çağrılmış bağımsız `adminSearchProducts` fonksiyonunun dönüşü; admin arama sonuçlarını döndürür
-
----
-
-### [N32_NASIL] AST Pointer: registry.ts::ProjectService.listUserProjects
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `listUserProjects` fonksiyonunun dönüşü; kullanıcının proje listesini döndürür
-
----
-
-### [N33_NASIL] AST Pointer: registry.ts::ProjectService.createProject
-- **params**: (`project`: TablesInsert<'user_projects'> — oluşturulacak proje verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve project ile çağrılmış bağımsız `createProject` fonksiyonunun dönüşü; yeni oluşturulan projeyi döndürür
-
----
-
-### [N34_NASIL] AST Pointer: registry.ts::ProjectService.deleteProject
-- **params**: (`id`: string — silinecek projenin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve id ile çağrılmış bağımsız `deleteProject` fonksiyonunun dönüşü; silme işleminin sonucunu döndürür
-
----
-
-### [N35_NASIL] AST Pointer: registry.ts::ProjectService.addProductToProject
-- **params**: (`projectId`: string — projenin ID'si, `productId`: string — eklenecek ürünün ID'si, `quantity?`: number — eklenecek miktar)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, projectId, productId, quantity ile çağrılmış bağımsız `addProductToProject` fonksiyonunun dönüşü; eklenen proje kalemini döndürür
-
----
-
-### [N36_NASIL] AST Pointer: registry.ts::ProjectService.removeProductFromProject
-- **params**: (`projectId`: string — projenin ID'si, `productId`: string — kaldırılacak ürünün ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, projectId, productId ile çağrılmış bağımsız `removeProductFromProject` fonksiyonunun dönüşü; kaldırma işleminin sonucunu döndürür
-
----
-
-### [N37_NASIL] AST Pointer: registry.ts::ProjectService.listProjectItems
-- **params**: (`projectId`: string — projenin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve projectId ile çağrılmış bağımsız `listProjectItems` fonksiyonunun dönüşü; projedeki ürün kalemleri listesini döndürür
-
----
-
-### [N38_NASIL] AST Pointer: registry.ts::ServiceRegistry.constructor
-- **params**: (`supabase`: SupabaseClient<Database> — Supabase istemcisi, private alan olarak saklanır)
+### [N1_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
 - **ic_degiskenler**:
-  - `this.supabase` — constructor parametresinden alınan SupabaseClient<Database> referansı, tüm alt servislere aktarılır
-  - `this.address` — `new AddressService(this.supabase)` ile oluşturulan AddressService örneği; adres CRUD işlemlerini yönetir
-  - `this.cart` — `new CartService(this.supabase)` ile oluşturulan CartService örneği; sepet işlemlerini yönetir
-  - `this.category` — `new CategoryService(this.supabase)` ile oluşturulan CategoryService örneği; kategori okuma işlemlerini yönetir
-  - `this.invoice` — `new InvoiceService(this.supabase)` ile oluşturulan InvoiceService örneği; fatura profili CRUD işlemlerini yönetir
-  - `this.pricing` — `new PricingService(this.supabase)` ile oluşturulan PricingService örneği; fiyat hesaplama işlemlerini yönetir
-  - `this.product` — `new ProductService(this.supabase)` ile oluşturulan ProductService örneği; ürün CRUD ve arama işlemlerini yönetir
-  - `this.project` — `new ProjectService(this.supabase)` ile oluşturulan ProjectService örneği; proje CRUD işlemlerini yönetir
-- **Dönüş**: yok (constructor); yan etki olarak 7 adet servis örneği oluşturur ve readonly alanlara atar
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N2_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.listAddresses
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listAddresses` fonksiyonuna aktarılır
+- **Dönüş**: `listAddresses(this.supabase)` fonksiyonunun dönüşü
+
+### [N3_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.createAddress
+- **params**: `payload: DbUserAddressInsert`
+- **ic_degiskenler**:
+  - `payload` — eklenecek adres verisi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `createAddress` fonksiyonuna aktarılır
+- **Dönüş**: `createAddress(this.supabase, payload)` fonksiyonunun dönüşü
+
+### [N4_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.updateAddress
+- **params**: `id: string`, `payload: DbUserAddressUpdate`
+- **ic_degiskenler**:
+  - `id` — güncellenecek adresin kimliği
+  - `payload` — güncellenecek adres verisi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `updateAddress` fonksiyonuna aktarılır
+- **Dönüş**: `updateAddress(this.supabase, id, payload)` fonksiyonunun dönüşü
+
+### [N5_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.deleteAddress
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — silinecek adresin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `deleteAddress` fonksiyonuna aktarılır
+- **Dönüş**: `deleteAddress(this.supabase, id)` fonksiyonunun dönüşü
+
+### [N6_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.setDefaultAddress
+- **params**: `kind: 'shipping' | 'billing'`, `id: string`
+- **ic_degiskenler**:
+  - `kind` — adres türü (kargo veya fatura)
+  - `id` — varsayılan yapılacak adresin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `setDefaultAddress` fonksiyonuna aktarılır
+- **Dönüş**: `setDefaultAddress(this.supabase, kind, id)` fonksiyonunun dönüşü
+
+### [N7_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N8_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.getOrCreateShoppingCart
+- **params**: `userId: string`
+- **ic_degiskenler**:
+  - `userId` — kullanıcı kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getOrCreateShoppingCart` fonksiyonuna aktarılır
+- **Dönüş**: `getOrCreateShoppingCart(this.supabase, userId)` fonksiyonunun dönüşü
+
+### [N9_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.listCartItems
+- **params**: `cartId: string`
+- **ic_degiskenler**:
+  - `cartId` — sepet kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listCartItems` fonksiyonuna aktarılır
+- **Dönüş**: `listCartItems(this.supabase, cartId)` fonksiyonunun dönüşü
+
+### [N10_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.listCartItemsWithProducts
+- **params**: `cartId: string`
+- **ic_degiskenler**:
+  - `cartId` — sepet kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listCartItemsWithProducts` fonksiyonuna aktarılır
+- **Dönüş**: `listCartItemsWithProducts(this.supabase, cartId)` fonksiyonunun dönüşü
+
+### [N11_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.upsertCartItem
+- **params**: `payload: { cartId: string; _productId: string; quantity: number; unitPrice?: number; priceListId?: string }`
+- **ic_degiskenler**:
+  - `payload` — sepete eklenecek/güncellenecek ürün verisi (cartId, _productId, quantity, unitPrice, priceListId alanlarını içerir)
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `upsertCartItem` fonksiyonuna aktarılır
+- **Dönüş**: `upsertCartItem(this.supabase, payload)` fonksiyonunun dönüşü
+
+### [N12_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.removeCartItem
+- **params**: `cartId: string`, `productId: string`
+- **ic_degiskenler**:
+  - `cartId` — sepet kimliği
+  - `productId` — kaldırılacak ürünün kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `removeCartItem` fonksiyonuna aktarılır
+- **Dönüş**: `removeCartItem(this.supabase, cartId, productId)` fonksiyonunun dönüşü
+
+### [N13_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.clearCartItems
+- **params**: `cartId: string`
+- **ic_degiskenler**:
+  - `cartId` — temizlenecek sepetin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `clearCartItems` fonksiyonuna aktarılır
+- **Dönüş**: `clearCartItems(this.supabase, cartId)` fonksiyonunun dönüşü
+
+### [N14_NASIL] AST Pointer: src/lib/services/registry.ts::CategoryService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N15_NASIL] AST Pointer: src/lib/services/registry.ts::CategoryService.getCategories
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getCategories` fonksiyonuna aktarılır
+- **Dönüş**: `getCategories(this.supabase)` fonksiyonunun dönüşü
+
+### [N16_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N17_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.listInvoiceProfiles
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listInvoiceProfiles` fonksiyonuna aktarılır
+- **Dönüş**: `listInvoiceProfiles(this.supabase)` fonksiyonunun dönüşü
+
+### [N18_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.createInvoiceProfile
+- **params**: `payload: DbInvoiceProfileInsert`
+- **ic_degiskenler**:
+  - `payload` — eklenecek fatura profili verisi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `createInvoiceProfile` fonksiyonuna aktarılır
+- **Dönüş**: `createInvoiceProfile(this.supabase, payload)` fonksiyonunun dönüşü
+
+### [N19_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.updateInvoiceProfile
+- **params**: `id: string`, `payload: DbInvoiceProfileUpdate`
+- **ic_degiskenler**:
+  - `id` — güncellenecek fatura profilinin kimliği
+  - `payload` — güncellenecek fatura profili verisi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `updateInvoiceProfile` fonksiyonuna aktarılır
+- **Dönüş**: `updateInvoiceProfile(this.supabase, id, payload)` fonksiyonunun dönüşü
+
+### [N20_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.deleteInvoiceProfile
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — silinecek fatura profilinin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `deleteInvoiceProfile` fonksiyonuna aktarılır
+- **Dönüş**: `deleteInvoiceProfile(this.supabase, id)` fonksiyonunun dönüşü
+
+### [N21_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.setDefaultInvoiceProfile
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — varsayılan yapılacak fatura profilinin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `setDefaultInvoiceProfile` fonksiyonuna aktarılır
+- **Dönüş**: `setDefaultInvoiceProfile(this.supabase, id)` fonksiyonunun dönüşü
+
+### [N22_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.fetchDefaultInvoiceProfile
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `fetchDefaultInvoiceProfile` fonksiyonuna aktarılır
+- **Dönüş**: `fetchDefaultInvoiceProfile(this.supabase)` fonksiyonunun dönüşü
+
+### [N23_NASIL] AST Pointer: src/lib/services/registry.ts::PricingService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N24_NASIL] AST Pointer: src/lib/services/registry.ts::PricingService.getEffectiveUnitPrice
+- **params**: `product: Product`
+- **ic_degiskenler**:
+  - `product` — fiyatı hesaplanacak ürün nesnesi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getEffectiveUnitPrice` fonksiyonuna aktarılır
+- **Dönüş**: `getEffectiveUnitPrice(this.supabase, product)` fonksiyonunun dönüşü
+
+### [N25_NASIL] AST Pointer: src/lib/services/registry.ts::PricingService.getEffectivePriceInfo
+- **params**: `product: Product`
+- **ic_degiskenler**:
+  - `product` — fiyat bilgisi alınacak ürün nesnesi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getEffectivePriceInfo` fonksiyonuna aktarılır
+- **Dönüş**: `getEffectivePriceInfo(this.supabase, product)` fonksiyonunun dönüşü
+
+### [N26_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N27_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getSearchSuggestions
+- **params**: `query: string`, `limit?: number`
+- **ic_degiskenler**:
+  - `query` — arama sorgusu
+  - `limit` — isteğe bağlı sonuç sayısı sınırı
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getSearchSuggestions` fonksiyonuna aktarılır
+- **Dönüş**: `getSearchSuggestions(this.supabase, query, limit)` fonksiyonunun dönüşü
+
+### [N28_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.ftsSearchProducts
+- **params**: `term: string`, `limit?: number`
+- **ic_degiskenler**:
+  - `term` — tam metin arama terimi
+  - `limit` — isteğe bağlı sonuç sayısı sınırı
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `ftsSearchProducts` fonksiyonuna aktarılır
+- **Dönüş**: `ftsSearchProducts(this.supabase, term, limit)` fonksiyonunun dönüşü
+
+### [N29_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProducts
+- **params**: `limit?: number`
+- **ic_degiskenler**:
+  - `limit` — isteğe bağlı sonuç sayısı sınırı
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProducts` fonksiyonuna aktarılır
+- **Dönüş**: `getProducts(this.supabase, limit)` fonksiyonunun dönüşü
+
+### [N30_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getAllProducts
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getAllProducts` fonksiyonuna aktarılır
+- **Dönüş**: `getAllProducts(this.supabase)` fonksiyonunun dönüşü
+
+### [N31_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductsByCategory
+- **params**: `categoryId: string`
+- **ic_degiskenler**:
+  - `categoryId` — kategori kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProductsByCategory` fonksiyonuna aktarılır
+- **Dönüş**: `getProductsByCategory(this.supabase, categoryId)` fonksiyonunun dönüşü
+
+### [N32_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductsBySubcategory
+- **params**: `subcategoryId: string`
+- **ic_degiskenler**:
+  - `subcategoryId` — alt kategori kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProductsBySubcategory` fonksiyonuna aktarılır
+- **Dönüş**: `getProductsBySubcategory(this.supabase, subcategoryId)` fonksiyonunun dönüşü
+
+### [N33_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductById
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — ürün kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProductById` fonksiyonuna aktarılır
+- **Dönüş**: `getProductById(this.supabase, id)` fonksiyonunun dönüşü
+
+### [N34_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductBySlugOrId
+- **params**: `identifier: string`
+- **ic_degiskenler**:
+  - `identifier` — ürün slug'ı veya kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProductBySlugOrId` fonksiyonuna aktarılır
+- **Dönüş**: `getProductBySlugOrId(this.supabase, identifier)` fonksiyonunun dönüşü
+
+### [N35_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductBySlug
+- **params**: `slug: string`
+- **ic_degiskenler**:
+  - `slug` — ürün slug'ı
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProductBySlug` fonksiyonuna aktarılır
+- **Dönüş**: `getProductBySlug(this.supabase, slug)` fonksiyonunun dönüşü
+
+### [N36_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getFeaturedProducts
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getFeaturedProducts` fonksiyonuna aktarılır
+- **Dönüş**: `getFeaturedProducts(this.supabase)` fonksiyonunun dönüşü
+
+### [N37_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.adminSearchProducts
+- **params**: `query: string`
+- **ic_degiskenler**:
+  - `query` — yönetici arama sorgusu
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `adminSearchProducts` fonksiyonuna aktarılır
+- **Dönüş**: `adminSearchProducts(this.supabase, query)` fonksiyonunun dönüşü
+
+### [N38_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N39_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.listUserProjects
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listUserProjects` fonksiyonuna aktarılır
+- **Dönüş**: `listUserProjects(this.supabase)` fonksiyonunun dönüşü
+
+### [N40_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.createProject
+- **params**: `project: TablesInsert<'user_projects'>`
+- **ic_degiskenler**:
+  - `project` — eklenecek proje verisi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `createProject` fonksiyonuna aktarılır
+- **Dönüş**: `createProject(this.supabase, project)` fonksiyonunun dönüşü
+
+### [N41_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.deleteProject
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — silinecek projenin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `deleteProject` fonksiyonuna aktarılır
+- **Dönüş**: `deleteProject(this.supabase, id)` fonksiyonunun dönüşü
+
+### [N42_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.addProductToProject
+- **params**: `projectId: string`, `productId: string`, `quantity?: number`
+- **ic_degiskenler**:
+  - `projectId` — projenin kimliği
+  - `productId` — eklenecek ürünün kimliği
+  - `quantity` — isteğe bağlı miktar
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `addProductToProject` fonksiyonuna aktarılır
+- **Dönüş**: `addProductToProject(this.supabase, projectId, productId, quantity)` fonksiyonunun dönüşü
+
+### [N43_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.removeProductFromProject
+- **params**: `projectId: string`, `productId: string`
+- **ic_degiskenler**:
+  - `projectId` — projenin kimliği
+  - `productId` — kaldırılacak ürünün kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `removeProductFromProject` fonksiyonuna aktarılır
+- **Dönüş**: `removeProductFromProject(this.supabase, projectId, productId)` fonksiyonunun dönüşü
+
+### [N44_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.listProjectItems
+- **params**: `projectId: string`
+- **ic_degiskenler**:
+  - `projectId` — proje kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listProjectItems` fonksiyonuna aktarılır
+- **Dönüş**: `listProjectItems(this.supabase, projectId)` fonksiyonunun dönüşü
+
+### [N45_NASIL] AST Pointer: src/lib/services/registry.ts::ServiceRegistry.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+  - `this.address` — `new AddressService(this.supabase)` ile oluşturulan adres servisi örneği
+  - `this.cart` — `new CartService(this.supabase)` ile oluşturulan sepet servisi örneği
+  - `this.category` — `new CategoryService(this.supabase)` ile oluşturulan kategori servisi örneği
+  - `this.invoice` — `new InvoiceService(this.supabase)` ile oluşturulan fatura servisi örneği
+  - `this.pricing` — `new PricingService(this.supabase)` ile oluşturulan fiyatlandırma servisi örneği
+  - `this.product` — `new ProductService(this.supabase)` ile oluşturulan ürün servisi örneği
+  - `this.project` — `new ProjectService(this.supabase)` ile oluşturulan proje servisi örneği
+- **Dönüş**: yok
 
 ---
 

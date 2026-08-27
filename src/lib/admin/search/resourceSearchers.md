@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts
-skeleton_hash: b24fef132eec349c
+source_path: C:\tmp\ops-t165\src\lib\admin\search\resourceSearchers.ts
+skeleton_hash: 36e28e38ee943b94
 entity_hashes:
   func:_movementQueryFn: a6e6ecbab9529862
   func:_velocityQueryFn: 42a2402d1f1ce214
@@ -18,7 +18,7 @@ entity_hashes:
   func:searchReturns: 821955f70c7c4d56
   func:searchUsers: be44fc325c9a7016
   overview: 2c3ae4e9b1596f22
-generated_at: 2026-08-24T12:48:21Z
+generated_at: 2026-08-27T06:57:21Z
 ---
 
 ## Genel Bakış
@@ -320,8 +320,8 @@ graph TD
     resourceSearchers_ts__searchProducts["searchProducts"]
     resourceSearchers_ts__searchReturns["searchReturns"]
     resourceSearchers_ts__searchUsers["searchUsers"]
-    resourceSearchers_ts__searchInventory --> resourceSearchers_ts___velocityQueryFn
     resourceSearchers_ts__searchMovements --> resourceSearchers_ts___movementQueryFn
+    resourceSearchers_ts__searchInventory --> resourceSearchers_ts___velocityQueryFn
 ```
 
 ## NODE ID STANDARD

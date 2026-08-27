@@ -42,19 +42,41 @@ else
     PYTHON_EXEC="python"
 fi
 
+# Companion kapsam süzgeci — `post-commit` ile PAYLAŞILAN tek uygulama (T166-VH).
+DOC_SCOPE="$REPO_ROOT/.githooks/lib/doc-scope.cjs"
+
 CHANGED=$(git diff --name-only ORIG_HEAD HEAD 2>/dev/null)
 [ -z "$CHANGED" ] && exit 0
 
 (
     echo "=== post-merge $(date) ==="
 
-    # 1) Kod companion'ları: pull'un getirdiği her .ts/.tsx için zorla üret.
+    # 1) Kod companion'ları: pull'un getirdiği KAPSAMDAKİ her kaynak için zorla üret.
     #    --force ŞART: worktree kancaları hash'i DB'ye yazıp çıktıyı worktree'de
     #    bırakabiliyor, yani hash DB'si "üretildi" der ama ana klasörde dosya yoktur.
-    echo "$CHANGED" | grep -E '^src/.*\.(ts|tsx)$' | while IFS= read -r f; do
-        [ -f "$REPO_ROOT/$f" ] || continue  # silinen dosya
-        "$PYTHON_EXEC" -m orion.cli.main doc single --py-file "$REPO_ROOT/$f" --force
-    done
+    #
+    # ⚠ T166-VH — BU SATIR BU KANCANIN EN PAHALI KUSURUYDU. Eskiden süzgeç şuydu:
+    #       grep -E '^src/.*\.(ts|tsx)$'
+    #    Yani TEK süzgeç uzantı süzgeciydi; `post-commit`in sahip olduğu test/`__tests__`
+    #    süzgeci burada YOKTU (`grep -v` sayımı: post-commit 1, post-merge 0). Sonuç: her
+    #    merge, değişen TÜM src kaynakları için companion üretiyordu — kapsam dışı test
+    #    dosyaları ve BAŞKA ŞERİTLERİN claim'indeki dosyalar dahil. Ayırt edici kanıt:
+    #    `build-skip-positive-logic.test.md`in mtime'ı merge commit'inin saniyesiydi ve o
+    #    dakikada hiçbir toplu üretim çağrısı koşmamıştı. O günün filo genelindeki "kim
+    #    dosyamı kirletti" alarmlarının büyük kısmının gerçek yazarı bu satırdı.
+    #
+    #    Onarım biçimi kasıtlı: buraya post-commit'in grep zincirini KOPYALAMIYORUZ (yarın
+    #    biri düzeltilir öteki geride kalır). Süzgeç tek uygulamada durur ve ikisi de ona sorar.
+    if [ ! -f "$DOC_SCOPE" ]; then
+        echo "[post-merge] ⚠ KAPSAM SUZGECI YOK ($DOC_SCOPE) — companion uretimi ATLANDI."
+        echo "[post-merge]   Sebebi bu dal .githooks/lib/doc-scope.cjs'i icermiyor olabilir."
+        echo "[post-merge]   SESSIZCE SUZGECSIZ URETMIYORUM: suzgecsiz uretim tam da onarilan arizadir."
+    else
+        echo "$CHANGED" | DOC_SCOPE_KOK="$REPO_ROOT" node "$DOC_SCOPE" | while IFS= read -r f; do
+            [ -f "$REPO_ROOT/$f" ] || continue  # silinen dosya
+            "$PYTHON_EXEC" -m orion.cli.main doc single --py-file "$REPO_ROOT/$f" --force
+        done
+    fi
 
     # 2) Migration geldiyse şema master'ı (baseline merdiveninden)
     if echo "$CHANGED" | grep -qE '^supabase/(migrations|baselines)/.*\.sql$'; then

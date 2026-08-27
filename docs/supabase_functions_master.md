@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T06:56:44.920017+00:00
+compiled_at: 2026-08-27T08:35:38.303704+00:00
 total_compiled_files: 39
-source_commit: cc0d70c5
+source_commit: 58e421e4
 source: supabase/functions
 ---
 
@@ -3995,8 +3995,8 @@ Bu modül, TCMB döviz kuru XML bültenlerini işleyerek veritabanını güncell
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\supabase\functions\_shared\caller.ts
-skeleton_hash: 936c66c9084e33f3
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\caller.ts
+skeleton_hash: cf9b0e6268e5d2fb
 entity_hashes:
   func:CallerConfigError:constructor: df8483ebfe5b3e3d
   func:CallerLookupError:constructor: 40e6e78eced3dceb
@@ -4005,7 +4005,7 @@ entity_hashes:
   func:timingSafeEquals: 1b5ce2b599ee24ff
   func:toProfileRow: d0e3271a9b376f12
   overview: 79f5642c4bc11b77
-generated_at: 2026-08-25T07:33:59Z
+generated_at: 2026-08-27T07:09:06Z
 ---
 
 ## Genel Bakış
@@ -4063,10 +4063,24 @@ Yapılandırma eksikliklerinde ve çağrıcı arama hatalarında fırlatılmak �
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: `CallerLookupError` sınıfının yapıcı metodudur. Yapılandırma bilgisi eksik olduğunda fırlatılacak hata nesnesini başlatır ve hata mesajını standart bir formatta oluşturur.
+
+**Nasıl yapar**: Üst sınıfın (`Error`) yapıcı metodunu `super()` aracılığıyla çağırır ve `CONFIG_MISSING:` öneki ile birlikte eksik yapılandırma bilgisini hata mesajı olarak iletir. Ardından `this.name` özelliğini `'CallerConfigError'` olarak ayarlayarak hatanın türünü tanımlar.
+
+**Parametreler**:
+- missing: string — Eksik olan yapılandırma bilgisinin adını veya tanımlayıcısını içerir. Bu değer hata mesajına `CONFIG_MISSING:{missing}` formatında eklenir.
+
+**Dönüş**: void — Yapıcı metodlar bir değer döndürmez, nesne örneğini başlatır.
 
 ### constructor
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: `CallerLookupError` sınıfının yapıcı metodudur. Yapılandırma bilgisi eksik olduğunda fırlatılacak hata nesnesini başlatır ve hata mesajını standart bir formatta oluşturur.
+
+**Nasıl yapar**: Üst sınıfın (`Error`) yapıcı metodunu `super()` aracılığıyla çağırır ve `CONFIG_MISSING:` öneki ile birlikte eksik yapılandırma bilgisini hata mesajı olarak iletir. Ardından `this.name` özelliğini `'CallerConfigError'` olarak ayarlayarak hatanın türünü tanımlar.
+
+**Parametreler**:
+- missing: string — Eksik olan yapılandırma bilgisinin adını veya tanımlayıcısını içerir. Bu değer hata mesajına `CONFIG_MISSING:{missing}` formatında eklenir.
+
+**Dönüş**: void — Yapıcı metodlar bir değer döndürmez, nesne örneğini başlatır.
 
 ---
 
@@ -4110,58 +4124,56 @@ type CallerKind = 'service_role' | 'user' | 'anon'
 
 ### [N1_NASIL] AST Pointer: caller.ts::CallerConfigError.constructor
 - **params**: `missing: string`
-- **ic_degiskenler**:
-  - `missing` — eksik yapılandırma değişken adı; hata mesajında `CONFIG_MISSING:{missing}` biçiminde kullanılır
-- **Dönüş**: yok (constructor; `this.name` alanını `'CallerConfigError'` olarak atar)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (constructor; `this.name` alanını `'CallerConfigError'` olarak atar, üst sınıfa `CONFIG_MISSING:${missing}` mesajı iletir)
 
 ### [N2_NASIL] AST Pointer: caller.ts::CallerLookupError.constructor
 - **params**: `detail: string`
-- **ic_degiskenler**:
-  - `detail` — profil sorgu hatasının açıklaması; hata mesajında `PROFILE_LOOKUP_FAILED:{detail}` biçiminde kullanılır
-- **Dönüş**: yok (constructor; `this.name` alanını `'CallerLookupError'` olarak atar)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (constructor; `this.name` alanını `'CallerLookupError'` olarak atar, üst sınıfa `PROFILE_LOOKUP_FAILED:${detail}` mesajı iletir)
 
 ### [N3_NASIL] AST Pointer: caller.ts::bearerToken
 - **params**: `request: Request`
 - **ic_degiskenler**:
-  - `header` — `request.headers.get('Authorization')` sonucu; Authorization header değeri, yoksa fonksiyon `null` döner
-  - `token` — `header` değerinden `BEARER_PREFIX_RE` regex ile "Bearer " öneki çıkarıldıktan ve `trim()` uygulandıktan sonra kalan string
-- **Dönüş**: `string | null` — çıkarılan token boşsa `null`, aksi halde token string'i
+  - `header` — `request.headers.get('Authorization')` sonucu; Authorization başlığının ham değeri
+  - `token` — `header` değerinden `BEARER_PREFIX_RE` ile eşleşen önek çıkarılıp `trim()` uygulanmış hali
+- **Dönüş**: `string | null` — başlık yoksa `null`, önek çıkarıldıktan sonra boş string ise `null`, aksi halde token string'i
 
 ### [N4_NASIL] AST Pointer: caller.ts::timingSafeEquals
 - **params**: `a: string`, `b: string`
 - **ic_degiskenler**:
-  - `encoder` — `new TextEncoder()` nesnesi; string'leri `Uint8Array`'e dönüştürmek için kullanılır
-  - `left` — `encoder.encode(a)` sonucu; birinci parametrenin byte karşılığı
-  - `right` — `encoder.encode(b)` sonucu; ikinci parametrenin byte karşılığı
-  - `diff` — `left.length ^ right.length` ile başlatılır; döngüde her byte çifti arasındaki XOR farkları bitwise OR ile eklenir
+  - `encoder` — `new TextEncoder()` örneği; string'leri byte dizisine dönüştürmek için
+  - `left` — `encoder.encode(a)` sonucu; `a` parametresinin Uint8Array karşılığı
+  - `right` — `encoder.encode(b)` sonucu; `b` parametresinin Uint8Array karşılığı
+  - `diff` — başlangıçta `left.length ^ right.length` (uzunluk farkı XOR); döngüde her byte çiftinin OR birikimli XOR farkı
   - `length` — `Math.max(left.length, right.length)`; döngü üst sınırı
-  - `i` — döngü sayacı; `0`'dan `length`'e kadar iterasyon yapar
-- **Dönüş**: `boolean` — `diff === 0` ise `true` (eşit), aksi halde `false`
+  - `i` — döngü sayacı; `0`'dan `length`'e kadar iterasyon indeksi
+- **Dönüş**: `boolean` — `diff === 0` ise `true` (değerler eşit), aksi halde `false`
 
 ### [N5_NASIL] AST Pointer: caller.ts::toProfileRow
 - **params**: `value: unknown`
 - **ic_degiskenler**:
-  - `record` — `value`'nun `Record<string, unknown>` tipine cast edilmiş hali; `role` ve `tenant_id` alanlarına erişim için kullanılır
-- **Dönüş**: `TenantProfileRow | null` — `value` nesne değilse veya `null` ise `null` döner; aksi halde `{ role: string | null, tenant_id: string | null }` nesnesi döner. `record.role` ve `record.tenant_id` string değilse ilgili alan `null` olarak atanır.
+  - `record` — `value`'nun `Record<string, unknown>` olarak cast edilmiş hali; `role` ve `tenant_id` alanlarına erişim için kullanılır
+- **Dönüş**: `TenantProfileRow | null` — `value` nesne değilse veya `null` ise `null`; aksi halde `role` (string ise, değilse `null`) ve `tenant_id` (string ise, değilse `null`) alanlarından oluşan nesne
 
 ### [N6_NASIL] AST Pointer: caller.ts::resolveCaller
 - **params**: `request: Request`, `parsedBody?: unknown`
 - **ic_degiskenler**:
-  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` sonucu; boşsa `CallerConfigError('SUPABASE_URL')` fırlatılır
-  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` sonucu; boşsa `CallerConfigError('SUPABASE_SERVICE_ROLE_KEY')` fırlatılır
-  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` sonucu; boşsa `CallerConfigError('SUPABASE_ANON_KEY')` fırlatılır
-  - `token` — `bearerToken(request)` çağrısının dönüşü; `null` ise fonksiyon `ANONYMOUS` sabitini döner
-  - `authClient` — `createClient(supabaseUrl, anonKey, { auth: { persistSession: false } })` ile oluşturulan Supabase istemcisi; JWT doğrulaması için kullanılır
-  - `userData` — `authClient.auth.getUser(token)` çağrısının `data` kısmı; kullanıcı bilgisi içerir
-  - `userError` — `authClient.auth.getUser(token)` çağrısının `error` kısmı; hata varsa `ANONYMOUS` döner
-  - `authUser` — `userData?.user ?? null`; doğrulanmış kullanıcı nesnesi, `null` ise `ANONYMOUS` döner
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL') ?? ''` sonucu; boş ise `CallerConfigError` fırlatır
+  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''` sonucu; boş ise `CallerConfigError` fırlatır
+  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY') ?? ''` sonucu; boş ise `CallerConfigError` fırlatır
+  - `token` — `bearerToken(request)` sonucu; `null` ise `ANONYMOUS` döner
+  - `authClient` — `createClient(supabaseUrl, anonKey, { auth: { persistSession: false } })` ile oluşturulan Supabase istemcisi; JWT doğrulaması için
+  - `userData` — `authClient.auth.getUser(token)` yanıtının `data` kısmı
+  - `userError` — `authClient.auth.getUser(token)` yanıtının `error` kısmı; varsa `ANONYMOUS` döner
+  - `authUser` — `userData?.user ?? null`; doğrulanmış kullanıcı nesnesi, yoksa `ANONYMOUS` döner
   - `user` — `{ id: authUser.id, app_metadata: authUser.app_metadata ?? null }` biçimindeki `VerifiedUser` nesnesi
-  - `admin` — `createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } })` ile oluşturulan Supabase istemcisi; profil sorgusu için kullanılır
+  - `admin` — `createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } })` ile oluşturulan Supabase istemcisi; profil sorgusu için
   - `profileData` — `admin.from('user_profiles').select('role, tenant_id').eq('id', user.id).maybeSingle()` sorgusunun `data` kısmı
-  - `profileError` — profil sorgusunun `error` kısmı; hata varsa `CallerLookupError(profileError.message)` fırlatılır
-  - `profile` — `toProfileRow(profileData)` çağrısının dönüşü; `TenantProfileRow | null`
-  - `decision` — service role yolunda `tenantFromServiceBody(parsedBody)`, user yolunda `tenantFromVerifiedUser(user, profile)` çağrısının dönüşü; `tenantId` ve `source` alanlarını içerir
-- **Dönüş**: `Promise<CallerContext>` — `{ kind: 'service_role' | 'user', user: VerifiedUser | null, role?: string, tenantId: ..., source: ... }` biçiminde bağlam nesnesi
+  - `profileError` — aynı sorgunun `error` kısmı; varsa `CallerLookupError` fırlatır
+  - `profile` — `toProfileRow(profileData)` sonucu; `role` ve `tenant_id` alanlarını içeren nesne veya `null`
+  - `decision` — service_role yolunda `tenantFromServiceBody(parsedBody)`, user yolunda `tenantFromVerifiedUser(user, profile)` sonucu; `tenantId` ve `source` alanlarını içerir
+- **Dönüş**: `Promise<CallerContext>` — `kind` (`'service_role'` veya `'user'`), `user` (service_role'da `null`, user'da `VerifiedUser`), `role` (sadece user yolunda, `profile?.role`), `tenantId`, `source` alanlarından oluşan nesne
 
 ---
 
@@ -4175,19 +4187,19 @@ graph TD
     caller_ts__timingSafeEquals["timingSafeEquals"]
     caller_ts__toProfileRow["toProfileRow"]
     caller_ts__resolveCaller --> caller_ts__bearerToken
-    caller_ts__resolveCaller --> caller_ts__timingSafeEquals
     caller_ts__resolveCaller --> caller_ts__toProfileRow
+    caller_ts__resolveCaller --> caller_ts__timingSafeEquals
 ```
 
 ## NODE ID STANDARD
 
-  file: caller.ts
-  function: caller.ts::bearerToken
-  function: caller.ts::timingSafeEquals
-  function: caller.ts::toProfileRow
-  function: caller.ts::resolveCaller
-  class: caller.ts::CallerConfigError
-  class: caller.ts::CallerLookupError
+  file: supabase\functions\_shared\caller.ts
+  function: supabase\functions\_shared\caller.ts::bearerToken
+  function: supabase\functions\_shared\caller.ts::timingSafeEquals
+  function: supabase\functions\_shared\caller.ts::toProfileRow
+  function: supabase\functions\_shared\caller.ts::resolveCaller
+  class: supabase\functions\_shared\caller.ts::CallerConfigError
+  class: supabase\functions\_shared\caller.ts::CallerLookupError
 
 ---
 
@@ -4201,6 +4213,53 @@ graph TD
   export: timingSafeEquals
   export: toProfileRow
 
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+NİÇİN BU DOSYA VAR
+-----------------
+Cetvel §3.2/§3.3'ün kanonik kapısı ("kimlik → yetki → ancak sonra service_role")
+bugün 5 bildirim ucunda + 3 admin ucunda KOPYALA-YAPIŞTIR hâlde duruyor ve her kopya
+birbirinden biraz farklı: kimi `getUser`'ı tenant çözümünden SONRA çağırıyor, kimi rol
+satırını `tenant_id` ile filtreliyor, kimi hata dalında sessizce devam ediyor. Sekiz
+kopya = sekiz farklı güvenlik duruşu; birini düzeltmek diğer yediyi düzeltmiyor.
+Bu modül o kapıyı TEK yere indirir: `resolveCaller(request, parsedBody)`.
+
+NİÇİN ROL VE TENANT AYNI SORGUDAN
+----------------------------------
+Eski kod önce tenant'ı çözüyor, sonra profili `id=eq.<x>&tenant_id=eq.<tenant>` ile
+filtreliyordu — yani "kullanıcının tenant'ını öğrenmek için tenant'ı bilmek" gerekiyordu.
+Bu döngü, tenant'ın istekten okunmasının GEREKÇESİYDİ. Döngüyü kırmanın tek yolu:
+filtre YALNIZ doğrulanmış `user.id`, `select` ise `role, tenant_id` — tek satır, tek
+round-trip, sıfır ek maliyet. Tenant artık sorgunun GİRDİSİ değil, SONUCU.
+
+NİÇİN `getUser` EN FAZLA BİR KEZ
+---------------------------------
+12 çağıranın 8'i zaten kendi `getUser`'ını çağırıyor. Tenant modülü kendi başına bir
+`getUser` daha yapsaydı o 8 uçta İKİNCİ bir Auth round-trip'i doğardı (performans
+regresyonu). Burada tek çağrı var ve sonucu (`user` + `role` + `tenantId`) çağırana
+birlikte veriliyor; çağıranın ayrıca `getUser` çağırmasına gerek kalmaz.
+
+NİÇİN SABİT-ZAMANLI ANAHTAR KARŞILAŞTIRMASI
+--------------------------------------------
+`authHeader === 'Bearer ' + serviceKey` erken çıkışlı bir karşılaştırmadır; teorik
+olarak anahtar baytları zamanlamayla sızdırılabilir. Sır karşılaştırmasında sabit-zamanlı
+olmak cetvel §3.5'in webhook imzaları için zaten dayattığı disiplin — service_role
+anahtarı ondan daha değerli olduğu için aynı disiplin burada da uygulanır.
+
+NE YAPMAZ
+---------
+Karar VERMEZ, yalnız KANITI TOPLAR. "Bu `kind`/`role` bu ucu çağırabilir mi?" sorusunu
+çağıran uç yanıtlar (401/403 onun sorumluluğu) — çünkü cevap uca göre değişir:
+sınıf (a) uçları rol ister, sınıf (a+b) uçları service_role'ü de kabul eder.
+```
+
+
 ---
 # FILE: supabase\functions\_shared\config_audit.md
 
@@ -4208,8 +4267,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\config_audit.ts
-skeleton_hash: 8c06e1d85806e501
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\config_audit.ts
+skeleton_hash: f66aa31448f66932
 entity_hashes:
   func:auditConfig: 0b81bbc5f84a6825
   func:konak: 4a6152e01a973bdf
@@ -4217,7 +4276,7 @@ entity_hashes:
   func:siteKonagi: c447c416b41fe314
   func:yerelMi: e46588c3d5d6d331
   overview: c188b443ebb2af39
-generated_at: 2026-08-25T08:47:05Z
+generated_at: 2026-08-27T07:09:08Z
 ---
 
 ## Genel Bakış
@@ -4358,10 +4417,10 @@ graph TD
     config_audit_ts__resolveIyzicoBase["resolveIyzicoBase"]
     config_audit_ts__siteKonagi["siteKonagi"]
     config_audit_ts__yerelMi["yerelMi"]
-    config_audit_ts__auditConfig --> config_audit_ts__resolveIyzicoBase
-    config_audit_ts__resolveIyzicoBase --> config_audit_ts__konak
     config_audit_ts__auditConfig --> config_audit_ts__yerelMi
+    config_audit_ts__resolveIyzicoBase --> config_audit_ts__konak
     config_audit_ts__auditConfig --> config_audit_ts__siteKonagi
+    config_audit_ts__auditConfig --> config_audit_ts__resolveIyzicoBase
     config_audit_ts__siteKonagi --> config_audit_ts__konak
 ```
 
@@ -4426,12 +4485,12 @@ konak adı. Konak adı sır değildir ve teşhisin tamamı ona bağlıdır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\supabase\functions\_shared\cors.ts
-skeleton_hash: d21db1e6bd4f3091
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\cors.ts
+skeleton_hash: 77b5503d4a2f1053
 entity_hashes:
   func:getCorsHeaders: 73642dabf029645c
   overview: 8eaad34e6f15ad7c
-generated_at: 2026-08-25T07:33:46Z
+generated_at: 2026-08-27T07:09:10Z
 ---
 
 ## Genel Bakış
@@ -4486,8 +4545,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: cors.ts
-  function: cors.ts::getCorsHeaders
+  file: supabase\functions\_shared\cors.ts
+  function: supabase\functions\_shared\cors.ts::getCorsHeaders
 
 ---
 
@@ -4501,8 +4560,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\supabase\functions\_shared\notify.ts
-skeleton_hash: 7077acc0da919b61
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\notify.ts
+skeleton_hash: 0a4a7f997f54901f
 entity_hashes:
   func:getEmailConfig: d69ed27e1c404dc2
   func:getEnv: 6925671b32beb020
@@ -4511,7 +4570,7 @@ entity_hashes:
   func:sendEmail: 2a2dc768ec5451fa
   func:sendSlack: cd61229d7922325b
   overview: be8ec04b8995d7cb
-generated_at: 2026-08-25T07:34:05Z
+generated_at: 2026-08-27T07:09:11Z
 ---
 
 ## Genel Bakış
@@ -4657,24 +4716,24 @@ graph TD
     notify_ts__notify["notify"]
     notify_ts__sendEmail["sendEmail"]
     notify_ts__sendSlack["sendSlack"]
-    notify_ts__notify --> notify_ts__getEnv
     notify_ts__getSlackWebhook --> notify_ts__getEnv
+    notify_ts__sendSlack --> notify_ts__getSlackWebhook
     notify_ts__getEmailConfig --> notify_ts__getEnv
     notify_ts__sendEmail --> notify_ts__getEmailConfig
-    notify_ts__notify --> notify_ts__sendSlack
+    notify_ts__notify --> notify_ts__getEnv
     notify_ts__notify --> notify_ts__sendEmail
-    notify_ts__sendSlack --> notify_ts__getSlackWebhook
+    notify_ts__notify --> notify_ts__sendSlack
 ```
 
 ## NODE ID STANDARD
 
-  file: notify.ts
-  function: notify.ts::getEnv
-  function: notify.ts::getSlackWebhook
-  function: notify.ts::getEmailConfig
-  function: notify.ts::sendSlack
-  function: notify.ts::sendEmail
-  function: notify.ts::notify
+  file: supabase\functions\_shared\notify.ts
+  function: supabase\functions\_shared\notify.ts::getEnv
+  function: supabase\functions\_shared\notify.ts::getSlackWebhook
+  function: supabase\functions\_shared\notify.ts::getEmailConfig
+  function: supabase\functions\_shared\notify.ts::sendSlack
+  function: supabase\functions\_shared\notify.ts::sendEmail
+  function: supabase\functions\_shared\notify.ts::notify
 
 ---
 
@@ -4694,8 +4753,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\origins.ts
-skeleton_hash: f2f47129327a42be
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\origins.ts
+skeleton_hash: a2700fdc4dd05e12
 entity_hashes:
   func:buildAllowedOrigins: 5e2ca73674ab1ca1
   func:isAllowedRedirectTarget: 889b440b22fb49ce
@@ -4703,7 +4762,7 @@ entity_hashes:
   func:normalizeOrigin: b40e1fd79e5225ba
   func:pickRedirectOrigin: e6d67aa2dc05c209
   overview: c7c2d674fb6c1287
-generated_at: 2026-08-25T08:47:00Z
+generated_at: 2026-08-27T07:09:13Z
 ---
 
 ## Genel Bakış
@@ -4818,8 +4877,8 @@ graph TD
     origins_ts__isOriginAccepted["isOriginAccepted"]
     origins_ts__normalizeOrigin["normalizeOrigin"]
     origins_ts__pickRedirectOrigin["pickRedirectOrigin"]
-    origins_ts__buildAllowedOrigins --> origins_ts__normalizeOrigin
     origins_ts__isAllowedRedirectTarget --> origins_ts__normalizeOrigin
+    origins_ts__buildAllowedOrigins --> origins_ts__normalizeOrigin
     origins_ts__isOriginAccepted --> origins_ts__normalizeOrigin
     origins_ts__pickRedirectOrigin --> origins_ts__normalizeOrigin
 ```
@@ -4884,13 +4943,13 @@ takas değil; burada ikisine de gerek yok.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\supabase\functions\_shared\rate_limit.ts
-skeleton_hash: 2ab7b0772d2c4b01
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\rate_limit.ts
+skeleton_hash: ab4c12eebd37adf1
 entity_hashes:
   func:checkRateLimit: eb2ddca9002ea24b
   func:rateLimitHeaders: 8e57db019805fbe0
   overview: 2d23853bbec3dccf
-generated_at: 2026-08-25T07:33:59Z
+generated_at: 2026-08-27T07:09:15Z
 ---
 
 ## Genel Bakış
@@ -4970,9 +5029,9 @@ type RateLimitResult = { allowed: boolean; remaining: number; resetAt: string }
 
 ## NODE ID STANDARD
 
-  file: rate_limit.ts
-  function: rate_limit.ts::checkRateLimit
-  function: rate_limit.ts::rateLimitHeaders
+  file: supabase\functions\_shared\rate_limit.ts
+  function: supabase\functions\_shared\rate_limit.ts::checkRateLimit
+  function: supabase\functions\_shared\rate_limit.ts::rateLimitHeaders
 
 ---
 
@@ -4988,8 +5047,8 @@ type RateLimitResult = { allowed: boolean; remaining: number; resetAt: string }
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\refund_guard.ts
-skeleton_hash: 81a41de26dca6fe9
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\refund_guard.ts
+skeleton_hash: 2478cd3b45859103
 entity_hashes:
   func:claimRefund: f4f88d95931f9978
   func:fetchAttempt: 5a8da5c20b5d55d6
@@ -4997,7 +5056,7 @@ entity_hashes:
   func:restHeaders: 3f515e0e3e1cd72a
   func:settleRefund: a43193d7e46764d2
   overview: 282bb5e46d33367e
-generated_at: 2026-08-25T08:47:26Z
+generated_at: 2026-08-27T07:09:17Z
 ---
 
 ## Genel Bakış
@@ -5161,10 +5220,10 @@ graph TD
     refund_guard_ts__fullCancelKey["fullCancelKey"]
     refund_guard_ts__restHeaders["restHeaders"]
     refund_guard_ts__settleRefund["settleRefund"]
+    refund_guard_ts__fetchAttempt --> refund_guard_ts__restHeaders
+    refund_guard_ts__claimRefund --> refund_guard_ts__restHeaders
     refund_guard_ts__claimRefund --> refund_guard_ts__fetchAttempt
     refund_guard_ts__settleRefund --> refund_guard_ts__restHeaders
-    refund_guard_ts__claimRefund --> refund_guard_ts__restHeaders
-    refund_guard_ts__fetchAttempt --> refund_guard_ts__restHeaders
 ```
 
 ## NODE ID STANDARD
@@ -5240,13 +5299,13 @@ Bu yüzden burada fail-closed davranış, İNSAN kararı istemektir: 409 + gelir
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\return_transitions.ts
-skeleton_hash: c63b4abc90537b5f
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\return_transitions.ts
+skeleton_hash: da1baae346bd8120
 entity_hashes:
   func:canCarrierTransition: 319f7f80006cd5c4
   func:isTerminalReturnStatus: b970cffbe2eea904
   overview: e4a16fc5919e804b
-generated_at: 2026-08-25T08:46:54Z
+generated_at: 2026-08-27T07:09:18Z
 ---
 
 ## Genel Bakış
@@ -5408,12 +5467,12 @@ demek olurdu. Bu ayrım INV-RETURN-1 testiyle sabitlenmiştir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\revenue_alarm.ts
-skeleton_hash: 4354b9f10aea862c
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\revenue_alarm.ts
+skeleton_hash: 45e6b9644b93d093
 entity_hashes:
   func:raiseRevenueAlarm: 583400307b182d35
   overview: ed4be68d95228a99
-generated_at: 2026-08-25T08:46:49Z
+generated_at: 2026-08-27T07:09:20Z
 ---
 
 ## Genel Bakış
@@ -5557,15 +5616,15 @@ platform loglarına düşer.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\sentry.ts
-skeleton_hash: 4a1eb17c4a08a475
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\sentry.ts
+skeleton_hash: 9ae3c67ed80ac3f9
 entity_hashes:
   func:parseDsn: de6e6bd80de1e473
   func:postStore: baa7d375e0588daa
   func:sentryCaptureException: d3efed22b661b471
   func:sentryCaptureMessage: f1e4a7cbdea35542
   overview: a0aac1a163270d41
-generated_at: 2026-08-13T07:40:33Z
+generated_at: 2026-08-27T07:09:22Z
 ---
 
 ## Genel Bakış
@@ -5734,8 +5793,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\supabase\functions\_shared\tenant.ts
-skeleton_hash: d8a37cd097d5cbe6
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\tenant.ts
+skeleton_hash: 0f8724e000a12424
 entity_hashes:
   func:TenantMismatchError:constructor: aa4b9629eb1115c1
   func:asTenantId: 22012e035e1c5ed1
@@ -5744,7 +5803,7 @@ entity_hashes:
   func:tenantFromServiceBody: 81173f01c019d0b4
   func:tenantFromVerifiedUser: 03f6724101c13164
   overview: 4177b2bce8b584b0
-generated_at: 2026-08-25T07:34:12Z
+generated_at: 2026-08-27T07:09:56Z
 ---
 
 ## Genel Bakış
@@ -5797,7 +5856,15 @@ Bu grup, tenant bilgileri arasındaki uyumsuzlukları yakalamak ve bildirmek iç
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: `TenantMismatchError` sınıfının yapıcı metodudur. Tenant (kiracı) uyumsuzluğu durumunda fırlatılacak hata nesnesini başlatır ve ilgili tenant kimlik bilgilerini hata nesnesine kaydeder.
+
+**Nasıl yapar**: Üst sınıfın constructor'ını `super('tenant_mismatch')` çağrısıyla başlatır; bu sayede hata mesajı olarak `'tenant_mismatch'` değerini kullanır. Ardından `this.name` özelliğini `'TenantMismatchError'` olarak ayarlayarak hata türünü tanımlar. Son olarak gelen `profileTenantId` ve `claimTenantId` parametrelerini ilgili örnek özelliklerine atar, böylece hata yakalandığında hangi tenant kimliklerinin uyuşmadığı bilgisine erişilebilir.
+
+**Parametreler**:
+- `profileTenantId`: `string | null` — Profil kaydındaki tenant kimliğini temsil eder. Profil kaydı bulunamadığında `null` olabilir.
+- `claimTenantId`: `string` — JWT claim'lerindeki tenant kimliğini temsil eder. Bu değer her zaman bir string olarak beklenir.
+
+**Dönüş**: Bilinmiyor. Constructor metotlarının dönüş tipi kaynak kodda belirtilmemiştir.
 
 ---
 
@@ -5836,43 +5903,43 @@ type TenantSource = 'user_profile' | 'service_body' | 'resource_row' | 'default'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/_shared/tenant.ts::constructor
+### [N1_NASIL] AST Pointer: tenant.ts::TenantMismatchError.constructor
 - **params**: `profileTenantId: string | null`, `claimTenantId: string`
 - **ic_degiskenler**: yok
-- **Dönüş**: yok (constructor — `super('tenant_mismatch')` çağrısı yapar, `this.name` alanını `'TenantMismatchError'` olarak atar, `this.profileTenantId` ve `this.claimTenantId` alanlarını parametre değerlerine atar)
+- **Dönüş**: yok (constructor; `super('tenant_mismatch')` çağrısı yapar, `this.name` alanını `'TenantMismatchError'` olarak atar, `this.profileTenantId` ve `this.claimTenantId` alanlarını parametrelerden doldurur)
 
-### [N2_NASIL] AST Pointer: supabase/functions/_shared/tenant.ts::asTenantId
+### [N2_NASIL] AST Pointer: tenant.ts::asTenantId
 - **params**: `value: unknown`
 - **ic_degiskenler**:
-  - `trimmed` — `value` parametresinin `.trim()` ile boşluklardan arındırılmış hali; `TENANT_UUID_RE` regex'i ile test edilir
-- **Dönüş**: `string | null` — `value` string değilse `null`; trim edilmiş değer `TENANT_UUID_RE` regex'ine uymuyorsa `null`; uyuyorsa `trimmed.toLowerCase()` (küçük harfe çevrilmiş UUID)
+  - `trimmed` — `value` string ise `value.trim()` sonucu; UUID regex testine sokulan temizlenmiş değer
+- **Dönüş**: `string | null` — `value` string değilse `null`; `trimmed` `TENANT_UUID_RE` regex'ine uymuyorsa `null`; uyuyorsa `trimmed.toLowerCase()` (küçük harfe çevrilmiş UUID)
 
-### [N3_NASIL] AST Pointer: supabase/functions/_shared/tenant.ts::readTenantField
+### [N3_NASIL] AST Pointer: tenant.ts::readTenantField
 - **params**: `source: unknown`
 - **ic_degiskenler**:
-  - `record` — `source` parametresinin `Record<string, unknown>` tipine cast edilmiş hali
-  - `key` — `TENANT_FIELD_KEYS` dizisi üzerinde döngüdeki her bir anahtar
-  - `candidate` — `record[key]` değerinin `asTenantId()` ile doğrulanmış sonucu
-- **Dönüş**: `string | null` — `TENANT_FIELD_KEYS` içindeki ilk geçerli UUID bulunursa o değer; bulunamazsa `null`; `source` nesne değilse `null`
+  - `record` — `source` object ve null değilse `source as Record<string, unknown>` ile dönüştürülen kayıt
+  - `key` — `TENANT_FIELD_KEYS` dizisi üzerinde döngüdeki mevcut anahtar
+  - `candidate` — `asTenantId(record[key])` çağrısının dönüş değeri; her anahtar için kontrol edilen tenant ID adayı
+- **Dönüş**: `string | null` — `source` object değilse `null`; `TENANT_FIELD_KEYS` içindeki anahtarlardan biri geçerli bir tenant ID döndürüyorsa o değer; hiçbiri bulamazsa `null`
 
-### [N4_NASIL] AST Pointer: supabase/functions/_shared/tenant.ts::tenantFromVerifiedUser
+### [N4_NASIL] AST Pointer: tenant.ts::tenantFromVerifiedUser
 - **params**: `user: VerifiedUser`, `profile: TenantProfileRow | null`
 - **ic_degiskenler**:
-  - `fromProfile` — `profile?.tenant_id ?? null` değerinin `asTenantId()` ile doğrulanmış sonucu
-  - `fromClaim` — `user.app_metadata ?? null` değerinin `readTenantField()` ile çıkarılmış tenant ID'si
-- **Dönüş**: `TenantDecision` — `fromClaim` ve `fromProfile` farklıysa `TenantMismatchError` fırlatır; `fromProfile` varsa `{ tenantId: fromProfile, source: 'user_profile' }`; yoksa `{ tenantId: DEFAULT_TENANT_ID, source: 'default' }`
+  - `fromProfile` — `asTenantId(profile?.tenant_id ?? null)` çağrısının dönüş değeri; profilden okunan tenant ID
+  - `fromClaim` — `readTenantField(user.app_metadata ?? null)` çağrısının dönüş değeri; kullanıcı claim'inden okunan tenant ID
+- **Dönüş**: `TenantDecision` — `fromClaim` ve `fromProfile` farklı ve ikisi de null değilse `TenantMismatchError` fırlatır; `fromProfile` null değilse `{ tenantId: fromProfile, source: 'user_profile' }`; aksi halde `{ tenantId: DEFAULT_TENANT_ID, source: 'default' }`
 
-### [N5_NASIL] AST Pointer: supabase/functions/_shared/tenant.ts::tenantFromServiceBody
+### [N5_NASIL] AST Pointer: tenant.ts::tenantFromServiceBody
 - **params**: `parsedBody: unknown`
 - **ic_degiskenler**:
-  - `claimed` — `parsedBody` değerinin `readTenantField()` ile çıkarılmış tenant ID'si
-- **Dönüş**: `TenantDecision` — `claimed` varsa `{ tenantId: claimed, source: 'service_body' }`; yoksa `{ tenantId: DEFAULT_TENANT_ID, source: 'default' }`
+  - `claimed` — `readTenantField(parsedBody)` çağrısının dönüş değeri; servis gövdesinden okunan tenant ID
+- **Dönüş**: `TenantDecision` — `claimed` null değilse `{ tenantId: claimed, source: 'service_body' }`; aksi halde `{ tenantId: DEFAULT_TENANT_ID, source: 'default' }`
 
-### [N6_NASIL] AST Pointer: supabase/functions/_shared/tenant.ts::tenantFromRow
+### [N6_NASIL] AST Pointer: tenant.ts::tenantFromRow
 - **params**: `row: { tenant_id?: string | null } | null`
 - **ic_degiskenler**:
-  - `fromRow` — `row?.tenant_id ?? null` değerinin `asTenantId()` ile doğrulanmış sonucu
-- **Dönüş**: `TenantDecision` — `fromRow` varsa `{ tenantId: fromRow, source: 'resource_row' }`; yoksa `{ tenantId: DEFAULT_TENANT_ID, source: 'default' }`
+  - `fromRow` — `asTenantId(row?.tenant_id ?? null)` çağrısının dönüş değeri; satırdan okunan tenant ID
+- **Dönüş**: `TenantDecision` — `fromRow` null değilse `{ tenantId: fromRow, source: 'resource_row' }`; aksi halde `{ tenantId: DEFAULT_TENANT_ID, source: 'default' }`
 
 ---
 
@@ -5886,22 +5953,22 @@ graph TD
     tenant_ts__tenantFromRow["tenantFromRow"]
     tenant_ts__tenantFromServiceBody["tenantFromServiceBody"]
     tenant_ts__tenantFromVerifiedUser["tenantFromVerifiedUser"]
-    tenant_ts__readTenantField --> tenant_ts__asTenantId
-    tenant_ts__tenantFromVerifiedUser --> tenant_ts__asTenantId
-    tenant_ts__tenantFromRow --> tenant_ts__asTenantId
     tenant_ts__tenantFromVerifiedUser --> tenant_ts__readTenantField
+    tenant_ts__tenantFromRow --> tenant_ts__asTenantId
     tenant_ts__tenantFromServiceBody --> tenant_ts__readTenantField
+    tenant_ts__tenantFromVerifiedUser --> tenant_ts__asTenantId
+    tenant_ts__readTenantField --> tenant_ts__asTenantId
 ```
 
 ## NODE ID STANDARD
 
-  file: tenant.ts
-  function: tenant.ts::asTenantId
-  function: tenant.ts::readTenantField
-  function: tenant.ts::tenantFromVerifiedUser
-  function: tenant.ts::tenantFromServiceBody
-  function: tenant.ts::tenantFromRow
-  class: tenant.ts::TenantMismatchError
+  file: supabase\functions\_shared\tenant.ts
+  function: supabase\functions\_shared\tenant.ts::asTenantId
+  function: supabase\functions\_shared\tenant.ts::readTenantField
+  function: supabase\functions\_shared\tenant.ts::tenantFromVerifiedUser
+  function: supabase\functions\_shared\tenant.ts::tenantFromServiceBody
+  function: supabase\functions\_shared\tenant.ts::tenantFromRow
+  class: supabase\functions\_shared\tenant.ts::TenantMismatchError
 
 ---
 
@@ -5923,6 +5990,56 @@ graph TD
   contains: string
   contains: string | null
 
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+NİÇİN BU DOSYA VAR
+-----------------
+Eski `_shared/tenant_config.ts::resolveTenantId` tenant sınırını ÜÇ ayrı istek
+alanından çiziyordu: `?tenant_id=` query'si (her şeyden önce), imzası hiç
+doğrulanmadan elle çözülmüş JWT payload'ı, ve gövde. Üçü de saldırganın yazdığı yerler
+— yani tenant sınırı pratikte YOKTU. Fonksiyonlar bu değeri PostgREST filtresine
+(`tenant_id=eq.${tenantId}`) koyduğu için etki "başka tenant'ın satırını oku/yaz"a
+kadar gidiyordu (cetvel §3.9 · CLAUDE.md §12 "data bleeding = felaket").
+
+NİÇİN HTTP İSTEK NESNESİNİ HİÇ GÖRMÜYOR (stil tercihi DEĞİL, yapısal kilit)
+---------------------------------------------------------------------------
+Kök sebep "sıra yanlıştı" değil, **tenant modülünün istek nesnesine erişebilmesiydi**.
+Erişim durdukça birileri er ya da geç yeniden "hızlıca şu query'yi de okuyalım" der.
+Bu yüzden dosya SAF tutulur: istek nesnesi, istek başlıkları, query parametreleri ve
+elle JWT çözme bu dosyada GEÇMEZ — hiçbiri, yorum içinde bile. Karar verirken elde
+yalnız ÇAĞIRANIN ZATEN DOĞRULADIĞI girdiler olur; doğrulamak çağıranın işidir
+(bkz. `_shared/caller.ts`).
+(`tenant-id-hardening-2026-08-15.md` §7-B bunu ileride statik kural olarak bağlayacak;
+kural ham dosyayı tarasa bile bu dosya temiz kalsın diye yasak diziler yazılmadı.)
+
+NİÇİN SINIF BAŞINA AYRI FONKSİYON ("JWT kazanır" tek başına yetmez)
+-------------------------------------------------------------------
+Cetvel §2'deki çağıran sınıflarının kanıtı FARKLIDIR, dolayısıyla tenant kaynağı da
+farklı olmak zorundadır:
+(a) oturumlu kullanıcı  → `user_profiles.tenant_id` (rol ile AYNI sorgudan)
+(b) service_role        → anahtar doğrulandıktan SONRA gövdedeki alan
+(c) harici sistem       → imza doğrulandıktan SONRA kaynağın KENDİ satırından
+Tek bir `resolveTenantId` bu üçünü aynı kaba koyduğu için en zayıf halka (query)
+hepsinin duruşunu belirliyordu. Üç ayrı fonksiyon, çağıranı sınıfını beyan etmeye
+zorlar; yanlış sınıfı kullanmak kodda görünür hâle gelir.
+
+NİÇİN "claim YOKSA hata değil" (ölçüme dayanır, tercihe değil)
+---------------------------------------------------------------
+2026-08-15 prod ölçümü: `auth.users` = 2 kullanıcı, İKİSİNİN DE
+`raw_app_meta_data->>'tenant_id'` alanı NULL; `user_profiles` = 2 satır, distinct
+tenant = 1. Yani `app_metadata.tenant_id` bugün HİÇBİR kullanıcıda yok. "Claim yoksa
+reddet" deseydik bugün canlı iki kullanıcının ikisi de kilitlenirdi. Bu yüzden claim
+bir OTORİTE değil, bir ÇAPRAZ KONTROLdür: yoksa profil kazanır, varsa profille
+UYUŞMAK ZORUNDADIR (plan R5).
+```
+
+
 ---
 # FILE: supabase\functions\_shared\tenant_config.md
 
@@ -5930,12 +6047,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\supabase\functions\_shared\tenant_config.ts
-skeleton_hash: 6b5012826ca17b3c
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\tenant_config.ts
+skeleton_hash: 5206c89ec698fe34
 entity_hashes:
   func:getTenantBranding: bde2d3819c7904af
   overview: 727819c400487687
-generated_at: 2026-08-25T07:34:07Z
+generated_at: 2026-08-27T07:09:58Z
 ---
 
 ## Genel Bakış
@@ -6015,8 +6132,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: tenant_config.ts
-  function: tenant_config.ts::getTenantBranding
+  file: supabase\functions\_shared\tenant_config.ts
+  function: supabase\functions\_shared\tenant_config.ts::getTenantBranding
 
 ---
 

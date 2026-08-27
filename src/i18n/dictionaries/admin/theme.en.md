@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\theme.en.ts
-skeleton_hash: bcf592d8ea62389b
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\theme.en.ts
+skeleton_hash: 75cb0f94dd6aedf8
 entity_hashes:
   overview: addd7e38799ae029
-generated_at: 2026-08-15T18:16:30Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış

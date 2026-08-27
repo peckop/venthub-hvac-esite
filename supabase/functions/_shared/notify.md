@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\supabase\functions\_shared\notify.ts
-skeleton_hash: 7077acc0da919b61
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\notify.ts
+skeleton_hash: 0a4a7f997f54901f
 entity_hashes:
   func:getEmailConfig: d69ed27e1c404dc2
   func:getEnv: 6925671b32beb020
@@ -12,7 +12,7 @@ entity_hashes:
   func:sendEmail: 2a2dc768ec5451fa
   func:sendSlack: cd61229d7922325b
   overview: be8ec04b8995d7cb
-generated_at: 2026-08-25T07:34:05Z
+generated_at: 2026-08-27T07:09:11Z
 ---
 
 ## Genel Bakış
@@ -158,24 +158,24 @@ graph TD
     notify_ts__notify["notify"]
     notify_ts__sendEmail["sendEmail"]
     notify_ts__sendSlack["sendSlack"]
-    notify_ts__notify --> notify_ts__getEnv
     notify_ts__getSlackWebhook --> notify_ts__getEnv
+    notify_ts__sendSlack --> notify_ts__getSlackWebhook
     notify_ts__getEmailConfig --> notify_ts__getEnv
     notify_ts__sendEmail --> notify_ts__getEmailConfig
-    notify_ts__notify --> notify_ts__sendSlack
+    notify_ts__notify --> notify_ts__getEnv
     notify_ts__notify --> notify_ts__sendEmail
-    notify_ts__sendSlack --> notify_ts__getSlackWebhook
+    notify_ts__notify --> notify_ts__sendSlack
 ```
 
 ## NODE ID STANDARD
 
-  file: notify.ts
-  function: notify.ts::getEnv
-  function: notify.ts::getSlackWebhook
-  function: notify.ts::getEmailConfig
-  function: notify.ts::sendSlack
-  function: notify.ts::sendEmail
-  function: notify.ts::notify
+  file: supabase\functions\_shared\notify.ts
+  function: supabase\functions\_shared\notify.ts::getEnv
+  function: supabase\functions\_shared\notify.ts::getSlackWebhook
+  function: supabase\functions\_shared\notify.ts::getEmailConfig
+  function: supabase\functions\_shared\notify.ts::sendSlack
+  function: supabase\functions\_shared\notify.ts::sendEmail
+  function: supabase\functions\_shared\notify.ts::notify
 
 ---
 
