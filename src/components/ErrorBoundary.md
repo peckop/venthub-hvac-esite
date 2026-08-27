@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\ErrorBoundary.tsx
-skeleton_hash: 9fac2b6a8a4ff7c0
+source_path: C:\Users\alize\venthub-wt-hotfix\src\components\ErrorBoundary.tsx
+skeleton_hash: 5d98db3d0b1967dd
 entity_hashes:
   func:ErrorBoundary:componentDidCatch: 13ff149b11a0e8ea
   func:ErrorBoundary:constructor: f8409de1e499d06a
@@ -13,7 +13,7 @@ entity_hashes:
   func:serializeError: 2f05a1b7f35a9398
   overview: 11526f7227fafcb9
   style_tokens: 1ab7ecfdeff4b247
-generated_at: 2026-08-27T07:54:00Z
+generated_at: 2026-08-15T06:35:03Z
 ---
 
 ## Genel Bakış
@@ -67,32 +67,32 @@ Bu modül, React ErrorBoundary deseni temelinde çalışır ve hata yakalama ya�
 **Dönüş**: `boolean` — Hata bir chunk yükleme hatasıysa `true`, aksi takdirde `false`.
 
 ### constructor
-**Ne yapar**: `ErrorBoundary` sınıfının yapıcı fonksiyonudur. Bileşen ilk oluşturulduğunda çağrılır ve bileşenin başlangıç durumunu ayarlar.
-**Nasıl yapar**: Üst sınıfın (`React.Component`) `constructor` metodunu `super(props)` ile çağırarak başlatma işlemini gerçekleştirir. Bileşenin state nesnesini, bir hata yakalanıp yakalanmadığını takip eden `hasError` değişkenini `false` olarak başlatır.
+**Ne yapar**: `ErrorBoundary` bileşeninin başlatıcı metodudur ve bileşenin ilk durumunu (state) ayarlar. Bileşenin hata yakalama mekanizmasını devreye sokan temel kurulumu gerçekleştirir.
+**Nasıl yapar**: `super(props)` çağrısı ile üst sınıf (React.Component) yapıcısını çağırarak props'ları iletir. Ardından `this.state` nesnesini `{ hasError: false }` olarak başlatır. Bu, bileşenin başlangıçta herhangi bir hata olmadığını belirtir.
 **Parametreler**:
-- props: Props — Bileşene geçirilen özellikleri içerir.
-**Dönüş**: Dönüş tipi belirtilmemiştir.
+- `props: Props` — Bileşene dışarıdan geçirilen özellikler nesnesi. Tipi, bileşenin dışarıdan alabileceği verileri tanımlayan bir arayüzdür.
+**Dönüş**: Dönüş tipi `void`'dur; yani herhangi bir değer döndürmez, sadece bileşenin iç durumunu başlatır.
 
 ### getDerivedStateFromError
-**Ne yapar**: Bir alt bileşende bir hata yakalandığında, `ErrorBoundary` bileşeninin state'ini güncellemek için kullanılan statik bir yaşam döngüsü metodudur. Hata bilgilerini state'e yansıtarak render metodunun hata durumunu gösterebilmesini sağlar.
-**Nasıl yapar**: Yakalanan `error` nesnesini parametre olarak alır. State'i, `hasError` alanını `true` yapan, yakalanan `error` nesnesini ve `isChunkLoadError` fonksiyonu ile hesaplanan `isChunkError` bayrağını içeren bir nesneyle günceller.
+**Ne yapar**: Bir render sırasında ortaya çıkan hataları yakalar ve bileşenin durumunu günceller. Bu, React tarafından çağrılan bir statik metottur ve hata yakalandığında bileşenin yeniden render edilmesini sağlar.
+**Nasıl yapar**: Parametre olarak aldığı `error` nesnesini inceler. `isChunkLoadError(error)` yardımcı fonksiyonunu kullanarak hatanın bir "chunk yükleme hatası" (örn: eski bir kod parçasını yüklemeye çalışma) olup olmadığını belirler. Sonra, `hasError: true`, hatanın kendisi ve `isChunkError` durumunu içeren yeni bir durum nesnesi döndürerek bileşenin durumunu günceller.
 **Parametreler**:
-- error: Error — Yakalanan hata nesnesi.
-**Dönüş**: State — Bileşenin güncellenmiş state'ini temsil eden bir nesne döndürür. Döndürülen nesne `hasError`, `error` ve `isChunkError` alanlarını içerir.
+- `error: Error` — Yakalanan JavaScript hata nesnesi. `Error` sınıfı veya türevlerinden bir instance olmalıdır.
+**Dönüş**: `State` tipinde bir nesne döndürür. Bu nesne en azından `hasError` (boolean), `error` (Error) ve `isChunkError` (boolean) alanlarını içerir. React, bu dönen nesneyi `this.state` ile birleştirerek bileşenin durumunu günceller.
 
 ### componentDidCatch
-**Ne yapar**: Bir alt bileşende bir hata yakalandığında ve hata bilgileri toplandıktan sonra çağrılan bir yaşam döngüsü metodudur. Hataları günlüğe kaydetmek ve harici bir hata raporlama servisine göndermek için kullanılır.
-**Nasıl yapar**: Yakalanan hata ve hata hakkında ek bilgileri (bileşen yığını) parametre olarak alır. Öncelikle hatayı `console.error` ile konsola yazar. Ardından, `reportError` fonksiyonunu çağırarak hatayı bir hata raporlama servisine ("log-client-error edge fonksiyonu") gönderir; bu işlem "fire-and-forget" niteliğindedir ve asla fırlatma (throw) yapmaz. Ek olarak, hata bir "chunk yükleme hatası" ise, kullanıcıyı bilgilendirmek için bir uyarı günlüğü (`console.warn`) yazar.
+**Ne yapar**: Bir render sırasında oluşan ve alt bileşenlerden yükselen hataları yakalar. Hata hakkında bilgi toplar ve hem konsola hem de uzak bir hata raporlama servisine iletir.
+**Nasıl yapar**: Öncelikle hata ve hata hakkında bilgi veren `errorInfo` nesnesini konsola `console.error` ile yazdırır. Ardından `reportError` fonksiyonunu çağırarak hatayı, kaynağını (`source: 'ErrorBoundary'`), bileşen yığın izini (`componentStack`) ve chunk hatası olup olmadığını (`isChunkError`) belirterek raporlar. Bu `reportError` çağrısı asenkron ("fire-and-forget") çalışır ve herhangi bir hata fırlatmaz. Eğer hata bir chunk yükleme hatası ise ayrıca bir `console.warn` ile kullanıcıya sayfayı yenilemesi gerektiğini bildirir.
 **Parametreler**:
-- error: Error — Yakalanan hata nesnesi.
-- errorInfo: ErrorInfo — Hata hakkında ek bilgileri (örneğin, bileşen yığını) içerir.
-**Dönüş**: Dönüş tipi belirtilmemiştir.
+- `error: Error` — Yakalanan JavaScript hata nesnesi.
+- `errorInfo: ErrorInfo` — Hatanın oluştuğu yerdeki bileşen yığın izini (`componentStack` property'si) içeren React tarafından sağlanan bilgi nesnesi.
+**Dönüş**: Dönüş tipi `void`'dur; yani herhangi bir değer döndürmez, sadece hata raporlama ve loglama yan etkileri gerçekleştirir.
 
 ### render
-**Ne yapar**: Bileşenin kullanıcı arayüzünü oluşturur. Hata durumuna göre farklı bir arayüz (hata mesajı ve aksiyon butonları) veya normal çocuk bileşenlerini görüntüler.
-**Nasıl yapar**: `I18nContext.Consumer` kullanarak bir çeviri fonksiyonuna (`t`) erişir. Eğer `this.state.hasError` true ise, önce `this.props.fallback` prop'unun varlığını kontrol eder; varsa onu döndürür. Fallback yoksa, hata bir "chunk yükleme hatası" (`isChunkError`) olup olmadığına bağlı olarak farklı başlık ve açıklama metinleriyle bir hata arayüzü oluşturur. Chunk hataları için "Sayfayı Yenile" butonu, diğer hatalar için "Tekrar Dene" ve "Sayfayı Yenile" butonları gösterilir. Geliştirme ortamında (`process.env.NODE_ENV === 'development'`) ise hata detaylarını gösteren bir `details` elementi ekler. Hata yoksa, bileşenin `children` prop'unu doğrudan döndürür.
-**Parametreler**: Parametre almaz.
-**Dönüş**: Dönüş tipi belirtilmemiştir. JSX elementi döndürür.
+**Ne yapar**: `ErrorBoundary` bileşeninin görünümünü (arayüzünü) belirler. Hata oluşup oluşmadığına göre, ya children'ları olduğu gibi render eder ya da kullanıcıya hata mesajı ve düzeltme seçenekleri sunan bir fallback arayüzü gösterir.
+**Nasıl yapar**: `I18nContext.Consumer` kullanarak çoklu dil desteği sağlar. `hasError` durumu `false` ise doğrudan `this.props.children`'ı render eder. `hasError` durumu `true` ise, bir hata arayüzü oluşturur. Eğer `this.props.fallback` prop'u verilmişse onu kullanır. Aksi takdirde, bir `isChunkError` kontrolü yaparak hata türüne göre farklı başlık, açıklama ve butonlar gösterir. Chunk hatası ise sadece "Sayfayı Yenile" butonu, diğer durumlarda "Tekrar Dene" ve "Sayfayı Yenile" butonları sunulur. Geliştirme ortamında (`NODE_ENV === 'development'`) ise, hatanın detaylarını gösteren bir `<details>` bölümü ekler.
+**Parametreler**: Parametre almaz (bir sınıf metodu olarak `this` bağlamı ile çalışır).
+**Dönüş**: JSX element döndürür. Hata durumunda bir `div` yapısı, hata yokluğunda ise `this.props.children` (React node) döndürür.
 
 ---
 
@@ -123,42 +123,55 @@ Bu modül, React ErrorBoundary deseni temelinde çalışır ve hata yakalama ya�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\ErrorBoundary.tsx::serializeError
-- **params**: `error` — unknown tipinde hata nesnesi
-- **ic_degiskenler**: yok
-- **Dönüş**: string — hata mesajı ve stack bilgisi veya JSON.stringify veya String(error)
+### [N1_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::serializeError
+- **params**: `(error: unknown)` — Fonksiyona geçirilen hata nesnesi (bilinmeyen tipte olabilir)
+- **ic_degiskenler**: 
+  - Yok
+- **Dönüş**: `string` — Hata bilgisinin string temsili. Error instance ise message ve stack birleştirilir, değilse JSON.stringify ile formatlanır, başarısız olursa String() kullanılır.
 
-### [N2_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\ErrorBoundary.tsx::isChunkLoadError
-- **params**: `error` — unknown tipinde hata nesnesi
-- **ic_degiskenler**: yok
-- **Dönüş**: boolean — hata mesajı "Loading chunk", "ChunkLoadError" veya "Loading CSS chunk" içeriyorsa true, aksi halde false
+### [N2_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::isChunkLoadError
+- **params**: `(error: unknown)` — Kontrol edilecek hata nesnesi
+- **ic_degiskenler**: 
+  - Yok
+- **Dönüş**: `boolean` — Hatanın chunk yükleme hatası olup olmadığını belirler. Error instance ise message'ın içeriğini kontrol eder.
 
-### [N3_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\ErrorBoundary.tsx::ErrorBoundary.constructor
-- **params**: `props` — Props tipinde bileşen özellikleri
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — super(props) çağrısı yapar ve this.state = { hasError: false } atar
+### [N3_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::ErrorBoundary.constructor
+- **params**: `(props: Props)` — Bileşenin prop'ları
+- **ic_degiskenler**: 
+  - Yok
+- **Dönüş**: `yok` — Sadece super() çağrısı ve state başlangıcı yapar.
 
-### [N4_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\ErrorBoundary.tsx::ErrorBoundary.getDerivedStateFromError
-- **params**: `error` — Error tipinde hata nesnesi
-- **ic_degiskenler**: yok
-- **Dönüş**: State nesnesi — { hasError: true, error, isChunkError: isChunkLoadError(error) }
+### [N4_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::ErrorBoundary.getDerivedStateFromError
+- **params**: `(error: Error)` — Yakalanan hata nesnesi
+- **ic_degiskenler**: 
+  - Yok
+- **Dönüş**: `State` — {hasError: true, error, isChunkError} state nesnesi döndürür.
 
-### [N5_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\ErrorBoundary.tsx::ErrorBoundary.componentDidCatch
-- **params**: `error` — Error tipinde hata nesnesi, `errorInfo` — ErrorInfo tipinde hata bilgisi
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — console.error ile hata loglar, reportError fonksiyonunu çağırır ve chunk yükleme hatalarını console.warn ile bildirir
+### [N5_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::ErrorBoundary.componentDidCatch
+- **params**: `(error: Error, errorInfo: ErrorInfo)` — Yakalanan hata ve bileşen stack bilgisi
+- **ic_degiskenler**: 
+  - Yok
+- **Dönüş**: `yok` — Hata loglama ve raporlama yan etkileri yapar.
 
-### [N6_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\ErrorBoundary.tsx::ErrorBoundary.render
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: ReactNode — I18nContext.Consumer içinde ctx parametreli anonim fonksiyon döndürür
+### [N6_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::ErrorBoundary.render
+- **params**: `(yok)` — Parametre almaz, this.state ve this.props kullanır
+- **ic_degiskenler**: 
+  - `ctx` — I18nContext.Consumer'dan gelen context nesnesi
+  - `t` — Çeviri fonksiyonu, ctx.t veya fallback olarak varsayılan çeviri fonksiyonu
+  - `isChunkError` — Bu state'den destructure edilen chunk hatası durumu
+- **Dönüş**: `ReactNode` — Hata durumunda hata UI'ı, normal durumda children render edilir.
 
-### [N7_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\ErrorBoundary.tsx::ErrorBoundary.render.anonim
-- **params**: `ctx` — I18nContext nesnesi
-- **ic_degiskenler**:
-  - `t` — ctx?.t veya varsayılan çeviri fonksiyonu (key ve alt parametreleri alır, alt veya key döndürür)
-  - `isChunkError` — this.state.isChunkError, chunk yükleme hatası olup olmadığını belirtir
-- **Dönüş**: ReactNode — hata durumunda hata UI'ı, aksi halde this.props.children
+### [N7_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::ErrorBoundary.handleRetry
+- **params**: `(yok)` — Parametresiz arrow fonksiyon
+- **ic_degiskenler**: 
+  - Yok
+- **Dönüş**: `yok` — this.setState ile state'i sıfırlar.
+
+### [N8_NASIL] AST Pointer: src/components/ErrorBoundary.tsx::ErrorBoundary.handleRefresh
+- **params**: `(yok)` — Parametresiz arrow fonksiyon
+- **ic_degiskenler**: 
+  - Yok
+- **Dönüş**: `yok` — Sayfayı yeniler (window.location.reload).
 
 ---
 

@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\PricingPolicyFormModal.tsx
-skeleton_hash: d5b560949e43db5c
+source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\PricingPolicyFormModal.tsx
+skeleton_hash: 3c0286cf4498401d
 entity_hashes:
   func:PricingPolicyFormModal: c790713d3645e68f
   func:emptyValue: 3e39d5edec3b0beb
@@ -11,7 +11,7 @@ entity_hashes:
   func:todayIso: 95210b5108b4d7dc
   overview: 41e27c329ea08500
   style_tokens: 93588bda75046878
-generated_at: 2026-08-27T08:13:52Z
+generated_at: 2026-08-25T08:43:23Z
 ---
 
 ## Genel Bakış
@@ -114,6 +114,48 @@ KUR KİLİDİ FORMU (FX-LOCK 2/2b · pricing-standard §8). TEK TASARIM KARARI, 
 
 ---
 
+### [N2_NASIL] AST Pointer: PricingPolicyFormModal.tsx::targetColumns
+- **params**: `scope` (number), `targetId` (string | null)
+- **ic_degiskenler**: (iç değişken yok — doğrudan koşullu ifadelerle obje döndürülür)
+- **Dönüş**: Obje. Alanları: `product_id` (scope 0 veya 1 ise targetId, değilse null), `brand_id` (scope 2 ise targetId, değilse null), `category_id` (scope 3 ise targetId, değilse null)
+
+---
+
+### [N3_NASIL] AST Pointer: PricingPolicyFormModal.tsx::todayIso
+- **params**: (parametre yok)
+- **ic_degiskenler**: (iç değişken yok)
+- **Dönüş**: `string` — `new Date().toISOString().slice(0, 10)` ile elde edilen YYYY-MM-DD biçiminde tarih
+
+---
+
+### [N4_NASIL] AST Pointer: PricingPolicyFormModal.tsx::PricingPolicyFormModal
+- **params**: `open`, `policy`, `onClose`, `onSaved` (props destructured)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu
+  - `canWrite` — `useRole()` hook'undan gelen yetki kontrol fonksiyonu
+  - `hasWriteAccess` — `canWrite('pricing')` çağrısının boolean sonucu; kullanıcının pricing yazma yetkisi var mı
+  - `value` — `useState<PolicyFormValue>(emptyValue)` ile oluşturulan form state'i; tüm form alanlarını tutar
+  - `setValue` — `value` state'ini güncelleyen setter fonksiyonu
+  - `decision` — `useState<FxLockFreezeDecision | null>(null)` ile oluşturulan state; `resolveFxLockFreeze` ölçüm sonucunu tutar
+  - `setDecision` — `decision` state'ini güncelleyen setter fonksiyonu
+  - `measuring` — `useState(false)` ile oluşturulan boolean state; FX kilit ölçümü yapılıyor mu
+  - `setMeasuring` — `measuring` state'ini güncelleyen setter fonksiyonu
+  - `saving` — `useState(false)` ile oluşturulan boolean state; kayıt işlemi yapılıyor mu
+  - `setSaving` — `saving` state'ini güncelleyen setter fonksiyonu
+  - `fxLock` — `value.fxLock` destructured; FX kilit aktif mi
+  - `scope` — `value.scope` destructured; politika kapsamı (0-4 arası)
+  - `targetId` — `value.targetId` destructured; kapsam hedefi ID'si
+  - `cancelled` — useEffect cleanup içinde kullanılan boolean; asenkron ölçüm iptal edildi mi (kapsam değişikliğinde bayat sonuç engellenir)
+  - `fresh` — `save` fonksiyonu içinde `resolveFxLockFreeze` çağrısının sonucu; kayıt anındaki taze ölçüm
+  - `frozenRate` — `save` fonksiyonu içinde `value.frozenRate` ile başlatılır, taze ölçüm başarılıysa `fresh.rate` ile güncellenir
+  - `payload` — `save` fonksiyonu içinde oluşturulan veritabanı kayıt objesi; `scope`, `product_id`/`brand_id`/`category_id`, `fx_lock`, `fx_frozen_rate`, `note`, `priority`, `is_active` alanlarını içerir
+  - `e` — `save` fonksiyonu catch bloğundaki hata yakalama değişkeni
+  - `save` — `useCallback` ile tanımlanmış async fonksiyon; formu veritabanına kaydeder (INSERT veya UPDATE)
+  - `blocked` — boolean; `value.fxLock` aktif VE `decision` null değil VE `decision.kind` 'ok' değilse true, kaydetme butonu devre dışı kalır
+- **Dönüş**: JSX (React bileşeni — `AdminModal` içinde form alanları ve butonlar render eder)
+
+---
+
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -123,8 +165,8 @@ graph TD
     PricingPolicyFormModal_tsx__targetColumns["targetColumns"]
     PricingPolicyFormModal_tsx__todayIso["todayIso"]
     PricingPolicyFormModal_tsx__PricingPolicyFormModal --> PricingPolicyFormModal_tsx__emptyValue
-    PricingPolicyFormModal_tsx__PricingPolicyFormModal --> PricingPolicyFormModal_tsx__todayIso
     PricingPolicyFormModal_tsx__PricingPolicyFormModal --> PricingPolicyFormModal_tsx__targetColumns
+    PricingPolicyFormModal_tsx__PricingPolicyFormModal --> PricingPolicyFormModal_tsx__todayIso
 ```
 
 ## NODE ID STANDARD

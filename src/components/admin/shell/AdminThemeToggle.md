@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\admin\shell\AdminThemeToggle.tsx
-skeleton_hash: ff4cb14938d92dc4
+source_path: C:\Users\alize\venthub-hvac\src\components\admin\shell\AdminThemeToggle.tsx
+skeleton_hash: 9befd2f13575812f
 entity_hashes:
   func:AdminThemeToggle: f21b10a6ba1e52f0
   overview: dedcbc8c954b1cae
   style_tokens: 7643397d069ce23f
-generated_at: 2026-08-27T08:23:57Z
+generated_at: 2026-08-26T07:13:16Z
 ---
 
 ## Genel Bakış
@@ -97,6 +97,16 @@ TEMA SEÇİCİ — açık / koyu / sistem Neden üç seçenek ve neden açılır
   - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `aria-label` ve menü öğesi etiketlerini yerelleştirmek için kullanılır
   - `ActiveIcon` — `OPTIONS` dizisinde `o.value === preference` koşulunu sağlayan öğenin `Icon` özelliği; eşleşme bulunamazsa `Sun` ikonuna düşer (nullish coalescing `??`); düğme içinde `<ActiveIcon size={18} />` olarak render edilir
 - **Dönüş**: JSX — `DropdownMenu.Root` ile sarılmış bir dropdown menü ağacı; tetikleyici olarak `data-testid="admin-theme-toggle"` ve `aria-label` taşıyan bir `<button>`, içerik olarak `OPTIONS` dizisi üzerinde `.map()` ile üretilmiş radyo öğeleri listesi
+
+---
+
+### [N2_NASIL] AST Pointer: src/components/admin/shell/AdminThemeToggle.tsx::OPTIONS.map callback
+- **params**:
+  - `value` — `OPTIONS` dizisindeki bir öğenin tema değeri; `DropdownMenu.RadioItem`'ın `key` ve `value` prop'larına atanır
+  - `labelKey` — `OPTIONS` dizisindeki bir öğenin çeviri anahtarı; `t(labelKey)` ile yerelleştirilmiş etiket metni elde edilir
+  - `Icon` — `OPTIONS` dizisindeki bir öğenin lucide-react ikon bileşeni; `<Icon size={15} />` olarak render edilir
+- **ic_degiskenler**: yok — fonksiyon gövdesinde yalnızca JSX üretimi yapılır, ek değişken tanımlanmaz
+- **Dönüş**: JSX — tek bir `DropdownMenu.RadioItem` öğesi; içinde ikon (`Icon`), yerelleştirilmiş etiket (`t(labelKey)`) ve seçili durum göstergesi (`DropdownMenu.ItemIndicator` içinde `Check` ikonu) barındırır
 
 ---
 

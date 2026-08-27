@@ -8,7 +8,7 @@ entity_hashes:
   func:PaymentWatcher: 50650d649c0e5bdb
   overview: 933db85f944b5101
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:58:22Z
+generated_at: 2026-08-27T09:05:23Z
 ---
 
 ## Genel Bakış
@@ -55,6 +55,44 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden 
 - import: react::useCallback
 - import: react::useEffect
 - import: react::useRef
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::PaymentWatcher
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `router` — `useRouter()` ile alınan Next.js router nesnesi; sayfa yönlendirmelerinde kullanılır
+  - `checkingRef` — `useRef(false)` ile oluşturulan boolean ref; `checkOnce` fonksiyonunun eşzamanlı olarak birden fazla kez çalışmasını engellemek için kilit bayrağı olarak kullanılır
+  - `timerRef` — `useRef<number | null>(null)` ile oluşturulan number|null ref; `setInterval` ile dönen timer kimliğini tutar, temizleme işleminde kullanılır
+  - `pathname` — `usePathname()` ile alınan mevcut URL yolu; useEffect bağımlılığında yer alır
+  - `checkOnce` — `useCallback` ile oluşturulan async fonksiyon; bekleyen siparişin ödeme durumunu kontrol eder
+- **Dönüş**: `null` — React bileşeni olarak ekrana bir şey render etmez
+
+### [N2_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::checkOnce
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `raw` — `localStorage.getItem(PENDING_ORDER_KEY)` ile alınan ham string; bekleyen sipariş verisini içerir, yoksa fonksiyondan çıkılır
+  - `data` — `JSON.parse(raw || '{}')` ile parse edilen nesne; `{ orderId?: string, conversationId?: string }` tipindedir
+  - `orderId` — `data.orderId` alanından okunan sipariş numarası; yoksa fonksiyondan çıkılır
+  - `supabase` — `await import('../lib/supabase/client')` ile dinamik olarak yüklenen `supabaseBrowserClient` nesnesi; veritabanı sorguları için kullanılır
+  - `row` — `supabase.from('venthub_orders').select('payment_status').eq('id', orderId).maybeSingle()` sorgusundan dönen veri satırı; `payment_status` alanını içerir
+  - `error` — aynı supabase sorgusundan dönen hata nesnesi; hata yoksa null/undefined olur
+- **Dönüş**: yok — yan etki olarak `localStorage.removeItem(PENDING_ORDER_KEY)` çağrısı yapar ve `router.push` ile sayfa yönlendirmesi gerçekleştirir
+
+### [N3_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::useEffect callback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `onFocus` — `window` nesnesinin `focus` olayına eklenen callback fonksiyonu; pencere odaklandığında `checkOnce()` çağrısı yapar
+  - `onVisibility` — `document` nesnesinin `visibilitychange` olayına eklenen callback fonksiyonu; `document.visibilityState === 'visible'` olduğunda `checkOnce()` çağrısı yapar
+  - `raw` — `localStorage.getItem(PENDING_ORDER_KEY)` ile alınan ham string; bekleyen sipariş varsa periyodik kontrol interval'ı başlatmak için kontrol edilir
+- **Dönüş**: cleanup fonksiyonu — `window.removeEventListener('focus', onFocus)`, `document.removeEventListener('visibilitychange', onVisibility)` ve `window.clearInterval(timerRef.current)` işlemlerini gerçekleştirir
+
+### [N4_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::useEffect cleanup
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok — dışarıdan erişilen `onFocus`, `onVisibility` ve `timerRef` kullanılır
+- **Dönüş**: yok — yan etki olarak `window.removeEventListener('focus', onFocus)`, `document.removeEventListener('visibilitychange', onVisibility)` ve koşullu olarak `window.clearInterval(timerRef.current)` çağrısı yapar
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\admin\data-table\BulkBar.tsx
-skeleton_hash: 29937caa06825999
+source_path: C:\tmp\wt-supurme\src\components\admin\data-table\BulkBar.tsx
+skeleton_hash: a458d0304b1561bd
 entity_hashes:
   func:BulkBar: fc5039c1504322f5
   overview: f1148d070e7fc5c5
   style_tokens: 7264340c3de4adfc
-generated_at: 2026-08-27T08:08:04Z
+generated_at: 2026-08-25T07:24:53Z
 ---
 
 ## Genel Bakış
@@ -43,6 +43,10 @@ Bu modül için fonksiyon gövdesi verilmediğinden, davranışsal aksiyom üret
 [Aksiyom 2]: Eğer `actions` prop'u sağlanmazsa, toplu işlem seçeneklerinin görüntülenmesi mümkün olmaz.
 
 [Aksiyom 3]: Eğer `toneClassMap` sabiti tanımlı değilse, bileşenin stil/tone sınıflarını eşlemesi mümkün olmaz.
+
+---
+
+**Not:** Fonksiyon gövdesi verilmediği için `selectedLabel`, `clearLabel` ve `on` prop'larının kullanım amacı ile `toneClassMap` sabitinin yapısı ve kullanım detayları bilinmiyor. Daha kesin aksiyomlar için fonksiyon gövdesi gereklidir.
 
 ---
 
@@ -106,10 +110,34 @@ Bu modül için fonksiyon gövdesi verilmediğinden, davranışsal aksiyom üret
 
 ---
 
+### [N2_NASIL] AST Pointer: src/components/admin/data-table/BulkBar.tsx::closePanel
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `void` — `setOpenKey(null)` çağırarak paneli kapatır
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/admin/data-table/BulkBar.tsx::actions.map callback
+- **params**: `action` — `actions` dizisinin her bir elemanı; `.key`, `.label`, `.tone`, `.panel`, `.onRun` alanlarına erişilir
+- **ic_degiskenler**:
+  - `toneClass` — `toneClassMap[action.tone ?? 'default']` ifadesinden elde edilen CSS sınıf adı; butonun görsel tonunu belirler
+  - `hasPanel` — `typeof action.panel === 'function'` kontrolünün sonucu; aksiyonun bir panel açıp açmayacağını belirten boolean
+  - `isOpen` — `openKey === action.key` karşılaştırması; bu aksiyonun panelinin şu an açık olup olmadığını belirten boolean
+- **Dönüş**: JSX elementi — her aksiyon için `<div>` içinde buton ve koşullu panel render'ı
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/admin/data-table/BulkBar.tsx::onClick handler (actions.map içinde)
+- **params**: yok
+- **ic_degiskenler**: yok — `hasPanel`, `isOpen`, `action` dış kapsamdan (actions.map callback) gelir
+- **Dönüş**: `void` — `hasPanel` true ise `setOpenKey(isOpen ? null : action.key)` çağırarak panel açar/kapatır; `hasPanel` false ve `action.onRun` varsa `void action.onRun()` çağırarak aksiyonu çalıştırır
+
+---
+
 ## NODE ID STANDARD
 
-  file: src\components\admin\data-table\BulkBar.tsx
-  function: src\components\admin\data-table\BulkBar.tsx::BulkBar
+  file: BulkBar.tsx
+  function: BulkBar.tsx::BulkBar
 
 ---
 

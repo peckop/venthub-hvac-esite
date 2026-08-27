@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\admin\dashboard\ActivityHeatmap.tsx
-skeleton_hash: 7ba86de476bb1ab7
+source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\ActivityHeatmap.tsx
+skeleton_hash: f80ac205549e0a66
 entity_hashes:
   func:ActivityHeatmap: bd94540a2dbd025e
   func:CustomTooltip: 99bc62d30dc2bdeb
   overview: 54bf3273bff08181
-  style_tokens: eb5185c4c1f4adc3
-generated_at: 2026-08-27T08:08:00Z
+  style_tokens: 92623035906e7e7c
+generated_at: 2026-06-19T20:47:14Z
 ---
 
 ## Genel Bakış
@@ -105,6 +105,37 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzalarından ve modülün 
 
 ---
 
+### [N2_NASIL] AST Pointer: `ActivityHeatmap.tsx::CustomTooltip`
+- **params**: `{ active, payload }`
+  - `active` — Tooltip'ın aktif olup olmadığını belirten opsiyonel boolean; `true` olduğunda tooltip içeriği gösterilir
+  - `payload` — Tooltip payload dizisi; her elemanın `payload[0].payload` alanı `{ dayName, hour, count, dayIndex }` alanlarını taşır
+- **ic_degiskenler**:
+  - `data` — `payload[0].payload` referansı; tooltip içinde gösterilecek `dayName`, `hour`, `count` değerlerini barındırır
+  - `formattedTime` — Template literal ile oluşturulmuş zaman dizesi; format: `"Pazartesi, 14:00"` gibi; `data.dayName` ve `data.hour` birleştirilerek `padStart(2, '0')` ile saat sıfır doldurulur
+- **Dönüş**: JSX veya `null` — Aktif ve payload varsa formatlanmış bilgi kartı (`glass-strong` stilli div), değilse `null`
+
+---
+
+### [N3_NASIL] AST Pointer: `ActivityHeatmap.tsx::(d) => { return {...} }`
+- **params**: `d`
+  - `d` — `data.map()` iterasyonundaki tek bir ham heatmap veri nesnesi; `{ day: number, hour: number, count: number }` yapısındadır
+- **ic_degiskenler**:
+  - `ourDayIndex` — JS `getDay()` değerini chart indeksine dönüştüren hesaplama: `d.day === 0 ? 6 : d.day - 1`. Sonuç: 0=Pazartesi, 1=Salı, ..., 6=Pazar
+- **Dönüş**: `{ hour, dayIndex, dayName, count }` — Chart bileşeninin beklediği dönüştürülmüş veri nesnesi; `dayName` değeri `dayNames[ourDayIndex]` ile lokalize edilmiş gün adıdır
+
+---
+
+### [N4_NASIL] AST Pointer: `ActivityHeatmap.tsx::(entry, index) => { return <Cell /> }`
+- **params**: `entry, index`
+  - `entry` — `chartData.map()` iterasyonundaki tek bir chart veri nesnesi; `{ hour, dayIndex, dayName, count }` yapısındadır
+  - `index` — Mevcut iterasyon indeksi; `key` prop'u için kullanılır (`key={`cell-${index}`}`)
+- **ic_degiskenler**:
+  - `intensity` — `entry.count / maxCount` ile hesaplanan normalleştirilmiş yoğunluk (0-1 arası); tüm görsel hesaplamaların (opacity, strokeWidth, drop-shadow) temel parametresidir
+  - `opacity` — `Math.max(0.15, intensity)` ile hesaplanan opaklık; yoğunluk sıfıra yakınsa bile minimum %15 görünür olmayı garanti eder; `Cell`'in `fillOpacity` prop'una bağlanır
+- **Dönüş**: JSX `<Cell>` — Recharts Scatter içindeki tek bir baloncuk hücresi; `fill="#22d3ee"` (cyan), opacity intensity ile orantılı, `intensity > 0.7` olduğunda 2px cyan stroke eklenir, `intensity > 0.5` olduğunda cyan glow drop-shadow filter uygulanır
+
+---
+
 ## NODE ID STANDARD
 
   file: src\components\admin\dashboard\ActivityHeatmap.tsx
@@ -124,10 +155,10 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzalarından ve modülün 
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- (yok)
+- `shadow-glow-md`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-admin-accent`, `bg-admin-accent-weak`, `bg-admin-surface`, `border-admin-accent/30`, `border-admin-border`, `group-hover/heatmap:text-admin-accent`, `hover:fill-white`, `text-admin-accent`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-fg-subtle`, `text-sm`, `text-xs`
+- **Renkler:** `bg-cyan-400`, `bg-cyan-500/30`, `bg-cyan-500/5`, `border-cyan-400/20`, `border-white/10`, `border-white/5`, `group-hover/heatmap:text-cyan-400`, `hover:fill-white`, `text-cyan-400`, `text-slate-500`, `text-slate-600`, `text-sm`, `text-white`, `text-xs`
 - **Layout:** `absolute`, `drop-shadow-heatmap-glow`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `group-hover/heatmap:w-20`, `h-0.5`, `h-2.5`, `h-48`, `h-full`, `items-center`, `justify-center`, `justify-end`
 - **Varyant/Responsive:** `group-hover/heatmap:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `-ml-6`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-in`, `blur-80`, `border`, `cursor-pointer`, `duration-200`, `duration-700`, `fade-in`, `font-semibold`, `group/heatmap`, `italic`, `mb-10`, `mb-2`
+- **Yardımcı Sınıflar:** `-ml-6`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-in`, `blur-80`, `border`, `cursor-pointer`, `duration-200`, `duration-700`, `fade-in`, `font-black`, `glass`, `glass-strong`, `group/heatmap`, `italic`

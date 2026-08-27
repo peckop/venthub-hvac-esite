@@ -2,17 +2,17 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\MegaMenu3DBackground.tsx
-skeleton_hash: 0ed000a95de9a55b
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\MegaMenu3DBackground.tsx
+skeleton_hash: 0c6506896eb744aa
 entity_hashes:
   func:MegaMenu3DBackground: bb72cddf66cbd5a0
-  overview: bbf3490d865f5caf
+  overview: 64226aa5800abc8b
   style_tokens: 487664132884f59c
-generated_at: 2026-06-12T10:20:05Z
+generated_at: 2026-08-27T09:03:55Z
 ---
 
 ## Genel Bakış
-Bu modül, mega menü bileşeninin arka planında üç boyutlu bir görsel efekt sunan bir React bileşenini tanımlar. Bileşen, verilen kategori slug'ına göre 3D bir model ve metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder.
+Bu modül, mega menü bileşeninin arka planında üç boyutlu bir görsel efekt sunan bir React bileşenini tanımlar. Bileşen, verilen kategori slug'ına göre 3D bir model ve metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder. Eğer `categorySlug` prop'u sağlanmazsa, bileşen hedefsiz çalışır ve beklenen 3D görsel efekti üretemez.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen (3D Arka Plan)
@@ -23,9 +23,15 @@ Mega menünün arka planını oluşturmak için gerekli olan 3D model ve gradyan
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için, verilen fonksiyon gövdesi (içerik) paylaşılmadığı için yalnızca fonksiyon imzasından türetilebilecek sınırlı aksiyomlar tanımlanabilmektedir.
+Bu modül için fonksiyon gövdesi (içerik) paylaşılmadığından, yalnızca fonksiyon imzasından aksiyom türetilememektedir.
 
-[Aksiyom 1]: Eğer `categorySlug` prop'u sağlanmazsa veya `undefined` olarak geçilirse, bileşenin hangi kategoriye ait 3D arka plan modelini ve ilgili gradyan overlay'ı render edeceği belirsiz olur; bileşen hedefsiz çalışır ve beklenen 3D görsel efekti üretemez.
+İmzadan çıkarılabilen tek bilgi:
+- Bileşen `categorySlug` adında bir prop almaktadır.
+- Bileşen `MegaMenu3DBackgroundProps` tipinde bir props nesnesi beklemektedir.
+
+Ancak bu bileşenin doğru çalışması için hangi koşulların var olması gerektiği (örneğin: hangi bağımlılıklar gerekli, hangi veriler zorunlu, hangi hata durumları ele alınmalı) fonksiyon gövdesi olmadan belirlenemez.
+
+**Sonuç:** Bu modül için fonksiyon gövdesi sağlanmadığından mimari aksiyom tanımlanamamaktadır. Aksiyom üretmek için `MegaMenu3DBackground` fonksiyonunun gerçek implementasyonu gereklidir.
 
 ---
 
@@ -44,6 +50,15 @@ Bu modül için, verilen fonksiyon gövdesi (içerik) paylaşılmadığı için 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../products/3d/core::VentHubCanvas
+- import: ../products/Category3DIcon::Category3DIcon
+- import: @react-three/drei::OrbitControls
+- import: react::React
+- import: react::Suspense
+
+---
+
 ## INTERFACES
 
 ### MegaMenu3DBackgroundProps
@@ -54,16 +69,20 @@ Bu modül için, verilen fonksiyon gövdesi (içerik) paylaşılmadığı için 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/navigation/MegaMenu3DBackground.tsx::MegaMenu3DBackground
-- **params**:
-  - `categorySlug` — PropTypes destructuring'den gelen kategori slug değeri; Category3DIcon bileşenine hangi kategori ikonunun gösterileceğini belirtir
-- **ic_degiskenler**: yok (fonksiyon gövdesinde herhangi bir `const`/`let`/`var` değişken tanımı bulunmamaktadır; doğrudan JSX döner)
-- **Dönüş**: React JSX Fragment — Üst %75 alanı kaplayan 3D Canvas (ambientLight, directionalLight, Category3DIcon, OrbitControls ile) ve alttan yukarıya doğru beyaz gradient overlay div'inden oluşan React Element Tree
-- **Yan etkiler**: Yok (stateless, side-effect-free saf bileşen)
-- **JSX içinde erişilen prop**: `categorySlug` — Category3DIcon'a `categorySlug={categorySlug}` olarak aktarılır
-- **Canvas yapılandırma değerleri**: `camera.position = [0, 0.1, 2.2]`, `camera.fov = 40`, `dpr = [1, 1]`, `frameloop = "demand"`
-- **OrbitControls yapılandırma değerleri**: `enableZoom = false`, `enablePan = false`, `enableRotate = false`, `autoRotate = true`, `autoRotateSpeed = 1.5`
-- **Category3DIcon prop değerleri**: `categorySlug` (prop'tan), `scale = 0.9`
-- **Light değerleri**: `ambientLight.intensity = 0.8`, `directionalLight.position = [5, 5, 5]`, `directionalLight.intensity = 1`
+- **params**: `categorySlug` — destructured props'tan gelen kategori slug değeri
+- **ic_degiskenler**:
+  - `categorySlug` — `Category3DIcon` bileşenine aynı adla prop olarak aktarılır
+  - `preset="nav"` — `VentHubCanvas` bileşenine verilen canvas ön-ayar adı
+  - `camera={{ position: [0, 0.1, 2.2], fov: 40 }}` — `VentHubCanvas` kamera konumu ve görüş açısı ayarı
+  - `frameloop="demand"` — `VentHubCanvas` kare döngüsü modu; talep üzerine render
+  - `fallback={null}` — `Suspense` bileşeninin yükleme sırasında gösterilecek alternatifi; boş
+  - `scale={0.9}` — `Category3DIcon` bileşeninin ölçek değeri
+  - `enableZoom={false}` — `OrbitControls` zoom özelliğini devre dışı bırakır
+  - `enablePan={false}` — `OrbitControls` kaydırma (pan) özelliğini devre dışı bırakır
+  - `enableRotate={false}` — `OrbitControls` kullanıcı etkileşimiyle döndürmeyi devre dışı bırakır
+  - `autoRotate` — `OrbitControls` otomatik döndürmeyi etkinleştirir (boolean true)
+  - `autoRotateSpeed={1.5}` — `OrbitControls` otomatik döndürme hızı
+- **Dönüş**: JSX fragment — biri 3D canvas içeren (üst 3/4 alan, `pointer-events-none`, `absolute` konumlu), diğeri beyaz gradient overlay olan iki `div` döndürür
 
 ---
 

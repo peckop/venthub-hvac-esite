@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\providers\SupabaseProvider.tsx
-skeleton_hash: 4bb9f7472673e15d
+source_path: C:\Users\alize\venthub-hvac\src\providers\SupabaseProvider.tsx
+skeleton_hash: ebb09593c042729b
 entity_hashes:
   func:SupabaseProvider: 0486f9c3690a1312
   func:useSupabaseClient: 7e076e7731f37f73
   overview: 3b25cabc9a7a5c0d
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T08:36:26Z
+generated_at: 2026-06-19T20:48:28Z
 ---
 
 ## Genel Bakış
@@ -95,6 +95,14 @@ type SupabaseContextType = {
   - `supabase` — `useState` hook'u ile initial edilen tekil Supabase browser client instance'ı; `supabaseBrowserClient` referansını initialState callback ile ata, ikinci GoTrueClient oluşturmasını engelle
   - `contextValue` — `useMemo` ile sarılmış `{ supabase }` nesnesi; SupabaseContext'e verilen value, gereksiz yeniden render'ları önler
 - **Dönüş**: JSX — `SupabaseContext.Provider` ile `contextValue` value olarak sarılmış `children` elemanlarını render eder (yan etki: `SupabaseContext`'e global supabase instance'ını enjekte eder)
+
+---
+
+### [N2_NASIL] AST Pointer: src/providers/SupabaseProvider.tsx::useSupabaseClient
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `context` — `useContext(SupabaseContext)` çağrısından dönen mevcut context nesnesi (içinde `supabase` barındırır); null olursa hata fırlatır
+- **Dönüş**: `context` nesnesi — `{ supabase: SupabaseClient<Database> }` yapısındaki context değeri
 
 ---
 
