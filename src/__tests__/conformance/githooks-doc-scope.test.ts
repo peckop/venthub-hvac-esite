@@ -82,10 +82,25 @@ const calistirilabilirYap = (yol: string): void => {
   nodeKos('require("fs").chmodSync(process.argv[1],0o755)', yol)
 }
 
+/**
+ * Sahte python: orion'u çağırmaz, YALNIZCA argümanlarını bildirir. Kancanın hangi dosyalar için
+ * companion üretmeye çalıştığını böyle ölçüyoruz — "üretti mi" değil, "kimi hedefledi".
+ *
+ * ⚠ STDOUT BİRİNCİL, `$PY_LOG` YALNIZ YARDIMCI — ÖLÇÜLMÜŞ SEBEP (2026-08-27):
+ * Bu ölçüm ilk hâlinde SADECE `$PY_LOG` dosyasına yazıyordu ve CI'da o dosya BOŞ okunuyordu:
+ * kanca günlüğünde `=== bitti` vardı, süzgeç `GIRDI 10 satir · CIKAN 4 yol` diyordu, ama
+ * `py.log`'da TEK BİR satır yoktu — koşulsuz çağrılan `doc tree` bile. Yani kaybı "süzgeç
+ * kesti" diye okumak YANLIŞ olurdu; kayıp ölçüm aracının İKİNCİ DOSYAYA bağımlı olmasındaydı.
+ *
+ * Şimdi PYCALL satırı kancanın KENDİ günlük akışına (`>> "$LOG" 2>&1`) düşüyor: `=== bitti`
+ * ile AYNI dosyada, AYNI sırada. Bekleyiş ile ölçüm arasındaki yarış böylece yapısal olarak
+ * ortadan kalkıyor. `$PY_LOG`'a yazmayı da bırakmıyoruz ama artık kanıtın taşıyıcısı o değil;
+ * ayrıca çocuk sürecin `$PY_LOG`'u NASIL gördüğü de yazılıyor (boşsa sebep orada görünür).
+ */
 const SAHTE_PYTHON = `#!/bin/sh
-# Sahte python: orion'u çağırmaz, YALNIZCA argümanlarını loglar. Kancanın hangi dosyalar için
-# companion üretmeye çalıştığını böyle ölçüyoruz — "üretti mi" değil, "kimi hedefledi".
-echo "PYCALL $*" >> "$PY_LOG"
+echo "PYCALL $*"
+echo "PYENV PY_LOG=[$PY_LOG]"
+echo "PYCALL $*" >> "$PY_LOG" 2>&1 || echo "PYLOG-YAZILAMADI [$PY_LOG]"
 exit 0
 `
 
