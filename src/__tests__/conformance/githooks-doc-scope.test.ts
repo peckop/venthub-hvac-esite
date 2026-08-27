@@ -248,4 +248,35 @@ describe('INV-HOOKS-2 · companion kapsam süzgeci TEK uygulama', () => {
       'src/lib/gercek.ts',
     )
   }, 60_000)
+
+  /**
+   * YOKLUK KANITI — ÖLÇÜLMÜŞ VAKA (2026-08-27, bu dosyanın KENDİ CI kırmızısı).
+   *
+   * Yukarıdaki kol CI'da düştü, YERELDE aynı girdiyle geçiyordu. Kanca günlüğünde tek iz
+   * "yedek süzgece düştüm" uyarısıydı; süzgecin girdi ALIP ALMADIĞI hiçbir yerde yazmadığı
+   * için arıza iki ihtimal arasında AYIRT EDİLEMEDİ: kapsam mı sıfır döndürdü, yoksa stdin mi
+   * hiç okunamadı? Teşhis yapamamamın sebebi kapının kendi körlüğüydü.
+   *
+   * Bu kol, süzgecin her koşumda SAYI basmasını şart koşar. Sayı kapıya bağlı olmazsa bir
+   * sonraki sessiz boş küme yine "kapsam kararı" gibi görünür — bugün tam olarak bu oldu.
+   */
+  it('süzgeç her koşumda SAYI basar — "hiçbir şey üretmedim" ile "hiçbir şey gelmedi" ayrılabilmeli', () => {
+    const r = kur('hooks-sayim')
+
+    const cikti = kancaKos(r, 'post-merge', '=== bitti')
+    expect(cikti, 'süzgeç kaç satır aldığını/kaç yol bastığını söylemiyor — körlük').toMatch(
+      /\[doc-scope\] GIRDI \d+ satir · CIKAN \d+ yol/,
+    )
+
+    // Girdi GERÇEKTEN boşken: sessiz kalmak yasak, sebep yazılmalı. Doğrudan çağırıyoruz —
+    // kanca üzerinden boş girdi üretmek `git diff` boşsa kancanın erken çıkmasına takılırdı.
+    const bos = execFileSync(process.execPath, [`${r.yol}/.githooks/lib/doc-scope.cjs`], {
+      cwd: r.yol,
+      input: '',
+      encoding: 'utf8',
+      env: { ...process.env, DOC_SCOPE_KOK: r.yol },
+      stdio: ['pipe', 'pipe', 'pipe'],
+    })
+    expect(bos, 'boş girdide stdout kirlenmiş — veri kanalı temiz kalmalı').toBe('')
+  }, 60_000)
 })
