@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T11:57:27.407152+00:00
+compiled_at: 2026-08-27T12:03:13.229968+00:00
 total_compiled_files: 655
-source_commit: fc47b189
+source_commit: 843c4e66
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T11:57:27.407152+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T12:03:13.229968+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -11328,9 +11328,7 @@ Bu modül için, fonksiyon gövdesinden üretilen aksiyomlar aşağıdadır. Aks
 
 ## SABİTLER
 - **Product3DViewer** (call) — `dynamic(
-
     () => import('./products/3d/Product3DViewer'),
-
     { ssr: fals...`
 
 ---
@@ -12581,7 +12579,6 @@ Bu modül için aksiyom tanımlanamamıştır. Fonksiyon gövdesi (implementatio
 W4b · Kartın fiyat kaynağı MOTORDUR (`displayPrice`), ham `products.price` DEĞİL — o kolon Kademe-2'de emekli edildi (INV-PRICE-1, cetvel §1). Alanlar bilinçli olarak OPSİYONEL: fiyat köprüsü henüz bağlanmamış çağıranlar (ör. ana sayfa blokları) derlenmeye devam etsin, ama fiyat yerine "Teklif İste"
 ```typescript
 type StorefrontProduct = Product &
-
   Partial<Pick<WithDisplayPrice<Product>, 'displayPrice' | 'displayPriceTaxIncluded'>>
 ```
 
@@ -12589,11 +12586,8 @@ type StorefrontProduct = Product &
 
 ## SABİTLER
 - **ProductCard** (call) — `React.memo(function ProductCard({
-
   product,
-
   layout = 'grid',
-
   priority...`
 
 ---
@@ -13927,7 +13921,6 @@ Bu modül için fonksiyon gövdeleri verilmediğinden, davranışsal aksiyom ür
 - **MegaMenu** (call) — `dynamic(() => import('./MegaMenu'), { ssr: false })`
 - **CategoryHubOverlay** (call) — `dynamic(() => import('./navigation/CategoryHubOverlay'), { ssr: false })`
 - **StickyHeader** (call) — `React.memo(function StickyHeader({ isScrolled }) {
-
   const { t, lang } = use...`
 
 ---
@@ -14890,8 +14883,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `icon: LucideIcon`
 - `title: string`
 - `description: string`
-- `action?: {
-`
+- `action?: {`
 - `compact?: boolean`
 
 ---
@@ -15436,38 +15428,24 @@ Bu modül, prop'ları aracılığıyla filtreleme ve durum gösterimi yapan bir 
 ### AdminToolbarChip
 ```typescript
 type AdminToolbarChip = {
-
   key: string
-
   label: string
-
   active: boolean
-
   onToggle: () => void
-
   classOn?: string
-
   classOff?: string
-
   title?: string
-
 }
 ```
 
 ### AdminToolbarToggle
 ```typescript
 type AdminToolbarToggle = {
-
   key: string
-
   label: string
-
   checked: boolean
-
   onChange: (checked: boolean) => void
-
   title?: string
-
 }
 ```
 
@@ -15479,25 +15457,15 @@ type AdminToolbarSelectOption = { value: string; label: string }
 ### AdminToolbarProps
 ```typescript
 type AdminToolbarProps = {
-
   search?: {
-
     value: string
-
     onChange: (v: string) => void
-
     placeholder?: string
-
     title?: string
-
     focusShortcut?: string // default '/'
-
   }
-
   select?: {
-
     value: string
-
   
 ```
 
@@ -15802,11 +15770,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **resourceSearchers** (object) — `{
-
   products: searchProducts,
-
   orders: searchOrders,
-
   returns: searchRet...`
 
 ---
@@ -16519,13 +16484,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### ExportMenuItem
 ```typescript
 type ExportMenuItem = {
-
   key: string
-
   label: string
-
   onSelect: () => void
-
 }
 ```
 
@@ -17408,17 +17369,11 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzası
 ### ReservedRow
 ```typescript
 type ReservedRow = {
-
     order_id: string;
-
     created_at: string;
-
     status: string;
-
     payment_status: string | null;
-
     quantity: number
-
 }
 ```
 
@@ -17975,12 +17930,9 @@ Yeni yetki blokları oluşturulduğunda veya varsayılan değerler gerektiğinde
 - **btnOutline** (template) — ``${btnBase} border border-admin-border bg-admin-surface shadow-admin-sm hover...`
 - **btnSecondary** (template) — ``${btnBase} bg-admin-surface-2 text-admin-fg-subtle shadow-admin-sm hover:bg-...`
 - **BLOCK_TYPES** (array) — `[
-
   { type: 'hero', labelKey: 'admin.authority.blockTypeHero', icon: Layers ...`
 - **blockTypeLabels** (object) — `{
-
   hero: 'admin.authority.blockTypeHero',
-
   specs: 'admin.authority.blockT...`
 
 ---
@@ -18376,9 +18328,7 @@ type CategoryFormValues = z.infer<ReturnType<typeof buildCategorySchema>>
 
 ## SABİTLER
 - **FIELD_FOCUS_ORDER** (array) — `[
-
     { name: 'name', id: 'category-name' },
-
     { name: 'slug', id: 'categ...`
 
 ---
@@ -20655,9 +20605,7 @@ type OrderFormValues = z.infer<ReturnType<typeof buildOrderFormSchema>>
 
 ## SABİTLER
 - **FIELD_FOCUS_ORDER** (array) — `[
-
   { name: 'customer_name', id: 'order-customer-name' },
-
   { name: 'custom...`
 - **STATUS_FLOW** (as_expression) — `['pending', 'paid', 'confirmed', 'shipped', 'delivered'] as const`
 - **TERMINAL_STATUSES** (as_expression) — `['cancelled', 'refunded', 'partial_refunded'] as const`
@@ -21187,8 +21135,7 @@ ONAY YÜZEYİ — `window.confirm` yerine. Cetvel: docs/standards/admin-design-s
 - `cancelLabel?: string`
 - `tone?: 'danger' | 'default'`
 - `requireTypedConfirmation?: string`
-- `reason?: {
-`
+- `reason?: {`
 
 ### ConfirmResult
 `useConfirmWithReason`'ın dönüşü.
@@ -21208,7 +21155,6 @@ type Resolver = (value: ConfirmResult) => void
 
 ## SABİTLER
 - **ConfirmContext** (call) — `React.createContext<
-
   ((options: ConfirmOptions) => Promise<ConfirmResult>)...`
 
 ---
@@ -21757,11 +21703,8 @@ Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan ve s
 
 ## SABİTLER
 - **SEGMENT_I18N_KEYS** (object) — `{
-
   individual: 'individual',
-
   dealer: 'dealer',
-
   corporate: 'corporate'...`
 
 ---
@@ -22262,19 +22205,12 @@ type PricingRuleFormValues = z.infer<ReturnType<typeof getPricingRuleSchema>>
 
 ## SABİTLER
 - **EMPTY_VALUES** (object) — `{
-
   scope: 4,
-
   product_id: null,
-
   brand_id: null,
-
-  category_id: null,
-...`
+  category_id: null,...`
 - **FIELD_FOCUS_ORDER** (array) — `[
-
   { name: 'margin_pct', id: 'rule-rate' },
-
   { name: 'fixed_price', id: '...`
 
 ---
@@ -22602,14 +22538,10 @@ type PricingSettingsValues = z.infer<typeof pricingSettingsSchema>
 - **PRICING_CURRENCY_OPTIONS** (as_expression) — `['TRY', 'EUR', 'USD'] as const`
 - **pricingSettingsSchema** (call) — `buildPricingSettingsSchema((key) => key)`
 - **DEFAULT_PRICING_SETTINGS** (object) — `{
-
   base_currency: 'TRY',
-
   enabled_currencies: ['TRY'],
-
   default_vat_rat...`
 - **FIELD_FOCUS_ORDER** (array) — `[
-
   // Para birimi grubunda TRY kapatılamaz → odak ilk DEĞİŞTİRİLEBİLİR kutu...`
 
 ---
@@ -23745,9 +23677,7 @@ type SettingsSection = 'general' | 'payment' | 'admins' | 'system'
 
 ## SABİTLER
 - **FIELD_FOCUS_ORDER** (array) — `[
-
   { name: 'site_name', id: 'settings-site-name' },
-
   { name: 'tagline', i...`
 
 ---
@@ -25084,9 +25014,7 @@ Teknik çizim verilerini alıp yetki/otorite bağlamında bir arayüz sunan bile
 
 ## SABİTLER
 - **formatColors** (object) — `{
-
     pdf: 'bg-red-50 text-red-600 border-red-100',
-
     dwg: 'bg-blue-50 te...`
 
 ---
@@ -29267,8 +29195,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 - `title: string`
 - `subtitle: string`
 - `viewAll: string`
-- `items: Record<string, {
-`
+- `items: Record<string, {`
 
 ### ApplicationSolutionsProps
 - `dictionary: LocalizedDict`
@@ -29278,13 +29205,9 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ## SABİTLER
 - **solutions** (array) — `[
-
   {
-
     id: 'parking',
-
     categorySlug: 'industrial-ventilation',
-
     ...`
 
 ---
@@ -29440,11 +29363,8 @@ Bu modül, sinematik bir ürün vitrini bileşeni sunar. Kullanıcının fare ha
 
 ## SABİTLER
 - **productImages** (array) — `[
-
   { 
-
     src: '/images/vortice_lineo_futuristic.webp', 
-
     label: 'Futu...`
 
 ---
@@ -30341,10 +30261,8 @@ Ana sayfadaki bilgi bloğunun render edilmesinden sorumludur. Çeviri sözlüğ�
 - `icon: React.ReactNode`
 
 ### KnowledgeBlockProps
-- `dictionary: {
-`
-- `finalCtaDict: {
-`
+- `dictionary: {`
+- `finalCtaDict: {`
 - `statsExperience: string`
 - `lang: string`
 - `onQuoteClick?: () => void`
@@ -30353,15 +30271,10 @@ Ana sayfadaki bilgi bloğunun render edilmesinden sorumludur. Çeviri sözlüğ�
 
 ## SABİTLER
 - **knowledgeItems** (array) — `[
-
   { 
-
     id: 'guides', 
-
     href: Routes.destek.home(),
-
     icon: (
-
   ...`
 
 ---
@@ -30586,8 +30499,7 @@ Bu aksiyomlar, StrategicBrands bileşeninin **çevrim (i18n) fonksiyonuna bağı
 ## INTERFACES
 
 ### StrategicBrandsProps
-- `dictionary: {
-`
+- `dictionary: {`
 
 ---
 
@@ -30690,8 +30602,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `subtitle?: string`
 - `visualAlt?: string`
 - `badge?: string`
-- `items?: Record<string, {
-`
+- `items?: Record<string, {`
 
 ### TrustStripDict
 
@@ -30703,13 +30614,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **proofItems** (as_expression) — `[
-
   { 
-
     key: 'brands', 
-
     icon: (
-
       <svg width="20" height="20" ...`
 - **trustStripKeys** (as_expression) — `['authorizedBrands', 'engineeringSupport', 'nationwideDelivery', 'projectGuid...`
 
@@ -31286,23 +31193,15 @@ Bu modül, saf bir sunum katmanı bileşeni olup, harici servisler veya durum y�
 
 ## SABİTLER
 - **widthStyles** (object) — `{
-
     contained: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
-
     wide: 'max-w...`
 - **spacingStyles** (object) — `{
-
     none: '',
-
     sm: 'py-4 sm:py-6',
-
     md: 'py-8 sm:py-12',
-
     lg: ...`
 - **PageShell** (call) — `forwardRef<HTMLElement, PageShellProps>(({ 
-
     children, 
-
     width = 'con...`
 
 ---
@@ -32156,7 +32055,6 @@ type NavActionTone = 'default' | 'accent' | 'success' | 'warning'
 
 ## SABİTLER
 - **toneClasses** (object) — `{
-
     default: 'text-steel-gray hover:text-primary-navy hover:bg-air-blue/30...`
 
 ---
@@ -32250,9 +32148,7 @@ Eski dokümanda bahsedilen `Routes` sabiti ve `brandName` prop'u, verilen kaynak
 
 ## SABİTLER
 - **NavBrand** (call) — `React.memo(({ brandName }) => {
-
     const Routes = useLocalizedRoutes()
-
    ...`
 
 ---
@@ -32345,13 +32241,9 @@ Bu modül, props tabanlı bir React bileşenidir; girdilerin interface tanımlar
 ## SABİTLER
 - **itemBaseClass** (str) — `'group relative inline-flex items-center justify-center gap-2 rounded-2xl bor...`
 - **NavPrimaryRail** (call) — `React.memo(({
-
     items,
-
     isCategoriesLoading,
-
     isCategoryHubOpen,
-
 ...`
 
 ---
@@ -32592,7 +32484,6 @@ Bu modül için, fonksiyon imzası ve modül bağlamından çıkarılabilecek mi
 
 ## SABİTLER
 - **NavSecondaryRail** (call) — `React.memo(({ items }) => {
-
     // Separate left-aligned corporate links fro...`
 
 ---
@@ -32925,9 +32816,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **ProductSmartInference** (call) — `React.memo(({ product }) => {
-
   const { t } = useI18n()
-
   const summaries =...`
 
 ---
@@ -42926,9 +42815,7 @@ Bu modül, görsel gösterimi ve yedek görsel mekanizması üzerine kurulu bir 
 
 ## SABİTLER
 - **FALLBACK_IMAGES** (object) — `{
-
   product: '/images/placeholders/product-placeholder.png',
-
   category: '/...`
 
 ---
@@ -44770,13 +44657,9 @@ Bu modül için temel mimari varsayım, sunulan verinin tutarlılığı ve eriş
 
 ## SABİTLER
 - **HVAC_BRANDS** (array) — `[
-
   { 
-
     name: 'Vortice', 
-
     slug: 'vortice', 
-
     description: '1954...`
 
 ---
@@ -45769,13 +45652,9 @@ Alışveriş sepetinin durumunu ve sepete ait işlemleri dışarıya açan ana h
 
 ## SABİTLER
 - **CART_FALLBACK** (object) — `{
-
   items: [],
-
   syncing: false,
-
   addToCart: () => { },
-
   removeFromCart...`
 
 ---
@@ -45883,13 +45762,9 @@ F5-B W2.1 — Gateway artık VERİ ÇEKMEZ. Liste (aile satırları) sunucuda `g
 
 ## SABİTLER
 - **DEFAULT_FILTERS** (object) — `{
-
   sortBy: 'name',
-
   viewMode: 'grid',
-
   selectedBrands: [],
-
   catSearch...`
 
 ---
@@ -46518,8 +46393,7 @@ Bu modül, ödeme sürecini orkestre etmek için dış bağımlılıklara dayan�
 - `user: User | null`
 - `clearCart: (options?: { silent: boolean }) => void`
 - `applyServerPricing: (items: { product_id: string, unit_price: number | null }[]) => void`
-- `orchestrator: {
-`
+- `orchestrator: {`
 - `couponCode: string | null`
 - `t: (key: string) => string`
 
@@ -47833,13 +47707,9 @@ Bağlam bulunamadığında ise `PROJECT_FALLBACK` sabiti döndürülür; bu değ
 
 ## SABİTLER
 - **PROJECT_FALLBACK** (object) — `{
-
   projects: [],
-
   loading: false,
-
   refreshProjects: async () => {},
-
   ...`
 
 ---
@@ -48027,9 +47897,7 @@ Bu modül, tarayıcı tabanlı uygulamalarda kullanılmak üzere tasarlanmış, 
 
 ## SABİTLER
 - **scrollAnimationClasses** (object) — `{
-
     fadeUp: (isVisible: boolean) =>
-
         `transition-colors duration-7...`
 
 ---
@@ -48184,17 +48052,11 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan çıkarı
 Scroll event'lerini throttle ederek optimize eden hook. Histerezis (showAt/hideBelow) ve ilk gösterim için kısa gecikme destekler. Kullanım: - useScrollThrottle(100, 16) → eski uyumlu; showAt=100, hideBelow=60 - useScrollThrottle({ showAt: 120, hideBelow: 80, throttleMs: 16, initialDelayMs: 180 })
 ```typescript
 type ScrollThrottleOptions = {
-
   showAt?: number
-
   hideBelow?: number
-
   throttleMs?: number
-
   initialDelayMs?: number
-
   syncKey?: unknown
-
 }
 ```
 
@@ -48341,10 +48203,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## INTERFACES
 
 ### AppSettings
-- `general: {
-`
-- `payment: {
-`
+- `general: {`
+- `payment: {`
 
 ---
 
@@ -66637,14 +66497,10 @@ type ModelContext = 'grounded' | 'centered' | 'orbital'
 
 ## SABİTLER
 - **DEFAULT_CONFIG** (object) — `{
-
     grounded: { position: [0, -0.55, 0], scale: 1 },
-
     centered: { posi...`
 - **MODEL_CONFIGS** (object) — `{
-
     // ---------------------------------------------------------
-
     // 1...`
 
 ---
@@ -66901,8 +66757,7 @@ Paylaşımlı takip numarası çakışması durumunu tanımlar ve tespit eder. `
 
 ### ShippingFunctionsHost
 Bu modülün istemciden ihtiyaç duyduğu TEK yetenek. `SupabaseClient<Database>` yerine dar bir sözleşme yazıldı — gerçek istemci bunu yapısal olarak zaten karşılıyor, ama test bir "sahte istemci" üretmek için tip zorlamasına (`as unknown as`) mecbur kalmıyor. Tip zorlaması testte de üretimdeki kadar t
-- `functions: {
-`
+- `functions: {`
 
 ---
 
@@ -66912,26 +66767,18 @@ Bu modülün istemciden ihtiyaç duyduğu TEK yetenek. `SupabaseClient<Database>
 `interface` DEĞİL `type`: arayüzlerin örtük indeks imzası yoktur ve `Record<string, unknown>` bekleyen `invoke` sözleşmesine geçmezdi.
 ```typescript
 type ShippingUpdateBody = {
-
   order_id: string
-
   carrier: string
-
   tracking_number: string
-
   tracking_url: string | null
-
   send_email: boolean
-
 }
 ```
 
 ### ShippingInvokeOutcome
 ```typescript
 type ShippingInvokeOutcome = | { ok: true; conflict: false }
-
   /** `conflict: true` → SADECE paylaşılan takip numarası reddi; başka her hata `false`. */
-
   | { ok: false; conflict: boolean; error: unknown }
 ```
 
@@ -67040,13 +66887,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - **adminInputWithIconClass** (template) — ``${fieldBaseClass} pl-10 pr-3 py-2``
 - **adminSelectClass** (template) — ``${fieldBaseClass} pl-3 pr-9 py-2 cursor-pointer appearance-none bg-no-repeat...`
 - **adminSelectStyle** (object) — `{
-
   backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or...`
 - **adminSettingsLabelClass** (str) — `'block text-xs font-medium text-admin-fg-muted uppercase tracking-wide mb-2'`
 - **adminStepperLineBgClass** (str) — `'absolute left-10% right-10% top-1/2 -translate-y-1/2 h-0.5 bg-admin-border -...`
 - **adminStepperLineFillClass** (str) — `'absolute left-10% top-1/2 -translate-y-1/2 h-0.5 bg-admin-accent -z-10 trans...`
 - **adminModalContentClass** (binary_expression) — `'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-modal ' +
-
   'fle...`
 - **adminColumnContainerClass** (binary_expression) — `'flex flex-col w-full md:w-320px shrink-0 bg-admin-surface-2 border border-ad...`
 - **adminOrderCardClass** (str) — `'bg-admin-surface border border-admin-border rounded-admin-md p-4 space-y-3 s...`
@@ -67263,9 +67108,7 @@ Bu modül, konu (topic) slug'larını kategori URL'lerine eşlemek için sabit b
 
 ## SABİTLER
 - **TOPIC_TO_CATEGORY_URL** (object) — `{
-
     'hava-perdesi': '/category/air-curtains',
-
     'jet-fan': '/category/j...`
 
 ---
@@ -67374,9 +67217,7 @@ Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çı
 
 ## SABİTLER
 - **Svg** (object) — `{
-
   building: (size: number) => (
-
     <svg width={size} height={size} viewB...`
 
 ---
@@ -67622,11 +67463,8 @@ Bilinmeyen türdeki bir değeri sayısal fiyata dönüştürür. Veritabanından
 Minimal shape needed to resolve a category URL slug: both `DbCategory` and `DomainCategory` satisfy it, as do raw Supabase rows whose `metadata` is still untyped (e.g. inside `generateStaticParams`).
 ```typescript
 type CategorySlugSource = {
-
     slug: string | null
-
     metadata?: unknown
-
 }
 ```
 
@@ -68365,17 +68203,11 @@ type NavigationMode = 'expanded' | 'compact'
 ### NavigationItemId
 ```typescript
 type NavigationItemId = | 'categories'
-
     | 'products'
-
     | 'brands'
-
     | 'knowledgeHub'
-
     | 'about'
-
     | 'contact'
-
     | 'account'
 ```
 
@@ -68383,22 +68215,14 @@ type NavigationItemId = | 'categories'
 
 ## SABİTLER
 - **NAVIGATION_PRIMARY_ITEMS** (array) — `[
-
     {
-
         id: 'categories',
-
         labelKey: 'common.categories',
-
 ...`
 - **NAVIGATION_SECONDARY_ITEMS** (array) — `[
-
     {
-
         id: 'brands',
-
         labelKey: 'common.brands',
-
         ...`
 
 ---
@@ -69438,17 +69262,11 @@ type TranslateFn = (key: string, paramsOrAlt?: Record<string, unknown> | string)
 
 ## SABİTLER
 - **UNIT_SUFFIXES** (object) — `{
-
   m3h: 'm³/h',
-
   m3s: 'm³/s',
-
   ls: 'l/s',
-
   ms: 'm/s',
-
   mm: 'mm',
-
  ...`
 
 ---
@@ -69602,23 +69420,17 @@ Modül, `next/headers` paketinden gelen `headers` fonksiyonu ile HTTP istek bağ
 - `subdomain: string | null`
 - `custom_domain: string | null`
 - `is_active: boolean`
-- `features: {
-`
-- `styles: {
-`
+- `features: {`
+- `styles: {`
 
 ---
 
 ## SABİTLER
 - **DEFAULT_TENANT_CONFIG** (object) — `{
-
   id: DEFAULT_TENANT_ID,
-
   name: 'Default Tenant',
-
   subdomain: 'default...`
 - **getTenantConfig** (call) — `cache(async function getTenantConfig(): Promise<TenantConfig> {
-
   let tenant...`
 
 ---
