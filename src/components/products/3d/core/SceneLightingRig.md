@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\3d\core\SceneLightingRig.tsx
-skeleton_hash: 5776515bb7637252
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\core\SceneLightingRig.tsx
+skeleton_hash: ce22c292a1901b9c
 entity_hashes:
   func:SceneLightingRig: 0b8be391d9cf4aa9
   overview: c682b535a83680d7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:26:15Z
+generated_at: 2026-08-27T07:06:01Z
 ---
 
 ## Genel Bakış
@@ -99,8 +99,8 @@ type EnvPresetKey = 'product' | 'showcase' | 'nav' | 'authority'
 
 ## NODE ID STANDARD
 
-  file: SceneLightingRig.tsx
-  function: SceneLightingRig.tsx::SceneLightingRig
+  file: src\components\products\3d\core\SceneLightingRig.tsx
+  function: src\components\products\3d\core\SceneLightingRig.tsx::SceneLightingRig
 
 ---
 

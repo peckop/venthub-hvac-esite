@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\category\EnhancedNeedsWizard.tsx
-skeleton_hash: 84fbbde63d25c518
+source_path: C:\tmp\vh-urun-comp\src\components\category\EnhancedNeedsWizard.tsx
+skeleton_hash: 7c356f00909a9f9a
 entity_hashes:
   func:EnhancedNeedsWizard: ca7bec73e049fe61
   func:getUsageLocations: 1e08ffb88dd30b7d
@@ -11,7 +11,7 @@ entity_hashes:
   func:prevStep: ac646de7f0306b72
   overview: 50c040456b6b5ced
   style_tokens: 4dfca29db2f1dc25
-generated_at: 2026-08-25T07:25:41Z
+generated_at: 2026-08-27T07:00:10Z
 ---
 
 ## Genel Bakış
@@ -211,17 +211,17 @@ graph TD
     EnhancedNeedsWizard_tsx__getUsageLocations["getUsageLocations"]
     EnhancedNeedsWizard_tsx__nextStep["nextStep"]
     EnhancedNeedsWizard_tsx__prevStep["prevStep"]
-    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__nextStep
     EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__getUsageLocations
+    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__nextStep
 ```
 
 ## NODE ID STANDARD
 
-  file: EnhancedNeedsWizard.tsx
-  function: EnhancedNeedsWizard.tsx::getUsageLocations
-  function: EnhancedNeedsWizard.tsx::EnhancedNeedsWizard
-  function: EnhancedNeedsWizard.tsx::nextStep
-  function: EnhancedNeedsWizard.tsx::prevStep
+  file: src\components\category\EnhancedNeedsWizard.tsx
+  function: src\components\category\EnhancedNeedsWizard.tsx::getUsageLocations
+  function: src\components\category\EnhancedNeedsWizard.tsx::EnhancedNeedsWizard
+  function: src\components\category\EnhancedNeedsWizard.tsx::nextStep
+  function: src\components\category\EnhancedNeedsWizard.tsx::prevStep
 
 ---
 

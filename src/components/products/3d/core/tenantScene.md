@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\3d\core\tenantScene.tsx
-skeleton_hash: f0ca774febe2269f
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\core\tenantScene.tsx
+skeleton_hash: 70f0f2a562d05c0e
 entity_hashes:
   func:TenantSceneProvider: 5edab7a00e167f03
   func:resolveEnvPreset: 393bddb44c031e77
@@ -11,7 +11,7 @@ entity_hashes:
   func:useSceneTenantId: 58ddbe7ce52afd78
   overview: b48ce6c3d9aa3569
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:26:18Z
+generated_at: 2026-08-27T07:06:05Z
 ---
 
 ## Genel Bakış
@@ -137,11 +137,11 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: tenantScene.tsx
-  function: tenantScene.tsx::TenantSceneProvider
-  function: tenantScene.tsx::useSceneTenantId
-  function: tenantScene.tsx::useResolveMaterials
-  function: tenantScene.tsx::resolveEnvPreset
+  file: src\components\products\3d\core\tenantScene.tsx
+  function: src\components\products\3d\core\tenantScene.tsx::TenantSceneProvider
+  function: src\components\products\3d\core\tenantScene.tsx::useSceneTenantId
+  function: src\components\products\3d\core\tenantScene.tsx::useResolveMaterials
+  function: src\components\products\3d\core\tenantScene.tsx::resolveEnvPreset
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\VorticeLineoModel.tsx
-skeleton_hash: b75b21682463c72d
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\factory\VorticeLineoModel.tsx
+skeleton_hash: 78709cdd403d5154
 entity_hashes:
   func:VorticeLineoModel: 4d32037362a7371d
   overview: 36c6bcc733eabf66
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:11Z
+generated_at: 2026-08-27T07:06:05Z
 ---
 
 ## Genel Bakış

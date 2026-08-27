@@ -2,17 +2,17 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\category\CategoryGridView.tsx
-skeleton_hash: 32abbfdef3326d64
+source_path: C:\tmp\vh-urun-comp\src\views\category\CategoryGridView.tsx
+skeleton_hash: d39399f77f45548f
 entity_hashes:
-  func:CategoryGridView: 7b1f2c5723260534
-  overview: bbed19dee4115a19
-  style_tokens: 9b61cf001b5ee023
-generated_at: 2026-06-19T20:50:11Z
+  func:CategoryGridView: 18fcb701e0fde17c
+  overview: e762b27fc914865e
+  style_tokens: 7655619e3195e611
+generated_at: 2026-08-27T07:36:16Z
 ---
 
 ## Genel Bakış
-Bu modül, bir kategori sayfasının ana ızgara görünümünü oluşturan tek bir React bileşenidir. Dışarıdan aldığı kategori, alt kategoriler ve marka bilgilerini kullanarak sayfanın temel yapısını ve içeriğini render eder.
+Bu modül, bir kategori sayfasının ana ızgara görünümünü oluşturan tek bir React fonksiyonel bileşenidir. Bileşen, dışarıdan aldığı kategori, üst kategori, alt kategoriler ve mevcut marka bilgilerini kullanarak sayfanın temel yapısını ve içeriğini render eder.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
@@ -22,43 +22,39 @@ Sayfanın tüm ızgara düzenini ve temel yapısını oluşturan merkezi bileşe
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, bir kategori ızgara görünümü sunan bir React bileşenidir ve dışarıdan prop olarak veri bekler.
 
-[Aksiyom 1]: Eğer `category` prop'u sağlanmazsa, kategori başlığı ve temel kategori bilgileri render edilemez, bileşen boş veya hatalı bir durumda kalır.
+Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca fonksiyon imzasından aksiyom üretilememektedir. İmzada yer alan `category`, `parentCategory`, `subCategories`, `availableBrands` ve kesilmiş görünen `famil` prop'larının bileşen içinde nasıl kullanıldığı, hangi koşulların kritik olduğu veya hangi hata durumlarının oluşabileceği fonksiyon gövdesi olmadan belirlenemez.
 
-[Aksiyom 2]: Eğer `subCategories` prop'u sağlanmazsa veya boş bir dizi ise, alt kategori grid'i oluşturulamaz ve alt kategoriler bölümü görünmez olur.
-
-[Aksiyom 3]: Eğer `availableBrands` prop'u sağlanmazsa veya boş bir dizi ise, marka filtreleme veya marka gösterim alanı render edilmez.
-
-[Aksiyom 4]: Eğer `parentCategory` prop'u sağlanmazsa, üst kategori referansı bilinmiyor durumda olur ve bileşen üst kategoriye ait herhangi bir bilgi gösteremez.
-
-[Aksiyom 5]: Eğer `pro` prop'u sağlanmazsa, pro kullanıcılara yönelik ek özellik veya fiyatlandırma bilgisi gösterilemez.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### CategoryGridView
-**Ne yapar**: Bu React Fonksiyonel Bileşeni, VentHub HVAC platformundaki kategori sayfaları için grid tabanlı arayüz sunar. Almış olduğu kategori, alt kategori, marka ve pro abonelik verilerini kullanarak kullanıcıların kategorileri gezmesi, filtrelemesi ve ilgili ürünlere erişmesi için gerekli UI öğelerini oluşturur. Kullanıcı deneyimini iyileştirmek için dinamik içerik gösterimi ve filtreleme seçenekleri sunar.
-**Nasıl yapar**: Bileşen, dışarıdan iletilen tüm propsları alır ve bu verileri kullanarak grid yapısını dinamik olarak oluşturur. Öncelikle ana kategori bilgilerini başlık olarak gösterir, ardından alt kategorileri kartlar halinde sıralar, mevcut markaları filtre seçenekleri olarak ekler ve pro kullanıcıları için özel içeriklerin erişilebilirliğini kontrol eder. Tüm veri akışını props üzerinden sağlayarak bağımsız, test edilebilir ve yeniden kullanılabilir bir yapı sunar.
+**Ne yapar**: Kategori verilerini görsel bir ızgara (grid) yapısında görüntülemek için kullanılan bir React fonksiyonel bileşenidir. Üst kategori, alt kategoriler ve mevcut markalar gibi kategoriyle ilişkili verileri alarak bir görünüm sunar.
+
+**Nasıl yapar**: Bileşen, aldığı props parametreleri aracılığıyla kategori hiyerarşisi ve ilişkili marka bilgilerini alır. Fonksiyonel bileşen yapısında tanımlanmış olup `CategoryGridViewProps` tipindeki props nesnesini destructure ederek kullanır. Bileşenin iç render mantığı verilen kaynak kodda belirtilmemiştir.
+
 **Parametreler**:
-- category: Category — Mevcut aktif kategori ile ilgili tüm meta verileri içeren nesne, kategori kimliği, adı, tanımı ve görsel bilgileri gibi temel verileri barındırır.
-- parentCategory: Category | undefined — Mevcut kategorinin üst kategorisi ile ilgili bilgileri içeren opsiyonel nesne, eğer mevcut kategori ana seviye bir kategori ise bu değer tanımlanmayabilir.
-- subCategories: Category[] — Mevcut kategorinin altındaki tüm alt kategorileri içeren dizi, grid görünümünde her bir alt kategori için ayrı kart öğeleri oluşturmak için kullanılır.
-- availableBrands: Brand[] — Mevcut kategori ile ilişkili tüm markaları içeren dizi, kullanıcıların marka bazında filtreleme yapması için seçenekler sunar.
-- pro: boolean — Mevcut kullanıcının pro abonelik durumunu belirten mantıksal değer, pro özel indirimler veya içeriklerin gösterilip gösterilmeyeceğine karar vermek için kullanılır.
-**Dönüş**: React.FC<CategoryGridViewProps> türünde bir React bileşeni döndürür. Bu döndürülen bileşen, alınan tüm propsları kullanarak render edilmiş grid arayüzünü sunar ve kategori gezintisi, alt kategori listeleme, marka filtreleme ve pro içerik erişimi gibi temel işlevleri barındırır.
+- category: `CategoryGridViewProps["category"]` — Görüntülenecek ana kategori bilgisi. Kaynak kodda tip tanımı verilmemiştir.
+- parentCategory: `CategoryGridViewProps["parentCategory"]` — Ana kategorinin üst (parent) kategori bilgisi. Kaynak kodda tip tanımı verilmemiştir.
+- subCategories: `CategoryGridViewProps["subCategories"]` — Ana kategorinin alt kategorilerini içeren koleksiyon. Kaynak kodda tip tanımı verilmemiştir.
+- availableBrands: `CategoryGridViewProps["availableBrands"]` — Kategoriyle ilişkili mevcut markaların listesi. Kaynak kodda tip tanımı verilmemiştir.
+- famil: `CategoryGridViewProps["famil"]` — Kaynak kodda bu parametrenin tam adı kesilmiş görünmektedir; aile (family) ile ilişkili bir veri olması beklenir ancak kesin işlevi kaynak kodda belirtilmemiştir. Tip tanımı verilmemiştir.
+
+**Dönüş**: `React.FC<CategoryGridViewProps>` — `CategoryGridViewProps` tipinde props alan bir React fonksiyonel bileşeni döndürür. Bu tip, bileşenin kabul ettiği tüm propların tip tanımlarını içerir ancak kaynak kodda `CategoryGridViewProps` tipinin kendisi tanımlanmamıştır.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../components/ProductCard::ProductCard
 - import: ../../components/category/CategoryFilters::CategoryFiltersComponent
 - import: ../../components/layout/PageShell::PageShell
+- import: ../../components/products/FamilyCard::FamilyCard
 - import: ../../hooks/useCategoryGateway::type { CategoryFilters }
 - import: ../../i18n/I18nProvider::useI18n
 - import: ../../lib/type-converters::type { DomainCategory }
-- import: @/types/ui-models::type { Product }
+- import: @/types/ui-models::type { FamilyListItem }
 - import: lucide-react::Grid
 - import: lucide-react::List
 - import: react::React
@@ -72,7 +68,7 @@ Bu modül, bir kategori ızgara görünümü sunan bir React bileşenidir ve dı
 - `parentCategory?: DomainCategory | null`
 - `subCategories: DomainCategory[]`
 - `availableBrands: string[]`
-- `products: Product[]`
+- `families: FamilyListItem[]`
 - `filters: CategoryFilters`
 - `onUpdateFilters: (updates: Partial<CategoryFilters>) => void`
 - `loading?: boolean`
@@ -81,11 +77,21 @@ Bu modül, bir kategori ızgara görünümü sunan bir React bileşenidir ve dı
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: CategoryGridView.tsx::CategoryGridView
-- **params**: `{ category, parentCategory, subCategories, availableBrands, products, filters, onUpdateFilters, loading }`
+### [N1_NASIL] AST Pointer: src/views/category/CategoryGridView.tsx::CategoryGridView
+- **params**:
+  - `category` — DomainCategory türünde, mevcut kategori bilgisi; CategoryFiltersComponent'e prop olarak geçilir
+  - `parentCategory` — üst kategori bilgisi; CategoryFiltersComponent'e prop olarak geçilir
+  - `subCategories` — alt kategori listesi; CategoryFiltersComponent'e prop olarak geçilir
+  - `availableBrands` — mevcut marka listesi; CategoryFiltersComponent'e prop olarak geçilir
+  - `families` — FamilyListItem dizisi; FamilyCard bileşenlerini oluşturmak için `map` ile döngüye alınır, uzunluğu `t('category.family.count')` çeviri çağrısında `count` olarak kullanılır, boşsa "ürün bulunamadı" mesajı gösterilir
+  - `filters` — CategoryFilters türünde, mevcut filre durumu; `filters.viewMode` görünüm modunu ('grid'/'list') belirler, `filters.sortBy` sıralama kriterini tutar, buton ve select bileşenlerinde aktif durumu kontrol etmek için okunur
+  - `onUpdateFilters` — filtre güncelleme fonksiyonu; görünüm modu butonlarına tıklandığında `{ viewMode: 'grid' }` veya `{ viewMode: 'list' }` objesiyle, sıralama select'i değiştiğinde `{ sortBy: e.target.value }` objesiyle çağrılır
+  - `loading` — yükleme durumu boolean'ı; `families.length === 0 && !loading` koşulunda "ürün bulunamadı" mesajının gösterilip gösterilmeyeceğini kontrol eder
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, UI metinlerini uluslararasılaştırmak için kullanılır
-- **Dönüş**: JSX (`<PageShell>` ile sarılmış category sayfası görünümü)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; aile sayısı metni (`category.family.count`), görünüm buton başlıkları (`category.view.grid`, `category.view.list`), sıralama etiketi (`category.sort.title`), sıralama seçenekleri (`category.sort.name`, `category.sort.variantCount`) ve boş durum mesajı (`category.noProductsFound`) için kullanılır
+  - `family` — `families.map` döngüsünde her bir FamilyListItem öğesi; `family.id` FamilyCard'a `key` prop'u olarak, `family` kendisi `family` prop'u olarak geçilir
+  - `e` — select onChange olayındaki event nesnesi; `e.target.value` ile seçilen sıralama değeri okunur ve `onUpdateFilters({ sortBy: e.target.value })` çağrısında kullanılır
+- **Dönüş**: JSX elementi — PageShell ile sarılmış, sol tarafta CategoryFiltersComponent içeren aside, sağ tarafta toolbar (aile sayısı, görünüm modu butonları, sıralama select'i) ve FamilyCard grid/listesi içeren main bölümünden oluşan React bileşeni
 
 ---
 
@@ -110,7 +116,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-3xl`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `hover:text-slate-600`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-slate-900`, `text-sm`, `text-white`
+- **Renkler:** `bg-primary-navy`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `hover:text-slate-600`, `text-center`, `text-slate-400`, `text-slate-500`, `text-slate-700`, `text-sm`, `text-white`
 - **Layout:** `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-12`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `items-center`, `items-start`, `justify-between`, `lg:flex-row`, `lg:w-80`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `lg:`, `sm:`, `xl:` önekleri
 - **Yardımcı Sınıflar:** `${filters.viewMode`, `:`, `===`, `border`, `focus-visible:ring-primary-ocean/20`, `font-bold`, `font-medium`, `list`, `mb-10`, `pb-6`, `pl-4`, `pr-10`, `py-2.5`, `py-32`, `rounded-lg`

@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\category\CategoryLandingView.tsx
-skeleton_hash: ed096badcb0b26c7
+source_path: C:\tmp\vh-urun-comp\src\views\category\CategoryLandingView.tsx
+skeleton_hash: decfe188fc865922
 entity_hashes:
   func:CategoryLanding: cc9f671a2c4ec223
   func:handleScrollToTarget: ca9eaec6204d6f95
   func:handleShowProducts: 47b7e50dc0139438
   overview: 04f349d9f2569d9e
   style_tokens: f296f474f77270b2
-generated_at: 2026-08-25T07:31:47Z
+generated_at: 2026-08-27T07:36:16Z
 ---
 
 ## Genel Bakış
@@ -138,16 +138,16 @@ graph TD
     CategoryLandingView_tsx__CategoryLanding["CategoryLanding"]
     CategoryLandingView_tsx__handleScrollToTarget["handleScrollToTarget"]
     CategoryLandingView_tsx__handleShowProducts["handleShowProducts"]
-    CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleShowProducts
     CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleScrollToTarget
+    CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleShowProducts
 ```
 
 ## NODE ID STANDARD
 
-  file: CategoryLandingView.tsx
-  function: CategoryLandingView.tsx::CategoryLanding
-  function: CategoryLandingView.tsx::handleScrollToTarget
-  function: CategoryLandingView.tsx::handleShowProducts
+  file: src\views\category\CategoryLandingView.tsx
+  function: src\views\category\CategoryLandingView.tsx::CategoryLanding
+  function: src\views\category\CategoryLandingView.tsx::handleScrollToTarget
+  function: src\views\category\CategoryLandingView.tsx::handleShowProducts
 
 ---
 

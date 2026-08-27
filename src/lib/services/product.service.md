@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\services\product.service.ts
-skeleton_hash: 5ef7b18eaa554902
+source_path: C:\tmp\vh-urun-comp\src\lib\services\product.service.ts
+skeleton_hash: 12fa393c0473579a
 entity_hashes:
   func:adminSearchProducts: 970962b53f79cf51
   func:fetchProductBy: d19ab661ec8d6c01
@@ -19,7 +19,7 @@ entity_hashes:
   func:getSearchSuggestions: 6a95061f76ade0bf
   func:withDisplayPricesSafe: 5f415b5684e506df
   overview: 9689ac3da1414e48
-generated_at: 2026-08-25T07:28:53Z
+generated_at: 2026-08-27T07:34:30Z
 ---
 
 ## Genel Bakış
@@ -240,33 +240,33 @@ graph TD
     product_service_ts__getProductsBySubcategory["getProductsBySubcategory"]
     product_service_ts__getSearchSuggestions["getSearchSuggestions"]
     product_service_ts__withDisplayPricesSafe["withDisplayPricesSafe"]
-    product_service_ts__getProductById --> product_service_ts__fetchProductBy
-    product_service_ts__getProductsByCategory --> product_service_ts__withDisplayPricesSafe
-    product_service_ts__getProductBySlug --> product_service_ts__fetchProductBy
     product_service_ts__fetchProductBy --> product_service_ts__withDisplayPricesSafe
     product_service_ts__getProducts --> product_service_ts__withDisplayPricesSafe
     product_service_ts__getProductBySlugOrId --> product_service_ts__fetchProductBy
-    product_service_ts__getAllProducts --> product_service_ts__withDisplayPricesSafe
-    product_service_ts__getProductsBySubcategory --> product_service_ts__withDisplayPricesSafe
+    product_service_ts__getProductById --> product_service_ts__fetchProductBy
     product_service_ts__getFeaturedProducts --> product_service_ts__withDisplayPricesSafe
+    product_service_ts__getProductsBySubcategory --> product_service_ts__withDisplayPricesSafe
+    product_service_ts__getAllProducts --> product_service_ts__withDisplayPricesSafe
+    product_service_ts__getProductsByCategory --> product_service_ts__withDisplayPricesSafe
+    product_service_ts__getProductBySlug --> product_service_ts__fetchProductBy
 ```
 
 ## NODE ID STANDARD
 
-  file: product.service.ts
-  function: product.service.ts::withDisplayPricesSafe
-  function: product.service.ts::getSearchSuggestions
-  function: product.service.ts::ftsSearchProducts
-  function: product.service.ts::getProducts
-  function: product.service.ts::getAllProducts
-  function: product.service.ts::getProductsByCategory
-  function: product.service.ts::getProductsBySubcategory
-  function: product.service.ts::fetchProductBy
-  function: product.service.ts::getProductById
-  function: product.service.ts::getProductBySlugOrId
-  function: product.service.ts::getProductBySlug
-  function: product.service.ts::getFeaturedProducts
-  function: product.service.ts::adminSearchProducts
+  file: src\lib\services\product.service.ts
+  function: src\lib\services\product.service.ts::withDisplayPricesSafe
+  function: src\lib\services\product.service.ts::getSearchSuggestions
+  function: src\lib\services\product.service.ts::ftsSearchProducts
+  function: src\lib\services\product.service.ts::getProducts
+  function: src\lib\services\product.service.ts::getAllProducts
+  function: src\lib\services\product.service.ts::getProductsByCategory
+  function: src\lib\services\product.service.ts::getProductsBySubcategory
+  function: src\lib\services\product.service.ts::fetchProductBy
+  function: src\lib\services\product.service.ts::getProductById
+  function: src\lib\services\product.service.ts::getProductBySlugOrId
+  function: src\lib\services\product.service.ts::getProductBySlug
+  function: src\lib\services\product.service.ts::getFeaturedProducts
+  function: src\lib\services\product.service.ts::adminSearchProducts
 
 ---
 
