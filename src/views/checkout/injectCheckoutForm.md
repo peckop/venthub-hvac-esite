@@ -13,6 +13,8 @@ entity_hashes:
 generated_at: 2026-08-25T08:45:55Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, ödeme (checkout) formunu dinamik olarak bir HTML container'a enjekte etme işlemini gerçekleştirir. Enjeksiyon sırasında mevcut render durumunu kontrol eder ve HTML içindeki script elementlerini güvenli biçimde yeniden canlandırır. Modül, DOM manipülasyonu ve script işleme sorumluluklarını üstlenir.
 

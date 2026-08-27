@@ -131,6 +131,78 @@
       "sebep": "uretec-sembol-kaybi",
       "kayit": "REC-83",
       "serit": "URUN"
+    },
+    {
+      "yol": "src/components/quotes/QuoteRequestButton.md",
+      "gercek_sembol": 2,
+      "kaynak": "f7b1ebfd",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "AUTH"
+    },
+    {
+      "yol": "src/views/ForgotPasswordPage.md",
+      "gercek_sembol": 2,
+      "kaynak": "f7b1ebfd",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "AUTH"
+    },
+    {
+      "yol": "src/views/RegisterPage.md",
+      "gercek_sembol": 4,
+      "kaynak": "f7b1ebfd",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "AUTH"
+    },
+    {
+      "yol": "src/views/account/AccountShipmentsPage.md",
+      "gercek_sembol": 8,
+      "kaynak": "f7b1ebfd",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "AUTH"
+    },
+    {
+      "yol": "src/views/admin/AdminPricingSettingsPage.md",
+      "gercek_sembol": 3,
+      "kaynak": "f7b1ebfd",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "AUTH"
+    },
+    {
+      "yol": "src/views/admin/AuditLogTableBody.md",
+      "gercek_sembol": 5,
+      "kaynak": "f7b1ebfd",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "AUTH"
+    },
+    {
+      "yol": "src/views/admin/PricingRulesTableBody.md",
+      "gercek_sembol": 4,
+      "kaynak": "f7b1ebfd",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "AUTH"
+    },
+    {
+      "yol": "src/views/admin/WebhookEventsTableBody.md",
+      "gercek_sembol": 2,
+      "kaynak": "f7b1ebfd",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "AUTH"
+    },
+    {
+      "yol": "src/views/checkout/injectCheckoutForm.md",
+      "gercek_sembol": 4,
+      "kaynak": "f7b1ebfd",
+      "sebep": "uretec-sembol-kaybi",
+      "kayit": "REC-83",
+      "serit": "AUTH"
     }
   ]
 }
