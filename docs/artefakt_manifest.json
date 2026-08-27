@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "096a71d5cf4728204cb83d016a0928034bfcca80cf93241689bf2f5ecb0654b6",
+      "icerik_sha256": "e750bdc1c59c3ce26ed85aa2256172bc512634ac6c9f5df39c2ec7549ab7684f",
       "kaynak": {
         "dosya_sayisi": 98,
         "dosyalar": {
@@ -108,7 +108,7 @@
         "izlenmeyen": [],
         "ozet": "13aca04c7a35256389064f212cccbf532b90b069fc40fe29bd8e467c6c22e036"
       },
-      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
+      "kaynak_commit": "49945b8febe411758ba528fc45dd330b98a057fd",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +125,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "0f7bc51183deba6b7009d0d8328c484f8ecab459dd691963c08b6a67a3bc6caa",
+      "icerik_sha256": "d442f7a8cec214246acda91931224977c7cc1b45230940a5b398180901856f16",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -195,7 +195,7 @@
         "izlenmeyen": [],
         "ozet": "e35f56e68357b6d4b50f6817406f18d3dd8762d03ac6b03ecdae01ba6af21697"
       },
-      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
+      "kaynak_commit": "49945b8febe411758ba528fc45dd330b98a057fd",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +204,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "7ae84cf4da671a5a79b3000da897854006a9958c9116e7fbcdddac6af4d2f4f9",
+      "icerik_sha256": "fe70f51e175dec2cc88d31e286f466f594a5b7f4056ad3d2c11aa92fd9ef2d74",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +251,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
+      "kaynak_commit": "49945b8febe411758ba528fc45dd330b98a057fd",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,13 +259,14 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "800ba301b36c3a06fef39b0aa4e1451d1698aa0237e01e57aa0f29653c5ca50f",
+      "icerik_sha256": "1fbd7203bcb679bdb9709cbfbf0763e589c0ec9557e3f95df400f92d6d0f4f46",
       "kaynak": {
-        "dosya_sayisi": 655,
+        "dosya_sayisi": 656,
         "dosyalar": {
+          "eslint.config.md": "a256f1839b250eefdcf1ca81b79a1cfe8e36ed40",
           "next-env.d.md": "360d89410c4ebb89679a43bb745b27a3d0e7924d",
           "next.config.md": "6e39db5abff257974eb3b91d813708d3bd14f787",
-          "playwright.config.md": "9e09302a73d4cec664bf99f1ca12bd6fa2b371a4",
+          "playwright.config.md": "aec3e5ba14f69503de4fbc65122671086932a847",
           "postcss.config.md": "d520cb36d819da20b0dfab4b76b309c209bbd8bf",
           "sentry.client.config.md": "b33940c0739a4492fe091d177c05bf01844d43e5",
           "sentry.edge.config.md": "b0bbe87c9845d6fa30129ae3c38ef3f17d435a89",
@@ -362,7 +363,7 @@
           "src/components/BuildTag.md": "29375f672e7155a609fa4e06833c4cbb3a6c456b",
           "src/components/CaseStudySection.md": "486bcdc35d1211fc22d10870d24af43e4818219a",
           "src/components/ErrorBoundary.md": "f7b50890f6df76d71f43e31e86ddef9e17961ee2",
-          "src/components/Footer.md": "bea0d37e4157b3718df2a208fd83b4f757add1aa",
+          "src/components/Footer.md": "f16b2451cda836bbc933ba03da7a9ffd1a8e521f",
           "src/components/HVACIcons.md": "76d796281e86598aeacc697a38e8a78e762f71f7",
           "src/components/ImageGallery.md": "99eb4c8328bf19b8caedf3ebf6004bdcfbffca16",
           "src/components/InViewCounter.md": "0ddebc7f4a8ea21b4f9ef1be002550ec1fc20536",
@@ -372,7 +373,7 @@
           "src/components/LoadingSpinner.md": "bea6637a2371a154305e0a141a2d49ad3504bdee",
           "src/components/MagneticCTA.md": "9cb15d1b9872a88461ef06a836a04a115fdf9a2f",
           "src/components/MegaMenu.md": "aed103b8e6d93a059f87b490f3ddb40033e11437",
-          "src/components/PaymentWatcher.md": "2c34dd50722529e018a59564dd6481a7a96818bf",
+          "src/components/PaymentWatcher.md": "ec4363e2b2a331a087bb35f5937e6fa303d77b79",
           "src/components/ProductCard.md": "73f88a4aeca8a8941a115702dc7ee14fe29bdc22",
           "src/components/QuickViewModal.md": "39136d1609db229a1516e5e8f2f35201937df11b",
           "src/components/ScrollLinkedProcess.md": "2e454414963a30d90953526a38e87faebf6a4cbe",
@@ -745,7 +746,7 @@
           "src/lib/utils.md": "fe532cbee10f0772bfd508167a6ab82fc888eb1f",
           "src/lib/validation/invoiceIdentity.md": "d0350b6ac39bfcb921e35862bccc0a248776526b",
           "src/lib/validation/taxIdentity.md": "675fbb7bbea3f382c75ffbb4659647e49f562a6c",
-          "src/middleware.md": "1b9ed1ff26350917726be5359e75f3497e4f5545",
+          "src/middleware.md": "d19ac650c71c2f38f8335e8217b66f77194d05b3",
           "src/next-env.d.md": "e148f05f3129f59020bf279c5ef4231d3a49f147",
           "src/providers/SupabaseProvider.md": "67d7884014e5c2bc0a3f0aa4257be51afa4ab643",
           "src/test/setup.d.md": "122b8b7c366ea4c127c8e370fbcd23284ca984a4",
@@ -920,9 +921,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "4b52ff14fd29fdea186bee29a2179d77eea9d1d510fc68922482001a8ca94064"
+        "ozet": "4ea47a9ecdfdc6b17bbadb30ca68573f4ed5bbfd9835b5bfa5f3a9d2245a2b59"
       },
-      "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
+      "kaynak_commit": "49945b8febe411758ba528fc45dd330b98a057fd",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -931,7 +932,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-27T13:08:48.126888+00:00",
-  "kaynak_commit": "582e5eb5125bad6c07e4af8c0ba7a97bcac42a18",
+  "derlendi": "2026-08-27T13:36:00.968596+00:00",
+  "kaynak_commit": "49945b8febe411758ba528fc45dd330b98a057fd",
   "surum": 1
 }
