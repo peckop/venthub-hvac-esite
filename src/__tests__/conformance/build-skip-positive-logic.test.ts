@@ -99,6 +99,7 @@ describe('INV-BUILD-SKIP · ignore-build betiği pozitif mantıkla karar verir',
       ['CI yapılandırması', ['.github/workflows/ci.yml']],
       ['şerit panosu aracı', ['scripts/board/board.cjs']],
       ['panonun alt dizini (yıldız `/` de yutar)', ['scripts/board/lib/x.cjs']],
+      ['ağaç hijyeni aracı', ['scripts/hijyen/agac-silme-kapisi.cjs']],
       ['git kancasının kendisi', ['.githooks/pre-commit']],
     ]
 
@@ -257,5 +258,49 @@ describe('INV-BUILD-SKIP · karşılaştırma tabanı gerçek depoda çözülür
     git(dir, 'update-ref', '-d', 'refs/remotes/origin/master')
     // Ağ yok, `git fetch` başarısız olacak → taban çözülemez → BUILD.
     expect(depodaKararVer(dir)).toBe('BUILD')
+  })
+
+  /**
+   * ⭐GÖZLENEBİLİRLİK KOLU — 2026-08-27'de ölçülen kusurun kapısı.
+   *
+   * Yukarıdaki kol "çözemezsen BUILD" davranışını sınar ve YEŞİLDİ. Ama üretimde
+   * o dal TEK yoldu: `origin/master` Vercel'in sığ klonunda hiç yok, çekme her
+   * seferinde başarısız oluyordu ve betik başarısızlığı `2>/dev/null || true` ile
+   * YUTUYORDU. Sonuç: pozitif sınıf listesi on gün boyunca BİR KEZ BİLE
+   * değerlendirilmedi, kimse fark etmedi, günlük yalnız "origin/master yok" diyordu.
+   * Ölçüm: üç Vercel dağıtımının build günlüğü (d9f31989 · f4c5c25f · 304a1785),
+   * üçünde de birebir aynı iki satır.
+   *
+   * DOĞRU DAVRANIŞ YETMEZ, GÖREBİLMEK GEREKİR: fail-safe sessizse, "kapı çalışıyor"
+   * ile "kapı hiç sıra bulamıyor" ayırt edilemez. Bu kol, her başarısız çekme
+   * denemesinin SEBEBİYLE birlikte günlüğe düşmesini zorunlu kılar.
+   */
+  it('taban çözülemediğinde SEBEP günlüğe yazılır (sessiz fail-safe yasak)', () => {
+    const dir = depoKur()
+    git(dir, 'checkout', '--quiet', '-b', 'docs/z')
+    commitAt(dir, 'docs/c.md', 'metin\n', 'docs: c')
+    git(dir, 'update-ref', '-d', 'refs/remotes/origin/master')
+
+    let gunluk = ''
+    try {
+      execFileSync('sh', [SCRIPT_MUTLAK], {
+        cwd: dir,
+        stdio: 'pipe',
+        encoding: 'utf8',
+        env: { ...process.env, VERCEL_GIT_PREVIOUS_SHA: '' },
+      })
+    } catch (err) {
+      gunluk = String((err as { stdout?: string }).stdout ?? '')
+    }
+
+    // Her iki çekme denemesi de adıyla ve gerekçesiyle görünmeli.
+    expect(gunluk, 'refspec denemesinin sonucu günlüğe yazılmamış').toMatch(
+      /refspec cekmesi basarisiz/,
+    )
+    expect(gunluk, 'ikinci (düz) çekme denemesinin sonucu günlüğe yazılmamış').toMatch(
+      /duz cekme de basarisiz/,
+    )
+    // Karar satırı da yerinde: sebep yazıldı diye karar kaybolmasın.
+    expect(gunluk).toMatch(/-> BUILD/)
   })
 })

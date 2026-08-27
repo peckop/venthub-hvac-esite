@@ -42,6 +42,7 @@ tetikler**; yalnız §D3'te ADIYLA sayılan sınıf atlanır.
 | `registry/**` | İş emri kayıtları |
 | `LICENSE` | Metin |
 | `scripts/board/**` | Şerit panosu araçları. Ölçüldü (2026-08-26): `package.json`, `next.config.mjs`, `vercel.json`, `.github/workflows/*` içinde `scripts/board` geçen **tek bir referans yok**. Pozitif kontrolle doğrulandı — aynı arama `scripts/setup-hooks` için referans **buluyor**. → D3.1 |
+| `scripts/hijyen/**` | Ağaç hijyeni araçları (kirli sayacı, ağaç-silme kapısı). Ölçüldü (2026-08-27): aynı arama, aynı dosyalar — `scripts/hijyen` geçen **0 referans**; pozitif kontrol `scripts/setup-hooks` için **1 referans** buluyor, yani arama gerçekten arıyor. Gerekçe `scripts/board/**` ile aynı sınıf. |
 | `.githooks/**` | Git kancalarının **kendisi** (kancaları kuran betik değil). Derleme hattıyla dolaylı bağı VAR ama üç ölçülmüş sebeple atlanabilir. → D3.1 |
 
 **Bilerek DIŞARIDA (build tetikler):** `supabase/migrations/**` — build'i doğrudan
@@ -218,8 +219,9 @@ inandırıcı görünüyordu. *Doğru gerekçe, ölçülmemiş premis.*
 | Sıra | Taban | Koşul |
 |---|---|---|
 | 1 | `VERCEL_GIT_PREVIOUS_SHA` | Yalnız commit **bu klonda gerçekten varsa** |
-| 2 | `git merge-base HEAD origin/<varsayılan dal>` | (1) çözülemezse |
-| — | *(hiçbiri)* | → **BUILD** |
+| 2 | `git merge-base HEAD origin/<varsayılan dal>` | (1) çözülemezse; ref yoksa **refspec çekmesi** denenir |
+| 3 | `git fetch origin <varsayılan dal>` → `FETCH_HEAD` | (2)'nin refspec biçimi reddedilirse |
+| — | *(hiçbiri)* | → **BUILD**, ve **her başarısız denemenin SEBEBİ günlüğe yazılır** |
 
 (1) en doğrusudur: son **başarılı** dağıtımdan bu yana biriken tüm değişiklikleri
 kapsar. Ama **yeni bir dalın ilk dağıtımında yoktur** ve bu depoda kural
@@ -233,6 +235,34 @@ arkaya atlanmış commit'lerden sonra daha eski bir kaynak değişikliğini gör
 
 Zincirin **hangi adımının kazandığı günlüğe yazılır**. Bu tesadüfi bir ayrıntı değil:
 yukarıdaki kusur tam olarak "hangi dalın çalıştığını göremediğimiz" için sessiz kaldı.
+
+### ⭐D8.1 — ZİNCİRİN 2. ADIMI ÜRETİMDE HİÇ ÇALIŞMADI (2026-08-27, ölçüldü)
+
+Yukarıdaki hüküm "(2) dalın tamamını kapsar" diyor ve **doğru**; ama üretimde o adıma
+hiç sıra gelmiyordu. Vercel'in **sığ klonunda `origin/master` yok**, ve betiğin çekme
+denemesi `2>/dev/null || true` ile **yutuluyordu** — başarısızlığın sebebi günlüğe hiç
+düşmedi. Sonuç: **pozitif sınıf listesi bir kez bile değerlendirilmedi**, salt-`.md`
+push'lar dağıtım yaktı ve HOBBY günlük kotası doldu, tren durdu.
+
+**Kanıt — üç ayrı dağıtımın build günlüğü, üçünde de birebir aynı iki satır:**
+
+```
+ignore-build: VERCEL_GIT_PREVIOUS_SHA bos (dalin ilk dagitimi) -> ortak ataya dusuyorum
+ignore-build: origin/master bu klonda yok -> BUILD
+```
+
+`d9f31989` (TEMIZLIK companion) · `f4c5c25f` (ALTYAPI 18 companion) · `304a1785` (I18N varyant).
+
+**KUSURUN SINIFI — doğru davranış yetmez, GÖREBİLMEK gerekir.** Fail-safe'in kendisi
+doğruydu: taban çözülemeyince BUILD demek doğru karardır. Kapı da bunu sınıyordu ve
+*"origin/master hiç yoksa BUILD"* kolu **yeşildi**. Ama hiçbir kol şunu sormuyordu:
+**bu dal üretimde İSTİSNA mı, yoksa TEK yol mu?** Sessiz bir fail-safe, "kapı çalışıyor"
+ile "kapı hiç sıra bulamıyor" hallerini ayırt edilemez kılar.
+
+**HÜKÜM:** taban çözümündeki her başarısız deneme, **adı ve sebebiyle** günlüğe yazılır.
+Bir adımın sessizce düşmesi yasaktır. Kapı bunu `taban çözülemediğinde SEBEP günlüğe
+yazılır` koluyla zorlar; kol bilerek bozularak kanıtlanmıştır (görünürlük satırları
+kaldırılınca kırmızı, geri konunca yeşil).
 
 ### Kapı bunu nasıl ölçüyor
 
