@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useSettings.ts
-skeleton_hash: c3659edf855e64a7
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useSettings.ts
+skeleton_hash: a2fb80737f6bcb74
 entity_hashes:
   func:useSettings: caf0b25f3b0d5fb3
   overview: 094819e02d799328
-generated_at: 2026-06-19T11:49:28Z
+generated_at: 2026-08-27T08:36:23Z
 ---
 
 ## Genel Bakış

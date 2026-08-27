@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\InViewCounter.tsx
-skeleton_hash: 94aaa03be3178db8
+source_path: C:\tmp\vh-altyapi-t165\src\components\InViewCounter.tsx
+skeleton_hash: d61c388d156bdea7
 entity_hashes:
   func:InViewCounter: 223b6183b16e2873
   overview: 61076e120659900f
   style_tokens: 2ef2cd2897b38d9e
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:26Z
 ---
 
 ## Genel Bakış

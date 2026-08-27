@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ProductCard.tsx
-skeleton_hash: c952d1ee37a51ab6
+source_path: C:\tmp\vh-altyapi-t165\src\components\ProductCard.tsx
+skeleton_hash: d86bff637dd59bb9
 entity_hashes:
   overview: 9d2b069c54b1d8b3
   style_tokens: f04c95b84c1173dc
-generated_at: 2026-08-15T07:02:08Z
+generated_at: 2026-08-27T07:58:23Z
 ---
 
 ## Genel Bakış

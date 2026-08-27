@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useRole.ts
-skeleton_hash: cba8bff2feceafcc
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useRole.ts
+skeleton_hash: 64b5da2aadc4dc55
 entity_hashes:
   func:useRole: 86c3bf52308dd229
   overview: 90cbd0f7f32b7b04
-generated_at: 2026-08-25T07:27:08Z
+generated_at: 2026-08-27T08:36:20Z
 ---
 
 ## Genel Bakış
@@ -84,8 +84,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: useRole.ts
-  function: useRole.ts::useRole
+  file: src\hooks\useRole.ts
+  function: src\hooks\useRole.ts::useRole
 
 ---
 

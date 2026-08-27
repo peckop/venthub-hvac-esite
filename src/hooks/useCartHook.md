@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useCartHook.ts
-skeleton_hash: 56b76f56edecb1e5
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCartHook.ts
+skeleton_hash: 423a81c5d372a8e1
 entity_hashes:
   func:useCart: 809254743b71e846
   overview: a6bb925fcf63c562
-generated_at: 2026-08-25T07:27:05Z
+generated_at: 2026-08-27T08:34:20Z
 ---
 
 ## Genel Bakış
@@ -68,8 +68,8 @@ Alışveriş sepetinin durumunu ve sepete ait işlemleri dışarıya açan ana h
 
 ## NODE ID STANDARD
 
-  file: useCartHook.ts
-  function: useCartHook.ts::useCart
+  file: src\hooks\useCartHook.ts
+  function: src\hooks\useCartHook.ts::useCart
 
 ---
 

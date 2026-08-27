@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\adminShipping.ts
-skeleton_hash: d9db2383d8a60915
+source_path: C:\tmp\vh-altyapi-t165\src\utils\adminShipping.ts
+skeleton_hash: 239e849b7b70a52d
 entity_hashes:
   func:SharedTrackingDeclinedError:constructor: 0da9cec1646cf6c1
   func:invokeShippingUpdate: c7a81a79ab7e135c
   func:isSharedTrackingConflict: 7ea7741c5087f777
   overview: 4609d8f90089ab87
-generated_at: 2026-08-25T07:28:55Z
+generated_at: 2026-08-27T08:37:11Z
 ---
 
 ## Genel Bakış
@@ -50,7 +50,11 @@ Paylaşımlı takip numarası çakışması durumunu tanımlar ve tespit eder. `
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: `SharedTrackingDeclinedError` sınıfının yapıcı metodudur. Bu hata sınıfı, paylaşılan bir takip numarasının onaylanmaması durumunda fırlatılmak üzere özel bir hata nesnesi oluşturur ve başlatır.
+**Nasıl yapar**: Metot, üst sınıfın (muhtemelen `Error`) yapıcı metodunu `super()` çağrısıyla çalıştırır ve varsayılan bir hata mesajı olarak `'Paylaşılan takip numarası onaylanmadı; kargo bilgisi yazılmadı.'` iletir. Ardından, oluşturulan hata nesnesinin `name` özelliğini `'SharedTrackingDeclinedError'` olarak ayarlayarak hatanın türünü tanımlar.
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz.
+**Dönüş**: Kaynakta dönüş tipi açıkça belirtilmemiştir. TypeScript'te `constructor` metodları genellikle `void` döndürür, ancak bu spesifik durumda dönüş tipi bilinmiyor.
 
 ---
 
@@ -87,24 +91,24 @@ type ShippingInvokeOutcome = | { ok: true; conflict: false }
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/utils/adminShipping.ts::isSharedTrackingConflict
+### [N1_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\utils\adminShipping.ts::isSharedTrackingConflict
 - **params**: `error: unknown`
 - **ic_degiskenler**:
-  - `context` — `error` nesnesinin `context` özelliği; optional chaining (`?.`) ile güvenli erişim sağlanır, ardından `null` kontrolü yapılır
-  - `body` — `context`'in `clone().json()` ile ayrıştırılan yanıt gövdesi; `clone()` çağrısı, orijinal `Response` nesnesinin tüketilmesini engellemek için yapılır
-- **Dönüş**: `Promise<boolean>` — `context` bir `Response` örneği değilse, `status` 409 değilse veya `json()` ayrıştırması başarısız olursa `false` döner; gövde içindeki `error` alanı `SHARED_TRACKING_CONFLICT` sabitine eşitse `true` döner
+  - `context` — `error` nesnesinin `context` özelliğini alır; `Response` instance'ı olup olmadığını kontrol eder.
+  - `body` — `context.clone().json()` ile elde edilen yanıt gövdesi; `SHARED_TRACKING_CONFLICT` sabitiyle eşleşip eşleşmediğini kontrol eder.
+- **Dönüş**: `Promise<boolean>`
 
-### [N2_NASIL] AST Pointer: src/utils/adminShipping.ts::invokeShippingUpdate
+### [N2_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\utils\adminShipping.ts::invokeShippingUpdate
 - **params**: `supabase: ShippingFunctionsHost`, `body: ShippingUpdateBody`, `allowSharedTracking` (varsayılan değer: `false`)
 - **ic_degiskenler**:
-  - `payload` — `allowSharedTracking` true ise `body` nesnesine `allow_shared_tracking: true` alanı eklenmiş genişletilmiş kopyası (`{ ...body, allow_shared_tracking: true }`); false ise `body`'nin kendisi
-  - `error` — `supabase.functions.invoke('admin-update-shipping', { body: payload })` çağrısından dönen hata nesnesi; destructuring ile alınır
-- **Dönüş**: `Promise<ShippingInvokeOutcome>` — hata yoksa `{ ok: true, conflict: false }` döner; hata varsa `{ ok: false, conflict: <isSharedTrackingConflict sonucu>, error }` döner
+  - `payload` — `allowSharedTracking` true ise `body`'ye `allow_shared_tracking: true` eklenmiş nesne, aksi halde `body`'nin kendisi.
+  - `error` — `supabase.functions.invoke('admin-update-shipping', { body: payload })` çağrısının hata sonucu.
+- **Dönüş**: `Promise<ShippingInvokeOutcome>`
 
-### [N3_NASIL] AST Pointer: src/utils/adminShipping.ts::SharedTrackingDeclinedError.constructor
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `super()` çağrısı ile üst sınıfın constructor'ı `'Paylaşılan takip numarası onaylanmadı; kargo bilgisi yazılmadı.'` mesajıyla başlatılır; `this.name` `'SharedTrackingDeclinedError'` değerine atanır
+### [N3_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\utils\adminShipping.ts::SharedTrackingDeclinedError.constructor
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok
 
 ---
 
@@ -120,10 +124,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: adminShipping.ts
-  function: adminShipping.ts::isSharedTrackingConflict
-  function: adminShipping.ts::invokeShippingUpdate
-  class: adminShipping.ts::SharedTrackingDeclinedError
+  file: src\utils\adminShipping.ts
+  function: src\utils\adminShipping.ts::isSharedTrackingConflict
+  function: src\utils\adminShipping.ts::invokeShippingUpdate
+  class: src\utils\adminShipping.ts::SharedTrackingDeclinedError
 
 ---
 

@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\categories\CategoryFormModal.tsx
-skeleton_hash: 31aaeefe37f500e9
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\categories\CategoryFormModal.tsx
+skeleton_hash: ccea0ca40e7f17b9
 entity_hashes:
   func:CategoryFormModal: 45e70a4b9811a0d5
   func:FieldError: 73ce29b5cf8d764a
@@ -15,7 +15,7 @@ entity_hashes:
   func:onSubmit: c1bb6fdd37c1f2b9
   overview: f91a583dfb37d990
   style_tokens: a0eaa2fd6256d10e
-generated_at: 2026-08-25T07:25:17Z
+generated_at: 2026-08-27T08:07:08Z
 ---
 
 ## Genel Bakış
@@ -238,21 +238,21 @@ graph TD
     CategoryFormModal_tsx__handleImageUpload["handleImageUpload"]
     CategoryFormModal_tsx__handleOpenChange["handleOpenChange"]
     CategoryFormModal_tsx__onSubmit["onSubmit"]
-    CategoryFormModal_tsx__CategoryFormModal --> CategoryFormModal_tsx__handleClose
     CategoryFormModal_tsx__CategoryFormModal --> CategoryFormModal_tsx__buildCategorySchema
+    CategoryFormModal_tsx__CategoryFormModal --> CategoryFormModal_tsx__handleClose
 ```
 
 ## NODE ID STANDARD
 
-  file: CategoryFormModal.tsx
-  function: CategoryFormModal.tsx::buildCategorySchema
-  function: CategoryFormModal.tsx::FieldError
-  function: CategoryFormModal.tsx::focusFirstInvalid
-  function: CategoryFormModal.tsx::CategoryFormModal
-  function: CategoryFormModal.tsx::handleImageUpload
-  function: CategoryFormModal.tsx::onSubmit
-  function: CategoryFormModal.tsx::handleClose
-  function: CategoryFormModal.tsx::handleOpenChange
+  file: src\components\admin\categories\CategoryFormModal.tsx
+  function: src\components\admin\categories\CategoryFormModal.tsx::buildCategorySchema
+  function: src\components\admin\categories\CategoryFormModal.tsx::FieldError
+  function: src\components\admin\categories\CategoryFormModal.tsx::focusFirstInvalid
+  function: src\components\admin\categories\CategoryFormModal.tsx::CategoryFormModal
+  function: src\components\admin\categories\CategoryFormModal.tsx::handleImageUpload
+  function: src\components\admin\categories\CategoryFormModal.tsx::onSubmit
+  function: src\components\admin\categories\CategoryFormModal.tsx::handleClose
+  function: src\components\admin\categories\CategoryFormModal.tsx::handleOpenChange
 
 ---
 

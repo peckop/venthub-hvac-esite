@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutPayment.ts
-skeleton_hash: f51625cf58c944a0
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCheckoutPayment.ts
+skeleton_hash: 7c9f7f0e9a6b4107
 entity_hashes:
   func:ServerValidationUnavailableError:constructor: ac305f0c901ddac7
   func:useCheckoutPayment: a8bb41b15d097162
   overview: 9288bb99d7e80dbc
-generated_at: 2026-08-26T07:14:12Z
+generated_at: 2026-08-27T08:35:38Z
 ---
 
 ## Genel Bakış
@@ -63,14 +63,14 @@ Bu modül, ödeme sürecini orkestre etmek için dış bağımlılıklara dayan�
 **Dönüş**: object — `{ loading: boolean, token: string, url: string, initiatePayment: function, ... }` şeklinde, ödeme durumunu (yükleme, token, yönlendirme URL’si) ve ödeme başlatma işlevini içeren bir nesne.
 
 ### constructor
-**Ne yapar**: `ServerValidationUnavailableError` sınıfının yapıcı metodudur. Sunucu doğrulamasının kullanılamadığı durumlarda fırlatılmak üzere özel bir hata nesnesi oluşturur. Hata mesajını, verilen `cause` değerinden türeterek standart bir önek ile birlikte yapılandırır.
+**Ne yapar**: `ServerValidationUnavailableError` sınıfının yapıcı metodudur. Sunucu doğrulamasının kullanılamadığı durumlarda fırlatılmak üzere özel bir hata nesnesi oluşturur. Hata mesajını `SERVER_VALIDATION_UNAVAILABLE` ön ekiyle birlikte verilen `cause` bilgisinden türetir.
 
-**Nasıl yapar**: Üst sınıfın (`super`) yapıcı metodunu çağırarak hata mesajını oluşturur. Mesaj, `SERVER_VALIDATION_UNAVAILABLE:` sabit metni ile `cause` parametresinin bir `Error` örneği olup olmadığına göre farklı biçimde birleştirilir: `cause` bir `Error` örneği ise `cause.message` özelliği kullanılır, aksi takdirde `String(cause)` ile metne dönüştürülür. Ardından `this.name` özelliği `'ServerValidationUnavailableError'` sabit değerine atanarak hata nesnesinin adı belirlenir.
+**Nasıl yapar**: Üst sınıfın (`Error`) yapıcı metodunu `super()` ile çağırarak hata mesajını iletir. Mesaj oluşturulurken `cause` parametresinin bir `Error` instance'ı olup olmadığı kontrol edilir; eğer öyleyse `cause.message` kullanılır, değilse `String(cause)` ile metin temsilini alır. Ardından `this.name` özelliğini `'ServerValidationUnavailableError'` olarak ayarlayarak hatanın tür adını belirler.
 
 **Parametreler**:
-- cause: unknown — Hatanın kaynağını temsil eden değer. Bir `Error` örneği olabileceği gibi herhangi bir başka türde değer de olabilir; mesaj oluşturulurken türüne göre işleme tabi tutulur.
+- cause: unknown — Hatanın kaynağını temsil eden değer. Bir `Error` nesnesi olabileceği gibi herhangi bir tip de olabilir; mesaj oluşturulurken türüne göre farklı biçimlendirme uygulanır.
 
-**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir.
+**Dönüş**: Bilinmiyor. Kaynak kodda dönüş tipi belirtilmemiştir.
 
 ---
 
@@ -116,71 +116,82 @@ type PaymentPhase = /** Henüz başlatılmadı. */
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::ServerValidationUnavailableError.constructor
+### [N1_NASIL] AST Pointer: useCheckoutPayment.ts::ServerValidationUnavailableError.constructor
 - **params**: `cause: unknown`
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (constructor — `super()` çağrısı yapar, `this.name` atar)
-
-### [N2_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useCheckoutPayment
-- **params**: `items`, `getCartTotal`, `user`, `clearCart`, `applyServerPricing`, `orchestrator`, `couponCode`, `t`
 - **ic_degiskenler**:
-  - `router` — `useRouter()` ile alınan Next.js router nesnesi; ödeme başarılı olduğunda `/payment-success` sayfasına yönlendirme yapmak için kullanılır
-  - `loading` / `setLoading` — ödeme işleminin devam edip etmediğini gösteren boolean state; `initiatePayment` başında `true`, `finally` bloğunda `false` yapılır
-  - `iyzToken` / `setIyzToken` — iyzico PSP'nin döndürdüğü token string'i; gömülü form senaryosunda `d.token` değerinden atanır
-  - `paymentUrl` / `setPaymentUrl` — PSP'nin döndürdüğü ödeme sayfası URL'i; `d.paymentPageUrl` değerinden atanır
-  - `orderId` / `setOrderId` — oluşturulan sipariş kimliği; `d.orderId` değerinden atanır, `useEffect` yoklamasında sipariş durumu sorgulamak için kullanılır
-  - `convId` / `setConvId` — iyzico conversation ID; `d.conversationId` değerinden atanır
-  - `formReady` / `setFormReady` — ödeme formunun gerçekten yüklendiğini gösteren boolean state; `markFormReady` tarafından `true` yapılır
-  - `progressPct` / `setProgressPct` — yükleme ilerleme yüzdesi (0-100); başlangıçta `20`, form yüklenirken `60`, hazır olduğunda `100`
-  - `paymentFrameContent` / `setPaymentFrameContent` — PSP'nin döndürdüğü form HTML içeriği; `d.checkoutFormContent` değerinden atanır
-  - `phase` / `setPhase` — ödeme aşaması (`PaymentPhase` tipinde); `'idle'` → `'starting'` → `'formLoading'` → `'ready'` veya `'error'`
-  - `errorMessage` / `setErrorMessage` — kullanıcıya gösterilecek hata mesajı string'i; hata durumlarında `t()` ile çevrilmiş mesaj atanır
-  - `markFormReady` — `useCallback` ile sarılı fonksiyon; form yüklendiğinde çağrılır, `formReady`'i `true`, `phase`'i `'ready'`, `progressPct`'yi `100` yapar
-  - `markFormFailed` — `useCallback` ile sarılı fonksiyon; form yüklenemediğinde çağrılır, `phase`'i `'error'` yapar, `reportError` ile hata raporlar
-  - `initiatePayment` — async fonksiyon; sunucu fiyat doğrulaması yapar, `buildPaymentRequest` ile istek oluşturur, `supabase.functions.invoke('iyzico-payment')` çağrısı yapar, başarılı olursa sipariş bilgilerini state'e ve `localStorage`'a yazar
-  - useEffect (sipariş durumu yoklaması) — `orderId` değiştiğinde tetiklenir, 3 saniyelik interval ile `venthub_orders` tablosundan `payment_status` sorgular, `'paid'` olduğunda `clearCart()` çağırır ve `/payment-success` sayfasına yönlendirir
-- **Dönüş**: nesne — `{ loading, iyzToken, paymentUrl, orderId, convId, formReady, progressPct, paymentFrameContent, phase, errorMessage, markFormReady, markFormFailed, setFormReady, setProgressPct, initiatePayment }`
+  - `cause` — super çağrısında `cause.message` (Error ise) veya `String(cause)` ile mesaj oluşturmak için kullanılır
+- **Dönüş**: yok (constructor)
 
-### [N3_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::markFormReady
+### [N2_NASIL] AST Pointer: useCheckoutPayment.ts::useCheckoutPayment
+- **params**: `items`, `getCartTotal`, `user`, `clearCart`, `applyServerPricing`, `orchestrator`, `couponCode`, `t` (UseCheckoutPaymentProps tipinden destructure edilmiş)
+- **ic_degiskenler**:
+  - `router` — `useRouter()` ile alınan Next.js router nesnesi; ödeme başarılı olduğunda `/payment-success` sayfasına yönlendirmek için kullanılır
+  - `loading` — `useState(false)` ile tanımlı boolean; ödeme işleminin devam edip etmediğini gösterir
+  - `setLoading` — `loading` state'inin setter fonksiyonu
+  - `iyzToken` — `useState('')` ile tanımlı string; iyzico PSP token'ını tutar
+  - `setIyzToken` — `iyzToken` state'inin setter fonksiyonu
+  - `paymentUrl` — `useState('')` ile tanımlı string; PSP ödeme sayfası URL'ini tutar
+  - `setPaymentUrl` — `paymentUrl` state'inin setter fonksiyonu
+  - `orderId` — `useState('')` ile tanımlı string; sipariş kimliğini tutar
+  - `setOrderId` — `orderId` state'inin setter fonksiyonu
+  - `convId` — `useState('')` ile tanımlı string; PSP conversation ID'sini tutar
+  - `setConvId` — `convId` state'inin setter fonksiyonu
+  - `formReady` — `useState(false)` ile tanımlı boolean; ödeme formunun gerçekten çıktığını gösterir
+  - `setFormReady` — `formReady` state'inin setter fonksiyonu
+  - `progressPct` — `useState(20)` ile tanımlı number; yükleme ilerleme yüzdesini tutar (başlangıç 20)
+  - `setProgressPct` — `progressPct` state'inin setter fonksiyonu
+  - `paymentFrameContent` — `useState('')` ile tanımlı string; PSP'nin döndürdüğü gömülü form HTML içeriğini tutar
+  - `setPaymentFrameContent` — `paymentFrameContent` state'inin setter fonksiyonu
+  - `phase` — `useState<PaymentPhase>('idle')` ile tanımlı PaymentPhase tipinde değer; ödeme akışının aşamasını tutar
+  - `setPhase` — `phase` state'inin setter fonksiyonu
+  - `errorMessage` — `useState('')` ile tanımlı string; kullanıcıya gösterilecek hata mesajını tutar
+  - `setErrorMessage` — `errorMessage` state'inin setter fonksiyonu
+  - `markFormReady` — `useCallback` ile tanımlı fonksiyon; form gerçekten çıktığında çağrılır, `formReady`'i true yapar, `phase`'i 'ready' yapar, `progressPct`'yi 100 yapar
+  - `markFormFailed` — `useCallback` ile tanımlı fonksiyon; yüzey kurulamadığında çağrılır, `phase`'i 'error' yapar, `errorMessage`'i ayarlar, `reportError` ile hata raporlar
+  - `initiatePayment` — async fonksiyon; ödeme işlemini başlatır (sunucu fiyat doğrulaması, ödeme isteği oluşturma, PSP çağrısı)
+  - useEffect (sipariş durumu yoklaması) — `orderId` değiştiğinde her 3 saniyede bir `venthub_orders` tablosundan `payment_status` sorgusu yapan interval kurar; 'paid' olduğunda temizlik yapar ve başarılı sayfasına yönlendirir
+- **Dönüş**: `{ loading, iyzToken, paymentUrl, orderId, convId, formReady, progressPct, paymentFrameContent, phase, errorMessage, markFormReady, markFormFailed, setFormReady, setProgressPct, initiatePayment }` — tüm state'ler ve fonksiyonlar
+
+### [N3_NASIL] AST Pointer: useCheckoutPayment.ts::markFormReady (useCallback)
 - **params**: yok
-- **ic_degiskenler**: yok (sadece setter çağrıları var)
+- **ic_degiskenler**: yok (dış scope'daki setter'lar doğrudan çağrılır: `setFormReady`, `setPhase`, `setProgressPct`)
 - **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::markFormFailed
+### [N4_NASIL] AST Pointer: useCheckoutPayment.ts::markFormFailed (useCallback)
 - **params**: `reason: string`
-- **ic_degiskenler**: yok
+- **ic_degiskenler**: yok (dış scope'daki `setPhase`, `setErrorMessage`, `t`, `reportError` doğrudan çağrılır)
 - **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::initiatePayment
+### [N5_NASIL] AST Pointer: useCheckoutPayment.ts::initiatePayment
+- **params**: yok (async arrow function)
+- **ic_degiskenler**:
+  - `authoritativeTotal` — `getCartTotal()` ile alınan başlangıç ödeme tutarı; sunucu fiyat doğrulaması sonrası `validation.totals?.subtotal` ile güncellenebilir
+  - `validation` — `validateServerCart(supabase, { userId: user?.id })` ile alınan sunucu doğrulama sonucu; `.items` ve `.totals` alanlarına erişilir
+  - `localHash` — `getPriceHashLocal(items)` ile hesaplanan yerel fiyat hash'i; sunucu hash'i ile karşılaştırılır
+  - `serverHash` — `getPriceHashServer(validation.items, items)` ile hesaplanan sunucu fiyat hash'i; `localHash` ile eşleşmezse fiyat güncellenir
+  - `buildPaymentRequest` — `await import('../views/checkout/buildPaymentRequest')` ile dynamic import edilen ödeme isteği oluşturma fonksiyonu
+  - `requestData` — `buildPaymentRequest()` ile oluşturulan ödeme isteği verisi; `amount`, `items`, `customer`, `shipping`, `billing`, `sameAsShipping`, `userId`, `invoiceType`, `invoiceInfo`, `legalConsents`, `shippingMethod`, `couponCode` alanlarını içerir
+  - `data` — `supabase.functions.invoke('iyzico-payment', { body: requestData })` yanıtının `data` alanı
+  - `error` — `supabase.functions.invoke('iyzico-payment')` yanıtının `error` alanı; varsa throw edilir
+  - `d` — `data.data`, PSP yanıtının iç verisi; `.orderId`, `.conversationId`, `.paymentPageUrl`, `.token`, `.checkoutFormContent` alanlarına erişilir
+  - `err` — catch bloğunda yakalanan hata; `unknown` tipindedir
+  - `i18nKey` — `err` nesnesinden çıkarılan i18n anahtarı (`err.i18nKey`); yoksa `null`
+  - `msg` — `err instanceof Error` ise `err.message`, değilse `String(err)` ile elde edilen hata mesajı
+  - `shown` — kullanıcıya gösterilecek hata mesajı; `i18nKey` varsa `t(i18nKey)`, yoksa `msg` veya `t('checkout.errors.paymentInit')`
+- **Dönüş**: `boolean` (başarılı form yüklemede `true`, hata durumunda `false`) veya `undefined` (paymentPageUrl redirect'inde return edilmeden önce `window.location.href` atanır)
+
+### [N6_NASIL] AST Pointer: useCheckoutPayment.ts::useEffect interval callback (anonim)
 - **params**: yok
 - **ic_degiskenler**:
-  - `authoritativeTotal` — `getCartTotal()` ile alınan sepet toplamı; sunucu fiyat doğrulaması sonrası `validation.totals?.subtotal` ile güncellenebilir
-  - `validation` — `validateServerCart(supabase, { userId: user?.id })` sonucu; sunucu tarafı sepet doğrulaması verisi
-  - `localHash` — `getPriceHashLocal(items)` ile hesaplanan istemci tarafı fiyat hash'i
-  - `serverHash` — `getPriceHashServer(validation.items, items)` ile hesaplanan sunucu tarafı fiyat hash'i; `localHash` ile eşleşmezse fiyat güncellenir
-  - `buildPaymentRequest` — `await import('../views/checkout/buildPaymentRequest')` ile dinamik olarak yüklenen fonksiyon
-  - `requestData` — `buildPaymentRequest()` çağrısının döndürdüğü ödeme istek verisi; `amount`, `items`, `customer`, `shipping`, `billing`, `sameAsShipping`, `userId`, `invoiceType`, `invoiceInfo`, `legalConsents`, `shippingMethod`, `couponCode` alanlarını içerir
-  - `data` — `supabase.functions.invoke('iyzico-payment', { body: requestData })` sonucunun `data` alanı
-  - `error` — `supabase.functions.invoke` sonucunun `error` alanı; varsa throw edilir
-  - `d` — `data.data` alt nesnesi; PSP yanıtını içerir
-  - `d.orderId` — PSP'nin döndürdüğü sipariş kimliği; `localStorage`'a `PENDING_ORDER_KEY` ile yazılır
-  - `d.conversationId` — PSP'nin döndürdüğü conversation ID; `localStorage`'a yazılır
-  - `d.paymentPageUrl` — PSP'nin döndürdüğü ödeme sayfası URL'i; token yoksa `window.location.href` ile yönlendirme yapılır
-  - `d.token` — PSP'nin döndürdüğü token; `setIyzToken` ile state'e atanır
-  - `d.checkoutFormContent` — PSP'nin döndürdüğü form HTML içeriği; `setPaymentFrameContent` ile state'e atanır
-  - `err` — `catch` bloğundaki hata nesnesi; `i18nKey` özelliği varsa çevrilmiş mesaj gösterilir
-  - `i18nKey` — `err` nesnesinden çıkarılan i18n anahtarı; `err.i18nKey` varsa `String()` ile dönüştürülür, yoksa `null`
-  - `msg` — `err instanceof Error` ise `err.message`, değilse `String(err)`
-  - `shown` — kullanıcıya gösterilecek mesaj; `i18nKey` varsa `t(i18nKey)`, yoksa `msg || t('checkout.errors.paymentInit')`
-- **Dönüş**: `boolean` — başarılıysa `true`, hata durumunda `false`
+  - `timer` — `setInterval(async () => {...}, 3000)` ile oluşturulan zamanlayıcı kimliği; `clearInterval(timer)` ile temizlenir
+  - `data` — `supabase.from('venthub_orders').select('payment_status').eq('id', orderId).maybeSingle()` sorgusundan dönen veri; `data?.payment_status` kontrol edilir
+- **Dönüş**: cleanup fonksiyonu (`() => clearInterval(timer)`)
 
-### [N6_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useEffect (sipariş durumu yoklaması)
-- **params**: yok (dışarıdan `orderId`, `clearCart`, `router` kullanır)
+### [N7_NASIL] AST Pointer: useCheckoutPayment.ts::setInterval async callback (anonim)
+- **params**: yok
 - **ic_degiskenler**:
-  - `timer` — `setInterval` ile oluşturulan zamanlayıcı ID'si; `clearInterval` ile temizlenir
-  - `data` — `supabase.from('venthub_orders').select('payment_status').eq('id', orderId).maybeSingle()` sorgu sonucu
-  - `data?.payment_status` — siparişin ödeme durumu; `'paid'` olduğunda zamanlayıcı durdurulur, `localStorage` temizlenir, sepet boşaltılır ve ödeme başarı sayfasına yönlendirilir
-- **Dönüş**: cleanup fonksiyonu — `return () => clearInterval(timer)`
+  - `data` — `supabase.from('venthub_orders').select('payment_status').eq('id', orderId).maybeSingle()` sorgusundan dönen veri; `data?.payment_status === 'paid'` olduğunda temizlik yapılır ve yönlendirme gerçekleşir
+- **Dönüş**: yok
 
 ---
 

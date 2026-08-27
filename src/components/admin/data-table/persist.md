@@ -2,17 +2,17 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\data-table\persist.ts
-skeleton_hash: 0fc250a18cc86f6b
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\data-table\persist.ts
+skeleton_hash: 7638dd7219e0847c
 entity_hashes:
-  func:colsKey: 6007ba5ac377f97c
-  func:densityKey: 2cbc74d8924bb606
-  func:loadColumnVisibility: 27a505efc9167601
-  func:loadDensity: 9d39f54622653f46
-  func:saveColumnVisibility: cc3ab7f7e3952cf6
-  func:saveDensity: c63bcc94a80cc55d
+  func:colsKey: be658c8a07bd5c9f
+  func:densityKey: baed2cf1288edf5d
+  func:loadColumnVisibility: 6de0d1f25c09c863
+  func:loadDensity: 763f774c77788895
+  func:saveColumnVisibility: 42203d8914dd0f82
+  func:saveDensity: c8bd7bf6174fa743
   overview: 4087fb32a2109943
-generated_at: 2026-06-19T20:47:00Z
+generated_at: 2026-08-27T08:10:40Z
 ---
 
 ## Genel Bakış
@@ -45,11 +45,14 @@ Bu modül, veri tablosu yapılandırmasını (yoğunluk ve sütun görünürlü�
 ## FONKSİYON DETAYLARI
 
 ### densityKey
-**Ne yapar**: Verilen bir anahtar için yerel depolamada satır yoğunluğu tercihini saklamak üzere oluşturulacak benzersiz depolama anahtarını üretir.
-**Nasıl yapar**: Sabit bir ön ek (`KEY_PREFIX`) ile verilen `persistKey` parametresonu birleştirir ve sonuna `:density` ekleyerek tam bir yerel depolama anahtarı döndürür. Bu, farklı bileşenlerin tercihlerini çakıştırmadan saklamasını sağlar.
+**Ne yapar**: Verilen `persistKey` değeri için localStorage'da kullanılacak tam depolama anahtarını (storage key) oluşturur. Oluşturulan anahtar, `KEY_PREFIX` sabiti ile başlar ve `:density` sonekiyle biter.
+
+**Nasıl yapar**: Template literal kullanarak `KEY_PREFIX` sabitini, `persistKey` parametresini ve `:density` sonekini birleştirip tek bir string döndürür.
+
 **Parametreler**:
-- persistKey: string — Bu bileşen (veya tablo) için benzersiz tanımlayıcı bir anahtar.
-**Dönüş**: string — Yerel depolamada kullanılabilecek tam formatta anahtar dizesi.
+- persistKey: string — Tablo bileşeninin benzersiz tanımlayıcısı; depolama anahtarının orta kısmını oluşturur.
+
+**Dönüş**: string — Oluşturulan tam depolama anahtarı (örneğin `KEY_PREFIX` değeri `"vh"` ise ve `persistKey` `"users"` ise sonuç `"vh:users:density"` olur).
 
 ### colsKey
 **Ne yapar**: Verilen bir anahtar için yerel depolamada sütun görünürlüğü tercihlerini saklamak üzere oluşturulacak benzersiz depolama anahtarını üretir.
@@ -98,45 +101,41 @@ Bu modül, veri tablosu yapılandırmasını (yoğunluk ve sütun görünürlü�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::densityKey
-- **params**: `persistKey: string` — localStorage anahtarının temel bileşeni, benzersiz alan adı
-- **ic_degiskenler**: (yok — sadece template literal döndürür)
-- **Dönüş**: `string` — `${KEY_PREFIX}${persistKey}:density` formatında localStorage anahtarı
+### [N1_NASIL] AST Pointer: persist.ts::densityKey
+- **params**: `persistKey` — bir dize; depolama anahtarının benzersiz parçası
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — `KEY_PREFIX` sabiti, `persistKey` ve `:density` parçalarından oluşan birleşik depolama anahtarı dizesi
 
-### [N2_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::colsKey
-- **params**: `persistKey: string` — localStorage anahtarının temel bileşeni, benzersiz alan adı
-- **ic_degiskenler**: (yok — sadece template literal döndürür)
-- **Dönüş**: `string` — `${KEY_PREFIX}${persistKey}:cols` formatında localStorage anahtarı
+### [N2_NASIL] AST Pointer: persist.ts::colsKey
+- **params**: `persistKey` — bir dize; depolama anahtarının benzersiz parçası
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — `KEY_PREFIX` sabiti, `persistKey` ve `:cols` parçalarından oluşan birleşik depolama anahtarı dizesi
 
-### [N3_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::loadDensity
-- **params**: `persistKey: string` — localStorage'dan hangi alanın yoğunluk tercihinin yükleneceğini belirler
+### [N3_NASIL] AST Pointer: persist.ts::loadDensity
+- **params**: `persistKey` — bir dize; hangi tablonun yoğunluk tercihini yükleyeceğini belirler
 - **ic_degiskenler**:
-  - `raw` — `window.localStorage.getItem(...)` çağrısından dönen ham string değer; `'compact'` veya `'comfortable'` olup olmadığı kontrol edilir
-- **Dönüş**: `Density` — geçerli bir değer yoksa `DEFAULT_DENSITY`, geçerliyse `raw` doğrudan döndürülür
+  - `raw` — `window.localStorage.getItem(densityKey(persistKey))` çağrısının sonucu; depodan okunan ham dize değeridir. `"compact"` veya `"comfortable"` ise doğrudan dönüş değeri olarak kullanılır
+- **Dönüş**: `Density` — depodan okunan geçerli yoğunluk değeri; `window` tanımsızsa, `raw` geçerli bir değer değilse veya depolama erişilemezse `DEFAULT_DENSITY` sabiti döner
 
-### [N4_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::saveDensity
-- **params**:
-  - `persistKey: string` — localStorage anahtarı üretiminde kullanılır
-  - `density: Density` — kaydedilecek yoğunluk değeri (`'compact'` veya `'comfortable'`)
-- **ic_degiskenler**: (yok — `densityKey(persistKey)` sonucu doğrudan `setItem`'e verilir)
-- **Dönüş**: `void` — yan etki: `window.localStorage.setItem` ile veri yazılır
+### [N4_NASIL] AST Pointer: persist.ts::saveDensity
+- **params**: `persistKey` — bir dize; hangi tablonun yoğunluk tercihini kaydedeceğini belirler, `density` — kaydedilecek `Density` türünde değer
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `window.localStorage.setItem(densityKey(persistKey), density)` çağrısıyla değeri depoya yazar. `window` tanımsızsa veya depolama erişilemezse hiçbir işlem yapmaz
 
-### [N5_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::loadColumnVisibility
-- **params**:
-  - `persistKey: string` — localStorage anahtarı üretiminde kullanılır
-  - `defaults: Record<string, boolean>` — sütun görünürlüğü için varsayılan değerler sözlüğü; hem fallback hem birleştirme başlangıç noktası
+### [N5_NASIL] AST Pointer: persist.ts::loadColumnVisibility
+- **params**: `persistKey` — bir dize; hangi tablonun sütun görünürlüğünü yükleyeceğini belirler, `defaults` — `Record<string, boolean>` türünde varsayılan sütun görünürlük eşlemesi
 - **ic_degiskenler**:
-  - `raw` — `window.localStorage.getItem(colsKey(persistKey))` çağrısından dönen ham JSON string; boşsa `{ ...defaults }` döndürülür
-  - `parsed` — `JSON.parse(raw)` sonucu `unknown` türünde; `null`, non-object veya `Array` ise `{ ...defaults }` döndürülür
-  - `merged` — `{ ...defaults }` ile oluşturulan kopya sözlük; sadece `boolean` türündeki değerler buraya kopyalanarak birleştirilir
-- **Dönüş**: `Record<string, boolean>` — birleştirilmiş sütun görünürlüğü sözlüğü; hata durumunda bile `{ ...defaults }` döner
+  - `raw` — `window.localStorage.getItem(colsKey(persistKey))` çağrısının sonucu; depodan okunan ham JSON dizesidir. Boşsa `{ ...defaults }` döner
+  - `parsed` — `JSON.parse(raw)` sonucu; `unknown` tipinde ayrıştırılmış değerdir. `null`, nesne olmayan veya dizi ise `{ ...defaults }` döner
+  - `merged` — `{ ...defaults }` ile oluşturulan `Record<string, boolean>` kopyası; `parsed` nesnesinden gelen geçerli boolean değerlerle güncellenir
+  - `key` — `Object.keys(defaults)` döngüsünde kullanılan dize; her varsayılan sütun adını temsil eder
+  - `value` — `(parsed as Record<string, unknown>)[key]` erişimiyle elde edilen değer; `typeof value === 'boolean"` koşulunu sağlıyorsa `merged[key]` atanır
+- **Dönüş**: `Record<string, boolean>` — depodaki geçerli boolean değerlerle birleştirilmiş sütun görünürlük eşlemesi. `window` tanımsızsa, `raw` boşsa, `parsed` geçerli bir nesne değilse veya depolama erişilemezse `{ ...defaults }` döner
 
-### [N6_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::saveColumnVisibility
-- **params**:
-  - `persistKey: string` — localStorage anahtarı üretiminde kullanılır
-  - `visibility: Record<string, boolean>` — kaydedilecek sütun görünürlüğü sözlüğü
-- **ic_degiskenler**: (yok — `colsKey(persistKey)` ve `JSON.stringify(visibility)` doğrudan `setItem`'e verilir)
-- **Dönüş**: `void` — yan etki: `window.localStorage.setItem` ile JSON string olarak yazılır
+### [N6_NASIL] AST Pointer: persist.ts::saveColumnVisibility
+- **params**: `persistKey` — bir dize; hangi tablonun sütun görünürlüğünü kaydedeceğini belirler, `visibility` — `Record<string, boolean>` türünde kaydedilecek sütun görünürlük eşlemesi
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `window.localStorage.setItem(colsKey(persistKey), JSON.stringify(visibility))` çağrısıyla eşlemenin JSON temsilini depoya yazar. `window` tanımsızsa veya depolama erişilemezse hiçbir işlem yapmaz
 
 ---
 
@@ -151,9 +150,9 @@ graph TD
     persist_ts__saveColumnVisibility["saveColumnVisibility"]
     persist_ts__saveDensity["saveDensity"]
     persist_ts__loadDensity --> persist_ts__densityKey
+    persist_ts__saveDensity --> persist_ts__densityKey
     persist_ts__loadColumnVisibility --> persist_ts__colsKey
     persist_ts__saveColumnVisibility --> persist_ts__colsKey
-    persist_ts__saveDensity --> persist_ts__densityKey
 ```
 
 ## NODE ID STANDARD

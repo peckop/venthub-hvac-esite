@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useIsMounted.ts
-skeleton_hash: fddb67ba3050ee3f
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useIsMounted.ts
+skeleton_hash: 12b806a51bd6813e
 entity_hashes:
   func:useIsMounted: ae14f2fca3691906
   overview: 050973256d3540a7
-generated_at: 2026-08-25T07:26:55Z
+generated_at: 2026-08-27T08:35:45Z
 ---
 
 ## Genel Bakış
@@ -64,8 +64,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: useIsMounted.ts
-  function: useIsMounted.ts::useIsMounted
+  file: src\hooks\useIsMounted.ts
+  function: src\hooks\useIsMounted.ts::useIsMounted
 
 ---
 

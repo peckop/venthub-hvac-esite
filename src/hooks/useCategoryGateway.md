@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useCategoryGateway.ts
-skeleton_hash: 1b375a757561a4d1
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCategoryGateway.ts
+skeleton_hash: 53e29835e6b3299d
 entity_hashes:
   func:useCategoryGateway: 8e95a6f39bff69fd
   overview: d663518b19af5432
-generated_at: 2026-08-24T11:53:27Z
+generated_at: 2026-08-27T08:34:21Z
 ---
 
 ## Genel Bakış

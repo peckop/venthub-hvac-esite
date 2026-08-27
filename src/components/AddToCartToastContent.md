@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToastContent.tsx
-skeleton_hash: 852817141636c428
+source_path: C:\tmp\vh-altyapi-t165\src\components\AddToCartToastContent.tsx
+skeleton_hash: 776f5ad8caa5c99c
 entity_hashes:
   func:AddToCartToastContent: da3886a1d2990a31
   overview: a72a624e0dfb150e
   style_tokens: 5ac0b676517c4959
-generated_at: 2026-06-19T20:46:47Z
+generated_at: 2026-08-27T07:52:14Z
 ---
 
 ## Genel Bakış

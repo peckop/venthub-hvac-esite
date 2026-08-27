@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\adminUi.ts
-skeleton_hash: 990fbeb0bf9239c1
+source_path: C:\tmp\vh-altyapi-t165\src\utils\adminUi.ts
+skeleton_hash: 13a75f056c167b4d
 entity_hashes:
   overview: d13e94e1526b35ae
-generated_at: 2026-08-25T07:28:46Z
+generated_at: 2026-08-27T08:37:12Z
 ---
 
 ## Genel Bakış
@@ -98,7 +98,7 @@ Fonksiyon gövdesi bulunmadığından AST Pointer üretilmemiştir.
 
 ## NODE ID STANDARD
 
-  file: adminUi.ts
+  file: src\utils\adminUi.ts
 
 ---
 

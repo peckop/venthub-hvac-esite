@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useCalculatorUsage.ts
-skeleton_hash: c049594110c57c82
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCalculatorUsage.ts
+skeleton_hash: 70b0ce5c0e9c12e7
 entity_hashes:
   func:girdiOzeti: ce3cd2e72a8b3e67
   func:useCalculatorUsage: f157c6548bb3e8d5
   overview: 456b32078d3a87d0
-generated_at: 2026-08-25T08:43:30Z
+generated_at: 2026-08-27T08:34:19Z
 ---
 
 ## Genel Bakış

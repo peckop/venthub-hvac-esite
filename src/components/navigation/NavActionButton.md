@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavActionButton.tsx
-skeleton_hash: 792f17d7ff38f976
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavActionButton.tsx
+skeleton_hash: 730cc348f913d405
 entity_hashes:
   func:NavActionButton: 9e352ab0f1dc93af
   overview: 42d52b47442e736b
   style_tokens: 7a26081e3b2c4d09
-generated_at: 2026-06-19T20:47:10Z
+generated_at: 2026-08-27T08:32:58Z
 ---
 
 ## Genel Bakış

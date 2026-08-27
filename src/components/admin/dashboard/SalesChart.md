@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\dashboard\SalesChart.tsx
-skeleton_hash: 22bee1a1ee1294f2
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\dashboard\SalesChart.tsx
+skeleton_hash: 1d2376b4feb5ff39
 entity_hashes:
   func:SalesChart: 81798fe6d2553ef7
   overview: b9d1d9a412f73b23
   style_tokens: eb6fa1f854f0685b
-generated_at: 2026-08-25T07:24:37Z
+generated_at: 2026-08-27T08:08:02Z
 ---
 
 ## Genel Bakış
@@ -91,8 +91,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: SalesChart.tsx
-  function: SalesChart.tsx::SalesChart
+  file: src\components\admin\dashboard\SalesChart.tsx
+  function: src\components\admin\dashboard\SalesChart.tsx::SalesChart
 
 ---
 

@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\navigationConfig.ts
-skeleton_hash: ce061c1ad5560b5c
+source_path: C:\tmp\vh-altyapi-t165\src\utils\navigationConfig.ts
+skeleton_hash: 8ee8168e4b9aa16d
 entity_hashes:
   overview: 0c8e815324d6c567
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:50Z
 ---
 
 ## Genel Bakış

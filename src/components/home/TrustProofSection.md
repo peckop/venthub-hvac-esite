@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx
-skeleton_hash: 92e92fa9817ef079
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\TrustProofSection.tsx
+skeleton_hash: 3a95d7e7be8d8a3a
 entity_hashes:
   func:TrustProofSection: ff4459fea67ab188
   overview: ecbeef82efa3251a
   style_tokens: fd859472e8c1a696
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T08:27:36Z
 ---
 
 ## Genel Bakış

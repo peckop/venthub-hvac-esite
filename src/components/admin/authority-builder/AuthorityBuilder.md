@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\AuthorityBuilder.tsx
-skeleton_hash: 03cf94d4374fb1dc
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\authority-builder\AuthorityBuilder.tsx
+skeleton_hash: 7eb34918d7ea63fb
 entity_hashes:
   func:AuthorityBuilder: ea4f02be3be8275d
   func:getInitialContent: d68640fe30ab6ebc
   overview: 2a123a4c769f5fe6
-  style_tokens: debe507a4c224f1e
-generated_at: 2026-06-19T20:47:06Z
+  style_tokens: 2ff661890d494e9a
+generated_at: 2026-08-27T08:07:06Z
 ---
 
 ## Genel Bakış
@@ -76,9 +76,9 @@ Yeni yetki blokları oluşturulduğunda veya varsayılan değerler gerektiğinde
 ---
 
 ## SABİTLER
-- **btnGhost** (template) — ``${btnBase} hover:bg-slate-100 hover:text-slate-900``
-- **btnOutline** (template) — ``${btnBase} border border-slate-200 bg-white shadow-sm hover:bg-slate-100 hov...`
-- **btnSecondary** (template) — ``${btnBase} bg-slate-100 text-slate-900 shadow-sm hover:bg-slate-100/80``
+- **btnGhost** (template) — ``${btnBase} hover:bg-admin-surface-2 hover:text-admin-fg-subtle``
+- **btnOutline** (template) — ``${btnBase} border border-admin-border bg-admin-surface shadow-admin-sm hover...`
+- **btnSecondary** (template) — ``${btnBase} bg-admin-surface-2 text-admin-fg-subtle shadow-admin-sm hover:bg-...`
 - **BLOCK_TYPES** (array) — `[
   { type: 'hero', labelKey: 'admin.authority.blockTypeHero', icon: Layers ...`
 - **blockTypeLabels** (object) — `{
@@ -133,7 +133,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-indigo-600`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-slate-900`, `bg-white`, `border-2`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `hover:bg-indigo-50`, `hover:bg-red-50`, `hover:bg-slate-200`, `hover:border-indigo-400`, `text-center`
-- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `h-10`, `h-4`, `h-5`, `h-6`, `h-8`, `h-auto`, `hover:shadow-md`
+- **Renkler:** `bg-admin-accent`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-surface-3`, `border-2`, `border-admin-border`, `border-b`, `border-dashed`, `hover:bg-admin-accent`, `hover:bg-admin-danger`, `hover:bg-admin-surface-2`, `hover:border-admin-accent`, `text-admin-accent`, `text-admin-accent-fg`, `text-admin-danger`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `h-10`, `h-4`, `h-5`, `h-6`, `h-8`, `h-auto`, `hover:shadow-admin-md`
 - **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:` önekleri
 - **Yardımcı Sınıflar:** `${btnOutline`, `${cardClass`, `border`, `cursor-grab`, `editor`, `font-bold`, `font-medium`, `font-mono`, `group`, `group-hover:opacity-100`, `italic`, `json`, `mr-2`, `mt-8`, `opacity-0`

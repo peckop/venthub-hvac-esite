@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\QuickViewModal.tsx
-skeleton_hash: 5894fff46064d856
+source_path: C:\tmp\vh-altyapi-t165\src\components\QuickViewModal.tsx
+skeleton_hash: ef0cc8f1679fa187
 entity_hashes:
   func:QuickViewModal: debc62013d59b5ee
   func:handleAdd: 552a96581034d630
   overview: 42118afde1c67a0d
   style_tokens: a2ee6e23d34d3389
-generated_at: 2026-08-15T07:02:08Z
+generated_at: 2026-08-27T07:58:24Z
 ---
 
 ## Genel Bakış

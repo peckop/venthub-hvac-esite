@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ui\Pagination.tsx
-skeleton_hash: d26d24749b77852e
+source_path: C:\tmp\vh-altyapi-t165\src\components\ui\Pagination.tsx
+skeleton_hash: f3d1f5f7fcf61d1e
 entity_hashes:
   func:Pagination: d5dc6893f11dd914
   func:hrefFor: bb2c2d7ab62a390f
   overview: 60d8a3ff982f4f10
   style_tokens: f3a8db447437f6e3
-generated_at: 2026-08-25T08:46:10Z
+generated_at: 2026-08-27T08:33:38Z
 ---
 
 ## Genel Bakış

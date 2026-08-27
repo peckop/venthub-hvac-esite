@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ScrollLinkedProcess.tsx
-skeleton_hash: e46f34b3024a1c91
+source_path: C:\tmp\vh-altyapi-t165\src\components\ScrollLinkedProcess.tsx
+skeleton_hash: bebc24fc64229c88
 entity_hashes:
   func:ScrollLinkedProcess: 5a92a40886643dd7
   func:scrollTo: ee292d22ad2f3df1
   overview: a4bd4fd5da1416a4
   style_tokens: dffb84eddfacefbd
-generated_at: 2026-06-19T20:47:32Z
+generated_at: 2026-08-27T07:58:25Z
 ---
 
 ## Genel Bakış

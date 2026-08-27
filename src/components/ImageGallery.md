@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ImageGallery.tsx
-skeleton_hash: 701f6aa8838e4566
+source_path: C:\tmp\vh-altyapi-t165\src\components\ImageGallery.tsx
+skeleton_hash: 679ce7614ce0b1c8
 entity_hashes:
   func:ImageGallery: ed5cc2a855b5b9b8
   func:handleMouseLeave: 60d41c470a6d0032
   func:handleMouseMove: b68c1278669bcb7a
   overview: f4654744ad74eeea
   style_tokens: 01bec99debdcd366
-generated_at: 2026-06-14T22:50:17Z
+generated_at: 2026-08-27T07:55:25Z
 ---
 
 ## Genel Bakış

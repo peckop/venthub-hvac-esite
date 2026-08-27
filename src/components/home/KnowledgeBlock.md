@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\home\KnowledgeBlock.tsx
-skeleton_hash: 9affeb7dd103be98
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\KnowledgeBlock.tsx
+skeleton_hash: c9bbc4a9af1dd4b8
 entity_hashes:
   func:KnowledgeBlock: 7e6b19d8803336cc
   overview: 2af91bd05b5de4f2
   style_tokens: 45bee56ab9c18ab4
-generated_at: 2026-08-25T07:25:43Z
+generated_at: 2026-08-27T08:27:33Z
 ---
 
 ## Genel Bakış
@@ -122,8 +122,8 @@ Ana sayfadaki bilgi bloğunun render edilmesinden sorumludur. Çeviri sözlüğ�
 
 ## NODE ID STANDARD
 
-  file: KnowledgeBlock.tsx
-  function: KnowledgeBlock.tsx::KnowledgeBlock
+  file: src\components\home\KnowledgeBlock.tsx
+  function: src\components\home\KnowledgeBlock.tsx::KnowledgeBlock
 
 ---
 

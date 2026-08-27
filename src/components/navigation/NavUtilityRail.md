@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\navigation\NavUtilityRail.tsx
-skeleton_hash: 249a2a1c390a7168
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavUtilityRail.tsx
+skeleton_hash: 7d82cbf73b7651e3
 entity_hashes:
   func:NavUtilityRail: efe2f36f82cc6787
   overview: 25d3844473822124
   style_tokens: 66d394971c83165e
-generated_at: 2026-08-25T07:25:35Z
+generated_at: 2026-08-27T08:33:35Z
 ---
 
 ## Genel Bakış
@@ -77,8 +77,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: NavUtilityRail.tsx
-  function: NavUtilityRail.tsx::NavUtilityRail
+  file: src\components\navigation\NavUtilityRail.tsx
+  function: src\components\navigation\NavUtilityRail.tsx::NavUtilityRail
 
 ---
 

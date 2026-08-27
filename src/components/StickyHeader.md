@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\StickyHeader.tsx
-skeleton_hash: 7ab7639604b41bb6
+source_path: C:\tmp\vh-altyapi-t165\src\components\StickyHeader.tsx
+skeleton_hash: 62eb7d3cbf77d9a4
 entity_hashes:
   func:CategoryHubOverlaySkeleton: 09095f7c03bb95f0
   func:MegaMenuSkeleton: 43156bd7843421f5
   func:SearchOverlaySkeleton: 6695469d4cdbd037
   overview: 620cf1a29f42e258
   style_tokens: a87cdf58739596c8
-generated_at: 2026-08-25T07:24:39Z
+generated_at: 2026-08-27T07:58:32Z
 ---
 
 ## Genel Bakış
@@ -226,10 +226,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: StickyHeader.tsx
-  function: StickyHeader.tsx::SearchOverlaySkeleton
-  function: StickyHeader.tsx::MegaMenuSkeleton
-  function: StickyHeader.tsx::CategoryHubOverlaySkeleton
+  file: src\components\StickyHeader.tsx
+  function: src\components\StickyHeader.tsx::SearchOverlaySkeleton
+  function: src\components\StickyHeader.tsx::MegaMenuSkeleton
+  function: src\components\StickyHeader.tsx::CategoryHubOverlaySkeleton
 
 ---
 

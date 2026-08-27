@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\authority\TechnicalDrawingAuthority.tsx
-skeleton_hash: 30c0fb3816dcc3ca
+source_path: C:\tmp\vh-altyapi-t165\src\components\authority\TechnicalDrawingAuthority.tsx
+skeleton_hash: 455314ebd95a1753
 entity_hashes:
   func:TechnicalDrawingAuthority: 9e9ee1c4c520dae4
   overview: 644a3bf371af42f4
   style_tokens: b07a83f8b2a17b2b
-generated_at: 2026-08-25T07:25:27Z
+generated_at: 2026-08-27T08:25:02Z
 ---
 
 ## Genel Bakış
@@ -93,8 +93,8 @@ Teknik çizim verilerini alıp yetki/otorite bağlamında bir arayüz sunan bile
 
 ## NODE ID STANDARD
 
-  file: TechnicalDrawingAuthority.tsx
-  function: TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
+  file: src\components\authority\TechnicalDrawingAuthority.tsx
+  function: src\components\authority\TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\StrategicBrands.tsx
-skeleton_hash: 6988c29fc80f9eda
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\StrategicBrands.tsx
+skeleton_hash: eebb4f2036325e5d
 entity_hashes:
   func:StrategicBrands: cf2c83a7b060b93b
   overview: 3329d9ad42f18a85
   style_tokens: 908950a4b058f189
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T08:27:35Z
 ---
 
 ## Genel Bakış  

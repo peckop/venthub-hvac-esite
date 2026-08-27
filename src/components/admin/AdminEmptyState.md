@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\AdminEmptyState.tsx
-skeleton_hash: 50b2a7d404cdb102
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\AdminEmptyState.tsx
+skeleton_hash: d306595fdf338de8
 entity_hashes:
   func:AdminEmptyState: 5a155dec87c91466
   overview: a8e9e23763cc1b0a
   style_tokens: 8ca6f8dd6c625d35
-generated_at: 2026-08-25T07:24:16Z
+generated_at: 2026-08-27T07:58:39Z
 ---
 
 ## Genel Bakış
@@ -91,8 +91,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: AdminEmptyState.tsx
-  function: AdminEmptyState.tsx::AdminEmptyState
+  file: src\components\admin\AdminEmptyState.tsx
+  function: src\components\admin\AdminEmptyState.tsx::AdminEmptyState
 
 ---
 

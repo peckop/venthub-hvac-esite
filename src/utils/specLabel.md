@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\specLabel.ts
-skeleton_hash: 2d7cac962aa06945
+source_path: C:\tmp\vh-altyapi-t165\src\utils\specLabel.ts
+skeleton_hash: 9c9f459604f8758e
 entity_hashes:
   func:humanizeSpecKey: 92b6a2883d350cb4
   func:isUnresolved: 9b9c86faed2da559
@@ -11,7 +11,7 @@ entity_hashes:
   func:specGroupLabel: 8b1dd350bdc82961
   func:titleCaseWord: 4c89297ad2712bb0
   overview: ec228b8d5ad8552f
-generated_at: 2026-08-25T08:45:18Z
+generated_at: 2026-08-27T08:40:02Z
 ---
 
 ## Genel Bakış
@@ -141,10 +141,10 @@ graph TD
     specLabel_ts__specFieldLabel["specFieldLabel"]
     specLabel_ts__specGroupLabel["specGroupLabel"]
     specLabel_ts__titleCaseWord["titleCaseWord"]
-    specLabel_ts__specFieldLabel --> specLabel_ts__isUnresolved
-    specLabel_ts__specFieldLabel --> specLabel_ts__humanizeSpecKey
-    specLabel_ts__specGroupLabel --> specLabel_ts__isUnresolved
     specLabel_ts__specGroupLabel --> specLabel_ts__humanizeSpecKey
+    specLabel_ts__specFieldLabel --> specLabel_ts__isUnresolved
+    specLabel_ts__specGroupLabel --> specLabel_ts__isUnresolved
+    specLabel_ts__specFieldLabel --> specLabel_ts__humanizeSpecKey
 ```
 
 ## NODE ID STANDARD

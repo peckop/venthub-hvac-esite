@@ -2,46 +2,68 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx
-skeleton_hash: d63c221ac89c815d
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryTable.tsx
+skeleton_hash: 471ba8f68e9e2696
 entity_hashes:
-  func:InventoryTable: 5588b8e97a6e44fb
-  overview: 0718ce22af046921
-  style_tokens: 4bf1cdbb52b9f224
-generated_at: 2026-06-16T10:18:09Z
+  func:InlineTextCell: 5304bf2790be654c
+  func:InventoryTable: 47104fbf154e4f0b
+  overview: b60b77faa900de78
+  style_tokens: 08a203db630b73af
+generated_at: 2026-08-27T08:06:24Z
 ---
 
 ## Genel Bakış
-InventoryTable, yönetim panelinde envanter verilerini düzenli bir tablo formatında sergileyen React bileşenidir. Yüklenme, hata ve boş veri durumlarını akıllıca yöneterek kullanıcıya kesintisiz bir deneyim sunar ve satır seçimleri ile sütun görünürlüğü üzerinden etkileşim imkanı sağlar.
+Bu modül, yönetim panelinde envanter verilerini tablo formatında gösteren ve tablo içindeki metin hücresi bileşenini sağlayan bir React bileşenidir. Yüklenme, hata ve boş veri durumlarını yöneterek kullanıcıya kesintisiz bir deneyim sunar ve satır seçimleri ile sütun görünürlüğü üzerinden etkileşim imkanı sağlar.
 
 ## Fonksiyon Grupları
+### Hücre Bileşenleri
+Tablo içindeki metin hücresini, istenen genişlik, etiket ve yer tutucu ile render eder.
+- InlineTextCell
+
 ### Veri Görselleştirme ve Tablo Yapısı
-Gelen envanter satırlarını ve görünür sütun tanımlarını alarak tablo başlıklarını, satır satırlarını ve hücre düzenini oluşturur. Temel render sorumluluğu bu grup tarafından üstlenilir.
+Gelen envanter satırlarını ve görünür sütun tanımlarını alarak tablo başlıklarını, satır satırlarını ve hücre düzenini oluşturur.
 - InventoryTable
 
 ### Durum Yönetimi ve Koşullu Gösterim
-Yüklenme süreci, hata oluşumu veya verinin hiç bulunmaması gibi durumları kontrol ederek uygun arayüz mesajlarını veya göstergelerini tablonun önüne veya yerine render eder.
+Yüklenme süreci, hata oluşumu veya verinin hiç bulunmaması gibi durumları kontrol ederek uygun arayüz mesajlarını veya göstergelerini render eder.
 - InventoryTable
 
 ### Etkileşim Koordinasyonu
-Kullanıcı tarafından yapılan satır seçimlerini ve sütun görünürlük tercihlerini üst bileşenlere iletmek üzere yönetir; bu sayede tablonun durumu uygulama geneliyle senkronize kalır.
+Kullanıcı tarafından yapılan satır seçimlerini ve sütun görünürlük tercihlerini üst bileşenlere iletmek üzere yönetir.
 - InventoryTable
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu bir React bileşeni (InventoryTable) olup, belirli prop'ların varlığı ve tipleri üzerine kuruludur. Aşağıdaki aksiyomlar, fonksiyon imzasından çıkarılmıştır.
 
-[Aksiyom 1]: Eğer `rows` prop'u verilmemiş veya `undefined` ise, bileşen tabloyu hiçbir satır göstermeden render eder veya `loading`/`error` durumuna göre davranır.
-[Aksiyom 2]: Eğer `loading` prop'u `true` değilse (veya `undefined` ise), bileşen yükleme göstergesini render etmez.
-[Aksiyom 3]: Eğer `error` prop'u `undefined` veya `null` ise, bileşen hata mesajını göstermez.
-[Aksiyom 4]: Eğer `selected` prop'u bir `Set` veya `Array` içermiyorsa (veya `undefined` ise), bileşen hiçbir satırı seçili olarak işaretleyemez.
-[Aksiyom 5]: Eğer `visibleCols` prop'u geçerli bir sütun listesi içermiyorsa (veya `undefined` ise), bileşen tüm potansiyel sütunları (veri yapısından çıkarılarak) veya hiçbirini gösteremeyebilir.
-[Aksiyom 6]: Eğer `den` prop'u `InventoryTableProps` arayüzüne uymayan bir değer ise, TypeScript çalışma zamanında hata verebilir veya bileşen beklenmedik davranış sergileyebilir.
+**[Aksiyom 1]**: Eğer `table` prop'u sağlanmazsa, `InventoryTable` bileşeni tablo verisini render edemez.
+
+**[Aksiyom 2]**: Eğer `hasWriteAccess` prop'u sağlanmazsa, bileşen yazma izni durumunu belirleyemez ve düzenleme tetikleyicilerinin görünürlüğü/erişilebilirliği bilinmiyor.
+
+**[Aksiyom 3]**: Eğer `onUpdateLocation` callback'i sağlanmazsa, konum güncelleme işlemi tetiklenemez.
+
+**[Aksiyom 4]**: Eğer `onUpdateSupplier` callback'i sağlanmazsa, tedarikçi güncelleme işlemi tetiklenemez.
+
+**[Aksiyom 5]**: Eğer `InlineTextCell` bileşenine `value` prop'u sağlanmazsa, hücre içeriği gösterilemez; sağlanan `placeholder` değeri yoksa `'-'` kullanılır.
+
+**[Aksiyom 6]**: Eğer `InlineTextCell` bileşenine `widthClass` prop'u sağlanmazsa, hücre genişleme sınıfı bilinmiyor.
+
+**[Aksiyom 7]**: Eğer `InlineTextCell` bileşenine `ariaLabel` prop'u sağlanmazsa, ekran okuyucu etiketi bilinmiyor.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### InlineTextCell
+**Ne yapar**: Satır içi metin düzenleme hücresi olarak kullanılan bir React bileşenidir. Verilen değeri görüntüler ve kullanıcıya düzenleme imkanı sunar.
+**Nasıl yapar**: Gövde verilmediği için iç mantığı bilinmiyor.
+**Parametreler**:
+- value: string — Görüntülenecek veya düzenlenecek mevcut metin değeri
+- widthClass: string — Hücre genişliğini belirleyen CSS sınıfı
+- ariaLabel: string — Erişilebilirlik için ekran okuyucu etiketi
+- placeholder: string — Değer boşken gösterilecek yer tutucu metin (varsayılan: '-')
+- extraSpanClass: string — Ek CSS sınıfı (opsiyonel)
+**Dönüş**: React.FC<InlineTextCellProps> — InlineTextCellProps arayüzüne uygun props alan bir React fonksiyonel bileşeni döndürür.
 
 ### InventoryTable
 **Ne yapar**: Envanter tablosunu gösteren ana React bileşenidir. Stok verilerini, sıralama, gruplama, durum gösterimi ve düzenleme yetkisine göre düzenlenebilir hücrelerle birlikte sunar.
@@ -70,90 +92,91 @@ Bu bir React bileşeni (InventoryTable) olup, belirli prop'ların varlığı ve 
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../hooks/useDragScroll::useDragScroll
-- import: ../../types/inventory::Density
-- import: ../../types/inventory::InventoryRow
-- import: ../../types/inventory::LoadState
-- import: ../../types/inventory::SortKey
-- import: ../../types/inventory::VisibleCols
-- import: ../../utils/adminUi::adminTableCellClass
-- import: ../../utils/adminUi::adminTableHeadCellClass
+- import: ../../hooks/useAdminTable::type { UseAdminTableResult }
+- import: ../../types/inventory::type { InventoryRow }
 - import: ./AdminEmptyState::AdminEmptyState
-- import: ./AdminSkeleton::AdminSkeleton
-- import: ./EditableCell::EditableCell
-- import: ./InfoTooltip::InfoTooltip
+- import: ./data-table/DataTableKit::DataTableKit
+- import: ./data-table/types::type { AdminColumn }
 - import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::Pencil
 - import: lucide-react::SearchX
 - import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
 
 ---
 
 ## INTERFACES
 
 ### InventoryTableProps
-- `rows: InventoryRow[]`
-- `loading: LoadState`
-- `error: string`
-- `selected: InventoryRow | null`
-- `visibleCols: VisibleCols`
-- `density: Density`
-- `sortKey: SortKey`
-- `sortDir: 'asc' | 'desc'`
-- `groupByCategory: boolean`
-- `groupedRows: { _c_id: string | null; name: string; items: InventoryRow[] }[]`
-- `onSort: (key: SortKey) => void`
-- `onSelect: (r: InventoryRow) => void`
-- `onUpdateLocation: (_productId: string, val: string) => Promise<void>`
-- `onUpdateSupplier: (_productId: string, val: string) => Promise<void>`
+- `table: UseAdminTableResult<InventoryRowWithCategory>`
 - `hasWriteAccess: boolean`
-- `thresholdMap: Record<string, number | null>`
-- `defaultThreshold: number | null`
-- `effectiveThreshold: (_productId: string) => number | null`
+- `onUpdateLocation: (productId: string, val: string) => Promise<void>`
+- `onUpdateSupplier: (productId: string, val: string) => Promise<void>`
+- `onSelectRow?: (row: InventoryRowWithCategory) => void`
+
+### InlineTextCellProps
+- `value: string`
+- `widthClass: string`
+- `ariaLabel?: string`
+- `placeholder?: string`
+- `extraSpanClass?: string`
+- `onSave: (val: string) => Promise<void>`
+
+---
+
+## TYPE ALIASES
+
+### InventoryRowWithCategory
+```typescript
+type InventoryRowWithCategory = InventoryRow & {
+  category_id?: string | null
+  low_stock_threshold?: number | null
+}
+```
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: InventoryTable.tsx::InventoryTable
-- **params**: rows, loading, error, selected, visibleCols, density, sortKey, sortDir, groupByCategory, groupedRows, onSort, onSelect, onUpdateLocation, onUpdateSupplier, hasWriteAccess, thresholdMap, defaultThreshold, effectiveThreshold
+### [N1_NASIL] AST Pointer: src/components/admin/InventoryTable.tsx::InlineTextCell
+- **params**: `value`, `widthClass`, `ariaLabel`, `placeholder` (varsayılan: `'-'`), `extraSpanClass` (varsayılan: `''`), `onSave`
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, metinleri dil için kullanılır
-  - `dragScrollRef` — useDragScroll hook'undan gelen ref, sürükleme ile yatay kaydırma için kullanılır
-  - `headPad` — density compact ise tablo başlık hücresi için padding className'i
-  - `cellPad` — density compact ise tablo gövde hücresi için padding className'i
-  - `sortIndicator` — iç fonksiyon, sortKey ve sortDir'e göre sıralama göstergesi döndürür
-  - `statusBadge` — iç fonksiyon, InventoryRow'a göre durum rozeti döndürür
-  - `TableRow` — iç bileşen, tek bir tablo satırını render eder
-- **Dönüş**: JSX element (tablo yapısı)
+  - `editing` — `useState(false)` ile başlatılan boolean; düzenleme modunun açık/kapalı durumunu tutar
+  - `setEditing` — `editing` durumunu güncelleyen setter fonksiyonu
+  - `draft` — `useState(value)` ile başlatılan string; düzenleme sırasında kullanıcının yazdığı geçici değeri tutar
+  - `setDraft` — `draft` değerini güncelleyen setter fonksiyonu
+  - `inputRef` — `useRef<HTMLInputElement>(null)` ile oluşturulan referans; düzenleme modundayken input'a odaklanmak için kullanılır
+  - `commit` — `useCallback` ile oluşturulan async fonksiyon; `draft` değerini `value`'dan farklıysa `onSave` fonksiyonuna gönderir, hata durumunda `draft`'ı orijinal `value`'ya sıfırlar
+- **Dönüş**: JSX elementi — `editing` true ise input elementi, false ise tıklanabilir buton elementi döner
 
-### [N2_NASIL] AST Pointer: InventoryTable.tsx::sortIndicator
-- **params**: key
-- **ic_degiskenler**: (yok)
-- **Dönüş**: string (sıralama göstergesi karakteri veya boş string)
-
-### [N3_NASIL] AST Pointer: InventoryTable.tsx::statusBadge
-- **params**: r
+### [N2_NASIL] AST Pointer: src/components/admin/InventoryTable.tsx::InventoryTable
+- **params**: `table`, `hasWriteAccess`, `onUpdateLocation`, `onUpdateSupplier`, `onSelectRow`
 - **ic_degiskenler**:
-  - `net` — Ürünün mevcut stok miktarı (r.available_stock)
-  - `th` — Ürün için eşik değeri (effectiveThreshold fonksiyonu ile hesaplanır)
-  - `base` — Rozet için ortak CSS className'i
-- **Dönüş**: JSX element (span içinde durum rozeti)
-
-### [N4_NASIL] AST Pointer: InventoryTable.tsx::TableRow
-- **params**: r
-- **ic_degiskenler**: (yok, sadece parametre ve closure değişkenleri kullanılır)
-- **Dönüş**: JSX element (tr içinde tek satır)
+  - `t` — `useI18n()` hook'undan alınan çeviri fonksiyonu; tablo başlıkları, durum etiketleri ve metinler için kullanılır
+  - `statusBadge` — `useCallback` ile oluşturulan fonksiyon; `InventoryRowWithCategory` parametresi alır, `r.available_stock` ve `r.low_stock_threshold` değerlerine göre durum badge'i (depleted/critical/reserved/available) döndürür
+  - `net` — `statusBadge` içindeki `r.available_stock` değeri; mevcut stok miktarını tutar
+  - `th` — `statusBadge` içindeki `r.low_stock_threshold ?? 5` değeri; düşük stok eşiğini tutar, yoksa 5 kullanılır
+  - `base` — `statusBadge` içindeki CSS sınıf string'i; badge'in temel stilini tanımlar
+  - `columns` — `useMemo` ile oluşturulan `AdminColumn<InventoryRowWithCategory>[]` dizisi; tablo sütunlarını (name, physical, reserved, available, threshold, location, supplier, abc, days, status, detail) tanımlar
+  - `isWarning` — `columns` içindeki days sütununda kullanılan boolean; `r.days_until_empty` 7 veya altındaysa true olur
+- **Dönüş**: `DataTableKit` JSX elementi — `columns`, `table`, `rowId`, `persistKey`, `hasWriteAccess`, `totalLabel`, `emptyState`, `filterEmptyState`, `columnsButtonLabel` props'ları ile render edilir
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\components\admin\InventoryTable.tsx
+  function: src\components\admin\InventoryTable.tsx::InlineTextCell
   function: src\components\admin\InventoryTable.tsx::InventoryTable
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: InlineTextCell
   export: InventoryTable
 
 ---
@@ -164,10 +187,10 @@ Bu bir React bileşeni (InventoryTable) olup, belirli prop'ların varlığı ve 
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `shadow-glow-sm`, `tracking-hvac-normal`, `tracking-hvac-relaxed`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500/10`, `bg-blue-500/10`, `bg-cyan-400`, `bg-cyan-500/5`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-slate-500/10`, `bg-transparent`, `bg-white/2`, `border-amber-500/20`, `border-b`, `border-b-0`, `border-blue-500/20`, `border-emerald-500/20`, `border-rose-500/20`
-- **Layout:** `backdrop-blur-xl`, `block`, `flex`, `flex-col`, `gap-1`, `gap-3`, `h-4`, `h-6`, `inline-flex`, `items-center`, `justify-center`, `justify-end`, `max-w-120px`, `min-w-1000px`, `overflow-x-auto`
-- **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `last:` önekleri
-- **Yardımcı Sınıflar:** `${base`, `${density`, `${r.abc_class`, `${r.days_until_empty`, `7`, `:`, `<=`, `===`, `A`, `B`, `animate-pulse`, `border`, `compact`, `content-auto-table`, `cursor-pointer`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-bg`, `bg-admin-danger-weak`, `bg-admin-success-weak`, `bg-admin-surface-2`, `bg-admin-surface-3`, `bg-admin-warning-weak`, `border-2`, `border-admin-accent/30`, `border-admin-border`, `border-admin-danger/30`, `border-admin-success/30`, `border-admin-warning/30`, `group-hover/btn:text-admin-accent`, `group-hover:text-admin-accent`
+- **Layout:** `block`, `flex`, `flex-col`, `flex-shrink-0`, `gap-1.5`, `h-6`, `inline-block`, `inline-flex`, `items-center`, `justify-center`, `relative`, `shadow-admin-sm`, `w-6`, `zoom-in`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover/btn:`, `group-hover:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${adminSupplierMaxWidthClass`, `${base`, `${extraSpanClass`, `${widthClass`, `:`, `===`, `A`, `B`, `animate-in`, `animate-pulse`, `border`, `duration-300`, `fade-in`, `focus-visible:outline-none`

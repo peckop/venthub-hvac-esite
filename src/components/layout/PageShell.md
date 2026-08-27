@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\layout\PageShell.tsx
-skeleton_hash: a57a4d0cf068f731
+source_path: C:\tmp\vh-altyapi-t165\src\components\layout\PageShell.tsx
+skeleton_hash: 4b8ac5f54e92c6ba
 entity_hashes:
   overview: 09c986d2dcf8a577
   style_tokens: f9c95184ddfe4989
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T08:30:37Z
 ---
 
 ## Genel Bakış

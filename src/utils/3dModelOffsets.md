@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\3dModelOffsets.ts
-skeleton_hash: b3a408f47684b4ab
+source_path: C:\tmp\vh-altyapi-t165\src\utils\3dModelOffsets.ts
+skeleton_hash: 4c54120c8509f808
 entity_hashes:
   func:getModelPlacement: 52ef620921a90fe6
   overview: ed4492b80664afe2
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:36:27Z
 ---
 
 ## Genel Bakış

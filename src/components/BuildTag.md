@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\BuildTag.tsx
-skeleton_hash: 859d858d16b6a190
+source_path: C:\tmp\vh-altyapi-t165\src\components\BuildTag.tsx
+skeleton_hash: 7547c525b9d867e1
 entity_hashes:
   func:BuildTag: 33fa67732a403b49
   overview: 5afd4a9c8d0105c9
   style_tokens: 9c295aa26dd24226
-generated_at: 2026-06-14T22:16:15Z
+generated_at: 2026-08-27T07:53:06Z
 ---
 
 ## Genel Bakış

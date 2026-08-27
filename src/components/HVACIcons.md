@@ -2,45 +2,47 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx
-skeleton_hash: ab3c3407e866ff6d
+source_path: C:\tmp\vh-altyapi-t165\src\components\HVACIcons.tsx
+skeleton_hash: 24a1beac0c200721
 entity_hashes:
   func:AccessoriesIcon: df362ba93a01a32a
   func:AirCurtainIcon: a991d6630fad3258
   func:AirPurifierIcon: 6d358290affcacb3
-  func:BrandIcon: abc1dbe6a42bf303
+  func:BrandIcon: 32c622c7ba9e80d1
   func:DehumidifierIcon: 40d30033e6855f3e
   func:FanIcon: 4fb3ddee9fac4362
   func:FlexibleDuctIcon: 252d34888f5ec8da
   func:HeatRecoveryIcon: 821f62398bcddd32
   func:SpeedControlIcon: dbb6f424f34e3326
   func:WhatsAppIcon: e7d41d76023d8693
-  overview: dff8b3ed99dcf496
+  overview: a08df0c2672d5abc
   style_tokens: 3b0534c287cddb44
-generated_at: 2026-06-14T22:50:17Z
+generated_at: 2026-08-27T07:55:24Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC sistemleriyle ilgili çeşitli ekipmanları ve bazı ortak kullanım amaçlı sembolleri temsil eden SVG tabanlı React ikon bileşenlerini toplar. Her bir fonksiyon, belirtilen boyut ve stil seçenekleriyle özelleştirilebilir bir ikon döndürerek arayüzde görsel eşleştirmeyi kolaylaştırır.
+Bu modül, HVAC sistemleriyle ilişkili ekipmanları ve bazı genel amaçlı sembolleri temsil eden SVG tabanlı React ikon bileşenlerini içerir. Her bileşen, boyut ve sınıf adı gibi özelleştirilebilir özellikler alarak arayüzde görsel eşleştirmeyi kolaylaştırır.
 
 ## Fonksiyon Grupları
 ### HVAC Ekipman İkonları
-HVAC sistemlerinin temel bileşenlerini görselleştirmek için kullanılan ikonlar burada yer alır; fan, ısı geri kazanımı, havalama perdeleri, nemlendirici, hava temizleyici, esnek kanal, hız kontrolü ve aksesuar gibi işlevleri temsil eder.
+Bu grup, HVAC sistemlerinin temel bileşenlerini görselleştiren ikonları içerir. Fan, ısı geri kazanımı, havalama perdesi, nemlendirici, hava temizleyici, esnek kanal, hız kontrolü ve aksesuar gibi işlevleri temsil eder.
 - FanIcon, HeatRecoveryIcon, AirCurtainIcon, DehumidifierIcon, AirPurifierIcon, FlexibleDuctIcon, SpeedControlIcon, AccessoriesIcon
 
 ### Ortak Kullanım İkonları
-Modülün geri kalan kısmı, sosyal medya bağlantıları ve marka gösterimi gibi genel amaçlı ihtiyaçlara hizmet eden basit ikonları içerir; bu sayede arayüzde tutarlı bir görsel dil sağlanır.
+Bu grup, sosyal medya ve marka gösterimi gibi genel amaçlı ikonları içerir. Arayüzde tutarlı bir görsel dil sağlamak için kullanılır.
 - WhatsAppIcon, BrandIcon
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, prop tiplerinin ve varsayılan değerlerinin beklendiği şekilde sağlandığını varsayar.
 
-[Aksiyom 1]: Eğer className prop'ı string değilse, component sınıf adı uygulanamayabilir ve stil hatası oluşabilir.  
-[Aksiyom 2]: Eğer size prop'ı sayı değilse, CSS boyutu geçersiz olur ve ikon beklenmedik şekilde render edilebilir.  
-[Aksiyom 3]: Eğer WhatsAppIcon'ın size prop'ı sağlanmazsa, varsayılan 24 kullanılır; ancak bu değerin sayı olmaması durumunda yukarıdaki aksiyom geçerlidir.  
-[Aksiyom 4]: Eğer BrandIcon'ın brand prop'ı sağlanmazsa veya tanımsız ise, component doğru şekilde render edilemez (brand eksikliği nedeniyle görüntülenemez).
+[Aksiyom 1]: Eğer `size` parametresi verilmezse, `FanIcon`, `HeatRecoveryIcon`, `AirCurtainIcon`, `DehumidifierIcon`, `AirPurifierIcon`, `FlexibleDuctIcon`, `SpeedControlIcon` ve `AccessoriesIcon` bileşenleri için 48, `WhatsAppIcon` bileşeni için 24 varsayılan değer olarak kullanılır.
+
+[Aksiyom 2]: Eğer `className` parametresi verilmezse, tüm ikon bileşenleri için boş string (`''`) varsayılan değer olarak kullanılır.
+
+[Aksiyom 3]: Eğer `BrandIcon` bileşeninde `brand` parametresi verilmezse, bileşen düzgün çalışamaz çünkü bu parametre zorunludur ve varsayılan değeri yoktur.
+
+[Aksiyom 4]: Eğer `IconProps` tipi tanımlı değilse, `FanIcon`, `HeatRecoveryIcon`, `AirCurtainIcon`, `DehumidifierIcon`, `AirPurifierIcon`, `FlexibleDuctIcon`, `SpeedControlIcon`, `AccessoriesIcon` ve `WhatsAppIcon` bileşenlerinin dönüş tipi tanımsız kalır ve TypeScript derleme hatası oluşur.
 
 ---
 
@@ -122,12 +124,15 @@ Bu modül, prop tiplerinin ve varsayılan değerlerinin beklendiği şekilde sa�
 **Dönüş**: `React.FC<IconProps>`; WhatsApp logosunu gösteren fonksiyonel bileşen.
 
 ### BrandIcon
-**Ne yapar**: Verilen `brand` parametresine göre ilgili marka logosunu render eden dinamik bir ikon bileşeni sağlar.  
-**Nasıl yapar**: `brand` string değerine göre önceden tanımlanmış marka SVG’lerinden uygun olanı seçer, `className` prop’sunu bu SVG’nin stiline uygular ve ekrana basar.  
+**Ne yapar**: Verilen `brand` parametresine göre ilgili markaya ait ikonu render eden bir React fonksiyonel bileşenidir. HVAC (Isıtma, Havalandırma, İklimlendirme) sistemiyle ilişkili markaların ikonlarını göstermek amacıyla kullanılır.
+
+**Nasıl yapar**: Fonksiyon, aldığı `brand` ve `className` parametrelerini kullanarak bir React bileşeni döndürür. Bileşen, `brand` değerine karşılık gelen marka ikonunu belirtilen CSS sınıfıyla birlikte görüntüler. Varsayılan olarak `className` boş string olarak atanmıştır, böylece dışarıdan bir sınıf belirtilmediğinde bileşen hata vermeden çalışır. Dosya yolu `HVACIcons.tsx` olduğundan, bu bileşenin HVAC ikonları koleksiyonunun bir parçası olduğu anlaşılmaktadır.
+
 **Parametreler**:
-- brand: string — Gösterilecek markanın adı; bu değere göre ilgili logo seçilir.  
-- className: string (opsiyonel) — Ekstra stil sınıfları eklemek için kullanılır, varsayılan boş string.  
-**Dönüş**: `React.FC<{ brand: string; className?: string }>`; marka logosunu gösteren fonksiyonel bileşen.
+- `brand`: `string` — Görüntülenecek markanın adını belirtir. Hangi markaların desteklendiği kaynak kodda tanımlı marka listesine bağlıdır.
+- `className`: `string` (varsayılan: `''`) — Bileşenin kök elemanına uygulanacak isteğe bağlı CSS sınıf adıdır. Belirtilmediğinde boş string kullanılır.
+
+**Dönüş**: `React.FC<{ brand: string; className?: string }>` — Verilen `brand` ve `className` prop'larını kabul eden bir React fonksiyonel bileşeni döndürür. Dönen bileşen, marka ikonunu DOM'a yerleştirir.
 
 ---
 
@@ -147,79 +152,59 @@ Bu modül, prop tiplerinin ve varsayılan değerlerinin beklendiği şekilde sa�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::FanIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N1_NASIL] AST Pointer: src/components/HVACIcons.tsx::FanIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (fan ikonu, dairesel kanatlar ve merkez nokta)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::HeatRecoveryIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N2_NASIL] AST Pointer: src/components/HVACIcons.tsx::HeatRecoveryIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (ısı geri kazanım ünitesi, mavi ve turuncu oklar, HRV_LABEL metni)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::AirCurtainIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N3_NASIL] AST Pointer: src/components/HVACIcons.tsx::AirCurtainIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (hava perdesi, dikey çizgiler ve eğik hava akışı)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::DehumidifierIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N4_NASIL] AST Pointer: src/components/HVACIcons.tsx::DehumidifierIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (nem alıcı, su damlacıkları ve gösterge çubukları)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::AirPurifierIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N5_NASIL] AST Pointer: src/components/HVACIcons.tsx::AirPurifierIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (hava temizleyici, filtre katmanları ve hava akışı)
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::FlexibleDuctIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N6_NASIL] AST Pointer: src/components/HVACIcons.tsx::FlexibleDuctIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (esnek kanal, dalgalı boru ve bağlantı noktaları)
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::SpeedControlIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N7_NASIL] AST Pointer: src/components/HVACIcons.tsx::SpeedControlIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (hız kontrolü, kadran ve RPM_LABEL metni)
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::AccessoriesIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N8_NASIL] AST Pointer: src/components/HVACIcons.tsx::AccessoriesIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (aksesuar, dişli çark ve bağlantı parçaları)
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::WhatsAppIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut (varsayılan 24)
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N9_NASIL] AST Pointer: src/components/HVACIcons.tsx::WhatsAppIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 24)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (WhatsApp logosu, beyaz dolgulu)
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::BrandIcon
-- **params**: brand, className
+### [N10_NASIL] AST Pointer: src/components/HVACIcons.tsx::BrandIcon
+- **params**: `brand`, `className` (varsayılan: '')
 - **ic_degiskenler**:
-  - `brand` — görüntülenecek markanın adı; lowercase versiyonu için `normalizedBrand` hesaplanır ve `<img>` alt metni olarak kullanılır
-  - `className` — dış öğeye (img veya fallback div) uygulanacak ek stil sınıfı
-  - `normalizedBrand` — `brand` küçük harfe çevrilmiş hali; marka eşleştirmesinde switch case’de kullanılır
-  - `basePath` — marka görsellerinin bulunduğu sabit yol (`/images/ekran`)
-  - `src` — seçilen markaya göre oluşturulan tam görsel URL’si; `<img>` öğesinin src özelliğine aktarılır
-  - `alt` — `<img>` öğesinin alt özelliği; erişilebilirlik için marka adıyla doldurulur
-- **Dönüş**: JSX elementi (React.FC<{ brand: string; className?: string }>) – marka görseli veya fallback metni döner.
+  - `normalizedBrand` — `brand.toLowerCase()` ile marka adının küçük harfe dönüştürülmüş hali
+  - `basePath` — '/images/ekran' sabit dizin yolu, marka görsellerinin bulunduğu klasör
+  - `src` — switch-case ile belirlenen marka görselinin dosya yolu (avens.svg, vortic.jpg, casals.png, nicotra.webp, flexiva.png)
+  - `alt` — `brand` parametresinin kendisi, erişilebilirlik için alternatif metin
+- **Dönüş**: JSX — Eşleşen marka varsa `Image` bileşeni içeren div; eşleşmezse marka adını gösteren fallback div
 
 ---
 

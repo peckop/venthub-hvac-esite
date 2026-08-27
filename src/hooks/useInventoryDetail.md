@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useInventoryDetail.ts
-skeleton_hash: fa74620e6ff72d0e
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useInventoryDetail.ts
+skeleton_hash: d5b8332d884ba108
 entity_hashes:
   func:useInventoryDetail: 6339f8150a38b023
   overview: 4c4c791d580870aa
-generated_at: 2026-08-24T12:47:22Z
+generated_at: 2026-08-27T08:35:43Z
 ---
 
 ## Genel Bakış

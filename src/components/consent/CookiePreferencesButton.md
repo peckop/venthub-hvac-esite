@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\consent\CookiePreferencesButton.tsx
-skeleton_hash: 368eedf8109b760b
+source_path: C:\tmp\vh-altyapi-t165\src\components\consent\CookiePreferencesButton.tsx
+skeleton_hash: 61dce46da54a3d65
 entity_hashes:
   func:CookiePreferencesButton: b7fd821936e37c45
   overview: b711f3b17cd72e7a
   style_tokens: f9b2fe95f9e414a2
-generated_at: 2026-08-25T08:43:35Z
+generated_at: 2026-08-27T08:26:31Z
 ---
 
 ## Genel Bakış

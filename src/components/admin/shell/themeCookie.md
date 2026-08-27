@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\shell\themeCookie.ts
-skeleton_hash: 2c7c17fe1487aba8
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\shell\themeCookie.ts
+skeleton_hash: b2a80515a98dda99
 entity_hashes:
   func:adminThemeCookieName: 1a1e272b635e1209
   func:parseAdminTheme: 9536bc7f12912b75
   func:serializeAdminTheme: 435f2c545db53218
   overview: aa8fce602e3b1c9d
-generated_at: 2026-08-15T18:15:44Z
+generated_at: 2026-08-27T08:23:59Z
 ---
 
 ## Genel Bakış
@@ -111,26 +111,6 @@ type AdminThemeResolved = 'light' | 'dark'
 - **params**: `tenantId: string` — tenant tanımlayıcısı, cookie adının bir parçası olarak kullanılır
 - **ic_degiskenler**: (yok)
 - **Dönüş**: Template literal `` `vh_admin_theme_${tenantId}` `` — tenant'a özel cookie adı döndürür
-
----
-
-### [N2_NASIL] AST Pointer: `src/components/admin/shell/themeCookie.ts::serializeAdminTheme`
-- **params**:
-  - `preference: AdminThemePreference` — kullanıcının tema tercihi (light/dark/system)
-  - `resolved: AdminThemeResolved` — sonucu çözülmüş tema değeri (light/dark)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: Template literal `` `${preference}:${resolved}` `` — iki değeri `:` ile birleştirerek cookie değeri üretir
-
----
-
-### [N3_NASIL] AST Pointer: `src/components/admin/shell/themeCookie.ts::parseAdminTheme`
-- **params**: `raw: string | undefined` — cookie'den okunan ham değer, tanımsız olabilir
-- **ic_degiskenler**:
-  - `[rawPreference, rawResolved]` — `raw` değerinin (boş stringe fallback ile) `:` karakteriyle split edilmesiyle elde edilen destructured array; `rawPreference` tercihi, `rawResolved` ise çözülmüş değeri tutar
-  - `preference: AdminThemePreference` — `rawPreference`'ın `light`, `dark` veya `system` olup olmadığına göre doğrulanmış tema tercihi; geçersizse `ADMIN_THEME_DEFAULT` sabitine düşer
-  - `resolvedFromCookie: AdminThemeResolved | null` — `rawResolved`'ın `light` veya `dark` olup olmadığına göre çözülmüş değer ya da `null`
-  - `resolved: AdminThemeResolved` — nihai çözülmüş tema; `preference === 'system'` ise `resolvedFromCookie` (yoksa `ADMIN_THEME_RESOLVED_DEFAULT`) kullanılır, değilse `preference`'ın kendisi döndürülür
-- **Dönüş**: `{ preference, resolved }` — `ParsedAdminTheme` nesnesi döndürür
 
 ---
 

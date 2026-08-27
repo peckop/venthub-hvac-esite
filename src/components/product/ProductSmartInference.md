@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\product\ProductSmartInference.tsx
-skeleton_hash: 3e5ac46b64ccf9d2
+source_path: C:\tmp\vh-altyapi-t165\src\components\product\ProductSmartInference.tsx
+skeleton_hash: 259d92c86d966700
 entity_hashes:
   overview: 18fbc67e6ef24df1
   style_tokens: 14ff5ff1bd6a1a02
-generated_at: 2026-08-25T07:25:43Z
+generated_at: 2026-08-27T08:33:37Z
 ---
 
 ## Genel Bakış
@@ -85,7 +85,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: ProductSmartInference.tsx
+  file: src\components\product\ProductSmartInference.tsx
 
 ---
 

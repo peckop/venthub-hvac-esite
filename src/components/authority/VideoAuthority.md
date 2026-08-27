@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\authority\VideoAuthority.tsx
-skeleton_hash: 6e7afa0385d107da
+source_path: C:\tmp\vh-altyapi-t165\src\components\authority\VideoAuthority.tsx
+skeleton_hash: bcadf1275c56c367
 entity_hashes:
   func:VideoAuthority: b42d8a27d95a4ea9
   overview: 931e142b761ac254
   style_tokens: ee9eb5151ad04adf
-generated_at: 2026-08-25T07:25:24Z
+generated_at: 2026-08-27T08:25:41Z
 ---
 
 ## Genel Bakış
@@ -102,8 +102,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: VideoAuthority.tsx
-  function: VideoAuthority.tsx::VideoAuthority
+  file: src\components\authority\VideoAuthority.tsx
+  function: src\components\authority\VideoAuthority.tsx::VideoAuthority
 
 ---
 

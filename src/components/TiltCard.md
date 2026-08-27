@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\TiltCard.tsx
-skeleton_hash: e464bc12b052721a
+source_path: C:\tmp\vh-altyapi-t165\src\components\TiltCard.tsx
+skeleton_hash: 8ea03e519fc57455
 entity_hashes:
   func:TiltCard: bfd1d2a43ccba8c3
   func:clamp: 6b6f2a3bb4b3c92e
@@ -12,7 +12,7 @@ entity_hashes:
   func:onMove: 855a2394d5f31485
   overview: 49812a020a38dab5
   style_tokens: 9c70068ed275c69c
-generated_at: 2026-08-25T07:24:24Z
+generated_at: 2026-08-27T07:58:33Z
 ---
 
 ## Genel Bakış
@@ -153,12 +153,12 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: TiltCard.tsx
-  function: TiltCard.tsx::clamp
-  function: TiltCard.tsx::TiltCard
-  function: TiltCard.tsx::onMove
-  function: TiltCard.tsx::onEnter
-  function: TiltCard.tsx::onLeave
+  file: src\components\TiltCard.tsx
+  function: src\components\TiltCard.tsx::clamp
+  function: src\components\TiltCard.tsx::TiltCard
+  function: src\components\TiltCard.tsx::onMove
+  function: src\components\TiltCard.tsx::onEnter
+  function: src\components\TiltCard.tsx::onLeave
 
 ---
 
