@@ -232,6 +232,7 @@ try {
     if (okunan && Array.isArray(okunan.yollar)) {
       taban = {
         surum: Number(okunan.surum) || 1,
+        ts: Number(okunan.ts) || 0,
         yollar: okunan.yollar,
         bildirilen: Array.isArray(okunan.bildirilen) ? okunan.bildirilen : [],
       }
@@ -247,7 +248,9 @@ const tabanYaz = (bildirilen) => {
     const gecici = TABAN_YOLU + '.tmp'
     fs.writeFileSync(
       gecici,
-      JSON.stringify({ surum: 2, sid, yollar: simdiki.map((s) => s.anahtar), bildirilen }),
+      // `ts` (surum 3): tabanin YAZILDIGI an. Bkz. aşağıdaki pencere ayrımı — bu damga
+      // olmadan "senin Bash'in yazdı" ile "sen yokken oldu" ayırt EDİLEMEZ.
+      JSON.stringify({ surum: 3, sid, ts: Date.now(), yollar: simdiki.map((s) => s.anahtar), bildirilen }),
       'utf8',
     )
     fs.renameSync(gecici, TABAN_YOLU)
@@ -280,7 +283,62 @@ if (taban.surum < 2) {
 }
 
 const tabanKume = new Set(taban.yollar)
-const yeniler = simdiki.filter((y) => !tabanKume.has(y.anahtar))
+const hamYeniler = simdiki.filter((y) => !tabanKume.has(y.anahtar))
+
+/**
+ * ⭐PENCERE AYRIMI (2026-08-28, REC-84) — ölçtüğüm şey ile İDDİA ETTİĞİM şey aynı olmalı.
+ *
+ * Bu kanca "taban kümesinde yoktu, şimdi var" ölçer. Alarmın metni ise "Bash SONRASI değişti"
+ * diyordu — bu bir NEDENSELLİK iddiasıdır ve ölçüm onu desteklemiyor. Taban dosyası
+ * (`.bash-audit-<sid>.json`) OTURUMLAR ARASI kalıcıdır: oturum kapalıyken doğan bir dosya,
+ * dönüşte "senin Bash'in yazdı" gibi görünür.
+ *
+ * ÖLÇÜLDÜ: bugün üç kez "üretim yolu kaçağı" diye alarm veren iki dosyanın
+ * (`build-skip-positive-logic.test.md`, `search-route-ssot.test.md`) mtime'ı BİR ÖNCEKİ
+ * GÜNDÜ. Süzgeç doğru çalışıyordu (`GIRDI 3 satir · CIKAN 1 yol`), üretim yolu kaçırmıyordu;
+ * yanlış olan alarmın cümlesiydi. İki şerit boşuna iş çıkardı.
+ *
+ * AYRIM: dosyanın mtime'ı tabanın yazıldığı andan ESKİYSE, o dosya bu pencerede doğmadı.
+ * Böyle kalemler ŞERİT SAHİBİNE ALARM OLARAK GİTMEZ — sessizce de yutulmaz, kendi
+ * satırlarıyla uyarı olarak basılır ve tabana alınır (bir daha ötmez).
+ *
+ * TOLERANS: taban yazımı ile dosya yazımı aynı saniyeye düşebilir; 2 sn'lik pay bırakıldı.
+ * Pay YÖNÜ bilinçli — şüpheli kalemi "bu pencerede" saymak yanlış-pozitif üretir, tersi
+ * yanlış-negatif; ikisi arasında yanlış-pozitifi seçiyoruz çünkü asıl ihlal SESSİZ KALMAMALI.
+ */
+const TOLERANS_MS = 2000
+const dosyaZamani = (y) => {
+  try {
+    return fs.statSync(path.resolve(y.agac, y.bagil)).mtimeMs
+  } catch {
+    return null // silinmiş/erişilemez: yaşını bilemeyiz, pencere İÇİ sayarız (sessiz kalmaktansa)
+  }
+}
+
+const bayatlar = []
+const yeniler = []
+for (const y of hamYeniler) {
+  const mt = taban.ts ? dosyaZamani(y) : null
+  if (taban.ts && mt !== null && mt < taban.ts - TOLERANS_MS) bayatlar.push({ ...y, mt })
+  else yeniler.push(y)
+}
+
+if (bayatlar.length) {
+  const bicim = (ms) => new Date(ms).toISOString().slice(0, 19).replace('T', ' ')
+  uyarilar.push(
+    '[bash-write-audit] PENCERE DISI ' + bayatlar.length + ' kalem — bu Bash cagrisinin ESERI DEGIL, ' +
+      'taban yazildigindan (' + bicim(taban.ts) + ') ONCE olusmuslar. Serit sahibine alarm GITMEDI:\n' +
+      bayatlar.map((b) => '  · ' + b.anahtar + '  (mtime ' + bicim(b.mt) + ')').join('\n') +
+      '\n  Sebep genellikle oturum araligi: taban dosyasi oturumlar arasi kalicidir.',
+  )
+}
+
+if (!taban.ts && hamYeniler.length) {
+  uyarilar.push(
+    '[bash-write-audit] taban ZAMAN DAMGASIZ (surum<3) — pencere ayrimi yapilamadi, ' +
+      hamYeniler.length + ' kalem "bu turda olustu" SAYILDI. Bir sonraki tur damgali olacak.',
+  )
+}
 
 if (!yeniler.length) {
   tabanYaz(taban.bildirilen)
@@ -357,8 +415,9 @@ for (const { claim, satirlar: laneSatirlar } of lanelereGore.values()) {
       type: 'note',
       to: hedef.to,
       text:
-        'OTOMATIK ALARM (bash-write-audit): Bash sonrasi SENIN SERIDINDEKI dosya(lar) benim ' +
-        'calisma agacimda degisti. Kasten olmamis olabilir ama SONUC ayni; haberin olsun diye yaziyorum.\n' +
+        'OTOMATIK ALARM (bash-write-audit): SENIN SERIDINDEKI dosya(lar) benim calisma ' +
+        'agacimda, BU BASH CAGRISININ PENCERESINDE degisti (dosya mtime > taban damgasi; ' +
+        'pencere disi kalemler bu alarma GIRMEZ). Kasten olmamis olabilir ama SONUC ayni.\n' +
         laneSatirlar.join('\n') +
         '\nBu, PreToolUse kapisinin GOREMEDIGI bir yazmadir: komut metninde hedef yoktu ' +
         '(ornek: node betik.cjs, ya da bir git kancasinin calistirdigi ureteci).',
@@ -370,7 +429,7 @@ for (const { claim, satirlar: laneSatirlar } of lanelereGore.values()) {
 
 uyariBas()
 process.stderr.write(
-  '[bash-write-audit] DIKIS YERI ALARMI — Bash sonrasi BASKA SERIDIN dosyalari degisti' +
+  '[bash-write-audit] DIKIS YERI ALARMI — BU PENCEREDE baska seridin dosyalari degisti' +
     (cokAgac ? ' (agac :: yol)' : '') + ':\n' +
     satirlar.join('\n') +
     '\n  Denetlenen agac(lar): ' + denetlenecek.join(', ') +
