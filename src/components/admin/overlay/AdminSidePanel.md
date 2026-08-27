@@ -2,64 +2,75 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\overlay\AdminSidePanel.tsx
-skeleton_hash: eee238a120b5f948
+source_path: C:\tmp\vh-comp\src\components\admin\overlay\AdminSidePanel.tsx
+skeleton_hash: fafed7bb5b970e49
 entity_hashes:
-  func:AdminSidePanel: 4fa559e400b39235
-  overview: 6fbb13f20fc2cbd1
+  func:AdminSidePanel: d6514db192d36644
+  overview: 058e6a8f16b4ade4
   style_tokens: 3e7eafac13f7d94a
-generated_at: 2026-08-15T18:39:59Z
+generated_at: 2026-08-27T04:12:17Z
 ---
 
 ## Genel Bakış
 
-AdminSidePanel, yöneticilik arayüzünde kullanılan kapalı panel (overlay) bileşenidir. Yan taraftan açılan, başlık, açıklama ve özelleştirilebilir kapat butonu içeren modal benzeri bir UI konteyneridir. İçeriğini `children` üzerinden alarak esnek bir yapı sunar.
+AdminSidePanel, yönetici arayüzünde kullanılan bir yan panel (overlay) bileşenidir. Yan taraftan açılıp kapanan, başlık, açıklama ve kapat butonu içeren modal benzeri bir UI konteyneridir. İçeriğini `children` prop'u aracılığıyla alır ve esnek bir yapı sunar.
 
 ## Fonksiyon Grupları
 
 ### Ana Bileşen
 
-Bileşen, panelin görünürlüğünü ve içeriğini yöneten ana UI unsurudur. Dışarıdan verilen `open` durumuna göre açılıp kapanır, kapatma işlemini üst bileşene bildirir.
+Panelin görünürlüğünü, başlık ve açıklama alanlarını, kapat butonunu ve içerik bölgesini yöneten ana UI unsurudur. Dışarıdan verilen `open` durumuna göre açılıp kapanır; kapatma işlemini `onClose` aracılığıyla üst bileşene bildirir.
 
-- `AdminSidePanel` — Props aracılığıyla panel durumunu, başlığını ve içerik alanını kontrol eden kapsayıcı bileşen.
+- AdminSidePanel
+
+## Mimari Varsayımlar
+
+- `open` prop'u `false` olduğunda panel kapalı görünür ve `onClose` çağrılmaz.
+- `open` prop'u `true` olduğunda panel açılır; `title` ve `description` prop'ları görünür olarak gösterilir.
+- `open` prop'u `true` iken kullanıcı overlay alanına tıklarsa veya ESC tuşuna basarsa `onClose` fonksiyonu çağrılır.
+- `title` prop'u verilmemişse panel başlığı boş görünür.
+- `description` prop'u verilmemişse açıklama bölümü boş görünür.
+- `closeLabel` prop'u verilmemişse varsayılan kapat butonu metni "Kapat" olarak görünür.
+- `children` prop'u verilmemişse veya boşsa panel içeriği boş görünür.
+- `open` prop'u `true` olduğunda bileşen DOM'da render edilir; `false` olduğunda DOM'dan kaldırılır veya gizlenir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, bir overlay tabanlı admin yan panelidir ve aşağıdaki mimari varsayımlara dayanır:
+Fonksiyon gövdesi verilmediği için yalnızca imzadan çıkarım yapılabilmektedir.
 
-[Aksiyom 1]: Eğer `open` prop'u `false` ise, modal kapalı görünür ve `onClose` çağrılmaz.
-[Aksiyom 2]: Eğer `open` prop'u `true` ise, modal açılır ve `title` ve `description` prop'ları görünür olarak gösterilir.
-[Aksiyom 3]: Eğer `open` prop'u `true` iken kullanıcı modal arka planına (overlay) tıklarsa veya ESC tuşuna basarsa, `onClose` fonksiyonu çağrılmalıdır.
-[Aksiyom 4]: Eğer `title` prop'u verilmemişse, panel başlığı boş görünür.
-[Aksiyom 5]: Eğer `description` prop'u verilmemişse, açıklama bölümü boş görünür.
-[Aksiyom 6]: Eğer `closeLabel` prop'u verilmemişse, varsayılan kapatma butonu metni "Kapat" olarak görünür.
-[Aksiyom 7]: Eğer `children` prop'u verilmemişse veya boşsa, panel içeriği boş görünür.
-[Aksiyom 8]: Bu modal bileşeni, `open` prop'u `true` olduğunda DOM'da render edilmelidir; `false` olduğunda DOM'dan kaldırılmalı veya gizlenmelidir.
-[Aksiyom 9]: `onClose` fonksiyonu her zaman çağrılabilir olmalıdır; bileşen kapatma işlemi sonrası bu callback'i tetikler.
-[Aksiyom 10]: Bu bileşen bir React functional component olarak tanımlıdır ve `React.ReactElement | null` döndürür.
-[Aksiyom 11]: Modal açıldığında (`open: true`), arka plan overlay'i karanlık yarı saydam olmalı ve modal content'i ön planda görünmelidir.
-[Aksiyom 12]: `title` ve `closeLabel` metinleri strings olmalıdır; sayısal veya diğer tipler verilirse bileşen hata verebilir veya garip davranabilir.
+[Aksiyom 1]: Eğer `open` prop'u sağlanmazsa, bileşenin null dönmesi beklenir; çünkü dönüş tipi `React.ReactElement | null` olarak tanımlıdır ve `open` durumu panelin görünürlüğünü kontrol eder.
+
+[Aksiyom 2]: Eğer `onClose` prop'u sağlanmazsa, panel kapatma işlevi çalışmaz; çünkü kapatma işlemi üst bileşene `onClose` callback'i aracılığıyla bildirilir.
+
+[Aksiyom 3]: Eğer `title` prop'u sağlanmazsa, panel başlığı görüntülenmez; çünkü başlık içeriği dışarıdan bu prop aracılığıyla beslenir.
+
+[Aksiyom 4]: Eğer `children` prop'u sağlanmazsa, panel içerik alanı boş görüntülenir; çünkü panelin ana içeriği `children` üzerinden aktarılır.
+
+[Aksiyom 5]: Eğer `description` prop'u sağlanmazsa, açıklama alanı görüntülenmez; çünkü açıklama metni dışarıdan bu prop aracılığıyla beslenir.
+
+[Aksiyom 6]: Eğer `closeLabel` prop'u sağlanmazsa, kapat butonu etiketi görüntülenmez veya varsayılan bir değer kullanılır; ancak fonksiyon gövdesi olmadığından varsayılan davranış bilinmiyor.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminSidePanel
-**Ne yapar**: Bu bileşen, bir yönetici arayüzünde sağ taraftan açılan bir yan paneli temsil eder. İçerik girişi veya detay gösterimi için kullanılır ve portal ile document.body üzerine render edilerek CSS sorunlarını önler.
 
-**Nasıl yapar**: `open` prop'unu kontrol ederek panelin görünürlüğünü yönetir. Panel ilk kez açıldığında, daha önce odaklanan elementi (`triggerRef`) saklar ve Escape tuşu ile kapatıldığında veya kapatma butonuna basıldığında odak eski konumuna geri döner. Portal kullanımı, panelin transform içeren bir atadan etkilenmesini engeller. `mounted` state'i, portal'ın DOM'a başarıyla eklenip eklenmediğini takip ederek ilk açılışta odak taşıma işlemini güvenli hale getirir.
+**Ne yapar**: Admin panelinde sağdan açılan, modal benzeri bir yan panel (side panel) bileşenidir. Panel açıkken ekranın sağ tarafını kaplar, başlık ve açıklama metni gösterir, bir kapatma düğmesi barındırır ve çocuklar (children) için kaydırılabilir bir içerik alanı sağlar. Panel kapalıyken veya henüz monte edilmemişken DOM'a hiçbir şey basmaz.
+
+**Nasıl yapar**: Fonksiyon, `open` ve `mounted` durumlarını kontrol ederek render edilip edilmeyeceğine karar verir. `mounted` durumu, bileşenin ilk render'ından sonra `useEffect` ile `true` yapılır; bu, portal'ın yalnızca istemci tarafında (client-side) basılmasını garanti eder. Panel açıldığında, o anki odakta olan öğe `triggerRef`'e kaydedilir ve odak panele taşınır; panel kapandığında ise odak bu tetikleyici öğeye geri döndürülür — bu sayede erişilebilirlik (accessibility) akışı korunur. `onClose` fonksiyonu bir ref üzerinden (`onCloseRef`) takip edilir; bu, `onClose` her render'da değişse bile `Escape` tuşu dinleyicisinin güncel referansı kullanmasını sağlar ve efekt bağımlılıklarının gereksiz yere tetiklenmesini önler. `Escape` tuşuna basıldığında `onCloseRef.current()` çağrılarak panel kapatılır. Panel, `createPortal` ile `document.body`'ye taşınır; bunun nedeni, `position: fixed` bir öğenin dönüştürülmüş (transform) bir ata öğe içinde olması durumunda viewport'a değil o ataya göre konumlanacağıdır — portal ile body'ye taşınarak bu sorunun önüne geçilir. Panel, `role="region"`, `aria-labelledby` ve `aria-describedby` özellikleriyle erişilebilirlik standartlarına uygun şekilde işaretlenmiştir. Kapatma düğmesi, `closeLabel` parametresiyle `aria-label` alır ve bir `X` ikonu içerir.
 
 **Parametreler**:
-- open: boolean — Panelin açılıp açılmadığını kontrol eden boolean değer. true olduğunda panel gösterilir.
-- onClose: () => void — Panel kapatıldığında çağrılacak callback fonksiyonu. Escape tuşu veya kapatma butonu ile tetiklenir.
-- title: string — Panelin üst kısmında görünecek başlık metni.
-- description: string — Başlığın altında görünecek açıklama veya alt başlık metni.
-- closeLabel: string — Kapatma butonu için aria-label değeri, erişilebilirlik sağlar.
-- children: React.ReactNode — Panelin içeriğinde render edilecek React elementleri veya bileşenleri.
+- `open`: `boolean` — Panelin açık olup olmadığını belirten durum değeri. `false` olduğunda bileşen DOM'a hiçbir şey basmaz.
+- `onClose`: `() => void` — Panel kapatıldığında çağrılacak geri çağırma fonksiyonu. Hem kapatma düğmesine tıklamada hem de `Escape` tuşunda tetiklenir.
+- `title`: `string` — Panelin üst kısmında `h2` başlık öğesi içinde gösterilen başlık metni. `aria-labelledby` aracılığıyla panelin erişilebilir adını tanımlar.
+- `description`: `string` — Başlığın altında `p` öğesi içinde gösterilen açıklama metni. `aria-describedby` aracılığıyla panelin açıklamasını tanımlar.
+- `closeLabel`: `string` — Kapatma düğmesinin `aria-label` özelliğine atanan, ekran okuyucular için erişilebilir etiket metni.
+- `children`: `React.ReactNode` — Panelin kaydırılabilir içerik alanında render edilecek alt bileşenler.
 
-**Dönüş**: React.ReactElement | null — Panel açıksa ve monte edildiyse, portal ile document.body üzerine render edilmiş React elementini döndürür. Aksi takdirde null döndürerek hiçbir şey render etmez.
+**Dönüş**: `React.ReactElement | null` — Panel açık ve monte edilmiş durumdaysa `document.body`'ye portal edilmiş bir `React.ReactElement` döndürür; aksi halde `null` döndürür.
 
 ---
 
@@ -87,24 +98,28 @@ NON-MODAL YAN PANEL — "sadece bakılıyor" yüzeyleri için. Cetvel: docs/stan
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/overlay/AdminSidePanel.tsx::AdminSidePanel
-
-- **params**: `open` (boolean — panelin açık/kapalı durumunu kontrol eder), `onClose` (callback fonksiyon — panel kapatma isteği tetiklendiğinde çağrılır), `title` (string — panel başlık metni), `description` (string — panel açıklama metni), `closeLabel` (string — kapat butonunun aria-label değeri), `children` (ReactNode — panel içeriğine yerleştirilecek alt bileşenler)
+- **params**:
+  - `open` — panelin açık olup olmadığını belirten boolean
+  - `onClose` — panel kapatıldığında çağrılacak callback fonksiyonu
+  - `title` — panel başlık metni
+  - `description` — panel açıklama metni
+  - `closeLabel` — kapatma butonu için erişilebilirlik etiketi (aria-label)
+  - `children` — panel içeriğinde render edilecek React çocuk öğeleri
 - **ic_degiskenler**:
-  - `panelRef` — panel `<div>` elementine verilen React ref; odak yönetimi (focus/focus restoration) için kullanılır, `panelRef.current?.focus()` ile odak panel üzerine taşınır
-  - `triggerRef` — panel açılmadan önce odakta olan elementi (trigger) saklayan ref; panel kapatıldığında `triggerRef.current?.focus()` ile odak geri döndürülür, temizlikte `null`'a atanır
-  - `titleId` — `React.useId()` ile oluşturulan benzersiz ID; panel `<div>`'ine `aria-labelledby`, `<h2>` elementine `id` olarak bağlanır (erişilebilirlik)
-  - `descriptionId` — `React.useId()` ile oluşturulan benzersiz ID; panel `<div>`'ine `aria-describedby`, `<p>` elementine `id` olarak bağlanır (erişilebilirlik)
-  - `onCloseRef` — `onClose` callback'ini ref içinde saklayan değişken; effect içindeki `handleKeyDown` kapanışı gibi asenkron/sürekli çalışan callback'lerde stale closure sorununu engeller, `onClose` her render'da değişse bile güncel değere erişilir
-  - `mounted` — `React.useState<boolean>(false)` state'i; bileşenin portal ile `document.body`'ye mounted olup olmadığını takip eder, `true` olduğunda portal DOM'a basılır ve ilk render'da `panelRef`'in boş olma sorunu önüne geçilir
-  - `setMounted` — `mounted` state'ini `true`'ya ayarlayan setter; birinci `useEffect`'te (`[]` bağımlılık) çağrılır, mount sonrası tetiklenir
-  - `handleKeyDown` — `document` level `keydown` event handler'ı; `Escape` tuşuna basıldığında `onCloseRef.current()` çağrısıyla paneli kapatır, cleanup'ta `removeEventListener` ile kaldırılır
-- **Dönüş**: `createPortal(...)` ile `document.body`'ye taşınsan JSX (panel markup'u) veya `!open || !mounted` koşulunda `null` — `React.ReactElement | null`
+  - `panelRef` — `React.useRef<HTMLDivElement>(null)` — panel kök div elementine referans; odak vermek ve erişilebilirlik özellikleri için kullanılır
+  - `triggerRef` — `React.useRef<HTMLElement | null>(null)` — panel açılmadan önce odakta olan tetikleyici elemente referans; panel kapandığında odağı geri taşımak için kullanılır
+  - `titleId` — `React.useId()` — başlık `<h2>` elementinin `id`'si; panel div'inin `aria-labelledby` değeri olarak atanır
+  - `descriptionId` — `React.useId()` — açıklama `<p>` elementinin `id`'si; panel div'inin `aria-describedby` değeri olarak atanır
+  - `onCloseRef` — `React.useRef(onClose)` — `onClose` callback'inin güncel referansını tutan ref; efekt bağımlılığında doğrudan `onClose` yerine kullanılarak gereksiz yeniden tetiklenmeyi önler
+  - `mounted` — `React.useState(false)` — bileşenin monte edilip edilmediğini takip eden boolean state; portal henüz basılmadan odak taşıma işlemini engellemek için kullanılır
+  - `setMounted` — `mounted` state'inin setter fonksiyonu; monte efektinde `true` olarak ayarlanır
+  - `handleKeyDown` — ana efekt içinde tanımlanan klavye olayı işleyicisi; `Escape` tuşunda `onCloseRef.current()` çağırarak paneli kapatır
+- **Dönüş**: `React.ReactElement | null` — `open` false veya `mounted` false ise `null` döner; aksi halde `createPortal` ile `document.body`'ye portal edilen sabit konumlu (`fixed`) panel JSX'i döner
 
-**Yan etkiler:**
-- `useEffect(open/mounted)` — panel açıldığında `document`'e `keydown` listener ekler, kapatıldığında kaldırır; odak yönetimi yapar (trigger elementi kaydeder, panele taşır, kapatınca geri döndürür)
-- `useEffect(onClose)` — `onCloseRef.current`'u her render'da güncel tutar
-- `useEffect([])` — mount'ta `setMounted(true)` çağırarak portal'ın DOM'a basılmasını tetikler
-- `createPortal(content, document.body)` — JSX'i React component tree'si dışına, doğrudan `document.body`'ye basar (modal overlay pattern)
+#### Efektler ve yan etkiler:
+1. **onCloseRef güncelleme efekti** — bağımlılık: `[onClose]` — `onClose` her değiştiğinde `onCloseRef.current`'i yeni değere atar
+2. **mount tespit efekti** — bağımlılık: `[]` — bileşen ilk monte edildiğinde `setMounted(true)` çağırır
+3. **odak ve klavye yönetimi efekti** — bağımlılık: `[open, mounted]` — `open` true ve `mounted` true olduğunda: `document.activeElement`'i `triggerRef.current`'e kaydeder, `panelRef.current`'e odak verir, `keydown` olayını dinler; temizlemede: `keydown` dinleyicisini kaldırır, `triggerRef.current`'e odağı geri taşır, `triggerRef.current`'i sıfırlar
 
 ---
 

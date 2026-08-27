@@ -2,16 +2,16 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx
-skeleton_hash: 34c0d72798eb13e6
+source_path: C:\tmp\vh-comp\src\components\admin\DateRangePicker.tsx
+skeleton_hash: 45f0289c1e53f144
 entity_hashes:
   func:DateRangePicker: ed79aaef040a5b25
   func:applySelection: 68dcb4d14b5cc83c
   func:cancelSelection: 4bec1b96cb2c08c1
   func:handleSelect: fdeacf6bd5ee123e
-  overview: 3490e076ad65f967
-  style_tokens: 8f057de8409875ea
-generated_at: 2026-06-19T20:47:00Z
+  overview: da8cb924abf024dd
+  style_tokens: 51e172772e8c260d
+generated_at: 2026-08-27T04:21:35Z
 ---
 
 ## Genel Bakış
@@ -19,37 +19,19 @@ Bu modül, yönetim paneli arayüzünde başlangıç ve bitiş tarihlerinin seç
 
 ## Fonksiyon Grupları
 ### Bileşen Tanımı
-Tarih seçici arayüzünü ve temel yapılandırmasını tanımlayan ana bileşendir.
+Tarih seçici arayüzünü ve temel yapılandırmasını tanımlayan ana bileşendir. `value` ve `onChange` props'ları aracılığıyla kontrollü bir bileşen olarak çalışır.
 - DateRangePicker
 
 ### Etkileşim ve Durum Yönetimi
-Kullanıcının tarih seçimi, seçimi onaylama veya iptal etme gibi aksiyonlarını işleyerek bileşenin iç durumunu ve çıktısını günceller.
+Kullanıcının tarih seçimi, seçimi onaylama veya iptal etme gibi aksiyonlarını işleyerek bileşenin iç durumunu ve çıktısını günceller. `handleSelect` geçici seçimi günceller, `applySelection` onaylandığında üst bileşene bildirir, `cancelSelection` ise seçimi sıfırlar.
 - handleSelect, applySelection, cancelSelection
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Aksiyom 1**: `className` prop’u sağlanmazsa, bileşen boş bir CSS sınıfı ile render edilir.  
-**Aksiyom 2**: `value` prop’u `undefined` veya geçerli bir tarih aralığı nesnesi değilse, bileşen başlangıçta seçili bir aralık göstermez.  
-**Aksiyom 3**: `onChange` callback’i sağlanmazsa, tarih aralığı değişiklikleri üst bileşene bildirilmez.  
-**Aksiyom 4**: `handleSelect` fonksiyonu `undefined` bir argüman alırsa, mevcut iç seçim durumu temizlenir.  
-**Aksiyom 5**: `handleSelect` fonksiyonu geçerli bir tarih aralığı nesnesi alırsa, bu değer iç duruma kaydedilir ve `onChange` tetiklenir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için sadece fonksiyon imzalarından türetilebilen temel mimari varsayımlar tanımlanmıştır. Fonksiyon gövdeleri verilmediğinden, içsel davranışa ilişkin aksiyomlar çıkarılamamıştır.
-
-**[Aksiyom 1]**: Eğer `DateRangePicker` bileşenine üst bileşen tarafından `onChange` callback'i sağlanmazsa, kullanıcının nihai tarih aralığı seçimi üst bileşene iletilemez (bileşen işlevsel olarak anlamsız hale gelir).
-
-**[Aksiyom 2]**: Eğer `DateRangePicker` bileşenine üst bileşen tarafından `value` prop'u (mevcut tarih aralığı) sağlanmazsa, bileşenin başlangıçta hangi tarih aralığını gösterdiği bilinmiyor; muhtemelen boş/belirsiz bir durumda başlar.
-
-**[Aksiyom 3]**: `handleSelect(r: DateRange | undefined)` fonksiyonu, `r` parametresi olarak `undefined` alabilir; bu durumda geçici seçim temizlenir (seçim iptal edilir). Eğer bu geçiş düzgün yönetilmezse, kullanıcı arayüzünde tutarsız bir seçim durumu oluşur.
-
-**[Aksiyom 4]**: `applySelection()` ve `cancelSelection()` fonksiyonları, bir içsel "geçici seçim" (pending selection) durumuna bağlıdır. Eğer geçici seçim durumu yoksa (hiç tarih seçilmediyse veya zaten uygulandıysa), bu fonksiyonların çağrılması anlamsızdır ve beklenmeyen davranışa yol açabilir.
-
-**[Aksiyom 5]**: Bileşen `className` prop'u için varsayılan değer olarak boş string (`''`) kullanır. Eğer üst bileşen bu değeri değiştirmezse, bileşen varsayılan stillendirme ile render edilir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -94,6 +76,7 @@ Bu modül için sadece fonksiyon imzalarından türetilebilen temel mimari varsa
 - import: lucide-react::Calendar
 - import: lucide-react::Check
 - import: lucide-react::ChevronDown
+- import: react-day-picker::ClassNames
 - import: react-day-picker::DateRange
 - import: react-day-picker::DayPicker
 - import: react::React
@@ -113,22 +96,78 @@ Bu modül için sadece fonksiyon imzalarından türetilebilen temel mimari varsa
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `DateRangePicker.tsx::DateRangePicker`
-- **params**: `({ value, onChange, placeholder, className = '' })`
+### [N1_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::DateRangePicker
+- **params**: `value`, `onChange`, `placeholder`, `className` (varsayılan: `''`)
 - **ic_degiskenler**:
-  - `lang` — `useI18n()` hook'undan destructure edilen dil ayarı (`'en'` veya `'tr'`)
-  - `locale` — `lang` değerine göre seçilen date-fns locale nesnesi (`enUS` veya `tr`)
-  - `isOpen` — `useState(false)`, popover'ın açık/kapalı durumunu tutar
-  - `setIsOpen` — `isOpen` state setter'ı, popover açma/kapama için kullanılır
-  - `selectedRange` — `useState<DateRange | undefined>(value)`, takvimde seçili olan tarih aralığını tutar
-  - `setSelectedRange` — `selectedRange` state setter'ı, seçim değişikliklerinde çağrılır
-  - `months` — `useState(2)`, DayPicker'da gösterilecek ay sayısını tutar (mobilde 1, masaüstünde 2)
-  - `setMonths` — `months` state setter'ı, resize eventinde güncellenir
-  - `checkMobile` — arrow function, `window.innerWidth < 768` kontrolü ile `setMonths` çağırır; hem useEffect içinde hem resize listener'da kullanılır
-  - `presets` — `Array<{label: string, getRange: () => DateRange}>`, 8 adet hazır tarih aralığı seçeneği (Bugün, Dün, Son 7 Gün, vb.) içeren dizi
-  - `triggerLabel` — string, popover tetikleyici butonunda gösterilen formatlanmış tarih aralığı metni; `value.from` varsa formatlanmış tarih, yoksa `placeholder` veya varsayılan metin
-  - `dayPickerClassNames` — object, `react-day-picker` `DayPicker` bileşeninin `classNames` prop'una geçirilen Tailwind CSS class override'ları
-- **Dönüş**: JSX — `Popover.Root` içine sarılı buton + popover content (takvim ve preset butonları)
+  - `lang` — `useI18n()` hook'undan gelen dil kodu; `'en'` ise `enUS`, değilse `tr` locale'ini seçmek için kullanılır
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; preset etiketleri, buton metinleri ve yer tutucu metinler için kullanılır
+  - `locale` — `lang` değerine göre seçilen `date-fns` locale nesnesi (`enUS` veya `tr`); tarih formatlamalarında kullanılır
+  - `isOpen` — popover'ın açık/kapalı durumunu tutan state; `Popover.Root` bileşeninin `open` prop'una bağlanır
+  - `setIsOpen` — `isOpen` state'ini güncelleyen setter; `Popover.Root`'un `onOpenChange`'ine, `applySelection` ve `cancelSelection` fonksiyonlarına bağlanır
+  - `selectedRange` — kullanıcının seçtiği tarih aralığını tutan state (`DateRange | undefined`); `DayPicker`'ın `selected` prop'una, preset karşılaştırmalarına ve aksiyon butonlarına bağlanır
+  - `setSelectedRange` — `selectedRange` state'ini güncelleyen setter; `handleSelect`, `cancelSelection` ve dış `value` senkronizasyonu useEffect'inde kullanılır
+  - `months` — takvimde gösterilen ay sayısını tutan state; ekran genişliğine göre 1 veya 2 olur; `DayPicker`'ın `numberOfMonths` prop'una bağlanır
+  - `setMonths` — `months` state'ini güncelleyen setter; resize event listener içinde kullanılır
+  - `checkMobile` — useEffect içinde tanımlanan fonksiyon; `window.innerWidth < 768` kontrolü yaparak `months` değerini belirler
+  - `presets` — hazır tarih aralığı seçeneklerini içeren dizi; her eleman `label` (çevrilmiş metin) ve `getRange` (aralık üreten fonksiyon) içerir
+  - `handleSelect` — `DayPicker`'ın `onSelect` prop'una ve preset butonlarına bağlanan callback; seçilen aralığı `selectedRange` state'ine yazar
+  - `applySelection` — "Uygula" butonuna bağlı callback; `selectedRange`'i dışarıya `onChange` ile bildirir ve popover'ı kapatır
+  - `cancelSelection` — "Vazgeç" butonuna bağlı callback; `selectedRange`'i dış `value`'ya sıfırlar ve popover'ı kapatır
+  - `triggerLabel` — tetikleyici butonda gösterilen metin; `value.from` varsa tarihleri formatlar, yoksa `placeholder` veya çeviri metni kullanır
+  - `navButton` — navigasyon butonlarına uygulanan Tailwind CSS sınıf dizesi; `button_previous` ve `button_next` sınıflarında yeniden kullanılır
+  - `dayPickerClassNames` — `react-day-picker` v9 için Tailwind CSS sınıf geçersiz kılma haritası (`Partial<ClassNames>` tipinde); takvim görünümünü özelleştirir
+- **Dönüş**: JSX (React.FC<DateRangePickerProps>)
+
+### [N2_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::handleSelect
+- **params**: `r` (`DateRange | undefined`)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok
+
+### [N3_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::applySelection
+- **params**: yok
+- **ic_degiskenler**:
+  - `onChange` — üst bileşenden gelen callback; `selectedRange` varsa çağrılır
+  - `selectedRange` — kullanıcının seçtiği tarih aralığı; `onChange`'e argüman olarak geçilir
+  - `setIsOpen` — popover'ı kapatmak için çağrılır (`false` argümanıyla)
+- **Dönüş**: yok
+
+### [N4_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::cancelSelection
+- **params**: yok
+- **ic_degiskenler**:
+  - `value` — üst bileşenden gelen mevcut tarih aralığı; `setSelectedRange`'e argüman olarak geçilerek seçim sıfırlanır
+  - `setSelectedRange` — `value` ile çağrılarak yerel seçim dış değere geri döndürülür
+  - `setIsOpen` — popover'ı kapatmak için çağrılır (`false` argümanıyla)
+- **Dönüş**: yok
+
+### [N5_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::useEffect (mobil kontrol)
+- **params**: yok
+- **ic_degiskenler**:
+  - `checkMobile` — ok fonksiyonu; `window.innerWidth < 768` koşuluyla `months` değerini 1 veya 2 olarak ayarlar
+  - `setMonths` — `checkMobile` içinde çağrılır; ekran genişliğine göre ay sayısını günceller
+  - `window` — `innerWidth` özelliği okunur; `resize` event listener eklenir/kaldırılır
+- **Dönüş**: cleanup fonksiyonu (`window.removeEventListener('resize', checkMobile)`)
+
+### [N6_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::useEffect (value senkronizasyonu)
+- **params**: yok
+- **ic_degiskenler**:
+  - `value` — üst bileşenden gelen tarih aralığı; `setSelectedRange`'e argüman olarak geçilir
+  - `setSelectedRange` — dış `value` değiştiğinde yerel `selectedRange`'i senkronize etmek için çağrılır
+- **Dönüş**: yok
+
+### [N7_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::getRange (lastMonth preset)
+- **params**: yok
+- **ic_degiskenler**:
+  - `lp` — `subMonths(new Date(), 1)` ile hesaplanan bir önceki ayın tarihi nesnesi; `startOfMonth` ve `endOfMonth`'a argüman olarak geçilir
+- **Dönüş**: `{ from: Date, to: Date }` (bir önceki ayın başlangıç ve bitiş tarihleri)
+
+### [N8_NASIL] AST Pointer: src/components/admin/DateRangePicker.tsx::presets.map callback
+- **params**: `preset` (dizi elemanı), `idx` (dizi indeksi)
+- **ic_degiskenler**:
+  - `isSelected` — mevcut `selectedRange` ile `preset.getRange()`'in `from` ve `to` zaman damgalarının eşitliğini kontrol eden boolean; buton stilini ve `Check` ikonunun görünürlüğünü belirler
+  - `selectedRange` — `from?.getTime()` ve `to?.getTime()` erişimleri yapılır; preset karşılaştırması için kullanılır
+  - `preset` — `label` (buton metni) ve `getRange()` (aralık üreten fonksiyon) özelliklerine erişilir
+  - `handleSelect` — buton `onClick`'inde `preset.getRange()` sonucuyla çağrılır
+- **Dönüş**: JSX (button elementi)
 
 ---
 
@@ -167,7 +206,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-white`, `bg-white/95`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `hover:bg-primary-navy/90`, `hover:bg-slate-100`, `hover:bg-slate-200/50`, `hover:bg-slate-50`, `hover:border-slate-300`, `hover:text-slate-800`
-- **Layout:** `backdrop-blur-xl`, `flex`, `flex-col`, `gap-1`, `gap-2`, `inline-flex`, `items-center`, `justify-between`, `max-h-60vh`, `max-h-85vh`, `max-w-full`, `md:flex-row`, `md:max-h-none`, `md:w-48`, `md:w-auto`
+- **Renkler:** `bg-admin-accent`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-border`, `border-b`, `border-t`, `hover:bg-admin-accent-hover`, `hover:bg-admin-surface-2`, `hover:border-admin-border`, `hover:text-admin-fg-subtle`, `md:border-b-0`, `md:border-r`, `text-admin-accent`, `text-admin-accent-fg`, `text-admin-fg-muted`
+- **Layout:** `flex`, `flex-col`, `gap-1`, `gap-2`, `inline-flex`, `items-center`, `justify-between`, `max-h-admin-popover`, `max-h-admin-popover-section`, `max-w-full`, `md:flex-row`, `md:max-h-none`, `md:w-48`, `md:w-auto`, `overflow-hidden`
 - **Varyant/Responsive:** `:`, `active:`, `disabled:`, `focus-visible:`, `hover:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `${className`, `${isOpen`, `${isSelected`, `:`, `active:scale-95`, `animate-in`, `border`, `disabled:active:scale-100`, `disabled:opacity-50`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-bold`
+- **Yardımcı Sınıflar:** `${className`, `${isOpen`, `${isSelected`, `:`, `active:scale-95`, `animate-in`, `border`, `disabled:active:scale-100`, `disabled:opacity-50`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-admin-ring`, `font-medium`
