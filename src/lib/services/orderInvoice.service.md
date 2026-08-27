@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\services\orderInvoice.service.ts
-skeleton_hash: 591f94b8331509fb
+source_path: C:\tmp\ops-t165\src\lib\services\orderInvoice.service.ts
+skeleton_hash: 89f1c96bca26993f
 entity_hashes:
   func:createInvoice: 2478534b19d58457
   func:faturaSatiri: 0eb38488588a89e0
@@ -15,7 +15,7 @@ entity_hashes:
   func:metinVeyaBos: 8451a7adcacdeb26
   func:sayiVeyaBos: adc4133d79ec119d
   overview: 30bb771da643e091
-generated_at: 2026-08-25T07:28:56Z
+generated_at: 2026-08-27T07:01:02Z
 ---
 
 ## Genel Bakış
@@ -198,26 +198,26 @@ graph TD
     orderInvoice_service_ts__metin["metin"]
     orderInvoice_service_ts__metinVeyaBos["metinVeyaBos"]
     orderInvoice_service_ts__sayiVeyaBos["sayiVeyaBos"]
-    orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__sayiVeyaBos
-    orderInvoice_service_ts__faturaSatiri --> orderInvoice_service_ts__metin
     orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__metin
-    orderInvoice_service_ts__createInvoice --> orderInvoice_service_ts__faturaSatiri
     orderInvoice_service_ts__faturaSatiri --> orderInvoice_service_ts__metinVeyaBos
+    orderInvoice_service_ts__createInvoice --> orderInvoice_service_ts__faturaSatiri
+    orderInvoice_service_ts__faturaSatiri --> orderInvoice_service_ts__metin
     orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__metinVeyaBos
+    orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__sayiVeyaBos
 ```
 
 ## NODE ID STANDARD
 
-  file: orderInvoice.service.ts
-  function: orderInvoice.service.ts::metin
-  function: orderInvoice.service.ts::metinVeyaBos
-  function: orderInvoice.service.ts::sayiVeyaBos
-  function: orderInvoice.service.ts::faturaSatiri
-  function: orderInvoice.service.ts::faturasizSatir
-  function: orderInvoice.service.ts::listInvoices
-  function: orderInvoice.service.ts::listInvoicesForOrder
-  function: orderInvoice.service.ts::listUninvoicedPaidOrders
-  function: orderInvoice.service.ts::createInvoice
+  file: src\lib\services\orderInvoice.service.ts
+  function: src\lib\services\orderInvoice.service.ts::metin
+  function: src\lib\services\orderInvoice.service.ts::metinVeyaBos
+  function: src\lib\services\orderInvoice.service.ts::sayiVeyaBos
+  function: src\lib\services\orderInvoice.service.ts::faturaSatiri
+  function: src\lib\services\orderInvoice.service.ts::faturasizSatir
+  function: src\lib\services\orderInvoice.service.ts::listInvoices
+  function: src\lib\services\orderInvoice.service.ts::listInvoicesForOrder
+  function: src\lib\services\orderInvoice.service.ts::listUninvoicedPaidOrders
+  function: src\lib\services\orderInvoice.service.ts::createInvoice
 
 ---
 

@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\refund_guard.ts
-skeleton_hash: 81a41de26dca6fe9
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\refund_guard.ts
+skeleton_hash: 2478cd3b45859103
 entity_hashes:
   func:claimRefund: f4f88d95931f9978
   func:fetchAttempt: 5a8da5c20b5d55d6
@@ -11,7 +11,7 @@ entity_hashes:
   func:restHeaders: 3f515e0e3e1cd72a
   func:settleRefund: a43193d7e46764d2
   overview: 282bb5e46d33367e
-generated_at: 2026-08-25T08:47:26Z
+generated_at: 2026-08-27T07:09:17Z
 ---
 
 ## Genel Bakış
@@ -175,10 +175,10 @@ graph TD
     refund_guard_ts__fullCancelKey["fullCancelKey"]
     refund_guard_ts__restHeaders["restHeaders"]
     refund_guard_ts__settleRefund["settleRefund"]
+    refund_guard_ts__fetchAttempt --> refund_guard_ts__restHeaders
+    refund_guard_ts__claimRefund --> refund_guard_ts__restHeaders
     refund_guard_ts__claimRefund --> refund_guard_ts__fetchAttempt
     refund_guard_ts__settleRefund --> refund_guard_ts__restHeaders
-    refund_guard_ts__claimRefund --> refund_guard_ts__restHeaders
-    refund_guard_ts__fetchAttempt --> refund_guard_ts__restHeaders
 ```
 
 ## NODE ID STANDARD

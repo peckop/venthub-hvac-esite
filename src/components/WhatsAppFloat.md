@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\WhatsAppFloat.tsx
-skeleton_hash: 4ae1d616306c21ed
+source_path: C:\tmp\vh-altyapi-t165\src\components\WhatsAppFloat.tsx
+skeleton_hash: bbb466ca229de8e3
 entity_hashes:
   func:WhatsAppFloat: 594fe2409e378878
   overview: 27f525e3029fcecb
   style_tokens: fb346cbde40036cb
-generated_at: 2026-08-26T07:12:34Z
+generated_at: 2026-08-27T07:58:37Z
 ---
 
 ## Genel Bakış

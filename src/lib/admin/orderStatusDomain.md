@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\orderStatusDomain.ts
-skeleton_hash: da867097de75ab9e
+source_path: C:\tmp\ops-t165\src\lib\admin\orderStatusDomain.ts
+skeleton_hash: 6b419ac5e02742f1
 entity_hashes:
   func:isOrderDbStatus: 2848b6982ecea1b1
   func:isPaymentDbStatus: accaf3e49b13b529
   func:isRefundedPayment: b9a0325c31574e1e
   overview: d1d23deaf89d76c1
-generated_at: 2026-08-25T08:46:16Z
+generated_at: 2026-08-27T06:57:15Z
 ---
 
 ## Genel Bakış

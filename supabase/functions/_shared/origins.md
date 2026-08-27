@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\origins.ts
-skeleton_hash: f2f47129327a42be
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\origins.ts
+skeleton_hash: a2700fdc4dd05e12
 entity_hashes:
   func:buildAllowedOrigins: 5e2ca73674ab1ca1
   func:isAllowedRedirectTarget: 889b440b22fb49ce
@@ -11,7 +11,7 @@ entity_hashes:
   func:normalizeOrigin: b40e1fd79e5225ba
   func:pickRedirectOrigin: e6d67aa2dc05c209
   overview: c7c2d674fb6c1287
-generated_at: 2026-08-25T08:47:00Z
+generated_at: 2026-08-27T07:09:13Z
 ---
 
 ## Genel Bakış
@@ -126,8 +126,8 @@ graph TD
     origins_ts__isOriginAccepted["isOriginAccepted"]
     origins_ts__normalizeOrigin["normalizeOrigin"]
     origins_ts__pickRedirectOrigin["pickRedirectOrigin"]
-    origins_ts__buildAllowedOrigins --> origins_ts__normalizeOrigin
     origins_ts__isAllowedRedirectTarget --> origins_ts__normalizeOrigin
+    origins_ts__buildAllowedOrigins --> origins_ts__normalizeOrigin
     origins_ts__isOriginAccepted --> origins_ts__normalizeOrigin
     origins_ts__pickRedirectOrigin --> origins_ts__normalizeOrigin
 ```

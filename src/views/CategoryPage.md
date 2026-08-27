@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\CategoryPage.tsx
-skeleton_hash: f4818ad1e5e0f37e
+source_path: C:\tmp\venthub-wt-t131\src\views\CategoryPage.tsx
+skeleton_hash: 33363a002d7b3ab0
 entity_hashes:
   func:CategoryPage: b9c874f6f0ad842f
   overview: e1bc718689213f84
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:29:20Z
+generated_at: 2026-08-27T07:08:56Z
 ---
 
 ## Genel Bakış
@@ -89,8 +89,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: CategoryPage.tsx
-  function: CategoryPage.tsx::CategoryPage
+  file: src\views\CategoryPage.tsx
+  function: src\views\CategoryPage.tsx::CategoryPage
 
 ---
 

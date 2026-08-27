@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\admin\pricing\preview\page.tsx
-skeleton_hash: 38186a30694c64b5
+source_path: C:\tmp\ops-t165\src\app\admin\pricing\preview\page.tsx
+skeleton_hash: f5e3c4e406a89578
 entity_hashes:
   func:Page: 38a14b07f492add8
   overview: f2c812d7ee2b06e8
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:42Z
+generated_at: 2026-08-27T06:55:15Z
 ---
 
 ## Genel Bakış
@@ -66,8 +66,8 @@ Fiyatlandırma önizleme sayfasının kullanıcı arayüzünü oluşturur ve ilg
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::Page
+  file: src\app\admin\pricing\preview\page.tsx
+  function: src\app\admin\pricing\preview\page.tsx::Page
 
 ---
 

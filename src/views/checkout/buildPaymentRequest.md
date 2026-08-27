@@ -2,36 +2,56 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\checkout\buildPaymentRequest.ts
-skeleton_hash: b2ce3c5b2d66e94c
+source_path: C:\tmp\venthub-wt-t131\src\views\checkout\buildPaymentRequest.ts
+skeleton_hash: de11d0e9b613951b
 entity_hashes:
-  func:buildPaymentRequest: 874080c807e1dee1
-  overview: d55be1ad42d13d7e
-generated_at: 2026-06-19T20:50:27Z
+  func:CartItemPriceMissingError:constructor: 73391055f60add13
+  func:PaymentAmountMismatchError:constructor: 569dbcf46e72d825
+  func:buildPaymentRequest: a9d52c7bfd23d880
+  func:isPayablePrice: e13ec373e4a95642
+  overview: 6c0c12c234f6f1df
+generated_at: 2026-08-27T07:33:47Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun ödeme sürecinin temel taşı olarak, sipariş ve müşteri verilerini harici ödeme servislerinin beklediği standart formata dönüştürme sorumluluğunu taşır. Checkout akışında, yerel sistem verilerini alarak geçerli ve eksiksiz bir ödeme talebi yapısı oluşturur ve böylece ödeme işleminin başarıyla başlatılmasını garanti altına alır.
+Bu modül, ödeme sürecinde sipariş verilerini harici ödeme servislerinin beklediği formata dönüştürmekten ve ödeme tutarının geçerliliğini doğrulamaktan sorumludur. Ayrıca ödeme akışında ortaya çıkabilecek tutar uyumsuzluğu veya eksik fiyat bilgisi gibi hataları temsil eden özel hata sınıfları tanımlar.
 
 ## Fonksiyon Grupları
 ### Ödeme İsteği Oluşturucu
-Modülün tek ve temel sorumluluğu olan, ödeme süreci için gerekli olan standartlaştırılmış istek nesnesini oluşturma işlemini yönetir.
+Sipariş ve müşteri verilerini alarak harici ödeme servisleri için standart bir ödeme talebi yapısı oluşturur.
 - buildPaymentRequest
+
+### Fiyat Doğrulama
+Verilen bir fiyat değerinin ödeme işlemi için uygun olup olmadığını kontrol eder.
+- isPayablePrice
+
+### Hata Sınıfları
+Ödeme sürecinde oluşabilecek spesifik hata durumlarını temsil eden sınıfları tanımlar.
+- PaymentAmountMismatchError, CartItemPriceMissingError
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmıştır.
 
-[Aksiyom 1]: Eğer `args` parametresi (`BuildPaymentArgs` tipinde) geçerli (null/undefined olmayan) bir nesne içermiyorsa, fonksiyon hata fırlatır veya beklenmeyen bir sonuç üretir.
-[Aksiyom 2]: Eğer `args` nesnesi içindeki alanlar (örn. `orderId`, `amount`, `currency` vb. - tam liste bilinmiyor) ödeme servisinin beklediği formata uygun (gerekli alanları içeren) değilse, fonksiyon geçersiz bir ödeme isteği yapısı üretir.
-[Aksiyom 3]: Eğer `args` içindeki `amount` alanı sayısal bir değer değilse (örn. string, null veya NaN), fonksiyon tutarsız veya hatalı bir ödeme tutarı içeren istek üretir.
-[Aksiyom 4]: Eğer `args` içindeki `currency` alanı geçerli bir para birimi kodu (örn. 'USD', 'EUR', 'TRY') içermiyorsa, fonksiyon geçersiz para birimi koduna sahip bir istek üretir.
-[Aksiyom 5]: Eğer `args` içindeki `orderId` alanı benzersiz veya geçerli bir sipariş tanımlayıcısı içermiyorsa, fonksiyon hedeflenen siparişle eşleşmeyen bir ödeme isteği üretir.
+[Aksiyom 1]: Eğer ödeme tutarı ile sepet kalemlerinin toplamı eşleşmezse, `PaymentAmountMismatchError` fırlatılır (parametreler: `amount`, `itemsSum`).
+
+[Aksiyom 2]: Eğer sepet kalemlerinden herhangi birinin fiyatı tanımlı değilse, `CartItemPriceMissingError` fırlatılır (parametre: fiyatı eksik ürünlerin `productIds` listesi).
+
+[Aksiyom 3]: Eğer `isPayablePrice` fonksiyonuna `undefined` değer gelirse, fiyat ödenebilir olarak değerlendirilmez — fonksiyon `number | undefined` tipini kabul eder ve undefined durumunu ele alır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### isPayablePrice
+**Ne yapar**: Verilen fiyat değerinin ödeme işlemine uygun olup olmadığını kontrol eder. Sonlu ve pozitif bir sayı olup olmadığını doğrulayan bir type guard fonksiyonudur. 0 değeri "fiyat yok" anlamına gelen eski bir maskeleme olarak kabul edilir ve ödeme için uygun değildir.
+
+**Nasıl yapar**: Gelen değerin önce `number` tipinde olup olmadığını kontrol eder, ardından `Number.isFinite()` ile sonlu (Infinity veya NaN olmayan) olduğunu doğrular ve son olarak 0'dan büyük olup olmadığını denetler. Bu üç koşulun hepsi sağlanırsa `true` döner ve TypeScript'e değerin `number` tipinde olduğunu bildirir.
+
+**Parametreler**:
+- value: `number | undefined` — Kontrol edilecek fiyat değeri. undefined olabilir.
+
+**Dönüş**: `value is number` — TypeScript type predicate dönüşü. true dönerse gelen değer `number` tipindedir.
 
 ### buildPaymentRequest
 **Ne yapar**: VentHub HVAC platformunun ödeme adımında çalışan bu fonksiyon, checkout sürecinde toplanan tüm verilerden geçerli, servisler tarafından kabul edilebilir bir ödeme talebi nesnesi oluşturur. Ödeme işlemlerinin sorunsuz başlatılabilmesi için yerel sistem verilerini harici ödeme sağlayıcılarının standartlarına uygun hale getirme görevini üstlenir. Checkout akışının kritik bir parçası olarak, eksik veya hatalı veri kaynaklı ödeme hatalarının önüne geçmek için standartlaştırılmış bir istek yapısı sunar.
@@ -40,10 +60,16 @@ Bu modül için özel aksiyom tanımlanmıştır.
 - name: args, type: BuildPaymentArgs — Ödeme talebi oluşturmak için gereken tüm sipariş, müşteri ve ödeme yöntemi bilgilerini içeren yapılandırılmış girdi nesnesi. Checkout adımında kullanıcıdan ve iç sistemden toplanan sipariş tutarı, teslimat adresi, müşteri kimliği, seçilen taksit planı gibi tüm işlem verilerini barındırır.
 **Dönüş**: req türünde ödeme talebi nesnesi döndürür. Bu nesne, tüm zorunlu alanları doldurulmuş, harici ödeme API'lerine gönderilmek üzere standart formatta yapılandırılmıştır, doğrudan ödeme işlemini başlatmak için kullanılır.
 
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../utils/type-converters::safeNumber
+- import: @/lib/images/productImage::resolveProductImageUrl
 - import: @/types/ui-models::type { UserAddress }
 
 ---
@@ -51,9 +77,11 @@ Bu modül için özel aksiyom tanımlanmıştır.
 ## INTERFACES
 
 ### CartItemInput
+W4b (T001-VH) · ödeme payload'ı artık YALNIZ doğrulanmış fiyatı taşır. Önceki hâlde kalem fiyatı ham `it.product.price`'tan geliyordu. O kolon Kademe-2'de emekli edildi (374 üründe NULL) → `safeNumber(null)` = 0 → İyzico'ya 0 TL'lik kalemler gidiyor, `amount` ile kalem toplamı tutmuyordu (tutarsız s
 - `id: string`
 - `quantity: number`
-- `product: { id: string; name: string; price: number; image_url?: string | null }`
+- `unitPrice?: number`
+- `product: { id: string; name: string; image_url?: string | null; cover_image_path?: string | null }`
 
 ### CustomerInput
 - `name?: string`
@@ -109,37 +137,68 @@ type InvoiceInfo = Partial<{ tckn: string; companyName: string; vkn: string; tax
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/checkout/buildPaymentRequest.ts::buildPaymentRequest
-- **params**:
-  - `args: BuildPaymentArgs` — ödeme isteği için gerekli tüm bilgileri (tutar, ürünler, müşteri, adresler, fatura, yasal onaylar vb.) barındıran nesne
+### [N1_NASIL] AST Pointer: src/views/checkout/buildPaymentRequest.ts::isPayablePrice
+- **params**: `value: number | undefined`
+- **ic_degiskenler**: yok
+- **Dönüş**: `value is number` (type guard — sayısal, sonlu ve pozitif ise `true`)
+
+### [N2_NASIL] AST Pointer: src/views/checkout/buildPaymentRequest.ts::buildPaymentRequest
+- **params**: `args: BuildPaymentArgs`
 - **ic_degiskenler**:
-  - `amount` — ödeme tutarı, args'ten destructure edilir
-  - `items` — sepet ürünleri dizisi, her biri ürün bilgisi ve adet içerir
-  - `customer` — müşteri bilgileri (isim, e-posta, telefon)
-  - `shipping` — kargo adresi girdisi (AddressInput | UserAddress | null)
-  - `billing` — fatura adresi girdisi (AddressInput | UserAddress | null)
-  - `sameAsShipping` — fatura adresinin kargo adresi ile aynı olup olmadığını belirten boolean
-  - `userId` — giriş yapmış kullanıcının ID'si (opsiyonel)
-  - `invoiceType` — fatura türü
-  - `invoiceInfo` — fatura detay bilgileri
-  - `legalConsents` — yasal onayların (KVKK, mesafeli satış, ön bilgilendirme vb.) tutulduğu nesne
-  - `shippingMethod` — kargo yöntemi (ör. standard)
-  - `cartItems` — items dizisinin map ile dönüştürülmüş hali; her eleman {product_id, quantity, price, product_name, product_image_url} yapısındadır
-  - `normalizeAddress` — inner function; AddressInput | UserAddress | null alıp {fullAddress, city, district, postalCode} formatında normalize edilmiş adres nesnesi döndürür; null ise boş alanlarla varsayılan nesne döner; Record<string, unknown> cast ile hem camelCase hem snake_case alan isimlerini destekler
-  - `a` — normalizeAddress içinde addr'nin Record<string, unknown> olarak cast edilmiş hali, alan erişimi için kullanılır
-  - `shippingAddress` — normalizeAddress(shipping) sonucuna `address_type: 'shipping'` eklenmiş kargo adresi nesnesi
-  - `billingAddress` — sameAsShipping true ise shippingAddress'in kopyasına `address_type: 'billing'` eklenir; false ise normalizeAddress(billing) ile oluşturulur
-  - `customerName` — customer.name varsa onu kullanır, yoksa firstName ve lastName birleştirilerek oluşturulur, trim ile boşluk temizlenir
-  - `consents` — legalConsents'ın Record<string, boolean | undefined> olarak cast edilmiş hali, yasal onay anahtarlarına erişim için kullanılır
-  - `req` — ödeme istek nesnesi; amount, cartItems, customerInfo (name, email, phone), shippingAddress, billingAddress, user_id, invoiceType, invoiceInfo, legalConsents (kvkk, distanceSales, preInfo, orderConfirm, marketing — her biri accepted boolean ve timestamp), shippingMethod, couponCode alanlarını içerir
-- **Dönüş**: `req` nesnesi — ödemeateway'e gönderilecek yapılandırılmış istek nesnesi (tutar, sepet, müşteri bilgisi, adresler, fatura, yasal onaylar, kargo yöntemi, kupon kodu)
+  - `amount` — `args.amount`'tan destructure edilen tahsil edilecek toplam tutar
+  - `items` — `args.items`'tan destructure edilen sepet kalemleri dizisi
+  - `customer` — `args.customer`'dan destructure edilen müşteri bilgisi nesnesi
+  - `shipping` — `args.shipping`'ten destructure edilen kargo adresi
+  - `billing` — `args.billing`'den destructure edilen fatura adresi
+  - `sameAsShipping` — `args.sameAsShipping`'den destructure edilen, fatura adresinin kargo adresiyle aynı olup olmadığını gösteren boolean
+  - `userId` — `args.userId`'den destructure edilen kullanıcı kimliği
+  - `invoiceType` — `args.invoiceType`'tan destructure edilen fatura tipi
+  - `invoiceInfo` — `args.invoiceInfo`'dan destructure edilen fatura bilgisi nesnesi
+  - `legalConsents` — `args.legalConsents`'ten destructure edilen yasal onaylar nesnesi
+  - `shippingMethod` — `args.shippingMethod`'den destructure edilen kargo yöntemi
+  - `cartItems` — fiyatı olan kalemlerin ödeme sunucusuna gönderilecek formata dönüştürülmüş dizisi; her elemanda `product_id`, `quantity`, `price`, `product_name`, `product_image_url` alanları bulunur
+  - `unpricedProductIds` — `isPayablePrice` ile fiyatı geçersiz bulunan ürünlerin `product.id` değerlerinin toplandığı dizi; doluysa `CartItemPriceMissingError` fırlatılır
+  - `it` — `items` dizisi üzerindeki `for...of` döngüsünde kullanılan geçici değişken; her sepet kalemini temsil eder
+  - `itemsSum` — `cartItems` dizisi üzerinde `reduce` ile hesaplanan kalem bazlı toplam tutar (`price * quantity` toplamı)
+  - `normalizeAddress` — `addr` parametresini alıp `fullAddress`, `city`, `district`, `postalCode` alanlarına normalize eden iç fonksiyon; `null` gelirse boş değerler döner, aksi halde hem camelCase hem snake_case alan adlarını kontrol eder
+  - `addr` — `normalizeAddress` fonksiyonunun parametresi; `AddressInput | UserAddress | null` tipinde adres girdisi
+  - `a` — `addr`'ın `Record<string, unknown>` olarak cast edilmiş hali; alan erişimleri için kullanılır
+  - `shippingAddress` — `normalizeAddress(shipping)` sonucuna `address_type: 'shipping'` eklenerek oluşan kargo adresi nesnesi
+  - `billingAddress` — `sameAsShipping` true ise `shippingAddress`'ın kopyası (`address_type: 'billing'` ile), false ise `normalizeAddress(billing)` sonucu (`address_type: 'billing'` ile)
+  - `customerName` — `customer.name` varsa onu kullanır, yoksa `customer.firstName` ve `customer.lastName`'in birleştirilip `trim()` edilmiş hali
+  - `consents` — `legalConsents`'in `Record<string, boolean | undefined>` olarak cast edilmiş hali; her bir onay alanının boolean değerine erişim için kullanılır
+  - `req` — döndürülecek ödeme isteği nesnesi; `amount`, `cartItems`, `customerInfo`, `shippingAddress`, `billingAddress`, `user_id`, `invoiceType`, `invoiceInfo`, `legalConsents`, `shippingMethod`, `couponCode` alanlarını içerir
+- **Dönüş**: `req` — ödeme isteği nesnesi
+
+### [N3_NASIL] AST Pointer: src/views/checkout/buildPaymentRequest.ts::PaymentAmountMismatchError.constructor
+- **params**: `amount: number`, `itemsSum: number`
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (super çağrısı ile hata mesajı oluşturulur, `this.name` atanır)
+
+### [N4_NASIL] AST Pointer: src/views/checkout/buildPaymentRequest.ts::CartItemPriceMissingError.constructor
+- **params**: `productIds: string[]`
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (super çağrısı ile hata mesajı oluşturulur, `this.name` ve `this.productIds` atanır)
 
 ---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    buildPaymentRequest_ts__buildPaymentRequest["buildPaymentRequest"]
+    buildPaymentRequest_ts__constructor["constructor"]
+    buildPaymentRequest_ts__isPayablePrice["isPayablePrice"]
+    buildPaymentRequest_ts__buildPaymentRequest --> buildPaymentRequest_ts__isPayablePrice
+```
 
 ## NODE ID STANDARD
 
   file: src\views\checkout\buildPaymentRequest.ts
+  function: src\views\checkout\buildPaymentRequest.ts::isPayablePrice
   function: src\views\checkout\buildPaymentRequest.ts::buildPaymentRequest
+  class: src\views\checkout\buildPaymentRequest.ts::PaymentAmountMismatchError
+  class: src\views\checkout\buildPaymentRequest.ts::CartItemPriceMissingError
 
 ---
 
@@ -147,8 +206,16 @@ type InvoiceInfo = Partial<{ tckn: string; companyName: string; vkn: string; tax
   export: AddressInput
   export: BuildPaymentArgs
   export: CartItemInput
+  export: CartItemPriceMissingError
   export: CustomerInput
   export: InvoiceInfo
   export: InvoiceType
   export: LegalConsentsInput
+  export: PaymentAmountMismatchError
   export: buildPaymentRequest
+  export: isPayablePrice
+
+---
+
+## BILEŞIM (CONTAINS)
+  contains: string[]

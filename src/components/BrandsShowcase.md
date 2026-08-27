@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\BrandsShowcase.tsx
-skeleton_hash: 214a7ca3f7d167b5
+source_path: C:\tmp\vh-altyapi-t165\src\components\BrandsShowcase.tsx
+skeleton_hash: 21e6e5421fcfb065
 entity_hashes:
   func:BrandsShowcase: 396bbfa4a2991af7
   func:Lane: 607c875efec6621a
-  overview: a64c9ee274fd0d0f
+  overview: 5afeff1221c0bd64
   style_tokens: 90e49e0ab0d8115d
-generated_at: 2026-06-08T10:08:12Z
+generated_at: 2026-08-27T07:53:05Z
 ---
 
 ## Genel Bakış
@@ -19,7 +19,7 @@ generated_at: 2026-06-08T10:08:12Z
 ## Fonksiyon Grupları
 
 ### Kaydırma Şeridi Bileşeni
-Tek bir şerit (lane) üzerindeki marka öğelerini belirli bir sürede otomatik olarak kaydıran yardımcı bileşeni tanımlar. Varsayılan 50 saniyelik döngü süresi ile sürekli bir animasyon akışı sağlar.
+Tek bir şerit üzerindeki marka öğelerini belirli bir sürede otomatik olarak kaydıran yardımcı bileşendir. Varsayılan 50 saniyelik döngü süresi ile sürekli bir animasyon akışı sağlar.
 - Lane
 
 ### Ana Vitrin Bileşeni
@@ -30,17 +30,9 @@ Sayfada tam bir marka vitrini oluşturarak kaydırma şeridini yapılandırır v
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, HVAC markalarını kaydırılabilir bir şerit içinde gösteren bir vitrin bileşenidir. `Lane` yardımcı bileşeni listedeki öğeleri belirtilen sürede yatay olarak kaydırarak sürekli bir akış oluşturur; `BrandsShowcase` ise bu şeriti sayfada sunan ana bileşendir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarılabilen varsayımlar listelenmiştir.
 
-[Aksiyom 1]: Eğer `Lane` bileşenine `items` argümanı sağlanmazsa, kaydırılacak marka içeriği bulunmayacağından şerit boş veya hatalı görüntülenir.
-
-[Aksiyom 2]: Eğer `Lane` bileşenine sağlanan `items` boş bir dizi ise (`[]`), şerit içeriği olmadan çalışır ve kaydırma animasyonu anlamsız hale gelir.
-
-[Aksiyom 3]: Eğer `durationSec` olarak `0` veya negatif bir değer verilirse, kaydırma animasyon süresi geçersiz olacağından animasyon düzgün çalışmaz veya çok hızlı/hatalı akar.
-
-[Aksiyom 4]: Eğer `BrandsShowcase` bileşeni içinde `Lane` bileşenine geçirilen `items` dizisi `Lane` bileşeninin beklediği formata (örn: img src, alt text içeren nesneler) uymuyorsa, öğeler düzgün render edilmez.
-
-[Aksiyom 5]: Eğer `durationSec` çok küçük bir değer olarak (örn: `1`) ayarlanırsa, marka logoları okunamayacak kadar hızlı kayar; çok büyük bir değer olarak ayarlanırsa ise kaydırma neredeyse görünmez hale gelir.
+[Aksiyom 1]: Eğer `items` parametres
 
 ---
 
@@ -62,26 +54,43 @@ Bu modül, HVAC markalarını kaydırılabilir bir şerit içinde gösteren bir 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../data/brands::HVAC_BRANDS
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: ../i18n/I18nProvider::useI18n
+- import: ./HVACIcons::BrandIcon
+- import: framer-motion::motion
+- import: next/link::Link
+- import: react::React
+- import: react::useMemo
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: BrandsShowcase.tsx::Lane
-- **params**: `{ items, durationSec = 50 }`
+### [N1_NASIL] AST Pointer: src/components/BrandsShowcase.tsx::Lane
+- **params**: `items` — HVAC_BRANDS dizisi türünde marka listesi, `durationSec` — animasyon süresi (varsayılan 50 saniye)
 - **ic_degiskenler**:
-  - `repeated` — `items` dizisini üç kez tekrarlayarak oluşturulan dizi, sonsuz kaydırma animasyonu için kullanılır.
-- **Dönüş**: JSX elementi (React bileşeni)
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen, yerelleştirilmiş rota oluşturma fonksiyonları nesnesi
+  - `repeated` — `useMemo` ile `items` dizisinin üç kez (`[...items, ...items, ...items]`) birleştirilmesiyle oluşan kaydırma animasyonu için tekrarlanmış dizi
+  - `brand` — `repeated.map` içinde her bir marka nesnesi (`brand.slug` ve `brand.name` özelliklerine erişilir)
+  - `idx` — `repeated.map` içinde her bir elemanın dizideki sayısal indeksi
+- **Dönüş**: JSX — sonsuz kaydırma (marquee) animasyonlu marka logosu ızgarası bileşeni
 
-### [N2_NASIL] AST Pointer: BrandsShowcase.tsx::(brand, idx) => (...)
-- **params**: `(brand, idx)`
+### [N2_NASIL] AST Pointer: src/components/BrandsShowcase.tsx::(map callback)
+- **params**: `brand` — tek bir marka nesnesi, `idx` — dizideki indeks numarası
 - **ic_degiskenler**:
-  - Yok
-- **Dönüş**: JSX elementi (Link bileşeni)
+  - `brand` — marka nesnesi; `brand.slug` Link href'inde rota parametresi olarak, `brand.name` ise `BrandIcon` bileşenine prop olarak ve metin etiketinde kullanılır
+  - `idx` — `key` prop'unu benzersiz kılmak için `brand.slug` ile birlikte birleştirilir (`${brand.slug}-${idx}`)
+- **Dönüş**: JSX — tek bir marka için Link içinde logo, çizgi göstergesi ve isim etiketi içeren kart bileşeni
 
-### [N3_NASIL] AST Pointer: BrandsShowcase.tsx::BrandsShowcase
+### [N3_NASIL] AST Pointer: src/components/BrandsShowcase.tsx::BrandsShowcase
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
-  - `brands` — HVAC_BRANDS sabitinden alınan marka dizisi
-- **Dönüş**: JSX elementi (React bileşeni)
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; `t('brands.sectionTitle')`, `t('brands.subtitlePart1')`, `t('brands.subtitlePart2')`, `t('brands.viewAll')` anahtarlarıyla metinleri çözer
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota fonksiyonları nesnesi; `Routes.brand(brand.slug)` ve `Routes.brands()` çağrılarıyla kullanılır
+  - `brands` — `HVAC_BRANDS` sabitinden gelen marka listesi; `Lane` bileşenine `items` prop'u olarak aktarılır
+- **Dönüş**: JSX — marka vitrin bölümü; başlık animasyonu, kenar solma efektli `Lane` kaydırma bileşeni ve "tümünü gör" bağlantısı içeren tam sayfa bölümü
 
 ---
 

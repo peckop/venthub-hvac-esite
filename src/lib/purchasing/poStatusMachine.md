@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\purchasing\poStatusMachine.ts
-skeleton_hash: 1b4a7ff17a01436b
+source_path: C:\tmp\ops-t165\src\lib\purchasing\poStatusMachine.ts
+skeleton_hash: 52256c2929a9bed6
 entity_hashes:
   func:allowedNextPoStatuses: 61761b9e31de6aa0
   func:isManualPoTransitionAllowed: daf7d6e4e1f8e07b
   overview: b2ca3afe0384f93f
-generated_at: 2026-08-25T08:44:20Z
+generated_at: 2026-08-27T06:57:44Z
 ---
 
 ## Genel Bakış

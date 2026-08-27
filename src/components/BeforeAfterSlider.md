@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\BeforeAfterSlider.tsx
-skeleton_hash: 7acc7874dafc0574
+source_path: C:\tmp\vh-altyapi-t165\src\components\BeforeAfterSlider.tsx
+skeleton_hash: 123671554a301036
 entity_hashes:
   func:BeforeAfterSlider: f6df4a2541ee7895
   overview: 0e8c7c405d8bc050
   style_tokens: ae3c52abb33abdfe
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-08-27T07:52:16Z
 ---
 
 ## Genel Bakış

@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\data-table\types.ts
-skeleton_hash: d6719ae1220d4b24
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\data-table\types.ts
+skeleton_hash: 4313c5b65fc88f78
 entity_hashes:
   overview: ddbf04dea1d9de40
-generated_at: 2026-06-19T20:47:00Z
+generated_at: 2026-08-27T08:10:41Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,7 @@ Bu dosyada herhangi bir fonksiyon veya metot bulunmamaktadır. Dosya, modül sev
 Kolonların TEK kaynağı (SSOT). `header` = i18n-ÇÖZÜLMÜŞ string — kit içinde `t()` YOK, çağıran taraf `t('...')` ile çözüp geçirir (fallback-pattern YASAK, standart §6.5).
 - `key: string`
 - `header: string`
+- `headerHint?: string`
 - `sortable?: boolean`
 - `align?: AdminAlign`
 - `hideable?: boolean`

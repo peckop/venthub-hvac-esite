@@ -82,10 +82,25 @@ const calistirilabilirYap = (yol: string): void => {
   nodeKos('require("fs").chmodSync(process.argv[1],0o755)', yol)
 }
 
+/**
+ * Sahte python: orion'u çağırmaz, YALNIZCA argümanlarını bildirir. Kancanın hangi dosyalar için
+ * companion üretmeye çalıştığını böyle ölçüyoruz — "üretti mi" değil, "kimi hedefledi".
+ *
+ * ⚠ STDOUT BİRİNCİL, `$PY_LOG` YALNIZ YARDIMCI — ÖLÇÜLMÜŞ SEBEP (2026-08-27):
+ * Bu ölçüm ilk hâlinde SADECE `$PY_LOG` dosyasına yazıyordu ve CI'da o dosya BOŞ okunuyordu:
+ * kanca günlüğünde `=== bitti` vardı, süzgeç `GIRDI 10 satir · CIKAN 4 yol` diyordu, ama
+ * `py.log`'da TEK BİR satır yoktu — koşulsuz çağrılan `doc tree` bile. Yani kaybı "süzgeç
+ * kesti" diye okumak YANLIŞ olurdu; kayıp ölçüm aracının İKİNCİ DOSYAYA bağımlı olmasındaydı.
+ *
+ * Şimdi PYCALL satırı kancanın KENDİ günlük akışına (`>> "$LOG" 2>&1`) düşüyor: `=== bitti`
+ * ile AYNI dosyada, AYNI sırada. Bekleyiş ile ölçüm arasındaki yarış böylece yapısal olarak
+ * ortadan kalkıyor. `$PY_LOG`'a yazmayı da bırakmıyoruz ama artık kanıtın taşıyıcısı o değil;
+ * ayrıca çocuk sürecin `$PY_LOG`'u NASIL gördüğü de yazılıyor (boşsa sebep orada görünür).
+ */
 const SAHTE_PYTHON = `#!/bin/sh
-# Sahte python: orion'u çağırmaz, YALNIZCA argümanlarını loglar. Kancanın hangi dosyalar için
-# companion üretmeye çalıştığını böyle ölçüyoruz — "üretti mi" değil, "kimi hedefledi".
-echo "PYCALL $*" >> "$PY_LOG"
+echo "PYCALL $*"
+echo "PYENV PY_LOG=[$PY_LOG]"
+echo "PYCALL $*" >> "$PY_LOG" 2>&1 || echo "PYLOG-YAZILAMADI [$PY_LOG]"
 exit 0
 `
 
@@ -117,9 +132,16 @@ function kur(onek: string, opts: { scopeKopyala?: boolean } = {}): Repo {
   dosyaYaz(`${yol}/.venv/bin/python`, SAHTE_PYTHON)
   calistirilabilirYap(`${yol}/.venv/bin/python`)
 
-  // İkinci commit: KAPSAMDA iki dosya, KAPSAM DIŞI iki dosya.
+  // İkinci commit: KAPSAMDA üç dosya, KAPSAM DIŞI iki dosya.
   dosyaYaz(`${yol}/src/lib/gercek.ts`, 'export const a = 1\n')
   dosyaYaz(`${yol}/next.config.mjs`, 'export default {}\n')
+  // `src` DIŞI ama skip_dirs'te de OLMAYAN bir kaynak — ÖLÇÜLMÜŞ REGRESYON KORUMASI:
+  // ilk süzgecim kapsamı "src/** + kök seviyesi" ile sınırlamıştı ve master'da TRACKED duran
+  // 46 gerçek companion'ı (supabase/functions/**, e2e/, scripts/**, .claude/hooks) sessizce
+  // dışarıda bırakıyordu. `post-commit`in eski hâli yol kısıtı KOYMUYORDU — yani daraltmayı
+  // bu iş emri sırasında BEN ekledim ve indikten sonra ölçüp geri aldım. Bu kol o daraltmanın
+  // sessizce geri gelmesini engeller.
+  dosyaYaz(`${yol}/supabase/functions/_shared/kritik.ts`, 'export const s = 1\n')
   dosyaYaz(`${yol}/src/__tests__/conformance/sahte.test.ts`, 'export const t = 1\n')
   dosyaYaz(`${yol}/src/lib/index.ts`, 'export * from "./gercek"\n')
   execFileSync('git', ['-C', yol, 'add', '-A'])
@@ -172,6 +194,11 @@ describe('INV-HOOKS-2 · companion kapsam süzgeci TEK uygulama', () => {
     )
     expect(
       cikti,
+      'src DISI kaynak hedeflenmedi — kapsam yol derinligiyle daraltilmis demektir; masterda ' +
+        'TRACKED duran 46 gercek companion tam bu yuzden uretilmeyecekti',
+    ).toContain('supabase/functions/_shared/kritik.ts')
+    expect(
+      cikti,
       'TEST DOSYASI hedeflendi — post-merge süzgeci hâlâ post-commit ile aynı değil; bu tam olarak ' +
         'filo genelinde "başkası dosyamı kirletti" alarmlarını yağdıran davranış',
     ).not.toContain('sahte.test.ts')
@@ -185,6 +212,7 @@ describe('INV-HOOKS-2 · companion kapsam süzgeci TEK uygulama', () => {
 
     expect(cikti).toContain('src/lib/gercek.ts')
     expect(cikti).toContain('next.config.mjs')
+    expect(cikti, 'post-commit src disi kaynagi hedeflemedi').toContain('supabase/functions/_shared/kritik.ts')
     expect(cikti, 'post-commit test dosyasını hedefledi').not.toContain('sahte.test.ts')
     expect(cikti, 'post-commit skip_files dosyasını hedefledi').not.toContain('src/lib/index.ts')
   }, 60_000)
@@ -234,5 +262,36 @@ describe('INV-HOOKS-2 · companion kapsam süzgeci TEK uygulama', () => {
     expect(cikti, 'yedeğe düşünce üretim TAMAMEN durdu — sessiz kayıp sınıfı').toContain(
       'src/lib/gercek.ts',
     )
+  }, 60_000)
+
+  /**
+   * YOKLUK KANITI — ÖLÇÜLMÜŞ VAKA (2026-08-27, bu dosyanın KENDİ CI kırmızısı).
+   *
+   * Yukarıdaki kol CI'da düştü, YERELDE aynı girdiyle geçiyordu. Kanca günlüğünde tek iz
+   * "yedek süzgece düştüm" uyarısıydı; süzgecin girdi ALIP ALMADIĞI hiçbir yerde yazmadığı
+   * için arıza iki ihtimal arasında AYIRT EDİLEMEDİ: kapsam mı sıfır döndürdü, yoksa stdin mi
+   * hiç okunamadı? Teşhis yapamamamın sebebi kapının kendi körlüğüydü.
+   *
+   * Bu kol, süzgecin her koşumda SAYI basmasını şart koşar. Sayı kapıya bağlı olmazsa bir
+   * sonraki sessiz boş küme yine "kapsam kararı" gibi görünür — bugün tam olarak bu oldu.
+   */
+  it('süzgeç her koşumda SAYI basar — "hiçbir şey üretmedim" ile "hiçbir şey gelmedi" ayrılabilmeli', () => {
+    const r = kur('hooks-sayim')
+
+    const cikti = kancaKos(r, 'post-merge', '=== bitti')
+    expect(cikti, 'süzgeç kaç satır aldığını/kaç yol bastığını söylemiyor — körlük').toMatch(
+      /\[doc-scope\] GIRDI \d+ satir · CIKAN \d+ yol/,
+    )
+
+    // Girdi GERÇEKTEN boşken: sessiz kalmak yasak, sebep yazılmalı. Doğrudan çağırıyoruz —
+    // kanca üzerinden boş girdi üretmek `git diff` boşsa kancanın erken çıkmasına takılırdı.
+    const bos = execFileSync(process.execPath, [`${r.yol}/.githooks/lib/doc-scope.cjs`], {
+      cwd: r.yol,
+      input: '',
+      encoding: 'utf8',
+      env: { ...process.env, DOC_SCOPE_KOK: r.yol },
+      stdio: ['pipe', 'pipe', 'pipe'],
+    })
+    expect(bos, 'boş girdide stdout kirlenmiş — veri kanalı temiz kalmalı').toBe('')
   }, 60_000)
 })

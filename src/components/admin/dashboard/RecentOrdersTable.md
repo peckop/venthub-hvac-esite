@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\dashboard\RecentOrdersTable.tsx
-skeleton_hash: 36270baa464da816
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\dashboard\RecentOrdersTable.tsx
+skeleton_hash: fd6f81fd974b2207
 entity_hashes:
   func:RecentOrdersTable: 74faabf4e70dfa3a
   func:getStatusLabel: 2edd561db46db1dc
   func:getStatusStyles: 419f18093a05eeeb
   overview: 1e3b923c1a9c6959
   style_tokens: a8137575ec78dd18
-generated_at: 2026-08-25T07:24:32Z
+generated_at: 2026-08-27T08:08:01Z
 ---
 
 ## Genel Bakış
@@ -125,16 +125,16 @@ graph TD
     RecentOrdersTable_tsx__RecentOrdersTable["RecentOrdersTable"]
     RecentOrdersTable_tsx__getStatusLabel["getStatusLabel"]
     RecentOrdersTable_tsx__getStatusStyles["getStatusStyles"]
-    RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusStyles
     RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusLabel
+    RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusStyles
 ```
 
 ## NODE ID STANDARD
 
-  file: RecentOrdersTable.tsx
-  function: RecentOrdersTable.tsx::RecentOrdersTable
-  function: RecentOrdersTable.tsx::getStatusStyles
-  function: RecentOrdersTable.tsx::getStatusLabel
+  file: src\components\admin\dashboard\RecentOrdersTable.tsx
+  function: src\components\admin\dashboard\RecentOrdersTable.tsx::RecentOrdersTable
+  function: src\components\admin\dashboard\RecentOrdersTable.tsx::getStatusStyles
+  function: src\components\admin\dashboard\RecentOrdersTable.tsx::getStatusLabel
 
 ---
 

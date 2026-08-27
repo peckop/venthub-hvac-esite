@@ -2,17 +2,17 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts
-skeleton_hash: db9d252a0d8e17dc
+source_path: C:\tmp\ops-t165\src\lib\services\project.service.ts
+skeleton_hash: 2db603f5c5f4f76e
 entity_hashes:
-  func:addProductToProject: 3ad72ee68e6e1dbb
-  func:createProject: f04be25a87702fe5
-  func:deleteProject: 46636280fcd04430
-  func:listProjectItems: 8111ac3266bdd891
-  func:listUserProjects: 01a071f49edbfd8e
-  func:removeProductFromProject: a5c4e58b38ee1a14
+  func:addProductToProject: 0a7b669c584f15fe
+  func:createProject: 2c6fc31720f34b89
+  func:deleteProject: 805372ee0e272024
+  func:listProjectItems: a458c44a64678a6e
+  func:listUserProjects: 2732617049348a3f
+  func:removeProductFromProject: 88aa7b89f1aa4ac9
   overview: 82cdf1fb2dbcb93a
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:05:22Z
 ---
 
 ## Genel Bakış
@@ -53,11 +53,14 @@ Bu modül, Supabase veritabanı üzerinden proje ve proje-ürün ilişkilerini y
 ## FONKSİYON DETAYLARI
 
 ### listUserProjects
-**Ne yapar**: Kimliği doğrulanmış mevcut kullanıcıya ait tüm projeleri getirir.
-**Nasıl yapar**: Supabase istemcisi aracılığıyla 'user_projects' tablosundaki tüm kayıtları, `updated_at` alanına göre azalan sırayla (en son güncellenen üstte) sorgular. Sorgu sonucunda veri yoksa boş bir dizi döner, hata oluşursa fırlatır.
+**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait tüm projeleri getirir. Projeler, son güncellenme tarihine göre azalan sırayla döndürülür. Veritabanı sorgusu başarısız olursa hata fırlatır.
+
+**Nasıl yapar**: Supabase istemcisi üzerinden `user_projects` tablosundan tüm sütunları (`*`) seçer ve `updated_at` alanına göre azalan sıralama uygular. Gelen veri, hata kontrolünden geçirildikten sonra `DbUserProject` tipine dönüştürülerek döndürülür. Veri yoksa boş dizi döner.
+
 **Parametreler**:
-- `supabase`: SupabaseClient<Database> — Etkin Supabase istemci örneği.
-**Dönüş**: `Promise<DbUserProject[]>` — Kullanıcının proje kayıtlarının bir dizisi; eğer proje yoksa boş bir dizi döner.
+- `supabase`: `SupabaseClient<Database>` — Aktif Supabase istemci örneği. Veritabanı bağlantısını temsil eder.
+
+**Dönüş**: `Promise<DbUserProject[]>` — Kullanıcı proje kayıtlarından oluşan bir dizi. Hiç proje yoksa boş dizi döner.
 
 ### createProject
 **Ne yapar**: Kimliği doğrulanmış kullanıcı için yeni bir proje oluşturur.
@@ -116,46 +119,62 @@ Bu modül, Supabase veritabanı üzerinden proje ve proje-ürün ilişkilerini y
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: project.service.ts::listUserProjects
-- **params**: (supabase: SupabaseClient<Database>)
+### [N1_NASIL] AST Pointer: src/lib/services/project.service.ts::listUserProjects
+- **params**: `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
 - **ic_degiskenler**:
-  - `data` — supabase.from('user_projects').select('*').order(...) sorgusundan dönen satır listesi
-  - `error` — sorgu sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-- **Dönüş**: DbUserProject[] — kullanıcının tüm projeleri (updated_at azalan sırayla)
+  - `data` — user_projects tablosundan çekilen satırları tutar; `select('*')` ile tüm sütunlar alınır, `updated_at` alanına göre azalan sırayla (`ascending: false`) sıralanır
+  - `error` — sorgu sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+- **Dönüş**: `DbUserProject[]` — hata fırlatılmazsa `data` döndürülür; `data` null ise boş dizi (`[]`) döndürülür
 
-### [N2_NASIL] AST Pointer: project.service.ts::createProject
-- **params**: (supabase: SupabaseClient<Database>, project: TablesInsert<'user_projects'>)
+### [N2_NASIL] AST Pointer: src/lib/services/project.service.ts::createProject
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
+  - `project` — TablesInsert<'user_projects'> tipinde, eklenecek proje verisi
 - **ic_degiskenler**:
-  - `data` — insert sonrası select().single() ile dönen tek satır; yeni oluşturulan proje
-  - `error` — insert sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-- **Dönüş**: DbUserProject — newly inserted project
+  - `data` — insert işlemi sonrası dönen tek satır veriyi tutar; `.insert(project).select().single()` zinciriyle eklenen kayıt geri alınır
+  - `error` — insert sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+- **Dönüş**: `DbUserProject` — hata fırlatılmazsa eklenen kayıt (`data`) döndürülür
 
-### [N3_NASIL] AST Pointer: project.service.ts::deleteProject
-- **params**: (supabase: SupabaseClient<Database>, id: string)
+### [N3_NASIL] AST Pointer: src/lib/services/project.service.ts::deleteProject
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
+  - `id` — string tipinde, silinecek projenin kimliği
 - **ic_degiskenler**:
-  - `error` — delete().eq('id', id) sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-- **Dönüş**: boolean — başarıyla silindiyse true
+  - `error` — delete sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+- **Dönüş**: `boolean` — hata fırlatılmazsa `true` döndürülür
 
-### [N4_NASIL] AST Pointer: project.service.ts::addProductToProject
-- **params**: (supabase: SupabaseClient<Database>, projectId: string, productId: string, quantity: number)
+### [N4_NASIL] AST Pointer: src/lib/services/project.service.ts::addProductToProject
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
+  - `projectId` — string tipinde, ürünün ekleneceği projenin kimliği
+  - `productId` — string tipinde, eklenecek ürünün kimliği
+  - `quantity` — number tipinde (varsayılan değer: `1`), eklenecek miktar
 - **ic_degiskenler**:
-  - `data` — insert({ project_id: projectId, product_id: productId, quantity }).select().single() ile dönen tek satır; eklenen proje kalemi
-  - `error` — insert sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-- **Dönüş**: DbProjectItem — newly inserted project item
+  - `data` — insert işlemi sonrası dönen tek satır veriyi tutar; `.insert({ project_id: projectId, product_id: productId, quantity }).select().single()` zinciriyle eklenen kayıt geri alınır
+  - `error` — insert sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+- **Dönüş**: `DbProjectItem` — hata fırlatılmazsa eklenen kayıt (`data`) döndürülür
 
-### [N5_NASIL] AST Pointer: project.service.ts::removeProductFromProject
-- **params**: (supabase: SupabaseClient<Database>, projectId: string, productId: string)
+### [N5_NASIL] AST Pointer: src/lib/services/project.service.ts::removeProductFromProject
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
+  - `projectId` — string tipinde, ürünün çıkarılacağı projenin kimliği
+  - `productId` — string tipinde, çıkarılacak ürünün kimliği
 - **ic_degiskenler**:
-  - `error` — delete().match({ project_id, product_id }) sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-- **Dönüş**: boolean — başarıyla silindiyse true
+  - `error` — delete sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+- **Dönüş**: `boolean` — hata fırlatılmazsa `true` döndürülür
 
-### [N6_NASIL] AST Pointer: project.service.ts::listProjectItems
-- **params**: (supabase: SupabaseClient<Database>, projectId: string)
+### [N6_NASIL] AST Pointer: src/lib/services/project.service.ts::listProjectItems
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
+  - `projectId` — string tipinde, ürünleri listelenecek projenin kimliği
 - **ic_degiskenler**:
-  - `data` — select('*, product:products(*)').eq('project_id', projectId) sorgusundan dönen satır listesi; product ilişkisi dahil
-  - `error` — sorgu sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-  - `items` — data'nın (DbProjectItem & { product: DbProduct | null })[] olarak tiplendirilmiş hali; map işlemi için kullanılır
-- **Dönüş**: ProjectItem[] — her kalem için product alanı mapDatabaseProductToDomain ile dönüştürülmüş UI model listesi
+  - `data` — project_items tablosundan çekilen satırları tutar; `select('*, product:products(*)')` ile ilişkili ürün bilgisiyle birlikte getirilir, `project_id` alanına göre filtrelenir (`.eq('project_id', projectId)`)
+  - `error` — sorgu sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+  - `items` — `data`'nın `(DbProjectItem & { product: DbProduct | null })[]` tipindeki hali; `data` null ise boş dizi (`[]`) atanır
+  - `item` — `items` dizisinin her bir elemanı; `map` fonksiyonunda kullanılır
+  - `product` — `item.product` alanıdır; ürün bilgisini tutar, null olabilir
+  - `rest` — `product` hariç `item`'ın geri kalan tüm özellikleri (destructuring ile ayrılır: `const { product, ...rest } = item`)
+- **Dönüş**: `ProjectItem[]` — hata fırlatılmazsa `items` dizisi `map` ile dönüştürülerek döndürülür; her elemanda `product` null değilse `mapDatabaseProductToDomain(product)` ile domaine dönüştürülüp `{ ...rest, product: ... }` olarak birleştirilir, null ise sadece `rest` döndürülür
 
 ---
 

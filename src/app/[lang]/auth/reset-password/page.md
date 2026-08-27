@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\reset-password\page.tsx
-skeleton_hash: 215dd04f2d232880
+source_path: C:\tmp\ops-t165\src\app\[lang]\auth\reset-password\page.tsx
+skeleton_hash: a94cd0ee99e45f75
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 6b42d995f8501c84
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T08:43:05Z
+generated_at: 2026-08-27T06:52:51Z
 ---
 
 ## Genel Bakış

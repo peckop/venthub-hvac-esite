@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\AccessDenied.tsx
-skeleton_hash: 4191c98afe89986a
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\AccessDenied.tsx
+skeleton_hash: b063e7c398f65e05
 entity_hashes:
   func:AccessDenied: ea91e56a2eab80b9
   overview: c138e2727c8c240f
-  style_tokens: 07b65f88bee816f7
-generated_at: 2026-06-19T20:46:38Z
+  style_tokens: 22fa330fa7bd104d
+generated_at: 2026-08-27T07:58:38Z
 ---
 
 ## Genel Bakış
@@ -86,10 +86,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `tracking-hvac-relaxed`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-rose-500/10`, `bg-surface-deep`, `bg-white/5`, `border-rose-500/20`, `border-white/5`, `hover:bg-white/10`, `text-3xl`, `text-center`, `text-rose-500`, `text-slate-400`, `text-slate-600`, `text-slate-700`, `text-white`, `text-xs`
+- **Renkler:** `bg-admin-bg`, `bg-admin-danger-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-border`, `border-admin-danger/30`, `hover:bg-admin-surface-3`, `text-3xl`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-fg-subtle`, `text-center`, `text-xs`
 - **Layout:** `block`, `flex`, `flex-col`, `gap-3`, `gap-4`, `h-12`, `h-24`, `inline-flex`, `items-center`, `justify-center`, `max-w-lg`, `min-h-screen`, `p-12`, `p-6`, `shadow-access-denied-black`
 - **Varyant/Responsive:** `group-hover:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `animate-in`, `border`, `duration-500`, `fade-in`, `font-black`, `font-bold`, `font-medium`, `glass-strong`, `group`, `group-hover:-translate-x-1`, `italic`, `leading-relaxed`, `mb-10`, `mb-4`, `mb-8`
+- **Yardımcı Sınıflar:** `animate-in`, `border`, `duration-500`, `fade-in`, `font-bold`, `font-medium`, `font-semibold`, `group`, `group-hover:-translate-x-1`, `italic`, `leading-relaxed`, `mb-10`, `mb-4`, `mb-8`, `mt-2`

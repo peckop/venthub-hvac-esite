@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\BrandsPage.tsx
-skeleton_hash: 48d807cf5a39178b
+source_path: C:\tmp\venthub-wt-t131\src\views\BrandsPage.tsx
+skeleton_hash: ec4c93cfd61888e3
 entity_hashes:
   func:BrandsPage: 7fe8abffb7e6dbf9
   overview: 3003d757bf1d8636
   style_tokens: 583cff7322941abd
-generated_at: 2026-08-25T07:29:18Z
+generated_at: 2026-08-27T07:08:52Z
 ---
 
 ## Genel Bakış
@@ -87,8 +87,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: BrandsPage.tsx
-  function: BrandsPage.tsx::BrandsPage
+  file: src\views\BrandsPage.tsx
+  function: src\views\BrandsPage.tsx::BrandsPage
 
 ---
 

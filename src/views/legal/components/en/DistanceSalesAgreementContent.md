@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\legal\components\en\DistanceSalesAgreementContent.tsx
-skeleton_hash: 18703e143e5cef90
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\components\en\DistanceSalesAgreementContent.tsx
+skeleton_hash: c6c503b55cc8e727
 entity_hashes:
   func:DistanceSalesAgreementContentEn: d5e77ac6d6f1d0fc
   overview: e09c7552d45f9eb1
   style_tokens: c2df28d44e819ffd
-generated_at: 2026-08-25T07:32:16Z
+generated_at: 2026-08-27T07:36:41Z
 ---
 
 ## Genel Bakış
@@ -92,8 +92,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: DistanceSalesAgreementContent.tsx
-  function: DistanceSalesAgreementContent.tsx::DistanceSalesAgreementContentEn
+  file: src\views\legal\components\en\DistanceSalesAgreementContent.tsx
+  function: src\views\legal\components\en\DistanceSalesAgreementContent.tsx::DistanceSalesAgreementContentEn
 
 ---
 

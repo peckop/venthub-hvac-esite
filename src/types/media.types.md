@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\types\media.types.ts
-skeleton_hash: 8d40d07321f51666
+source_path: C:\tmp\venthub-wt-t131\src\types\media.types.ts
+skeleton_hash: ea7a924505383fd8
 entity_hashes:
   overview: c22dcf353dfe0240
-generated_at: 2026-08-25T07:28:31Z
+generated_at: 2026-08-27T07:07:41Z
 ---
 
 ## Genel Bakış
@@ -41,14 +41,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `title?: string`
 - `thumbnailUrl?: string`
 - `aspectRatio?: '16:9' | '4:3' | '1:1' | 'vertical'`
-- `options?: {`
+- `options?: {`
 
 ### ThreeDMetadata
 - `modelId: string`
 - `format: 'glb' | 'gltf' | 'obj'`
 - `modelUrl: string`
-- `config?: {`
-- `hotspots?: Array<{`
+- `config?: {`
+- `hotspots?: Array<{`
 
 ### TechnicalDrawingMetadata
 - `id: string`
@@ -96,7 +96,7 @@ Bu dosya (`src\types\media.types.ts`) bir TypeScript tip tanımlama dosyasıdır
 
 ## NODE ID STANDARD
 
-  file: media.types.ts
+  file: src\types\media.types.ts
 
 ---
 

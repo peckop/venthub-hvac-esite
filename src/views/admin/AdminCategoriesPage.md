@@ -2,35 +2,31 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx
-skeleton_hash: f1e2f4d7f509cc69
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminCategoriesPage.tsx
+skeleton_hash: d6db22928db51fe1
 entity_hashes:
   func:AdminCategoriesPage: 2946cca3392b7941
-  overview: a42b51d530c2f063
+  overview: d8f09a59729b2ede
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-19T20:48:48Z
+generated_at: 2026-08-27T07:11:03Z
 ---
 
 ## Genel Bakış
-AdminCategoriesPage, VentHub HVAC yönetim panelinde kategori yönetimi için kullanılan ana React sayfasıdır. Sayfa, kategorilerin listelenmesi, eklenmesi, düzenlenmesi, silinmesi ve tasarım ayarlarının yönetilmesi gibi tüm kategori CRUD işlemlerini tek bir arayüzde sunar. Bileşen, veri yükleme ve silme gibi asenkron işlemleri, kullanıcının eylemlerini işleyen iç işlevlerle entegre eder.
+AdminCategoriesPage, VentHub HVAC yönetim panelinde kategori yönetimi için kullanılan ana React sayfasıdır. Bileşen, kategorilerin listelenmesi, eklenmesi, düzenlenmesi, silinmesi ve tasarım ayarlarının yönetilmesi gibi tüm kategori CRUD işlemlerini tek bir arayüzde sunar. DataTableKit bileşen setine göç edilmiş bir CLIENT-mode CRUD sayfası olarak işlev gösterir ve kritik durum yönetimini alt bileşenlere delege eder.
 
 ## Fonksiyon Grupları
+
 ### Ana Sayfa Bileşeni
-Kategori yönetim arayüzünün tüm yapısını ve işlevsel akışını tanımlayan, dışa aktarılan ana React bileşenidir.
+Kategori yönetim arayüzünün tüm yapısını ve işlevsel akışını tanımlayan, dışa aktarılan ana React bileşenidir. Sayfa yapısını oluşturmak için başlık alanını ve Suspense ile sarılmış bir area'yı birleştirir; veri yönetimi, URL state'i ve seçim state'i gibi kritik durumları `CategoriesTableBody` alt bileşenine delege eder.
 - AdminCategoriesPage
-
-### Veri Yönetim İşlemleri
-Kategori verilerinin sunucudan yüklenmesi ve belirli bir kategorinin sistemden kalıcı olarak silinmesi gibi asenkron veri işlemlerini yönetir.
-- load, remove
-
-### Eylem İşleyicileri
-Yeni kategori oluşturma, mevcut kategoriyi düzenleme formunu açma ve kategorinin tasarım sayfasına yönlendirme gibi kullanıcı etkileşimlerini yönetir.
-- handleCreate, handleEdit, handleDesign
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+
 Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** Fonksiyon gövdesi sağlanmadığından (yalnızca `AdminCategoriesPage() -> React.FC` imzası mevcut), gövdeden çıkarılabilecek mimari varsayım üretilememektedir. Eski dokümanda yer alan açıklamalar docstring/belge niteliğinde olduğundan aksiyom kaynağı olarak kullanılmamıştır.
 
 ---
 
@@ -50,9 +46,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./CategoriesTableBody::CategoriesTableBody
 - import: react::React
 - import: react::Suspense
@@ -62,16 +57,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminCategoriesPage.tsx::AdminCategoriesPage
-- **params**: () — parametre yok (React fonksiyonel bileşeni)
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `t('admin.titles.categories')` ve `t('admin.categories.subtitle')` çağrılarıyla UI metinlerini uluslararası dil destekli olarak render eder
-- **Dönüş**: JSX — `<div>` sarmalayıcısı içinde `<header>` (başlık + alt başlık) ve `<Suspense>` sarmalayıcısı içinde `<CategoriesTableBody />` bileşeninden oluşan ReactElement
-- **Yan Etkiler / Bileşen Kullanımları**:
-  - `adminSectionTitleClass` — import edilmiş CSS class sabiti, `<h1>` elementine `className` olarak uygulanır
-  - `adminSubtitleClass` — import edilmiş CSS class sabiti, `<p>` elementine `className` olarak uygulanır
-  - `Suspense` — React Suspense sınırı; `fallback` prop'u ile `AdminSkeleton` bileşeni (`variant="table" count={7} rows={6}` parametreleriyle) gösterilir
-  - `AdminSkeleton` — Suspense fallback'inde yüklenme durumunda tablo iskeleti render eder
-  - `CategoriesTableBody` — Suspense içinde lazy yüklenen kategori tablosu gövde bileşeni
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('admin.titles.categories')` ve `t('admin.categories.subtitle')` çağrılarıyla sayfa başlığı ve alt başlık metinlerini yerelleştirmek için kullanılır
+- **Dönüş**: JSX — `className="space-y-6 pb-20"` ile bir `<div>` içinde; `AdminPageHeader` bileşeni (`title` ve `description` prop'ları `t()` ile üretilir) ve `AdminSkeleton` fallback'li (`variant="table"`, `count={7}`, `rows={6}`) `<Suspense>` ile sarmalanmış `CategoriesTableBody` bileşeni döndürür
 
 ---
 

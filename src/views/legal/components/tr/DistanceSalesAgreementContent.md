@@ -2,50 +2,57 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\components\tr\DistanceSalesAgreementContent.tsx
-skeleton_hash: 8cb2c014dd41b8ac
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\components\tr\DistanceSalesAgreementContent.tsx
+skeleton_hash: 4bfe0f08e03c6dd4
 entity_hashes:
-  func:DistanceSalesAgreementContentTr: 03bf5fa5238f63e7
-  overview: 5da2b46d10bebf39
-  style_tokens: 083693da379aea89
-generated_at: 2026-06-19T20:50:52Z
+  func:DistanceSalesAgreementContentTr: 74efe788b0e15e6a
+  overview: ba0f5f1025465f7f
+  style_tokens: c2df28d44e819ffd
+generated_at: 2026-08-27T07:39:44Z
 ---
 
 ## Genel Bakış
-Bu modül, mesafeli satış sözleşmesinin Türkçe dil versiyonunu gösteren bir React bileşenidir. Yasal metin içeriğini sunan basit bir görünümden (presentation) oluşan bileşen, yalnızca dil prop'u alarak ilgili sözleşme metnini render eder. Mimari olarak yasal belge bileşenleri içinde yer alır ve dinamik bir bağımlılığı yoktur.
+Bu modül, mesafeli satış sözleşmesinin Türkçe dil versiyonunu görüntülemek için kullanılan bir React bileşeni içerir. E-ticaret platformlarında yasal zorunluluk olarak sunulan sözleşme metnini Türkçe olarak render eder. Modül yalnızca bir bileşen fonksiyonundan oluşur ve dış bağımlılığı bulunmuyor.
 
 ## Fonksiyon Grupları
-### Sözleşme İçeriği Görünümü
-Mesafeli satış sözleşmesinin Türkçe yasal metnini sayfada sunan bileşenin tanımı ve yapısını oluşturur. Fonksiyon, dil parametresine göre içerik üretir veya doğrudan Türkçe içeriği döndürür.
+
+### Yasal Belge Görünümü
+Mesafeli satış sözleşmesinin Türkçe içeriğini sayfada sunan bileşenin tanımlandığı gruptur. Bileşen, dil parametresini alarak sözleşme metnini ekrana render eder.
 - `DistanceSalesAgreementContentTr`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzasından çıkarılabilecek varsayımlar listelenmiştir.
+
+[Aksiyom 1]: Eğer `lang` prop'u sağlanmazsa, bileşenin nasıl davranacağı fonksiyon gövdesi bilinmediği için belirlenemez.
+
+[Aksiyom 2]: Eğer `lang` prop'u `string` tipinde değilse, TypeScript derleme aşamasında tip uyumsuzluğu hatası oluşur.
+
+[Aksiyom 3]: Eğer bileşenin render ettiği Türkçe sözleşme metni mevcut değilse (dosya, sabit veya kaynak eksikse), içerik boş veya hatalı görüntülenir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### DistanceSalesAgreementContentTr
+**Ne yapar**: Mesafeli satış sözleşmesinin Türkçe içeriğini sunan bir React bileşenidir. `views/legal/components/tr/` klasöründe konumlandırılmıştır ve yasal belge içeriklerinin dil bazlı ayrıştırılması mimarisinin bir parçasıdır.
 
-**Ne yapar**: Mesafeli Satış Sözleşmesi'nin Türkçe versiyonunu içeren bir React bileşeni döndürür. Bu fonksiyon, e-ticaret platformlarında yasal zorunluluk olarak sunulan mesafeli satış sözleşmesi içeriğini Türkçe dil seçeneğiyle render eden bir fonksiyonel bileşeni dışa aktarır.
-
-**Nasıl yapar**: Fonksiyon, bir React fonksiyonel bileşeni (React.FC) döndürür. Döndürülen bileşen, `lang` parametresini kabul eder ve Türkçe ("tr") diline ait mesafeli satış sözleşmesi içeriğini ekrana render eder. "Tr" suffix'i, bu bileşenin yalnızca Türkçe dil içeriğini sunduğunu belirtir.
+**Nasıl yapar**: Destructuring ile aldığı `lang` prop'unu kullanarak Türkçe mesafeli satış sözleşmesi metnini render eder. Fonksiyon, `React.FC<{ lang: string }>` tipinde bir bileşen döndürecek şekilde tanımlanmıştır. Docstring boş bırakılmıştır; bileşenin dahili render mantığı hakkında kaynakta ek bilgi bulunmamaktadır.
 
 **Parametreler**:
+- lang: `{ lang: string }` — Bileşene aktarılacak dil bilgisini taşıyan nesne içerisinden destructuring ile çıkarılan dil kodu. Kaynakta bu parametrenin bileşen içinde nasıl kullanıldığına dair ek bilgi yer almamaktadır.
 
-- **lang**: `string` — Bileşenin hangi dilde içerik göstereceğini belirten dil kodudur. Bu bileşen spesifik olarak Türkçe ("tr") dil içeriği sunar.
-
-**Dönüş**: `React.FC<{ lang: string }>` — `lang` parametresini kabul eden bir React fonksiyonel bileşeni döndürür. Bu bileşen, mesafeli satış sözleşmesinin Türkçe metnini render eder.
+**Dönüş**: `React.FC<{ lang: string }>` — `lang` prop'u alan bir React fonksiyonel bileşeni döndürür. Bu, higher-order component (HOC) yapısını işaret eder; dış fonksiyon `lang` değerini alır ve bu değeri kullanan iç bileşeni üretir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: @/config/legal::legalConfig
+- import: @/utils/routes::Routes
+- import: @/utils/routes::localizedHref
+- import: next/link::Link
 - import: react::React
 
 ---
@@ -53,22 +60,37 @@ Mesafeli satış sözleşmesinin Türkçe yasal metnini sayfada sunan bileşenin
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/components/tr/DistanceSalesAgreementContent.tsx::DistanceSalesAgreementContentTr
-- **params**: (parametre yok — bileşen imzası `{ lang: string }` olarak tanımlı ancak fonksiyon gövdesinde `lang` hiçbir yerde okunmaz)
+- **params**: `lang` — dil kodu, `localizedHref` çağrılarında yönlendirme URL'lerinin dillere göre oluşturulmasında kullanılır
 - **ic_degiskenler**:
-  - `legalConfig` — `@/config/legal` import'undan gelen yapılandırma nesnesi; sözleşme metnindeki dinamik değerlerin tamamını sağlar
-  - `legalConfig.sellerTitle` — Satıcı unvanını "Taraflar" maddesinde gösterir
-  - `legalConfig.websiteUrl` — E-ticaret sitesinin alan adını "Taraflar" ve "Tanımlar" maddelerinde referans olarak kullanır
-  - `legalConfig.sellerAddress` — Satıcının fiziksel adresini iletişim bilgileri paragrafında gösterir
-  - `legalConfig.sellerEmail` — Satıcının e-posta adresini iletişim bilgileri ve cayma bildirimi bölümlerinde kullanır
-  - `legalConfig.sellerPhone` — Satıcının telefon numarasını iletişim bilgileri paragrafında gösterir
-  - `legalConfig.taxOffice` — Satıcının vergi dairesi bilgisini iletişim bilgilerinde gösterir
-  - `legalConfig.taxNumber` — Satıcının vergi numarasını iletişim bilgilerinde gösterir
-  - `legalConfig.deliveryTime` — Teslimat süresini "Teslimat" maddesinde belirtir
-  - `legalConfig.returnAddress` — İade ürünlerin gönderileceği adresi "Cayma Hakkının Kullanımı ve İade" maddesinde gösterir
-  - `legalConfig.cargoCompanies` — İade kargo firması bilgisini iade maddesinde belirtir
-  - `legalConfig.refundTime` — Ücret iadesi süresini iade maddesinde gösterir
-  - `legalConfig.lastUpdated` — Sözleşmenin son güncelleme tarihini "Yürürlük" maddesinde belirtir
-- **Dönüş**: JSX elementi (`React.ReactNode`) — 12 maddelik Mesafeli Satış Sözleşmesi içeriği `<>...</>` fragment içinde render edilir; `lang` prop'u tanımlı olmasına rağmen hiçbir yerde okunmaz
+  - `legalConfig` — `@/config/legal` modülünden import edilen yapılandırma nesnesi; sözleşme metnindeki satıcı bilgileri, süreler ve adresler için kullanılır
+    - `legalConfig.sellerTitle` — satıcı unvanı, "Taraflar" bölümünde satıcı adı olarak gösterilir
+    - `legalConfig.websiteUrl` — site alan adı, sözleşme metninde platform adresi olarak gösterilir
+    - `legalConfig.sellerAddress` — satıcı adresi, satıcı bilgileri alanında gösterilir
+    - `legalConfig.sellerPhone` — satıcı telefonu, satıcı bilgileri alanında gösterilir
+    - `legalConfig.sellerEmail` — satıcı e-posta adresi, satıcı bilgileri alanında ve cayma bildirim adresi olarak gösterilir
+    - `legalConfig.kepAddress` — satıcı KEP adresi, satıcı bilgileri alanında gösterilir
+    - `legalConfig.mersis` — MERSİS numarası, satıcı bilgileri alanında gösterilir
+    - `legalConfig.tradeRegistryNo` — ticaret sicil numarası, satıcı bilgileri alanında gösterilir
+    - `legalConfig.chamberOfCommerce` — kayıtlı olunan oda, satıcı bilgileri alanında gösterilir
+    - `legalConfig.taxOffice` — vergi dairesi, satıcı bilgileri alanında gösterilir
+    - `legalConfig.taxNumber` — vergi numarası, satıcı bilgileri alanında gösterilir
+    - `legalConfig.etbisNo` — ETBİS kayıt numarası, satıcı bilgileri alanında gösterilir
+    - `legalConfig.refundTime` — iade süresi, fiyat/stok hatası ve cayma hakkı iade koşullarında gösterilir
+    - `legalConfig.invoiceDeliveryTime` — fatura teslim süresi, fatura düzenleme koşullarında gösterilir
+    - `legalConfig.deliveryTime` — teslimat süresi, teslimat bölümünde kargoya verilme süresi olarak gösterilir
+    - `legalConfig.cargoCompanies` — taşıyıcı firma bilgisi, teslimat ve iade kargo koşullarında gösterilir
+    - `legalConfig.returnAddress` — iade gönderim adresi, cayma hakkı kullanımı bölümünde gösterilir
+    - `legalConfig.returnShippingBearer` — iade kargo masrafını üstlenen taraf, iade masrafları koşullarında gösterilir
+    - `legalConfig.warrantyPeriod` — garanti süresi, ayıplı mal bölümünde gösterilir
+    - `legalConfig.usefulLife` — kullanım ömrü, ayıplı mal bölümünde gösterilir
+    - `legalConfig.afterSalesService` — yetkili servis/satış sonrası hizmet bilgisi, ayıplı mal bölümünde gösterilir
+    - `legalConfig.lastUpdated` — sözleşme son güncelleme tarihi, yürürlük bölümünde gösterilir
+  - `Routes` — `@/utils/routes` modülünden import edilen rota tanımları nesnesi
+    - `Routes.legal.onBilgilendirme()` — Ön Bilgilendirme Formu sayfasının rota yolunu döndüren fonksiyon; Link bileşenlerinin `href` prop'unda kullanılır
+    - `Routes.legal.kvkk()` — KVKK Aydınlatma Metni sayfasının rota yolunu döndüren fonksiyon; Link bileşeninin `href` prop'unda kullanılır
+  - `localizedHref` — `@/utils/routes` modülünden import edilen fonksiyon; rota yolu ve `lang` parametresini alarak dile özgü URL oluşturur, Link bileşenlerinin `href` değerinde kullanılır
+  - `Link` — `next/link` modülünden import edilen Next.js bağlantı bileşeni; Ön Bilgilendirme Formu ve KVKK metni bağlantılarında kullanılır
+- **Dönüş**: JSX (React.ReactNode) — Mesafeli Satış Sözleşmesi'nin Türkçe içeriğini oluşturan 14 bölüm (Taraflar, Tanımlar, Konu, Sözleşmenin Kurulması, Ürün/Bedel ve Ödeme Koşulları, Teslimat, Cayma Hakkı, Cayma Hakkının Kullanımı/İade/Masraflar, Cayma Hakkının İstisnaları, Ayıplı Mal/Garanti/Satış Sonrası Hizmet, Mücbir Sebepler, Kişisel Verilerin Korunması, Uyuşmazlıkların Çözümü, Yürürlük) içeren React fragment'ı
 
 ---
 
@@ -93,7 +115,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-industrial-gray`, `text-sm`, `text-xl`
+- **Renkler:** `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`
 - **Layout:** (yok)
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `font-semibold`, `mb-3`, `mt-2`
+- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `mt-2`, `pl-6`, `space-y-1`, `underline`

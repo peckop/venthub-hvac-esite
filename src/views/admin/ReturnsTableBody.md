@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\ReturnsTableBody.tsx
-skeleton_hash: c467a3b6d226f576
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\ReturnsTableBody.tsx
+skeleton_hash: e41bac66f680250a
 entity_hashes:
   func:ReturnDetailRow: 417bd75eec24c246
   func:ReturnsTableBody: c4e62ff41fb05b22
@@ -16,7 +16,7 @@ entity_hashes:
   func:updateReturnStatusCas: 2159b80fd9ed9fe4
   overview: b5692f23b36b8ec1
   style_tokens: 6d490f1d65bd9e21
-generated_at: 2026-08-25T07:31:08Z
+generated_at: 2026-08-27T07:32:33Z
 ---
 
 ## Genel Bakış
@@ -95,7 +95,14 @@ Bu grup, iade durumu güncelleme işlemleri sırasında oluşabilecek eski veriy
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: `StaleReturnWriteError` sınıfının yapıcı metodudur. Hata nesnesini oluştururken bir hata mesajı alır ve bu mesajı üst sınıfın yapıcısına aktarır. Ayrıca hata nesnesinin `name` özelliğini `'StaleReturnWriteError'` olarak ayarlayarak hata türünün tanımlanmasını sağlar.
+
+**Nasıl yapar**: `super(message)` çağrısı ile üst sınıfın (muhtemelen `Error`) yapıcı metoduna iletilen mesaj parametresini aktarır. Ardından `this.name` özelliğini `'StaleReturnWriteError'` string değerine atayarak, hata yakalandığında hata türünün kolayca anlaşılmasını sağlar.
+
+**Parametreler**:
+- message: string — Hata nesnesine atanacak hata mesajıdır. `super()` çağrısına iletilerek üst sınıfın yapıcısına aktarılır.
+
+**Dönüş**: Kaynak kodda dönüş tipi belirtilmemiştir.
 
 ---
 
@@ -199,93 +206,205 @@ type RefundOutcome = { ok: true } | { ok: false; message: string }
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/ReturnsTableBody.tsx::fromView
-- **params**: `row` — ReturnViewRow tipinde, veritabanından gelen ham satır verisi
-- **ic_degiskenler**: (yok — doğrudan return ifadesi kullanılır)
-- **Dönüş**: ReturnRow — `row` alanlarının nullish coalescing ile varsayılan değerlere dönüştürülmüş hali; `id`, `order_id`, `user_id`, `reason`, `status`, `created_at`, `updated_at` boş string'e, `description`, `order_number`, `customer_name`, `customer_email`, `total_amount` ise doğrudan kopyalanır
+### [N1_NASIL] AST Pointer: ReturnsTableBody.tsx::fromView
+- **params**: `row` (ReturnViewRow)
+- **ic_degiskenler**: yok — doğrudan return ifadesi kullanılır
+- **Dönüş**: ReturnRow nesnesi; `row` alanlarını `??` ile varsayılan boş string'e düşürerek haritalar (`id`, `order_id`, `user_id`, `reason`, `status`, `created_at`, `updated_at`); `description`, `order_number`, `customer_name`, `customer_email`, `total_amount` doğrudan geçirilir
 
-### [N2_NASIL] AST Pointer: src/views/admin/ReturnsTableBody.tsx::ReturnDetailRow
-- **params**: `row` — ReturnRow tipinde, iade detayı gösterilecek satır
+### [N2_NASIL] AST Pointer: ReturnsTableBody.tsx::ReturnDetailRow
+- **params**: `{ row }` (ReturnRow)
 - **ic_degiskenler**:
-  - `t` — i18n çeviri fonksiyonu, `useI18n()` ile alınır
-  - `lang` — mevcut dil kodu, `useI18n()` ile alınır; `formatDateTime` çağrısında kullanılır
-- **Dönüş**: React.FC — iade detay panelini render eden JSX; `row.id`, `row.order_id`, `row.user_id`, `row.reason`, `row.description`, `row.updated_at` alanlarını görüntüler
+  - `t` — `useI18n()` kancasından alınan çeviri fonksiyonu
+  - `lang` — `useI18n()` kancasından alınan dil kodu
+- **Dönüş**: JSX (React.FC); iade detay kartını render eder — `row.id`, `row.order_id`, `row.user_id`, `row.reason`, `row.description`, `row.updated_at` alanlarını görüntüler; `formatDateTime` ile tarih biçimlendirir
 
-### [N3_NASIL] AST Pointer: src/views/admin/ReturnsTableBody.tsx::performRealRefund
-- **params**: `orderId` — string, iade yapılacak sipariş kimliği; `returnId` — string, iade kaydı kimliği
+### [N3_NASIL] AST Pointer: ReturnsTableBody.tsx::performRealRefund
+- **params**: `orderId` (string), `returnId` (string)
 - **ic_degiskenler**:
-  - `data` — `supabaseBrowserClient.functions.invoke('iyzico-refund')` yanıtının veri kısmı
-  - `error` — aynı çağrının hata kısmı; ağ/HTTP hatası varsa dolu gelir
-  - `status` — `data?.status` — iyzico yanıtındaki iade durumu; `'refunded'`, `'partial_refunded'` veya `'already_refunded'` olmalı
-  - `err` — catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: `Promise<RefundOutcome>` — `{ ok: true }` veya `{ ok: false, message: string }`; iyzico-refund edge function çağrısının sonucunu döndürür
+  - `data` — `supabaseBrowserClient.functions.invoke<RefundResponse>('iyzico-refund', ...)` çağrısından dönen yanıt verisi
+  - `error` — aynı çağrının ağ/HTTP hatası
+  - `status` — `data?.status` değeri; `'refunded'`, `'partial_refunded'`, `'already_refunded'` dışında ise hata döner
+  - `err` — `catch` bloğunda yakalanan hata nesnesi
+- **Dönüş**: `Promise<RefundOutcome>`; `{ ok: true }` veya `{ ok: false, message: ... }`
 
-### [N4_NASIL] AST Pointer: src/views/admin/ReturnsTableBody.tsx::buildReturnUpdate
-- **params**: `newStatus` — string, yeni iade durumu; `note` — opsiyonel string, yönetici notu
+### [N4_NASIL] AST Pointer: ReturnsTableBody.tsx::buildReturnUpdate
+- **params**: `newStatus` (string), `note?` (string)
 - **ic_degiskenler**:
-  - `now` — `new Date().toISOString()`, güncel zaman damgası
-  - `update` — `ReturnUpdate` tipinde nesne; başlangıçta `{ status: newStatus }` olarak oluşturulur
-  - `trimmed` — `note?.trim()` — notun boşluklardan arındırılmış hali; boş değilse `update.admin_notes` alanına atanır
-- **Dönüş**: `ReturnUpdate` — duruma göre `approved_at`, `processed_at`, `completed_at` ve opsiyonel `admin_notes` alanlarını içeren güncelleme nesnesi
+  - `now` — `new Date().toISOString()` ile üretilen anlık zaman damgası
+  - `update` — oluşturulacak `ReturnUpdate` nesnesi; `status: newStatus` ile başlatılır
+  - `trimmed` — `note?.trim()` sonucu; boş değilse `update.admin_notes` alanına atanır
+- **Dönüş**: `ReturnUpdate`; `newStatus` değerine göre `approved_at`, `processed_at`, `completed_at` alanlarını zaman damgasıyla ekler; `note` varsa `admin_notes` alanını ekler
 
-### [N5_NASIL] AST Pointer: src/views/admin/ReturnsTableBody.tsx::StaleReturnWriteError.constructor
-- **params**: `message` — string, hata mesajı
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `super(message)` çağrısı yapar ve `this.name` değerini `'StaleReturnWriteError'` olarak atar
-
-### [N6_NASIL] AST Pointer: src/views/admin/ReturnsTableBody.tsx::updateReturnStatusCas
-- **params**: `returnId` — string, iade kaydı kimliği; `expectedStatus` — string, beklenen mevcut durum (CAS kontrolü); `payload` — ReturnUpdate, yapılacak güncelleme; `staleMessage` — string, bayat yazma hatası mesajı
+### [N5_NASIL] AST Pointer: ReturnsTableBody.tsx::updateReturnStatusCas
+- **params**: `returnId` (string), `expectedStatus` (string), `payload` (ReturnUpdate), `staleMessage` (string)
 - **ic_degiskenler**:
-  - `data` — `supabaseBrowserClient.from('venthub_returns').update(payload).eq('id', returnId).eq('status', expectedStatus).select('id')` sorgusunun dönen satırları
-  - `error` — aynı sorgunun hata nesnesi; varsa throw edilir
-- **Dönüş**: `Promise<void>` — başarılıysa sessiz döner; `error` varsa throw eder, `data` boşsa `StaleReturnWriteError` fırlatır
+  - `data` — `supabaseBrowserClient.from('venthub_returns').update(payload).eq('id', returnId).eq('status', expectedStatus).select('id')` sonucu
+  - `error` — aynı sorgunun hatası
+- **Dönüş**: `Promise<void>`; `error` varsa fırlatır; `data` boşsa (0 satır güncellendiyse) `StaleReturnWriteError(staleMessage)` fırlatır
 
-### [N7_NASIL] AST Pointer: src/views/admin/ReturnsTableBody.tsx::returnsFetcher
-- **params**: `supabase` — `SupabaseClient<Database>` tipinde, Supabase istemcisi; `params` — `FetchParams` tipinde, filtreleme/sayfalama/sıralama parametreleri
+### [N6_NASIL] AST Pointer: ReturnsTableBody.tsx::returnsFetcher
+- **params**: `supabase` (SupabaseClient\<Database\>), `params` (FetchParams)
 - **ic_degiskenler**:
-  - `query` — Supabase sorgu zinciri; `RETURNS_VIEW` tablosundan `RETURNS_SELECT` ile veri çeker, `count: 'exact'` ile toplam sayıyı döndürür
-  - `statuses` — `params.filters.status ?? []` — durum filtresi dizisi
-  - `term` — `params.query.trim()` — global arama terimi; `search_text` kolonunda `ilike` ile aranır
-  - `sortKey` — `params.sort?.key` — sıralama anahtarı
-  - `ascending` — `params.sort?.dir === 'asc'` — sıralama yönü
-  - `offset` — `(params.page - 1) * params.pageSize` — sayfalama ofseti
-  - `data` — sorgu sonucu satırlar
-  - `error` — sorgu hatası; varsa throw edilir
-  - `count` — eşleşen toplam satır sayısı
+  - `query` — `supabase.from(RETURNS_VIEW).select(RETURNS_SELECT, { count: 'exact' })` ile başlatılan sorgu zinciri
+  - `statuses` — `params.filters.status ?? [];` durum filtresi dizisi
+  - `term` — `params.query.trim()` global arama terimi; boş değilse `query.ilike('search_text', ...)` uygulanır
+  - `sortKey` — `params.sort?.key` sıralama anahtarı
+  - `ascending` — `params.sort?.dir === 'asc'` boolean değeri
+  - `offset` — `(params.page - 1) * params.pageSize` sayfalama ofseti
+  - `data` — `query.range(offset, offset + params.pageSize - 1)` sonucundaki satırlar
+  - `error` — aynı sorgunun hatası
+  - `count` — toplam eşleşen satır sayısı
   - `rows` — `(data ?? []).map(fromView)` ile ReturnRow dizisine dönüştürülen satırlar
-  - `totalMatched` — `typeof count === 'number' ? count : rows.length` — toplam eşleşme sayısı
-- **Dönüş**: `Promise<FetchResult<ReturnRow>>` — `{ rows, totalMatched }` nesnesi
+  - `totalMatched` — `typeof count === 'number' ? count : rows.length`
+- **Dönüş**: `Promise<FetchResult<ReturnRow>>`; `{ rows, totalMatched }` nesnesi; `error` varsa fırlatır
 
-### [N8_NASIL] AST Pointer: src/views/admin/ReturnsTableBody.tsx::orderLabel
-- **params**: `r` — ReturnRow tipinde, iade satırı
-- **ic_degiskenler**: (yok — doğrudan return ifadesi)
-- **Dönüş**: `string` — `r.order_number` varsa `#` ve tire sonrasındaki kısmı, yoksa `r.order_id`'nin son 8 karakterinin büyük harfli hali
+### [N7_NASIL] AST Pointer: ReturnsTableBody.tsx::orderLabel
+- **params**: `r` (ReturnRow)
+- **ic_degiskenler**: yok
+- **Dönüş**: `string`; `r.order_number` varsa `#${r.order_number.split('-')[1] ?? r.order_number}`, yoksa `#${r.order_id.slice(-8).toUpperCase()}`
 
-### [N9_NASIL] AST Pointer: src/views/admin/ReturnsTableBody.tsx::ReturnsTableBody
-- **params**: (yok)
+### [N8_NASIL] AST Pointer: ReturnsTableBody.tsx::StaleReturnWriteError.constructor
+- **params**: `message` (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok; `super(message)` çağrısı yapar ve `this.name = 'StaleReturnWriteError'` atar
+
+### [N9_NASIL] AST Pointer: ReturnsTableBody.tsx::ReturnsTableBody
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — i18n çeviri fonksiyonu
-  - `lang` — mevcut dil kodu
-  - `router` — `useRouter()` ile alınan Next.js router nesnesi
-  - `hasWriteAccess` — yazma yetkisi olup olmadığını gösteren boolean
-  - `updatingStatus` — şu an güncellenen satırın kimliği veya null; `useState` ile yönetilir
-  - `setUpdatingStatus` — `updatingStatus` state setter fonksiyonu
-  - `statusCounts` — durum bazlı sayımlar; `useState` ile yönetilen `Record<string, number>`
-  - `setStatusCounts` — `statusCounts` state setter fonksiyonu
-  - `bulkStatus` — toplu durum değişikliği için seçilen durum; `useState` ile yönetilir
-  - `setBulkStatus` — `bulkStatus` state setter fonksiyonu
-  - `fetchStatusCounts` — anonim async fonksiyon; `venthub_returns` tablosundan durum sayımlarını çeker ve `setStatusCounts` ile günceller
-  - `getStatusIcon` — anonim fonksiyon; `status` string alır, duruma göre Clock/CheckCircle/XCircle/Truck/Package/RefreshCw ikonu döndürür
-  - `getStatusColor` — anonim fonksiyon; `status` string alır, duruma göre CSS sınıf string'i döndürür
-  - `handleStatusUpdate` — anonim async fonksiyon; `row`, `newStatus`, opsiyonel `note` alır; `allowedNextStatuses` kontrolü yapar, `refunded` durumunda `performRealRefund` çağırır, `updateReturnStatusCas` ile güncelleme yapar, `syncOrderFromReturn` ve `return-status-notification` çağırır, hata yönetimi yapar
-  - `requestStatusChange` — anonim async fonksiyon; `row` ve `newStatus` alır; `refunded` durumunda `confirmWithReason` ile onay ister, `STATUSES_REQUIRING_NOTE` kontrolü yapar, `handleStatusUpdate` çağırır
-  - `bulkStatusChange` — anonim async fonksiyon; `targetStatus` alır; seçili satırlar üzerinde toplu durum değişikliği yapar, `Promise.allSettled` kullanır, kısmi başarı/hata yönetimi yapar
-  - `columns` — anonim fonksiyon; tablo sütun tanımlarını döndüren dizi; `order_number`, `customer_name`, `reason`, `status`, `created_at`, `actions` sütunlarını içerir
-  - `filterFacets` — anonim fonksiyon; durum filtresi facet tanımı döndürür; `statusCounts` kullanır
-  - `handleExportCsv` — anonim async fonksiyon; tabloyu CSV olarak dışa aktarır
-  - `handleExportXls` — anonim async fonksiyon; tabloyu XLS (HTML tablo) olarak dışa aktarır
-  - `bulkActions` — anonim fonksiyon; toplu işlem paneli tanımlarını döndüren dizi; `bulkStatus` select ve `bulkStatusChange` tetikleme butonu içerir
-- **Dönüş**: `React.FC` — iade yönetimi tablosunu render eden bileşen; AdminToolbar ve tablo içerir
+  - `t` — `useI18n()` çeviri fonksiyonu
+  - `lang` — `useI18n()` dil kodu
+  - `router` — `useRouter()` Next.js yönlendirici nesnesi
+  - `supabaseBrowserClient` — modül seviyesinde import edilen Supabase istemcisi
+  - `table` — admin tablo kancasından alınan tablo durumu (satırlar, filtreleme, sıralama, sayfalama, seçim, yeniden yükleme, dışa aktarma)
+  - `updatingStatus` / `setUpdatingStatus` — `useState<string | null>(null)`; güncellenen satırın ID'sini tutar
+  - `statusCounts` / `setStatusCounts` — `useState<Record<string, number>>({})`; her durum için toplam sayı
+  - `hasWriteAccess` — yazma yetkisi boolean değeri
+  - `bulkStatus` / `setBulkStatus` — `useState<string>('approved')`; toplu durum geçişi için seçilen hedef durum
+  - `fetchStatusCounts` — async fonksiyon; `supabaseBrowserClient.from('venthub_returns').select('status')` ile durum sayılarını çeker ve `setStatusCounts` ile günceller
+  - `getStatusIcon` — `(status: string) => React.ReactNode`; duruma göre ikon bileşeni döndürür (Clock, CheckCircle, XCircle, Truck, Package, RefreshCw)
+  - `getStatusColor` — `(status: string) => string`; duruma göre CSS sınıf string'i döndürür
+  - `handleStatusUpdate` — `async (row: ReturnRow, newStatus: string, note?: string) => void`; tek satır durum güncelleme akışı: `allowedNextStatuses` kontrolü, `performRealRefund` (refunded ise), `updateReturnStatusCas`, `syncOrderFromReturn`, `return-status-notification` çağrısı; `StaleReturnWriteError` yakalanırsa tablo yeniden yüklenir
+  - `requestStatusChange` — `async (row: ReturnRow, newStatus: string) => void`; `refunded` durumunda `confirmWithReason` ile onay ister; `STATUSES_REQUIRING_NOTE` içindeki durumlar için gerekçe zorunlu; ardından `handleStatusUpdate` çağırır
+  - `bulkStatusChange` — `async (targetStatus: string) => void`; seçili satırlar üzerinde toplu durum geçişi; `Promise.allSettled` ile kısmi başarı yönetimi; `failures` dizisi ile düşen satırları takip eder
+  - `columns` — `useMemo(() => [...], [...])` ile oluşturulan sütun tanımları dizisi; her sütun `key`, `header`, `sortable`, `cell` içerir
+  - `filterFacets` — `useMemo(() => [...], [...])` ile oluşturulan filtre facet'leri; `status` facet'i `STATUS_VALUES` ve `statusCounts` kullanır
+  - `handleExportCsv` — `async () => void`; `table.fetchAllForExport()` ile tüm satırları alır, CSV formatında Blob oluşturur ve indirir
+  - `handleExportXls` — `async () => void`; `table.fetchAllForExport()` ile tüm satırları alır, HTML tablo formatında `.xls` Blob oluşturur ve indirir
+  - `bulkActions` — `useMemo(() => [...], [...])` ile oluşturulan toplu işlem tanımları; `apply-status` action'ı select ve buton içerir
+- **Dönüş**: JSX (React.FC); AdminToolbar ve tablo yapısını render eder
+
+### [N10_NASIL] AST Pointer: ReturnsTableBody.tsx::fetchStatusCounts (ReturnsTableBody içinde)
+- **params**: yok
+- **ic_degiskenler**:
+  - `data` — `supabaseBrowserClient.from('venthub_returns').select('status')` sonucu
+  - `error` — aynı sorgunun hatası
+  - `counts` — `Record<string, number>`; her `row.status` için sayaç tutar
+  - `row` — `data` dizisindeki her satır; `row.status` değeri kullanılır
+  - `err` — `catch` bloğunda yakalanan hata
+- **Dönüş**: yok (void); yan etki olarak `setStatusCounts(counts)` çağırır; hata durumunda `console.warn` ile loglar
+
+### [N11_NASIL] AST Pointer: ReturnsTableBody.tsx::getStatusIcon (ReturnsTableBody içinde)
+- **params**: `status` (string)
+- **ic_degiskenler**: yok — doğrudan switch-case ile JSX döndürür
+- **Dönüş**: `React.ReactNode`; duruma göre ikon bileşeni: `'requested'` → Clock, `'approved'` → CheckCircle, `'rejected'` → XCircle, `'in_transit'` → Truck, `'received'` → Package, `'refunded'` → CheckCircle, `'cancelled'` → XCircle, varsayılan → RefreshCw
+
+### [N12_NASIL] AST Pointer: ReturnsTableBody.tsx::getStatusColor (ReturnsTableBody içinde)
+- **params**: `status` (string)
+- **ic_degiskenler**: yok — doğrudan switch-case ile string döndürür
+- **Dönüş**: `string`; duruma göre CSS sınıf adları (bg, text, border); varsayılan `'bg-admin-surface-3 text-admin-fg-muted border-admin-border'`
+
+### [N13_NASIL] AST Pointer: ReturnsTableBody.tsx::handleStatusUpdate (ReturnsTableBody içinde)
+- **params**: `row` (ReturnRow), `newStatus` (string), `note?` (string)
+- **ic_degiskenler**:
+  - `hasWriteAccess` — kapanış değişkeni; yazma yetkisi kontrolü
+  - `allowed` — `allowedNextStatuses(row.status)` sonucu; izin verilen durumlar dizisi
+  - `oldStatus` — `row.status` güncelleme öncesi durum
+  - `refund` — `performRealRefund(row.order_id, row.id)` sonucu; `newStatus === 'refunded'` ise çağrılır
+  - `err` — `catch` bloğunda yakalanan hata
+- **Dönüş**: yok (void); yan etkiler: `setUpdatingStatus(row.id)`, `mutateWithAudit` ile veritabanı güncellemesi, `toast.success`/`toast.error`, `table.reload()`, `setUpdatingStatus(null)`
+
+### [N14_NASIL] AST Pointer: ReturnsTableBody.tsx::requestStatusChange (ReturnsTableBody içinde)
+- **params**: `row` (ReturnRow), `newStatus` (string)
+- **ic_degiskenler**:
+  - `confirmed` — `confirmWithReason` sonucu onay boolean'ı
+  - `reason` — `confirmWithReason` sonucu gerekçe string'i
+- **Dönüş**: yok (void); `newStatus === 'refunded'` ise onay dialogu gösterir; `STATUSES_REQUIRING_NOTE.has(newStatus)` ise gerekçe zorunlu dialogu gösterir; ardından `handleStatusUpdate` çağırır
+
+### [N15_NASIL] AST Pointer: ReturnsTableBody.tsx::bulkStatusChange (ReturnsTableBody içinde)
+- **params**: `targetStatus` (string)
+- **ic_degiskenler**:
+  - `hasWriteAccess` — kapanış değişkeni; yazma yetkisi kontrolü
+  - `selected` — `table.selection.selectedIds`; seçili satır ID'leri
+  - `targets` — `table.rows.filter(...)` sonucu; geçerli geçiş yapabilen satırlar
+  - `needsNote` — `STATUSES_REQUIRING_NOTE.has(targetStatus)` boolean'ı
+  - `confirmed` — `confirmWithReason` sonucu onay boolean'ı
+  - `reason` — `confirmWithReason` sonucu gerekçe string'i
+  - `failures` — `string[]`; başarısız olan satırların hata mesajları
+  - `dbUpdates` — `targets.map(async (row) => {...})` ile oluşturulan Promise dizisi
+  - `outcomes` — `Promise.allSettled(dbUpdates)` sonucu
+  - `rejected` — `outcomes.filter(...)` ile reddedilen sonuçlar
+  - `e` — dış `catch` bloğunda yakalanan hata
+- **Dönüş**: yok (void); yan etkiler: `mutateWithAudit` ile toplu güncelleme, `toast.warning` (kısmi hata), `toast.success`, `table.selection.clear()`, `table.reload()`
+
+### [N16_NASIL] AST Pointer: ReturnsTableBody.tsx::columns (ReturnsTableBody içinde, useMemo)
+- **params**: yok
+- **ic_degiskenler**:
+  - `t` — kapanış değişkeni; çeviri fonksiyonu
+  - `lang` — kapanış değişkeni; dil kodu
+  - `router` — kapanış değişkeni; Next.js yönlendirici
+  - `hasWriteAccess` — kapanış değişkeni; yazma yetkisi
+  - `updatingStatus` — kapanış değişkeni; güncellenen satır ID'si
+  - `requestStatusChange` — kapanış değişkeni; durum değiştirme fonksiyonu
+  - `r` — her sütunun `cell` fonksiyonunda kullanılan satır parametresi (ReturnRow)
+  - `next` — `allowedNextStatuses(r.status)` sonucu; izin verilen sonraki durumlar
+  - `status` — `next.map(...)` içindeki her durum değeri
+- **Dönüş**: sütun tanımları dizisi; her eleman `{ key, header, sortable?, hideable?, cell }` içerir
+
+### [N17_NASIL] AST Pointer: ReturnsTableBody.tsx::filterFacets (ReturnsTableBody içinde, useMemo)
+- **params**: yok
+- **ic_degiskenler**:
+  - `t` — kapanış değişkeni; çeviri fonksiyonu
+  - `statusCounts` — kapanış değişkeni; durum sayıları
+  - `value` — `STATUS_VALUES.map(...)` içindeki her durum değeri
+- **Dönüş**: filtre facet'leri dizisi; `{ key: 'status', label, options: [{ value, label, count }] }`
+
+### [N18_NASIL] AST Pointer: ReturnsTableBody.tsx::handleExportCsv (ReturnsTableBody içinde)
+- **params**: yok
+- **ic_degiskenler**:
+  - `rows` — `table.fetchAllForExport()` sonucu; dışa aktarılacak tüm satırlar
+  - `header` — CSV başlık satırı dizisi (çevrilmiş sütun adları)
+  - `escape` — `(v: unknown) => string`; değerleri çift tırnak içinde escape eden fonksiyon
+  - `lines` — `rows.map(...)` sonucu; her satırı CSV formatına dönüştüren string dizisi
+  - `bom` — UTF-8 BOM karakteri `'﻿'`
+  - `csv` — birleştirilmiş CSV string'i
+  - `blob` — `new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })`
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici URL
+  - `a` — `document.createElement('a')` ile oluşturulan indirme bağlantısı
+- **Dönüş**: yok (void); yan etki olarak dosya indirme tetikler
+
+### [N19_NASIL] AST Pointer: ReturnsTableBody.tsx::handleExportXls (ReturnsTableBody içinde)
+- **params**: yok
+- **ic_degiskenler**:
+  - `rows` — `table.fetchAllForExport()` sonucu; dışa aktarılacak tüm satırlar
+  - `rowsHtml` — `rows.map(...)` sonucu; her satırı HTML `<tr>` formatına dönüştüren string dizisi
+  - `r` — `rows.map(...)` içindeki her satır (ReturnRow)
+  - `amount` — `typeof r.total_amount === 'number' ? formatCurrency(...) : ''` para birimi formatlı değer
+  - `htmlTable` — tam HTML tablo string'i
+  - `blob` — `new Blob([htmlTable], { type: 'application/vnd.ms-excel' })`
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici URL
+  - `a` — `document.createElement('a')` ile oluşturulan indirme bağlantısı
+- **Dönüş**: yok (void); yan etki olarak `.xls` dosyası indirme tetikler
+
+### [N20_NASIL] AST Pointer: ReturnsTableBody.tsx::bulkActions (ReturnsTableBody içinde, useMemo)
+- **params**: yok
+- **ic_degiskenler**:
+  - `t` — kapanış değişkeni; çeviri fonksiyonu
+  - `bulkStatus` — kapanış değişkeni; seçili hedef durum
+  - `setBulkStatus` — kapanış değişkeni; hedef durum setter'ı
+  - `bulkStatusChange` — kapanış değişkeni; toplu durum değiştirme fonksiyonu
+  - `close` — panel fonksiyonu parametresi; paneli kapatır
+  - `s` — select seçenekleri içindeki her durum değeri
+- **Dönüş**: toplu işlem tanımları dizisi; `{ key: 'apply-status', label, tone, panel }` içerir
 
 ---
 
@@ -303,23 +422,23 @@ graph TD
     ReturnsTableBody_tsx__returnsFetcher["returnsFetcher"]
     ReturnsTableBody_tsx__updateReturnStatusCas["updateReturnStatusCas"]
     ReturnsTableBody_tsx__ReturnsTableBody --> ReturnsTableBody_tsx__updateReturnStatusCas
-    ReturnsTableBody_tsx__ReturnsTableBody --> ReturnsTableBody_tsx__orderLabel
     ReturnsTableBody_tsx__ReturnsTableBody --> ReturnsTableBody_tsx__buildReturnUpdate
+    ReturnsTableBody_tsx__ReturnsTableBody --> ReturnsTableBody_tsx__orderLabel
     ReturnsTableBody_tsx__ReturnsTableBody --> ReturnsTableBody_tsx__performRealRefund
 ```
 
 ## NODE ID STANDARD
 
-  file: ReturnsTableBody.tsx
-  function: ReturnsTableBody.tsx::fromView
-  function: ReturnsTableBody.tsx::ReturnDetailRow
-  function: ReturnsTableBody.tsx::performRealRefund
-  function: ReturnsTableBody.tsx::buildReturnUpdate
-  function: ReturnsTableBody.tsx::updateReturnStatusCas
-  function: ReturnsTableBody.tsx::returnsFetcher
-  function: ReturnsTableBody.tsx::orderLabel
-  function: ReturnsTableBody.tsx::ReturnsTableBody
-  class: ReturnsTableBody.tsx::StaleReturnWriteError
+  file: src\views\admin\ReturnsTableBody.tsx
+  function: src\views\admin\ReturnsTableBody.tsx::fromView
+  function: src\views\admin\ReturnsTableBody.tsx::ReturnDetailRow
+  function: src\views\admin\ReturnsTableBody.tsx::performRealRefund
+  function: src\views\admin\ReturnsTableBody.tsx::buildReturnUpdate
+  function: src\views\admin\ReturnsTableBody.tsx::updateReturnStatusCas
+  function: src\views\admin\ReturnsTableBody.tsx::returnsFetcher
+  function: src\views\admin\ReturnsTableBody.tsx::orderLabel
+  function: src\views\admin\ReturnsTableBody.tsx::ReturnsTableBody
+  class: src\views\admin\ReturnsTableBody.tsx::StaleReturnWriteError
 
 ---
 

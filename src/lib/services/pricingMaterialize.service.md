@@ -2,62 +2,62 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\pricingMaterialize.service.ts
-skeleton_hash: b67f376748ad8690
+source_path: C:\tmp\ops-t165\src\lib\services\pricingMaterialize.service.ts
+skeleton_hash: 1a7504600073853a
 entity_hashes:
-  func:cacheKey: 7a2b037fbced40b9
-  func:materializePrices: ddcf4da4c28a534a
-  func:refreshCostInBase: 00ed35554ce3f37b
-  func:round4: dece9adaef67a7d6
-  func:todayIso: 0d4e0c50e1686151
-  overview: b94ba1fbd6fd9d6b
-generated_at: 2026-08-15T03:55:24Z
+  func:cacheKey: d7c6032a8e6f48af
+  func:materializePrices: 255ce2dc23446808
+  func:refreshCostInBase: 180bf3fe8b9a41eb
+  func:round4: fc9039dc27f20ec9
+  func:todayIso: 793f9a0b13e73649
+  overview: 257d35d42f8e9fe7
+generated_at: 2026-08-27T07:04:12Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC fiyatlandırma sistemindeki maliyet verilerinin ve fiyat listelerinin hesaplanarak veritabanına somutlaştırılmasını (materialize) yönetir. Supabase üzerinden veri okuma/yazma işlemlerini gerçekleştirerek, fiyatların baz para birimine göre güncellenmesi ve önbellek anahtarlarının üretimini koordine eder.
+Bu modül, HVAC fiyatlandırma sisteminde maliyet ve fiyat verilerinin hesaplanması, dönüştürülmesi ve veritabanına somutlaştırılmasını (materialize) yönetir. Supabase veritabanı üzerinden okuma ve yazma işlemlerini gerçekleştirerek, fiyatların baz para birimine göre güncellenmesini ve önbellek anahtarlarının üretimini koordine eder.
 
 ## Fonksiyon Grupları
 
 ### Yardımcı Fonksiyonlar
-Tarih ve sayısal değerlerin formatlanması ile önbellek anahtarı üretimi gibi yardımcı işlemler sağlar.
+Tarih üretimi, sayısal değerlerin hassas yuvarlanması ve önbellek anahtarı oluşturma gibi temel yardımcı işlemleri sağlar.
 - todayIso, round4, cacheKey
 
 ### Maliyet Yenileme
-Maliyet verilerinin baz para birimine göre güncellenmesini ve özet raporlama işlemlerini yürütür. DRY-RUN modu ile test amaçlı çalıştırma desteği sunar.
+Maliyet verilerinin baz para birimine göre güncellenmesini ve bu işlemin özet raporunu oluşturmayı sağlar. DRY-RUN modu ile test amaçlı çalıştırma desteği sunar.
 - refreshCostInBase
 
 ### Fiyat Somutlaştırma
-Tüm fiyat listelerinin hesaplanarak veritabanına kalıcı olarak yazılmasını orkestra eder. Bu işlem muhtemelen maliyet yenileme ve yardımcı fonksiyonları bir arada kullanarak ana iş mantığını yönetir.
+Tüm fiyat listelerinin hesaplanarak veritabanına kalıcı olarak yazılmasını orkestra eder. Bu işlem, maliyet yenileme ve yardımcı fonksiyonları kullanarak ana iş mantığını yönetir.
 - materializePrices
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için temel aksiyomlar aşağıda listelenmiştir. Bu aksiyomlar, fonksiyon imzaları ve modülün genel amacına dayanılarak çıkarılmıştır.
+[Aksiyom 1]: Eğer `supabase` parametresi yoksa, `refreshCostInBase` ve `materializePrices` fonksiyonları veritabanına erişemez ve çalışamaz.
 
-[Aksiyom 1]: Eğer `todayIso()` fonksiyonu geçerli bir ISO formatında (YYYY-MM-DD) tarih dizesi döndürmeyi başaramazsa, `refreshCostInBase` ve `materializePrices` fonksiyonları tarafından yapılan tarih bazlı tüm hesaplamalar ve filtreleme işlemleri yanlış çalışır.
+[Aksiyom 2]: Eğer `productId`, `priceListId` veya `currency` parametrelerinden herhangi biri yoksa, `cacheKey` fonksiyonu benzersiz bir önbellek anahtarı üretemez.
 
-[Aksiyom 2]: Eğer `round4(value: number)` fonksiyonu, girilen sayıyı hassas bir şekilde 4 ondalık basamağa yuvarlayamazsa (örn: yuvarlama hataları, kayan nokta hassasiyet kaybı), hesaplanan fiyatlar tutarsız olur ve toplamlarda hata birikir.
+[Aksiyom 3]: Eğer `value` parametresi yoksa, `round4` fonksiyonu yuvarlama işlemi gerçekleştiremez.
 
-[Aksiyom 3]: Eğer `supabase: SupabaseClient<Database>` istemcisi geçerli bir veritabanı bağlantısı sağlamaz veya `Database` şeması beklenen tabloları (fiyat listeleri, maliyet kayıtları vb.) içermezse, `refreshCostInBase` ve `materializePrices` fonksiyonlarındaki tüm veritabanı işlemleri başarısız olur.
+[Aksiyom 4]: Eğer `dryRun` opsiyonu `true` olarak ayarlanırsa, `refreshCostInBase` ve `materializePrices` fonksiyonlarının yazma işlemleri gerçekleştirilmez (salt okunur modda çalışır).
 
-[Aksiyom 4]: Eğer `options?.today` parametresi (`refreshCostInBase` ve `materializePrices` için) geçerli bir tarih dizesi olarak sağlanmazsa ve `todayIso()` da bozuksa, fonksiyonların hangi tarih aralığında çalışacağı belirsizleşir; bu durumda varsayılan olarak `todayIso()` sonucunun kullanılması beklenir, aksi halde tarih duyarlı sorgular yanlış veri döndürür.
-
-[Aksiyom 5]: Eğer `options?.dryRun` parametresi `true` olarak ayarlandığında, `refreshCostInBase` ve `materializePrices` fonksiyonlarının veritabanında kalıcı değişiklik yapmaması gerekir; dryRun modunda yazma işlemi gerçekleşirse, test veya izleme amaçlı çalıştırma güvenli hale gelmez ve istenmeyen veri değişiklikleri oluşur.
-
-[Aksiyom 6]: Eğer `cacheKey(productId: string, priceListId: string, currency: string)` fonksiyonu, verilen parametrelerden benzersiz ve tutarlı bir anahtar üretmezse (
+[Aksiyom 5]: Eğer `today` opsiyonu belirtilmezse, `refreshCostInBase` fonksiyonu tarih bilgisi için `todayIso` fonksiyonunu kullanır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### todayIso
-**Ne yapar**: Geçerli tarihini ISO 8601 formatında (YYYY-MM-DD) döndürür. Bu, günün tarihini tutarlı ve sıralanabilir bir metin olarak elde etmek için kullanılır.
-**Nasıl yapar**: `new Date()` ile mevcut tarih ve saat nesnesini oluşturur. Ardından `toISOString()` metoduyla UTC tabanlı ISO dizgesine dönüştürür. `slice(0, 10)` ile yalnızca ilk 10 karakteri (yıl-ay-gün kısmını) alarak saat ve zaman dilimi bilgisini atar.
-**Parametreler**: Parametre almaz.
-**Dönüş**: `string` — Bugünün tarihini "YYYY-MM-DD" formatında temsil eden dize.
+**Ne yapar**: Bugünün tarihini ISO 8601 formatında (YYYY-MM-DD) string olarak döndürür. Kur hesaplamalarında ve fiyat geçerlilik tarihlerinde referans tarih olarak kullanılır.
+
+**Nasıl yapar**: `new Date()` ile anlık tarih nesnesi oluşturur, `toISOString()` ile UTC milisaniye cinsinden ISO formatına çevirir ve `slice(0, 10)` ile yalnızca ilk 10 karakteri (YYYY-MM-DD kısmını) alır.
+
+**Parametreler**:
+- Bu fonksiyon parametre almaz.
+
+**Dönüş**: `string` — Bugünün tarihi "YYYY-MM-DD" biçiminde (örneğin "2026-08-24").
 
 ### round4
 **Ne yapar**: Verilen bir sayıyı ondalıklı noktadan sonra 4 basamağa yuvarlar ve bu hassasiyetle bir sayısal değer döndürür.
@@ -101,6 +101,7 @@ Tüm bu süreç toplu (batch) upsert'ler ve sayfalama kullanılarak performansl�
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../types/database.types::type { Database }
+- import: ./fxRate.service::resolveFxRate
 - import: @supabase/supabase-js::type { SupabaseClient }
 
 ---
@@ -112,6 +113,7 @@ Tüm bu süreç toplu (batch) upsert'ler ve sayfalama kullanılarak performansl�
 - `updated: number`
 - `skippedNoRate: number`
 - `skippedNoPurchasePrice: number`
+- `skippedFxLocked: number`
 - `ratesUsed: { currency: string; rate: number; effectiveDate: string }[]`
 
 ### MaterializeSampleRow
@@ -136,6 +138,7 @@ Tüm bu süreç toplu (batch) upsert'ler ve sayfalama kullanılarak performansl�
 - `rowsUpserted: number`
 - `skippedManual: number`
 - `unbridgedBrand: number`
+- `skippedFxLocked: number`
 - `deactivated: number`
 - `bySegment: MaterializeSegmentSummary[]`
 - `samples: MaterializeSampleRow[]`
@@ -159,110 +162,141 @@ type ProductPriceUpsertRow = Database['public']['Tables']['product_prices']['Ins
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/lib/services/pricingMaterialize.service.ts::todayIso
+### [N1_NASIL] AST Pointer: pricingMaterialize.service.ts::todayIso
 - **params**: (parametre yok)
-- **ic_degiskenler**: (değişken yok)
-- **Dönüş**: string —_today's date in ISO format (YYYY-MM-DD) without time
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string` — günün tarihi `YYYY-MMAA-GG` biçiminde
 
-### [N2_NASIL] AST Pointer: src/lib/services/pricingMaterialize.service.ts::round4
-- **params**: value: number
-- **ic_degiskenler**: (değişken yok)
-- **Dönüş**: number — value rounded to 4 decimal places
+---
 
-### [N3_NASIL] AST Pointer: src/lib/services/pricingMaterialize.service.ts::refreshCostInBase
-- **params**: supabase: SupabaseClient<Database>, options?: { dryRun?: boolean; today?: string }
+### [N2_NASIL] AST Pointer: pricingMaterialize.service.ts::round4
+- **params**: `value: number`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `number` — virgülden sonra 4 basamağa yuvarlanmış sayı
+
+---
+
+### [N3_NASIL] AST Pointer: pricingMaterialize.service.ts::refreshCostInBase
+- **params**: `supabase: SupabaseClient<Database>`, `options?: { dryRun?: boolean; today?: string }`
 - **ic_degiskenler**:
-  - `dryRun` — boolean flag for dry run mode (defaults to true if not specified)
-  - `today` — date string in ISO format (defaults to current date if not specified)
-  - `productsData` — raw product data from Supabase query
-  - `productsErr` — error from Supabase products query
-  - `products` — array of product objects from database (defaults to empty array)
-  - `rateByCcy` — Map to cache exchange rates by currency code to avoid duplicate API calls
-  - `ratesUsed` — array tracking all exchange rates used in the operation
-  - `ccy` — uppercased currency code within getRateFor nested function
-  - `val` — exchange rate object for TRY currency within getRateFor nested function
-  - `rates` — exchange rate data from Supabase query within getRateFor nested function
-  - `ratesErr` — error from Supabase currency_rates query within getRateFor nested function
-  - `row` — first row from currency_rates query result within getRateFor nested function
-  - `rate` — parsed numeric exchange rate within getRateFor nested function
-  - `val` — exchange rate object for non-TRY currencies within getRateFor nested function
-  - `updated` — count of products successfully updated
-  - `skippedNoRate` — count of products skipped due to missing exchange rate
-  - `skippedNoPurchasePrice` — count of products skipped due to invalid purchase price
-  - `toWrite` — array of objects to update in database (id, costInBase, purchaseRateToBase)
-  - `p` — current product being processed in the products loop
-  - `purchasePrice` — parsed numeric purchase price from product
-  - `fx` — exchange rate object for product's currency (from getRateFor)
-  - `newCostInBase` — calculated cost in base currency (TRY)
-  - `newRate` — exchange rate used for this product
-  - `sameCost` — boolean indicating if cost is unchanged from existing value
-  - `sameRate` — boolean indicating if exchange rate is unchanged from existing value
-  - `i` — loop index for chunking database updates
-  - `chunk` — array of product updates to process in current batch
-  - `results` — array of promise results from database update operations
-  - `failed` — first failed result from update operations
-- **Dönüş**: Promise<CostRefreshSummary> — { scanned, updated, skippedNoRate, skippedNoPurchasePrice, ratesUsed }
+  - `dryRun` — `options?.dryRun ?? true`; veritabanına yazma işlemini atlayıp atlamayacağını belirler
+  - `today` — `options?.today ?? todayIso()`; kur çözümlemesinde kullanılacak tarih
+  - `productsData` — `supabase.from('products').select(...)` sorgusunun `data` dönüşü; aktif, silinmemiş ürünler
+  - `productsErr` — ürün sorgusunun hata nesnesi; varsa throw edilir
+  - `products` — `productsData ?? [];` null ise boş dizi
+  - `rateByCcy` — `Map<string, { rate: number; effectiveDate: string } | null>`; para birimi başına önbelleklenmiş kur bilgisi
+  - `ratesUsed` — `CostRefreshSummary['ratesUsed']`; kullanılan kurların kaydı (para birimi, kur, etkin tarih)
+  - `updated` — güncellenen ürün sayısı sayacı
+  - `skippedNoRate` — kur bulunamadığı için atlanan ürün sayısı
+  - `skippedNoPurchasePrice` — geçerli alış fiyatı olmadığı için atlanan ürün sayısı
+  - `skippedFxLocked` — fx-lock nedeniyle atlanan ürün sayısı
+  - `toWrite` — `{ id: string; costInBase: number; purchaseRateToBase: number }[]`; veritabanına yazılacak güncelleme kayıtları
+  - `brandIdForLocks` — `loadBrandIdByName(supabase)` dönüşü; marka adından marka ID'sine eşleme haritası
+  - `fxLocks` — `resolveFxLocks(...)` dönüşü; ürün başına fx-lock durumu haritası
+  - `p` — `products` dizisi üzerindeki döngü değişkeni; tek bir ürün satırı
+  - `purchasePrice` — `Number(p.purchase_price)`; ürünün alış fiyatı
+  - `fx` — `getRateFor(p.purchase_currency)` dönüşü; `{ rate: number; effectiveDate: string } | null`
+  - `newCostInBase` — `round4(purchasePrice * fx.rate)`; yeni maliyet (taban para biriminde)
+  - `newRate` — `fx.rate`; kullanılan döviz kuru
+  - `sameCost` — mevcut `cost_in_base` ile `newCostInBase` arasındaki farkın `1e-9`'dan küçük olup olmadığını gösteren boolean
+  - `sameRate` — mevcut `purchase_rate_to_base` ile `newRate` arasındaki farkın `1e-9`'dan küçük olup olmadığını gösteren boolean
+  - `i` — `toWrite` dizisinin chunk'lar halinde işlenmesinde döngü sayacı
+  - `chunk` — `toWrite.slice(i, i + COST_UPDATE_CONCURRENCY)`; eşzamanlı güncelleme grubu
+  - `results` — `Promise.all(chunk.map(...))` dönüşü; her ürün için Supabase update sonucu dizisi
+  - `failed` — `results.find(r => r.error)`; hata içeren ilk sonuç; varsa throw edilir
+- **Dönüş**: `Promise<CostRefreshSummary>` — `{ scanned, updated, skippedNoRate, skippedNoPurchasePrice, skippedFxLocked, ratesUsed }`
 
-### [N4_NASIL] AST Pointer: src/lib/services/pricingMaterialize.service.ts::cacheKey
-- **params**: productId: string, priceListId: string, currency: string
-- **ic_degiskenler**: (değişken yok)
-- **Dönüş**: string — composite cache key in format `${productId}|${priceListId}|${currency}`
+---
 
-### [N5_NASIL] AST Pointer: src/lib/services/pricingMaterialize.service.ts::materializePrices
-- **params**: supabase: SupabaseClient<Database>, options?: MaterializeOptions
+### [N4_NASIL] AST Pointer: pricingMaterialize.service.ts::getRateFor (refreshCostInBase içinde)
+- **params**: `ccyRaw: string`
 - **ic_degiskenler**:
-  - `dryRun` — boolean flag for dry run mode (defaults to true if not specified)
-  - `today` — date string in ISO format (defaults to current date if not specified)
-  - `sampleSize` — number of sample records to collect (defaults to 10)
-  - `ruleRows` — raw pricing rules data from Supabase query
-  - `rulesErr` — error from Supabase pricing_rule query
-  - `allRules` — array of pricing rule objects (cast to PricingRuleRow[])
-  - `hasScope3Rules` — boolean indicating if any rules have scope=3
-  - `parentOf` — Map mapping category IDs to parent category IDs
-  - `EMPTY_ANCESTORS` — readonly Set as empty default for ancestors
-  - `cursor` — current category ID being traversed in ancestorsFor function
-  - `ancestors` — Set of ancestor category IDs within ancestorsFor function
-  - `depth` — loop counter for ancestor traversal depth within ancestorsFor function
-  - `priceListRows` — raw price list data from Supabase query
-  - `listsErr` — error from Supabase price_lists query
-  - `priceLists` — array of active price list objects
-  - `segmentAcc` — Map accumulating pricing statistics per segment (priceListId)
-  - `list` — current price list being processed
-  - `acc` — segment accumulator object for current price list
-  - `brandIdByName` — Map of brand names to brand IDs (loaded externally)
-  - `manualKeys` — Set of cache keys for manually overridden prices (not to be overwritten)
-  - `derivedActiveIdByKey` — Map of cache keys to database IDs for active derived prices
-  - `snapshotOffset` — pagination offset for existing product_prices snapshot
-  - `existingRows` — raw existing product_prices data from Supabase query
-  - `existingErr` — error from Supabase product_prices snapshot query
-  - `rows` — array of existing product price rows within pagination loop
-  - `row` — current existing row being processed
-  - `key` — cache key constructed from row's product_id, price_list_id, currency
-  - `fxRate` — fixed null value for fxRate (TRY-only materialization)
-  - `productsScanned` — count of products scanned
-  - `pricedProducts` — count of products with calculated prices
-  - `quoteOnlyProducts` — count of products without calculated prices
-  - `rowsUpserted` — count of rows upserted to product_prices
-  - `skippedManual` — count of products skipped due to manual overrides
-  - `unbridgedBrand` — count of products with unmapped brand names
-  - `totalNetTry` — sum of net prices in TRY for individual segments
-  - `samples` — array of sample pricing records for inspection
-  - `upsertBuffer` — buffer array for batch upsert operations
-  - `writtenKeys` — Set of cache keys written in this run (for stale row detection)
-  - `offset` — pagination offset for products query
-  - `pageRows` — raw product data from paginated Supabase query
-  - `productsErr` — error from Supabase products query
-  - `rows` — array of product scope rows
-  - `row` — current product being processed
-  - `productInput` — transformed product input for pricing engine
-  - `ancestors` — Set of ancestor category IDs for current product
-  - `productPriced` — boolean flag if product received any price
-  - `resolution` — pricing resolution result for product-list combination
-  - `key` — cache key for product-list-currency combination
-  - `staleIds` — array of IDs for stale derived prices to deactivate
-  - `i` — loop index for deactivation batching
-  - `chunk` — array of IDs to deactivate in current batch
-- **Dönüş**: Promise<MaterializeSummary> — { dryRun, productsScanned, pricedProducts, quoteOnlyProducts, rowsUpserted, skippedManual, unbridgedBrand, deactivated, bySegment, samples, totalNetTry }
+  - `ccy` — `ccyRaw.toUpperCase()`; büyük harfe dönüştürülmüş para birimi kodu
+  - `val` — `resolveFxRate(supabase, ccy, today)` dönüşü; `{ rate: number; effectiveDate: string } | null`; önbelleğe yazılır ve `ratesUsed` dizisine eklenir
+- **Dönüş**: `Promise<{ rate: number; effectiveDate: string } | null>`
+
+---
+
+### [N5_NASIL] AST Pointer: pricingMaterialize.service.ts::cacheKey
+- **params**: `productId: string`, `priceListId: string`, `currency: string`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string` — `` `${productId}|${priceListId}|${currency}` `` biçiminde birleşik anahtar
+
+---
+
+### [N6_NASIL] AST Pointer: pricingMaterialize.service.ts::materializePrices
+- **params**: `supabase: SupabaseClient<Database>`, `options?: MaterializeOptions`
+- **ic_degiskenler**:
+  - `dryRun` — `options?.dryRun ?? true`; veritabanına yazma işlemini atlayıp atlamayacağını belirler
+  - `today` — `options?.today ?? todayIso()`; fiyat çözümlemesinde kullanılacak tarih
+  - `sampleSize` — `options?.sampleSize ?? 10`; örneklem satır sayısı üst sınırı
+  - `ruleRows` — `supabase.from('pricing_rule').select('*')` sorgusunun `data` dönüşü
+  - `rulesErr` — kural sorgusunun hata nesnesi; varsa throw edilir
+  - `allRules` — `(ruleRows ?? []) as PricingRuleRow[]`; tüm fiyatlandırma kuralları
+  - `hasScope3Rules` — `allRules.some(r => r.scope === 3)`; scope=3 kuralı var mı boolean'ı
+  - `parentOf` — `Map<string, string | null>`; kategori ID'sinden üst kategori ID'sine eşleme haritası
+  - `cats` — `supabase.from('categories').select('id, parent_id')` sorgusunun `data` dönüşü
+  - `catsErr` — kategori sorgusunun hata nesnesi; varsa throw edilir
+  - `c` — `(cats ?? [])` dizisi üzerindeki döngü değişkeni; `{ id: string; parent_id: string | null }`
+  - `EMPTY_ANCESTORS` — `ReadonlySet<string>`; boş atalar kümesi (sabit referans)
+  - `priceListRows` — `supabase.from('price_lists').select('id, user_type').eq('is_active', true)` sorgusunun `data` dönüşü
+  - `listsErr` — fiyat listesi sorgusunun hata nesnesi; varsa throw edilir
+  - `priceLists` — `(priceListRows ?? []) as { id: string; user_type: string | null }[]`; aktif fiyat listeleri
+  - `segmentAcc` — `Map<string, MaterializeSegmentSummary>`; fiyat listesi başına birikim özeti
+  - `list` — `priceLists` dizisi üzerindeki döngü değişkeni
+  - `brandIdByName` — `loadBrandIdByName(supabase)` dönüşü; marka adından marka ID'sine eşleme haritası
+  - `manualKeys` — `Set<string>`; elle ezilmiş (is_derived=false, is_active≠false) satırların cache anahtarları
+  - `derivedActiveIdByKey` — `Map<string, string>`; aktif türetilmiş satırların cache anahtarından veritabanı ID'sine eşlemesi
+  - `snapshotOffset` — mevcut cache fotoğrafı sayfalama ofseti
+  - `existingRows` — `supabase.from('product_prices').select(...)` sorgusunun `data` dönüşü (sayfalı)
+  - `existingErr` — mevcut satır sorgusunun hata nesnesi; varsa throw edilir
+  - `rows` — `existingRows ?? [];` mevcut cache satırları
+  - `row` — `rows` dizisi üzerindeki döngü değişkeni
+  - `key` — `cacheKey(row.product_id, row.price_list_id, row.currency)`; tek bir satırın cache anahtarı
+  - `fxRate` — `RuleEvaluationInputs['fxRate']` olarak `null`; materialize daima TRY yazar, gösterim kuru gerekmez
+  - `productsScanned` — taranan ürün sayısı sayacı
+  - `pricedProducts` — fiyatlandırılan ürün sayısı sayacı
+  - `quoteOnlyProducts` — yalnızca teklif moduna düşen ürün sayısı sayacı
+  - `rowsUpserted` — upsert edilen satır sayısı sayacı
+  - `skippedManual` — elle ezilmiş satır nedeniyle atlanan sayaç
+  - `skippedFxLocked` — fx-lock nedeniyle atlanan ürün sayısı sayacı
+  - `unbridgedBrand` — marka ID'si köprülenemeyen ürün sayısı sayacı
+  - `totalNetTry` — bireysel segmentteki toplam net TRY tutarı
+  - `samples` — `MaterializeSampleRow[]`; bireysel segmentten örneklem satırları
+  - `upsertBuffer` — `ProductPriceUpsertRow[]`; toplu upsert için biriktirilen satırlar
+  - `writtenKeys` — `Set<string>`; bu koşuda üretilen cache anahtarları; bayat satır tespiti için kullanılır
+  - `fxPolicies` — `fetchActivePolicies(supabase)` dönüşü; aktif fiyatlandırma politikaları
+  - `offset` — ürün sayfalama ofseti
+  - `pageRows` — `supabase.from('products').select(PRODUCT_SCOPE_COLUMNS)` sorgusunun `data` dönüşü (sayfalı)
+  - `productsErr` — ürün sorgusunun hata nesnesi; varsa throw edilir
+  - `row` — `pageRows ?? []` dizisi üzerindeki döngü değişkeni; `ProductScopeRow`
+  - `productInput` — `toPricingProductInput(row, brandIdByName)` dönüşü; fiyatlandırma motoruna verilen ürün girdisi
+  - `ancestors` — `ancestorsFor(productInput.categoryId)` dönüşü; kategori ataları kümesi
+  - `productPriced` — bu ürün herhangi bir segmentte fiyatlandırıldı mı boolean'ı
+  - `acc` — `segmentAcc.get(list.id)`; mevcut segment birikim özeti
+  - `resolution` — `resolvePriceWithRules(...)` dönüşü; fiyat çözümleme sonucu
+  - `key` — `cacheKey(productInput.id, list.id, MATERIALIZE_CURRENCY)`; üretilen cache anahtarı
+  - `staleIds` — `string[]`; bu koşuda üretilmeyen eski türetilmiş satır ID'leri; pasifleştirilecek
+  - `i` — `staleIds` dizisinin chunk'lar halinde işlenmesinde döngü sayacı
+  - `chunk` — `staleIds.slice(i, i + DEACTIVATE_BATCH_SIZE)`; pasifleştirme grubu
+- **Dönüş**: `Promise<MaterializeSummary>` — `{ dryRun, productsScanned, pricedProducts, quoteOnlyProducts, rowsUpserted, skippedManual, unbridgedBrand, skippedFxLocked, deactivated, bySegment, samples, totalNetTry }`
+
+---
+
+### [N7_NASIL] AST Pointer: pricingMaterialize.service.ts::ancestorsFor (materializePrices içinde)
+- **params**: `categoryId: string | null | undefined`
+- **ic_degiskenler**:
+  - `ancestors` — `new Set<string>([categoryId])`; başlangıçta kendini içeren atalar kümesi
+  - `cursor` — `parentOf.get(categoryId)`; üst kategori zincirini takip eden işaretçi
+  - `depth` — döngü sayacı; `10` ile sınırlı (sonsuz döngü koruması)
+- **Dönüş**: `ReadonlySet<string>` — verilen kategorinin ve atalarının ID kümesi
+
+---
+
+### [N8_NASIL] AST Pointer: pricingMaterialize.service.ts::flushUpsertBatch (materializePrices içinde)
+- **params**: `rows: ProductPriceUpsertRow[]`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (void) — `dryRun` true ise veya `rows` boşsa hiçbir şey yapmaz; aksi halde `supabase.from('product_prices').upsert(rows, { onConflict: CACHE_CONFLICT_TARGET })` çağrısı yapar, hata varsa throw eder
 
 ---
 
@@ -275,10 +309,10 @@ graph TD
     pricingMaterialize_service_ts__refreshCostInBase["refreshCostInBase"]
     pricingMaterialize_service_ts__round4["round4"]
     pricingMaterialize_service_ts__todayIso["todayIso"]
-    pricingMaterialize_service_ts__refreshCostInBase --> pricingMaterialize_service_ts__todayIso
-    pricingMaterialize_service_ts__materializePrices --> pricingMaterialize_service_ts__todayIso
     pricingMaterialize_service_ts__refreshCostInBase --> pricingMaterialize_service_ts__round4
     pricingMaterialize_service_ts__materializePrices --> pricingMaterialize_service_ts__cacheKey
+    pricingMaterialize_service_ts__materializePrices --> pricingMaterialize_service_ts__todayIso
+    pricingMaterialize_service_ts__refreshCostInBase --> pricingMaterialize_service_ts__todayIso
 ```
 
 ## NODE ID STANDARD

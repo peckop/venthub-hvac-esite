@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\checkout\SecurePaymentOverlay.tsx
-skeleton_hash: cc3a2247b73d603d
+source_path: C:\tmp\venthub-wt-t131\src\views\checkout\SecurePaymentOverlay.tsx
+skeleton_hash: 0827b19752f39dd8
 entity_hashes:
   func:SecurePaymentOverlay: 2034f9e5c072e96b
   overview: abfd0850fbcc2e8a
   style_tokens: 5b40eb77343c895c
-generated_at: 2026-08-25T07:31:50Z
+generated_at: 2026-08-27T07:32:52Z
 ---
 
 ## Genel Bakış
@@ -90,8 +90,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: SecurePaymentOverlay.tsx
-  function: SecurePaymentOverlay.tsx::SecurePaymentOverlay
+  file: src\views\checkout\SecurePaymentOverlay.tsx
+  function: src\views\checkout\SecurePaymentOverlay.tsx::SecurePaymentOverlay
 
 ---
 

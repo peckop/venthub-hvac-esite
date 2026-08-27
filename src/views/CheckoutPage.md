@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\CheckoutPage.tsx
-skeleton_hash: 19e35a930c3d034c
+source_path: C:\tmp\venthub-wt-t131\src\views\CheckoutPage.tsx
+skeleton_hash: 67fb2d823758d011
 entity_hashes:
   func:CheckoutPage: d9bc38b15b781fcb
   func:handleAddressDelete: ec0b9e7a9db92cd8
@@ -11,7 +11,7 @@ entity_hashes:
   func:onNextStep: 3e6b3d1f38e13467
   overview: c81a7524fbfb8b66
   style_tokens: 71bc3e57c5f9a6e4
-generated_at: 2026-08-26T07:14:40Z
+generated_at: 2026-08-27T07:08:57Z
 ---
 
 ## Genel Bakış

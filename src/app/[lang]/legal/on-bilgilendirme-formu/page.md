@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx
-skeleton_hash: fb6641ae7be2819b
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx
+skeleton_hash: 4cca32ae0e9debc7
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: c6e80b9884dd71c2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:59Z
+generated_at: 2026-08-27T06:53:27Z
 ---
 
 ## Genel Bakış
@@ -73,9 +73,9 @@ URL'den gelen `lang` parametresini alarak ön bilgilendirme formu sayfasını re
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::generateStaticParams
-  function: page.tsx::Page
+  file: src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx
+  function: src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx::generateStaticParams
+  function: src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx::Page
 
 ---
 

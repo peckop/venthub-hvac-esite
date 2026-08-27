@@ -2,18 +2,18 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\router.ts
-skeleton_hash: 44163c2c76a39492
+source_path: C:\tmp\vh-altyapi-t165\src\utils\router.ts
+skeleton_hash: 82533b886b31dc7f
 entity_hashes:
-  func:clearClaimsCacheCookie: baefb8519ef63f63
-  func:createRedirectResponse: 05310081a4cd5ade
-  func:decryptClaims: 2068430aed6e8d59
-  func:encryptClaims: 76648dff74640cd4
-  func:getCryptoKey: 31659864bb2e78d3
-  func:resolveUserClaims: d4caa44069b031aa
-  func:setClaimsCacheCookie: ec602be634499d82
+  func:clearClaimsCacheCookie: fba385ee00475160
+  func:createRedirectResponse: 00b335ae92f46ddf
+  func:decryptClaims: 21b8d001e7219f7b
+  func:encryptClaims: 867fdb1c76091627
+  func:getCryptoKey: fbe3e5052e863dcb
+  func:resolveUserClaims: 6e51c2cd0c1f6898
+  func:setClaimsCacheCookie: f9b1d3723f21de35
   overview: efa2eee8e5e3339c
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:39:59Z
 ---
 
 ## Genel Bakış
@@ -60,14 +60,14 @@ Bu modül, kullanıcı kimlik doğrulama claim'lerini (yetkilendirme bilgilerini
 ## FONKSİYON DETAYLARI
 
 ### getCryptoKey
-**Ne yapar**: Verilen bir gizli metin dizesinden (secret) AES kriptoografik anahtarı türetir. Bu işlem,Edge ortamlarıyla uyumlu Web Crypto API kullanılarak gerçekleştirilir.
+**Ne yapar**: Bir string gizli anahtardan (secret) SHA-256 kullanarak AES şifreleme için bir `CryptoKey` nesnesi türetir. Edge ortamlarıyla uyumlu Web Crypto API sarmalayıcısı olarak çalışır.
 
-**Nasıl yapar**: Secret dizisini UTF-8 byte dizisine dönüştürür, SHA-256 algoritması ile deterministik bir hash (dize parmak izi) üretir. Elde edilen 256-bit hash değerini, AES-GCM algoritması için ‘raw’ formatında import ederek, şifreleme ve şifre çözümü için kullanılabilecek bir CryptoKey nesnesi oluşturur.
+**Nasıl yapar**: Önce `TextEncoder` ile gizli anahtar string'ini bayt dizisine dönüştürür. Ardından `crypto.subtle.digest` ile SHA-256 özetini hesaplayarak deterministik bir 256-bit değer elde eder. Son olarak `crypto.subtle.importKey` ile bu özeti `'raw'` formatında, AES algoritmasıyla ve `['encrypt', 'decrypt']` kullanım amaçlarıyla bir `CryptoKey` nesnesine dönüştürür. Anahtar dışa aktarılamaz olarak (`false`) ayarlanır.
 
 **Parametreler**:
-- `secret`: string — Anahtar türetme için kullanılacak gizli dize.
+- secret: string — Türetilecek kriptografik anahtarın kaynağı olan gizli dize
 
-**Dönüş**: `Promise<CryptoKey>` — AES-GCM algoritması için kullanılabilecek, ‘encrypt’ ve ‘decrypt’ izinlerine sahip CryptoKey nesnesi.
+**Dönüş**: `Promise<CryptoKey>` — AES-GCM şifreleme ve çözme işlemlerinde kullanılacak kriptografik anahtar nesnesi
 
 ### encryptClaims
 **Ne yapar**: Bir claims (talep) nesnesini AES-GCM algoritması ile şifreler, oluşturulan şifreli veriyi Base64URL formatına dönüştürerek bir token string’i üretir.
@@ -150,62 +150,82 @@ Bu modül, kullanıcı kimlik doğrulama claim'lerini (yetkilendirme bilgilerini
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/utils/router.ts::getCryptoKey
-- **params**: (secret: string)
+- **params**: `secret` — şifreleme anahtarı türetilecek gizli dize
 - **ic_degiskenler**:
-    - `encoder` — Metinleri byte dizisine dönüştüren TextEncoder nesnesi
-    - `secretBytes` — `secret` parametresinin byte dizisi karşılığı
-    - `hash` — `secretBytes` değerinin SHA-256 ile hashlenmiş 256-bit hali
-- **Dönüş**: Promise<CryptoKey>
+  - `encoder` — `TextEncoder` örneği, `secret` dizesini bayt dizisine dönüştürmek için kullanılır
+  - `secretBytes` — `encoder.encode(secret)` sonucu oluşan `Uint8Array`, SHA-256 özetlemesine girdi olarak verilir
+  - `hash` — `crypto.subtle.digest('SHA-256', secretBytes)` sonucu oluşan 256-bit `ArrayBuffer`, ham anahtar olarak `importKey`'e aktarılır
+- **Dönüş**: `CryptoKey` — AES-GCM algoritmasıyla `encrypt` ve `decrypt` işlemleri için kullanılacak anahtar
+
+---
 
 ### [N2_NASIL] AST Pointer: src/utils/router.ts::encryptClaims
-- **params**: (claims: Record<string, unknown>, secret: string)
+- **params**: `claims` — şifrelenecek `Record<string, unknown>` türünde veri; `secret` — şifreleme anahtarı türetilecek gizli dize
 - **ic_degiskenler**:
-    - `key` — `secret` kullanılarak oluşturulan şifreleme anahtarı (CryptoKey)
-    - `encoder` — Metinleri byte dizisine dönüştüren TextEncoder nesnesi
-    - `dataBytes` — `claims` nesnesinin JSON string halinin byte dizisi
-    - `iv` — AES-GCM şifrelemesi için rastgele 12 byte'lık başlatma vektörü
-    - `encryptedBuffer` — `dataBytes`'ın `iv` ile şifrelenmiş hali (ArrayBuffer)
-    - `combined` — `iv` ve `encryptedBuffer`'ın birleştirilmiş byte dizisi
-- **Dönüş**: Promise<string> (Base64URL formatında şifreli metin)
+  - `key` — `getCryptoKey(secret)` çağrısından dönen `CryptoKey`, AES-GCM şifrelemesinde kullanılır
+  - `encoder` — `TextEncoder` örneği, JSON dizesini bayt dizisine dönüştürmek için
+  - `dataBytes` — `JSON.stringify(claims)` sonucunun `encoder.encode` ile bayt karşılığı
+  - `iv` — `crypto.getRandomValues(new Uint8Array(12))` ile üretilen 12 baytlık rastgele Initialization Vector
+  - `encryptedBuffer` — `crypto.subtle.encrypt({ name: AES_ALGORITHM, iv }, key, dataBytes)` sonucu oluşan şifreli `ArrayBuffer`
+  - `combined` — `iv` ve `encryptedBuffer`'ın birleştirildiği `Uint8Array`; önce `iv` başa, ardından şifreli veri eklenir
+- **Dönüş**: `string` — `combined` bayt dizisinin Base64URL kodlaması (`=`, `+`, `/` karakterleri kaldırılarak)
+
+---
 
 ### [N3_NASIL] AST Pointer: src/utils/router.ts::decryptClaims
-- **params**: (cookieValue: string, secret: string)
+- **params**: `cookieValue` — Base64URL kodlanmış şifreli çerez değeri; `secret` — şifreleme anahtarı türetilecek gizli dize
 - **ic_degiskenler**:
-    - `key` — `secret` kullanılarak oluşturulan şifreleme anahtarı (CryptoKey)
-    - `base64` — `cookieValue`'nin Base64'e dönüştürülmüş hali (tire ve alt çizgi temizlenmiş)
-    - `binary` — `base64` string'inin atob() ile çözülmüş ikili metin hali
-    - `bytes` — `binary` metninin Uint8Array karşılığı
-    - `iv` — `bytes` dizisinin ilk 12 byte'ı (başlatma vektörü)
-    - `encryptedData` — `bytes` dizisinin 12. byte'dan sonuna kadar olan şifreli veri kısmı
-    - `decryptedBuffer` — `encryptedData`'nın `iv` ile çözülmüş hali (ArrayBuffer)
-    - `decryptedStr` — `decryptedBuffer`'ın TextDecoder ile metin string'e dönüştürülmüş hali
-- **Dönüş**: Promise<Record<string, unknown> | null> (hata durumunda null)
+  - `key` — `getCryptoKey(secret)` çağrısından dönen `CryptoKey`
+  - `base64` — `cookieValue`'nun `-` → `+`, `_` → `/` dönüşümü yapılmış ve padding eklenmiş hali
+  - `binary` — `atob(base64)` sonucu oluşan ikili dize
+  - `bytes` — `binary` dizesinin her karakterinin `charCodeAt` ile `Uint8Array`'e dönüştürülmüş hali
+  - `iv` — `bytes.slice(0, 12)` ile çıkarılan 12 baytlık Initialization Vector
+  - `encryptedData` — `bytes.slice(12)` ile çıkarılan şifreli veri kısmı
+  - `decryptedBuffer` — `crypto.subtle.decrypt({ name: AES_ALGORITHM, iv }, key, encryptedData)` sonucu oluşan `ArrayBuffer`
+  - `decryptedStr` — `new TextDecoder().decode(decryptedBuffer)` sonucu oluşan düz metin
+  - `error` — `catch` bloğunda yakalanan hata; `console.error` ile `[Router] Claims cache decryption failed:` mesajıyla loglanır
+- **Dönüş**: `Record<string, unknown> | null` — başarılıysa çözümlenmiş claims nesnesi, hata durumunda veya `bytes.length < 12` ise `null`
+
+---
 
 ### [N4_NASIL] AST Pointer: src/utils/router.ts::resolveUserClaims
-- **params**: (request: NextRequest, response: NextResponse, supabase: { auth: { getClaims: () => Promise<{ data: { claims: Record<string, unknown> | null } | null; error: unknown }> } }, secret: string)
+- **params**: `request` — gelen `NextRequest` nesnesi; `response` — yanıt olarak kullanılacak `NextResponse` nesnesi; `supabase` — `auth.getClaims` metodu olan Supabase istemcisi; `secret` — şifreleme anahtarı türetilecek gizli dize
 - **ic_degiskenler**:
-    - `cachedCookie` — İstekten alınan 'sb-claims-cache' cookie değeri
-    - `claims` — Önbellekten başarıyla çözülen veya Supabase'den alınan kullanıcı iddiaları (claims)
-    - `data` — Supabase auth.getClaims() çağrısının successful sonucu (claims içeren nesne)
-    - `error` — Supabase auth.getClaims() çağrısının hata sonucu
-    - `encrypted` — `claims`'in `secret` ile şifrelenmiş hali (cookie için hazırlanmış)
-- **Dönüş**: Promise<{ claims: Record<string, unknown> | null; error: unknown; source: 'cache' | 'client' }>
+  - `cachedCookie` — `request.cookies.get('sb-claims-cache')?.value` ile okunan çerez değeri; varsa önbellekten çözümleme denenir
+  - `claims` — (ilk blok) `decryptClaims(cachedCookie, secret)` sonucu; `claims.user_role` varsa önbellek kaynağıyla dönülür
+  - `data` — `supabase.auth.getClaims()` sonucundaki `data` alanı; `data.claims` null değilse kullanılır
+  - `error` — `supabase.auth.getClaims()` sonucundaki `error` alanı; varsa hata ile dönülür
+  - `claims` — (ikinci blok) `data.claims` ataması; önbelleğe yazılır ve `source: 'client'` ile dönülür
+  - `encrypted` — `encryptClaims(claims, secret)` sonucu oluşan Base64URL dizesi; `setClaimsCacheCookie` ile çereze yazılır
+  - `err` — `catch` bloğunda yakalanan hata; `source: 'client'` ile birlikte dönülür
+- **Dönüş**: `{ claims: Record<string, unknown> | null; error: unknown; source: 'cache' | 'client' }` — claims verisi, hata durumu ve verinin kaynağı (önbellek veya Supabase istemcisi)
+
+---
 
 ### [N5_NASIL] AST Pointer: src/utils/router.ts::setClaimsCacheCookie
-- **params**: (response: NextResponse, cookieValue: string, maxAgeSeconds: number)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: response nesnesine cookie ekler)
+- **params**: `response` — çerez eklenecek `NextResponse` nesnesi; `cookieValue` — çereze yazılacak şifreli değer; `maxAgeSeconds` — çerez ömrü saniye cinsinden (varsayılan `900`, yani 15 dakika)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `response.cookies.set('sb-claims-cache', ...)` çağrısı yapılır; `httpOnly: true`, `secure` ortama bağlı (`process.env.NODE_ENV === 'production'`), `sameSite: 'lax'`, `path: '/'`
+
+---
 
 ### [N6_NASIL] AST Pointer: src/utils/router.ts::clearClaimsCacheCookie
-- **params**: (response: NextResponse)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: response nesnesindeki cookie'yi siler)
+- **params**: `response` — çerez silinecek `NextResponse` nesnesi
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `response.cookies.set('sb-claims-cache', '', ...)` çağrısı yapılır; `maxAge: 0` ile çerez hemen silinir; `httpOnly: true`, `secure` ortama bağlı, `sameSite: 'lax'`, `path: '/'`
+
+---
 
 ### [N7_NASIL] AST Pointer: src/utils/router.ts::createRedirectResponse
-- **params**: (request: NextRequest, targetUrl: string | URL, responseToCopyFrom: NextResponse, status: number)
+- **params**: `request` — gelen `NextRequest` nesnesi (fonksiyon gövdesinde doğrudan kullanılmaz); `targetUrl` — yönlendirme hedefi `string | URL`; `responseToCopyFrom` — çerez ve başlıkları kopyalanacak `NextResponse` nesnesi; `status` — HTTP durum kodu (varsayılan `302`)
 - **ic_degiskenler**:
-    - `redirectRes` — Yeni oluşturulacak ve döndürülecek yönlendirme yanıtı
-- **Dönüş**: NextResponse (yeni yönlendirme yanıtı)
+  - `redirectRes` — `NextResponse.redirect(targetUrl, status)` ile oluşturulan yönlendirme yanıtı
+  - `name` — `responseToCopyFrom.cookies.getAll()` sonucundaki her çerez nesnesinden çıkarılan çerez adı
+  - `value` — çerez değeri
+  - `options` — çerez nesnesinden geriye kalan seçenekler (`...options` ile yayılır)
+  - `value` — `responseToCopyFrom.headers.forEach` içindeki başlık değeri
+  - `key` — başlık adı
+- **Dönüş**: `NextResponse` — `responseToCopyFrom`'dan tüm çerezlerin ve başlıkların kopyalandığı yönlendirme yanıtı
 
 ---
 
@@ -220,11 +240,11 @@ graph TD
     router_ts__getCryptoKey["getCryptoKey"]
     router_ts__resolveUserClaims["resolveUserClaims"]
     router_ts__setClaimsCacheCookie["setClaimsCacheCookie"]
-    router_ts__resolveUserClaims --> router_ts__decryptClaims
     router_ts__decryptClaims --> router_ts__getCryptoKey
+    router_ts__resolveUserClaims --> router_ts__decryptClaims
     router_ts__encryptClaims --> router_ts__getCryptoKey
-    router_ts__resolveUserClaims --> router_ts__encryptClaims
     router_ts__resolveUserClaims --> router_ts__setClaimsCacheCookie
+    router_ts__resolveUserClaims --> router_ts__encryptClaims
 ```
 
 ## NODE ID STANDARD

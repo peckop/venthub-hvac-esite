@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useScrollThrottle.tsx
-skeleton_hash: 76f0aa788753fa84
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useScrollThrottle.tsx
+skeleton_hash: e6802c65c1edd874
 entity_hashes:
   func:useScrollThrottle: 8c5a736c0985619d
   overview: 780bbb29a8b9d01e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:27:31Z
+generated_at: 2026-08-27T08:36:22Z
 ---
 
 ## Genel Bakış
@@ -132,8 +132,8 @@ type ScrollThrottleOptions = {
 
 ## NODE ID STANDARD
 
-  file: useScrollThrottle.tsx
-  function: useScrollThrottle.tsx::useScrollThrottle
+  file: src\hooks\useScrollThrottle.tsx
+  function: src\hooks\useScrollThrottle.tsx::useScrollThrottle
 
 ---
 

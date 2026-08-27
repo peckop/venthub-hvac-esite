@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\pricing\RuleScopeTargetPicker.tsx
-skeleton_hash: e267c406eaf62bd0
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\RuleScopeTargetPicker.tsx
+skeleton_hash: b70daa4147dc189c
 entity_hashes:
   func:RuleScopeTargetPicker: f4ade92279a11a9a
   overview: 2f50bfc7ddc59a2a
   style_tokens: 44e70660b758686a
-generated_at: 2026-08-25T07:25:11Z
+generated_at: 2026-08-27T08:19:53Z
 ---
 
 ## Genel Bakış
@@ -175,8 +175,8 @@ Kural kapsamının HEDEF seçicisi (scope ↔ hedef DB CHECK'inin UI karşılı�
 
 ## NODE ID STANDARD
 
-  file: RuleScopeTargetPicker.tsx
-  function: RuleScopeTargetPicker.tsx::RuleScopeTargetPicker
+  file: src\components\admin\pricing\RuleScopeTargetPicker.tsx
+  function: src\components\admin\pricing\RuleScopeTargetPicker.tsx::RuleScopeTargetPicker
 
 ---
 

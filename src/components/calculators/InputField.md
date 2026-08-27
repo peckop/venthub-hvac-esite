@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\calculators\InputField.tsx
-skeleton_hash: e7def4df7bf66638
+source_path: C:\tmp\vh-altyapi-t165\src\components\calculators\InputField.tsx
+skeleton_hash: cf33bd1a4486297c
 entity_hashes:
   func:InputField: 67cc20ea60eef576
   func:RadioGroup: 3547a0581eb094b6
   overview: 886525d7c102a6da
   style_tokens: d04e77e09b4ac40e
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-08-27T08:26:28Z
 ---
 
 ## Genel Bakış  

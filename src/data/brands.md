@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\data\brands.ts
-skeleton_hash: d5b2e25cfa473431
+source_path: C:\tmp\vh-altyapi-t165\src\data\brands.ts
+skeleton_hash: efb8e830e1a099f1
 entity_hashes:
   overview: 1c324d780c68eb8e
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:34:14Z
 ---
 
 ## Genel Bakış
@@ -55,7 +55,7 @@ Bu modül için temel mimari varsayım, sunulan verinin tutarlılığı ve eriş
   { 
     name: 'Vortice', 
     slug: 'vortice', 
-    description: '1954 yıl...`
+    description: '1954...`
 
 ---
 

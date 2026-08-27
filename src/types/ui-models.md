@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\types\ui-models.ts
-skeleton_hash: cecf3f41ce0cebe8
+source_path: C:\tmp\venthub-wt-t131\src\types\ui-models.ts
+skeleton_hash: fd8c49eb8a81bde9
 entity_hashes:
   overview: 33a9634a40be4fcc
-generated_at: 2026-08-13T08:54:16Z
+generated_at: 2026-08-27T07:07:44Z
 ---
 
 ## Genel Bakış
@@ -50,9 +50,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `url: string`
 - `metadata?: Json`
 
-### FtsProductResult extends DomainProduct
+### FtsProductResult
+`fts_search_products` RPC'sinin GERÇEK satır modeli. Eskiden `extends DomainProduct` yazıyordu: tip 30 alan vaat ediyor, RPC 6 alan döndürüyordu. Bu yalan canlı bir hatayı gizledi — arama sonucu `r.slug!` ile yönlendiriliyordu ve slug hiç gelmediği için `/products/undefined` açılıyordu. (W4b'de doma
+- `id: string`
+- `name: string`
+- `sku: string`
+- `brand: string`
+- `price: number | null`
 - `rank?: number`
 - `is_fuzzy_match?: boolean`
+- `family_slug?: string | null`
+- `cover_image_path?: string | null`
 
 ### FamilyListItem
 FamilyListItem: get_product_families_enriched RPC'sinin satır modeli (F5-B W0.2). Aile-bazlı vitrin listelerinin (W2.1) veri birimi; varyant satırı listeye girmez.
@@ -83,9 +91,9 @@ type DomainCategory = Omit<DbCategory, 'name' | 'description'> & {
 ```
 
 ### DomainProduct
-DomainProduct: The sanitized, UI-ready version of a product. Refines DbProduct to guarantee name, description and brand are strings.
+W4b: `price` BİLİNÇLİ olarak domain tipinden çıkarıldı. Satış fiyatını artık fiyat motoru üretiyor (`display_price` → `WithDisplayPrice.displayPrice`); ham kolon müşteri yolunda SELECT bile edilmiyor. Tip `price: number` demeye devam etseydi kaçan her okuma derlenir ve runtime'da `undefined` alırdı 
 ```typescript
-type DomainProduct = Omit<DbProduct, 'name' | 'description' | 'brand'> & {
+type DomainProduct = Omit<DbProduct, 'name' | 'description' | 'brand' | 'price'> & {
   name: string;
   description: string;
   brand: string;
@@ -100,7 +108,7 @@ type DomainProduct = Omit<DbProduct, 'name' | 'description' | 'brand'> & {
 
 ### ProjectItem
 ```typescript
-type ProjectItem = DbProjectItem & { product?: Product }
+type ProjectItem = Omit<DbProjectItem, 'product'> & { product?: Product }
 ```
 
 ### UserAddress
@@ -145,8 +153,3 @@ Bu dosyada fonksiyon gövdesi bulunmamaktadır.
   export: SearchSuggestion
   export: UserAddress
   export: UserProject
-
----
-
-## BILEŞIM (CONTAINS)
-  contains: DomainProduct

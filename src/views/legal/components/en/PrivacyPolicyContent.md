@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\components\en\PrivacyPolicyContent.tsx
-skeleton_hash: e663a80a279a5b60
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\components\en\PrivacyPolicyContent.tsx
+skeleton_hash: 2752987676be08fc
 entity_hashes:
   func:PrivacyPolicyContentEn: 0b9028540cd295ad
-  overview: 20980fb4e6c9124c
-  style_tokens: 4e890ff82c62079d
-generated_at: 2026-06-16T11:55:52Z
+  overview: 18acb08d3e5f1974
+  style_tokens: c2df28d44e819ffd
+generated_at: 2026-08-27T07:38:23Z
 ---
 
 ## Genel Bakış
@@ -18,13 +18,25 @@ Bu modül, VentHub HVAC uygulamasının İngilizce gizlilik politikası sayfası
 ## Fonksiyon Grupları
 
 ### Gizlilik Politikası İçerik Bileşeni
+
 Bu grup, gizlilik politikasının İngilizce dilindeki yapısını ve metinlerini oluşturarak kullanıcıya sunan temel bileşeni içerir. Bileşen, dil parametresini alarak içeriği dinamik olarak biçimlendirebilir, ancak asıl işlevi yasal metinlerin tutarlı bir şekilde görüntülenmesini sağlamaktır.
+
 - PrivacyPolicyContentEn
+
+## Bağımlılıklar ve Mimari Notlar
+
+- **İç bağımlılıklar**: Kaynakta başka bir iç modüle çağrı bilgisi yer almamaktadır.
+- **Dış bağımlılıklar**: React kütüphanesine bağlıdır; bileşen `React.FC` tipi ile tanımlanmıştır.
+- **Dinamik/lazy yükleme**: Kaynakta bu yönde bir bilgi bulunmamaktadır.
+- **Mimari önem**: Uygulamanın yasal uyumluluk katmanında yer alır; gizlilik politikasının İngilizce sürümünü sunan tek sorumlu bileşendir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+
 Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** Fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzası (`PrivacyPolicyContentEn({ lang })`) mevcuttur. Aksiyomlar yalnızca fonksiyon gövdesinden üretilebilir.
 
 ---
 
@@ -44,7 +56,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: @/config/legal::legalConfig
+- import: @/config/legal::legalConfigEn
 - import: @/utils/routes::Routes
 - import: @/utils/routes::localizedHref
 - import: next/link::Link
@@ -55,21 +67,28 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/components/en/PrivacyPolicyContent.tsx::PrivacyPolicyContentEn
-- **params**: `lang` — dil kodu (ör. "en"), localized URL'lerde ve href'lerde kullanılır
-- **ic_degiskenler**: (fonksiyon gövdesinde yerel değişken tanımlanmamıştır)
-  - `legalConfig.sellerTitle` — Yasal satıcı unvanı, "1) Data Controller" bölümünde rendered
-  - `legalConfig.sellerAddress` — Satıcı adresi, controller bölümünde rendered
-  - `legalConfig.sellerEmail` — Satıcı e-postası, controller bölümünde rendered
-  - `legalConfig.sellerPhone` — Satıcı telefonu, controller bölümünde rendered
-  - `legalConfig.retentionOrders` — Sipariş/fatura verisi saklama süresi, "6) Retention Periods" bölümünde rendered
-  - `legalConfig.retentionSupport` — Destek yazışmaları saklama süresi, retention bölümünde rendered
-  - `legalConfig.retentionMarketing` — Pazarlama onayları/verileri saklama süresi, retention bölümünde rendered
-  - `legalConfig.retentionLogs` — Log ve güvenlik kayıtları saklama süresi, retention bölümünde rendered
-  - `legalConfig.applicationEmail` — KVKK başvuru e-postası, "7) Your Rights" bölümünde rendered
-  - `legalConfig.lastUpdated` — Politika güncelleme tarihi, "8) Updates" bölümünde rendered
-  - `localizedHref(Routes.legal.cerez(), lang)` — Çerez politikası sayfası için localize edilmiş URL, `<Link>` href'inde kullanılır
-  - `Routes.legal.cerez()` — Çerez politikası rotasını döndüren zincirsel metod çağrısı, `localizedHref`'e argüman olarak verilir
-- **Dönüş**: JSX Fragment (`<><section>...</section>...</>`) — 8 bölümlük İngilizce gizlilik politikası içeriği; yan etki yok, state değiştirme yok, sadece statik render
+- **params**: `lang` — dil kodu (string), URL'lerin yerelleştirilmesinde kullanılır
+- **ic_degiskenler**:
+  - `legalConfig` — `@/config/legal` dosyasından `legalConfigEn` olarak import edilen yapılandırma nesnesi; satıcı bilgileri, saklama süreleri, web sitesi URL'si gibi yasal metin sabitlerini içerir
+  - `legalConfig.sellerTitle` — veri sorumlusunun unvanı
+  - `legalConfig.sellerAddress` — veri sorumlusunun adresi
+  - `legalConfig.sellerPhone` — veri sorumlusunun telefon numarası
+  - `legalConfig.sellerEmail` — veri sorumlusunun e-posta adresi
+  - `legalConfig.websiteUrl` — web sitesi URL'si
+  - `legalConfig.cargoCompanies` — kargo/kurye firmalarının adları
+  - `legalConfig.retentionOrders` — sipariş ve fatura verilerinin saklama süresi
+  - `legalConfig.retentionSupport` — destek yazışmalarının saklama süresi
+  - `legalConfig.retentionMarketing` — pazarlama izin/verilerinin saklama süresi
+  - `legalConfig.retentionLogs` — log ve güvenlik kayıtlarının saklama süresi
+  - `legalConfig.applicationEmail` — KVKK hakları başvuru e-posta adresi
+  - `legalConfig.lastUpdated` — politikanın son güncelleme tarihi
+  - `localizedHref` — `@/utils/routes` dosyasından import edilen fonksiyon; verilen rota ve dil parametresiyle yerelleştirilmiş URL üretir
+  - `Routes` — `@/utils/routes` dosyasından import edilen rota tanımları nesnesi
+  - `Routes.legal.kvkk()` — KVKK Aydınlatma Metni sayfasının rotasını döndüren fonksiyon çağrısı
+  - `Routes.legal.cerez()` — Çerez Politikası sayfasının rotasını döndüren fonksiyon çağrısı
+  - `Link` — `next/link` paketinden import edilen React bileşeni; istemci tarafı navigasyonu sağlar
+  - `lang` (parametre) — `localizedHref` çağrılarında ikinci argüman olarak kullanılarak URL'lerin dile göre şekillendirilmesini sağlar
+- **Dönüş**: `React.ReactNode` — Gizlilik Politikası içeriğini İngilizce olarak sunan JSX fragment'ı; 11 adet `<section>` bloğundan oluşur (veri sorumlusu, toplanan veriler, işleme amaçları, paylaşım, uluslararası aktarımlar, çerezler, saklama süreleri, veri güvenliği, çocukların verileri, haklar, güncellemeler)
 
 ---
 
@@ -94,7 +113,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-industrial-gray`, `text-primary-navy`, `text-xl`
+- **Renkler:** `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`
 - **Layout:** (yok)
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `pl-6`, `space-y-1`, `underline`
+- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `mt-2`, `pl-6`, `space-y-1`, `underline`

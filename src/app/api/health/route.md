@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\api\health\route.ts
-skeleton_hash: edc5a3c3f240642c
+source_path: C:\tmp\ops-t165\src\app\api\health\route.ts
+skeleton_hash: 0658a518b3ae9274
 entity_hashes:
-  func:GET: 3a9b2c312d190949
+  func:GET: db5df860aaeadf1a
   overview: c73ec3ea3e37e6ac
-generated_at: 2026-06-19T20:46:34Z
+generated_at: 2026-08-27T06:56:09Z
 ---
 
 ## Genel Bakış
@@ -37,17 +37,16 @@ Bu modül, Next.js App Router yapısında bir API sağlık kontrolü endpoint'id
 ## FONKSİYON DETAYLARI
 
 ### GET
-**Ne yapar**: Health check (sağlık kontrolü) endpoint'ini sunar ve API servisinin aktif olduğunu doğrulayan basit bir yanıt döndürür. Bu fonksiyon, sistemin çalışıp çalışmadığını kontrol etmek için kullanılan standart bir izleme mekanizmasıdır.
+**Ne yapar**: Bu fonksiyon, bir sağlık kontrolü (health check) uç noktası olarak hizmet verir. Sunucunun çalışır durumda olduğunu doğrulamak amacıyla istemciye durum bilgisi ve geçerli zaman damgası içeren bir JSON yanıtı döndürür.
 
-**Nasıl yapar**: Fonksiyon, `NextResponse.json()` metodunu kullanarak HTTP 200 durum koduyla birlikte JSON formatında yanıt oluşturur. Yanıt içinde `status` alanına "ok" değeri, `timestamp` alanına ise o anki UTC zaman damgası ISO 8601 formatında eklenir. Fonksiyon asenkron (async) olarak tanımlanmıştır, ancak mevcut implementasyonda herhangi bir asenkron işlem gerçekleştirmemektedir.
+**Nasıl yapar**: Fonksiyon herhangi bir iş mantığı uygulamaz; çağrıldığında doğrudan `NextResponse.json` metodu ile bir JSON nesnesi oluşturur ve döndürür. Bu nesne iki alandan oluşur: `status` alanı sabit `"ok"` değerini, `timestamp` alanı ise `new Date().toISOString()` çağrısıyla elde edilen UTC formatındaki geçerli zaman bilgisini içerir. Fonksiyonun `async` olarak tanımlanmış olması, Next.js'in API route handler sözleşme yapısına uyumluluk sağlar; ancak gövde içinde herhangi bir `await` ifadesi bulunmaz.
 
 **Parametreler**:
-- Fonksiyon herhangi bir parametre almamaktadır.
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**:
-- `NextResponse` — JSON formatında yanıt içeren HTTP response nesnesi
-  - `status`: string — Servisin durumunu belirtir, her zaman "ok" değerini döndürür
-  - `timestamp`: string — ISO 8601 formatında UTC zaman damgası (örnek: "2024-01-15T10:30:00.000Z")
+**Dönüş**: `NextResponse` nesnesi döndürür. Bu nesne, `Content-Type: application/json` başlığıyla birlikte aşağıdaki yapıya sahip bir JSON gövdesi içerir:
+- `status`: `string` — Sunucunun çalışır durumda olduğunu belirten `"ok"` sabit değeri.
+- `timestamp`: `string` — `Date.prototypetoISOString()` tarafından üretilen, ISO 8601 formatında UTC zaman damgası (örneğin `"2024-01-15T12:30:45.000Z"`).
 
 ---
 
@@ -58,10 +57,10 @@ Bu modül, Next.js App Router yapısında bir API sağlık kontrolü endpoint'id
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\api\health\route.ts::GET
-- **params**: (yok)
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde atanmış değişken bulunmamaktadır)
-- **Dönüş**: `NextResponse.json()` — Sağlık durumu bilgisini (status ve timestamp) JSON formatında döndürür
+### [N1_NASIL] AST Pointer: src/app/api/health/route.ts::GET
+- **params**: (parametre yok)
+- **ic_degiskenler**: (iç değişken yok)
+- **Dönüş**: `NextResponse.json` ile `status` ve `timestamp` alanlarını içeren JSON yanıt nesnesi döndürür. `status` sabit `"ok"` değerine, `timestamp` ise `new Date().toISOString()` çağrısının sonucuna eşittir.
 
 ---
 

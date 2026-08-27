@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\shell\AdminPageHeader.tsx
-skeleton_hash: 18c2d028c904b027
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\shell\AdminPageHeader.tsx
+skeleton_hash: 5276a80aa581ba71
 entity_hashes:
   func:AdminPageHeader: 9007c4c4bb00760d
   overview: e26822fd35affb04
   style_tokens: 774aecf71fafa764
-generated_at: 2026-08-15T18:23:38Z
+generated_at: 2026-08-27T08:23:54Z
 ---
 
 ## Genel Bakış

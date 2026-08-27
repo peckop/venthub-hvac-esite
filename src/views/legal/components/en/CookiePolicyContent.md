@@ -2,53 +2,55 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\components\en\CookiePolicyContent.tsx
-skeleton_hash: b953ff96c31b44de
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\components\en\CookiePolicyContent.tsx
+skeleton_hash: 90d9cc9143ee82d7
 entity_hashes:
-  func:CookiePolicyContentEn: 2826dfb8331957d4
-  overview: 253c2705d1e569f2
-  style_tokens: 6460a848de07bdf3
-generated_at: 2026-06-19T20:50:35Z
+  func:CookiePolicyContentEn: 64ceff3b3db53c10
+  overview: d2ac6a35885f1fc4
+  style_tokens: 88353204d6ac1f19
+generated_at: 2026-08-27T07:36:39Z
 ---
 
 ## Genel Bakış
-Bu modül, web sitesinin hukuki bölümünde yer alan çerez politikası bilgilendirme metnini İngilizce dilinde sunan bir React bileşenidir. Tek bir stateless fonksiyonel component olarak tasarlanmış olup, dışarıdan alınan dil parametresine göre içeriği render eder.
+Bu modül, VentHub HVAC uygulamasının hukuki sayfaları arasında yer alan çerez politikası bilgilendirme metnini İngilizce dilinde sunan bir React bileşenidir. Tek bir fonksiyonel bileşen olarak tasarlanmış olup, dışarıdan aldığı `lang` parametresine göre içeriği render eder. Modül, yasal uyumluluk kapsamında kullanıcıları çerez kullanımı hakkında bilgilendirme amacı taşır.
 
 ## Fonksiyon Grupları
 ### Çerez Politikası İçerik Bileşeni
-Modülün tek ve temel sorumluluğu, çerez politikasına ilişkin yasal metni ve bilgilendirme içeriğini, belirtilen dile göre (İngilizce) biçimlendirerek bir React JSX yapısı olarak sunmaktır.
+Modülün tek sorumluluğu, İngilizce dilindeki çerez politikası metnini bir React JSX yapısı olarak sunmaktır. Bileşen stateless olarak tasarlanmış olup, `lang` prop'u çağrımcı tarafından sağlanmalıdır.
 - CookiePolicyContentEn
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi paylaşılmadığı için sadece fonksiyon imzasından türetilebilecek minimal varsayımlar aşağıdadır.
+Bu modül için fonksiyon gövdesi paylaşılmadığından, yalnızca fonksiyon imzasından çıkarılabilen varsayımlar listelenmektedir.
 
-[Aksiyom 1]: Eğer `lang` prop'u sağlanmazsa veya `undefined`/boş string olarak geçilirse, bileşen doğru dilde içerik üretemeyebilir veya geçersiz bir duruma düşebilir.
+[Aksiyom 1]: Eğer `lang` prop'u sağlanmazsa, `lang` değeri `undefined` olur; çünkü imzada bir default değer tanımlanmamıştır.
 
-[Aksiyom 2]: Bileşen `React.FC<{ lang: string }>` tipiyle tanımlandığından, `lang` prop'u çağrımcı tarafından her durumda sağlanmalıdır; opsiyonel (`?`) olarak işaretlenmemiştir.
+[Aksiyom 2]: Eğer `lang` prop'u `string` tipinde değilse, bileşenin beklenen davranışı bilinmiyor; çünkü fonksiyon gövdesinde tip kontrolü yapılıp yapılmadığı bilinmemektedir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### CookiePolicyContentEn
+**Ne yapar**: İngilizce dilinde çerez politikası içeriğini görüntülemek için kullanılan bir React fonksiyonel bileşenidir. Bileşen, `lang` parametresini alarak dil bazlı içerik gösterimi sağlar.
 
-**Ne yapar**: Bu fonksiyon, bir React fonksiyonel bileşeni (Functional Component) döndüren bir fabrika fonksiyonudur. VentHub HVAC uygulamasının Ingilizce dilindeki Cookie Policy (Çerez Politikası) sayfasının içeriğini render eden bileşeni üretir.
-
-**Nasıl yapar**: Fonksiyon çağrıldığında, belirli bir dil prop'u kabul eden bir React bileşeni döndürür. Bu yapı sayesinde bileşen, dil parametresine göre Ingilizce çerez politikası içeriğini dinamik olarak gösterebilir. Fonksiyonun dönüş tipi `React.FC<{ lang: string }>` olarak belirtilmiştir; bu, döndürdüğü bileşenin `lang` adında bir string prop'u beklediğini ifade eder.
+**Nasıl yapar**: Fonksiyon, aldığı `lang` parametresini kullanarak çerez politikası metinlerini render eder. İç mantık hakkında docstring boş olduğu için detaylı bilgi mevcut değildir. Dosya yapısı (`src/views/legal/components/en/`) incelendiğinde, yasal sayfalar altında İngilizce diline özel bir bileşen olarak konumlandığı görülmektedir.
 
 **Parametreler**:
-- Fonksiyonun kendisi parametre almamaktadır.
+- lang: `{ lang }` (destructuring ile alınır) — Bileşenin hangi dilde içerik göstereceğini belirten dil kodu. Bileşen.fromFunction tipi `React.FC<{ lang: string }>` olarak tanımlandığından, bu parametre `string` tipindedir.
 
-**Dönüş**: 
-- `React.FC<{ lang: string }>` — Döndürülen değer, `lang` prop'unu kabul eden bir React fonksiyonel bileşenidir. Bu bileşen render edildiğinde Ingilizce çerez politikası içeriğini görüntülemektedir. `{ lang: string }` generic tipi, bileşenin props arayüzünü tanımlamakta ve `lang` parametresinin bir string değeri olarak zorunlu olduğunu belirtmektedir.
+**Dönüş**: `React.FC<{ lang: string }>` — `lang` parametresi alan bir React fonksiyonel bileşeni döndürür. Bu, bileşenin kendisinin de `lang` prop'u ile çağrılabilen bir bileşen olduğunu gösterir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: @/config/legal::legalConfig
+- import: @/components/consent/CookiePreferencesButton::CookiePreferencesButton
+- import: @/config/legal::legalConfigEn
+- import: @/utils/routes::Routes
+- import: @/utils/routes::localizedHref
+- import: next/link::Link
 - import: react::React
 
 ---
@@ -56,12 +58,16 @@ Bu modül için fonksiyon gövdesi paylaşılmadığı için sadece fonksiyon im
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/components/en/CookiePolicyContent.tsx::CookiePolicyContentEn
-- **params**: () — parametre almaz (React.FC<{ lang: string }> olarak tiplense de fonksiyon gövdesinde lang kullanılmaz)
-- **ic_degiskenler**: (yerel değişken yok — sadece import edilen config nesnesinden okuma yapılır)
-  - `legalConfig` — `@/config/legal` modülünden import edilen yasal yapılandırma nesnesi; `sellerEmail` ve `lastUpdated` alanları JSX içinde doğrudan referans olarak kullanılır
-  - `legalConfig.sellerEmail` — 5. bölüm ("Contact") içinde <strong> etiketiyle render edilen satıcı e-posta adresi
-  - `legalConfig.lastUpdated` — 6. bölüm ("Entry into Force") içinde <strong> etiketiyle render edilen güncelleme tarihi
-- **Dönüş**: `JSX.Element` — Fragment (`<>...</>`) içinde 6 adet `<section>` barındıran İngilizce Cookie Policy HTML içeriği döner; 1. section Cookie tanımı, 2. section cookie türleri (Essential, Analytical, Functional), 3. section üçüncü parti cookie'ler, 4. section cookie yönetimi talimatları, 5. section iletişim bilgisi (legalConfig.sellerEmail), 6. section yürürlük tarihi (legalConfig.lastUpdated) içerir. Yan etki: state veya hook kullanmaz, saf bir sunucu tarafı render bileşenidir.
+- **params**: `lang` — dil kodu (string), bileşen prop'u olarak destructured alınır
+- **ic_degiskenler**:
+  - `lang` — `localizedHref(Routes.legal.kvkk(), lang)` çağrısında KVKK bağlantısının dil-bağımlı URL'ini üretmek için kullanılır; ayrıca bileşen prop tipi `React.FC<{ lang: string }>` olarak tanımlıdır
+  - `legalConfig.sellerEmail` — 7. section "Contact" başlığının altında satıcı e-posta adresini metin olarak render eder
+  - `legalConfig.lastUpdated` — 8. section "Effective Date" başlığının altında politikanın son güncelleme tarihini metin olarak render eder
+  - `Routes.legal.kvkk()` — 6. section'daki `<Link>` bileşeninin `href` prop'unda KVKK sayfasının yolunu üretmek için çağrılır
+  - `localizedHref` — `Routes.legal.kvkk()` sonucunu ve `lang` parametresini alarak dil-bağımlı tam URL döndüren yardımcı fonksiyon; `<Link href={localizedHref(Routes.legal.kvkk(), lang)}>` şeklinde kullanılır
+  - `Link` — Next.js link bileşeni; 6. section "Relationship With Your Personal Data" içinde KVKK bildirgesine yönlendiren `<Link>` olarak render edilir; `className="text-primary-navy underline"` ve `href` propları alır
+  - `CookiePreferencesButton` — 5. section "Managing Your Preferences" içinde `<CookiePreferencesButton />` olarak render edilen, kullanıcıya çerez tercihlerini yönetme butonu sunan bileşen
+- **Dönüş**: `React.ReactNode` — bir React Fragment (`<>...</>`) içinde sekiz adet `<section>` elementi döndürür; her section çerez politikasının bir maddesini (tanım, kullanılan çerezler, yasal dayanak, üçüncü taraf hizmetleri, tercih yönetimi, kişisel veri ilişkisi, iletişim, yürürlük tarihi) içerir
 
 ---
 
@@ -86,7 +92,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-industrial-gray`, `text-xl`
-- **Layout:** (yok)
+- **Renkler:** `bg-gray-50`, `border-b`, `border-light-gray`, `text-industrial-gray`, `text-left`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`
+- **Layout:** `min-w-full`, `overflow-x-auto`, `p-2`
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `pl-6`, `space-y-1`
+- **Yardımcı Sınıflar:** `border`, `font-semibold`, `list-disc`, `mb-3`, `mt-2`, `mt-3`, `mt-4`, `pl-6`, `space-y-1`, `underline`

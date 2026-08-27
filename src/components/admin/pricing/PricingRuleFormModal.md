@@ -2,19 +2,21 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\PricingRuleFormModal.tsx
-skeleton_hash: 1a1c6cdfb78173d6
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\PricingRuleFormModal.tsx
+skeleton_hash: fef9fabe35f67961
 entity_hashes:
+  func:FieldError: 73ce29b5cf8d764a
   func:PricingRuleFormModal: 5017b207035eeb67
   func:checkViolationKey: 22e511fa606eb81b
-  func:fieldError: 922eae618bf3ddb5
+  func:errText: 8a537a0380518c38
+  func:focusFirstInvalid: e259adc3f012f99f
   func:getPricingRuleSchema: e0d0c902881ddac2
   func:isPostgrestError: 15f008fc13ed6567
   func:parseNumberInput: bdead8e5f41b382d
   func:ruleToFormValues: ac74e08b56288be9
-  overview: 2e04603267bf68bd
-  style_tokens: ed3d0e5d56480a0e
-generated_at: 2026-08-14T09:13:17Z
+  overview: 4184a1042220c1da
+  style_tokens: 8097a8b7f5d9da11
+generated_at: 2026-08-27T09:03:19Z
 ---
 
 ## Genel Bakış
@@ -22,40 +24,27 @@ Bu modül, yönetici panelinde fiyatlandırma kurallarını oluşturmak veya dü
 
 ## Fonksiyon Grupları
 ### Form Şeması ve Veri Dönüşümü
-Bu grup, form alanlarının yapısını ve varsayılan değerlerini tanımlar, ayrıca mevcut veriyi formun kullanabileceği formatlara dönüştürür.
+Form alanlarının yapısını, doğrulama kurallarını ve varsayılan değerlerini tanımlar; ayrıca mevcut bir kural kaydını formun kullanabileceği formata dönüştürür.
 - `getPricingRuleSchema`, `ruleToFormValues`
 
 ### Girdi İşleme ve Doğrulama
-Kullanıcıdan alınan ham girdileri (özellikle sayısal alanları) işleyip uygun türlere dönüştürür ve formvalidasyon hatalarını formatlar.
-- `parseNumberInput`, `fieldError`
+Kullanıcıdan alınan ham girdileri (özellikle sayısal alanları) uygun türlere dönüştürür, form doğrulama hatalarını kullanıcıya gösterilecek biçime getirir ve ilk geçersiz alana otomatik odaklanmayı sağlar.
+- `parseNumberInput`, `FieldError`, `focusFirstInvalid`
 
 ### Hata Yönetimi
-Veritabanından veya API'den dönen hataları analiz eder, özellikle benzersizlik ihlali gibi iş kuralları hatalarını tanır ve uygulama içinde ele alınabilir hale getirir.
-- `isPostgrestError`, `checkViolationKey`
+Veritabanından veya API'den dönen hataları analiz eder; özellikle benzersizlik ihlali gibi iş kuralları hatalarını tanır ve insan tarafından okunabilir hata metinleri üretir.
+- `isPostgrestError`, `checkViolationKey`, `errText`
 
-### Ana Bileşen (Orkestrasyon)
-Tüm bu yardımcı fonksiyonları bir araya getirerek modalın açılmasını, formunsubmission sürecini ve durum yönetimini koordine eden üst düzey React bileşenidir.
+### Ana Bileşen
+Tüm yardımcı fonksiyonları bir araya getirerek modalın açılmasını, formun gönderilme sürecini ve durum yönetimini koordine eden üst düzey React bileşenidir.
 - `PricingRuleFormModal`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, bir fiyatlandırma kuralı (Pricing Rule) oluşturma/düzenleme formunu modal olarak sunar. Aşağıdaki mimari varsayımlar modülün doğru çalışması için zorunludur.
-
-**[Aksiyom 1 – Çeviri Fonksiyonu Zorunluluğu]:** Eğer `getPricingRuleSchema` fonksiyonuna geçerli bir `t: (key: string) => string` çeviri fonksiyonu sağlanmazsa, form validasyon şemasındaki semua hata mesajları yerelleştirilmemiş (raw key) olarak görünür ve kullanıcı deneyimi bozulur.
-
-**[Aksiyom 2 – PricingRuleRow Veri Shape'i]:** Eğer `ruleToFormValues` fonksiyonuna beklenen `PricingRuleRow` shape'ine uymayan bir nesne verilirse, form alanları yanlış/eksik değerlerle başlatılır; modal düzenleme modunda hatalı veri gösterimi oluşur.
-
-**[Aksiyom 3 – Sayısal Girdi Null Handling]:** Eğer `parseNumberInput` tarafından döndürülen `null` değeri çağrıucuda ele alınmazsa (örn. form submit sırasında), geçersiz/NaN değerler backend'e gönderilir ve beklenmeyen hatalar oluşur.
-
-**[Aksiyom 4 – PostgREST Hata Formatı Varsayımı]:** Eğer backend'den dönen hata PostgREST hata formatında (`PostgrestError`) değilse, hem `isPostgrestError` hem de `checkViolationKey` fonksiyonları `false`/`null` döndürür; bu durumda duplicate veya constraint violation hataları kullanıcıya anlamsız bir şekilde gösterilir.
-
-**[Aksiyom 5 – EMPTY_VALUES Shape Eşleşmesi]:** Eğer `EMPTY_VALUES` sabitinin shape'i form alanlarıyla eşleşmiyorsa (alan isimleri, türleri değişmişse), modal yeni kural oluşturma modunda boş/bozuk form değerleriyle başlatılır.
-
-**[Aksiyom 6 – Modal Props Zorunluluğu]:** Eğer `PricingRuleFormModal` bileşenine `open`, `onClose` veya `onSaved` callback'leri sağlanmazsa, modal açılamaz, kapatılamaz veya kayıt sonrası tetikleme (list yenileme vb.) gerçekleşmez.
-
-**[Aksiyom 7 – Validation Schema ile fieldError Tutarlılığı]:** Eğer `getPricingRuleSchema` tarafından döndürülen Zod şemasındaki alan isimleri ile `fieldError`'ın beklediği message formatı uyumsuzsa, form submit sırasında validasyon hataları doğru alanlara bağlanmaz ve kullanıcı hangi alanda hata olduğunu bilemez.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -96,6 +85,22 @@ Bu modül, bir fiyatlandırma kuralı (Pricing Rule) oluşturma/düzenleme formu
 - `error`: `unknown` — İşlenecek hata nesnesi.
 **Dönüş**: `string | null` — Eşleşen bir CHECK constraint bulunursa i18n mesaj anahtarı, aksi halde `null`.
 
+### errText
+**Ne yapar**: React Hook Form (RHF) kütüphanesinden gelen hata mesajını güvenli bir şekilde string türüne daraltır. RHF'nin `FieldError` tipindeki `message` alanı `unknown` olarak tanımlıdır; bu fonksiyon, `any` kullanmadan bu değeri `string` ya da `undefined` olarak döndürerek tip güvenliği sağlar.
+
+**Nasıl yapar**: Gelen `message` parametresinin türünü kontrol eder. Eğer değer bir string ise onu string olarak döndürür; aksi halde `undefined` döndürür. Bu sayede `any` türüne başvurmadan tip daraltma (type narrowing) işlemi gerçekleştirilir.
+
+**Parametreler**:
+- `message: unknown` — React Hook Form'un hata nesnesinden gelen mesaj değeri. Türü önceden bilinmediği için `unknown` olarak tanımlanmıştır.
+
+**Dönüş**: `string | undefined` — Eğer gelen mesaj bir string ise o string değerini; değilse `undefined` döndürür.
+
+### FieldError
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### focusFirstInvalid
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
 ### PricingRuleFormModal
 **Ne yapar**: Bir fiyatlandırma kuralı oluşturmak veya düzenlemek için açılan modal form bileşenini temsil eder.
 **Nasıl yapar**: Bu bir React fonksiyonel bileşenidir. `open`, `rule`, `onClose` ve `onSaved` prop'larını alır. `open` prop'u modal'ın görünür olup olmadığını kontrol eder. Düzenleme modunda ise `rule` prop'u ile mevcut kural değerleri form alanlarına doldurulur. Form gönderildiğinde `onSaved` callback'i ile üst bileşene bildirimde bulunur ve `onClose` ile kapanır.
@@ -106,16 +111,10 @@ Bu modül, bir fiyatlandırma kuralı (Pricing Rule) oluşturma/düzenleme formu
 - `onSaved`: `(saved: PricingRuleRow) => void` — Kural başarıyla kaydedildiğinde çağrılan fonksiyon.
 **Dönüş**: `React.FC<PricingRuleFormModalProps>` — React fonksiyonel bileşeni.
 
-### fieldError
-**Ne yapar**: Form alanları için hata mesajını işleyen ve muhtemelen UI'da gösterilmek üzere formatlayan bir yardımcı fonksiyondur.
-**Nasıl yapar**: Verilen `message` parametresinin (hata bilgisi) işlenmesi ve form alanına özgü bir hata gösterimi üretmesi beklenen bir yardımcı fonksiyondur. Belirli bir mantığı docstring'de detaylandırılmamıştır, ancak genellikle form library'lerindeki (örn. react-hook-form) hata gösterimiyle entegre çalışır.
-**Parametreler**:
-- `message`: `unknown` — İşlenecek hata bilgisi, string veya nesne olabilir.
-**Dönüş**: Belirtilmemiş, muhtemelen `string` veya `ReactNode` gibi bir hata gösterim elemanı döndürür.
-
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../overlay/ConfirmProvider::useConfirm
 - import: ./RuleScopeTargetPicker::RuleScopeTargetPicker
 - import: @/hooks/useRole::useRole
 - import: @/i18n/I18nProvider::useI18n
@@ -131,6 +130,7 @@ Bu modül, bir fiyatlandırma kuralı (Pricing Rule) oluşturma/düzenleme formu
 - import: lucide-react::Loader2
 - import: lucide-react::Save
 - import: lucide-react::X
+- import: react-hook-form::type { FieldErrors }
 - import: react-hook-form::useForm
 - import: react::React
 - import: react::useCallback
@@ -175,107 +175,120 @@ type PricingRuleFormValues = z.infer<ReturnType<typeof getPricingRuleSchema>>
   scope: 4,
   product_id: null,
   brand_id: null,
-  category_id: null,...`
+  category_id: null,...`
+- **FIELD_FOCUS_ORDER** (array) — `[
+  { name: 'margin_pct', id: 'rule-rate' },
+  { name: 'fixed_price', id: '...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::getPricingRuleSchema
-- **params**: `t` — i18n çeviri fonksiyonu, validation mesajlarını lokalize etmek için kullanılır
+### [N1_NASIL] AST Pointer: PricingRuleFormModal.tsx::getPricingRuleSchema
+- **params**: `t` — çeviri fonksiyonu, `key: string` alır ve `string` döndürür
 - **ic_degiskenler**:
-  - `v` — superRefine callback'inde form değerlerini temsil eden Zod doğrulama nesnesi (scope, method, margin_pct, fixed_price, product_id, brand_id, category_id, round_to, charm_ending, currency, min_margin_abs, max_margin_abs, valid_from, valid_to alanlarını içerir)
-  - `ctx` — Zod RefinementCtx, `addIssue` ile hata eklemek için kullanılır
-  - `targetIssue` — scope hedefi için hata üreten yerel fonksiyon; path parametresi ile hangi alanın eksik olduğunu belirtir
-- **Dönüş**: Zod schema nesnesi (PricingRuleFormValues tipini doğrulayan object schema + superRefine)
+  - `v` — superRefine callback'inde doğrulanan form değerleri objesi
+  - `ctx` — Zod doğrulama context'i, `addIssue` metoduyla hata ekler
+  - `targetIssue` — scope hedef alanı eksik olduğunda hata ekleyen yardımcı fonksiyon; `path` parametresi `'product_id' | 'brand_id' | 'category_id'` alır
+  - `path` — `targetIssue` fonksiyonuna iletilen alan adı
+- **Dönüş**: z.object Zod şeması (superRefine ile genişletilmiş)
 
----
+### [N2_NASIL] AST Pointer: PricingRuleFormModal.tsx::ruleToFormValues
+- **params**: `rule` — `PricingRuleRow` tipinde veritabanı satırı
+- **ic_degiskenler**: yok (doğrudan return objesi oluşturulur)
+- **Dönüş**: `PricingRuleFormValues` objesi
 
-### [N2_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::ruleToFormValues
-- **params**: `rule` — PricingRuleRow tipinde veritabanından gelen fiyatlandırma kuralı satırı
-- **ic_degiskenler**: yok (doğrudan `rule` özelliklerinden return objesi oluşturulur)
-- **Dönüş**: PricingRuleFormValues — rule alanlarını form input değerlerine dönüştürülmüş nesne; `rule.method` === 'fixed' olduğunda 'fixed', aksi halde 'cost_plus' olarak normalize eder; `rule.currency` ve `rule.valid_from`/`rule.valid_to` null ise boş string fallback kullanır
-
----
-
-### [N3_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::parseNumberInput
-- **params**: `raw` — string, kullanıcının girdiği ham sayısal metin
+### [N3_NASIL] AST Pointer: PricingRuleFormModal.tsx::parseNumberInput
+- **params**: `raw` — ham string input
 - **ic_degiskenler**:
-  - `normalized` — `raw`'ın trim edilip virgülünün noktaya dönüştürülmüş hali; TR locale girdisi için normalize
-- **Dönüş**: `number | null` — boş string ise null, aksi halde `Number(normalized)` sonucu
+  - `normalized` — `raw` değerinin trimlenmiş ve virgülün noktaya çevrilmiş hali
+- **Dönüş**: `number | null` — boş string ise `null`, aksi halde `Number(normalized)`
 
----
-
-### [N4_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::isPostgrestError
-- **params**: `error` — unknown tipinde yakalanan hata
-- **ic_degiskenler**: yok (doğrudan `error` üzerinde `typeof`, `null` kontrolü ve `'code' in`, `'message' in` member check yapılır)
-- **Dönüş**: `error is PostgrestError` — type guard; nesne olup `code` ve `message` özelliğine sahipse true
-
----
-
-### [N5_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::checkViolationKey
-- **params**: `error` — unknown tipinde yakalanan hata
-- **ic_degiskenler**:
-  - `detail` — `${error.message} ${error.details ?? ''}` birleşimi; violation constraint adını içeren aranacak metin
-- **Dönüş**: `string | null` — PostgrestError code '23514' değilse null; `detail` içinde `pricing_rule_method_fields`, `pricing_rule_scope_target`, `min_quantity`, `scope` kalıp kontrolü ile i18n anahtar döner; eşleşme yoksa `'admin.pricing.rules.errors.checkViolation'`
-
----
-
-### [N6_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::PricingRuleFormModal
-- **params**: `{ open, rule, onClose, onSaved }` — `open`: modalın açık olup olmadığı, `rule`: düzenlenecek PricingRuleRow (yeni kural için undefined/null), `onClose`: kapatma callback'i, `onSaved`: kayıt başarılı sonrası callback
-- **ic_degiskenler**:
-  - `EMPTY_VALUES` — sabit, formun varsayılan boş değerleri objesi
-  - `next` — `ruleToFormValues(rule)` çağrısının sonucu; mevcut kuralı form değerlerine dönüştürür
-  - `nextMode` — `next.method === 'fixed' ? 'fixed' : 'percent'`; form yüklendiğinde input modunu belirler
-  - `setMode` — RateInputMode state setter; yüzde/sabit fiyat geçişi
-  - `setRateRaw` — ham oran girdisi state setter
-  - `reset` — react-hook-form `reset` fonksiyonu; form değerlerini toplu olarak sıfırlar
-  - `setExistingRules` — mevcut fiyatlandırma kuralları listesi state setter
-  - `supabase` — Supabase istemci instance'ı; API çağrıları için kullanılır
-  - `rules` — `listPricingRules(supabase)` sonucu; mevcut kurallar dizisi
-  - `alive` — cleanup flag; async işlemler sırasında bileşen unmount edildiğinde state güncellemesini engeller
-  - `scope` — form değerinden gelen mevcut kapsam (1=product, 2=brand, 3=category, 4=all)
-  - `targetId` — kapsam 1-3 olduğunda hedef ID
-  - `setImpactCount` — etki sayısı state setter
-  - `setImpactSamples` — etki örnekleri state setter
-  - `setImpactLoading` — etki hesaplama yükleme durumu state setter
-  - `SAMPLE_SIZE` — sabit, örnekleme için çekilecek ürün sayısı
-  - `IMPACT_DEBOUNCE_MS` — sabit, debounce bekleme süresi
-  - `count` — `countProductsInScope` sonucu; kapsam dahilindeki ürün sayısı
-  - `samples` — `sampleProductsInScope` sonucu; örnek ürün dizisi
-  - `withBefore` — ImpactSample[] dizisi; her ürün için mevcut gross fiyatı eklenmiş hali
-  - `product` — for döngüsü içindeki tekil ürün; `resolvePrice` ile fiyatı çözümlenir
-  - `price` — `resolvePrice` sonucu; `{ price }` destructuring
-  - `timer` — `setTimeout` sonucu; debounce timer referansı
-  - `values` — react-hook-form `getValues()` mevcut form değerleri
-  - `draftRule` — `buildPayload` callback'inin döndürdüğü PricingRuleCreateInput; hesaplama ve karşılaştırma için kullanılır
-  - `DRAFT_RULE_ID` — sabit, draft kural için geçici ID
-  - `ancestors` — `new Set<string>`; ürünün kategori ataları seti
-  - `today` — `new Date().toISOString().slice(0, 10)`; bugünün YYYY-MM-DD stringi, geçerlilik kontrolü için
-  - `rivals` — `existingRules.filter(...)` sonucu; draft ile rekabet eden kurallar dizisi
-  - `winner` — `sortRules([...rivals, draftRule], null)[0]`; sıralama sonrası birinci kural
-  - `payload` — PricingRuleCreateInput; DB'ye gönderilecek ham veri objesi; `scope` değerine göre product_id/brand_id/category_id'i koşullu atar, method'a göre margin_pct/fixed_price seçer, currency uppercase'e dönüştürülür
-  - `authData` — `supabase.auth.getUser()` sonucu; `authData.user?.id` ile userId alınır
-  - `userId` — `authData.user?.id ?? null`; audit trail için kullanıcı ID'si
-  - `setSaving` — kaydetme durumu state setter
-  - `mutateWithAudit` — audit log'lu veri yazma fonksiyonu; resource, canWrite, action, rowPk, before/after ile çağrılır
-  - `hasWriteAccess` — boolean; kullanıcının yazma izni olup olmadığı
-  - `checkKey` — `checkViolationKey(e)` sonucu; DB constraint ihlali için i18n anahtarı
-  - `e` — catch bloğunda yakalanan hata
-  - `handleBeforeUnload` — `beforeunload` event handler; form kirliyse tarayıcı kapatmayı engeller
-  - `raw` — handleRateChange parametresi; ham oran girdisi
-  - `parsed` — `parseNumberInput(raw)` sonucu; parse edilmiş sayı veya null
-  - `marginPct` — `values.margin_pct` kısayolu; geçerli marj yüzdesi
-  - `nextScope` — handleScopeChange parametresi; yeni scope değeri
-  - `nextId` — handleTargetChange parametresi; yeni hedef ID
-- **Dönüş**: JSX.Element — React functional component; pricing kuralı ekleme/düzenleme modalı; form alanlarını, etki hesaplamasını, kaydetme mantığını render eder
-
----
-
-### [N7_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::fieldError
-- **params**: `message` — unknown tipinde hata mesajı
+### [N4_NASIL] AST Pointer: PricingRuleFormModal.tsx::isPostgrestError
+- **params**: `error` — `unknown` tipinde hata
 - **ic_degiskenler**: yok
-- **Dönüş**: `JSX.Element | null` — message string ise `<p>` ile rose-400 renkli hata metni, değilse null
+- **Dönüş**: `boolean` — type guard; `error` obje, null değil, `code` ve `message` alanlarına sahipse `true`
+
+### [N5_NASIL] AST Pointer: PricingRuleFormModal.tsx::checkViolationKey
+- **params**: `error` — `unknown` tipinde hata
+- **ic_degiskenler**:
+  - `detail` — `error.message` ve `error.details` değerlerinin birleştirilmiş string hali
+- **Dönüş**: `string | null` — constraint violation mesaj anahtarı veya `null`
+
+### [N6_NASIL] AST Pointer: PricingRuleFormModal.tsx::errText
+- **params**: `message` — `unknown` tipinde hata mesajı
+- **ic_degiskenler**: gövde verilmemiş
+- **Dönüş**: `string | undefined`
+
+### [N7_NASIL] AST Pointer: PricingRuleFormModal.tsx::FieldError
+- **params**: `id` — input element ID'si (`string`), `message` — hata mesajı (`string`, opsiyonel)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element veya `null` — `message` varsa `<p>` etiketi, yoksa `null`
+
+### [N8_NASIL] AST Pointer: PricingRuleFormModal.tsx::focusFirstInvalid
+- **params**: `errs` — `FieldErrors<PricingRuleFormValues>` tipinde form hataları objesi
+- **ic_degiskenler**:
+  - `first` — `FIELD_FOCUS_ORDER` dizisinde `errs[name]` eşleşen ilk öğe
+- **Dönüş**: `void`
+
+### [N9_NASIL] AST Pointer: PricingRuleFormModal.tsx::PricingRuleFormModal
+- **params**: `open` — modal açık mı (`boolean`), `rule` — düzenlenen kural (`PricingRuleRow | null`), `onClose` — kapatma callback'i, `onSaved` — kayıt başarılı callback'i
+- **ic_degiskenler**:
+  - `form` — `useForm` hook dönüşü; `register`, `setValue`, `reset`, `handleSubmit`, `formState`, `clearErrors`, `watch` metotlarını içerir
+  - `values` — `watch()` ile izlenen tüm form değerleri
+  - `mode` — `useState<RateInputMode>`; `'percent'` veya `'fixed'` modu
+  - `setMode` — `mode` state.setter fonksiyonu
+  - `rateRaw` — `useState<string>`; oran input'unun ham string değeri
+  - `setRateRaw` — `rateRaw` state.setter fonksiyonu
+  - `impactCount` — `useState<number | null>`; etki alanındaki ürün sayısı
+  - `setImpactCount` — `impactCount` state.setter fonksiyonu
+  - `impactSamples` — `useState<ImpactSample[]>`; örnek ürün listesi
+  - `setImpactSamples` — `impactSamples` state.setter fonksiyonu
+  - `impactLoading` — `useState<boolean>`; etki hesaplama yükleniyor mu
+  - `setImpactLoading` — `impactLoading` state.setter fonksiyonu
+  - `existingRules` — `useState<PricingRuleRow[]>`; mevcut kurallar listesi
+  - `setExistingRules` — `existingRules` state.setter fonksiyonu
+  - `saving` — `useState<boolean>`; kayıt işlemi devam ediyor mu
+  - `setSaving` — `saving` state.setter fonksiyonu
+  - `hasWriteAccess` — `useRole()` hook'undan gelen yazma yetkisi (`boolean`)
+  - `confirm` — `useConfirm()` hook'undan gelen onay dialog fonksiyonu
+  - `supabase` — Supabase istemcisi (hook'tan geliyor)
+  - `locale` — yerel ayar bilgisi (JSX'te kullanılıyor)
+  - `draftRule` — `useMemo` ile hesaplanmış, form değerlerinden türetilen kural objesi
+  - `draftRulePayload` — form değerlerini `PricingRuleCreateInput` formatına dönüştüren fonksiyon; `values` parametresi alır
+  - `draftLosesFor` — ürünün mevcut kurallarla karşılaştırmasını yapıp draft kuralın kaybedip kaybetmediğini kontrol eden fonksiyon; `product: SampleProduct` parametresi alır
+  - `handleRateChange` — oran input değişikliğini işleyen fonksiyon; `raw: string` ve `nextMode: RateInputMode` parametreleri alır
+  - `switchMode` — mod geçişini işleyen fonksiyon; `nextMode: RateInputMode` parametresi alır
+  - `handleScopeChange` — kapsam değişikliğini işleyen fonksiyon; `nextScope: number` parametresi alır
+  - `handleTargetChange` — hedef ID değişikliğini işleyen fonksiyon; `nextId: string | null` parametresi alır
+  - `handleClose` — kapatma işlemini işleyen async fonksiyon; kaydedilmemiş değişiklik kontrolü yapar
+  - `handleSubmit` — form gönderimini işleyen async fonksiyon; `v: PricingRuleFormValues` parametresi alır
+  - `renderImpactSample` — etki örneğini JSX olarak render eden fonksiyon; `{ product, beforeGross }` parametresi alır
+  - `handleBeforeUnload` — sayfa kapanış uyarısı için event handler; `e: BeforeUnloadEvent` parametresi alır
+  - `alive` — useEffect cleanup'larında kullanılan boolean flag
+  - `timer` — debounce için setTimeout ID'si
+  - `targetIssue` — scope hedef alanı eksikliğinde hata ekleyen yardımcı fonksiyon (superRefine içinde)
+  - `next` — `ruleToFormValues(rule)` dönüşü, form resetleme için kullanılır
+  - `nextMode` — `RateInputMode` tipinde mod değeri (useEffect içinde)
+  - `rules` — `listPricingRules` dönüşü, mevcut kurallar listesi
+  - `count` — `countProductsInScope` dönüşü, ürün sayısı
+  - `samples` — `sampleProductsInScope` dönüşü, örnek ürün dizisi
+  - `withBefore` — `ImpactSample[]` tipinde, önceki fiyat bilgisi eklenmiş örnekler
+  - `product` — döngüdeki `SampleProduct` öğesi
+  - `price` — `resolvePrice` dönüşünden destructure edilen fiyat objesi
+  - `payload` — `PricingRuleCreateInput` tipinde kayıt payload'ı
+  - `authData` — `supabase.auth.getUser()` dönüşü
+  - `userId` — kimlik doğrulama kullanıcı ID'si (`string | null`)
+  - `checkKey` — `checkViolationKey(e)` dönüşü, constraint violation anahtarı
+  - `e` — catch bloğundaki hata objesi
+  - `m` — JSX map döngüsündeki mod öğesi (`{ key, label }`)
+  - `rivals` — `existingRules` filtrelenmiş hali, rakip kurallar
+  - `winner` — `sortRules` ile sıralanan kurallar dizisinin ilk elemanı
+  - `ancestors` — `Set<string>` tipinde ürün kategori ataları kümesi
+  - `today` — günün tarihi string olarak (`YYYY-MM-DD` formatında)
+  - `after` — `computePriceFromRule` dönüşü, hesaplanmış fiyat
+  - `loses` — `draftLosesFor(product)` dönüşü, boolean
+- **Dönüş**: JSX element (React.FC)
 
 ---
 
@@ -283,19 +296,21 @@ type PricingRuleFormValues = z.infer<ReturnType<typeof getPricingRuleSchema>>
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    PricingRuleFormModal_tsx__FieldError["FieldError"]
     PricingRuleFormModal_tsx__PricingRuleFormModal["PricingRuleFormModal"]
     PricingRuleFormModal_tsx__checkViolationKey["checkViolationKey"]
-    PricingRuleFormModal_tsx__fieldError["fieldError"]
+    PricingRuleFormModal_tsx__errText["errText"]
+    PricingRuleFormModal_tsx__focusFirstInvalid["focusFirstInvalid"]
     PricingRuleFormModal_tsx__getPricingRuleSchema["getPricingRuleSchema"]
     PricingRuleFormModal_tsx__isPostgrestError["isPostgrestError"]
     PricingRuleFormModal_tsx__parseNumberInput["parseNumberInput"]
     PricingRuleFormModal_tsx__ruleToFormValues["ruleToFormValues"]
-    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__checkViolationKey
-    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__fieldError
-    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__getPricingRuleSchema
+    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__ruleToFormValues
     PricingRuleFormModal_tsx__checkViolationKey --> PricingRuleFormModal_tsx__isPostgrestError
     PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__parseNumberInput
-    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__ruleToFormValues
+    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__checkViolationKey
+    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__getPricingRuleSchema
+    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__errText
 ```
 
 ## NODE ID STANDARD
@@ -306,14 +321,19 @@ graph TD
   function: src\components\admin\pricing\PricingRuleFormModal.tsx::parseNumberInput
   function: src\components\admin\pricing\PricingRuleFormModal.tsx::isPostgrestError
   function: src\components\admin\pricing\PricingRuleFormModal.tsx::checkViolationKey
+  function: src\components\admin\pricing\PricingRuleFormModal.tsx::errText
+  function: src\components\admin\pricing\PricingRuleFormModal.tsx::FieldError
+  function: src\components\admin\pricing\PricingRuleFormModal.tsx::focusFirstInvalid
   function: src\components\admin\pricing\PricingRuleFormModal.tsx::PricingRuleFormModal
-  function: src\components\admin\pricing\PricingRuleFormModal.tsx::fieldError
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: FieldError
   export: PricingRuleFormModal
   export: checkViolationKey
+  export: errText
+  export: focusFirstInvalid
   export: getPricingRuleSchema
   export: isPostgrestError
   export: parseNumberInput
@@ -330,7 +350,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-cyan-400`, `bg-slate-800`, `bg-surface-deep`, `bg-white/2`, `bg-white/3`, `border-b`, `border-t`, `border-white/10`, `border-white/5`, `hover:bg-white/10`, `hover:text-white`, `text-amber-400`, `text-cyan-400`, `text-cyan-500`
-- **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-11`, `h-4`, `h-9`
+- **Renkler:** `bg-admin-accent`, `bg-admin-bg`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-surface-3`, `bg-black/60`, `border-admin-border`, `border-b`, `border-t`, `hover:bg-admin-surface-3`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-accent-fg`, `text-admin-danger`, `text-admin-fg`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-11`, `h-4`, `h-9`, `inline-flex`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminButtonPrimaryClass`, `${adminInputClass`, `${adminModalScrollAreaClass`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `===`, `animate-spin`, `border`, `cursor-pointer`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/20`, `focus-visible:ring-cyan-400/40`, `font-black`
+- **Yardımcı Sınıflar:** `!border-admin-danger`, `$`, `${adminButtonPrimaryClass`, `${adminInputClass`, `${adminInputClass}${charmError`, `${adminInputClass}${maxMarginError`, `${adminInputClass}${minMarginError`, `${adminInputClass}${minQuantityError`, `${adminInputClass}${priorityError`, `${adminInputClass}${rateErrorIds`, `${adminInputClass}${roundToError`, `${adminInputClass}${surchargeError`, `${adminInputClass}${validToError`, `${adminInputClass}${vatError`, `${adminModalScrollAreaClass`

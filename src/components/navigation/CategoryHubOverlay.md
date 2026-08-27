@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\navigation\CategoryHubOverlay.tsx
-skeleton_hash: 1c3f4e6b36b06fee
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\CategoryHubOverlay.tsx
+skeleton_hash: 68bf66bfe1f571c9
 entity_hashes:
   func:CategoryHubOverlay: fb718076583f7612
   func:handleCategoryClick: f62c24f62a6cba1b
   func:handleSubCategoryClick: abc84e61f250f252
   overview: d24237daefdb4b23
   style_tokens: 96d06533c66f365a
-generated_at: 2026-08-25T07:26:16Z
+generated_at: 2026-08-27T08:31:09Z
 ---
 
 ## Genel Bakış
@@ -220,16 +220,16 @@ graph TD
     CategoryHubOverlay_tsx__CategoryHubOverlay["CategoryHubOverlay"]
     CategoryHubOverlay_tsx__handleCategoryClick["handleCategoryClick"]
     CategoryHubOverlay_tsx__handleSubCategoryClick["handleSubCategoryClick"]
-    CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleCategoryClick
     CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleSubCategoryClick
+    CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleCategoryClick
 ```
 
 ## NODE ID STANDARD
 
-  file: CategoryHubOverlay.tsx
-  function: CategoryHubOverlay.tsx::CategoryHubOverlay
-  function: CategoryHubOverlay.tsx::handleCategoryClick
-  function: CategoryHubOverlay.tsx::handleSubCategoryClick
+  file: src\components\navigation\CategoryHubOverlay.tsx
+  function: src\components\navigation\CategoryHubOverlay.tsx::CategoryHubOverlay
+  function: src\components\navigation\CategoryHubOverlay.tsx::handleCategoryClick
+  function: src\components\navigation\CategoryHubOverlay.tsx::handleSubCategoryClick
 
 ---
 

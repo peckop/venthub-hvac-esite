@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useApiCall.ts
-skeleton_hash: 95b8fea9a8f314c7
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useApiCall.ts
+skeleton_hash: e87790cb401d3b4b
 entity_hashes:
   func:useApiCall: 42a6f8dca553808c
   overview: 345d6974057e4bc1
-generated_at: 2026-08-25T07:27:01Z
+generated_at: 2026-08-27T08:34:17Z
 ---
 
 ## Genel Bakış
@@ -84,33 +84,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: src/hooks/useApiCall.ts::execute (useApiCall içindeki useCallback)
-- **params**: `apiFunc: () => Promise<T>` — çağrılacak async API fonksiyonu; `options?: UseApiCallOptions` — bu çağrıya özel opsiyonlar
-- **ic_degiskenler**:
-  - `mergedOptions` — `{ ...defaultOptions, ...options }` ile oluşturulan birleşik seçenekler nesnesi; dış scope'daki `defaultOptions` ile parametre `options` birleştirilir
-  - `result` — `await apiFunc()` sonucu dönen değer (tip: T); başarılı durumda state.data'ya atanır ve return edilir
-  - `err` — catch bloğunda yakalanan hata (tip: unknown)
-  - `error` — `err` değerinden türetilen Error nesnesi; `err instanceof Error` kontrolü yapılır, değilse `new Error(String(err))` ile dönüştürülür; state.error'a atanır
-  - `setState` — dış scope'dan erişilen state setter; loading/error/data güncellemelerinde kullanılır
-  - `defaultOptions` — dış scope'dan erişilen varsayılan seçenekler parametresi
-  - `t` — dış scope'dan erişilen çeviri fonksiyonu; `mergedOptions.errorMessage` yoksa `t('common.errorGeneric')` ile genel hata mesajı alınır
-  - `toast` — `sonner` kütüphanesinden import edilen bildirim aracı; `toast.success()` ve `toast.error()` çağrılarıyla kullanılır
-- **Dönüş**: `Promise<T | null>` — başarılıysa `result` (T), hata durumunda `null`
-
----
-
-### [N3_NASIL] AST Pointer: src/hooks/useApiCall.ts::reset (useApiCall içindeki useCallback)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setState` — dış scope'dan erişilen state setter; `{ data: null, loading: false, error: null }` ile state'i başlangıç değerine sıfırlar
-- **Dönüş**: yok (void)
-
----
-
 ## NODE ID STANDARD
 
-  file: useApiCall.ts
-  function: useApiCall.ts::useApiCall
+  file: src\hooks\useApiCall.ts
+  function: src\hooks\useApiCall.ts::useApiCall
 
 ---
 

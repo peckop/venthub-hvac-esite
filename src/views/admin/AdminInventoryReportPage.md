@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventoryReportPage.tsx
-skeleton_hash: 5ac25ae722ac4343
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminInventoryReportPage.tsx
+skeleton_hash: 77ce07f52aadd6db
 entity_hashes:
-  func:AdminInventoryReportPage: 89d4145e27225208
-  func:InventoryReportContent: aabca4efc3fe9cfa
+  func:AdminInventoryReportPage: 19552a84e92d3ebc
+  func:InventoryReportContent: dbcbdf06c6840787
   overview: 13a120399f1afc85
-  style_tokens: 4816686e7a19ba05
-generated_at: 2026-06-19T20:50:27Z
+  style_tokens: 3bf32080a7408e3f
+generated_at: 2026-08-27T07:16:33Z
 ---
 
 ## Genel Bakış
@@ -32,23 +32,14 @@ Bu grup, admin rapor sayfasının ana iskeletini ve içindeki rapor içerik böl
 ## FONKSİYON DETAYLARI
 
 ### InventoryReportContent
-**Ne yapar**: Stok hareketleri raporunu gösteren ana bileşendir. Tarih aralığına ve arama sorgusuna göre filtrelenen stok giriş/çıkış verilerini, istatistikleri ve grafikleri (eğilim, neden dağılımı, en çok hareket gören ürünler) kullanıcıya sunar.
+**Ne yapar**: Admin panelinde stok hareket raporu sayfasının ana içeriğini oluşturan React bileşenidir. Stok giriş-çıkış hareketlerini listeler, özet istatistikler (toplam giriş, çıkış, net değişim) gösterir, neden bazlı pasta grafik, trend alan grafik ve en çok hareket gören ürünler çubuk grafik sunar. Ayrıca hareket verilerini CSV formatında dışa aktarma imkânı sağlar.
 
-**Nasıl yapar**: 
-- `useI18n` hook'u ile çoklu dil desteği, `useSupabaseClient` ile veritabanı bağlantısı sağlar.
-- URL search parametrelerinden (`q`, `from`, `to`) başlangıç değerlerini okur ve state ile senkronize eder (Back/Forward navigasyonu destekler).
-- `useDragScroll` hook'ları ile tabloların sürüklemeyle kaydırılmasını sağlar.
-- `React.useState` ile state yönetimi, `React.useEffect` ile URL senkronizasyonu, debounce ve veri yükleme işlemlerini yönetir.
-- `loadData` fonksiyonu `getInventoryMovements` çağrısı ile Supabase'den stok hareketlerini çeker.
-- `React.useMemo` ile arama filtresi uygulanmış hareketleri hesaplar, bu filtreleri giriş/çıkış olarak ikiye böler.
-- `exportCsv` fonksiyonu ile hareket verilerini CSV formatına dönüştürerek indirme işlemini başlatır.
-- `React.useEffect` içinde `movementsData`'yı işleyerek istatistikler (toplam giriş, çıkış, net), neden dağılımı, en çok satan ürünler ve günlük eğilim verilerini hesaplar.
-- Recharts kütüphanesi ile `AreaChart`, `PieChart`, `BarChart` kullanarak interaktif grafikler oluşturur.
+**Nasıl yapar**: Bileşen, `useI18n` ile uluslararasılaştırma, `useSupabaseClient` ile Supabase veritabanı bağlantısı, `useRouter` ve `usePathname` ile Next.js yönlendirme, `useSearchParams` ile URL sorgu parametrelerini okur. `useDragScroll` hook'u ile giriş ve çıkış tablolarında sürüklemeyle kaydırma desteği ekler. URL'den `q` (arama), `from` ve `to` (tarih aralığı) parametrelerini okuyarak başlangıç state'lerini belirler. Arama sorgusu 350 milisaniyelik debounce ile geciktirilir. State değişiklikleri URL'ye yansıtılır ve tarayıcı geri/ileri navigasyonu URL'den state'e senkronize edilir. `loadData` useCallback ile tanımlanır; `ensureSessionFresh` çağrısı ardından `getInventoryMovements` fonksiyonu ile Supabase'den hareket verilerini çeker. Hata durumunda `loadError` state'i true yapılır ve kullanıcıya hata mesajı gösterilir. Ham hareket verileri üzerinde filtreleme (ürün adı veya ürün kimliğine göre), istatistik hesaplama (toplam giriş/çıkış/net), neden bazlı gruplama, en çok çıkış yapan ürünler sıralaması ve tarih bazlı trend verisi üretimi yapılır. Grafikler için Recharts kütüphanesinden `AreaChart`, `PieChart`, `BarChart` ve `ResponsiveContainer` kullanılır. `exportCsv` fonksiyonu hareket verilerini UTF-8 BOM ekli CSV'ye dönüştürüp tarayıcı üzerinden indirir. Yükleniyor durumunda iskelet (skeleton) animasyonu, veri yoksa `AdminEmptyState` bileşeni gösterilir.
 
 **Parametreler**:
-- Fonksiyon parametresi almaz.
+- Bu fonksiyon parametre almaz.
 
-**Dönüş**: JSX elementi döndürür (React component). Yüklenme durumunda skeleton animasyonlu bir loading UI, veri yüklendiğinde tam rapor sayfasını gösterir.
+**Dönüş**: Bilinmiyor — fonksiyon bir JSX yapısı döndürür (React bileşeni), ancak kaynak kodda açık bir dönüş tipi belirtilmemiştir.
 
 ### AdminInventoryReportPage
 **Ne yapar**: Stok raporu sayfasının dış sarmalayıcı bileşenidir. `InventoryReportContent` bileşenini `React.Suspense` ile sararak yükleme durumunda bir fallback UI (iskelet animasyonu) gösterir.
@@ -89,28 +80,163 @@ Bu grup, admin rapor sayfasının ana iskeletini ve içindeki rapor içerik böl
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminInventoryReportPage.tsx::InventoryReportContent
-- **params**: ()
+### [N1_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(tarih aralığı oluşturma)
+- **params**: yok
 - **ic_degiskenler**:
-  - `searchParams` — useSearchParams hook'undan gelen URLSearchParams nesnesi, URL'deki arama parametrelerini okumak için kullanılır.
-  - `router` — useRouter hook'undan gelen Next.js yönlendirici, URL'yi programatik olarak değiştirmek (router.replace) için kullanılır.
-  - `pathname` — usePathname hook'undan gelen mevcut sayfa dosya yolu, URL oluştururken temel yol olarak kullanılır.
-  - `supabase` — useSupabaseClient hook'undan gelen Supabase istemcisi, veritabanı işlemleri (envanter hareketlerini çekmek) için kullanılır.
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini uluslararasılaştırmak için kullanılır.
-  - `searchQuery` — React state, kullanıcının arama kutusuna girdiği metni tutar.
-  - `setSearchQuery` — searchQuery state'ini güncelleyen fonksiyon.
-  - `debouncedQuery` — React state, arama sorgusunun debounce edilmiş (geciktirilmiş) versiyonunu tutar, gereksiz API çağrılarını önler.
-  - `setDebouncedQuery` — debouncedQuery state'ini güncelleyen fonksiyon.
-  - `dateRange` — React state, seçilen başlangıç ve bitiş tarihlerini (DateRange tipinde) tutar.
-  - `setDateRange` — dateRange state'ini güncelleyen fonksiyon.
-  - `movementsData` — React state, API'den çekilen envanter hareketleri verisini (InventoryMovementRow[]) tutar.
-  - `setMovementsData` — movementsData state'ini güncelleyen fonksiyon.
-  - `loading` — React state, veri yüklenirken true olan yükleme durumunu tutar.
-  - `setLoading` — loading state'ini güncelleyen fonksiyon.
-  - `stats` — React state, hesaplanan toplam giriş (totalIn), çıkış (totalOut) ve net (net) istatistiklerini tutar.
-  - `setStats` — stats state'ini güncelleyen fonksiyon.
-  - `reasonData` — React state, hareket nedenlerine (sale, return, restock, vb.) göre gruplandırılmış ve grafik için hazırlanmış veriyi tutar.
-  - `setReasonData` — reasonData state'ini güncelleyen fonksiyon.
+  - `urlFrom` — dışarıdan gelen başlangıç tarihi string'i; varsa `new Date(urlFrom)` ile Date nesnesine dönüştürülür, yoksa bugünden 30 gün öncesi kullanılır
+  - `urlTo` — dışarıdan gelen bitiş tarihi string'i; varsa `endOfDay(new Date(urlTo))` ile gün sonuna ayarlanır, yoksa bugünün gün sonu kullanılır
+  - `from` — hesaplanan başlangıç Date nesnesi
+  - `to` — hesaplanan bitiş Date nesnesi (gün sonuna ayarlı)
+- **Dönüş**: `{ from: Date, to: Date }`
+
+### [N2_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(stateRef güncelleme)
+- **params**: yok
+- **ic_degiskenler**:
+  - `stateRef.current` — dışarıdan erişilen ref nesnesi; `searchQuery` ve `dateRange` değerleri bu ref'e kaydedilir
+  - `searchQuery` — dışarıdan gelen arama sorgusu state'i
+  - `dateRange` — dışarıdan gelen tarih aralığı state'i
+- **Dönüş**: yok
+
+### [N3_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(debounce timeout)
+- **params**: yok
+- **ic_degiskenler**:
+  - `t` — `setTimeout` ile oluşturulan 350ms gecikme zamanlayıcısının ID'si; cleanup fonksiyonunda `clearTimeout(t)` ile temizlenir
+  - `searchQuery` — dışarıdan gelen arama sorgusu; `trim()` uygulanarak `setDebouncedQuery`'ye aktarılır
+- **Dönüş**: cleanup fonksiyonu (`() => clearTimeout(t)`)
+
+### [N4_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(debouncedQuery doğrudan güncelleme)
+- **params**: yok
+- **ic_degiskenler**:
+  - `searchQuery` — dışarıdan gelen arama sorgusu; `trim()` uygulanarak `setDebouncedQuery`'ye aktarılır
+- **Dönüş**: yok
+
+### [N5_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(URL parametrelerini güncelleme)
+- **params**: yok
+- **ic_degiskenler**:
+  - `params` — `new URLSearchParams()` ile oluşturulan URL parametre nesnesi
+  - `debouncedQuery` — dışarıdan gelen debounce edilmiş sorgu; varsa `params.set('q', debouncedQuery)` ile eklenir
+  - `dateRange` — dışarıdan gelen tarih aralığı; `.from` varsa ISO string olarak `from` parametresine, `.to` varsa `to` parametresine eklenir
+  - `currentQs` — mevcut URL query string'i (`searchParams?.toString() ?? ''`)
+  - `nextQs` — yeni URL query string'i (`params.toString()`)
+  - `router` — Next.js router nesnesi; `router.replace` ile URL güncellenir
+  - `pathname` — mevcut sayfa yolu
+- **Dönüş**: yok
+
+### [N6_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(URL'den state güncelleme)
+- **params**: yok
+- **ic_degiskenler**:
+  - `q` — URL'den okunan `q` parametresi (`searchParams?.get('q') ?? ''`)
+  - `fromStr` — URL'den okunan `from` parametresi string'i
+  - `toStr` — URL'den okunan `to` parametresi string'i
+  - `nextFrom` — `fromStr` varsa `new Date(fromStr)`, yoksa bugünden 30 gün öncesi
+  - `nextTo` — `toStr` varsa `endOfDay(new Date(toStr))`, yoksa bugünün gün sonu
+  - `currentFromTime` — `stateRef.current.dateRange?.from?.getTime()` ile elde edilen mevcut başlangıç zamanı
+  - `currentToTime` — `stateRef.current.dateRange?.to?.getTime()` ile elde edilen mevcut bitiş zamanı
+  - `nextFromTime` — `nextFrom?.getTime()` ile elde edilen yeni başlangıç zamanı
+  - `nextToTime` — `nextTo?.getTime()` ile elde edilen yeni bitiş zamanı
+  - `stateRef` — dışarıdan erişilen ref nesnesi; mevcut state karşılaştırması için kullanılır
+- **Dönüş**: yok
+
+### [N7_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(async veri yükleme)
+- **params**: yok
+- **ic_degiskenler**:
+  - `data` — `getInventoryMovements(supabase, { from, to })` çağrısından dönen stok hareket verisi
+  - `err` — `catch` bloğunda yakalanan hata nesnesi; `console.error` ile loglanır
+  - `supabase` — dışarıdan gelen Supabase istemcisi
+  - `dateRange` — dışarıdan gelen tarih aralığı; `.from` ve `.to` değerleri API çağrısına parametre olarak geçilir
+- **Dönüş**: yok (async fonksiyon; yan etki olarak `setMovementsData`, `setLoadError`, `setLoading` çağrılır)
+
+### [N8_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(loadData çağrısı)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (`void loadData()` ile çağrılır)
+
+### [N9_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(istatistik hesaplama)
+- **params**: yok
+- **ic_degiskenler**:
+  - `tIn` — toplam giriş miktarı (pozitif delta'ların toplamı)
+  - `tOut` — toplam çıkış miktarı (negatif delta'ların mutlak değerlerinin toplamı)
+  - `reasonMap` — hareket nedenlerine göre toplam miktar tutan sözlük; anahtarlar: `sale`, `return`, `restock`, `manual_in`, `manual_out`, `adjustment`
+  - `productSales` — ürün adına göre satış çıkışlarını tutan sözlük; her giriş `{ name: string, out: number }` içerir
+  - `trendMap` — tarih bazlı trend verisi tutan sözlük; her giriş `{ date: string, incoming: number, outgoing: number }` içerir
+  - `term` — `searchQuery`'den türetilen küçük harf arama terimi
+  - `filtered` — `term` varsa `movementsData`'nın ürün adı veya ürün ID'si üzerinden filtrelenmiş hali, yoksa tüm `movementsData`
+  - `dateRange` — dışarıdan gelen tarih aralığı; `.from` ve `.to` ile `eachDayOfInterval` kullanılarak gün listesi oluşturulur
+  - `days` — `eachDayOfInterval` ile oluşturulan tarih dizisi
+  - `d` — `days.forEach` callback'indeki her bir tarih nesnesi
+  - `k` — `format(d, 'yyyy-MM-dd')` ile oluşturulan tarih anahtarı
+  - `m` — `filtered.forEach` callback'indeki her bir stok hareket satırı
+  - `dateKey` — `format(new Date(m.created_at), 'yyyy-MM-dd')` ile oluşturulan tarih anahtarı
+  - `deltaAbs` — `Math.abs(m.delta)` ile hesaplanan mutlak miktar
+  - `pname` — ürün adı; `m.products?.name` varsa o, yoksa `m.product_id`
+  - `rData` — pie chart için hazırlanan neden verisi dizisi; her eleman `{ name, value, color }` içerir; `value > 0` olanlar filtrelenir
+  - `sortedProds` — `productSales` değerlerinin çıkış miktarına göre azalan sıralanmış, ilk 8'inin alınıp `{ name, amount }` formatına dönüştürülmüş hali; 15 karakterden uzun isimler `...` ile kısaltılır
+  - `t` — dışarıdan gelen `useI18n` çeviri fonksiyonu
+- **Dönüş**: yok (yan etki olarak `setStats`, `setReasonData`, `setTopProducts`, `setTrendData` çağrılır)
+
+### [N10_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(trendMap forEach callback)
+- **params**: `d` — `eachDayOfInterval` dizisindeki her bir tarih nesnesi
+- **ic_degiskenler**:
+  - `k` — `format(d, 'yyyy-MM-dd')` ile oluşturulan tarih anahtarı; `trendMap[k]` olarak kullanılır
+- **Dönüş**: yok
+
+### [N11_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(filtered.forEach callback)
+- **params**: `m` — filtrelenmiş stok hareket satırı (`InventoryMovementRow`)
+- **ic_degiskenler**:
+  - `dateKey` — `format(new Date(m.created_at), 'yyyy-MM-dd')` ile oluşturulan tarih anahtarı
+  - `deltaAbs` — `Math.abs(m.delta)` ile hesaplanan mutlak miktar
+  - `pname` — ürün adı; `m.products?.name` varsa o, yoksa `m.product_id`
+  - `tIn` — dışarıdan erişilen toplam giriş miktarı; pozitif delta'larda artırılır
+  - `tOut` — dışarıdan erişilen toplam çıkış miktarı; negatif delta'larda artırılır
+  - `trendMap` — dışarıdan erişilen trend sözlüğü; tarih anahtarına göre `incoming` veya `outgoing` artırılır
+  - `reasonMap` — dışarıdan erişilen neden sözlüğü; `m.reason` anahtarına göre artırılır
+  - `productSales` — dışarıdan erişilen ürün satış sözlüğü; `sale` veya `manual_out` nedenli negatif delta'larda güncellenir
+- **Dönüş**: yok
+
+### [N12_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(sortedProds map callback)
+- **params**: `p` — `productSales` sözlüğündeki her bir ürün nesnesi (`{ name: string, out: number }`)
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ name: string, amount: number }` — `name` 15 karakterden uzunsa `...` ile kısaltılır, `amount` çıkış miktarıdır
+
+### [N13_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(CSV dışa aktarma)
+- **params**: yok
+- **ic_degiskenler**:
+  - `header` — CSV başlık satırı dizisi; `t()` ile çevrilmiş sütun adları: `id`, `date`, `product`, `amount`, `reason`, `productId`
+  - `csvRows` — `movementsData.map` ile oluşturulan CSV satırları dizisi; her satır virgülle ayrılmış ve çift tırnakla escape edilmiş değerlerden oluşur
+  - `csvString` — BOM karakteri (`\ufeff`) ile başlayan, başlık ve satırları `\n` ile birleştiren tam CSV metni
+  - `blob` — `csvString`'den oluşturulan `Blob` nesnesi (`type: 'text/csv;charset=utf-8;'`)
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici URL
+  - `a` — `document.createElement('a')` ile oluşturulan indirme bağlantısı elementi; `download` özelliği `stok-raporu-{tarih}.csv` olarak ayarlanır
+  - `movementsData` — dışarıdan gelen stok hareket verisi dizisi
+  - `t` — dışarıdan gelen çeviri fonksiyonu
+- **Dönüş**: yok (yan etki olarak dosya indirme tetiklenir)
+
+### [N14_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(csvRows map callback)
+- **params**: `m` — stok hareket satırı (`InventoryMovementRow`)
+- **ic_degiskenler**: yok
+- **Dönüş**: string — virgülle ayrılmış ve çift tırnakla escape edilmiş CSV satırı; alanlar: `m.id`, `m.created_at` (formatlanmış), ürün adı veya `m.product_id`, `m.delta`, `m.reason`, `m.product_id`
+
+### [N15_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(filtrelenmiş movementsData)
+- **params**: yok
+- **ic_degiskenler**:
+  - `term` — `searchQuery.toLowerCase().trim()` ile oluşturulan arama terimi
+  - `movementsData` — dışarıdan gelen stok hareket verisi dizisi; `term` varsa ürün adı (`m.products?.name`) veya ürün ID'si (`m.product_id`) üzerinden filtrelenir
+- **Dönüş**: `InventoryMovementRow[]` — filtrelenmiş stok hareket dizisi
+
+### [N16_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(incoming tablo satırı render)
+- **params**: `m` — stok hareket satırı (`InventoryMovementRow`)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — giriş hareketi tablo satırı; tarih (`dd.MM HH:mm`), ürün adı ve pozitif delta değeri gösterilir
+
+### [N17_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::(outgoing tablo satırı render)
+- **params**: `m` — stok hareket satırı (`InventoryMovementRow`)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — çıkış hareketi tablo satırı; tarih (`dd.MM HH:mm`), ürün adı ve negatif delta değeri gösterilir
+
+### [N18_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::AdminInventoryReportPage
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `Suspense` ile sarmalanmış `InventoryReportContent` bileşeni; fallback olarak skeleton yükleme ekranı gösterilir
 
 ---
 
@@ -134,10 +260,10 @@ Bu grup, admin rapor sayfasının ana iskeletini ve içindeki rapor içerik böl
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-400/10`, `bg-emerald-500/5`, `bg-rose-400/10`, `bg-rose-500/5`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50`, `border-b`, `border-emerald-100/10`, `border-emerald-400/20`, `border-emerald-500/10`, `border-l-4`, `border-l-emerald-500`, `border-l-indigo-500`, `border-l-rose-500`
+- **Renkler:** `bg-admin-danger-weak`, `bg-admin-success-weak`, `bg-admin-surface-2`, `border-admin-border`, `border-admin-danger/30`, `border-admin-success/30`, `border-b`, `border-l-4`, `border-l-emerald-500`, `border-l-indigo-500`, `border-l-rose-500`, `hover:bg-admin-danger-weak`, `hover:bg-admin-success-weak`, `text-3xl`, `text-admin-accent`
 - **Layout:** `absolute`, `flex`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `h-4`, `h-5`, `h-72`, `h-8`, `h-80`, `h-full`, `items-center`
 - **Varyant/Responsive:** `:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `!px-4`, `!py-2.5`, `!rounded-2xl`, `!rounded-3xl`, `!rounded-xl`, `${adminButtonSecondaryClass`, `${adminCardClass`, `${adminTableCellClass`, `${adminTableCellTruncate150Class`, `${adminTableScrollAreaClass`, `${stats.net`, `0`, `:`, `<`, `>`
+- **Yardımcı Sınıflar:** `!px-4`, `!py-2.5`, `!rounded-admin-lg`, `!rounded-admin-md`, `${adminButtonSecondaryClass`, `${adminCardClass`, `${adminTableCellClass`, `${adminTableCellTruncate150Class`, `${adminTableScrollAreaClass`, `${stats.net`, `0`, `:`, `<`, `>`, `animate-in`

@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\tenantServer.ts
-skeleton_hash: d8a9297cf2031ecb
+source_path: C:\tmp\vh-altyapi-t165\src\utils\tenantServer.ts
+skeleton_hash: a948cd8391b951f5
 entity_hashes:
   overview: 5ef2b4c70f7b5fe7
-generated_at: 2026-08-24T12:50:47Z
+generated_at: 2026-08-27T08:40:04Z
 ---
 
 ## Genel Bakış
@@ -44,8 +44,8 @@ Modül, `next/headers` paketinden gelen `headers` fonksiyonu ile HTTP istek bağ
 - `subdomain: string | null`
 - `custom_domain: string | null`
 - `is_active: boolean`
-- `features: {`
-- `styles: {`
+- `features: {`
+- `styles: {`
 
 ---
 

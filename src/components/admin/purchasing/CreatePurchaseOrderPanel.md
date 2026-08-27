@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\purchasing\CreatePurchaseOrderPanel.tsx
-skeleton_hash: 816bab8d5fa22582
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\purchasing\CreatePurchaseOrderPanel.tsx
+skeleton_hash: cfe6fe92941c9136
 entity_hashes:
   func:CreatePurchaseOrderPanel: a078f5162fb3a710
   overview: 750dd9416d29924d
   style_tokens: 967bed87e53566b5
-generated_at: 2026-08-25T08:43:50Z
+generated_at: 2026-08-27T08:22:57Z
 ---
 
 ## Genel Bakış

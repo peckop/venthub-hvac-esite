@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\checkout\page.tsx
-skeleton_hash: dc76e2fab76b588a
+source_path: C:\tmp\ops-t165\src\app\[lang]\checkout\page.tsx
+skeleton_hash: fbc4074f1145221f
 entity_hashes:
   func:Page: 752ea1d46a136aae
   overview: cbc240f327cf6544
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:01Z
 ---
 
 ## Genel Bakış

@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\components\quotes\QuoteRequestButton.tsx
-skeleton_hash: ee037bc0672c0f70
+source_path: C:\Users\alize\venthub-wt-quote\src\components\quotes\QuoteRequestButton.tsx
+skeleton_hash: edd67155640f8f9f
 entity_hashes:
   func:QuoteRequestButton: 1c02d0db31dc1cc0
   func:handleClick: 34afc9e41eb1379f
   overview: 7d23af31ac316cc6
   style_tokens: 871c1a0c89a4b399
-generated_at: 2026-08-27T06:49:05Z
+generated_at: 2026-08-17T11:20:13Z
 ---
 
 ## Genel Bakış
@@ -122,6 +122,13 @@ Bu modül, teklif talep düğmesini temsil eden bir React bileşenidir. Aşağı
   - `setOpen` — open state'inin setter fonksiyonu, modal açma/kapama tetiklenir
   - `handleClick` — buton tıklama işleyici iç fonksiyon, kullanıcının giriş durumuna göre toast gösterir veya modal açar
 - **Dönüş**: JSX — `<button>` (FileText ikonlu, tıklanabilir, `items.length === 0` ise devre dışı) ve `<QuoteRequestModal>` (açılır-modal, open/onClose/source/sourceProjectId/items/qtyEditable propsları ile)
+
+---
+
+### [N2_NASIL] AST Pointer: components/quotes/QuoteRequestButton.tsx::handleClick
+- **params**: (yok)
+- **ic_degiskenler**: (yok — closure üzerinden üst kapsam değişkenlerine erişir: `user`, `t`, `router`, `Routes`, `pathname`, `setOpen`)
+- **Dönüş**: yok (yan etkiler: `!user` durumunda `toast.error(t('quotes.request.loginRequired'))` ile hata bildirimi gösterir, `router.push(Routes.auth.login(pathname ?? undefined))` ile login sayfasına yönlendirir; `user` varsa `setOpen(true)` ile modalı açar)
 
 ---
 

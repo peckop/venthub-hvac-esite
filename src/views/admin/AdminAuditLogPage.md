@@ -2,29 +2,37 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminAuditLogPage.tsx
-skeleton_hash: e74a330a9f326f55
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminAuditLogPage.tsx
+skeleton_hash: d7bee2efa3bc394b
 entity_hashes:
   func:AdminAuditLogPage: 8228aa5d40a8a979
-  overview: 83860b5a121fa408
+  overview: a246254b15a03f7e
   style_tokens: a7fe3ab3ca0c1259
-generated_at: 2026-06-19T20:48:40Z
+generated_at: 2026-08-27T07:10:42Z
 ---
 
 ## Genel Bakış
-VentHub HVAC uygulamasının yönetici panelinde yer alan denetim günlüğü sayfasını sunan React bileşenidir. Sistem üzerinde gerçekleştirilen kullanıcı ve sistem aktivitelerinin kayıtlarını yetkili yöneticilere görüntüleme arayüzü sağlar.
+VentHub HVAC uygulamasının yönetici panelindeki denetim günlüğü sayfasını sunan React bileşenidir. Sistem üzerinde gerçekleştirilen kullanıcı ve sistem aktivitelerinin kayıtlarını yetkili yöneticilere görüntüleme arayüzü sağlar. Veri sunucu tarafında (server-mode) sorgulanır ve DataTableKit aracılığıyla tablo biçiminde gösterilir.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Modülün tek sorumluluğu olan yönetici denetim günlüğü sayfasının kullanıcı arayüzünü ve sayfa düzeyindeki işlevselliği tanımlar.
+Modülün tek sorumluluğu olan yönetici denetim günlüğü sayfasının kullanıcı arayüzünü ve sayfa düzeyindeki işlevselliği tanımlar. Sayfa bir başlık ve Suspense ile sarılmış bir içerik bölgesi içerir; veri yönetimi ve filtreleme AuditLogTableBody bileşeni ile useAdminTable özel kancası üzerinden gerçekleştirilir.
 - AdminAuditLogPage
+
+## Bağımlılıklar
+**İç bağımlılıklar:** AuditLogTableBody bileşeni sayfanın ana içerik bölümünü oluşturur ve useAdminTable kancası üzerinden veri akışını yönetir.
+
+**Dış bağımlılıklar:** DataTableKit (tablo sunumu), useSearchParams (URL parametreleri), Suspense (yükleme durumu yönetimi) modülün kullandığı dış bağımlılıklardır.
+
+**Mimari not:** Suspense sarmalama yapısı, yükleme durumlarının doğru işlenmesini sağlayacak şekilde uygulanmıştır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Not:** Verilen fonksiyon gövdesi bulunmamaktadır; yalnızca fonksiyon imzası (`AdminAuditLogPage() -> React.FC`) mevcuttur. Mimari varsayımların üretilmesi için fonksiyon gövdesindeki kod yapısına, bağımlılıklara, koşullara veya hata yönetimine ilişkin bilgilere ihtiyaç vardır. Mevcut bilgilerle üretilen aksiyomlar spekülatif olur ve bu durum aksiyomların güvenilirliğini zedeleyeceğinden, modül için aksiyom tanımlanmamıştır.
+Bu modül için özel aksiyom tanımlanamaz.
+
+**Gerekçe:** Fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzası (`AdminAuditLogPage() -> React.FC`) mevcuttur. Mimari varsayımlar yalnızca fonksiyon gövdesindeki mantıksal akış, koşul kontrolleri ve bağımlılıklardan türetilebilir. Gövde mevcut olmadığından modülün çalışması için hangi koşulların gerekli olduğu belirlenememektedir.
 
 ---
 
@@ -43,9 +51,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./AuditLogTableBody::AuditLogTableBody
 - import: react::React
 - import: react::Suspense
@@ -54,11 +61,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\admin\AdminAuditLogPage.tsx::AdminAuditLogPage
-- **params**: (yok)
-- **ic_degiskenler**: 
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, JSX içinde admin sayfası başlık ve alt başlık metinlerini çevirmek için kullanılır (admin.titles.audit ve admin.audit.subtitle anahtarları ile)
-- **Dönüş**: JSX elementi — Admin denetim günlükleri sayfasını render eden React bileşeni, Suspense ile sarılmış AuditLogTableBody içeren bir div döndürür
+### [N1_NASIL] AST Pointer: src/views/admin/AdminAuditLogPage.tsx::AdminAuditLogPage
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('admin.titles.audit')` ve `t('admin.audit.subtitle')` çağrılarıyla sayfa başlığı ve alt başlık metinlerini yerelleştirir
+- **Dönüş**: JSX — bir `<div>` kapsayıcısı içinde `AdminPageHeader` bileşeni (`title` ve `description` prop'ları ile) ve `Suspense` ile sarılmış `AuditLogTableBody` bileşeni; `Suspense`'ın `fallback` prop'unda `AdminSkeleton` (`variant="table"`, `count={5}`, `rows={6}`) kullanılır
 
 ---
 

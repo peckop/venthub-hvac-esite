@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\account\AccountOverviewPage.tsx
-skeleton_hash: 6611c27300b3f129
+source_path: C:\tmp\venthub-wt-t131\src\views\account\AccountOverviewPage.tsx
+skeleton_hash: d560ac129dbe4210
 entity_hashes:
   func:AccountOverviewPage: 4e9482fa9ca4867b
   overview: c522b04767bd3545
   style_tokens: 98f0536966ac7e31
-generated_at: 2026-08-25T07:30:00Z
+generated_at: 2026-08-27T07:10:07Z
 ---
 
 ## Genel Bakış
@@ -146,8 +146,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: AccountOverviewPage.tsx
-  function: AccountOverviewPage.tsx::AccountOverviewPage
+  file: src\views\account\AccountOverviewPage.tsx
+  function: src\views\account\AccountOverviewPage.tsx::AccountOverviewPage
 
 ---
 

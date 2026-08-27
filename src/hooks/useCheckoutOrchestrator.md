@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutOrchestrator.ts
-skeleton_hash: 72543d19f0a3b8cf
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCheckoutOrchestrator.ts
+skeleton_hash: c9028befaf257cf9
 entity_hashes:
   func:useCheckoutOrchestrator: 27abaa56edfb49c9
   overview: d20540bc22d68feb
-generated_at: 2026-08-24T12:45:18Z
+generated_at: 2026-08-27T08:34:25Z
 ---
 
 ## Genel Bakış

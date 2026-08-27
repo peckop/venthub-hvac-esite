@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx
-skeleton_hash: 164c78147076aa40
+source_path: C:\tmp\vh-altyapi-t165\src\components\ui\ScrollObserver.tsx
+skeleton_hash: 6b4bc208173a28c6
 entity_hashes:
   func:ScrollObserver: 862e0356d80495a5
   overview: 165bc7baf7c13a58
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:39Z
+generated_at: 2026-08-27T08:33:40Z
 ---
 
 ## Genel Bakış

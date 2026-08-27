@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\BrandDetailPage.tsx
-skeleton_hash: ad47a1f826995eb0
+source_path: C:\tmp\venthub-wt-t131\src\views\BrandDetailPage.tsx
+skeleton_hash: c0fc4e7743218c78
 entity_hashes:
   func:BrandDetailPage: 658e62bc6ce56cad
   overview: 83474bb2d24aa7c3
   style_tokens: 7d26806290344037
-generated_at: 2026-08-13T08:55:59Z
+generated_at: 2026-08-27T07:08:51Z
 ---
 
 ## Genel Bakış
@@ -24,18 +24,6 @@ Marka detay sayfasının ana görünümünü ve sunum mantığını yöneten Rea
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, bir React sayfa bileşeni olup props ve sabit obje bağımlılıkları üzerinden çalışır. Aşağıdaki mimari varsayımlar fonksiyon imzası ve modül sabitlerinden türetilmiştir.
-
----
-
-**[Aksiyom 1]:** Eğer `initialBrandSlug` prop'u sağlanmazsa veya `undefined`/`null` ise, `BrandDetailPage` bileşeni ilgili markayı `BRAND_DETAILS` objesinden bulamaz ve bileşenin beklenen içeriği render edilemez.
-
-**[Aksiyom 2]:** Eğer `BRAND_DETAILS` sabit objesi tanımlı değilse veya boş (`{}`) ise, `initialBrandSlug` değeri ne olursa olsun bileşen herhangi bir marka verisi gösteremez.
-
-**[Aksiyom 3]:** Eğer `initialBrandSlug` değeri `BRAND_DETAILS` objesindeki herhangi bir anahtar (key) ile eşleşmiyorsa, bileşen geçerli bir marka bulamaz ve alternatif bir durum (örn: 404 / "marka bulunamadı") göstermesi beklenir.
-
-**[Aksiyom 4]:** `BRAND_DETAILS` objesindeki her bir marka kaydının, `initialBrandSlug` ile eşleşebilen bir slug/anahtar alanına sahip olması gerekir; aksi takdirde bileşen veri eşleştirmesi yapamaz.
-
-**[Aksiyom 5]:** Bileşen, sunucu tarafı render (SSR) ortamında çalıştırılacaksa, `initialBrandSlug` prop'unun SSR girişinde sağlanması zorunludur; aksi takdirde sunucu tarafı renderda boş veya hatalı içerik üretilir.
 
 ---
 

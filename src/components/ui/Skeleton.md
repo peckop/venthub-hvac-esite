@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ui\Skeleton.tsx
-skeleton_hash: af8394547a4d87ff
+source_path: C:\tmp\vh-altyapi-t165\src\components\ui\Skeleton.tsx
+skeleton_hash: e05306555b5f2c39
 entity_hashes:
-  func:Skeleton: b70faa0883864e7c
+  func:Skeleton: 547c1486976d9411
   overview: dd78551ca6caccba
   style_tokens: 9afb047eb7d0beac
-generated_at: 2026-06-19T20:47:39Z
+generated_at: 2026-08-27T08:34:11Z
 ---
 
 ## Genel Bakış
@@ -34,13 +34,16 @@ Bu React tabanlı UI yükleme iskeleti (Skeleton) bileşeninin doğru görsel ve
 ## FONKSİYON DETAYLARI
 
 ### Skeleton
-**Ne yapar**: React tabanlı kullanıcı arayüzlerinde içeriklerin yüklenme sürecinde, yüklenecek içeriğin yerini tutan görsel yükleme göstergesi (skeleton) bileşenidir. Kullanıcıya yükleme işleminin aktif olduğunu iletirken, sayfa içeriğinin nihai düzenini önceden temsil ederek ani içerik kaymalarını önler.
-**Nasıl yapar**: Temel olarak bir div elementi olarak render edilir, cn utility fonksiyonu kullanılarak varsayılan "animate-pulse" ve "rounded-md" CSS sınıflarını, seçilen varyanta ait özel stilleri ve kullanıcı tarafından iletilen özel sınıfları birleştirir. Tüm iletilen ek propsları doğrudan oluşturulan div elementine aktararak, istenen tüm özelleştirmelerin uygulanmasını sağlar.
+**Ne yapar**: Yükleme (loading) durumlarında içerik yerine gösterilen iskelet placeholder bileşenidir. Kullanıcıya içeriğin henüz yüklenmediğini belirten, animasyonlu gri bir alan oluşturur. Genellikle veri çekilirken veya sayfa yüklenirken geçici içerik olarak kullanılır.
+
+**Nasıl yapar**: Bileşen, aldığı `variant` parametresine göre önceden tanımlı renk stillerinden birini seçer. `variantStyles` nesnesinde üç farklı varyant tanımlıdır: `default` (standart gri tonları), `light` (açık gri tonları) ve `dark` (koyu tonlar). Her varyant, Tailwind CSS'in `dark:` önekini kullanarak koyu mod desteğini içerir. `cn` yardımcı fonksiyonu ile temel sınıflar (`animate-pulse` ile titreşim animasyonu, `rounded-md` ile yuvarlatılmış köşeler), seçilen varyant stili ve isteğe bağlı özel `className` birleştirilerek tek bir className string'i oluşturulur. Kalan tüm props, spread operatörü (`...props`) aracılığıyla doğrudan kök `<div>` elementine aktarılır.
+
 **Parametreler**:
-- className: string | undefined — Bileşene eklenecek özel CSS sınıflarıdır, isteğe bağlı olarak iletilir. Varsayılan stillere ek olarak uygulanarak bileşenin boyut, renk gibi görsel özellikleri özelleştirilebilir.
-- variant: string | undefined — Kullanılacak skeleton görünüm varyantıdır, varsayılan değeri "default" olarak tanımlanmıştır. Önceden tanımlanmış farklı varyant stillerinden birini seçmek için kullanılır.
-- ...props: React.HTMLAttributes<HTMLDivElement> — HTML div elementlerine uygulanabilen tüm standart React DOM özellikleri, olay dinleyicileri ve diğer ek parametrelerdir, isteğe bağlı olarak iletilir ve doğrudan render edilen div elementine aktarılır.
-**Dönüş**: JSX.Element — Tüm aktarılan ve birleştirilen stillere, özelliklere sahip bir div elementi olarak, React ağacında render edilmek üzere bir JSX öğesi döndürür.
+- `className`: `string` — Bileşene ek CSS sınıfları eklemek için kullanılan isteğe bağlı alan. Varsayılan bir değer atanmamıştır; gönderilmezse undefined olarak kalır ve `cn` fonksiyonu tarafından yok sayılır.
+- `variant`: `"default" | "light" | "dark"` — İskelet bileşeninin renk temasını belirler. Varsayılan değeri `"default"` olup `bg-gray-200 dark:bg-gray-800` stilini uygular. `"light"` seçeneği `bg-gray-100 dark:bg-gray-700`, `"dark"` seçeneği ise `bg-slate-900 dark:bg-gray-950` kullanır.
+- `...props`: `React.HTMLAttributes<HTMLDivElement>` — Kök `<div>` elementine aktarılan tüm standart HTML öznitelikleri ve React olay işleyicileri. `SkeletonProps` tipi üzerinden tanımlanan bu genişletilmiş props, bileşenin esnekliğini artırır.
+
+**Dönüş**: JSX elementi (`<div>`). Bileşen, `animate-pulse` sınıfı ile sürekli titreşim animasyonu uygulanmış bir `<div>` elementi döndürür. Bu div, seçilen varyanta göre arka plan rengine ve yuvarlatılmış köşelere sahiptir.
 
 ---
 
@@ -59,12 +62,11 @@ Bu React tabanlı UI yükleme iskeleti (Skeleton) bileşeninin doğru görsel ve
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ui\Skeleton.tsx::Skeleton
-- **params**: className, variant (varsayılan değer: "default"), ...props — tüm parametreler SkeletonProps türündedir
+### [N1_NASIL] AST Pointer: src/components/ui/Skeleton.tsx::Skeleton
+- **params**: `className`, `variant` (varsayılan: "default"), `...props` (SkeletonProps tipinde)
 - **ic_degiskenler**:
-  - `variantStyles` - Farklı skeleton görünüm varyantları için Tailwind CSS arka plan renk sınıflarını saklayan nesne; "default", "light", "dark" anahtarlarıyla her varyantın ışık/karanlık mod renk sınıflarını içerir
-  - `cn` - @/lib/utils modülünden import edilen, class stringlerini birleştirmek için kullanılan utility fonksiyonu; döndürülen div elementinin className propunu oluşturmak için çağrılır
-- **Dönüş**: React JSX div elementi (tüm aktarılan propsları alan, yükleme göstergesi olarak kullanılan skeleton DOM elementi)
+  - `variantStyles` — "default", "light", "dark" anahtarlarına sahip bir nesne; her anahtar için arka plan renk sınıflarını (`bg-gray-200 dark:bg-gray-800`, `bg-gray-100 dark:bg-gray-700`, `bg-slate-900 dark:bg-slate-950`) içerir.
+- **Dönüş**: `div` elementi; `className` özelliği `"animate-pulse rounded-md"`, `variantStyles[variant]` ve `className` parametresinin `cn` fonksiyonu ile birleştirilmesiyle oluşturulur, `...props` ile diğer özellikleri yayar.
 
 ---
 

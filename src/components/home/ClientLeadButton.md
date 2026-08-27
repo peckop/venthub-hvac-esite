@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\home\ClientLeadButton.tsx
-skeleton_hash: d99740799fda0413
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\ClientLeadButton.tsx
+skeleton_hash: c9926b8ef87e83b9
 entity_hashes:
   func:ClientLeadButton: 8f87f454fa733cb3
   overview: 5fd9adef525bec13
   style_tokens: 3a5eed4082aa65a0
-generated_at: 2026-08-25T07:25:41Z
+generated_at: 2026-08-27T08:26:35Z
 ---
 
 ## Genel Bakış
@@ -80,8 +80,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesinden tür
 
 ## NODE ID STANDARD
 
-  file: ClientLeadButton.tsx
-  function: ClientLeadButton.tsx::ClientLeadButton
+  file: src\components\home\ClientLeadButton.tsx
+  function: src\components\home\ClientLeadButton.tsx::ClientLeadButton
 
 ---
 

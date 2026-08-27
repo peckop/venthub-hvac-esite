@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx
-skeleton_hash: db11764911d1f16c
+source_path: C:\tmp\venthub-wt-t131\src\views\checkout\StepAddressInfo.tsx
+skeleton_hash: 6284f71b98ca2b4a
 entity_hashes:
   func:StepAddressInfo: d5b5813fe5d1d5af
   overview: 4a44d69bf10e19a2
   style_tokens: 7a84088359f41f22
-generated_at: 2026-06-19T20:50:27Z
+generated_at: 2026-08-27T07:32:53Z
 ---
 
 ## Genel Bakış

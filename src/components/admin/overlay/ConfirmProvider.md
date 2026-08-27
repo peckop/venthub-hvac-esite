@@ -2,53 +2,49 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\overlay\ConfirmProvider.tsx
-skeleton_hash: 37d2055df82cda60
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\overlay\ConfirmProvider.tsx
+skeleton_hash: 65a7b1bd45879018
 entity_hashes:
-  func:ConfirmProvider: 7ea9af04dd28f549
-  func:useConfirm: cfd17de4049eeec4
-  overview: 9c51abdb8f5e9a28
-  style_tokens: 867d6b490cb9cbcb
-generated_at: 2026-08-15T15:07:27Z
+  func:ConfirmProvider: b26c53bb39572748
+  func:useConfirm: a345aa0d41529fc3
+  func:useConfirmContext: 9a10fc33efe544e1
+  func:useConfirmWithReason: 2e6d50f0f7ba74d3
+  overview: 419a959dee8da6b1
+  style_tokens: ae3ccd97b6863bd8
+generated_at: 2026-08-27T08:11:43Z
 ---
 
 ## Genel Bakış
-Bu modül, React uygulaması genelinde tutarlı bir modal onay diyaloğu sunmak için tasarlanmış bir bağlam (context) sağlayıcısıdır. Temel olarak, asenkron "Evet/Hayır" kararlarını yöneten merkezi bir `useConfirm` hook'unu ve onu içeren `ConfirmProvider` bileşenini içerir. Mimari olarak, uygulama genelinde paylaşılan bir durum (onay isteği) ve arabirimi yöneten bir altyapı katmanı görevi görür.
+Bu modül, React uygulaması genelinde tutarlı bir modal onay diyaloğu sunmak için tasarlanmış bir bağlam (context) sağlayıcısı ve tüketici hook'larını içerir. Asenkron "Evet/Hayır" kararlarını yöneten merkezi bir altyapı katmanı görevi görür ve farklı onay senaryoları için pratik API'ler sunar.
 
 ## Fonksiyon Grupları
-### Onay Bağlamı Sağlayıcısı (Altyapı)
-Bu grup, onay diyaloğunun tüm çocuk bileşenler tarafından erişilebilir olmasını sağlayan React bağlamını (context) oluşturur ve yönetir. Sağlayıcı, asenkron onay isteklerinin durumunu (örn. beklemede, çözümlenmiş) ve çözücü (resolver) fonksiyonlarını barındırır.
+### Onay Bağlamı Sağlayıcısı
+Bu grup, onay diyaloğunun tüm çocuk bileşenler tarafından erişilebilir olmasını sağlayan React bağlamını oluşturur ve yönetir. Sağlayıcı, asenkron onay isteklerinin durumunu ve çözücü fonksiyonlarını barındırır.
 - `ConfirmProvider`
 
-### Onay Hook'u (Tüketici Arayüzü)
-Bu grup, alt bileşenlerin onay diyaloğunu tetiklemek için kullanacağı pratik bir API sunar. Hook, bir onay isteği başlatır, diyaloğun kullanıcı tarafından onaylanmasını veya reddedilmesini bekler ve sonucu bir Promise ile döndürerek bileşenlerin akışını kontrol etmesine olanak tanır.
-- `useConfirm`
+### Bağlam Tüketici Hook'ları
+Bu grup, alt bileşenlerin onay diyaloğunu tetiklemek için kullanacağı hook'ları sunar. Farklı dönüş tipleriyle (boolean veya detaylı sonuç) onay istekleri başlatır ve kullanıcı kararını bekleyerek sonucu bir Promise ile döndürür.
+- `useConfirmContext`, `useConfirm`, `useConfirmWithReason`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, React Context tabanlı bir onay dialog (confirm) sistemi sunar. Aşağıdaki mimari varsayımlar, yalnızca fonksiyon imzaları ve modül sabitlerinden türetilmiştir.
-
-[Aksiyom 1]: Eğer `useConfirm()` hook'u `ConfirmProvider` bileşeninin alt ağacında (child) çağrılmamışsa, `ConfirmContext` üzerinde `call` erişilemez ve çalışma zamanı hatası (örn: `Context is undefined`) oluşur.
-
-[Aksiyom 2]: Eğer `useConfirm()` tarafından döndürülen fonksiyona geçilen `ConfirmOptions` nesnesi `ConfirmContext (call)` tarafından beklenen zorunlu alanları içermiyorsa, confirm dialog'un davranışı tanımsızdır (bilinmiyor — `ConfirmOptions` tipinin içeriği bu imzalardan çıkarılamamaktadır).
-
-[Aksiyom 3]: Eğer `ConfirmProvider` bileşenine `children` prop'u geçirilmemiş veya `null/undefined` ise, alt ağaç hiçbir şey render etmez (React.Provider sarmalayıcısı çalışmaz, dolayısıyla hiçbir alt bileşen context'e erişemez).
-
-[Aksiyom 4]: Eğer `useConfirm()` return value'su (`Promise<boolean>`) await edilmeden veya `.then/.catch` ile işlenmeden çağrılırsa, confirm sonucu (kullanıcı onayladı/redetti) kaybolur ve asenkron akış devam eder.
-
-[Aksiyom 5]: Eğer birden fazla `ConfirmProvider` iç içe (nested) kullanılırsa, en yakın üstteki `ConfirmProvider`'ın sağladığı `ConfirmContext (call)` geçerli olur; dıştaki provider'lar ignored edilir.
-
----
-
-**Notlar:**
-- `ConfirmOptions` tipinin inner yapısı (hangi alanların zorunlu olduğu) fonksiyon imzasında tanımlı değildir; bu nedenle Aksiyom 2'de spesifik alan adları verilmemiştir.
-- `ConfirmContext` içindeki `call`'ın tam çalışma prensibi (dialog açma/kapama mekanizması) bu imzalardan çıkarılamamaktadır; yalnızca varlığının zorunluluğu belirtilmiştir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, fonksiyon gövdesine dayalı özel aksiyom tanımlanamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### useConfirmContext
+**Ne yapar**: Onay mekanizmasının React bağlamını (context) tüketen bir kanca fonksiyonudur. `<ConfirmProvider>` bileşeni tarafından sağlanan `confirm` fonksiyonuna erişim sağlar. Bu kanca, bağlam dışında çağrıldığında hata fırlatarak geliştiriciye açık bir uyarı verir.
+
+**Nasıl yapar**: `React.useContext` ile `ConfirmContext` bağlamını okur. Eğer bağlam değeri yoksa (yani fonksiyon `<ConfirmProvider>` ağacı dışında çağrıldıysa), açıklayıcı bir hata mesajıyla `throw` eder. Bağlam mevcutsa, doğrudan bağlam değerini döndürür. Hata mesajında `AdminLayout` içinde `<ConfirmProvider>` mount edilmesi gerektiği belirtilir.
+
+**Parametreler**:
+- Bu fonksiyon parametre almaz.
+
+**Dönüş**: `(options: ConfirmOptions) => Promise<ConfirmResult>` — Onay seçeneklerini kabul eden ve onay sonucunu çözümleyen bir fonksiyon döner. `ConfirmResult` yapısı `confirmed` (boolean) ve `reason` (string) alanlarını içerir.
 
 ### useConfirm
 **Ne yapar**: Onay isteyen imperatif bir kancadır. `ConfirmProvider` içinde tanımlanan onay dialogunu programatik olarak açmak ve kullanıcının kararını beklemek için kullanılır.
@@ -58,6 +54,9 @@ Bu modül, React Context tabanlı bir onay dialog (confirm) sistemi sunar. Aşa�
 **Parametreler**: Parametresizdir.
 
 **Dönüş**: `(options: ConfirmOptions) => Promise<boolean>` tipinde bir fonksiyon. Bu fonksiyon, verilen `ConfirmOptions` yapılandırmasıyla onay dialogunu açar ve kullanıcının onay (`true`) veya iptal (`false`) kararını temsil eden bir Promise resolve eder.
+
+### useConfirmWithReason
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### ConfirmProvider
 **Ne yapar**: Çocuk bileşenlere onay dialogu (`alertdialog`) yetenekini sağlayan bir React bileşenidir. `ConfirmContext` oluşturur ve dialogun tüm state'ini, açma/kapatma mantığını ve Promise çözümlemesini yönetir.
@@ -88,6 +87,12 @@ ONAY YÜZEYİ — `window.confirm` yerine. Cetvel: docs/standards/admin-design-s
 - `cancelLabel?: string`
 - `tone?: 'danger' | 'default'`
 - `requireTypedConfirmation?: string`
+- `reason?: {`
+
+### ConfirmResult
+`useConfirmWithReason`'ın dönüşü.
+- `confirmed: boolean`
+- `reason: string`
 
 ---
 
@@ -95,49 +100,83 @@ ONAY YÜZEYİ — `window.confirm` yerine. Cetvel: docs/standards/admin-design-s
 
 ### Resolver
 ```typescript
-type Resolver = (value: boolean) => void
+type Resolver = (value: ConfirmResult) => void
 ```
 
 ---
 
 ## SABİTLER
 - **ConfirmContext** (call) — `React.createContext<
-  ((options: ConfirmOptions) => Promise<boolean>) | null...`
+  ((options: ConfirmOptions) => Promise<ConfirmResult>)...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `ConfirmProvider.tsx::useConfirm`
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: ConfirmProvider.tsx::useConfirmContext
+- **params**: yok
 - **ic_degiskenler**:
-  - `ctx` — `React.useContext(ConfirmContext)` ile elde edilen context değeri; onay dialog'unu tetikleyen `confirm` fonksiyonunu barındırır
-- **Dönüş**: `(options: ConfirmOptions) => Promise<boolean>` — doğrudan `ctx`'nin kendisi döndürülür
+  - `ctx` — `React.useContext(ConfirmContext)` çağrısı ile elde edilen bağlam değeri; `<ConfirmProvider>` dışında çağrılırsa hata fırlatır, aksi halde `(options: ConfirmOptions) => Promise<ConfirmResult}` tipinde fonksiyon döndürür
+- **Dönüş**: `(options: ConfirmOptions) => Promise<ConfirmResult>` — ConfirmContext içindeki `confirm` fonksiyonu
+
+### [N2_NASIL] AST Pointer: ConfirmProvider.tsx::useConfirm
+- **params**: yok
+- **ic_degiskenler**:
+  - `ask` — `useConfirmContext()` çağrısından dönen onay fonksiyonu
+  - `React.useCallback` içindeki `options` parametresi — `ConfirmOptions` tipinde onay seçenekleri; `ask(options)` çağrısının sonucundan `confirmed` alanını çıkarır
+- **Dönüş**: `(options: ConfirmOptions) => Promise<boolean>` — sadece `confirmed` boolean değerini döndüren sarılı fonksiyon
+
+### [N3_NASIL] AST Pointer: ConfirmProvider.tsx::useConfirmWithReason
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `(options: ConfirmOptions) => Promise<ConfirmResult>` — `useConfirmContext()` doğrudan döndürülür; `confirmed` ve `reason` alanlarını içeren sonuç
+
+### [N4_NASIL] AST Pointer: ConfirmProvider.tsx::ConfirmProvider
+- **params**:
+  - `children` — `React.ReactNode` tipinde; sağlayıcı içine yerleştirilen alt bileşenler
+- **ic_degiskenler**:
+  - `t` — `useI18n()` çağrısından destructure edilen çeviri fonksiyonu
+  - `options` — `React.useState<ConfirmOptions | null>(null)` ile yönetilen durum; mevcut onay iletişim kutusunun yapılandırması, `null` ise iletişim kutusu kapalı
+  - `setOptions` — `options` durumunu güncelleyen setter fonksiyonu
+  - `typed` — `React.useState('')` ile yönetilen durum; kullanıcının "yazarak onayla" alanına girdiği metin
+  - `setTyped` — `typed` durumunu güncelleyen setter fonksiyonu
+  - `reason` — `React.useState('')` ile yönetilen durum; kullanıcının gerekçe alanına girdiği metin
+  - `setReason` — `reason` durumunu güncelleyen setter fonksiyonu
+  - `resolverRef` — `React.useRef<Resolver | null>(null)` ile oluşturulan ref; `confirm` fonksiyonunun oluşturduğu Promise'in `resolve` fonksiyonunu tutar
+  - `cancelRef` — `React.useRef<HTMLButtonElement>(null)` ile oluşturulan ref; iptal butonuna referans, `onOpenAutoFocus` içinde odaklanmak için kullanılır
+  - `reasonRef` — `React.useRef('')` ile oluşturulan ref; `settle` fonksiyonunun bayat closure sorununu önlemek için gerekçe metninin güncel değerini tutar
+  - `confirm` — `React.useCallback` ile sarılı fonksiyon; `next` parametresi alır (`ConfirmOptions`), `typed`/`reason`/`reasonRef` değerlerini sıfırlar, `options` durumunu `next` olarak ayarlar ve `Promise<ConfirmResult>` döndürür
+  - `settle` — `React.useCallback` ile sarılı fonksiyon; `confirmed` parametresi alır (`boolean`), `resolverRef.current`'ı çağırarak `{ confirmed, reason }` sonucunu iletir, ref'i temizler ve tüm durumları sıfırlar
+  - `handleOpenChange` — `React.useCallback` ile sarılı fonksiyon; `open` parametresi alır (`boolean`), `open` false ise `settle(false)` çağırarak sözü çözümler
+  - `isDanger` — `options?.tone === 'danger'` ifadesi; onay tonunun yıkıcı olup olmadığını belirten boolean
+  - `needsTyped` — `Boolean(options?.requireTypedConfirmation)` ifadesi; yazarak onay gerektirip gerektirmediğini belirten boolean
+  - `typedOk` — `!needsTyped || typed.trim() === options?.requireTypedConfirmation` ifadesi; yazarak onay koşulunun sağlanıp sağlanmadığını belirten boolean
+  - `reasonOk` — `!options?.reason?.required || reason.trim().length > 0` ifadesi; gerekçe zorunlu ise boş olup olmadığını kontrol eden boolean
+  - `canConfirm` — `typedOk && reasonOk` ifadesi; onay butonunun aktif olup olmadığını belirleyen boolean
+  - JSX içindeki `onOpenAutoFocus` handler'ı — `event` parametresi alır, `event.preventDefault()` çağırır ve `cancelRef.current?.focus()` ile odaklanmayı iptal butonuna yönlendirir
+  - JSX içindeki `onChange` handler'ı (reason textarea) — `event` parametresi alır, `setReason(event.target.value)` ve `reasonRef.current = event.target.value` ile hem state'i hem ref'i günceller
+- **Dönüş**: yok — `ConfirmContext.Provider` içinde `confirm` fonksiyonunu value olarak verir ve `Dialog.Root` ile onay iletişim kutusunu render eder
 
 ---
 
-### [N2_NASIL] AST Pointer: `ConfirmProvider.tsx::ConfirmProvider`
-- **params**: `{ children }` — `children: React.ReactNode`, provider'ın sarmaladığı alt React elemanları
-- **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan alınan çeviri fonksiyonu; `admin.confirm.defaultTitle`, `admin.confirm.cancel`, `admin.confirm.confirm`, `admin.confirm.typeToConfirm` gibi anahtarları çevirir
-  - `options` — `ConfirmOptions | null`, dialog konfigürasyonu (`title`, `description`, `tone`, `cancelLabel`, `confirmLabel`, `requireTypedConfirmation`); `null` iken dialog kapalıdır
-  - `typed` — `string`, kullanıcının "onay için yaz" alanına girdiği metin; `requireTypedConfirmation` eşleşmesi kontrol edilir
-  - `resolverRef` — `React.useRef<Resolver | null>`, açılan dialog'un ardındaki `Promise<boolean>`'in `resolve` fonksiyonunu tutar; `settle` çağrısında çözülür
-  - `cancelRef` — `React.useRef<HTMLButtonElement>`, iptal butonuna DOM referansı; `onOpenAutoFocus`'ta en az yıkıcı eyleme odaklanmak için kullanılır
-  - `confirm` — `React.useCallback`, `(next: ConfirmOptions) => Promise<boolean>`; `typed`'ı sıfırlar, `options`'ı set eder, yeni bir `Promise` oluşturur ve `resolverRef`'e `resolve` atar
-  - `settle` — `React.useCallback`, `(result: boolean) => void`; `resolverRef`'i çağırarak Promise'i çözünür, `resolverRef`'i `null`'a, `options`'ı `null`'a, `typed`'ı boş string'e sıfırlar
-  - `handleOpenChange` — `React.useCallback`, `(open: boolean) => void`; Radix `Dialog.Root`'un `onOpenChange` callback'i; dialog kapanırken (`open === false`) `settle(false)` çağırarak Promise'i çözünür
-  - `isDanger` — `boolean`, `options?.tone === 'danger'` kontrolü;true ise onay butonu `adminTableActionDangerClass`,false ise `adminTableActionPrimaryClass` sınıfını alır
-  - `needsTyped` — `boolean`, `Boolean(options?.requireTypedConfirmation)`; true ise metin girişi alanı gösterilir
-  - `typedOk` — `boolean`, `!needsTyped || typed.trim() === options?.requireTypedConfirmation`; onay butonunun `disabled` durumunu belirler
-- **Dönüş**: JSX — `<ConfirmContext.Provider>` içine çocukların ve `Dialog.Root` tabanlı onay modalının render edildiği React node; doğrudan `void` (yan etki: DOM'a dialog ekler)
 
----
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    ConfirmProvider_tsx__ConfirmProvider["ConfirmProvider"]
+    ConfirmProvider_tsx__useConfirm["useConfirm"]
+    ConfirmProvider_tsx__useConfirmContext["useConfirmContext"]
+    ConfirmProvider_tsx__useConfirmWithReason["useConfirmWithReason"]
+    ConfirmProvider_tsx__useConfirm --> ConfirmProvider_tsx__useConfirmContext
+    ConfirmProvider_tsx__useConfirmWithReason --> ConfirmProvider_tsx__useConfirmContext
+```
 
 ## NODE ID STANDARD
 
   file: src\components\admin\overlay\ConfirmProvider.tsx
+  function: src\components\admin\overlay\ConfirmProvider.tsx::useConfirmContext
   function: src\components\admin\overlay\ConfirmProvider.tsx::useConfirm
+  function: src\components\admin\overlay\ConfirmProvider.tsx::useConfirmWithReason
   function: src\components\admin\overlay\ConfirmProvider.tsx::ConfirmProvider
 
 ---
@@ -145,7 +184,10 @@ type Resolver = (value: boolean) => void
 ## DISA AKTARILANLAR (EXPORTS)
   export: ConfirmOptions
   export: ConfirmProvider
+  export: ConfirmResult
   export: useConfirm
+  export: useConfirmContext
+  export: useConfirmWithReason
 
 ---
 
@@ -158,7 +200,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-white/5`, `border-white/15`, `text-base`, `text-sm`, `text-white`, `text-white/60`, `text-white/70`, `text-xs`
+- **Renkler:** `bg-admin-surface-2`, `bg-black/60`, `border-admin-border`, `placeholder:text-admin-fg-subtle`, `text-admin-fg`, `text-admin-fg-muted`, `text-base`, `text-sm`, `text-xs`
 - **Layout:** `block`, `fixed`, `flex`, `flex-wrap`, `gap-2`, `h-12`, `items-center`, `justify-end`, `max-w-90vw`, `p-6`, `sm:max-w-modal`, `w-full`, `z-backdrop`
-- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `${adminModalContentClass`, `${isDanger`, `:`, `adminTableActionDangerClass`, `adminTableActionPrimaryClass`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/60`, `font-semibold`, `inset-0`, `leading-relaxed`, `pt-2`
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `placeholder:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${adminModalContentClass`, `${isDanger`, `:`, `adminTableActionDangerClass`, `adminTableActionPrimaryClass`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-semibold`, `inset-0`, `leading-relaxed`, `pt-2`

@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx
-skeleton_hash: 7b0aae5bb1bf6c9c
+source_path: C:\tmp\venthub-wt-t131\src\views\OrdersPage.tsx
+skeleton_hash: 0dcad2e464389764
 entity_hashes:
   func:OrdersPage: 438a8bbd716fd9a1
   func:formatDate: cda2f023d87c7e9e
@@ -12,7 +12,7 @@ entity_hashes:
   func:getStatusText: 248f40bb51719423
   overview: 92d9a0fb39ef0360
   style_tokens: 4894888e4850f9b4
-generated_at: 2026-08-24T11:58:47Z
+generated_at: 2026-08-27T07:09:53Z
 ---
 
 ## Genel Bakış
@@ -42,10 +42,6 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, gövde tabanlı aksiy
 [Aksiyom 4]: Eğer `getStatusText` fonksiyonuna bir durum string'i (`status`) sağlanmazsa, fonksiyonun nasıl davrandığı bilinmiyor — gövde incelenmeden belirlenemez.
 
 [Aksiyom 5]: Eğer `OrdersPage` bileşeni bir React ortamında (`React.FC` dönüş tipiyle uyumlu) render edilmezse, bileşenin davranışı bilinmiyor — gövde incelenmeden hangi alt bileşenleri kullandığı veya hangi verileri beklediği belirlenemez.
-
----
-
-**Not:** Bu modülün gerçek mimari varsayımlarını (örneğin beklenen sipariş veri yapısı, durum kodlarının geçerli değerleri, tarih formatı, fiyat birimi vb.) belirlemek için fonksiyon gövdelerinin incelenmesi gerekmektedir. Mevcut çıktı yalnızca imzalardan elde edilebilen minimal bilgileri içermektedir.
 
 ---
 
@@ -335,9 +331,9 @@ graph TD
     OrdersPage_tsx__formatPrice["formatPrice"]
     OrdersPage_tsx__getStatusColor["getStatusColor"]
     OrdersPage_tsx__getStatusText["getStatusText"]
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatDate
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
-    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusColor
 ```
 

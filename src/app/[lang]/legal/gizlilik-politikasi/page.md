@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\gizlilik-politikasi\page.tsx
-skeleton_hash: 9bd6ed6a6fa608c9
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\gizlilik-politikasi\page.tsx
+skeleton_hash: 592cdd0739c47420
 entity_hashes:
   func:Page: 851f6a31795db41b
   overview: 28f1a50675cb6f01
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:30Z
+generated_at: 2026-08-27T06:53:21Z
 ---
 
 ## Genel Bakış
@@ -29,10 +29,6 @@ Bu modül, Next.js App Router yapısında çalışan asenkron bir sayfa bileşen
 [Aksiyom 2]: Eğer `params` Promise'i başarıyla çözümlenemezse (resolve edilemezse), asenkron sayfa render süreci tamamlanamaz ve Next.js sunucu tarafında bir render hatası oluşur.
 
 [Aksiyom 3]: Eğer `lang` değeri uygulamanın desteklediği dil listesinde yer almayan geçersiz bir değer olarak gelirse (örn: `"xx"`, `"jp"` yerine `"ja"` bekleniyorsa), sayfa için çeviri metinleri eşleştirilemeyebilir — fallback mekanizması tanımlı değilse eksik içerik gösterilir.
-
----
-
-**Not:** Bu sayfa modülü tamamen bir üst bileşene (PageComponent vb.) bağımlı olduğu için, sayfa içeriğinin doğru render edilmesi o bağımlı bileşenin varlığına ve doğruluğuna da bağlıdır — ancak bu durum fonksiyon imzasından çıkarılamadığı için aksiyom olarak değil, not olarak belirtilmiştir.
 
 ---
 

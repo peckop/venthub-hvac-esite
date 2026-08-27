@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\hesaplayicilar\hava-perdesi\page.tsx
-skeleton_hash: 12863f418bab1f43
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\hesaplayicilar\hava-perdesi\page.tsx
+skeleton_hash: 4d8080b6d7b6981a
 entity_hashes:
   func:Page: 3f2298054a9d2ba4
   overview: 286959abaf4b75d1
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:05Z
 ---
 
 ## Genel Bakış

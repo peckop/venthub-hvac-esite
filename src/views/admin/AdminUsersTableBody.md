@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\AdminUsersTableBody.tsx
-skeleton_hash: 07307960de8aade8
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminUsersTableBody.tsx
+skeleton_hash: d070e7a769904bbf
 entity_hashes:
   func:AdminUsersTableBody: f0dd41f9640952ff
   func:UserSpecsRow: be404842cf22242f
@@ -11,7 +11,7 @@ entity_hashes:
   func:sortUserRows: d15e06d110df5cc4
   overview: 3ef15410f94664f7
   style_tokens: f22b4cd19d47cdb2
-generated_at: 2026-08-25T07:55:09Z
+generated_at: 2026-08-27T07:22:48Z
 ---
 
 ## Genel Bakış
@@ -325,11 +325,11 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: AdminUsersTableBody.tsx
-  function: AdminUsersTableBody.tsx::normalizeRole
-  function: AdminUsersTableBody.tsx::UserSpecsRow
-  function: AdminUsersTableBody.tsx::AdminUsersTableBody
-  function: AdminUsersTableBody.tsx::sortUserRows
+  file: src\views\admin\AdminUsersTableBody.tsx
+  function: src\views\admin\AdminUsersTableBody.tsx::normalizeRole
+  function: src\views\admin\AdminUsersTableBody.tsx::UserSpecsRow
+  function: src\views\admin\AdminUsersTableBody.tsx::AdminUsersTableBody
+  function: src\views\admin\AdminUsersTableBody.tsx::sortUserRows
 
 ---
 

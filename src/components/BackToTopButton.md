@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx
-skeleton_hash: fc970852e5b16423
+source_path: C:\tmp\vh-altyapi-t165\src\components\BackToTopButton.tsx
+skeleton_hash: 4afcaf8d8882ec95
 entity_hashes:
   func:BackToTopButton: c8f2538093a58334
   func:handleScrollToTop: 94e0754193bc122d
   overview: cab9522d3717ffc4
   style_tokens: b29c0a49231e465f
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-08-27T07:52:15Z
 ---
 
 ## Genel Bakış

@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useHideOnScroll.ts
-skeleton_hash: 487831d2e25b9a1a
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useHideOnScroll.ts
+skeleton_hash: 2daa2054c3757b69
 entity_hashes:
   func:useHideOnScroll: 8147a4dacc20e5ab
   overview: 12bcf4529d8cd3f7
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:35:42Z
 ---
 
 ## Genel Bakış

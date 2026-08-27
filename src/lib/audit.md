@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\audit.ts
-skeleton_hash: 9ad955496d105f1f
+source_path: C:\tmp\ops-t165\src\lib\audit.ts
+skeleton_hash: d2246538cf4d6f05
 entity_hashes:
   func:logAdminAction: 83ab9f1273deee6a
   overview: beb3974c7555e069
-generated_at: 2026-06-19T20:48:09Z
+generated_at: 2026-08-27T06:57:23Z
 ---
 
 ## Genel Bakış
