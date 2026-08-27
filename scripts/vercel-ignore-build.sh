@@ -155,6 +155,31 @@ fi
 #  .github/**      → CI yapılandırması; Vercel çıktısını etkilemez.
 #  registry/**     → İş emri kayıtları.
 #  LICENSE         → Metin.
+#  scripts/board/**→ Şerit panosu araçları. ÖLÇÜLDÜ (2026-08-26, taze master):
+#                    package.json, next.config.mjs, vercel.json ve .github/workflows/*
+#                    içinde "scripts/board" geçen TEK BİR referans yok. Derleme
+#                    hattına hiçbir yerden girmiyor. Ölçüm pozitif kontrolle
+#                    yapıldı: aynı komut "scripts/setup-hooks" için referans
+#                    BULUYOR, yani arama gerçekten arıyordu.
+#  .githooks/**    → Git kancalarının KENDİSİ (kancaları KURAN betik değil).
+#                    Burada dürüst olmak gerek: bu sınıfın derleme hattıyla bir
+#                    bağı VAR — package.json "prepare": "node scripts/setup-hooks.mjs"
+#                    ve Vercel `pnpm install` koştuğu için prepare de koşar.
+#                    Yine de atlanabilir, ÜÇ ölçülmüş sebeple:
+#                      1. Koşan dosya `scripts/setup-hooks.mjs`, `.githooks/**`
+#                         DEĞİL — o betik kancaları OKUR. Betiğin kendisi bu
+#                         listede değil, yani ona dokunmak build'i TETİKLER.
+#                      2. setup-hooks.mjs FAIL-SAFE: kancalar bozuk ya da yokken
+#                         sessizce exit 0 veriyor (kaynakta catch → process.exit(0)).
+#                         Yani bozuk bir kanca `pnpm install`i düşürmüyor.
+#                      3. Kancalar `.git/hooks`a kopyalanır; DAĞITILAN ÇIKTIYA
+#                         hiçbir şey yazmaz.
+#                    ARTIK RİSK ve NEDEN KABUL EDİLEBİLİR: atlarsak, bir
+#                    `.githooks` değişikliğinin Vercel'in install adımını bozup
+#                    bozmadığını o dağıtımda ÖĞRENEMEYİZ. Bu boşluğu CI kapatıyor:
+#                    `.github/workflows/ci.yml`de YOL FİLTRESİ YOK (ölçüldü), yani
+#                    her PR'da `pnpm install` zaten koşuyor ve bozuk bir prepare
+#                    orada kırmızı verir. Atlama CI kapılarını KÖRLEŞTİRMİYOR.
 #
 #  BİLEREK DIŞARIDA (yani build TETİKLER): supabase/migrations/** — build'i
 #  doğrudan etkilemez ama önizleme dağıtımı, migration'ın vitrine yansımasını
@@ -170,6 +195,13 @@ is_build_irrelevant() {
     .github/*)       return 0 ;;
     registry/*)      return 0 ;;
     LICENSE)         return 0 ;;
+    # DİKKAT — kapsam DAR tutuldu: `scripts/*` DEĞİL `scripts/board/*`.
+    # `scripts/vercel-ignore-build.sh` (bu betik) ve `scripts/setup-hooks.mjs`
+    # derleme hattının parçası; onlara dokunmak build'i TETİKLEMELİ.
+    # Sondaki `/` de kasıtlı: `scripts/board*` yazsaydık `scripts/boardfake.ts`
+    # de sessizce atlanırdı.
+    scripts/board/*) return 0 ;;
+    .githooks/*)     return 0 ;;
     *)               return 1 ;;
   esac
 }
