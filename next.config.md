@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\next.config.mjs
-skeleton_hash: bb7b26f4927f7e09
+source_path: C:\tmp\vh-comp\next.config.mjs
+skeleton_hash: 8fb14273831b0b9a
 entity_hashes:
   overview: ce293451cf435cb1
-generated_at: 2026-06-08T09:00:15Z
+generated_at: 2026-08-27T04:23:37Z
 ---
 
 ## Genel Bakış
@@ -41,6 +41,12 @@ Bu modül bir Next.js yapılandırma dosyasıdır (`next.config.mjs`). Aşağıd
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @next/bundle-analyzer::bundleAnalyzer
+- import: @sentry/nextjs::withSentryConfig
+
+---
+
 ## SABİTLER
 - **withBundleAnalyzer** [env-backed] (call) — `bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -65,3 +71,17 @@ Bu modül bir Next.js yapılandırma dosyasıdır (`next.config.mjs`). Aşağıd
 ## NODE ID STANDARD
 
   file: next.config.mjs
+
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+Altı çap ailesi 2026-08-21'de açılmış, 2026-08-23'te kapatıldı: çap bir KARAR noktası
+değil, aynı sayfadaki seçicidir. Kapanan altı adres sitemap'te DURUYORDU; yönlendirme
+olmadan altısı da 404 verirdi. Ürünler kaybolmadı — hepsi kanonik aile sayfasında.
+(Aile slug'ı `/products/<slug>` biçimindedir; varyant `?sku=` ile aynı sayfada seçilir.)
+```

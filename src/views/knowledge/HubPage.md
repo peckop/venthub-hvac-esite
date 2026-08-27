@@ -2,38 +2,33 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\knowledge\HubPage.tsx
-skeleton_hash: ad8e775969d61ec4
+source_path: C:\tmp\vh-comp\src\views\knowledge\HubPage.tsx
+skeleton_hash: ce053a964570b0f6
 entity_hashes:
   func:HubPage: ae5a0ef5e997bc98
-  overview: 8c0dd30f100fc26b
+  overview: 811b30842f3209b4
   style_tokens: 8d8885134f307444
-generated_at: 2026-06-19T20:51:24Z
+generated_at: 2026-08-27T04:26:54Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub projesinin "Bilgi Merkezi" ana sayfasını oluşturan temel React bileşenini tanımlar. Modül, sayfanın tüm kullanıcı arayüzünü, yapısını ve temel düzenini render eden tek bir ana bileşenden oluşur. Bağımsız bir görünüm modülüdür ve içeriği dinamik olarak yüklenmez.
-
-## Fonksiyon Grupları
-### Sayfa Bileşeni
-Bilgi Merkezi ana sayfasının tüm görsel yapısını, düzenini ve temel içeriğini oluşturan, bağımsız çalışan bir React fonksiyonel bileşenini tanımlar.
-- HubPage
-
-**Dış Bağımlılıklar:** React kütüphanesine bağımlıdır. Kullanım yerine göre, stil tanımları veya alt bileşenler gibi bazı iç bağımlılıkları olabilir, ancak modül tek başına çalışacak şekilde yapılandırılmıştır. Lazy yükleme veya dinamik modül içeriği bulunmamaktadır.
+Bu modül, VentHub projesinin "Bilgi Merkezi" ana sayfasını oluşturan temel React
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, bilgi merkezi ana sayfasını render eden bağımsız bir React bileşenidir.
+Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca imza ve modül sabitlerinden çıkarım yapılabilir.
 
-**[Aksiyom 1]**: Eğer `TOPIC_SLUGS` sabiti modül kapsaminda tanımlı veya import edilmemişse, sayfadaki konu listeleme işlevi çalışamaz ve bileşen hata verir.
+[Aksiyom 1]: Eğer `TOPIC_SLUGS` sabiti tanımlı değilse, HubPage bileşeni bu sabite erişemez ve bilgi merkezi sayfasının konu yapılandırması eksik kalır.
 
-**[Aksiyom 2]**: Eğer `TAGS` sabiti modül kapsamında tanımlı veya import edilmemişse, etiket tabanlı içerik gösterimi veya filtreleme işlevi çalışmaz.
+[Aksiyom 2]: Eğer `TAGS` sabiti tanımlı değilse, HubPage bileşeni bu sabite erişemez ve etiket/arama filtreleme işlevselliği çalışamaz.
 
-**[Aksiyom 3]**: Eğer bileşen props almadığı halde dışarıdan veri bağımlılığı varsa (örn: context, global state) ve bu veri kaynağı mevcut değilse, sayfa eksik veya hatalı içerik gösterir.
+[Aksiyom 3]: Eğer `HubPage` fonksiyonu bir React.FC döndürmezse, bileşen olarak kullanılamaz ve sayfa render edilemez.
 
-**[Aksiyom 4]**: Eğer `TOPIC_SLUGS` veya `TAGS` boş bir dizi/nesne olarak tanımlanmışsa, sayfa teknik olarak çalışır ancak kullanıcılara gösterilecek konu veya etiket içeriği bulunmaz.
+[Aksiyom 4]: Eğer React kütüphanesi mevcut değilse, `HubPage` bileşeni çalışamaz çünkü bağımlılık sağlanamaz.
+
+**Not:** Fonksiyon gövdesi sağlanmadığı için, `TOPIC_SLUGS` ve `TAGS` sabitlerinin nasıl kullanıldığı, hangi alt bileşenlerin render edildiği ve sayfa yapısının detayları bilinmiyor. Daha kesin aksiyomlar için fonksiyon gövdesi gereklidir.
 
 ---
 
@@ -54,6 +49,7 @@ Bu modül, bilgi merkezi ana sayfasını render eden bağımsız bir React bile�
 - import: ../../components/Seo::Seo
 - import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/case::foldForSearch
 - import: framer-motion::AnimatePresence
 - import: framer-motion::motion
 - import: lucide-react::ArrowRight
@@ -89,58 +85,81 @@ type TopicSlug = typeof TOPIC_SLUGS[number]
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/knowledge/HubPage.tsx::HubPage
-- **params**: ()
+### [N1_NASIL] AST Pointer: views/knowledge/HubPage.tsx::HubPage
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hookundan gelen çeviri fonksiyonu, UI metinlerini çevirir
-  - `Routes` — useLocalizedRoutes hookundan gelen yerelleştirilmiş rota nesnesi, navigasyon bağlantıları oluşturur
-  - `q` — useState hook'u ile oluşturulan arama sorgusu state'i
-  - `setQ` — q state'ini güncellemek için setter fonksiyonu
-  - `activeTag` — useState hook'u ile oluşturulan aktif etiket state'i, TopicSlug veya 'all' tutar
-  - `setActiveTag` — activeTag state'ini güncellemek için setter fonksiyonu
-  - `topics` — useMemo ile hesaplanan konular dizisi, her konu için slug, title, summary, time ve category tutar
-  - `filtered` — useMemo ile hesaplanan filtrelenmiş konular dizisi, arama sorgusu ve etikete göre filtreler
-- **Dönüş**: JSX elementi (tam sayfa bileşeni)
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu; metinleri dile göre çözümlemek için kullanılır
+  - `lang` — useI18n() hook'undan dönen mevcut dil kodu; foldForSearch aramalarında normalize işlemi için kullanılır
+  - `Routes` — useLocalizedRoutes() hook'undan dönen yönlendirme nesnesi; Link bileşenlerinde href üretmek için kullanılır
+  - `q` — useState('') ile yönetilen arama sorgusu; input.value'ya bağlıdır
+  - `setQ` — q state'ini güncelleyen setter fonksiyonu; input onChange olayında e.target.value ile çağrılır
+  - `activeTag` — useState<TopicSlug | 'all'>('all') ile yönetilen aktif etiket; filtre butonlarıyla değiştirilir
+  - `setActiveTag` — activeTag state'ini güncelleyen setter fonksiyonu; TAGS.map içindeki buton onClick'inde tag.key ile çağrılır
+  - `topics` — useMemo ile TOPIC_SLUGS.map sonucu hesaplanan konu listesi; her eleman {slug, title, summary, time, category} nesnesi taşır
+  - `filtered` — useMemo ile topics.filter sonucu hesaplanan filtrelenmiş konu listesi; q ve activeTag değişiminde yeniden hesaplanır
+- **Dönüş**: JSX (React.FC) — tam sayfa yapısı: Seo, Hero bölümü, filtre butonları, konu kartları grid'i, araçlar/planlama bölümü, destek banner'ı
 
-### [N2_NASIL] AST Pointer: src/views/knowledge/HubPage.tsx::topics.map callback
-- **params**: `(slug)` — Topik slug'u (string)
+### [N2_NASIL] AST Pointer: views/knowledge/HubPage.tsx::useMemo_topics_callback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `categoryKey` — slug'a göre belirlenen kategori anahtarı ('comfort', 'safety' veya 'efficiency')
-- **Dönüş**: `{ slug, title, summary, time, category }` nesnesi
+  - `TOPIC_SLUGS` — dış sabit; tüm konu slug'larını içeren dizi, map ile dönülür
+  - `t` — dış scope'dan gelen çeviri fonksiyonu; title, summary, time, category alanları için kullanılır
+- **Dönüş**: dizi — her eleman {slug, title, summary, time, category} nesnesi
 
-### [N3_NASIL] AST Pointer: src/views/knowledge/HubPage.tsx::slugToTopic
-- **params**: `(slug)` — Topik slug'u (string)
+### [N3_NASIL] AST Pointer: views/knowledge/HubPage.tsx::topics_map_callback
+- **params**: `slug`
 - **ic_degiskenler**:
-  - `categoryKey` — slug'a göre belirlenen kategori anahtarı ('comfort', 'safety' veya 'efficiency')
-- **Dönüş**: `{ slug, title, summary, time, category }` nesnesi
+  - `categoryKey` — slug değerine göre belirlenen kategori anahtarı; 'hava-perdesi' ise 'comfort', 'jet-fan' ise 'safety', diğerleri 'efficiency'
+  - `t` — dış scope'dan gelen çeviri fonksiyonu; `knowledge.topics.${slug}.title`, `knowledge.topics.${slug}.summary`, `knowledge.hub.readTime`, `knowledge.hub.categories.${categoryKey}` anahtarlarını çözümlemek için kullanılır
+- **Dönüş**: nesne — {slug, title: string, summary: string, time: string, category: string}
 
-### [N4_NASIL] AST Pointer: src/views/knowledge/HubPage.tsx::filtered.topicsFilter
-- **params**: ()
+### [N4_NASIL] AST Pointer: views/knowledge/HubPage.tsx::useMemo_filtered_callback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `text` — q state'inin trimlenmiş ve küçük harfe dönüştürülmüş hali
-- **Dönüş**: topics.filter() sonucu, filtrelenmiş konular dizisi
+  - `text` — foldForSearch(q.trim(), lang) ile hesaplanan normalize edilmiş arama sorgusu; boş string ise filtreleme atlanır
+  - `q` — dış scope'dan gelen arama sorgusu state'i; trim() ile boşlukları temizlenir
+  - `lang` — dış scope'dan gelen dil kodu; foldForSearch'a ikinci argüman olarak geçilir
+  - `topics` — dış scope'dan gelen konu listesi; filter ile dönülür
+  - `activeTag` — dış scope'dan gelen aktif etiket; 'all' ise tüm etiketler geçer, değilse slug eşleşmesi gerekir
+  - `foldForSearch` — dış scope'dan import edilen arama normalizasyon fonksiyonu; metinleri küçük harfe ve aksansız forma dönüştürür
+- **Dönüş**: dizi — filtrelenmiş topic nesneleri
 
-### [N5_NASIL] AST Pointer: src/views/knowledge/HubPage.tsx::topicFilterCallback
-- **params**: `(tpc)` — Tek bir konu nesnesi
+### [N5_NASIL] AST Pointer: views/knowledge/HubPage.tsx::filtered_filter_callback
+- **params**: `tpc`
 - **ic_degiskenler**:
-  - `matchesText` — konunun title ve summary'sinin text ile eşleşip eşleşmediğini tutan boolean
-  - `matchesTag` — konunun slug'ının activeTag ile eşleşip eşleşmediğini tutan boolean
-- **Dönüş**: `matchesText && matchesTag` boolean değeri
+  - `matchesText` — boolean; text boşsa true, değilse foldForSearch(`${tpc.title} ${tpc.summary}`, lang) sonucunun text'i içerip içermediğini kontrol eder
+  - `matchesTag` — boolean; activeTag 'all' ise true, değilse tpc.slug === activeTag eşleşmesini kontrol eder
+  - `text` — dış scope'dan gelen normalize edilmiş arama sorgusu
+  - `activeTag` — dış scope'dan gelen aktif etiket
+  - `lang` — dış scope'dan gelen dil kodu
+  - `foldForSearch` — dış scope'dan gelen normalizasyon fonksiyonu; tpc.title ve tpc.summary birleşimini normalize etmek için kullanılır
+- **Dönüş**: boolean — matchesText && matchesTag
 
-### [N6_NASIL] AST Pointer: src/views/knowledge/HubPage.tsx::titleSplitter
-- **params**: `(part, i)` — part: Virgülle bölünmüş başlık parçası (string), i: indeks (number)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: React.Fragment elementi, parçayı ve virgülü/boşluk/enter'i gösterir
+### [N6_NASIL] AST Pointer: views/knowledge/HubPage.tsx::title_split_map_callback
+- **params**: `part`, `i`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX (React.Fragment) — part metni, i === 0 ise virgül ve <br /> eklenir
 
-### [N7_NASIL] AST Pointer: src/views/knowledge/HubPage.tsx::tagButtonRenderer
-- **params**: `(tag)` — TAGS dizisindeki tek bir etiket nesnesi
-- **ic_degiskenler**: (yok)
-- **Dönüş**: button JSX elementi, etiket için filtreleme butonu
+### [N7_NASIL] AST Pointer: views/knowledge/HubPage.tsx::TAGS_map_callback
+- **params**: `tag`
+- **ic_degiskenler**:
+  - `setActiveTag` — dış scope'dan gelen state setter; buton onClick'inde tag.key ile çağrılır
+  - `activeTag` — dış scope'dan gelen aktif etiket; tag.key ile eşleşiyorsa farklı stil uygulanır
+  - `t` — dış scope'dan gelen çeviri fonksiyonu; tag.labelKey ile aria-label ve buton metni için kullanılır
+- **Dönüş**: JSX (button) — aktif etikete göre stil değişen filtre butonu
 
-### [N8_NASIL] AST Pointer: src/views/knowledge/HubPage.tsx::topicCardRenderer
-- **params**: `(topic, i)` — topic: Tek bir konu nesnesi, i: indeks (number)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: motion.div JSX elementi, animasyonlu konu kartı
+### [N8_NASIL] AST Pointer: views/knowledge/HubPage.tsx::filtered_map_callback
+- **params**: `topic`, `i`
+- **ic_degiskenler**:
+  - `Routes` — dış scope'dan gelen yönlendirme nesnesi; Routes.destek.konular(topic.slug) ile Link href'i üretilir
+  - `t` — dış scope'dan gelen çeviri fonksiyonu; 'knowledge.hub.readStart' anahtarını çözümlemek için kullanılır
+  - `topic.slug` — konu benzersiz tanımlayıcısı; motion key ve Link href'inde kullanılır
+  - `topic.category` — konu kategori etiketi; kart üst kısmında gösterilir
+  - `topic.time` — okuma süresi bilgisi; Clock ikonu yanında gösterilir
+  - `topic.title` — konu başlığı; h2 içinde gösterilir
+  - `topic.summary` — konu özeti; p içinde 3 satırla sınırlı gösterilir
+  - `i` — dizi indeksi; motion transition delay hesaplamasında i * 0.05 olarak kullanılır
+- **Dönüş**: JSX (motion.div > Link) — animasyonlu konu kartı
 
 ---
 

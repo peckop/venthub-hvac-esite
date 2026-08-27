@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "686ab36236f64dd37781405b3e225fa03fa7f2d0297317506da50f685c5c25d0",
+      "icerik_sha256": "564c01ce84756ba14da797e7dc8b423bd918ba61546d93ada3f83fbbe5389a38",
       "kaynak": {
         "dosya_sayisi": 98,
         "dosyalar": {
@@ -108,7 +108,7 @@
         "izlenmeyen": [],
         "ozet": "13aca04c7a35256389064f212cccbf532b90b069fc40fe29bd8e467c6c22e036"
       },
-      "kaynak_commit": "b9d8a168995f25a13726d8a5e5ff43df785946ee",
+      "kaynak_commit": "f84cfe78ecfb0961a33e45183eeae541a02141cb",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +125,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "f6ceeed6c41c21ae0cc875c8b512714b16b366e90382bdfd98200df119bd7c1d",
+      "icerik_sha256": "b1b1a1b0d19fddf3c6f281e7699afe1beb474a11f16858db46234637d516bd5a",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -195,7 +195,7 @@
         "izlenmeyen": [],
         "ozet": "70a27e4ae05202e2d71e593dd78f3178d5aa2324354ac58de120e214ee82c84b"
       },
-      "kaynak_commit": "b9d8a168995f25a13726d8a5e5ff43df785946ee",
+      "kaynak_commit": "f84cfe78ecfb0961a33e45183eeae541a02141cb",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +204,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "f6ba5061ae7eaaa12e6fb809af21777d000f7706c114e4050e211d919d4dd8db",
+      "icerik_sha256": "eb894887189e6c8937642026eb5b2fecbaa00a55e49adb2ba51f72a25099791e",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +251,7 @@
         "izlenmeyen": [],
         "ozet": "5f668b0cb06f66330209b3db479b057b3af56f993ecfc0ab19343995d55e72a2"
       },
-      "kaynak_commit": "b9d8a168995f25a13726d8a5e5ff43df785946ee",
+      "kaynak_commit": "f84cfe78ecfb0961a33e45183eeae541a02141cb",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,12 +259,12 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "a8a0c594be6ad5233b1446ffb14a34fca73d8d2a233a8276418dec3ea11c61e9",
+      "icerik_sha256": "66ef57f044e438e19d063fa5f113088ee3374b9feb8ea498e2fc7ca62d8ef03e",
       "kaynak": {
         "dosya_sayisi": 655,
         "dosyalar": {
           "next-env.d.md": "360d89410c4ebb89679a43bb745b27a3d0e7924d",
-          "next.config.md": "5bb6964d32f5dd967c041fa3ee3f87eed466fe8b",
+          "next.config.md": "6e39db5abff257974eb3b91d813708d3bd14f787",
           "playwright.config.md": "9e09302a73d4cec664bf99f1ca12bd6fa2b371a4",
           "postcss.config.md": "d520cb36d819da20b0dfab4b76b309c209bbd8bf",
           "sentry.client.config.md": "b33940c0739a4492fe091d177c05bf01844d43e5",
@@ -368,7 +368,7 @@
           "src/components/InViewCounter.md": "7a081a279c03273479b8838e6fa8214eed8a9527",
           "src/components/LanguageSwitcher.md": "a1a7d707e4f6ab13b172c62d5ac82a0c2ea908e9",
           "src/components/LazyInView.md": "9cd0f66687a486939e5fb6b8a695ec2ba4e591a5",
-          "src/components/LeadModal.md": "d5bd2cdc559ea658fcf84b1db7ce5004e7cb43ef",
+          "src/components/LeadModal.md": "d7839296067759b575e890ef51563cb557584dd0",
           "src/components/LoadingSpinner.md": "21d72648b8bc43c05fa070d4b70b3fe74246901e",
           "src/components/MagneticCTA.md": "10b8fdcecc8a200a52523808045212be9fd2bb5d",
           "src/components/MegaMenu.md": "af8bbe51db92256398db428eba2da65e0aca6230",
@@ -392,9 +392,9 @@
           "src/components/admin/AdminRealtimeNotifications.md": "987965ac3a0f687ba3df8c5d498df0ab236e2e3c",
           "src/components/admin/AdminSkeleton.md": "e582ae6851fc3c806c78eaa1f22c16712ab9618d",
           "src/components/admin/AdminToolbar.md": "0cb8896bb59fdb4b432a10e92aa2081fd9926329",
-          "src/components/admin/ColumnsMenu.md": "98829984454ea3edd8a53ce7b82c0a0c4ee4a078",
+          "src/components/admin/ColumnsMenu.md": "39ad357b5830845b8183629adccc64b7213ab009",
           "src/components/admin/CommandPalette.md": "a7c5a7c4b0d365bcb36670080152707a37b96a61",
-          "src/components/admin/DateRangePicker.md": "290d79dde63f278c039c1e4ff83d32c76b58a47d",
+          "src/components/admin/DateRangePicker.md": "a8fd4c51647ed93e2acfd3456067730b6a61d0ce",
           "src/components/admin/EditableCell.md": "46da418a6161fbf25ed33749a7d54a187134d0f0",
           "src/components/admin/ExportMenu.md": "84bd204ab881ac05f83411e350a22effd0a9ed33",
           "src/components/admin/InfoTooltip.md": "973c62942cb2682cca31665c313858028c5d1a15",
@@ -415,16 +415,16 @@
           "src/components/admin/dashboard/SalesChart.md": "4e5c19ac1cf9b488f5bf6d0dabea399c3300606c",
           "src/components/admin/dashboard/StatCard.md": "07613783fd031271b852c9649d337d2fde10db11",
           "src/components/admin/data-table/BulkBar.md": "2919a4dfd8af08f0d0ea81ff0d625eae7e07018e",
-          "src/components/admin/data-table/BulkPricePanel.md": "ca7dfa072053bf0c5fbe12ef98afba54b975de54",
-          "src/components/admin/data-table/BulkRolePanel.md": "dad2a954e944c780ae2e229fb20e08abb9a81965",
-          "src/components/admin/data-table/DataTableHead.md": "df20abd55a06d623ec7d9c328811c4ed78c316e2",
+          "src/components/admin/data-table/BulkPricePanel.md": "ad4d6821aa25e8f507d4c81fbd8090a55cb3a4cf",
+          "src/components/admin/data-table/BulkRolePanel.md": "843b2197aefa53115f4cc1333a65c8a06109d815",
+          "src/components/admin/data-table/DataTableHead.md": "44245dfc2d55f60837b7aa543760ffa80fe3a91b",
           "src/components/admin/data-table/DataTableKit.md": "27ceddb74135cb2f34389ecc5f19bbab91a40354",
           "src/components/admin/data-table/FacetedFilter.md": "d54b93c16d2454fdac49c3530d790a246ecdde07",
           "src/components/admin/data-table/persist.md": "ea99944ecf5b2f40b4fa994a1000f549216b6e4b",
           "src/components/admin/data-table/types.md": "5835220631c90f82e7be4a8ec58ef80e430301ff",
           "src/components/admin/orders/OrderFormModal.md": "834d452bdea1b734d23dc8d5f6a3851907500dcd",
-          "src/components/admin/overlay/AdminModal.md": "2541970e005bd08406725e61028bdd25eff997cd",
-          "src/components/admin/overlay/AdminSidePanel.md": "5b57636c3b3c06e339f29cbedc4452638296f9a1",
+          "src/components/admin/overlay/AdminModal.md": "43792230e665d3cdee43a91cfc0e174fdfee63bc",
+          "src/components/admin/overlay/AdminSidePanel.md": "46441ee1f22453d81e48d802cdac44424f41a033",
           "src/components/admin/overlay/ConfirmProvider.md": "b25838e79bfed8952b0e55a8b8623557ee216c7f",
           "src/components/admin/pricing/CostRefreshModal.md": "51d317791a3d28f20670c3cc81e9f46c1ad91982",
           "src/components/admin/pricing/CurrencyRatesCard.md": "6130fbebee33a5d90b708632911c7e260de0b0b5",
@@ -484,7 +484,7 @@
           "src/components/home/FeaturedCommercialBlocks.md": "2749070d44f149174b1c1eb3b6032f9f5341db14",
           "src/components/home/GuidedCategoryDiscovery.md": "8909ef199a5f8f52cee75d7f96306c95ae6694f2",
           "src/components/home/HomePageClientWrapper.md": "8c182e1f4800a58544c9fc26e24a4d1642f0e737",
-          "src/components/home/HomeSinevizyon.md": "9db2be7a8576a92eb0a5218208bde34dd44a39b3",
+          "src/components/home/HomeSinevizyon.md": "36c45009b8722c57a0718954d6854a1ea7f9946e",
           "src/components/home/KnowledgeBlock.md": "97f0af96b3c6f39e243d2768852a42a711da26f2",
           "src/components/home/RevealSection.md": "c2f339e30ba5fdccaf634b2c3451a65f1b4dd3b2",
           "src/components/home/StrategicBrands.md": "332a7b2524b9e6fb48f59c8e00c555f45314ae79",
@@ -571,13 +571,13 @@
           "src/components/ui/Skeleton.md": "2db5f9ed58f963f31bb8a908dc61e71f5fc32975",
           "src/components/ui/VentImage.md": "f8b7a1f8568d18d1ab5582b9a57a4109ab077cd6",
           "src/config/admin-resources.md": "391065308351da49e2e6cc50bab3bc68ca2ee6ea",
-          "src/config/admin.md": "ea64193087570b602be4953598e266fc9bb2acf6",
+          "src/config/admin.md": "356e9d1bafe01042934379bd21c424b5bd26612a",
           "src/config/applications.md": "1afd44c131548c2a53f49453dffbda7df53bc639",
           "src/config/index.md": "86fb3c2d8f2e596b380dee47ade7c3dfb93c1ef5",
           "src/config/legal.md": "9236b86b84cd266c7615afc4b5e6390d313f9eec",
           "src/config/orbitalCarouselConfig.md": "4c386fa1015c5b44fc371172991b7607f4a7f145",
           "src/config/siteUrl.md": "459a1095666c239a75feec2955b1d853e439827a",
-          "src/contexts/AuthContext.md": "6b69d6090930aaf18e1d40b72a4c8496fcf5ceed",
+          "src/contexts/AuthContext.md": "a7a1cb328335a309dff1e8a58755995d9f04bbb4",
           "src/contexts/AuthContextDefinition.md": "57b22fc9e8e4e713962a3361290043ef4aeaf056",
           "src/contexts/CartContext.md": "f6c1cc79285286513c0090f5173e19a5014f3393",
           "src/contexts/CartProvider.md": "707087dc2bff0f7507234799f6cfd34342d6129b",
@@ -631,13 +631,13 @@
           "src/i18n/dictionaries/admin/confirm.tr.md": "716cb0fad4f5700476c731c587378028a0d3050b",
           "src/i18n/dictionaries/admin/coupons.en.md": "baf2426d4e8abdb74d18cac05aa11a669062ee68",
           "src/i18n/dictionaries/admin/coupons.tr.md": "9d4246583a10c24d3cb603f686e82f2574f11539",
-          "src/i18n/dictionaries/admin/dashboard.en.md": "a23f56599bec5f46b9148f267c82ee43b86df433",
-          "src/i18n/dictionaries/admin/dashboard.tr.md": "09c48bdabd4b1faae33a2ceceeff9dc5ce5b1c63",
+          "src/i18n/dictionaries/admin/dashboard.en.md": "dd2d95cb5e068ad52ac0a7241523c46e34c02bf9",
+          "src/i18n/dictionaries/admin/dashboard.tr.md": "c3b843975e531ebc5cb6d519d3f90fb0010b18f5",
           "src/i18n/dictionaries/admin/dataRequests.en.md": "a0b124604a324a444430d827b6cc055037a12e3b",
           "src/i18n/dictionaries/admin/dataRequests.tr.md": "97f380aa34c7fa337de142e40304c0a9d5a72dfe",
           "src/i18n/dictionaries/admin/dataTable.en.md": "85b17a58e402545a06639ab4f4c13dde8288071d",
           "src/i18n/dictionaries/admin/dataTable.tr.md": "8530a2a3821db9cb2c329ae10c0b2513eb965528",
-          "src/i18n/dictionaries/admin/en.md": "1bed1ffcdebf4ad3a22e7bfff7329e607520ab52",
+          "src/i18n/dictionaries/admin/en.md": "3a1b0707c7988a642c435c23326df51bc65e93b5",
           "src/i18n/dictionaries/admin/errorGroups.en.md": "f4846e26f238f9d86c561feea20591d39221db93",
           "src/i18n/dictionaries/admin/errorGroups.tr.md": "033d94ba2b054dd6983739b2dc65ba2f7f20ea1e",
           "src/i18n/dictionaries/admin/errors.en.md": "17ea539aa949296c2284bec23149e7f5ae16ffe9",
@@ -652,8 +652,8 @@
           "src/i18n/dictionaries/admin/menu.tr.md": "a6ea174b5a9cb71fe944ec6ab5f1303c6a46c1c3",
           "src/i18n/dictionaries/admin/movements.en.md": "f8b0c4e3880eae821d344708f0bfd188959c951a",
           "src/i18n/dictionaries/admin/movements.tr.md": "5e4bd2ecc63b2d5b6741971ea59e8546fab500d2",
-          "src/i18n/dictionaries/admin/orders.en.md": "f7f47a99e676625deb9282ebbdd32cb9f155cba8",
-          "src/i18n/dictionaries/admin/orders.tr.md": "d798a910186d785aa25a139c88079fa3c333f58f",
+          "src/i18n/dictionaries/admin/orders.en.md": "8d48c3de76e0f070bb27198c43cb9213f604c826",
+          "src/i18n/dictionaries/admin/orders.tr.md": "cec0be274d721f0dd506fc820ab0520b0fe7fcb7",
           "src/i18n/dictionaries/admin/pricing.en.md": "bcb7ec5a4f29b7637e2d272c7126a2f2d855039e",
           "src/i18n/dictionaries/admin/pricing.tr.md": "6fadcd4c1b224554587a7d415bff79fa2d1a9080",
           "src/i18n/dictionaries/admin/products.en.md": "875b814bef63775d26bb77d27dedd550af3782b7",
@@ -780,7 +780,7 @@
           "src/utils/navigationConfig.md": "cb8789ebb5c9d5649007fb8077f2a2f2cdd45e10",
           "src/utils/passwordSecurity.md": "90a155d11189713c3746335ac624c92a9b94d797",
           "src/utils/prefetch.md": "b2428bf53c4cbdaeaddccd6cfd1bccca26d666a0",
-          "src/utils/productHelpers.md": "3c3fd3edb0e40aea60f87f3ff68445bb2f869609",
+          "src/utils/productHelpers.md": "94e3ff3dffecd200a92b4b5775a082f7ab2b811a",
           "src/utils/router.md": "05910e74b883de97f2ec387d5f5ebd9e05b19fc5",
           "src/utils/routes.md": "947135542a66b6946366d38722d234d08a272fe0",
           "src/utils/searchHighlight.md": "ad6d5a620bfec90445df1e4ca478b85ccdff5b9f",
@@ -818,7 +818,7 @@
           "src/views/account/AccountShipmentsPage.md": "d694e63902874fd4381557b8f9559f1f0619d07b",
           "src/views/account/DataRequestsPage.md": "077506637e69be4225b2ebc7ce1dd9f6f264476e",
           "src/views/account/FavoritesPage.md": "9afb423a687438fc520393033fd2525fb04a6d4a",
-          "src/views/account/OrderDetailPage.md": "f016b0f3065e8321a1d2f75fa2b682e39f99ef8d",
+          "src/views/account/OrderDetailPage.md": "abec8f2bd01553319c71518c63aee1197ffc59e8",
           "src/views/account/ProjectsPage.md": "55bdd157c9b937eb59f905648c8ef600e9102be1",
           "src/views/account/quotes/AccountQuotesPage.md": "7ddc86a18f72a88fa26de9286f4e53dc40605e6a",
           "src/views/account/quotes/QuoteDetailPage.md": "04c9dbe117bb1517d124f789bbe0f05e015367a6",
@@ -839,7 +839,7 @@
           "src/views/admin/AdminLogisticsPage.md": "24e515c0edd2a78237ecd9baf0cc100b8adcba48",
           "src/views/admin/AdminLogisticsTableBody.md": "927dac7b92a52730b1b97170e8767e7667b31b00",
           "src/views/admin/AdminMovementsPage.md": "7e061cd5783b5a77578a03d3d2bc512f38dacb77",
-          "src/views/admin/AdminOrdersBoard.md": "da092f17647dc300c168344a2439e94d8062c627",
+          "src/views/admin/AdminOrdersBoard.md": "a7a117b4848ff907fd64fe822f6728e6840f3763",
           "src/views/admin/AdminOrdersPage.md": "839d6e909761d6dba2a308a985513c10f8424216",
           "src/views/admin/AdminPricePreviewPage.md": "597a2bf963c199d0765898e4a89cc3ce53ac4257",
           "src/views/admin/AdminPricingRulesPage.md": "2490220f28fcb5bc0cb9f2b15d1e2d0fe19e5e2e",
@@ -869,9 +869,9 @@
           "src/views/admin/purchasing/PurchasingTableBody.md": "a3087d28fed4b751039c4ee2e9e7cc7ddfe8f643",
           "src/views/admin/quotes/AdminQuotesPage.md": "a7e512cc42ebef1a605195a4ab575e15ec6aaf8f",
           "src/views/admin/quotes/QuotesTableBody.md": "3a8eafd6a05c02f10498691a12e00d6d15af85e1",
-          "src/views/calculators/AirCurtainCalcPage.md": "cac00a2a287f80771c7338848020fe07f89f9f15",
+          "src/views/calculators/AirCurtainCalcPage.md": "5150db2a432171dcdcb35f793cd5e592b6efc60c",
           "src/views/calculators/DuctCalcPage.md": "c3f8ed2546969d7d109a38dabfe7b4931e86bc19",
-          "src/views/calculators/HRVCalcPage.md": "8cece37bd0d3e2296af0cfa967e92accf02e80a2",
+          "src/views/calculators/HRVCalcPage.md": "ec63c689d00e2e2dc4b653289a5df7427013af59",
           "src/views/calculators/JetFanCalcPage.md": "519b28147d87d398367955d0efb13264f51ae2e1",
           "src/views/category/CategoryGridView.md": "1cc512cf4fc3c49926a7051265109a181f6329d8",
           "src/views/category/CategoryLandingView.md": "db67480cdcb9e6eb0c80cfab4ffc651b911bd626",
@@ -890,7 +890,7 @@
           "src/views/checkout/StepCustomerInfo.md": "85c82663b93e63de22fe568b1e6d4b73f478ad59",
           "src/views/checkout/buildPaymentRequest.md": "031187cd2d594f5f8137e699c4719da5ce026039",
           "src/views/checkout/injectCheckoutForm.md": "1829128c1192d90f8b9533b62ad6f1aeca435318",
-          "src/views/knowledge/HubPage.md": "5faf75dbb6967ca391ad1b70e77b5ea5bb073fb7",
+          "src/views/knowledge/HubPage.md": "34c30539ae83e9ce8fedeba03a26867e63e791e0",
           "src/views/knowledge/TopicPage.md": "f21aefb3dbc9b559fe01ec02e7a2e4cf3cac4c8a",
           "src/views/legal/CookiePolicyPage.md": "39e4341b2e07e31dd19b9cc4739e5075658aa43b",
           "src/views/legal/DistanceSalesAgreementPage.md": "e8ccfefa47a5391b3c801680f2b67f4e87431384",
@@ -920,9 +920,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "60907cc753118998a216ec2b84c1f9a932cdfcf86b5fa40660d58068081ea772"
+        "ozet": "2f9bdf5d5c8134092c38025607e95b553464a2f5c3496b0cf50fa9fb473e89f4"
       },
-      "kaynak_commit": "b9d8a168995f25a13726d8a5e5ff43df785946ee",
+      "kaynak_commit": "f84cfe78ecfb0961a33e45183eeae541a02141cb",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -931,7 +931,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-26T22:06:58.232155+00:00",
-  "kaynak_commit": "b9d8a168995f25a13726d8a5e5ff43df785946ee",
+  "derlendi": "2026-08-27T04:37:20.837523+00:00",
+  "kaynak_commit": "f84cfe78ecfb0961a33e45183eeae541a02141cb",
   "surum": 1
 }
