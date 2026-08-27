@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\admin\mutateWithAudit.ts
-skeleton_hash: 1bbef8d128a791ff
+source_path: C:\tmp\ops-t165\src\lib\admin\mutateWithAudit.ts
+skeleton_hash: 03e86d09225587ae
 entity_hashes:
   func:AdminPermissionError:constructor: 6bdb0294b4ca977f
   func:mutateWithAudit: e6e4bf4f5f88c365
   overview: f4a791bb090e6115
-generated_at: 2026-08-25T07:27:53Z
+generated_at: 2026-08-27T06:57:14Z
 ---
 
 ## Genel Bakış
@@ -65,7 +65,14 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan 
 **Dönüş**: Promise<R> — `args.fn()` fonksiyonunun dönüş değeri
 
 ### constructor
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: `AdminPermissionError` sınıfının yapıcı metodudur. RBAC (Role-Based Access Control) sisteminde belirli bir kaynak üzerinde yazma yetkisi bulunmadığında fırlatılacak özel bir hata nesnesi oluşturur.
+
+**Nasıl yapar**: Üst sınıfın (muhtemelen `Error`) `super()` metodunu çağırarak hata mesajını iletir. Mesajda, yetkisiz erişim denemesinin yapıldığı kaynak adı string interpolasyonu ile yerleştirilir. Ardından `this.name` özelliği `'AdminPermissionError'` olarak ayarlanarak hatanın türü tanımlanır.
+
+**Parametreler**:
+- resource: string — Yetkisiz erişim denemesinin yapıldığı kaynak adını temsil eder. Hata mesajında bu değer kullanıcıya gösterilir.
+
+**Dönüş**: Belirtilmemiş. Constructor'lar tipik olarak sınıf örneğini döndürür ancak kaynak kodda açık bir dönüş tipi tanımlanmamıştır.
 
 ---
 
@@ -107,34 +114,32 @@ type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE'
 ### [N1_NASIL] AST Pointer: src/lib/admin/mutateWithAudit.ts::AdminPermissionError.constructor
 - **params**: `resource: string`
 - **ic_degiskenler**:
-  - `resource` — Hata mesajında kullanılacak kaynak adı. `super` çağrısına `'${resource}'` olarak iletilir.
-- **Dönüş**: yok
+  - `resource` — `super()` çağrısında hata mesajında kaynak adı olarak kullanılır; mesaj formatı: `RBAC: '${resource}' kaynağında yazma yetkisi yok`
+- **Dönüş**: yok (constructor; `this.name` alanını `'AdminPermissionError'` olarak ayarlar)
 
 ### [N2_NASIL] AST Pointer: src/lib/admin/mutateWithAudit.ts::mutateWithAudit
 - **params**: `supabase: SupabaseClient<Database>`, `args: MutateWithAuditArgs<R>`
 - **ic_degiskenler**:
-  - `args.canWrite` — Yazma izni olup olmadığını kontrol eden boolean değer. `false` ise `AdminPermissionError` fırlatılır.
-  - `args.resource` — Hata fırlatma ve denetim günlüğü için kullanılan kaynak adı.
-  - `args.fn` — Çağrılacak ve sonucu döndürülecek mutasyon fonksiyonu.
-  - `args.auditedByEdge` — Denetim günlüğünün kenar (edge) tarafından yazılıp yazılmadığını gösteren boolean. `true` ise denetim günlüğü atlanır.
-  - `args.after` — Denetim günlüğü için mutasyon sonrası durumu temsil eden veri.
-  - `args.afterFrom` — Mutasyon sonucundan (`result`) denetim günlüğü için sonrası durumu çıkaran fonksiyon. Varsa kullanılır, başarısız olursa `args.after` kullanılır.
-  - `args.rowPk` — Denetim günlüğü için satır birincil anahtarı.
-  - `args.action` — Denetim günlüğü için gerçekleştirilen eylem.
-  - `args.before` — Denetim günlüğü için mutasyon öncesi durumu temsil eden veri.
-  - `args.comment` — Denetim günlüğü için yorum.
-  - `result` — `args.fn()` çağrısının döndürdüğü mutasyon sonucu.
-  - `after` — Denetim günlüğüne yazılacak nihai sonrası durum verisi. Önce `args.afterFrom` ile hesaplanır, başarısız olursa `args.after` kullanılır.
-  - `e` — `args.afterFrom` veya `logAdminAction` çağrılarındaki hataları yakalamak için kullanılan hata nesnesi.
-- **Dönüş**: `Promise<R>` — Mutasyon fonksiyonunun (`args.fn`) döndürdüğü sonuç.
+  - `args.canWrite` — yazma yetkisi olup olmadığını belirten boolean; `false` ise `AdminPermissionError` fırlatılır
+  - `args.resource` — yetki hatası durumunda `AdminPermissionError`'a kaynak adı olarak geçilir, audit log'da `table_name` olarak kullanılır
+  - `result` — `args.fn()` çağrısının dönüş değeri; fonksiyonun asıl mutasyon sonucunu tutar
+  - `args.auditedByEdge` — audit log'un edge tarafında yapılıp yapılmadığını gösteren boolean; `true` ise audit log bloğu atlanır
+  - `after` — audit log'a gönderilecek "sonrası" durumu; başlangıçta `args.after` değerini alır
+  - `args.afterFrom` — varsa `result`'ı alıp `after` değerini dönüştüren fonksiyon; başarısız olursa `args.after`'a düşülür
+  - `e` — `catch` bloklarında yakalanan hata nesnesi; `console.error` ile loglanır
+  - `args.rowPk` — audit log'da satır birincil anahtarı olarak kullanılır
+  - `args.action` — audit log'da gerçekleştirilen işlem türünü belirtir
+  - `args.before` — audit log'da işlem öncesi durumu belirtir
+  - `args.comment` — audit log'da işlem açıklaması olarak kullanılır
+- **Dönüş**: `Promise<R>` — mutasyon sonucu olan `result` değerini döndürür
 
 ---
 
 ## NODE ID STANDARD
 
-  file: mutateWithAudit.ts
-  function: mutateWithAudit.ts::mutateWithAudit
-  class: mutateWithAudit.ts::AdminPermissionError
+  file: src\lib\admin\mutateWithAudit.ts
+  function: src\lib\admin\mutateWithAudit.ts::mutateWithAudit
+  class: src\lib\admin\mutateWithAudit.ts::AdminPermissionError
 
 ---
 

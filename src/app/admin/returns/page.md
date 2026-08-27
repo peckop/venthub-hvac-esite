@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\admin\returns\page.tsx
-skeleton_hash: 63c78e509934ddaa
+source_path: C:\tmp\ops-t165\src\app\admin\returns\page.tsx
+skeleton_hash: d493779035e77791
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: 8443af27af30d61d
   overview: 5b1a16aab3aba293
   style_tokens: 08b1938b3f3a81d8
-generated_at: 2026-08-25T07:23:27Z
+generated_at: 2026-08-27T06:55:45Z
 ---
 
 ## Genel Bakış
@@ -80,9 +80,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::Loading
-  function: page.tsx::Page
+  file: src\app\admin\returns\page.tsx
+  function: src\app\admin\returns\page.tsx::Loading
+  function: src\app\admin\returns\page.tsx::Page
 
 ---
 

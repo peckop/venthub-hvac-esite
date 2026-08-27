@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\admin\layout.tsx
-skeleton_hash: 2be9462bf62a55e3
+source_path: C:\tmp\ops-t165\src\app\admin\layout.tsx
+skeleton_hash: 8dbbe911ab339ff4
 entity_hashes:
   func:Layout: ba5a2fa47c4a3578
   overview: 2c0f6861ff270d4c
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:24Z
+generated_at: 2026-08-27T06:54:46Z
 ---
 
 ## Genel Bakış
@@ -73,8 +73,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, gövdeden türetilen özel 
 
 ## NODE ID STANDARD
 
-  file: layout.tsx
-  function: layout.tsx::Layout
+  file: src\app\admin\layout.tsx
+  function: src\app\admin\layout.tsx::Layout
 
 ---
 

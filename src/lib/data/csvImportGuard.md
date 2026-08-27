@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\data\csvImportGuard.ts
-skeleton_hash: a4e005618add51d3
+source_path: C:\tmp\ops-t165\src\lib\data\csvImportGuard.ts
+skeleton_hash: ce7606c85eafc439
 entity_hashes:
   func:splitByExistingSku: d2107b0423a7baf1
   overview: d58c9002ee424267
-generated_at: 2026-08-25T08:46:25Z
+generated_at: 2026-08-27T06:57:26Z
 ---
 
 ## Genel Bakış

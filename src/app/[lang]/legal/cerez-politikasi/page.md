@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\cerez-politikasi\page.tsx
-skeleton_hash: fe900b3d5527f4b2
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\cerez-politikasi\page.tsx
+skeleton_hash: 8948c6668486ff6b
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: dbefcec9367e9b65
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:19Z
 ---
 
 ## Genel Bakış

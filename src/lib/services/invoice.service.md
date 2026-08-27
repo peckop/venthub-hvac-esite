@@ -2,17 +2,17 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\invoice.service.ts
-skeleton_hash: cefdf01a9abcce88
+source_path: C:\tmp\ops-t165\src\lib\services\invoice.service.ts
+skeleton_hash: 2d08c67470e6970e
 entity_hashes:
-  func:createInvoiceProfile: 5e5a37f5f764d379
-  func:deleteInvoiceProfile: 65d9f6fe10df813f
-  func:fetchDefaultInvoiceProfile: 2c73823e50b3579a
-  func:listInvoiceProfiles: 28aa8aa7e1a9d27a
-  func:setDefaultInvoiceProfile: 5969056d403828fd
-  func:updateInvoiceProfile: 978db19027a5f5be
+  func:createInvoiceProfile: b61cab6e7702bfbf
+  func:deleteInvoiceProfile: 8866a054d85e0ac1
+  func:fetchDefaultInvoiceProfile: f1287ca9e9965700
+  func:listInvoiceProfiles: 6ba70aee1e01c86e
+  func:setDefaultInvoiceProfile: 4d36f8d033787f35
+  func:updateInvoiceProfile: 980d1d157193156f
   overview: a257728e512b389b
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:01:01Z
 ---
 
 ## Genel Bakış
@@ -50,11 +50,14 @@ Bu modül, fatura profillerinin CRUD işlemlerini ve varsayılan profil yönetim
 ## FONKSİYON DETAYLARI
 
 ### listInvoiceProfiles
-**Ne yapar**: Kullanıcının tüm fatura profillerini listeler. Varsayılan profiller ve oluşturulma tarihine göre sıralanmış bir dizi döndürür. Fatura profilleri tablosu mevcut değilse boş dizi döner.
-**Nasıl yapar**: Supabase istemcisi aracılığıyla 'user_invoice_profiles' tablosundaki tüm kayıtları çeker. Sıralama önce `is_default` (azalan) ardından `created_at` (azalan) alanına göre yapılır. Tablo bulunamadı hatası (PGRST205) oluşursa sessizce boş dizi döner, diğer hataları fırlatır.
+**Ne yapar**: Veritabanındaki tüm kullanıcı fatura profillerini listeler. Profiller önce varsayılan olana (`is_default`), ardından oluşturulma tarihine (`created_at`) göre azalan sırada sıralanır.
+
+**Nasıl yapar**: Supabase istemcisi üzerinden `user_invoice_profiles` tablosundan tüm kayıtları (`select('*')`) çeker. Sonuçları iki sıralama kriteriyle getirir: önce `is_default` alanı azalan (true olanlar üstte), sonra `created_at` alanı azalan (en yeni üstte). Hata durumunda, tablonun bulunamadığına dair özel bir hata kodu (`PGRST205`) veya mesajı kontrol eder; bu durumda boş dizi döner. Diğer hataları fırlatır.
+
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Supabase veritabanı bağlantısı için kullanılan istemci nesnesi.
-**Dönüş**: `Promise<DbInvoiceProfile[]>` — Sıralanmış fatura profilleri dizisi. Hata durumunda boş dizi döner.
+- `supabase`: `SupabaseClient<Database>` — Supabase veritabanı istemcisi. Veritabanı bağlantısını ve sorgu yetkilerini sağlar.
+
+**Dönüş**: `Promise<DbInvoiceProfile[]>` — Fatura profillerinin listesini içeren bir Promise. Tablo bulunamazsa boş dizi, başarılı olursa profiller dizisi döner.
 
 ### createInvoiceProfile
 **Ne yapar**: Yeni bir fatura profili oluşturur. Oluşturma işleminden önce kullanıcının kimliğini doğrular ve profili otomatik olarak ilgili kullanıcıya atar.
@@ -107,58 +110,59 @@ Bu modül, fatura profillerinin CRUD işlemlerini ve varsayılan profil yönetim
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/services/invoice.service.ts::listInvoiceProfiles
-- **params**: `(supabase: SupabaseClient<Database>)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen `user_invoice_profiles` tablosu satırlarının dizisi
-  - `error` — Supabase sorgusu sırasında oluşan hata nesnesi; `PGRST205` kodu veya tablo bulunamadı hatası kontrol edilir
-  - `e` — `error` nesnesinin `PostgrestErrorExtended` arayüzüne dönüştürülmüş hali, hata kodu ve mesajı için kullanılır
-- **Dönüş**: `Promise<DbInvoiceProfile[]>` — Tablo bulunamazsa boş dizi döner, aksi halde tüm fatura profilleri sıralı olarak döner
+  - `data` — supabase sorgusundan dönen satırlar dizisi (destructuring ile alınır)
+  - `error` — supabase sorgusundan dönen hata nesnesi (destructuring ile alınır)
+  - `e` — `error` değişkeninin `PostgrestErrorExtended` arayüzüne cast edilmiş hali; `code` ve `message` alanlarına erişim sağlar
+- **Dönüş**: `DbInvoiceProfile[]` — tüm fatura profillerinin listesi; tablo bulunamazsa boş dizi döner
 
 ### [N2_NASIL] AST Pointer: src/lib/services/invoice.service.ts::createInvoiceProfile
-- **params**: `(supabase: SupabaseClient<Database>, payload: DbInvoiceProfileInsert)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `payload` — DbInvoiceProfileInsert tipinde, oluşturulacak profil verisi
 - **ic_degiskenler**:
-  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi
-  - `userError` — Kimlik doğrulama sırasında oluşan hata nesnesi
-  - `user` — `authData.user` property'si; oturum açmış kullanıcı nesnesi, `user.id` alanı payload'a eklenir
-  - `dbPayload` — `payload` ile `user.id` alanının birleştirilmiş hali; `...payload` spread operatorü ile `user_id` eklenir
-  - `data` — Supabase `insert` ve `select` sorgusundan dönen tek satırlık veri
-  - `error` — Supabase insert/select sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<DbInvoiceProfile>` — Yeni oluşturulmuş fatura profili nesnesi
+  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi (destructuring ile alınır)
+  - `userError` — `supabase.auth.getUser()` çağrısından dönen hata (destructuring ile alınır)
+  - `user` — `authData?.user` erişimiyle elde edilen kullanıcı nesnesi
+  - `dbPayload` — `payload` nesnesinin spread edilip `user_id: user.id` alanının eklenmiş hali; veritabanına gönderilecek son veri
+  - `data` — insert sorgusundan dönen tekil satır (destructuring ile alınır)
+  - `error` — insert sorgusundan dönen hata (destructuring ile alınır)
+- **Dönüş**: `DbInvoiceProfile` — oluşturulan fatura profili
 
 ### [N3_NASIL] AST Pointer: src/lib/services/invoice.service.ts::updateInvoiceProfile
-- **params**: `(supabase: SupabaseClient<Database>, id: string, payload: DbInvoiceProfileUpdate)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — güncellenecek profilin kimlik değeri; `payload` — DbInvoiceProfileUpdate tipinde, güncelleme verisi
 - **ic_degiskenler**:
-  - `data` — Supabase `update` ve `select` sorgusundan dönen tek satırlık güncellenmiş veri
-  - `error` — Supabase update/select sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<DbInvoiceProfile>` — Güncellenmiş fatura profili nesnesi
+  - `data` — update sorgusundan dönen tekil satır (destructuring ile alınır)
+  - `error` — update sorgusundan dönen hata (destructuring ile alınır)
+- **Dönüş**: `DbInvoiceProfile` — güncellenmiş fatura profili
 
 ### [N4_NASIL] AST Pointer: src/lib/services/invoice.service.ts::deleteInvoiceProfile
-- **params**: `(supabase: SupabaseClient<Database>, id: string)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — silinecek profilin kimlik değeri
 - **ic_degiskenler**:
-  - `error` — Supabase `delete` sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<boolean>` — Silme başarılıysa `true` döner, hata oluşursa exception fırlatılır
+  - `error` — delete sorgusundan dönen hata (destructuring ile alınır)
+- **Dönüş**: `boolean` — silme başarılıysa `true`; hata varsa fırlatılır
 
 ### [N5_NASIL] AST Pointer: src/lib/services/invoice.service.ts::setDefaultInvoiceProfile
-- **params**: `(supabase: SupabaseClient<Database>, id: string)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — varsayılan yapılacak profilin kimlik değeri
 - **ic_degiskenler**:
-  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi
-  - `userError` — Kimlik doğrulama sırasında oluşan hata nesnesi
-  - `user` — `authData.user` property'si; oturum açmış kullanıcı nesnesi, `user.id` alanı mevcut varsayılan profilleri temizlemek için kullanılır
-  - `clear` — Kullanıcının diğer tüm `is_default: true` olan profillerini `is_default: false` yapma işleminin sonucu; `clear.error` kontrol edilir
-  - `data` — Belirtilen `id`'li profilin `is_default: true` olarak güncellenmesi sonrası dönen tek satırlık veri
-  - `error` — Supabase update/select sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<DbInvoiceProfile>` — Varsayılan olarak ayarlanmış fatura profili nesnesi
+  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi (destructuring ile alınır)
+  - `userError` — `supabase.auth.getUser()` çağrısından dönen hata (destructuring ile alınır)
+  - `user` — `authData?.user` erişimiyle elde edilen kullanıcı nesnesi
+  - `clear` — aynı kullanıcıya ait mevcut varsayılan profilleri `is_default: false` olarak güncelleyen sorgu sonucu
+  - `clear.error` — `clear` nesnesinin `error` alanı; temizleme sorgusundaki hata
+  - `data` — `id` ile belirtilen profili `is_default: true` yapan update sorgusundan dönen tekil satır (destructuring ile alınır)
+  - `error` — ikinci update sorgusundan dönen hata (destructuring ile alınır)
+- **Dönüş**: `DbInvoiceProfile` — varsayılan olarak ayarlanan fatura profili
 
 ### [N6_NASIL] AST Pointer: src/lib/services/invoice.service.ts::fetchDefaultInvoiceProfile
-- **params**: `(supabase: SupabaseClient<Database>)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
 - **ic_degiskenler**:
-  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi
-  - `userError` — Kimlik doğrulama sırasında oluşan hata nesnesi
-  - `user` — `authData.user` property'si; oturum açmış kullanıcı nesnesi, `user.id` alanı `user_id` filtresi için kullanılır
-  - `data` — Supabase `select` sorgusundan dönen `user_invoice_profiles` tablosu satırlarının dizisi; `user_id` ve `is_default` filtreleri uygulanmış, `updated_at` azalan sırayla, en fazla 1 satır
-  - `error` — Supabase select sırasında oluşan hata nesnesi; `PGRST205` kodu veya tablo bulunamadı hatası kontrol edilir
-  - `e` — `error` nesnesinin `PostgrestErrorExtended` arayüzüne dönüştürülmüş hali, hata kodu ve mesajı için kullanılır
-- **Dönüş**: `Promise<DbInvoiceProfile | null>` — Varsayılan fatura profili varsa `data[0]` olarak döner, bulunamazsa veya tablo yoksa `null` döner
+  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi (destructuring ile alınır)
+  - `userError` — `supabase.auth.getUser()` çağrısından dönen hata (destructuring ile alınır)
+  - `user` — `authData?.user` erişimiyle elde edilen kullanıcı nesnesi
+  - `data` — select sorgusundan dönen satırlar dizisi (destructuring ile alınır)
+  - `error` — select sorgusundan dönen hata (destructuring ile alınır)
+  - `e` — `error` değişkeninin `PostgrestErrorExtended` arayüzüne cast edilmiş hali; `code` ve `message` alanlarına erişim sağlar
+- **Dönüş**: `DbInvoiceProfile | null` — kullanıcının varsayılan fatura profili; bulunamazsa `null`, tablo yoksa `null` döner
 
 ---
 

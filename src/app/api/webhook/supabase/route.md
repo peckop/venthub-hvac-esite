@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\api\webhook\supabase\route.ts
-skeleton_hash: 5b8ce373973b3051
+source_path: C:\tmp\ops-t165\src\app\api\webhook\supabase\route.ts
+skeleton_hash: 92d388bc3cca6d2c
 entity_hashes:
   func:POST: e403611d31ac574d
   func:categoryPathsFor: 9b42d3d5a66b4be0
@@ -14,7 +14,7 @@ entity_hashes:
   func:revalidateFamilyChain: 4b63a5deec09a21a
   func:walkFamilyChain: 88b7db91345e77f1
   overview: 8197b1ebd33adfbe
-generated_at: 2026-08-25T07:24:30Z
+generated_at: 2026-08-27T06:56:11Z
 ---
 
 ## Genel Bakış
@@ -222,29 +222,29 @@ graph TD
     route_ts__revalidateCategoryTree["revalidateCategoryTree"]
     route_ts__revalidateFamilyChain["revalidateFamilyChain"]
     route_ts__walkFamilyChain["walkFamilyChain"]
-    route_ts__revalidateCategoryTree --> route_ts__categoryPathsFor
-    route_ts__revalidateCategoryTree --> route_ts__categoryRowById
-    route_ts__POST --> route_ts__categoryPathsFor
     route_ts__revalidateFamilyChain --> route_ts__walkFamilyChain
+    route_ts__POST --> route_ts__hasDiscoverySensitiveChange
+    route_ts__revalidateCategoryTree --> route_ts__categoryPathsFor
+    route_ts__POST --> route_ts__categoryPathsFor
+    route_ts__POST --> route_ts__walkFamilyChain
+    route_ts__revalidateCategoryTree --> route_ts__categoryRowById
+    route_ts__POST --> route_ts__categoryRowById
+    route_ts__walkFamilyChain --> route_ts__familyRowById
     route_ts__POST --> route_ts__revalidateFamilyChain
     route_ts__POST --> route_ts__revalidateCategoryTree
-    route_ts__walkFamilyChain --> route_ts__familyRowById
-    route_ts__POST --> route_ts__categoryRowById
-    route_ts__POST --> route_ts__walkFamilyChain
-    route_ts__POST --> route_ts__hasDiscoverySensitiveChange
 ```
 
 ## NODE ID STANDARD
 
-  file: route.ts
-  function: route.ts::hasDiscoverySensitiveChange
-  function: route.ts::familyRowById
-  function: route.ts::walkFamilyChain
-  function: route.ts::revalidateFamilyChain
-  function: route.ts::categoryPathsFor
-  function: route.ts::categoryRowById
-  function: route.ts::revalidateCategoryTree
-  function: route.ts::POST
+  file: src\app\api\webhook\supabase\route.ts
+  function: src\app\api\webhook\supabase\route.ts::hasDiscoverySensitiveChange
+  function: src\app\api\webhook\supabase\route.ts::familyRowById
+  function: src\app\api\webhook\supabase\route.ts::walkFamilyChain
+  function: src\app\api\webhook\supabase\route.ts::revalidateFamilyChain
+  function: src\app\api\webhook\supabase\route.ts::categoryPathsFor
+  function: src\app\api\webhook\supabase\route.ts::categoryRowById
+  function: src\app\api\webhook\supabase\route.ts::revalidateCategoryTree
+  function: src\app\api\webhook\supabase\route.ts::POST
 
 ---
 

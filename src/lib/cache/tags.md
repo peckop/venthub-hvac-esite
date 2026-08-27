@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\cache\tags.ts
-skeleton_hash: 85228f198cb06b9c
+source_path: C:\tmp\ops-t165\src\lib\cache\tags.ts
+skeleton_hash: 412a2bf37c447ac4
 entity_hashes:
   func:discoveryTag: 95a49a01d81cd6c2
   func:familyTag: ba67c6f5b527773a
   func:homeDataTag: 303b142949a39355
   func:variantStockTag: 5ec1e6fcd103258e
   overview: 070e09d2f73aa81b
-generated_at: 2026-08-25T08:46:29Z
+generated_at: 2026-08-27T06:57:24Z
 ---
 
 ## Genel Bakış

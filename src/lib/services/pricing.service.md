@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\services\pricing.service.ts
-skeleton_hash: 83999a08595cf2be
+source_path: C:\tmp\ops-t165\src\lib\services\pricing.service.ts
+skeleton_hash: a1bc94bcebe44ec5
 entity_hashes:
   func:computePriceFromRule: 20d0773f85dcc18b
   func:getEffectivePriceInfo: c612469fff714cef
@@ -18,7 +18,7 @@ entity_hashes:
   func:scopeMatchesProduct: d59f1cfb776d4fcd
   func:sortRules: 5a906937cc73d945
   overview: b38a0c8da1fe006b
-generated_at: 2026-08-25T07:29:07Z
+generated_at: 2026-08-27T07:01:04Z
 ---
 
 ## Genel Bakış
@@ -375,34 +375,34 @@ graph TD
     pricing_service_ts__ruleMatchesProduct["ruleMatchesProduct"]
     pricing_service_ts__scopeMatchesProduct["scopeMatchesProduct"]
     pricing_service_ts__sortRules["sortRules"]
-    pricing_service_ts__computePriceFromRule --> pricing_service_ts__round2
-    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__sortRules
-    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__round2
-    pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__nowIso
     pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__getUserPriceSegment
-    pricing_service_ts__getEffectiveUnitPrice --> pricing_service_ts__getEffectivePriceInfo
+    pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__nowIso
+    pricing_service_ts__computePriceFromRule --> pricing_service_ts__round2
+    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__round2
+    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__computePriceFromRule
     pricing_service_ts__computePriceFromRule --> pricing_service_ts__roundToStep
+    pricing_service_ts__getEffectiveUnitPrice --> pricing_service_ts__getEffectivePriceInfo
+    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__sortRules
+    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__ruleMatchesProduct
     pricing_service_ts__resolvePrice --> pricing_service_ts__resolvePriceWithRules
     pricing_service_ts__ruleMatchesProduct --> pricing_service_ts__scopeMatchesProduct
-    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__ruleMatchesProduct
-    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__computePriceFromRule
 ```
 
 ## NODE ID STANDARD
 
-  file: pricing.service.ts
-  function: pricing.service.ts::getUserPriceSegment
-  function: pricing.service.ts::nowIso
-  function: pricing.service.ts::getEffectiveUnitPrice
-  function: pricing.service.ts::getEffectivePriceInfo
-  function: pricing.service.ts::roundToStep
-  function: pricing.service.ts::round2
-  function: pricing.service.ts::scopeMatchesProduct
-  function: pricing.service.ts::ruleMatchesProduct
-  function: pricing.service.ts::sortRules
-  function: pricing.service.ts::computePriceFromRule
-  function: pricing.service.ts::resolvePriceWithRules
-  function: pricing.service.ts::resolvePrice
+  file: src\lib\services\pricing.service.ts
+  function: src\lib\services\pricing.service.ts::getUserPriceSegment
+  function: src\lib\services\pricing.service.ts::nowIso
+  function: src\lib\services\pricing.service.ts::getEffectiveUnitPrice
+  function: src\lib\services\pricing.service.ts::getEffectivePriceInfo
+  function: src\lib\services\pricing.service.ts::roundToStep
+  function: src\lib\services\pricing.service.ts::round2
+  function: src\lib\services\pricing.service.ts::scopeMatchesProduct
+  function: src\lib\services\pricing.service.ts::ruleMatchesProduct
+  function: src\lib\services\pricing.service.ts::sortRules
+  function: src\lib\services\pricing.service.ts::computePriceFromRule
+  function: src\lib\services\pricing.service.ts::resolvePriceWithRules
+  function: src\lib\services\pricing.service.ts::resolvePrice
 
 ---
 
