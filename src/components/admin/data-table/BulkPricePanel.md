@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\data-table\BulkPricePanel.tsx
-skeleton_hash: c6e852bc24d82b38
+source_path: C:\tmp\vh-comp\src\components\admin\data-table\BulkPricePanel.tsx
+skeleton_hash: 1ddf21d26a06d896
 entity_hashes:
-  func:BulkPricePanel: 98486d576f3fce24
+  func:BulkPricePanel: fee171469e911c3e
   overview: fe92bf0c51b69212
-  style_tokens: e2f13243910dab82
-generated_at: 2026-08-15T16:41:17Z
+  style_tokens: 0d100a4eba997618
+generated_at: 2026-08-27T04:10:17Z
 ---
 
 ## Genel Bakış
@@ -32,22 +32,18 @@ Bu modül için fonksiyon gövdesi verilmediğinden, sadece fonksiyon imzasında
 
 ---
 
-**Not:** Fonksiyon gövdesi sağlandığında daha detaylı mimari varsayımlar (eşik değerleri, state bağımlılıkları, API çağrı koşulları vb.) üretilebilir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### BulkPricePanel
-**Ne yapar**: Toplu fiyat güncelleme panelini oluşturan ve yöneten React bileşenidir. Kullanıcının seçili ürünlerin fiyatlarını yüzde olarak veya sabit tutar olarak topluca güncellemesine olanak tanır.
+**Ne yapar**: Toplu fiyat güncelleme işlemini kullanıcıya sunan bir React bileşenidir. Kullanıcının yüzde bazlı veya sabit tutar bazlı fiyat değişikliği yapabilmesini sağlar; geçersiz giriş durumunda satır içi hata mesajı gösterir ve geçerli değer girildiğinde üst bileşene fiyat modu ve sayısal değer çiftini iletir.
 
-**Nasıl yapar**: `useI18n` hook'u ile çoklu dil desteği sağlar. `priceMode` durumu ile yüzde veya sabit tutar modu arasında seçim yapılmasını, `priceValue` durumu ile girilen değerin takibini ve `priceError` durumu ile hata yönetimini yönetir. `apply` fonksiyonu içinde girilen değeri `parseFloat` ile sayıya dönüştürerek doğrulama yapar; geçersiz bir değer girildiğinde `priceError` durumunu ayarlar ve hata mesajını bileşen içinde gösterir. Geçerli bir değer girildiğinde `onApply` callback'ini çağırarak fiyatı uygular ve paneli kapatır. `modeButtonClass` yardımcı fonksiyonu, aktif/pasif duruma göre dinamik CSS sınıfları üretir.
+**Nasıl yapar**: Bileşen, `useI18n` hook'u aracılığıyla uluslararasılaştırma desteğini alır ve tüm metinleri `t()` fonksiyonuyla çözümleyerek çoklu dil desteği sağlar. Üç adet `React.useState` ile durum yönetimi yapar: `priceMode` (yüzde mi sabit tutar mı seçili), `priceValue` (kullanıcının girdiği ham değer) ve `priceError` (satır içi doğrulama hatası). `apply` adlı iç fonksiyon, girilen değeri `parseFloat` ile sayıya dönüştürür; dönüşüm başarısız olursa (NaN) `priceError` durumunu ayarlayarak sayfada satır içi hata görüntüler — `alert()` kullanılmaz, bu tasarım NN/g'nin "hata, oluştuğu yerin yanında raporlanmalıdır" ilkesine uyar. Geçerli bir sayı girildiğinde `onApply` prop'una `(priceMode, parsed)` çiftini aktarır, input alanını sıfırlar ve `onClose` prop'unu çağırarak paneli kapatır. `modeButtonClass` adlı yardımcı fonksiyon, Tailwind CSS sınıflarını birleştirerek aktif/pasif buton durumlarına göre farklı görsel stiller döndürür. JSX dönüşünde iki mod butonu (yüzde ve sabit tutar), bir sayısal input alanı, bir uygulama butonu, koşullu hata mesajı ve mod'a göre değişen ipucu metni yer alır. Input alanı, hata durumunda `aria-invalid` ve `aria-describedby` öznitelikleriyle erişilebilirlik standartlarına uygun şekilde işaretlenir.
 
 **Parametreler**:
-- `onApply`: `(mode: 'percent' | 'fixed', value: number) => void` — Fiyat güncelleme işlemi uygulandığında çağrılan geri çağırma fonksiyonu. Modu ('percent' veya 'fixed') ve sayısal değeri parametre olarak alır.
-- `onClose`: `() => void` — Panel kapatıldığında çağrılan geri çağırma fonksiyonu.
+- `onApply`: `(mode: 'percent' | 'fixed', value: number) => void` — Kullanıcı geçerli bir değer girdiğinde çağrılan geri çağırım fonksiyonu. Seçili fiyat modu ve sayısal değeri parametre olarak alır.
+- `onClose`: `() => void` — Uygulama işlemi tamamlandıktan sonra paneli kapatmak için çağrılan geri çağırım fonksiyonu.
 
-**Dönüş**: `React.ReactNode` — Oluşturulan JSX içeriğini döndürür.
+**Dönüş**: `React.ReactNode` — Toplu fiyat güncelleme panelinin JSX ağacını döndürür. Panel; başlık, iki mod seçici buton, sayısal input, uygulama butonu, koşullu hata mesajı ve ipucu metni içeren bir kapsayıcı div'den oluşur.
 
 ---
 
@@ -70,36 +66,34 @@ TOPLU FİYAT GÜNCELLEME PANELİ `BulkActionToolbar`'dan çıkarıldı: o bileş
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: BulkPricePanel.tsx::BulkPricePanel
-- **params**: ({ onApply, onClose }: BulkPricePanelProps)
+- **params**: `{ onApply, onClose }` — `BulkPricePanelProps` tipinde, `onApply` fiyat güncelleme işlemini başlatan fonksiyon, `onClose` paneli kapatan fonksiyon
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu, UI metinlerini çevirir
-  - `priceMode` — Fiyat modu state'i ('percent' veya 'fixed'), varsayılan 'percent'
-  - `setPriceMode` — priceMode state'ini güncelleyen setter fonksiyonu
-  - `priceValue` — Kullanıcının girdiği fiyat değeri string state'i
-  - `setPriceValue` — priceValue state'ini güncelleyen setter fonksiyonu
-  - `priceError` — Hata mesajı state'i, null veya string
-  - `setPriceError` — priceError state'ini güncelleyen setter fonksiyonu
-  - `apply` — Fiyat uygulama fonksiyonu, iç fonksiyon
-  - `modeButtonClass` — Mod butonu için CSS class'ını döndüren iç fonksiyon
-  - `PERCENT_ICON` — Yüzde ikonu (JSX içinde kullanılır)
-  - `LIRA_ICON` — Lira ikonu (JSX içinde kullanılır)
-- **Dönüş**: React.ReactNode
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu, metinleri yerelleştirmek için kullanılır
+  - `priceMode` — state, `'percent' | 'fixed'` tipinde, seçili fiyat modunu tutar (başlangıç: `'percent'`)
+  - `setPriceMode` — `priceMode` state'ini güncelleyen setter fonksiyonu
+  - `priceValue` — state, string tipinde, kullanıcının girdiği fiyat değerini tutar (başlangıç: `''`)
+  - `setPriceValue` — `priceValue` state'ini güncelleyen setter fonksiyonu
+  - `priceError` — state, `string | null` tipinde, doğrulama hatası mesajını tutar (başlangıç: `null`)
+  - `setPriceError` — `priceError` state'ini güncelleyen setter fonksiyonu
+  - `apply` — içinde tanımlı fonksiyon, form gönderimini işler
+  - `modeButtonClass` — içinde tanımlı fonksiyon, mod butonlarının CSS sınıfını döndürür
+- **Dönüş**: `React.ReactNode`
 
 ### [N2_NASIL] AST Pointer: BulkPricePanel.tsx::apply
-- **params**: (yok)
+- **params**: yok
 - **ic_degiskenler**:
-  - `parsed` — parseFloat(priceValue) ile elde edilen ondalık sayı değeri
-- **Dönüş**: void
+  - `parsed` — `parseFloat(priceValue)` sonucu, kullanıcının girdiği değerin sayısal karşılığı
+- **Dönüş**: `void` — ancak yan etki olarak `setPriceError`, `onApply`, `setPriceValue` ve `onClose` fonksiyonlarını çağırır
 
 ### [N3_NASIL] AST Pointer: BulkPricePanel.tsx::modeButtonClass
-- **params**: (active: boolean)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: string — Dinamik CSS class string'i
+- **params**: `active: boolean` — butonun aktif olup olmadığını belirtir
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — CSS sınıf adlarını içeren template literal
 
-### [N4_NASIL] AST Pointer: BulkPricePanel.tsx::onChange (input handler)
-- **params**: (e) — React.ChangeEvent<HTMLInputElement>
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void
+### [N4_NASIL] AST Pointer: BulkPricePanel.tsx::onChange
+- **params**: `e` — input değişiklik olayı nesnesi
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `setPriceValue(e.target.value)` ve `setPriceError(null)` çağırır
 
 ---
 
@@ -125,7 +119,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-white`, `border-gray-200`, `text-gray-400`, `text-gray-800`, `text-primary-navy`, `text-rose-500`, `text-sm`, `text-xs`
-- **Layout:** `fixed`, `flex`, `flex-1`, `gap-2`, `items-center`, `min-w-280px`, `p-4`, `shadow-2xl`
+- **Renkler:** `bg-admin-surface`, `border-admin-border`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-primary-navy`, `text-sm`, `text-xs`
+- **Layout:** `fixed`, `flex`, `flex-1`, `gap-2`, `items-center`, `min-w-280px`, `p-4`, `shadow-admin-lg`
 - **Varyant/Responsive:** `focus-visible:` önekleri
-- **Yardımcı Sınıflar:** `!py-2`, `!text-xs`, `${adminButtonPrimaryClass`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/30`, `font-semibold`, `mb-3`, `mt-2`, `percent`, `px-3`, `py-2`, `rounded-lg`, `rounded-xl`
+- **Yardımcı Sınıflar:** `!py-2`, `!text-xs`, `${adminButtonPrimaryClass`, `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/30`, `font-semibold`, `mb-3`, `mt-2`, `percent`, `px-3`, `py-2`, `rounded-admin-md`

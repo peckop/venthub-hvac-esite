@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\contexts\AuthContext.tsx
-skeleton_hash: f4d5ced51ff2d848
+source_path: C:\tmp\vh-comp\src\contexts\AuthContext.tsx
+skeleton_hash: 64cf2241fc4021e5
 entity_hashes:
   func:AuthProvider: 8a171b0bec808d24
   overview: 367d05e5814d0229
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T04:31:52Z
 ---
 
 ## Genel Bakış

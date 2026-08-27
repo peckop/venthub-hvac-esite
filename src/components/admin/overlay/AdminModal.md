@@ -2,56 +2,75 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\overlay\AdminModal.tsx
-skeleton_hash: 9db6bbb0108df18a
+source_path: C:\tmp\vh-comp\src\components\admin\overlay\AdminModal.tsx
+skeleton_hash: 0fbad743f36b478d
 entity_hashes:
-  func:AdminModal: ebb2a2f3d9e5e293
-  overview: 23feaff1c2b1fda9
+  func:AdminModal: 6399eab0ba79bc72
+  overview: d3635e4ad09f0841
   style_tokens: be0cd721ede72a1e
-generated_at: 2026-08-15T18:39:31Z
+generated_at: 2026-08-27T04:11:49Z
 ---
 
 ## Genel Bakış
 
-AdminModal,administratif arayüzde modal overlay bileşeni sunan bir React bileşenidir. Başlık, açıklama ve kapatma etiketi gibi yapılandırılabilir özelliklerle,DialogContent içinde modal pencere gösterir. Bileşen, açık/kapalı durumunu kontrol eden ve durum değişikliklerini üst bileşene ileten bir API sunar.
+AdminModal, yönetici arayüzünde kullanılan bir modal diyalog bileşenidir. Radix UI'ın Dialog yapı taşlarını temel alarak modal pencere, başlık, açıklama ve kapatma aksiyonu sunar. Bileşen, açık/kapalı durumunu dışarıdan kontrol eden bir API sağlar.
 
 ## Fonksiyon Grupları
 
 ### Modal Bileşeni
-Modal overlay'ın ana React bileşenidir ve Dialog, DialogContent, DialogHeader yapısını render eder.
+Modal overlay'ın ana render mantığını üstlenir; Dialog.Root, Dialog.Portal, Dialog.Overlay ve Dialog.Content gibi Radix UI yapılarını kullanarak erişilebilir bir diyalog penceresi oluşturur.
 - AdminModal
 
 ### Props Tanımları
-Bileşenin alabileceği parametreleri ve opsiyonel değerleri tanımlar.
-- open, onOpenChange, title, description, closeLabel, widthClass
+Bileşenin yapılandırılabilir parametrelerini tanımlar: `open` (görünürlük durumu), `onOpenChange` (durum değişiklik bildirimi), `title` (başlık), `description` (açıklama), `closeLabel` (kapatma etiketi), `widthClass` (genişlik sınıfı).
+- AdminModalProps
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+- [Aksiyom 1]: Modülün dışa açtığı yapı (şema / prop kümesi) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir prop ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve tüketici bileşenler aynı commit'te güncellenmelidir.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca imzadan çıkarım yapılabilmektedir. Aşağıdaki varsayımlar imza bilgisine dayanır:
+
+[Aksiyom 1]: Eğer `open` prop'u sağlanmazsa, bileşenin modal'ı gösterip göstermeyeceği bilinmiyor — fonksiyon gövdesindeki varsayılan davranış bilinmemektedir.
+
+[Aksiyom 2]: Eğer `onOpenChange` prop'u sağlanmazsa, modal kapatma işleminin nasıl yürütüleceği bilinmiyor.
+
+[Aksiyom 3]: Eğer `title` prop'u sağlanmazsa, modal başlığının nasıl render edileceği bilinmiyor.
+
+[Aksiyom 4]: Eğer `description` prop'u sağlanmazsa, açıklama alanının nasıl render edileceği bilinmiyor.
+
+[Aksiyom 5]: Eğer `closeLabel` prop'u sağlanmazsa, kapatma butonu etiketinin ne olacağı bilinmiyor.
+
+[Aksiyom 6]: Eğer `widthClass` prop'u sağlanmazsa, modal genişliğinin nasıl belirleneceği bilinmiyor.
+
+**Not:** Fonksiyon gövdesi (implementation) sağlanmadığı için, bu prop'ların zorunlu mu yoksa opsiyonel mi olduğu, hangi alt dökümantasyon bileşenlerinin (Dialog, DialogContent, DialogHeader) kullanıldığı ve bunların nasıl bir araya getirildiği gibi kritik mimari detaylar belirlenememektedir. Daha kesin aksiyomlar için kaynak kodun kendisi gereklidir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminModal
-**Ne yapar**: Bu fonksiyon, bir modal diyalog penceresi render eden bir React bileşenidir. Yönetici arayüzünde farklı işlevler için kullanılan, erişilebilir ve tutarlı bir arayüz sağlar; başlık, açıklama, ana içerik alanı ve opsiyonel bir alt bilgi (footer) bölümünü barındırır.
+**Ne yapar**: Admin paneli için erişilebilir bir modal (diyalog) bileşeni oluşturur. Radix UI Dialog altyapısını kullanarak başlık, açıklama, içerik ve opsiyonel alt bilgi (footer) alanlarını yapılandırılmış bir şekilde görüntüler. Modal açılıp kapanma durumunu dışarıdan kontrol eder.
 
-**Nasıl yapar**: Bileşen, Radix UI kütüphanesinin (`Dialog.Root`, `Dialog.Portal`, `Dialog.Overlay`, `Dialog.Content`, vb.) erişilebilir diyalog yapı taşlarını kullanarak modali oluşturur. `Dialog.Root`, `open` ve `onOpenChange` prop'ları ile dışarıdan kontrol edilen bir durum yönetimi sağlar. Portal (`Dialog.Portal`) yapısı, modal içeriğinin React uygulamasının ana DOM hiyerarşisinden bağımsız olarak, genellikle `<body>` elementinin sonuna eklenerek render edilmesini garantiler. `Dialog.Overlay` sabit bir arka plan perdesi oluşturarak sayfa kaydırmasını kilitler ve odak tuzaklamasını destekler. Bileşen, Radix'in varsayılan olarak `aria-modal` özniteliğini eklemediği için, erişilebilirlik için (`cetvel §4.8/7` referansıyla) bu özniteliği manuel olarak `Dialog.Content` üzerine ekler. Tüm görünüm, Tailwind CSS sınıfları ile stillendirilmiştir.
+**Nasıl yapar**: Radix UI kütüphanesinin `Dialog.Root`, `Dialog.Portal`, `Dialog.Overlay`, `Dialog.Content`, `Dialog.Title`, `Dialog.Description` ve `Dialog.Close` bileşenlerini hiyerarşik şekilde bir araya getirir. `Dialog.Root` ile modalın açık/kapalı durumu ve durum değişikliği yönetimi sağlanır. `Dialog.Portal` ile içerik DOM ağacının kökenine taşınır. `Dialog.Overlay` siyah yarı saydam bir perde oluşturur ve aynı zamanda gövde kaydırma kilidi (body scroll lock) işlevi görür — kod yorumunda bu perdenin çıkarılmaması gerektiği vurgulanmıştır. `Dialog.Content` ana modal kutusunu oluşturur; Radix'in `aria-modal` niteliğini otomatik olarak eklemediği tespit edildiği için bu nitelik elle eklenmiştir. Başlık bölümünde `Dialog.Title` ve `Dialog.Description` ile erişilebilir başlık ve açıklama sunulur. Kapatma butonu `Dialog.Close` ile oluşturulur ve `aria-label` niteliği ile ekran okuyuculara erişilebilirlik sağlanır; buton içinde `X` ikonu `aria-hidden="true"` ile gizlenir. `children` prop'u esnek kaydırılabilir bir alana yerleştirilir. `footer` prop'u verilmişse, üst kenarlıklı bir alt bölümde görüntülenir; verilmemişse bu bölüm hiç render edilmez.
 
 **Parametreler**:
-- `open`: boolean — Diyalog penceresinin açıksa `true`, kapalıysa `false` olduğunu belirtir. Kontrol bileşeni dışarıdan yönetilir.
-- `onOpenChange`: `(open: boolean) => void` — Diyalog penceresinin durum değişikliği (açılma/kapanma) gerçekleştiğinde çağrılan geri çağırma fonksiyonudur. Bileşen, durumunu güncellemek için bu fonksiyonu çağırır.
-- `title`: string | React.ReactNode — Diyalog penceresinin üst kısmında gösterilecek başlık metnini veya React elemanını temsil eder.
-- `description`: string | React.ReactNode — Başlığın hemen altında, daha küçük bir font ile gösterilecek açıklama metnini veya React elemanını temsil eder.
-- `closeLabel`: string — Kapatma butonu için erişilebilirlik (aria-label) etiketini tanımlar. Bu metin, görme engelli kullanıcılar tarafından ekran okuyucu ile duyulacaktır.
-- `widthClass`: string (Varsayılan: `'w-full max-w-90vw sm:max-w-modal'`) — Modal içeriğinin genişliğini ve maksimum genişliğini kontrol eden Tailwind CSS sınıf(ları)dır. Bu sayede farklı ekran boyutlarına uyumlu genişlik ayarı yapılabilir.
-- `footer`: React.ReactNode (Opsiyonel) — Modal penceresinin alt kısmında, genellikle eylem butonlarını (örn. "Kaydet", "İptal") içeren bir bölüm için React elemanıdır. Sağlanmazsa alt bilgi alanı render edilmez.
-- `children`: React.ReactNode — Modal penceresinin ana içerik alanını oluşturacak olan React elemanlarıdır.
+- open: boolean — Modalın açık olup olmadığını belirten durum değişmezi. `true` olduğunda modal görünür hale gelir.
+- onOpenChange: (open: boolean) => void — Modalın açık/kapalı durumu değiştiğinde çağrılan geri çağırım fonksiyonu. Kullanıcı overlay'e tıkladığında veya Escape tuşuna bastığında tetiklenir.
+- title: string — Modalın başlık metni. `Dialog.Title` bileşeni içinde görüntülenir ve erişilebilirlik için kullanılır.
+- description: string — Modalın açıklama metni. `Dialog.Description` bileşeni içinde görüntülenir ve modalın amacını açıklar.
+- closeLabel: string — Kapatma butonu için erişilebilirlik etiketi. `Dialog.Close` bileşeninin `aria-label` niteliğine atanır; ekran okuyucuların butonun işlevini anlamasını sağlar.
+- widthClass: string — Modal genişliğini belirleyen Tailwind CSS sınıfı. Varsayılan değeri `'w-full max-w-90vw sm:max-w-modal'` olarak atanmıştır; bu sayede mobilde ekranın %90'ı, küçük ekran ve üzeri cihazlarda `max-w-modal` genişliği kullanılır.
+- footer: React.ReactNode — Modalın alt kısmında görüntülenecek opsiyonel içerik. Genellikle aksiyon butonları (kaydet, iptal vb.) buraya yerleştirilir. Verilmediğinde alt bölüm hiç oluşturulmaz.
+- children: React.ReactNode — Modalın ana içerik alanı. Kaydırılabilir bir alana (`adminModalScrollAreaClass`) yerleştirilir.
 
-**Dönüş**: `React.ReactElement` — Oluşturulan modal diyalog yapısını (Radix Dialog bileşenlerini ve Tailwind ile stillendirilmişdiv'leri) içeren bir React elemanı döndürür.
+**Dönüş**: React.ReactElement — Radix UI Dialog bileşenlerinden oluşan tam yapılandırılmış modal ağacını döndürür.
 
 ---
 
@@ -82,9 +101,18 @@ MODAL ÇALIŞMA YÜZEYİ — elle yazılmış `fixed inset-0` overlay'lerin yeri
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/overlay/AdminModal.tsx::AdminModal
-- **params**: `open` — Dialog'un açık/kapalı durumunu kontrol eder; `onOpenChange` — Dialog durumu değiştiğinde çağrılan callback; `title` — Modal başlık metni olarak render edilir; `description` — Modal açıklama metni olarak render edilir; `closeLabel` — Kapatma butonunun `aria-label` değeri; `widthClass` — Modal genişlik stilleri, varsayılan `'w-full max-w-90vw sm:max-w-modal'`; `footer` — Opsiyonel footer içeriği, varsa alt kısımda border ile ayrılmış alanda render edilir; `children` — Modal gövde içeriği, scroll edilebilir alanda render edilir
-- **ic_degiskenler**: (fonksiyon gövdesinde herhangi bir `const`/`let`/`var` değişken tanımı yoktur; tüm değerler parametrelerden ve import'lardan doğrudan JSX içinde kullanılır)
-- **Dönüş**: `React.ReactElement` — `Dialog.Root` ile sarılmış, Portal içinde Overlay + Content yapısını içeren tam modal JSX'i döner; `adminModalContentClass` ve `adminModalScrollAreaClass` import'lu utility sınıfları className'lerde kullanılır; `X` ikonu kapatma butonunda render edilir
+- **params**:
+  - `open` — diyalogun açık/kapalı durumunu belirten boolean; `Dialog.Root` bileşeninin `open` prop'una aktarılır
+  - `onOpenChange` — diyalog durumu değiştiğinde çağırılan callback fonksiyon; `Dialog.Root` bileşeninin `onOpenChange` prop'una aktarılır
+  - `title` — diyalog başlık metni; `Dialog.Title` bileşeni içinde render edilir
+  - `description` — diyalog açıklama metni; `Dialog.Description` bileşeni içinde render edilir
+  - `closeLabel` — kapatma butonunun erişilebilirlik etiketi; `Dialog.Close` bileşeninin `aria-label` prop'una atanır
+  - `widthClass` — diyalog içerik kutusunun genişlik CSS sınıfı; varsayılan değer `'w-full max-w-90vw sm:max-w-modal'`; `Dialog.Content` bileşeninin `className`'inde `adminModalContentClass` ile birlikte kullanılır
+  - `footer` — diyalog altbilgi alanı içeriği (opsiyonel); varsa alt kenarlıklı bir div içinde render edilir, yoksa null döner
+  - `children` — diyalog ana içerik alanı; `adminModalScrollAreaClass` uygulanmış bir div içinde render edilir
+- **ic_degiskenler**:
+  - (fonksiyon gövdesinde tanımlanmış iç değişken yoktur; tüm veri props'lardan doğrudan JSX'e aktarılır)
+- **Dönüş**: `React.ReactElement` — Radix `Dialog.Root` ile sarmalanmış, portal içinde overlay, içerik kutusu (başlık, açıklama, kapatma butonu, children, opsiyonel footer) barındıran bir JSX ağacı döndürür
 
 ---
 
