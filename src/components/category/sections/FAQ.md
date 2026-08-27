@@ -2,22 +2,26 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\FAQ.tsx
-skeleton_hash: e37ce1098854250f
+source_path: C:\tmp\vh-urun-comp\src\components\category\sections\FAQ.tsx
+skeleton_hash: d13285b9414302fd
 entity_hashes:
   func:FAQ: 09e0c00f56bbdf5d
-  overview: 2819faae975a53e8
+  overview: 93d5af423fe50354
   style_tokens: 44e8cc594d8dadd1
-generated_at: 2026-06-14T21:00:10Z
+generated_at: 2026-08-27T07:03:58Z
 ---
 
 ## Genel Bakış
-Bu modül, kategori sayfalarında görünen Sık Sorulan Sorular (SSS) bölümünürender eden tek bir React bileşeni sunar. Bileşen, sabit bir soru-cevap listesini alır ve bunları akordiyon (accordion) yapısında sunarak kullanıcıların soruları tek tek açıp kapatabilmesini sağlar.
+Bu modül, kategori sayfalarında görünen Sık Sorulan Sorular (SSS) bölümünü render eden tek bir React bileşeni sunar. Bileşen, sabit bir soru-cevap listesini akordiyon (accordion) yapısında sunarak kullanıcıların soruları tek tek açıp kapatabilmesini sağlar. Modül, uluslararasılaştırma desteği için i18n altyapısından yararlanır.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Modülün tek ve temel bileşeni olan FAQ, SSS bölümünün tamamını (başlık, sorular ve cevaplar) oluşturur ve yönetir.
-- FAQ()
+Modülün tek ve temel bileşeni olan FAQ, SSS bölümünün tamamını (başlık, sorular ve cevaplar) oluşturur ve yönetir. Kullanıcı etkileşimiyle akordiyon öğelerinin açık/kapalı durumunu kontrol eder.
+- FAQ
+
+## Dış Bağımlılıklar
+- **Routes** (utils/routes): Sayfa yönlendirme ve bağlantı yapılandırması için kullanılır.
+- **use** (i18n/I18nProvider): Çoklu dil desteği sağlamak amacıyla metinlerin uluslararasılaştırılmasında kullanılır.
 
 ---
 
@@ -42,7 +46,7 @@ Modülün tek ve temel bileşeni olan FAQ, SSS bölümünün tamamını (başlı
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../../utils/routes::Routes
+- import: ../../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: @/i18n/I18nProvider::useI18n
 - import: lucide-react::ChevronDown
 - import: lucide-react::ChevronUp
@@ -55,22 +59,17 @@ Modülün tek ve temel bileşeni olan FAQ, SSS bölümünün tamamını (başlı
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/category/sections/FAQ.tsx::FAQ
-- **params**: (parametre yok)
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan dönen çeviri fonksiyonu; `t('category.faq.q1')` gibi anahtarlarla çok dilli çeviri dizesi üretir
-  - `openIndex` — useState ile tutulan state; hangi FAQ maddesinin açık olduğunu index olarak saklar; başlangıç değeri `0` (ilk madde açık), `null` ise hepsi kapalı
-  - `setOpenIndex` — openIndex state'ini güncelleyen setter fonksiyonu; tıklama ile openIndex değiştirilir
-  - `faqs` — 6 elemanlı array; her eleman `{ question: string, answer: string }` yapısındadır; `t()` çağrılarıyla çeviri anahtarlarından doldurulur
-  - `faq` — `faqs.map` callback'inde mevcut eleman; `{ question, answer }` yapısında
-  - `index` — `faqs.map` callback'inde mevcut elemanın dizin numarası (0-5 arası)
-  - `isOpen` — `openIndex === index` karşılaştırmasıyla hesaplanan boolean; ilgili maddenin açık olup olmadığını belirler; JSX'te koşullu className ve animasyon mantığını kontrol eder
-- **Dönüş**: JSX — `<section>` ile sarılmış FAQ bölümü; accordion yapısında soru-cevap listesi, üst başlık (`HelpCircle` ikonu + heading + subtitle), ve iletişim CTA linki (`Routes.contact()`) içeren React functional component; `setOpenIndex(isOpen ? null : index)` ile state güncellenir (yan etki)
-
-### [N2_NASIL] AST Pointer: src/components/category/sections/FAQ.tsx::(faq, index) => { ... } (map callback)
-- **params**: (`faq` — faqs dizisindeki mevcut eleman `{ question: string, answer: string }`, `index` — elemanın dizin numarası)
-- **ic_degiskenler**:
-  - `isOpen` — `openIndex === index` karşılaştırmasıyla hesaplanan boolean; akordeon maddesinin açık olup olmadığını belirler; JSX'te koşullu className (`border-blue-200 shadow-md` vs `border-gray-200`, `bg-blue-50` vs `bg-white hover:bg-gray-50`, `text-blue-700` vs `text-gray-900`) ve animasyon (`max-h-96` vs `max-h-0`) mantığını kontrol eder
-- **Dönüş**: JSX — tek bir FAQ maddesi `<div>` elementi; `<button>` ile tıklama handler'ı (`setOpenIndex(isOpen ? null : index)`), `ChevronUp`/`ChevronDown` ikon koşullu gösterimi, `faq.question` başlık içeriği, `faq.answer` cevap içeriği; `isOpen` durumuna göre border renk-gölge, arka plan rengi ve metin rengi koşullu olarak değişir
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; metin anahtarlarını yerel metinlere dönüştürmek için kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota nesnesi; `Routes.contact()` çağrılarak iletişim sayfası URL'si elde edilir
+  - `openIndex` — `useState<number | null>(0)` ile oluşturulan state; şu an açık olan SSS kartının indeksini tutar, başlangıç değeri `0`'dır
+  - `setOpenIndex` — `openIndex` state'ini güncelleyen setter fonksiyonu; tıklama olayında `isOpen ? null : index` değeri atanır
+  - `faqs` — SSS verilerini içeren dizi; her eleman `t('category.faq.qN')` ile soru ve `t('category.faq.aN')` ile cevap alanlarına sahip 6 öğelik sabit dizi
+  - `faq` — `faqs.map` callback parametresi; tek bir SSS elemanını temsil eder, `.question` ve `.answer` alanlarına sahiptir
+  - `index` — `faqs.map` callback parametresi; mevcut elemanın dizideki sıfır-tabanlı indeks numarası
+  - `isOpen` — `openIndex === index` karşılaştırma sonucu; bu SSS kartının şu an genişletilmiş olup olmadığını gösteren boolean değer
+- **Dönüş**: JSX — `<section>` kök elemanı içeren React bileşeni; SSS başlığı, accordion kartları ve iletişim CTA bağlantısı içerir
 
 ---
 
