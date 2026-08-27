@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\titles.tr.ts
-skeleton_hash: 095691850a410925
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\titles.tr.ts
+skeleton_hash: fbdf2226837f7ebd
 entity_hashes:
   overview: 92aa8036d07ad320
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -32,7 +32,7 @@ Modülde herhangi bir fonksiyon veya metot bulunmamaktadır. Kod yapısı, en ü
 - **titles** (object) — `{
       dashboard: 'Dashboard',
       orders: 'Siparişler',
-      inventory: ...`
+      inventor...`
 
 ---
 

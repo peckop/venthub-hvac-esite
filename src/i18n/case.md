@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\case.ts
-skeleton_hash: a2a779b8339d02b1
+source_path: C:\tmp\vh-comp\src\i18n\case.ts
+skeleton_hash: f5bbdb49b60d2a07
 entity_hashes:
   func:foldForSearch: b05c0f6782097fb8
   func:localeLower: 0aa41d0053763fd1
@@ -11,7 +11,7 @@ entity_hashes:
   func:trLower: 1a3860d21076eeaa
   func:trUpper: b59711e581908cbe
   overview: b1cd4e538306d230
-generated_at: 2026-08-24T11:54:03Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış

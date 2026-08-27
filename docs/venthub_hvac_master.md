@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T06:56:44.353569+00:00
+compiled_at: 2026-08-27T07:10:09.479694+00:00
 total_compiled_files: 655
-source_commit: cc0d70c5
+source_commit: 11411411
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T06:56:44.353569+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T07:10:09.479694+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -202,13 +202,13 @@ file: C:\Users\alize\venthub-hvac\src\next-env.d.ts
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\layout.tsx
-skeleton_hash: 8412d56ab919a28f
+source_path: C:\tmp\vh-comp\src\app\layout.tsx
+skeleton_hash: e9fd26aae76e6b15
 entity_hashes:
   func:RootLayout: b91efb59fd6362f0
   overview: 49bead2b697f0509
   style_tokens: eebc13a3fedd1bcb
-generated_at: 2026-08-25T07:23:26Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -286,8 +286,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imza ve sabit tan
 
 ## NODE ID STANDARD
 
-  file: layout.tsx
-  function: layout.tsx::RootLayout
+  file: src\app\layout.tsx
+  function: src\app\layout.tsx::RootLayout
 
 ---
 
@@ -11778,7 +11778,7 @@ entity_hashes:
   func:validate: 986ff306b233d4e4
   overview: e6fd6a1ce6c238d0
   style_tokens: 01d5bdbc603763a7
-generated_at: 2026-08-27T04:27:31Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -11926,8 +11926,8 @@ graph TD
     LeadModal_tsx__handleClose["handleClose"]
     LeadModal_tsx__submit["submit"]
     LeadModal_tsx__validate["validate"]
-    LeadModal_tsx__LeadModal --> LeadModal_tsx__handleClose
     LeadModal_tsx__LeadModal --> LeadModal_tsx__validate
+    LeadModal_tsx__LeadModal --> LeadModal_tsx__handleClose
 ```
 
 ## NODE ID STANDARD
@@ -46897,11 +46897,11 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\I18nContext.ts
-skeleton_hash: 78be8abf262fb6a0
+source_path: C:\tmp\vh-comp\src\i18n\I18nContext.ts
+skeleton_hash: 7c6a025de5f0caa0
 entity_hashes:
   overview: 0ce19631cc889ffb
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -47005,15 +47005,15 @@ Bu dosyada **fonksiyon gövdesi bulunmamaktadır**. Dosya yalnızca bir React Co
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\I18nProvider.tsx
-skeleton_hash: 594e65ddf8b00878
+source_path: C:\tmp\vh-comp\src\i18n\I18nProvider.tsx
+skeleton_hash: b6bf55cd8050fe70
 entity_hashes:
   func:I18nProvider: e23d74154d179265
   func:interpolate: 02cc51f0bd59e8d6
   func:useI18n: 7f95c6a8fb408f61
   overview: 7eca34d148d2fa1f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -47179,8 +47179,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\case.ts
-skeleton_hash: a2a779b8339d02b1
+source_path: C:\tmp\vh-comp\src\i18n\case.ts
+skeleton_hash: f5bbdb49b60d2a07
 entity_hashes:
   func:foldForSearch: b05c0f6782097fb8
   func:localeLower: 0aa41d0053763fd1
@@ -47188,7 +47188,7 @@ entity_hashes:
   func:trLower: 1a3860d21076eeaa
   func:trUpper: b59711e581908cbe
   overview: b1cd4e538306d230
-generated_at: 2026-08-24T11:54:03Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -47339,9 +47339,9 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\currency.ts
-skeleton_hash: b91cac8235fd6821
-generated_at: 2026-08-25T08:45:47.732426+00:00
+source_path: C:\tmp\vh-comp\src\i18n\currency.ts
+skeleton_hash: e720524f39dba275
+generated_at: 2026-08-27T06:50:24.687810+00:00
 ---
 
 ## Genel Bakış
@@ -47356,7 +47356,7 @@ T094 · Sistemin para birimi — TEK YER, ADI KONMUŞ VARSAYIM. ─────�
 (Dışa açılan çağrılabilir öğe yok — modül-düzeyi yan-etki; AST işaretçisi gerektiren fonksiyon/metot yok.)
 
 ## NODE ID STANDARD
-file: C:\Users\alize\venthub-hvac\src\i18n\currency.ts
+file: C:\tmp\vh-comp\src\i18n\currency.ts
 
 
 ---
@@ -47366,14 +47366,14 @@ file: C:\Users\alize\venthub-hvac\src\i18n\currency.ts
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\datetime.ts
-skeleton_hash: d0372a159f925bd8
+source_path: C:\tmp\vh-comp\src\i18n\datetime.ts
+skeleton_hash: 4c345a75acfda674
 entity_hashes:
   func:formatDate: 14e0f22f55add348
   func:formatDateTime: bca9df36994c09a4
   func:formatTime: ffcc8071ca9c075f
   overview: 3b7d66dc5c8cd5fa
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -47483,13 +47483,13 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\format.ts
-skeleton_hash: b1f270d844a80806
+source_path: C:\tmp\vh-comp\src\i18n\format.ts
+skeleton_hash: 4afe4bc846b54ef5
 entity_hashes:
   func:formatCurrency: c74424c786c4ea7f
   func:formatNumber: 0816f48e81145d1c
   overview: cad42f6789244c28
-generated_at: 2026-08-26T07:14:40Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -47599,12 +47599,12 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan 
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\getDictValue.ts
-skeleton_hash: 5dd3501554501d6b
+source_path: C:\tmp\vh-comp\src\i18n\getDictValue.ts
+skeleton_hash: fb78e2266fb5a28f
 entity_hashes:
-  func:getDictValue: 8458c9d7ff2daa26
+  func:getDictValue: 93fb357a5c54bf54
   overview: 3ad66d5b97f51555
-generated_at: 2026-06-15T11:41:12Z
+generated_at: 2026-08-27T06:51:14Z
 ---
 
 ## Genel Bakış
@@ -47640,28 +47640,29 @@ Bu modül, iç içe geçmiş nesne yapılarından nokta notasyonuyla (dot notati
 ## FONKSİYON DETAYLARI
 
 ### getDictValue
+**Ne yapar**: Sözlük yapısındaki bir obje üzerinde nokta-yolu (dot-path) ile güvenli bir şekilde değer çözümlemesi yapar. İstenen anahtar bulunamazsa, verilen `path` değerinin kendisini döndürür. Bu davranış, i18n (uluslararasılaştırma) bağlamlarında "ham anahtar" (raw key) semantiği sağlar; çağıran taraf, dönen değerin `path` ile aynı olup olmadığını kontrol ederek çözümlemenin başarısız olduğunu anlayabilir. Saf (pure) bir fonksiyondur ve `'use client'` direktifi içermez; bu sayede hem Server Component'larda hem de Client Component'larda kullanılabilir.
 
-**Ne yapar**: Verilen bir nesne (`obj`) içerisinde, nokta ile ayrılmış yollardan (ör. `"common.categoryList.ac"`) oluşan bir anahtarı (`path`) güvenli bir şekilde çözer. Anahtar yolu geçerli bir değere ulaşamazsa, çözülen değer yerine orijinal `path` dizesinin kendisini döndürür. Bu davranış, i18n sistemlerinde "ham anahtar" semantiğinin temelini oluşturur; çağrı yapan taraf `sonuç === path` karşılaştırması ile değerin çözülüp çözülmediğini anlayabilir.
-
-**Nasıl yapar**: Fonksiyon bir `try-catch` bloğu içinde çalışır. Öncelikle `path` dizesi nokta (`.`) karakteri kullanılarak bir dizi anahtara (`keys`) bölünür. Ardından `obj` nesnesi üzerinde bir döngü başlatılır; her bir alt anahtar (`k`) için mevcut nesnenin (`current`) bir nesne olup olmadığı ve ilgili anahtarın bu nesnenin içinde bulunup bulunmadığı kontrol edilir. Eğer herhangi bir aşamada anahtar bulunamazsa veya mevcut değer beklenen türde (nesne) değilse, döngü kırılır ve orijinal `path` döndürülür. Döngü başarıyla tamamlanırsa, elde edilen son değerin türü kontrol edilir: `string` ise doğrudan, `number` veya `boolean` ise `String()` ile string'e dönüştürülerek döndürülür. Herhangi bir hata oluşursa (`catch` bloğu), fonksiyon yine `path` değerini döndürerek kırılgan bir davranış sergilemez. Fonksiyon saf (pure) bir yapıdadır ve `'use client'` direktifi içermez; bu nedenle hem Server Component'lerde hem de istemci taraflı kodda kullanılabilir.
+**Nasıl yapar**: Fonksiyon, verilen `path` string'ini nokta (`.`) karakterinden parçalara ayırarak bir anahtar dizisi oluşturur. Ardından bu anahtarları sırayla takip ederek obje üzerinde gezinir. Her adımda, mevcut değerin bir obje olup olmadığı ve istenen anahtarı içerip içermediği kontrol edilir. Eğer bir adımda anahtar bulunamazsa, döngüden çıkılarak orijinal `path` değeri geri döndürülür. Tüm anahtarlar başarıyla çözümlendiyse, elde edilen son değer kontrol edilir: eğer `string` türündeyse doğrudan, `number` veya `boolean` türündeyse `String()` ile string'e dönüştürülerek döndürülür. Diğer tüm durumlarda (örneğin değer bir obje veya `undefined` ise) yine `path` döndürülür. Tüm işlem bir `try-catch` bloğu içinde sarılıdır; herhangi bir istisna oluşursa güvenli bir şekilde `path` döndürülür.
 
 **Parametreler**:
-- `obj`: `unknown` — Nokta yolu ile erişilecek olan sözlük (nesne) yapısı. Türü bilinmediği için `unknown` olarak belirtilmiştir; fonksiyon içinde her bir seviyede `typeof current === 'object'` kontrolü yapılarak güvenli bir şekilde işlenir.
-- `path`: `string` — Nokta ile ayrılmış anahtar yolu (ör. `"common.categoryList.ac"`). Fonksiyon bu yolu `.` karakterine göre bölerek her bir bileşeni sırasıyla nesne hiyerarşisinde aşağı doğru takip eder.
+- `obj`: `unknown` — Nokta-yolu ile değer aranacak sözlük yapısındaki kaynak obje. Türü `unknown` olarak belirtilmiştir; fonksiyon çalışma zamanında objenin yapısını kontrol ederek güvenli erişim sağlar.
+- `path`: `string` — Nokta ile ayrılmış anahtar yolu (ör. `"common.categoryList.ac"`). Her nokta, bir iç içe geçmiş obje seviyesini temsil eder.
 
-**Dönüş**: `string` — Çözümleme başarılıysa ilgili sözlük değeri (string, number veya boolean ise string'e dönüştürülmüş hali) döndürülür. Çözümleme başarısız olursa veya herhangi bir hata yakalanırsa, orijinal `path` parametresinin kendisi döndürülür. Bu sayede çağrı yapan kod, dönüş değeri ile orijinal yolu karşılaştırarak i18n anahtarının çözülüp çözülmediğini anlayabilir.
+**Dönüş**: `string` — Çözümlenen değerin string karşılığıdır. Değer bulunamazsa, bulunamama durumunu işaret etmek amacıyla verilen `path` parametresinin kendisi döndürülür. `number` ve `boolean` türündeki değerler otomatik olarak string'e dönüştürülür.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/i18n/getDictValue.ts::getDictValue
-- **params**: (obj: unknown, path: string)
+- **params**:
+  - `obj: unknown` — içinden değer aranacak sözlük/nesne
+  - `path: string` — nokta (`.`) ile ayrılmış erişim yolu (ör. `"menu.title"`)
 - **ic_degiskenler**:
-  - `keys` — path string'ini nokta charakteri ile split ederek elde edilen string dizisi; obje içinde derinlemesine erişim için adım adım kullanılır
-  - `current` — döngü içerisinde her seviyede güncellenen o anki erişilen değer; başlangıçta fonksiyona gelen obj parametresidir
-  - `k` — döngü iterasyonunda mevcut anahtar; keys dizisinden sırayla alınan her bir yol parçası
-- **Dönüş**: string — path ile erişilen değer string ise doğrudan o değer, number veya boolean ise String() ile stringify edilmiş hali, erişim başarısızsa veya hata oluşursa orijinal path döner
+  - `keys` — `path.split('.')` ile elde edilen anahtar dizisi; yol her noktadan bölünerek parçalara ayrılır
+  - `current` — nesne içinde gezinirken mevcut düğümü tutan değişken; başlangıçta `obj` değerine eşitlenir, her döngü adımında bir alt seviyeye iner
+  - `k` — `keys` dizisi üzerinde `for...of` döngüsüyle dolaşılan her bir anahtar
+- **Dönüş**: `string` — bulunan değer; `current` string ise doğrudan, number veya boolean ise `String(current)` ile dönüştürülerek döndürülür. Herhangi bir adımda anahtar bulunamazsa, `current` nesne değilse, değer string/number/boolean değilse ya da bir hata fırlarsa orijinal `path` değeri döndürülür.
 
 ---
 
@@ -47682,15 +47683,15 @@ Bu modül, iç içe geçmiş nesne yapılarından nokta notasyonuyla (dot notati
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\sort.ts
-skeleton_hash: 0d08d9eaf8b957f7
+source_path: C:\tmp\vh-comp\src\i18n\sort.ts
+skeleton_hash: 36df3c55ef9e9f65
 entity_hashes:
   func:byText: a6f3e4b7650ab66d
   func:collator: afec8bbed0857fb0
   func:compareText: 0247c751341efd4d
   func:harmanlamaDileDuyarliMi: 677e528ae0f4cfe1
   overview: e8a9fb1052b55aa7
-generated_at: 2026-08-24T11:54:43Z
+generated_at: 2026-08-27T06:51:14Z
 ---
 
 ## Genel Bakış
@@ -47797,9 +47798,9 @@ graph TD
     sort_ts__collator["collator"]
     sort_ts__compareText["compareText"]
     sort_ts__harmanlamaDileDuyarliMi["harmanlamaDileDuyarliMi"]
-    sort_ts__compareText --> sort_ts__collator
-    sort_ts__harmanlamaDileDuyarliMi --> sort_ts__compareText
     sort_ts__byText --> sort_ts__collator
+    sort_ts__harmanlamaDileDuyarliMi --> sort_ts__compareText
+    sort_ts__compareText --> sort_ts__collator
 ```
 
 ## NODE ID STANDARD
@@ -47962,11 +47963,11 @@ Bu dosyada fonksiyon tanımlı değildir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\a11y.en.ts
-skeleton_hash: 7e177e613315ae06
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\a11y.en.ts
+skeleton_hash: b8010a034c93f98f
 entity_hashes:
   overview: ad9f036d9f96b692
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -47996,7 +47997,7 @@ Bu modül için fonksiyon gövdesinden üretilecek mimari varsayımlar bulunmama
       close: 'Close',
       collapse: 'Collapse',
       copy: 'Copy',
-     ...`
+ ...`
 
 ---
 
@@ -48029,11 +48030,11 @@ Bu dosyada (`a11y.en.ts`) herhangi bir fonksiyon gövdesi bulunmamaktadır. Dosy
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\a11y.tr.ts
-skeleton_hash: 62996d2ba0d81866
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\a11y.tr.ts
+skeleton_hash: f30cf8fe0b9f7b85
 entity_hashes:
   overview: ad9f036d9f96b692
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -48069,7 +48070,7 @@ Bu modül bir i18n sözlük dosyasıdır ve içinde herhangi bir fonksiyon gövd
       close: 'Kapat',
       delete: 'Sil',
       edit: 'Düzenle',
-      sav...`
+     ...`
 
 ---
 
@@ -48101,11 +48102,11 @@ Bu dosyada **fonksiyon bulunmamaktadır**. Dosya, sadece bir i18n sözlük sabit
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\audit.en.ts
-skeleton_hash: d31f7e6d3869f15c
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\audit.en.ts
+skeleton_hash: a8f5e1f10fe25ae6
 entity_hashes:
   overview: 296262cb85b992c0
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -48170,11 +48171,11 @@ Bu dosyada **fonksiyon bulunmamaktadır**.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\audit.tr.ts
-skeleton_hash: 63ed96c8426e1278
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\audit.tr.ts
+skeleton_hash: 9ebf2c1b7d52f5d0
 entity_hashes:
   overview: 296262cb85b992c0
-generated_at: 2026-08-25T07:27:26Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -48210,7 +48211,7 @@ Bu dosyada (`src/i18n/dictionaries/admin/audit.tr.ts`) tanımlı fonksiyon bulun
 
 ## NODE ID STANDARD
 
-  file: audit.tr.ts
+  file: src\i18n\dictionaries\admin\audit.tr.ts
 
 ---
 
@@ -48224,11 +48225,11 @@ Bu dosyada (`src/i18n/dictionaries/admin/audit.tr.ts`) tanımlı fonksiyon bulun
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\authority.en.ts
-skeleton_hash: cbe174ff2a5a63a5
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\authority.en.ts
+skeleton_hash: f5738751f827c53a
 entity_hashes:
   overview: d75139dd453d58b5
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -48288,11 +48289,11 @@ Bu dosyada fonksiyon bulunmamaktadır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\authority.tr.ts
-skeleton_hash: 0a21746b687c9e49
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\authority.tr.ts
+skeleton_hash: 80f9d783b1787936
 entity_hashes:
   overview: d75139dd453d58b5
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -48354,11 +48355,11 @@ Bu dosya **i18n sözlük dosyası**dır ve **fonksiyon içermez**.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\categories.en.ts
-skeleton_hash: a1250c45e576adce
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\categories.en.ts
+skeleton_hash: 348214e270a6db2f
 entity_hashes:
   overview: e1ad358253fda567
-generated_at: 2026-08-15T18:48:28Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -48420,11 +48421,11 @@ Bu dosyada **hiç fonksiyon bulunmamaktadır**. Dosya saf bir i18n sözlük dosy
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\categories.tr.ts
-skeleton_hash: 4a3be7e26b2249e4
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\categories.tr.ts
+skeleton_hash: d12f3a0d6976402f
 entity_hashes:
   overview: e1ad358253fda567
-generated_at: 2026-08-15T18:48:28Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -48479,11 +48480,11 @@ Bu kaynak dosyada fonksiyon bulunmamaktadır. Dosya yalnızca `categories` adın
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\common.en.ts
-skeleton_hash: 5391b6d4f15735b3
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\common.en.ts
+skeleton_hash: 025255f30e9969f5
 entity_hashes:
   overview: 43c6db6003831046
-generated_at: 2026-08-25T07:27:17Z
+generated_at: 2026-08-27T06:50:26Z
 ---
 
 ## Genel Bakış
@@ -48523,7 +48524,7 @@ Bu dosyada (`src/i18n/dictionaries/admin/common.en.ts`) fonksiyon tanımlanmamı
 
 ## NODE ID STANDARD
 
-  file: common.en.ts
+  file: src\i18n\dictionaries\admin\common.en.ts
 
 ---
 
@@ -48537,11 +48538,11 @@ Bu dosyada (`src/i18n/dictionaries/admin/common.en.ts`) fonksiyon tanımlanmamı
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\i18n\dictionaries\admin\common.tr.ts
-skeleton_hash: 1518f8ff1a3f656a
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\common.tr.ts
+skeleton_hash: f093bfd765b8addc
 entity_hashes:
   overview: 43c6db6003831046
-generated_at: 2026-08-18T06:48:12Z
+generated_at: 2026-08-27T06:50:26Z
 ---
 
 ## Genel Bakış
@@ -48590,11 +48591,11 @@ Bu dosya, yönetici panelinin (admin) ortak kullanım alanları için Türkçe �
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\confirm.en.ts
-skeleton_hash: 5fd88297cb217354
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\confirm.en.ts
+skeleton_hash: 3630d41a1e66293a
 entity_hashes:
   overview: a909ef0d4730a50e
-generated_at: 2026-08-15T15:08:18Z
+generated_at: 2026-08-27T06:50:26Z
 ---
 
 ## Genel Bakış
@@ -48625,7 +48626,7 @@ Bu modül için bir JavaScript/TypeScript modülü olup, dışarıya bir `confir
 ## SABİTLER
 - **confirm** (object) — `{
       defaultTitle: 'Are you sure?',
-      // Button labels summarise the o...`
+      // Button labels summarise the...`
 
 ---
 
@@ -48634,18 +48635,6 @@ Bu modül için bir JavaScript/TypeScript modülü olup, dışarıya bir `confir
 Bu dosya (`confirm.en.ts`) bir i18n sözlük/dictionary dosyasıdır. Fonksiyon içermez, sadece `confirm` adında bir export edilen nesne sabiti bulunur. Fonksiyon gövdesi tanımlı değildir.
 
 **Sonuç:** Fonksiyon olmadığı için AST Pointer oluşturulamaz.
-
----
-
-**Not:** Dosya yapısı itibarıyla bu bir **sabit nesne tanımı** dosyasıdır — tipik olarak şu formatta olacaktır:
-
-```ts
-export const confirm = {
-  // key-value çiftleri (çeviri stringleri)
-};
-```
-
-Fonksiyon gövdeleri mevcut olmadığından, `params`, `ic_degiskenler` ve `Dönüş` bilgileri üretilemez.
 
 ---
 
@@ -48665,11 +48654,11 @@ Fonksiyon gövdeleri mevcut olmadığından, `params`, `ic_degiskenler` ve `Dön
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\confirm.tr.ts
-skeleton_hash: aaee7225a5707664
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\confirm.tr.ts
+skeleton_hash: d7f669628def00bf
 entity_hashes:
   overview: a909ef0d4730a50e
-generated_at: 2026-08-15T15:08:50Z
+generated_at: 2026-08-27T06:50:26Z
 ---
 
 ## Genel Bakış
@@ -48696,7 +48685,7 @@ Bu dosya fonksiyon veya method içermemektedir; yalnızca statik bir çeviri sö
 ## SABİTLER
 - **confirm** (object) — `{
       defaultTitle: 'Emin misiniz?',
-      // Buton etiketleri sonucu ÖZETL...`
+      // Buton etiketleri sonucu ÖZE...`
 
 ---
 
@@ -48724,11 +48713,11 @@ Bu dosyada fonksiyon bulunmamaktadır. Dosya saf bir çeviri sözlüğü (transl
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\coupons.en.ts
-skeleton_hash: f5b43b114e0a73ee
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\coupons.en.ts
+skeleton_hash: 9d12f039b9ea7fae
 entity_hashes:
   overview: e01c0e2ade1a4912
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:26Z
 ---
 
 ## Genel Bakış
@@ -48788,14 +48777,20 @@ AST Pointer üretimi için fonksiyon gövdesi gerekli olduğundan, bu dosya içi
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\coupons.tr.ts
-skeleton_hash: 67aa022469908c50
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\coupons.tr.ts
+skeleton_hash: 9d09459492de4758
 entity_hashes:
   overview: e01c0e2ade1a4912
-generated_at: 2026-06-13T15:03:46Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
+## Genel Bakış
 
+Bu modül, admin panelindeki kupon yönetim sayfasına ait Türkçe çeviri metinlerini içeren bir i18n sözlük dosyasıdır. Dışa aktarılan `coupons` sabit nesnesi, sayfa başlığı, alt başlık, buton etiketleri ve benzeri arayüz metinlerini tutar. Dosya herhangi bir fonksiyon, ortam değişkeni veya API çağrısı içermez; tamamen statik bir veri yapısıdır.
+
+## Fonksiyon Grupları
+
+Bu dosyada fonksiyon bulunmamaktadır. Modül yalnızca `coupons` adında dışa aktarılan bir sabit nesne içerir. Fonksiyon gruplaması bu nedenle geçerli değildir.
 
 ---
 
@@ -48803,7 +48798,7 @@ generated_at: 2026-06-13T15:03:46Z
 
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Açıklama:** Verilen modül (dosya) bir TypeScript nesnesi (sabit) içerir; herhangi bir fonksiyon imzası veya çalıştırılabilir kod bulunmamaktadır. Mimari varsayımlar, bir modülün doğru çalışması için gerekli koşulları (örn: bağımlılıklar, giriş önkoşulları, beklenen durumlar) tanımlar. Statik bir veri yapısı (sözlük/kayıt) olduğu için bu tür varsayımlar bu modül için geçerli değildir.
+**Açıklama:** Verilen modül (`coupons.tr.ts`) yalnızca statik bir i18n sözlük nesnesi (`coupons`) içerir. Herhangi bir fonksiyon gövdesi, hesaplama mantığı veya çalıştırılabilir kod bulunmadığından, modülün doğru çalışması için gerekli koşulları tanımlayan mimari varsayımlar üretilememektedir.
 
 ---
 
@@ -48813,7 +48808,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **coupons** (object) — `{
-      subtitle: 'İndirim kuponlarını yönetin ve kullanım istatistiklerini t...`
+      subtitle: 'İndirim kuponlarını yönetin ve kullanım istatistiklerini ...`
 
 ---
 
@@ -48847,7 +48842,7 @@ source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\dashboard.en.ts
 skeleton_hash: 1eaa6cd768f58a51
 entity_hashes:
   overview: 978b08ca21df4d0c
-generated_at: 2026-08-27T04:12:54Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -48904,7 +48899,7 @@ source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\dashboard.tr.ts
 skeleton_hash: ef820fb27ef4f139
 entity_hashes:
   overview: 978b08ca21df4d0c
-generated_at: 2026-08-27T04:12:54Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -48956,11 +48951,11 @@ Bu dosya fonksiyon içermemektedir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\dataRequests.en.ts
-skeleton_hash: c76425aa2648f845
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\dataRequests.en.ts
+skeleton_hash: 05a1828258c06601
 entity_hashes:
   overview: 8054e12732b167fd
-generated_at: 2026-08-25T08:43:24Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -49013,11 +49008,11 @@ Dosya yalnızca `dataRequests` adında bir object sabiti içermektedir; bu sabit
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\dataRequests.tr.ts
-skeleton_hash: a271ce9dc1784af5
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\dataRequests.tr.ts
+skeleton_hash: 5926fdf181f1d94e
 entity_hashes:
   overview: 8054e12732b167fd
-generated_at: 2026-08-25T08:43:36Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -49070,11 +49065,11 @@ Bu dosyada (`dataRequests.tr.ts`) tanımlı fonksiyon bulunmamaktadır. Dosya ya
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\dataTable.en.ts
-skeleton_hash: 1a23d0e9f9fa181e
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\dataTable.en.ts
+skeleton_hash: d6b48d6ae963997f
 entity_hashes:
   overview: 929ede5dd9b9aed8
-generated_at: 2026-08-15T18:29:39Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -49131,11 +49126,11 @@ Bu dosyada fonksiyon bulunmamaktadır. Dosya, statik bir i18n sözlük nesnesi (
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\dataTable.tr.ts
-skeleton_hash: 6ac04dbe149770d0
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\dataTable.tr.ts
+skeleton_hash: 50458c43b62b8058
 entity_hashes:
   overview: 929ede5dd9b9aed8
-generated_at: 2026-08-25T07:27:22Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -49172,7 +49167,7 @@ Bu dosyada fonksiyon tanımlanmamıştır. Yalnızca `dataTable` adında bir obj
 
 ## NODE ID STANDARD
 
-  file: dataTable.tr.ts
+  file: src\i18n\dictionaries\admin\dataTable.tr.ts
 
 ---
 
@@ -49190,7 +49185,7 @@ source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\en.ts
 skeleton_hash: 52acb6a97b3323f4
 entity_hashes:
   overview: d20c765ec6eb43b4
-generated_at: 2026-08-27T04:13:27Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -49284,11 +49279,11 @@ Fonksiyon gövdesi bulunmadığından AST Pointer üretilecek birim yoktur.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\errorGroups.en.ts
-skeleton_hash: 54e9229bb7718984
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\errorGroups.en.ts
+skeleton_hash: f048d61261596fb3
 entity_hashes:
   overview: 38d648bd807c5d10
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -49321,7 +49316,7 @@ Bu modül, hata gruplarını (error groups) tanımlayan statik bir veri yapısı
 
 ## SABİTLER
 - **errorGroups** (object) — `{
-      subtitle: 'Monitor, assign, and manage the status of grouped client e...`
+      subtitle: 'Monitor, assign, and manage the status of grouped client ...`
 
 ---
 
@@ -49347,11 +49342,11 @@ Bu dosyada herhangi bir fonksiyon gövdesi bulunmamaktadır. Dosya yalnızca bir
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\errorGroups.tr.ts
-skeleton_hash: dfcf2527d8350dc0
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\errorGroups.tr.ts
+skeleton_hash: 6f5244de043f0865
 entity_hashes:
   overview: 38d648bd807c5d10
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -49375,7 +49370,7 @@ Bu modül, yönetimsel hata gruplarının Türkçe çevirilerini tutan bir ulusl
 
 ## SABİTLER
 - **errorGroups** (object) — `{
-      subtitle: 'Toplanmış istemci hatalarını izleyin, atayın ve durumların...`
+      subtitle: 'Toplanmış istemci hatalarını izleyin, atayın ve durumları...`
 
 ---
 
@@ -49410,11 +49405,11 @@ Bu dosyada fonksiyon bulunmamaktadır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\errors.en.ts
-skeleton_hash: bce7d646f19e5be8
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\errors.en.ts
+skeleton_hash: 7ba36d4493188f95
 entity_hashes:
   overview: 0cabb6ce3dc6888f
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -49469,11 +49464,11 @@ Bu dosyada fonksiyon bulunmamaktadır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\errors.tr.ts
-skeleton_hash: 825d9e0cd25c876f
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\errors.tr.ts
+skeleton_hash: 1a7064fef42b35cf
 entity_hashes:
   overview: 0cabb6ce3dc6888f
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -49524,11 +49519,11 @@ Bu dosyada **hiç fonksiyon gövedesi bulunmamaktadır**. Dosya yalnızca bir ne
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\inventory.en.ts
-skeleton_hash: 3f5b925513b3b7d1
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\inventory.en.ts
+skeleton_hash: 40467670ef9bf80f
 entity_hashes:
   overview: 18ed3f6f33fcd066
-generated_at: 2026-08-15T18:26:23Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -49583,11 +49578,11 @@ Bu dosya (`inventory.en.ts`) yalnızca bir sabit nesne (`inventory`) tanımı i�
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\inventory.tr.ts
-skeleton_hash: a10f993a1c5e8629
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\inventory.tr.ts
+skeleton_hash: 5fb4bbde685104f5
 entity_hashes:
   overview: 18ed3f6f33fcd066
-generated_at: 2026-08-15T18:26:23Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -49640,11 +49635,11 @@ Bu dosyada tanımlı fonksiyon bulunmamaktadır. Dosya, bir nesne (inventory) i�
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\invoices.en.ts
-skeleton_hash: 264279df4492227d
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\invoices.en.ts
+skeleton_hash: 6bae90a52255eb3d
 entity_hashes:
   overview: d1de60c97ced1bcb
-generated_at: 2026-08-25T08:43:31Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -49694,11 +49689,11 @@ Bu dosyada (`src/i18n/dictionaries/admin/invoices.en.ts`) tanımlı fonksiyon bu
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\invoices.tr.ts
-skeleton_hash: 524c32016c32f830
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\invoices.tr.ts
+skeleton_hash: 199b217e406cf189
 entity_hashes:
   overview: d1de60c97ced1bcb
-generated_at: 2026-08-25T08:43:53Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -49747,11 +49742,11 @@ Dosya yalnızca `invoices` adında bir nesne sabiti içermektedir; bu sabit muht
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\logistics.en.ts
-skeleton_hash: a9d0aa08d79f1413
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\logistics.en.ts
+skeleton_hash: 71acea5ba51bf860
 entity_hashes:
   overview: 41df9c420e1d004e
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -49812,11 +49807,11 @@ Dosya yapısı incelendiğinde:
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\logistics.tr.ts
-skeleton_hash: b43d134cb998d464
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\logistics.tr.ts
+skeleton_hash: 69cfbd060c3b8b9c
 entity_hashes:
   overview: 41df9c420e1d004e
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -49871,11 +49866,11 @@ Bu dosyada herhangi bir **fonksiyon bulunmamaktadır**. Dosya, yalnızca bir i18
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\i18n\dictionaries\admin\menu.en.ts
-skeleton_hash: 92a23907345a724c
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\menu.en.ts
+skeleton_hash: 328fbe70098fc0db
 entity_hashes:
   overview: 34e06702dc3cc9a5
-generated_at: 2026-08-18T06:48:16Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -49937,11 +49932,11 @@ Bu dosya (`menu.en.ts`) bir i18n sözlük dosyasıdır ve **hiçbir fonksiyon i�
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\i18n\dictionaries\admin\menu.tr.ts
-skeleton_hash: 9bb892b6e6c28a74
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\menu.tr.ts
+skeleton_hash: f2b86c7bd782c902
 entity_hashes:
   overview: 34e06702dc3cc9a5
-generated_at: 2026-08-18T06:48:20Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -50000,11 +49995,11 @@ Bu dosyada herhangi bir fonksiyon bulunmamaktadır. Dosya, yalnızca bir `menu` 
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\movements.en.ts
-skeleton_hash: 2d38ad8579dc90eb
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\movements.en.ts
+skeleton_hash: b648ac28552add5d
 entity_hashes:
   overview: 913c3c44e13878f9
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -50030,7 +50025,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## SABİTLER
 - **movements** (object) — `{
       subtitle: 'Track, filter and export inventory in/out movements',
-    ...`
+  ...`
 
 ---
 
@@ -50058,11 +50053,11 @@ Herhangi bir `### [N_NASIL] AST Pointer` bloğu üretilemez çünkü analiz edil
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\movements.tr.ts
-skeleton_hash: e79560ab4ea296d0
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\movements.tr.ts
+skeleton_hash: eef9c4545b4a0642
 entity_hashes:
   overview: 913c3c44e13878f9
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -50091,7 +50086,7 @@ Bu modül, yalnızca statik bir çeviri sözlüğü (nesne sabiti) dışa aktara
 
 ## SABİTLER
 - **movements** (object) — `{
-      subtitle: 'Envanter giriş/çıkış hareketlerini izleyin, filtreleyin ve...`
+      subtitle: 'Envanter giriş/çıkış hareketlerini izleyin, filtreleyin v...`
 
 ---
 
@@ -50130,7 +50125,7 @@ source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\orders.en.ts
 skeleton_hash: 9602ac75946bb599
 entity_hashes:
   overview: f65c48db03384b35
-generated_at: 2026-08-27T04:13:27Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -50188,7 +50183,7 @@ source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\orders.tr.ts
 skeleton_hash: 02db388bdd9a25e2
 entity_hashes:
   overview: f65c48db03384b35
-generated_at: 2026-08-27T04:13:27Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -50248,11 +50243,11 @@ Fonksiyon bulunamadı.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\i18n\dictionaries\admin\pricing.en.ts
-skeleton_hash: 38f60efe046c348a
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\pricing.en.ts
+skeleton_hash: b892724c7223211e
 entity_hashes:
   overview: a30f302d74ed1c78
-generated_at: 2026-08-18T06:48:23Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -50306,11 +50301,11 @@ Fonksiyon gövdesi bulunamadı. Bu dosya (`pricing.en.ts`) bir i18n sözlük dos
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\i18n\dictionaries\admin\pricing.tr.ts
-skeleton_hash: 02367b90e52643e7
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\pricing.tr.ts
+skeleton_hash: f9ca74d381143934
 entity_hashes:
   overview: 09d4da507c2b51b1
-generated_at: 2026-08-18T06:48:27Z
+generated_at: 2026-08-27T06:50:45Z
 ---
 
 ## Genel Bakış
@@ -50367,11 +50362,11 @@ Bu dosyada herhangi bir fonksiyon bulunmamaktadır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\products.en.ts
-skeleton_hash: 92d7d8d716b7f2fd
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\products.en.ts
+skeleton_hash: 23043b4e7491776a
 entity_hashes:
   overview: b4058d53edae1644
-generated_at: 2026-08-24T11:54:05Z
+generated_at: 2026-08-27T06:50:45Z
 ---
 
 ## Genel Bakış
@@ -50426,11 +50421,11 @@ Bu dosya **fonksiyon içermeyen**, sadece i18n (uluslararasılaştırma) sözlü
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\products.tr.ts
-skeleton_hash: fca0aca500683931
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\products.tr.ts
+skeleton_hash: 635b9ed323a65c72
 entity_hashes:
   overview: b4058d53edae1644
-generated_at: 2026-08-24T11:54:06Z
+generated_at: 2026-08-27T06:50:45Z
 ---
 
 ## Genel Bakış
@@ -50487,11 +50482,11 @@ Bu dosyada fonksiyon bulunmamaktadır. Dosya, bir i18n sözlük dosyası olup ya
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\purchasing.en.ts
-skeleton_hash: 2fc9fc6508132bba
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\purchasing.en.ts
+skeleton_hash: 95361c32011161e6
 entity_hashes:
   overview: 76a765e0fc5704e4
-generated_at: 2026-08-25T08:43:37Z
+generated_at: 2026-08-27T06:50:45Z
 ---
 
 ## Genel Bakış
@@ -50542,11 +50537,11 @@ Bu dosyada (`C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\purchasing.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\purchasing.tr.ts
-skeleton_hash: 58d8a791b637fea4
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\purchasing.tr.ts
+skeleton_hash: 2974dc98b9b0ae58
 entity_hashes:
   overview: 76a765e0fc5704e4
-generated_at: 2026-08-25T08:46:12Z
+generated_at: 2026-08-27T06:50:45Z
 ---
 
 ## Genel Bakış
@@ -50601,11 +50596,11 @@ Dosya yalnızca `purchasing` adında bir object sabiti içermektedir; fonksiyon,
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\returns.en.ts
-skeleton_hash: 96bd8b6071281ec2
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\returns.en.ts
+skeleton_hash: 22be714701d501eb
 entity_hashes:
   overview: f74c60dbdfef5408
-generated_at: 2026-08-16T07:34:14Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -50668,11 +50663,11 @@ içermemektedir. Bu nedenle "Eğer ... yoksa, ... olur." formatında üretilecek
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\returns.tr.ts
-skeleton_hash: 9ddda4dbb9684395
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\returns.tr.ts
+skeleton_hash: fed5e019a959fa61
 entity_hashes:
   overview: f74c60dbdfef5408
-generated_at: 2026-08-16T07:34:14Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -50728,11 +50723,11 @@ Bu dosyada (`returns.tr.ts`) herhangi bir fonksiyon gövdesi bulunmamaktadır. D
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\search.en.ts
-skeleton_hash: ebd8a4cc857be165
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\search.en.ts
+skeleton_hash: 9d93d60d0414f20e
 entity_hashes:
   overview: fc6cf9147f6079c3
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -50805,11 +50800,11 @@ Bu dosyada fonksiyon gövdesi bulunmamaktadır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\search.tr.ts
-skeleton_hash: 857fe11e6f48d537
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\search.tr.ts
+skeleton_hash: 331998ad04e03333
 entity_hashes:
   overview: fc6cf9147f6079c3
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -50862,11 +50857,11 @@ Bu dosyada **hiç fonksiyon bulunmamaktadır**.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\i18n\dictionaries\admin\settings.en.ts
-skeleton_hash: dad3d2ccb7c95ac5
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\settings.en.ts
+skeleton_hash: 93151926faa8d2da
 entity_hashes:
   overview: a6820ef6861612f2
-generated_at: 2026-08-17T13:20:03Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -50897,7 +50892,7 @@ Bu modül bir i18n sözlük dosyasıdır (admin/settings.en.ts) ve `settings` ad
 - **settings** (object) — `{
       hoursUnit: 'Hours',
       siteName: 'Site Name',
-      tagline: 'Tagl...`
+      tagline: 'T...`
 
 ---
 
@@ -50927,11 +50922,11 @@ Fonksiyon imzası, fonksiyon gövdesi veya çalıştırılabilir kod bloğu mevc
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\i18n\dictionaries\admin\settings.tr.ts
-skeleton_hash: a0a799fb2aabe069
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\settings.tr.ts
+skeleton_hash: df570d678ff9ec43
 entity_hashes:
   overview: a6820ef6861612f2
-generated_at: 2026-08-17T13:20:04Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -50973,7 +50968,7 @@ Bu modül için fonksiyon gövdesi bulunmadığından, fonksiyon tabanlı mimari
 - **settings** (object) — `{
       hoursUnit: 'Saat',
       addAdmin: 'Yeni Yönetici Ekle',
-      admins...`
+      adm...`
 
 ---
 
@@ -51006,11 +51001,11 @@ Fonksiyon imzası, fonksiyon gövdesi veya class yapısı bulunmadığından AST
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\theme.en.ts
-skeleton_hash: bcf592d8ea62389b
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\theme.en.ts
+skeleton_hash: 75cb0f94dd6aedf8
 entity_hashes:
   overview: addd7e38799ae029
-generated_at: 2026-08-15T18:16:30Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -51068,11 +51063,11 @@ AST Pointer üretimi için gereken minimum koşul (en az bir fonksiyon gövdesi)
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\theme.tr.ts
-skeleton_hash: cacadec61b0e0aee
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\theme.tr.ts
+skeleton_hash: a06831609dfdbd9a
 entity_hashes:
   overview: 79b6edd4cd4818fd
-generated_at: 2026-08-25T08:49:18Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -51126,11 +51121,11 @@ Bu dosyada fonksiyon tanımlanmamıştır. Dosya yalnızca `theme` adında bir n
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\titles.en.ts
-skeleton_hash: 7d36c92b6143fcde
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\titles.en.ts
+skeleton_hash: 1d0684bc838218dc
 entity_hashes:
   overview: 92aa8036d07ad320
-generated_at: 2026-08-25T07:27:26Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -51167,7 +51162,7 @@ Bu dosyada (`src/i18n/dictionaries/admin/titles.en.ts`) tanımlı fonksiyon bulu
 
 ## NODE ID STANDARD
 
-  file: titles.en.ts
+  file: src\i18n\dictionaries\admin\titles.en.ts
 
 ---
 
@@ -51181,11 +51176,11 @@ Bu dosyada (`src/i18n/dictionaries/admin/titles.en.ts`) tanımlı fonksiyon bulu
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\titles.tr.ts
-skeleton_hash: 095691850a410925
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\titles.tr.ts
+skeleton_hash: fbdf2226837f7ebd
 entity_hashes:
   overview: 92aa8036d07ad320
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -51211,7 +51206,7 @@ Modülde herhangi bir fonksiyon veya metot bulunmamaktadır. Kod yapısı, en ü
 - **titles** (object) — `{
       dashboard: 'Dashboard',
       orders: 'Siparişler',
-      inventory: ...`
+      inventor...`
 
 ---
 
@@ -51247,11 +51242,11 @@ Dosya yapısı:
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\toolbar.en.ts
-skeleton_hash: 12a56541c6d987f7
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\toolbar.en.ts
+skeleton_hash: 2798e64ca4b32127
 entity_hashes:
   overview: 3efab1f125273943
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -51315,11 +51310,11 @@ Bu dosya (`toolbar.en.ts`) bir **i18n sözlük dosyasıdır** ve **hiçbir fonks
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\toolbar.tr.ts
-skeleton_hash: a3e3de16ea3f2de8
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\toolbar.tr.ts
+skeleton_hash: 86808bd0f574ea93
 entity_hashes:
   overview: 3efab1f125273943
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -51376,11 +51371,11 @@ Bu dosyada herhangi bir fonksiyon bulunmamaktadır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\tr.ts
-skeleton_hash: 6959dc6ee42c1cd6
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\tr.ts
+skeleton_hash: ea01cf62748a6526
 entity_hashes:
   overview: db9fc58164f2ef61
-generated_at: 2026-08-25T07:27:26Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -51460,7 +51455,7 @@ Fonksiyon gövdesi bulunmadığından AST Pointer üretilmemiştir.
 
 ## NODE ID STANDARD
 
-  file: tr.ts
+  file: src\i18n\dictionaries\admin\tr.ts
 
 ---
 
@@ -51474,11 +51469,11 @@ Fonksiyon gövdesi bulunmadığından AST Pointer üretilmemiştir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\ui.en.ts
-skeleton_hash: e00e60c032ddb977
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\ui.en.ts
+skeleton_hash: efd1f7fe409cadc7
 entity_hashes:
   overview: 1ca0cb4cc145d139
-generated_at: 2026-08-15T18:26:23Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -51541,11 +51536,11 @@ Bu modül, uluslararasılaştırma (i18n) sözlük verisi içeren bir kaynaktır
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\ui.tr.ts
-skeleton_hash: d03f8966fc710c8b
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\ui.tr.ts
+skeleton_hash: 6d0c5eefe4b263d7
 entity_hashes:
   overview: 1ca0cb4cc145d139
-generated_at: 2026-08-15T18:26:23Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -51607,11 +51602,11 @@ Bu dosyada fonksiyon bulunmamaktadır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\users.en.ts
-skeleton_hash: 06391434f612f6aa
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\users.en.ts
+skeleton_hash: e56cacabfce0e577
 entity_hashes:
   overview: e82fc2cbc75bd133
-generated_at: 2026-08-16T08:37:43Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -51672,11 +51667,11 @@ Dosya yapısı itibarıyla bir **i18n sözlük/diclık dosyasıdır** ve yalnız
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\users.tr.ts
-skeleton_hash: cd2424e885babde3
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\users.tr.ts
+skeleton_hash: df0c86cd0ab8320c
 entity_hashes:
   overview: e82fc2cbc75bd133
-generated_at: 2026-08-16T08:37:43Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -51728,11 +51723,11 @@ Bu dosyada fonksiyon bulunmamaktadır. Dosya, yalnızca bir `users` nesnesi (i18
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\webhooks.en.ts
-skeleton_hash: 2856424cb781d08e
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\webhooks.en.ts
+skeleton_hash: f19f1a2d7ef1ec96
 entity_hashes:
   overview: a695b1bd72d402b4
-generated_at: 2026-08-25T07:27:49Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -51769,7 +51764,7 @@ Bu dosyada (`src/i18n/dictionaries/admin/webhooks.en.ts`) fonksiyon tanımlanmam
 
 ## NODE ID STANDARD
 
-  file: webhooks.en.ts
+  file: src\i18n\dictionaries\admin\webhooks.en.ts
 
 ---
 
@@ -51783,11 +51778,11 @@ Bu dosyada (`src/i18n/dictionaries/admin/webhooks.en.ts`) fonksiyon tanımlanmam
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\webhooks.tr.ts
-skeleton_hash: 8a4a5f339c3ce520
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\webhooks.tr.ts
+skeleton_hash: 02895330866e80da
 entity_hashes:
   overview: a695b1bd72d402b4
-generated_at: 2026-08-25T07:27:33Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -51821,7 +51816,7 @@ Bu dosyada fonksiyon tanımı bulunmamaktadır. Dosya yalnızca `webhooks` adın
 
 ## NODE ID STANDARD
 
-  file: webhooks.tr.ts
+  file: src\i18n\dictionaries\admin\webhooks.tr.ts
 
 ---
 
@@ -69409,15 +69404,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-rec80\src\views\ContactPage.tsx
-skeleton_hash: 6da6f6200d810df4
+source_path: C:\tmp\vh-comp\src\views\ContactPage.tsx
+skeleton_hash: 399d79c2eeef0d49
 entity_hashes:
   func:ArrowRight: 1546741fbe749202
   func:ContactPage: a5b3030a0864a814
   func:handleSubmit: 95200638b7a8d648
   overview: 4bedca8cde6e58ef
-  style_tokens: 9d39e82e06c400aa
-generated_at: 2026-08-26T19:28:58Z
+  style_tokens: acc0e9611cfea096
+generated_at: 2026-08-27T06:51:14Z
 ---
 
 ## Genel Bakış
@@ -69611,10 +69606,10 @@ graph TD
 - **diğer:** (yok)
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `rounded-hvac-3xl`, `tracking-hvac-loose`, `tracking-hvac-wide`
+- `rounded-hvac-2xl`, `rounded-hvac-3xl`, `rounded-hvac-md`, `tracking-hvac-loose`, `tracking-hvac-wide`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-red-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-red-200`, `border-slate-100`, `border-slate-300`
+- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-red-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-red-200`, `border-slate-100`, `group-hover:bg-cyan-500`
 - **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `h-12`, `h-2`, `h-20`, `h-4`, `h-500px`
 - **Varyant/Responsive:** `active:`, `disabled:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
 - **Yardımcı Sınıflar:** `active:scale-95`, `active:scale-98`, `animate-pulse`, `blur-120`, `border`, `cursor-pointer`, `disabled:opacity-60`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-cyan-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`

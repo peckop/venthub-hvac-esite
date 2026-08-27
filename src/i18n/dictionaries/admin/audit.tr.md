@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\audit.tr.ts
-skeleton_hash: 63ed96c8426e1278
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\audit.tr.ts
+skeleton_hash: 9ebf2c1b7d52f5d0
 entity_hashes:
   overview: 296262cb85b992c0
-generated_at: 2026-08-25T07:27:26Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -42,7 +42,7 @@ Bu dosyada (`src/i18n/dictionaries/admin/audit.tr.ts`) tanımlı fonksiyon bulun
 
 ## NODE ID STANDARD
 
-  file: audit.tr.ts
+  file: src\i18n\dictionaries\admin\audit.tr.ts
 
 ---
 
