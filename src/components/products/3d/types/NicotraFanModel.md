@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\NicotraFanModel.tsx
-skeleton_hash: a7e500890d07ccb7
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\NicotraFanModel.tsx
+skeleton_hash: 5ee9180432bca418
 entity_hashes:
   func:NicotraFanModel: 2bdd08e329a67558
   overview: a978abdd718e5dd3
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:20:16Z
+generated_at: 2026-08-25T07:27:00Z
 ---
 
 ## Genel Bakış
@@ -79,10 +79,68 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::useFrame callback
+- **params**: `state`, `delta`
+- **ic_degiskenler**:
+  - `fanRef.current` — üst kapsamdan erişilen `Group` referansı; `null` kontrolü yapıldıktan sonra `rotation.x` özelliği `delta * 15` kadar azaltılır (X ekseninde sürekli dönüş animasyonu)
+- **Dönüş**: yok
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::sideShape useMemo callback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `shape` — `new Shape()` ile oluşturulan nesne; logaritmik spiral profil noktaları ve atış ağzı çizgileri eklenir
+  - `segments` — `48` sabit değeri; spiral profil için döngü segment sayısı
+  - `i` — `for` döngü sayacı; `0`'dan `segments`'e kadar iterasyon
+  - `th` — `(i / segments) * Math.PI * 2.2` formülüyle hesaplanan açı (radyan); spiral profil için polar koordinat açısı
+  - `r` — `0.3 + (th / (Math.PI * 2)) * 0.4` formülüyle hesaplanan yarıçap; logaritmik spiral mesafesi
+  - `x` — `Math.cos(th) * r` hesaplaması; profil noktasının X koordinatı
+  - `y` — `Math.sin(th) * r` hesaplaması; profil noktasının Y koordinatı
+  - `hole` — `new Path()` ile oluşturulan nesne; `hole.absarc(0, 0, 0.28, 0, Math.PI * 2, true)` ile dairesel delik tanımlanır ve `shape.holes` dizisine eklenir
+- **Dönüş**: `Shape` — logaritmik spiral profilli, dairesel delikli ve atış ağzı çizgili şekil nesnesi
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::useEffect cleanup factory
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: cleanup fonksiyonu — `baseFrameGeometry.dispose()`, `vibrationMountGeometry.dispose()`, `sideShapeGeometry.dispose()`, `scrollWrapperGeometry.dispose()`, `dischargeGeometry.dispose()`, `wheelGeometry.dispose()`, `bladeGeometry.dispose()`, `motorGeometry.dispose()` çağrılır
+
+---
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::useEffect inner cleanup
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — sekiz geometri nesnesinin `dispose()` metodu çağrılarak bellek temizliği yapılır
+
+---
+
+### [N6_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::vibration mount outer map
+- **params**: `x`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX array — `[0.4, -0.4].map(z => ...)` ile iki titreşim takozu mesh'i döndürülür
+
+---
+
+### [N7_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::vibration mount inner map
+- **params**: `z`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `<mesh key={...} position={[x, -0.05, z]} geometry={vibrationMountGeometry} material={materials.matteBlack} />` elementi; üst kapsamdan `x` ve `vibrationMountGeometry` kullanılır
+
+---
+
+### [N8_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::blade map
+- **params**: `_`, `i`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `<mesh key={i} rotation={[0, (i / 24) * Math.PI * 2, 0]} position={[0.36, 0, 0]} geometry={bladeGeometry} material={materials.galvanizedSteel} />` elementi; `i` indeksine göre 24 kanat eşit açılarla yerleştirilir
+
+---
+
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\NicotraFanModel.tsx
-  function: src\components\products\3d\types\NicotraFanModel.tsx::NicotraFanModel
+  file: NicotraFanModel.tsx
+  function: NicotraFanModel.tsx::NicotraFanModel
 
 ---
 
