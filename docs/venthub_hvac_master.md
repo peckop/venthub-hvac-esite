@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T04:28:41.499393+00:00
+compiled_at: 2026-08-27T04:37:19.524750+00:00
 total_compiled_files: 655
-source_commit: 08d077b0
+source_commit: f84cfe78
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T04:28:41.499393+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T04:37:19.524750+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -19252,11 +19252,8 @@ type UserRoleCode = 'user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | '
 
 ## SABİTLER
 - **ROLE_BUTTON_ICON** (object) — `{
-
   super_admin: <Crown size={14} />,
-
   admin: <Shield size={14} />,
-
   war...`
 
 ---
@@ -29233,11 +29230,8 @@ Verilen bir slayt indeksine göre o slayta ait başlık, açıklama ve diğer bi
 
 ## SABİTLER
 - **slidesData** (array) — `[
-
   {
-
     image: '/images/hero_hvac_industrial_premium_1.webp',
-
     produc...`
 
 ---
@@ -41551,7 +41545,7 @@ entity_hashes:
   func:listAdminUsers: d933c96b85d7b147
   func:setUserAdminRole: 8d3b86f7b7baaf3b
   overview: 5893087b4e779eea
-generated_at: 2026-08-27T04:12:41Z
+generated_at: 2026-08-27T04:31:52Z
 ---
 
 ## Genel Bakış
@@ -42076,7 +42070,7 @@ entity_hashes:
   func:AuthProvider: 8a171b0bec808d24
   overview: 367d05e5814d0229
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T04:12:41Z
+generated_at: 2026-08-27T04:31:52Z
 ---
 
 ## Genel Bakış
@@ -48801,11 +48795,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **dashboard** (object) — `{
-
   subtitle: 'Quick glance and latest activity',
-
   rangeToday: 'Today',
-
  ...`
 
 ---
@@ -48858,11 +48849,8 @@ Bu modül, bir admin dashboard için Türkçe çeviri sözlüğünü içeren bir
 
 ## SABİTLER
 - **dashboard** (object) — `{
-
   subtitle: 'Hızlı bakış ve son hareketler',
-
   rangeToday: 'Bugün',
-
   ra...`
 
 ---
@@ -49181,17 +49169,11 @@ Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturmak ama
 
 ## SABİTLER
 - **admin** (object) — `{
-
   pricing,
-
   common,
-
   confirm,
-
   coupons,
-
   dataRequests,
-
   dataTabl...`
 
 ---
@@ -50097,11 +50079,8 @@ Bu modül bir i18n sözlük nesnesi (dictionary) tanımı içerir; fonksiyon imz
 
 ## SABİTLER
 - **orders** (object) — `{
-
       view_list: 'List View',
-
       view_board: 'Board View',
-
       subt...`
 
 ---
@@ -50164,11 +50143,8 @@ Bu modül, bir uygulama içinde sipariş (order) ile ilgili metinlerin (örn. bu
 
 ## SABİTLER
 - **orders** (object) — `{
-
       view_list: 'Liste Görünümü',
-
       view_board: 'Pano Görünümü',
-
   ...`
 
 ---
@@ -66686,15 +66662,10 @@ Fonksiyon gövdeleri sağlanmadığı için, yalnızca imzalardan çıkarılabil
 Çözücünün ihtiyaç duyduğu asgari varyant şekli (RPC satırı da, DB satırı da uyar).
 ```typescript
 type ProductIdentitySource = {
-
   name?: string | null
-
   model_code?: string | null
-
   /** BİLEREK opsiyonel ve BİLEREK kullanılmıyor — bkz. yukarıdaki uyarı. */
-
   sku?: string | null
-
 }
 ```
 
@@ -66702,9 +66673,7 @@ type ProductIdentitySource = {
 Aile şekli — yalnız ad gerekir.
 ```typescript
 type ProductFamilySource = {
-
   name?: string | null
-
 }
 ```
 
@@ -66712,27 +66681,17 @@ type ProductFamilySource = {
 
 ## SABİTLER
 - **UNIT_SUFFIXES** (call) — `(
-
   [
-
     ['_db_a', 'dB(A)'],
-
     ['_m3h', 'm³/h'],
-
     ['_pct', '%'],
-
  ...`
 - **UNIT_BY_KEY** (object) — `{
-
   humidity_removed_l_24h: 'L/24h',
-
 }`
 - **SPEC_SORT_ORDER** (object) — `{
-
   // Performance Group Priority
-
   'number_of_speeds': 1,
-
   'max_ambient_...`
 
 ---
@@ -83861,7 +83820,7 @@ entity_hashes:
   func:reset: 16764b441f7bc7b6
   overview: 477df472883f5208
   style_tokens: 27adff48ed74fee3
-generated_at: 2026-08-27T04:19:27Z
+generated_at: 2026-08-27T04:31:52Z
 ---
 
 ## Genel Bakış
@@ -86696,9 +86655,7 @@ type TopicSlug = typeof TOPIC_SLUGS[number]
 ## SABİTLER
 - **TOPIC_SLUGS** (as_expression) — `['hava-perdesi', 'jet-fan', 'hrv'] as const`
 - **TAGS** (array) — `[
-
   { key: 'all', labelKey: 'knowledge.tags.all' },
-
   { key: 'hava-perdesi'...`
 
 ---
@@ -89328,18 +89285,12 @@ Bu modül bir Next.js yapılandırma dosyasıdır (`next.config.mjs`). Aşağıd
 
 ## SABİTLER
 - **withBundleAnalyzer** [env-backed] (call) — `bundleAnalyzer({
-
   enabled: process.env.ANALYZE === 'true',
-
   openAnalyzer:...`
 - **nextConfig** (object) — `{
-
     reactStrictMode: true,
-
     typedRoutes: true,
-
     images: {
-
        ...`
 
 ---
