@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "bf43e7c30ca3a2d3cb890dc7c321842c4ecbdc07793b05be61d8b57419320e47",
+      "icerik_sha256": "ee480318fb1f6917be5bdbb64bfe8e594e46eb94caf5cc2f2217624e4955f540",
       "kaynak": {
         "dosya_sayisi": 98,
         "dosyalar": {
@@ -108,7 +108,7 @@
         "izlenmeyen": [],
         "ozet": "13aca04c7a35256389064f212cccbf532b90b069fc40fe29bd8e467c6c22e036"
       },
-      "kaynak_commit": "2b86722a5af607d99da5ae63fddef0e4ca7ece53",
+      "kaynak_commit": "da05e8904915f8d2fce94d4a6911ab62b4d62f8d",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +125,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "f668517d1b7605e42dc4e41df01e120a2265097091a5d1865bbad06c35ef5066",
+      "icerik_sha256": "3b9072a6a7d6110633b9c87bc16ef428b8949a91b9a5ccb134abe32d0bc5defa",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -195,7 +195,7 @@
         "izlenmeyen": [],
         "ozet": "c99b0b974d927c16ceb0af0f89db5dc833b46518a811199ec0aab586052466ef"
       },
-      "kaynak_commit": "2b86722a5af607d99da5ae63fddef0e4ca7ece53",
+      "kaynak_commit": "da05e8904915f8d2fce94d4a6911ab62b4d62f8d",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +204,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "1d4aff97391045a70fe0fa834883623c754812235f129439773f50b8833d82a4",
+      "icerik_sha256": "2c01f87ab5cd57b6d4b96703a17f27e5a2280397927f270e02559d4fa8d2d2cf",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +251,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "2b86722a5af607d99da5ae63fddef0e4ca7ece53",
+      "kaynak_commit": "da05e8904915f8d2fce94d4a6911ab62b4d62f8d",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,7 +259,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "d0f34366e052b7158de1c2c2a29c2c69d51c3e6e1c809b6b552d8ef4b45ec500",
+      "icerik_sha256": "c2c7d2db514e68bdb498f3f79bb6ada874adfc9a856b6bcef150d002033ad558",
       "kaynak": {
         "dosya_sayisi": 655,
         "dosyalar": {
@@ -505,7 +505,7 @@
           "src/components/navigation/NavShell.md": "52b22ef40c6076c93187b89c44e4e6d347ffc505",
           "src/components/navigation/NavUtilityRail.md": "4c7ce6443250006ece321ff51d331d9087e65c4c",
           "src/components/product/ProductSmartInference.md": "440c12a1c753d4218439851c4a9e39726b6da2a8",
-          "src/components/products/3d/AutoCenter.md": "e2ea0c4b90da92d819dfdb9fbfe6b6040099bd27",
+          "src/components/products/3d/AutoCenter.md": "a94b1c498063f8dba30506506ae85773997a9eb0",
           "src/components/products/3d/Product3DViewer.md": "3c4799abf8e57fd1dbba3575a72cf75cd3b9082f",
           "src/components/products/3d/ProductModelRenderer.md": "3e3679c1b0ae42a8c9a94180c6034abc93cf03c7",
           "src/components/products/3d/SmartCenterScale.md": "11c5d3e2feabc1747bdd07f5b6223f8bd328c075",
@@ -523,7 +523,7 @@
           "src/components/products/3d/factory/parts/BoxAndBase.md": "196d44797a18e310cfffe94a17bc82ad1c7b59b8",
           "src/components/products/3d/factory/parts/GreenClamps.md": "4d12eb7db9d44bbd199c114472c94038abb2afaf",
           "src/components/products/3d/factory/parts/InternalFanRotor.md": "a0299e194c84ebed761d60c86472428b279d7057",
-          "src/components/products/3d/factory/parts/MainChassis.md": "c1453126c07821d1d0047e860fd27b72d730a3ef",
+          "src/components/products/3d/factory/parts/MainChassis.md": "142727724b2c551021426a52b7658e570feae90d",
           "src/components/products/3d/materials/useFanMaterials.md": "ab39ce9baf8c9239b71513a5a592c2bdbdd2cb6e",
           "src/components/products/3d/parts/Housing.md": "803a0acb1f7dec41860795333747916d1f17ef65",
           "src/components/products/3d/parts/Impeller.md": "fff30ac4d4f1b23a41101f511c5849706a40e34b",
@@ -534,20 +534,20 @@
           "src/components/products/3d/types/AirPurifierModel.md": "1948569bbf4eaaa14784ee40f515ce7e80a98d71",
           "src/components/products/3d/types/AxialFanModel.md": "4e0acc4ac52a348c6c92352b6103444b9dc630c9",
           "src/components/products/3d/types/CentrifugalFanModel.md": "b776628bed9c000a389cfbefb928198e311885c8",
-          "src/components/products/3d/types/DehumidifierModel.md": "c12554435736a44bd0dd1bca08d0b4f0cf806fb8",
-          "src/components/products/3d/types/DomesticFanModel.md": "3a30504e0bc6bbe6e08d25c93a4292a290643a11",
-          "src/components/products/3d/types/DuctFanModel.md": "f2801148ddf1964784178a40a6fe5d8353227933",
+          "src/components/products/3d/types/DehumidifierModel.md": "05acf72d65f248c02a76aac7067b900027d3172f",
+          "src/components/products/3d/types/DomesticFanModel.md": "ca4a343a5f689115116d64d7f87448544e0eb758",
+          "src/components/products/3d/types/DuctFanModel.md": "b3aa70e0646520c4bd9125868e938a45ceaa6184",
           "src/components/products/3d/types/ExproofFanModel.md": "d1f53c8fe2c6d1cad57bbe192532fd51950b2e74",
           "src/components/products/3d/types/FlexibleDuctModel.md": "4108d2b17c9f9800f13110b1c9fddf2453054030",
           "src/components/products/3d/types/HRVModel.md": "6cd1e1ec91b483dadf825c45ca77fa256e511d7c",
-          "src/components/products/3d/types/JetFanModel.md": "62639007771cbab348d2edab943dbaaff0ffe702",
-          "src/components/products/3d/types/NicotraFanModel.md": "963d5ebab7e85bd4c1943f121eec971f806ad57b",
-          "src/components/products/3d/types/PlugFanModel.md": "64609a14b9b8988d032fb4d428ae2dd780a76b21",
+          "src/components/products/3d/types/JetFanModel.md": "4be0cc4706c6b6f93f242544fe3be1fa902b0410",
+          "src/components/products/3d/types/NicotraFanModel.md": "95966bab9e5ec3f15bc7cf2f36e716655894a087",
+          "src/components/products/3d/types/PlugFanModel.md": "1a8cd0fb79b2b45e859d7fefbc58c279cc9da624",
           "src/components/products/3d/types/RoofFanModel.md": "d789f64390be0702e91b2eb7dd3770cedd7608f2",
           "src/components/products/3d/types/RoundDuctFanModel.md": "f26b6a1addd3557a548364e3c7216295c6b39d00",
           "src/components/products/3d/types/SilentChannelFanModel.md": "07f48ca296423845516721ba78fc9086d54ea026",
           "src/components/products/3d/types/SmokeExhaustFanModel.md": "8d496ad2e7e38270b01f162acda568624595696e",
-          "src/components/products/3d/types/SnailFanModel.md": "4ac06912d015642534a59a6ff9f7b76a66b76989",
+          "src/components/products/3d/types/SnailFanModel.md": "431917dcde123418bdbe4cc5515e1b805039e623",
           "src/components/products/3d/types/SpeedControlModel.md": "4b6f963d20436d7c4fd2c369fd679718533c87f5",
           "src/components/products/3d/types/WallMountedCompactFanModel.md": "001dce4418204cf6eba897356aad4a9bcf2daaa7",
           "src/components/products/AddToProjectModal.md": "893c1ff1b35ed0c67d37735678e091d1d9e716a7",
@@ -875,7 +875,7 @@
           "src/views/calculators/JetFanCalcPage.md": "f86f47ffd5617515778c9f29d5077711ae73dd13",
           "src/views/category/CategoryGridView.md": "21496fd045afb81c177337d6336d194f44bb5757",
           "src/views/category/CategoryLandingView.md": "b1f9894b2a5d8eb7df31eb95a94f5ebc88eb8b3a",
-          "src/views/category/CategorySeriesView.md": "8af76561199c308103b7a41098f5e3dd5b764d1f",
+          "src/views/category/CategorySeriesView.md": "89b5005dcaa1235a0ddd47aecb53ddf03a675e5b",
           "src/views/category/CategoryShowcaseView.md": "e9abf5e399c7cafa684062f6f0eb6445597706d0",
           "src/views/category/SeriesLandingView.md": "cef54acca99b361cd16c36d440cd9e19af977848",
           "src/views/checkout/AddressFormModal.md": "304f6a3e605d51ea336917fb2e1d635fc373692f",
@@ -920,9 +920,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "9e4d5cdeb78decf0b22a48ebb52403bb4a9e3e2580ba7a3a6a8d61c1cf08ca2a"
+        "ozet": "85368f911da518be4cd99fd9c6bfadf748d6488e9c0a056053f625d520430e70"
       },
-      "kaynak_commit": "2b86722a5af607d99da5ae63fddef0e4ca7ece53",
+      "kaynak_commit": "da05e8904915f8d2fce94d4a6911ab62b4d62f8d",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -931,7 +931,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-27T12:20:25.996339+00:00",
-  "kaynak_commit": "2b86722a5af607d99da5ae63fddef0e4ca7ece53",
+  "derlendi": "2026-08-27T12:38:01.572960+00:00",
+  "kaynak_commit": "da05e8904915f8d2fce94d4a6911ab62b4d62f8d",
   "surum": 1
 }
