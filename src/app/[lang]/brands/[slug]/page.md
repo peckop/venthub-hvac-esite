@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\brands\[slug]\page.tsx
-skeleton_hash: c15cf305a34aaa22
+source_path: C:\tmp\ops-t165\src\app\[lang]\brands\[slug]\page.tsx
+skeleton_hash: 04f66f5b6bfce278
 entity_hashes:
   func:Page: 4d65ed88cfe128b6
   func:generateMetadata: 8a3eefe22233ffdc
   func:generateStaticParams: e00bf8d31deb4098
   overview: 76ea9ab109aa0e89
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-26T07:11:51Z
+generated_at: 2026-08-27T06:52:53Z
 ---
 
 ## Genel Bakış

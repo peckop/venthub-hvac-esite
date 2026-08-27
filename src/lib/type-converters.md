@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\type-converters.ts
-skeleton_hash: 8594d2eca488a9e5
+source_path: C:\tmp\ops-t165\src\lib\type-converters.ts
+skeleton_hash: 1c8dc1c27f25a678
 entity_hashes:
   func:isRecord: 9a2880b352f34e74
   func:mapCategoryWithLocale: b422ccbc9ea334f8
@@ -13,7 +13,7 @@ entity_hashes:
   func:toUICategoryList: 9721c9c2f6b7b799
   func:toUIProductList: a473c58e2b2833ca
   overview: f13174abbed571b6
-generated_at: 2026-08-25T07:28:01Z
+generated_at: 2026-08-27T07:08:10Z
 ---
 
 ## Genel Bakış
@@ -138,14 +138,14 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: type-converters.ts
-  function: type-converters.ts::toSupabaseJson
-  function: type-converters.ts::isRecord
-  function: type-converters.ts::mapDatabaseCategoryToDomain
-  function: type-converters.ts::mapDatabaseProductToDomain
-  function: type-converters.ts::toUICategoryList
-  function: type-converters.ts::toUIProductList
-  function: type-converters.ts::mapCategoryWithLocale
+  file: src\lib\type-converters.ts
+  function: src\lib\type-converters.ts::toSupabaseJson
+  function: src\lib\type-converters.ts::isRecord
+  function: src\lib\type-converters.ts::mapDatabaseCategoryToDomain
+  function: src\lib\type-converters.ts::mapDatabaseProductToDomain
+  function: src\lib\type-converters.ts::toUICategoryList
+  function: src\lib\type-converters.ts::toUIProductList
+  function: src\lib\type-converters.ts::mapCategoryWithLocale
 
 ---
 

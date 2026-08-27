@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\invoices\page.tsx
-skeleton_hash: 0cb1a9f445e42d79
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\invoices\page.tsx
+skeleton_hash: d1444acdaa3773bb
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:49:47Z
 ---
 
 ## Genel Bakış
@@ -47,7 +47,7 @@ Bu modül, minimal bir React sarmalayıcı (wrapper) bileşenidir; fonksiyon gö
 ---
 
 ## SABİTLER
-- **PageComponent** (call) — `nextDynamic(() => import('../../../../views/account/AccountInvoicesPage'), {...`
+- **PageComponent** (call) — `nextDynamic(() => import('../../../../views/account/AccountInvoicesPage'), {...`
 
 ---
 

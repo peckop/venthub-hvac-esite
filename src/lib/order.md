@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\order.ts
-skeleton_hash: caa6a8920fb718d0
+source_path: C:\tmp\ops-t165\src\lib\order.ts
+skeleton_hash: 8cf2ce519513741b
 entity_hashes:
   func:validateServerCart: be0fbe2d0b50eaac
   overview: 5c7e7d27dac9b004
-generated_at: 2026-08-24T12:48:52Z
+generated_at: 2026-08-27T06:57:38Z
 ---
 
 ## Genel Bakış

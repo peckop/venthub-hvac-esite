@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-rec80\src\lib\services\contactMessageService.ts
-skeleton_hash: 7132a939a872ee42
+source_path: C:\tmp\ops-t165\src\lib\services\contactMessageService.ts
+skeleton_hash: 12c46923ef1efb26
 entity_hashes:
-  func:submitContactMessage: 0d8bdfa3ae2bec82
+  func:submitContactMessage: bdff0d3b1c594401
   overview: e4c082f3ad81112f
-generated_at: 2026-08-26T19:27:53Z
+generated_at: 2026-08-27T06:59:27Z
 ---
 
 ## Genel Bakış
@@ -40,15 +40,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### submitContactMessage
-**Ne yapar**: İletişim mesajını veritabanına kaydeder ve kaydedilen satırın kimliğini döndürür. Hata durumunda fırlatır — sessiz yutma yoktur. Başarı kanıtlanamıyorsa (RPC hata vermez ama kimlik de dönmezse) bu durum da hata olarak değerlendirilir.
+**Ne yapar**: İletişim formu mesajını veritabanına kaydeder ve kaydedilen satırın kimliğini döndürür. Hata durumunda fırlatır; sessiz yutma yoktur.
 
-**Nasıl yapar**: Supabase istemcisi üzerinden `submit_contact_message` adlı sunucu tarafı (RPC) fonksiyonunu çağırır. Girdi nesnesindeki tüm alanları bu RPC fonksiyonuna parametre olarak aktarır. Çağrı tamamlandıktan sonra iki kontrol yapılır: Birincisi, `error` değişkeni doluysa bu hata doğrudan fırlatılır. İkincisi, `data` değişkeni boşsa (yani RPC hata vermeden çalıştı ama bir kimlik dönmediyse) bu durum "yazma kanıtlanamadı" anlamına geldiği için açık bir `Error` fırlatılarak çağıranın başarı ekranını göstermesi engellenir. Her iki kontrol de geçilirse `data` değeri (yazılan satırın kimliği) döndürülür.
+**Nasıl yapar**: Supabase istemcisini kullanarak `submit_contact_message` adlı RPC fonksiyonunu çağırır. Girdi nesnesindeki tüm alanları (`name`, `message`, `email`, `phone`, `company`, `city`, `applicationArea`, `subject`, `consent`) RPC parametrelerine eşler. Çağrı sonucunda hata varsa hatayı fırlatır. Hata yoksa ancak dönen veri de null ise, yazma işleminin kanıtlanamadığı gerekçesiyle bir `Error` fırlatır. Başarılı durumda dönen kimlik değerini döndürür.
 
 **Parametreler**:
 - supabase: `SupabaseClient<Database>` — Supabase veritabanı istemcisi. RPC çağrısını gerçekleştirmek için kullanılır.
-- input: `ContactMessageInput` — İletişim formundan gelen girdi verisi. İçinde şu alanları barındırır: `name` (ad), `message` (mesaj), `email` (e-posta), `phone` (telefon), `company` (şirket), `city` (şehir), `applicationArea` (uygulama alanı), `subject` (konu), `consent` (onay).
+- input: `ContactMessageInput` — İletişim formundan gelen verileri taşıyan nesne. Şu alanları içerir: `name`, `message`, `email`, `phone`, `company`, `city`, `applicationArea`, `subject`, `consent`.
 
-**Dönüş**: `Promise<string>` — Başarılı kayıt durumunda veritabanına yazılan satırın kimliğini (string) döndürür. Hata durumunda bu Promise rejection ile sonuçlanır (hata fırlatılır).
+**Dönüş**: `Promise<string>` — Kaydedilen mesaj satırının kimliğini temsil eden string değer. Ancak RPC başarılı olup kimlik döndürürse bu değere ulaşılır; aksi takdirde hata fırlatılır.
 
 ---
 
@@ -76,23 +76,14 @@ MÜŞTERİ-YÜZÜ FORM YAZMA KATMANI — `docs/standards/form-submission-standar
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: contactMessageService.ts::submitContactMessage
+### [N1_NASIL] AST Pointer: src/lib/services/contactMessageService.ts::submitContactMessage
 - **params**:
-  - `supabase` — SupabaseClient<Database> tipinde, veritabanı istemcisi
-  - `input` — ContactMessageInput tipinde, iletişim formu verilerini taşır
+  - `supabase` — `SupabaseClient<Database>` tipinde, Supabase veritabanı istemcisi
+  - `input` — `ContactMessageInput` tipinde, iletişim mesajı form verisi
 - **ic_degiskenler**:
-  - `data` — `supabase.rpc('submit_contact_message', {...})` çağrısından dönen sonuç; RPC fonksiyonu başarılıysa oluşturulan kaydın kimliğini (string) içerir, başarısızsa null olabilir
-  - `error` — `supabase.rpc('submit_contact_message', {...})` çağrısından dönen hata nesnesi; hata yoksa null/falsy
-  - `input.name` — RPC parametresi `p_name` olarak gönderilir, kullanıcının adı
-  - `input.message` — RPC parametresi `p_message` olarak gönderilir, mesaj içeriği
-  - `input.email` — RPC parametresi `p_email` olarak gönderilir, e-posta adresi
-  - `input.phone` — RPC parametresi `p_phone` olarak gönderilir, telefon numarası
-  - `input.company` — RPC parametresi `p_company` olarak gönderilir, şirket adı
-  - `input.city` — RPC parametresi `p_city` olarak gönderilir, şehir
-  - `input.applicationArea` — RPC parametresi `p_application_area` olarak gönderilir, uygulama alanı
-  - `input.subject` — RPC parametresi `p_subject` olarak gönderilir, konu
-  - `input.consent` — RPC parametresi `p_consent` olarak gönderilir, onay durumu
-- **Dönüş**: `Promise<string>` — RPC fonksiyonundan dönen kimlik (data); hata varsa veya data null ise hata fırlatır, aksi takdirde data string olarak döner
+  - `data` — `supabase.rpc` çağrısından dönen yanıt verisi; `submit_contact_message` RPC fonksiyonunun dönüş değeri (string beklenir). Destructuring ile `error` ile birlikte alınır
+  - `error` — `supabase.rpc` çağrısından dönen hata nesnesi; varsa `throw error` ile fırlatılır
+- **Dönüş**: `Promise<string>` — RPC fonksiyonundan dönen `data` değeri (yazma kanıtı olarak kimlik/ID). `data` null ise hata fırlatılır, çağıran başarı ekranı açmaması için `Error` nesnesi üretilir
 
 ---
 

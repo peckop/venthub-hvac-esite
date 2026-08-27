@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\utils.ts
-skeleton_hash: bf9dd00541d5ca81
+source_path: C:\tmp\ops-t165\src\lib\utils.ts
+skeleton_hash: 0a8cb48ab465ab27
 entity_hashes:
   func:buildWhatsAppLink: 5a13d41915079738
   func:cn: 2cda58c352da4d7c
   overview: 0d255118ec884be0
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:08:11Z
 ---
 
 ## Genel Bakış

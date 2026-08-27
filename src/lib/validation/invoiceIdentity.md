@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\validation\invoiceIdentity.ts
-skeleton_hash: fda5648cfe233922
+source_path: C:\tmp\ops-t165\src\lib\validation\invoiceIdentity.ts
+skeleton_hash: 37d4644f3cd3cec9
 entity_hashes:
   func:checkInvoiceIdentity: 7ceb3259ceb5474f
   overview: f60500888403bcb4
-generated_at: 2026-08-25T08:44:55Z
+generated_at: 2026-08-27T07:08:13Z
 ---
 
 ## Genel Bakış
@@ -39,10 +39,6 @@ Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesine dayal�
 [Aksiyom 3]: Eğer `identityThreshold` (number tipinde) sağlanmazsa, fonksiyon çağrılamaz.
 
 [Aksiyom 4]: Fonksiyon, bir `InvoiceIdentityIssue` nesnesi ya da `null` döndürür; `null` dönüşü sorun tespit edilmediğini gösterir.
-
----
-
-**Not:** Fonksiyonun iç mantığı (hangi kontrollerin yapıldığı, hangi koşullarda issue üretildiği, eşik değerlerin nasıl kullanıldığı) hakkında bilgi verilmediğinden, davranışsal aksiyomlar üretilememiştir. Daha detaylı aksiyomlar için fonksiyon gövdesinin sağlanması gerekmektedir.
 
 ---
 

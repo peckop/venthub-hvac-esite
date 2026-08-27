@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\pdfAssets.ts
-skeleton_hash: 0bd969c579540042
+source_path: C:\tmp\ops-t165\src\lib\pdfAssets.ts
+skeleton_hash: 9d97eb931a529aaf
 entity_hashes:
   func:getAbsoluteAssetUrl: 96c03e7f744b3527
   func:getBase64ImageFromUrl: ca8a45fdefa4e7ed
   overview: 4faa1d63c142f598
-generated_at: 2026-08-25T07:27:53Z
+generated_at: 2026-08-27T06:57:41Z
 ---
 
 ## Genel Bakış
@@ -91,9 +91,9 @@ Bir görsel URL'sini asenkron olarak alıp, görselin base64 kodlanmış halini 
 
 ## NODE ID STANDARD
 
-  file: pdfAssets.ts
-  function: pdfAssets.ts::getAbsoluteAssetUrl
-  function: pdfAssets.ts::getBase64ImageFromUrl
+  file: src\lib\pdfAssets.ts
+  function: src\lib\pdfAssets.ts::getAbsoluteAssetUrl
+  function: src\lib\pdfAssets.ts::getBase64ImageFromUrl
 
 ---
 

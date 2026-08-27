@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\coupons\page.tsx
-skeleton_hash: 20e286efb838025b
+source_path: C:\tmp\ops-t165\src\app\admin\coupons\page.tsx
+skeleton_hash: cef038d67755f6de
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: 556d56b0dab8a0be
   overview: 5b1a16aab3aba293
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:27Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:54:34Z
 ---
 
 ## Genel Bakış
@@ -24,10 +24,6 @@ Modülün temel sorumluluğu, `/admin/coupons` rotasını sunarak tarayıcıya k
 ### Yükleniyor Durumu
 Sayfa içeriği hazırlanırken kullanıcıya görsel geri bildirim sağlamakla yükümlüdür. Kullanıcı deneyimini iyileştirmek için basit bir loading göstergesi sunar.
 - `Loading`
-
----
-
-**Dış Bağımlılıklar**: Modül, `AdminCouponsPage` bileşenini dinamik import ile (`next/dynamic`) yükler; bu sayede ana sayfa yüklenirken kupon arayüzü ayrı bir chunk olarak indirilir.
 
 ---
 
@@ -118,7 +114,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
