@@ -62,7 +62,7 @@ Paylaşımlı takip numarası çakışması durumunu tanımlar ve tespit eder. `
 
 ### ShippingFunctionsHost
 Bu modülün istemciden ihtiyaç duyduğu TEK yetenek. `SupabaseClient<Database>` yerine dar bir sözleşme yazıldı — gerçek istemci bunu yapısal olarak zaten karşılıyor, ama test bir "sahte istemci" üretmek için tip zorlamasına (`as unknown as`) mecbur kalmıyor. Tip zorlaması testte de üretimdeki kadar t
-- `functions: {`
+- `functions: {`
 
 ---
 

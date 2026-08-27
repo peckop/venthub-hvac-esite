@@ -63,7 +63,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `icon: LucideIcon`
 - `title: string`
 - `description: string`
-- `action?: {`
+- `action?: {`
 - `compact?: boolean`
 
 ---

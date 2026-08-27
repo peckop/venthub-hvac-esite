@@ -54,8 +54,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## INTERFACES
 
 ### AppSettings
-- `general: {`
-- `payment: {`
+- `general: {`
+- `payment: {`
 
 ---
 

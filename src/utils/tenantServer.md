@@ -44,8 +44,8 @@ Modül, `next/headers` paketinden gelen `headers` fonksiyonu ile HTTP istek bağ
 - `subdomain: string | null`
 - `custom_domain: string | null`
 - `is_active: boolean`
-- `features: {`
-- `styles: {`
+- `features: {`
+- `styles: {`
 
 ---
 

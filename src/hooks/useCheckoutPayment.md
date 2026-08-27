@@ -98,7 +98,7 @@ Bu modül, ödeme sürecini orkestre etmek için dış bağımlılıklara dayan�
 - `user: User | null`
 - `clearCart: (options?: { silent: boolean }) => void`
 - `applyServerPricing: (items: { product_id: string, unit_price: number | null }[]) => void`
-- `orchestrator: {`
+- `orchestrator: {`
 - `couponCode: string | null`
 - `t: (key: string) => string`
 

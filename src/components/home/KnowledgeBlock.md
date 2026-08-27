@@ -68,8 +68,8 @@ Ana sayfadaki bilgi bloğunun render edilmesinden sorumludur. Çeviri sözlüğ�
 - `icon: React.ReactNode`
 
 ### KnowledgeBlockProps
-- `dictionary: {`
-- `finalCtaDict: {`
+- `dictionary: {`
+- `finalCtaDict: {`
 - `statsExperience: string`
 - `lang: string`
 - `onQuoteClick?: () => void`

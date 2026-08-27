@@ -87,7 +87,7 @@ ONAY YÜZEYİ — `window.confirm` yerine. Cetvel: docs/standards/admin-design-s
 - `cancelLabel?: string`
 - `tone?: 'danger' | 'default'`
 - `requireTypedConfirmation?: string`
-- `reason?: {`
+- `reason?: {`
 
 ### ConfirmResult
 `useConfirmWithReason`'ın dönüşü.

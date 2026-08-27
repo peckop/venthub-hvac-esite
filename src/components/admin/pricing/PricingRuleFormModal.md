@@ -175,7 +175,7 @@ type PricingRuleFormValues = z.infer<ReturnType<typeof getPricingRuleSchema>>
   scope: 4,
   product_id: null,
   brand_id: null,
-  category_id: null,...`
+  category_id: null,...`
 - **FIELD_FOCUS_ORDER** (array) — `[
   { name: 'margin_pct', id: 'rule-rate' },
   { name: 'fixed_price', id: '...`

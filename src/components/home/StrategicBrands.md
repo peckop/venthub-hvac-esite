@@ -65,7 +65,7 @@ Bu aksiyomlar, StrategicBrands bileşeninin **çevrim (i18n) fonksiyonuna bağı
 ## INTERFACES
 
 ### StrategicBrandsProps
-- `dictionary: {`
+- `dictionary: {`
 
 ---
 

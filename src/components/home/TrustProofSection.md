@@ -55,7 +55,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `subtitle?: string`
 - `visualAlt?: string`
 - `badge?: string`
-- `items?: Record<string, {`
+- `items?: Record<string, {`
 
 ### TrustStripDict
 

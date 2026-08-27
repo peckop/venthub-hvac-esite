@@ -74,7 +74,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 - `title: string`
 - `subtitle: string`
 - `viewAll: string`
-- `items: Record<string, {`
+- `items: Record<string, {`
 
 ### ApplicationSolutionsProps
 - `dictionary: LocalizedDict`
