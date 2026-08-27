@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T07:50:03.700740+00:00
+compiled_at: 2026-08-27T08:10:32.138817+00:00
 total_compiled_files: 655
-source_commit: badc4384
+source_commit: 3e670cfa
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T07:50:03.700740+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T08:10:32.138817+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -318,12 +318,12 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\robots.ts
-skeleton_hash: 59e37004f4c9248c
+source_path: C:\tmp\ops-t165\src\app\robots.ts
+skeleton_hash: d7d07361568d0b0d
 entity_hashes:
   func:robots: 04938e582a28c5d6
   overview: f391529836fd465a
-generated_at: 2026-06-19T20:46:34Z
+generated_at: 2026-08-27T06:56:44Z
 ---
 
 ## Genel Bakış
@@ -507,13 +507,13 @@ Fonksiyon gövdesi sunulmadığı için yalnızca imza tabanlı varsayımlar ür
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\admin\layout.tsx
-skeleton_hash: 2be9462bf62a55e3
+source_path: C:\tmp\ops-t165\src\app\admin\layout.tsx
+skeleton_hash: 8dbbe911ab339ff4
 entity_hashes:
   func:Layout: ba5a2fa47c4a3578
   overview: 2c0f6861ff270d4c
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:24Z
+generated_at: 2026-08-27T06:54:46Z
 ---
 
 ## Genel Bakış
@@ -578,8 +578,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, gövdeden türetilen özel 
 
 ## NODE ID STANDARD
 
-  file: layout.tsx
-  function: layout.tsx::Layout
+  file: src\app\admin\layout.tsx
+  function: src\app\admin\layout.tsx::Layout
 
 ---
 
@@ -609,14 +609,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\page.tsx
-skeleton_hash: 2e439699c68b18a2
+source_path: C:\tmp\ops-t165\src\app\admin\page.tsx
+skeleton_hash: 40eb95e7d5283fd2
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: e310741650765783
   overview: 5b1a16aab3aba293
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:51Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:55:11Z
 ---
 
 ## Genel Bakış
@@ -711,7 +711,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -723,14 +723,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\audit-logs\page.tsx
-skeleton_hash: db6a2fa39f599ed7
+source_path: C:\tmp\ops-t165\src\app\admin\audit-logs\page.tsx
+skeleton_hash: c9fedc7b956214a5
 entity_hashes:
   func:Loading: 657ee72781ec51d8
-  func:Page: fd2706f7cd85c29f
+  func:Page: 5d73985a9b37dcd4
   overview: ad893d1e0e0b6ff3
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:27Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:53:52Z
 ---
 
 ## Genel Bakış
@@ -766,14 +766,13 @@ Bu modül, React/Next.js ortamında bir bileşen (component) olarak çalışır.
 **Dönüş**: Return tipi `void veya bilinmiyor` olarak belirtilmiştir. React bileşeni olması sebebiyle muhtemelen bir `JSX.Element` döndürmektedir, ancak kesin dönüş tipi verilen bilgiler dahilinde doğrulanamamaktadır.
 
 ### Page
-**Ne yapar**: Bu fonksiyon, admin denetim kayıtları (audit logs) sayfasının üst seviye React bileşenidir. Asıl sayfa içeriğini Suspense ile sararak yükleme durumunda kullanıcıya animasyonlu bir loading göstergesi sunar.
+**Ne yapar**: Admin denetim günlükleri (audit logs) sayfasını oluşturan üst düzey sayfa bileşenidir. Uluslararasılaştırma desteğiyle birlikte asenkron yüklenen alt bileşeni bir yükleme durumu göstergesiyle çevreleyerek kullanıcıya sunar.
 
-**Nasıl yapar**: Fonksiyon, `useI18n` hook'u aracılığıyla çoklu dil desteği sağlayan çeviri fonksiyonunu alır. Ardından React'in `Suspense` bileşenini kullanarak `AdminAuditLogsPage` bileşenini sarar. Veri yüklenirken fallback olarak animasyonlu bir loading div'i gösterir; bu div, `animate-pulse` sınıfı sayesinde soluk bir animasyon efekti oluşturur ve `common.loading` çeviri anahtarı ile kullanıcının diline uygun "Yükleniyor" mesajını display eder.
+**Nasıl yapar**: `useI18n` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t` elde edilir. Ardından `AdminAuditLogsPage` bileşeni React'ın `Suspense` bileşeni ile sarılır; böylece alt bileşen yüklenene kadar kullanıcıya bir yükleme göstergesi (`fallback`) sunulur. Fallback içeriğinde `t('common.loading')` çağrısıyla yerelleştirilmiş bir yükleme metni, `animate-pulse` animasyonu ve `text-admin-fg-muted` renk sınıfı ile görüntülenir.
 
-**Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz. Next.js App Router yapısında otomatik olarak sayfa bileşeni olarak yüklenir.
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: `JSX.Element` — Suspense sarmalayıcısı içinde sarılmış `AdminAuditLogsPage` bileşenini döndürür. Yükleme sırasında fallback UI (animasyonlu loading div'i) render edilir.
+**Dönüş**: Kaynakta açık bir dönüş tipi belirtilmemiştir. Fonksiyon gövdesi JSX yapısı döndürmektedir.
 
 ---
 
@@ -794,17 +793,17 @@ Bu modül, React/Next.js ortamında bir bileşen (component) olarak çalışır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/audit-logs/page.tsx::Loading
-- **params**: ()
+### [N1_NASIL] AST Pointer: C:\tmp\ops-t165\src\app\admin\audit-logs\page.tsx::Loading
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `t('admin.common.loading')` ve `t('common.loading')` çağrılarında kullanılır
-- **Dönüş**: JSX element — `div` içeren loading placeholder, `animate-pulse` ile sallantılı animasyonlu slate-400 renkli "Yükleniyor" göstergesi
+  - `t` — `useI18n()` hook'undan destructuring ile alınan çeviri fonksiyonu; `'admin.common.loading'` anahtarının karşılığını döndürmek için kullanılır
+- **Dönüş**: JSX — `className="p-8 text-center text-admin-fg-muted animate-pulse"` özellikli bir `<div>` elementi; içeriği `t('admin.common.loading')` çağrısının sonucu
 
-### [N2_NASIL] AST Pointer: src/app/admin/audit-logs/page.tsx::Page
-- **params**: ()
+### [N2_NASIL] AST Pointer: C:\tmp\ops-t165\src\app\admin\audit-logs\page.tsx::Page
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `Suspense` fallback'inde `t('common.loading')` çağrısında kullanılır
-- **Dönüş**: JSX element — `<Suspense>` sarmalayıcısı içinde `<AdminAuditLogsPage />` component'ini render eder; fallback olarak loading placeholder gösterir
+  - `t` — `useI18n()` hook'undan destructuring ile alınan çeviri fonksiyonu; `'common.loading'` anahtarının karşılığını döndürmek için kullanılır
+- **Dönüş**: JSX — `<Suspense>` bileşeni; `fallback` prop'u olarak `className="p-8 text-center text-admin-fg-muted animate-pulse"` özellikli bir `<div>` (içeriği `t('common.loading')`) alır; çocuk olarak `<AdminAuditLogsPage />` bileşenini render eder
 
 ---
 
@@ -831,7 +830,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -843,14 +842,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\categories\page.tsx
-skeleton_hash: 57546cc709dd80c0
+source_path: C:\tmp\ops-t165\src\app\admin\categories\page.tsx
+skeleton_hash: 153e3b470869b645
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: 3494fba1713b6485
   overview: 5b1a16aab3aba293
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:32Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:54:33Z
 ---
 
 ## Genel Bakış
@@ -949,7 +948,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -961,32 +960,47 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\categories\[id]\builder\page.tsx
-skeleton_hash: 6f66d930456963ac
+source_path: C:\tmp\ops-t165\src\app\admin\categories\[id]\builder\page.tsx
+skeleton_hash: 7ca3842d2ac818fe
 entity_hashes:
-  func:CategoryBuilderPage: b1b2565a20b825f9
-  overview: 152bd8ffebcdcce2
-  style_tokens: 5aeaea31beafa07a
-generated_at: 2026-06-08T10:08:11Z
+  func:CategoryBuilderPage: 605172f14c98cbc0
+  func:Loading: 657ee72781ec51d8
+  overview: dae47e8499e6084c
+  style_tokens: 9e2a0862230ce35c
+generated_at: 2026-08-27T06:54:31Z
 ---
 
 ## Genel Bakış
-`CategoryBuilderPage`, yönetim panelinde belirli bir kategorinin yapısal düzenlemelerini yapmak için kullanılan tam ekran bir sayfa oluşturucu (page builder) bileşenidir. URL'den gelen asenkron `id` parametresini çözerek, bu kimliği ilgili alt bileşenlere iletir ve kullanıcıya kategori bazlı içerik oluşturma veya düzenleme arayüzü sunar.
+Bu modül, yönetim panelinde belirli bir kategorinin yapısal düzenlemelerini yapmak için kullanılan bir sayfa oluşturucu (page builder) arayüzü sunar. URL'den gelen asenkron kategori kimliğini çözerek ana düzenleyici bileşenini render eder ve yükleme durumunu yönetir.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni ve Veri Akışı
-Bu grup, asenkron URL parametrelerinin çözümü ve sayfanın ana yapısının oluşturulmasından sorumludur. Tek bir bileşen olarak, sayfanın tüm render mantığını ve alt bileşenlere veri aktarımını yönetir.
-- CategoryBuilderPage
+### Sayfa Bileşeni ve Yükleme Durumu
+Bu grup, sayfanın ana yapısını oluşturur, asenkron URL parametrelerini çözer ve yükleme esnasında gösterilecek geçici arayüzü sağlar. Kullanıcıya kategori bazlı içerik düzenleme arayüzü sunar.
+- Loading, CategoryBuilderPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-[Aksiyom 1]: Eğer `params` `Promise<{ id: string }>` türünde çözümlenemezse (örn. `await` edilmeden kullanılırsa), sayfa render edilemez ve hata oluşur.
-[Aksiyom 2]: Eğer `params` içindeki `id` alanı bir `string` içermiyorsa, ilgili kategori bulunamaz ve hata oluşur.
+
+Bu modül, bir üst bileşen tarafından sağlanan `params` prop'unun varlığını ve yapısını temel alır.
+
+[Aksiyom 1]: Eğer `params` prop'u sağlanmazsa, `CategoryBuilderPage` bileşeni `id` değerine erişemez ve sayfa doğru şekilde oluşturulamaz.
+[Aksiyom 2]: Eğer `params` içinde `id` alanı yoksa veya bu alan bir string değilse, bileşen beklenen kategori kimliğini alamaz ve alt bileşenlere geçersiz veri iletir.
+[Aksiyom 3]: Eğer `params` bir Promise olarak çözümlenmezse (örneğin, doğrudan bir nesne olarak gelirse), bileşen asenkron veri akışını işleyemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### Loading
+**Ne yapar**: Next.js App Router yapısında sayfa yüklenirken gösterilen yükleme durumu bileşenidir. Bu fonksiyon, CategoryBuilderPage yüklenene kadar kullanıcıya bir yükleme ekranı göstermek amacıyla kullanılır.
+
+**Nasıl yapar**: Fonksiyonun gövdesi verilmemiştir. Sadece fonksiyon tanımı ve `void` veya bilinmeyen dönüş tipi belirtilmiştir. Next.js'in özel yükleme dosyası (loading.tsx) olarak çalışması beklenir.
+
+**Parametreler**:
+- Bu fonksiyon parametre almaz.
+
+**Dönüş**: Dönüş tipi verilmemiştir. `void` veya bilinmiyor.
 
 ### CategoryBuilderPage
 
@@ -1001,27 +1015,49 @@ Bu grup, asenkron URL parametrelerinin çözümü ve sayfanın ana yapısının 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: next/dynamic::nextDynamic
+- import: react::React
+- import: react::use
+
+---
+
+## SABİTLER
+- **CategoryBuilderView** (call) — `nextDynamic(
+  () => import('@/views/admin/CategoryBuilderView'),
+  { ssr: ...`
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/categories/[id]/builder/page.tsx::CategoryBuilderPage
-- **params**: `{ params: Promise<{ id: string }> }` — Next.js tarafından sağlanan route parametreleri, Promise olarak gelir
+### [N1_NASIL] AST Pointer: src/app/admin/categories/[id]/builder/page.tsx::Loading
+- **params**: yok
 - **ic_degiskenler**:
-  - `id` — `use(params)` hook'u ile Promise'ten çözülen kategori ID'si (string), URL'deki `[id]` segmentinden gelir
-- **Dönüş**: JSX element (React component) — `id` yoksa hata mesajı div'i, varsa `CategoryBuilderView` component'i
-- **Yan etkiler**: Yok (stateless sunucu component)
-- **Notlar**: `use()` hook'u React 19 ile gelen Promise unwrap fonksiyonudur; `CategoryBuilderView` component'ine `categoryId` prop'u olarak geçirilir
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `admin.common.loading` anahtarını çözümlemek için kullanılır
+- **Dönüş**: JSX element — `div` içinde yükleme mesajı (`t('admin.common.loading')`) gösterir
+
+### [N2_NASIL] AST Pointer: src/app/admin/categories/[id]/builder/page.tsx::CategoryBuilderPage
+- **params**: `{ params }: { params: Promise<{ id: string }> }` — Next.js dinamik rota parametrelerini taşıyan Promise nesnesi
+- **ic_degiskenler**:
+  - `id` — `use(params)` ile Promise'den çözümlenen kategori kimliği (`string`); yoksa geçersiz mesajı gösterilir, varsa `CategoryBuilderView` bileşenine iletilir
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `admin.common.invalidCategory` anahtarını çözümlemek için kullanılır
+- **Dönüş**: JSX element — `id` yoksa geçersiz kategori uyarısı (`t('admin.common.invalidCategory')`) içeren `div`, varsa `<CategoryBuilderView categoryId={id} />` bileşeni döner
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\app\admin\categories\[id]\builder\page.tsx
+  function: src\app\admin\categories\[id]\builder\page.tsx::Loading
   function: src\app\admin\categories\[id]\builder\page.tsx::CategoryBuilderPage
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CategoryBuilderPage
+  export: Loading
 
 ---
 
@@ -1034,10 +1070,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-surface-deep`, `text-slate-400`, `text-xs`
+- **Renkler:** `bg-admin-bg`, `text-admin-fg-muted`, `text-xs`
 - **Layout:** `flex`, `h-screen`, `items-center`, `justify-center`
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `font-mono`, `tracking-widest`, `uppercase`
+- **Yardımcı Sınıflar:** `font-mono`
 
 ---
 # FILE: src\app\admin\coupons\page.md
@@ -1046,14 +1082,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\coupons\page.tsx
-skeleton_hash: 20e286efb838025b
+source_path: C:\tmp\ops-t165\src\app\admin\coupons\page.tsx
+skeleton_hash: cef038d67755f6de
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: 556d56b0dab8a0be
   overview: 5b1a16aab3aba293
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:27Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:54:34Z
 ---
 
 ## Genel Bakış
@@ -1068,10 +1104,6 @@ Modülün temel sorumluluğu, `/admin/coupons` rotasını sunarak tarayıcıya k
 ### Yükleniyor Durumu
 Sayfa içeriği hazırlanırken kullanıcıya görsel geri bildirim sağlamakla yükümlüdür. Kullanıcı deneyimini iyileştirmek için basit bir loading göstergesi sunar.
 - `Loading`
-
----
-
-**Dış Bağımlılıklar**: Modül, `AdminCouponsPage` bileşenini dinamik import ile (`next/dynamic`) yükler; bu sayede ana sayfa yüklenirken kupon arayüzü ayrı bir chunk olarak indirilir.
 
 ---
 
@@ -1162,7 +1194,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -1268,14 +1300,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\error-groups\page.tsx
-skeleton_hash: faa4b355afc8b0b6
+source_path: C:\tmp\ops-t165\src\app\admin\error-groups\page.tsx
+skeleton_hash: 646416936d0ab2c9
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: b47a5eb18beb6937
   overview: 5b1a16aab3aba293
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:38Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:54:36Z
 ---
 
 ## Genel Bakış
@@ -1368,7 +1400,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -1380,14 +1412,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\errors\page.tsx
-skeleton_hash: ece390272f3633d0
+source_path: C:\tmp\ops-t165\src\app\admin\errors\page.tsx
+skeleton_hash: 67c691cca4eab7bb
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: dbe2af9383c2f93d
   overview: 5b1a16aab3aba293
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:31Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:54:38Z
 ---
 
 ## Genel Bakış
@@ -1485,7 +1517,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -1497,13 +1529,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\inventory\page.tsx
-skeleton_hash: fdcd9ebe1feeb814
+source_path: C:\tmp\ops-t165\src\app\admin\inventory\page.tsx
+skeleton_hash: 4ce31946a4eaf6a2
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:15Z
+generated_at: 2026-08-27T06:54:39Z
 ---
 
 ## Genel Bakış
@@ -1591,14 +1623,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\inventory\report\page.tsx
-skeleton_hash: a0ea631964d0dc60
+source_path: C:\tmp\ops-t165\src\app\admin\inventory\report\page.tsx
+skeleton_hash: c9003dd7edbc1132
 entity_hashes:
   func:InventoryReportPage: bfcc8ccf4dbc326a
   func:Loading: 657ee72781ec51d8
   overview: 42ff76dfbef674ca
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:39Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:54:41Z
 ---
 
 ## Genel Bakış
@@ -1700,7 +1732,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -1712,13 +1744,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\inventory\settings\page.tsx
-skeleton_hash: 7b33409261c4a967
+source_path: C:\tmp\ops-t165\src\app\admin\inventory\settings\page.tsx
+skeleton_hash: d656e3d23666e791
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: dac29de5a88fc4b5
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:27Z
+generated_at: 2026-08-27T06:54:42Z
 ---
 
 ## Genel Bakış
@@ -1797,13 +1829,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\invoices\page.tsx
-skeleton_hash: 40a750f1030ec4ac
+source_path: C:\tmp\ops-t165\src\app\admin\invoices\page.tsx
+skeleton_hash: f62149b498aebd29
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 59a58d5e6daf74ea
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T08:43:05Z
+generated_at: 2026-08-27T06:54:44Z
 ---
 
 ## Genel Bakış
@@ -1892,14 +1924,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\logistics\page.tsx
-skeleton_hash: 326d930023ab4cf3
+source_path: C:\tmp\ops-t165\src\app\admin\logistics\page.tsx
+skeleton_hash: db0cb3476b3e1a64
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:LogisticsPage: 70696f052bf11390
   overview: 1341488ff93bac5c
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:40Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:54:47Z
 ---
 
 ## Genel Bakış
@@ -1976,14 +2008,6 @@ Bu modül, Next.js App Router yapısında çalışan bir admin sayfası olup, lo
 
 ---
 
-### [N2_NASIL] AST Pointer: src/app/admin/logistics/page.tsx::LogisticsPage
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - (yok — gövde herhangi bir değişken bildirmez)
-- **Dönüş**: `<AdminLogisticsPage />` — `next/dynamic` ile import edilmiş ve `call` değişkeni olarak işaretlenmiş lazy-loaded `AdminLogisticsPage` bileşeninin doğrudan render edilmesi; sayfa bileşeni olarak dinamik import'ın tetiklendiği nokta
-
----
-
 ## NODE ID STANDARD
 
   file: src\app\admin\logistics\page.tsx
@@ -2007,7 +2031,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -2019,13 +2043,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\movements\page.tsx
-skeleton_hash: 1a1e4ed3c0375a2e
+source_path: C:\tmp\ops-t165\src\app\admin\movements\page.tsx
+skeleton_hash: 72c3d77b26744b2e
 entity_hashes:
   func:Page: 9c08060caeb88969
   overview: 9da4b48a024a6a7c
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:27Z
+generated_at: 2026-08-27T06:54:48Z
 ---
 
 ## Genel Bakış
@@ -2125,14 +2149,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\orders\page.tsx
-skeleton_hash: 6253cab314739e1e
+source_path: C:\tmp\ops-t165\src\app\admin\orders\page.tsx
+skeleton_hash: dc1137c535e089b3
 entity_hashes:
   func:Loading: 657ee72781ec51d8
-  func:Page: d710ec3bcbfd4e2f
+  func:Page: 460322f3b21c41ac
   overview: 84e62d35617899bd
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:43Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:55:10Z
 ---
 
 ## Genel Bakış
@@ -2155,20 +2179,6 @@ Bu modül, Next.js App Router yapısında bir sayfa bileşenidir. Aşağıdaki m
 
 ---
 
-**[Aksiyom 1 - Sayfa Bileşeni Zorunluluğu]:** Eğer `Page()` fonksiyonu geçerli bir React elementi (JSX) döndürmüyorsa, Next.js bu rotada hata sayfası gösterir veya derleme hatası oluşur.
-
-**[Aksiyom 2 - Yükleme Durumu Zorunluluğu]:** Eğer `Loading()` fonksiyonu tanımlı değilse veya geçerli bir React elementi döndürmüyorsa, sayfa yüklenirken Suspense fallback görüntülenemez ve kullanıcı loading durumunu göremez.
-
-**[Aksiyom 3 - Modül Export Zorunluluğu]:** Eğer `AdminOrdersPage` export edilmemişse, modül dışarıdan erişilemez hale gelir ve Next.js router bileşeni olarak kullanılamaz.
-
-**[Aksiyom 4 - Parametresiz Çalışma]:** Her iki fonksiyon da (`Page()` ve `Loading()`) parametresiz olarak tanımlanmıştır. Fonksiyon gövdesi verilmediği için, bu fonksiyonların hangi verileri tüketip ürettiği bilinmemektedir.
-
-**[Aksiyom 5 - Bağımlılık Bilinmezliği]:** Fonksiyon gövdesi verilmediği için, modülün hangi harici servislere, context'lere veya veri kaynaklarına bağımlı olduğu bilinmemektedir. Dolayısıyla harici bağımlılık aksiyomları tanımlanamamıştır.
-
-**[Aksiyom 6 - Veri Kaynağı Bilinmezliği]:** Fonksiyon gövdesi verilmediği için, modülün verileri nereden çektiği (API, static data, database vb.) bilinmemektedir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### Loading
@@ -2182,10 +2192,14 @@ Bu modül, Next.js App Router yapısında bir sayfa bileşenidir. Aşağıdaki m
 **Dönüş**: `JSX.Element` veya `React.ReactNode` tipinde bir React bileşeni döndürür. Return tipi kaynak kodda açıkça belirtilmemiş olup, Next.js loading convention gereği geçerli bir JSX yapısı döndürmesi beklenmektedir.
 
 ### Page
-**Ne yapar**: Bu bileşen, yönetici siparişleri sayfasının ana giriş noktası olarak görev yapar. Uluslararasılaştırma desteği entegre eder ve içerik yüklenirken kullanıcıya görsel bir geri bildirim sağlar.
-**Nasıl yapar**: `useI18n` kancasından (hook) elde edilen çeviri fonksiyonunu kullanarak metinleri yerelleştirir. Asıl içeriği oluşturan `AdminOrdersPage` bileşenini, `fallback` özelliği ile yükleniyor animasyonu içeren bir `Suspense` yapısı içinde sarmalayarak render eder.
-**Parametreler**: Yok
-**Dönüş**: JSX.Element — `Suspense` bileşeni ile sarılmış sayfa yapısını döndürür.
+**Ne yapar**: Admin siparişler sayfasını render eden bir React fonksiyon bileşenidir. Uluslararasılaştırma desteğiyle birlikte, bileşen yüklenirken kullanıcıya yükleme göstergesi sunar.
+
+**Nasıl yapar**: `useI18n()` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t`'yi alır. Ardından `AdminOrdersPage` bileşenini React'in `Suspense` bileşeni ile sarar. `Suspense`, alt bileşen ağacı henüz hazır olmadığında `fallback` prop'unda tanımlanmış yükleme arayüzünü gösterir. Bu fallback, Tailwind CSS sınıflarıyla (`p-8`, `text-center`, `text-admin-fg-muted`, `animate-pulse`) biçimlendirilmiş bir `div` öğesidir ve `t('common.loading')` çağrısıyla yerelleştirilmiş bir yükleme metni görüntüler. Bileşen hazır olduğunda `Suspense`, fallback'i kaldırıp `AdminOrdersPage` bileşenini kullanıcıya sunar.
+
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**: JSX öğesi döndürür; `Suspense` ile sarılmış bir React ağacı üretir. Kesin dönüş tipi kaynakta belirtilmemiştir.
 
 ---
 
@@ -2206,16 +2220,16 @@ Bu modül, Next.js App Router yapısında bir sayfa bileşenidir. Aşağıdaki m
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/admin/orders/page.tsx::Loading
-- **params**: (yok)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `t('admin.common.loading')` çağrılarak admin sayfasına özel loading metni çevrilir
-- **Dönüş**: JSX — `div` elemanı (`p-8 text-center text-slate-400 animate-pulse` class'ları ile loading animasyonu gösteren bir placeholder); `AdminOrdersPage` bileşeni yüklenene kadar Suspense fallback olarak kullanılır
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `'admin.common.loading'` anahtarıyla yükleniyor metni elde etmek için kullanılır
+- **Dönüş**: JSX `<div>` elementi — `className="p-8 text-center text-admin-fg-muted animate-pulse"` ile stil uygulanmış, `t('admin.common.loading')` metni içeren yükleniyor göstergesi
 
 ### [N2_NASIL] AST Pointer: src/app/admin/orders/page.tsx::Page
-- **params**: (yok)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `t('common.loading')` çağrılarak ortak loading metni çevrilir
-- **Dönüş**: JSX — `<Suspense>` sarmalayıcısı içinde `<AdminOrdersPage />` bileşenini döndürür; `fallback` prop'u olarak loading spinner/div'i verilir; `AdminOrdersPage` dinamik import ile `next/dynamic` kullanılarak lazy yüklenen ana sipariş yönetim bileşenidir
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `'common.loading'` anahtarıyla Suspense fallback metni elde etmek için kullanılır
+- **Dönüş**: JSX `<Suspense>` elementi — `fallback` prop'unda `t('common.loading')` metni içeren `<div>` yükleniyor göstergesi, çocuk olarak `<AdminOrdersPage />` bileşeni render edilir
 
 ---
 
@@ -2242,7 +2256,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -2254,13 +2268,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\pricing\page.tsx
-skeleton_hash: 99a9292da2aad0b9
+source_path: C:\tmp\ops-t165\src\app\admin\pricing\page.tsx
+skeleton_hash: 7f3672a50ef91fec
 entity_hashes:
   func:Page: 8da9614d8cc1846c
   overview: 5ab5d7e5fc444b30
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-14T09:11:44Z
+generated_at: 2026-08-27T06:55:12Z
 ---
 
 ## Genel Bakış
@@ -2350,13 +2364,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\pricing\policies\page.tsx
-skeleton_hash: 413e7a9e2156b0bf
+source_path: C:\tmp\ops-t165\src\app\admin\pricing\policies\page.tsx
+skeleton_hash: a84365e774e1e607
 entity_hashes:
   func:Page: a9025d8698ba19f7
   overview: bfc35d44691025c3
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T08:43:05Z
+generated_at: 2026-08-27T06:55:14Z
 ---
 
 ## Genel Bakış
@@ -2447,13 +2461,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\admin\pricing\preview\page.tsx
-skeleton_hash: 38186a30694c64b5
+source_path: C:\tmp\ops-t165\src\app\admin\pricing\preview\page.tsx
+skeleton_hash: f5e3c4e406a89578
 entity_hashes:
   func:Page: 38a14b07f492add8
   overview: f2c812d7ee2b06e8
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:42Z
+generated_at: 2026-08-27T06:55:15Z
 ---
 
 ## Genel Bakış
@@ -2511,8 +2525,8 @@ Fiyatlandırma önizleme sayfasının kullanıcı arayüzünü oluşturur ve ilg
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::Page
+  file: src\app\admin\pricing\preview\page.tsx
+  function: src\app\admin\pricing\preview\page.tsx::Page
 
 ---
 
@@ -2543,13 +2557,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\pricing\rules\page.tsx
-skeleton_hash: 79aa3a61a6d4585a
+source_path: C:\tmp\ops-t165\src\app\admin\pricing\rules\page.tsx
+skeleton_hash: fe5ada3d375f299c
 entity_hashes:
   func:Page: cd9efdf41c64d125
   overview: 36e05498f361936e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-14T09:12:20Z
+generated_at: 2026-08-27T06:55:16Z
 ---
 
 ## Genel Bakış
@@ -2646,14 +2660,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx
-skeleton_hash: de02d609fb6878b2
+source_path: C:\tmp\ops-t165\src\app\admin\products\page.tsx
+skeleton_hash: 02de2ae35c649d22
 entity_hashes:
   func:Loading: 657ee72781ec51d8
-  func:Page: 50c72d14cf6e5d39
+  func:Page: 2cf75b2e71e493c7
   overview: ad893d1e0e0b6ff3
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:47:00Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:55:42Z
 ---
 
 ## Genel Bakış
@@ -2686,15 +2700,14 @@ Yönetim panelindeki ürünler sayfasının temel yapısını oluşturarak ilgil
 **Dönüş**: Fonksiyonun dönüş tipi `void` veya belirsiz olarak belirtilmiştir. Fonksiyonun bir UI bileşeni (örn. React bileşeni) döndürmesi beklenirken, verilen bilgi kesin bir tip içermemektedir.
 
 ### Page
+**Ne yapar**: Admin ürünler sayfasının ana sayfa bileşenidir. Uluslararasılaştırma desteğiyle birlikte asenkron yükleme sırasında kullanıcıya yükleme göstergesi sunar ve `AdminProductsPage` bileşenini render eder. Next.js'in dosya tabanlı yönlendirme sisteminde `page.tsx` dosyası olarak tanımlanan bir sayfa bileşenidir.
 
-**Ne yapar**: Admin ürünler sayfasının ana giriş noktasıdır. Sayfa yüklendiğinde Suspense ile sarmalanmış bir loading durumu gösterirken asıl ürün yönetim sayfasının yüklenmesini bekler.
-
-**Nasıl yapar**: Fonksiyon, useI18n hook'u ile çok dilli destek sağlar ve useTercüme edilmiş 'common.loading' anahtarını kullanarak Suspense fallback bileşenini oluşturur. Bu fallback, sayfa yüklenene kadar animasyonlu bir loading göstergesi sunar. Suspense boundary, asıl AdminProductsPage bileşeninin yüklenmesi sırasında kullanıcıya kesintisiz bir deneyim sunar.
+**Nasıl yapar**: Fonksiyon önce `useI18n` hook'unu çağırarak uluslararasılaştırma fonksiyonu `t`'yi elde eder. Ardından React'ın `Suspense` bileşenini kullanarak `AdminProductsPage` bileşenini sarmalar. `Suspense`, alt bileşen asenkron veri yüklemesi tamamlanana kadar bir fallback içeriği gösterir. Fallback olarak, Tailwind CSS sınıflarıyla stilize edilmiş bir yükleme mesajı görüntülenir; bu mesaj `t('common.loading')` ile yerelleştirilmiş metin içerir ve `animate-pulse` sınıfıyla nabız animasyonu uygulanır.
 
 **Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz
+- Bu fonksiyon parametre almaz.
 
-**Dönüş**: JSX.Element — Suspense ile sarılmış AdminProductsPage component'ini içeren React bileşeni döndürür
+**Dönüş**: JSX elementi döndürür. Return tipi kaynak kodda açıkça belirtilmemiştir.
 
 ---
 
@@ -2715,17 +2728,17 @@ Yönetim panelindeki ürünler sayfasının temel yapısını oluşturarak ilgil
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx::Loading
+### [N1_NASIL] AST Pointer: src/app/admin/products/page.tsx::Loading
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini yerelleştirmek için kullanılır
-- **Dönüş**: React JSX elementi (loading durumu için animasyonlu mesaj)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `'admin.common.loading'` anahtarıyla yükleme mesajını almak için kullanılır
+- **Dönüş**: JSX — `className="p-8 text-center text-admin-fg-muted animate-pulse"` özellikli `<div>` elementi
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx::Page
+### [N2_NASIL] AST Pointer: src/app/admin/products/page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini yerelleştirmek için kullanılır
-- **Dönüş**: React JSX elementi (Suspense ile sarılmış AdminProductsPage bileşeni)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `'common.loading'` anahtarıyla yükleme mesajını almak için kullanılır
+- **Dönüş**: JSX — `<Suspense>` bileşeni; `fallback` prop'unda yükleme göstergesi (`<div>`) taşır, çocuk olarak `<AdminProductsPage />` bileşenini sarmalar
 
 ---
 
@@ -2752,7 +2765,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -2764,14 +2777,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\purchasing\page.tsx
-skeleton_hash: 210395eb415a8a77
+source_path: C:\tmp\ops-t165\src\app\admin\purchasing\page.tsx
+skeleton_hash: e88e3e8f1b9967e1
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: 84ffa19e59af0ad3
   overview: 5b1a16aab3aba293
   style_tokens: 08b1938b3f3a81d8
-generated_at: 2026-08-25T08:43:06Z
+generated_at: 2026-08-27T06:55:43Z
 ---
 
 ## Genel Bakış
@@ -2981,14 +2994,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\admin\returns\page.tsx
-skeleton_hash: 63c78e509934ddaa
+source_path: C:\tmp\ops-t165\src\app\admin\returns\page.tsx
+skeleton_hash: d493779035e77791
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: 8443af27af30d61d
   overview: 5b1a16aab3aba293
   style_tokens: 08b1938b3f3a81d8
-generated_at: 2026-08-25T07:23:27Z
+generated_at: 2026-08-27T06:55:45Z
 ---
 
 ## Genel Bakış
@@ -3059,9 +3072,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::Loading
-  function: page.tsx::Page
+  file: src\app\admin\returns\page.tsx
+  function: src\app\admin\returns\page.tsx::Loading
+  function: src\app\admin\returns\page.tsx::Page
 
 ---
 
@@ -3092,13 +3105,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\settings\page.tsx
-skeleton_hash: 5cc0fb075ff4ab37
+source_path: C:\tmp\ops-t165\src\app\admin\settings\page.tsx
+skeleton_hash: c223b0c58fc5ee2b
 entity_hashes:
   func:Page: 9367d1f0b801970c
   overview: a5dfa30287607de2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:32Z
+generated_at: 2026-08-27T06:55:46Z
 ---
 
 ## Genel Bakış
@@ -3189,14 +3202,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\users\page.tsx
-skeleton_hash: 40f2846223fe5a83
+source_path: C:\tmp\ops-t165\src\app\admin\users\page.tsx
+skeleton_hash: ccccd306281ccb7b
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: c68e4a7cc2b89422
   overview: 5b1a16aab3aba293
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:46:46Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:55:48Z
 ---
 
 ## Genel Bakış
@@ -3207,24 +3220,6 @@ Next.js App Router yapısında yer alan kullanıcı yönetimi sayfasının giri�
 ### Sayfa Bileşenleri
 Rota karşılama ve durum göstergesi sorumluluklarını üstlenen temel sayfa bileşenleridir.
 - Page, Loading
-
----
-
-## Mimari Notlar
-
-**Bağımlılıklar:**
-- AdminUsersPage bileşeni (dinamik import ile yüklenen dış bağımlılık)
-
-**Mimari Önemi:**
-- `/admin/users` rotasının tekil giriş noktası
-- SSR yerine istemci tarafı dinamik yükleme stratejisi benimsemiş
-- Loading bileşeni ile Suspense uyumlu yükleme durumu sunuyor
-
-**Aksiyomlar:**
-- AdminUsersPage modülü mevcut değilse sayfa çalışmaz
-- Next.js App Router yapısı bu dosyayı tanımıyorsa rota erişilemez olur
-- Dynamic import mekanizması bozuksa ana içerik render edilmez
-- Page varsayılan export ile dışa aktarılmazsa Next.js bileşeni tanıyamaz
 
 ---
 
@@ -3288,13 +3283,6 @@ Bu modül, Next.js App Router yapısında tanımlanmış minimal bir sayfa giri�
 
 ---
 
-### [N2_NASIL] AST Pointer: admin/users/page.tsx::Page
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `<AdminUsersPage />` JSX componenti
-
----
-
 ## NODE ID STANDARD
 
   file: src\app\admin\users\page.tsx
@@ -3318,7 +3306,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -3330,14 +3318,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\admin\webhook-events\page.tsx
-skeleton_hash: 54f68cba14a6500d
+source_path: C:\tmp\ops-t165\src\app\admin\webhook-events\page.tsx
+skeleton_hash: 66cb33c6cc6e8492
 entity_hashes:
   func:Loading: 657ee72781ec51d8
   func:Page: 03bf0c7eea267025
   overview: 5b1a16aab3aba293
   style_tokens: 08b1938b3f3a81d8
-generated_at: 2026-08-25T07:23:41Z
+generated_at: 2026-08-27T06:55:49Z
 ---
 
 ## Genel Bakış
@@ -3389,8 +3377,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **AdminWebhookEventsPage** (call) — `nextDynamic(
-  () => import('../../../views/admin/AdminWebhookEventsPage'),
-...`
+  () => import('../../../views/admin/AdminWebhookEventsPage'),...`
 
 ---
 
@@ -3411,9 +3398,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::Loading
-  function: page.tsx::Page
+  file: src\app\admin\webhook-events\page.tsx
+  function: src\app\admin\webhook-events\page.tsx::Loading
+  function: src\app\admin\webhook-events\page.tsx::Page
 
 ---
 
@@ -3444,12 +3431,12 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\api\health\route.ts
-skeleton_hash: edc5a3c3f240642c
+source_path: C:\tmp\ops-t165\src\app\api\health\route.ts
+skeleton_hash: 0658a518b3ae9274
 entity_hashes:
-  func:GET: 3a9b2c312d190949
+  func:GET: db5df860aaeadf1a
   overview: c73ec3ea3e37e6ac
-generated_at: 2026-06-19T20:46:34Z
+generated_at: 2026-08-27T06:56:09Z
 ---
 
 ## Genel Bakış
@@ -3479,17 +3466,16 @@ Bu modül, Next.js App Router yapısında bir API sağlık kontrolü endpoint'id
 ## FONKSİYON DETAYLARI
 
 ### GET
-**Ne yapar**: Health check (sağlık kontrolü) endpoint'ini sunar ve API servisinin aktif olduğunu doğrulayan basit bir yanıt döndürür. Bu fonksiyon, sistemin çalışıp çalışmadığını kontrol etmek için kullanılan standart bir izleme mekanizmasıdır.
+**Ne yapar**: Bu fonksiyon, bir sağlık kontrolü (health check) uç noktası olarak hizmet verir. Sunucunun çalışır durumda olduğunu doğrulamak amacıyla istemciye durum bilgisi ve geçerli zaman damgası içeren bir JSON yanıtı döndürür.
 
-**Nasıl yapar**: Fonksiyon, `NextResponse.json()` metodunu kullanarak HTTP 200 durum koduyla birlikte JSON formatında yanıt oluşturur. Yanıt içinde `status` alanına "ok" değeri, `timestamp` alanına ise o anki UTC zaman damgası ISO 8601 formatında eklenir. Fonksiyon asenkron (async) olarak tanımlanmıştır, ancak mevcut implementasyonda herhangi bir asenkron işlem gerçekleştirmemektedir.
+**Nasıl yapar**: Fonksiyon herhangi bir iş mantığı uygulamaz; çağrıldığında doğrudan `NextResponse.json` metodu ile bir JSON nesnesi oluşturur ve döndürür. Bu nesne iki alandan oluşur: `status` alanı sabit `"ok"` değerini, `timestamp` alanı ise `new Date().toISOString()` çağrısıyla elde edilen UTC formatındaki geçerli zaman bilgisini içerir. Fonksiyonun `async` olarak tanımlanmış olması, Next.js'in API route handler sözleşme yapısına uyumluluk sağlar; ancak gövde içinde herhangi bir `await` ifadesi bulunmaz.
 
 **Parametreler**:
-- Fonksiyon herhangi bir parametre almamaktadır.
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**:
-- `NextResponse` — JSON formatında yanıt içeren HTTP response nesnesi
-  - `status`: string — Servisin durumunu belirtir, her zaman "ok" değerini döndürür
-  - `timestamp`: string — ISO 8601 formatında UTC zaman damgası (örnek: "2024-01-15T10:30:00.000Z")
+**Dönüş**: `NextResponse` nesnesi döndürür. Bu nesne, `Content-Type: application/json` başlığıyla birlikte aşağıdaki yapıya sahip bir JSON gövdesi içerir:
+- `status`: `string` — Sunucunun çalışır durumda olduğunu belirten `"ok"` sabit değeri.
+- `timestamp`: `string` — `Date.prototypetoISOString()` tarafından üretilen, ISO 8601 formatında UTC zaman damgası (örneğin `"2024-01-15T12:30:45.000Z"`).
 
 ---
 
@@ -3500,10 +3486,10 @@ Bu modül, Next.js App Router yapısında bir API sağlık kontrolü endpoint'id
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\api\health\route.ts::GET
-- **params**: (yok)
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde atanmış değişken bulunmamaktadır)
-- **Dönüş**: `NextResponse.json()` — Sağlık durumu bilgisini (status ve timestamp) JSON formatında döndürür
+### [N1_NASIL] AST Pointer: src/app/api/health/route.ts::GET
+- **params**: (parametre yok)
+- **ic_degiskenler**: (iç değişken yok)
+- **Dönüş**: `NextResponse.json` ile `status` ve `timestamp` alanlarını içeren JSON yanıt nesnesi döndürür. `status` sabit `"ok"` değerine, `timestamp` ise `new Date().toISOString()` çağrısının sonucuna eşittir.
 
 ---
 
@@ -3524,8 +3510,8 @@ Bu modül, Next.js App Router yapısında bir API sağlık kontrolü endpoint'id
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\api\webhook\supabase\route.ts
-skeleton_hash: 5b8ce373973b3051
+source_path: C:\tmp\ops-t165\src\app\api\webhook\supabase\route.ts
+skeleton_hash: 92d388bc3cca6d2c
 entity_hashes:
   func:POST: e403611d31ac574d
   func:categoryPathsFor: 9b42d3d5a66b4be0
@@ -3536,7 +3522,7 @@ entity_hashes:
   func:revalidateFamilyChain: 4b63a5deec09a21a
   func:walkFamilyChain: 88b7db91345e77f1
   overview: 8197b1ebd33adfbe
-generated_at: 2026-08-25T07:24:30Z
+generated_at: 2026-08-27T06:56:11Z
 ---
 
 ## Genel Bakış
@@ -3744,29 +3730,29 @@ graph TD
     route_ts__revalidateCategoryTree["revalidateCategoryTree"]
     route_ts__revalidateFamilyChain["revalidateFamilyChain"]
     route_ts__walkFamilyChain["walkFamilyChain"]
-    route_ts__revalidateCategoryTree --> route_ts__categoryPathsFor
-    route_ts__revalidateCategoryTree --> route_ts__categoryRowById
-    route_ts__POST --> route_ts__categoryPathsFor
     route_ts__revalidateFamilyChain --> route_ts__walkFamilyChain
+    route_ts__POST --> route_ts__hasDiscoverySensitiveChange
+    route_ts__revalidateCategoryTree --> route_ts__categoryPathsFor
+    route_ts__POST --> route_ts__categoryPathsFor
+    route_ts__POST --> route_ts__walkFamilyChain
+    route_ts__revalidateCategoryTree --> route_ts__categoryRowById
+    route_ts__POST --> route_ts__categoryRowById
+    route_ts__walkFamilyChain --> route_ts__familyRowById
     route_ts__POST --> route_ts__revalidateFamilyChain
     route_ts__POST --> route_ts__revalidateCategoryTree
-    route_ts__walkFamilyChain --> route_ts__familyRowById
-    route_ts__POST --> route_ts__categoryRowById
-    route_ts__POST --> route_ts__walkFamilyChain
-    route_ts__POST --> route_ts__hasDiscoverySensitiveChange
 ```
 
 ## NODE ID STANDARD
 
-  file: route.ts
-  function: route.ts::hasDiscoverySensitiveChange
-  function: route.ts::familyRowById
-  function: route.ts::walkFamilyChain
-  function: route.ts::revalidateFamilyChain
-  function: route.ts::categoryPathsFor
-  function: route.ts::categoryRowById
-  function: route.ts::revalidateCategoryTree
-  function: route.ts::POST
+  file: src\app\api\webhook\supabase\route.ts
+  function: src\app\api\webhook\supabase\route.ts::hasDiscoverySensitiveChange
+  function: src\app\api\webhook\supabase\route.ts::familyRowById
+  function: src\app\api\webhook\supabase\route.ts::walkFamilyChain
+  function: src\app\api\webhook\supabase\route.ts::revalidateFamilyChain
+  function: src\app\api\webhook\supabase\route.ts::categoryPathsFor
+  function: src\app\api\webhook\supabase\route.ts::categoryRowById
+  function: src\app\api\webhook\supabase\route.ts::revalidateCategoryTree
+  function: src\app\api\webhook\supabase\route.ts::POST
 
 ---
 
@@ -3787,12 +3773,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\auth\callback\route.ts
-skeleton_hash: 18a7638a8c3b289a
+source_path: C:\tmp\ops-t165\src\app\auth\callback\route.ts
+skeleton_hash: 28f31014b513feb5
 entity_hashes:
   func:GET: 87f900e6676c777d
   overview: cceb50975600e00b
-generated_at: 2026-08-25T08:43:06Z
+generated_at: 2026-08-27T06:56:12Z
 ---
 
 ## Genel Bakış
@@ -3866,12 +3852,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\auth\signout\route.ts
-skeleton_hash: be6286006ba44974
+source_path: C:\tmp\ops-t165\src\app\auth\signout\route.ts
+skeleton_hash: cb5712fc44153c68
 entity_hashes:
-  func:POST: c85301a22b3fe20e
+  func:POST: 9db1e564185a6ae3
   overview: fa888e32d3000f25
-generated_at: 2026-06-19T20:46:34Z
+generated_at: 2026-08-27T06:56:43Z
 ---
 
 ## Genel Bakış
@@ -3897,15 +3883,14 @@ Bu modül, kullanıcı oturumunu sonlandıran bir API endpoint'idir.
 ## FONKSİYON DETAYLARI
 
 ### POST
+**Ne yapar**: Kullanıcının mevcut oturumunu sonlandırır ve kullanıcıyı dil tercihine göre login sayfasına yönlendirir. Bu fonksiyon, Next.js App Router yapısında bir API route olarak tanımlanmıştır ve HTTP POST isteklerini işler.
 
-**Ne yapar**: Kullanıcının oturumunu sonlandırır (sign-out) ve login sayfasına yönlendirme yapar. Bu fonksiyon, bir HTTP POST isteği geldiğinde tetiklenen bir Next.js App Router rotasıdır.
-
-**Nasıl yapar**: Önce Supabase sunucu istemcisi oluşturarak kullanıcının mevcut oturum claims'lerini kontrol eder. Eğer geçerli claims'ler varsa `signOut()` metodunu çağırarak oturumu sonlandırır. Ardından tüm sayfa önbelleğini temizlemek için `revalidatePath` ile layout seviyesinde revalidation yapar. Kullanıcının tercih ettiği dil bilgisini (`NEXT_LOCALE` cookie'sinden) okur ve bu dile göre login sayfasına 302 yönlendirmesi oluşturur. Son olarak claims cache cookie'sini temizleyerek önbellekteki yetkilendirme verilerinin kalıcı olarak silinmesini sağlar.
+**Nasıl yapar**: Fonksiyon önce `createSupabaseServerClient` ile bir Supabase sunucu istemcisi oluşturur. Ardından `supabase.auth.getClaims()` ile kullanıcının mevcut kimlik bilgilerini (claims) kontrol eder. Eğer `data?.claims` mevcutsa (kullanıcı giriş yapmışsa), `supabase.auth.signOut()` çağrılarak oturum sonlandırılır. Sonrasında `revalidatePath('/', 'layout')` ile kök dizin için layout seviyesindeki veri önbelleği geçersiz kılınır. İstek URL'si parse edilir, çerez deposundan `NEXT_LOCALE` çerezi okunarak dil tercihi belirlenir (bulunamazsa varsayılan olarak `'tr'` kullanılır). Kullanıcı, belirlenen dil önekiyle birlikte `/{lang}/auth/login` yoluna 302 geçici yönlendirme ile gönderilir. Yönlendirme yanıtı oluşturulduktan sonra `clearClaimsCacheCookie` çağrılarak claims önbellek çerezi temizlenir ve yanıt döndürülür.
 
 **Parametreler**:
-- `request`: Request — Next.js tarafından sağlanan HTTP istek nesnesi, isteğin URL bilgisini ve diğer header verilerini içerir
+- request: Request — Gelen HTTP isteğini temsil eden nesne. İsteğin URL bilgisini (`request.url`) içerir ve yönlendirme hedefinin belirlenmesinde kullanılır.
 
-**Dönüş**: `NextResponse` — Kullanıcıyı `/{lang}/auth/login` adresine yönlendiren 302 HTTP yanıt döner. Yanıt aynı zamanda claims cache cookie'sini temizleme işlemini de içerir.
+**Dönüş**: NextResponse — 302 durum koduyla birlikte `/{lang}/auth/login` yoluna yönlendirme yapan HTTP yanıt nesnesi döndürür. Yanıt nesnesi, `clearClaimsCacheCookie` fonksiyonu aracılığıyla claims önbellek çerezinin temizlenmesi için kullanılır.
 
 ---
 
@@ -3921,15 +3906,18 @@ Bu modül, kullanıcı oturumunu sonlandıran bir API endpoint'idir.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/auth/signout/route.ts::POST
-- **params**: `(request: Request)`
+- **params**: `request` — `Request` tipinde, gelen HTTP isteğini temsil eder
 - **ic_degiskenler**:
-  - `supabase` — `createSupabaseServerClient()` ile oluşturulan Supabase istemcisi; auth işlemleri (getClaims, signOut) için kullanılır
-  - `data` — `supabase.auth.getClaims()` çağrısından dönen `{ data }` destructuring ile elde edilen claims nesnesi; mevcut claim'lerin olup olmadığını kontrol eder
-  - `requestUrl` — `request.url` string'inden `new URL()` ile oluşturulan URL nesnesi; redirect için `origin` bilgisini sağlamak üzere kullanılır
-  - `cookieStore` — `cookies()` ile elde edilen cookie deposu; tarayıcıdaki `NEXT_LOCALE` cookie'sine erişim sağlar
-  - `lang` — `cookieStore.get('NEXT_LOCALE')?.value || 'tr'` ifadesinden elde edilen dil kodu; login yönlendirme URL'inde path olarak kullanılır (`/${lang}/auth/login`); cookie yoksa `'tr'` varsayılır
-  - `response` — `NextResponse.redirect()` ile oluşturulan 302 redirect yanıtı; login sayfasına yönlendirme yapar ve `clearClaimsCacheCookie` ile temizlenip döndürülür
-- **Dönüş**: `NextResponse` — login sayfasına (`/${lang}/auth/login`) 302 redirect yanıtı döndürür; yan etkileri: supabase auth signOut çağırır, revalidatePath ile layout cache'ini temizler, claims cache cookie'sini siler
+  - `supabase` — `createSupabaseServerClient()` ile oluşturulan Supabase sunucu istemcisi; kimlik doğrulama ve oturum işlemleri için kullanılır
+  - `data` — `supabase.auth.getClaims()` sonucundan destructuring ile elde edilen nesne; kullanıcının claims bilgisini içerir
+  - `data.claims` — `data` nesnesi içindeki claims alanı; varlığı kontrol edilerek kullanıcının oturum açmış olup olmadığı belirlenir
+  - `requestUrl` — `request.url` kullanılarak oluşturulan `URL` nesnesi; yönlendirme URL'lerinde origin bilgisi için kullanılır
+  - `cookieStore` — `cookies()` ile elde edilen çerez deposu; çerez okuma işlemleri için kullanılır
+  - `lang` — `cookieStore.get('NEXT_LOCALE')?.value` ile elde edilen dil değeri; çerez yoksa `'tr'` varsayılan değerini alır
+  - `response` — `NextResponse.redirect()` ile oluşturulan 302 yönlendirme yanıtı; `/{lang}/auth/login` adresine yönlendirir
+- **Dönüş**: `NextResponse` — `response` değişkeni, 302 durum koduyla login sayfasına yönlendirme yanıtı döndürür
+
+**Yan etkiler**: `supabase.auth.getClaims()` ile claims kontrolü yapılır; claims varsa `supabase.auth.signOut()` ile oturum sonlandırılır. `revalidatePath('/', 'layout')` ile kök yoldaki layout önbelleği geçersiz kılınır. `clearClaimsCacheCookie(response)` ile yanıt üzerindeki claims önbellek çerezi temizlenir.
 
 ---
 
@@ -3950,15 +3938,15 @@ Bu modül, kullanıcı oturumunu sonlandıran bir API endpoint'idir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\layout.tsx
-skeleton_hash: 05fc451ce96a0fbf
+source_path: C:\tmp\ops-t165\src\app\[lang]\layout.tsx
+skeleton_hash: b3d7ebd5d2e5bf0c
 entity_hashes:
   func:LangLayout: 894f6821eb40308a
   func:generateMetadata: eb1a1666700b2105
   func:generateStaticParams: 8c98a454509d7f36
   overview: f59cd1af0dc3b1fe
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-24T11:49:16Z
+generated_at: 2026-08-27T06:53:18Z
 ---
 
 ## Genel Bakış
@@ -4119,8 +4107,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx
-skeleton_hash: 61356cfd1e65f41e
+source_path: C:\tmp\ops-t165\src\app\[lang]\page.tsx
+skeleton_hash: fa13207f4aa45982
 entity_hashes:
   func:RootPage: 8ad4b4fd1a8c654d
   func:generateMetadata: 507857aa921043d5
@@ -4128,7 +4116,7 @@ entity_hashes:
   func:getCachedHomeData: 3cdedf9dace01d81
   overview: 721a34f597b2222e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-24T11:50:02Z
+generated_at: 2026-08-27T06:53:29Z
 ---
 
 ## Genel Bakış
@@ -4242,59 +4230,6 @@ type Props = {
 
 ---
 
-### [N2_NASIL] AST Pointer: src/app/[lang]/page.tsx::generateMetadata
-- **params**: `{ params }: Props` — `params` nesnesi `await` ile açılır
-- **ic_degiskenler**:
-  - `lang` — `await params` sonucu elde edilen dil kodu (`'tr'` veya `'en'`)
-  - `dict` — `lang === 'en'` ise `en`, değilse `tr` sözlük nesnesi
-  - `siteUrl` — `SITE_URL` sabiti; site kök URL'si
-  - `canonical` — `` `${siteUrl}/${lang}` `` ifadesiyle oluşturulan canonical URL
-- **Dönüş**: `Promise<Metadata>` — Next.js `Metadata` nesnesi; `title`, `description`, `alternates`, `openGraph`, `twitter`, `robots` alanlarını içerir
-
----
-
-### [N3_NASIL] AST Pointer: src/app/[lang]/page.tsx::getCachedHomeData
-- **params**: `lang: string`, `tenantId: string`
-- **ic_degiskenler**:
-  - `catData` — `getCategories(supabaseStaticClient)` çağrısından dönen kategori verisi
-  - `prodData` — `getProducts(supabaseStaticClient, 12)` çağrısından dönen ürün verisi (12 ürün)
-  - `countRes` — `supabaseStaticClient.rpc('get_category_counts')` çağrısından dönen RPC sonucu
-  - `productCounts` — `Record<string, number>` tipinde; her kategori kimliğine karşılık ürün sayısını tutar
-  - `row` — `countRes.data ?? []` dizisi üzerinde `for...of` ile iterasyon yapılan her satır
-  - `row.category_id` — satırdaki kategori kimliği; `productCounts` sözlüğünün anahtarı olarak kullanılır
-  - `row.product_count` — satırdaki ürün sayısı; `?? 0` ile varsayılan değer atanır
-- **Dönüş**: `{ catData, prodData, productCounts }` — `unstable_cache` ile sarılmış; `['home-page-data', lang, tenantId]` cache anahtarı ve `[HOME_DATA_TAG, homeDataTag(tenantId)]` tag'leri ile `revalidate: 3600` süresi tanımlıdır
-
----
-
-### [N4_NASIL] AST Pointer: src/app/[lang]/page.tsx::RootPage
-- **params**: `{ params }: Props` — `params` nesnesi `await` ile açılır
-- **ic_degiskenler**:
-  - `lang` — `await params` sonucu elde edilen dil kodu
-  - `dict` — `lang === 'en'` ise `en`, değilse `tr` sözlük nesnesi
-  - `tenantConfig` — `getTenantConfig()` çağrısından dönen yapılandırma nesnesi
-  - `tenantId` — `tenantConfig.id`; kiracı kimliği
-  - `categories` — `DomainCategory[]` tipinde; `try` bloğu içinde `toUICategoryList(data.catData)` ile atanır, hata durumunda boş dizi
-  - `products` — `Product[]` tipinde; `try` bloğu içinde `(data.prodData as Product[]) || []` ile atanır, hata durumunda boş dizi
-  - `productCounts` — `Record<string, number>` tipinde; `try` bloğu içinde `data.productCounts` ile atanır, hata durumunda boş nesne
-  - `data` — `getCachedHomeData(lang, tenantId)` çağrısından dönen önbelleklenmiş veri
-  - `error` — `catch` bloğunda yakalanan hata; `console.warn` ile loglanır
-  - `t` — `(key: string) => getDictValue(dict, key)` fonksiyonu; sözlükten değer okumak için çeviri yardımcısı
-  - `displayCategories` — `CategoryViewModelLite[]` tipinde; `categories` dizisinden filtrelenmiş, sıralanmış ve dönüştürülmüş kategori listesi
-  - `c` — `.filter` ve `.map` zincirindeki her kategori nesnesi
-  - `c.parent_id` — üst kategori kimliği; `!c.parent_id` ile üst kategorisi olmayanlar filtrelenir
-  - `c.id` — kategori kimliği; `productCounts[c.id]` ile ürün sayısı kontrol edilir
-  - `c.name` — kategori adı; `compareText` ile sıralamada kullanılır
-  - `c.description` — kategori açıklaması; boşsa `''` atanır
-  - `c.image_url` — kategori görsel URL'si
-  - `siteUrl` — `SITE_URL` sabiti
-  - `jsonLds` — `Array<object>` tipinde; `WebSite` ve `Organization` olmak üzere iki JSON-LD yapı verisi
-  - `ld` — `jsonLds.map` döngüsündeki her JSON-LD nesnesi
-  - `i` — `jsonLds.map` döngüsündeki indeks; `key` prop'u olarak kullanılır
-- **Dönüş**: JSX — `TenantProvider` ile sarılmış; `jsonLds` dizisi üzerinden `<script type="application/ld+json">` etiketleri ve `<HomePage>` bileşeni render edilir. `HomePage`'ye `initialCategories`, `rawCategories`, `initialProducts`, `dictionary`, `lang` prop'ları iletilir
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -4345,14 +4280,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\[lang]\about\page.tsx
-skeleton_hash: f0da2bf968e8f6b7
+source_path: C:\tmp\ops-t165\src\app\[lang]\about\page.tsx
+skeleton_hash: e684f3b4e8e9488b
 entity_hashes:
   func:Page: 6f033064b6e4463f
   func:generateStaticParams: 8c98a454509d7f36
   overview: 8dff6fca298bde81
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:39Z
+generated_at: 2026-08-27T06:49:42Z
 ---
 
 ## Genel Bakış
@@ -4431,9 +4366,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::Page
-  function: page.tsx::generateStaticParams
+  file: src\app\[lang]\about\page.tsx
+  function: src\app\[lang]\about\page.tsx::Page
+  function: src\app\[lang]\about\page.tsx::generateStaticParams
 
 ---
 
@@ -4464,13 +4399,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\layout.tsx
-skeleton_hash: f682ac63af07c487
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\layout.tsx
+skeleton_hash: aa1a70d05becb01e
 entity_hashes:
   func:Layout: f1cd59870391c992
   overview: 3aba322b2667e63f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:49:48Z
 ---
 
 ## Genel Bakış
@@ -4567,13 +4502,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\page.tsx
-skeleton_hash: 34a93a484e8fe06a
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\page.tsx
+skeleton_hash: 80dc6b5756516d79
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 8bcc27d9f8041805
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:49:52Z
 ---
 
 ## Genel Bakış
@@ -4649,13 +4584,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\addresses\page.tsx
-skeleton_hash: 46e74f8e737d3adb
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\addresses\page.tsx
+skeleton_hash: cbdc708b75c19949
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:49:43Z
 ---
 
 ## Genel Bakış
@@ -4834,13 +4769,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\favorites\page.tsx
-skeleton_hash: fd85e2f77a1b7ba9
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\favorites\page.tsx
+skeleton_hash: 7580a6c4e0742922
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 7120e736684183a3
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T08:43:03Z
+generated_at: 2026-08-27T06:49:45Z
 ---
 
 ## Genel Bakış
@@ -4927,13 +4862,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\invoices\page.tsx
-skeleton_hash: 0cb1a9f445e42d79
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\invoices\page.tsx
+skeleton_hash: d1444acdaa3773bb
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:49:47Z
 ---
 
 ## Genel Bakış
@@ -4972,8 +4907,7 @@ Bu modül, minimal bir React sarmalayıcı (wrapper) bileşenidir; fonksiyon gö
 ---
 
 ## SABİTLER
-- **PageComponent** (call) — `nextDynamic(() => import('../../../../views/account/AccountInvoicesPage'), {
-...`
+- **PageComponent** (call) — `nextDynamic(() => import('../../../../views/account/AccountInvoicesPage'), {...`
 
 ---
 
@@ -5019,13 +4953,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\orders\page.tsx
-skeleton_hash: 724856e28fd1364d
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\orders\page.tsx
+skeleton_hash: efebf7a38814ef07
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:49:51Z
 ---
 
 ## Genel Bakış
@@ -5114,13 +5048,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\orders\detail\page.tsx
-skeleton_hash: 9ddea9e996ab6175
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\orders\detail\page.tsx
+skeleton_hash: 5b4a0a40985cede6
 entity_hashes:
   func:Page: 9e0b3aa05006aa66
   overview: c1af68d41814429f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:49:50Z
 ---
 
 ## Genel Bakış
@@ -5206,13 +5140,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\profile\page.tsx
-skeleton_hash: acb9b7729f3fb32f
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\profile\page.tsx
+skeleton_hash: 67d7f769cf6d009c
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 7cf783e7a557a530
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:49:54Z
 ---
 
 ## Genel Bakış
@@ -5288,13 +5222,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\projects\page.tsx
-skeleton_hash: dc63eaf3140937c6
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\projects\page.tsx
+skeleton_hash: 66af088a6ff79d0c
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 830f8638fc03d1cf
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T08:43:03Z
+generated_at: 2026-08-27T06:49:55Z
 ---
 
 ## Genel Bakış
@@ -5575,13 +5509,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\[lang]\account\returns\page.tsx
-skeleton_hash: e5cc6f7b5589d0c3
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\returns\page.tsx
+skeleton_hash: 461c8401e31166a3
 entity_hashes:
   func:Page: 9c08060caeb88969
   overview: 9db8b446a5775015
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-08-25T07:23:44Z
+generated_at: 2026-08-27T06:49:57Z
 ---
 
 ## Genel Bakış
@@ -5646,8 +5580,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::Page
+  file: src\app\[lang]\account\returns\page.tsx
+  function: src\app\[lang]\account\returns\page.tsx::Page
 
 ---
 
@@ -5677,13 +5611,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\security\page.tsx
-skeleton_hash: ec23a479f10a52b1
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\security\page.tsx
+skeleton_hash: c83ce5cfdb43baeb
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: d3e2cc3bf7442df0
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:49:58Z
 ---
 
 ## Genel Bakış
@@ -5770,13 +5704,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\shipments\page.tsx
-skeleton_hash: c56caae0a95c55b9
+source_path: C:\tmp\ops-t165\src\app\[lang]\account\shipments\page.tsx
+skeleton_hash: 5ccd886526270dd8
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 196d231af4e46298
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:50:00Z
 ---
 
 ## Genel Bakış
@@ -5851,22 +5785,27 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\callback\page.tsx
-skeleton_hash: d7753f00949ae2f0
+source_path: C:\tmp\ops-t165\src\app\[lang]\auth\callback\page.tsx
+skeleton_hash: a9d8249ac59fd741
 entity_hashes:
-  func:Page: 02ee67f324c336e5
-  overview: 796eb654597451ee
-  style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+  func:Page: 9c08060caeb88969
+  overview: 87f123706b8e2f74
+  style_tokens: 9144ece4bffe7964
+generated_at: 2026-08-27T06:52:45Z
 ---
 
 ## Genel Bakış
-Bu modül, çok dilli bir yapıda kimlik doğrulama sürecinin callback aşamasını yöneten tek bir React bileşenini (Page) içerir. `[lang]` parametresi sayesinde farklı dillerdeki kullanıcılar için aynı iş akışı sağlanır. Kullanıcı bir dış kimlik sağlayıcıdan yönlendirildiğinde bu sayfa çalıştırılır, gerekli tokenlar işlenir ve kullanıcı uygulamanın ana akışına yönlendirilir.
+Bu modül, çok dilli bir uygulama yapısında kimlik doğrulama sağlayıcısından gelen callback isteklerini karşılayan sayfa bileşenini içerir. `[lang]` dinamik rotası sayesinde farklı diller için aynı callback akışı sunulur. Modül, gerçek iş mantığını barındıran `PageComponent` bileşenini ithal edip render ederek bir sarmalayıcı görevi görür.
 
 ## Fonksiyon Grupları
-### Callback İşleme ve Yönlendirme
-Bu grup, kimlik doğrulama sağlayıcısından gelen yanıtı alıp, oturum bilgilerini (ör. erişim tokenı) saklayarak kullanıcıyı uygun bir sayfaya yönlendirmeyi sorumludur. Dil desteği sayesinde her dil için aynı temel işlem gerçekleştirilir.
+### Callback Sayfa Sarmalayıcı
+Kimlik doğrulama callback sayfasını render eden, parametre almayan ve doğrudan `PageComponent` bileşenini döndüren tek bir bileşenden oluşur. Tüm callback işleme mantığı views katmanındaki `PageComponent` bileşenine devredilmiştir.
 - Page
+
+## Bağımlılıklar
+- **İç bağımlılık**: Yok; modül tek bir fonksiyondan oluşur ve kendi içinde başka fonksiyon çağırmaz.
+- **Dış bağımlılık**: `PageComponent` bileşeni, `../../../../views/AuthCallbackPage` yolundan ithal edilir. Bu bileşen, callback sürecinin asıl iş mantığını (token işleme, yönlendirme vb.) gerçekleştirir.
+- **Dinamik/lazy yükleme**: Kaynakta bu yönde bir bilgi bulunmuyor.
 
 ---
 
@@ -5878,25 +5817,21 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: `Page` fonksiyonu, uygulamanın auth callback sayfasını render eden basit bir bileşen sarmalayıcıdır.  
-**Nasıl yapar**: Fonksiyon gövdesinde doğrudan `<PageComponent />` JSX elemanını döndürür; ek mantık veya state yönetimi içermez.  
-**Parametreler**:  
-- (fonksiyon parametresi almaz)  
-**Dönüş**: JSX elemanı olan `<PageComponent />` döner; bu, sayfanın gerçek içeriğini içeren başka bir bileşendir.
+**Ne yapar**: Bu fonksiyon, bir sayfa bileşenini (PageComponent) React'ın `Suspense` mekanizması ile sararak, bileşen yüklenirken bir yükleme göstergesi (spinner) gösteren bir sayfa kabuğu oluşturur. Asıl sayfa içeriği yüklenene kadar kullanıcıya görsel bir geri bildirim sağlar.
+
+**Nasıl yapar**: Fonksiyon, `PageComponent` bileşenini `<Suspense>` bileşeni ile çevreler. `Suspense` bileşeninin `fallback` prop'una, sayfanın tamamını kaplayan (`min-h-screen`) ve içinde ortalanmış bir yükleme animasyonu (spinner) bulunan bir `<div>` atanmıştır. Bu animasyon, Tailwind CSS sınıfları (`animate-spin`, `rounded-full`, `border-b-2`, `border-primary-navy`) ile stilize edilmiştir. `PageComponent` yüklenene kadar bu fallback içeriği gösterilir.
+
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**: Fonksiyon, bir JSX elementi döndürür. Bu element, `PageComponent`'i saran bir `Suspense` bileşenidir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../../../views/AuthCallbackPage::PageComponent
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\callback\page.tsx::Page
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: `<PageComponent />` JSX element
+- import: react::React
+- import: react::Suspense
 
 ---
 
@@ -5921,10 +5856,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** (yok)
-- **Layout:** (yok)
+- **Renkler:** `border-b-2`, `border-primary-navy`
+- **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** (yok)
+- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`
 
 ---
 # FILE: src\app\[lang]\auth\forgot-password\page.md
@@ -5933,13 +5868,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\forgot-password\page.tsx
-skeleton_hash: d9f5e15eb31323dd
+source_path: C:\tmp\ops-t165\src\app\[lang]\auth\forgot-password\page.tsx
+skeleton_hash: 39ef2e9ba7049e92
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 232ae7bb53cf37d7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:52:47Z
 ---
 
 ## Genel Bakış
@@ -6028,13 +5963,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\login\page.tsx
-skeleton_hash: cfb0f612047668fb
+source_path: C:\tmp\ops-t165\src\app\[lang]\auth\login\page.tsx
+skeleton_hash: d1f3391e238d0ebb
 entity_hashes:
   func:Page: 83ffb23295a76d3b
   overview: 86b7320436f9e263
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:52:48Z
 ---
 
 ## Genel Bakış
@@ -6115,13 +6050,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\register\page.tsx
-skeleton_hash: aa1699d089f8a4d1
+source_path: C:\tmp\ops-t165\src\app\[lang]\auth\register\page.tsx
+skeleton_hash: 461b090aed355b33
 entity_hashes:
   func:Page: bc1b43d61a04fc17
   overview: d837ef1ff30aab7f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:52:50Z
 ---
 
 ## Genel Bakış
@@ -6202,13 +6137,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\reset-password\page.tsx
-skeleton_hash: 215dd04f2d232880
+source_path: C:\tmp\ops-t165\src\app\[lang]\auth\reset-password\page.tsx
+skeleton_hash: a94cd0ee99e45f75
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 6b42d995f8501c84
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T08:43:05Z
+generated_at: 2026-08-27T06:52:51Z
 ---
 
 ## Genel Bakış
@@ -6291,13 +6226,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\brands\page.tsx
-skeleton_hash: ff04888e91ee860f
+source_path: C:\tmp\ops-t165\src\app\[lang]\brands\page.tsx
+skeleton_hash: 5527d8e524051371
 entity_hashes:
   func:Page: 766296f80aeb6522
   overview: c73bb90923c0bd87
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:52:54Z
 ---
 
 ## Genel Bakış
@@ -6381,15 +6316,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\brands\[slug]\page.tsx
-skeleton_hash: c15cf305a34aaa22
+source_path: C:\tmp\ops-t165\src\app\[lang]\brands\[slug]\page.tsx
+skeleton_hash: 04f66f5b6bfce278
 entity_hashes:
   func:Page: 4d65ed88cfe128b6
   func:generateMetadata: 8a3eefe22233ffdc
   func:generateStaticParams: e00bf8d31deb4098
   overview: 76ea9ab109aa0e89
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-26T07:11:51Z
+generated_at: 2026-08-27T06:52:53Z
 ---
 
 ## Genel Bakış
@@ -6539,13 +6474,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\cart\page.tsx
-skeleton_hash: 4e8781721b6dc8a0
+source_path: C:\tmp\ops-t165\src\app\[lang]\cart\page.tsx
+skeleton_hash: 00feb54345475ba2
 entity_hashes:
   func:Page: caa361dd303c55cf
   overview: 77749cbbbd217b97
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:52:56Z
 ---
 
 ## Genel Bakış
@@ -6623,8 +6558,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\category\[categorySlug]\page.tsx
-skeleton_hash: 61cc4647bd19285b
+source_path: C:\tmp\ops-t165\src\app\[lang]\category\[categorySlug]\page.tsx
+skeleton_hash: 6cae321984279fa6
 entity_hashes:
   func:Page: 12913f4fb306f591
   func:generateMetadata: 191280413c5aca03
@@ -6633,7 +6568,7 @@ entity_hashes:
   func:parsePageParam: 478b1488bab262a0
   overview: e37d7f83fc7d9b78
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-08-15T06:32:39Z
+generated_at: 2026-08-27T06:52:59Z
 ---
 
 ## Genel Bakış
@@ -6783,108 +6718,6 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzalarında belirtilen par
 
 ---
 
-### [N2_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::parsePageParam
-- **params**: `raw: string | string[] | undefined`
-- **ic_degiskenler**:
-  - `value` — raw array ise `raw[0]`, değilse raw'un kendisi; parseInt'e girecek ham string
-  - `parsed` — `Number.parseInt(value ?? '1', 10)` sonucu; geçersizse `NaN` döner
-- **Dönüş**: `number` — geçerli ve >1 ise parsed değeri, aksi halde `1`
-
----
-
-### [N3_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::generateStaticParams
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `data` — `supabase.from('categories').select('slug, metadata').eq('is_active', true)` sonucu; tüm aktif kategorilerin slug ve metadata alanları
-  - `categoriesList` — `data`'nın `(data || [])` ile garanti altına alınmış hali; tipi `{ slug: string | null, metadata: unknown }[]`
-- **Dönüş**: `Array<{ lang: 'tr' | 'en', categorySlug: string }>` — her kategori için TR ve EN olmak üzere 2 statik parametre
-
----
-
-### [N4_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::generateStaticParams.flatMap_callback
-- **params**: `c` — `{ slug: string | null, metadata: unknown }` tipinde tek bir kategori satırı
-- **ic_degiskenler**: (yok)
-- **Kullanilan dis kaynaklar**:
-  - `getLocalizedCategorySlug(c, 'tr')` — kategorinin Türkçe lokalize slug'ını döner
-  - `getLocalizedCategorySlug(c, 'en')` — kategorinin İngilizce lokalize slug'ını döner
-- **Dönüş**: `Array<{ lang: 'tr' | 'en', categorySlug: string }>` — tek kategoriden üretilen 2 parametre çifti
-
----
-
-### [N5_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::generateMetadata
-- **params**: `params: Promise<{ categorySlug: string, lang: string }>`
-- **ic_degiskenler**:
-  - `categorySlug` — `await params` destructuring'inden gelen kategori slug'ı (URL parçası)
-  - `lang` — `await params` destructuring'inden gelen dil kodu (`'tr'` veya `'en'`)
-  - `category` — `getCachedCategoryData(categorySlug)` ile cache'lenmiş kategori verisi; bulunamazsa `null`
-  - `dict` — aktif dilin sözlük nesnesi; `lang === 'en'` ise `en`, değilse `tr`
-  - `t` — `(key: string) => getDictValue(dict, key)` fonksiyonu; sözlükten çeviri değeri çeker
-  - `displayName` — `getCategoryDisplayName(category, t)` ile çözülen kategorinin görnen adı
-  - `desc` — SEO meta description; dile göre farklı şablon ile üretilir
-  - `trUrl` — Türkçe canonical URL; `${SITE_URL}/tr/category/${getLocalizedCategorySlug(category, 'tr')}`
-  - `enUrl` — İngilizce canonical URL; `${SITE_URL}/en/category/${getLocalizedCategorySlug(category, 'en')}`
-  - `canonicalUrl` — aktif dile göre `enUrl` veya `trUrl`
-- **Kullanilan dis sabitler**: `SITE_URL`
-- **Yan etkiler**: `preloadCategory(categorySlug)` — veriyi erken prefetch/prime eder
-- **Dönüş**: `Metadata` nesnesi — `title`, `description`, `alternates` (canonical, hreflang), `openGraph`
-
----
-
-### [N6_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::Page
-- **params**: `params: Promise<{ categorySlug: string, lang: string }>`, `searchParams: Promise<{ page?: string | string[] }>`
-- **ic_degiskenler**:
-  - `categorySlug` — `await params` destructuring'inden gelen URL slug'ı
-  - `lang` — `await params` destructuring'inden gelen dil kodu
-  - `pageParam` — `await searchParams` destructuring'inden gelen sayfa parametresi (`string | string[] | undefined`)
-  - `page` — `parsePageParam(pageParam)` sonucu; geçerli pozitif integer veya `1`
-  - `category` — `getCachedCategoryData(categorySlug)` ile çekilmiş kategori nesnesi; `null` olabilir
-  - `expectedSlug` — `getLocalizedCategorySlug(category, lang)` ile hesaplanan dil-specific slug; yönlendirme kontrolü için
-  - `dict` — aktif dilin sözlük nesnesi (`en` veya `tr`)
-  - `t` — `(key: string) => getDictValue(dict, key)` fonksiyonu
-  - `displayName` — `getCategoryDisplayName(category, t)` sonucu; `null/empty` ise `categorySlug` fallback kullanılır
-  - `families` — `FamilyListItem[]`; varsayılan boş dizi; kategori varsa `familiesPage.items` ile doldurulur
-  - `total` — `number`; kategori varsa `familiesPage.total` ile doldurulur
-  - `subCategories` — `DomainCategory[]`; varsayılan boş dizi; kategori varsa filtrelenmiş ve map edilmiş alt kategoriler
-  - `tenantId` — `await getTenantConfig()` sonucunun `.id` alanı; cache key ve API çağrıları için
-  - `subsData` — `supabase.from('categories')...eq('parent_id', category.id)...` sonucunun `data` alanı; ham alt kategori satırları
-  - `countsData` — `supabase.rpc('get_category_counts')` sonucunun `data` alanı; `{ category_id, product_count }` satırları
-  - `countMap` — `Map<string, number>`; `countsData`'dan doldurulan `category_id → product_count` eşleme haritası
-  - `categoriesArray` — `subsData`'nın `(subsData || []) as DbCategory[]` ile tip güvenliği sağlanmış hali
-  - `categoryIds` — `[category.id, ...subCategories.map(s => s.id)]`; ana kategori + tüm geçerli alt kategori ID'leri
-  - `familiesPage` — `getCachedFamilies(lang, tenantId, category.id, page, categoryIds)` sonucu; `{ items, total }`
-  - `jsonLd` — `buildCategoryJsonLd({...})` ile üretilen JSON-LD nesnesi; SEO structured data
-- **Kullanilan dis sabitler**: `SITE_URL`, `PAGE_SIZE`
-- **Kullanilan dis fonksiyonlar**: `preloadCategory`, `getCachedCategoryData`, `getLocalizedCategorySlug`, `getCategoryDisplayName`, `getDictValue`, `getTenantConfig`, `mapDatabaseCategoryToDomain`, `getCachedFamilies`, `buildCategoryJsonLd`, `assertNoUuid`, `permanentRedirect`
-- **Yan etkiler**: `preloadCategory(categorySlug)` prefetch; `permanentRedirect(...)` 308 yönlendirme (koşullu)
-- **Dönüş**: JSX — `<script type="application/ld+json">` + `<React.Suspense>` içinde `<PageComponent>`
-
----
-
-### [N7_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::Page.mapDatabaseCategoryToDomain_callback
-- **params**: `s` — `DbCategory` tipinde ham veritabanı satırı (tüm category alanlarını içerir)
-- **ic_degiskenler**: (yok — inline spread ve map)
-- **Alan dönüşümleri**:
-  - `s.name` → `name: s.name || ''` (null/undefined koruması)
-  - `s.menu_label` → `menu_label: s.menu_label as string | null`
-  - `s.marketing_title` → `marketing_title: s.marketing_title as string | null`
-  - `s.translation_key` → `translation_key: s.translation_key as string | null`
-  - `s.description` → `description: s.description as string | null`
-  - `s.metadata` → `metadata: s.metadata as CategoryMetadata | null`
-  - `s.authority_content` → `authority_content: s.authority_content as AuthorityContent | null`
-  - Diğer alanlar (`id`, `parent_id`, `slug`, `is_active`, `sort_order`, `level`, `image_url`, `seo_title`, `seo_desc`, `created_at`, `updated_at`, `display_mode`, `is_featured`) spread ile doğrudan kopyalanır
-- **Dönüş**: `DomainCategory` — `mapDatabaseCategoryToDomain()` ile dönüştürülmüş kategori nesnesi
-
----
-
-### [N8_NASIL] AST Pointer: `[lang]/category/[categorySlug]/page.tsx`::getCategoryData
-- **params**: `id: string` — kategori UUID'si
-- **ic_degiskenler**: (yok)
-- **Kullanilan dis kaynaklar**: `supabase` (static client)
-- **Sorgu**: `supabase.from('categories').select('*').eq('id', id).single()`
-- **Dönüş**: `Promise<SupabaseResponse>` — tek kategori satırı; bulunamazsa `data: null`
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -6894,8 +6727,8 @@ graph TD
     page_tsx__generateStaticParams["generateStaticParams"]
     page_tsx__getCachedFamilies["getCachedFamilies"]
     page_tsx__parsePageParam["parsePageParam"]
-    page_tsx__Page --> page_tsx__parsePageParam
     page_tsx__Page --> page_tsx__getCachedFamilies
+    page_tsx__Page --> page_tsx__parsePageParam
 ```
 
 ## NODE ID STANDARD
@@ -6939,8 +6772,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx
-skeleton_hash: 8989f94f0cfb0c58
+source_path: C:\tmp\ops-t165\src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx
+skeleton_hash: 1f355d984cd1c1a7
 entity_hashes:
   func:Page: 3f194a51738b081b
   func:generateMetadata: 374cf14702a129ba
@@ -6950,7 +6783,7 @@ entity_hashes:
   func:resolveLocalizedSegments: 606c139694573527
   overview: a95554f4a816ca75
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-08-25T07:24:07Z
+generated_at: 2026-08-27T06:52:57Z
 ---
 
 ## Genel Bakış
@@ -7135,21 +6968,21 @@ graph TD
     page_tsx__getCachedFamilies["getCachedFamilies"]
     page_tsx__parsePageParam["parsePageParam"]
     page_tsx__resolveLocalizedSegments["resolveLocalizedSegments"]
-    page_tsx__generateMetadata --> page_tsx__resolveLocalizedSegments
     page_tsx__Page --> page_tsx__getCachedFamilies
-    page_tsx__Page --> page_tsx__parsePageParam
     page_tsx__Page --> page_tsx__resolveLocalizedSegments
+    page_tsx__generateMetadata --> page_tsx__resolveLocalizedSegments
+    page_tsx__Page --> page_tsx__parsePageParam
 ```
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::getCachedFamilies
-  function: page.tsx::parsePageParam
-  function: page.tsx::generateStaticParams
-  function: page.tsx::resolveLocalizedSegments
-  function: page.tsx::generateMetadata
-  function: page.tsx::Page
+  file: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::getCachedFamilies
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::parsePageParam
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::generateStaticParams
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::resolveLocalizedSegments
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::generateMetadata
+  function: src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx::Page
 
 ---
 
@@ -7184,13 +7017,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\checkout\page.tsx
-skeleton_hash: dc76e2fab76b588a
+source_path: C:\tmp\ops-t165\src\app\[lang]\checkout\page.tsx
+skeleton_hash: fbc4074f1145221f
 entity_hashes:
   func:Page: 752ea1d46a136aae
   overview: cbc240f327cf6544
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:01Z
 ---
 
 ## Genel Bakış
@@ -7278,13 +7111,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\contact\page.tsx
-skeleton_hash: ec76b7a76e7ee380
+source_path: C:\tmp\ops-t165\src\app\[lang]\contact\page.tsx
+skeleton_hash: 6f1e60239787244f
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: a07fce05e4917c91
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:02Z
 ---
 
 ## Genel Bakış
@@ -7368,13 +7201,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\garanti-servis\page.tsx
-skeleton_hash: 6d3d2ab8d6b93195
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\garanti-servis\page.tsx
+skeleton_hash: 23c10a8ae27cbecf
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 6c2c809acf8ab283
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:03Z
 ---
 
 ## Genel Bakış
@@ -7462,13 +7295,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\hesaplayicilar\hava-perdesi\page.tsx
-skeleton_hash: 12863f418bab1f43
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\hesaplayicilar\hava-perdesi\page.tsx
+skeleton_hash: 4d8080b6d7b6981a
 entity_hashes:
   func:Page: 3f2298054a9d2ba4
   overview: 286959abaf4b75d1
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:05Z
 ---
 
 ## Genel Bakış
@@ -7552,13 +7385,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\hesaplayicilar\hrv\page.tsx
-skeleton_hash: 13bcdfaec4698e95
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\hesaplayicilar\hrv\page.tsx
+skeleton_hash: a33f2aba57289cd8
 entity_hashes:
   func:Page: 3f2298054a9d2ba4
   overview: 92457a7c21ad9373
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:06Z
 ---
 
 ## Genel Bakış
@@ -7643,13 +7476,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\hesaplayicilar\jet-fan\page.tsx
-skeleton_hash: 3cd9525d6e558de0
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\hesaplayicilar\jet-fan\page.tsx
+skeleton_hash: a402165decf57641
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: ed78a418e47b7805
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:08Z
 ---
 
 ## Genel Bakış
@@ -7728,13 +7561,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\hesaplayicilar\kanal\page.tsx
-skeleton_hash: 4ea5d13616ae5681
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\hesaplayicilar\kanal\page.tsx
+skeleton_hash: 2c0daa6bb5273a62
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: b10dad1d55a83f15
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:09Z
 ---
 
 ## Genel Bakış
@@ -7822,13 +7655,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\iade-degisim\page.tsx
-skeleton_hash: bcd4432df4f60f35
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\iade-degisim\page.tsx
+skeleton_hash: 727bc594c2ffc5c0
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c2e343e3cf2a2ea2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:11Z
 ---
 
 ## Genel Bakış
@@ -7911,14 +7744,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\konular\[slug]\page.tsx
-skeleton_hash: 718e91b7fb8eaa10
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\konular\[slug]\page.tsx
+skeleton_hash: 655ac8f948363dbc
 entity_hashes:
   func:Page: 2d510b14b2c5d81b
   func:generateStaticParams: f1cbfd553f9fcd39
   overview: 379a6c4a34f8235e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:12Z
 ---
 
 ## Genel Bakış
@@ -8025,13 +7858,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\merkez\page.tsx
-skeleton_hash: 44ff75aca702a312
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\merkez\page.tsx
+skeleton_hash: 1092d173b7c29ea4
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 77d1db6b23de9b07
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:14Z
 ---
 
 ## Genel Bakış
@@ -8111,13 +7944,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\sss\page.tsx
-skeleton_hash: a148bac5d254a7b4
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\sss\page.tsx
+skeleton_hash: e53dbe959fe82cde
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 03efc7ca11e5aa1a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:15Z
 ---
 
 ## Genel Bakış
@@ -8207,13 +8040,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\teslimat-kargo\page.tsx
-skeleton_hash: 64ea44e3df29105d
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\teslimat-kargo\page.tsx
+skeleton_hash: 2640680767ac9ed0
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: eeb2664f8ef21a75
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:16Z
 ---
 
 ## Genel Bakış
@@ -8294,14 +8127,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\cerez-politikasi\page.tsx
-skeleton_hash: fe900b3d5527f4b2
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\cerez-politikasi\page.tsx
+skeleton_hash: 8948c6668486ff6b
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: dbefcec9367e9b65
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:19Z
 ---
 
 ## Genel Bakış
@@ -8403,13 +8236,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\gizlilik-politikasi\page.tsx
-skeleton_hash: 9bd6ed6a6fa608c9
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\gizlilik-politikasi\page.tsx
+skeleton_hash: 592cdd0739c47420
 entity_hashes:
   func:Page: 851f6a31795db41b
   overview: 28f1a50675cb6f01
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:30Z
+generated_at: 2026-08-27T06:53:21Z
 ---
 
 ## Genel Bakış
@@ -8430,10 +8263,6 @@ Bu modül, Next.js App Router yapısında çalışan asenkron bir sayfa bileşen
 [Aksiyom 2]: Eğer `params` Promise'i başarıyla çözümlenemezse (resolve edilemezse), asenkron sayfa render süreci tamamlanamaz ve Next.js sunucu tarafında bir render hatası oluşur.
 
 [Aksiyom 3]: Eğer `lang` değeri uygulamanın desteklediği dil listesinde yer almayan geçersiz bir değer olarak gelirse (örn: `"xx"`, `"jp"` yerine `"ja"` bekleniyorsa), sayfa için çeviri metinleri eşleştirilemeyebilir — fallback mekanizması tanımlı değilse eksik içerik gösterilir.
-
----
-
-**Not:** Bu sayfa modülü tamamen bir üst bileşene (PageComponent vb.) bağımlı olduğu için, sayfa içeriğinin doğru render edilmesi o bağımlı bileşenin varlığına ve doğruluğuna da bağlıdır — ancak bu durum fonksiyon imzasından çıkarılamadığı için aksiyom olarak değil, not olarak belirtilmiştir.
 
 ---
 
@@ -8499,14 +8328,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\kullanim-kosullari\page.tsx
-skeleton_hash: 3d46a45450b5913b
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\kullanim-kosullari\page.tsx
+skeleton_hash: 303f1d6b98cb4244
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: 5231a61d2c38b252
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:33Z
+generated_at: 2026-08-27T06:53:23Z
 ---
 
 ## Genel Bakış
@@ -8526,16 +8355,6 @@ Kullanım Koşulları sayfasının React bileşenini oluşturur ve sunucu taraf�
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, çok dilli (i18n) bir Next.js sayfasıdır. Aksiyonlar fonksiyon imzalarından ve dosya yolu yapısından çıkarılmıştır.
-
----
-
-[Aksiyom 1]: Eğer `generateStaticParams()` fonksiyonu `{ lang: string }` formatında bir dizi döndürmezse, statik sayfa oluşturma (build) aşamasında hata oluşur ve sayfalar önceden derlenemez.
-
-[Aksiyom 2]: Eğer `Page` bileşenine geçirilen `params` promise'i `{ lang: string }` yapısında çözümlenmezse (resolve/reject olursa), bileşen geçerli dil parametresine erişemez ve sayfa içeriği doğru dille gösterilemez.
-
-[Aksiyom 3]: Eğer `lang` parametresi uygulamanın desteklediği dil listesinde (örn: 'tr', 'en') yer almıyorsa, sayfa geçersiz bir dil ile oluşturulur veya 404 hatası döndürülür.
-
-[Aksiyom 4]: Eğer `Page` bileşeni geçerli bir JSX/React elementi (`React.ReactNode`) döndürmezse veya `undefined`/`null` döndürse, tarayıcıda boş sayfa veya React hata sınırı (error boundary) tetiklenir.
 
 ---
 
@@ -8619,14 +8438,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\[lang]\legal\kvkk\page.tsx
-skeleton_hash: 871091e899426f74
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\kvkk\page.tsx
+skeleton_hash: bb212cc11d3dd91d
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: 5fe3924512d7505c
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:50Z
+generated_at: 2026-08-27T06:53:24Z
 ---
 
 ## Genel Bakış
@@ -8697,9 +8516,9 @@ Bu modül, Next.js App Router yapısında `[lang]` dinamik segmenti altında yer
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::generateStaticParams
-  function: page.tsx::Page
+  file: src\app\[lang]\legal\kvkk\page.tsx
+  function: src\app\[lang]\legal\kvkk\page.tsx::generateStaticParams
+  function: src\app\[lang]\legal\kvkk\page.tsx::Page
 
 ---
 
@@ -8730,14 +8549,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\mesafeli-satis-sozlesmesi\page.tsx
-skeleton_hash: 05c1042723e61e07
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\mesafeli-satis-sozlesmesi\page.tsx
+skeleton_hash: a1e3194eab8f878c
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: 0f7f79057de13ae8
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:26Z
 ---
 
 ## Genel Bakış
@@ -8840,14 +8659,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx
-skeleton_hash: fb6641ae7be2819b
+source_path: C:\tmp\ops-t165\src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx
+skeleton_hash: 4cca32ae0e9debc7
 entity_hashes:
   func:Page: 851f6a31795db41b
   func:generateStaticParams: 42ae72125a484b5f
   overview: c6e80b9884dd71c2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:59Z
+generated_at: 2026-08-27T06:53:27Z
 ---
 
 ## Genel Bakış
@@ -8911,9 +8730,9 @@ URL'den gelen `lang` parametresini alarak ön bilgilendirme formu sayfasını re
 
 ## NODE ID STANDARD
 
-  file: page.tsx
-  function: page.tsx::generateStaticParams
-  function: page.tsx::Page
+  file: src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx
+  function: src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx::generateStaticParams
+  function: src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx::Page
 
 ---
 
@@ -8944,13 +8763,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\payment-success\page.tsx
-skeleton_hash: 9a405f8d33a1ddeb
+source_path: C:\tmp\ops-t165\src\app\[lang]\payment-success\page.tsx
+skeleton_hash: a0191f5f10860315
 entity_hashes:
   func:Page: bf48e1a50cafa3b0
   overview: c57cfc349133b98c
   style_tokens: fca21e5c46ce3029
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:31Z
 ---
 
 ## Genel Bakış
@@ -52587,12 +52406,12 @@ Bu dosyada fonksiyon tanımı bulunmamaktadır. Dosya yalnızca `webhooks` adın
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\audit.ts
-skeleton_hash: 9ad955496d105f1f
+source_path: C:\tmp\ops-t165\src\lib\audit.ts
+skeleton_hash: d2246538cf4d6f05
 entity_hashes:
   func:logAdminAction: 83ab9f1273deee6a
   overview: beb3974c7555e069
-generated_at: 2026-06-19T20:48:09Z
+generated_at: 2026-08-27T06:57:23Z
 ---
 
 ## Genel Bakış
@@ -52695,12 +52514,12 @@ type AdminAuditAction = 'INSERT' | 'UPDATE' | 'DELETE' | 'CUSTOM'
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\ensureSessionFresh.ts
-skeleton_hash: 17deb46f64faae1d
+source_path: C:\tmp\ops-t165\src\lib\ensureSessionFresh.ts
+skeleton_hash: d0ba5facacb60a85
 entity_hashes:
   func:ensureSessionFresh: 28037b5d7337277a
   overview: 7e306322f9d1fbb3
-generated_at: 2026-06-19T20:48:09Z
+generated_at: 2026-08-27T06:57:32Z
 ---
 
 ## Genel Bakış
@@ -52779,8 +52598,8 @@ Bu fonksiyon herhangi bir parametre almamaktadır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\errorReporter.ts
-skeleton_hash: 614316a41b8c4e4b
+source_path: C:\tmp\ops-t165\src\lib\errorReporter.ts
+skeleton_hash: deda32c96eeab034
 entity_hashes:
   func:describeError: f982c2b4529ce11b
   func:reportError: 33efe1f9e1957e00
@@ -52791,7 +52610,7 @@ entity_hashes:
   func:sendToEdge: 38f38b99a458a86f
   func:truncate: 8f9f7f00279f8ac4
   overview: 0e6aadea8acd54ac
-generated_at: 2026-08-25T07:28:13Z
+generated_at: 2026-08-27T06:57:34Z
 ---
 
 ## Genel Bakış
@@ -52966,28 +52785,28 @@ graph TD
     errorReporter_ts__sanitizeContext["sanitizeContext"]
     errorReporter_ts__sendToEdge["sendToEdge"]
     errorReporter_ts__truncate["truncate"]
+    errorReporter_ts__reportError --> errorReporter_ts__sanitizeContext
     errorReporter_ts__reportError --> errorReporter_ts__sendToEdge
     errorReporter_ts__reportError --> errorReporter_ts__safeUserAgent
-    errorReporter_ts__reportError --> errorReporter_ts__sanitizeContext
+    errorReporter_ts__reportError --> errorReporter_ts__describeError
     errorReporter_ts__reportError --> errorReporter_ts__truncate
-    errorReporter_ts__sanitizeContext --> errorReporter_ts__truncate
     errorReporter_ts__sendToEdge --> errorReporter_ts__resolveBearerToken
     errorReporter_ts__safeUserAgent --> errorReporter_ts__truncate
-    errorReporter_ts__reportError --> errorReporter_ts__describeError
+    errorReporter_ts__sanitizeContext --> errorReporter_ts__truncate
     errorReporter_ts__reportError --> errorReporter_ts__safePageUrl
 ```
 
 ## NODE ID STANDARD
 
-  file: errorReporter.ts
-  function: errorReporter.ts::truncate
-  function: errorReporter.ts::describeError
-  function: errorReporter.ts::safePageUrl
-  function: errorReporter.ts::safeUserAgent
-  function: errorReporter.ts::sanitizeContext
-  function: errorReporter.ts::resolveBearerToken
-  function: errorReporter.ts::sendToEdge
-  function: errorReporter.ts::reportError
+  file: src\lib\errorReporter.ts
+  function: src\lib\errorReporter.ts::truncate
+  function: src\lib\errorReporter.ts::describeError
+  function: src\lib\errorReporter.ts::safePageUrl
+  function: src\lib\errorReporter.ts::safeUserAgent
+  function: src\lib\errorReporter.ts::sanitizeContext
+  function: src\lib\errorReporter.ts::resolveBearerToken
+  function: src\lib\errorReporter.ts::sendToEdge
+  function: src\lib\errorReporter.ts::reportError
 
 ---
 
@@ -53681,12 +53500,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\order.ts
-skeleton_hash: caa6a8920fb718d0
+source_path: C:\tmp\ops-t165\src\lib\order.ts
+skeleton_hash: 8cf2ce519513741b
 entity_hashes:
   func:validateServerCart: be0fbe2d0b50eaac
   overview: 5c7e7d27dac9b004
-generated_at: 2026-08-24T12:48:52Z
+generated_at: 2026-08-27T06:57:38Z
 ---
 
 ## Genel Bakış
@@ -53791,8 +53610,8 @@ Sunucu tarafında tutulan kullanıcı alışveriş sepetlerinin geçerlilik ve e
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\orderStatusService.ts
-skeleton_hash: b1e72bfe3697ffe8
+source_path: C:\tmp\ops-t165\src\lib\orderStatusService.ts
+skeleton_hash: 2afed7d0bf88078b
 entity_hashes:
   func:isReturnStatus: b72fd60a31916058
   func:resolveDbFields: bb3f04ce63170b18
@@ -53801,7 +53620,7 @@ entity_hashes:
   func:syncReturnsRecord: dc5a56e469e899d4
   func:updateOrderStatus: b743f322bfcde089
   overview: 9db0fdcde6bd771e
-generated_at: 2026-08-24T12:49:42Z
+generated_at: 2026-08-27T06:57:39Z
 ---
 
 ## Genel Bakış
@@ -54014,9 +53833,9 @@ graph TD
     orderStatusService_ts__syncReturnsRecord["syncReturnsRecord"]
     orderStatusService_ts__updateOrderStatus["updateOrderStatus"]
     orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__isReturnStatus
+    orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__resolveDbFields
     orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__restoreStockForOrder
     orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__syncReturnsRecord
-    orderStatusService_ts__updateOrderStatus --> orderStatusService_ts__resolveDbFields
 ```
 
 ## NODE ID STANDARD
@@ -54046,13 +53865,13 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\pdfAssets.ts
-skeleton_hash: 0bd969c579540042
+source_path: C:\tmp\ops-t165\src\lib\pdfAssets.ts
+skeleton_hash: 9d97eb931a529aaf
 entity_hashes:
   func:getAbsoluteAssetUrl: 96c03e7f744b3527
   func:getBase64ImageFromUrl: ca8a45fdefa4e7ed
   overview: 4faa1d63c142f598
-generated_at: 2026-08-25T07:27:53Z
+generated_at: 2026-08-27T06:57:41Z
 ---
 
 ## Genel Bakış
@@ -54135,9 +53954,9 @@ Bir görsel URL'sini asenkron olarak alıp, görselin base64 kodlanmış halini 
 
 ## NODE ID STANDARD
 
-  file: pdfAssets.ts
-  function: pdfAssets.ts::getAbsoluteAssetUrl
-  function: pdfAssets.ts::getBase64ImageFromUrl
+  file: src\lib\pdfAssets.ts
+  function: src\lib\pdfAssets.ts::getAbsoluteAssetUrl
+  function: src\lib\pdfAssets.ts::getBase64ImageFromUrl
 
 ---
 
@@ -54154,13 +53973,13 @@ Bir görsel URL'sini asenkron olarak alıp, görselin base64 kodlanmış halini 
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\pdfGenerator.ts
-skeleton_hash: 9a0d463b06abe5e4
+source_path: C:\tmp\ops-t165\src\lib\pdfGenerator.ts
+skeleton_hash: 043aa06516120779
 entity_hashes:
   func:arrayBufferToBase64: ac0cb07b30bf5c01
   func:generateProductDatasheet: eac5e07d950d7a2e
   overview: 8f2e14b413976ba5
-generated_at: 2026-06-19T20:48:09Z
+generated_at: 2026-08-27T06:57:43Z
 ---
 
 ## Genel Bakış
@@ -54481,11 +54300,11 @@ Cevap "vaat" ise açılacak sayfalar RLS ölçümüyle tek tek eklenir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\supabase.ts
-skeleton_hash: d0b01bf4098a6681
+source_path: C:\tmp\ops-t165\src\lib\supabase.ts
+skeleton_hash: 60ed5cf7146f77ea
 entity_hashes:
   overview: 8a47b4c00ad1c0ec
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:07:34Z
 ---
 
 ## Genel Bakış
@@ -54562,12 +54381,12 @@ Bu dosyada analiz edilecek **fonksiyon gövdesi bulunmamaktadır**.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\tenantResolver.ts
-skeleton_hash: 8062e9abd5eb49d4
+source_path: C:\tmp\ops-t165\src\lib\tenantResolver.ts
+skeleton_hash: 8ef0c96ccf6701db
 entity_hashes:
   func:resolveTenant: c08cc2e05c8a4513
   overview: 7802d22f60606102
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:08:08Z
 ---
 
 ## Genel Bakış
@@ -54651,8 +54470,8 @@ Bu modül için yalnızca fonksiyon imzasından türetilebilecek temel varsayım
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\type-converters.ts
-skeleton_hash: 8594d2eca488a9e5
+source_path: C:\tmp\ops-t165\src\lib\type-converters.ts
+skeleton_hash: 1c8dc1c27f25a678
 entity_hashes:
   func:isRecord: 9a2880b352f34e74
   func:mapCategoryWithLocale: b422ccbc9ea334f8
@@ -54662,7 +54481,7 @@ entity_hashes:
   func:toUICategoryList: 9721c9c2f6b7b799
   func:toUIProductList: a473c58e2b2833ca
   overview: f13174abbed571b6
-generated_at: 2026-08-25T07:28:01Z
+generated_at: 2026-08-27T07:08:10Z
 ---
 
 ## Genel Bakış
@@ -54787,14 +54606,14 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: type-converters.ts
-  function: type-converters.ts::toSupabaseJson
-  function: type-converters.ts::isRecord
-  function: type-converters.ts::mapDatabaseCategoryToDomain
-  function: type-converters.ts::mapDatabaseProductToDomain
-  function: type-converters.ts::toUICategoryList
-  function: type-converters.ts::toUIProductList
-  function: type-converters.ts::mapCategoryWithLocale
+  file: src\lib\type-converters.ts
+  function: src\lib\type-converters.ts::toSupabaseJson
+  function: src\lib\type-converters.ts::isRecord
+  function: src\lib\type-converters.ts::mapDatabaseCategoryToDomain
+  function: src\lib\type-converters.ts::mapDatabaseProductToDomain
+  function: src\lib\type-converters.ts::toUICategoryList
+  function: src\lib\type-converters.ts::toUIProductList
+  function: src\lib\type-converters.ts::mapCategoryWithLocale
 
 ---
 
@@ -54814,13 +54633,13 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\utils.ts
-skeleton_hash: bf9dd00541d5ca81
+source_path: C:\tmp\ops-t165\src\lib\utils.ts
+skeleton_hash: 0a8cb48ab465ab27
 entity_hashes:
   func:buildWhatsAppLink: 5a13d41915079738
   func:cn: 2cda58c352da4d7c
   overview: 0d255118ec884be0
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:08:11Z
 ---
 
 ## Genel Bakış
@@ -54916,8 +54735,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\csvProductMapping.ts
-skeleton_hash: 7ef94559dd3cb641
+source_path: C:\tmp\ops-t165\src\lib\admin\csvProductMapping.ts
+skeleton_hash: 9398fe8f1886bf11
 entity_hashes:
   func:hazirlaUrunSatirlari: 499631139b430177
   func:kategoriIdBul: 39ac7a650db7a3fe
@@ -54926,7 +54745,7 @@ entity_hashes:
   func:slugAnahtari: 5862670ce51cb575
   func:urunSlugUret: 5952d0a7efa5241d
   overview: f7655cb8d9cfeb74
-generated_at: 2026-08-24T11:55:32Z
+generated_at: 2026-08-27T06:56:46Z
 ---
 
 ## Genel Bakış
@@ -55091,12 +54910,12 @@ graph TD
     csvProductMapping_ts__metadataSluglari["metadataSluglari"]
     csvProductMapping_ts__slugAnahtari["slugAnahtari"]
     csvProductMapping_ts__urunSlugUret["urunSlugUret"]
-    csvProductMapping_ts__urunSlugUret --> csvProductMapping_ts__slugAnahtari
-    csvProductMapping_ts__kategoriIdBul --> csvProductMapping_ts__slugAnahtari
     csvProductMapping_ts__kategoriIdBul --> csvProductMapping_ts__metadataSluglari
     csvProductMapping_ts__metadataSluglari --> csvProductMapping_ts__kayitMi
-    csvProductMapping_ts__hazirlaUrunSatirlari --> csvProductMapping_ts__urunSlugUret
+    csvProductMapping_ts__urunSlugUret --> csvProductMapping_ts__slugAnahtari
     csvProductMapping_ts__hazirlaUrunSatirlari --> csvProductMapping_ts__kategoriIdBul
+    csvProductMapping_ts__kategoriIdBul --> csvProductMapping_ts__slugAnahtari
+    csvProductMapping_ts__hazirlaUrunSatirlari --> csvProductMapping_ts__urunSlugUret
 ```
 
 ## NODE ID STANDARD
@@ -55129,12 +54948,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\admin\inboxCounts.ts
-skeleton_hash: 59e096981ef05cc6
+source_path: C:\tmp\ops-t165\src\lib\admin\inboxCounts.ts
+skeleton_hash: 7b4b1e16c5b89dcc
 entity_hashes:
   func:fetchInboxCounts: 87c45c5352b61223
   overview: 4445631b0879c94f
-generated_at: 2026-08-25T07:27:48Z
+generated_at: 2026-08-27T06:56:48Z
 ---
 
 ## Genel Bakış
@@ -55221,8 +55040,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesinden tür
 
 ## NODE ID STANDARD
 
-  file: inboxCounts.ts
-  function: inboxCounts.ts::fetchInboxCounts
+  file: src\lib\admin\inboxCounts.ts
+  function: src\lib\admin\inboxCounts.ts::fetchInboxCounts
 
 ---
 
@@ -55237,13 +55056,13 @@ Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesinden tür
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\admin\mutateWithAudit.ts
-skeleton_hash: 1bbef8d128a791ff
+source_path: C:\tmp\ops-t165\src\lib\admin\mutateWithAudit.ts
+skeleton_hash: 03e86d09225587ae
 entity_hashes:
   func:AdminPermissionError:constructor: 6bdb0294b4ca977f
   func:mutateWithAudit: e6e4bf4f5f88c365
   overview: f4a791bb090e6115
-generated_at: 2026-08-25T07:27:53Z
+generated_at: 2026-08-27T06:57:14Z
 ---
 
 ## Genel Bakış
@@ -55300,7 +55119,14 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan 
 **Dönüş**: Promise<R> — `args.fn()` fonksiyonunun dönüş değeri
 
 ### constructor
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: `AdminPermissionError` sınıfının yapıcı metodudur. RBAC (Role-Based Access Control) sisteminde belirli bir kaynak üzerinde yazma yetkisi bulunmadığında fırlatılacak özel bir hata nesnesi oluşturur.
+
+**Nasıl yapar**: Üst sınıfın (muhtemelen `Error`) `super()` metodunu çağırarak hata mesajını iletir. Mesajda, yetkisiz erişim denemesinin yapıldığı kaynak adı string interpolasyonu ile yerleştirilir. Ardından `this.name` özelliği `'AdminPermissionError'` olarak ayarlanarak hatanın türü tanımlanır.
+
+**Parametreler**:
+- resource: string — Yetkisiz erişim denemesinin yapıldığı kaynak adını temsil eder. Hata mesajında bu değer kullanıcıya gösterilir.
+
+**Dönüş**: Belirtilmemiş. Constructor'lar tipik olarak sınıf örneğini döndürür ancak kaynak kodda açık bir dönüş tipi tanımlanmamıştır.
 
 ---
 
@@ -55342,34 +55168,32 @@ type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE'
 ### [N1_NASIL] AST Pointer: src/lib/admin/mutateWithAudit.ts::AdminPermissionError.constructor
 - **params**: `resource: string`
 - **ic_degiskenler**:
-  - `resource` — Hata mesajında kullanılacak kaynak adı. `super` çağrısına `'${resource}'` olarak iletilir.
-- **Dönüş**: yok
+  - `resource` — `super()` çağrısında hata mesajında kaynak adı olarak kullanılır; mesaj formatı: `RBAC: '${resource}' kaynağında yazma yetkisi yok`
+- **Dönüş**: yok (constructor; `this.name` alanını `'AdminPermissionError'` olarak ayarlar)
 
 ### [N2_NASIL] AST Pointer: src/lib/admin/mutateWithAudit.ts::mutateWithAudit
 - **params**: `supabase: SupabaseClient<Database>`, `args: MutateWithAuditArgs<R>`
 - **ic_degiskenler**:
-  - `args.canWrite` — Yazma izni olup olmadığını kontrol eden boolean değer. `false` ise `AdminPermissionError` fırlatılır.
-  - `args.resource` — Hata fırlatma ve denetim günlüğü için kullanılan kaynak adı.
-  - `args.fn` — Çağrılacak ve sonucu döndürülecek mutasyon fonksiyonu.
-  - `args.auditedByEdge` — Denetim günlüğünün kenar (edge) tarafından yazılıp yazılmadığını gösteren boolean. `true` ise denetim günlüğü atlanır.
-  - `args.after` — Denetim günlüğü için mutasyon sonrası durumu temsil eden veri.
-  - `args.afterFrom` — Mutasyon sonucundan (`result`) denetim günlüğü için sonrası durumu çıkaran fonksiyon. Varsa kullanılır, başarısız olursa `args.after` kullanılır.
-  - `args.rowPk` — Denetim günlüğü için satır birincil anahtarı.
-  - `args.action` — Denetim günlüğü için gerçekleştirilen eylem.
-  - `args.before` — Denetim günlüğü için mutasyon öncesi durumu temsil eden veri.
-  - `args.comment` — Denetim günlüğü için yorum.
-  - `result` — `args.fn()` çağrısının döndürdüğü mutasyon sonucu.
-  - `after` — Denetim günlüğüne yazılacak nihai sonrası durum verisi. Önce `args.afterFrom` ile hesaplanır, başarısız olursa `args.after` kullanılır.
-  - `e` — `args.afterFrom` veya `logAdminAction` çağrılarındaki hataları yakalamak için kullanılan hata nesnesi.
-- **Dönüş**: `Promise<R>` — Mutasyon fonksiyonunun (`args.fn`) döndürdüğü sonuç.
+  - `args.canWrite` — yazma yetkisi olup olmadığını belirten boolean; `false` ise `AdminPermissionError` fırlatılır
+  - `args.resource` — yetki hatası durumunda `AdminPermissionError`'a kaynak adı olarak geçilir, audit log'da `table_name` olarak kullanılır
+  - `result` — `args.fn()` çağrısının dönüş değeri; fonksiyonun asıl mutasyon sonucunu tutar
+  - `args.auditedByEdge` — audit log'un edge tarafında yapılıp yapılmadığını gösteren boolean; `true` ise audit log bloğu atlanır
+  - `after` — audit log'a gönderilecek "sonrası" durumu; başlangıçta `args.after` değerini alır
+  - `args.afterFrom` — varsa `result`'ı alıp `after` değerini dönüştüren fonksiyon; başarısız olursa `args.after`'a düşülür
+  - `e` — `catch` bloklarında yakalanan hata nesnesi; `console.error` ile loglanır
+  - `args.rowPk` — audit log'da satır birincil anahtarı olarak kullanılır
+  - `args.action` — audit log'da gerçekleştirilen işlem türünü belirtir
+  - `args.before` — audit log'da işlem öncesi durumu belirtir
+  - `args.comment` — audit log'da işlem açıklaması olarak kullanılır
+- **Dönüş**: `Promise<R>` — mutasyon sonucu olan `result` değerini döndürür
 
 ---
 
 ## NODE ID STANDARD
 
-  file: mutateWithAudit.ts
-  function: mutateWithAudit.ts::mutateWithAudit
-  class: mutateWithAudit.ts::AdminPermissionError
+  file: src\lib\admin\mutateWithAudit.ts
+  function: src\lib\admin\mutateWithAudit.ts::mutateWithAudit
+  class: src\lib\admin\mutateWithAudit.ts::AdminPermissionError
 
 ---
 
@@ -55386,14 +55210,14 @@ type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE'
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\orderStatusDomain.ts
-skeleton_hash: da867097de75ab9e
+source_path: C:\tmp\ops-t165\src\lib\admin\orderStatusDomain.ts
+skeleton_hash: 6b419ac5e02742f1
 entity_hashes:
   func:isOrderDbStatus: 2848b6982ecea1b1
   func:isPaymentDbStatus: accaf3e49b13b529
   func:isRefundedPayment: b9a0325c31574e1e
   overview: d1d23deaf89d76c1
-generated_at: 2026-08-25T08:46:16Z
+generated_at: 2026-08-27T06:57:15Z
 ---
 
 ## Genel Bakış
@@ -55541,13 +55365,13 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\orderStatusLabels.ts
-skeleton_hash: 72e0e1d3bf819b01
+source_path: C:\tmp\ops-t165\src\lib\admin\orderStatusLabels.ts
+skeleton_hash: 8546064f4077710a
 entity_hashes:
   func:isOrderBoardStatus: 83f58a39bb062cc5
   func:orderStatusLabel: fd64fbe04de7c1df
   overview: 39e6e6fc2196bd21
-generated_at: 2026-08-25T08:46:18Z
+generated_at: 2026-08-27T06:57:17Z
 ---
 
 ## Genel Bakış
@@ -55657,13 +55481,13 @@ type Translate = (key: string, params?: Record<string, unknown>) => string
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\admin\orderStatusMachine.ts
-skeleton_hash: a47068840509eb87
+source_path: C:\tmp\ops-t165\src\lib\admin\orderStatusMachine.ts
+skeleton_hash: 3f66b0e1667490f2
 entity_hashes:
   func:allowedNextOrderStatuses: aeafdd7e384021d1
   func:canTransitionOrder: b9d35825d6dc47f6
   overview: 94cd02ee81a21baa
-generated_at: 2026-08-25T07:27:46Z
+generated_at: 2026-08-27T06:57:18Z
 ---
 
 ## Genel Bakış
@@ -55674,12 +55498,6 @@ Bu modül, sipariş durumları arasındaki geçiş kurallarını tanımlayan bir
 ### Durum Geçiş Kontrolü
 Sipariş durum geçişlerinin geçerliliğini sorgulayan fonksiyonları içerir. Mevcut bir durumdan yapılabilecek geçişleri listeler ve belirli bir geçişin izinli olup olmadığını denetler.
 - allowedNextOrderStatuses, canTransitionOrder
-
----
-
-**Notlar:**
-- `OrderBoardStatus` tipi bu modülün dışından tanımlanmış olup, geçerli sipariş durumlarını temsil eder.
-- `canTransitionOrder` fonksiyonunun, `allowedNextOrderStatuses` fonksiyonunu çağırarak çalışıp çalışmadığı kaynak kodda belirtilmemiştir; bu nedenle ikisi arasındaki kesin ilişki bilinmemektedir.
 
 ---
 
@@ -55761,9 +55579,9 @@ type OrderBoardStatus = | 'pending'
 
 ## NODE ID STANDARD
 
-  file: orderStatusMachine.ts
-  function: orderStatusMachine.ts::allowedNextOrderStatuses
-  function: orderStatusMachine.ts::canTransitionOrder
+  file: src\lib\admin\orderStatusMachine.ts
+  function: src\lib\admin\orderStatusMachine.ts::allowedNextOrderStatuses
+  function: src\lib\admin\orderStatusMachine.ts::canTransitionOrder
 
 ---
 
@@ -55779,12 +55597,12 @@ type OrderBoardStatus = | 'pending'
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\admin\returnStatusMachine.ts
-skeleton_hash: 5ce707b066c93a43
+source_path: C:\tmp\ops-t165\src\lib\admin\returnStatusMachine.ts
+skeleton_hash: 906a940d2991e98c
 entity_hashes:
   func:allowedNextStatuses: c5a64be7cb890a38
   overview: eb1dc3e13feb0c1b
-generated_at: 2026-08-25T07:27:50Z
+generated_at: 2026-08-27T06:57:20Z
 ---
 
 ## Genel Bakış
@@ -55863,8 +55681,8 @@ type ReturnStatus = | 'requested'
 
 ## NODE ID STANDARD
 
-  file: returnStatusMachine.ts
-  function: returnStatusMachine.ts::allowedNextStatuses
+  file: src\lib\admin\returnStatusMachine.ts
+  function: src\lib\admin\returnStatusMachine.ts::allowedNextStatuses
 
 ---
 
@@ -55879,8 +55697,8 @@ type ReturnStatus = | 'requested'
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\search\resourceSearchers.ts
-skeleton_hash: b24fef132eec349c
+source_path: C:\tmp\ops-t165\src\lib\admin\search\resourceSearchers.ts
+skeleton_hash: 36e28e38ee943b94
 entity_hashes:
   func:_movementQueryFn: a6e6ecbab9529862
   func:_velocityQueryFn: 42a2402d1f1ce214
@@ -55895,7 +55713,7 @@ entity_hashes:
   func:searchReturns: 821955f70c7c4d56
   func:searchUsers: be44fc325c9a7016
   overview: 2c3ae4e9b1596f22
-generated_at: 2026-08-24T12:48:21Z
+generated_at: 2026-08-27T06:57:21Z
 ---
 
 ## Genel Bakış
@@ -56197,8 +56015,8 @@ graph TD
     resourceSearchers_ts__searchProducts["searchProducts"]
     resourceSearchers_ts__searchReturns["searchReturns"]
     resourceSearchers_ts__searchUsers["searchUsers"]
-    resourceSearchers_ts__searchInventory --> resourceSearchers_ts___velocityQueryFn
     resourceSearchers_ts__searchMovements --> resourceSearchers_ts___movementQueryFn
+    resourceSearchers_ts__searchInventory --> resourceSearchers_ts___velocityQueryFn
 ```
 
 ## NODE ID STANDARD
@@ -56242,15 +56060,15 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\cache\tags.ts
-skeleton_hash: 85228f198cb06b9c
+source_path: C:\tmp\ops-t165\src\lib\cache\tags.ts
+skeleton_hash: 412a2bf37c447ac4
 entity_hashes:
   func:discoveryTag: 95a49a01d81cd6c2
   func:familyTag: ba67c6f5b527773a
   func:homeDataTag: 303b142949a39355
   func:variantStockTag: 5ec1e6fcd103258e
   overview: 070e09d2f73aa81b
-generated_at: 2026-08-25T08:46:29Z
+generated_at: 2026-08-27T06:57:24Z
 ---
 
 ## Genel Bakış
@@ -56363,12 +56181,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\data\csvImportGuard.ts
-skeleton_hash: a4e005618add51d3
+source_path: C:\tmp\ops-t165\src\lib\data\csvImportGuard.ts
+skeleton_hash: ce7606c85eafc439
 entity_hashes:
   func:splitByExistingSku: d2107b0423a7baf1
   overview: d58c9002ee424267
-generated_at: 2026-08-25T08:46:25Z
+generated_at: 2026-08-27T06:57:26Z
 ---
 
 ## Genel Bakış
@@ -56460,14 +56278,14 @@ type ImportSplit = <T extends SkuBearing>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\data\preload.ts
-skeleton_hash: 1ecde0090d80f049
+source_path: C:\tmp\ops-t165\src\lib\data\preload.ts
+skeleton_hash: 39431ced20de9260
 entity_hashes:
   func:preloadCategory: c41a63f5591b9705
   func:preloadFamily: 88b4c30632a4f69a
   func:preloadProduct: fd0b3bb92f6ab3aa
   overview: 291aab3ad1b06ceb
-generated_at: 2026-08-25T07:28:08Z
+generated_at: 2026-08-27T06:57:27Z
 ---
 
 ## Genel Bakış
@@ -56608,10 +56426,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: preload.ts
-  function: preload.ts::preloadFamily
-  function: preload.ts::preloadProduct
-  function: preload.ts::preloadCategory
+  file: src\lib\data\preload.ts
+  function: src\lib\data\preload.ts::preloadFamily
+  function: src\lib\data\preload.ts::preloadProduct
+  function: src\lib\data\preload.ts::preloadCategory
 
 ---
 
@@ -56633,12 +56451,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\data\productRoute.ts
-skeleton_hash: 6ba85168e43af72a
+source_path: C:\tmp\ops-t165\src\lib\data\productRoute.ts
+skeleton_hash: ed3e1fcf21773c7e
 entity_hashes:
   func:resolveProductRoute: 69c463e1d31d1e03
   overview: 3ce8abad1f29d75f
-generated_at: 2026-08-25T08:46:28Z
+generated_at: 2026-08-27T06:57:29Z
 ---
 
 ## Genel Bakış
@@ -56671,10 +56489,6 @@ Bu modül için fonksiyon gövdesi verilmediğinden, davranışsal aksiyom üret
 **[Aksiyom 3]**: Eğer `deps` parametresi sağlanmazsa, fonksiyonun bağımlılıklara (veri erişimi, servisler vb.) erişimi olmaz ve çalışması beklenemez.
 
 **[Aksiyom 4]**: Eğer `ProductRouteDeps` yapısı beklenen üyeleri içermiyorsa, fonksiyonun hangi davranışı sergileyeceği bilinmiyor (fonksiyon gövdesi mevcut değil).
-
----
-
-> **Not**: Fonksiyon gövdesi (`resolveProductRoute` implementasyonu) sağlanmadığı için, `slug` ve `lang` değerlerinin nasıl doğrulandığı, hangi eşik değerlerinin kullanıldığı, hata durumlarının nasıl ele alındığı, `ProductRouteResolution`'ın hangi koşullarda hangi alanları içerdiği gibi davranışsal detaylar belirlenememektedir. Daha kesin aksiyomlar için fonksiyon gövdesi gereklidir.
 
 ---
 
@@ -56778,12 +56592,12 @@ type ProductRouteResolution = | { kind: 'family'; detail: FamilyDetail }
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\data\selectVariant.ts
-skeleton_hash: 6ccfa44bfd139a48
+source_path: C:\tmp\ops-t165\src\lib\data\selectVariant.ts
+skeleton_hash: de4e8dbc69aa2b11
 entity_hashes:
   func:selectVariant: ac5f2e14be230ef9
   overview: de5b89a98f0e8505
-generated_at: 2026-08-25T08:44:09Z
+generated_at: 2026-08-27T06:57:30Z
 ---
 
 ## Genel Bakış
@@ -56875,8 +56689,8 @@ type VariantSelection = <T extends VariantLike>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductFanSelection.ts
-skeleton_hash: cf67fad21ac874be
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductFanSelection.ts
+skeleton_hash: d25b597f76ec7fa0
 entity_hashes:
   func:calismaNoktasi: 477178de8115d130
   func:degerlendir: f750568727981b71
@@ -56885,7 +56699,7 @@ entity_hashes:
   func:secimYap: 4647312ff1acd1ac
   func:sistemKatsayisi: 04ecc41bc675abb4
   overview: 1ad4e3445b46e669
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:57Z
 ---
 
 ## Genel Bakış
@@ -57036,23 +56850,15 @@ type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
 
 ## SABİTLER
 - **MAHAL_KURALLARI** (object) — `{
-
   bathroom: { ach: 8, minimumM3h: 85 },
-
   kitchen: { ach: 15, minimumM3h:...`
 - **GUZERGAH_GEOMETRISI** (object) — `{
-
   short: { uzunlukM: 3, dirsek90: 1, dirsek45: 0 },
-
   medium: { uzunlukM:...`
 - **SESSIZLIK_AGIRLIGI** (object) — `{
-
   normal: 0.2,
-
   important: 0.4,
-
   critical: 0.6,
-
 }`
 
 ---
@@ -57145,11 +56951,11 @@ graph TD
     ductFanSelection_ts__parsePQCurve["parsePQCurve"]
     ductFanSelection_ts__secimYap["secimYap"]
     ductFanSelection_ts__sistemKatsayisi["sistemKatsayisi"]
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
 ```
 
 ## NODE ID STANDARD
@@ -57192,8 +56998,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductPressure.ts
-skeleton_hash: a0b705802650fa34
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductPressure.ts
+skeleton_hash: 1579ba7b4e3d68fe
 entity_hashes:
   func:akisHizi: a87413c22f69c858
   func:dinamikBasinc: 4288bc94c70c6d78
@@ -57201,7 +57007,7 @@ entity_hashes:
   func:reynolds: d87c6fd9c4af1b38
   func:surtunmeFaktoru: 20425e5a77455729
   overview: 1dd122290e85a03e
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:34Z
 ---
 
 ## Genel Bakış
@@ -57298,23 +57104,15 @@ type KanalMalzemesi = keyof typeof PURUZLULUK_M
 
 ## SABİTLER
 - **PURUZLULUK_M** (as_expression) — `{
-
   galvanized: 0.00015,
-
   pvc: 0.00001,
-
   flex: 0.003,
-
 } as const`
 - **FITTING_K** (as_expression) — `{
-
   /** 90° yuvarlak dirsek, eğrilik yarıçapı = 1,5·D (tipik hazır dirsek). ...`
 - **TERMINAL_K** (as_expression) — `{
-
   /** İç mahal egzoz menfezi/ızgarası. */
-
   menfez: 2.5,
-
   /** Geri-akış...`
 - **TERMINAL_K_TOPLAM** (binary_expression) — `TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur`
 
@@ -57378,8 +57176,8 @@ graph TD
     ductPressure_ts__kanalBasincKaybi["kanalBasincKaybi"]
     ductPressure_ts__reynolds["reynolds"]
     ductPressure_ts__surtunmeFaktoru["surtunmeFaktoru"]
-    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
+    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__akisHizi
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__dinamikBasinc
 ```
@@ -57416,14 +57214,14 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\images\productImage.ts
-skeleton_hash: 59c91508988fcc5e
+source_path: C:\tmp\ops-t165\src\lib\images\productImage.ts
+skeleton_hash: 7ff610225a97ec18
 entity_hashes:
   func:productImagePlaceholder: a344f93ff9be3970
   func:resolveProductImageUrl: c7799fa1912841a5
   func:storagePathToUrl: 3a9b7073128d0db3
   overview: fb7b1d367d7bbbed
-generated_at: 2026-08-25T08:44:18Z
+generated_at: 2026-08-27T06:57:36Z
 ---
 
 ## Genel Bakış
@@ -57661,13 +57459,13 @@ type TerminalStatus = (typeof TERMINAL_STATUSES)[number]
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\purchasing\poStatusMachine.ts
-skeleton_hash: 1b4a7ff17a01436b
+source_path: C:\tmp\ops-t165\src\lib\purchasing\poStatusMachine.ts
+skeleton_hash: 52256c2929a9bed6
 entity_hashes:
   func:allowedNextPoStatuses: 61761b9e31de6aa0
   func:isManualPoTransitionAllowed: daf7d6e4e1f8e07b
   overview: b2ca3afe0384f93f
-generated_at: 2026-08-25T08:44:20Z
+generated_at: 2026-08-27T06:57:44Z
 ---
 
 ## Genel Bakış
@@ -58232,16 +58030,16 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\address.service.ts
-skeleton_hash: ee1024a7169d1ac6
+source_path: C:\tmp\ops-t165\src\lib\services\address.service.ts
+skeleton_hash: 75c931bb2bc7aaba
 entity_hashes:
-  func:createAddress: 58bfa83da20b8ccd
-  func:deleteAddress: 9e5cf23e8c132105
-  func:listAddresses: 18356c7e570cc9a7
-  func:setDefaultAddress: 369fe22c82c4c3ee
-  func:updateAddress: 7395bc16ccf7b629
+  func:createAddress: da004f6f92a4959b
+  func:deleteAddress: 373bd7c57f2244db
+  func:listAddresses: 8cc7542164780c27
+  func:setDefaultAddress: 0f10965357784c31
+  func:updateAddress: 6745b429af7f5a0a
   overview: 9816bb84388067d9
-generated_at: 2026-06-19T20:48:09Z
+generated_at: 2026-08-27T06:58:32Z
 ---
 
 ## Genel Bakış
@@ -58279,48 +58077,45 @@ Bu modül, kullanıcı adresleri için temel CRUD (Oluştur, Listele, Güncelle,
 ## FONKSİYON DETAYLARI
 
 ### listAddresses
-**Ne yapar**: Kimliği doğrulanmış kullanıcının tüm adreslerini getirir. Adresler varsayılan gönderim durumuna göre sıralanır, ardından oluşturma tarihine göre azalan sırayla listelenir.
-
-**Nasıl yapar**: `user_addresses` tablosundan tüm sütunları seçer, `is_default_shipping` sütunu azalan (true primero) ve ardından `created_at` sütunu azalan sırada sıralar. Veritabanı sorgusu başarılı olduğunda bir dizi adres nesnesi, hata oluştuğunda ise hata fırlatır.
-
+**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait tüm adreslerin bir listesini getirir. Adresler, varsayılan gönderim durumuna göre (önce varsayılan olanlar) ve ardından oluşturulma tarihine göre (en yeniden en eskiye) sıralanır.
+**Nasıl yapar**: Verilen Supabase istemcisini kullanarak `user_addresses` tablosundan tüm kayıtları (`*`) seçer. Sorgu, `is_default_shipping` alanını azalan (`false` ile başlayan, yani `true` olanlar önce gelir) ve ardından `created_at` alanını azalan sırada sıralar. Sorgu başarısız olursa hata fırlatır, başarılı olursa gelen veriyi `DbUserAddress[]` tipine dönüştürerek döndürür.
 **Parametreler**:
-- `supabase`: SupabaseClient<Database> — Aktif Supabase istemci örneği
-
-**Dönüş**: Promise<DbUserAddress[]> — Kullanıcının tüm adreslerini içeren bir dizi nesne
+- supabase: SupabaseClient<Database> — Aktif Supabase istemci örneği. Veritabanı sorgularını yürütmek için kullanılır.
+**Dönüş**: Promise<DbUserAddress[]> — Kullanıcının adres nesnelerinden oluşan bir diziyi çözümleyen bir Promise. Veri bulunamazsa boş bir dizi döner.
 
 ### createAddress
-**Ne yapar**: Kimliği doğrulanmış kullanıcı için yeni bir adres kaydı oluşturur.
-**Nasıl yapar**: Önce kullanıcının oturumunu doğrular. Ardından, sağlanan `payload` verisini kullanıcının ID'si ile genişleterek veritabanına ekler. `street_address` alanını `address_line`'dan, `address_type` alanını ise `is_default_shipping` bayrağına göre belirler. İşlem başarılı olduktan sonra, `is_default_shipping` veya `is_default_billing` bayrakları true ise ilgili adresi varsayılan olarak ayarlar.
+**Ne yapar**: Kimliği doğrulanmış kullanıcı için yeni bir adres oluşturur. Payload'da belirtilmişse, adresi otomatik olarak varsayılan gönderim veya fatura adresi olarak ayarlar.
+**Nasıl yapar**: Önce `supabase.auth.getUser()` ile kimlik doğrulaması yapar ve kullanıcı bilgisini alır. Kullanıcı bulunamazsa hata fırlatır. Ardından gelen `payload`'a `user_id` ekler ve `street_address` alanını `address_line`'dan, `address_type` alanını ise `is_default_shipping` durumuna göre otomatik olarak doldurur. Bu işlenmiş veriyi `user_addresses` tablosuna ekler ve eklenen kaydı döndürür. Son olarak, payload'da `is_default_shipping` veya `is_default_billing` true ise, ilgili varsayılan adresi ayarlamak için `setDefaultAddress` fonksiyonunu çağırır.
 **Parametreler**:
-- payload: DbUserAddressInsert — Oluşturulacak adresin tüm verilerini içeren nesne.
-- supabase: SupabaseClient — Veritabanı işlemleri için kullanılacak istemci. Opsiyoneldir ve varsayılan olarak modülde tanımlı `defaultClient` kullanılır.
-**Dönüş**: Promise<DbUserAddress> — Yeni oluşturulan adres nesnesi.
+- supabase: SupabaseClient<Database> — Aktif Supabase istemci örneği.
+- payload: DbUserAddressInsert — Oluşturulacak yeni adresin verilerini içeren nesne. `user_id` hariç tüm adres bilgilerini (adres satırı, türü, varsayılan durumları vb.) içerir.
+**Dönüş**: Promise<DbUserAddress> — Yeni oluşturulan adres nesnesini çözümleyen bir Promise.
 
 ### updateAddress
-**Ne yapar**: Mevcut bir adresi kimliği doğrulanmış kullanıcı adına günceller.
-**Nasıl yapar**: Verilen `id` ile eşleşen adres kaydını bulur ve `payload` içindeki alanlarla günceller. `address_line` alanı sağlanmışsa bunu `street_address` alanına eşler. Güncelleme başarılı olduktan sonra, `is_default_shipping` veya `is_default_billing` bayrakları true ise ilgili adresi varsayılan olarak ayarlar.
+**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait mevcut bir adresi günceller. Payload'da belirtilmişse, adresin varsayılan gönderim veya fatura adresi olma durumunu otomatik olarak yönetir.
+**Nasıl yapar**: Gelen `payload`'ı bir güncelleme yaması olarak kopyalar. Eğer `payload` içinde `address_line` varsa, bunu `street_address` alanına da atar. Bu yamayı, verilen `id`'ye sahip adres kaydını güncellemek için kullanır. Güncelleme başarılı olursa ve `payload`'da `is_default_shipping` veya `is_default_billing` true ise, ilgili varsayılan adresi ayarlamak için `setDefaultAddress` fonksiyonunu çağırır.
 **Parametreler**:
+- supabase: SupabaseClient<Database> — Aktif Supabase istemci örneği.
 - id: string — Güncellenecek adresin benzersiz tanımlayıcısı.
-- payload: DbUserAddressUpdate — Güncellenecek alanları içeren kısmi veri nesnesi.
-- supabase: SupabaseClient — Veritabanı işlemleri için kullanılacak istemci. Opsiyoneldir ve varsayılan olarak modülde tanımlı `defaultClient` kullanılır.
-**Dönüş**: Promise<DbUserAddress> — Güncellenmiş adres nesnesi.
+- payload: DbUserAddressUpdate — Adresin güncellenecek kısmi verilerini içeren nesne. Tüm alanlar zorunlu değildir.
+**Dönüş**: Promise<DbUserAddress> — Güncellenmiş adres nesnesini çözümleyen bir Promise.
 
 ### deleteAddress
-**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait belirli bir adresi kalıcı olarak siler.
-**Nasıl yapar**: Verilen `id` parametresine sahip adres kaydını `user_addresses` tablosundan siler. İşlem başarılıysa `true` değeri döner. Veritabanı silme işleminde bir hata oluşursa bir istisna fırlatır.
+**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait belirli bir adresi, verilen kimlik numarasına (ID) göre siler.
+**Nasıl yapar**: Verilen `id`'ye sahip kaydı `user_addresses` tablosundan siler. Silme işlemi başarısız olursa hata fırlatır, başarılı olursa `true` değerini döndürür.
 **Parametreler**:
+- supabase: SupabaseClient<Database> — Aktif Supabase istemci örneği.
 - id: string — Silinecek adresin benzersiz tanımlayıcısı.
-- supabase: SupabaseClient — Veritabanı işlemleri için kullanılacak istemci. Opsiyoneldir ve varsayılan olarak modülde tanımlı `defaultClient` kullanılır.
-**Dönüş**: Promise<boolean> — Silme işlemi başarılıysa `true`.
+**Dönüş**: Promise<boolean> — Silme işleminin başarılı olması durumunda `true` değerini çözümleyen bir Promise.
 
 ### setDefaultAddress
-**Ne yapar**: Bir adresi kullanıcının varsayılan gönderim veya fatura adresi olarak ayarlar.
-**Nasıl yapar**: Önce kullanıcının oturumunu doğrular. Then, kullanıcının tüm adreslerinde belirtilen türdeki (`shipping` veya `billing`) varsayılanlık bayrağını (`is_default_shipping` veya `is_default_billing`) `false` olarak günceller. Bu, mevcut tüm varsayılan adresleri devre dışı bırakır. Ardından, belirtilen `id`'ye sahip adresin aynı bayrağını `true` olarak ayarlayarak onu yeni varsayılan yapar.
+**Ne yapar**: Belirli bir adresi, belirtilen tür için (gönderim veya fatura) varsayılan adres olarak ayarlar. Aynı türde daha önce ayarlanmış olan diğer varsayılan adreslerin bayrağını otomatik olarak temizler.
+**Nasıl yapar**: Önce kimlik doğrulaması yapar ve kullanıcı bilgisini alır. Kullanıcı bulunamazsa hata fırlatır. `kind` parametresine göre ilgili bayrak alanını (`is_default_shipping` veya `is_default_billing`) belirler. İlk olarak, bu kullanıcının tüm adreslerinde bu bayrak alanını `false` yaparak mevcut varsayılanları temizler. Ardından, verilen `id`'ye sahip adrese bu bayrak alanını `true` olarak ayarlar ve güncellenmiş adres kaydını döndürür.
 **Parametreler**:
-- kind: 'shipping' | 'billing' — Varsayılan olarak ayarlanacak adres türü.
+- supabase: SupabaseClient<Database> — Aktif Supabase istemci örneği.
+- kind: 'shipping' | 'billing' — Varsayılan olarak ayarlanacak adres türü. 'shipping' gönderim, 'billing' fatura adresini ifade eder.
 - id: string — Varsayılan olarak ayarlanacak adresin benzersiz tanımlayıcısı.
-- supabase: SupabaseClient — Veritabanı işlemleri için kullanılacak istemci. Opsiyoneldir ve varsayılan olarak modülde tanımlı `defaultClient` kullanılır.
-**Dönüş**: Promise<DbUserAddress> — Varsayılan olarak ayarlanmış güncel adres nesnesi.
+**Dönüş**: Promise<DbUserAddress> — Varsayılan olarak ayarlanmış (güncellenmiş) adres nesnesini çözümleyen bir Promise.
 
 ---
 
@@ -58333,12 +58128,51 @@ Bu modül, kullanıcı adresleri için temel CRUD (Oluştur, Listele, Güncelle,
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: address.service.ts::listAddresses
-- **params**: `(supabase: SupabaseClient<Database>)`
+### [N1_NASIL] AST Pointer: src/lib/services/address.service.ts::listAddresses
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
 - **ic_degiskenler**:
-  - `data` — supabase'den dönen user_addresses tablosu satırları
-  - `error` — supabase sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<DbUserAddress[]>` — kullanıcının tüm adresleri varsayılan sıralama ile; hata varsa fırlatılır, veri yoksa boş dizi döner
+  - `data` — supabase sorgusundan dönen user_addresses satırları (select('*') sonucu)
+  - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
+- **Dönüş**: `DbUserAddress[]` — is_default_shipping azalan, created_at azalan sırayla sıralanmış adres dizisi; hata yoksa data, data yoksa boş dizi döner
+
+### [N2_NASIL] AST Pointer: src/lib/services/address.service.ts::createAddress
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `payload` — DbUserAddressInsert tipinde, oluşturulacak adres verisi
+- **ic_degiskenler**:
+  - `authData` — supabase.auth.getUser() sonucu; kimlik doğrulama verisini taşır
+  - `userError` — getUser() sırasında oluşan hata; varsa throw ile fırlatılır
+  - `user` — authData?.user; mevcut oturum açmış kullanıcı nesnesi; yoksa 'Not authenticated' hatası fırlatılır
+  - `dbPayload` — DbUserAddressInsert tipinde, payload üzerine user_id, street_address (payload.street_address veya payload.address_line) ve address_type (payload.address_type veya is_default_shipping'e göre 'shipping'/'billing') eklenmiş nihai kayıt verisi
+  - `data` — insert sorgusundan dönen tekil DbUserAddress satırı
+  - `error` — insert sorgusu sırasında oluşan hata; varsa throw ile fırlatılır
+- **Dönüş**: `DbUserAddress` — oluşturulan adres kaydı; insert sonrası payload.is_default_shipping true ise setDefaultAddress(supabase, 'shipping', data.id), payload.is_default_billing true ise setDefaultAddress(supabase, 'billing', data.id) çağrılır
+
+### [N3_NASIL] AST Pointer: src/lib/services/address.service.ts::updateAddress
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — güncellenecek adresin string tipinde kimliği; `payload` — DbUserAddressUpdate tipinde, güncelleme verisi
+- **ic_degiskenler**:
+  - `updatePatch` — DbUserAddressUpdate tipinde, payload'ın kopyası; payload.address_line varsa updatePatch.street_address = payload.address_line olarak atanır
+  - `data` — update sorgusundan dönen tekil DbUserAddress satırı
+  - `error` — update sorgusu sırasında oluşan hata; varsa throw ile fırlatılır
+- **Dönüş**: `DbUserAddress` — güncellenen adres kaydı; update sonrası payload.is_default_shipping true ise setDefaultAddress(supabase, 'shipping', id), payload.is_default_billing true ise setDefaultAddress(supabase, 'billing', id) çağrılır
+
+### [N4_NASIL] AST Pointer: src/lib/services/address.service.ts::deleteAddress
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — silinecek adresin string tipinde kimliği
+- **ic_degiskenler**:
+  - `error` — delete sorgusu sırasında oluşan hata; varsa throw ile fırlatılır
+- **Dönüş**: `boolean` — silme başarılıysa true döner; hata varsa throw ile fırlatılır
+
+### [N5_NASIL] AST Pointer: src/lib/services/address.service.ts::setDefaultAddress
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `kind` — 'shipping' | 'billing; varsayılan adres türü; `id` — varsayılan yapılacak adresin string tipinde kimliği
+- **ic_degiskenler**:
+  - `authData` — supabase.auth.getUser() sonucu; kimlik doğrulama verisini taşır
+  - `userError` — getUser() sırasında oluşan hata; varsa throw ile fırlatılır
+  - `user` — authData?.user; mevcut oturum açmış kullanıcı nesnesi; yoksa 'Not authenticated' hatası fırlatılır
+  - `flag` — 'is_default_shipping' | 'is_default_billing; kind === 'shipping' ise 'is_default_shipping', aksi halde 'is_default_billing'
+  - `clearPatch` — DbUserAddressUpdate tipinde, { [flag]: false }; aynı kullanıcıya ait diğer adreslerdeki ilgili varsayılan bayrağını temizlemek için kullanılır
+  - `clear` — clearPatch ile user_addresses tablosunda user_id'ye göre update sorgusu sonucu; clear.error varsa throw ile fırlatılır
+  - `setPatch` — DbUserAddressUpdate tipinde, { [flag]: true }; belirtilen adrese varsayılan bayrağını atamak için kullanılır
+  - `data` — setPatch ile id'ye göre update sorgusundan dönen tekil DbUserAddress satırı
+  - `error` — setPatch update sorgusu sırasında oluşan hata; varsa throw ile fırlatılır
+- **Dönüş**: `DbUserAddress` — varsayılan olarak ayarlanan adres kaydı
 
 ---
 
@@ -58351,8 +58185,8 @@ graph TD
     address_service_ts__listAddresses["listAddresses"]
     address_service_ts__setDefaultAddress["setDefaultAddress"]
     address_service_ts__updateAddress["updateAddress"]
-    address_service_ts__createAddress --> address_service_ts__setDefaultAddress
     address_service_ts__updateAddress --> address_service_ts__setDefaultAddress
+    address_service_ts__createAddress --> address_service_ts__setDefaultAddress
 ```
 
 ## NODE ID STANDARD
@@ -58380,8 +58214,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\services\cart.service.ts
-skeleton_hash: 02209daf527c63bc
+source_path: C:\tmp\ops-t165\src\lib\services\cart.service.ts
+skeleton_hash: 012ab85ea5c7450b
 entity_hashes:
   func:clearCartItems: 56829660b28fad3e
   func:ensureUserProfile: 3b934029dfb6c2d7
@@ -58391,7 +58225,7 @@ entity_hashes:
   func:removeCartItem: 266d3621f6d5ba34
   func:upsertCartItem: 48510d49ceaa32a2
   overview: 8bbdad4d0c699097
-generated_at: 2026-08-25T07:28:32Z
+generated_at: 2026-08-27T06:58:34Z
 ---
 
 ## Genel Bakış
@@ -58539,20 +58373,20 @@ graph TD
     cart_service_ts__listCartItemsWithProducts["listCartItemsWithProducts"]
     cart_service_ts__removeCartItem["removeCartItem"]
     cart_service_ts__upsertCartItem["upsertCartItem"]
-    cart_service_ts__listCartItemsWithProducts --> cart_service_ts__listCartItems
     cart_service_ts__getOrCreateShoppingCart --> cart_service_ts__ensureUserProfile
+    cart_service_ts__listCartItemsWithProducts --> cart_service_ts__listCartItems
 ```
 
 ## NODE ID STANDARD
 
-  file: cart.service.ts
-  function: cart.service.ts::ensureUserProfile
-  function: cart.service.ts::getOrCreateShoppingCart
-  function: cart.service.ts::listCartItems
-  function: cart.service.ts::listCartItemsWithProducts
-  function: cart.service.ts::upsertCartItem
-  function: cart.service.ts::removeCartItem
-  function: cart.service.ts::clearCartItems
+  file: src\lib\services\cart.service.ts
+  function: src\lib\services\cart.service.ts::ensureUserProfile
+  function: src\lib\services\cart.service.ts::getOrCreateShoppingCart
+  function: src\lib\services\cart.service.ts::listCartItems
+  function: src\lib\services\cart.service.ts::listCartItemsWithProducts
+  function: src\lib\services\cart.service.ts::upsertCartItem
+  function: src\lib\services\cart.service.ts::removeCartItem
+  function: src\lib\services\cart.service.ts::clearCartItems
 
 ---
 
@@ -58572,12 +58406,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\category.service.ts
-skeleton_hash: 6fc863c61335ac6c
+source_path: C:\tmp\ops-t165\src\lib\services\category.service.ts
+skeleton_hash: 5d85c4595663b3c1
 entity_hashes:
-  func:getCategories: 7d5e8e0b45de974e
+  func:getCategories: 8f639a551cb88029
   overview: 094095f1defe0e5b
-generated_at: 2026-06-19T20:48:09Z
+generated_at: 2026-08-27T06:59:00Z
 ---
 
 ## Genel Bakış
@@ -58599,15 +58433,14 @@ Bu modül için aksiyomlar, yalnızca fonksiyon imzasından çıkarılabilen ko�
 ## FONKSİYON DETAYLARI
 
 ### getCategories
+**Ne yapar**: Supabase veritabanındaki `categories` tablosundan yalnızca aktif (`is_active` değeri `true` olan) kategorileri çeker ve UI katmanında kullanılmak üzere `Category[]` tipine dönüştürerek döndürür. Kategorileri önce seviye (`level`) ardından isim (`name`) sırasına göre sıralı biçimde getirir.
 
-**Ne yapar**: Veritabanındaki tüm aktif kategorileri getsel olarak çeker ve UI bileşenleri tarafından kullanılabilecek forma dönüştürerek döndürür. Bu fonksiyon, HVAC sistemi için kategori hiyerarşisini ve kategori metalarını merkezi bir noktadan yöneten temel veri erişim katmanıdır.
-
-**Nasıl yapar**: Supabase istemcisi aracılığıyla `categories` tablosuna sorgu gönderir. Önce `is_active` alanı `true` olan kayıtları filtreler, ardından `level` (artan) ve `name` (artan) sıralamasıyla sonuçları düzenler. Sorgulanan alanlar arasında kategori yapısını, SEO bilgilerini, gösterim ayarlarını ve çevirilerini tanımlayan tüm gerekli sütunlar bulunur. Sorgu sonucu elde edilen ham veri, `toUICategoryList` yardımcı fonksiyonu aracılığıyla UI tarafında tüketilmeye uygun `Category[]` yapısına dönüştürülür.
+**Nasıl yapar**: Fonksiyon, parametre olarak aldığı `supabase` istemcisi üzerinden `categories` tablosuna bir sorgu gönderir. Sorguda belirli alanlar (`id`, `parent_id`, `name`, `slug`, `image_url`, `level`, `is_active`, `metadata`, `created_at`, `updated_at`, `menu_label`, `marketing_title`, `translation_key`, `description`, `authority_content`, `display_mode`, `is_featured`, `seo_desc`, `seo_title`, `sort_order`) seçilir. `.eq('is_active', true)` filtresiyle yalnızca aktif kayıtlar getirilir. `.order('level', { ascending: true })` ile önce seviyeye göre artan, ardından `.order('name', { ascending: true })` ile isme göre artan sıralama uygulanır. Sorgu sonucunda bir hata oluşursa bu hata fırlatılır (`throw error`). Hata yoksa, gelen veri önce `DbCategory[]` tipine cast edilir ve ardından `toUICategoryList` yardımcı fonksiyonu aracılığıyla UI katmanının beklediği `Category[]` biçimine dönüştürülerek döndürülür. Veri `null` veya `undefined` ise boş dizi (`[]`) kullanılır.
 
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Yetkilendirilmiş ve tip güvenli Supabase istemcisi. Veritabanı bağlantısı ve sorgulama işlemleri için kullanılır. Database generic tipi, veritabanı şemasını ve tablo yapılarını tanımlar.
+- `supabase`: `SupabaseClient<Database>` — Supabase veritabanı istemcisi örneği. `Database` genel tip parametresi, veritabanı şemasının TypeScript tip tanımlarını belirtir. Fonksiyon bu istemci üzerinden tablo sorgularını yürütür.
 
-**Dönüş**: `Promise<Category[]>` — Asenkron olarak çözünen ve UI tarafında kullanıma hazır kategorilerin dizisini döndürür. Her bir Category nesnesi, kategorinin ID'si, üst kategori ID'si, adı, slug'ı, görsel URL'i, seviyesi, aktiflik durumu, metaverisi, oluşturulma/güncellenme tarihleri, menü etiketi, pazarlama başlığı, çeviri anahtarı, açıklama, otorite içeriği, gösterim modu, öne çıkan durumu, SEO açıklaması/başlığı ve sıralama düzeni gibi alanları içerir.
+**Dönüş**: `Promise<Category[]>` — Asenkron bir yapıda, aktif kategorilerin UI katmanında kullanılan `Category` tipinde bir dizi olarak çözümlenen Promise döner. Her bir `Category` nesnesi, veritabanından çekilen ham verinin `toUICategoryList` fonksiyonu aracılığıyla dönüştürülmüş halidir.
 
 ---
 
@@ -58623,12 +58456,12 @@ Bu modül için aksiyomlar, yalnızca fonksiyon imzasından çıkarılabilen ko�
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/services/category.service.ts::getCategories
-- **params**: (supabase: SupabaseClient<Database>)
+- **params**:
+  - `supabase` — `SupabaseClient<Database>` tipinde, Supabase veritabanı istemcisi
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen kategori verisi (DbCategory[] tipinde veya null)
-  - `error` — Supabase sorgusu sırasında oluşan hata nesnesi (varsa)
-  - `result` — data ve error destructure edilen nesne (sadece `{ data, error }` ataması ile oluşturuldu)
-- **Dönüş**: Promise<Category[]> — Aktif kategorilerin UI modeline dönüştürülmüş listesi
+  - `data` — `supabase.from('categories').select(...).eq(...).order(...).order(...)` sorgusundan dönen satırlar; destructuring ile elde edilir; hata yoksa `toUICategoryList` fonksiyonuna aktarılır
+  - `error` — aynı sorgudan dönen hata nesnesi; truthy ise `throw error` ile fırlatılır
+- **Dönüş**: `Promise<Category[]>` — `toUICategoryList` fonksiyonuna `(data as DbCategory[]) || []` argümanı verilerek üretilen UI kategori listesi
 
 ---
 
@@ -58649,12 +58482,12 @@ Bu modül için aksiyomlar, yalnızca fonksiyon imzasından çıkarılabilen ko�
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-rec80\src\lib\services\contactMessageService.ts
-skeleton_hash: 7132a939a872ee42
+source_path: C:\tmp\ops-t165\src\lib\services\contactMessageService.ts
+skeleton_hash: 12c46923ef1efb26
 entity_hashes:
-  func:submitContactMessage: 0d8bdfa3ae2bec82
+  func:submitContactMessage: bdff0d3b1c594401
   overview: e4c082f3ad81112f
-generated_at: 2026-08-26T19:27:53Z
+generated_at: 2026-08-27T06:59:27Z
 ---
 
 ## Genel Bakış
@@ -58687,15 +58520,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### submitContactMessage
-**Ne yapar**: İletişim mesajını veritabanına kaydeder ve kaydedilen satırın kimliğini döndürür. Hata durumunda fırlatır — sessiz yutma yoktur. Başarı kanıtlanamıyorsa (RPC hata vermez ama kimlik de dönmezse) bu durum da hata olarak değerlendirilir.
+**Ne yapar**: İletişim formu mesajını veritabanına kaydeder ve kaydedilen satırın kimliğini döndürür. Hata durumunda fırlatır; sessiz yutma yoktur.
 
-**Nasıl yapar**: Supabase istemcisi üzerinden `submit_contact_message` adlı sunucu tarafı (RPC) fonksiyonunu çağırır. Girdi nesnesindeki tüm alanları bu RPC fonksiyonuna parametre olarak aktarır. Çağrı tamamlandıktan sonra iki kontrol yapılır: Birincisi, `error` değişkeni doluysa bu hata doğrudan fırlatılır. İkincisi, `data` değişkeni boşsa (yani RPC hata vermeden çalıştı ama bir kimlik dönmediyse) bu durum "yazma kanıtlanamadı" anlamına geldiği için açık bir `Error` fırlatılarak çağıranın başarı ekranını göstermesi engellenir. Her iki kontrol de geçilirse `data` değeri (yazılan satırın kimliği) döndürülür.
+**Nasıl yapar**: Supabase istemcisini kullanarak `submit_contact_message` adlı RPC fonksiyonunu çağırır. Girdi nesnesindeki tüm alanları (`name`, `message`, `email`, `phone`, `company`, `city`, `applicationArea`, `subject`, `consent`) RPC parametrelerine eşler. Çağrı sonucunda hata varsa hatayı fırlatır. Hata yoksa ancak dönen veri de null ise, yazma işleminin kanıtlanamadığı gerekçesiyle bir `Error` fırlatır. Başarılı durumda dönen kimlik değerini döndürür.
 
 **Parametreler**:
 - supabase: `SupabaseClient<Database>` — Supabase veritabanı istemcisi. RPC çağrısını gerçekleştirmek için kullanılır.
-- input: `ContactMessageInput` — İletişim formundan gelen girdi verisi. İçinde şu alanları barındırır: `name` (ad), `message` (mesaj), `email` (e-posta), `phone` (telefon), `company` (şirket), `city` (şehir), `applicationArea` (uygulama alanı), `subject` (konu), `consent` (onay).
+- input: `ContactMessageInput` — İletişim formundan gelen verileri taşıyan nesne. Şu alanları içerir: `name`, `message`, `email`, `phone`, `company`, `city`, `applicationArea`, `subject`, `consent`.
 
-**Dönüş**: `Promise<string>` — Başarılı kayıt durumunda veritabanına yazılan satırın kimliğini (string) döndürür. Hata durumunda bu Promise rejection ile sonuçlanır (hata fırlatılır).
+**Dönüş**: `Promise<string>` — Kaydedilen mesaj satırının kimliğini temsil eden string değer. Ancak RPC başarılı olup kimlik döndürürse bu değere ulaşılır; aksi takdirde hata fırlatılır.
 
 ---
 
@@ -58723,23 +58556,14 @@ MÜŞTERİ-YÜZÜ FORM YAZMA KATMANI — `docs/standards/form-submission-standar
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: contactMessageService.ts::submitContactMessage
+### [N1_NASIL] AST Pointer: src/lib/services/contactMessageService.ts::submitContactMessage
 - **params**:
-  - `supabase` — SupabaseClient<Database> tipinde, veritabanı istemcisi
-  - `input` — ContactMessageInput tipinde, iletişim formu verilerini taşır
+  - `supabase` — `SupabaseClient<Database>` tipinde, Supabase veritabanı istemcisi
+  - `input` — `ContactMessageInput` tipinde, iletişim mesajı form verisi
 - **ic_degiskenler**:
-  - `data` — `supabase.rpc('submit_contact_message', {...})` çağrısından dönen sonuç; RPC fonksiyonu başarılıysa oluşturulan kaydın kimliğini (string) içerir, başarısızsa null olabilir
-  - `error` — `supabase.rpc('submit_contact_message', {...})` çağrısından dönen hata nesnesi; hata yoksa null/falsy
-  - `input.name` — RPC parametresi `p_name` olarak gönderilir, kullanıcının adı
-  - `input.message` — RPC parametresi `p_message` olarak gönderilir, mesaj içeriği
-  - `input.email` — RPC parametresi `p_email` olarak gönderilir, e-posta adresi
-  - `input.phone` — RPC parametresi `p_phone` olarak gönderilir, telefon numarası
-  - `input.company` — RPC parametresi `p_company` olarak gönderilir, şirket adı
-  - `input.city` — RPC parametresi `p_city` olarak gönderilir, şehir
-  - `input.applicationArea` — RPC parametresi `p_application_area` olarak gönderilir, uygulama alanı
-  - `input.subject` — RPC parametresi `p_subject` olarak gönderilir, konu
-  - `input.consent` — RPC parametresi `p_consent` olarak gönderilir, onay durumu
-- **Dönüş**: `Promise<string>` — RPC fonksiyonundan dönen kimlik (data); hata varsa veya data null ise hata fırlatır, aksi takdirde data string olarak döner
+  - `data` — `supabase.rpc` çağrısından dönen yanıt verisi; `submit_contact_message` RPC fonksiyonunun dönüş değeri (string beklenir). Destructuring ile `error` ile birlikte alınır
+  - `error` — `supabase.rpc` çağrısından dönen hata nesnesi; varsa `throw error` ile fırlatılır
+- **Dönüş**: `Promise<string>` — RPC fonksiyonundan dönen `data` değeri (yazma kanıtı olarak kimlik/ID). `data` null ise hata fırlatılır, çağıran başarı ekranı açmaması için `Error` nesnesi üretilir
 
 ---
 
@@ -58949,14 +58773,14 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\displayPrice.service.ts
-skeleton_hash: d3b4f015e5924efb
+source_path: C:\tmp\ops-t165\src\lib\services\displayPrice.service.ts
+skeleton_hash: 31ca049f2a475149
 entity_hashes:
-  func:attachDisplayPrices: edb7bdd96283fd3b
-  func:fetchDisplayPrices: 41610a811dbd6e55
-  func:withDisplayPrices: e6e948c43ee9994a
+  func:attachDisplayPrices: 036996666f9ba667
+  func:fetchDisplayPrices: 6496b06cad7ad65e
+  func:withDisplayPrices: 219174d395855717
   overview: 9bf72b47d700eb31
-generated_at: 2026-08-25T08:49:35Z
+generated_at: 2026-08-27T07:00:06Z
 ---
 
 ## Genel Bakış
@@ -58994,15 +58818,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### fetchDisplayPrices
-**Ne yapar**: Ürün kimliklerine göre vitrin fiyatlarını çeker. Fiyatı olmayan ürün haritada yer almaz — null yerine yokluk söz konusudur. Bu sayede çağıran taraf "fiyat yok" ile "sıfır fiyat"ı karıştıramaz.
+**Ne yapar**: Ürün kimliklerine göre vitrin fiyatlarını çeker. Fiyatı olmayan ürün haritada yer almaz — null yerine yokluk kullanılır, böylece çağıran taraf "fiyat yok" ile "sıfır fiyat"ı karıştıramaz.
 
-**Nasıl yapar**: Önce `productIds` dizisindeki tekrar eden ve geçersiz (string olmayan veya boş) kimlikleri eler. Kalan benzersiz kimlikleri `PRICE_LOOKUP_CHUNK` boyutunda parçalara bölerek her parça için Supabase'in `get_display_prices` RPC fonksiyonunu çağırır. RPC hatası oluşursa veya veri dönmezse o parçayı atlar, sayfayı düşürmez — vitrin bu durumda "Teklif Alın" gösterir. Dönen her satır için `display_price` değerini sayıya çevirir; sonucu sonlu ve pozitifse haritaya ekler. `tax_included` alanı tam olarak `true` ise vergi dahil bilgisini `true` olarak kaydeder.
+**Nasıl yapar**: Önce gelen `productIds` dizisini benzersiz ve geçerli (boş olmayan string) kimliklere filtreler. Ardından bu kimlikleri `PRICE_LOOKUP_CHUNK` sabitine göre parçalara (chunk) bölerek her parça için Supabase'in `get_display_prices` RPC fonksiyonunu çağırır. RPC'den dönen her satır için `display_price` değeri sonlu pozitif bir sayıya dönüştürülebilirse haritaya eklenir; dönüştürülemezse o satır atlanır. Hata durumunda sayfa düşürülmez, sadece o chunk atlanır ve vitrin "Teklif Alın" gösterir.
 
 **Parametreler**:
-- supabase: `SupabaseClient<Database>` — Veritabanı bağlantısı. Supabase istemcisi üzerinden RPC çağrısı yapılır.
-- productIds: `string[]` — Vitrin fiyatı sorgulanacak ürünlerin kimliklerini içeren dizi.
+- supabase: `SupabaseClient<Database>` — Veritabanı bağlantısını temsil eden Supabase istemcisi
+- productIds: `string[]` — Vitrin fiyatı sorgulanacak ürün kimliklerinin dizisi
 
-**Dönüş**: `Promise<Map<string, DisplayPriceInfo>` — Anahtar olarak `product_id`, değer olarak `DisplayPriceInfo` (içinde `amount` ve `taxIncluded` alanları) içeren bir Map. Fiyatı bulunamayan veya geçersiz fiyatlı ürünler bu haritada yer almaz.
+**Dönüş**: `Promise<Map<string, DisplayPriceInfo>>` — Ürün kimliğini anahtar, vitrin fiyat bilgisini (`amount` ve `taxIncluded` alanlarını içeren nesne) değer olarak tutan Map. Fiyatı bulunamayan ürünler bu haritada yer almaz.
 
 ### attachDisplayPrices
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -59039,37 +58863,31 @@ type WithDisplayPrice = <T>
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: displayPrice.service.ts::fetchDisplayPrices
-- **params**:
-  - `supabase` — Supabase istemcisi (SupabaseClient<Database> tipinde)
-  - `productIds` — Ürün kimliklerini içeren dizi (string[])
+### [N1_NASIL] AST Pointer: src/lib/services/displayPrice.service.ts::fetchDisplayPrices
+- **params**: `supabase` — SupabaseClient<Database> tipinde veritabanı istemcisi; `productIds` — string[] tipinde ürün id dizisi
 - **ic_degiskenler**:
-  - `result` — Sonuç olarak döndürülecek boş Map<string, DisplayPriceInfo> nesnesi; her başarılı fiyat çözümlemesinde ürün kimliği ile fiyat bilgisi eşleştirilerek doldurulur
-  - `unique` — `productIds` dizisinden tekrar eden elemanları, string olmayanları ve boş stringleri filtreleyerek elde edilen benzersiz geçerli ürün kimliklerinin dizisi
-  - `i` — `unique` dizisini `PRICE_LOOKUP_CHUNK` boyutunda parçalara ayırmak için kullanılan döngü sayacı
-  - `chunk` — `unique` dizisinden `i` indeksinden itibaren `PRICE_LOOKUP_CHUNK` uzunluğunda dilimlenen ürün kimlikleri alt kümesi
-  - `data` — `supabase.rpc('get_display_prices', { p_product_ids: chunk })` çağrısından dönen veri; her elemanı `product_id`, `display_price`, `tax_included` alanlarını içerir
-  - `error` — `supabase.rpc('get_display_prices', ...)` çağrısından dönen hata; mevcutsa veya `data` yoksa o chunk atlanır
-  - `row` — `data` dizisindeki her bir satır; `row.display_price` ve `row.product_id` ve `row.tax_included` alanlarına erişilir
-  - `amount` — `row.display_price` değerinin `Number()` ile sayıya dönüştürülmüş hali; sonlu ve sıfırdan büyükse `result` Map'ine eklenir
-- **Dönüş**: `Promise<Map<string, DisplayPriceInfo>>` — ürün kimliğini fiyat bilgisine eşleyen Map
+  - `result` — Map<string, DisplayPriceInfo> tipinde, döndürülecek fiyat haritası; başlangıçta boş oluşturulur
+  - `unique` — productIds dizisinden filtrelenmiş, boş olmayan string elemanlardan oluşan benzersiz id dizisi; `new Set` ile tekrarlar kaldırılır
+  - `i` — for döngüsü sayaç değişkeni; PRICE_LOOKUP_CHUNK aralıklarıyla artırılır
+  - `chunk` — unique dizisinden i indisinden itibaren PRICE_LOOKUP_CHUNK uzunluğunda dilimlenmiş id alt kümesi
+  - `data` — `supabase.rpc('get_display_prices', { p_product_ids: chunk })` çağrısından dönen fiyat satırları; hata varsa veya null ise atlanır
+  - `error` — `supabase.rpc` çağrısından dönen hata nesnesi; truthy ise mevcut chunk atlanır
+  - `row` — data dizisindeki her bir fiyat satırı
+  - `amount` — `row.display_price` değerinin `Number()` ile sayıya çevrilmiş hali; sonlu ve pozitif değilse o satır atlanır
+- **Dönüş**: `Promise<Map<string, DisplayPriceInfo>>` — ürün id'lerini fiyat bilgisine eşleyen harita
 
-### [N2_NASIL] AST Pointer: displayPrice.service.ts::attachDisplayPrices
-- **params**:
-  - `rows` — `id` alanına sahip nesneler dizisi (T[])
-  - `prices` — `fetchDisplayPrices` fonksiyonundan dönen fiyat haritası (Map<string, DisplayPriceInfo>)
+### [N2_NASIL] AST Pointer: src/lib/services/displayPrice.service.ts::attachDisplayPrices
+- **params**: `rows` — T[] tipinde, `{ id: string }` arayüzüne uyan nesne dizisi; `prices` — Map<string, DisplayPriceInfo> tipinde fiyat haritası
 - **ic_degiskenler**:
-  - `row` — `rows` dizisindeki her bir eleman; `row.id` ile `prices` Map'inde arama yapılır
-  - `info` — `prices.get(row.id)` sonucu; eşleşme varsa `info.amount` ve `info.taxIncluded` alanlarına erişilir, yoksa `null` atanır
-- **Dönüş**: `WithDisplayPrice<T>[]` — her satıra `displayPrice` (amount veya null) ve `displayPriceTaxIncluded` (taxIncluded veya null) alanları eklenmiş dizi
+  - `row` — rows.map içindeki her bir eleman; `row.id` ile prices haritasından eşleşme aranır
+  - `info` — `prices.get(row.id)` sonucu; eşleşme varsa DisplayPriceInfo, yoksa undefined
+- **Dönüş**: `WithDisplayPrice<T>[]` — her satıra `displayPrice` (info.amount veya null) ve `displayPriceTaxIncluded` (info.taxIncluded veya null) alanları eklenmiş yeni dizi
 
-### [N3_NASIL] AST Pointer: displayPrice.service.ts::withDisplayPrices
-- **params**:
-  - `supabase` — Supabase istemcisi (SupabaseClient<Database> tipinde)
-  - `rows` — `id` alanına sahip nesneler dizisi (T[])
+### [N3_NASIL] AST Pointer: src/lib/services/displayPrice.service.ts::withDisplayPrices
+- **params**: `supabase` — SupabaseClient<Database> tipinde veritabanı istemcisi; `rows` — T[] tipinde, `{ id: string }` arayüzüne uyan nesne dizisi
 - **ic_degiskenler**:
-  - `prices` — `fetchDisplayPrices(supabase, rows.map(r => r.id))` çağrısından dönen fiyat haritası; `rows` dizisindeki tüm `r.id` değerleri ile fiyatlar çekilir
-- **Dönüş**: `Promise<WithDisplayPrice<T>[]>` — fiyat bilgileri eklenmiş satır dizisi; `rows` boşsa boş dizi döner
+  - `prices` — `fetchDisplayPrices(supabase, rows.map(r => r.id))` çağrısından dönen Map<string, DisplayPriceInfo> haritası; rows dizisi boşsa bu çağrı yapılmaz
+- **Dönüş**: `Promise<WithDisplayPrice<T>[]>` — rows dizisine fiyat bilgileri eklenmiş yeni dizi; rows boşsa boş dizi döner
 
 ---
 
@@ -59080,8 +58898,8 @@ graph TD
     displayPrice_service_ts__attachDisplayPrices["attachDisplayPrices"]
     displayPrice_service_ts__fetchDisplayPrices["fetchDisplayPrices"]
     displayPrice_service_ts__withDisplayPrices["withDisplayPrices"]
-    displayPrice_service_ts__withDisplayPrices --> displayPrice_service_ts__fetchDisplayPrices
     displayPrice_service_ts__withDisplayPrices --> displayPrice_service_ts__attachDisplayPrices
+    displayPrice_service_ts__withDisplayPrices --> displayPrice_service_ts__fetchDisplayPrices
 ```
 
 ## NODE ID STANDARD
@@ -59394,12 +59212,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\fxLockAdmin.service.ts
-skeleton_hash: 842677c912721fd8
+source_path: C:\tmp\ops-t165\src\lib\services\fxLockAdmin.service.ts
+skeleton_hash: f1cd687398ea61af
 entity_hashes:
   func:resolveFxLockFreeze: 1ce8633abb6e16a1
   overview: 094880244f3a70bb
-generated_at: 2026-08-25T08:44:36Z
+generated_at: 2026-08-27T07:00:07Z
 ---
 
 ## Genel Bakış
@@ -59505,12 +59323,12 @@ type FxLockFreezeDecision = /** Kapsamda aktif ürün yok — kilitlenecek bir �
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\fxRate.service.ts
-skeleton_hash: cefa55c85cf35b82
+source_path: C:\tmp\ops-t165\src\lib\services\fxRate.service.ts
+skeleton_hash: 39b81c1648946073
 entity_hashes:
   func:resolveFxRate: 75857a7dfc6e1eea
   overview: 6908f8f6ffdccdd7
-generated_at: 2026-08-25T08:44:34Z
+generated_at: 2026-08-27T07:00:09Z
 ---
 
 ## Genel Bakış
@@ -59532,10 +59350,6 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca imzadan çık
 [Aksiyom 2]: Eğer `quoteCcy` parametresi tanımlanmamış veya geçersiz bir para birimi kodu ise, fonksiyon null dönebilir (dönüş tipi `FxRateResult | null` olarak tanımlıdır).
 
 [Aksiyom 3]: Eğer `today` parametresi tanımlanmamış veya geçersiz bir tarih formatı ise, fonksiyon null dönebilir.
-
----
-
-**Not:** Fonksiyon gövdesi (implementation) sağlanmadığından, bu aksiyomlar yalnızca imzadan çıkarılan varsayımlardır. Gövdedeki iş mantığı, veritabanı sorguları, hata yönetimi ve eşik değerleri gibi detaylı mimari varsayımlar için kaynak kodun kendisi gereklidir.
 
 ---
 
@@ -59605,13 +59419,13 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca imzadan çık
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\inventoryReport.service.ts
-skeleton_hash: fb9f50ae8dd5b2a8
+source_path: C:\tmp\ops-t165\src\lib\services\inventoryReport.service.ts
+skeleton_hash: 1c3a4525f60ec199
 entity_hashes:
   func:getInventoryMovements: 07db97961f2a156e
   func:movementQueryFn: 2f48e11557ce3e37
   overview: 100075d17225ac3b
-generated_at: 2026-08-24T12:50:12Z
+generated_at: 2026-08-27T07:00:10Z
 ---
 
 ## Genel Bakış
@@ -59718,17 +59532,17 @@ type InventoryMovementRow = QueryData<ReturnType<typeof movementQueryFn>>[number
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\invoice.service.ts
-skeleton_hash: cefdf01a9abcce88
+source_path: C:\tmp\ops-t165\src\lib\services\invoice.service.ts
+skeleton_hash: 2d08c67470e6970e
 entity_hashes:
-  func:createInvoiceProfile: 5e5a37f5f764d379
-  func:deleteInvoiceProfile: 65d9f6fe10df813f
-  func:fetchDefaultInvoiceProfile: 2c73823e50b3579a
-  func:listInvoiceProfiles: 28aa8aa7e1a9d27a
-  func:setDefaultInvoiceProfile: 5969056d403828fd
-  func:updateInvoiceProfile: 978db19027a5f5be
+  func:createInvoiceProfile: b61cab6e7702bfbf
+  func:deleteInvoiceProfile: 8866a054d85e0ac1
+  func:fetchDefaultInvoiceProfile: f1287ca9e9965700
+  func:listInvoiceProfiles: 6ba70aee1e01c86e
+  func:setDefaultInvoiceProfile: 4d36f8d033787f35
+  func:updateInvoiceProfile: 980d1d157193156f
   overview: a257728e512b389b
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:01:01Z
 ---
 
 ## Genel Bakış
@@ -59766,11 +59580,14 @@ Bu modül, fatura profillerinin CRUD işlemlerini ve varsayılan profil yönetim
 ## FONKSİYON DETAYLARI
 
 ### listInvoiceProfiles
-**Ne yapar**: Kullanıcının tüm fatura profillerini listeler. Varsayılan profiller ve oluşturulma tarihine göre sıralanmış bir dizi döndürür. Fatura profilleri tablosu mevcut değilse boş dizi döner.
-**Nasıl yapar**: Supabase istemcisi aracılığıyla 'user_invoice_profiles' tablosundaki tüm kayıtları çeker. Sıralama önce `is_default` (azalan) ardından `created_at` (azalan) alanına göre yapılır. Tablo bulunamadı hatası (PGRST205) oluşursa sessizce boş dizi döner, diğer hataları fırlatır.
+**Ne yapar**: Veritabanındaki tüm kullanıcı fatura profillerini listeler. Profiller önce varsayılan olana (`is_default`), ardından oluşturulma tarihine (`created_at`) göre azalan sırada sıralanır.
+
+**Nasıl yapar**: Supabase istemcisi üzerinden `user_invoice_profiles` tablosundan tüm kayıtları (`select('*')`) çeker. Sonuçları iki sıralama kriteriyle getirir: önce `is_default` alanı azalan (true olanlar üstte), sonra `created_at` alanı azalan (en yeni üstte). Hata durumunda, tablonun bulunamadığına dair özel bir hata kodu (`PGRST205`) veya mesajı kontrol eder; bu durumda boş dizi döner. Diğer hataları fırlatır.
+
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Supabase veritabanı bağlantısı için kullanılan istemci nesnesi.
-**Dönüş**: `Promise<DbInvoiceProfile[]>` — Sıralanmış fatura profilleri dizisi. Hata durumunda boş dizi döner.
+- `supabase`: `SupabaseClient<Database>` — Supabase veritabanı istemcisi. Veritabanı bağlantısını ve sorgu yetkilerini sağlar.
+
+**Dönüş**: `Promise<DbInvoiceProfile[]>` — Fatura profillerinin listesini içeren bir Promise. Tablo bulunamazsa boş dizi, başarılı olursa profiller dizisi döner.
 
 ### createInvoiceProfile
 **Ne yapar**: Yeni bir fatura profili oluşturur. Oluşturma işleminden önce kullanıcının kimliğini doğrular ve profili otomatik olarak ilgili kullanıcıya atar.
@@ -59823,58 +59640,59 @@ Bu modül, fatura profillerinin CRUD işlemlerini ve varsayılan profil yönetim
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/services/invoice.service.ts::listInvoiceProfiles
-- **params**: `(supabase: SupabaseClient<Database>)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen `user_invoice_profiles` tablosu satırlarının dizisi
-  - `error` — Supabase sorgusu sırasında oluşan hata nesnesi; `PGRST205` kodu veya tablo bulunamadı hatası kontrol edilir
-  - `e` — `error` nesnesinin `PostgrestErrorExtended` arayüzüne dönüştürülmüş hali, hata kodu ve mesajı için kullanılır
-- **Dönüş**: `Promise<DbInvoiceProfile[]>` — Tablo bulunamazsa boş dizi döner, aksi halde tüm fatura profilleri sıralı olarak döner
+  - `data` — supabase sorgusundan dönen satırlar dizisi (destructuring ile alınır)
+  - `error` — supabase sorgusundan dönen hata nesnesi (destructuring ile alınır)
+  - `e` — `error` değişkeninin `PostgrestErrorExtended` arayüzüne cast edilmiş hali; `code` ve `message` alanlarına erişim sağlar
+- **Dönüş**: `DbInvoiceProfile[]` — tüm fatura profillerinin listesi; tablo bulunamazsa boş dizi döner
 
 ### [N2_NASIL] AST Pointer: src/lib/services/invoice.service.ts::createInvoiceProfile
-- **params**: `(supabase: SupabaseClient<Database>, payload: DbInvoiceProfileInsert)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `payload` — DbInvoiceProfileInsert tipinde, oluşturulacak profil verisi
 - **ic_degiskenler**:
-  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi
-  - `userError` — Kimlik doğrulama sırasında oluşan hata nesnesi
-  - `user` — `authData.user` property'si; oturum açmış kullanıcı nesnesi, `user.id` alanı payload'a eklenir
-  - `dbPayload` — `payload` ile `user.id` alanının birleştirilmiş hali; `...payload` spread operatorü ile `user_id` eklenir
-  - `data` — Supabase `insert` ve `select` sorgusundan dönen tek satırlık veri
-  - `error` — Supabase insert/select sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<DbInvoiceProfile>` — Yeni oluşturulmuş fatura profili nesnesi
+  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi (destructuring ile alınır)
+  - `userError` — `supabase.auth.getUser()` çağrısından dönen hata (destructuring ile alınır)
+  - `user` — `authData?.user` erişimiyle elde edilen kullanıcı nesnesi
+  - `dbPayload` — `payload` nesnesinin spread edilip `user_id: user.id` alanının eklenmiş hali; veritabanına gönderilecek son veri
+  - `data` — insert sorgusundan dönen tekil satır (destructuring ile alınır)
+  - `error` — insert sorgusundan dönen hata (destructuring ile alınır)
+- **Dönüş**: `DbInvoiceProfile` — oluşturulan fatura profili
 
 ### [N3_NASIL] AST Pointer: src/lib/services/invoice.service.ts::updateInvoiceProfile
-- **params**: `(supabase: SupabaseClient<Database>, id: string, payload: DbInvoiceProfileUpdate)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — güncellenecek profilin kimlik değeri; `payload` — DbInvoiceProfileUpdate tipinde, güncelleme verisi
 - **ic_degiskenler**:
-  - `data` — Supabase `update` ve `select` sorgusundan dönen tek satırlık güncellenmiş veri
-  - `error` — Supabase update/select sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<DbInvoiceProfile>` — Güncellenmiş fatura profili nesnesi
+  - `data` — update sorgusundan dönen tekil satır (destructuring ile alınır)
+  - `error` — update sorgusundan dönen hata (destructuring ile alınır)
+- **Dönüş**: `DbInvoiceProfile` — güncellenmiş fatura profili
 
 ### [N4_NASIL] AST Pointer: src/lib/services/invoice.service.ts::deleteInvoiceProfile
-- **params**: `(supabase: SupabaseClient<Database>, id: string)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — silinecek profilin kimlik değeri
 - **ic_degiskenler**:
-  - `error` — Supabase `delete` sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<boolean>` — Silme başarılıysa `true` döner, hata oluşursa exception fırlatılır
+  - `error` — delete sorgusundan dönen hata (destructuring ile alınır)
+- **Dönüş**: `boolean` — silme başarılıysa `true`; hata varsa fırlatılır
 
 ### [N5_NASIL] AST Pointer: src/lib/services/invoice.service.ts::setDefaultInvoiceProfile
-- **params**: `(supabase: SupabaseClient<Database>, id: string)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — varsayılan yapılacak profilin kimlik değeri
 - **ic_degiskenler**:
-  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi
-  - `userError` — Kimlik doğrulama sırasında oluşan hata nesnesi
-  - `user` — `authData.user` property'si; oturum açmış kullanıcı nesnesi, `user.id` alanı mevcut varsayılan profilleri temizlemek için kullanılır
-  - `clear` — Kullanıcının diğer tüm `is_default: true` olan profillerini `is_default: false` yapma işleminin sonucu; `clear.error` kontrol edilir
-  - `data` — Belirtilen `id`'li profilin `is_default: true` olarak güncellenmesi sonrası dönen tek satırlık veri
-  - `error` — Supabase update/select sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<DbInvoiceProfile>` — Varsayılan olarak ayarlanmış fatura profili nesnesi
+  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi (destructuring ile alınır)
+  - `userError` — `supabase.auth.getUser()` çağrısından dönen hata (destructuring ile alınır)
+  - `user` — `authData?.user` erişimiyle elde edilen kullanıcı nesnesi
+  - `clear` — aynı kullanıcıya ait mevcut varsayılan profilleri `is_default: false` olarak güncelleyen sorgu sonucu
+  - `clear.error` — `clear` nesnesinin `error` alanı; temizleme sorgusundaki hata
+  - `data` — `id` ile belirtilen profili `is_default: true` yapan update sorgusundan dönen tekil satır (destructuring ile alınır)
+  - `error` — ikinci update sorgusundan dönen hata (destructuring ile alınır)
+- **Dönüş**: `DbInvoiceProfile` — varsayılan olarak ayarlanan fatura profili
 
 ### [N6_NASIL] AST Pointer: src/lib/services/invoice.service.ts::fetchDefaultInvoiceProfile
-- **params**: `(supabase: SupabaseClient<Database>)`
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
 - **ic_degiskenler**:
-  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi
-  - `userError` — Kimlik doğrulama sırasında oluşan hata nesnesi
-  - `user` — `authData.user` property'si; oturum açmış kullanıcı nesnesi, `user.id` alanı `user_id` filtresi için kullanılır
-  - `data` — Supabase `select` sorgusundan dönen `user_invoice_profiles` tablosu satırlarının dizisi; `user_id` ve `is_default` filtreleri uygulanmış, `updated_at` azalan sırayla, en fazla 1 satır
-  - `error` — Supabase select sırasında oluşan hata nesnesi; `PGRST205` kodu veya tablo bulunamadı hatası kontrol edilir
-  - `e` — `error` nesnesinin `PostgrestErrorExtended` arayüzüne dönüştürülmüş hali, hata kodu ve mesajı için kullanılır
-- **Dönüş**: `Promise<DbInvoiceProfile | null>` — Varsayılan fatura profili varsa `data[0]` olarak döner, bulunamazsa veya tablo yoksa `null` döner
+  - `authData` — `supabase.auth.getUser()` çağrısından dönen kimlik doğrulama verisi (destructuring ile alınır)
+  - `userError` — `supabase.auth.getUser()` çağrısından dönen hata (destructuring ile alınır)
+  - `user` — `authData?.user` erişimiyle elde edilen kullanıcı nesnesi
+  - `data` — select sorgusundan dönen satırlar dizisi (destructuring ile alınır)
+  - `error` — select sorgusundan dönen hata (destructuring ile alınır)
+  - `e` — `error` değişkeninin `PostgrestErrorExtended` arayüzüne cast edilmiş hali; `code` ve `message` alanlarına erişim sağlar
+- **Dönüş**: `DbInvoiceProfile | null` — kullanıcının varsayılan fatura profili; bulunamazsa `null`, tablo yoksa `null` döner
 
 ---
 
@@ -59917,8 +59735,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\services\orderInvoice.service.ts
-skeleton_hash: 591f94b8331509fb
+source_path: C:\tmp\ops-t165\src\lib\services\orderInvoice.service.ts
+skeleton_hash: 89f1c96bca26993f
 entity_hashes:
   func:createInvoice: 2478534b19d58457
   func:faturaSatiri: 0eb38488588a89e0
@@ -59930,7 +59748,7 @@ entity_hashes:
   func:metinVeyaBos: 8451a7adcacdeb26
   func:sayiVeyaBos: adc4133d79ec119d
   overview: 30bb771da643e091
-generated_at: 2026-08-25T07:28:56Z
+generated_at: 2026-08-27T07:01:02Z
 ---
 
 ## Genel Bakış
@@ -60113,26 +59931,26 @@ graph TD
     orderInvoice_service_ts__metin["metin"]
     orderInvoice_service_ts__metinVeyaBos["metinVeyaBos"]
     orderInvoice_service_ts__sayiVeyaBos["sayiVeyaBos"]
-    orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__sayiVeyaBos
-    orderInvoice_service_ts__faturaSatiri --> orderInvoice_service_ts__metin
     orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__metin
-    orderInvoice_service_ts__createInvoice --> orderInvoice_service_ts__faturaSatiri
     orderInvoice_service_ts__faturaSatiri --> orderInvoice_service_ts__metinVeyaBos
+    orderInvoice_service_ts__createInvoice --> orderInvoice_service_ts__faturaSatiri
+    orderInvoice_service_ts__faturaSatiri --> orderInvoice_service_ts__metin
     orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__metinVeyaBos
+    orderInvoice_service_ts__faturasizSatir --> orderInvoice_service_ts__sayiVeyaBos
 ```
 
 ## NODE ID STANDARD
 
-  file: orderInvoice.service.ts
-  function: orderInvoice.service.ts::metin
-  function: orderInvoice.service.ts::metinVeyaBos
-  function: orderInvoice.service.ts::sayiVeyaBos
-  function: orderInvoice.service.ts::faturaSatiri
-  function: orderInvoice.service.ts::faturasizSatir
-  function: orderInvoice.service.ts::listInvoices
-  function: orderInvoice.service.ts::listInvoicesForOrder
-  function: orderInvoice.service.ts::listUninvoicedPaidOrders
-  function: orderInvoice.service.ts::createInvoice
+  file: src\lib\services\orderInvoice.service.ts
+  function: src\lib\services\orderInvoice.service.ts::metin
+  function: src\lib\services\orderInvoice.service.ts::metinVeyaBos
+  function: src\lib\services\orderInvoice.service.ts::sayiVeyaBos
+  function: src\lib\services\orderInvoice.service.ts::faturaSatiri
+  function: src\lib\services\orderInvoice.service.ts::faturasizSatir
+  function: src\lib\services\orderInvoice.service.ts::listInvoices
+  function: src\lib\services\orderInvoice.service.ts::listInvoicesForOrder
+  function: src\lib\services\orderInvoice.service.ts::listUninvoicedPaidOrders
+  function: src\lib\services\orderInvoice.service.ts::createInvoice
 
 ---
 
@@ -60157,8 +59975,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\services\pricing.service.ts
-skeleton_hash: 83999a08595cf2be
+source_path: C:\tmp\ops-t165\src\lib\services\pricing.service.ts
+skeleton_hash: a1bc94bcebe44ec5
 entity_hashes:
   func:computePriceFromRule: 20d0773f85dcc18b
   func:getEffectivePriceInfo: c612469fff714cef
@@ -60173,7 +59991,7 @@ entity_hashes:
   func:scopeMatchesProduct: d59f1cfb776d4fcd
   func:sortRules: 5a906937cc73d945
   overview: b38a0c8da1fe006b
-generated_at: 2026-08-25T07:29:07Z
+generated_at: 2026-08-27T07:01:04Z
 ---
 
 ## Genel Bakış
@@ -60530,34 +60348,34 @@ graph TD
     pricing_service_ts__ruleMatchesProduct["ruleMatchesProduct"]
     pricing_service_ts__scopeMatchesProduct["scopeMatchesProduct"]
     pricing_service_ts__sortRules["sortRules"]
-    pricing_service_ts__computePriceFromRule --> pricing_service_ts__round2
-    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__sortRules
-    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__round2
-    pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__nowIso
     pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__getUserPriceSegment
-    pricing_service_ts__getEffectiveUnitPrice --> pricing_service_ts__getEffectivePriceInfo
+    pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__nowIso
+    pricing_service_ts__computePriceFromRule --> pricing_service_ts__round2
+    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__round2
+    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__computePriceFromRule
     pricing_service_ts__computePriceFromRule --> pricing_service_ts__roundToStep
+    pricing_service_ts__getEffectiveUnitPrice --> pricing_service_ts__getEffectivePriceInfo
+    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__sortRules
+    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__ruleMatchesProduct
     pricing_service_ts__resolvePrice --> pricing_service_ts__resolvePriceWithRules
     pricing_service_ts__ruleMatchesProduct --> pricing_service_ts__scopeMatchesProduct
-    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__ruleMatchesProduct
-    pricing_service_ts__resolvePriceWithRules --> pricing_service_ts__computePriceFromRule
 ```
 
 ## NODE ID STANDARD
 
-  file: pricing.service.ts
-  function: pricing.service.ts::getUserPriceSegment
-  function: pricing.service.ts::nowIso
-  function: pricing.service.ts::getEffectiveUnitPrice
-  function: pricing.service.ts::getEffectivePriceInfo
-  function: pricing.service.ts::roundToStep
-  function: pricing.service.ts::round2
-  function: pricing.service.ts::scopeMatchesProduct
-  function: pricing.service.ts::ruleMatchesProduct
-  function: pricing.service.ts::sortRules
-  function: pricing.service.ts::computePriceFromRule
-  function: pricing.service.ts::resolvePriceWithRules
-  function: pricing.service.ts::resolvePrice
+  file: src\lib\services\pricing.service.ts
+  function: src\lib\services\pricing.service.ts::getUserPriceSegment
+  function: src\lib\services\pricing.service.ts::nowIso
+  function: src\lib\services\pricing.service.ts::getEffectiveUnitPrice
+  function: src\lib\services\pricing.service.ts::getEffectivePriceInfo
+  function: src\lib\services\pricing.service.ts::roundToStep
+  function: src\lib\services\pricing.service.ts::round2
+  function: src\lib\services\pricing.service.ts::scopeMatchesProduct
+  function: src\lib\services\pricing.service.ts::ruleMatchesProduct
+  function: src\lib\services\pricing.service.ts::sortRules
+  function: src\lib\services\pricing.service.ts::computePriceFromRule
+  function: src\lib\services\pricing.service.ts::resolvePriceWithRules
+  function: src\lib\services\pricing.service.ts::resolvePrice
 
 ---
 
@@ -60593,8 +60411,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\services\pricingAdmin.service.ts
-skeleton_hash: 8ac5cab7bd200c1c
+source_path: C:\tmp\ops-t165\src\lib\services\pricingAdmin.service.ts
+skeleton_hash: 869bf29b1bc7154e
 entity_hashes:
   func:ScopeFilterableQuery:eq: b0d4a7d1d095dcbd
   func:activeProductsQuery: 8b70307de3dcf767
@@ -60615,7 +60433,7 @@ entity_hashes:
   func:updatePricingRule: 5601b347117ac443
   func:withScopeFilter: 2b3e8009205fb17a
   overview: f4cde8561230f2aa
-generated_at: 2026-08-25T07:28:49Z
+generated_at: 2026-08-27T07:02:33Z
 ---
 
 ## Genel Bakış
@@ -60720,7 +60538,14 @@ Ham ürün kapsamı verisini fiyatlandırma ürününe dönüştürür ve marj y
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### eq
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Bu fonksiyon hakkında kaynakta bilgi bulunamadı. Fonksiyonun görevi bilinmiyor.
+
+**Nasıl yapar**: İç mantığı bilinmiyor.
+
+**Parametreler**:
+- Bilinmiyor. Kaynakta parametre bilgisi mevcut değil.
+
+**Dönüş**: Bilinmiyor. Kaynakta dönüş değeri bilgisi mevcut değil.
 
 ---
 
@@ -60743,8 +60568,7 @@ Kapsam örneklemesi için gerekli minimum ürün alanları.
 - `cost_in_base: number | null`
 
 ### ScopeFilterableQuery
-- `eq(column: 'id' | 'brand', value: string): Q
-`
+- `eq(column: 'id' | 'brand', value: string): Q`
 
 ---
 
@@ -60795,127 +60619,135 @@ type ScopeFilter = | { kind: 'empty' }
 ### [N1_NASIL] AST Pointer: pricingAdmin.service.ts::listPricingRules
 - **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
 - **ic_degiskenler**:
-  - `data` — sorgudan dönen satırlar dizisi (PricingRuleRow[])
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-- **Dönüş**: `data ?? []` — PricingRuleRow[] dizisi; data null ise boş dizi döner
+  - `data` — supabase sorgusundan dönen satırlar dizisi (PricingRuleRow[])
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: Promise<PricingRuleRow[]> — pricing_rule tablosundan çekilen kurallar listesi; hata varsa throw edilir, data yoksa boş dizi döner
 
 ### [N2_NASIL] AST Pointer: pricingAdmin.service.ts::createPricingRule
 - **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `input` — PricingRuleCreateInput tipinde, eklenecek kural verisi
 - **ic_degiskenler**:
-  - `data` — insert sonrası dönen tek satır (PricingRuleRow)
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-- **Dönüş**: `data` — PricingRuleRow
+  - `data` — insert işlemi sonrası dönen tek satır (PricingRuleRow)
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: Promise<PricingRuleRow> — oluşturulan kuralın tüm alanlarını içeren tek satır; hata varsa throw edilir
 
 ### [N3_NASIL] AST Pointer: pricingAdmin.service.ts::updatePricingRule
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — string, güncellenecek kuralın kimliği; `patch` — PricingRuleUpdateInput tipinde, güncellenecek alanlar; `updatedBy` — string | null, güncellemeyi yapan kişi
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — string tipinde, güncellenecek kuralın birincil anahtarı; `patch` — PricingRuleUpdateInput tipinde, güncellenecek alanlar; `updatedBy` — string | null tipinde, güncellemeyi yapan kişi/kimlik
 - **ic_degiskenler**:
-  - `payload` — PricingRuleUpdateInput tipinde, patch alanlarını `updated_at` (ISO tarih) ve `updated_by` ile birleştirerek oluşturulan güncelleme verisi
-  - `data` — güncelleme sonrası dönen tek satır (PricingRuleRow)
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-- **Dönüş**: `data` — PricingRuleRow
+  - `payload` — PricingRuleUpdateInput tipinde, patch alanlarını, `updated_at` (ISO tarih) ve `updated_by` alanlarını birleştiren nesne
+  - `data` — update işlemi sonrası dönen tek satır (PricingRuleRow)
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: Promise<PricingRuleRow> — güncellenen kuralın tüm alanlarını içeren tek satır; hata varsa throw edilir
 
 ### [N4_NASIL] AST Pointer: pricingAdmin.service.ts::deletePricingRule
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — string, silinecek kuralın kimliği
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `id` — string tipinde, silinecek kuralın birincil anahtarı
 - **ic_degiskenler**:
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-- **Dönüş**: yok (void)
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: Promise<void> — hata varsa throw edilir, başarılıysa bir şey döndürmez
 
 ### [N5_NASIL] AST Pointer: pricingAdmin.service.ts::deletePricingRules
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `ids` — string[], silinecek kural kimlikleri dizisi
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `ids` — string[] tipinde, silinecek kuralların birincil anahtarları dizisi
 - **ic_degiskenler**:
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-- **Dönüş**: yok (void); `ids` boşsa erken dönüş yapılır
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: Promise<void> — ids boşsa erken dönüş yapar, hata varsa throw edilir
 
 ### [N6_NASIL] AST Pointer: pricingAdmin.service.ts::loadBrandIdByName
 - **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
 - **ic_degiskenler**:
-  - `data` — brands tablosundan dönen satırlar dizisi (id, name alanları)
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-  - `map` — Map<string, string> tipinde, marka adını anahtar olarak marka kimliğine eşleyen harita
-- **Dönüş**: `map` — Map<string, string>
+  - `data` — brands tablosundan dönen satırlar dizisi (id ve name alanları)
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+  - `map` — Map<string, string> tipinde, marka adını marka kimliğine eşleyen sözlük
+  - `row` — data dizisindeki her bir satır; `row.name` anahtar olarak, `row.id` değer olarak kullanılır
+- **Dönüş**: Promise<Map<string, string>> — marka adı → marka kimliği eşlemesi; hata varsa throw edilir
 
 ### [N7_NASIL] AST Pointer: pricingAdmin.service.ts::toPricingProductInput
-- **params**: `row` — ProductScopeRow tipinde, ürün satırı; `brandIdByName` — Map<string, string> tipinde, marka adından marka kimliğine eşleme haritası
-- **ic_degiskenler**: yok (doğrudan return objesi oluşturulur)
-- **Dönüş**: SampleProduct nesnesi — `id`, `brandId` (brandIdByName.get(row.brand) ?? brandIdByName.get(row.brand.trim()) ?? null), `categoryId` (row.category_id ?? null), `costInBase` (row.cost_in_base ?? null), `name`, `sku` alanlarını içerir
+- **params**: `row` — ProductScopeRow tipinde, ürün kapsam satırı; `brandIdByName` — Map<string, string> tipinde, marka adı → marka kimliği eşlemesi
+- **ic_degiskenler**:
+  - (yok — doğrudan return ifadesi ile nesne oluşturulur)
+- **Dönüş**: SampleProduct — `id`, `brandId`, `categoryId`, `costInBase`, `name`, `sku` alanlarını içeren nesne; `brandId` için row.brand ile eşleşme yoksa row.brand.trim() ile tekrar denenir, ikisi de yoksa null döner
 
 ### [N8_NASIL] AST Pointer: pricingAdmin.service.ts::brandNameById
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `brandId` — string, aranacak marka kimliği
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `brandId` — string tipinde, aranacak marka kimliği
 - **ic_degiskenler**:
-  - `data` — sorgudan dönen tek satır (name alanı); bulunamazsa null
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-- **Dönüş**: `data?.name ?? null` — string | null
+  - `data` — sorgu sonucu dönen tek satır (name alanı); eşleşme yoksa null olabilir
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: Promise<string | null> — marka adı veya eşleşme yoksa null; hata varsa throw edilir
 
 ### [N9_NASIL] AST Pointer: pricingAdmin.service.ts::categoryIdsWithDescendants
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `rootId` — string, kök kategori kimliği
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `rootId` — string tipinde, kök kategori kimliği
 - **ic_degiskenler**:
-  - `data` — categories tablosundan dönen satırlar dizisi (id, parent_id alanları)
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-  - `childrenOf` — Map<string, string[]> tipinde, her parent_id'ye ait çocuk kimliklerini tutan harita
-  - `collected` — Set<string> tipinde, BFS ile toplanan tüm kategori kimliklerini tutan küme; başlangıçta rootId içerir
+  - `data` — categories tablosundan dönen satırlar dizisi (id ve parent_id alanları)
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+  - `childrenOf` — Map<string, string[]> tipinde, her parent_id için çocuk kimliklerini tutan sözlük
+  - `bucket` — childrenOf.get(row.parent_id) sonucu, mevcut çocuk listesi veya undefined
+  - `collected` — Set<string> tipinde, ziyaret edilen kategori kimliklerini tutan küme; başlangıçta rootId içerir
   - `queue` — string[] tipinde, BFS kuyruğu; başlangıçta rootId içerir
-  - `current` — BFS döngüsünde işlenen mevcut kategori kimliği
-- **Dönüş**: `[...collected]` — string[] dizisi; rootId ve tüm alt kategori kimliklerini içerir
+  - `current` — queue.shift() ile kuyruktan çıkarılan mevcut kategori kimliği
+  - `child` — childrenOf.get(current) listesindeki her bir alt kategori kimliği
+- **Dönüş**: Promise<string[]> — rootId ve tüm torun kategorilerin kimliklerini içeren dizi; hata varsa throw edilir
 
 ### [N10_NASIL] AST Pointer: pricingAdmin.service.ts::resolveScopeFilter
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `scope` — number, kapsam türü (0, 1, 2, 3 veya diğer); `targetId` — string | null, hedef kimlik
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `scope` — number tipinde, kapsam türü (0, 1, 2, 3 veya diğer); `targetId` — string | null tipinde, hedef kimlik
 - **ic_degiskenler**:
   - `name` — brandNameById çağrısından dönen marka adı (scope === 2 durumunda)
-- **Dönüş**: ScopeFilter nesnesi — scope ve targetId değerlerine göre: `{ kind: 'id', value: targetId }`, `{ kind: 'empty' }`, `{ kind: 'brand', value: name }`, `{ kind: 'categories', values: [...] }` veya `{ kind: 'all' }`
+- **Dönüş**: Promise<ScopeFilter> — kapsam türüne göre filtre nesnesi: scope 0/1 → targetId varsa {kind:'id', value} yoksa {kind:'empty'}; scope 2 → marka adı varsa {kind:'brand', value} yoksa {kind:'empty'}; scope 3 → {kind:'categories', values}; diğer → {kind:'all'}
 
 ### [N11_NASIL] AST Pointer: pricingAdmin.service.ts::withScopeFilter
-- **params**: `query` — ScopeFilterableQuery<Q> tipinde, Supabase sorgu nesnesi; `filter` — ScopeFilter tipinde, kapsam filtresi
-- **ic_degiskenler**: yok (switch-case ile doğrudan sorgu zincirleme yapılır)
-- **Dönüş**: `query` — Q tipinde; filter.kind değerine göre `.eq('id', filter.value)`, `.eq('brand', filter.value)`, `.in('category_id', filter.values)` uygulanmış veya filtresiz sorgu
+- **params**: `query` — Q tipinde (ScopeFilterableQuery<Q>), sorgu nesnesi; `filter` — ScopeFilter tipinde, uygulanacak filtre
+- **ic_degiskenler**:
+  - (yok — switch-case ile doğrudan sorgu zincirleme işlemi yapılır)
+- **Dönüş**: Q — filtre türüne göre uygulanmış sorgu: 'id' → query.eq('id', value); 'brand' → query.eq('brand', value); 'categories' → query.in('category_id', values); default → query (değişmeden)
 
 ### [N12_NASIL] AST Pointer: pricingAdmin.service.ts::activeProductsQuery
 - **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
-- **ic_degiskenler**: yok (doğrudan sorgu zincirleme döndürülür)
-- **Dönüş**: Supabase sorgu nesnesi — products tablosundan PRODUCT_SCOPE_COLUMNS seçer, deleted_at null olan ve status 'active' olan kayıtları filtreler
+- **ic_degiskenler**:
+  - (yok — doğrudan sorgu zincirleme döndürülür)
+- **Dönüş**: (belirtilmemiş dönüş tipi) — products tablosundan PRODUCT_SCOPE_COLUMNS seçilen, deleted_at null olan ve status 'active' olan sorgu nesnesi
 
 ### [N13_NASIL] AST Pointer: pricingAdmin.service.ts::countProductsInScope
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `scope` — number, kapsam türü; `targetId` — string | null, hedef kimlik
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `scope` — number tipinde, kapsam türü; `targetId` — string | null tipinde, hedef kimlik
 - **ic_degiskenler**:
-  - `filter` — resolveScopeFilter çağrısından dönen ScopeFilter nesnesi
-  - `countQuery` — products tablosundan id seçen, deleted_at null ve status 'active' filtreli sayım sorgusu
-  - `count` — sorgudan dönen toplam kayıt sayısı
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-- **Dönüş**: `count ?? 0` — number; filter.kind 'empty' ise 0 döner
+  - `filter` — resolveScopeFilter sonucu dönen ScopeFilter nesnesi
+  - `countQuery` — products tablosundan id seçen, deleted_at null ve status 'active' olan, head:true ve count:'exact' ile sorgu
+  - `count` — sorgu sonucu dönen sayı (exact count)
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: Promise<number> — kapsam içindeki aktif ürün sayısı; filter.kind 'empty' ise 0 döner; hata varsa throw edilir; count null ise 0 döner
 
 ### [N14_NASIL] AST Pointer: pricingAdmin.service.ts::sampleProductsInScope
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `scope` — number, kapsam türü; `targetId` — string | null, hedef kimlik; `n` — number (varsayılan 3), örnek ürün sayısı
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `scope` — number tipinde, kapsam türü; `targetId` — string | null tipinde, hedef kimlik; `n` — number tipinde (varsayılan 3), örneklem sayısı
 - **ic_degiskenler**:
-  - `filter` — resolveScopeFilter çağrısından dönen ScopeFilter nesnesi
-  - `data` — sorgudan dönen satırlar dizisi
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-  - `rows` — ProductScopeRow[] tipinde, data ?? [] ataması
-  - `brandIdByName` — loadBrandIdByName çağrısından dönen Map<string, string>
-- **Dönüş**: `rows.map((row) => toPricingProductInput(row, brandIdByName))` — SampleProduct[] dizisi; filter.kind 'empty' ise boş dizi döner
+  - `filter` — resolveScopeFilter sonucu dönen ScopeFilter nesnesi
+  - `data` — sorgu sonucu dönen satırlar dizisi
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+  - `rows` — ProductScopeRow[] tipinde, data ?? [] ile null-safe hale getirilmiş satırlar
+  - `brandIdByName` — loadBrandIdByName sonucu dönen Map<string, string>
+- **Dönüş**: Promise<SampleProduct[]> — kapsam içindeki aktif ürünlerden n adet örnek; filter.kind 'empty' ise boş dizi döner; her satır toPricingProductInput ile dönüştürülür; hata varsa throw edilir
 
 ### [N15_NASIL] AST Pointer: pricingAdmin.service.ts::distinctPurchaseCurrenciesInScope
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `scope` — number, kapsam türü; `targetId` — string | null, hedef kimlik
+- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `scope` — number tipinde, kapsam türü; `targetId` — string | null tipinde, hedef kimlik
 - **ic_degiskenler**:
-  - `filter` — resolveScopeFilter çağrısından dönen ScopeFilter nesnesi
+  - `filter` — resolveScopeFilter sonucu dönen ScopeFilter nesnesi
   - `found` — Set<string> tipinde, bulunan benzersiz para birimlerini tutan küme
-  - `page` — number, döngü sayaç değişkeni (0'dan SCOPE_SCAN_MAX_PAGES'e kadar)
-  - `from` — number, sayfalama başlangıç indeksi (page * SCOPE_SCAN_PAGE)
-  - `baseQuery` — products tablosundan purchase_currency seçen, deleted_at null ve status 'active' filtreli sorgu
-  - `data` — sorgudan dönen satırlar dizisi
-  - `error` — sorgu hatası varsa fırlatılacak hata nesnesi
-  - `rows` — data ?? [] ataması
-  - `row` — rows dizisindeki her bir satır (purchase_currency alanı okunur)
-  - `currency` — row.purchase_currency ?? '' değerinin trim().toUpperCase() işleminden geçmiş hali
-- **Dönüş**: `[...found].sort()` — string[] dizisi (sıralı benzersiz para birimleri); sayfa boyutundan az satır dönerse erken dönüş; SCOPE_SCAN_MAX_PAGES aşılırsa hata fırlatılır
+  - `page` — number tipinde, döngü sayaç (0'dan SCOPE_SCAN_MAX_PAGES'e kadar)
+  - `from` — number tipinde, sayfa başlangıç indeksi (page * SCOPE_SCAN_PAGE)
+  - `baseQuery` — products tablosundan purchase_currency seçen, deleted_at null ve status 'active' olan sorgu
+  - `data` — sorgu sonucu dönen satırlar dizisi
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi
+  - `rows` — data ?? [] ile null-safe hale getirilmiş satırlar dizisi
+  - `row` — rows dizisindeki her bir satır
+  - `currency` — row.purchase_currency ?? '' ifadesinin trim().toUpperCase() sonucu
+- **Dönüş**: Promise<string[]> — kapsam içindeki aktif ürünlerin benzersiz purchase_currency değerlerini alfabetik sıralı dizi; filter.kind 'empty' ise boş dizi döner; SCOPE_SCAN_MAX_PAGES * SCOPE_SCAN_PAGE ürün sayısını aşarsa hata fırlatır
 
 ### [N16_NASIL] AST Pointer: pricingAdmin.service.ts::marginPctToCoefficient
-- **params**: `marginPct` — number, yüzde olarak kâr marjı
-- **ic_degiskenler**: yok
-- **Dönüş**: `Number((1 + marginPct / 100).toFixed(4))` — number; marginPct sonlu değilse `Number.NaN` döner
+- **params**: `marginPct` — number tipinde, yüzde olarak kâr marjı
+- **ic_degiskenler**:
+  - (yok — doğrudan return ifadesi)
+- **Dönüş**: number — (1 + marginPct / 100) ifadesinin 4 ondalık basamağa yuvarlanmış hali; marginPct sonlu değilse Number.NaN döner
 
 ### [N17_NASIL] AST Pointer: pricingAdmin.service.ts::coefficientToMarginPct
-- **params**: `coefficient` — number, katsayı
-- **ic_degiskenler**: yok
-- **Dönüş**: `Number(((coefficient - 1) * 100).toFixed(4))` — number; coefficient sonlu değilse `Number.NaN` döner
+- **params**: `coefficient` — number tipinde, katsayı
+- **ic_degiskenler**:
+  - (yok — doğrudan return ifadesi)
+- **Dönüş**: number — (coefficient - 1) * 100 ifadesinin 4 ondalık basamağa yuvarlanmış hali; coefficient sonlu değilse Number.NaN döner
 
 ---
 
@@ -60940,39 +60772,39 @@ graph TD
     pricingAdmin_service_ts__toPricingProductInput["toPricingProductInput"]
     pricingAdmin_service_ts__updatePricingRule["updatePricingRule"]
     pricingAdmin_service_ts__withScopeFilter["withScopeFilter"]
-    pricingAdmin_service_ts__countProductsInScope --> pricingAdmin_service_ts__resolveScopeFilter
-    pricingAdmin_service_ts__distinctPurchaseCurrenciesInScope --> pricingAdmin_service_ts__resolveScopeFilter
-    pricingAdmin_service_ts__resolveScopeFilter --> pricingAdmin_service_ts__categoryIdsWithDescendants
-    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__withScopeFilter
-    pricingAdmin_service_ts__countProductsInScope --> pricingAdmin_service_ts__withScopeFilter
     pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__toPricingProductInput
-    pricingAdmin_service_ts__distinctPurchaseCurrenciesInScope --> pricingAdmin_service_ts__withScopeFilter
-    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__activeProductsQuery
-    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__loadBrandIdByName
     pricingAdmin_service_ts__resolveScopeFilter --> pricingAdmin_service_ts__brandNameById
     pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__resolveScopeFilter
+    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__withScopeFilter
+    pricingAdmin_service_ts__resolveScopeFilter --> pricingAdmin_service_ts__categoryIdsWithDescendants
+    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__activeProductsQuery
+    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__loadBrandIdByName
+    pricingAdmin_service_ts__distinctPurchaseCurrenciesInScope --> pricingAdmin_service_ts__withScopeFilter
+    pricingAdmin_service_ts__distinctPurchaseCurrenciesInScope --> pricingAdmin_service_ts__resolveScopeFilter
+    pricingAdmin_service_ts__countProductsInScope --> pricingAdmin_service_ts__withScopeFilter
+    pricingAdmin_service_ts__countProductsInScope --> pricingAdmin_service_ts__resolveScopeFilter
 ```
 
 ## NODE ID STANDARD
 
-  file: pricingAdmin.service.ts
-  function: pricingAdmin.service.ts::listPricingRules
-  function: pricingAdmin.service.ts::createPricingRule
-  function: pricingAdmin.service.ts::updatePricingRule
-  function: pricingAdmin.service.ts::deletePricingRule
-  function: pricingAdmin.service.ts::deletePricingRules
-  function: pricingAdmin.service.ts::loadBrandIdByName
-  function: pricingAdmin.service.ts::toPricingProductInput
-  function: pricingAdmin.service.ts::brandNameById
-  function: pricingAdmin.service.ts::categoryIdsWithDescendants
-  function: pricingAdmin.service.ts::resolveScopeFilter
-  function: pricingAdmin.service.ts::withScopeFilter
-  function: pricingAdmin.service.ts::activeProductsQuery
-  function: pricingAdmin.service.ts::countProductsInScope
-  function: pricingAdmin.service.ts::sampleProductsInScope
-  function: pricingAdmin.service.ts::distinctPurchaseCurrenciesInScope
-  function: pricingAdmin.service.ts::marginPctToCoefficient
-  function: pricingAdmin.service.ts::coefficientToMarginPct
+  file: src\lib\services\pricingAdmin.service.ts
+  function: src\lib\services\pricingAdmin.service.ts::listPricingRules
+  function: src\lib\services\pricingAdmin.service.ts::createPricingRule
+  function: src\lib\services\pricingAdmin.service.ts::updatePricingRule
+  function: src\lib\services\pricingAdmin.service.ts::deletePricingRule
+  function: src\lib\services\pricingAdmin.service.ts::deletePricingRules
+  function: src\lib\services\pricingAdmin.service.ts::loadBrandIdByName
+  function: src\lib\services\pricingAdmin.service.ts::toPricingProductInput
+  function: src\lib\services\pricingAdmin.service.ts::brandNameById
+  function: src\lib\services\pricingAdmin.service.ts::categoryIdsWithDescendants
+  function: src\lib\services\pricingAdmin.service.ts::resolveScopeFilter
+  function: src\lib\services\pricingAdmin.service.ts::withScopeFilter
+  function: src\lib\services\pricingAdmin.service.ts::activeProductsQuery
+  function: src\lib\services\pricingAdmin.service.ts::countProductsInScope
+  function: src\lib\services\pricingAdmin.service.ts::sampleProductsInScope
+  function: src\lib\services\pricingAdmin.service.ts::distinctPurchaseCurrenciesInScope
+  function: src\lib\services\pricingAdmin.service.ts::marginPctToCoefficient
+  function: src\lib\services\pricingAdmin.service.ts::coefficientToMarginPct
 
 ---
 
@@ -61006,62 +60838,62 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\pricingMaterialize.service.ts
-skeleton_hash: b67f376748ad8690
+source_path: C:\tmp\ops-t165\src\lib\services\pricingMaterialize.service.ts
+skeleton_hash: 1a7504600073853a
 entity_hashes:
-  func:cacheKey: 7a2b037fbced40b9
-  func:materializePrices: ddcf4da4c28a534a
-  func:refreshCostInBase: 00ed35554ce3f37b
-  func:round4: dece9adaef67a7d6
-  func:todayIso: 0d4e0c50e1686151
-  overview: b94ba1fbd6fd9d6b
-generated_at: 2026-08-15T03:55:24Z
+  func:cacheKey: d7c6032a8e6f48af
+  func:materializePrices: 255ce2dc23446808
+  func:refreshCostInBase: 180bf3fe8b9a41eb
+  func:round4: fc9039dc27f20ec9
+  func:todayIso: 793f9a0b13e73649
+  overview: 257d35d42f8e9fe7
+generated_at: 2026-08-27T07:04:12Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC fiyatlandırma sistemindeki maliyet verilerinin ve fiyat listelerinin hesaplanarak veritabanına somutlaştırılmasını (materialize) yönetir. Supabase üzerinden veri okuma/yazma işlemlerini gerçekleştirerek, fiyatların baz para birimine göre güncellenmesi ve önbellek anahtarlarının üretimini koordine eder.
+Bu modül, HVAC fiyatlandırma sisteminde maliyet ve fiyat verilerinin hesaplanması, dönüştürülmesi ve veritabanına somutlaştırılmasını (materialize) yönetir. Supabase veritabanı üzerinden okuma ve yazma işlemlerini gerçekleştirerek, fiyatların baz para birimine göre güncellenmesini ve önbellek anahtarlarının üretimini koordine eder.
 
 ## Fonksiyon Grupları
 
 ### Yardımcı Fonksiyonlar
-Tarih ve sayısal değerlerin formatlanması ile önbellek anahtarı üretimi gibi yardımcı işlemler sağlar.
+Tarih üretimi, sayısal değerlerin hassas yuvarlanması ve önbellek anahtarı oluşturma gibi temel yardımcı işlemleri sağlar.
 - todayIso, round4, cacheKey
 
 ### Maliyet Yenileme
-Maliyet verilerinin baz para birimine göre güncellenmesini ve özet raporlama işlemlerini yürütür. DRY-RUN modu ile test amaçlı çalıştırma desteği sunar.
+Maliyet verilerinin baz para birimine göre güncellenmesini ve bu işlemin özet raporunu oluşturmayı sağlar. DRY-RUN modu ile test amaçlı çalıştırma desteği sunar.
 - refreshCostInBase
 
 ### Fiyat Somutlaştırma
-Tüm fiyat listelerinin hesaplanarak veritabanına kalıcı olarak yazılmasını orkestra eder. Bu işlem muhtemelen maliyet yenileme ve yardımcı fonksiyonları bir arada kullanarak ana iş mantığını yönetir.
+Tüm fiyat listelerinin hesaplanarak veritabanına kalıcı olarak yazılmasını orkestra eder. Bu işlem, maliyet yenileme ve yardımcı fonksiyonları kullanarak ana iş mantığını yönetir.
 - materializePrices
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için temel aksiyomlar aşağıda listelenmiştir. Bu aksiyomlar, fonksiyon imzaları ve modülün genel amacına dayanılarak çıkarılmıştır.
+[Aksiyom 1]: Eğer `supabase` parametresi yoksa, `refreshCostInBase` ve `materializePrices` fonksiyonları veritabanına erişemez ve çalışamaz.
 
-[Aksiyom 1]: Eğer `todayIso()` fonksiyonu geçerli bir ISO formatında (YYYY-MM-DD) tarih dizesi döndürmeyi başaramazsa, `refreshCostInBase` ve `materializePrices` fonksiyonları tarafından yapılan tarih bazlı tüm hesaplamalar ve filtreleme işlemleri yanlış çalışır.
+[Aksiyom 2]: Eğer `productId`, `priceListId` veya `currency` parametrelerinden herhangi biri yoksa, `cacheKey` fonksiyonu benzersiz bir önbellek anahtarı üretemez.
 
-[Aksiyom 2]: Eğer `round4(value: number)` fonksiyonu, girilen sayıyı hassas bir şekilde 4 ondalık basamağa yuvarlayamazsa (örn: yuvarlama hataları, kayan nokta hassasiyet kaybı), hesaplanan fiyatlar tutarsız olur ve toplamlarda hata birikir.
+[Aksiyom 3]: Eğer `value` parametresi yoksa, `round4` fonksiyonu yuvarlama işlemi gerçekleştiremez.
 
-[Aksiyom 3]: Eğer `supabase: SupabaseClient<Database>` istemcisi geçerli bir veritabanı bağlantısı sağlamaz veya `Database` şeması beklenen tabloları (fiyat listeleri, maliyet kayıtları vb.) içermezse, `refreshCostInBase` ve `materializePrices` fonksiyonlarındaki tüm veritabanı işlemleri başarısız olur.
+[Aksiyom 4]: Eğer `dryRun` opsiyonu `true` olarak ayarlanırsa, `refreshCostInBase` ve `materializePrices` fonksiyonlarının yazma işlemleri gerçekleştirilmez (salt okunur modda çalışır).
 
-[Aksiyom 4]: Eğer `options?.today` parametresi (`refreshCostInBase` ve `materializePrices` için) geçerli bir tarih dizesi olarak sağlanmazsa ve `todayIso()` da bozuksa, fonksiyonların hangi tarih aralığında çalışacağı belirsizleşir; bu durumda varsayılan olarak `todayIso()` sonucunun kullanılması beklenir, aksi halde tarih duyarlı sorgular yanlış veri döndürür.
-
-[Aksiyom 5]: Eğer `options?.dryRun` parametresi `true` olarak ayarlandığında, `refreshCostInBase` ve `materializePrices` fonksiyonlarının veritabanında kalıcı değişiklik yapmaması gerekir; dryRun modunda yazma işlemi gerçekleşirse, test veya izleme amaçlı çalıştırma güvenli hale gelmez ve istenmeyen veri değişiklikleri oluşur.
-
-[Aksiyom 6]: Eğer `cacheKey(productId: string, priceListId: string, currency: string)` fonksiyonu, verilen parametrelerden benzersiz ve tutarlı bir anahtar üretmezse (
+[Aksiyom 5]: Eğer `today` opsiyonu belirtilmezse, `refreshCostInBase` fonksiyonu tarih bilgisi için `todayIso` fonksiyonunu kullanır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### todayIso
-**Ne yapar**: Geçerli tarihini ISO 8601 formatında (YYYY-MM-DD) döndürür. Bu, günün tarihini tutarlı ve sıralanabilir bir metin olarak elde etmek için kullanılır.
-**Nasıl yapar**: `new Date()` ile mevcut tarih ve saat nesnesini oluşturur. Ardından `toISOString()` metoduyla UTC tabanlı ISO dizgesine dönüştürür. `slice(0, 10)` ile yalnızca ilk 10 karakteri (yıl-ay-gün kısmını) alarak saat ve zaman dilimi bilgisini atar.
-**Parametreler**: Parametre almaz.
-**Dönüş**: `string` — Bugünün tarihini "YYYY-MM-DD" formatında temsil eden dize.
+**Ne yapar**: Bugünün tarihini ISO 8601 formatında (YYYY-MM-DD) string olarak döndürür. Kur hesaplamalarında ve fiyat geçerlilik tarihlerinde referans tarih olarak kullanılır.
+
+**Nasıl yapar**: `new Date()` ile anlık tarih nesnesi oluşturur, `toISOString()` ile UTC milisaniye cinsinden ISO formatına çevirir ve `slice(0, 10)` ile yalnızca ilk 10 karakteri (YYYY-MM-DD kısmını) alır.
+
+**Parametreler**:
+- Bu fonksiyon parametre almaz.
+
+**Dönüş**: `string` — Bugünün tarihi "YYYY-MM-DD" biçiminde (örneğin "2026-08-24").
 
 ### round4
 **Ne yapar**: Verilen bir sayıyı ondalıklı noktadan sonra 4 basamağa yuvarlar ve bu hassasiyetle bir sayısal değer döndürür.
@@ -61105,6 +60937,7 @@ Tüm bu süreç toplu (batch) upsert'ler ve sayfalama kullanılarak performansl�
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../types/database.types::type { Database }
+- import: ./fxRate.service::resolveFxRate
 - import: @supabase/supabase-js::type { SupabaseClient }
 
 ---
@@ -61116,6 +60949,7 @@ Tüm bu süreç toplu (batch) upsert'ler ve sayfalama kullanılarak performansl�
 - `updated: number`
 - `skippedNoRate: number`
 - `skippedNoPurchasePrice: number`
+- `skippedFxLocked: number`
 - `ratesUsed: { currency: string; rate: number; effectiveDate: string }[]`
 
 ### MaterializeSampleRow
@@ -61140,6 +60974,7 @@ Tüm bu süreç toplu (batch) upsert'ler ve sayfalama kullanılarak performansl�
 - `rowsUpserted: number`
 - `skippedManual: number`
 - `unbridgedBrand: number`
+- `skippedFxLocked: number`
 - `deactivated: number`
 - `bySegment: MaterializeSegmentSummary[]`
 - `samples: MaterializeSampleRow[]`
@@ -61163,110 +60998,141 @@ type ProductPriceUpsertRow = Database['public']['Tables']['product_prices']['Ins
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/lib/services/pricingMaterialize.service.ts::todayIso
+### [N1_NASIL] AST Pointer: pricingMaterialize.service.ts::todayIso
 - **params**: (parametre yok)
-- **ic_degiskenler**: (değişken yok)
-- **Dönüş**: string —_today's date in ISO format (YYYY-MM-DD) without time
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string` — günün tarihi `YYYY-MMAA-GG` biçiminde
 
-### [N2_NASIL] AST Pointer: src/lib/services/pricingMaterialize.service.ts::round4
-- **params**: value: number
-- **ic_degiskenler**: (değişken yok)
-- **Dönüş**: number — value rounded to 4 decimal places
+---
 
-### [N3_NASIL] AST Pointer: src/lib/services/pricingMaterialize.service.ts::refreshCostInBase
-- **params**: supabase: SupabaseClient<Database>, options?: { dryRun?: boolean; today?: string }
+### [N2_NASIL] AST Pointer: pricingMaterialize.service.ts::round4
+- **params**: `value: number`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `number` — virgülden sonra 4 basamağa yuvarlanmış sayı
+
+---
+
+### [N3_NASIL] AST Pointer: pricingMaterialize.service.ts::refreshCostInBase
+- **params**: `supabase: SupabaseClient<Database>`, `options?: { dryRun?: boolean; today?: string }`
 - **ic_degiskenler**:
-  - `dryRun` — boolean flag for dry run mode (defaults to true if not specified)
-  - `today` — date string in ISO format (defaults to current date if not specified)
-  - `productsData` — raw product data from Supabase query
-  - `productsErr` — error from Supabase products query
-  - `products` — array of product objects from database (defaults to empty array)
-  - `rateByCcy` — Map to cache exchange rates by currency code to avoid duplicate API calls
-  - `ratesUsed` — array tracking all exchange rates used in the operation
-  - `ccy` — uppercased currency code within getRateFor nested function
-  - `val` — exchange rate object for TRY currency within getRateFor nested function
-  - `rates` — exchange rate data from Supabase query within getRateFor nested function
-  - `ratesErr` — error from Supabase currency_rates query within getRateFor nested function
-  - `row` — first row from currency_rates query result within getRateFor nested function
-  - `rate` — parsed numeric exchange rate within getRateFor nested function
-  - `val` — exchange rate object for non-TRY currencies within getRateFor nested function
-  - `updated` — count of products successfully updated
-  - `skippedNoRate` — count of products skipped due to missing exchange rate
-  - `skippedNoPurchasePrice` — count of products skipped due to invalid purchase price
-  - `toWrite` — array of objects to update in database (id, costInBase, purchaseRateToBase)
-  - `p` — current product being processed in the products loop
-  - `purchasePrice` — parsed numeric purchase price from product
-  - `fx` — exchange rate object for product's currency (from getRateFor)
-  - `newCostInBase` — calculated cost in base currency (TRY)
-  - `newRate` — exchange rate used for this product
-  - `sameCost` — boolean indicating if cost is unchanged from existing value
-  - `sameRate` — boolean indicating if exchange rate is unchanged from existing value
-  - `i` — loop index for chunking database updates
-  - `chunk` — array of product updates to process in current batch
-  - `results` — array of promise results from database update operations
-  - `failed` — first failed result from update operations
-- **Dönüş**: Promise<CostRefreshSummary> — { scanned, updated, skippedNoRate, skippedNoPurchasePrice, ratesUsed }
+  - `dryRun` — `options?.dryRun ?? true`; veritabanına yazma işlemini atlayıp atlamayacağını belirler
+  - `today` — `options?.today ?? todayIso()`; kur çözümlemesinde kullanılacak tarih
+  - `productsData` — `supabase.from('products').select(...)` sorgusunun `data` dönüşü; aktif, silinmemiş ürünler
+  - `productsErr` — ürün sorgusunun hata nesnesi; varsa throw edilir
+  - `products` — `productsData ?? [];` null ise boş dizi
+  - `rateByCcy` — `Map<string, { rate: number; effectiveDate: string } | null>`; para birimi başına önbelleklenmiş kur bilgisi
+  - `ratesUsed` — `CostRefreshSummary['ratesUsed']`; kullanılan kurların kaydı (para birimi, kur, etkin tarih)
+  - `updated` — güncellenen ürün sayısı sayacı
+  - `skippedNoRate` — kur bulunamadığı için atlanan ürün sayısı
+  - `skippedNoPurchasePrice` — geçerli alış fiyatı olmadığı için atlanan ürün sayısı
+  - `skippedFxLocked` — fx-lock nedeniyle atlanan ürün sayısı
+  - `toWrite` — `{ id: string; costInBase: number; purchaseRateToBase: number }[]`; veritabanına yazılacak güncelleme kayıtları
+  - `brandIdForLocks` — `loadBrandIdByName(supabase)` dönüşü; marka adından marka ID'sine eşleme haritası
+  - `fxLocks` — `resolveFxLocks(...)` dönüşü; ürün başına fx-lock durumu haritası
+  - `p` — `products` dizisi üzerindeki döngü değişkeni; tek bir ürün satırı
+  - `purchasePrice` — `Number(p.purchase_price)`; ürünün alış fiyatı
+  - `fx` — `getRateFor(p.purchase_currency)` dönüşü; `{ rate: number; effectiveDate: string } | null`
+  - `newCostInBase` — `round4(purchasePrice * fx.rate)`; yeni maliyet (taban para biriminde)
+  - `newRate` — `fx.rate`; kullanılan döviz kuru
+  - `sameCost` — mevcut `cost_in_base` ile `newCostInBase` arasındaki farkın `1e-9`'dan küçük olup olmadığını gösteren boolean
+  - `sameRate` — mevcut `purchase_rate_to_base` ile `newRate` arasındaki farkın `1e-9`'dan küçük olup olmadığını gösteren boolean
+  - `i` — `toWrite` dizisinin chunk'lar halinde işlenmesinde döngü sayacı
+  - `chunk` — `toWrite.slice(i, i + COST_UPDATE_CONCURRENCY)`; eşzamanlı güncelleme grubu
+  - `results` — `Promise.all(chunk.map(...))` dönüşü; her ürün için Supabase update sonucu dizisi
+  - `failed` — `results.find(r => r.error)`; hata içeren ilk sonuç; varsa throw edilir
+- **Dönüş**: `Promise<CostRefreshSummary>` — `{ scanned, updated, skippedNoRate, skippedNoPurchasePrice, skippedFxLocked, ratesUsed }`
 
-### [N4_NASIL] AST Pointer: src/lib/services/pricingMaterialize.service.ts::cacheKey
-- **params**: productId: string, priceListId: string, currency: string
-- **ic_degiskenler**: (değişken yok)
-- **Dönüş**: string — composite cache key in format `${productId}|${priceListId}|${currency}`
+---
 
-### [N5_NASIL] AST Pointer: src/lib/services/pricingMaterialize.service.ts::materializePrices
-- **params**: supabase: SupabaseClient<Database>, options?: MaterializeOptions
+### [N4_NASIL] AST Pointer: pricingMaterialize.service.ts::getRateFor (refreshCostInBase içinde)
+- **params**: `ccyRaw: string`
 - **ic_degiskenler**:
-  - `dryRun` — boolean flag for dry run mode (defaults to true if not specified)
-  - `today` — date string in ISO format (defaults to current date if not specified)
-  - `sampleSize` — number of sample records to collect (defaults to 10)
-  - `ruleRows` — raw pricing rules data from Supabase query
-  - `rulesErr` — error from Supabase pricing_rule query
-  - `allRules` — array of pricing rule objects (cast to PricingRuleRow[])
-  - `hasScope3Rules` — boolean indicating if any rules have scope=3
-  - `parentOf` — Map mapping category IDs to parent category IDs
-  - `EMPTY_ANCESTORS` — readonly Set as empty default for ancestors
-  - `cursor` — current category ID being traversed in ancestorsFor function
-  - `ancestors` — Set of ancestor category IDs within ancestorsFor function
-  - `depth` — loop counter for ancestor traversal depth within ancestorsFor function
-  - `priceListRows` — raw price list data from Supabase query
-  - `listsErr` — error from Supabase price_lists query
-  - `priceLists` — array of active price list objects
-  - `segmentAcc` — Map accumulating pricing statistics per segment (priceListId)
-  - `list` — current price list being processed
-  - `acc` — segment accumulator object for current price list
-  - `brandIdByName` — Map of brand names to brand IDs (loaded externally)
-  - `manualKeys` — Set of cache keys for manually overridden prices (not to be overwritten)
-  - `derivedActiveIdByKey` — Map of cache keys to database IDs for active derived prices
-  - `snapshotOffset` — pagination offset for existing product_prices snapshot
-  - `existingRows` — raw existing product_prices data from Supabase query
-  - `existingErr` — error from Supabase product_prices snapshot query
-  - `rows` — array of existing product price rows within pagination loop
-  - `row` — current existing row being processed
-  - `key` — cache key constructed from row's product_id, price_list_id, currency
-  - `fxRate` — fixed null value for fxRate (TRY-only materialization)
-  - `productsScanned` — count of products scanned
-  - `pricedProducts` — count of products with calculated prices
-  - `quoteOnlyProducts` — count of products without calculated prices
-  - `rowsUpserted` — count of rows upserted to product_prices
-  - `skippedManual` — count of products skipped due to manual overrides
-  - `unbridgedBrand` — count of products with unmapped brand names
-  - `totalNetTry` — sum of net prices in TRY for individual segments
-  - `samples` — array of sample pricing records for inspection
-  - `upsertBuffer` — buffer array for batch upsert operations
-  - `writtenKeys` — Set of cache keys written in this run (for stale row detection)
-  - `offset` — pagination offset for products query
-  - `pageRows` — raw product data from paginated Supabase query
-  - `productsErr` — error from Supabase products query
-  - `rows` — array of product scope rows
-  - `row` — current product being processed
-  - `productInput` — transformed product input for pricing engine
-  - `ancestors` — Set of ancestor category IDs for current product
-  - `productPriced` — boolean flag if product received any price
-  - `resolution` — pricing resolution result for product-list combination
-  - `key` — cache key for product-list-currency combination
-  - `staleIds` — array of IDs for stale derived prices to deactivate
-  - `i` — loop index for deactivation batching
-  - `chunk` — array of IDs to deactivate in current batch
-- **Dönüş**: Promise<MaterializeSummary> — { dryRun, productsScanned, pricedProducts, quoteOnlyProducts, rowsUpserted, skippedManual, unbridgedBrand, deactivated, bySegment, samples, totalNetTry }
+  - `ccy` — `ccyRaw.toUpperCase()`; büyük harfe dönüştürülmüş para birimi kodu
+  - `val` — `resolveFxRate(supabase, ccy, today)` dönüşü; `{ rate: number; effectiveDate: string } | null`; önbelleğe yazılır ve `ratesUsed` dizisine eklenir
+- **Dönüş**: `Promise<{ rate: number; effectiveDate: string } | null>`
+
+---
+
+### [N5_NASIL] AST Pointer: pricingMaterialize.service.ts::cacheKey
+- **params**: `productId: string`, `priceListId: string`, `currency: string`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string` — `` `${productId}|${priceListId}|${currency}` `` biçiminde birleşik anahtar
+
+---
+
+### [N6_NASIL] AST Pointer: pricingMaterialize.service.ts::materializePrices
+- **params**: `supabase: SupabaseClient<Database>`, `options?: MaterializeOptions`
+- **ic_degiskenler**:
+  - `dryRun` — `options?.dryRun ?? true`; veritabanına yazma işlemini atlayıp atlamayacağını belirler
+  - `today` — `options?.today ?? todayIso()`; fiyat çözümlemesinde kullanılacak tarih
+  - `sampleSize` — `options?.sampleSize ?? 10`; örneklem satır sayısı üst sınırı
+  - `ruleRows` — `supabase.from('pricing_rule').select('*')` sorgusunun `data` dönüşü
+  - `rulesErr` — kural sorgusunun hata nesnesi; varsa throw edilir
+  - `allRules` — `(ruleRows ?? []) as PricingRuleRow[]`; tüm fiyatlandırma kuralları
+  - `hasScope3Rules` — `allRules.some(r => r.scope === 3)`; scope=3 kuralı var mı boolean'ı
+  - `parentOf` — `Map<string, string | null>`; kategori ID'sinden üst kategori ID'sine eşleme haritası
+  - `cats` — `supabase.from('categories').select('id, parent_id')` sorgusunun `data` dönüşü
+  - `catsErr` — kategori sorgusunun hata nesnesi; varsa throw edilir
+  - `c` — `(cats ?? [])` dizisi üzerindeki döngü değişkeni; `{ id: string; parent_id: string | null }`
+  - `EMPTY_ANCESTORS` — `ReadonlySet<string>`; boş atalar kümesi (sabit referans)
+  - `priceListRows` — `supabase.from('price_lists').select('id, user_type').eq('is_active', true)` sorgusunun `data` dönüşü
+  - `listsErr` — fiyat listesi sorgusunun hata nesnesi; varsa throw edilir
+  - `priceLists` — `(priceListRows ?? []) as { id: string; user_type: string | null }[]`; aktif fiyat listeleri
+  - `segmentAcc` — `Map<string, MaterializeSegmentSummary>`; fiyat listesi başına birikim özeti
+  - `list` — `priceLists` dizisi üzerindeki döngü değişkeni
+  - `brandIdByName` — `loadBrandIdByName(supabase)` dönüşü; marka adından marka ID'sine eşleme haritası
+  - `manualKeys` — `Set<string>`; elle ezilmiş (is_derived=false, is_active≠false) satırların cache anahtarları
+  - `derivedActiveIdByKey` — `Map<string, string>`; aktif türetilmiş satırların cache anahtarından veritabanı ID'sine eşlemesi
+  - `snapshotOffset` — mevcut cache fotoğrafı sayfalama ofseti
+  - `existingRows` — `supabase.from('product_prices').select(...)` sorgusunun `data` dönüşü (sayfalı)
+  - `existingErr` — mevcut satır sorgusunun hata nesnesi; varsa throw edilir
+  - `rows` — `existingRows ?? [];` mevcut cache satırları
+  - `row` — `rows` dizisi üzerindeki döngü değişkeni
+  - `key` — `cacheKey(row.product_id, row.price_list_id, row.currency)`; tek bir satırın cache anahtarı
+  - `fxRate` — `RuleEvaluationInputs['fxRate']` olarak `null`; materialize daima TRY yazar, gösterim kuru gerekmez
+  - `productsScanned` — taranan ürün sayısı sayacı
+  - `pricedProducts` — fiyatlandırılan ürün sayısı sayacı
+  - `quoteOnlyProducts` — yalnızca teklif moduna düşen ürün sayısı sayacı
+  - `rowsUpserted` — upsert edilen satır sayısı sayacı
+  - `skippedManual` — elle ezilmiş satır nedeniyle atlanan sayaç
+  - `skippedFxLocked` — fx-lock nedeniyle atlanan ürün sayısı sayacı
+  - `unbridgedBrand` — marka ID'si köprülenemeyen ürün sayısı sayacı
+  - `totalNetTry` — bireysel segmentteki toplam net TRY tutarı
+  - `samples` — `MaterializeSampleRow[]`; bireysel segmentten örneklem satırları
+  - `upsertBuffer` — `ProductPriceUpsertRow[]`; toplu upsert için biriktirilen satırlar
+  - `writtenKeys` — `Set<string>`; bu koşuda üretilen cache anahtarları; bayat satır tespiti için kullanılır
+  - `fxPolicies` — `fetchActivePolicies(supabase)` dönüşü; aktif fiyatlandırma politikaları
+  - `offset` — ürün sayfalama ofseti
+  - `pageRows` — `supabase.from('products').select(PRODUCT_SCOPE_COLUMNS)` sorgusunun `data` dönüşü (sayfalı)
+  - `productsErr` — ürün sorgusunun hata nesnesi; varsa throw edilir
+  - `row` — `pageRows ?? []` dizisi üzerindeki döngü değişkeni; `ProductScopeRow`
+  - `productInput` — `toPricingProductInput(row, brandIdByName)` dönüşü; fiyatlandırma motoruna verilen ürün girdisi
+  - `ancestors` — `ancestorsFor(productInput.categoryId)` dönüşü; kategori ataları kümesi
+  - `productPriced` — bu ürün herhangi bir segmentte fiyatlandırıldı mı boolean'ı
+  - `acc` — `segmentAcc.get(list.id)`; mevcut segment birikim özeti
+  - `resolution` — `resolvePriceWithRules(...)` dönüşü; fiyat çözümleme sonucu
+  - `key` — `cacheKey(productInput.id, list.id, MATERIALIZE_CURRENCY)`; üretilen cache anahtarı
+  - `staleIds` — `string[]`; bu koşuda üretilmeyen eski türetilmiş satır ID'leri; pasifleştirilecek
+  - `i` — `staleIds` dizisinin chunk'lar halinde işlenmesinde döngü sayacı
+  - `chunk` — `staleIds.slice(i, i + DEACTIVATE_BATCH_SIZE)`; pasifleştirme grubu
+- **Dönüş**: `Promise<MaterializeSummary>` — `{ dryRun, productsScanned, pricedProducts, quoteOnlyProducts, rowsUpserted, skippedManual, unbridgedBrand, skippedFxLocked, deactivated, bySegment, samples, totalNetTry }`
+
+---
+
+### [N7_NASIL] AST Pointer: pricingMaterialize.service.ts::ancestorsFor (materializePrices içinde)
+- **params**: `categoryId: string | null | undefined`
+- **ic_degiskenler**:
+  - `ancestors` — `new Set<string>([categoryId])`; başlangıçta kendini içeren atalar kümesi
+  - `cursor` — `parentOf.get(categoryId)`; üst kategori zincirini takip eden işaretçi
+  - `depth` — döngü sayacı; `10` ile sınırlı (sonsuz döngü koruması)
+- **Dönüş**: `ReadonlySet<string>` — verilen kategorinin ve atalarının ID kümesi
+
+---
+
+### [N8_NASIL] AST Pointer: pricingMaterialize.service.ts::flushUpsertBatch (materializePrices içinde)
+- **params**: `rows: ProductPriceUpsertRow[]`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (void) — `dryRun` true ise veya `rows` boşsa hiçbir şey yapmaz; aksi halde `supabase.from('product_prices').upsert(rows, { onConflict: CACHE_CONFLICT_TARGET })` çağrısı yapar, hata varsa throw eder
 
 ---
 
@@ -61279,10 +61145,10 @@ graph TD
     pricingMaterialize_service_ts__refreshCostInBase["refreshCostInBase"]
     pricingMaterialize_service_ts__round4["round4"]
     pricingMaterialize_service_ts__todayIso["todayIso"]
-    pricingMaterialize_service_ts__refreshCostInBase --> pricingMaterialize_service_ts__todayIso
-    pricingMaterialize_service_ts__materializePrices --> pricingMaterialize_service_ts__todayIso
     pricingMaterialize_service_ts__refreshCostInBase --> pricingMaterialize_service_ts__round4
     pricingMaterialize_service_ts__materializePrices --> pricingMaterialize_service_ts__cacheKey
+    pricingMaterialize_service_ts__materializePrices --> pricingMaterialize_service_ts__todayIso
+    pricingMaterialize_service_ts__refreshCostInBase --> pricingMaterialize_service_ts__todayIso
 ```
 
 ## NODE ID STANDARD
@@ -61315,8 +61181,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\pricingPolicy.service.ts
-skeleton_hash: 324478aa89374921
+source_path: C:\tmp\ops-t165\src\lib\services\pricingPolicy.service.ts
+skeleton_hash: 5f1426c804e747cd
 entity_hashes:
   func:buildCategoryAncestors: 4e4191b37dfe153f
   func:fetchActivePolicies: 3360e7a8109a3d8d
@@ -61324,7 +61190,7 @@ entity_hashes:
   func:resolveFxLocks: dc07618c268da34d
   func:sortPolicies: 4c21c5723215a593
   overview: aefd41fe88bee720
-generated_at: 2026-08-25T08:44:59Z
+generated_at: 2026-08-27T07:04:14Z
 ---
 
 ## Genel Bakış
@@ -61478,8 +61344,8 @@ graph TD
     pricingPolicy_service_ts__resolveFxLocks["resolveFxLocks"]
     pricingPolicy_service_ts__sortPolicies["sortPolicies"]
     pricingPolicy_service_ts__resolveFxLocks --> pricingPolicy_service_ts__resolveFxLockWithPolicies
-    pricingPolicy_service_ts__resolveFxLocks --> pricingPolicy_service_ts__fetchActivePolicies
     pricingPolicy_service_ts__resolveFxLocks --> pricingPolicy_service_ts__buildCategoryAncestors
+    pricingPolicy_service_ts__resolveFxLocks --> pricingPolicy_service_ts__fetchActivePolicies
     pricingPolicy_service_ts__resolveFxLockWithPolicies --> pricingPolicy_service_ts__sortPolicies
 ```
 
@@ -61511,11 +61377,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\product.columns.ts
-skeleton_hash: 48841921b454beb5
+source_path: C:\tmp\ops-t165\src\lib\services\product.columns.ts
+skeleton_hash: 5587dba06fe44cc6
 entity_hashes:
   overview: ef888ebf26b7056e
-generated_at: 2026-08-25T08:44:37Z
+generated_at: 2026-08-27T07:04:15Z
 ---
 
 ## Genel Bakış
@@ -61867,17 +61733,17 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts
-skeleton_hash: db9d252a0d8e17dc
+source_path: C:\tmp\ops-t165\src\lib\services\project.service.ts
+skeleton_hash: 2db603f5c5f4f76e
 entity_hashes:
-  func:addProductToProject: 3ad72ee68e6e1dbb
-  func:createProject: f04be25a87702fe5
-  func:deleteProject: 46636280fcd04430
-  func:listProjectItems: 8111ac3266bdd891
-  func:listUserProjects: 01a071f49edbfd8e
-  func:removeProductFromProject: a5c4e58b38ee1a14
+  func:addProductToProject: 0a7b669c584f15fe
+  func:createProject: 2c6fc31720f34b89
+  func:deleteProject: 805372ee0e272024
+  func:listProjectItems: a458c44a64678a6e
+  func:listUserProjects: 2732617049348a3f
+  func:removeProductFromProject: 88aa7b89f1aa4ac9
   overview: 82cdf1fb2dbcb93a
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:05:22Z
 ---
 
 ## Genel Bakış
@@ -61918,11 +61784,14 @@ Bu modül, Supabase veritabanı üzerinden proje ve proje-ürün ilişkilerini y
 ## FONKSİYON DETAYLARI
 
 ### listUserProjects
-**Ne yapar**: Kimliği doğrulanmış mevcut kullanıcıya ait tüm projeleri getirir.
-**Nasıl yapar**: Supabase istemcisi aracılığıyla 'user_projects' tablosundaki tüm kayıtları, `updated_at` alanına göre azalan sırayla (en son güncellenen üstte) sorgular. Sorgu sonucunda veri yoksa boş bir dizi döner, hata oluşursa fırlatır.
+**Ne yapar**: Kimliği doğrulanmış kullanıcıya ait tüm projeleri getirir. Projeler, son güncellenme tarihine göre azalan sırayla döndürülür. Veritabanı sorgusu başarısız olursa hata fırlatır.
+
+**Nasıl yapar**: Supabase istemcisi üzerinden `user_projects` tablosundan tüm sütunları (`*`) seçer ve `updated_at` alanına göre azalan sıralama uygular. Gelen veri, hata kontrolünden geçirildikten sonra `DbUserProject` tipine dönüştürülerek döndürülür. Veri yoksa boş dizi döner.
+
 **Parametreler**:
-- `supabase`: SupabaseClient<Database> — Etkin Supabase istemci örneği.
-**Dönüş**: `Promise<DbUserProject[]>` — Kullanıcının proje kayıtlarının bir dizisi; eğer proje yoksa boş bir dizi döner.
+- `supabase`: `SupabaseClient<Database>` — Aktif Supabase istemci örneği. Veritabanı bağlantısını temsil eder.
+
+**Dönüş**: `Promise<DbUserProject[]>` — Kullanıcı proje kayıtlarından oluşan bir dizi. Hiç proje yoksa boş dizi döner.
 
 ### createProject
 **Ne yapar**: Kimliği doğrulanmış kullanıcı için yeni bir proje oluşturur.
@@ -61981,46 +61850,62 @@ Bu modül, Supabase veritabanı üzerinden proje ve proje-ürün ilişkilerini y
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: project.service.ts::listUserProjects
-- **params**: (supabase: SupabaseClient<Database>)
+### [N1_NASIL] AST Pointer: src/lib/services/project.service.ts::listUserProjects
+- **params**: `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
 - **ic_degiskenler**:
-  - `data` — supabase.from('user_projects').select('*').order(...) sorgusundan dönen satır listesi
-  - `error` — sorgu sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-- **Dönüş**: DbUserProject[] — kullanıcının tüm projeleri (updated_at azalan sırayla)
+  - `data` — user_projects tablosundan çekilen satırları tutar; `select('*')` ile tüm sütunlar alınır, `updated_at` alanına göre azalan sırayla (`ascending: false`) sıralanır
+  - `error` — sorgu sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+- **Dönüş**: `DbUserProject[]` — hata fırlatılmazsa `data` döndürülür; `data` null ise boş dizi (`[]`) döndürülür
 
-### [N2_NASIL] AST Pointer: project.service.ts::createProject
-- **params**: (supabase: SupabaseClient<Database>, project: TablesInsert<'user_projects'>)
+### [N2_NASIL] AST Pointer: src/lib/services/project.service.ts::createProject
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
+  - `project` — TablesInsert<'user_projects'> tipinde, eklenecek proje verisi
 - **ic_degiskenler**:
-  - `data` — insert sonrası select().single() ile dönen tek satır; yeni oluşturulan proje
-  - `error` — insert sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-- **Dönüş**: DbUserProject — newly inserted project
+  - `data` — insert işlemi sonrası dönen tek satır veriyi tutar; `.insert(project).select().single()` zinciriyle eklenen kayıt geri alınır
+  - `error` — insert sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+- **Dönüş**: `DbUserProject` — hata fırlatılmazsa eklenen kayıt (`data`) döndürülür
 
-### [N3_NASIL] AST Pointer: project.service.ts::deleteProject
-- **params**: (supabase: SupabaseClient<Database>, id: string)
+### [N3_NASIL] AST Pointer: src/lib/services/project.service.ts::deleteProject
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
+  - `id` — string tipinde, silinecek projenin kimliği
 - **ic_degiskenler**:
-  - `error` — delete().eq('id', id) sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-- **Dönüş**: boolean — başarıyla silindiyse true
+  - `error` — delete sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+- **Dönüş**: `boolean` — hata fırlatılmazsa `true` döndürülür
 
-### [N4_NASIL] AST Pointer: project.service.ts::addProductToProject
-- **params**: (supabase: SupabaseClient<Database>, projectId: string, productId: string, quantity: number)
+### [N4_NASIL] AST Pointer: src/lib/services/project.service.ts::addProductToProject
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
+  - `projectId` — string tipinde, ürünün ekleneceği projenin kimliği
+  - `productId` — string tipinde, eklenecek ürünün kimliği
+  - `quantity` — number tipinde (varsayılan değer: `1`), eklenecek miktar
 - **ic_degiskenler**:
-  - `data` — insert({ project_id: projectId, product_id: productId, quantity }).select().single() ile dönen tek satır; eklenen proje kalemi
-  - `error` — insert sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-- **Dönüş**: DbProjectItem — newly inserted project item
+  - `data` — insert işlemi sonrası dönen tek satır veriyi tutar; `.insert({ project_id: projectId, product_id: productId, quantity }).select().single()` zinciriyle eklenen kayıt geri alınır
+  - `error` — insert sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+- **Dönüş**: `DbProjectItem` — hata fırlatılmazsa eklenen kayıt (`data`) döndürülür
 
-### [N5_NASIL] AST Pointer: project.service.ts::removeProductFromProject
-- **params**: (supabase: SupabaseClient<Database>, projectId: string, productId: string)
+### [N5_NASIL] AST Pointer: src/lib/services/project.service.ts::removeProductFromProject
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
+  - `projectId` — string tipinde, ürünün çıkarılacağı projenin kimliği
+  - `productId` — string tipinde, çıkarılacak ürünün kimliği
 - **ic_degiskenler**:
-  - `error` — delete().match({ project_id, product_id }) sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-- **Dönüş**: boolean — başarıyla silindiyse true
+  - `error` — delete sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+- **Dönüş**: `boolean` — hata fırlatılmazsa `true` döndürülür
 
-### [N6_NASIL] AST Pointer: project.service.ts::listProjectItems
-- **params**: (supabase: SupabaseClient<Database>, projectId: string)
+### [N6_NASIL] AST Pointer: src/lib/services/project.service.ts::listProjectItems
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, Supabase istemcisi
+  - `projectId` — string tipinde, ürünleri listelenecek projenin kimliği
 - **ic_degiskenler**:
-  - `data` — select('*, product:products(*)').eq('project_id', projectId) sorgusundan dönen satır listesi; product ilişkisi dahil
-  - `error` — sorgu sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
-  - `items` — data'nın (DbProjectItem & { product: DbProduct | null })[] olarak tiplendirilmiş hali; map işlemi için kullanılır
-- **Dönüş**: ProjectItem[] — her kalem için product alanı mapDatabaseProductToDomain ile dönüştürülmüş UI model listesi
+  - `data` — project_items tablosundan çekilen satırları tutar; `select('*, product:products(*)')` ile ilişkili ürün bilgisiyle birlikte getirilir, `project_id` alanına göre filtrelenir (`.eq('project_id', projectId)`)
+  - `error` — sorgu sırasında oluşan hata varsa bu değişkende tutulur; hata varsa `Error` olarak fırlatılır
+  - `items` — `data`'nın `(DbProjectItem & { product: DbProduct | null })[]` tipindeki hali; `data` null ise boş dizi (`[]`) atanır
+  - `item` — `items` dizisinin her bir elemanı; `map` fonksiyonunda kullanılır
+  - `product` — `item.product` alanıdır; ürün bilgisini tutar, null olabilir
+  - `rest` — `product` hariç `item`'ın geri kalan tüm özellikleri (destructuring ile ayrılır: `const { product, ...rest } = item`)
+- **Dönüş**: `ProjectItem[]` — hata fırlatılmazsa `items` dizisi `map` ile dönüştürülerek döndürülür; her elemanda `product` null değilse `mapDatabaseProductToDomain(product)` ile domaine dönüştürülüp `{ ...rest, product: ... }` olarak birleştirilir, null ise sadece `rest` döndürülür
 
 ---
 
@@ -62063,8 +61948,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\purchasing.service.ts
-skeleton_hash: 8475a4e916232174
+source_path: C:\tmp\ops-t165\src\lib\services\purchasing.service.ts
+skeleton_hash: 269552d1bf645d35
 entity_hashes:
   func:createPurchaseOrder: 97040d46ea3b6919
   func:createSupplier: 99bf4fe1fd2ef785
@@ -62077,7 +61962,7 @@ entity_hashes:
   func:setPurchaseOrderStatus: c384754a09944d6e
   func:updateSupplier: c7d283c93e01b4aa
   overview: f4e8cc60f7907c8c
-generated_at: 2026-08-25T08:45:32Z
+generated_at: 2026-08-27T07:05:24Z
 ---
 
 ## Genel Bakış
@@ -62267,120 +62152,6 @@ type GoodsReceiptRow = Database['public']['Tables']['goods_receipts']['Row']
   - `data` — sorgu sonucu dönen satırlar dizisi
   - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
 - **Dönüş**: `Promise<SupplierRow[]>` — tedarikçi satırları dizisi; veri yoksa boş dizi döner
-
----
-
-### [N2_NASIL] AST Pointer: purchasing.service.ts::createSupplier
-- **params**:
-  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
-  - `input` — SupplierInsert tipinde, oluşturulacak tedarikçi verisi
-- **ic_degiskenler**:
-  - `data` — insert işlemi sonrası dönen tekil tedarikçi satırı
-  - `error` — insert sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
-- **Dönüş**: `Promise<SupplierRow>` — oluşturulan tedarikçi satırı; ayrıca `logAdminAction` ile `suppliers` tablosuna yapılan INSERT işlemi audit kaydı oluşturulur
-
----
-
-### [N3_NASIL] AST Pointer: purchasing.service.ts::updateSupplier
-- **params**:
-  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
-  - `id` — string tipinde, güncellenecek tedarikçinin birincil anahtarı
-  - `patch` — SupplierUpdate tipinde, güncellenecek alanlar
-- **ic_degiskenler**:
-  - `data` — update işlemi sonrası dönen tekil tedarikçi satırı
-  - `error` — update sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
-- **Dönüş**: `Promise<SupplierRow>` — güncellenen tedarikçi satırı; ayrıca `logAdminAction` ile `suppliers` tablosuna yapılan UPDATE işlemi audit kaydı oluşturulur
-
----
-
-### [N4_NASIL] AST Pointer: purchasing.service.ts::listPurchaseOrders
-- **params**:
-  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
-  - `opts` — `{ status?: string }` tipinde, opsiyonel; varsayılan değeri boş nesne `{}`
-- **ic_degiskenler**:
-  - `q` — supabase sorgu nesnesi; önce `purchase_orders` tablosundan tüm alanları seçer ve `created_at` alanına göre azalan sıralar; `opts.status` tanımlı ise `status` alanına eşitlik filtresi uygulanır
-  - `data` — sorgu sonucu dönen satınalma siparişi satırları dizisi
-  - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
-- **Dönüş**: `Promise<PurchaseOrderRow[]>` — satınalma siparişi satırları dizisi; veri yoksa boş dizi döner
-
----
-
-### [N5_NASIL] AST Pointer: purchasing.service.ts::getPurchaseOrder
-- **params**:
-  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
-  - `id` — string tipinde, getirilecek satınalma siparişinin birincil anahtarı
-- **ic_degiskenler**:
-  - `data` — sorgu sonucu dönen satınalma siparişi satırı (ilişkili kalemlerle birlikte) veya null
-  - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
-- **Dönüş**: `Promise<PurchaseOrderWithItems | null>` — satınalma siparişi ve ilişkili kalemler; bulunamazsa null döner
-
----
-
-### [N6_NASIL] AST Pointer: purchasing.service.ts::createPurchaseOrder
-- **params**:
-  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
-  - `input` — PurchaseOrderInput tipinde, oluşturulacak sipariş verisi (satırlar dahil)
-- **ic_degiskenler**:
-  - `po` — `purchase_orders` tablosuna insert sonrası dönen tekil sipariş satırı
-  - `poError` — sipariş insert sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
-  - `items` — `purchase_order_items` tablosuna insert sonrası dönen kalem satırları dizisi
-  - `itemsError` — kalem insert sırasında oluşan hata nesnesi; varsa önce oluşturulan sipariş silinir (rollback), sonra throw ile fırlatılır
-  - `l` — `input.lines` dizisinin her elemanı; map içinde kullanılır; `l.product_id`, `l.qty_ordered`, `l.unit_cost`, `l.currency`, `l.tax_rate` alanlarına erişilir
-- **Dönüş**: `Promise<PurchaseOrderWithItems>` — oluşturulan sipariş ve kalemleri; ayrıca `logAdminAction` ile `purchase_orders` tablosuna yapılan INSERT işlemi audit kaydı oluşturulur
-
----
-
-### [N7_NASIL] AST Pointer: purchasing.service.ts::setPurchaseOrderStatus
-- **params**:
-  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
-  - `poId` — string tipinde, durumu değiştirilecek siparişin birincil anahtarı
-  - `next` — string tipinde, hedef durum değeri
-  - `opts` — `{ closeNote?: string }` tipinde, opsiyonel; varsayılan değeri boş nesne `{}`
-- **ic_degiskenler**:
-  - `current` — mevcut sipariş satırı (`id` ve `status` alanları seçilir); bulunamazsa hata fırlatılır
-  - `readError` — mevcut siparişi okuma sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
-  - `patch` — güncelleme nesnesi; `status` ve `updated_at` alanlarını içerir; `opts.closeNote` tanımlı ise `close_note` alanı da eklenir
-  - `data` — update işlemi sonrası dönen tekil sipariş satırı
-  - `error` — update sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
-- **Dönüş**: `Promise<PurchaseOrderRow>` — güncellenen sipariş satırı; ayrıca `logAdminAction` ile `purchase_orders` tablosuna yapılan UPDATE işlemi audit kaydı oluşturulur. Geçiş `isManualPoTransitionAllowed` ile doğrulanır; `partially_received` → `closed` geçişinde `closeNote` zorunludur
-
----
-
-### [N8_NASIL] AST Pointer: purchasing.service.ts::parseGoodsReceiptResult
-- **params**:
-  - `data` — `Json | null` tipinde, RPC yanıt verisi
-- **ic_degiskenler**:
-  - `data.success` — boolean olarak kontrol edilir; `true` ise `success: true` atanır
-  - `data.error` — string olarak kontrol edilir; string ise `error` alanına atanır
-  - `data.receipt_id` — string olarak kontrol edilir; string ise `receipt_id` alanına atanır
-  - `data.processed_count` — number olarak kontrol edilir; number ise `processed_count` alanına atanır
-  - `data.received_units` — number olarak kontrol edilir; number ise `received_units` alanına atanır
-  - `data.po_status` — string olarak kontrol edilir; string ise `po_status` alanına atanır
-- **Dönüş**: `GoodsReceiptResult` — `success`, `error`, `receipt_id`, `processed_count`, `received_units`, `po_status` alanlarını içeren nesne; `data` null veya geçersiz tipte ise `{ success: false, error: 'unexpected RPC response shape' }` döner
-
----
-
-### [N9_NASIL] AST Pointer: purchasing.service.ts::processGoodsReceipt
-- **params**:
-  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
-  - `args` — `{ poId: string; documentNo: string; lines: GoodsReceiptLineInput[]; note?: string }` tipinde, mal kabul işlemi girdileri
-- **ic_degiskenler**:
-  - `data` — `process_goods_receipt` RPC çağrısı sonucu dönen veri
-  - `error` — RPC çağrısı sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
-  - `result` — `parseGoodsReceiptResult` fonksiyonu ile ayrıştırılmış mal kabul sonucu nesnesi
-  - `l` — `args.lines` dizisinin her elemanı; map içinde kullanılır; `l.product_id`, `l.qty`, `l.unit_cost` alanlarına erişilir
-- **Dönüş**: `Promise<GoodsReceiptResult>` — mal kabul işlemi sonucu; `result.success` true ise `logAdminAction` ile `goods_receipts` tablosuna audit kaydı oluşturulur
-
----
-
-### [N10_NASIL] AST Pointer: purchasing.service.ts::listGoodsReceipts
-- **params**:
-  - `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
-  - `poId` — string tipinde, mal kabul kayıtlarının filtreleneceği satınalma siparişinin birincil anahtarı
-- **ic_degiskenler**:
-  - `data` — sorgu sonucu dönen mal kabul satırları dizisi
-  - `error` — sorgu sırasında oluşan hata nesnesi; varsa throw ile fırlatılır
-- **Dönüş**: `Promise<GoodsReceiptRow[]>` — mal kabul satırları dizisi; veri yoksa boş dizi döner
 
 ---
 
@@ -62676,8 +62447,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\registry.ts
-skeleton_hash: 69bd4c2379786328
+source_path: C:\tmp\ops-t165\src\lib\services\registry.ts
+skeleton_hash: adf6f80ec27738e9
 entity_hashes:
   func:AddressService:constructor: 0e35462915cc5372
   func:AddressService:createAddress: 523df76982196318
@@ -62725,7 +62496,7 @@ entity_hashes:
   func:ProjectService:removeProductFromProject: 267b218308338057
   func:ServiceRegistry:constructor: 0e35462915cc5372
   overview: 938705e66862ef28
-generated_at: 2026-08-13T08:53:50Z
+generated_at: 2026-08-27T07:07:30Z
 ---
 
 ## Genel Bakış
@@ -62791,7 +62562,11 @@ Bu modül, ServiceRegistry aracılığıyla bir SupabaseClient üzerinden birden
 ## FONKSİYON DETAYLARI
 
 ### constructor
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: ServiceRegistry sınıfının yapıcı metodudur. Sınıf örneği oluşturulurken Supabase istemcisini sınıf içinde kullanıma hazırlar.
+**Nasıl yapar**: Parametre olarak gelen Supabase istemcisini sınıfın private bir özelliği olarak saklar. Bu sayede sınıfın diğer metotları bu istemciyi kullanarak veritabanı işlemlerini gerçekleştirebilir.
+**Parametreler**:
+- supabase: SupabaseClient<Database> — Supabase veritabanı bağlantısını temsil eden istemci nesnesi
+**Dönüş**: Bilinmiyor (gövdede return ifadesi yok)
 
 ### AddressService.listAddresses
 **Ne yapar**: Tüm adres kayıtlarını listeler.
@@ -62858,250 +62633,183 @@ Bu modül, ServiceRegistry aracılığıyla bir SupabaseClient üzerinden birden
 **Dönüş**: `listCartItemsWithProducts` fonksiyonunun dönüş değeri. Verilen bilgiye göre dönüş tipi belirtilmemiştir.
 
 ### upsertCartItem
-**Ne yapar**: Bir sepete ürün ekler veya mevcut bir ürünün miktarını/parametrelerini günceller (yukarı ekleme-upsert).
-**Nasıl yapar**: Fonksiyon, harici bir `upsertCartItem` modül fonksiyonunu çağırır. Bu modül fonksiyonuna `this.supabase` istemcisini ve verilen `payload` parametresini geçerek veritabanı işlemini başlatır. Bu, sepet öğesi eklemek/güncellemek için merkezi bir mantık uygular.
+**Ne yapar**: Sepet öğesini ekler veya günceller. "Upsert" işlemi, öğe yoksa ekler, varsa günceller.
+**Nasıl yapar**: Bu metot, CartService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini ve gelen payload parametresini alarak harici `upsertCartItem` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
 **Parametreler**:
-- `payload`: `{ cartId: string; _productId: string; quantity: number; unitPrice?: number; priceListId?: string }` — Sepet işleminin tüm gerekli ve opsiyonel verilerini içeren bir nesne. `cartId` hedef sepetin, `_productId` ürünün, `quantity` miktarın, `unitPrice` birim fiyatın (opsiyonel), `priceListId` fiyat listesinin (opsiyonel) kimliğini/değerini tutar.
-**Dönüş**: Fonksiyon, altındaki `upsertCartItem` modül fonksiyonunun Promise olarak döndürdüğü sonucu doğrudan iletir (veritabanı sonucu).
+- payload: { cartId: string; _productId: string; quantity: number; unitPrice?: number; priceListId?: string } — Sepet öğesi bilgilerini içeren nesne. cartId sepet kimliğini, _productId ürün kimliğini, quantity miktarı, unitPrice birim fiyatı (isteğe bağlı), priceListId fiyat listesi kimliğini (isteğe bağlı) temsil eder.
+**Dönüş**: Harici `upsertCartItem` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### removeCartItem
 **Ne yapar**: Belirli bir sepetteki belirli bir ürünü kaldırır.
-**Nasıl yapar**: Fonksiyon, harici bir `removeCartItem` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini, `cartId` ve `productId` parametrelerini geçirerek belirtilen ürünü sepetten silme işlemini başlatır.
+**Nasıl yapar**: Bu metot, CartService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini ve gelen parametreleri alarak harici `removeCartItem` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
 **Parametreler**:
-- `cartId`: `string` — Ürünü kaldırılacak sepetin benzersiz tanımlayıcısı.
-- `productId`: `string` — Kaldırılacak ürünün benzersiz tanımlayıcısı.
-**Dönüş**: Fonksiyon, altındaki `removeCartItem` modül fonksiyonunun Promise olarak döndürdüğü sonucu doğrudan iletir.
+- cartId: string — Ürünün kaldırılacağı sepetin kimliği
+- productId: string — Kaldırılacak ürünün kimliği
+**Dönüş**: Harici `removeCartItem` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### clearCartItems
-**Ne yapar**: Belirtilen sepetin içindeki tüm ürünleri toplu olarak kaldırır (sepeti temizler).
-**Nasıl yapar**: Fonksiyon, harici bir `clearCartItems` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini ve `cartId` parametreterini geçirerek ilgili sepetin tüm öğelerini silme işlemini başlatır.
+**Ne yapar**: Belirli bir sepetin tüm öğelerini temizler.
+**Nasıl yapar**: Bu metot, CartService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini ve gelen parametreyi alarak harici `clearCartItems` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
 **Parametreler**:
-- `cartId`: `string` — İçeriği temizlenecek sepetin benzersiz tanımlayıcısı.
-**Dönüş**: Fonksiyon, altındaki `clearCartItems` modül fonksiyonunun Promise olarak döndürdüğü sonucu doğrudan iletir.
+- cartId: string — Temizlenecek sepetin kimliği
+**Dönüş**: Harici `clearCartItems` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### constructor
-**Ne yapar**: `ServiceRegistry` sınıfının bir örneğini oluşturur ve bağımlılık enjeksiyonu yapar.
-**Nasıl yapar**: Sınıfın bir alanı olan `this.supabase`'i, constructor'a verilen `supabase` parametresiyle başlatır. Bu, servislerin veritabanı bağlantısını almasının temel yoludur. `private` anahtar kelimesi, parametrenin aynı zamanda sınıf alanı olarak da atanmasını sağlar.
+**Ne yapar**: ServiceRegistry sınıfının yapıcı metodudur. Sınıf örneği oluşturulurken Supabase istemcisini sınıf içinde kullanıma hazırlar.
+**Nasıl yapar**: Parametre olarak gelen Supabase istemcisini sınıfın private bir özelliği olarak saklar. Bu sayede sınıfın diğer metotları bu istemciyi kullanarak veritabanı işlemlerini gerçekleştirebilir.
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Bu servislerin kullanacağı, veritabanı şeması (`Database`) ile güçlü tiplendirilmiş Supabase istemcisi örneği.
-**Dönüş**: Fonksiyon bir constructor olduğu için doğrudan bir değer dönmez (geri dönüş tipi `void`).
+- supabase: SupabaseClient<Database> — Supabase veritabanı bağlantısını temsil eden istemci nesnesi
+**Dönüş**: Bilinmiyor (gövdede return ifadesi yok)
 
 ### getCategories
-**Ne yapar**: Veritabanından tüm ürün kategorilerinin listesini getirir.
-**Nasıl yapar**: Fonksiyon, harici bir `getCategories` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini geçirerek kategorilerin okunma (listelenme) işlemini başlatır.
-**Parametreler**: Fonksiyonun herhangi bir parametresi yoktur.
-**Dönüş**: Fonksiyon, altındaki `getCategories` modül fonksiyonunun Promise olarak döndürdüğü kategori listesini (veya sonucunu) doğrudan iletir.
+**Ne yapar**: Kategorileri getirir.
+**Nasıl yapar**: Bu metot, CategoryService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini alarak harici `getCategories` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
+**Parametreler**: Parametre almaz.
+**Dönüş**: Harici `getCategories` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### constructor
-**Ne yapar**: `ServiceRegistry` sınıfının bir örneğini oluşturur ve bağımlılık enjeksiyonu yapar.
-**Nasıl yapar**: Sınıfın bir alanı olan `this.supabase`'i, constructor'a verilen `supabase` parametresiyle başlatır. Bu, servislerin veritabanı bağlantısını almasının temel yoludur. `private` anahtar kelimesi, parametrenin aynı zamanda sınıf alanı olarak da atanmasını sağlar.
+**Ne yapar**: ServiceRegistry sınıfının yapıcı metodudur. Sınıf örneği oluşturulurken Supabase istemcisini sınıf içinde kullanıma hazırlar.
+**Nasıl yapar**: Parametre olarak gelen Supabase istemcisini sınıfın private bir özelliği olarak saklar. Bu sayede sınıfın diğer metotları bu istemciyi kullanarak veritabanı işlemlerini gerçekleştirebilir.
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Bu servislerin kullanacağı, veritabanı şeması (`Database`) ile güçlü tiplendirilmiş Supabase istemcisi örneği.
-**Dönüş**: Fonksiyon bir constructor olduğu için doğrudan bir değer dönmez (geri dönüş tipi `void`).
+- supabase: SupabaseClient<Database> — Supabase veritabanı bağlantısını temsil eden istemci nesnesi
+**Dönüş**: Bilinmiyor (gövdede return ifadesi yok)
 
 ### listInvoiceProfiles
-**Ne yapar**: Mevcut tüm fatura profillerinin bir listesini getirir.
-**Nasıl yapar**: Fonksiyon, harici bir `listInvoiceProfiles` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini geçirerek fatura profillerinin veritabanından okunmasını başlatır.
-**Parametreler**: Fonksiyonun herhangi bir parametresi yoktur.
-**Dönüş**: Fonksiyon, altındaki `listInvoiceProfiles` modül fonksiyonunun Promise olarak döndürdüğü fatura profili listesini doğrudan iletir.
+**Ne yapar**: Fatura profillerini listeler.
+**Nasıl yapar**: Bu metot, InvoiceService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini alarak harici `listInvoiceProfiles` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
+**Parametreler**: Parametre almaz.
+**Dönüş**: Harici `listInvoiceProfiles` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### createInvoiceProfile
-**Ne yapar**: Verilen verilerle yeni bir fatura profili oluşturur.
-**Nasıl yapar**: Fonksiyon, harici bir `createInvoiceProfile` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini ve `payload` parametresini geçirerek veritabanına yeni bir fatura profili ekleme işlemini başlatır.
+**Ne yapar**: Yeni bir fatura profili oluşturur.
+**Nasıl yapar**: Bu metot, InvoiceService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini ve gelen payload parametresini alarak harici `createInvoiceProfile` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
 **Parametreler**:
-- `payload`: `DbInvoiceProfileInsert` — Veritabanına eklenecek yeni fatura profilinin tüm alanlarını içeren veri nesnesi. Bu tip, veritabanı şemasına göre zorunlu ve opsiyonel alanları belirler.
-**Dönüş**: Fonksiyon, altındaki `createInvoiceProfile` modül fonksiyonunun Promise olarak döndürdüğü sonucu (muhtemelen oluşturulan profilin kendisi) doğrudan iletir.
+- payload: DbInvoiceProfileInsert — Oluşturulacak fatura profilinin verilerini içeren nesne
+**Dönüş**: Harici `createInvoiceProfile` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### updateInvoiceProfile
-**Ne yapar**: Belirli bir ID'ye sahip mevcut bir fatura profilini günceller.
-**Nasıl yapar**: Fonksiyon, harici bir `updateInvoiceProfile` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini, güncellenecek profilin `id`'sini ve güncellenecek alanları içeren `payload`'ı geçirerek veritabanı güncelleme işlemini başlatır.
+**Ne yapar**: Mevcut bir fatura profilini günceller.
+**Nasıl yapar**: Bu metot, InvoiceService sınıfının bir metodudur ve asenkron olarak çalışır. Kendi sınıfının `this.supabase` özelliğini ve gelen parametreleri alarak harici `updateInvoiceProfile` fonksiyonuna yönlendirir. İşlemin kendisi bu fonksiyon tarafından gerçekleştirilir.
 **Parametreler**:
-- `id`: `string` — Güncellenecek fatura profilinin benzersiz tanımlayıcısı.
-- `payload`: `DbInvoiceProfileUpdate` — Güncellenecek alanları ve değerleri içeren veri nesnesi. Bu tip, veritabanı şemasına göre güncellenebilir alanları belirler.
-**Dönüş**: Fonksiyon, altındaki `updateInvoiceProfile` modül fonksiyonunun Promise olarak döndürdüğü sonucu (muhtemelen güncellenen profilin güncel hali) doğrudan iletir.
+- id: string — Güncellenecek fatura profilinin kimliği
+- payload: DbInvoiceProfileUpdate — Güncellenecek fatura profilinin yeni verilerini içeren nesne
+**Dönüş**: Harici `updateInvoiceProfile` fonksiyonunun dönüş değerini döndürür (dönüş tipi belirtilmemiş).
 
 ### deleteInvoiceProfile
-**Ne yapar**: Belirli bir ID'ye sahip fatura profilini siler.
-**Nasıl yapar**: Fonksiyon, harici bir `deleteInvoiceProfile` modül fonksiyonunu çağırır. Bu fonksiyona `this.supabase` istemcisini ve silinecek profilin `id`'sini geçirerek veritabanından kaydı kaldırma işlemini başlatır.
+**Ne yapar**: Belirtilen kimliğe sahip fatura profilini siler. Bu işlem, `InvoiceService` sınıfı üzerinden yürütülür ve veritabanında ilgili kaydın kaldırılmasını sağlar.
+
+**Nasıl yapar**: Fonksiyon, aldığı `id` parametresini ve sınıfın `this.supabase` bağlantısını harici `deleteInvoiceProfile` fonksiyonuna aktararak silme işlemini gerçekleştirir. İş mantığı bu sınıf içinde değil, dışarıdaki bağımsız fonksiyonda tanımlıdır.
+
 **Parametreler**:
-- `id`: `string` — Silinecek fatura profilinin benzersiz tanımlayıcısı.
-**Dönüş**: Fonksiyon, altındaki `deleteInvoiceProfile` modül fonksiyonunun Promise olarak döndürdüğü sonucu doğrudan iletir.
+- id: string — Silinecek fatura profilinin benzersiz kimlik numarası
+
+**Dönüş**: Harici `deleteInvoiceProfile` fonksiyonunun dönüş değerini aynen iletir. Kesin dönüş tipi belirtilmemiştir.
 
 ### setDefaultInvoiceProfile
-**Ne yapar**: Belirtilen fatura profilini, ilgili kullanıcının veya sistem konfigürasyonunun varsayılan fatura profili olarak ayarlar.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve profil ID'si alır. Bu istemciyi ve ID'yi kullanarak, `setDefaultInvoiceProfile` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, veritabanında ilgili kayıt üzerinde güncelleme işlemi yaparak profile varsayılan statüsünü atar.
-**Parametreler**:
-- id: string — Varsayılan olarak ayarlanacak fatura profilinin benzersiz tanımlayıcısı.
-**Dönüş**: Promise<any> — Harici fonksiyonun döndürdüğü sonucu, muhtemelen işlem durumunu veya güncellenen profil bilgisini içeren bir promise.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### fetchDefaultInvoiceProfile
-**Ne yapar**: Sistemde yapılandırılmış olan veya aktif kullanıcının sahip olduğu varsayılan fatura profilini getirir.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi alır ve bu istemciyi kullanarak `fetchDefaultInvoiceProfile` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, veritabanından varsayılan olarak işaretlenmiş fatura profilini sorgular ve sonucu döndürür.
-**Parametreler**: Bu fonksiyonun parametresi yoktur.
-**Dönüş**: Promise<any> — Harici fonksiyonun döndürdüğü sonucu, muhtemelen fatura profilinin verilerini veya null döndüren bir promise.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: İlgili servis sınıfının bir örneğini oluşturur ve bağımlılık enjeksiyonu yapar.
-**Nasıl yapar**: Bu, bir TypeScript yapıcı metodudur. `private` erişim belirteci ile `supabase` parametresini alır ve bu parametreyi sınıfın bir özel üyesine atar. Bu tasarım, servis metodlarının bu ortak Supabase istemcisini kullanmasını sağlar.
-**Parametreler**:
-- supabase: SupabaseClient<Database> — Servis tarafından kullanılacak Supabase istemcisi.
-**Dönüş**: Bu bir yapıcıdır, doğrudan bir dönüş değeri yoktur.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getEffectiveUnitPrice
-**Ne yapar**: Belirli bir ürün için, varsa indirimler, vergiler veya özel fiyatlandırma kuralları uygulanmış geçerli birim fiyatı hesaplar veya getirir.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve bir `Product` nesnesi alır. Bu bilgileri kullanarak `getEffectiveUnitPrice` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, ürün verilerini ve olası fiyatlandırma mantığını işleyerek nihai birim fiyatı hesaplar.
-**Parametreler**:
-- product: Product — Fiyatı hesaplanacak olan ürün nesnesi. Ürünün temel bilgilerini (örn. temel fiyat, kategori) içerir.
-**Dönüş**: Promise<number | null> — Harici fonksiyonun döndürdüğü sonucu, hesaplanmış geçerli birim fiyatını veya fiyat bulunamazsa null değerini içeren bir promise.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getEffectivePriceInfo
-**Ne yapar**: Belirli bir ürün için, birim fiyatın yanı sıra ilgili tüm fiyatlandırma detaylarını (örn. para birimi, indirim oranı, vergi bilgisi) da içeren kapsamlı bir fiyat bilgi nesnesi getirir.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve bir `Product` nesnesi alır. Bu bilgileri kullanarak `getEffectivePriceInfo` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, ürün ve fiyatlandırma kurallarını analiz ederek zenginleştirilmiş bir fiyat bilgi yapısı oluşturur.
-**Parametreler**:
-- product: Product — Fiyat bilgisi istenen ürün nesnesi.
-**Dönüş**: Promise<PriceInfo | null> — Harici fonksiyonun döndürdüğü sonucu, detaylı fiyat bilgilerini (birim fiyat, para birimi, indirim vb.) içeren bir nesneyi veya bilgi bulunamazsa null değerini içeren bir promise.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: İlgili servis sınıfının bir örneğini oluşturur ve bağımlılık enjeksiyonu yapar.
-**Nasıl yapar**: Bu, bir TypeScript yapıcı metodudur. `private` erişim belirteci ile `supabase` parametresini alır ve bu parametreyi sınıfın bir özel üyesine atar. Bu tasarım, servis metodlarının bu ortak Supabase istemcisini kullanmasını sağlar.
-**Parametreler**:
-- supabase: SupabaseClient<Database> — Servis tarafından kullanılacak Supabase istemcisi.
-**Dönüş**: Bu bir yapıcıdır, doğrudan bir dönüş değeri yoktur.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getSearchSuggestions
-**Ne yapar**: Kullanıcının girdiği kısmi bir arama sorgusuna dayanarak, eşleşen ürün adları veya anahtar kelimelerden oluşan bir öneri listesi döndürür.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi, bir arama dizesi ve opsiyonel bir limit alır. Bu parametreleri kullanarak `getSearchSuggestions` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, veritabanında kısmi eşleşme (örn. LIKE sorgusu) yaparak önerileri bulur ve belirtilen limit kadar sonuç döndürür.
-**Parametreler**:
-- query: string — Arama motoruna girilen kısmi sorgu veya anahtar kelime.
-- limit: number | undefined — Döndürülecek maksimal öneri sayısı. Tanımlanmazsa varsayılan bir değer kullanılır.
-**Dönüş**: Promise<string[]> — Harici fonksiyonun döndürdüğü sonucu, eşleşen arama önerilerini içeren bir dize dizisi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### ftsSearchProducts
-**Ne yapar**: Full-Text Search (FTS) özelliğini kullanarak, belirtilen arama terimine göre ürünleri kapsamlı bir şekilde arar.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi, bir arama terimi ve opsiyonel bir limit alır. Bu parametreleri kullanarak `ftsSearchProducts` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, veritabanında full-text search indekslerini sorgulayarak terimle anlamlı şekilde eşleşen ürünleri bulur ve döndürür.
-**Parametreler**:
-- term: string — Ürünlerde aranacak tam veya kısmi anahtar kelime/cümle.
-- limit: number | undefined — Döndürülecek maksimal sonuç sayısı.
-**Dönüş**: Promise<Product[]> — Harici fonksiyonun döndürdüğü sonucu, arama terimiyle eşleşen ürün nesnelerinden oluşan bir dizi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getProducts
-**Ne yapar**: Belirli bir miktarda ürün listesini, temel bilgileriyle birlikte getirir.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi ve opsiyonel bir limit alır. Bu parametreleri kullanarak `getProducts` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, veritabanından belirtilen limit kadar kaydı (örn. en son eklenenler veya varsayılan sıralamayla) sorgular ve döndürür.
-**Parametreler**:
-- limit: number | undefined — Getirilecek maksimal ürün sayısı. Tanımlanmazsa tüm ürünler döndürülebilir veya varsayılan bir limit uygulanabilir.
-**Dönüş**: Promise<Product[]> — Harici fonksiyonun döndürdüğü sonucu, ürün nesnelerinden oluşan bir dizi.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getAllProducts
-**Ne yapar**: Veritabanında bulunan tüm ürün kayıtlarını, temel bilgileriyle birlikte getirir.
-**Nasıl yapar**: Fonksiyon, bir Supabase istemcisi alır. Bu istemciyi kullanarak `getAllProducts` adlı harici bir modül fonksiyonunu çağırır. Bu harici fonksiyon, sınırlama olmadan (LIMITsiz) tüm ürünleri sorgular ve döndürür.
-**Parametreler**: Bu fonksiyonun parametresi yoktur.
-**Dönüş**: Promise<Product[]> — Harici fonksiyonun döndürdüğü sonucu, veritabanındaki tüm ürün nesnelerinden oluşan bir dizi.
+**Ne yapar**: ProductService sınıfının tüm ürünleri getiren asenkron metodudur. Ürünlerin tamamını getirmek için üst kapsam fonksiyonu çağırır.
+**Nasıl yapar**: Sınıf içindeki `this.supabase` nesnesini parametre olarak `getAllProducts` fonksiyonuna aktarır ve sonucu doğrudan döndürür. İş mantığı bu metodun içinde değil, çağrılan üst kapsam fonksiyonda yer alır.
+**Parametreler**:
+- Bu metod herhangi bir parametre almaz.
+**Dönüş**: Dönüş tipi belirtilmemiştir, bilinmiyor.
 
 ### getProductsByCategory
-**Ne yapar**: Belirli bir kategoriye (category) ait tüm ürünleri getirir.
-**Nasıl yapar**: `getProductsByCategory` adlı harici (external) bir servis fonksiyonunu, sınıf içinde saklanan `this.supabase` istemcisini ve gelen `categoryId` parametreğini ileterek çağırır. Asenkron bir operasyondur ve sonucu bir Promise olarak döner. Bu yapı, veritabanı erişim mantığını (`getProductsByCategory` fonksiyonu) sınıfın kendi metodundan ayırarak modülerlik sağlar.
-**Parametreler**:
-- categoryId: `string` — Ürünlerin getirilmek istendiği kategorinin benzersiz tanımlayıcısı (ID).
-**Dönüş**: Fonksiyonun kendisi bir `Promise` döner. Dönen değerin tipi, çağrılan `getProductsByCategory` harici fonksiyonunun dönüş tipine bağlıdır; bu durumda bir ürün listesi (örn. `Product[]`) veya hata durumu beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getProductsBySubcategory
-**Ne yapar**: Belirli bir alt kategoriye (subcategory) ait tüm ürünleri getirir.
-**Nasıl yapar**: `getProductsBySubcategory` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisini ve `subcategoryId` parametresini ileterek çağırır. Asenkron bir operasyondur ve sonucu bir Promise olarak döner. Kategori bazlı sorgulamadan daha spesifik bir alt kategori filtresi uygular.
-**Parametreler**:
-- subcategoryId: `string` — Ürünlerin getirilmek istendiği alt kategorinin benzersiz tanımlayıcısı (ID).
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; genellikle bir ürün listesi beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getProductById
-**Ne yapar**: Benzersiz bir tanımlayıcıya (ID) sahip tek bir ürünü getirir.
-**Nasıl yapar**: `getProductById` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisini ve ürünün `id` parametresini ileterek çağırır. Bu, en temel ve spesifik ürün sorgulama metodudur. Sonuç bir Promise içinde döner.
-**Parametreler**:
-- id: `string` — İstenen ürünün benzersiz tanımlayıcısı (ID).
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; bu durumda tek bir ürün nesnesi veya belirtilen ID ile eşleşen ürün bulunamazsa bir hata durumu/boş değer beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getProductBySlugOrId
-**Ne yapar**: Bir ürünün URL-dostu kısa adı (slug) veya benzersiz tanımlayıcısı (ID) ile ürünü getirir.
-**Nasıl yapar**: `getProductBySlugOrId` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisini ve esnek `identifier` parametresini ileterek çağırır. Bu metot, birincil arama anahtarı olarak slug kullanmayı tercih eden, ancak ID ile de erişimi destekleyen bir arama mantığına sahiptir. Sonuç bir Promise içinde döner.
-**Parametreler**:
-- identifier: `string` — Ürünü bulmak için kullanılan esnek tanımlayıcı. Bu değer bir slug (URL-dostu kısa ad) veya bir ID olabilir. Harici fonksiyonun hangi tür değer olduğunu belirleyip arama yapması beklenir.
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; bulunan ürün nesnesi veya eşleşme yoksa hata durumu beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getProductBySlug
-**Ne yapar**: Bir ürünün URL-dostu kısa adı (slug) ile ürünü getirir.
-**Nasıl yapar**: `getProductBySlug` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisi ve ürünün `slug` parametresini ileterek çağırır. Bu, `getProductBySlugOrId` metodundan daha spesifik, sadece slug tabanlı bir arama metodudur. Sonuç bir Promise içinde döner.
-**Parametreler**:
-- slug: `string` — İstenen ürünün URL-dostu kısa adı.
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; belirtilen slug ile eşleşen ürün nesnesi veya eşleşme yoksa hata durumu beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getFeaturedProducts
-**Ne yapar**: Öne çıkan (featured) ürünleri getirir.
-**Nasıl yapar**: `getFeaturedProducts` adlı harici bir servis fonksiyonunu, sadece `this.supabase` istemcisini ileterek çağırır. Bu metot, genellikle ana sayfa veya özel kampanya bölümlerinde gösterilecek, önceden belirlenmiş (örn. veritabanında `is_featured` alanı işaretli) ürünleri sorgular. Parametre almayan bir metottur ve sonucu bir Promise olarak döner.
-**Parametreler**: Parametre almaz.
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; genellikle öne çıkan ürünlerin bir listesi (örn. `Product[]`) beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### adminSearchProducts
-**Ne yapar**: Yönetici (admin) paneli için ürünleri belirli bir sorgu metnine göre arar.
-**Nasıl yapar**: `adminSearchProducts` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisi ve `query` parametresini ileterek çağırır. Bu arama, yöneticinin ürünleri isim, açıklama, SKU gibi alanlarda serbest metin araması yapabilmesini sağlar. Arama sonuçları, yönetici arayüzüne özel olarak formatlanabilir (örn. daha fazla alan içerebilir). Sonuç bir Promise içinde döner.
-**Parametreler**:
-- query: `string` — Ürünlerde yapılacak serbest metin araması için kullanılan anahtar kelime veya cümle.
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; arama kriterlerine uyan ürünlerin bir listesi veya boş bir dizi beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: ServiceRegistry sınıfının (veya türediği sınıfların) başlatıcısı olarak görev yapar. Bu metot, sınıf örneği oluşturulduğunda çağrılır ve bağımlılıkları (dependencies) sınıfa enjekte eder.
-**Nasıl yapar**: `constructor` anahtar kelimesi ile tanımlanmış bir metottur. `private` erişim belirleyicisi ile tanımlanan `supabase` parametresi, bu sınıfın tüm metotları tarafından kullanılacak olan Supabase veritabanı istemcisini (client) temsil eder. TypeScript/JavaScript'deki `private` anahtar kelimesi, bu özelliğin sadece sınıf içinde erişilebilir olduğunu ve aynı zamanda bir class field olarak otomatik olarak atanacağını belirtir. Sınıf dışarıdan bu istemciyi doğrudan değiştiremez.
-**Parametreler**:
-- supabase: `SupabaseClient<Database>` — Bağımlılık olarak enjekte edilen, veritabanı işlemleri için kullanılacak Supabase istemcisi örneği. Generic tipi `Database` olarak belirtilmiştir, bu da veritabanı şemasının (tabloların, enumların vb.) TypeScript'e yansıtılmış tip tanımını ifade eder.
-**Dönüş**: `void` veya belirtilmemiş. Bir constructor metodu olduğu için değer dönmez, sadece nesne başlatma işlemi yapar.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### listUserProjects
-**Ne yapar**: Oturum açmış kullanıcının tüm projelerini listeler.
-**Nasıl yapar**: `listUserProjects` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisini ileterek çağırır. Bu metot, arka planda mevcut kullanıcının oturum bilgisine (authenticated user) erişerek, sadece o kullanıcıya ait projeleri (`user_projects` tablosundan) sorgular. Asenkron bir operasyondur ve sonuçları bir Promise olarak döner.
-**Parametreler**: Parametre almaz.
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; kullanıcının projelerinden oluşan bir dizi (örn. `UserProject[]`) beklenir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### createProject
-**Ne yapar**: Yeni bir kullanıcı projesi oluşturur ve kaydeder.
-**Nasıl yapar**: `createProject` adlı harici bir servis fonksiyonunu, `this.supabase` istemcisi ve `project` parametresini ileterek çağırır. `project` parametresi, veritabanına eklenecek yeni satırın (record) verilerini içeren bir nesnedir. `TablesInsert<'user_projects'>` tipi, `user_projects` tablosuna eklenebilecek geçerli veri yapısını (alan adlarını ve tiplerini) tanımlar. Asenkron operasyon sonucu Promise olarak döner.
+**Ne yapar**: Yeni bir kullanıcı projesi oluşturur. Verilen proje verilerini kullanarak projeyi veritabanına ekler.
+**Nasıl yapar**: `ProjectService` sınıfının bir metodu olarak çalışır. Sınıf içindeki `this.supabase` Supabase istemcisini alır ve dışarıda tanımlı `createProject` fonksiyonuna hem bu istemciyi hem de proje verisini aktararak çağırır. İşin asıl yükü dışarıdaki `createProject` fonksiyonuna devredilir.
 **Parametreler**:
-- project: `TablesInsert<'user_projects'>` — Oluşturulacak yeni projenin verilerini içeren nesne. Bu tip, `user_projects` tablosuna eklenebilecek tüm zorunlu ve opsiyonel alanların bir dökümüdür (örn. `title`, `description`, `user_id` vb.).
-**Dönüş**: Bir `Promise` döner. Dönen değerin tipi, çağrılan harici fonksiyonun dönüş tipine bağlıdır; başarı durumunda oluşturulan yeni proje nesnesi (muhtemelen veritabanı tarafından otomatik eklenen `id`, `created_at` gibi alanları da içerir) veya hata durumu beklenir.
+- project: TablesInsert<'user_projects'> — Oluşturulacak projenin veritabanına eklenecek verilerini içeren nesne. `TablesInsert<'user_projects'>` tipi, `user_projects` tablosuna insert işlemi için gerekli alanları tanımlar.
+**Dönüş**: Dışarıdaki `createProject` fonksiyonunun dönüş değerini aynen iletir. Dönüş tipi bu fonksiyonun tanımına bağlıdır ve kaynakta belirtilmemiştir.
 
 ### deleteProject
-**Ne yapar**: Belirtilen ID'ye sahip projeyi veritabanından siler.
-**Nasıl yapar**: Fonksiyon, sınıf içinde tanımlı olan `deleteProject` import edilmiş fonksiyonunu çağırır. Bu çağrıya, sınıfa ait `this.supabase` istemcisini ve silinecek projenin `id` parametresini iletir. Asenkron bir işlemdir.
+**Ne yapar**: Belirtilen kimliğe sahip kullanıcı projesini siler.
+**Nasıl yapar**: `ProjectService` sınıfının bir metodu olarak çalışır. Sınıf içindeki `this.supabase` Supabase istemcisini alır ve dışarıda tanımlı `deleteProject` fonksiyonuna hem bu istemciyi hem de silinecek projenin kimliğini aktararak çağırır. İşin asıl yükü dışarıdaki `deleteProject` fonksiyonuna devredilir.
 **Parametreler**:
-- `id`: `string` — Silinecek projenin benzersiz tanımlayıcısı.
-**Dönüş**: `Promise<...>` — İçe aktarılan `deleteProject` fonksiyonunun döndürdüğü sonucu döndürür.
+- id: string — Silinecek projenin benzersiz kimlik değeri.
+**Dönüş**: Dışarıdaki `deleteProject` fonksiyonunun dönüş değerini aynen iletir. Dönüş tipi bu fonksiyonun tanımına bağlıdır ve kaynakta belirtilmemiştir.
 
 ### addProductToProject
-**Ne yapar**: Belirli bir projeye bir ürün ekler.
-**Nasıl yapar**: Sınıf içinde tanımlı olan `addProductToProject` import edilmiş fonksiyonunu çağırır. Bu çağrıya, Supabase istemcisi (`this.supabase`), proje ID'si, ürün ID'si ve opsiyonel olarak ürün miktarını iletir. Bu asenkron bir işlemdir.
+**Ne yapar**: Belirtilen projeye bir ürün ekler. İsteğe bağlı olarak ürün miktarı da belirtilebilir.
+**Nasıl yapar**: `ProjectService` sınıfının bir metodu olarak çalışır. Sınıf içindeki `this.supabase` Supabase istemcisini alır ve dışarıda tanımlı `addProductToProject` fonksiyonuna bu istemciyi, proje kimliğini, ürün kimliğini ve opsiyonel miktar bilgisini aktararak çağırır. İşin asıl yükü dışarıdaki `addProductToProject` fonksiyonuna devredilir.
 **Parametreler**:
-- `projectId`: `string` — Ürünün ekleneceği projenin benzersiz tanımlayıcısı.
-- `productId`: `string` — Projeye eklenecek olan ürünün benzersiz tanımlayıcısı.
-- `quantity?`: `number` — Eklenecek ürün miktarı. Belirtilmezse varsayılan bir değer kullanılabilir.
-**Dönüş**: `Promise<...>` — İçe aktarılan `addProductToProject` fonksiyonunun döndürdüğü sonucu döndürür.
+- projectId: string — Ürünün ekleneceği projenin benzersiz kimlik değeri.
+- productId: string — Projeye eklenecek ürünün benzersiz kimlik değeri.
+- quantity?: number — Eklenecek ürünün miktarı. Opsiyonel parametre olup belirtilmezse varsayılan değer kullanılır.
+**Dönüş**: Dışarıdaki `addProductToProject` fonksiyonunun dönüş değerini aynen iletir. Dönüş tipi bu fonksiyonun tanımına bağlıdır ve kaynakta belirtilmemiştir.
 
 ### removeProductFromProject
-**Ne yapar**: Belirli bir projeden bir ürünü kaldırır.
-**Nasıl yapar**: Sınıf içinde tanımlı olan `removeProductFromProject` import edilmiş fonksiyonunu çağırır. Bu çağrıya, Supabase istemcisi (`this.supabase`), proje ID'si ve kaldırılacak ürün ID'sini iletir. Bu asenkron bir işlemdir.
+**Ne yapar**: Belirtilen projeden bir ürünü kaldırır.
+**Nasıl yapar**: `ProjectService` sınıfının bir metodu olarak çalışır. Sınıf içindeki `this.supabase` Supabase istemcisini alır ve dışarıda tanımlı `removeProductFromProject` fonksiyonuna hem bu istemciyi hem de proje ve ürün kimliklerini aktararak çağırır. İşin asıl yükü dışarıdaki `removeProductFromProject` fonksiyonuna devredilir.
 **Parametreler**:
-- `projectId`: `string` — Ürünün kaldırılacağı projenin benzersiz tanımlayıcısı.
-- `productId`: `string` — Projeden kaldırılacak olan ürünün benzersiz tanımlayıcısı.
-**Dönüş**: `Promise<...>` — İçe aktarılan `removeProductFromProject` fonksiyonunun döndürdüğü sonucu döndürür.
+- projectId: string — Ürünün kaldırılacağı projenin benzersiz kimlik değeri.
+- productId: string — Projeden kaldırılacak ürünün benzersiz kimlik değeri.
+**Dönüş**: Dışarıdaki `removeProductFromProject` fonksiyonunun dönüş değerini aynen iletir. Dönüş tipi bu fonksiyonun tanımına bağlıdır ve kaynakta belirtilmemiştir.
 
 ### listProjectItems
-**Ne yapar**: Belirli bir projeye ait tüm ürün kalemlerini listeler.
-**Nasıl yapar**: Sınıf içinde tanımlı olan `listProjectItems` import edilmiş fonksiyonunu çağırır. Bu çağrıya, Supabase istemcisi (`this.supabase`) ve listelenecek projenin ID'sini iletir. Bu asenkron bir işlemdir.
+**Ne yapar**: Belirtilen projeye ait tüm öğeleri listeler.
+**Nasıl yapar**: `ProjectService` sınıfının bir metodu olarak çalışır. Sınıf içindeki `this.supabase` Supabase istemcisini alır ve dışarıda tanımlı `listProjectItems` fonksiyonuna hem bu istemciyi hem de proje kimliğini aktararak çağırır. İşin asıl yükü dışarıdaki `listProjectItems` fonksiyonuna devredilir.
 **Parametreler**:
-- `projectId`: `string` — Ürünlerin listeleneceği projenin benzersiz tanımlayıcısı.
-**Dönüş**: `Promise<...>` — İçe aktarılan `listProjectItems` fonksiyonunun döndürdüğü sonucu döndürür.
+- projectId: string — Öğeleri listelenecek projenin benzersiz kimlik değeri.
+**Dönüş**: Dışarıdaki `listProjectItems` fonksiyonunun dönüş değerini aynen iletir. Dönüş tipi bu fonksiyonun tanımına bağlıdır ve kaynakta belirtilmemiştir.
 
 ### constructor
-**Ne yapar**: `ServiceRegistry` sınıfının bir örneğini başlatır ve bağımlılıklarını enjekte eder.
-**Nasıl yapar**: `ServiceRegistry` sınıfının yapıcı (constructor) metodudur. TypeScript'in `private` erişim belirteci kullanılarak, gelen `supabase` parametresini sınıfın `_supabase` private üyesine atar. Bu, sınıfın tüm metotlarının (örneğin, `deleteProject`, `addProductToProject` vb.) bu Supabase istemcisini kullanmasını sağlar.
+**Ne yapar**: `ServiceRegistry` sınıfını başlatır ve sınıf içinde kullanılacak Supabase istemcisini tanımlar.
+**Nasıl yapar**: TypeScript constructor sözdizimi kullanılarak `supabase` parametresi doğrudan sınıfın özel (private) özelliği olarak atanır. `private` anahtar kelimesi, bu özelliğin yalnızca sınıf içinden erişilebilir olduğunu belirtir. Bu sayede sınıfın diğer metotları `this.supabase` üzerinden veritabanı işlemlerini gerçekleştirebilir.
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı bağlantısı için kullanılan ve yapılandırılmış bir Supabase istemci nesnesi.
-**Dönüş**: Yok (`void`).
+- supabase: SupabaseClient<Database> — Veritabanı bağlantısını ve işlemlerini yöneten Supabase istemci nesnesi. `Database` genel tipi, veritabanı şemasının TypeScript tarafındaki tip tanımlarını temsil eder.
+**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir.
 
 ---
 
@@ -63118,277 +62826,321 @@ Bu modül, ServiceRegistry aracılığıyla bir SupabaseClient üzerinden birden
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: registry.ts::AddressService.listAddresses
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `listAddresses` fonksiyonunun dönüşü; kullanıcının tüm adres listesini döndürür
-
----
-
-### [N2_NASIL] AST Pointer: registry.ts::AddressService.createAddress
-- **params**: (`payload`: DbUserAddressInsert — oluşturulacak adres verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve payload ile çağrılmış bağımsız `createAddress` fonksiyonunun dönüşü; yeni oluşturulan kaydı döndürür
-
----
-
-### [N3_NASIL] AST Pointer: registry.ts::AddressService.updateAddress
-- **params**: (`id`: string — güncellenecek adresin ID'si, `payload`: DbUserAddressUpdate — güncelleme verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, id, payload ile çağrılmış bağımsız `updateAddress` fonksiyonunun dönüşü; güncellenen kaydı döndürür
-
----
-
-### [N4_NASIL] AST Pointer: registry.ts::AddressService.deleteAddress
-- **params**: (`id`: string — silinecek adresin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve id ile çağrılmış bağımsız `deleteAddress` fonksiyonunun dönüşü; silme işleminin sonucunu döndürür
-
----
-
-### [N5_NASIL] AST Pointer: registry.ts::AddressService.setDefaultAddress
-- **params**: (`kind`: 'shipping' | 'billing' — adres türü, `id`: string — varsayılan yapılacak adresin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, kind, id ile çağrılmış bağımsız `setDefaultAddress` fonksiyonunun dönüşü; varsayılan adres güncelleme sonucunu döndürür
-
----
-
-### [N6_NASIL] AST Pointer: registry.ts::CartService.getOrCreateShoppingCart
-- **params**: (`userId`: string — kullanıcının ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve userId ile çağrılmış bağımsız `getOrCreateShoppingCart` fonksiyonunun dönüşü; mevcut veya yeni oluşturulan sepet nesnesini döndürür
-
----
-
-### [N7_NASIL] AST Pointer: registry.ts::CartService.listCartItems
-- **params**: (`cartId`: string — sepetin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve cartId ile çağrılmış bağımsız `listCartItems` fonksiyonunun dönüşü;.sepetteki ürün kalemleri listesini döndürür
-
----
-
-### [N8_NASIL] AST Pointer: registry.ts::CartService.listCartItemsWithProducts
-- **params**: (`cartId`: string — sepetin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve cartId ile çağrılmış bağımsız `listCartItemsWithProducts` fonksiyonunun dönüşü; ürün detaylarıyla zenginleştirilmiş sepet kalemlerini döndürür
-
----
-
-### [N9_NASIL] AST Pointer: registry.ts::CartService.upsertCartItem
-- **params**: (`payload`: { cartId: string; _productId: string; quantity: number; unitPrice?: number; priceListId?: string } — sepet kalemi ekleme/güncelleme verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve payload ile çağrılmış bağımsız `upsertCartItem` fonksiyonunun dönüşü; eklenen/güncellenen sepet kalemini döndürür
-
----
-
-### [N10_NASIL] AST Pointer: registry.ts::CartService.removeCartItem
-- **params**: (`cartId`: string — sepetin ID'si, `productId`: string — kaldırılacak ürünün ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, cartId, productId ile çağrılmış bağımsız `removeCartItem` fonksiyonunun dönüşü; kaldırma işleminin sonucunu döndürür
-
----
-
-### [N11_NASIL] AST Pointer: registry.ts::CartService.clearCartItems
-- **params**: (`cartId`: string — sepetin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve cartId ile çağrılmış bağımsız `clearCartItems` fonksiyonunun dönüşü; sepetin tüm kalemlerini temizleme sonucunu döndürür
-
----
-
-### [N12_NASIL] AST Pointer: registry.ts::CategoryService.getCategories
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `getCategories` fonksiyonunun dönüşü; kategori listesini döndürür
-
----
-
-### [N13_NASIL] AST Pointer: registry.ts::InvoiceService.listInvoiceProfiles
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `listInvoiceProfiles` fonksiyonunun dönüşü; fatura profilleri listesini döndürür
-
----
-
-### [N14_NASIL] AST Pointer: registry.ts::InvoiceService.createInvoiceProfile
-- **params**: (`payload`: DbInvoiceProfileInsert — oluşturulacak fatura profili verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve payload ile çağrılmış bağımsız `createInvoiceProfile` fonksiyonunun dönüşü; yeni oluşturulan fatura profilini döndürür
-
----
-
-### [N15_NASIL] AST Pointer: registry.ts::InvoiceService.updateInvoiceProfile
-- **params**: (`id`: string — güncellenecek fatura profilinin ID'si, `payload`: DbInvoiceProfileUpdate — güncelleme verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, id, payload ile çağrılmış bağımsız `updateInvoiceProfile` fonksiyonunun dönüşü; güncellenen fatura profilini döndürür
-
----
-
-### [N16_NASIL] AST Pointer: registry.ts::InvoiceService.deleteInvoiceProfile
-- **params**: (`id`: string — silinecek fatura profilinin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve id ile çağrılmış bağımsız `deleteInvoiceProfile` fonksiyonunun dönüşü; silme işleminin sonucunu döndürür
-
----
-
-### [N17_NASIL] AST Pointer: registry.ts::InvoiceService.setDefaultInvoiceProfile
-- **params**: (`id`: string — varsayılan yapılacak fatura profilinin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve id ile çağrılmış bağımsız `setDefaultInvoiceProfile` fonksiyonunun dönüşü; varsayılan fatura profilini ayarlama sonucunu döndürür
-
----
-
-### [N18_NASIL] AST Pointer: registry.ts::InvoiceService.fetchDefaultInvoiceProfile
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `fetchDefaultInvoiceProfile` fonksiyonunun dönüşü; varsayılan fatura profilini döndürür
-
----
-
-### [N19_NASIL] AST Pointer: registry.ts::PricingService.getEffectiveUnitPrice
-- **params**: (`product`: Product — birim fiyat hesaplanacak ürün nesnesi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve product ile çağrılmış bağımsız `getEffectiveUnitPrice` fonksiyonunun dönüşü; geçerli birim fiyatı (sayı) döndürür
-
----
-
-### [N20_NASIL] AST Pointer: registry.ts::PricingService.getEffectivePriceInfo
-- **params**: (`product`: Product — fiyat bilgisi hesaplanacak ürün nesnesi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve product ile çağrılmış bağımsız `getEffectivePriceInfo` fonksiyonunun dönüşü; detaylı fiyat bilgisini döndürür
-
----
-
-### [N21_NASIL] AST Pointer: registry.ts::ProductService.getSearchSuggestions
-- **params**: (`query`: string — arama sorgusu, `limit?`: number — maksimum sonuç sayısı)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, query, limit ile çağrılmış bağımsız `getSearchSuggestions` fonksiyonunun dönüşü; arama önerileri listesini döndürür
-
----
-
-### [N22_NASIL] AST Pointer: registry.ts::ProductService.ftsSearchProducts
-- **params**: (`term`: string — full-text arama terimi, `limit?`: number — maksimum sonuç sayısı)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, term, limit ile çağrılmış bağımsız `ftsSearchProducts` fonksiyonunun dönüşü; full-text arama sonuçlarını döndürür
-
----
-
-### [N23_NASIL] AST Pointer: registry.ts::ProductService.getProducts
-- **params**: (`limit?`: number — maksimum ürün sayısı)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve limit ile çağrılmış bağımsız `getProducts` fonksiyonunun dönüşü; ürün listesini döndürür
-
----
-
-### [N24_NASIL] AST Pointer: registry.ts::ProductService.getAllProducts
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `getAllProducts` fonksiyonunun dönüşü; tüm ürünleri döndürür
-
----
-
-### [N25_NASIL] AST Pointer: registry.ts::ProductService.getProductsByCategory
-- **params**: (`categoryId`: string — kategori ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve categoryId ile çağrılmış bağımsız `getProductsByCategory` fonksiyonunun dönüşü; belirli kategorideki ürünleri döndürür
-
----
-
-### [N26_NASIL] AST Pointer: registry.ts::ProductService.getProductsBySubcategory
-- **params**: (`subcategoryId`: string — alt kategori ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve subcategoryId ile çağrılmış bağımsız `getProductsBySubcategory` fonksiyonunun dönüşü; belirli alt kategorideki ürünleri döndürür
-
----
-
-### [N27_NASIL] AST Pointer: registry.ts::ProductService.getProductById
-- **params**: (`id`: string — ürün ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve id ile çağrılmış bağımsız `getProductById` fonksiyonunun dönüşü; tek bir ürünü döndürür
-
----
-
-### [N28_NASIL] AST Pointer: registry.ts::ProductService.getProductBySlugOrId
-- **params**: (`identifier`: string — ürün slug'ı veya ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve identifier ile çağrılmış bağımsız `getProductBySlugOrId` fonksiyonunun dönüşü; slug veya ID ile bulunan tek ürünü döndürür
-
----
-
-### [N29_NASIL] AST Pointer: registry.ts::ProductService.getProductBySlug
-- **params**: (`slug`: string — ürün slug'ı)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve slug ile çağrılmış bağımsız `getProductBySlug` fonksiyonunun dönüşü; slug ile bulunan tek ürünü döndürür
-
----
-
-### [N30_NASIL] AST Pointer: registry.ts::ProductService.getFeaturedProducts
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `getFeaturedProducts` fonksiyonunun dönüşü; öne çıkan ürünleri döndürür
-
----
-
-### [N31_NASIL] AST Pointer: registry.ts::ProductService.adminSearchProducts
-- **params**: (`query`: string — admin arama sorgusu)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve query ile çağrılmış bağımsız `adminSearchProducts` fonksiyonunun dönüşü; admin arama sonuçlarını döndürür
-
----
-
-### [N32_NASIL] AST Pointer: registry.ts::ProjectService.listUserProjects
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ile çağrılmış bağımsız `listUserProjects` fonksiyonunun dönüşü; kullanıcının proje listesini döndürür
-
----
-
-### [N33_NASIL] AST Pointer: registry.ts::ProjectService.createProject
-- **params**: (`project`: TablesInsert<'user_projects'> — oluşturulacak proje verisi)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve project ile çağrılmış bağımsız `createProject` fonksiyonunun dönüşü; yeni oluşturulan projeyi döndürür
-
----
-
-### [N34_NASIL] AST Pointer: registry.ts::ProjectService.deleteProject
-- **params**: (`id`: string — silinecek projenin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve id ile çağrılmış bağımsız `deleteProject` fonksiyonunun dönüşü; silme işleminin sonucunu döndürür
-
----
-
-### [N35_NASIL] AST Pointer: registry.ts::ProjectService.addProductToProject
-- **params**: (`projectId`: string — projenin ID'si, `productId`: string — eklenecek ürünün ID'si, `quantity?`: number — eklenecek miktar)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, projectId, productId, quantity ile çağrılmış bağımsız `addProductToProject` fonksiyonunun dönüşü; eklenen proje kalemini döndürür
-
----
-
-### [N36_NASIL] AST Pointer: registry.ts::ProjectService.removeProductFromProject
-- **params**: (`projectId`: string — projenin ID'si, `productId`: string — kaldırılacak ürünün ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase, projectId, productId ile çağrılmış bağımsız `removeProductFromProject` fonksiyonunun dönüşü; kaldırma işleminin sonucunu döndürür
-
----
-
-### [N37_NASIL] AST Pointer: registry.ts::ProjectService.listProjectItems
-- **params**: (`projectId`: string — projenin ID'si)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: this.supabase ve projectId ile çağrılmış bağımsız `listProjectItems` fonksiyonunun dönüşü; projedeki ürün kalemleri listesini döndürür
-
----
-
-### [N38_NASIL] AST Pointer: registry.ts::ServiceRegistry.constructor
-- **params**: (`supabase`: SupabaseClient<Database> — Supabase istemcisi, private alan olarak saklanır)
+### [N1_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
 - **ic_degiskenler**:
-  - `this.supabase` — constructor parametresinden alınan SupabaseClient<Database> referansı, tüm alt servislere aktarılır
-  - `this.address` — `new AddressService(this.supabase)` ile oluşturulan AddressService örneği; adres CRUD işlemlerini yönetir
-  - `this.cart` — `new CartService(this.supabase)` ile oluşturulan CartService örneği; sepet işlemlerini yönetir
-  - `this.category` — `new CategoryService(this.supabase)` ile oluşturulan CategoryService örneği; kategori okuma işlemlerini yönetir
-  - `this.invoice` — `new InvoiceService(this.supabase)` ile oluşturulan InvoiceService örneği; fatura profili CRUD işlemlerini yönetir
-  - `this.pricing` — `new PricingService(this.supabase)` ile oluşturulan PricingService örneği; fiyat hesaplama işlemlerini yönetir
-  - `this.product` — `new ProductService(this.supabase)` ile oluşturulan ProductService örneği; ürün CRUD ve arama işlemlerini yönetir
-  - `this.project` — `new ProjectService(this.supabase)` ile oluşturulan ProjectService örneği; proje CRUD işlemlerini yönetir
-- **Dönüş**: yok (constructor); yan etki olarak 7 adet servis örneği oluşturur ve readonly alanlara atar
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N2_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.listAddresses
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listAddresses` fonksiyonuna aktarılır
+- **Dönüş**: `listAddresses(this.supabase)` fonksiyonunun dönüşü
+
+### [N3_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.createAddress
+- **params**: `payload: DbUserAddressInsert`
+- **ic_degiskenler**:
+  - `payload` — eklenecek adres verisi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `createAddress` fonksiyonuna aktarılır
+- **Dönüş**: `createAddress(this.supabase, payload)` fonksiyonunun dönüşü
+
+### [N4_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.updateAddress
+- **params**: `id: string`, `payload: DbUserAddressUpdate`
+- **ic_degiskenler**:
+  - `id` — güncellenecek adresin kimliği
+  - `payload` — güncellenecek adres verisi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `updateAddress` fonksiyonuna aktarılır
+- **Dönüş**: `updateAddress(this.supabase, id, payload)` fonksiyonunun dönüşü
+
+### [N5_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.deleteAddress
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — silinecek adresin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `deleteAddress` fonksiyonuna aktarılır
+- **Dönüş**: `deleteAddress(this.supabase, id)` fonksiyonunun dönüşü
+
+### [N6_NASIL] AST Pointer: src/lib/services/registry.ts::AddressService.setDefaultAddress
+- **params**: `kind: 'shipping' | 'billing'`, `id: string`
+- **ic_degiskenler**:
+  - `kind` — adres türü (kargo veya fatura)
+  - `id` — varsayılan yapılacak adresin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `setDefaultAddress` fonksiyonuna aktarılır
+- **Dönüş**: `setDefaultAddress(this.supabase, kind, id)` fonksiyonunun dönüşü
+
+### [N7_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N8_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.getOrCreateShoppingCart
+- **params**: `userId: string`
+- **ic_degiskenler**:
+  - `userId` — kullanıcı kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getOrCreateShoppingCart` fonksiyonuna aktarılır
+- **Dönüş**: `getOrCreateShoppingCart(this.supabase, userId)` fonksiyonunun dönüşü
+
+### [N9_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.listCartItems
+- **params**: `cartId: string`
+- **ic_degiskenler**:
+  - `cartId` — sepet kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listCartItems` fonksiyonuna aktarılır
+- **Dönüş**: `listCartItems(this.supabase, cartId)` fonksiyonunun dönüşü
+
+### [N10_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.listCartItemsWithProducts
+- **params**: `cartId: string`
+- **ic_degiskenler**:
+  - `cartId` — sepet kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listCartItemsWithProducts` fonksiyonuna aktarılır
+- **Dönüş**: `listCartItemsWithProducts(this.supabase, cartId)` fonksiyonunun dönüşü
+
+### [N11_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.upsertCartItem
+- **params**: `payload: { cartId: string; _productId: string; quantity: number; unitPrice?: number; priceListId?: string }`
+- **ic_degiskenler**:
+  - `payload` — sepete eklenecek/güncellenecek ürün verisi (cartId, _productId, quantity, unitPrice, priceListId alanlarını içerir)
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `upsertCartItem` fonksiyonuna aktarılır
+- **Dönüş**: `upsertCartItem(this.supabase, payload)` fonksiyonunun dönüşü
+
+### [N12_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.removeCartItem
+- **params**: `cartId: string`, `productId: string`
+- **ic_degiskenler**:
+  - `cartId` — sepet kimliği
+  - `productId` — kaldırılacak ürünün kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `removeCartItem` fonksiyonuna aktarılır
+- **Dönüş**: `removeCartItem(this.supabase, cartId, productId)` fonksiyonunun dönüşü
+
+### [N13_NASIL] AST Pointer: src/lib/services/registry.ts::CartService.clearCartItems
+- **params**: `cartId: string`
+- **ic_degiskenler**:
+  - `cartId` — temizlenecek sepetin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `clearCartItems` fonksiyonuna aktarılır
+- **Dönüş**: `clearCartItems(this.supabase, cartId)` fonksiyonunun dönüşü
+
+### [N14_NASIL] AST Pointer: src/lib/services/registry.ts::CategoryService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N15_NASIL] AST Pointer: src/lib/services/registry.ts::CategoryService.getCategories
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getCategories` fonksiyonuna aktarılır
+- **Dönüş**: `getCategories(this.supabase)` fonksiyonunun dönüşü
+
+### [N16_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N17_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.listInvoiceProfiles
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listInvoiceProfiles` fonksiyonuna aktarılır
+- **Dönüş**: `listInvoiceProfiles(this.supabase)` fonksiyonunun dönüşü
+
+### [N18_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.createInvoiceProfile
+- **params**: `payload: DbInvoiceProfileInsert`
+- **ic_degiskenler**:
+  - `payload` — eklenecek fatura profili verisi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `createInvoiceProfile` fonksiyonuna aktarılır
+- **Dönüş**: `createInvoiceProfile(this.supabase, payload)` fonksiyonunun dönüşü
+
+### [N19_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.updateInvoiceProfile
+- **params**: `id: string`, `payload: DbInvoiceProfileUpdate`
+- **ic_degiskenler**:
+  - `id` — güncellenecek fatura profilinin kimliği
+  - `payload` — güncellenecek fatura profili verisi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `updateInvoiceProfile` fonksiyonuna aktarılır
+- **Dönüş**: `updateInvoiceProfile(this.supabase, id, payload)` fonksiyonunun dönüşü
+
+### [N20_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.deleteInvoiceProfile
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — silinecek fatura profilinin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `deleteInvoiceProfile` fonksiyonuna aktarılır
+- **Dönüş**: `deleteInvoiceProfile(this.supabase, id)` fonksiyonunun dönüşü
+
+### [N21_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.setDefaultInvoiceProfile
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — varsayılan yapılacak fatura profilinin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `setDefaultInvoiceProfile` fonksiyonuna aktarılır
+- **Dönüş**: `setDefaultInvoiceProfile(this.supabase, id)` fonksiyonunun dönüşü
+
+### [N22_NASIL] AST Pointer: src/lib/services/registry.ts::InvoiceService.fetchDefaultInvoiceProfile
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `fetchDefaultInvoiceProfile` fonksiyonuna aktarılır
+- **Dönüş**: `fetchDefaultInvoiceProfile(this.supabase)` fonksiyonunun dönüşü
+
+### [N23_NASIL] AST Pointer: src/lib/services/registry.ts::PricingService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N24_NASIL] AST Pointer: src/lib/services/registry.ts::PricingService.getEffectiveUnitPrice
+- **params**: `product: Product`
+- **ic_degiskenler**:
+  - `product` — fiyatı hesaplanacak ürün nesnesi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getEffectiveUnitPrice` fonksiyonuna aktarılır
+- **Dönüş**: `getEffectiveUnitPrice(this.supabase, product)` fonksiyonunun dönüşü
+
+### [N25_NASIL] AST Pointer: src/lib/services/registry.ts::PricingService.getEffectivePriceInfo
+- **params**: `product: Product`
+- **ic_degiskenler**:
+  - `product` — fiyat bilgisi alınacak ürün nesnesi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getEffectivePriceInfo` fonksiyonuna aktarılır
+- **Dönüş**: `getEffectivePriceInfo(this.supabase, product)` fonksiyonunun dönüşü
+
+### [N26_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N27_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getSearchSuggestions
+- **params**: `query: string`, `limit?: number`
+- **ic_degiskenler**:
+  - `query` — arama sorgusu
+  - `limit` — isteğe bağlı sonuç sayısı sınırı
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getSearchSuggestions` fonksiyonuna aktarılır
+- **Dönüş**: `getSearchSuggestions(this.supabase, query, limit)` fonksiyonunun dönüşü
+
+### [N28_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.ftsSearchProducts
+- **params**: `term: string`, `limit?: number`
+- **ic_degiskenler**:
+  - `term` — tam metin arama terimi
+  - `limit` — isteğe bağlı sonuç sayısı sınırı
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `ftsSearchProducts` fonksiyonuna aktarılır
+- **Dönüş**: `ftsSearchProducts(this.supabase, term, limit)` fonksiyonunun dönüşü
+
+### [N29_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProducts
+- **params**: `limit?: number`
+- **ic_degiskenler**:
+  - `limit` — isteğe bağlı sonuç sayısı sınırı
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProducts` fonksiyonuna aktarılır
+- **Dönüş**: `getProducts(this.supabase, limit)` fonksiyonunun dönüşü
+
+### [N30_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getAllProducts
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getAllProducts` fonksiyonuna aktarılır
+- **Dönüş**: `getAllProducts(this.supabase)` fonksiyonunun dönüşü
+
+### [N31_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductsByCategory
+- **params**: `categoryId: string`
+- **ic_degiskenler**:
+  - `categoryId` — kategori kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProductsByCategory` fonksiyonuna aktarılır
+- **Dönüş**: `getProductsByCategory(this.supabase, categoryId)` fonksiyonunun dönüşü
+
+### [N32_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductsBySubcategory
+- **params**: `subcategoryId: string`
+- **ic_degiskenler**:
+  - `subcategoryId` — alt kategori kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProductsBySubcategory` fonksiyonuna aktarılır
+- **Dönüş**: `getProductsBySubcategory(this.supabase, subcategoryId)` fonksiyonunun dönüşü
+
+### [N33_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductById
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — ürün kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProductById` fonksiyonuna aktarılır
+- **Dönüş**: `getProductById(this.supabase, id)` fonksiyonunun dönüşü
+
+### [N34_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductBySlugOrId
+- **params**: `identifier: string`
+- **ic_degiskenler**:
+  - `identifier` — ürün slug'ı veya kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProductBySlugOrId` fonksiyonuna aktarılır
+- **Dönüş**: `getProductBySlugOrId(this.supabase, identifier)` fonksiyonunun dönüşü
+
+### [N35_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getProductBySlug
+- **params**: `slug: string`
+- **ic_degiskenler**:
+  - `slug` — ürün slug'ı
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getProductBySlug` fonksiyonuna aktarılır
+- **Dönüş**: `getProductBySlug(this.supabase, slug)` fonksiyonunun dönüşü
+
+### [N36_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.getFeaturedProducts
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `getFeaturedProducts` fonksiyonuna aktarılır
+- **Dönüş**: `getFeaturedProducts(this.supabase)` fonksiyonunun dönüşü
+
+### [N37_NASIL] AST Pointer: src/lib/services/registry.ts::ProductService.adminSearchProducts
+- **params**: `query: string`
+- **ic_degiskenler**:
+  - `query` — yönetici arama sorgusu
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `adminSearchProducts` fonksiyonuna aktarılır
+- **Dönüş**: `adminSearchProducts(this.supabase, query)` fonksiyonunun dönüşü
+
+### [N38_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+- **Dönüş**: yok
+
+### [N39_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.listUserProjects
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listUserProjects` fonksiyonuna aktarılır
+- **Dönüş**: `listUserProjects(this.supabase)` fonksiyonunun dönüşü
+
+### [N40_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.createProject
+- **params**: `project: TablesInsert<'user_projects'>`
+- **ic_degiskenler**:
+  - `project` — eklenecek proje verisi
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `createProject` fonksiyonuna aktarılır
+- **Dönüş**: `createProject(this.supabase, project)` fonksiyonunun dönüşü
+
+### [N41_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.deleteProject
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — silinecek projenin kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `deleteProject` fonksiyonuna aktarılır
+- **Dönüş**: `deleteProject(this.supabase, id)` fonksiyonunun dönüşü
+
+### [N42_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.addProductToProject
+- **params**: `projectId: string`, `productId: string`, `quantity?: number`
+- **ic_degiskenler**:
+  - `projectId` — projenin kimliği
+  - `productId` — eklenecek ürünün kimliği
+  - `quantity` — isteğe bağlı miktar
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `addProductToProject` fonksiyonuna aktarılır
+- **Dönüş**: `addProductToProject(this.supabase, projectId, productId, quantity)` fonksiyonunun dönüşü
+
+### [N43_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.removeProductFromProject
+- **params**: `projectId: string`, `productId: string`
+- **ic_degiskenler**:
+  - `projectId` — projenin kimliği
+  - `productId` — kaldırılacak ürünün kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `removeProductFromProject` fonksiyonuna aktarılır
+- **Dönüş**: `removeProductFromProject(this.supabase, projectId, productId)` fonksiyonunun dönüşü
+
+### [N44_NASIL] AST Pointer: src/lib/services/registry.ts::ProjectService.listProjectItems
+- **params**: `projectId: string`
+- **ic_degiskenler**:
+  - `projectId` — proje kimliği
+  - `this.supabase` — sınıf içinde saklanan Supabase istemcisi, `listProjectItems` fonksiyonuna aktarılır
+- **Dönüş**: `listProjectItems(this.supabase, projectId)` fonksiyonunun dönüşü
+
+### [N45_NASIL] AST Pointer: src/lib/services/registry.ts::ServiceRegistry.constructor
+- **params**: `supabase: SupabaseClient<Database>`
+- **ic_degiskenler**:
+  - `supabase` — constructor parametresi, Supabase istemcisi
+  - `this.address` — `new AddressService(this.supabase)` ile oluşturulan adres servisi örneği
+  - `this.cart` — `new CartService(this.supabase)` ile oluşturulan sepet servisi örneği
+  - `this.category` — `new CategoryService(this.supabase)` ile oluşturulan kategori servisi örneği
+  - `this.invoice` — `new InvoiceService(this.supabase)` ile oluşturulan fatura servisi örneği
+  - `this.pricing` — `new PricingService(this.supabase)` ile oluşturulan fiyatlandırma servisi örneği
+  - `this.product` — `new ProductService(this.supabase)` ile oluşturulan ürün servisi örneği
+  - `this.project` — `new ProjectService(this.supabase)` ile oluşturulan proje servisi örneği
+- **Dönüş**: yok
 
 ---
 
@@ -63626,11 +63378,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\supabase\client.ts
-skeleton_hash: 84661defa15293fe
+source_path: C:\tmp\ops-t165\src\lib\supabase\client.ts
+skeleton_hash: 7049eed0f21a19ec
 entity_hashes:
   overview: 34e9332f051f8980
-generated_at: 2026-08-25T07:28:28Z
+generated_at: 2026-08-27T07:07:37Z
 ---
 
 ## Genel Bakış
@@ -63673,7 +63425,7 @@ Bu dosyada (`src/lib/supabase/client.ts`) tanımlı fonksiyon bulunmamaktadır. 
 
 ## NODE ID STANDARD
 
-  file: client.ts
+  file: src\lib\supabase\client.ts
 
 ---
 
@@ -63687,12 +63439,12 @@ Bu dosyada (`src/lib/supabase/client.ts`) tanımlı fonksiyon bulunmamaktadır. 
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\supabase\server.ts
-skeleton_hash: f4e30b8090c51d71
+source_path: C:\tmp\ops-t165\src\lib\supabase\server.ts
+skeleton_hash: ab267eb484a0c7c2
 entity_hashes:
-  func:createSupabaseServerClient: e1abcfb101f22d63
+  func:createSupabaseServerClient: f9a15c72a61b3af3
   overview: 32f6efa96dd36ed3
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:08:05Z
 ---
 
 ## Genel Bakış
@@ -63715,16 +63467,14 @@ Supabase sunucu istemcisi oluşturma modülü için temel mimari varsayımlar:
 ## FONKSİYON DETAYLARI
 
 ### createSupabaseServerClient
+**Ne yapar**: Sunucu tarafında çalışan bir Supabase istemcisi oluşturur. Cookie tabanlı oturum yönetimini yapılandırarak Next.js sunucu ortamında Supabase veritabanı bağlantısı sağlar.
 
-**Ne yapar**: Bu fonksiyon, sunucu tarafında (Next.js App Router ortamında) çalışacak şekilde yapılandırılmış bir Supabase istemcisi oluşturur. Temel amacı, kullanıcı oturumunu ve ilgili cookie'leri yönetebilen bir veritabanı bağlantısı sağlamaktır.
-
-**Nasıl yapar**: Fonksiyon, asenkron olarak mevcut istekle ilişkili cookie mağazasını (`cookies()`) alır. Ardından, ortam değişkenlerinden (`NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY`) Supabase bağlantısı için gerekli URL ve anahtarı okur; bu değerler tanımlı değilse bir yer tutucu değer kullanır. Son olarak, `createServerClient` fonksiyonunu çağırarak, cookie'leri okma (`getAll`) ve ayarlama (`setAll`) yeteneklerine sahip bir Supabase istemcisi nesnesi döndürür. `setAll` metodundaki `try-catch` bloğu, cookie ayarlama işleminin başarısız olabileceği durumları (örneğin, istek gövdesinin salt okunur olduğu durumları) sessizce işler.
+**Nasıl yapar**: Fonksiyon önce `cookies()` fonksiyonunu çağırarak cookie deposunu elde eder. Ardından ortam değişkenlerinden `NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY` değerlerini okur; bu değişkenler tanımlı değilse `'https://placeholder.supabase.co'` ve `'placeholder-key'` gibi placeholder değerler kullanır. Son olarak `createServerClient<Database>` fonksiyonunu çağırarak istemciyi döndürür. Bu çağrıda cookie yönetimi için iki metot tanımlanır: `getAll()` mevcut tüm cookie'leri okurken, `setAll()` yeni cookie'leri yazmaya çalışır. `setAll` içindeki `try-catch` bloğu, cookie yazma işleminde oluşan hataları yakalar ve yoksayar; kod yorumuna göre bu durumda middleware'in refresh işlemini üstlenmesi beklenir.
 
 **Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz.
+- Fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**:
-Fonksiyon, `SupabaseClient<Database>` tipinde bir nesne döndürür. Bu nesne, sunucu tarafında veritabanı sorguları yapmak ve kullanıcı oturumunu yönetmek için kullanılır.
+**Dönüş**: `createServerClient<Database>` fonksiyonunun dönüş değeri olan Supabase sunucu istemcisini döndürür. Kesin dönüş tipi belirtilmemiştir.
 
 ---
 
@@ -63740,14 +63490,17 @@ Fonksiyon, `SupabaseClient<Database>` tipinde bir nesne döndürür. Bu nesne, s
 ### [N1_NASIL] AST Pointer: src/lib/supabase/server.ts::createSupabaseServerClient
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `cookieStore` — Next.js cookies() API'sinden dönen cookie depolama nesnesi; tarayıcı çerezlerine okuma/yazma yapmak için kullanılır
-  - `SUPABASE_URL` — `process.env.NEXT_PUBLIC_SUPABASE_URL` ortam değişkeninden okunan Supabase proje URL'i; yoksa `'https://placeholder.supabase.co'` fallback değeri kullanılır
-  - `SUPABASE_ANON_KEY` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` ortam değişkeninden okunan Supabase anonim anahtarı; yoksa `'placeholder-key'` fallback değeri kullanılır
-  - `cookiesToSet` — `setAll` iç fonksiyonunun parametresi; ayarlanması istenen çerezlerin dizisi
-  - `name` — `cookiesToSet` içindeki her bir çerezin adı; `cookieStore.set()` çağrısında kullanılır
-  - `value` — `cookiesToSet` içindeki her bir çerezin değeri; `cookieStore.set()` çağrısında kullanılır
-  - `options` — `cookiesToSet` içindeki her bir çerezin seçenekleri (path, maxAge, httpOnly vb.); `cookieStore.set()` çağrısında kullanılır
-- **Dönüş**: `Database` tipi ile tiplemiş `createServerClient<Database>` çağısının döndürdüğü Supabase sunucu istemcisi (ServerClient<Database>); cookie getAll/setAll adapter'ı bağlanmış halde
+  - `cookieStore` — `await cookies()` ile elde edilen Next.js cookie store nesnesi; `getAll()` ve `set()` metodlarını sağlar
+  - `SUPABASE_URL` — `process.env.NEXT_PUBLIC_SUPABASE_URL` ortam değişkeni; tanımlı değilse `'https://placeholder.supabase.co'` varsayılan değerini alır
+  - `SUPABASE_ANON_KEY` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` ortam değişkeni; tanımlı değilse `'placeholder-key'` varsayılan değerini alır
+  - `cookies` — `createServerClient`'a iletilen yapılandırma nesnesi içindeki alt obje; `getAll` ve `setAll` metodlarını tanımlar
+  - `getAll()` — `cookieStore.getAll()` çağırarak tüm çerezleri döndüren anonim fonksiyon
+  - `setAll(cookiesToSet)` — verilen çerez dizisini `cookieStore.set()` ile ayarlayan anonim fonksiyon; hata fırlatılırsa yoksayar (middleware'in yenilemeyi üstlenebileceği varsayımıyla)
+  - `cookiesToSet` — `setAll` fonksiyonuna gelen parametre; her elemanı `{ name, value, options }` alanlarına sahip nesnelerden oluşan dizi
+  - `name` — `cookiesToSet` elemanlarından destructuring ile elde edilen çerez adı
+  - `value` — `cookiesToSet` elemanlarından destructuring ile elde edilen çerez değeri
+  - `options` — `cookiesToSet` elemanlarından destructuring ile elde edilen çerez seçenekleri nesnesi
+- **Dönüş**: `createServerClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, { cookies })` çağrısının dönüşü — `Database` tipi ile genericlenmiş Supabase sunucu istemcisi
 
 ---
 
@@ -63768,11 +63521,11 @@ Fonksiyon, `SupabaseClient<Database>` tipinde bir nesne döndürür. Bu nesne, s
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\supabase\static.ts
-skeleton_hash: c0b4248c73227b1e
+source_path: C:\tmp\ops-t165\src\lib\supabase\static.ts
+skeleton_hash: 9ba793dd2d28ddcd
 entity_hashes:
   overview: cb63656e8f0a9199
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:08:06Z
 ---
 
 ## Genel Bakış
@@ -63843,12 +63596,12 @@ Bu dosyada herhangi bir **fonksiyon gövdesi** bulunmamaktadır. Dosya yalnızca
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\validation\invoiceIdentity.ts
-skeleton_hash: fda5648cfe233922
+source_path: C:\tmp\ops-t165\src\lib\validation\invoiceIdentity.ts
+skeleton_hash: 37d4644f3cd3cec9
 entity_hashes:
   func:checkInvoiceIdentity: 7ceb3259ceb5474f
   overview: f60500888403bcb4
-generated_at: 2026-08-25T08:44:55Z
+generated_at: 2026-08-27T07:08:13Z
 ---
 
 ## Genel Bakış
@@ -63880,10 +63633,6 @@ Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesine dayal�
 [Aksiyom 3]: Eğer `identityThreshold` (number tipinde) sağlanmazsa, fonksiyon çağrılamaz.
 
 [Aksiyom 4]: Fonksiyon, bir `InvoiceIdentityIssue` nesnesi ya da `null` döndürür; `null` dönüşü sorun tespit edilmediğini gösterir.
-
----
-
-**Not:** Fonksiyonun iç mantığı (hangi kontrollerin yapıldığı, hangi koşullarda issue üretildiği, eşik değerlerin nasıl kullanıldığı) hakkında bilgi verilmediğinden, davranışsal aksiyomlar üretilememiştir. Daha detaylı aksiyomlar için fonksiyon gövdesinin sağlanması gerekmektedir.
 
 ---
 
@@ -63967,13 +63716,13 @@ type InvoiceIdentityIssue = | 'tcknRequired'
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\validation\taxIdentity.ts
-skeleton_hash: dc42de9f3e295dc8
+source_path: C:\tmp\ops-t165\src\lib\validation\taxIdentity.ts
+skeleton_hash: ddd129a27b7e7320
 entity_hashes:
   func:isValidTckn: 57058047dbe03513
   func:isValidVkn: d10e78946293210b
   overview: 73a3a50bbf3ac748
-generated_at: 2026-08-25T07:28:20Z
+generated_at: 2026-08-27T07:08:15Z
 ---
 
 ## Genel Bakış
@@ -64037,9 +63786,9 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, gövdeden türetilebi
 
 ## NODE ID STANDARD
 
-  file: taxIdentity.ts
-  function: taxIdentity.ts::isValidTckn
-  function: taxIdentity.ts::isValidVkn
+  file: src\lib\validation\taxIdentity.ts
+  function: src\lib\validation\taxIdentity.ts::isValidTckn
+  function: src\lib\validation\taxIdentity.ts::isValidVkn
 
 ---
 
