@@ -2,22 +2,22 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\MaterializePricesModal.tsx
-skeleton_hash: 94367fbb069166ae
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\MaterializePricesModal.tsx
+skeleton_hash: 4d94a8781a959b7b
 entity_hashes:
   func:MaterializePricesModal: a9f17a6079aab68c
-  func:segmentLabel: 4ca4ae3bc0bc7b4f
-  overview: 1c693ac72f8cfeb1
-  style_tokens: 2b5b8b8bb44e326b
-generated_at: 2026-08-15T03:54:29Z
+  func:segmentLabel: 86ac48424a89d196
+  overview: 6b9b41040cb03897
+  style_tokens: cead584dfbc0b2e2
+generated_at: 2026-08-27T08:13:51Z
 ---
 
 ## Genel Bakış
-Bu modül, bir fiyatlandırma yönetim arayüzünde fiyatları "nesneleştirmek" (materialize) için kullanılan bir modal (dialog) bileşenidir. Kullanıcı türüne göre segment etiketlerini dinamik olarak oluşturarak modal içindeki içeriği özelleştirir, modalın açılıp kapanmasını ve başarı durumunda üst bileşene geri bildirim gönderilmesini yönetir.
+Bu modül, fiyatlandırma yönetim arayüzünde fiyatları "nesneleştirmek" (materialize) amacıyla kullanılan bir modal bileşeni içerir. Kullanıcı türüne göre segment etiketlerini dinamik olarak oluşturarak modal içeriğini özelleştirir. Modalın açılıp kapanması ile başarı durumunda üst bileşene geri bildirim gönderilmesini yönetir.
 
 ## Fonksiyon Grupları
 ### Yardımcı Fonksiyonlar
-Kullanıcı türüne ve çeviri fonksiyonuna bağlı olarak arayüzde gösterilecek segment etiketlerini dinamik olarak üretir.
+Kullanıcı tipine ve çeviri fonksiyonuna bağlı olarak arayüzde gösterilecek segment etiketlerini dinamik olarak üretir. Bilinen bir segment için çevrilmiş metni, aksi halde orijinal kullanıcı tipi değerini döndürür.
 - segmentLabel
 
 ### Bileşenler
@@ -27,24 +27,35 @@ Ana modal bileşenini ve içindeki temel mantığı tanımlar. Modalın açma/ka
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan ve sabit tanımlarından çıkarım yapılabilir.
+
+[Aksiyom 1]: Eğer `userType` parametresi verilmezse, `segmentLabel` fonksiyonu uygun bir segment etiketi üretemez.
+
+[Aksiyom 2]: Eğer `t` çeviri fonksiyonu verilmezse, `segmentLabel` uluslararasılaştırma anahtarlarını çözümleyemez ve etiket metni gösterilemez.
+
+[Aksiyom 3]: Eğer `SEGMENT_I18N_KEYS` sabiti tanımlı değilse, `segmentLabel` fonksiyonu kullanıcı türüne karşılık gelen i18n anahtarını bulamaz.
+
+[Aksiyom 4]: Eğer `open` prop'u sağlanmazsa, `MaterializePricesModal` bileşeninin görünürlük durumu belirlenemez.
+
+[Aksiyom 5]: Eğer `onClose` prop'u sağlanmazsa, modal kapatma işlemi gerçekleştirilemez.
+
+[Aksiyom 6]: Eğer `onSuccess` prop'u sağlanmazsa, fiyat nesneleştirme işlemi başarılı olduğunda üst bileşene geri bildirim gönderilemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### segmentLabel
-**Ne yapar**: Kullanıcı tipine karşılık gelen segment etiketini uluslararasılaştırma (i18n) anahtarı üzerinden çevirerek döndüren yardımcı fonksiyondur. Kullanıcı tipi bilinen bir segment ise çevrilmiş metni, aksi halde orijinal userType değerini olduğu gibi döndürür.
+**Ne yapar**: Kullanıcı tipine (userType) karşılık gelen yerelleştirilmiş (i18n) segment etiketini döndürür. Eğer verilen kullanıcı tipi için önceden tanımlanmış bir çeviri anahtarı mevcutsa, o anahtarın çevirisini üretir; aksi takdirde ham kullanıcı tipi değerini olduğu gibi geri verir.
 
-**Nasıl yapar**: Fonksiyon, tanımlı bir `SEGMENT_I18N_KEYS` haritasını kullanarak verilen `userType` değerinin i18n anahtar eşlemesini bulur. Bulunan anahtar `t()` fonksiyonuna `admin.pricing.common.segment.{key}` formatında bir çeviri yolu olarak geçirilir. Eğer userType haritada eşleşmiyorsa, çeviri yapılmadan ham userType değeri doğrudan döndürülür.
+**Nasıl yapar**: Fonksiyon, önceden tanımlı `SEGMENT_I18N_KEYS` adlı bir eşleme nesnesinde (map/dictionary) verilen `userType` parametresini arar. Bu eşleme, kullanıcı tiplerini uluslararasılaştırma (i18n) anahtarlarına dönüştürür. Bulunan anahtar varsa, `t` fonksiyonu aracılığıyla `admin.pricing.common.segment.${key}` yolundaki çeviri metni çekilir ve döndürür. Eğer eşlemede karşılık gelen bir anahtar bulunamazsa (truthy değilse), `userType` değeri doğrudan, herhangi bir çeviri işlemi uygulanmadan döndürülür. Bu sayede bilinmeyen veya tanımsız kullanıcı tipleri için bile anlamlı bir çıktı elde edilir.
 
 **Parametreler**:
-- `userType`: `string` — Segment/kullanıcı tipini belirten string değeri. Bu değer, `SEGMENT_I18N_KEYS` haritasında bir karşılık bulabilir veya bulunmayabilir.
-- `t`: `(key: string) => string` —Uluslararasılaştırma fonksiyonu. Verilen i18n anahtarı için çevrilmiş metni döndüren bir callback'tir. Genellikle useTranslation veya benzeri bir hook'tan elde edilir.
+- `userType`: `string` — Segment etiketi istenen kullanıcının tipini belirten dize değeridir (örneğin "bireysel", "kurumsal" gibi). Bu değer `SEGMENT_I18N_KEYS` eşleme nesnesinde aranır.
+- `t`: `(key: string) => string` — Uluslararasılaştırma (i18n) sisteminin çeviri fonksiyonudur. Verilen anahtar dizesine karşılık gelen yerelleştirilmiş metni döndürmesi beklenir.
 
-**Dönüş**: `string` — Çevrilmiş segment etiket metni veya bilinmeyen bir userType durumunda ham userType değeri.
+**Dönüş**: `string` — Kullanıcı tipine karşılık gelen yerelleştirilmiş segment etiketi dizesi ya da eşleme bulunamadığında ham `userType` değerinin kendisi.
 
 ### MaterializePricesModal
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -89,18 +100,92 @@ Ana modal bileşenini ve içindeki temel mantığı tanımlar. Modalın açma/ka
 - **SEGMENT_I18N_KEYS** (object) — `{
   individual: 'individual',
   dealer: 'dealer',
-  corporate: 'corporate',
- ...`
+  corporate: 'corporate'...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: MaterializePricesModal.tsx::segmentLabel
-- **params**: `(userType: string, t: (key: string) => string)`
+### [N1_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::segmentLabel
+- **params**: `userType` — segment kullanıcı tipi anahtarı, `t` — i18n çeviri fonksiyonu
 - **ic_degiskenler**:
-  - `key` — `SEGMENT_I18N_KEYS[userType]` dictionary erişimiyle elde edilen i18n anahtarı; userType'a karşılık gelen çeviri anahtarını tutar
-- **Dönüş**: `string` — i18n key mevcutsa `t('admin.pricing.common.segment.${key}')` çağrısının sonucu, değilse ham `userType` değeri
+  - `key` — `SEGMENT_I18N_KEYS[userType]` ile elde edilen i18n anahtarı; bulunamazsa `userType` doğrudan döner
+- **Dönüş**: `string` — çevrilmiş segment etiketi veya ham `userType`
+
+### [N2_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::MaterializePricesModal
+- **params**: `open` — modal açık/kapalı durumu, `onClose` — kapatma callback'i, `onSuccess` — başarılı uygulama sonrası callback'i
+- **ic_degiskenler**:
+  - `alive` — bileşen mount durumunu takip eden boolean; cleanup'ta `false` yapılır, async işlemlerden önce kontrol edilir
+  - `previewLoading` — önizleme yükleniyor durumu; `setPreviewLoading(true/false)` ile yönetilir
+  - `loadFailed` — yükleme hatası durumu; `setLoadFailed(true/false)` ile yönetilir
+  - `preview` — `materializePrices` dry-run sonucu; `setPreview(summary)` ile atanır, hata durumunda `null` yapılır
+  - `staleCosts` — `refreshCostInBase` dry-run sonucundaki güncellenen maliyet sayısı; `costCheck.updated` değeri veya `null`/`0`
+  - `applying` — uygulama işlemi devam durumu; `setApplying(true/false)` ile yönetilir
+  - `cancelPreviewRef` — `useRef` ile tutulan iptal fonksiyonu referansı; `loadPreview()` dönüş cleanup fonksiyonunu saklar
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu
+  - `locale` — `useI18n()` hook'undan gelen locale değeri
+  - `hasWriteAccess` — `useRole()` hook'undan gelen yazma yetkisi boolean'ı
+  - `supabase` — `supabaseBrowserClient` import'u; `materializePrices` ve `refreshCostInBase` çağrılarında birinci argüman olarak kullanılır
+  - `summary` — `materializePrices(supabase, { dryRun: true })` sonucu; destructuring ile alınır
+  - `costCheck` — `refreshCostInBase(supabase, { dryRun: true }).catch(() => null)` sonucu; hata durumunda `null`
+  - `result` — `mutateWithAudit` dönüşü; `result.rowsUpserted` toast mesajında kullanılır
+  - `e` — catch bloğundaki hata; `AdminPermissionError` instance kontrolü yapılır
+  - `seg` — JSX `.map()` callback parametresi; `seg.priceListId`, `seg.userType`, `seg.priced`, `seg.quoteOnly` alanlarına erişilir
+  - `row` — JSX `.map()` callback parametresi; `row.sku`, `row.ruleId`, `row.name`, `row.userType`, `row.net`, `row.gross` alanlarına erişilir
+- **Dönüş**: `JSX.Element` — Radix Dialog yapısı içinde önizleme ve uygulama arayüzü
+
+### [N3_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::loadPreview (useEffect cleanup-returning async)
+- **params**: yok
+- **ic_degiskenler**:
+  - `alive` — bileşen yaşam döngüsü flag'i; cleanup'ta `false` yapılır
+  - `summary` — `materializePrices(supabase, { dryRun: true })` sonucu; `setPreview(summary)` ile state'e yazılır
+  - `costCheck` — `refreshCostInBase(supabase, { dryRun: true }).catch(() => null)` sonucu; `costCheck ? costCheck.updated : null` ile `setStaleCosts`'a yazılır
+- **Dönüş**: `() => void` — cleanup fonksiyonu (`alive = false`)
+
+### [N4_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::startPreview
+- **params**: yok
+- **ic_degiskenler**:
+  - `cancelPreviewRef.current` — önceki yükleme iptal fonksiyonu; çağrılır, ardından `loadPreview()` yeni değer olarak atanır
+- **Dönüş**: yok
+
+### [N5_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::handleClose
+- **params**: yok
+- **ic_degiskenler**:
+  - `applying` — uygulama devam durumu; `true` ise kapatma engellenir
+- **Dönüş**: yok; `onClose()` çağrısı yapar
+
+### [N6_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::handleApply
+- **params**: yok
+- **ic_degiskenler**:
+  - `preview` — önizleme verisi; yoksa fonksiyon erken döner
+  - `result` — `mutateWithAudit` dönüşü; `result.rowsUpserted` toast'ta kullanılır
+  - `e` — catch bloğu hatası; `AdminPermissionError` kontrolü ile uygun hata mesajı seçilir
+- **Dönüş**: yok; yan etkileri: `setApplying`, `toast.success`/`toast.error`, `onSuccess()`, `onClose()`
+
+### [N7_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::mutateWithAudit fn callback
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `Promise` — `materializePrices(supabase, { dryRun: false })` sonucu
+
+### [N8_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::segmentListRender (seg callback)
+- **params**: `seg` — segment veri objesi
+- **ic_degiskenler**:
+  - `seg.priceListId` — fiyat listesi kimliği; JSX key'inde kullanılır
+  - `seg.userType` — kullanıcı tipi; `segmentLabel(seg.userType, t)` ile etiketlenir, JSX key'inde kullanılır
+  - `seg.priced` — fiyatlandırılmış ürün sayısı; `formatNumber(seg.priced, locale)` ile gösterilir
+  - `seg.quoteOnly` — sadece teklif ürün sayısı; `formatNumber(seg.quoteOnly, locale)` ile gösterilir
+- **Dönüş**: `JSX.Element` — `<li>` öğesi
+
+### [N9_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::priceRowRender (row callback)
+- **params**: `row` — fiyat satırı veri objesi
+- **ic_degiskenler**:
+  - `row.sku` — stok kodu; JSX key'inde ve `<span>` içinde gösterilir
+  - `row.ruleId` — kural kimliği; JSX key'inde kullanılır
+  - `row.name` — ürün adı; `<span>` içinde gösterilir
+  - `row.userType` — kullanıcı tipi; `segmentLabel(row.userType, t)` ile etiketlenir
+  - `row.net` — net fiyat; `formatCurrency(row.net, locale, { currency: 'TRY' })` ile gösterilir
+  - `row.gross` — brüt fiyat; `formatCurrency(row.gross, locale, { currency: 'TRY' })` ile gösterilir
+- **Dönüş**: `JSX.Element` — `<li>` öğesi
 
 ---
 
@@ -127,7 +212,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-400/10`, `bg-black/60`, `bg-cyan-500/10`, `bg-surface-deep`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-amber-400/30`, `border-b`, `border-cyan-500/20`, `border-t`, `border-white/10`, `border-white/5`, `hover:bg-white/10`, `hover:bg-white/5`
-- **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-9`, `inline-flex`, `items-center`, `items-start`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-bg`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-warning-weak`, `bg-black/60`, `border-admin-accent/30`, `border-admin-border`, `border-admin-warning/30`, `border-b`, `border-t`, `hover:bg-admin-surface-2`, `hover:bg-admin-surface-3`, `hover:text-admin-fg`, `text-admin-accent`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-9`, `inline-flex`, `items-center`, `items-start`, `justify-between`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminModalScrollAreaClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/40`, `font-black`, `font-bold`, `font-mono`, `glass`, `inset-0`
+- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminModalScrollAreaClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-bold`, `font-mono`, `font-semibold`, `inset-0`, `ml-auto`

@@ -2,44 +2,55 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\breadcrumbUtils.ts
-skeleton_hash: e98f8f14c33e5a6b
+source_path: C:\tmp\vh-t088\src\utils\breadcrumbUtils.ts
+skeleton_hash: 6026df992f74657c
 entity_hashes:
-  func:buildCategoryBreadcrumb: 75f26731c077f8ae
-  overview: f70a9db5a198b67e
-generated_at: 2026-06-19T20:48:17Z
+  func:buildCategoryBreadcrumb: 57eb6d8f024616e4
+  overview: abeb057cc67ee6d6
+generated_at: 2026-08-27T13:26:32Z
 ---
 
 ## Genel Bakış
-Bu utility modülü, VentHub HVAC uygulamasının kullanıcı arayüzü gezinme bileşenleri için gerekli ekmek kırıntısı (breadcrumb) verilerini üretmek üzere tasarlanmıştır. Modülün temel amacı kategori hiyerarşilerinden yola çıkarak standartlaştırılmış gezinme öğeleri listeleri oluşturmak, uygulama içi gezinme deneyimini desteklemektir.
+Bu yardımcı modül, kullanıcı arayüzünde kullanılan ekmek kırıntısı (breadcrumb) gezinme bileşenlerinin verisini üretmekle sorumludur. Kategori hiyerarşisinden yola çıkarak standartlaştırılmış bir gezinme öğeleri dizisi oluşturur ve uygulama içi gezinme deneyimini destekler.
 
 ## Fonksiyon Grupları
+
 ### Kategori Tabanlı Ekmek Kırıntısı Üretimi
-Verilen ana kategori, isteğe bağlı üst kategori ve anasayfa etiketi bilgilerini birleştirerek, arayüz tarafından doğrudan kullanılabilecek standart ekmek kırıntısı öğeleri dizisi oluşturur.
+Verilen kategori, isteğe bağlı üst kategori, anasayfa etiketi ve dil bilgisini birleştirerek arayüz tarafından doğrudan kullanılabilecek bir ekmek kırıntısı öğeleri listesi üretir. Girdi olarak null veya undefined değerler alabilir; bu durumda üretim buna göre şekillenir.
 - buildCategoryBreadcrumb
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, domain kategori nesnelerinden ekmek kırıntısı (breadcrumb) listeleri oluşturmak üzere tasarlanmış bir yardımcı modüldür, doğru çalışması yalnızca girdi parametrelerinin belirtilen türlere uygunluğu ve kategori nesneleri arasındaki hiyerarşik bütünlüğe bağlıdır.
 
-[Aksiyom 1]: Eğer category parametresi DomainCategory, null veya undefined türleri dışında bir türde gönderilirse, breadcrumb oluşturma işlemi başarısız olur veya çalışma zamanı hatası meydana gelir.
-[Aksiyom 2]: Eğer dolu gönderilen parentCategory nesnesi ile category nesnesi arasındaki hiyerarşik ilişki geçerli değilse, oluşturulan breadcrumb zinciri yanlış sıralı veya mantıksız olur.
-[Aksiyom 3]: Eğer homeLabel parametresi string türünde okunabilir bir değer olarak sağlanmazsa, breadcrumb zincirinin başlangıç (ana sayfa) öğesi eksik veya kullanıcı tarafından okunamaz hale gelir.
-[Aksiyom 4]: Eğer gönderilen DomainCategory nesneleri hiyerarşik ilişki kurmak için gereken temel kimlik ve görünüm özelliklerini içermiyorsa, üretilen breadcrumb listesi eksik veya yanlış öğeler barındırır.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan çıkarılabilecek varsayımlar belirlenebilir.
+
+[Aksiyom 1]: Eğer `homeLabel` parametresi sağlanmazsa, fonksiyonun nasıl bir değer kullanacağı bilinmiyor; bu durumda üretilen `BreadcrumbItem[]` dizisinin ilk elemanının içeriği belirsiz olur.
+
+[Aksiyom 2]: Eğer `lang` parametresi sağlanmazsa, fonksiyonun dil bazlı bir işlem yapıp yapmadığı bilinmiyor; bu durumda üretilen ekmek kırıntısı öğelerinin dilsel içeriği belirsiz olur.
+
+[Aksiyom 3]: Eğer `category` parametresi `null` veya `undefined` ise, fonksiyonun boş bir dizi mi döndürdüğü yoksa hata mı fırlattığı bilinmiyor.
+
+[Aksiyom 4]: Eğer `parentCategory` parametresi verilmezse veya `null` ise, fonksiyonun üst kategori olmadan tek seviyeli bir ekmek kırıntısı mı ürettiği bilinmiyor.
+
+[Aksiyom 5]: `DomainCategory` tipinin hangi alanları içerdiği bu imzadan belirlenememektedir; fonksiyonun bu tipten hangi özellikleri okuduğu bilinmiyor.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### buildCategoryBreadcrumb
-**Ne yapar**: Kategori sayfaları için gezinme amacıyla kullanılacak breadcrumb (ekmek kırıntısı) öğeleri listesi oluşturan bir yardımcı fonksiyondur. Web sitesi içi gezinme deneyimini iyileştirmek amacıyla kullanıcının o anda bulunduğu kategori hiyerarşisini net bir şekilde görmesini sağlayan, kullanılmaya hazır navigasyon öğeleri üretir. Null veya undefined olabilecek kategori verilerini de güvenli bir şekilde işleyerek uygulama içi hataların önüne geçer.
-**Nasıl yapar**: İletilen tüm parametreleri sırayla işleyerek breadcrumb dizisini yapılandırır. İlk olarak en başa anasayfa etiketini kullanarak anasayfa navigasyon öğesini ekler, sonrasında mevcut kategorinin varsa geçerli üst kategorisini diziye ekler, en son olarak da içinde bulunulan mevcut kategoriyi ekleyerek tam kategori hiyerarşisini sıralı bir şekilde oluşturur. Geçersiz (null/undefined) kategori verileri ile karşılaşması durumunda sadece var olan geçerli öğeleri diziye ekleyerek çalışmaya devam eder.
+**Ne yapar**: Kategori sayfaları için breadcrumb (sayfa yolu) öğeleri listesi oluşturur. Ana sayfadan başlayarak varsa üst kategori ve mevcut kategori olmak üzere hiyerarşik bir navigasyon yapısı üretir.
+
+**Nasıl yapar**: Fonksiyon öncelikle ana sayfa öğesini içeren bir dizi başlatır. Ardından `parentCategory` parametresi tanımlıysa, bu üst kategorinin görünen adını ve aktif dile göre yerelleştirilmiş slug'ını kullanarak bir href içeren öğe ekler. Son olarak `category` parametresi tanımlıysa, bu kategorinin görünen adıyla birlikte `href` değeri `undefined` olan bir öğe ekler; çünkü breadcrumb'daki son öğe tıklanabilir olmamalıdır. Fonksiyon, `getCategoryDisplayName` ve `getLocalizedCategorySlug` yardımcı fonksiyonlarını kullanarak kategori bilgilerini uygun biçime dönüştürür.
+
 **Parametreler**:
-- name: category, type: DomainCategory | null | undefined — Kullanıcının o anda bulunduğu mevcut kategori nesnesi, null veya undefined değerlerini de alabilir
-- name: parentCategory, type: DomainCategory | null | undefined — Mevcut kategorinin hiyerarşideki bir üst kategori nesnesi, opsiyonel olarak iletilir ve null değerini alabilir
-- name: homeLabel, type: any — Breadcrumb listesinin en başında yer alacak anasayfa öğesinin görünen etiketi olarak kullanılacak değer
-**Dönüş**: BreadcrumbItem[] — Kullanılmaya hazır, sıralanmış navigasyon öğeleri dizisi. Tüm geçersiz veri durumlarında bile sadece var olan geçerli öğeleri içeren veya gerektiğinde boş bir dizi olarak güvenli bir şekilde döndürülür.
+- category: DomainCategory | null | undefined — Breadcrumb'da gösterilecek ana kategori nesnesi. Null veya undefined olabilir; bu durumda son kategori öğesi eklenmez.
+- parentCategory: DomainCategory | null — Ana kategorinin üst kategorisi. Tanımlıysa breadcrumb'a bir üst kategori öğesi olarak eklenir ve tıklanabilir bağlantı (href) içerir.
+- homeLabel: string — Ana sayfa öğesinin görünen metni. Varsayılan değeri `'Ana Sayfa'`dır.
+- lang: string — Aktif dil kodu. Üst kategori bağlantısının URL'inde kullanılacak yerelleştirilmiş slug bu dile göre üretilir. Varsayılan değeri `'tr'`dir.
+
+**Dönüş**: BreadcrumbItem[] — Her biri `label` ve `href` alanlarına sahip breadcrumb öğelerinden oluşan bir dizi. Dizideki son öğenin `href` değeri `undefined` olarak ayarlanır; diğer öğeler geçerli URL'lere sahiptir.
 
 ---
 
@@ -48,22 +59,21 @@ Bu modül, domain kategori nesnelerinden ekmek kırıntısı (breadcrumb) listel
 - import: ../lib/type-converters::DomainCategory
 - import: ../utils/routes::Routes
 - import: ./categoryHelpers::getCategoryDisplayName
+- import: ./categoryHelpers::getLocalizedCategorySlug
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\breadcrumbUtils.ts::buildCategoryBreadcrumb
-- **params**: category (DomainCategory | null | undefined), parentCategory? (DomainCategory | null), homeLabel (string, varsayılan değer: 'Ana Sayfa')
+### [N1_NASIL] AST Pointer: src/utils/breadcrumbUtils.ts::buildCategoryBreadcrumb
+- **params**:
+  - `category` — DomainCategory | null | undefined; breadcrumb oluşturulacak kategori
+  - `parentCategory` — DomainCategory | null | undefined (opsiyonel); üst kategori
+  - `homeLabel` — string (varsayılan `'Ana Sayfa'`); ana sayfa etiketi
+  - `lang` — string (varsayılan `'tr'`); dil kodu, slug yerelleştirmede kullanılır
 - **ic_degiskenler**:
-  - `items` — BreadcrumbItem türünde dizi, tüm breadcrumb öğelerini toplamak için oluşturulan ana dizi, ilk elemanı ana sayfa öğesi olarak başlatılır
-  - `homeLabel` — Fonksiyona parametre olarak gelen ana sayfa görünür etiketi, ilk breadcrumb öğesinin `label` alanına atanır
-  - `parentCategory` — Üst kategori nesnesi, varlığı kontrol edilerek mevcutsa items dizisine üst kategori breadcrumb öğesi eklenir; içinden `parentCategory.slug` özelliğine erişilerek rota oluşturulur
-  - `getCategoryDisplayName(parentCategory)` — Üst kategorinin kullanıcıya gösterilecek adını almak için çağrılan kategori yardımcı fonksiyonunun çıktısı, üst kategori breadcrumb öğesinin `label` alanına atanır
-  - `Routes.category(parentCategory.slug)` — Üst kategori için yönlendirme rotası oluşturmak için çağrılan Routes yardımcısının çıktısı, üst kategori breadcrumb öğesinin `href` alanına atanır
-  - `category` — Mevcut kategori nesnesi, varlığı kontrol edilerek mevcutsa son breadcrumb öğesi olarak items dizisine eklenir
-  - `getCategoryDisplayName(category)` — Mevcut kategorinin kullanıcıya gösterilecek adını almak için çağrılan kategori yardımcı fonksiyonunun çıktısı, son breadcrumb öğesinin `label` alanına atanır
-- **Dönüş**: BreadcrumbItem[] türünde, tam olarak oluşturulmuş breadcrumb öğeleri dizisi
+  - `items` — BreadcrumbItem[] dizisi; başlangıçta `homeLabel` ve `'/'` href'li tek elemanla başlatılır, ardından parentCategory ve category varsa push ile genişletilir
+- **Dönüş**: `BreadcrumbItem[]` — breadcrumb öğeleri dizisi; ilk eleman daima ana sayfa, parentCategory varsa ikinci eleman üst kategori, category varsa üçüncü eleman mevcut kategori (href'siz, son öğe olarak)
 
 ---
 

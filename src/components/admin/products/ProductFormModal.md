@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\products\ProductFormModal.tsx
-skeleton_hash: c9d3d39f056d0bd2
+source_path: C:\tmp\vh-t088\src\components\admin\products\ProductFormModal.tsx
+skeleton_hash: 6c4f3067bb0b0a8f
 entity_hashes:
   func:ProductFormModal: 6997b37c35b0ebef
   func:getProductSchema: 1aed3dbe58799d62
   func:onSubmit: 56cec6a550e2cc75
   overview: 7ffa6a2ec80048ee
-  style_tokens: 553a7b8fa0cd3c86
-generated_at: 2026-08-13T08:57:18Z
+  style_tokens: 6d7728838ddc9818
+generated_at: 2026-08-27T13:17:54Z
 ---
 
 ## Genel Bakış
@@ -203,7 +203,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/50`, `bg-primary-navy`, `bg-white`, `hover:bg-blue-700`, `hover:bg-slate-100`, `hover:bg-slate-50`, `text-industrial-gray`, `text-red-500`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
-- **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-center`, `justify-between`, `justify-end`, `left-1/2`, `max-h-90vh`, `max-w-2xl`, `md:grid-cols-2`
+- **Renkler:** `bg-admin-accent`, `bg-admin-surface`, `bg-black/50`, `hover:bg-admin-accent`, `hover:bg-admin-surface-2`, `text-admin-accent-fg`, `text-admin-danger`, `text-admin-fg-muted`, `text-industrial-gray`, `text-xl`, `text-xs`
+- **Layout:** `fixed`, `flex`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-center`, `justify-between`, `justify-end`, `left-1/2`, `max-h-90vh`, `max-w-2xl`, `md:grid-cols-2`, `md:grid-cols-3`
 - **Varyant/Responsive:** `focus-visible:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `focus-visible:outline-none`, `font-bold`, `inset-0`, `mb-6`, `mt-8`, `px-4`, `px-6`, `py-2`, `rounded-2xl`, `rounded-full`, `rounded-lg`
+- **Yardımcı Sınıflar:** `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `focus-visible:outline-none`, `font-bold`, `inset-0`, `mb-6`, `mt-8`, `px-4`, `px-6`, `py-2`, `rounded-admin-lg`, `rounded-admin-md`, `rounded-full`

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\AbcPieChart.tsx
-skeleton_hash: cb71fb57bbf4a080
+source_path: C:\tmp\vh-t088\src\components\admin\dashboard\AbcPieChart.tsx
+skeleton_hash: 80f926fbaf3cf540
 entity_hashes:
-  func:AbcPieChart: 3ae66809a3c8cea6
+  func:AbcPieChart: cde258b4cc2386ed
   overview: 64d9c987fb2a5f21
-  style_tokens: cc7ba7a958715321
-generated_at: 2026-06-19T20:47:04Z
+  style_tokens: 5302d85fc9a1582c
+generated_at: 2026-08-27T13:12:35Z
 ---
 
 ## Genel Bakış
@@ -34,32 +34,18 @@ Bu modül için mimari fonksiyon gövdesi paylaşılmadığından, yalnızca fon
 
 ---
 
-> **Not:** Modül gövdesi (function body) paylaşılmadığından, verinin işlenme mantığı (sıfır kontrolü, boş durum ekranı, grafik kütüphane entegrasyonu vb.) hakkında kesin aksiyon üretmek mümkün değildir. Eski dokümanda bahsedilen "veri yoksa boş ekran gösterimi" gibi davranışlar docstring/yorum kaynaklıdır ve mimari aksiyom olarak doğrulanamaz.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### AbcPieChart
+**Ne yapar**: ABC ürün sınıflandırmasını gösteren bir pasta grafik (pie chart) bileşenidir. Gelen veri boşsa, yoksa veya tüm değerler sıfırsa, kullanıcıya bilgilendirici bir boş durum ekranı sunar. Aksi takdirde, Recharts kütüphanesini kullanarak etkileşimli ve animasyonlu bir pasta grafik çizer ve grafik merkezinde toplam stok miktarını görüntüler.
 
-**Ne yapar**: Admin dashboard'da ABC ürün sınıflandırması için interaktif donut (iç portionlu) pasta grafik gösteren React bileşenidir. Veri olmadığında veya tüm değerler sıfır olduğunda boş durum bileşeni (AdminEmptyState) gösterir, aksi halde renkli dilimlerden oluşan animasyonlu bir pie chart ve merkezde toplam stok sayısını sunar.
-
-**Nasıl yapar**: 
-- `useI18n()` hook'u ile çevirileri (`t` fonksiyonu) alarak çok dilli destek sağlar.
-- İlk olarak data dizisinin geçerliliğini kontrol eder: `data` tanımsızsa, boşsa veya tüm elemanların `value` değeri 0 ise, `AdminEmptyState` bileşeni ile veri yetersizlik mesajı gösterir.
-- Geçerli veri varsa, `data.reduce()` ile toplam değeri hesaplar ve `ResponsiveContainer` içinde `PieChart` bileşenini render eder.
-- `Pie` bileşeninde her bir veri elemanı için `Cell` oluşturur; her hücreye ait `color` değeri `fill` olarak kullanılır, hover'da opacity düşüşü ile interaktiflik sağlanır.
-- `Tooltip` ile üzerine gelindiğinde ürün sayısını ve sınıf adını formatlanmış şekilde gösterir.
-- `Legend` bileşeni ile grafik altında sınıf isimlerini listeler.
-- Grafik merkezine `absolute` konumlandırma ile toplam değer ve "Toplam Stok" etiketi yerleştirir; arkasında `blur` efekti ile görsel derinlik oluşturulur.
-- Tüm grafik animasyonları `animationBegin={0}` ve `animationDuration={1500}` ile 1.5 saniyelik giriş animasyonuna sahiptir.
-- Grubun tamamına `group/pie` class'ı eklenerek, başlık ve alt çizgi üzerinde hover efekti (`group-hover/pie:text-cyan-400`, `group-hover/pie:w-20`) uygulanır.
+**Nasıl yapar**: Bileşen, önce `useI18n` hook'u aracılığıyla uluslararasılaştırma fonksiyonunu (`t`) alır. Ardından gelen `data` prop'unu kontrol eder: veri yoksa, boşsa veya tüm elemanların `value` değeri sıfırsa, `AdminEmptyState` bileşenini içeren bir boş durum arayüzü döndürür. Veri mevcutsa, `data` dizisindeki tüm `value` değerlerini toplayarak `totalValue` hesaplar. Ana dönüş kısmında, `ResponsiveContainer` içinde bir `PieChart` oluşturur. Grafik, `innerRadius` ve `outerRadius` ile halka şeklinde, `paddingAngle` ile dilimler arası boşluklu, `stroke` ile kenarlıklı ve animasyonlu (`animationDuration`) bir `Pie` bileşeni içerir. Her dilim, verideki `color` değerine göre boyanır. Grafik üzerinde özel stillenmiş bir `Tooltip` ve `Legend` bulunur. Grafik mutlak konumlandırılmış bir `div` içinde, merkezde toplam stok miktarını ve bir etiket gösterir.
 
 **Parametreler**:
-- `data` — `AbcPieChartItem[]` veya `undefined` — Pasta grafikte gösterilecek veri dizisi; her eleman bir ürün sınıfını (A, B, C vb.) temsil eder, `value` (sayı) ve `color` (hex renk kodu) alanları içerir. Boş veya tanımsız geldiğinde boş durum gösterilir.
-- `title` — `string` veya `undefined` — Grafik başlığı; belirtilmezse varsayılan olarak `t('admin.dashboard.abcProductClassification')` çevirisi kullanılır.
+- `data`: `AbcPieChartProps['data']` (tipi verilmemiş, ancak gövdeden `value` ve `color` alanlarına sahip bir nesne dizisi olduğu anlaşılmaktadır) — Grafikte gösterilecek veri seti. Her elemanın bir `value` (sayısal değer) ve bir `color` (renk kodu) özelliği olmalıdır.
+- `title`: `AbcPieChartProps['title']` (tipi verilmemiş, ancak gövdeden bir string olduğu anlaşılmaktadır) — Grafiğin başlığı. Belirtilmezse veya boşsa, `t('admin.dashboard.abcProductClassification')` ile alınan varsayılan metin kullanılır.
 
-**Dönüş**: `JSX.Element` — Bu bileşen React JSX'i döner; iki durumdan birini render eder: ya veri yetersizlik durumu için `AdminEmptyState` içeren bir `div`, ya da donut pie chart, tooltip, legend ve merkez toplam göstergesi içeren tam grafik görünümü.
+**Dönüş**: Bileşen, bir React bileşeni olarak JSX döndürür. Dönüş tipi kodda açıkça belirtilmemiştir.
 
 ---
 
@@ -87,18 +73,18 @@ Bu modül için mimari fonksiyon gövdesi paylaşılmadığından, yalnızca fon
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/dashboard/AbcPieChart.tsx::AbcPieChart
-- **params**: `{ data, title }` (destructure edilmiş AbcPieChartProps objesi)
-  - `data` — Pie chart veri dizisi; her eleman `value` (sayı), `color` (renk kodu) ve `name` (sınıf adı) özelliklerine sahiptir
-  - `title` — Grafik başlık metni (opsiyonel, verilmezse `t('admin.dashboard.abcProductClassification')` kullanılır)
+- **params**: `data` — ABC ürün sınıflandırma veri dizisi (her elemanda `value` ve `color` alanları bulunur), `title` — grafik başlığı (opsiyonel, yoksa varsayılan çeviri anahtarı kullanılır)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; tüm UI metinlerinin lokalizasyonu için kullanılır (`t('admin.dashboard.noAnalysisData')`, `t('admin.dashboard.productCount', { count: value })` vb.)
-  - `totalValue` — `data.reduce((acc, curr) => acc + curr.value, 0)` ile hesaplanan tüm data elemanlarının value toplamı; grafiğin merkezinde "Toplam Stok" olarak görüntülenir
-- **Dönüş**: JSX (React bileşeni) — Veri boşsa veya sıfırdan oluşan `AdminEmptyState` bileşeni, değilse donut pie chart bileşeni döner
-- **Yan etkiler**: Yok (render-only bileşen)
-- **Inline callback değişkenleri** (JSX içinde tanımlı):
-  - `entry` / `index` — `data.map` callback'inde her pie dilimi elemanını ve indeksini temsil eder; `Cell` bileşenine `entry.color` ile renk ve `key={cell-${index}}` ile anahtar atar
-  - `value` / `name` — `Tooltip` `formatter` callback parametreleri; `value` ürün sayısını, `name` ürün sınıf adını temsil eder, çeviri fonksiyonuyla formatlanır
-  - `value` — `Legend` `formatter` callback parametresi; legend metnini render eder
+  - `t` — `useI18n()` kancasından destructure edilen çeviri fonksiyonu; metinleri yerelleştirmek için kullanılır
+  - `totalValue` — `data.reduce((acc, curr) => acc + curr.value, 0)` ile hesaplanan tüm veri elemanlarının `value` alanlarının toplamı; grafik merkezinde gösterilir
+  - `d` — `data.every(d => d.value === 0)` ifadesindeki her bir veri elemanı; tüm değerlerin sıfır olup olmadığını kontrol etmek için kullanılır
+  - `acc` — `reduce` işlemindeki birikimli toplam değeri tutan akümülatör
+  - `curr` — `reduce` işlemindeki mevcut veri elemanı; `curr.value` ile değeri toplama eklenir
+  - `entry` — `data.map((entry, index) => ...)` içindeki her bir veri elemanı; `entry.color` ile hücre rengi belirlenir
+  - `index` — `data.map((entry, index) => ...)` içindeki döngü indeksi; `key={`cell-${index}`}` olarak Cell bileşenine atanır
+  - `value` — Tooltip `formatter` fonksiyonunda ürün sayısını temsil eden sayısal değer; Legend `formatter` fonksiyonunda ise sınıf adını temsil eden metin
+  - `name` — Tooltip `formatter` fonksiyonunda ürün sınıfı adını temsil eden metin
+- **Dönüş**: JSX elementi — veri yoksa veya tüm değerler sıfırsa `AdminEmptyState` içeren boş durum kartı; aksi halde `ResponsiveContainer` içinde `PieChart` (donut grafik) ve merkezde toplam stok gösteren bileşen döndürür
 
 ---
 
@@ -120,10 +106,10 @@ Bu modül için mimari fonksiyon gövdesi paylaşılmadığından, yalnızca fon
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `tracking-hvac-relaxed`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-500/10`, `bg-cyan-500/30`, `bg-slate-900/40`, `border-white/5`, `group-hover/pie:text-cyan-400`, `text-4xl`, `text-slate-500`, `text-white`, `text-xs`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-surface-2`, `border-admin-border`, `group-hover/pie:text-admin-accent`, `text-4xl`, `text-admin-fg`, `text-admin-fg-muted`, `text-xs`
 - **Layout:** `absolute`, `drop-shadow-pie-chart-glow`, `flex`, `flex-1`, `flex-col`, `group-hover/pie:w-20`, `h-0.5`, `h-full`, `items-center`, `justify-center`, `left-1/2`, `min-h-300px`, `p-10`, `relative`, `top-1/2`
 - **Varyant/Responsive:** `group-hover/pie:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `-mt-4`, `-translate-x-1/2`, `-translate-y-1/2`, `blur-3xl`, `border`, `cursor-pointer`, `duration-500`, `duration-700`, `font-black`, `group/pie`, `hover:opacity-80`, `inset-0`, `italic`, `mb-10`, `ml-1`
+- **Yardımcı Sınıflar:** `-mt-4`, `-translate-x-1/2`, `-translate-y-1/2`, `blur-3xl`, `border`, `cursor-pointer`, `duration-500`, `duration-700`, `font-semibold`, `group/pie`, `hover:opacity-80`, `inset-0`, `italic`, `mb-10`, `ml-1`

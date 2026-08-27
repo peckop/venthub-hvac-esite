@@ -2,26 +2,27 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\authority\ThreeDAuthority.tsx
-skeleton_hash: c9194246507cc7e5
+source_path: C:\tmp\vh-t088\src\components\authority\ThreeDAuthority.tsx
+skeleton_hash: 21cf35edb21c4e5b
 entity_hashes:
   func:Model: cad84f3d7aa627bb
-  func:ThreeDAuthority: c02b5265d94cfe82
-  overview: 7857aa142adb4c56
+  func:ThreeDAuthority: 4f723bb2221e26f2
+  overview: 1ca18e8f0d071f75
   style_tokens: 79effa301ffb588d
-generated_at: 2026-06-14T22:17:21Z
+generated_at: 2026-08-27T13:19:25Z
 ---
 
 ## Genel Bakış
-Bu modül, 3‑boyutlu bir modelin tarayıcıda yüklenmesini ve model üzerinde etkileşimli noktaların (hotspot) gösterilmesini yöneten, üst seviye bir React bileşenidir. Dışarıdan veri (model URL'si ve hotspot tanımları) alıp, bu verileri 3D motoru ile arayüz arasını bağlayan bir “yönlendirici” (authority) işlevi görür.
+Bu modül, 3 boyutlu bir modelin tarayıcıda yüklenmesini ve model üzerinde etkileşimli noktaların (hotspot) gösterilmesini üstlenen bir React bileşenidir. Dışarıdan gelen model URL'si ve hotspot tanımlarını alarak 3D motoru ile arayüz arasında bir yönlendirici işlevi görür. Modül davranışsal mantık içermez; salt veri, konfigürasyon ve tip tanımı barındırır.
 
 ## Fonksiyon Grupları
+
 ### Model Render ve Hotspot Yönetimi
-Bu grup, asıl 3D sahnenin yüklenmesini ve model üzerine yerleştirilmiş hotspot işaretçilerinin render edilmesinden sorumludur.
+Bu grup, asıl 3D sahnenin yüklenmesini ve model üzerine yerleştirilmiş hotspot işaretçilerinin render edilmesinden sorumludur. Verilen URL ile model yüklenir, sağlanmışsa bu noktalar modele eklenir.
 - Model
 
-### Üst‑Seviye Bileşen Sarmalayıcı
-Bu grup, dış kaynaklardan gelen veri paketini (metadata) alır, gerekli dönüşümleri yapar ve altındaki Model bileşenine doğru prop'ları aktararak modülün dışarıya sunduğu tek bir arayüz oluşturur.
+### Üst Seviye Bileşen Sarmalayıcı
+Bu grup, dış kaynaklardan gelen veri paketini (metadata) alır, gerekli dönüşümleri yapar ve altındaki Model bileşenine doğru prop'ları aktararak modülün dışarıya sunduğu tek bir arayüzü oluşturur.
 - ThreeDAuthority
 
 ---
@@ -44,29 +45,28 @@ Bu grup, dış kaynaklardan gelen veri paketini (metadata) alır, gerekli dönü
 **Dönüş**: void — fonksiyon JSX elementi döndürür, açık bir değer döndürmez.
 
 ### ThreeDAuthority
-**Ne yapar**: ThreeDAuthority, bir HVAC ürününün gerçek 3D modelini (GLB/GLTF formatında) interaktif bir şekilde görüntülemek için kullanılır. Bileşen, performans optimizasyonu sağlamak amacıyla "Tıkla-Yükle" (Click-to-Load) stratejisini uygular; yani 3D model, kullanıcı bir yükleme ekranına tıklayana kadar tarayıcıda arka planda hazırlanmaz.
 
-**Nasıl yapar**: Fonksiyon, `useI18n` hook'u ile çoklu dil desteğini, `React.useState` ile `isStarted` adlı bir durum değişkenini yönetir. Başlangıçta (`isStarted` false iken), `motion.div` ile animasyonlu bir placeholder (yükleme ekranı) döndürür. Bu ekranda "Tıkla ve Başlat" çağrısı ve loading animasyonu bulunur. Kullanıcı bu alana tıkladığında `setIsStarted(true)` çağrısı yapılır ve bileşen durumu değişir. Ardından `@react-three/fiber` kütüphanesinden gelen `Canvas` bileşeni içinde 3D sahne oluşturulur. `metadata.config` nesnesindeki değerler (`autoRotate`, `initialZoom`, `environment`, `shadows`) kullanılarak sahne özelleştirilir. `Model` bileşeni (`url` ve `hotspots` prop'ları ile) yüklenir, ortam aydınlatması ve gölgeler eklenir. `OrbitControls` ile kullanıcı etkileşimine (sürükleme, döndürme) izin verilir. `frameloop` prop'u, `autoRotate`true ise `'always'` (sürekli yeniden çizim), değilse `'demand'` (sadece etkileşimde yeniden çizim) olarak dinamik atanarak performans optimizasyonu yapılır.
+**Ne yapar**: Gerçek 3D ürün modellerini (GLB/GLTF) interaktif olarak render eden bir React fonksiyonel bileşenidir. Performans optimizasyonu için "Click-to-Load" (tıklayarak yükle) stratejisini uygular; bileşen ilk yüklendiğinde 3D modeli hemen yüklemez, kullanıcı tıkladıktan sonra yüklemeyi başlatır.
+
+**Nasıl yapar**: Bileşen, `isStarted` adlı bir durum değişkeniyle iki farklı görünüm arasında geçiş yapar. İlk durumda (`isStarted` değeri `false` iken), kullanıcıya tıklanabilir bir placeholder gösterilir; bu placeholder, dönen bir yükleme ikonu ve "etkileşimli görünümü başlatmak için tıklayın" mesajı içerir. Kullanıcı bu alana tıkladığında `setIsStarted(true)` çağrılarak durum güncellenir ve ikinci görünüme geçilir. İkinci durumda, `VentHubCanvas` bileşeni kullanılarak bir 3D canvas oluşturulur. Canvas içinde `Suspense` ile sarmalanan `Model` bileşeni, verilen URL'den 3D modeli yükler; yükleme sırasında bir spinner gösterilir. `metadata.config.autoRotate` değerine göre canvas'ın `frameloop` modu `'always'` (sürekli render) veya `'demand` (talep üzerine render) olarak ayarlanır. `ContactShadows` bileşeni, `metadata.config.shadows` değeri `false` değilse zemin gölgeleri ekler. `OrbitControls` bileşeni, kullanıcının fareyle modeli döndürmesine olanak tanır; yatay kaydırma (`enablePan`) devre dışıdır ve dikey açı sınırları belirlenmiştir. Her iki görünüm de `motion.div` ile sarmalanarak opaklık animasyonu uygulanır. `useI18n` hook'u ile uluslararasılaştırma metinleri alınır.
 
 **Parametreler**:
-- `metadata`: `ThreeDAuthorityProps` tipindeki nesne. Bileşenin render edeceği 3D modelin ve yapılandırma ayarlarının tüm bilgilerini içerir.
-    - `modelUrl`: `string` — GLB/GLTF formatındaki 3D model dosyasının URL'i.
-    - `hotspots`: `any[]` — (Seçeneksel) Model üzerindeki interaktif bilgi noktaları.
-    - `config`: `object` (Seçeneksel) — Sahne yapılandırma ayarları:
-        - `autoRotate`: `boolean` — Otomatik döndürme aktif mi.
-        - `initialZoom`: `number` — Başlangıç kamera mesafesi.
-        - `environment`: `string` — Ortam haritası preset'i ('studio', 'sunset' vb.).
-        - `shadows`: `boolean` — Gölgelerin gösterilip gösterilmeyeceği.
-- `className`: `string` — (Varsayılan: `''`) Bileşenin dış sarmalayıcısına (wrapper) eklenecek CSS sınıf adı.
+- `metadata`: `ThreeDAuthorityProps` tipinden gelen ve 3D model yapılandırmasını içeren nesne. Alt alanları kaynak kodundan tespit edildiği kadarıyla şunlardır:
+  - `metadata.modelUrl`: `string` — Yüklenecek 3D modelin (GLB/GLTF) URL adresi.
+  - `metadata.hotspots`: tipi kaynakta belirtilmemiş — Modele atanmış hotspot (sıcak nokta) verileri.
+  - `metadata.config.autoRotate`: `boolean` — Modelin otomatik olarak dönüp dönmeyeceğini belirler. Varsayılan değeri `false` olarak kullanılır.
+  - `metadata.config.initialZoom`: `number` — Kameranın başlangıç zoom mesafesi. Belirtilmezse `5` kullanılır.
+  - `metadata.config.shadows`: `boolean` — Zemin gölgelerinin gösterilip gösterilmeyeceğini belirler. `false` olarak ayarlanmadığı sürece gölgeler gösterilir.
+- `className`: `string` — Bileşenin kök elementine eklenecek ek CSS sınıf adları. Varsayılan değeri boş string (`''`) dir.
 
-**Dönüş**: `JSX.Element` (veya `React.ReactNode`). Başlangıç durumuna göre animasyonlu bir yükleme ekranı veya tam interaktif 3D görüntüleyici JSX'i döndürür.
+**Dönüş**: Kaynak kodunda dönüş tipi açıkça belirtilmemiştir. Fonksiyon, `isStarted` durumuna göre iki farklı JSX yapısı döndürür; her ikisi de `motion.div` ile sarmalanmış, animasyonlu ve stillendirilmiş bir konteynerdir. İlk durumda tıklanabilir bir placeholder, ikinci durumda 3D canvas içeren bir yapı döndürülür.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../types/media.types::type { ThreeDMetadata }
+- import: ../products/3d/core::VentHubCanvas
 - import: @/i18n/I18nProvider::useI18n
-- import: @react-three/fiber::Canvas
 - import: framer-motion::motion
 - import: react::React
 - import: react::Suspense
@@ -83,19 +83,29 @@ Bu grup, dış kaynaklardan gelen veri paketini (metadata) alır, gerekli dönü
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\components\authority\ThreeDAuthority.tsx::Model
-- **params**: (url: string, hotspots?: ThreeDMetadata['hotspots'])
+### [N1_NASIL] AST Pointer: src/components/authority/ThreeDAuthority.tsx::Model
+- **params**: `url` (string), `hotspots` (ThreeDMetadata['hotspots'] opsiyonel)
 - **ic_degiskenler**:
-  - `scene` — useGLTF(url) hook'undan dönen 3D model sahnesi. primitive elementine object olarak bağlanır
-- **Dönüş**: JSX element (group içinde scene ve hotspot'lerin render ettiği yapı)
+  - `scene` — useGLTF(url) ile elde edilen 3D sahne nesnesi; primitive bileşenine object prop'u olarak aktarılır
+  - `spot` — hotspots dizisinin map döngüsündeki her bir elemanı; position, label ve description alanlarına erişilir
+  - `idx` — hotspots dizisinin map döngüsündeki indeks numarası; Html bileşenine key prop'u olarak kullanılır
+  - `spot.position` — hotspots elemanının 3D uzaydaki konumu; Html bileşenine position prop'u olarak aktarılır
+  - `spot.label` — hotspots elemanının etiket metni; üst-case CSS sınıfıyla p etiketinde görüntülenir
+  - `spot.description` — hotspots elemanının açıklama metni; varsa koşullu olarak p etiketinde görüntülenir
+- **Dönüş**: JSX — group bileşeni içinde primitive ve hotspots haritası
 
-### [N2_NASIL] AST Pointer: src\components\authority\ThreeDAuthority.tsx::ThreeDAuthority
-- **params**: (metadata: ThreeDAuthorityProps, className: string = '')
+### [N2_NASIL] AST Pointer: src/components/authority/ThreeDAuthority.tsx::ThreeDAuthority
+- **params**: `metadata` (ThreeDAuthorityProps), `className` (string, varsayılan '')
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu. Metinleri çok dilli yapmak için kullanılır
-  - `isStarted` — 3D modelin yüklenip yüklenmediğini takip eden boolean state
-  - `setIsStarted` — isStarted state'ini güncellemek için setter fonksiyonu
-- **Dönüş**: JSX element (isStarted false ise placeholder, true ise Canvas ile 3D görünüm)
+  - `t` — useI18n() ile elde edilen çeviri fonksiyonu; 'pdp.threeDAuthority.interactiveView', 'pdp.threeDAuthority.clickToInitialize', 'pdp.threeDAuthority.loadingModel', 'pdp.threeDAuthority.dragToRotate' anahtarlarıyla metin almak için kullanılır
+  - `isStarted` — React.useState(false) ile oluşturulan boolean durum; 3D modelin başlatılıp başlatılmadığını kontrol eder
+  - `setIsStarted` — isStarted durumunu güncelleyen setter fonksiyonu; onClick olayında true olarak çağrılır
+  - `metadata.config?.autoRotate` — otomatik döndürme ayarı; true ise frameloop 'always', değilse 'demand' olur
+  - `metadata.config?.initialZoom` — başlangıç yakınlaştırma mesafesi; yoksa 5 kullanılır, kamera position'ının z bileşenine aktarılır
+  - `metadata.config?.shadows` — gölge ayarı; false değilse ContactShadows bileşeni render edilir
+  - `metadata.modelUrl` — 3D model dosyasının URL'si; Model bileşenine url prop'u olarak aktarılır
+  - `metadata.hotspots` — 3D model üzerindeki hotspot tanımları; Model bileşenine hotspots prop'u olarak aktarılır
+- **Dönüş**: JSX — isStarted durumuna göre ya başlatma ekranı (motion.div) ya da 3D canvas (VentHubCanvas) render eder
 
 ---
 

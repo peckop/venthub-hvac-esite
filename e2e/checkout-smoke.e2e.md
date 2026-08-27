@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\e2e\checkout-smoke.e2e.ts
-skeleton_hash: fade75568c3fc639
+source_path: C:\tmp\vh-t088\e2e\checkout-smoke.e2e.ts
+skeleton_hash: aa83018c0858b176
 entity_hashes:
   overview: 529d691256ce33bd
-generated_at: 2026-06-19T12:06:25Z
+generated_at: 2026-08-27T13:04:03Z
 ---
 
 ## Genel Bakış
@@ -68,3 +68,36 @@ Bu modül, bir E2E (End-to-End) test dosyasıdır ve checkout akışı için sig
 ## NODE ID STANDARD
 
   file: e2e\checkout-smoke.e2e.ts
+
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+NİÇİN ŞİMDİ ÖNEMLİ — bu testin asıl işi bugün değişti. 2026-08-15'te ödeme yolu
+FAIL-CLOSED yapıldı (T041-VH): `order-validate` doğrulaması yapılamazsa `iyzico-payment`
+ödemeyi BAŞLATMIYOR ve istemci fiyatına düşen yedek yol SİLİNDİ. Bu doğru karar ama yeni
+bir risk getirdi: fail-closed mantığında bir hata olsa checkout tamamen ölür ve **bunu
+yakalayacak hiçbir çalışma-zamanı kapısı yoktu** — 794 testin tamamı statik/birim, hiçbiri
+tarayıcı açmıyor. Bu dosya o boşluğu kapatır.
+
+Ödeme adımına HÂLÂ girilmez (aşağıdaki güvenlik sınırı); ölçülen şey, hunının ödeme
+düğmesine kadar boot olup interaktif kaldığıdır.
+```
+
+```text
+⚠️ ESKİ SEÇİCİ NİÇİN KALDIRILDI (2026-08-15, karantinadan çıkarken ilk koşuda patladı):
+Test "satın alınabilir kart"ı `hasNotText: 'Teklif İste'` ile arıyordu. O varsayım
+ARTIK YANLIŞ: `/tr/products` F5-B'den beri `FamilyCard` basıyor ve fiyat karttan
+BİLEREK kaldırıldı (PS-042 önbellek izolasyonu) — dosyanın kendi yorumu diyor ki
+"her kart aynı 'Teklif İste' CTA'sını gösterir". Yani filtre SIFIR kart eşleştiriyordu.
+Kod doğruydu, test eski sözleşmeyi kodluyordu.
+
+YENİ ÇAPA: satın alınabilirliğin tek dürüst işareti PDP'deki `pdp-add-to-cart`.
+Kart metnine değil, ürünün gerçekten sepete eklenebilir olmasına bakılır. 374 ailenin
+348'i fiyatlı, ama İLK kartın fiyatlı olduğu garanti değil — bu yüzden ilk birkaç
+kart sırayla denenir. (Kart metnine geri dönme: aynı hataya düşersin.)
+```

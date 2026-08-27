@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\CostRefreshModal.tsx
-skeleton_hash: d5581159a8130481
+source_path: C:\tmp\vh-t088\src\components\admin\pricing\CostRefreshModal.tsx
+skeleton_hash: e58b4a7445018c90
 entity_hashes:
   func:CostRefreshModal: 6d78cfeb2c873bb6
   overview: 21a4586912b6831f
-  style_tokens: bd81234d13a2dffa
-generated_at: 2026-08-15T03:54:29Z
+  style_tokens: 4e601042ef8a3eb1
+generated_at: 2026-08-27T13:16:01Z
 ---
 
 ## Genel Bakış
@@ -136,7 +136,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-surface-deep`, `bg-white/2`, `border-b`, `border-t`, `border-white/10`, `border-white/5`, `hover:bg-white/10`, `hover:bg-white/5`, `hover:text-white`, `last:border-0`, `text-amber-400`, `text-cyan-400`, `text-lg`, `text-rose-400`
-- **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-10`, `h-9`, `inline-flex`, `items-center`, `justify-between`
+- **Renkler:** `bg-admin-bg`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-black/60`, `border-admin-border`, `border-b`, `border-t`, `hover:bg-admin-surface-2`, `hover:bg-admin-surface-3`, `hover:text-admin-fg`, `last:border-0`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-10`, `h-9`, `inline-flex`, `items-center`, `justify-between`, `justify-end`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `last:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminModalScrollAreaClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/40`, `font-black`, `font-bold`, `glass`, `inset-0`, `last:pb-0`
+- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminModalScrollAreaClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-bold`, `font-semibold`, `inset-0`, `last:pb-0`, `ml-2`

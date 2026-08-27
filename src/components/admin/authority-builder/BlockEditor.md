@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\BlockEditor.tsx
-skeleton_hash: 64a64a5a4ef0c335
+source_path: C:\tmp\vh-t088\src\components\admin\authority-builder\BlockEditor.tsx
+skeleton_hash: 4a7e959fa1d4cc79
 entity_hashes:
   func:BlockEditor: 214d29bf0d4fb6bd
   overview: 451c6f0d8f51e9a4
-  style_tokens: bc113824a6724140
-generated_at: 2026-06-16T10:18:09Z
+  style_tokens: 98b0ad75e2789f2c
+generated_at: 2026-08-27T13:11:53Z
 ---
 
 ## Genel Bakış
@@ -157,10 +157,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-indigo-50`, `bg-indigo-50/20`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-white`, `border-indigo-100/50`, `border-slate-100`, `hover:text-indigo-700`, `hover:text-red-500`, `text-center`, `text-indigo-400`, `text-indigo-600`, `text-slate-300`, `text-slate-400`
+- **Renkler:** `bg-admin-accent`, `bg-admin-accent-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-accent/30`, `border-admin-border`, `hover:text-admin-accent`, `hover:text-admin-danger`, `text-admin-accent`, `text-admin-fg`, `text-admin-fg-muted`, `text-center`, `text-sm`, `text-xs`
 - **Layout:** `absolute`, `flex`, `flex-1`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-32`, `h-7`, `h-9`, `items-center`, `items-start`, `justify-between`
 - **Varyant/Responsive:** `hover:` önekleri
-- **Yardımcı Sınıflar:** `${inputClass`, `${textareaClass`, `border`, `font-black`, `font-bold`, `font-mono`, `group`, `italic`, `px-3`, `py-1`, `rounded`, `rounded-full`, `rounded-lg`, `rounded-xl`, `space-y-3`
+- **Yardımcı Sınıflar:** `${inputClass`, `${textareaClass`, `border`, `font-bold`, `font-mono`, `font-semibold`, `group`, `italic`, `px-3`, `py-1`, `rounded`, `rounded-admin-md`, `rounded-full`, `space-y-3`, `space-y-4`

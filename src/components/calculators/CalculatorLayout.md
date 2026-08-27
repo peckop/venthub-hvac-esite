@@ -2,17 +2,17 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\calculators\CalculatorLayout.tsx
-skeleton_hash: bd03e80c5b75e201
+source_path: C:\tmp\vh-t088\src\components\calculators\CalculatorLayout.tsx
+skeleton_hash: 4e57c9bdde5e6398
 entity_hashes:
   func:CalculatorLayout: 992031a52a171585
-  overview: 1653d259eecd0578
+  overview: ce819e8c92e08794
   style_tokens: 8b0a8e4795cce63b
-generated_at: 2026-06-14T19:43:54Z
+generated_at: 2026-08-27T13:20:00Z
 ---
 
 ## Genel Bakış
-Bu modül, tüm HVAC hesaplayıcı sayfalarına ortak bir görünüm ve yapı kazandırmak için tasarlanmış bir layout (yerleşim) şablonudur. Tek bileşeni olan CalculatorLayout, başlık, açıklama ve ikon gibi tekrarlanabilir UI öğelerini alarak sayfa düzenini standardize eder ve içeriği child bileşenlere yer açar. Varsayılan değerler ve aksiyomlarla, bileşenin farklı durumlarda nasıl davranacağı belirlenmiştir.
+Bu modül, HVAC hesaplayıcı sayfaları için ortak bir layout şablonu sağlar. Tek bileşeni olan CalculatorLayout, sayfa başlığı, açıklama, ikon ve geri dönüş linki gibi özellikleri alarak sayfa düzenini standardize eder. Modül, davranışsal mantık içermez ve dışa açtığı yapı bir sözleşme niteliğindedir.
 
 ## Fonksiyon Grupları
 ### UI Şablonu ve Yerleşimi
@@ -22,9 +22,8 @@ Bu grup, hesaplayıcı sayfalarının üst başlık bölümünü ve içerik kont
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için fonksiyon gövdesi sağlanmadığından, gövdeden türetilen mimari aksiyom üretilememektedir.
 
 ---
 
@@ -46,8 +45,8 @@ Bu grup, hesaplayıcı sayfalarının üst başlık bölümünü ve içerik kont
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/routes::Routes
 - import: ../Seo::Seo
 - import: lucide-react::AlertTriangle
 - import: lucide-react::ArrowLeft
@@ -75,10 +74,19 @@ Bu grup, hesaplayıcı sayfalarının üst başlık bölümünü ve içerik kont
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/calculators/CalculatorLayout.tsx::CalculatorLayout
-- **params**: (`title`, `description`, `icon`, `backLink = '/products'`, `backLabel`, `infoText`, `warningText`, `children`)
+- **params**:
+  - `title` — sayfa başlığı, hem görünümde hem SEO meta etiketinde kullanılır
+  - `description` — açıklama metni, hem görünümde hem SEO meta etiketinde kullanılır
+  - `icon` — opsiyonel ikon bileşeni; verilmezse varsayılan `Calculator` ikonu gösterilir
+  - `backLink` — geri dönüş bağlantısı URL'i; varsayılan değeri `'/products'`
+  - `backLabel` — geri dönüş bağlantısı etiketi; verilmezse `t('calculators.layout.backLabel')` çeviri anahtarından alınır
+  - `infoText` — bilgi banner metni; varsa `Info` ikonuyla birlikte gösterilir
+  - `warningText` — uyarı banner metni; varsa `AlertTriangle` ikonuyla birlikte gösterilir
+  - `children` — ana içerik alanı, layout'un ortasına yerleştirilir
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, metinleri çoklu dilde göstermek için kullanılır
-- **Dönüş**: JSX Elemanı (Sayfa düzenini oluşturan React bileşeni)
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; footer metinleri ve varsayılan etiketler için kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan gelen lokalize rota nesnesi; footer'daki iletişim bağlantısı için `Routes.contact()` çağrılır
+- **Dönüş**: JSX — tam sayfa calculator layout'u; `Seo` bileşeni, breadcrumb navigasyonlu header (başlık + açıklama + ikon), opsiyonel info/warning banner'ları, `children` ana içerik alanı ve disclaimer/iletişim footer'ı içerir
 
 ---
 

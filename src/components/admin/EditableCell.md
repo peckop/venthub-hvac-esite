@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\EditableCell.tsx
-skeleton_hash: c8931401a80d9dd5
+source_path: C:\tmp\vh-t088\src\components\admin\EditableCell.tsx
+skeleton_hash: 9f6534813c606d11
 entity_hashes:
   func:EditableCell: c69e143b78ab0750
   overview: e0ead7dc16886f70
-  style_tokens: 2f2ada2707ada249
-generated_at: 2026-06-19T20:47:00Z
+  style_tokens: 9c5ac06edd88021a
+generated_at: 2026-08-27T13:07:43Z
 ---
 
 ## Genel Bakış
@@ -170,7 +170,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-transparent`, `border-2`, `border-b`, `border-dashed`, `border-primary-navy`, `border-primary-navy/30`, `border-slate-300`, `border-t-primary-navy`, `hover:border-primary-navy`, `hover:text-primary-navy`, `text-left`, `text-slate-400`, `text-sm`
+- **Renkler:** `bg-transparent`, `border-2`, `border-admin-border`, `border-b`, `border-dashed`, `border-primary-navy`, `border-primary-navy/30`, `border-t-primary-navy`, `hover:border-primary-navy`, `hover:text-primary-navy`, `text-admin-fg-muted`, `text-left`, `text-sm`
 - **Layout:** `gap-1`, `h-3.5`, `inline-block`, `inline-flex`, `items-center`, `p-0`, `w-3.5`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
 - **Yardımcı Sınıflar:** `${className`, `${inputWidth`, `animate-spin`, `border`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-1`, `focus-visible:ring-primary-navy/50`, `px-1.5`, `py-0.5`, `rounded`, `rounded-full`, `transition-colors`

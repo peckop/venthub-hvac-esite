@@ -2,29 +2,35 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\layout\CookieConsent.tsx
-skeleton_hash: af5e987988010b85
+source_path: C:\tmp\vh-altyapi-t165\src\components\layout\CookieConsent.tsx
+skeleton_hash: 1a656857c4b01b30
 entity_hashes:
-  func:CookieConsent: a5f102228e57f333
-  overview: a960efeee3d27963
-  style_tokens: 20b5f371d2cf3ccf
-generated_at: 2026-06-15T17:03:21Z
+  func:CookieConsent: a98941af7804591f
+  overview: af56f8b739dda456
+  style_tokens: 22a5292b65783726
+generated_at: 2026-08-27T08:29:53Z
 ---
 
 ## Genel Bakış
-Bu modül, web sitesinin çerez politikasına ilişkin kullanıcı rızasını yöneten ve gösteren bir React bileşenidir. Kullanıcının çerez tercihlerini kabul etmesini veya reddetmesini sağlayarak gizlilik düzenlemelerine uyumu kolaylaştırır.
+Bu modül, web sitesinin çerez politikasına ilişkin kullanıcı rızasını yöneten ve gösteren bir React bileşenidir. Kullanıcının çerez tercihlerini kabul etmesini veya reddetmesini sağlayarak gizlilik düzenlemelerine uyumu kolaylaştırır. Bileşen, dil duyarlı bir banner arayüzü sunar ve tercihleri yerel depoda (`localStorage`) saklar.
 
 ## Fonksiyon Grupları
 ### Çerez Rıza Bileşeni
-Bileşen, kullanıcının çerez kullanımına ilişkin tercihlerini almak ve kaydetmek için bir arayüz sağlar.
+Kullanıcının çerez kullanımına ilişkin tercihlerini toplayan, dil bazlı lokalize metinlerle bir iletişim kutusu gösteren ve tercih kalıcılığını sağlayan tek bileşen grubudur. Daha önce tercih belirtilmemişse sayfa yüklemesinden 1.5 saniye sonra animasyonlu bir banner görüntüler.
 - CookieConsent
+
+## Bağımlılıklar ve Mimari Notlar
+- **Dış bağımlılıklar**: `useI18n()` hook'u ile mevcut dil (`lang`) alınır; `useLocalizedRoutes()` hook'u ile Çerez Politikası sayfasına yönlendirme bağlantısı oluşturulur.
+- **Durum yönetimi**: `useState(false)` ile banner görünürlüğü (`isVisible`) yönetilir; `useEffect` ile bileşen monte edildiğinde `localStorage` içindeki `vh_cookie_consent` anahtarı kontrol edilir.
+- **Yapısal sözleşme**: Modülün dışa açtığı yapı bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler. Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** Fonksiyon gövdesi sağlanmadığından (`CookieConsent` yalnızca imzasıyla verilmiştir), gövde tabanlı çıkarım yapılamamaktadır.
 
 ---
 
@@ -56,6 +62,7 @@ Bileşen, kullanıcının çerez kullanımına ilişkin tercihlerini almak ve ka
 - import: ../../i18n/I18nProvider::useI18n
 - import: next/link::Link
 - import: react::React
+- import: react::useCallback
 - import: react::useEffect
 - import: react::useState
 
@@ -66,40 +73,57 @@ Bileşen, kullanıcının çerez kullanımına ilişkin tercihlerini almak ve ka
 ### [N1_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::CookieConsent
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `lang` — `useI18n()` hook'undan dönen mevcut dil kodu (ör. `'en'`, `'tr'`), lokalize metinlerin seçiminde kullanılır
-  - `routes` — `useLocalizedRoutes()` hook'undan dönen lokalize rota fonksiyonları nesnesi; `routes.legal.cerez()` çağrısıyla çerez politikası sayfasının URL'sini üretir
-  - `isVisible` — boolean state, çerez izni bannerının görünür olup olmadığını kontrol eder; `false` ise bileşen `null` döner (gizlenir)
-  - `setIsVisible` — `isVisible` state'ini güncelleyen setter fonksiyonu, bannerın gösterilmesini/gizlenmesini tetikler
-  - `consent` — `localStorage.getItem('vh_cookie_consent')` çağrısından dönen string değer; daha önce çerez onayı verilip verilmediğini tutar (`'accepted'`, `'rejected'` veya `null`)
-  - `timer` — `setTimeout` dönüşü, 1500ms sonra `setIsVisible(true)` çağrısını tetikler; cleanup fonksiyonunda `clearTimeout(timer)` ile temizlenir
-  - `text` — `lang` değerine göre seçilen lokalize çerez politikası açıklama metni (`'en'` veya `'tr'`)
-  - `policyText` — `lang` değerine göre seçilen lokalize `"Cookie Policy"` / `"Çerez Politikası"` buton metni
-  - `acceptText` — `lang` değerine göre seçilen lokalize `"Accept All"` / `"Tümünü Kabul Et"` buton metni
-  - `rejectText` — `lang` değerine göre seçilen lokalize `"Reject"` / `"Reddet"` buton metni
-  - `handleAccept` — arrow fonksiyon; `localStorage.setItem('vh_cookie_consent', 'accepted')` yazarak çerez onayını kalıcı olarak kaydeder, ardından `setIsVisible(false)` ile bannerı gizler
-  - `handleReject` — arrow fonksiyon; `localStorage.setItem('vh_cookie_consent', 'rejected')` yazarak çerez reddini kalıcı olarak kaydeder, ardından `setIsVisible(false)` ile bannerı gizler
-- **Dönüş**: `JSX.Element | null` — `isVisible` false ise `null`, true ise çerez izni banner JSX'i döner
+  - `t` — useI18n() hook'undan destructure edilen çeviri fonksiyonu; JSX içinde metinleri yerelleştirmek için kullanılır
+  - `routes` — useLocalizedRoutes() hook'undan gelen rotalar objesi; Link bileşeninde `routes.legal.cerez()` ile href oluşturmak için kullanılır
+  - `isVisible` — useState(false) ile tanımlı boolean state; bileşenin görünürlük durumunu tutar
+  - `setIsVisible` — isVisible state'ini güncelleyen setter fonksiyonu
+  - `showDetails` — useState(false) ile tanımlı boolean state; çerez kategori detaylarının açık/kapalı durumunu tutar
+  - `setShowDetails` — showDetails state'ini güncelleyen setter fonksiyonu
+  - `draft` — useState({functional: false, analytics: false, marketing: false}) ile tanımlı obje state; kullanıcının çerez tercihlerinin taslağını tutar
+  - `setDraft` — draft state'ini güncelleyen setter fonksiyonu
+  - `syncVisibility` — useCallback ile tanımlı fonksiyon; consent durumunu kontrol eder ve isVisible state'ini günceller
+  - `handleAcceptAll` — acceptAll() çağırır ve isVisible'ı false yaparak bileşeni gizler
+  - `handleRejectOptional` — rejectOptional() çağırır ve isVisible'ı false yaparak bileşeni gizler
+  - `handleSaveSelection` — setConsent(draft) çağırır ve isVisible'ı false yaparak bileşeni gizler
+- **Dönüş**: isVisible false ise null, aksi halde JSX elementi
 
-### [N2_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::useEffect_callback
-- **params**: (parametre yok) — `useEffect` callback fonksiyonu
-- **ic_degiskenler**:
-  - `consent` — `localStorage.getItem('vh_cookie_consent')` çağrısından dönen `string | null`; daha önce kullanıcı çerez tercihini kaydedip kaydetmediğini belirler
-  - `timer` — `setTimeout(() => setIsVisible(true), 1500)` dönüşü; 1.5 saniye gecikme ile bannerın gösterilmesini sağlar, LCP/CLS optimizasyonu için kullanılır
-- **Dönüş**: temizleme fonksiyonu `() => clearTimeout(timer)` — timer'ı iptal eder, bileşen unmount olduğunda sızıntıyı önler
+### [N2_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::syncVisibility
+- **params**: (parametre yok)
+- **ic_degiskenler**: (gövdede tanımlı değişken yok)
+- **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleAccept
+### [N3_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::useEffect callback
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `localStorage.setItem('vh_cookie_consent', 'accepted')` — tarayıcı localStorage'ına çerez onay durumunu `'accepted'` değeriyle yazar
-  - `setIsVisible(false)` — state'i `false` yaparak bannerı DOM'dan kaldırır
-- **Dönüş**: yok (void) — yan etki olarak localStorage'a yazar ve bannerı gizler
+  - `timer` — setTimeout ile syncVisibility fonksiyonunu 1500ms gecikmeli çalıştırmak için oluşturulan zamanlayıcı kimliği
+  - `off` — onConsentChange ile oluşturulan dinleyici aboneliğini kaldıran fonksiyon
+- **Dönüş**: cleanup fonksiyonu
 
-### [N4_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleReject
+### [N4_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::useEffect cleanup
 - **params**: (parametre yok)
+- **ic_degiskenler**: (gövdede tanımlı değişken yok)
+- **Dönüş**: yok
+
+### [N5_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleAcceptAll
+- **params**: (parametre yok)
+- **ic_degiskenler**: (gövdede tanımlı değişken yok)
+- **Dönüş**: yok
+
+### [N6_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleRejectOptional
+- **params**: (parametre yok)
+- **ic_degiskenler**: (gövdede tanımlı değişken yok)
+- **Dönüş**: yok
+
+### [N7_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleSaveSelection
+- **params**: (parametre yok)
+- **ic_degiskenler**: (gövdede tanımlı değişken yok)
+- **Dönüş**: yok
+
+### [N8_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::map callback (category)
+- **params**: `category` — OPTIONAL_CATEGORIES dizisinden gelen çerez kategori adı
 - **ic_degiskenler**:
-  - `localStorage.setItem('vh_cookie_consent', 'rejected')` — tarayıcı localStorage'ına çerez onay durumunu `'rejected'` değeriyle yazar
-  - `setIsVisible(false)` — state'i `false` yaparak bannerı DOM'dan kaldırır
-- **Dönüş**: yok (void) — yan etki olarak localStorage'a yazar ve bannerı gizler
+  - `e` — onChange event objesi; `e.target.checked` ile checkbox durumunu almak için kullanılır
+- **Dönüş**: JSX elementi (label)
 
 ---
 
@@ -124,7 +148,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-500/10`, `bg-gradient-to-r`, `border-t`, `border-white/10`, `border-white/5`, `from-cyan-500`, `hover:bg-white/5`, `hover:from-cyan-400`, `hover:text-cyan-400`, `hover:text-white`, `hover:to-blue-500`, `text-cyan-400`, `text-slate-300`, `text-slate-400`, `text-sm`
-- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `from-cyan-500`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `h-5`, `hover:from-cyan-400`, `hover:shadow-lg`, `items-center`, `items-start`, `justify-between`
+- **Renkler:** `accent-cyan-500`, `bg-cyan-500/10`, `bg-gradient-to-r`, `border-t`, `border-white/10`, `border-white/5`, `from-cyan-500`, `hover:bg-white/5`, `hover:from-cyan-400`, `hover:text-cyan-400`, `hover:text-white`, `hover:to-blue-500`, `text-cyan-400`, `text-slate-300`, `text-slate-400`
+- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `flex-wrap`, `from-cyan-500`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `h-5`, `hover:from-cyan-400`, `hover:shadow-lg`, `items-center`, `items-start`
 - **Varyant/Responsive:** `active:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `active:scale-95`, `animate-fadeInUp`, `border`, `cyan-glow`, `duration-200`, `duration-300`, `font-bold`, `font-medium`, `glass-strong`, `hover:scale-105`, `leading-relaxed`, `pt-2`, `px-3`, `px-4`, `py-1.5`
+- **Yardımcı Sınıflar:** `active:scale-95`, `animate-fadeInUp`, `border`, `cursor-not-allowed`, `cursor-pointer`, `cyan-glow`, `duration-200`, `duration-300`, `font-bold`, `font-medium`, `glass-strong`, `hover:scale-105`, `leading-relaxed`, `mt-1`, `opacity-60`

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\AdminToolbar.tsx
-skeleton_hash: ce976823bc22f126
+source_path: C:\tmp\vh-t088\src\components\admin\AdminToolbar.tsx
+skeleton_hash: 3244573e4e88b4d4
 entity_hashes:
   func:AdminToolbar: af143a8f279e1c1e
   overview: f526ba131742fbc5
-  style_tokens: f914d27adccfd567
-generated_at: 2026-06-19T20:47:20Z
+  style_tokens: 5ffe1c60552a91d0
+generated_at: 2026-08-27T13:07:43Z
 ---
 
 ## Genel Bakış
@@ -217,10 +217,10 @@ type AdminToolbarProps = {
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-lg`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-rose-500`, `bg-surface-deep`, `bg-surface-deep/20`, `bg-surface-deep/40`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/3`, `bg-white/5`, `border-cyan-400`, `border-l`, `border-surface-deep`, `border-t`, `border-white/10`
-- **Layout:** `${sticky`, `-right-1`, `-top-1`, `absolute`, `backdrop-blur-2xl`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-2.5`, `gap-3`, `gap-4`, `gap-5`
+- **Renkler:** `bg-admin-accent`, `bg-admin-bg`, `bg-admin-danger`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-surface-3`, `bg-transparent`, `border-admin-accent`, `border-admin-border`, `border-l`, `border-t`, `data-[state=checked]:bg-admin-accent`, `focus-visible:border-admin-accent/30`, `focus-visible:border-admin-accent/40`, `group-focus-within:text-admin-accent`
+- **Layout:** `${sticky`, `-right-1`, `-top-1`, `absolute`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-2.5`, `gap-3`, `gap-4`, `gap-5`, `gap-6`
 - **Varyant/Responsive:** `:`, `data-[state=checked]:`, `focus-visible:`, `group-focus-within:`, `hover:`, `lg:`, `md:`, `placeholder:` önekleri
 - **Yardımcı Sınıflar:** `$`, `${adminSelectClass`, `${ch.active`, `${className`, `-translate-y-1/2`, `:`, `animate-in`, `border`, `ch.classOff`, `ch.classOn`, `cursor-pointer`, `data-[state=checked]:translate-x-3.5`, `data-[state=checked]:translate-x-4.5`, `defaultChipOff`, `defaultChipOn`

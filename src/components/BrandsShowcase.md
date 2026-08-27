@@ -2,24 +2,24 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\BrandsShowcase.tsx
-skeleton_hash: 214a7ca3f7d167b5
+source_path: C:\tmp\vh-t088\src\components\BrandsShowcase.tsx
+skeleton_hash: ff89f158a8590368
 entity_hashes:
   func:BrandsShowcase: 396bbfa4a2991af7
   func:Lane: 607c875efec6621a
-  overview: a64c9ee274fd0d0f
+  overview: 5afeff1221c0bd64
   style_tokens: 90e49e0ab0d8115d
-generated_at: 2026-06-08T10:08:12Z
+generated_at: 2026-08-27T13:04:43Z
 ---
 
 ## Genel Bakış
 
-`BrandsShowcase` modülü, HVAC markalarını sürekli kayan bir şerit (marquee) formatında sunan bir vitrin bileşenidir. Modül, marka logolarının kesintisiz döngü halinde akmasını sağlayarak dinamik ve görsel çekici bir marka tanıtımı oluşturur.
+`BrandsShowcase` modülü, HVAC markalarını sürekli kayan bir şerit (marquee) formatında sunan bir vitrin bileşenidir. Modül, marka logolarının kesintisiz döngü halinde akmasını sağlayarak dinamik ve görsel açıdan çekici bir marka tanıtımı oluşturur.
 
 ## Fonksiyon Grupları
 
 ### Kaydırma Şeridi Bileşeni
-Tek bir şerit (lane) üzerindeki marka öğelerini belirli bir sürede otomatik olarak kaydıran yardımcı bileşeni tanımlar. Varsayılan 50 saniyelik döngü süresi ile sürekli bir animasyon akışı sağlar.
+Tek bir şerit üzerindeki marka öğelerini belirli bir sürede otomatik olarak kaydıran yardımcı bileşendir. Varsayılan 50 saniyelik döngü süresi ile sürekli bir animasyon akışı sağlar.
 - Lane
 
 ### Ana Vitrin Bileşeni
@@ -30,17 +30,15 @@ Sayfada tam bir marka vitrini oluşturarak kaydırma şeridini yapılandırır v
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, HVAC markalarını kaydırılabilir bir şerit içinde gösteren bir vitrin bileşenidir. `Lane` yardımcı bileşeni listedeki öğeleri belirtilen sürede yatay olarak kaydırarak sürekli bir akış oluşturur; `BrandsShowcase` ise bu şeriti sayfada sunan ana bileşendir.
+Bu modül, HVAC markalarını sürekli kayan şeritler halinde gösteren bir vitrin bileşenidir.
 
-[Aksiyom 1]: Eğer `Lane` bileşenine `items` argümanı sağlanmazsa, kaydırılacak marka içeriği bulunmayacağından şerit boş veya hatalı görüntülenir.
+**[Aksiyom 1]**: Eğer `HVAC_BRANDS` adında bir veri kaynağı (marka listesi) tanımlı değilse, `Lane` bileşeninin `items` parametresi için tip referansı (`typeof HVAC_BRANDS`) çözülemez ve bileşen derlenemez.
 
-[Aksiyom 2]: Eğer `Lane` bileşenine sağlanan `items` boş bir dizi ise (`[]`), şerit içeriği olmadan çalışır ve kaydırma animasyonu anlamsız hale gelir.
+**[Aksiyom 2]**: Eğer `items` parametresi boş bir dizi olarak verilirse, şerit üzerinde gösterilecek marka öğesi olmayacağından animasyon akışı gerçekleşmez.
 
-[Aksiyom 3]: Eğer `durationSec` olarak `0` veya negatif bir değer verilirse, kaydırma animasyon süresi geçersiz olacağından animasyon düzgün çalışmaz veya çok hızlı/hatalı akar.
+**[Aksiyom 3]**: Eğer `durationSec` değeri sıfır veya negatif olursa, CSS animasyon süresi geçersiz olacağından kayma hareketi düzgün çalışmaz. Varsayılan değer 50 saniyedir.
 
-[Aksiyom 4]: Eğer `BrandsShowcase` bileşeni içinde `Lane` bileşenine geçirilen `items` dizisi `Lane` bileşeninin beklediği formata (örn: img src, alt text içeren nesneler) uymuyorsa, öğeler düzgün render edilmez.
-
-[Aksiyom 5]: Eğer `durationSec` çok küçük bir değer olarak (örn: `1`) ayarlanırsa, marka logoları okunamayacak kadar hızlı kayar; çok büyük bir değer olarak ayarlanırsa ise kaydırma neredeyse görünmez hale gelir.
+**[Aksiyom 4]**: Eğer `BrandsShowcase` bileşeni içinde `Lane` bileşeni kullanılmıyorsa, eski dokümanda belirtilen "kayıt şeridini yapılandırır ve kullanıma sunar" davranışı yerine getirilemez.
 
 ---
 
@@ -62,26 +60,38 @@ Bu modül, HVAC markalarını kaydırılabilir bir şerit içinde gösteren bir 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../data/brands::HVAC_BRANDS
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: ../i18n/I18nProvider::useI18n
+- import: ./HVACIcons::BrandIcon
+- import: framer-motion::motion
+- import: next/link::Link
+- import: react::React
+- import: react::useMemo
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: BrandsShowcase.tsx::Lane
-- **params**: `{ items, durationSec = 50 }`
+- **params**: `items` (typeof HVAC_BRANDS), `durationSec` (number, varsayılan değer: 50)
 - **ic_degiskenler**:
-  - `repeated` — `items` dizisini üç kez tekrarlayarak oluşturulan dizi, sonsuz kaydırma animasyonu için kullanılır.
-- **Dönüş**: JSX elementi (React bileşeni)
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota fonksiyonları nesnesi; `Routes.brand(brand.slug)` çağrılarak marka detay sayfası URL'i üretilir
+  - `repeated` — `useMemo` ile hesaplanan, `items` dizisinin 3 kez (`[...items, ...items, ...items]`) tekrar edilerek birleştirilmiş hali; bağımlılık dizisi `[items]`
+  - `brand` — `repeated.map()` callback'indeki her bir marka nesnesi; `.slug` ve `.name` alanlarına erişilir
+  - `idx` — `repeated.map()` callback'indeki döngü indeksi; key üretimi için `${brand.slug}-${idx}` şeklinde kullanılır
+- **Dönüş**: JSX elementi — `div.relative.overflow-hidden.group` kök elemanı; içinde `style` (inline CSS keyframes), `div.flex.marquee-premium-track` (marka kartlarının kaydırıldığı bant) ve `repeated.map()` ile üretilen `Link` öğeleri içerir
 
-### [N2_NASIL] AST Pointer: BrandsShowcase.tsx::(brand, idx) => (...)
-- **params**: `(brand, idx)`
-- **ic_degiskenler**:
-  - Yok
-- **Dönüş**: JSX elementi (Link bileşeni)
+---
 
-### [N3_NASIL] AST Pointer: BrandsShowcase.tsx::BrandsShowcase
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: BrandsShowcase.tsx::BrandsShowcase
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
-  - `brands` — HVAC_BRANDS sabitinden alınan marka dizisi
-- **Dönüş**: JSX elementi (React bileşeni)
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('brands.sectionTitle')`, `t('brands.subtitlePart1')`, `t('brands.subtitlePart2')`, `t('brands.viewAll')` çağrılarıyla metinler alınır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota fonksiyonları nesnesi; `Routes.brands()` çağrılarak tüm markalar sayfası URL'i üretilir
+  - `brands` — `HVAC_BRANDS` import'undan gelen marka listesi; `Lane` bileşenine `items` prop'u olarak aktarılır
+- **Dönüş**: JSX elementi — `section.relative.bg-white` kök elemanı; arka plan atmosferi (`div.bg-brands-radial`), başlık alanı (`motion.div` ve `motion.h2` ile animasyonlu), kenar solma efektli `Lane` carousel'i (`durationSec={70}`) ve "tümünü gör" CTA linki (`Routes.brands()`) içerir
 
 ---
 

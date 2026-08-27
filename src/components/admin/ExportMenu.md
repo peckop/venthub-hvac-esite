@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\ExportMenu.tsx
-skeleton_hash: 795929f00f599bec
+source_path: C:\tmp\vh-t088\src\components\admin\ExportMenu.tsx
+skeleton_hash: 2f781db4f29ce535
 entity_hashes:
   func:ExportMenu: 9e536638b7cdf449
   overview: fcef70276d80a8c4
-  style_tokens: 7659c3683121a964
-generated_at: 2026-06-19T20:47:00Z
+  style_tokens: b6f5e12168df9a4c
+generated_at: 2026-08-27T13:07:43Z
 ---
 
 ## Genel Bakış
@@ -96,10 +96,10 @@ type ExportMenuItem = {
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-lg`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-500/10`, `border-white/10`, `hover:bg-white/5`, `hover:text-white`, `text-emerald-400`, `text-slate-300`, `text-slate-500`, `text-xs`
-- **Layout:** `flex`, `gap-2`, `gap-3`, `h-12`, `h-8`, `items-center`, `justify-center`, `min-w-140px`, `min-w-200px`, `p-2`, `shadow-elevation-5`, `w-8`, `z-50`, `zoom-in-95`
-- **Varyant/Responsive:** `hover:` önekleri
-- **Yardımcı Sınıflar:** `animate-in`, `border`, `cursor-pointer`, `duration-200`, `fade-in`, `font-black`, `font-bold`, `glass-strong`, `italic`, `mb-1`, `outline-none`, `pb-2`, `pt-2`, `px-3`, `px-4`
+- **Renkler:** `bg-admin-success-weak`, `bg-admin-surface`, `border-admin-border`, `data-[highlighted]:bg-admin-surface-2`, `hover:bg-admin-surface-2`, `hover:text-admin-fg`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-success`, `text-xs`
+- **Layout:** `flex`, `gap-2`, `gap-3`, `h-12`, `h-8`, `items-center`, `justify-center`, `min-w-140px`, `min-w-200px`, `p-2`, `shadow-admin-overlay`, `w-8`, `z-popover`, `zoom-in-95`
+- **Varyant/Responsive:** `data-[highlighted]:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `animate-in`, `border`, `cursor-pointer`, `data-[highlighted]:ring-2`, `data-[highlighted]:ring-admin-ring`, `data-[highlighted]:ring-inset`, `duration-200`, `fade-in`, `font-semibold`, `italic`, `mb-1`, `outline-none`, `pb-2`, `pt-2`, `px-3`

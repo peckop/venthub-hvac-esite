@@ -2,65 +2,64 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryStockAdjust.tsx
-skeleton_hash: 257f3a60c6c02a8b
+source_path: C:\tmp\vh-t088\src\components\admin\InventoryStockAdjust.tsx
+skeleton_hash: c6f44b511d86ab45
 entity_hashes:
-  func:InventoryStockAdjust: 140b16e336bb5af7
-  overview: 3b1f0525645c9b2f
-  style_tokens: 333546eed756e72e
-generated_at: 2026-05-28T22:35:34Z
+  func:InventoryStockAdjust: a603a8fb9cd928b0
+  overview: 96a63ecb10c9f683
+  style_tokens: cd4ce488b4601abd
+generated_at: 2026-08-27T13:11:17Z
 ---
 
 ## Genel Bakış
-`InventoryStockAdjust` bileşeni, bir ürünün stok miktarını ayarlamak için kullanılan bir yönetim arayüzü sunar. Kullanıcıdan alınan miktar değişikliği, dışarıdan sağlanan `onAdjust` callback’i aracılığıyla üst katmana iletilir ve bileşen içinde geçici bir durum (`moveQty`) yönetilir.
+`InventoryStockAdjust` bileşeni, bir ürünün stok miktarını ayarlamak için kullanılan bir yönetim arayüzüdür. Dışarıdan sağlanan `onAdjust` callback'i aracılığıyla üst katmana stok güncelleme isteği iletir; geçici miktar değeri `moveQty` ve `setMoveQty` prop'ları üzerinden yönetilir. Bileşen, `moving` prop'u ile yükleme durumunu kontrol eder ve `_productId` ile hangi ürünün stok ayarının yapılacağını belirler.
 
 ## Fonksiyon Grupları
-### UI ve Props İşleme
-Bileşen, gelen `productId`, `moving`, `onAdjust`, `moveQty` ve `setMoveQty` gibi prop’ları alır, bunları JSX içinde uygun giriş alanları ve butonlarla bağlayarak kullanıcı etkileşimini sağlar.  
+
+### UI ve Etkileşim Yönetimi
+Bileşen, gelen prop'ları JSX içinde giriş alanları ve butonlarla bağlayarak kullanıcı etkileşimini sağlar. Kullanıcı miktar girişi yaptığında `setMoveQty` ile geçici miktar güncellenir; ayarlama butonuna basıldığında `onAdjust` çağrılarak stok güncelleme işlemi tetiklenir.
 - InventoryStockAdjust
 
-### Durum ve Etkileşim Yönetimi
-Kullanıcı miktar girişi yaptığında `setMoveQty` ile geçici miktar güncellenir; “Ayarlama” butonuna basıldığında `onAdjust` çağrılarak stok güncelleme işlemi tetiklenir.  
-- (İçeride tanımlı event handler’lar ve state güncellemeleri – doğrudan fonksiyon listesinde yer almaz ancak `InventoryStockAdjust` içinde yer alır)
+## Aksiyomlar
+
+**Aksiyom 1**: Eğer `_productId` sağlanmazsa, bileşen hangi ürünün stok ayarının yapılacağını belirleyemez ve işlem başarısız olur.
+
+**Aksiyom 2**: Eğer `onAdjust` fonksiyonu sağlanmazsa, stok ayarlama işlemi tamamlandığında hiçbir geri bildirim gerçekleşmez.
+
+**Aksiyom 3**: Eğer `moving` değeri `true` değilse, bileşen hareket göstergesi göstermemeli ve kullanıcı etkileşimi engellenmemelidir.
+
+**Aksiyom 4**: Eğer `moveQty` değeri tanımlı değilse veya geçersiz ise, bileşen geçerli bir miktar değeriyle çalışamaz.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır. Aşağıdaki aksiyomlar, **InventoryStockAdjust** bileşeninin fonksiyon imzasından türetilmiştir.
-
-**Aksiyom 1**: Eğer `_productId` sağlanmazsa, bileşen hangi ürünün stok ayarının yapılacağını belirleyemez ve işlem **başarısız** olur.  
-
-**Aksiyom 2**: Eğer `onAdjust` fonksiyonu sağlanmazsa, stok ayarlama işlemi tamamlandığında **hiçbir geri bildirim** (ör. API çağrısı, durum güncellemesi) gerçekleşmez.  
-
-**Aksiyom 3**: Eğer `moving` değeri `true` değilse, bileşen **hareket (loading) göstergesi** göstermemeli ve kullanıcı etkileşimi **engellenmemelidir**.  
-
-**Aksiyom 4**: Eğer `moveQty` değeri tanımlı değilse veya `null/undefined` ise, bileşen **geçerli bir miktar** alana kadar **işlem yapmaz** ve muhtemelen bir doğrulama hatası gösterir.  
-
-**Aksiyom 5**: Eğer `setMoveQty` fonksiyonu sağlanmazsa, kullanıcı tarafından girilen miktar **bileşen içinde saklanamaz** ve UI’da **girdi değişikliği** yansıtılamaz.  
-
-**Aksiyom 6**: Eğer `moveQty` negatif bir sayı ise, **stok azaltma** mantığı dışındaki bir senaryo olduğu için **işlem reddedilir** (negatif miktar kabul edilmez).  
-
-**Aksiyom 7**: Eğer `setMoveQty` bir fonksiyon değilse, **state güncellemesi** yapılamaz ve bileşen **runtime hatası** verir.  
-
-**Aksiyom 8**: Eğer `onAdjust` bir fonksiyon değilse, **stok ayarlama** tamamlandığında **callback** tetiklenemez ve **yanıt** alınamaz.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### InventoryStockAdjust
-**Ne yapar**: Belirli bir ürün için hızlı stok girişi veya çıkışı yapılmasını sağlayan bir React bileşenidir. Kullanıcı miktar girip iki butondan birine tıklayarak manuel stok hareketi oluşturur.
+**Ne yapar**: Envanter stok yönetimi için hızlı stok giriş ve çıkış işlemlerinin yapılabildiği bir arayüz bileşeni sunar. Kullanıcının belirli bir ürün için manuel stok hareketi (giriş veya çıkış) gerçekleştirmesine olanak tanır.
 
-**Nasıl yapar**: Bir input alanı ve iki buton içeren bir bölüm render eder. Input `moveQty` state'ine bağlıdır ve değer değiştiğinde `setMoveQty` ile güncellenir (en az 1 olacak şekilde zorlanır). "Stok Girişi" butonu, `onAdjust` callback'ine pozitif miktar ve `'manual_in'` türü ile çağrı yapar; "Stok Çıkışı" butonu negatif miktar ve `'manual_out'` türü ile çağrı yapar. Butonlar `moving` prop'u `true` iken devre dışı kalır.
+**Nasıl yapar**: `useI18n()` hook'u ile uluslararasılaştırma desteği alır ve `t` fonksiyonunu kullanarak metinleri çevrilmiş biçimde görüntüler. Bileşen, bir sayısal input alanı ve iki butondan oluşan kompakt bir form yapısı render eder. Input alanı `moveQty` değerini gösterir ve değişikliklerde `setMoveQty` ile güncellenir; değer 1'den küçük olamaz, `Math.max(1, ...)` ile alt sınır korunur. "Stok Girişi" butonuna tıklandığında `onAdjust` fonksiyonu pozitif mutlak değer ve `'manual_in'` tipiyle çağrılır. "Stok Çıkışı" butonuna tıklandığında ise negatif mutlak değer ve `'manual_out'` tipiyle çağrılır. `moving` durumu true olduğunda her iki buton da devre dışı bırakılır ve yarı saydam görünüm uygulanır.
 
 **Parametreler**:
-- `_productId`: `string` — Stok hareketi yapılacak ürünün benzersiz kimliği. `onAdjust` callback'ine parametre olarak iletilir.
-- `onAdjust`: `(productId: string, qty: number, type: 'manual_in' | 'manual_out') => void` — Stok hareketini gerçekleştiren callback fonksiyonu. Ürün ID'si, miktar (pozitif veya negatif) ve hareket türü parametrelerini alır.
-- `moving`: `boolean` — Bir stok hareketi işlemi devam ederken butonların devre dışı bırakılmasını sağlayan bayrak.
-- `moveQty`: `number` — Input alanındaki mevcut miktar değeri. Varsayılan olarak en az 1 olacak şekilde yönetilir.
-- `setMoveQty`: `React.Dispatch<React.SetStateAction<number>>` — `moveQty` state'ini güncellemek için kullanılan fonksiyon. Input onChange olayında çağrılır.
+- `_productId`: InventoryStockAdjustProps içinde tanımlı — stok hareketi yapılacak ürünün kimlik bilgisi. Alt çizgi öneki ile tanımlanmış olup bileşen içinde doğrudan `onAdjust` fonksiyonuna aktarılır
+- `onAdjust`: InventoryStockAdjustProps içinde tanımlı — stok ayarlama işlemini tetikleyen callback fonksiyonu. Üç parametre alır: ürün kimliği, miktar (pozitif veya negatif) ve hareket tipi (`'manual_in'` veya `'manual_out'`)
+- `moving`: InventoryStockAdjustProps içinde tanımlı — stok hareketi işleminin devam edip etmediğini gösteren durum değeri. `true` olduğunda butonlar `disabled` durumuna geçer
+- `moveQty`: InventoryStockAdjustProps içinde tanımlı — input alanında gösterilen ve hareket miktarını temsil eden sayısal değer
+- `setMoveQty`: InventoryStockAdjustProps içinde tanımlı — `moveQty` değerini güncelleyen state setter fonksiyonu. Input onChange olayında `Math.max(1, Number(e.target.value || 1))` hesaplamasıyla çağrılır
 
-**Dönüş**: `JSX.Element` — Stok hareketi arayüzüne ait bir `section` elementi döndürür.
+**Dönüş**: JSX elementi döndüren bir React fonksiyon bileşeni. Dönen yapı, `space-y-4` sınıflı bir `<section>` içinde çevrilmiş başlık, sayısal input ve iki buton içeren bir `<div>` yapısından oluşur. Bileşenin dönüş tipi kodda açıkça belirtilmemiştir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: react::React
 
 ---
 
@@ -77,16 +76,16 @@ Bu modül için özel aksiyom tanımlanmamıştır. Aşağıdaki aksiyomlar, **I
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryStockAdjust.tsx::InventoryStockAdjust
-- **params**: `_productId`, `onAdjust`, `moving`, `moveQty`, `setMoveQty`
+### [N1_NASIL] AST Pointer: src/components/admin/InventoryStockAdjust.tsx::InventoryStockAdjust
+- **params**:
+  - `_productId` — ürün kimliği, stok hareketi butonlarına tıklandığında `onAdjust` fonksiyonuna birinci argüman olarak iletilir
+  - `onAdjust` — stok düzeltme fonksiyonu, "Stok Girişi" butonunda `(_productId, Math.abs(moveQty), 'manual_in')` ve "Stok Çıkışı" butonunda `(_productId, -Math.abs(moveQty), 'manual_out')` çağrılarıyla kullanılır
+  - `moving` — hareket işlemi devam ederken true olan boolean; her iki butonun `disabled` prop'una atanır
+  - `moveQty` — sayısal input'un `value` prop'una atanır; stok hareket miktarını temsil eder
+  - `setMoveQty` — input onChange handler'ında `Math.max(1, Number(e.target.value || 1))` sonucuyla çağrılarak miktar güncellenir
 - **ic_degiskenler**:
-  - `moveQty` — Mevcut stok hareket miktarını tutar; input değeri olarak ve `onAdjust` çağrısında mutlak değeri (`Math.abs(moveQty)`) ile kullanılır.
-  - `setMoveQty` — Stok miktarını güncellemek için kullanılan fonksiyon; input `onChange` olayında yeni değeri hesaplayıp atar.
-  - `moving` — Stok hareketi işleminin devam edip etmediğini belirten boolean; butonların `disabled` özelliğini kontrol eder.
-  - `onAdjust` — Stok giriş/çıkış işlemini gerçekleştirmek için çağrılan callback; `_productId`, mutlak miktar ve işlem türü (`'manual_in'` veya `'manual_out'`) parametreleriyle çağrılır.
-  - `_productId` — Stok hareketi yapılacak ürünün ID'si; `onAdjust` callback'ine ilk argüman olarak iletilir.
-  - `e` — Input değişikliği event nesnesi; `e.target.value` üzerinden yeni miktar alınır ve `Number()` ile sayıya dönüştürülür.
-- **Dönüş**: React.ReactNode (JSX elemanı)
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('admin.inventory.quickStockMovement')`, `t('admin.inventory.stockEntry')` ve `t('admin.inventory.stockExit')` çağrılarıyla metinler yerelleştirilir
+- **Dönüş**: JSX element (`<section>`); stok giriş/çıkış butonlarını ve miktar input'unu içeren bir form bölümü render eder
 
 ---
 
@@ -108,10 +107,10 @@ Bu modül için özel aksiyom tanımlanmamıştır. Aşağıdaki aksiyomlar, **I
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-500/10`, `bg-rose-500/10`, `bg-white/3`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `focus-visible:border-cyan-400/40`, `hover:bg-emerald-500/20`, `hover:bg-rose-500/20`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-sm`, `text-white`, `text-xs`
+- **Renkler:** `bg-admin-danger-weak`, `bg-admin-success-weak`, `bg-admin-surface-2`, `border-admin-border`, `border-admin-danger/30`, `border-admin-success/30`, `focus-visible:border-admin-accent/40`, `hover:bg-admin-danger-weak`, `hover:bg-admin-success-weak`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-success`, `text-sm`, `text-xs`
 - **Layout:** `flex`, `flex-1`, `gap-3`, `h-12`, `items-center`, `w-24`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `border`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`, `ml-1`, `px-4`, `py-3`, `rounded-2xl`, `space-y-4`, `tracking-widest`, `transition-colors`, `transition-opacity`
+- **Yardımcı Sınıflar:** `border`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-bold`, `font-semibold`, `ml-1`, `px-4`, `py-3`, `rounded-admin-lg`, `space-y-4`, `transition-colors`, `transition-opacity`
