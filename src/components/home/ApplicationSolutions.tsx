@@ -14,25 +14,34 @@ interface SolutionItem {
 
 // Yollar Routes.category() builder'ından kurulur (SSOT); dil öneki render anında
 // localizedHref ile eklenir. Sabit '/category/...' string'i = SSOT + localize kaçağı.
+// ⚠ 2026-08-28 — SLUG'LAR KATALOG OMURGASI MIGRATION'INA GÖRE YENİLENDİ (REC-56).
+// Buradaki değerler DB'deki `categories.slug` ile BİREBİR eşleşmek zorundadır: eşleşmezse
+// kart canlıda "Kategori Bulunamadı"ya götürür ve HİÇBİR kapı görmez — tip sistemi `string`
+// görür, test yoktur, sayfa 200 döner. Migration `industrial-ventilation`ı `fans` yaptı ve
+// `commercial-ventilation`ı pasifleştirdi; ikisi de canlıda ölçülerek yakalandı.
+// Yeni hedefler canlı DB'den okundu (hepsi aktif):
+//   fans/parking-jet-fan · fans/duct-fans · air-curtains (artık ANA kategori) · heat-recovery-vmc
 const solutions: SolutionItem[] = [
   {
     id: 'parking',
-    categorySlug: 'industrial-ventilation',
-    subSlug: 'jet-fans',
+    categorySlug: 'fans',
+    subSlug: 'parking-jet-fan',
     image: '/images/bento/parking.jpg',
     span: 'sm:col-span-2 lg:col-span-2'
   },
   {
+    // Eski değer 'industrial-ventilation'/'duct-type-fans' idi; alt slug DB'de HİÇ yoktu,
+    // yani bu kart migration'dan ÖNCE de kırıktı. Doğru karşılığı: fans/duct-fans.
     id: 'kitchen',
-    categorySlug: 'industrial-ventilation',
-    subSlug: 'duct-type-fans',
+    categorySlug: 'fans',
+    subSlug: 'duct-fans',
     image: '/images/bento/kitchen.jpg',
     span: 'sm:col-span-1 lg:col-span-1'
   },
   {
+    // 'air-curtains' artık ALT değil ANA kategori — alt slug verilmez.
     id: 'entrance',
-    categorySlug: 'commercial-ventilation',
-    subSlug: 'air-curtains',
+    categorySlug: 'air-curtains',
     image: '/images/bento/entrance.jpg',
     span: 'sm:col-span-1 lg:col-span-1'
   },
