@@ -212,6 +212,22 @@ function depodaKararVer(dir: string, env: Record<string, string> = {}): Karar {
   }
 }
 
+/** Betiği koşturur ve KARARDAN bağımsız olarak stdout günlüğünü döndürür. */
+function gunlukAl(dir: string, env: Record<string, string> = {}): string {
+  try {
+    return String(
+      execFileSync('sh', [SCRIPT_MUTLAK], {
+        cwd: dir,
+        stdio: 'pipe',
+        encoding: 'utf8',
+        env: { ...process.env, VERCEL_GIT_PREVIOUS_SHA: '', ...env },
+      }),
+    )
+  } catch (err) {
+    return String((err as { stdout?: string }).stdout ?? '')
+  }
+}
+
 describe('INV-BUILD-SKIP · karşılaştırma tabanı gerçek depoda çözülür', () => {
   it('ölçüm aracı gerçekten çalışıyor: salt-.md dal ATLANIR (vacuous-pass koruması)', () => {
     // Bu test aynı zamanda ASIL DÜZELTMEnin kanıtıdır: VERCEL_GIT_PREVIOUS_SHA
@@ -281,26 +297,42 @@ describe('INV-BUILD-SKIP · karşılaştırma tabanı gerçek depoda çözülür
     commitAt(dir, 'docs/c.md', 'metin\n', 'docs: c')
     git(dir, 'update-ref', '-d', 'refs/remotes/origin/master')
 
-    let gunluk = ''
-    try {
-      execFileSync('sh', [SCRIPT_MUTLAK], {
-        cwd: dir,
-        stdio: 'pipe',
-        encoding: 'utf8',
-        env: { ...process.env, VERCEL_GIT_PREVIOUS_SHA: '' },
-      })
-    } catch (err) {
-      gunluk = String((err as { stdout?: string }).stdout ?? '')
-    }
+    const gunluk = gunlukAl(dir)
 
-    // Her iki çekme denemesi de adıyla ve gerekçesiyle görünmeli.
-    expect(gunluk, 'refspec denemesinin sonucu günlüğe yazılmamış').toMatch(
-      /refspec cekmesi basarisiz/,
-    )
-    expect(gunluk, 'ikinci (düz) çekme denemesinin sonucu günlüğe yazılmamış').toMatch(
-      /duz cekme de basarisiz/,
+    // Uzak YOK ve ortam değişkeni de yoksa: neden çekilemediği ADIYLA yazılmalı.
+    expect(gunluk, 'çekilemeyişin sebebi günlüğe yazılmamış').toMatch(
+      /origin uzagi YOK ve VERCEL_GIT_REPO_OWNER\/SLUG bos/,
     )
     // Karar satırı da yerinde: sebep yazıldı diye karar kaybolmasın.
     expect(gunluk).toMatch(/-> BUILD/)
+  })
+
+  /**
+   * ⭐ÜRETİMDEKİ GERÇEK SEBEP — `origin` UZAĞI HİÇ YOK (2026-08-27, dağıtım 5cjXTJWY).
+   *
+   * Görünürlük onarımı ilk koşumunda cevabı verdi:
+   *   `ignore-build: refspec cekmesi basarisiz -> fatal: 'origin' does not appear to be a git repository`
+   * Sorun refspec biçimi ya da derinlik değildi; Vercel'in klonunda uzak tanımlı DEĞİL.
+   * Bu yüzden "origin"e yapılan hiçbir çekme tutamazdı. Betik artık uzağı ortam
+   * değişkenlerinden kurar (depo public, kimlik gerekmez).
+   *
+   * Bu kol o yolu AĞSIZ koşturur: yerel bir bare depo `origin` olarak bağlanır,
+   * `refs/remotes/origin/master` SİLİNİR — yani betik gerçekten ÇEKMEK zorunda kalır.
+   */
+  it('origin/master ref yoksa ama uzak ERİŞİLEBİLİRSE çekip tabanı çözer → salt-.md ATLA', () => {
+    const dir = depoKur()
+    const bare = mkdtempSync(join(tmpdir(), 'inv-build-skip-bare-')).replace(/\\/g, '/')
+    execFileSync('git', ['init', '--bare', '--quiet', bare], { stdio: 'pipe' })
+    git(dir, 'remote', 'add', 'origin', bare)
+    git(dir, 'push', '--quiet', 'origin', 'master')
+
+    git(dir, 'checkout', '--quiet', '-b', 'docs/z')
+    commitAt(dir, 'docs/c.md', 'metin\n', 'docs: c')
+    // Yerel takip referansını SİL: betik çekmezse tabanı çözemez.
+    git(dir, 'update-ref', '-d', 'refs/remotes/origin/master')
+
+    const gunluk = gunlukAl(dir)
+    expect(gunluk, 'çekme yolu hiç koşmamış').toMatch(/taban = /)
+    expect(depodaKararVer(dir)).toBe('ATLA')
   })
 })

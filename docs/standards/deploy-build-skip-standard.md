@@ -259,6 +259,30 @@ doğruydu: taban çözülemeyince BUILD demek doğru karardır. Kapı da bunu s�
 **bu dal üretimde İSTİSNA mı, yoksa TEK yol mu?** Sessiz bir fail-safe, "kapı çalışıyor"
 ile "kapı hiç sıra bulamıyor" hallerini ayırt edilemez kılar.
 
+### D8.2 — GERÇEK SEBEP: Vercel klonunda `origin` UZAĞI HİÇ YOK
+
+Görünürlük onarımı **ilk koşumunda** cevabı verdi (dağıtım `5cjXTJWY`, PR #875'in kendi önizlemesi):
+
+```
+ignore-build: refspec cekmesi basarisiz -> fatal: 'origin' does not appear to be a git repository
+```
+
+Sorun refspec biçimi ya da klon derinliği **değildi**: Vercel'in derleme klonunda uzak
+**tanımlı değil**. Yani `origin`'e yapılan hiçbir çekme tutamazdı — hangi refspec'i
+denersek deneyelim. On günlük sessizliğin tek cümlelik sebebi budur.
+
+**Çözüm:** uzak yoksa URL ortamdan kurulur —
+`https://github.com/$VERCEL_GIT_REPO_OWNER/$VERCEL_GIT_REPO_SLUG.git`. Depo **public**
+olduğu için kimlik gerekmez. Repo bir gün private olursa çekme başarısız olur ve
+fail-safe aynen işler (→ BUILD); yani bu çözüm güvenliği gevşetmez.
+
+Kapı bu yolu **ağsız** koşturur: yerel bir bare depo `origin` olarak bağlanır,
+`refs/remotes/origin/master` silinir, betik gerçekten çekmek zorunda kalır.
+Sabotajla kanıtlandı — **her iki** çekme denemesi de kapatılınca kol düştü, geri
+konunca yeşil. (İlk sabotaj denemem yalnız birinci denemeyi kapatmıştı ve kol yeşil
+kaldı; "sabotaj sonuç değiştirmedi" demek yerine sabotajın kendisini ölçtüm, eksik
+olan oydu. Sabotaj, sınanan yeteneği GERÇEKTEN kaldırmalıdır.)
+
 **HÜKÜM:** taban çözümündeki her başarısız deneme, **adı ve sebebiyle** günlüğe yazılır.
 Bir adımın sessizce düşmesi yasaktır. Kapı bunu `taban çözülemediğinde SEBEP günlüğe
 yazılır` koluyla zorlar; kol bilerek bozularak kanıtlanmıştır (görünürlük satırları

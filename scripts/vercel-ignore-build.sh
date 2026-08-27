@@ -122,16 +122,34 @@ else
       # Kapi da bunu goremezdi: "origin/master yoksa BUILD" kolu YESILDI —
       # dogru davranisi sinar ama o dalin URETIMDE TEK yol oldugunu sormaz.
       # Bu yuzden buradaki her deneme SEBEBIYLE birlikte gunluge yazilir.
-      CEKME_HATA=$(git fetch --no-tags --depth=50 origin \
-        "+refs/heads/$DEFAULT_BRANCH:refs/remotes/origin/$DEFAULT_BRANCH" 2>&1) || {
-        echo "ignore-build: refspec cekmesi basarisiz -> $(printf '%s' "$CEKME_HATA" | head -n 1)"
-      }
+      # ⭐GORUNURLUK ONARIMI ILK KOSUMDA CEVABI VERDI (dagitim 5cjXTJWY, 2026-08-27):
+      #     ignore-build: refspec cekmesi basarisiz -> fatal: 'origin' does not appear to be a git repository
+      # Yani sorun refspec bicimi ya da derinlik DEGIL: Vercel'in klonunda `origin`
+      # UZAGI HIC YOK. Bu yuzden "origin"e yapilan HICBIR cekme tutamazdi ve on gun
+      # boyunca tutmadi. Uzagi kendimiz kurariz — depo PUBLIC oldugu icin kimlik
+      # gerekmez (CLAUDE.md: repo 2026-08-15'ten beri public).
+      UZAK_URL=""
+      if git remote get-url origin >/dev/null 2>&1; then
+        UZAK_URL="origin"
+      elif [ -n "${VERCEL_GIT_REPO_OWNER:-}" ] && [ -n "${VERCEL_GIT_REPO_SLUG:-}" ]; then
+        UZAK_URL="https://github.com/${VERCEL_GIT_REPO_OWNER}/${VERCEL_GIT_REPO_SLUG}.git"
+        echo "ignore-build: origin uzagi yok, URL ortamdan kuruldu ($UZAK_URL)"
+      else
+        echo "ignore-build: origin uzagi YOK ve VERCEL_GIT_REPO_OWNER/SLUG bos -> cekilemez"
+      fi
+
+      if [ -n "$UZAK_URL" ]; then
+        CEKME_HATA=$(git fetch --no-tags --depth=50 "$UZAK_URL" \
+          "+refs/heads/$DEFAULT_BRANCH:refs/remotes/origin/$DEFAULT_BRANCH" 2>&1) || {
+          echo "ignore-build: refspec cekmesi basarisiz -> $(printf '%s' "$CEKME_HATA" | head -n 1)"
+        }
+      fi
     fi
 
     # Ikinci deneme: duz cekme + FETCH_HEAD. Refspec bicimi bazi sig klonlarda
     # reddedilebiliyor; ayni sonucu farkli yoldan istemek ucuz ve fail-safe.
-    if ! git rev-parse --verify --quiet "$REMOTE_REF" >/dev/null 2>&1; then
-      CEKME_HATA=$(git fetch --no-tags --depth=50 origin "$DEFAULT_BRANCH" 2>&1) && {
+    if ! git rev-parse --verify --quiet "$REMOTE_REF" >/dev/null 2>&1 && [ -n "${UZAK_URL:-}" ]; then
+      CEKME_HATA=$(git fetch --no-tags --depth=50 "$UZAK_URL" "$DEFAULT_BRANCH" 2>&1) && {
         if git rev-parse --verify --quiet FETCH_HEAD >/dev/null 2>&1; then
           REMOTE_REF="FETCH_HEAD"
           echo "ignore-build: duz cekme tuttu, taban referansi = FETCH_HEAD"
