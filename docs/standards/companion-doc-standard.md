@@ -221,7 +221,26 @@ Kapı (`INV-DOC-5`) **ikisini karşılaştırır**: listede olan bir dosyada iş
 yeniden üretilmiştir → KIRMIZI. İşaret frontmatter'ın **içine** değil hemen ardına konur;
 frontmatter üretecin makine alanıdır.
 
-`gercek-sembol` = parantezsiz `AST Pointer:` başlık sayısı.
+#### C8.3.0 `gercek-sembol` ölçütü (v4) — önceki İKİ ölçüt de yanlıştı, TERS yönlerde
+
+| ölçüt | hata | kanıt |
+|---|---|---|
+| *"sonu `)` ile bitmeyen `AST Pointer:` başlığı gerçektir"* — **filo çapında benimsenmişti** | **şişirir** | Boşlukla yazılmış sözde başlıkları gerçek sayıyor: `::productsByTab useMemo callback`, `::tabOrder.map callback`; ayrıca parantezle **başlayıp** `}` ile biten isimsiz arrow'lar: `::(d) => { return {...} }`. `FeaturedCommercialBlocks` 4 sanıldı, **gerçekte 1**. |
+| *"`::` sonrası düz bir tanımlayıcı olsun"* — ilk düzeltmem | **azaltır** | `ErrorBoundary`'nin 8 sembolünün **6'sı** `ErrorBoundary.render` biçiminde sınıf metodu; hepsi eleniyordu (8→2 gibi sahte bir düşüş). |
+
+**⭐ v4:** `::` sonrası **noktalı tanımlayıcı yolu** olmalı — boşluk yok, parantez yok.
+Geçerli: `Foo` · `Foo.bar` · `ErrorBoundary.getDerivedStateFromError` · `_x$`.
+Geçersiz: `Foo (useEffect callback)` · `productsByTab useMemo callback` · `(d) => {...}`.
+
+**Ek geçerlilik testi (AUTH'un tezi):** tanımlayıcının kök parçası **bugünkü kaynakta** geçiyor mu?
+Sözde semboller kaynakta tanımlayıcı olarak geçmez; bayat semboller de geçmez — tek ölçüm hem
+sözdeliği hem yanlışlığı ayıklar, sezgisel desen listesine (`_callback|_mapper|…`) gerek kalmaz.
+
+Ölçüldü: bu düzeltme dokuz kaydın **beşini** değiştirdi (`ActivityHeatmap` 4→2, `BulkBar` 3→2,
+`AdminThemeToggle` 2→1, `InventoryTable` 4→2, `FeaturedCommercialBlocks` 4→1).
+
+> **Şişmiş eşik kapıyı GEVŞETİR:** gerçek bir kayıpta bile `sembol ≥ eşik` tutabilir. Yani ölçüt
+> hatası yalnızca raporu bozmaz, **kapının kendisini kör eder.**
 
 #### C8.3.1 ⚠ ÇÜRÜTÜLMÜŞ KURAL: "tarihsel en yükseğe geri yükle"
 

@@ -45,12 +45,30 @@ const dosyaOku = (yol: string): string =>
   )
 
 /**
- * GERÇEK sembol sayımı — parantezli SÖZDE başlıklar elenir (AUTH'un keskinleştirmesi).
- * Ham sayım kaybı hem ABARTIR (`AddToCartToast` ham 5→1 iken gerçek 1→1) hem MASKELER
- * (üreteç gerçek sembol düşürürken sözde başlık ekleyip toplamı sabit tutabilir).
+ * GERÇEK sembol sayımı — v4. **Önceki iki ölçüt de yanlıştı, ters yönlerde** (2026-08-27):
+ *
+ * | ölçüt | hata | kanıt |
+ * |---|---|---|
+ * | "sonu `)` ile bitmeyen başlık gerçektir" (filo çapında benimsenmişti) | **şişirir** | `::productsByTab useMemo callback` ve `::(d) => { return {...} }` sözde ama `)` ile bitmiyor → gerçek sayılıyordu; `FeaturedCommercialBlocks` 4 sanıldı, gerçekte 1 |
+ * | "sadece düz tanımlayıcı olsun" (ilk düzeltmem) | **azaltır** | `ErrorBoundary`'nin 8 sembolünün 6'sı `ErrorBoundary.render` biçiminde metot; hepsi eleniyordu |
+ *
+ * **v4:** `::` sonrası **noktalı tanımlayıcı yolu** olmalı — boşluk yok, parantez yok.
+ * Bu düzeltme dokuz kaydın **beşini** değiştirdi. Şişmiş bir eşik kapıyı **gevşetir**:
+ * gerçek bir kayıpta bile `sembol >= eşik` tutabilir, yani ölçüt hatası kapıyı kör eder.
  */
-const gercekSembol = (metin: string): number =>
-  (metin.match(/AST Pointer:[^\n]*/g) ?? []).filter((s) => !/\)\s*$/.test(s.trim())).length
+const YOL_DESENI = /^[A-Za-z_$][A-Za-z0-9_$]*(\.[A-Za-z_$][A-Za-z0-9_$]*)*$/
+
+const sembolAdlari = (metin: string): string[] =>
+  (metin.match(/AST Pointer:[^\n]*/g) ?? [])
+    .map((baslik) => {
+      const i = baslik.lastIndexOf('::')
+      if (i < 0) return null
+      const ham = baslik.slice(i + 2).replace(/`/g, '').trim()
+      return YOL_DESENI.test(ham) ? ham : null
+    })
+    .filter((x): x is string => x !== null)
+
+const gercekSembol = (metin: string): number => sembolAdlari(metin).length
 
 const ISARET_DESENI = /<!--\s*ORION-DONDURULMUS:\s*gercek-sembol=(\d+)\s*·\s*kaynak=([0-9a-f]{7,40})\s*·\s*sebep=([a-z0-9-]+)\s*·\s*kayit=(REC-\d+)\s*-->/
 

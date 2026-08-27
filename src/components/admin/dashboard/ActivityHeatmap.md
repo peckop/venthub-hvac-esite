@@ -12,7 +12,7 @@ entity_hashes:
 generated_at: 2026-06-19T20:47:14Z
 ---
 
-<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 Bu modül, yönetim paneli dashboard'unun bir parçası olarak aktivite verilerini görselleştirmek için tasarlanmış, takvim tabanlı bir ısı haritası bileşenidir. Dışarıdan sağlanan veri setini, yoğunluk bilgisini renk kodlarıyla gösteren interaktif bir arayüze dönüştürür ve kullanıcı etkileşimlerini zenginleştirmek için özel bir bilgi baloncuğu (tooltip) içerir.

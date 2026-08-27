@@ -11,7 +11,7 @@ entity_hashes:
 generated_at: 2026-08-15T06:32:06Z
 ---
 
-<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+<!-- ORION-DONDURULMUS: gercek-sembol=1 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 `FeaturedCommercialBlocks`, ana sayfada öne çıkan ticari HVAC ürünlerini (klima, havalandırma üniteleri vb.) görselleri ve temel bilgileriyle birlikte sergileyen bir React bileşenidir. Verilen ürün listesini işleyerek eksik veya geçersiz görselleri temizler ve kullanıcılara düzenli bir görünüm sunar.

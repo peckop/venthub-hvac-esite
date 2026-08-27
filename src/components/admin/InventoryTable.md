@@ -11,7 +11,7 @@ entity_hashes:
 generated_at: 2026-06-16T10:18:09Z
 ---
 
-<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 InventoryTable, yönetim panelinde envanter verilerini düzenli bir tablo formatında sergileyen React bileşenidir. Yüklenme, hata ve boş veri durumlarını akıllıca yöneterek kullanıcıya kesintisiz bir deneyim sunar ve satır seçimleri ile sütun görünürlüğü üzerinden etkileşim imkanı sağlar.
