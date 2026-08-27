@@ -9,7 +9,7 @@ entity_hashes:
   func:reset: 16764b441f7bc7b6
   overview: 477df472883f5208
   style_tokens: 27adff48ed74fee3
-generated_at: 2026-08-27T04:19:27Z
+generated_at: 2026-08-27T04:31:52Z
 ---
 
 ## Genel Bakış

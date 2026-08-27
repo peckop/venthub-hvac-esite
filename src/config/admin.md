@@ -9,7 +9,7 @@ entity_hashes:
   func:listAdminUsers: d933c96b85d7b147
   func:setUserAdminRole: 8d3b86f7b7baaf3b
   overview: 5893087b4e779eea
-generated_at: 2026-08-27T04:12:41Z
+generated_at: 2026-08-27T04:31:52Z
 ---
 
 ## Genel Bakış

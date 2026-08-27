@@ -8,7 +8,7 @@ entity_hashes:
   func:AuthProvider: 8a171b0bec808d24
   overview: 367d05e5814d0229
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T04:12:41Z
+generated_at: 2026-08-27T04:31:52Z
 ---
 
 ## Genel Bakış
