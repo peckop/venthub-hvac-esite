@@ -33,9 +33,21 @@
  *   node scripts/hijyen/kirli-sayac.cjs --json          # makine okunur
  *   node scripts/hijyen/kirli-sayac.cjs --only vh-,ops- # yol parçasına göre süz
  *   node scripts/hijyen/kirli-sayac.cjs --esik 50       # toplam eşiği aşarsa çıkış kodu 1
+ *   node scripts/hijyen/kirli-sayac.cjs --taban-yaz     # TRENDİ SIFIRLAR — bilerek, elle
+ *
+ * TREND — NİÇİN AĞAÇ BAŞI, NİÇİN TOPLAM DEĞİL:
+ * Toplam sayı ters gideni GİZLER. İki ağaç -10 temizlenirken bir ağaç +12 büyürse toplam
+ * +2 görünür ve büyüyen ağaç fark edilmez. Bu ölçülmüş bir tuzaktır (2026-08-27, I18N:
+ * toplam "+7.705 bayt kazanç" derken iki dosyada içerik YARIYA düşmüştü). Bu yüzden taban
+ * AĞAÇ BAŞI tutulur ve rapor büyüyeni ADIYLA söyler.
+ *
+ * Taban: `scripts/hijyen/kirli-sayac-taban.json`, YALNIZ `--taban-yaz` ile tazelenir.
+ * Otomatik tazeleme kasten YOK: her koşumda taban güncellenseydi betik her gün "0 değişim"
+ * derdi — yani tam da ölçmek için var olduğu şeyi hiçbir zaman görmezdi.
  */
 
 const { execFileSync } = require('child_process')
+const fs = require('fs')
 const path = require('path')
 
 const argv = process.argv.slice(2)
@@ -49,6 +61,26 @@ const DETAY = bayrak('--detay')
 const JSON_CIKTI = bayrak('--json')
 const ONLY = (deger('--only') || '').split(',').map((s) => s.trim()).filter(Boolean)
 const ESIK = deger('--esik') !== null ? Number(deger('--esik')) : null
+const TABAN_YAZ = bayrak('--taban-yaz')
+
+const TABAN_YOLU = path.join(__dirname, 'kirli-sayac-taban.json')
+
+/**
+ * Taban okunamazsa SESSİZ GEÇİLMEZ. Eksik taban, "değişim yok" ile aynı ekranı üretirse
+ * trend öldüğünde kimse fark etmez — bu betiğin önlemek için var olduğu sınıfın ta kendisi.
+ * Bu yüzden okunamama hâli SEBEBİYLE BİRLİKTE basılır ve trend sütunu açıkça kapatılır.
+ */
+function tabanOku() {
+  try {
+    const t = JSON.parse(fs.readFileSync(TABAN_YOLU, 'utf8'))
+    if (!t || typeof t.agaclar !== 'object' || t.agaclar === null) {
+      return { yok: true, sebep: 'agaclar alani yok ya da bozuk' }
+    }
+    return t
+  } catch (e) {
+    return { yok: true, sebep: (e && e.code) || String(e) }
+  }
+}
 
 function git(args, cwd) {
   return execFileSync('git', args, {
@@ -132,6 +164,57 @@ for (const wt of secili) {
   })
 }
 
+/**
+ * TREND. `--only` verildiğinde toplam karşılaştırması KASTEN yapılmaz: taban tüm ağaçların
+ * fotoğrafıdır, süzülmüş bir toplamla kıyaslamak "170 düştü" gibi sahte bir kazanç basardı.
+ * Ağaç başı deltalar süzgeçle de anlamlı olduğu için onlar korunur.
+ */
+const taban = tabanOku()
+const trendVar = !taban.yok
+const delta = new Map()
+let yeniAgac = []
+let gitmisAgac = []
+
+if (trendVar) {
+  for (const s of satirlar) {
+    if (s.erisilemedi) continue
+    const isim = path.basename(s.agac)
+    const eski = taban.agaclar[isim]
+    if (eski === undefined) yeniAgac.push({ isim, simdi: s.rozet })
+    else delta.set(isim, s.rozet - eski)
+  }
+  const mevcut = new Set(satirlar.filter((s) => !s.erisilemedi).map((s) => path.basename(s.agac)))
+  gitmisAgac = Object.keys(taban.agaclar).filter((a) => !mevcut.has(a))
+}
+
+if (TABAN_YAZ) {
+  if (ONLY.length) {
+    console.error('REDDEDILDI: --taban-yaz ile --only birlikte KULLANILAMAZ.')
+    console.error('Suzulmus bir fotograf taban olarak yazilirsa, listede olmayan her agac')
+    console.error('sonraki kosumda "YENI" gorunur ve trend sessizce anlamini yitirir.')
+    process.exit(2)
+  }
+  const yeni = {
+    _nicin: (taban && taban._nicin) || 'Rozet buyudugunde HANGI AGACTAN buyudugu gorunsun diye.',
+    _olcut: 'git status --porcelain — dizinler KATLANMIS (rozetle karsilastirilan sayi budur).',
+    _anahtar: 'Agac ADI (basename), tam yol DEGIL.',
+    _tazeleme: "SADECE 'node scripts/hijyen/kirli-sayac.cjs --taban-yaz' ile, ELLE.",
+    olculdu: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+    olcen: 'kirli-sayac.cjs --taban-yaz',
+    onceki_taban: (taban && taban.olculdu) || null,
+    toplam: toplamRozet,
+    agaclar: Object.fromEntries(
+      satirlar.filter((s) => !s.erisilemedi).map((s) => [path.basename(s.agac), s.rozet])
+    ),
+  }
+  fs.writeFileSync(TABAN_YOLU, JSON.stringify(yeni, null, 2) + '\n', 'utf8')
+  console.log('TABAN YENIDEN YAZILDI: ' + TABAN_YOLU)
+  console.log('  onceki taban: ' + (yeni.onceki_taban || '(yok)') + ' -> ' + yeni.olculdu)
+  console.log('  toplam      : ' + ((taban && taban.toplam) || '?') + ' -> ' + toplamRozet)
+  console.log('  ⚠ TREND SIFIRLANDI — bundan sonraki deltalar bu fotografa gore olculur.')
+  process.exit(0)
+}
+
 if (JSON_CIKTI) {
   console.log(
     JSON.stringify(
@@ -140,7 +223,19 @@ if (JSON_CIKTI) {
         erisilemeyen,
         toplamRozet,
         toplamDosya,
-        agaclar: satirlar.map((s) => (DETAY ? s : { ...s, satirlar: undefined })),
+        taban: trendVar
+          ? { olculdu: taban.olculdu, toplam: taban.toplam, fark: ONLY.length ? null : toplamRozet - taban.toplam }
+          : { yok: true, sebep: taban.sebep },
+        agaclar: satirlar.map((s) => {
+          const isim = path.basename(s.agac)
+          return {
+            ...s,
+            satirlar: DETAY ? s.satirlar : undefined,
+            fark: delta.has(isim) ? delta.get(isim) : null,
+            yeni: yeniAgac.some((y) => y.isim === isim) || undefined,
+          }
+        }),
+        gitmisAgaclar: gitmisAgac,
       },
       null,
       2
@@ -156,11 +251,21 @@ if (JSON_CIKTI) {
       continue
     }
     const isim = path.basename(s.agac)
+    let trendStr = ''
+    if (trendVar) {
+      if (delta.has(isim)) {
+        const d = delta.get(isim)
+        trendStr = d === 0 ? '      ·' : (d > 0 ? '     +' : '     ') + d
+      } else {
+        trendStr = '   YENI'
+      }
+    }
     console.log(
       String(s.rozet).padStart(7) +
         String(s.dosya).padStart(7) +
         String(s.izlenenKirli).padStart(9) +
         String(s.izlenmeyen).padStart(12) +
+        trendStr.padStart(trendVar ? 8 : 0) +
         '  ' +
         isim +
         (s.rozet === 0 ? '' : '   (' + s.agac + ')')
@@ -174,8 +279,44 @@ if (JSON_CIKTI) {
   console.log('  TOPLAM DOSYA (--untracked-files=all, dosya dosya)     : ' + toplamDosya)
   console.log('  AGAC SAYISI: ' + secili.length + (erisilemeyen ? '  ERISILEMEYEN: ' + erisilemeyen : ''))
   console.log('')
+
+  if (!trendVar) {
+    console.log('  ⚠ TREND KAPALI — taban okunamadi (' + taban.sebep + ').')
+    console.log('    Dosya: ' + TABAN_YOLU)
+    console.log('    Bunu sessiz gecmiyoruz: eksik taban "degisim yok" ile ayni ekrani uretirdi.')
+  } else {
+    console.log('  == TREND (taban ' + taban.olculdu + ') ==')
+    if (ONLY.length) {
+      console.log('    Toplam karsilastirmasi ATLANDI — --only ile suzdun, taban TUM agaclarin')
+      console.log('    fotografi. Suzulmus toplami tabanla kiyaslamak sahte kazanc basardi.')
+    } else {
+      const fark = toplamRozet - taban.toplam
+      console.log(
+        '    TOPLAM: ' + taban.toplam + ' -> ' + toplamRozet +
+          '  (' + (fark > 0 ? '+' : '') + fark + ')'
+      )
+    }
+    const buyuyen = [...delta.entries()].filter(([, d]) => d > 0).sort((a, b) => b[1] - a[1])
+    const dusen = [...delta.entries()].filter(([, d]) => d < 0).sort((a, b) => a[1] - b[1])
+    if (buyuyen.length) {
+      console.log('    BUYUYEN: ' + buyuyen.map(([a, d]) => a + ' +' + d).join(' · '))
+    }
+    if (dusen.length) {
+      console.log('    DUSEN  : ' + dusen.map(([a, d]) => a + ' ' + d).join(' · '))
+    }
+    if (!buyuyen.length && !dusen.length) console.log('    Agac basi degisim YOK.')
+    if (yeniAgac.length) {
+      console.log('    YENI AGAC: ' + yeniAgac.map((y) => y.isim + ' (' + y.simdi + ')').join(' · '))
+    }
+    if (gitmisAgac.length) {
+      console.log('    GITMIS AGAC: ' + gitmisAgac.join(' · ') + '  — tabanda vardi, artik yok.')
+    }
+    console.log('    ⭐Toplama degil BUYUYEN satirina bak: toplam ters gideni gizler.')
+    console.log('    Tabani tazelemek TRENDI SIFIRLAR; bilerek yap: --taban-yaz')
+  }
+  console.log('')
   console.log('  Recep in rozetiyle karsilastirilacak sayi ROZET sutunudur.')
-  console.log('  Rozet YALNIZ VS Code ta ACIK olan kokleri toplar; burada 31 agacin hepsi var.')
+  console.log('  Rozet YALNIZ VS Code ta ACIK olan kokleri toplar; burada TUM agaclar var.')
   console.log('  Sapma gorursen once "kac klasor acik" diye sor, sonra --only ile darabilirsin.')
 }
 
