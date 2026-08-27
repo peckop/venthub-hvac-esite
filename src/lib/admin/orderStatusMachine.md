@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\admin\orderStatusMachine.ts
-skeleton_hash: a47068840509eb87
+source_path: C:\tmp\ops-t165\src\lib\admin\orderStatusMachine.ts
+skeleton_hash: 3f66b0e1667490f2
 entity_hashes:
   func:allowedNextOrderStatuses: aeafdd7e384021d1
   func:canTransitionOrder: b9d35825d6dc47f6
   overview: 94cd02ee81a21baa
-generated_at: 2026-08-25T07:27:46Z
+generated_at: 2026-08-27T06:57:18Z
 ---
 
 ## Genel Bakış
@@ -19,12 +19,6 @@ Bu modül, sipariş durumları arasındaki geçiş kurallarını tanımlayan bir
 ### Durum Geçiş Kontrolü
 Sipariş durum geçişlerinin geçerliliğini sorgulayan fonksiyonları içerir. Mevcut bir durumdan yapılabilecek geçişleri listeler ve belirli bir geçişin izinli olup olmadığını denetler.
 - allowedNextOrderStatuses, canTransitionOrder
-
----
-
-**Notlar:**
-- `OrderBoardStatus` tipi bu modülün dışından tanımlanmış olup, geçerli sipariş durumlarını temsil eder.
-- `canTransitionOrder` fonksiyonunun, `allowedNextOrderStatuses` fonksiyonunu çağırarak çalışıp çalışmadığı kaynak kodda belirtilmemiştir; bu nedenle ikisi arasındaki kesin ilişki bilinmemektedir.
 
 ---
 
@@ -106,9 +100,9 @@ type OrderBoardStatus = | 'pending'
 
 ## NODE ID STANDARD
 
-  file: orderStatusMachine.ts
-  function: orderStatusMachine.ts::allowedNextOrderStatuses
-  function: orderStatusMachine.ts::canTransitionOrder
+  file: src\lib\admin\orderStatusMachine.ts
+  function: src\lib\admin\orderStatusMachine.ts::allowedNextOrderStatuses
+  function: src\lib\admin\orderStatusMachine.ts::canTransitionOrder
 
 ---
 

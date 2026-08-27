@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\checkout\OrderSummarySidebar.tsx
-skeleton_hash: 0b522a5451a86a43
+source_path: C:\tmp\venthub-wt-t131\src\views\checkout\OrderSummarySidebar.tsx
+skeleton_hash: 7c6a2dd366f5d3a2
 entity_hashes:
   func:OrderSummarySidebar: d1d455540c8e8d0c
   overview: ce3348034c2766ed
   style_tokens: ed45dfd73f706270
-generated_at: 2026-06-14T17:51:42Z
+generated_at: 2026-08-27T07:32:47Z
 ---
 
 ## Genel Bakış
@@ -67,10 +67,11 @@ Bu sipariş özeti kenar çubuğu bileşeni, ödeme sayfasında maliyet kalemler
 ## INTERFACES
 
 ### OrderSummaryItem
+W4b: kalem fiyatı YALNIZ `unitPrice`tan okunur (sunucunun doğruladığı fiyat). Ham `product.price` alanı bilinçli olarak KALDIRILDI — o kolon Kademe-2'de emekli edildi ve ona düşmek özet ekranında 0 TL gösteriyordu. Fiyat yoksa "Teklif Alın".
 - `id: string`
-- `product: {`
+- `product: {`
 - `quantity: number`
-- `unitPrice?: number | string`
+- `unitPrice?: number`
 
 ### OrderSummarySidebarProps
 - `items: OrderSummaryItem[]`

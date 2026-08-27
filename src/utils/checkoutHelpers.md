@@ -2,28 +2,29 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\checkoutHelpers.ts
-skeleton_hash: 48d47ef3a66cd735
+source_path: C:\tmp\vh-altyapi-t165\src\utils\checkoutHelpers.ts
+skeleton_hash: 5cf92f9016b3012a
 entity_hashes:
-  func:getPriceHashLocal: 13f64c7a6218a753
-  func:getPriceHashServer: 9916fbf1157483b4
+  func:getPriceHashLocal: ddf03350541b5b6c
+  func:getPriceHashServer: 7bce7288aa694458
   func:getTranslationWithFallback: 017e759a3be126ab
-  func:to2: b98feff70eaa59fa
-  overview: 72cc4065bdd6058b
-generated_at: 2026-06-19T20:48:17Z
+  func:normUnit: df5c71868b272131
+  func:to2: 9cbbe8abff4d0ba5
+  overview: 92ab3bf2b70f093b
+generated_at: 2026-08-27T08:48:56Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC platformu sipariş tamamlama (checkout) sürecinde kullanılan yardımcı işlevleri barındırır. Temel olarak fiyat verilerinin tutarlılığını sağlamak için hash oluşturma, sayısal değerleri formatlama ve çeviri metinlerini yönetme gibi tekrarlayan görevleri merkezi bir noktadan sunar. Hem istemci hem sunucu taraflı akışları destekleyerek kod tekrarını azaltır.
+Bu modül, sipariş tamamlama (checkout) sürecinde kullanılan yardımcı işlevleri içerir. Fiyat verilerinin tutarlılığını sağlamak için hash oluşturma, sayısal değerleri formatlama ve normalize etme, ayrıca çeviri metinlerini yönetme gibi görevleri merkezi bir noktadan sunar. Hem istemci hem sunucu taraflı akışları destekleyerek kod tekrarını azaltır.
 
 ## Fonksiyon Grupları
 ### Fiyat Hash Oluşturma Fonksiyonları
-Sepet veya sipariş öğeleri için benzersiz bir parmak izi (hash) oluşturarak, checkout sürecin farklı aşamalarında veya taraflarında fiyatların tutarlı olduğunu doğrulamak için kullanılır.
+Sepet veya sipariş öğeleri için benzersiz bir parmak izi (hash) oluşturarak, checkout sürecinin farklı aşamalarında veya taraflarında fiyatların tutarlı olduğunu doğrulamak için kullanılır.
 - getPriceHashLocal, getPriceHashServer
 
-### Temel Biçimlendirme Yardımcısı
-Özellikle fiyat tutarları gibi nicelikleri standart ve okunabilir formata dönüştürmek için temel bir yardımcı işlev sunar.
-- to2
+### Veri Biçimlendirme ve Normalizasyon Yardımcıları
+Sayısal değerleri standart ve okunabilir formata dönüştürmek ve bilinmeyen türdeki değerleri güvenli bir şekilde sayıya çevirmek için kullanılır.
+- to2, normUnit
 
 ### Çeviri Yedekleme Yardımcısı
 Arayüz metinleri için çeviri anahtarlarını güvenli bir şekilde işler; istenen çeviri yoksa belirli bir varsayılan metni döndürerek eksik içerik sorunlarını önler.
@@ -33,30 +34,31 @@ Arayüz metinleri için çeviri anahtarlarını güvenli bir şekilde işler; is
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, checkout sürecinde fiyat tutarlılığı, veri formatlama ve çeviri fallback mekanizması sağlayan yardımcı fonksiyonlar içermektedir. Aşağıda her bir fonksiyonun doğru çalışması için gereken mimari varsayımlar listelenmiştir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarılabilecek varsayımlar belirtilebilir.
 
-[Aksiyom 1]: Eğer `to2` fonksiyonuna geçilen `n` parametresi geçerli bir sayı (finite number) değilse (örn: `NaN`, `Infinity`), sonuç `NaN` veya `Infinity` olur ve para birimi formatlaması anlamsızlaşır.
+[Aksiyom 1]: Eğer `getPriceHashServer` fonksiyonuna `serverItems` parametresi `undefined` veya `null` olarak geçilirse, fonksiyon bu durumla başa çıkacak şekilde davranmalıdır; aksi takdirde null/undefined üzerinde işlem yapma hatası oluşur.
 
-[Aksiyom 2]: Eğer `getPriceHashLocal` fonksiyonuna geçilen `items` dizisi `null` veya `undefined` ise veya içindeki herhangi bir elemanın `product_id` alanı eksikse, hesaplanan fiyat hash'i tutarsız veya eksik olur ve fiyat doğrulaması yanıltıcı sonuç verebilir.
+[Aksiyom 2]: Eğer `getPriceHashServer` fonksiyonuna verilen `serverItems` dizisindeki bir öğenin `unit_price` değeri `null` ise, fonksiyon bu null fiyatı işleyebilmelidir; aksi takdirde null üzerinde matematiksel işlem hatası oluşur.
 
-[Aksiyom 3]: Eğer `getPriceHashServer` fonksiyonuna `serverItems` parametresi olarak `undefined` veya `null` geçilirse, fonksiyon sadece `localItems`'ı kullanarak bir hash oluşturur; ancak bu durumda sunucu tarafı fiyat doğrulaması yapılamaz ve olası fiyat tutarsızlıkları tespit edilemez.
+[Aksiyom 3]: Eğer `getPriceHashServer` fonksiyonuna verilen `serverItems` dizisindeki bir öğede `quantity` alanı yoksa, fonksiyon bu eksikliği tolere etmelidir; aksi takdirde undefined değerle çarpma/toplama hatası oluşur.
 
-[Aksiyom 4]: Eğer `getPriceHashServer` fonksiyonuna hem `serverItems` hem de `localItems` geçilirse ve her iki listedeki ürünlerin `product_id` eşleşmelerinde (`serverItems`'daki `product_id` ile `localItems`'daki `product_id`) tutarsızlık varsa (örn: farklı ürünler, eksik ürünler), hesaplanan hash'ler farklı olur; bu durum modülün fiyat tutarlılığı doğrulama amacına hizmet eder ancak hash'lerin karşılaştırılabilirliği için her iki tarafın da aynı ürün setini ve sırasını beklemesi gerekir.
+[Aksiyom 4]: Eğer `normUnit` fonksiyonuna geçersiz bir `value` verilirse (sayıya dönüştürülemeyen bir değer), fonksiyon `null` döndürmelidir; aksi takdirde geçersiz sayıyla devam eden hesaplamalar hatalı sonuç üretir.
 
-[Aksiyom 5]: Eğer `getTranslationWithFallback` fonksiyonuna geçilen `t` fonksiyonu (çeviri fonksiyonu) verilen `key` için bir çeviri sağlayamazsa (boş string veya `undefined` döndürürse), `fallback` değeri döndürülür. Eğer `fallback` de boş string ise, sonuç boş string olur ve arayüzde eksik metin görünebilir.
-
-[Aksiyom 6]: `getPriceHashLocal` ve `getPriceHashServer` fonksiyonlarının döndürdüğü hash değerlerinin karşılaştırılabilir olması için, her iki fonksiyonun da aynı hash algoritmasını (örn: aynı string birleştirme ve hash fonksiyonu) kullanması gerekir; aksi takdirde fiyat tutarlılığı karşılaştırması yapılamaz.
+[Aksiyom 5]: Eğer `getTranslationWithFallback` fonksiyonuna verilen `t` parametresi belirtilen imzaya (`(key: string) => string`) uymuyorsa, fonksiyon düzgün çalışamaz; aksi takdirde `t(key)` çağrısı runtime hat
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### to2
-**Ne yapar**: Girdi olarak aldığı sayısal değeri güvenli bir şekilde 2 ondalık basamağa dönüştürür. Genellikle para birimi hesaplamaları gibi hassasiyet gerektiren işlemlerde kullanılır, ondalık basamak sayısını standartlaştırarak hesaplama hatalarının önüne geçer.
-**Nasıl yapar**: Sayısal girdinin formatını standartlaştırarak 2 ondalık basamağa sabitler, olası geçersiz sayısal girdilere karşı koruma sağlayarak uygulamanın çökmesini engeller. İşlevi boyunca dönüşüm sırasında veri kaybını minimize edecek yöntemler kullanır.
+**Ne yapar**: Verilen bir sayıyı güvenli bir şekilde 2 ondalık basamağa dönüştürür. Sayısal olmayan değerleri sayıya çevirmeyi dener; sonucun sonlu bir sayı olup olmadığını kontrol eder.
+**Nasıl yapar**: Fonksiyon, gelen `value` parametresinin `number` tipinde olup olmadığını kontrol eder. Eğer sayı değilse `Number()` ile sayıya çevirmeye çalışır. Elde edilen değer `Number.isFinite()` ile sonlu bir sayı mı diye denetlenir. Sonlu ise `to2` fonksiyonu çağrılarak 2 ondalık basamağa yuvarlanır; sonlu değilse `null` döndürülür. Bu yapı, geçersiz veya sonsuz değerlerin sisteme girmesini engelleyen bir güvenlik katmanı oluşturur.
 **Parametreler**:
-- name: n, type: number — 2 ondalık basamağa dönüştürülecek olan ham sayısal değer
-**Dönüş**: Dönüş tipi dokümantasyonda bilinmiyor veya void olarak işaretlenmiştir, ancak işlevinin amacı gereği 2 ondalık basamağa sahip sayısal bir değer döndürmesi beklenir.
+- value: unknown — Dönüştürülecek değer; sayısal olmayan bir tip gelirse otomatik olarak sayıya çevrilmeye çalışılır
+**Dönüş**: Sayısal ve sonlu bir değerse 2 ondalık basamaklı `number`; aksi halde `null` döndürür.
+
+### normUnit
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getPriceHashLocal
 **Ne yapar**: İstemci tarafında tutulan yerel sepet öğeleri için tutarlı bir hash string'i oluşturur. Oluşturulan bu hash, ödeme süreci boyunca sepet içeriğinde meydana gelen değişiklikleri anında tespit etmek için kullanılır. Sepet tutarlılığını kontrol etmeye yarayan temel bir yardımcı fonksiyondur.
@@ -91,10 +93,43 @@ Bu modül, checkout sürecinde fiyat tutarlılığı, veri formatlama ve çeviri
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: checkoutHelpers.ts::to2
-- **params**: `(n: number)`
-- **ic_degiskenler**: (gövde verilmemiş — sadece imza mevcut)
-- **Dönüş**: tipi imzada belirtilmemiş; kullanım bağlamından (`to2(Number(...))`) number döndüğü anlaşılıyor
+### [N1_NASIL] AST Pointer: src/utils/checkoutHelpers.ts::to2
+- **params**: `n` — number türünde bir sayı
+- **ic_degiskenler**: (gövde verilmemiş, analiz edilemiyor)
+- **Dönüş**: yok
+
+### [N2_NASIL] AST Pointer: src/utils/checkoutHelpers.ts::normUnit
+- **params**: `value` — unknown türünde, dönüştürülmeye çalışılacak değer
+- **ic_degiskenler**:
+  - `v` — `value`'nun number olup olmadığı kontrol edilir; number ise doğrudan atanır, değilse `Number(value)` ile sayıya dönüştürülür
+- **Dönüş**: `number | null` — `v` sonucu sonlu bir sayıysa `to2(v)` çağrısının dönüşü, değilse `null`
+
+### [N3_NASIL] AST Pointer: src/utils/checkoutHelpers.ts::getPriceHashLocal
+- **params**: `items` — `CartItem[]` türünde, sepet öğeleri dizisi
+- **ic_degiskenler**:
+  - `norm` — `items` dizisinin her elemanını `{ id: i.id, qty: i.quantity, unit: normUnit(i.unitPrice) }` biçimine dönüştürüp `id` alanına göre alfabetik sıralayan yeni dizi
+  - `i` — `map` içindeki her bir `CartItem` elemanı; `id`, `quantity` ve `unitPrice` alanlarına erişilir
+- **Dönüş**: `string` — `norm` dizisinin `JSON.stringify` ile JSON metnine dönüştürülmüş hali
+
+### [N4_NASIL] AST Pointer: src/utils/checkoutHelpers.ts::getPriceHashServer
+- **params**:
+  - `serverItems` — `Array<{ product_id: string; quantity?: number; unit_price: number | null }> | undefined | null` türünde, sunucu sepet öğeleri
+  - `localItems` — `CartItem[]` türünde, yerel sepet öğeleri
+- **ic_degiskenler**:
+  - `arr` — `serverItems` bir dizi ise kendisi, değilse boş dizi `[]`
+  - `norm` — `arr` dizisinin her elemanını `{ id: String(i.product_id), qty: Number(i.quantity ?? localItems.find(it => it.id === String(i.product_id))?.quantity ?? 0), unit: normUnit(i.unit_price) }` biçimine dönüştürüp `id` alanına göre alfabetik sıralayan yeni dizi
+  - `i` — `map` içindeki her bir sunucu öğesi elemanı; `product_id`, `quantity` ve `unit_price` alanlarına erişilir
+  - `it` — `localItems.find` içindeki her bir `CartItem` elemanı; `id` alanıyla eşleşme kontrolü yapılır
+- **Dönüş**: `string` — `norm` dizisinin `JSON.stringify` ile JSON metnine dönüştürülmüş hali
+
+### [N5_NASIL] AST Pointer: src/utils/checkoutHelpers.ts::getTranslationWithFallback
+- **params**:
+  - `t` — `(key: string) => string` türünde, çeviri fonksiyonu
+  - `key` — `string` türünde, çeviri anahtarı
+  - `fallback` — `string` türünde, yedek metin
+- **ic_degiskenler**:
+  - `v` — `t(key)` çağrısının sonucu; çevrilmiş metin veya hata durumunda kullanılmaz
+- **Dönüş**: `string` — `v` değeri `key`'e eşit değilse `v`, eşitse veya hata oluşursa `fallback`
 
 ---
 
@@ -105,15 +140,18 @@ graph TD
     checkoutHelpers_ts__getPriceHashLocal["getPriceHashLocal"]
     checkoutHelpers_ts__getPriceHashServer["getPriceHashServer"]
     checkoutHelpers_ts__getTranslationWithFallback["getTranslationWithFallback"]
+    checkoutHelpers_ts__normUnit["normUnit"]
     checkoutHelpers_ts__to2["to2"]
-    checkoutHelpers_ts__getPriceHashServer --> checkoutHelpers_ts__to2
-    checkoutHelpers_ts__getPriceHashLocal --> checkoutHelpers_ts__to2
+    checkoutHelpers_ts__getPriceHashLocal --> checkoutHelpers_ts__normUnit
+    checkoutHelpers_ts__getPriceHashServer --> checkoutHelpers_ts__normUnit
+    checkoutHelpers_ts__normUnit --> checkoutHelpers_ts__to2
 ```
 
 ## NODE ID STANDARD
 
   file: src\utils\checkoutHelpers.ts
   function: src\utils\checkoutHelpers.ts::to2
+  function: src\utils\checkoutHelpers.ts::normUnit
   function: src\utils\checkoutHelpers.ts::getPriceHashLocal
   function: src\utils\checkoutHelpers.ts::getPriceHashServer
   function: src\utils\checkoutHelpers.ts::getTranslationWithFallback
@@ -124,4 +162,5 @@ graph TD
   export: getPriceHashLocal
   export: getPriceHashServer
   export: getTranslationWithFallback
+  export: normUnit
   export: to2

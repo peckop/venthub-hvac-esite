@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\CouponsTableBody.tsx
-skeleton_hash: ea715fdc000a21be
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\CouponsTableBody.tsx
+skeleton_hash: 7e1fed1636adab14
 entity_hashes:
   func:CouponsTableBody: 23d12459633c7a42
   func:couponsFetcher: 07d4dca875cd8885
@@ -11,7 +11,7 @@ entity_hashes:
   func:isAllowedCouponType: af4b48320744b9de
   overview: 13fc647bd8624415
   style_tokens: a73366d5aa63d45f
-generated_at: 2026-08-25T07:31:51Z
+generated_at: 2026-08-27T07:24:32Z
 ---
 
 ## Genel Bakış
@@ -309,11 +309,11 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: CouponsTableBody.tsx
-  function: CouponsTableBody.tsx::isAllowedCouponType
-  function: CouponsTableBody.tsx::dbToUi
-  function: CouponsTableBody.tsx::couponsFetcher
-  function: CouponsTableBody.tsx::CouponsTableBody
+  file: src\views\admin\CouponsTableBody.tsx
+  function: src\views\admin\CouponsTableBody.tsx::isAllowedCouponType
+  function: src\views\admin\CouponsTableBody.tsx::dbToUi
+  function: src\views\admin\CouponsTableBody.tsx::couponsFetcher
+  function: src\views\admin\CouponsTableBody.tsx::CouponsTableBody
 
 ---
 

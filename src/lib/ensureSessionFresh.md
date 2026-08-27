@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\ensureSessionFresh.ts
-skeleton_hash: 17deb46f64faae1d
+source_path: C:\tmp\ops-t165\src\lib\ensureSessionFresh.ts
+skeleton_hash: d0ba5facacb60a85
 entity_hashes:
   func:ensureSessionFresh: 28037b5d7337277a
   overview: 7e306322f9d1fbb3
-generated_at: 2026-06-19T20:48:09Z
+generated_at: 2026-08-27T06:57:32Z
 ---
 
 ## Genel Bakış

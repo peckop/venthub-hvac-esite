@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressSelectModal.tsx
-skeleton_hash: c6634e963d1ed44b
+source_path: C:\tmp\venthub-wt-t131\src\views\checkout\AddressSelectModal.tsx
+skeleton_hash: 62148d31c11fc759
 entity_hashes:
   func:AddressSelectModal: adfcf435f03c2db9
   overview: 55656091e9138090
   style_tokens: 0a79973eb6842aa3
-generated_at: 2026-06-14T17:51:41Z
+generated_at: 2026-08-27T07:32:43Z
 ---
 
 ## Genel Bakış

@@ -2,54 +2,49 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\PricingSettingsFormModal.tsx
-skeleton_hash: c10e1536b134a2cb
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\PricingSettingsFormModal.tsx
+skeleton_hash: 80f1bb8c8ab74ab5
 entity_hashes:
+  func:FieldError: 73ce29b5cf8d764a
   func:PricingSettingsFormModal: 0a20027362b0d8df
   func:buildPricingSettingsSchema: b3cc2b049ab1978a
-  func:handleClose: b985b474034243a8
+  func:fieldError: cea0608ef7eae058
+  func:focusFirstInvalid: 5ffd27b47b0aec8f
+  func:handleClose: 179f5fcb5f1d26fb
   func:handleOpenChange: b7949752bd032233
   func:onSubmit: cfdda7962049d53c
   func:toggleCurrency: a4a520940e991de3
-  overview: 4474d1a1bd6b4fc8
-  style_tokens: 90ced0abeaea521e
-generated_at: 2026-08-14T09:14:02Z
+  overview: 7afd0d45cfc373b2
+  style_tokens: bedbee12bcb68601
+generated_at: 2026-08-27T08:46:13Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelinde fiyatlandırma ayarlarını düzenlemek için kullanılan kontrollü bir modal form bileşenidir. Para birimi seçimi, form validasyonu ve ayarların kaydedilmesi dahil olmak üzere fiyatlandırma yapılandırmasıyla ilgili tüm kullanıcı etkileşimlerini yönetir. Bileşen, form durumunu ve modal açılış/kapanış akışını kontrol ederek bir dizi işlevi bir araya getirir.
+Bu modül, yönetici panelindeki fiyatlandırma ayarlarını düzenlemek için kullanılan kontrollü bir modal form bileşenidir. Form validasyonu, para birimi seçimi ve ayarların sunucuya gönderilmesi dahil olmak üzere fiyatlandırma yapılandırmasıyla ilgili tüm kullanıcı etkileşimlerini yönetir. Bileşen, form durumunu ve modal açılış/kapanış akışını kontrol ederek bir dizi işlevi bir araya getirir.
 
 ## Fonksiyon Grupları
 ### Modal Kontrol ve Durum Yönetimi
-Grup, modalın açılıp kapanmasını ve formun temel akışını kontrol eden temel işlevleri kapsar.
+Bu grup, modalın açılıp kapanmasını ve formun temel akışını kontrol eden temel işlevleri kapsar.
 - `handleClose`, `handleOpenChange`, `PricingSettingsFormModal`
 
 ### Form İşlemleri ve İş Mantığı
-Bu grup, form içindeki veriManipülasyonunu ve sunucuya gönderme sürecini yöneten işlevlerden oluşur.
+Bu grup, form içindeki veri manipülasyonunu ve sunucuya gönderme sürecini yöneten işlevlerden oluşur.
 - `toggleCurrency`, `onSubmit`
 
 ### Validasyon ve Şema Oluşturma
 Bu işlev, form alanları için tip güvenli ve çok dilli bir validasyon şeması tanımlar.
 - `buildPricingSettingsSchema`
 
+### Hata Yönetimi ve Yardımcı Bileşenler
+Bu grup, form hatalarını göstermek ve yönetmek için yardımcı bileşen ve fonksiyonları içerir.
+- `FieldError`, `fieldError`, `focusFirstInvalid`
+
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, fiyatlandırma ayarlarını düzenlemek için bir form modalı sunar. Aşağıda modülün doğru çalışması için gerekli mimari varsayımlar listelenmiştir.
-
-[Aksiyom 1]: Eğer `PRICING_CURRENCY_OPTIONS` sabiti boşsa veya geçerli bir Para Birimi Kodu içermiyorsa, `toggleCurrency` fonksiyonu işlevini yerine getiremez ve kullanıcı hangi para biriminin seçili olduğunu belirleyemez.
-
-[Aksiyom 2]: Eğer `pricingSettingsSchema` çağrısı (yani form şeması) başarısızsa veya geçerli bir Zod şeması döndürmüyorsa, `onSubmit` fonksiyonu form verilerini doğrulayamaz ve hatalı veriler kaydedilebilir.
-
-[Aksiyom 3]: Eğer `initialValues` prop'u sağlanmamışsa veya `DEFAULT_PRICING_SETTINGS` nesnesi tanımsızsa, form başlangıçta boş alanlarla açılır ve kullanıcı tüm alanları manuel olarak doldurmak zorunda kalır.
-
-[Aksiyom 4]: Eğer `open` prop'u `true` ise ancak `handleOpenChange` fonksiyonu çağrılamıyorsa (örneğin `onOpenChange` callback'i tanımsızsa), modal kapatılamaz ve kullanıcı arayüzünde takılma yaşanır.
-
-[Aksiyom 5]: Eğer `onSuccess` callback'i sağlanmamışsa, form başarıyla gönderildikten sonra kullanıcıya başarı bildirimi gösterilemez veya modal otomatik kapatılamaz.
-
-[Aksiyom 6]: Eğer `buildPricingSettingsSchema` fonksiyonu bir hata fırlatıyorsa veya beklenen formatta (örneğin bir Zod şeması) döndürmüyorsa, `pricingSettingsSchema` sabit değeri geçersiz olur ve formun doğrulama mantığı bozulur.
-
-[Aksiyom 7]: Eğer `onSubmit` fonksiyonu `async` bir işlem sırasında-network hatası veya sunucu hatası-alınırsa ve bu hata yakalanıp kullanıcıya iletilemezse, kullanıcı gönderme işleminin başarıp başarısız olduğunu bilemez.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -65,7 +60,24 @@ Bu modül, fiyatlandırma ayarlarını düzenlemek için bir form modalı sunar.
 
 **Dönüş**: Zod validasyon nesnesi (tip bilgisi verilmemiştir)
 
+### FieldError
+**Ne yapar**: Form alanının hemen altında görüntülenen hata mesajı satırını render eden bir React bileşenidir. Hata mesajı yoksa (undefined veya boş) DOM'a hiçbir eleman basmaz; bu sayede gereksiz boşluk oluşmaz.
+
+**Nasıl yapar**: `message` parametresinin dolu olup olmadığını kontrol eder. Mesaj mevcutsa, verilen `id` değeriyle ilişkilendirilmiş bir hata satırı olarak DOM'a basar. Mesaj yoksa `null` döndürerek hiçbir şey render etmez.
+
+**Parametreler**:
+- `id`: `string` — Hata mesajının ilişkilendirildiği form alanının benzersiz kimliği. Erişilebilirlik (accessibility) amacıyla kullanılır.
+- `message`: `string` (opsiyonel) — Gösterilecek hata mesajı metni. Tanımlı olmadığında bileşen hiçbir şey render etmez.
+
+**Dönüş**: `React.FC<{ id: string; message?: string }>` — id ve message props alan bir React fonksiyonel bileşeni döndürür.
+
+### focusFirstInvalid
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
 ### PricingSettingsFormModal
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### fieldError
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### handleClose
@@ -83,6 +95,7 @@ Bu modül, fiyatlandırma ayarlarını düzenlemek için bir form modalı sunar.
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../overlay/ConfirmProvider::useConfirm
 - import: @/hooks/useRole::useRole
 - import: @/i18n/I18nProvider::useI18n
 - import: @/lib/admin/mutateWithAudit::AdminPermissionError
@@ -94,6 +107,7 @@ Bu modül, fiyatlandırma ayarlarını düzenlemek için bir form modalı sunar.
 - import: lucide-react::Loader2
 - import: lucide-react::Save
 - import: lucide-react::X
+- import: react-hook-form::type { FieldErrors }
 - import: react-hook-form::useForm
 - import: react::React
 - import: react::useEffect
@@ -134,66 +148,84 @@ type PricingSettingsValues = z.infer<typeof pricingSettingsSchema>
   base_currency: 'TRY',
   enabled_currencies: ['TRY'],
   default_vat_rat...`
+- **FIELD_FOCUS_ORDER** (array) — `[
+  // Para birimi grubunda TRY kapatılamaz → odak ilk DEĞİŞTİRİLEBİLİR kutu...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: PricingSettingsFormModal.tsx::buildPricingSettingsSchema
-- **params**: (t: (key: string) => string)
+- **params**: `t` — çeviri fonksiyonu, `key: string` alır ve string döndürür
 - **ic_degiskenler**:
-  - `v` — Translation helper fonksiyonu; verilen key'i `admin.pricing.settings.validation.` prefix'i ile birleştirerek t fonksiyonunu çağırır
-- **Dönüş**: Zod schema nesnesi (pricing ayarları için validasyon kurallarını tanımlar)
+  - `v` — `t` fonksiyonunu saran yardımcı fonksiyon, `admin.pricing.settings.validation.${key}` ön ekini otomatik ekler
+- **Dönüş**: Zod şeması (`z.object`) — `base_currency`, `enabled_currencies`, `default_vat_rate_pct`, `default_price_is_vat_inclusive`, `default_round_to`, `default_charm_ending`, `display_spread_pct` alanlarını doğrular
 
-### [N2_NASIL] AST Pointer: PricingSettingsFormModal.tsx::PricingSettingsFormModal
-- **params**: (open: boolean, onOpenChange: (open: boolean) => void, initialValues?: PricingSettingsValues, onSuccess?: () => void)
+### [N2_NASIL] AST Pointer: PricingSettingsFormModal.tsx::FieldError
+- **params**: `id` — hata mesajının HTML `id` niteliği, `message` — opsiyonel hata metni
+- **ic_degiskenler**: yok
+- **Dönüş**: `message` varsa `<p>` elementi (role="alert", className="mt-1 text-xs font-bold tracking-tighter text-admin-danger"), yoksa `null`
+
+### [N3_NASIL] AST Pointer: PricingSettingsFormModal.tsx::focusFirstInvalid
+- **params**: `errs` — `FieldErrors<PricingSettingsValues>` türünde form hataları nesnesi
 - **ic_degiskenler**:
-  - `form` — useForm hook'undan gelen form instance'ı (react-hook-form)
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
-  - `hasWriteAccess` — useRole hook'undan gelen yazma izni boolean'ı
-  - `saving` — Form submission durumunu takip eden state (boolean)
-  - `setSaving` — saving state'ini güncelleyen setter fonksiyonu
-  - `handleClose` — Modal kapatma işlevi (değişiklik kontrolü ile)
-  - `handleOpenChange` — Modal open state değişiklik işlevi
-  - `handleBeforeUnload` — Sayfadan ayrılma engelleme işlevi (kirli form durumunda)
-  - `toggleCurrency` — Para birimi toggle işlevi
-  - `onSubmit` — Form submission asenkron işlevi
-  - `enabledCurrencies` — Formun enabled_currencies alanından gelen array (JSX içinde kullanılır)
-- **Dönüş**: React.FC<PricingSettingsFormModalProps> (Pricing ayarları form modalı)
+  - `first` — `FIELD_FOCUS_ORDER` dizisinde `errs[name]` eşleşen ilk eleman; bulunamazsa fonksiyon erken döner
+- **Dönüş**: `void` — yan etki olarak `document.getElementById(first.id)?.focus()` çağrısı yapar
 
-### [N3_NASIL] AST Pointer: PricingSettingsFormModal.tsx::handleClose
-- **params**: (yok)
+### [N4_NASIL] AST Pointer: PricingSettingsFormModal.tsx::PricingSettingsFormModal
+- **params**: `open` — modal açık/kapalı durumu, `onOpenChange` — durum değişiklik callback'i, `initialValues` — başlangıç form değerleri, `onSuccess` — başarılı kayıt sonrası callback
 - **ic_degiskenler**:
-  - `form.formState.isDirty` — Formda kaydedilmemiş değişiklik olup olmadığını kontrol eder
-- **Dönüş**: yok (yan etki: onOpenChange(false) çağırır, gerekirse onay dialoğu gösterir)
+  - `form` — `useForm` hook'undan dönen form nesnesi (zodResolver ile)
+  - `saving` — `useState` ile tutulan kayıt durumu boolean'ı
+  - `enabledCurrencies` — `form.watch('enabled_currencies')` ile izlenen etkin para birimleri dizisi
+  - `handleBeforeUnload` — `beforeunload` olayı için event handler, `form.formState.isDirty` kontrolü yapar
+  - `handleClose` — async kapatma fonksiyonu, kirli form durumunda onay ister
+  - `handleOpenChange` — `openVal` parametreli, kapalı durumda `handleClose()` çağırır
+  - `toggleCurrency` — `code` parametreli, TRY hariç para birimi seçimini açar/kapatır
+  - `fieldError` — `name` parametreli, form hata mesajını string olarak döndürür
+  - `onSubmit` — async form gönderim fonksiyonu
+  - `t` — `useI18n` hook'undan gelen çeviri fonksiyonu
+  - `hasWriteAccess` — `useRole` hook'undan gelen yazma yetkisi boolean'ı
+  - `supabase` — Supabase istemcisi
+  - `confirm` — onay dialog fonksiyonu
+  - `mutateWithAudit` — denetimli veri değiştirme fonksiyonu
+  - `toSupabaseJson` — JSON dönüştürücü yardımcı fonksiyon
+- **Dönüş**: `React.FC<PricingSettingsFormModalProps>` — modal JSX'i
 
-### [N4_NASIL] AST Pointer: PricingSettingsFormModal.tsx::handleOpenChange
-- **params**: (openVal: boolean)
-- **ic_degiskenler**: (yok — sadece parametre ve mevcut state kullanılır)
-- **Dönüş**: yok (yan etki: handleClose() veya onOpenChange(true) çağırır)
-
-### [N5_NASIL] AST Pointer: PricingSettingsFormModal.tsx::toggleCurrency
-- **params**: (code: PricingCurrencyCode)
+### [N5_NASIL] AST Pointer: PricingSettingsFormModal.tsx::fieldError
+- **params**: `name` — `keyof PricingSettingsValues` türünde form alan adı
 - **ic_degiskenler**:
-  - `current` — Mevcut enabled_currencies array'i (form.getValues ile alınır)
-  - `next` — Toggle sonrası güncellenmiş enabled_currencies array'i
-- **Dönüş**: yok (yan etki: form.setValue ile enabled_currencies güncellenir)
+  - `message` — `form.formState.errors[name]?.message` erişimi; string ise döndürülür, değilse `undefined`
+- **Dönüş**: `string | undefined`
 
-### [N6_NASIL] AST Pointer: PricingSettingsFormModal.tsx::onSubmit
-- **params**: (values: PricingSettingsValues)
+### [N6_NASIL] AST Pointer: PricingSettingsFormModal.tsx::handleClose
+- **params**: yok
 - **ic_degiskenler**:
-  - `authData` — Supabase auth.getUser() sonucu gelen kullanıcı verisi
-  - `userId` — authData.user?.id veya null (kullanıcı ID'si)
-  - `payload` — Güncellenmiş pricing değerleri (base_currency her zaman 'TRY' olarak zorlanır)
-  - `e` — Catch bloğundaki hata nesnesi
-  - `msg` — Kullanıcıya gösterilecek hata mesajı (AdminPermissionError, Error veya genel hata)
-- **Dönüş**: yok (yan etki: mutateWithAudit ile veritabanına kaydeder, toast mesajı gösterir, onSuccess ve onOpenChange çağırır)
+  - `ok` — `confirm()` fonksiyonunun dönüş değeri; kullanıcı onay verirse `true`
+- **Dönüş**: yok — yan etki olarak form kirli değilse `onOpenChange(false)` çağırır; kirliyse onay dialogu gösterir, onaylanırsa `onOpenChange(false)` çağırır
 
-### [N7_NASIL] AST Pointer: PricingSettingsFormModal.tsx::innerUpsertFunction
-- **params**: (yok — anonymous async fonksiyon)
+### [N7_NASIL] AST Pointer: PricingSettingsFormModal.tsx::handleOpenChange
+- **params**: `openVal` — boolean, modal'ın yeni açık/kapalı durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `openVal` false ise `handleClose()` çağırır, true ise `onOpenChange(true)` çağırır
+
+### [N8_NASIL] AST Pointer: PricingSettingsFormModal.tsx::toggleCurrency
+- **params**: `code` — `PricingCurrencyCode` türünde para birimi kodu
 - **ic_degiskenler**:
-  - `error` — Supabase upsert işleminde oluşabilecek hata
-- **Dönüş**: Promise<void> (veritabanına upsert işlemi yapar, hata fırlatabilir)
+  - `current` — `form.getValues('enabled_currencies')` sonucu; mevcut etkin para birimleri dizisi, yoksa boş dizi
+  - `next` — `current` dizisi içinde `code` varsa filtrelenmiş hali, yoksa eklenmiş hali
+- **Dönüş**: yok — yan etki olarak `form.setValue('enabled_currencies', next, { shouldDirty: true, shouldValidate: true })` çağrısı yapar; `code === 'TRY'` ise erken döner (taban para birimi kapatılamaz)
+
+### [N9_NASIL] AST Pointer: PricingSettingsFormModal.tsx::onSubmit
+- **params**: `values` — `PricingSettingsValues` türünde form değerleri
+- **ic_degiskenler**:
+  - `authData` — `supabase.auth.getUser()` sonucu; kullanıcı kimlik bilgisi
+  - `userId` — `authData.user?.id` değeri; yoksa `null`
+  - `payload` — `values` nesnesinin `base_currency: 'TRY'` ile birleştirilmiş kopyası
+  - `error` — `supabase.from('site_settings').upsert(...)` sonucu; hata varsa fırlatılır
+  - `e` — `catch` bloğunda yakalanan `unknown` türünde hata
+  - `msg` — hata türüne göre belirlenen mesaj: `AdminPermissionError` ise yetki hatası, `Error` ise `e.message`, diğer durumlarda genel hata mesajı
+- **Dönüş**: yok — yan etkiler: `setSaving(true/false)`, `mutateWithAudit` ile denetimli kayıt, başarılıysa `toast.success` + `onSuccess()` + `onOpenChange(false)`, hata durumunda `toast.error(msg)`
 
 ---
 
@@ -201,14 +233,18 @@ type PricingSettingsValues = z.infer<typeof pricingSettingsSchema>
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    PricingSettingsFormModal_tsx__FieldError["FieldError"]
     PricingSettingsFormModal_tsx__PricingSettingsFormModal["PricingSettingsFormModal"]
     PricingSettingsFormModal_tsx__buildPricingSettingsSchema["buildPricingSettingsSchema"]
+    PricingSettingsFormModal_tsx__fieldError["fieldError"]
+    PricingSettingsFormModal_tsx__focusFirstInvalid["focusFirstInvalid"]
     PricingSettingsFormModal_tsx__handleClose["handleClose"]
     PricingSettingsFormModal_tsx__handleOpenChange["handleOpenChange"]
     PricingSettingsFormModal_tsx__onSubmit["onSubmit"]
     PricingSettingsFormModal_tsx__toggleCurrency["toggleCurrency"]
     PricingSettingsFormModal_tsx__PricingSettingsFormModal --> PricingSettingsFormModal_tsx__buildPricingSettingsSchema
     PricingSettingsFormModal_tsx__PricingSettingsFormModal --> PricingSettingsFormModal_tsx__toggleCurrency
+    PricingSettingsFormModal_tsx__PricingSettingsFormModal --> PricingSettingsFormModal_tsx__fieldError
     PricingSettingsFormModal_tsx__PricingSettingsFormModal --> PricingSettingsFormModal_tsx__handleClose
 ```
 
@@ -216,7 +252,10 @@ graph TD
 
   file: src\components\admin\pricing\PricingSettingsFormModal.tsx
   function: src\components\admin\pricing\PricingSettingsFormModal.tsx::buildPricingSettingsSchema
+  function: src\components\admin\pricing\PricingSettingsFormModal.tsx::FieldError
+  function: src\components\admin\pricing\PricingSettingsFormModal.tsx::focusFirstInvalid
   function: src\components\admin\pricing\PricingSettingsFormModal.tsx::PricingSettingsFormModal
+  function: src\components\admin\pricing\PricingSettingsFormModal.tsx::fieldError
   function: src\components\admin\pricing\PricingSettingsFormModal.tsx::handleClose
   function: src\components\admin\pricing\PricingSettingsFormModal.tsx::handleOpenChange
   function: src\components\admin\pricing\PricingSettingsFormModal.tsx::toggleCurrency
@@ -226,11 +265,13 @@ graph TD
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: DEFAULT_PRICING_SETTINGS
+  export: FieldError
   export: PRICING_CURRENCY_OPTIONS
   export: PricingCurrencyCode
   export: PricingSettingsFormModal
   export: PricingSettingsValues
   export: buildPricingSettingsSchema
+  export: focusFirstInvalid
   export: pricingSettingsSchema
 
 ---
@@ -244,7 +285,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-cyan-400/10`, `bg-slate-950/40`, `bg-surface-deep`, `bg-transparent`, `bg-white/2`, `border-b`, `border-cyan-400/20`, `border-cyan-400/30`, `border-t`, `border-white/10`, `border-white/5`, `group-hover:text-cyan-400`, `hover:bg-white/10`, `hover:border-white/10`
-- **Layout:** `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-4`, `h-5`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-bg`, `bg-admin-surface-2`, `bg-black/60`, `bg-transparent`, `border-admin-accent/30`, `border-admin-border`, `border-b`, `border-t`, `group-hover:text-admin-accent`, `hover:bg-admin-surface-3`, `hover:border-admin-border`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-danger`
+- **Layout:** `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-4`, `h-5`, `items-center`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminButtonPrimaryClass`, `${disabled`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `animate-spin`, `border`, `checked`, `cursor-not-allowed`, `cursor-pointer`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`, `group`
+- **Yardımcı Sınıflar:** `!border-admin-danger`, `$`, `${adminButtonPrimaryClass`, `${adminInputClass}${fieldError('default_charm_ending`, `${adminInputClass}${fieldError('default_round_to`, `${adminInputClass}${fieldError('default_vat_rate_pct`, `${adminInputClass}${fieldError('display_spread_pct`, `${disabled`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `animate-spin`, `border`, `checked`, `cursor-not-allowed`

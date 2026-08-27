@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavSecondaryRail.tsx
-skeleton_hash: cc95f594826a9731
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavSecondaryRail.tsx
+skeleton_hash: 28e51b34feeeadf5
 entity_hashes:
   func:getIconForId: 81e46f9f714fe65d
   overview: 6f5924a947fecbc3
   style_tokens: 9b60048869298a29
-generated_at: 2026-06-19T20:47:10Z
+generated_at: 2026-08-27T08:33:33Z
 ---
 
 ## Genel Bakış

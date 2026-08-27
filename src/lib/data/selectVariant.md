@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\data\selectVariant.ts
-skeleton_hash: 6ccfa44bfd139a48
+source_path: C:\tmp\ops-t165\src\lib\data\selectVariant.ts
+skeleton_hash: de4e8dbc69aa2b11
 entity_hashes:
   func:selectVariant: ac5f2e14be230ef9
   overview: de5b89a98f0e8505
-generated_at: 2026-08-25T08:44:09Z
+generated_at: 2026-08-27T06:57:30Z
 ---
 
 ## Genel Bakış

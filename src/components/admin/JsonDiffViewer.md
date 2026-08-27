@@ -2,32 +2,34 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\JsonDiffViewer.tsx
-skeleton_hash: bb6a751ee807919b
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\JsonDiffViewer.tsx
+skeleton_hash: 30b2fcda71cda919
 entity_hashes:
   func:JsonDiffViewer: 00fa2648afca347e
   func:safeStringify: 9ba27221b507c072
-  overview: 2279b25945479824
-  style_tokens: 6a22f095496c6ef9
-generated_at: 2026-05-28T22:35:36Z
+  overview: a686cb82b4e79c82
+  style_tokens: 447f0cef72f1a3d8
+generated_at: 2026-08-27T08:07:05Z
 ---
 
 ## Genel Bakış
-`JsonDiffViewer` bileşeni, iki JSON nesnesi (`before` ve `after`) arasındaki farkları görsel olarak gösteren bir React arayüzü sunar. Bu işlemi destekleyen `safeStringify` yardımcı fonksiyonu, nesneleri güvenli bir şekilde stringe dönüştürerek görüntüleme sırasında oluşabilecek hataları önler.
+`JsonDiffViewer` bileşeni, iki JSON nesnesi arasındaki farkları görsel olarak kullanıcıya sunan bir React arayüzüdür. Bileşen, `before` ve `after` adlı iki prop alır ve bu veriler arasındaki değişiklikleri görüntüler. Görüntüleme sırasında oluşabilecek hataları önlemek üzere `safeStringify` yardımcı fonksiyonu kullanılır.
 
 ## Fonksiyon Grupları
 ### UI Rendering
-Kullanıcı arayüzünü oluşturur ve JSON farklarını ağaç veya liste formatında görselleştirir.  
+Kullanıcı arayüzünü oluşturur ve JSON farklarını görselleştirir. `before` ve `after` prop'larını alarak bir React fonksiyonel bileşeni döndürür.
 - JsonDiffViewer
 
 ### Yardımcı / Utility
-Veri işleme ve güvenli string dönüşümünü sağlar; UI bileşeni tarafından kullanılır.  
+Veri işleme ve güvenli string dönüşümünü sağlar; UI bileşeni tarafından kullanılmak üzere tasarlanmıştır. `unknown` tipindeki değerleri güvenli biçimde stringe dönüştürür.
 - safeStringify
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -50,6 +52,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: react::React
+
+---
+
 ## INTERFACES
 
 ### JsonDiffViewerProps
@@ -60,31 +68,32 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\JsonDiffViewer.tsx::JsonDiffViewer
-- **params**: before, after
+### [N1_NASIL] AST Pointer: src/components/admin/JsonDiffViewer.tsx::JsonDiffViewer
+- **params**: `before`, `after`
 - **ic_degiskenler**:
-  - `bObj` — normalleştirilmiş *before* nesnesi; `before` bir obje ve null değilse onu `Record<string, unknown>` olarak alır, aksi takdirde boş obje `{}`.
-  - `aObj` — normalleştirilmiş *after* nesnesi; `after` bir obje ve null değilse onu `Record<string, unknown>` olarak alır, aksi takdirde boş obje `{}`.
-  - `allKeys` — `bObj` ve `aObj` anahtarlarının birleşiminden oluşan, tekrarlanmamış ve alfabetik olarak sıralanmış dizi.
-  - `safeStringify` — bir değeri ekranda gösterilecek string hâline dönüştürücü yardımcı fonksiyon; `undefined`/`null` → `'null'`, string → `"${val}"`, obje → `JSON.stringify(val)`, diğer türler → `String(val)`.
-- **Dönüş**: JSX elementi (React bileşeninin render çıktısı)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('admin.common.oldValueBefore')`, `t('admin.common.newValueAfter')`, `t('admin.common.added')`, `t('admin.common.deleted')`, `t('admin.common.noChangeDetails')` çağrılarıyla kullanılır
+  - `bObj` — `before` parametresi object ve null değilse `before as Record<string, unknown>`, aksi halde boş obje `{}` olarak atanır
+  - `aObj` — `after` parametresi object ve null değilse `after as Record<string, unknown>`, aksi halde boş obje `{}` olarak atanır
+  - `allKeys` — `bObj` ve `aObj` key'lerinin birleşimi (`new Set` ile tekrarlar kaldırılır), alfabetik sıralanır
+  - `safeStringify` — iç fonksiyon; `val` parametresini güvenli şekilde string'e dönüştürür (null/undefined → `'null'`, string → tırnak içinde, object → `JSON.stringify`, diğer → `String`)
+- **Dönüş**: JSX element — iki sütunlu (önceki/sonraki değer) diff görünümü; `allKeys` üzerinde `.map()` ile her key için satır oluşturulur, key yoksa "değişiklik yok" mesajı gösterilir
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\JsonDiffViewer.tsx::safeStringify
-- **params**: val
-- **ic_degiskenler**: (yok)
-- **Dönüş**: string
+### [N2_NASIL] AST Pointer: src/components/admin/JsonDiffViewer.tsx::safeStringify
+- **params**: `val` (unknown)
+- **ic_degiskenler**: yok
+- **Dönüş**: string — `val` undefined veya null ise `'null'`, string ise `"${val}"` (tırnak içinde), object ise `JSON.stringify(val)`, diğer durumlarda `String(val)`
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\JsonDiffViewer.tsx::map callback (key => { … })
-- **params**: key
+### [N3_NASIL] AST Pointer: src/components/admin/JsonDiffViewer.tsx::allKeys.map callback
+- **params**: `key`
 - **ic_degiskenler**:
-  - `valB` — `bObj` nesnesindeki mevcut `key` değeri (tanımsız olabilir).
-  - `valA` — `aObj` nesnesindeki mevcut `key` değeri (tanımsız olabilir).
-  - `strB` — `valB` değerinin `safeStringify` ile elde edilen string temsili.
-  - `strA` — `valA` değerinin `safeStringify` ile elde edilen string temsili.
-  - `isRemoved` — `true` ise `key` yalnızca `before` içinde var, `after` içinde yoktur (silindi).
-  - `isAdded` — `true` ise `key` yalnızca `after` içinde var, `before` içinde yoktur (eklendi).
-  - `isChanged` — `true` ise `key` her iki nesnede de var fakat `strB` ve `strA` farklıdır (değiştirildi).
-- **Dönüş**: JSX elementi (her satır için render edilen `<div>`)
+  - `valB` — `bObj[key]` değeri; önceki (before) nesnede bu key'e karşılık gelen değer
+  - `valA` — `aObj[key]` değeri; sonraki (after) nesnede bu key'e karşılık gelen değer
+  - `strB` — `safeStringify(valB)` sonucu; `valB`'nin string gösterimi
+  - `strA` — `safeStringify(valA)` sonucu; `valA`'nın string gösterimi
+  - `isRemoved` — `valB !== undefined && valA === undefined` koşulu; key'in sonraki nesneden silinip silinmediğini belirtir
+  - `isAdded` — `valB === undefined && valA !== undefined` koşulu; key'in sonraki nesneye eklenip eklenmediğini belirtir
+  - `isChanged` — `!isRemoved && !isAdded && strB !== strA` koşulu; key'in değerinin değişip değişmediğini belirtir
+- **Dönüş**: JSX element — değişiklik yoksa gri renkli iki sütunda aynı değer gösterilir; silinmişse before sütunu kırmızı arka planlı ve "silindi" etiketli, eklenmişse before sütunu gri arka planlı ve "eklendi" etiketli, değişmişse before kırmızı/after yeşil arka planlı gösterilir
 
 ---
 
@@ -110,7 +119,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-500`, `bg-emerald-500/10`, `bg-rose-500`, `bg-rose-500/10`, `bg-slate-800/30`, `bg-slate-800/80`, `bg-slate-900`, `border-b`, `border-r`, `border-slate-700`, `border-slate-800`, `hover:bg-slate-800/50`, `text-center`, `text-emerald-300`, `text-rose-300`
-- **Layout:** `flex`, `flex-1`, `gap-2`, `h-2`, `items-center`, `max-h-400px`, `overflow-hidden`, `overflow-x-auto`, `p-3`, `shadow-xl`, `w-2`, `w-full`
+- **Renkler:** `bg-admin-danger`, `bg-admin-danger-weak`, `bg-admin-success`, `bg-admin-success-weak`, `bg-admin-surface-2`, `bg-admin-surface-3`, `border-admin-border`, `border-b`, `border-r`, `hover:bg-admin-surface-2`, `text-admin-danger`, `text-admin-fg-muted`, `text-admin-fg-subtle`, `text-admin-success`, `text-center`
+- **Layout:** `flex`, `flex-1`, `gap-2`, `h-2`, `items-center`, `max-h-400px`, `overflow-hidden`, `overflow-x-auto`, `p-3`, `w-2`, `w-full`
 - **Varyant/Responsive:** `:`, `hover:` önekleri
 - **Yardımcı Sınıflar:** `${isAdded`, `${isRemoved`, `:`, `border`, `font-mono`, `font-semibold`, `isAdded`, `isChanged`, `isRemoved`, `italic`, `leading-relaxed`, `mr-2`, `opacity-70`, `px-2`, `py-1`

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\AdminProductsPage.tsx
-skeleton_hash: 932e1a5d4d27d29f
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminProductsPage.tsx
+skeleton_hash: 6756b19a85912667
 entity_hashes:
   func:AdminProductsPage: c722f6b673f81dbe
   overview: 20b1fe71a28f1bf8
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-08-25T07:29:54Z
+generated_at: 2026-08-27T07:20:46Z
 ---
 
 ## Genel Bakış
@@ -69,8 +69,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: AdminProductsPage.tsx
-  function: AdminProductsPage.tsx::AdminProductsPage
+  file: src\views\admin\AdminProductsPage.tsx
+  function: src\views\admin\AdminProductsPage.tsx::AdminProductsPage
 
 ---
 

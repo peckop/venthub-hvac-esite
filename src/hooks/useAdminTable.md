@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useAdminTable.ts
-skeleton_hash: a2b6367142b8d73f
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useAdminTable.ts
+skeleton_hash: 4e8d6a80bcb5f74c
 entity_hashes:
   func:defaultCompare: 97ad9135d8ab982a
   func:getCell: 732b1ce10a743e82
@@ -12,7 +12,7 @@ entity_hashes:
   func:parseSortParam: 0925c7aec25db78a
   func:useAdminTable: c94594605f044df4
   overview: 4718da8f76c0c8f1
-generated_at: 2026-08-25T07:27:21Z
+generated_at: 2026-08-27T08:34:16Z
 ---
 
 ## Genel Bakış
@@ -295,22 +295,22 @@ graph TD
     useAdminTable_ts__parseFiltersFromParams["parseFiltersFromParams"]
     useAdminTable_ts__parseSortParam["parseSortParam"]
     useAdminTable_ts__useAdminTable["useAdminTable"]
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__defaultCompare
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__matchesQuery
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseSortParam
     useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseFiltersFromParams
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseSortParam
     useAdminTable_ts__useAdminTable --> useAdminTable_ts__getCell
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__matchesQuery
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__defaultCompare
 ```
 
 ## NODE ID STANDARD
 
-  file: useAdminTable.ts
-  function: useAdminTable.ts::getCell
-  function: useAdminTable.ts::defaultCompare
-  function: useAdminTable.ts::matchesQuery
-  function: useAdminTable.ts::parseSortParam
-  function: useAdminTable.ts::parseFiltersFromParams
-  function: useAdminTable.ts::useAdminTable
+  file: src\hooks\useAdminTable.ts
+  function: src\hooks\useAdminTable.ts::getCell
+  function: src\hooks\useAdminTable.ts::defaultCompare
+  function: src\hooks\useAdminTable.ts::matchesQuery
+  function: src\hooks\useAdminTable.ts::parseSortParam
+  function: src\hooks\useAdminTable.ts::parseFiltersFromParams
+  function: src\hooks\useAdminTable.ts::useAdminTable
 
 ---
 

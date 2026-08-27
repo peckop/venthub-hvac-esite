@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\supabase\server.ts
-skeleton_hash: f4e30b8090c51d71
+source_path: C:\tmp\ops-t165\src\lib\supabase\server.ts
+skeleton_hash: ab267eb484a0c7c2
 entity_hashes:
-  func:createSupabaseServerClient: e1abcfb101f22d63
+  func:createSupabaseServerClient: f9a15c72a61b3af3
   overview: 32f6efa96dd36ed3
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-27T07:08:05Z
 ---
 
 ## Genel Bakış
@@ -30,16 +30,14 @@ Supabase sunucu istemcisi oluşturma modülü için temel mimari varsayımlar:
 ## FONKSİYON DETAYLARI
 
 ### createSupabaseServerClient
+**Ne yapar**: Sunucu tarafında çalışan bir Supabase istemcisi oluşturur. Cookie tabanlı oturum yönetimini yapılandırarak Next.js sunucu ortamında Supabase veritabanı bağlantısı sağlar.
 
-**Ne yapar**: Bu fonksiyon, sunucu tarafında (Next.js App Router ortamında) çalışacak şekilde yapılandırılmış bir Supabase istemcisi oluşturur. Temel amacı, kullanıcı oturumunu ve ilgili cookie'leri yönetebilen bir veritabanı bağlantısı sağlamaktır.
-
-**Nasıl yapar**: Fonksiyon, asenkron olarak mevcut istekle ilişkili cookie mağazasını (`cookies()`) alır. Ardından, ortam değişkenlerinden (`NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY`) Supabase bağlantısı için gerekli URL ve anahtarı okur; bu değerler tanımlı değilse bir yer tutucu değer kullanır. Son olarak, `createServerClient` fonksiyonunu çağırarak, cookie'leri okma (`getAll`) ve ayarlama (`setAll`) yeteneklerine sahip bir Supabase istemcisi nesnesi döndürür. `setAll` metodundaki `try-catch` bloğu, cookie ayarlama işleminin başarısız olabileceği durumları (örneğin, istek gövdesinin salt okunur olduğu durumları) sessizce işler.
+**Nasıl yapar**: Fonksiyon önce `cookies()` fonksiyonunu çağırarak cookie deposunu elde eder. Ardından ortam değişkenlerinden `NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY` değerlerini okur; bu değişkenler tanımlı değilse `'https://placeholder.supabase.co'` ve `'placeholder-key'` gibi placeholder değerler kullanır. Son olarak `createServerClient<Database>` fonksiyonunu çağırarak istemciyi döndürür. Bu çağrıda cookie yönetimi için iki metot tanımlanır: `getAll()` mevcut tüm cookie'leri okurken, `setAll()` yeni cookie'leri yazmaya çalışır. `setAll` içindeki `try-catch` bloğu, cookie yazma işleminde oluşan hataları yakalar ve yoksayar; kod yorumuna göre bu durumda middleware'in refresh işlemini üstlenmesi beklenir.
 
 **Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz.
+- Fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**:
-Fonksiyon, `SupabaseClient<Database>` tipinde bir nesne döndürür. Bu nesne, sunucu tarafında veritabanı sorguları yapmak ve kullanıcı oturumunu yönetmek için kullanılır.
+**Dönüş**: `createServerClient<Database>` fonksiyonunun dönüş değeri olan Supabase sunucu istemcisini döndürür. Kesin dönüş tipi belirtilmemiştir.
 
 ---
 
@@ -55,14 +53,17 @@ Fonksiyon, `SupabaseClient<Database>` tipinde bir nesne döndürür. Bu nesne, s
 ### [N1_NASIL] AST Pointer: src/lib/supabase/server.ts::createSupabaseServerClient
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `cookieStore` — Next.js cookies() API'sinden dönen cookie depolama nesnesi; tarayıcı çerezlerine okuma/yazma yapmak için kullanılır
-  - `SUPABASE_URL` — `process.env.NEXT_PUBLIC_SUPABASE_URL` ortam değişkeninden okunan Supabase proje URL'i; yoksa `'https://placeholder.supabase.co'` fallback değeri kullanılır
-  - `SUPABASE_ANON_KEY` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` ortam değişkeninden okunan Supabase anonim anahtarı; yoksa `'placeholder-key'` fallback değeri kullanılır
-  - `cookiesToSet` — `setAll` iç fonksiyonunun parametresi; ayarlanması istenen çerezlerin dizisi
-  - `name` — `cookiesToSet` içindeki her bir çerezin adı; `cookieStore.set()` çağrısında kullanılır
-  - `value` — `cookiesToSet` içindeki her bir çerezin değeri; `cookieStore.set()` çağrısında kullanılır
-  - `options` — `cookiesToSet` içindeki her bir çerezin seçenekleri (path, maxAge, httpOnly vb.); `cookieStore.set()` çağrısında kullanılır
-- **Dönüş**: `Database` tipi ile tiplemiş `createServerClient<Database>` çağısının döndürdüğü Supabase sunucu istemcisi (ServerClient<Database>); cookie getAll/setAll adapter'ı bağlanmış halde
+  - `cookieStore` — `await cookies()` ile elde edilen Next.js cookie store nesnesi; `getAll()` ve `set()` metodlarını sağlar
+  - `SUPABASE_URL` — `process.env.NEXT_PUBLIC_SUPABASE_URL` ortam değişkeni; tanımlı değilse `'https://placeholder.supabase.co'` varsayılan değerini alır
+  - `SUPABASE_ANON_KEY` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` ortam değişkeni; tanımlı değilse `'placeholder-key'` varsayılan değerini alır
+  - `cookies` — `createServerClient`'a iletilen yapılandırma nesnesi içindeki alt obje; `getAll` ve `setAll` metodlarını tanımlar
+  - `getAll()` — `cookieStore.getAll()` çağırarak tüm çerezleri döndüren anonim fonksiyon
+  - `setAll(cookiesToSet)` — verilen çerez dizisini `cookieStore.set()` ile ayarlayan anonim fonksiyon; hata fırlatılırsa yoksayar (middleware'in yenilemeyi üstlenebileceği varsayımıyla)
+  - `cookiesToSet` — `setAll` fonksiyonuna gelen parametre; her elemanı `{ name, value, options }` alanlarına sahip nesnelerden oluşan dizi
+  - `name` — `cookiesToSet` elemanlarından destructuring ile elde edilen çerez adı
+  - `value` — `cookiesToSet` elemanlarından destructuring ile elde edilen çerez değeri
+  - `options` — `cookiesToSet` elemanlarından destructuring ile elde edilen çerez seçenekleri nesnesi
+- **Dönüş**: `createServerClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, { cookies })` çağrısının dönüşü — `Database` tipi ile genericlenmiş Supabase sunucu istemcisi
 
 ---
 

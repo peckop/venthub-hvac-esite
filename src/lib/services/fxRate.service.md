@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\fxRate.service.ts
-skeleton_hash: cefa55c85cf35b82
+source_path: C:\tmp\ops-t165\src\lib\services\fxRate.service.ts
+skeleton_hash: 39b81c1648946073
 entity_hashes:
   func:resolveFxRate: 75857a7dfc6e1eea
   overview: 6908f8f6ffdccdd7
-generated_at: 2026-08-25T08:44:34Z
+generated_at: 2026-08-27T07:00:09Z
 ---
 
 ## Genel Bakış
@@ -29,10 +29,6 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca imzadan çık
 [Aksiyom 2]: Eğer `quoteCcy` parametresi tanımlanmamış veya geçersiz bir para birimi kodu ise, fonksiyon null dönebilir (dönüş tipi `FxRateResult | null` olarak tanımlıdır).
 
 [Aksiyom 3]: Eğer `today` parametresi tanımlanmamış veya geçersiz bir tarih formatı ise, fonksiyon null dönebilir.
-
----
-
-**Not:** Fonksiyon gövdesi (implementation) sağlanmadığından, bu aksiyomlar yalnızca imzadan çıkarılan varsayımlardır. Gövdedeki iş mantığı, veritabanı sorguları, hata yönetimi ve eşik değerleri gibi detaylı mimari varsayımlar için kaynak kodun kendisi gereklidir.
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx
-skeleton_hash: 728012497673d860
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminOrdersPage.tsx
+skeleton_hash: 80374e33b45796ac
 entity_hashes:
   func:AdminOrdersPage: e43c6c3c6f2a0c99
   overview: cd2f2af45ddb107c
-  style_tokens: cfe5ac8098e12bb2
-generated_at: 2026-06-19T20:48:58Z
+  style_tokens: 3c1b71aa89e552d3
+generated_at: 2026-08-27T07:19:44Z
 ---
 
 ## Genel Bakış
@@ -119,10 +119,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `shadow-glow-md`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `border-white/5`, `hover:bg-white/5`, `hover:text-white`, `text-slate-400`, `text-surface-deep`, `text-xs`
-- **Layout:** `flex`, `flex-col`, `gap-1`, `gap-2`, `gap-6`, `h-full`, `items-center`, `justify-between`, `md:flex-row`, `md:items-center`, `p-1`, `shadow-2xl`
+- **Renkler:** `bg-admin-accent`, `bg-admin-surface`, `border-admin-border`, `hover:bg-admin-surface-2`, `hover:text-admin-fg`, `text-admin-accent-fg`, `text-admin-fg-muted`, `text-xs`
+- **Layout:** `flex`, `flex-col`, `gap-1`, `gap-2`, `gap-6`, `h-full`, `items-center`, `justify-between`, `md:flex-row`, `md:items-center`, `p-1`, `shadow-admin-lg`
 - **Varyant/Responsive:** `:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `$`, `:`, `===`, `board`, `border`, `duration-500`, `font-black`, `glass-strong`, `list`, `pb-2`, `pb-20`, `px-6`, `py-2.5`, `rounded-2xl`, `rounded-xl`
+- **Yardımcı Sınıflar:** `$`, `:`, `===`, `board`, `border`, `duration-500`, `font-semibold`, `list`, `pb-2`, `pb-20`, `px-6`, `py-2.5`, `rounded-admin-lg`, `rounded-admin-md`, `shrink-0`

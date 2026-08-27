@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\RevealSection.tsx
-skeleton_hash: f1c38d93e81e4119
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\RevealSection.tsx
+skeleton_hash: adb89985c5ec2236
 entity_hashes:
   func:RevealSection: ba33115191e442f1
   overview: 83509008900591e6
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T08:27:34Z
 ---
 
 ## Genel Bakış

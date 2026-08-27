@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\analytics.ts
-skeleton_hash: 3c46058e15fdcdf5
+source_path: C:\tmp\vh-altyapi-t165\src\utils\analytics.ts
+skeleton_hash: 2744449f19164fdb
 entity_hashes:
   func:trackEvent: 561450afbdac10ee
   overview: 34daeb673bd862b6
-generated_at: 2026-08-25T07:28:51Z
+generated_at: 2026-08-27T08:37:13Z
 ---
 
 ## Genel Bakış
@@ -78,8 +78,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: analytics.ts
-  function: analytics.ts::trackEvent
+  file: src\utils\analytics.ts
+  function: src\utils\analytics.ts::trackEvent
 
 ---
 

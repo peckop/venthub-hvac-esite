@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\HomePage.tsx
-skeleton_hash: db7856abd6c3d51b
+source_path: C:\tmp\venthub-wt-t131\src\views\HomePage.tsx
+skeleton_hash: 6f4e642dc8c1fb54
 entity_hashes:
   func:HomePage: 942e6678a2c90194
   overview: c60416d7c16e0ad1
   style_tokens: 481a957f2fef5bcd
-generated_at: 2026-08-25T07:29:22Z
+generated_at: 2026-08-27T07:09:01Z
 ---
 
 ## Genel Bakış
@@ -104,8 +104,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzası
 
 ## NODE ID STANDARD
 
-  file: HomePage.tsx
-  function: HomePage.tsx::HomePage
+  file: src\views\HomePage.tsx
+  function: src\views\HomePage.tsx::HomePage
 
 ---
 

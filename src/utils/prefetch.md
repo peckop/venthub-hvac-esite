@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\prefetch.ts
-skeleton_hash: d4a29652d269dd10
+source_path: C:\tmp\vh-altyapi-t165\src\utils\prefetch.ts
+skeleton_hash: c107e961eb5bc507
 entity_hashes:
   func:prefetchProductsPage: 1087d9febfcd8d00
   overview: d39d9fa31cbd8eda
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:52Z
 ---
 
 ## Genel Bakış

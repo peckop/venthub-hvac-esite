@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\whatsapp.ts
-skeleton_hash: 4278eead10d35e83
+source_path: C:\tmp\vh-altyapi-t165\src\utils\whatsapp.ts
+skeleton_hash: beaad6bb00740cd0
 entity_hashes:
   func:createWhatsAppLink: 48e63882e6e926f6
   func:formatPhoneNumber: d061dc961d242dd9
@@ -18,7 +18,7 @@ entity_hashes:
   func:isWhatsAppAvailable: 424fa5ec202a97c6
   func:msg: 33516e409efa62f9
   overview: c6b7df78706dfc37
-generated_at: 2026-08-25T07:29:39Z
+generated_at: 2026-08-27T08:40:08Z
 ---
 
 ## Genel Bakış
@@ -227,35 +227,35 @@ graph TD
     whatsapp_ts__getWhatsAppNumber["getWhatsAppNumber"]
     whatsapp_ts__isWhatsAppAvailable["isWhatsAppAvailable"]
     whatsapp_ts__msg["msg"]
-    whatsapp_ts__getSupportLink --> whatsapp_ts__createWhatsAppLink
+    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__generateStockInquiryMessage
+    whatsapp_ts__getSupportLink --> whatsapp_ts__getWhatsAppNumber
     whatsapp_ts__generateTechnicalQuoteMessage --> whatsapp_ts__msg
     whatsapp_ts__getSupportLink --> whatsapp_ts__generateSupportMessage
-    whatsapp_ts__generateFAQSupportMessage --> whatsapp_ts__msg
+    whatsapp_ts__getSupportLink --> whatsapp_ts__createWhatsAppLink
     whatsapp_ts__generateSupportMessage --> whatsapp_ts__msg
+    whatsapp_ts__generateStockInquiryMessage --> whatsapp_ts__msg
     whatsapp_ts__getStockInquiryLink --> whatsapp_ts__getWhatsAppNumber
     whatsapp_ts__getStockInquiryLink --> whatsapp_ts__createWhatsAppLink
-    whatsapp_ts__generateStockInquiryMessage --> whatsapp_ts__msg
     whatsapp_ts__isWhatsAppAvailable --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__generateFAQSupportMessage --> whatsapp_ts__msg
     whatsapp_ts__generateContactMessage --> whatsapp_ts__msg
-    whatsapp_ts__getSupportLink --> whatsapp_ts__getWhatsAppNumber
-    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__generateStockInquiryMessage
 ```
 
 ## NODE ID STANDARD
 
-  file: whatsapp.ts
-  function: whatsapp.ts::msg
-  function: whatsapp.ts::getWhatsAppNumber
-  function: whatsapp.ts::formatPhoneNumber
-  function: whatsapp.ts::createWhatsAppLink
-  function: whatsapp.ts::generateStockInquiryMessage
-  function: whatsapp.ts::generateSupportMessage
-  function: whatsapp.ts::generateTechnicalQuoteMessage
-  function: whatsapp.ts::generateFAQSupportMessage
-  function: whatsapp.ts::generateContactMessage
-  function: whatsapp.ts::isWhatsAppAvailable
-  function: whatsapp.ts::getStockInquiryLink
-  function: whatsapp.ts::getSupportLink
+  file: src\utils\whatsapp.ts
+  function: src\utils\whatsapp.ts::msg
+  function: src\utils\whatsapp.ts::getWhatsAppNumber
+  function: src\utils\whatsapp.ts::formatPhoneNumber
+  function: src\utils\whatsapp.ts::createWhatsAppLink
+  function: src\utils\whatsapp.ts::generateStockInquiryMessage
+  function: src\utils\whatsapp.ts::generateSupportMessage
+  function: src\utils\whatsapp.ts::generateTechnicalQuoteMessage
+  function: src\utils\whatsapp.ts::generateFAQSupportMessage
+  function: src\utils\whatsapp.ts::generateContactMessage
+  function: src\utils\whatsapp.ts::isWhatsAppAvailable
+  function: src\utils\whatsapp.ts::getStockInquiryLink
+  function: src\utils\whatsapp.ts::getSupportLink
 
 ---
 

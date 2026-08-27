@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\categoryHelpers.ts
-skeleton_hash: 50ceaf47f8f33ac7
+source_path: C:\tmp\vh-altyapi-t165\src\utils\categoryHelpers.ts
+skeleton_hash: 3d1332325a36cbfc
 entity_hashes:
   func:getCategoryDescription: 59a2fb71a2f4949e
   func:getCategoryDisplayName: 403835a175ba4a6a
@@ -11,7 +11,7 @@ entity_hashes:
   func:getLocalizedCategorySlug: 80277bf91f91aa17
   func:parsePriceToNumber: 42be44b6c84206bc
   overview: bd07bebb31813743
-generated_at: 2026-08-25T07:37:32Z
+generated_at: 2026-08-27T08:37:51Z
 ---
 
 ## Genel Bakış
@@ -160,12 +160,12 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: categoryHelpers.ts
-  function: categoryHelpers.ts::getCategoryDisplayName
-  function: categoryHelpers.ts::getLocalizedCategorySlug
-  function: categoryHelpers.ts::getCategoryMarketingTitle
-  function: categoryHelpers.ts::getCategoryDescription
-  function: categoryHelpers.ts::parsePriceToNumber
+  file: src\utils\categoryHelpers.ts
+  function: src\utils\categoryHelpers.ts::getCategoryDisplayName
+  function: src\utils\categoryHelpers.ts::getLocalizedCategorySlug
+  function: src\utils\categoryHelpers.ts::getCategoryMarketingTitle
+  function: src\utils\categoryHelpers.ts::getCategoryDescription
+  function: src\utils\categoryHelpers.ts::parsePriceToNumber
 
 ---
 

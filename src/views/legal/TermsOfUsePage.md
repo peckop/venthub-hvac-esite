@@ -2,41 +2,41 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\TermsOfUsePage.tsx
-skeleton_hash: 030d91eb108c27ac
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\TermsOfUsePage.tsx
+skeleton_hash: 557194aebc9e8cb9
 entity_hashes:
   func:TermsOfUsePage: c46efeb3b2b3ab6b
-  func:t: 429ceff97c59b722
-  overview: 83f5e8529a5aed52
+  func:t: 4865c1bb87148feb
+  overview: 1eca5015b00de8ab
   style_tokens: 06829f9d93bd4397
-generated_at: 2026-06-19T20:51:45Z
+generated_at: 2026-08-27T07:36:08Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun Kullanım Şartları sayfasını oluşturan temel React bileşenini barındırır. Ziyaretçilerin platformun kullanım kurallarını ve yasal şartlarını okuyabileceği resmi bir sayfa sunar ve dil desteği sağlayarak farklı kullanıcılar için içerik gösterir.
+
+Bu modül, VentHub HVAC platformunun Kullanım Şartları sayfasını oluşturan bir React bileşenidir. Sayfa, ziyaretçilere platformun kullanım kurallarını ve yasal şartlarını sunar. Dil desteği sağlanarak farklı dillerde içerik gösterimi amaçlanır; bu amaçla `lang` prop'u üzerinden bir çeviri yardımcısı kullanılır.
 
 ## Fonksiyon Grupları
+
 ### Sayfa Bileşeni
-Modülün ana gövdesini oluşturur, Kullanım Şartları sayfasının tüm yapısını ve yasal metinleri render eder.
+Modülün ana gövdesini oluşturur; Kullanım Şartları sayfasının yapısını ve yasal metinleri render eder. `lang` prop'unu alarak dil bağlamını belirler ve çeviri fonksiyonunu çalıştırır.
 - TermsOfUsePage
 
 ### Çeviri Yardımcısı
-Sayfa içindeki metinlerin farklı dillere göre çevrilmesini yönetir ve dil yapılandırmasına bağlı olarak uygun içeriği sağlar.
+Sayfa içindeki metinlerin ilgili dile göre çevrilmesini sağlar. Verilen bir anahtar karşılığında uygun dildeki içeriği döndürür.
 - t
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için tanımlanan mimari varsayımlar aşağıdadır:
+Bu modül için fonksiyon gövdeleri verilmediğinden, davranışsal aksiyom üretilememektedir.
 
-**[Aksiyom 1]**: Eğer `lang` prop'u çağrılmazsa (yani `undefined` veya verilmezse), `t()` çeviri fonksiyonu geçerli bir dil bağlamı bulamaz ve sayfa içerikleri doğru dille render edilmez.
+[Aksiyom 1]: Eğer `lang` prop'u sağlanmazsa, sonucun ne olacağı bilinmiyor; fonksiyon gövdesinde default değer tanımı görünmemektedir.
 
-**[Aksiyom 2]**: Eğer `t()` çeviri fonksiyonu modül kapsaminda erişilebilir değilse (örn. imports/excope alınamamışsa), Kullanım Şartları sayfasındaki hiçbir metin anahtarı çözülemez ve sayfa boş veya hata içerikli render edilir.
+[Aksiyom 2]: Eğer `t` fonksiyonuna geçersiz bir `key` verilirse, sonucun ne olacağı bilinmiyor; fonksiyon gövdesi verilmemiştir.
 
-**[Aksiyom 3]**: Eğer `lang` geçerli bir dil kodu değilse (örn. `"tr"`, `"en"` gibi tanımlı bir değer değilse), `t()` fonksiyonu eşleşen çeviri kümesini bulamaz ve varsayılan/fallback dil içeriği gösterilir veya `undefined` döner.
-
-**[Aksiyom 4]**: Eğer bileşen yasal sayfa rotası altında (örn. `/legal/terms-of-use`) çağrılmazsa, kullanıcının beklediği yasal içerik sayfası sunulmaz ve platformun yasal sorumluluk bildirimleri görüntülenemez.
+[Aksiyom 3]: Eğer dil desteği mekanizması çalışmazsa, sayfanın nasıl davranacağı bilinmiyor; `t` fonksiyonunun fallback davranışı fonksiyon gövdesinden çıkarılamamaktadır.
 
 ---
 
@@ -54,7 +54,15 @@ Bu modül için tanımlanan mimari varsayımlar aşağıdadır:
 **Dönüş**: `React.FC<{ lang: string }>` — Lang prop'u alan bir React fonksiyonel bileşeni döndürür.
 
 ### t
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+**Ne yapar**: Verilen bir anahtar (key) değeri kullanarak, önceden belirlenmiş bir sözlük (dictionary) yapısı içerisinden karşılık gelen çeviri metnini getiren bir çeviri yardımcısı fonksiyonudur. Bileşen içinde yerel olarak tanımlanmış olup, sayfa genelinde metinlerin dile göre dinamik olarak yüklenmesini sağlar.
+
+**Nasıl yapar**: Fonksiyon, kapsayan bileşenin kapsamındaki `dict` değişkenine erişir. Bu `dict` değişkeni, bileşenin aldığı `lang` prop'una bağlı olarak ya `en` ya da `tr` sözlük nesnesine atanmış durumdadır. `t` fonksiyonu çağrıldığında, aldığı `key` parametresini ve mevcut `dict` nesnesini `getDictValue` fonksiyonuna aktararak, ilgili anahtarın sözlükteki karşılığını döndürür. Bu mekanizma sayesinde `lang` prop'u `'en'` olduğunda İngilizce, `'tr'` olduğunda Türkçe metinler elde edilir.
+
+**Parametreler**:
+- `key`: `string` — Sözlükten getirilecek çeviri değerinin anahtarı. Nokta notasyonuyla hiyerarşik erişim sağlayan bir yapıda olabilir (örneğin `'legal.termsTitle'`, `'legal.draftWarning'`, `'legal.disclaimer'` gibi).
+
+**Dönüş**: `getDictValue` fonksiyonunun dönüş tipi kaynak kodda belirtilmemiştir; bu nedenle kesin dönüş tipi bilinmiyor. Kullanım bağlamından, verilen anahtara karşılık gelen çeviri metnini (muhtemelen `string` türünde) döndürdüğü anlaşılmaktadır, ancak bu bir çıkarımdır ve kesin değildir.
 
 ---
 
@@ -64,6 +72,7 @@ Bu modül için tanımlanan mimari varsayımlar aşağıdadır:
 - import: ../../i18n/getDictValue::getDictValue
 - import: ./components/en/TermsOfUseContent::TermsOfUseContentEn
 - import: ./components/tr/TermsOfUseContent::TermsOfUseContentTr
+- import: @/config/legal::isLegalContentReady
 - import: react::React
 
 ---
@@ -71,16 +80,16 @@ Bu modül için tanımlanan mimari varsayımlar aşağıdadır:
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/TermsOfUsePage.tsx::TermsOfUsePage
-- **params**: ({ lang })
+- **params**: `lang` — sayfanın dilini belirten string parametre
 - **ic_degiskenler**:
-  - `dict` — Dil seçimine göre İngilizce veya Türkçe sözlük nesnesini depolar (lang === 'en' ? en : tr)
-  - `t` — Sözlükten değer almak için kullanılan fonksiyon (getDictValue(dict, key) çağrısı yapar)
-- **Dönüş**: JSX elementi (React bileşeni, div, h1 ve conditionally rendered TermsOfUseContentEn/Tr bileşenlerini içerir)
+  - `dict` — `lang` parametresinin değerine göre `en` veya `tr` sözlük nesnesini seçen değişken
+  - `t` — `key` parametresiyle sözlükten değer almak için kullanılan fonksiyon; gövdesi `getDictValue(dict, key)` çağrısını yapar
+- **Dönüş**: JSX elementi — `div` kök elemanı içeren bir React bileşeni
 
 ### [N2_NASIL] AST Pointer: src/views/legal/TermsOfUsePage.tsx::t
-- **params**: (key: string)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `getDictValue(dict, key)` çağrısının dönüş değeri (sözlükten alınan string değer)
+- **params**: `key` — sözlükte aranacak anahtar string
+- **ic_degiskenler**: yok
+- **Dönüş**: `getDictValue(dict, key)` fonksiyonunun dönüş değeri (bilinmiyor)
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\SpotlightHeroOverlay.tsx
-skeleton_hash: c731b7c5e5d0a9b8
+source_path: C:\tmp\vh-altyapi-t165\src\components\SpotlightHeroOverlay.tsx
+skeleton_hash: c382334b89845c89
 entity_hashes:
   func:SpotlightHeroOverlay: 3df6afb4a4a31d8f
   overview: 1f157560c005aa84
   style_tokens: 2d403f9b7fca7034
-generated_at: 2026-06-19T20:47:34Z
+generated_at: 2026-08-27T07:58:31Z
 ---
 
 ## Genel Bakış

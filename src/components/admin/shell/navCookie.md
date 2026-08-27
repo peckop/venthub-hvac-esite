@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\shell\navCookie.ts
-skeleton_hash: b94a2f7431e005bc
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\shell\navCookie.ts
+skeleton_hash: c3900fde97f3abf0
 entity_hashes:
   func:navCookieName: 8a86dcbe310f0bfe
   overview: 0ea1a0c140fc2427
-generated_at: 2026-08-25T07:25:02Z
+generated_at: 2026-08-27T08:23:58Z
 ---
 
 ## Genel Bakış
@@ -59,8 +59,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan çıkarı
 
 ## NODE ID STANDARD
 
-  file: navCookie.ts
-  function: navCookie.ts::navCookieName
+  file: src\components\admin\shell\navCookie.ts
+  function: src\components\admin\shell\navCookie.ts::navCookieName
 
 ---
 

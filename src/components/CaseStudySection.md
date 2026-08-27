@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\CaseStudySection.tsx
-skeleton_hash: 7631420c6a87f664
+source_path: C:\tmp\vh-altyapi-t165\src\components\CaseStudySection.tsx
+skeleton_hash: 26e26545a95fe0c0
 entity_hashes:
   func:CaseStudySection: 30e263b0ef69a0a4
   func:openLead: 3d89ba2774c36aa2
   overview: 5af9581c1e08259f
   style_tokens: de735ee559e96a8f
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-08-27T07:53:07Z
 ---
 
 ## Genel Bakış

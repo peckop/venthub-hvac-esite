@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\passwordSecurity.ts
-skeleton_hash: 4dea2a5498ffe35e
+source_path: C:\tmp\vh-altyapi-t165\src\utils\passwordSecurity.ts
+skeleton_hash: a09c0156948c39c4
 entity_hashes:
   func:hibpPwnedCount: 710f4dd1fd996690
   func:sha1Hex: 0a8c8ae40a0afcf2
   overview: ff989043abdda4b6
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:51Z
 ---
 
 ## Genel Bakış

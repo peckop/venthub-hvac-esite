@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx
-skeleton_hash: 8152ed3568ca718b
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminUsersPage.tsx
+skeleton_hash: 651b76018a8f2f7f
 entity_hashes:
   func:AdminUsersPage: 451e88fd6557b257
-  overview: 5d4f94424fb6fbfb
+  overview: 59fb62326dee9132
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-19T20:49:23Z
+generated_at: 2026-08-27T07:22:46Z
 ---
 
 ## Genel Bakış
@@ -16,26 +16,20 @@ AdminUsersPage, VentHub HVAC yönetici panelinin kullanıcı yönetimi sayfasın
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Kullanıcı yönetimi arayüzünü, veri akışını ve yöneticiye özgü işlevsellikleri tek bir bileşen altında toplar.
+Kullanıcı yönetimi arayüzünü, veri akışını ve yöneticiye özgü işlevsellikleri tek bir bileşen altında toplar. Bileşen parametre almaz; veri ihtiyacı hooks veya bağlam (context) aracılığıyla karşılanır.
 - AdminUsersPage
+
+## Bağımlılıklar ve Mimari Notlar
+- Dış bağımlılıklar: `useAuth`, `useRole` hook'ları ve API servis bağımlılıkları aracılığıyla yetkilendirme ve veri erişimi sağlanır.
+- Rol filtreleme işlevselliği içerir.
+- DataTableKit tabanlı bir arayüz sunar.
+- Bileşen parametre almaz; harici veriye ihtiyaç duyulursa bu veri hooks veya bağlam (context) aracılığıyla temin edilmelidir. Prop aracılığıyla veri sağlanamaz.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi paylaşılmamıştır; dolayısıyla fonksiyon gövdesinden çıkarılabilir mimari varsayım üretilememektedir. Aşağıda yalnızca fonksiyon imzasından (```AdminUsersPage() -> React.FC```) güvenle çıkarılabilecek minimal varsayımlar yer almaktadır.
-
----
-
-**[Aksiyom 1]:** Eğer `AdminUsersPage` bileşeni React dışında bir ortamda (ör. Node.js sunucu tarafı) çağrılacak olursa, React render motoru olmadığından bileşen geçerli bir JSX/React elementi üretemez ve çağrı hata ile sonuçlanır.
-
-**[Aksiyom 2]:** Eğer `AdminUsersPage` bileşeninin dönüş tipi (`React.FC`) ile uyumsuz bir değer (ör. `null`, `undefined`, `string`, `number`) döndürülecek olursa, TypeScript derleme zamanı hatası oluşur veya React çalışma zamanında geçersiz çocuk hatası verir.
-
-**[Aksiyom 3]:** Bileşen parametre almamaktadır (imzada prop tanımı yoktur); eğer bileşen içinden harici veriye ihtiyaç duyulursa, bu veri hooks veya bağlam (context) aracılığıyla temin edilmelidir. Prop aracılığı veri sağlanamaz.
-
----
-
-> **Not:** `useAuth`, `useRole`, API servis bağımlılıkları, rol filtreleme, kullanıcı listesi yükleme gibi konularda fonksiyon gövdesianaliz edilmediğinden (paylaşılmadığından) aksiyom üretilememiştir. Fonksiyon gövdesi sağlandığında kapsamlı mimari varsayımlar oluşturulabilir.
+Bu modül için fonksiyon gövdesi paylaşılmamıştır; dolayısıyla fonksiyon gövdesinden türetilebilecek mimari varsayımlar belirlenememiştir.
 
 ---
 
@@ -55,12 +49,11 @@ Bu fonksiyon bir React fonksiyonel bileşenidir (`React.FC`) ve herhangi bir par
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../hooks/useAuth::useAuth
 - import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../hooks/useRole::useRole
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./AdminUsersTableBody::AdminUsersTableBody
 - import: next/navigation::useRouter
 - import: react::React
@@ -73,25 +66,25 @@ Bu fonksiyon bir React fonksiyonel bileşenidir (`React.FC`) ve herhangi bir par
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminUsersPage.tsx::AdminUsersPage
-- **params**: () — parametre yok (React fonksiyonel bileşeni)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `user` — `useAuth()` hook'undan destructured, mevcut oturum açmış kullanıcı nesnesi; kimlik doğrulama durumunu temsil eder
-  - `loading` — `useAuth()` hook'undan destructured, kimlik doğrulama durumunun hâlâ yüklenmekte olduğunu belirten boolean bayrak
-  - `role` — `useRole()` hook'undan destructured, kullanıcının rol dizesi (ör. `'super_admin'`, `'admin'`, `'user'`)
-  - `router` — `useRouter()` ile elde edilen Next.js yönlendirici nesnesi; programlı sayfa geçişleri için kullanılır
-  - `t` — `useI18n()` hook'undan destructured, çevirileri döndüren uluslararasılaştırma fonksiyonu
-  - `Routes` — `useLocalizedRoutes()` hook'undan elde edilen lokalize rota tanımları nesnesi; `Routes.auth.login(...)` gibi erişimlerle kullanılır
-  - `isAdmin` — `useMemo` ile hesaplanan boolean; `role` değerinin `'super_admin'` veya `'admin'` olup olmadığını kontrol eder, `AdminUsersTableBody` bileşenine prop olarak geçilir
-- **Dönüş**: JSX — `<div>` sarmalayıcısı içinde `<header>` (başlık + alt başlık) ve `<Suspense>` sarmalı içinde `AdminUsersTableBody` bileşeni döndürülür
+  - `user` — `useAuth()` hook'undan dönen, kimlik doğrulaması yapılmış kullanıcı nesnesi; giriş yapmamış kullanıcıyı yönlendirmek için kontrol edilir
+  - `loading` — `useAuth()` hook'undan dönen, kimlik doğrulama yüklenme durumu; yönlendirme kararında `user` ile birlikte kontrol edilir
+  - `role` — `useRole()` hook'undan dönen, kullanıcının rol bilgisi string'i; `isAdmin` hesaplamasında kullanılır
+  - `router` — `useRouter()` hook'undan dönen Next.js router nesnesi; yetkisiz kullanıcıyı login sayfasına yönlendirmek için `router.push()` çağrısında kullanılır
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; sayfa başlığı ve açıklama metinlerini yerelleştirmek için kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen, yerelleştirilmiş rota yollarını içeren nesne; login sayfası yoluna erişmek için `Routes.auth.login()` çağrısında kullanılır
+  - `isAdmin` — `useMemo` ile hesaplanan boolean değer; `role` değişkeni `'super_admin'` veya `'admin'` ise `true`, aksi halde `false` olur; bağımlılık dizisi `[role]`
+- **Dönüş**: JSX elementi — `className="space-y-6 pb-20"` olan bir `<div>` içinde `AdminPageHeader` ve `Suspense` ile sarılmış `AdminUsersTableBody` bileşenlerini render eder
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminUsersPage.tsx::AdminUsersPage/useEffect callback
-- **params**: () — parametre yok (arrow function)
+### [N2_NASIL] AST Pointer: src/views/admin/AdminUsersPage.tsx::useEffect callback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `loading` — useEffect closure'undan erişilen üst kapsam değişkeni, auth yükleme durumu
-  - `user` — useEffect closure'undan erişilen üst kapsam değişkeni, oturum açmış kullanıcı nesnesi
-  - `router` — useEffect closure'undan erişilen üst kapsam değişkeni, Next.js yönlendirici
-  - `Routes` — useEffect closure'undan erişilen üst kapsam değişkeni, lokalize rota tanımları
-- **Dönüş**: yok — yan etki olarak `router.push(Routes.auth.login('/admin/users'))` çağrısıyla admin kullanıcılar giriş sayfasına yönlendirme yapılır; `loading` false ve `user` falsy olduğunda tetiklenir
+  - `loading` — dış scope'dan gelen, `useAuth()` hook'undan dönen kimlik doğrulama yüklenme durumu; `false` olduğunda yönlendirme kontrolü yapılır
+  - `user` — dış scope'dan gelen, `useAuth()` hook'undan dönen kullanıcı nesnesi; `null`/falsy ise login sayfasına yönlendirme tetiklenir
+  - `router` — dış scope'dan gelen Next.js router nesnesi; `router.push()` ile login sayfasına yönlendirme yapılır
+  - `Routes` — dış scope'dan gelen yerelleştirilmiş rota nesnesi; `Routes.auth.login('/admin/users')` çağrısıyla login sayfası yolu ve geri dönüş parametresi oluşturulur
+- **Dönüş**: yok — yan etki olarak `loading` false ve `user` falsy olduğunda `Routes.auth.login('/admin/users')` yoluna `router.push()` ile yönlendirme yapar
 
 ---
 

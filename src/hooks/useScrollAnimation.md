@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useScrollAnimation.ts
-skeleton_hash: 27cee276d7d1c833
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useScrollAnimation.ts
+skeleton_hash: fd8df5ccbb04a0ee
 entity_hashes:
   func:useScrollAnimation: 82da0eb2280833d9
   overview: d9bfa1798829a924
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:36:21Z
 ---
 
 ## Genel Bakış

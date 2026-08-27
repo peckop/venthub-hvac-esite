@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\orderStatusLabels.ts
-skeleton_hash: 72e0e1d3bf819b01
+source_path: C:\tmp\ops-t165\src\lib\admin\orderStatusLabels.ts
+skeleton_hash: 8546064f4077710a
 entity_hashes:
   func:isOrderBoardStatus: 83f58a39bb062cc5
   func:orderStatusLabel: fd64fbe04de7c1df
   overview: 39e6e6fc2196bd21
-generated_at: 2026-08-25T08:46:18Z
+generated_at: 2026-08-27T06:57:17Z
 ---
 
 ## Genel Bakış

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\Breadcrumb.tsx
-skeleton_hash: 8c92fea85517808a
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\Breadcrumb.tsx
+skeleton_hash: 7901d5e6ddb85d76
 entity_hashes:
   func:Breadcrumb: 8dc746a161585543
   overview: c3a2c03ed767502e
   style_tokens: 37bda1495ede52cb
-generated_at: 2026-06-15T17:03:33Z
+generated_at: 2026-08-27T08:31:08Z
 ---
 
 ## Genel Bakış
@@ -18,15 +18,6 @@ Breadcrumb bileşeni, kullanıcının uygulama içindeki mevcut konumunu hiyerar
 ### Navigasyon Yolu Gösterimi
 Bileşenin tek ve temel sorumluluğu, verilen öğe listesini kullanıcı dostu bir breadcrumb çubuğu olarak sunmaktır. Geçerli sayfa yolunu okunabilir ve erişilebilir biçimde kullanıcılara iletir.
 - Breadcrumb
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Breadcrumb bileşeni, `items` prop'unun mutlaka sağlanması gerektiğini, `variant` ve `className` prop'larının ise opsiyonel olduğunu varsayar.
-
-- **[Aksiyom 1]**: `items` prop'u sağlanmazsa bileşen boş veya hata veren bir breadcrumb render edilir.
-- **[Aksiyom 2]**: `variant` prop'u sağlanmazsa bileşen `'white'` değerini varsayılan olarak kullanır.
-- **[Aksiyom 3]**: `className` prop'u sağlanmazsa bileşen boş string değerini varsayılan olarak kullanır.
 
 ---
 
@@ -98,6 +89,25 @@ Bu modül, hiyerarşik navigasyon yolunu gösteren bir breadcrumb bileşenidir. 
 - `items: BreadcrumbItem[]`
 - `variant?: 'white' | 'transparent' | 'dark'`
 - `className?: string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/navigation/Breadcrumb.tsx::Breadcrumb
+- **params**:
+  - `items` — breadcrumb öğeleri dizisi; her öğe `label` ve opsiyonel `href` alanlarına sahip
+  - `variant` — varsayılan `'white'`; arka plan ve metin stilini belirleyen tema seçimi (`'white'`, `'transparent'`, `'dark'`)
+  - `className` — varsayılan `''`; dışarıdan ek CSS sınıfı eklemek için
+- **ic_degiskenler**:
+  - `lang` — `useI18n()` hook'undan destruct edilen mevcut dil kodu; `localizedHref` çağrılarında URL'yi yerelleştirmek için kullanılır
+  - `bgClasses` — `variant` anahtarına göre arka plan CSS sınıflarını eşleyen nesne; `'white'` → `'bg-white border-b'`, `'transparent'` → `'bg-transparent'`, `'dark'` → `'bg-primary-navy/10'`
+  - `textClasses` — `variant` anahtarına göre alt nesneler (`link`, `current`, `separator`) içeren metin CSS sınıfları eşleme nesnesi
+  - `styles` — `textClasses[variant]` erişimiyle seçilen stil seti; alt anahtarları `link`, `current`, `separator` olarak JSX içinde kullanılır
+  - `jsonLd` — Schema.org `BreadcrumbList` yapısı; `items.map` ile her öğe için `ListItem` nesneleri oluşturulur; `position` → `index + 1`, `name` → `item.label`, `item` → `item.href` varsa `SITE_URL` + `localizedHref(item.href, lang)` birleşimi, yoksa `undefined`
+  - `isLast` — map callback'inde `index === items.length - 1` karşılaştırması; son öğe olup olmadığını belirler; son öğe ise `<Link>` yerine `<span>` render edilir
+  - `isFirst` — map callback'inde `index === 0` karşılaştırması; ilk öğe olup olmadığını belirler; ilk öğeye `Home` ikonu eklenir
+- **Dönüş**: `items` yoksa veya uzunluğu 0 ise `null`; aksi halde `<nav>` JSX elementi (içinde `<script type="application/ld+json">` ile `jsonLd` verisi ve `<ol>` ile breadcrumb öğeleri listesi)
 
 ---
 

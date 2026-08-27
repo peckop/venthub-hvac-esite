@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\sentry.ts
-skeleton_hash: 4a1eb17c4a08a475
+source_path: C:\tmp\ops-t165\supabase\functions\_shared\sentry.ts
+skeleton_hash: 9ae3c67ed80ac3f9
 entity_hashes:
   func:parseDsn: de6e6bd80de1e473
   func:postStore: baa7d375e0588daa
   func:sentryCaptureException: d3efed22b661b471
   func:sentryCaptureMessage: f1e4a7cbdea35542
   overview: a0aac1a163270d41
-generated_at: 2026-08-13T07:40:33Z
+generated_at: 2026-08-27T07:09:22Z
 ---
 
 ## Genel Bakış

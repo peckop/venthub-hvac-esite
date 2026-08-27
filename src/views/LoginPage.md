@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\LoginPage.tsx
-skeleton_hash: 07456cedded7594e
+source_path: C:\tmp\venthub-wt-t131\src\views\LoginPage.tsx
+skeleton_hash: 4f32b10d201aa2f4
 entity_hashes:
   func:LoginPage: c196ecbcf52f1c61
   func:handleGoogleSignIn: 0c49de53cd5a94df
   func:handleSubmit: 460293fdfa9263b6
-  overview: 7b61ab089a04c74b
-  style_tokens: 4dc86ff7a25fa026
-generated_at: 2026-06-19T20:51:13Z
+  overview: 8a5adef2bab24a43
+  style_tokens: 75e44a9407f324eb
+generated_at: 2026-08-27T07:09:51Z
 ---
 
 ## Genel Bakış
@@ -28,22 +28,9 @@ Kullanıcının e-posta/şifre bilgilerini sunucuya göndererek veya Google OAut
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, bir React giriş sayfası bileşeni olup fonksiyon imzalarına dayalı mimari varsayımlar aşağıdadır.
-
-**[Aksiyom 1]:** Eğer `handleSubmit` fonksiyonuna geçerli bir `React.FormEvent` nesnesi sağlanmazsa, form gönderimi doğru işlenemez ve kimlik doğrulama akışı başlatılamaz.
-
-**[Aksiyom 2]:** Eğer `handleGoogleSignIn` fonksiyonu çağrıldığında harici Google OAuth servis yapılandırması (client ID, redirect URI vb.) mevcut değilse, Google ile giriş işlemi başarısız olur.
-
-**[Aksiyom 3]:** Eğer `LoginPage` bileşeni React bileşen ağacı içinde bir `<form>` elementi ile kullanılmazsa, `handleSubmit` fonksiyonu tetiklenemez ve kullanıcı e-posta/şifre ile giriş yapamaz.
-
-**[Aksiyom 4]:** Eğer `handleSubmit` veya `handleGoogleSignIn` asenkron işlemleri sırasında bir hata yakalanmazsa (try-catch veya .catch), kullanıcıya hata geri bildirimi sunulmaz ve uygulama beklenmedik şekilde başarısız olur.
-
-**[Aksiyom 5]:** Eğer `handleSubmit` fonksiyonu çağrıldığında form içindeki e-posta ve şifre alanları boş veya geçersiz değerler içeriyorsa, sunucu tarafı kimlik doğrulaması başarısız olur (bu alanların doğrulaması bu modülün dışında gerçekleşir).
-
----
-
-> **Not:** Bu aksiyomlar yalnızca fonksiyon imzalarından türetilmiştir. Fonksiyon gövdelerinin içeriği, state yönetimi, API çağrı detayları ve hata işleme stratejileri hakkında bilinmeyenler mevcuttur; bunlar hakkında varsayımda bulunulmamıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -66,6 +53,7 @@ Bu modül, bir React giriş sayfası bileşeni olup fonksiyon imzalarına dayal�
 - import: ../utils/routes::Routes
 - import: ../utils/routes::localizedHref
 - import: @/lib/supabase/client::supabaseBrowserClient
+- import: lucide-react::AlertCircle
 - import: lucide-react::ArrowLeft
 - import: lucide-react::Eye
 - import: lucide-react::EyeOff
@@ -84,57 +72,42 @@ Bu modül, bir React giriş sayfası bileşeni olup fonksiyon imzalarına dayal�
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/LoginPage.tsx::LoginPage
-- **params**: (parametre yok — React fonksiyon bileşeni)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `isPending` — useState hook'u, form gönderimi sırasında loading durumunu takip eder, true olduğunda buton spinner gösterir
-  - `setIsPending` — isPending durumunu güncellemek için setter
-  - `signIn` — useAuth hook'undan gelen kimlik doğrulama fonksiyonu, email/şifre ile giriş yapar
-  - `email` — useState hook'u, kullanıcı email giriş alanının değeri
-  - `setEmail` — email değerini güncellemek için setter
-  - `password` — useState hook'u, kullanıcı şifre giriş alanının değeri
-  - `setPassword` — password değerini güncellemek için setter
-  - `showPassword` — useState hook'u, şifre alanının görünür/gizli durumunu kontrol eder
-  - `setShowPassword` — showPassword durumunu toggle eden setter
-  - `rememberMe` — useState hook'u, "beni hatırla" checkbox durumu, başlangıç değeri true
-  - `setRememberMe` — rememberMe değerini güncelleyen setter
-  - `router` — useRouter hook'undan gelen Next.js router, sayfa yönlendirme ve yenileme için kullanılır
-  - `searchParams` — useSearchParams hook'undan gelen URLSearchParams, redirect parametresini okumak için kullanılır
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, tüm metinlerin uluslararasılaştırılması için kullanılır
-  - `lang` — useI18n hook'undan gelen güncel dil kodu, localizedHref içinde URL dilini belirler
-  - `from` — searchParams'dan `redirect` query parametresi alınarak oluşturulur, fallback olarak `'/'` kullanılır; giriş sonrası yönlendirme hedefini tutar
-  - `handleSubmit` — form submit handler, inner function olarak tanımlanır
-  - `handleGoogleSignIn` — Google OAuth giriş handler'ı, inner function olarak tanımlanır
-- **Dönüş**: JSX — Tam login sayfası görünümü (form, Google sign-in butonu, register linki, brand footer)
-
----
+  - `isPending` / `setIsPending` — `useState(false)` ile tanımlı; form gönderilirken yükleme durumunu tutar, butonu devre dışı bırakır ve spinner gösterir
+  - `signIn` — `useAuth()` hook'undan destructure edilen; Supabase ile e-posta/şifre giriş işlemini başlatan fonksiyon
+  - `email` / `setEmail` — `useState('')` ile tanımlı; e-posta input alanının değerini tutar
+  - `password` / `setPassword` — `useState('')` ile tanımlı; şifre input alanının değerini tutar
+  - `showPassword` / `setShowPassword` — `useState(false)` ile tanımlı; şifre input'unun `type` özelliğini `'text'` veya `'password'` olarak değiştirir
+  - `rememberMe` / `setRememberMe` — `useState(true)` ile tanımlı; "Beni hatırla" checkbox durumunu tutar
+  - `router` — `useRouter()` ile alınan Next.js router nesnesi; `router.refresh()` ve `router.push()` çağrılarında kullanılır
+  - `searchParams` — `useSearchParams()` ile alınan URL search params nesnesi; `?.get()` ile parametre okumak için kullanılır
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; tüm UI metinlerini yerelleştirir
+  - `lang` — `useI18n()` hook'undan destructure edilen dil kodu; `localizedHref()` çağrılarında URL yolunu yerelleştirmek için kullanılır
+  - `from` — `searchParams?.get('redirect')` veya `searchParams?.get('from')` değerlerinden ilki, yoksa `'/'`; başarılı giriş sonrası yönlendirme hedefi
+  - `errorParam` — `searchParams?.get('error')` değeri; URL'de varsa hata mesajı olarak alert alanında gösterilir
+  - `expired` — `searchParams?.get('reason') === 'expired` karşılaştırmasının sonucu; oturum süresi dolmuşsa `true` olur ve "Oturum süreniz doldu" uyarısı gösterilir
+  - `handleSubmit` — form `onSubmit` olayına bağlı iç async fonksiyon; `signIn` çağrısı yapar, hata veya başarı durumuna göre toast gösterir, başarılıysa `from` adresine yönlendirir
+  - `handleGoogleSignIn` — Google OAuth butonuna bağlı iç async fonksiyon; `supabase.auth.signInWithOAuth` ile Google giriş akışını başlatır
+- **Dönüş**: JSX (React.FC) — giriş sayfasının tam UI çıktısını döndürür
 
 ### [N2_NASIL] AST Pointer: src/views/LoginPage.tsx::handleSubmit
-- **params**: `(e: React.FormEvent)` — form submit olay nesnesi, e.preventDefault() ile varsayılan davranış engellenir
+- **params**:
+  - `e` — `React.FormEvent`; form submit olayını temsil eder, `e.preventDefault()` ile varsayılan davranışı engeller
 - **ic_degiskenler**:
-  - `result` — signIn(email, password) asenkron çağrısının dönüş değeri, `.error` alanı varsa hata olduğunu gösterir, başarılıysa kullanıcı giriş yapmıştır
-  - `email` — dış kapsamdan (LoginPage) erişilen useState değeri, kullanıcının girdiği email adresi
-  - `password` — dış kapsamdan erişilen useState değeri, kullanıcının girdiği şifre
-  - `signIn` — dış kapsamdan erişilen useAuth fonksiyonu, supabase auth ile email/şifre girişi yapar
-  - `setIsPending` — dış kapsamdan erişilen setter, loading durumunu true/false yapar
-  - `toast` — sonner kütüphanesinden import edilen bildirim fonksiyonu, success/error mesajları gösterir
-  - `t` — dış kapsamdan erişilen çeviri fonksiyonu, auth.loginSuccess ve auth.genericLoginError anahtarlarından çevirileri alır
-  - `router` — dış kapsamdan erişilen Next.js router, .refresh() ile sayfayı yeniler, .push() ile yönlendirme yapar
-  - `from` — dış kapsamdan erişilen değişken, yönlendirme hedef URL'si
-  - `lang` — dış kapsamdan erişilen dil kodu, localizedHref içinde URL oluşturmak için kullanılır
-- **Dönüş**: yok — Yan etkiler: toast bildirimleri gösterir, başarılı girişte sayfayı yeniler ve yönlendirir, finally bloğunda isPending'i false yapar
-
----
+  - `result` — `await signIn(email, password)` çağrısının dönüş değeri; `{ error }` içerir, hata varsa `result.error.message` okunur
+  - `raw` — `result.error.message || ''`; Supabase'den gelen ham hata metni, boşsa `''` atanır
+  - `mapped` — `raw` string'i üzerinde `includes()` kontrolleri yapılarak belirlenen çevrilmiş hata mesajı; `'Email not confirmed'` ise `t('auth.emailNotConfirmed')`, `'Invalid login credentials'` ise `t('auth.invalidCreds')`, diğer durumlarda `raw` veya `t('auth.genericLoginError')` kullanılır
+- **Dönüş**: yok (void) — yan etki olarak toast mesajı gösterir, başarılı girişte `router.refresh()` ve `router.push(localizedHref(from, lang))` çağırır, `finally` bloğunda `setIsPending(false)` ile yükleme durumunu sıfırlar
 
 ### [N3_NASIL] AST Pointer: src/views/LoginPage.tsx::handleGoogleSignIn
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `origin` — tarayıcı tarafında `window.location.origin` değerini alır; sunucu tarafında (SSR) `'http://localhost:3000'` fallback'i kullanılır; OAuth redirect URL'sinin kök DOMAIN kısmını oluşturur
-  - `redirectTo` — origin ve `Routes.auth.callback()` birleştirilerek oluşturulan tam callback URL'si, Google OAuth'tan sonra yönlendirme yapılacak adres
-  - `error` — `supabase.auth.signInWithOAuth()` çağrısının destructuring ile alınan hata nesnesi; null ise başarılı, değilse hata olduğunu gösterir
-  - `e` — catch bloğunda yakalanan istisna nesnesi, Google sign-in sırasında beklenmeyen bir hata oluştuğunda loglanır
-  - `supabase` — dış kapsamdan import edilen supabase browser client, Supabase API'sine istek yapar
-  - `t` — dış kapsamdan erişilen çeviri fonksiyonu, auth.googleSignInFail ve auth.googleSignInError çevirilerini alır
-- **Dönüş**: yok — Yan etkiler: Google OAuth akışını başlatır (tarayıcıyı Google yetkilendirme sayfasına yönlendirir), hata oluşursa console'a log yazar ve toast bildirimi gösterir
+  - `origin` — `typeof window !== 'undefined'` kontrolü ile tarayıcı ortamında `window.location.origin`, sunucu ortamında `'http://localhost:3000'` değeri atanır; OAuth yönlendirme URL'inin kök adresini belirler
+  - `redirectTo` — `` `${origin}${Routes.auth.callback()}` `` template literal ile oluşturulan tam callback URL'i; Google OAuth sonrası kullanıcı bu adrese yönlendirilir
+  - `error` — `await supabase.auth.signInWithOAuth(...)` çağrısından destructure edilen hata nesnesi; varsa `console.error` ile loglanır ve `toast.error(t('auth.googleSignInFail'))` gösterilir
+  - `e` — `catch` bloğundaki exception nesnesi; `console.error('Google sign-in exception:', e)` ile loglanır ve `toast.error(t('auth.googleSignInError'))` gösterilir
+- **Dönüş**: yok (void) — yan etki olarak Google OAuth akışını başlatır, hata durumunda konsola log yazar ve toast mesajı gösterir
 
 ---
 
@@ -170,7 +143,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-25`, `tracking-hvac-normal`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-clean-white`, `bg-gradient-to-br`, `bg-login-radial`, `bg-primary-navy`, `bg-repeat`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-t`, `border-white/20`, `focus-visible:border-primary-ocean`, `from-air-blue`, `from-primary-navy`, `group-hover:text-primary-navy`, `hover:bg-industrial-gray`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `from-air-blue`, `from-primary-navy`, `gap-3`, `group-hover:shadow-login-btn-hover`, `h-16`, `h-4`, `h-5`, `inline-flex`, `items-center`, `justify-between`, `justify-center`
+- **Renkler:** `bg-clean-white`, `bg-error-red/10`, `bg-gradient-to-br`, `bg-login-radial`, `bg-primary-navy`, `bg-repeat`, `bg-white`, `bg-white/90`, `border-error-red/30`, `border-light-gray`, `border-t`, `border-white/20`, `focus-visible:border-primary-ocean`, `from-air-blue`, `from-primary-navy`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `from-air-blue`, `from-primary-navy`, `gap-2`, `gap-3`, `group-hover:shadow-login-btn-hover`, `h-16`, `h-4`, `h-5`, `inline-flex`, `items-center`, `items-start`
 - **Varyant/Responsive:** `active:`, `disabled:`, `focus-visible:`, `group-hover:`, `hover:`, `placeholder:` önekleri
 - **Yardımcı Sınıflar:** `active:scale-98`, `animate-spin`, `border`, `cursor-pointer`, `disabled:opacity-70`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-primary-ocean/20`, `font-bold`, `font-medium`, `group`, `group-hover:-translate-y-1`, `inset-0`, `inset-y-0`, `mb-2`

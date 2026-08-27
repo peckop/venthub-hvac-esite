@@ -2,51 +2,54 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\components\tr\CookiePolicyContent.tsx
-skeleton_hash: 85985f9ee991f929
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\components\tr\CookiePolicyContent.tsx
+skeleton_hash: 782d0430be589f04
 entity_hashes:
-  func:CookiePolicyContentTr: 0284b5d72d7677e5
-  overview: 7744e91e555544e5
-  style_tokens: 6460a848de07bdf3
-generated_at: 2026-06-19T20:50:50Z
+  func:CookiePolicyContentTr: 405488fadaf0218c
+  overview: a62575be1eca51d1
+  style_tokens: 342fd94b09ce272b
+generated_at: 2026-08-27T07:38:59Z
 ---
 
 ## Genel Bakış
 
-Bu modül, VentHub platformunun Türkçe çerez politikası sayfası için gerekli içeriği sunan bir React bileşenidir. Kullanıcılara çerezlerin kullanımı, türleri ve yönetimi konusunda yasal bilgilendirmeyi sağlamakla sorumludur.
+Bu modül, VentHub platformunun Türkçe çerez politikası sayfası için içerik sunan bir React bileşenidir. Çerezlerin kullanımı, türleri ve yönetimi hakkında yasal bilgilendirme sağlamaktan sorumludur. Bileşen, dil parametresine göre dinamik olarak ilgili dildeki içeriği yükler.
 
 ## Fonksiyon Grupları
 
 ### İçerik Görüntüleme
 
-Çerez politikasının Türkçe metin ve bölümlerini tarayıcıda render eden bileşeni içerir.
+Çerez politikasının Türkçe metin ve bölümlerini tarayıcıda render eden bileşeni içerir. Dil parametresine bağlı olarak ilgili dildeki içerik bileşeni dinamik olarak import edilir ve sayfaya entegre edilir.
 
-- `CookiePolicyContentTr`
+- CookiePolicyContentTr
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, VentHub HVAC uygulamasının yasal sayfalarında görüntülenen statik bir bileşen (content component) olup, cookie policy içeriğini sunar.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### CookiePolicyContentTr
-**Ne yapar**: Bu fonksiyon, belirli bir dil (`lang` parametresi) için çerez politikası içeriğini render eden bir React bileşeni (`React.FC`) döndürür. Çerez politikası metinlerinin dinamik olarak yüklenmesini ve sunulmasını sağlar.
+**Ne yapar**: Türkçe çerez politikası içeriğini görüntülemek için kullanılan bir React bileşenidir. Bileşen, dil bilgisini (`lang`) prop olarak alır ve Türkçe çerez politikası metnini kullanıcıya sunar.
 
-**Nasıl yapar**: Fonksiyon, bir `React.FC` türünde bir bileşen döndürür. Bileşenin kendisi, `lang` parametresini alır ve bu dile karşılık gelen çerez politikası içeriğini render eder. İçerik, `lang` parametresine bağlı olarak dinamik olarak import edilir (örneğin `import(`../content/${lang}/CookiePolicy`)`), bu da istenen dildeki bileşenin asenkron olarak yüklenmesini sağlar. Bileşen, yüklenen içeriği React fragment (`<>...</>`) içinde sararak sayfaya entegre eder.
+**Nasıl yapar**: Bileşen, `lang` prop'unu destructuring yöntemiyle alır. `React.FC<{ lang: string }>` tipinde bir fonksiyonel bileşen olarak tanımlanmıştır. Dosya yolu (`src\views\legal\components\tr\`) incelendiğinde, Türkçe ("tr") diline özel çerez politikası içeriğini render ettiği anlaşılmaktadır. Bileşenin iç yapısı hakkında verilen kaynakta ek bilgi bulunmamaktadır.
 
 **Parametreler**:
-- `lang`: `string` — Bileşenin hangi dilde içerik göstereceğini belirten ISO dil kodu (örn: 'tr', 'en'). Doğrudan kullanılmaz, ancak döndürülen `React.FC` bileşeninin prop'u olarak beklenir.
+- `lang`: `string` — Bileşenin hangi dilde çalışacağını belirten dil kodu parametresi. Prop olarak dışarıdan alınır ve bileşenin dil davranışını yönlendirmek için kullanılır.
 
-**Dönüş**: `React.FC<{ lang: string }>` — Verilen `lang` prop'una göre ilgili dildeki çerez politikası içeriğini render eden, `React.FC` türünde bir React fonksiyonel bileşeni.
+**Dönüş**: `React.FC<{ lang: string }>` — `lang` prop'u alan bir React fonksiyonel bileşeni döndürür. Döndürülen bileşen, Türkçe çerez politikası içeriğini render etmek üzere tasarlanmıştır.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: @/components/consent/CookiePreferencesButton::CookiePreferencesButton
 - import: @/config/legal::legalConfig
+- import: @/utils/routes::Routes
+- import: @/utils/routes::localizedHref
+- import: next/link::Link
 - import: react::React
 
 ---
@@ -54,12 +57,16 @@ Bu modül, VentHub HVAC uygulamasının yasal sayfalarında görüntülenen stat
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/components/tr/CookiePolicyContent.tsx::CookiePolicyContentTr
-- **params**: `{ lang: string }` — component props'u olarak tanımlı; fonksiyon gövdesinde kullanılmıyor
-- **ic_degiskenler**: yok (hiçbir local değişken tanımlanmamış, sadece JSX return ediliyor)
-- **Dict Access**:
-  - `legalConfig.sellerEmail` — `@/config/legal` import'undan gelen config nesnesinden iletişim e-posta adresi çekilir, 5. section'daki `<strong>` içinde render edilir
-  - `legalConfig.lastUpdated` — `@/config/legal` import'undan gelen config nesnesinden politika güncelleme tarihi çekilir, 6. section'daki `<strong>` içinde render edilir
-- **Dönüş**: JSX — React Fragment (`<>`) içinde 6 adet `<section>` elementi; çerez politikasının Türkçe metin içeriğini (tanım, türler, üçüncü taraf çerezleri, yönetim, iletişim, yürürlük tarihi) statik olarak render eden React element
+- **params**: `lang` — bileşene dışarıdan aktarılan dil bilgisi (ör. `"tr"`)
+- **ic_degiskenler**:
+  - `lang` — `localizedHref` fonksiyonuna ikinci argüman olarak geçirilir; KVKK linkinin dile özgü URL'sini üretmek için kullanılır
+  - `legalConfig.sellerEmail` — iletişim bölümünde satıcı e-posta adresi olarak JSX içinde gösterilir
+  - `legalConfig.lastUpdated` — yürürlük bölümünde politikanın son güncelleme tarihi olarak JSX içinde gösterilir
+  - `localizedHref(Routes.legal.kvkk(), lang)` — KVKK Aydınlatma Metni linkinin `href` değeri olarak hesaplanır; `Routes.legal.kvkk()` döndürdüğü yol ve `lang` parametresiyle dile özgü tam URL üretir
+  - `Routes.legal.kvkk()` — KVKK sayfasının rota yolunu döndüren fonksiyon çağrısı; `localizedHref`'e ilk argüman olarak aktarılır
+  - `CookiePreferencesButton` — çerez tercipleri yönetim düğmesi olarak JSX içinde render edilir
+  - `Link` — Next.js link bileşeni; KVKK metnine yönlendiren `<Link>` etiketinde kullanılır
+- **Dönüş**: `React.ReactElement` — çerez politikasının Türkçe içeriğini barındıran JSX fragment (`<>...</>`) döndürür; sekiz adet `<section>` bloğu içerir (çerez tanımı, kullanılan çerezler tablosu, hukuki dayanak, üçüncü taraf hizmetleri, tercip yönetimi, kişisel veriler, iletişim, yürürlük)
 
 ---
 
@@ -84,7 +91,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-industrial-gray`, `text-xl`
-- **Layout:** (yok)
+- **Renkler:** `bg-gray-50`, `border-b`, `border-light-gray`, `text-industrial-gray`, `text-left`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`
+- **Layout:** `min-w-full`, `overflow-x-auto`, `p-2`
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `pl-6`, `space-y-1`
+- **Yardımcı Sınıflar:** `border`, `font-semibold`, `list-disc`, `mb-3`, `mt-3`, `mt-4`, `pl-6`, `space-y-1`, `underline`

@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\errorReporter.ts
-skeleton_hash: 614316a41b8c4e4b
+source_path: C:\tmp\ops-t165\src\lib\errorReporter.ts
+skeleton_hash: deda32c96eeab034
 entity_hashes:
   func:describeError: f982c2b4529ce11b
   func:reportError: 33efe1f9e1957e00
@@ -14,7 +14,7 @@ entity_hashes:
   func:sendToEdge: 38f38b99a458a86f
   func:truncate: 8f9f7f00279f8ac4
   overview: 0e6aadea8acd54ac
-generated_at: 2026-08-25T07:28:13Z
+generated_at: 2026-08-27T06:57:34Z
 ---
 
 ## Genel Bakış
@@ -189,28 +189,28 @@ graph TD
     errorReporter_ts__sanitizeContext["sanitizeContext"]
     errorReporter_ts__sendToEdge["sendToEdge"]
     errorReporter_ts__truncate["truncate"]
+    errorReporter_ts__reportError --> errorReporter_ts__sanitizeContext
     errorReporter_ts__reportError --> errorReporter_ts__sendToEdge
     errorReporter_ts__reportError --> errorReporter_ts__safeUserAgent
-    errorReporter_ts__reportError --> errorReporter_ts__sanitizeContext
+    errorReporter_ts__reportError --> errorReporter_ts__describeError
     errorReporter_ts__reportError --> errorReporter_ts__truncate
-    errorReporter_ts__sanitizeContext --> errorReporter_ts__truncate
     errorReporter_ts__sendToEdge --> errorReporter_ts__resolveBearerToken
     errorReporter_ts__safeUserAgent --> errorReporter_ts__truncate
-    errorReporter_ts__reportError --> errorReporter_ts__describeError
+    errorReporter_ts__sanitizeContext --> errorReporter_ts__truncate
     errorReporter_ts__reportError --> errorReporter_ts__safePageUrl
 ```
 
 ## NODE ID STANDARD
 
-  file: errorReporter.ts
-  function: errorReporter.ts::truncate
-  function: errorReporter.ts::describeError
-  function: errorReporter.ts::safePageUrl
-  function: errorReporter.ts::safeUserAgent
-  function: errorReporter.ts::sanitizeContext
-  function: errorReporter.ts::resolveBearerToken
-  function: errorReporter.ts::sendToEdge
-  function: errorReporter.ts::reportError
+  file: src\lib\errorReporter.ts
+  function: src\lib\errorReporter.ts::truncate
+  function: src\lib\errorReporter.ts::describeError
+  function: src\lib\errorReporter.ts::safePageUrl
+  function: src\lib\errorReporter.ts::safeUserAgent
+  function: src\lib\errorReporter.ts::sanitizeContext
+  function: src\lib\errorReporter.ts::resolveBearerToken
+  function: src\lib\errorReporter.ts::sendToEdge
+  function: src\lib\errorReporter.ts::reportError
 
 ---
 

@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx
-skeleton_hash: de02d609fb6878b2
+source_path: C:\tmp\ops-t165\src\app\admin\products\page.tsx
+skeleton_hash: 02de2ae35c649d22
 entity_hashes:
   func:Loading: 657ee72781ec51d8
-  func:Page: 50c72d14cf6e5d39
+  func:Page: 2cf75b2e71e493c7
   overview: ad893d1e0e0b6ff3
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-19T20:47:00Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:55:42Z
 ---
 
 ## Genel Bakış
@@ -42,15 +42,14 @@ Yönetim panelindeki ürünler sayfasının temel yapısını oluşturarak ilgil
 **Dönüş**: Fonksiyonun dönüş tipi `void` veya belirsiz olarak belirtilmiştir. Fonksiyonun bir UI bileşeni (örn. React bileşeni) döndürmesi beklenirken, verilen bilgi kesin bir tip içermemektedir.
 
 ### Page
+**Ne yapar**: Admin ürünler sayfasının ana sayfa bileşenidir. Uluslararasılaştırma desteğiyle birlikte asenkron yükleme sırasında kullanıcıya yükleme göstergesi sunar ve `AdminProductsPage` bileşenini render eder. Next.js'in dosya tabanlı yönlendirme sisteminde `page.tsx` dosyası olarak tanımlanan bir sayfa bileşenidir.
 
-**Ne yapar**: Admin ürünler sayfasının ana giriş noktasıdır. Sayfa yüklendiğinde Suspense ile sarmalanmış bir loading durumu gösterirken asıl ürün yönetim sayfasının yüklenmesini bekler.
-
-**Nasıl yapar**: Fonksiyon, useI18n hook'u ile çok dilli destek sağlar ve useTercüme edilmiş 'common.loading' anahtarını kullanarak Suspense fallback bileşenini oluşturur. Bu fallback, sayfa yüklenene kadar animasyonlu bir loading göstergesi sunar. Suspense boundary, asıl AdminProductsPage bileşeninin yüklenmesi sırasında kullanıcıya kesintisiz bir deneyim sunar.
+**Nasıl yapar**: Fonksiyon önce `useI18n` hook'unu çağırarak uluslararasılaştırma fonksiyonu `t`'yi elde eder. Ardından React'ın `Suspense` bileşenini kullanarak `AdminProductsPage` bileşenini sarmalar. `Suspense`, alt bileşen asenkron veri yüklemesi tamamlanana kadar bir fallback içeriği gösterir. Fallback olarak, Tailwind CSS sınıflarıyla stilize edilmiş bir yükleme mesajı görüntülenir; bu mesaj `t('common.loading')` ile yerelleştirilmiş metin içerir ve `animate-pulse` sınıfıyla nabız animasyonu uygulanır.
 
 **Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz
+- Bu fonksiyon parametre almaz.
 
-**Dönüş**: JSX.Element — Suspense ile sarılmış AdminProductsPage component'ini içeren React bileşeni döndürür
+**Dönüş**: JSX elementi döndürür. Return tipi kaynak kodda açıkça belirtilmemiştir.
 
 ---
 
@@ -71,17 +70,17 @@ Yönetim panelindeki ürünler sayfasının temel yapısını oluşturarak ilgil
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx::Loading
+### [N1_NASIL] AST Pointer: src/app/admin/products/page.tsx::Loading
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini yerelleştirmek için kullanılır
-- **Dönüş**: React JSX elementi (loading durumu için animasyonlu mesaj)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `'admin.common.loading'` anahtarıyla yükleme mesajını almak için kullanılır
+- **Dönüş**: JSX — `className="p-8 text-center text-admin-fg-muted animate-pulse"` özellikli `<div>` elementi
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx::Page
+### [N2_NASIL] AST Pointer: src/app/admin/products/page.tsx::Page
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini yerelleştirmek için kullanılır
-- **Dönüş**: React JSX elementi (Suspense ile sarılmış AdminProductsPage bileşeni)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `'common.loading'` anahtarıyla yükleme mesajını almak için kullanılır
+- **Dönüş**: JSX — `<Suspense>` bileşeni; `fallback` prop'unda yükleme göstergesi (`<div>`) taşır, çocuk olarak `<AdminProductsPage />` bileşenini sarmalar
 
 ---
 
@@ -108,7 +107,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`

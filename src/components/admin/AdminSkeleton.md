@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\AdminSkeleton.tsx
-skeleton_hash: 10a5598cfbfacede
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\AdminSkeleton.tsx
+skeleton_hash: 68755857c27aac1d
 entity_hashes:
   func:AdminSkeleton: 77330e168e73e66f
   overview: f3781a370e1b4261
   style_tokens: 9e8ea6f4cb9e6a4c
-generated_at: 2026-08-25T07:24:24Z
+generated_at: 2026-08-27T08:00:41Z
 ---
 
 ## Genel Bakış
@@ -87,8 +87,8 @@ Admin panelinin çeşitli görünümlerinde veri yüklenirken gösterilen iskele
 
 ## NODE ID STANDARD
 
-  file: AdminSkeleton.tsx
-  function: AdminSkeleton.tsx::AdminSkeleton
+  file: src\components\admin\AdminSkeleton.tsx
+  function: src\components\admin\AdminSkeleton.tsx::AdminSkeleton
 
 ---
 

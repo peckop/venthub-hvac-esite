@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\shell\AdminSidebar.tsx
-skeleton_hash: f6d6b0b8f97bec54
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\shell\AdminSidebar.tsx
+skeleton_hash: 0e76a93ffca52c2f
 entity_hashes:
   func:AdminMobileNav: 2796687b9805241d
   func:AdminSidebar: 56939624b9898a40
   func:NavList: 26f7e965010c847c
   overview: a33b54ba73b627ed
   style_tokens: bc5af71be1a20afb
-generated_at: 2026-08-25T07:25:24Z
+generated_at: 2026-08-27T08:23:56Z
 ---
 
 ## Genel Bakış
@@ -148,10 +148,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: AdminSidebar.tsx
-  function: AdminSidebar.tsx::NavList
-  function: AdminSidebar.tsx::AdminSidebar
-  function: AdminSidebar.tsx::AdminMobileNav
+  file: src\components\admin\shell\AdminSidebar.tsx
+  function: src\components\admin\shell\AdminSidebar.tsx::NavList
+  function: src\components\admin\shell\AdminSidebar.tsx::AdminSidebar
+  function: src\components\admin\shell\AdminSidebar.tsx::AdminMobileNav
 
 ---
 

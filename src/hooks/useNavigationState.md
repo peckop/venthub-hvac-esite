@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useNavigationState.ts
-skeleton_hash: 8625c236e971e1a7
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useNavigationState.ts
+skeleton_hash: d45035348ace3aad
 entity_hashes:
   func:useNavigationState: 312ef38a3d9c5c5d
   overview: cee2f65a2ff09739
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:36:18Z
 ---
 
 ## Genel Bakış

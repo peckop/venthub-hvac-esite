@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\hesaplayicilar\jet-fan\page.tsx
-skeleton_hash: 3cd9525d6e558de0
+source_path: C:\tmp\ops-t165\src\app\[lang]\destek\hesaplayicilar\jet-fan\page.tsx
+skeleton_hash: a402165decf57641
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: ed78a418e47b7805
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-27T06:53:08Z
 ---
 
 ## Genel Bakış
