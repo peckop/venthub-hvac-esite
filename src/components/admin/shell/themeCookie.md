@@ -12,6 +12,8 @@ entity_hashes:
 generated_at: 2026-08-15T18:15:44Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=3 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, admin panelinin tema tercihlerinin (örneğin koyu/aydınlık mod, renk vurgusu) tarayıcı çerezleri (cookies) üzerinden saklanması ve okunması için gerekli yardımcı fonksiyonları içerir. Temelde, çerez adını oluşturmayı, tema tercihlerini depolanabilir bir metin formatına dönüştürmeyi ve bu metinden tercihleri yeniden yapılandırmayı sağlar. Modül, admin shell bileşenleri tarafından tema yönetimi süreçlerinde bağımsız bir yardımcı (utility) katman olarak kullanılır.
 

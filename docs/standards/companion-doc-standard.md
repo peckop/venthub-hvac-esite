@@ -178,3 +178,68 @@ geçirilmemesinde**. Uzun vade tercihi bot/CI yapılandırmasına dokunduğu iç
 Kod dizinlerinde **668** `.md`; **665** eşli, **2** yetim (temizlendi), **1** muaf.
 Temizlik sonrası ihlal listesi **BOŞ** — bu yüzden bekçi ratchet/baseline taşımaz,
 muafiyetsiz ve tam kapalı kurulmuştur.
+
+## C8 — BİLEREK DONDURULMUŞ companion: karar yazılmazsa hiçbir ölçüm geri getirmez
+
+> Ölçülmüş vaka (2026-08-27, REC-83). Dört şerit toplam ~40 companion'ı **bilerek** bayat
+> bıraktı: üreteç o dosyalarda sembol kaybediyordu ve "bayat ama TAM" sürüm, "taze ama EKSİK"
+> olana tercih edildi. Sonra I18N bir yapısal çelişki ölçtü.
+
+### C8.1 Çelişki: "bayat" ile "bilerek dondurulmuş" AYNI görünüyor
+
+Bir tazelik/bayatlık aracına bakıldığında ikisi ayırt edilemez. Bir sonraki bayat-süpürmesi,
+dokuz dosyalık onarımı **sessizce geri alacaktı** — hem de onarımı yapanın haberi olmadan.
+
+### C8.2 "Dondurulmuş" bir VERİ özelliği değil, bir KARARDIR — depoda izi yoktur
+
+I18N listelere körlemesine güvenmek istemedi ve kendi dedektörünü yazdı: *"geri alınmış dosya,
+master blob'u daha eski bir sürümle birebir olan dosyadır."* **48 dosyada koştu → 0 buldu**, oysa
+dondurulmuş olduğu bilinen dosyalar o kümedeydi.
+
+Sebebi ölçüldü: `InventoryTable.md`'nin master'daki son commit'i **06-16**; geri alma zaten var
+olan içeriğe denk geldiği için git hiçbir şey kaydetmedi. Yani dosya "bugün donduruldu" değil,
+"aylardır eski". Karar hiçbir yere yazılmadığı için **hiçbir bağımsız ölçüm onu bulamaz.**
+
+> Bu maddenin en pahalı cümlesi: *ölçülemeyen şey ölçülmediği için değil, ölçülecek yerde
+> durmadığı için ölçülemez.* Kararlar veri bırakmaz; yazılmaları gerekir.
+
+### C8.3 İKİ kayıt birden — ve niçin ikisi de tek başına yetmez
+
+| kayıt | tek başına neden yetmez |
+|---|---|
+| dosya içi işaret | yeniden üretim dosyayı **ezer**, işaret de silinir → kapı kör kalır. Kaybı ölçen şeyi, tam da kaybın olduğu yerde kaybederdik. |
+| ayrı liste | liste ile gerçek **ayrışır**. Ölçüldü: dokuz dosyalık listeyi elle kopyalayan **iki** taraf da birer dosyayı yanlış saydı. |
+
+**Çözüm ikisi birden.** `.companion-dondurulmus.json` "hangi dosyalar dondurulmuş" sorusunun
+SSOT'u; dosya içindeki işaret onun insan-görünür yankısı:
+
+```
+<!-- ORION-DONDURULMUS: gercek-sembol=<N> · kaynak=<sha> · sebep=<slug> · kayit=<REC-nn> -->
+```
+
+Kapı (`INV-DOC-5`) **ikisini karşılaştırır**: listede olan bir dosyada işaret yoksa o dosya
+yeniden üretilmiştir → KIRMIZI. İşaret frontmatter'ın **içine** değil hemen ardına konur;
+frontmatter üretecin makine alanıdır.
+
+`gercek-sembol` = parantezsiz `AST Pointer:` başlık sayısı ve değer **master'daki değil TARİHSEL
+EN YÜKSEK** sayıdır. Niçin: geri-alma tabanı "bugünkü süpürmeden önce"ydi ve o taban **daha eski**
+turlarda kaybedilmiş sembolleri taşımıyor — "geri aldım" ≠ "TAM", yalnızca "bugünkü kayıp yok".
+Ölçüldü: dokuz dosyanın ikisi tarihsel maksimumun altındaydı (`InventoryTable` 4→6 `8172fdc9`,
+`FeaturedCommercialBlocks` 4→5 `a013f342`; üç sembol, önceki turların borcu).
+
+### C8.4 Koordinasyona bağlı güvenliği, ÖLÇÜME bağlı güvenliğe çevir
+
+Liste bir güvenlik şartıysa, listeyi kaçıran herkes hasar üretir — ve bugün iki taraf da yanlış
+saydı. I18N'in tersine çevirmesi doğrudur ve **asıl koruma budur**: süpürme, üretim **öncesi** her
+dosyanın gerçek sembol sayısını kaydeder, **sonrasında** tekrar ölçer ve **sembol kaybeden her
+dosyayı geri alır**. O zaman liste bir **optimizasyon** olur (boşuna üretim yapmamak), güvenlik
+şartı olmaktan çıkar; liste eksikse kimse felaket yaşamaz.
+
+İkisi birlikte savunma katmanıdır: liste + işaret **kararı** korur, öncesi/sonrası ölçüm
+**içeriği** korur.
+
+### C8.5 Kaydın kaldırılması
+
+Üreteç o dosyada artık sembol kaybetmiyorsa kayıt **silinir** ve companion yeniden üretilir.
+Kaydın gereksiz kalması, düzelmiş bir üretecin önünde kalıcı duvar olur — dondurma bir çözüm
+değil, üreteç kusurunun faturasıdır.

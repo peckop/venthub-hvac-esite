@@ -16,6 +16,8 @@ entity_hashes:
 generated_at: 2026-08-15T06:35:03Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=8 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, React uygulamalarında beklenmeyen hataları yakalayan bir ErrorBoundary bileşenidir. Uygulamanın tamamen çökmesini önleyerek kullanıcıya uygun bir hata arayüzü sunar ve hataları loglama veya raporlama için işler.
 

@@ -11,6 +11,8 @@ entity_hashes:
 generated_at: 2026-08-25T07:24:53Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=3 · kaynak=4f542c31 · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 BulkBar, bir veri tablosunda seçili öğelerin sayısını gösteren ve bu öğeler üzerinde toplu işlem gerçekleştirilmesini sağlayan bir React bileşenidir. Admin panelindeki veri tablosu arayüzünde, kullanıcı seçim yaptıktan sonra görünür hale gelen bir aksiyon çubuğu olarak çalışır.
 

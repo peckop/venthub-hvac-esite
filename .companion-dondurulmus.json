@@ -1,0 +1,40 @@
+{
+  "_niçin": [
+    "BILEREK BAYAT BIRAKILMIS companion'larin SSOT'u. Uretec bazi dosyalarda sembol KAYBEDIYOR",
+    "(REC-83). O dosyalarda 'bayat ama TAM' surumu, 'taze ama EKSIK' olana tercih ettik.",
+    "SORUN: bir supurme aracina bakildiginda 'bayat' ile 'bilerek dondurulmus' AYNI goruntu.",
+    "I18N 2026-08-27'de bunu olctu ve bir supurme dokuz dosyalik onarimi geri alacakti.",
+    "",
+    "NICIN AYRI DOSYA VE AYNI ZAMANDA DOSYA ICI ISARET — ikisi birden, gerekcesiyle:",
+    "  · YALNIZ dosya ici isaret yetmez: yeniden uretim dosyayi EZER, isaret de silinir,",
+    "    kapi kor kalir. Kaybi tam da kaybi olcecek sey ile birlikte kaybederdik.",
+    "  · YALNIZ liste yetmez: liste ile gercek AYRISIR. Bugun tam bu yasandi — dokuz dosyalik",
+    "    listeyi elle kopyalayan iki taraf da birer dosyayi yanlis sayd.",
+    "  · COZUM: liste 'hangi dosyalar dondurulmus' sorusunun SSOT'udur (kalici, gozden gecirilir);",
+    "    dosya ici isaret onun insan-gorunur yankisidir. KAPI IKISINI KARSILASTIRIR: listede olan",
+    "    bir dosyada isaret YOKSA, o dosya yeniden uretilmis demektir -> KIRMIZI.",
+    "",
+    "ISARET BICIMI (companion'in ilk 40 satirinda, tek satir):",
+    "  <!-- ORION-DONDURULMUS: gercek-sembol=<N> · kaynak=<sha> · sebep=<slug> · kayit=<REC-nn> -->",
+    "",
+    "gercek-sembol = parantezsiz 'AST Pointer:' baslik sayisi. Parantezli basliklar sozde",
+    "sembol (ornek: 'Foo (useEffect callback)') ve ham sayim kaybi hem ABARTIR hem MASKELER.",
+    "DEGER, master'daki degil TARIHSEL EN YUKSEK sayidir (I18N'in duzeltmesi): boylece isaret",
+    "'daha iyisi var mi' sorusunu da kapatir ve kapi esigi TAM surum olur.",
+    "",
+    "KALDIRMA: uretec o dosyada artik sembol kaybetmiyorsa kayit SILINIR ve companion yeniden",
+    "uretilir. Kaydin kalmasi, duzelmis bir uretecin onunde gereksiz duvar olur."
+  ],
+  "surum": 1,
+  "kayitlar": [
+    { "yol": "src/components/ErrorBoundary.md",                        "gercek_sembol": 8, "kaynak": "4f542c31", "sebep": "uretec-sembol-kaybi", "kayit": "REC-83", "serit": "ALTYAPI" },
+    { "yol": "src/components/admin/dashboard/ActivityHeatmap.md",      "gercek_sembol": 4, "kaynak": "4f542c31", "sebep": "uretec-sembol-kaybi", "kayit": "REC-83", "serit": "ALTYAPI" },
+    { "yol": "src/components/admin/data-table/BulkBar.md",             "gercek_sembol": 3, "kaynak": "4f542c31", "sebep": "uretec-sembol-kaybi", "kayit": "REC-83", "serit": "ALTYAPI" },
+    { "yol": "src/components/admin/pricing/PricingPolicyFormModal.md", "gercek_sembol": 4, "kaynak": "4f542c31", "sebep": "uretec-sembol-kaybi", "kayit": "REC-83", "serit": "ALTYAPI" },
+    { "yol": "src/components/admin/shell/AdminThemeToggle.md",         "gercek_sembol": 2, "kaynak": "4f542c31", "sebep": "uretec-sembol-kaybi", "kayit": "REC-83", "serit": "ALTYAPI" },
+    { "yol": "src/components/admin/shell/themeCookie.md",              "gercek_sembol": 3, "kaynak": "4f542c31", "sebep": "uretec-sembol-kaybi", "kayit": "REC-83", "serit": "ALTYAPI" },
+    { "yol": "src/providers/SupabaseProvider.md",                      "gercek_sembol": 2, "kaynak": "4f542c31", "sebep": "uretec-sembol-kaybi", "kayit": "REC-83", "serit": "ALTYAPI" },
+    { "yol": "src/components/admin/InventoryTable.md",                 "gercek_sembol": 6, "kaynak": "8172fdc9", "sebep": "uretec-sembol-kaybi-tarihsel", "kayit": "REC-83", "serit": "ALTYAPI" },
+    { "yol": "src/components/home/FeaturedCommercialBlocks.md",        "gercek_sembol": 5, "kaynak": "a013f342", "sebep": "uretec-sembol-kaybi-tarihsel", "kayit": "REC-83", "serit": "ALTYAPI" }
+  ]
+}
