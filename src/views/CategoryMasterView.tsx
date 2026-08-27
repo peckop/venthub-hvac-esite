@@ -22,6 +22,32 @@ const CategorySeriesView = dynamic(() => import('./category/CategorySeriesView')
 const CategoryShowcaseView = dynamic(() => import('./category/CategoryShowcaseView'))
 const ProductsDiscoveryView = dynamic(() => import('./ProductsDiscoveryView'))
 
+/**
+ * Görünüm modunun YÜRÜRLÜKTEKİ hâli — `display_mode` sütunu ne derse desin, veri onu
+ * taşıyamıyorsa mod düşer.
+ *
+ * NİÇİN VAR (canlı ölçüm, 2026-08-26): `CategoryShowcaseView` yalnız `subCategories` alır,
+ * `families` ALMAZ; showcase'te sayfalama da kapalıdır. Yani **alt kategorisi olmayan** bir
+ * showcase kategorisi müşteriye HİÇBİR ŞEY listelemez — ileriye giden tek bir bağlantı bile
+ * çıkmaz. Canlıda iki bağımsız örnekte ölçüldü (ana içerik bölgesi, footer hariç):
+ *   /tr/category/isi-geri-kazanim                (16 aktif ürün) → 0 ürün, 0 kategori bağlantısı
+ *   /tr/category/endustriyel-tavan-vantilatorleri ( 7 aktif ürün) → 0 ürün, 0 kategori bağlantısı
+ * Ayırt edici kontrol: aynı görünüm alt kategorisi OLAN kategoride çalışıyor
+ * (/tr/category/endustriyel-havalandirma → 7 alt kategori kartı). Yani bileşen bozuk değil,
+ * **veri yokken boşa düşüyor**. Etkilenen: 27 aktif ürün (16 + 7 + 4 akıllı-ev).
+ *
+ * NİÇİN AYRI FONKSİYON: mod İKİ yerde okunuyor — hangi görünümün çizileceği ve sayfalamanın
+ * gösterilip gösterilmeyeceği. İkisi ayrı ayrı hesaplanırsa sessizce ayrışır (bu dosyada zaten
+ * bir kez oldu). Tek kaynak, iki tüketici.
+ */
+export function etkinGorunumModu(
+  displayMode: 'showcase' | 'landing' | 'series' | 'grid',
+  altKategoriSayisi: number,
+): 'showcase' | 'landing' | 'series' | 'grid' {
+  if (displayMode === 'showcase' && altKategoriSayisi < 1) return 'series'
+  return displayMode
+}
+
 interface CategoryMasterViewProps {
   initialCategory?: DomainCategory | null
   /** F5-B W2.1: liste birimi artık varyant değil AİLE satırıdır. */
@@ -107,11 +133,16 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
     )
   }
 
+  // Yürürlükteki mod: sütun + verinin BİRLİKTE söylediği şey (bkz. etkinGorunumModu).
+  const etkinMod = category
+    ? etkinGorunumModu(category.displayMode, rawSubCategories?.length ?? 0)
+    : null
+
   // Determine which view to render based on ViewModel's displayMode
   const renderView = () => {
     if (!category) return null
 
-    switch (category.displayMode) {
+    switch (etkinMod) {
       case 'showcase':
         return (
           <CategoryShowcaseView
@@ -178,7 +209,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
     <div className="min-h-screen">
       <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy" /></div>}>
         {renderView()}
-        {category?.displayMode !== 'showcase' && pagination}
+        {etkinMod !== 'showcase' && pagination}
       </React.Suspense>
     </div>
   )

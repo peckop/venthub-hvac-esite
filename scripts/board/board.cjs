@@ -128,7 +128,7 @@ function liveClaims(now = Date.now()) {
       bySession.set(e.sid, {
         sid: e.sid,
         lane: e.lane || (prev && prev.lane) || 'lane',
-        globs: prev ? [...new Set([...prev.globs, ...globs])] : globs,
+        globs: prev && !e.exact ? [...new Set([...prev.globs, ...globs])] : globs,
         ts: prev ? prev.ts : e.ts, // kıdem korunur
         heartbeat: e.ts,
         ttlMs: typeof e.ttlMs === 'number' ? e.ttlMs : DEFAULT_TTL_MS,
@@ -177,7 +177,7 @@ function tumTalepler(now = Date.now()) {
       bySession.set(e.sid, {
         sid: e.sid,
         lane: e.lane || (prev && prev.lane) || 'lane',
-        globs: prev ? [...new Set([...prev.globs, ...globs])] : globs,
+        globs: prev && !e.exact ? [...new Set([...prev.globs, ...globs])] : globs,
         ts: prev ? prev.ts : e.ts,
         heartbeat: e.ts,
         ttlMs: typeof e.ttlMs === 'number' ? e.ttlMs : DEFAULT_TTL_MS,
@@ -628,8 +628,48 @@ if (require.main === module) {
   if (verb === 'claim') {
     const globs = String(flags.globs || '').split(',').map(s => s.trim()).filter(Boolean)
     if (globs.length === 0) { console.error('--globs zorunlu (virgülle ayır)'); process.exit(1) }
-    append(sid, { type: 'claim', lane: flags.lane || 'lane', globs })
-    console.log(`talep alındı: ${flags.lane || 'lane'} → ${globs.join(', ')}`)
+    /**
+     * BOŞLUKLU GLOB REDDEDİLİR — ölçülmüş sessiz arıza (2026-08-26).
+     *
+     * Ayırıcı YALNIZ virgül. Boşluk ayırmalı tek dize verildiğinde eski hâl hata VERMEZDİ:
+     * dizeyi aynen geri basar, "talep alındı" derdi ve TEK bir dev glob saklardı. O glob
+     * hiçbir yolla eşleşmez, yani claim VAR görünür ama koruma YOKTUR; pano "çakışma yok" der
+     * ve şerit kapısı YEŞİL yanar. Sahte-yeşil ailesinin pano biçimi.
+     * Filo taraması: 8 canlı şeritten 3'ünde (EDGE, ALTYAPI, URUN) bu vardı; claim birleştirdiği
+     * için çoğu parça başka girdiyle kapsanıyordu, GERÇEKTEN korumasız kalan 5 yol çıktı — ikisi
+     * Bash yazma kapısının KENDİ kaynak dosyalarıydı (kapıyı yaz, kapıyı claim etmeyi kaçır).
+     *
+     * NİÇİN "boşluktan da ayır" DEĞİL de RED: sessizce yeniden yorumlamak, boşluk içeren gerçek
+     * bir yolu iki ayrı globa bölerek ÇOK GENİŞ bir claim üretirdi — aynı sınıfın öteki yönü.
+     * Fail-closed davranış deterministiktir ve doğru komutu ÖĞRETİR.
+     */
+    const bosluklu = globs.filter(g => /[\s]/.test(g))
+    if (bosluklu.length) {
+      console.error('--globs REDDEDILDI: glob degeri BOSLUK iceriyor. Ayirici YALNIZ virgul.')
+      for (const g of bosluklu) {
+        const parca = g.split(/[\s]+/).filter(Boolean)
+        console.error(`  bosluklu deger (${parca.length} parcaya benziyor): ${g.slice(0, 120)}${g.length > 120 ? '...' : ''}`)
+        console.error(`  bunu demek istediysen: --globs "${parca.join(',')}"`)
+      }
+      console.error('Niçin reddediyoruz: bosluklu dize TEK dev glob olarak saklanir, hicbir yolla')
+      console.error('eslesmez ve claim VAR gorunurken koruma OLMAZ (olculdu 2026-08-26).')
+      process.exit(1)
+    }
+    /**
+     * --exact: verilen liste KESİN olur (birleştirme YOK) ve KIDEM KORUNUR.
+     *
+     * NİÇİN GEREKLİ: claim birleştirir, yani bir şeridi DARALTMANIN yolu yoktu. İki şerit aynı
+     * cetvel dosyasını meşru sebeplerle talep ettiğinde (2026-08-26: ALTYAPI ve I18N) ayrışma
+     * yalnız SÖZLE mümkün oluyordu, mekanik değil. `release` bir çözüm DEĞİL: oturumu haritadan
+     * siler, sonraki claim YENİ bir ts alır ve şerit bütün ortak yollarda kıdemsiz düşer.
+     * Yani "bir dosyayı bırakmak" istemek, başka her yerde kapıyı aleyhine çevirmek anlamına
+     * geliyordu. --exact daraltmayı kıdem bedeli ödemeden yapar.
+     */
+    const exact = flags.exact === true
+    append(sid, exact
+      ? { type: 'claim', lane: flags.lane || 'lane', globs, exact: true }
+      : { type: 'claim', lane: flags.lane || 'lane', globs })
+    console.log(`talep alındı${exact ? ' (KESIN — onceki globlar DUSTU, kidem korundu)' : ''}: ${flags.lane || 'lane'} → ${globs.join(', ')}`)
   } else if (verb === 'heartbeat') {
     append(sid, { type: 'heartbeat' })
     console.log('atış kaydedildi')
@@ -657,7 +697,9 @@ if (require.main === module) {
     // dışarıda bırakırdı. Yazan fiiller kimliksiz koşmaz; okuyan fiiller koşar.
     console.log(yoklama())
   } else {
-    console.log('kullanım: board.cjs <claim|heartbeat|release|note|who|yoklama> --sid X [--lane Y] [--globs "a/**,b/**"] [--to Z] [--text "..."]')
+    console.log('kullanım: board.cjs <claim|heartbeat|release|note|who|yoklama> --sid X [--lane Y] [--globs "a/**,b/**"] [--exact] [--to Z] [--text "..."]')
+    console.log('  --globs AYIRICISI VIRGUL — bosluk iceren deger REDDEDILIR (tek dev glob hicbir seyle eslesmez).')
+    console.log('  --exact: verilen listeyi KESIN kilar (birlestirme yok) ve KIDEMI KORUR; daraltmak icin release KULLANMA.')
     console.log('yoklama (rollcall): filonun UC EKSENLI canlilik fotografi — ATIS=yasiyor, GOZCU=duyuyor, SES=uretiyor. --sid istemez.')
     console.log('--sid YAZAN fiillerde (claim/heartbeat/release/note) ZORUNLUDUR; CLAUDE_SESSION_ID doluysa oradan okunur.')
   }

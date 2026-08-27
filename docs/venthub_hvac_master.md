@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T20:41:14.671056+00:00
-total_compiled_files: 654
-source_commit: 26d43672
+compiled_at: 2026-08-26T22:06:57.015047+00:00
+total_compiled_files: 655
+source_commit: b9d8a168
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-26T20:41:14.671056+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-26T22:06:57.015047+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -13098,26 +13098,27 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\SearchOverlay.tsx
-skeleton_hash: 53b07c7abe76457d
+source_path: C:\Users\alize\venthub-wt-rec79\src\components\SearchOverlay.tsx
+skeleton_hash: 8f421614d69395ad
 entity_hashes:
   func:SearchOverlay: 5877a83b84daa2a4
-  func:addToRecent: bf8c952c533ee587
+  func:addToRecent: af5ac74b08af9d79
   func:goToResult: 6dfa6700ed753b5f
-  func:handleClose: 21aa296a9a1984eb
+  func:goToSuggestion: 238fc2d74bfd3d69
+  func:handleClose: 9730550b57aba466
   func:handleKeyDown: 1487e8d647499b5f
   func:performFullSearch: ffbaaa64876e5226
   func:renderIdle: ceb6e27699bb9c05
   func:renderResults: e506feef4e55d367
   func:renderSuggestion: 843bcfdde37f5fbe
   func:renderSuggestions: 8f7a31a904a04209
-  overview: 7539016b585301ee
+  overview: 017dfdb544329b86
   style_tokens: dd6869457e23a7f7
-generated_at: 2026-08-25T07:24:54Z
+generated_at: 2026-08-26T19:10:23Z
 ---
 
 ## Genel Bakış
-SearchOverlay, tam ekran veya modal olarak açılan bir arama arayüzü bileşenidir. Kullanıcının arama terimi girmesini, önerileri ve sonuçları görüntülemesini, klavye ile gezinmesini ve son aramalarını takip etmesini sağlar. Bileşen, `open` ve `onClose` props ile kontrol edilir ve farklı UI durumlarını (boşta, öneriler, sonuçlar) render fonksiyonları aracılığıyla yönetir.
+SearchOverlay, kullanıcının arama terimi girdiği, önerileri ve sonuçları görüntülediği, klavye ile gezindiği ve son aramalarını takip ettiği tam ekran veya modal bir arama arayüzü bileşenidir. Bileşen, `open` ve `onClose` props ile kontrol edilir ve farklı UI durumlarını (boşta, öneriler, sonuçlar) render fonksiyonları aracılığıyla yönetir. Arama işlemleri asenkron olarak gerçekleştirilir ve kullanıcı etkileşimleri olay yönetimi ile ele alınır.
 
 ## Fonksiyon Grupları
 
@@ -13125,24 +13126,38 @@ SearchOverlay, tam ekran veya modal olarak açılan bir arama arayüzü bileşen
 Bileşenin dış dünya ile etkileşimini ve kapatma mantığını yönetir.
 - SearchOverlay, handleClose
 
-### Arama İşlemleri
-Arama sorgusunun yürütülmesi, sonuçlara yönlendirme ve son aramaların kaydedilmesinden sorumludur. `performFullSearch` asenkron olarak tam metin araması yapar; `addToRecent` arama terimini son aramalar listesine ekler; `goToResult` seçilen bir arama sonucuna navigasyon sağlar.
-- performFullSearch, addToRecent, goToResult
+### Arama ve Navigasyon
+Arama sorgusunun yürütülmesi, sonuçlara ve önerilere yönlendirme ve son aramaların kaydedilmesinden sorumludur. `performFullSearch` asenkron olarak tam metin araması yapar; `addToRecent` arama terimini son aramalar listesine ekler; `goToResult` ve `goToSuggestion` ise ilgili sonuç veya öneriyi seçerek navigasyon sağlar.
+- performFullSearch, addToRecent, goToResult, goToSuggestion
 
 ### Olay Yönetimi
 Klavye olaylarını dinleyerek kullanıcı etkileşimlerini (örneğin Enter ile arama, Escape ile kapatma) işler.
 - handleKeyDown
 
 ### UI Durum Renderları
-Bileşenin farklı durumlarını (boşta bekleme, önerilerin listelenmesi, arama sonuçlarının gösterilmesi) görsel olarak oluşturur. `renderSuggestion` tek bir öneriyi, diğerleri ise ilgili durumun tamamını render eder.
-- renderIdle, renderSuggestions, renderResults, renderSuggestion
+Bileşenin farklı durumlarını (boşta bekleme, önerilerin listelenmesi, arama sonuçlarının gösterilmesi) görsel olarak oluşturur. `renderSuggestion` tek bir öneriyi, diğerleri ise ilg
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, `open` ve `onClose` props ile kontrol edilen bir arama overlay bileşenidir; farklı UI durumlarını (boşta, öneriler, sonuçlar) yönetir.
+
+**[Aksiyom 1]**: Eğer `open` prop'u sağlanmazsa, bileşenin görünürlük durumu belirlenemez; overlay'in açık/kapalı kontrolü çalışmaz.
+
+**[Aksiyom 2]**: Eğer `onClose` prop'u sağlanmazsa, `handleClose` fonksiyonu overlay'i kapatamaz; kullanıcı modal'dan çıkamaz.
+
+**[Aksiyom 3]**: Eğer `FtsProductResult` tipinde veri yoksa, `goToResult` fonksiyonu bir arama sonucuna yönlendirme yapamaz.
+
+**[Aksiyom 4]**: Eğer `SearchSuggestion` tipinde veri yoksa, `goToSuggestion` ve `renderSuggestion` fonksiyonları öneri görüntüleme ve yönlendirme işlemini gerçekleştiremez.
+
+**[Aksiyom 5]**: Eğer `performFullSearch` fonksiyonu için bir arama veri kaynağı (API endpoint veya servis) yoksa, async tam arama işlemi sonuç döndüremez.
+
+**[Aksiyom 6]**: Eğer `addToRecent` fonksiyonu için bir son aramaları saklama mekanizması yoksa, kullanıcının arama geçmişi kaydedilemez.
+
+**[Aksiyom 7]**: Eğer `handleKeyDown` fonksiyonu için `React.KeyboardEvent` olay kaynağı yoksa, klavye ile gezinme (ok tuşları, Enter, Escape) çalışmaz.
+
+**[Aksiyom 8]**: Eğer `renderIdle`, `renderSuggestions` ve `renderResults` fonksiyonları için gerekli state verileri yoksa, bileşen hangi UI durumunu göstereceğini belirleyemez.
 
 ---
 
@@ -13157,12 +13172,22 @@ Bileşenin farklı durumlarını (boşta bekleme, önerilerin listelenmesi, aram
 **Dönüş**: React.FC<SearchOverlayProps> — React fonksiyonel bileşeni döndürür
 
 ### handleClose
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Klavye olaylarını işleyerek arama overlay'inde gezinme ve seçim işlemlerini yönetir. Escape tuşuyla overlay'i kapatır, ok tuşlarıyla öneriler veya sonuçlar arasında gezinmeyi sağlar, Enter tuşuyla mevcut seçimi onaylar veya tam arama gerçekleştirir.
+
+**Nasıl yapar**: `React.KeyboardEvent` parametresi alarak tuş bazlı dallanma yapar. Escape tuşunda `handleClose()` fonksiyonunu çağırır. Ok tuşlarında `viewState` durumuna göre üst sınır belirler: durum `'SUGGESTING'` ise `suggestions.length - 1`, durum `'RESULTS'` ise `results.length - 1`, diğer durumlarda `-1` değerini kullanır. ArrowDown tuşunda `activeIndex` değerini bir artırır (üst sınıra ulaşılmadıysa), ArrowUp tuşunda bir azaltır (`-1`'in altına düşmez). Enter tuşunda `activeIndex` sıfırdan büyükse ilgili duruma göre `goToSuggestion` veya `goToResult` fonksiyonunu çağırır; `activeIndex` `-1` ise `performFullSearch` fonksiyonunu çalıştırır.
+
+**Parametreler**:
+- e: React.KeyboardEvent — tetiklenen klavye olayını temsil eder; `e.key` değeri hangi tuşa basıldığını belirler
+
+**Dönüş**: Bilinmiyor — kaynakta dönüş tipi belirtilmemiş.
 
 ### goToResult
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### addToRecent
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### goToSuggestion
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### performFullSearch
@@ -13194,6 +13219,7 @@ Bileşenin farklı durumlarını (boşta bekleme, önerilerin listelenmesi, aram
 - import: ../types/db-rows::type { DbCategory }
 - import: ../utils/categoryHelpers::getLocalizedCategorySlug
 - import: ../utils/getCategoryIcon::getCategoryIcon
+- import: ../utils/routes::localizedHref
 - import: ../utils/searchHighlight::highlightMatch
 - import: @/types/ui-models::type { FtsProductResult, SearchSuggestion }
 - import: next/image::Image
@@ -13221,193 +13247,116 @@ type ViewState = 'IDLE' | 'SUGGESTING' | 'RESULTS'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/SearchOverlay.tsx::popularCategories (useMemo callback)
-- **params**: yok
+### [N1_NASIL] AST Pointer: src/components/SearchOverlay.tsx::SearchOverlay
+- **params**: `open` — arama overlay'inin açık/kapalı durumu, `onClose` — kapatma callback fonksiyonu
 - **ic_degiskenler**:
-  - `c` — globalCategories dizisindeki her bir kategori nesnesi; `c.parent_id` değeri falsy olanlar filtrelenir
-- **Dönüş**: `Partial<DbCategory>[]` — üst kategorilerden en fazla 5 tanesi
+  - `globalCategories` — `useCategories` hook'undan gelen tüm kategoriler listesi
+  - `router` — `useRouter` hook'undan gelen Next.js router nesnesi
+  - `Routes` — `useLocalizedRoutes` hook'undan gelen rota yardımcı fonksiyonları
+  - `localizedHref` — `useLocalizedRoutes` hook'undan gelen yerelleştirilmiş URL çözümleyici
+  - `lang` — `useLocalizedRoutes` hook'undan gelen mevcut dil kodu
+  - `t` — `useI18n` hook'undan gelen çeviri fonksiyonu
+  - `getCategoryIcon` — `useLocalizedRoutes` hook'undan gelen kategori ikon yardımcısı
+  - `getLocalizedCategorySlug` — `useLocalizedRoutes` hook'undan gelen yerelleştirilmiş kategori slug yardımcısı
+  - `RECENT_SEARCHES_KEY` — localStorage anahtar sabiti (kaynakta tanımlı değil, dışarıdan geliyor)
+  - `recentSearches`, `setRecentSearches` — son aramalar state'i ve setter'ı
+  - `q`, `setQ` — arama sorgusu state'i ve setter'ı
+  - `debounced`, `setDebounced` — debounce edilmiş sorgu state'i ve setter'ı
+  - `viewState`, `setViewState` — görünüm durumu state'i ('IDLE', 'SUGGESTING', 'RESULTS')
+  - `suggestions`, `setSuggestions` — öneriler listesi state'i ve setter'ı
+  - `results`, `setResults` — arama sonuçları listesi state'i ve setter'ı
+  - `loading`, `setLoading` — yükleme durumu state'i ve setter'ı
+  - `error`, `setError` — hata mesajı state'i ve setter'ı
+  - `activeIndex`, `setActiveIndex` — aktif seçili indeks state'i ve setter'ı
+  - `inputRef` — arama input elementine referans
+  - `listRef` — sonuç listesi elementine referans
+  - `popularCategories` — üst kategorilerden ilk 5 tanesini filtreleyen hesaplanmış değer
+  - `handleClose` — overlay'i kapatıp tüm state'leri sıfırlayan fonksiyon
+  - `goToResult` — ürün sonucuna yönlendiren fonksiyon
+  - `addToRecent` — arama terimini son aramalara ekleyen fonksiyon
+  - `goToSuggestion` — öneriye tıklandığında yönlendirme yapan fonksiyon
+  - `performFullSearch` — tam metin araması gerçekleştiren async fonksiyon
+  - `handleKeyDown` — klavye olaylarını işleyen fonksiyon
+  - `renderSuggestion` — tek bir öneriyi render eden fonksiyon
+  - `renderIdle` — boş durum ekranını render eden fonksiyon
+  - `renderSuggestions` — öneriler listesini render eden fonksiyon
+  - `renderResults` — arama sonuçlarını render eden fonksiyon
+  - `highlightMatch` — metin eşleşmelerini vurgulayan yardımcı fonksiyon (kaynakta tanımlı değil, dışarıdan geliyor)
+  - `active` — useEffect cleanup için bayrak değişkeni
+  - `t_id` — setTimeout ID'si (debounce için)
+  - `stored` — localStorage'dan okunan ham string
+  - `next` — güncellenmiş son aramalar dizisi
+  - `maxIndex` — klavye navigasyonu için maksimum indeks değeri
+  - `s` — suggestions dizisinden seçilen eleman
+  - `res` — results dizisinden seçilen eleman
+  - `isActive` — render fonksiyonlarında aktif indeks kontrolü
+  - `icon` — öneri tipine göre SVG ikon JSX'i
+  - `label` — marka önerisi için önek eklenmiş etiket
+  - `hasFuzzy` — sonuçlarda bulanık eşleşme olup olmadığını gösteren boolean
+  - `rImgUrl` — `resolveProductImageUrl` ile çözümlenmiş ürün görsel URL'i
+- **Dönüş**: JSX elementi (React.FC)
 
-### [N2_NASIL] AST Pointer: src/components/SearchOverlay.tsx::loadRecentSearches (useEffect callback)
-- **params**: yok
-- **ic_degiskenler**:
-  - `stored` — `localStorage.getItem(RECENT_SEARCHES_KEY)` sonucu; JSON.parse ile çözülür, ilk 5 elemanı `setRecentSearches` ile state'e yazılır
-- **Dönüş**: yok
-
-### [N3_NASIL] AST Pointer: src/components/SearchOverlay.tsx::debounceEffect (useEffect callback)
-- **params**: yok
-- **ic_degiskenler**:
-  - `t_id` — `setTimeout` ile oluşturulan zamanlayıcı kimliği; `q.trim()` değerini 200ms gecikmeyle `setDebounced` ile state'e yazar
-- **Dönüş**: cleanup fonksiyonu — `clearTimeout(t_id)` çağırır
-
-### [N4_NASIL] AST Pointer: src/components/SearchOverlay.tsx::resetActiveIndex (useEffect callback)
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — `setActiveIndex(-1)` çağırarak aktif indeksi sıfırlar
-
-### [N5_NASIL] AST Pointer: src/components/SearchOverlay.tsx::scrollToActive (useEffect callback)
-- **params**: yok
-- **ic_degiskenler**:
-  - `activeEl` — `listRef.current.children[activeIndex]` elemanı; `scrollIntoView({ block: 'nearest' })` ile görünür alana kaydırılır
-- **Dönüş**: yok
-
-### [N6_NASIL] AST Pointer: src/components/SearchOverlay.tsx::fetchSuggestionsEffect (useEffect callback)
-- **params**: yok
-- **ic_degiskenler**:
-  - `active` — cleanup bayrağı; bileşen unmount olduğunda false yapılır
-  - `fetchData` — async iç fonksiyon; `open` false ise veya `debounced` boşsa erken döner
-  - `getSearchSuggestions` — dinamik import ile `../lib/services/product.service` modülünden alınır
-  - `items` — `getSearchSuggestions(supabaseBrowserClient, debounced, 6)` sonucu; `setSuggestions` ile state'e yazılır
-  - `err` — yakalanan hata; `console.error` ile loglanır
-- **Dönüş**: cleanup fonksiyonu — `active = false` yapar
-
-### [N7_NASIL] AST Pointer: src/components/SearchOverlay.tsx::fetchData (iç fonksiyon)
-- **params**: yok
-- **ic_degiskenler**:
-  - `open` — overlay açık mı kontrolü; false ise erken dönüş
-  - `debounced` — arama terimi; boşsa `setViewState('IDLE')`, `setSuggestions([])`, `setResults([])` çağırır
-  - `getSearchSuggestions` — dinamik import ile alınan servis fonksiyonu
-  - `items` — `getSearchSuggestions(supabaseBrowserClient, debounced, 6)` sonucu
-  - `active` — bileşen aktif mi bayrağı; true ise `setSuggestions(items)` ve `setViewState('SUGGESTING')` çağırır
-  - `err` — yakalanan hata
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: src/components/SearchOverlay.tsx::openEffect (useEffect callback)
-- **params**: yok
-- **ic_degiskenler**:
-  - `open` — overlay açık mı; true ise `setQ('')` çağırır ve 50ms sonra `inputRef.current?.focus()` ile input'a odaklanır
-- **Dönüş**: yok
-
-### [N9_NASIL] AST Pointer: src/components/SearchOverlay.tsx::handleClose
+### [N2_NASIL] AST Pointer: src/components/SearchOverlay.tsx::handleClose
 - **params**: yok
 - **ic_degiskenler**: yok
 - **Dönüş**: yok — `setQ('')`, `setResults([])`, `setSuggestions([])`, `setViewState('IDLE')`, `setActiveIndex(-1)` ve `onClose()` çağırır
 
-### [N10_NASIL] AST Pointer: src/components/SearchOverlay.tsx::goToResult
-- **params**: `res: FtsProductResult`
-- **ic_degiskenler**:
-  - `res.family_slug` — ürün ailesi slug'ı; varsa `Routes.product(res.family_slug, res.sku)` ile yönlendirme yapılır, yoksa `Routes.products()` ile genel ürün sayfasına gidilir
-  - `res.sku` — ürün SKU'su
-- **Dönüş**: yok — `router.push` ve `handleClose()` çağırır
+### [N3_NASIL] AST Pointer: src/components/SearchOverlay.tsx::goToResult
+- **params**: `res` — FtsProductResult tipinde arama sonucu nesnesi
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `res.family_slug` varsa `Routes.product(res.family_slug, res.sku)` ile, yoksa `Routes.products()` ile `router.push` çağırır, ardından `handleClose()` çağırır
 
-### [N11_NASIL] AST Pointer: src/components/SearchOverlay.tsx::addToRecent
-- **params**: `term: string`
+### [N4_NASIL] AST Pointer: src/components/SearchOverlay.tsx::addToRecent
+- **params**: `term` — string tipinde arama terimi
 - **ic_degiskenler**:
-  - `term` — arama terimi; boşsa erken dönüş
-  - `next` — `term` ve mevcut `recentSearches` dizisinin birleşimi; `term` tekrarları filtrelenir, en fazla 5 eleman alınır
-- **Dönüş**: yok — `setRecentSearches(next)` ve `localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next))` çağırır
+  - `next` — mevcut `recentSearches` dizisinden `term` filtrelenip başına eklenerek ve 5 elemana kesilerek oluşturulan yeni dizi
+- **Dönüş**: yok — `setRecentSearches(next)` çağırır ve `localStorage.setItem` ile `RECENT_SEARCHES_KEY` anahtarına JSON.stringify(next) yazar
 
-### [N12_NASIL] AST Pointer: src/components/SearchOverlay.tsx::performFullSearch
-- **params**: `term: string`
+### [N5_NASIL] AST Pointer: src/components/SearchOverlay.tsx::goToSuggestion
+- **params**: `s` — SearchSuggestion tipinde öneri nesnesi, `term` — string tipinde arama terimi
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `s.url` varsa `localizedHref(s.url, lang)` ile `router.push` çağırır, ardından `addToRecent(term)` ve `handleClose()` çağırır
+
+### [N6_NASIL] AST Pointer: src/components/SearchOverlay.tsx::performFullSearch
+- **params**: `term` — string tipinde arama terimi
 - **ic_degiskenler**:
-  - `term` — arama terimi; boşsa erken dönüş
-  - `ftsSearchProducts` — dinamik import ile `../lib/services/product.service` modülünden alınır
-  - `rows` — `ftsSearchProducts(supabaseBrowserClient, term, 20)` sonucu; `setResults(rows)` ile state'e yazılır
-  - `t` — i18n fonksiyonu; hata durumunda `t('search.noResults')` mesajı kullanılır
-- **Dönüş**: yok — `setLoading(true)`, `setError(null)`, `setViewState('RESULTS')`, `addToRecent(term)`, `setActiveIndex(-1)` çağırır; sonunda `setLoading(false)`
+  - `ftsSearchProducts` — dinamik import ile `../lib/services/product.service` modülünden alınan tam metin arama fonksiyonu
+  - `rows` — `ftsSearchProducts(supabaseBrowserClient, term, 20)` çağrısından dönen arama sonuçları dizisi
+- **Dönüş**: yok — `setLoading(true)`, `setError(null)`, `setViewState('RESULTS')`, `addToRecent(term)`, `setActiveIndex(-1)` çağırır; başarılıysa `setResults(rows)`, hatada `setError(t('search.noResults') || 'Arama sırasında hata oluştu.')` çağırır; finally bloğunda `setLoading(false)` çağırır
 
-### [N13_NASIL] AST Pointer: src/components/SearchOverlay.tsx::handleKeyDown
-- **params**: `e: React.KeyboardEvent`
+### [N7_NASIL] AST Pointer: src/components/SearchOverlay.tsx::handleKeyDown
+- **params**: `e` — React.KeyboardEvent tipinde klavye olayı
 - **ic_degiskenler**:
-  - `e.key` — basılan tuş; 'Escape' ise `handleClose()` çağırır
-  - `maxIndex` — `viewState` 'SUGGESTING' ise `suggestions.length - 1`, 'RESULTS' ise `results.length - 1`, değilse -1
-  - `s` — `suggestions[activeIndex]`; Enter tuşu ve 'SUGGESTING' durumunda `router.push` ve `addToRecent` ile yönlendirme yapılır
-  - `res` — `results[activeIndex]`; Enter tuşu ve 'RESULTS' durumunda `goToResult(res)` çağırılır
-  - `q` — mevcut arama terimi; Enter tuşu ve aktif indeks -1 ise `performFullSearch(q)` çağırılır
-- **Dönüş**: yok
+  - `maxIndex` — `viewState` 'SUGGESTING' ise `suggestions.length - 1`, 'RESULTS' ise `results.length - 1`, değilse `-1`
+  - `s` — `viewState` 'SUGGESTING' olduğunda `suggestions[activeIndex]` elemanı
+  - `res` — `viewState` 'RESULTS' olduğunda `results[activeIndex]` elemanı
+- **Dönüş**: yok — Escape tuşunda `handleClose()` çağırır; ArrowDown/ArrowUp ile `setActiveIndex` günceller; Enter tuşunda aktif indeks varsa ilgili öneri/sonuç fonksiyonunu, yoksa `performFullSearch(q)` çağırır
 
-### [N14_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderSuggestion
-- **params**: `s: SearchSuggestion`, `idx: number`
+### [N8_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderSuggestion
+- **params**: `s` — SearchSuggestion tipinde öneri nesnesi, `idx` — number tipinde indeks
 - **ic_degiskenler**:
-  - `isActive` — `idx === activeIndex` kontrolü
-  - `s.type` — öneri tipi; 'product', 'category' veya 'brand' olabilir
-  - `s.metadata` — `Record<string, string>` tipinde; `image_url`, `sku`, `brand` alanlarına erişilir
-  - `s.label` — öneri etiketi
-  - `s.url` — yönlendirme URL'i
-  - `icon` — `s.type`'a göre SVG ikonu; 'product' ise ve `image_url` varsa `Image` bileşeni kullanılır
-  - `label` — `s.type` 'brand' ise `t('search.brandPrefix')` ile birleştirilir
-  - `debounced` — arama terimi; `highlightMatch` fonksiyonuna iletilir
-- **Dönüş**: JSX — buton elementi
+  - `isActive` — `idx === activeIndex` karşılaştırması sonucu boolean
+  - `icon` — `s.type` değerine göre ('product', 'category', 'brand') seçilen SVG ikon JSX'i; ürün tipinde `s.metadata.image_url` varsa Image bileşeni kullanılır
+  - `label` — `s.type` 'brand' ise `t('search.brandPrefix')` + `s.label`, değilse `s.label`
+- **Dönüş**: JSX elementi (button)
 
-### [N15_NASIL] AST Pointer: src/components/SearchOverlay.tsx::suggestionOnClick (renderSuggestion içinde)
-- **params**: yok
-- **ic_degiskenler**:
-  - `s.url` — yönlendirme URL'i; yoksa '#' kullanılır
-  - `q` — mevcut arama terimi; `addToRecent(q)` çağırır
-- **Dönüş**: yok — `router.push` ve `handleClose()` çağırır
-
-### [N16_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderIdle
-- **params**: yok
-- **ic_degiskenler**:
-  - `recentSearches` — son aramalar dizisi; boş değilse liste gösterilir
-  - `popularCategories` — popüler kategoriler dizisi; boşsa fallback kategoriler gösterilir
-  - `term` — recentSearches map callback'inde her bir arama terimi
-  - `i` — recentSearches map callback'inde indeks
-  - `cat` — popularCategories map callback'inde kategori nesnesi; `cat.id`, `cat.slug`, `cat.metadata`, `cat.name` alanlarına erişilir
-  - `lang` — mevcut dil; `getLocalizedCategorySlug` fonksiyonuna iletilir
-  - `t` — i18n fonksiyonu; 'search.recentSearches', 'search.clearRecent', 'search.popularCategories' anahtarlarına erişilir
-- **Dönüş**: JSX — idle durumu içeriği
-
-### [N17_NASIL] AST Pointer: src/components/SearchOverlay.tsx::clearRecentSearches (renderIdle içinde)
+### [N9_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderIdle
 - **params**: yok
 - **ic_degiskenler**: yok
-- **Dönüş**: yok — `setRecentSearches([])` ve `localStorage.removeItem(RECENT_SEARCHES_KEY)` çağırır
+- **Dönüş**: JSX elementi — son aramalar listesini ve popüler kategorileri gösteren boş durum ekranı
 
-### [N18_NASIL] AST Pointer: src/components/SearchOverlay.tsx::recentSearchItem (renderIdle map callback)
-- **params**: `term` (string), `i` (number)
-- **ic_degiskenler**:
-  - `term` — arama terimi; buton içinde gösterilir
-  - `i` — indeks; `key` prop'u olarak kullanılır
-- **Dönüş**: JSX — liste elemanı; onClick'de `setQ(term)` ve `performFullSearch(term)` çağırır
+### [N10_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderSuggestions
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX elementi — `suggestions` boşsa "sonuç yok" mesajı ve detaylı arama butonu; değilse öneri listesi ve "tüm sonuçlar" butonu
 
-### [N19_NASIL] AST Pointer: src/components/SearchOverlay.tsx::popularCategoryItem (renderIdle map callback)
-- **params**: `cat` (Partial<DbCategory>)
-- **ic_degiskenler**:
-  - `cat.id` — kategori kimliği; `key` prop'u olarak `String(cat.id)` kullanılır
-  - `cat.slug` — kategori slug'ı; `getLocalizedCategorySlug` fonksiyonuna iletilir
-  - `cat.metadata` — kategori metadata'sı; `getLocalizedCategorySlug` fonksiyonuna iletilir
-  - `cat.name` — kategori adı; buton içinde `String(cat.name)` olarak gösterilir
-  - `lang` — mevcut dil
-- **Dönüş**: JSX — buton elementi; onClick'de `router.push(Routes.category(...))` ve `handleClose()` çağırır
-
-### [N20_NASIL] AST Pointer: src/components/SearchOverlay.tsx::fallbackCategoryItem (renderIdle map callback)
-- **params**: `cat` ({ name: string, slug: string })
-- **ic_degiskenler**:
-  - `cat.name` — kategori adı; buton içinde gösterilir
-  - `cat.slug` — kategori slug'ı; `Routes.category(cat.slug)` ile yönlendirme yapılır
-- **Dönüş**: JSX — buton elementi; onClick'de `router.push(Routes.category(cat.slug))` ve `handleClose()` çağırır
-
-### [N21_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderSuggestions
+### [N11_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderResults
 - **params**: yok
 - **ic_degiskenler**:
-  - `suggestions` — öneri dizisi; boşsa "sonuç yok" mesajı gösterilir
-  - `debounced` — arama terimi; `performFullSearch(debounced)` ve `highlightMatch` fonksiyonlarına iletilir
-  - `s` — `suggestions.map` callback'inde her bir öneri
-  - `idx` — `suggestions.map` callback'inde indeks
-  - `t` — i18n fonksiyonu; 'search.noResults', 'search.detailedSearch', 'search.overlay.allResultsFor' anahtarlarına erişilir
-- **Dönüş**: JSX — öneriler listesi veya boş durum mesajı
-
-### [N22_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderResults
-- **params**: yok
-- **ic_degiskenler**:
-  - `results` — sonuç dizisi; boşsa "sonuç yok" mesajı gösterilir
-  - `hasFuzzy` — `results.some(r => r.is_fuzzy_match)` kontrolü; true ise fuzzy match uyarısı gösterilir
-  - `r` — `results.map` callback'inde her bir sonuç
-  - `idx` — `results.map` callback'inde indeks
-  - `isActive` — `idx === activeIndex` kontrolü
-  - `rImgUrl` — `resolveProductImageUrl(r)` sonucu; ürün görsel URL'i
-  - `debounced` — arama terimi; `highlightMatch` fonksiyonuna iletilir
-  - `t` — i18n fonksiyonu; 'search.noResults', 'search.noResultsAdvice', 'search.fuzzyMatchNotice', 'search.overlay.enterKey' anahtarlarına erişilir
-- **Dönüş**: JSX — sonuçlar listesi veya boş durum mesajı
-
-### [N23_NASIL] AST Pointer: src/components/SearchOverlay.tsx::resultItem (renderResults map callback)
-- **params**: `r` (FtsProductResult), `idx` (number)
-- **ic_degiskenler**:
-  - `r` — ürün sonucu; `r.id`, `r.name`, `r.brand`, `r.sku`, `r.is_fuzzy_match` alanlarına erişilir
-  - `idx` — indeks
-  - `isActive` — `idx === activeIndex` kontrolü
-  - `rImgUrl` — `resolveProductImageUrl(r)` sonucu
-  - `debounced` — arama terimi; `highlightMatch` fonksiyonuna iletilir
-- **Dönüş**: JSX — liste elemanı; onClick'de `goToResult(r)` çağırır, onMouseEnter'de `setActiveIndex(idx)` çağırır
+  - `hasFuzzy` — `results.some(r => r.is_fuzzy_match)` sonucu boolean; bulanık eşleşme uyarısı gösterilip gösterilmeyeceğini belirler
+  - `isActive` — her sonuç elemanı için `idx === activeIndex` karşılaştırması
+  - `rImgUrl` — `resolveProductImageUrl(r)` ile çözümlenmiş ürün görsel URL'i
+- **Dönüş**: JSX elementi — sonuçlar boşsa "sonuç yok" mesajı; değilse bulanık eşleşme uyarısı ve sonuç listesi
 
 ---
 
@@ -13418,6 +13367,7 @@ graph TD
     SearchOverlay_tsx__SearchOverlay["SearchOverlay"]
     SearchOverlay_tsx__addToRecent["addToRecent"]
     SearchOverlay_tsx__goToResult["goToResult"]
+    SearchOverlay_tsx__goToSuggestion["goToSuggestion"]
     SearchOverlay_tsx__handleClose["handleClose"]
     SearchOverlay_tsx__handleKeyDown["handleKeyDown"]
     SearchOverlay_tsx__performFullSearch["performFullSearch"]
@@ -13425,29 +13375,31 @@ graph TD
     SearchOverlay_tsx__renderResults["renderResults"]
     SearchOverlay_tsx__renderSuggestion["renderSuggestion"]
     SearchOverlay_tsx__renderSuggestions["renderSuggestions"]
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__goToResult
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__goToSuggestion
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
 ```
 
 ## NODE ID STANDARD
 
-  file: SearchOverlay.tsx
-  function: SearchOverlay.tsx::SearchOverlay
-  function: SearchOverlay.tsx::handleClose
-  function: SearchOverlay.tsx::goToResult
-  function: SearchOverlay.tsx::addToRecent
-  function: SearchOverlay.tsx::performFullSearch
-  function: SearchOverlay.tsx::handleKeyDown
-  function: SearchOverlay.tsx::renderSuggestion
-  function: SearchOverlay.tsx::renderIdle
-  function: SearchOverlay.tsx::renderSuggestions
-  function: SearchOverlay.tsx::renderResults
+  file: src\components\SearchOverlay.tsx
+  function: src\components\SearchOverlay.tsx::SearchOverlay
+  function: src\components\SearchOverlay.tsx::handleClose
+  function: src\components\SearchOverlay.tsx::goToResult
+  function: src\components\SearchOverlay.tsx::addToRecent
+  function: src\components\SearchOverlay.tsx::goToSuggestion
+  function: src\components\SearchOverlay.tsx::performFullSearch
+  function: src\components\SearchOverlay.tsx::handleKeyDown
+  function: src\components\SearchOverlay.tsx::renderSuggestion
+  function: src\components\SearchOverlay.tsx::renderIdle
+  function: src\components\SearchOverlay.tsx::renderSuggestions
+  function: src\components\SearchOverlay.tsx::renderResults
 
 ---
 
@@ -47735,11 +47687,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts
-skeleton_hash: cb85a85e8d45db0d
+source_path: C:\tmp\vh-rec80\src\i18n\dictionaries\en.ts
+skeleton_hash: 761178315be27aad
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-24T11:54:07Z
+generated_at: 2026-08-26T19:38:59Z
 ---
 
 ## Genel Bakış
@@ -47798,11 +47750,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
-skeleton_hash: 100b21dc23104fef
+source_path: C:\tmp\vh-rec80\src\i18n\dictionaries\tr.ts
+skeleton_hash: 0f425846c1a7eb72
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-08-24T11:54:09Z
+generated_at: 2026-08-26T19:39:02Z
 ---
 
 ## Genel Bakış
@@ -57622,6 +57574,118 @@ Bu modül için aksiyomlar, yalnızca fonksiyon imzasından çıkarılabilen ko�
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: getCategories
+
+---
+# FILE: src\lib\services\contactMessageService.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\tmp\vh-rec80\src\lib\services\contactMessageService.ts
+skeleton_hash: 7132a939a872ee42
+entity_hashes:
+  func:submitContactMessage: 0d8bdfa3ae2bec82
+  overview: e4c082f3ad81112f
+generated_at: 2026-08-26T19:27:53Z
+---
+
+## Genel Bakış
+
+Bu modül, iletişim mesajlarının gönderilmesiyle ilgilenen bir servis katmanıdır. Supabase veritabanı istemcisini kullanarak kullanıcıdan gelen iletişim mesajı verilerini işler. Modül tek bir asenkron fonksiyondan oluşur ve bir sonuç değeri döndürür.
+
+## Fonksiyon Grupları
+
+### İletişim Mesajı Gönderme
+
+Kullanıcıdan alınan iletişim mesajı verisini Supabase veritabanına kaydeder ve işlemin sonucunu döndürür.
+
+- submitContactMessage
+
+## Bağımlılıklar
+
+- **Dış bağımlılık:** SupabaseClient ve Database türleri (Supabase kütüphanesi)
+- **Dış bağımlılık:** ContactMessageInput türü (muhtemelen aynı projede tanımlı bir arayüz veya tip)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Neden:** Fonksiyon gövdesi verilmediğinden, `submitContactMessage` fonksiyonunun çalışma mantığı, hangi tabloya yazdığı, hangi doğrulama kontrollerini yaptığı veya hangi hata senaryolarını ele aldığı bilinmemektedir. Yalnızca fonksiyon imzası (`supabase: SupabaseClient<Database>`, `input: ContactMessageInput`, dönüş tipi `Promise<string>`) mevcuttur; bu bilgiler fonksiyonun davranışını belirlemek için yeterli değildir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### submitContactMessage
+**Ne yapar**: İletişim mesajını veritabanına kaydeder ve kaydedilen satırın kimliğini döndürür. Hata durumunda fırlatır — sessiz yutma yoktur. Başarı kanıtlanamıyorsa (RPC hata vermez ama kimlik de dönmezse) bu durum da hata olarak değerlendirilir.
+
+**Nasıl yapar**: Supabase istemcisi üzerinden `submit_contact_message` adlı sunucu tarafı (RPC) fonksiyonunu çağırır. Girdi nesnesindeki tüm alanları bu RPC fonksiyonuna parametre olarak aktarır. Çağrı tamamlandıktan sonra iki kontrol yapılır: Birincisi, `error` değişkeni doluysa bu hata doğrudan fırlatılır. İkincisi, `data` değişkeni boşsa (yani RPC hata vermeden çalıştı ama bir kimlik dönmediyse) bu durum "yazma kanıtlanamadı" anlamına geldiği için açık bir `Error` fırlatılarak çağıranın başarı ekranını göstermesi engellenir. Her iki kontrol de geçilirse `data` değeri (yazılan satırın kimliği) döndürülür.
+
+**Parametreler**:
+- supabase: `SupabaseClient<Database>` — Supabase veritabanı istemcisi. RPC çağrısını gerçekleştirmek için kullanılır.
+- input: `ContactMessageInput` — İletişim formundan gelen girdi verisi. İçinde şu alanları barındırır: `name` (ad), `message` (mesaj), `email` (e-posta), `phone` (telefon), `company` (şirket), `city` (şehir), `applicationArea` (uygulama alanı), `subject` (konu), `consent` (onay).
+
+**Dönüş**: `Promise<string>` — Başarılı kayıt durumunda veritabanına yazılan satırın kimliğini (string) döndürür. Hata durumunda bu Promise rejection ile sonuçlanır (hata fırlatılır).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/types/database.types::type { Database }
+- import: @supabase/supabase-js::type { SupabaseClient }
+
+---
+
+## INTERFACES
+
+### ContactMessageInput
+MÜŞTERİ-YÜZÜ FORM YAZMA KATMANI — `docs/standards/form-submission-standard.md` §6. NİÇİN SERVİS: bileşen doğrudan `supabase.from(...)` çağırmaz; yazma DI'lı bir servisten geçer (CLAUDE.md §2 — ilk parametre `supabase`). Ev deseni: `createQuoteRequest`. NİÇİN RPC, DOĞRUDAN TABLO DEĞİL — cetvel §6'da 
+- `name: string`
+- `message: string`
+- `email?: string`
+- `phone?: string`
+- `company?: string`
+- `city?: string`
+- `applicationArea?: string`
+- `subject?: string`
+- `consent: boolean`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: contactMessageService.ts::submitContactMessage
+- **params**:
+  - `supabase` — SupabaseClient<Database> tipinde, veritabanı istemcisi
+  - `input` — ContactMessageInput tipinde, iletişim formu verilerini taşır
+- **ic_degiskenler**:
+  - `data` — `supabase.rpc('submit_contact_message', {...})` çağrısından dönen sonuç; RPC fonksiyonu başarılıysa oluşturulan kaydın kimliğini (string) içerir, başarısızsa null olabilir
+  - `error` — `supabase.rpc('submit_contact_message', {...})` çağrısından dönen hata nesnesi; hata yoksa null/falsy
+  - `input.name` — RPC parametresi `p_name` olarak gönderilir, kullanıcının adı
+  - `input.message` — RPC parametresi `p_message` olarak gönderilir, mesaj içeriği
+  - `input.email` — RPC parametresi `p_email` olarak gönderilir, e-posta adresi
+  - `input.phone` — RPC parametresi `p_phone` olarak gönderilir, telefon numarası
+  - `input.company` — RPC parametresi `p_company` olarak gönderilir, şirket adı
+  - `input.city` — RPC parametresi `p_city` olarak gönderilir, şehir
+  - `input.applicationArea` — RPC parametresi `p_application_area` olarak gönderilir, uygulama alanı
+  - `input.subject` — RPC parametresi `p_subject` olarak gönderilir, konu
+  - `input.consent` — RPC parametresi `p_consent` olarak gönderilir, onay durumu
+- **Dönüş**: `Promise<string>` — RPC fonksiyonundan dönen kimlik (data); hata varsa veya data null ise hata fırlatır, aksi takdirde data string olarak döner
+
+---
+
+## NODE ID STANDARD
+
+  file: src\lib\services\contactMessageService.ts
+  function: src\lib\services\contactMessageService.ts::submitContactMessage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: ContactMessageInput
+  export: submitContactMessage
 
 ---
 # FILE: src\lib\services\dataSubjectRequest.service.md
@@ -69149,44 +69213,42 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\views\ContactPage.tsx
-skeleton_hash: f0abe85fd597d1ce
+source_path: C:\tmp\vh-rec80\src\views\ContactPage.tsx
+skeleton_hash: 6da6f6200d810df4
 entity_hashes:
   func:ArrowRight: 1546741fbe749202
   func:ContactPage: a5b3030a0864a814
-  func:handleSubmit: 460293fdfa9263b6
-  overview: 060d74556606246c
-  style_tokens: 21b7b2d66d6de05a
-generated_at: 2026-08-18T06:51:24Z
+  func:handleSubmit: 95200638b7a8d648
+  overview: 4bedca8cde6e58ef
+  style_tokens: 9d39e82e06c400aa
+generated_at: 2026-08-26T19:28:58Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub uygulamasının iletişim sayfasını temsil eden tek bir React bileşeninden oluşur. Temel amacı, kullanıcıdan iletişim formu verilerini (e-posta, telefon, mesaj) toplayarak bu bilgileri sunucuya göndermektir.
+
+Bu modül, VentHub uygulamasının iletişim sayfasını oluşturan bir React bileşenidir. Kullanıcıdan e-posta, telefon ve mesaj gibi iletişim bilgilerini toplayan bir form içerir ve form gönderim işlemini yönetir. Modül, ana sayfa bileşeni, form gönderme işleyicisi ve yardımcı bir ok ikonu bileşeninden oluşur.
 
 ## Fonksiyon Grupları
+
 ### Ana Sayfa Bileşeni
-Modülün ana yapısını ve kullanıcı arayüzünü oluşturur; form alanlarını, başlığı ve gönderme butonunu render eder.
+İletişim sayfasının tüm kullanıcı arayüzünü oluşturur; form alanlarını, başlığı ve gönderme butonunu render eder. Diğer fonksiyonları ve yardımcı bileşenleri bir araya getirir.
 - ContactPage
 
-### Form Veri İşleme
-Kullanıcı formu gönderdiğinde tetiklenen mantıksal akışı yönetir; form verilerini toplar, doğrular ve bir eylem (örn. sunucuya gönderme) başlatır.
+### Form Gönderme İşleyicisi
+Kullanıcı formu gönderdiğinde tetiklenir; form verilerini toplar ve sunucuya gönderme işlemini başlatır. Form olayının varsayılan davranışını engelleyerek sayfanın yeniden yüklenmesini önler.
 - handleSubmit
 
-### Yardımcı UI Bileşenleri
-Sayfa içinde tekrar kullanılabilen, küçük ve tek sorumlu görsel öğeleri sağlar.
+### Yardımcı UI Bileşeni
+Sayfa içinde tekrar kullanılabilen bir ok ikonu sağlar. Varsayılan boyutu 16 pikseldir ancak farklı bağlamlarda kullanılabilmesi için boyut parametresi alır.
 - ArrowRight
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon gövdeleri erişime açık değildir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1]**: Eğer `handleSubmit` fonksiyonu `React.FormEvent` parametresi almıyorsa, form gönderim olayı doğru yakalanamaz ve kullanıcı girişleri işlenemez.
-
-**[Aksiyom 2]**: Eğer `ArrowRight` bileşeni `size` parametresi desteklemiyorsa, bileşen farklı bağlamda (buton, başlık vb.) kullanıldığında boyut ayarlanamaz ve tutarsız render oluşur.
-
-**[Aksiyom 3]**: Eğer `ContactPage` bileşeni bir React form elemanı içermiyorsa, `handleSubmit` hiçbir zaman tetiklenemez ve sayfa işlevsiz kalır.
+**Neden:** Fonksiyon gövdeleri sağlanmadığı için, yalnızca imzalardan (`ContactPage`, `handleSubmit`, `ArrowRight`) mimari varsayımlar üretilememektedir. İmzalar davranışsal koşul içermez; aksiyom üretimi için fonksiyon gövdesindeki mantıksal dallanma, hata kontrolü, eşik değerleri veya bağımlılık kontrolleri gereklidir.
 
 ---
 
@@ -69203,14 +69265,14 @@ Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon g
 **Dönüş**: React.FC — bir React fonksiyonel bileşeni.
 
 ### handleSubmit
-**Ne yapar**: handleSubmit, iletişim formu gönderildiğinde tetiklenen bir olay işleyicisidir. Form verilerini toplar, doğrulama adımlarını başlatabilir ve gönderim sürecini yönetir. İşlem tamamlandığında sayfa yenilenmesi veya başka bir UI güncellemesi yapılabilir.  
+**Ne yapar**: İletişim formunun gönderilmesi işlemini yöneten asenkron fonksiyondur. Form gönderildiğinde tetiklenir ve müşteriye "iletildi" mesajı gösterir; ancak form verilerini hiçbir veritabanına veya harici hizmete kaydetmez. Kaynak kodda bu fonksiyonun gövdesinde yalnızca bir yorum satırı bulunur: "Form submission logic using supabase would go here". Yani asıl gönderim mantığı hiç uygulanmamıştır.
 
-**Nasıl yapar**: Fonksiyon, React.FormEvent tipinde bir olay nesnesi alır ve bu nesnenin `preventDefault()` metodunu çağırarak tarayıcının varsayılan form gönderimini engeller. Ardından, form alanlarından değerler okunur ve gerekli iş mantığı (ör. API çağrısı) yürütülür.  
+**Nasıl yapar**: Fonksiyonun iç mantığı kaynakta mevcut değildir — gövdede gerçek bir işlem yerine yalnızca gelecekteki implementasyonu ima eden bir yorum satırı bırakılmıştır. `form-submission-standard.md` belgesinin §7 maddesi, yazma işlemi yerine geçen bu tür yorumları adıyla yasaklamaktadır. Üretim ortamında `contact_messages` tablosuna kayıt yapılmadığı ölçülmüştür.
 
-**Parametreler**:  
-- e: React.FormEvent — Form gönderim olayını temsil eden nesne; olayın detaylerine ve hedef form elemanlarına erişim sağlar.  
+**Parametreler**:
+- `e`: `React.FormEvent` — Formun gönderilme olayını temsil eden event nesnesi. Form submit davranışını kontrol etmek (varsayılan davranışı engellemek gibi) amacıyla kullanılır.
 
-**Dönüş**: Belirtilmemiş; genellikle `void` (geri dönüş değeri yok) olarak kullanılır.
+**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir. Bilinmiyor.
 
 ### ArrowRight
 **Ne yapar**: ArrowRight, sağa yön gösteren bir ikon bileşenidir ve UI içinde ok işareti olarak kullanılabilir. Varsayılan olarak 16 piksel boyutunda render edilir, ancak `size` parametresi ile farklı boyutlar ayarlanabilir. Bu bileşen, ikonun stil ve renk özelliklerini dışarıdan gelen props ile özelleştirmeye olanak tanır.  
@@ -69227,15 +69289,20 @@ Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon g
 ## İTHALATLAR (IMPORTS)
 - import: ../components/HVACIcons::WhatsAppIcon
 - import: ../components/Seo::Seo
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../hooks/useScrollAnimation::scrollAnimationClasses
 - import: ../hooks/useScrollAnimation::useScrollAnimation
 - import: ../i18n/I18nProvider::useI18n
+- import: ../lib/errorReporter::reportError
+- import: ../lib/services/contactMessageService::submitContactMessage
+- import: ../lib/supabase/client::supabaseBrowserClient
 - import: ../utils/whatsapp::getSupportLink
 - import: lucide-react::CheckCircle
 - import: lucide-react::Clock
 - import: lucide-react::Mail
 - import: lucide-react::MapPin
 - import: lucide-react::Phone
+- import: next/link::Link
 - import: react::React
 - import: react::useState
 
@@ -69243,31 +69310,74 @@ Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon g
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: ContactPage.tsx::ContactPage
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: src/views/ContactPage.tsx::ContactPage
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
-  - `formSubmitted` — form gönderim durumunu tutan state değişkeni
-  - `setFormSubmitted` — formSubmitted state'ini güncelleyen setter fonksiyonu
-  - `whatsappLink` — getSupportLink() ile oluşturulan WhatsApp destek bağlantısı
-  - `heroBadgeRef` — Hero badge bölümü için ref nesnesi
-  - `heroBadgeVisible` — Hero badge bölümünün görünür olup olmadığını belirten boolean
-  - `contactGridRef` — İletişim kartları grid'i için ref nesnesi
-  - `contactGridVisible` — İletişim kartlarının görünür olup olmadığını belirten boolean
-  - `formSuccessRef` — Form başarı mesajı bölümü için ref nesnesi
-  - `formSuccessVisible` — Form başarı mesajının görünür olup olmadığını belirten boolean
-  - `contactCards` — İletişim bilgilerini tutan dizi (Phone, Mail, MapPin ikonları ile)
-- **Dönüş**: React.JSX.Element (sayfa yapısı)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; sayfa metinlerini yerelleştirmek için kullanılır
+  - `lang` — `useI18n()` hook'undan dönen geçerli dil kodu; `getSupportLink` çağrısına iletilir
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen yönlendirme nesnesi; KVKK linkinde `Routes.legal.kvkk()` olarak erişilir
+  - `formSubmitted` — `useState(false)` ile oluşturulan boolean durum; form başarıyla gönderildiğinde `true` olur ve başarı ekranını gösterir
+  - `setFormSubmitted` — `formSubmitted` durumunu güncelleyen setter fonksiyonu
+  - `name` — `useState('')` ile oluşturulan string; formdaki isim input alanının kontrol edilen değeri
+  - `setName` — `name` durumunu güncelleyen setter fonksiyonu
+  - `email` — `useState('')` ile oluşturulan string; formdaki e-posta input alanının kontrol edilen değeri
+  - `setEmail` — `email` durumunu güncelleyen setter fonksiyonu
+  - `subject` — `useState('')` ile oluşturulan string; formdaki konu input alanının kontrol edilen değeri
+  - `setSubject` — `subject` durumunu güncelleyen setter fonksiyonu
+  - `message` — `useState('')` ile oluşturulan string; formdaki mesaj textarea alanının kontrol edilen değeri
+  - `setMessage` — `message` durumunu güncelleyen setter fonksiyonu
+  - `consent` — `useState(false)` ile oluşturulan boolean; KVKK rıza kutusunun işaretlenip işaretlenmediğini tutar
+  - `setConsent` — `consent` durumunu güncelleyen setter fonksiyonu
+  - `submitting` — `useState(false)` ile oluşturulan boolean; form gönderilirken `true` olur, butonu devre dışı bırakır
+  - `setSubmitting` — `submitting` durumunu güncelleyen setter fonksiyonu
+  - `formError` — `useState('')` ile oluşturulan string; form hata mesajını tutar, boşsa hata gösterilmez
+  - `setFormError` — `formError` durumunu güncelleyen setter fonksiyonu
+  - `whatsappLink` — `getSupportLink(t('common.whatsapp.supportMessageDefault'), lang)` çağrısından dönen WhatsApp destek URL'si
+  - `heroBadgeRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })` hook'undan dönen DOM referansı; hero rozet elementine bağlanır
+  - `heroBadgeVisible` — aynı hook'tan dönen boolean; hero rozeti görünür olduğunda `true` olur, animasyon sınıfını tetikler
+  - `contactGridRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })` hook'undan dönen DOM referansı; iletişim kartları ızgarasına bağlanır
+  - `contactGridVisible` — aynı hook'tan dönen boolean; ızgara görünür olduğunda `true` olur
+  - `formSuccessRef` — `useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })` hook'undan dönen DOM referansı; başarı ekranına bağlanır
+  - `formSuccessVisible` — aynı hook'tan dönen boolean; başarı ekranı görünür olduğunda `true` olur
+  - `contactCards` — üç elemanlı dizi; her eleman `icon`, `title`, `value`, `href`, `label` alanlarından oluşur (telefon, e-posta, ofis adresi kartları)
+  - `handleSubmit` — içe tanımlı async fonksiyon; form gönderimini yönetir, `submitContactMessage` servisini çağırır
+- **Dönüş**: JSX — tam sayfa iletişim bileşeni (hero, iletişim kartları ızgarası, WhatsApp CTA, form veya başarı ekranı)
 
-### [N2_NASIL] AST Pointer: ContactPage.tsx::handleSubmit
-- **params**: (e: React.FormEvent)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (formSubmitted state'ini true yapar)
+### [N2_NASIL] AST Pointer: src/views/ContactPage.tsx::handleSubmit
+- **params**: `e` — `React.FormEvent` türünde form olayı nesnesi; `e.preventDefault()` ile varsayılan form davranışı engellenir
+- **ic_degiskenler**:
+  - `consent` — üst kapsamdan (ContactPage) gelen boolean; KVKK rıza kutusunun durumunu temsil eder, `false` ise fonksiyon erken döner
+  - `t` — üst kapsamdan gelen çeviri fonksiyonu; hata ve rıza uyarı mesajlarını almak için kullanılır
+  - `setFormError` — üst kapsamdan gelen setter fonksiyonu; rıza eksikse veya gönderim başarısızsa hata mesajını ayarlar
+  - `setSubmitting` — üst kapsamdan gelen setter fonksiyonu; gönderim başlarken `true`, bittiğinde `false` yapılır
+  - `submitContactMessage` — import edilen servis fonksiyonu; `supabaseBrowserClient` ve form verileriyle çağrılır
+  - `supabaseBrowserClient` — üst kapsamdan gelen Supabase istemci nesnesi; `submitContactMessage`'e birinci argüman olarak iletilir
+  - `name` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `message` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `email` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `subject` — üst kapsamdan gelen string; form verisi olarak gönderilir
+  - `setFormSubmitted` — üst kapsamdan gelen setter fonksiyonu; başarılı gönderim sonrası `true` yapılır
+  - `err` — `catch` bloğunda yakalanan hata nesnesi; `reportError` fonksiyonuna iletilir
+  - `reportError` — import edilen hata raporlama fonksiyonu; `err` ve `{ source: 'ContactPage.handleSubmit'}` bağlamıyla çağrılır
+- **Dönüş**: yok (void) — yan etki olarak form durumunu günceller, Supabase'e veri yazar
 
-### [N3_NASIL] AST Pointer: ContactPage.tsx::ArrowRight
-- **params**: ({ size = 16 })
-- **ic_degiskenler**: (yok)
-- **Dönüş**: React.JSX.Element (SVG ok ikonu)
+### [N3_NASIL] AST Pointer: src/views/ContactPage.tsx::ArrowRight
+- **params**: `size` — number, varsayılan değeri `16`; SVG ikonunun genişlik ve yükseklik değerini belirler
+- **ic_degiskenler**:
+  - `size` — SVG elementinin `width` ve `height` attribute'larına atanır
+- **Dönüş**: JSX — ok ikonu SVG elementi (`<svg>` içinde `<path d="M5 12h14M12 5l7 7-7 7" />`)
+
+### [N4_NASIL] AST Pointer: src/views/ContactPage.tsx::contactCards.map callback
+- **params**: `card` — `contactCards` dizisinden gelen nesne (`icon`, `title`, `value`, `href`, `label` alanları), `i` — number, dizi indeksi
+- **ic_degiskenler**:
+  - `card.href` — `<a>` elementinin `href` attribute'una atanır
+  - `card.icon` — bileşen referansı; `<card.icon size={24} strokeWidth={1.5} />` olarak render edilir
+  - `card.title` — kart başlık metni; `<h3>` içinde gösterilir
+  - `card.value` — kart değer metni; telefon numarası, e-posta veya adres
+  - `card.label` — kart etiket metni; ok ikonuyla birlikte gösterilir
+  - `contactGridVisible` — üst kapsamdan gelen boolean; `scrollAnimationClasses.fadeUp(contactGridVisible)` ile CSS sınıfını belirler
+  - `i` — `scrollAnimationClasses.staggerChild(i)` ile animasyon gecikmesi hesaplanır; ayrıca `key` prop'u olarak kullanılır
+- **Dönüş**: JSX — tekil iletişim kartı `<a>` elementi (ikon, başlık, değer, etiket ve ok ikonu içerir)
 
 ---
 
@@ -69308,10 +69418,10 @@ graph TD
 - `rounded-hvac-2xl`, `rounded-hvac-3xl`, `tracking-hvac-loose`, `tracking-hvac-wide`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-slate-100`, `group-hover:bg-cyan-500`, `group-hover:text-white`, `hover:bg-cyan-400`
-- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `h-12`, `h-2`, `h-20`, `h-500px`, `inline-flex`
-- **Varyant/Responsive:** `active:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `active:scale-95`, `active:scale-98`, `animate-pulse`, `blur-120`, `border`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-cyan-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `group`, `hover:underline`
+- **Renkler:** `bg-blue-500/10`, `bg-cyan-500`, `bg-cyan-500/10`, `bg-cyan-500/20`, `bg-green-50`, `bg-red-50`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-none`, `border-red-200`, `border-slate-100`, `border-slate-300`
+- **Layout:** `absolute`, `bottom-0`, `flex`, `gap-2`, `gap-24`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `h-12`, `h-2`, `h-20`, `h-4`, `h-500px`
+- **Varyant/Responsive:** `active:`, `disabled:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `active:scale-95`, `active:scale-98`, `animate-pulse`, `blur-120`, `border`, `cursor-pointer`, `disabled:opacity-60`, `duration-500`, `focus-visible:ring-2`, `focus-visible:ring-cyan-500`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`
 
 ---
 # FILE: src\views\ForgotPasswordPage.md

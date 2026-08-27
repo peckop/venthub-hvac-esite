@@ -63,7 +63,7 @@ function agGozcusu(): string[] {
 }
 
 /** Formu geçerli biçimde doldurup gönderir (ad + e-posta + zorunlu rıza). */
-function formuGonder(container: HTMLElement) {
+async function formuGonder(container: HTMLElement) {
   const girdiler = container.querySelectorAll('input')
   fireEvent.change(girdiler[0], { target: { value: 'Test Kullanici' } })
   fireEvent.change(girdiler[2], { target: { value: 'test@example.com' } })
@@ -76,10 +76,14 @@ function formuGonder(container: HTMLElement) {
   if (!(form instanceof HTMLFormElement)) throw new Error('Form bulunamadı')
   fireEvent.submit(form)
 
-  // Bileşen başarıyı bir zamanlayıcının ardından açıyor. `act` şart: zamanlayıcı
-  // ilerlemesiyle tetiklenen durum güncellemeleri aksi hâlde React'e boşaltılmaz.
-  act(() => {
+  // NİÇİN ASENKRON OLDU — 2026-08-26, T104 onarımıyla birlikte: gönderim artık bir
+  // zamanlayıcı değil GERÇEK bir yazma çağrısı bekliyor. Zamanlayıcı ilerletmek tek
+  // başına yetmez; söz zincirinin (microtask) boşalması gerekir, yoksa React durum
+  // güncellemesini hiç görmez ve kapı "başarı ekranı açılmadı" diye YANLIŞ kırmızı verir.
+  await act(async () => {
     vi.advanceTimersByTime(1500)
+    await Promise.resolve()
+    await Promise.resolve()
   })
   return girdiler.length
 }
@@ -116,9 +120,9 @@ describe('INV-PROMISE-1 — vaat eden yüzey gerçekten bir şey yapıyor mu', (
     ).toHaveLength(1)
   })
 
-  it('R1 — senaryo geçerli: gönderim başarı vaadini gerçekten açıyor', () => {
+  it('R1 — senaryo geçerli: gönderim başarı vaadini gerçekten açıyor', async () => {
     const { container } = render(<LeadModal open onClose={vi.fn()} />)
-    const alanSayisi = formuGonder(container)
+    const alanSayisi = await formuGonder(container)
 
     expect(
       alanSayisi,
@@ -132,19 +136,25 @@ describe('INV-PROMISE-1 — vaat eden yüzey gerçekten bir şey yapıyor mu', (
     ).toBeTruthy()
   })
 
-  it('R2 — TABAN ÇİZGİSİ: "Talebiniz Alındı" derken HİÇBİR çağrı yapılmıyor', () => {
+  it('R2 — VAAT DAYANAKLI: "Talebiniz Alındı" derken GERÇEKTEN yazma çağrısı yapılıyor', async () => {
+    // KAYIT GÜNCELLENDİ — 2026-08-26. Bu iddia eskiden TERSİYDİ ("hiçbir çağrı yapılmıyor")
+    // ve LeadModal'ın o günkü KUSURLU davranışını adıyla donduruyordu. Testin kendi notu
+    // şunu emrediyordu: *"Onarım indiği an R2 KIRMIZIYA döner... Yapılacak: bu iddiayı
+    // tersine çevir (çağrı YAPILIYOR olmalı) ve kaydı güncelle. Testi gevşetme."*
+    // Onarım REC-80 ile indi; iddia gevşetilmedi, TERSİNE ÇEVRİLDİ.
+    //
+    // Kusurun bedeli ölçülmüştü: prod'da `contact_messages` tablosu 0 kayıt taşıyordu.
     const { container } = render(<LeadModal open onClose={vi.fn()} />)
-    formuGonder(container)
+    await formuGonder(container)
 
     expect(
-      cagrilar,
-      '\nLeadModal artık bir çağrı yapıyor — YANİ T104 ONARIMI GELMİŞ OLABİLİR.\n' +
-        'Bu KIRMIZI bir kusur değil, KAYDIN ESKİDİĞİNİN işaretidir.\n' +
-        'Yapılacak: bu iddiayı tersine çevir (çağrı YAPILIYOR olmalı) ve kaydı güncelle. ' +
-        'Testi gevşetme.',
-    ).toEqual([])
+      cagrilar.length,
+      '\nLeadModal başarı ekranını açtı ama HİÇBİR yazma çağrısı görülmedi.\n' +
+        'Bu, T104 kusurunun GERİ DÖNDÜĞÜ anlamına gelir: müşteriye "aldık" denip\n' +
+        'hiçbir yere yazılmıyor. Testi gevşetme — bileşeni onar.',
+    ).toBeGreaterThan(0)
 
-    // Ve tam da bu yüzden vaat yanlıştır: ekranda "alındı" yazıyor, arkasında hiçbir şey yok.
+    // Ve vaat artık dayanaklı: ekranda "alındı" yazıyor VE arkasında bir yazma var.
     expect(screen.queryByText('lead.success.title')).toBeTruthy()
   })
 })

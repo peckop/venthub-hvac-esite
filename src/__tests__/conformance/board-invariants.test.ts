@@ -788,3 +788,137 @@ describe('INV-BOARD-1 · toRepoRelative git kökünden çözer', () => {
     ).toBe('foo.ts')
   })
 })
+
+/**
+ * INV-BOARD-6 · CLAIM SEMANTİĞİ — glob ayırıcısı, daraltma ve kıdem.
+ *
+ * NİÇİN VAR (2026-08-26 ölçümü, tahmin değil): --globs YALNIZ virgülle ayrılıyordu ve boşluk
+ * ayırmalı bir dize verildiğinde komut HATA VERMİYORDU — dizeyi geri basıp "talep alındı" der,
+ * TEK bir dev glob saklardı. O glob hiçbir yolla eşleşmez: claim VAR görünür, koruma YOKTUR,
+ * pano "çakışma yok" der ve şerit kapısı YEŞİL yanar. Filo taraması 8 canlı şeritten 3'ünde
+ * (EDGE, ALTYAPI, URUN) bunu buldu; gerçekten korumasız kalan 5 yolun ikisi Bash yazma kapısının
+ * KENDİ kaynak dosyalarıydı — kapıyı yaz, kapıyı claim etmeyi kaçır.
+ *
+ * İKİNCİ KUSUR AYNI YERDE: claim BİRLEŞTİRİR, yani bir şeridi DARALTMANIN yolu yoktu. İki şerit
+ * aynı cetvel dosyasını meşru sebeplerle talep ettiğinde (ALTYAPI ve I18N, aynı gün) ayrışma
+ * yalnız SÖZLE mümkündü. release çözüm değil: oturumu haritadan siler, sonraki claim YENİ bir ts
+ * alır ve şerit bütün ortak yollarda kıdemsiz düşer. --exact daraltmayı kıdem bedeli ödemeden yapar.
+ *
+ * KAPININ KENDİSİ İÇİN YANLIŞ-POZİTİF KOLU ZORUNLU: bu kapının ilk yazımında boşluk deseni
+ * kabuk katmanlarında bozuldu ve dosyaya "harf s arayan" bir kontrol düştü. Sözdizimi geçerliydi
+ * ama masum her glob'u reddedecekti. Bir kapının fazla dar olması kadar fazla geniş olması da
+ * arızadır; ikisi AYRI kollarla ölçülür.
+ */
+describe('INV-BOARD-6 · claim semantiği', () => {
+  function claimCli(args: string[]): { status: number; stdout: string; stderr: string } {
+    const ciftler = Object.entries(process.env).filter(([k]) => k !== 'CLAUDE_SESSION_ID')
+    ciftler.push(['VENTHUB_BOARD_DIR', boardDir])
+    const env = Object.fromEntries(ciftler) as typeof process.env
+    const r = spawnSync('node', [BOARD_MODULE_PATH, ...args], { encoding: 'utf8', env })
+    return { status: typeof r.status === 'number' ? r.status : -1, stdout: r.stdout ?? '', stderr: r.stderr ?? '' }
+  }
+
+  it('BOŞLUKLU --globs REDDEDİLİR ve panoya HİÇBİR ŞEY yazılmaz', () => {
+    const r = claimCli(['claim', '--sid', 'sess-bosluk', '--lane', 'T', '--globs', 'a/** b/**'])
+
+    expect(
+      r.status,
+      'boşluklu --globs KABUL EDİLDİ — tek dev glob saklanır, hiçbir yolla eşleşmez ve şerit ' +
+        'korunuyor sanılırken korunmaz (2026-08-26: 3 şeritte, 5 yolda gerçekleşti)',
+    ).not.toBe(0)
+    expect(
+      r.stderr,
+      'red mesajı doğru komutu ÖĞRETMELİ, yoksa kullanıcı aynı hatayı tekrarlar',
+    ).toContain('a/**,b/**')
+
+    const board = loadBoard(boardDir)
+    const yazilan = board.readEvents().filter(e => e.sid === 'sess-bosluk')
+    expect(
+      yazilan.length,
+      'reddedilen claim yine de panoya YAZILMIŞ — "hata verdi ama kaydetti" en kötü hâl: kapı kırmızı, veri yeşil',
+    ).toBe(0)
+  })
+
+  it('YANLIŞ-POZİTİF KOLU: içinde s harfi geçen masum globlar KABUL EDİLİR', () => {
+    const masum = 'scripts/board/**,src/lib/services/x.ts,supabase/functions/**,docs/standards/y.md'
+    const r = claimCli(['claim', '--sid', 'sess-masum', '--lane', 'T', '--globs', masum])
+
+    expect(
+      r.status,
+      'masum globlar REDDEDİLDİ — boşluk kontrolü fazla geniş yazılmış olabilir (ilk yazımda tam ' +
+        'bu oldu: desen kabuk katmanlarında bozulup harf-s arayan bir kontrole dönüştü)',
+    ).toBe(0)
+
+    const board = loadBoard(boardDir)
+    const c = board.liveClaims().find(x => x.sid === 'sess-masum')
+    expect(c?.globs.length, 'dört glob virgülden ayrılmalıydı').toBe(4)
+  })
+
+  it('--exact OLMADAN claim BİRLEŞTİRİR (varsayılan davranış korunur)', () => {
+    const board = loadBoard(boardDir)
+    board.append('sess-birlesim', { ts: isoAgo(5000), type: 'claim', lane: 'T', globs: ['a/**'] })
+    board.append('sess-birlesim', { ts: isoAgo(1000), type: 'claim', lane: 'T', globs: ['b/**'] })
+
+    const c = board.liveClaims().find(x => x.sid === 'sess-birlesim')
+    expect(
+      c?.globs.slice().sort(),
+      'genişletme birleştirmiyor — şeridimi-genişleteyim hareketi eskisini sessizce bırakır',
+    ).toEqual(['a/**', 'b/**'])
+  })
+
+  it('--exact DARALTIR: önceki globlar düşer', () => {
+    const board = loadBoard(boardDir)
+    board.append('sess-exact', { ts: isoAgo(5000), type: 'claim', lane: 'T', globs: ['a/**', 'b/**', 'c/**'] })
+    board.append('sess-exact', { ts: isoAgo(1000), type: 'claim', lane: 'T', globs: ['b/**'], exact: true })
+
+    const c = board.liveClaims().find(x => x.sid === 'sess-exact')
+    expect(
+      c?.globs,
+      'exact claim BİRLEŞTİRİLMİŞ — daraltma imkânsız kalır ve iki şerit bir dosyayı ancak SÖZLE ayrıştırabilir',
+    ).toEqual(['b/**'])
+  })
+
+  it('--exact KIDEMİ KORUR — daraltma en-erken-kazanır hakkını kaybettirmemeli', () => {
+    const board = loadBoard(boardDir)
+    const ilkTs = isoAgo(5000)
+    board.append('sess-kidem', { ts: ilkTs, type: 'claim', lane: 'T', globs: ['a/**', 'b/**'] })
+    board.append('sess-kidem', { ts: isoAgo(1000), type: 'claim', lane: 'T', globs: ['a/**'], exact: true })
+
+    const c = board.liveClaims().find(x => x.sid === 'sess-kidem')
+    expect(
+      c?.ts,
+      'daraltma kıdemi TAZELEDİ — şerit bütün ortak yollarda kıdemsiz düşer, yani bir dosyayı ' +
+        'bırakmak başka her yerde kapıyı aleyhine çevirir',
+    ).toBe(ilkTs)
+  })
+
+  it('KARŞIT KANIT: release ile daraltma kıdemi SIFIRLAR — bu yüzden --exact gerekli', () => {
+    const board = loadBoard(boardDir)
+    const ilkTs = isoAgo(5000)
+    board.append('sess-release', { ts: ilkTs, type: 'claim', lane: 'T', globs: ['a/**', 'b/**'] })
+    board.append('sess-release', { ts: isoAgo(3000), type: 'release' })
+    board.append('sess-release', { ts: isoAgo(1000), type: 'claim', lane: 'T', globs: ['a/**'] })
+
+    const c = board.liveClaims().find(x => x.sid === 'sess-release')
+    expect(
+      c?.ts,
+      'release+claim kıdemi KORUDU — öyleyse --exact gerekçesi çökmüş demektir; bu testin ' +
+        'kırmızısı gerçek bir tasarım değişikliğidir, sessizce yeşile çevrilmemeli',
+    ).not.toBe(ilkTs)
+  })
+
+  it('SÜRÜKLENME KAPISI: liveClaims ve tumTalepler AYNI glob kümesini verir', () => {
+    const board = loadBoard(boardDir)
+    board.append('sess-surukle', { ts: isoAgo(5000), type: 'claim', lane: 'T', globs: ['a/**', 'b/**'] })
+    board.append('sess-surukle', { ts: isoAgo(1000), type: 'claim', lane: 'T', globs: ['b/**'], exact: true })
+
+    const canli = board.liveClaims().find(x => x.sid === 'sess-surukle')
+    const hepsi = board.tumTalepler().find(x => x.sid === 'sess-surukle')
+
+    expect(
+      hepsi?.globs,
+      'iki görünüm AYRIŞTI — claim indirgeme mantığı board.cjs içinde İKİ KEZ yazılıdır; birine ' +
+        'dokunup ötekini unutmak panonun iki yüzünü farklı gerçeklere böler ve hiçbir kapı görmez',
+    ).toEqual(canli?.globs)
+  })
+})

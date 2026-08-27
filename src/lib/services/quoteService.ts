@@ -28,14 +28,33 @@ export type QuoteItemRow = Database['public']['Tables']['venthub_quote_items']['
 export type QuoteSource = 'pdp' | 'cart' | 'project'
 
 export interface QuoteRequestItemInput {
-  productId: string | null
+  /**
+   * v2'de ZORUNLU (cetvel §3.2): katalog-dışı kalem serbest metin değil, PASİF
+   * ÜRÜN kaydıdır (`products.status='draft'`). DB kolonu NOT NULL'a çekildi;
+   * tipi daraltmak kısıtı derleyiciye de öğretir — aksi hâlde ihlal ancak
+   * çalışma zamanında 23502 olarak görünürdü.
+   */
+  productId: string
   productName: string
   qty: number
   note?: string | null
 }
 
+/**
+ * Muhatap kimliği (cetvel §2.5) — **kimliksiz teklif OLMAZ.** Üçü de DB'de NOT NULL.
+ * Hesap ekseninden ayrıdır: `user_id` teklifin ONAYLANABİLMESİ için gerekir,
+ * bu üçlü teklifin VAR OLABİLMESİ için.
+ */
+export interface QuoteContactInput {
+  name: string
+  email: string
+  phone: string
+}
+
 export interface CreateQuoteRequestInput {
   userId: string
+  /** Kimlik üçlüsü — cetvel §2.5, DB'de NOT NULL. Boş geçilemez. */
+  contact: QuoteContactInput
   source: QuoteSource
   sourceProjectId?: string | null
   items: QuoteRequestItemInput[]
@@ -61,6 +80,11 @@ export async function createQuoteRequest(
     .from('venthub_quotes')
     .insert({
       user_id: input.userId,
+      // Kimlik üçlüsü (§2.5): belgeye YAZILIR, profile bağlanmaz. Profil sonradan
+      // değişse bile teklifin kime verildiği belgede sabit kalır — ERP normu.
+      contact_name: input.contact.name,
+      contact_email: input.contact.email,
+      contact_phone: input.contact.phone,
       source: input.source,
       source_project_id: input.sourceProjectId ?? null,
     })
@@ -147,16 +171,36 @@ export async function getQuoteDetail(
  */
 export async function decideQuote(
   supabase: SupabaseClient<Database>,
-  quote: Pick<QuoteRow, 'id' | 'status'>,
+  quote: Pick<QuoteRow, 'id' | 'status' | 'revision_no'>,
   decision: Extract<QuoteStatus, 'accepted' | 'rejected'>,
 ): Promise<void> {
   if (!allowedCustomerQuoteActions(quote.status).includes(decision)) {
     throw new Error(`invalid customer quote transition: ${quote.status} -> ${decision}`)
   }
 
+  // KABUL = kanıt üreten bir eylemdir (cetvel §7.1). Politikanın `with check` bloğu
+  // bu alanları ŞART koşuyor (§7.2): kanal 'site', kabul edilen revizyon belgeye
+  // PİNLENİR, ve `accept_recorded_by` boş kalır — müşteri, admin-işlenmiş bir
+  // kabulü kendi adına yazamaz. Ret yolu kanıt seti istemez; koşsaydı müşteri
+  // teklifi reddedemez hâle gelirdi.
+  //
+  // ⚠ `accept_ip` ve `accept_declaration_version` BURADAN YAZILMAZ ve politikada da
+  // şart değildir: bu iki alanı yazabilecek tek taraf istemcidir ve istemciden gelen
+  // IP kanıt değil BEYANdır. Şartı koymak kanıt üretmez, uydurmaya zorlar. Sunucu
+  // damgalı kabul ucu AYRI kalemdir — eksiğin adı burada ve cetvel §15'te yazılı.
+  const payload =
+    decision === 'accepted'
+      ? {
+          status: decision,
+          accepted_at: new Date().toISOString(),
+          accept_channel: 'site',
+          accepted_revision_no: quote.revision_no,
+        }
+      : { status: decision }
+
   const { error } = await supabase
     .from('venthub_quotes')
-    .update({ status: decision })
+    .update(payload)
     .eq('id', quote.id)
   if (error) throw error
 }

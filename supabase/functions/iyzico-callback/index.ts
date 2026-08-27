@@ -310,31 +310,21 @@ Deno.serve(async (req) => {
         console.error(`[iyzico-callback] BASARILI odeme yazilamadi (status=${r ? r.status : 'yok'}) — para cekildi, siparis guncellenmedi.`);
       }
       
-      // Send order confirmation (best-effort, only after payment success)
-      try {
-        let finalOrderId: string | null = orderId || null
-        if (!finalOrderId && (result?.conversationId || conversationId)) {
-          const oResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!) }${orderTenantFilter}&select=id`, {
-            headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey }
-          })
-          if (oResp.ok) {
-            const arr = await oResp.json().catch(()=>[])
-            const row = Array.isArray(arr) ? arr[0] : null
-            finalOrderId = row?.id || null
-          }
-        }
-        if (finalOrderId) {
-          await fetch(`${supabaseUrl}/functions/v1/order-confirmation`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${serviceRoleKey}`,
-              'apikey': serviceRoleKey,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ order_id: finalOrderId, tenant_id: tenantId })
-          })
-        }
-      } catch { /* ignore */ }
+      // T137-VH (2026-08-20): BURADAKI ATESLE-UNUT ONAY E-POSTASI CAGRISI KALDIRILDI.
+      //
+      // Eski hal: order-confirmation ucu try { ... } catch { /* ignore */ } icinde
+      // cagriliyordu. Ag duserse, uc soguk baslarsa ya da 500 donerse siparis `paid`
+      // kalir, e-posta HIC gitmez ve HICBIR IZ KALMAZDI — log yok, yeniden deneme yok,
+      // kayit yok. Ayrica gonderim idempotan degildi: ikinci cagri ikinci e-posta demekti.
+      //
+      // Yeni hal: bildirim VERIYE baglandi. `payment_status` paid'e GECERKEN `paid_at`
+      // damgalanir; `trg_notify_order_paid` o damganin ILK KEZ yazilmasina bakip
+      // `order-paid-webhook` ucunu pg_net ile cagirir. Uc, gondermeden once
+      // `paid_email_sent_at` damgasina bakar.
+      //
+      // ⚠ BU SATIRLARI GERI EKLEMEYIN: tetik ve eski cagri AYNI ANDA yasarsa cift
+      // gonderim yolu acilir — tetik damgayi gorup atlar ama eski cagri damgaya HIC
+      // bakmaz. Migration: supabase/migrations/20260820140000_order_paid_notification.sql
       
       // Kuponu finalize et: order row'dan coupon_code'yi al, varsa usage increment ve discount hesapla (best-effort)
       try {

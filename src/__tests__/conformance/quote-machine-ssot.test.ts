@@ -78,7 +78,17 @@ function relPath(globKey: string): string {
   return (idx >= 0 ? globKey.slice(idx + '/src/'.length) : globKey).replace(/\\/g, '/')
 }
 
-const TERMINALS: QuoteStatus[] = ['accepted', 'rejected', 'expired']
+/**
+ * SOĞURUCU TERMİNALLER — cetvel §4'ün listesi (v2, T131-VH).
+ *
+ * ⚠ `accepted` BU LİSTEDEN ÇIKTI ve bu bir GEVŞETMEDİR; sessizce yapılmıyor.
+ * Yetkisi cetvelin kendisidir: §4 "accepted → converted" köprüsünü (§10) tanımlar,
+ * yani kabul artık soğurucu değil. Kapıyı geçirmek için kapıyı değiştirmek
+ * tehlikeli bir desendir; o yüzden değişiklikten sonra bekçi BİLEREK BOZULARAK
+ * (ör. `accepted → quoted` eklenerek) hâlâ kırmızı verdiği kanıtlandı — yeşil
+ * geçmesi çalıştığını kanıtlamaz (§15 son paragraf).
+ */
+const TERMINALS: QuoteStatus[] = ['rejected', 'expired', 'cancelled', 'superseded', 'converted']
 
 function migrationSource(): { path: string; sql: string } {
   const entries = Object.entries(QUOTE_MIGRATIONS)
@@ -160,6 +170,44 @@ describe('INV-QUOTE-1 · teklif durum-makinesi SSOT', () => {
       }
     }
     expect(offenders, `SSOT dışında geçiş haritası tanımı: ${offenders.join(', ')}`).toEqual([])
+  })
+
+  /* ---- R1d: quote yüzeylerinde YEREL statü dizisi tanımlanamaz ---- */
+  it('R1d: teklif yüzeylerinde durum kümesi elle yazılmış bir dizi olarak tanımlanamaz', () => {
+    // NİÇİN AYRI BİR MADDE: R1b AD-BAZLI. Yalnız QUOTE_TRANSITIONS ve kardeşlerinin
+    // adını arıyor. T131'de ölçüldü ki admin kuyruğunda `STATUS_VALUES` adıyla İKİNCİ
+    // bir durum listesi yaşıyordu ve R1b onu GÖRMÜYORDU — harita beşten dokuza
+    // çıktığında dört yeni durum admin süzgecinde sessizce görünmez olurdu. Kusur
+    // R1b'nin engellemek istediği şeydi; sadece adı tutmuyordu.
+    //
+    // KAPSAM BİLİNÇLİ DAR: yalnız TEKLİF yüzeyleri. `venthub_returns` kendi durum
+    // kümesini taşıyor ve 'requested'/'rejected'/'cancelled' sözcükleri ORTAK —
+    // depo geneline açılan bir desen İADE şeridinin listesini yanlış-pozitif
+    // suçlardı. Kapı başka şeridin işini suçlayamaz.
+    const KAPSAM = ['views/admin/quotes/', 'views/account/quotes/', 'components/quotes/']
+    const offenders: string[] = []
+
+    for (const [key, source] of Object.entries(SRC)) {
+      const rel = relPath(key)
+      if (!KAPSAM.some((s) => rel.startsWith(s))) continue
+      if (rel.includes('.test.') || rel.includes('__tests__')) continue
+      const clean = stripTsComments(source)
+
+      // Dizi literalleri: içinde İKİ VE DAHA FAZLA quote statüsü dizesi geçen bir
+      // literal, elle yazılmış bir durum kümesidir. SSOT'tan türetme (`QUOTE_STATUSES`
+      // referansı) bu desende değildir, o yüzden yakalanmaz.
+      for (const [literal] of clean.matchAll(/\[[^[\]]*\]/g)) {
+        const sayim = (QUOTE_STATUSES as readonly string[]).filter((s) =>
+          new RegExp(`['"]${s}['"]`).test(literal),
+        ).length
+        if (sayim >= 2) offenders.push(`${rel} → ${literal.slice(0, 60)}`)
+      }
+    }
+
+    expect(
+      offenders,
+      `Teklif yüzeyinde yerel durum kümesi (SSOT'tan türet: QUOTE_STATUSES): ${offenders.join(' | ')}`,
+    ).toEqual([])
   })
 
   /* ---- R1c (çağrı-bazlı kullanım): karar yüzeyleri SSOT fonksiyonlarını çağırır ---- */

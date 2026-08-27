@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T20:41:15.417175+00:00
+compiled_at: 2026-08-26T22:06:57.833398+00:00
 total_compiled_files: 98
-source_commit: 26d43672
+source_commit: b9d8a168
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -13465,11 +13465,11 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T19:03:33.326117+00:00
+compiled_at: 2026-08-26T22:06:51.992987+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-26T19:03:33.326117+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-26T22:06:51.992987+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -13939,6 +13939,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T19:03:33.326117+00:00 tarihind
 │   │   │   │   ├── ✅ `BulkRolePanel.tsx`
 │   │   │   │   ├── ✅ `DataTableHead.tsx`
 │   │   │   │   ├── ✅ `DataTableKit.tsx`
+│   │   │   │   ├── ❌ `DataTablePagination.tsx`
 │   │   │   │   ├── ✅ `FacetedFilter.tsx`
 │   │   │   │   ├── ✅ `persist.ts`
 │   │   │   │   └── ✅ `types.ts`
@@ -14280,6 +14281,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T19:03:33.326117+00:00 tarihind
 │   │   │   ├── ✅ `address.service.ts`
 │   │   │   ├── ✅ `cart.service.ts`
 │   │   │   ├── ✅ `category.service.ts`
+│   │   │   ├── ✅ `contactMessageService.ts`
 │   │   │   ├── ✅ `dataSubjectRequest.service.ts`
 │   │   │   ├── ✅ `displayPrice.service.ts`
 │   │   │   ├── ✅ `family.service.ts`
@@ -14549,7 +14551,8 @@ Bu belge, otonom derleyici tarafından 2026-08-26T19:03:33.326117+00:00 tarihind
 ```
 
 ## Eksik Dokümantasyonlar
-Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
+- [ ] `src\components\admin\data-table\DataTablePagination.tsx`
+- [ ] `src\components\admin\data-table\DataTablePagination.tsx`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.

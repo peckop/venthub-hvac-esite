@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T20:41:15.271105+00:00
+compiled_at: 2026-08-26T22:06:57.682429+00:00
 total_compiled_files: 62
-source_commit: 26d43672
+source_commit: b9d8a168
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -3300,6 +3300,71 @@ K2 için makine kapısı **yoktur ve olmamalıdır** — "bu ayrım paragraf hak
 anlatısı taşıyorsa, o anlatı ya yazılmamıştır ya da yazılamayan bir ayrımı anlatmaya
 çalışmaktadır.
 
+## 4b. K4 — Görünüm modu veriye bağlıdır, tercihe değil (2026-08-26)
+
+### 4b.1 Niçin bu madde eklendi
+
+Bu cetvel şimdiye kadar **derinliği** yönetiyordu (kaç kademe sayfa olur), **görünüm modunu**
+yönetmiyordu (o sayfa neyi listeler). O boşlukta canlı bir müşteri kaybı yaşadı ve **hiçbir
+kapı görmedi** — CLAUDE.md kural 1'in tarif ettiği durumun ta kendisi.
+
+**Ölçüm (2026-08-26, prod, tarayıcıda, ana içerik bölgesi sayıldı — footer hariç):**
+
+| adres | mod | alt kategori | aktif ürün | ileriye giden bağlantı |
+|---|---|---|---|---|
+| `/tr/category/isi-geri-kazanim` | showcase | 0 | 16 | **0** |
+| `/tr/category/endustriyel-tavan-vantilatorleri` | showcase | 0 | 7 | **0** |
+| `/tr/category/endustriyel-havalandirma` | showcase | 7 | 225 | 7 alt kategori kartı |
+| `/tr/category/aksiyel-sanayi-fanlari` | series | 0 | 16 | 1 aile kartı |
+
+Sebep: `CategoryShowcaseView` yalnız `subCategories` alır, `families` **almaz**; showcase'te
+sayfalama da kapalıdır. Yani alt kategorisi olmayan bir showcase kategorisi **hiçbir şey**
+listelemez. Bileşen bozuk değildi — **veri yokken boşa düşüyordu.** Etkilenen: 27 aktif ürün.
+
+Not: metin taraması bu kusuru göremez. Sözlük dizeleri RSC yüküne serileştiği için her iki
+görünüme özgü ibareler **her sayfada** geçer; gösterge iki durumu ayırt etmez. Ölçüm ancak
+tarayıcıda **yapısal** olarak (render edilmiş bağlantı sayımı) yapılabilir.
+
+### 4b.2 Kural
+
+> **Bir kategori sayfası, ileriye giden en az bir yol göstermek zorundadır** — ya alt kategori
+> kartı, ya aile/ürün kartı. Hiçbir mod, sayfayı çıkışsız bırakmayı meşrulaştırmaz.
+
+Bunun sonucu olarak **görünüm modu tek başına bir tercih değildir; verinin onu taşıyıp
+taşımadığıyla birlikte geçerlidir**:
+
+| mod | ne gösterir | veri şartı |
+|---|---|---|
+| `showcase` | alt kategori kartları + anlatı | **en az 1 alt kategori** |
+| `landing` | aile kartları + karar anlatısı | en az 1 aile |
+| `series` | aile kartları (teknik) | en az 1 aile |
+
+Şart sağlanmıyorsa mod **düşer**: `showcase` → `series`. Düşme sessiz bir çare değil,
+**kuralın kendisidir** — `display_mode` sütunu bir niyet beyanıdır, sayfanın çıkışsız
+kalmasına izin veren bir yetki değil.
+
+### 4b.3 Yürürlük noktası ve bekçi
+
+Kuralın koddaki karşılığı tek bir fonksiyondur:
+`src/views/CategoryMasterView.tsx` → `etkinGorunumModu(displayMode, altKategoriSayisi)`.
+
+Mod **iki yerde** tüketilir: hangi görünümün çizileceği ve sayfalamanın gösterilip
+gösterilmeyeceği. İkisi ayrı hesaplanırsa sessizce ayrışır — bu dosyada zaten bir kez ayrıştı.
+Bu yüzden kural **tek kaynak** olarak yazılır ve bekçi bunu da kilitler.
+
+Bekçi: `src/__tests__/conformance/category-view-reach.test.ts` (INV-CATEGORY-REACH-1).
+Sabotaj **üç yönde** kırmızı verir: (1) düşme kuralı sökülünce, (2) aşırı düzeltilip her
+showcase düşürülünce, (3) sayfalama ham modu yeniden okuyunca.
+
+### 4b.4 Kapsam dışı — ayrı kalemler
+
+- **Boş kategoriler.** `parking-jet-fan` ana kategorisinin 0 alt kategorisi ve 0 ürünü var;
+  `hygiene-sanitizer`, `summer-ventilation`, `air-conditioning` de boş. Bu bir **veri**
+  kararıdır (gizle / doldur / sil) ve bu cetvelin konusu değildir.
+- **Ölü kod.** `CategoryMasterView`'in `switch` `default:` dalı ve `CategoryGridView`
+  ulaşılamaz: `useCategoryViewModel` `'grid'` değerini `'series'`e çevirir ve sütunda 0 adet
+  `'grid'` vardır. `knip` bunu yakalayamaz çünkü dosya **import ediliyor**.
+
 ## 5. Ölçülmüş durum (2026-08-23, canlı DB)
 
 | ölçüm | sonuç |
@@ -4139,6 +4204,50 @@ ref'te bırakılmaz** (`git log --all -- <dosya>` ile boş olduğu doğrulanır)
 
 > ⚠ Bu **ara önlem**. Kalıcı çözüm bot yapılandırmasında (bilinçli-kırmızı PR'ları onarım
 > kapsamı dışında tutmak) ve Recep kararına bağlı.
+
+**K8 — `--globs` AYIRICISI VİRGÜL; boşluklu değer REDDEDİLİR (2026-08-26 ölçümü).**
+`board.cjs claim --globs` değerini **yalnız virgülle** ayırır. Boşluk ayırmalı tek dize verildiğinde
+eski hâl **hata VERMİYORDU**: dizeyi aynen geri basar, "talep alındı" der ve **TEK bir dev glob**
+saklardı. O glob hiçbir yolla eşleşmez — yani **claim VAR görünür, koruma YOKTUR**; pano "çakışma yok"
+der ve şerit kapısı **YEŞİL** yanar. Sahte-yeşil ailesinin pano biçimi.
+
+Ölçüm (8 canlı şerit, 154 glob): **3 şeritte** (EDGE, ALTYAPI, URUN) boşluklu dev glob vardı. Claim
+birleştirdiği için çoğu parça başka bir girdiyle kapsanıyordu; **gerçekten korumasız kalan 5 yol** çıktı
+ve ikisi **Bash yazma kapısının kendi kaynak dosyalarıydı** (`bash-write-guard.cjs`,
+`bash-write-audit.cjs`) — kapıyı yaz, kapıyı claim etmeyi kaçır.
+
+- Doğru kullanım: `--globs "scripts/board/**,docs/standards/x.md"`
+- Boşluklu değer artık **exit 1** verir, **hiçbir şey yazmaz** ve doğru komutu **basar**.
+- **Niçin "boşluktan da ayır" değil de RED:** sessizce yeniden yorumlamak, boşluk içeren gerçek bir
+  yolu iki globa bölerek **çok geniş** bir claim üretirdi — aynı sınıfın öteki yönü. Fail-closed
+  davranış deterministiktir ve doğru komutu öğretir.
+- **"talep alındı" çıktısı kanıt DEĞİLDİR.** Kanıt, yolun `liveClaims()` içinde **tek başına bir girdi**
+  olarak durmasıdır:
+  `node -e "const b=require('./scripts/board/board.cjs');console.log(b.liveClaims().find(c=>c.sid===SID).globs)"`
+- Bekçi: `src/__tests__/conformance/board-invariants.test.ts` → `INV-BOARD-6`
+  (biri red kolu, biri **yanlış-pozitif** kolu — kapının fazla geniş yazılması da arızadır; ilk yazımda
+  boşluk deseni kabuk katmanlarında bozuldu ve dosyaya "harf s arayan" bir kontrol düştü, `scripts/**`
+  gibi masum her glob'u reddedecekti).
+
+**K9 — DARALTMA `claim --exact` iledir; `release` ile DEĞİL (kıdem bedeli).**
+`claim` **birleştirir** (K2'deki "genişleteyim" hareketi eskisini sessizce bırakmasın diye). Bunun bedeli:
+bir şeridi **daraltmanın yolu yoktu**. İki şerit aynı cetvel dosyasını meşru sebeplerle talep ettiğinde
+(2026-08-26: ALTYAPI `lang-metadata`/`instruction-surface` için, I18N INV kural metni için — aynı dosya)
+ayrışma yalnız **sözle** mümkündü, mekanik değil.
+
+`release` bir çözüm **DEĞİL** ve niçin olmadığı ölçüldü: `release` oturumu haritadan siler, sonraki
+`claim` **YENİ bir `ts`** alır ve şerit **bütün ortak yollarda kıdemsiz** düşer (`findConflict`,
+"en erken kazanır" — K2/§3). Yani *bir dosyayı bırakmak* istemek, **başka her yerde kapıyı aleyhine
+çevirmek** anlamına geliyordu.
+
+- Daraltma: `--globs "<kesin liste>" --exact` → verilen liste **KESİN** olur, **kıdem KORUNUR**.
+- Genişletme: `--exact` **verilmez** → birleştirir (varsayılan davranış değişmedi).
+- Bekçiler (`INV-BOARD-6`): daraltma kolu · **kıdem koruma** kolu (ayrı, çünkü daraltma doğru olup
+  kıdem kaybedilebilir) · **karşıt kanıt** kolu (`release`+`claim` kıdemi gerçekten sıfırlıyor mu —
+  sıfırlamıyorsa `--exact`'in gerekçesi çökmüştür ve bu sessizce yeşile çevrilmemelidir).
+- **SÜRÜKLENME KAPISI:** claim indirgeme mantığı `board.cjs` içinde **iki kez** yazılıdır
+  (`liveClaims` ve `tumTalepler`). Birine dokunup ötekini unutmak panonun iki yüzünü farklı gerçeklere
+  böler ve hiçbir kapı görmez; `INV-BOARD-6` ikisinin **aynı glob kümesini** verdiğini ölçer.
 
 ---
 
@@ -5894,8 +6003,6 @@ tetikler**; yalnız §D3'te ADIYLA sayılan sınıf atlanır.
 | `.github/**` | CI yapılandırması; Vercel çıktısını etkilemez |
 | `registry/**` | İş emri kayıtları |
 | `LICENSE` | Metin |
-| `scripts/board/**` | Şerit panosu araçları. Ölçüldü (2026-08-26): `package.json`, `next.config.mjs`, `vercel.json`, `.github/workflows/*` içinde `scripts/board` geçen **tek bir referans yok**. Pozitif kontrolle doğrulandı — aynı arama `scripts/setup-hooks` için referans **buluyor**. → D3.1 |
-| `.githooks/**` | Git kancalarının **kendisi** (kancaları kuran betik değil). Derleme hattıyla dolaylı bağı VAR ama üç ölçülmüş sebeple atlanabilir. → D3.1 |
 
 **Bilerek DIŞARIDA (build tetikler):** `supabase/migrations/**` — build'i doğrudan
 etkilemez, ama önizleme dağıtımı migration'ın vitrine yansımasını görmenin **tek**
@@ -5905,48 +6012,6 @@ yoludur ve bu depoda migration merge'i prod'a **otomatik** uygulanır. Ayrıca
 **Listeye ekleme kuralı:** yeni bir sınıf eklemek isteyen, "bu dosya türü derlemeye
 girmiyor" iddiasını **ölçerek** kanıtlar (import taraması + yapılandırma kontrolü) ve
 INV-BUILD-SKIP'e o sınıf için bir assert ekler. Gerekçesiz satır eklenmez.
-
-### D3.1 — `scripts/board/**` ve `.githooks/**` (2026-08-26, Ref REC-76)
-
-İki sınıf eklendi. Gerekçeleri **aynı ağırlıkta değil** ve bunu açıkça yazmak gerekiyor:
-birincisi temiz, ikincisi **kabul edilmiş bir artık riski** taşıyor.
-
-**`scripts/board/**` — temiz.** Derleme hattında sıfır referans. Ölçüm, aramanın
-gerçekten aradığını gösteren bir **pozitif kontrolle** yapıldı: aynı komut
-`scripts/setup-hooks` için `package.json:10`'u buluyor. Bulmayan bir arama ile
-"referans yok" demek, ölçüm değil sessizliktir.
-
-**`.githooks/**` — bağı VAR, yine de atlanabilir.** `package.json`'da
-`"prepare": "node scripts/setup-hooks.mjs"` var ve Vercel `pnpm install` koştuğu için
-prepare de koşar. Buna rağmen atlanabilir olmasının üç ölçülmüş sebebi:
-
-1. **Koşan dosya `scripts/setup-hooks.mjs`, `.githooks/**` değil.** O betik kancaları
-   *okur*. Betiğin kendisi listede DEĞİL — ona dokunmak build'i tetikler.
-2. **`setup-hooks.mjs` fail-safe.** Kancalar bozuk ya da yokken sessizce `exit 0`
-   veriyor (kaynakta `catch → process.exit(0)`). Bozuk bir kanca `pnpm install`i
-   düşürmüyor.
-3. **Dağıtılan çıktıya hiçbir şey yazmıyor** — kancalar `.git/hooks`a kopyalanır.
-
-**ARTIK RİSK ve neden kabul edilebilir:** atlarsak, bir `.githooks` değişikliğinin
-Vercel'in install adımını bozup bozmadığını **o dağıtımda öğrenemeyiz**. Bu boşluğu CI
-kapatıyor: `.github/workflows/ci.yml`'de **yol filtresi yok** (ölçüldü), yani her PR'da
-`pnpm install` zaten koşuyor ve bozuk bir prepare orada kırmızı verir. Atlama, hiçbir
-conformance kapısını **körleştirmiyor**. Bu cümle bir varsayım değil, kapının
-kaldırılması hâlinde yeniden ölçülmesi gereken bir **ön koşul**: `ci.yml`'e yol filtresi
-eklenirse bu satır geçersizleşir.
-
-**KAPSAM DAR TUTULUR — desen yazarken iki tuzak:**
-
-| Yanlış | Niçin tehlikeli |
-|---|---|
-| `scripts/*` | `scripts/vercel-ignore-build.sh`'ı da atlar — kapı **kendi değişikliğini** doğrulayamaz hâle gelir. `scripts/setup-hooks.mjs` de atlanır ve (2) numaralı gerekçe çöker. |
-| `.githooks*` (sondaki `/` düşerse) | `.githooksfake/…` gibi yollar sessizce atlama sınıfına girer. |
-
-INV-BUILD-SKIP bu iki tuzağı **adıyla** ölçer (`scripts/vercel-ignore-build.sh → BUILD`,
-`scripts/setup-hooks.mjs → BUILD`, `scripts/boardfake.ts → BUILD`,
-`.githooksfake/pre-commit → BUILD`). Sabotaj sınavı **5/5**: kapsamı `scripts/*`'a
-genişletmek, eğik çizgiyi düşürmek, eklenen satırı sökmek ve ölçüm aracını körleştirmek
-— dördü de kırmızı verdi; bozulmamış hâl yeşil kaldı (sınav vacuous değil).
 
 ## D4 — Karşılaştırma tabanı `VERCEL_GIT_PREVIOUS_SHA`, `HEAD^` DEĞİL
 
@@ -11390,7 +11455,7 @@ bağlanır: isim, e-posta, telefon.
 | `root_quote_id` | uuid → `venthub_quotes(id)` | Zincir başı; portalda gruplama | türetildi |
 | `superseded_by` | uuid → `venthub_quotes(id)` | Yerine geçen revizyon; **NULL = güncel** | türetildi |
 | `valid_until` | timestamptz | Belge düzeyinde süre (Ç7) | Odoo/PandaDoc |
-| `currency` | char(3), NOT NULL | Para birimi **türetilmez** | INV-CURRENCY-1 |
+| `currency` | char(3), **NULLABLE** (şart tetikte) | Para birimi **türetilmez** | INV-CURRENCY-1 |
 | `total_amount` | numeric | Belge toplamı (kalemlerden türetilir, snapshot'lanır) | fatura hattı |
 | `user_id` | uuid → `auth.users`, **NULLABLE** | Hesapsız (prospect) muhatap; hesap açılınca dolar (§2.5) | Recep 08-20 |
 | `contact_name` · `contact_email` · `contact_phone` | text, **NOT NULL** | Kimlik üçlüsü; kimliksiz teklif olmaz (§2.5) | Recep 08-20 |
@@ -11759,6 +11824,23 @@ terminaller, sahiplik+tenant, fiyat kolonlarına müşteri yazamaz, rota↔sayfa
 | R16 | `contact_name`/`contact_email`/`contact_phone` NOT NULL; kimliksiz teklif satırı oluşamaz | §2.5 — kimlik ekseni |
 | R17 | Hesapsız teklif hiçbir müşteri SELECT politikasından dönmez | §3.3 — sahiplik yüklemi NULL ile eşleşmemeli |
 
+**⚠ R9'un İKİ ŞARTI HENÜZ POLİTİKADA DEĞİL — adıyla, gizlenmeden (2026-08-26).**
+`accept_ip` ve `accept_declaration_version` NOT NULL şartı `quotes_update_customer_decision`
+politikasına **yazılmadı**. Gerekçe ölçüldü, tercih değil: bu iki alanı yazabilecek tek
+taraf istemcidir (kolon-grant `authenticated`'a verilir), ve **istemciden gelen IP kanıt
+değil BEYANdır**. Şartı koymak kanıt üretmez; istemciyi değer uydurmaya zorlar ve ortaya
+*kanıt gibi görünen* bir alan çıkarır — bu, hiç alan olmamasından daha tehlikelidir.
+Doğru çözüm **sunucu tarafında damgalayan bir kabul ucu**dur (RPC/Edge) ve o **ayrı bir
+kalemdir**. O uç inene kadar R9 üç şartla koşar (`superseded_by is null`,
+`valid_until >= now()`, `accept_recorded_by is null` + kanal/revizyon pini) ve bu satır
+eksiğin **bitiş kriteridir**: sunucu damgalı uç indiği gün iki şart politikaya girer ve
+bu paragraf silinir.
+
+**⚠ §3.1 `currency` hücresi ile R10 arasındaki fark bilinçlidir.** Kolon NULLABLE'dır;
+NOT NULL şartı `draft → quoted` geçişinde tetiktedir. Kolon düzeyinde NOT NULL, DEFAULT
+gerektirirdi ve DEFAULT bir **türetmedir** — INV-CURRENCY-1'in yasakladığı şey. DEFAULT'suz
+NOT NULL ise canlı RFQ yazma yolunu kırardı (ölçüldü: `quoteService.ts` currency göndermiyor).
+
 **Ölçüm biçimi zorunlu:** kurallar **etki** ölçer, metin değil. R9/R12 için ayırt edici kol
 şarttır — yalnız ret gözlemi "kanal kapalı" hâlinden ayırt edilemez; **kabul eden bir kol**
 da denenmelidir. R15 için kabul eden kol: `user_id` dolduruldu → AYNI geçiş **geçmeli**;
@@ -11778,7 +11860,12 @@ sonra **tek bir migration** olarak iner:
 4. Kalem alanları (§3.2) + `product_id` NOT NULL'a çekilir
 5. RLS: admin INSERT politikaları (Ç1/Ç2), müşteri kabul politikasının sertleştirilmesi (§7.2),
    Satış Projesi izolasyonu (§2/3)
-6. Expiry cron işi (§6, kapı 1)
+6. Expiry cron işi (§6, kapı 1) — ⚠ **AYRI ONAYLA KURULUR, bu migration'ın parçası
+   DEĞİLDİR.** Karar OPS/AUTH 2026-08-26: cron kurulduğu an **periyodik prod yazımı**
+   başlar; bu, tek seferlik bir şema değişikliğinden farklı bir risk sınıfıdır ve
+   kendi Recep onayını hak eder. Şemayı kuran migration cron'suz iner; §6'nın
+   **kapı 2'si** (kabul anındaki `valid_until >= now()` şartı) zaten tetikte ve
+   politikada olduğu için süresi geçmiş teklif cron hiç koşmasa bile kabul edilemez
 7. **Muhatap kimliği (§2.5):** `user_id` NULLABLE'a çekilir; `contact_name`/`contact_email`/
    `contact_phone` NOT NULL eklenir; muhatap kilidi `enforce_quote_status_transition` içine yazılır
 
