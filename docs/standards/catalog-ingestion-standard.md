@@ -128,6 +128,35 @@ slug kuralı + Jidoka kalite kapısı** → **`csv-import-export-standard.md`**.
 
 ---
 
+## 3.1 Seri, BÖLÜM BAŞLIĞINDAN türetilmez (2026-08-27)
+
+> Bu madde bir **yöntem** kuralıdır. `series` kolonunun biçimi/zorunluluğu format cetvelinin işidir
+> (`csv-import-export-standard.md`); burada yazan şey, o kolonun **neyden türetileceğidir**.
+
+**Kural.** Seri **ürün adından** türetilir. `avensair_section` (katalog bölüm başlığı) bir
+**kategori adayıdır**, seri değildir — `marka + bölüm başlığı` birleştirerek seri üretmek yasaktır.
+
+**Niçin — ölçülmüş hasar (2026-08-27, 28 çıkarım dosyası + fiyat listesi HQ sürümü).**
+Çıkarım CSV'lerinde `series` alanı **yoktu** (28 dosyanın 0'ında). İçe alım seriyi bölüm
+başlığından uydurdu ve **beş ayrı hata sınıfı** doğdu; hiçbirini hiçbir kapı görmedi:
+
+| # | Hata sınıfı | Somut örnek | Sonuç |
+|---|---|---|---|
+| 1 | Bölüm başlığı seri sanıldı | "DAVLUMBAZ FANLAR" → *AVenS Davlumbaz Fanları* serisi | **AVenS o ürünü hiç üretmiyor** (fiyat listesi s.36). Uydurulan serinin altında 3 aksesuar kaldı |
+| 2 | Alt başlık bölüm sanıldı | s.69'un gerçek bölümü *ISI GERİ KAZANIM CİHAZLARI*; "ELEKTRİKLİ ISITICILAR" onun altındaki iki tablodan biri | Suyla ısıtan sulu batarya, elektrikli ısıtıcı serisine girdi — 8 model yanlış seride |
+| 3 | Fiyat listesi sahibi marka sanıldı | AVenS listesindeki satırların tamamı `brand=AVenS` damgalandı, içindeki **Danfoss FC-51** dahil | Danfoss ürünü AVenS markasıyla ve davlumbaz serisinde |
+| 4 | Sayfa altı aksesuar tablosu ürün sayıldı | hız anahtarları s.27 **ve** s.36'da tekrar ediyor | Aksesuar, fan serisinin modeli oldu |
+| 5 | Aynı ürün hattı iki seride | Lineo, hem *VORT Commercial In-Line* (Ticari) hem *Lineo Quiet* (Konut) altında | Aynı hat **iki ana kategoride** |
+
+Ayrıca **sütun kayması** sessizce geçti: 6 satırda Kcal/h değeri `model_code`, "UYGUN MODEL"
+sütunu `name` sanıldı. Bu yakalanabilirdi — o satırların **fiyatları doğru gelmişti**, yani
+fiyat üzerinden çapraz doğrulama mümkündü ve yapılmamıştı.
+
+**Kalan borç (görünür kılınıyor, kapatılmış değil):** düzeltme yalnız 4 AVenS CSV'sinde
+uygulandı (35/35 satır `series` dolu). **Diğer 24 marka CSV'sinde `series` kolonu hâlâ yok.**
+
+---
+
 ## 4. Avensair 27-bölüm → 2-seviye kategori haritası (gruplama rehberi)
 
 > Worker ürünü **Avensair bölümüne** göre gruplar. Nihai slug'lar `category-taxonomy-standard.md` ile kesinleşir;
@@ -246,6 +275,35 @@ sabotajla kırmızı görüldü.
 > `toplam ihlal 21 | tabanda 21 | YENI 0 | bayat taban satiri 0` → YEŞİL.
 > **Recep'ten beklenen bir şey yoktur;** eskiden burada `SUPABASE_CA_CERT` eklemesi isteniyordu,
 > o adım **kaldırıldı**. Kökün depoya alınması bu bekleyişi tamamen ortadan kaldırdı.
+
+---
+
+## 6.2 Seri türetme kapısı — **INV-CATALOG-2** (ÖNERİ, 2026-08-27)
+
+> **Durum: ÖNERİ — henüz ÖLÇMÜYOR.** Mekanizma ilanı kuralı gereği "ölçüyor" yazılamaz;
+> ilan, ilk gerçek koşumun kanıtına dayanır. Bu bölüm kapının **sözleşmesidir**, ilanı değil.
+> §3.1'deki hasar ölçülmüştür; kapı yazılmamıştır.
+
+### Ne ölçülür (satır reddi)
+
+| # | Kontrol | Karar | Neyi yakalar |
+|---|---|---|---|
+| 1 | `series` boş | **RED** | Alanın hiç gelmemesi. "Kapsam kararı" ile "alan gelmedi" **ayrı** basılır; sessiz atlama yok |
+| 2 | `series` değeri `avensair_section` ile birebir eşit | **RED** | Bölüm başlığının seri diye yazılması (§3.1 hata sınıfı 1–2) |
+| 3 | `brand`, ürün adından çözülen markayla çelişiyor | **UYARI + insan onayı** | Fiyat listesi sahibinin marka sanılması (§3.1 hata sınıfı 3) |
+
+### Ne ölçülmez — dürüst sınır
+
+Bu kapı **"seri dolu mu"** ve **"seri başlık değil mi"** sorularını cevaplar.
+**"Seri doğru mu"** sorusunu CEVAPLAMAZ — o bir yargıdır ve katalog sayfasına bakan insana bağlıdır.
+§6.1'in aynı gerekçesi burada da geçerli: ölçülemeyen şeyi kapı diye yazmak yalnız **sahte yeşil**
+üretir. Kapının kapsamı, gerçek kapsamından geniş anlatılmasın diye bu paragraf yazıldı.
+
+3. kontrolün **UYARI** olmasının sebebi de bu: marka çözümü ad üzerinden yapılır ve ad her zaman
+markayı taşımaz; kesin olmayan bir çıkarımı **RED** yapmak, doğru satırları da düşürürdü.
+
+**Bağlantılı:** `product-schema-standard.md` §11.4 / §11.4.1 (ayırt edicilik + veri borcu) ·
+`csv-import-export-standard.md` (`series` kolonunun şemaya eklenmesi **oranın** işi) · §6.1 INV-CATALOG-1.
 
 ---
 

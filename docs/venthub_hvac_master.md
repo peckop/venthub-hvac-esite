@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T12:53:18.088455+00:00
+compiled_at: 2026-08-27T13:08:47.033419+00:00
 total_compiled_files: 655
-source_commit: a52dfd1a
+source_commit: 582e5eb5
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T12:53:18.088455+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T13:08:47.033419+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -39456,49 +39456,55 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\DehumidifierModel.tsx
-skeleton_hash: 4515c32920cb2979
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\DehumidifierModel.tsx
+skeleton_hash: e1a5bf73c6af946a
 entity_hashes:
-  func:DehumidifierModel: 9ef5181c317802b4
-  overview: 5b9ba7d5b196184b
+  func:DehumidifierModel: 2c43127eab258a17
+  overview: 2f7f0e2906ed1b2d
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-12T10:22:00Z
+generated_at: 2026-08-27T07:14:28Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulaması için özel olarak tasarlanmış, üç boyutlu (3B) bir nemlendirici (kurutucu) ürün modelini temsil eden bir React Three Fiber bileşenidir. Bileşen, cihazın görsel yapısını, dahili bileşenlerini ve dönen fan tekerleği animasyonunu tanımlayarak, ürünün etkileşimli 3B gösterimini sağlar.
+Bu modül, VentHub HVAC uygulaması için üç boyutlu bir nemlendirici (kurutucu) ürün modelini temsil eden bir React Three Fiber bileşenidir. Bileşen, cihazın görsel yapısını ve dönen fan tekerleği animasyonunu tanımlayarak ürünün etkileşimli 3B gösterimini sağlar. Parametre almaz; kendi içinde sabit geometri ve malzeme tanımlarıyla çalışır.
 
 ## Fonksiyon Grupları
 ### 3D Model Bileşeni
-Bu grup, modülün tek ve temel bileşenini oluşturur. Sorumluluğu, nemlendiricinin geometrik yapısını, malzemelerini ve fan tekerleğinin sürekli döndüğü animasyon mantığını tanımlayarak JSX formatında bir 3B model döndürmektir.
+Modülün tek bileşeni olup, nemlendiricinin geometrik yapısını, malzemelerini ve fan tekerleğinin sürekli döndüğü animasyon mantığını tanımlayarak JSX formatında bir 3B model döndürür. `useRef` ile fan pervanesi referansı oluşturur, `useFanMaterials` hook'undan malzeme nesneleri alır ve `useFrame` ile animasyon döngüsünü yönetir.
 - DehumidifierModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, parametresiz bir React Three Fiber 3B model bileşenidir.
-
----
-
-[Aksiyom 1]: Eğer React Three Fiber Canvas bağlamı (Three.js ortamı) yoksa, bileşen 3B sahne oluşturamaz ve render hatası ile sonuçlanır.
-
-[Aksiyom 2]: Bileşen parametresiz (`DehumidifierModel()`) çağrılmak zorundadır; prop bağımlılığı olmadığından, harici veri beslemesi olmadan kendi içinde sabit geometri ve materyal tanımlarıyla çalışmalıdır.
-
-[Aksiyom 3]: Eğer `useFrame` veya benzeri animasyon döngüsü mekanizması yoksa, fan tekerleği döndürme animasyonu çalışmaz ve statik bir model gösterilir.
+Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden türetilen özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### DehumidifierModel
-**Ne yapar**: Bu fonksiyon, bir kurutma makinesinin (dehumidifier) 3D modelini oluşturur ve canlandırır. Fonksiyon, bir React bileşeni olarak Three.js sahnesine yerleştirilecek bir `group` JSX elementi döndürür.
+**Ne yapar**: Nem alıcı (dehumidifier) cihazının 3D modelini React Three Fiber (R3F) kullanarak oluşturan bir React fonksiyon bileşenidir. Gövde, üst panel, ekran, su tankı, havalandırma ızgaraları, dönen fan çarkı ve tekerlekler dahil olmak üzere cihazın tüm parçalarını üç boyutlu olarak sahneye yerleştirir.
 
-**Nasıl yapar**: Fonksiyon, `useRef` hook'u ile fan pervanesi için bir referans (`fanWheelRef`) oluşturur ve `useFanMaterials()` hook'undan malzeme nesnelerini alır. `useFrame` hook'unu kullanarak her görüntü karesinde (`delta` süresince) fan pervanesinin (`fanWheelRef.current`) Y ekseni etrafında sabit bir hızla (delta * 6) dönmesini sağlar. Döndüğü JSX yapısı, gövde, üst panel, ekran, su tankı, fan montajı (dönen pervane ve ızgara), yan havalandırma deliği ve ayaklar olmak üzere several `mesh` ve `group` nesnelerinden oluşan bir 3D modeli temsil eder. Her `mesh` elementi, belirli bir geometri (`boxGeometry`, `planeGeometry` vb.) ve `materials` objesinden alınan bir malzeme ile tanımlanmıştır.
+**Nasıl yapar**: Fonksiyon, `useRef` ile fan çarkı için bir referans oluşturur ve `useResolveMaterials` özel hook'u ile modelde kullanılacak tüm materyalleri (boxMat, matteBlack, chassisInnerMat, castIron, industrialSteel, rubber) çözümler. `useFrame` hook'u ile her karede fan çarkının Y ekseninde sürekli dönmesini sağlar (delta * 6 hızıyla). `useMemo` kullanarak tüm geometrileri (BoxGeometry, PlaneGeometry, CylinderGeometry) yalnızca bir kez hesaplar ve performans kazancı sağlar. `useEffect` ile bileşen kaldırıldığında tüm geometri nesnelerini `dispose()` ederek bellek sızıntısını önler. JSX dönüşünde, `group` elemanı içinde ölçek `[1, 1, 1]` ve konum `[0, -0.5, 0]` ile tüm parçalar `mesh` elemanları olarak yerleştirilir; fan çarkı `ref` ile referanslanarak animasyona tabi tutulur, tekerlekler ise `map` fonksiyonuyla ikişerli gruplar halinde oluşturulur.
 
 **Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: Fonksiyon, React bileşeni olarak bir JSX elementi (`React.ReactElement`) döndürür. Dönüş tipi resmi olarak `void` değil, bileşenin render ettiği 3D sahne yapısıdır.
+**Dönüş**: JSX elemanı döndürür. Dönen yapı, `group` içinde konumlandırılmış çok sayıda `mesh` ve iç içe `group` elemanlarından oluşan bir Three.js sahne hiyerarşisidir. Bileşen, React Three Fiber ortamında doğrudan render edilebilir bir 3D model sunar.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../core::useResolveMaterials
+- import: @react-three/fiber::useFrame
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: three::BoxGeometry
+- import: three::CylinderGeometry
+- import: three::PlaneGeometry
+- import: three::type { Group }
 
 ---
 
@@ -39507,30 +39513,26 @@ Bu modül, parametresiz bir React Three Fiber 3B model bileşenidir.
 ### [N1_NASIL] AST Pointer: src/components/products/3d/types/DehumidifierModel.tsx::DehumidifierModel
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `fanWheelRef` — useRef ile oluşturulmuş bir referans nesnesi, dönen fan tekerleğinin (fanWheelRef.current) döndürülmesi için kullanılır
-  - `materials` — useFanMaterials hook'undan dönen malzeme nesnesi (boxMat, matteBlack, chassisInnerMat, castIron, industrialSteel, rubber gibi materyalleri içerir)
-- **Dönüş**: JSX - nem alma cihazının (dehumidifier) 3D modelini oluşturan React bileşeni. Gövde, panel, ekran, su tankı, fan sistemi ve ayakları içeren bir 3D model döndürür.
-
-### [N2_NASIL] AST Pointer: src/components/products/3d/types/DehumidifierModel.tsx::useFrame callback (state, delta)
-- **params**: (state, delta)
-  - `state` — useFrame tarafından sağlanan state nesnesi (kullanılmıyor)
-  - `delta` — son kareden bu yana geçen süre (saniye cinsinden), fan hızını hesaplamak için kullanılır
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok - her karede çalışarak fanWheelRef.current.rotation.y değerini delta * 6 kadar artırarak fanı döndürür
-
-### [N3_NASIL] AST Pointer: src/components/products/3d/types/DehumidifierModel.tsx::map callback (x, i) - lg1 ayağı
-- **params**: (x, i)
-  - `x` — [-0.5, 0.5] dizisinden gelen x koordinatı, ayakların yatay konumunu belirler
-  - `i` — döngü indeksi, benzersiz key oluşturmak için kullanılır
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX - modelin ön (z=0.3) tarafındaki silindirik ayaklardan birini döndürür
-
-### [N4_NASIL] AST Pointer: src/components/products/3d/types/DehumidifierModel.tsx::map callback (x, i) - lg2 ayağı
-- **params**: (x, i)
-  - `x` — [-0.5, 0.5] dizisinden gelen x koordinatı, ayakların yatay konumunu belirler
-  - `i` — döngü indeksi, benzersiz key oluşturmak için kullanılır
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX - modelin arka (z=-0.3) tarafındaki silindirik ayaklardan birini döndürür
+  - `fanWheelRef` — `useRef<Group>(null)` ile oluşturulmuş ref; fan çarkı grubunun DOM referansını tutar, `useFrame` içinde `rotation.y` güncellemesinde kullanılır
+  - `materials` — `useResolveMaterials()` hook'undan dönen malzeme nesnesi; JSX içinde `boxMat`, `matteBlack`, `chassisInnerMat`, `castIron`, `industrialSteel`, `rubber` alanlarına erişilir
+  - `geometries` — `useMemo(() => {...}, [])` ile oluşturulan ve boş bağımlılık dizisi sayesinde yalnızca bir kez hesaplanan geometri nesnesi; şu alanları içerir:
+    - `geometries.bodyGeo` — `new BoxGeometry(1.5, 2.5, 1)` ile oluşturulmuş gövde kutu geometrisi
+    - `geometries.topPanelGeo` — `new BoxGeometry(1.4, 0.05, 0.9)` ile oluşturulmuş üst panel kutu geometrisi
+    - `geometries.screenGeo` — `new PlaneGeometry(0.6, 0.3)` ile oluşturulmuş ekran düzlem geometrisi
+    - `geometries.waterTankGeo` — `new BoxGeometry(1.2, 0.6, 0.1)` ile oluşturulmuş su tankı kutu geometrisi
+    - `geometries.topVentGeo` — `new PlaneGeometry(0.8, 0.5)` ile oluşturulmuş üst havalandırma düzlem geometrisi
+    - `geometries.fanWheelGeo` — `new CylinderGeometry(0.3, 0.3, 0.02, 16)` ile oluşturulmuş fan çarkı silindir geometrisi
+    - `geometries.barGeo` — `new BoxGeometry(0.85, 0.02, 0.02)` ile oluşturulmuş çubuk kutu geometrisi
+    - `geometries.sideVentGeo` — `new PlaneGeometry(0.6, 1.2)` ile oluşturulmuş yan havalandırma düzlem geometrisi
+    - `geometries.wheelGeo` — `new CylinderGeometry(0.1, 0.1, 0.05, 16)` ile oluşturulmuş tekerlek silindir geometrisi
+  - `useFrame` callback parametreleri:
+    - `state` — React Three Fiber frame durumu; bu fonksiyonda doğrudan kullanılmaz
+    - `delta` — çerçeve süresi (saniye); `fanWheelRef.current.rotation.y` artışında `delta * 6` çarpanı olarak kullanılır
+  - `useEffect` cleanup fonksiyonu — `Object.values(geometries).forEach(geo => geo.dispose())` çağrısıyla tüm geometri nesnelerini bellekten temizler
+  - JSX map callback parametreleri:
+    - `x` — tekerlek pozisyonu için x ekseni değeri (ilk döngüde `-0.5` ve `0.5`)
+    - `i` — map dizin değeri; `key` prop'u olarak `` `lg1-${i}` `` ve `` `lg2-${i}` `` ifadelerinde kullanılır
+- **Dönüş**: JSX — `<group scale={[1, 1, 1]} position={[0, -0.5, 0]}>` kök elemanı; alt elemanlar olarak `Body`, `TopPanel`, `Screen`, `WaterTank`, `SideVent` adlı mesh'ler, üst havalandırma grubu (topVentGeo, fanWheelGeo, barGeo x3) ve alt tekerlek grubu (wheelGeo x4) içerir
 
 ---
 
@@ -41740,37 +41742,60 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx
-skeleton_hash: 8c1cbc5c9d7f6757
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\SnailFanModel.tsx
+skeleton_hash: 2f6930ab92e4f727
 entity_hashes:
+  func:Bolt: 381f5e19a767419a
   func:SnailFanModel: 43312a20c26f093f
-  overview: 0330a77864ae91b3
+  overview: 72ddfa5a87eeec1f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:51:48Z
+generated_at: 2026-08-27T07:44:37Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun ürün görselleştirme altyapısında, salyangoz tipi fanların üç boyutlu modellerini tarayıcı ortamında render etmekle yükümlüdür. React ekosistemi içinde çalışarak, ürün sayfalarında gerçekçi ve etkileşimli fan görünümleri sunmayı amaçlayan tek amaçlı bir bileşen paketidir.
+Bu modül, VentHub HVAC platformunun ürün görselleştirme altyapısında salyangoz tipi santrifüj fanların üç boyutlu modellerini tarayıcı ortamında render etmekle yükümlüdür. React ekosistemi içinde çalışarak ürün sayfalarında gerçekçi ve etkileşimli fan görünümleri sunmayı amaçlayan tek amaçlı bir bileşen paketidir. Modül, ana fan modelinin yanı sıra modelin cıvata gibi alt parçalarını da ayrı bileşenler olarak tanımlar.
 
 ## Fonksiyon Grupları
-### 3D Fan Modeli Bileşeni
-Modülün temel ve tek sorumluluğu, salyangoz fanın üç boyutlu modelini oluşturup kullanıcıya sunmaktır. Fonksiyon, 3D sahne entegrasyonu ve görsel parametreleri yöneterek fanı ekranda canlandırır.
+
+### Ana 3D Model Bileşeni
+Salyangoz fanın bütünsel üç boyutlu modelini oluşturup kullanıcıya sunan ana bileşendir. Fanın genel yapısını, alt bileşenlerini bir araya getirerek sahneye yerleştirir ve ürün sayfasında görüntülenmesini sağlar.
 - SnailFanModel
+
+### Yardımcı Alt Bileşen
+Fan modelinin cıvata (bolt) gibi fiziksel parçalarını temsil eden yardımcı bileşendir. Üst bileşen tarafından sağlanan geometri ve materyal bilgilerini kullanarak cıvata görselini oluşturur.
+- Bolt
+
+## Fonksiyonlar Arası İlişkiler
+- `SnailFanModel`, fan modelini oluştururken `Bolt` bileşenini birden fazla kez çağırarak cıvata parçalarını modele yerleştirir.
+- `Bolt`, dışarıdan aldığı `position`, `cylinderGeo`, `sphereGeo` ve `boltChromeMaterial` parametreleriyle konumlandırılır ve görselleştirilir; bu parametreler `SnailFanModel` tarafından sağlanır.
+
+## Bağımlılıklar
+- **Dış bağımlılıklar**: React, 3D render kütüphanesi (Three.js tabanlı altyapı)
+- **İç bağımlılıklar**: `Bolt` bileşeni `SnailFanModel` tarafından tüketilir; modülün kendisi ürün sayfası/bileşeni tarafından çağrılır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-React tabanlı 3D render bileşeni olarak çalışan bu modül, salyangoz fan modelinin görüntülenmesi için belirli ortam koşullarına bağlıdır.
-
-[Aksiyom 1]: Eğer React runtime ortamı (tarayıcı DOM'u) yoksa, SnailFanModel bileşeni render edilemez.
-
-[Aksiyom 2]: Eğer WebGL desteği veya Three.js benzeri 3D render kütüphanesi yüklü değilse, salyangoz fan 3D modeli görüntülenemez.
-
-[Aksiyom 3]: Eğer bu bileşen 3D ürün görüntüleme altyapısı (ürün sayfası/bileşeni) içinde çağrılmazsa, fan modeli sayfada yer almaz.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### Bolt
+**Ne yapar**: 3D sahne içinde bir cıvata (bolt) bileşeni oluşturan bir React fonksiyonel bileşenidir. Verilen geometriler ve malzeme kullanılarak cıvatanın görsel temsilini render eder.
+
+**Nasıl yapar**: Fonksiyon, aldığı `position`, `cylinderGeo`, `sphereGeo` ve `boltChromeMaterial` parametrelerini kullanarak bir cıvata modeli oluşturur. `cylinderGeo` ve `sphereGeo` geometrileri, cıvatanın silindirik gövdesi ve küresel başı gibi kısımlarını temsil etmek üzere kullanılır. `boltChromeMaterial` ise cıvatanın krom görünümünü sağlayan malzeme olarak atanır. Fonksiyon, `BoltProps` tipinde props alarak `React.FC<BoltProps>` tipinde bir bileşen döndürür.
+
+**Parametreler**:
+- position: Bilinmiyor — cıvatanın 3D uzaydaki konumunu belirten değer. Tip bilgisi verilmemiştir.
+- cylinderGeo: Bilinmiyor — cıvatanın silindirik kısımları için kullanılacak Three.js geometri nesnesi. Tip bilgisi verilmemiştir.
+- sphereGeo: Bilinmiyor — cıvatanın küresel kısımları için kullanılacak Three.js geometri nesnesi. Tip bilgisi verilmemiştir.
+- boltChromeMaterial: Bilinmiyor — cıvatanın krom malzeme görünümünü sağlayan Three.js malzeme nesnesi. Tip bilgisi verilmemiştir.
+
+**Dönüş**: `React.FC<BoltProps>` — BoltProps tipinde props alan bir React fonksiyonel bileşeni döndürür. BoltProps interface'inin içeriği verilen kaynakta belirtilmemiştir.
 
 ### SnailFanModel
 **Ne yapar**: VentHub HVAC projesinde kullanılan standart santrifüj (salyangoz) fan tipinin 3B modelini render eden React fonksiyonel bileşenini tanımlar ve döndürür. Ürün sayfalarında ilgili HVAC ekipmanının üç boyutlu olarak kullanıcılara sunulmasını sağlayan özel bileşen ailesinin bir parçasıdır, yalnızca salyangoz fan modelinin görselleştirilmesi için özel olarak geliştirilmiştir.
@@ -41781,62 +41806,97 @@ React tabanlı 3D render bileşeni olarak çalışan bu modül, salyangoz fan mo
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../core::useResolveMaterials
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: three
+
+---
+
+## INTERFACES
+
+### BoltProps
+- `position: [number, number, number]`
+- `cylinderGeo: THREE.CylinderGeometry`
+- `sphereGeo: THREE.SphereGeometry`
+- `boltChromeMaterial: THREE.Material`
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::SnailFanModel
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/products/3d/types/SnailFanModel.tsx::Bolt
+- **params**: `position`, `cylinderGeo`, `sphereGeo`, `boltChromeMaterial`
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials() hook'undan dönen materyal objesi, tüm 3D parçalar için malzeme tanımlarını içerir
-  - `scrollShape` — useMemo ile oluşturulan salyangoz formu Shape nesnesi, extrudeGeometry için kullanılır
-  - `Bolt` — Standart cıvata bileşeni, position parametresi ile konumlandırılır
-- **Dönüş**: JSX.Element (React functional component)
+  - `position` — grubun 3D uzaydaki konumunu belirleyen dizi; doğrudan `<group>` elementinin `position` prop'una atanır
+  - `cylinderGeo` — silindir geometrisi; ilk `<mesh>` elementinin `geometry` prop'una atanır
+  - `sphereGeo` — küre geometrisi; ikinci `<mesh>` elementinin `geometry` prop'una atanır
+  - `boltChromeMaterial` — krom kaplama materyali; her iki `<mesh>` elementinin `material` prop'una atanır
+- **Dönüş**: JSX — `rotation={[Math.PI / 2, 0, 0]}` ile döndürülmüş bir `<group>` içinde iki `<mesh>` çocuğu (silindir ve küre)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::scrollShapeCreator
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/SnailFanModel.tsx::SnailFanModel
+- **params**: yok
 - **ic_degiskenler**:
-  - `shape` — Three.js Shape nesnesi, salyangoz formunun 2D konturu oluşturulur
-- **Dönüş**: Shape (Three.js Shape nesnesi)
+  - `materials` — `useResolveMaterials()` hook'undan dönen materyal nesnesi; `industrialBlue`, `darkGrey`, `zincGray`, `motorSilver`, `industrialSteel`, `galvanizedSteel`, `boltChrome`, `matteBlack` alanlarına erişilir
+  - `scrollShape` — `useMemo` ile oluşturulan `THREE.Shape` nesnesi; salyangoz formunun dış konturunu tanımlar; `geometries` hesaplamasında `extrude` geometrisi için kullanılır
+  - `geometries` — `useMemo` ile oluşturulan geometri nesneleri kümesi; `scrollShape` bağımlılığıyla hesaplanır; şu alanları içerir: `boltCylinder`, `boltSphere`, `motorBody`, `fin`, `klemensBox`, `label`, `rearCover`, `basePlate`, `baseFoot`, `extrude`, `inletFunnel`, `inletRing`, `toruses`, `wire`, `outletBox`, `outletFlange`, `outletHole`
+  - `i` — `Array(24).fill(0).map` callback'inde indeks; soğutma kanatlarının rotasyon açısını hesaplamak için `i * (Math.PI / 12)` formülünde kullanılır
+  - `angle` — `[45, 135, 225, 315].map` callback'inde vida açısı derece cinsinden; `Math.cos(angle * Math.PI / 180)` ve `Math.sin(angle * Math.PI / 180)` ile vida pozisyonu hesaplanır
+  - `torusGeo` — `geometries.toruses.map` callback'inde tek bir torus geometrisi; koruma ızgarası halkalarının `geometry` prop'una atanır
+  - `t` — `geometries.toruses.forEach` callback'inde tek bir torus geometrisi; cleanup sırasında `t.dispose()` ile GPU belleği serbest bırakılır
+- **Dönüş**: JSX — motor, salyangoz gövde, emiş ünitesi ve atış ağzı bileşenlerini içeren `<group>`
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::Bolt
-- **params**: `{ position: [number, number, number] }` — Cıvatanın 3D koordinat pozisyonu
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/SnailFanModel.tsx::useMemo::scrollShape
+- **params**: yok
 - **ic_degiskenler**:
-  - `materials` — Ana bileşenden gelen materyal objesi, materials.boltChrome kullanılır
-- **Dönüş**: JSX.Element (Cıvata 3D modeli)
+  - `shape` — `new THREE.Shape()` ile oluşturulan şekil nesnesi; `moveTo`, `lineTo`, `quadraticCurveTo` metotlarıyla salyangoz formunun dış konturu çizilir
+- **Dönüş**: `THREE.Shape` — salyangoz formunun dış konturunu tanımlayan şekil nesnesi
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::coolingFinMapper
-- **params**: `(_, i)` — _ kullanılmayan eleman, i döngü indeksi
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/SnailFanModel.tsx::useMemo::geometries
+- **params**: yok
 - **ic_degiskenler**:
-  - `materials` — Ana bileşenden gelen materyal objesi, materials.industrialBlue kullanılır
-- **Dönüş**: JSX.Element (Soğutma kanadı mesh)
+  - `scrollShape` — dışarıdan erişilen `THREE.Shape` nesnesi; `extrude` geometrisinin oluşturulmasında `THREE.ExtrudeGeometry`'nin ilk parametresi olarak kullanılır
+  - `boltCylinder` — `new THREE.CylinderGeometry(0.012, 0.012, 0.02, 6)` ile oluşturulan silindir geometrisi; vida gövdesi için
+  - `boltSphere` — `new THREE.SphereGeometry(0.011, 8, 8, 0, Math.PI * 2, 0, Math.PI / 2)` ile oluşturulan yarım küre geometrisi; vida başı için
+  - `motorBody` — `new THREE.CylinderGeometry(0.18, 0.18, 0.42, 32)` ile oluşturulan silindir geometrisi; motor gövdesi için
+  - `fin` — `new THREE.BoxGeometry(0.015, 0.39, 0.40)` ile oluşturulan kutu geometrisi; soğutma kanatları için
+  - `klemensBox` — `new THREE.BoxGeometry(0.16, 0.12, 0.16)` ile oluşturulan kutu geometrisi; klemens kutusu için
+  - `label` — `new THREE.PlaneGeometry(0.08, 0.08)` ile oluşturulan düzlem geometrisi; etiket için
+  - `rearCover` — `new THREE.CylinderGeometry(0.19, 0.185, 0.12, 32)` ile oluşturulan silindir geometrisi; arka kapak için
+  - `basePlate` — `new THREE.BoxGeometry(0.25, 0.08, 0.30)` ile oluşturulan kutu geometrisi; kaide plakası için
+  - `baseFoot` — `new THREE.BoxGeometry(0.32, 0.02, 0.38)` ile oluşturulan kutu geometrisi; kaide ayağı için
+  - `extrude` — `new THREE.ExtrudeGeometry(scrollShape, { depth: 0.24, bevelEnabled: false })` ile oluşturulan extrude geometrisi; salyangoz gövde için
+  - `inletFunnel` — `new THREE.CylinderGeometry(0.24, 0.20, 0.04, 64, 1, true)` ile oluşturulan açık silindir geometrisi; emiş hunisi için
+  - `inletRing` — `new THREE.RingGeometry(0.20, 0.24, 64)` ile oluşturulan halka geometrisi; huni ön yüzeyi için
+  - `toruses` — `[0.05, 0.10, 0.15, 0.19].map(r => new THREE.TorusGeometry(r, 0.003, 8, 64))` ile oluşturulan torus geometrileri dizisi; koruma ızgarası halkaları için
+  - `r` — `map` callback'inde torus yarıçapı değeri; `0.05`, `0.10`, `0.15`, `0.19` değerlerini alır
+  - `wire` — `new THREE.BoxGeometry(0.38, 0.006, 0.006)` ile oluşturulan kutu geometrisi; ızgara telleri için
+  - `outletBox` — `new THREE.BoxGeometry(0.3, 0.35, 0.24)` ile oluşturulan kutu geometrisi; atış ağzı kutusu için
+  - `outletFlange` — `new THREE.BoxGeometry(0.02, 0.40, 0.28)` ile oluşturulan kutu geometrisi; atış ağzı flanşı için
+  - `outletHole` — `new THREE.BoxGeometry(0.32, 0.28, 0.20)` ile oluşturulan kutu geometrisi; ağız boşluğu için
+- **Dönüş**: nesne — 17 geometri alanını içeren nesne (`boltCylinder`, `boltSphere`, `motorBody`, `fin`, `klemensBox`, `label`, `rearCover`, `basePlate`, `baseFoot`, `extrude`, `inletFunnel`, `inletRing`, `toruses`, `wire`, `outletBox`, `outletFlange`, `outletHole`)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::boltMapper
-- **params**: `(angle, i)` — angle açı derecesi (radyana çevrilir), i döngü indeksi
+### [N5_NASIL] AST Pointer: src/components/products/3d/types/SnailFanModel.tsx::useEffect::cleanup
+- **params**: yok
 - **ic_degiskenler**:
-  - `materials` — Ana bileşenden gelen materyal objesi, Bolt bileşenine aktarılır
-- **Dönüş**: JSX.Element (Bolt bileşeni ile konumlandırılmış cıvata)
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::ringMapper
-- **params**: `(r, i)` — r daire yarıçapı, i döngü indeksi
-- **ic_degiskenler**:
-  - `materials` — Ana bileşenden gelen materyal objesi, materials.industrialBlue kullanılır
-- **Dönüş**: JSX.Element (Torus geometrik halka mesh)
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::wireMapper
-- **params**: `(angle, i)` — angle açı derecesi (radyana çevrilir), i döngü indeksi
-- **ic_degiskenler**:
-  - `materials` — Ana bileşenden gelen materyal objesi, materials.industrialBlue kullanılır
-- **Dönüş**: JSX.Element (Dikdörtgen kutu geometrik tel mesh)
+  - `geometries` — dışarıdan erişilen geometri nesneleri kümesi; tüm geometrilerin `dispose()` metodu çağrılarak GPU belleği serbest bırakılır
+  - `t` — `geometries.toruses.forEach` callback'inde tek bir torus geometrisi; `t.dispose()` ile bellekten temizlenir
+- **Dönüş**: yok — yan etki: bileşen unmount olduğunda tüm geometri nesnelerinin GPU belleğini serbest bırakır
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\components\products\3d\types\SnailFanModel.tsx
+  function: src\components\products\3d\types\SnailFanModel.tsx::Bolt
   function: src\components\products\3d\types\SnailFanModel.tsx::SnailFanModel
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: Bolt
   export: SnailFanModel
 
 ---
@@ -57866,8 +57926,8 @@ type VariantSelection = <T extends VariantLike>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductFanSelection.ts
-skeleton_hash: d25b597f76ec7fa0
+source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductFanSelection.ts
+skeleton_hash: cf67fad21ac874be
 entity_hashes:
   func:calismaNoktasi: 477178de8115d130
   func:degerlendir: f750568727981b71
@@ -57876,7 +57936,7 @@ entity_hashes:
   func:secimYap: 4647312ff1acd1ac
   func:sistemKatsayisi: 04ecc41bc675abb4
   overview: 1ad4e3445b46e669
-generated_at: 2026-08-25T08:44:57Z
+generated_at: 2026-08-27T07:32:10Z
 ---
 
 ## Genel Bakış
@@ -58027,15 +58087,23 @@ type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
 
 ## SABİTLER
 - **MAHAL_KURALLARI** (object) — `{
+
   bathroom: { ach: 8, minimumM3h: 85 },
+
   kitchen: { ach: 15, minimumM3h:...`
 - **GUZERGAH_GEOMETRISI** (object) — `{
+
   short: { uzunlukM: 3, dirsek90: 1, dirsek45: 0 },
+
   medium: { uzunlukM:...`
 - **SESSIZLIK_AGIRLIGI** (object) — `{
+
   normal: 0.2,
+
   important: 0.4,
+
   critical: 0.6,
+
 }`
 
 ---
@@ -58128,11 +58196,11 @@ graph TD
     ductFanSelection_ts__parsePQCurve["parsePQCurve"]
     ductFanSelection_ts__secimYap["secimYap"]
     ductFanSelection_ts__sistemKatsayisi["sistemKatsayisi"]
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
     ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
 ```
 
 ## NODE ID STANDARD
@@ -58175,8 +58243,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductPressure.ts
-skeleton_hash: 1579ba7b4e3d68fe
+source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductPressure.ts
+skeleton_hash: a0b705802650fa34
 entity_hashes:
   func:akisHizi: a87413c22f69c858
   func:dinamikBasinc: 4288bc94c70c6d78
@@ -58184,7 +58252,7 @@ entity_hashes:
   func:reynolds: d87c6fd9c4af1b38
   func:surtunmeFaktoru: 20425e5a77455729
   overview: 1dd122290e85a03e
-generated_at: 2026-08-25T08:44:34Z
+generated_at: 2026-08-27T07:32:10Z
 ---
 
 ## Genel Bakış
@@ -58281,15 +58349,23 @@ type KanalMalzemesi = keyof typeof PURUZLULUK_M
 
 ## SABİTLER
 - **PURUZLULUK_M** (as_expression) — `{
+
   galvanized: 0.00015,
+
   pvc: 0.00001,
+
   flex: 0.003,
+
 } as const`
 - **FITTING_K** (as_expression) — `{
+
   /** 90° yuvarlak dirsek, eğrilik yarıçapı = 1,5·D (tipik hazır dirsek). ...`
 - **TERMINAL_K** (as_expression) — `{
+
   /** İç mahal egzoz menfezi/ızgarası. */
+
   menfez: 2.5,
+
   /** Geri-akış...`
 - **TERMINAL_K_TOPLAM** (binary_expression) — `TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur`
 
@@ -58353,8 +58429,8 @@ graph TD
     ductPressure_ts__kanalBasincKaybi["kanalBasincKaybi"]
     ductPressure_ts__reynolds["reynolds"]
     ductPressure_ts__surtunmeFaktoru["surtunmeFaktoru"]
-    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
+    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__akisHizi
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__dinamikBasinc
 ```
@@ -73316,13 +73392,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\account\AccountAddressesPage.tsx
-skeleton_hash: f7e7228eef723bcc
+source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx
+skeleton_hash: 6a35ab6f5cca3044
 entity_hashes:
   func:AccountAddressesPage: 8a10c2ba61747811
   overview: cfdfd55850a3c6f9
   style_tokens: 20e5949307a3284f
-generated_at: 2026-08-27T07:10:03Z
+generated_at: 2026-06-19T20:48:21Z
 ---
 
 ## Genel Bakış
@@ -73395,15 +73471,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **emptyForm** (object) — `{
-
   label: '',
-
   full_name: '',
-
   phone: '',
-
   address_line: '',
-
   city:...`
 
 ---
@@ -83501,15 +83572,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\admin\PricingPoliciesTableBody.tsx
-skeleton_hash: 414834293eae7a27
+source_path: C:\Users\alize\venthub-hvac\src\views\admin\PricingPoliciesTableBody.tsx
+skeleton_hash: 6dc08285098d673f
 entity_hashes:
   func:EffectiveLockPanel: f5eb59505e91e68f
   func:PricingPoliciesTableBody: 242122ccd79025dd
   func:policiesFetcher: 3dc61bf26c95820a
   overview: 0735c2f1aad88d41
   style_tokens: 406c48a0ed4c398b
-generated_at: 2026-08-27T07:30:16Z
+generated_at: 2026-08-25T08:46:05Z
 ---
 
 ## Genel Bakış
@@ -83616,15 +83687,10 @@ type ScopeKey = 'variant' | 'product' | 'brand' | 'category' | 'global'
 
 ## SABİTLER
 - **SCOPE_KEYS** (object) — `{
-
   0: 'variant',
-
   1: 'product',
-
   2: 'brand',
-
   3: 'category',
-
   4: 'g...`
 
 ---
