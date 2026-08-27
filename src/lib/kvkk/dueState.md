@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\kvkk\dueState.ts
-skeleton_hash: b086f545a664056d
+source_path: C:\tmp\venthub-wt-t131\src\lib\kvkk\dueState.ts
+skeleton_hash: 96f3478ea3b8fb0f
 entity_hashes:
   func:computeDueState: 654130d80b0a082a
   func:isTerminalStatus: 804d60cc46a3141a
   overview: e8d1766ba7090536
-generated_at: 2026-08-25T08:44:13Z
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış

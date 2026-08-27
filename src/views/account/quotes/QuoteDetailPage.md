@@ -2,34 +2,31 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\views\account\quotes\QuoteDetailPage.tsx
-skeleton_hash: bf02fcbd76ed7fdc
+source_path: C:\tmp\venthub-wt-t131\src\views\account\quotes\QuoteDetailPage.tsx
+skeleton_hash: 62c7fec9786e8d95
 entity_hashes:
-  func:QuoteDetailPage: ad75de9f3250ca48
-  overview: a7b68aa43fac48dc
+  func:QuoteDetailPage: 3d71e18440faf62b
+  overview: 172bfe259539c2cd
   style_tokens: f3eac423c34fd21f
-generated_at: 2026-08-16T10:24:24Z
+generated_at: 2026-08-27T06:51:24Z
 ---
 
 ## Genel Bakış
 
-Bu modül, teklif (quote) detay sayfasını gösteren bir React sayfa bileşenidir. Teklifin tüm bilgilerini ve ilgili ayrıntıları kullanıcılara sunarak, teklif yönetimi sürecinde kritik bir görüntüleme noktası olarak görev yapar.
+Bu modül, teklif (quote) detay sayfasını gösteren bir React sayfa bileşenidir. URL'deki `id` parametresini kullanarak ilgili teklifin tüm bilgilerini yükler ve kullanıcıya sunar. Teklif yönetimi sürecinde görüntüleme noktası olarak görev yapar; duruma göre müşteri için kabul/red karar butonlarını dinamik olarak gösterir.
 
 ## Fonksiyon Grupları
 
 ### Sayfa Bileşeni
-Teklif detay sayfasının tamamını oluşturan ve yöneten ana React bileşenidir. Sayfa yüklenişinde ilgili teklif verisini çeker, düzenler ve kullanıcıya okunabilir bir biçimde sunar.
+
+Teklif detay sayfasının tamamını oluşturan ana React bileşenidir. Ürün kalemleri, fiyatlar ve durum bilgileri dahil teklif verisini çeker, düzenler ve kullanıcıya okunabilir biçimde sunar.
 - QuoteDetailPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için verilen bilgilerden (sadece parametresiz fonksiyon imzası) somut mimari varsayımlar çıkarılamamaktadır.
-
-[Aksiyom 1]: Eğer `QuoteDetailPage` bir React Sayfa (Page) bileşeni olarak çalışıyorsa, bileşenin props almadan (parametresiz) çalıştığı ve gerekli verileri React Router'dan (useParams/useLocation) veya üst bileşenlerden context yoluyla aldığı varsayılır. Aksi takdirde, bileşen bağımsız olarak test edilemez hale gelir.
-
-[Aksiyom 2]: Eğer `QuoteDetailPage` bir quote detay sayfası olarak render ediliyorsa, ilgili quote verisinin (ID, detaylar, kalemler vb.) bileşen içinden erişilebilir bir kaynaktan (API servisi, store veya context) sağlanıyor olması gerekir; aksi takdirde sayfa boş veya hata durumunda render edilir.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca parametresiz `QuoteDetailPage` imzasından somut mimari varsayımlar çıkarılamamaktadır.
 
 ---
 
@@ -37,39 +34,16 @@ Bu modül için verilen bilgilerden (sadece parametresiz fonksiyon imzası) somu
 
 ### QuoteDetailPage
 
-**Ne yapar**: Teklif detay sayfasını render eden React fonksiyonel bileşenidir. URL'deki `id` parametresini alarak ilgili teklifin tüm bilgilerini (ürün kalemleri, fiyatlar, durum) yükler ve görüntüler. Ayrıca müşteri için kabul/red karar butonlarını duruma göre dinamik olarak gösterir.
+**Ne yapar**: `/account/quotes/detail?id=<uuid>` yolunda çalışan bir React fonksiyonel bileşenidir. Teklif detayını ve müşteri kararını (kabul/red) görüntüler. Karar düğmeleri SSOT'tan çizilir (`allowedCustomerQuoteActions` fonksiyonu ile belirlenir) — yerel bir geçiş listesi yoktur. Fiyat kolonları bu bileşende yalnızca okunur (cetvel R5). `useSearchParams` tüketicisidir ve uygulama sayfası `<Suspense>` ile sarar (kural 5).
 
-**Nasıl yapar**: Sayfa yüklendiğinde `useSearchParams` hook'u ile URL'den `quoteId` parametresini çeker. `useCallback` ile tanımlanan `load` fonksiyonu, `getQuoteDetail` API çağrısı yaparak teklif verisini çeker ve state'e yazar. `useEffect`, `user` değiştiğinde otomatik olarak `load` fonksiyonunu tetikler. Fiyat hesaplaması, tüm kalemlerin fiyatlı ve aynı para biriminde olup olmadığını kontrol ederek toplam tutarı hesaplar. Karar butonları `allowedCustomerQuoteActions` fonksiyonundan gelen izin listesine göre koşullu olarak render edilir. `handleDecision` fonksiyonu, kullanıcı onayı aldıktan sonra `decideQuote` API çağrısı yapar ve ardından sayfayı yeniler.
+**Nasıl yapar**: Bileşen, URL'deki `id` parametresini `useSearchParams` ile alır ve `quoteId` olarak kullanır. `useCallback` ile tanımlanan `load` fonksiyonu, Supabase üzerinden `getQuoteDetail` çağırarak teklif detayını yükler. `useEffect` içinde kullanıcı (`user`) mevcut olduğunda `load` tetiklenir. Yükleme sırasında spinner gösterilir; teklif bulunamazsa "bulunamadı" ekranı ve listeye dönüş butonu sunulur. Teklif başarıyla yüklendikçe kalemler tablo halinde listelenir. Fiyatlanmış kalemlerin toplamı yalnızca tüm kalemler fiyatlıysa ve tek para birimindeyse hesaplanır ve gösterilir (kısmi toplamı "Toplam" diye sunmak yanıltıcı olacağından — W4b dersi). Duruma göre `allowedCustomerQuoteActions` ile elde edilen aksiyon listesine göre kabul/red düğmeleri render edilir. `handleDecision` fonksiyonu, kullanıcıdan onay aldıktan sonra `decideQuote` çağırır ve ardından tekrar `load` ile veriyi tazeler. Durum etiketleri `statusLabel` ile çevrilir, durum renkleri `statusClass` ile belirlenir.
 
-**Parametreler**:
-Bu bileşen doğrudan parametre almaz — props'suz bir sayfa bileşenidir. Veri kaynağı olarak şu hook'ları kullanır:
+**Parametreler**: Fonksiyon herhangi bir parametre almaz (React bileşeni olarak props'suz tanımlanmıştır).
 
-- `useAuth()` — `{ user }`: Mevcut oturum açmış kullanıcı bilgisini sağlar. Kullanıcı oturum açmamışsa veri yüklenmez.
-- `useI18n()` — `{ t, lang }`: Çoklu dil desteği için çeviri fonksiyonu (`t`) ve dil kodu (`lang`) döndürür.
-- `useLocalizedRoutes()` — `Routes`: Localize edilmiş rota builder'ları sağlar (örn: `Routes.account.quotes()`).
-- `useRouter()` — `router`: Sayfa yönlendirme işlemleri için Next.js router nesnesi.
-- `useSearchParams()` — `searchParams`: URL query string parametrelerine erişim sağlar. `id` parametresi teklif UUID'sini taşır.
-
-**Dönüş**: `JSX.Element` — Teklif detay sayfasının tamamını oluşturan JSX yapısı. Yükleniyor durumunda spinner, teklif bulunamadığında hata kartı, aksi halde teklif detayı tablosu ve karar butonları döndürür. Bileşen `<Suspense>` zarfı içinde kullanılmalıdır zira `useSearchParams` kullanır.
-
-**İç Durum Değişkenleri**:
-- `quote`: `QuoteWithItems | null` — Yüklenen teklif verisi ve kalemleri.
-- `loading`: `boolean` — Veri yükleme durumunu takip eder.
-- `deciding`: `boolean` — Karar (kabul/red) işleminin devam edip etmediğini takip eder, butonları devre dışı bırakmak için kullanılır.
-
-**Yardımcı Fonksiyonlar**:
-
-`statusLabel(s: string): string`
-Durum kodunu çeviri sistemi üzerinden okunabilir etikete dönüştürür. `t('quotes.statusLabels.${s}')` kalıbını kullanır.
-
-`statusClass(s: string): string`
-Durum koduna göre Tailwind CSS sınıfı döndürür. `requested` için sarı, `quoted` için mavi, `accepted` için yeşil, `rejected` için kırmızı, `expired` için gri tonları kullanır.
-
-`handleDecision(decision: 'accepted' | 'rejected'): Promise<void>`
-Müşteri karar işlerini yürütür. Önce `window.confirm` ile kullanıcı onayı alır, ardından `decideQuote` API çağrısı yapar. Başarılıysa toast bildirimi gösterir ve sayfayı yeniler; başarısızsa hata toast'u gösterir.
-
-**Fiyat Hesaplama Mantığı**:
-Toplam tutar, yalnızca tüm kalemlerin `unit_price` değerine sahip olduğu ve tüm kalemlerin aynı para biriminde olduğu durumlarda hesaplanır. Farklı para birimleri varsa veya bazı kalemlerin fiyatı yoksa toplam `null` olarak kalır — bu, kısmi toplamların yanıltıcı olmasını önler.
+**Dönüş**: JSX elementi döndürür. Üç farklı durumda farklı arayüz sunar:
+- Yükleme durumunda: Dönen bir spinner (animate-spin) içeren ortalanmış bir `div`.
+- Teklif bulunamadığında: Dosya ikonu, "bulunamadı" mesajı ve listeye dönüş butonu içeren beyaz kart.
+- Teklif mevcut olduğunda: Başlık satırı (tarih, kaynak, durum etiketi), duruma özel bilgi banner'ı (beklemede veya kabul edildi), kalemler tablosu (ürün adı, not, miktar, birim fiyat, satır toplamı, geçerlilik tarihi) ve toplam satırı (koşullu), ardından kabul/red düğmeleri (aksiyon listesine göre koşullu).
 
 ---
 
@@ -98,68 +72,66 @@ Toplam tutar, yalnızca tüm kalemlerin `unit_price` değerine sahip olduğu ve 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: QuoteDetailPage.tsx::QuoteDetailPage
-- **params**: ()
+### [N1_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::QuoteDetailPage
+- **params**: yok
 - **ic_degiskenler**:
-  - `user` — useAuth hook'undan alınan kullanıcı bilgisi, kimlik doğrulama için kullanılır
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, uluslararasılaştırma için kullanılır
-  - `lang` — useI18n hook'undan alınan dil bilgisi, format fonksiyonlarına parametre olarak geçilir
-  - `Routes` — useLocalizedRoutes hook'undan alınan lokalize edilmiş rota nesnesi, navigasyon için kullanılır
-  - `router` — useRouter hook'undan alınan Next.js router nesnesi, programlı navigasyon için kullanılır
-  - `searchParams` — useSearchParams hook'undan alınan URL arama parametreleri nesnesi
-  - `quoteId` — searchParams'dan 'id' parametresinin değeri, teklifin benzersiz tanımlayıcısı
-  - `quote` — useState ile yönetilen QuoteWithItems tipinde teklif verisi veya null
-  - `loading` — useState ile yönetilen boolean, veri yükleme durumunu takip eder
-  - `deciding` — useState ile yönetilen boolean, karar alma işleminin devam ettiğini gösterir
-  - `load` — useCallback ile tanımlanan asenkron fonksiyon, teklif detayını yükler
-  - `statusLabel` — parametre alan fonksiyon, duruma göre çevrilmiş etiket döndürür
-  - `statusClass` — parametre alan fonksiyon, duruma göre CSS sınıf adı döndürür
-  - `handleDecision` — parametre alan asenkron fonksiyon, teklif kabul/red işlemini yönetir
-  - `allPriced` — boolean, tüm kalemlerin fiyatlanıp fiyatlanmadığını kontrol eder
-  - `currencies` — Set nesnesi, kalemlerdeki para birimlerini toplar
-  - `singleCurrency` — string veya null, tüm kalemlerde tek para birimi varsa o birimi tutar
-  - `total` — number veya null, tüm kalemlerin fiyatlı ve tek para biriminde ise toplam tutar
-  - `actions` — string array, mevcut duruma göre izin verilen müşteri aksiyonları
-- **Dönüş**: JSX (React bileşeni)
+  - `user` — `useAuth()` hook'undan dönen kullanıcı nesnesi; useEffect içinde `load` fonksiyonunu tetiklemek için varlığı kontrol edilir
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; tüm metin etiketlerinde, hata/başarı toast mesajlarında kullanılır
+  - `lang` — `useI18n()` hook'undan dönen dil kodu; `formatDate` ve `formatCurrency` çağrılarına aktarılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota nesnesi; `Routes.account.quotes()` ile teklif listesine geri dönüş URL'si üretilir
+  - `router` — `useRouter()` hook'undan dönen Next.js router nesnesi; `router.push()` ile programatik yönlendirme yapılır
+  - `searchParams` — `useSearchParams()` hook'undan dönen URLSearchParams nesnesi; `?.get('id')` ile teklif ID'si alınır
+  - `quoteId` — URL'deki `id` query parametresi; yoksa boş string atanır; `load` fonksiyonuna bağımlılık olarak kullanılır
+  - `quote` — `useState<QuoteWithItems | null>(null)` ile tutulan teklif detayı; yükleme sonrası `setQuote` ile güncellenir; null ise "bulunamadı" ekranı gösterilir
+  - `setQuote` — `quote` state'inin setter fonksiyonu; `load` ve `handleDecision` içinde teklif verisini atamak için kullanılır
+  - `loading` — `useState(true)` ile tutulan yükleme durumu; true iken spinner gösterilir
+  - `setLoading` — `loading` state'inin setter fonksiyonu; `load` içinde yükleme başlangıcında true, bitişinde false yapılır
+  - `deciding` — `useState(false)` ile tutulan karar verme durumu; butonların `disabled` prop'una bağlanır
+  - `setDeciding` — `deciding` state'inin setter fonksiyonu; `handleDecision` içinde işlem başlangıcında true, bitişinde false yapılır
+  - `load` — `useCallback` ile sarılmış async fonksiyon; `quoteId` varsa `getQuoteDetail` çağırarak teklif detayını yükler, state'i günceller
+  - `statusLabel` — durum string'ini alıp `t('quotes.statusLabels.${s}')` ile çevrilmiş etiket döndüren fonksiyon
+  - `statusClass` — durum string'ini alıp ilgili Tailwind CSS sınıfını döndüren fonksiyon; switch-case ile requested/quoted/accepted/rejected/expired/default durumlarını eşler
+  - `handleDecision` — async fonksiyon; `decision` parametresiyle kabul/red işlemi yapar, onay dialogu gösterir, `decideQuote` çağırır, ardından `load` ile veriyi yeniler
+  - `allPriced` — `quote.items.length > 0` VE `quote.items.every((i) => typeof i.unit_price === 'number')` koşullarının sonucu; tüm kalemlerin fiyatlı olup olmadığını belirten boolean
+  - `currencies` — `quote.items.map((i) => i.currency ?? 'TRY')` ile oluşturulan para birimlerini tutan `Set`; tek para birimi kontrolü için kullanılır
+  - `singleCurrency` — `currencies.size === 1` ise tek para birimi string'i, değilse null; toplam hesaplamada ve `formatCurrency` çağrılarında kullanılır
+  - `total` — `allPriced && singleCurrency` koşulu sağlanıyorsa `quote.items.reduce((sum, i) => sum + Number(i.unit_price) * i.qty, 0)` ile hesaplanan toplam fiyat; sağlanmıyorsa null
+  - `actions` — `allowedCustomerQuoteActions(quote.status)` fonksiyonundan dönen izin verilen aksiyon dizisi; butonların gösterilip gösterilmeyeceğini kontrol eder
+- **Dönüş**: JSX (React bileşeni); loading durumunda spinner, quote null ise "bulunamadı" ekranı, aksi halde teklif detay tablosu ve aksiyon butonları render eder
 
-### [N2_NASIL] AST Pointer: QuoteDetailPage.tsx::load
-- **params**: ()
+### [N2_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::load (useCallback)
+- **params**: yok (useCallback içinde tanımlanmış, bağımlılıkları: `[quoteId, t]`)
 - **ic_degiskenler**:
-  - `detail` — getQuoteDetail asenkron fonksiyonundan dönen teklif detay verisi
-- **Dönüş**: Promise<void> (yan etkiler: quote state'ini günceller, hata durumunda toast gösterir)
+  - `detail` — `await getQuoteDetail(supabase, quoteId)` sonucu dönen teklif detayı; `setQuote(detail)` ile state'e atanır
+  - `e` — `catch` bloğunda yakalanan hata nesnesi; `console.warn` ile loglanır
+- **Dönüş**: yok (void); yan etkileri: `setLoading`, `setQuote` state güncellemeleri, hata durumunda `toast.error` gösterimi
 
-### [N3_NASIL] AST Pointer: QuoteDetailPage.tsx::useEffect
-- **params**: ()
-- **ic_degiskenler**:
-  - `user` — useAuth'dan gelen kullanıcı nesnesi, varsa yükleme işlemi başlatılır
-  - `load` — useCallback ile tanımlanan yükleme fonksiyonu, user mevcutsa çağrılır
-- **Dönüş**: void (yan etkiler: component mount veya dependency değiştiğinde load fonksiyonunu çağırır)
+### [N3_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::useEffect callback
+- **params**: yok
+- **ic_degiskenler**: yok (kapsam değişkenleri `user` ve `load` doğrudan erişilir)
+- **Dönüş**: yok; `user` truthy ise `load()` fonksiyonunu çağırır (void ile fire-and-foretch)
 
-### [N4_NASIL] AST Pointer: QuoteDetailPage.tsx::statusLabel
-- **params**: `(s: string)` — durum string'i parametresi
-- **ic_degiskenler**:
-  - `s` — durum değerini temsil eden string parametre
-- **Dönüş**: string (çevrilmiş durum etiketi)
+### [N4_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::statusLabel
+- **params**: `s` — durum string'i (örn: 'requested', 'quoted', 'accepted', 'rejected', 'expired')
+- **ic_degiskenler**: yok
+- **Dönüş**: string — `t('quotes.statusLabels.${s}')` ile çevrilmiş durum etiketi
 
-### [N5_NASIL] AST Pointer: QuoteDetailPage.tsx::statusClass
-- **params**: `(s: string)` — durum string'i parametresi
-- **ic_degiskenler**:
-  - `s` — durum değerini temsil eden string parametre
-- **Dönüş**: string (duruma göre CSS sınıf adı)
+### [N5_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::statusClass
+- **params**: `s` — durum string'i
+- **ic_degiskenler**: yok
+- **Dönüş**: string — Tailwind CSS sınıfı; switch-case ile: 'requested' → 'bg-yellow-100 text-yellow-800', 'quoted' → 'bg-blue-100 text-blue-800', 'accepted' → 'bg-green-100 text-green-800', 'rejected' → 'bg-red-100 text-red-800', 'expired' → 'bg-slate-100 text-slate-600', default → 'bg-air-blue/10 text-primary-navy'
 
-### [N6_NASIL] AST Pointer: QuoteDetailPage.tsx::handleDecision
-- **params**: `(decision: 'accepted' | 'rejected')` — karar tipi parametresi
+### [N6_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::handleDecision
+- **params**: `decision` — `'accepted' | 'rejected'` union tipinde karar değeri
 - **ic_degiskenler**:
-  - `quote` — mevcut teklif verisi (eğer null ise erken dönüş)
-  - `confirmKey` — karar tipine göre çeviri anahtarı
-  - `decision` — parametre olarak gelen karar ('accepted' veya 'rejected')
-- **Dönüş**: Promise<void> (yan etkiler: decideQuote çağırır, toast gösterir, load fonksiyonunu çağırarak state'i günceller)
+  - `confirmKey` — `decision === 'accepted'` ise 'quotes.detail.acceptConfirm', değilse 'quotes.detail.rejectConfirm'; onay dialogu çeviri anahtarı olarak kullanılır
+  - `e` — `catch` bloğunda yakalanan hata nesnesi; `console.error` ile loglanır
+- **Dönüş**: yok (void); yan etkileri: `window.confirm` ile onay dialogu, `setDeciding` state güncellemesi, `decideQuote(supabase, quote, decision)` API çağırısı, `toast.success`/`toast.error` gösterimi, `load()` ile veri yenileme
 
-### [N7_NASIL] AST Pointer: QuoteDetailPage.tsx::quote.items.map
-- **params**: `(item)` — QuoteItem tipinde teklif kalemi parametresi
-- **ic_degiskenler**:
-  - `item` — map fonksiyonuna parametre olarak gelen teklif kalemi nesnesi
-- **Dönüş**: JSX (tablo satırı)
+### [N7_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::items map callback
+- **params**: `item` — `quote.items` dizisinin elemanı (teklif kalemi nesnesi)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (`<tr>`); `item.id` key olarak kullanılır; `item.product_name`, `item.note`, `item.qty`, `item.unit_price`, `item.currency`, `item.valid_until` alanlarını render eder; `item.unit_price` number ise `formatCurrency` ile fiyat gösterilir, değilse '—' gösterilir; `item.valid_until` varsa `formatDate` ile tarih gösterilir, yoksa '—'
 
 ---
 

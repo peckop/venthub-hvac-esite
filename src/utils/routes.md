@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\routes.ts
-skeleton_hash: 15798fbb1ec3f765
+source_path: C:\tmp\venthub-wt-t131\src\utils\routes.ts
+skeleton_hash: 8798c5c4178f0ac2
 entity_hashes:
   func:assertProductSlug: 7cc00756c332a6af
   func:localizedHref: e1a2d461bb32d4d4
   overview: 8cbb4744a23035a6
-generated_at: 2026-08-25T07:59:27Z
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış
@@ -123,9 +123,9 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, gövdeden çıkarım 
 
 ## NODE ID STANDARD
 
-  file: routes.ts
-  function: routes.ts::assertProductSlug
-  function: routes.ts::localizedHref
+  file: src\utils\routes.ts
+  function: src\utils\routes.ts::assertProductSlug
+  function: src\utils\routes.ts::localizedHref
 
 ---
 

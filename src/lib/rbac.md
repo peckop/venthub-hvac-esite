@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\rbac.ts
-skeleton_hash: b6e28f3dccf14a94
+source_path: C:\tmp\venthub-wt-t131\src\lib\rbac.ts
+skeleton_hash: 2b942251bb35c0ea
 entity_hashes:
   func:canAccessPage: 502373e4fa126e0a
   func:canWrite: 289f50aba94e238a
   func:isReadOnly: 4b13d0168f4b164b
   overview: f1352d33dc973192
-generated_at: 2026-08-24T11:56:00Z
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış
@@ -133,3 +133,27 @@ graph TD
   export: canAccessPage
   export: canWrite
   export: isReadOnly
+
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+ekledi ve cümle yanlış oldu. KARAR değişmedi (yeni politika da `is_admin_user()`
+istiyor, moderator'ü kabul etmiyor) ama GEREKÇE bayatladı. O yüzden burada artık
+dayanağın ADI var, anlık ölçüm değeri yok. Kaynak: canlı `pg_policies` (migration
+dosyası değil), 2026-08-20.
+
+⚠ AÇIK KARAR (Recep): bu ölçüm moderator'ün DB düzeyinde neredeyse yetkisiz olduğunu
+söylüyor — viewer ile aynı sınıf. Rol ya DB'de açılmalı (politikalara moderator
+eklenerek) ya da vaat edilmediği kabul edilmeli. UI'yi geniş tutmak üçüncü bir seçenek
+DEĞİL: sessiz-boş ekran üretir. Ölçemediğim rota FAIL-CLOSED bırakıldı (listede yok).
+```
+
+```text
+AÇIK KARAR (Recep): viewer vaat edilmiş bir yetenek mi, yoksa kaldırılacak mı?
+Cevap "vaat" ise açılacak sayfalar RLS ölçümüyle tek tek eklenir.
+```

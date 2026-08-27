@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\app\admin\quotes\page.tsx
-skeleton_hash: 37d6aa080da39cfd
+source_path: C:\tmp\venthub-wt-t131\src\app\admin\quotes\page.tsx
+skeleton_hash: 2ecaa489bf9531fc
 entity_hashes:
   func:Loading: 657ee72781ec51d8
-  func:Page: 21a709ac71299cff
+  func:Page: e8cb9cd59886f702
   overview: 5b1a16aab3aba293
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-08-16T11:35:26Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış
@@ -30,20 +30,6 @@ Bu modül minimal bir Next.js sayfa yapısından oluşmaktadır. Aşağıda yaln
 
 ---
 
-**[Aksiyom 1]:** Eğer `AdminQuotesPage` modülü (bileşeni) import edilebilir konumda (module path) değilse, `Page()` bileşeni render edilemez ve uygulama hata verir.
-
-**[Aksiyom 2]:** Eğer `Page()` bileşeni çağrıldığında `AdminRecipesPage` bileşeni bir React/JSX bileşeni değilse (örn: undefined, null veya geçersiz bir modül), React render hatası oluşur.
-
-**[Aksiyom 3]:** Eğer Next.js runtime `loading.tsx` dosyasını desteklemiyorsa, `Loading()` bileşeni asla tetiklenmez ve sayfa yükleme durumunda kullanıcıya geri bildirim verilmez.
-
-**[Aksiyom 4]:** Bu modül, `/admin/quotes` route'u altında çalışmaktadır; eğer Next.js router yapısı bu path'i yönlendirmiyorsa, `Page()` bileşeri hiçbir zaman erişilebilir olmaz.
-
----
-
-> **Not:** Bu modüldeki `Page()` ve `Loading()` fonksiyonlarının gövdesinde herhangi bir logic, prop, state veya API çağrısı tespit edilememiştir. Dolayısıyla fonksiyonel aksiyomlar (veri bağımlılığı, eşik değerleri, kabul kriterleri vb.) üretilememiştir. Modülün mevcut durumu, yalnızca `AdminRecipesPage` bileşenini sarman (wrap) basit bir yer tutucu (placeholder) yapıdadır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### Loading
@@ -54,11 +40,14 @@ Bu modül minimal bir Next.js sayfa yapısından oluşmaktadır. Aşağıda yaln
 **Dönüş**: `JSX.Element` — Bileşenin render ettiği yükleme arayüzü JSX yapısını döndürür.
 
 ### Page
-**Ne yapar**: Bu fonksiyon, `/admin/quotes` rotasının temel sayfa bileşenidir. Sayfanın tamamını sarmalayan ve içeriği oluşturan üst düzey yapıdır.
-**Nasıl yapar**: Fonksiyon, doğrudan `AdminQuotesPage` adlı bileşeni döndüren bir React kaplayıcı (wrapper) bileşendir. Next.js sayfa yönlendirmesi mantığıyla çalışır ve rotanın ana içeriğini render eder. Gövdesi basit bir bileşen dönüşümüdür.
+**Ne yapar**: Admin panelindeki teklifler (quotes) sayfasını oluşturan üst düzey sayfa bileşenidir. Bu fonksiyon, Next.js'in dosya tabanlı yönlendirme (file-based routing) sistemi kapsamında bir sayfa rotası olarak görev yapar ve doğrudan `AdminQuotesPage` bileşenini render eder.
+
+**Nasıl yapar**: Fonksiyonun gövdesi son derece sadedir; herhangi bir durum yönetimi, veri çekme veya koşullu render mantığı içermez. Tek işi, `AdminQuotesPage` adlı bileşeni döndürmektir. `src/app/admin/quotes/page.tsx` dosyasında tanımlı olması, Next.js App Router yapısı gereği `/admin/quotes` rotasına karşılık gelmesini sağlar. Kullanıcı bu rotaya eriştiğinde `Page` fonksiyonu çalıştırılır ve sonuç olarak `AdminQuotesPage` bileşeni tarayıcıda görüntülenir.
+
 **Parametreler**:
 - Bu fonksiyon herhangi bir parametre almaz.
-**Dönüş**: `JSX.Element` — `AdminQuotesPage` bileşeninin oluşturduğu tüm sayfa içeriğini (JSX) döndürür.
+
+**Dönüş**: JSX elementi — `AdminQuotesPage` bileşeninin render çıktısını döndürür. Next.js sayfa bileşeni sözleşmesi gereği bu dönüş değeri, ilgili rotanın kullanıcı arayüzünü temsil eder.
 
 ---
 
@@ -70,23 +59,22 @@ Bu modül minimal bir Next.js sayfa yapısından oluşmaktadır. Aşağıda yaln
 
 ## SABİTLER
 - **AdminQuotesPage** (call) — `nextDynamic(
-  () => import('../../../views/admin/quotes/AdminQuotesPage'),
- ...`
+  () => import('../../../views/admin/quotes/AdminQuotesPage'),...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/admin/quotes/page.tsx::Loading
-- **params**: ()
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan elde edilen çeviri fonksiyonu; `t('admin.common.loading')` çağrısıyla yüklenme metnini döner
-- **Dönüş**: JSX — `className="p-8 text-center text-slate-400 animate-pulse"` özellikli div, içeriğinde `t('admin.common.loading')` çevirisi; pulse animasyonlu loading göstergesi
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `'admin.common.loading'` anahtarının yerel metnini almak için kullanılır
+- **Dönüş**: JSX — `className="p-8 text-center text-admin-fg-muted animate-pulse"` özellikli `<div>` elementi; içinde `t('admin.common.loading')` çağrısının sonucu metin olarak yerleştirilir
 
 ### [N2_NASIL] AST Pointer: src/app/admin/quotes/page.tsx::Page
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX — `<AdminQuotesPage />` bileşeninin render edilmesi; AdminQuotesPage'i Next.js dynamic import ile sarılmış olarak döner
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `<AdminQuotesPage />` bileşeninin render sonucu
 
 ---
 
@@ -113,7 +101,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
