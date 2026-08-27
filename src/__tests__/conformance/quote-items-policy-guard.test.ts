@@ -40,6 +40,15 @@ import { describe, expect, it } from 'vitest'
  * demektir; o hâlde test yeşile kaçmaz, KIRMIZI verir.
  */
 
+declare global {
+  interface ImportMeta {
+    glob(
+      pattern: string,
+      options: { query: string; import: string; eager: true },
+    ): Record<string, string>
+  }
+}
+
 const ALL_MIGRATIONS: Record<string, string> = import.meta.glob(
   '/supabase/migrations/*.sql',
   { query: '?raw', import: 'default', eager: true },
