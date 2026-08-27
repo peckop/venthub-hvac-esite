@@ -2,43 +2,35 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\PricePreviewPanel.tsx
-skeleton_hash: 3a91ec75cdd0a005
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\PricePreviewPanel.tsx
+skeleton_hash: 157c80149d827f00
 entity_hashes:
   func:PricePreviewPanel: b4f46de0b63b53f0
   func:parseQty: ff99e0938af43376
-  overview: a10b8ee64f63f73a
-  style_tokens: 56dc4a15f9495626
-generated_at: 2026-08-14T09:19:24Z
+  overview: 700305af35439775
+  style_tokens: 81908022c66bd3df
+generated_at: 2026-08-27T07:56:05Z
 ---
 
 ## Genel Bakış
-Bu modül, admin arayüzünde fiyatlandırma süreçlerinin görsel olarak önizlenmesini sağlayan bir React bileşenidir. Kullanıcılara, fiyatlandırma kurallarının ve hesaplamaların dinamik bir panel üzerinde nasıl sonuçlanacağını göstererek karar destek mekanizması sunar.
+Bu modül, admin panelinde fiyatlandırma önizleme işlevi sunan bir React bileşenidir. Kullanıcıların fiyatlandırma kurallarının ve hesaplamaların sonuçlarını dinamik bir panel üzerinde görsel olarak incelemesine olanak tanır.
 
 ## Fonksiyon Grupları
 ### Miktar Dönüştürme Yardımcıları
-Bu grup, kullanıcıdan gelen ham metin tabanlı miktar değerlerini, fiyat hesaplamalarında kullanılacak tutarlı sayısal formata dönüştürmekten sorumludur.
+Bu grup, kullanıcıdan alınan ham metin tabanlı miktar bilgisini, fiyat hesaplamalarında kullanılabilir sayısal bir değere dönüştürmekten sorumludur.
 - parseQty
 
 ### Ana Bileşen
-Bu grup, modülün temel arayüzünü ve iş mantığını oluşturan, fiyatlandırma verilerini alıp kullanıcıya düzenli bir şekilde sunan ana React bileşenini kapsar.
+Bu grup, modülün temel arayüzünü oluşturan ve fiyatlandırma verilerini kullanıcıya sunan ana React bileşenini kapsar.
 - PricePreviewPanel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, HVAC fiyat önizleme paneli sunan bir React bileşen modülüdür. Aşağıdaki mimari varsayımlar, yalnızca fonksiyon imzaları ve modül sabitlerinden çıkarılmıştır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-**[Aksiyom 1 – parseQty Girdi Biçimi]:** `parseQty` fonksiyonuna verilen `raw` parametrası, sayısal bir değere dönüştürülebilir bir dize (string) olmalıdır. Eğer `raw` geçerli bir sayısal temsili içermiyorsa, fonksiyonun dönüş değeri `NaN` (Not a Number) olur ve fiyat hesaplamaları bozulur.
-
-**[Aksiyom 2 – SCOPE_KEYS Yapısı]:** `SCOPE_KEYS` nesnesi, bileşenin fiyat önizlemesini hangi kapsam (scope) boyutlarında göstereceğini belirleyen anahtarlar içermelidir. Eğer `SCOPE_KEYS` tanımlı veya boş bir nesne ise, bileşen geçerli bir kapsam gösteremez ve fiyat önizlemesi anlamsız veya eksik olur.
-
-**[Aksiyom 3 – SEGMENT_LABEL_KEYS Yapısı]:** `SEGMENT_LABEL_KEYS` nesnesi, segment bazlı fiyat gösteriminde kullanılacak etiket (label) anahtarlarını tanımlamalıdır. Eğer `SEGMENT_LABEL_KEYS` tanımsız veya uygun yapıda değilse, segment etiketleri düzgün eşleştirilemez ve bileşen üzerinde hatalı veya boş etiketler görüntülenir.
-
-**[Aksiyom 4 – PRODUCT_SELECT Sabiti]:** `PRODUCT_SELECT` dizgesi, bileşenin ürün seçim arayüzünde kullanacağı tanımlayıcı (identifier) değer olmalıdır. Eğer `PRODUCT_SELECT` boş dize veya tanımsız ise, ürün seçimi işlevi çalışmayabilir veya yanlış bir urun referansı kullanılabilir.
-
-**[Aksiyom 5 – React Çalışma Ortamı]:** `PricePreviewPanel`, `React.FC` döndüren bir fonksiyon bileşendir. Eğer React render bağlamı (Provider/Context) mevcut değilse bileşen DOM'a bağlanamaz ve fiyat önizleme paneli görüntülenemez.
+**Gerekçe:** Fonksiyon gövdeleri sağlanmadığından (yalnızca imzalar ve sabitler mevcut), mimari varsayımlar yalnızca fonksiyon gövdesinden üretilebilir kuralı uyarınca aksiyom türetilememektedir.
 
 ---
 
@@ -72,6 +64,7 @@ Bu modül, HVAC fiyat önizleme paneli sunan bir React bileşen modülüdür. A�
 - import: ../../lib/services/pricingAdmin.service::loadBrandIdByName
 - import: ../../lib/services/pricingAdmin.service::toPricingProductInput
 - import: ../../lib/supabase/client::supabaseBrowserClient
+- import: lucide-react::AlertTriangle
 - import: lucide-react::ExternalLink
 - import: lucide-react::Loader2
 - import: lucide-react::Percent
@@ -137,187 +130,192 @@ type ScopeKey = 'variant' | 'product' | 'brand' | 'category' | 'global'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: PricePreviewPanel.tsx::parseQty
-- **params**: (raw: string)
+- **params**: `raw` (string)
 - **ic_degiskenler**:
-  - `n` — parsed integer value from raw string after removing non-digit characters
-- **Dönüş**: number (parsed positive integer or 1 if invalid/zero)
+  - `n` — `raw` stringinden rakam olmayan karakterler temizlenip `parseInt` ile 10 tabanında sayıya dönüştürülen değer
+- **Dönüş**: number — `n` sonlu ve 0'dan büyükse `n`, değilse `1`
 
-### [N2_NASIL] AST Pointer: PricePreviewPanel.tsx::updateUrlParams
-- **params**: ()
+### [N2_NASIL] AST Pointer: PricePreviewPanel.tsx::URL güncelleme arrow fonksiyonu
+- **params**: yok
 - **ic_degiskenler**:
-  - `params` — URLSearchParams object constructed from current filter state
-  - `qs` — serialized query string from params
-- **Dönüş**: void (side effect: updates browser URL via router.replace)
+  - `params` — `new URLSearchParams()` ile oluşturulan boş URL parametre nesnesi
+  - `productId` — dışarıdan erişilen ürün kimliği; tanımlıysa `params`'a `'productId'` anahtarıyla eklenir
+  - `segment` — dışarıdan erişilen segment; tanımlıysa `params`'a `'segment'` anahtarıyla eklenir
+  - `currency` — dışarıdan erişilen para birimi; tanımlıysa `params`'a `'currency'` anahtarıyla eklenir
+  - `quantity` — dışarıdan erişilen miktar; `1`'e eşit değilse `params`'a `'qty'` anahtarıyla string olarak eklenir
+  - `qs` — `params.toString()` sonucu oluşan sorgu stringi
+  - `pathname` — dışarıdan erişilen mevcut URL yolu
+  - `router` — dışarıdan erişilen Next.js router nesnesi
+- **Dönüş**: yok — `router.replace` çağırarak URL'i günceller, `{ scroll: false }` seçeneğiyle
 
-### [N3_NASIL] AST Pointer: PricePreviewPanel.tsx::loadInitialData
-- **params**: ()
+### [N3_NASIL] AST Pointer: PricePreviewPanel.tsx::init useEffect (cleanup'lı)
+- **params**: yok
 - **ic_degiskenler**:
-  - `alive` — flag for async operation lifecycle (prevents state updates after unmount)
-  - `lists` — price lists data from Supabase query
-  - `listsErr` — error from price lists query
-  - `settingsRow` — site settings data from Supabase query
-  - `settingsErr` — error from site settings query
-  - `settingsValue` — parsed settings object containing enabled currencies
-  - `raw` — raw enabled currencies array from settings
-  - `currencies` — validated string array of enabled currencies or fallback
-  - `e` — caught error during async operation
-- **Dönüş**: cleanup function (sets alive to false)
+  - `alive` — bileşen monte edilmiş mi kontrolü; cleanup'ta `false` yapılır
+  - `lists` — `supabase.from('price_lists')` sorgusundan dönen `data` (aktif fiyat listeleri)
+  - `listsErr` — `price_lists` sorgusundan dönen `error`
+  - `settingsRow` — `supabase.from('site_settings')` sorgusundan dönen `data` (key='pricing' ayarı)
+  - `settingsErr` — `site_settings` sorgusundan dönen `error`
+  - `settingsValue` — `settingsRow?.value` objesi; `{ enabled_currencies?: unknown }` tipine cast edilir
+  - `raw` — `settingsValue.enabled_currencies` ham değeri
+  - `currencies` — `raw` dizi ise ve her elemanı string ise `raw`, değilse `FALLBACK_CURRENCIES`
+  - `e` — `catch` bloğunda yakalanan hata; `Error` instance'ıysa `e.message`, değilse `String(e)` olarak `setInitError`'a aktarılır
+- **Dönüş**: cleanup fonksiyonu — `alive = false` yapar
 
-### [N4_NASIL] AST Pointer: PricePreviewPanel.tsx::reloadInitialData
-- **params**: ()
+### [N4_NASIL] AST Pointer: PricePreviewPanel.tsx::async init fonksiyonu
+- **params**: yok
 - **ic_degiskenler**:
-  - `alive` — flag for async operation lifecycle
-  - `lists` — price lists data from Supabase query
-  - `listsErr` — error from price lists query
-  - `settingsRow` — site settings data from Supabase query
-  - `settingsErr` — error from site settings query
-  - `settingsValue` — parsed settings object containing enabled currencies
-  - `raw` — raw enabled currencies array from settings
-  - `currencies` — validated string array of enabled currencies or fallback
-  - `e` — caught error during async operation
-- **Dönüş**: void (async function)
+  - `lists` — `supabase.from('price_lists')` sorgusundan dönen `data`
+  - `listsErr` — `price_lists` sorgusundan dönen `error`
+  - `settingsRow` — `supabase.from('site_settings')` sorgusundan dönen `data`
+  - `settingsErr` — `site_settings` sorgusundan dönen `error`
+  - `settingsValue` — `settingsRow?.value` objesi
+  - `raw` — `settingsValue.enabled_currencies` ham değeri
+  - `currencies` — doğrulanmış para birimleri dizisi veya `FALLBACK_CURRENCIES`
+  - `e` — yakalanan hata
+- **Dönüş**: yok (async)
 
-### [N5_NASIL] AST Pointer: PricePreviewPanel.tsx::resetAliveFlag
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void
-
-### [N6_NASIL] AST Pointer: PricePreviewPanel.tsx::setDefaultSegment
-- **params**: ()
+### [N5_NASIL] AST Pointer: PricePreviewPanel.tsx::init cleanup fonksiyonu
+- **params**: yok
 - **ic_degiskenler**:
-  - `individual` — found price list with user_type 'individual'
-- **Dönüş**: void (side effect: sets segment state)
+  - `alive` — `false` yapılır
+- **Dönüş**: yok
 
-### [N7_NASIL] AST Pointer: PricePreviewPanel.tsx::setDefaultCurrency
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (side effect: sets currency state)
-
-### [N8_NASIL] AST Pointer: PricePreviewPanel.tsx::loadSelectedProduct
-- **params**: ()
+### [N6_NASIL] AST Pointer: PricePreviewPanel.tsx::segment default useEffect
+- **params**: yok
 - **ic_degiskenler**:
-  - `alive` — flag for async operation lifecycle
-  - `data` — product data from Supabase query
-  - `error` — error from product query
-  - `e` — caught error during async operation
-- **Dönüş**: cleanup function (sets alive to false)
+  - `individual` — `priceLists` dizisinde `user_type === 'individual'` olan elemanı bulan `find` sonucu
+- **Dönüş**: yok — `individual` varsa `setSegment(individual.id)`, yoksa `setSegment(BASE_BOOK_VALUE)` çağırır
 
-### [N9_NASIL] AST Pointer: PricePreviewPanel.tsx::fetchProductById
-- **params**: ()
+### [N7_NASIL] AST Pointer: PricePreviewPanel.tsx::currency default useEffect
+- **params**: yok
+- **ic_degiskenler**: yok (dışarıdan erişim: `initLoading`, `currency`, `enabledCurrencies`)
+- **Dönüş**: yok — `enabledCurrencies[0]` varsa onu, yoksa `'TRY'` değerini `setCurrency` ile atar
+
+### [N8_NASIL] AST Pointer: PricePreviewPanel.tsx::product load useEffect (cleanup'lı)
+- **params**: yok
 - **ic_degiskenler**:
-  - `alive` — flag for async operation lifecycle
-  - `data` — product data from Supabase query
-  - `error` — error from product query
-- **Dönüş**: void (async function)
+  - `alive` — bileşen monte edilmiş mi kontrolü
+  - `data` — `supabase.from('products').select(PRODUCT_SELECT).eq('id', productId).is('deleted_at', null).maybeSingle()` sorgusundan dönen veri
+  - `error` — ürün sorgusundan dönen hata
+  - `e` — yakalanan hata (kullanılmıyor, sadece cleanup'ta `alive` kontrolü var)
+- **Dönüş**: cleanup fonksiyonu — `alive = false` yapar
 
-### [N10_NASIL] AST Pointer: PricePreviewPanel.tsx::cleanupProductLoad
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void
-
-### [N11_NASIL] AST Pointer: PricePreviewPanel.tsx::searchProducts
-- **params**: ()
+### [N9_NASIL] AST Pointer: PricePreviewPanel.tsx::async product load fonksiyonu
+- **params**: yok
 - **ic_degiskenler**:
-  - `needle` — trimmed search term
-  - `alive` — flag for async operation lifecycle
-  - `timer` — debounce timer ID
-  - `pattern` — SQL LIKE pattern for product search
-  - `data` — search results from Supabase query
-  - `e` — caught error during async operation
-- **Dönüş**: cleanup function (clears timer and sets alive to false)
+  - `data` — `supabase.from('products')` sorgusundan dönen ürün verisi
+  - `error` — sorgu hatası
+- **Dönüş**: yok (async)
 
-### [N12_NASIL] AST Pointer: PricePreviewPanel.tsx::executeProductSearch
-- **params**: ()
+### [N10_NASIL] AST Pointer: PricePreviewPanel.tsx::product load cleanup
+- **params**: yok
 - **ic_degiskenler**:
-  - `pattern` — SQL LIKE pattern for product search
-  - `data` — search results from Supabase query
-- **Dönüş**: void (async function)
+  - `alive` — `false` yapılır
+- **Dönüş**: yok
 
-### [N13_NASIL] AST Pointer: PricePreviewPanel.tsx::executeProductSearchInner
-- **params**: ()
+### [N11_NASIL] AST Pointer: PricePreviewPanel.tsx::search useEffect (cleanup'lı)
+- **params**: yok
 - **ic_degiskenler**:
-  - `pattern` — SQL LIKE pattern for product search
-  - `data` — search results from Supabase query
-- **Dönüş**: void (async function)
+  - `needle` — `term.trim()` sonucu; arama terimi
+  - `isBrowse` — `needle.length < 2` kontrolü; `true` ise tarama modu (sıralı liste), `false` ise arama modu
+  - `alive` — bileşen monte edilmiş mi kontrolü
+  - `timer` — `setTimeout` ile oluşturulan debounce zamanlayıcısı (`SEARCH_DEBOUNCE_MS` ms)
+  - `pattern` — `needle`'dan `%,` karakterleri temizlenip `%` ile sarılarak oluşturulan SQL LIKE pattern
+  - `query` — `supabase.from('products').select(PRODUCT_SELECT).is('deleted_at', null)` sorgu nesnesi; `isBrowse` ise `.order('name')`, değilse `.or(...)` eklenir
+  - `data` — sorgu sonucu dönen ürünler dizisi
+  - `error` — sorgu hatası
+- **Dönüş**: cleanup fonksiyonu — `alive = false` ve `clearTimeout(timer)` çağırır
 
-### [N14_NASIL] AST Pointer: PricePreviewPanel.tsx::cleanupSearchTimer
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void
-
-### [N15_NASIL] AST Pointer: PricePreviewPanel.tsx::pickProduct
-- **params**: (p: ProductSearchRow)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (side effect: sets selectedProduct, productId, clears term and results)
-
-### [N16_NASIL] AST Pointer: PricePreviewPanel.tsx::clearProductSelection
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (side effect: clears selectedProduct, productId, term, results)
-
-### [N17_NASIL] AST Pointer: PricePreviewPanel.tsx::loadBrandMap
-- **params**: ()
+### [N12_NASIL] AST Pointer: PricePreviewPanel.tsx::async search fonksiyonu
+- **params**: yok
 - **ic_degiskenler**:
-  - `alive` — flag for async operation lifecycle
-  - `map` — brand ID mapping from loadBrandIdByName
-  - `e` — caught error during async operation
-- **Dönüş**: cleanup function (sets alive to false)
+  - `pattern` — SQL LIKE pattern
+  - `query` — Supabase sorgu nesnesi
+  - `data` — sorgu sonucu
+  - `error` — sorgu hatası
+- **Dönüş**: yok (async)
 
-### [N18_NASIL] AST Pointer: PricePreviewPanel.tsx::fetchBrandMap
-- **params**: ()
+### [N13_NASIL] AST Pointer: PricePreviewPanel.tsx::search cleanup
+- **params**: yok
 - **ic_degiskenler**:
-  - `alive` — flag for async operation lifecycle
-  - `map` — brand ID mapping from loadBrandIdByName
-  - `e` — caught error during async operation
-- **Dönüş**: void (async function)
+  - `alive` — `false` yapılır
+  - `timer` — `clearTimeout` ile temizlenir
+- **Dönüş**: yok
 
-### [N19_NASIL] AST Pointer: PricePreviewPanel.tsx::cleanupBrandMapLoad
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void
+### [N14_NASIL] AST Pointer: PricePreviewPanel.tsx::pickProduct
+- **params**: `p` (ProductSearchRow)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `setSelectedProduct(p)`, `setProductId(p.id)`, `setTerm('')`, `setResults([])` çağırır
 
-### [N20_NASIL] AST Pointer: PricePreviewPanel.tsx::resolveProductPrice
-- **params**: ()
+### [N15_NASIL] AST Pointer: PricePreviewPanel.tsx::clear selection fonksiyonu
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `setSelectedProduct(null)`, `setProductId(null)`, `setTerm('')`, `setResults([])` çağırır
+
+### [N16_NASIL] AST Pointer: PricePreviewPanel.tsx::brand map load useEffect (cleanup'lı)
+- **params**: yok
 - **ic_degiskenler**:
-  - `alive` — flag for async operation lifecycle
-  - `input` — pricing product input converted from selected product
-  - `result` — price resolution result from resolvePrice
-  - `e` — caught error during async operation
-- **Dönüş**: cleanup function (sets alive to false)
+  - `alive` — bileşen monte edilmiş mi kontrolü
+  - `map` — `loadBrandIdByName(supabase)` sonucu dönen marka kimliği haritası
+  - `e` — yakalanan hata; `console.error` ile loglanır ve `setInitError` ile kullanıcıya gösterilir
+- **Dönüş**: cleanup fonksiyonu — `alive = false` yapar
 
-### [N21_NASIL] AST Pointer: PricePreviewPanel.tsx::executePriceResolution
-- **params**: ()
+### [N17_NASIL] AST Pointer: PricePreviewPanel.tsx::async brand map load fonksiyonu
+- **params**: yok
 - **ic_degiskenler**:
-  - `alive` — flag for async operation lifecycle
-  - `input` — pricing product input converted from selected product
-  - `result` — price resolution result from resolvePrice
-  - `e` — caught error during async operation
-- **Dönüş**: void (async function)
+  - `map` — `loadBrandIdByName(supabase)` sonucu
+  - `e` — yakalanan hata
+- **Dönüş**: yok (async)
 
-### [N22_NASIL] AST Pointer: PricePreviewPanel.tsx::cleanupPriceResolution
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void
+### [N18_NASIL] AST Pointer: PricePreviewPanel.tsx::brand map cleanup
+- **params**: yok
+- **ic_degiskenler**:
+  - `alive` — `false` yapılır
+- **Dönüş**: yok
 
-### [N23_NASIL] AST Pointer: PricePreviewPanel.tsx::renderSearchResultItem
-- **params**: (p: ProductSearchRow)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX element (product list item with name and SKU)
+### [N19_NASIL] AST Pointer: PricePreviewPanel.tsx::price resolution useEffect (cleanup'lı)
+- **params**: yok
+- **ic_degiskenler**:
+  - `alive` — bileşen monte edilmiş mi kontrolü
+  - `input` — `toPricingProductInput(selectedProduct, brandMapRef.current!)` sonucu; fiyatlandırma için ürün girdisi
+  - `result` — `resolvePrice(supabase, input, { priceBookId, currency, quantity })` sonucu; fiyat çözümleme sonucu
+  - `e` — yakalanan hata; `Error` instance'ıysa `e.message`, değilse `String(e)` olarak `setResolveError`'a aktarılır
+- **Dönüş**: cleanup fonksiyonu — `alive = false` yapar
 
-### [N24_NASIL] AST Pointer: PricePreviewPanel.tsx::renderSegmentOption
-- **params**: (p: PriceList)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX element (option with translated user type label or name)
+### [N20_NASIL] AST Pointer: PricePreviewPanel.tsx::async price resolution fonksiyonu
+- **params**: yok
+- **ic_degiskenler**:
+  - `input` — fiyatlandırma ürün girdisi
+  - `result` — fiyat çözümleme sonucu
+  - `e` — yakalanan hata
+- **Dönüş**: yok (async)
 
-### [N25_NASIL] AST Pointer: PricePreviewPanel.tsx::renderCurrencyOption
-- **params**: (c: string)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX element (option with currency code)
+### [N21_NASIL] AST Pointer: PricePreviewPanel.tsx::price resolution cleanup
+- **params**: yok
+- **ic_degiskenler**:
+  - `alive` — `false` yapılır
+- **Dönüş**: yok
 
-### [N26_NASIL] AST Pointer: PricePreviewPanel.tsx::renderResolutionLine
-- **params**: (line: string, i: number)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX element (styled list item with line number and content)
+### [N22_NASIL] AST Pointer: PricePreviewPanel.tsx::product list render fonksiyonu
+- **params**: `p` (ProductSearchRow)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element — `<li>` içinde ürün adı (`p.name`) ve SKU (`p.sku`) gösteren buton
+
+### [N23_NASIL] AST Pointer: PricePreviewPanel.tsx::segment option render fonksiyonu
+- **params**: `p` (PriceList)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element — `<option>`; `p.user_type` varsa ve `SEGMENT_LABEL_KEYS[p.user_type]` tanımlıysa çevrilmiş etiket, yoksa `p.name` gösterilir
+
+### [N24_NASIL] AST Pointer: PricePreviewPanel.tsx::currency option render fonksiyonu
+- **params**: `c` (string)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element — `<option>`; para birimi kodunu (`c`) gösterir
+
+### [N25_NASIL] AST Pointer: PricePreviewPanel.tsx::resolution line render fonksiyonu
+- **params**: `line` (string), `i` (number)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element — `<li>`; `line` `'KAZANAN'` ile başlıyorsa vurgulu stil uygulanır, satır numarası (`i + 1`) ve satır içeriği (`line`) gösterilir
 
 ---
 
@@ -344,7 +342,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500/10`, `bg-cyan-400/10`, `bg-cyan-400/5`, `bg-cyan-500/10`, `bg-rose-500/10`, `bg-white/3`, `border-amber-500/20`, `border-cyan-400/20`, `border-cyan-500/20`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `focus-visible:bg-white/5`, `hover:bg-white/10`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-warning-weak`, `border-admin-accent/30`, `border-admin-border`, `border-admin-danger/30`, `border-admin-warning/30`, `border-t`, `focus-visible:bg-admin-surface-2`, `hover:bg-admin-surface-2`, `hover:bg-admin-surface-3`, `hover:text-admin-accent`, `hover:text-admin-fg`
 - **Layout:** `absolute`, `block`, `custom-scrollbar`, `flex`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `grid-cols-2`, `inline-flex`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `lg:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminCardPaddedClass`, `-translate-y-1/2`, `:`, `KAZANAN`, `animate-spin`, `border`, `break-all`, `divide-white/5`, `divide-y`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/40`, `font-black`, `font-bold`
+- **Yardımcı Sınıflar:** `$`, `${adminCardPaddedClass`, `-translate-y-1/2`, `:`, `KAZANAN`, `animate-spin`, `border`, `break-all`, `divide-admin-border`, `divide-y`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-bold`, `font-mono`

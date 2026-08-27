@@ -2,52 +2,42 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\views\admin\AdminSettingsPage.tsx
-skeleton_hash: ed3434f0015766ed
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminSettingsPage.tsx
+skeleton_hash: 955efbb84184a1dc
 entity_hashes:
   func:AdminSettingsPage: d7abe5daa414ecdd
   func:openModal: 742557352e2b120f
-  overview: a93bc9c56cdba4e0
+  overview: c1b3377dff6e6dba
   style_tokens: 05cbeefecec906ae
-generated_at: 2026-08-17T13:20:42Z
+generated_at: 2026-08-27T07:54:13Z
 ---
 
 ## Genel Bakış
-AdminSettingsPage, yönetim panelinde merkezi bir ayarlar sayfası olarak çalışır. Yönetici kullanıcıların genel yapılandırma, ödeme, admin ve sistem gibi farklı kategorilerdeki ayarları sekmeli bir arayüzde görüntülemesini ve düzenlemesini sağlar.
+AdminSettingsPage, yönetim panelinde merkezi bir ayarlar sayfası olarak çalışan bir React bileşenidir. Yönetici kullanıcıların genel yapılandırma, ödeme, admin ve sistem gibi farklı kategorilerdeki ayarları sekmeli bir arayüzde görüntülemesini ve düzenlemesini sağlar. Modül, `SettingsSection` ve `RenderableSettings` tiplerine bağımlıdır ve kendi veri yükleme mekanizmasına dayanır.
 
 ## Fonksiyon Grupları
 
 ### Sayfa Bileşeni
 Ana React bileşenini ve sayfa yapısını oluşturur. Ayar sekmelerinin yönetimi, durum kontrolü ve alt bileşenlerin render edilmesi koordine edilir.
-- `AdminSettingsPage`
+- AdminSettingsPage
 
 ### Modal Etkileşimi
 Belirli bir ayar bölümünün düzenlenmesi için modal penceresi açma mantığını yönetir. Bölüm türüne göre uygun modal içeriğini ve varsayılan değerleri belirler.
-- `openModal`
+- openModal
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-AdminSettingsPage modülü, bağımsız çalışan bir React bileşeni olup, iç state yönetimi ve modal tabanlı düzenleme akışına dayanır.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarılabilecek varsayımlar belirlenebilir.
 
----
+[Aksiyom 1]: Eğer `SettingsSection` tipi tanımlı değilse, `openModal` fonksiyonu çağrılamaz ve derleme hatası oluşur.
 
-**[Aksiyom 1]:** Eğer `SettingsSection` tipi tanımlı veya erişilebilir değilse, `openModal` fonksiyonunun `section` parametresi geçersiz olacağından modal hangi ayar bölümünü göstereceği bilemez.
+[Aksiyom 2]: Eğer `RenderableSettings` tipi tanımlı değilse, `openModal` fonksiyonu çağrılamaz ve derleme hatası oluşur.
 
-**[Aksiyom 2]:** Eğer `RenderableSettings` tipi tanımlı veya erişilebilir değilse, `openModal` fonksiyonunun `values` parametresi için tip uyumsuzluğu oluşur.
+[Aksiyom 3]: Eğer `openModal` fonksiyonuna `values` parametresi olarak `null` geçilirse, modal düzenleme modu yerine farklı bir davranış sergilemelidir (gövde bilinmediğinden kesin davranış belirlenemez).
 
-**[Aksiyom 3]:** Eğer `openModal(section, values)` çağrısında `section` parametresi geçerli bir `SettingsSection` değeri değilse, modal doğru ayar arayüzünü render edemez.
-
-**[Aksiyom 4]:** `AdminSettingsPage` hiç parametre almaz (`()`), bu nedenle kendi veri yükleme mechanism'ına (fetch, context, store vb.) bağımlıdır. Eğer bu mekanizma çalışmazsa sayfa boş veya hatalı render olur.
-
-**[Aksiyom 5]:** `openModal` fonksiyonu `values: null` alabilir — bu durumda modal muhtemelen "yeni ekleme" modunda açılmalıdır. Eğer modal bileşeni `null` değerini handle edemezse hata oluşur.
-
-**[Aksiyom 6]:** Bileşen modal durumunu kendi içinde yönetiyorsa (state), bileşen unmount olduğunda modal state'i temizlenmezse (cleanup) hafıza sızıntısı oluşabilir.
-
----
-
-> **Not:** `SettingsSection` ve `RenderableSettings` tiplerinin içeriği fonksiyon imzasında belirtilmediğinden, bunların hangi değerlere izin verdiği bilinmemektedir. Bu tiplerin modül dışında tanımlı olduğu varsayılmıştır.
+[Aksiyom 4]: Eğer `AdminSettingsPage` bileşeni bir üst bileşen tarafından render edilmezse, ayarlar sayfası kullanıcıya gösterilmez.
 
 ---
 
@@ -98,57 +88,54 @@ Bu bileşen parametre almaz — React.FC olarak tanımlı, stateles veya kendi i
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::AdminSettingsPage
 - **params**: yok
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, Türkçe dize çevirileri için kullanılır
-  - `canWrite` — useRole hook'undan gelen izin kontrol fonksiyonu
-  - `hasWriteAccess` — `canWrite('settings')` çağrısının boolean sonucu, settings bölümü için yazma izni olup olmadığını belirtir
-  - `loading` — `useState(true)` ile tanımlı, sayfa yükleme durumunu tutar (başlangıçta true)
-  - `setLoading` — loading state'ini güncellemek için setter
-  - `error` — `useState<string | null>(null)` ile tanımlı, hata mesajını tutar
-  - `setError` — error state'ini güncellemek için setter
-  - `RenderableSettings` — `Record<string, string | number | boolean | null | undefined>` türünde tip tanımı
-  - `generalValues` — `useState<RenderableSettings | null>(null)` ile tanımlı, genel site ayar değerlerini tutar (site_name, tagline, contact_email, support_phone, headquarters, logo_url)
-  - `setGeneralValues` — generalValues state'ini güncellemek için setter
-  - `paymentValues` — `useState<RenderableSettings | null>(null)` ile tanımlı, ödeme ayar değerlerini tutar (iyzico_enabled, iyzico_mode, iyzico_api_key)
-  - `setPaymentValues` — paymentValues state'ini güncellemek için setter
-  - `adminsValues` — `useState<RenderableSettings | null>(null)` ile tanımlı, admin politika değerlerini tutar (admin_sessions_timeout, mfa_required)
-  - `setAdminsValues` — adminsValues state'ini güncellemek için setter
-  - `systemValues` — `useState<RenderableSettings | null>(null)` ile tanımlı, sistem yapılandırma değerlerini tutar (system_log_level, debug_mode)
-  - `setSystemValues` — systemValues state'ini güncellemek için setter
-  - `modalOpen` — `useState(false)` ile tanımlı, modalın açık olup olmadığını belirtir
-  - `setModalOpen` — modalOpen state'ini güncellemek için setter
-  - `modalSection` — `useState<SettingsSection | null>(null)` ile tanımlı, modalda düzenlenecek bölümü tutar
-  - `setModalSection` — modalSection state'ini güncellemek için setter
-  - `modalInitialValues` — `useState<RenderableSettings | null>(null)` ile tanımlı, modal açılırken kullanılacak başlangıç değerlerini tutar
-  - `setModalInitialValues` — modalInitialValues state'ini güncellemek için setter
-  - `fetchAllSettings` — `useCallback` ile sarılmış, supabase'den `site_settings` tablosunu çekip state'leri güncelleyen asenkron fonksiyon
-- **Dönüş**: JSX — AdminSettingsPage bileşeninin render ettiği React elementi (ayar kartları, modal, skeleton veya hata gösterimi)
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; JSX içinde `t('admin.titles.settings')` gibi anahtarlarla metinleri çözümlemek için kullanılır
+  - `canWrite` — `useRole()` hook'undan destructure edilen yetki kontrol fonksiyonu; belirli bir modülün yazma iznini sorgular
+  - `hasWriteAccess` — `canWrite('settings')` çağrısının boolean sonucu; düzenleme butonlarının `disabled` özelliğini kontrol eder
+  - `loading` — sayfa yükleme durumunu tutan boolean state; `true` iken skeleton gösterilir
+  - `setLoading` — `loading` state'ini güncelleyen setter fonksiyonu
+  - `error` — hata mesajını tutan `string | null` state; fetch sırasında oluşan hata burada saklanır
+  - `setError` — `error` state'ini güncelleyen setter fonksiyonu
+  - `generalValues` — genel site ayarlarını (site_name, tagline, contact_email, support_phone, headquarters, logo_url) tutan `RenderableSettings | null` state
+  - `setGeneralValues` — `generalValues` state'ini güncelleyen setter fonksiyonu
+  - `paymentValues` — ödeme ayarlarını (iyzico_enabled, iyzico_mode, iyzico_api_key) tutan `RenderableSettings | null` state
+  - `setPaymentValues` — `paymentValues` state'ini güncelleyen setter fonksiyonu
+  - `adminsValues` — yönetici politikalarını (admin_sessions_timeout, mfa_required) tutan `RenderableSettings | null` state
+  - `setAdminsValues` — `adminsValues` state'ini güncelleyen setter fonksiyonu
+  - `systemValues` — sistem yapılandırmalarını (system_log_level, debug_mode) tutan `RenderableSettings | null` state
+  - `setSystemValues` — `systemValues` state'ini güncelleyen setter fonksiyonu
+  - `modalOpen` — modal'ın açık/kapalı durumunu tutan boolean state
+  - `setModalOpen` — `modalOpen` state'ini güncelleyen setter fonksiyonu; `SettingsFormModal` bileşeninin `onOpenChange` prop'una bağlanır
+  - `modalSection` — modal'da düzenlenen ayar bölümünü tutan `SettingsSection | null` state
+  - `setModalSection` — `modalSection` state'ini güncelleyen setter fonksiyonu
+  - `modalInitialValues` — modal açıldığında forma doldurulan başlangıç değerlerini tutan `RenderableSettings | null` state
+  - `setModalInitialValues` — `modalInitialValues` state'ini güncelleyen setter fonksiyonu
+  - `fetchAllSettings` — `useCallback` ile sarılmış async fonksiyon; Supabase'den `site_settings` tablosunu çekip dört section state'ini doldurur
+  - `openModal` — modal'ı açan fonksiyon; section ve values parametrelerini state'lere yazar, `modalOpen`'u `true` yapar
+- **Dönüş**: JSX elementi — loading durumunda skeleton, aksi halde ayar kartları grid'i ve `SettingsFormModal` bileşeni render edilir
 
 ### [N2_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::fetchAllSettings
-- **params**: yok
+- **params**: yok (useCallback ile sarılmış, dependency array boş `[]`)
 - **ic_degiskenler**:
-  - `data` — `supabase.from('site_settings').select('key, value')` çağrısından dönen satır dizisi
-  - `fetchError` — supabase çağrısından dönen hata nesnesi, `error: fetchError` destructuring ile ayrıştırılmış
-  - `gen` — `data?.find((r) => r.key === 'general')?.value` sonucu, `RenderableSettings` olarak cast edilmiş genel ayarlar
-  - `pay` — `data?.find((r) => r.key === 'payment')?.value` sonucu, `RenderableSettings` olarak cast edilmiş ödeme ayarları
-  - `adm` — `data?.find((r) => r.key === 'admins')?.value` sonucu, `Record<string, unknown>` olarak cast edilmiş admin politika değerleri
-  - `sys` — `data?.find((r) => r.key === 'system')?.value` sonucu, `Record<string, unknown>` olarak cast edilmiş sistem yapılandırma değerleri
-  - `err` — catch bloğunda yakalanan hata nesnesi (unknown türünde)
-- **Dönüş**: yok — state setter'ları (setGeneralValues, setPaymentValues, setAdminsValues, setSystemValues, setLoading, setError) çağırarak yan etki üretir
+  - `data` — `supabase.from('site_settings').select('key, value')` sorgusundan dönen satır dizisi; her satırda `key` ve `value` alanları bulunur
+  - `fetchError` — Supabase sorgusundan dönen hata nesnesi; `error` olarak yeniden adlandırılır, varsa `throw` ile yakalanır
+  - `gen` — `data` içinde `key === 'general'` olan satırın `value` alanı; bulunamazsa boş obje `{}` kullanılır, `RenderableSettings` tipine cast edilir
+  - `pay` — `data` içinde `key === 'payment'` olan satırın `value` alanı; bulunamazsa boş obje `{}` kullanılır, `RenderableSettings` tipine cast edilir
+  - `adm` — `data` içinde `key === 'admins'` olan satırın `value` alanı; bulunamazsa boş obje `{}` kullanılır, `Record<string, unknown>` tipine cast edilir
+  - `sys` — `data` içinde `key === 'system'` olan satırın `value` alanı; bulunamazsa boş obje `{}` kullanılır, `Record<string, unknown>` tipine cast edilir
+  - `err` — `catch` bloğunda yakalanan hata nesnesi; `console.error` ile loglanır, `Error` instance ise `.message`'ı, değilse `String(err)` ile `setError`'a yazılır
+- **Dönüş**: `Promise<void>` — async fonksiyon, bir değer döndürmez; yan etki olarak dört section state'ini (`setGeneralValues`, `setPaymentValues`, `setAdminsValues`, `setSystemValues`) günceller
 
 ### [N3_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::useEffect callback
 - **params**: yok
 - **ic_degiskenler**: yok
-- **Dönüş**: yok — `fetchAllSettings()` çağırarak bileşen mount edildiğinde ayarları çeker
+- **Dönüş**: yok — bileşen mount edildiğinde `fetchAllSettings()` fonksiyonunu çağırır; dependency array `[fetchAllSettings]` olarak tanımlıdır
 
 ### [N4_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::openModal
-- **params**: `(section: SettingsSection, values: RenderableSettings | null)`
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — `setModalSection(section)`, `setModalInitialValues(values)`, `setModalOpen(true)` çağırarak modalı açar
-
-### [N5_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::SettingsFormModal onSuccess callback
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — `fetchAllSettings()` çağırarak modal başarıyla kapandığında ayarları yeniden çeker
+- **params**:
+  - `section` — `SettingsSection` tipinde; modal'da düzenlenecek ayar bölümünü belirtir ('general', 'payment', 'admins', 'system' değerlerinden biri)
+  - `values` — `RenderableSettings | null` tipinde; modal'a aktarılacak mevcut ayar değerleri
+- **ic_degiskenler**: yok (sadece state setter çağrıları yapılır)
+- **Dönüş**: yok — yan etki olarak `setModalSection(section)`, `setModalInitialValues(values)` ve `setModalOpen(true)` çağrılarıyla modal state'lerini günceller
 
 ---
 
