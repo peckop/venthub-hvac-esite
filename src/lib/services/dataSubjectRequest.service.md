@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\dataSubjectRequest.service.ts
-skeleton_hash: 8caba86ddf48a8d7
+source_path: C:\tmp\venthub-wt-t131\src\lib\services\dataSubjectRequest.service.ts
+skeleton_hash: 143b1a876a059a0a
 entity_hashes:
   func:createDataSubjectRequest: e6eabf821fdc0515
   func:listDataSubjectRequests: 68b977600195a53c
   func:updateDataSubjectRequest: 6afb08cf74cd4c9f
   overview: 648fcab7b721f676
-generated_at: 2026-08-25T08:44:27Z
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış

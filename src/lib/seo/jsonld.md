@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\seo\jsonld.ts
-skeleton_hash: 4066f32bee016da5
+source_path: C:\tmp\vh-urun-comp\src\lib\seo\jsonld.ts
+skeleton_hash: 6607a4c4a3b4b636
 entity_hashes:
   func:assertNoUuid: d83159e636734ab9
   func:buildBreadcrumbJsonLd: 0892b574dbabfc0a
@@ -13,7 +13,7 @@ entity_hashes:
   func:buildWebSiteRef: af771558e946c290
   func:pickLocalized: 7d6d9fce7e316fb8
   overview: 5a533e9af609c2f8
-generated_at: 2026-08-25T08:45:03Z
+generated_at: 2026-08-27T06:50:40Z
 ---
 
 ## Genel Bakış
@@ -224,10 +224,10 @@ graph TD
     jsonld_ts__buildSeriesLandingJsonLd["buildSeriesLandingJsonLd"]
     jsonld_ts__buildWebSiteRef["buildWebSiteRef"]
     jsonld_ts__pickLocalized["pickLocalized"]
-    jsonld_ts__buildProductGroupJsonLd --> jsonld_ts__buildWebSiteRef
-    jsonld_ts__buildCategoryJsonLd --> jsonld_ts__buildWebSiteRef
-    jsonld_ts__buildProductGroupJsonLd --> jsonld_ts__pickLocalized
     jsonld_ts__buildSeriesLandingJsonLd --> jsonld_ts__buildWebSiteRef
+    jsonld_ts__buildCategoryJsonLd --> jsonld_ts__buildWebSiteRef
+    jsonld_ts__buildProductGroupJsonLd --> jsonld_ts__buildWebSiteRef
+    jsonld_ts__buildProductGroupJsonLd --> jsonld_ts__pickLocalized
 ```
 
 ## NODE ID STANDARD

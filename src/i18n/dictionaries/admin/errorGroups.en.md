@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\errorGroups.en.ts
-skeleton_hash: 54e9229bb7718984
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\errorGroups.en.ts
+skeleton_hash: f048d61261596fb3
 entity_hashes:
   overview: 38d648bd807c5d10
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -39,7 +39,7 @@ Bu modül, hata gruplarını (error groups) tanımlayan statik bir veri yapısı
 
 ## SABİTLER
 - **errorGroups** (object) — `{
-      subtitle: 'Monitor, assign, and manage the status of grouped client e...`
+      subtitle: 'Monitor, assign, and manage the status of grouped client ...`
 
 ---
 

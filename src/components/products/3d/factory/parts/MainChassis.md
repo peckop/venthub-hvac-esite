@@ -2,19 +2,19 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\MainChassis.tsx
-skeleton_hash: 352a525786c594ef
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\factory\parts\MainChassis.tsx
+skeleton_hash: 8f17b88014cd01e1
 entity_hashes:
   func:MainChassis: 6dd2e12708a32b7b
   func:buildInnerLathePoints: 899a29ff8993fbf2
   func:buildLathePoints: b2b421c8a803ff34
-  overview: 2b61bbe9ce53a1c8
+  overview: 23b9faac376a7b11
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:39:09Z
+generated_at: 2026-08-27T07:41:38Z
 ---
 
 ## Genel Bakış
-Bu modül, 3B bir şasinin dış ve iç profillerini tanımlayan geometrik nokta dizilerini üretmekle sorumludur. Elde edilen bu noktalar, React tabanlı bir 3B modelleme bileşeni tarafından kullanılarak görsel ve etkileşimli bir şasi parçası oluşturulur.
+Bu modül, 3B bir şasinin dış ve iç profillerini oluşturan geometrik noktaları üretir ve bu noktaları kullanarak etkileşimli bir 3B şasi bileşeni sunar. Modül, geometrik veri üretimi ve bu veriyi tüketen bir React bileşeni olmak üzere iki temel sorumluluğa sahiptir.
 
 ## Fonksiyon Grupları
 ### Geometrik Veri Üretimi
@@ -28,26 +28,9 @@ Bu grup, üretilen geometrik verileri alarak tarayıcıda renderedilen interakti
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, dış ve iç profil geometrilerini üreten iki bağımsız fonksiyon ile bu geometriyi render eden bir React bileşeninden oluşur. Fonksiyon imzaları ve modül sabitleri üzerinden aşağıdaki varsayımlar türetilmiştir.
-
----
-
-**[Aksiyom 1]:** Eğer `PROFILE_POINTS` sabiti tanımlı değilse veya boş dizi ise, `buildLathePoints()` geçerli dış profil geometri noktaları üretemez.
-
-**[Aksiyom 2]:** Eğer `INNER_PROFILE_POINTS` sabiti tanımlı değilse veya boş dizi ise, `buildInnerLathePoints()` geçerli iç profil geometri noktaları üretemez.
-
-**[Aksiyom 3]:** Eğer `MainChassis` bileşeni çağrıldığında `isSelected` prop'u sağlanmamışsa, bileşenin seçim durumu belirsiz olur.
-
-**[Aksiyom 4]:** Eğer `MainChassis` bileşeni çağrıldığında `isIsolated` prop'u sağlanmamışsa, bileşenin izole durumu belirsiz olur.
-
-**[Aksiyom 5]:** Eğer `MainChassis` bileşeni çağrıldığında `isHidden` prop'u sağlanmamışsa, bileşenin görünürlük durumu belirsiz olur.
-
-**[Aksiyom 6]:** Eğer `onClick` callback'i sağlanmamışsa ve kullanıcı şasiye tıklarsa, tıklama olayı işlenemez (propagation durumu bilinmiyor).
-
-**[Aksiyom 7]:** `PROFILE_POINTS` ve `INNER_PROFILE_POINTS` dizilerinin her bir elemanının, geçerli 3D koordinat verisi (sayısal değerler içeren yapı) içerdiği varsayılır; aksi halde geometri oluşturma fonksiyonları hatalı sonuç döndürür.
-
-**[Aksiyom 8]:** `buildLathePoints()` ve `buildInnerLathePoints()` fonksiyonları parametresiz oldukları için, girdilerini yalnızca modül kapsamındaki sabitlerden (`PROFILE_POINTS`, `INNER_PROFILE_POINTS`) alır; harici bağımlılıkları yoktur.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -82,6 +65,18 @@ Bu modül, dış ve iç profil geometrilerini üreten iki bağımsız fonksiyon 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../core::useResolveMaterials
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: three::BoxGeometry
+- import: three::LatheGeometry
+- import: three::TorusGeometry
+- import: three::Vector2
+
+---
+
 ## INTERFACES
 
 ### MainChassisProps
@@ -95,72 +90,40 @@ Bu modül, dış ve iç profil geometrilerini üreten iki bağımsız fonksiyon 
 
 ## SABİTLER
 - **PROFILE_POINTS** (array) — `[
-
   [-0.76, 0.485], [-0.74, 0.496], [-0.72, 0.500], [-0.70, 0.497], [-0.66, ...`
 - **INNER_PROFILE_POINTS** (array) — `[
-
   [-0.72, 0.460], [-0.60, 0.455], [-0.45, 0.445], [-0.30, 0.432], [-0.15, ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::buildLathePoints
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::buildLathePoints
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `Vector2[]` — `PROFILE_POINTS` sabitindeki her `[y, r]` çiftini `new Vector2(r, y)` nesnesine dönüştürerek dizi oluşturur
+
+### [N2_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::buildInnerLathePoints
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `Vector2[]` — `INNER_PROFILE_POINTS` sabitindeki her `[y, r]` çiftini `new Vector2(r, y)` nesnesine dönüştürerek dizi oluşturur
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::MainChassis
+- **params**:
+  - `isSelected` — bileşenin seçili olup olmadığını belirten boolean
+  - `isIsolated` — bileşenin izole edilip edilmediğini belirten boolean
+  - `isHidden` — bileşenin gizli olup olmadığını belirten boolean
+  - `onClick` — tıklama olayında çağrılacak fonksiyon (opsiyonel)
 - **ic_degiskenler**:
-  - `PROFILE_POINTS` — Sabit array, `map` ile `[y, r]` çiftlerini `Vector2(r, y)`'ye dönüştürür; dış gövde profil noktalarını tanımlar
-- **Dönüş**: `Vector2[]` — LatheGeometry'ye verilecek 2B profil noktaları
-
----
-
-### [N2_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::buildInnerLathePoints
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `INNER_PROFILE_POINTS` — Sabit array, `map` ile `[y, r]` çiftlerini `Vector2(r, y)`'ye dönüştürür; iç gövde profil noktalarını tanımlar
-- **Dönüş**: `Vector2[]` — LatheGeometry'ye verilecek iç profil noktaları
-
----
-
-### [N3_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::MainChassis
-- **params**: `{ isSelected, isIsolated, isHidden, onClick }` — Destructured props
-- **ic_degiskenler**:
-  - `galvanizedSteel` — `useFanMaterials()` hook'undan gelen galvaniz çelik malzemesi; varsayılan dış gövde rengi
-  - `chassisInnerMat` — `useFanMaterials()` hook'undan gelen iç şasi malzemesi; iç mesh'e atanır
-  - `safetyOrange` — `useFanMaterials()` hook'undan gelen turuncu malzeme; seçili durumda dış gövde rengi
-  - `outerGeo` — `useMemo` ile oluşturulan `LatheGeometry(buildLathePoints(), 72)`; dış gövde geometrisi, 72 segment
-  - `innerGeo` — `useMemo` ile oluşturulan `LatheGeometry(buildInnerLathePoints(), 72)`; iç gövde geometrisi, 72 segment
-  - `flangeGeo` — `useMemo` ile oluşturulan `TorusGeometry(0.493, 0.012, 12, 72)`; flanş/halka geometrisi, 0.493 yarıçap, 0.012 tüp yarıçapı
-  - `ribGeos` — `useMemo` callback'inden dönen `BoxGeometry[]` dizisi; 4 adet `BoxGeometry(0.008, 1.44, 0.008)` (ince dikey kaburga)
-  - `mainMaterial` — `isSelected ? safetyOrange : galvanizedSteel` koşullu atama; seçiliyse turuncu, değilse galvaniz çelik
-- **Dönüş**: JSX `<group name="MainChassis">` — 1 outer mesh, 1 inner mesh, 2 flanş mesh (üst/alt y=±0.72), 4 rib mesh (dairesel yerleşim)
-
----
-
-### [N4_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::ribGeos (useMemo callback)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `ribs` — `BoxGeometry[]` boş dizi; döngüde 4 adet `BoxGeometry(0.008, 1.44, 0.008)` push edilir
-  - `i` — `let` ile tanımlı döngü sayacı, 0..3 arası; her iterasyonda yeni bir kaburga geometrisi ekler
-- **Dönüş**: `BoxGeometry[]` — 4 elemanlı geometri dizisi
-
----
-
-### [N5_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::onClick (event handler)
-- **params**: `e` — React synthetic event
-- **ic_degiskenler**:
-  - `e` — Tıklama eventi; `e.stopPropagation()` ile yukarı propogasyon engellenir
-  - `onClick` — Prop'tan gelen opsiyonel callback; `onClick?.()` ile çağrılır (event durdurulduktan sonra)
-- **Dönüş**: yok (yan etki: tıklama event'i durdurulur, üst bileşen onClick çağrılır)
-
----
-
-### [N6_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::ribGeos.map callback
-- **params**: `geo, i` — `geo`: mevcut `BoxGeometry` elemanı, `i`: dizi indeksi (0..3)
-- **ic_degiskenler**:
-  - `geo` — Mevcut iterasyondaki `BoxGeometry` nesnesi; `<mesh>`'in `geometry` prop'una atanır
-  - `i` — Dizi indeksi; hem `key={i}` hem de dairesel konum hesaplamasında `Math.cos((i * Math.PI) / 2)` ve `Math.sin((i * Math.PI) / 2)` ile kullanılır
-  - `mainMaterial` — Dışarıdan kapanan değişken; tüm rib mesh'lerine `material` olarak atanır
-- **Dönüş**: JSX `<mesh>` — 4 kaburga, yarıçap 0.485 daire üzerinde 0°, 90°, 180°, 270° açılarıyla yerleştirilmiş
+  - `galvanizedSteel` — `useResolveMaterials()` kancasından gelen galvanizli çelik malzeme
+  - `chassisInnerMat` — `useResolveMaterials()` kancasından gelen şasi iç malzemesi
+  - `safetyOrange` — `useResolveMaterials()` kancasından gelen güvenlik turuncusu malzeme
+  - `outerGeo` — `useMemo` ile oluşturulan `LatheGeometry`, `buildLathePoints()` ve 72 segment ile dış geometri
+  - `innerGeo` — `useMemo` ile oluşturulan `LatheGeometry`, `buildInnerLathePoints()` ve 72 segment ile iç geometri
+  - `flangeGeo` — `useMemo` ile oluşturulan `TorusGeometry(0.493, 0.012, 12, 72)` flanş geometrisi
+  - `ribGeo` — `useMemo` ile oluşturulan `BoxGeometry(0.008, 1.44, 0.008)` kaburga geometrisi
+  - `mainMaterial` — `isSelected` true ise `safetyOrange`, false ise `galvanizedSteel` olarak atanan ana malzeme
+- **Dönüş**: `JSX.Element | null` — `isHidden` true veya `isIsolated` false ise `null` döner, aksi halde `<group>` içinde mesh'lerden oluşan JSX döner. `useEffect` cleanup fonksiyonu ile `outerGeo`, `innerGeo`, `flangeGeo`, `ribGeo` geometrilerini dispose eder.
 
 ---
 

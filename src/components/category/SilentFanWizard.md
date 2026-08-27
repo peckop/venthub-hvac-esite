@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\SilentFanWizard.tsx
-skeleton_hash: 1417d1af007f1c89
+source_path: C:\tmp\vh-urun-comp\src\components\category\SilentFanWizard.tsx
+skeleton_hash: d2482ad2f7de047f
 entity_hashes:
   func:OneriKarti: 97c485c0d2d475d4
   func:SilentFanWizard: 9f1774f3b17d5e04
   overview: a6fbe1769b3cb472
   style_tokens: 152b7536a8556fc2
-generated_at: 2026-08-25T08:44:23Z
+generated_at: 2026-08-27T07:00:10Z
 ---
 
 ## Genel Bakış

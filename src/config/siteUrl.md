@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\config\siteUrl.ts
-skeleton_hash: de78b7adbd10fe5b
+source_path: C:\tmp\vh-urun-comp\src\config\siteUrl.ts
+skeleton_hash: e93df4d3e36f06e1
 entity_hashes:
   func:getSiteUrl: d80f85481d8cb42c
   func:stripTrailingSlash: 3465e09577d109be
   overview: 2aa2ae0b13b700f6
-generated_at: 2026-08-25T07:26:40Z
+generated_at: 2026-08-27T07:32:08Z
 ---
 
 ## Genel Bakış
@@ -68,9 +68,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: siteUrl.ts
-  function: siteUrl.ts::stripTrailingSlash
-  function: siteUrl.ts::getSiteUrl
+  file: src\config\siteUrl.ts
+  function: src\config\siteUrl.ts::stripTrailingSlash
+  function: src\config\siteUrl.ts::getSiteUrl
 
 ---
 

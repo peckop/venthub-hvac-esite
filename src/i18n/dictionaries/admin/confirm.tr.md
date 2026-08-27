@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\confirm.tr.ts
-skeleton_hash: aaee7225a5707664
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\confirm.tr.ts
+skeleton_hash: d7f669628def00bf
 entity_hashes:
   overview: a909ef0d4730a50e
-generated_at: 2026-08-15T15:08:50Z
+generated_at: 2026-08-27T06:50:26Z
 ---
 
 ## Genel Bakış
@@ -33,7 +33,7 @@ Bu dosya fonksiyon veya method içermemektedir; yalnızca statik bir çeviri sö
 ## SABİTLER
 - **confirm** (object) — `{
       defaultTitle: 'Emin misiniz?',
-      // Buton etiketleri sonucu ÖZETL...`
+      // Buton etiketleri sonucu ÖZE...`
 
 ---
 

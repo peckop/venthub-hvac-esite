@@ -2,22 +2,22 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\SmartCenterScale.tsx
-skeleton_hash: 05c6832f2fb54dac
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\SmartCenterScale.tsx
+skeleton_hash: 91a4afb1a705c043
 entity_hashes:
-  func:SmartCenterScale: 891dc4c382b38713
-  func:getLocalBoundingBox: c8bbc6f3936c29b8
-  overview: 7380060fc5ddedbc
+  func:SmartCenterScale: ab18f9a5eaf38c7c
+  func:getLocalBoundingBox: 8e08dceb1399af38
+  overview: c708233fc47ade9a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-18T19:50:14Z
+generated_at: 2026-08-27T07:05:32Z
 ---
 
 ## Genel Bakış
-SmartCenterScale, Three.js tabanlı React uygulamalarında 3D nesnelerin merkezi olarak ölçeklendirilmesini ve konumlandırılmasını sağlayan bir üst düzey bileşendir. Bileşen, geometrik sınırlayıcı kutuları hesaplayarak nesneleri orijine taşır, belirtilen hedef boyuta göre yeniden ölçekler ve opsiyonel kaydırma vektörleri uygular. Bu modül, VR/AR ve 3D ürün görüntüleme senaryolarında model boyutlarının tutarlılığını sağlamada kritik bir mimari yapı taşıdır.
+SmartCenterScale, Three.js tabanlı React uygulamalarında 3D nesnelerin merkezi olarak ölçeklendirilmesini ve konumlandırılmasını sağlayan bir üst düzey bileşendir. Bileşen, geometrik sınırlayıcı kutuları hesaplayarak nesneleri orijine taşır ve belirtilen hedef boyuta göre yeniden ölçekler. Bu modül, 3D ürün görüntüleme senaryolarında model boyutlarının tutarlılığını sağlamada kritik bir mimari yapı taşıdır.
 
 ## Fonksiyon Grupları
 ### Geometri Hesaplama Yardımcıları
-3D nesnelerin yerel koordinat sistemindeki sınırlayıcı kutularını (bounding box) hesaplayan alt düzey geometri işleme fonksiyonlarını içerir. Bu hesaplamalar, merkezleme ve ölçekleme operations için temel metrik verileri sağlar.
+3D nesnelerin yerel koordinat sistemindeki sınırlayıcı kutularını hesaplayan alt düzey geometri işleme fonksiyonlarını içerir. Bu hesaplamalar, merkezleme ve ölçekleme işlemleri için temel metrik verileri sağlar.
 - getLocalBoundingBox
 
 ### Bileşen Orkestrasyonu
@@ -27,37 +27,42 @@ SmartCenterScale, Three.js tabanlı React uygulamalarında 3D nesnelerin merkezi
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, Three.js `Group` ve `Box3` geometri tipleri üzerine kurulmuştur; bu nesnelerin çalışma zamanında mevcut olması gerekir.
+
+[Aksiyom 1]: Eğer `getLocalBoundingBox` fonksiyonuna geçirilen `root` parametresi geçerli bir Three.js `Group` nesnesi değilse, sınırlayıcı kutu hesaplaması yapılamaz ve `targetBox` doldurulamaz.
+
+[Aksiyom 2]: Eğer `SmartCenterScale` bileşeninde `targetSize` değeri 0 ise, ölçekleme hesaplamasında sıfıra bölme hatası oluşur.
+
+[Aksiyom 3]: Eğer `SmartCenterScale` bileşeninde `enabled` parametresi `false` ise, ölçekleme ve konumlandırma işlemi uygulanmaz; çocuklar oldukları haliyle render edilir.
+
+[Aksiyom 4]: Eğer `SmartCenterScale` bileşenine geçerli bir `children` (Three.js sahne nesnesi) sağlanmazsa, sınırlayıcı kutu hesaplanacak bir geometri bulunamaz.
+
+[Aksiyom 5]: Eğer `shift` parametresi verilmezse, varsayılan değer `[0, 0, ...]` kullanılır; kaydırma vektörünün tam boyutu imzadan kesilmiş olup bilinmiyor.
+
+[Aksiyom 6]: Eğer modül sabitleri (`tempBox`, `tempCenter`, `tempSize`, `tempSphere`, `tempInverse`, `tempMatrix`, `tempMeshBox`) oluşturulamazsa, geometri hesaplama yardımcıları çalışamaz; bu sabitler geçici hesaplama nesneleri olarak kullanılır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### getLocalBoundingBox
-**Ne yapar**: Verilen bir Three.js `Group` nesnesinin yerel (local) bounding box'ını hesaplar. Üst nesnelerin rotasyon bozmalarını engelleyerek 3D modelin gerçek boyutlarını doğru şekilde ölçmeyi hedefler.
-
-**Nasıl yapar**: Fonksiyon, hedef box'ı boşaltarak başlar ve kök nesnenin dünya matrisini günceller. Ardından dünya matrisinin tersini (inverse) alarak geçici bir değişkene kaydeder. Kök nesne altında `traverse` ile tüm alt nesneleri dolaşır; her bir `Mesh` tipindeki çocuğu bulduğunda, geometrinin bounding box'ını hesaplamamışsa hesaplar, bu box'ı geçici bir matris ile çarparak kök nesnenin local koordinat sistemine dönüştürür ve son olarak hedef box ile birleştirir (`union`). Bu sayede üst hiyerarşideki rotasyon ve ölçekleme bozulmaları bertaraf edilir.
-
+**Ne yapar**: Üst öğe (parent) rotasyonlarının ölçümleri bozmasını önlemek için verilen bir `Group` nesnesi için merkezlenmiş bir yerel sınırlayıcı kutu (bounding box) hesaplar ve bu kutuyu `targetBox` parametresine yazar.
+**Nasıl yapar**: Fonksiyon, önce `targetBox`'ı boşaltır ve kök grubun dünya matrisini günceller. Ardından kök grubun dünya matrisinin tersini alarak geçici bir matrise kopyalar. Kök grubun altındaki tüm çocukları dolaşarak (traverse) sadece `Mesh` tipindeki nesneleri işler. Her mesh'in geometrisi için bir sınırlayıcı kutu hesaplanır (veya mevcut olan kullanılır). Bu kutu, mesh'in dünya matrisinin kök grubun ters matrisiyle çarpılması sonucu elde edilen yerel dönüşüm matrisiyle dönüştürülür ve `targetBox` ile birleştirilir (union). Bu sayede, üst öğelerin rotasyonlarından bağımsız, nesnenin kendi koordinat sisteminde bir sınırlayıcı kutu elde edilir.
 **Parametreler**:
-- `root: Group` — Hesaplamanın yapılacağı Three.js Group nesnesi. Bu nesnenin dünya matrisi (`matrixWorld`) kullanılarak tüm alt mesh geometrileri yerel koordinat sistemine taşınır.
-- `targetBox: Box3` — Sonucun yazılacağı Three.js Box3 nesnesi. Fonksiyon başlangıçta bu box'ı boşaltır (`makeEmpty`) ve hesaplama boyunca union işlemleriyle genişletir.
-
-**Dönüş**: Fonksiyonun dönüş tipi `void`'dur; sonuç doğrudan `targetBox` referansı üzerinden dışarıya aktarılır.
+- root: Group — Sınırlayıcı kutusu hesaplanacak kök Three.js grubu.
+- targetBox: Box3 — Hesaplanan yerel sınırlayıcı kutunun yazılacağı hedef `Box3` nesnesi.
+**Dönüş**: Belirtilmemiş (void). Fonksiyon, hesaplanan kutuyu doğrudan `targetBox` parametresinin referansı üzerinden değiştirir.
 
 ### SmartCenterScale
-**Ne yapar**: SmartCenterScale, bir 3D modelin geometrik merkezini hesaplayıp (0,0,0) noktasına taşıyarak otomatik merkezleme yapar; ardından modeli belirtilen `targetSize` değerine uygun şekilde ölçekleyerek normalize eder. Ayrıca hesaplama tamamlanana kadar modelin görüntüsünün titreşmesini (flicker) önleyen bir mekanizma sağlar.
-
-**Nasıl yapar**: Bileşen, içindeki `children` olarak verilen 3D modeli alır; önce modelin sınırlayıcı kutusunu (bounding box) kullanarak merkez noktasını bulur ve bu merkezi origemine getiren bir çeviri matrisi uygular. Sonra modelin en büyük boyutunu ölçer, `targetSize` ile oranını alır ve bu oranı tüm eksenlerde ölçek faktörü olarak kullanarak modeli yeniden boyutlandırır. `enabled` prop’u false olduğunda bu işlemler atlanır ve `shift` prop’u ile ek bir translasyon (ofset) uygulanabilir; bu sayede merkezleme ve ölçekleme sonrası model istenen bir miktar kaydırılabilir.
-
+**Ne yapar**: Profesyonel bir 3D normalizasyon bileşenidir. Verilen çocuk bileşenleri (children) belirli bir hedef boyuta (targetSize) ölçeklendirir ve isteğe bağlı olarak konumlarını kaydırır (shift). Bu, 3D sahnelerde nesneleri tutarlı bir ölçek ve konumda sunmak için kullanılır.
+**Nasıl yapar**: Bileşen, bir React fonksiyonel bileşeni olarak tanımlanmıştır. Parametre olarak aldığı `children`, `enabled`, `targetSize` ve `shift` değerlerini kullanarak bir normalizasyon mantığı uygular. `enabled` parametresi `false` olduğunda bileşen normalizasyon işlemini devre dışı bırakır ve çocukları olduğu gibi render eder. `targetSize` parametresi, nesnelerin ölçeklendirileceği referans boyutu belirtir. `shift` parametresi, ölçeklendirme sonrası nesnelerin x, y, z eksenlerinde ne kadar kaydırılacağını tanımlar. Bileşen, `SmartCenterScaleProps` arayüzüne uygun bir yapıdadır.
 **Parametreler**:
-- children: React.ReactNode — 3D modelini veya sahnedeki diğer öğeleri temsil eden JSX içeriği.
-- enabled: boolean — Varsayılan `true`. Özelliğin aktif olup olmadığını kontrol eder; `false` olduğunda merkezleme ve ölçekleme atlanır.
-- targetSize: number — Varsayılan `1.0`. Modelin en uzun ekseni bu değere eşitlemek için kullanılan hedef boyut.
-- shift: number[] — Varsayılan `[0, 0, 0]` (belirtilen parçalı ifadeye göre). Modelin merkezlenip ölçeklendikten sonra uygulanacak ekstra translasyon vektörü (x, y, z).
-
-**Dönüş**: React.FC<SmartCenterScaleProps> — `SmartCenterScaleProps` tipini alan ve işlenen 3D içeriği render eden bir fonksiyonel React bileşeni döner. Bu bileşen, JSX içinde doğrudan kullanılarak sahnedeki modelin otomatik olarak merkezlenip ölçeklenmesini sağlar.
+- children: React.ReactNode — Bileşenin içinde render edilecek alt bileşenler veya 3D nesneler.
+- enabled: boolean — Bileşenin normalizasyon işlemini yapıp yapmayacağını kontrol eder. Varsayılan değeri `true`'dur.
+- targetSize: number — Nesnelerin ölçeklendirileceği hedef boyut. Varsayılan değeri `1.0`'dır.
+- shift: [number, number, number] — Ölçeklendirme sonrası nesnelerin x, y, z eksenlerindeki kaydırma miktarlarını içeren bir dizi. Verilen kodda parametre tanımı eksik (`shift = [0, 0,)` şeklinde kesilmiş), ancak dokümantasyona göre bir vektör (muhtemelen [x, y, z]) bekler.
+**Dönüş**: React.FC<SmartCenterScaleProps> — `SmartCenterScaleProps` arayüzüne uygun bir React fonksiyonel bileşeni döndürür.
 
 ---
 
@@ -101,28 +106,27 @@ SmartCenterScale, Three.js tabanlı React uygulamalarında 3D nesnelerin merkezi
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/products/3d/SmartCenterScale.tsx::getLocalBoundingBox
-- **params**: (root: Group, targetBox: Box3)
+- **params**: `root: Group`, `targetBox: Box3`
 - **ic_degiskenler**:
-  - `tempInverse` — root'un world matrix'inin ters matrix'i, child'ların world matrix'lerini root space'e dönüştürmek için kullanılır
-  - `child` — root.traverse içindeki her bir child düğüm, Mesh olup olmadığı kontrol edilir
-  - `mesh` — child'ın Mesh tipine cast edilmiş hali, geometri ve bounding box erişimi için kullanılır
-  - `mesh.geometry.boundingBox` — mesh'in geometrisinin bounding box'ı, computeBoundingBox() ile hesaplanmamışsa hesaplanır
-  - `tempMeshBox` — her child mesh'in geometri bounding box'ının kopyası, dönüşüm sonrası union işlemi için kullanılır
-  - `tempMatrix` — mesh'in world matrix'inin root matrix world'ün tersi ile çarpılmış hali, local space dönüşümü için kullanılır
-- **Dönüş**: yok (targetBox parametresini modify eder)
+  - `child` — `root.traverse` içindeki her alt çocuğu temsil eder
+  - `mesh` — `child`'ın `Mesh` tipine cast edilmiş hali; geometri ve matris bilgilerine erişmek için kullanılır
+  - `bb` — `mesh.geometry.boundingBox` referansı; geometrinin yerel sınırlayıcı kutusunu tutar
+- **Dönüş**: yok (void). `targetBox` parametresini, `root` grubundaki tüm mesh'lerin birleşik yerel sınırlayıcı kutusuyla günceller.
 
 ### [N2_NASIL] AST Pointer: src/components/products/3d/SmartCenterScale.tsx::SmartCenterScale
-- **params**: (children, enabled, targetSize, shift, visibleDelay, alignment)
+- **params**: `children`, `enabled = true`, `targetSize = 1.0`, `shift = [0, 0, 0]`, `visibleDelay = 3`, `alignment = 'center'`
 - **ic_degiskenler**:
-  - `groupRef` — dış group elementine referans, shift pozisyonu için kullanılır
-  - `innerGroupRef` — iç group elementine referans, scale ve position uygulanacak ana eleman
-  - `isVisible` — component'in görünür olup olmadığını kontrol eden state
-  - `isLocked` — hesaplamanın yapılıp yapılmadığını kontrol eden ref, bir kez hesaplama yapıldıktan sonra true olur
-  - `frameCount` — useFrame callback'inde frame sayısını sayan ref, visibleDelay kontrolü için kullanılır
-  - `diameter` — tempSphere radius'unun 2 katı, normalizasyon faktörünü hesaplamak için kullanılır
-  - `scaleFactor` — targetSize / diameter oranıyla hesaplanan ölçek faktörü, iç group'u normalize etmek için kullanılır
-  - `yOffset` — vertical hizalama offset'i, alignment parametresine göre hesaplanır
-- **Dönüş**: JSX element (<group> yapısı)
+  - `groupRef` — dış `group` elementine referans; `shift` pozisyonunu uygulamak için kullanılır
+  - `innerGroupRef` — iç `group` elementine referans; normalizasyon ve merkezleme transformasyonlarının uygulandığı grup
+  - `isVisible` — bileşenin görünür olup olmadığını kontrol eden state
+  - `setIsVisible` — `isVisible` state'ini güncelleyen setter fonksiyonu
+  - `isLocked` — hesaplama tamamlandıktan sonra `useFrame` döngüsünü kilitleyen ref
+  - `frameCount` — kaç çerçevenin geçtiğini sayan ref; geometri yüklenmesini beklemek için kullanılır
+  - `diameter` — hesaplanan sınırlayıcı kürenin çapı (`tempSphere.radius * 2`)
+  - `scaleFactor` — `targetSize` ile `diameter` oranından elde edilen ölçek faktörü
+  - `yOffset` — hizalama moduna göre hesaplanan dikey ofset
+  - `timer` — `useEffect` içindeki 500ms gecikmeli gösterim için zamanlayıcı
+- **Dönüş**: `React.FC<SmartCenterScaleProps>` — iki iç içe `group` elementi döndüren JSX yapısı
 
 ---
 

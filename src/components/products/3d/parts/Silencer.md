@@ -2,42 +2,40 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Silencer.tsx
-skeleton_hash: 0d417fee6be9a360
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\parts\Silencer.tsx
+skeleton_hash: 0fef1b08fa4df660
 entity_hashes:
   func:Silencer: b0d56de6b93be1bd
-  overview: ae5f7c5e5d83ff51
+  overview: 82793f5cbf0c62b3
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-12T10:21:26Z
+generated_at: 2026-08-27T07:10:50Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC ürünlerinin 3 boyutlu görselleştirilmesinde kullanılan, silindirik bir susturucu parçasını temsil eden yapılandırımlı bir React bileşenidir. Bileşen, parçanın temel geometrik özelliklerini ve 3D sahadaki konumunu belirleyen parametreler alır.
+
+Bu modül, HVAC ürünlerinin 3 boyutlu görselleştirilmesinde kullanılan silindirik bir susturucu parçasını temsil eden bir React bileşeni içerir. Bileşen, silindirin yarıçapı, uzunluğu ve 3D sahadaki konumu gibi temel geometrik parametreleri alarak yapılandırılabilir bir parça oluşturur. Modül, daha geniş bir 3D ürün sahnesi içinde tek bir parçayı temsil etmek üzere tasarlanmış yalın bir bileşendir.
 
 ## Fonksiyon Grupları
+
 ### Bileşen Tanımı ve Oluşturma
-Bu grup, modülün tek ve temel işlevini tanımlar; susturucu parçasının geometrisini ve görünümünü belirleyen bir React fonksiyonel bileşeni sağlar.
+
+Bu grup, susturucu parçasının geometrisini ve 3D sahadaki konumunu tanımlayan tek bir React fonksiyonel bileşenini kapsar. Varsayılan değerlerle birlikte radius, length ve position parametreleri alır; geçersiz geometrik değerlerde (negatif veya sıfır) silindirik yapı tanımsız hale gelir. Bileşen, bir 3D sahne bağlamı dışında render edilirse görüntülenemez.
+
 - Silencer
+
+## Bağımlılıklar ve Mimari Notlar
+
+- **İç bağımlılık yoktur**: Modül tek bir bileşenden oluşur, başka fonksiyon veya modül çağırmaz.
+- **Dış bağımlılıklar**: Kaynakta açıkça belirtilmemiştir; ancak `React.FC` dönüş tipinden React bağımlılığı kesin, 3D render mekanizması bilinmiyor.
+- **Dinamik/lazy yükleme**: Kaynakta bu yönde bir tanımlama bulunmamaktadır.
+- **Mimari önem**: Bu bileşen, daha büyük bir 3D ürün sahnesinin alt parçası olarak konumlanır; tek sorumluluğu susturucu geometrisini parametreler aracılığıyla oluşturmaktır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, 3D sahada silindirik bir susturucu parçası oluşturan bir React bileşenidir. Aşağıdaki mimari varsayımlar fonksiyon imzasından türetilmiştir.
-
-[Aksiyom 1]: Eğer `radius` parametresi negatif veya sıfır değer alırsa, geçersiz silindirik geometri oluşur (geometrik olarak tanımsız).
-
-[Aksiyom 2]: Eğer `length` parametresi negatif veya sıfır değer alırsa, geçersiz silindirik geometri oluşur (geometrik olarak tanımsız).
-
-[Aksiyom 3]: Eğer `position` parametresi 3 elemanlı bir dizi [x, y, z] formatında verilmezse, bileşenin 3D sahadaki konumu tanımsız olur.
-
-[Aksiyom 4]: Eğer bileşen bir 3D sahne bağlamı (örn: Three.js sahnesi) dışında render edilirse, geometrik nesne görüntülenemez.
-
-[Aksiyom 5]: Eğer `radius` ve `length` değerleri arasındaki oran aşırı derecede farklılaşır (örn: radius ≫ length veya length ≫ radius), susturucu geometrisi gerçekçi bir görünüm kazanamaz; bunun için eşik değer bilinmiyor.
-
----
-
-**Not:** Bu modül için belirli eşik değerleri (minimum/maximum radius, length) veya kabul kriterleri fonksiyon imzasında tanımlanmamıştır. Sadece geometrik tanımlılık varsayımları çıkarılmıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -54,6 +52,18 @@ Bu modül, 3D sahada silindirik bir susturucu parçası oluşturan bir React bil
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../core::useResolveMaterials
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: three::BoxGeometry
+- import: three::CylinderGeometry
+- import: three::RingGeometry
+- import: three::TorusGeometry
+
+---
+
 ## INTERFACES
 
 ### SilencerProps
@@ -65,40 +75,49 @@ Bu modül, 3D sahada silindirik bir susturucu parçası oluşturan bir React bil
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::Silencer
-- **params**: (`radius` — Genlik yarıçapı, varsayılan 0.6; `length` — Uzunluk, varsayılan 0.8; `position` — 3B konum vektörü, varsayılan [0,0,0])
+### [N1_NASIL] AST Pointer: Silencer.tsx::Silencer
+- **params**: `radius` (varsayılan 0.6), `length` (varsayılan 0.8), `position` (varsayılan [0, 0, 0])
 - **ic_degiskenler**:
-  - `materials` — `useFanMaterials()` hook'undan dönen malzeme nesnesi. 3B modellere uygulanacak malzemeleri (galvanizedSteel, industrialSteel, matteBlack) içerir.
-  - `_perforationGeometry` — `useMemo` ile hesaplanan ve önbelleğe alınan iç delikli yüzey geometrisi. `radius` değişkenine bağlı olarak yeniden hesaplanır.
-- **Dönüş**: JSX elementi (React bileşeni). `group` elementi içinde 3D silansör modelini render eder.
+  - `materials` — `useResolveMaterials()` hook'undan dönen malzeme nesnesi; `materials.galvanizedSteel`, `materials.industrialSteel`, `materials.matteBlack` alanlarına erişilir
+  - `geometries` — `useMemo` ile memoize edilmiş geometri nesnesi; `geometries.outerCasingGeo`, `geometries.flangeGeo`, `geometries.innerLinerGeo`, `geometries.perforationRingGeo`, `geometries.reinforcementRingGeo`, `geometries.bracketGeo` alanlarına erişilir
+- **Dönüş**: JSX — `position` prop'u ile konumlandırılmış `<group>` elementi; dış kasa silindiri, flanşlar, iç delikli astar, perforasyon halkaları, yapısal takviye halkaları ve montaj braketlerini içerir
 
-### [N2_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::useMemo callback
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: Silencer.tsx::useMemo callback
+- **params**: yok
 - **ic_degiskenler**:
-  - `shape` — Three.js `Shape` nesnesi. Deliklerin oluşturulacağı temel şekil.
-  - `holeRadius` — Deliklerin oluşturulacağı halka yarıçapı. `radius * 0.85` hesaplanır.
-  - `holeCount` — Oluşturulacak delik sayısı. Sabit 12.
-  - `angle` — Döngü içinde her deliğin açısı. `(i / holeCount) * Math.PI * 2` ile hesaplanır.
-  - `hx` — Deliğin merkezinin x koordinatı. `Math.cos(angle) * holeRadius` ile hesaplanır.
-  - `hy` — Deliğin merkezinin y koordinatı. `Math.sin(angle) * holeRadius` ile hesaplanır.
-  - `hole` — Three.js `Path` nesnesi. Tek bir daire deliğini temsil eder. `shape.holes` dizisine eklenir.
-- **Dönüş**: `ShapeGeometry` nesnesi. Deliklerle oluşturulmuş 2B şekilden türetilmiş geometri.
+  - `outerCasingGeo` — `new CylinderGeometry(radius, radius, length, 64, 1, true)` ile oluşturulan açık uçlu dış kasa silindir geometrisi
+  - `flangeGeo` — `new RingGeometry(radius * 0.9, radius, 32)` ile oluşturulan flanş halka geometrisi
+  - `innerLinerGeo` — `new CylinderGeometry(radius * 0.85, radius * 0.85, length * 0.95, 48, 4, true)` ile oluşturulan iç astar silindir geometrisi
+  - `perforationRingGeo` — `new RingGeometry(radius * 0.7, radius * 0.9, 32)` ile oluşturulan perforasyon halka geometrisi
+  - `reinforcementRingGeo` — `new TorusGeometry(radius * 1.02, 0.015, 8, 32)` ile oluşturulan takviye torus geometrisi
+  - `bracketGeo` — `new BoxGeometry(0.06, 0.08, 0.12)` ile oluşturulan montaj braketi kutu geometrisi
+- **Dönüş**: nesne — altı geometri nesnesini içeren `{ outerCasingGeo, flangeGeo, innerLinerGeo, perforationRingGeo, reinforcementRingGeo, bracketGeo }`
 
-### [N3_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::map callback (perforation rings)
-- **params**: (`_` — Kullanılmayan mevcut eleman, `i` — Dizideki mevcut indeks)
+### [N3_NASIL] AST Pointer: Silencer.tsx::useEffect callback
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: cleanup fonksiyonu — `geometries` nesnesindeki tüm geometrilerin `dispose()` metodunu çağırarak VRAM bellek sızıntısını önler
+
+### [N4_NASIL] AST Pointer: Silencer.tsx::useEffect cleanup
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `Object.values(geometries).forEach(geo => geo.dispose())` ile her geometri nesnesinin dispose edilmesi işlemini yürütür
+
+### [N5_NASIL] AST Pointer: Silencer.tsx::Array(6).fill(0).map callback
+- **params**: `_` (kullanılmayan eleman), `i` (dizin)
 - **ic_degiskenler**:
-  - `zPos` — Halkanın z-ekseni üzerindeki konumu. `length` ve `i` değerlerinden hesaplanır: `-length / 2 + (i + 1) * (length / 7)`.
-- **Dönüş**: JSX elementi. Delikli iç yüzeydeki akustik halka geometrisini render eden `mesh`.
+  - `zPos` — `-length / 2 + (i + 1) * (length / 7)` hesaplamasıyla elde edilen perforasyon halkasının uzunluk ekseni boyunca konumu
+- **Dönüş**: JSX — `key={i}`, `position={[0, zPos, 0]}`, `rotation={[Math.PI / 2, 0, 0]}` ile konumlandırılmış, `geometries.perforationRingGeo` geometrisi ve `materials.matteBlack` malzemesi kullanılan `<mesh>` elementi
 
-### [N4_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::map callback (structural reinforcement rings)
-- **params**: (`z` — Halkanın z ekseni konumu, `i` — Dizideki mevcut indeks)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX elementi. Yapısal destek halkasını (torus) render eden `mesh`.
+### [N6_NASIL] AST Pointer: Silencer.tsx::[-0.3, 0, 0.3].map callback
+- **params**: `z` (z ekseni konum değeri), `i` (dizin)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `key={i}`, `position={[0, 0, z]}`, `rotation={[Math.PI / 2, 0, 0]}` ile konumlandırılmış, `geometries.reinforcementRingGeo` geometrisi ve `materials.industrialSteel` malzemesi kullanılan `<mesh>` elementi
 
-### [N5_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::map callback (mounting brackets)
-- **params**: (`angle` — Braketin döndürme açısı (derece), `i` — Dizideki mevcut indeks)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX elementi. Montaj braketini ( kutu geometrisi ) içeren `group`.
+### [N7_NASIL] AST Pointer: Silencer.tsx::[0, 120, 240].map callback
+- **params**: `angle` (derece cinsinden açı), `i` (dizin)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `key={i}`, `rotation={[0, (angle * Math.PI) / 180, 0]}` ile döndürülmüş `<group>` içinde, `position={[radius + 0.04, 0, 0]}` konumunda, `geometries.bracketGeo` geometrisi ve `materials.galvanizedSteel` malzemesi kullanılan `<mesh>` elementi
 
 ---
 

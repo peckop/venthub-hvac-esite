@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\components\quotes\QuoteRequestModal.tsx
-skeleton_hash: a7e7280807ba3785
+source_path: C:\tmp\venthub-wt-t131\src\components\quotes\QuoteRequestModal.tsx
+skeleton_hash: e43656ecdf567701
 entity_hashes:
   func:QuoteRequestModal: e72735855c826745
   func:handleSubmit: 72b54eeeae0b55b3
   overview: ee5a6a71b7344ae5
-  style_tokens: 3dcb526ce7d50f48
-generated_at: 2026-08-17T11:20:41Z
+  style_tokens: 59eadc3928b808d6
+generated_at: 2026-08-27T04:29:22Z
 ---
 
 ## Genel Bakış
@@ -81,7 +81,7 @@ Bu modül, dışarıdan kontrol edilen bir modal olup, temel işlevselliği içi
 
 ### QuoteRequestModalItem
 Teklif isteme modali — T067-VH v1 (cetvel: docs/standards/quote-standard.md §Q4). Giriş kapıları: PDP (tek kalem, adet düzenlenebilir) + sepet (fiyatsız kalemler). Teklif LOGIN'lidir; oturum yoksa buton katmanı (QuoteRequestButton) login'e yönlendirir, modal hiç açılmaz. Fiyat otoritesi (cetvel R5):
-- `productId: string | null`
+- `productId: string`
 - `productName: string`
 - `qty: number`
 
@@ -92,6 +92,11 @@ Teklif isteme modali — T067-VH v1 (cetvel: docs/standards/quote-standard.md §
 - `sourceProjectId?: string | null`
 - `items: QuoteRequestModalItem[]`
 - `qtyEditable?: boolean`
+
+---
+
+## SABİTLER
+- **ALAN_GIRDI_SINIFI** (str) — `'w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-mediu...`
 
 ---
 
@@ -146,7 +151,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-slate-900/40`, `bg-white`, `border-2`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `border-t-transparent`, `border-white`, `focus-visible:border-primary-navy`, `hover:bg-industrial-gray`, `hover:bg-slate-50`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `gap-1.5`, `gap-2`, `gap-3`, `h-10`, `h-4`, `h-7`, `inline-block`, `inline-flex`, `items-center`, `justify-between`
-- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `align-middle`, `animate-in`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `focus-visible:ring-primary-navy/30`, `focus-visible:ring-primary-navy/50`, `focus-visible:ring-slate-200`, `font-bold`
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-slate-900/40`, `bg-white`, `border-2`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `border-t-transparent`, `border-white`, `hover:bg-industrial-gray`, `hover:bg-slate-50`, `hover:border-primary-navy`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `gap-1.5`, `gap-2`, `gap-3`, `grid`, `h-10`, `h-4`, `h-7`, `inline-block`, `inline-flex`, `items-center`
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${ALAN_GIRDI_SINIFI`, `align-middle`, `animate-in`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/30`, `focus-visible:ring-primary-navy/50`, `focus-visible:ring-slate-200`, `font-bold`

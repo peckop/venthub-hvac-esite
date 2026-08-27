@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\sitemap.ts
-skeleton_hash: fe809ae13ebe1b08
+source_path: C:\tmp\vh-urun-comp\src\app\sitemap.ts
+skeleton_hash: 9092ed88ff68599a
 entity_hashes:
   func:sitemap: c0b328c7136de117
   overview: 5da40d79a2cf8381
-generated_at: 2026-08-26T07:12:34Z
+generated_at: 2026-08-27T06:54:02Z
 ---
 
 ## Genel Bakış
@@ -17,16 +17,6 @@ Bu modül, Next.js uygulaması için arama motoru dostu site haritasını dinami
 ### Site Haritası Oluşturma
 Uygulamanın tüm sayfa rotalarını tarayarak arama motorları için geçerli bir site haritası yapısı hazırlar. Supabase veritabanına erişerek dinamik içerik URL'lerini çeker ve statik rotalarla birleştirir.
 - sitemap
-
----
-
-## Bağımlılıklar ve Mimari Notlar
-
-**Dış Bağımlılıklar**: Fonksiyon gövdesi tam olarak sunulmadığı için kesin bağımlılıklar bilinmiyor. Eski dokümantasyondaki kesik bilgi, Supabase veritabanına erişim olduğunu gösteriyor; ancak tam erişim detayları bilinmiyor.
-
-**Dinamik/Lazy Yükleme**: Bilgi mevcut değil.
-
-**Mimari Önem**: Bu modül, Next.js'in yerleşik `MetadataRoute.Sitemap` sözleşmesini uygular. Uygulama tek bir `sitemap` fonksiyonu dışa aktardığı için, tüm site haritası mantığı bu fonksiyonun sorumluluğundadır. Fonksiyon parametre almaz ve async olarak çalışır.
 
 ---
 

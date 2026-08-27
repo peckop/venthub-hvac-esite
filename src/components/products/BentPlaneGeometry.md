@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\BentPlaneGeometry.tsx
-skeleton_hash: a1afc85f10d943e1
+source_path: C:\tmp\vh-urun-comp\src\components\products\BentPlaneGeometry.tsx
+skeleton_hash: def82e30f1409b36
 entity_hashes:
   func:BentPlaneGeometry: 925b96f61263e22a
   func:handleClick: bffc3b12eebc550c
   overview: d44152fef8988bad
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:48:16Z
+generated_at: 2026-08-27T07:28:39Z
 ---
 
 ## Genel Bakış
@@ -29,22 +29,6 @@ Bükülmüş düzlem geometrisini Three.js sahasında oluşturup render eden ana
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, Three.js tabanlı eğilmiş düzlem geometrisi gösteren bir React bileşeni için aşağıdaki mimari varsayımlara dayanır.
-
----
-
-**[Aksiyom 1]:** Eğer `image` parametresi sağlanmazsa, `textureLoader` kullanılarak doku oluşturulamaz ve bileşen geçersiz dokuya sahip geometri render eder.
-
-**[Aksiyom 2]:** Eğer `id` parametresi sağlanmazsa, bileşenin Three.js sahasında benzersiz tanımlaması yapılamaz ve potansiyel kimlik çakışmaları oluşur.
-
-**[Aksiyom 3]:** Eğer `BentPlaneMaterial` fonksiyonu çağrılamazsa (modül yüklenemezse), geometri için uygun materyal atanamaz ve nesne görünür hale gelmez.
-
-**[Aksiyom 4]:** Eğer `textureLoader` nesnesi oluşturulamazsa, `image` parametresinden doku yüklenemez ve geometri boş/varsayılan doku ile render edilir.
-
-**[Aksiyom 5]:** Eğer `position` parametresi geçersiz bir dizi formatındaysa (örn: 3 elemanlı değilse), Three.js sahasında beklenmeyen konumlandırma davranışı oluşur.
-
----
-
-**Not:** Fonksiyon gövdeleri verilmediği için, `handleClick` işleyicisinin gerçekleştirdiği spesifik eylemler (örn: yönlendirme, durum güncelleme) hakkında mimari varsayım üretilememektedir. Sadece fonksiyon imzası ve modül sabitlerine dayalı varsayımlar tanımlanmıştır.
 
 ---
 

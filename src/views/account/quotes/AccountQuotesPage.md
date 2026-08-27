@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\views\account\quotes\AccountQuotesPage.tsx
-skeleton_hash: a73143fe6a704c36
+source_path: C:\tmp\venthub-wt-t131\src\views\account\quotes\AccountQuotesPage.tsx
+skeleton_hash: 8266de8a1c041cd0
 entity_hashes:
   func:AccountQuotesPage: 676b0f814ec2c5da
   overview: c6a0e6e2db5efcaf
   style_tokens: e101b5f2657eda63
-generated_at: 2026-08-16T10:23:55Z
+generated_at: 2026-08-27T06:50:17Z
 ---
 
 ## Genel Bakış

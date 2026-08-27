@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-rec80\src\i18n\dictionaries\en.ts
-skeleton_hash: 761178315be27aad
+source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\en.ts
+skeleton_hash: 9d0705a703cca270
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-26T19:38:59Z
+generated_at: 2026-08-27T04:25:30Z
 ---
 
 ## Genel Bakış

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\Assembler.tsx
-skeleton_hash: 20d5e4edc9857de5
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\factory\Assembler.tsx
+skeleton_hash: ba9276825ec50a5a
 entity_hashes:
   func:Assembler: fce0437dc1401eb7
   overview: 1319e0e67eee55ba
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:11Z
+generated_at: 2026-08-27T07:06:05Z
 ---
 
 ## Genel Bakış

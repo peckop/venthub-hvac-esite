@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\3d\types\FlexibleDuctModel.tsx
-skeleton_hash: be3af2fd6b58aab1
+source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\FlexibleDuctModel.tsx
+skeleton_hash: 2283b2e67d628d84
 entity_hashes:
   func:FlexibleDuctModel: 3bca0ec1b35809a5
   func:updateWaveCurve: 6edc25976d31416d
   overview: 7399efaa6127c9e1
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:27:07Z
+generated_at: 2026-08-27T07:16:48Z
 ---
 
 ## Genel Bakış
@@ -37,10 +37,6 @@ Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çı
 [Aksiyom 3]: Eğer `pointsPool` dizisi boş bir dizi olarak verilirse, fonksiyonun nasıl bir sonuç üreteceği bilinmiyor (gövde mevcut değil).
 
 [Aksiyom 4]: `FlexibleDuctModel` fonksiyonu parametre almaz; eğer bağımlı olduğu harici durum (state, context, store) mevcut değilse, bileşenin nasıl render edeceği bilinmiyor (gövde mevcut değil).
-
----
-
-**Not:** Fonksiyon gövdeleri sağlanmadığından, bu modülün çalışması için gerekli kesin koşullar (eşik değerleri, null kontrolü, hata senaryoları vb.) belirlenememektedir. Daha doğru aksiyomlar için kaynak kodun gövde içeriklerinin sağlanması gerekmektedir.
 
 ---
 
@@ -166,9 +162,9 @@ Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çı
 
 ## NODE ID STANDARD
 
-  file: FlexibleDuctModel.tsx
-  function: FlexibleDuctModel.tsx::updateWaveCurve
-  function: FlexibleDuctModel.tsx::FlexibleDuctModel
+  file: src\components\products\3d\types\FlexibleDuctModel.tsx
+  function: src\components\products\3d\types\FlexibleDuctModel.tsx::updateWaveCurve
+  function: src\components\products\3d\types\FlexibleDuctModel.tsx::FlexibleDuctModel
 
 ---
 

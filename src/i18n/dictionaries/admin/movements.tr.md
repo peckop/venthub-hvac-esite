@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\movements.tr.ts
-skeleton_hash: e79560ab4ea296d0
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\movements.tr.ts
+skeleton_hash: eef9c4545b4a0642
 entity_hashes:
   overview: 913c3c44e13878f9
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış
@@ -35,7 +35,7 @@ Bu modül, yalnızca statik bir çeviri sözlüğü (nesne sabiti) dışa aktara
 
 ## SABİTLER
 - **movements** (object) — `{
-      subtitle: 'Envanter giriş/çıkış hareketlerini izleyin, filtreleyin ve...`
+      subtitle: 'Envanter giriş/çıkış hareketlerini izleyin, filtreleyin v...`
 
 ---
 

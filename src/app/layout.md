@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\app\layout.tsx
-skeleton_hash: 8412d56ab919a28f
+source_path: C:\tmp\vh-comp\src\app\layout.tsx
+skeleton_hash: e9fd26aae76e6b15
 entity_hashes:
   func:RootLayout: b91efb59fd6362f0
   overview: 49bead2b697f0509
   style_tokens: eebc13a3fedd1bcb
-generated_at: 2026-08-25T07:23:26Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış
@@ -86,8 +86,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imza ve sabit tan
 
 ## NODE ID STANDARD
 
-  file: layout.tsx
-  function: layout.tsx::RootLayout
+  file: src\app\layout.tsx
+  function: src\app\layout.tsx::RootLayout
 
 ---
 

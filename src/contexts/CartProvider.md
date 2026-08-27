@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\contexts\CartProvider.tsx
-skeleton_hash: 74a67e0e4c2361e3
+source_path: C:\tmp\venthub-wt-t131\src\contexts\CartProvider.tsx
+skeleton_hash: 6667ade294980519
 entity_hashes:
   func:CartProvider: 8807e7c812fc3463
   overview: 37930ba7d9f73804
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:27:34Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
@@ -225,8 +225,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan ve sabit 
 
 ## NODE ID STANDARD
 
-  file: CartProvider.tsx
-  function: CartProvider.tsx::CartProvider
+  file: src\contexts\CartProvider.tsx
+  function: src\contexts\CartProvider.tsx::CartProvider
 
 ---
 

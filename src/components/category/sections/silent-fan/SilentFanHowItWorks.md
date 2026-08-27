@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanHowItWorks.tsx
-skeleton_hash: 7aee5716377cfa95
+source_path: C:\tmp\vh-urun-comp\src\components\category\sections\silent-fan\SilentFanHowItWorks.tsx
+skeleton_hash: 5d22458c6bdfc4b8
 entity_hashes:
   func:SilentFanHowItWorks: 1d9f7bbf01c39f23
   func:tr: b282b53f03d688a5
   overview: 8afe080395065c81
   style_tokens: b11a600d5d7c65a7
-generated_at: 2026-06-19T20:47:07Z
+generated_at: 2026-08-27T07:00:29Z
 ---
 
 ## Genel Bakış

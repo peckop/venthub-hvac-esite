@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\i18n\dictionaries\admin\settings.tr.ts
-skeleton_hash: a0a799fb2aabe069
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\settings.tr.ts
+skeleton_hash: df570d678ff9ec43
 entity_hashes:
   overview: a6820ef6861612f2
-generated_at: 2026-08-17T13:20:04Z
+generated_at: 2026-08-27T06:50:46Z
 ---
 
 ## Genel Bakış
@@ -48,7 +48,7 @@ Bu modül için fonksiyon gövdesi bulunmadığından, fonksiyon tabanlı mimari
 - **settings** (object) — `{
       hoursUnit: 'Saat',
       addAdmin: 'Yeni Yönetici Ekle',
-      admins...`
+      adm...`
 
 ---
 

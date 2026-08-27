@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\products\RadialActionMenu.tsx
-skeleton_hash: 5e3ca13a8316793b
+source_path: C:\tmp\vh-urun-comp\src\components\products\RadialActionMenu.tsx
+skeleton_hash: 98efdd0d1c85e595
 entity_hashes:
   func:RadialActionMenu: 0b7a99200882ee32
   func:getItemPosition: fe5533094bc4f10c
   func:getSubcategoryPosition: baca01aa62eeaa95
   overview: d9d0bbf865eea128
   style_tokens: 398c177ac8f627cc
-generated_at: 2026-08-25T07:26:16Z
+generated_at: 2026-08-27T07:32:08Z
 ---
 
 ## Genel Bakış
@@ -253,16 +253,16 @@ graph TD
     RadialActionMenu_tsx__RadialActionMenu["RadialActionMenu"]
     RadialActionMenu_tsx__getItemPosition["getItemPosition"]
     RadialActionMenu_tsx__getSubcategoryPosition["getSubcategoryPosition"]
-    RadialActionMenu_tsx__RadialActionMenu --> RadialActionMenu_tsx__getItemPosition
     RadialActionMenu_tsx__RadialActionMenu --> RadialActionMenu_tsx__getSubcategoryPosition
+    RadialActionMenu_tsx__RadialActionMenu --> RadialActionMenu_tsx__getItemPosition
 ```
 
 ## NODE ID STANDARD
 
-  file: RadialActionMenu.tsx
-  function: RadialActionMenu.tsx::RadialActionMenu
-  function: RadialActionMenu.tsx::getItemPosition
-  function: RadialActionMenu.tsx::getSubcategoryPosition
+  file: src\components\products\RadialActionMenu.tsx
+  function: src\components\products\RadialActionMenu.tsx::RadialActionMenu
+  function: src\components\products\RadialActionMenu.tsx::getItemPosition
+  function: src\components\products\RadialActionMenu.tsx::getSubcategoryPosition
 
 ---
 
