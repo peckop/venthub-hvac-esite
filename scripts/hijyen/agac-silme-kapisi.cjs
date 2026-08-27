@@ -34,6 +34,24 @@
  * itiraz penceresi) — yani 4. koşul bir formalite değil, kapının ASIL emniyetidir. 1-3'ü
  * geçip 4'ü atlamak, bugün yaşanan kazanın aynısını üretir.
  *
+ * ⚠ K4'ÜN KENDİ ZAYIFLIĞI — SESSİZLİK ONAY DEĞİLDİR (AUTH'un uyarısı, 2026-08-27):
+ * Pencere sessiz kapandıysa bu "sahipsiz" değil, "sahibi KONUŞAMIYOR" demek olabilir —
+ * ölü bir oturumun ağacı itiraz edemez. Yani K4 de bir absans çıkarımıdır ve tek başına
+ * güvenilmez. NİÇİN YİNE DE YETERLİ: bu zayıflık K1-K3 tarafından SINIRLANIR. Dördünü de
+ * geçen bir ağaç tanım gereği "kimliksiz + her şeyi uzakta + izlenmeyen dahil tertemiz"dir;
+ * böyle bir ağacı silmek KURTARILAMAZ hiçbir şey kaybettirmez, olsa olsa birinin worktree'yi
+ * yeniden kurmasını gerektirir. Yani net dağılım şudur:
+ *     K2/K3 = VERİ KAYBINA karşı emniyet (mutlak)
+ *     K4    = KESİNTİYE karşı emniyet (olasılıksal — sessizlik yanıltabilir)
+ * Bu ayrımı bilerek yazıyorum: K4'ü "her şeyi tutar" sanıp K2/K3'ü gevşetmek, kapıyı
+ * bugünkü kazadan DAHA kötü bir hale getirir.
+ *
+ * ⛔ SAHİPLİK İÇİN `git log --format=%an` KULLANMA — BU DEPODA AYIRT ETMEZ:
+ * Tüm ajanlar Recep'in kimliğiyle commit atar, yani yazar alanı her dalda aynıdır. Bugün
+ * iki şerit (AUTH, I18N) sahipliği bağımsız olarak DOKUNULAN DOSYA KÜMESİ ile ölçtü ve aynı
+ * cevaba vardı; ad kalıbı ("dal adı bana benzemiyor") ikisinin de zayıf bulduğu kanıttı.
+ * Sahiplik sorusunun ayırt eden ölçütü: dalın dokunduğu dosyalar ∩ şeridin claim'i.
+ *
  * BU BETİK HİÇBİR ŞEY SİLMEZ. Karar üretir ve gerekçesini basar; silme komutunu insan/ajan
  * çalıştırır. Silme kararını üreten ile uygulayanın ayrı olması kasıtlıdır.
  *
@@ -171,6 +189,51 @@ function ilanOku() {
   }
 }
 
+// ---------------------------------------------------------------- sahiplik modu
+
+/**
+ * "Bu ağaç kimin?" sorusunun AYIRT EDEN ölçütü: erişilemeyen commit'lerin DOKUNDUĞU DOSYA
+ * KÜMESİ. 2026-08-27'de AUTH ve I18N bu ölçümü ayrı ayrı, ELLE koştu ve aynı sonuca vardı;
+ * üçüncü kez elle koşulmasın diye buraya alındı. İkisi de kendi ilk cevaplarını ("dal adı
+ * bana benzemiyor") ZAYIF bulup geri çekti — ad kalıbı ölçüt değildir, dosya kümesi ölçüttür.
+ */
+const SAHIPLIK = deger('--sahiplik')
+if (SAHIPLIK) {
+  const wt = agaclar().find((w) => path.basename(w) === SAHIPLIK)
+  if (!wt) {
+    console.error('HATA: worktree bulunamadi: ' + SAHIPLIK)
+    process.exit(2)
+  }
+  let dosyalar = []
+  let commitler = []
+  try {
+    commitler = git(['log', '--format=%h %s', 'HEAD', '--not', '--remotes'], wt)
+      .split('\n').filter((s) => s.trim())
+    dosyalar = [
+      ...new Set(
+        git(['log', '--name-only', '--format=', 'HEAD', '--not', '--remotes'], wt)
+          .split('\n').map((s) => s.trim()).filter(Boolean)
+      ),
+    ].sort()
+  } catch (e) {
+    console.error('HATA: olculemedi — ' + e.message)
+    process.exit(2)
+  }
+  console.log('== SAHIPLIK OLCUMU: ' + SAHIPLIK + ' ==')
+  console.log('  dal: ' + git(['rev-parse', '--abbrev-ref', 'HEAD'], wt).trim())
+  console.log('')
+  console.log('  ERISILEMEYEN COMMITLER (' + commitler.length + '):')
+  for (const c of commitler) console.log('    ' + c)
+  console.log('')
+  console.log('  DOKUNULAN DOSYALAR (' + dosyalar.length + ') — sahiplik SORUSUNUN CEVABI BURADA:')
+  for (const d of dosyalar) console.log('    ' + d)
+  console.log('')
+  console.log('  Bu listeyi seritlerin claim globlariyla KESISTIR (board.cjs who).')
+  console.log('  ⛔ git yazar alanina (--format=%an) BAKMA: bu depoda tum ajanlar Recep in')
+  console.log('     kimligiyle commit atar, alan her dalda ayni — AYIRT ETMEZ.')
+  process.exit(0)
+}
+
 // ---------------------------------------------------------------- ilan modu
 
 if (ILAN.length) {
@@ -247,6 +310,19 @@ if (JSON_CIKTI) {
   console.log('')
   console.log('  ⚠ K1-K3 "temiz+itilmis+kimliksiz ama HALA KULLANILAN" agaci AYIRT EDEMEZ.')
   console.log('    O boslugu kapatan K4 tur. 1-3 u gecip 4 u atlamak 2026-08-27 kazasini tekrarlar.')
+  console.log('  ⚠ K4 de absans cikarimidir: SESSIZLIK "sahipsiz" degil "sahibi KONUSAMIYOR"')
+  console.log('    olabilir (olu oturumun agaci itiraz edemez). Zayifligi K1-K3 SINIRLAR:')
+  console.log('    K2/K3 = VERI KAYBINA karsi emniyet (mutlak) · K4 = KESINTIYE karsi (olasiliksal).')
+  console.log('    Bu yuzden K4 e guvenip K2/K3 u gevsetmek kapiyi DAHA kotu hale getirir.')
+  const riskli = sonuclar.filter((s) => s.erisilemeyenCommit > 0)
+  if (riskli.length) {
+    console.log('')
+    console.log('  ⛔ KAYIP RISKI (K2) — bu agaclar silinemez, ama sahibi cikip ITMELI:')
+    for (const s of riskli) {
+      console.log('     ' + String(s.erisilemeyenCommit).padStart(3) + ' commit  ' + s.ad)
+    }
+    console.log('     Sahibi bulmak icin: --sahiplik <agac-adi>  (yazar alanina BAKMA, ayirt etmez)')
+  }
 }
 
 process.exit(silinebilir.length ? 0 : 1)
