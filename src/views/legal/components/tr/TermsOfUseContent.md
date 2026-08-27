@@ -2,27 +2,26 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\components\tr\TermsOfUseContent.tsx
-skeleton_hash: 4dccdb20b4ad17f8
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\components\tr\TermsOfUseContent.tsx
+skeleton_hash: f4764d6f0e46b953
 entity_hashes:
-  func:TermsOfUseContentTr: eed63a486a457bcd
-  overview: c8c962c36de42ed3
-  style_tokens: 6460a848de07bdf3
-generated_at: 2026-06-16T11:57:51Z
+  func:TermsOfUseContentTr: ae2cbf8b29e4a1e0
+  overview: 6cfd8dacdb7a9f0c
+  style_tokens: c2df28d44e819ffd
+generated_at: 2026-08-27T07:41:07Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub platformunun Türkçe kullanıcılarına yönelik Kullanım Koşulları metnini ekranda gösteren bir React bileşenidir. İçerik, dinamik olarak belirlenebilen bir dil parametresine (`lang`) göre render edilebilir; bu sayede farklı dil sürümlerine aynı yapıyla geçiş yapılabilir. Bileşen, modülün genel yapısı içinde sadece statik bir içerik gösteriminden sorumludur ve dışarıya veri göndermez veya harici bir durum yönetmez.
+Bu modül, VentHub platformunun Türkçe kullanıcılarına yönelik Kullanım Koşulları metnini ekranda gösteren bir React bileşenini tanımlar. Bileşen, dinamik olarak belirlenebilen bir dil parametresi (`lang`) alarak render edilir ve sadece statik bir içerik gösteriminden sorumludur; dışarıya veri göndermez veya harici bir durum yönetmez.
 
 ## Fonksiyon Grupları
 ### Kullanım Koşulları Bileşeni
-Bu grup, yasal metinlerin (özellikle Kullanım Koşulları'nın) kullanıcıya sunulması için gerekli olan React bileşenini tanımlar.
+Bu grup, yasal metinlerin (Kullanım Koşulları'nın) kullanıcıya Türkçe olarak sunulması için gerekli olan React bileşenini tanımlar ve döndürür.
 - TermsOfUseContentTr
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
 Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
@@ -30,20 +29,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### TermsOfUseContentTr
+**Ne yapar**: Kullanım koşulları içeriğine ait bir React fonksiyon bileşeni döndüren bir üst düzey fonksiyondur. Dosya yolu (`src\views\legal\components\tr\TermsOfUseContent.tsx`) ve fonksiyon adındaki `Tr` soneki, bileşenin Türkçe kullanım koşulları içeriğiyle ilişkili olduğunu gösterir. Docstring boş bırakılmıştır; fonksiyonun iç mantığı ve davranışına dair kaynakta ek bilgi bulunmamaktadır.
 
-**Ne yapar**: Türkçe Kullanım Koşulları içerik bileşenini döndüren bir React fonksiyonel bileşenidir. VentHub HVAC uygulamasının yasal sayfalarında görüntülenmek üzere tasarlanmış, kullanıcılara hizmet koşullarını Türkçe olarak sunan bir bileşen fabrikasıdır.
-
-**Nasıl yapar**: Fonksiyon çağrıldığında, `React.FC<{ lang: string }>` türünde bir fonksiyonel bileşen döndürür. Döndürülen bileşen, `lang` prop'unu kabul ederek dil yapılandırmasına uyum sağlar. Bileşen, Türkçe olarak hazırlanmış Kullanım Koşulları metin içeriğini render eder.
+**Nasıl yapar**: Kaynakta iç mantığa dair bir açıklama (docstring) yer almamaktadır. Fonksiyon, aldığı `lang` parametresini kullanarak bir React fonksiyon bileşeni (`React.FC`) üretir ve döndürür. Bileşenin render mantığı ve hangi içeriği oluşturduğu bu kaynakta belirtilmemiştir.
 
 **Parametreler**:
-- Bu fonksiyon parametre almaz — çağrıldığında doğrudan bir React bileşeni döndürür.
+- `lang`: `{ lang: string }` — Fonksiyona destructuring yoluyla aktarılan nesne içindeki `lang` özelliğidir. Dil bilgisini temsil eden bir string değer alır.
 
-**Dönüş**: `React.FC<{ lang: string }>` — Dil parametresini kabul eden, VentHub HVAC uygulamasının Türkçe Kullanım Koşulları içeriğini render eden bir React fonksiyonel bileşeni döndürür.
+**Dönüş**: `React.FC<{ lang: string }>` — `lang` adında string türünde bir prop alan bir React fonksiyon bileşeni döndürür. Döndürülen bileşen, kendisi de bir `lang` prop'u bekleyerek kullanım koşulları içeriğini render eder.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: @/config/legal::legalConfig
+- import: @/utils/routes::Routes
+- import: @/utils/routes::localizedHref
+- import: next/link::Link
 - import: react::React
 
 ---
@@ -51,14 +52,27 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/components/tr/TermsOfUseContent.tsx::TermsOfUseContentTr
-- **params**: () — parametre almaz (React bileşen imzası `({ lang: string })` olarak tanımlı olmasına rağmen fonksiyon gövdesinde `lang` parametresi destructure edilmemiş ve hiç kullanılmamıştır)
-- **ic_degiskenler**: yerel değişken yoktur — fonksiyon doğrudan JSX döndürür
-- **Erisilen Dis Kaynaklar**:
-  - `legalConfig.websiteUrl` — 1. maddede site adresi olarak kullanılır (`www.{legalConfig.websiteUrl}`)
-  - `legalConfig.sellerTitle` — 3. maddede fikri mülkiyet sahibi, 5. maddede sorumluluk red-dicları içinde satıcı unvanı olarak kullanılır
-  - `legalConfig.lastUpdated` — 7. maddede koşulların son güncelleme tarihi olarak `<strong>` etiketi içinde gösterilir
-- **Dönüş**: JSX fragment (`<>...</>`) — 7 adet `<section>` içeren Türkçe Kullanım Koşulları içerik yapısı. Her bölüm bir `<h2>` başlık ve ilgili `<p>` veya `<ul>` açıklama içerir. Return türü React.FC bileşenidir.
-- **Yan Etkiler**: yok — saf bileşen, state değiştirmez, API çağrısı yapmaz, hook kullanmaz
+- **params**: `lang` — sayfa dili; `localizedHref` çağrılarında href üretmek için kullanılır
+- **ic_degiskenler**:
+  - `legalConfig.websiteUrl` — sitenin alan adı; `<p>` içinde `www.{legalConfig.websiteUrl}` olarak gösterilir
+  - `legalConfig.sellerTitle` — satıcı unvanı; işletme bilgisi, fikri mülkiyet ve sorumluluk reddi bölümlerinde `<strong>` içinde kullanılır
+  - `legalConfig.sellerAddress` — satıcı adresi; iletişim bilgisi satırında gösterilir
+  - `legalConfig.sellerEmail` — satıcı e-posta adresi; iletişim bilgisi satırında ve yetkisiz kullanım bildirimi yönlendirmesinde kullanılır
+  - `legalConfig.sellerPhone` — satıcı telefon numarası; iletişim bilgisi satırında gösterilir
+  - `legalConfig.mersis` — MERSİS numarası; iletişim bilgisi satırında gösterilir
+  - `legalConfig.tradeRegistryNo` — ticaret sicil numarası; iletişim bilgisi satırında gösterilir
+  - `legalConfig.etbisNo` — ETBİS kayıt numarası; iletişim bilgisi satırında gösterilir
+  - `legalConfig.lastUpdated` — koşulların son güncelleme tarihi; "Değişiklikler" bölümünde gösterilir
+  - `Routes.legal.mesafeliSatis()` — mesafeli satış sözleşmesi rotası; `localizedHref` ile birlikte `<Link>` href'inde kullanılır
+  - `Routes.legal.onBilgilendirme()` — ön bilgilendirme formu rotası; `localizedHref` ile birlikte `<Link>` href'inde kullanılır
+  - `Routes.legal.kvkk()` — KVKK aydınlatma metni rotası; `localizedHref` ile birlikte `<Link>` href'inde kullanılır
+  - `Routes.legal.gizlilik()` — gizlilik politikası rotası; `localizedHref` ile birlikte `<Link>` href'inde kullanılır
+  - `localizedHref(Routes.legal.mesafeliSatis(), lang)` — mesafeli satış sözleşmesi linkinin dile göre tam URL'si
+  - `localizedHref(Routes.legal.onBilgilendirme(), lang)` — ön bilgilendirme formu linkinin dile göre tam URL'si
+  - `localizedHref(Routes.legal.kvkk(), lang)` — KVKK aydınlatma metni linkinin dile göre tam URL'si
+  - `localizedHref(Routes.legal.gizlilik(), lang)` — gizlilik politikası linkinin dile göre tam URL'si
+  - `Link` — Next.js link bileşeni; mesafeli satış, ön bilgilendirme, KVKK ve gizlilik politikası sayfalarına yönlendirmek için kullanılır
+- **Dönüş**: React fragment (`<>...</>`) içinde 11 adet `<section>` elementi — Türkçe kullanım koşulları içeriği
 
 ---
 
@@ -83,7 +97,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-industrial-gray`, `text-xl`
+- **Renkler:** `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-xl`
 - **Layout:** (yok)
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `pl-6`, `space-y-1`
+- **Yardımcı Sınıflar:** `font-semibold`, `list-disc`, `mb-3`, `mt-2`, `pl-6`, `space-y-1`, `underline`

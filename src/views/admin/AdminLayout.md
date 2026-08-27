@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\AdminLayout.tsx
-skeleton_hash: 1808d3b25055cd3a
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminLayout.tsx
+skeleton_hash: 7201e18c626de406
 entity_hashes:
   func:AdminLayout: 3672368aae604677
   overview: 17bc6946654c7feb
   style_tokens: 56cdd112a4e87a83
-generated_at: 2026-08-25T07:29:55Z
+generated_at: 2026-08-27T07:17:36Z
 ---
 
 ## Genel Bakış
@@ -174,8 +174,8 @@ Admin panelinin genel sayfa yapısını oluşturur ve alt bileşenleri bu yapı 
 
 ## NODE ID STANDARD
 
-  file: AdminLayout.tsx
-  function: AdminLayout.tsx::AdminLayout
+  file: src\views\admin\AdminLayout.tsx
+  function: src\views\admin\AdminLayout.tsx::AdminLayout
 
 ---
 

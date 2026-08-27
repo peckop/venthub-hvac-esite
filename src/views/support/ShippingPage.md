@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\support\ShippingPage.tsx
-skeleton_hash: 8f55c1e6ffb341aa
+source_path: C:\tmp\venthub-wt-t131\src\views\support\ShippingPage.tsx
+skeleton_hash: 4ace6a6aea5912e9
 entity_hashes:
   func:ShippingPage: 321c885e2ea88a49
   overview: 2fb078273ffdbcdc
   style_tokens: f66481541679296a
-generated_at: 2026-08-25T07:32:06Z
+generated_at: 2026-08-27T07:41:11Z
 ---
 
 ## Genel Bakış
@@ -72,8 +72,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: ShippingPage.tsx
-  function: ShippingPage.tsx::ShippingPage
+  file: src\views\support\ShippingPage.tsx
+  function: src\views\support\ShippingPage.tsx::ShippingPage
 
 ---
 

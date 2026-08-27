@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\calculators\JetFanCalcPage.tsx
-skeleton_hash: 8c1fc45645cb2d1f
+source_path: C:\tmp\venthub-wt-t131\src\views\calculators\JetFanCalcPage.tsx
+skeleton_hash: a87b19e1bc2dfca4
 entity_hashes:
   func:JetFanCalcPage: b83a7ef4e6b81401
   func:getACHStatus: e2c951766a2e003c
   func:reset: 16764b441f7bc7b6
   overview: 72eb88bbbe4cd630
   style_tokens: 614f0725ca061dc9
-generated_at: 2026-08-25T07:31:38Z
+generated_at: 2026-08-27T07:32:40Z
 ---
 
 ## Genel Bakış
@@ -129,10 +129,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: JetFanCalcPage.tsx
-  function: JetFanCalcPage.tsx::JetFanCalcPage
-  function: JetFanCalcPage.tsx::reset
-  function: JetFanCalcPage.tsx::getACHStatus
+  file: src\views\calculators\JetFanCalcPage.tsx
+  function: src\views\calculators\JetFanCalcPage.tsx::JetFanCalcPage
+  function: src\views\calculators\JetFanCalcPage.tsx::reset
+  function: src\views\calculators\JetFanCalcPage.tsx::getACHStatus
 
 ---
 

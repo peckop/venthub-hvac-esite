@@ -2,18 +2,18 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\legal\DistanceSalesAgreementPage.tsx
-skeleton_hash: 3d9da3206aa6168d
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\DistanceSalesAgreementPage.tsx
+skeleton_hash: 7c698e88182f6399
 entity_hashes:
   func:DistanceSalesAgreementPage: de11566081e661c0
-  func:t: 281688e1734ee99d
-  overview: 2a142a6874192776
+  func:t: d9b8bfb5c1688ab1
+  overview: 33b5ec86d4ecfb63
   style_tokens: 06829f9d93bd4397
-generated_at: 2026-06-19T20:50:48Z
+generated_at: 2026-08-27T07:34:32Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHup platformunda yasal gereklilikler kapsamında "Uzaktan Satış Sözleşmesi" sayfasını render eden bağımsız bir React bileşenidir. Bileşen, sözleşmenin standart metnini dil ayarlarına göre sunar ve dinamik verileri (satıcı unvanı, web sitesi adresi, satıcı adresi gibi) proje genelinde paylaşılan yasal konfigürasyon nesnesinden alarak kullanıcılara ilgili hukuki metni gösterir.
+Bu modül, VentHup platformunda "Uzaktan Satış Sözleşmesi" sayfasını render eden bir React bileşenidir. Bileşen, sözleşme metnini dil ayarlarına göre sunar ve satıcı bilgileri gibi dinamik verileri yasal konfigürasyon nesnesinden alarak kullanıcıya gösterir. Sayfa içeriğinin çoklu dil desteğiyle görüntülenmesini sağlayan bir çeviri fonksiyonu içerir.
 
 ## Fonksiyon Grupları
 ### UI Rendering
@@ -27,14 +27,9 @@ Sayfanın tüm düzenini ve içeriğini oluşturarak kullanıcıya Uzaktan Satı
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, dil-destekli bir yasal sözleşme sayfa görünümü sunan minimal bir React bileşenidir.
-
-**[Aksiyom 1 - Dil Bağımlılığı]:** Eğer `lang` parametresi sağlanmazsa veya geçerli bir dil kodu içermiyorsa, sözleşme metni hedef dilde görüntülenemez.
-
-**[Aksiyom 2 - Çeviri Fonksiyonu]:** Eğer `t(key)` fonksiyonu çağrılmadan önce modül bağlamında tanımlanmamışsa (bağımlılık olarak enjekte edilmemişse), çeviri beklenmeyen şekilde başarısız olur.
-
-**[Aksiyom 3 - Parametre Gerekliliği]:** Eğer `lang` parametresi opsiyonel olarak işaretlenmemişse (fonksiyon imzasında default değer verilmemiştir), bileşen çağrısında bu parametre zorunludur; aksi halde TypeScript derleme hatası oluşur.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -51,14 +46,15 @@ Bu modül, dil-destekli bir yasal sözleşme sayfa görünümü sunan minimal bi
 **Dönüş**: `React.FC<{ lang: string }>` — Belirtilen dile uygun HTML yapısını içeren bir React Functional Component.
 
 ### t
-**Ne yapar**: Sayfa içindeki statik metinlerin (başlık, uyarı, feragatname) çevrilmesini sağlayan bir yardımcı fonksiyondur.
 
-**Nasıl yapar**: Dış fonksiyon (`DistanceSalesAgreementPage`) tarafından tanımlanan bir inner function'dır. Çalıştığı bağlamda (`DistanceSalesAgreementPage`'in kapanma alanı) zaten tanımlı olan `dict` (sözlük) nesnesine erişir. Verilen anahtar (`key`) ile `getDictValue` yardımcı fonksiyonunu kullanarak sözlükten ilgili çeviri metnini alır ve döndürür.
+**Ne yapar**: Verilen bir `key` parametresi aracılığıyla, aktif dile ait sözlükten karşılık gelen çeviri değerini getirir. Bileşenin içinde tanımlanmış bir yardımcı çeviri fonksiyonudur.
+
+**Nasıl yapar**: Fonksiyon, dış bileşenin `lang` parametresine göre seçilmiş olan `dict` sözlük nesnesini kullanır. `getDictValue` fonksiyonuna bu sözlüğü ve aranacak `key` değerini ileterek sonucu döndürür. Dil seçimi bileşen seviyesinde yapılır: `lang === 'en'` ise İngilizce (`en`) sözlüğü, aksi halde Türkçe (`tr`) sözlüğü atanır.
 
 **Parametreler**:
-- `key`: `string` — Çevrilecek metnin sözlük içindeki noktanotation ile belirtilen yolu (örn: `'legal.distanceSalesTitle'`).
+- key: string — Sözlükten getirilecek değerin nokta notasyonuyla belirtilen anahtar yolu (örneğin `'legal.distanceSalesTitle'`, `'legal.draftWarning'`, `'legal.disclaimer'`)
 
-**Dönüş**: `string` — Verilen anahtara karşılık gelen, seçili dile ait çevrilmiş metin.
+**Dönüş**: `getDictValue` fonksiyonunun dönüş tipine bağlıdır; kaynakta açıkça belirtilmemiştir.
 
 ---
 
@@ -68,6 +64,7 @@ Bu modül, dil-destekli bir yasal sözleşme sayfa görünümü sunan minimal bi
 - import: ../../i18n/getDictValue::getDictValue
 - import: ./components/en/DistanceSalesAgreementContent::DistanceSalesAgreementContentEn
 - import: ./components/tr/DistanceSalesAgreementContent::DistanceSalesAgreementContentTr
+- import: @/config/legal::isLegalContentReady
 - import: react::React
 
 ---
@@ -75,16 +72,20 @@ Bu modül, dil-destekli bir yasal sözleşme sayfa görünümü sunan minimal bi
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/legal/DistanceSalesAgreementPage.tsx::DistanceSalesAgreementPage
-- **params**: `{ lang }` — dil bilgisi ('en' veya 'tr')
+- **params**: `{ lang }` — bileşen prop'u; sayfa dilini belirtir (`'en'` veya `'tr'`)
 - **ic_degiskenler**:
-  - `dict` — lang parametresine göre İngilizce veya Türkçe sözlük nesnesini tutar (en veya tr)
-  - `t` — getDictValue fonksiyonunu dict ile bağlayan çeviri fonksiyonu; verilen key'e karşılık gelen sözlük değerini döndürür
-- **Dönüş**: JSX — Dil seçimine göre başlık, uyarı, mesafeli satış sözleşmesi içeriği ve feragatname gösteren React bileşeni
+  - `dict` — `lang === 'en'` koşulu sağlanırsa `en` sözlüğü, sağlanmazsa `tr` sözlüğü atanır; çeviri anahtarlarının çözümlenmesinde kullanılır
+  - `t` — `(key: string) => getDictValue(dict, key)` şeklinde tanımlanan arrow function; `dict` sözlüğünde `key` ile eşleşen değeri döndürür
+- **Dönüş**: JSX element — `div` kök elemanı içinde şu alt yapıyı içerir:
+  - `h1` başlığı: `t('legal.distanceSalesTitle')` çağrısıyla metin
+  - Koşullu uyarı bloğu: `!isLegalContentReady()` true ise sarı arka planlı `div` içinde `t('legal.draftWarning')` metni
+  - İçerik alanı: `lang === 'en'` ise `<DistanceSalesAgreementContentEn lang={lang} />`, değilse `<DistanceSalesAgreementContentTr lang={lang} />` bileşeni render edilir
+  - `p` paragrafı: `t('legal.disclaimer')` çağrısıyla metin
 
 ### [N2_NASIL] AST Pointer: src/views/legal/DistanceSalesAgreementPage.tsx::t
-- **params**: `key: string` — sözlükte aranacak çeviri anahtarı (ör. 'legal.distanceSalesTitle')
-- **ic_degiskenler**: (yok)
-- **Dönüş**: string — `getDictValue(dict, key)` çağrısıyla elde edilen sözlük değeri
+- **params**: `key: string` — sözlükte aranacak çeviri anahtarı
+- **ic_degiskenler**: yok
+- **Dönüş**: `getDictValue(dict, key)` fonksiyonunun dönüş değeri — `dict` kapsam dışındaki değişkenden gelir, `key` parametresiyle birlikte `getDictValue`'ya aktarılır
 
 ---
 

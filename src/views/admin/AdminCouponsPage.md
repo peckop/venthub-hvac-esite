@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx
-skeleton_hash: df403a75acdea28d
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminCouponsPage.tsx
+skeleton_hash: 6d57f8d3c8d3cf9a
 entity_hashes:
   func:AdminCouponsPage: e1c124663ca9483b
-  overview: 4ef12aeba405f39c
+  overview: 2094a307cb4d0099
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-19T20:48:41Z
+generated_at: 2026-08-27T07:11:39Z
 ---
 
 ## Genel Bakış
@@ -16,20 +16,8 @@ AdminCouponsPage modülü, yönetici panelinde kupon yönetimi sayfasını sunan
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Kupon yönetimi arayüzünün ana yapısını, state yönetimini, form elemanlarını ve kullanıcı etkileşim akışlarını orkestre eden merkezi React bileşenidir.
+Kupon yönetimi arayüzünün ana yapısını, state yönetimini, form elemanlarını ve kullanıcı etkileşim akışlarını orkestre eden merkezi React bileşenidir. Veri dönüştürme, filtreleme ve API etkileşimleri dahil tüm kupon yaşam döngüsü operasyonlarını bu bileşen içinde gerçekleştirir.
 - AdminCouponsPage
-
-### Veri Dönüştürme ve Doğrulama
-Veritabanından gelen kupon verilerini arayüzde gösterilebilir forma dönüştürür ve kupon türlerinin sistem tarafından izin verilen değerler arasında olup olmadığını doğrular.
-- dbToUi, isAllowedCouponType
-
-### Filtreleme
-Kullanıcı tarafından seçilen kriterlere göre kupon listesini dinamik olarak filtreleyerek görüntülenecek alt kümesi belirler.
-- filtered
-
-### API Etkileşimleri
-Sunucu tarafında yeni kupon kaydetme ve mevcut kuponların aktif/pasif durumunu değiştirme gibi kalıcı veri değişiklikleri için asenkron istekleri yönetir.
-- saveCoupon, toggleActive
 
 ---
 
@@ -37,6 +25,14 @@ Sunucu tarafında yeni kupon kaydetme ve mevcut kuponların aktif/pasif durumunu
 - Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
 - [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
 - [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** `AdminCouponsPage` fonksiyonunun gövdesi veri setinde yer almamaktadır. Yalnızca fonksiyon imzası (`def AdminCouponsPage() -> React.FC`) ve modül sabitleri (boş) mevcuttur. İmzada parametre veya default değer bulunmadığından, fonksiyon gövdesi olmadan mimari varsayım üretilemez.
 
 ---
 
@@ -53,9 +49,8 @@ Sunucu tarafında yeni kupon kaydetme ve mevcut kuponların aktif/pasif durumunu
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./CouponsTableBody::CouponsTableBody
 - import: react::React
 - import: react::Suspense
@@ -65,15 +60,10 @@ Sunucu tarafında yeni kupon kaydetme ve mevcut kuponların aktif/pasif durumunu
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::AdminCouponsPage
-- **params**: () — parametre almaz
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('admin.titles.coupons')` ve `t('admin.coupons.subtitle')` çağrılarıyla anahtar kelime tabanlı lokalize metin döndürür
-- **JSX Icindeki Kullanimlar**:
-  - `adminSectionTitleClass` — `adminUi` modülünden import edilen CSS class string'i; `<h1>` başlık elemanına uygulanır
-  - `adminSubtitleClass` — `adminUi` modülünden import edilen CSS class string'i; `<p>` alt başlık elemanına uygulanır
-  - `AdminSkeleton` — Suspense fallback'inde `variant="table" count={8} rows={6}` propslarıyla kullanılır; yükleme durumunda iskelet tablo gösterir
-  - `CouponsTableBody` — Suspense içine sarılı ana tablo gövdesi bileşeni; coupon verilerini yükler ve tablolar
-- **Dönüş**: `JSX.Element` — Admin Coupons sayfasının tamamını oluşturan React bileşeni; başlık, alt başlık ve Suspense ile sarılmış CouponsTableBody içeren bir `<div>` döndürür
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('admin.titles.coupons')` ve `t('admin.coupons.subtitle')` çağrılarıyla sayfa başlığı ve alt başlık metinlerini lokalize eder
+- **Dönüş**: JSX elementi — `className="space-y-6 pb-20"` ile stillenmiş bir `<div>` kapsayıcısı; içinde `AdminPageHeader` bileşeni (`title` ve `description` prop'larıyla) ve `Suspense` ile sarılmış `CouponsTableBody` bileşeni (fallback olarak `AdminSkeleton` kullanır, `variant="table"`, `count={8}`, `rows={6}` prop'larıyla) bulunur
 
 ---
 

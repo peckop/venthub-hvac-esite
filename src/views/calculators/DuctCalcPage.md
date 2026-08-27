@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\calculators\DuctCalcPage.tsx
-skeleton_hash: 02773ac7feece43b
+source_path: C:\tmp\venthub-wt-t131\src\views\calculators\DuctCalcPage.tsx
+skeleton_hash: a7b7a90699bfdb59
 entity_hashes:
   func:DuctCalcPage: 531002b319923b38
   func:reset: 16764b441f7bc7b6
   overview: baef5b6e42c8ff64
   style_tokens: 002582f3ef540f0d
-generated_at: 2026-08-25T07:31:58Z
+generated_at: 2026-08-27T07:32:38Z
 ---
 
 ## Genel Bakış
@@ -138,9 +138,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: DuctCalcPage.tsx
-  function: DuctCalcPage.tsx::DuctCalcPage
-  function: DuctCalcPage.tsx::reset
+  file: src\views\calculators\DuctCalcPage.tsx
+  function: src\views\calculators\DuctCalcPage.tsx::DuctCalcPage
+  function: src\views\calculators\DuctCalcPage.tsx::reset
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\legal\components\en\TermsOfUseContent.tsx
-skeleton_hash: 901c2fcd180664d0
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\components\en\TermsOfUseContent.tsx
+skeleton_hash: 0a4dbd48f8bf5509
 entity_hashes:
   func:TermsOfUseContentEn: 2d425a97c4f30297
   overview: 55f2a6482c0be2a4
   style_tokens: c2df28d44e819ffd
-generated_at: 2026-08-25T07:48:22Z
+generated_at: 2026-08-27T07:38:25Z
 ---
 
 ## Genel Bakış
@@ -91,8 +91,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: TermsOfUseContent.tsx
-  function: TermsOfUseContent.tsx::TermsOfUseContentEn
+  file: src\views\legal\components\en\TermsOfUseContent.tsx
+  function: src\views\legal\components\en\TermsOfUseContent.tsx::TermsOfUseContentEn
 
 ---
 

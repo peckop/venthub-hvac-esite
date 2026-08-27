@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\legal\components\tr\KvkkContent.tsx
-skeleton_hash: 1b73a8efd8260b09
+source_path: C:\tmp\venthub-wt-t131\src\views\legal\components\tr\KvkkContent.tsx
+skeleton_hash: e6afac47ecfdd02a
 entity_hashes:
   func:KvkkContentTr: ce8aa32329dc415e
   overview: 9ac8e2b6eeaddd22
   style_tokens: 93d28fc913e27f7d
-generated_at: 2026-08-25T07:32:16Z
+generated_at: 2026-08-27T07:39:45Z
 ---
 
 ## Genel Bakış
@@ -82,8 +82,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: KvkkContent.tsx
-  function: KvkkContent.tsx::KvkkContentTr
+  file: src\views\legal\components\tr\KvkkContent.tsx
+  function: src\views\legal\components\tr\KvkkContent.tsx::KvkkContentTr
 
 ---
 

@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\types\db-rows.ts
-skeleton_hash: ed3ebdafcfc05c8b
+source_path: C:\tmp\venthub-wt-t131\src\types\db-rows.ts
+skeleton_hash: efbc6c4ddc1eb8d8
 entity_hashes:
   overview: 700f37bc5a714626
-generated_at: 2026-08-13T08:54:02Z
+generated_at: 2026-08-27T07:07:34Z
 ---
 
 ## Genel Bakış
@@ -303,20 +303,6 @@ Bu dosya **(`db-rows.ts`)** bir **TypeScript tip tanımlama dosyasıdır** (`imp
 - **Fonksiyon gövdesi bulunmamaktadır**
 - **Sadece tip tanımları (type/interface) yer almaktadır**
 - **Hiçbir çalıştırılabilir kod içermemektedir**
-
----
-
-### Sonuç
-
-| Kategori | Durum |
-|----------|-------|
-| Fonksiyon sayısı | 0 |
-| AST Pointer üretimi | Yapılamaz |
-| Neden | Dosya sadece type tanımlarından oluşmaktadır;fonksiyon gövdesi, parametre veya iç değişken bulunmamaktadır |
-
----
-
-**Not:** Bu dosya `db-rows.ts` olarak adlandırılmış olup muhtemelen veritabanı satırları için tip tanımları (`DbRow`, `UserRow`, `OrderRow` gibi interface/type tanımları) içermektedir. Çalıştırılabilir fonksiyon barındırmadığı için AST Pointer analizi uygulanamaz.
 
 ---
 

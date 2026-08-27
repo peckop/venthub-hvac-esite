@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventorySettingsPage.tsx
-skeleton_hash: 4951bc8903437c34
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminInventorySettingsPage.tsx
+skeleton_hash: cf467ca46cc66985
 entity_hashes:
   func:AdminInventorySettingsPage: 19119fa4d0915cd3
   func:save: f665f70eecd0464b
   func:saveGeneralSettings: 8c4e593571ba8563
-  overview: 9323d0a1247c733d
-  style_tokens: 4fdace2e7c9567fa
-generated_at: 2026-06-19T20:48:46Z
+  overview: bac780a222edc79e
+  style_tokens: d543402d4cb49685
+generated_at: 2026-08-27T07:17:32Z
 ---
 
 ## Genel Bakış
@@ -30,7 +30,7 @@ Yapılan değişikliklerin sunucuya iletilmesini ve kalıcı olarak saklanmasın
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, yönetici panelindeki envanter ayarları sayfasını ve ilişkili kaydetme mantığını içeren bir React bileşenidir. Aşağıdaki mimari varsayımlar fonksiyon imzalarından türetilmiştir.
+Bu modül için özel aksiyom tanımlanmamıştır. Fonksiyon gövdeleri sağlanmadığından, modülün doğru çalışması için gerekli koşullar belirlenememiştir.
 
 ---
 
@@ -65,6 +65,7 @@ Bu modül, yönetici panelindeki envanter ayarları sayfasını ve ilişkili kay
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/overlay/ConfirmProvider::useConfirm
 - import: ../../hooks/useRole::useRole
 - import: @/i18n/I18nProvider::useI18n
 - import: @/lib/admin/mutateWithAudit::AdminPermissionError
@@ -91,107 +92,86 @@ Bu modül, yönetici panelindeki envanter ayarları sayfasını ve ilişkili kay
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::AdminInventorySettingsPage
-- **params**: ()
-- **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, tüm metinleri çevirir
-  - `pathname` — usePathname hook'undan gelen mevcut URL yolu, efektleri tetikler
-  - `defaultThreshold` — Stok uyarı eşiği değeri (sayı veya boş string), form input'unun değeri
-  - `setDefaultThreshold` — defaultThreshold state setter'ı
-  - `resetAll` — Tüm ürünlere eşik değerini uygulayıp uygulamayacağını belirten boolean
-  - `setResetAll` — resetAll state setter'ı
-  - `loading` — Veri yükleme durumu (LoadState enum)
-  - `setLoading` — loading state setter'ı
-  - `saving` — Eşik formunun kaydetme durumu
-  - `setSaving` — saving state setter'ı
-  - `savingGeneral` — Genel ayarlar formunun kaydetme durumu
-  - `setSavingGeneral` — savingGeneral state setter'ı
-  - `error` — Hata mesajı string'i
-  - `setError` — error state setter'ı
-  - `success` — Başarı mesajı string'i
-  - `setSuccess` — success state setter'ı
-  - `alertEmail` — Alarm e-posta adresi, form input'unun değeri
-  - `setAlertEmail` — alertEmail state setter'ı
-  - `alertWebhook` — Webhook URL'i, form input'unun değeri
-  - `setAlertWebhook` — alertWebhook state setter'ı
-  - `resTimeout` — Rezervasyon zaman aşımı süresi (saat), varsayılan 24
-  - `setResTimeout` — resTimeout state setter'ı
-  - `canWrite` — useRole hook'undan gelen izin kontrol fonksiyonu
-  - `hasWriteAccess` — canWrite('inventory_settings') ile hesaplanan yazma izni boolean'ı
-  - `load` — React.useCallback ile tanımlı, veritabanından ayarları yükleyen async fonksiyon
-  - `save` — Stok eşiği ayarlarını kaydeden async fonksiyon
-  - `saveGeneralSettings` — Genel alarm ve rezervasyon ayarlarını kaydeden async fonksiyon
-- **Dönüş**: JSX element (React component)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (ana bileşen fonksiyonu, gövdesi verilmemiş)
+- **Dönüş**: React.FC
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::load
-- **params**: ()
-- **ic_degiskenler**:
-  - `setLoading` — Dış kapsamdan gelen loading state setter'ı
-  - `supabase` — Dış kapsamdan gelen Supabase istemcisi
-  - `data` — supabase.from('inventory_settings').select('*').maybeSingle() yanıtının data alanı
-  - `error` — supabase.from('inventory_settings').select('*').maybeSingle() yanıtının error alanı
-  - `val` — data.default_low_stock_threshold değerini number veya null olarak çıkaran geçici değişken
-  - `setDefaultThreshold` — Dış kapsamdan gelen setter
-  - `setAlertEmail` — Dış kapsamdan gelen setter
-  - `setAlertWebhook` — Dış kapsamdan gelen setter
-  - `setResTimeout` — Dış kapsamdan gelen setter
-  - `setError` — Dış kapsamdan gelen setter
-  - `t` — Dış kapsamdan gelen çeviri fonksiyonu
-- **Dönüş**: void (Promise)
+---
 
-### [N3_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::save
-- **params**: ()
+### [N2_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::anonim_async_load
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `setSaving` — Dış kapsamdan gelen saving state setter'ı
-  - `setSuccess` — Dış kapsamdan gelen success state setter'ı
-  - `setError` — Dış kapsamdan gelen error state setter'ı
-  - `defaultThreshold` — Dış kapsamdan gelen stok eşiği değeri
-  - `value` — defaultThreshold'u number veya null'a dönüştüren yerel değişken
-  - `mutateWithAudit` — Dış kapsamdan gelen audit korumalı mutasyon fonksiyonu
-  - `supabase` — Dış kapsamdan gelen Supabase istemcisi
-  - `hasWriteAccess` — Dış kapsamdan gelen yazma izni boolean'ı
-  - `resetAll` — Dış kapsamdan gelen toplu uygulama boolean'ı
-  - `t` — Dış kapsamdan gelen çeviri fonksiyonu
-  - `load` — Dış kapsamdan gelen veri yükleme fonksiyonu
-  - `e` — catch bloğundaki hata nesnesi
-  - `msg` — e nesnesinden türetilen kullanıcıya gösterilecek hata mesajı string'i
-- **Dönüş**: void (Promise)
+  - `data` — Supabase `inventory_settings` tablosundan `select('*').maybeSingle()` ile çekilen satır; `default_low_stock_threshold`, `alert_email`, `alert_webhook_url`, `reservation_timeout_hours` alanlarına erişilir
+  - `error` — Supabase sorgusundan dönen hata nesnesi; varsa throw ile fırlatılır
+  - `val` — `data?.default_low_stock_threshold` değeri, `number | null` tipinde; null ise formda boş gösterilir
+  - `thresholdVal` — `val` null ise boş string `''`, değilse `Number(val)` ile sayıya dönüştürülen eşik değeri
+  - `emailVal` — `data?.alert_email` değeri; yoksa boş string `''`
+  - `webhookVal` — `data?.alert_webhook_url` değeri; yoksa boş string `''`
+  - `timeoutVal` — `data?.reservation_timeout_hours` değeri; yoksa varsayılan `24`
+- **Dönüş**: yok
+- **Yan etkiler**: `setLoading`, `setDefaultThreshold`, `setAlertEmail`, `setAlertWebhook`, `setResTimeout`, `setResetAll`, `setError`, `setInitialValues` state setter'larını çağırır; hata durumunda `setError` ve `setLoading(LoadState.Error)` ile hata state'ini günceller
 
-### [N4_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::save.fn
-- **params**: ()
-- **ic_degiskenler**:
-  - `supabase` — Dış kapsamdan (save fonksiyonu) gelen Supabase istemcisi
-  - `value` — Dış kapsamdan (save fonksiyonu) gelen sayısal eşik değeri
-  - `resetAll` — Dış kapsamdan (save fonksiyonu) gelen toplu uygulama boolean'ı
-  - `error` — supabase.rpc() yanıtının hata alanı
-- **Dönüş**: void (Promise)
+---
 
-### [N5_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::saveGeneralSettings
-- **params**: ()
+### [N3_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::anonim_useEffect_cleanup
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `setSavingGeneral` — Dış kapsamdan gelen savingGeneral state setter'ı
-  - `setSuccess` — Dış kapsamdan gelen success state setter'ı
-  - `setError` — Dış kapsamdan gelen error state setter'ı
-  - `mutateWithAudit` — Dış kapsamdan gelen audit korumalı mutasyon fonksiyonu
-  - `supabase` — Dış kapsamdan gelen Supabase istemcisi
-  - `hasWriteAccess` — Dış kapsamdan gelen yazma izni boolean'ı
-  - `alertEmail` — Dış kapsamdan gelen e-posta adresi string'i
-  - `alertWebhook` — Dış kapsamdan gelen webhook URL string'i
-  - `resTimeout` — Dış kapsamdan gelen zaman aşımı süresi (saat)
-  - `t` — Dış kapsamdan gelen çeviri fonksiyonu
-  - `load` — Dış kapsamdan gelen veri yükleme fonksiyonu
-  - `e` — catch bloğundaki hata nesnesi
-  - `msg` — e nesnesinden türetilen kullanıcıya gösterilecek hata mesajı string'i
-- **Dönüş**: void (Promise)
+  - `handleBeforeUnload` — `window` `beforeunload` olayını dinleyen fonksiyon; `isFormDirty` true ise `e.preventDefault()` çağırır ve `e.returnValue = ''` atar
+- **Dönüş**: cleanup fonksiyonu — `window.removeEventListener('beforeunload', handleBeforeUnload)` çağırır
 
-### [N6_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::saveGeneralSettings.fn
-- **params**: ()
+---
+
+### [N4_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::handleBeforeUnload
+- **params**:
+  - `e` — `BeforeUnloadEvent` tipinde; tarayıcı sekmesi kapatılmadan önce tetiklenen olay nesnesi
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` (`''`) veya `undefined` — `isFormDirty` true ise `e.preventDefault()` çağrılır ve boş string döndürülür; false ise hiçbir şey yapılmaz
+
+---
+
+### [N5_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::save
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `supabase` — Dış kapsamdan (saveGeneralSettings fonksiyonu) gelen Supabase istemcisi
-  - `alertEmail` — Dış kapsamdan (saveGeneralSettings fonksiyonu) gelen e-posta adresi
-  - `alertWebhook` — Dış kapsamdan (saveGeneralSettings fonksiyonu) gelen webhook URL'i
-  - `resTimeout` — Dış kapsamdan (saveGeneralSettings fonksiyonu) gelen zaman aşımı süresi
-  - `error` — supabase.from().update().eq() yanıtının hata alanı
-- **Dönüş**: void (Promise)
+  - `ok` — `confirm()` dialog sonucu; kullanıcı onaylarsa true, iptal ederse false; `resetAll` true iken gösterilen onay dialogundan döner
+  - `value` — `defaultThreshold` boş string ise `null`, değilse `Number(defaultThreshold)` ile sayıya dönüştürülen eşik değeri; `update_inventory_thresholds` RPC'sine `p_default` parametresi olarak gönderilir
+  - `e` — `catch` bloğunda yakalanan hata nesnesi; `AdminPermissionError` veya `Error` tipine göre farklı mesaj gösterilir
+  - `msg` — hata tipine göre belirlenen kullanıcıya gösterilecek mesaj; `AdminPermissionError` ise yetki hatası, `Error` ise `e.message`, diğer durumlarda çeviri anahtarı
+- **Dönüş**: yok
+- **Yan etkiler**: `setSaving`, `setSuccess`, `setError` state setter'larını çağırır; `mutateWithAudit` ile `update_inventory_thresholds` RPC'sini tetikler; başarılı olursa `load()` fonksiyonunu çağırır; `setSaving(false)` ile yüklenme durumunu sıfırlar
+
+---
+
+### [N6_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::save::mutateWithAudit_fn
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `error` — `supabase.rpc('update_inventory_thresholds', ...)` çağrısından dönen hata; varsa throw ile fırlatılır
+  - `p_default` — RPC parametresi olarak gönderilen `value` değeri, `number` tipinde zorlanır (`as number`)
+  - `p_reset_overrides` — RPC parametresi olarak gönderilen `resetAll` boolean değeri; tüm ürün-bazlı eşik override'larını silme bayrağı
+- **Dönüş**: yok
+- **Yan etkiler**: Supabase `update_inventory_thresholds` RPC fonksiyonunu çağırır
+
+---
+
+### [N7_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::saveGeneralSettings
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `e` — `catch` bloğunda yakalanan hata nesnesi; `AdminPermissionError` veya `Error` tipine göre farklı mesaj gösterilir
+  - `msg` — hata tipine göre belirlenen kullanıcıya gösterilecek mesaj; `AdminPermissionError` ise yetki hatası, `Error` ise `e.message`, diğer durumlarda çeviri anahtarı
+- **Dönüş**: yok
+- **Yan etkiler**: `setSavingGeneral`, `setSuccess`, `setError` state setter'larını çağırır; `mutateWithAudit` ile `inventory_settings` tablosunu güncelleme işlemi tetikler; başarılı olursa `load()` fonksiyonunu çağırır; `setSavingGeneral(false)` ile yüklenme durumunu sıfırlar
+
+---
+
+### [N8_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::saveGeneralSettings::mutateWithAudit_fn
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `error` — `supabase.from('inventory_settings').update(...)` çağrısından dönen hata; varsa throw ile fırlatılır
+  - `alert_email` — `alertEmail` state değeri; boşsa `null` olarak gönderilir
+  - `alert_webhook_url` — `alertWebhook` state değeri; boşsa `null` olarak gönderilir
+  - `reservation_timeout_hours` — `resTimeout` state değeri; yoksa varsayılan `24` gönderilir
+  - `updated_at` — `new Date().toISOString()` ile üretilen güncel zaman damgası
+- **Dönüş**: yok
+- **Yan etkiler**: Supabase `inventory_settings` tablosunda `.eq('id', true)` koşuluyla satır güncelleme işlemi gerçekleştirir
 
 ---
 
@@ -224,10 +204,10 @@ graph TD
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-xl`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500/5`, `bg-cyan-500/5`, `bg-rose-500/5`, `bg-surface-deep/40`, `bg-transparent`, `bg-violet-500`, `bg-violet-500/5`, `border-amber-500/10`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `first:border-t-0`, `group-hover/item:text-cyan-400`, `group-hover:bg-amber-500/10`
+- **Renkler:** `bg-admin-accent`, `bg-admin-danger-weak`, `bg-admin-surface`, `bg-admin-warning-weak`, `bg-surface-deep/40`, `bg-transparent`, `border-admin-border`, `border-admin-danger/30`, `border-admin-warning/30`, `border-t`, `first:border-t-0`, `group-hover/item:text-admin-accent`, `hover:bg-admin-accent`, `hover:border-admin-border`, `text-admin-accent`
 - **Layout:** `block`, `flex`, `flex-1`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `h-14`, `h-5`, `items-center`, `items-end`, `items-start`, `justify-end`
-- **Varyant/Responsive:** `first:`, `focus-visible:`, `group-hover/item:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `${adminBlurBlobClass`, `${adminButtonPrimaryClass`, `${adminCardClass`, `${adminInputClass`, `${adminInputThresholdClass`, `${adminInputTimeoutClass`, `animate-in`, `border`, `cursor-pointer`, `duration-700`, `fade-in`, `first:pt-0`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`
+- **Varyant/Responsive:** `first:`, `focus-visible:`, `group-hover/item:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminCardClass`, `${adminInputClass`, `${adminInputThresholdClass`, `${adminInputTimeoutClass`, `animate-in`, `border`, `cursor-pointer`, `duration-700`, `fade-in`, `first:pt-0`, `focus-visible:ring-admin-accent/30`, `font-bold`, `font-semibold`, `group`

@@ -2,29 +2,27 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminPricePreviewPage.tsx
-skeleton_hash: 6ce858d9d2374d34
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminPricePreviewPage.tsx
+skeleton_hash: a12890eded5826aa
 entity_hashes:
   func:AdminPricePreviewPage: d76022c4c2d70ef6
-  overview: fc36ebf0837e0537
+  overview: c6580e02bc96aa38
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-08-14T09:17:41Z
+generated_at: 2026-08-27T07:20:08Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelinde fiyatlandırma verilerinin önizlenmesini sağlayan tek sayfalık bir React bileşenini tanımlar. Sayfa, muhtemelen fiyat listelerini, filtreleme seçeneklerini ve düzenlemeye yönelik arayüz elemanlarını bir araya getirerek yöneticilerin fiyatlandırma politikalarını görsel olarak kontrol etmesine olanak tanır.
+Bu modül, yönetici panelinde fiyatlandırma verilerinin önizlenmesini sağlayan tek sayfalık bir React bileşenini tanımlar. Sayfa, ürün bazlı fiyat karşılaştırmasını segment, para birimi ve miktar filtreleriyle sunar. Bileşen, PricePreviewPanel alt bileşenini Suspense ile sararak URL query parametrelerine bağlı asenkron veri yüklemesini yönetir.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Fiyatlandırma önizleme arayüzünün tamamını oluşturan ana konteyner bileşeni. Kullanıcı etkileşimlerini yönetir ve alt bileşenleri düzenler.
+Fiyatlandırma önizleme arayüzünün tamamını oluşturan ana konteyner bileşendir. Sayfa başlığını render eder ve PricePreviewPanel bileşenini Suspense sarmalayıcısı içinde barındırır; bu yapı, useSearchParams hook'u nedeniyle zorunludur.
 - AdminPricePreviewPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -50,9 +48,8 @@ Fiyatlandırma önizleme arayüzünün tamamını oluşturan ana konteyner bile�
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./PricePreviewPanel::PricePreviewPanel
 - import: react::React
 - import: react::Suspense
@@ -62,10 +59,10 @@ Fiyatlandırma önizleme arayüzünün tamamını oluşturan ana konteyner bile�
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminPricePreviewPage.tsx::AdminPricePreviewPage
-- **params**: (parametre yok)
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('admin.titles.pricingPreview')` ve `t('admin.pricing.preview.subtitle')` çağrılarıyla başlık ve alt başlık metinlerini uluslararası dilde döndürür
-- **Dönüş**: JSX döndürür — `<div>` wrapper içinde `<header>` (başlık ve alt başlık) ve `<Suspense>` ile sarılmış `<PricePreviewPanel />` bileşeni; Suspense fallback olarak `<AdminSkeleton variant="form" fields={4} />` gösterir
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `admin.titles.pricingPreview` ve `admin.pricing.preview.subtitle` anahtarlarıyla sayfa başlığı ve alt başlık metinlerini almak için kullanılır
+- **Dönüş**: JSX — bir `div` (className `"space-y-6 pb-20"`) içinde `AdminPageHeader` bileşeni (`title` ve `description` prop'ları ile) ve `Suspense` ile sarılmış `PricePreviewPanel` bileşeni döndürür; `Suspense` yüklenirken `AdminSkeleton` (variant `"form"`, fields `4`) fallback olarak gösterilir
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\knowledge\TopicPage.tsx
-skeleton_hash: 6b0ffa53b127489b
+source_path: C:\tmp\venthub-wt-t131\src\views\knowledge\TopicPage.tsx
+skeleton_hash: 2a38901c920a434b
 entity_hashes:
   func:TopicPage: f0965ed8eda6ce60
   overview: 6055c95ad4a87f00
   style_tokens: cc78d049395b1cf9
-generated_at: 2026-08-25T07:32:00Z
+generated_at: 2026-08-27T07:33:49Z
 ---
 
 ## Genel Bakış
@@ -92,8 +92,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: TopicPage.tsx
-  function: TopicPage.tsx::TopicPage
+  file: src\views\knowledge\TopicPage.tsx
+  function: src\views\knowledge\TopicPage.tsx::TopicPage
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\support\WarrantyPage.tsx
-skeleton_hash: 36d1ed89a33153dd
+source_path: C:\tmp\venthub-wt-t131\src\views\support\WarrantyPage.tsx
+skeleton_hash: 11a12879c296d877
 entity_hashes:
   func:WarrantyPage: 10b812b014f5f78b
   overview: 24646a95fed0395f
   style_tokens: f66481541679296a
-generated_at: 2026-06-19T20:51:03Z
+generated_at: 2026-08-27T07:41:12Z
 ---
 
 ## Genel Bakış

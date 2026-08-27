@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\PaymentSuccessPage.tsx
-skeleton_hash: 1bec43a9d884913e
+source_path: C:\tmp\venthub-wt-t131\src\views\PaymentSuccessPage.tsx
+skeleton_hash: 85f77e8b5b560edc
 entity_hashes:
   func:PaymentSuccessPage: 1b3614ca0faf5f01
   overview: af5b78ab3c363714
   style_tokens: dcab201fde8662b7
-generated_at: 2026-08-25T07:29:55Z
+generated_at: 2026-08-27T07:09:55Z
 ---
 
 ## Genel Bakış
@@ -128,8 +128,8 @@ type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: str
 
 ## NODE ID STANDARD
 
-  file: PaymentSuccessPage.tsx
-  function: PaymentSuccessPage.tsx::PaymentSuccessPage
+  file: src\views\PaymentSuccessPage.tsx
+  function: src\views\PaymentSuccessPage.tsx::PaymentSuccessPage
 
 ---
 

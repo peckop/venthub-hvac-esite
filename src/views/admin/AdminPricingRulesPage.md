@@ -2,24 +2,22 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminPricingRulesPage.tsx
-skeleton_hash: 1193a447d8f1fa22
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminPricingRulesPage.tsx
+skeleton_hash: 57846c9846dcd9f7
 entity_hashes:
   func:AdminPricingRulesPage: c44326a0069563ae
-  overview: 20aa255e4d5d76e9
+  overview: 349955979a3fd56e
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-08-14T09:18:03Z
+generated_at: 2026-08-27T07:20:43Z
 ---
 
 ## Genel Bakış
-
-`AdminPricingRulesPage` modülü, HVAC servis platformunun yönetici panelinde fiyatlandırma kurallarının yönetildiği sayfa bileşenidir. Tek bir React fonksiyonel bileşeninden oluşan bu modül, fiyatlandırma politikalarının görüntülenmesi, eklenmesi ve düzenlenmesi için arayüz sağlar.
+Bu modül, HVAC servis platformunun yönetici panelinde fiyatlandırma kurallarının yönetimini sağlayan sayfa bileşenini içerir. Tek bir fonksiyonel bileşenden oluşan modül, fiyatlandırma politikalarının görüntülenmesi ve düzenlenmesi için kullanıcı arayüzü sunar.
 
 ## Fonksiyon Grupları
-
 ### Sayfa Bileşeni
-Tek bileşenli bir sayfa yapısına sahiptir ve fiyatlandırma kuralları yönetimini üstlenir.
-- `AdminPricingRulesPage` — Yönetici panelinde fiyatlandırma kurallarını listeleme ve yönetim işlemlerini gerçekleştiren ana sayfa bileşeni
+Tek bileşenli bir sayfa yapısına sahiptir ve fiyatlandırma kuralları yönetimini üstlenir. Bileşen, veri yüklenirken bir yedek içerik göstermek için Suspense kullanır.
+- AdminPricingRulesPage
 
 ---
 
@@ -45,9 +43,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../components/admin/shell/AdminPageHeader::AdminPageHeader
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/adminUi::adminSectionTitleClass
-- import: ../../utils/adminUi::adminSubtitleClass
 - import: ./PricingRulesTableBody::PricingRulesTableBody
 - import: react::React
 - import: react::Suspense
@@ -56,11 +53,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminPricingRulesPage.tsx::AdminPricingRulesPage
+### [N1_NASIL] AST Pointer: src/views/admin/AdminPricingRulesPage.tsx::AdminPricingRulesPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan elde edilen çeviri fonksiyonu, UI metinlerini uluslararası dilde göstermek için kullanılır
-- **Dönüş**: React.FC (JSX element döndürür)
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('admin.pricing.rules.title')` ve `t('admin.pricing.rules.subtitle')` çağrılarıyla sayfa başlığı ve açıklaması için metin üretmek amacıyla kullanılır
+- **Dönüş**: JSX elementi — `div.space-y-6.pb-20` kapsayıcısı içinde `AdminPageHeader` bileşeni (title ve description prop'ları ile) ve `Suspense` ile sarılmış `PricingRulesTableBody` bileşeni döndürülür; `Suspense` fallback olarak `AdminSkeleton` (variant="table", count={8}, rows={6}) kullanır
 
 ---
 
