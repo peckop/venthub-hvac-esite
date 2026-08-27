@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "ee480318fb1f6917be5bdbb64bfe8e594e46eb94caf5cc2f2217624e4955f540",
+      "icerik_sha256": "9045cd72aaf555e3389ae68ef9e00ed7c017caeb822eca7a70546726d7cca540",
       "kaynak": {
         "dosya_sayisi": 98,
         "dosyalar": {
@@ -108,7 +108,7 @@
         "izlenmeyen": [],
         "ozet": "13aca04c7a35256389064f212cccbf532b90b069fc40fe29bd8e467c6c22e036"
       },
-      "kaynak_commit": "da05e8904915f8d2fce94d4a6911ab62b4d62f8d",
+      "kaynak_commit": "0a3e9d1abb26a30a1a03f96089add6cd82dbcbf8",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +125,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "3b9072a6a7d6110633b9c87bc16ef428b8949a91b9a5ccb134abe32d0bc5defa",
+      "icerik_sha256": "6d367279bd312d50e1c949bfb91edb5888c75b3cd506f3325a777bdf1a63e5a8",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -195,7 +195,7 @@
         "izlenmeyen": [],
         "ozet": "c99b0b974d927c16ceb0af0f89db5dc833b46518a811199ec0aab586052466ef"
       },
-      "kaynak_commit": "da05e8904915f8d2fce94d4a6911ab62b4d62f8d",
+      "kaynak_commit": "0a3e9d1abb26a30a1a03f96089add6cd82dbcbf8",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +204,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "2c01f87ab5cd57b6d4b96703a17f27e5a2280397927f270e02559d4fa8d2d2cf",
+      "icerik_sha256": "fc55dcb107ed9104c5a421f0af6e33853f5c878367dad890eb692f0e50ae34fc",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +251,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "da05e8904915f8d2fce94d4a6911ab62b4d62f8d",
+      "kaynak_commit": "0a3e9d1abb26a30a1a03f96089add6cd82dbcbf8",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,7 +259,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "c2c7d2db514e68bdb498f3f79bb6ada874adfc9a856b6bcef150d002033ad558",
+      "icerik_sha256": "c622134a5ac19545c1a1e36ea63e06b594fd0fe2d9a4c414591883e708804ead",
       "kaynak": {
         "dosya_sayisi": 655,
         "dosyalar": {
@@ -534,7 +534,7 @@
           "src/components/products/3d/types/AirPurifierModel.md": "1948569bbf4eaaa14784ee40f515ce7e80a98d71",
           "src/components/products/3d/types/AxialFanModel.md": "4e0acc4ac52a348c6c92352b6103444b9dc630c9",
           "src/components/products/3d/types/CentrifugalFanModel.md": "b776628bed9c000a389cfbefb928198e311885c8",
-          "src/components/products/3d/types/DehumidifierModel.md": "05acf72d65f248c02a76aac7067b900027d3172f",
+          "src/components/products/3d/types/DehumidifierModel.md": "c12554435736a44bd0dd1bca08d0b4f0cf806fb8",
           "src/components/products/3d/types/DomesticFanModel.md": "ca4a343a5f689115116d64d7f87448544e0eb758",
           "src/components/products/3d/types/DuctFanModel.md": "b3aa70e0646520c4bd9125868e938a45ceaa6184",
           "src/components/products/3d/types/ExproofFanModel.md": "d1f53c8fe2c6d1cad57bbe192532fd51950b2e74",
@@ -547,7 +547,7 @@
           "src/components/products/3d/types/RoundDuctFanModel.md": "f26b6a1addd3557a548364e3c7216295c6b39d00",
           "src/components/products/3d/types/SilentChannelFanModel.md": "07f48ca296423845516721ba78fc9086d54ea026",
           "src/components/products/3d/types/SmokeExhaustFanModel.md": "8d496ad2e7e38270b01f162acda568624595696e",
-          "src/components/products/3d/types/SnailFanModel.md": "431917dcde123418bdbe4cc5515e1b805039e623",
+          "src/components/products/3d/types/SnailFanModel.md": "4ac06912d015642534a59a6ff9f7b76a66b76989",
           "src/components/products/3d/types/SpeedControlModel.md": "4b6f963d20436d7c4fd2c369fd679718533c87f5",
           "src/components/products/3d/types/WallMountedCompactFanModel.md": "001dce4418204cf6eba897356aad4a9bcf2daaa7",
           "src/components/products/AddToProjectModal.md": "893c1ff1b35ed0c67d37735678e091d1d9e716a7",
@@ -920,9 +920,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "85368f911da518be4cd99fd9c6bfadf748d6488e9c0a056053f625d520430e70"
+        "ozet": "4b52ff14fd29fdea186bee29a2179d77eea9d1d510fc68922482001a8ca94064"
       },
-      "kaynak_commit": "da05e8904915f8d2fce94d4a6911ab62b4d62f8d",
+      "kaynak_commit": "0a3e9d1abb26a30a1a03f96089add6cd82dbcbf8",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -931,7 +931,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-27T12:38:01.572960+00:00",
-  "kaynak_commit": "da05e8904915f8d2fce94d4a6911ab62b4d62f8d",
+  "derlendi": "2026-08-27T12:53:38.147512+00:00",
+  "kaynak_commit": "0a3e9d1abb26a30a1a03f96089add6cd82dbcbf8",
   "surum": 1
 }
