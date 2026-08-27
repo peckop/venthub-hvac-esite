@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-hotfix\e2e\admin-smoke.e2e.ts
-skeleton_hash: 04c7e0b87d83897c
+source_path: C:\tmp\vh-t088\e2e\admin-smoke.e2e.ts
+skeleton_hash: 201c205a6539e8f1
 entity_hashes:
   overview: 529d691256ce33bd
-generated_at: 2026-08-14T21:38:09Z
+generated_at: 2026-08-27T13:04:03Z
 ---
 
 ## Genel Bakış

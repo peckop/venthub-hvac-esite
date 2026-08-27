@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T13:46:47.304130+00:00
+compiled_at: 2026-08-27T13:36:00.286964+00:00
 total_compiled_files: 62
-source_commit: 73374ffc
+source_commit: 49945b8f
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -4747,113 +4747,6 @@ geçirilmemesinde**. Uzun vade tercihi bot/CI yapılandırmasına dokunduğu iç
 Kod dizinlerinde **668** `.md`; **665** eşli, **2** yetim (temizlendi), **1** muaf.
 Temizlik sonrası ihlal listesi **BOŞ** — bu yüzden bekçi ratchet/baseline taşımaz,
 muafiyetsiz ve tam kapalı kurulmuştur.
-
-## C8 — BİLEREK DONDURULMUŞ companion: karar yazılmazsa hiçbir ölçüm geri getirmez
-
-> Ölçülmüş vaka (2026-08-27, REC-83). Dört şerit toplam ~40 companion'ı **bilerek** bayat
-> bıraktı: üreteç o dosyalarda sembol kaybediyordu ve "bayat ama TAM" sürüm, "taze ama EKSİK"
-> olana tercih edildi. Sonra I18N bir yapısal çelişki ölçtü.
-
-### C8.1 Çelişki: "bayat" ile "bilerek dondurulmuş" AYNI görünüyor
-
-Bir tazelik/bayatlık aracına bakıldığında ikisi ayırt edilemez. Bir sonraki bayat-süpürmesi,
-dokuz dosyalık onarımı **sessizce geri alacaktı** — hem de onarımı yapanın haberi olmadan.
-
-### C8.2 "Dondurulmuş" bir VERİ özelliği değil, bir KARARDIR — depoda izi yoktur
-
-I18N listelere körlemesine güvenmek istemedi ve kendi dedektörünü yazdı: *"geri alınmış dosya,
-master blob'u daha eski bir sürümle birebir olan dosyadır."* **48 dosyada koştu → 0 buldu**, oysa
-dondurulmuş olduğu bilinen dosyalar o kümedeydi.
-
-Sebebi ölçüldü: `InventoryTable.md`'nin master'daki son commit'i **06-16**; geri alma zaten var
-olan içeriğe denk geldiği için git hiçbir şey kaydetmedi. Yani dosya "bugün donduruldu" değil,
-"aylardır eski". Karar hiçbir yere yazılmadığı için **hiçbir bağımsız ölçüm onu bulamaz.**
-
-> Bu maddenin en pahalı cümlesi: *ölçülemeyen şey ölçülmediği için değil, ölçülecek yerde
-> durmadığı için ölçülemez.* Kararlar veri bırakmaz; yazılmaları gerekir.
-
-### C8.3 İKİ kayıt birden — ve niçin ikisi de tek başına yetmez
-
-| kayıt | tek başına neden yetmez |
-|---|---|
-| dosya içi işaret | yeniden üretim dosyayı **ezer**, işaret de silinir → kapı kör kalır. Kaybı ölçen şeyi, tam da kaybın olduğu yerde kaybederdik. |
-| ayrı liste | liste ile gerçek **ayrışır**. Ölçüldü: dokuz dosyalık listeyi elle kopyalayan **iki** taraf da birer dosyayı yanlış saydı. |
-
-**Çözüm ikisi birden.** `.companion-dondurulmus.json` "hangi dosyalar dondurulmuş" sorusunun
-SSOT'u; dosya içindeki işaret onun insan-görünür yankısı:
-
-```
-<!-- ORION-DONDURULMUS: gercek-sembol=<N> · kaynak=<sha> · sebep=<slug> · kayit=<REC-nn> -->
-```
-
-Kapı (`INV-DOC-5`) **ikisini karşılaştırır**: listede olan bir dosyada işaret yoksa o dosya
-yeniden üretilmiştir → KIRMIZI. İşaret frontmatter'ın **içine** değil hemen ardına konur;
-frontmatter üretecin makine alanıdır.
-
-`gercek-sembol` = parantezsiz `AST Pointer:` başlık sayısı.
-
-#### C8.3.1 ⚠ ÇÜRÜTÜLMÜŞ KURAL: "tarihsel en yükseğe geri yükle"
-
-Bu madde ilk hâlinde *"değer master'daki değil TARİHSEL EN YÜKSEK sayıdır"* diyordu. Gerekçe
-sağlam görünüyordu: geri-alma tabanı "bugünkü süpürmeden önce"ydi ve o taban daha eski turlarda
-kaybedilmiş sembolleri taşımıyor — "geri aldım" ≠ "TAM". **Kural yine de yanlıştı ve ölçümle
-çürütüldü.** Zinciri adıyla kaydediyorum, çünkü çürütülmüş bir kural da bilgidir:
-
-| kim | ne dedi | sonuç |
-|---|---|---|
-| I18N | "tarihsel en yükseğe geri yükle" | önerdi, sonra **kendi geri aldı** |
-| AUTH | "kuralın bir sınırı var" + `N commit değişmiş` ölçütü | itiraz **haklı**, ölçütü **vekil** olduğu için kendi geri aldı |
-| I18N | doğru ölçüt: tarihsel sürümdeki tanımlayıcı **bugünkü kaynakta** var mı? | ölçüt **kabul edildi** |
-| ALTYAPI | iki dosyada kendim ölçtüm | geri yüklemeyi **iptal ettim** |
-
-Ölçüm: `InventoryTable`'ın 6 sembollü sürümünde **4** sembol (`sortIndicator`, `TableRow`,
-`groupedRows`, `rows`) bugünkü `.tsx`'te **yok**; `FeaturedCommercialBlocks`'un 5 sembollü
-sürümünde **2** sembol (`tabButton`, `productCard`) yok. Eski sürüm o günün kaynağını belgeliyor;
-kaynak değiştiyse geri yükleme **bugün olmayan şeyleri anlatan** bir dosya üretir.
-
-> **Eksik companion'dan kötüsü YANLIŞ companion'dır:** okuyan, var olduğu söylenen sembolü arar
-> ve bulamaz. Eksiklik "az bilgi"dir; yanlışlık "yanlış yön"dür.
-
-**DOĞRU KURAL:** değer, sembolleri **bugünkü kaynakta hâlâ var olan** en yüksek sayıdır. Ölçüt
-sembol varlığıdır; *"kaynak o günden beri N commit değişmiş"* ölçütü **vekildir** — sürüklenme
-ölçer, yanlışlık ölçmez. Bu ayrım AUTH'un kendi geri alışından çıktı ve §C8 boyunca geçerlidir.
-
-### C8.4 Koordinasyona bağlı güvenliği, ÖLÇÜME bağlı güvenliğe çevir
-
-Liste bir güvenlik şartıysa, listeyi kaçıran herkes hasar üretir — ve bugün iki taraf da yanlış
-saydı. I18N'in tersine çevirmesi doğrudur ve **asıl koruma budur**: süpürme, üretim **öncesi** her
-dosyanın gerçek sembol sayısını kaydeder, **sonrasında** tekrar ölçer ve **sembol kaybeden her
-dosyayı geri alır**. O zaman liste bir **optimizasyon** olur (boşuna üretim yapmamak), güvenlik
-şartı olmaktan çıkar; liste eksikse kimse felaket yaşamaz.
-
-İkisi birlikte savunma katmanıdır: liste + işaret **kararı** korur, öncesi/sonrası ölçüm
-**içeriği** korur.
-
-### C8.5 Kaydın kaldırılması
-
-Üreteç o dosyada artık sembol kaybetmiyorsa kayıt **silinir** ve companion yeniden üretilir.
-Kaydın gereksiz kalması, düzelmiş bir üretecin önünde kalıcı duvar olur — dondurma bir çözüm
-değil, üreteç kusurunun faturasıdır.
-
-### C8.6 Bu maddenin kanıtı
-
-`INV-DOC-5` (`src/__tests__/conformance/companion-dondurulmus.test.ts`) altı kollu: **beşi
-fixture** üzerinde (sembol düşüşü · işaretin silinmesi · bozuk işaret · liste-işaret ayrışması ·
-yanlış-pozitif yokluğu), **biri** gerçek listeye uygulanır.
-
-Gerçek kolun boş geçmediği **sabotajla** kanıtlandı; her turdan sonra sağlam sürüme dönüş
-`sha256` ile doğrulandı ve ön koşul olarak `geçen > 0` arandı:
-
-| sabotaj | düşen kol |
-|---|---|
-| companion'dan işaret silinsin (yeniden üretim benzetimi) | 1 |
-| companion'dan bir sembol silinsin | 1 |
-| listedeki sayı yükseltilsin (liste ↔ işaret ayrışması) | 1 |
-
-⚠ Fixture kolları **sabotaja gerek bırakmadan** ayırt edicidir: her biri belirli bir ihlal
-sınıfını üretip yakalandığını gösterir. Gerçek kol ise ayrı kanıt ister, çünkü liste bir gün
-haklı olarak boşalabilir (üreteç düzelirse kayıtlar silinir) ve o hâlde **hiçbir şey ölçmeden
-yeşil** görünürdü — ölçüm aracının kendi körlüğü sınıfı (bkz. `fleet-mechanism-standard.md` §9.6).
 
 
 ---
