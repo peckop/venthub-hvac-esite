@@ -118,3 +118,7 @@ TAM-RAPOR.txt
 # birikmisti (658K) ve porcelain'de TEK satira katlandigi icin sayacta 1 gorunuyor, VS Code
 # dosya listesinde 31 satir doldurup gercek degisiklikleri goze bogduruyordu.
 .playwright-mcp/
+
+# Silme ilani = KOSUM DURUMU (itiraz penceresi zaman damgasi), kaynak degil.
+# Commitlenirse bayat bir pencere "gecmis" gorunur ve kapi sahte yesil verir.
+scripts/hijyen/silme-ilani.json
