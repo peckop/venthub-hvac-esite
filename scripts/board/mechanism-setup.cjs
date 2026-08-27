@@ -62,6 +62,14 @@ const OFSETLER = {
   AUTH: '15,35,55',
   ORION: '17,37,57',
   'OPS-AUDIT': '19,39,59',
+  // TEMIZLIK (2026-08-28, REC-84 Kol-4). TEK ÇİFT TABANLI SATIR ve sebebi yazılı:
+  // yukarıdaki on şerit 1..19 arası TEK dakikaların TAMAMINI tutuyor, yani tek-taban
+  // havuzu TÜKENDİ. Çift tabanlar hiçbir tek tabanla çakışmaz, o yüzden yeni şeritler
+  // buradan devam eder (sıradaki serbest: 4,24,44 · 6,26,46 ...).
+  // Bu satırı ALTYAPI yazdı çünkü dosya onun claim'inde ve TEMIZLIK şeridinin gözcüsü
+  // tablo olmadan KANITSIZ kalıyordu — adresli emir ulaşmayabilirdi. Sayı OPS'tan
+  // gelmedi, çakışma kuralından TÜRETİLDİ ve OPS'a yazıldı; OPS başka değer derse değişir.
+  TEMIZLIK: '2,22,42',
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
