@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\hooks\useCheckoutCoupon.ts
-skeleton_hash: 6c126810ed805c81
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCheckoutCoupon.ts
+skeleton_hash: 04bcf61d779f3f3d
 entity_hashes:
   func:useCheckoutCoupon: 4495b524ff78f42b
   overview: 292a471e78e94271
-generated_at: 2026-08-18T06:48:05Z
+generated_at: 2026-08-27T08:34:24Z
 ---
 
 ## Genel Bakış

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useLocalizedRoutes.ts
-skeleton_hash: 04da0f3115ca38f1
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useLocalizedRoutes.ts
+skeleton_hash: 7a040af28515001e
 entity_hashes:
-  func:createLocalizedProxy: b213c316ec0c2854
-  func:useLocalizedRoutes: d8dba6cf829a1dea
+  func:createLocalizedProxy: 4d95c08749380726
+  func:useLocalizedRoutes: 7a3cb2d3169a4afe
   overview: 9cb31a2460306030
-generated_at: 2026-06-15T17:03:48Z
+generated_at: 2026-08-27T08:36:15Z
 ---
 
 ## Genel Bakış
@@ -44,16 +44,15 @@ Aktif dil bilgisini React Context üzerinden alarak, uygulama genelinde kullanı
 ## FONKSİYON DETAYLARI
 
 ### createLocalizedProxy
+**Ne yapar**: Verilen bir nesneyi JavaScript `Proxy` ile sarmalayarak, bu nesne üzerindeki fonksiyon çağrılarının ve iç içe nesne erişimlerinin otomatik olarak yerelleştirilmiş (localized) URL'ler üretmesini sağlar. Rota tanımlarını dil duyarlı hale getirmek için kullanılır.
 
-**Ne yapar**: Verilen bir nesneyi JavaScript Proxy ile sararak, tüm fonksiyon çağrılarının sonuçlarını otomatik olarak lokalize eder. Bu sayede bir route nesnesi üzerindeki fonksiyonlar çağrıldığında, dönen URL'ler seçilen dile göre otomatik dönüşüme uğrar.
-
-**Nasıl yapar**: JavaScript Proxy nesnesi oluşturarak target nesnesinin her bir property erişimini yakalar. `get` trap'i içinde drei senaryoyu yönetir: Eğer erişilen değer bir fonksiyon ise, bu fonksiyonu bir wrapper ile sarar ve orijinal fonksiyonun döndürdüğü URL'yi `localizedHref` fonksiyonu ile dile dönüştürür. Eğer değer null olmayan bir object ise, recursive olarak kendini tekrar çağırarak iç içe nesneleri de proxy ile sarar. Diğer tüm durumlarda (primitive değerler, string'ler, sayılar vb.) değeri olduğu gibi döndürür. `Reflect.get` kullanılarak orijinal nesnenin property değeri güvenli bir şekilde alınır.
+**Nasıl yapar**: `Proxy` nesnesi oluşturarak `get` tuzağı (trap) tanımlar. Bir özelliğe erişildiğinde `Reflect.get` ile değeri alır ve üç senaryoya göre hareket eder: Eğer değer bir fonksiyonsa, bu fonksiyonu saran yeni bir fonksiyon döndürür; saran fonksiyon orijinal fonksiyonu çağırarak elde ettiği URL'yi `localizedHref` fonksiyonu ile dile göre dönüştürür. Eğer değer null olmayan bir nesneseyse, aynı mantıkla o nesne için de özyinelemeli (recursive) olarak yeni bir `createLocalizedProxy` çağrısı yapar; böylece iç içe geçmiş rota nesnelerinin tamamı yerelleştirilir. Diğer durumlarda (primitif değerler) değeri olduğu gibi döndürür.
 
 **Parametreler**:
-- `target: T extends object` — Proxy ile sarılacak kaynak nesne. Fonksiyonlar veya iç içe nesneler içerebilen herhangi bir nesne tipi olabilir.
-- `lang: string` — Hedef lokalizasyon dili. URL'lerin dönüştürüleceği dil kodunu belirtir (örn: "tr", "en", "de").
+- target: `T` (burada `T extends object`) — Yerelleştirilecek hedef nesne. Genellikle rota tanımlarını içeren bir nesnedir.
+- lang: `string` — Hedef dil kodu. URL'lerin hangi dile göre yerelleştirileceğini belirtir.
 
-**Dönüş**: `T` — Orijinal nesnenin tipi ile aynı olan bir Proxy nesnesi döndürülür. TypeScript jenerik yapısı sayesinde, çağrı yapan kodun tip güvenliği korunurken, tüm property erişimleri ve fonksiyon çağrıları localize edilmiş şekilde çalışır.
+**Dönüş**: `T` tipinde bir `Proxy` nesnesi döndürür. Bu proxy, orijinal nesneyle aynı arayüze sahiptir ancak fonksiyon çağrıları ve iç içe nesne erişimleri yerelleştirilmiş URL'ler üretir.
 
 ### useLocalizedRoutes
 **Ne yapar**: Aktif dil context'ine duyarlı, yerelleştirilmiş bir Routes proxy nesnesi döner.  
@@ -81,21 +80,21 @@ type RouteFunction = (...args: unknown[]) => string
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: useLocalizedRoutes.ts::createLocalizedProxy
-- **params**: `(target: T, lang: string)`
+### [N1_NASIL] AST Pointer: src/hooks/useLocalizedRoutes.ts::createLocalizedProxy
+- **params**: `target` — T tipinde, proxy ile sarılacak hedef nesne; `lang` — string, yerelleştirme için dil kodu
 - **ic_degiskenler**:
-  - `value` — `Reflect.get(t, prop)` ile proxy target'ından erişilen property'nin ham değeri; fonksiyon mu nesne mi olduğunu belirlemek için kullanılır
-  - `t` — Proxy handler `get` trap'indeki orijinal target referansı
-  - `prop` — Proxy'ye erişilen property adı (symbol veya string)
-  - `originalUrl` — `value` bir fonksiyon olduğunda, o fonksiyonun `args` ile çağrılmasından dönen orijinal URL string'i; `localizedHref`'e girdi olarak verilir
-  - `args` — Proxy üzerinden çağrılan orijinal route fonksiyonuna aktarılan argümanlar dizisi
-- **Dönüş**: `new Proxy(target, handler)` — `target` objesinin her property erişimini `localizedHref` ile sarmalayan proxy nesnesi (tip: T)
+  - `t` — Proxy get handler'ında yakalanan hedef nesne (target ile aynı referans)
+  - `prop` — Proxy get handler'ında erişilen özellik adı (string | symbol)
+  - `value` — `Reflect.get(t, prop)` ile elde edilen özelliğin değeri
+  - `args` — Özellik fonksiyon ise, o fonksiyona iletilen bilinmeyen türdeki argüman dizisi
+  - `originalUrl` — `(value as RouteFunction)(...args)` çağrısından dönen orijinal URL string'i
+- **Dönüş**: T — `new Proxy(target, ...)` ile oluşturulan proxy nesnesi; özellik fonksiyon ise `localizedHref(originalUrl, lang)` sonucu, nesne ise özyinelemeli `createLocalizedProxy(value, lang)` sonucu, diğer durumlarda ham değer döner
 
-### [N2_NASIL] AST Pointer: useLocalizedRoutes.ts::useLocalizedRoutes
-- **params**: `(yok)`
+### [N2_NASIL] AST Pointer: src/hooks/useLocalizedRoutes.ts::useLocalizedRoutes
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `lang` — `useI18n()` hook'unun dönüşünden destructure edilen mevcut dil kodu string'i; proxy'nin href dönüştürmelerinde hangi dilin kullanılacağını belirler
-- **Dönüş**: `useMemo` ile sarılmış `createLocalizedProxy(Routes, lang)` sonucu; `Routes` objesinin tüm href fonksiyonlarını otomatik localize eden proxy nesnesi; `lang` değiştiğinde yeniden hesaplanır
+  - `lang` — `useI18n()` çağrısından destructure edilen mevcut dil kodu
+- **Dönüş**: `useMemo(() => createLocalizedProxy(Routes, lang), [lang])` — `lang` değişkenine bağlı olarak hesaplanan, `Routes` nesnesinin yerelleştirilmiş proxy kopyası
 
 ---
 

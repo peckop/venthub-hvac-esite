@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\DomesticFanModel.tsx
-skeleton_hash: a82921aef29d25c2
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\DomesticFanModel.tsx
+skeleton_hash: e792783b88913a8b
 entity_hashes:
   func:DomesticFanModel: c93fddd365c3092d
   overview: 65a1eab25cd13393
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:14:28Z
+generated_at: 2026-08-25T07:26:39Z
 ---
 
 ## Genel Bakış
@@ -82,10 +82,36 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/DomesticFanModel.tsx::useEffect (grid oluşturma)
+- **params**: (parametre yok — useEffect callback)
+- **ic_degiskenler**:
+  - `index` — sayaç değişkeni, `0`'dan başlar; her döngü iterasyonunda artırılarak instancedMesh matris indisini belirler
+  - `row` — dış döngü değişkeni, `0`'dan `12`'ye kadar (dahil değil) iterasyon yapar
+  - `col` — iç döngü değişkeni, `0`'dan `12`'ye kadar (dahil değil) iterasyon yapar
+  - `x` — `(col - 5.5) * (panelSize * 0.07)` hesaplaması ile elde edilen yatay konum değeri; `tempObject3D.position.set`'in ilk parametresi olarak kullanılır
+  - `y` — `(row - 5.5) * (panelSize * 0.07)` hesaplaması ile elde edilen dikey konum değeri; `tempObject3D.position.set`'in ikinci parametresi olarak kullanılır
+- **Dönüş**: yok — yan etki olarak `gridRef.current` InstancedMesh'inin 144 instance matrisini 12×12 ızgara düzeninde konumlandırır ve `instanceMatrix.needsUpdate = true` yapar
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/DomesticFanModel.tsx::useEffect (temizleme)
+- **params**: (parametre yok — useEffect callback)
+- **ic_degiskenler**: yok
+- **Dönüş**: temizleme fonksiyonu döndürür — bileşen unmount olduğunda çağrılır
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/DomesticFanModel.tsx::temizleme fonksiyonu (useEffect return)
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `panel.dispose()`, `background.dispose()`, `gridBoxGeo.dispose()`, `cylinder.dispose()`, `plane.dispose()` çağrılarıyla VRAM belleğini serbest bırakır
+
+---
+
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\DomesticFanModel.tsx
-  function: src\components\products\3d\types\DomesticFanModel.tsx::DomesticFanModel
+  file: DomesticFanModel.tsx
+  function: DomesticFanModel.tsx::DomesticFanModel
 
 ---
 

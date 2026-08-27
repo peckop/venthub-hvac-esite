@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\shell\useAdminThemeBodyScope.ts
-skeleton_hash: b67c4de253b25644
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\shell\useAdminThemeBodyScope.ts
+skeleton_hash: 3a8361a82976c8ca
 entity_hashes:
   func:useAdminThemeBodyScope: cd448415a9b4837a
   overview: 3f58a351c987c09f
-generated_at: 2026-08-25T08:43:06Z
+generated_at: 2026-08-27T08:24:00Z
 ---
 
 ## Genel Bakış

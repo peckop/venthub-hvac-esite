@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\crypto.ts
-skeleton_hash: 78f986a735ad3900
+source_path: C:\tmp\vh-altyapi-t165\src\utils\crypto.ts
+skeleton_hash: a3e2db332a30494c
 entity_hashes:
   func:generateId: b72c75acd1bdb8bf
   overview: 3748b737e825394a
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:45Z
 ---
 
 ## Genel Bakış

@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\pricing\CurrencyRatesCard.tsx
-skeleton_hash: 2215ec7385b4f840
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\CurrencyRatesCard.tsx
+skeleton_hash: 97d8a62ca57cd53e
 entity_hashes:
   func:CurrencyRatesCard: 71450bfaf86f2322
   func:daysSince: ae26b102945d5c03
@@ -11,7 +11,7 @@ entity_hashes:
   func:sourceBadgeClass: b256e5aabc3c94d1
   overview: c0d4871abf33187b
   style_tokens: ad378b7f6d5e50fb
-generated_at: 2026-08-27T13:30:54Z
+generated_at: 2026-08-27T08:12:44Z
 ---
 
 ## Genel Bakış
@@ -19,39 +19,32 @@ Bu modül, HVAC fiyatlandırma sisteminde döviz kurlarının yönetimini ve gö
 
 ## Fonksiyon Grupları
 ### Döviz Kuru Durum ve Kaynak Kontrolü
-Bu grup, kurların ne kadar güncel olduğunu ve kaynağını belirleyen yardımcı fonksiyonları içerir. Tarih bazlı hesaplamalar ve dinamik CSS sınıflandırması yaparak bileşenin durumunu belirler.
+Kurların ne kadar güncel olduğunu ve kaynağını belirleyen yardımcı fonksiyonları içerir. Tarih bazlı hesaplamalar ve dinamik CSS sınıflandırması yaparak bileşenin durumunu belirler.
 - isStale, daysSince, sourceBadgeClass
 
 ### Ana Bileşen
-Ana kart bileşenini oluşturup ilgili durum kontrollerini entegre eden fonksiyondur. Döviz kuru verilerini alıp gösterir ve kullanıcının güncel bilgileri okumasını sağlar.
+Ana kart bileşenini oluşturup ilgili durum kontrollerini entegre eder. Döviz kuru verilerini alıp gösterir ve kullanıcının güncel bilgileri okumasını sağlar.
 - CurrencyRatesCard
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, döviz kurlarının zaman bazlı durumunu ve kaynağını değerlendirerek kullanıcıya sunan bir React bileşenidir.
-
-[Aksiyom 1]: Eğer `isStale` fonksiyonuna geçerli bir tarih string'i sağlanmazsa, fonksiyon eskime durumunu doğru hesaplayamaz.
-
-[Aksiyom 2]: Eğer `daysSince` fonksiyonuna geçerli bir tarih formatı verilmezse, gün sayısı hesaplaması yapılamaz.
-
-[Aksiyom 3]: Eğer `sourceBadgeClass` fonksiyonuna bilinen bir kaynak değeri verilmezse, uygun CSS sınıfı belirlenemez.
-
-[Aksiyom 4]: Eğer `CurrencyRatesCard` bileşeni döviz kuru verilerine erişemezse, kart boş veya hatalı durumda görüntülenir.
-
-[Aksiyom 5]: Eğer `effectiveDate` parametresi bugünden yeterince eski bir tarih içeriyorsa, `isStale` fonksiyonu `true` döndürür; ancak eşik değeri fonksiyon gövdesinde tanımlıdır ve bu belgede belirtilmemiştir.
+Bu modül için özel aksiyom tanımlanmamıştır. Fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan mimari varsayım çıkarımı yapılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### isStale
-**Ne yapar**: Verilen etkinlik tarihinin (effective date) güncel olup olmadığını kontrol eder. Tarih belirli bir süreden daha eski ise "stale" (bayatlamış/geçersiz) olarak değerlendirilir ve `true` döndürür.
-**Nasıl yapar**: Fonksiyonun iç mantığı verilen kaynak kodunda gösterilmemiştir. Sadece imzası ve kullanım şekli bilinmektedir. Çağrıldığı yerde `row.effective_date` değeri parametre olarak iletilir ve dönüş değeri bir boolean olarak tablo satırında uyarı gösterilip gösterilmeyeceğini belirler.
+**Ne yapar**: Verilen bir tarihin (effectiveDate) güncel olup olmadığını kontrol eder. Eğer tarih belirli bir süreden daha eskiyse "stale" (bayat/geçersiz) olarak kabul edilir ve `true` döndürür; aksi halde `false` döndürür. Döviz kuru verilerinin ne kadar güncel olduğunu takip etmek için kullanılır.
+
+**Nasıl yapar**: Fonksiyonun iç mantığı verilen kaynak kodda gösterilmemiştir. Sadece imzası ve dönüş tipi bilinmektedir. Muhtemelen verilen tarih ile bugün arasındaki farkı hesaplayarak belirli bir eşik değerini aşıp aşmadığını kontrol eder.
+
 **Parametreler**:
-- effectiveDate: string — Kontrol edilecek tarih değeri, ISO formatında bir tarih string'i olması beklenir
-**Dönüş**: boolean — Tarih eski/stale ise `true`, güncel ise `false` döner
+- effectiveDate: string — Kontrol edilecek tarihi temsil eden string değer. "YYYY-MM-DD" formatında bir tarih olması beklenir.
+
+**Dönüş**: boolean — Tarih eski/stale ise `true`, güncel ise `false` döndürür.
 
 ### daysSince
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -95,66 +88,66 @@ Bu modül, döviz kurlarının zaman bazlı durumunu ve kaynağını değerlendi
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: CurrencyRatesCard.tsx::isStale
+### [N1_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::isStale
 - **params**: `effectiveDate: string`
 - **ic_degiskenler**:
-  - `eff` — `effectiveDate` parametresinden `new Date()` ile oluşturulan Date nesnesi; geçerlilik tarihini temsil eder
-  - `now` — `new Date()` ile oluşturulan anlık tarih/saat nesnesi
-  - `diffMs` — `now.getTime() - eff.getTime()` hesaplamasıyla elde edilen iki tarih arasındaki milisaniye farkı
-  - `diffDays` — `diffMs` değerinin `Math.floor(diffMs / (1000 * 60 * 60 * 24))` formülüyle gün cinsine dönüştürülmüş tam sayı değeri
-- **Dönüş**: `boolean` — `diffDays >= STALE_THRESHOLD_DAYS` koşulu sağlanıyorsa `true`, aksi halde `false`; ayrıca `eff.getTime()` `NaN` ise doğrudan `false` döner
+  - `eff` — `effectiveDate` parametresinden `new Date()` ile oluşturulan Date nesnesi
+  - `now` — mevcut zamanı temsil eden `new Date()` nesnesi
+  - `diffMs` — `now.getTime()` ile `eff.getTime()` arasındaki milisaniye farkı
+  - `diffDays` — `diffMs` değerinin gün cinsinden karşılığı; `Math.floor(diffMs / (1000 * 60 * 60 * 24))` ile hesaplanır
+- **Dönüş**: `boolean` — `eff` geçerli bir tarih değilse `false`; aksi halde `diffDays >= STALE_THRESHOLD_DAYS` koşulunun sonucu
 
-### [N2_NASIL] AST Pointer: CurrencyRatesCard.tsx::daysSince
+### [N2_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::daysSince
 - **params**: `effectiveDate: string`
 - **ic_degiskenler**:
-  - `eff` — `effectiveDate` parametresinden `new Date()` ile oluşturulan Date nesnesi; geçerlilik tarihini temsil eder
-  - `now` — `new Date()` ile oluşturulan anlık tarih/saat nesnesi
-- **Dönüş**: `number` — `Math.max(0, Math.floor((now.getTime() - eff.getTime()) / (1000 * 60 * 60 * 24)))` formülüyle hesaplanan, 0'dan küçük olmayan gün sayısı; `eff.getTime()` `NaN` ise doğrudan `0` döner
+  - `eff` — `effectiveDate` parametresinden `new Date()` ile oluşturulan Date nesnesi
+  - `now` — mevcut zamanı temsil eden `new Date()` nesnesi
+- **Dönüş**: `number` — `eff` geçerli bir tarih değilse `0`; aksi halde `Math.max(0, Math.floor((now.getTime() - eff.getTime()) / (1000 * 60 * 60 * 24)))` sonucu (negatif olamaz)
 
-### [N3_NASIL] AST Pointer: CurrencyRatesCard.tsx::sourceBadgeClass
+### [N3_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::sourceBadgeClass
 - **params**: `source: string`
 - **ic_degiskenler**: yok (tek ifadeli arrow function)
-- **Dönüş**: `string` — `source === 'tcmb'` ise `'bg-admin-accent-weak border-admin-accent/30 text-admin-accent'`, aksi halde `'bg-admin-warning-weak border-admin-warning/30 text-admin-warning'` CSS sınıf dizesi
+- **Dönüş**: `string` — `source === 'tcmb'` ise `'bg-admin-accent-weak border-admin-accent/30 text-admin-accent'`; aksi halde `'bg-admin-warning-weak border-admin-warning/30 text-admin-warning'`
 
-### [N4_NASIL] AST Pointer: CurrencyRatesCard.tsx::CurrencyRatesCard
+### [N4_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::CurrencyRatesCard
 - **params**: yok
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; tablo başlıklarını, hata mesajlarını, buton metinlerini ve uyarılarda kullanılır
-  - `lang` — `useI18n()` hook'undan destructure edilen dil kodu; `formatNumber` ve `formatDate` çağrılarına iletilir
-  - `loading` — `useState(true)` ile tanımlanan boolean state; veri yüklenme durumunu kontrol eder
+  - `t` — `useI18n()` kancasından gelen çeviri fonksiyonu; `t('admin.pricing.settings.currencyRates.title')` gibi anahtarlarla metin üretmek için kullanılır
+  - `lang` — `useI18n()` kancasından gelen dil kodu; `formatNumber` ve `formatDate` fonksiyonlarına iletilir
+  - `loading` — `useState(true)` ile oluşturulan boolean state; veri yüklenme durumunu gösterir
   - `setLoading` — `loading` state'ini güncelleyen setter fonksiyonu
-  - `error` — `useState<string | null>(null)` ile tanımlanan state; yükleme hatası oluştuğunda hata mesajını tutar
+  - `error` — `useState<string | null>(null)` ile oluşturulan state; hata mesajını tutar, yoksa `null`
   - `setError` — `error` state'ini güncelleyen setter fonksiyonu
-  - `rates` — `useState<CurrencyRateRow[]>([])` ile tanımlanan state; her para birimi için en güncel kur satırlarını tutar
+  - `rates` — `useState<CurrencyRateRow[]>([])` ile oluşturulan state; her para birimi için en güncel kur satırlarını tutar
   - `setRates` — `rates` state'ini güncelleyen setter fonksiyonu
-  - `fetchRates` — `useCallback` ile sarılmış async fonksiyon; Supabase'den `currency_rates` tablosunu sorgular, her `quote_ccy` için en güncel satırı `latestByCcy` Map'inde biriktirir ve `setRates` ile state'e yazar
-- **Dönüş**: `JSX` — Dış sarmalayıcı `div` içinde başlık (Coins ikonu + çeviri başlık/altyazı), yükleme/hata/boş durum koşulları, kur tablosu (rates.map ile satırlar), spread bilgisi (rates.map ile etiketler) ve devre dışı "manuel kur ekle" butonu render eder
+  - `fetchRates` — `useCallback` ile sarılmış async fonksiyon; `supabase` üzerinden `currency_rates` tablosundan veri çeker, her `quote_ccy` için en güncel satırı `latestByCcy` Map'inde biriktirir ve `setRates` ile state'e yazar
+- **Dönüş**: `JSX.Element` — Dış sarmalayıcı `div` (adminCardClass ile); içinde başlık, koşullu içerik (loading skeleton / hata uyarısı / boş mesaj / kur tablosu), spread bilgisi ve devre dışı "manuel kur ekle" butonu bulunur
 
-### [N5_NASIL] AST Pointer: CurrencyRatesCard.tsx::fetchRates (useCallback içinde)
+### [N5_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::fetchRates (useCallback)
 - **params**: yok
 - **ic_degiskenler**:
-  - `data` — `supabase.from('currency_rates').select(...)` sorgusundan dönen veri dizisi; `quote_ccy`, `rate`, `source`, `effective_date`, `fetched_at`, `spread_pct` alanlarını içerir
-  - `fetchError` — Supabase sorgusundan dönen hata nesnesi (`error` olarak yeniden adlandırılmış); varsa `throw` ile fırlatılır
-  - `latestByCcy` — `new Map<string, CurrencyRateRow>()` ile oluşturulan Map; her `quote_ccy` için yalnızca ilk (en güncel) satırı tutar, çünkü veri `effective_date` ve `fetched_at` azalan sırayla gelir
-  - `row` — `data` dizisi üzerindeki `for...of` döngüsündeki mevcut `CurrencyRateRow` nesnesi
-  - `err` — `catch` bloğunda yakalanan hata; `instanceof Error` kontrolüyle `err.message` veya `String(err)` olarak `setError`'a iletilir
-- **Dönüş**: yok (void) — yan etki: `setLoading(true/false)`, `setError(null/hata mesajı)`, `setRates(Array.from(latestByCcy.values()))` çağrılarıyla state güncellenir
+  - `data` — `supabase.from('currency_rates').select(...)` sorgusundan dönen satır dizisi; `quote_ccy, rate, source, effective_date, fetched_at, spread_pct` alanlarını içerir
+  - `fetchError` — supabase sorgusundan dönen hata nesnesi; varsa `throw` ile yakalanır
+  - `latestByCcy` — `new Map<string, CurrencyRateRow>()` ile oluşturulan Map; her `quote_ccy` için yalnızca ilk (en güncel) satırı saklar
+  - `row` — `data` dizisi üzerindeki `for...of` döngüsündeki mevcut satır; `row.quote_ccy` anahtar olarak kullanılır
+  - `err` — `catch` bloğunda yakalanan hata; `instanceof Error` kontrolüyle `err.message` veya `String(err)` olarak `setError`'a yazılır
+- **Dönüş**: yok (void) — yan etki olarak `setLoading`, `setError`, `setRates` state setter'larını çağırır
 
-### [N6_NASIL] AST Pointer: CurrencyRatesCard.tsx::useEffect callback
+### [N6_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::useEffect callback
 - **params**: yok
 - **ic_degiskenler**: yok
-- **Dönüş**: yok — `fetchRates()` fonksiyonunu çağırır; bağımlılık dizisi `[fetchRates]` ile yalnızca `fetchRates` değiştiğinde tetiklenir
+- **Dönüş**: yok — bileşen mount edildiğinde ve `fetchRates` değiştiğinde `fetchRates()` çağrısını tetikler
 
-### [N7_NASIL] AST Pointer: CurrencyRatesCard.tsx::rates.map (tablo satırları)
-- **params**: `row` — `CurrencyRateRow` tipinde, rates dizisindeki tekil kur nesnesi
+### [N7_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::rates.map (tablo satırları)
+- **params**: `row` — `CurrencyRateRow` tipinde; `quote_ccy`, `rate`, `source`, `effective_date` alanlarına erişilir
 - **ic_degiskenler**:
-  - `stale` — `isStale(row.effective_date)` çağrısının döndürüdüğü boolean; kurun güncel olup olmadığını belirler, `true` ise tarih yanında uyarı ikonu gösterilir
-- **Dönüş**: `JSX` — `<tr>` elementi; dört `<td>` hücresi içerir: `row.quote_ccy` (para birimi kodu), `row.rate` (`formatNumber` ile biçimlendirilmiş kur), `row.source` (`sourceBadgeClass` ile CSS sınıfı uygulanmış etiket, `'tcmb'` ise çeviri anahtarı `sourceTcmb` aksi halde `sourceManual`), `row.effective_date` (`formatDate` ile biçimlendirilmiş tarih ve opsiyonel `stale` uyarısı)
+  - `stale` — `isStale(row.effective_date)` çağrısının sonucu; kurun güncel olup olmadığını belirten boolean
+- **Dönüş**: `JSX.Element` — `<tr>` satırı; para birimi adı, `formatNumber` ile biçimlendirilmiş kur, `sourceBadgeClass` ile CSS sınıfı atanmış kaynak etiketi, `formatDate` ile biçimlendirilmiş tarih ve `stale` ise `daysSince` ile hesaplanmış gün sayısıyla uyarı ikonu içerir
 
-### [N8_NASIL] AST Pointer: CurrencyRatesCard.tsx::rates.map (spread gösterimi)
-- **params**: `row` — `CurrencyRateRow` tipinde, rates dizisindeki tekil kur nesnesi
+### [N8_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::rates.map (spread gösterimi)
+- **params**: `row` — `CurrencyRateRow` tipinde; `quote_ccy` ve `spread_pct` alanlarına erişilir
 - **ic_degiskenler**: yok
-- **Dönüş**: `JSX` — `<span>` elementi; `row.quote_ccy` ve `row.spread_pct` (`formatNumber` ile iki ondalık basamaklı biçimde) değerlerini yüzde işaretiyle birlikte gösterir
+- **Dönüş**: `JSX.Element` — `<span>` etiketi; `row.quote_ccy` ve `formatNumber(row.spread_pct, lang, ...)` ile yüzde biçiminde spread değerini gösterir
 
 ---
 
@@ -166,9 +159,9 @@ graph TD
     CurrencyRatesCard_tsx__daysSince["daysSince"]
     CurrencyRatesCard_tsx__isStale["isStale"]
     CurrencyRatesCard_tsx__sourceBadgeClass["sourceBadgeClass"]
-    CurrencyRatesCard_tsx__CurrencyRatesCard --> CurrencyRatesCard_tsx__isStale
-    CurrencyRatesCard_tsx__CurrencyRatesCard --> CurrencyRatesCard_tsx__daysSince
     CurrencyRatesCard_tsx__CurrencyRatesCard --> CurrencyRatesCard_tsx__sourceBadgeClass
+    CurrencyRatesCard_tsx__CurrencyRatesCard --> CurrencyRatesCard_tsx__daysSince
+    CurrencyRatesCard_tsx__CurrencyRatesCard --> CurrencyRatesCard_tsx__isStale
 ```
 
 ## NODE ID STANDARD

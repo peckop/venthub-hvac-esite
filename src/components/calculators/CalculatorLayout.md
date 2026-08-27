@@ -2,28 +2,36 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\calculators\CalculatorLayout.tsx
-skeleton_hash: 4e57c9bdde5e6398
+source_path: C:\tmp\vh-altyapi-t165\src\components\calculators\CalculatorLayout.tsx
+skeleton_hash: 951eb72957153f9e
 entity_hashes:
   func:CalculatorLayout: 992031a52a171585
   overview: ce819e8c92e08794
   style_tokens: 8b0a8e4795cce63b
-generated_at: 2026-08-27T13:20:00Z
+generated_at: 2026-08-27T08:26:27Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC hesaplayıcı sayfaları için ortak bir layout şablonu sağlar. Tek bileşeni olan CalculatorLayout, sayfa başlığı, açıklama, ikon ve geri dönüş linki gibi özellikleri alarak sayfa düzenini standardize eder. Modül, davranışsal mantık içermez ve dışa açtığı yapı bir sözleşme niteliğindedir.
+Bu modül, tüm HVAC hesaplayıcı sayfalarına ortak bir görünüm ve yapı kazandırmak için tasarlanmış bir layout şablonu bileşeni sunar. Tek bileşeni olan CalculatorLayout, başlık, açıklama, ikon ve geri dönüş linki gibi tekrarlanabilir UI öğelerini alarak sayfa düzenini standardize eder ve içeriği child bileşenler için bir konteynıra yerleştirir. Modül davranışsal mantık içermez; salt görsel yerleşim ve yapısal şablonlama sorumluluğuna sahiptir.
 
 ## Fonksiyon Grupları
 ### UI Şablonu ve Yerleşimi
-Bu grup, hesaplayıcı sayfalarının üst başlık bölümünü ve içerik konteynırını oluşturan temel layout bileşenini barındırır.
+Bu grup, hesaplayıcı sayfalarının üst başlık bölümünü ve içerik konteynırını oluşturan temel layout bileşenini barındırır. Bileşen, sayfa başlığı, açıklama, ikon ve breadcrumb navigasyonu gibi öğeleri bir araya getirerek tutarlı bir sayfa yapısı oluşturur.
 - CalculatorLayout
+
+## Bağımlılıklar ve Mimari Notlar
+- Modül dış bağımlılıkları kaynak kodda açıkça belirtilmemiştir; bilinmiyor.
+- Modül, tüketici bileşenler tarafından bir wrapper olarak kullanılır ve kendisi alt bileşen çağırmaz.
+- Aksiyom 1: Modülün dışa açtığı prop yapısı bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- Aksiyom 2: Prop listesine bir öğe ekleme veya çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi sağlanmadığından, gövdeden türetilen mimari aksiyom üretilememektedir.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzasından görünen varsayımlar belirtilebilir.
+
+[Aksiyom 1]: Eğer `backLink` parametresi çağrıda belirtilmezse, varsayılan olarak
 
 ---
 
@@ -75,18 +83,18 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, gövdeden türetilen mi
 
 ### [N1_NASIL] AST Pointer: src/components/calculators/CalculatorLayout.tsx::CalculatorLayout
 - **params**:
-  - `title` — sayfa başlığı, hem görünümde hem SEO meta etiketinde kullanılır
-  - `description` — açıklama metni, hem görünümde hem SEO meta etiketinde kullanılır
-  - `icon` — opsiyonel ikon bileşeni; verilmezse varsayılan `Calculator` ikonu gösterilir
-  - `backLink` — geri dönüş bağlantısı URL'i; varsayılan değeri `'/products'`
-  - `backLabel` — geri dönüş bağlantısı etiketi; verilmezse `t('calculators.layout.backLabel')` çeviri anahtarından alınır
-  - `infoText` — bilgi banner metni; varsa `Info` ikonuyla birlikte gösterilir
-  - `warningText` — uyarı banner metni; varsa `AlertTriangle` ikonuyla birlikte gösterilir
-  - `children` — ana içerik alanı, layout'un ortasına yerleştirilir
+  - `title` — sayfa başlığı, hem `<h1>` etiketinde hem de `<Seo>` bileşeninin `title` prop'unda kullanılır
+  - `description` — sayfa açıklaması, `<Seo>` bileşeninin `description` prop'unda ve başlığın altında paragraf olarak gösterilir
+  - `icon` — header alanında gösterilecek ikon bileşeni; verilmezse varsayılan olarak `<Calculator size={32} />` kullanılır
+  - `backLink` — geri dönüş linki, varsayılan değeri `'/products'`; `<Link>` bileşeninin `href` prop'una `as import('next').Route` tip dönüşümüyle atanır
+  - `backLabel` — geri dönüş linkinin etiketi; verilmezse `t('calculators.layout.backLabel')` çeviri anahtarıyla fallback yapılır (nullish coalescing `??` operatörü)
+  - `infoText` — bilgi banner'ı metni; truthy ise `<Info>` ikonlu mavi bilgi kutusu render edilir
+  - `warningText` — uyarı banner'ı metni; truthy ise `<AlertTriangle>` ikonlu turuncu uyarı kutusu render edilir
+  - `children` — ana içerik alanı, `<div className="max-w-5xl ...">` içinde render edilir
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; footer metinleri ve varsayılan etiketler için kullanılır
-  - `Routes` — `useLocalizedRoutes()` hook'undan gelen lokalize rota nesnesi; footer'daki iletişim bağlantısı için `Routes.contact()` çağrılır
-- **Dönüş**: JSX — tam sayfa calculator layout'u; `Seo` bileşeni, breadcrumb navigasyonlu header (başlık + açıklama + ikon), opsiyonel info/warning banner'ları, `children` ana içerik alanı ve disclaimer/iletişim footer'ı içerir
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; footer disclaimer, iletişim yönlendirmesi, iletişim linki ve backLabel fallback'inde kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rotalar objesi; footer'daki iletişim linkinin `href` değeri için `Routes.contact()` çağrısında kullanılır
+- **Dönüş**: JSX elementi — `CalculatorLayoutProps` tipinde bir React fonksiyonel bileşen (`React.FC<CalculatorLayoutProps>`) döndürür. Bileşen; breadcrumb'lı header, opsiyonel info/warning banner'ları, children içerik alanı ve disclaimer/footer içeren tam sayfa düzeni render eder.
 
 ---
 

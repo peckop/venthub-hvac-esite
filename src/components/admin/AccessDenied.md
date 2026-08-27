@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\AccessDenied.tsx
-skeleton_hash: 9aa781d2520ff516
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\AccessDenied.tsx
+skeleton_hash: b063e7c398f65e05
 entity_hashes:
   func:AccessDenied: ea91e56a2eab80b9
   overview: c138e2727c8c240f
   style_tokens: 22fa330fa7bd104d
-generated_at: 2026-08-27T13:06:38Z
+generated_at: 2026-08-27T07:58:38Z
 ---
 
 ## Genel Bakış

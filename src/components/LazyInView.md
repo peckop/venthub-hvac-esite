@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\LazyInView.tsx
-skeleton_hash: e06566b45d2ed847
+source_path: C:\tmp\vh-altyapi-t165\src\components\LazyInView.tsx
+skeleton_hash: db3b914be41ce4b2
 entity_hashes:
   func:LazyInView: a6cf07d9fd7df258
   overview: dcd89aaa1940f652
   style_tokens: 884aa794c8b33f43
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:29Z
 ---
 
 ## Genel Bakış

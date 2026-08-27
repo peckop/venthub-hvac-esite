@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\AdminToolbar.tsx
-skeleton_hash: 3244573e4e88b4d4
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\AdminToolbar.tsx
+skeleton_hash: da49f9d4f12b338b
 entity_hashes:
   func:AdminToolbar: af143a8f279e1c1e
   overview: f526ba131742fbc5
   style_tokens: 5ffe1c60552a91d0
-generated_at: 2026-08-27T13:07:43Z
+generated_at: 2026-08-27T08:00:43Z
 ---
 
 ## Genel Bakış

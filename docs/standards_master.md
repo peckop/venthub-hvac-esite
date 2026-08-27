@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T08:56:47.356169+00:00
+compiled_at: 2026-08-27T13:08:47.620280+00:00
 total_compiled_files: 62
-source_commit: 32b26661
+source_commit: 582e5eb5
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -3530,6 +3530,35 @@ slug kuralı + Jidoka kalite kapısı** → **`csv-import-export-standard.md`**.
 
 ---
 
+## 3.1 Seri, BÖLÜM BAŞLIĞINDAN türetilmez (2026-08-27)
+
+> Bu madde bir **yöntem** kuralıdır. `series` kolonunun biçimi/zorunluluğu format cetvelinin işidir
+> (`csv-import-export-standard.md`); burada yazan şey, o kolonun **neyden türetileceğidir**.
+
+**Kural.** Seri **ürün adından** türetilir. `avensair_section` (katalog bölüm başlığı) bir
+**kategori adayıdır**, seri değildir — `marka + bölüm başlığı` birleştirerek seri üretmek yasaktır.
+
+**Niçin — ölçülmüş hasar (2026-08-27, 28 çıkarım dosyası + fiyat listesi HQ sürümü).**
+Çıkarım CSV'lerinde `series` alanı **yoktu** (28 dosyanın 0'ında). İçe alım seriyi bölüm
+başlığından uydurdu ve **beş ayrı hata sınıfı** doğdu; hiçbirini hiçbir kapı görmedi:
+
+| # | Hata sınıfı | Somut örnek | Sonuç |
+|---|---|---|---|
+| 1 | Bölüm başlığı seri sanıldı | "DAVLUMBAZ FANLAR" → *AVenS Davlumbaz Fanları* serisi | **AVenS o ürünü hiç üretmiyor** (fiyat listesi s.36). Uydurulan serinin altında 3 aksesuar kaldı |
+| 2 | Alt başlık bölüm sanıldı | s.69'un gerçek bölümü *ISI GERİ KAZANIM CİHAZLARI*; "ELEKTRİKLİ ISITICILAR" onun altındaki iki tablodan biri | Suyla ısıtan sulu batarya, elektrikli ısıtıcı serisine girdi — 8 model yanlış seride |
+| 3 | Fiyat listesi sahibi marka sanıldı | AVenS listesindeki satırların tamamı `brand=AVenS` damgalandı, içindeki **Danfoss FC-51** dahil | Danfoss ürünü AVenS markasıyla ve davlumbaz serisinde |
+| 4 | Sayfa altı aksesuar tablosu ürün sayıldı | hız anahtarları s.27 **ve** s.36'da tekrar ediyor | Aksesuar, fan serisinin modeli oldu |
+| 5 | Aynı ürün hattı iki seride | Lineo, hem *VORT Commercial In-Line* (Ticari) hem *Lineo Quiet* (Konut) altında | Aynı hat **iki ana kategoride** |
+
+Ayrıca **sütun kayması** sessizce geçti: 6 satırda Kcal/h değeri `model_code`, "UYGUN MODEL"
+sütunu `name` sanıldı. Bu yakalanabilirdi — o satırların **fiyatları doğru gelmişti**, yani
+fiyat üzerinden çapraz doğrulama mümkündü ve yapılmamıştı.
+
+**Kalan borç (görünür kılınıyor, kapatılmış değil):** düzeltme yalnız 4 AVenS CSV'sinde
+uygulandı (35/35 satır `series` dolu). **Diğer 24 marka CSV'sinde `series` kolonu hâlâ yok.**
+
+---
+
 ## 4. Avensair 27-bölüm → 2-seviye kategori haritası (gruplama rehberi)
 
 > Worker ürünü **Avensair bölümüne** göre gruplar. Nihai slug'lar `category-taxonomy-standard.md` ile kesinleşir;
@@ -3648,6 +3677,35 @@ sabotajla kırmızı görüldü.
 > `toplam ihlal 21 | tabanda 21 | YENI 0 | bayat taban satiri 0` → YEŞİL.
 > **Recep'ten beklenen bir şey yoktur;** eskiden burada `SUPABASE_CA_CERT` eklemesi isteniyordu,
 > o adım **kaldırıldı**. Kökün depoya alınması bu bekleyişi tamamen ortadan kaldırdı.
+
+---
+
+## 6.2 Seri türetme kapısı — **INV-CATALOG-2** (ÖNERİ, 2026-08-27)
+
+> **Durum: ÖNERİ — henüz ÖLÇMÜYOR.** Mekanizma ilanı kuralı gereği "ölçüyor" yazılamaz;
+> ilan, ilk gerçek koşumun kanıtına dayanır. Bu bölüm kapının **sözleşmesidir**, ilanı değil.
+> §3.1'deki hasar ölçülmüştür; kapı yazılmamıştır.
+
+### Ne ölçülür (satır reddi)
+
+| # | Kontrol | Karar | Neyi yakalar |
+|---|---|---|---|
+| 1 | `series` boş | **RED** | Alanın hiç gelmemesi. "Kapsam kararı" ile "alan gelmedi" **ayrı** basılır; sessiz atlama yok |
+| 2 | `series` değeri `avensair_section` ile birebir eşit | **RED** | Bölüm başlığının seri diye yazılması (§3.1 hata sınıfı 1–2) |
+| 3 | `brand`, ürün adından çözülen markayla çelişiyor | **UYARI + insan onayı** | Fiyat listesi sahibinin marka sanılması (§3.1 hata sınıfı 3) |
+
+### Ne ölçülmez — dürüst sınır
+
+Bu kapı **"seri dolu mu"** ve **"seri başlık değil mi"** sorularını cevaplar.
+**"Seri doğru mu"** sorusunu CEVAPLAMAZ — o bir yargıdır ve katalog sayfasına bakan insana bağlıdır.
+§6.1'in aynı gerekçesi burada da geçerli: ölçülemeyen şeyi kapı diye yazmak yalnız **sahte yeşil**
+üretir. Kapının kapsamı, gerçek kapsamından geniş anlatılmasın diye bu paragraf yazıldı.
+
+3. kontrolün **UYARI** olmasının sebebi de bu: marka çözümü ad üzerinden yapılır ve ad her zaman
+markayı taşımaz; kesin olmayan bir çıkarımı **RED** yapmak, doğru satırları da düşürürdü.
+
+**Bağlantılı:** `product-schema-standard.md` §11.4 / §11.4.1 (ayırt edicilik + veri borcu) ·
+`csv-import-export-standard.md` (`series` kolonunun şemaya eklenmesi **oranın** işi) · §6.1 INV-CATALOG-1.
 
 ---
 
@@ -7805,6 +7863,75 @@ her kolu **sabotajla** kanıtlandı; sağlam sürüme dönüş `sha256` ile doğ
 betiği artık **ön koşul olarak `geçen > 0`** doğruluyor: `düşen = 0` ancak araç gerçekten bir
 şey okuduysa kanıttır.
 
+### 9.6 Kanıtın TAŞIYICISI — ölçtüğün olayla aynı akışta mı?
+
+> Ölçülmüş vaka (2026-08-27, T166-VH / INV-HOOKS-2). Bu madde bir tercih değil, **iki gün ve
+> dört şeridi** tutan bir yanlış teşhisin bedelinden çıktı.
+
+`githooks-doc-scope.test.ts` CI'da kırmızı, **yerelde aynı girdiyle yeşildi**. Kırmızı, master'ın
+`c96977f6` ucunda başladı ve #858 / #856 / #855'i birden bekletti. Üç şerit (ALTYAPI, AUTH, OPS)
+kırmızıyı iki gün boyunca **"süzgeç kesiyor"** diye okudu. Süzgeç suçsuzdu.
+
+**Arıza ölçüm aracındaydı:** test, kancanın bitişini kancanın **günlüğünden** (`LOG`) bekliyor,
+kanıtı **başka bir dosyadan** (`py.log`) okuyordu. İki dosya, tek bekleyiş — yapısal yarış.
+
+#### Neden fark edilmedi: yanlış ama TUTARLI görünen hikâye
+
+| ne yapıldı | doğru muydu | yine de yanlışa götürdü çünkü |
+|---|---|---|
+| Ham CI logu okundu, iki `PYCALL` satırı görüldü | Satırlar **gerçekti** | Yarışan bir dosyanın **anlık görüntüsüydü** |
+| Hayatta kalanlar/kaybolanlar eşleştirildi | Korelasyon **gerçekti** | Kesilme noktası **yazma sırasıyla hizalı**ydı, o yüzden "gerçek depoda var mı" gibi sahte bir temizlik üretti |
+
+Bu, hata sınıflarının en tehlikelisidir: veri doğru, korelasyon güçlü, hikâye tutarlı — ve
+mekanizma yanlış. Çürütülmesi kolay görünmez.
+
+#### Kural
+
+1. **"Alınan değeri oku" YETMEZ.** Ek soru: *bu değerin taşıyıcısı, ölçtüğüm olayla aynı akışta mı?*
+   Ayrı dosyaya yazılan kanıt, tek bir bitiş işaretiyle beklenip okunursa sessiz yarış üretir.
+2. **Kanıtı kapının kendi akışına bağla.** Onarım eşiği büyütmek DEĞİLDİ: sahte üretici `PYCALL`
+   satırını stdout'a basar, kanca onu `>> "$LOG" 2>&1` ile kendi günlüğüne alır. Kanıt ile
+   `=== bitti` artık **aynı dosyada, aynı sırada** — yarış imkânsız hâle gelir.
+   *Ölçüm:* onarım öncesi kod **4 koşumda kırmızı**, sonrası **2 koşum üst üste yeşil**.
+3. **Her kapı SAYI bassın (yokluk kanıtı).** Teşhisi mümkün kılan tek şey süzgece eklenen
+   `[doc-scope] GIRDI 10 satir · CIKAN 4 yol` satırı oldu. O satır olmadan **"kapsam sıfır
+   döndürdü"** ile **"kanıt okunamadı"** aynı görünüyordu. Sayı yoksa körlük vardır.
+4. **Şüphelendiğin mekanizmayı BORUDAN SÖKÜP izole çağır** (AUTH'un ölçümü). Kirli bir boru
+   üzerinden akıl yürütmek iki gün yedi; `kapsamda()`'yı dört sabit girdiyle doğrudan çağırmak
+   bir tur sürdü ve süzgeci akladı. İzole çağrı + muhasebe satırı = **iki bağımsız yöntemle** aynı
+   sonuç; tek yöntem hiçbirini kesinleştirmiyordu.
+
+#### Elenen iki mekanizma (kayda geçer — geri alınmış hipotez de bilgidir)
+
+- *"Kanca gerçek ağaçta varlık/izlenme kontrolü yapıyor"* (AUTH önerdi, **kendisi geri aldı**):
+  `doc-scope.cjs` baştan sona okundu, dosyada tek bir `existsSync`/`ls-files`/git çağrısı yok.
+- *"stdin boş / EAGAIN"* (ALTYAPI önerdi, **AUTH çürüttü**): dayanağı vitest'in **kırpılmış**
+  assertion çıktısıydı; ham logda `py.log` boş değildi. → §9.5'teki "kırpılmış çıktı kanıt
+  değildir" maddesiyle aynı kök.
+
+> Yan ürün, ayrıca korunur: süzgeç stdin hatasını `catch` ile yutmuyor ve stdout'a
+> `fs.writeSync(1, …)` ile **kısmi yazma ele alınarak** yazıyor. `process.stdout.write` POSIX
+> borusunda asenkrondur; süreç boşalmadan çıkarsa kuyruk sessizce uçar. İkisi de "sessizce
+> hiçbir şey üretmeyen kanca" sınıfına ait ve #859'da kapatıldı.
+
+#### 9.6.1 Bu maddenin kanıtı
+
+`INV-HOOKS-2`'nin altıncı kolu (`src/__tests__/conformance/githooks-doc-scope.test.ts`) sabotajla
+kanıtlandı; her turdan sonra sağlam sürüme dönüş `sha256` ile doğrulandı ve **ön koşul olarak
+`geçen > 0`** arandı (sağlam sürüm 6/6 geçiyor):
+
+| sabotaj | düşen kol |
+|---|---|
+| muhasebe satırı (`GIRDI … CIKAN …`) susturulsun | 1 |
+| boş girdide stdout kirletilsin (veri kanalı temiz kalmasın) | 1 |
+
+⚠ Sabotaj aracının **kendisi** ilk turda yarım kaldı: çalışma ağacındaki dosya **CRLF** ile
+checkout edilmişti ve düz `\n` içeren çok satırlı arama dizisi hiç eşleşmedi — tek satırlık desen
+tutmuşken. Betik bunu `UYGULANAMADI (desen tutmadı)` diye bildirdiği için fark edildi; bildirmeseydi
+"iki sabotajdan biri yakalandı" diyen **yanlış bir kanıt** yazılacaktı. Çok satırlı sabotaj deseni
+Windows checkout'unda **EOL-bağımsız** (`\r?\n`) olmalıdır. Bu, §9.5'teki "ölçüm aracının kendisi
+kör olabilir" dersinin ikinci örneğidir; ölçüm aracı da ölçülür.
+
 
 ---
 # FILE: docs\standards\form-submission-standard.md
@@ -11817,6 +11944,46 @@ eklendi → admin kolu **yeşil** (kabul kolu; ret gözlemi tek başına kanıt 
 **Bu bekçinin ölçmediği (adıyla):** politikanın *çalıştığını* değil, *yazıldığını* ölçer.
 Davranışsal kanıt gerçek JWT bağlamı ister; ayrıcalıklı bağlantı §15'in dediği gibi
 yanlış yeşil üretir.
+
+### 7.2.2 INSERT tarafı — korunan şey admin tekeli değil, **durum sınırı** (INV-QUOTE-3)
+
+§7.2.1 UPDATE yüzeyini kapattı. **INSERT yüzeyi ayrı bir yüzeydir ve aynı reçete burada
+YANLIŞ olurdu:** müşterinin `'requested'` teklif açması ve kendi `'requested'` teklifine
+kalem eklemesi **meşrudur** (v1'den beri canlı). "INSERT eden her politika admin şartı
+taşısın" deseydik bugünkü doğru politikaları kırmızıya düşürürdük.
+
+**Korunan değişmez:** teklif tablolarına INSERT eden her politika **ya `is_admin_user()`
+şartı taşır, ya da yazdığı/bağlandığı teklifin durumunu `'requested'` değerine çiviler.**
+
+**Niçin bu sınır (canlı ölçüm, 2026-08-27):** `'draft'` admin'in teklifi yazdığı,
+**fiyatın oluştuğu** durumdur. `authenticated` rolünün INSERT kolon yetkisi
+`venthub_quotes`'ta **7**, `venthub_quote_items`'ta **8** kolondur ve grant admin ile
+müşteriye **aynı anda** verilir — admin de `authenticated`'tır. Durumu çivilemeyen bir
+müşteri-INSERT politikası eklenirse müşteri kendine doğrudan `'draft'` teklif üretip
+fiyat yazabilir ve akışın tamamını atlar. **Grant daraltmak çözüm değildir** (admin'i
+kırar); koruma politikanın gövdesindeki `status = 'requested'` çivisidir.
+
+**Bekçi:** `src/__tests__/conformance/quote-insert-policy-guard.test.ts`. Bütün
+migration'ları okur, seçimi **ada değil içeriğe** göre yapar (yeniden adlandırma
+atlatamaz), `create` **ve** `alter` yakalar (şart gevşetmek de tehlikelidir), `for`
+yazılmamış politikayı PostgreSQL varsayılanı `ALL` sayar, SQL yorumlarını CRLF-güvenli
+sıyırır ve **boş evren koruması** taşır.
+
+**Kanıt (sabotaj, üç kol):** ne admin ne çivi taşıyan politika → **kırmızı** · aynı
+politikaya `is_admin_user()` eklendi → şart kolu **yeşil** (kabul kolu; ret gözlemi tek
+başına kanıt değildir) · şart yalnız **yorumda** → **kırmızı kaldı**.
+
+**Bu bekçinin ölçmediği (adıyla, iki kalem):** (1) politikanın canlıda *etkin* olduğunu
+değil, *yazıldığını* ölçer — davranışsal kanıt §15 ve `begin … rollback` kolundadır.
+(2) Şartların konjonksiyon içinde olduğunu ispatlamaz: `status = 'requested'` bir `or`
+dalında dursaydı çivi işlevi görmez ama bekçi yeşil kalırdı. **Bu boşluğun bekçisi
+ratchet'tir** — politika adı kümesi sabitlenmiştir, yeni ya da yeniden adlandırılmış her
+politika kırmızı yakar ve insan gözden geçirmesini zorlar. Sessizce eklenemez.
+
+**Ayrıca ölçüldü (2026-08-27):** admin INSERT politikaları `#844` ile canlıya indi, ancak
+bugün **sıfır çağıranı** vardır — depoda admin `'draft'` teklif üreten kod yolu yoktur
+(tek INSERT yolu `quoteService.ts` `createQuoteRequest`, o da müşteri yoludur). Kapı
+açıktır, geçen henüz yoktur; geçişi E5 Kompozör (REC-54 Kalem 2) yazacaktır.
 
 ### 7.3 Eşik — mekanizma otonom, değer config
 

@@ -2,19 +2,19 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\BrandsShowcase.tsx
-skeleton_hash: ff89f158a8590368
+source_path: C:\tmp\vh-altyapi-t165\src\components\BrandsShowcase.tsx
+skeleton_hash: 21e6e5421fcfb065
 entity_hashes:
   func:BrandsShowcase: 396bbfa4a2991af7
   func:Lane: 607c875efec6621a
   overview: 5afeff1221c0bd64
   style_tokens: 90e49e0ab0d8115d
-generated_at: 2026-08-27T13:04:43Z
+generated_at: 2026-08-27T07:53:05Z
 ---
 
 ## Genel Bakış
 
-`BrandsShowcase` modülü, HVAC markalarını sürekli kayan bir şerit (marquee) formatında sunan bir vitrin bileşenidir. Modül, marka logolarının kesintisiz döngü halinde akmasını sağlayarak dinamik ve görsel açıdan çekici bir marka tanıtımı oluşturur.
+`BrandsShowcase` modülü, HVAC markalarını sürekli kayan bir şerit (marquee) formatında sunan bir vitrin bileşenidir. Modül, marka logolarının kesintisiz döngü halinde akmasını sağlayarak dinamik ve görsel çekici bir marka tanıtımı oluşturur.
 
 ## Fonksiyon Grupları
 
@@ -30,15 +30,9 @@ Sayfada tam bir marka vitrini oluşturarak kaydırma şeridini yapılandırır v
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, HVAC markalarını sürekli kayan şeritler halinde gösteren bir vitrin bileşenidir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarılabilen varsayımlar listelenmiştir.
 
-**[Aksiyom 1]**: Eğer `HVAC_BRANDS` adında bir veri kaynağı (marka listesi) tanımlı değilse, `Lane` bileşeninin `items` parametresi için tip referansı (`typeof HVAC_BRANDS`) çözülemez ve bileşen derlenemez.
-
-**[Aksiyom 2]**: Eğer `items` parametresi boş bir dizi olarak verilirse, şerit üzerinde gösterilecek marka öğesi olmayacağından animasyon akışı gerçekleşmez.
-
-**[Aksiyom 3]**: Eğer `durationSec` değeri sıfır veya negatif olursa, CSS animasyon süresi geçersiz olacağından kayma hareketi düzgün çalışmaz. Varsayılan değer 50 saniyedir.
-
-**[Aksiyom 4]**: Eğer `BrandsShowcase` bileşeni içinde `Lane` bileşeni kullanılmıyorsa, eski dokümanda belirtilen "kayıt şeridini yapılandırır ve kullanıma sunar" davranışı yerine getirilemez.
+[Aksiyom 1]: Eğer `items` parametres
 
 ---
 
@@ -74,24 +68,29 @@ Bu modül, HVAC markalarını sürekli kayan şeritler halinde gösteren bir vit
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: BrandsShowcase.tsx::Lane
-- **params**: `items` (typeof HVAC_BRANDS), `durationSec` (number, varsayılan değer: 50)
+### [N1_NASIL] AST Pointer: src/components/BrandsShowcase.tsx::Lane
+- **params**: `items` — HVAC_BRANDS dizisi türünde marka listesi, `durationSec` — animasyon süresi (varsayılan 50 saniye)
 - **ic_degiskenler**:
-  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota fonksiyonları nesnesi; `Routes.brand(brand.slug)` çağrılarak marka detay sayfası URL'i üretilir
-  - `repeated` — `useMemo` ile hesaplanan, `items` dizisinin 3 kez (`[...items, ...items, ...items]`) tekrar edilerek birleştirilmiş hali; bağımlılık dizisi `[items]`
-  - `brand` — `repeated.map()` callback'indeki her bir marka nesnesi; `.slug` ve `.name` alanlarına erişilir
-  - `idx` — `repeated.map()` callback'indeki döngü indeksi; key üretimi için `${brand.slug}-${idx}` şeklinde kullanılır
-- **Dönüş**: JSX elementi — `div.relative.overflow-hidden.group` kök elemanı; içinde `style` (inline CSS keyframes), `div.flex.marquee-premium-track` (marka kartlarının kaydırıldığı bant) ve `repeated.map()` ile üretilen `Link` öğeleri içerir
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen, yerelleştirilmiş rota oluşturma fonksiyonları nesnesi
+  - `repeated` — `useMemo` ile `items` dizisinin üç kez (`[...items, ...items, ...items]`) birleştirilmesiyle oluşan kaydırma animasyonu için tekrarlanmış dizi
+  - `brand` — `repeated.map` içinde her bir marka nesnesi (`brand.slug` ve `brand.name` özelliklerine erişilir)
+  - `idx` — `repeated.map` içinde her bir elemanın dizideki sayısal indeksi
+- **Dönüş**: JSX — sonsuz kaydırma (marquee) animasyonlu marka logosu ızgarası bileşeni
 
----
-
-### [N2_NASIL] AST Pointer: BrandsShowcase.tsx::BrandsShowcase
-- **params**: yok
+### [N2_NASIL] AST Pointer: src/components/BrandsShowcase.tsx::(map callback)
+- **params**: `brand` — tek bir marka nesnesi, `idx` — dizideki indeks numarası
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('brands.sectionTitle')`, `t('brands.subtitlePart1')`, `t('brands.subtitlePart2')`, `t('brands.viewAll')` çağrılarıyla metinler alınır
-  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota fonksiyonları nesnesi; `Routes.brands()` çağrılarak tüm markalar sayfası URL'i üretilir
-  - `brands` — `HVAC_BRANDS` import'undan gelen marka listesi; `Lane` bileşenine `items` prop'u olarak aktarılır
-- **Dönüş**: JSX elementi — `section.relative.bg-white` kök elemanı; arka plan atmosferi (`div.bg-brands-radial`), başlık alanı (`motion.div` ve `motion.h2` ile animasyonlu), kenar solma efektli `Lane` carousel'i (`durationSec={70}`) ve "tümünü gör" CTA linki (`Routes.brands()`) içerir
+  - `brand` — marka nesnesi; `brand.slug` Link href'inde rota parametresi olarak, `brand.name` ise `BrandIcon` bileşenine prop olarak ve metin etiketinde kullanılır
+  - `idx` — `key` prop'unu benzersiz kılmak için `brand.slug` ile birlikte birleştirilir (`${brand.slug}-${idx}`)
+- **Dönüş**: JSX — tek bir marka için Link içinde logo, çizgi göstergesi ve isim etiketi içeren kart bileşeni
+
+### [N3_NASIL] AST Pointer: src/components/BrandsShowcase.tsx::BrandsShowcase
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; `t('brands.sectionTitle')`, `t('brands.subtitlePart1')`, `t('brands.subtitlePart2')`, `t('brands.viewAll')` anahtarlarıyla metinleri çözer
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota fonksiyonları nesnesi; `Routes.brand(brand.slug)` ve `Routes.brands()` çağrılarıyla kullanılır
+  - `brands` — `HVAC_BRANDS` sabitinden gelen marka listesi; `Lane` bileşenine `items` prop'u olarak aktarılır
+- **Dönüş**: JSX — marka vitrin bölümü; başlık animasyonu, kenar solma efektli `Lane` kaydırma bileşeni ve "tümünü gör" bağlantısı içeren tam sayfa bölümü
 
 ---
 

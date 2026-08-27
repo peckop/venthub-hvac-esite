@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useManualScrollRestoration.ts
-skeleton_hash: 7e697c3523ec0619
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useManualScrollRestoration.ts
+skeleton_hash: b6add87fcecc9552
 entity_hashes:
   func:useManualScrollRestoration: c36f5fe9ca492bf5
   overview: fbb89d52cd2f5084
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:36:16Z
 ---
 
 ## Genel Bakış

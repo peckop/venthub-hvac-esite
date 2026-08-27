@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useDragScroll.ts
-skeleton_hash: f543371fbdfe6cc5
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useDragScroll.ts
+skeleton_hash: 66164a6764c33264
 entity_hashes:
   func:useDragScroll: 285567f9f95bbe2e
   overview: 65551040518f5649
-generated_at: 2026-08-25T07:27:13Z
+generated_at: 2026-08-27T08:35:39Z
 ---
 
 ## Genel Bakış
@@ -21,10 +21,6 @@ Bu modül, sürükleme tabanlı kaydırma (drag scroll) işlevselliği sağlayan
 Modülün tek ve ana fonksiyonudur. Sürükleme ile kaydırma davranışını yöneten bir React hook'u olarak tanımlanmıştır.
 
 - useDragScroll
-
----
-
-**Not:** Kaynak kodu incelenmediğinden, fonksiyonun döndürdüğü değerler, kabul ettiği parametreler ve iç işleyişi hakkında detaylı bilgi verilememektedir. Detaylı bilgi için kaynak dosyanın incelenmesi gerekir.
 
 ---
 
@@ -119,8 +115,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: useDragScroll.ts
-  function: useDragScroll.ts::useDragScroll
+  file: src\hooks\useDragScroll.ts
+  function: src\hooks\useDragScroll.ts::useDragScroll
 
 ---
 

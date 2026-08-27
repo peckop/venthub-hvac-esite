@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx
-skeleton_hash: e83138a57f7df82e
+source_path: C:\tmp\vh-altyapi-t165\src\components\VisualShowcase.tsx
+skeleton_hash: 39a75f1a82c0793d
 entity_hashes:
   func:ChevronLeftIcon: 528282355948f0bf
   func:ChevronRightIcon: eee2ea0200791ea6
@@ -15,7 +15,7 @@ entity_hashes:
   func:usePrefersReducedMotion: 11085ad489b48f61
   overview: 7e4ec691259cb85e
   style_tokens: 2f11e16677a4f30c
-generated_at: 2026-06-19T20:47:48Z
+generated_at: 2026-08-27T07:58:36Z
 ---
 
 ## Genel Bakış

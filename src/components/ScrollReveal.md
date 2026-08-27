@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ScrollReveal.tsx
-skeleton_hash: 5e6a31137dce1c9b
+source_path: C:\tmp\vh-altyapi-t165\src\components\ScrollReveal.tsx
+skeleton_hash: 5b69a4240a390eb6
 entity_hashes:
   func:ScrollReveal: 5164aa702775b185
   overview: 7c3e9f948c132ef9
   style_tokens: fce5caac08f51876
-generated_at: 2026-06-19T20:47:32Z
+generated_at: 2026-08-27T07:58:26Z
 ---
 
 ## Genel Bakış

@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\products\ProductFormModal.tsx
-skeleton_hash: 6c4f3067bb0b0a8f
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\products\ProductFormModal.tsx
+skeleton_hash: db7f42cb4a2edd61
 entity_hashes:
   func:ProductFormModal: 6997b37c35b0ebef
   func:getProductSchema: 1aed3dbe58799d62
   func:onSubmit: 56cec6a550e2cc75
   overview: 7ffa6a2ec80048ee
   style_tokens: 6d7728838ddc9818
-generated_at: 2026-08-27T13:17:54Z
+generated_at: 2026-08-27T08:22:54Z
 ---
 
 ## Genel Bakış

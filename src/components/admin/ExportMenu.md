@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\ExportMenu.tsx
-skeleton_hash: 2f781db4f29ce535
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\ExportMenu.tsx
+skeleton_hash: 952569e6c7605451
 entity_hashes:
   func:ExportMenu: 9e536638b7cdf449
   overview: fcef70276d80a8c4
   style_tokens: b6f5e12168df9a4c
-generated_at: 2026-08-27T13:07:43Z
+generated_at: 2026-08-27T08:00:46Z
 ---
 
 ## Genel Bakış

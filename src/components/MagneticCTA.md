@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\MagneticCTA.tsx
-skeleton_hash: cf3c8c9c62c08336
+source_path: C:\tmp\vh-altyapi-t165\src\components\MagneticCTA.tsx
+skeleton_hash: f34807372895c773
 entity_hashes:
   func:MagneticCTA: 45285325a7d3c355
   func:onLeave: 47432f2c7853fc8a
   func:onMove: 0f9106ce87047fd0
   overview: 798bbdff09c682bc
   style_tokens: dfcd3a7af18b6331
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:31Z
 ---
 
 ## Genel Bakış

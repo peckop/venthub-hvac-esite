@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\EditableCell.tsx
-skeleton_hash: 9f6534813c606d11
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\EditableCell.tsx
+skeleton_hash: 8a8588a3c9b679e7
 entity_hashes:
   func:EditableCell: c69e143b78ab0750
   overview: e0ead7dc16886f70
   style_tokens: 9c5ac06edd88021a
-generated_at: 2026-08-27T13:07:43Z
+generated_at: 2026-08-27T08:00:45Z
 ---
 
 ## Genel Bakış

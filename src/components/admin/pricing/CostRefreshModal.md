@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\pricing\CostRefreshModal.tsx
-skeleton_hash: e58b4a7445018c90
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\CostRefreshModal.tsx
+skeleton_hash: 1b6f743e96cacb15
 entity_hashes:
   func:CostRefreshModal: 6d78cfeb2c873bb6
   overview: 21a4586912b6831f
   style_tokens: 4e601042ef8a3eb1
-generated_at: 2026-08-27T13:16:01Z
+generated_at: 2026-08-27T08:11:44Z
 ---
 
 ## Genel Bakış

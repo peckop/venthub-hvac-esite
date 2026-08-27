@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\type-converters.ts
-skeleton_hash: 43b8963130f87849
+source_path: C:\tmp\vh-altyapi-t165\src\utils\type-converters.ts
+skeleton_hash: 00b8bf17d9a5cbef
 entity_hashes:
   func:isRecord: 8ce9e37872c18872
   func:safeNumber: 2b963d2c4a44b8a1
   func:safeString: c82cbd1b53f6b21c
   overview: 7d1f2b251cf19bd1
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:40:06Z
 ---
 
 ## Genel Bakış

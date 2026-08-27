@@ -358,6 +358,46 @@ eklendi → admin kolu **yeşil** (kabul kolu; ret gözlemi tek başına kanıt 
 Davranışsal kanıt gerçek JWT bağlamı ister; ayrıcalıklı bağlantı §15'in dediği gibi
 yanlış yeşil üretir.
 
+### 7.2.2 INSERT tarafı — korunan şey admin tekeli değil, **durum sınırı** (INV-QUOTE-3)
+
+§7.2.1 UPDATE yüzeyini kapattı. **INSERT yüzeyi ayrı bir yüzeydir ve aynı reçete burada
+YANLIŞ olurdu:** müşterinin `'requested'` teklif açması ve kendi `'requested'` teklifine
+kalem eklemesi **meşrudur** (v1'den beri canlı). "INSERT eden her politika admin şartı
+taşısın" deseydik bugünkü doğru politikaları kırmızıya düşürürdük.
+
+**Korunan değişmez:** teklif tablolarına INSERT eden her politika **ya `is_admin_user()`
+şartı taşır, ya da yazdığı/bağlandığı teklifin durumunu `'requested'` değerine çiviler.**
+
+**Niçin bu sınır (canlı ölçüm, 2026-08-27):** `'draft'` admin'in teklifi yazdığı,
+**fiyatın oluştuğu** durumdur. `authenticated` rolünün INSERT kolon yetkisi
+`venthub_quotes`'ta **7**, `venthub_quote_items`'ta **8** kolondur ve grant admin ile
+müşteriye **aynı anda** verilir — admin de `authenticated`'tır. Durumu çivilemeyen bir
+müşteri-INSERT politikası eklenirse müşteri kendine doğrudan `'draft'` teklif üretip
+fiyat yazabilir ve akışın tamamını atlar. **Grant daraltmak çözüm değildir** (admin'i
+kırar); koruma politikanın gövdesindeki `status = 'requested'` çivisidir.
+
+**Bekçi:** `src/__tests__/conformance/quote-insert-policy-guard.test.ts`. Bütün
+migration'ları okur, seçimi **ada değil içeriğe** göre yapar (yeniden adlandırma
+atlatamaz), `create` **ve** `alter` yakalar (şart gevşetmek de tehlikelidir), `for`
+yazılmamış politikayı PostgreSQL varsayılanı `ALL` sayar, SQL yorumlarını CRLF-güvenli
+sıyırır ve **boş evren koruması** taşır.
+
+**Kanıt (sabotaj, üç kol):** ne admin ne çivi taşıyan politika → **kırmızı** · aynı
+politikaya `is_admin_user()` eklendi → şart kolu **yeşil** (kabul kolu; ret gözlemi tek
+başına kanıt değildir) · şart yalnız **yorumda** → **kırmızı kaldı**.
+
+**Bu bekçinin ölçmediği (adıyla, iki kalem):** (1) politikanın canlıda *etkin* olduğunu
+değil, *yazıldığını* ölçer — davranışsal kanıt §15 ve `begin … rollback` kolundadır.
+(2) Şartların konjonksiyon içinde olduğunu ispatlamaz: `status = 'requested'` bir `or`
+dalında dursaydı çivi işlevi görmez ama bekçi yeşil kalırdı. **Bu boşluğun bekçisi
+ratchet'tir** — politika adı kümesi sabitlenmiştir, yeni ya da yeniden adlandırılmış her
+politika kırmızı yakar ve insan gözden geçirmesini zorlar. Sessizce eklenemez.
+
+**Ayrıca ölçüldü (2026-08-27):** admin INSERT politikaları `#844` ile canlıya indi, ancak
+bugün **sıfır çağıranı** vardır — depoda admin `'draft'` teklif üreten kod yolu yoktur
+(tek INSERT yolu `quoteService.ts` `createQuoteRequest`, o da müşteri yoludur). Kapı
+açıktır, geçen henüz yoktur; geçişi E5 Kompozör (REC-54 Kalem 2) yazacaktır.
+
 ### 7.3 Eşik — mekanizma otonom, değer config
 
 T134/4: hiçbir üründe insan-tanımsız eşik yok; mekanizma platform sabiti, değer admin config.

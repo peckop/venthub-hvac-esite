@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T08:56:46.679776+00:00
+compiled_at: 2026-08-27T13:08:47.033419+00:00
 total_compiled_files: 655
-source_commit: 32b26661
+source_commit: 582e5eb5
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T08:56:46.679776+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T13:08:47.033419+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -9845,13 +9845,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\AddToCartToast.tsx
-skeleton_hash: 025fdc0eea708e0b
+source_path: C:\tmp\vh-altyapi-t165\src\components\AddToCartToast.tsx
+skeleton_hash: 79117146ebc05a83
 entity_hashes:
   func:AddToCartToast: 581f14d900d31bb4
   overview: 4631aecdd4e1b7b7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:59Z
+generated_at: 2026-08-27T07:52:12Z
 ---
 
 ## Genel Bakış
@@ -9904,44 +9904,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (useEffect callback)
-- **params**: yok
-- **ic_degiskenler**:
-  - `onAdded` — olay dinleyici fonksiyonu; `EVENT` adlı custom event'i dinler, ürün bilgisi varsa toast gösterir
-- **Dönüş**: cleanup fonksiyonu — `window.removeEventListener` ile `onAdded` dinleyicisini kaldırır
-
----
-
-### [N3_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (onAdded)
-- **params**:
-  - `e` — Event nesnesi; CustomEvent'e cast edilir
-- **ic_degiskenler**:
-  - `customEvent` — `e`'nin `CustomEvent<{ product?: Product }>` tipine cast edilmiş hali; TypeScript derleyicisini tatmin etmek ve zero-any sağlamak için
-  - `detail` — `customEvent.detail`; opsiyonel `product` alanı taşır
-  - `product` — `detail.product`; koşullu olarak atanır, `detail?.product` truthy ise kullanılır
-- **Dönüş**: yok — yan etki olarak `toast.custom` çağırır
-
----
-
-### [N4_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (toast.custom callback)
-- **params**:
-  - `id` — Sonner tarafından sağlanan benzersiz toast kimliği
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX — `<AddToCartToastContent product={product} onClose={() => toast.dismiss(id)} />` bileşeni
-
----
-
-### [N5_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (cleanup)
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — yan etki olarak `window.removeEventListener(EVENT, onAdded as EventListener)` çağırır
-
----
-
 ## NODE ID STANDARD
 
-  file: AddToCartToast.tsx
-  function: AddToCartToast.tsx::AddToCartToast
+  file: src\components\AddToCartToast.tsx
+  function: src\components\AddToCartToast.tsx::AddToCartToast
 
 ---
 
@@ -9971,13 +9937,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToastContent.tsx
-skeleton_hash: 852817141636c428
+source_path: C:\tmp\vh-altyapi-t165\src\components\AddToCartToastContent.tsx
+skeleton_hash: 776f5ad8caa5c99c
 entity_hashes:
   func:AddToCartToastContent: da3886a1d2990a31
   overview: a72a624e0dfb150e
   style_tokens: 5ac0b676517c4959
-generated_at: 2026-06-19T20:46:47Z
+generated_at: 2026-08-27T07:52:14Z
 ---
 
 ## Genel Bakış
@@ -10082,14 +10048,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx
-skeleton_hash: fc970852e5b16423
+source_path: C:\tmp\vh-altyapi-t165\src\components\BackToTopButton.tsx
+skeleton_hash: 4afcaf8d8882ec95
 entity_hashes:
   func:BackToTopButton: c8f2538093a58334
   func:handleScrollToTop: 94e0754193bc122d
   overview: cab9522d3717ffc4
   style_tokens: b29c0a49231e465f
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-08-27T07:52:15Z
 ---
 
 ## Genel Bakış
@@ -10191,13 +10157,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\BeforeAfterSlider.tsx
-skeleton_hash: 7acc7874dafc0574
+source_path: C:\tmp\vh-altyapi-t165\src\components\BeforeAfterSlider.tsx
+skeleton_hash: 123671554a301036
 entity_hashes:
   func:BeforeAfterSlider: f6df4a2541ee7895
   overview: 0e8c7c405d8bc050
   style_tokens: ae3c52abb33abdfe
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-08-27T07:52:16Z
 ---
 
 ## Genel Bakış
@@ -10296,14 +10262,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\BrandsShowcase.tsx
-skeleton_hash: 214a7ca3f7d167b5
+source_path: C:\tmp\vh-altyapi-t165\src\components\BrandsShowcase.tsx
+skeleton_hash: 21e6e5421fcfb065
 entity_hashes:
   func:BrandsShowcase: 396bbfa4a2991af7
   func:Lane: 607c875efec6621a
-  overview: a64c9ee274fd0d0f
+  overview: 5afeff1221c0bd64
   style_tokens: 90e49e0ab0d8115d
-generated_at: 2026-06-08T10:08:12Z
+generated_at: 2026-08-27T07:53:05Z
 ---
 
 ## Genel Bakış
@@ -10313,7 +10279,7 @@ generated_at: 2026-06-08T10:08:12Z
 ## Fonksiyon Grupları
 
 ### Kaydırma Şeridi Bileşeni
-Tek bir şerit (lane) üzerindeki marka öğelerini belirli bir sürede otomatik olarak kaydıran yardımcı bileşeni tanımlar. Varsayılan 50 saniyelik döngü süresi ile sürekli bir animasyon akışı sağlar.
+Tek bir şerit üzerindeki marka öğelerini belirli bir sürede otomatik olarak kaydıran yardımcı bileşendir. Varsayılan 50 saniyelik döngü süresi ile sürekli bir animasyon akışı sağlar.
 - Lane
 
 ### Ana Vitrin Bileşeni
@@ -10324,17 +10290,9 @@ Sayfada tam bir marka vitrini oluşturarak kaydırma şeridini yapılandırır v
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, HVAC markalarını kaydırılabilir bir şerit içinde gösteren bir vitrin bileşenidir. `Lane` yardımcı bileşeni listedeki öğeleri belirtilen sürede yatay olarak kaydırarak sürekli bir akış oluşturur; `BrandsShowcase` ise bu şeriti sayfada sunan ana bileşendir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarılabilen varsayımlar listelenmiştir.
 
-[Aksiyom 1]: Eğer `Lane` bileşenine `items` argümanı sağlanmazsa, kaydırılacak marka içeriği bulunmayacağından şerit boş veya hatalı görüntülenir.
-
-[Aksiyom 2]: Eğer `Lane` bileşenine sağlanan `items` boş bir dizi ise (`[]`), şerit içeriği olmadan çalışır ve kaydırma animasyonu anlamsız hale gelir.
-
-[Aksiyom 3]: Eğer `durationSec` olarak `0` veya negatif bir değer verilirse, kaydırma animasyon süresi geçersiz olacağından animasyon düzgün çalışmaz veya çok hızlı/hatalı akar.
-
-[Aksiyom 4]: Eğer `BrandsShowcase` bileşeni içinde `Lane` bileşenine geçirilen `items` dizisi `Lane` bileşeninin beklediği formata (örn: img src, alt text içeren nesneler) uymuyorsa, öğeler düzgün render edilmez.
-
-[Aksiyom 5]: Eğer `durationSec` çok küçük bir değer olarak (örn: `1`) ayarlanırsa, marka logoları okunamayacak kadar hızlı kayar; çok büyük bir değer olarak ayarlanırsa ise kaydırma neredeyse görünmez hale gelir.
+[Aksiyom 1]: Eğer `items` parametres
 
 ---
 
@@ -10356,26 +10314,43 @@ Bu modül, HVAC markalarını kaydırılabilir bir şerit içinde gösteren bir 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../data/brands::HVAC_BRANDS
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: ../i18n/I18nProvider::useI18n
+- import: ./HVACIcons::BrandIcon
+- import: framer-motion::motion
+- import: next/link::Link
+- import: react::React
+- import: react::useMemo
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: BrandsShowcase.tsx::Lane
-- **params**: `{ items, durationSec = 50 }`
+### [N1_NASIL] AST Pointer: src/components/BrandsShowcase.tsx::Lane
+- **params**: `items` — HVAC_BRANDS dizisi türünde marka listesi, `durationSec` — animasyon süresi (varsayılan 50 saniye)
 - **ic_degiskenler**:
-  - `repeated` — `items` dizisini üç kez tekrarlayarak oluşturulan dizi, sonsuz kaydırma animasyonu için kullanılır.
-- **Dönüş**: JSX elementi (React bileşeni)
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen, yerelleştirilmiş rota oluşturma fonksiyonları nesnesi
+  - `repeated` — `useMemo` ile `items` dizisinin üç kez (`[...items, ...items, ...items]`) birleştirilmesiyle oluşan kaydırma animasyonu için tekrarlanmış dizi
+  - `brand` — `repeated.map` içinde her bir marka nesnesi (`brand.slug` ve `brand.name` özelliklerine erişilir)
+  - `idx` — `repeated.map` içinde her bir elemanın dizideki sayısal indeksi
+- **Dönüş**: JSX — sonsuz kaydırma (marquee) animasyonlu marka logosu ızgarası bileşeni
 
-### [N2_NASIL] AST Pointer: BrandsShowcase.tsx::(brand, idx) => (...)
-- **params**: `(brand, idx)`
+### [N2_NASIL] AST Pointer: src/components/BrandsShowcase.tsx::(map callback)
+- **params**: `brand` — tek bir marka nesnesi, `idx` — dizideki indeks numarası
 - **ic_degiskenler**:
-  - Yok
-- **Dönüş**: JSX elementi (Link bileşeni)
+  - `brand` — marka nesnesi; `brand.slug` Link href'inde rota parametresi olarak, `brand.name` ise `BrandIcon` bileşenine prop olarak ve metin etiketinde kullanılır
+  - `idx` — `key` prop'unu benzersiz kılmak için `brand.slug` ile birlikte birleştirilir (`${brand.slug}-${idx}`)
+- **Dönüş**: JSX — tek bir marka için Link içinde logo, çizgi göstergesi ve isim etiketi içeren kart bileşeni
 
-### [N3_NASIL] AST Pointer: BrandsShowcase.tsx::BrandsShowcase
+### [N3_NASIL] AST Pointer: src/components/BrandsShowcase.tsx::BrandsShowcase
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
-  - `brands` — HVAC_BRANDS sabitinden alınan marka dizisi
-- **Dönüş**: JSX elementi (React bileşeni)
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; `t('brands.sectionTitle')`, `t('brands.subtitlePart1')`, `t('brands.subtitlePart2')`, `t('brands.viewAll')` anahtarlarıyla metinleri çözer
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota fonksiyonları nesnesi; `Routes.brand(brand.slug)` ve `Routes.brands()` çağrılarıyla kullanılır
+  - `brands` — `HVAC_BRANDS` sabitinden gelen marka listesi; `Lane` bileşenine `items` prop'u olarak aktarılır
+- **Dönüş**: JSX — marka vitrin bölümü; başlık animasyonu, kenar solma efektli `Lane` kaydırma bileşeni ve "tümünü gör" bağlantısı içeren tam sayfa bölümü
 
 ---
 
@@ -10414,13 +10389,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\BuildTag.tsx
-skeleton_hash: 859d858d16b6a190
+source_path: C:\tmp\vh-altyapi-t165\src\components\BuildTag.tsx
+skeleton_hash: 7547c525b9d867e1
 entity_hashes:
   func:BuildTag: 33fa67732a403b49
   overview: 5afd4a9c8d0105c9
   style_tokens: 9c295aa26dd24226
-generated_at: 2026-06-14T22:16:15Z
+generated_at: 2026-08-27T07:53:06Z
 ---
 
 ## Genel Bakış
@@ -10505,14 +10480,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\CaseStudySection.tsx
-skeleton_hash: 7631420c6a87f664
+source_path: C:\tmp\vh-altyapi-t165\src\components\CaseStudySection.tsx
+skeleton_hash: 26e26545a95fe0c0
 entity_hashes:
   func:CaseStudySection: 30e263b0ef69a0a4
   func:openLead: 3d89ba2774c36aa2
   overview: 5af9581c1e08259f
   style_tokens: de735ee559e96a8f
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-08-27T07:53:07Z
 ---
 
 ## Genel Bakış
@@ -10854,26 +10829,44 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\Footer.tsx
-skeleton_hash: 91583130499c2de6
+source_path: C:\tmp\vh-altyapi-t165\src\components\Footer.tsx
+skeleton_hash: b13b185bbf96a807
 entity_hashes:
   func:Footer: 1e0192e85e1f6373
-  overview: 05f327193547be84
+  overview: a3368ce4cddcd9ef
   style_tokens: 266d0ec5d4b33045
-generated_at: 2026-06-14T22:50:16Z
+generated_at: 2026-08-27T07:54:41Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın alt kısmında görünecek olan Footer bileşenini tanımlar. React işlevsel bileşeni olarak uygulanmış olup, sayfanın son kısmında gerekli bağlantı, telif hakkı veya sosyal medya gibi bilgileri sunmak için kullanılır.
+Bu modül, uygulamanın altbilgi (footer) bölümünü oluşturan React fonksiyonel bileşenini tanımlar. Bileşen, çeviri desteğiyle birlikte telif hakkı metni, kategori bağlantıları ve diğer altbilgi öğelerini render eder. Kategori verisini `CategoryContext`'ten, metinleri ise `I18nProvider`'dan alır.
 
 ## Fonksiyon Grupları
 ### Bileşen Tanımı
-Footer bileşeninin oluşturulması ve dışa aktarılması sorumluluğundadır.
+Uygulamanın altbilgi bölümünü render etmekten sorumludur. `useCategories` ve `useI18n` hook'larından aldığı verileri kullanarak, `mainCategories` gibi memoize edilmiş türev veriler üretir ve bunları JSX içinde sayfa düzenine dönüştürür.
 - Footer
+
+## Bağımlılıklar
+**Dış Bağımlılıklar:**
+- `CategoryContext` — `useCategories` hook'u aracılığıyla global kategori listesini sağlar.
+- `I18nProvider` — `useI18n` hook'u aracılığıyla çeviri fonksiyonu `t` nesnesini sağlar.
+- `Routes` — Sayfa yönlendirme bağlantıları için kullanılır.
+- `BuildTag` — Yapı bilgisi etiketi olarak altbilgiye eklenir.
+- `Link` (next/link) — Next.js bağlantı bileşeni olarak kullanılır.
+- `React` — Temel React bağımlılığı.
+
+**Dinamik/Lazy Yüklenen Modül:**
+Bilgi yok — mevcut kaynakta bu tür bir yükleme stratejisine dair bir işaret bulunmuyor.
+
+## Mimari Notlar
+- Modül tek bir fonksiyonel bileşenden oluşur; sunum katmanında yer alan basit bir UI bileşenidir.
+- `mainCategories` değişkeni `React.useMemo` ile memoize edilmiştir; bu, üst bileşenin her render'ında kategori listesinin yeniden hesaplanmasını önler.
+- Çeviri ve kategori verisi doğrudan context hook'larından çekilir; bileşen kendi başına veri üretmez veya depolamaz.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+
 Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
@@ -10890,8 +10883,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## İTHALATLAR (IMPORTS)
 - import: ../contexts/CategoryContext::useCategories
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
-- import: ../utils/routes::Routes
+- import: ../utils/categoryHelpers::getCategoryDisplayName
+- import: ../utils/categoryHelpers::getLocalizedCategorySlug
 - import: ./BuildTag::BuildTag
 - import: next/link::Link
 - import: react::React
@@ -10903,21 +10898,30 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### [N1_NASIL] AST Pointer: src/components/Footer.tsx::Footer
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — çeviri fonksiyonu, `useI18n` hook'undan elde edilen `t` nesnesi; footer üzerindeki tüm metinleri çevirmek için kullanılır.
-  - `globalCategories` — `useCategories` context'inden gelen tüm kategorilerin dizisi; footer'ın kategori listesi ve diğer bölümlerde kaynak veri olarak kullanılır.
-  - `mainCategories` — `React.useMemo` ile memoize edilmiş değişken; `parent_id` olmayan (üst seviye) kategorilerin ilk 8 elemanını içerir ve footer'ın "Kategoriler" bölümünde gösterilir.
-- **Dönüş**: JSX.Element — `<footer>...</footer>` elementi olarak render edilen footer bileşeni.
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; metinleri anahtarla çağırmak için kullanılır
+  - `lang` — `useI18n()` hook'undan dönen geçerli dil kodu; `getLocalizedCategorySlug` fonksiyonuna iletilir
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rotalar objesi; `Routes.home()`, `Routes.products()`, `Routes.brands()`, `Routes.about()`, `Routes.contact()`, `Routes.destek.home()`, `Routes.destek.sss()`, `Routes.destek.iadeDegisim()`, `Routes.destek.teslimatKargo()`, `Routes.destek.garantiServis()`, `Routes.category()`, `Routes.legal.kvkk()`, `Routes.legal.mesafeliSatis()`, `Routes.legal.onBilgilendirme()`, `Routes.legal.cerez()`, `Routes.legal.gizlilik()`, `Routes.legal.kullanimKosullari()` metotları çağrılarak Link bileşenlerinin href'leri oluşturulur
+  - `globalCategories` — `useCategories()` hook'undan destructure edilen kategori dizisi; `mainCategories` hesaplamasında filtrelenmek üzere kullanılır
+  - `mainCategories` — `React.useMemo` ile hesaplanan, `globalCategories` dizisinden `parent_id` değeri olmayan kategorilerin ilk 8 tanesi; kategori bölümünde `.slice(0, 6)` ile altı tanesi listelenir
+  - `FOOTER_ICON_ADDRESS` — adres ikonu JSX'i; iletişim bölümünde adres satırının solunda gösterilir
+  - `FOOTER_ICON_PHONE` — telefon ikonu JSX'i; iletişim bölümünde telefon satırının solunda gösterilir
+  - `FOOTER_ICON_MAIL` — e-posta ikonu JSX'i; iletişim bölümünde e-posta satırının solunda gösterilir
+  - `WEEKDAY_HOURS` — hafta içi çalışma saatleri metni; çalışma saatleri kutusunda gösterilir
+  - `SATURDAY_HOURS` — cumartesi çalışma saatleri metni; çalışma saatleri kutusunda gösterilir
+  - `HVAC_SUFFIX` — alt bilgi bandında telif hakkı satırında marka adından sonra eklenen sonek metin
+- **Dönüş**: JSX — `<footer>` elementi; şirket bilgisi, hızlı bağlantılar, kategoriler, iletişim bilgileri ve alt bilgi bandı içeren responsive footer düzeni
 
-### [N2_NASIL] AST Pointer: src/components/Footer.tsx::mainCategories (useMemo callback)
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/components/Footer.tsx::useMemo callback
+- **params**: (parametre yok; `globalCategories` dış kapsamdan erişilir)
 - **ic_degiskenler**:
-  - `globalCategories` — dış kapsaktan gelen tüm kategoriler dizisi; bu fonksiyon içinde `filter` ve `slice` işlemlerine kaynak olarak kullanılır.
-- **Dönüş**: Category[] — `parent_id` olmayan kategorilerin ilk 8 elemanını içeren yeni dizi; footer'da gösterilecek kategori özetini sağlar.
+  - `c` — `.filter()` callback parametresi; her bir kategori nesnesini temsil eder, `c.parent_id` değeri falsy olanlar (ana kategoriler) tutulur
+- **Dönüş**: Dizi — `parent_id` değeri olmayan kategorilerin en fazla 8 tanesi
 
-### [N3_NASIL] AST Pointer: src/components/Footer.tsx::renderCategoryItem
-- **params**: `category` — bir kategori nesnesi; `slug` ve `name` özelliklerini içerir, bu özellikler link oluşturma ve metin gösteriminde kullanılır.
-- **ic_degiskenler**: (yok) — fonksiyon gövdesinde ek bir değişken tanımlanmaz.
-- **Dönüş**: JSX.Element — `<li>` elementi içinde bir `<Link>` barındıran kategori öğesi; footer'ın kategori listesinde tek bir satır olarak render edilir.
+### [N3_NASIL] AST Pointer: src/components/Footer.tsx::map callback (kategoriler)
+- **params**:
+  - `category` — dizideki tek bir kategori nesnesi; `category.slug` anahtar olarak, `getLocalizedCategorySlug(category, lang)` ile yerelleştirilmiş slug, `getCategoryDisplayName(category, t)` ile görünen ad elde edilir
+- **ic_degiskenler**: (yok; `category` doğrudan JSX'te kullanılır)
+- **Dönüş**: JSX — `<li>` elementi içinde `<Link>` bileşeni; `Routes.category()` ile kategori sayfasına yönlendirme sağlar
 
 ---
 
@@ -10954,45 +10958,47 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx
-skeleton_hash: ab3c3407e866ff6d
+source_path: C:\tmp\vh-altyapi-t165\src\components\HVACIcons.tsx
+skeleton_hash: 24a1beac0c200721
 entity_hashes:
   func:AccessoriesIcon: df362ba93a01a32a
   func:AirCurtainIcon: a991d6630fad3258
   func:AirPurifierIcon: 6d358290affcacb3
-  func:BrandIcon: abc1dbe6a42bf303
+  func:BrandIcon: 32c622c7ba9e80d1
   func:DehumidifierIcon: 40d30033e6855f3e
   func:FanIcon: 4fb3ddee9fac4362
   func:FlexibleDuctIcon: 252d34888f5ec8da
   func:HeatRecoveryIcon: 821f62398bcddd32
   func:SpeedControlIcon: dbb6f424f34e3326
   func:WhatsAppIcon: e7d41d76023d8693
-  overview: dff8b3ed99dcf496
+  overview: a08df0c2672d5abc
   style_tokens: 3b0534c287cddb44
-generated_at: 2026-06-14T22:50:17Z
+generated_at: 2026-08-27T07:55:24Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC sistemleriyle ilgili çeşitli ekipmanları ve bazı ortak kullanım amaçlı sembolleri temsil eden SVG tabanlı React ikon bileşenlerini toplar. Her bir fonksiyon, belirtilen boyut ve stil seçenekleriyle özelleştirilebilir bir ikon döndürerek arayüzde görsel eşleştirmeyi kolaylaştırır.
+Bu modül, HVAC sistemleriyle ilişkili ekipmanları ve bazı genel amaçlı sembolleri temsil eden SVG tabanlı React ikon bileşenlerini içerir. Her bileşen, boyut ve sınıf adı gibi özelleştirilebilir özellikler alarak arayüzde görsel eşleştirmeyi kolaylaştırır.
 
 ## Fonksiyon Grupları
 ### HVAC Ekipman İkonları
-HVAC sistemlerinin temel bileşenlerini görselleştirmek için kullanılan ikonlar burada yer alır; fan, ısı geri kazanımı, havalama perdeleri, nemlendirici, hava temizleyici, esnek kanal, hız kontrolü ve aksesuar gibi işlevleri temsil eder.
+Bu grup, HVAC sistemlerinin temel bileşenlerini görselleştiren ikonları içerir. Fan, ısı geri kazanımı, havalama perdesi, nemlendirici, hava temizleyici, esnek kanal, hız kontrolü ve aksesuar gibi işlevleri temsil eder.
 - FanIcon, HeatRecoveryIcon, AirCurtainIcon, DehumidifierIcon, AirPurifierIcon, FlexibleDuctIcon, SpeedControlIcon, AccessoriesIcon
 
 ### Ortak Kullanım İkonları
-Modülün geri kalan kısmı, sosyal medya bağlantıları ve marka gösterimi gibi genel amaçlı ihtiyaçlara hizmet eden basit ikonları içerir; bu sayede arayüzde tutarlı bir görsel dil sağlanır.
+Bu grup, sosyal medya ve marka gösterimi gibi genel amaçlı ikonları içerir. Arayüzde tutarlı bir görsel dil sağlamak için kullanılır.
 - WhatsAppIcon, BrandIcon
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, prop tiplerinin ve varsayılan değerlerinin beklendiği şekilde sağlandığını varsayar.
 
-[Aksiyom 1]: Eğer className prop'ı string değilse, component sınıf adı uygulanamayabilir ve stil hatası oluşabilir.  
-[Aksiyom 2]: Eğer size prop'ı sayı değilse, CSS boyutu geçersiz olur ve ikon beklenmedik şekilde render edilebilir.  
-[Aksiyom 3]: Eğer WhatsAppIcon'ın size prop'ı sağlanmazsa, varsayılan 24 kullanılır; ancak bu değerin sayı olmaması durumunda yukarıdaki aksiyom geçerlidir.  
-[Aksiyom 4]: Eğer BrandIcon'ın brand prop'ı sağlanmazsa veya tanımsız ise, component doğru şekilde render edilemez (brand eksikliği nedeniyle görüntülenemez).
+[Aksiyom 1]: Eğer `size` parametresi verilmezse, `FanIcon`, `HeatRecoveryIcon`, `AirCurtainIcon`, `DehumidifierIcon`, `AirPurifierIcon`, `FlexibleDuctIcon`, `SpeedControlIcon` ve `AccessoriesIcon` bileşenleri için 48, `WhatsAppIcon` bileşeni için 24 varsayılan değer olarak kullanılır.
+
+[Aksiyom 2]: Eğer `className` parametresi verilmezse, tüm ikon bileşenleri için boş string (`''`) varsayılan değer olarak kullanılır.
+
+[Aksiyom 3]: Eğer `BrandIcon` bileşeninde `brand` parametresi verilmezse, bileşen düzgün çalışamaz çünkü bu parametre zorunludur ve varsayılan değeri yoktur.
+
+[Aksiyom 4]: Eğer `IconProps` tipi tanımlı değilse, `FanIcon`, `HeatRecoveryIcon`, `AirCurtainIcon`, `DehumidifierIcon`, `AirPurifierIcon`, `FlexibleDuctIcon`, `SpeedControlIcon`, `AccessoriesIcon` ve `WhatsAppIcon` bileşenlerinin dönüş tipi tanımsız kalır ve TypeScript derleme hatası oluşur.
 
 ---
 
@@ -11074,12 +11080,15 @@ Bu modül, prop tiplerinin ve varsayılan değerlerinin beklendiği şekilde sa�
 **Dönüş**: `React.FC<IconProps>`; WhatsApp logosunu gösteren fonksiyonel bileşen.
 
 ### BrandIcon
-**Ne yapar**: Verilen `brand` parametresine göre ilgili marka logosunu render eden dinamik bir ikon bileşeni sağlar.  
-**Nasıl yapar**: `brand` string değerine göre önceden tanımlanmış marka SVG’lerinden uygun olanı seçer, `className` prop’sunu bu SVG’nin stiline uygular ve ekrana basar.  
+**Ne yapar**: Verilen `brand` parametresine göre ilgili markaya ait ikonu render eden bir React fonksiyonel bileşenidir. HVAC (Isıtma, Havalandırma, İklimlendirme) sistemiyle ilişkili markaların ikonlarını göstermek amacıyla kullanılır.
+
+**Nasıl yapar**: Fonksiyon, aldığı `brand` ve `className` parametrelerini kullanarak bir React bileşeni döndürür. Bileşen, `brand` değerine karşılık gelen marka ikonunu belirtilen CSS sınıfıyla birlikte görüntüler. Varsayılan olarak `className` boş string olarak atanmıştır, böylece dışarıdan bir sınıf belirtilmediğinde bileşen hata vermeden çalışır. Dosya yolu `HVACIcons.tsx` olduğundan, bu bileşenin HVAC ikonları koleksiyonunun bir parçası olduğu anlaşılmaktadır.
+
 **Parametreler**:
-- brand: string — Gösterilecek markanın adı; bu değere göre ilgili logo seçilir.  
-- className: string (opsiyonel) — Ekstra stil sınıfları eklemek için kullanılır, varsayılan boş string.  
-**Dönüş**: `React.FC<{ brand: string; className?: string }>`; marka logosunu gösteren fonksiyonel bileşen.
+- `brand`: `string` — Görüntülenecek markanın adını belirtir. Hangi markaların desteklendiği kaynak kodda tanımlı marka listesine bağlıdır.
+- `className`: `string` (varsayılan: `''`) — Bileşenin kök elemanına uygulanacak isteğe bağlı CSS sınıf adıdır. Belirtilmediğinde boş string kullanılır.
+
+**Dönüş**: `React.FC<{ brand: string; className?: string }>` — Verilen `brand` ve `className` prop'larını kabul eden bir React fonksiyonel bileşeni döndürür. Dönen bileşen, marka ikonunu DOM'a yerleştirir.
 
 ---
 
@@ -11099,79 +11108,59 @@ Bu modül, prop tiplerinin ve varsayılan değerlerinin beklendiği şekilde sa�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::FanIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N1_NASIL] AST Pointer: src/components/HVACIcons.tsx::FanIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (fan ikonu, dairesel kanatlar ve merkez nokta)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::HeatRecoveryIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N2_NASIL] AST Pointer: src/components/HVACIcons.tsx::HeatRecoveryIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (ısı geri kazanım ünitesi, mavi ve turuncu oklar, HRV_LABEL metni)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::AirCurtainIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N3_NASIL] AST Pointer: src/components/HVACIcons.tsx::AirCurtainIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (hava perdesi, dikey çizgiler ve eğik hava akışı)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::DehumidifierIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N4_NASIL] AST Pointer: src/components/HVACIcons.tsx::DehumidifierIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (nem alıcı, su damlacıkları ve gösterge çubukları)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::AirPurifierIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N5_NASIL] AST Pointer: src/components/HVACIcons.tsx::AirPurifierIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (hava temizleyici, filtre katmanları ve hava akışı)
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::FlexibleDuctIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N6_NASIL] AST Pointer: src/components/HVACIcons.tsx::FlexibleDuctIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (esnek kanal, dalgalı boru ve bağlantı noktaları)
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::SpeedControlIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N7_NASIL] AST Pointer: src/components/HVACIcons.tsx::SpeedControlIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (hız kontrolü, kadran ve RPM_LABEL metni)
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::AccessoriesIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N8_NASIL] AST Pointer: src/components/HVACIcons.tsx::AccessoriesIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 48)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (aksesuar, dişli çark ve bağlantı parçaları)
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::WhatsAppIcon
-- **params**: className, size
-- **ic_degiskenler**:
-  - `className` — SVG öğesinin className özelliğine aktarılan stil sınıfı
-  - `size` — SVG öğesinin width ve height özelliklerine piksel cinsinden aktarılan boyut (varsayılan 24)
-- **Dönüş**: JSX elementi (React.FC<IconProps>)
+### [N9_NASIL] AST Pointer: src/components/HVACIcons.tsx::WhatsAppIcon
+- **params**: `className` (varsayılan: ''), `size` (varsayılan: 24)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — SVG elementi (WhatsApp logosu, beyaz dolgulu)
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx::BrandIcon
-- **params**: brand, className
+### [N10_NASIL] AST Pointer: src/components/HVACIcons.tsx::BrandIcon
+- **params**: `brand`, `className` (varsayılan: '')
 - **ic_degiskenler**:
-  - `brand` — görüntülenecek markanın adı; lowercase versiyonu için `normalizedBrand` hesaplanır ve `<img>` alt metni olarak kullanılır
-  - `className` — dış öğeye (img veya fallback div) uygulanacak ek stil sınıfı
-  - `normalizedBrand` — `brand` küçük harfe çevrilmiş hali; marka eşleştirmesinde switch case’de kullanılır
-  - `basePath` — marka görsellerinin bulunduğu sabit yol (`/images/ekran`)
-  - `src` — seçilen markaya göre oluşturulan tam görsel URL’si; `<img>` öğesinin src özelliğine aktarılır
-  - `alt` — `<img>` öğesinin alt özelliği; erişilebilirlik için marka adıyla doldurulur
-- **Dönüş**: JSX elementi (React.FC<{ brand: string; className?: string }>) – marka görseli veya fallback metni döner.
+  - `normalizedBrand` — `brand.toLowerCase()` ile marka adının küçük harfe dönüştürülmüş hali
+  - `basePath` — '/images/ekran' sabit dizin yolu, marka görsellerinin bulunduğu klasör
+  - `src` — switch-case ile belirlenen marka görselinin dosya yolu (avens.svg, vortic.jpg, casals.png, nicotra.webp, flexiva.png)
+  - `alt` — `brand` parametresinin kendisi, erişilebilirlik için alternatif metin
+- **Dönüş**: JSX — Eşleşen marka varsa `Image` bileşeni içeren div; eşleşmezse marka adını gösteren fallback div
 
 ---
 
@@ -11242,15 +11231,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ImageGallery.tsx
-skeleton_hash: 701f6aa8838e4566
+source_path: C:\tmp\vh-altyapi-t165\src\components\ImageGallery.tsx
+skeleton_hash: 679ce7614ce0b1c8
 entity_hashes:
   func:ImageGallery: ed5cc2a855b5b9b8
   func:handleMouseLeave: 60d41c470a6d0032
   func:handleMouseMove: b68c1278669bcb7a
   overview: f4654744ad74eeea
   style_tokens: 01bec99debdcd366
-generated_at: 2026-06-14T22:50:17Z
+generated_at: 2026-08-27T07:55:25Z
 ---
 
 ## Genel Bakış
@@ -11407,13 +11396,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\InViewCounter.tsx
-skeleton_hash: 94aaa03be3178db8
+source_path: C:\tmp\vh-altyapi-t165\src\components\InViewCounter.tsx
+skeleton_hash: d61c388d156bdea7
 entity_hashes:
   func:InViewCounter: 223b6183b16e2873
   overview: 61076e120659900f
   style_tokens: 2ef2cd2897b38d9e
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:26Z
 ---
 
 ## Genel Bakış
@@ -11579,14 +11568,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\LanguageSwitcher.tsx
-skeleton_hash: d6dfc9a8a72992f9
+source_path: C:\tmp\vh-altyapi-t165\src\components\LanguageSwitcher.tsx
+skeleton_hash: 2d13d652bec031c8
 entity_hashes:
   func:LanguageSwitcher: e20e68a6d834aa54
   func:switchLanguage: ceec0990f90068b4
   overview: 2f23c86896c74c04
   style_tokens: 819c78943fe15425
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:27Z
 ---
 
 ## Genel Bakış
@@ -11707,13 +11696,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\LazyInView.tsx
-skeleton_hash: e06566b45d2ed847
+source_path: C:\tmp\vh-altyapi-t165\src\components\LazyInView.tsx
+skeleton_hash: db3b914be41ce4b2
 entity_hashes:
   func:LazyInView: a6cf07d9fd7df258
   overview: dcd89aaa1940f652
   style_tokens: 884aa794c8b33f43
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:29Z
 ---
 
 ## Genel Bakış
@@ -11860,49 +11849,63 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\components\LeadModal.tsx
-skeleton_hash: e17640613f7b7de8
+source_path: C:\Users\alize\venthub-wt-quote\src\components\LeadModal.tsx
+skeleton_hash: 499c5e0afbe64842
 entity_hashes:
   func:LeadModal: d62325f85f800f09
-  func:handleClose: 63d7dd03089c88aa
-  func:submit: 524cec536455da2d
-  func:validate: 986ff306b233d4e4
-  overview: e6fd6a1ce6c238d0
-  style_tokens: 01d5bdbc603763a7
-generated_at: 2026-08-27T06:50:24Z
+  func:handleClose: 0cc370a6edc1c061
+  func:submit: 57ac99ffc1840be0
+  func:validate: 4db8fe8dea658f52
+  overview: 99ab56de684b2e03
+  style_tokens: 671fc429a274af0c
+generated_at: 2026-08-17T13:18:14Z
 ---
 
 ## Genel Bakış
-Bu modül, potansiyel müşteri (lead) bilgilerini toplamak için kullanılan bir modal form bileşeni içerir. Bileşen, formun doğrulamasını, gönderilmesini ve modalın açılıp kapanma kontrolünü yöneterek kullanıcı verilerini sisteme kaydetme işlemini gerçekleştirir.
+`LeadModal` bileşeni, potansiyel müşteri (lead) bilgilerini toplamak için kullanılan modal tabanlı bir form penceresidir. Bileşen, form alanlarının doğrulamasını, gönderim işlemini ve modalın açılıp kapanma kontrollerini yöneterek kullanıcı iletişim verilerini sisteme kaydeder.
 
 ## Fonksiyon Grupları
 ### Modal Kontrol ve Render
-Modalın açılıp kapanma durumunu kontrol eder, prop'lar aracılığıyla görünürlüğü yönetir ve form alanlarını içeren arayüzü oluşturur.
+Modalın açılıp kapanmasını kontrol eder, prop'lar aracılığıyla görünürlüğü yönetir ve form alanlarını içeren JSX yapısını render eder.
 - LeadModal
 
 ### Form Doğrulama
-Kullanıcı tarafından girilen form verilerinin geçerliliğini kontrol eder; zorunlu alanların doluluğunu ve veri formatını doğrular.
+Kullanıcı tarafından doldurulan form alanlarının geçerliliğini kontrol eder; zorunlu alanların doluluğunu ve veri formatlarını doğrular.
 - validate
 
 ### Form İşleme
-Form gönderim olayını yakalayarak doğrulama çalıştırır, başarılı ise veriyi işler; ayrıca modalı kapatma ve ilgili geri çağırma fonksiyonunu tetikleme işlemini yönetir.
+Form gönderim olayını yakalayarak doğrulama çalıştırır, başarılı ise lead verisini işler; ayrıca modal kapatma işlemini ve ilgili callback çağrısını yönetir.
 - submit, handleClose
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-[Aksiyom 1]: Eğer `open` prop'u sağlanmazsa, modalın açık/kapalı durumu belirlenemez ve bileşen render edilse bile görünür olup olmadığı kontrol edilemez.
+Bu modül, ürün ile ilgili potansiyel müşteri bilgilerini toplayan kontrollü bir modal form bileşenidir. Aşağıdaki varsayımlar fonksiyon imzaları ve yapısal ipuçlarından türetilmiştir.
 
-[Aksiyom 2]: Eğer `onClose` prop'u sağlanmazsa, kullanıcı modalı kapatamaz; handleClose fonksiyonu kapatma işlemini tetikleyecek bir callback bulamaz.
+---
 
-[Aksiyom 3]: Eğer `productName` prop'u sağlanmazsa, formda ürün adı gösterilemez; hangi ürün için lead toplandığı kullanıcıya bildirilemez.
+**[Aksiyom 1]:** Eğer `onClose` callback'i sağlanmazsa, modal bileşeni kendi kendini kontrollü modo kapatabilir (`open` prop'u false yapabilir) ancak üst bileşen durumunu güncelleyemez ve modal kalıcı olarak açık kalır.
 
-[Aksiyom 4]: Eğer validate fonksiyonu submit öncesinde çağrılmazsa, geçersiz veya eksik form verileriyle gönderim yapılabilir.
+**[Aksiyom 2]:** Eğer `open` prop'u `boolean` türünde (veya truthy/falsy dönüştürülebilir) değilse, modalın render edilip edilmeyeceği belirlenemez ve bileşen beklenmedik davranışı gösterir.
 
-[Aksiyom 5]: Eğer submit fonksiyonu bir FormEvent almazsa, formun varsayılan davranışı (sayfa yenileme) engellenemez.
+**[Aksiyom 3]:** Eğer `productName` değeri sağlanmazsa, toplanan lead bilgileri hangi ürüne ait olduğu belirsiz olacağından, form gönderiminde ürün bağlamı eksik olur.
 
-[Aksiyom 6]: Eğer handleClose fonksiyonu onClose prop'unu çağırmazsa, modal kapatıldığında üst bileşen durumdan haberdar olamaz ve modal tekrar açılamaz hale gelebilir.
+**[Aksiyom 4]:** Eğer `validate()` fonksiyonu `submit()` invokasyonundan önce çağrılmazsa, geçersiz form verileri sunucuya gönderilebilir; bu nedenle validasyon submit iş akışının zorunlu bir ön koşuludur.
+
+**[Aksiyom 5]:** Eğer `submit()` fonksiyonu `React.FormEvent` parametresi almazsa (örn: çağrıcı event'i iletmezse), form default submit davranışını (`page reload`) engelleyemez.
+
+**[Aksiyom 6]:** `_productId` prop'u (`__productId` olarak yeniden adlandırılmış) sağlanmazsa, lead kaydının hangi ürün ID'sine bağlı olacağı belirsiz olur; bu değerin form submission payload'ında gerekli olduğu varsayılır.
+
+---
+
+### Domain-Specific Kurallar
+
+| Kural | Açıklama |
+|---|---|
+| **Zorunlu alan doğrulaması** | `validate()`, tüm zorunlu form alanlarının doluluğunu kontrol etmelidir; boş alan bırakılamaz. |
+| **Kontrollü bileşen paterni** | Modal görünürlüğü `open` prop'u ile dışarıdan yönetilir; bileşen içinden `open` state'i doğrudan mutate edilmez. |
+| **Eşik değer** | Tanımlanmamıştır — form alanı sayısına veya zorunlu alan koşullarına ilişkin eşik değer kodda belirlenmemiştir. |
 
 ---
 
@@ -11919,33 +11922,37 @@ Form gönderim olayını yakalayarak doğrulama çalıştırır, başarılı ise
 **Dönüş**: React.FC\<LeadModalProps\> — Tanımlı prop tipleriyle bir React fonksiyonel bileşeni döndürür.
 
 ### validate
-**Ne yapar**: Form gönderiminden önce form alanlarının doğrulama işlemini tetikler ve doğrulama hatalarını state'e kaydeder. Form geçerliyse gönderim sürecini başlatır.
-**Nasıl yapar**: Asenkron bir arrow function olarak tanımlanmıştır ve `React.FormEvent` parametresi alır. Önce `e.preventDefault()` ile formun varsayılan tarayıcı davranışını (sayfa yenileme) engeller. Ardından dışarıdan tanımlı `validate()` fonksiyonunu çağırarak doğrulama sonuçlarını alır ve `setErrors` ile hata state'ine atar. Eğer hata nesnesinde anahtar varsa (yani doğrulama başarısızsa) fonksiyondan erken çıkış yapar. Doğrulama başarılıysa `setSubmitted(true)` ile gönderim durumunu aktif eder ve `submitContactMessage` fonksiyonunu `supabaseBrowserClient` ile birlikte çağırır. Gönderilen veriler arasında `name`, `message`, `email`, `phone`, `company`, `city`, `applicationArea` (appArea'dan), `subject` (productName varsa `lead:${productName}`, yoksa `lead` olarak) ve `consent` alanları bulunur. Başarı durumunda `setIsSuccess(true)` ve `setSubmitted(false)` çağrıları yapılır, ardından 3000 milisaniye gecikmeyle `handleClose()` çağrılarak modal otomatik kapatılır. Hata durumunda `reportError` ile hata raporlanır (kaynak: `LeadModal.submit`), `setSubmitted(false)` yapılır ve kullanıcıya çevrilmiş bir hata mesajı (`t('lead.errors.submitFailed')`) `setErrors` aracılığıyla gösterilir. Hata durumunda form açık kalır ve kullanıcı girdileri korunur; teknik hata detayı yalnızca teşhis kaydına gider.
+**Ne yapar**: Bu fonksiyon, bir formun gönderilmeden önce (submit) içeriğinin geçerliliğini kontrol eder. Tüm form alanlarının doğruluğunu değerlendirir ve bulunan hataları bir nesne olarak döndürür. Hata yoksa boş bir nesne döner.
+
+**Nasıl yapar**: Fonksiyon, bir React form olay işleyicisi içinde `e.preventDefault()` ile varsayılan form gönderme işlemini engelledikten hemen sonra çağrılır. Çağrının ardından, döndürülen hata nesnesi `setErrors` aracılığıyla bileşenin state'ine kaydedilir. Eğer hata anahtarı varsa (hata bulunuyorsa) fonksiyon erken bir `return` ile işlemi sonlandırır, böylece başarılı gönderim (API çağrısı simülasyonu) sadece hata yokken çalıştırılır.
+
 **Parametreler**:
-- e: React.FormEvent — Form gönderilme olayı nesnesi; varsayılan davranışı engellemek için kullanılır
-**Dönüş**: Bilinmiyor (return tipi belirtilmemiş)
+- Bu fonksiyonun tanımında herhangi bir parametre listelenmemiştir. Ancak çağrı yapılan bağlamda (`validate()`) boş olarak çağrıldığı görülmektedir. Fonksiyonun ihtiyaç duyduğu form verilerine, muhtemelen bileşenin kendi state'inden veya bir bağlam (context) üzerinden eriştiği varsayılmaktadır.
+
+**Dönüş**: Belirtilmemiştir. Ancak kullanımından, hata durumlarını içeren bir nesne veya boş bir nesne döndüreceği anlaşılmaktadır.
 
 ### submit
-**Ne yapar**: Form gönderimini simüle eden ve geçmişte kusurlu bir yapıya sahip olan fonksiyon. Dokümantasyon notuna göre bu fonksiyon, 2026-08-26 tarihinde ölçülen canlı bir kusuru belgelemektedir.
-**Nasıl yapar**: Fonksiyon gövdesi verilmemiştir, yalnızca docstring bilgisi mevcuttur. Docstring'e göre eskiden bu fonksiyonun içinde `setTimeout(1200ms)` bulunuyordu ve yorumu "Simulate API Call for better UX instead of mailto" şeklindeydi. Yani ana sayfadaki ve her ürün sayfasındaki talep formu müşteriye "aldık" mesajı gösterirken hiçbir yere veri yazmıyordu. Bu kusur üç ay boyunca canlı ortamda tespit edilememiş ve 2026-08-26'da ölçülmüştür. Mevcut durumda fonksiyonun nasıl çalıştığına dair gövde bilgisi verilmemiştir.
+**Ne yapar**: Form gönderildiğinde çalıştırılan ana işlem akışını yönetir.  
+**Nasıl yapar**: `e.preventDefault()` ile formun doğal gönderimini durdurur, `validate()` ile doğrulama yapar, hatalar varsa işlemi sonlandırır; hatasız ise `setSubmitted(true)` ile gönderim durumunu işaretler, ardından API taklidi için gecikmeli bir `setTimeout` içinde başarı durumunu ayarlar, modalı otomatik kapatmak için ikinci bir gecikme başlatır.  
 **Parametreler**:
-- e: React.FormEvent — Form gönderilme olayı nesnesi
-**Dönüş**: Bilinmiyor (return tipi belirtilmemiş)
+- `e`: React.FormEvent — Form submit olay nesnesi.  
+**Dönüş**: Bilinmiyor (fonksiyon içinde yan etkiler vardır, dönüş değeri belirtilmemiştir).
 
 ### handleClose
-**Ne yapar**: Modal penceresini kapatma işlemini tetikler.
-**Nasıl yapar**: Arrow function olarak tanımlanmıştır. Gövdesinde yalnızca `handleClose()` çağrısı bulunmaktadır. Bu, muhtemelen üst bileşenden veya bir context/prop aracılığıyla gelen kapatma fonksiyonunu çağırır. Fonksiyonun kendisi bir sarmalayıcı (wrapper) işlevi görür.
-**Parametreler**: Belirtilmemiş
-**Dönüş**: Bilinmiyor (return tipi belirtilmemiş)
+**Ne yapar**: Bu fonksiyon, bir modal veya açılır pencere bileşeninin kapanmasını tetikler. Genellikle bir başarı durumu gösterildikten sonra veya kullanıcı "kapat" butonuna tıkladığında çağrılır.
+
+**Nasıl yapar**: Fonksiyon, kapanış işlemini yöneten bir durumu (state) veya prop'u günceller. Sağlanan gövde kodunda, callback fonksiyonu içinde kendisini (`handleClose()`) çağırmaktadır. Bu, genellikle bir `useState` hook'u ile yönetilen `isOpen` veya benzeri bir boolean'ı `false` yaparak modalı görünmez kılan bir eylemdir. Başarılı form gönderimi sonrasında da otomatik kapanma için belirli bir gecikmeyle (3 saniye) bu fonksiyon çağrılır.
+
+**Parametreler**:
+- Bu fonksiyonun tanımında herhangi bir parametre listelenmemiştir. Çağrıldığında boş olarak çağrılır (`handleClose()`).
+
+**Dönüş**: Belirtilmemiştir, ancak bir durum güncelleme eylemi gerçekleştirdiği için doğrudan bir değer döndürmez (void/undefined).
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
-- import: ../lib/errorReporter::reportError
-- import: ../lib/services/contactMessageService::submitContactMessage
-- import: ../lib/supabase/client::supabaseBrowserClient
 - import: next/link::Link
 - import: react::React
 - import: react::useState
@@ -11964,48 +11971,41 @@ Form gönderim olayını yakalayarak doğrulama çalıştırır, başarılı ise
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: LeadModal.tsx::validate
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/LeadModal.tsx::validate
+- **params**: ()
 - **ic_degiskenler**:
-  - `e` — hataları toplayan boş `Record<string, string>` nesnesi; koşullar sağlanmazsa `name`, `contact`, `consent` anahtarlarıyla hata mesajı eklenir
-  - `name` — dış kapsamdan gelen form alanı; `trim()` ile boşluk kontrolü yapılır
-  - `email` — dış kapsamdan gelen form alanı; `trim()` ile boşluk kontrolü yapılır
-  - `phone` — dış kapsamdan gelen form alanı; `trim()` ile boşluk kontrolü yapılır
-  - `consent` — dış kapsamdan gelen onay boolean'ı; falsy ise hata eklenir
-  - `t` — dış kapsamdan gelen çeviri fonksiyonu; hata mesajlarını yerelleştirmek için kullanılır
-- **Dönüş**: `Record<string, string>` — doğrulama hatalarını içeren nesne; hata yoksa boş nesne döner
+  - `e` — Form validasyon hatalarını tutan bir nesne. Başlangıçta boş bir `Record<string, string>` olarak oluşturulur ve hata mesajlarıyla doldurulur.
+- **Dönüş**: `e` — Hataları içeren bir nesne (`Record<string, string>`).
 
-### [N2_NASIL] AST Pointer: LeadModal.tsx::submit
-- **params**: `e` — `React.FormEvent` tipinde form gönderim olayı
+### [N2_NASIL] AST Pointer: src/components/LeadModal.tsx::submit
+- **params**: (`e: React.FormEvent`)
 - **ic_degiskenler**:
-  - `v` — `validate()` çağrısının dönüşü; doğrulama hatalarını tutar
-  - `name` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `message` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `email` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `phone` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `company` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `city` — dış kapsamdan gelen form alanı; `submitContactMessage` payload'ında kullanılır
-  - `appArea` — dış kapsamdan gelen form alanı; `applicationArea` anahtarıyla `submitContactMessage` payload'ına gönderilir
-  - `productName` — dış kapsamdan gelen prop; varsa `subject` değeri `"lead:{productName}"` olarak, yoksa `"lead"` olarak ayarlanır
-  - `consent` — dış kapsamdan gelen onay boolean'ı; `submitContactMessage` payload'ında kullanılır
-  - `err` — `catch` bloğunda yakalanan hata nesnesi; `reportError` ile teşhis kaydına gönderilir
-  - `supabaseBrowserClient` — dış kapsamdan gelen Supabase istemcisi; `submitContactMessage` fonksiyonuna birinci argüman olarak geçilir
-- **Dönüş**: yok (async void)
+  - `v` — `validate()` fonksiyonunun döndürdüğü validasyon sonuçlarını (hatalar) tutan nesne.
+- **Dönüş**: yok (yan etki: formu submit eder, durumları değiştirir, başarı durumunu tetikler)
 
-### [N3_NASIL] AST Pointer: LeadModal.tsx::handleClose
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose
+- **params**: ()
 - **ic_degiskenler**:
-  - `onClose` — dış kapsamdan gelen kapatma callback'i; modal kapatma işlemini tetikler
-  - `productName` — dış kapsamdan gelen prop; `productName` varsa `t('lead.defaultMessage', { productName })` ile varsayılan mesaj oluşturulur, yoksa boş string atanır
-  - `t` — dış kapsamdan gelen çeviri fonksiyonu; varsayılan mesajı yerelleştirmek için kullanılır
-- **Dönüş**: yok (yan etki: `onClose()` çağrılır, 300ms sonra tüm form state'leri sıfırlanır)
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; dışarıdan gelen `onClose`, `setIsSuccess`, `setName`, vb. state setter'ları kullanılır)
+- **Dönüş**: yok (yan etki: modalı kapatır, form alanlarını sıfırlar)
 
-### [N4_NASIL] AST Pointer: LeadModal.tsx::handleClose (setTimeout callback)
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose (iç kapanış fonksiyonu)
+- **params**: ()
 - **ic_degiskenler**:
-  - `productName` — dış kapsamdan gelen prop; varsa `t('lead.defaultMessage', { productName })` ile varsayılan mesaj oluşturulur, yoksa boş string atanır
-  - `t` — dış kapsamdan gelen çeviri fonksiyonu; varsayılan mesajı yerelleştirmek için kullanılır
-- **Dönüş**: yok (yan etki: `isSuccess`, `name`, `company`, `email`, `phone`, `city`, `appArea`, `consent`, `message`, `errors` state'leri sıfırlanır)
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; sadece `handleClose()` çağrısı yapılır)
+- **Dönüş**: yok (yan etki: ana kapanış fonksiyonunu çağırır)
+
+### [N5_NASIL] AST Pointer: src/components/LeadModal.tsx::resetForm
+- **params**: ()
+- **ic_degiskenler**:
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; dışarıdan gelen `onClose`, `setIsSuccess`, `setName`, `setCompany`, `setEmail`, `setPhone`, `setCity`, `setAppArea`, `setConsent`, `setMessage`, `setErrors` state setter'ları ve `productName`, `t` fonksiyonu kullanılır)
+- **Dönüş**: yok (yan etki: modalı kapatır, tüm form alanlarını başlangıç değerlerine sıfırlar)
+
+### [N6_NASIL] AST Pointer: src/components/LeadModal.tsx::resetForm (iç sıfırlama fonksiyonu)
+- **params**: ()
+- **ic_degiskenler**:
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; dışarıdan gelen `setIsSuccess`, `setName`, `setCompany`, `setEmail`, `setPhone`, `setCity`, `setAppArea`, `setConsent`, `setMessage`, `setErrors` state setter'ları ve `productName`, `t` fonksiyonu kullanılır)
+- **Dönüş**: yok (yan etki: form alanlarını başlangıç değerlerine sıfırlar)
 
 ---
 
@@ -12045,7 +12045,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gradient-to-br`, `bg-gray-100`, `bg-gray-50`, `bg-gray-50/50`, `bg-green-100`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue/80`, `bg-white`, `bg-white/10`, `border-2`, `border-gray-100`, `border-gray-200`, `border-gray-300`, `border-red-200`
+- **Renkler:** `bg-gradient-to-br`, `bg-gray-100`, `bg-gray-50`, `bg-gray-50/50`, `bg-green-100`, `bg-primary-navy`, `bg-secondary-blue/80`, `bg-white`, `bg-white/10`, `border-2`, `border-gray-100`, `border-gray-200`, `border-gray-300`, `border-red-400`, `border-t`
 - **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `flex-1`, `flex-col`, `from-blue-600/20`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `grid`
 - **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `focus:`, `group-hover:`, `hover:`, `md:`, `sm:` önekleri
 - **Yardımcı Sınıflar:** `${errors.name`, `-mt-2`, `:`, `animate-bounce`, `animate-in`, `animate-spin`, `border`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-70`, `duration-300`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-gray-300`
@@ -12057,13 +12057,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\LoadingSpinner.tsx
-skeleton_hash: 22d19cd5aa2d4cf9
+source_path: C:\tmp\vh-altyapi-t165\src\components\LoadingSpinner.tsx
+skeleton_hash: f207e64e51b0e607
 entity_hashes:
   func:LoadingSpinner: 420e244c3ab22ba8
   overview: 055c22213f5fb1f9
   style_tokens: b21c3354ed86bc3e
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:30Z
 ---
 
 ## Genel Bakış
@@ -12155,15 +12155,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\MagneticCTA.tsx
-skeleton_hash: cf3c8c9c62c08336
+source_path: C:\tmp\vh-altyapi-t165\src\components\MagneticCTA.tsx
+skeleton_hash: f34807372895c773
 entity_hashes:
   func:MagneticCTA: 45285325a7d3c355
   func:onLeave: 47432f2c7853fc8a
   func:onMove: 0f9106ce87047fd0
   overview: 798bbdff09c682bc
   style_tokens: dfcd3a7af18b6331
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:31Z
 ---
 
 ## Genel Bakış
@@ -12284,13 +12284,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\MegaMenu.tsx
-skeleton_hash: 94fd26e812855e91
+source_path: C:\tmp\vh-altyapi-t165\src\components\MegaMenu.tsx
+skeleton_hash: 24fa44d9d911fbac
 entity_hashes:
   func:MegaMenu: 73d16c7403c0be73
   overview: 7b77f95abaa36af5
   style_tokens: 607cd2b8b83a451b
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:32Z
 ---
 
 ## Genel Bakış
@@ -12403,53 +12403,53 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\PaymentWatcher.tsx
-skeleton_hash: 043ce5cffec8a10b
+source_path: C:\tmp\vh-altyapi-t165\src\components\PaymentWatcher.tsx
+skeleton_hash: 90f59405bec9d434
 entity_hashes:
-  func:PaymentWatcher: 0d799bcd7a7c68f4
-  overview: cac0a3def1dcd9ec
+  func:PaymentWatcher: 50650d649c0e5bdb
+  overview: 933db85f944b5101
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:10Z
+generated_at: 2026-08-27T09:05:23Z
 ---
 
 ## Genel Bakış
-PaymentWatcher modülü, uygulama genelinde ödeme durumunu arka planda sürekli olarak izleyen bir React bileşenidir. Kullanıcıya herhangi bir arayüz göstermeden, belirli aralıklarla ödeme durumunu kontrol ederek ilgili durumlarda otomatik yönlendirmeler veya durum güncellemeleri yapar.
+PaymentWatcher modülü, ödeme durumunu arka planda sürekli olarak izleyen ve kullanıcıya arayüz göstermeden çalışan bir React bileşenidir. Belirli aralıklarla ödeme durumunu kontrol ederek ilgili durumlarda otomatik yönlendirmeler veya durum güncellemeleri yapar. Modül, React Runtime, geçerli bir state kaynağı ve tarayıcı ortamı gerektirir; bu ortamlar sağlanamazsa bileşen işlevselliğini yerine getirmez.
 
 ## Fonksiyon Grupları
 ### Bileşen Tanımı ve İzleme Mantığı
-Modülün temel yapısını ve periyodik izleme mekanizmasını tanımlayan ana bileşen fonksiyonunu içerir. Bu grup, bileşenin iç durumunu, zamanlayıcı referanslarını ve durum kontrol mantığını bir arada yönetir.
+Modülün temel yapısını ve periyodik izleme mekanizmasını tanımlayan ana bileşen fonksiyonunu içerir. Bileşen, ödeme ile ilgili değişiklikleri izleyerek ilgili bileşenlere veya servislere bildirimlerde bulunur.
 - PaymentWatcher
+
+## Bağımlılıklar ve Mimari Notlar
+- **İç bağımlılıklar**: Tek fonksiyonlu modül olduğundan iç bağımlılık bulunmuyor.
+- **Dış bağımlılıklar**: React Runtime, React Context veya global state kaynağı (Redux, Zustand vb.) ve tarayıcı ortamı (React DOM) gerektirir.
+- **Dinamik/lazy yükleme**: Kaynakta belirtilmemiş.
+- **Mimari önem**: Uygulama genelinde ödeme süreçlerinin takibini sağlayan altyapı bileşenidir; ödeme durumu değişikliklerini yakalayıp sistemin geri kalanını bilgilendirir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-PaymentWatcher modülü, parametre almayan bir React bileşenidir ve sadece fonksiyon imzasına dayalı sınırlı bilgi mevcuttur.
-
-[Aksiyom 1]: Eğer React Runtime (React kütüphanesi ve bileşen hiyerarşisi) yoksa, bileşen doğru şekilde render edilmez.
-
-[Aksiyom 2]: Eğer bileşen için geçerli bir React Context veya global state kaynağı (Redux, Zustand vb.) yoksa, PaymentWatcher'ın izleyeceği ödeme siparişlerine erişimi olmaz ve işlevselliği çalışmaz.
-
-[Aksiyom 3]: Eğer tarayıcı ortamı (veya React DOM/Server-Side Rendering ortamı) yoksa, bileşen DOM'a bağlanamaz ve periyodik izleme döngüsü başlatılamaz.
+Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden türetilebilecek mimari varsayımlar belirlenememiştir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### PaymentWatcher
+**Ne yapar**: 3DS ödeme doğrulama penceresinden dönemeyen müşterileri kurtaran bir güvenlik ağı bileşenidir. Ödeme sürecinde müşterinin 3DS sayfasından başarıyla dönemediği durumlarda, bekleyen sipariş durumunu kontrol ederek müşteriyi kurtarmayı amaçlar.
 
-**Ne yapar**: PaymentWatcher, ödeme işlemlerinin durumunu izleyen bir React bileşenidir. VentHub HVAC projesinde ödeme süreçlerinin takip edilmesini ve gerekli durum güncellemelerinin yapılmasını sağlar.
-
-**Nasıl yapar**: Bileşen, uygulama içinde ödeme ile ilgili değişiklikleri izleyerek ilgili bileşenlere veya servislere bildirimlerde bulunur. Ödeme durumlarındaki değişiklikleri yakalayıp gerektiğinde UI güncellemeleri veya tetikleyiciler oluşturur.
+**Nasıl yapar**: Bileşen, `vh_pending_order` anahtarını localStorage'dan okuyarak çalışır. Ancak kaynakta belirtildiği üzere, bu bileşen 2026-08-15 tarihine kadar hiç çalışmadı — iki bağımsız sebeple: (1) Tetikleyicisi yoktu; `vh_pending_order` anahtarını kodun hiçbir yeri yazmıyordu (dokuz kullanımın hepsi `getItem`/`removeItem` idi), bu nedenle `raw` daima `null` oluyordu ve bileşen erken çıkış yapıyordu. Bileşen bir React fonksiyon bileşeni olarak tanımlanmıştır.
 
 **Parametreler**:
-- Parametre almamaktadır (props tanımlı değildir).
+- Bu fonksiyon parametre almaz.
 
-**Dönüş**: `React.FC` - Standart bir React işlevsel bileşeni olarak render edilir.
+**Dönüş**: `React.FC` — React fonksiyon bileşeni döndürür. Bileşen, 3DS ödeme sürecinde güvenlik ağı görevi görerek müşterilerin kaybolmasını önlemeyi amaçlar.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../hooks/useCheckoutPayment::PENDING_ORDER_KEY
 - import: next/navigation::usePathname
 - import: next/navigation::useRouter
 - import: react::React
@@ -12464,36 +12464,36 @@ PaymentWatcher modülü, parametre almayan bir React bileşenidir ve sadece fonk
 ### [N1_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::PaymentWatcher
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `router` — useRouter() hook'undan gelen Next.js router instance'ı, programmatic navigasyon için kullanılır
-  - `checkingRef` — useRef<boolean>, checkOnce'ın eşzamanlı çalışmasını engelleyen guard flag tutar
-  - `timerRef` — useRef<number | null>, periyodik checkOnce çağrısını tutan interval ID'si
-  - `pathname` — usePathname() hook'undan gelen mevcut URL path string'i
-  - `checkOnce` — useCallback ile tanımlı async fonksiyon, localStorage'dan sipariş bilgisini okur ve Supabase'den sipariş durumunu kontrol eder
-- **Dönüş**: JSX null döner (yarn component, yalnızca yan etkileri vardır)
+  - `router` — `useRouter()` ile alınan Next.js router nesnesi; sayfa yönlendirmelerinde kullanılır
+  - `checkingRef` — `useRef(false)` ile oluşturulan boolean ref; `checkOnce` fonksiyonunun eşzamanlı olarak birden fazla kez çalışmasını engellemek için kilit bayrağı olarak kullanılır
+  - `timerRef` — `useRef<number | null>(null)` ile oluşturulan number|null ref; `setInterval` ile dönen timer kimliğini tutar, temizleme işleminde kullanılır
+  - `pathname` — `usePathname()` ile alınan mevcut URL yolu; useEffect bağımlılığında yer alır
+  - `checkOnce` — `useCallback` ile oluşturulan async fonksiyon; bekleyen siparişin ödeme durumunu kontrol eder
+- **Dönüş**: `null` — React bileşeni olarak ekrana bir şey render etmez
 
-### [N2_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::PaymentWatcher::checkOnce
+### [N2_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::checkOnce
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `raw` — localStorage.getItem(STORAGE_KEY) ile okunan ham JSON string'i veya null
-  - `data` — JSON.parse(raw || '{}') sonucu elde edilen `{ orderId?: string, conversationId?: string }` tipinde parsed obje
-  - `orderId` — data.orderId erişimi ile elde edilen sipariş ID string'i
-  - `supabase` — dinamik import ile yüklenen supabaseBrowserClient instance'ı
-  - `row` — supabase.from('venthub_orders').select('status').eq('id', orderId).maybeSingle() sorgusundan dönen veri satırı
-  - `error` — aynı Supabase sorgusundan dönen hata nesnesi
-- **Dönüş**: void (Promise<void)), fonksiyon localStorage temizler ve router.push ile navigasyon yapar
+  - `raw` — `localStorage.getItem(PENDING_ORDER_KEY)` ile alınan ham string; bekleyen sipariş verisini içerir, yoksa fonksiyondan çıkılır
+  - `data` — `JSON.parse(raw || '{}')` ile parse edilen nesne; `{ orderId?: string, conversationId?: string }` tipindedir
+  - `orderId` — `data.orderId` alanından okunan sipariş numarası; yoksa fonksiyondan çıkılır
+  - `supabase` — `await import('../lib/supabase/client')` ile dinamik olarak yüklenen `supabaseBrowserClient` nesnesi; veritabanı sorguları için kullanılır
+  - `row` — `supabase.from('venthub_orders').select('payment_status').eq('id', orderId).maybeSingle()` sorgusundan dönen veri satırı; `payment_status` alanını içerir
+  - `error` — aynı supabase sorgusundan dönen hata nesnesi; hata yoksa null/undefined olur
+- **Dönüş**: yok — yan etki olarak `localStorage.removeItem(PENDING_ORDER_KEY)` çağrısı yapar ve `router.push` ile sayfa yönlendirmesi gerçekleştirir
 
-### [N3_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::PaymentWatcher::useEffect_callback
+### [N3_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::useEffect callback
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `onFocus` — window focus olayında checkOnce çağıran callback
-  - `onVisibility` — document visibilitychange olayında visible ise checkOnce çağıran callback
-  - `raw` — localStorage.getItem(STORAGE_KEY) ile okunan ham JSON string'i veya null, bekleyen sipariş olup olmadığını kontrol eder
-- **Dönüş**: temizleme fonksiyonu döner — event listener'ları kaldırır ve interval'ı temizler
+  - `onFocus` — `window` nesnesinin `focus` olayına eklenen callback fonksiyonu; pencere odaklandığında `checkOnce()` çağrısı yapar
+  - `onVisibility` — `document` nesnesinin `visibilitychange` olayına eklenen callback fonksiyonu; `document.visibilityState === 'visible'` olduğunda `checkOnce()` çağrısı yapar
+  - `raw` — `localStorage.getItem(PENDING_ORDER_KEY)` ile alınan ham string; bekleyen sipariş varsa periyodik kontrol interval'ı başlatmak için kontrol edilir
+- **Dönüş**: cleanup fonksiyonu — `window.removeEventListener('focus', onFocus)`, `document.removeEventListener('visibilitychange', onVisibility)` ve `window.clearInterval(timerRef.current)` işlemlerini gerçekleştirir
 
-### [N4_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::PaymentWatcher::useEffect_cleanup
+### [N4_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::useEffect cleanup
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok — yalnızca outer scope'taki onFocus, onVisibility ve timerRef kullanılır)
-- **Dönüş**: void, event listener'ları ve interval'ı temizler
+- **ic_degiskenler**: yok — dışarıdan erişilen `onFocus`, `onVisibility` ve `timerRef` kullanılır
+- **Dönüş**: yok — yan etki olarak `window.removeEventListener('focus', onFocus)`, `document.removeEventListener('visibilitychange', onVisibility)` ve koşullu olarak `window.clearInterval(timerRef.current)` çağrısı yapar
 
 ---
 
@@ -12530,12 +12530,12 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ProductCard.tsx
-skeleton_hash: c952d1ee37a51ab6
+source_path: C:\tmp\vh-altyapi-t165\src\components\ProductCard.tsx
+skeleton_hash: d86bff637dd59bb9
 entity_hashes:
   overview: 9d2b069c54b1d8b3
   style_tokens: f04c95b84c1173dc
-generated_at: 2026-08-15T07:02:08Z
+generated_at: 2026-08-27T07:58:23Z
 ---
 
 ## Genel Bakış
@@ -12648,14 +12648,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\QuickViewModal.tsx
-skeleton_hash: 5894fff46064d856
+source_path: C:\tmp\vh-altyapi-t165\src\components\QuickViewModal.tsx
+skeleton_hash: ef0cc8f1679fa187
 entity_hashes:
   func:QuickViewModal: debc62013d59b5ee
   func:handleAdd: 552a96581034d630
   overview: 42118afde1c67a0d
   style_tokens: a2ee6e23d34d3389
-generated_at: 2026-08-15T07:02:08Z
+generated_at: 2026-08-27T07:58:24Z
 ---
 
 ## Genel Bakış
@@ -12790,14 +12790,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ScrollLinkedProcess.tsx
-skeleton_hash: e46f34b3024a1c91
+source_path: C:\tmp\vh-altyapi-t165\src\components\ScrollLinkedProcess.tsx
+skeleton_hash: bebc24fc64229c88
 entity_hashes:
   func:ScrollLinkedProcess: 5a92a40886643dd7
   func:scrollTo: ee292d22ad2f3df1
   overview: a4bd4fd5da1416a4
   style_tokens: dffb84eddfacefbd
-generated_at: 2026-06-19T20:47:32Z
+generated_at: 2026-08-27T07:58:25Z
 ---
 
 ## Genel Bakış
@@ -12946,13 +12946,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ScrollReveal.tsx
-skeleton_hash: 5e6a31137dce1c9b
+source_path: C:\tmp\vh-altyapi-t165\src\components\ScrollReveal.tsx
+skeleton_hash: 5b69a4240a390eb6
 entity_hashes:
   func:ScrollReveal: 5164aa702775b185
   overview: 7c3e9f948c132ef9
   style_tokens: fce5caac08f51876
-generated_at: 2026-06-19T20:47:32Z
+generated_at: 2026-08-27T07:58:26Z
 ---
 
 ## Genel Bakış
@@ -13070,13 +13070,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ScrollToTop.tsx
-skeleton_hash: 1cdd60ce3f775483
+source_path: C:\tmp\vh-altyapi-t165\src\components\ScrollToTop.tsx
+skeleton_hash: 42d48c76c1438178
 entity_hashes:
   func:ScrollToTop: 67a45bb41004286e
   overview: 3fbf0b01314ba145
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:32Z
+generated_at: 2026-08-27T07:58:28Z
 ---
 
 ## Genel Bakış
@@ -13497,13 +13497,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\SecurityRibbon.tsx
-skeleton_hash: 8868b245364bfa62
+source_path: C:\tmp\vh-altyapi-t165\src\components\SecurityRibbon.tsx
+skeleton_hash: b64bfb403036d146
 entity_hashes:
   func:SecurityRibbon: a7c5f379d943c103
   overview: 08117376b2a86eee
   style_tokens: 3e379506fde07599
-generated_at: 2026-06-14T22:16:29Z
+generated_at: 2026-08-27T07:58:29Z
 ---
 
 ## Genel Bakış
@@ -13609,13 +13609,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\Seo.tsx
-skeleton_hash: 56de44a929f57db0
+source_path: C:\tmp\vh-altyapi-t165\src\components\Seo.tsx
+skeleton_hash: ec5b2ea5a5d381b2
 entity_hashes:
   func:Seo: efb90eeb61c051d0
   overview: c4b11b13e9e25b50
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:34Z
+generated_at: 2026-08-27T07:58:30Z
 ---
 
 ## Genel Bakış
@@ -13726,13 +13726,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\SpotlightHeroOverlay.tsx
-skeleton_hash: c731b7c5e5d0a9b8
+source_path: C:\tmp\vh-altyapi-t165\src\components\SpotlightHeroOverlay.tsx
+skeleton_hash: c382334b89845c89
 entity_hashes:
   func:SpotlightHeroOverlay: 3df6afb4a4a31d8f
   overview: 1f157560c005aa84
   style_tokens: 2d403f9b7fca7034
-generated_at: 2026-06-19T20:47:34Z
+generated_at: 2026-08-27T07:58:31Z
 ---
 
 ## Genel Bakış
@@ -13830,15 +13830,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\StickyHeader.tsx
-skeleton_hash: 7ab7639604b41bb6
+source_path: C:\tmp\vh-altyapi-t165\src\components\StickyHeader.tsx
+skeleton_hash: 62eb7d3cbf77d9a4
 entity_hashes:
   func:CategoryHubOverlaySkeleton: 09095f7c03bb95f0
   func:MegaMenuSkeleton: 43156bd7843421f5
   func:SearchOverlaySkeleton: 6695469d4cdbd037
   overview: 620cf1a29f42e258
   style_tokens: a87cdf58739596c8
-generated_at: 2026-08-25T07:24:39Z
+generated_at: 2026-08-27T07:58:32Z
 ---
 
 ## Genel Bakış
@@ -14054,10 +14054,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: StickyHeader.tsx
-  function: StickyHeader.tsx::SearchOverlaySkeleton
-  function: StickyHeader.tsx::MegaMenuSkeleton
-  function: StickyHeader.tsx::CategoryHubOverlaySkeleton
+  file: src\components\StickyHeader.tsx
+  function: src\components\StickyHeader.tsx::SearchOverlaySkeleton
+  function: src\components\StickyHeader.tsx::MegaMenuSkeleton
+  function: src\components\StickyHeader.tsx::CategoryHubOverlaySkeleton
 
 ---
 
@@ -14089,8 +14089,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\TiltCard.tsx
-skeleton_hash: e464bc12b052721a
+source_path: C:\tmp\vh-altyapi-t165\src\components\TiltCard.tsx
+skeleton_hash: 8ea03e519fc57455
 entity_hashes:
   func:TiltCard: bfd1d2a43ccba8c3
   func:clamp: 6b6f2a3bb4b3c92e
@@ -14099,7 +14099,7 @@ entity_hashes:
   func:onMove: 855a2394d5f31485
   overview: 49812a020a38dab5
   style_tokens: 9c70068ed275c69c
-generated_at: 2026-08-25T07:24:24Z
+generated_at: 2026-08-27T07:58:33Z
 ---
 
 ## Genel Bakış
@@ -14240,12 +14240,12 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: TiltCard.tsx
-  function: TiltCard.tsx::clamp
-  function: TiltCard.tsx::TiltCard
-  function: TiltCard.tsx::onMove
-  function: TiltCard.tsx::onEnter
-  function: TiltCard.tsx::onLeave
+  file: src\components\TiltCard.tsx
+  function: src\components\TiltCard.tsx::clamp
+  function: src\components\TiltCard.tsx::TiltCard
+  function: src\components\TiltCard.tsx::onMove
+  function: src\components\TiltCard.tsx::onEnter
+  function: src\components\TiltCard.tsx::onLeave
 
 ---
 
@@ -14276,13 +14276,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\UndecidedUserCTA.tsx
-skeleton_hash: 3ecd27f7ef8a142c
+source_path: C:\tmp\vh-altyapi-t165\src\components\UndecidedUserCTA.tsx
+skeleton_hash: dc8706624d47afb5
 entity_hashes:
   func:UndecidedUserCTA: e9ab9b6769bffef9
   overview: fcf28800e004a782
   style_tokens: d1dc68fb1553bbf5
-generated_at: 2026-08-25T07:24:06Z
+generated_at: 2026-08-27T07:58:35Z
 ---
 
 ## Genel Bakış
@@ -14346,8 +14346,8 @@ Bunlar genel React varsayımları kapsamına girdiğinden (kural gereği yazılm
 
 ## NODE ID STANDARD
 
-  file: UndecidedUserCTA.tsx
-  function: UndecidedUserCTA.tsx::UndecidedUserCTA
+  file: src\components\UndecidedUserCTA.tsx
+  function: src\components\UndecidedUserCTA.tsx::UndecidedUserCTA
 
 ---
 
@@ -14377,8 +14377,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx
-skeleton_hash: e83138a57f7df82e
+source_path: C:\tmp\vh-altyapi-t165\src\components\VisualShowcase.tsx
+skeleton_hash: 39a75f1a82c0793d
 entity_hashes:
   func:ChevronLeftIcon: 528282355948f0bf
   func:ChevronRightIcon: eee2ea0200791ea6
@@ -14390,7 +14390,7 @@ entity_hashes:
   func:usePrefersReducedMotion: 11085ad489b48f61
   overview: 7e4ec691259cb85e
   style_tokens: 2f11e16677a4f30c
-generated_at: 2026-06-19T20:47:48Z
+generated_at: 2026-08-27T07:58:36Z
 ---
 
 ## Genel Bakış
@@ -14636,13 +14636,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\WhatsAppFloat.tsx
-skeleton_hash: 4ae1d616306c21ed
+source_path: C:\tmp\vh-altyapi-t165\src\components\WhatsAppFloat.tsx
+skeleton_hash: bbb466ca229de8e3
 entity_hashes:
   func:WhatsAppFloat: 594fe2409e378878
   overview: 27f525e3029fcecb
   style_tokens: fb346cbde40036cb
-generated_at: 2026-08-26T07:12:34Z
+generated_at: 2026-08-27T07:58:37Z
 ---
 
 ## Genel Bakış
@@ -14734,13 +14734,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\AccessDenied.tsx
-skeleton_hash: 4191c98afe89986a
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\AccessDenied.tsx
+skeleton_hash: b063e7c398f65e05
 entity_hashes:
   func:AccessDenied: ea91e56a2eab80b9
   overview: c138e2727c8c240f
-  style_tokens: 07b65f88bee816f7
-generated_at: 2026-06-19T20:46:38Z
+  style_tokens: 22fa330fa7bd104d
+generated_at: 2026-08-27T07:58:38Z
 ---
 
 ## Genel Bakış
@@ -14818,13 +14818,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `tracking-hvac-relaxed`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-rose-500/10`, `bg-surface-deep`, `bg-white/5`, `border-rose-500/20`, `border-white/5`, `hover:bg-white/10`, `text-3xl`, `text-center`, `text-rose-500`, `text-slate-400`, `text-slate-600`, `text-slate-700`, `text-white`, `text-xs`
+- **Renkler:** `bg-admin-bg`, `bg-admin-danger-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-border`, `border-admin-danger/30`, `hover:bg-admin-surface-3`, `text-3xl`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-fg-subtle`, `text-center`, `text-xs`
 - **Layout:** `block`, `flex`, `flex-col`, `gap-3`, `gap-4`, `h-12`, `h-24`, `inline-flex`, `items-center`, `justify-center`, `max-w-lg`, `min-h-screen`, `p-12`, `p-6`, `shadow-access-denied-black`
 - **Varyant/Responsive:** `group-hover:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `animate-in`, `border`, `duration-500`, `fade-in`, `font-black`, `font-bold`, `font-medium`, `glass-strong`, `group`, `group-hover:-translate-x-1`, `italic`, `leading-relaxed`, `mb-10`, `mb-4`, `mb-8`
+- **Yardımcı Sınıflar:** `animate-in`, `border`, `duration-500`, `fade-in`, `font-bold`, `font-medium`, `font-semibold`, `group`, `group-hover:-translate-x-1`, `italic`, `leading-relaxed`, `mb-10`, `mb-4`, `mb-8`, `mt-2`
 
 ---
 # FILE: src\components\admin\AdminEmptyState.md
@@ -14833,13 +14833,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\AdminEmptyState.tsx
-skeleton_hash: 50b2a7d404cdb102
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\AdminEmptyState.tsx
+skeleton_hash: d306595fdf338de8
 entity_hashes:
   func:AdminEmptyState: 5a155dec87c91466
   overview: a8e9e23763cc1b0a
   style_tokens: 8ca6f8dd6c625d35
-generated_at: 2026-08-25T07:24:16Z
+generated_at: 2026-08-27T07:58:39Z
 ---
 
 ## Genel Bakış
@@ -14894,8 +14894,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `icon: LucideIcon`
 - `title: string`
 - `description: string`
-- `action?: {
-`
+- `action?: {`
 - `compact?: boolean`
 
 ---
@@ -14923,8 +14922,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: AdminEmptyState.tsx
-  function: AdminEmptyState.tsx::AdminEmptyState
+  file: src\components\admin\AdminEmptyState.tsx
+  function: src\components\admin\AdminEmptyState.tsx::AdminEmptyState
 
 ---
 
@@ -14954,46 +14953,40 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\AdminRealtimeNotifications.tsx
-skeleton_hash: 630a0b44842f3f14
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\AdminRealtimeNotifications.tsx
+skeleton_hash: b9f2cd48b9213474
 entity_hashes:
   func:AdminRealtimeNotifications: 1b67a246f8f15ea8
   func:IconForType: b8eaefdda2e3fd3b
   func:clearAll: 256b77623e27b78c
   func:toggleDropdown: 97a60ca3e9e42667
-  overview: 7bdad66ea5e40303
-  style_tokens: 58e7fc7febbe30f9
-generated_at: 2026-06-08T10:08:36Z
+  overview: 270b110a82da194a
+  style_tokens: f5556e7dbea65087
+generated_at: 2026-08-27T08:41:46Z
 ---
 
 ## Genel Bakış
-`AdminRealtimeNotifications`, yönetim panelinde gerçek zamanlı bildirimlerin gösterilmesini ve yönetilmesini sağlayan bir React bileşenidir. Bildirim menüsünün açılıp kapatılması, tüm bildirimlerin temizlenmesi ve bildirim türlerine göre ikon seçimi gibi temel etkileşimleri merkezi olarak kontrol eder.
+Bu modül, yönetim panelinde gerçek zamanlı bildirimlerin görüntülenmesini ve yönetilmesini sağlayan bir React bileşeni içerir. Bileşen, bildirim menüsünün açılıp kapatılması, tüm bildirimlerin temizlenmesi ve bildirim türlerine göre uygun ikonun seçilmesi gibi temel etkileşimleri kontrol eder.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Tüm bildirim mantığını ve durum yönetimini yöneten ana React bileşenidir.
-- `AdminRealtimeNotifications`
+Tüm bildirim mantığını ve durum yönetimini üstlenen ana React bileşenidir.
+- AdminRealtimeNotifications
 
 ### Etkileşim Yardımcıları
-Menü durumunu değiştiren ve bildirimleri temizleyen yardımcı fonksiyonlardır.
-- `toggleDropdown`, `clearAll`
+Bildirim menüsünün durumunu değiştiren ve bildirim listesini temizleyen yardımcı fonksiyonlardır.
+- toggleDropdown, clearAll
 
 ### Görsel Eşleştirme
-Bildirim türlerine göre ikon bileşenini belirleyen yardımcı bileşendir.
-- `IconForType`
+Bildirim türüne göre uygun ikon bileşenini seçen yardımcı bileşendir.
+- IconForType
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, bir React bileşeni olup temel işlevselliği için aşağıdaki mimari varsayımlara bağlıdır.
-
-[Aksiyom 1]: Eğer `AdminRealtimeNotifications` bileşenine bildirim verisi (`notifications` veya benzeri bir prop) sağlanmazsa, bileşen boş bir durum (empty state) gösterir veya hatalı bir duruma geçer.
-
-[Aksiyom 2]: Eğer `toggleDropdown` işlevi, bileşenin iç durumunu (state) güncelleyemezse (örn: `useState` hook'u düzgün çalışmıyorsa), bildirim menüsünün açılıp kapatılması işlevi çalışmaz.
-
-[Aksiyom 3]: Eğer `clearAll` işlevi çağrıldığında temizlenecek bildirim listesi (state) boş değilse, tüm bildirimler listeden kaldırılır. Liste zaten boşsa, işlev herhangi bir yan etki oluşturmaz.
-
-[Aksiyom 4]: Eğer `IconForType` bileşenine `type` prop'u olarak geçerli bir bildirim türü dizesi verilmezse (örn: `undefined`, `null` veya bilinmeyen bir değer), bileşen varsayılan veya hata ikonunu render eder.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -15020,6 +15013,24 @@ Bu modül, bir React bileşeni olup temel işlevselliği için aşağıdaki mima
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useTenant::useTenant
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/datetime::formatDateTime
+- import: ../../i18n/format::formatCurrency
+- import: @/hooks/useRole::useRole
+- import: @/lib/admin/inboxCounts::InboxCounts
+- import: @/lib/admin/inboxCounts::fetchInboxCounts
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: next/navigation::useRouter
+- import: react::React
+- import: react::useEffect
+- import: react::useRef
+- import: react::useState
+- import: sonner::toast
+
+---
+
 ## INTERFACES
 
 ### AppNotification
@@ -15035,52 +15046,156 @@ Bu modül, bir React bileşeni olup temel işlevselliği için aşağıdaki mima
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::AdminRealtimeNotifications
+### [N1_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::AdminRealtimeNotifications
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `active` — async operasyonların devam edip etmediğini kontrol eden bayrak, component unmount olduğunda false yapılır
-  - `ordersChannel` — Supabase Realtime siparişleri için abone olunan kanal
-  - `stockChannel` — Supabase Realtime stok hareketleri için abone olunan kanal
-  - `handleClickOutside` — Dropdown dışına tıklama olayını yöneten event handler fonksiyonu
-  - `setIsOpen` — Dropdown'ın açık/kapalı durumunu güncelleyen state setter
-  - `isOpen` — Dropdown'ın şu anki açık/kapalı durumunu tutan state değişkeni
-  - `notifications` — Tüm bildirimleri tutan state dizisi
-  - `setNotifications` — Bildirimleri güncelleyen state setter
-  - `unreadCount` — Okunmamış bildirim sayısını tutan state değişkeni
-  - `setUnreadCount` — Okunmamış sayısını güncelleyen state setter
-  - `dropdownRef` — Dropdown elementine ref referansı
-  - `router` — Next.js useRouter hook'u
-  - `tenantId` — useTenant hook'undan gelen kiracı ID'si
-  - `formatDateTime` — Tarih formatlama fonksiyonu importu
-- **Dönüş**: React.FC (React Functional Component)
+  - `isOpen` — dropdown menüsünün açık/kapalı durumunu tutan state
+  - `setIsOpen` — isOpen state'ini güncelleyen setter fonksiyonu
+  - `notifications` — bildirim listesini tutan state (AppNotification[])
+  - `setNotifications` — notifications state'ini güncelleyen setter fonksiyonu
+  - `unreadCount` — okunmamış bildirim sayısını tutan state
+  - `setUnreadCount` — unreadCount state'ini güncelleyen setter fonksiyonu
+  - `inboxCounts` — gelen kutusu sayımlarını tutan state (InboxCounts)
+  - `setInboxCounts` — inboxCounts state'ini güncelleyen setter fonksiyonu
+  - `dropdownRef` — dropdown DOM elemanına referans veren useRef
+  - `router` — Next.js useRouter ile alınan router nesnesi
+  - `canWrite` — useRole hook'undan gelen yetki kontrol fonksiyonu
+  - `tenantId` — useTenant hook'undan gelen kiracı kimliği
+  - `lang` — useTenant hook'undan gelen dil kodu
+  - `t` — çeviri fonksiyonu (useTenant veya i18n'den)
+  - `loadInboxCounts` — gelen kutusu sayımlarını yükleyen async fonksiyon
+  - `toggleDropdown` — dropdown açma/kapama fonksiyonu
+  - `clearAll` — tüm bildirimleri temizleyen fonksiyon
+  - `fetchRecentActivity` — son aktiviteleri Supabase'den çeken async fonksiyon
+  - `hasAnyAccess` — kullanıcının herhangi bir modüle yazma yetkisi olup olmadığını gösteren boolean
+  - `counts` — fetchInboxCounts sonucu dönen InboxCounts verisi
+  - `err` — yakalanan hata nesnesi
+  - `interval` — setInterval referansı
+  - `handleClickOutside` — dışarı tıklama olayını yakalayan fonksiyon
+  - `handleKeyDown` — klavye olayını yakalayan fonksiyon
+  - `active` — bileşen hâlâ aktif mi bilgisini tutan boolean flag
+  - `oData` — venthub_orders tablosundan çekilen son 5 sipariş verisi
+  - `sData` — inventory_movements tablosundan çekilen son 5 stok hareketi verisi
+  - `combined` — sipariş ve stok hareketlerinin birleştirildiği bildirim dizisi
+  - `ordersChannel` — Supabase realtime sipariş kanalı
+  - `stockChannel` — Supabase realtime stok hareketi kanalı
+  - `inboxMenuItems` — gelen kutusu menü öğeleri dizisi (sayım ve ikon bilgileriyle)
+- **Dönüş**: JSX.Element (React.FC)
 
-### [N2_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::fetchRecentActivity (iç fonksiyon)
+### [N2_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::loadInboxCounts
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `oData` — Son 5 siparişin verisi (supabase.from('venthub_orders') sorgusu)
-  - `sData` — Son 5 stok hareketi verisi (supabase.from('inventory_movements') sorgusu)
-  - `combined` — Sipariş ve stok hareketlerinin birleştirildiği AppNotification[]
-  - `products` — Stok hareketine ait ürün bilgisi (s.products olarak cast edilir)
-  - `pName` — Ürün adı, products.name veya 'Bilinmeyen Ürün' fallback
-  - `pSku` — Ürün SKU kodu, products.sku veya boş string
-  - `delta` — Stok miktarı değişimi (Number olarak parse edilir)
-  - `movementType` — Hareket türü, delta > 0 ise 'Giriş', değilse 'Çıkış'
-  - `absQty` — Mutlak stok miktarı (Math.abs ile)
-  - `o` — forEach ile dolaşılan her bir sipariş objesi
-  - `s` — forEach ile dolaşılan her bir stok hareketi objesi
-- **Dönüş**: void (Promise<void>)
+  - `hasAnyAccess` — canWrite('returns'), canWrite('orders'), canWrite('inventory'), canWrite('error_groups') kontrollerinin OR sonucu; kullanıcı en az bir modüle yazabiliyorsa true
+  - `counts` — fetchInboxCounts(supabase) çağrısından dönen InboxCounts verisi
+  - `err` — try-catch bloğunda yakalanan hata nesnesi; console.error ile loglanır
+- **Dönüş**: yok (void, async fonksiyon; yan etki olarak setInboxCounts çağırır)
 
-### [N3_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::toggleDropdown
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `isOpen` — Mevcut dropdown durumu, !isOpen ile terslenir
-  - `unreadCount` — Okunmamış bildirim sayısı, 0'dan büyükse okundu sayılır
-- **Dönüş**: void
-
-### [N4_NASIL] AST Pointer: AdminRealtimeNotifications.tsx::clearAll
+### [N3_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::toggleDropdown
 - **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: void (setNotifications([]) ve setUnreadCount(0) ile side effect)
+- **Dönüş**: yok (void; isOpen state'ini tersine çevirir, isOpen false iken açılıyorsa tüm bildirimleri okundu olarak işaretler ve unreadCount'ı sıfırlar)
+
+### [N4_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::clearAll
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (void; notifications dizisini boşaltır ve unreadCount'ı sıfırlar)
+
+### [N5_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::IconForType
+- **params**: `{ type: string }` — bildirim tipi ('order', 'stock' veya diğer)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element — tip 'order' ise ShoppingBag ikonu, 'stock' ise Box ikonu, diğer durumlarda Activity ikonu döndürür
+
+### [N6_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::fetchRecentActivity
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `oData` — supabase.from('venthub_orders') sorgusundan dönen veri; id, total_amount, created_at, order_number alanlarını içerir, created_at'e göre azalan sırada ilk 5 kayıt
+  - `sData` — supabase.from('inventory_movements') sorgusundan dönen veri; id, delta, reason, created_at ve products (join ile name, sku) alanlarını içerir, created_at'e göre azalan sırada ilk 5 kayıt
+  - `combined` — AppNotification tipinde birleştirilmiş bildirim dizisi
+  - `o` — oData dizisindeki her bir sipariş objesi
+  - `formattedAmount` — formatCurrency(o.total_amount || 0, lang, { currency: 'TRY' }) ile formatlanmış sipariş tutarı
+  - `s` — sData dizisindeki her bir stok hareketi objesi (Record<string, unknown>)
+  - `products` — s.products alanından türetilen ürün bilgisi (Record<string, unknown> | null)
+  - `pName` — products?.name veya t('admin.dashboard.unknownProduct') ile elde edilen ürün adı
+  - `pSku` — products?.sku veya boş string ile elde edilen ürün SKU'su
+  - `delta` — Number(s.delta || 0) ile elde edilen stok değişim miktarı
+  - `movementType` — delta > 0 ise 'incomingLabel', değilse 'outgoingLabel' çeviri anahtarı
+  - `absQty` — Math.abs(delta) ile elde edilen mutlak miktar
+  - `err` — yakalanan hata nesnesi; console.error ile loglanır
+- **Dönüş**: yok (void, async fonksiyon; yan etki olarak setNotifications çağırır, combined dizisini tarihe göre sıralayıp ilk 10 kaydı alır)
+
+### [N7_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::ordersChannel.on callback
+- **params**: `payload` — Supabase postgres_changes olay payload'ı; INSERT olayında yeni sipariş verisini içerir
+- **ic_degiskenler**:
+  - `newOrder` — payload.new alanından türetilen yeni sipariş verisi (Record<string, unknown>)
+  - `totalAmt` — Number(newOrder.total_amount || 0) ile elde edilen toplam tutar
+  - `amt` — formatCurrency(totalAmt, lang, { currency: 'TRY' }) ile formatlanmış tutar
+  - `orderId` — String(newOrder.id || '') ile elde edilen sipariş kimliği
+  - `orderNumber` — newOrder.order_number varsa onu kullanır, yoksa orderId'nin ilk 8 karakteri
+  - `notif` — oluşturulan AppNotification nesnesi; id 'order_rt_' ön ekiyle başlar, type 'order', isRead false, link sipariş sayfasına yönlendirir
+  - `id` — toast.custom callback'indeki toast kimliği
+  - `e` — onKeyDown olayındaki KeyboardEvent nesnesi
+- **Dönüş**: yok (void; yan etki olarak setNotifications, setUnreadCount, loadInboxCounts ve toast.custom çağırır)
+
+### [N8_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::stockChannel.on callback
+- **params**: `payload` — Supabase postgres_changes olay payload'ı; INSERT olayında yeni stok hareketi verisini içerir
+- **ic_degiskenler**:
+  - `m` — payload.new alanından türetilen stok hareketi verisi (Record<string, unknown>)
+  - `delta` — Number(m.delta || 0) ile elde edilen stok değişim miktarı
+  - `movementType` — delta > 0 ise 'incomingLabel', değilse 'outgoingLabel' çeviri anahtarı
+  - `absQty` — Math.abs(delta) ile elde edilen mutlak miktar
+  - `notif` — oluşturulan AppNotification nesnesi; id 'stock_rt_' ön ekiyle başlar, type 'stock', isRead false, link '/admin/products' sayfasına yönlendirir
+  - `id` — toast.custom callback'indeki toast kimliği
+  - `e` — onKeyDown olayındaki KeyboardEvent nesnesi
+- **Dönüş**: yok (void; yan etki olarak setNotifications, setUnreadCount, loadInboxCounts ve toast.custom çağırır)
+
+### [N9_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::useEffect (realtime subscriptions)
+- **params**: (parametre yok; useEffect bağımlılık dizisi: [tenantId, lang])
+- **ic_degiskenler**:
+  - `ordersChannel` — supabase.channel ile oluşturulan sipariş realtime kanalı; 'admin-orders-realtime-{tenantId}' adıyla, private config ile, venthub_orders tablosundaki INSERT olaylarını dinler, tenant_id filtresi uygular
+  - `stockChannel` — supabase.channel ile oluşturulan stok hareketi realtime kanalı; 'admin-stock-realtime-{tenantId}' adıyla, private config ile, inventory_movements tablosundaki INSERT olaylarını dinler, tenant_id filtresi uygular
+- **Dönüş**: cleanup fonksiyonu (supabase.removeChannel(ordersChannel) ve supabase.removeChannel(stockChannel) çağırır)
+
+### [N10_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::useEffect (fetchRecentActivity)
+- **params**: (parametre yok; useEffect bağımlılık dizisi: [lang])
+- **ic_degiskenler**:
+  - `active` — bileşen hâlâ aktif mi bilgisini tutan boolean; cleanup fonksiyonunda false yapılır
+  - `fetchRecentActivity` — son sipariş ve stok hareketlerini Supabase'den çekip combined dizisine dönüştüren async fonksiyon
+- **Dönüş**: cleanup fonksiyonu (active = false atar)
+
+### [N11_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::useEffect (interval)
+- **params**: (parametre yok; useEffect bağımlılık dizisi: [])
+- **ic_degiskenler**:
+  - `interval` — setInterval ile her 30000 milisaniyede (30 saniye) bir loadInboxCounts() çağıran interval referansı
+- **Dönüş**: cleanup fonksiyonu (clearInterval(interval) çağırır)
+
+### [N12_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::useEffect (click outside)
+- **params**: (parametre yok; useEffect bağımlılık dizisi: [])
+- **ic_degiskenler**:
+  - `handleClickOutside` — document üzerindeki mousedown olayını dinleyen fonksiyon; dropdownRef.current varsa ve tıklanan hedef dropdown içinde değilse setIsOpen(false) çağırır
+  - `event` — MouseEvent nesnesi; tıklanan hedef elemanı içerir
+- **Dönüş**: cleanup fonksiyonu (document.removeEventListener('mousedown', handleClickOutside) çağırır)
+
+### [N13_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::useEffect (keydown)
+- **params**: (parametre yok; useEffect bağımlılık dizisi: [isOpen])
+- **ic_degiskenler**:
+  - `handleKeyDown` — document üzerindeki keydown olayını dinleyen fonksiyon; Escape tuşuna basıldığında setIsOpen(false) çağırır
+  - `event` — KeyboardEvent nesnesi; basılan tuşu içerir
+- **Dönüş**: cleanup fonksiyonu (document.removeEventListener('keydown', handleKeyDown) çağırır; sadece isOpen true iken listener eklenir)
+
+### [N14_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::useEffect (initial load)
+- **params**: (parametre yok; useEffect bağımlılık dizisi: [])
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (void; mount anında loadInboxCounts() çağırır)
+
+### [N15_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::useEffect (isOpen load)
+- **params**: (parametre yok; useEffect bağımlılık dizisi: [isOpen])
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (void; isOpen true olduğunda loadInboxCounts() çağırır)
+
+### [N16_NASIL] AST Pointer: src/components/admin/AdminRealtimeNotifications.tsx::useEffect (visibilitychange)
+- **params**: (parametre yok; useEffect bağımlılık dizisi: [])
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (void; sayfa görünürlüğü değiştiğinde loadInboxCounts() çağırır)
 
 ---
 
@@ -15118,10 +15233,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-50`, `bg-blue-50/30`, `bg-emerald-50`, `bg-emerald-500/10`, `bg-primary-navy`, `bg-primary-navy/10`, `bg-rose-100`, `bg-rose-500`, `bg-slate-100`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-slate-500/10`, `bg-white`, `border-2`
-- **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-1`, `gap-2`, `gap-3`, `h-10`, `h-12`, `h-2`, `h-2.5`, `items-center`, `justify-between`, `justify-center`
-- **Varyant/Responsive:** `:`, `hover:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `${!notif.isRead`, `${notif.link`, `:`, `animate-in`, `animate-pulse`, `border`, `cursor-pointer`, `duration-300`, `fade-in`, `font-bold`, `font-medium`, `hover:shadow`, `leading-relaxed`, `mb-3`, `ml-3`
+- **Renkler:** `bg-admin-accent`, `bg-admin-accent-weak`, `bg-admin-danger`, `bg-admin-success`, `bg-admin-success-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-surface-3`, `bg-primary-navy/10`, `border-2`, `border-admin-border`, `border-admin-success`, `border-b`, `border-l-4`, `border-primary-navy`
+- **Layout:** `absolute`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-1`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-3`, `grid`, `grid-cols-1`, `h-10`, `h-12`, `h-2`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${!notif.isRead`, `${item.bgColor`, `${notif.link`, `:`, `animate-in`, `animate-pulse`, `border`, `cursor-pointer`, `duration-300`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `font-bold`, `font-medium`
 
 ---
 # FILE: src\components\admin\AdminSkeleton.md
@@ -15130,13 +15245,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\AdminSkeleton.tsx
-skeleton_hash: 10a5598cfbfacede
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\AdminSkeleton.tsx
+skeleton_hash: 68755857c27aac1d
 entity_hashes:
   func:AdminSkeleton: 77330e168e73e66f
   overview: f3781a370e1b4261
   style_tokens: 9e8ea6f4cb9e6a4c
-generated_at: 2026-08-25T07:24:24Z
+generated_at: 2026-08-27T08:00:41Z
 ---
 
 ## Genel Bakış
@@ -15215,8 +15330,8 @@ Admin panelinin çeşitli görünümlerinde veri yüklenirken gösterilen iskele
 
 ## NODE ID STANDARD
 
-  file: AdminSkeleton.tsx
-  function: AdminSkeleton.tsx::AdminSkeleton
+  file: src\components\admin\AdminSkeleton.tsx
+  function: src\components\admin\AdminSkeleton.tsx::AdminSkeleton
 
 ---
 
@@ -15246,13 +15361,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\AdminToolbar.tsx
-skeleton_hash: ce976823bc22f126
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\AdminToolbar.tsx
+skeleton_hash: da49f9d4f12b338b
 entity_hashes:
   func:AdminToolbar: af143a8f279e1c1e
   overview: f526ba131742fbc5
-  style_tokens: f914d27adccfd567
-generated_at: 2026-06-19T20:47:20Z
+  style_tokens: 5ffe1c60552a91d0
+generated_at: 2026-08-27T08:00:43Z
 ---
 
 ## Genel Bakış
@@ -15461,11 +15576,11 @@ type AdminToolbarProps = {
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-lg`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-rose-500`, `bg-surface-deep`, `bg-surface-deep/20`, `bg-surface-deep/40`, `bg-transparent`, `bg-white`, `bg-white/10`, `bg-white/3`, `bg-white/5`, `border-cyan-400`, `border-l`, `border-surface-deep`, `border-t`, `border-white/10`
-- **Layout:** `${sticky`, `-right-1`, `-top-1`, `absolute`, `backdrop-blur-2xl`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-2.5`, `gap-3`, `gap-4`, `gap-5`
+- **Renkler:** `bg-admin-accent`, `bg-admin-bg`, `bg-admin-danger`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-surface-3`, `bg-transparent`, `border-admin-accent`, `border-admin-border`, `border-l`, `border-t`, `data-[state=checked]:bg-admin-accent`, `focus-visible:border-admin-accent/30`, `focus-visible:border-admin-accent/40`, `group-focus-within:text-admin-accent`
+- **Layout:** `${sticky`, `-right-1`, `-top-1`, `absolute`, `block`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-2.5`, `gap-3`, `gap-4`, `gap-5`, `gap-6`
 - **Varyant/Responsive:** `:`, `data-[state=checked]:`, `focus-visible:`, `group-focus-within:`, `hover:`, `lg:`, `md:`, `placeholder:` önekleri
 - **Yardımcı Sınıflar:** `$`, `${adminSelectClass`, `${ch.active`, `${className`, `-translate-y-1/2`, `:`, `animate-in`, `border`, `ch.classOff`, `ch.classOn`, `cursor-pointer`, `data-[state=checked]:translate-x-3.5`, `data-[state=checked]:translate-x-4.5`, `defaultChipOff`, `defaultChipOn`
 
@@ -15586,15 +15701,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\CommandPalette.tsx
-skeleton_hash: 8953e81a0b0a0976
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\CommandPalette.tsx
+skeleton_hash: 03b652b86cf7221d
 entity_hashes:
   func:CommandPalette: d6aeed4e7453fe44
   func:handleKeyDown: 1487e8d647499b5f
   func:selectItem: 8a6a6e8e20f5896e
   overview: 0ae0fe4944b487b7
-  style_tokens: 7dfe1be44eebd77e
-generated_at: 2026-06-19T20:47:48Z
+  style_tokens: 7d0ca75a1c75e964
+generated_at: 2026-08-27T08:00:44Z
 ---
 
 ## Genel Bakış
@@ -15914,13 +16029,13 @@ graph TD
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-xl`, `shadow-glow-md`, `shadow-glow-sm`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-surface-deep/10`, `bg-surface-deep/60`, `bg-transparent`, `bg-white/5`, `border-b`, `border-cyan-400/20`, `border-none`, `border-t`, `border-white/10`, `border-white/5`, `group-hover:text-cyan-400`, `hover:bg-white/5`, `hover:text-white`
-- **Layout:** `absolute`, `backdrop-blur-md`, `fixed`, `flex`, `flex-1`, `gap-1.5`, `gap-2`, `gap-4`, `h-1.5`, `h-10`, `h-16`, `h-5`, `h-8`, `h-full`, `items-center`
+- **Renkler:** `bg-admin-accent`, `bg-admin-accent-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-surface-deep/10`, `bg-surface-deep/60`, `bg-transparent`, `border-admin-accent/30`, `border-admin-border`, `border-b`, `border-none`, `border-t`, `group-hover:text-admin-accent`, `hover:bg-admin-surface-2`, `hover:text-admin-fg`
+- **Layout:** `absolute`, `fixed`, `flex`, `flex-1`, `gap-1.5`, `gap-2`, `gap-4`, `h-1.5`, `h-10`, `h-16`, `h-5`, `h-8`, `h-full`, `items-center`, `items-start`
 - **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `placeholder:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${isActive`, `:`, `animate-in`, `animate-pulse`, `animate-spin`, `border`, `cursor-default`, `cursor-pointer`, `cyan-glow`, `duration-200`, `font-black`, `font-bold`, `font-medium`, `font-mono`
+- **Yardımcı Sınıflar:** `$`, `${isActive`, `:`, `animate-in`, `animate-pulse`, `animate-spin`, `border`, `cursor-default`, `cursor-pointer`, `cyan-glow`, `duration-200`, `font-bold`, `font-medium`, `font-mono`, `font-semibold`
 
 ---
 # FILE: src\components\admin\DateRangePicker.md
@@ -16145,13 +16260,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\EditableCell.tsx
-skeleton_hash: c8931401a80d9dd5
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\EditableCell.tsx
+skeleton_hash: 8a8588a3c9b679e7
 entity_hashes:
   func:EditableCell: c69e143b78ab0750
   overview: e0ead7dc16886f70
-  style_tokens: 2f2ada2707ada249
-generated_at: 2026-06-19T20:47:00Z
+  style_tokens: 9c5ac06edd88021a
+generated_at: 2026-08-27T08:00:45Z
 ---
 
 ## Genel Bakış
@@ -16313,7 +16428,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-transparent`, `border-2`, `border-b`, `border-dashed`, `border-primary-navy`, `border-primary-navy/30`, `border-slate-300`, `border-t-primary-navy`, `hover:border-primary-navy`, `hover:text-primary-navy`, `text-left`, `text-slate-400`, `text-sm`
+- **Renkler:** `bg-transparent`, `border-2`, `border-admin-border`, `border-b`, `border-dashed`, `border-primary-navy`, `border-primary-navy/30`, `border-t-primary-navy`, `hover:border-primary-navy`, `hover:text-primary-navy`, `text-admin-fg-muted`, `text-left`, `text-sm`
 - **Layout:** `gap-1`, `h-3.5`, `inline-block`, `inline-flex`, `items-center`, `p-0`, `w-3.5`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
 - **Yardımcı Sınıflar:** `${className`, `${inputWidth`, `animate-spin`, `border`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-1`, `focus-visible:ring-primary-navy/50`, `px-1.5`, `py-0.5`, `rounded`, `rounded-full`, `transition-colors`
@@ -16325,13 +16440,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\ExportMenu.tsx
-skeleton_hash: 795929f00f599bec
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\ExportMenu.tsx
+skeleton_hash: 952569e6c7605451
 entity_hashes:
   func:ExportMenu: 9e536638b7cdf449
   overview: fcef70276d80a8c4
-  style_tokens: 7659c3683121a964
-generated_at: 2026-06-19T20:47:00Z
+  style_tokens: b6f5e12168df9a4c
+generated_at: 2026-08-27T08:00:46Z
 ---
 
 ## Genel Bakış
@@ -16419,13 +16534,13 @@ type ExportMenuItem = {
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-lg`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-500/10`, `border-white/10`, `hover:bg-white/5`, `hover:text-white`, `text-emerald-400`, `text-slate-300`, `text-slate-500`, `text-xs`
-- **Layout:** `flex`, `gap-2`, `gap-3`, `h-12`, `h-8`, `items-center`, `justify-center`, `min-w-140px`, `min-w-200px`, `p-2`, `shadow-elevation-5`, `w-8`, `z-50`, `zoom-in-95`
-- **Varyant/Responsive:** `hover:` önekleri
-- **Yardımcı Sınıflar:** `animate-in`, `border`, `cursor-pointer`, `duration-200`, `fade-in`, `font-black`, `font-bold`, `glass-strong`, `italic`, `mb-1`, `outline-none`, `pb-2`, `pt-2`, `px-3`, `px-4`
+- **Renkler:** `bg-admin-success-weak`, `bg-admin-surface`, `border-admin-border`, `data-[highlighted]:bg-admin-surface-2`, `hover:bg-admin-surface-2`, `hover:text-admin-fg`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-success`, `text-xs`
+- **Layout:** `flex`, `gap-2`, `gap-3`, `h-12`, `h-8`, `items-center`, `justify-center`, `min-w-140px`, `min-w-200px`, `p-2`, `shadow-admin-overlay`, `w-8`, `z-popover`, `zoom-in-95`
+- **Varyant/Responsive:** `data-[highlighted]:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `animate-in`, `border`, `cursor-pointer`, `data-[highlighted]:ring-2`, `data-[highlighted]:ring-admin-ring`, `data-[highlighted]:ring-inset`, `duration-200`, `fade-in`, `font-semibold`, `italic`, `mb-1`, `outline-none`, `pb-2`, `pt-2`, `px-3`
 
 ---
 # FILE: src\components\admin\InfoTooltip.md
@@ -16434,26 +16549,27 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\InfoTooltip.tsx
-skeleton_hash: 979bd18efdbbfccc
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InfoTooltip.tsx
+skeleton_hash: f0ca4c18d6b635f9
 entity_hashes:
   func:InfoTooltip: 183c7d447a0090ba
-  overview: aa0bb37988421fc0
-  style_tokens: 15a027a0bab7a2ef
-generated_at: 2026-06-19T20:47:00Z
+  overview: 7d5fe73182f0a761
+  style_tokens: 853d14269b613998
+generated_at: 2026-08-27T08:01:21Z
 ---
 
 ## Genel Bakış
-`InfoTooltip` bileşeni, yönetim panelindeki metin öğelerine ek bilgi sağlamak amacıyla kullanılan bir tooltip (ipucu) komponentidir. Verilen metni ve isteğe bağlı boyut ve stil parametrelerini alarak, kullanıcı fareyi üzerine getirdiğinde açıklayıcı bir balon gösterir.
+`InfoTooltip`, yönetim panelinde kullanılan bir React tooltip bileşenidir. Kullanıcı fareyi üzerine getirdiğinde bilgilendirici bir metin baloncuğu gösterir. Bileşen, `lucide-react` kütüphanesinden aldığı `Info` ikonunu tetikleyici olarak kullanır ve dışarıdan aldığı `text`, `size` ve `className` parametreleriyle yapılandırılır.
 
 ## Fonksiyon Grupları
-### Tooltip Render ve Konfigürasyon
-Bu grup, tooltip’in içeriğini ve görünümünü oluşturup, dışarıdan gelen `text`, `size` ve `className` prop’larını işleyerek React elementini döndürür.
+### Tooltip Bileşeni
+Bu grup, bilgilendirici tooltip'in render edilmesinden ve görünümünün yapılandırılmasından sorumludur. Verilen metni bir ipucu baloncuğu içinde gösterirken, ikon boyutu ve ek CSS sınıfları gibi özelleştirmelere olanak tanır.
 - InfoTooltip
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+
 Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
@@ -16475,14 +16591,20 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
 - import: lucide-react::Info
 - import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useId
+- import: react::useState
 
 ---
 
 ## INTERFACES
 
 ### InfoTooltipProps
+KOLON AÇIKLAMASI (tooltip). `e1018e46` ile tablo başlıklarına eklenmiş, sonraki kit göçünde importer'ı kaybolmuştu; bileşen de sözlükteki `admin.inventory.tooltip.*` anahtarları da yetim kaldı. Geri bağlandı — SİLİNMEDİ, çünkü "Fiziksel / Rezerve / Müsait / Eşik / ABC / Tükenme" kolonları isimlerind
 - `text: string`
 - `size?: number`
 - `className?: string`
@@ -16492,10 +16614,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/InfoTooltip.tsx::InfoTooltip
-- **params**: ({ text, size = 14, className = '' })
+- **params**: `text` — tooltip içinde gösterilecek metin; `size` — varsayılan 14, lucide-react `Info` ikonunun piksel boyutu; `className` — varsayılan boş dize, sarmalayıcı `<span>`'e eklenen ek CSS sınıfı
 - **ic_degiskenler**:
-  - (Fonksiyon gövdesinde tanımlanmış değişken yok)
-- **Dönüş**: JSX elementi (React bileşeni). Fonksiyon, `text` parametresini tooltip içeriği olarak gösteren ve üzerine gelindiğinde (Tailwind `group-hover` ile) görünür olan, `Info` ikonu ve tooltip kutusu içeren bir React bileşeni döndürür. Parametre olarak `text`, `size` ve `className` kullanılır.
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; butonun `aria-label` değerinde `t('admin.ui.moreInfo')` olarak kullanılır
+  - `open` — `useState(false)` ile oluşturulan boolean durum; tooltip'in açık/kapalı olduğunu tutar
+  - `setOpen` — `open` durumunu güncelleyen setter fonksiyonu; `show`, `hide`, `onClick` handler'ı ve `onKey` içinde `setOpen(true)`, `setOpen(false)`, `setOpen((v) => !v)` çağrılarıyla kullanılır
+  - `tooltipId` — `useId()` ile üretilen benzersiz dize; tooltip `<span>`'inin `id`'si ve butonun `aria-describedby` değeri olarak kullanılır
+  - `show` — `useCallback(() => setOpen(true), [])` ile oluşturulan stabilize fonksiyon; sarmalayıcı `<span>`'in `onMouseEnter`'ında ve butonun `onFocus`'unda tetiklenir
+  - `hide` — `useCallback(() => setOpen(false), [])` ile oluşturulan stabilize fonksiyon; sarmalayıcı `<span>`'in `onMouseLeave`'inde ve butonun `onBlur`'unda tetiklenir
+- **Dönüş**: JSX elementi — `open` true ise tooltip içeriğini (`text`, ok üçgeni) barındıran `role="tooltip"` `<span>`'ini, değilse yalnızca butonu render eden bir `<span>` sarmalayıcı döndürür
+
+### [N2_NASIL] AST Pointer: src/components/admin/InfoTooltip.tsx::InfoTooltip → useEffect callback
+- **params**: yok (React useEffect callback'i; bağımlılık dizisi `[open]`)
+- **ic_degiskenler**:
+  - `onKey` — `(e: KeyboardEvent) => { ... }` imzalı fonksiyon; `e.key === 'Escape'` koşulu sağlandığında `setOpen(false)` çağırarak tooltip'i kapatır; `document.addEventListener('keydown', onKey)` ile eklenir, cleanup'ta `document.removeEventListener('keydown', onKey)` ile kaldırılır
+- **Dönüş**: cleanup fonksiyonu — `document.removeEventListener('keydown', onKey)` çağırır; `open` false ise erken return ile hiçbir listener eklenmez ve dönüş yoktur
+
+### [N3_NASIL] AST Pointer: src/components/admin/InfoTooltip.tsx::InfoTooltip → useEffect callback → onKey
+- **params**: `e` — `KeyboardEvent` olay nesnesi; `e.key` özelliği Escape tuşu kontrolü için okunur
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (void) — yan etki olarak `e.key === 'Escape'` koşulu gerçekleşirse `setOpen(false)` çağırır
 
 ---
 
@@ -16520,10 +16658,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-slate-800`, `border-4`, `border-t-slate-800`, `border-transparent`, `hover:text-primary-navy`, `text-left`, `text-slate-400`, `text-white`, `text-xs`
-- **Layout:** `absolute`, `bottom-full`, `inline-flex`, `items-center`, `justify-center`, `left-1/2`, `relative`, `shadow-xl`, `top-full`, `w-64`, `z-50`
-- **Varyant/Responsive:** `group-hover:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `${className`, `-translate-x-1/2`, `align-middle`, `cursor-help`, `duration-200`, `font-normal`, `group`, `group-hover:opacity-100`, `group-hover:visible`, `invisible`, `leading-relaxed`, `mb-2`, `ml-1`, `normal-case`, `opacity-0`
+- **Renkler:** `bg-admin-surface-3`, `border-4`, `border-b-admin-surface-3`, `border-transparent`, `hover:text-admin-accent`, `text-admin-fg`, `text-admin-fg-muted`, `text-left`, `text-xs`
+- **Layout:** `absolute`, `bottom-full`, `inline-flex`, `items-center`, `justify-center`, `left-1/2`, `relative`, `shadow-admin-lg`, `top-full`, `w-64`, `z-popover`
+- **Varyant/Responsive:** `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `${className`, `-translate-x-1/2`, `align-middle`, `cursor-help`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-normal`, `group`, `leading-relaxed`, `ml-1`, `mt-2`, `normal-case`, `px-3`, `py-2`
 
 ---
 # FILE: src\components\admin\InventoryCsvImport.md
@@ -16532,13 +16670,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\InventoryCsvImport.tsx
-skeleton_hash: 768a388cd89758e5
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryCsvImport.tsx
+skeleton_hash: dd9394357b1fe44d
 entity_hashes:
   func:InventoryCsvImport: 9318bdab1aeb480b
   overview: 8a8e33b88d67f992
   style_tokens: 735539ffb01f0fbd
-generated_at: 2026-08-25T07:25:11Z
+generated_at: 2026-08-27T08:01:22Z
 ---
 
 ## Genel Bakış
@@ -16729,8 +16867,8 @@ CSV STOK İÇE AKTARMA. `dcc5a895` (Inventory → DataTableKit) göçünde impor
 
 ## NODE ID STANDARD
 
-  file: InventoryCsvImport.tsx
-  function: InventoryCsvImport.tsx::InventoryCsvImport
+  file: src\components\admin\InventoryCsvImport.tsx
+  function: src\components\admin\InventoryCsvImport.tsx::InventoryCsvImport
 
 ---
 
@@ -16760,21 +16898,21 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryDetailDrawer.tsx
-skeleton_hash: a795a88f64a4a4b7
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryDetailDrawer.tsx
+skeleton_hash: 430f4ab6d93eb848
 entity_hashes:
-  func:InventoryDetailDrawer: 3a57400ca0f546b7
-  overview: 92caa1481da5cee7
-  style_tokens: 4b283d8541dc151c
-generated_at: 2026-06-08T10:08:36Z
+  func:InventoryDetailDrawer: d112e7d0baa4046c
+  overview: 0293743016101c3c
+  style_tokens: 173df4c477f18528
+generated_at: 2026-08-27T08:02:16Z
 ---
 
 ## Genel Bakış
-InventoryDetailDrawer, envanter öğelerinin ayrıntılarını gösteren bir React bileşenidir. Kullanıcıya seçilen ürünün stok miktarı, konumu ve diğer meta verileri sunar. Ayrıca düzenleme ve kapatma işlevlerini sağlayarak envanter yönetimi akışını destekler.
+InventoryDetailDrawer, envanter öğelerinin ayrıntılarını gösteren bir React bileşenidir. Seçili ürünün stok miktarı, eşik değerleri ve hareket geçmişi gibi bilgileri bir yan çekmece (drawer) arayüzünde sunar. Kullanıcıların QR etiketi yazdırması, eşik güncellemesi, stok ayarlaması ve hareketleri geri alması gibi etkileşimli işlemleri destekler.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Bileşenin giriş noktası ve render mantığını yönetir.
+Bileşenin giriş noktası ve render mantığını yönetir; props içinde gelen durum ve setter fonksiyonlarını kullanarak çekmece arayüzünü oluşturur. Escape tuşu ile çekmeceyi kapatma desteği sağlar, selected nesnesi yoksa null döner.
 - InventoryDetailDrawer
 
 ---
@@ -16787,42 +16925,56 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### InventoryDetailDrawer
-**Ne yapar**: Seçili bir ürünün stok detaylarını, eşik değerlerini ve hareket geçmişini gösteren bir yan çekmece (drawer) arayüzü oluşturur. Kullanıcıların QR etiketi yazdırması, eşik güncellemesi, stok ayarlaması ve hareketleri geri alması gibi etkileşimli işlemleri yönetir.  
+**Ne yapar**: Seçili bir envanter ürününün detaylarını gösteren, sağdan kayarak açılan bir drawer (çekmece) bileşenidir. Ürün bilgileri, stok durumu, eşik değeri düzenleme, stok hareketi yapma, rezerve siparişler ve hareket geçmişi gibi bölümleri içerir. Radix UI Dialog altyapısını kullanarak modal bir yapı oluşturur.
 
-**Nasıl yapar**: Props içinde gelen durum ve setter fonksiyonlarını destrüktüre eder, Escape tuşu ile çekmeceyi kapatmak için bir `useEffect` ekler ve `selected` nesnesi yoksa `null` döner. UI, bir kapatma butonu, ürün bilgileri, stok ve eşik kartları, zeki satın alma önerisi, eşik güncelleme formu, stok ayarlama bileşeni, rezerve sipariş tablosu ve hareket geçmişi bölümlerinden oluşur. Buton ve input etkileşimleri ilgili callback’leri (ör. `printQrLabel`, `saveThreshold`, `adjustStock`, `undoLastMovement`) tetikler.  
+**Nasıl yapar**: Bileşen, `props` parametresinden gerekli tüm verileri ve fonksiyonları destructure ederek alır. `selected` değeri yoksa `null` döner ve render işlemi gerçekleştirilmez. Radix UI `Dialog.Root`, `Dialog.Portal`, `Dialog.Overlay`, `Dialog.Content`, `Dialog.Title`, `Dialog.Close` bileşenlerini kullanarak semantik bir modal yapı kurar. `Dialog.Overlay` siyah yarı saydam bir perde oluşturur ve body scroll kilidi sağlar (yorumda "cetvel §2.5" referansı ile ASLA çıkarılmaması gerektiği belirtilmiştir). `Dialog.Content` bileşenine `aria-modal="true"` elle eklenmiştir çünkü Radix'in otomatik olarak bu özelliği basmadığı belirtilmiştir (INV-ADMIN-OVERLAY-2 referansı). Ayrıca APG (ARIA Practices Guide) uyarınca panelin kendisine odaklanması gerektiği için `aria-describedby` undefined olarak ayarlanmıştır. İçerikte `useI18n` hook'u ile uluslararasılaştırma sağlanır. `selected.daily_velocity` tanımlı ve sıfırdan büyük olduğunda "Zeki Öneri Bölümü" gösterilir; bu bölümde 30 günlük satış hızı ve önerilen sipariş miktarı hesaplanır. `selected.abc_class` değeri `'A'` olduğunda ek bir bilgi mesajı görüntülenir. `hasWriteAccess` true olduğunda eşik değeri düzenleme ve stok hareketi bölümleri render edilir. `printQrLabel` fonksiyonu, QR etiket yazdırma butonuna tıklandığında çağrılır ve yazdırma işlemi sırasında buton devre dışı kalır. `Dialog.Root` bileşeninin `onOpenChange` olayı, dialog kapatıldığında `onClose` fonksiyonunu çağırır.
 
 **Parametreler**:
-- props: InventoryDetailDrawerProps — Çekmeceyi kontrol eden tüm durum ve fonksiyonları içeren nesne. İçerisinde:
-  - selected: any — Görüntülenecek ürün nesnesi; yoksa çekmece kapanır.
-  - setSelected: (value: any) => void — Çekmeceyi kapatmak veya seçimi değiştirmek için kullanılan setter.
-  - printingQr: boolean — QR etiketi yazdırma işleminin devam edip etmediğini gösterir.
-  - setPrintingQr: (value: boolean) => void — QR yazdırma durumunu günceller.
-  - selectedStock: number | null — Ürünün mevcut stok miktarı.
-  - selectedThreshold: string | number — Kullanıcı tarafından girilen eşik değeri.
-  - setSelectedThreshold: (value: string | number) => void — Eşik değerini günceller.
-  - defaultThreshold: number | null — Sistem tarafından tanımlı varsayılan eşik.
-  - saving: boolean — Eşik kaydetme işleminin sürecini gösterir.
-  - saveThreshold: (productId: string) => void — Yeni eşik değerini kaydeder.
-  - hasWriteAccess: boolean — Kullanıcının düzenleme yetkisi olup olmadığını belirler.
-  - moveQty: number — Stok hareketi miktarı.
-  - setMoveQty: (value: number) => void — Stok hareket miktarını ayarlar.
-  - moving: boolean — Stok hareketi işleminin devam edip etmediği.
-  - adjustStock: (params: any) => void — Stok ayarlama işlemini gerçekleştirir.
-  - reservedOrders: any[] — Rezerve siparişlerin listesi.
-  - movements: any[] — Stok hareket geçmişi.
-  - undoLastMovement: () => void — Son stok hareketini geri alır.
-  - undoing: boolean — Geri alma işleminin sürecini gösterir.
-  - t: (key: string) => string — Çeviri fonksiyonu.
+- props: InventoryDetailDrawerProps — Bileşenin ihtiyacı olan tüm verileri ve callback fonksiyonlarını içeren props nesnesi. Aşağıdaki alt alanları içerir:
+  - selected: bilinmiyor — Detayları gösterilecek seçili envanter ürünü. Bu değer yoksa bileşen null döner.
+  - onClose: () => void — Drawer kapatıldığında çağrılan fonksiyon.
+  - printingQr: boolean — QR etiket yazdırma işleminin devam edip etmediğini gösteren durum.
+  - setPrintingQr: (value: boolean) => void — `printingQr` durumunu güncelleyen fonksiyon.
+  - selectedStock: number | null | undefined — Seçili ürünün güncel stok miktarı. Null veya undefined ise "-" gösterilir.
+  - selectedThreshold: number | '' — Kullanıcının ayarladığı eşik değeri. Boş string olabilir.
+  - setSelectedThreshold: (value: number | '') => void — Eşik değerini güncelleyen fonksiyon.
+  - defaultThreshold: number | null | undefined — Varsayılan eşik değeri. `selectedThreshold` boş olduğunda bu değer gösterilir.
+  - saving: boolean — Eşik değeri kaydetme işleminin devam edip etmediğini gösteren durum.
+  - saveThreshold: (productId: string) => void — Eşik değerini kaydetmek için çağrılan fonksiyon. `selected.product_id` parametre olarak iletilir.
+  - hasWriteAccess: boolean — Kullanıcının yazma yetkisi olup olmadığını belirten değer. Eşik düzenleme, stok hareketi ve son hareketi geri alma bölümleri bu değere bağlı olarak gösterilir.
+  - moveQty: number | string — Stok hareketi için girilen miktar değeri.
+  - setMoveQty: (value: number | string) => void — `moveQty` değerini güncelleyen fonksiyon.
+  - moving: boolean — Stok hareketi işleminin devam edip etmediğini gösteren durum.
+  - adjustStock: bilinmiyor — Stok düzeltme işlemi için çağrılan fonksiyon. `InventoryStockAdjust` bileşenine `onAdjust` prop'u olarak iletilir.
+  - reservedOrders: bilinmiyor — Rezerve siparişlerin listesi. `InventoryReservedTable` bileşenine prop olarak iletilir.
+  - movements: Array — Stok hareket geçmişi kayıtları. `InventoryMovementHistory` bileşenine prop olarak iletilir. Dizi uzunluğu sıfırdan büyükse "son hareketi geri al" butonu gösterilir.
+  - undoLastMovement: () => void — Son stok hareketini geri almak için çağrılan fonksiyon.
+  - undoing: boolean — Geri alma işleminin devam edip etmediğini gösteren durum.
 
-**Dönüş**: `void` (React bileşeni olarak JSX döndürür; render edildiğinde UI oluşturur).
+**Dönüş**: JSX.Element — Radix UI Dialog bileşenlerinden oluşan drawer arayüzünü döndürür. `selected` null veya undefined ise `null` döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../types/inventory::InventoryRow
+- import: ../../types/inventory::ReservedRow
+- import: ./InventoryMovementHistory::InventoryMovementHistory
+- import: ./InventoryMovementHistory::Movement
+- import: ./InventoryQrLabel::printQrLabel
+- import: ./InventoryReservedTable::InventoryReservedTable
+- import: ./InventoryStockAdjust::InventoryStockAdjust
+- import: @/i18n/I18nProvider::useI18n
+- import: @radix-ui/react-dialog
+- import: react::React
 
 ---
 
 ## INTERFACES
 
 ### InventoryDetailDrawerProps
+STOK DETAY ÇEKMECESİ. Cetvel: `docs/standards/admin-design-standard.md` §4. NEDEN MODAL (§4.1/§4.3): §4.1 "tablo satırı seçince hızlı detay" için non-modal split panel öneriyor; ama §4.3 net: **"Modal bir drawer, sadece şekli değişmiş bir modaldır"** ve panelin non-modal SAYILMASI için arka içeriğin
 - `selected: InventoryRow | null`
-- `setSelected: (v: InventoryRow | null) => void`
+- `onClose: () => void`
 - `printingQr: boolean`
 - `setPrintingQr: (v: boolean) => void`
 - `selectedStock: number | null`
@@ -16840,37 +16992,35 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `movements: Movement[]`
 - `undoLastMovement: () => void`
 - `undoing: boolean`
-- `t: (key: string) => string`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryDetailDrawer.tsx::InventoryDetailDrawer
-- **params**: (props)
+### [N1_NASIL] AST Pointer: src/components/admin/InventoryDetailDrawer.tsx::InventoryDetailDrawer
+- **params**: `props: InventoryDetailDrawerProps`
 - **ic_degiskenler**:
-  - `selected` — seçili envanter satırı, drawer’ın gösterilip gösterilmeyeceğini belirler
-  - `setSelected` — seçili satırı sıfırlamak için kullanılan state setter fonksiyonu
-  - `printingQr` — QR kodu basımının şu anda gerçekleşip gerçekleşmediğini gösteren boolean
-  - `setPrintingQr` — QR basım durumunu güncelleyen state setter fonksiyonu
-  - `selectedStock` — seçili ürünün mevcut stok miktarı
-  - `selectedThreshold` — seçili ürün için gösterilen eşik (alarm) değeri
-  - `setSelectedThreshold` — eşik değerini güncelleyen state setter fonksiyonu
-  - `defaultThreshold` — ürünün varsayılan eşik değeri (fallback)
-  - `saving` — eşik güncelleme işleminin devam edip etmediğini gösteren boolean
-  - `saveThreshold` — eşik değerini kaydeden fonksiyon (product_id parametresi alır)
-  - `hasWriteAccess` — kullanıcının düzenleme yetkisi olup olmadığını belirten boolean
-  - `moveQty` — stok hareketi miktarı (adjust component’ine aktarılır)
-  - `setMoveQty` — hareket miktarını güncelleyen state setter fonksiyonu
-  - `moving` — stok hareketi işleminin devam edip etmediğini gösteren boolean
-  - `adjustStock` — stok ayarlama işlemini tetikleyen callback
-  - `reservedOrders` — rezerve siparişlerin listesi, `InventoryReservedTable`a prop olarak verilir
-  - `movements` — stok hareket geçmişi dizisi, `InventoryMovementHistory`a prop olarak verilir
-  - `undoLastMovement` — son hareketi geri almayı tetikleyen fonksiyon
-  - `undoing` — geri alma işleminin devam edip etmediğini gösteren boolean
-  - `t` — i18n çeviri fonksiyonu
-  - `onKey` — `Escape` tuşuna basıldığında drawer’ı kapatan yerel fonksiyon (useEffect içinde tanımlanır)
-- **Dönüş**: yok (React bileşeni, JSX döndürür; yan etkileri: `useEffect` ile klavye dinleyicisi ekler ve temizler)
+  - `selected` — `props`'tan destructure edilen seçili envanter satırı (`InventoryRow`); drawer kapatma kontrolünde `if (!selected) return null` ile null-guard yapılır; `selected.name`, `selected.product_id`, `selected.physical_stock`, `selected.daily_velocity`, `selected.available_stock`, `selected.abc_class` alanlarına erişilir
+  - `onClose` — `props`'tan destructure edilen drawer kapatma fonksiyonu; `Dialog.Root` bileşeninin `onOpenChange` handler'ında `next` false ise çağrılır
+  - `printingQr` — `props`'tan destructure edilen QR yazdırma durumu (boolean); QR butonunun `disabled` durumunu ve buton metnini kontrol eder
+  - `setPrintingQr` — `props`'tan destructure edilen QR yazdırma durumunu güncelleyen setter fonksiyonu; `printQrLabel` fonksiyonuna ikinci argüman olarak geçilir
+  - `selectedStock` — `props`'tan destructure edilen mevcut stok miktarı; özet kartında `?? '-'` fallback ile görüntülenir
+  - `selectedThreshold` — `props`'tan destructure edilen eşik değeri; eşik alarm kartında ve input'un `value` prop'unda kullanılır; `=== ''` kontrolüyle boş durum ayrımı yapılır
+  - `setSelectedThreshold` — `props`'tan destructure edilen eşik değerini güncelleyen setter fonksiyonu; input `onChange` handler'ında `e.target.value` boşsa `''` değilse `Number(e.target.value)` atanır; reset butonunda `''` atanır
+  - `defaultThreshold` — `props`'tan destructure edilen varsayılan eşik değeri; eşik alarm kartında `selectedThreshold === ''` olduğunda `?? '-'` fallback ile kullanılır
+  - `saving` — `props`'tan destructure edilen kaydetme işlemi durumu (boolean); eşik kaydet ve reset butonlarının `disabled` durumunu kontrol eder
+  - `saveThreshold` — `props`'tan destructure edilen eşiği kaydeden fonksiyon; eşik kaydet butonu `onClick`'inde `selected.product_id` argümanıyla çağrılır
+  - `hasWriteAccess` — `props`'tan destructure edilen yazma yetkisi durumu (boolean); eşik düzenleme bölümü, stok düzeltme bölümü ve son hareketi geri al butonunun koşullu render'ını kontrol eder
+  - `moveQty` — `props`'tan destructure edilen stok hareket miktarı; `InventoryStockAdjust` bileşeninin `moveQty` prop'una geçilir
+  - `setMoveQty` — `props`'tan destructure edilen hareket miktarını güncelleyen setter fonksiyonu; `InventoryStockAdjust` bileşeninin `setMoveQty` prop'una geçilir
+  - `moving` — `props`'tan destructure edilen stok hareket işlemi durumu (boolean); `InventoryStockAdjust` bileşeninin `moving` prop'una geçilir
+  - `adjustStock` — `props`'tan destructure edilen stok düzeltme fonksiyonu; `InventoryStockAdjust` bileşeninin `onAdjust` prop'una geçilir
+  - `reservedOrders` — `props`'tan destructure edilen rezerve sipariş listesi (`ReservedRow[]`); `InventoryReservedTable` bileşeninin `reservedOrders` prop'una geçilir
+  - `movements` — `props`'tan destructure edilen stok hareket geçmişi (`Movement[]`); `InventoryMovementHistory` bileşeninin `movements` prop'una geçilir; `.length > 0` kontrolüyle geri al butonunun koşullu render'ını kontrol eder
+  - `undoLastMovement` — `props`'tan destructure edilen son hareketi geri alma fonksiyonu; hareket geçmişi başlığının geri al butonu `onClick`'inde çağrılır
+  - `undoing` — `props`'tan destructure edilen geri alma işlemi durumu (boolean); geri al butonunun `disabled` durumunu ve buton metnini kontrol eder
+  - `t` — `useI18n()` hook'undan destructure edilen i18n çeviri fonksiyonu; tüm UI metinlerinde, QR etiket parametrelerinde ve `stockLine` interpolasyonunda (`{ count: selected.physical_stock }`) kullanılır
+- **Dönüş**: `JSX.Element | null` — `selected` falsy ise `null`, aksi halde Radix `Dialog.Root` ile sarmalanmış drawer JSX'i
 
 ---
 
@@ -16892,13 +17042,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-lg`, `rounded-hvac-xl`, `shadow-glow-md`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500`, `bg-black/60`, `bg-cyan-400`, `bg-cyan-400/10`, `bg-white/2`, `bg-white/3`, `border-b`, `border-cyan-400/20`, `border-l`, `border-none`, `border-white/10`, `border-white/5`, `focus-visible:border-cyan-400/40`, `hover:bg-cyan-300`, `hover:border-amber-400/30`
-- **Layout:** `-right-8`, `-top-8`, `absolute`, `backdrop-blur-sm`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`
+- **Renkler:** `bg-admin-accent`, `bg-admin-accent-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-warning`, `bg-black/60`, `border-admin-accent/30`, `border-admin-border`, `border-b`, `border-l`, `focus-visible:border-admin-accent/40`, `hover:bg-admin-accent-hover`, `hover:border-admin-warning/30`, `hover:text-admin-danger`, `hover:text-admin-fg`
+- **Layout:** `-right-8`, `-top-8`, `absolute`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `grid`, `grid-cols-2`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `animate-in`, `animate-ping`, `animate-pulse`, `blur-3xl`, `border`, `cursor-default`, `disabled:opacity-50`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`, `font-mono`, `glass`
+- **Yardımcı Sınıflar:** `animate-in`, `animate-ping`, `animate-pulse`, `blur-3xl`, `border`, `disabled:opacity-50`, `duration-300`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-bold`, `font-mono`, `font-semibold`, `group`, `inset-0`
 
 ---
 # FILE: src\components\admin\InventoryMovementHistory.md
@@ -16907,13 +17057,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryMovementHistory.tsx
-skeleton_hash: b866bc2cf5b15d5f
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryMovementHistory.tsx
+skeleton_hash: 59cf82b74f629248
 entity_hashes:
-  func:InventoryMovementHistory: 2413e5385b8816cc
-  overview: a9fb0b3f91f018c7
-  style_tokens: 1f29bfe131c33c25
-generated_at: 2026-06-08T10:08:37Z
+  func:InventoryMovementHistory: 4aa730c3557d304e
+  overview: 260384a8d41194d3
+  style_tokens: 58feab8a69484a8a
+generated_at: 2026-08-27T08:03:07Z
 ---
 
 ## Genel Bakış
@@ -16921,7 +17071,7 @@ generated_at: 2026-06-08T10:08:37Z
 
 ## Fonksiyon Grupları
 ### Ana Bileşen Grubu
-Bu grup, modülün tek işlevini yerine getirir; envanter hareket geçmişini UI olarak render eder.  
+Bu grup, modülün tek işlevini yerine getirir; envanter hareket geçmişini UI olarak render eder.
 - InventoryMovementHistory
 
 ---
@@ -16929,21 +17079,38 @@ Bu grup, modülün tek işlevini yerine getirir; envanter hareket geçmişini UI
 ## AXIOMS – Mimari Varsayımlar
 Bu modül, `movements` prop'una dayalı olarak çalışır; bu prop'un varlığı ve türü bileşenin doğru render edilmesi için kritiktir.
 
-[Aksiyom 1]: Eğer `movements` prop'u tanımlı değilse (undefined), bileşen render sırasında `movements.map` gibi bir yöntem çağırarak çalışma zamanı hatası fırlatabilir.  
-[Aksiyom 2]: Eğer `movements` prop'u bir dizi (iterable) değilse, `.map` veya benzeri yineleme işlevi başarısız olur ve bileşen hata verir.  
-[Aksiyom 3]: Eğer `movements` dizisi boşsa, bileşen hiçbir hareket öğesi render etmez ve boş bir görünüm gösterir.  
+[Aksiyom 1]: Eğer `movements` prop'u tanımlı değilse (undefined), bileşen render sırasında `movements.map` gibi bir yöntem çağırarak çalışma zamanı hatası fırlatabilir.
+[Aksiyom 2]: Eğer `movements` prop'u bir dizi (iterable) değilse, `.map` veya benzeri yineleme işlevi başarısız olur ve bileşen hata verir.
+[Aksiyom 3]: Eğer `movements` dizisi boşsa, bileşen hiçbir hareket öğesi render etmez ve boş bir görünüm gösterir.
 [Aksiyom 4]: Eğer `movements` dizisindeki öğeler bileşenin görüntülemesi gereken veriyi (tarih, ürün, miktar vb.) içermiyorsa, bu eksik veriler undefined veya boş olarak görünebilir ve kullanıcıya eksik bilgi sunulur.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### InventoryMovementHistory
-**Ne yapar**: Envanter hareketlerinin listesini görüntüleyen bir React bileşenidir.  
-**Nasıl yapar**: `movements` prop'undan gelen verileri alıp, içindeki her bir hareket için uygun UI elemanları (örnek satır, kart vb.) oluşturur ve döndürür. Bileşenin iç mantığı, gelen veriyi iterate ederek her bir hareket için gerekli görsel öğeleri üretmektir.  
-**Parametreler**:  
-- movements: InventoryMovementHistoryProps — Gösterilecek envanter hareketlerinin koleksiyonu (tipi tanımlanmamış, ancak genellikle dizidir).  
-**Dönüş**: void (React elementi döndürür; işlevsel bileşen olarak JSX üretir).
+**Ne yapar**: Envanter hareket geçmişini tablo formatında görüntüler. Her bir hareket kaydı için tarih, sebep ve stok değişim miktarını (delta) gösteren üç sütunlu bir tablo oluşturur. Hareket listesi boş olduğunda hiçbir şey render etmez.
+
+**Nasıl yapar**: `useI18n()` hook'u ile uluslararasılaştırma fonksiyonu (`t`) ve aktif dil bilgisini (`lang`) alır. `movements` dizisinin uzunluğu 0 ise `null` döndürerek bileşeni gizler. Aksi halde, yatay kaydırma desteği olan bir kapsayıcı içinde `<table>` elementi render eder. Tablo başlıkları `t()` fonksiyonu ile çevrilir. Her hareket kaydı `movements.map()` ile satıra dönüştürülür; satırlar `m.id` ile benzersiz şekilde anahtarlanır. Tarih sütununda `formatDateTime` yardımcı fonksiyonu kullanılarak `m.created_at` değeri dile uygun biçimde formatlanır. Delta sütununda `Number(m.delta)` değeri sıfırdan büyükse `text-admin-success` (yeşil) CSS sınıfı ve önüne `+` işareti eklenir; aksi halde `text-admin-danger` (kırmızı) CSS sınıfı uygulanır. Sebep sütunu `truncate` ve `max-w-140px` sınıflarıyla metin taşması durumunda kısaltılır; tam metin `title` özelliğiyle araç ipucu olarak sunulur. Son satır hariç tüm satırlarda alt kenarlık (`border-b`) gösterilir; `group-last:border-0` ile son satırın kenarlığı kaldırılır.
+
+**Parametreler**:
+- movements: InventoryMovementHistoryProps — Envanter hareket kayıtlarını içeren dizi. Her eleman `id`, `created_at`, `reason` ve `delta` alanlarına sahiptir.
+
+**Dönüş**: Bilinmiyor (return tipi belirtilmemiş; `movements` boşsa `null`, aksi halde JSX tablo elementi döndürdüğü gözlemlenmektedir).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/datetime::formatDateTime
+- import: react::React
 
 ---
 
@@ -16962,12 +17129,17 @@ Bu modül, `movements` prop'una dayalı olarak çalışır; bu prop'un varlığ�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/InventoryMovementHistory.tsx::InventoryMovementHistory
-- **params**: movements
-- **ic_degiskenler**: 
-  - `movements` — prop containing array of movement objects passed from parent component.
-  - `m` — each movement item iterated over in the `.map` callback; used to access `m.id`, `m.created_at`, `m.reason`, and `m.delta`.
-- **Dönüş**: JSX.Element | null (returns `null` when `movements.length === 0`, otherwise returns the rendered table JSX)
+### [N1_NASIL] AST Pointer: InventoryMovementHistory.tsx::InventoryMovementHistory
+- **params**: `movements` — InventoryMovementHistoryProps tipinde, stok hareketlerini içeren dizi
+- **ic_degiskenler**:
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu; tablo başlıklarının metinlerini (`admin.inventory.table.date`, `admin.inventory.table.reason`, `admin.inventory.table.delta`) çevirmek için kullanılır
+  - `lang` — useI18n hook'undan dönen dil kodu; `formatDateTime` fonksiyonuna tarih biçimlendirmesi için iletilir
+  - `m` — `movements.map` callback parametresi; dizideki her hareket nesnesini temsil eder
+  - `m.id` — hareketin benzersiz kimliği; `<tr>` elementinin React `key` prop'u olarak kullanılır
+  - `m.created_at` — hareketin oluşturulma tarihi/zamanı; `formatDateTime(m.created_at, lang)` çağrılarak biçimlendirilmiş olarak ilk sütunda gösterilir
+  - `m.reason` — hareketin nedeni/açıklaması; ikinci sütunda metin içeriği ve `title` attribute'u olarak kullanılır
+  - `m.delta` — stok değişim miktarı; `Number(m.delta) > 0` kontrolüyle pozitifse `text-admin-success` (öneki `+` ile), negatifse `text-admin-danger` CSS sınıfı uygulanır
+- **Dönüş**: `movements.length === 0` ise `null`; aksi halde `overflow-x-auto` sarmalayıcısı içinde `<table>` JSX elementi
 
 ---
 
@@ -16990,13 +17162,13 @@ Bu modül, `movements` prop'una dayalı olarak çalışır; bu prop'un varlığ�
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-transparent`, `bg-white/2`, `border-b`, `border-separate`, `border-spacing-0`, `border-white/5`, `group-last:border-0`, `hover:bg-white/2`, `text-emerald-400`, `text-left`, `text-right`, `text-rose-400`, `text-slate-300`, `text-slate-500`, `text-xs`
-- **Layout:** `max-w-140px`, `overflow-hidden`, `w-full`
+- **Renkler:** `bg-admin-surface-2`, `bg-transparent`, `border-admin-border`, `border-b`, `border-separate`, `border-spacing-0`, `group-last:border-0`, `hover:bg-admin-surface-2`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-success`, `text-left`, `text-right`, `text-xs`
+- **Layout:** `custom-scrollbar`, `max-w-140px`, `overflow-x-auto`, `w-full`
 - **Varyant/Responsive:** `:`, `group-last:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `${Number(m.delta`, `0`, `:`, `>`, `font-black`, `font-bold`, `group`, `px-4`, `py-3`, `transition-colors`, `truncate`, `uppercase`
+- **Yardımcı Sınıflar:** `${Number(m.delta`, `0`, `:`, `>`, `font-semibold`, `group`, `px-4`, `py-2.5`, `py-3`, `transition-colors`, `truncate`
 
 ---
 # FILE: src\components\admin\InventoryQrLabel.md
@@ -17005,39 +17177,52 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryQrLabel.tsx
-skeleton_hash: fe505da59f1230cb
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryQrLabel.tsx
+skeleton_hash: bcf16d561ce2cb90
 entity_hashes:
-  func:printQrLabel: 68158948d578d02a
-  overview: ddf13ce18f5512aa
+  func:printQrLabel: 1e2155968c16ad3a
+  overview: 24734b9ad0c44486
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:03Z
+generated_at: 2026-08-27T08:03:46Z
 ---
 
 ## Genel Bakış
-Bu modül, envanter kalemleri için QR kod etiketlerinin yazdırılmasını yöneten tek bir odaklı işlev sunar. Kullanıcının yazdırma tetiklemesiyle asenkron olarak çalışan fonksiyon, yazdırma sürecinin UI üzerindeki durumunu (yazdırılıyor/yazdırıldı) kontrol eder.
+Bu modül, envanter kalemlerine ait QR kod etiketlerinin yazdırılmasını sağlayan tek bir asenkron fonksiyon içerir. Yazdırma işlemi başlatıldığında UI durumunu günceller ve kullanıcıya bildirim gösterir. Modül, yazdırma sürecinin hazırlık, tetikleme ve durum yönetimi aşamalarını tek bir işlevde birleştirir.
 
 ## Fonksiyon Grupları
 ### QR Etiket Yazdırma
-Etiket yazdırma sürecinin tüm aşamalarını — hazırlık, basıcıya gönderim ve durum yönetimi — tek bir işlevde kümeler.
+Envanter ürününe ait QR etiketinin yazdırma işlemini gerçekleştirir ve yazdırma durumunu UI üzerinde yönetir.
 - printQrLabel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, QR etiket yaz
+
+Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesinden türetilen aksiyom üretilememektedir.
+
+İmzadan çıkarılabilecek bilgiler (aksiyom niteliğinde değildir):
+
+- `printQrLabel` fonksiyonu asenkron (`async`) olarak tanımlanmıştır.
+- Fonksiyon üç parametre alır: `r` (QrLabelProps), `setPrintingQr` (boolean alan callback), `texts` (QrLabelTexts).
+- `setPrintingQr` parametresi, UI üzerinde yazdırma durumunu güncellemek için bir callback fonksiyonu bekler.
+
+Fonksiyon gövdesi sağlanırsa aksiyomlar üretilebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### printQrLabel
-**Ne yapar**: QR etiketini yazdırma işlemini gerçekleştirir.  
-**Nasıl yapar**: `QrLabelProps` türündeki `r` parametresinden etiket verisini alır ve `setPrintingQr` fonksiyonunu çağırarak yazdırma durumunu günceller.  
+**Ne yapar**: QR etiketi yazdırma işlemini başlatan asenkron bir fonksiyondur. Fonksiyonun docstring'i verilmediği için görevi hakkında kesin bir bilgi bulunmamaktadır; ancak parametre yapısından bir QR etiketinin yazdırılması sürecini tetiklediği anlaşılmaktadır.
+
+**Nasıl yapar**: Fonksiyon `async` olarak tanımlanmıştır, bu da yazdırma işleminin asenkron bir süreç (örneğin bir yazdırma servisi çağrısı, dosya oluşturma veya tarayıcı yazdırma API'si) içerdiğini gösterir. `setPrintingQr` parametresi aracılığıyla yazdırma durumunu dışarıya bildiren bir durum güncellemesi yaptığı anlaşılmaktadır. Fonksiyonun iç mantığı hakkında kaynakta başka bilgi bulunmamaktadır.
+
 **Parametreler**:
-- r: QrLabelProps — Yazdırılacak QR etiketinin özelliklerini içeren nesne.  
-- setPrintingQr: (v: boolean) => void — Yazdırma işleminin başlatılıp bitirilmesini gösteren durum güncelleyici fonksiyonu.  
-**Dönüş**: void — Fonksiyon bir değer döndürmez.
+- `r`: `QrLabelProps` — QR etiketinin içeriğini ve yapılandırmasını tanımlayan özellik nesnesi. Tip tanımı `QrLabelProps` olarak belirtilmiştir.
+- `setPrintingQr`: `(v: boolean) => void` — Yazdırma durumunu güncellemek için kullanılan callback fonksiyon. Parametre olarak bir boolean değer alır ve void döner. Yazdırma işlemi başlarken ve tamamlandığında durumu bildirmek için kullanıldığı anlaşılmaktadır.
+- `texts`: `QrLabelTexts` — QR etiketinde kullanılacak metinleri içeren nesne. Tip tanımı `QrLabelTexts` olarak belirtilmiştir.
+
+**Dönüş**: Fonksiyonun dönüş tipi hakkında kaynakta kesin bir bilgi bulunmamaktadır. `async` fonksiyonlar varsayılan olarak `Promise` döndürür, ancak bu fonksiyonun spesifik dönüş değeri belirtilmemiştir.
 
 ---
 
@@ -17054,23 +17239,34 @@ Bu modül, QR etiket yaz
 - `warehouse_location?: string | null`
 - `physical_stock: number`
 
+### QrLabelTexts
+Yazdırma belgesi ayrı bir iframe belgesidir — React ağacının dışında olduğu için `useI18n()` oraya ulaşmaz. Metinler çağıran taraftan ÇÖZÜLMÜŞ geçirilir (CLAUDE.md kural 7: kullanıcıya görünen metin sözlükten gelir).
+- `documentTitle: string`
+- `skuLabel: string`
+- `shelfLabel: string`
+- `stockLine: string`
+- `qrAlt: string`
+- `failed: string`
+
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: InventoryQrLabel.tsx::printQrLabel
-- **params**: `(r: QrLabelProps, setPrintingQr: (v: boolean) => void)`
-  - `r` — QR etiketi basılacak ürünün bilgilerini taşıyan nesne; `r.product_id`, `r.name`, `r.warehouse_location`, `r.physical_stock` alanları kullanılır
-  - `setPrintingQr` — yazdırma işleminin devam edip etmediğini belirten state setter; `true` ile başlar, `finally` bloğunda `false` yapılır
+### [N1_NASIL] AST Pointer: src/components/admin/InventoryQrLabel.tsx::printQrLabel
+- **params**:
+  - `r` — QrLabelProps tipinde, QR etiketi için gerekli ürün verilerini içerir
+  - `setPrintingQr` — (v: boolean) => void tipinde, baskı durumunu güncelleyen state setter fonksiyonu
+  - `texts` — QrLabelTexts tipinde, UI metinlerini/çevirilerini içeren nesne
 - **ic_degiskenler**:
-  - `url` — qrserver.com API'si kullanılarak oluşturulan QR kod görselinin URL adresi; `r.product_id` Base64-URL-encode edilerek dataya eklenir
-  - `iframe` — yazdırma işlemini gerçekleştirmek için DOM'a eklenen gizli iframe elemanı; HTML içeriği içine yazılır ve `window.print()` tetiklenir
-  - `safeName` — `r.name` değerinin XSS-safe hali; `<` ve `>` karakterleri HTML entity'lerine dönüştürülür; HTML template'de ürün adı olarak gösterilir
-  - `safeSku` — `r.product_id`'den ilk 8 karakter alınıp büyük harfe çevrilmiş, XSS-safe SKU kodu; HTML template'de "SKU Kodu" olarak gösterilir
-  - `safeLoc` — `r.warehouse_location` değerinin XSS-safe hali; boşsa `'-'` değeri kullanılır; HTML template'de "Depo Rafı" olarak gösterilir
-  - `htmlContent` — iframe içine yazılacak tam HTML doküman stringi; CSS stilleri, QR görseli, ürün bilgileri ve yazdırma medya sorgularını içerir; `safeSku`, `safeName`, `safeLoc`, `url`, `r.physical_stock` template literal ile interpolatedir
-  - `doc` — `iframe.contentWindow?.document` ifadesinden elde edilen iframe'in Document nesnesi; `null` kontrolü yapılarak `doc.open()`, `doc.write(htmlContent)`, `doc.close()` ile HTML içeriği iframe'a yazılır
-- **Dönüş**: yok — fonksiyon asenkrondür, doğrudan bir değer dönmez; yan etki olarak iframe oluşturur, HTML yazar, 5 saniye sonra iframe'ı DOM'dan kaldırır; hata durumunda `toast.error('Etiket oluşturulamadı')` gösterir; her durumda `setPrintingQr(false)` çağırır
+  - `url` — `https://api.qrserver.com/v1/create-qr-code/` API'sine gönderilen QR kodu oluşturma URL'si; `r.product_id` değeri `encodeURIComponent` ile kodlanarak `data` parametresine eklenir
+  - `iframe` — `document.createElement('iframe')` ile oluşturulan gizli iframe DOM elementi; `style.display = 'none'` ile görünmez yapılır ve `document.body.appendChild` ile sayfaya eklenir
+  - `safeName` — `r.name` değerinden türetilen XSS güvenli ürün adı; boşsa `''` kullanılır, `<` ve `>` karakterleri HTML entity'lerine dönüştürülür
+  - `safeSku` — `r.product_id`'nin ilk 8 karakteri, `.toUpperCase()` ile büyük harfe çevrilmiş ve `<`/`>` escape edilmiş stok kodu
+  - `safeLoc` — `r.warehouse_location` değerinden türetilen XSS güvenli depo konumu; yoksa `'-'` kullanılır, `<` ve `>` escape edilir
+  - `htmlContent` — Tam HTML belgesi string'i; CSS stilleri (Inter fontu, kart düzeni, baskı medya sorgusu), QR görseli (`<img src="${url}" onload="window.print();">`), ürün adı, SKU, raf konumu ve stok bilgisi içerir
+  - `doc` — `iframe.contentWindow?.document` ile erişilen iframe'in document nesnesi; varsa `doc.open()`, `doc.write(htmlContent)`, `doc.close()` çağrılarıyla HTML içeriği iframe'e yazılır
+  - `setTimeout` callback'i — 5000ms gecikmeyle `iframe.parentNode.removeChild(iframe)` çağırarak iframe'i DOM'dan temizler
+- **Dönüş**: yok (void) — yan etki olarak gizli iframe içinde QR etiketi HTML'i oluşturulur, QR görseli yüklendiğinde `window.print()` ile baskı penceresi açılır, hata durumunda `toast.error(texts.failed)` ile bildirim gösterilir, `finally` bloğunda `setPrintingQr(false)` ile baskı durumu sıfırlanır
 
 ---
 
@@ -17082,6 +17278,7 @@ Bu modül, QR etiket yaz
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: QrLabelTexts
   export: printQrLabel
 
 ---
@@ -17107,47 +17304,67 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryReservedTable.tsx
-skeleton_hash: 83eea5dd1bd8d79e
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryReservedTable.tsx
+skeleton_hash: 38d2a2be2cc17cca
 entity_hashes:
-  func:InventoryReservedTable: 126336fe1c94b592
-  overview: e173f7662e40b92c
-  style_tokens: 45cb66bf7519a761
-generated_at: 2026-06-08T10:08:37Z
+  func:InventoryReservedTable: eb9d55bb47faabb8
+  overview: f94d5a8cd19fcfaf
+  style_tokens: 7b254cdb88c7452c
+generated_at: 2026-08-27T08:42:20Z
 ---
 
 ## Genel Bakış
-`InventoryReservedTable` bileşeni, yönetim panelinde rezerve edilmiş siparişlerin listelendiği bir tabloyu render eder. Gelen `reservedOrders` propunu alır, tablo başlıklarını ve satırlarını oluşturur, ayrıca boş veri durumları ve yükleme/hataya karşı temel UI geri bildirimlerini sağlar.
+`InventoryReservedTable` bileşeni, yönetim panelinde rezerve edilmiş siparişlerin listelendiği bir tabloyu render eder. Gelen `reservedOrders` propunu alır, tablo başlıklarını ve satırlarını oluşturur, ayrıca boş veri durumlarına karşı temel UI geri bildirimleri sağlar.
 
 ## Fonksiyon Grupları
-### UI Render & Layout
-Bu grup, tablo yapısını, başlık satırını ve her bir rezerve sipariş satırını JSX içinde oluşturur.  
+### UI Render ve Layout
+Bu grup, tablo yapısını, başlık satırını ve her bir rezerve sipariş satırını JSX içinde oluşturur.
 - InventoryReservedTable
 
-### Veri Hazırlama & Durum Kontrolü
-Bu grup, `reservedOrders` propunun varlığını, boş olup olmadığını ve olası hata/boş veri senaryolarını kontrol eder; UI’nın hangi duruma göre gösterileceğine karar verir.  
+### Veri Hazırlama ve Durum Kontrolü
+Bu grup, `reservedOrders` propunun varlığını ve boş olup olmadığını kontrol eder; kullanıcının hangi duruma göre hangi UI geri bildirimini göreceğine karar verir.
 - InventoryReservedTable
+
+## Bağımlılıklar ve Mimari Notlar
+- Dış bağımlılık olarak `reservedOrders` prop'u beklenir; bu prop sağlanmazsa bileşen çalışırken hata üretir.
+- Dahili olarak başka bir modüle çağrı yapılmaz; bileşen kendi içinde render ve durum kontrol mantığını barındırır.
+- Yönetim paneli altındaki bir alt bileşendir; üst bileşen tarafından veri sağlanarak kullanılır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için aşağıdaki varsayımlar geçerlidir.
 
-[Aksiyom 1]: Eğer `reservedOrders` prop'u sağlanmazsa, bileşen derleme zamanında TypeScript hatası verir veya çalışma zamanında `undefined` değeri nedeniyle render sırasında hata olur.  
-[Aksiyom 2]: Eğer `reservedOrders` `null` veya `undefined` ise, bileşen `.length` özelliğine erişmeye çalıştığı için çalışma zamanı hatası olur.  
-[Aksiyom 3]: Eğer `reservedOrders` boş bir dizi (`[]`) ise, bileşen boş veri durumu UI'sini render eder.  
-[Aksiyom 4]: Eğer `reservedOrders` bir dizi tipi değilse (örneğin string, obje), bileşen `.length` veya `.map` gibi dizi metodlarına erişmeye çalıştığı için beklenmeyen davranış veya hata olur.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzasından ve dokümanda açıkça belirtilen davranışlardan aksiyom üretilebilir.
+
+[Aksiyom 1]: Eğer `reservedOrders` propu sağlanmazsa, bileşen boş veri durumunu gösterir (dokümanda "boş veri durumları kontrol edilir" ifadesi mevcut).
+
+[Aksiyom 2]: Eğer `reservedOrders` boş bir dizi ise, tablo satırı oluşturulmaz (dokümanda "tablo başlıklarını ve satırlarını oluşturur" ifadesi mevcut; satır oluşturmak için veri gerekir).
+
+[Aksiyom 3]: Eğer yükleme veya hata durumu mevcutsa, bileşen temel UI geri bildirimi sağlar (dokümanda "yükleme/hataya karşı temel UI geri bildirimlerini sağlar" ifadesi mevcut).
+
+**Not:** Fonksiyon gövdesi verilmediği için, `reservedOrders` içinde beklenen alan adları (ör. sipariş numarası, ürün adı, miktar, tarih vb.), eşik değerleri veya spesifik hata mesajları hakkında bilgi çıkarılamaz. Bu bilgiler ancak fonksiyon gövdesi incelenerek belirlenebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### InventoryReservedTable
-**Ne yapar**: Rezervasyon alınan siparişlerin bir tablosunu görüntüler.  
-**Nasıl yapar**: `reservedOrders` prop'undan gelen veriyi alıp, her bir sipariş için tablo satırı oluşturur ve bu satırları bir JSX tablosu içinde render eder.  
+
+**Ne yapar**: Rezerve edilmiş siparişlerin listelendiği bir tablo bileşenidir. Gelen `reservedOrders` dizisi boşsa hiçbir şey render etmez; aksi halde sipariş numarası, tarih ve miktar bilgilerini gösteren bir tablo oluşturur.
+
+**Nasıl yapar**: Bileşen önce `useI18n()` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t` ve geçerli dil bilgisi `lang` değerlerini alır. Ardından `reservedOrders` dizisinin uzunluğunu kontrol eder; dizi boşsa `null` döndürerek hiçbir DOM öğesi oluşturmaz. Dizi doluysa, yatay kaydırma desteği sağlayan bir kapsayıcı (`div`) içinde bir HTML tablosu render eder. Tablonun başlık satırında sipariş, tarih ve miktar sütunları yer alır; bu başlıklar `t` fonksiyonuyla çevrilir. Tablo gövdesinde `reservedOrders` dizisi `.map()` ile dönülerek her bir rezerve sipariş için bir satır oluşturulur. Her satırda sipariş numarasının son 8 karakteri (`ro.order_id.slice(-8)`), `formatDateTime` fonksiyonuyla `lang` parametresine göre biçimlendirilmiş tarih ve miktar değeri gösterilir. Satırlar arasında hover efekti ve geçiş animasyonları tanımlıdır; son satırın alt kenarlığı `group-last:border-0` sınıfıyla gizlenir.
+
 **Parametreler**:
-- reservedOrders: InventoryReservedTableProps — Görüntülenecek rezervasyon siparişlerinin veri yapısı (genellikle bir dizi ve ilgili meta bilgiler içerir).  
-**Dönüş**: void — Fonksiyon bir JSX elementi döndürür; açık bir değer döndürmez.
+- `reservedOrders`: `InventoryReservedTableProps` — Bileşenin props nesnesinden destructure edilen rezerve siparişler dizisi. Dizinin her elemanı `order_id` (string), `created_at` (tarih/zaman değeri) ve `quantity` (sayı) alanlarına sahiptir.
+
+**Dönüş**: Kaynakta dönüş tipi açıkça belirtilmemiştir. Fonksiyon, `reservedOrders` boş olduğunda `null`, aksi halde JSX yapısı döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/datetime::formatDateTime
+- import: react::React
 
 ---
 
@@ -17175,17 +17392,16 @@ type ReservedRow = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryReservedTable.tsx::InventoryReservedTable
-- **params**: reservedOrders
-- **ic_degiskenler**: 
-  - `reservedOrders` — prop containing array of reserved order objects, used to check length and map over.
-- **Dönüs**: JSX.Element
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryReservedTable.tsx::InventoryReservedTable.map callback
-- **params**: ro
-- **ic_degiskenler**: 
-  - `ro` — each reserved order object with `order_id`, `created_at`, and `quantity` properties.
-- **Dönüs**: JSX.Element
+### [N1_NASIL] AST Pointer: src/components/admin/InventoryReservedTable.tsx::InventoryReservedTable
+- **params**: `{ reservedOrders }` — InventoryReservedTableProps tipinde, rezerve edilmiş siparişlerin listesi
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; tablo başlıklarını çevirmek için kullanılır (`t('admin.inventory.order')`, `t('admin.inventory.table.date')`, `t('admin.inventory.quantity')`)
+  - `lang` — `useI18n()` hook'undan destructure edilen dil bilgisi; `formatDateTime(ro.created_at, lang)` çağrısında tarih formatlamasının hangi dile göre yapılacağını belirtir
+  - `ro` — `reservedOrders.map()` callback parametresi; listedeki her bir rezerve sipariş nesnesini temsil eder
+  - `ro.order_id` — sipariş kimliği; tablo hücresinde `ro.order_id.slice(-8)` ile son 8 karakteri gösterilir, ayrıca `<tr key={...}>` olarak kullanılır
+  - `ro.created_at` — siparişin oluşturulma tarihi; `formatDateTime(ro.created_at, lang)` ile formatlanarak tabloda gösterilir
+  - `ro.quantity` — sipariş miktarı; tabloda sağa yaslı olarak gösterilir
+- **Dönüş**: `reservedOrders.length === 0` ise `null`; aksi halde tablo yapısı içeren JSX elementi (`<div>` > `<table>` > `<thead>` + `<tbody>`)
 
 ---
 
@@ -17208,13 +17424,13 @@ type ReservedRow = {
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-transparent`, `bg-white/2`, `border-b`, `border-separate`, `border-spacing-0`, `border-white/5`, `group-last:border-0`, `hover:bg-white/2`, `text-cyan-400`, `text-left`, `text-right`, `text-slate-300`, `text-slate-500`, `text-xs`
-- **Layout:** `overflow-hidden`, `w-full`
+- **Renkler:** `bg-admin-surface-2`, `bg-transparent`, `border-admin-border`, `border-b`, `border-separate`, `border-spacing-0`, `group-last:border-0`, `hover:bg-admin-surface-2`, `text-admin-accent`, `text-admin-fg`, `text-admin-fg-muted`, `text-left`, `text-right`, `text-xs`
+- **Layout:** `custom-scrollbar`, `overflow-x-auto`, `w-full`
 - **Varyant/Responsive:** `group-last:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `font-black`, `font-bold`, `font-mono`, `group`, `px-4`, `py-3`, `tracking-tighter`, `transition-colors`, `uppercase`
+- **Yardımcı Sınıflar:** `font-mono`, `font-semibold`, `group`, `px-4`, `py-2.5`, `tracking-tighter`, `transition-colors`
 
 ---
 # FILE: src\components\admin\InventoryStockAdjust.md
@@ -17223,65 +17439,62 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryStockAdjust.tsx
-skeleton_hash: 257f3a60c6c02a8b
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryStockAdjust.tsx
+skeleton_hash: 2733abe37bc58676
 entity_hashes:
-  func:InventoryStockAdjust: 140b16e336bb5af7
-  overview: 3b1f0525645c9b2f
-  style_tokens: 333546eed756e72e
-generated_at: 2026-05-28T22:35:34Z
+  func:InventoryStockAdjust: a603a8fb9cd928b0
+  overview: 96a63ecb10c9f683
+  style_tokens: cd4ce488b4601abd
+generated_at: 2026-08-27T08:05:33Z
 ---
 
 ## Genel Bakış
-`InventoryStockAdjust` bileşeni, bir ürünün stok miktarını ayarlamak için kullanılan bir yönetim arayüzü sunar. Kullanıcıdan alınan miktar değişikliği, dışarıdan sağlanan `onAdjust` callback’i aracılığıyla üst katmana iletilir ve bileşen içinde geçici bir durum (`moveQty`) yönetilir.
+`InventoryStockAdjust` bileşeni, bir ürünün stok miktarını ayarlamak için bir yönetim arayüzü sunar. Bileşen, dışarıdan sağlanan propları kullanarak kullanıcı etkileşimini yönetir ve stok ayarlama işlemini tetikler.
 
 ## Fonksiyon Grupları
 ### UI ve Props İşleme
-Bileşen, gelen `productId`, `moving`, `onAdjust`, `moveQty` ve `setMoveQty` gibi prop’ları alır, bunları JSX içinde uygun giriş alanları ve butonlarla bağlayarak kullanıcı etkileşimini sağlar.  
+Bileşen, gelen propları alır ve kullanıcı arayüzünü oluşturur. Bu grup, bileşenin görsel katmanını ve prop bağlamasını yönetir.
 - InventoryStockAdjust
 
 ### Durum ve Etkileşim Yönetimi
-Kullanıcı miktar girişi yaptığında `setMoveQty` ile geçici miktar güncellenir; “Ayarlama” butonuna basıldığında `onAdjust` çağrılarak stok güncelleme işlemi tetiklenir.  
-- (İçeride tanımlı event handler’lar ve state güncellemeleri – doğrudan fonksiyon listesinde yer almaz ancak `InventoryStockAdjust` içinde yer alır)
+Kullanıcı etkileşimlerini işler, geçici durumu günceller ve stok ayarlama işlemini tetikler. Bu grup, bileşenin davranışını ve olay yönetimini kapsar.
+- (İçeride tanımlı olay işleyicileri ve durum güncellemeleri – doğrudan fonksiyon listesinde yer almaz ancak `InventoryStockAdjust` içinde yer alır)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır. Aşağıdaki aksiyomlar, **InventoryStockAdjust** bileşeninin fonksiyon imzasından türetilmiştir.
 
-**Aksiyom 1**: Eğer `_productId` sağlanmazsa, bileşen hangi ürünün stok ayarının yapılacağını belirleyemez ve işlem **başarısız** olur.  
+Bu bileşen, stok ayarlama arayüzünü sunmak için dışarıdan sağlanan prop'lara bağımlıdır.
 
-**Aksiyom 2**: Eğer `onAdjust` fonksiyonu sağlanmazsa, stok ayarlama işlemi tamamlandığında **hiçbir geri bildirim** (ör. API çağrısı, durum güncellemesi) gerçekleşmez.  
+[Aksiyom 1]: Eğer `onAdjust` callback'i sağlanmazsa, kullanıcı stok ayarlaması yapamaz çünkü miktar değişikliği üst katmana iletilemez.
 
-**Aksiyom 3**: Eğer `moving` değeri `true` değilse, bileşen **hareket (loading) göstergesi** göstermemeli ve kullanıcı etkileşimi **engellenmemelidir**.  
+[Aksiyom 2]: Eğer `setMoveQty` fonksiyonu sağlanmazsa, kullanıcı miktar girişi yapamaz çünkü geçici durum güncellenemez.
 
-**Aksiyom 4**: Eğer `moveQty` değeri tanımlı değilse veya `null/undefined` ise, bileşen **geçerli bir miktar** alana kadar **işlem yapmaz** ve muhtemelen bir doğrulama hatası gösterir.  
-
-**Aksiyom 5**: Eğer `setMoveQty` fonksiyonu sağlanmazsa, kullanıcı tarafından girilen miktar **bileşen içinde saklanamaz** ve UI’da **girdi değişikliği** yansıtılamaz.  
-
-**Aksiyom 6**: Eğer `moveQty` negatif bir sayı ise, **stok azaltma** mantığı dışındaki bir senaryo olduğu için **işlem reddedilir** (negatif miktar kabul edilmez).  
-
-**Aksiyom 7**: Eğer `setMoveQty` bir fonksiyon değilse, **state güncellemesi** yapılamaz ve bileşen **runtime hatası** verir.  
-
-**Aksiyom 8**: Eğer `onAdjust` bir fonksiyon değilse, **stok ayarlama** tamamlandığında **callback** tetiklenemez ve **yanıt** alınamaz.
+[Aksiyom 3]: Eğer `moveQty` değeri sağlanmazsa, bileşen mevcut ayarlanacak miktarı görüntüleyeme
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### InventoryStockAdjust
-**Ne yapar**: Belirli bir ürün için hızlı stok girişi veya çıkışı yapılmasını sağlayan bir React bileşenidir. Kullanıcı miktar girip iki butondan birine tıklayarak manuel stok hareketi oluşturur.
+**Ne yapar**: Envanter yönetim panelinde hızlı stok hareketi (giriş ve çıkış) yapılmasını sağlayan bir React bileşenidir. Kullanıcının belirli bir ürün için sayısal değer girerek stok artırımı veya azaltımı yapmasına olanak tanır.
 
-**Nasıl yapar**: Bir input alanı ve iki buton içeren bir bölüm render eder. Input `moveQty` state'ine bağlıdır ve değer değiştiğinde `setMoveQty` ile güncellenir (en az 1 olacak şekilde zorlanır). "Stok Girişi" butonu, `onAdjust` callback'ine pozitif miktar ve `'manual_in'` türü ile çağrı yapar; "Stok Çıkışı" butonu negatif miktar ve `'manual_out'` türü ile çağrı yapar. Butonlar `moving` prop'u `true` iken devre dışı kalır.
+**Nasıl yapar**: `useI18n()` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t`'yi alır. Bileşen gövdesinde bir `section` içinde üç ana eleman render eder: bir sayısal `input` (minimum değeri 1), bir "Stok Giriş" butonu ve bir "Stok Çıkış" butonu. Input'un `onChange` olayında girilen değer `Math.max(1, Number(e.target.value || 1))` ifadesiyle işlenir; bu sayede değer her zaman 1 veya daha büyük olur. "Stok Giriş" butonuna tıklandığında `onAdjust` fonksiyonu pozitif `Math.abs(moveQty)` değeri ve `'manual_in'` tipiyle çağrılır. "Stok Çıkış" butonuna tıklandığında ise negatif `Math.abs(moveQty)` değeri ve `'manual_out'` tipiyle çağrılır. Her iki buton da `moving` durumu `true` olduğunda `disabled` hale gelir ve yarı saydam görünür.
 
 **Parametreler**:
-- `_productId`: `string` — Stok hareketi yapılacak ürünün benzersiz kimliği. `onAdjust` callback'ine parametre olarak iletilir.
-- `onAdjust`: `(productId: string, qty: number, type: 'manual_in' | 'manual_out') => void` — Stok hareketini gerçekleştiren callback fonksiyonu. Ürün ID'si, miktar (pozitif veya negatif) ve hareket türü parametrelerini alır.
-- `moving`: `boolean` — Bir stok hareketi işlemi devam ederken butonların devre dışı bırakılmasını sağlayan bayrak.
-- `moveQty`: `number` — Input alanındaki mevcut miktar değeri. Varsayılan olarak en az 1 olacak şekilde yönetilir.
-- `setMoveQty`: `React.Dispatch<React.SetStateAction<number>>` — `moveQty` state'ini güncellemek için kullanılan fonksiyon. Input onChange olayında çağrılır.
+- `_productId`: bilinmiyor — Stok hareketi yapılacak ürünün kimlik bilgisini temsil eder. Alt çizgi önekiyle tanımlanmış olup bileşen içinde doğrudan `onAdjust` fonksiyonuna iletilir.
+- `onAdjust`: bilinmiyor — Stok düzeltme işlemini tetikleyen geri çağırma (callback) fonksiyonudur. Üç parametre alır: ürün kimliği, miktar (pozitif veya negatif) ve hareket tipi (`'manual_in'` veya `'manual_out'`).
+- `moving`: bilinmiyor — Stok hareketi işleminin devam edip etmediğini gösteren boolean değerdir. `true` olduğunda butonlar devre dışı bırakılır.
+- `moveQty`: bilinmiyor — Hareket miktarını temsil eden sayısal değerdir. Input bileşeninin `value` prop'una atanır.
+- `setMoveQty`: bilinmiyor — `moveQty` değerini güncelleyen durum ayarlayıcı (state setter) fonksiyondur. Input değişikliklerinde yeni değeri hesaplayarak çağrılır.
 
-**Dönüş**: `JSX.Element` — Stok hareketi arayüzüne ait bir `section` elementi döndürür.
+**Dönüş**: Bileşen bir React fonksiyon bileşeni olarak JSX yapısı döndürür. Kesin dönüş tipi kaynakta belirtilmemiştir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: react::React
 
 ---
 
@@ -17298,16 +17511,16 @@ Bu modül için özel aksiyom tanımlanmamıştır. Aşağıdaki aksiyomlar, **I
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryStockAdjust.tsx::InventoryStockAdjust
-- **params**: `_productId`, `onAdjust`, `moving`, `moveQty`, `setMoveQty`
+### [N1_NASIL] AST Pointer: src/components/admin/InventoryStockAdjust.tsx::InventoryStockAdjust
+- **params**:
+  - `_productId` — stok hareketi yapılacak ürünün kimliği; `onAdjust` fonksiyonuna birinci argüman olarak iletilir
+  - `onAdjust` — stok düzeltme işlemini tetikleyen fonksiyon; `(productId, miktar, hareket_tipi)` imzasıyla çağrılır
+  - `moving` — stok hareketi işleminin devam edip etmediğini gösteren boolean; `true` iken butonlar disabled olur
+  - `moveQty` — input alanında gösterilen ve hareket miktarı olarak kullanılan sayısal değer
+  - `setMoveQty` — `moveQty` değerini güncelleyen state setter fonksiyonu; input onChange olayında `Math.max(1, Number(e.target.value || 1))` ile çağrılır
 - **ic_degiskenler**:
-  - `moveQty` — Mevcut stok hareket miktarını tutar; input değeri olarak ve `onAdjust` çağrısında mutlak değeri (`Math.abs(moveQty)`) ile kullanılır.
-  - `setMoveQty` — Stok miktarını güncellemek için kullanılan fonksiyon; input `onChange` olayında yeni değeri hesaplayıp atar.
-  - `moving` — Stok hareketi işleminin devam edip etmediğini belirten boolean; butonların `disabled` özelliğini kontrol eder.
-  - `onAdjust` — Stok giriş/çıkış işlemini gerçekleştirmek için çağrılan callback; `_productId`, mutlak miktar ve işlem türü (`'manual_in'` veya `'manual_out'`) parametreleriyle çağrılır.
-  - `_productId` — Stok hareketi yapılacak ürünün ID'si; `onAdjust` callback'ine ilk argüman olarak iletilir.
-  - `e` — Input değişikliği event nesnesi; `e.target.value` üzerinden yeni miktar alınır ve `Number()` ile sayıya dönüştürülür.
-- **Dönüş**: React.ReactNode (JSX elemanı)
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `'admin.inventory.quickStockMovement'`, `'admin.inventory.stockEntry'`, `'admin.inventory.stockExit'` anahtarlarıyla metinleri çözümlemek için kullanılır
+- **Dönüş**: JSX — bir `<section>` elementi içinde başlık, sayısal input ve iki butondan oluşan stok hareketi arayüzü döndürür
 
 ---
 
@@ -17329,13 +17542,13 @@ Bu modül için özel aksiyom tanımlanmamıştır. Aşağıdaki aksiyomlar, **I
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-500/10`, `bg-rose-500/10`, `bg-white/3`, `border-emerald-500/20`, `border-rose-500/20`, `border-white/5`, `focus-visible:border-cyan-400/40`, `hover:bg-emerald-500/20`, `hover:bg-rose-500/20`, `text-emerald-400`, `text-rose-400`, `text-slate-500`, `text-sm`, `text-white`, `text-xs`
+- **Renkler:** `bg-admin-danger-weak`, `bg-admin-success-weak`, `bg-admin-surface-2`, `border-admin-border`, `border-admin-danger/30`, `border-admin-success/30`, `focus-visible:border-admin-accent/40`, `hover:bg-admin-danger-weak`, `hover:bg-admin-success-weak`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-success`, `text-sm`, `text-xs`
 - **Layout:** `flex`, `flex-1`, `gap-3`, `h-12`, `items-center`, `w-24`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `border`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`, `ml-1`, `px-4`, `py-3`, `rounded-2xl`, `space-y-4`, `tracking-widest`, `transition-colors`, `transition-opacity`
+- **Yardımcı Sınıflar:** `border`, `disabled:opacity-50`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-bold`, `font-semibold`, `ml-1`, `px-4`, `py-3`, `rounded-admin-lg`, `space-y-4`, `transition-colors`, `transition-opacity`
 
 ---
 # FILE: src\components\admin\InventoryTable.md
@@ -17521,32 +17734,34 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\JsonDiffViewer.tsx
-skeleton_hash: bb6a751ee807919b
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\JsonDiffViewer.tsx
+skeleton_hash: 30b2fcda71cda919
 entity_hashes:
   func:JsonDiffViewer: 00fa2648afca347e
   func:safeStringify: 9ba27221b507c072
-  overview: 2279b25945479824
-  style_tokens: 6a22f095496c6ef9
-generated_at: 2026-05-28T22:35:36Z
+  overview: a686cb82b4e79c82
+  style_tokens: 447f0cef72f1a3d8
+generated_at: 2026-08-27T08:07:05Z
 ---
 
 ## Genel Bakış
-`JsonDiffViewer` bileşeni, iki JSON nesnesi (`before` ve `after`) arasındaki farkları görsel olarak gösteren bir React arayüzü sunar. Bu işlemi destekleyen `safeStringify` yardımcı fonksiyonu, nesneleri güvenli bir şekilde stringe dönüştürerek görüntüleme sırasında oluşabilecek hataları önler.
+`JsonDiffViewer` bileşeni, iki JSON nesnesi arasındaki farkları görsel olarak kullanıcıya sunan bir React arayüzüdür. Bileşen, `before` ve `after` adlı iki prop alır ve bu veriler arasındaki değişiklikleri görüntüler. Görüntüleme sırasında oluşabilecek hataları önlemek üzere `safeStringify` yardımcı fonksiyonu kullanılır.
 
 ## Fonksiyon Grupları
 ### UI Rendering
-Kullanıcı arayüzünü oluşturur ve JSON farklarını ağaç veya liste formatında görselleştirir.  
+Kullanıcı arayüzünü oluşturur ve JSON farklarını görselleştirir. `before` ve `after` prop'larını alarak bir React fonksiyonel bileşeni döndürür.
 - JsonDiffViewer
 
 ### Yardımcı / Utility
-Veri işleme ve güvenli string dönüşümünü sağlar; UI bileşeni tarafından kullanılır.  
+Veri işleme ve güvenli string dönüşümünü sağlar; UI bileşeni tarafından kullanılmak üzere tasarlanmıştır. `unknown` tipindeki değerleri güvenli biçimde stringe dönüştürür.
 - safeStringify
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -17569,6 +17784,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: react::React
+
+---
+
 ## INTERFACES
 
 ### JsonDiffViewerProps
@@ -17579,31 +17800,32 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\JsonDiffViewer.tsx::JsonDiffViewer
-- **params**: before, after
+### [N1_NASIL] AST Pointer: src/components/admin/JsonDiffViewer.tsx::JsonDiffViewer
+- **params**: `before`, `after`
 - **ic_degiskenler**:
-  - `bObj` — normalleştirilmiş *before* nesnesi; `before` bir obje ve null değilse onu `Record<string, unknown>` olarak alır, aksi takdirde boş obje `{}`.
-  - `aObj` — normalleştirilmiş *after* nesnesi; `after` bir obje ve null değilse onu `Record<string, unknown>` olarak alır, aksi takdirde boş obje `{}`.
-  - `allKeys` — `bObj` ve `aObj` anahtarlarının birleşiminden oluşan, tekrarlanmamış ve alfabetik olarak sıralanmış dizi.
-  - `safeStringify` — bir değeri ekranda gösterilecek string hâline dönüştürücü yardımcı fonksiyon; `undefined`/`null` → `'null'`, string → `"${val}"`, obje → `JSON.stringify(val)`, diğer türler → `String(val)`.
-- **Dönüş**: JSX elementi (React bileşeninin render çıktısı)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('admin.common.oldValueBefore')`, `t('admin.common.newValueAfter')`, `t('admin.common.added')`, `t('admin.common.deleted')`, `t('admin.common.noChangeDetails')` çağrılarıyla kullanılır
+  - `bObj` — `before` parametresi object ve null değilse `before as Record<string, unknown>`, aksi halde boş obje `{}` olarak atanır
+  - `aObj` — `after` parametresi object ve null değilse `after as Record<string, unknown>`, aksi halde boş obje `{}` olarak atanır
+  - `allKeys` — `bObj` ve `aObj` key'lerinin birleşimi (`new Set` ile tekrarlar kaldırılır), alfabetik sıralanır
+  - `safeStringify` — iç fonksiyon; `val` parametresini güvenli şekilde string'e dönüştürür (null/undefined → `'null'`, string → tırnak içinde, object → `JSON.stringify`, diğer → `String`)
+- **Dönüş**: JSX element — iki sütunlu (önceki/sonraki değer) diff görünümü; `allKeys` üzerinde `.map()` ile her key için satır oluşturulur, key yoksa "değişiklik yok" mesajı gösterilir
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\JsonDiffViewer.tsx::safeStringify
-- **params**: val
-- **ic_degiskenler**: (yok)
-- **Dönüş**: string
+### [N2_NASIL] AST Pointer: src/components/admin/JsonDiffViewer.tsx::safeStringify
+- **params**: `val` (unknown)
+- **ic_degiskenler**: yok
+- **Dönüş**: string — `val` undefined veya null ise `'null'`, string ise `"${val}"` (tırnak içinde), object ise `JSON.stringify(val)`, diğer durumlarda `String(val)`
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\JsonDiffViewer.tsx::map callback (key => { … })
-- **params**: key
+### [N3_NASIL] AST Pointer: src/components/admin/JsonDiffViewer.tsx::allKeys.map callback
+- **params**: `key`
 - **ic_degiskenler**:
-  - `valB` — `bObj` nesnesindeki mevcut `key` değeri (tanımsız olabilir).
-  - `valA` — `aObj` nesnesindeki mevcut `key` değeri (tanımsız olabilir).
-  - `strB` — `valB` değerinin `safeStringify` ile elde edilen string temsili.
-  - `strA` — `valA` değerinin `safeStringify` ile elde edilen string temsili.
-  - `isRemoved` — `true` ise `key` yalnızca `before` içinde var, `after` içinde yoktur (silindi).
-  - `isAdded` — `true` ise `key` yalnızca `after` içinde var, `before` içinde yoktur (eklendi).
-  - `isChanged` — `true` ise `key` her iki nesnede de var fakat `strB` ve `strA` farklıdır (değiştirildi).
-- **Dönüş**: JSX elementi (her satır için render edilen `<div>`)
+  - `valB` — `bObj[key]` değeri; önceki (before) nesnede bu key'e karşılık gelen değer
+  - `valA` — `aObj[key]` değeri; sonraki (after) nesnede bu key'e karşılık gelen değer
+  - `strB` — `safeStringify(valB)` sonucu; `valB`'nin string gösterimi
+  - `strA` — `safeStringify(valA)` sonucu; `valA`'nın string gösterimi
+  - `isRemoved` — `valB !== undefined && valA === undefined` koşulu; key'in sonraki nesneden silinip silinmediğini belirtir
+  - `isAdded` — `valB === undefined && valA !== undefined` koşulu; key'in sonraki nesneye eklenip eklenmediğini belirtir
+  - `isChanged` — `!isRemoved && !isAdded && strB !== strA` koşulu; key'in değerinin değişip değişmediğini belirtir
+- **Dönüş**: JSX element — değişiklik yoksa gri renkli iki sütunda aynı değer gösterilir; silinmişse before sütunu kırmızı arka planlı ve "silindi" etiketli, eklenmişse before sütunu gri arka planlı ve "eklendi" etiketli, değişmişse before kırmızı/after yeşil arka planlı gösterilir
 
 ---
 
@@ -17629,8 +17851,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-emerald-500`, `bg-emerald-500/10`, `bg-rose-500`, `bg-rose-500/10`, `bg-slate-800/30`, `bg-slate-800/80`, `bg-slate-900`, `border-b`, `border-r`, `border-slate-700`, `border-slate-800`, `hover:bg-slate-800/50`, `text-center`, `text-emerald-300`, `text-rose-300`
-- **Layout:** `flex`, `flex-1`, `gap-2`, `h-2`, `items-center`, `max-h-400px`, `overflow-hidden`, `overflow-x-auto`, `p-3`, `shadow-xl`, `w-2`, `w-full`
+- **Renkler:** `bg-admin-danger`, `bg-admin-danger-weak`, `bg-admin-success`, `bg-admin-success-weak`, `bg-admin-surface-2`, `bg-admin-surface-3`, `border-admin-border`, `border-b`, `border-r`, `hover:bg-admin-surface-2`, `text-admin-danger`, `text-admin-fg-muted`, `text-admin-fg-subtle`, `text-admin-success`, `text-center`
+- **Layout:** `flex`, `flex-1`, `gap-2`, `h-2`, `items-center`, `max-h-400px`, `overflow-hidden`, `overflow-x-auto`, `p-3`, `w-2`, `w-full`
 - **Varyant/Responsive:** `:`, `hover:` önekleri
 - **Yardımcı Sınıflar:** `${isAdded`, `${isRemoved`, `:`, `border`, `font-mono`, `font-semibold`, `isAdded`, `isChanged`, `isRemoved`, `italic`, `leading-relaxed`, `mr-2`, `opacity-70`, `px-2`, `py-1`
 
@@ -17641,14 +17863,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\AuthorityBuilder.tsx
-skeleton_hash: 03cf94d4374fb1dc
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\authority-builder\AuthorityBuilder.tsx
+skeleton_hash: 7eb34918d7ea63fb
 entity_hashes:
   func:AuthorityBuilder: ea4f02be3be8275d
   func:getInitialContent: d68640fe30ab6ebc
   overview: 2a123a4c769f5fe6
-  style_tokens: debe507a4c224f1e
-generated_at: 2026-06-19T20:47:06Z
+  style_tokens: 2ff661890d494e9a
+generated_at: 2026-08-27T08:07:06Z
 ---
 
 ## Genel Bakış
@@ -17715,9 +17937,9 @@ Yeni yetki blokları oluşturulduğunda veya varsayılan değerler gerektiğinde
 ---
 
 ## SABİTLER
-- **btnGhost** (template) — ``${btnBase} hover:bg-slate-100 hover:text-slate-900``
-- **btnOutline** (template) — ``${btnBase} border border-slate-200 bg-white shadow-sm hover:bg-slate-100 hov...`
-- **btnSecondary** (template) — ``${btnBase} bg-slate-100 text-slate-900 shadow-sm hover:bg-slate-100/80``
+- **btnGhost** (template) — ``${btnBase} hover:bg-admin-surface-2 hover:text-admin-fg-subtle``
+- **btnOutline** (template) — ``${btnBase} border border-admin-border bg-admin-surface shadow-admin-sm hover...`
+- **btnSecondary** (template) — ``${btnBase} bg-admin-surface-2 text-admin-fg-subtle shadow-admin-sm hover:bg-...`
 - **BLOCK_TYPES** (array) — `[
   { type: 'hero', labelKey: 'admin.authority.blockTypeHero', icon: Layers ...`
 - **blockTypeLabels** (object) — `{
@@ -17772,8 +17994,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-indigo-600`, `bg-slate-50/50`, `bg-slate-50/80`, `bg-slate-900`, `bg-white`, `border-2`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `hover:bg-indigo-50`, `hover:bg-red-50`, `hover:bg-slate-200`, `hover:border-indigo-400`, `text-center`
-- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `h-10`, `h-4`, `h-5`, `h-6`, `h-8`, `h-auto`, `hover:shadow-md`
+- **Renkler:** `bg-admin-accent`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-surface-3`, `border-2`, `border-admin-border`, `border-b`, `border-dashed`, `hover:bg-admin-accent`, `hover:bg-admin-danger`, `hover:bg-admin-surface-2`, `hover:border-admin-accent`, `text-admin-accent`, `text-admin-accent-fg`, `text-admin-danger`
+- **Layout:** `flex`, `flex-1`, `flex-col`, `gap-1`, `gap-2`, `gap-3`, `grid`, `grid-cols-2`, `h-10`, `h-4`, `h-5`, `h-6`, `h-8`, `h-auto`, `hover:shadow-admin-md`
 - **Varyant/Responsive:** `group-hover:`, `hover:`, `lg:`, `md:` önekleri
 - **Yardımcı Sınıflar:** `${btnOutline`, `${cardClass`, `border`, `cursor-grab`, `editor`, `font-bold`, `font-medium`, `font-mono`, `group`, `group-hover:opacity-100`, `italic`, `json`, `mr-2`, `mt-8`, `opacity-0`
 
@@ -17784,13 +18006,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\BlockEditor.tsx
-skeleton_hash: 64a64a5a4ef0c335
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\authority-builder\BlockEditor.tsx
+skeleton_hash: dc9cd3297ce82cc4
 entity_hashes:
   func:BlockEditor: 214d29bf0d4fb6bd
   overview: 451c6f0d8f51e9a4
-  style_tokens: bc113824a6724140
-generated_at: 2026-06-16T10:18:09Z
+  style_tokens: 98b0ad75e2789f2c
+generated_at: 2026-08-27T08:07:07Z
 ---
 
 ## Genel Bakış
@@ -17939,13 +18161,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-indigo-50`, `bg-indigo-50/20`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-50/50`, `bg-white`, `border-indigo-100/50`, `border-slate-100`, `hover:text-indigo-700`, `hover:text-red-500`, `text-center`, `text-indigo-400`, `text-indigo-600`, `text-slate-300`, `text-slate-400`
+- **Renkler:** `bg-admin-accent`, `bg-admin-accent-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-accent/30`, `border-admin-border`, `hover:text-admin-accent`, `hover:text-admin-danger`, `text-admin-accent`, `text-admin-fg`, `text-admin-fg-muted`, `text-center`, `text-sm`, `text-xs`
 - **Layout:** `absolute`, `flex`, `flex-1`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-32`, `h-7`, `h-9`, `items-center`, `items-start`, `justify-between`
 - **Varyant/Responsive:** `hover:` önekleri
-- **Yardımcı Sınıflar:** `${inputClass`, `${textareaClass`, `border`, `font-black`, `font-bold`, `font-mono`, `group`, `italic`, `px-3`, `py-1`, `rounded`, `rounded-full`, `rounded-lg`, `rounded-xl`, `space-y-3`
+- **Yardımcı Sınıflar:** `${inputClass`, `${textareaClass`, `border`, `font-bold`, `font-mono`, `font-semibold`, `group`, `italic`, `px-3`, `py-1`, `rounded`, `rounded-admin-md`, `rounded-full`, `space-y-3`, `space-y-4`
 
 ---
 # FILE: src\components\admin\categories\CategoryFormModal.md
@@ -17954,8 +18176,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\categories\CategoryFormModal.tsx
-skeleton_hash: 31aaeefe37f500e9
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\categories\CategoryFormModal.tsx
+skeleton_hash: ccea0ca40e7f17b9
 entity_hashes:
   func:CategoryFormModal: 45e70a4b9811a0d5
   func:FieldError: 73ce29b5cf8d764a
@@ -17967,7 +18189,7 @@ entity_hashes:
   func:onSubmit: c1bb6fdd37c1f2b9
   overview: f91a583dfb37d990
   style_tokens: a0eaa2fd6256d10e
-generated_at: 2026-08-25T07:25:17Z
+generated_at: 2026-08-27T08:07:08Z
 ---
 
 ## Genel Bakış
@@ -18190,21 +18412,21 @@ graph TD
     CategoryFormModal_tsx__handleImageUpload["handleImageUpload"]
     CategoryFormModal_tsx__handleOpenChange["handleOpenChange"]
     CategoryFormModal_tsx__onSubmit["onSubmit"]
-    CategoryFormModal_tsx__CategoryFormModal --> CategoryFormModal_tsx__handleClose
     CategoryFormModal_tsx__CategoryFormModal --> CategoryFormModal_tsx__buildCategorySchema
+    CategoryFormModal_tsx__CategoryFormModal --> CategoryFormModal_tsx__handleClose
 ```
 
 ## NODE ID STANDARD
 
-  file: CategoryFormModal.tsx
-  function: CategoryFormModal.tsx::buildCategorySchema
-  function: CategoryFormModal.tsx::FieldError
-  function: CategoryFormModal.tsx::focusFirstInvalid
-  function: CategoryFormModal.tsx::CategoryFormModal
-  function: CategoryFormModal.tsx::handleImageUpload
-  function: CategoryFormModal.tsx::onSubmit
-  function: CategoryFormModal.tsx::handleClose
-  function: CategoryFormModal.tsx::handleOpenChange
+  file: src\components\admin\categories\CategoryFormModal.tsx
+  function: src\components\admin\categories\CategoryFormModal.tsx::buildCategorySchema
+  function: src\components\admin\categories\CategoryFormModal.tsx::FieldError
+  function: src\components\admin\categories\CategoryFormModal.tsx::focusFirstInvalid
+  function: src\components\admin\categories\CategoryFormModal.tsx::CategoryFormModal
+  function: src\components\admin\categories\CategoryFormModal.tsx::handleImageUpload
+  function: src\components\admin\categories\CategoryFormModal.tsx::onSubmit
+  function: src\components\admin\categories\CategoryFormModal.tsx::handleClose
+  function: src\components\admin\categories\CategoryFormModal.tsx::handleOpenChange
 
 ---
 
@@ -18237,13 +18459,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\AbcPieChart.tsx
-skeleton_hash: cb71fb57bbf4a080
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\dashboard\AbcPieChart.tsx
+skeleton_hash: 86396a9f281a2c0f
 entity_hashes:
-  func:AbcPieChart: 3ae66809a3c8cea6
+  func:AbcPieChart: cde258b4cc2386ed
   overview: 64d9c987fb2a5f21
-  style_tokens: cc7ba7a958715321
-generated_at: 2026-06-19T20:47:04Z
+  style_tokens: 5302d85fc9a1582c
+generated_at: 2026-08-27T08:07:59Z
 ---
 
 ## Genel Bakış
@@ -18269,32 +18491,18 @@ Bu modül için mimari fonksiyon gövdesi paylaşılmadığından, yalnızca fon
 
 ---
 
-> **Not:** Modül gövdesi (function body) paylaşılmadığından, verinin işlenme mantığı (sıfır kontrolü, boş durum ekranı, grafik kütüphane entegrasyonu vb.) hakkında kesin aksiyon üretmek mümkün değildir. Eski dokümanda bahsedilen "veri yoksa boş ekran gösterimi" gibi davranışlar docstring/yorum kaynaklıdır ve mimari aksiyom olarak doğrulanamaz.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### AbcPieChart
+**Ne yapar**: ABC ürün sınıflandırmasına ait verileri pasta grafik (pie chart) olarak görselleştiren bir React bileşenidir. Veri yoksa veya tüm değerler sıfırsa boş durum ekranı gösterir; aksi halde etkileşimli bir pasta grafik oluşturur ve merkezinde toplam stok miktarını görüntüler.
 
-**Ne yapar**: Admin dashboard'da ABC ürün sınıflandırması için interaktif donut (iç portionlu) pasta grafik gösteren React bileşenidir. Veri olmadığında veya tüm değerler sıfır olduğunda boş durum bileşeni (AdminEmptyState) gösterir, aksi halde renkli dilimlerden oluşan animasyonlu bir pie chart ve merkezde toplam stok sayısını sunar.
-
-**Nasıl yapar**: 
-- `useI18n()` hook'u ile çevirileri (`t` fonksiyonu) alarak çok dilli destek sağlar.
-- İlk olarak data dizisinin geçerliliğini kontrol eder: `data` tanımsızsa, boşsa veya tüm elemanların `value` değeri 0 ise, `AdminEmptyState` bileşeni ile veri yetersizlik mesajı gösterir.
-- Geçerli veri varsa, `data.reduce()` ile toplam değeri hesaplar ve `ResponsiveContainer` içinde `PieChart` bileşenini render eder.
-- `Pie` bileşeninde her bir veri elemanı için `Cell` oluşturur; her hücreye ait `color` değeri `fill` olarak kullanılır, hover'da opacity düşüşü ile interaktiflik sağlanır.
-- `Tooltip` ile üzerine gelindiğinde ürün sayısını ve sınıf adını formatlanmış şekilde gösterir.
-- `Legend` bileşeni ile grafik altında sınıf isimlerini listeler.
-- Grafik merkezine `absolute` konumlandırma ile toplam değer ve "Toplam Stok" etiketi yerleştirir; arkasında `blur` efekti ile görsel derinlik oluşturulur.
-- Tüm grafik animasyonları `animationBegin={0}` ve `animationDuration={1500}` ile 1.5 saniyelik giriş animasyonuna sahiptir.
-- Grubun tamamına `group/pie` class'ı eklenerek, başlık ve alt çizgi üzerinde hover efekti (`group-hover/pie:text-cyan-400`, `group-hover/pie:w-20`) uygulanır.
+**Nasıl yapar**: Bileşen, `useI18n()` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t`'yi alır. İlk olarak `data` prop'unu kontrol eder: veri yoksa, dizi uzunluğu sıfırsa ya da tüm elemanların `value` değeri sıfırsa, `AdminEmptyState` bileşenini içeren bir boş durum kartı döndürür. Veri mevcutsa, `data` dizisindeki tüm `value` değerlerini `reduce` ile toplayarak `totalValue` hesaplar. Ardından Recharts kütüphanesinin `ResponsiveContainer`, `PieChart`, `Pie`, `Cell`, `Tooltip` ve `Legend` bileşenlerini kullanarak responsive bir pasta grafik oluşturur. Pasta dilimleri `data` dizisindeki her elemanın `color` özelliğine göre renklendirilir; her hücre (`Cell`) hover'da opaklık geçişi ve tıklanabilirlik efektlerine sahiptir. Tooltip, ürün sayısı ve sınıf bilgisini uluslararasılaştırılmış biçimde gösterir. Grafik merkezinde, bulanık arka plan efektli (`blur-3xl`) bir katman üzerinde toplam stok sayısı ve "toplam stok" etiketi yer alır. Başlık olarak `title` prop'u kullanılır; belirtilmemişse uluslararasılaştırılmış varsayılan metin (`admin.dashboard.abcProductClassification`) görüntülenir.
 
 **Parametreler**:
-- `data` — `AbcPieChartItem[]` veya `undefined` — Pasta grafikte gösterilecek veri dizisi; her eleman bir ürün sınıfını (A, B, C vb.) temsil eder, `value` (sayı) ve `color` (hex renk kodu) alanları içerir. Boş veya tanımsız geldiğinde boş durum gösterilir.
-- `title` — `string` veya `undefined` — Grafik başlığı; belirtilmezse varsayılan olarak `t('admin.dashboard.abcProductClassification')` çevirisi kullanılır.
+- data: AbcPieChartProps['data'] — Her elemanı `value` (sayısal) ve `color` (renk kodu) özelliklerini içeren bir dizi. Pasta grafik dilimlerinin değerlerini ve renklerini belirler.
+- title: AbcPieChartProps['title'] — Bileşenin üst kısmında gösterilecek başlık metni. Belirtilmezse varsayılan uluslararasılaştırılmış metin kullanılır.
 
-**Dönüş**: `JSX.Element` — Bu bileşen React JSX'i döner; iki durumdan birini render eder: ya veri yetersizlik durumu için `AdminEmptyState` içeren bir `div`, ya da donut pie chart, tooltip, legend ve merkez toplam göstergesi içeren tam grafik görünümü.
+**Dönüş**: JSX elementi döndürür. Veri yoksa veya tüm değerler sıfırsa boş durum kartı, aksi halde pasta grafik içeren bir bileşen ağacı döndürür. Kesin dönüş tipi kaynakta belirtilmemiştir.
 
 ---
 
@@ -18322,18 +18530,26 @@ Bu modül için mimari fonksiyon gövdesi paylaşılmadığından, yalnızca fon
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/dashboard/AbcPieChart.tsx::AbcPieChart
-- **params**: `{ data, title }` (destructure edilmiş AbcPieChartProps objesi)
-  - `data` — Pie chart veri dizisi; her eleman `value` (sayı), `color` (renk kodu) ve `name` (sınıf adı) özelliklerine sahiptir
-  - `title` — Grafik başlık metni (opsiyonel, verilmezse `t('admin.dashboard.abcProductClassification')` kullanılır)
+- **params**: `data` — ABC sınıflandırma veri dizisi; her elemanda `value` (sayı) ve `color` (renk) alanları bulunur; `title` — grafik başlığı, verilmezse varsayılan çeviri anahtarı kullanılır
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; tüm UI metinlerinin lokalizasyonu için kullanılır (`t('admin.dashboard.noAnalysisData')`, `t('admin.dashboard.productCount', { count: value })` vb.)
-  - `totalValue` — `data.reduce((acc, curr) => acc + curr.value, 0)` ile hesaplanan tüm data elemanlarının value toplamı; grafiğin merkezinde "Toplam Stok" olarak görüntülenir
-- **Dönüş**: JSX (React bileşeni) — Veri boşsa veya sıfırdan oluşan `AdminEmptyState` bileşeni, değilse donut pie chart bileşeni döner
-- **Yan etkiler**: Yok (render-only bileşen)
-- **Inline callback değişkenleri** (JSX içinde tanımlı):
-  - `entry` / `index` — `data.map` callback'inde her pie dilimi elemanını ve indeksini temsil eder; `Cell` bileşenine `entry.color` ile renk ve `key={cell-${index}}` ile anahtar atar
-  - `value` / `name` — `Tooltip` `formatter` callback parametreleri; `value` ürün sayısını, `name` ürün sınıf adını temsil eder, çeviri fonksiyonuyla formatlanır
-  - `value` — `Legend` `formatter` callback parametresi; legend metnini render eder
+  - `t` — `useI18n()` kancasından destructure edilen çeviri fonksiyonu; metinleri yerelleştirmek için kullanılır
+  - `data.length` — veri dizisinin uzunluğu; boş veri kontrolünde `=== 0` ile karşılaştırılır
+  - `d` — `data.every()` callback parametresi; her elemanın `d.value` değeri `0` ile eşit mi diye kontrol edilir
+  - `totalValue` — `data.reduce()` ile hesaplanan toplam stok miktarı; `acc` birikimli toplam, `curr` mevcut eleman, her elemanın `curr.value` değeri toplanır; grafik merkezinde gösterilir
+  - `entry` — `data.map()` callback parametresi; her dilim verisini temsil eder, `entry.color` ile dilim rengi belirlenir
+  - `index` — `data.map()` callback parametresi; her dilim için benzersiz key üretmek amacıyla `cell-${index}` formatında kullanılır
+  - `value` — Tooltip `formatter` fonksiyonunun ilk parametresi (sayı tipinde); ürün sayısını temsil eder, `t('admin.dashboard.productCount', { count: value })` ile çevrilir
+  - `name` — Tooltip `formatter` fonksiyonunun ikinci parametresi (string tipinde); ürün sınıfını temsil eder, `t('admin.dashboard.productClass', { name })` ile çevrilir
+  - `value` — Legend `formatter` fonksiyonunun parametresi; legend etiketi metnini temsil eder, `<span>` içinde render edilir
+  - `PieIcon` — `lucide-react` kütüphanesinden import edilen ikon; boş durumda `AdminEmptyState` bileşeninin `icon` prop'una aktarılır
+  - `AdminEmptyState` — boş durum bileşeni; veri yoksa veya tüm değerler sıfırsa `icon`, `title`, `description` ve `compact` prop'ları ile render edilir
+  - `ResponsiveContainer` — recharts bileşeni; `%100` genişlik ve yükseklik ile grafik konteynerini responsive yapar
+  - `PieChart` — recharts pasta grafik konteyneri
+  - `Pie` — recharts pasta dilim bileşeni; `data`, `cx`, `cy`, `innerRadius` (70), `outerRadius` (95), `paddingAngle` (5), `dataKey` ("value"), `stroke` ("#0A0F1E"), `strokeWidth` (6), `animationBegin` (0), `animationDuration` (1500) prop'ları ile yapılandırılır
+  - `Cell` — recharts hücre bileşeni; her dilim için `key`, `fill` (entry.color) ve className prop'ları ile render edilir
+  - `Tooltip` — recharts araç ipucu bileşeni; `contentStyle` (yuvarlak köşeler, blur arka plan, gölge), `itemStyle` (yazı tipi ayarları) ve `formatter` prop'ları ile yapılandırılır
+  - `Legend` — recharts legend bileşeni; `verticalAlign` ("bottom"), `align` ("center"), `height` (40), `iconType` ("circle"), `iconSize` (8) ve `formatter` prop'ları ile yapılandırılır
+- **Dönüş**: JSX elementi — veri yoksa boş durum kartı, varsa pasta grafik ve merkezde toplam stok gösteren bileşen ağacı döndürür
 
 ---
 
@@ -18355,13 +18571,13 @@ Bu modül için mimari fonksiyon gövdesi paylaşılmadığından, yalnızca fon
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-2xl`, `tracking-hvac-relaxed`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-500/10`, `bg-cyan-500/30`, `bg-slate-900/40`, `border-white/5`, `group-hover/pie:text-cyan-400`, `text-4xl`, `text-slate-500`, `text-white`, `text-xs`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-surface-2`, `border-admin-border`, `group-hover/pie:text-admin-accent`, `text-4xl`, `text-admin-fg`, `text-admin-fg-muted`, `text-xs`
 - **Layout:** `absolute`, `drop-shadow-pie-chart-glow`, `flex`, `flex-1`, `flex-col`, `group-hover/pie:w-20`, `h-0.5`, `h-full`, `items-center`, `justify-center`, `left-1/2`, `min-h-300px`, `p-10`, `relative`, `top-1/2`
 - **Varyant/Responsive:** `group-hover/pie:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `-mt-4`, `-translate-x-1/2`, `-translate-y-1/2`, `blur-3xl`, `border`, `cursor-pointer`, `duration-500`, `duration-700`, `font-black`, `group/pie`, `hover:opacity-80`, `inset-0`, `italic`, `mb-10`, `ml-1`
+- **Yardımcı Sınıflar:** `-mt-4`, `-translate-x-1/2`, `-translate-y-1/2`, `blur-3xl`, `border`, `cursor-pointer`, `duration-500`, `duration-700`, `font-semibold`, `group/pie`, `hover:opacity-80`, `inset-0`, `italic`, `mb-10`, `ml-1`
 
 ---
 # FILE: src\components\admin\dashboard\ActivityHeatmap.md
@@ -18538,15 +18754,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\dashboard\RecentOrdersTable.tsx
-skeleton_hash: 36270baa464da816
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\dashboard\RecentOrdersTable.tsx
+skeleton_hash: fd6f81fd974b2207
 entity_hashes:
   func:RecentOrdersTable: 74faabf4e70dfa3a
   func:getStatusLabel: 2edd561db46db1dc
   func:getStatusStyles: 419f18093a05eeeb
   overview: 1e3b923c1a9c6959
   style_tokens: a8137575ec78dd18
-generated_at: 2026-08-25T07:24:32Z
+generated_at: 2026-08-27T08:08:01Z
 ---
 
 ## Genel Bakış
@@ -18661,16 +18877,16 @@ graph TD
     RecentOrdersTable_tsx__RecentOrdersTable["RecentOrdersTable"]
     RecentOrdersTable_tsx__getStatusLabel["getStatusLabel"]
     RecentOrdersTable_tsx__getStatusStyles["getStatusStyles"]
-    RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusStyles
     RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusLabel
+    RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusStyles
 ```
 
 ## NODE ID STANDARD
 
-  file: RecentOrdersTable.tsx
-  function: RecentOrdersTable.tsx::RecentOrdersTable
-  function: RecentOrdersTable.tsx::getStatusStyles
-  function: RecentOrdersTable.tsx::getStatusLabel
+  file: src\components\admin\dashboard\RecentOrdersTable.tsx
+  function: src\components\admin\dashboard\RecentOrdersTable.tsx::RecentOrdersTable
+  function: src\components\admin\dashboard\RecentOrdersTable.tsx::getStatusStyles
+  function: src\components\admin\dashboard\RecentOrdersTable.tsx::getStatusLabel
 
 ---
 
@@ -18700,13 +18916,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\dashboard\SalesChart.tsx
-skeleton_hash: 22bee1a1ee1294f2
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\dashboard\SalesChart.tsx
+skeleton_hash: 1d2376b4feb5ff39
 entity_hashes:
   func:SalesChart: 81798fe6d2553ef7
   overview: b9d1d9a412f73b23
   style_tokens: eb6fa1f854f0685b
-generated_at: 2026-08-25T07:24:37Z
+generated_at: 2026-08-27T08:08:02Z
 ---
 
 ## Genel Bakış
@@ -18789,8 +19005,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: SalesChart.tsx
-  function: SalesChart.tsx::SalesChart
+  file: src\components\admin\dashboard\SalesChart.tsx
+  function: src\components\admin\dashboard\SalesChart.tsx::SalesChart
 
 ---
 
@@ -18820,13 +19036,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\dashboard\StatCard.tsx
-skeleton_hash: c2ff1a98196483d7
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\dashboard\StatCard.tsx
+skeleton_hash: d621feee8fc4d2b7
 entity_hashes:
   func:StatCard: 42faa1e1d38b732c
   overview: cd8b364f9dc61291
   style_tokens: fe92468c4406b452
-generated_at: 2026-08-25T07:36:55Z
+generated_at: 2026-08-27T08:08:03Z
 ---
 
 ## Genel Bakış
@@ -18931,8 +19147,8 @@ Bu modül için özel aksiyom tanımlanamamıştır.
 
 ## NODE ID STANDARD
 
-  file: StatCard.tsx
-  function: StatCard.tsx::StatCard
+  file: src\components\admin\dashboard\StatCard.tsx
+  function: src\components\admin\dashboard\StatCard.tsx::StatCard
 
 ---
 
@@ -19520,13 +19736,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\data-table\DataTableKit.tsx
-skeleton_hash: f3b0ebf28a23834d
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\data-table\DataTableKit.tsx
+skeleton_hash: d01d6fc893236a10
 entity_hashes:
-  func:DataTableKit: e714f69d9f2449b2
-  overview: a2c088a7cccc7fb9
-  style_tokens: 5a324826484cf67f
-generated_at: 2026-08-25T07:26:28Z
+  func:DataTableKit: 9d029f93373fe873
+  overview: b868e3edab37a5c7
+  style_tokens: db6fc579bfa7b43f
+generated_at: 2026-08-27T08:09:45Z
 ---
 
 ## Genel Bakış
@@ -19540,7 +19756,7 @@ Veri tablosunun ana render sorumluluğunu üstlenir. Generic tip parametresi say
 
 ## Bağımlılıklar
 
-**İç Bağımlılıklar:** Verilen kaynakta başka fonksiyon tanımlanmadığından, modül içi fonksiyon çağrısı bulunmamaktadır. Bileşen, muhtemelen alt bileşenleri ve yardımcı araçları dışarıdan import ediyor olabilir ancak bu bilgi mevcut kaynakta yer almamaktadır.
+**İç Bağımlılıklar:** Kaynakta başka fonksiyon tanımlanmadığından, modül içi fonksiyon çağrısı bulunmamaktadır.
 
 **Dış Bağımlılıklar:** DataTableKitProps tipi, bileşenin kabul ettiği propları tanımlayan bir arayüzdür. Bu tipin neler içerdiği mevcut kaynak bilgisinden bilinmemektedir.
 
@@ -19550,44 +19766,42 @@ Veri tablosunun ana render sorumluluğunu üstlenir. Generic tip parametresi say
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Gerekçe:** Fonksiyon gövdesi verilmediğinden, gövdeden çıkarım yapılabilecek bir koşul bulunmamaktadır. Yalnızca fonksiyon imzası (`DataTableKit(props: DataTableKitProps<T>) -> ReactNode`) mevcut olup, imza tek başına çalıştırılabilir bir aksiyom üretmez.
+Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesinden türetilen özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### DataTableKit
-**Ne yapar**: Veri tablosu bileşeninin tüm yönetim mantığını tek bir "kit" (set) altında birleştiren üst düzey React fonksiyonudur. Kolon görünürlüğü, yoğunluk (density), satır genişletme, sayfalama, seçim, sıralama ve erişim denetimi gibi tablonun tüm durumlarını koordine eder; toolbar, toplu işlem çubuğu, tablo başlığı, satır gövdesi ve durum ekranlarını (boş, filtre boş, hata, yetki reddi) bir arada render eder.
+**Ne yapar**: Genel amaçlı bir veri tablosu bileşeni kitidir. Tablonun başlık kısmını, satırlarını, seçim (checkbox) mekanizmasını, satır genişletme (expand) işlevini, yoğunluk (density) ayarını, kolon görünürlük yönetimini, sayfalama bileşenini, hata ve boş durum ekranlarını tek bir bütünleşik yapı altında sunar. Generic `T` tip parametresi sayesinde farklı veri türleriyle kullanılabilir.
 
-**Nasıl yapar**: Props'tan gelen `table` nesnesi üzerinden sıralama (`table.sorting`), seçim (`table.selection`), sayfalama (`table.pagination`), filtreleme (`table.filtering`) ve yükleme durumu (`table.isLoading`) gibi alt modüllere erişir. Kolon görünürlüğü ve yoğunluk tercihleri `persistKey` ile `localStorage`'a yazılır ve okunur; `useEffect` bağımlılıkları sayesinde her değişiklikte otomatik kaydedilir. `useMemo` ile görünür kolon anahtarları ve kolon toggle listesi hesaplanır; `hideable` olmayan kolonlar her zaman görünürdür, `defaultHidden` olanlar varsayılan olarak gizlidir. Satır genişletme durumu `expanded` adlı bir `Set<string>` ile yönetilir; `toggleExpand` fonksiyonu bu seti günceller. `hasReadAccess === false` olduğunda bileşen erken dönüş yaparak `accessDeniedState` görüntüler. Tablo gövdesinde üç durum ele alınır: yükleme sırasında iskelet (skeleton), satır yokken boş durum (filtre aktifse `filterEmptyState`, değilse `emptyState`), ve satırlar varken satır haritalama. Her satırda seçim kutusu (`selectable`), genişletme butonu (`expandable`) ve görünür kolonlar sırayla render edilir. İlk görünür kolonun hücresi `rowHref` tanımlıysa bir `Link` bileşeniyle sarmalanır. Sayfalama kontrolleri `pageCount > 1` koşulunda gösterilir; `renderPageLabel` prop'u ile sayfa etiketi özelleştirilebilir. `ColumnsMenu` bileşeni kolon görünürlük anahtarlarını ve yoğunluk seçimini sunar. `useI18n` hook'u ile uluslararasılaştırma desteği sağlanır; i18n etiketleri (`selectAllLabel`, `rowSelectLabel`, `expandLabel`, `totalLabel`) prop olarak geçilmezse sözlükten (`t()`) varsayılan değerler alınır — bu, eski sürümdeki ham Türkçe dizgi sorununu çözmek için tasarlanmıştır.
+**Nasıl yapar**: Bileşen önce `props` değerlerini destruct eder. `useI18n` hook'u ile uluslararasılaştırma desteği sağlar; etiketler için `??` operatörüyle prop'tan gelen değer yoksa sözlükten (`t()`) varsayılanı alır. Kolon görünürlüğü ve yoğunluk ayarları `persistKey` ile `localStorage`'a yüklenir ve kaydedilir (`loadColumnVisibility`, `saveColumnVisibility`, `loadDensity`, `saveDensity`). `useMemo` ile görünür kolon anahtarları ve kolon toggle listesi hesaplanır. `hasReadAccess === false` olduğunda `accessDeniedState` render edilerek erişim engeli gösterilir. Tablo gövdesinde dört durum ele alınır: yükleme sırasında iskelet (skeleton), filtre aktifken boş durum, filtresiz boş durum ve normal satır listesi. Her satırda seçim checkbox'ı, genişletme butonu ve görünür kolon hücreleri render edilir. `rowHref` verilmişse ilk görünür kolonun içeriği `Link` bileşeniyle sarılır. Genişletilen satırlar için `renderExpandedRow` fonksiyonu çağrılır. Sayfalama, tablonun altında `DataTablePagination` bileşeniyle gösterilir (admin-standard.md §3/4 kuralı). Bileşenin üst kısmında `toolbarSlot`, alt kısmında `bulkBarSlot` prop olarak yerleştirilir.
 
 **Parametreler**:
-- props: DataTableKitProps\<T\> — Tablonun tüm yapılandırma ve davranış tanımlarını içeren tek props nesnesi. Aşağıdaki alanlar bu nesneden destruct edilir:
-  - columns: ColumnDef\<T\>[] — Tablonun tanımlı kolon dizisi. Her kolon `key`, `header`, `cell`, `hideable`, `defaultHidden`, `align`, `cellClassName` gibi alanlar içerir.
-  - table: TableState\<T\> — Tablonun tüm durum nesnesi. `rows`, `totalMatched`, `isLoading`, `error`, `pagination` (`page`, `pageCount`, `setPage`), `sorting` (`sort`, `toggleSort`), `selection` (`isSelected`, `toggle`, `allSelected`, `toggleAll`), `filtering` (`hasActiveFilters`) alt nesnelerini barındırır.
-  - rowId: (row: T) => string — Her satırı benzersiz şekilde tanımlayan kimlik üreten fonksiyon.
-  - persistKey: string — Kolon görünürlüğü ve yoğunluk tercihlerinin `localStorage`'da saklanacağı anahtar.
-  - hasWriteAccess: boolean — Yazma yetkisi olup olmadığını belirtir; `true` olduğunda satır seçim kutuları ve toplu işlem desteği aktif olur.
-  - hasReadAccess: boolean — Okuma yetkisi olup olmadığını belirtir; `false` olduğunda `accessDeniedState` gösterilir. Varsayılan değeri `true`'dur.
-  - emptyState: ReactNode — Tabloda hiç satır yokken ve filtre aktif değilken gösterilecek bileşen.
-  - filterEmptyState: ReactNode — Tabloda hiç satır yokken ve filtre aktifken gösterilecek bileşen.
-  - accessDeniedState: ReactNode — Okuma yetkisi reddedildiğinde gösterilecek bileşen.
-  - errorLabel: string — Tablo hata durumunda gösterilecek metin; geçilmezse sözlükten `admin.dataTable.states.error` anahtarıyla alınır.
-  - rowHref: ((row: T) => string) | undefined — Satırın ilk görünür hücresini tıklanabilir bağlantıya dönüştüren fonksiyon; tanımlıysa `Link` bileşeniyle sarmalanır.
-  - onRowClick: ((row: T) => void) | undefined — Satıra tıklandığında çağrılan fonksiyon; tanımlıysa satır `cursor-pointer` ve `role="button"` ile erişilebilir hale gelir, Enter ve Space tuşlarıyla tetiklenebilir.
-  - renderExpandedRow: ((row: T) => ReactNode) | undefined — Genişletilmiş satırın içeriğini üreten fonksiyon; tanımlıysa her satırda genişletme butonu gösterilir.
-  - toolbarSlot: ReactNode — Tablonun üstüne yerleştirilecek özel toolbar içeriği.
-  - bulkBarSlot: ReactNode — Tablonun altına yerleştirilecek toplu işlem çubuğu içeriği.
-  - columnsButtonLabel: string — Kolon menüsü butonunun etiketi.
-  - selectAllLabel: string — Tablo başlığındaki "tümünü seç" onay kutusunun erişilebilirlik etiketi; geçilmezse sözlükten `admin.dataTable.labels.selectAll` anahtarıyla alınır.
-  - rowSelectLabel: string — Her satırdaki seçim onay kutusunun erişilebilirlik etiketi; geçilmezse sözlükten `admin.dataTable.labels.rowSelect` anahtarıyla alınır.
-  - expandLabel: string — Her satırdaki genişletme butonunun erişilebilirlik etiketi; geçilmezse sözlükten `admin.dataTable.labels.expand` anahtarıyla alınır.
-  - totalLabel: string — Sayfalama alanında gösterilen toplam kayıt etiketi; geçilmezse sözlükten `admin.dataTable.pagination.total` anahtarıyla alınır.
-  - renderPageLabel: ((page: number, pageCount: number) => ReactNode) | undefined — Sayfa göstergesini özel olarak biçimlendiren fonksiyon; geçilmezse `"{page} / {pageCount}"` biçimi kullanılır.
+- `props`: `DataTableKitProps<T>` — Bileşenin tüm yapılandırma ve davranışlarını tanımlayan props nesnesi. Aşağıdaki alt alanları içerir:
+  - `columns`: `Column<T>[]` (varsayım — tipte açıkça belirtilmemiş ama `columns` dizisi üzerinde `.key`, `.header`, `.hideable`, `.defaultHidden`, `.cell`, `.align`, `.cellClassName` alanlarına erişiliyor) — Tablonun kolon tanımları dizisi.
+  - `table`: (tipi açıkça belirtilmemiş) — Tablo durumunu ve aksiyonlarını içeren nesne. `table.pagination` (`page`, `pageCount`, `setPage`), `table.sorting` (`sort`, `toggleSort`), `table.selection` (`allSelected`, `toggleAll`, `isSelected`, `toggle`), `table.filtering` (`hasActiveFilters`), `table.rows`, `table.totalMatched`, `table.isLoading`, `table.error` alanlarına sahiptir.
+  - `rowId`: `(row: T) => string` (varsayım — kullanımından çıkarılıyor) — Her satır için benzersiz kimlik üreten fonksiyon.
+  - `persistKey`: `string` — Kolon görünürlüğü ve yoğunluk ayarının `localStorage`'da saklanacağı anahtar.
+  - `hasWriteAccess`: `boolean` — Yazma yetkisi olup olmadığını belirtir; `true` ise satır seçim checkbox'ları gösterilir.
+  - `hasReadAccess`: `boolean` — Okuma yetkisi olup olmadığını belirtir; `false` olduğunda `accessDeniedState` render edilir. Varsayılan değeri `true`.
+  - `emptyState`: `ReactNode` — Filtre aktif değilken ve tabloda satır yokken gösterilecek bileşen.
+  - `filterEmptyState`: `ReactNode` — Filtre aktifken ve tabloda satır yokken gösterilecek bileşen.
+  - `accessDeniedState`: `ReactNode` — Okuma yetkisi yokken gösterilecek bileşen.
+  - `errorLabel`: `string` — Tablo hata durumunda gösterilecek metin; verilmezse sözlükten `admin.dataTable.states.error` anahtarıyla alınır.
+  - `rowHref`: `(row: T) => string` (varsayım — `Link` bileşenine `href` olarak veriliyor) — Satırın ilk görünür kolonunu bağlantıya dönüştüren fonksiyon.
+  - `onRowClick`: `(row: T) => void` (varsayım — kullanımından çıkarılıyor) — Satıra tıklandığında çağrılan fonksiyon; verildiğinde satır `cursor-pointer` ve `role="button"` ile erişilebilir hale gelir, Enter ve Space tuşlarıyla tetiklenebilir.
+  - `renderExpandedRow`: `(row: T) => ReactNode` (varsayım — kullanımından çıkarılıyor) — Genişletilen satır için içerik üreten fonksiyon; verildiğinde expand butonu gösterilir.
+  - `toolbarSlot`: `ReactNode` — Tablonun üstüne yerleştirilecek özel araç çubuğu içeriği.
+  - `bulkBarSlot`: `ReactNode` — Tablonun altına yerleştirilecek toplu işlem çubuğu içeriği.
+  - `columnsButtonLabel`: `string` — Kolon menüsü butonunun etiketi.
+  - `selectAllLabel`: `string` — "Tümünü seç" checkbox etiketi; verilmezse sözlükten `admin.dataTable.labels.selectAll` anahtarıyla alınır.
+  - `rowSelectLabel`: `string` — Satır seçim checkbox etiketi; verilmezse sözlükten `admin.dataTable.labels.rowSelect` anahtarıyla alınır.
+  - `expandLabel`: `string` — Satır genişletme butonu etiketi; verilmezse sözlükten `admin.dataTable.labels.expand` anahtarıyla alınır.
+  - `totalLabel`: `string` — Toplam kayıt sayısı etiketi; verilmezse sözlükten `admin.dataTable.pagination.total` anahtarıyla alınır.
+  - `renderPageLabel`: `(page: number) => string` (varsayım — `DataTablePagination`'a prop olarak geçiliyor) — Sayfa numarası etiketini üreten fonksiyon.
 
-**Dönüş**: ReactNode — Tablonun tüm alt bileşenlerini (toolbar, tablo konteyneri, hata bandı, sayfalama, tablo başlığı, satırlar, toplu işlem çubuğu) içeren bir React ağacı döndürür. `hasReadAccess === false` olduğunda doğrudan `accessDeniedState` döndürülür.
+**Dönüş**: `ReactNode` — Tablo kitinin tamamını içeren JSX ağacı. Okuma yetkisi yoksa `accessDeniedState` döner; aksi halde araç çubuğu, tablo (başlık, gövde, satırlar), sayfalama ve toplu işlem çubuğunu içeren bir `div` döner.
 
 ---
 
@@ -19598,6 +19812,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - import: ../ColumnsMenu::ColumnsMenu
 - import: ../ColumnsMenu::type ColumnToggle
 - import: ./DataTableHead::DataTableHead
+- import: ./DataTablePagination::DataTablePagination
 - import: ./persist::loadColumnVisibility
 - import: ./persist::loadDensity
 - import: ./persist::saveColumnVisibility
@@ -19643,10 +19858,156 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::DataTableKit
+- **params**: `props: DataTableKitProps<T>`
+- **ic_degiskenler**:
+  - `columns` — props'tan destruct edilen, tablo sütun tanımlarını içeren dizi
+  - `table` — UseAdminTableResult tipinde, tablonun tüm durumunu (sayfalama, sıralama, seçim, filtreleme, yükleme, hata) yöneten nesne
+  - `rowId` — her satır verisinden benzersiz bir string ID çıkaran fonksiyon
+  - `persistKey` — sütun görünürlüğü ve yoğunluk ayarlarını localStorage'da saklamak için kullanılan anahtar string
+  - `hasWriteAccess` — yazma yetkisi olup olmadığını belirten boolean; satır seçilebilirliğini (`selectable`) belirler
+  - `hasReadAccess` — okuma yetkisi; varsayılanı `true`; `false` ise `accessDeniedState` gösterilir
+  - `emptyState` — tablo satır içermezken ve filtre aktif değilken gösterilecek ReactNode
+  - `filterEmptyState` — filtre aktifken sonuç yokken gösterilecek ReactNode
+  - `accessDeniedState` — okuma yetkisi yokken gösterilecek ReactNode
+  - `errorLabel` — tablo hata durumundayken gösterilecek metin; yoksa `t('admin.dataTable.states.error')` kullanılır
+  - `rowHref` — satır verisinden link URL'si üreten fonksiyon; ilk görünür sütundaki hücre içeriğini `<Link>` ile sarar
+  - `onRowClick` — satıra tıklandığında çağrılan fonksiyon; varsa satır `cursor-pointer` ve `role="button"` olur
+  - `renderExpandedRow` — genişletilmiş satırı render eden fonksiyon; varsa her satırda genişletme butonu gösterilir
+  - `toolbarSlot` — tablonun üstüne yerleştirilen araç çubuğu ReactNode'u
+  - `bulkBarSlot` — tablonun altına yerleştirilen toplu işlem çubuğu ReactNode'u
+  - `columnsButtonLabel` — ColumnsMenu bileşenindeki buton etiketi
+  - `selectAllLabel` — tüm satırları seç checkbox'ının aria-label'ı; yoksa `t('admin.dataTable.labels.selectAll')` kullanılır
+  - `rowSelectLabel` — tek satır seç checkbox'ının aria-label'ı; yoksa `t('admin.dataTable.labels.rowSelect')` kullanılır
+  - `expandLabel` — genişletme butonunun aria-label'ı; yoksa `t('admin.dataTable.labels.expand')` kullanılır
+  - `totalLabel` — toplam kayıt sayısı etiketi; yoksa `t('admin.dataTable.pagination.total')` kullanılır
+  - `renderPageLabel` — sayfalama bileşenine geçirilen sayfa etiketi render fonksiyonu
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
+  - `defaultVisibility` — useMemo ile hesaplanan, her `hideable` sütun için varsayılan görünürlük haritası (`c.defaultHidden` tersi)
+  - `visibleCols` — state; sütun anahtarlarından boolean görünürlük haritası; başlangıç değeri `loadColumnVisibility(persistKey, defaultVisibility)` ile yüklenir
+  - `setVisibleCols` — `visibleCols` state setter fonksiyonu
+  - `density` — state; tablo yoğunluğu (`Density` tipi); başlangıç değeri `loadDensity(persistKey)` ile yüklenir
+  - `setDensity` — `density` state setter fonksiyonu
+  - `visibleKeys` — useMemo ile hesaplanan `Set<string>`; `hideable` olmayan sütunlar her zaman dahil, `hideable` olanlar `visibleCols[c.key] !== false` koşulunu sağlıyorsa dahil
+  - `visibleColumns` — useMemo ile hesaplanan, `visibleKeys` set'inde bulunan anahtarlara sahip sütunların filtrelenmiş dizisi
+  - `columnToggles` — useMemo ile hesaplanan `ColumnToggle[]`; her `hideable` sütun için `key`, `label`, `checked` ve `onChange` içeren nesneler dizisi
+  - `expanded` — state; genişletilmiş satır ID'lerini tutan `Set<string>`
+  - `setExpanded` — `expanded` state setter fonksiyonu
+  - `toggleExpand` — verilen `id` string'ini `expanded` set'inde ekleyip çıkaran fonksiyon
+  - `selectable` — `hasWriteAccess` değerine eşit boolean; satır seçme checkbox'larının gösterilip gösterilmeyeceğini belirler
+  - `expandable` — `typeof renderExpandedRow === 'function'` sonucu boolean; genişletme butonunun gösterilip gösterilmeyeceğini belirler
+  - `colSpan` — `visibleColumns.length + (selectable ? 1 : 0) + (expandable ? 1 : 0)` formülüyle hesaplanan tablo colspan değeri
+  - `cellPad` — yoğunluk `compact` ise `'px-2 py-2'`, değilse boş string; hücre padding sınıfı
+  - `firstVisibleKey` — `visibleColumns[0]?.key`; rowHref varsa ilk görünür sütundaki hücre içeriğini link yapmak için kullanılır
+  - `page` — `table.pagination.page`; mevcut sayfa numarası
+  - `pageCount` — `table.pagination.pageCount`; toplam sayfa sayısı
+  - `setPage` — `table.pagination.setPage`; sayfa değiştirme fonksiyonu
+- **Dönüş**: `ReactNode`
+
+### [N2_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::defaultVisibility (useMemo callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `d` — `Record<string, boolean>` tipinde boş nesne; `hideable` sütunların varsayılan görünürlüğünü toplar
+  - `c` — `columns` dizisi üzerinde iterasyon yapılan her sütun nesnesi; `c.hideable` ve `c.defaultHidden` alanlarına erişilir
+- **Dönüş**: `Record<string, boolean>` — sütun anahtarlarından varsayılan görünürlük haritası
+
+### [N3_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::saveColumnVisibility (useEffect callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `persistKey` — dış scope'dan yakalanan, localStorage anahtarı
+  - `visibleCols` — dış scope'dan yakalanan, mevcut sütun görünürlük haritası
+- **Dönüş**: yok — yan etki: `saveColumnVisibility(persistKey, visibleCols)` çağrısı yapar
+
+### [N4_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::saveDensity (useEffect callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `persistKey` — dış scope'dan yakalanan, localStorage anahtarı
+  - `density` — dış scope'dan yakalanan, mevcut yoğunluk değeri
+- **Dönüş**: yok — yan etki: `saveDensity(persistKey, density)` çağrısı yapar
+
+### [N5_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::visibleKeys (useMemo callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `s` — `Set<string>` tipinde boş küme; görünür sütun anahtarlarını toplar
+  - `c` — `columns` dizisi üzerinde iterasyon yapılan her sütun nesnesi; `c.hideable`, `c.key` ve `visibleCols[c.key]` erişimi yapılır
+- **Dönüş**: `Set<string>` — görünür sütun anahtarları kümesi
+
+### [N6_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::columnToggles (useMemo callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `columns` — dış scope'dan yakalanan sütun tanımları dizisi; `.filter((c) => c.hideable)` ile sadece gizlenebilir sütunlar alınır
+  - `c` — filtrelenmiş sütunlar üzerinde map iterasyonu yapılan her sütun nesnesi; `c.key`, `c.header`, `visibleCols[c.key]` erişimi yapılır
+  - `v` — onChange callback parametresi; yeni boolean görünürlük değeri
+  - `prev` — setVisibleCols updater fonksiyonu parametresi; önceki görünürlük haritası
+- **Dönüş**: `ColumnToggle[]` — her gizlenebilir sütun için `key`, `label`, `checked`, `onChange` içeren nesneler dizisi
+
+### [N7_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::toggleExpand
+- **params**: `id: string`
+- **ic_degiskenler**:
+  - `id` — genişletme durumu değiştirilecek satırın benzersiz ID'si
+  - `prev` — setExpanded updater fonksiyonu parametresi; önceki genişletilmiş ID'ler set'i
+  - `next` — `new Set(prev)` ile oluşturulan klon set; üzerinde ekleme/çıkarma yapılır
+- **Dönüş**: yok — yan etki: `setExpanded` çağrısı ile `expanded` state güncellenir
+
+### [N8_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::toggleExpand (setExpanded updater)
+- **params**: `prev`
+- **ic_degiskenler**:
+  - `prev` — mevcut genişletilmiş ID'ler set'i
+  - `next` — `new Set(prev)` ile oluşturulan klon set
+  - `id` — dış scope'dan yakalanan, genişletme durumu değiştirilecek satır ID'si
+- **Dönüş**: `Set<string>` — güncellenmiş genişletilmiş ID'ler set'i
+
+### [N9_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::table.rows.map callback
+- **params**: `row`
+- **ic_degiskenler**:
+  - `row` — tablo satır verisi; `rowId`, `col.cell`, `onRowClick`, `renderExpandedRow`, `rowHref` fonksiyonlarına geçirilir
+  - `id` — `rowId(row)` sonucu; satırın benzersiz string ID'si
+  - `selected` — `table.selection.isSelected(id)` sonucu; satırın seçili olup olmadığını belirten boolean
+  - `isExpanded` — `expanded.has(id)` sonucu; satırın genişletilmiş olup olmadığını belirten boolean
+  - `clickable` — `typeof onRowClick === 'function'` sonucu; satırın tıklanabilir olup olmadığını belirten boolean
+- **Dönüş**: `ReactNode` — Fragment içinde satır tr elementi ve genişletilmiş satır (varsa)
+
+### [N10_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::onKeyDown (satır klavye olayı)
+- **params**: `e`
+- **ic_degiskenler**:
+  - `e` — klavye olayı nesnesi; `e.key` kontrol edilir, `e.preventDefault()` çağrılır
+  - `row` — dış scope'dan yakalanan satır verisi; `onRowClick(row)` çağrısına geçirilir
+- **Dönüş**: yok — yan etki: Enter veya Space tuşunda `onRowClick(row)` çağrısı yapar
+
+### [N11_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::checkbox onClick
+- **params**: `e`
+- **ic_degiskenler**:
+  - `e` — MouseEvent nesnesi; `e.stopPropagation()` ve `e.shiftKey` kullanılır
+  - `id` — dış scope'dan yakalanan satır ID'si; `table.selection.toggle` çağrısına geçirilir
+- **Dönüş**: yok — yan etki: `e.stopPropagation()` çağrısı yapar ve `table.selection.toggle(id, { shiftKey: e.shiftKey })` çağrısı ile satır seçim durumunu değiştirir
+
+### [N12_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::expand button onClick
+- **params**: `e`
+- **ic_degiskenler**:
+  - `e` — MouseEvent nesnesi; `e.stopPropagation()` kullanılır
+  - `id` — dış scope'dan yakalanan satır ID'si; `toggleExpand(id)` çağrısına geçirilir
+- **Dönüş**: yok — yan etki: `e.stopPropagation()` çağrısı yapar ve `toggleExpand(id)` ile genişletme durumunu değiştirir
+
+### [N13_NASIL] AST Pointer: src/components/admin/data-table/DataTableKit.tsx::visibleColumns.map callback
+- **params**: `col`
+- **ic_degiskenler**:
+  - `col` — görünür sütun nesnesi; `col.align`, `col.key`, `col.cell`, `col.cellClassName` alanlarına erişilir
+  - `alignClass` — `col.align` değerine göre `'text-right'`, `'text-center'` veya `'text-left'` CSS sınıfı
+  - `rendered` — `col.cell(row)` sonucu; hücrenin render edilmiş içeriği
+  - `content` — `rowHref` varsa ve `col.key === firstVisibleKey` ise `<Link>` ile sarılmış `rendered`, değilse `rendered`
+  - `row` — dış scope'dan yakalanan satır verisi; `col.cell` ve `rowHref` fonksiyonlarına geçirilir
+  - `rowHref` — dış scope'dan yakalanan satır link fonksiyonu; `rowHref(row)` çağrısı yapılır
+  - `firstVisibleKey` — dış scope'dan yakalanan ilk görünür sütun anahtarı; link sarmalama koşulunda kullanılır
+- **Dönüş**: `ReactNode` — `<td>` elementi; sınıf adları `adminTableCellClass`, `cellPad`, `alignClass`, `col.cellClassName` birleşiminden oluşur
+
+---
+
 ## NODE ID STANDARD
 
-  file: DataTableKit.tsx
-  function: DataTableKit.tsx::DataTableKit
+  file: src\components\admin\data-table\DataTableKit.tsx
+  function: src\components\admin\data-table\DataTableKit.tsx::DataTableKit
 
 ---
 
@@ -19665,10 +20026,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger`, `bg-admin-danger-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `border-admin-border`, `border-b`, `hover:bg-admin-surface-2`, `hover:text-admin-accent`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg-muted`, `text-center`, `text-xs`
-- **Layout:** `block`, `custom-scrollbar`, `flex`, `flex-wrap`, `gap-2`, `gap-3`, `h-1.5`, `h-4`, `h-6`, `h-8`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `overflow-x-auto`
-- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminTableCellClass`, `${alignClass`, `${cellPad`, `${clickable`, `${col.cellClassName`, `:`, `border`, `content-auto-table`, `cursor-pointer`, `disabled:cursor-not-allowed`, `disabled:opacity-30`, `divide-admin-border`, `divide-y`, `duration-300`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger`, `bg-admin-danger-weak`, `bg-admin-surface-2`, `border-admin-border`, `border-b`, `hover:bg-admin-surface-2`, `hover:text-admin-accent`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg-muted`, `text-center`, `text-xs`
+- **Layout:** `block`, `custom-scrollbar`, `flex`, `flex-wrap`, `gap-2`, `gap-3`, `h-1.5`, `h-4`, `h-6`, `items-center`, `justify-between`, `justify-center`, `justify-end`, `overflow-x-auto`, `p-0`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${adminTableCellClass`, `${alignClass`, `${cellPad`, `${clickable`, `${col.cellClassName`, `:`, `content-auto-table`, `cursor-pointer`, `divide-admin-border`, `divide-y`, `duration-300`, `focus-visible:ring-admin-accent/30`, `focus-visible:ring-offset-0`, `font-bold`
 
 ---
 # FILE: src\components\admin\data-table\FacetedFilter.md
@@ -19677,13 +20038,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\data-table\FacetedFilter.tsx
-skeleton_hash: acaab1978f17b5cf
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\data-table\FacetedFilter.tsx
+skeleton_hash: 24dea7afb80cebeb
 entity_hashes:
   func:FacetedFilter: 49c4b53ab33910e8
   overview: d3bf186543b0d057
   style_tokens: 0c0078156433b2eb
-generated_at: 2026-08-25T07:24:54Z
+generated_at: 2026-08-27T08:09:46Z
 ---
 
 ## Genel Bakış
@@ -19784,8 +20145,8 @@ Fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzasından çıkarıla
 
 ## NODE ID STANDARD
 
-  file: FacetedFilter.tsx
-  function: FacetedFilter.tsx::FacetedFilter
+  file: src\components\admin\data-table\FacetedFilter.tsx
+  function: src\components\admin\data-table\FacetedFilter.tsx::FacetedFilter
 
 ---
 
@@ -19816,17 +20177,17 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\data-table\persist.ts
-skeleton_hash: 0fc250a18cc86f6b
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\data-table\persist.ts
+skeleton_hash: 7638dd7219e0847c
 entity_hashes:
-  func:colsKey: 6007ba5ac377f97c
-  func:densityKey: 2cbc74d8924bb606
-  func:loadColumnVisibility: 27a505efc9167601
-  func:loadDensity: 9d39f54622653f46
-  func:saveColumnVisibility: cc3ab7f7e3952cf6
-  func:saveDensity: c63bcc94a80cc55d
+  func:colsKey: be658c8a07bd5c9f
+  func:densityKey: baed2cf1288edf5d
+  func:loadColumnVisibility: 6de0d1f25c09c863
+  func:loadDensity: 763f774c77788895
+  func:saveColumnVisibility: 42203d8914dd0f82
+  func:saveDensity: c8bd7bf6174fa743
   overview: 4087fb32a2109943
-generated_at: 2026-06-19T20:47:00Z
+generated_at: 2026-08-27T08:10:40Z
 ---
 
 ## Genel Bakış
@@ -19859,11 +20220,14 @@ Bu modül, veri tablosu yapılandırmasını (yoğunluk ve sütun görünürlü�
 ## FONKSİYON DETAYLARI
 
 ### densityKey
-**Ne yapar**: Verilen bir anahtar için yerel depolamada satır yoğunluğu tercihini saklamak üzere oluşturulacak benzersiz depolama anahtarını üretir.
-**Nasıl yapar**: Sabit bir ön ek (`KEY_PREFIX`) ile verilen `persistKey` parametresonu birleştirir ve sonuna `:density` ekleyerek tam bir yerel depolama anahtarı döndürür. Bu, farklı bileşenlerin tercihlerini çakıştırmadan saklamasını sağlar.
+**Ne yapar**: Verilen `persistKey` değeri için localStorage'da kullanılacak tam depolama anahtarını (storage key) oluşturur. Oluşturulan anahtar, `KEY_PREFIX` sabiti ile başlar ve `:density` sonekiyle biter.
+
+**Nasıl yapar**: Template literal kullanarak `KEY_PREFIX` sabitini, `persistKey` parametresini ve `:density` sonekini birleştirip tek bir string döndürür.
+
 **Parametreler**:
-- persistKey: string — Bu bileşen (veya tablo) için benzersiz tanımlayıcı bir anahtar.
-**Dönüş**: string — Yerel depolamada kullanılabilecek tam formatta anahtar dizesi.
+- persistKey: string — Tablo bileşeninin benzersiz tanımlayıcısı; depolama anahtarının orta kısmını oluşturur.
+
+**Dönüş**: string — Oluşturulan tam depolama anahtarı (örneğin `KEY_PREFIX` değeri `"vh"` ise ve `persistKey` `"users"` ise sonuç `"vh:users:density"` olur).
 
 ### colsKey
 **Ne yapar**: Verilen bir anahtar için yerel depolamada sütun görünürlüğü tercihlerini saklamak üzere oluşturulacak benzersiz depolama anahtarını üretir.
@@ -19912,45 +20276,41 @@ Bu modül, veri tablosu yapılandırmasını (yoğunluk ve sütun görünürlü�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::densityKey
-- **params**: `persistKey: string` — localStorage anahtarının temel bileşeni, benzersiz alan adı
-- **ic_degiskenler**: (yok — sadece template literal döndürür)
-- **Dönüş**: `string` — `${KEY_PREFIX}${persistKey}:density` formatında localStorage anahtarı
+### [N1_NASIL] AST Pointer: persist.ts::densityKey
+- **params**: `persistKey` — bir dize; depolama anahtarının benzersiz parçası
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — `KEY_PREFIX` sabiti, `persistKey` ve `:density` parçalarından oluşan birleşik depolama anahtarı dizesi
 
-### [N2_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::colsKey
-- **params**: `persistKey: string` — localStorage anahtarının temel bileşeni, benzersiz alan adı
-- **ic_degiskenler**: (yok — sadece template literal döndürür)
-- **Dönüş**: `string` — `${KEY_PREFIX}${persistKey}:cols` formatında localStorage anahtarı
+### [N2_NASIL] AST Pointer: persist.ts::colsKey
+- **params**: `persistKey` — bir dize; depolama anahtarının benzersiz parçası
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — `KEY_PREFIX` sabiti, `persistKey` ve `:cols` parçalarından oluşan birleşik depolama anahtarı dizesi
 
-### [N3_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::loadDensity
-- **params**: `persistKey: string` — localStorage'dan hangi alanın yoğunluk tercihinin yükleneceğini belirler
+### [N3_NASIL] AST Pointer: persist.ts::loadDensity
+- **params**: `persistKey` — bir dize; hangi tablonun yoğunluk tercihini yükleyeceğini belirler
 - **ic_degiskenler**:
-  - `raw` — `window.localStorage.getItem(...)` çağrısından dönen ham string değer; `'compact'` veya `'comfortable'` olup olmadığı kontrol edilir
-- **Dönüş**: `Density` — geçerli bir değer yoksa `DEFAULT_DENSITY`, geçerliyse `raw` doğrudan döndürülür
+  - `raw` — `window.localStorage.getItem(densityKey(persistKey))` çağrısının sonucu; depodan okunan ham dize değeridir. `"compact"` veya `"comfortable"` ise doğrudan dönüş değeri olarak kullanılır
+- **Dönüş**: `Density` — depodan okunan geçerli yoğunluk değeri; `window` tanımsızsa, `raw` geçerli bir değer değilse veya depolama erişilemezse `DEFAULT_DENSITY` sabiti döner
 
-### [N4_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::saveDensity
-- **params**:
-  - `persistKey: string` — localStorage anahtarı üretiminde kullanılır
-  - `density: Density` — kaydedilecek yoğunluk değeri (`'compact'` veya `'comfortable'`)
-- **ic_degiskenler**: (yok — `densityKey(persistKey)` sonucu doğrudan `setItem`'e verilir)
-- **Dönüş**: `void` — yan etki: `window.localStorage.setItem` ile veri yazılır
+### [N4_NASIL] AST Pointer: persist.ts::saveDensity
+- **params**: `persistKey` — bir dize; hangi tablonun yoğunluk tercihini kaydedeceğini belirler, `density` — kaydedilecek `Density` türünde değer
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `window.localStorage.setItem(densityKey(persistKey), density)` çağrısıyla değeri depoya yazar. `window` tanımsızsa veya depolama erişilemezse hiçbir işlem yapmaz
 
-### [N5_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::loadColumnVisibility
-- **params**:
-  - `persistKey: string` — localStorage anahtarı üretiminde kullanılır
-  - `defaults: Record<string, boolean>` — sütun görünürlüğü için varsayılan değerler sözlüğü; hem fallback hem birleştirme başlangıç noktası
+### [N5_NASIL] AST Pointer: persist.ts::loadColumnVisibility
+- **params**: `persistKey` — bir dize; hangi tablonun sütun görünürlüğünü yükleyeceğini belirler, `defaults` — `Record<string, boolean>` türünde varsayılan sütun görünürlük eşlemesi
 - **ic_degiskenler**:
-  - `raw` — `window.localStorage.getItem(colsKey(persistKey))` çağrısından dönen ham JSON string; boşsa `{ ...defaults }` döndürülür
-  - `parsed` — `JSON.parse(raw)` sonucu `unknown` türünde; `null`, non-object veya `Array` ise `{ ...defaults }` döndürülür
-  - `merged` — `{ ...defaults }` ile oluşturulan kopya sözlük; sadece `boolean` türündeki değerler buraya kopyalanarak birleştirilir
-- **Dönüş**: `Record<string, boolean>` — birleştirilmiş sütun görünürlüğü sözlüğü; hata durumunda bile `{ ...defaults }` döner
+  - `raw` — `window.localStorage.getItem(colsKey(persistKey))` çağrısının sonucu; depodan okunan ham JSON dizesidir. Boşsa `{ ...defaults }` döner
+  - `parsed` — `JSON.parse(raw)` sonucu; `unknown` tipinde ayrıştırılmış değerdir. `null`, nesne olmayan veya dizi ise `{ ...defaults }` döner
+  - `merged` — `{ ...defaults }` ile oluşturulan `Record<string, boolean>` kopyası; `parsed` nesnesinden gelen geçerli boolean değerlerle güncellenir
+  - `key` — `Object.keys(defaults)` döngüsünde kullanılan dize; her varsayılan sütun adını temsil eder
+  - `value` — `(parsed as Record<string, unknown>)[key]` erişimiyle elde edilen değer; `typeof value === 'boolean"` koşulunu sağlıyorsa `merged[key]` atanır
+- **Dönüş**: `Record<string, boolean>` — depodaki geçerli boolean değerlerle birleştirilmiş sütun görünürlük eşlemesi. `window` tanımsızsa, `raw` boşsa, `parsed` geçerli bir nesne değilse veya depolama erişilemezse `{ ...defaults }` döner
 
-### [N6_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::saveColumnVisibility
-- **params**:
-  - `persistKey: string` — localStorage anahtarı üretiminde kullanılır
-  - `visibility: Record<string, boolean>` — kaydedilecek sütun görünürlüğü sözlüğü
-- **ic_degiskenler**: (yok — `colsKey(persistKey)` ve `JSON.stringify(visibility)` doğrudan `setItem`'e verilir)
-- **Dönüş**: `void` — yan etki: `window.localStorage.setItem` ile JSON string olarak yazılır
+### [N6_NASIL] AST Pointer: persist.ts::saveColumnVisibility
+- **params**: `persistKey` — bir dize; hangi tablonun sütun görünürlüğünü kaydedeceğini belirler, `visibility` — `Record<string, boolean>` türünde kaydedilecek sütun görünürlük eşlemesi
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `window.localStorage.setItem(colsKey(persistKey), JSON.stringify(visibility))` çağrısıyla eşlemenin JSON temsilini depoya yazar. `window` tanımsızsa veya depolama erişilemezse hiçbir işlem yapmaz
 
 ---
 
@@ -19965,9 +20325,9 @@ graph TD
     persist_ts__saveColumnVisibility["saveColumnVisibility"]
     persist_ts__saveDensity["saveDensity"]
     persist_ts__loadDensity --> persist_ts__densityKey
+    persist_ts__saveDensity --> persist_ts__densityKey
     persist_ts__loadColumnVisibility --> persist_ts__colsKey
     persist_ts__saveColumnVisibility --> persist_ts__colsKey
-    persist_ts__saveDensity --> persist_ts__densityKey
 ```
 
 ## NODE ID STANDARD
@@ -19997,11 +20357,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\data-table\types.ts
-skeleton_hash: d6719ae1220d4b24
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\data-table\types.ts
+skeleton_hash: 4313c5b65fc88f78
 entity_hashes:
   overview: ddbf04dea1d9de40
-generated_at: 2026-06-19T20:47:00Z
+generated_at: 2026-08-27T08:10:41Z
 ---
 
 ## Genel Bakış
@@ -20034,6 +20394,7 @@ Bu dosyada herhangi bir fonksiyon veya metot bulunmamaktadır. Dosya, modül sev
 Kolonların TEK kaynağı (SSOT). `header` = i18n-ÇÖZÜLMÜŞ string — kit içinde `t()` YOK, çağıran taraf `t('...')` ile çözüp geçirir (fallback-pattern YASAK, standart §6.5).
 - `key: string`
 - `header: string`
+- `headerHint?: string`
 - `sortable?: boolean`
 - `align?: AdminAlign`
 - `hideable?: boolean`
@@ -20094,8 +20455,8 @@ Bu dosya (`types.ts`) yalnızca TypeScript type/interface tanımları içerir; h
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\orders\OrderFormModal.tsx
-skeleton_hash: 272516b5c45ae867
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\orders\OrderFormModal.tsx
+skeleton_hash: 2a53e1adb861286e
 entity_hashes:
   func:FieldError: 73ce29b5cf8d764a
   func:OrderFormModal: dfc366e8224d3a5a
@@ -20107,7 +20468,7 @@ entity_hashes:
   func:onSubmit: 1b223598d4c15756
   overview: a2fe9d03e11078fe
   style_tokens: 24ef268b91606a4a
-generated_at: 2026-08-25T07:25:23Z
+generated_at: 2026-08-27T08:10:43Z
 ---
 
 ## Genel Bakış
@@ -20348,22 +20709,22 @@ graph TD
     OrderFormModal_tsx__handleOpenChange["handleOpenChange"]
     OrderFormModal_tsx__isStatusTransitionAllowed["isStatusTransitionAllowed"]
     OrderFormModal_tsx__onSubmit["onSubmit"]
-    OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__buildOrderFormSchema
     OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__handleClose
     OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__isStatusTransitionAllowed
+    OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__buildOrderFormSchema
 ```
 
 ## NODE ID STANDARD
 
-  file: OrderFormModal.tsx
-  function: OrderFormModal.tsx::buildOrderFormSchema
-  function: OrderFormModal.tsx::FieldError
-  function: OrderFormModal.tsx::focusFirstInvalid
-  function: OrderFormModal.tsx::isStatusTransitionAllowed
-  function: OrderFormModal.tsx::OrderFormModal
-  function: OrderFormModal.tsx::handleClose
-  function: OrderFormModal.tsx::handleOpenChange
-  function: OrderFormModal.tsx::onSubmit
+  file: src\components\admin\orders\OrderFormModal.tsx
+  function: src\components\admin\orders\OrderFormModal.tsx::buildOrderFormSchema
+  function: src\components\admin\orders\OrderFormModal.tsx::FieldError
+  function: src\components\admin\orders\OrderFormModal.tsx::focusFirstInvalid
+  function: src\components\admin\orders\OrderFormModal.tsx::isStatusTransitionAllowed
+  function: src\components\admin\orders\OrderFormModal.tsx::OrderFormModal
+  function: src\components\admin\orders\OrderFormModal.tsx::handleClose
+  function: src\components\admin\orders\OrderFormModal.tsx::handleOpenChange
+  function: src\components\admin\orders\OrderFormModal.tsx::onSubmit
 
 ---
 
@@ -20700,53 +21061,49 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\overlay\ConfirmProvider.tsx
-skeleton_hash: 37d2055df82cda60
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\overlay\ConfirmProvider.tsx
+skeleton_hash: 65a7b1bd45879018
 entity_hashes:
-  func:ConfirmProvider: 7ea9af04dd28f549
-  func:useConfirm: cfd17de4049eeec4
-  overview: 9c51abdb8f5e9a28
-  style_tokens: 867d6b490cb9cbcb
-generated_at: 2026-08-15T15:07:27Z
+  func:ConfirmProvider: b26c53bb39572748
+  func:useConfirm: a345aa0d41529fc3
+  func:useConfirmContext: 9a10fc33efe544e1
+  func:useConfirmWithReason: 2e6d50f0f7ba74d3
+  overview: 419a959dee8da6b1
+  style_tokens: ae3ccd97b6863bd8
+generated_at: 2026-08-27T08:11:43Z
 ---
 
 ## Genel Bakış
-Bu modül, React uygulaması genelinde tutarlı bir modal onay diyaloğu sunmak için tasarlanmış bir bağlam (context) sağlayıcısıdır. Temel olarak, asenkron "Evet/Hayır" kararlarını yöneten merkezi bir `useConfirm` hook'unu ve onu içeren `ConfirmProvider` bileşenini içerir. Mimari olarak, uygulama genelinde paylaşılan bir durum (onay isteği) ve arabirimi yöneten bir altyapı katmanı görevi görür.
+Bu modül, React uygulaması genelinde tutarlı bir modal onay diyaloğu sunmak için tasarlanmış bir bağlam (context) sağlayıcısı ve tüketici hook'larını içerir. Asenkron "Evet/Hayır" kararlarını yöneten merkezi bir altyapı katmanı görevi görür ve farklı onay senaryoları için pratik API'ler sunar.
 
 ## Fonksiyon Grupları
-### Onay Bağlamı Sağlayıcısı (Altyapı)
-Bu grup, onay diyaloğunun tüm çocuk bileşenler tarafından erişilebilir olmasını sağlayan React bağlamını (context) oluşturur ve yönetir. Sağlayıcı, asenkron onay isteklerinin durumunu (örn. beklemede, çözümlenmiş) ve çözücü (resolver) fonksiyonlarını barındırır.
+### Onay Bağlamı Sağlayıcısı
+Bu grup, onay diyaloğunun tüm çocuk bileşenler tarafından erişilebilir olmasını sağlayan React bağlamını oluşturur ve yönetir. Sağlayıcı, asenkron onay isteklerinin durumunu ve çözücü fonksiyonlarını barındırır.
 - `ConfirmProvider`
 
-### Onay Hook'u (Tüketici Arayüzü)
-Bu grup, alt bileşenlerin onay diyaloğunu tetiklemek için kullanacağı pratik bir API sunar. Hook, bir onay isteği başlatır, diyaloğun kullanıcı tarafından onaylanmasını veya reddedilmesini bekler ve sonucu bir Promise ile döndürerek bileşenlerin akışını kontrol etmesine olanak tanır.
-- `useConfirm`
+### Bağlam Tüketici Hook'ları
+Bu grup, alt bileşenlerin onay diyaloğunu tetiklemek için kullanacağı hook'ları sunar. Farklı dönüş tipleriyle (boolean veya detaylı sonuç) onay istekleri başlatır ve kullanıcı kararını bekleyerek sonucu bir Promise ile döndürür.
+- `useConfirmContext`, `useConfirm`, `useConfirmWithReason`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, React Context tabanlı bir onay dialog (confirm) sistemi sunar. Aşağıdaki mimari varsayımlar, yalnızca fonksiyon imzaları ve modül sabitlerinden türetilmiştir.
-
-[Aksiyom 1]: Eğer `useConfirm()` hook'u `ConfirmProvider` bileşeninin alt ağacında (child) çağrılmamışsa, `ConfirmContext` üzerinde `call` erişilemez ve çalışma zamanı hatası (örn: `Context is undefined`) oluşur.
-
-[Aksiyom 2]: Eğer `useConfirm()` tarafından döndürülen fonksiyona geçilen `ConfirmOptions` nesnesi `ConfirmContext (call)` tarafından beklenen zorunlu alanları içermiyorsa, confirm dialog'un davranışı tanımsızdır (bilinmiyor — `ConfirmOptions` tipinin içeriği bu imzalardan çıkarılamamaktadır).
-
-[Aksiyom 3]: Eğer `ConfirmProvider` bileşenine `children` prop'u geçirilmemiş veya `null/undefined` ise, alt ağaç hiçbir şey render etmez (React.Provider sarmalayıcısı çalışmaz, dolayısıyla hiçbir alt bileşen context'e erişemez).
-
-[Aksiyom 4]: Eğer `useConfirm()` return value'su (`Promise<boolean>`) await edilmeden veya `.then/.catch` ile işlenmeden çağrılırsa, confirm sonucu (kullanıcı onayladı/redetti) kaybolur ve asenkron akış devam eder.
-
-[Aksiyom 5]: Eğer birden fazla `ConfirmProvider` iç içe (nested) kullanılırsa, en yakın üstteki `ConfirmProvider`'ın sağladığı `ConfirmContext (call)` geçerli olur; dıştaki provider'lar ignored edilir.
-
----
-
-**Notlar:**
-- `ConfirmOptions` tipinin inner yapısı (hangi alanların zorunlu olduğu) fonksiyon imzasında tanımlı değildir; bu nedenle Aksiyom 2'de spesifik alan adları verilmemiştir.
-- `ConfirmContext` içindeki `call`'ın tam çalışma prensibi (dialog açma/kapama mekanizması) bu imzalardan çıkarılamamaktadır; yalnızca varlığının zorunluluğu belirtilmiştir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, fonksiyon gövdesine dayalı özel aksiyom tanımlanamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### useConfirmContext
+**Ne yapar**: Onay mekanizmasının React bağlamını (context) tüketen bir kanca fonksiyonudur. `<ConfirmProvider>` bileşeni tarafından sağlanan `confirm` fonksiyonuna erişim sağlar. Bu kanca, bağlam dışında çağrıldığında hata fırlatarak geliştiriciye açık bir uyarı verir.
+
+**Nasıl yapar**: `React.useContext` ile `ConfirmContext` bağlamını okur. Eğer bağlam değeri yoksa (yani fonksiyon `<ConfirmProvider>` ağacı dışında çağrıldıysa), açıklayıcı bir hata mesajıyla `throw` eder. Bağlam mevcutsa, doğrudan bağlam değerini döndürür. Hata mesajında `AdminLayout` içinde `<ConfirmProvider>` mount edilmesi gerektiği belirtilir.
+
+**Parametreler**:
+- Bu fonksiyon parametre almaz.
+
+**Dönüş**: `(options: ConfirmOptions) => Promise<ConfirmResult>` — Onay seçeneklerini kabul eden ve onay sonucunu çözümleyen bir fonksiyon döner. `ConfirmResult` yapısı `confirmed` (boolean) ve `reason` (string) alanlarını içerir.
 
 ### useConfirm
 **Ne yapar**: Onay isteyen imperatif bir kancadır. `ConfirmProvider` içinde tanımlanan onay dialogunu programatik olarak açmak ve kullanıcının kararını beklemek için kullanılır.
@@ -20756,6 +21113,9 @@ Bu modül, React Context tabanlı bir onay dialog (confirm) sistemi sunar. Aşa�
 **Parametreler**: Parametresizdir.
 
 **Dönüş**: `(options: ConfirmOptions) => Promise<boolean>` tipinde bir fonksiyon. Bu fonksiyon, verilen `ConfirmOptions` yapılandırmasıyla onay dialogunu açar ve kullanıcının onay (`true`) veya iptal (`false`) kararını temsil eden bir Promise resolve eder.
+
+### useConfirmWithReason
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### ConfirmProvider
 **Ne yapar**: Çocuk bileşenlere onay dialogu (`alertdialog`) yetenekini sağlayan bir React bileşenidir. `ConfirmContext` oluşturur ve dialogun tüm state'ini, açma/kapatma mantığını ve Promise çözümlemesini yönetir.
@@ -20786,6 +21146,12 @@ ONAY YÜZEYİ — `window.confirm` yerine. Cetvel: docs/standards/admin-design-s
 - `cancelLabel?: string`
 - `tone?: 'danger' | 'default'`
 - `requireTypedConfirmation?: string`
+- `reason?: {`
+
+### ConfirmResult
+`useConfirmWithReason`'ın dönüşü.
+- `confirmed: boolean`
+- `reason: string`
 
 ---
 
@@ -20793,49 +21159,83 @@ ONAY YÜZEYİ — `window.confirm` yerine. Cetvel: docs/standards/admin-design-s
 
 ### Resolver
 ```typescript
-type Resolver = (value: boolean) => void
+type Resolver = (value: ConfirmResult) => void
 ```
 
 ---
 
 ## SABİTLER
 - **ConfirmContext** (call) — `React.createContext<
-  ((options: ConfirmOptions) => Promise<boolean>) | null...`
+  ((options: ConfirmOptions) => Promise<ConfirmResult>)...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `ConfirmProvider.tsx::useConfirm`
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: ConfirmProvider.tsx::useConfirmContext
+- **params**: yok
 - **ic_degiskenler**:
-  - `ctx` — `React.useContext(ConfirmContext)` ile elde edilen context değeri; onay dialog'unu tetikleyen `confirm` fonksiyonunu barındırır
-- **Dönüş**: `(options: ConfirmOptions) => Promise<boolean>` — doğrudan `ctx`'nin kendisi döndürülür
+  - `ctx` — `React.useContext(ConfirmContext)` çağrısı ile elde edilen bağlam değeri; `<ConfirmProvider>` dışında çağrılırsa hata fırlatır, aksi halde `(options: ConfirmOptions) => Promise<ConfirmResult}` tipinde fonksiyon döndürür
+- **Dönüş**: `(options: ConfirmOptions) => Promise<ConfirmResult>` — ConfirmContext içindeki `confirm` fonksiyonu
+
+### [N2_NASIL] AST Pointer: ConfirmProvider.tsx::useConfirm
+- **params**: yok
+- **ic_degiskenler**:
+  - `ask` — `useConfirmContext()` çağrısından dönen onay fonksiyonu
+  - `React.useCallback` içindeki `options` parametresi — `ConfirmOptions` tipinde onay seçenekleri; `ask(options)` çağrısının sonucundan `confirmed` alanını çıkarır
+- **Dönüş**: `(options: ConfirmOptions) => Promise<boolean>` — sadece `confirmed` boolean değerini döndüren sarılı fonksiyon
+
+### [N3_NASIL] AST Pointer: ConfirmProvider.tsx::useConfirmWithReason
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `(options: ConfirmOptions) => Promise<ConfirmResult>` — `useConfirmContext()` doğrudan döndürülür; `confirmed` ve `reason` alanlarını içeren sonuç
+
+### [N4_NASIL] AST Pointer: ConfirmProvider.tsx::ConfirmProvider
+- **params**:
+  - `children` — `React.ReactNode` tipinde; sağlayıcı içine yerleştirilen alt bileşenler
+- **ic_degiskenler**:
+  - `t` — `useI18n()` çağrısından destructure edilen çeviri fonksiyonu
+  - `options` — `React.useState<ConfirmOptions | null>(null)` ile yönetilen durum; mevcut onay iletişim kutusunun yapılandırması, `null` ise iletişim kutusu kapalı
+  - `setOptions` — `options` durumunu güncelleyen setter fonksiyonu
+  - `typed` — `React.useState('')` ile yönetilen durum; kullanıcının "yazarak onayla" alanına girdiği metin
+  - `setTyped` — `typed` durumunu güncelleyen setter fonksiyonu
+  - `reason` — `React.useState('')` ile yönetilen durum; kullanıcının gerekçe alanına girdiği metin
+  - `setReason` — `reason` durumunu güncelleyen setter fonksiyonu
+  - `resolverRef` — `React.useRef<Resolver | null>(null)` ile oluşturulan ref; `confirm` fonksiyonunun oluşturduğu Promise'in `resolve` fonksiyonunu tutar
+  - `cancelRef` — `React.useRef<HTMLButtonElement>(null)` ile oluşturulan ref; iptal butonuna referans, `onOpenAutoFocus` içinde odaklanmak için kullanılır
+  - `reasonRef` — `React.useRef('')` ile oluşturulan ref; `settle` fonksiyonunun bayat closure sorununu önlemek için gerekçe metninin güncel değerini tutar
+  - `confirm` — `React.useCallback` ile sarılı fonksiyon; `next` parametresi alır (`ConfirmOptions`), `typed`/`reason`/`reasonRef` değerlerini sıfırlar, `options` durumunu `next` olarak ayarlar ve `Promise<ConfirmResult>` döndürür
+  - `settle` — `React.useCallback` ile sarılı fonksiyon; `confirmed` parametresi alır (`boolean`), `resolverRef.current`'ı çağırarak `{ confirmed, reason }` sonucunu iletir, ref'i temizler ve tüm durumları sıfırlar
+  - `handleOpenChange` — `React.useCallback` ile sarılı fonksiyon; `open` parametresi alır (`boolean`), `open` false ise `settle(false)` çağırarak sözü çözümler
+  - `isDanger` — `options?.tone === 'danger'` ifadesi; onay tonunun yıkıcı olup olmadığını belirten boolean
+  - `needsTyped` — `Boolean(options?.requireTypedConfirmation)` ifadesi; yazarak onay gerektirip gerektirmediğini belirten boolean
+  - `typedOk` — `!needsTyped || typed.trim() === options?.requireTypedConfirmation` ifadesi; yazarak onay koşulunun sağlanıp sağlanmadığını belirten boolean
+  - `reasonOk` — `!options?.reason?.required || reason.trim().length > 0` ifadesi; gerekçe zorunlu ise boş olup olmadığını kontrol eden boolean
+  - `canConfirm` — `typedOk && reasonOk` ifadesi; onay butonunun aktif olup olmadığını belirleyen boolean
+  - JSX içindeki `onOpenAutoFocus` handler'ı — `event` parametresi alır, `event.preventDefault()` çağırır ve `cancelRef.current?.focus()` ile odaklanmayı iptal butonuna yönlendirir
+  - JSX içindeki `onChange` handler'ı (reason textarea) — `event` parametresi alır, `setReason(event.target.value)` ve `reasonRef.current = event.target.value` ile hem state'i hem ref'i günceller
+- **Dönüş**: yok — `ConfirmContext.Provider` içinde `confirm` fonksiyonunu value olarak verir ve `Dialog.Root` ile onay iletişim kutusunu render eder
 
 ---
 
-### [N2_NASIL] AST Pointer: `ConfirmProvider.tsx::ConfirmProvider`
-- **params**: `{ children }` — `children: React.ReactNode`, provider'ın sarmaladığı alt React elemanları
-- **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan alınan çeviri fonksiyonu; `admin.confirm.defaultTitle`, `admin.confirm.cancel`, `admin.confirm.confirm`, `admin.confirm.typeToConfirm` gibi anahtarları çevirir
-  - `options` — `ConfirmOptions | null`, dialog konfigürasyonu (`title`, `description`, `tone`, `cancelLabel`, `confirmLabel`, `requireTypedConfirmation`); `null` iken dialog kapalıdır
-  - `typed` — `string`, kullanıcının "onay için yaz" alanına girdiği metin; `requireTypedConfirmation` eşleşmesi kontrol edilir
-  - `resolverRef` — `React.useRef<Resolver | null>`, açılan dialog'un ardındaki `Promise<boolean>`'in `resolve` fonksiyonunu tutar; `settle` çağrısında çözülür
-  - `cancelRef` — `React.useRef<HTMLButtonElement>`, iptal butonuna DOM referansı; `onOpenAutoFocus`'ta en az yıkıcı eyleme odaklanmak için kullanılır
-  - `confirm` — `React.useCallback`, `(next: ConfirmOptions) => Promise<boolean>`; `typed`'ı sıfırlar, `options`'ı set eder, yeni bir `Promise` oluşturur ve `resolverRef`'e `resolve` atar
-  - `settle` — `React.useCallback`, `(result: boolean) => void`; `resolverRef`'i çağırarak Promise'i çözünür, `resolverRef`'i `null`'a, `options`'ı `null`'a, `typed`'ı boş string'e sıfırlar
-  - `handleOpenChange` — `React.useCallback`, `(open: boolean) => void`; Radix `Dialog.Root`'un `onOpenChange` callback'i; dialog kapanırken (`open === false`) `settle(false)` çağırarak Promise'i çözünür
-  - `isDanger` — `boolean`, `options?.tone === 'danger'` kontrolü;true ise onay butonu `adminTableActionDangerClass`,false ise `adminTableActionPrimaryClass` sınıfını alır
-  - `needsTyped` — `boolean`, `Boolean(options?.requireTypedConfirmation)`; true ise metin girişi alanı gösterilir
-  - `typedOk` — `boolean`, `!needsTyped || typed.trim() === options?.requireTypedConfirmation`; onay butonunun `disabled` durumunu belirler
-- **Dönüş**: JSX — `<ConfirmContext.Provider>` içine çocukların ve `Dialog.Root` tabanlı onay modalının render edildiği React node; doğrudan `void` (yan etki: DOM'a dialog ekler)
 
----
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    ConfirmProvider_tsx__ConfirmProvider["ConfirmProvider"]
+    ConfirmProvider_tsx__useConfirm["useConfirm"]
+    ConfirmProvider_tsx__useConfirmContext["useConfirmContext"]
+    ConfirmProvider_tsx__useConfirmWithReason["useConfirmWithReason"]
+    ConfirmProvider_tsx__useConfirm --> ConfirmProvider_tsx__useConfirmContext
+    ConfirmProvider_tsx__useConfirmWithReason --> ConfirmProvider_tsx__useConfirmContext
+```
 
 ## NODE ID STANDARD
 
   file: src\components\admin\overlay\ConfirmProvider.tsx
+  function: src\components\admin\overlay\ConfirmProvider.tsx::useConfirmContext
   function: src\components\admin\overlay\ConfirmProvider.tsx::useConfirm
+  function: src\components\admin\overlay\ConfirmProvider.tsx::useConfirmWithReason
   function: src\components\admin\overlay\ConfirmProvider.tsx::ConfirmProvider
 
 ---
@@ -20843,7 +21243,10 @@ type Resolver = (value: boolean) => void
 ## DISA AKTARILANLAR (EXPORTS)
   export: ConfirmOptions
   export: ConfirmProvider
+  export: ConfirmResult
   export: useConfirm
+  export: useConfirmContext
+  export: useConfirmWithReason
 
 ---
 
@@ -20856,10 +21259,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-white/5`, `border-white/15`, `text-base`, `text-sm`, `text-white`, `text-white/60`, `text-white/70`, `text-xs`
+- **Renkler:** `bg-admin-surface-2`, `bg-black/60`, `border-admin-border`, `placeholder:text-admin-fg-subtle`, `text-admin-fg`, `text-admin-fg-muted`, `text-base`, `text-sm`, `text-xs`
 - **Layout:** `block`, `fixed`, `flex`, `flex-wrap`, `gap-2`, `h-12`, `items-center`, `justify-end`, `max-w-90vw`, `p-6`, `sm:max-w-modal`, `w-full`, `z-backdrop`
-- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `${adminModalContentClass`, `${isDanger`, `:`, `adminTableActionDangerClass`, `adminTableActionPrimaryClass`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/60`, `font-semibold`, `inset-0`, `leading-relaxed`, `pt-2`
+- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `placeholder:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${adminModalContentClass`, `${isDanger`, `:`, `adminTableActionDangerClass`, `adminTableActionPrimaryClass`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-semibold`, `inset-0`, `leading-relaxed`, `pt-2`
 
 ---
 # FILE: src\components\admin\pricing\CostRefreshModal.md
@@ -20868,13 +21271,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\CostRefreshModal.tsx
-skeleton_hash: d5581159a8130481
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\CostRefreshModal.tsx
+skeleton_hash: 1b6f743e96cacb15
 entity_hashes:
   func:CostRefreshModal: 6d78cfeb2c873bb6
   overview: 21a4586912b6831f
-  style_tokens: bd81234d13a2dffa
-generated_at: 2026-08-15T03:54:29Z
+  style_tokens: 4e601042ef8a3eb1
+generated_at: 2026-08-27T08:11:44Z
 ---
 
 ## Genel Bakış
@@ -21002,10 +21405,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-surface-deep`, `bg-white/2`, `border-b`, `border-t`, `border-white/10`, `border-white/5`, `hover:bg-white/10`, `hover:bg-white/5`, `hover:text-white`, `last:border-0`, `text-amber-400`, `text-cyan-400`, `text-lg`, `text-rose-400`
-- **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-10`, `h-9`, `inline-flex`, `items-center`, `justify-between`
+- **Renkler:** `bg-admin-bg`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-black/60`, `border-admin-border`, `border-b`, `border-t`, `hover:bg-admin-surface-2`, `hover:bg-admin-surface-3`, `hover:text-admin-fg`, `last:border-0`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-10`, `h-9`, `inline-flex`, `items-center`, `justify-between`, `justify-end`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `last:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminModalScrollAreaClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/40`, `font-black`, `font-bold`, `glass`, `inset-0`, `last:pb-0`
+- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminModalScrollAreaClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-bold`, `font-semibold`, `inset-0`, `last:pb-0`, `ml-2`
 
 ---
 # FILE: src\components\admin\pricing\CurrencyRatesCard.md
@@ -21014,51 +21417,49 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\CurrencyRatesCard.tsx
-skeleton_hash: 107517f4b7de4f95
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\CurrencyRatesCard.tsx
+skeleton_hash: 97d8a62ca57cd53e
 entity_hashes:
   func:CurrencyRatesCard: 71450bfaf86f2322
   func:daysSince: ae26b102945d5c03
-  func:isStale: 3712649fb7c6a605
+  func:isStale: 473f47b79964c918
   func:sourceBadgeClass: b256e5aabc3c94d1
-  overview: 14d4d291a74f0626
-  style_tokens: edf5afc7687aad87
-generated_at: 2026-08-14T09:12:42Z
+  overview: c0d4871abf33187b
+  style_tokens: ad378b7f6d5e50fb
+generated_at: 2026-08-27T08:12:44Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC fiyatlandırma sisteminde döviz kurlarının yönetimini ve görselleştirilmesini sağlayan bir React bileşenidir. Temel olarak para birimi kurlarının güncel durumunu, kaynağını ve zamanla eskimesini kontrol ederek kullanıcıya bilgilendirici bir kart sunar.
+Bu modül, HVAC fiyatlandırma sisteminde döviz kurlarının yönetimini ve görselleştirilmesini sağlayan bir React bileşenidir. Para birimi kurlarının güncel durumunu, kaynağını ve zamanla eskimesini kontrol ederek kullanıcıya bilgilendirici bir kart sunar.
 
 ## Fonksiyon Grupları
 ### Döviz Kuru Durum ve Kaynak Kontrolü
-Bu grup, kurların ne kadar güncel olduğunu ve kaynağını belirleyen yardımcı fonksiyonları içerir. Fonksiyonlar, tarih bazlı hesaplamalar ve dinamik CSS sınıflandırması yaparak bileşenin durumunu belirler.
+Kurların ne kadar güncel olduğunu ve kaynağını belirleyen yardımcı fonksiyonları içerir. Tarih bazlı hesaplamalar ve dinamik CSS sınıflandırması yaparak bileşenin durumunu belirler.
 - isStale, daysSince, sourceBadgeClass
 
 ### Ana Bileşen
-Ana kart bileşenini oluşturup ilgili durum kontrollerini entegre eden fonksiyondur. Döviz kuru verilerini alıp gösterir ve kullanıcının güncel bilgileri okumasını sağlar.
+Ana kart bileşenini oluşturup ilgili durum kontrollerini entegre eder. Döviz kuru verilerini alıp gösterir ve kullanıcının güncel bilgileri okumasını sağlar.
 - CurrencyRatesCard
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için özel aksiyom tanımlanmamıştır. Fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan mimari varsayım çıkarımı yapılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### isStale
+**Ne yapar**: Verilen bir tarihin (effectiveDate) güncel olup olmadığını kontrol eder. Eğer tarih belirli bir süreden daha eskiyse "stale" (bayat/geçersiz) olarak kabul edilir ve `true` döndürür; aksi halde `false` döndürür. Döviz kuru verilerinin ne kadar güncel olduğunu takip etmek için kullanılır.
 
-**Ne yapar**: Verilen bir geçerlilik tarihine (effective date) bakarak para birimi kurunun "eski" (stale) sayılıp sayılmayacağını belirler. Kursun güncelliğini kontrol eden bir bayrak değer döndürür.
-
-**Nasıl yapar**: Fonksiyon, parametre olarak aldığı `effectiveDate` string değerini alır ve iç mantığı kod gövdesinde görünmese de kullanım bağlamından anlaşıldığı üzere, bu tarih ile güncel tarih arasındaki farkı hesaplayarak belirli bir eşik değer (muhtemelen belli bir gün sayısı) üzerinde olup olmadığını kontrol eder. Döndürdüğü boolean değeri, bileşen içinde kurs satırının yanında bir uyarı ikonu (AlertTriangle) gösterilip gösterilmeyeceğini belirler.
+**Nasıl yapar**: Fonksiyonun iç mantığı verilen kaynak kodda gösterilmemiştir. Sadece imzası ve dönüş tipi bilinmektedir. Muhtemelen verilen tarih ile bugün arasındaki farkı hesaplayarak belirli bir eşik değerini aşıp aşmadığını kontrol eder.
 
 **Parametreler**:
-- `effectiveDate`: `string` — Kontrol edilecek kurun geçerlilik tarihini temsil eden ISO formatında tarih dizesi. Kodda `row.effective_date` alanından gelir.
+- effectiveDate: string — Kontrol edilecek tarihi temsil eden string değer. "YYYY-MM-DD" formatında bir tarih olması beklenir.
 
-**Dönüş**: `boolean` — `true` ise kur eski/güncellenmemiş sayılır ve bileşende amber renkli bir uyarı ikonu görüntülenir; `false` ise kur günceldir.
+**Dönüş**: boolean — Tarih eski/stale ise `true`, güncel ise `false` döndürür.
 
 ### daysSince
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -21072,7 +21473,6 @@ Ana kart bileşenini oluşturup ilgili durum kontrollerini entegre eden fonksiyo
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../../utils/adminUi::adminBlurBlobClass
 - import: ../../../utils/adminUi::adminCardClass
 - import: ../AdminSkeleton::AdminSkeleton
 - import: @/i18n/I18nProvider::useI18n
@@ -21103,46 +21503,66 @@ Ana kart bileşenini oluşturup ilgili durum kontrollerini entegre eden fonksiyo
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `C:\Users\alize\venthub-hvac\src\components\admin\pricing\CurrencyRatesCard.tsx`::isStale
-- **params**: `(effectiveDate: string)` — kontrol edilecek tarih stringi
+### [N1_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::isStale
+- **params**: `effectiveDate: string`
 - **ic_degiskenler**:
-  - `eff` — effectiveDate stringinden oluşturulan Date nesnesi
-  - `now` — şu anki tarih/saat (Date nesnesi)
-  - `diffMs` — now ile eff arasındaki milisaniye farkı
-  - `diffDays` — milisaniye farkının gün cinsinden karşılığı (aşağı yuvarlanmış)
-- **Dönüş**: `boolean` — tarih STALE_THRESHOLD_DAYS kadar eskiyse `true`
+  - `eff` — `effectiveDate` parametresinden `new Date()` ile oluşturulan Date nesnesi
+  - `now` — mevcut zamanı temsil eden `new Date()` nesnesi
+  - `diffMs` — `now.getTime()` ile `eff.getTime()` arasındaki milisaniye farkı
+  - `diffDays` — `diffMs` değerinin gün cinsinden karşılığı; `Math.floor(diffMs / (1000 * 60 * 60 * 24))` ile hesaplanır
+- **Dönüş**: `boolean` — `eff` geçerli bir tarih değilse `false`; aksi halde `diffDays >= STALE_THRESHOLD_DAYS` koşulunun sonucu
 
-### [N2_NASIL] AST Pointer: `C:\Users\alize\venthub-hvac\src\components\admin\pricing\CurrencyRatesCard.tsx`::daysSince
-- **params**: `(effectiveDate: string)` — hesaplama yapılacak tarih stringi
+### [N2_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::daysSince
+- **params**: `effectiveDate: string`
 - **ic_degiskenler**:
-  - `eff` — effectiveDate stringinden oluşturulan Date nesnesi
-  - `now` — şu anki tarih/saat (Date nesnesi)
-- **Dönüş**: `number` — effectiveDate'ten bu yana geçen gün sayısı (negatifse 0 döner)
+  - `eff` — `effectiveDate` parametresinden `new Date()` ile oluşturulan Date nesnesi
+  - `now` — mevcut zamanı temsil eden `new Date()` nesnesi
+- **Dönüş**: `number` — `eff` geçerli bir tarih değilse `0`; aksi halde `Math.max(0, Math.floor((now.getTime() - eff.getTime()) / (1000 * 60 * 60 * 24)))` sonucu (negatif olamaz)
 
-### [N3_NASIL] AST Pointer: `C:\Users\alize\venthub-hvac\src\components\admin\pricing\CurrencyRatesCard.tsx`::sourceBadgeClass
-- **params**: `(source: string)` — kur kaynağı (ör. `'tcmb'` veya manuel)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `string` — source `'tcmb'` ise cyan tonları, değilse amber tonları Tailwind CSS class stringi
+### [N3_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::sourceBadgeClass
+- **params**: `source: string`
+- **ic_degiskenler**: yok (tek ifadeli arrow function)
+- **Dönüş**: `string` — `source === 'tcmb'` ise `'bg-admin-accent-weak border-admin-accent/30 text-admin-accent'`; aksi halde `'bg-admin-warning-weak border-admin-warning/30 text-admin-warning'`
 
-### [N4_NASIL] AST Pointer: `C:\Users\alize\venthub-hvac\src\components\admin\pricing\CurrencyRatesCard.tsx`::CurrencyRatesCard
-- **params**: (yok) — React fonksiyonel bileşeni, props almaz
+### [N4_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::CurrencyRatesCard
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu
-  - `lang` — `useI18n()` hook'undan gelen geçerli dil kodu
-  - `loading` — `useState(true)` ile tanımlı, veri yüklenme durumu (boolean)
-  - `setLoading` — loading durumunu güncelleyen setter fonksiyonu
-  - `error` — `useState<string | null>(null)` ile tanımlı, hata mesajı veya null
-  - `setError` — error durumunu güncelleyen setter fonksiyonu
-  - `rates` — `useState<CurrencyRateRow[]>([])` ile tanımlı, para birimi kurları dizisi
-  - `setRates` — rates durumunu güncelleyen setter fonksiyonu
-  - `fetchRates` — `useCallback` ile sarılmış asenkron fonksiyon; Supabase'den `currency_rates` tablosunu sorgular, `quote_ccy` bazında en güncel satırları `latestByCcy` Map'ine dedüpe edip `rates` state'ine yazar
-  - `data` — Supabase `.select(...).order(...).limit(30)` sorgusundan dönen satır dizisi
-  - `fetchError` — Supabase sorgusundan dönen hata nesnesi
-  - `latestByCcy` — `Map<string, CurrencyRateRow>` — her para birimi için en güncel kuru tutan harita
-  - `row` — `for...of` döngüsünde `data` dizisi üzerindeki iterasyon değişkeni (Map'e ekleme yapılan)
-  - `row` — `rates.map()` callback parametresi; tablodaki her satırı render eder
-  - `stale` — `isStale(row.effective_date)` çağrısından dönen boolean; kurun eski olup olmadığını belirler
-- **Dönüş**: JSX (`<div>` — tablo, spread bilgisi ve devre dışı buton içeren admin kart bileşeni)
+  - `t` — `useI18n()` kancasından gelen çeviri fonksiyonu; `t('admin.pricing.settings.currencyRates.title')` gibi anahtarlarla metin üretmek için kullanılır
+  - `lang` — `useI18n()` kancasından gelen dil kodu; `formatNumber` ve `formatDate` fonksiyonlarına iletilir
+  - `loading` — `useState(true)` ile oluşturulan boolean state; veri yüklenme durumunu gösterir
+  - `setLoading` — `loading` state'ini güncelleyen setter fonksiyonu
+  - `error` — `useState<string | null>(null)` ile oluşturulan state; hata mesajını tutar, yoksa `null`
+  - `setError` — `error` state'ini güncelleyen setter fonksiyonu
+  - `rates` — `useState<CurrencyRateRow[]>([])` ile oluşturulan state; her para birimi için en güncel kur satırlarını tutar
+  - `setRates` — `rates` state'ini güncelleyen setter fonksiyonu
+  - `fetchRates` — `useCallback` ile sarılmış async fonksiyon; `supabase` üzerinden `currency_rates` tablosundan veri çeker, her `quote_ccy` için en güncel satırı `latestByCcy` Map'inde biriktirir ve `setRates` ile state'e yazar
+- **Dönüş**: `JSX.Element` — Dış sarmalayıcı `div` (adminCardClass ile); içinde başlık, koşullu içerik (loading skeleton / hata uyarısı / boş mesaj / kur tablosu), spread bilgisi ve devre dışı "manuel kur ekle" butonu bulunur
+
+### [N5_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::fetchRates (useCallback)
+- **params**: yok
+- **ic_degiskenler**:
+  - `data` — `supabase.from('currency_rates').select(...)` sorgusundan dönen satır dizisi; `quote_ccy, rate, source, effective_date, fetched_at, spread_pct` alanlarını içerir
+  - `fetchError` — supabase sorgusundan dönen hata nesnesi; varsa `throw` ile yakalanır
+  - `latestByCcy` — `new Map<string, CurrencyRateRow>()` ile oluşturulan Map; her `quote_ccy` için yalnızca ilk (en güncel) satırı saklar
+  - `row` — `data` dizisi üzerindeki `for...of` döngüsündeki mevcut satır; `row.quote_ccy` anahtar olarak kullanılır
+  - `err` — `catch` bloğunda yakalanan hata; `instanceof Error` kontrolüyle `err.message` veya `String(err)` olarak `setError`'a yazılır
+- **Dönüş**: yok (void) — yan etki olarak `setLoading`, `setError`, `setRates` state setter'larını çağırır
+
+### [N6_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::useEffect callback
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — bileşen mount edildiğinde ve `fetchRates` değiştiğinde `fetchRates()` çağrısını tetikler
+
+### [N7_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::rates.map (tablo satırları)
+- **params**: `row` — `CurrencyRateRow` tipinde; `quote_ccy`, `rate`, `source`, `effective_date` alanlarına erişilir
+- **ic_degiskenler**:
+  - `stale` — `isStale(row.effective_date)` çağrısının sonucu; kurun güncel olup olmadığını belirten boolean
+- **Dönüş**: `JSX.Element` — `<tr>` satırı; para birimi adı, `formatNumber` ile biçimlendirilmiş kur, `sourceBadgeClass` ile CSS sınıfı atanmış kaynak etiketi, `formatDate` ile biçimlendirilmiş tarih ve `stale` ise `daysSince` ile hesaplanmış gün sayısıyla uyarı ikonu içerir
+
+### [N8_NASIL] AST Pointer: src/components/admin/pricing/CurrencyRatesCard.tsx::rates.map (spread gösterimi)
+- **params**: `row` — `CurrencyRateRow` tipinde; `quote_ccy` ve `spread_pct` alanlarına erişilir
+- **ic_degiskenler**: yok
+- **Dönüş**: `JSX.Element` — `<span>` etiketi; `row.quote_ccy` ve `formatNumber(row.spread_pct, lang, ...)` ile yüzde biçiminde spread değerini gösterir
 
 ---
 
@@ -21154,9 +21574,9 @@ graph TD
     CurrencyRatesCard_tsx__daysSince["daysSince"]
     CurrencyRatesCard_tsx__isStale["isStale"]
     CurrencyRatesCard_tsx__sourceBadgeClass["sourceBadgeClass"]
+    CurrencyRatesCard_tsx__CurrencyRatesCard --> CurrencyRatesCard_tsx__sourceBadgeClass
     CurrencyRatesCard_tsx__CurrencyRatesCard --> CurrencyRatesCard_tsx__daysSince
     CurrencyRatesCard_tsx__CurrencyRatesCard --> CurrencyRatesCard_tsx__isStale
-    CurrencyRatesCard_tsx__CurrencyRatesCard --> CurrencyRatesCard_tsx__sourceBadgeClass
 ```
 
 ## NODE ID STANDARD
@@ -21186,10 +21606,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-400/10`, `bg-cyan-500/5`, `bg-rose-500/10`, `bg-white/3`, `border-amber-400/20`, `border-b`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `group-hover:bg-cyan-500/10`, `text-amber-400`, `text-center`, `text-cyan-400`, `text-left`
+- **Renkler:** `bg-admin-danger-weak`, `bg-admin-surface-2`, `bg-admin-warning-weak`, `border-admin-border`, `border-admin-danger/30`, `border-admin-warning/30`, `border-b`, `border-t`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-warning`, `text-center`, `text-left`
 - **Layout:** `flex`, `flex-wrap`, `gap-1`, `gap-2`, `gap-3`, `inline-flex`, `items-center`, `justify-between`, `justify-center`, `lg:p-10`, `overflow-hidden`, `overflow-x-auto`, `p-4`, `p-8`, `relative`
-- **Varyant/Responsive:** `group-hover:`, `lg:` önekleri
-- **Yardımcı Sınıflar:** `${adminBlurBlobClass`, `${adminCardClass`, `${sourceBadgeClass(row.source`, `border`, `cursor-not-allowed`, `divide-white/5`, `divide-y`, `font-black`, `font-bold`, `font-mono`, `group`, `mt-1`, `opacity-50`, `pb-4`, `pr-4`
+- **Varyant/Responsive:** `lg:` önekleri
+- **Yardımcı Sınıflar:** `${adminCardClass`, `${sourceBadgeClass(row.source`, `border`, `cursor-not-allowed`, `divide-admin-border`, `divide-y`, `font-bold`, `font-mono`, `font-semibold`, `group`, `mt-1`, `opacity-50`, `pb-4`, `pr-4`, `pt-6`
 
 ---
 # FILE: src\components\admin\pricing\MaterializePricesModal.md
@@ -21198,22 +21618,22 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\MaterializePricesModal.tsx
-skeleton_hash: 94367fbb069166ae
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\MaterializePricesModal.tsx
+skeleton_hash: 4d94a8781a959b7b
 entity_hashes:
   func:MaterializePricesModal: a9f17a6079aab68c
-  func:segmentLabel: 4ca4ae3bc0bc7b4f
-  overview: 1c693ac72f8cfeb1
-  style_tokens: 2b5b8b8bb44e326b
-generated_at: 2026-08-15T03:54:29Z
+  func:segmentLabel: 86ac48424a89d196
+  overview: 6b9b41040cb03897
+  style_tokens: cead584dfbc0b2e2
+generated_at: 2026-08-27T08:13:51Z
 ---
 
 ## Genel Bakış
-Bu modül, bir fiyatlandırma yönetim arayüzünde fiyatları "nesneleştirmek" (materialize) için kullanılan bir modal (dialog) bileşenidir. Kullanıcı türüne göre segment etiketlerini dinamik olarak oluşturarak modal içindeki içeriği özelleştirir, modalın açılıp kapanmasını ve başarı durumunda üst bileşene geri bildirim gönderilmesini yönetir.
+Bu modül, fiyatlandırma yönetim arayüzünde fiyatları "nesneleştirmek" (materialize) amacıyla kullanılan bir modal bileşeni içerir. Kullanıcı türüne göre segment etiketlerini dinamik olarak oluşturarak modal içeriğini özelleştirir. Modalın açılıp kapanması ile başarı durumunda üst bileşene geri bildirim gönderilmesini yönetir.
 
 ## Fonksiyon Grupları
 ### Yardımcı Fonksiyonlar
-Kullanıcı türüne ve çeviri fonksiyonuna bağlı olarak arayüzde gösterilecek segment etiketlerini dinamik olarak üretir.
+Kullanıcı tipine ve çeviri fonksiyonuna bağlı olarak arayüzde gösterilecek segment etiketlerini dinamik olarak üretir. Bilinen bir segment için çevrilmiş metni, aksi halde orijinal kullanıcı tipi değerini döndürür.
 - segmentLabel
 
 ### Bileşenler
@@ -21223,24 +21643,35 @@ Ana modal bileşenini ve içindeki temel mantığı tanımlar. Modalın açma/ka
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan ve sabit tanımlarından çıkarım yapılabilir.
+
+[Aksiyom 1]: Eğer `userType` parametresi verilmezse, `segmentLabel` fonksiyonu uygun bir segment etiketi üretemez.
+
+[Aksiyom 2]: Eğer `t` çeviri fonksiyonu verilmezse, `segmentLabel` uluslararasılaştırma anahtarlarını çözümleyemez ve etiket metni gösterilemez.
+
+[Aksiyom 3]: Eğer `SEGMENT_I18N_KEYS` sabiti tanımlı değilse, `segmentLabel` fonksiyonu kullanıcı türüne karşılık gelen i18n anahtarını bulamaz.
+
+[Aksiyom 4]: Eğer `open` prop'u sağlanmazsa, `MaterializePricesModal` bileşeninin görünürlük durumu belirlenemez.
+
+[Aksiyom 5]: Eğer `onClose` prop'u sağlanmazsa, modal kapatma işlemi gerçekleştirilemez.
+
+[Aksiyom 6]: Eğer `onSuccess` prop'u sağlanmazsa, fiyat nesneleştirme işlemi başarılı olduğunda üst bileşene geri bildirim gönderilemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### segmentLabel
-**Ne yapar**: Kullanıcı tipine karşılık gelen segment etiketini uluslararasılaştırma (i18n) anahtarı üzerinden çevirerek döndüren yardımcı fonksiyondur. Kullanıcı tipi bilinen bir segment ise çevrilmiş metni, aksi halde orijinal userType değerini olduğu gibi döndürür.
+**Ne yapar**: Kullanıcı tipine (userType) karşılık gelen yerelleştirilmiş (i18n) segment etiketini döndürür. Eğer verilen kullanıcı tipi için önceden tanımlanmış bir çeviri anahtarı mevcutsa, o anahtarın çevirisini üretir; aksi takdirde ham kullanıcı tipi değerini olduğu gibi geri verir.
 
-**Nasıl yapar**: Fonksiyon, tanımlı bir `SEGMENT_I18N_KEYS` haritasını kullanarak verilen `userType` değerinin i18n anahtar eşlemesini bulur. Bulunan anahtar `t()` fonksiyonuna `admin.pricing.common.segment.{key}` formatında bir çeviri yolu olarak geçirilir. Eğer userType haritada eşleşmiyorsa, çeviri yapılmadan ham userType değeri doğrudan döndürülür.
+**Nasıl yapar**: Fonksiyon, önceden tanımlı `SEGMENT_I18N_KEYS` adlı bir eşleme nesnesinde (map/dictionary) verilen `userType` parametresini arar. Bu eşleme, kullanıcı tiplerini uluslararasılaştırma (i18n) anahtarlarına dönüştürür. Bulunan anahtar varsa, `t` fonksiyonu aracılığıyla `admin.pricing.common.segment.${key}` yolundaki çeviri metni çekilir ve döndürür. Eğer eşlemede karşılık gelen bir anahtar bulunamazsa (truthy değilse), `userType` değeri doğrudan, herhangi bir çeviri işlemi uygulanmadan döndürülür. Bu sayede bilinmeyen veya tanımsız kullanıcı tipleri için bile anlamlı bir çıktı elde edilir.
 
 **Parametreler**:
-- `userType`: `string` — Segment/kullanıcı tipini belirten string değeri. Bu değer, `SEGMENT_I18N_KEYS` haritasında bir karşılık bulabilir veya bulunmayabilir.
-- `t`: `(key: string) => string` —Uluslararasılaştırma fonksiyonu. Verilen i18n anahtarı için çevrilmiş metni döndüren bir callback'tir. Genellikle useTranslation veya benzeri bir hook'tan elde edilir.
+- `userType`: `string` — Segment etiketi istenen kullanıcının tipini belirten dize değeridir (örneğin "bireysel", "kurumsal" gibi). Bu değer `SEGMENT_I18N_KEYS` eşleme nesnesinde aranır.
+- `t`: `(key: string) => string` — Uluslararasılaştırma (i18n) sisteminin çeviri fonksiyonudur. Verilen anahtar dizesine karşılık gelen yerelleştirilmiş metni döndürmesi beklenir.
 
-**Dönüş**: `string` — Çevrilmiş segment etiket metni veya bilinmeyen bir userType durumunda ham userType değeri.
+**Dönüş**: `string` — Kullanıcı tipine karşılık gelen yerelleştirilmiş segment etiketi dizesi ya da eşleme bulunamadığında ham `userType` değerinin kendisi.
 
 ### MaterializePricesModal
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -21285,18 +21716,92 @@ Ana modal bileşenini ve içindeki temel mantığı tanımlar. Modalın açma/ka
 - **SEGMENT_I18N_KEYS** (object) — `{
   individual: 'individual',
   dealer: 'dealer',
-  corporate: 'corporate',
- ...`
+  corporate: 'corporate'...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: MaterializePricesModal.tsx::segmentLabel
-- **params**: `(userType: string, t: (key: string) => string)`
+### [N1_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::segmentLabel
+- **params**: `userType` — segment kullanıcı tipi anahtarı, `t` — i18n çeviri fonksiyonu
 - **ic_degiskenler**:
-  - `key` — `SEGMENT_I18N_KEYS[userType]` dictionary erişimiyle elde edilen i18n anahtarı; userType'a karşılık gelen çeviri anahtarını tutar
-- **Dönüş**: `string` — i18n key mevcutsa `t('admin.pricing.common.segment.${key}')` çağrısının sonucu, değilse ham `userType` değeri
+  - `key` — `SEGMENT_I18N_KEYS[userType]` ile elde edilen i18n anahtarı; bulunamazsa `userType` doğrudan döner
+- **Dönüş**: `string` — çevrilmiş segment etiketi veya ham `userType`
+
+### [N2_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::MaterializePricesModal
+- **params**: `open` — modal açık/kapalı durumu, `onClose` — kapatma callback'i, `onSuccess` — başarılı uygulama sonrası callback'i
+- **ic_degiskenler**:
+  - `alive` — bileşen mount durumunu takip eden boolean; cleanup'ta `false` yapılır, async işlemlerden önce kontrol edilir
+  - `previewLoading` — önizleme yükleniyor durumu; `setPreviewLoading(true/false)` ile yönetilir
+  - `loadFailed` — yükleme hatası durumu; `setLoadFailed(true/false)` ile yönetilir
+  - `preview` — `materializePrices` dry-run sonucu; `setPreview(summary)` ile atanır, hata durumunda `null` yapılır
+  - `staleCosts` — `refreshCostInBase` dry-run sonucundaki güncellenen maliyet sayısı; `costCheck.updated` değeri veya `null`/`0`
+  - `applying` — uygulama işlemi devam durumu; `setApplying(true/false)` ile yönetilir
+  - `cancelPreviewRef` — `useRef` ile tutulan iptal fonksiyonu referansı; `loadPreview()` dönüş cleanup fonksiyonunu saklar
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu
+  - `locale` — `useI18n()` hook'undan gelen locale değeri
+  - `hasWriteAccess` — `useRole()` hook'undan gelen yazma yetkisi boolean'ı
+  - `supabase` — `supabaseBrowserClient` import'u; `materializePrices` ve `refreshCostInBase` çağrılarında birinci argüman olarak kullanılır
+  - `summary` — `materializePrices(supabase, { dryRun: true })` sonucu; destructuring ile alınır
+  - `costCheck` — `refreshCostInBase(supabase, { dryRun: true }).catch(() => null)` sonucu; hata durumunda `null`
+  - `result` — `mutateWithAudit` dönüşü; `result.rowsUpserted` toast mesajında kullanılır
+  - `e` — catch bloğundaki hata; `AdminPermissionError` instance kontrolü yapılır
+  - `seg` — JSX `.map()` callback parametresi; `seg.priceListId`, `seg.userType`, `seg.priced`, `seg.quoteOnly` alanlarına erişilir
+  - `row` — JSX `.map()` callback parametresi; `row.sku`, `row.ruleId`, `row.name`, `row.userType`, `row.net`, `row.gross` alanlarına erişilir
+- **Dönüş**: `JSX.Element` — Radix Dialog yapısı içinde önizleme ve uygulama arayüzü
+
+### [N3_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::loadPreview (useEffect cleanup-returning async)
+- **params**: yok
+- **ic_degiskenler**:
+  - `alive` — bileşen yaşam döngüsü flag'i; cleanup'ta `false` yapılır
+  - `summary` — `materializePrices(supabase, { dryRun: true })` sonucu; `setPreview(summary)` ile state'e yazılır
+  - `costCheck` — `refreshCostInBase(supabase, { dryRun: true }).catch(() => null)` sonucu; `costCheck ? costCheck.updated : null` ile `setStaleCosts`'a yazılır
+- **Dönüş**: `() => void` — cleanup fonksiyonu (`alive = false`)
+
+### [N4_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::startPreview
+- **params**: yok
+- **ic_degiskenler**:
+  - `cancelPreviewRef.current` — önceki yükleme iptal fonksiyonu; çağrılır, ardından `loadPreview()` yeni değer olarak atanır
+- **Dönüş**: yok
+
+### [N5_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::handleClose
+- **params**: yok
+- **ic_degiskenler**:
+  - `applying` — uygulama devam durumu; `true` ise kapatma engellenir
+- **Dönüş**: yok; `onClose()` çağrısı yapar
+
+### [N6_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::handleApply
+- **params**: yok
+- **ic_degiskenler**:
+  - `preview` — önizleme verisi; yoksa fonksiyon erken döner
+  - `result` — `mutateWithAudit` dönüşü; `result.rowsUpserted` toast'ta kullanılır
+  - `e` — catch bloğu hatası; `AdminPermissionError` kontrolü ile uygun hata mesajı seçilir
+- **Dönüş**: yok; yan etkileri: `setApplying`, `toast.success`/`toast.error`, `onSuccess()`, `onClose()`
+
+### [N7_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::mutateWithAudit fn callback
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `Promise` — `materializePrices(supabase, { dryRun: false })` sonucu
+
+### [N8_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::segmentListRender (seg callback)
+- **params**: `seg` — segment veri objesi
+- **ic_degiskenler**:
+  - `seg.priceListId` — fiyat listesi kimliği; JSX key'inde kullanılır
+  - `seg.userType` — kullanıcı tipi; `segmentLabel(seg.userType, t)` ile etiketlenir, JSX key'inde kullanılır
+  - `seg.priced` — fiyatlandırılmış ürün sayısı; `formatNumber(seg.priced, locale)` ile gösterilir
+  - `seg.quoteOnly` — sadece teklif ürün sayısı; `formatNumber(seg.quoteOnly, locale)` ile gösterilir
+- **Dönüş**: `JSX.Element` — `<li>` öğesi
+
+### [N9_NASIL] AST Pointer: src/components/admin/pricing/MaterializePricesModal.tsx::priceRowRender (row callback)
+- **params**: `row` — fiyat satırı veri objesi
+- **ic_degiskenler**:
+  - `row.sku` — stok kodu; JSX key'inde ve `<span>` içinde gösterilir
+  - `row.ruleId` — kural kimliği; JSX key'inde kullanılır
+  - `row.name` — ürün adı; `<span>` içinde gösterilir
+  - `row.userType` — kullanıcı tipi; `segmentLabel(row.userType, t)` ile etiketlenir
+  - `row.net` — net fiyat; `formatCurrency(row.net, locale, { currency: 'TRY' })` ile gösterilir
+  - `row.gross` — brüt fiyat; `formatCurrency(row.gross, locale, { currency: 'TRY' })` ile gösterilir
+- **Dönüş**: `JSX.Element` — `<li>` öğesi
 
 ---
 
@@ -21323,10 +21828,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-400/10`, `bg-black/60`, `bg-cyan-500/10`, `bg-surface-deep`, `bg-white/2`, `bg-white/3`, `bg-white/5`, `border-amber-400/30`, `border-b`, `border-cyan-500/20`, `border-t`, `border-white/10`, `border-white/5`, `hover:bg-white/10`, `hover:bg-white/5`
-- **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-9`, `inline-flex`, `items-center`, `items-start`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-bg`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-warning-weak`, `bg-black/60`, `border-admin-accent/30`, `border-admin-border`, `border-admin-warning/30`, `border-b`, `border-t`, `hover:bg-admin-surface-2`, `hover:bg-admin-surface-3`, `hover:text-admin-fg`, `text-admin-accent`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-2`, `h-9`, `inline-flex`, `items-center`, `items-start`, `justify-between`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminModalScrollAreaClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/40`, `font-black`, `font-bold`, `font-mono`, `glass`, `inset-0`
+- **Yardımcı Sınıflar:** `${adminButtonPrimaryClass`, `${adminModalScrollAreaClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-40`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/30`, `font-bold`, `font-mono`, `font-semibold`, `inset-0`, `ml-auto`
 
 ---
 # FILE: src\components\admin\pricing\PricingPolicyFormModal.md
@@ -21541,19 +22046,21 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\PricingRuleFormModal.tsx
-skeleton_hash: 1a1c6cdfb78173d6
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\PricingRuleFormModal.tsx
+skeleton_hash: fef9fabe35f67961
 entity_hashes:
+  func:FieldError: 73ce29b5cf8d764a
   func:PricingRuleFormModal: 5017b207035eeb67
   func:checkViolationKey: 22e511fa606eb81b
-  func:fieldError: 922eae618bf3ddb5
+  func:errText: 8a537a0380518c38
+  func:focusFirstInvalid: e259adc3f012f99f
   func:getPricingRuleSchema: e0d0c902881ddac2
   func:isPostgrestError: 15f008fc13ed6567
   func:parseNumberInput: bdead8e5f41b382d
   func:ruleToFormValues: ac74e08b56288be9
-  overview: 2e04603267bf68bd
-  style_tokens: ed3d0e5d56480a0e
-generated_at: 2026-08-14T09:13:17Z
+  overview: 4184a1042220c1da
+  style_tokens: 8097a8b7f5d9da11
+generated_at: 2026-08-27T09:03:19Z
 ---
 
 ## Genel Bakış
@@ -21561,40 +22068,27 @@ Bu modül, yönetici panelinde fiyatlandırma kurallarını oluşturmak veya dü
 
 ## Fonksiyon Grupları
 ### Form Şeması ve Veri Dönüşümü
-Bu grup, form alanlarının yapısını ve varsayılan değerlerini tanımlar, ayrıca mevcut veriyi formun kullanabileceği formatlara dönüştürür.
+Form alanlarının yapısını, doğrulama kurallarını ve varsayılan değerlerini tanımlar; ayrıca mevcut bir kural kaydını formun kullanabileceği formata dönüştürür.
 - `getPricingRuleSchema`, `ruleToFormValues`
 
 ### Girdi İşleme ve Doğrulama
-Kullanıcıdan alınan ham girdileri (özellikle sayısal alanları) işleyip uygun türlere dönüştürür ve formvalidasyon hatalarını formatlar.
-- `parseNumberInput`, `fieldError`
+Kullanıcıdan alınan ham girdileri (özellikle sayısal alanları) uygun türlere dönüştürür, form doğrulama hatalarını kullanıcıya gösterilecek biçime getirir ve ilk geçersiz alana otomatik odaklanmayı sağlar.
+- `parseNumberInput`, `FieldError`, `focusFirstInvalid`
 
 ### Hata Yönetimi
-Veritabanından veya API'den dönen hataları analiz eder, özellikle benzersizlik ihlali gibi iş kuralları hatalarını tanır ve uygulama içinde ele alınabilir hale getirir.
-- `isPostgrestError`, `checkViolationKey`
+Veritabanından veya API'den dönen hataları analiz eder; özellikle benzersizlik ihlali gibi iş kuralları hatalarını tanır ve insan tarafından okunabilir hata metinleri üretir.
+- `isPostgrestError`, `checkViolationKey`, `errText`
 
-### Ana Bileşen (Orkestrasyon)
-Tüm bu yardımcı fonksiyonları bir araya getirerek modalın açılmasını, formunsubmission sürecini ve durum yönetimini koordine eden üst düzey React bileşenidir.
+### Ana Bileşen
+Tüm yardımcı fonksiyonları bir araya getirerek modalın açılmasını, formun gönderilme sürecini ve durum yönetimini koordine eden üst düzey React bileşenidir.
 - `PricingRuleFormModal`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, bir fiyatlandırma kuralı (Pricing Rule) oluşturma/düzenleme formunu modal olarak sunar. Aşağıdaki mimari varsayımlar modülün doğru çalışması için zorunludur.
-
-**[Aksiyom 1 – Çeviri Fonksiyonu Zorunluluğu]:** Eğer `getPricingRuleSchema` fonksiyonuna geçerli bir `t: (key: string) => string` çeviri fonksiyonu sağlanmazsa, form validasyon şemasındaki semua hata mesajları yerelleştirilmemiş (raw key) olarak görünür ve kullanıcı deneyimi bozulur.
-
-**[Aksiyom 2 – PricingRuleRow Veri Shape'i]:** Eğer `ruleToFormValues` fonksiyonuna beklenen `PricingRuleRow` shape'ine uymayan bir nesne verilirse, form alanları yanlış/eksik değerlerle başlatılır; modal düzenleme modunda hatalı veri gösterimi oluşur.
-
-**[Aksiyom 3 – Sayısal Girdi Null Handling]:** Eğer `parseNumberInput` tarafından döndürülen `null` değeri çağrıucuda ele alınmazsa (örn. form submit sırasında), geçersiz/NaN değerler backend'e gönderilir ve beklenmeyen hatalar oluşur.
-
-**[Aksiyom 4 – PostgREST Hata Formatı Varsayımı]:** Eğer backend'den dönen hata PostgREST hata formatında (`PostgrestError`) değilse, hem `isPostgrestError` hem de `checkViolationKey` fonksiyonları `false`/`null` döndürür; bu durumda duplicate veya constraint violation hataları kullanıcıya anlamsız bir şekilde gösterilir.
-
-**[Aksiyom 5 – EMPTY_VALUES Shape Eşleşmesi]:** Eğer `EMPTY_VALUES` sabitinin shape'i form alanlarıyla eşleşmiyorsa (alan isimleri, türleri değişmişse), modal yeni kural oluşturma modunda boş/bozuk form değerleriyle başlatılır.
-
-**[Aksiyom 6 – Modal Props Zorunluluğu]:** Eğer `PricingRuleFormModal` bileşenine `open`, `onClose` veya `onSaved` callback'leri sağlanmazsa, modal açılamaz, kapatılamaz veya kayıt sonrası tetikleme (list yenileme vb.) gerçekleşmez.
-
-**[Aksiyom 7 – Validation Schema ile fieldError Tutarlılığı]:** Eğer `getPricingRuleSchema` tarafından döndürülen Zod şemasındaki alan isimleri ile `fieldError`'ın beklediği message formatı uyumsuzsa, form submit sırasında validasyon hataları doğru alanlara bağlanmaz ve kullanıcı hangi alanda hata olduğunu bilemez.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -21635,6 +22129,22 @@ Bu modül, bir fiyatlandırma kuralı (Pricing Rule) oluşturma/düzenleme formu
 - `error`: `unknown` — İşlenecek hata nesnesi.
 **Dönüş**: `string | null` — Eşleşen bir CHECK constraint bulunursa i18n mesaj anahtarı, aksi halde `null`.
 
+### errText
+**Ne yapar**: React Hook Form (RHF) kütüphanesinden gelen hata mesajını güvenli bir şekilde string türüne daraltır. RHF'nin `FieldError` tipindeki `message` alanı `unknown` olarak tanımlıdır; bu fonksiyon, `any` kullanmadan bu değeri `string` ya da `undefined` olarak döndürerek tip güvenliği sağlar.
+
+**Nasıl yapar**: Gelen `message` parametresinin türünü kontrol eder. Eğer değer bir string ise onu string olarak döndürür; aksi halde `undefined` döndürür. Bu sayede `any` türüne başvurmadan tip daraltma (type narrowing) işlemi gerçekleştirilir.
+
+**Parametreler**:
+- `message: unknown` — React Hook Form'un hata nesnesinden gelen mesaj değeri. Türü önceden bilinmediği için `unknown` olarak tanımlanmıştır.
+
+**Dönüş**: `string | undefined` — Eğer gelen mesaj bir string ise o string değerini; değilse `undefined` döndürür.
+
+### FieldError
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### focusFirstInvalid
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
 ### PricingRuleFormModal
 **Ne yapar**: Bir fiyatlandırma kuralı oluşturmak veya düzenlemek için açılan modal form bileşenini temsil eder.
 **Nasıl yapar**: Bu bir React fonksiyonel bileşenidir. `open`, `rule`, `onClose` ve `onSaved` prop'larını alır. `open` prop'u modal'ın görünür olup olmadığını kontrol eder. Düzenleme modunda ise `rule` prop'u ile mevcut kural değerleri form alanlarına doldurulur. Form gönderildiğinde `onSaved` callback'i ile üst bileşene bildirimde bulunur ve `onClose` ile kapanır.
@@ -21645,16 +22155,10 @@ Bu modül, bir fiyatlandırma kuralı (Pricing Rule) oluşturma/düzenleme formu
 - `onSaved`: `(saved: PricingRuleRow) => void` — Kural başarıyla kaydedildiğinde çağrılan fonksiyon.
 **Dönüş**: `React.FC<PricingRuleFormModalProps>` — React fonksiyonel bileşeni.
 
-### fieldError
-**Ne yapar**: Form alanları için hata mesajını işleyen ve muhtemelen UI'da gösterilmek üzere formatlayan bir yardımcı fonksiyondur.
-**Nasıl yapar**: Verilen `message` parametresinin (hata bilgisi) işlenmesi ve form alanına özgü bir hata gösterimi üretmesi beklenen bir yardımcı fonksiyondur. Belirli bir mantığı docstring'de detaylandırılmamıştır, ancak genellikle form library'lerindeki (örn. react-hook-form) hata gösterimiyle entegre çalışır.
-**Parametreler**:
-- `message`: `unknown` — İşlenecek hata bilgisi, string veya nesne olabilir.
-**Dönüş**: Belirtilmemiş, muhtemelen `string` veya `ReactNode` gibi bir hata gösterim elemanı döndürür.
-
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../overlay/ConfirmProvider::useConfirm
 - import: ./RuleScopeTargetPicker::RuleScopeTargetPicker
 - import: @/hooks/useRole::useRole
 - import: @/i18n/I18nProvider::useI18n
@@ -21670,6 +22174,7 @@ Bu modül, bir fiyatlandırma kuralı (Pricing Rule) oluşturma/düzenleme formu
 - import: lucide-react::Loader2
 - import: lucide-react::Save
 - import: lucide-react::X
+- import: react-hook-form::type { FieldErrors }
 - import: react-hook-form::useForm
 - import: react::React
 - import: react::useCallback
@@ -21714,108 +22219,120 @@ type PricingRuleFormValues = z.infer<ReturnType<typeof getPricingRuleSchema>>
   scope: 4,
   product_id: null,
   brand_id: null,
-  category_id: null,
-...`
+  category_id: null,...`
+- **FIELD_FOCUS_ORDER** (array) — `[
+  { name: 'margin_pct', id: 'rule-rate' },
+  { name: 'fixed_price', id: '...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::getPricingRuleSchema
-- **params**: `t` — i18n çeviri fonksiyonu, validation mesajlarını lokalize etmek için kullanılır
+### [N1_NASIL] AST Pointer: PricingRuleFormModal.tsx::getPricingRuleSchema
+- **params**: `t` — çeviri fonksiyonu, `key: string` alır ve `string` döndürür
 - **ic_degiskenler**:
-  - `v` — superRefine callback'inde form değerlerini temsil eden Zod doğrulama nesnesi (scope, method, margin_pct, fixed_price, product_id, brand_id, category_id, round_to, charm_ending, currency, min_margin_abs, max_margin_abs, valid_from, valid_to alanlarını içerir)
-  - `ctx` — Zod RefinementCtx, `addIssue` ile hata eklemek için kullanılır
-  - `targetIssue` — scope hedefi için hata üreten yerel fonksiyon; path parametresi ile hangi alanın eksik olduğunu belirtir
-- **Dönüş**: Zod schema nesnesi (PricingRuleFormValues tipini doğrulayan object schema + superRefine)
+  - `v` — superRefine callback'inde doğrulanan form değerleri objesi
+  - `ctx` — Zod doğrulama context'i, `addIssue` metoduyla hata ekler
+  - `targetIssue` — scope hedef alanı eksik olduğunda hata ekleyen yardımcı fonksiyon; `path` parametresi `'product_id' | 'brand_id' | 'category_id'` alır
+  - `path` — `targetIssue` fonksiyonuna iletilen alan adı
+- **Dönüş**: z.object Zod şeması (superRefine ile genişletilmiş)
 
----
+### [N2_NASIL] AST Pointer: PricingRuleFormModal.tsx::ruleToFormValues
+- **params**: `rule` — `PricingRuleRow` tipinde veritabanı satırı
+- **ic_degiskenler**: yok (doğrudan return objesi oluşturulur)
+- **Dönüş**: `PricingRuleFormValues` objesi
 
-### [N2_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::ruleToFormValues
-- **params**: `rule` — PricingRuleRow tipinde veritabanından gelen fiyatlandırma kuralı satırı
-- **ic_degiskenler**: yok (doğrudan `rule` özelliklerinden return objesi oluşturulur)
-- **Dönüş**: PricingRuleFormValues — rule alanlarını form input değerlerine dönüştürülmüş nesne; `rule.method` === 'fixed' olduğunda 'fixed', aksi halde 'cost_plus' olarak normalize eder; `rule.currency` ve `rule.valid_from`/`rule.valid_to` null ise boş string fallback kullanır
-
----
-
-### [N3_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::parseNumberInput
-- **params**: `raw` — string, kullanıcının girdiği ham sayısal metin
+### [N3_NASIL] AST Pointer: PricingRuleFormModal.tsx::parseNumberInput
+- **params**: `raw` — ham string input
 - **ic_degiskenler**:
-  - `normalized` — `raw`'ın trim edilip virgülünün noktaya dönüştürülmüş hali; TR locale girdisi için normalize
-- **Dönüş**: `number | null` — boş string ise null, aksi halde `Number(normalized)` sonucu
+  - `normalized` — `raw` değerinin trimlenmiş ve virgülün noktaya çevrilmiş hali
+- **Dönüş**: `number | null` — boş string ise `null`, aksi halde `Number(normalized)`
 
----
-
-### [N4_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::isPostgrestError
-- **params**: `error` — unknown tipinde yakalanan hata
-- **ic_degiskenler**: yok (doğrudan `error` üzerinde `typeof`, `null` kontrolü ve `'code' in`, `'message' in` member check yapılır)
-- **Dönüş**: `error is PostgrestError` — type guard; nesne olup `code` ve `message` özelliğine sahipse true
-
----
-
-### [N5_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::checkViolationKey
-- **params**: `error` — unknown tipinde yakalanan hata
-- **ic_degiskenler**:
-  - `detail` — `${error.message} ${error.details ?? ''}` birleşimi; violation constraint adını içeren aranacak metin
-- **Dönüş**: `string | null` — PostgrestError code '23514' değilse null; `detail` içinde `pricing_rule_method_fields`, `pricing_rule_scope_target`, `min_quantity`, `scope` kalıp kontrolü ile i18n anahtar döner; eşleşme yoksa `'admin.pricing.rules.errors.checkViolation'`
-
----
-
-### [N6_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::PricingRuleFormModal
-- **params**: `{ open, rule, onClose, onSaved }` — `open`: modalın açık olup olmadığı, `rule`: düzenlenecek PricingRuleRow (yeni kural için undefined/null), `onClose`: kapatma callback'i, `onSaved`: kayıt başarılı sonrası callback
-- **ic_degiskenler**:
-  - `EMPTY_VALUES` — sabit, formun varsayılan boş değerleri objesi
-  - `next` — `ruleToFormValues(rule)` çağrısının sonucu; mevcut kuralı form değerlerine dönüştürür
-  - `nextMode` — `next.method === 'fixed' ? 'fixed' : 'percent'`; form yüklendiğinde input modunu belirler
-  - `setMode` — RateInputMode state setter; yüzde/sabit fiyat geçişi
-  - `setRateRaw` — ham oran girdisi state setter
-  - `reset` — react-hook-form `reset` fonksiyonu; form değerlerini toplu olarak sıfırlar
-  - `setExistingRules` — mevcut fiyatlandırma kuralları listesi state setter
-  - `supabase` — Supabase istemci instance'ı; API çağrıları için kullanılır
-  - `rules` — `listPricingRules(supabase)` sonucu; mevcut kurallar dizisi
-  - `alive` — cleanup flag; async işlemler sırasında bileşen unmount edildiğinde state güncellemesini engeller
-  - `scope` — form değerinden gelen mevcut kapsam (1=product, 2=brand, 3=category, 4=all)
-  - `targetId` — kapsam 1-3 olduğunda hedef ID
-  - `setImpactCount` — etki sayısı state setter
-  - `setImpactSamples` — etki örnekleri state setter
-  - `setImpactLoading` — etki hesaplama yükleme durumu state setter
-  - `SAMPLE_SIZE` — sabit, örnekleme için çekilecek ürün sayısı
-  - `IMPACT_DEBOUNCE_MS` — sabit, debounce bekleme süresi
-  - `count` — `countProductsInScope` sonucu; kapsam dahilindeki ürün sayısı
-  - `samples` — `sampleProductsInScope` sonucu; örnek ürün dizisi
-  - `withBefore` — ImpactSample[] dizisi; her ürün için mevcut gross fiyatı eklenmiş hali
-  - `product` — for döngüsü içindeki tekil ürün; `resolvePrice` ile fiyatı çözümlenir
-  - `price` — `resolvePrice` sonucu; `{ price }` destructuring
-  - `timer` — `setTimeout` sonucu; debounce timer referansı
-  - `values` — react-hook-form `getValues()` mevcut form değerleri
-  - `draftRule` — `buildPayload` callback'inin döndürdüğü PricingRuleCreateInput; hesaplama ve karşılaştırma için kullanılır
-  - `DRAFT_RULE_ID` — sabit, draft kural için geçici ID
-  - `ancestors` — `new Set<string>`; ürünün kategori ataları seti
-  - `today` — `new Date().toISOString().slice(0, 10)`; bugünün YYYY-MM-DD stringi, geçerlilik kontrolü için
-  - `rivals` — `existingRules.filter(...)` sonucu; draft ile rekabet eden kurallar dizisi
-  - `winner` — `sortRules([...rivals, draftRule], null)[0]`; sıralama sonrası birinci kural
-  - `payload` — PricingRuleCreateInput; DB'ye gönderilecek ham veri objesi; `scope` değerine göre product_id/brand_id/category_id'i koşullu atar, method'a göre margin_pct/fixed_price seçer, currency uppercase'e dönüştürülür
-  - `authData` — `supabase.auth.getUser()` sonucu; `authData.user?.id` ile userId alınır
-  - `userId` — `authData.user?.id ?? null`; audit trail için kullanıcı ID'si
-  - `setSaving` — kaydetme durumu state setter
-  - `mutateWithAudit` — audit log'lu veri yazma fonksiyonu; resource, canWrite, action, rowPk, before/after ile çağrılır
-  - `hasWriteAccess` — boolean; kullanıcının yazma izni olup olmadığı
-  - `checkKey` — `checkViolationKey(e)` sonucu; DB constraint ihlali için i18n anahtarı
-  - `e` — catch bloğunda yakalanan hata
-  - `handleBeforeUnload` — `beforeunload` event handler; form kirliyse tarayıcı kapatmayı engeller
-  - `raw` — handleRateChange parametresi; ham oran girdisi
-  - `parsed` — `parseNumberInput(raw)` sonucu; parse edilmiş sayı veya null
-  - `marginPct` — `values.margin_pct` kısayolu; geçerli marj yüzdesi
-  - `nextScope` — handleScopeChange parametresi; yeni scope değeri
-  - `nextId` — handleTargetChange parametresi; yeni hedef ID
-- **Dönüş**: JSX.Element — React functional component; pricing kuralı ekleme/düzenleme modalı; form alanlarını, etki hesaplamasını, kaydetme mantığını render eder
-
----
-
-### [N7_NASIL] AST Pointer: src/components/admin/pricing/PricingRuleFormModal.tsx::fieldError
-- **params**: `message` — unknown tipinde hata mesajı
+### [N4_NASIL] AST Pointer: PricingRuleFormModal.tsx::isPostgrestError
+- **params**: `error` — `unknown` tipinde hata
 - **ic_degiskenler**: yok
-- **Dönüş**: `JSX.Element | null` — message string ise `<p>` ile rose-400 renkli hata metni, değilse null
+- **Dönüş**: `boolean` — type guard; `error` obje, null değil, `code` ve `message` alanlarına sahipse `true`
+
+### [N5_NASIL] AST Pointer: PricingRuleFormModal.tsx::checkViolationKey
+- **params**: `error` — `unknown` tipinde hata
+- **ic_degiskenler**:
+  - `detail` — `error.message` ve `error.details` değerlerinin birleştirilmiş string hali
+- **Dönüş**: `string | null` — constraint violation mesaj anahtarı veya `null`
+
+### [N6_NASIL] AST Pointer: PricingRuleFormModal.tsx::errText
+- **params**: `message` — `unknown` tipinde hata mesajı
+- **ic_degiskenler**: gövde verilmemiş
+- **Dönüş**: `string | undefined`
+
+### [N7_NASIL] AST Pointer: PricingRuleFormModal.tsx::FieldError
+- **params**: `id` — input element ID'si (`string`), `message` — hata mesajı (`string`, opsiyonel)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element veya `null` — `message` varsa `<p>` etiketi, yoksa `null`
+
+### [N8_NASIL] AST Pointer: PricingRuleFormModal.tsx::focusFirstInvalid
+- **params**: `errs` — `FieldErrors<PricingRuleFormValues>` tipinde form hataları objesi
+- **ic_degiskenler**:
+  - `first` — `FIELD_FOCUS_ORDER` dizisinde `errs[name]` eşleşen ilk öğe
+- **Dönüş**: `void`
+
+### [N9_NASIL] AST Pointer: PricingRuleFormModal.tsx::PricingRuleFormModal
+- **params**: `open` — modal açık mı (`boolean`), `rule` — düzenlenen kural (`PricingRuleRow | null`), `onClose` — kapatma callback'i, `onSaved` — kayıt başarılı callback'i
+- **ic_degiskenler**:
+  - `form` — `useForm` hook dönüşü; `register`, `setValue`, `reset`, `handleSubmit`, `formState`, `clearErrors`, `watch` metotlarını içerir
+  - `values` — `watch()` ile izlenen tüm form değerleri
+  - `mode` — `useState<RateInputMode>`; `'percent'` veya `'fixed'` modu
+  - `setMode` — `mode` state.setter fonksiyonu
+  - `rateRaw` — `useState<string>`; oran input'unun ham string değeri
+  - `setRateRaw` — `rateRaw` state.setter fonksiyonu
+  - `impactCount` — `useState<number | null>`; etki alanındaki ürün sayısı
+  - `setImpactCount` — `impactCount` state.setter fonksiyonu
+  - `impactSamples` — `useState<ImpactSample[]>`; örnek ürün listesi
+  - `setImpactSamples` — `impactSamples` state.setter fonksiyonu
+  - `impactLoading` — `useState<boolean>`; etki hesaplama yükleniyor mu
+  - `setImpactLoading` — `impactLoading` state.setter fonksiyonu
+  - `existingRules` — `useState<PricingRuleRow[]>`; mevcut kurallar listesi
+  - `setExistingRules` — `existingRules` state.setter fonksiyonu
+  - `saving` — `useState<boolean>`; kayıt işlemi devam ediyor mu
+  - `setSaving` — `saving` state.setter fonksiyonu
+  - `hasWriteAccess` — `useRole()` hook'undan gelen yazma yetkisi (`boolean`)
+  - `confirm` — `useConfirm()` hook'undan gelen onay dialog fonksiyonu
+  - `supabase` — Supabase istemcisi (hook'tan geliyor)
+  - `locale` — yerel ayar bilgisi (JSX'te kullanılıyor)
+  - `draftRule` — `useMemo` ile hesaplanmış, form değerlerinden türetilen kural objesi
+  - `draftRulePayload` — form değerlerini `PricingRuleCreateInput` formatına dönüştüren fonksiyon; `values` parametresi alır
+  - `draftLosesFor` — ürünün mevcut kurallarla karşılaştırmasını yapıp draft kuralın kaybedip kaybetmediğini kontrol eden fonksiyon; `product: SampleProduct` parametresi alır
+  - `handleRateChange` — oran input değişikliğini işleyen fonksiyon; `raw: string` ve `nextMode: RateInputMode` parametreleri alır
+  - `switchMode` — mod geçişini işleyen fonksiyon; `nextMode: RateInputMode` parametresi alır
+  - `handleScopeChange` — kapsam değişikliğini işleyen fonksiyon; `nextScope: number` parametresi alır
+  - `handleTargetChange` — hedef ID değişikliğini işleyen fonksiyon; `nextId: string | null` parametresi alır
+  - `handleClose` — kapatma işlemini işleyen async fonksiyon; kaydedilmemiş değişiklik kontrolü yapar
+  - `handleSubmit` — form gönderimini işleyen async fonksiyon; `v: PricingRuleFormValues` parametresi alır
+  - `renderImpactSample` — etki örneğini JSX olarak render eden fonksiyon; `{ product, beforeGross }` parametresi alır
+  - `handleBeforeUnload` — sayfa kapanış uyarısı için event handler; `e: BeforeUnloadEvent` parametresi alır
+  - `alive` — useEffect cleanup'larında kullanılan boolean flag
+  - `timer` — debounce için setTimeout ID'si
+  - `targetIssue` — scope hedef alanı eksikliğinde hata ekleyen yardımcı fonksiyon (superRefine içinde)
+  - `next` — `ruleToFormValues(rule)` dönüşü, form resetleme için kullanılır
+  - `nextMode` — `RateInputMode` tipinde mod değeri (useEffect içinde)
+  - `rules` — `listPricingRules` dönüşü, mevcut kurallar listesi
+  - `count` — `countProductsInScope` dönüşü, ürün sayısı
+  - `samples` — `sampleProductsInScope` dönüşü, örnek ürün dizisi
+  - `withBefore` — `ImpactSample[]` tipinde, önceki fiyat bilgisi eklenmiş örnekler
+  - `product` — döngüdeki `SampleProduct` öğesi
+  - `price` — `resolvePrice` dönüşünden destructure edilen fiyat objesi
+  - `payload` — `PricingRuleCreateInput` tipinde kayıt payload'ı
+  - `authData` — `supabase.auth.getUser()` dönüşü
+  - `userId` — kimlik doğrulama kullanıcı ID'si (`string | null`)
+  - `checkKey` — `checkViolationKey(e)` dönüşü, constraint violation anahtarı
+  - `e` — catch bloğundaki hata objesi
+  - `m` — JSX map döngüsündeki mod öğesi (`{ key, label }`)
+  - `rivals` — `existingRules` filtrelenmiş hali, rakip kurallar
+  - `winner` — `sortRules` ile sıralanan kurallar dizisinin ilk elemanı
+  - `ancestors` — `Set<string>` tipinde ürün kategori ataları kümesi
+  - `today` — günün tarihi string olarak (`YYYY-MM-DD` formatında)
+  - `after` — `computePriceFromRule` dönüşü, hesaplanmış fiyat
+  - `loses` — `draftLosesFor(product)` dönüşü, boolean
+- **Dönüş**: JSX element (React.FC)
 
 ---
 
@@ -21823,19 +22340,21 @@ type PricingRuleFormValues = z.infer<ReturnType<typeof getPricingRuleSchema>>
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    PricingRuleFormModal_tsx__FieldError["FieldError"]
     PricingRuleFormModal_tsx__PricingRuleFormModal["PricingRuleFormModal"]
     PricingRuleFormModal_tsx__checkViolationKey["checkViolationKey"]
-    PricingRuleFormModal_tsx__fieldError["fieldError"]
+    PricingRuleFormModal_tsx__errText["errText"]
+    PricingRuleFormModal_tsx__focusFirstInvalid["focusFirstInvalid"]
     PricingRuleFormModal_tsx__getPricingRuleSchema["getPricingRuleSchema"]
     PricingRuleFormModal_tsx__isPostgrestError["isPostgrestError"]
     PricingRuleFormModal_tsx__parseNumberInput["parseNumberInput"]
     PricingRuleFormModal_tsx__ruleToFormValues["ruleToFormValues"]
-    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__checkViolationKey
-    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__fieldError
-    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__getPricingRuleSchema
+    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__ruleToFormValues
     PricingRuleFormModal_tsx__checkViolationKey --> PricingRuleFormModal_tsx__isPostgrestError
     PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__parseNumberInput
-    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__ruleToFormValues
+    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__checkViolationKey
+    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__getPricingRuleSchema
+    PricingRuleFormModal_tsx__PricingRuleFormModal --> PricingRuleFormModal_tsx__errText
 ```
 
 ## NODE ID STANDARD
@@ -21846,14 +22365,19 @@ graph TD
   function: src\components\admin\pricing\PricingRuleFormModal.tsx::parseNumberInput
   function: src\components\admin\pricing\PricingRuleFormModal.tsx::isPostgrestError
   function: src\components\admin\pricing\PricingRuleFormModal.tsx::checkViolationKey
+  function: src\components\admin\pricing\PricingRuleFormModal.tsx::errText
+  function: src\components\admin\pricing\PricingRuleFormModal.tsx::FieldError
+  function: src\components\admin\pricing\PricingRuleFormModal.tsx::focusFirstInvalid
   function: src\components\admin\pricing\PricingRuleFormModal.tsx::PricingRuleFormModal
-  function: src\components\admin\pricing\PricingRuleFormModal.tsx::fieldError
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: FieldError
   export: PricingRuleFormModal
   export: checkViolationKey
+  export: errText
+  export: focusFirstInvalid
   export: getPricingRuleSchema
   export: isPostgrestError
   export: parseNumberInput
@@ -21870,10 +22394,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-cyan-400`, `bg-slate-800`, `bg-surface-deep`, `bg-white/2`, `bg-white/3`, `border-b`, `border-t`, `border-white/10`, `border-white/5`, `hover:bg-white/10`, `hover:text-white`, `text-amber-400`, `text-cyan-400`, `text-cyan-500`
-- **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-11`, `h-4`, `h-9`
+- **Renkler:** `bg-admin-accent`, `bg-admin-bg`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-admin-surface-3`, `bg-black/60`, `border-admin-border`, `border-b`, `border-t`, `hover:bg-admin-surface-3`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-accent-fg`, `text-admin-danger`, `text-admin-fg`
+- **Layout:** `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-11`, `h-4`, `h-9`, `inline-flex`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminButtonPrimaryClass`, `${adminInputClass`, `${adminModalScrollAreaClass`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `===`, `animate-spin`, `border`, `cursor-pointer`, `focus-visible:ring-2`, `focus-visible:ring-cyan-400/20`, `focus-visible:ring-cyan-400/40`, `font-black`
+- **Yardımcı Sınıflar:** `!border-admin-danger`, `$`, `${adminButtonPrimaryClass`, `${adminInputClass`, `${adminInputClass}${charmError`, `${adminInputClass}${maxMarginError`, `${adminInputClass}${minMarginError`, `${adminInputClass}${minQuantityError`, `${adminInputClass}${priorityError`, `${adminInputClass}${rateErrorIds`, `${adminInputClass}${roundToError`, `${adminInputClass}${surchargeError`, `${adminInputClass}${validToError`, `${adminInputClass}${vatError`, `${adminModalScrollAreaClass`
 
 ---
 # FILE: src\components\admin\pricing\PricingSettingsFormModal.md
@@ -21882,54 +22406,49 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\pricing\PricingSettingsFormModal.tsx
-skeleton_hash: c10e1536b134a2cb
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\PricingSettingsFormModal.tsx
+skeleton_hash: 80f1bb8c8ab74ab5
 entity_hashes:
+  func:FieldError: 73ce29b5cf8d764a
   func:PricingSettingsFormModal: 0a20027362b0d8df
   func:buildPricingSettingsSchema: b3cc2b049ab1978a
-  func:handleClose: b985b474034243a8
+  func:fieldError: cea0608ef7eae058
+  func:focusFirstInvalid: 5ffd27b47b0aec8f
+  func:handleClose: 179f5fcb5f1d26fb
   func:handleOpenChange: b7949752bd032233
   func:onSubmit: cfdda7962049d53c
   func:toggleCurrency: a4a520940e991de3
-  overview: 4474d1a1bd6b4fc8
-  style_tokens: 90ced0abeaea521e
-generated_at: 2026-08-14T09:14:02Z
+  overview: 7afd0d45cfc373b2
+  style_tokens: bedbee12bcb68601
+generated_at: 2026-08-27T08:46:13Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelinde fiyatlandırma ayarlarını düzenlemek için kullanılan kontrollü bir modal form bileşenidir. Para birimi seçimi, form validasyonu ve ayarların kaydedilmesi dahil olmak üzere fiyatlandırma yapılandırmasıyla ilgili tüm kullanıcı etkileşimlerini yönetir. Bileşen, form durumunu ve modal açılış/kapanış akışını kontrol ederek bir dizi işlevi bir araya getirir.
+Bu modül, yönetici panelindeki fiyatlandırma ayarlarını düzenlemek için kullanılan kontrollü bir modal form bileşenidir. Form validasyonu, para birimi seçimi ve ayarların sunucuya gönderilmesi dahil olmak üzere fiyatlandırma yapılandırmasıyla ilgili tüm kullanıcı etkileşimlerini yönetir. Bileşen, form durumunu ve modal açılış/kapanış akışını kontrol ederek bir dizi işlevi bir araya getirir.
 
 ## Fonksiyon Grupları
 ### Modal Kontrol ve Durum Yönetimi
-Grup, modalın açılıp kapanmasını ve formun temel akışını kontrol eden temel işlevleri kapsar.
+Bu grup, modalın açılıp kapanmasını ve formun temel akışını kontrol eden temel işlevleri kapsar.
 - `handleClose`, `handleOpenChange`, `PricingSettingsFormModal`
 
 ### Form İşlemleri ve İş Mantığı
-Bu grup, form içindeki veriManipülasyonunu ve sunucuya gönderme sürecini yöneten işlevlerden oluşur.
+Bu grup, form içindeki veri manipülasyonunu ve sunucuya gönderme sürecini yöneten işlevlerden oluşur.
 - `toggleCurrency`, `onSubmit`
 
 ### Validasyon ve Şema Oluşturma
 Bu işlev, form alanları için tip güvenli ve çok dilli bir validasyon şeması tanımlar.
 - `buildPricingSettingsSchema`
 
+### Hata Yönetimi ve Yardımcı Bileşenler
+Bu grup, form hatalarını göstermek ve yönetmek için yardımcı bileşen ve fonksiyonları içerir.
+- `FieldError`, `fieldError`, `focusFirstInvalid`
+
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, fiyatlandırma ayarlarını düzenlemek için bir form modalı sunar. Aşağıda modülün doğru çalışması için gerekli mimari varsayımlar listelenmiştir.
-
-[Aksiyom 1]: Eğer `PRICING_CURRENCY_OPTIONS` sabiti boşsa veya geçerli bir Para Birimi Kodu içermiyorsa, `toggleCurrency` fonksiyonu işlevini yerine getiremez ve kullanıcı hangi para biriminin seçili olduğunu belirleyemez.
-
-[Aksiyom 2]: Eğer `pricingSettingsSchema` çağrısı (yani form şeması) başarısızsa veya geçerli bir Zod şeması döndürmüyorsa, `onSubmit` fonksiyonu form verilerini doğrulayamaz ve hatalı veriler kaydedilebilir.
-
-[Aksiyom 3]: Eğer `initialValues` prop'u sağlanmamışsa veya `DEFAULT_PRICING_SETTINGS` nesnesi tanımsızsa, form başlangıçta boş alanlarla açılır ve kullanıcı tüm alanları manuel olarak doldurmak zorunda kalır.
-
-[Aksiyom 4]: Eğer `open` prop'u `true` ise ancak `handleOpenChange` fonksiyonu çağrılamıyorsa (örneğin `onOpenChange` callback'i tanımsızsa), modal kapatılamaz ve kullanıcı arayüzünde takılma yaşanır.
-
-[Aksiyom 5]: Eğer `onSuccess` callback'i sağlanmamışsa, form başarıyla gönderildikten sonra kullanıcıya başarı bildirimi gösterilemez veya modal otomatik kapatılamaz.
-
-[Aksiyom 6]: Eğer `buildPricingSettingsSchema` fonksiyonu bir hata fırlatıyorsa veya beklenen formatta (örneğin bir Zod şeması) döndürmüyorsa, `pricingSettingsSchema` sabit değeri geçersiz olur ve formun doğrulama mantığı bozulur.
-
-[Aksiyom 7]: Eğer `onSubmit` fonksiyonu `async` bir işlem sırasında-network hatası veya sunucu hatası-alınırsa ve bu hata yakalanıp kullanıcıya iletilemezse, kullanıcı gönderme işleminin başarıp başarısız olduğunu bilemez.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -21945,7 +22464,24 @@ Bu modül, fiyatlandırma ayarlarını düzenlemek için bir form modalı sunar.
 
 **Dönüş**: Zod validasyon nesnesi (tip bilgisi verilmemiştir)
 
+### FieldError
+**Ne yapar**: Form alanının hemen altında görüntülenen hata mesajı satırını render eden bir React bileşenidir. Hata mesajı yoksa (undefined veya boş) DOM'a hiçbir eleman basmaz; bu sayede gereksiz boşluk oluşmaz.
+
+**Nasıl yapar**: `message` parametresinin dolu olup olmadığını kontrol eder. Mesaj mevcutsa, verilen `id` değeriyle ilişkilendirilmiş bir hata satırı olarak DOM'a basar. Mesaj yoksa `null` döndürerek hiçbir şey render etmez.
+
+**Parametreler**:
+- `id`: `string` — Hata mesajının ilişkilendirildiği form alanının benzersiz kimliği. Erişilebilirlik (accessibility) amacıyla kullanılır.
+- `message`: `string` (opsiyonel) — Gösterilecek hata mesajı metni. Tanımlı olmadığında bileşen hiçbir şey render etmez.
+
+**Dönüş**: `React.FC<{ id: string; message?: string }>` — id ve message props alan bir React fonksiyonel bileşeni döndürür.
+
+### focusFirstInvalid
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
 ### PricingSettingsFormModal
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### fieldError
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### handleClose
@@ -21963,6 +22499,7 @@ Bu modül, fiyatlandırma ayarlarını düzenlemek için bir form modalı sunar.
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../overlay/ConfirmProvider::useConfirm
 - import: @/hooks/useRole::useRole
 - import: @/i18n/I18nProvider::useI18n
 - import: @/lib/admin/mutateWithAudit::AdminPermissionError
@@ -21974,6 +22511,7 @@ Bu modül, fiyatlandırma ayarlarını düzenlemek için bir form modalı sunar.
 - import: lucide-react::Loader2
 - import: lucide-react::Save
 - import: lucide-react::X
+- import: react-hook-form::type { FieldErrors }
 - import: react-hook-form::useForm
 - import: react::React
 - import: react::useEffect
@@ -22014,66 +22552,84 @@ type PricingSettingsValues = z.infer<typeof pricingSettingsSchema>
   base_currency: 'TRY',
   enabled_currencies: ['TRY'],
   default_vat_rat...`
+- **FIELD_FOCUS_ORDER** (array) — `[
+  // Para birimi grubunda TRY kapatılamaz → odak ilk DEĞİŞTİRİLEBİLİR kutu...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: PricingSettingsFormModal.tsx::buildPricingSettingsSchema
-- **params**: (t: (key: string) => string)
+- **params**: `t` — çeviri fonksiyonu, `key: string` alır ve string döndürür
 - **ic_degiskenler**:
-  - `v` — Translation helper fonksiyonu; verilen key'i `admin.pricing.settings.validation.` prefix'i ile birleştirerek t fonksiyonunu çağırır
-- **Dönüş**: Zod schema nesnesi (pricing ayarları için validasyon kurallarını tanımlar)
+  - `v` — `t` fonksiyonunu saran yardımcı fonksiyon, `admin.pricing.settings.validation.${key}` ön ekini otomatik ekler
+- **Dönüş**: Zod şeması (`z.object`) — `base_currency`, `enabled_currencies`, `default_vat_rate_pct`, `default_price_is_vat_inclusive`, `default_round_to`, `default_charm_ending`, `display_spread_pct` alanlarını doğrular
 
-### [N2_NASIL] AST Pointer: PricingSettingsFormModal.tsx::PricingSettingsFormModal
-- **params**: (open: boolean, onOpenChange: (open: boolean) => void, initialValues?: PricingSettingsValues, onSuccess?: () => void)
+### [N2_NASIL] AST Pointer: PricingSettingsFormModal.tsx::FieldError
+- **params**: `id` — hata mesajının HTML `id` niteliği, `message` — opsiyonel hata metni
+- **ic_degiskenler**: yok
+- **Dönüş**: `message` varsa `<p>` elementi (role="alert", className="mt-1 text-xs font-bold tracking-tighter text-admin-danger"), yoksa `null`
+
+### [N3_NASIL] AST Pointer: PricingSettingsFormModal.tsx::focusFirstInvalid
+- **params**: `errs` — `FieldErrors<PricingSettingsValues>` türünde form hataları nesnesi
 - **ic_degiskenler**:
-  - `form` — useForm hook'undan gelen form instance'ı (react-hook-form)
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
-  - `hasWriteAccess` — useRole hook'undan gelen yazma izni boolean'ı
-  - `saving` — Form submission durumunu takip eden state (boolean)
-  - `setSaving` — saving state'ini güncelleyen setter fonksiyonu
-  - `handleClose` — Modal kapatma işlevi (değişiklik kontrolü ile)
-  - `handleOpenChange` — Modal open state değişiklik işlevi
-  - `handleBeforeUnload` — Sayfadan ayrılma engelleme işlevi (kirli form durumunda)
-  - `toggleCurrency` — Para birimi toggle işlevi
-  - `onSubmit` — Form submission asenkron işlevi
-  - `enabledCurrencies` — Formun enabled_currencies alanından gelen array (JSX içinde kullanılır)
-- **Dönüş**: React.FC<PricingSettingsFormModalProps> (Pricing ayarları form modalı)
+  - `first` — `FIELD_FOCUS_ORDER` dizisinde `errs[name]` eşleşen ilk eleman; bulunamazsa fonksiyon erken döner
+- **Dönüş**: `void` — yan etki olarak `document.getElementById(first.id)?.focus()` çağrısı yapar
 
-### [N3_NASIL] AST Pointer: PricingSettingsFormModal.tsx::handleClose
-- **params**: (yok)
+### [N4_NASIL] AST Pointer: PricingSettingsFormModal.tsx::PricingSettingsFormModal
+- **params**: `open` — modal açık/kapalı durumu, `onOpenChange` — durum değişiklik callback'i, `initialValues` — başlangıç form değerleri, `onSuccess` — başarılı kayıt sonrası callback
 - **ic_degiskenler**:
-  - `form.formState.isDirty` — Formda kaydedilmemiş değişiklik olup olmadığını kontrol eder
-- **Dönüş**: yok (yan etki: onOpenChange(false) çağırır, gerekirse onay dialoğu gösterir)
+  - `form` — `useForm` hook'undan dönen form nesnesi (zodResolver ile)
+  - `saving` — `useState` ile tutulan kayıt durumu boolean'ı
+  - `enabledCurrencies` — `form.watch('enabled_currencies')` ile izlenen etkin para birimleri dizisi
+  - `handleBeforeUnload` — `beforeunload` olayı için event handler, `form.formState.isDirty` kontrolü yapar
+  - `handleClose` — async kapatma fonksiyonu, kirli form durumunda onay ister
+  - `handleOpenChange` — `openVal` parametreli, kapalı durumda `handleClose()` çağırır
+  - `toggleCurrency` — `code` parametreli, TRY hariç para birimi seçimini açar/kapatır
+  - `fieldError` — `name` parametreli, form hata mesajını string olarak döndürür
+  - `onSubmit` — async form gönderim fonksiyonu
+  - `t` — `useI18n` hook'undan gelen çeviri fonksiyonu
+  - `hasWriteAccess` — `useRole` hook'undan gelen yazma yetkisi boolean'ı
+  - `supabase` — Supabase istemcisi
+  - `confirm` — onay dialog fonksiyonu
+  - `mutateWithAudit` — denetimli veri değiştirme fonksiyonu
+  - `toSupabaseJson` — JSON dönüştürücü yardımcı fonksiyon
+- **Dönüş**: `React.FC<PricingSettingsFormModalProps>` — modal JSX'i
 
-### [N4_NASIL] AST Pointer: PricingSettingsFormModal.tsx::handleOpenChange
-- **params**: (openVal: boolean)
-- **ic_degiskenler**: (yok — sadece parametre ve mevcut state kullanılır)
-- **Dönüş**: yok (yan etki: handleClose() veya onOpenChange(true) çağırır)
-
-### [N5_NASIL] AST Pointer: PricingSettingsFormModal.tsx::toggleCurrency
-- **params**: (code: PricingCurrencyCode)
+### [N5_NASIL] AST Pointer: PricingSettingsFormModal.tsx::fieldError
+- **params**: `name` — `keyof PricingSettingsValues` türünde form alan adı
 - **ic_degiskenler**:
-  - `current` — Mevcut enabled_currencies array'i (form.getValues ile alınır)
-  - `next` — Toggle sonrası güncellenmiş enabled_currencies array'i
-- **Dönüş**: yok (yan etki: form.setValue ile enabled_currencies güncellenir)
+  - `message` — `form.formState.errors[name]?.message` erişimi; string ise döndürülür, değilse `undefined`
+- **Dönüş**: `string | undefined`
 
-### [N6_NASIL] AST Pointer: PricingSettingsFormModal.tsx::onSubmit
-- **params**: (values: PricingSettingsValues)
+### [N6_NASIL] AST Pointer: PricingSettingsFormModal.tsx::handleClose
+- **params**: yok
 - **ic_degiskenler**:
-  - `authData` — Supabase auth.getUser() sonucu gelen kullanıcı verisi
-  - `userId` — authData.user?.id veya null (kullanıcı ID'si)
-  - `payload` — Güncellenmiş pricing değerleri (base_currency her zaman 'TRY' olarak zorlanır)
-  - `e` — Catch bloğundaki hata nesnesi
-  - `msg` — Kullanıcıya gösterilecek hata mesajı (AdminPermissionError, Error veya genel hata)
-- **Dönüş**: yok (yan etki: mutateWithAudit ile veritabanına kaydeder, toast mesajı gösterir, onSuccess ve onOpenChange çağırır)
+  - `ok` — `confirm()` fonksiyonunun dönüş değeri; kullanıcı onay verirse `true`
+- **Dönüş**: yok — yan etki olarak form kirli değilse `onOpenChange(false)` çağırır; kirliyse onay dialogu gösterir, onaylanırsa `onOpenChange(false)` çağırır
 
-### [N7_NASIL] AST Pointer: PricingSettingsFormModal.tsx::innerUpsertFunction
-- **params**: (yok — anonymous async fonksiyon)
+### [N7_NASIL] AST Pointer: PricingSettingsFormModal.tsx::handleOpenChange
+- **params**: `openVal` — boolean, modal'ın yeni açık/kapalı durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `openVal` false ise `handleClose()` çağırır, true ise `onOpenChange(true)` çağırır
+
+### [N8_NASIL] AST Pointer: PricingSettingsFormModal.tsx::toggleCurrency
+- **params**: `code` — `PricingCurrencyCode` türünde para birimi kodu
 - **ic_degiskenler**:
-  - `error` — Supabase upsert işleminde oluşabilecek hata
-- **Dönüş**: Promise<void> (veritabanına upsert işlemi yapar, hata fırlatabilir)
+  - `current` — `form.getValues('enabled_currencies')` sonucu; mevcut etkin para birimleri dizisi, yoksa boş dizi
+  - `next` — `current` dizisi içinde `code` varsa filtrelenmiş hali, yoksa eklenmiş hali
+- **Dönüş**: yok — yan etki olarak `form.setValue('enabled_currencies', next, { shouldDirty: true, shouldValidate: true })` çağrısı yapar; `code === 'TRY'` ise erken döner (taban para birimi kapatılamaz)
+
+### [N9_NASIL] AST Pointer: PricingSettingsFormModal.tsx::onSubmit
+- **params**: `values` — `PricingSettingsValues` türünde form değerleri
+- **ic_degiskenler**:
+  - `authData` — `supabase.auth.getUser()` sonucu; kullanıcı kimlik bilgisi
+  - `userId` — `authData.user?.id` değeri; yoksa `null`
+  - `payload` — `values` nesnesinin `base_currency: 'TRY'` ile birleştirilmiş kopyası
+  - `error` — `supabase.from('site_settings').upsert(...)` sonucu; hata varsa fırlatılır
+  - `e` — `catch` bloğunda yakalanan `unknown` türünde hata
+  - `msg` — hata türüne göre belirlenen mesaj: `AdminPermissionError` ise yetki hatası, `Error` ise `e.message`, diğer durumlarda genel hata mesajı
+- **Dönüş**: yok — yan etkiler: `setSaving(true/false)`, `mutateWithAudit` ile denetimli kayıt, başarılıysa `toast.success` + `onSuccess()` + `onOpenChange(false)`, hata durumunda `toast.error(msg)`
 
 ---
 
@@ -22081,14 +22637,18 @@ type PricingSettingsValues = z.infer<typeof pricingSettingsSchema>
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    PricingSettingsFormModal_tsx__FieldError["FieldError"]
     PricingSettingsFormModal_tsx__PricingSettingsFormModal["PricingSettingsFormModal"]
     PricingSettingsFormModal_tsx__buildPricingSettingsSchema["buildPricingSettingsSchema"]
+    PricingSettingsFormModal_tsx__fieldError["fieldError"]
+    PricingSettingsFormModal_tsx__focusFirstInvalid["focusFirstInvalid"]
     PricingSettingsFormModal_tsx__handleClose["handleClose"]
     PricingSettingsFormModal_tsx__handleOpenChange["handleOpenChange"]
     PricingSettingsFormModal_tsx__onSubmit["onSubmit"]
     PricingSettingsFormModal_tsx__toggleCurrency["toggleCurrency"]
     PricingSettingsFormModal_tsx__PricingSettingsFormModal --> PricingSettingsFormModal_tsx__buildPricingSettingsSchema
     PricingSettingsFormModal_tsx__PricingSettingsFormModal --> PricingSettingsFormModal_tsx__toggleCurrency
+    PricingSettingsFormModal_tsx__PricingSettingsFormModal --> PricingSettingsFormModal_tsx__fieldError
     PricingSettingsFormModal_tsx__PricingSettingsFormModal --> PricingSettingsFormModal_tsx__handleClose
 ```
 
@@ -22096,7 +22656,10 @@ graph TD
 
   file: src\components\admin\pricing\PricingSettingsFormModal.tsx
   function: src\components\admin\pricing\PricingSettingsFormModal.tsx::buildPricingSettingsSchema
+  function: src\components\admin\pricing\PricingSettingsFormModal.tsx::FieldError
+  function: src\components\admin\pricing\PricingSettingsFormModal.tsx::focusFirstInvalid
   function: src\components\admin\pricing\PricingSettingsFormModal.tsx::PricingSettingsFormModal
+  function: src\components\admin\pricing\PricingSettingsFormModal.tsx::fieldError
   function: src\components\admin\pricing\PricingSettingsFormModal.tsx::handleClose
   function: src\components\admin\pricing\PricingSettingsFormModal.tsx::handleOpenChange
   function: src\components\admin\pricing\PricingSettingsFormModal.tsx::toggleCurrency
@@ -22106,11 +22669,13 @@ graph TD
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: DEFAULT_PRICING_SETTINGS
+  export: FieldError
   export: PRICING_CURRENCY_OPTIONS
   export: PricingCurrencyCode
   export: PricingSettingsFormModal
   export: PricingSettingsValues
   export: buildPricingSettingsSchema
+  export: focusFirstInvalid
   export: pricingSettingsSchema
 
 ---
@@ -22124,10 +22689,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-cyan-400/10`, `bg-slate-950/40`, `bg-surface-deep`, `bg-transparent`, `bg-white/2`, `border-b`, `border-cyan-400/20`, `border-cyan-400/30`, `border-t`, `border-white/10`, `border-white/5`, `group-hover:text-cyan-400`, `hover:bg-white/10`, `hover:border-white/10`
-- **Layout:** `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-4`, `h-5`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-bg`, `bg-admin-surface-2`, `bg-black/60`, `bg-transparent`, `border-admin-accent/30`, `border-admin-border`, `border-b`, `border-t`, `group-hover:text-admin-accent`, `hover:bg-admin-surface-3`, `hover:border-admin-border`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-danger`
+- **Layout:** `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-wrap`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `h-4`, `h-5`, `items-center`
 - **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminButtonPrimaryClass`, `${disabled`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `animate-spin`, `border`, `checked`, `cursor-not-allowed`, `cursor-pointer`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`, `group`
+- **Yardımcı Sınıflar:** `!border-admin-danger`, `$`, `${adminButtonPrimaryClass`, `${adminInputClass}${fieldError('default_charm_ending`, `${adminInputClass}${fieldError('default_round_to`, `${adminInputClass}${fieldError('default_vat_rate_pct`, `${adminInputClass}${fieldError('display_spread_pct`, `${disabled`, `-translate-x-1/2`, `-translate-y-1/2`, `:`, `animate-spin`, `border`, `checked`, `cursor-not-allowed`
 
 ---
 # FILE: src\components\admin\pricing\RuleScopeTargetPicker.md
@@ -22136,13 +22701,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\pricing\RuleScopeTargetPicker.tsx
-skeleton_hash: e267c406eaf62bd0
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\pricing\RuleScopeTargetPicker.tsx
+skeleton_hash: b70daa4147dc189c
 entity_hashes:
   func:RuleScopeTargetPicker: f4ade92279a11a9a
   overview: 2f50bfc7ddc59a2a
   style_tokens: 44e70660b758686a
-generated_at: 2026-08-25T07:25:11Z
+generated_at: 2026-08-27T08:19:53Z
 ---
 
 ## Genel Bakış
@@ -22309,8 +22874,8 @@ Kural kapsamının HEDEF seçicisi (scope ↔ hedef DB CHECK'inin UI karşılı�
 
 ## NODE ID STANDARD
 
-  file: RuleScopeTargetPicker.tsx
-  function: RuleScopeTargetPicker.tsx::RuleScopeTargetPicker
+  file: src\components\admin\pricing\RuleScopeTargetPicker.tsx
+  function: src\components\admin\pricing\RuleScopeTargetPicker.tsx::RuleScopeTargetPicker
 
 ---
 
@@ -22340,13 +22905,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\products\ProductCsvImport.tsx
-skeleton_hash: 84a0e091fa0e547f
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\products\ProductCsvImport.tsx
+skeleton_hash: c0e5d32399c7f0b6
 entity_hashes:
   func:ProductCsvImport: 2d3e91e9df88f214
   overview: 59646c8b18833a0c
   style_tokens: 3b8273019bfac780
-generated_at: 2026-08-25T07:26:37Z
+generated_at: 2026-08-27T08:22:53Z
 ---
 
 ## Genel Bakış
@@ -22408,8 +22973,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzası
 
 ## NODE ID STANDARD
 
-  file: ProductCsvImport.tsx
-  function: ProductCsvImport.tsx::ProductCsvImport
+  file: src\components\admin\products\ProductCsvImport.tsx
+  function: src\components\admin\products\ProductCsvImport.tsx::ProductCsvImport
 
 ---
 
@@ -22439,15 +23004,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\products\ProductFormModal.tsx
-skeleton_hash: c9d3d39f056d0bd2
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\products\ProductFormModal.tsx
+skeleton_hash: db7f42cb4a2edd61
 entity_hashes:
   func:ProductFormModal: 6997b37c35b0ebef
   func:getProductSchema: 1aed3dbe58799d62
   func:onSubmit: 56cec6a550e2cc75
   overview: 7ffa6a2ec80048ee
-  style_tokens: 553a7b8fa0cd3c86
-generated_at: 2026-08-13T08:57:18Z
+  style_tokens: 6d7728838ddc9818
+generated_at: 2026-08-27T08:22:54Z
 ---
 
 ## Genel Bakış
@@ -22640,10 +23205,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/50`, `bg-primary-navy`, `bg-white`, `hover:bg-blue-700`, `hover:bg-slate-100`, `hover:bg-slate-50`, `text-industrial-gray`, `text-red-500`, `text-slate-500`, `text-white`, `text-xl`, `text-xs`
-- **Layout:** `backdrop-blur-sm`, `fixed`, `flex`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-center`, `justify-between`, `justify-end`, `left-1/2`, `max-h-90vh`, `max-w-2xl`, `md:grid-cols-2`
+- **Renkler:** `bg-admin-accent`, `bg-admin-surface`, `bg-black/50`, `hover:bg-admin-accent`, `hover:bg-admin-surface-2`, `text-admin-accent-fg`, `text-admin-danger`, `text-admin-fg-muted`, `text-industrial-gray`, `text-xl`, `text-xs`
+- **Layout:** `fixed`, `flex`, `gap-2`, `gap-3`, `gap-4`, `grid`, `grid-cols-1`, `items-center`, `justify-between`, `justify-end`, `left-1/2`, `max-h-90vh`, `max-w-2xl`, `md:grid-cols-2`, `md:grid-cols-3`
 - **Varyant/Responsive:** `focus-visible:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `focus-visible:outline-none`, `font-bold`, `inset-0`, `mb-6`, `mt-8`, `px-4`, `px-6`, `py-2`, `rounded-2xl`, `rounded-full`, `rounded-lg`
+- **Yardımcı Sınıflar:** `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `focus-visible:outline-none`, `font-bold`, `inset-0`, `mb-6`, `mt-8`, `px-4`, `px-6`, `py-2`, `rounded-admin-lg`, `rounded-admin-md`, `rounded-full`
 
 ---
 # FILE: src\components\admin\products\ProductHealthBadge.md
@@ -22652,13 +23217,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\products\ProductHealthBadge.tsx
-skeleton_hash: 1dd9494cac97bf20
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\products\ProductHealthBadge.tsx
+skeleton_hash: cf0d9fd434f025c3
 entity_hashes:
   func:ProductHealthBadge: 7149ab2cdd96084d
   overview: 300c84dd02e2dca2
-  style_tokens: ee784aad25800471
-generated_at: 2026-06-19T20:47:05Z
+  style_tokens: 07d2b0a0a3540bdf
+generated_at: 2026-08-27T08:22:56Z
 ---
 
 ## Genel Bakış
@@ -22752,7 +23317,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Tailwind Sınıf Özeti
 - **Renkler:** `text-xs`
-- **Layout:** `h-6`, `inline-flex`, `items-center`, `justify-center`, `shadow-sm`, `w-6`
+- **Layout:** `h-6`, `inline-flex`, `items-center`, `justify-center`, `shadow-admin-sm`, `w-6`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `${colors[score]`, `border`, `font-bold`, `ring-2`, `ring-offset-1`, `rounded-full`
 
@@ -22763,13 +23328,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\purchasing\CreatePurchaseOrderPanel.tsx
-skeleton_hash: 816bab8d5fa22582
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\purchasing\CreatePurchaseOrderPanel.tsx
+skeleton_hash: cfe6fe92941c9136
 entity_hashes:
   func:CreatePurchaseOrderPanel: a078f5162fb3a710
   overview: 750dd9416d29924d
   style_tokens: 967bed87e53566b5
-generated_at: 2026-08-25T08:43:50Z
+generated_at: 2026-08-27T08:22:57Z
 ---
 
 ## Genel Bakış
@@ -22970,47 +23535,82 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\settings\SettingsFormModal.tsx
-skeleton_hash: 010b688aa07bc3a1
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\settings\SettingsFormModal.tsx
+skeleton_hash: e283eff68e7437d6
 entity_hashes:
+  func:FieldError: 73ce29b5cf8d764a
   func:SettingsFormModal: c24cb91e033d6d4b
+  func:buildAdminsSchema: 67672964dbd5b43a
+  func:buildGeneralSchema: 496911c10ff4aaf4
+  func:buildPaymentSchema: dee5a7d812640652
+  func:buildSystemSchema: 687a1d24379bba59
+  func:fieldError: 37d7abfeddb1b397
+  func:focusFirstInvalid: 3a6bc1fe36e42a48
   func:getSectionTitle: bc295f0afa8615b4
-  func:handleClose: b985b474034243a8
+  func:handleClose: a37ec62b7916052c
   func:handleOpenChange: b7949752bd032233
   func:onSubmit: 36d88356bd3272ee
-  overview: 5a17b2b7a2c5a922
-  style_tokens: 631fa82b70a5654d
-generated_at: 2026-06-19T20:47:05Z
+  overview: 307d74c7f295a46d
+  style_tokens: bf489b98a67753fe
+generated_at: 2026-08-27T08:23:53Z
 ---
 
 ## Genel Bakış
-Bu modül, admin panelindeki ayarlar bölümünde bölüm bazlı yapılandırma düzenlemeleri için kullanılan kontrollü bir form modal bileşenidir. Modal penceresinin açılıp kapanmasını yönetir, form gönderimlerini işler ve ilgili bölüm başlıklarını dinamik olarak belirler.
+Bu modül, admin panelindeki ayarlar bölümünde kullanılan kontrollü bir form modal bileşenidir. Form validasyon şemalarını oluşturur, modalın açılıp kapanma durumunu yönetir ve kullanıcı tarafından girilen ayar verilerinin gönderilmesini sağlar. Ayrıca form hatalarını görüntüler ve ilk geçersiz alana odaklanma gibi kullanıcı deneyimi iyileştirmeleri sunar.
 
 ## Fonksiyon Grupları
+### Şema Oluşturma
+Formun geçerliliğini kontrol etmek için kullanılan validasyon şemalarını, ilgili ayar bölümüne göre dinamik olarak oluşturur.
+- buildGeneralSchema, buildPaymentSchema, buildAdminsSchema, buildSystemSchema
+
 ### Modal Durum Yönetimi
 Modal penceresinin açılıp kapanma akışını kontrol eder ve üst bileşen ile iletişim kurarak durum değişikliklerini yönetir.
 - handleClose, handleOpenChange
 
-### Form İşlemleri
-Kullanıcıdan toplanan form verilerini alır ve sunucuya göndererek ayarların güncellenmesi işlemini başlatır. Bu işlem asenkron bir yapıda çalışır.
-- onSubmit
+### Form İşlemleri ve Hata Yönetimi
+Form gönderimini işler, form hatalarını belirler ve kullanıcı arayüzünde hata mesajlarını gösterir. Ayrıca form hataları varsa ilk geçersiz alana odaklanmayı sağlar.
+- onSubmit, focusFirstInvalid, fieldError, FieldError
 
 ### Yardımcı İşlevler
 Modal başlığını, mevcut ayar bölümüne göre dinamik olarak belirler ve bileşen içi okunabilirliği artırır.
 - getSectionTitle
 
+### Ana Bileşen
+Tüm bu grupları bir araya getiren, formu ve modalı yapılandıran ana bileşendir.
+- SettingsFormModal
+
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, ayarlar formunu section bazlı olarak yöneten kontrollü bir modal bileşenidir.
-
-[Aksiyom 1]: Eğer `section` parametresi `generalSchema`, `paymentSchema`, `adminsSchema` veya `systemSchema` değerlerinden biri değilse, form_Validasyon şeması seçilemez ve form gönderimi hatalı çalışır.
-
-[Aksiyom 2]: Eğer `initialValues` prop'u sağlanmazsa, form boş değerlerle
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### buildGeneralSchema
+**Ne yapar**: Genel ayarlar bölümünün form doğrulama şemasını oluşturur. `v` parametresi aracılığıyla doğrulama mesajlarını uluslararasılaştırma (i18n) sisteminden çeker.
+**Nasıl yapar**: Verilen `v` fonksiyonunu kullanarak genel ayarlar için geçerli bir doğrulama şeması üretir. Gövdedeki mantığa göre, eğer `section` tanımlı değilse doğrudan `buildGeneralSchema(v)` çağrılır; `section` tanımlıysa switch-case yapısıyla ilgili bölümün şeması oluşturulur. `'general'` durumunda `buildGeneralSchema(v)`, `'payment'` durumunda `buildPaymentSchema(v)`, `'admins'` durumunda `buildAdminsSchema(v)`, `'system'` durumunda `buildSystemSchema()` çağrılır.
+**Parametreler**:
+- v: (key: string) => string — Doğrulama mesaharını i18n anahtarına göre döndüren fonksiyon. `t('admin.settings.validation.${key}')` şeklinde çağrılır.
+**Dönüş**: Bilinmiyor — kaynakta dönüş tipi belirtilmemiş.
+
+### buildPaymentSchema
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### buildAdminsSchema
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### buildSystemSchema
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### FieldError
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### focusFirstInvalid
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### SettingsFormModal
 **Ne yapar**: Admin panelindeki ayarlar sayfası için form içeren bir modal bileşenidir. Kullanıcının ayar formunu görüntülemesini, düzenlemesini ve kaydetmesini sağlar.
@@ -23025,6 +23625,9 @@ Bu modül, ayarlar formunu section bazlı olarak yöneten kontrollü bir modal b
 - onSuccess: () => void — Form başarıyla gönderildiğinde ve kaydedildiğinde çağrılan callback fonksiyonu. Parent bileşenin verileri yenilemesini veya bildirim göstermesini tetikler.
 
 **Dönüş**: `React.FC<SettingsFormModalProps>` tipinde bir React functional component döndürür. Bu, React JSX elementleri üreten bir bileşendir.
+
+### fieldError
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### handleClose
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -23041,6 +23644,7 @@ Bu modül, ayarlar formunu section bazlı olarak yöneten kontrollü bir modal b
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../overlay/ConfirmProvider::useConfirm
 - import: @/hooks/useRole::useRole
 - import: @/i18n/I18nProvider::useI18n
 - import: @/lib/admin/mutateWithAudit::AdminPermissionError
@@ -23052,6 +23656,7 @@ Bu modül, ayarlar formunu section bazlı olarak yöneten kontrollü bir modal b
 - import: lucide-react::Loader2
 - import: lucide-react::Save
 - import: lucide-react::X
+- import: react-hook-form::type { FieldErrors }
 - import: react-hook-form::useForm
 - import: react::React
 - import: react::useEffect
@@ -23082,27 +23687,81 @@ type SettingsSection = 'general' | 'payment' | 'admins' | 'system'
 ---
 
 ## SABİTLER
-- **generalSchema** (call) — `z.object({
-  site_name: z.string().min(1, 'Site adı zorunludur'),
-  tagline...`
-- **paymentSchema** (call) — `z.object({
-  iyzico_enabled: z.boolean(),
-  iyzico_mode: z.enum(['sandbox',...`
-- **adminsSchema** (call) — `z.object({
-  admin_sessions_timeout: z.string().min(1, 'Oturum süresi zorunl...`
-- **systemSchema** (call) — `z.object({
-  system_log_level: z.enum(['debug', 'info', 'warn', 'error']),
-...`
+- **FIELD_FOCUS_ORDER** (array) — `[
+  { name: 'site_name', id: 'settings-site-name' },
+  { name: 'tagline', i...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: SettingsFormModal.tsx::getSchema (anonim)
-- **params**: () — parametre yok
+### [N1_NASIL] AST Pointer: SettingsFormModal.tsx::buildGeneralSchema
+- **params**: `v` — (key: string) => string tipinde çeviri fonksiyonu
 - **ic_degiskenler**: yok
-- **Kullanılan closure değişkenleri**: `section` — hangi ayarlar bölümünün aktif olduğunu belirten string; `generalSchema`, `paymentSchema`, `adminsSchema`, `systemSchema` — bölüm bazlı Zod doğrulama şemaları
-- **Dönüş**: ZodSchema — `section` değerine göre ilgili şemayı döndürür; `section` falsy ise `generalSchema` döner
+- **Dönüş**: z.object (Zod şeması) — site_name, tagline, contact_email, support_phone, headquarters, logo_url alanlarını doğrular
+
+### [N2_NASIL] AST Pointer: SettingsFormModal.tsx::buildPaymentSchema
+- **params**: `v` — (key: string) => string tipinde çeviri fonksiyonu
+- **ic_degiskenler**: yok
+- **Dönüş**: z.object (Zod şeması) — iyzico_enabled, iyzico_mode, iyzico_api_key alanlarını doğrular
+
+### [N3_NASIL] AST Pointer: SettingsFormModal.tsx::buildAdminsSchema
+- **params**: `v` — (key: string) => string tipinde çeviri fonksiyonu
+- **ic_degiskenler**: yok
+- **Dönüş**: z.object (Zod şeması) — admin_sessions_timeout, mfa_required alanlarını doğrular
+
+### [N4_NASIL] AST Pointer: SettingsFormModal.tsx::buildSystemSchema
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: z.object (Zod şeması) — system_log_level, debug_mode alanlarını doğrular
+
+### [N5_NASIL] AST Pointer: SettingsFormModal.tsx::FieldError
+- **params**: `id` — string, `message` — string (opsiyonel)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — message varsa `<p>` elementi (role="alert", className="mt-1 text-xs font-bold tracking-tighter text-admin-danger"), yoksa null
+
+### [N6_NASIL] AST Pointer: SettingsFormModal.tsx::focusFirstInvalid
+- **params**: `errs` — FieldErrors<Record<string, unknown>>
+- **ic_degiskenler**:
+  - `first` — FIELD_FOCUS_ORDER dizisinde errs[name] eşleşen ilk öğe; bulunamazsa fonksiyon erken döner
+- **Dönüş**: void — bulunan öğenin id'si ile document.getElementById(first.id)?.focus() çağrısı yapar
+
+### [N7_NASIL] AST Pointer: SettingsFormModal.tsx::getSchema
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `v` — t fonksiyonunu kullanarak `admin.settings.validation.${key}` anahtarını çeviren arrow function
+- **Dönüş**: Zod şeması — section değerine göre buildGeneralSchema, buildPaymentSchema, buildAdminsSchema veya buildSystemSchema çağrısı; section yoksa buildGeneralSchema(v) döner
+
+### [N8_NASIL] AST Pointer: SettingsFormModal.tsx::fieldError
+- **params**: `name` — string
+- **ic_degiskenler**:
+  - `message` — form.formState.errors[name]?.message değeri; typeof kontrolü ile string ise döndürülür, değilse undefined
+- **Dönüş**: string | undefined
+
+### [N9_NASIL] AST Pointer: SettingsFormModal.tsx::handleClose
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `ok` — confirm fonksiyonunun await ile beklenen boolean dönüş değeri
+- **Dönüş**: void (async) — form.formState.isDirty false ise doğrudan onOpenChange(false) çağrısı yapar; true ise confirm dialog gösterir, ok true ise onOpenChange(false) çağrısı yapar
+
+### [N10_NASIL] AST Pointer: SettingsFormModal.tsx::handleOpenChange
+- **params**: `openVal` — boolean
+- **ic_degiskenler**: yok
+- **Dönüş**: void — openVal false ise handleClose() çağrısı yapar, true ise onOpenChange(true) çağrısı yapar
+
+### [N11_NASIL] AST Pointer: SettingsFormModal.tsx::onSubmit
+- **params**: `values` — Record<string, unknown>
+- **ic_degiskenler**:
+  - `authData` — supabase.auth.getUser() sonucu; authData.user?.id ile kullanıcı kimliği alınır
+  - `userId` — authData.user?.id || null; veritabanına yazılacak kullanıcı kimliği
+  - `e` — catch bloğunda yakalanan unknown tipinde hata
+  - `msg` — hata tipine göre belirlenen mesaj: AdminPermissionError ise t('admin.settings.noPermission'), Error ise e.message, diğer durumlarda t('admin.settings.saveError')
+- **Dönüş**: void (async) — section yoksa erken döner; setSaving(true) ile başlar; mutateWithAudit ile site_settings tablosuna upsert yapar (key: section, value: toSupabaseJson(values), updated_by: userId, updated_at: ISO tarih); başarılıysa toast.success, onSuccess(), onOpenChange(false); hatada toast.error; finally'de setSaving(false)
+
+### [N12_NASIL] AST Pointer: SettingsFormModal.tsx::getSectionTitle
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: string — section değerine göre çevrilmiş başlık: 'general' ise t('admin.settings.generalSettingsTitle'), 'payment' ise t('admin.settings.paymentSettingsTitle'), 'admins' ise t('admin.settings.adminsPolicyTitle'), 'system' ise t('admin.settings.systemConfigTitle'); section yoksa boş string
 
 ---
 
@@ -23110,19 +23769,38 @@ type SettingsSection = 'general' | 'payment' | 'admins' | 'system'
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    SettingsFormModal_tsx__FieldError["FieldError"]
     SettingsFormModal_tsx__SettingsFormModal["SettingsFormModal"]
+    SettingsFormModal_tsx__buildAdminsSchema["buildAdminsSchema"]
+    SettingsFormModal_tsx__buildGeneralSchema["buildGeneralSchema"]
+    SettingsFormModal_tsx__buildPaymentSchema["buildPaymentSchema"]
+    SettingsFormModal_tsx__buildSystemSchema["buildSystemSchema"]
+    SettingsFormModal_tsx__fieldError["fieldError"]
+    SettingsFormModal_tsx__focusFirstInvalid["focusFirstInvalid"]
     SettingsFormModal_tsx__getSectionTitle["getSectionTitle"]
     SettingsFormModal_tsx__handleClose["handleClose"]
     SettingsFormModal_tsx__handleOpenChange["handleOpenChange"]
     SettingsFormModal_tsx__onSubmit["onSubmit"]
     SettingsFormModal_tsx__SettingsFormModal --> SettingsFormModal_tsx__handleClose
+    SettingsFormModal_tsx__SettingsFormModal --> SettingsFormModal_tsx__fieldError
+    SettingsFormModal_tsx__SettingsFormModal --> SettingsFormModal_tsx__buildAdminsSchema
+    SettingsFormModal_tsx__SettingsFormModal --> SettingsFormModal_tsx__buildPaymentSchema
+    SettingsFormModal_tsx__SettingsFormModal --> SettingsFormModal_tsx__buildGeneralSchema
+    SettingsFormModal_tsx__SettingsFormModal --> SettingsFormModal_tsx__buildSystemSchema
     SettingsFormModal_tsx__SettingsFormModal --> SettingsFormModal_tsx__getSectionTitle
 ```
 
 ## NODE ID STANDARD
 
   file: src\components\admin\settings\SettingsFormModal.tsx
+  function: src\components\admin\settings\SettingsFormModal.tsx::buildGeneralSchema
+  function: src\components\admin\settings\SettingsFormModal.tsx::buildPaymentSchema
+  function: src\components\admin\settings\SettingsFormModal.tsx::buildAdminsSchema
+  function: src\components\admin\settings\SettingsFormModal.tsx::buildSystemSchema
+  function: src\components\admin\settings\SettingsFormModal.tsx::FieldError
+  function: src\components\admin\settings\SettingsFormModal.tsx::focusFirstInvalid
   function: src\components\admin\settings\SettingsFormModal.tsx::SettingsFormModal
+  function: src\components\admin\settings\SettingsFormModal.tsx::fieldError
   function: src\components\admin\settings\SettingsFormModal.tsx::handleClose
   function: src\components\admin\settings\SettingsFormModal.tsx::handleOpenChange
   function: src\components\admin\settings\SettingsFormModal.tsx::onSubmit
@@ -23131,8 +23809,14 @@ graph TD
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: FieldError
   export: SettingsFormModal
   export: SettingsSection
+  export: buildAdminsSchema
+  export: buildGeneralSchema
+  export: buildPaymentSchema
+  export: buildSystemSchema
+  export: focusFirstInvalid
 
 ---
 
@@ -23145,10 +23829,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-black/60`, `bg-slate-950/40`, `bg-surface-deep`, `bg-transparent`, `bg-white/2`, `border-b`, `border-t`, `border-white/10`, `border-white/5`, `group-hover:text-cyan-400`, `hover:bg-white/10`, `hover:border-white/10`, `hover:text-white`, `text-cyan-400`, `text-red-400`
-- **Layout:** `backdrop-blur-sm`, `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `grid-cols-2`, `h-5`, `items-center`, `items-start`
-- **Varyant/Responsive:** `focus-visible:`, `group-hover:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `!bg-slate-950`, `!border-white/5`, `${adminButtonPrimaryClass`, `${adminInputClass`, `-translate-x-1/2`, `-translate-y-1/2`, `animate-spin`, `border`, `cursor-pointer`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`, `group`, `group-hover:-translate-y-px`, `inset-0`
+- **Renkler:** `bg-admin-bg`, `bg-admin-surface-2`, `bg-black/60`, `bg-transparent`, `border-admin-border`, `border-b`, `border-t`, `group-hover:text-admin-accent`, `hover:bg-admin-surface-3`, `hover:border-admin-border`, `hover:text-admin-fg`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`
+- **Layout:** `block`, `custom-scrollbar`, `fixed`, `flex`, `flex-1`, `flex-col`, `gap-2`, `gap-4`, `grid`, `grid-cols-1`, `grid-cols-2`, `h-5`, `items-center`, `items-start`, `justify-between`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `!bg-admin-surface-3`, `!border-admin-border`, `!border-admin-danger`, `${adminButtonPrimaryClass`, `${adminInputClass`, `${adminInputClass}${fieldError('admin_sessions_timeout`, `${adminInputClass}${fieldError('contact_email`, `${adminInputClass}${fieldError('headquarters`, `${adminInputClass}${fieldError('iyzico_api_key`, `${adminInputClass}${fieldError('logo_url`, `${adminInputClass}${fieldError('site_name`, `${adminInputClass}${fieldError('support_phone`, `${adminInputClass}${fieldError('tagline`, `-translate-x-1/2`, `-translate-y-1/2`
 
 ---
 # FILE: src\components\admin\shell\AdminPageHeader.md
@@ -23157,13 +23841,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\shell\AdminPageHeader.tsx
-skeleton_hash: 18c2d028c904b027
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\shell\AdminPageHeader.tsx
+skeleton_hash: 5276a80aa581ba71
 entity_hashes:
   func:AdminPageHeader: 9007c4c4bb00760d
   overview: e26822fd35affb04
   style_tokens: 774aecf71fafa764
-generated_at: 2026-08-15T18:23:38Z
+generated_at: 2026-08-27T08:23:54Z
 ---
 
 ## Genel Bakış
@@ -23276,15 +23960,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\shell\AdminSidebar.tsx
-skeleton_hash: f6d6b0b8f97bec54
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\shell\AdminSidebar.tsx
+skeleton_hash: 0e76a93ffca52c2f
 entity_hashes:
   func:AdminMobileNav: 2796687b9805241d
   func:AdminSidebar: 56939624b9898a40
   func:NavList: 26f7e965010c847c
   overview: a33b54ba73b627ed
   style_tokens: bc5af71be1a20afb
-generated_at: 2026-08-25T07:25:24Z
+generated_at: 2026-08-27T08:23:56Z
 ---
 
 ## Genel Bakış
@@ -23422,10 +24106,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: AdminSidebar.tsx
-  function: AdminSidebar.tsx::NavList
-  function: AdminSidebar.tsx::AdminSidebar
-  function: AdminSidebar.tsx::AdminMobileNav
+  file: src\components\admin\shell\AdminSidebar.tsx
+  function: src\components\admin\shell\AdminSidebar.tsx::NavList
+  function: src\components\admin\shell\AdminSidebar.tsx::AdminSidebar
+  function: src\components\admin\shell\AdminSidebar.tsx::AdminMobileNav
 
 ---
 
@@ -23600,12 +24284,12 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\shell\navCookie.ts
-skeleton_hash: b94a2f7431e005bc
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\shell\navCookie.ts
+skeleton_hash: c3900fde97f3abf0
 entity_hashes:
   func:navCookieName: 8a86dcbe310f0bfe
   overview: 0ea1a0c140fc2427
-generated_at: 2026-08-25T07:25:02Z
+generated_at: 2026-08-27T08:23:58Z
 ---
 
 ## Genel Bakış
@@ -23657,8 +24341,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan çıkarı
 
 ## NODE ID STANDARD
 
-  file: navCookie.ts
-  function: navCookie.ts::navCookieName
+  file: src\components\admin\shell\navCookie.ts
+  function: src\components\admin\shell\navCookie.ts::navCookieName
 
 ---
 
@@ -23837,12 +24521,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\shell\useAdminThemeBodyScope.ts
-skeleton_hash: b67c4de253b25644
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\shell\useAdminThemeBodyScope.ts
+skeleton_hash: 3a8361a82976c8ca
 entity_hashes:
   func:useAdminThemeBodyScope: cd448415a9b4837a
   overview: 3f58a351c987c09f
-generated_at: 2026-08-25T08:43:06Z
+generated_at: 2026-08-27T08:24:00Z
 ---
 
 ## Genel Bakış
@@ -23915,13 +24599,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\analytics\ConsentGatedAnalytics.tsx
-skeleton_hash: 93b9759ea94cac66
+source_path: C:\tmp\vh-altyapi-t165\src\components\analytics\ConsentGatedAnalytics.tsx
+skeleton_hash: 74e2f92e69474c6f
 entity_hashes:
   func:ConsentGatedAnalytics: 9b16ee63b631e51c
   overview: a8de5e3a277277bd
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T08:43:28Z
+generated_at: 2026-08-27T08:24:01Z
 ---
 
 ## Genel Bakış
@@ -24018,8 +24702,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\authority\AuthorityRenderer.tsx
-skeleton_hash: 11ff45903fa8d6a7
+source_path: C:\tmp\vh-altyapi-t165\src\components\authority\AuthorityRenderer.tsx
+skeleton_hash: 5182d5555a42c724
 entity_hashes:
   func:AuthorityRenderer: b497d8ee6938f090
   func:ComparisonBlock: 3b92c32ed036d564
@@ -24028,43 +24712,39 @@ entity_hashes:
   func:HeroBlock: 004bad6f0e03f1b8
   func:IconRenderer: 6dea11b29c7fd6b8
   func:SpecsBlock: 02f28da6bc471010
-  overview: d1ce42a9320b0273
+  overview: 6f14bbf658674292
   style_tokens: c2dd5bfa6feb94e3
-generated_at: 2026-06-14T22:16:54Z
+generated_at: 2026-08-27T08:47:04Z
 ---
 
 ## Genel Bakış
-`AuthorityRenderer` modülü, dinamik ve çoklu içerik bloklarını (hero bölümü, özellikler, karşılaştırma tabloları vb.) merkezi olarak yöneten bir React bileşenidir. Modül, bir içerik blokları koleksiyonunu alır ve her bir bloğun `type` alanına göre önceden tanımlı, uygun render bileşenine yönlendirerek modüler ve tutarlı bir arayüz üretir.
+`AuthorityRenderer` modülü, dinamik içerik bloklarını merkezi olarak yöneten bir React bileşenidir. Modül, bir içerik koleksiyonunu alır ve her bloğun türüne göre uygun render bileşenine yönlendirerek modüler bir arayüz üretir. Blok bileşenleri bağımsızdır ve her biri kendisine iletilen veri yapısını çözümleyerek ilgili arayüz bölümünü oluşturur.
 
 ## Fonksiyon Grupları
+
 ### Ana Yönlendirici ve Yardımcılar
-Modülün giriş noktası olan ana bileşen, içerik dizisini iterasyona alarak blok tipine göre doğru render bileşenini çağırır. Yardımcı bileşen, bloklar içinde ortak ihtiyaç duyulan ikon gösterimini soyutlayarak tekrar kullanılırlığı sağlar.
-- `AuthorityRenderer`, `IconBlock` olarak da adlandırılabilecek `IconRenderer`.
+Modülün giriş noktasıdır. İçerik dizisini iterasyona alarak blok tipine göre doğru render bileşenini çağırır. Yardımcı bileşen ise bloklar içinde ortak ihtiyaç duyulan ikon gösterimini soyutlar.
+- `AuthorityRenderer`, `IconRenderer`
 
 ### Blok Bazlı Render Bileşenleri
-Her bir içerik bloğu tipi için özel olarak tasarlanmış bağımsız React bileşenleri. Her biri, kendisine iletilen `block` veri yapısını çözümleyerek o bloğun arayüzünü (örneğin başlık ve açıklama, özellik kartları, karşılaştırma satırları) oluşturur.
-- `HeroBlock`, `SpecsBlock`, `FeaturesGridBlock`, `ComparisonBlock`, `CtaBannerBlock`.
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül, içerik koleksiyonunu blok tiplerine göre ayırıp ilgili render bileşenlerine yönlendiren bir yapıya sahiptir.
-
-[Aksiyom 1]: Eğer `IconRenderer` bileşenine geçerli bir `name` parametresi (boş string veya undefined) verilmezse, ikon gösterimi başarısız olur.
-
-[Aksiyom 2]: Eğer bir blok bileşenine (HeroBlock, SpecsBlock, FeaturesGridBlock, ComparisonBlock, CtaBannerBlock) `block` parametresi verilmezse, bileşenin çalışması belirsiz veya hatalı olacaktır; tüm blok bileşenleri blok verisi alacak şekilde tasarlanmıştır.
+Her içerik bloğu tipi için özel tasarlanmış bağımsız bileşenlerdir. Her biri kendisine iletilen blok verisini çözümleyerek o bloğun arayüzünü (başlık, açıklama, özellik kartları, karşılaştırma satırları vb.) oluşturur.
+- `HeroBlock`, `SpecsBlock`, `FeaturesGridBlock`, `ComparisonBlock`, `CtaBannerBlock`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, içerik bloklarını türlerine göre yönlendiren bir render zincirinden oluşur. Aşağıdaki varsayımlar yalnızca fonksiyon imzalarından çıkarılmıştır.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca tip imzaları ve genel bakıştan çıkarılabilecek varsayımlar yazılabilir.
 
-**[Aksiyom 1]:** Eğer `AuthorityRenderer`'a `content` parametresi olarak `null` geçilirse, bileşen içeriği boş/bozuk olarak işleyebilmelidir — çünkü tipi `AuthorityContent | null` olarak tanımlıdır ve `null` geçerli bir girdidir.
+[Aksiyom 1]: Eğer `content` null ise, `AuthorityRenderer`'ın ne render edeceği fonksiyon gövdesine bağlıdır ve bilinmiyor.
 
-**[Aksiyom 2]:** Eğer `AuthorityRenderer`, bir içeriği işlerken uygun alt blok bileşenine yönlendirme yapacaksa, her blok nesnesinin bir `type` alanı ile birlikte ilgili blok tipine (`HeroBlockType`, `SpecsBlockType`, `FeaturesGridBlockType`, `ComparisonBlockType`, `CtaBannerType`) karşık gelmesi gerekir;aksi takdirde hangi bileşene yönlendirileceği belirsiz olur.
+[Aksiyom 2]: Eğer her bloğun `type` alanı tanımlı değilse, `AuthorityRenderer` o bloğu hangi alt bileşene yönlendireceğini bilemez — bu durumda ne olacağı fonksiyon gövdesine bağlıdır ve bilinmiyor.
 
-**[Aksiyom 3]:** Eğer `IconRenderer`'a `name` parametresi geçirilmezse, bileşen çalışamaz — çünkü `name: string` olarak zorunlu (non-optional) tanımlıdır. `className` ise opsiyoneldir ve verilmezse bile bileşen çalışabilir.
+[Aksiyom 3]: Eğer `IconRenderer` bileşenine `name` parametresi verilmezse, bileşen hangi ikonu çizeceğini bilemez — `name` zorunlu bir parametredir.
 
-**[Aksiyom 4]:** Eğer bir blok nesnesi, beklenen tip arayüzünden (`HeroBlockType`, `SpecsBlockType`, vb.) farklı bir yapıya sahipse (örneğin gerekli alanları eksikse), ilgili blok bileşeni (`HeroBlock`, `SpecsBlock`, vb.) beklenmedik davranış gösterebilir; çünkü her bileşen kesin tip garantisiyle çalışmak üzere tasarlanmıştır.
+[Aksiyom 4]: Eğer `HeroBlock`, `SpecsBlock`, `FeaturesGridBlock`, `ComparisonBlock` veya `CtaBannerBlock` bileşenlerine `block` prop'u verilmezse, bileşen render edeceği veriye sahip olamaz — `block` bu bileşenler için zorunlu bir prop'tur.
+
+[Aksiyom 5]: Eğer `AuthorityContent` yapısı beklenen blok koleksiyonunu içermiyorsa, `AuthorityRenderer`'ın yönlendireceği blok listesi oluşmaz — bu durumda ne olacağı fonksiyon gövdesine bağlıdır ve bilinmiyor.
 
 ---
 
@@ -24137,46 +24817,91 @@ Bu modül, içerik bloklarını türlerine göre yönlendiren bir render zinciri
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/authority/AuthorityRenderer.tsx::IconRenderer
-- **params**: `name: string`, `className?: string`
+### [N1_NASIL] AST Pointer: AuthorityRenderer.tsx::IconRenderer
+- **params**: `name` (string), `className` (string, opsiyonel)
 - **ic_degiskenler**:
-  - `iconName` — `name` parametresinin ilk harfini büyük yaparak Lucide icon adı formatına dönüştürür, tipi `keyof typeof LucideIcons` olarak belirlenir
-  - `Icon` — `iconName` ile `LucideIcons` objesinden ilgili React componentini alır, bulunamazsa `LucideIcons.Zap` fallback'ini kullanır
-- **Dönüş**: `<Icon className={className} />` JSX elemanı (Lucide icon bileşeni)
+  - `iconName` — `name` parametresinin ilk harfi büyük harfe çevrilip geri kalanı eklenerek oluşturulan Lucide ikon adı; `keyof typeof LucideIcons` tipine dönüştürülür
+  - `Icon` — `LucideIcons[iconName]` erişimiyle elde edilen bileşen; bulunamazsa `LucideIcons.Zap` kullanılır
+- **Dönüş**: `<Icon className={className} />` JSX elementi
 
-### [N2_NASIL] AST Pointer: src/components/authority/AuthorityRenderer.tsx::HeroBlock
-- **params**: `block: HeroBlockType`
-- **ic_degiskenler**: (yok — doğrudan `block` propertysinden veri okunur)
-- **Dönüş**: `<section>` JSX elemanı. İçeriğe göre `block.content.eyebrow`, `block.content.title`, `block.content.description`, `block.content.ctaLabel`, `block.content.ctaLink`, `block.content.imageUrl` değerlerini render eder. `block.config?.fullWidth` ve `block.config?.theme` yapılandırmalarına göre CSS sınıfı belirler.
-
-### [N3_NASIL] AST Pointer: src/components/authority/AuthorityRenderer.tsx::SpecsBlock
-- **params**: `block: SpecsBlockType`
-- **ic_degiskenler**: (yok — `block.content.columns` ve `block.content.rows` doğrudan kullanılır)
-- **Dönüş**: `<div>` containing specs grid JSX elemanı. `block.content.title`, `block.content.description`, `block.content.columns` değerlerini render eder. `block.content.rows` dizisini `.map()` ile dönerek her satır için `{row.label}`, `{row.value}`, `{row.unit}` değerlerini gösterir.
-
-### [N4_NASIL] AST Pointer: src/components/authority/AuthorityRenderer.tsx::FeaturesGridBlock
-- **params**: `block: FeaturesGridBlockType`
-- **ic_degiskenler**: (yok — `block.content.items` dizisi `.map()` ile dönülür)
-- **Dönüş**: `<div>` containing features grid JSX elemanı. `block.content.title` başlığını, `block.content.items` dizisini `.map()` ile dönerek her item için `item.icon`, `item.title`, `item.description` değerlerini ve `IconRenderer` bileşenini render eder.
-
-### [N5_NASIL] AST Pointer: src/components/authority/AuthorityRenderer.tsx::ComparisonBlock
-- **params**: `block: ComparisonBlockType`
-- **ic_degiskenler**: (yok — `block.content` alanları doğrudan kullanılır)
-- **Dönüş**: `<div>` containing comparison layout JSX elemanı. `block.content.title`, `block.content.leftLabel`, `block.content.leftImage`, `block.content.rightLabel`, `block.content.rightImage`, `block.content.differenceText` değerlerini render eder. Sol ve sağ taraflar için conditionall `Image` componentleri veya fallback iconlar gösterir.
-
-### [N6_NASIL] AST Pointer: src/components/authority/AuthorityRenderer.tsx::CtaBannerBlock
-- **params**: `block: CtaBannerBlockType`
-- **ic_degiskenler**: (yok — `block.content` alanları doğrudan kullanılır)
-- **Dönüş**: `<div>` containing CTA banner JSX elemanı. `block.content.title`, `block.content.description`, `block.content.buttonLabel`, `block.content.buttonLink` değerlerini render eder. Background accent div'leri de ekler.
-
-### [N7_NASIL] AST Pointer: src/components/authority/AuthorityRenderer.tsx::AuthorityRenderer
-- **params**: `content: AuthorityContent | null`
+### [N2_NASIL] AST Pointer: AuthorityRenderer.tsx::HeroBlock
+- **params**: `block` (HeroBlockType)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu
-  - `block` — `content.map()` callback'indeki mevcut blok (her iterasyonda değişir)
-  - `mediaBlock` — `block`'un `MediaBlockType` olarak cast edilmiş hali (sadece `'media'` case'inde)
-  - `rtBlock` — `block`'un `RichTextBlockType` olarak cast edilmiş hali (sadece `'rich-text'` case'inde)
-- **Dönüş**: `null` veya `<div className="authority-content-wrapper">` JSX elemanı. `content` dizisini dönerek her `block` için `block.type`'a göre ilgili bileşeni (`HeroBlock`, `SpecsBlock`, `FeaturesGridBlock`, `ComparisonBlock`, `CtaBannerBlock`) render eder. `'media'` tipi için `VideoAuthority`, `LazyInView` (ThreeDAuthority için), `TechnicalDrawingAuthority`, `Image` bileşenlerini conditionally render eder. `'rich-text'` tipi için `DOMPurify.sanitize(rtBlock.content.html)` ile sanitize edilmiş HTML render eder. Bilinmeyen blok tipi için `t()` ile çevrilmiş hata mesajı gösterir. `block.config?.isHidden` true ise bloğu atlar.
+  - `block.config?.fullWidth` — tam genişlik olup olmadığını belirten opsiyonel yapılandırma; true ise `"w-full"`, değilse `"max-w-7xl mx-auto rounded-3xl my-12"` sınıfı uygulanır
+  - `block.config?.theme` — tema ayarı; `'dark'` ise koyu arka plan, değilse açık arka plan sınıfları uygulanır
+  - `block.content.eyebrow` — üst başlık metni; varsa `<span>` içinde gösterilir
+  - `block.content.title` — ana başlık metni
+  - `block.content.description` — açıklama metni; varsa `<p>` içinde gösterilir
+  - `block.content.ctaLabel` — eylem butonu etiketi; varsa buton oluşturulur
+  - `block.content.ctaLink` — eylem butonu bağlantısı; yoksa `"#"` kullanılır
+  - `block.content.imageUrl` — arka plan görsel URL'si; varsa `<Image>` bileşeni ile gösterilir
+- **Dönüş**: `<section>` içinde yapılandırılmış hero bloğu JSX elementi
+
+### [N3_NASIL] AST Pointer: AuthorityRenderer.tsx::SpecsBlock
+- **params**: `block` (SpecsBlockType)
+- **ic_degiskenler**:
+  - `block.content.title` — blok başlığı
+  - `block.content.description` — blok açıklaması; varsa gösterilir
+  - `block.content.columns` — sütun sayısı; 4 ise dört sütunlu, 3 ise üç sütunlu, diğer durumda iki sütunlu grid oluşturulur
+  - `block.content.rows` — spec satırları dizisi; her eleman için `row.label`, `row.value`, `row.unit` kullanılır
+  - `row` — döngüdeki her spec satırı nesnesi
+  - `i` — döngü indeks numarası; `key` prop'u olarak kullanılır
+  - `row.label` — spec etiketi
+  - `row.value` — spec değeri
+  - `row.unit` — spec birimi; varsa değerin yanında gösterilir
+- **Dönüş**: specs grid yapısı JSX elementi
+
+### [N4_NASIL] AST Pointer: AuthorityRenderer.tsx::FeaturesGridBlock
+- **params**: `block` (FeaturesGridBlockType)
+- **ic_degiskenler**:
+  - `block.content.title` — blok başlığı; varsa gösterilir
+  - `block.content.items` — özellik öğeleri dizisi; her eleman için `item.icon`, `item.title`, `item.description` kullanılır
+  - `item` — döngüdeki her özellik öğesi nesnesi
+  - `i` — döngü indeks numarası; `key` prop'u olarak kullanılır
+  - `item.icon` — ikon adı; `IconRenderer` bileşenine `name` prop'u olarak geçilir
+  - `item.title` — özellik başlığı
+  - `item.description` — özellik açıklaması
+- **Dönüş**: özellik grid yapısı JSX elementi
+
+### [N5_NASIL] AST Pointer: AuthorityRenderer.tsx::ComparisonBlock
+- **params**: `block` (ComparisonBlockType)
+- **ic_degiskenler**:
+  - `block.content.title` — blok başlığı; varsa gösterilir
+  - `block.content.leftLabel` — sol taraf etiketi
+  - `block.content.leftImage` — sol taraf görsel URL'si; varsa `<Image>` ile gösterilir, yoksa `LucideIcons.AlertCircle` gösterilir
+  - `block.content.rightLabel` — sağ taraf etiketi
+  - `block.content.rightImage` — sağ taraf görsel URL'si; varsa `<Image>` ile gösterilir, yoksa `LucideIcons.CheckCircle2` gösterilir
+  - `block.content.differenceText` — fark metni; varsa alt kısımda gösterilir
+- **Dönüş**: karşılaştırma bloğu JSX elementi
+
+### [N6_NASIL] AST Pointer: AuthorityRenderer.tsx::CtaBannerBlock
+- **params**: `block` (CtaBannerBlockType)
+- **ic_degiskenler**:
+  - `block.content.title` — CTA başlığı
+  - `block.content.description` — CTA açıklaması
+  - `block.content.buttonLabel` — buton etiketi
+  - `block.content.buttonLink` — buton bağlantısı
+- **Dönüş**: CTA banner bloğu JSX elementi
+
+### [N7_NASIL] AST Pointer: AuthorityRenderer.tsx::AuthorityRenderer
+- **params**: `content` (AuthorityContent | null)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan alınan çeviri fonksiyonu
+  - `content` — gelen içerik dizisi; null, dizi olmayan veya boş ise `null` döner
+  - `block` — `content.map()` döngüsündeki her blok nesnesi
+  - `block.config?.isHidden` — blok gizli mi kontrolü; true ise o blok render edilmez
+  - `block.type` — blok tipi; `'hero'`, `'specs'`, `'features-grid'`, `'comparison'`, `'cta-banner'`, `'media'`, `'rich-text'` değerlerine göre ilgili bileşen render edilir
+  - `block.id` — blok benzersiz tanımlayıcısı; `key` prop'u olarak kullanılır
+  - `mediaBlock` — `block as MediaBlockType` ile dönüştürülen medya bloğu
+  - `mediaBlock.config?.fullWidth` — medya bloğu tam genişlik ayarı
+  - `mediaBlock.content.title` — medya bloğu başlığı
+  - `mediaBlock.content.mediaType` — medya tipi; `'video'`, `'3d'`, `'drawing'`, `'image'` değerlerinden biri
+  - `mediaBlock.content.mediaId` — medya tanımlayıcısı
+  - `mediaBlock.content.aspectRatio` — video en-boy oranı; `'vertical'` ise dikey, değilse `'16:9'` kullanılır
+  - `mediaBlock.content.description` — medya açıklaması
+  - `rtBlock` — `block as RichTextBlockType` ile dönüştürülen zengin metin bloğu
+  - `rtBlock.content.html` — zengin metin HTML içeriği; `DOMPurify.sanitize()` ile temizlenerek `dangerouslySetInnerHTML` ile render edilir
+- **Dönüş**: `content` dizisi null/boş ise `null`, değilse `<div className="authority-content-wrapper space-y-0 bg-white">` içinde blokların render edildiği JSX elementi
 
 ---
 
@@ -24238,13 +24963,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\authority\TechnicalDrawingAuthority.tsx
-skeleton_hash: 30c0fb3816dcc3ca
+source_path: C:\tmp\vh-altyapi-t165\src\components\authority\TechnicalDrawingAuthority.tsx
+skeleton_hash: 455314ebd95a1753
 entity_hashes:
   func:TechnicalDrawingAuthority: 9e9ee1c4c520dae4
   overview: 644a3bf371af42f4
   style_tokens: b07a83f8b2a17b2b
-generated_at: 2026-08-25T07:25:27Z
+generated_at: 2026-08-27T08:25:02Z
 ---
 
 ## Genel Bakış
@@ -24329,8 +25054,8 @@ Teknik çizim verilerini alıp yetki/otorite bağlamında bir arayüz sunan bile
 
 ## NODE ID STANDARD
 
-  file: TechnicalDrawingAuthority.tsx
-  function: TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
+  file: src\components\authority\TechnicalDrawingAuthority.tsx
+  function: src\components\authority\TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
 
 ---
 
@@ -24360,26 +25085,27 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\authority\ThreeDAuthority.tsx
-skeleton_hash: c9194246507cc7e5
+source_path: C:\tmp\vh-altyapi-t165\src\components\authority\ThreeDAuthority.tsx
+skeleton_hash: 96b9bdf60e143cbe
 entity_hashes:
   func:Model: cad84f3d7aa627bb
-  func:ThreeDAuthority: c02b5265d94cfe82
-  overview: 7857aa142adb4c56
+  func:ThreeDAuthority: 4f723bb2221e26f2
+  overview: 1ca18e8f0d071f75
   style_tokens: 79effa301ffb588d
-generated_at: 2026-06-14T22:17:21Z
+generated_at: 2026-08-27T08:25:40Z
 ---
 
 ## Genel Bakış
-Bu modül, 3‑boyutlu bir modelin tarayıcıda yüklenmesini ve model üzerinde etkileşimli noktaların (hotspot) gösterilmesini yöneten, üst seviye bir React bileşenidir. Dışarıdan veri (model URL'si ve hotspot tanımları) alıp, bu verileri 3D motoru ile arayüz arasını bağlayan bir “yönlendirici” (authority) işlevi görür.
+Bu modül, 3 boyutlu modelin tarayıcıda yüklenmesini ve model üzerinde etkileşimli noktaların (hotspot) gösterilmesini üstlenen bir React bileşenidir. Dışarıdan gelen model URL'si ve hotspot tanımlarını alıp 3D motoru ile arayüz arasında bir köprü görevi görür. Üst seviye bileşen olan `ThreeDAuthority`, dış kaynaklardan gelen veri paketini işleyerek alt bileşenine aktarır.
 
 ## Fonksiyon Grupları
+
 ### Model Render ve Hotspot Yönetimi
-Bu grup, asıl 3D sahnenin yüklenmesini ve model üzerine yerleştirilmiş hotspot işaretçilerinin render edilmesinden sorumludur.
+Bu grup, verilen URL adresindeki 3D modelin yüklenmesinden ve model üzerine yerleştirilmiş hotspot işaretçilerinin render edilmesinden sorumludur.
 - Model
 
-### Üst‑Seviye Bileşen Sarmalayıcı
-Bu grup, dış kaynaklardan gelen veri paketini (metadata) alır, gerekli dönüşümleri yapar ve altındaki Model bileşenine doğru prop'ları aktararak modülün dışarıya sunduğu tek bir arayüz oluşturur.
+### Üst Seviye Bileşen Sarmalayıcı
+Bu grup, dış kaynaklardan gelen veri paketini alır, gerekli dönüşümleri yapar ve altındaki `Model` bileşenine doğru özellikleri aktararak modülün dışarıya sunduğu tek bir arayüzü oluşturur.
 - ThreeDAuthority
 
 ---
@@ -24402,29 +25128,22 @@ Bu grup, dış kaynaklardan gelen veri paketini (metadata) alır, gerekli dönü
 **Dönüş**: void — fonksiyon JSX elementi döndürür, açık bir değer döndürmez.
 
 ### ThreeDAuthority
-**Ne yapar**: ThreeDAuthority, bir HVAC ürününün gerçek 3D modelini (GLB/GLTF formatında) interaktif bir şekilde görüntülemek için kullanılır. Bileşen, performans optimizasyonu sağlamak amacıyla "Tıkla-Yükle" (Click-to-Load) stratejisini uygular; yani 3D model, kullanıcı bir yükleme ekranına tıklayana kadar tarayıcıda arka planda hazırlanmaz.
+**Ne yapar**: Gerçek 3D ürün modellerini (GLB/GLTF formatında) interaktif olarak kullanıcıya sunan bir React fonksiyonel bileşenidir. Performans optimizasyonu amacıyla "Click-to-Load" (yükleme için tıkla) stratejisini benimser; bu sayede sayfa yüklendiğinde ağır 3D model hemen render edilmez, kullanıcı tıkladığında başlatılır.
 
-**Nasıl yapar**: Fonksiyon, `useI18n` hook'u ile çoklu dil desteğini, `React.useState` ile `isStarted` adlı bir durum değişkenini yönetir. Başlangıçta (`isStarted` false iken), `motion.div` ile animasyonlu bir placeholder (yükleme ekranı) döndürür. Bu ekranda "Tıkla ve Başlat" çağrısı ve loading animasyonu bulunur. Kullanıcı bu alana tıkladığında `setIsStarted(true)` çağrısı yapılır ve bileşen durumu değişir. Ardından `@react-three/fiber` kütüphanesinden gelen `Canvas` bileşeni içinde 3D sahne oluşturulur. `metadata.config` nesnesindeki değerler (`autoRotate`, `initialZoom`, `environment`, `shadows`) kullanılarak sahne özelleştirilir. `Model` bileşeni (`url` ve `hotspots` prop'ları ile) yüklenir, ortam aydınlatması ve gölgeler eklenir. `OrbitControls` ile kullanıcı etkileşimine (sürükleme, döndürme) izin verilir. `frameloop` prop'u, `autoRotate`true ise `'always'` (sürekli yeniden çizim), değilse `'demand'` (sadece etkileşimde yeniden çizim) olarak dinamik atanarak performans optimizasyonu yapılır.
+**Nasıl yapar**: Bileşen, `isStarted` adlı bir React state'i üzerinden iki farklı görünüm arasında geçiş yapar. İlk durumda (`isStarted === false`), Framer Motion kütüphanesinin `motion.div` bileşeniyle animasyonlu bir placeholder/CTA (harekete geçirici çağrı) ekranı gösterilir; bu ekranda dönen bir yükleme ikonu ve "etkileşimli görünümü başlatmak için tıklayın" mesajı yer alır. Kullanıcı bu alana tıkladığında `setIsStarted(true)` çağrılarak ikinci duruma geçilir. İkinci durumda (`isStarted === true`), `VentHubCanvas` bileşeni içerisine yerleştirilmiş bir Three.js/R3F (React Three Fiber) sahnesi render edilir. Bu sahne; `Suspense` ile sarılmış bir `Model` bileşeni (3D model yükleme), isteğe bağlı `ContactShadows` (gölge efekti) ve `OrbitControls` (kullanıcının fareyle modeli döndürmesini sağlayan kontrol) içerir. `VentHubCanvas`'a verilen `frameloop` parametresi, `metadata.config.autoRotate` değerine göre `'always'` (sürekli render) veya `'demand'` (talep üzerine render) olarak ayarlanır; bu, otomatik döndürme aktif değilse gereksiz render döngülerini önleyerek performans kazandırır. Kamera pozisyonu ve görüş açısı (FOV) `metadata.config.initialZoom` ve sabit değerlerle yapılandırılır. `OrbitControls` bileşeninde yatay kaydırma (pan) devre dışı bırakılmış, dikey döndürme açısı `Math.PI / 4` ile `Math.PI / 1.5` arasında sınırlandırılmıştır. Model yüklenirken `Suspense`'ın `fallback` prop'u aracılığıyla bir yükleme göstergesi (spinner ve metin) görüntülenir. Ekranın sol alt köşesinde, kullanıcının fareyle sürükleyerek döndürebileceğini belirten bir yardım metni yer alır. Tüm metinler `useI18n()` hook'u ile uluslararasılaştırma (i18n) desteği kullanılarak render edilir.
 
 **Parametreler**:
-- `metadata`: `ThreeDAuthorityProps` tipindeki nesne. Bileşenin render edeceği 3D modelin ve yapılandırma ayarlarının tüm bilgilerini içerir.
-    - `modelUrl`: `string` — GLB/GLTF formatındaki 3D model dosyasının URL'i.
-    - `hotspots`: `any[]` — (Seçeneksel) Model üzerindeki interaktif bilgi noktaları.
-    - `config`: `object` (Seçeneksel) — Sahne yapılandırma ayarları:
-        - `autoRotate`: `boolean` — Otomatik döndürme aktif mi.
-        - `initialZoom`: `number` — Başlangıç kamera mesafesi.
-        - `environment`: `string` — Ortam haritası preset'i ('studio', 'sunset' vb.).
-        - `shadows`: `boolean` — Gölgelerin gösterilip gösterilmeyeceği.
-- `className`: `string` — (Varsayılan: `''`) Bileşenin dış sarmalayıcısına (wrapper) eklenecek CSS sınıf adı.
+- `metadata`: `ThreeDAuthorityProps` tipinde — 3D modelin yapılandırma verilerini içerir. Alt alanları kaynak koddan tespit edildiği kadarıyla şunlardır: `metadata.modelUrl` (yüklenecek 3D model dosyasının URL'si), `metadata.hotspots` (model üzerindeki etkileşimli noktalar), `metadata.config.autoRotate` (modelin otomatik dönüp dönmeyeceği, boolean), `metadata.config.initialZoom` (kameranın başlangıç yakınlaştırma mesafesi, sayı), `metadata.config.shadows` (gölge efektinin gösterilip gösterilmeyeceği, boolean; `false` olarak ayarlanmadığı sürece gölgeler gösterilir).
+- `className`: `string` — Bileşenin kök DOM elemanına uygulanacak ek CSS sınıf adları. Varsayılan değeri boş string (`''`) dir.
 
-**Dönüş**: `JSX.Element` (veya `React.ReactNode`). Başlangıç durumuna göre animasyonlu bir yükleme ekranı veya tam interaktif 3D görüntüleyici JSX'i döndürür.
+**Dönüş**: JSX elementi döndürür. `isStarted` durumuna göre ya bir `motion.div` placeholder'ı ya da `VentHubCanvas` içeren tam bir 3D sahne yapısı render eder. Fonksiyonun açık bir dönüş tipi belirtilmemiştir; bu bir React fonksiyonel bileşeni olduğundan dönüş tipi `React.ReactElement` (JSX) olarak değerlendirilir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../types/media.types::type { ThreeDMetadata }
+- import: ../products/3d/core::VentHubCanvas
 - import: @/i18n/I18nProvider::useI18n
-- import: @react-three/fiber::Canvas
 - import: framer-motion::motion
 - import: react::React
 - import: react::Suspense
@@ -24441,19 +25160,26 @@ Bu grup, dış kaynaklardan gelen veri paketini (metadata) alır, gerekli dönü
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\components\authority\ThreeDAuthority.tsx::Model
-- **params**: (url: string, hotspots?: ThreeDMetadata['hotspots'])
+### [N1_NASIL] AST Pointer: ThreeDAuthority.tsx::Model
+- **params**: `url` (string), `hotspots` (ThreeDMetadata['hotspots'] opsiyonel)
 - **ic_degiskenler**:
-  - `scene` — useGLTF(url) hook'undan dönen 3D model sahnesi. primitive elementine object olarak bağlanır
-- **Dönüş**: JSX element (group içinde scene ve hotspot'lerin render ettiği yapı)
+  - `scene` — `useGLTF(url)` çağrısıyla elde edilen 3D sahne nesnesi; `<primitive object={scene} />` ile render edilir
+  - `spot` — `hotspots` dizisinin `.map()` içindeki her bir elemanı; `spot.position`, `spot.label`, `spot.description` alanlarına erişilir
+  - `idx` — `hotspots` dizisinin `.map()` içindeki indeks numarası; `<Html key={idx}>` olarak kullanılır
+- **Dönüş**: JSX — `<group>` içinde `<primitive>` ve hotspots haritası
 
-### [N2_NASIL] AST Pointer: src\components\authority\ThreeDAuthority.tsx::ThreeDAuthority
-- **params**: (metadata: ThreeDAuthorityProps, className: string = '')
+### [N2_NASIL] AST Pointer: ThreeDAuthority.tsx::ThreeDAuthority
+- **params**: `metadata` (ThreeDAuthorityProps), `className` (string, varsayılan `''`)
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu. Metinleri çok dilli yapmak için kullanılır
-  - `isStarted` — 3D modelin yüklenip yüklenmediğini takip eden boolean state
-  - `setIsStarted` — isStarted state'ini güncellemek için setter fonksiyonu
-- **Dönüş**: JSX element (isStarted false ise placeholder, true ise Canvas ile 3D görünüm)
+  - `t` — `useI18n()` çağrısıyla elde edilen çeviri fonksiyonu; `'pdp.threeDAuthority.interactiveView'`, `'pdp.threeDAuthority.clickToInitialize'`, `'pdp.threeDAuthority.loadingModel'`, `'pdp.threeDAuthority.dragToRotate'` anahtarlarıyla metinleri çözer
+  - `isStarted` — `React.useState(false)` ile oluşturulan boolean state; 3D modelin başlatılıp başlatılmadığını belirler
+  - `setIsStarted` — `isStarted` state'ini güncelleyen setter fonksiyonu; `onClick={() => setIsStarted(true)}` ile tetiklenir
+  - `metadata.config?.autoRotate` — opsiyonel boolean; `frameloop` ve `OrbitControls autoRotate` değerlerini belirler
+  - `metadata.config?.initialZoom` — opsiyonel sayı; kamera z pozisyonu olarak kullanılır, yoksa `5` varsayılır
+  - `metadata.config?.shadows` — opsiyonel; `false` değilse `<ContactShadows>` render edilir
+  - `metadata.modelUrl` — string; `<Model url={metadata.modelUrl}>` prop'u olarak aktarılır
+  - `metadata.hotspots` — opsiyonel dizi; `<Model hotspots={metadata.hotspots}>` prop'u olarak aktarılır
+- **Dönüş**: JSX — `isStarted` durumuna göre ya tıklama ekranı (`motion.div` ile placeholder) ya da `<VentHubCanvas>` içinde 3D model render'ı
 
 ---
 
@@ -24492,13 +25218,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\authority\VideoAuthority.tsx
-skeleton_hash: 6e7afa0385d107da
+source_path: C:\tmp\vh-altyapi-t165\src\components\authority\VideoAuthority.tsx
+skeleton_hash: bcadf1275c56c367
 entity_hashes:
   func:VideoAuthority: b42d8a27d95a4ea9
   overview: 931e142b761ac254
   style_tokens: ee9eb5151ad04adf
-generated_at: 2026-08-25T07:25:24Z
+generated_at: 2026-08-27T08:25:41Z
 ---
 
 ## Genel Bakış
@@ -24592,8 +25318,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: VideoAuthority.tsx
-  function: VideoAuthority.tsx::VideoAuthority
+  file: src\components\authority\VideoAuthority.tsx
+  function: src\components\authority\VideoAuthority.tsx::VideoAuthority
 
 ---
 
@@ -24623,29 +25349,36 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\calculators\CalculatorLayout.tsx
-skeleton_hash: bd03e80c5b75e201
+source_path: C:\tmp\vh-altyapi-t165\src\components\calculators\CalculatorLayout.tsx
+skeleton_hash: 951eb72957153f9e
 entity_hashes:
   func:CalculatorLayout: 992031a52a171585
-  overview: 1653d259eecd0578
+  overview: ce819e8c92e08794
   style_tokens: 8b0a8e4795cce63b
-generated_at: 2026-06-14T19:43:54Z
+generated_at: 2026-08-27T08:26:27Z
 ---
 
 ## Genel Bakış
-Bu modül, tüm HVAC hesaplayıcı sayfalarına ortak bir görünüm ve yapı kazandırmak için tasarlanmış bir layout (yerleşim) şablonudur. Tek bileşeni olan CalculatorLayout, başlık, açıklama ve ikon gibi tekrarlanabilir UI öğelerini alarak sayfa düzenini standardize eder ve içeriği child bileşenlere yer açar. Varsayılan değerler ve aksiyomlarla, bileşenin farklı durumlarda nasıl davranacağı belirlenmiştir.
+Bu modül, tüm HVAC hesaplayıcı sayfalarına ortak bir görünüm ve yapı kazandırmak için tasarlanmış bir layout şablonu bileşeni sunar. Tek bileşeni olan CalculatorLayout, başlık, açıklama, ikon ve geri dönüş linki gibi tekrarlanabilir UI öğelerini alarak sayfa düzenini standardize eder ve içeriği child bileşenler için bir konteynıra yerleştirir. Modül davranışsal mantık içermez; salt görsel yerleşim ve yapısal şablonlama sorumluluğuna sahiptir.
 
 ## Fonksiyon Grupları
 ### UI Şablonu ve Yerleşimi
-Bu grup, hesaplayıcı sayfalarının üst başlık bölümünü ve içerik konteynırını oluşturan temel layout bileşenini barındırır.
+Bu grup, hesaplayıcı sayfalarının üst başlık bölümünü ve içerik konteynırını oluşturan temel layout bileşenini barındırır. Bileşen, sayfa başlığı, açıklama, ikon ve breadcrumb navigasyonu gibi öğeleri bir araya getirerek tutarlı bir sayfa yapısı oluşturur.
 - CalculatorLayout
+
+## Bağımlılıklar ve Mimari Notlar
+- Modül dış bağımlılıkları kaynak kodda açıkça belirtilmemiştir; bilinmiyor.
+- Modül, tüketici bileşenler tarafından bir wrapper olarak kullanılır ve kendisi alt bileşen çağırmaz.
+- Aksiyom 1: Modülün dışa açtığı prop yapısı bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- Aksiyom 2: Prop listesine bir öğe ekleme veya çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzasından görünen varsayımlar belirtilebilir.
+
+[Aksiyom 1]: Eğer `backLink` parametresi çağrıda belirtilmezse, varsayılan olarak
 
 ---
 
@@ -24667,8 +25400,8 @@ Bu grup, hesaplayıcı sayfalarının üst başlık bölümünü ve içerik kont
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/routes::Routes
 - import: ../Seo::Seo
 - import: lucide-react::AlertTriangle
 - import: lucide-react::ArrowLeft
@@ -24696,10 +25429,19 @@ Bu grup, hesaplayıcı sayfalarının üst başlık bölümünü ve içerik kont
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/calculators/CalculatorLayout.tsx::CalculatorLayout
-- **params**: (`title`, `description`, `icon`, `backLink = '/products'`, `backLabel`, `infoText`, `warningText`, `children`)
+- **params**:
+  - `title` — sayfa başlığı, hem `<h1>` etiketinde hem de `<Seo>` bileşeninin `title` prop'unda kullanılır
+  - `description` — sayfa açıklaması, `<Seo>` bileşeninin `description` prop'unda ve başlığın altında paragraf olarak gösterilir
+  - `icon` — header alanında gösterilecek ikon bileşeni; verilmezse varsayılan olarak `<Calculator size={32} />` kullanılır
+  - `backLink` — geri dönüş linki, varsayılan değeri `'/products'`; `<Link>` bileşeninin `href` prop'una `as import('next').Route` tip dönüşümüyle atanır
+  - `backLabel` — geri dönüş linkinin etiketi; verilmezse `t('calculators.layout.backLabel')` çeviri anahtarıyla fallback yapılır (nullish coalescing `??` operatörü)
+  - `infoText` — bilgi banner'ı metni; truthy ise `<Info>` ikonlu mavi bilgi kutusu render edilir
+  - `warningText` — uyarı banner'ı metni; truthy ise `<AlertTriangle>` ikonlu turuncu uyarı kutusu render edilir
+  - `children` — ana içerik alanı, `<div className="max-w-5xl ...">` içinde render edilir
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, metinleri çoklu dilde göstermek için kullanılır
-- **Dönüş**: JSX Elemanı (Sayfa düzenini oluşturan React bileşeni)
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; footer disclaimer, iletişim yönlendirmesi, iletişim linki ve backLabel fallback'inde kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rotalar objesi; footer'daki iletişim linkinin `href` değeri için `Routes.contact()` çağrısında kullanılır
+- **Dönüş**: JSX elementi — `CalculatorLayoutProps` tipinde bir React fonksiyonel bileşen (`React.FC<CalculatorLayoutProps>`) döndürür. Bileşen; breadcrumb'lı header, opsiyonel info/warning banner'ları, children içerik alanı ve disclaimer/footer içeren tam sayfa düzeni render eder.
 
 ---
 
@@ -24736,14 +25478,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\calculators\InputField.tsx
-skeleton_hash: e7def4df7bf66638
+source_path: C:\tmp\vh-altyapi-t165\src\components\calculators\InputField.tsx
+skeleton_hash: cf33bd1a4486297c
 entity_hashes:
   func:InputField: 67cc20ea60eef576
   func:RadioGroup: 3547a0581eb094b6
   overview: 886525d7c102a6da
   style_tokens: d04e77e09b4ac40e
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-08-27T08:26:28Z
 ---
 
 ## Genel Bakış  
@@ -24898,8 +25640,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\components\calculators\ResultCard.tsx
-skeleton_hash: 0f34bdbbaaf3dded
+source_path: C:\tmp\vh-altyapi-t165\src\components\calculators\ResultCard.tsx
+skeleton_hash: 5dc31bdb489790c9
 entity_hashes:
   func:Recommendations: cb90824638a4b1f2
   func:ResultCard: 3c33f679c49530b1
@@ -24907,7 +25649,7 @@ entity_hashes:
   func:getStatusConfig: 90a49b86c8e12ce2
   overview: 5c46ca5f553e8511
   style_tokens: 8d8fc38c13829fd7
-generated_at: 2026-08-17T13:20:03Z
+generated_at: 2026-08-27T08:26:29Z
 ---
 
 ## Genel Bakış
@@ -25110,13 +25852,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\calculators\StepIndicator.tsx
-skeleton_hash: 36265045b33ab050
+source_path: C:\tmp\vh-altyapi-t165\src\components\calculators\StepIndicator.tsx
+skeleton_hash: f7683af1ffd722c2
 entity_hashes:
   func:StepIndicator: 203f6e11e7ae2ca6
   overview: a00e439886770189
   style_tokens: a71e92d8d5570ada
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-08-27T08:26:30Z
 ---
 
 ## Genel Bakış
@@ -28283,13 +29025,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\consent\CookiePreferencesButton.tsx
-skeleton_hash: 368eedf8109b760b
+source_path: C:\tmp\vh-altyapi-t165\src\components\consent\CookiePreferencesButton.tsx
+skeleton_hash: 61dce46da54a3d65
 entity_hashes:
   func:CookiePreferencesButton: b7fd821936e37c45
   overview: b711f3b17cd72e7a
   style_tokens: f9b2fe95f9e414a2
-generated_at: 2026-08-25T08:43:35Z
+generated_at: 2026-08-27T08:26:31Z
 ---
 
 ## Genel Bakış
@@ -28392,13 +29134,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\ApplicationSolutions.tsx
-skeleton_hash: ebcb58b4e3e45923
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\ApplicationSolutions.tsx
+skeleton_hash: 237ecb9291b78191
 entity_hashes:
   func:ApplicationSolutions: 93f4bfc3e2d056b5
   overview: 26527ace9a268eaa
   style_tokens: a60445c0b91a13d5
-generated_at: 2026-06-19T20:47:08Z
+generated_at: 2026-08-27T08:26:32Z
 ---
 
 ## Genel Bakış
@@ -28464,8 +29206,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 - `title: string`
 - `subtitle: string`
 - `viewAll: string`
-- `items: Record<string, {
-`
+- `items: Record<string, {`
 
 ### ApplicationSolutionsProps
 - `dictionary: LocalizedDict`
@@ -28533,8 +29274,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\home\CinematicProductShowcase.tsx
-skeleton_hash: f037089d85d30a21
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\CinematicProductShowcase.tsx
+skeleton_hash: 214cf486e4132ff4
 entity_hashes:
   func:CinematicProductShowcase: 3aa8752ddebafcfc
   func:Hotspot: de57d250f854e416
@@ -28542,7 +29283,7 @@ entity_hashes:
   func:handleMouseMove: 717aaec7fdab40a5
   overview: 543d609da89f6ecb
   style_tokens: f822c8b8db2eb0c1
-generated_at: 2026-08-25T07:25:47Z
+generated_at: 2026-08-27T08:26:33Z
 ---
 
 ## Genel Bakış
@@ -28704,11 +29445,11 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: CinematicProductShowcase.tsx
-  function: CinematicProductShowcase.tsx::Hotspot
-  function: CinematicProductShowcase.tsx::CinematicProductShowcase
-  function: CinematicProductShowcase.tsx::handleMouseMove
-  function: CinematicProductShowcase.tsx::handleMouseLeave
+  file: src\components\home\CinematicProductShowcase.tsx
+  function: src\components\home\CinematicProductShowcase.tsx::Hotspot
+  function: src\components\home\CinematicProductShowcase.tsx::CinematicProductShowcase
+  function: src\components\home\CinematicProductShowcase.tsx::handleMouseMove
+  function: src\components\home\CinematicProductShowcase.tsx::handleMouseLeave
 
 ---
 
@@ -28739,13 +29480,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\home\ClientLeadButton.tsx
-skeleton_hash: d99740799fda0413
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\ClientLeadButton.tsx
+skeleton_hash: c9926b8ef87e83b9
 entity_hashes:
   func:ClientLeadButton: 8f87f454fa733cb3
   overview: 5fd9adef525bec13
   style_tokens: 3a5eed4082aa65a0
-generated_at: 2026-08-25T07:25:41Z
+generated_at: 2026-08-27T08:26:35Z
 ---
 
 ## Genel Bakış
@@ -28817,8 +29558,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesinden tür
 
 ## NODE ID STANDARD
 
-  file: ClientLeadButton.tsx
-  function: ClientLeadButton.tsx::ClientLeadButton
+  file: src\components\home\ClientLeadButton.tsx
+  function: src\components\home\ClientLeadButton.tsx::ClientLeadButton
 
 ---
 
@@ -28999,27 +29740,23 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\GuidedCategoryDiscovery.tsx
-skeleton_hash: 8963a76c7b2fd7c8
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\GuidedCategoryDiscovery.tsx
+skeleton_hash: 9557640ed0b5b596
 entity_hashes:
   func:GuidedCategoryDiscovery: 3b7f2bdef4872624
-  overview: cc60fb76dc1f398d
+  overview: 45ef6f3b2def2985
   style_tokens: ba1e7efd5f41a7fe
-generated_at: 2026-06-15T08:00:10Z
+generated_at: 2026-08-27T08:27:30Z
 ---
 
 ## Genel Bakış
-Bu modül, ana sayfada kullanıcılara yönelik rehberli bir kategori keşfi deneyimi sunan tek bir React bileşeninden oluşur. Bileşen, dışarıdan beslenen bir kategori listesini (displayCategories) alır ve bu listeyi kullanarak ürünleri görsel ve metin tabanlı bir arayüzde sunarak kullanıcıları bilgilendirir.
-
-## Fonksiyon Grupları
-### Ana Bileşen
-Modülün tek ve merkezi birimini oluşturarak, verilen kategori verisini kullanıcıya sunulan interaktif ve yönlendirici bir arayüze dönüştürür.
-- GuidedCategoryDiscovery
+Bu modül, ana sayfada kullanıcılara yönelik rehberli bir kategori keşfi deneyimi sunan tek bir React bileşeninden oluşur. Bileşen,
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için fonksiyon gövdesi verilmediğinden, aksiyom üretilememektedir. Dolayısıyla, bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için fonksiyon gövdesi verilmediğinden, aksiyom üretilememektedir. Fonksiyon gövdesi sağlanmadığı sürece yalnızca imzadan çıkarım yapılması, 0d kuralı gereği spekülasyona gireceğinden yapılmamıştır.
 
 ---
 
@@ -29035,8 +29772,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, aksiyom üretilememektedir.
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/routes::Routes
 - import: @/utils/imageUtils::normalizeImageUrl
 - import: next/image::Image
 - import: next/link::Link
@@ -29061,17 +29798,27 @@ Bu modül için fonksiyon gövdesi verilmediğinden, aksiyom üretilememektedir.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/home/GuidedCategoryDiscovery.tsx::GuidedCategoryDiscovery
-- **params**: ( { displayCategories = [] } )
+- **params**: `{ displayCategories = [] }` — props destructuring; `displayCategories` varsayılan boş dizi olan kategori listesi
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, sayfadaki metinleri lokalize etmek için kullanılır
-- **Dönüş**: React elementi (section yapısı)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; JSX içinde `t('home.guidedDiscovery.eyebrowLabel')`, `t('home.guidedDiscovery.heading')`, `t('home.guidedDiscovery.intro')`, `t('home.guidedDiscovery.cardFallback')` anahtarlarıyla metinleri çözümlemek için kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota nesnesi; `Routes.category(category.slug)` çağrısıyla kategori bağlantılarını üretmek için kullanılır
+  - `category` — `displayCategories.map()` callback parametresi; her bir kategori nesnesi. Erişilen alanları: `category.id`, `category.image_url`, `category.displayName`, `category.slug`, `category.description`
+  - `idx` — `displayCategories.map()` callback parametresi; döngü indeksi, animasyon gecikme sınıfı seçmek için `idx % 4` olarak kullanılır
+  - `finalSrc` — `normalizeImageUrl(category.image_url, FALLBACK_CATEGORY_IMAGE, 'category-images')` çağrısının dönüşü; `<Image src={finalSrc}>` içinde kullanılan normalize edilmiş resim URL'si
+  - `delayClass` — `['delay-0', 'delay-100', 'delay-200', 'delay-300'][idx % 4]` ifadesinden elde edilen animasyon gecikme CSS sınıfı; her kartın fade-up animasyonunu geciktirmek için kullanılır
+- **Dönüş**: JSX — `<section>` kök elemanı içeren React bileşeni
 
 ### [N2_NASIL] AST Pointer: src/components/home/GuidedCategoryDiscovery.tsx::(anonymous map callback)
-- **params**: ( category, idx )
+- **params**: `category`, `idx` — `displayCategories.map()` içindeki her eleman ve indeksi
 - **ic_degiskenler**:
-  - `finalSrc` — normalizeImageUrl fonksiyonu ile hesaplanan, kategori görselinin nihai URL'i
-  - `delayClass` — idx mod 4'e göre belirlenen, animasyon gecikme sınıfı (delay-0, delay-100, delay-200, delay-300)
-- **Dönüş**: React elementi (div yapısı)
+  - `finalSrc` — `normalizeImageUrl(category.image_url, FALLBACK_CATEGORY_IMAGE, 'category-images')` çağrısının dönüşü; kategori resminin normalize edilmiş URL'si, `<Image src={finalSrc}>` prop'unda kullanılır
+  - `delayClass` — `['delay-0', 'delay-100', 'delay-200', 'delay-300'][idx % 4]` ifadesinden elde edilen CSS sınıfı; kartın `data-observe="fade-up"` animasyonuna gecikme ekler
+  - `category.id` — kart `<div>` elemanının `key` prop'u olarak kullanılır
+  - `category.image_url` — `normalizeImageUrl` fonksiyonuna birinci argüman olarak geçilir
+  - `category.displayName` — `<Image alt={category.displayName}>` ve `<h3>{category.displayName}</h3>` içinde kullanılır
+  - `category.slug` — `Routes.category(category.slug)` çağrısında `<Link href>` prop'u için kullanılır
+  - `category.description` — `category.description || t('home.guidedDiscovery.cardFallback')` ifadesinde kullanılır; yoksa çeviri fonksiyonundan fallback metin alınır
+- **Dönüş**: JSX — tek bir kategori kartını temsil eden `<div>` elemanı
 
 ---
 
@@ -29109,13 +29856,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\HomePageClientWrapper.tsx
-skeleton_hash: ebd9a0b777f9ba09
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\HomePageClientWrapper.tsx
+skeleton_hash: 841e11bca1e1a84e
 entity_hashes:
   func:HomePageClientWrapper: feb3517aa1583d9b
   overview: e9b94ab20ec42ba0
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T08:27:31Z
 ---
 
 ## Genel Bakış
@@ -29459,13 +30206,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\home\KnowledgeBlock.tsx
-skeleton_hash: 9affeb7dd103be98
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\KnowledgeBlock.tsx
+skeleton_hash: c9bbc4a9af1dd4b8
 entity_hashes:
   func:KnowledgeBlock: 7e6b19d8803336cc
   overview: 2af91bd05b5de4f2
   style_tokens: 45bee56ab9c18ab4
-generated_at: 2026-08-25T07:25:43Z
+generated_at: 2026-08-27T08:27:33Z
 ---
 
 ## Genel Bakış
@@ -29525,10 +30272,8 @@ Ana sayfadaki bilgi bloğunun render edilmesinden sorumludur. Çeviri sözlüğ�
 - `icon: React.ReactNode`
 
 ### KnowledgeBlockProps
-- `dictionary: {
-`
-- `finalCtaDict: {
-`
+- `dictionary: {`
+- `finalCtaDict: {`
 - `statsExperience: string`
 - `lang: string`
 - `onQuoteClick?: () => void`
@@ -29581,8 +30326,8 @@ Ana sayfadaki bilgi bloğunun render edilmesinden sorumludur. Çeviri sözlüğ�
 
 ## NODE ID STANDARD
 
-  file: KnowledgeBlock.tsx
-  function: KnowledgeBlock.tsx::KnowledgeBlock
+  file: src\components\home\KnowledgeBlock.tsx
+  function: src\components\home\KnowledgeBlock.tsx::KnowledgeBlock
 
 ---
 
@@ -29612,13 +30357,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\RevealSection.tsx
-skeleton_hash: f1c38d93e81e4119
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\RevealSection.tsx
+skeleton_hash: adb89985c5ec2236
 entity_hashes:
   func:RevealSection: ba33115191e442f1
   overview: 83509008900591e6
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T08:27:34Z
 ---
 
 ## Genel Bakış
@@ -29702,13 +30447,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\StrategicBrands.tsx
-skeleton_hash: 6988c29fc80f9eda
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\StrategicBrands.tsx
+skeleton_hash: eebb4f2036325e5d
 entity_hashes:
   func:StrategicBrands: cf2c83a7b060b93b
   overview: 3329d9ad42f18a85
   style_tokens: 908950a4b058f189
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T08:27:35Z
 ---
 
 ## Genel Bakış  
@@ -29765,8 +30510,7 @@ Bu aksiyomlar, StrategicBrands bileşeninin **çevrim (i18n) fonksiyonuna bağı
 ## INTERFACES
 
 ### StrategicBrandsProps
-- `dictionary: {
-`
+- `dictionary: {`
 
 ---
 
@@ -29816,13 +30560,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx
-skeleton_hash: 92e92fa9817ef079
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\TrustProofSection.tsx
+skeleton_hash: 3a95d7e7be8d8a3a
 entity_hashes:
   func:TrustProofSection: ff4459fea67ab188
   overview: ecbeef82efa3251a
   style_tokens: fd859472e8c1a696
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T08:27:36Z
 ---
 
 ## Genel Bakış
@@ -29869,8 +30613,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `subtitle?: string`
 - `visualAlt?: string`
 - `badge?: string`
-- `items?: Record<string, {
-`
+- `items?: Record<string, {`
 
 ### TrustStripDict
 
@@ -29954,20 +30697,20 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\layout\ClientLayout.tsx
-skeleton_hash: 20611eaa2b02286d
+source_path: C:\tmp\vh-altyapi-t165\src\components\layout\ClientLayout.tsx
+skeleton_hash: 0c6f663edc271f14
 entity_hashes:
   func:ClientLayout: 6950fd4597251d25
-  func:ClientLayoutInner: 51b8420900083527
+  func:ClientLayoutInner: 37e47d9296a1f7a9
   func:NavigationTracker: 42dc03a7f1389152
   func:Providers: 3400c1a5354d979d
-  overview: 1cb24898c372f6f1
+  overview: 59f92422c0061f1e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T08:28:11Z
 ---
 
 ## Genel Bakış
-Bu modül, istemci tarafı uygulamanın temel yerleşim ve altyapı katmanlarını tanımlar. Uygulama genelindeki tüm çocukların erişeceği bağlam sağlayıcılarını yapılandırır, gezinti olaylarını merkezi olarak izler ve sayfa düzeninin dış- iç katmanlarını oluşturur.
+Bu modül, istemci tarafı uygulamanın temel yerleşim ve altyapı katmanlarını tanımlayan bir dizi React bileşeninden oluşur. Uygulama genelindeki çocukların erişeceği bağlam sağlayıcılarını yapılandırır, gezinti olaylarını merkezi olarak izler ve sayfa düzeninin dış ile iç katmanlarını oluşturur.
 
 ## Fonksiyon Grupları
 ### Bağlam ve Yapılandırma
@@ -29979,16 +30722,14 @@ URL değişimlerini ve sayfa geçişlerini izleyen bağımsız bir bileşendir; 
 - NavigationTracker
 
 ### Düzen Katmanları
-Sayfa yapısının dış ve iç katmanlarını oluşturur. Dış katman (ClientLayout) genel sayfa çerçevesini ve sağlayıcıları sararken, iç katman (ClientLayoutInner) içerik alanının yerleşimini, düzenini ve alt bileşenlerin (örn. gezinti izleyici) konumunu yönetir.
+Sayfa yapısının dış ve iç katmanlarını oluşturur. Dış katman genel sayfa çerçevesini ve sağlayıcıları sararken, iç katman içerik alanının yerleşimini, düzenini ve alt bileşenlerin konumunu yönetir.
 - ClientLayout, ClientLayoutInner
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, istemci tarafı uygulamanın temel yapı taşlarını bir araya getiren layout bileşenlerinden oluşur. Aşağıdaki mimari varsayımlar, bu bileşenlerin doğru çalışması için zorunlu kabul edilir.
-
-**[Aksiyom 1]: Eğer `Providers` bileşeni, uygulamanın üst seviye bileşenlerini sarmıyorsa (veya gerekli bağlam sağlayıcıları içermiyorsa), alt bileşenler
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -30012,15 +30753,14 @@ Bu modül, istemci tarafı uygulamanın temel yapı taşlarını bir araya getir
 **Dönüş**: null – fonksiyon herhangi bir görsel çıktı üretmez, sadece yan etkiler (takip) sağlar.
 
 ### ClientLayoutInner
+**Ne yapar**: Uygulamanın istemci tarafı ana düzen yapısını oluşturan bir React bileşenidir. Ana layout bileşeni içinde çocuk bileşenleri, çerez onay mekanizmasını, rızaya bağlı analitik izlemeyi ve navigasyon takipçisini bir araya getirir.
 
-**Ne yapar**: Uygulamanın istemci tarafı (client-side) ana layout yapısını oluşturur. Sayfa içeriklerini (`children`) sarmalayan üst düzey layout bileşenidir ve sayfanın alt kısmına çerez onay bannerı ile sayfa navigasyon takipçisini ekler.
-
-**Nasıl yapar**: Fonksiyon, React bileşenleri olan `MainLayout`, `CookieConsent` ve `NavigationTracker`'ı bir araya getirir. `MainLayout` bileşeni içinde `children`'ı render ederek sayfa içeriğini yerleştirir. Ardından `CookieConsent` bileşenini doğrudan ekler. `NavigationTracker` bileşenini ise `Suspense` ile sararak yükleme durumunda (`fallback={null}`) herhangi bir UI göstermeden asenktron olarak yüklenmesini sağlar. Bu sayede navigasyon takibi arka planda çalışırken ana sayfa içeriği engellenmemiş olur.
+**Nasıl yapar**: `MainLayout` bileşeni ile tüm içeriği sarar. Çocuk bileşenlerden sonra sırasıyla `CookieConsent` (çerez onay aracı), `ConsentGatedAnalytics` (rıza kontrollü analitik) ve `Suspense` ile sarılmış `NavigationTracker` (navigasyon takipçisi) bileşenlerini render eder. Yorumda belirtildiği üzere, `ConsentGatedAnalytics` bileşeni `NEXT_PUBLIC_GA_ID` ortam değişkeni tanımlı değilse ya da kullanıcı rıza vermemişse hiçbir analitik kod yüklemez. `NavigationTracker` bileşeni `Suspense` ile sarılarak asenkron yükleme sırasında kullanıcı deneyiminin kesintiye uğraması engellenir; yedek içerik olarak `null` kullanılır.
 
 **Parametreler**:
-- `children`: `React.ReactNode` — Ana layout içinde render edilecek sayfa içeriği. Bu prop, geçerli rotaya ait tüm alt sayfa bileşenlerini barındırır.
+- children: React.ReactNode — Ana layout içinde gösterilecek alt bileşenlerin tamamı. Bu bileşenler `MainLayout` kapsayıcısı içinde render edilir.
 
-**Dönüş**: JSX elementi döndürür. `MainLayout` içine sarılmış, sayfa içeriği (`children`), çerez onay bileşeni (`CookieConsent`) ve sarmalanmış navigasyon takipçisi (`NavigationTracker`) içeren bir React bileşen yapısı döndürür.
+**Dönüş**: JSX elementi döndürür. `MainLayout` ile sarılmış, içinde çocuk bileşenleri, çerez onay aracını, rızaya bağlı analitik bileşenini ve `Suspense` ile sarılmış navigasyon takipçisini barındıran bir React ağacı üretir.
 
 ### ClientLayout
 **Ne yapar**: Uygulama istemci tarafı düzenini oluşturmak için `ClientLayoutInner` bileşenini kullanarak verilen `children` öğesini sarmalar.  
@@ -30039,6 +30779,7 @@ Bu modül, istemci tarafı uygulamanın temel yapı taşlarını bir araya getir
 - import: ../../i18n/I18nProvider::I18nProvider
 - import: ./CookieConsent::CookieConsent
 - import: ./MainLayout::MainLayout
+- import: @/components/analytics/ConsentGatedAnalytics::ConsentGatedAnalytics
 - import: @/providers/SupabaseProvider::SupabaseProvider
 - import: next/navigation::usePathname
 - import: next/navigation::useSearchParams
@@ -30050,39 +30791,36 @@ Bu modül, istemci tarafı uygulamanın temel yapı taşlarını bir araya getir
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: ClientLayout.tsx::Providers
-- **params**: `{ children }: { children: React.ReactNode }`
-- **ic_degiskenler**:
-  - `children` — Alt bileşenler, provider sarmalama zincirinin en içine yerleştirilen React düğümleri
-- **Dönüş**: JSX (SupabaseProvider > I18nProvider > AuthProvider > CategoryProvider > CartProvider > ProjectProvider > children sarmalama yapısı)
+### [N1_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::Providers
+- **params**: `{ children }: { children: React.ReactNode }` — sarmalanacak alt bileşenler
+- **ic_degiskenler**: yok (yalnızca JSX return eder)
+- **Dönüş**: JSX ağacı — `SupabaseProvider` > `I18nProvider` > `AuthProvider` > `CategoryProvider` > `CartProvider` > `ProjectProvider` > `{children}` sıralı sarma yapısı
 
-### [N2_NASIL] AST Pointer: ClientLayout.tsx::NavigationTracker
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::NavigationTracker
+- **params**: yok
 - **ic_degiskenler**:
-  - `pathname` — `usePathname()` hook'undan gelen mevcut URL path'i, navigasyon yığını güncellemelerinde hangi sayfada olunduğunu belirler
-  - `searchParams` — `useSearchParams()` hook'undan gelen URL arama parametreleri, tam yol hesaplamasında query string kısmını oluşturur
-  - `handlePopState` — Arrow fonksiyon; tarayıcı geri/ileri butonu ile navigasyonda `sessionStorage`'a `vh_is_pop` = `'true'` yazan event handler
-  - `handleInteraction` — Arrow fonksiyon; fare tıklaması veya tuş basımı ile `sessionStorage`'a `vh_is_pop` = `'false'` yazan event handler (capture modunda)
-  - `updateStack` — Arrow fonksiyon; mevcut path, search params ve hash'i birleştirerek `vh_nav_stack` session storage anahtarında navigasyon geçmişini yığın olarak yönetir
-  - `search` — `searchParams?.toString()` sonucu, URL query string'i (`?key=value` formatında); yol birleştirme için kullanılır
-  - `hash` — `window.location.hash`, URL fragment identifier'ı; tam yol hesaplamasında eklenir
-  - `currentFullPath` — `pathname`, `search` ve `hash` birleştirilerek oluşturulan tam URL yolu; navigasyon yığınındaki eşleşmeleri kontrol eder
-  - `stack` — `string[]` tipinde dizi; `sessionStorage`'dan okunan veya boş dizi ile başlatılan navigasyon geçmiş yığını, `currentFullPath` eklenip/çıkartılarak güncellenir
-  - `lastItem` — `stack[stack.length - 1]`, navigasyon yığınının en üstündeki (son eklenen) yol; mevcut yol ile karşılaştırma için kullanılır
-  - `secondLastItem` — `stack[stack.length - 2]`, navigasyon yığınının sondan bir önceki yolu; geri navigasyon algılama için kullanılır
-- **Dönüş**: `null` (JSX render etmez, sadece yan etki olarak sessionStorage ve event listener yönetimi yapar)
+  - `pathname` — `usePathname()` hook'undan dönen mevcut URL yolu
+  - `searchParams` — `useSearchParams()` hook'undan dönen mevcut arama parametreleri nesnesi
+  - `handlePopState` — `popstate` olayını dinleyen callback; `sessionStorage`'da `vh_is_pop` anahtarını `'true'` yapar
+  - `handleInteraction` — `mousedown` ve `keydown` olaylarını dinleyen callback; `sessionStorage`'da `vh_is_pop` anahtarını `'false'` yapar
+  - `updateStack` — navigasyon geçmişini `sessionStorage`'da `vh_nav_stack` anahtarında güncelleyen fonksiyon
+  - `search` — `searchParams?.toString()` sonucu, yoksa boş string
+  - `hash` — `window.location.hash`, yoksa boş string
+  - `currentFullPath` — `pathname + (search ? '?' + search : '') + hash` birleşimi; tam URL yolu
+  - `stack` — `sessionStorage`'dan `JSON.parse` ile okunan navigasyon yığını dizisi (`string[]`)
+  - `lastItem` — `stack[stack.length - 1]`; yığının son elemanı
+  - `secondLastItem` — `stack[stack.length - 2]`; yığının sondan ikinci elemanı
+- **Dönüş**: `null` (yalnızca yan etki üretir; `sessionStorage`'da `vh_is_pop` ve `vh_nav_stack` anahtarlarını yönetir, `popstate`/`hashchange`/`mousedown`/`keydown` olay dinleyicileri kurar ve temizler)
 
-### [N3_NASIL] AST Pointer: ClientLayout.tsx::ClientLayoutInner
-- **params**: `{ children }: { children: React.ReactNode }`
-- **ic_degiskenler**:
-  - `children` — Alt bileşenler, `MainLayout` içine yerleştirilen React düğümleri
-- **Dönüş**: JSX (MainLayout sarmalaması içinde children, CookieConsent ve Suspense ile sarılmış NavigationTracker)
+### [N3_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::ClientLayoutInner
+- **params**: `{ children }: { children: React.ReactNode }` — sarmalanacak alt bileşenler
+- **ic_degiskenler**: yok (yalnızca JSX return eder)
+- **Dönüş**: JSX ağacı — `MainLayout` içinde `{children}`, `CookieConsent`, `ConsentGatedAnalytics` ve `Suspense` ile sarılı `NavigationTracker` bileşenlerini render eder
 
-### [N4_NASIL] AST Pointer: ClientLayout.tsx::ClientLayout
-- **params**: `{ children }: { children: React.ReactNode }`
-- **ic_degiskenler**:
-  - `children` — Alt bileşenler, `ClientLayoutInner` içine aktarılan React düğümleri
-- **Dönüş**: JSX (ClientLayoutInner sarmalaması içinde children)
+### [N4_NASIL] AST Pointer: src/components/layout/ClientLayout.tsx::ClientLayout
+- **params**: `{ children }: { children: React.ReactNode }` — sarmalanacak alt bileşenler
+- **ic_degiskenler**: yok (yalnızca JSX return eder)
+- **Dönüş**: JSX — `ClientLayoutInner` bileşeni ile `{children}` sarmalayan yapı
 
 ---
 
@@ -30135,29 +30873,35 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\layout\CookieConsent.tsx
-skeleton_hash: af5e987988010b85
+source_path: C:\tmp\vh-altyapi-t165\src\components\layout\CookieConsent.tsx
+skeleton_hash: 1a656857c4b01b30
 entity_hashes:
-  func:CookieConsent: a5f102228e57f333
-  overview: a960efeee3d27963
-  style_tokens: 20b5f371d2cf3ccf
-generated_at: 2026-06-15T17:03:21Z
+  func:CookieConsent: a98941af7804591f
+  overview: af56f8b739dda456
+  style_tokens: 22a5292b65783726
+generated_at: 2026-08-27T08:29:53Z
 ---
 
 ## Genel Bakış
-Bu modül, web sitesinin çerez politikasına ilişkin kullanıcı rızasını yöneten ve gösteren bir React bileşenidir. Kullanıcının çerez tercihlerini kabul etmesini veya reddetmesini sağlayarak gizlilik düzenlemelerine uyumu kolaylaştırır.
+Bu modül, web sitesinin çerez politikasına ilişkin kullanıcı rızasını yöneten ve gösteren bir React bileşenidir. Kullanıcının çerez tercihlerini kabul etmesini veya reddetmesini sağlayarak gizlilik düzenlemelerine uyumu kolaylaştırır. Bileşen, dil duyarlı bir banner arayüzü sunar ve tercihleri yerel depoda (`localStorage`) saklar.
 
 ## Fonksiyon Grupları
 ### Çerez Rıza Bileşeni
-Bileşen, kullanıcının çerez kullanımına ilişkin tercihlerini almak ve kaydetmek için bir arayüz sağlar.
+Kullanıcının çerez kullanımına ilişkin tercihlerini toplayan, dil bazlı lokalize metinlerle bir iletişim kutusu gösteren ve tercih kalıcılığını sağlayan tek bileşen grubudur. Daha önce tercih belirtilmemişse sayfa yüklemesinden 1.5 saniye sonra animasyonlu bir banner görüntüler.
 - CookieConsent
+
+## Bağımlılıklar ve Mimari Notlar
+- **Dış bağımlılıklar**: `useI18n()` hook'u ile mevcut dil (`lang`) alınır; `useLocalizedRoutes()` hook'u ile Çerez Politikası sayfasına yönlendirme bağlantısı oluşturulur.
+- **Durum yönetimi**: `useState(false)` ile banner görünürlüğü (`isVisible`) yönetilir; `useEffect` ile bileşen monte edildiğinde `localStorage` içindeki `vh_cookie_consent` anahtarı kontrol edilir.
+- **Yapısal sözleşme**: Modülün dışa açtığı yapı bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler. Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** Fonksiyon gövdesi sağlanmadığından (`CookieConsent` yalnızca imzasıyla verilmiştir), gövde tabanlı çıkarım yapılamamaktadır.
 
 ---
 
@@ -30189,6 +30933,7 @@ Bileşen, kullanıcının çerez kullanımına ilişkin tercihlerini almak ve ka
 - import: ../../i18n/I18nProvider::useI18n
 - import: next/link::Link
 - import: react::React
+- import: react::useCallback
 - import: react::useEffect
 - import: react::useState
 
@@ -30199,40 +30944,57 @@ Bileşen, kullanıcının çerez kullanımına ilişkin tercihlerini almak ve ka
 ### [N1_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::CookieConsent
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `lang` — `useI18n()` hook'undan dönen mevcut dil kodu (ör. `'en'`, `'tr'`), lokalize metinlerin seçiminde kullanılır
-  - `routes` — `useLocalizedRoutes()` hook'undan dönen lokalize rota fonksiyonları nesnesi; `routes.legal.cerez()` çağrısıyla çerez politikası sayfasının URL'sini üretir
-  - `isVisible` — boolean state, çerez izni bannerının görünür olup olmadığını kontrol eder; `false` ise bileşen `null` döner (gizlenir)
-  - `setIsVisible` — `isVisible` state'ini güncelleyen setter fonksiyonu, bannerın gösterilmesini/gizlenmesini tetikler
-  - `consent` — `localStorage.getItem('vh_cookie_consent')` çağrısından dönen string değer; daha önce çerez onayı verilip verilmediğini tutar (`'accepted'`, `'rejected'` veya `null`)
-  - `timer` — `setTimeout` dönüşü, 1500ms sonra `setIsVisible(true)` çağrısını tetikler; cleanup fonksiyonunda `clearTimeout(timer)` ile temizlenir
-  - `text` — `lang` değerine göre seçilen lokalize çerez politikası açıklama metni (`'en'` veya `'tr'`)
-  - `policyText` — `lang` değerine göre seçilen lokalize `"Cookie Policy"` / `"Çerez Politikası"` buton metni
-  - `acceptText` — `lang` değerine göre seçilen lokalize `"Accept All"` / `"Tümünü Kabul Et"` buton metni
-  - `rejectText` — `lang` değerine göre seçilen lokalize `"Reject"` / `"Reddet"` buton metni
-  - `handleAccept` — arrow fonksiyon; `localStorage.setItem('vh_cookie_consent', 'accepted')` yazarak çerez onayını kalıcı olarak kaydeder, ardından `setIsVisible(false)` ile bannerı gizler
-  - `handleReject` — arrow fonksiyon; `localStorage.setItem('vh_cookie_consent', 'rejected')` yazarak çerez reddini kalıcı olarak kaydeder, ardından `setIsVisible(false)` ile bannerı gizler
-- **Dönüş**: `JSX.Element | null` — `isVisible` false ise `null`, true ise çerez izni banner JSX'i döner
+  - `t` — useI18n() hook'undan destructure edilen çeviri fonksiyonu; JSX içinde metinleri yerelleştirmek için kullanılır
+  - `routes` — useLocalizedRoutes() hook'undan gelen rotalar objesi; Link bileşeninde `routes.legal.cerez()` ile href oluşturmak için kullanılır
+  - `isVisible` — useState(false) ile tanımlı boolean state; bileşenin görünürlük durumunu tutar
+  - `setIsVisible` — isVisible state'ini güncelleyen setter fonksiyonu
+  - `showDetails` — useState(false) ile tanımlı boolean state; çerez kategori detaylarının açık/kapalı durumunu tutar
+  - `setShowDetails` — showDetails state'ini güncelleyen setter fonksiyonu
+  - `draft` — useState({functional: false, analytics: false, marketing: false}) ile tanımlı obje state; kullanıcının çerez tercihlerinin taslağını tutar
+  - `setDraft` — draft state'ini güncelleyen setter fonksiyonu
+  - `syncVisibility` — useCallback ile tanımlı fonksiyon; consent durumunu kontrol eder ve isVisible state'ini günceller
+  - `handleAcceptAll` — acceptAll() çağırır ve isVisible'ı false yaparak bileşeni gizler
+  - `handleRejectOptional` — rejectOptional() çağırır ve isVisible'ı false yaparak bileşeni gizler
+  - `handleSaveSelection` — setConsent(draft) çağırır ve isVisible'ı false yaparak bileşeni gizler
+- **Dönüş**: isVisible false ise null, aksi halde JSX elementi
 
-### [N2_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::useEffect_callback
-- **params**: (parametre yok) — `useEffect` callback fonksiyonu
-- **ic_degiskenler**:
-  - `consent` — `localStorage.getItem('vh_cookie_consent')` çağrısından dönen `string | null`; daha önce kullanıcı çerez tercihini kaydedip kaydetmediğini belirler
-  - `timer` — `setTimeout(() => setIsVisible(true), 1500)` dönüşü; 1.5 saniye gecikme ile bannerın gösterilmesini sağlar, LCP/CLS optimizasyonu için kullanılır
-- **Dönüş**: temizleme fonksiyonu `() => clearTimeout(timer)` — timer'ı iptal eder, bileşen unmount olduğunda sızıntıyı önler
+### [N2_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::syncVisibility
+- **params**: (parametre yok)
+- **ic_degiskenler**: (gövdede tanımlı değişken yok)
+- **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleAccept
+### [N3_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::useEffect callback
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `localStorage.setItem('vh_cookie_consent', 'accepted')` — tarayıcı localStorage'ına çerez onay durumunu `'accepted'` değeriyle yazar
-  - `setIsVisible(false)` — state'i `false` yaparak bannerı DOM'dan kaldırır
-- **Dönüş**: yok (void) — yan etki olarak localStorage'a yazar ve bannerı gizler
+  - `timer` — setTimeout ile syncVisibility fonksiyonunu 1500ms gecikmeli çalıştırmak için oluşturulan zamanlayıcı kimliği
+  - `off` — onConsentChange ile oluşturulan dinleyici aboneliğini kaldıran fonksiyon
+- **Dönüş**: cleanup fonksiyonu
 
-### [N4_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleReject
+### [N4_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::useEffect cleanup
 - **params**: (parametre yok)
+- **ic_degiskenler**: (gövdede tanımlı değişken yok)
+- **Dönüş**: yok
+
+### [N5_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleAcceptAll
+- **params**: (parametre yok)
+- **ic_degiskenler**: (gövdede tanımlı değişken yok)
+- **Dönüş**: yok
+
+### [N6_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleRejectOptional
+- **params**: (parametre yok)
+- **ic_degiskenler**: (gövdede tanımlı değişken yok)
+- **Dönüş**: yok
+
+### [N7_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::handleSaveSelection
+- **params**: (parametre yok)
+- **ic_degiskenler**: (gövdede tanımlı değişken yok)
+- **Dönüş**: yok
+
+### [N8_NASIL] AST Pointer: src/components/layout/CookieConsent.tsx::map callback (category)
+- **params**: `category` — OPTIONAL_CATEGORIES dizisinden gelen çerez kategori adı
 - **ic_degiskenler**:
-  - `localStorage.setItem('vh_cookie_consent', 'rejected')` — tarayıcı localStorage'ına çerez onay durumunu `'rejected'` değeriyle yazar
-  - `setIsVisible(false)` — state'i `false` yaparak bannerı DOM'dan kaldırır
-- **Dönüş**: yok (void) — yan etki olarak localStorage'a yazar ve bannerı gizler
+  - `e` — onChange event objesi; `e.target.checked` ile checkbox durumunu almak için kullanılır
+- **Dönüş**: JSX elementi (label)
 
 ---
 
@@ -30257,10 +31019,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-500/10`, `bg-gradient-to-r`, `border-t`, `border-white/10`, `border-white/5`, `from-cyan-500`, `hover:bg-white/5`, `hover:from-cyan-400`, `hover:text-cyan-400`, `hover:text-white`, `hover:to-blue-500`, `text-cyan-400`, `text-slate-300`, `text-slate-400`, `text-sm`
-- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `from-cyan-500`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `h-5`, `hover:from-cyan-400`, `hover:shadow-lg`, `items-center`, `items-start`, `justify-between`
+- **Renkler:** `accent-cyan-500`, `bg-cyan-500/10`, `bg-gradient-to-r`, `border-t`, `border-white/10`, `border-white/5`, `from-cyan-500`, `hover:bg-white/5`, `hover:from-cyan-400`, `hover:text-cyan-400`, `hover:text-white`, `hover:to-blue-500`, `text-cyan-400`, `text-slate-300`, `text-slate-400`
+- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `flex-wrap`, `from-cyan-500`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `h-5`, `hover:from-cyan-400`, `hover:shadow-lg`, `items-center`, `items-start`
 - **Varyant/Responsive:** `active:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `active:scale-95`, `animate-fadeInUp`, `border`, `cyan-glow`, `duration-200`, `duration-300`, `font-bold`, `font-medium`, `glass-strong`, `hover:scale-105`, `leading-relaxed`, `pt-2`, `px-3`, `px-4`, `py-1.5`
+- **Yardımcı Sınıflar:** `active:scale-95`, `animate-fadeInUp`, `border`, `cursor-not-allowed`, `cursor-pointer`, `cyan-glow`, `duration-200`, `duration-300`, `font-bold`, `font-medium`, `glass-strong`, `hover:scale-105`, `leading-relaxed`, `mt-1`, `opacity-60`
 
 ---
 # FILE: src\components\layout\MainLayout.md
@@ -30269,13 +31031,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\layout\MainLayout.tsx
-skeleton_hash: d7fee17040961632
+source_path: C:\tmp\vh-altyapi-t165\src\components\layout\MainLayout.tsx
+skeleton_hash: 7433144502143f99
 entity_hashes:
-  func:MainLayout: 7d14ab9d717a82fb
-  overview: f38b891811e26fb3
-  style_tokens: c300b80e9d38560c
-generated_at: 2026-06-14T22:18:29Z
+  func:MainLayout: 7607152681e8475f
+  overview: b51c14c938afce8b
+  style_tokens: 57ab2fa7fdc3ea42
+generated_at: 2026-08-27T08:30:36Z
 ---
 
 ## Genel Bakış
@@ -30299,35 +31061,25 @@ Uygulamanın temel görsel yapısını ve sayfa yerleşimini belirleyen ana layo
 
 ### MainLayout
 
-**Ne yapar**: Uygulamanın ana layout (yerleşim) bileşenidir. Admin paneli ile genel site olmak üzere iki farklı yerleşim şemasını koşullu olarak render eder. Sayfa içeriğini (`children`) sararak üst bilgi çubuğu (header), alt bilgi çubuğu (footer), geri yukarı butonu, WhatsApp butonu, dil seçici, toast bildirimleri ve ödeme izleyicisi gibi globallyel bileşenleri yönetir.
+**Ne yapar**: Uygulamanın ana sayfa düzenini (layout) oluşturan React bileşenidir. Admin sayfaları için minimal bir sarma (sadece `children`), normal sayfalar için ise üstbilgi, altbilgi, gezinme butonları ve global katmanlardan (toaster, WhatsApp, dil değiştirici) oluşan tam bir sayfa iskeleti sunar.
 
-**Nasıl yapar**:
-- `useI18n()` hook'u ile çoklu dil desteği (i18n) sağlar ve çevirileri `t()` fonksiyonuyla sunar.
-- `usePathname()` hook'u ile mevcut URL yolunu okur. Eğer yol `/admin` ile başlıyorsa `isAdmin` flag'ini `true` yaparak yöneticilere özel minimal bir layout render eder; aksi halde genel site layout'unu render eder.
-- `useScrollThrottle` özel hook'unu kullanarak sayfanın kaydırma (scroll) durumunu throttled (kesikli/aralıklı) şekilde takip eder. `showAt: 100` parametresi ile 100px kaydırma eşiğinde başlık çubuğunun "scrolled" moduna geçmesini sağlar, `hideBelow: 60` ile 60px altında başlığın tekrar görünür olmasını, `syncKey: pathname` ile her sayfa geçişinde scroll durumunun sıfırlanmasını tetikler.
-- `useState` ve `useEffect` ile iki adet lazy-enable (gecikmeli etkinleştirme) mekanizması kurar: `enableToaster` state'i kullanıcı ilk kez pointer (fare/parmak) bastığında veya tuşa bastığında etkinleşir (`{ once: true }` ile sadece bir kez dinlenir); `enableWhatsApp` state'i ise kullanıcı ilk kez kaydırma yaptığında (`passive: true` ile tarayıcı engeli olmadan) etkinleşir. Bu sayede above-the-fold performansı korunur.
-- Admin layout'unda koyu arka planlı bir üst çubuk ve geri dönüş linki ile basit bir content alanı sunar.
-- Genel site layout'unda `ScrollToTop` (sayfa geçişlerinde yukarı kaydırma), `StickyHeader` (kaydırma durumuna göre yapışkan/sabit başlık), `BackToTopButton`, `WhatsAppFloat`, `LanguageSwitcher`, `PaymentWatcher`, `Footer`, `AddToCartToast` ve `Toaster` gibi bileşenleri stratejik olarak konumlandırır.
-- `Suspense` ile sarmalanan `WhatsAppFloat` ve `AddToCartToaster` bileşenleri, code-splitting (kod ayırma) ile asenkron yüklenir; `fallback={null}` sayesinde yüklenme sırasında boş render yapılır.
+**Nasıl yapar**: Bileşen önce mevcut URL yolunu `usePathname` ile alır ve `/admin` ile başlayıp başlamadığını kontrol eder. Admin yolu tespit edilirse, hiçbir ek kabuk sarmalamadan yalnızca `children` döndürülür; bu sayede `AdminLayout` bileşeninin tek tam ekran katman olarak çalışması sağlanır ve çifte scrollbar, üst üste marka çubuğu gibi sorunlar önlenir. Normal sayfalarda ise `useScrollThrottle` ile sayfanın kaydırma durumu izlenir; bu hook, belirtilen piksel eşiklerine göre yapışkan başlığın (StickyHeader) görünürlüğünü yönetir ve `pathname`'e bağlı bir `syncKey` ile senkronize çalışır. Toaster ve WhatsAppFloat bileşenleri, performans amacıyla kullanıcı etkileşimi gerçekleşene kadar yüklenmez; `pointerdown` veya `keydown` olayları Toaster'ı, `scroll` olayı ise WhatsAppFloat'ı aktifleştirir. Her iki durumda da olay dinleyicileri `{ once: true }` ile yalnızca bir kez tetiklenir ve bileşen kaldırıldığında temizlenir. Sayfa geçiş animasyonu kapatılmıştır; bu, belirtilen sorun kaynağının kendisidir. Admin dışı sayfalarda `ScrollToTop`, `BackToTopButton`, `LanguageSwitcher`, `PaymentWatcher` ve `Footer` bileşenleri sabit olarak; `WhatsAppFloat`, `AddToCartToast` ve `Toaster` ise koşullu olarak render edilir.
 
 **Parametreler**:
-- `children: React.ReactNode` — Layout tarafından sarılacak (wrap edilecek) alt sayfa bileşenleri. Sayfa içeriği bu prop aracılığıyla layout'un orta bölgesine yerleştirilir.
+- `children`: `MainLayoutProps` tipinden destruct edilen özellik — Bileşenin içeriğini oluşturan alt bileşenler. `MainLayoutProps` tipi bu dosyada tanımlı olup `children` alanını içerir; kesin tip tanımı verilen kaynakta belirtilmemiştir.
 
-**Dönüş**: `JSX.Element` — Render edilen layout yapısı. Admin rotası için minimal bir yönetim paneli yerleşimi, genel rotalar için tam donanımlı site yerleşimi (header, main, footer ve global overlay bileşenleri) döndürür.
+**Dönüş**: JSX döndüren bir React fonksiyon bileşenidir. Admin sayfalarında `<>{children}</>` fragment'ı, normal sayfalarda ise `className="relative min-h-screen bg-white flex flex-col"` özellikli bir `div` kapsayıcısı içinde düzenlenmiş bileşen ağacı döndürülür. Kesin dönüş tipi verilen kaynakta belirtilmemiştir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../hooks/useScrollThrottle::useScrollThrottle
-- import: ../../i18n/I18nProvider::useI18n
-- import: ../../utils/routes::Routes
 - import: ../BackToTopButton::BackToTopButton
 - import: ../Footer::Footer
 - import: ../LanguageSwitcher::LanguageSwitcher
 - import: ../PaymentWatcher::PaymentWatcher
 - import: ../ScrollToTop::ScrollToTop
 - import: ../StickyHeader::StickyHeader
-- import: next/link::Link
 - import: next/navigation::usePathname
 - import: react::React
 - import: react::Suspense
@@ -30353,37 +31105,19 @@ Uygulamanın temel görsel yapısını ve sayfa yerleşimini belirleyen ana layo
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/components/layout/MainLayout.tsx`::MainLayout
-- **params**: `{ children }: MainLayoutProps`
-  - `children` — React child elemanları, layout içinde render edilen sayfa içeriği
+### [N1_NASIL] AST Pointer: src/components/layout/MainLayout.tsx::MainLayout
+- **params**: `children` — `MainLayoutProps` tipinde, sarmalanacak alt bileşenler
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructured çeviri fonksiyonu; `t('header.adminBar.brand')` ve `t('header.adminBar.backToSite')` çağrılıyor
-  - `pathname` — `usePathname()` hook'undan gelen mevcut URL pathname; admin kontrolü ve scroll senkronizasyonu için kullanılır
-  - `isAdmin` — `pathname?.startsWith('/admin')` ifadesinden türetilen boolean; admin sayfasıysa farklı layout döner
-  - `isScrolled` — `useScrollThrottle({ showAt: 100, hideBelow: 60, throttleMs: 16, initialDelayMs: 180, syncKey: pathname || '' })` çağrısından dönen scroll durumu; `StickyHeader`'a prop olarak verilir
-  - `enableToaster` — `useState(false)` state'i; `pointerdown`/`keydown` event'inde `true` olur, Toaster ve AddToCartToast'ın lazy yüklenmesini tetikler
-  - `setEnableToaster` — `enableToaster` state setter'ı
-  - `enableWhatsApp` — `useState(false)` state'i; `scroll` event'inde `true` olur, WhatsAppFloat'ın lazy yüklenmesini tetikler
-  - `setEnableWhatsApp` — `enableWhatsApp` state setter'ı
-  - `enable` (1. useEffect içinde) — arrow callback; `setEnableToaster(true)` çağırır, `pointerdown` ve `keydown` için `{ once: true }` ile event listener ekler, cleanup'ta kaldırır
-  - `enable` (2. useEffect içinde) — arrow callback; `setEnableWhatsApp(true)` çağırır, `scroll` için `{ once: true, passive: true }` ile event listener ekler, cleanup'ta kaldırır
-- **Return**: JSX — `isAdmin` true ise minimal admin bar layout'u; değilse tam layout (StickyHeader, main content, BackToTopButton, WhatsAppFloat via lazy, LanguageSwitcher, PaymentWatcher, Footer, AddToCartToast via lazy, Toaster via lazy)
-
----
-
-### [N2_NASIL] AST Pointer: `src/components/layout/MainLayout.tsx`::useEffect_1 (enableToaster)
-- **params**: yok
-- **ic_degiskenler**:
-  - `enable` — arrow fonksiyon; `setEnableToaster(true)` çağırarak Toaster'ı etkinleştirir; `window`'a `pointerdown` ve `keydown` event listener'ları `{ once: true }` ile eklenir
-- **Return**: cleanup fonksiyonu — `pointerdown` ve `keydown` listener'larını `removeEventListener` ile kaldırır
-
----
-
-### [N3_NASIL] AST Pointer: `src/components/layout/MainLayout.tsx`::useEffect_2 (enableWhatsApp)
-- **params**: yok
-- **ic_degiskenler**:
-  - `enable` — arrow fonksiyon; `setEnableWhatsApp(true)` çağırarak WhatsAppFloat'ı etkinleştirir; `window`'a `scroll` event listener'ı `{ once: true, passive: true }` ile eklenir
-- **Return**: cleanup fonksiyonu — `scroll` listener'ını `removeEventListener` ile kaldırır
+  - `pathname` — `usePathname()` hook'undan dönen mevcut URL yolu
+  - `isAdmin` — `pathname?.startsWith('/admin')` ile hesaplanan boolean; admin sayfasında olup olmadığını belirler
+  - `isScrolled` — `useScrollThrottle` hook'undan dönen kaydırma durumu; `{ showAt: 100, hideBelow: 60, throttleMs: 16, initialDelayMs: 180, syncKey: pathname || '' }` parametreleriyle yapılandırılır
+  - `enableToaster` — `useState(false)` ile tanımlanan boolean; Toaster ve AddToCartToast bileşenlerinin gösterilip gösterilmeyeceğini kontrol eder
+  - `setEnableToaster` — `enableToaster` durumunu güncelleyen setter fonksiyonu
+  - `enableWhatsApp` — `useState(false)` ile tanımlanan boolean; WhatsAppFloat bileşeninin gösterilip gösterilmeyeceğini kontrol eder
+  - `setEnableWhatsApp` — `enableWhatsApp` durumunu güncelleyen setter fonksiyonu
+  - `enable` (ilk useEffect) — `setEnableToaster(true)` çağıran fonksiyon; `pointerdown` ve `keydown` olaylarına `{ once: true }` ile bağlanır
+  - `enable` (ikinci useEffect) — `setEnableWhatsApp(true)` çağıran fonksiyon; `scroll` olayına `{ once: true, passive: true }` ile bağlanır
+- **Dönüş**: JSX.Element — `isAdmin` true ise `<>{children}</>` döner; aksi halde `ScrollToTop`, `StickyHeader`, `main` (children içerir), `BackToTopButton`, koşullu `WhatsAppFloat` (Suspense ile), `LanguageSwitcher`, `PaymentWatcher`, `Footer` ve koşullu `AddToCartToast` + `Toaster` (Suspense ile) içeren bir `<div>` döner
 
 ---
 
@@ -30408,10 +31142,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gray-50`, `bg-slate-900`, `bg-white`, `bg-white/10`, `hover:bg-white/20`, `text-white`, `text-xs`
-- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `flex-grow`, `gap-3`, `items-center`, `items-end`, `justify-between`, `min-h-screen`, `overflow-auto`, `relative`, `right-6`, `z-modal`, `z-toast`
-- **Varyant/Responsive:** `hover:` önekleri
-- **Yardımcı Sınıflar:** `duration-300`, `font-bold`, `pointer-events-auto`, `pointer-events-none`, `px-3`, `px-6`, `py-1`, `py-3`, `rounded-full`, `shrink-0`, `tracking-tighter`, `tracking-widest`, `transition-colors`, `uppercase`
+- **Renkler:** `bg-white`
+- **Layout:** `bottom-6`, `fixed`, `flex`, `flex-col`, `flex-grow`, `gap-3`, `items-end`, `min-h-screen`, `relative`, `right-6`, `z-toast`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `duration-300`, `pointer-events-auto`, `pointer-events-none`, `transition-colors`
 
 ---
 # FILE: src\components\layout\PageShell.md
@@ -30420,12 +31154,12 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\layout\PageShell.tsx
-skeleton_hash: a57a4d0cf068f731
+source_path: C:\tmp\vh-altyapi-t165\src\components\layout\PageShell.tsx
+skeleton_hash: 4b8ac5f54e92c6ba
 entity_hashes:
   overview: 09c986d2dcf8a577
   style_tokens: f9c95184ddfe4989
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T08:30:37Z
 ---
 
 ## Genel Bakış
@@ -30519,13 +31253,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\Breadcrumb.tsx
-skeleton_hash: 8c92fea85517808a
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\Breadcrumb.tsx
+skeleton_hash: 7901d5e6ddb85d76
 entity_hashes:
   func:Breadcrumb: 8dc746a161585543
   overview: c3a2c03ed767502e
   style_tokens: 37bda1495ede52cb
-generated_at: 2026-06-15T17:03:33Z
+generated_at: 2026-08-27T08:31:08Z
 ---
 
 ## Genel Bakış
@@ -30535,15 +31269,6 @@ Breadcrumb bileşeni, kullanıcının uygulama içindeki mevcut konumunu hiyerar
 ### Navigasyon Yolu Gösterimi
 Bileşenin tek ve temel sorumluluğu, verilen öğe listesini kullanıcı dostu bir breadcrumb çubuğu olarak sunmaktır. Geçerli sayfa yolunu okunabilir ve erişilebilir biçimde kullanıcılara iletir.
 - Breadcrumb
-
----
-
-## AXIOMS – Mimari Varsayımlar
-Breadcrumb bileşeni, `items` prop'unun mutlaka sağlanması gerektiğini, `variant` ve `className` prop'larının ise opsiyonel olduğunu varsayar.
-
-- **[Aksiyom 1]**: `items` prop'u sağlanmazsa bileşen boş veya hata veren bir breadcrumb render edilir.
-- **[Aksiyom 2]**: `variant` prop'u sağlanmazsa bileşen `'white'` değerini varsayılan olarak kullanır.
-- **[Aksiyom 3]**: `className` prop'u sağlanmazsa bileşen boş string değerini varsayılan olarak kullanır.
 
 ---
 
@@ -30618,6 +31343,25 @@ Bu modül, hiyerarşik navigasyon yolunu gösteren bir breadcrumb bileşenidir. 
 
 ---
 
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/navigation/Breadcrumb.tsx::Breadcrumb
+- **params**:
+  - `items` — breadcrumb öğeleri dizisi; her öğe `label` ve opsiyonel `href` alanlarına sahip
+  - `variant` — varsayılan `'white'`; arka plan ve metin stilini belirleyen tema seçimi (`'white'`, `'transparent'`, `'dark'`)
+  - `className` — varsayılan `''`; dışarıdan ek CSS sınıfı eklemek için
+- **ic_degiskenler**:
+  - `lang` — `useI18n()` hook'undan destruct edilen mevcut dil kodu; `localizedHref` çağrılarında URL'yi yerelleştirmek için kullanılır
+  - `bgClasses` — `variant` anahtarına göre arka plan CSS sınıflarını eşleyen nesne; `'white'` → `'bg-white border-b'`, `'transparent'` → `'bg-transparent'`, `'dark'` → `'bg-primary-navy/10'`
+  - `textClasses` — `variant` anahtarına göre alt nesneler (`link`, `current`, `separator`) içeren metin CSS sınıfları eşleme nesnesi
+  - `styles` — `textClasses[variant]` erişimiyle seçilen stil seti; alt anahtarları `link`, `current`, `separator` olarak JSX içinde kullanılır
+  - `jsonLd` — Schema.org `BreadcrumbList` yapısı; `items.map` ile her öğe için `ListItem` nesneleri oluşturulur; `position` → `index + 1`, `name` → `item.label`, `item` → `item.href` varsa `SITE_URL` + `localizedHref(item.href, lang)` birleşimi, yoksa `undefined`
+  - `isLast` — map callback'inde `index === items.length - 1` karşılaştırması; son öğe olup olmadığını belirler; son öğe ise `<Link>` yerine `<span>` render edilir
+  - `isFirst` — map callback'inde `index === 0` karşılaştırması; ilk öğe olup olmadığını belirler; ilk öğeye `Home` ikonu eklenir
+- **Dönüş**: `items` yoksa veya uzunluğu 0 ise `null`; aksi halde `<nav>` JSX elementi (içinde `<script type="application/ld+json">` ile `jsonLd` verisi ve `<ol>` ile breadcrumb öğeleri listesi)
+
+---
+
 ## NODE ID STANDARD
 
   file: src\components\navigation\Breadcrumb.tsx
@@ -30652,15 +31396,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\navigation\CategoryHubOverlay.tsx
-skeleton_hash: 1c3f4e6b36b06fee
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\CategoryHubOverlay.tsx
+skeleton_hash: 68bf66bfe1f571c9
 entity_hashes:
   func:CategoryHubOverlay: fb718076583f7612
   func:handleCategoryClick: f62c24f62a6cba1b
   func:handleSubCategoryClick: abc84e61f250f252
   overview: d24237daefdb4b23
   style_tokens: 96d06533c66f365a
-generated_at: 2026-08-25T07:26:16Z
+generated_at: 2026-08-27T08:31:09Z
 ---
 
 ## Genel Bakış
@@ -30870,16 +31614,16 @@ graph TD
     CategoryHubOverlay_tsx__CategoryHubOverlay["CategoryHubOverlay"]
     CategoryHubOverlay_tsx__handleCategoryClick["handleCategoryClick"]
     CategoryHubOverlay_tsx__handleSubCategoryClick["handleSubCategoryClick"]
-    CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleCategoryClick
     CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleSubCategoryClick
+    CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleCategoryClick
 ```
 
 ## NODE ID STANDARD
 
-  file: CategoryHubOverlay.tsx
-  function: CategoryHubOverlay.tsx::CategoryHubOverlay
-  function: CategoryHubOverlay.tsx::handleCategoryClick
-  function: CategoryHubOverlay.tsx::handleSubCategoryClick
+  file: src\components\navigation\CategoryHubOverlay.tsx
+  function: src\components\navigation\CategoryHubOverlay.tsx::CategoryHubOverlay
+  function: src\components\navigation\CategoryHubOverlay.tsx::handleCategoryClick
+  function: src\components\navigation\CategoryHubOverlay.tsx::handleSubCategoryClick
 
 ---
 
@@ -30909,24 +31653,26 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\EliteMegaMenu.tsx
-skeleton_hash: 1e6adc2d04003d3c
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\EliteMegaMenu.tsx
+skeleton_hash: 2db6b453cf712056
 entity_hashes:
   func:EliteMegaMenu: 887e772baf4da3df
   func:MobileMegaMenu: 63ce544d1da454df
-  func:getSubCategories: b504c4c1aa89bb99
+  func:getSubCategories: 7f79c6051bf00c5b
   func:handleLinkClick: 44a1929f40d26342
-  overview: 8f103b72ea77af12
+  overview: c5c3e5aa35b93483
   style_tokens: 950eb84fcf443cff
-generated_at: 2026-06-14T22:19:48Z
+generated_at: 2026-08-27T08:32:21Z
 ---
 
 ## Genel Bakış
-Bu modül, web sitesinin ana navigasyonunu sağlayan çok seviyeli bir mega menü bileşenidir. Hem masaüstü hem de mobil cihazlar için optimize edilmiş iki farklı görünüm sunar. Modül, dışarıdan sağlanan `categories` verisi ve `onNavigate` callback fonksiyonuna bağımlıdır; bu veriler olmadan menü yapısı oluşturulamaz ve kullanıcı yönlendirmesi yapılamaz. Mimari olarak, kullanıcının site içi dolaşımını kontrol eden kritik bir arayüz bileşenidir.
+
+Bu modül, web sitesinin ana navigasyonunu sağlayan çok seviyeli bir mega menü bileşenidir. Hem masaüstü hem de mobil cihazlar için optimize edilmiş iki farklı görünüm sunar. Modül, dışarıdan sağlanan `categories` verisi ve `onNavigate` callback fonksiyonuna bağımlıdır; bu veriler olmadan menü yapısı oluşturulamaz ve kullanıcı yönlendirmesi yapılamaz.
 
 ## Fonksiyon Grupları
+
 ### Menü Bileşenleri
-Masaüstü ve mobil cihazlara özel, veriye dayalı arayüzü render eden iki ana React bileşenini içerir.
+Masaüstü ve mobil cihazlara özel, veriye dayalı arayüzü render eden iki ana React bileşenini içerir. Her iki bileşen de aynı prop yapısını (`categories`, `onNavigate`) alır.
 - `EliteMegaMenu`, `MobileMegaMenu`
 
 ### Etkileşim ve Yönlendirme İşleyicileri
@@ -30941,19 +31687,15 @@ Menü yapısını oluşturmak için gerekli olan, belirli bir üst kategorinin t
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, çok seviyeli navigasyon menüsü sunan React bileşenleri içerir. Aşağıdaki mimari varsayımlar, yalnızca fonksiyon imzaları ve modül sabitlerinden türetilmiştir.
+[Aksiyom 1]: Eğer `categories` prop'u sağlanmazsa, menü yapısı oluşturulamaz ve bileşen boş veya hatalı durumda render edilir.
 
-**[Aksiyom 1]:** Eğer `categories` prop'u `EliteMegaMenu` veya `MobileMegaMenu`'ya sağlanmazsa, menü hiyerarşisi oluşturulamaz ve bileşen boş/hatalı render edilir.
+[Aksiyom 2]: Eğer `onNavigate` callback fonksiyonu sağlanmazsa, kullanıcı tıklama işlemleri sonucunda sayfa yönlendirmesi gerçekleştirilemez.
 
-**[Aksiyom 2]:** Eğer `onNavigate` callback'i `EliteMegaMenu` veya `MobileMegaMenu`'ya sağlanmazsa, kullanıcı menü bağlantısına tıkladığında yönlendirme gerçekleştirilmez.
+[Aksiyom 3]: Eğer `getSubCategories` fonksiyonuna geçerli bir `parentId` değeri verilmezse, alt kategori verileri getirilemez.
 
-**[Aksiyom 3]:** Eğer `getSubCategories`'e geçilen `parentId` string'i geçerli bir kategori kimliği değilse, alt kategoriler alınamaz ve menü alt seviye dalları boş kalır.
+[Aksiyom 4]: Eğer `handleLinkClick` fonksiyonuna geçerli bir `level` ve `slug` değeri sağlanmazsa, link tıklama işlemi düzgün biçimde işlenemez.
 
-**[Aksiyom 4]:** Eğer `handleLinkClick` fonksiyonu çağrılırken `level` parametresi sayısal bir değer olarak sağlanmazsa, tıklanan bağlantının derinlik seviyesi belirlenemez ve yanlış sayfaya yönlendirme olabilir.
-
-**[Aksiyom 5]:** Eğer `handleLinkClick` fonksiyonu çağrılırken `slug` parametresi bir string olarak sağlanmazsa, hedef URL belirlenemez ve `onNavigate` geçersiz bir slugs ile çağrılabilir.
-
-**[Aksiyom 6]:** Eğer `categories` prop'u bir dizi (array) formatında değilse, hem masaüstü (`EliteMegaMenu`) hem de mobil (`MobileMegaMenu`) bileşenlerinde menü öğeleri iterate edilemez.
+[Aksiyom 5]: Eğer `MegaMenu3DBackground` bileşeni mevcut değilse, menü arka plan efekti görüntülenemez.
 
 ---
 
@@ -30984,20 +31726,24 @@ Bu modül, çok seviyeli navigasyon menüsü sunan React bileşenleri içerir. A
 **Dönüş**: Belirtilmemiş (fonksiyonun dönüş tipi dokümantasyonda tanımlı değildir).
 
 ### getSubCategories
-**Ne yapar**: Verilen bir üst kategori kimliğine (`parentId`) ait alt kategori listesini elde eder.  
-**Nasıl yapar**: Fonksiyon, `parentId` parametresiyle çağrıldığında ilgili alt kategorileri döndürür; örnek kullanım içinde `const subs = getSubCategories(category.id)` şeklinde görülür ve dönen `subs` dizisi render sürecinde alt linkler olarak gösterilir.  
+**Ne yapar**: Verilen bir üst kategorinin alt kategorilerini özyinelemeli (recursive) olarak alır ve her bir kategori için bir React JSX yapısı döndürerek hiyerarşik bir menü öğesi oluşturur. Ana kategori bir `Link` bileşeni olarak gösterilirken, var olan alt kategoriler girintili bir şekilde (`pl-6`) listelenir.
+
+**Nasıl yapar**: Fonksiyon bir `category` parametresi alır ve önce `getSubCategories(category.id)` çağrısıyla aynı fonksiyonu özyinelemeli olarak kullanarak alt kategorileri (`subs`) elde eder. Ardından `wrapCategory(category)` ile kategori verisini bir görünüm modeline (`vm`) sarar. Döndürülen JSX yapısında ana kategori için `Routes.category(getLocalizedCategorySlug(category, lang))` ile bir URL oluşturularak `Link` bileşeninde kullanılır; `getCategoryIcon(category.slug, { size: 18 })` ile ikon ve `vm?.displayName` ile görünen ad gösterilir. Alt kategoriler varsa (`subs.length > 0`), her bir alt kategori için `wrapCategory(sub)` ile görünüm modeli oluşturulur ve `Routes.category(getLocalizedCategorySlug(category, lang), getLocalizedCategorySlug(sub, lang))` ile alt kategoriye özel URL ile ayrı `Link` bileşenleri render edilir. Her iki `Link` bileşeninde de `onClick` olayında `onNavigate?.()` çağrısı yapılır; bu, isteğe bağlı bir navigasyon callback'idir ve varsa tetiklenir.
+
 **Parametreler**:
-- `parentId`: string — Alt kategorilerin alınacağı üst kategori kimliği.  
-**Dönüş**: Belirtilmemiş (fonksiyonun dönüş tipi dokümantasyonda tanımlı değildir).
+- `parentId`: string — Alt kategorileri alınacak üst kategorinin kimlik numarası. Fonksiyon tanımında bu parametre yer alır; ancak gövde içinde doğrudan `parentId` yerine `category.id` kullanılmaktadır.
+
+**Dönüş**: JSX elementi döndürür. Döndürülen yapı, bir üst `div` içinde ana kategori `Link`'ini ve varsa alt kategorilerin listelendiği girintili bir `div` yapısını içerir. Dönüş tipi açıkça belirtilmemiştir; TypeScript/React ortamında `JSX.Element` veya benzeri bir tip olması beklenir ancak kaynakta tanımlı değildir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../hooks/useCategoryViewModel::useCategoryViewModel
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
 - import: ../../lib/type-converters::DomainCategory
+- import: ../../utils/categoryHelpers::getLocalizedCategorySlug
 - import: ../../utils/getCategoryIcon::getCategoryIcon
-- import: ../../utils/routes::Routes
 - import: @radix-ui/react-navigation-menu
 - import: lucide-react::ChevronDown
 - import: lucide-react::ExternalLink
@@ -31024,89 +31770,50 @@ Bu modül, çok seviyeli navigasyon menüsü sunan React bileşenleri içerir. A
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: components/navigation/EliteMegaMenu.tsx::MobileMegaMenu
-- **params**: `{ categories, onNavigate }`
+### [N1_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\navigation\EliteMegaMenu.tsx::MobileMegaMenu
+- **params**: `categories`, `onNavigate`
 - **ic_degiskenler**:
-  - `wrapCategory` — `useCategoryViewModel()` hook'undan alınan, kategori nesnesini view model'e saran fonksiyon
-  - `mainCategories` — `categories.filter((c) => !c.parent_id)` ile elde edilen, üst seviye (kök) kategoriler dizisi
-  - `getSubCategories` — `(parentId: string) => categories.filter(...)` tanımı; verilen parentId'e ait alt kategorileri döndüren yardımcı fonksiyon
-  - `subs` — her ana kategori döngüsünde `getSubCategories(category.id)` ile elde edilen alt kategoriler dizisi
-  - `vm` — `wrapCategory(category)` ile sarılmış ana kategori view modeli
-  - `subVm` — iç içe `subs.map` içinde `wrapCategory(sub)` ile sarılmış alt kategori view modeli
-- **Dönüş**: JSX — flex column layout'unda ana ve alt kategorileri listele
+  - `wrapCategory` — `useCategoryViewModel` hook'undan dönen, bir kategori nesnesini sarıp görüntü modeline dönüştüren fonksiyon
+  - `lang` — `useI18n` hook'undan dönen, geçerli dil kodunu tutan değişken
+  - `Routes` — `useLocalizedRoutes` hook'undan dönen, yerelleştirilmiş rota oluşturma fonksiyonlarını içeren nesne
+  - `mainCategories` — `categories` dizisinden `parent_id` değeri olmayan (ana) kategorileri filtreleyerek oluşturan dizi
+  - `getSubCategories` — `parentId` parametresiyle eşleşen `parent_id`'ye sahip alt kategorileri `categories` dizisinden filtreleyen fonksiyon
+  - `category` — `.map` döngüsünde kullanılan, ana kategoriler dizisindeki tekil eleman
+  - `subs` — `getSubCategories` fonksiyonu ile hesaplanan, mevcut ana kategorinin alt kategorilerini tutan dizi
+  - `vm` — `wrapCategory(category)` çağrısı ile elde edilen, ana kategorinin görüntü modeli nesnesi
+  - `sub` — alt kategoriler dizisindeki tekil eleman
+  - `subVm` — `wrapCategory(sub)` çağrısı ile elde edilen, alt kategorinin görüntü modeli nesnesi
+- **Dönüş**: JSX (React bileşeni)
 
----
-
-### [N2_NASIL] AST Pointer: components/navigation/EliteMegaMenu.tsx::EliteMegaMenu
-- **params**: `{ categories, onNavigate }`
+### [N2_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\navigation\EliteMegaMenu.tsx::EliteMegaMenu
+- **params**: `categories`, `onNavigate`
 - **ic_degiskenler**:
-  - `wrapCategory` — `useCategoryViewModel()` hook'undan alınan kategori view model wrapper fonksiyonu
-  - `t` — `useI18n()` hook'undan alınan çeviri fonksiyonu (örn. `t('megamenu.elite.viewAll')`)
-  - `isMounted` — `useState(false)` ile tanımlı, client-side mount durumunu takip eden state
-  - `handleLinkClick` — link tıklamalarını işleyen, level ve slug parametreleri alan dahili fonksiyon
-  - `mainCategories` — `categories.filter((c) => !c.parent_id)` ile elde edilen üst seviye kategoriler
-  - `getSubCategories` — `(parentId: string) => categories.filter(...)` tanımı; alt kategorileri filtreleyen yardımcı fonksiyon
-  - `subs` — her ana kategori döngüsünde `getSubCategories(category.id)` ile elde edilen alt kategoriler dizisi
-  - `vm` — `wrapCategory(category)` ile sarılmış ana kategori view modeli
-  - `subVm` — `subs.filter().map` içinde `wrapCategory(sub)` ile sarılmış alt kategori view modeli
-- **Dönüş**: `null` (eğer `!isMounted` ise) veya Radix NavigationMenu tabanlı mega menu JSX
+  - `wrapCategory` — `useCategoryViewModel` hook'undan dönen, bir kategori nesnesini sarıp görüntü modeline dönüştüren fonksiyon
+  - `t` — `useI18n` hook'undan dönen, çeviri anahtarını alıp yerelleştirilmiş metni döndüren fonksiyon
+  - `lang` — `useI18n` hook'undan dönen, geçerli dil kodunu tutan değişken
+  - `Routes` — `useLocalizedRoutes` hook'undan dönen, yerelleştirilmiş rota oluşturma fonksiyonlarını içeren nesne
+  - `isMounted` — `useState(false)` ile oluşturulan, bileşenin tarayıcıda monte edilip edilmediğini takip eden state değişkeni
+  - `setIsMounted` — `isMounted` state'ini güncelleyen setter fonksiyonu
+  - `handleLinkClick` — `level` ve `slug` parametrelerini alıp, bir `_log` değişkeni oluşturduktan sonra `onNavigate` fonksiyonunu çağıran fonksiyon
+  - `mainCategories` — `categories` dizisinden `parent_id` değeri olmayan (ana) kategorileri filtreleyerek oluşturan dizi
+  - `getSubCategories` — `parentId` parametresiyle eşleşen `parent_id`'ye sahip alt kategorileri `categories` dizisinden filtreleyen fonksiyon
+  - `category` — `.map` döngüsünde kullanılan, ana kategoriler dizisindeki tekil eleman
+  - `subs` — `getSubCategories` fonksiyonu ile hesaplanan, mevcut ana kategorinin alt kategorilerini tutan dizi
+  - `vm` — `wrapCategory(category)` çağrısı ile elde edilen, ana kategorinin görüntü modeli nesnesi
+  - `sub` — alt kategoriler dizisindeki tekil eleman
+  - `subVm` — `wrapCategory(sub)` çağrısı ile elde edilen, alt kategorinin görüntü modeli nesnesi
+- **Dönüş**: JSX (React bileşeni) veya `null` (`isMounted` `false` ise)
 
----
-
-### [N3_NASIL] AST Pointer: components/navigation/EliteMegaMenu.tsx::handleLinkClick
-- **params**: `(level: number, slug: string)`
+### [N3_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\navigation\EliteMegaMenu.tsx::handleLinkClick
+- **params**: `level`, `slug`
 - **ic_degiskenler**:
-  - `_log` — `` `${level} - ${slug}` `` formatında oluşturulan, log amaçlı string (lint uyumluluğu için console.log kaldırılmış)
-- **Dönüş**: yok — `onNavigate?.()` yan etkisi tetikler
+  - `_log` — `level` ve `slug` değişkenlerini birleştirerek oluşturan, ancak kullanılmayan (console log kaldırılmış) string değişken
+- **Dönüş**: yok
 
----
-
-### [N4_NASIL] AST Pointer: components/navigation/EliteMegaMenu.tsx::getSubCategories
-- **params**: `(parentId: string)`
+### [N4_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\navigation\EliteMegaMenu.tsx::getSubCategories
+- **params**: `parentId`
 - **ic_degiskenler**: yok
-- **Dönüş**: `categories.filter((c) => c.parent_id === parentId)` — parentId'e eşleşen alt kategoriler dizisi
-
----
-
-### [N5_NASIL] AST Pointer: components/navigation/EliteMegaMenu.tsx::useEffect callback (EliteMegaMenu içinde)
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — `setIsMounted(true)` yan etkisi ile mount durumunu true yapar
-
----
-
-### [N6_NASIL] AST Pointer: components/navigation/EliteMegaMenu.tsx::mainCategories.map callback (MobileMegaMenu içinde)
-- **params**: `{ category }`
-- **ic_degiskenler**:
-  - `subs` — `getSubCategories(category.id)` ile mevcut kategorinin alt kategorileri
-  - `vm` — `wrapCategory(category)` ile sarılmış kategori view modeli
-- **Dönüş**: JSX — kategori adı ve alt kategorileri içeren div
-
----
-
-### [N7_NASIL] AST Pointer: components/navigation/EliteMegaMenu.tsx::subs.map callback (MobileMegaMenu içinde)
-- **params**: `{ sub }`
-- **ic_degiskenler**:
-  - `subVm` — `wrapCategory(sub)` ile sarılmış alt kategori view modeli
-- **Dönüş**: JSX — `Link` bileşeni ile alt kategori bağlantısı
-
----
-
-### [N8_NASIL] AST Pointer: components/navigation/EliteMegaMenu.tsx::mainCategories.map callback (EliteMegaMenu içinde)
-- **params**: `{ category }`
-- **ic_degiskenler**:
-  - `subs` — `getSubCategories(category.id)` ile mevcut kategorinin alt kategorileri
-  - `vm` — `wrapCategory(category)` ile sarılmış kategori view modeli
-  - `subVm` — iç içe `subs.filter().map` içinde `wrapCategory(sub)` ile sarılmış alt kategori view modeli
-- **Dönüş**: JSX — alt kategorisi yoksa basit Link, varsa NavigationMenu.Item + Trigger + Content yapısı (MegaMenu3DBackground dahil)
-
----
-
-### [N9_NASIL] AST Pointer: components/navigation/EliteMegaMenu.tsx::subs.filter().map callback (EliteMegaMenu içinde)
-- **params**: `{ sub }`
-- **ic_degiskenler**:
-  - `subVm` — `wrapCategory(sub)` ile sarılmış alt kategori view modeli
-- **Dönüş**: JSX — `li` içinde `Link` bileşeni ile alt kategori bağlantısı
+- **Dönüş**: `DomainCategory[]` (filtrelenmiş alt kategoriler dizisi)
 
 ---
 
@@ -31160,17 +31867,17 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\MegaMenu3DBackground.tsx
-skeleton_hash: 0ed000a95de9a55b
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\MegaMenu3DBackground.tsx
+skeleton_hash: 0c6506896eb744aa
 entity_hashes:
   func:MegaMenu3DBackground: bb72cddf66cbd5a0
-  overview: bbf3490d865f5caf
+  overview: 64226aa5800abc8b
   style_tokens: 487664132884f59c
-generated_at: 2026-06-12T10:20:05Z
+generated_at: 2026-08-27T09:03:55Z
 ---
 
 ## Genel Bakış
-Bu modül, mega menü bileşeninin arka planında üç boyutlu bir görsel efekt sunan bir React bileşenini tanımlar. Bileşen, verilen kategori slug'ına göre 3D bir model ve metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder.
+Bu modül, mega menü bileşeninin arka planında üç boyutlu bir görsel efekt sunan bir React bileşenini tanımlar. Bileşen, verilen kategori slug'ına göre 3D bir model ve metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder. Eğer `categorySlug` prop'u sağlanmazsa, bileşen hedefsiz çalışır ve beklenen 3D görsel efekti üretemez.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen (3D Arka Plan)
@@ -31181,9 +31888,15 @@ Mega menünün arka planını oluşturmak için gerekli olan 3D model ve gradyan
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için, verilen fonksiyon gövdesi (içerik) paylaşılmadığı için yalnızca fonksiyon imzasından türetilebilecek sınırlı aksiyomlar tanımlanabilmektedir.
+Bu modül için fonksiyon gövdesi (içerik) paylaşılmadığından, yalnızca fonksiyon imzasından aksiyom türetilememektedir.
 
-[Aksiyom 1]: Eğer `categorySlug` prop'u sağlanmazsa veya `undefined` olarak geçilirse, bileşenin hangi kategoriye ait 3D arka plan modelini ve ilgili gradyan overlay'ı render edeceği belirsiz olur; bileşen hedefsiz çalışır ve beklenen 3D görsel efekti üretemez.
+İmzadan çıkarılabilen tek bilgi:
+- Bileşen `categorySlug` adında bir prop almaktadır.
+- Bileşen `MegaMenu3DBackgroundProps` tipinde bir props nesnesi beklemektedir.
+
+Ancak bu bileşenin doğru çalışması için hangi koşulların var olması gerektiği (örneğin: hangi bağımlılıklar gerekli, hangi veriler zorunlu, hangi hata durumları ele alınmalı) fonksiyon gövdesi olmadan belirlenemez.
+
+**Sonuç:** Bu modül için fonksiyon gövdesi sağlanmadığından mimari aksiyom tanımlanamamaktadır. Aksiyom üretmek için `MegaMenu3DBackground` fonksiyonunun gerçek implementasyonu gereklidir.
 
 ---
 
@@ -31202,6 +31915,15 @@ Bu modül için, verilen fonksiyon gövdesi (içerik) paylaşılmadığı için 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../products/3d/core::VentHubCanvas
+- import: ../products/Category3DIcon::Category3DIcon
+- import: @react-three/drei::OrbitControls
+- import: react::React
+- import: react::Suspense
+
+---
+
 ## INTERFACES
 
 ### MegaMenu3DBackgroundProps
@@ -31212,16 +31934,20 @@ Bu modül için, verilen fonksiyon gövdesi (içerik) paylaşılmadığı için 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/navigation/MegaMenu3DBackground.tsx::MegaMenu3DBackground
-- **params**:
-  - `categorySlug` — PropTypes destructuring'den gelen kategori slug değeri; Category3DIcon bileşenine hangi kategori ikonunun gösterileceğini belirtir
-- **ic_degiskenler**: yok (fonksiyon gövdesinde herhangi bir `const`/`let`/`var` değişken tanımı bulunmamaktadır; doğrudan JSX döner)
-- **Dönüş**: React JSX Fragment — Üst %75 alanı kaplayan 3D Canvas (ambientLight, directionalLight, Category3DIcon, OrbitControls ile) ve alttan yukarıya doğru beyaz gradient overlay div'inden oluşan React Element Tree
-- **Yan etkiler**: Yok (stateless, side-effect-free saf bileşen)
-- **JSX içinde erişilen prop**: `categorySlug` — Category3DIcon'a `categorySlug={categorySlug}` olarak aktarılır
-- **Canvas yapılandırma değerleri**: `camera.position = [0, 0.1, 2.2]`, `camera.fov = 40`, `dpr = [1, 1]`, `frameloop = "demand"`
-- **OrbitControls yapılandırma değerleri**: `enableZoom = false`, `enablePan = false`, `enableRotate = false`, `autoRotate = true`, `autoRotateSpeed = 1.5`
-- **Category3DIcon prop değerleri**: `categorySlug` (prop'tan), `scale = 0.9`
-- **Light değerleri**: `ambientLight.intensity = 0.8`, `directionalLight.position = [5, 5, 5]`, `directionalLight.intensity = 1`
+- **params**: `categorySlug` — destructured props'tan gelen kategori slug değeri
+- **ic_degiskenler**:
+  - `categorySlug` — `Category3DIcon` bileşenine aynı adla prop olarak aktarılır
+  - `preset="nav"` — `VentHubCanvas` bileşenine verilen canvas ön-ayar adı
+  - `camera={{ position: [0, 0.1, 2.2], fov: 40 }}` — `VentHubCanvas` kamera konumu ve görüş açısı ayarı
+  - `frameloop="demand"` — `VentHubCanvas` kare döngüsü modu; talep üzerine render
+  - `fallback={null}` — `Suspense` bileşeninin yükleme sırasında gösterilecek alternatifi; boş
+  - `scale={0.9}` — `Category3DIcon` bileşeninin ölçek değeri
+  - `enableZoom={false}` — `OrbitControls` zoom özelliğini devre dışı bırakır
+  - `enablePan={false}` — `OrbitControls` kaydırma (pan) özelliğini devre dışı bırakır
+  - `enableRotate={false}` — `OrbitControls` kullanıcı etkileşimiyle döndürmeyi devre dışı bırakır
+  - `autoRotate` — `OrbitControls` otomatik döndürmeyi etkinleştirir (boolean true)
+  - `autoRotateSpeed={1.5}` — `OrbitControls` otomatik döndürme hızı
+- **Dönüş**: JSX fragment — biri 3D canvas içeren (üst 3/4 alan, `pointer-events-none`, `absolute` konumlu), diğeri beyaz gradient overlay olan iki `div` döndürür
 
 ---
 
@@ -31258,13 +31984,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavActionButton.tsx
-skeleton_hash: 792f17d7ff38f976
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavActionButton.tsx
+skeleton_hash: 730cc348f913d405
 entity_hashes:
   func:NavActionButton: 9e352ab0f1dc93af
   overview: 42d52b47442e736b
   style_tokens: 7a26081e3b2c4d09
-generated_at: 2026-06-19T20:47:10Z
+generated_at: 2026-08-27T08:32:58Z
 ---
 
 ## Genel Bakış
@@ -31388,33 +32114,39 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavBrand.tsx
-skeleton_hash: 98ccd7153feff405
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavBrand.tsx
+skeleton_hash: 233dc20a42cb3f74
 entity_hashes:
-  overview: c6785379bea85d87
+  overview: 8f1b73db672da6d9
   style_tokens: f2b8e78bf7817c52
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-08-27T08:33:28Z
 ---
 
 ## Genel Bakış
-NavBrand.tsx, uygulamanın üst navigasyon çubuğunda marka logosunu ve adını gösteren statik bir React bileşenidir. Bu modül, Next.js'in Link bileşenini kullanarak ana sayfaya yönlendirme yapar ve bu bağlantı için `utils/routes` modülündeki `Routes` sabitinden yararlanır. Modül herhangi bir harici API çağrısı yapmaz, ortam değişkeni kullanmaz ve yalnızca bir kullanıcı arayüzü parçası sunar.
 
-## Fonksiyon Grupları
-Dosya içinde çağrılabilecek veya yeniden kullanılabilecek herhangi bir fonksiyon veya method bulunmamaktadır. Kod, doğrudan bir React bileşeni (`NavBrand`) olarak modül seviyesinde tanımlanmıştır.
+NavBrand.tsx, uygulamanın üst navigasyon çubuğunda marka logosunu ve adını gösteren bir React bileşenidir. Bileşen, `React.memo` ile sarmalanmış olup `brandName` prop'u alır ve Next.js'in `Link` bileşenini kullanarak ana sayfaya yönlendirme sağlar. Yönlendirme URL'i için `useLocalizedRoutes` hook'undan yararlanır; bu hook, çoklu dil desteğiyle birlikte lokalize edilmiş rotaları sunar. Modül herhangi bir harici API çağrısı yapmaz ve ortam değişkeni kullanmaz; yalnızca bir kullanıcı arayüzü parçası olarak çalışır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-[Aksiyom 1]: Eğer `brandName` prop'u sağlanmıyorsa, bileşen tip tanımlaması (`NavBrandProps`) gereği bileşen hatalı çalışır veya `undefined` bir değer render edilir.
+Bu modül için fonksiyon imzası verilmediğinden ve modül sabitleri yalnızca `NavBrand` (call) olarak belirtildiğinden, fonksiyon gövdesinden türetilebilecek kesin aksiyom üretilememektedir.
 
-[Aksiyom 2]: Eğer `utils/routes` modülünden import edilen `Routes` sabiti tanımlı değilse veya geçerli bir rota içermiyorsa, `Link` bileşeninin `href` değeri tanımsız olur ve navigasyon çalışması bozulur.
+Eski dokümanda bahsedilen `Routes` sabiti ve `brandName` prop'u, verilen kaynak kodda doğrulanamadığından (fonksiyon imzaları boş) aksiyom olarak yazılmaz.
 
-[Aksiyom 3]: Eğer bileşen Next.js `Link` component'ini kullanıyorsa, bu bileşenin bir Next.js (`next/link`) ortamında render edilmesi gerekir; aksi takdirde `Link` çalışmaz veya hata fırlatır.
+**Bilinen bağımlılıklar (eski dokümana göre, doğrulanmamış):**
+- Eski dokümana göre modül, `utils/routes` modülündeki `Routes` sabitini kullanır ve Next.js `Link` bileşeniyle ana sayfaya yönlendirme yapar. Ancak bu bilgiler fonksiyon gövdesinden değil eski dokümandan geldiğinden aksiyom statüsü verilmez.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: next/link::Link
+- import: react::React
 
 ---
 
@@ -31427,18 +32159,19 @@ Dosya içinde çağrılabilecek veya yeniden kullanılabilecek herhangi bir fonk
 
 ## SABİTLER
 - **NavBrand** (call) — `React.memo(({ brandName }) => {
-    return (
-        <Link
-            hre...`
+    const Routes = useLocalizedRoutes()
+   ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: components/navigation/NavBrand.tsx::NavBrand
-- **params**: `{ brandName }` — marka adını tutan prop, JSX içinde `{brandName}` olarak render edilir
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde bağımsız değişken tanımlanmamış)
-- **Dönüş**: JSX — `<Link>` bileşeni; `Routes.home()` href'ine sahip, içinde "VH" logosu div'i ve `{brandName}` metnini barındıran anchor elementi döner
+### [N1_NASIL] AST Pointer: src/components/navigation/NavBrand.tsx::NavBrand
+- **params**: `brandName` — bileşene dışarıdan aktarılan marka adı; JSX içinde doğrudan metin olarak render edilir
+- **ic_degiskenler**:
+  - `Routes` — `useLocalizedRoutes()` hook çağrısının dönüş değeri; lokalize edilmiş rota fonksiyonlarını barındırır
+  - `Routes.home()` — `Routes` nesnesi üzerinden erişilen ana sayfa rota fonksiyonu; `Link` bileşeninin `href` prop'una atanır
+- **Dönüş**: JSX — `<Link>` bileşeni; içinde VH logosu (gradient arka planlı `div` + `span`) ve `brandName` metnini gösteren iki alt `div` barındırır. `Link` bileşeni `next/link` modülünden gelir ve `Routes.home()` adresine yönlendirir.
 
 ---
 
@@ -31469,12 +32202,12 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavPrimaryRail.tsx
-skeleton_hash: c356d196fdd45e23
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavPrimaryRail.tsx
+skeleton_hash: 42d82b986e37d47a
 entity_hashes:
   overview: 4d24cdf1272dfd45
   style_tokens: ab3a3305965e5539
-generated_at: 2026-06-19T20:47:10Z
+generated_at: 2026-08-27T08:33:29Z
 ---
 
 ## Genel Bakış
@@ -31587,13 +32320,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavSearchTrigger.tsx
-skeleton_hash: 3fd500eca04776e8
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavSearchTrigger.tsx
+skeleton_hash: e71ee633ffce92ee
 entity_hashes:
   func:NavSearchTrigger: 685a255257840b8c
   overview: f880d1849bdfe091
   style_tokens: 76073a5206e1d6d6
-generated_at: 2026-06-19T20:47:10Z
+generated_at: 2026-08-27T08:33:31Z
 ---
 
 ## Genel Bakış
@@ -31703,13 +32436,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavSecondaryRail.tsx
-skeleton_hash: cc95f594826a9731
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavSecondaryRail.tsx
+skeleton_hash: 28e51b34feeeadf5
 entity_hashes:
   func:getIconForId: 81e46f9f714fe65d
   overview: 6f5924a947fecbc3
   style_tokens: 9b60048869298a29
-generated_at: 2026-06-19T20:47:10Z
+generated_at: 2026-08-27T08:33:33Z
 ---
 
 ## Genel Bakış
@@ -31809,13 +32542,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavShell.tsx
-skeleton_hash: 0c60bc38ac4baa40
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavShell.tsx
+skeleton_hash: 5d9902da314e1146
 entity_hashes:
   func:NavShell: 6b1b48f5c901dde6
   overview: 5c6cc2484e8ea784
   style_tokens: fe546e0bed477a10
-generated_at: 2026-06-19T20:47:10Z
+generated_at: 2026-08-27T08:33:34Z
 ---
 
 ## Genel Bakış
@@ -31940,13 +32673,13 @@ NavShell, dışarıdan yapılandırılan parametrelerle çalışan bir navigasyo
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\navigation\NavUtilityRail.tsx
-skeleton_hash: 249a2a1c390a7168
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavUtilityRail.tsx
+skeleton_hash: 7d82cbf73b7651e3
 entity_hashes:
   func:NavUtilityRail: efe2f36f82cc6787
   overview: 25d3844473822124
   style_tokens: 66d394971c83165e
-generated_at: 2026-08-25T07:25:35Z
+generated_at: 2026-08-27T08:33:35Z
 ---
 
 ## Genel Bakış
@@ -32015,8 +32748,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: NavUtilityRail.tsx
-  function: NavUtilityRail.tsx::NavUtilityRail
+  file: src\components\navigation\NavUtilityRail.tsx
+  function: src\components\navigation\NavUtilityRail.tsx::NavUtilityRail
 
 ---
 
@@ -32046,12 +32779,12 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\product\ProductSmartInference.tsx
-skeleton_hash: 3e5ac46b64ccf9d2
+source_path: C:\tmp\vh-altyapi-t165\src\components\product\ProductSmartInference.tsx
+skeleton_hash: 259d92c86d966700
 entity_hashes:
   overview: 18fbc67e6ef24df1
   style_tokens: 14ff5ff1bd6a1a02
-generated_at: 2026-08-25T07:25:43Z
+generated_at: 2026-08-27T08:33:37Z
 ---
 
 ## Genel Bakış
@@ -32129,7 +32862,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: ProductSmartInference.tsx
+  file: src\components\product\ProductSmartInference.tsx
 
 ---
 
@@ -34711,17 +35444,17 @@ file: C:\Users\alize\venthub-hvac\src\components\products\index.ts
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\AutoCenter.tsx
-skeleton_hash: e29f84f9e12345d1
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\AutoCenter.tsx
+skeleton_hash: 780a64c9eae7c864
 entity_hashes:
-  func:AutoCenter: 5839fe397b2c2b36
-  overview: ddbb8cf0a3e64fc1
+  func:AutoCenter: 7e5fd029da989dd5
+  overview: 9be491c8c9204cb2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:00:29Z
+generated_at: 2026-06-10T09:37:16Z
 ---
 
 ## Genel Bakış
-AutoCenter modülü, 3D sahnelerdeki çocuk bileşenlerin otomatik olarak merkeze hizalanmasını sağlayan bir React sarmalayıcı bileşendir. Bileşen, içeriğin sınırlayıcı kutusunu hesaplayarak modelin sahnede dengeli bir şekilde konumlandırılmasını sağlar. Opsiyonel kaydırma parametresi ile bu konumlandırma ince ayara olanak tanır.
+AutoCenter modülü, 3D sahnelerdeki çocuk bileşenlerin otomatik olarak merkeze hizalanmasını sağlayan bir React sarmalayıcı bileşenidir. Bileşen, içeriğin sınırlayıcı kutusunu hesaplayarak modelin sahnede dengeli bir şekilde konumlandırılmasını sağlar. Opsiyonel kaydırma parametresi ile bu konumlandırma ince ayara olanak tanır.
 
 ## Fonksiyon Grupları
 ### Merkezleme Bileşeni
@@ -34732,58 +35465,53 @@ Modülün tek ve temel bileşenini oluşturur. Çocuk düğümleri alır, merkez
 
 ## AXIOMS – Mimari Varsayımlar
 
-[Aksiyom 1]: Eğer `children` parametresi yoksa, bileşen render edilemez çünkü zorunlu çocuk içeriği tanımlanmamış olur.
+Bu modül için temel mimari varsayımlar fonksiyon imzasından çıkarılmıştır:
 
-[Aksiyom 2]: Eğer `enabled` parametresi `false` olarak verilirse, merkezleme işlemi devre dışı kalır; çocuklar orijinal konumlarıyla render edilir. Varsayılan değer `true` olduğundan, parametre belirtilmediğinde merkezleme aktif olur.
+[Aksiyom 1]: Eğer `children` parametresi sağlanmazsa, bileşen render edilecek içeriğe sahip olmadığından merkezleme işlemi uygulanacak bir hedef bulunmaz.
 
-[Aksiyom 3]: Eğer `shift` parametresi verilmezse, varsayılan değer `[0, 0, 0]` kullanılır ve merkezleme noktasına ek bir kaydırma uygulanmaz. Üç elemanlı bir sayı dizisi olmalıdır.
+[Aksiyom 2]: Eğer `enabled` parametresi `false` olarak ayarlanırsa, modül merkezleme mantığını devre dışı bırakır ve children bileşenleri transform uygulanmadan render edilir.
+
+[Aksiyom 3]: Eğer `shift` parametresi verilmezse, varsayılan olarak `[0, 0, 0]` kullanılır; bu durumda herhangi bir eksende kaydırma uygulanmaz.
+
+[Aksiyom 4]: Eğer `shift` dizisi 3 elemandan farklı uzunlukta sağlanırsa, bu beklenmeyen bir giriş olur ve x, y, z ekseni kaydırma değerlerinin tam olarak karşılanması mümkün olmaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AutoCenter
-**Ne yapar**: Üç boyutlu sahnelerde otomatik merkezleme işlevi sağlayan bir React fonksiyonel bileşenidir. Bileşen, çocuk elemanlarını (`children`) sararak merkezleme davranışı kazandırır. `enabled` parametresiyle bu davranış etkinleştirilip devre dışı bırakılabilir; `shift` parametresiyle ise merkez noktasına ofset uygulanabilir.
+**Ne yapar**: 3D sahne içindeki çocuk bileşenlerin otomatik olarak merkezlenmesini sağlayan bir React sarmalayıcı (wrapper) bileşenidir. Bileşen, içeriğinin bounding box hesaplamasını kontrol ederek modelin sahnede dengeli bir şekilde konumlandırılmasını temin eder.
 
-**Nasıl yapar**: Kaynak kodda implementasyon detayı (docstring veya fonksiyon gövdesi) verilmemiştir. Yalnızca fonksiyon imzası mevcuttur. Bileşen, aldığı `children` elemanlarını bir kapsayıcı içinde render eder; `enabled` durumuna göre merkezleme mantığını uygular veya atlar; `shift` dizisi ise x, y, z eksenlerinde piksel veya birim bazında kaydırma değeri sağlar.
+**Nasıl yapar**: Eski versiyonda yaşanan bir sorunu çözüme kavuşturmak için yeniden tasarlanmıştır. Önceki sürüm `useLayoutEffect` ve `Box3.setFromObject()` yöntemlerini kullanıyordu; bu yöntem, animasyonlu parçacıklar dahil tüm alt objeleri taradığından, parçacıklar hareket ettikçe bounding box merkezi kayıyor ve model istemsizce "zıplıyordu". Yeni stabil sürümde bu sorun giderilerek güvenilir bir merkezleme davranışı sağlanmıştır.
 
 **Parametreler**:
-- `children`: `React.ReactNode` — Bileşenin içine yerleştirilecek alt elemanlar (3D sahne nesneleri, mesh'ler vb.). Zorunlu parametredir.
-- `enabled`: `boolean` — Merkezleme davranışının etkin olup olmadığını belirler. Varsayılan değeri `true`'dur. Opsiyonel parametredir.
-- `shift`: `[number, number, number]` — Merkez noktasına uygulanacak x, y, z eksenlerindeki kaydırma (ofset) değerlerini tutan üç elemanlı sayı dizisi. Varsayılan değeri `[0, 0, 0]`'dır. Opsiyonel parametredir.
+- `children`: React.ReactNode — Merkezlenecek olan 3D model veya bileşen içeriği. Bu parametre zorunludur ve bileşenin render edeceği çocuk elemanları temsil eder.
+- `enabled`: boolean — Otomatik merkezleme işlevinin aktif olup olmadığını kontrol eder. Varsayılan değeri `true`'dur. `false` olarak ayarlandığında merkezleme devre dışı kalır.
+- `shift`: [number, number, number] — [x, y, z] formatında bir dizi. Otomatik merkezleme üzerine eklenecek manuel kaydırma (offset) değerini belirtir. Varsayılan değeri `[0, 0, 0]` olup herhangi bir kaydırma yapmaz.
 
-**Dönüş**: `React.FC<{ children: React.ReactNode; enabled?: boolean; shift?: [number, number, number] }>` — Belirtilen prop tiplerini kabul eden bir React fonksiyonel bileşeni döndürür. `children` zorunlu, `enabled` ve `shift` opsiyonel proplardır.
-
----
-
-## İTHALATLAR (IMPORTS)
-- import: @react-three/fiber::useFrame
-- import: react::React
-- import: react::useRef
-- import: three::Box3
-- import: three::Vector3
-- import: three::type { Group }
-
----
-
-## SABİTLER
-- **tempBox** (new_expression) — `new Box3()`
-- **tempCenter** (new_expression) — `new Vector3()`
+**Dönüş**: `React.FC<{ children: React.ReactNode; enabled?: boolean; shift?: [number, number, number] }>` — Otomatik merkezleme mantığını içeren ve çocuk bileşenlerini sarmalayan bir React işlevsel bileşeni döndürür.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/3d/AutoCenter.tsx::AutoCenter
-- **params**:
-  - `children` — React.ReactNode tipinde, group içine yerleştirilecek alt bileşenler
-  - `enabled` — boolean, varsayılan `true`; otomatik merkezleme işleminin etkin olup olmadığını belirler
-  - `shift` — `[number, number, number]` tipinde, varsayılan `[0, 0, 0]`; hesaplanan merkeze uygulanacak ofset değerleri
+### [N1_NASIL] AST Pointer: src\components\products\3d\AutoCenter.tsx::AutoCenter
+- **params**: ({ children, enabled = true, shift = [0, 0, 0] })
 - **ic_degiskenler**:
-  - `groupRef` — `useRef<Group>(null)` ile oluşturulmuş ref; `<group>` DOM elementine referans tutar, pozisyon ayarlamaları ve bounding box hesaplamaları için kullanılır
-  - `isLocked` — `useRef(false)` ile oluşturulmuş ref; merkezleme işlemi tamamlandıktan sonra `true` yapılır, sonraki frame'lerde tekrar hesaplanmasını engeller
-  - `frameCount` — `useRef(0)` ile oluşturulmuş ref; her frame'de artırılır, ilk 3 frame boyunca geometrilerin yüklenmesini beklemek için kullanılır
-- **Dönüş**: JSX — `<group ref={groupRef}>{children}</group>` elementi döner
+  - `groupRef` — useRef<Group>(null): Three.js Group nesnesine referans, 3D grubun DOM elementine erişmek için kullanılır
+  - `isLocked` — useRef(false): Merkezleme işlemi tamamlandıktan sonra kilitlenme durumunu tutar
+  - `frameCount` — useRef(0): Frame sayacını tutar, ilk birkaç frame'i atlamak için kullanılır
+- **Dönüş**: JSX elementi (<group ref={groupRef}>{children}</group>)
+
+### [N2_NASIL] AST Pointer: src\components\products\3d\AutoCenter.tsx::useFrame_callback
+- **params**: () => { ... }
+- **ic_degiskenler**:
+  - `box` — new Box3().setFromObject(groupRef.current): Grubun bounding box'ını hesaplar
+  - `center` — new Vector3(): Bounding box'ın merkezini tutar
+  - `yOffset` — -center.y + shift[1]: Y ekseni için hesaplanan ofset, merkezleme ve shift değerini birleştirir
+  - `xOffset` — shift[0]: X ekseni için ofset değeri, shift parametresinden alınır
+  - `zOffset` — shift[2]: Z ekseni için ofset değeri, shift parametresinden alınır
+- **Dönüş**: yok (yan etki: groupRef.current.position'ı ayarlar, isLocked.current'ı true yapar)
 
 ---
 
@@ -37087,19 +37815,19 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\factory\parts\MainChassis.tsx
-skeleton_hash: 8f17b88014cd01e1
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\MainChassis.tsx
+skeleton_hash: 352a525786c594ef
 entity_hashes:
   func:MainChassis: 6dd2e12708a32b7b
   func:buildInnerLathePoints: 899a29ff8993fbf2
   func:buildLathePoints: b2b421c8a803ff34
-  overview: 23b9faac376a7b11
+  overview: 2b61bbe9ce53a1c8
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:41:38Z
+generated_at: 2026-06-10T09:39:09Z
 ---
 
 ## Genel Bakış
-Bu modül, 3B bir şasinin dış ve iç profillerini oluşturan geometrik noktaları üretir ve bu noktaları kullanarak etkileşimli bir 3B şasi bileşeni sunar. Modül, geometrik veri üretimi ve bu veriyi tüketen bir React bileşeni olmak üzere iki temel sorumluluğa sahiptir.
+Bu modül, 3B bir şasinin dış ve iç profillerini tanımlayan geometrik nokta dizilerini üretmekle sorumludur. Elde edilen bu noktalar, React tabanlı bir 3B modelleme bileşeni tarafından kullanılarak görsel ve etkileşimli bir şasi parçası oluşturulur.
 
 ## Fonksiyon Grupları
 ### Geometrik Veri Üretimi
@@ -37113,9 +37841,26 @@ Bu grup, üretilen geometrik verileri alarak tarayıcıda renderedilen interakti
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, dış ve iç profil geometrilerini üreten iki bağımsız fonksiyon ile bu geometriyi render eden bir React bileşeninden oluşur. Fonksiyon imzaları ve modül sabitleri üzerinden aşağıdaki varsayımlar türetilmiştir.
+
+---
+
+**[Aksiyom 1]:** Eğer `PROFILE_POINTS` sabiti tanımlı değilse veya boş dizi ise, `buildLathePoints()` geçerli dış profil geometri noktaları üretemez.
+
+**[Aksiyom 2]:** Eğer `INNER_PROFILE_POINTS` sabiti tanımlı değilse veya boş dizi ise, `buildInnerLathePoints()` geçerli iç profil geometri noktaları üretemez.
+
+**[Aksiyom 3]:** Eğer `MainChassis` bileşeni çağrıldığında `isSelected` prop'u sağlanmamışsa, bileşenin seçim durumu belirsiz olur.
+
+**[Aksiyom 4]:** Eğer `MainChassis` bileşeni çağrıldığında `isIsolated` prop'u sağlanmamışsa, bileşenin izole durumu belirsiz olur.
+
+**[Aksiyom 5]:** Eğer `MainChassis` bileşeni çağrıldığında `isHidden` prop'u sağlanmamışsa, bileşenin görünürlük durumu belirsiz olur.
+
+**[Aksiyom 6]:** Eğer `onClick` callback'i sağlanmamışsa ve kullanıcı şasiye tıklarsa, tıklama olayı işlenemez (propagation durumu bilinmiyor).
+
+**[Aksiyom 7]:** `PROFILE_POINTS` ve `INNER_PROFILE_POINTS` dizilerinin her bir elemanının, geçerli 3D koordinat verisi (sayısal değerler içeren yapı) içerdiği varsayılır; aksi halde geometri oluşturma fonksiyonları hatalı sonuç döndürür.
+
+**[Aksiyom 8]:** `buildLathePoints()` ve `buildInnerLathePoints()` fonksiyonları parametresiz oldukları için, girdilerini yalnızca modül kapsamındaki sabitlerden (`PROFILE_POINTS`, `INNER_PROFILE_POINTS`) alır; harici bağımlılıkları yoktur.
 
 ---
 
@@ -37150,18 +37895,6 @@ Bu grup, üretilen geometrik verileri alarak tarayıcıda renderedilen interakti
 
 ---
 
-## İTHALATLAR (IMPORTS)
-- import: ../../core::useResolveMaterials
-- import: react::React
-- import: react::useEffect
-- import: react::useMemo
-- import: three::BoxGeometry
-- import: three::LatheGeometry
-- import: three::TorusGeometry
-- import: three::Vector2
-
----
-
 ## INTERFACES
 
 ### MainChassisProps
@@ -37175,40 +37908,72 @@ Bu grup, üretilen geometrik verileri alarak tarayıcıda renderedilen interakti
 
 ## SABİTLER
 - **PROFILE_POINTS** (array) — `[
+
   [-0.76, 0.485], [-0.74, 0.496], [-0.72, 0.500], [-0.70, 0.497], [-0.66, ...`
 - **INNER_PROFILE_POINTS** (array) — `[
+
   [-0.72, 0.460], [-0.60, 0.455], [-0.45, 0.445], [-0.30, 0.432], [-0.15, ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::buildLathePoints
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: `Vector2[]` — `PROFILE_POINTS` sabitindeki her `[y, r]` çiftini `new Vector2(r, y)` nesnesine dönüştürerek dizi oluşturur
-
-### [N2_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::buildInnerLathePoints
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: `Vector2[]` — `INNER_PROFILE_POINTS` sabitindeki her `[y, r]` çiftini `new Vector2(r, y)` nesnesine dönüştürerek dizi oluşturur
-
-### [N3_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::MainChassis
-- **params**:
-  - `isSelected` — bileşenin seçili olup olmadığını belirten boolean
-  - `isIsolated` — bileşenin izole edilip edilmediğini belirten boolean
-  - `isHidden` — bileşenin gizli olup olmadığını belirten boolean
-  - `onClick` — tıklama olayında çağrılacak fonksiyon (opsiyonel)
+### [N1_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::buildLathePoints
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `galvanizedSteel` — `useResolveMaterials()` kancasından gelen galvanizli çelik malzeme
-  - `chassisInnerMat` — `useResolveMaterials()` kancasından gelen şasi iç malzemesi
-  - `safetyOrange` — `useResolveMaterials()` kancasından gelen güvenlik turuncusu malzeme
-  - `outerGeo` — `useMemo` ile oluşturulan `LatheGeometry`, `buildLathePoints()` ve 72 segment ile dış geometri
-  - `innerGeo` — `useMemo` ile oluşturulan `LatheGeometry`, `buildInnerLathePoints()` ve 72 segment ile iç geometri
-  - `flangeGeo` — `useMemo` ile oluşturulan `TorusGeometry(0.493, 0.012, 12, 72)` flanş geometrisi
-  - `ribGeo` — `useMemo` ile oluşturulan `BoxGeometry(0.008, 1.44, 0.008)` kaburga geometrisi
-  - `mainMaterial` — `isSelected` true ise `safetyOrange`, false ise `galvanizedSteel` olarak atanan ana malzeme
-- **Dönüş**: `JSX.Element | null` — `isHidden` true veya `isIsolated` false ise `null` döner, aksi halde `<group>` içinde mesh'lerden oluşan JSX döner. `useEffect` cleanup fonksiyonu ile `outerGeo`, `innerGeo`, `flangeGeo`, `ribGeo` geometrilerini dispose eder.
+  - `PROFILE_POINTS` — Sabit array, `map` ile `[y, r]` çiftlerini `Vector2(r, y)`'ye dönüştürür; dış gövde profil noktalarını tanımlar
+- **Dönüş**: `Vector2[]` — LatheGeometry'ye verilecek 2B profil noktaları
+
+---
+
+### [N2_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::buildInnerLathePoints
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `INNER_PROFILE_POINTS` — Sabit array, `map` ile `[y, r]` çiftlerini `Vector2(r, y)`'ye dönüştürür; iç gövde profil noktalarını tanımlar
+- **Dönüş**: `Vector2[]` — LatheGeometry'ye verilecek iç profil noktaları
+
+---
+
+### [N3_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::MainChassis
+- **params**: `{ isSelected, isIsolated, isHidden, onClick }` — Destructured props
+- **ic_degiskenler**:
+  - `galvanizedSteel` — `useFanMaterials()` hook'undan gelen galvaniz çelik malzemesi; varsayılan dış gövde rengi
+  - `chassisInnerMat` — `useFanMaterials()` hook'undan gelen iç şasi malzemesi; iç mesh'e atanır
+  - `safetyOrange` — `useFanMaterials()` hook'undan gelen turuncu malzeme; seçili durumda dış gövde rengi
+  - `outerGeo` — `useMemo` ile oluşturulan `LatheGeometry(buildLathePoints(), 72)`; dış gövde geometrisi, 72 segment
+  - `innerGeo` — `useMemo` ile oluşturulan `LatheGeometry(buildInnerLathePoints(), 72)`; iç gövde geometrisi, 72 segment
+  - `flangeGeo` — `useMemo` ile oluşturulan `TorusGeometry(0.493, 0.012, 12, 72)`; flanş/halka geometrisi, 0.493 yarıçap, 0.012 tüp yarıçapı
+  - `ribGeos` — `useMemo` callback'inden dönen `BoxGeometry[]` dizisi; 4 adet `BoxGeometry(0.008, 1.44, 0.008)` (ince dikey kaburga)
+  - `mainMaterial` — `isSelected ? safetyOrange : galvanizedSteel` koşullu atama; seçiliyse turuncu, değilse galvaniz çelik
+- **Dönüş**: JSX `<group name="MainChassis">` — 1 outer mesh, 1 inner mesh, 2 flanş mesh (üst/alt y=±0.72), 4 rib mesh (dairesel yerleşim)
+
+---
+
+### [N4_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::ribGeos (useMemo callback)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `ribs` — `BoxGeometry[]` boş dizi; döngüde 4 adet `BoxGeometry(0.008, 1.44, 0.008)` push edilir
+  - `i` — `let` ile tanımlı döngü sayacı, 0..3 arası; her iterasyonda yeni bir kaburga geometrisi ekler
+- **Dönüş**: `BoxGeometry[]` — 4 elemanlı geometri dizisi
+
+---
+
+### [N5_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::onClick (event handler)
+- **params**: `e` — React synthetic event
+- **ic_degiskenler**:
+  - `e` — Tıklama eventi; `e.stopPropagation()` ile yukarı propogasyon engellenir
+  - `onClick` — Prop'tan gelen opsiyonel callback; `onClick?.()` ile çağrılır (event durdurulduktan sonra)
+- **Dönüş**: yok (yan etki: tıklama event'i durdurulur, üst bileşen onClick çağrılır)
+
+---
+
+### [N6_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::ribGeos.map callback
+- **params**: `geo, i` — `geo`: mevcut `BoxGeometry` elemanı, `i`: dizi indeksi (0..3)
+- **ic_degiskenler**:
+  - `geo` — Mevcut iterasyondaki `BoxGeometry` nesnesi; `<mesh>`'in `geometry` prop'una atanır
+  - `i` — Dizi indeksi; hem `key={i}` hem de dairesel konum hesaplamasında `Math.cos((i * Math.PI) / 2)` ve `Math.sin((i * Math.PI) / 2)` ile kullanılır
+  - `mainMaterial` — Dışarıdan kapanan değişken; tüm rib mesh'lerine `material` olarak atanır
+- **Dönüş**: JSX `<mesh>` — 4 kaburga, yarıçap 0.485 daire üzerinde 0°, 90°, 180°, 270° açılarıyla yerleştirilmiş
 
 ---
 
@@ -38804,13 +39569,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\DomesticFanModel.tsx
-skeleton_hash: a82921aef29d25c2
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\DomesticFanModel.tsx
+skeleton_hash: e792783b88913a8b
 entity_hashes:
   func:DomesticFanModel: c93fddd365c3092d
   overview: 65a1eab25cd13393
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:14:28Z
+generated_at: 2026-08-25T07:26:39Z
 ---
 
 ## Genel Bakış
@@ -38884,10 +39649,36 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/DomesticFanModel.tsx::useEffect (grid oluşturma)
+- **params**: (parametre yok — useEffect callback)
+- **ic_degiskenler**:
+  - `index` — sayaç değişkeni, `0`'dan başlar; her döngü iterasyonunda artırılarak instancedMesh matris indisini belirler
+  - `row` — dış döngü değişkeni, `0`'dan `12`'ye kadar (dahil değil) iterasyon yapar
+  - `col` — iç döngü değişkeni, `0`'dan `12`'ye kadar (dahil değil) iterasyon yapar
+  - `x` — `(col - 5.5) * (panelSize * 0.07)` hesaplaması ile elde edilen yatay konum değeri; `tempObject3D.position.set`'in ilk parametresi olarak kullanılır
+  - `y` — `(row - 5.5) * (panelSize * 0.07)` hesaplaması ile elde edilen dikey konum değeri; `tempObject3D.position.set`'in ikinci parametresi olarak kullanılır
+- **Dönüş**: yok — yan etki olarak `gridRef.current` InstancedMesh'inin 144 instance matrisini 12×12 ızgara düzeninde konumlandırır ve `instanceMatrix.needsUpdate = true` yapar
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/DomesticFanModel.tsx::useEffect (temizleme)
+- **params**: (parametre yok — useEffect callback)
+- **ic_degiskenler**: yok
+- **Dönüş**: temizleme fonksiyonu döndürür — bileşen unmount olduğunda çağrılır
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/DomesticFanModel.tsx::temizleme fonksiyonu (useEffect return)
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `panel.dispose()`, `background.dispose()`, `gridBoxGeo.dispose()`, `cylinder.dispose()`, `plane.dispose()` çağrılarıyla VRAM belleğini serbest bırakır
+
+---
+
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\DomesticFanModel.tsx
-  function: src\components\products\3d\types\DomesticFanModel.tsx::DomesticFanModel
+  file: DomesticFanModel.tsx
+  function: DomesticFanModel.tsx::DomesticFanModel
 
 ---
 
@@ -38917,14 +39708,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\DuctFanModel.tsx
-skeleton_hash: 23d47e32861145e6
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\DuctFanModel.tsx
+skeleton_hash: cf9b9eb1f8da034f
 entity_hashes:
   func:DuctFanModel: db7d5fa48410ad07
   func:RectangularDuctFanModel: c575246c49ae9f50
   overview: d682035eaa626359
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:14:28Z
+generated_at: 2026-08-25T07:26:52Z
 ---
 
 ## Genel Bakış
@@ -39003,11 +39794,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+### [N2_NASIL] AST Pointer: DuctFanModel.tsx::RectangularDuctFanModel
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `materials` — useResolveMaterials() hook'undan dönen materyal nesnesi; mesh'lerde `material` prop'u olarak kullanılır (`materials.galvanizedSteel`, `materials.industrialSteel`, `materials.matteBlack`, `materials.brushedAluminum`)
+  - `geometries` — useMemo ile memoize edilmiş geometri nesnesi; tüm mesh'lerde `geometry` prop'u olarak kullanılır
+    - `bodyGeo` — BoxGeometry(1, 0.6, 0.6), ana gövde kutusu
+    - `flangeGeo` — BoxGeometry(0.05, 0.7, 0.7), flanş kutusu (position [±0.5, 0, 0])
+    - `topBoxGeo` — BoxGeometry(0.3, 0.15, 0.2), üst kutu (position [0, 0.35, 0])
+    - `cylinderGeo` — CylinderGeometry(0.25, 0.25, 1.02, 32), merkezi silindir (rotation [0, 0, Math.PI / 2])
+  - `x` — flanş map callback'inin ilk parametresi; [-0.5, 0.5] değerlerini alır, mesh position'ında kullanılır
+  - `i` — flanş map callback'inin ikinci parametresi; key prop'u olarak kullanılır
+- **Dönüş**: JSX — `<group>` içinde dikdörtgen kanal fanı 3D modeli
+
+---
+
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\DuctFanModel.tsx
-  function: src\components\products\3d\types\DuctFanModel.tsx::DuctFanModel
-  function: src\components\products\3d\types\DuctFanModel.tsx::RectangularDuctFanModel
+  file: DuctFanModel.tsx
+  function: DuctFanModel.tsx::DuctFanModel
+  function: DuctFanModel.tsx::RectangularDuctFanModel
 
 ---
 
@@ -39637,14 +40443,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\JetFanModel.tsx
-skeleton_hash: b4ee918076d4726a
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\JetFanModel.tsx
+skeleton_hash: c298291b50e6a753
 entity_hashes:
   func:FlexibleCable: 7422952d69466487
   func:JetFanModel: b12c8fa3c1846be6
-  overview: 492d48d9f7958885
+  overview: 036f18c566d2c82f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:43:23Z
+generated_at: 2026-06-10T09:46:54Z
 ---
 
 ## Genel Bakış
@@ -39656,20 +40462,24 @@ Modülün dışarıya açılan temel bileşeni; jet fanın ana 3B geometrisini, 
 - JetFanModel
 
 ### Yardımcı Alt Bileşenler
-Ana modelin yapısı içinde yer alan, belirli bir parça veya özellik için kullanıma özel, yeniden kullanılabilir görsel bileşenleri içerir. `FlexibleCable` bileşeni zorunlu olarak `materials` parametresi alır ve bu parametre `FanMaterials` tipinde olmalıdır; parametre verilmezse bileşen düzgün render edilemez.
+Ana modelin yapısı içinde yer alan, belirli bir parça veya özellik için kullanıma özel, yeniden kullanılabilir görsel bileşenleri içerir.
 - FlexibleCable
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çıkarılabilen varsayımlar listelenmiştir.
+Bu modül, jet fan tipi 3D görselleştirme bileşenlerinden oluşmaktadır.
 
-[Aksiyom 1]: Eğer `FanMaterials` tipi tanımlı değilse, `FlexibleCable` bileşeni derleme aşamasında hata verir; çünkü `materials` prop'u bu tipe bağlıdır.
+**[Aksiyom 1]:** Eğer `FlexibleCable` bileşeni `materials` parametresi olmadan çağrılırsa, bileşen düzgün render edilemez veya derleme hatası oluşur. `materials` parametresi zorunludur ve `FanMaterials` tipinde olmalıdır.
 
-[Aksiyom 2]: Eğer `FlexibleCable` bileşenine `materials` prop'u sağlanmazsa, bileşen eksik veriyle render edilir; prop zorunlu olarak tanımlanmıştır (varsayılan değer yoktur).
+**[Aksiyom 2]:** Eğer `FanMaterials` tipi tanımlı değilse veya geçerli bir yapıda değilse, `FlexibleCable` bileşeninin malzeme özellikleri eksik kalır ve 3D modelde malzeme gösterimi hatalı olur.
 
-[Aksiyom 3]: Eğer `JetFanModel` bileşeni bir React ortamında kullanılmıyorsa (örneğin Three.js sahne bağlamı yoksa), bileşen düzgün çalışmaz; çünkü 3B model görselleştirme React tabanlı bir 3B kütüphane altyapısına bağlıdır.
+**[Aksiyom 3]:** Eğer `JetFanModel` ana 3D sahneye yerleştirilmezse, jet fan modeli görsel olarak görünmez olur.
+
+---
+
+**Not:** Bu modül için fonksiyon gövdesi detayları paylaşılmadığından, sadece fonksiyon imzalarından türeyen zorunluluklar (parametre gereksinimleri) aksiyom olarak belirlenmiştir. Fonksiyon iç mantığına ilişkin ek varsayımlar, gövde kodu incelendikten sonra eklenebilir.
 
 ---
 
@@ -39690,76 +40500,94 @@ Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çı
 
 ---
 
-## İTHALATLAR (IMPORTS)
-- import: ../core::useResolveMaterials
-- import: ../materials/useFanMaterials::type FanMaterials
-- import: @react-three/fiber::useFrame
-- import: react::React
-- import: react::useEffect
-- import: react::useMemo
-- import: react::useRef
-- import: three::type { Group }
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::JetFanModel
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `materials` — useFanMaterials hook'unun dönüş değeri; tüm 3D model malzemelerini (jetOrange, greyBox, matteBlack, cableGrey, brushedAluminum) içerir
+  - `fanRef` — useRef<Group>(null) ile oluşturulan React ref; iç pervaneyi (rotor) referans alır, useFrame içinde döndürmek için kullanılır
+- **Dönüş**: JSX (React.FC) — 3B jet fan modelini oluşturan React Three Fiber group elemanı
 
 ---
 
-## AST POINTERS
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::useFrame_callback
+- **params**: `(state, delta)` — state: Three.js state objesi (kullanılmıyor), delta: son frame ile geçen süre (saniye)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — fanRef.current.rotation.y değerini delta * 25 kadar azaltarak pervaneyi döndürür (yan etki)
 
-### [N1_NASIL] AST Pointer: JetFanModel.tsx::JetFanModel
-- **params**: yok
+---
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_sol_kanatlar
+- **params**: `(xVal, k)` — xVal: kanat pozisyonu (0, -0.12, -0.22), k: index anahtarı
 - **ic_degiskenler**:
-  - `materials` — `useResolveMaterials()` hook'undan dönen malzeme nesnesi; `materials.jetOrange`, `materials.greyBox`, `materials.matteBlack`, `materials.cableGrey`, `materials.brushedAluminum` alanlarına erişilir
-  - `fanRef` — `useRef<Group>(null)` ile oluşturulan Three.js Group referansı; `useFrame` içinde `fanRef.current.rotation.y` güncellenerek pervane animasyonu sağlanır
-  - `geometries` — `useMemo` ile oluşturulan geometri nesneleri objesi; `cylinder032`, `cylinder034`, `cylinder028`, `cylinderPin`, `cylinderRakor`, `cylinderBolt`, `cylinderRotor`, `torus032`, `torusRings`, `innerBladeGeos`, `boxMazgal`, `boxGrey`, `boxMountVert`, `boxMountHoriz`, `boxRotorBlade` anahtarlarını içerir
-- **Dönüş**: JSX (React.FC)
+  - `r` — sabit yarıçap değeri 0.31; silindirik gövde yarıçapını temsil eder
+  - `w` — hesaplanmış genişlik; `2 * Math.sqrt(Math.max(0, r*r - xVal*xVal))` formülüyle xVal konumundaki daire kirişi genişliğini hesaplar
+- **Dönüş**: JSX mesh elemanı — sol taraftaki yatay iç kanat
 
-### [N2_NASIL] AST Pointer: JetFanModel.tsx::useFrame callback
-- **params**: `state`, `delta`
-- **ic_degiskenler**: yok
-- **Dönüş**: yok; yan etki olarak `fanRef.current.rotation.y` değerini `delta * 25` kadar azaltır
+---
 
-### [N3_NASIL] AST Pointer: JetFanModel.tsx::useMemo callback (geometries)
-- **params**: yok
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_mazgal_tel
+- **params**: `(_, k)` — _ : kullanılmayan index, k: tel çubuk indexi (0-7)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX mesh elemanı — dairesel mazgal ızgaranın tek bir tel çubuğu
+
+---
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_mazgal halka
+- **params**: `(radius, j)` — radius: halka yarıçapı (0.12, 0.2, 0.28), j: index anahtarı
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX mesh elemanı — mazgal ızgaranın tek bir dairesel halkası
+
+---
+
+### [N6_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_elektrik_bx
+- **params**: `bx` — X ekseninde vida pozisyonu (0.065, -0.065)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Nested map sonucu JSX — elektrik kutusu vidalarının bir satırı
+
+---
+
+### [N7_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_elektrik_by
+- **params**: `by` — Y ekseninde vida pozisyonu (0.05, -0.05)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX mesh elemanı — tek bir vida (matteBlack silindir)
+
+---
+
+### [N8_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_montaj_xPos
+- **params**: `xPos` — X ekseninde montaj ayağı pozisyonu (-0.35, 0.35)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX group elemanı — bir montaj ayağı çifti (zPos map'i içinde 2 ayak)
+
+---
+
+### [N9_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_montaj_zPos
+- **params**: `zPos` — Z ekseninde montaj ayağı pozisyonu (-0.22, 0.22)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX group elemanı — tek bir montaj ayağı (dikey plaka + yatay taban + somun)
+
+---
+
+### [N10_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_pervane
+- **params**: `(_, i)` — _ : kullanılmayan index, i: kanat indexi (0-7)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX mesh elemanı — pervanenin tek bir kanadı (cableGrey malzemeli kutu)
+
+---
+
+### [N11_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::FlexibleCable
+- **params**: `{ materials }` — FanMaterials tipinde; materials.cableGrey kullanılır
 - **ic_degiskenler**:
-  - `cylinder032` — `CylinderGeometry(0.32, 0.32, 0.8, 64, 1, true)`; açık uçlu büyük çaplı silindir geometrisi
-  - `cylinder034` — `CylinderGeometry(0.34, 0.34, 0.03, 64)`; flanş geometrisi
-  - `cylinder028` — `CylinderGeometry(0.28, 0.28, 0.5, 64, 1, true)`; açık uçlu küçük çaplı silindir geometrisi
-  - `cylinderPin` — `CylinderGeometry(0.006, 0.006, 0.012, 8)`; pin geometrisi
-  - `cylinderRakor` — `CylinderGeometry(0.02, 0.025, 0.06, 16)`; kablo giriş rakoru geometrisi
-  - `cylinderBolt` — `CylinderGeometry(0.008, 0.008, 0.015, 8)`; cıvata geometrisi
-  - `cylinderRotor` — `CylinderGeometry(0.12, 0.12, 0.1, 32)`; rotor gövde geometrisi
-  - `torus032` — `TorusGeometry(0.32, 0.006, 8, 64)`; silindir uç kenar yuvarlatma geometrisi
-  - `torusRings` — `[0.12, 0.2, 0.28]` yarıçaplarıyla oluşturulmuş `TorusGeometry` dizisi; mazgal ızgara halkaları
-  - `innerBladeGeos` — `[0, -0.12, -0.22]` xVal değerleriyle hesaplanmış `BoxGeometry` dizisi; iç kanat geometrileri
-  - `boxMazgal` — `BoxGeometry(0.64, 0.01, 0.006)`; mazgal ızgara çubuğu geometrisi
-  - `boxGrey` — `BoxGeometry(0.16, 0.14, 0.10)`; gri elektrik kutusu geometrisi
-  - `boxMountVert` — `BoxGeometry(0.08, 0.12, 0.015)`; dikey montaj ayağı geometrisi
-  - `boxMountHoriz` — `BoxGeometry(0.08, 0.015, 0.08)`; yatay montaj ayağı geometrisi
-  - `boxRotorBlade` — `BoxGeometry(0.20, 0.012, 0.06)`; rotor kanat geometrisi
-- **Dönüş**: geometri nesneleri objesi
+  - `path` — useMemo ile memoize edilmiş CatmullRomCurve3 nesnesi; 4 noktadan oluşan kablo eğrisi yolu
+- **Dönüş**: JSX mesh elemanı — tubeGeometry ile oluşturulmuş 3B kablo modeli
 
-### [N4_NASIL] AST Pointer: JetFanModel.tsx::innerBladeGeos map callback
-- **params**: `xVal`
-- **ic_degiskenler**:
-  - `r` — 0.31 sabit değeri; iç kanat yarıçapı
-  - `w` — `2 * Math.sqrt(Math.max(0, r * r - xVal * xVal))` formülüyle hesaplanan kanat genişliği
-- **Dönüş**: BoxGeometry
+---
 
-### [N5_NASIL] AST Pointer: JetFanModel.tsx::useEffect cleanup (geometries)
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: cleanup fonksiyonu; `geometries` objesindeki tüm geometrilerin `.dispose()` metodunu çağırır
-
-### [N6_NASIL] AST Pointer: JetFanModel.tsx::FlexibleCable
-- **params**: `{ materials }` — `FanMaterials` tipinde; `materials.cableGrey` alanına erişilir
-- **ic_degiskenler**:
-  - `path` — `useMemo` ile oluşturulan `CatmullRomCurve3` eğrisi; `[new Vector3(0, 0, 0), new Vector3(0, 0.04, 0.05), new Vector3(0, 0.06, 0.12), new Vector3(0, 0.06, 0.175)]` noktalarıyla tanımlı kablo yolu
-  - `tubeGeo` — `useMemo` ile oluşturulan `TubeGeometry`; `path` eğrisi, 20 segment, 0.012 tüp yarıçapı, 8 radial segment, kapalı değil
-- **Dönüş**: JSX (mesh); `materials.cableGrey` malzemesi ve `tubeGeo` geometrisiyle render edilen kablo mesh'i
-
-### [N7_NASIL] AST Pointer: JetFanModel.tsx::FlexibleCable useEffect cleanup
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: cleanup fonksiyonu; `tubeGeo.dispose()` çağrısı yapar
+### [N12_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::useMemo_callback_FlexibleCable
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `CatmullRomCurve3` — 4 Vector3 noktasından (0,0,0 → 0,0.04,0.05 → 0,0.06,0.12 → 0,0.06,0.175) oluşan Catmull-Rom spline eğrisi
 
 ---
 
@@ -39798,13 +40626,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\NicotraFanModel.tsx
-skeleton_hash: a7e500890d07ccb7
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\NicotraFanModel.tsx
+skeleton_hash: 5ee9180432bca418
 entity_hashes:
   func:NicotraFanModel: 2bdd08e329a67558
   overview: a978abdd718e5dd3
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:20:16Z
+generated_at: 2026-08-25T07:27:00Z
 ---
 
 ## Genel Bakış
@@ -39875,10 +40703,68 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::useFrame callback
+- **params**: `state`, `delta`
+- **ic_degiskenler**:
+  - `fanRef.current` — üst kapsamdan erişilen `Group` referansı; `null` kontrolü yapıldıktan sonra `rotation.x` özelliği `delta * 15` kadar azaltılır (X ekseninde sürekli dönüş animasyonu)
+- **Dönüş**: yok
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::sideShape useMemo callback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `shape` — `new Shape()` ile oluşturulan nesne; logaritmik spiral profil noktaları ve atış ağzı çizgileri eklenir
+  - `segments` — `48` sabit değeri; spiral profil için döngü segment sayısı
+  - `i` — `for` döngü sayacı; `0`'dan `segments`'e kadar iterasyon
+  - `th` — `(i / segments) * Math.PI * 2.2` formülüyle hesaplanan açı (radyan); spiral profil için polar koordinat açısı
+  - `r` — `0.3 + (th / (Math.PI * 2)) * 0.4` formülüyle hesaplanan yarıçap; logaritmik spiral mesafesi
+  - `x` — `Math.cos(th) * r` hesaplaması; profil noktasının X koordinatı
+  - `y` — `Math.sin(th) * r` hesaplaması; profil noktasının Y koordinatı
+  - `hole` — `new Path()` ile oluşturulan nesne; `hole.absarc(0, 0, 0.28, 0, Math.PI * 2, true)` ile dairesel delik tanımlanır ve `shape.holes` dizisine eklenir
+- **Dönüş**: `Shape` — logaritmik spiral profilli, dairesel delikli ve atış ağzı çizgili şekil nesnesi
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::useEffect cleanup factory
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: cleanup fonksiyonu — `baseFrameGeometry.dispose()`, `vibrationMountGeometry.dispose()`, `sideShapeGeometry.dispose()`, `scrollWrapperGeometry.dispose()`, `dischargeGeometry.dispose()`, `wheelGeometry.dispose()`, `bladeGeometry.dispose()`, `motorGeometry.dispose()` çağrılır
+
+---
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::useEffect inner cleanup
+- **params**: (parametre yok)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — sekiz geometri nesnesinin `dispose()` metodu çağrılarak bellek temizliği yapılır
+
+---
+
+### [N6_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::vibration mount outer map
+- **params**: `x`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX array — `[0.4, -0.4].map(z => ...)` ile iki titreşim takozu mesh'i döndürülür
+
+---
+
+### [N7_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::vibration mount inner map
+- **params**: `z`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `<mesh key={...} position={[x, -0.05, z]} geometry={vibrationMountGeometry} material={materials.matteBlack} />` elementi; üst kapsamdan `x` ve `vibrationMountGeometry` kullanılır
+
+---
+
+### [N8_NASIL] AST Pointer: src/components/products/3d/types/NicotraFanModel.tsx::blade map
+- **params**: `_`, `i`
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `<mesh key={i} rotation={[0, (i / 24) * Math.PI * 2, 0]} position={[0.36, 0, 0]} geometry={bladeGeometry} material={materials.galvanizedSteel} />` elementi; `i` indeksine göre 24 kanat eşit açılarla yerleştirilir
+
+---
+
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\NicotraFanModel.tsx
-  function: src\components\products\3d\types\NicotraFanModel.tsx::NicotraFanModel
+  file: NicotraFanModel.tsx
+  function: NicotraFanModel.tsx::NicotraFanModel
 
 ---
 
@@ -39908,13 +40794,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\PlugFanModel.tsx
-skeleton_hash: 6b6f19d8a5d12772
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\PlugFanModel.tsx
+skeleton_hash: 5cf8fe96bb2bf840
 entity_hashes:
   func:PlugFanModel: b85fe612276b43fc
   overview: 84b4f359828824c7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:20:16Z
+generated_at: 2026-08-25T07:27:02Z
 ---
 
 ## Genel Bakış
@@ -39981,10 +40867,72 @@ Bu modül için fonksiyon gövdesi verilmediğinden, gövdeden türetilebilecek 
 
 ---
 
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/PlugFanModel.tsx::PlugFanModel::useFrame_callback
+- **params**: `state`, `delta`
+- **ic_degiskenler**:
+  - `fanRef.current` — dış kapsamdan erişilen ref nesnesi; varsa `fanRef.current.rotation.z` değerini `6 * delta` kadar azaltarak fanı sürekli döndürür
+- **Dönüş**: yok
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/PlugFanModel.tsx::PlugFanModel::useEffect_cleanup_factory
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `inletConeGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `flangeGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `shroudGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `bladeGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `motorBodyGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `finGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `klemensGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `baseGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `supportGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+- **Dönüş**: cleanup fonksiyonu — bileşen unmount olduğunda tüm memoize edilmiş geometrileri VRAM'den temizler
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/PlugFanModel.tsx::PlugFanModel::useEffect_cleanup_inner
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `inletConeGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `flangeGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `shroudGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `bladeGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `motorBodyGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `finGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `klemensGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `baseGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `supportGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+- **Dönüş**: yok
+
+---
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/types/PlugFanModel.tsx::PlugFanModel::blade_map_callback
+- **params**: `_`, `i`
+- **ic_degiskenler**:
+  - `_` — kullanılmayan dizi elemanı (fill(0) kaynaklı)
+  - `i` — dizi indeksi; `(i / 7) * Math.PI * 2` formülüyle her kanat için Z ekseni etrafında eşit açısal dağılım hesaplanır
+  - `bladeGeo` — dış kapsamdan erişilen BoxGeometry; kanat mesh'inin `geometry` prop'u olarak kullanılır
+  - `materials.safetyOrange` — dış kapsamdan erişilen malzeme; kanat mesh'inin `material` prop'u olarak kullanılır
+- **Dönüş**: JSX — `<group>` içinde döndürülmüş `<mesh>` döndürür; 7 adet geriye eğimli pervane kanadı oluşturur
+
+---
+
+### [N6_NASIL] AST Pointer: src/components/products/3d/types/PlugFanModel.tsx::PlugFanModel::fin_map_callback
+- **params**: `_`, `i`
+- **ic_degiskenler**:
+  - `_` — kullanılmayan dizi elemanı (fill(0) kaynaklı)
+  - `i` — dizi indeksi; `(i / 12) * Math.PI * 2` formülüyle her kanatçık için Y ekseni etrafında eşit açısal dağılım hesaplanır
+  - `finGeo` — dış kapsamdan erişilen BoxGeometry; soğutma kanatçığı mesh'inin `geometry` prop'u olarak kullanılır
+  - `materials.industrialSteel` — dış kapsamdan erişilen malzeme; soğutma kanatçığı mesh'inin `material` prop'u olarak kullanılır
+- **Dönüş**: JSX — motor gövdesi etrafına dağıtılmış 12 adet soğutma kanatçığı `<mesh>` döndürür
+
+---
+
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\PlugFanModel.tsx
-  function: src\components\products\3d\types\PlugFanModel.tsx::PlugFanModel
+  file: PlugFanModel.tsx
+  function: PlugFanModel.tsx::PlugFanModel
 
 ---
 
@@ -41643,14 +42591,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ui\Pagination.tsx
-skeleton_hash: d26d24749b77852e
+source_path: C:\tmp\vh-altyapi-t165\src\components\ui\Pagination.tsx
+skeleton_hash: f3d1f5f7fcf61d1e
 entity_hashes:
   func:Pagination: d5dc6893f11dd914
   func:hrefFor: bb2c2d7ab62a390f
   overview: 60d8a3ff982f4f10
   style_tokens: f3a8db447437f6e3
-generated_at: 2026-08-25T08:46:10Z
+generated_at: 2026-08-27T08:33:38Z
 ---
 
 ## Genel Bakış
@@ -41779,13 +42727,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx
-skeleton_hash: 164c78147076aa40
+source_path: C:\tmp\vh-altyapi-t165\src\components\ui\ScrollObserver.tsx
+skeleton_hash: 6b4bc208173a28c6
 entity_hashes:
   func:ScrollObserver: 862e0356d80495a5
   overview: 165bc7baf7c13a58
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:39Z
+generated_at: 2026-08-27T08:33:40Z
 ---
 
 ## Genel Bakış
@@ -41917,13 +42865,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ui\Skeleton.tsx
-skeleton_hash: af8394547a4d87ff
+source_path: C:\tmp\vh-altyapi-t165\src\components\ui\Skeleton.tsx
+skeleton_hash: e05306555b5f2c39
 entity_hashes:
-  func:Skeleton: b70faa0883864e7c
+  func:Skeleton: 547c1486976d9411
   overview: dd78551ca6caccba
   style_tokens: 9afb047eb7d0beac
-generated_at: 2026-06-19T20:47:39Z
+generated_at: 2026-08-27T08:34:11Z
 ---
 
 ## Genel Bakış
@@ -41949,13 +42897,16 @@ Bu React tabanlı UI yükleme iskeleti (Skeleton) bileşeninin doğru görsel ve
 ## FONKSİYON DETAYLARI
 
 ### Skeleton
-**Ne yapar**: React tabanlı kullanıcı arayüzlerinde içeriklerin yüklenme sürecinde, yüklenecek içeriğin yerini tutan görsel yükleme göstergesi (skeleton) bileşenidir. Kullanıcıya yükleme işleminin aktif olduğunu iletirken, sayfa içeriğinin nihai düzenini önceden temsil ederek ani içerik kaymalarını önler.
-**Nasıl yapar**: Temel olarak bir div elementi olarak render edilir, cn utility fonksiyonu kullanılarak varsayılan "animate-pulse" ve "rounded-md" CSS sınıflarını, seçilen varyanta ait özel stilleri ve kullanıcı tarafından iletilen özel sınıfları birleştirir. Tüm iletilen ek propsları doğrudan oluşturulan div elementine aktararak, istenen tüm özelleştirmelerin uygulanmasını sağlar.
+**Ne yapar**: Yükleme (loading) durumlarında içerik yerine gösterilen iskelet placeholder bileşenidir. Kullanıcıya içeriğin henüz yüklenmediğini belirten, animasyonlu gri bir alan oluşturur. Genellikle veri çekilirken veya sayfa yüklenirken geçici içerik olarak kullanılır.
+
+**Nasıl yapar**: Bileşen, aldığı `variant` parametresine göre önceden tanımlı renk stillerinden birini seçer. `variantStyles` nesnesinde üç farklı varyant tanımlıdır: `default` (standart gri tonları), `light` (açık gri tonları) ve `dark` (koyu tonlar). Her varyant, Tailwind CSS'in `dark:` önekini kullanarak koyu mod desteğini içerir. `cn` yardımcı fonksiyonu ile temel sınıflar (`animate-pulse` ile titreşim animasyonu, `rounded-md` ile yuvarlatılmış köşeler), seçilen varyant stili ve isteğe bağlı özel `className` birleştirilerek tek bir className string'i oluşturulur. Kalan tüm props, spread operatörü (`...props`) aracılığıyla doğrudan kök `<div>` elementine aktarılır.
+
 **Parametreler**:
-- className: string | undefined — Bileşene eklenecek özel CSS sınıflarıdır, isteğe bağlı olarak iletilir. Varsayılan stillere ek olarak uygulanarak bileşenin boyut, renk gibi görsel özellikleri özelleştirilebilir.
-- variant: string | undefined — Kullanılacak skeleton görünüm varyantıdır, varsayılan değeri "default" olarak tanımlanmıştır. Önceden tanımlanmış farklı varyant stillerinden birini seçmek için kullanılır.
-- ...props: React.HTMLAttributes<HTMLDivElement> — HTML div elementlerine uygulanabilen tüm standart React DOM özellikleri, olay dinleyicileri ve diğer ek parametrelerdir, isteğe bağlı olarak iletilir ve doğrudan render edilen div elementine aktarılır.
-**Dönüş**: JSX.Element — Tüm aktarılan ve birleştirilen stillere, özelliklere sahip bir div elementi olarak, React ağacında render edilmek üzere bir JSX öğesi döndürür.
+- `className`: `string` — Bileşene ek CSS sınıfları eklemek için kullanılan isteğe bağlı alan. Varsayılan bir değer atanmamıştır; gönderilmezse undefined olarak kalır ve `cn` fonksiyonu tarafından yok sayılır.
+- `variant`: `"default" | "light" | "dark"` — İskelet bileşeninin renk temasını belirler. Varsayılan değeri `"default"` olup `bg-gray-200 dark:bg-gray-800` stilini uygular. `"light"` seçeneği `bg-gray-100 dark:bg-gray-700`, `"dark"` seçeneği ise `bg-slate-900 dark:bg-gray-950` kullanır.
+- `...props`: `React.HTMLAttributes<HTMLDivElement>` — Kök `<div>` elementine aktarılan tüm standart HTML öznitelikleri ve React olay işleyicileri. `SkeletonProps` tipi üzerinden tanımlanan bu genişletilmiş props, bileşenin esnekliğini artırır.
+
+**Dönüş**: JSX elementi (`<div>`). Bileşen, `animate-pulse` sınıfı ile sürekli titreşim animasyonu uygulanmış bir `<div>` elementi döndürür. Bu div, seçilen varyanta göre arka plan rengine ve yuvarlatılmış köşelere sahiptir.
 
 ---
 
@@ -41974,12 +42925,11 @@ Bu React tabanlı UI yükleme iskeleti (Skeleton) bileşeninin doğru görsel ve
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\ui\Skeleton.tsx::Skeleton
-- **params**: className, variant (varsayılan değer: "default"), ...props — tüm parametreler SkeletonProps türündedir
+### [N1_NASIL] AST Pointer: src/components/ui/Skeleton.tsx::Skeleton
+- **params**: `className`, `variant` (varsayılan: "default"), `...props` (SkeletonProps tipinde)
 - **ic_degiskenler**:
-  - `variantStyles` - Farklı skeleton görünüm varyantları için Tailwind CSS arka plan renk sınıflarını saklayan nesne; "default", "light", "dark" anahtarlarıyla her varyantın ışık/karanlık mod renk sınıflarını içerir
-  - `cn` - @/lib/utils modülünden import edilen, class stringlerini birleştirmek için kullanılan utility fonksiyonu; döndürülen div elementinin className propunu oluşturmak için çağrılır
-- **Dönüş**: React JSX div elementi (tüm aktarılan propsları alan, yükleme göstergesi olarak kullanılan skeleton DOM elementi)
+  - `variantStyles` — "default", "light", "dark" anahtarlarına sahip bir nesne; her anahtar için arka plan renk sınıflarını (`bg-gray-200 dark:bg-gray-800`, `bg-gray-100 dark:bg-gray-700`, `bg-slate-900 dark:bg-slate-950`) içerir.
+- **Dönüş**: `div` elementi; `className` özelliği `"animate-pulse rounded-md"`, `variantStyles[variant]` ve `className` parametresinin `cn` fonksiyonu ile birleştirilmesiyle oluşturulur, `...props` ile diğer özellikleri yayar.
 
 ---
 
@@ -42017,13 +42967,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ui\VentImage.tsx
-skeleton_hash: c33c889cb5e7319a
+source_path: C:\tmp\vh-altyapi-t165\src\components\ui\VentImage.tsx
+skeleton_hash: 485d928af75510ae
 entity_hashes:
   func:VentImage: 5527f2e63e5e22a5
   overview: ed4ba88e88a612db
-  style_tokens: 1d628435b48e7258
-generated_at: 2026-06-19T20:47:39Z
+  style_tokens: 602daf73ccaf621d
+generated_at: 2026-08-27T08:34:12Z
 ---
 
 ## Genel Bakış
@@ -42139,7 +43089,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Renkler:** `bg-gray-100/50`
 - **Layout:** `absolute`, `h-auto`, `transform-gpu`, `w-full`, `z-0`
 - **Varyant/Responsive:** `:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${className`, `${isFillMode`, `:`, `duration-300`, `ease-in-out`, `inset-0`, `isLoaded`, `object-cover`, `opacity-0`, `opacity-100`, `props.priority`, `transition-opacity`, `||`
+- **Yardımcı Sınıflar:** `$`, `${className`, `${isFillMode`, `/\bobject-/.test(className`, `:`, `duration-300`, `ease-in-out`, `inset-0`, `isLoaded`, `object-cover`, `opacity-0`, `opacity-100`, `props.priority`, `transition-opacity`, `||`
 
 ---
 # FILE: src\config\admin-resources.md
@@ -42295,57 +43245,78 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\config\admin.ts
-skeleton_hash: 7935dad8af4131d7
+source_path: C:\Users\alize\venthub-hvac\src\config\admin.ts
+skeleton_hash: 2cc0382d2782b947
 entity_hashes:
-  func:getUserRole: 2c200fb867d424aa
+  func:checkAdminAccess: 0195cef58edf96a2
+  func:getUserRole: 638c917cdcbbb2e5
+  func:isAdminByEmail: 97d57e6b9c4cf9a2
+  func:isDevAdmin: 527f404e6ee96806
   func:listAdminUsers: d933c96b85d7b147
   func:setUserAdminRole: 8d3b86f7b7baaf3b
-  overview: 5893087b4e779eea
-generated_at: 2026-08-27T04:31:52Z
+  overview: 3d7af3e502cf1294
+generated_at: 2026-06-19T20:48:16Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı rollerinin sorgulanması, atanması ve yönetici kullanıcıların listelenmesi işlemlerini merkezi olarak yönetir. Tüm fonksiyonlar asenkron yapıda olup dış bir veri kaynağına erişerek yönetici rol bilgilerini okur ve günceller.
+Bu modül, HVAC yönetim platformu VentHub'un konfigürasyon katmanında yer alarak yönetici erişim ve rol yönetimi süreçlerini tek merkezde toplar. Kullanıcı kimlik bilgilerine göre yönetici yetkilerini doğrular, kullanıcı rolleri üzerinde düzenleme ve sorgulama işlemleri yapar, sistemdeki tüm yönetici kullanıcılarını listeleme imkanı sunar.
 
 ## Fonksiyon Grupları
 ### Kullanıcı Rol Yönetimi
-Belirli bir kullanıcının mevcut rolünü sorgulama, kullanıcıya yönetici rolü atama ve sistemdeki tüm yönetici kullanıcıları listeleme gibi temel rol yönetim işlemlerini gerçekleştirir.
+Kullanıcı rollerini getirme, yeni yönetici rolü atama ve sistemdeki kayıtlı tüm yönetici kullanıcılarının listesini alma gibi temel rol yönetimi işlemlerini gerçekleştirir.
 - getUserRole, setUserAdminRole, listAdminUsers
 
-## Bağımlılıklar ve Mimari Notlar
-- Tüm fonksiyonlar asenkron (async) yapıdadır ve Promise döndürür; bu durum modülün dış bir veri deposu veya servise bağlı olduğunu gösterir.
-- Fonksiyonlar arasında doğrudan bir çağrı ilişkisi belirlenmemiştir; her biri bağımsız olarak dış sisteme erişir.
-- `setUserAdminRole` fonksiyonu boolean değer döndürerek işlemin başarılı olup olmadığını bildirir.
-- `listAdminUsers` fonksiyonu `AdminUser` tipinde bir dizi döndürür; bu tipin tanımı modül dışındadır.
+### Yönetici Erişim Doğrulama
+Farklı senaryolara göre kullanıcıların yönetici erişimine sahip olup olmadığını kontrol eden güvenlik kontrollerini sunar, yerel geliştirici statüsünden e-posta ve kullanıcı meta verilerine kadar birçok kriteri baz alır.
+- isAdminByEmail, isDevAdmin, checkAdminAccess
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, VentHub HVAC sisteminin yönetici erişim kontrolünü ve rol yönetimini gerçekleştirmek üzere tasarlanmıştır, tüm fonksiyonların doğru çalışması için giriş parametrelerinin, sabit tanımlı yönetici listelerinin ve kullanıcı meta verilerinin eksiksiz ve güvenilir olması zorunludur.
 
-Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarılabilecek varsayımlar belirlenmiştir.
-
-[Aksiyom 1]: Eğer `userId` parametresi geçerli bir kullanıcı kimliği içermiyorsa, `getUserRole` ve `setUserAdminRole` fonksiyonları beklenen sonucu üretemez.
-
-[Aksiyom 2]: Eğer `setUserAdminRole` fonksiyonunda verilen `role` değeri sistem tarafından tanınan geçerli bir rol değilse, fonksiyon `false` döndürür.
-
-[Aksiyom 3]: Eğer sistemde kayıtlı yönetici kullanıcısı yoksa, `listAdminUsers` fonksiyonu boş bir dizi (`[]`) döndürür.
-
-[Aksiyom 4]: Eğer `getUserRole` fonksiyonuna verilen `userId` sistemde kayıtlı değilse, fonksiyon hata fırlatır veya boş/varsayılan bir string değer döndürür — hangi davranışın uygulandığı fonksiyon gövdesinden bilinmiyor.
+[Aksiyom 1]: Eğer FALLBACK_ADMIN_EMAILS sabiti tanımsız veya boş bir dizi ise, e-posta tabanlı temel yönetici erişim kontrolleri çalışmaz, tanımlı yedek yönetici hesapları sisteme erişemez.
+[Aksiyom 2]: Eğer checkAdminAccess fonksiyonuna iletilen kullanıcı nesnesi (user) hem email hem de user_metadata.role alanlarından yoksun ise, hiçbir kullanıcıya yönetici erişimi tanımlanamaz, tüm yönetici paneli erişim istekleri reddedilir.
+[Aksiyom 3]: Eğer getUserRole veya setUserAdminRole fonksiyonlarına iletilen userId parametresi boş veya geçersiz string ise, kullanıcı rolü ne sorgulanabilir ne de atanabilir, rol tabanlı tüm erişim kontrolleri başarısız olur.
+[Aksiyom 4]: Eğer setUserAdminRole fonksiyonuna iletilen role parametresi sistemde tanımsız bir string ise, rol veri tabanına kaydedilse dahi erişim kontrolleri tarafından tanınmaz, ilgili kullanıcıya yönetici erişimi sağlanamaz.
+[Aksiyom 5]: Eğer isDevAdmin() fonksiyonunun çalışması için gereken ortam spesifik işaretçi tanımsız ise, geliştirici yönetici erişimi gerektiren tüm işlemler devre dışı kalır.
+[Aksiyom 6]: Eğer listAdminUsers fonksiyonunun eriştiği sistemdeki tüm kullanıcı verisi erişilemez ise, fonksiyon eksik veya hatalı yönetici listesi döndürür, yetkisiz hesapların tespiti yapılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### getUserRole
-**Ne yapar**: Veritabanından belirtilen kullanıcının rol bilgisini getirir. Rol bilgisinin tek yetkili kaynağı `user_profiles` tablosundaki `role` alanıdır. Fonksiyon, hata durumunda veya profil satırı bulunamadığında varsayılan olarak `'user'` döndürür.
 
-**Nasıl yapar**: Fonksiyon öncelikle çalışma ortamını tespit eder; `window` tanımlıysa tarayıcı ortamında olduğunu anlar ve `supabaseBrowserClient` istemcisini, aksi halde sunucu/statik ortamda olduğunu anlar ve `supabaseStaticClient` istemcisini dinamik olarak (`await import`) içe aktarır. Seçilen Supabase istemcisi üzerinden `user_profiles` tablosuna gidilir, `role` alanı seçilir ve `id` alanı `userId` parametresiyle eşleşen satır `maybeSingle()` ile sorgulanır. Sorgu sonucunda hata oluşursa konsola uyarı yazdırılır ve `'user'` döndürülür. Veri başarıyla gelirse `data.role` değeri döndürülür. Profil satırı hiç yoksa (veri null ise) yine `'user'` döndürülür. Dokümanda belirtildiği üzere, eski sürümde profil satırı olmayan kullanıcılar için e-posta listesi üzerinden `'admin'` döndüren bir yol varmış; ancak bu yol kaldırılmıştır çünkü profili olmayan birine yetki vermek yerine doğru akışın önce profil satırını oluşturmak olduğu belirtilmiştir. Fonksiyonun kendisi bir `try-catch` bloğu ile sarılıdır; yakalanan herhangi bir exception durumunda konsola uyarı yazdırılır ve `'user'` döndürülür.
+**Ne yapar**: Verilen kullanıcı ID'sine ait rol bilgisini Supabase veritabanından asenkron olarak çeker. Kullanıcı veritabanında kayıtlı değilse veya bir hata oluşursa, opsiyonel olarak verilen email adresi üzerinden fallback mekanizmasıyla rol belirleme yapar.
+
+**Nasıl yapar**: Fonksiyon öncelikle opsiyonel `userEmail` parametresini kontrol eder ve bu email'in hardcoded superadmin listesinde (`recep.varlik@gmail.com`, `recepvarlk@gmail.com`) olup olmadığına bakar; bu listeye uyan email'ler için `'super_admin'`, `isAdminByEmail()` yardımcısı tarafından tanımlanan diğer admin email'leri için `'admin'` rolünü doğrudan döndürerek veritabanı sorgusunu atlatabilir. Ardından `window` nesnesinin varlığına göre tarayıcı taraflı (`supabaseBrowserClient`) veya statik taraflı (`supabaseStaticClient`) Supabase istemcisini dinamik import ile yükler ve `user_profiles` tablosundan ilgili kullanıcının `role` alanını `maybeSingle()` ile çeker. Sorgu başarılı olup `data.role` mevcutsa bu değer döndürülür; veritabanında kayıt bulunamaması durumunda tekrar email fallback kontrolü yapılarak admin olup olmadığı kontrol edilir. Herhangi bir hata veya istisna durumunda `console.warn` ile log yazdırarak varsayılan `'user'` rolünü döndürür.
 
 **Parametreler**:
-- `userId`: `string` — Kullanıcının benzersiz kimlik numarası. Bu değer `user_profiles` tablosundaki `id` alanı ile eşleştirilerek sorgulama yapılır.
+- `userId`: `string` — Sorgulanacak kullanıcının benzersiz tanımlayıcısı. `user_profiles` tablosundaki `id` alanıyla eşleşir.
+- `userEmail`: `string | undefined` — Opsiyonel. Kullanıcının email adresi. Veritabanı sorgusu başarısız olduğunda veya kayıt bulunamadığında rol belirleme için fallback olarak kullanılır.
 
-**Dönüş**: `Promise<string>` — Asenkron olarak çözülen bir Promise döndürür. Çözüldüğünde kullanıcının rol bilgisini içeren bir string değer verir. Başarılı sorgularda veritabanındaki `role` değeri (örneğin `'admin'`), hata veya bulunamama durumlarında ise `'user'` döndürülür.
+**Dönüş**: `Promise<string>` — Kullanıcının rolünü temsil eden dize. Olası değerler: `'super_admin'`, `'admin'`, `'user'`. Veritabanı hatası, istisna veya tanımsız durumlarda varsayılan olarak `'user'` döner.
+
+### isAdminByEmail
+**Ne yapar**: E-posta adresi bazlı olarak kullanıcının admin yetkisine sahip olup olmadığını kontrol eden senkron fallback kontrol fonksiyonudur. Genellikle ana rol sorgusu çalışmadığında veya önbellekte rol bilgisi bulunamadığında yetki doğrulamak için kullanılır.
+**Nasıl yapar**: Sistemde önceden tanımlanmış yetkili admin e-postaları listesi ile girilen e-posta adresini karşılaştırır. Eğer eşleşme tespit edilirse kullanıcının admin olduğu kabul edilir, eğer hiç e-posta adresi sağlanmazsa otomatik olarak yetkisiz olarak değerlendirilir.
+**Parametreler**:
+- email?: string — Admin yetkisi kontrol edilmek istenen kullanıcının opsiyonel e-posta adresi
+**Dönüş**: boolean — Kullanıcının admin olup olmadığını belirten boolean değer, admin ise true, aksi halde false döndürür
+
+### isDevAdmin
+**Ne yapar**: Sadece uygulamanın geliştirme ortamında çalıştığı durumlarda kullanılmak üzere kullanıcının geliştirici statüsündeki admin olup olmadığını kontrol eder, üretim ortamında hiçbir şekilde çalışmaz. Yerel geliştirme süreçlerinde test amaçlı yetki vermek için kullanılır.
+**Nasıl yapar**: Uygulamanın çalıştığı ortamı tanımlayan ortam değişkenlerini kontrol eder, eğer ortam geliştirme olarak tanımlıysa sisteme kayıtlı geliştirici kullanıcı bilgileriyle eşleştirme yapar, herhangi bir ortamda eşleşme sağlanmazsa false döndürür.
+**Parametreler**: Herhangi bir parametre almaz
+**Dönüş**: boolean — Geliştirme ortamında yetki doğrulanırsa true, tüm diğer durumlarda (üretim ortamı, yetkisiz kullanıcı vb.) false döndürür
+
+### checkAdminAccess
+**Ne yapar**: Önbellekte tutulan önceki kimlik doğrulama durumu verilerini kullanarak senkron şekilde kullanıcının admin erişimine sahip olup olmadığını kontrol eder, anlık yetki sorguları için optimize edilmiş cache tabanlı bir kontroldür.
+**Nasıl yapar**: Öncelikle girdi olarak aldığı kullanıcı nesnesinin user_metadata alanında yer alan rol bilgisini kontrol eder, eğer geçerli bir rol bilgisi varsa bu bilgiye göre yetkiyi belirler. Eğer kullanıcı nesnesinde rol bilgisi bulunamazsa fallback olarak kullanıcının e-posta adresiyle admin kontrolü gerçekleştirir. Eğer kullanıcı nesnesi null olarak gelirse otomatik olarak yetkisiz olarak değerlendirir.
+**Parametreler**:
+- user: { email?: string; user_metadata?: { role?: string } } | null — Admin erişimi kontrol edilmek istenen kullanıcı nesnesi, null olabilir, içeriğinde opsiyonel e-posta ve yine opsiyonel olarak kullanıcı meta verilerinde rol bilgisini barındırır
+**Dönüş**: boolean — Kullanıcının admin erişimine sahip olması durumunda true, aksi halde false döndürür
 
 ### setUserAdminRole
 **Ne yapar**: Sadece istemci tarafında kullanılmak üzere belirtilen kullanıcıya admin rolü atar, bu işlem sadece yerel istemci verilerini günceller, kalıcı bir veritabanı değişikliği yapmaz. Gerçek veritabanı güncellemesi için ayrı bir admin paneli işlemi yapılması zorunludur.
@@ -42377,44 +43348,67 @@ Admin user interface for type safety
 
 ---
 
+## SABİTLER
+- **FALLBACK_ADMIN_EMAILS** (array) — `[
+  'admin@venthub.com',
+  'info@venthub.com',
+  'alize@venthub.com',
+  '...`
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/config/admin.ts::getUserRole
-- **params**: `userId` — string, kullanıcının benzersiz kimliği
+- **params**: `userId: string`, `userEmail?: string`
 - **ic_degiskenler**:
-  - `supabaseBrowserClient` — tarayıcı ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/client` modülünden alınır
-  - `supabaseStaticClient` — statik/sunucu ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/static` modülünden alınır
-  - `supabase` — ortam tespitiyle seçilen Supabase istemcisi; `typeof window !== 'undefined'` koşulu sağlanırsa `supabaseBrowserClient`, sağlanmazsa `supabaseStaticClient` atanır
-  - `data` — `user_profiles` tablosundan `role` alanını seçen sorgunun sonucu; `.maybeSingle()` ile tek satır veya null döner
-  - `error` — Supabase sorgusunda oluşan hata nesnesi; varsa `console.warn` ile loglanır ve `'user'` döndürülür
-  - `error` (catch bloğu) — `try` bloğu içinde yakalanan genel istisna; `console.warn` ile loglanır ve `'user'` döndürülür
-- **Dönüş**: `Promise<string>` — kullanıcının rolü; `data?.role` varsa o değer, hata durumunda veya profil satırı yoksa `'user'`
+  - `supabase` — Ortam koşuluna göre browser veya static supabase client; `typeof window !== 'undefined'` kontrolü ile seçilir
+  - `supabaseBrowserClient` — Dinamik import ile yüklenen tarayıcı tarafı supabase istemcisi (`'../lib/supabase/client'`)
+  - `supabaseStaticClient` — Dinamik import ile yüklenen statik/sunucu tarafı supabase istemcisi (`'../lib/supabase/static'`)
+  - `data` — `user_profiles` tablosundan `role` alanı ile getirilen satır sonucu
+  - `error` — Supabase sorgusu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: `Promise<string>` — Kullanıcının rolü (`'super_admin'`, `'admin'` veya `'user'`)
 
-### [N2_NASIL] AST Pointer: src/config/admin.ts::setUserAdminRole
-- **params**:
-  - `userId` — string, rolü değiştirilecek kullanıcının benzersiz kimliği
-  - `role` — string, atanacak yeni rol değeri
-- **ic_degiskenler**:
-  - `supabaseBrowserClient` — tarayıcı ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/client` modülünden alınır
-  - `supabaseStaticClient` — statik/sunucu ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/static` modülünden alınır
-  - `supabase` — ortam tespitiyle seçilen Supabase istemcisi; `typeof window !== 'undefined'` koşulu sağlanırsa `supabaseBrowserClient`, sağlanmazsa `supabaseStaticClient` atanır
-  - `data` — `set_user_admin_role` RPC çağrısının dönüş değeri; `true` ise rol atama başarılı
-  - `error` — RPC çağrısında oluşan hata nesnesi; varsa `console.error` ile loglanır ve `false` döndürülür
-  - `error` (catch bloğu) — `try` bloğu içinde yakalanan genel istisna; `console.error` ile loglanır ve `false` döndürülür
-- **Dönüş**: `Promise<boolean>` — rol atama başarılıysa `true`, hata durumunda `false`
+### [N2_NASIL] AST Pointer: src/config/admin.ts::isAdminByEmail
+- **params**: `email?: string`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `boolean` — E-posta adresi `FALLBACK_ADMIN_EMAILS` listesinde küçük harfe çevrilmiş haliyle varsa `true`
 
-### [N3_NASIL] AST Pointer: src/config/admin.ts::listAdminUsers
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/config/admin.ts::isDevAdmin
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `ensureSessionFresh` — oturum tazeliğini sağlayan fonksiyon, dinamik import ile `../lib/ensureSessionFresh` modülünden alınır; RPC çağrısından önce `await` ile çalıştırılır
-  - `supabaseBrowserClient` — tarayıcı ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/client` modülünden alınır
-  - `supabaseStaticClient` — statik/sunucu ortamı için Supabase istemcisi, dinamik import ile `../lib/supabase/static` modülünden alınır
-  - `supabase` — ortam tespitiyle seçilen Supabase istemcisi; `typeof window !== 'undefined'` koşulu sağlanırsa `supabaseBrowserClient`, sağlanmazsa `supabaseStaticClient` atanır
-  - `rpcRes` — `admin_list_users` RPC çağrısının ham sonucu; `error` ve `data` alanlarını içerir
-  - `rpcErr` — `rpcRes` nesnesinden çıkarılan hata değeri; varsa `console.error` ile loglanır ve boş dizi döndürülür
-  - `rpcData` — `rpcRes` nesnesinden çıkarılan veri dizisi; null veya undefined ise boş diziye düşülür, `AdminUser[]` tipine cast edilir
-  - `error` (catch bloğu) — `try` bloğu içinde yakalanan genel istisna; `console.error` ile loglanır ve boş dizi döndürülür
-- **Dönüş**: `Promise<AdminUser[]>` — admin kullanıcı listesi; hata durumunda boş dizi `[]`
+  - `isDev` — `process.env.NODE_ENV === 'development'` kontrolü ile development ortamında olunduğunu belirtir
+  - `isLocalhost` — `window.location.hostname === 'localhost'` kontrolü ile yerel sunucuda olunduğunu belirtir
+- **Dönüş**: `boolean` — Hem development ortamı hem localhost ise `true`
+
+### [N4_NASIL] AST Pointer: src/config/admin.ts::checkAdminAccess
+- **params**: `user: { email?: string; user_metadata?: { role?: string } } | null`
+- **ic_degiskenler**:
+  - `lowerEmail` — `user.email` değerinin küçük harfe çevrilmiş hali; email karşılaştırmalarında kullanılır
+  - `metadataRole` — Supabase user metadata'sından okunan `role` alanı; izin verilen roller listesinde (`super_admin`, `admin`, `moderator`, `warehouse`, `sales`, `viewer`) kontrol edilir
+- **Dönüş**: `boolean` — Kullanıcının admin erişimine sahip olup olmadığı; email fallback, metadata rol veya local dev fallback ile belirlenir
+
+### [N5_NASIL] AST Pointer: src/config/admin.ts::setUserAdminRole
+- **params**: `userId: string`, `role: string`
+- **ic_degiskenler**:
+  - `supabase` — Ortam koşuluna göre browser veya static supabase client; `typeof window !== 'undefined'` kontrolü ile seçilir
+  - `supabaseBrowserClient` — Dinamik import ile yüklenen tarayıcı tarafı supabase istemcisi (`'../lib/supabase/client'`)
+  - `supabaseStaticClient` — Dinamik import ile yüklenen statik/sunucu tarafı supabase istemcisi (`'../lib/supabase/static'`)
+  - `data` — `set_user_admin_role` RPC çağrısının dönüş değeri; `true` ise atama başarılı
+  - `error` — RPC çağrısı sırasında oluşabilecek hata nesnesi
+- **Dönüş**: `Promise<boolean>` — Rol ataması başarılıysa `true`, hata oluşursa `false`
+
+### [N6_NASIL] AST Pointer: src/config/admin.ts::listAdminUsers
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `ensureSessionFresh` — Dinamik import ile yüklenen oturum tazeleme fonksiyonu (`'../lib/ensureSessionFresh'`); çağrılarak session'un güncel olmasını sağlar
+  - `supabase` — Ortam koşuluna göre browser veya static supabase client; `typeof window !== 'undefined'` kontrolü ile seçilir
+  - `supabaseBrowserClient` — Dinamik import ile yüklenen tarayıcı tarafı supabase istemcisi (`'../lib/supabase/client'`)
+  - `supabaseStaticClient` — Dinamik import ile yüklenen statik/sunucu tarafı supabase istemcisi (`'../lib/supabase/static'`)
+  - `rpcRes` — `admin_list_users` RPC çağrısınınham sonucu; `.data` ve `.error` alanları ayrıştırılır
+  - `rpcErr` — RPC sonucundaki `.error` alanı; hata varsa `true` döner ve boş dizi döner
+  - `rpcData` — RPC başarıyla döndüğünde `AdminUser[]` tipindeki kullanıcı listesi; `data` alanı `null` olabilir, bu durumda boş dizi kullanılır
+- **Dönüş**: `Promise<AdminUser[]>` — Admin kullanıcıların listesi; hata durumunda boş dizi `[]` döner
 
 ---
 
@@ -42422,22 +43416,34 @@ Admin user interface for type safety
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    admin_ts__checkAdminAccess["checkAdminAccess"]
     admin_ts__getUserRole["getUserRole"]
+    admin_ts__isAdminByEmail["isAdminByEmail"]
+    admin_ts__isDevAdmin["isDevAdmin"]
     admin_ts__listAdminUsers["listAdminUsers"]
     admin_ts__setUserAdminRole["setUserAdminRole"]
+    admin_ts__checkAdminAccess --> admin_ts__isDevAdmin
+    admin_ts__getUserRole --> admin_ts__isAdminByEmail
+    admin_ts__checkAdminAccess --> admin_ts__isAdminByEmail
 ```
 
 ## NODE ID STANDARD
 
   file: src\config\admin.ts
   function: src\config\admin.ts::getUserRole
+  function: src\config\admin.ts::isAdminByEmail
+  function: src\config\admin.ts::isDevAdmin
+  function: src\config\admin.ts::checkAdminAccess
   function: src\config\admin.ts::setUserAdminRole
   function: src\config\admin.ts::listAdminUsers
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: checkAdminAccess
   export: getUserRole
+  export: isAdminByEmail
+  export: isDevAdmin
   export: listAdminUsers
   export: setUserAdminRole
 
@@ -43883,11 +44889,11 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\data\brands.ts
-skeleton_hash: d5b2e25cfa473431
+source_path: C:\tmp\vh-altyapi-t165\src\data\brands.ts
+skeleton_hash: efb8e830e1a099f1
 entity_hashes:
   overview: 1c324d780c68eb8e
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:34:14Z
 ---
 
 ## Genel Bakış
@@ -43936,7 +44942,7 @@ Bu modül için temel mimari varsayım, sunulan verinin tutarlılığı ve eriş
   { 
     name: 'Vortice', 
     slug: 'vortice', 
-    description: '1954 yıl...`
+    description: '1954...`
 
 ---
 
@@ -44143,13 +45149,13 @@ Bu dosya (`tokens.js`) **fonksiyon içermemektedir**. Dosya yalnızca dışa akt
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\use-mobile.tsx
-skeleton_hash: 979674ac2716239b
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\use-mobile.tsx
+skeleton_hash: c94c2c5b5ec4ae5e
 entity_hashes:
   func:useIsMobile: a6742235a7536cbb
   overview: e7e6eb331c36bd56
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:34:15Z
 ---
 
 ## Genel Bakış
@@ -44250,8 +45256,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useAdminTable.ts
-skeleton_hash: a2b6367142b8d73f
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useAdminTable.ts
+skeleton_hash: 4e8d6a80bcb5f74c
 entity_hashes:
   func:defaultCompare: 97ad9135d8ab982a
   func:getCell: 732b1ce10a743e82
@@ -44260,7 +45266,7 @@ entity_hashes:
   func:parseSortParam: 0925c7aec25db78a
   func:useAdminTable: c94594605f044df4
   overview: 4718da8f76c0c8f1
-generated_at: 2026-08-25T07:27:21Z
+generated_at: 2026-08-27T08:34:16Z
 ---
 
 ## Genel Bakış
@@ -44543,22 +45549,22 @@ graph TD
     useAdminTable_ts__parseFiltersFromParams["parseFiltersFromParams"]
     useAdminTable_ts__parseSortParam["parseSortParam"]
     useAdminTable_ts__useAdminTable["useAdminTable"]
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__defaultCompare
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__matchesQuery
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseSortParam
     useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseFiltersFromParams
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseSortParam
     useAdminTable_ts__useAdminTable --> useAdminTable_ts__getCell
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__matchesQuery
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__defaultCompare
 ```
 
 ## NODE ID STANDARD
 
-  file: useAdminTable.ts
-  function: useAdminTable.ts::getCell
-  function: useAdminTable.ts::defaultCompare
-  function: useAdminTable.ts::matchesQuery
-  function: useAdminTable.ts::parseSortParam
-  function: useAdminTable.ts::parseFiltersFromParams
-  function: useAdminTable.ts::useAdminTable
+  file: src\hooks\useAdminTable.ts
+  function: src\hooks\useAdminTable.ts::getCell
+  function: src\hooks\useAdminTable.ts::defaultCompare
+  function: src\hooks\useAdminTable.ts::matchesQuery
+  function: src\hooks\useAdminTable.ts::parseSortParam
+  function: src\hooks\useAdminTable.ts::parseFiltersFromParams
+  function: src\hooks\useAdminTable.ts::useAdminTable
 
 ---
 
@@ -44587,12 +45593,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useApiCall.ts
-skeleton_hash: 95b8fea9a8f314c7
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useApiCall.ts
+skeleton_hash: e87790cb401d3b4b
 entity_hashes:
   func:useApiCall: 42a6f8dca553808c
   overview: 345d6974057e4bc1
-generated_at: 2026-08-25T07:27:01Z
+generated_at: 2026-08-27T08:34:17Z
 ---
 
 ## Genel Bakış
@@ -44669,33 +45675,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: src/hooks/useApiCall.ts::execute (useApiCall içindeki useCallback)
-- **params**: `apiFunc: () => Promise<T>` — çağrılacak async API fonksiyonu; `options?: UseApiCallOptions` — bu çağrıya özel opsiyonlar
-- **ic_degiskenler**:
-  - `mergedOptions` — `{ ...defaultOptions, ...options }` ile oluşturulan birleşik seçenekler nesnesi; dış scope'daki `defaultOptions` ile parametre `options` birleştirilir
-  - `result` — `await apiFunc()` sonucu dönen değer (tip: T); başarılı durumda state.data'ya atanır ve return edilir
-  - `err` — catch bloğunda yakalanan hata (tip: unknown)
-  - `error` — `err` değerinden türetilen Error nesnesi; `err instanceof Error` kontrolü yapılır, değilse `new Error(String(err))` ile dönüştürülür; state.error'a atanır
-  - `setState` — dış scope'dan erişilen state setter; loading/error/data güncellemelerinde kullanılır
-  - `defaultOptions` — dış scope'dan erişilen varsayılan seçenekler parametresi
-  - `t` — dış scope'dan erişilen çeviri fonksiyonu; `mergedOptions.errorMessage` yoksa `t('common.errorGeneric')` ile genel hata mesajı alınır
-  - `toast` — `sonner` kütüphanesinden import edilen bildirim aracı; `toast.success()` ve `toast.error()` çağrılarıyla kullanılır
-- **Dönüş**: `Promise<T | null>` — başarılıysa `result` (T), hata durumunda `null`
-
----
-
-### [N3_NASIL] AST Pointer: src/hooks/useApiCall.ts::reset (useApiCall içindeki useCallback)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setState` — dış scope'dan erişilen state setter; `{ data: null, loading: false, error: null }` ile state'i başlangıç değerine sıfırlar
-- **Dönüş**: yok (void)
-
----
-
 ## NODE ID STANDARD
 
-  file: useApiCall.ts
-  function: useApiCall.ts::useApiCall
+  file: src\hooks\useApiCall.ts
+  function: src\hooks\useApiCall.ts::useApiCall
 
 ---
 
@@ -44795,13 +45778,13 @@ Bu modül için fonksiyon gövdesi verilmediği için mimari aksiyom üretilemem
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useCalculatorUsage.ts
-skeleton_hash: c049594110c57c82
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCalculatorUsage.ts
+skeleton_hash: 70b0ce5c0e9c12e7
 entity_hashes:
   func:girdiOzeti: ce3cd2e72a8b3e67
   func:useCalculatorUsage: f157c6548bb3e8d5
   overview: 456b32078d3a87d0
-generated_at: 2026-08-25T08:43:30Z
+generated_at: 2026-08-27T08:34:19Z
 ---
 
 ## Genel Bakış
@@ -44899,12 +45882,12 @@ type HesaplayiciGirdileri = Record<string, string | number | boolean | null | un
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useCartHook.ts
-skeleton_hash: 56b76f56edecb1e5
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCartHook.ts
+skeleton_hash: 423a81c5d372a8e1
 entity_hashes:
   func:useCart: 809254743b71e846
   overview: a6bb925fcf63c562
-generated_at: 2026-08-25T07:27:05Z
+generated_at: 2026-08-27T08:34:20Z
 ---
 
 ## Genel Bakış
@@ -44965,8 +45948,8 @@ Alışveriş sepetinin durumunu ve sepete ait işlemleri dışarıya açan ana h
 
 ## NODE ID STANDARD
 
-  file: useCartHook.ts
-  function: useCartHook.ts::useCart
+  file: src\hooks\useCartHook.ts
+  function: src\hooks\useCartHook.ts::useCart
 
 ---
 
@@ -44980,12 +45963,12 @@ Alışveriş sepetinin durumunu ve sepete ait işlemleri dışarıya açan ana h
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useCategoryGateway.ts
-skeleton_hash: 1b375a757561a4d1
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCategoryGateway.ts
+skeleton_hash: 53e29835e6b3299d
 entity_hashes:
   func:useCategoryGateway: 8e95a6f39bff69fd
   overview: d663518b19af5432
-generated_at: 2026-08-24T11:53:27Z
+generated_at: 2026-08-27T08:34:21Z
 ---
 
 ## Genel Bakış
@@ -45164,12 +46147,12 @@ F5-B W2.1 — Gateway artık VERİ ÇEKMEZ. Liste (aile satırları) sunucuda `g
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useCategoryViewModel.ts
-skeleton_hash: 2a3d750598e1d2ce
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCategoryViewModel.ts
+skeleton_hash: f8e77f137c8a9b33
 entity_hashes:
   func:useCategoryViewModel: f906bfd41f78277c
   overview: 9ffb86ff262e790b
-generated_at: 2026-08-24T12:44:12Z
+generated_at: 2026-08-27T08:34:23Z
 ---
 
 ## Genel Bakış
@@ -45281,12 +46264,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-altyapi\src\hooks\useCheckoutCoupon.ts
-skeleton_hash: 6c126810ed805c81
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCheckoutCoupon.ts
+skeleton_hash: 04bcf61d779f3f3d
 entity_hashes:
   func:useCheckoutCoupon: 4495b524ff78f42b
   overview: 292a471e78e94271
-generated_at: 2026-08-18T06:48:05Z
+generated_at: 2026-08-27T08:34:24Z
 ---
 
 ## Genel Bakış
@@ -45377,12 +46360,12 @@ Bu modül, Venthub projesinin ödeme (checkout) sürecinde kupon kodu yönetimin
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutOrchestrator.ts
-skeleton_hash: 72543d19f0a3b8cf
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCheckoutOrchestrator.ts
+skeleton_hash: c9028befaf257cf9
 entity_hashes:
   func:useCheckoutOrchestrator: 27abaa56edfb49c9
   overview: d20540bc22d68feb
-generated_at: 2026-08-24T12:45:18Z
+generated_at: 2026-08-27T08:34:25Z
 ---
 
 ## Genel Bakış
@@ -45591,13 +46574,13 @@ type CheckoutOrchestrator = ReturnType<typeof useCheckoutOrchestrator>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutPayment.ts
-skeleton_hash: f51625cf58c944a0
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useCheckoutPayment.ts
+skeleton_hash: 7c9f7f0e9a6b4107
 entity_hashes:
   func:ServerValidationUnavailableError:constructor: ac305f0c901ddac7
   func:useCheckoutPayment: a8bb41b15d097162
   overview: 9288bb99d7e80dbc
-generated_at: 2026-08-26T07:14:12Z
+generated_at: 2026-08-27T08:35:38Z
 ---
 
 ## Genel Bakış
@@ -45652,14 +46635,14 @@ Bu modül, ödeme sürecini orkestre etmek için dış bağımlılıklara dayan�
 **Dönüş**: object — `{ loading: boolean, token: string, url: string, initiatePayment: function, ... }` şeklinde, ödeme durumunu (yükleme, token, yönlendirme URL’si) ve ödeme başlatma işlevini içeren bir nesne.
 
 ### constructor
-**Ne yapar**: `ServerValidationUnavailableError` sınıfının yapıcı metodudur. Sunucu doğrulamasının kullanılamadığı durumlarda fırlatılmak üzere özel bir hata nesnesi oluşturur. Hata mesajını, verilen `cause` değerinden türeterek standart bir önek ile birlikte yapılandırır.
+**Ne yapar**: `ServerValidationUnavailableError` sınıfının yapıcı metodudur. Sunucu doğrulamasının kullanılamadığı durumlarda fırlatılmak üzere özel bir hata nesnesi oluşturur. Hata mesajını `SERVER_VALIDATION_UNAVAILABLE` ön ekiyle birlikte verilen `cause` bilgisinden türetir.
 
-**Nasıl yapar**: Üst sınıfın (`super`) yapıcı metodunu çağırarak hata mesajını oluşturur. Mesaj, `SERVER_VALIDATION_UNAVAILABLE:` sabit metni ile `cause` parametresinin bir `Error` örneği olup olmadığına göre farklı biçimde birleştirilir: `cause` bir `Error` örneği ise `cause.message` özelliği kullanılır, aksi takdirde `String(cause)` ile metne dönüştürülür. Ardından `this.name` özelliği `'ServerValidationUnavailableError'` sabit değerine atanarak hata nesnesinin adı belirlenir.
+**Nasıl yapar**: Üst sınıfın (`Error`) yapıcı metodunu `super()` ile çağırarak hata mesajını iletir. Mesaj oluşturulurken `cause` parametresinin bir `Error` instance'ı olup olmadığı kontrol edilir; eğer öyleyse `cause.message` kullanılır, değilse `String(cause)` ile metin temsilini alır. Ardından `this.name` özelliğini `'ServerValidationUnavailableError'` olarak ayarlayarak hatanın tür adını belirler.
 
 **Parametreler**:
-- cause: unknown — Hatanın kaynağını temsil eden değer. Bir `Error` örneği olabileceği gibi herhangi bir başka türde değer de olabilir; mesaj oluşturulurken türüne göre işleme tabi tutulur.
+- cause: unknown — Hatanın kaynağını temsil eden değer. Bir `Error` nesnesi olabileceği gibi herhangi bir tip de olabilir; mesaj oluşturulurken türüne göre farklı biçimlendirme uygulanır.
 
-**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir.
+**Dönüş**: Bilinmiyor. Kaynak kodda dönüş tipi belirtilmemiştir.
 
 ---
 
@@ -45687,8 +46670,7 @@ Bu modül, ödeme sürecini orkestre etmek için dış bağımlılıklara dayan�
 - `user: User | null`
 - `clearCart: (options?: { silent: boolean }) => void`
 - `applyServerPricing: (items: { product_id: string, unit_price: number | null }[]) => void`
-- `orchestrator: {
-`
+- `orchestrator: {`
 - `couponCode: string | null`
 - `t: (key: string) => string`
 
@@ -45706,71 +46688,82 @@ type PaymentPhase = /** Henüz başlatılmadı. */
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::ServerValidationUnavailableError.constructor
+### [N1_NASIL] AST Pointer: useCheckoutPayment.ts::ServerValidationUnavailableError.constructor
 - **params**: `cause: unknown`
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (constructor — `super()` çağrısı yapar, `this.name` atar)
-
-### [N2_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useCheckoutPayment
-- **params**: `items`, `getCartTotal`, `user`, `clearCart`, `applyServerPricing`, `orchestrator`, `couponCode`, `t`
 - **ic_degiskenler**:
-  - `router` — `useRouter()` ile alınan Next.js router nesnesi; ödeme başarılı olduğunda `/payment-success` sayfasına yönlendirme yapmak için kullanılır
-  - `loading` / `setLoading` — ödeme işleminin devam edip etmediğini gösteren boolean state; `initiatePayment` başında `true`, `finally` bloğunda `false` yapılır
-  - `iyzToken` / `setIyzToken` — iyzico PSP'nin döndürdüğü token string'i; gömülü form senaryosunda `d.token` değerinden atanır
-  - `paymentUrl` / `setPaymentUrl` — PSP'nin döndürdüğü ödeme sayfası URL'i; `d.paymentPageUrl` değerinden atanır
-  - `orderId` / `setOrderId` — oluşturulan sipariş kimliği; `d.orderId` değerinden atanır, `useEffect` yoklamasında sipariş durumu sorgulamak için kullanılır
-  - `convId` / `setConvId` — iyzico conversation ID; `d.conversationId` değerinden atanır
-  - `formReady` / `setFormReady` — ödeme formunun gerçekten yüklendiğini gösteren boolean state; `markFormReady` tarafından `true` yapılır
-  - `progressPct` / `setProgressPct` — yükleme ilerleme yüzdesi (0-100); başlangıçta `20`, form yüklenirken `60`, hazır olduğunda `100`
-  - `paymentFrameContent` / `setPaymentFrameContent` — PSP'nin döndürdüğü form HTML içeriği; `d.checkoutFormContent` değerinden atanır
-  - `phase` / `setPhase` — ödeme aşaması (`PaymentPhase` tipinde); `'idle'` → `'starting'` → `'formLoading'` → `'ready'` veya `'error'`
-  - `errorMessage` / `setErrorMessage` — kullanıcıya gösterilecek hata mesajı string'i; hata durumlarında `t()` ile çevrilmiş mesaj atanır
-  - `markFormReady` — `useCallback` ile sarılı fonksiyon; form yüklendiğinde çağrılır, `formReady`'i `true`, `phase`'i `'ready'`, `progressPct`'yi `100` yapar
-  - `markFormFailed` — `useCallback` ile sarılı fonksiyon; form yüklenemediğinde çağrılır, `phase`'i `'error'` yapar, `reportError` ile hata raporlar
-  - `initiatePayment` — async fonksiyon; sunucu fiyat doğrulaması yapar, `buildPaymentRequest` ile istek oluşturur, `supabase.functions.invoke('iyzico-payment')` çağrısı yapar, başarılı olursa sipariş bilgilerini state'e ve `localStorage`'a yazar
-  - useEffect (sipariş durumu yoklaması) — `orderId` değiştiğinde tetiklenir, 3 saniyelik interval ile `venthub_orders` tablosundan `payment_status` sorgular, `'paid'` olduğunda `clearCart()` çağırır ve `/payment-success` sayfasına yönlendirir
-- **Dönüş**: nesne — `{ loading, iyzToken, paymentUrl, orderId, convId, formReady, progressPct, paymentFrameContent, phase, errorMessage, markFormReady, markFormFailed, setFormReady, setProgressPct, initiatePayment }`
+  - `cause` — super çağrısında `cause.message` (Error ise) veya `String(cause)` ile mesaj oluşturmak için kullanılır
+- **Dönüş**: yok (constructor)
 
-### [N3_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::markFormReady
+### [N2_NASIL] AST Pointer: useCheckoutPayment.ts::useCheckoutPayment
+- **params**: `items`, `getCartTotal`, `user`, `clearCart`, `applyServerPricing`, `orchestrator`, `couponCode`, `t` (UseCheckoutPaymentProps tipinden destructure edilmiş)
+- **ic_degiskenler**:
+  - `router` — `useRouter()` ile alınan Next.js router nesnesi; ödeme başarılı olduğunda `/payment-success` sayfasına yönlendirmek için kullanılır
+  - `loading` — `useState(false)` ile tanımlı boolean; ödeme işleminin devam edip etmediğini gösterir
+  - `setLoading` — `loading` state'inin setter fonksiyonu
+  - `iyzToken` — `useState('')` ile tanımlı string; iyzico PSP token'ını tutar
+  - `setIyzToken` — `iyzToken` state'inin setter fonksiyonu
+  - `paymentUrl` — `useState('')` ile tanımlı string; PSP ödeme sayfası URL'ini tutar
+  - `setPaymentUrl` — `paymentUrl` state'inin setter fonksiyonu
+  - `orderId` — `useState('')` ile tanımlı string; sipariş kimliğini tutar
+  - `setOrderId` — `orderId` state'inin setter fonksiyonu
+  - `convId` — `useState('')` ile tanımlı string; PSP conversation ID'sini tutar
+  - `setConvId` — `convId` state'inin setter fonksiyonu
+  - `formReady` — `useState(false)` ile tanımlı boolean; ödeme formunun gerçekten çıktığını gösterir
+  - `setFormReady` — `formReady` state'inin setter fonksiyonu
+  - `progressPct` — `useState(20)` ile tanımlı number; yükleme ilerleme yüzdesini tutar (başlangıç 20)
+  - `setProgressPct` — `progressPct` state'inin setter fonksiyonu
+  - `paymentFrameContent` — `useState('')` ile tanımlı string; PSP'nin döndürdüğü gömülü form HTML içeriğini tutar
+  - `setPaymentFrameContent` — `paymentFrameContent` state'inin setter fonksiyonu
+  - `phase` — `useState<PaymentPhase>('idle')` ile tanımlı PaymentPhase tipinde değer; ödeme akışının aşamasını tutar
+  - `setPhase` — `phase` state'inin setter fonksiyonu
+  - `errorMessage` — `useState('')` ile tanımlı string; kullanıcıya gösterilecek hata mesajını tutar
+  - `setErrorMessage` — `errorMessage` state'inin setter fonksiyonu
+  - `markFormReady` — `useCallback` ile tanımlı fonksiyon; form gerçekten çıktığında çağrılır, `formReady`'i true yapar, `phase`'i 'ready' yapar, `progressPct`'yi 100 yapar
+  - `markFormFailed` — `useCallback` ile tanımlı fonksiyon; yüzey kurulamadığında çağrılır, `phase`'i 'error' yapar, `errorMessage`'i ayarlar, `reportError` ile hata raporlar
+  - `initiatePayment` — async fonksiyon; ödeme işlemini başlatır (sunucu fiyat doğrulaması, ödeme isteği oluşturma, PSP çağrısı)
+  - useEffect (sipariş durumu yoklaması) — `orderId` değiştiğinde her 3 saniyede bir `venthub_orders` tablosundan `payment_status` sorgusu yapan interval kurar; 'paid' olduğunda temizlik yapar ve başarılı sayfasına yönlendirir
+- **Dönüş**: `{ loading, iyzToken, paymentUrl, orderId, convId, formReady, progressPct, paymentFrameContent, phase, errorMessage, markFormReady, markFormFailed, setFormReady, setProgressPct, initiatePayment }` — tüm state'ler ve fonksiyonlar
+
+### [N3_NASIL] AST Pointer: useCheckoutPayment.ts::markFormReady (useCallback)
 - **params**: yok
-- **ic_degiskenler**: yok (sadece setter çağrıları var)
+- **ic_degiskenler**: yok (dış scope'daki setter'lar doğrudan çağrılır: `setFormReady`, `setPhase`, `setProgressPct`)
 - **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::markFormFailed
+### [N4_NASIL] AST Pointer: useCheckoutPayment.ts::markFormFailed (useCallback)
 - **params**: `reason: string`
-- **ic_degiskenler**: yok
+- **ic_degiskenler**: yok (dış scope'daki `setPhase`, `setErrorMessage`, `t`, `reportError` doğrudan çağrılır)
 - **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::initiatePayment
+### [N5_NASIL] AST Pointer: useCheckoutPayment.ts::initiatePayment
+- **params**: yok (async arrow function)
+- **ic_degiskenler**:
+  - `authoritativeTotal` — `getCartTotal()` ile alınan başlangıç ödeme tutarı; sunucu fiyat doğrulaması sonrası `validation.totals?.subtotal` ile güncellenebilir
+  - `validation` — `validateServerCart(supabase, { userId: user?.id })` ile alınan sunucu doğrulama sonucu; `.items` ve `.totals` alanlarına erişilir
+  - `localHash` — `getPriceHashLocal(items)` ile hesaplanan yerel fiyat hash'i; sunucu hash'i ile karşılaştırılır
+  - `serverHash` — `getPriceHashServer(validation.items, items)` ile hesaplanan sunucu fiyat hash'i; `localHash` ile eşleşmezse fiyat güncellenir
+  - `buildPaymentRequest` — `await import('../views/checkout/buildPaymentRequest')` ile dynamic import edilen ödeme isteği oluşturma fonksiyonu
+  - `requestData` — `buildPaymentRequest()` ile oluşturulan ödeme isteği verisi; `amount`, `items`, `customer`, `shipping`, `billing`, `sameAsShipping`, `userId`, `invoiceType`, `invoiceInfo`, `legalConsents`, `shippingMethod`, `couponCode` alanlarını içerir
+  - `data` — `supabase.functions.invoke('iyzico-payment', { body: requestData })` yanıtının `data` alanı
+  - `error` — `supabase.functions.invoke('iyzico-payment')` yanıtının `error` alanı; varsa throw edilir
+  - `d` — `data.data`, PSP yanıtının iç verisi; `.orderId`, `.conversationId`, `.paymentPageUrl`, `.token`, `.checkoutFormContent` alanlarına erişilir
+  - `err` — catch bloğunda yakalanan hata; `unknown` tipindedir
+  - `i18nKey` — `err` nesnesinden çıkarılan i18n anahtarı (`err.i18nKey`); yoksa `null`
+  - `msg` — `err instanceof Error` ise `err.message`, değilse `String(err)` ile elde edilen hata mesajı
+  - `shown` — kullanıcıya gösterilecek hata mesajı; `i18nKey` varsa `t(i18nKey)`, yoksa `msg` veya `t('checkout.errors.paymentInit')`
+- **Dönüş**: `boolean` (başarılı form yüklemede `true`, hata durumunda `false`) veya `undefined` (paymentPageUrl redirect'inde return edilmeden önce `window.location.href` atanır)
+
+### [N6_NASIL] AST Pointer: useCheckoutPayment.ts::useEffect interval callback (anonim)
 - **params**: yok
 - **ic_degiskenler**:
-  - `authoritativeTotal` — `getCartTotal()` ile alınan sepet toplamı; sunucu fiyat doğrulaması sonrası `validation.totals?.subtotal` ile güncellenebilir
-  - `validation` — `validateServerCart(supabase, { userId: user?.id })` sonucu; sunucu tarafı sepet doğrulaması verisi
-  - `localHash` — `getPriceHashLocal(items)` ile hesaplanan istemci tarafı fiyat hash'i
-  - `serverHash` — `getPriceHashServer(validation.items, items)` ile hesaplanan sunucu tarafı fiyat hash'i; `localHash` ile eşleşmezse fiyat güncellenir
-  - `buildPaymentRequest` — `await import('../views/checkout/buildPaymentRequest')` ile dinamik olarak yüklenen fonksiyon
-  - `requestData` — `buildPaymentRequest()` çağrısının döndürdüğü ödeme istek verisi; `amount`, `items`, `customer`, `shipping`, `billing`, `sameAsShipping`, `userId`, `invoiceType`, `invoiceInfo`, `legalConsents`, `shippingMethod`, `couponCode` alanlarını içerir
-  - `data` — `supabase.functions.invoke('iyzico-payment', { body: requestData })` sonucunun `data` alanı
-  - `error` — `supabase.functions.invoke` sonucunun `error` alanı; varsa throw edilir
-  - `d` — `data.data` alt nesnesi; PSP yanıtını içerir
-  - `d.orderId` — PSP'nin döndürdüğü sipariş kimliği; `localStorage`'a `PENDING_ORDER_KEY` ile yazılır
-  - `d.conversationId` — PSP'nin döndürdüğü conversation ID; `localStorage`'a yazılır
-  - `d.paymentPageUrl` — PSP'nin döndürdüğü ödeme sayfası URL'i; token yoksa `window.location.href` ile yönlendirme yapılır
-  - `d.token` — PSP'nin döndürdüğü token; `setIyzToken` ile state'e atanır
-  - `d.checkoutFormContent` — PSP'nin döndürdüğü form HTML içeriği; `setPaymentFrameContent` ile state'e atanır
-  - `err` — `catch` bloğundaki hata nesnesi; `i18nKey` özelliği varsa çevrilmiş mesaj gösterilir
-  - `i18nKey` — `err` nesnesinden çıkarılan i18n anahtarı; `err.i18nKey` varsa `String()` ile dönüştürülür, yoksa `null`
-  - `msg` — `err instanceof Error` ise `err.message`, değilse `String(err)`
-  - `shown` — kullanıcıya gösterilecek mesaj; `i18nKey` varsa `t(i18nKey)`, yoksa `msg || t('checkout.errors.paymentInit')`
-- **Dönüş**: `boolean` — başarılıysa `true`, hata durumunda `false`
+  - `timer` — `setInterval(async () => {...}, 3000)` ile oluşturulan zamanlayıcı kimliği; `clearInterval(timer)` ile temizlenir
+  - `data` — `supabase.from('venthub_orders').select('payment_status').eq('id', orderId).maybeSingle()` sorgusundan dönen veri; `data?.payment_status` kontrol edilir
+- **Dönüş**: cleanup fonksiyonu (`() => clearInterval(timer)`)
 
-### [N6_NASIL] AST Pointer: src/hooks/useCheckoutPayment.ts::useEffect (sipariş durumu yoklaması)
-- **params**: yok (dışarıdan `orderId`, `clearCart`, `router` kullanır)
+### [N7_NASIL] AST Pointer: useCheckoutPayment.ts::setInterval async callback (anonim)
+- **params**: yok
 - **ic_degiskenler**:
-  - `timer` — `setInterval` ile oluşturulan zamanlayıcı ID'si; `clearInterval` ile temizlenir
-  - `data` — `supabase.from('venthub_orders').select('payment_status').eq('id', orderId).maybeSingle()` sorgu sonucu
-  - `data?.payment_status` — siparişin ödeme durumu; `'paid'` olduğunda zamanlayıcı durdurulur, `localStorage` temizlenir, sepet boşaltılır ve ödeme başarı sayfasına yönlendirilir
-- **Dönüş**: cleanup fonksiyonu — `return () => clearInterval(timer)`
+  - `data` — `supabase.from('venthub_orders').select('payment_status').eq('id', orderId).maybeSingle()` sorgusundan dönen veri; `data?.payment_status === 'paid'` olduğunda temizlik yapılır ve yönlendirme gerçekleşir
+- **Dönüş**: yok
 
 ---
 
@@ -45794,12 +46787,12 @@ type PaymentPhase = /** Henüz başlatılmadı. */
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useDragScroll.ts
-skeleton_hash: f543371fbdfe6cc5
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useDragScroll.ts
+skeleton_hash: 66164a6764c33264
 entity_hashes:
   func:useDragScroll: 285567f9f95bbe2e
   overview: 65551040518f5649
-generated_at: 2026-08-25T07:27:13Z
+generated_at: 2026-08-27T08:35:39Z
 ---
 
 ## Genel Bakış
@@ -45813,10 +46806,6 @@ Bu modül, sürükleme tabanlı kaydırma (drag scroll) işlevselliği sağlayan
 Modülün tek ve ana fonksiyonudur. Sürükleme ile kaydırma davranışını yöneten bir React hook'u olarak tanımlanmıştır.
 
 - useDragScroll
-
----
-
-**Not:** Kaynak kodu incelenmediğinden, fonksiyonun döndürdüğü değerler, kabul ettiği parametreler ve iç işleyişi hakkında detaylı bilgi verilememektedir. Detaylı bilgi için kaynak dosyanın incelenmesi gerekir.
 
 ---
 
@@ -45911,8 +46900,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: useDragScroll.ts
-  function: useDragScroll.ts::useDragScroll
+  file: src\hooks\useDragScroll.ts
+  function: src\hooks\useDragScroll.ts::useDragScroll
 
 ---
 
@@ -45926,13 +46915,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useFavorites.ts
-skeleton_hash: 88946dc0241b1f87
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useFavorites.ts
+skeleton_hash: fe4dedc11d2e5faf
 entity_hashes:
   func:readIds: af9317674fdf837a
   func:useFavorites: dcf6b0f3ad596563
   overview: 0ff10d420319610b
-generated_at: 2026-08-24T12:45:51Z
+generated_at: 2026-08-27T08:35:40Z
 ---
 
 ## Genel Bakış
@@ -46026,12 +47015,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useHideOnScroll.ts
-skeleton_hash: 487831d2e25b9a1a
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useHideOnScroll.ts
+skeleton_hash: 2daa2054c3757b69
 entity_hashes:
   func:useHideOnScroll: 8147a4dacc20e5ab
   overview: 12bcf4529d8cd3f7
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:35:42Z
 ---
 
 ## Genel Bakış
@@ -46119,12 +47108,12 @@ Bu React hook'u, kaydırma olaylarını dinleyerek UI elemanlarının görünür
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useInventoryDetail.ts
-skeleton_hash: fa74620e6ff72d0e
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useInventoryDetail.ts
+skeleton_hash: d5b8332d884ba108
 entity_hashes:
   func:useInventoryDetail: 6339f8150a38b023
   overview: 4c4c791d580870aa
-generated_at: 2026-08-24T12:47:22Z
+generated_at: 2026-08-27T08:35:43Z
 ---
 
 ## Genel Bakış
@@ -46446,12 +47435,12 @@ Tablodan gelen satır — eşik kolonu view'de yok, `products`'tan eşleştirili
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useIsMounted.ts
-skeleton_hash: fddb67ba3050ee3f
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useIsMounted.ts
+skeleton_hash: 12b806a51bd6813e
 entity_hashes:
   func:useIsMounted: ae14f2fca3691906
   overview: 050973256d3540a7
-generated_at: 2026-08-25T07:26:55Z
+generated_at: 2026-08-27T08:35:45Z
 ---
 
 ## Genel Bakış
@@ -46508,8 +47497,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: useIsMounted.ts
-  function: useIsMounted.ts::useIsMounted
+  file: src\hooks\useIsMounted.ts
+  function: src\hooks\useIsMounted.ts::useIsMounted
 
 ---
 
@@ -46523,13 +47512,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useLocalizedRoutes.ts
-skeleton_hash: 04da0f3115ca38f1
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useLocalizedRoutes.ts
+skeleton_hash: 7a040af28515001e
 entity_hashes:
-  func:createLocalizedProxy: b213c316ec0c2854
-  func:useLocalizedRoutes: d8dba6cf829a1dea
+  func:createLocalizedProxy: 4d95c08749380726
+  func:useLocalizedRoutes: 7a3cb2d3169a4afe
   overview: 9cb31a2460306030
-generated_at: 2026-06-15T17:03:48Z
+generated_at: 2026-08-27T08:36:15Z
 ---
 
 ## Genel Bakış
@@ -46565,16 +47554,15 @@ Aktif dil bilgisini React Context üzerinden alarak, uygulama genelinde kullanı
 ## FONKSİYON DETAYLARI
 
 ### createLocalizedProxy
+**Ne yapar**: Verilen bir nesneyi JavaScript `Proxy` ile sarmalayarak, bu nesne üzerindeki fonksiyon çağrılarının ve iç içe nesne erişimlerinin otomatik olarak yerelleştirilmiş (localized) URL'ler üretmesini sağlar. Rota tanımlarını dil duyarlı hale getirmek için kullanılır.
 
-**Ne yapar**: Verilen bir nesneyi JavaScript Proxy ile sararak, tüm fonksiyon çağrılarının sonuçlarını otomatik olarak lokalize eder. Bu sayede bir route nesnesi üzerindeki fonksiyonlar çağrıldığında, dönen URL'ler seçilen dile göre otomatik dönüşüme uğrar.
-
-**Nasıl yapar**: JavaScript Proxy nesnesi oluşturarak target nesnesinin her bir property erişimini yakalar. `get` trap'i içinde drei senaryoyu yönetir: Eğer erişilen değer bir fonksiyon ise, bu fonksiyonu bir wrapper ile sarar ve orijinal fonksiyonun döndürdüğü URL'yi `localizedHref` fonksiyonu ile dile dönüştürür. Eğer değer null olmayan bir object ise, recursive olarak kendini tekrar çağırarak iç içe nesneleri de proxy ile sarar. Diğer tüm durumlarda (primitive değerler, string'ler, sayılar vb.) değeri olduğu gibi döndürür. `Reflect.get` kullanılarak orijinal nesnenin property değeri güvenli bir şekilde alınır.
+**Nasıl yapar**: `Proxy` nesnesi oluşturarak `get` tuzağı (trap) tanımlar. Bir özelliğe erişildiğinde `Reflect.get` ile değeri alır ve üç senaryoya göre hareket eder: Eğer değer bir fonksiyonsa, bu fonksiyonu saran yeni bir fonksiyon döndürür; saran fonksiyon orijinal fonksiyonu çağırarak elde ettiği URL'yi `localizedHref` fonksiyonu ile dile göre dönüştürür. Eğer değer null olmayan bir nesneseyse, aynı mantıkla o nesne için de özyinelemeli (recursive) olarak yeni bir `createLocalizedProxy` çağrısı yapar; böylece iç içe geçmiş rota nesnelerinin tamamı yerelleştirilir. Diğer durumlarda (primitif değerler) değeri olduğu gibi döndürür.
 
 **Parametreler**:
-- `target: T extends object` — Proxy ile sarılacak kaynak nesne. Fonksiyonlar veya iç içe nesneler içerebilen herhangi bir nesne tipi olabilir.
-- `lang: string` — Hedef lokalizasyon dili. URL'lerin dönüştürüleceği dil kodunu belirtir (örn: "tr", "en", "de").
+- target: `T` (burada `T extends object`) — Yerelleştirilecek hedef nesne. Genellikle rota tanımlarını içeren bir nesnedir.
+- lang: `string` — Hedef dil kodu. URL'lerin hangi dile göre yerelleştirileceğini belirtir.
 
-**Dönüş**: `T` — Orijinal nesnenin tipi ile aynı olan bir Proxy nesnesi döndürülür. TypeScript jenerik yapısı sayesinde, çağrı yapan kodun tip güvenliği korunurken, tüm property erişimleri ve fonksiyon çağrıları localize edilmiş şekilde çalışır.
+**Dönüş**: `T` tipinde bir `Proxy` nesnesi döndürür. Bu proxy, orijinal nesneyle aynı arayüze sahiptir ancak fonksiyon çağrıları ve iç içe nesne erişimleri yerelleştirilmiş URL'ler üretir.
 
 ### useLocalizedRoutes
 **Ne yapar**: Aktif dil context'ine duyarlı, yerelleştirilmiş bir Routes proxy nesnesi döner.  
@@ -46602,21 +47590,21 @@ type RouteFunction = (...args: unknown[]) => string
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: useLocalizedRoutes.ts::createLocalizedProxy
-- **params**: `(target: T, lang: string)`
+### [N1_NASIL] AST Pointer: src/hooks/useLocalizedRoutes.ts::createLocalizedProxy
+- **params**: `target` — T tipinde, proxy ile sarılacak hedef nesne; `lang` — string, yerelleştirme için dil kodu
 - **ic_degiskenler**:
-  - `value` — `Reflect.get(t, prop)` ile proxy target'ından erişilen property'nin ham değeri; fonksiyon mu nesne mi olduğunu belirlemek için kullanılır
-  - `t` — Proxy handler `get` trap'indeki orijinal target referansı
-  - `prop` — Proxy'ye erişilen property adı (symbol veya string)
-  - `originalUrl` — `value` bir fonksiyon olduğunda, o fonksiyonun `args` ile çağrılmasından dönen orijinal URL string'i; `localizedHref`'e girdi olarak verilir
-  - `args` — Proxy üzerinden çağrılan orijinal route fonksiyonuna aktarılan argümanlar dizisi
-- **Dönüş**: `new Proxy(target, handler)` — `target` objesinin her property erişimini `localizedHref` ile sarmalayan proxy nesnesi (tip: T)
+  - `t` — Proxy get handler'ında yakalanan hedef nesne (target ile aynı referans)
+  - `prop` — Proxy get handler'ında erişilen özellik adı (string | symbol)
+  - `value` — `Reflect.get(t, prop)` ile elde edilen özelliğin değeri
+  - `args` — Özellik fonksiyon ise, o fonksiyona iletilen bilinmeyen türdeki argüman dizisi
+  - `originalUrl` — `(value as RouteFunction)(...args)` çağrısından dönen orijinal URL string'i
+- **Dönüş**: T — `new Proxy(target, ...)` ile oluşturulan proxy nesnesi; özellik fonksiyon ise `localizedHref(originalUrl, lang)` sonucu, nesne ise özyinelemeli `createLocalizedProxy(value, lang)` sonucu, diğer durumlarda ham değer döner
 
-### [N2_NASIL] AST Pointer: useLocalizedRoutes.ts::useLocalizedRoutes
-- **params**: `(yok)`
+### [N2_NASIL] AST Pointer: src/hooks/useLocalizedRoutes.ts::useLocalizedRoutes
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `lang` — `useI18n()` hook'unun dönüşünden destructure edilen mevcut dil kodu string'i; proxy'nin href dönüştürmelerinde hangi dilin kullanılacağını belirler
-- **Dönüş**: `useMemo` ile sarılmış `createLocalizedProxy(Routes, lang)` sonucu; `Routes` objesinin tüm href fonksiyonlarını otomatik localize eden proxy nesnesi; `lang` değiştiğinde yeniden hesaplanır
+  - `lang` — `useI18n()` çağrısından destructure edilen mevcut dil kodu
+- **Dönüş**: `useMemo(() => createLocalizedProxy(Routes, lang), [lang])` — `lang` değişkenine bağlı olarak hesaplanan, `Routes` nesnesinin yerelleştirilmiş proxy kopyası
 
 ---
 
@@ -46639,12 +47627,12 @@ type RouteFunction = (...args: unknown[]) => string
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useManualScrollRestoration.ts
-skeleton_hash: 7e697c3523ec0619
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useManualScrollRestoration.ts
+skeleton_hash: b6add87fcecc9552
 entity_hashes:
   func:useManualScrollRestoration: c36f5fe9ca492bf5
   overview: fbb89d52cd2f5084
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:36:16Z
 ---
 
 ## Genel Bakış
@@ -46783,12 +47771,12 @@ Bu modül, React tabanlı web uygulamalarında sayfa yönlendirmeleri veya yenid
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useNavigationState.ts
-skeleton_hash: 8625c236e971e1a7
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useNavigationState.ts
+skeleton_hash: d45035348ace3aad
 entity_hashes:
   func:useNavigationState: 312ef38a3d9c5c5d
   overview: cee2f65a2ff09739
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:36:18Z
 ---
 
 ## Genel Bakış
@@ -46940,12 +47928,12 @@ type NavigationSurface = 'none' | 'menu' | 'categoryHub' | 'search'
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useProjectLists.ts
-skeleton_hash: ec9603d0175eb421
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useProjectLists.ts
+skeleton_hash: 16fe78060ed8dea8
 entity_hashes:
   func:useProjectLists: e1f5d498634d6db5
   overview: b42bbc25ae784887
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:36:19Z
 ---
 
 ## Genel Bakış
@@ -47030,12 +48018,12 @@ Bağlam bulunamadığında ise `PROJECT_FALLBACK` sabiti döndürülür; bu değ
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useRole.ts
-skeleton_hash: cba8bff2feceafcc
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useRole.ts
+skeleton_hash: 64b5da2aadc4dc55
 entity_hashes:
   func:useRole: 86c3bf52308dd229
   overview: 90cbd0f7f32b7b04
-generated_at: 2026-08-25T07:27:08Z
+generated_at: 2026-08-27T08:36:20Z
 ---
 
 ## Genel Bakış
@@ -47112,8 +48100,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: useRole.ts
-  function: useRole.ts::useRole
+  file: src\hooks\useRole.ts
+  function: src\hooks\useRole.ts::useRole
 
 ---
 
@@ -47127,12 +48115,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useScrollAnimation.ts
-skeleton_hash: 27cee276d7d1c833
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useScrollAnimation.ts
+skeleton_hash: fd8df5ccbb04a0ee
 entity_hashes:
   func:useScrollAnimation: 82da0eb2280833d9
   overview: d9bfa1798829a924
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:36:21Z
 ---
 
 ## Genel Bakış
@@ -47278,13 +48266,13 @@ Bu modül, tarayıcı tabanlı uygulamalarda kullanılmak üzere tasarlanmış, 
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useScrollThrottle.tsx
-skeleton_hash: 76f0aa788753fa84
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useScrollThrottle.tsx
+skeleton_hash: e6802c65c1edd874
 entity_hashes:
   func:useScrollThrottle: 8c5a736c0985619d
   overview: 780bbb29a8b9d01e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:27:31Z
+generated_at: 2026-08-27T08:36:22Z
 ---
 
 ## Genel Bakış
@@ -47408,8 +48396,8 @@ type ScrollThrottleOptions = {
 
 ## NODE ID STANDARD
 
-  file: useScrollThrottle.tsx
-  function: useScrollThrottle.tsx::useScrollThrottle
+  file: src\hooks\useScrollThrottle.tsx
+  function: src\hooks\useScrollThrottle.tsx::useScrollThrottle
 
 ---
 
@@ -47440,12 +48428,12 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useSettings.ts
-skeleton_hash: c3659edf855e64a7
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useSettings.ts
+skeleton_hash: a2fb80737f6bcb74
 entity_hashes:
   func:useSettings: caf0b25f3b0d5fb3
   overview: 094819e02d799328
-generated_at: 2026-06-19T11:49:28Z
+generated_at: 2026-08-27T08:36:23Z
 ---
 
 ## Genel Bakış
@@ -47492,10 +48480,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## INTERFACES
 
 ### AppSettings
-- `general: {
-`
-- `payment: {
-`
+- `general: {`
+- `payment: {`
 
 ---
 
@@ -47537,14 +48523,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useTenant.tsx
-skeleton_hash: dbfcd5af80785735
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useTenant.tsx
+skeleton_hash: a75eef71f2e931f3
 entity_hashes:
   func:TenantProvider: 55e323a184679af4
   func:useTenant: 1b557639af7ddf07
   overview: ea8d03008ab03037
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:27:21Z
+generated_at: 2026-08-27T08:36:25Z
 ---
 
 ## Genel Bakış
@@ -47634,9 +48620,9 @@ Bu modül, tenant (kiracı) yapılandırma bilgisini React bileşen ağacı boyu
 
 ## NODE ID STANDARD
 
-  file: useTenant.tsx
-  function: useTenant.tsx::TenantProvider
-  function: useTenant.tsx::useTenant
+  file: src\hooks\useTenant.tsx
+  function: src\hooks\useTenant.tsx::TenantProvider
+  function: src\hooks\useTenant.tsx::useTenant
 
 ---
 
@@ -49952,16 +50938,28 @@ Bu dosyada fonksiyon tanımlanmamıştır. Yalnızca `dataTable` adında bir obj
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\en.ts
-skeleton_hash: 52acb6a97b3323f4
+source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\en.ts
+skeleton_hash: 458261091768abac
 entity_hashes:
-  overview: d20c765ec6eb43b4
-generated_at: 2026-08-27T06:50:42Z
+  overview: 4b1e1c79283931d3
+generated_at: 2026-08-15T19:08:10Z
 ---
 
 ## Genel Bakış
+Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturarak erişilebilirlik, denetim, otorite, kategoriler, ortak metinler, kontrol paneli, veri tablosu ve kuponlar gibi farklı modüllerin çeviri kaynaklarını tek bir `admin` nesnesi altında birleştirir. Uygulama genelinde tutarlı dil kullanımı sağlamak ve çeviri yönetimini merkezileştirmek amacıyla yapılandırılmış statik bir veri dosyasıdır. Dosya herhangi bir fonksiyon, ortam değişkeni veya API çağrısı içermez; yalnızca import edilmiş alt sözlükleri bir araya getirerek dışa aktarır.
 
-Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturmak amacıyla farklı modüllere ait çeviri kaynaklarını tek bir `admin` nesnesi altında birleştirir. a11y, audit, authority, categories, common, confirm, coupons ve dashboard gibi alt sözlükleri import ederek dışa aktarır. Dosya herhangi bir fonksiyon, ortam değişkeni veya API çağrısı içermez; yalnızca statik çeviri verilerini merkezileştiren bir birleştirme modülüdür.
+## Modül Yapısı
+Bu dosya fonksiyon içermediğinden "Fonksiyon Grupları" bölümü yerine modülün yapısı aşağıda özetlenmiştir.
+
+### İçe Aktarılan Alt Sözlükler
+Modül, farklı alanlara ait çeviri dosyalarını import ederek tek bir `admin` nesnesi altında birleştirir. Her bir import, ilgili domain'e ait anahtar-değer çiftlerini taşır.
+- a11y (erişilebilirlik), audit (denetim), authority (otorite), categories (kategoriler), common (ortak metinler), confirm (onay metinleri), coupons (kuponlar), dashboard (kontrol paneli), dataTable (veri tablosu), errorGroups (hata grupları), errors (hatalar), inventory (envanter), logistics (lojistik), menu (menü), movements (hareketler), orders (siparişler), pricing (fiyatlandırma), products (ürünler), returns (iadeler), search (arama), settings (ayarlar), titles (başlıklar), toolbar (araç çubuğu), ui (arayüz), users (kullanıcılar), webhooks
+
+### Dışa Aktarılan Sabitler
+Modülün tek çıktısı olan `admin` nesnesi, tüm alt sözlükleri bir araya getirerek uygulama genelinde çeviri erişimi sağlar.
+
+### Bağımlılıklar
+Dosya yalnızca yerel çeviri dosyalarına bağımlıdır; dış API, ortam değişkeni veya dinamik yükleme (lazy import) içermez. Tüm bağımlılıklar statik ve derleme zamanında çözümlenir.
 
 ---
 
@@ -49985,19 +50983,16 @@ Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturmak ama
 - import: ./confirm.en::confirm
 - import: ./coupons.en::coupons
 - import: ./dashboard.en::dashboard
-- import: ./dataRequests.en::dataRequests
 - import: ./dataTable.en::dataTable
 - import: ./errorGroups.en::errorGroups
 - import: ./errors.en::errors
 - import: ./inventory.en::inventory
-- import: ./invoices.en::invoices
 - import: ./logistics.en::logistics
 - import: ./menu.en::menu
 - import: ./movements.en::movements
 - import: ./orders.en::orders
 - import: ./pricing.en::pricing
 - import: ./products.en::products
-- import: ./purchasing.en::purchasing
 - import: ./returns.en::returns
 - import: ./search.en::search
 - import: ./settings.en::settings
@@ -50016,21 +51011,68 @@ Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturmak ama
   common,
   confirm,
   coupons,
-  dataRequests,
-  dataTabl...`
+  dataTable,
+  dashboard,...`
 
 ---
 
 ## AST POINTERS
 
-Bu dosyada (`C:\tmp\vh-comp\src\i18n\dictionaries\admin\en.ts`) fonksiyon tanımlanmamıştır.
+### [N1_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::a11y
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `a11y` nesnesi (erişilebilirlik çevirileri içerir)
 
-Dosya yalnızca aşağıdaki bileşenlerden oluşur:
+### [N2_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::theme
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `theme` nesnesi (tema/renk çevirileri içerir)
 
-- **İçe Aktarımlar**: `a11y`, `audit`, `authority`, `categories`, `common`, `confirm`, `coupons`, `dashboard`, `dataRequests`, `dataTable` — her biri kendi `.en` modülünden tekil export olarak alınır.
-- **Sabit**: `admin` — object türünde bir sabit; muhtemelen yukarıdaki tüm içe aktarımları tek bir çatı altında birleştiren sözlük (dictionary) nesnesi.
+### [N3_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::audit
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `audit` nesnesi (denetim/logging çevirileri içerir)
 
-Fonksiyon gövdesi bulunmadığından AST Pointer üretilecek birim yoktur.
+### [N4_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::authority
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `authority` nesnesi (yetki/izin çevirileri içerir)
+
+### [N5_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::categories
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `categories` nesnesi (kategori çevirileri içerir)
+
+### [N6_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::common
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `common` nesnesi (genel ortak çevirileri içerir)
+
+### [N7_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::confirm
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `confirm` nesnesi (onay/pencere çevirileri içerir)
+
+### [N8_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::coupons
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `coupons` nesnesi (kupon çevirileri içerir)
+
+### [N9_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::dashboard
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `dashboard` nesnesi (gösterge paneli çevirileri içerir)
+
+### [N10_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::dataTable
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `dataTable` nesnesi (veri tablosu çevirileri içerir)
+
+### [N11_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::admin
+- **params**: (parametre yok)
+- **ic_degiskenler**: 
+  - `admin` — Tüm import edilen çeviri modüllerini (a11y, theme, audit, authority, categories, common, confirm, coupons, dashboard, dataTable) birleştiren ve export edilen ana İngilizce sözlük nesnesi
+- **Dönüş**: `admin` nesnesi (tüm admin alanı çevirilerini birleştiren ana sözlük)
 
 ---
 
@@ -56884,8 +57926,8 @@ type VariantSelection = <T extends VariantLike>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductFanSelection.ts
-skeleton_hash: d25b597f76ec7fa0
+source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductFanSelection.ts
+skeleton_hash: cf67fad21ac874be
 entity_hashes:
   func:calismaNoktasi: 477178de8115d130
   func:degerlendir: f750568727981b71
@@ -56894,7 +57936,7 @@ entity_hashes:
   func:secimYap: 4647312ff1acd1ac
   func:sistemKatsayisi: 04ecc41bc675abb4
   overview: 1ad4e3445b46e669
-generated_at: 2026-08-25T08:44:57Z
+generated_at: 2026-08-27T07:32:10Z
 ---
 
 ## Genel Bakış
@@ -57045,15 +58087,23 @@ type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
 
 ## SABİTLER
 - **MAHAL_KURALLARI** (object) — `{
+
   bathroom: { ach: 8, minimumM3h: 85 },
+
   kitchen: { ach: 15, minimumM3h:...`
 - **GUZERGAH_GEOMETRISI** (object) — `{
+
   short: { uzunlukM: 3, dirsek90: 1, dirsek45: 0 },
+
   medium: { uzunlukM:...`
 - **SESSIZLIK_AGIRLIGI** (object) — `{
+
   normal: 0.2,
+
   important: 0.4,
+
   critical: 0.6,
+
 }`
 
 ---
@@ -57146,11 +58196,11 @@ graph TD
     ductFanSelection_ts__parsePQCurve["parsePQCurve"]
     ductFanSelection_ts__secimYap["secimYap"]
     ductFanSelection_ts__sistemKatsayisi["sistemKatsayisi"]
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
     ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
 ```
 
 ## NODE ID STANDARD
@@ -57193,8 +58243,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductPressure.ts
-skeleton_hash: 1579ba7b4e3d68fe
+source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductPressure.ts
+skeleton_hash: a0b705802650fa34
 entity_hashes:
   func:akisHizi: a87413c22f69c858
   func:dinamikBasinc: 4288bc94c70c6d78
@@ -57202,7 +58252,7 @@ entity_hashes:
   func:reynolds: d87c6fd9c4af1b38
   func:surtunmeFaktoru: 20425e5a77455729
   overview: 1dd122290e85a03e
-generated_at: 2026-08-25T08:44:34Z
+generated_at: 2026-08-27T07:32:10Z
 ---
 
 ## Genel Bakış
@@ -57299,15 +58349,23 @@ type KanalMalzemesi = keyof typeof PURUZLULUK_M
 
 ## SABİTLER
 - **PURUZLULUK_M** (as_expression) — `{
+
   galvanized: 0.00015,
+
   pvc: 0.00001,
+
   flex: 0.003,
+
 } as const`
 - **FITTING_K** (as_expression) — `{
+
   /** 90° yuvarlak dirsek, eğrilik yarıçapı = 1,5·D (tipik hazır dirsek). ...`
 - **TERMINAL_K** (as_expression) — `{
+
   /** İç mahal egzoz menfezi/ızgarası. */
+
   menfez: 2.5,
+
   /** Geri-akış...`
 - **TERMINAL_K_TOPLAM** (binary_expression) — `TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur`
 
@@ -57371,8 +58429,8 @@ graph TD
     ductPressure_ts__kanalBasincKaybi["kanalBasincKaybi"]
     ductPressure_ts__reynolds["reynolds"]
     ductPressure_ts__surtunmeFaktoru["surtunmeFaktoru"]
-    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
+    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__akisHizi
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__dinamikBasinc
 ```
@@ -65707,12 +66765,12 @@ file: C:\Users\alize\venthub-hvac\src\types\vitest-axe.d.ts
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\3dModelOffsets.ts
-skeleton_hash: b3a408f47684b4ab
+source_path: C:\tmp\vh-altyapi-t165\src\utils\3dModelOffsets.ts
+skeleton_hash: 4c54120c8509f808
 entity_hashes:
   func:getModelPlacement: 52ef620921a90fe6
   overview: ed4492b80664afe2
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:36:27Z
 ---
 
 ## Genel Bakış
@@ -65830,8 +66888,8 @@ type ModelContext = 'grounded' | 'centered' | 'orbital'
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\adminQueryFilters.ts
-skeleton_hash: 331949875cff49bb
+source_path: C:\tmp\vh-altyapi-t165\src\utils\adminQueryFilters.ts
+skeleton_hash: d34eb7c01e894809
 entity_hashes:
   func:eqValue: 6ee7485124ac79c3
   func:ilikeContains: 9f1cad34e47b3f24
@@ -65839,7 +66897,7 @@ entity_hashes:
   func:orIlikeContains: 3fcfe7696b288256
   func:quoteFilterValue: b1ee36a50a7c1f00
   overview: 33ade9288c229159
-generated_at: 2026-08-25T08:45:15Z
+generated_at: 2026-08-27T08:36:28Z
 ---
 
 ## Genel Bakış
@@ -65958,8 +67016,8 @@ graph TD
     adminQueryFilters_ts__orConditions["orConditions"]
     adminQueryFilters_ts__orIlikeContains["orIlikeContains"]
     adminQueryFilters_ts__quoteFilterValue["quoteFilterValue"]
-    adminQueryFilters_ts__orIlikeContains --> adminQueryFilters_ts__ilikeContains
     adminQueryFilters_ts__ilikeContains --> adminQueryFilters_ts__quoteFilterValue
+    adminQueryFilters_ts__orIlikeContains --> adminQueryFilters_ts__ilikeContains
     adminQueryFilters_ts__eqValue --> adminQueryFilters_ts__quoteFilterValue
 ```
 
@@ -65988,14 +67046,14 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\adminShipping.ts
-skeleton_hash: d9db2383d8a60915
+source_path: C:\tmp\vh-altyapi-t165\src\utils\adminShipping.ts
+skeleton_hash: 239e849b7b70a52d
 entity_hashes:
   func:SharedTrackingDeclinedError:constructor: 0da9cec1646cf6c1
   func:invokeShippingUpdate: c7a81a79ab7e135c
   func:isSharedTrackingConflict: 7ea7741c5087f777
   overview: 4609d8f90089ab87
-generated_at: 2026-08-25T07:28:55Z
+generated_at: 2026-08-27T08:37:11Z
 ---
 
 ## Genel Bakış
@@ -66036,7 +67094,11 @@ Paylaşımlı takip numarası çakışması durumunu tanımlar ve tespit eder. `
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### constructor
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: `SharedTrackingDeclinedError` sınıfının yapıcı metodudur. Bu hata sınıfı, paylaşılan bir takip numarasının onaylanmaması durumunda fırlatılmak üzere özel bir hata nesnesi oluşturur ve başlatır.
+**Nasıl yapar**: Metot, üst sınıfın (muhtemelen `Error`) yapıcı metodunu `super()` çağrısıyla çalıştırır ve varsayılan bir hata mesajı olarak `'Paylaşılan takip numarası onaylanmadı; kargo bilgisi yazılmadı.'` iletir. Ardından, oluşturulan hata nesnesinin `name` özelliğini `'SharedTrackingDeclinedError'` olarak ayarlayarak hatanın türünü tanımlar.
+**Parametreler**:
+- Bu fonksiyon herhangi bir parametre almaz.
+**Dönüş**: Kaynakta dönüş tipi açıkça belirtilmemiştir. TypeScript'te `constructor` metodları genellikle `void` döndürür, ancak bu spesifik durumda dönüş tipi bilinmiyor.
 
 ---
 
@@ -66044,8 +67106,7 @@ Paylaşımlı takip numarası çakışması durumunu tanımlar ve tespit eder. `
 
 ### ShippingFunctionsHost
 Bu modülün istemciden ihtiyaç duyduğu TEK yetenek. `SupabaseClient<Database>` yerine dar bir sözleşme yazıldı — gerçek istemci bunu yapısal olarak zaten karşılıyor, ama test bir "sahte istemci" üretmek için tip zorlamasına (`as unknown as`) mecbur kalmıyor. Tip zorlaması testte de üretimdeki kadar t
-- `functions: {
-`
+- `functions: {`
 
 ---
 
@@ -66074,24 +67135,24 @@ type ShippingInvokeOutcome = | { ok: true; conflict: false }
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/utils/adminShipping.ts::isSharedTrackingConflict
+### [N1_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\utils\adminShipping.ts::isSharedTrackingConflict
 - **params**: `error: unknown`
 - **ic_degiskenler**:
-  - `context` — `error` nesnesinin `context` özelliği; optional chaining (`?.`) ile güvenli erişim sağlanır, ardından `null` kontrolü yapılır
-  - `body` — `context`'in `clone().json()` ile ayrıştırılan yanıt gövdesi; `clone()` çağrısı, orijinal `Response` nesnesinin tüketilmesini engellemek için yapılır
-- **Dönüş**: `Promise<boolean>` — `context` bir `Response` örneği değilse, `status` 409 değilse veya `json()` ayrıştırması başarısız olursa `false` döner; gövde içindeki `error` alanı `SHARED_TRACKING_CONFLICT` sabitine eşitse `true` döner
+  - `context` — `error` nesnesinin `context` özelliğini alır; `Response` instance'ı olup olmadığını kontrol eder.
+  - `body` — `context.clone().json()` ile elde edilen yanıt gövdesi; `SHARED_TRACKING_CONFLICT` sabitiyle eşleşip eşleşmediğini kontrol eder.
+- **Dönüş**: `Promise<boolean>`
 
-### [N2_NASIL] AST Pointer: src/utils/adminShipping.ts::invokeShippingUpdate
+### [N2_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\utils\adminShipping.ts::invokeShippingUpdate
 - **params**: `supabase: ShippingFunctionsHost`, `body: ShippingUpdateBody`, `allowSharedTracking` (varsayılan değer: `false`)
 - **ic_degiskenler**:
-  - `payload` — `allowSharedTracking` true ise `body` nesnesine `allow_shared_tracking: true` alanı eklenmiş genişletilmiş kopyası (`{ ...body, allow_shared_tracking: true }`); false ise `body`'nin kendisi
-  - `error` — `supabase.functions.invoke('admin-update-shipping', { body: payload })` çağrısından dönen hata nesnesi; destructuring ile alınır
-- **Dönüş**: `Promise<ShippingInvokeOutcome>` — hata yoksa `{ ok: true, conflict: false }` döner; hata varsa `{ ok: false, conflict: <isSharedTrackingConflict sonucu>, error }` döner
+  - `payload` — `allowSharedTracking` true ise `body`'ye `allow_shared_tracking: true` eklenmiş nesne, aksi halde `body`'nin kendisi.
+  - `error` — `supabase.functions.invoke('admin-update-shipping', { body: payload })` çağrısının hata sonucu.
+- **Dönüş**: `Promise<ShippingInvokeOutcome>`
 
-### [N3_NASIL] AST Pointer: src/utils/adminShipping.ts::SharedTrackingDeclinedError.constructor
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `super()` çağrısı ile üst sınıfın constructor'ı `'Paylaşılan takip numarası onaylanmadı; kargo bilgisi yazılmadı.'` mesajıyla başlatılır; `this.name` `'SharedTrackingDeclinedError'` değerine atanır
+### [N3_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\utils\adminShipping.ts::SharedTrackingDeclinedError.constructor
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok
 
 ---
 
@@ -66107,10 +67168,10 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: adminShipping.ts
-  function: adminShipping.ts::isSharedTrackingConflict
-  function: adminShipping.ts::invokeShippingUpdate
-  class: adminShipping.ts::SharedTrackingDeclinedError
+  file: src\utils\adminShipping.ts
+  function: src\utils\adminShipping.ts::isSharedTrackingConflict
+  function: src\utils\adminShipping.ts::invokeShippingUpdate
+  class: src\utils\adminShipping.ts::SharedTrackingDeclinedError
 
 ---
 
@@ -66129,11 +67190,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\adminUi.ts
-skeleton_hash: 990fbeb0bf9239c1
+source_path: C:\tmp\vh-altyapi-t165\src\utils\adminUi.ts
+skeleton_hash: 13a75f056c167b4d
 entity_hashes:
   overview: d13e94e1526b35ae
-generated_at: 2026-08-25T07:28:46Z
+generated_at: 2026-08-27T08:37:12Z
 ---
 
 ## Genel Bakış
@@ -66225,7 +67286,7 @@ Fonksiyon gövdesi bulunmadığından AST Pointer üretilmemiştir.
 
 ## NODE ID STANDARD
 
-  file: adminUi.ts
+  file: src\utils\adminUi.ts
 
 ---
 
@@ -66261,12 +67322,12 @@ Fonksiyon gövdesi bulunmadığından AST Pointer üretilmemiştir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\analytics.ts
-skeleton_hash: 3c46058e15fdcdf5
+source_path: C:\tmp\vh-altyapi-t165\src\utils\analytics.ts
+skeleton_hash: 2744449f19164fdb
 entity_hashes:
   func:trackEvent: 561450afbdac10ee
   overview: 34daeb673bd862b6
-generated_at: 2026-08-25T07:28:51Z
+generated_at: 2026-08-27T08:37:13Z
 ---
 
 ## Genel Bakış
@@ -66337,8 +67398,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: analytics.ts
-  function: analytics.ts::trackEvent
+  file: src\utils\analytics.ts
+  function: src\utils\analytics.ts::trackEvent
 
 ---
 
@@ -66352,12 +67413,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\applicationLinks.ts
-skeleton_hash: 57d78bbfb155ef37
+source_path: C:\tmp\vh-altyapi-t165\src\utils\applicationLinks.ts
+skeleton_hash: 0f929cdac30eecaf
 entity_hashes:
   func:getCategoryUrlFromTopic: 179f53035c1027b6
   overview: e1865700dc78efd4
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:37:15Z
 ---
 
 ## Genel Bakış
@@ -66430,14 +67491,14 @@ Bu modül, konu (topic) slug'larını kategori URL'lerine eşlemek için sabit b
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\applicationUi.tsx
-skeleton_hash: bd34ea6485556e69
+source_path: C:\tmp\vh-altyapi-t165\src\utils\applicationUi.tsx
+skeleton_hash: 568adad80ba80501
 entity_hashes:
   func:accentOverlayClass: d8ef037541c09389
   func:iconFor: 8ef77854d85af42b
   overview: bbb9266e1effc225
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:28:57Z
+generated_at: 2026-08-27T08:37:16Z
 ---
 
 ## Genel Bakış
@@ -66530,9 +67591,9 @@ Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çı
 
 ## NODE ID STANDARD
 
-  file: applicationUi.tsx
-  function: applicationUi.tsx::iconFor
-  function: applicationUi.tsx::accentOverlayClass
+  file: src\utils\applicationUi.tsx
+  function: src\utils\applicationUi.tsx::iconFor
+  function: src\utils\applicationUi.tsx::accentOverlayClass
 
 ---
 
@@ -66563,16 +67624,16 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\breadcrumbUtils.ts
-skeleton_hash: e98f8f14c33e5a6b
+source_path: C:\tmp\vh-altyapi-t165\src\utils\breadcrumbUtils.ts
+skeleton_hash: 03fbc248c3a1c477
 entity_hashes:
-  func:buildCategoryBreadcrumb: 75f26731c077f8ae
-  overview: f70a9db5a198b67e
-generated_at: 2026-06-19T20:48:17Z
+  func:buildCategoryBreadcrumb: 57eb6d8f024616e4
+  overview: abeb057cc67ee6d6
+generated_at: 2026-08-27T08:37:50Z
 ---
 
 ## Genel Bakış
-Bu utility modülü, VentHub HVAC uygulamasının kullanıcı arayüzü gezinme bileşenleri için gerekli ekmek kırıntısı (breadcrumb) verilerini üretmek üzere tasarlanmıştır. Modülün temel amacı kategori hiyerarşilerinden yola çıkarak standartlaştırılmış gezinme öğeleri listeleri oluşturmak, uygulama içi gezinme deneyimini desteklemektir.
+Bu modül, kullanıcı arayüzünde gezinme bileşenleri için ekmek kırıntısı (breadcrumb) verileri üreten bir yardımcı modüldür. Temel amacı, verilen kategori hiyerarşilerinden standartlaştırılmış bir gezinme öğeleri listesi oluşturmaktır. Modül, uygulama içi gezinme deneyimini destekleyen tek bir temel fonksiyon içerir.
 
 ## Fonksiyon Grupları
 ### Kategori Tabanlı Ekmek Kırıntısı Üretimi
@@ -66582,25 +67643,35 @@ Verilen ana kategori, isteğe bağlı üst kategori ve anasayfa etiketi bilgiler
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, domain kategori nesnelerinden ekmek kırıntısı (breadcrumb) listeleri oluşturmak üzere tasarlanmış bir yardımcı modüldür, doğru çalışması yalnızca girdi parametrelerinin belirtilen türlere uygunluğu ve kategori nesneleri arasındaki hiyerarşik bütünlüğe bağlıdır.
 
-[Aksiyom 1]: Eğer category parametresi DomainCategory, null veya undefined türleri dışında bir türde gönderilirse, breadcrumb oluşturma işlemi başarısız olur veya çalışma zamanı hatası meydana gelir.
-[Aksiyom 2]: Eğer dolu gönderilen parentCategory nesnesi ile category nesnesi arasındaki hiyerarşik ilişki geçerli değilse, oluşturulan breadcrumb zinciri yanlış sıralı veya mantıksız olur.
-[Aksiyom 3]: Eğer homeLabel parametresi string türünde okunabilir bir değer olarak sağlanmazsa, breadcrumb zincirinin başlangıç (ana sayfa) öğesi eksik veya kullanıcı tarafından okunamaz hale gelir.
-[Aksiyom 4]: Eğer gönderilen DomainCategory nesneleri hiyerarşik ilişki kurmak için gereken temel kimlik ve görünüm özelliklerini içermiyorsa, üretilen breadcrumb listesi eksik veya yanlış öğeler barındırır.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan çıkarılabilecek varsayımlar belirtilebilir. Gövde bilinmediği için davranışsal aksiyom üretilemez.
+
+[Aksiyom 1]: Eğer `category` parametresi `null` veya `undefined` ise, fonksiyonun nasıl bir `BreadcrumbItem[]` ürettiği bilinmiyor (gövde mevcut değil).
+
+[Aksiyom 2]: Eğer `parentCategory` parametresi verilmezse veya `null` ise, breadcrumb dizisinde üst kategori öğesinin yer alıp almadığı bilinmiyor.
+
+[Aksiyom 3]: Eğer `homeLabel` parametresi verilmezse, fonksiyon çağrılamaz — bu parametre zorunludur ve default değeri yoktur.
+
+[Aksiyom 4]: Eğer `lang` parametresi verilmezse, fonksiyon çağrılamaz — bu parametre zorunludur ve default değeri yoktur.
+
+[Aksiyom 5]: Eğer `DomainCategory` tipi beklenen yapıda verilmezse, breadcrumb öğelerinin nasıl oluşturulduğu bilinmiyor — `DomainCategory` alanları ve `BreadcrumbItem` yapısı gövdeden çıkarılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### buildCategoryBreadcrumb
-**Ne yapar**: Kategori sayfaları için gezinme amacıyla kullanılacak breadcrumb (ekmek kırıntısı) öğeleri listesi oluşturan bir yardımcı fonksiyondur. Web sitesi içi gezinme deneyimini iyileştirmek amacıyla kullanıcının o anda bulunduğu kategori hiyerarşisini net bir şekilde görmesini sağlayan, kullanılmaya hazır navigasyon öğeleri üretir. Null veya undefined olabilecek kategori verilerini de güvenli bir şekilde işleyerek uygulama içi hataların önüne geçer.
-**Nasıl yapar**: İletilen tüm parametreleri sırayla işleyerek breadcrumb dizisini yapılandırır. İlk olarak en başa anasayfa etiketini kullanarak anasayfa navigasyon öğesini ekler, sonrasında mevcut kategorinin varsa geçerli üst kategorisini diziye ekler, en son olarak da içinde bulunulan mevcut kategoriyi ekleyerek tam kategori hiyerarşisini sıralı bir şekilde oluşturur. Geçersiz (null/undefined) kategori verileri ile karşılaşması durumunda sadece var olan geçerli öğeleri diziye ekleyerek çalışmaya devam eder.
+**Ne yapar**: Kategori sayfaları için breadcrumb (ekmek kırıntısı navigasyonu) öğeleri dizisi oluşturur. Ana sayfadan başlayarak varsa üst kategori ve mevcut kategori olmak üzere hiyerarşik bir navigasyon yolu üretir.
+
+**Nasıl yapar**: Fonksiyon öncelikle bir `items` dizisi oluşturur ve ilk eleman olarak ana sayfa bağlantısını (`href: '/'`) ekler. Ardından `parentCategory` parametresi tanımlı ve truthy ise, üst kategorinin görünen adını `getCategoryDisplayName` fonksiyonuyla alır ve yerelleştirilmiş slug'ını `getLocalizedCategorySlug` fonksiyonuyla elde ederek `Routes.category` üzerinden üst kategori linkini üretir. Son olarak `category` parametresi truthy ise, mevcut kategorinin görünen adını ekler; ancak bu son eleman olduğundan `href` değeri `undefined` olarak atanır — bu sayede breadcrumb'ın son öğesi tıklanamaz bir metin olarak görüntülenir.
+
 **Parametreler**:
-- name: category, type: DomainCategory | null | undefined — Kullanıcının o anda bulunduğu mevcut kategori nesnesi, null veya undefined değerlerini de alabilir
-- name: parentCategory, type: DomainCategory | null | undefined — Mevcut kategorinin hiyerarşideki bir üst kategori nesnesi, opsiyonel olarak iletilir ve null değerini alabilir
-- name: homeLabel, type: any — Breadcrumb listesinin en başında yer alacak anasayfa öğesinin görünen etiketi olarak kullanılacak değer
-**Dönüş**: BreadcrumbItem[] — Kullanılmaya hazır, sıralanmış navigasyon öğeleri dizisi. Tüm geçersiz veri durumlarında bile sadece var olan geçerli öğeleri içeren veya gerektiğinde boş bir dizi olarak güvenli bir şekilde döndürülür.
+- `category`: `DomainCategory | null | undefined` — Breadcrumb'da son öğe olarak gösterilecek mevcut kategori nesnesi. `null` veya `undefined` olduğunda son kategori öğesi breadcrumb'a eklenmez.
+- `parentCategory`: `DomainCategory | null` (opsiyonel) — Mevcut kategorinin üst kategorisi. Tanımlı ve truthy olduğunda breadcrumb'a ara öğe olarak eklenir; üst kategori linki aktif dile göre yerelleştirilmiş slug ile üretilir.
+- `homeLabel`: `string` (varsayılan: `'Ana Sayfa'`) — Breadcrumb'ın ilk elemanı olan ana sayfa öğesinin görünen etiket metni.
+- `lang`: `string` (varsayılan: `'tr'`) — Aktif dil kodu. Üst kategori linki bu dilin görünen slug'ıyla üretilir; `getLocalizedCategorySlug` fonksiyonuna iletilir.
+
+**Dönüş**: `BreadcrumbItem[]` — Her biri `label` (görünen metin) ve `href` (hedef URL, son elemanda `undefined`) alanlarından oluşan breadcrumb öğeleri dizisi. Dizi en az bir eleman (ana sayfa) içerir; `parentCategory` ve `category` parametrelerinin durumuna göre en fazla üç elemana ulaşır.
 
 ---
 
@@ -66609,22 +67680,21 @@ Bu modül, domain kategori nesnelerinden ekmek kırıntısı (breadcrumb) listel
 - import: ../lib/type-converters::DomainCategory
 - import: ../utils/routes::Routes
 - import: ./categoryHelpers::getCategoryDisplayName
+- import: ./categoryHelpers::getLocalizedCategorySlug
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\breadcrumbUtils.ts::buildCategoryBreadcrumb
-- **params**: category (DomainCategory | null | undefined), parentCategory? (DomainCategory | null), homeLabel (string, varsayılan değer: 'Ana Sayfa')
+### [N1_NASIL] AST Pointer: src/utils/breadcrumbUtils.ts::buildCategoryBreadcrumb
+- **params**:
+  - `category: DomainCategory | null | undefined` — breadcrumb'da gösterilecek kategori nesnesi; null veya undefined olabilir
+  - `parentCategory?: DomainCategory | null` — üst kategori nesnesi; opsiyonel, null olabilir
+  - `homeLabel = 'Ana Sayfa'` — breadcrumb'ın ilk elemanı olan ana sayfa etiketi; varsayılan değeri `'Ana Sayfa'`
+  - `lang = 'tr'` — dil kodu; kategori slug'ı oluşturulurken kullanılır, varsayılan `'tr'`
 - **ic_degiskenler**:
-  - `items` — BreadcrumbItem türünde dizi, tüm breadcrumb öğelerini toplamak için oluşturulan ana dizi, ilk elemanı ana sayfa öğesi olarak başlatılır
-  - `homeLabel` — Fonksiyona parametre olarak gelen ana sayfa görünür etiketi, ilk breadcrumb öğesinin `label` alanına atanır
-  - `parentCategory` — Üst kategori nesnesi, varlığı kontrol edilerek mevcutsa items dizisine üst kategori breadcrumb öğesi eklenir; içinden `parentCategory.slug` özelliğine erişilerek rota oluşturulur
-  - `getCategoryDisplayName(parentCategory)` — Üst kategorinin kullanıcıya gösterilecek adını almak için çağrılan kategori yardımcı fonksiyonunun çıktısı, üst kategori breadcrumb öğesinin `label` alanına atanır
-  - `Routes.category(parentCategory.slug)` — Üst kategori için yönlendirme rotası oluşturmak için çağrılan Routes yardımcısının çıktısı, üst kategori breadcrumb öğesinin `href` alanına atanır
-  - `category` — Mevcut kategori nesnesi, varlığı kontrol edilerek mevcutsa son breadcrumb öğesi olarak items dizisine eklenir
-  - `getCategoryDisplayName(category)` — Mevcut kategorinin kullanıcıya gösterilecek adını almak için çağrılan kategori yardımcı fonksiyonunun çıktısı, son breadcrumb öğesinin `label` alanına atanır
-- **Dönüş**: BreadcrumbItem[] türünde, tam olarak oluşturulmuş breadcrumb öğeleri dizisi
+  - `items: BreadcrumbItem[]` — breadcrumb öğelerini tutan dizi; başlangıçta `{ label: homeLabel, href: '/' }` elemanıyla başlatılır; `parentCategory` truthy ise `getCategoryDisplayName(parentCategory)` etiketi ve `Routes.category(getLocalizedCategorySlug(parentCategory, lang))` href'i ile ikinci eleman eklenir; `category` truthy ise `getCategoryDisplayName(category)` etiketi ve `href: undefined` ile üçüncü eleman eklenir
+- **Dönüş**: `BreadcrumbItem[]` — breadcrumb öğeleri dizisi; en az bir eleman (ana sayfa), en fazla üç eleman (ana sayfa + üst kategori + kategori) içerir
 
 ---
 
@@ -66645,8 +67715,8 @@ Bu modül, domain kategori nesnelerinden ekmek kırıntısı (breadcrumb) listel
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\categoryHelpers.ts
-skeleton_hash: 50ceaf47f8f33ac7
+source_path: C:\tmp\vh-altyapi-t165\src\utils\categoryHelpers.ts
+skeleton_hash: 3d1332325a36cbfc
 entity_hashes:
   func:getCategoryDescription: 59a2fb71a2f4949e
   func:getCategoryDisplayName: 403835a175ba4a6a
@@ -66654,7 +67724,7 @@ entity_hashes:
   func:getLocalizedCategorySlug: 80277bf91f91aa17
   func:parsePriceToNumber: 42be44b6c84206bc
   overview: bd07bebb31813743
-generated_at: 2026-08-25T07:37:32Z
+generated_at: 2026-08-27T08:37:51Z
 ---
 
 ## Genel Bakış
@@ -66803,12 +67873,12 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: categoryHelpers.ts
-  function: categoryHelpers.ts::getCategoryDisplayName
-  function: categoryHelpers.ts::getLocalizedCategorySlug
-  function: categoryHelpers.ts::getCategoryMarketingTitle
-  function: categoryHelpers.ts::getCategoryDescription
-  function: categoryHelpers.ts::parsePriceToNumber
+  file: src\utils\categoryHelpers.ts
+  function: src\utils\categoryHelpers.ts::getCategoryDisplayName
+  function: src\utils\categoryHelpers.ts::getLocalizedCategorySlug
+  function: src\utils\categoryHelpers.ts::getCategoryMarketingTitle
+  function: src\utils\categoryHelpers.ts::getCategoryDescription
+  function: src\utils\categoryHelpers.ts::parsePriceToNumber
 
 ---
 
@@ -66827,28 +67897,29 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\checkoutHelpers.ts
-skeleton_hash: 48d47ef3a66cd735
+source_path: C:\tmp\vh-altyapi-t165\src\utils\checkoutHelpers.ts
+skeleton_hash: 5cf92f9016b3012a
 entity_hashes:
-  func:getPriceHashLocal: 13f64c7a6218a753
-  func:getPriceHashServer: 9916fbf1157483b4
+  func:getPriceHashLocal: ddf03350541b5b6c
+  func:getPriceHashServer: 7bce7288aa694458
   func:getTranslationWithFallback: 017e759a3be126ab
-  func:to2: b98feff70eaa59fa
-  overview: 72cc4065bdd6058b
-generated_at: 2026-06-19T20:48:17Z
+  func:normUnit: df5c71868b272131
+  func:to2: 9cbbe8abff4d0ba5
+  overview: 92ab3bf2b70f093b
+generated_at: 2026-08-27T08:48:56Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC platformu sipariş tamamlama (checkout) sürecinde kullanılan yardımcı işlevleri barındırır. Temel olarak fiyat verilerinin tutarlılığını sağlamak için hash oluşturma, sayısal değerleri formatlama ve çeviri metinlerini yönetme gibi tekrarlayan görevleri merkezi bir noktadan sunar. Hem istemci hem sunucu taraflı akışları destekleyerek kod tekrarını azaltır.
+Bu modül, sipariş tamamlama (checkout) sürecinde kullanılan yardımcı işlevleri içerir. Fiyat verilerinin tutarlılığını sağlamak için hash oluşturma, sayısal değerleri formatlama ve normalize etme, ayrıca çeviri metinlerini yönetme gibi görevleri merkezi bir noktadan sunar. Hem istemci hem sunucu taraflı akışları destekleyerek kod tekrarını azaltır.
 
 ## Fonksiyon Grupları
 ### Fiyat Hash Oluşturma Fonksiyonları
-Sepet veya sipariş öğeleri için benzersiz bir parmak izi (hash) oluşturarak, checkout sürecin farklı aşamalarında veya taraflarında fiyatların tutarlı olduğunu doğrulamak için kullanılır.
+Sepet veya sipariş öğeleri için benzersiz bir parmak izi (hash) oluşturarak, checkout sürecinin farklı aşamalarında veya taraflarında fiyatların tutarlı olduğunu doğrulamak için kullanılır.
 - getPriceHashLocal, getPriceHashServer
 
-### Temel Biçimlendirme Yardımcısı
-Özellikle fiyat tutarları gibi nicelikleri standart ve okunabilir formata dönüştürmek için temel bir yardımcı işlev sunar.
-- to2
+### Veri Biçimlendirme ve Normalizasyon Yardımcıları
+Sayısal değerleri standart ve okunabilir formata dönüştürmek ve bilinmeyen türdeki değerleri güvenli bir şekilde sayıya çevirmek için kullanılır.
+- to2, normUnit
 
 ### Çeviri Yedekleme Yardımcısı
 Arayüz metinleri için çeviri anahtarlarını güvenli bir şekilde işler; istenen çeviri yoksa belirli bir varsayılan metni döndürerek eksik içerik sorunlarını önler.
@@ -66858,30 +67929,31 @@ Arayüz metinleri için çeviri anahtarlarını güvenli bir şekilde işler; is
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, checkout sürecinde fiyat tutarlılığı, veri formatlama ve çeviri fallback mekanizması sağlayan yardımcı fonksiyonlar içermektedir. Aşağıda her bir fonksiyonun doğru çalışması için gereken mimari varsayımlar listelenmiştir.
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan çıkarılabilecek varsayımlar belirtilebilir.
 
-[Aksiyom 1]: Eğer `to2` fonksiyonuna geçilen `n` parametresi geçerli bir sayı (finite number) değilse (örn: `NaN`, `Infinity`), sonuç `NaN` veya `Infinity` olur ve para birimi formatlaması anlamsızlaşır.
+[Aksiyom 1]: Eğer `getPriceHashServer` fonksiyonuna `serverItems` parametresi `undefined` veya `null` olarak geçilirse, fonksiyon bu durumla başa çıkacak şekilde davranmalıdır; aksi takdirde null/undefined üzerinde işlem yapma hatası oluşur.
 
-[Aksiyom 2]: Eğer `getPriceHashLocal` fonksiyonuna geçilen `items` dizisi `null` veya `undefined` ise veya içindeki herhangi bir elemanın `product_id` alanı eksikse, hesaplanan fiyat hash'i tutarsız veya eksik olur ve fiyat doğrulaması yanıltıcı sonuç verebilir.
+[Aksiyom 2]: Eğer `getPriceHashServer` fonksiyonuna verilen `serverItems` dizisindeki bir öğenin `unit_price` değeri `null` ise, fonksiyon bu null fiyatı işleyebilmelidir; aksi takdirde null üzerinde matematiksel işlem hatası oluşur.
 
-[Aksiyom 3]: Eğer `getPriceHashServer` fonksiyonuna `serverItems` parametresi olarak `undefined` veya `null` geçilirse, fonksiyon sadece `localItems`'ı kullanarak bir hash oluşturur; ancak bu durumda sunucu tarafı fiyat doğrulaması yapılamaz ve olası fiyat tutarsızlıkları tespit edilemez.
+[Aksiyom 3]: Eğer `getPriceHashServer` fonksiyonuna verilen `serverItems` dizisindeki bir öğede `quantity` alanı yoksa, fonksiyon bu eksikliği tolere etmelidir; aksi takdirde undefined değerle çarpma/toplama hatası oluşur.
 
-[Aksiyom 4]: Eğer `getPriceHashServer` fonksiyonuna hem `serverItems` hem de `localItems` geçilirse ve her iki listedeki ürünlerin `product_id` eşleşmelerinde (`serverItems`'daki `product_id` ile `localItems`'daki `product_id`) tutarsızlık varsa (örn: farklı ürünler, eksik ürünler), hesaplanan hash'ler farklı olur; bu durum modülün fiyat tutarlılığı doğrulama amacına hizmet eder ancak hash'lerin karşılaştırılabilirliği için her iki tarafın da aynı ürün setini ve sırasını beklemesi gerekir.
+[Aksiyom 4]: Eğer `normUnit` fonksiyonuna geçersiz bir `value` verilirse (sayıya dönüştürülemeyen bir değer), fonksiyon `null` döndürmelidir; aksi takdirde geçersiz sayıyla devam eden hesaplamalar hatalı sonuç üretir.
 
-[Aksiyom 5]: Eğer `getTranslationWithFallback` fonksiyonuna geçilen `t` fonksiyonu (çeviri fonksiyonu) verilen `key` için bir çeviri sağlayamazsa (boş string veya `undefined` döndürürse), `fallback` değeri döndürülür. Eğer `fallback` de boş string ise, sonuç boş string olur ve arayüzde eksik metin görünebilir.
-
-[Aksiyom 6]: `getPriceHashLocal` ve `getPriceHashServer` fonksiyonlarının döndürdüğü hash değerlerinin karşılaştırılabilir olması için, her iki fonksiyonun da aynı hash algoritmasını (örn: aynı string birleştirme ve hash fonksiyonu) kullanması gerekir; aksi takdirde fiyat tutarlılığı karşılaştırması yapılamaz.
+[Aksiyom 5]: Eğer `getTranslationWithFallback` fonksiyonuna verilen `t` parametresi belirtilen imzaya (`(key: string) => string`) uymuyorsa, fonksiyon düzgün çalışamaz; aksi takdirde `t(key)` çağrısı runtime hat
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### to2
-**Ne yapar**: Girdi olarak aldığı sayısal değeri güvenli bir şekilde 2 ondalık basamağa dönüştürür. Genellikle para birimi hesaplamaları gibi hassasiyet gerektiren işlemlerde kullanılır, ondalık basamak sayısını standartlaştırarak hesaplama hatalarının önüne geçer.
-**Nasıl yapar**: Sayısal girdinin formatını standartlaştırarak 2 ondalık basamağa sabitler, olası geçersiz sayısal girdilere karşı koruma sağlayarak uygulamanın çökmesini engeller. İşlevi boyunca dönüşüm sırasında veri kaybını minimize edecek yöntemler kullanır.
+**Ne yapar**: Verilen bir sayıyı güvenli bir şekilde 2 ondalık basamağa dönüştürür. Sayısal olmayan değerleri sayıya çevirmeyi dener; sonucun sonlu bir sayı olup olmadığını kontrol eder.
+**Nasıl yapar**: Fonksiyon, gelen `value` parametresinin `number` tipinde olup olmadığını kontrol eder. Eğer sayı değilse `Number()` ile sayıya çevirmeye çalışır. Elde edilen değer `Number.isFinite()` ile sonlu bir sayı mı diye denetlenir. Sonlu ise `to2` fonksiyonu çağrılarak 2 ondalık basamağa yuvarlanır; sonlu değilse `null` döndürülür. Bu yapı, geçersiz veya sonsuz değerlerin sisteme girmesini engelleyen bir güvenlik katmanı oluşturur.
 **Parametreler**:
-- name: n, type: number — 2 ondalık basamağa dönüştürülecek olan ham sayısal değer
-**Dönüş**: Dönüş tipi dokümantasyonda bilinmiyor veya void olarak işaretlenmiştir, ancak işlevinin amacı gereği 2 ondalık basamağa sahip sayısal bir değer döndürmesi beklenir.
+- value: unknown — Dönüştürülecek değer; sayısal olmayan bir tip gelirse otomatik olarak sayıya çevrilmeye çalışılır
+**Dönüş**: Sayısal ve sonlu bir değerse 2 ondalık basamaklı `number`; aksi halde `null` döndürür.
+
+### normUnit
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getPriceHashLocal
 **Ne yapar**: İstemci tarafında tutulan yerel sepet öğeleri için tutarlı bir hash string'i oluşturur. Oluşturulan bu hash, ödeme süreci boyunca sepet içeriğinde meydana gelen değişiklikleri anında tespit etmek için kullanılır. Sepet tutarlılığını kontrol etmeye yarayan temel bir yardımcı fonksiyondur.
@@ -66916,10 +67988,43 @@ Bu modül, checkout sürecinde fiyat tutarlılığı, veri formatlama ve çeviri
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: checkoutHelpers.ts::to2
-- **params**: `(n: number)`
-- **ic_degiskenler**: (gövde verilmemiş — sadece imza mevcut)
-- **Dönüş**: tipi imzada belirtilmemiş; kullanım bağlamından (`to2(Number(...))`) number döndüğü anlaşılıyor
+### [N1_NASIL] AST Pointer: src/utils/checkoutHelpers.ts::to2
+- **params**: `n` — number türünde bir sayı
+- **ic_degiskenler**: (gövde verilmemiş, analiz edilemiyor)
+- **Dönüş**: yok
+
+### [N2_NASIL] AST Pointer: src/utils/checkoutHelpers.ts::normUnit
+- **params**: `value` — unknown türünde, dönüştürülmeye çalışılacak değer
+- **ic_degiskenler**:
+  - `v` — `value`'nun number olup olmadığı kontrol edilir; number ise doğrudan atanır, değilse `Number(value)` ile sayıya dönüştürülür
+- **Dönüş**: `number | null` — `v` sonucu sonlu bir sayıysa `to2(v)` çağrısının dönüşü, değilse `null`
+
+### [N3_NASIL] AST Pointer: src/utils/checkoutHelpers.ts::getPriceHashLocal
+- **params**: `items` — `CartItem[]` türünde, sepet öğeleri dizisi
+- **ic_degiskenler**:
+  - `norm` — `items` dizisinin her elemanını `{ id: i.id, qty: i.quantity, unit: normUnit(i.unitPrice) }` biçimine dönüştürüp `id` alanına göre alfabetik sıralayan yeni dizi
+  - `i` — `map` içindeki her bir `CartItem` elemanı; `id`, `quantity` ve `unitPrice` alanlarına erişilir
+- **Dönüş**: `string` — `norm` dizisinin `JSON.stringify` ile JSON metnine dönüştürülmüş hali
+
+### [N4_NASIL] AST Pointer: src/utils/checkoutHelpers.ts::getPriceHashServer
+- **params**:
+  - `serverItems` — `Array<{ product_id: string; quantity?: number; unit_price: number | null }> | undefined | null` türünde, sunucu sepet öğeleri
+  - `localItems` — `CartItem[]` türünde, yerel sepet öğeleri
+- **ic_degiskenler**:
+  - `arr` — `serverItems` bir dizi ise kendisi, değilse boş dizi `[]`
+  - `norm` — `arr` dizisinin her elemanını `{ id: String(i.product_id), qty: Number(i.quantity ?? localItems.find(it => it.id === String(i.product_id))?.quantity ?? 0), unit: normUnit(i.unit_price) }` biçimine dönüştürüp `id` alanına göre alfabetik sıralayan yeni dizi
+  - `i` — `map` içindeki her bir sunucu öğesi elemanı; `product_id`, `quantity` ve `unit_price` alanlarına erişilir
+  - `it` — `localItems.find` içindeki her bir `CartItem` elemanı; `id` alanıyla eşleşme kontrolü yapılır
+- **Dönüş**: `string` — `norm` dizisinin `JSON.stringify` ile JSON metnine dönüştürülmüş hali
+
+### [N5_NASIL] AST Pointer: src/utils/checkoutHelpers.ts::getTranslationWithFallback
+- **params**:
+  - `t` — `(key: string) => string` türünde, çeviri fonksiyonu
+  - `key` — `string` türünde, çeviri anahtarı
+  - `fallback` — `string` türünde, yedek metin
+- **ic_degiskenler**:
+  - `v` — `t(key)` çağrısının sonucu; çevrilmiş metin veya hata durumunda kullanılmaz
+- **Dönüş**: `string` — `v` değeri `key`'e eşit değilse `v`, eşitse veya hata oluşursa `fallback`
 
 ---
 
@@ -66930,15 +68035,18 @@ graph TD
     checkoutHelpers_ts__getPriceHashLocal["getPriceHashLocal"]
     checkoutHelpers_ts__getPriceHashServer["getPriceHashServer"]
     checkoutHelpers_ts__getTranslationWithFallback["getTranslationWithFallback"]
+    checkoutHelpers_ts__normUnit["normUnit"]
     checkoutHelpers_ts__to2["to2"]
-    checkoutHelpers_ts__getPriceHashServer --> checkoutHelpers_ts__to2
-    checkoutHelpers_ts__getPriceHashLocal --> checkoutHelpers_ts__to2
+    checkoutHelpers_ts__getPriceHashLocal --> checkoutHelpers_ts__normUnit
+    checkoutHelpers_ts__getPriceHashServer --> checkoutHelpers_ts__normUnit
+    checkoutHelpers_ts__normUnit --> checkoutHelpers_ts__to2
 ```
 
 ## NODE ID STANDARD
 
   file: src\utils\checkoutHelpers.ts
   function: src\utils\checkoutHelpers.ts::to2
+  function: src\utils\checkoutHelpers.ts::normUnit
   function: src\utils\checkoutHelpers.ts::getPriceHashLocal
   function: src\utils\checkoutHelpers.ts::getPriceHashServer
   function: src\utils\checkoutHelpers.ts::getTranslationWithFallback
@@ -66949,6 +68057,7 @@ graph TD
   export: getPriceHashLocal
   export: getPriceHashServer
   export: getTranslationWithFallback
+  export: normUnit
   export: to2
 
 ---
@@ -66958,12 +68067,12 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\crypto.ts
-skeleton_hash: 78f986a735ad3900
+source_path: C:\tmp\vh-altyapi-t165\src\utils\crypto.ts
+skeleton_hash: a3e2db332a30494c
 entity_hashes:
   func:generateId: b72c75acd1bdb8bf
   overview: 3748b737e825394a
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:45Z
 ---
 
 ## Genel Bakış
@@ -67028,15 +68137,15 @@ Bu modül, sistem genelinde kullanılmak üzere benzersiz, güvenilir kimlik (ID
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\engineeringIntelligence.ts
-skeleton_hash: ef6aac028f6d1ec4
+source_path: C:\tmp\vh-altyapi-t165\src\utils\engineeringIntelligence.ts
+skeleton_hash: f0e2bc10ae33337e
 entity_hashes:
   func:generateEngineeringSummary: e027e9800497ecbe
   func:getEfficiencyInference: 05c710f909e9d6a9
   func:getMotorInference: ef91c03ee063a82d
   func:getNoiseInference: 9266c31de55779b5
   overview: 9ce3d52a464cda5e
-generated_at: 2026-08-13T08:57:45Z
+generated_at: 2026-08-27T08:38:46Z
 ---
 
 ## Genel Bakış
@@ -67172,8 +68281,8 @@ graph TD
     engineeringIntelligence_ts__getMotorInference["getMotorInference"]
     engineeringIntelligence_ts__getNoiseInference["getNoiseInference"]
     engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getEfficiencyInference
-    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getNoiseInference
     engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getMotorInference
+    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getNoiseInference
 ```
 
 ## NODE ID STANDARD
@@ -67200,13 +68309,13 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\getCategoryIcon.tsx
-skeleton_hash: 3ebb541d03aef2e0
+source_path: C:\tmp\vh-altyapi-t165\src\utils\getCategoryIcon.tsx
+skeleton_hash: cfe275dcae465119
 entity_hashes:
   func:getCategoryIcon: e7e3d3061db761f5
   overview: c7c53a125873016e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:47Z
 ---
 
 ## Genel Bakış
@@ -67298,13 +68407,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\imageUtils.ts
-skeleton_hash: a4358d1be8e85f5b
+source_path: C:\tmp\vh-altyapi-t165\src\utils\imageUtils.ts
+skeleton_hash: 77b277d464dca49e
 entity_hashes:
   func:compressImage: 52ddf4e7747053ca
   func:normalizeImageUrl: a7c1782886d55260
   overview: 3edb070ce8076b34
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:48Z
 ---
 
 ## Genel Bakış
@@ -67396,11 +68505,11 @@ Bu modül, resimleri sıkıştırmak ve görsel URL'leri normalize etmek için b
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\navigationConfig.ts
-skeleton_hash: ce061c1ad5560b5c
+source_path: C:\tmp\vh-altyapi-t165\src\utils\navigationConfig.ts
+skeleton_hash: 8ee8168e4b9aa16d
 entity_hashes:
   overview: 0c8e815324d6c567
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:50Z
 ---
 
 ## Genel Bakış
@@ -67494,13 +68603,13 @@ C:\Users\alize\venthub-hvac\src\utils\navigationConfig.ts konumlu kaynak dosyas�
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\passwordSecurity.ts
-skeleton_hash: 4dea2a5498ffe35e
+source_path: C:\tmp\vh-altyapi-t165\src\utils\passwordSecurity.ts
+skeleton_hash: a09c0156948c39c4
 entity_hashes:
   func:hibpPwnedCount: 710f4dd1fd996690
   func:sha1Hex: 0a8c8ae40a0afcf2
   overview: ff989043abdda4b6
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:51Z
 ---
 
 ## Genel Bakış
@@ -67611,12 +68720,12 @@ Bu modül, şifre hashleme ve harici servis üzerinden şifre ihlal geçmişini 
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\prefetch.ts
-skeleton_hash: d4a29652d269dd10
+source_path: C:\tmp\vh-altyapi-t165\src\utils\prefetch.ts
+skeleton_hash: c107e961eb5bc507
 entity_hashes:
   func:prefetchProductsPage: 1087d9febfcd8d00
   overview: d39d9fa31cbd8eda
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:52Z
 ---
 
 ## Genel Bakış
@@ -67904,18 +69013,18 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\router.ts
-skeleton_hash: 44163c2c76a39492
+source_path: C:\tmp\vh-altyapi-t165\src\utils\router.ts
+skeleton_hash: 82533b886b31dc7f
 entity_hashes:
-  func:clearClaimsCacheCookie: baefb8519ef63f63
-  func:createRedirectResponse: 05310081a4cd5ade
-  func:decryptClaims: 2068430aed6e8d59
-  func:encryptClaims: 76648dff74640cd4
-  func:getCryptoKey: 31659864bb2e78d3
-  func:resolveUserClaims: d4caa44069b031aa
-  func:setClaimsCacheCookie: ec602be634499d82
+  func:clearClaimsCacheCookie: fba385ee00475160
+  func:createRedirectResponse: 00b335ae92f46ddf
+  func:decryptClaims: 21b8d001e7219f7b
+  func:encryptClaims: 867fdb1c76091627
+  func:getCryptoKey: fbe3e5052e863dcb
+  func:resolveUserClaims: 6e51c2cd0c1f6898
+  func:setClaimsCacheCookie: f9b1d3723f21de35
   overview: efa2eee8e5e3339c
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:39:59Z
 ---
 
 ## Genel Bakış
@@ -67962,14 +69071,14 @@ Bu modül, kullanıcı kimlik doğrulama claim'lerini (yetkilendirme bilgilerini
 ## FONKSİYON DETAYLARI
 
 ### getCryptoKey
-**Ne yapar**: Verilen bir gizli metin dizesinden (secret) AES kriptoografik anahtarı türetir. Bu işlem,Edge ortamlarıyla uyumlu Web Crypto API kullanılarak gerçekleştirilir.
+**Ne yapar**: Bir string gizli anahtardan (secret) SHA-256 kullanarak AES şifreleme için bir `CryptoKey` nesnesi türetir. Edge ortamlarıyla uyumlu Web Crypto API sarmalayıcısı olarak çalışır.
 
-**Nasıl yapar**: Secret dizisini UTF-8 byte dizisine dönüştürür, SHA-256 algoritması ile deterministik bir hash (dize parmak izi) üretir. Elde edilen 256-bit hash değerini, AES-GCM algoritması için ‘raw’ formatında import ederek, şifreleme ve şifre çözümü için kullanılabilecek bir CryptoKey nesnesi oluşturur.
+**Nasıl yapar**: Önce `TextEncoder` ile gizli anahtar string'ini bayt dizisine dönüştürür. Ardından `crypto.subtle.digest` ile SHA-256 özetini hesaplayarak deterministik bir 256-bit değer elde eder. Son olarak `crypto.subtle.importKey` ile bu özeti `'raw'` formatında, AES algoritmasıyla ve `['encrypt', 'decrypt']` kullanım amaçlarıyla bir `CryptoKey` nesnesine dönüştürür. Anahtar dışa aktarılamaz olarak (`false`) ayarlanır.
 
 **Parametreler**:
-- `secret`: string — Anahtar türetme için kullanılacak gizli dize.
+- secret: string — Türetilecek kriptografik anahtarın kaynağı olan gizli dize
 
-**Dönüş**: `Promise<CryptoKey>` — AES-GCM algoritması için kullanılabilecek, ‘encrypt’ ve ‘decrypt’ izinlerine sahip CryptoKey nesnesi.
+**Dönüş**: `Promise<CryptoKey>` — AES-GCM şifreleme ve çözme işlemlerinde kullanılacak kriptografik anahtar nesnesi
 
 ### encryptClaims
 **Ne yapar**: Bir claims (talep) nesnesini AES-GCM algoritması ile şifreler, oluşturulan şifreli veriyi Base64URL formatına dönüştürerek bir token string’i üretir.
@@ -68052,62 +69161,82 @@ Bu modül, kullanıcı kimlik doğrulama claim'lerini (yetkilendirme bilgilerini
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/utils/router.ts::getCryptoKey
-- **params**: (secret: string)
+- **params**: `secret` — şifreleme anahtarı türetilecek gizli dize
 - **ic_degiskenler**:
-    - `encoder` — Metinleri byte dizisine dönüştüren TextEncoder nesnesi
-    - `secretBytes` — `secret` parametresinin byte dizisi karşılığı
-    - `hash` — `secretBytes` değerinin SHA-256 ile hashlenmiş 256-bit hali
-- **Dönüş**: Promise<CryptoKey>
+  - `encoder` — `TextEncoder` örneği, `secret` dizesini bayt dizisine dönüştürmek için kullanılır
+  - `secretBytes` — `encoder.encode(secret)` sonucu oluşan `Uint8Array`, SHA-256 özetlemesine girdi olarak verilir
+  - `hash` — `crypto.subtle.digest('SHA-256', secretBytes)` sonucu oluşan 256-bit `ArrayBuffer`, ham anahtar olarak `importKey`'e aktarılır
+- **Dönüş**: `CryptoKey` — AES-GCM algoritmasıyla `encrypt` ve `decrypt` işlemleri için kullanılacak anahtar
+
+---
 
 ### [N2_NASIL] AST Pointer: src/utils/router.ts::encryptClaims
-- **params**: (claims: Record<string, unknown>, secret: string)
+- **params**: `claims` — şifrelenecek `Record<string, unknown>` türünde veri; `secret` — şifreleme anahtarı türetilecek gizli dize
 - **ic_degiskenler**:
-    - `key` — `secret` kullanılarak oluşturulan şifreleme anahtarı (CryptoKey)
-    - `encoder` — Metinleri byte dizisine dönüştüren TextEncoder nesnesi
-    - `dataBytes` — `claims` nesnesinin JSON string halinin byte dizisi
-    - `iv` — AES-GCM şifrelemesi için rastgele 12 byte'lık başlatma vektörü
-    - `encryptedBuffer` — `dataBytes`'ın `iv` ile şifrelenmiş hali (ArrayBuffer)
-    - `combined` — `iv` ve `encryptedBuffer`'ın birleştirilmiş byte dizisi
-- **Dönüş**: Promise<string> (Base64URL formatında şifreli metin)
+  - `key` — `getCryptoKey(secret)` çağrısından dönen `CryptoKey`, AES-GCM şifrelemesinde kullanılır
+  - `encoder` — `TextEncoder` örneği, JSON dizesini bayt dizisine dönüştürmek için
+  - `dataBytes` — `JSON.stringify(claims)` sonucunun `encoder.encode` ile bayt karşılığı
+  - `iv` — `crypto.getRandomValues(new Uint8Array(12))` ile üretilen 12 baytlık rastgele Initialization Vector
+  - `encryptedBuffer` — `crypto.subtle.encrypt({ name: AES_ALGORITHM, iv }, key, dataBytes)` sonucu oluşan şifreli `ArrayBuffer`
+  - `combined` — `iv` ve `encryptedBuffer`'ın birleştirildiği `Uint8Array`; önce `iv` başa, ardından şifreli veri eklenir
+- **Dönüş**: `string` — `combined` bayt dizisinin Base64URL kodlaması (`=`, `+`, `/` karakterleri kaldırılarak)
+
+---
 
 ### [N3_NASIL] AST Pointer: src/utils/router.ts::decryptClaims
-- **params**: (cookieValue: string, secret: string)
+- **params**: `cookieValue` — Base64URL kodlanmış şifreli çerez değeri; `secret` — şifreleme anahtarı türetilecek gizli dize
 - **ic_degiskenler**:
-    - `key` — `secret` kullanılarak oluşturulan şifreleme anahtarı (CryptoKey)
-    - `base64` — `cookieValue`'nin Base64'e dönüştürülmüş hali (tire ve alt çizgi temizlenmiş)
-    - `binary` — `base64` string'inin atob() ile çözülmüş ikili metin hali
-    - `bytes` — `binary` metninin Uint8Array karşılığı
-    - `iv` — `bytes` dizisinin ilk 12 byte'ı (başlatma vektörü)
-    - `encryptedData` — `bytes` dizisinin 12. byte'dan sonuna kadar olan şifreli veri kısmı
-    - `decryptedBuffer` — `encryptedData`'nın `iv` ile çözülmüş hali (ArrayBuffer)
-    - `decryptedStr` — `decryptedBuffer`'ın TextDecoder ile metin string'e dönüştürülmüş hali
-- **Dönüş**: Promise<Record<string, unknown> | null> (hata durumunda null)
+  - `key` — `getCryptoKey(secret)` çağrısından dönen `CryptoKey`
+  - `base64` — `cookieValue`'nun `-` → `+`, `_` → `/` dönüşümü yapılmış ve padding eklenmiş hali
+  - `binary` — `atob(base64)` sonucu oluşan ikili dize
+  - `bytes` — `binary` dizesinin her karakterinin `charCodeAt` ile `Uint8Array`'e dönüştürülmüş hali
+  - `iv` — `bytes.slice(0, 12)` ile çıkarılan 12 baytlık Initialization Vector
+  - `encryptedData` — `bytes.slice(12)` ile çıkarılan şifreli veri kısmı
+  - `decryptedBuffer` — `crypto.subtle.decrypt({ name: AES_ALGORITHM, iv }, key, encryptedData)` sonucu oluşan `ArrayBuffer`
+  - `decryptedStr` — `new TextDecoder().decode(decryptedBuffer)` sonucu oluşan düz metin
+  - `error` — `catch` bloğunda yakalanan hata; `console.error` ile `[Router] Claims cache decryption failed:` mesajıyla loglanır
+- **Dönüş**: `Record<string, unknown> | null` — başarılıysa çözümlenmiş claims nesnesi, hata durumunda veya `bytes.length < 12` ise `null`
+
+---
 
 ### [N4_NASIL] AST Pointer: src/utils/router.ts::resolveUserClaims
-- **params**: (request: NextRequest, response: NextResponse, supabase: { auth: { getClaims: () => Promise<{ data: { claims: Record<string, unknown> | null } | null; error: unknown }> } }, secret: string)
+- **params**: `request` — gelen `NextRequest` nesnesi; `response` — yanıt olarak kullanılacak `NextResponse` nesnesi; `supabase` — `auth.getClaims` metodu olan Supabase istemcisi; `secret` — şifreleme anahtarı türetilecek gizli dize
 - **ic_degiskenler**:
-    - `cachedCookie` — İstekten alınan 'sb-claims-cache' cookie değeri
-    - `claims` — Önbellekten başarıyla çözülen veya Supabase'den alınan kullanıcı iddiaları (claims)
-    - `data` — Supabase auth.getClaims() çağrısının successful sonucu (claims içeren nesne)
-    - `error` — Supabase auth.getClaims() çağrısının hata sonucu
-    - `encrypted` — `claims`'in `secret` ile şifrelenmiş hali (cookie için hazırlanmış)
-- **Dönüş**: Promise<{ claims: Record<string, unknown> | null; error: unknown; source: 'cache' | 'client' }>
+  - `cachedCookie` — `request.cookies.get('sb-claims-cache')?.value` ile okunan çerez değeri; varsa önbellekten çözümleme denenir
+  - `claims` — (ilk blok) `decryptClaims(cachedCookie, secret)` sonucu; `claims.user_role` varsa önbellek kaynağıyla dönülür
+  - `data` — `supabase.auth.getClaims()` sonucundaki `data` alanı; `data.claims` null değilse kullanılır
+  - `error` — `supabase.auth.getClaims()` sonucundaki `error` alanı; varsa hata ile dönülür
+  - `claims` — (ikinci blok) `data.claims` ataması; önbelleğe yazılır ve `source: 'client'` ile dönülür
+  - `encrypted` — `encryptClaims(claims, secret)` sonucu oluşan Base64URL dizesi; `setClaimsCacheCookie` ile çereze yazılır
+  - `err` — `catch` bloğunda yakalanan hata; `source: 'client'` ile birlikte dönülür
+- **Dönüş**: `{ claims: Record<string, unknown> | null; error: unknown; source: 'cache' | 'client' }` — claims verisi, hata durumu ve verinin kaynağı (önbellek veya Supabase istemcisi)
+
+---
 
 ### [N5_NASIL] AST Pointer: src/utils/router.ts::setClaimsCacheCookie
-- **params**: (response: NextResponse, cookieValue: string, maxAgeSeconds: number)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: response nesnesine cookie ekler)
+- **params**: `response` — çerez eklenecek `NextResponse` nesnesi; `cookieValue` — çereze yazılacak şifreli değer; `maxAgeSeconds` — çerez ömrü saniye cinsinden (varsayılan `900`, yani 15 dakika)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `response.cookies.set('sb-claims-cache', ...)` çağrısı yapılır; `httpOnly: true`, `secure` ortama bağlı (`process.env.NODE_ENV === 'production'`), `sameSite: 'lax'`, `path: '/'`
+
+---
 
 ### [N6_NASIL] AST Pointer: src/utils/router.ts::clearClaimsCacheCookie
-- **params**: (response: NextResponse)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: response nesnesindeki cookie'yi siler)
+- **params**: `response` — çerez silinecek `NextResponse` nesnesi
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — yan etki olarak `response.cookies.set('sb-claims-cache', '', ...)` çağrısı yapılır; `maxAge: 0` ile çerez hemen silinir; `httpOnly: true`, `secure` ortama bağlı, `sameSite: 'lax'`, `path: '/'`
+
+---
 
 ### [N7_NASIL] AST Pointer: src/utils/router.ts::createRedirectResponse
-- **params**: (request: NextRequest, targetUrl: string | URL, responseToCopyFrom: NextResponse, status: number)
+- **params**: `request` — gelen `NextRequest` nesnesi (fonksiyon gövdesinde doğrudan kullanılmaz); `targetUrl` — yönlendirme hedefi `string | URL`; `responseToCopyFrom` — çerez ve başlıkları kopyalanacak `NextResponse` nesnesi; `status` — HTTP durum kodu (varsayılan `302`)
 - **ic_degiskenler**:
-    - `redirectRes` — Yeni oluşturulacak ve döndürülecek yönlendirme yanıtı
-- **Dönüş**: NextResponse (yeni yönlendirme yanıtı)
+  - `redirectRes` — `NextResponse.redirect(targetUrl, status)` ile oluşturulan yönlendirme yanıtı
+  - `name` — `responseToCopyFrom.cookies.getAll()` sonucundaki her çerez nesnesinden çıkarılan çerez adı
+  - `value` — çerez değeri
+  - `options` — çerez nesnesinden geriye kalan seçenekler (`...options` ile yayılır)
+  - `value` — `responseToCopyFrom.headers.forEach` içindeki başlık değeri
+  - `key` — başlık adı
+- **Dönüş**: `NextResponse` — `responseToCopyFrom`'dan tüm çerezlerin ve başlıkların kopyalandığı yönlendirme yanıtı
 
 ---
 
@@ -68122,11 +69251,11 @@ graph TD
     router_ts__getCryptoKey["getCryptoKey"]
     router_ts__resolveUserClaims["resolveUserClaims"]
     router_ts__setClaimsCacheCookie["setClaimsCacheCookie"]
-    router_ts__resolveUserClaims --> router_ts__decryptClaims
     router_ts__decryptClaims --> router_ts__getCryptoKey
+    router_ts__resolveUserClaims --> router_ts__decryptClaims
     router_ts__encryptClaims --> router_ts__getCryptoKey
-    router_ts__resolveUserClaims --> router_ts__encryptClaims
     router_ts__resolveUserClaims --> router_ts__setClaimsCacheCookie
+    router_ts__resolveUserClaims --> router_ts__encryptClaims
 ```
 
 ## NODE ID STANDARD
@@ -68297,13 +69426,13 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, gövdeden çıkarım 
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\searchHighlight.tsx
-skeleton_hash: d0885af7ae2aacf0
+source_path: C:\tmp\vh-altyapi-t165\src\utils\searchHighlight.tsx
+skeleton_hash: 90c0f88127d617df
 entity_hashes:
   func:highlightMatch: bf63ff75bf4f9ff9
   overview: 9e26f4040beaf132
   style_tokens: 9f79124e858dad58
-generated_at: 2026-08-24T11:56:38Z
+generated_at: 2026-08-27T08:40:00Z
 ---
 
 ## Genel Bakış
@@ -68401,8 +69530,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\specLabel.ts
-skeleton_hash: 2d7cac962aa06945
+source_path: C:\tmp\vh-altyapi-t165\src\utils\specLabel.ts
+skeleton_hash: 9c9f459604f8758e
 entity_hashes:
   func:humanizeSpecKey: 92b6a2883d350cb4
   func:isUnresolved: 9b9c86faed2da559
@@ -68410,7 +69539,7 @@ entity_hashes:
   func:specGroupLabel: 8b1dd350bdc82961
   func:titleCaseWord: 4c89297ad2712bb0
   overview: ec228b8d5ad8552f
-generated_at: 2026-08-25T08:45:18Z
+generated_at: 2026-08-27T08:40:02Z
 ---
 
 ## Genel Bakış
@@ -68540,10 +69669,10 @@ graph TD
     specLabel_ts__specFieldLabel["specFieldLabel"]
     specLabel_ts__specGroupLabel["specGroupLabel"]
     specLabel_ts__titleCaseWord["titleCaseWord"]
-    specLabel_ts__specFieldLabel --> specLabel_ts__isUnresolved
-    specLabel_ts__specFieldLabel --> specLabel_ts__humanizeSpecKey
-    specLabel_ts__specGroupLabel --> specLabel_ts__isUnresolved
     specLabel_ts__specGroupLabel --> specLabel_ts__humanizeSpecKey
+    specLabel_ts__specFieldLabel --> specLabel_ts__isUnresolved
+    specLabel_ts__specGroupLabel --> specLabel_ts__isUnresolved
+    specLabel_ts__specFieldLabel --> specLabel_ts__humanizeSpecKey
 ```
 
 ## NODE ID STANDARD
@@ -68571,9 +69700,9 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\tenantConstants.ts
-skeleton_hash: 3cbd7024528e2833
-generated_at: 2026-06-19T20:48:17.194932+00:00
+source_path: C:\tmp\vh-altyapi-t165\src\utils\tenantConstants.ts
+skeleton_hash: dcf3360b9932ec9a
+generated_at: 2026-08-27T08:40:03.355639+00:00
 ---
 
 ## Genel Bakış
@@ -68588,7 +69717,7 @@ Client-safe tenant sabitleri — `next/headers` İÇERMEZ, client bundle'a güve
 (Dışa açılan çağrılabilir öğe yok — modül-düzeyi yan-etki; AST işaretçisi gerektiren fonksiyon/metot yok.)
 
 ## NODE ID STANDARD
-file: C:\Users\alize\venthub-hvac\src\utils\tenantConstants.ts
+file: C:\tmp\vh-altyapi-t165\src\utils\tenantConstants.ts
 
 
 ---
@@ -68598,11 +69727,11 @@ file: C:\Users\alize\venthub-hvac\src\utils\tenantConstants.ts
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\tenantServer.ts
-skeleton_hash: d8a9297cf2031ecb
+source_path: C:\tmp\vh-altyapi-t165\src\utils\tenantServer.ts
+skeleton_hash: a948cd8391b951f5
 entity_hashes:
   overview: 5ef2b4c70f7b5fe7
-generated_at: 2026-08-24T12:50:47Z
+generated_at: 2026-08-27T08:40:04Z
 ---
 
 ## Genel Bakış
@@ -68640,10 +69769,8 @@ Modül, `next/headers` paketinden gelen `headers` fonksiyonu ile HTTP istek bağ
 - `subdomain: string | null`
 - `custom_domain: string | null`
 - `is_active: boolean`
-- `features: {
-`
-- `styles: {
-`
+- `features: {`
+- `styles: {`
 
 ---
 
@@ -68686,13 +69813,13 @@ Hiçbir fonksiyon imzası veya gövdesi sağlanmadığından, AST Pointer üreti
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\testA11y.tsx
-skeleton_hash: c7d2ee75c282088f
+source_path: C:\tmp\vh-altyapi-t165\src\utils\testA11y.tsx
+skeleton_hash: cf604bbe98724a72
 entity_hashes:
   func:testA11y: 6d4bd31af048cc2e
   overview: 20d45dae2ce47704
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:40:05Z
 ---
 
 ## Genel Bakış
@@ -68776,14 +69903,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\type-converters.ts
-skeleton_hash: 43b8963130f87849
+source_path: C:\tmp\vh-altyapi-t165\src\utils\type-converters.ts
+skeleton_hash: 00b8bf17d9a5cbef
 entity_hashes:
   func:isRecord: 8ce9e37872c18872
   func:safeNumber: 2b963d2c4a44b8a1
   func:safeString: c82cbd1b53f6b21c
   overview: 7d1f2b251cf19bd1
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:40:06Z
 ---
 
 ## Genel Bakış
@@ -68887,8 +70014,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\whatsapp.ts
-skeleton_hash: 4278eead10d35e83
+source_path: C:\tmp\vh-altyapi-t165\src\utils\whatsapp.ts
+skeleton_hash: beaad6bb00740cd0
 entity_hashes:
   func:createWhatsAppLink: 48e63882e6e926f6
   func:formatPhoneNumber: d061dc961d242dd9
@@ -68903,7 +70030,7 @@ entity_hashes:
   func:isWhatsAppAvailable: 424fa5ec202a97c6
   func:msg: 33516e409efa62f9
   overview: c6b7df78706dfc37
-generated_at: 2026-08-25T07:29:39Z
+generated_at: 2026-08-27T08:40:08Z
 ---
 
 ## Genel Bakış
@@ -69112,35 +70239,35 @@ graph TD
     whatsapp_ts__getWhatsAppNumber["getWhatsAppNumber"]
     whatsapp_ts__isWhatsAppAvailable["isWhatsAppAvailable"]
     whatsapp_ts__msg["msg"]
-    whatsapp_ts__getSupportLink --> whatsapp_ts__createWhatsAppLink
+    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__generateStockInquiryMessage
+    whatsapp_ts__getSupportLink --> whatsapp_ts__getWhatsAppNumber
     whatsapp_ts__generateTechnicalQuoteMessage --> whatsapp_ts__msg
     whatsapp_ts__getSupportLink --> whatsapp_ts__generateSupportMessage
-    whatsapp_ts__generateFAQSupportMessage --> whatsapp_ts__msg
+    whatsapp_ts__getSupportLink --> whatsapp_ts__createWhatsAppLink
     whatsapp_ts__generateSupportMessage --> whatsapp_ts__msg
+    whatsapp_ts__generateStockInquiryMessage --> whatsapp_ts__msg
     whatsapp_ts__getStockInquiryLink --> whatsapp_ts__getWhatsAppNumber
     whatsapp_ts__getStockInquiryLink --> whatsapp_ts__createWhatsAppLink
-    whatsapp_ts__generateStockInquiryMessage --> whatsapp_ts__msg
     whatsapp_ts__isWhatsAppAvailable --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__generateFAQSupportMessage --> whatsapp_ts__msg
     whatsapp_ts__generateContactMessage --> whatsapp_ts__msg
-    whatsapp_ts__getSupportLink --> whatsapp_ts__getWhatsAppNumber
-    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__generateStockInquiryMessage
 ```
 
 ## NODE ID STANDARD
 
-  file: whatsapp.ts
-  function: whatsapp.ts::msg
-  function: whatsapp.ts::getWhatsAppNumber
-  function: whatsapp.ts::formatPhoneNumber
-  function: whatsapp.ts::createWhatsAppLink
-  function: whatsapp.ts::generateStockInquiryMessage
-  function: whatsapp.ts::generateSupportMessage
-  function: whatsapp.ts::generateTechnicalQuoteMessage
-  function: whatsapp.ts::generateFAQSupportMessage
-  function: whatsapp.ts::generateContactMessage
-  function: whatsapp.ts::isWhatsAppAvailable
-  function: whatsapp.ts::getStockInquiryLink
-  function: whatsapp.ts::getSupportLink
+  file: src\utils\whatsapp.ts
+  function: src\utils\whatsapp.ts::msg
+  function: src\utils\whatsapp.ts::getWhatsAppNumber
+  function: src\utils\whatsapp.ts::formatPhoneNumber
+  function: src\utils\whatsapp.ts::createWhatsAppLink
+  function: src\utils\whatsapp.ts::generateStockInquiryMessage
+  function: src\utils\whatsapp.ts::generateSupportMessage
+  function: src\utils\whatsapp.ts::generateTechnicalQuoteMessage
+  function: src\utils\whatsapp.ts::generateFAQSupportMessage
+  function: src\utils\whatsapp.ts::generateContactMessage
+  function: src\utils\whatsapp.ts::isWhatsAppAvailable
+  function: src\utils\whatsapp.ts::getStockInquiryLink
+  function: src\utils\whatsapp.ts::getSupportLink
 
 ---
 
@@ -72265,13 +73392,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\account\AccountAddressesPage.tsx
-skeleton_hash: f7e7228eef723bcc
+source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx
+skeleton_hash: 6a35ab6f5cca3044
 entity_hashes:
   func:AccountAddressesPage: 8a10c2ba61747811
   overview: cfdfd55850a3c6f9
   style_tokens: 20e5949307a3284f
-generated_at: 2026-08-27T07:10:03Z
+generated_at: 2026-06-19T20:48:21Z
 ---
 
 ## Genel Bakış
@@ -72344,15 +73471,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **emptyForm** (object) — `{
-
   label: '',
-
   full_name: '',
-
   phone: '',
-
   address_line: '',
-
   city:...`
 
 ---
@@ -73965,17 +75087,17 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\views\account\OrderDetailPage.tsx
-skeleton_hash: 2b6661c0a71b96df
+source_path: C:\Users\alize\venthub-wt-altyapi\src\views\account\OrderDetailPage.tsx
+skeleton_hash: 884bfc2dd0c01b0e
 entity_hashes:
-  func:OrderDetailPage: 85c6f615024b92fd
-  overview: a5cc962f9daa7e69
+  func:OrderDetailPage: dfa1eb0c67bb7d37
+  overview: c0f73db07d5be692
   style_tokens: 2d7ff3d6e2a546ab
-generated_at: 2026-08-27T04:15:16Z
+generated_at: 2026-08-18T06:53:36Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcının hesap panelinden eriştiği belirli bir siparişin detaylı görünümünü sunan tek bir React sayfa bileşeninden oluşur. Sipariş özeti, ürünler, kargo takibi ve fatura bilgilerini sekmeler halinde düzenler ve sipariş durumunu adım adım gösteren bir ilerleme çubuğu ile yeniden sipariş verme gibi eylemler sunar. Bileşen, URL'den sipariş kimliğini alır, kimlik doğrulamasını kontrol eder ve Supabase veritabanından sipariş verilerini ilişkisel sorguyla çeker.
+Bu modül, kullanıcı hesap panelinden erişilen tek bir siparişin tüm detaylarını görüntüleyen React sayfa bileşenidir. Sipariş özeti, ürünler, ödeme bilgileri ve teslimat durumunu düzenli bir arayüzde sunarak kullanıcıya siparişinin tamamını tek bir sayfada inceleme imkânı sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
@@ -73985,21 +75107,22 @@ Modülün tek ve merkezi bileşeni olup, sipariş verisini alarak sayfa düzenin
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden türetilen özel aksiyom tanımlanmamıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### OrderDetailPage
-**Ne yapar**: Sipariş detay sayfasını oluşturan React bileşenidir. URL'den alınan sipariş kimliğine göre veritabanından sipariş verilerini çeker, sipariş kalemlerini eşler ve kullanıcıya sipariş özeti, ürünler, kargo takibi ve fatura bilgilerini sekmeli bir arayüzde sunar. Kimlik doğrulama yapılmamış kullanıcıları giriş sayfasına yönlendirir.
+**Ne yapar**: Kullanıcının belirli bir siparişinin detaylı görünümünü sunan React bileşenidir. Sipariş özeti, ürünler, kargo takibi ve fatura olmak üzere dört sekmede bilgi görüntüler; sipariş durumunu adım adım gösteren bir ilerleme çubuğu ve yeniden sipariş verme gibi eylemler sunar.
 
-**Nasıl yapar**: Bileşen önce `useSearchParams` ile URL'deki `id` parametresini alır. `useAuth` ile kullanıcı oturum durumunu kontrol eder; oturum açılmamışsa `useRouter` ile giriş sayfasına yönlendirir. `useI18n` ve `useLocalizedRoutes` ile çoklu dil desteği ve yerelleştirilmiş rotaları kullanır. `useCart` ile sepete ekleme fonksiyonuna erişir. İlk `useEffect` kimlik doğrulama kontrolü yapar. İkinci `useEffect` içinde tanımlanan `load` fonksiyonu, Supabase üzerinden `venthub_orders` tablosundan sipariş ana verilerini ve ilişkili `venthub_order_items` kalemlerini tek bir sorguda çeker (ilişkisel sorgu optimizasyonu). Çekilen kalemler `*_snapshot` sütunlarından okunur; canlı katalogtan değil, sipariş anındaki anlık değerlerden — bu bir fatura görünümüdür ve ürün adı ya da fiyatı sonradan değişse bile müşterinin gördüğü kayıt değişmemelidir. Yedek (fallback) bilerek yoktur çünkü bu alanlar veritabanında NOT NULL olarak tanımlıdır ve "boşsa eski kolona düş" davranışı sessiz bozulmaya yol açardı. Görünen müşteri adı yedeği sözlükten gelir; ham Türkçe dizge EN kullanıcıya da gösteriyordu (I18N-SWEEP bildirdi; anahtar ortak sözlükte). Durum renkleri ve metinleri için `getStatusColor` ve `getStatusText` yardımcı fonksiyonları kullanılır. İlerleme çubuğu için `'confirmed'` durumu `'paid'` olarak normalize edilir. Sekme yapısı `'overview'`, `'items'`, `'shipping'`, `'invoice'` olmak üzere dört bölümden oluşur. Yükleme sırasında spinner gösterilir.
+**Nasıl yapar**: `useSearchParams` hook'u ile URL'den sipariş ID'sini alır. `useAuth` hook'u ile kimlik doğrulaması kontrol eder; kullanıcı giriş yapmamışsa `useRouter` ile login sayfasına yönlendirme yapar. `useEffect` içindeki `load` asenkron fonksiyonu ile Supabase veritabanından `venthub_orders` tablosuna ilişkisel sorgu (`.select` ile `venthub_order_items` join'i) göndererek tek bir sorguda sipariş ana verilerini ve kalemleri çeker. Ham verileri `Order` ve `OrderItem` tiplerine dönüştürürken `*_snapshot` kolonlarından (`product_name_snapshot`, `unit_price_snapshot`, `product_sku_snapshot`) okuma yaparak sipariş anındaki fiyat ve ürün bilgisini korur (W2b-2 snapshot prensibi). `handleInvoicePdf` fonksiyonunda `jsPDF` ve `jspdf-autotable` paketlerini `Promise.all` ile dinamik import ederek proforma PDF'i oluşturur ve indirir. `handleReorder` fonksiyonunda sipariş kalemlerinden ürünleri sorgulayarak sepete ekler. `useI18n` hook'u ile çoklu dil desteği, `useCart` hook'u ile sepet yönetimi sağlar.
 
-**Parametreler**:
-- Parametre almaz (fonksiyon bileşeni).
+**Parametreler**: Parametre almaz (React bileşeni, props’suz fonksiyonel bileşendir).
 
-**Dönüş**: Bilinmiyor (tip belirtilmemiş).
+**Dönüş**: JSX.Element — Sipariş detay sayfasını oluşturan React JSX'i; yükleme durumunda spinner, sipariş hazır olduğunda tam sayfa arayüzü döndürür.
 
 ---
 
@@ -74008,7 +75131,6 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden 
 - import: ../../hooks/useCartHook::useCart
 - import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
-- import: ../../i18n/currency::SYSTEM_CURRENCY
 - import: ../../i18n/datetime::formatDateTime
 - import: ../../i18n/format::formatCurrency
 - import: ../../lib/services/product.columns::VARIANT_DETAIL_COLUMNS
@@ -74074,226 +75196,182 @@ Bu modül için fonksiyon gövdesi sağlanmadığından, fonksiyon gövdesinden 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::useEffect (auth kontrol)
-- **params**: yok
+### [N1_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::authRedirectEffect
+- **params**: (yok — anonim arrow fonksiyon)
 - **ic_degiskenler**:
-  - `authLoading` — kimlik doğrulama yüklenme durumu; true ise kontrol yapılmaz
-  - `user` — giriş yapmış kullanıcı nesnesi; yoksa login sayfasına yönlendirilir
-  - `router` — Next.js router nesnesi; sayfa yönlendirmesi için kullanılır
-  - `Routes` — rota sabitleri nesnesi; `Routes.auth.login()` ve `Routes.account.orderDetail()` fonksiyonları çağrılır
-  - `id` — sipariş ID'si; login sonrası geri dönüş URL'inde kullanılır
-- **Dönüş**: yok
+  - `authLoading` — useAuth hook'undan gelen yükleme durumu bayrağı
+  - `user` — useAuth hook'undan gelen oturum açmış kullanıcı nesnesi
+  - `router` — useRouter() navigasyon nesnesi
+  - `id` — useSearchParams'dan gelen sipariş URL parametresi
+  - `Routes.auth.login(...)` — login sayfası rotası, argüman olarak orderDetail rotası verilir
+  - `Routes.account.orderDetail(id)` — mevcut sipariş detay rotası
+- **Dönüş**: yok (yan etki: `router.push` ile login sayfasına yönlendirme)
 
-### [N2_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::useEffect (sipariş yükleme)
-- **params**: yok
-- **ic_degiskenler**:
-  - `user` — giriş yapmış kullanıcı nesnesi; yoksa yükleme yapılmaz
-  - `id` — sipariş ID'si; yoksa yükleme yapılmaz
-  - `setLoading` — yükleme durumunu güncelleyen state setter fonksiyonu
-  - `supabase` — Supabase istemcisi; veritabanı sorguları için kullanılır
-  - `setOrder` — sipariş verisini güncelleyen state setter fonksiyonu
-  - `toast` — bildirim gösterme fonksiyonu; hata durumunda `toast.error()` çağrılır
-  - `t` — çeviri fonksiyonu; hata mesajı anahtarı için kullanılır
-  - `console.error` — hata günlüğü; yakalanan hataları konsola yazar
-- **Dönüş**: yok
+---
 
-### [N3_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::load
-- **params**: yok
+### [N2_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::loadEffect
+- **params**: (yok — anonim arrow fonksiyon, useEffect callback)
 - **ic_degiskenler**:
-  - `user` — giriş yapmış kullanıcı nesnesi; yoksa fonksiyon erken döner
-  - `id` — sipariş ID'si; Supabase sorgusunda `.eq('id', id)` filtresi olarak kullanılır
-  - `setLoading` — yükleme durumunu güncelleyen state setter; try bloğunda true, finally'de false yapılır
-  - `supabase` — Supabase istemcisi; `venthub_orders` tablosundan veri çeker
-  - `orderData` — Supabase sorgusundan dönen sipariş verisi; ilişkisel sorgu ile `venthub_order_items` dahil çekilir
-  - `orderError` — Supabase sorgu hatası; varsa throw edilir
-  - `rawItems` — `orderData.venthub_order_items` dizisi; `Record<string, unknown>[]` tipinde, yoksa boş dizi atanır
-  - `mappedItems` — `rawItems` dizisinin `OrderItem` tipine dönüştürülmüş hali; `rawItems.map()` ile oluşturulur
-  - `mappedOrder` — `Order` tipinde nesne; `orderData` alanlarından dönüştürülerek oluşturulur
-  - `setOrder` — `mappedOrder`'ı state'e kaydeden setter fonksiyonu
-  - `toast` — bildirim fonksiyonu; hata durumunda `toast.error()` çağrılır
-  - `t` — çeviri fonksiyonu; `t('orders.unexpectedError')` ve `t('common.userFallback')` anahtarları için kullanılır
-  - `console.error` — hata günlüğü; `'Order load error:'` mesajıyla yakalanan hatayı yazar
-  - `e` — catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: yok
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi; load içinde koruma kontrolü yapılır
+  - `id` — useSearchParams'dan gelen sipariş ID'si; load içinde koruma kontrolü yapılır
+  - `load` — effectscope içinde tanımlı asenkron yardımcı fonksiyon; veri çekme işlemini yürütür ve ardından hemen çağrılır
+- **Dönüş**: yok (yan etki: asenkron veri yükleme, state güncellemeleri)
 
-### [N4_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::mappedItems map callback
-- **params**: `it` — ham sipariş kalemi nesnesi; `Record<string, unknown>` tipinde
-- **ic_degiskenler**:
-  - `it.unit_price_snapshot` — birim fiyat snapshot alanı; `Number()` ile sayıya dönüştürülür, yoksa 0 atanır
-  - `it.quantity` — miktar alanı; `Number()` ile sayıya dönüştürülür, yoksa 0 atanır
-  - `unit` — dönüştürülmüş birim fiyat; `Number(it.unit_price_snapshot) || 0`
-  - `qty` — dönüştürülmüş miktar; `Number(it.quantity) || 0`
-  - `it.id` — kalemin ID'si; `String()` ile dönüştürülür
-  - `it.product_id` — ürün ID'si; varsa `String()` ile dönüştürülür, yoksa `undefined`
-  - `it.product_name_snapshot` — ürün adı snapshot; `String()` ile dönüştürülür
-  - `it.product_sku_snapshot` — ürün SKU snapshot; varsa `String()` ile dönüştürülür, yoksa `undefined`
-  - `it.product_image_url` — ürün görsel URL'si; varsa `String()` ile dönüştürülür, yoksa `null`
-- **Dönüş**: `OrderItem` nesnesi — `id`, `product_id`, `product_name`, `product_sku`, `quantity`, `unit_price`, `total_price`, `product_image_url` alanlarını içerir
+---
 
-### [N5_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::copyToClipboard
-- **params**: `text` — kopyalanacak metin; opsiyonel string
+### [N3_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::load
+- **params**: (yok — `async function load()`)
 - **ic_degiskenler**:
-  - `text` — kopyalanacak metin; yoksa fonksiyon erken döner
-  - `navigator.clipboard.writeText` — panoya yazma API'si; `text` parametresini panoya kopyalar
-  - `toast` — bildirim fonksiyonu; başarılı kopyalamada `toast.success()`, hata durumunda `toast.error()` çağrılır
-  - `t` — çeviri fonksiyonu; `t('orders.copied')` ve `t('orders.copyFailed')` anahtarları için kullanılır
-- **Dönüş**: yok
+  - `orderData` — `supabase.from('venthub_orders').select(...).eq('id', id).single()` sorgusundan dönen sipariş ve ilişkili kalemler verisi (ilişkisel sorgu ile tek seferde çekilen ana + detay verisi)
+  - `orderError` — Supabase sorgu sonucundan destructuring ile alınan hata nesnesi; throw ile yukarı fırlatılır
+  - `rawItems` — `orderData.venthub_order_items` alanının `Record<string, unknown>[]` tipine cast edilmiş ham kalem dizisi; `|| []` ile boş dizi fallback'i
+  - `mappedItems` — `rawItems.map(...)` çağrısı ile `OrderItem[]` formatına dönüştürülmüş sipariş kalemleri dizisi
+  - `mappedOrder` — Tüm sipariş alanlarının `Order` tipine dönüştürülmüş tam nesne; snapshot kolonları, fallback değerler ve `user` nesnesinden türetilen alanlar dahil
+  - `e` — try-catch yakalama değişkeni; `console.error` ve `toast.error` ile işlenir
+- **Dönüş**: yok (yan etki: `setOrder(mappedOrder)`, `setLoading(false)`, `toast.error`)
+- **API Çağrıları**: `supabase.from('venthub_orders').select(relationalQuery).eq('id', id).single()`
+- **Dict Erişimleri**: `orderData.id`, `orderData.total_amount`, `orderData.status`, `orderData.payment_status`, `orderData.created_at`, `orderData.customer_name`, `orderData.customer_email`, `orderData.shipping_address`, `orderData.order_number`, `orderData.conversation_id`, `orderData.carrier`, `orderData.tracking_number`, `orderData.tracking_url`, `orderData.shipped_at`, `orderData.delivered_at`, `orderData.shipping_method`, `orderData.invoice_type`, `orderData.invoice_info`, `orderData.legal_consents`, `orderData.venthub_order_items`, `user?.user_metadata?.full_name`, `user?.email`
 
-### [N6_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::downloadProforma
-- **params**: `o` — proforma oluşturulacak `Order` nesnesi
-- **ic_degiskenler**:
-  - `jsPDF` — jsPDF kütüphanesinin default export'u; dinamik import ile yüklenir
-  - `autoTable` — jspdf-autotable eklentisinin default export'u; dinamik import ile yüklenir
-  - `doc` — jsPDF belge nesnesi; `new jsPDF({ unit: 'pt', format: 'a4' })` ile oluşturulur
-  - `o.order_number` — sipariş numarası; varsa `'-'` ile bölünerek ikinci parça alınır
-  - `o.id` — sipariş ID'si; `order_number` yoksa son 8 karakteri büyük harfle kullanılır
-  - `orderNo` — proforma numarası; `o.order_number` veya `o.id` türetilir
-  - `o.created_at` — sipariş oluşturulma tarihi; `formatDateTime()` ile biçimlendirilir
-  - `lang` — dil parametresi; tarih ve para birimi biçimlendirmede kullanılır
-  - `o.customer_name` — müşteri adı; PDF'de gösterilir
-  - `o.customer_email` — müşteri e-postası; varsa PDF'de gösterilir
-  - `head` — tablo başlık satırı; çeviri fonksiyonu ile oluşturulur
-  - `o.order_items` — sipariş kalemleri dizisi; tablo gövdesi için dönüştürülür
-  - `body` — tablo gövdesi; her kalem için `[ürün_adı, miktar, birim_fiyat, toplam_fiyat]` dizisi
-  - `formatCurrency` — para birimi biçimlendirme fonksiyonu; fiyatlar için kullanılır
-  - `SYSTEM_CURRENCY` — sistem para birimi sabiti; `formatCurrency`'ye iletilir
-  - `after` — autoTable bitiş Y koordinatı; `doc.lastAutoTable.finalY` veya 100
-  - `o.total_amount` — sipariş toplam tutarı; grand total satırında gösterilir
-  - `t` — çeviri fonksiyonu; `t('orders.grandTotal')` anahtarı için kullanılır
-  - `e` — catch bloğunda yakalanan hata nesnesi
-  - `toast` — bildirim fonksiyonu; hata durumunda `toast.error()` çağrılır
-- **Dönüş**: yok
+---
 
-### [N7_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::reorder
-- **params**: `o` — yeniden sipariş verilecek `Order` nesnesi
+### [N4_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::mapOrderItem
+- **params**: `(it)` — Ham sipariş kalemi satırı (`Record<string, unknown>`)
 - **ic_degiskenler**:
-  - `o.order_items` — sipariş kalemleri dizisi; ürün ID'leri ve isimleri çıkarılır
-  - `ids` — benzersiz ürün ID'leri dizisi; `Set` ile tekrarlar kaldırılır, boş olmayan `product_id` değerleri filtrelenir
-  - `names` — benzersiz ürün adları dizisi; `product_id` olmayan ama `product_name` olan kalemlerden çıkarılır
-  - `productMap` — ürün haritası; `Record<string, Product>` tipinde, ID ve isim anahtarlarıyla ürünleri saklar
-  - `supabase` — Supabase istemcisi; `products` tablosundan veri çeker
-  - `VARIANT_DETAIL_COLUMNS` — ürün sütun seçimi sabiti; Supabase select sorgusunda kullanılır
-  - `data` — Supabase sorgusundan dönen ürün verisi; `Product[]` tipine dönüştürülür
-  - `error` — Supabase sorgu hatası; varsa throw edilir
-  - `added` — sepete eklenen toplam miktar; sayaç olarak kullanılır
-  - `it` — döngüdeki sipariş kalemi; `product_id` veya `product_name` ile eşleştirilir
-  - `prod` — eşleştirilen `Product` nesnesi; `productMap`'ten ID veya isimle aranır
-  - `addToCart` — sepete ekleme fonksiyonu; `prod` ve `it.quantity` ile çağrılır
-  - `toast` — bildirim fonksiyonu; başarılı durumda `toast.success()`, hata durumunda `toast.error()` çağrılır
-  - `t` — çeviri fonksiyonu; `t('orders.reorderedToast')`, `t('orders.reorderNotFound')`, `t('orders.reorderError')` anahtarları için kullanılır
-  - `router` — Next.js router nesnesi; sepet sayfasına yönlendirme için kullanılır
-  - `Routes` — rota sabitleri nesnesi; `Routes.cart()` fonksiyonu çağrılır
-  - `e` — catch bloğunda yakalanan hata nesnesi
-  - `console.error` — hata günlüğü; yakalanan hatayı konsola yazar
-- **Dönüş**: yok
+  - `unit` — `Number(it.unit_price_snapshot) || 0` hesaplaması ile elde edilen birim fiyat (sayısal, snapshot kolonundan okunur, canlı katalogdan değil)
+  - `qty` — `Number(it.quantity) || 0` hesaplaması ile elde edilen ürün miktarı (sayısal)
+- **Dönüş**: `OrderItem` nesnesi — `id`, `product_id`, `product_name`, `product_sku`, `quantity`, `unit_price`, `total_price` (`unit * qty`), `product_image_url` alanlarını içerir
+- **Dict Erişimleri**: `it.unit_price_snapshot`, `it.quantity`, `it.id`, `it.product_id`, `it.product_name_snapshot`, `it.product_sku_snapshot`, `it.product_image_url`
 
-### [N8_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::getStatusColor
-- **params**: `status` — sipariş durumu string'i
-- **ic_degiskenler**:
-  - `status` — sipariş durumu; `toLowerCase()` ile küçük harfe dönüştürülerek eşleştirilir
-- **Dönüş**: string — Tailwind CSS renk sınıfı; duruma göre `bg-yellow-100 text-yellow-800`, `bg-blue-100 text-blue-800`, `bg-purple-100 text-purple-800`, `bg-green-100 text-green-800`, `bg-red-100 text-red-800` veya `bg-gray-100 text-gray-800`
+---
 
-### [N9_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::getStatusText
-- **params**: `status` — sipariş durumu string'i
+### [N5_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::copyToClipboard
+- **params**: `(text?: string)` — Kopyalanacak metin dizgesi (opsiyonel)
 - **ic_degiskenler**:
-  - `status` — sipariş durumu; `toLowerCase()` ile küçük harfe dönüştürülerek eşleştirilir
-  - `t` — çeviri fonksiyonu; durum metinleri için `t('orders.pending')`, `t('orders.paid')`, `t('orders.shipped')`, `t('orders.delivered')`, `t('orders.failed')`, `t('orders.cancelled')`, `t('orders.refunded')` anahtarları kullanılır
-- **Dönüş**: string — çevrilmiş durum metni veya eşleşme yoksa orijinal `status` değeri
+  - (yok — parametre ve API çağrıları dışında yerel değişken yok)
+- **Dönüş**: yok (yan etki: `navigator.clipboard.writeText(text)`, `toast.success` veya `toast.error`)
+- **API Çağrıları**: `navigator.clipboard.writeText(text)`
 
-### [N10_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::step render callback
-- **params**: `s` — adım durumu string'i, `idx` — adım indeksi numarası
-- **ic_degiskenler**:
-  - `s` — adım durumu; `getStatusText(s)` ile çevrilerek gösterilir
-  - `idx` — adım indeksi; 0'dan başlar, aktif adım kontrolünde kullanılır
-  - `activeIdx` — aktif adım indeksi; `idx <= activeIdx` kontrolüyle adım durumu belirlenir
-  - `steps` — adımlar dizisi; son adım kontrolünde `steps.length - 1` ile karşılaştırılır
-  - `getStatusText` — durum metni fonksiyonu; `s` parametresiyle çağrılır
-- **Dönüş**: JSX element — adım göstergesi (daire + metin + çizgi)
+---
 
-### [N11_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::tab render callback
-- **params**: `tt` — sekme adı string'i
+### [N6_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::generatePDF
+- **params**: `(o: Order)` — PDF'i oluşturulacak sipariş nesnesi
 - **ic_degiskenler**:
-  - `tt` — sekme adı; `'overview'`, `'items'`, `'shipping'`, `'invoice'` değerlerinden biri
-  - `setTab` — sekme state setter fonksiyonu; tıklama olayında `setTab(tt)` çağrılır
-  - `tab` — aktif sekme; `tab === tt` kontrolüyle aktif stil belirlenir
-  - `t` — çeviri fonksiyonu; `t('orders.tabs.overview')`, `t('orders.tabs.items')`, `t('orders.tabs.shipping')`, `t('orders.tabs.invoice')` anahtarları için kullanılır
-- **Dönüş**: JSX element — sekme butonu
+  - `jsPDF` — `import('jspdf')` dinamik import'undan gelen varsayılan dışa aktarım; PDF belge sınıfı
+  - `autoTable` — `import('jspdf-autotable')` dinamik import'undan gelen varsayılan dışa aktarım; tablo ekleme fonksiyonu
+  - `doc` — `new jsPDF({ unit: 'pt', format: 'a4' })` ile oluşturulan PDF belge nesnesi
+  - `orderNo` — Proforma numarası; `o.order_number` varsa `'-'` ile bölünüp ikinci parça alınır, yoksa `o.id.slice(-8).toUpperCase()` fallback'i
+  - `head` — Tablo başlık satırı dizisi: `[t('orders.productCol'), t('orders.qtyCol'), t('orders.unitPriceCol'), t('orders.totalCol')]`
+  - `body` — `o.order_items.map(...)` ile oluşturulan tablo gövde satırları; her satır `[ürünAdı, miktar, birimFiyat, toplamFiyat]` formatında
+  - `after` — Tablonun bittiği Y koordinatı; `(doc as ...).lastAutoTable?.finalY || 100` ile hesaplanır
+  - `e` — try-catch yakalama değişkeni
+- **Dönüş**: yok (yan etki: `doc.save(...)` ile PDF dosyası indirilir, `toast.error` hata durumunda)
+- **Dinamik Importlar**: `import('jspdf')`, `import('jspdf-autotable')`
+- **Dict Erişimleri**: `o.order_number`, `o.created_at`, `o.customer_name`, `o.customer_email`, `o.order_items`, `o.total_amount`
 
-### [N12_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::adres render callback
-- **params**: yok
-- **ic_degiskenler**:
-  - `order` — sipariş nesnesi; `order.shipping_address` alanına erişilir
-  - `addr` — `order.shipping_address`'in `ShippingAddress` tipine dönüştürülmüş hali
-  - `addr.fullAddress` — tam adres; `addr.street`'e fallback olarak kullanılır
-  - `addr.street` — sokak adresi; `line1`'e atanır
-  - `addr.city` — şehir; `line2`'ye eklenir
-  - `addr.district` — ilçe; `addr.state`'e fallback olarak kullanılır, `line2`'ye eklenir
-  - `addr.state` — eyalet/il; `addr.district` yoksa kullanılır
-  - `addr.postalCode` — posta kodu; `addr.postal_code`'a fallback olarak kullanılır
-  - `addr.postal_code` — posta kodu (alternatif alan adı); `line3`'e atanır
-  - `line1` — birinci adres satırı; `addr.fullAddress || addr.street`
-  - `line2` — ikinci adres satırı; `[addr.city, addr.district || addr.state].filter(Boolean).join(', ')`
-  - `line3` — üçüncü adres satırı; `addr.postalCode || addr.postal_code`
-- **Dönüş**: JSX element — adres bilgisi div'i
+---
 
-### [N13_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::sipariş kalemi render callback
-- **params**: `item` — sipariş kalemi nesnesi
+### [N7_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::reorder
+- **params**: `(o: Order)` — Tekrar sipariş verilecek sipariş nesnesi
 - **ic_degiskenler**:
-  - `item.id` — kalem ID'si; `key` prop'u olarak kullanılır
-  - `item.product_id` — ürün ID'si; varsa `Routes.legacyProduct(item.product_id)` ile ürün sayfasına link oluşturulur
-  - `item.product_name` — ürün adı; tablo hücresinde gösterilir
-  - `item.product_sku` — ürün SKU'su; varsa `t('orders.skuLabel', { sku: item.product_sku })` ile gösterilir
-  - `item.product_image_url` — ürün görsel URL'si; varsa `VentImage` bileşeniyle gösterilir
-  - `item.quantity` — miktar; tablo hücresinde gösterilir
-  - `item.unit_price` — birim fiyat; `formatPrice(item.unit_price)` ile biçimlendirilir
-  - `item.total_price` — toplam fiyat; `formatPrice(item.total_price)` ile biçimlendirilir
-  - `Routes` — rota sabitleri nesnesi; `Routes.legacyProduct()` fonksiyonu çağrılır
-  - `Link` — Next.js Link bileşeni; ürün sayfasına yönlendirme için kullanılır
-  - `VentImage` — özel görsel bileşeni; ürün görseli için kullanılır
-  - `t` — çeviri fonksiyonu; `t('orders.skuLabel')` ve `t('orders.noImage')` anahtarları için kullanılır
-  - `formatPrice` — fiyat biçimlendirme fonksiyonu; birim ve toplam fiyatlar için kullanılır
-- **Dönüş**: JSX element — tablo satırı (`<tr>`)
+  - `ids` — `o.order_items` içindeki `product_id` alanlarının benzersiz, null/undefined filtreli string dizisi; `Array.from(new Set(...))` ile elde edilir
+  - `names` — `product_id`'si olmayan kalemlerin `product_name` değerlerinin benzersiz dizisi; products tablosunda isim ile arama için kullanılır
+  - `productMap` — `Record<string, Product>` sözlüğü; ürün ID'si veya adına göre `Product` nesnesini eşler
+  - `data` — `supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('id', ids)` sorgusundan dönen ürün verisi
+  - `error` — IDs tabanlı Supabase sorgu hatası
+  - `p` — `forEach` callback parametresi; `Product` nesnesi; `productMap[p.id]` veya `productMap[p.name]` olarak kaydedilir
+  - `added` — Sepete eklenen toplam ürün adedi sayacı
+  - `it` — `for...of` döngü değişkeni; `o.order_items` içindeki her sipariş kalemi
+  - `prod` — Mevcut kaleme karşılık gelen `Product` nesnesi; önce `productMap[it.product_id]`, sonra fallback olarak `productMap[it.product_name]` ile bulunur
+  - `e` — try-catch yakalama değişkeni
+- **Dönüş**: yok (yan etki: `addToCart(prod, it.quantity)`, `toast.success`/`toast.error`, `router.push(Routes.cart())`)
+- **API Çağrıları**: `supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('id', ids)`, `supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('name', names)`
+- **Dict Erişimleri**: `productMap[p.id]`, `productMap[p.name]`, `productMap[it.product_id]`, `productMap[it.product_name]`, `it.product_id`, `it.product_name`, `it.quantity`
 
-### [N14_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::fatura bilgisi render callback
-- **params**: yok
-- **ic_degiskenler**:
-  - `order` — sipariş nesnesi; `order.invoice_info` ve `order.invoice_type` alanlarına erişilir
-  - `info` — `order.invoice_info`'nun `Record<string, unknown>` tipine dönüştürülmüş hali
-  - `iv` — fatura alanı okuma fonksiyonu; `info?.[k]` değerini string'e dönüştürür, yoksa `'-'` döner
-  - `order.invoice_type` — fatura tipi; `'corporate'` ise kurumsal, değilse bireysel gösterilir
-  - `info.companyName` — şirket adı; kurumsal faturada gösterilir
-  - `info.vkn` — vergi kimlik numarası; kurumsal faturada gösterilir
-  - `info.taxOffice` — vergi dairesi; kurumsal faturada gösterilir
-  - `info.tckn` — T.C. kimlik numarası; bireysel faturada gösterilir
-  - `t` — çeviri fonksiyonu; `t('account.orderDetail.companyTitleLabel')`, `t('account.orderDetail.vknLabel')`, `t('account.orderDetail.taxOfficeLabel')`, `t('account.orderDetail.tcknLabel')` anahtarları için kullanılır
-- **Dönüş**: JSX element — fatura bilgisi div'i
+---
 
-### [N15_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::yasal onay render callback
-- **params**: yok
+### [N8_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::getStatusColor
+- **params**: `(status: string)` — Sipariş veya ödeme durumu dizgesi
 - **ic_degiskenler**:
-  - `order` — sipariş nesnesi; `order.legal_consents` alanına erişilir
-  - `cons` — `order.legal_consents`'in `Record<string, { accepted?: boolean; ts?: string | null }>` tipine dönüştürülmüş hali
-  - `row` — onay satırı render fonksiyonu; `label` ve `k` parametreleriyle çağrılır
-  - `formatDateTime` — tarih biçimlendirme fonksiyonu; onay tarihi için kullanılır
-  - `lang` — dil parametresi; tarih biçimlendirmede kullanılır
-  - `t` — çeviri fonksiyonu; `t('account.orderDetail.consentDistanceSales')`, `t('account.orderDetail.consentPreInfo')`, `t('account.orderDetail.consentOrderConfirm')`, `t('account.orderDetail.consentMarketing')` anahtarları için kullanılır
-- **Dönüş**: JSX element — yasal onay listesi
+  - (yok — parametre dışında yerel değişken yok)
+- **Dönüş**: `string` — Tailwind CSS class adı (ör. `'bg-yellow-100 text-yellow-800'`, `'bg-blue-100 text-blue-800'`); durum değerine göre `switch/case` ile belirlenir; `'pending'`, `'paid'`/`'confirmed'`, `'shipped'`, `'delivered'`, `'failed'`/`'cancelled'` ve default kolları vardır
 
-### [N16_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::row (yasal onay satırı)
-- **params**: `label` — onay etiketi string'i, `k` — onay anahtarı string'i
+---
+
+### [N9_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::getStatusText
+- **params**: `(status: string)` — Sipariş veya ödeme durumu dizgesi
 - **ic_degiskenler**:
-  - `cons` — yasal onaylar nesnesi; `cons?.[k]` ile belirli onay bilgisine erişilir
-  - `c` — belirli onay nesnesi; `cons?.[k]`'dan alınır
-  - `c.accepted` — onay durumu boolean'ı; `!!c?.accepted` ile dönüştürülür
-  - `c.ts` — onay tarihi string'i; varsa `formatDateTime(c.ts, lang)` ile biçimlendirilir
-  - `ok` — onaylanmış mı boolean'ı; `!!c?.accepted`
-  - `ts` — biçimlendirilmiş onay tarihi; `c.ts` varsa `formatDateTime(c.ts, lang)`, yoksa `'-'`
-  - `label` — onay etiketi; `<span>` içinde gösterilir
-  - `k` — onay anahtarı; `key` prop'u olarak kullanılır
-  - `formatDateTime` — tarih biçimlendirme fonksiyonu; `c.ts` ve `lang` parametreleriyle çağrılır
-  - `lang` — dil parametresi; tarih biçimlendirmede kullanılır
-  - `t` — çeviri fonksiyonu; `t('account.orderDetail.consentAccepted')` ve `t('account.orderDetail.consentNone')` anahtarları için kullanılır
-- **Dönüş**: JSX element — onay satırı div'i
+  - (yok — parametre dışında yerel değişken yok)
+- **Dönüş**: `string` — `t()` uluslararasılaştırma fonksiyonu ile çevrilmiş durum metni (ör. `t('orders.pending')`); `'refunded'` durumu ek olarak ele alınır; bilinmeyen durumlarda ham `status` dizgesi döner
+
+---
+
+### [N10_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderStep
+- **params**: `(s, idx)` — `s`: adım durumu dizgesi, `idx`: adımın sırası (0-tabanlı indeks)
+- **ic_degiskenler**:
+  - (yok — yerel değişken yok; JSX içinde doğrudan hesaplama)
+- **Dönüş**: JSX `React.Fragment` — Sipariş takip adımını gösteren daire + çizgi bloğu; `idx <= activeIdx` koşulu ile aktif/pasif renklendirme; `getStatusText(s)` ile durum metni; `steps.length - 1` kontrolü ile son adımda çizgi gizlenir
+- **Dict Erişimleri**: `idx <= activeIdx` (dış kapsam değişkeni `activeIdx`)
+
+---
+
+### [N11_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderTabButton
+- **params**: `(tt)` — Sekme identifier dizgesi (ör. `'overview'`, `'items'`, `'shipping'`, `'invoice'`)
+- **ic_degiskenler**:
+  - (yok — yerel değişken yok)
+- **Dönüş**: JSX `button` elementi — `onClick={() => setTab(tt)}` ile aktif sekme değiştirilir; `tab === tt` koşulu ile aktif/pasif stil uygulanır; her `tt` değeri için `t()` ile çevrilmiş sekme başlığı gösterilir
+- **Dict Erişimleri**: `tab === tt` (dış kapsam değişkeni `tab`)
+
+---
+
+### [N12_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderShippingAddress
+- **params**: (yok — anonim arrow fonksiyon)
+- **ic_degiskenler**:
+  - `addr` — `order.shipping_address` alanının `ShippingAddress` tipine cast edilmiş hali; kargo adresi nesnesi
+  - `line1` — Tam adres satırı; `addr.fullAddress` varsa o alınır, yoksa `addr.street` fallback'i
+  - `line2` — İlçe/İl bilgisi; `addr.city` ve `addr.district || addr.state` değerlerinin `', '` ile birleşimi; `filter(Boolean)` ile boş değerler temizlenir
+  - `line3` — Posta kodu; `addr.postalCode || addr.postal_code` ile iki farklı isimlendirme desteklenir
+- **Dönüş**: JSX `div` elementi — Adres satırlarını (`line1`, `line2`, `line3`) koşullu olarak gösteren `<p>` blokları
+- **Dict Erişimleri**: `order.shipping_address`, `addr.fullAddress`, `addr.street`, `addr.city`, `addr.district`, `addr.state`, `addr.postalCode`, `addr.postal_code`
+
+---
+
+### [N13_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderOrderItemRow
+- **params**: `(item)` — Tek bir sipariş kalemi nesnesi (`OrderItem`); `product_id`, `product_name`, `product_sku`, `quantity`, `unit_price`, `total_price`, `product_image_url` alanlarını içerir
+- **ic_degiskenler**:
+  - (yok — yerel değişken yok; JSX içinde doğrudan parametre erişimi)
+- **Dönüş**: JSX `tr` elementi — Ürün adı (`item.product_name`), SKU etiketi (`item.product_sku`), ürün görseli (`item.product_image_url` ile `VentImage`), miktar (`item.quantity`), birim fiyat (`item.unit_price` ile `formatPrice`), toplam fiyat (`item.total_price` ile `formatPrice`); `item.product_id` varsa ürün adına `Link` ile tıklanabilir bağlantı eklenir
+- **Dict Erişimleri**: `item.product_id`, `item.product_name`, `item.product_sku`, `item.product_image_url`, `item.quantity`, `item.unit_price`, `item.total_price`
+
+---
+
+### [N14_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderInvoiceInfo
+- **params**: (yok — anonim arrow fonksiyon)
+- **ic_degiskenler**:
+  - `info` — `order.invoice_info` alanının `Record<string, unknown>` tipine cast edilmiş fatura bilgisi sözlüğü; `|| {}` ile boş nesne fallback'i
+  - `iv` — İç helper fonksiyon `(k: string) => string`; `info?.[k]` erişimi ile belirli bir anahtarın değerini `String()` ile döner, yoksa `'-'` döner
+- **Dönüş**: JSX element — `order.invoice_type` `'corporate'` ise kurumsal fatura bilgileri (`companyName`, `vkn`, `taxOffice`); değilse bireysel fatura bilgisi (`tckn`); her alan `iv()` helper'ı ile okunur
+- **Dict Erişimleri**: `order.invoice_info`, `order.invoice_type`, `info?.[k]`, `info[k]`
+
+---
+
+### [N15_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderLegalConsents
+- **params**: (yok — anonim arrow fonksiyon)
+- **ic_degiskenler**:
+  - `cons` — `order.legal_consents` alanının `Record<string, { accepted?: boolean; ts?: string | null }>` tipine cast edilmiş yasal onay sözlüğü; `|| {}` ile boş nesne fallback'i
+  - `row` — İç helper fonksiyon `(label: string, k: string) => JSX`; belirli bir onay kaydının etiketini, kabul durumunu ve zaman damgasını gösterir; `[N16_NASIL]` fonksiyonunun aynısıdır
+- **Dönüş**: JSX fragment — Beş onay satırı: `'kvkk'`, `'distanceSales'`, `'preInfo'`, `'orderConfirm'`, `'marketing'`; her biri `row()` helper'ı ile render edilir
+- **Dict Erişimleri**: `order.legal_consents`, `cons?.[k]`
+
+---
+
+### [N16_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderConsentRow
+- **params**: `(label: string, k: string)` — `label`: Görünen etiket metni, `k`: Onay kaydının sözlük anahtarı
+- **ic_degiskenler**:
+  - `c` — `cons?.[k]` erişimi ile elde edilen tekil onay nesnesi (`{ accepted?: boolean; ts?: string | null }`)
+  - `ok` — `!!c?.accepted` ile hesaplanan boolean; onayın verilip verilmediğini gösterir
+  - `ts` — `c?.ts ? formatDateTime(c.ts, lang) : '-'` ile formatlanmış zaman damgası dizgesi
+- **Dönüş**: JSX `div` elementi — Sol tarafta etiket, sağ tarafta zaman damgası ve onay durumu rozeti (`accepted` ise yeşil, değilse gri); `formatDateTime(c.ts, lang)` ile tarih formatlanır
+- **Dict Erişimleri**: `cons?.[k]`, `c?.accepted`, `c?.ts`
 
 ---
 
@@ -82494,15 +83572,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\admin\PricingPoliciesTableBody.tsx
-skeleton_hash: 414834293eae7a27
+source_path: C:\Users\alize\venthub-hvac\src\views\admin\PricingPoliciesTableBody.tsx
+skeleton_hash: 6dc08285098d673f
 entity_hashes:
   func:EffectiveLockPanel: f5eb59505e91e68f
   func:PricingPoliciesTableBody: 242122ccd79025dd
   func:policiesFetcher: 3dc61bf26c95820a
   overview: 0735c2f1aad88d41
   style_tokens: 406c48a0ed4c398b
-generated_at: 2026-08-27T07:30:16Z
+generated_at: 2026-08-25T08:46:05Z
 ---
 
 ## Genel Bakış
@@ -82609,15 +83687,10 @@ type ScopeKey = 'variant' | 'product' | 'brand' | 'category' | 'global'
 
 ## SABİTLER
 - **SCOPE_KEYS** (object) — `{
-
   0: 'variant',
-
   1: 'product',
-
   2: 'brand',
-
   3: 'category',
-
   4: 'g...`
 
 ---
@@ -84885,8 +85958,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\views\calculators\AirCurtainCalcPage.tsx
-skeleton_hash: 06eef9a89ff8c512
+source_path: C:\Users\alize\venthub-hvac\src\views\calculators\AirCurtainCalcPage.tsx
+skeleton_hash: 021e5baddf9ce963
 entity_hashes:
   func:AirCurtainCalcPage: bdec5c3fc5c7251e
   func:canProceed: bc4e4a8101ac93b2
@@ -84894,34 +85967,49 @@ entity_hashes:
   func:nextStep: 092152293cace343
   func:prevStep: ac646de7f0306b72
   func:reset: 16764b441f7bc7b6
-  overview: 8f204952dbebe9ee
+  overview: cb9aae03024cedc0
   style_tokens: 310141484625a6c4
-generated_at: 2026-08-27T04:22:29Z
+generated_at: 2026-08-14T06:44:54Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformu için hava perdesi hesaplama arayüzünü sunan bir React sayfasıdır. Çok adımlı bir sihirbaz (wizard) yapısıyla kullanıcıdan gerekli bilgileri toplar ve adım geçişlerini yönetir. Hesaplama sonucunda elde edilen verimlilik değerini kullanıcıya anlamlı durum kategorileriyle geri bildirir.
+Bu modül, VentHub HVAC platformu için hava perdesi hesaplama arayüzünü sunan React sayfasıdır. Kullanıcılara adım adım bilgi girmelerini ve hesaplama yapmalarını sağlayan çok adımlı bir süreç yönetir. Hesaplanan verimlilik değerlerini arayüzde anlamlı durum kategorilerine dönüştürerek kullanıcıya geri bildirim sunar.
 
 ## Fonksiyon Grupları
 
 ### Ana Sayfa Bileşeni
-Modülün giriş noktasıdır. Tüm hesaplama sayfasının arayüzünü, durum yönetimini ve alt fonksiyonların kullanımını bir arada barındıran üst düzey React bileşenidir.
-- AirCurtainCalcPage
+Modülün giriş noktası olan ana React bileşenidir. Tüm hesaplama sayfasının arayüzünü, durum yönetimini ve iş mantığını bir arada barındırır.
+- `AirCurtainCalcPage`
 
 ### Adım Yönetimi
-Çok adımlı hesaplama sürecinde kullanıcının ileri-geri gezinmesini, sonraki adıma geçiş koşullarının denetlenmesini ve tüm sürecin başlangıç durumuna sıfırlanmasını sağlar. `canProceed` fonksiyonu, geçerli adımın zorunlu girdileri sağlanmadığı sürece `True` dönmez; bu sayede eksik bilgiyle ilerleme engellenir.
-- canProceed, nextStep, prevStep, reset
+Çok adımlı hesaplama sürecinde kullanıcının ileri veya geri gitmesini, sonraki adıma geçiş yapabilme koşullarını kontrol etmesini ve gerektiğinde tüm süreci başlangıç değerlerine döndürmesini sağlar. Fonksiyonlar birbirini tamamlayarak tutarlı bir gezinme akışı sunar.
+- `canProceed`, `nextStep`, `prevStep`, `reset`
 
 ### Verimlilik Değerlendirme
-Hesaplama sonucu ortaya çıkan verimlilik oranını, arayüzde gösterilecek kabul edilebilirlik seviyelerine (optimal, acceptable, warning) sınıflandırır. Kullanıcıya sonuçların kalitesi hakkında net ve anında geri bildirim sunar.
-- getEfficiencyStatus
+Hesaplama sonucunda ortaya çıkan verimlilik oranını, arayüzde gösterilmek üzere kabul edilebilirlik seviyelerine sınıflandırır. Bu sayede kullanıcıya sonuçların kalitesi hakkında net bir geri bildirim verilir.
+- `getEfficiencyStatus`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, çok adımlı bir hava perdesi hesaplama sihirbazını (wizard) yöneten React bileşenidir. Aşağıdaki varsayımlar fonksiyon imzalarından çıkarılmıştır.
+
+[Aksiyom 1]: Eğer `canProceed()` çağrıldığında geçerli adımın tüm zorunlu girdileri sağlanmamışsa, `True` dönmez (kullanıcı bir sonraki adıma geçemez).
+
+[Aksiyom 2]: Eğer `nextStep()` çağrıldığında zaten son adımda olunuyorsa, adım ilerlemez (modül durumu değiştirmez).
+
+[Aksiyom 3]: Eğer `prevStep()` çağrıldığında ilk adımda olunuyorsa, adım geri gitmez (modül durumu değiştirmez).
+
+[Aksiyom 4]: Eğer `getEfficiencyStatus()` fonksiyonuna `undefined` değer girdiyse, `'optimal'` veya `'acceptable'` veya `'warning'` değerlerinden biri döner (hangisinin döndüğü bilinmiyor — eşik değerleri fonksiyon gövdesinde tanımlıdır).
+
+[Aksiyom 5]: Eğer `getEfficiencyStatus()` fonksiyonuna `string` tipinde bir `eff` parametresi girdiyse, geçerli bir verimlilik aralığının dışındaysa `'warning'`, kabul edilebilir aralıktaysa `'acceptable'`, optimal aralıktaysa `'optimal'` döner (kesin eşik değerleri bilinmiyor — fonksiyon gövdesinden çıkarılmalıdır).
+
+[Aksiyom 6]: Eğer `reset()` fonksiyonu çağrılırsa, modülün tüm adım durumu ve girilen veriler sıfırlanır.
+
+---
+
+**Not:** Fonksiyon gövdesi kodu paylaşılmadığı için eşik değerler (örn. verimlilik oranı %85 ise `'optimal'` döner gibi) belirlenememiştir. Bu değerler `getEfficiencyStatus` gövdesinden çıkarılmalıdır.
 
 ---
 
@@ -84972,7 +86060,6 @@ Hesaplama sonucu ortaya çıkan verimlilik oranını, arayüzde gösterilecek ka
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../hooks/useCalculatorUsage::useCalculatorUsage
 - import: ../../i18n/I18nProvider::useI18n
 - import: lucide-react::ArrowLeft
 - import: lucide-react::ArrowRight
@@ -84993,84 +86080,62 @@ Hesaplama sonucu ortaya çıkan verimlilik oranını, arayüzde gösterilecek ka
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::AirCurtainCalcPage
-- **params**: yok
-- **ic_degiskenler**:
-  - `t` — i18n çeviri fonksiyonu, metinleri yerelleştirir
-  - `router` — Next.js useRouter ile alınan navigasyon nesnesi
-  - `pathname` — usePathname ile alınan mevcut URL yolu
-  - `searchParams` — useSearchParams ile alınan URL sorgu parametreleri
-  - `currentStep` — useState ile tutulan mevcut adım numarası (1-4 arası)
-  - `setCurrentStep` — currentStep state'ini güncelleyen setter fonksiyonu
-  - `doorWidth` — useState ile tutulan kapı genişliği değeri (varsayılan '1.5')
-  - `setDoorWidth` — doorWidth state'ini güncelleyen setter fonksiyonu
-  - `doorHeight` — useState ile tutulan kapı yüksekliği değeri (varsayılan '2.5')
-  - `setDoorHeight` — doorHeight state'ini güncelleyen setter fonksiyonu
-  - `application` — useState ile tutulan uygulama tipi ('comfort', 'insect', 'coldRoom')
-  - `setApplication` — application state'ini güncelleyen setter fonksiyonu
-  - `windCondition` — useState ile tutulan rüzgar koşulu ('none', 'light', 'moderate', 'strong')
-  - `setWindCondition` — windCondition state'ini güncelleyen setter fonksiyonu
-  - `trafficIntensity` — useState ile tutulan trafik yoğunluğu ('low', 'medium', 'high')
-  - `setTrafficIntensity` — trafficIntensity state'ini güncelleyen setter fonksiyonu
-  - `result` — useState ile tutulan hesaplama sonucu nesnesi
-  - `setResult` — result state'ini güncelleyen setter fonksiyonu
-  - `steps` — useMemo ile oluşturulan adım tanımları dizisi (id, label, description)
-  - `applicationsOptions` — useMemo ile oluşturulan uygulama seçenekleri dizisi (value, label, description, icon)
-  - `windOptions` — useMemo ile oluşturulan rüzgar koşulu seçenekleri dizisi (value, label, description)
-  - `trafficOptions` — useMemo ile oluşturulan trafik yoğunluğu seçenekleri dizisi (value, label, description)
-  - `updateURL` — URL sorgu parametrelerini güncelleyen fonksiyon
-  - `canProceed` — mevcut adımın geçiş kriterlerini kontrol eden fonksiyon
-  - `nextStep` — bir sonraki adıma geçiş yapan fonksiyon
-  - `prevStep` — bir önceki adıma geçiş yapan fonksiyon
-  - `reset` — tüm form state'lerini varsayılan değerlere sıfırlayan fonksiyon
-  - `getEfficiencyStatus` — verimlilik durumu string'ini güvenli tipe dönüştüren fonksiyon
-  - `useCalculatorUsage` — hesaplama kullanımını takip eden hook
-- **Dönüş**: React.FC (JSX elementi)
+### [N1_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getSteps
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of { id: number, label: string, description: string }
 
-### [N2_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::canProceed
-- **params**: yok
-- **ic_degiskenler**:
-  - `currentStep` — kontrol edilen mevcut adım numarası (1, 2, 3 veya diğer)
-  - `doorWidth` — parseFloat ile sayıya dönüştürülen kapı genişliği string'i
-  - `doorHeight` — parseFloat ile sayıya dönüştürülen kapı yüksekliği string'i
-  - `w` — parseFloat(doorWidth) sonucu, kapı genişliğinin sayısal değeri
-  - `h` — parseFloat(doorHeight) sonucu, kapı yüksekliğinin sayısal değeri
-  - `application` — uygulama tipi, 2. adımda varlığı kontrol edilir
-  - `windCondition` — rüzgar koşulu, 3. adımda varlığı kontrol edilir
-  - `trafficIntensity` — trafik yoğunluğu, 3. adımda varlığı kontrol edilir
-- **Dönüş**: boolean — adım kriterleri sağlanıyorsa true, sağlanmıyorsa false
+### [N2_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getApplicationOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of { value: string, label: string, description: string, icon: JSX.Element }
 
-### [N3_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::nextStep
-- **params**: yok
-- **ic_degiskenler**:
-  - `currentStep` — mevcut adım numarası, setCurrentStep ile artırılır
-  - `setCurrentStep` — currentStep state'ini güncelleyen setter fonksiyonu
-- **Dönüş**: yok
+### [N3_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getWindConditions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of { value: string, label: string, description: string }
 
-### [N4_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::prevStep
-- **params**: yok
-- **ic_degiskenler**:
-  - `currentStep` — mevcut adım numarası, setCurrentStep ile azaltılır
-  - `setCurrentStep` — currentStep state'ini güncelleyen setter fonksiyonu
-- **Dönüş**: yok
+### [N4_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getTrafficOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of { value: string, label: string, description: string }
 
-### [N5_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::reset
-- **params**: yok
+### [N5_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::syncUrlParams
+- **params**: ()
 - **ic_degiskenler**:
-  - `setCurrentStep` — currentStep'i 1'e sıfırlayan setter fonksiyonu
-  - `setDoorWidth` — doorWidth'i '1.5' değerine sıfırlayan setter fonksiyonu
-  - `setDoorHeight` — doorHeight'i '2.5' değerine sıfırlayan setter fonksiyonu
-  - `setApplication` — application'ı 'comfort' değerine sıfırlayan setter fonksiyonu
-  - `setWindCondition` — windCondition'ı 'none' değerine sıfırlayan setter fonksiyonu
-  - `setTrafficIntensity` — trafficIntensity'ı 'medium' değerine sıfırlayan setter fonksiyonu
-  - `setResult` — result'ı null'a sıfırlayan setter fonksiyonu
-- **Dönüş**: yok
+  - `params` — URL sorgu parametrelerini tutmak ve güncellemek için oluşturulan URLSearchParams nesnesi
+  - `query` — params nesnesinin string karşılığı, URL'e eklenecek kısım
+- **Dönüş**: yok (yan etki: URL'i günceller)
 
-### [N6_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getEfficiencyStatus
-- **params**: `eff` — string | undefined tipinde verimlilik durumu değeri
+### [N6_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::performCalculation
+- **params**: ()
 - **ic_degiskenler**:
-  - `eff` — 'optimal', 'acceptable' veya undefined olabilen girdi parametresi
-- **Dönüş**: 'optimal' | 'acceptable' | 'warning' — eff 'optimal' ise 'optimal', 'acceptable' ise 'acceptable', diğer tüm durumlarda 'warning' döner
+  - `width` — parseFloat(doorWidth) ile elde edilen kapı genişliği numerik değeri
+  - `height` - parseFloat(doorHeight) ile elde edilen kapı yüksekliği numerik değeri
+  - `calculationResult` - calculateAirCurtain fonksiyonu ile hesaplanan sonuç nesnesi
+- **Dönüş**: yok (yan etki: setResult ile sonucu günceller)
+
+### [N7_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::canProceed
+- **params**: ()
+- **ic_degiskenler**:
+  - `w` — parseFloat(doorWidth) ile elde edilen kapı genişliği numerik değeri (case 1 içinde)
+  - `h` — parseFloat(doorHeight) ile elde edilen kapı yüksekliği numerik değeri (case 1 içinde)
+- **Dönüş**: boolean (adımın devam edip edemeyeceğini belirler)
+
+### [N8_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::resetForm
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: tüm form state'lerini başlangıç değerlerine sıfırlar)
+
+### [N9_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::getEfficiencyStatus
+- **params**: (eff: string | undefined)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: 'optimal' | 'acceptable' | 'warning'
+
+### [N10_NASIL] AST Pointer: src/views/calculators/AirCurtainCalcPage.tsx::renderGraphTick
+- **params**: (x, i)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element (grafik ekseni çizgi ve ok işaretini render eden bileşen)
 
 ---
 
@@ -85294,32 +86359,33 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\views\calculators\HRVCalcPage.tsx
-skeleton_hash: eb3ddc9355b10956
+source_path: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx
+skeleton_hash: dc14c1431beef43c
 entity_hashes:
   func:HRVCalcPage: f6b36b28ed5f44cd
   func:reset: 16764b441f7bc7b6
-  overview: 477df472883f5208
+  overview: f4b47809b44ad2d8
   style_tokens: 27adff48ed74fee3
-generated_at: 2026-08-27T04:31:52Z
+generated_at: 2026-08-14T06:44:54Z
 ---
 
 ## Genel Bakış
-Bu modül, Isı Geri Kazanımlı Havalandırma (HRV) cihazları için bir hesaplama sayfası sunan React tabanlı bir bileşendir. Kullanıcıların HRV sistemiyle ilgili parametreleri girip sonuçları görüntülemesini sağlar ve sayfa durumunu sıfırlama işlevi sunar.
+Bu modül, Isı Geri Kazanımlı Havalandırma (HRV) cihazları için hesaplama işlemlerini sunan React tabanlı bir sayfa bileşenidir. Kullanıcıların HRV sistemiyle ilgili parametreleri girerek hesaplama yapmasını ve sonuçları görüntülemesini sağlar.
 
 ## Fonksiyon Grupları
+
 ### Ana Sayfa Bileşeni
-HRV hesaplama sayfasının tüm kullanıcı arayüzünü, state yönetimini ve hesaplama mantığını barındıran ana bileşendir. Bu bileşen, kullanıcı etkileşimlerini yönetir ve hesaplama sonuçlarını görüntüler.
+HRV hesaplayıcı sayfasının tüm kullanıcı arayüzünü, state yönetimini ve hesaplama mantığını barındıran ana bileşendir.
 - HRVCalcPage
 
 ### Yardımcı İşlevler
-Kullanıcının form değerlerini veya hesaplama durumunu başlangıç noktalarına döndürmek için kullanılan destekleyici işlevleri içerir. Bu işlev, ana bileşen içinde çağrılarak sayfanın sıfırlanmasını sağlar.
+Kullanıcının form değerlerini veya hesaplama durumunu başlangıç noktalarına döndirmek için kullanılan destekleyici işlevleri içerir.
 - reset
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için, verilen fonksiyon gövdeleri temel alınarak türetilebilecek spesifik mimari varsayımlar bulunmamaktadır.
 
 ---
 
@@ -85345,7 +86411,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../hooks/useCalculatorUsage::useCalculatorUsage
 - import: ../../i18n/I18nProvider::useI18n
 - import: next/navigation::usePathname
 - import: next/navigation::useRouter
@@ -85359,101 +86424,43 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: HRVCalcPage.tsx::HRVCalcPage
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu; etiket ve açıklamaları yerelleştirmek için kullanılır
-  - `recoveryType` — useState ile tutulan durum; ısı geri kazanım tipi ('hrv' veya 'erv')
-  - `buildingType` — useState ile tutulan durum; bina tipi ('residential', 'office', 'commercial')
-  - `climateZone` — useState ile tutulan durum; iklim bölgesi ('cold', 'temperate', 'hot')
-  - `area` — useState ile tutulan durum; alan değeri (metre kare, varsayılan '100')
-  - `occupancy` — useState ile tutulan durum; kişi sayısı (varsayılan '10')
-  - `operatingHours` — useState ile tutulan durum; çalışma saati (varsayılan '10')
-  - `sensibleEfficiency` — useState ile tutulan durum; duyulur verimlilik yüzdesi (varsayılan '75')
-  - `latentEfficiency` — useState ile tutulan durum; gizli verimlilik yüzdesi (varsayılan '65')
-  - `electricityCost` — useState ile tutulan durum; elektrik birim fiyatı (varsayılan '3.5')
-  - `pathname` — usePathname hook'undan gelen mevcut URL yolu
-  - `router` — useRouter hook'undan gelen Next.js yönlendirici nesnesi
-  - `searchParams` — useSearchParams hook'undan gelen mevcut URL parametreleri
-  - `calculateHRV` — HRV hesaplama fonksiyonu; dışarıdan import edilen hesaplama mantığı
-  - `useCalculatorUsage` — hesaplama kullanımını izleyen hook
-- **Dönüş**: React.FC (JSX elementi)
+### [N1_NASIL] AST Pointer: HRVCalcPage.tsx::recoveryTypeOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of objects with `value`, `label`, `description`, `icon` properties
 
-### [N2_NASIL] AST Pointer: HRVCalcPage.tsx::useMemo_1 (HRV tipi seçenekleri)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n'den gelen çeviri fonksiyonu; 'calculators.hrv.form.hrv', 'calculators.hrv.form.hrvDesc', 'calculators.hrv.form.erv', 'calculators.hrv.form.ervDesc' anahtarlarını çözümlemek için kullanılır
-  - `value` — her seçeneğin benzersiz tanımlayıcı değeri ('hrv' veya 'erv')
-  - `label` — t() ile çevrilmiş görünen etiket
-  - `description` — t() ile çevrilmiş açıklama metni
-  - `icon` — ThermometerSun (hrv için) veya Snowflake (erv için) lucide-react ikonu, 24px boyutunda
-- **Dönüş**: Array<{value: string, label: string, description: string, icon: JSX.Element}>
+### [N2_NASIL] AST Pointer: HRVCalcPage.tsx::buildingTypeOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of objects with `value`, `label`, `description` properties
 
-### [N3_NASIL] AST Pointer: HRVCalcPage.tsx::useMemo_2 (bina tipi seçenekleri)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n'den gelen çeviri fonksiyonu; 'common.homeLabel', 'calculators.hrv.form.office', 'calculators.hrv.form.commercial' anahtarlarını çözümlemek için kullanılır
-  - `value` — her seçeneğin benzersiz tanımlayıcı değeri ('residential', 'office', 'commercial')
-  - `label` — t() ile çevrilmiş görünen etiket
-  - `description` — sabit İngilizce açıklama metni ('Domestic', 'Workplace', 'Retail/Mall')
-- **Dönüş**: Array<{value: string, label: string, description: string}>
+### [N3_NASIL] AST Pointer: HRVCalcPage.tsx::climateZoneOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of objects with `value`, `label`, `description` properties
 
-### [N4_NASIL] AST Pointer: HRVCalcPage.tsx::useMemo_3 (iklim bölgesi seçenekleri)
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: HRVCalcPage.tsx::syncUrlWithState
+- **params**: ()
 - **ic_degiskenler**:
-  - `t` — useI18n'den gelen çeviri fonksiyonu; 'calculators.hrv.form.cold', 'calculators.hrv.form.temperate', 'calculators.hrv.form.hot' anahtarlarını çözümlemek için kullanılır
-  - `value` — her seçeneğin benzersiz tanımlayıcı değeri ('cold', 'temperate', 'hot')
-  - `label` — t() ile çevrilmiş görünen etiket
-  - `description` — sabit İngilizce açıklama metni ('North/Mountain', 'Central', 'South/Coast')
-- **Dönüş**: Array<{value: string, label: string, description: string}>
+  - `params` — URLSearchParams nesnesi, URL query string'ini oluşturmak için kullanılır
+  - `query` — `params`'ın string karşılığı, URL'ye eklenecek query string
+- **Dönüş**: yok (yan etki: `router.replace` ile URL güncellenir)
 
-### [N5_NASIL] AST Pointer: HRVCalcPage.tsx::useEffect_1 (URL senkronizasyonu)
-- **params**: (parametre yok)
+### [N5_NASIL] AST Pointer: HRVCalcPage.tsx::calculateResults
+- **params**: ()
 - **ic_degiskenler**:
-  - `window` — typeof kontrolü ile SSR ortamında çalışıp çalışmadığını belirler; 'undefined' ise erken dönüş yapar
-  - `params` — new URLSearchParams() ile oluşturulan boş parametre nesnesi
-  - `recoveryType` — durum değişkeni; 'hrv' değilse URL'ye eklenir
-  - `buildingType` — durum değişkeni; 'office' değilse URL'ye eklenir
-  - `climateZone` — durum değişkeni; 'temperate' değilse URL'ye eklenir
-  - `area` — durum değişkeni; '100' değilse URL'ye eklenir
-  - `occupancy` — durum değişkeni; '10' değilse URL'ye eklenir
-  - `operatingHours` — durum değişkeni; '10' değilse URL'ye eklenir
-  - `sensibleEfficiency` — durum değişkeni; '75' değilse URL'ye eklenir
-  - `latentEfficiency` — durum değişkeni; '65' değilse URL'ye eklenir
-  - `electricityCost` — durum değişkeni; '3.5' değilse URL'ye eklenir
-  - `query` — params.toString() ile oluşturulan URL sorgu dizesi
-  - `router` — useRouter'dan gelen nesne; router.replace() ile URL'yi günceller
-  - `pathname` — usePathname'dan gelen mevcut yol; sorgu dizesi ile birleştirilir
-- **Dönüş**: yok (yan etki: tarayıcı URL'sini scroll:false ile günceller)
+  - `areaVal` — `area` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `occVal` — `occupancy` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `hoursVal` — `operatingHours` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `sensEff` — `sensibleEfficiency` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `latEff` — `latentEfficiency` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `elecCost` — `electricityCost` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+- **Dönüş**: `calculateHRV` fonksiyonunun dönüş değeri veya geçersiz parametrelerde `null`
 
-### [N6_NASIL] AST Pointer: HRVCalcPage.tsx::useMemo_4 (HRV hesaplama)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `areaVal` — parseFloat(area) sonucu; geçersiz ise 0, alan değeri (metre kare)
-  - `occVal` — parseFloat(occupancy) sonucu; geçersiz ise 0, kişi sayısı
-  - `hoursVal` — parseFloat(operatingHours) sonucu; geçersiz ise 0, günlük çalışma saati
-  - `sensEff` — parseFloat(sensibleEfficiency) sonucu; geçersiz ise 0, duyulur verimlilik yüzdesi
-  - `latEff` — parseFloat(latentEfficiency) sonucu; geçersiz ise 0, gizli verimlilik yüzdesi
-  - `elecCost` — parseFloat(electricityCost) sonucu; geçersiz ise 0, elektrik birim fiyatı (kWh başına)
-  - `recoveryType` — durum değişkeni; ısı geri kazanım tipi
-  - `buildingType` — durum değişkeni; bina tipi
-  - `climateZone` — durum değişkeni; iklim bölgesi
-  - `calculateHRV` — dışarıdan gelen hesaplama fonksiyonu; nesne argümanı alır
-- **Dönüş**: areaVal <= 0, occVal < 0, hoursVal <= 0 veya sensEff <= 0 ise null; aksi halde calculateHRV() dönüş değeri
-
-### [N7_NASIL] AST Pointer: HRVCalcPage.tsx::reset
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setRecoveryType` — useState setter; 'hrv' değerine sıfırlar
-  - `setBuildingType` — useState setter; 'office' değerine sıfırlar
-  - `setClimateZone` — useState setter; 'temperate' değerine sıfırlar
-  - `setArea` — useState setter; '100' değerine sıfırlar
-  - `setOccupancy` — useState setter; '10' değerine sıfırlar
-  - `setOperatingHours` — useState setter; '10' değerine sıfırlar
-  - `setSensibleEfficiency` — useState setter; '75' değerine sıfırlar
-  - `setLatentEfficiency` — useState setter; '65' değerine sıfırlar
-  - `setElectricityCost` — useState setter; '3.5' değerine sıfırlar
-- **Dönüş**: yok (yan etki: tüm form durum değişkenlerini varsayılan değerlerine döndürür)
+### [N6_NASIL] AST Pointer: HRVCalcPage.tsx::resetForm
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: tüm state'leri varsayılan değerlere sıfırlar)
 
 ---
 
@@ -85952,67 +86959,89 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\views\category\CategorySeriesView.tsx
-skeleton_hash: 078dd79540d30eeb
+source_path: C:\Users\alize\venthub-hvac\src\views\category\CategorySeriesView.tsx
+skeleton_hash: 7dba4980ddcfefc5
 entity_hashes:
-  func:CategorySeriesView: dbe49211dde9a885
-  overview: 1ed6fd4e6398c43f
-  style_tokens: 886ea79af95dd54c
-generated_at: 2026-08-27T07:36:47Z
+  func:CategorySeriesView: 3515932791ff3914
+  func:getSpec: bd8056751502e13f
+  func:toggleViewMode: 812e9c6634a25d9c
+  overview: a5cd1bd9f5ba494b
+  style_tokens: 7eddfe831f5ad8ff
+generated_at: 2026-06-19T20:50:48Z
 ---
 
 ## Genel Bakış
-CategorySeriesView modülü, VentHub HVAC platformunda kategori sayfalarında ürün serilerini görüntülemek için tasarlanmış bir React bileşenidir. Kategori, üst kategori ve aile listesi bilgilerini alarak kullanıcılara kategori serisi arayüzünü sunar. Modül tek bir bileşen fonksiyonundan oluşur.
+CategorySeriesView modülü, VentHub HVAC platformunda kategori sayfalarında yer alan ürün serilerini görüntülemek için tasarlanmış bir React görünüm bileşenidir. Kategori, üst kategori ve ürün listesi bilgilerini alarak kullanıcılara düzenli bir seriler arayüzü sunar. Görünüm modu değiştirme ve ürün özelliklerini güvenli biçimde okuma gibi yardımcı işlevler içerir.
 
 ## Fonksiyon Grupları
 ### Ana Görünüm Bileşeni
-Kategori metadatasını, üst kategori bilgisini ve ürün ailesi listesini birleştirerek kategori serisi görünümünü render eder. Modülün tek giriş noktası olup tüm sorumluluk bu bileşende toplanmıştır.
+Modülün tek giriş noktasıdır; kategori metadatasını, üst kategori bilgisini ve ürün listesini birleştirerek kullanıcılara kategori serisi görünümünü sunar.
 - CategorySeriesView
+
+### Yardımcı Fonksiyonlar
+Kullanıcı arayüzündeki görünüm modu geçişlerini yöneten ve ürün nesnelerinden istenen özellik değerlerini güvenli biçimde çıkaran yardımcı işlevlerdir.
+- toggleViewMode, getSpec
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, `category`, `parentCategory` ve `families` prop'larının üçünü de aldığı varsayımıyla çalışır.
+Bu modül için temel mimari varsayımlar şunlardır:
 
-[Aksiyom 1]: Eğer `category` prop'u sağlanmazsa, bileşen hangi kategoriye ait serileri görüntüleyeceğini bilemez ve kategori başlığı/metadata gösterimi eksik veya hatalı olur.
+**[Aksiyom 1]:** Eğer `category` parametresi `undefined` veya `null` olarak verilmişse, `CategorySeriesView` bileşeni doğru şekilde render edilemez veya eksik/boş bir görünüm oluşur.
 
-[Aksiyom 2]: Eğer `parentCategory` prop'u sağlanmazsa, üst kategori navigasyonu veya breadcrumb gösterimi gerçekleştirilemez.
+**[Aksiyom 2]:** Eğer `products` parametresi boş bir dizi (`[]`) olarak verilmişse, `CategorySeriesView` bileşeni hiçbir ürün serisi göstermez.
 
-[Aksiyom 3]: Eğer `families` prop'u sağlanmazsa, görüntülenecek ürün serisi listesi boş kalır ve bileşen seriler arayüzünü sunamaz.
+**[Aksiyom 3]:** Eğer `parentCategory` parametresi `undefined` veya `null` olarak verilmişse, `CategorySeriesView` bileşeni üst kategori bilgisi olmadan çalışır (başka bir hata üretmez).
+
+**[Aksiyom 4]:** Eğer `toggleViewMode(seriesName)` fonksiyonu çağrılmışsa, geçerli bir `seriesName` dizgesi (`string`) ile çağrılmalıdır; aksi halde view mode değiştirme işlemi başarısız olur veya beklenmeyen bir durum oluşur.
+
+**[Aksiyom 5]:** Eğer `getSpec(p, key)` fonksiyonunda `p` parametresi geçerli bir `DomainProduct` nesnesi değilse veya `key` parametresi geçerli bir özellik anahtarı (`string`) değilse, fonksiyon `undefined` veya `null` değer döndürür.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### CategorySeriesView
-**Ne yapar**: Kategori sayfasında seri bazlı ürün görünümünü sağlayan bir React bileşenidir. Kategori bilgisi, üst kategori bilgisi ve aile verilerini alarak kategori-seri ilişkili arayüzü render eder. F5-B W2.1 notuna göre, daha önceki `groupProductsBySeries` heuristiği (`name.split(' ')[0]`) ve seri-matris tablosu bu bileşenden SİLİNMİŞTİR. Aile gerçeği artık veritabanından (`product_families`) gelir; varyant karşılaştırma matrisi ise PDP'ye taşınmıştır (W2.2).
+**Ne yapar**: Kategoriye ait serileri ve ürünleri görüntüleyen bir React bileşenidir. Verilen kategori yapısına göre ürün listesini ve serileri kullanıcıya sunar.
 
-**Nasıl yapar**: Fonksiyon, bir React fonksiyonel bileşeni (`React.FC<CategorySeriesViewProps>`) olarak tanımlanmıştır. Props parametresini destructure ederek `category`, `parentCategory` ve `families` değerlerini alır. Önceki sürümlerde bulunan `groupProductsBySeries` heuristiği kaldırılmıştır; artık ürün aileleri doğrudan veritabanından gelen `families` prop'u üzerinden sağlanır. Seri-matris tablosu bu bileşende yer almaz; varyant karşılaştırma işlevi PDP (Product Detail Page) bileşenine taşınmıştır.
+**Nasıl yapar**: Bileşen, props olarak aldığı category, parentCategory ve products verilerini kullanarak kategori serileri görünümünü render eder. Seri bazlı gruplandırma ve navigasyon işlevleri sağlar.
 
 **Parametreler**:
-- `category`: object — Görüntülenecek kategori bilgisini içerir. Kategori sayfasının ana veri kaynağıdır.
-- `parentCategory`: object — Mevcut kategorinin üst kategori bilgisini taşır. Kategori hiyerarşisinde yukarı doğru navigasyon veya bağlam sağlamak için kullanılır.
-- `families`: array — Ürün ailelerini içeren veri koleksiyonudur. Veritabanındaki `product_families` tablosundan gelen gerçek aile verisini temsil eder. Önceki `groupProductsBySeries` heuristiğinin yerini almıştır.
+- category: object — Görüntülenen ana kategori nesnesi
+- parentCategory: object — Üst kategori nesnesi, geri dönüş veya hiyerarşik yapı için kullanılır
+- products: array — Kategoriye ait ürün listesi dizisi
 
-**Dönüş**: `React.FC<CategorySeriesViewProps>` — `CategorySeriesViewProps` tipinde props alan bir React fonksiyonel bileşeni döndürür. Bileşen, kategori-seri görünümünün arayüz çıktısını üretir.
+**Dönüş**: React.FC<CategorySeriesViewProps> — Tip tanımlı bir React fonksiyonel bileşeni
+
+### toggleViewMode
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### getSpec
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useCartHook::useCart
 - import: ../../hooks/useCategoryViewModel::useCategoryViewModel
 - import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/format::formatCurrency
 - import: ../../lib/type-converters::DomainCategory
-- import: ../../utils/categoryHelpers::getLocalizedCategorySlug
+- import: ../../lib/type-converters::DomainProduct
+- import: ../../utils/type-converters::isRecord
+- import: @/components/ProductCard::ProductCard
 - import: @/components/navigation/Breadcrumb::Breadcrumb
-- import: @/components/products/FamilyCard::FamilyCard
-- import: @/types/ui-models::type { FamilyListItem }
 - import: framer-motion::motion
 - import: lucide-react::Activity
+- import: lucide-react::LayoutGrid
+- import: lucide-react::Table
 - import: lucide-react::Wind
 - import: lucide-react::Zap
+- import: next/image::Image
 - import: react::React
+- import: react::useState
 
 ---
 
@@ -86021,30 +87050,64 @@ Bu modül, `category`, `parentCategory` ve `families` prop'larının üçünü d
 ### CategorySeriesViewProps
 - `category: DomainCategory`
 - `parentCategory?: DomainCategory | null`
-- `families: FamilyListItem[]`
+- `products: DomainProduct[]`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/category/CategorySeriesView.tsx::CategorySeriesView
-- **params**: `category`, `parentCategory`, `families`
+### [N1_NASIL] AST Pointer: CategorySeriesView.tsx::CategorySeriesView
+- **params**: (category, parentCategory, products) — Ana bileşen prop'ları: mevcut kategori nesnesi, üst kategori nesnesi ve bu kategorideki ürünler dizisi
 - **ic_degiskenler**:
-  - `lang` — `useI18n()` hook'undan gelen mevcut dil kodu; breadcrumb ve kategori slug'ı için kullanılır
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; metinlerin yerelleştirilmesinde kullanılır
-  - `Routes` — `useLocalizedRoutes()` hook'undan gelen rota oluşturma yardımcıları; kategori bağlantıları için kullanılır
-  - `wrapCategory` — `useCategoryViewModel()` hook'undan gelen fonksiyon; ham kategori verisini görünüm modeline dönüştürür
-  - `vm` — `wrapCategory(category)` çağrısının dönüşü; mevcut kategorinin görünüm modeli (`displayName`, `description` alanlarına erişilir)
-  - `parentVm` — `wrapCategory(parentCategory)` çağrısının dönüşü; üst kategorinin görünüm modeli (`displayName`, `raw` alanlarına erişilir); varsa breadcrumb'a eklenir
-  - `breadcrumbItems` — breadcrumb navigasyon öğeleri dizisi; her eleman `label` ve `href` alanlarından oluşur, `Breadcrumb` bileşenine prop olarak geçilir
-- **Dönüş**: JSX elementi — hero bölümü (başlık, açıklama, breadcrumb), aile listesi grid'i (`FamilyCard` bileşenleri) ve güven strip'i içeren tam sayfa düzeni
+  - `lang` — `useI18n` hook'undan gelen mevcut dil kodu, para birimi formatlamada kullanılır
+  - `t` — `useI18n` hook'undan gelen çeviri fonksiyonu, tüm metin etiketlerini uluslararasılaştırır
+  - `addToCart` — `useCart` hook'undan gelen sepete ekleme fonksiyonu
+  - `Routes` — `useLocalizedRoutes` hook'undan gelen yerelleştirilmiş rotalar nesnesi, kategori sayfa bağlantılarını oluşturur
+  - `wrapCategory` — `useCategoryViewModel` hook'undan gelen kategori sarma fonksiyonu, ham kategori verisini görünüm modeline dönüştürür
+  - `groupProductsBySeries` — `useCategoryViewModel` hook'undan gelen ürünleri seriye göre gruplama fonksiyonu
+  - `viewModes` — Her seri için görünüm modunu ('grid' veya 'matrix') tutan state nesnesi
+  - `setViewModes` — viewModes state'ini güncelleyen setter fonksiyonu
+  - `vm` — `category` prop'unun `wrapCategory` ile sarılmış görünüm modeli, kategori adı ve açıklamasını sağlar
+  - `parentVm` — `parentCategory` prop'unun sarılmış görünüm modeli, üst kategori bilgilerini sağlar
+  - `seriesGroups` — Ürünlerin seri bazında gruplandırılmış hali, her grup seri adını ve ürün dizisini içerir
+  - `breadcrumbItems` — Breadcrumb navigasyonu için öğe dizisi, ev sahibi, üst kategori ve mevcut kategori bağlantılarını içerir
+  - `heroImage` — Kategori sayfasının hero bölümünde kullanılacak görsel URL'si, category.image_url yoksa varsayılan görsel kullanılır
+  - `toggleViewMode` — Seri adına göre görünüm modunu değiştiren iç fonksiyon
+  - `getSpec` — Ürün nesnesi ve anahtar parametresiyle teknik özellik değerini döndüren iç fonksiyon
+- **Dönüş**: React.ReactNode (JSX markup — kategori serisi sayfasının tüm görsel yapısı)
+
+### [N2_NASIL] AST Pointer: CategorySeriesView.tsx::toggleViewMode
+- **params**: (seriesName: string) — Görünüm modu değiştirilecek serinin adı
+- **ic_degiskenler**:
+  - `seriesName` — Parametre olarak alınan seri adı, viewModes nesnesinde güncelleme yapılacak anahtar olarak kullanılır
+- **Dönüş**: void (Stateful güncelleme — viewModes state'ini toggling yaparak seri adına ait görünüm modunu 'grid'↔'matrix' arasında değiştirir)
+
+### [N3_NASIL] AST Pointer: CategorySeriesView.tsx::getSpec
+- **params**: (p: DomainProduct, key: string) — p: Teknik özelliklerine bakılacak ürün nesnesi, key: Aranacak teknik özellik anahtarı
+- **ic_degiskenler**:
+  - `specs` — Ürünün `technical_specs` alanından gelen nesne, `isRecord` kontrolüyle doğrulanmış veya boş nesne
+  - `val` — Specs nesnesinde önce orijinal key ile, sonra lowerCase key ile aranan değer
+- **Dönüş**: string (Bulunan teknik özellik değerini String'e çevirerek döndürür, bulunamazsa '-' karakterini döndürür)
 
 ---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    CategorySeriesView_tsx__CategorySeriesView["CategorySeriesView"]
+    CategorySeriesView_tsx__getSpec["getSpec"]
+    CategorySeriesView_tsx__toggleViewMode["toggleViewMode"]
+    CategorySeriesView_tsx__CategorySeriesView --> CategorySeriesView_tsx__toggleViewMode
+    CategorySeriesView_tsx__CategorySeriesView --> CategorySeriesView_tsx__getSpec
+```
 
 ## NODE ID STANDARD
 
   file: src\views\category\CategorySeriesView.tsx
   function: src\views\category\CategorySeriesView.tsx::CategorySeriesView
+  function: src\views\category\CategorySeriesView.tsx::toggleViewMode
+  function: src\views\category\CategorySeriesView.tsx::getSpec
 
 ---
 
@@ -86059,13 +87122,13 @@ Bu modül, `category`, `parentCategory` ve `families` prop'larının üçünü d
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-3xl`, `tracking-hvac-loose`, `tracking-hvac-relaxed`
+- `rounded-hvac-2xl`, `tracking-hvac-loose`, `tracking-hvac-relaxed`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-500`, `bg-cyan-500/10`, `bg-secondary-blue`, `bg-slate-50`, `bg-slate-950`, `bg-white`, `border-b`, `border-cyan-500/20`, `border-dashed`, `border-slate-100`, `border-slate-200`, `lg:text-8xl`, `md:text-5xl`, `text-4xl`, `text-5xl`
-- **Layout:** `flex`, `flex-col`, `gap-16`, `gap-3`, `gap-4`, `gap-8`, `grid`, `grid-cols-1`, `h-2`, `h-px`, `inline-flex`, `items-center`, `justify-between`, `justify-center`, `lg:flex-row`
-- **Varyant/Responsive:** `lg:`, `md:`, `sm:`, `xl:` önekleri
-- **Yardımcı Sınıflar:** `animate-pulse`, `border`, `content-auto`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `italic`, `leading-hvac-11`, `leading-relaxed`, `lg:px-8`, `mb-10`, `mb-12`, `mb-4`
+- **Renkler:** `bg-cyan-500`, `bg-cyan-500/10`, `bg-secondary-blue`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-slate-950`, `bg-white`, `border-b`, `border-collapse`, `border-cyan-500/20`, `border-slate-100`, `border-slate-200`, `hover:bg-slate-50/50`, `hover:text-slate-600`
+- **Layout:** `flex`, `flex-col`, `flex-wrap`, `gap-16`, `gap-2`, `gap-3`, `gap-4`, `gap-8`, `grid`, `grid-cols-1`, `h-12`, `h-2`, `h-px`, `inline-flex`, `items-center`
+- **Varyant/Responsive:** `:`, `hover:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
+- **Yardımcı Sınıflar:** `${!isMatrix`, `${isMatrix`, `:`, `animate-fadeIn`, `animate-pulse`, `border`, `divide-slate-50`, `divide-y`, `font-black`, `font-bold`, `font-extralight`, `font-light`, `font-medium`, `group`, `italic`
 
 ---
 # FILE: src\views\category\CategoryShowcaseView.md

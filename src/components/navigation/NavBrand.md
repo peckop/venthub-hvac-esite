@@ -2,29 +2,28 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\navigation\NavBrand.tsx
-skeleton_hash: e4402e7b42c69016
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavBrand.tsx
+skeleton_hash: 233dc20a42cb3f74
 entity_hashes:
   overview: 8f1b73db672da6d9
   style_tokens: f2b8e78bf7817c52
-generated_at: 2026-08-27T13:31:14Z
+generated_at: 2026-08-27T08:33:28Z
 ---
 
 ## Genel Bakış
 
-NavBrand.tsx, uygulamanın üst navigasyon çubuğunda marka adını gösteren bir React bileşenidir. Bileşen, Next.js'in `Link` bileşenini kullanarak ana sayfaya yönlendirme sağlar ve bu yönlendirme için `useLocalizedRoutes` hook'undan yararlanır. Modül herhangi bir harici API çağrısı yapmaz, ortam değişkeni kullanmaz ve yalnızca bir kullanıcı arayüzü parçası sunar.
-
-## Fonksiyon Grupları
-
-Dosya içinde çağrılabilecek veya yeniden kullanılabilecek herhangi bir fonksiyon veya method bulunmamaktadır. Kod, doğrudan bir React bileşeni (`NavBrand`) olarak modül seviyesinde tanımlanmıştır.
+NavBrand.tsx, uygulamanın üst navigasyon çubuğunda marka logosunu ve adını gösteren bir React bileşenidir. Bileşen, `React.memo` ile sarmalanmış olup `brandName` prop'u alır ve Next.js'in `Link` bileşenini kullanarak ana sayfaya yönlendirme sağlar. Yönlendirme URL'i için `useLocalizedRoutes` hook'undan yararlanır; bu hook, çoklu dil desteğiyle birlikte lokalize edilmiş rotaları sunar. Modül herhangi bir harici API çağrısı yapmaz ve ortam değişkeni kullanmaz; yalnızca bir kullanıcı arayüzü parçası olarak çalışır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için fonksiyon imzası verilmediğinden ve modül sabitleri yalnızca `NavBrand` (call) olarak belirtildiğinden, fonksiyon gövdesinden türetilebilecek kesin aksiyom üretilememektedir.
 
-**Gerekçe:** Fonksiyon imzaları verilmemiştir; fonksiyon gövdesi kaynak olarak sağlanmamıştır. Aksiyomlar yalnızca fonksiyon gövdesinden üretilebilir.
+Eski dokümanda bahsedilen `Routes` sabiti ve `brandName` prop'u, verilen kaynak kodda doğrulanamadığından (fonksiyon imzaları boş) aksiyom olarak yazılmaz.
+
+**Bilinen bağımlılıklar (eski dokümana göre, doğrulanmamış):**
+- Eski dokümana göre modül, `utils/routes` modülündeki `Routes` sabitini kullanır ve Next.js `Link` bileşeniyle ana sayfaya yönlendirme yapar. Ancak bu bilgiler fonksiyon gövdesinden değil eski dokümandan geldiğinden aksiyom statüsü verilmez.
 
 ---
 
@@ -56,10 +55,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/navigation/NavBrand.tsx::NavBrand
-- **params**: `brandName` — bileşen prop'u olarak alınan marka adı; JSX içinde `{brandName}` ile doğrudan render edilir
+- **params**: `brandName` — bileşene dışarıdan aktarılan marka adı; JSX içinde doğrudan metin olarak render edilir
 - **ic_degiskenler**:
-  - `Routes` — `useLocalizedRoutes()` hook çağırısının dönüş değeri; `Routes.home()` metodu çağrılarak ana sayfa URL'si `<Link>` bileşeninin `href` prop'una atanır
-- **Dönüş**: JSX elementi — `<Link>` bileşeni; içinde iki `<div>` çocuğu barındırır: birincisi "VH" yazan gradient arka planlı logo kutusu, ikincisi `brandName` prop'unu gösteren metin alanı. `<Link>` bileşeni `next/link` modülünden gelir ve `Routes.home()` ile elde edilen href değerine yönlendirme yapar.
+  - `Routes` — `useLocalizedRoutes()` hook çağrısının dönüş değeri; lokalize edilmiş rota fonksiyonlarını barındırır
+  - `Routes.home()` — `Routes` nesnesi üzerinden erişilen ana sayfa rota fonksiyonu; `Link` bileşeninin `href` prop'una atanır
+- **Dönüş**: JSX — `<Link>` bileşeni; içinde VH logosu (gradient arka planlı `div` + `span`) ve `brandName` metnini gösteren iki alt `div` barındırır. `Link` bileşeni `next/link` modülünden gelir ve `Routes.home()` adresine yönlendirir.
 
 ---
 

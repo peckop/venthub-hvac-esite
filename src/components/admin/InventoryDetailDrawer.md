@@ -2,28 +2,26 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\InventoryDetailDrawer.tsx
-skeleton_hash: 8dfaab977cb74191
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryDetailDrawer.tsx
+skeleton_hash: 430f4ab6d93eb848
 entity_hashes:
   func:InventoryDetailDrawer: d112e7d0baa4046c
   overview: 0293743016101c3c
   style_tokens: 173df4c477f18528
-generated_at: 2026-08-27T13:08:53Z
+generated_at: 2026-08-27T08:02:16Z
 ---
 
 ## Genel Bakış
-InventoryDetailDrawer, admin panelinde seçili bir envanter öğesinin detaylarını gösteren bir yan çekmece (drawer) bileşenidir. Ürünün stok miktarı, eşik değerleri, hareket geçmişi ve rezerve sipariş bilgilerini sunar. Kullanıcının QR etiketi yazdırması, eşik güncellemesi, stok ayarlaması ve hareketleri geri alması gibi etkileşimli işlemleri destekler.
+InventoryDetailDrawer, envanter öğelerinin ayrıntılarını gösteren bir React bileşenidir. Seçili ürünün stok miktarı, eşik değerleri ve hareket geçmişi gibi bilgileri bir yan çekmece (drawer) arayüzünde sunar. Kullanıcıların QR etiketi yazdırması, eşik güncellemesi, stok ayarlaması ve hareketleri geri alması gibi etkileşimli işlemleri destekler.
 
 ## Fonksiyon Grupları
-
 ### Ana Bileşen
-Çekmece arayüzünün render mantığını yönetir, Escape tuşu ile kapatma davranışını tanımlar ve alt bileşenler aracılığıyla ürün bilgileri, stok kartları, eşik formu, stok ayarlama aracı, zeki satın alma önerisi, rezerve sipariş tablosu ve hareket geçmişi bölümlerini sunar. Props olarak gelen durum ve callback fonksiyonlarını (örneğin `printQrLabel`, `saveThreshold`, `adjustStock`, `undoLastMovement`) ilgili UI etkileşimlerine bağlar.
+Bileşenin giriş noktası ve render mantığını yönetir; props içinde gelen durum ve setter fonksiyonlarını kullanarak çekmece arayüzünü oluşturur. Escape tuşu ile çekmeceyi kapatma desteği sağlar, selected nesnesi yoksa null döner.
 - InventoryDetailDrawer
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
 Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
@@ -31,33 +29,33 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### InventoryDetailDrawer
-**Ne yapar**: Seçili bir envanter öğesinin detaylarını gösteren, ekranın sağ tarafından kayarak açılan bir yan panel (drawer) bileşenidir. Stok miktarı, eşik alarmı, akıllı satın alma önerisi, stok hareket geçmişi ve rezerve siparişler gibi bilgileri kullanıcıya sunar; yazma yetkisi olan kullanıcılar için eşik düzenleme ve stok ayarlama işlemleri sağlar.
+**Ne yapar**: Seçili bir envanter ürününün detaylarını gösteren, sağdan kayarak açılan bir drawer (çekmece) bileşenidir. Ürün bilgileri, stok durumu, eşik değeri düzenleme, stok hareketi yapma, rezerve siparişler ve hareket geçmişi gibi bölümleri içerir. Radix UI Dialog altyapısını kullanarak modal bir yapı oluşturur.
 
-**Nasıl yapar**: Radix UI `Dialog` bileşenlerini kullanarak modal bir drawer yapısı oluşturur. `Dialog.Root` ile açık/kapalı durumu yönetilir; `onOpenChange` callback'i aracılığıyla panel kapatıldığında `onClose` fonksiyonu tetiklenir. `Dialog.Overlay` siyah yarı saydam bir perde ekleyerek arka planı kilitler ve body scroll'u engeller (yorumda belirtildiği üzere cetvel §2.5 kuralı). `Dialog.Content` panelin kendisi olup `aria-modal="true"` özelliği elle eklenmiştir çünkü Radix'in otomatik olarak bu özelliği basmadığı belirtilmiştir; ayrıca `aria-describedby` özelliği `undefined` olarak ayarlanmıştır çünkü gövde semantik yapı (tablolar, çoklu bölüm) içerdiğinden APG (ARIA Practices Guide) uyarınca başlığa değil panelin kendisine odaklanılması gerektiği ifade edilmiştir. Bileşen `selected` prop'u null ise erken dönüş yaparak hiçbir şey render etmez. İçerik bölümünde `selected.daily_velocity` tanımlı ve sıfırdan büyük olduğunda "Zeki Öneri" bölümü koşullu olarak render edilir; bu bölümde 30 günlük satış hızı ve önerilen sipariş miktarı hesaplanarak gösterilir. `selected.abc_class` değeri `'A'` olduğunda ek bir bilgi mesajı görüntülenir. `hasWriteAccess` true olduğunda eşik düzenleme ve stok ayarlama bölümleri görünür hale gelir. Hareket geçmişi listesinde (`movements`) eleman varsa ve yazma erişimi mevcutsa son hareketi geri alma butonu gösterilir.
+**Nasıl yapar**: Bileşen, `props` parametresinden gerekli tüm verileri ve fonksiyonları destructure ederek alır. `selected` değeri yoksa `null` döner ve render işlemi gerçekleştirilmez. Radix UI `Dialog.Root`, `Dialog.Portal`, `Dialog.Overlay`, `Dialog.Content`, `Dialog.Title`, `Dialog.Close` bileşenlerini kullanarak semantik bir modal yapı kurar. `Dialog.Overlay` siyah yarı saydam bir perde oluşturur ve body scroll kilidi sağlar (yorumda "cetvel §2.5" referansı ile ASLA çıkarılmaması gerektiği belirtilmiştir). `Dialog.Content` bileşenine `aria-modal="true"` elle eklenmiştir çünkü Radix'in otomatik olarak bu özelliği basmadığı belirtilmiştir (INV-ADMIN-OVERLAY-2 referansı). Ayrıca APG (ARIA Practices Guide) uyarınca panelin kendisine odaklanması gerektiği için `aria-describedby` undefined olarak ayarlanmıştır. İçerikte `useI18n` hook'u ile uluslararasılaştırma sağlanır. `selected.daily_velocity` tanımlı ve sıfırdan büyük olduğunda "Zeki Öneri Bölümü" gösterilir; bu bölümde 30 günlük satış hızı ve önerilen sipariş miktarı hesaplanır. `selected.abc_class` değeri `'A'` olduğunda ek bir bilgi mesajı görüntülenir. `hasWriteAccess` true olduğunda eşik değeri düzenleme ve stok hareketi bölümleri render edilir. `printQrLabel` fonksiyonu, QR etiket yazdırma butonuna tıklandığında çağrılır ve yazdırma işlemi sırasında buton devre dışı kalır. `Dialog.Root` bileşeninin `onOpenChange` olayı, dialog kapatıldığında `onClose` fonksiyonunu çağırır.
 
 **Parametreler**:
-- props: InventoryDetailDrawerProps — Bileşenin tüm verilerini ve callback fonksiyonlarını içeren props nesnesi. Aşağıdaki alanlar bu nesneden destructure edilir:
-  - selected: bilinmiyor — Detayları gösterilecek seçili envanter öğesi. `name`, `product_id`, `physical_stock`, `daily_velocity`, `available_stock`, `abc_class` gibi alanlara sahiptir. Null olabilir; null ise bileşen hiçbir şey render etmez.
-  - onClose: () => void — Panel kapatıldığında çağrılan fonksiyon.
-  - printingQr: boolean — QR etiketi yazdırma işleminin devam edip etmediğini gösteren durum bayrağı.
-  - setPrintingQr: (value: boolean) => void — `printingQr` durumunu güncelleyen setter fonksiyonu.
-  - selectedStock: string | number | null | undefined — Seçili öğenin mevcut stok miktarı. Null veya undefined ise `'-'` olarak gösterilir.
-  - selectedThreshold: string | number — Kullanıcının girdiği eşik değeri. Boş string olabilir.
-  - setSelectedThreshold: (value: string | number) => void — Eşik değerini güncelleyen setter fonksiyonu.
-  - defaultThreshold: string | number | null | undefined — Varsayılan eşik değeri. `selectedThreshold` boş string olduğunda bu değer kullanılır.
-  - saving: boolean — Eşik kaydetme işleminin devam edip etmediğini gösteren durum bayrağı.
-  - saveThreshold: (productId: string) => void — Belirtilen ürün kimliği için eşik değerini kaydeden fonksiyon.
-  - hasWriteAccess: boolean — Kullanıcının yazma yetkisi olup olmadığını belirten bayrak. Eşik düzenleme, stok ayarlama ve hareket geri alma bölümlerinin görünürlüğünü kontrol eder.
-  - moveQty: bilinmiyor — Stok hareketi için girilen miktar değeri.
-  - setMoveQty: (value: bilinmiyor) => void — Stok hareketi miktarını güncelleyen setter fonksiyonu.
-  - moving: boolean — Stok hareketi işleminin devam edip etmediğini gösteren durum bayrağı.
-  - adjustStock: bilinmiyor — Stok ayarlama işlemini gerçekleştiren fonksiyon. `InventoryStockAdjust` bileşeninin `onAdjust` prop'una aktarılır.
-  - reservedOrders: bilinmiyor — Rezerve siparişlerin listesi. `InventoryReservedTable` bileşenine prop olarak aktarılır.
-  - movements: Array — Son stok hareketlerinin listesi. Uzunluğu kontrol edilerek geri alma butonunun görünürlüğü belirlenir ve `InventoryMovementHistory` bileşenine prop olarak aktarılır.
-  - undoLastMovement: () => void — Son stok hareketini geri alan fonksiyon.
-  - undoing: boolean — Geri alma işleminin devam edip etmediğini gösteren durum bayrağı.
+- props: InventoryDetailDrawerProps — Bileşenin ihtiyacı olan tüm verileri ve callback fonksiyonlarını içeren props nesnesi. Aşağıdaki alt alanları içerir:
+  - selected: bilinmiyor — Detayları gösterilecek seçili envanter ürünü. Bu değer yoksa bileşen null döner.
+  - onClose: () => void — Drawer kapatıldığında çağrılan fonksiyon.
+  - printingQr: boolean — QR etiket yazdırma işleminin devam edip etmediğini gösteren durum.
+  - setPrintingQr: (value: boolean) => void — `printingQr` durumunu güncelleyen fonksiyon.
+  - selectedStock: number | null | undefined — Seçili ürünün güncel stok miktarı. Null veya undefined ise "-" gösterilir.
+  - selectedThreshold: number | '' — Kullanıcının ayarladığı eşik değeri. Boş string olabilir.
+  - setSelectedThreshold: (value: number | '') => void — Eşik değerini güncelleyen fonksiyon.
+  - defaultThreshold: number | null | undefined — Varsayılan eşik değeri. `selectedThreshold` boş olduğunda bu değer gösterilir.
+  - saving: boolean — Eşik değeri kaydetme işleminin devam edip etmediğini gösteren durum.
+  - saveThreshold: (productId: string) => void — Eşik değerini kaydetmek için çağrılan fonksiyon. `selected.product_id` parametre olarak iletilir.
+  - hasWriteAccess: boolean — Kullanıcının yazma yetkisi olup olmadığını belirten değer. Eşik düzenleme, stok hareketi ve son hareketi geri alma bölümleri bu değere bağlı olarak gösterilir.
+  - moveQty: number | string — Stok hareketi için girilen miktar değeri.
+  - setMoveQty: (value: number | string) => void — `moveQty` değerini güncelleyen fonksiyon.
+  - moving: boolean — Stok hareketi işleminin devam edip etmediğini gösteren durum.
+  - adjustStock: bilinmiyor — Stok düzeltme işlemi için çağrılan fonksiyon. `InventoryStockAdjust` bileşenine `onAdjust` prop'u olarak iletilir.
+  - reservedOrders: bilinmiyor — Rezerve siparişlerin listesi. `InventoryReservedTable` bileşenine prop olarak iletilir.
+  - movements: Array — Stok hareket geçmişi kayıtları. `InventoryMovementHistory` bileşenine prop olarak iletilir. Dizi uzunluğu sıfırdan büyükse "son hareketi geri al" butonu gösterilir.
+  - undoLastMovement: () => void — Son stok hareketini geri almak için çağrılan fonksiyon.
+  - undoing: boolean — Geri alma işleminin devam edip etmediğini gösteren durum.
 
-**Dönüş**: JSX.Element — Radix UI Dialog yapısını temel alan, envanter detaylarını gösteren drawer bileşeninin render çıktısı. `selected` null ise `null` döndürür.
+**Dönüş**: JSX.Element — Radix UI Dialog bileşenlerinden oluşan drawer arayüzünü döndürür. `selected` null veya undefined ise `null` döner.
 
 ---
 
@@ -106,27 +104,27 @@ STOK DETAY ÇEKMECESİ. Cetvel: `docs/standards/admin-design-standard.md` §4. N
 ### [N1_NASIL] AST Pointer: src/components/admin/InventoryDetailDrawer.tsx::InventoryDetailDrawer
 - **params**: `props: InventoryDetailDrawerProps`
 - **ic_degiskenler**:
-  - `selected` — props'tan destructure edilen seçili envanter satırı (InventoryRow); drawer'ın gösterdiği ana veri kaynağı. `selected.name`, `selected.product_id`, `selected.physical_stock`, `selected.daily_velocity`, `selected.available_stock`, `selected.abc_class` alanlarına erişilir. `null` veya `undefined` ise fonksiyon `null` döner ve render gerçekleşmez
-  - `onClose` — drawer'ı kapatma fonksiyonu; Dialog.Root bileşeninin `onOpenChange` callback'inde `next` değeri `false` olduğunda çağrılır
-  - `printingQr` — QR etiketi yazdırma işlemi devam ediyor mu (boolean); QR butonunun `disabled` durumunu ve buton metnini kontrol eder
-  - `setPrintingQr` — QR yazdırma durumunu değiştiren setter; `printQrLabel` fonksiyonuna ikinci argüman olarak iletilir
-  - `selectedStock` — seçili ürünün güncel stok miktarı (sayı veya null); özet kartında `selectedStock ?? '-'` olarak gösterilir
-  - `selectedThreshold` — seçili eşik alarm değeri (sayı veya boş string); input alanının `value`'su olarak kullanılır, boşsa `defaultThreshold` gösterilir
-  - `setSelectedThreshold` — eşik değerini değiştiren setter; input `onChange`'inde `e.target.value` ile sayıya dönüştürülerek veya boş string olarak çağrılır, reset butonunda `''` ile çağrılır
-  - `defaultThreshold` — varsayılan eşik değeri; `selectedThreshold` boş olduğunda özet kartında `defaultThreshold ?? '-'` olarak gösterilir
-  - `saving` — eşik kaydetme işlemi devam ediyor mu (boolean); kaydet ve reset butonlarının `disabled` durumunu kontrol eder
-  - `saveThreshold` — eşik değerini kaydetme fonksiyonu; kaydet butonu `onClick`'inde `saveThreshold(selected.product_id)` olarak çağrılır
-  - `hasWriteAccess` — yazma yetkisi var mı (boolean); eşik düzenleme bölümü, stok hareketleri bölümü ve son hareketi geri alma butonunun görünürlüğünü kontrol eder
-  - `moveQty` — stok hareket miktarı; `InventoryStockAdjust` bileşenine prop olarak iletilir
-  - `setMoveQty` — stok hareket miktarını değiştiren setter; `InventoryStockAdjust` bileşenine prop olarak iletilir
-  - `moving` — stok hareketi (düzeltme) işlemi devam ediyor mu (boolean); `InventoryStockAdjust` bileşenine prop olarak iletilir
-  - `adjustStock` — stok düzeltme fonksiyonu; `InventoryStockAdjust` bileşeninin `onAdjust` prop'una atanır
-  - `reservedOrders` — rezerve siparişler dizisi (ReservedRow[]); `InventoryReservedTable` bileşenine prop olarak iletilir
-  - `movements` — stok hareket geçmişi dizisi (Movement[]); `InventoryMovementHistory` bileşenine prop olarak iletilir, ayrıca `movements.length > 0` kontrolüyle geri alma butonunun görünürlüğü belirlenir
-  - `undoLastMovement` — son hareketi geri alma fonksiyonu; hareket geçmişi başlığındaki geri alma butonu `onClick`'inde çağrılır
-  - `undoing` — geri alma işlemi devam ediyor mu (boolean); geri alma butonunun `disabled` durumunu ve metnini kontrol eder
-  - `t` — i18n çeviri fonksiyonu; `useI18n()` hook'undan elde edilir, tüm UI metinlerinin çevirisinde kullanılır
-- **Dönüş**: `selected` falsy ise `null`, aksi halde JSX (Dialog.Root bileşeni — Radix Dialog kullanılarak oluşturulmuş modal drawer)
+  - `selected` — `props`'tan destructure edilen seçili envanter satırı (`InventoryRow`); drawer kapatma kontrolünde `if (!selected) return null` ile null-guard yapılır; `selected.name`, `selected.product_id`, `selected.physical_stock`, `selected.daily_velocity`, `selected.available_stock`, `selected.abc_class` alanlarına erişilir
+  - `onClose` — `props`'tan destructure edilen drawer kapatma fonksiyonu; `Dialog.Root` bileşeninin `onOpenChange` handler'ında `next` false ise çağrılır
+  - `printingQr` — `props`'tan destructure edilen QR yazdırma durumu (boolean); QR butonunun `disabled` durumunu ve buton metnini kontrol eder
+  - `setPrintingQr` — `props`'tan destructure edilen QR yazdırma durumunu güncelleyen setter fonksiyonu; `printQrLabel` fonksiyonuna ikinci argüman olarak geçilir
+  - `selectedStock` — `props`'tan destructure edilen mevcut stok miktarı; özet kartında `?? '-'` fallback ile görüntülenir
+  - `selectedThreshold` — `props`'tan destructure edilen eşik değeri; eşik alarm kartında ve input'un `value` prop'unda kullanılır; `=== ''` kontrolüyle boş durum ayrımı yapılır
+  - `setSelectedThreshold` — `props`'tan destructure edilen eşik değerini güncelleyen setter fonksiyonu; input `onChange` handler'ında `e.target.value` boşsa `''` değilse `Number(e.target.value)` atanır; reset butonunda `''` atanır
+  - `defaultThreshold` — `props`'tan destructure edilen varsayılan eşik değeri; eşik alarm kartında `selectedThreshold === ''` olduğunda `?? '-'` fallback ile kullanılır
+  - `saving` — `props`'tan destructure edilen kaydetme işlemi durumu (boolean); eşik kaydet ve reset butonlarının `disabled` durumunu kontrol eder
+  - `saveThreshold` — `props`'tan destructure edilen eşiği kaydeden fonksiyon; eşik kaydet butonu `onClick`'inde `selected.product_id` argümanıyla çağrılır
+  - `hasWriteAccess` — `props`'tan destructure edilen yazma yetkisi durumu (boolean); eşik düzenleme bölümü, stok düzeltme bölümü ve son hareketi geri al butonunun koşullu render'ını kontrol eder
+  - `moveQty` — `props`'tan destructure edilen stok hareket miktarı; `InventoryStockAdjust` bileşeninin `moveQty` prop'una geçilir
+  - `setMoveQty` — `props`'tan destructure edilen hareket miktarını güncelleyen setter fonksiyonu; `InventoryStockAdjust` bileşeninin `setMoveQty` prop'una geçilir
+  - `moving` — `props`'tan destructure edilen stok hareket işlemi durumu (boolean); `InventoryStockAdjust` bileşeninin `moving` prop'una geçilir
+  - `adjustStock` — `props`'tan destructure edilen stok düzeltme fonksiyonu; `InventoryStockAdjust` bileşeninin `onAdjust` prop'una geçilir
+  - `reservedOrders` — `props`'tan destructure edilen rezerve sipariş listesi (`ReservedRow[]`); `InventoryReservedTable` bileşeninin `reservedOrders` prop'una geçilir
+  - `movements` — `props`'tan destructure edilen stok hareket geçmişi (`Movement[]`); `InventoryMovementHistory` bileşeninin `movements` prop'una geçilir; `.length > 0` kontrolüyle geri al butonunun koşullu render'ını kontrol eder
+  - `undoLastMovement` — `props`'tan destructure edilen son hareketi geri alma fonksiyonu; hareket geçmişi başlığının geri al butonu `onClick`'inde çağrılır
+  - `undoing` — `props`'tan destructure edilen geri alma işlemi durumu (boolean); geri al butonunun `disabled` durumunu ve buton metnini kontrol eder
+  - `t` — `useI18n()` hook'undan destructure edilen i18n çeviri fonksiyonu; tüm UI metinlerinde, QR etiket parametrelerinde ve `stockLine` interpolasyonunda (`{ count: selected.physical_stock }`) kullanılır
+- **Dönüş**: `JSX.Element | null` — `selected` falsy ise `null`, aksi halde Radix `Dialog.Root` ile sarmalanmış drawer JSX'i
 
 ---
 

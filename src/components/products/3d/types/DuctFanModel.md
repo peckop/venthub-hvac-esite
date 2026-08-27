@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\DuctFanModel.tsx
-skeleton_hash: 23d47e32861145e6
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\DuctFanModel.tsx
+skeleton_hash: cf9b9eb1f8da034f
 entity_hashes:
   func:DuctFanModel: db7d5fa48410ad07
   func:RectangularDuctFanModel: c575246c49ae9f50
   overview: d682035eaa626359
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:14:28Z
+generated_at: 2026-08-25T07:26:52Z
 ---
 
 ## Genel Bakış
@@ -88,11 +88,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+### [N2_NASIL] AST Pointer: DuctFanModel.tsx::RectangularDuctFanModel
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `materials` — useResolveMaterials() hook'undan dönen materyal nesnesi; mesh'lerde `material` prop'u olarak kullanılır (`materials.galvanizedSteel`, `materials.industrialSteel`, `materials.matteBlack`, `materials.brushedAluminum`)
+  - `geometries` — useMemo ile memoize edilmiş geometri nesnesi; tüm mesh'lerde `geometry` prop'u olarak kullanılır
+    - `bodyGeo` — BoxGeometry(1, 0.6, 0.6), ana gövde kutusu
+    - `flangeGeo` — BoxGeometry(0.05, 0.7, 0.7), flanş kutusu (position [±0.5, 0, 0])
+    - `topBoxGeo` — BoxGeometry(0.3, 0.15, 0.2), üst kutu (position [0, 0.35, 0])
+    - `cylinderGeo` — CylinderGeometry(0.25, 0.25, 1.02, 32), merkezi silindir (rotation [0, 0, Math.PI / 2])
+  - `x` — flanş map callback'inin ilk parametresi; [-0.5, 0.5] değerlerini alır, mesh position'ında kullanılır
+  - `i` — flanş map callback'inin ikinci parametresi; key prop'u olarak kullanılır
+- **Dönüş**: JSX — `<group>` içinde dikdörtgen kanal fanı 3D modeli
+
+---
+
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\DuctFanModel.tsx
-  function: src\components\products\3d\types\DuctFanModel.tsx::DuctFanModel
-  function: src\components\products\3d\types\DuctFanModel.tsx::RectangularDuctFanModel
+  file: DuctFanModel.tsx
+  function: DuctFanModel.tsx::DuctFanModel
+  function: DuctFanModel.tsx::RectangularDuctFanModel
 
 ---
 

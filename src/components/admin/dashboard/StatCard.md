@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\dashboard\StatCard.tsx
-skeleton_hash: c2ff1a98196483d7
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\dashboard\StatCard.tsx
+skeleton_hash: d621feee8fc4d2b7
 entity_hashes:
   func:StatCard: 42faa1e1d38b732c
   overview: cd8b364f9dc61291
   style_tokens: fe92468c4406b452
-generated_at: 2026-08-25T07:36:55Z
+generated_at: 2026-08-27T08:08:03Z
 ---
 
 ## Genel Bakış
@@ -113,8 +113,8 @@ Bu modül için özel aksiyom tanımlanamamıştır.
 
 ## NODE ID STANDARD
 
-  file: StatCard.tsx
-  function: StatCard.tsx::StatCard
+  file: src\components\admin\dashboard\StatCard.tsx
+  function: src\components\admin\dashboard\StatCard.tsx::StatCard
 
 ---
 

@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\authority-builder\BlockEditor.tsx
-skeleton_hash: 4a7e959fa1d4cc79
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\authority-builder\BlockEditor.tsx
+skeleton_hash: dc9cd3297ce82cc4
 entity_hashes:
   func:BlockEditor: 214d29bf0d4fb6bd
   overview: 451c6f0d8f51e9a4
   style_tokens: 98b0ad75e2789f2c
-generated_at: 2026-08-27T13:11:53Z
+generated_at: 2026-08-27T08:07:07Z
 ---
 
 ## Genel Bakış

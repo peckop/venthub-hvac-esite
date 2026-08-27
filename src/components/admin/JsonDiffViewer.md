@@ -2,43 +2,34 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\JsonDiffViewer.tsx
-skeleton_hash: 2128e2e264cb0b0f
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\JsonDiffViewer.tsx
+skeleton_hash: 30b2fcda71cda919
 entity_hashes:
   func:JsonDiffViewer: 00fa2648afca347e
   func:safeStringify: 9ba27221b507c072
   overview: a686cb82b4e79c82
   style_tokens: 447f0cef72f1a3d8
-generated_at: 2026-08-27T13:11:53Z
+generated_at: 2026-08-27T08:07:05Z
 ---
 
 ## Genel Bakış
-Bu modül, iki JSON nesnesi arasındaki farkları görsel olarak gösteren bir React bileşeni ve bu bileşenin veri işleme sürecinde kullandığı güvenli bir string dönüşüm yardımcısını içerir. Modül, admin arayüzünde veri değişikliklerinin anlaşılmasını kolaylaştırmayı amaçlar.
+`JsonDiffViewer` bileşeni, iki JSON nesnesi arasındaki farkları görsel olarak kullanıcıya sunan bir React arayüzüdür. Bileşen, `before` ve `after` adlı iki prop alır ve bu veriler arasındaki değişiklikleri görüntüler. Görüntüleme sırasında oluşabilecek hataları önlemek üzere `safeStringify` yardımcı fonksiyonu kullanılır.
 
 ## Fonksiyon Grupları
 ### UI Rendering
-Kullanıcı arayüzünü oluşturur ve JSON verileri arasındaki farkları görsel bir formatta sunar.
+Kullanıcı arayüzünü oluşturur ve JSON farklarını görselleştirir. `before` ve `after` prop'larını alarak bir React fonksiyonel bileşeni döndürür.
 - JsonDiffViewer
 
 ### Yardımcı / Utility
-Veri işleme ve güvenli string dönüşümünü sağlar; UI bileşeni tarafından kullanılır.
+Veri işleme ve güvenli string dönüşümünü sağlar; UI bileşeni tarafından kullanılmak üzere tasarlanmıştır. `unknown` tipindeki değerleri güvenli biçimde stringe dönüştürür.
 - safeStringify
-
-## Bağımlılıklar ve Mimari Notlar
-- **İç Bağımlılıklar**: `safeStringify` fonksiyonu, `JsonDiffViewer` bileşeni tarafından kullanılır.
-- **Dış Bağımlılıklar**: Modül, `React` kütüphanesine bağımlıdır. Fonksiyon imzalarından başka bir dış bağımlılık bilgisi çıkarılamaz.
-- **Dinamik/Lazy Yükleme**: Kaynakta bu konuda bilgi bulunmamaktadır.
-- **Mimari Önem**: Modül, admin panelinde JSON formatındaki veri değişikliklerinin görsel olarak incelenmesi için temel bir bileşendir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-[Aksiyom 1]: Eğer `before` prop'u sağlanmazsa, `JsonDiffViewer` bileşeni karşılaştırma yapacak bir kaynak veriye sahip olamaz.
-
-[Aksiyom 2]: Eğer `after` prop'u sağlanmazsa, `JsonDiffViewer` bileşeni karşılaştırma yapacak bir hedef veriye sahip olamaz.
-
-[Aksiyom 3]: Eğer `safeStringify` fonksiyonuna bir `val` parametresi verilmezse, fonksiyon çağrısı gerçekleştirilemez.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -77,32 +68,32 @@ Veri işleme ve güvenli string dönüşümünü sağlar; UI bileşeni tarafınd
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: components/admin/JsonDiffViewer.tsx::JsonDiffViewer
+### [N1_NASIL] AST Pointer: src/components/admin/JsonDiffViewer.tsx::JsonDiffViewer
 - **params**: `before`, `after`
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('admin.common.oldValueBefore')`, `t('admin.common.newValueAfter')`, `t('admin.common.added')`, `t('admin.common.deleted')`, `t('admin.common.noChangeDetails')` çağrılarında kullanılır
-  - `bObj` — `before` parametresinin object ve null olmayan durumda `Record<string, unknown>` olarak atanmış hali; aksi durumda boş obje atanır
-  - `aObj` — `after` parametresinin object ve null olmayan durumda `Record<string, unknown}` olarak atanmış hali; aksi durumda boş obje atanır
-  - `allKeys` — `bObj` ve `aObj` key'lerinin `Set` ile birleştirilip alfabetik sıralanmış dizisi; `.map()` ile her key için diff satırı oluşturulur
-  - `safeStringify` — `val` parametresini alan, undefined/null ise `'null'`, string ise tırnak içinde, object ise `JSON.stringify`, diğer durumlarda `String(val)` döndüren yardımcı fonksiyon
-- **Dönüş**: JSX element — iki sütunlu (before/after) diff görünümü; `allKeys` boşsa "noChangeDetails" mesajı gösterir
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('admin.common.oldValueBefore')`, `t('admin.common.newValueAfter')`, `t('admin.common.added')`, `t('admin.common.deleted')`, `t('admin.common.noChangeDetails')` çağrılarıyla kullanılır
+  - `bObj` — `before` parametresi object ve null değilse `before as Record<string, unknown>`, aksi halde boş obje `{}` olarak atanır
+  - `aObj` — `after` parametresi object ve null değilse `after as Record<string, unknown>`, aksi halde boş obje `{}` olarak atanır
+  - `allKeys` — `bObj` ve `aObj` key'lerinin birleşimi (`new Set` ile tekrarlar kaldırılır), alfabetik sıralanır
+  - `safeStringify` — iç fonksiyon; `val` parametresini güvenli şekilde string'e dönüştürür (null/undefined → `'null'`, string → tırnak içinde, object → `JSON.stringify`, diğer → `String`)
+- **Dönüş**: JSX element — iki sütunlu (önceki/sonraki değer) diff görünümü; `allKeys` üzerinde `.map()` ile her key için satır oluşturulur, key yoksa "değişiklik yok" mesajı gösterilir
 
-### [N2_NASIL] AST Pointer: components/admin/JsonDiffViewer.tsx::safeStringify
+### [N2_NASIL] AST Pointer: src/components/admin/JsonDiffViewer.tsx::safeStringify
 - **params**: `val` (unknown)
 - **ic_degiskenler**: yok
 - **Dönüş**: string — `val` undefined veya null ise `'null'`, string ise `"${val}"` (tırnak içinde), object ise `JSON.stringify(val)`, diğer durumlarda `String(val)`
 
-### [N3_NASIL] AST Pointer: components/admin/JsonDiffViewer.tsx::allKeys.map callback
+### [N3_NASIL] AST Pointer: src/components/admin/JsonDiffViewer.tsx::allKeys.map callback
 - **params**: `key`
 - **ic_degiskenler**:
-  - `valB` — `bObj[key]` erişimi; before objesindeki key karşılığı değer
-  - `valA` — `aObj[key]` erişimi; after objesindeki key karşılığı değer
-  - `strB` — `safeStringify(valB)` sonucu; before değerinin string gösterimi
-  - `strA` — `safeStringify(valA)` sonucu; after değerinin string gösterimi
-  - `isRemoved` — `valB !== undefined && valA === undefined` koşulu; key'in before'da var olup after'da silinmiş olduğunu belirtir
-  - `isAdded` — `valB === undefined && valA !== undefined` koşulu; key'in before'da yokken after'da eklenmiş olduğunu belirtir
-  - `isChanged` — `!isRemoved && !isAdded && strB !== strA` koşulu; key'in her iki tarafta da var olup değerinin değiştiğini belirtir
-- **Dönüş**: JSX element — değişmemiş key'ler için iki sütunda aynı değer gösterilir; eklenen/silinen/değişen key'ler için renkli vurgu ve `t()` ile çevrilmiş etiketler (`added`, `deleted`) kullanılır
+  - `valB` — `bObj[key]` değeri; önceki (before) nesnede bu key'e karşılık gelen değer
+  - `valA` — `aObj[key]` değeri; sonraki (after) nesnede bu key'e karşılık gelen değer
+  - `strB` — `safeStringify(valB)` sonucu; `valB`'nin string gösterimi
+  - `strA` — `safeStringify(valA)` sonucu; `valA`'nın string gösterimi
+  - `isRemoved` — `valB !== undefined && valA === undefined` koşulu; key'in sonraki nesneden silinip silinmediğini belirtir
+  - `isAdded` — `valB === undefined && valA !== undefined` koşulu; key'in sonraki nesneye eklenip eklenmediğini belirtir
+  - `isChanged` — `!isRemoved && !isAdded && strB !== strA` koşulu; key'in değerinin değişip değişmediğini belirtir
+- **Dönüş**: JSX element — değişiklik yoksa gri renkli iki sütunda aynı değer gösterilir; silinmişse before sütunu kırmızı arka planlı ve "silindi" etiketli, eklenmişse before sütunu gri arka planlı ve "eklendi" etiketli, değişmişse before kırmızı/after yeşil arka planlı gösterilir
 
 ---
 

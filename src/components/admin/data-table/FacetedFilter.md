@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\data-table\FacetedFilter.tsx
-skeleton_hash: acaab1978f17b5cf
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\data-table\FacetedFilter.tsx
+skeleton_hash: 24dea7afb80cebeb
 entity_hashes:
   func:FacetedFilter: 49c4b53ab33910e8
   overview: d3bf186543b0d057
   style_tokens: 0c0078156433b2eb
-generated_at: 2026-08-25T07:24:54Z
+generated_at: 2026-08-27T08:09:46Z
 ---
 
 ## Genel Bakış
@@ -109,8 +109,8 @@ Fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzasından çıkarıla
 
 ## NODE ID STANDARD
 
-  file: FacetedFilter.tsx
-  function: FacetedFilter.tsx::FacetedFilter
+  file: src\components\admin\data-table\FacetedFilter.tsx
+  function: src\components\admin\data-table\FacetedFilter.tsx::FacetedFilter
 
 ---
 

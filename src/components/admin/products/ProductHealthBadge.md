@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\products\ProductHealthBadge.tsx
-skeleton_hash: d77b4e9b2f92bad9
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\products\ProductHealthBadge.tsx
+skeleton_hash: cf0d9fd434f025c3
 entity_hashes:
   func:ProductHealthBadge: 7149ab2cdd96084d
   overview: 300c84dd02e2dca2
   style_tokens: 07d2b0a0a3540bdf
-generated_at: 2026-08-27T13:17:54Z
+generated_at: 2026-08-27T08:22:56Z
 ---
 
 ## Genel Bakış

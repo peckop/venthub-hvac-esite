@@ -2,9 +2,9 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\tenantConstants.ts
-skeleton_hash: 3cbd7024528e2833
-generated_at: 2026-06-19T20:48:17.194932+00:00
+source_path: C:\tmp\vh-altyapi-t165\src\utils\tenantConstants.ts
+skeleton_hash: dcf3360b9932ec9a
+generated_at: 2026-08-27T08:40:03.355639+00:00
 ---
 
 ## Genel Bakış
@@ -19,4 +19,4 @@ Client-safe tenant sabitleri — `next/headers` İÇERMEZ, client bundle'a güve
 (Dışa açılan çağrılabilir öğe yok — modül-düzeyi yan-etki; AST işaretçisi gerektiren fonksiyon/metot yok.)
 
 ## NODE ID STANDARD
-file: C:\Users\alize\venthub-hvac\src\utils\tenantConstants.ts
+file: C:\tmp\vh-altyapi-t165\src\utils\tenantConstants.ts

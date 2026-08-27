@@ -2,43 +2,36 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\navigation\MegaMenu3DBackground.tsx
-skeleton_hash: 0d987d56b09d771a
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\MegaMenu3DBackground.tsx
+skeleton_hash: 0c6506896eb744aa
 entity_hashes:
   func:MegaMenu3DBackground: bb72cddf66cbd5a0
   overview: 64226aa5800abc8b
   style_tokens: 487664132884f59c
-generated_at: 2026-08-27T13:23:16Z
+generated_at: 2026-08-27T09:03:55Z
 ---
 
 ## Genel Bakış
-Bu modül, mega menü bileşeninin arka planında üç boyutlu bir görsel efekt sunan bir React bileşenini tanımlar. Bileşen, verilen kategori slug'ına göre 3D bir model ve metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder. Modül tek bir bileşenden oluşur ve dışarıya yalnızca bu bileşeni dışa aktarır.
+Bu modül, mega menü bileşeninin arka planında üç boyutlu bir görsel efekt sunan bir React bileşenini tanımlar. Bileşen, verilen kategori slug'ına göre 3D bir model ve metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder. Eğer `categorySlug` prop'u sağlanmazsa, bileşen hedefsiz çalışır ve beklenen 3D görsel efekti üretemez.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen (3D Arka Plan)
-Mega menünün arka planını oluşturmak için gerekli olan 3D model ve gradyan overlay'ı bir arada sunan temel React bileşenini tanımlar. Bileşenin üst kısmına büyük bir 3D görsel yerleştirirken, alt kısımda koyu bir gradyan efekti uygulayarak menü metinlerinin okunabilirliğini artırır.
+Mega menünün arka planını oluşturmak için gerekli olan 3D model ve gradyan overlay'ı bir arada sunan temel React bileşenini tanımlar.
 - MegaMenu3DBackground
-
-## Bağımlılıklar ve Mimari Notlar
-- **Dış bağımlılıklar**: Bileşenin 3D model yükleme ve gradyan overlay oluşturma işlemleri için hangi harici kütüphaneleri kullandığı fonksiyon gövdesi paylaşılmadığı için bilinmiyor.
-- **Dinamik/lazy yükleme**: `categorySlug` prop'una göre dinamik olarak farklı bir 3D model veya tema yüklenip yüklenmediği fonksiyon gövdesi olmadan doğrulanamıyor.
-- **Mimari önem**: Bu bileşen, mega menü dropdown'unun görsel deneyimini doğrudan etkilediğinden, navigasyon katmanının kullanıcı arayüzü tarafında kritik bir rol üstlenir. `categorySlug` prop'u sağlanmazsa bileşenin hangi kategoriye ait 3D arka plan modelini render edeceği belirsiz olur.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için, fonksiyon gövdesi (içerik) paylaşılmadığından yalnızca fonksiyon imzasından türetilebilecek sınırlı varsayımlar belirlenebilir.
+Bu modül için fonksiyon gövdesi (içerik) paylaşılmadığından, yalnızca fonksiyon imzasından aksiyom türetilememektedir.
 
-[Aksiyom 1]: Eğer `categorySlug` prop'u sağlanmazsa, bileşen hangi kategoriye ait 3D arka planı render edeceğini bilemez; davranış bilinmiyor (fonksiyon gövdesi verilmediği için null kontrolü yapılıp yapılmadığı tespit edilemez).
+İmzadan çıkarılabilen tek bilgi:
+- Bileşen `categorySlug` adında bir prop almaktadır.
+- Bileşen `MegaMenu3DBackgroundProps` tipinde bir props nesnesi beklemektedir.
 
-[Aksiyom 2]: Eğer `MegaMenu3DBackgroundProps` tip tanımı mevcut değilse, bileşen beklenen prop yapısını doğrulayamaz ve TypeScript derleme hatası oluşur.
+Ancak bu bileşenin doğru çalışması için hangi koşulların var olması gerektiği (örneğin: hangi bağımlılıklar gerekli, hangi veriler zorunlu, hangi hata durumları ele alınmalı) fonksiyon gövdesi olmadan belirlenemez.
 
-[Aksiyom 3]: Eğer bileşenin render edildiği ortamda 3D rendering desteği (örneğin WebGL) yoksa, 3D model gösteriminin nasıl davranacağı bilinmiyor (fonksiyon gövdesinde fallback mekanizması olup olmadığı tespit edilemez).
-
----
-
-**Not:** Fonksiyon gövdesi verilmediği için bu modülün gerçek mimari varsayımları (gradyan overlay davranışı, model yükleme stratejisi, hata yönetimi, performans optimizasyonları vb.) üretilememektedir. Yukarıdaki aksiyomlar yalnızca imzadan çıkarılabilecek minimum düzeyde varsayımlardır. Daha doğru aksiyomlar için fonksiyon gövdesinin sağlanması gerekmektedir.
+**Sonuç:** Bu modül için fonksiyon gövdesi sağlanmadığından mimari aksiyom tanımlanamamaktadır. Aksiyom üretmek için `MegaMenu3DBackground` fonksiyonunun gerçek implementasyonu gereklidir.
 
 ---
 
@@ -75,16 +68,21 @@ Bu modül için, fonksiyon gövdesi (içerik) paylaşılmadığından yalnızca 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\tmp\vh-t088\src\components\navigation\MegaMenu3DBackground.tsx::MegaMenu3DBackground
-- **params**: `categorySlug` — kategori slug bilgisi, Category3DIcon bileşenine prop olarak aktarılır
+### [N1_NASIL] AST Pointer: src/components/navigation/MegaMenu3DBackground.tsx::MegaMenu3DBackground
+- **params**: `categorySlug` — destructured props'tan gelen kategori slug değeri
 - **ic_degiskenler**:
-  - `VentHubCanvas` — 3D canvas bileşeni; `preset="nav"`, `camera={{ position: [0, 0.1, 2.2], fov: 40 }}`, `frameloop="demand"` ile yapılandırılır
-  - `Suspense` — asenkron yüklenen 3D bileşenleri sarmalar; `fallback={null}` ile yüklenirken hiçbir şey göstermez
-  - `Category3DIcon` — kategoriye özel 3D ikon bileşeni; `categorySlug={categorySlug}` ve `scale={0.9}` prop'ları ile kullanılır
-  - `OrbitControls` — kamera kontrol bileşeni; `enableZoom={false}`, `enablePan={false}`, `enableRotate={false}` ile tüm manuel kontrol devre dışı, `autoRotate` aktif, `autoRotateSpeed={1.5}` ile otomatik dönüş hızı ayarlı
-  - `div` (canvas sarmalayıcı) — `className="absolute top-0 left-0 right-0 h-3/4 pointer-events-none"` ile üst yüzde 75'lik alana konumlandırılır, tıklama olaylarını geçirmez
-  - `div` (gradient overlay) — `className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent pointer-events-none"` ile beyaz gradient geçiş efekti oluşturur, tıklama olaylarını geçirmez
-- **Dönüş**: JSX — iki `div` elementinden oluşan React fragment (`<>...</>`); birincisi 3D canvas'ı üst yüzde 75 alanda gösterir, ikincisi alttan yukarıya doğru beyaz gradient overlay ekler
+  - `categorySlug` — `Category3DIcon` bileşenine aynı adla prop olarak aktarılır
+  - `preset="nav"` — `VentHubCanvas` bileşenine verilen canvas ön-ayar adı
+  - `camera={{ position: [0, 0.1, 2.2], fov: 40 }}` — `VentHubCanvas` kamera konumu ve görüş açısı ayarı
+  - `frameloop="demand"` — `VentHubCanvas` kare döngüsü modu; talep üzerine render
+  - `fallback={null}` — `Suspense` bileşeninin yükleme sırasında gösterilecek alternatifi; boş
+  - `scale={0.9}` — `Category3DIcon` bileşeninin ölçek değeri
+  - `enableZoom={false}` — `OrbitControls` zoom özelliğini devre dışı bırakır
+  - `enablePan={false}` — `OrbitControls` kaydırma (pan) özelliğini devre dışı bırakır
+  - `enableRotate={false}` — `OrbitControls` kullanıcı etkileşimiyle döndürmeyi devre dışı bırakır
+  - `autoRotate` — `OrbitControls` otomatik döndürmeyi etkinleştirir (boolean true)
+  - `autoRotateSpeed={1.5}` — `OrbitControls` otomatik döndürme hızı
+- **Dönüş**: JSX fragment — biri 3D canvas içeren (üst 3/4 alan, `pointer-events-none`, `absolute` konumlu), diğeri beyaz gradient overlay olan iki `div` döndürür
 
 ---
 

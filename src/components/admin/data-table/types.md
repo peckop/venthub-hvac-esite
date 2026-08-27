@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\data-table\types.ts
-skeleton_hash: 7862d8a04e8a0f7e
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\data-table\types.ts
+skeleton_hash: 4313c5b65fc88f78
 entity_hashes:
   overview: ddbf04dea1d9de40
-generated_at: 2026-08-27T13:15:08Z
+generated_at: 2026-08-27T08:10:41Z
 ---
 
 ## Genel Bakış

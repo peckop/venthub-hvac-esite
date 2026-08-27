@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\products\3d\types\PlugFanModel.tsx
-skeleton_hash: 6b6f19d8a5d12772
+source_path: C:\tmp\wt-supurme\src\components\products\3d\types\PlugFanModel.tsx
+skeleton_hash: 5cf8fe96bb2bf840
 entity_hashes:
   func:PlugFanModel: b85fe612276b43fc
   overview: 84b4f359828824c7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T07:20:16Z
+generated_at: 2026-08-25T07:27:02Z
 ---
 
 ## Genel Bakış
@@ -75,10 +75,72 @@ Bu modül için fonksiyon gövdesi verilmediğinden, gövdeden türetilebilecek 
 
 ---
 
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/PlugFanModel.tsx::PlugFanModel::useFrame_callback
+- **params**: `state`, `delta`
+- **ic_degiskenler**:
+  - `fanRef.current` — dış kapsamdan erişilen ref nesnesi; varsa `fanRef.current.rotation.z` değerini `6 * delta` kadar azaltarak fanı sürekli döndürür
+- **Dönüş**: yok
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/PlugFanModel.tsx::PlugFanModel::useEffect_cleanup_factory
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `inletConeGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `flangeGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `shroudGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `bladeGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `motorBodyGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `finGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `klemensGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `baseGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+  - `supportGeo` — dış kapsamdan erişilen geometri; cleanup'ta `.dispose()` çağrılır
+- **Dönüş**: cleanup fonksiyonu — bileşen unmount olduğunda tüm memoize edilmiş geometrileri VRAM'den temizler
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/PlugFanModel.tsx::PlugFanModel::useEffect_cleanup_inner
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `inletConeGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `flangeGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `shroudGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `bladeGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `motorBodyGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `finGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `klemensGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `baseGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+  - `supportGeo` — dış kapsamdan erişilen geometri; `.dispose()` ile serbest bırakılır
+- **Dönüş**: yok
+
+---
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/types/PlugFanModel.tsx::PlugFanModel::blade_map_callback
+- **params**: `_`, `i`
+- **ic_degiskenler**:
+  - `_` — kullanılmayan dizi elemanı (fill(0) kaynaklı)
+  - `i` — dizi indeksi; `(i / 7) * Math.PI * 2` formülüyle her kanat için Z ekseni etrafında eşit açısal dağılım hesaplanır
+  - `bladeGeo` — dış kapsamdan erişilen BoxGeometry; kanat mesh'inin `geometry` prop'u olarak kullanılır
+  - `materials.safetyOrange` — dış kapsamdan erişilen malzeme; kanat mesh'inin `material` prop'u olarak kullanılır
+- **Dönüş**: JSX — `<group>` içinde döndürülmüş `<mesh>` döndürür; 7 adet geriye eğimli pervane kanadı oluşturur
+
+---
+
+### [N6_NASIL] AST Pointer: src/components/products/3d/types/PlugFanModel.tsx::PlugFanModel::fin_map_callback
+- **params**: `_`, `i`
+- **ic_degiskenler**:
+  - `_` — kullanılmayan dizi elemanı (fill(0) kaynaklı)
+  - `i` — dizi indeksi; `(i / 12) * Math.PI * 2` formülüyle her kanatçık için Y ekseni etrafında eşit açısal dağılım hesaplanır
+  - `finGeo` — dış kapsamdan erişilen BoxGeometry; soğutma kanatçığı mesh'inin `geometry` prop'u olarak kullanılır
+  - `materials.industrialSteel` — dış kapsamdan erişilen malzeme; soğutma kanatçığı mesh'inin `material` prop'u olarak kullanılır
+- **Dönüş**: JSX — motor gövdesi etrafına dağıtılmış 12 adet soğutma kanatçığı `<mesh>` döndürür
+
+---
+
 ## NODE ID STANDARD
 
-  file: src\components\products\3d\types\PlugFanModel.tsx
-  function: src\components\products\3d\types\PlugFanModel.tsx::PlugFanModel
+  file: PlugFanModel.tsx
+  function: PlugFanModel.tsx::PlugFanModel
 
 ---
 

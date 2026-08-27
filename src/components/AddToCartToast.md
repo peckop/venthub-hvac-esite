@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\AddToCartToast.tsx
-skeleton_hash: 025fdc0eea708e0b
+source_path: C:\tmp\vh-altyapi-t165\src\components\AddToCartToast.tsx
+skeleton_hash: 79117146ebc05a83
 entity_hashes:
   func:AddToCartToast: 581f14d900d31bb4
   overview: 4631aecdd4e1b7b7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:23:59Z
+generated_at: 2026-08-27T07:52:12Z
 ---
 
 ## Genel Bakış
@@ -61,44 +61,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-### [N2_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (useEffect callback)
-- **params**: yok
-- **ic_degiskenler**:
-  - `onAdded` — olay dinleyici fonksiyonu; `EVENT` adlı custom event'i dinler, ürün bilgisi varsa toast gösterir
-- **Dönüş**: cleanup fonksiyonu — `window.removeEventListener` ile `onAdded` dinleyicisini kaldırır
-
----
-
-### [N3_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (onAdded)
-- **params**:
-  - `e` — Event nesnesi; CustomEvent'e cast edilir
-- **ic_degiskenler**:
-  - `customEvent` — `e`'nin `CustomEvent<{ product?: Product }>` tipine cast edilmiş hali; TypeScript derleyicisini tatmin etmek ve zero-any sağlamak için
-  - `detail` — `customEvent.detail`; opsiyonel `product` alanı taşır
-  - `product` — `detail.product`; koşullu olarak atanır, `detail?.product` truthy ise kullanılır
-- **Dönüş**: yok — yan etki olarak `toast.custom` çağırır
-
----
-
-### [N4_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (toast.custom callback)
-- **params**:
-  - `id` — Sonner tarafından sağlanan benzersiz toast kimliği
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX — `<AddToCartToastContent product={product} onClose={() => toast.dismiss(id)} />` bileşeni
-
----
-
-### [N5_NASIL] AST Pointer: src/components/AddToCartToast.tsx::AddToCartToast (cleanup)
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — yan etki olarak `window.removeEventListener(EVENT, onAdded as EventListener)` çağırır
-
----
-
 ## NODE ID STANDARD
 
-  file: AddToCartToast.tsx
-  function: AddToCartToast.tsx::AddToCartToast
+  file: src\components\AddToCartToast.tsx
+  function: src\components\AddToCartToast.tsx::AddToCartToast
 
 ---
 

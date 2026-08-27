@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\dashboard\AbcPieChart.tsx
-skeleton_hash: 80f926fbaf3cf540
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\dashboard\AbcPieChart.tsx
+skeleton_hash: 86396a9f281a2c0f
 entity_hashes:
   func:AbcPieChart: cde258b4cc2386ed
   overview: 64d9c987fb2a5f21
   style_tokens: 5302d85fc9a1582c
-generated_at: 2026-08-27T13:12:35Z
+generated_at: 2026-08-27T08:07:59Z
 ---
 
 ## Genel Bakış
@@ -37,15 +37,15 @@ Bu modül için mimari fonksiyon gövdesi paylaşılmadığından, yalnızca fon
 ## FONKSİYON DETAYLARI
 
 ### AbcPieChart
-**Ne yapar**: ABC ürün sınıflandırmasını gösteren bir pasta grafik (pie chart) bileşenidir. Gelen veri boşsa, yoksa veya tüm değerler sıfırsa, kullanıcıya bilgilendirici bir boş durum ekranı sunar. Aksi takdirde, Recharts kütüphanesini kullanarak etkileşimli ve animasyonlu bir pasta grafik çizer ve grafik merkezinde toplam stok miktarını görüntüler.
+**Ne yapar**: ABC ürün sınıflandırmasına ait verileri pasta grafik (pie chart) olarak görselleştiren bir React bileşenidir. Veri yoksa veya tüm değerler sıfırsa boş durum ekranı gösterir; aksi halde etkileşimli bir pasta grafik oluşturur ve merkezinde toplam stok miktarını görüntüler.
 
-**Nasıl yapar**: Bileşen, önce `useI18n` hook'u aracılığıyla uluslararasılaştırma fonksiyonunu (`t`) alır. Ardından gelen `data` prop'unu kontrol eder: veri yoksa, boşsa veya tüm elemanların `value` değeri sıfırsa, `AdminEmptyState` bileşenini içeren bir boş durum arayüzü döndürür. Veri mevcutsa, `data` dizisindeki tüm `value` değerlerini toplayarak `totalValue` hesaplar. Ana dönüş kısmında, `ResponsiveContainer` içinde bir `PieChart` oluşturur. Grafik, `innerRadius` ve `outerRadius` ile halka şeklinde, `paddingAngle` ile dilimler arası boşluklu, `stroke` ile kenarlıklı ve animasyonlu (`animationDuration`) bir `Pie` bileşeni içerir. Her dilim, verideki `color` değerine göre boyanır. Grafik üzerinde özel stillenmiş bir `Tooltip` ve `Legend` bulunur. Grafik mutlak konumlandırılmış bir `div` içinde, merkezde toplam stok miktarını ve bir etiket gösterir.
+**Nasıl yapar**: Bileşen, `useI18n()` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t`'yi alır. İlk olarak `data` prop'unu kontrol eder: veri yoksa, dizi uzunluğu sıfırsa ya da tüm elemanların `value` değeri sıfırsa, `AdminEmptyState` bileşenini içeren bir boş durum kartı döndürür. Veri mevcutsa, `data` dizisindeki tüm `value` değerlerini `reduce` ile toplayarak `totalValue` hesaplar. Ardından Recharts kütüphanesinin `ResponsiveContainer`, `PieChart`, `Pie`, `Cell`, `Tooltip` ve `Legend` bileşenlerini kullanarak responsive bir pasta grafik oluşturur. Pasta dilimleri `data` dizisindeki her elemanın `color` özelliğine göre renklendirilir; her hücre (`Cell`) hover'da opaklık geçişi ve tıklanabilirlik efektlerine sahiptir. Tooltip, ürün sayısı ve sınıf bilgisini uluslararasılaştırılmış biçimde gösterir. Grafik merkezinde, bulanık arka plan efektli (`blur-3xl`) bir katman üzerinde toplam stok sayısı ve "toplam stok" etiketi yer alır. Başlık olarak `title` prop'u kullanılır; belirtilmemişse uluslararasılaştırılmış varsayılan metin (`admin.dashboard.abcProductClassification`) görüntülenir.
 
 **Parametreler**:
-- `data`: `AbcPieChartProps['data']` (tipi verilmemiş, ancak gövdeden `value` ve `color` alanlarına sahip bir nesne dizisi olduğu anlaşılmaktadır) — Grafikte gösterilecek veri seti. Her elemanın bir `value` (sayısal değer) ve bir `color` (renk kodu) özelliği olmalıdır.
-- `title`: `AbcPieChartProps['title']` (tipi verilmemiş, ancak gövdeden bir string olduğu anlaşılmaktadır) — Grafiğin başlığı. Belirtilmezse veya boşsa, `t('admin.dashboard.abcProductClassification')` ile alınan varsayılan metin kullanılır.
+- data: AbcPieChartProps['data'] — Her elemanı `value` (sayısal) ve `color` (renk kodu) özelliklerini içeren bir dizi. Pasta grafik dilimlerinin değerlerini ve renklerini belirler.
+- title: AbcPieChartProps['title'] — Bileşenin üst kısmında gösterilecek başlık metni. Belirtilmezse varsayılan uluslararasılaştırılmış metin kullanılır.
 
-**Dönüş**: Bileşen, bir React bileşeni olarak JSX döndürür. Dönüş tipi kodda açıkça belirtilmemiştir.
+**Dönüş**: JSX elementi döndürür. Veri yoksa veya tüm değerler sıfırsa boş durum kartı, aksi halde pasta grafik içeren bir bileşen ağacı döndürür. Kesin dönüş tipi kaynakta belirtilmemiştir.
 
 ---
 
@@ -73,18 +73,26 @@ Bu modül için mimari fonksiyon gövdesi paylaşılmadığından, yalnızca fon
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/dashboard/AbcPieChart.tsx::AbcPieChart
-- **params**: `data` — ABC ürün sınıflandırma veri dizisi (her elemanda `value` ve `color` alanları bulunur), `title` — grafik başlığı (opsiyonel, yoksa varsayılan çeviri anahtarı kullanılır)
+- **params**: `data` — ABC sınıflandırma veri dizisi; her elemanda `value` (sayı) ve `color` (renk) alanları bulunur; `title` — grafik başlığı, verilmezse varsayılan çeviri anahtarı kullanılır
 - **ic_degiskenler**:
   - `t` — `useI18n()` kancasından destructure edilen çeviri fonksiyonu; metinleri yerelleştirmek için kullanılır
-  - `totalValue` — `data.reduce((acc, curr) => acc + curr.value, 0)` ile hesaplanan tüm veri elemanlarının `value` alanlarının toplamı; grafik merkezinde gösterilir
-  - `d` — `data.every(d => d.value === 0)` ifadesindeki her bir veri elemanı; tüm değerlerin sıfır olup olmadığını kontrol etmek için kullanılır
-  - `acc` — `reduce` işlemindeki birikimli toplam değeri tutan akümülatör
-  - `curr` — `reduce` işlemindeki mevcut veri elemanı; `curr.value` ile değeri toplama eklenir
-  - `entry` — `data.map((entry, index) => ...)` içindeki her bir veri elemanı; `entry.color` ile hücre rengi belirlenir
-  - `index` — `data.map((entry, index) => ...)` içindeki döngü indeksi; `key={`cell-${index}`}` olarak Cell bileşenine atanır
-  - `value` — Tooltip `formatter` fonksiyonunda ürün sayısını temsil eden sayısal değer; Legend `formatter` fonksiyonunda ise sınıf adını temsil eden metin
-  - `name` — Tooltip `formatter` fonksiyonunda ürün sınıfı adını temsil eden metin
-- **Dönüş**: JSX elementi — veri yoksa veya tüm değerler sıfırsa `AdminEmptyState` içeren boş durum kartı; aksi halde `ResponsiveContainer` içinde `PieChart` (donut grafik) ve merkezde toplam stok gösteren bileşen döndürür
+  - `data.length` — veri dizisinin uzunluğu; boş veri kontrolünde `=== 0` ile karşılaştırılır
+  - `d` — `data.every()` callback parametresi; her elemanın `d.value` değeri `0` ile eşit mi diye kontrol edilir
+  - `totalValue` — `data.reduce()` ile hesaplanan toplam stok miktarı; `acc` birikimli toplam, `curr` mevcut eleman, her elemanın `curr.value` değeri toplanır; grafik merkezinde gösterilir
+  - `entry` — `data.map()` callback parametresi; her dilim verisini temsil eder, `entry.color` ile dilim rengi belirlenir
+  - `index` — `data.map()` callback parametresi; her dilim için benzersiz key üretmek amacıyla `cell-${index}` formatında kullanılır
+  - `value` — Tooltip `formatter` fonksiyonunun ilk parametresi (sayı tipinde); ürün sayısını temsil eder, `t('admin.dashboard.productCount', { count: value })` ile çevrilir
+  - `name` — Tooltip `formatter` fonksiyonunun ikinci parametresi (string tipinde); ürün sınıfını temsil eder, `t('admin.dashboard.productClass', { name })` ile çevrilir
+  - `value` — Legend `formatter` fonksiyonunun parametresi; legend etiketi metnini temsil eder, `<span>` içinde render edilir
+  - `PieIcon` — `lucide-react` kütüphanesinden import edilen ikon; boş durumda `AdminEmptyState` bileşeninin `icon` prop'una aktarılır
+  - `AdminEmptyState` — boş durum bileşeni; veri yoksa veya tüm değerler sıfırsa `icon`, `title`, `description` ve `compact` prop'ları ile render edilir
+  - `ResponsiveContainer` — recharts bileşeni; `%100` genişlik ve yükseklik ile grafik konteynerini responsive yapar
+  - `PieChart` — recharts pasta grafik konteyneri
+  - `Pie` — recharts pasta dilim bileşeni; `data`, `cx`, `cy`, `innerRadius` (70), `outerRadius` (95), `paddingAngle` (5), `dataKey` ("value"), `stroke` ("#0A0F1E"), `strokeWidth` (6), `animationBegin` (0), `animationDuration` (1500) prop'ları ile yapılandırılır
+  - `Cell` — recharts hücre bileşeni; her dilim için `key`, `fill` (entry.color) ve className prop'ları ile render edilir
+  - `Tooltip` — recharts araç ipucu bileşeni; `contentStyle` (yuvarlak köşeler, blur arka plan, gölge), `itemStyle` (yazı tipi ayarları) ve `formatter` prop'ları ile yapılandırılır
+  - `Legend` — recharts legend bileşeni; `verticalAlign` ("bottom"), `align` ("center"), `height` (40), `iconType` ("circle"), `iconSize` (8) ve `formatter` prop'ları ile yapılandırılır
+- **Dönüş**: JSX elementi — veri yoksa boş durum kartı, varsa pasta grafik ve merkezde toplam stok gösteren bileşen ağacı döndürür
 
 ---
 

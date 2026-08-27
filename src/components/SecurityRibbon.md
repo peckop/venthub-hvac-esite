@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\SecurityRibbon.tsx
-skeleton_hash: 8868b245364bfa62
+source_path: C:\tmp\vh-altyapi-t165\src\components\SecurityRibbon.tsx
+skeleton_hash: b64bfb403036d146
 entity_hashes:
   func:SecurityRibbon: a7c5f379d943c103
   overview: 08117376b2a86eee
   style_tokens: 3e379506fde07599
-generated_at: 2026-06-14T22:16:29Z
+generated_at: 2026-08-27T07:58:29Z
 ---
 
 ## Genel Bakış

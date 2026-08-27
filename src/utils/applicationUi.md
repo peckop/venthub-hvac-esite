@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\applicationUi.tsx
-skeleton_hash: bd34ea6485556e69
+source_path: C:\tmp\vh-altyapi-t165\src\utils\applicationUi.tsx
+skeleton_hash: 568adad80ba80501
 entity_hashes:
   func:accentOverlayClass: d8ef037541c09389
   func:iconFor: 8ef77854d85af42b
   overview: bbb9266e1effc225
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:28:57Z
+generated_at: 2026-08-27T08:37:16Z
 ---
 
 ## Genel Bakış
@@ -102,9 +102,9 @@ Bu modül için fonksiyon gövdeleri verilmediğinden, yalnızca imzalardan çı
 
 ## NODE ID STANDARD
 
-  file: applicationUi.tsx
-  function: applicationUi.tsx::iconFor
-  function: applicationUi.tsx::accentOverlayClass
+  file: src\utils\applicationUi.tsx
+  function: src\utils\applicationUi.tsx::iconFor
+  function: src\utils\applicationUi.tsx::accentOverlayClass
 
 ---
 

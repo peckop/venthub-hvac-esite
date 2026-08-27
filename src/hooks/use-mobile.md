@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\use-mobile.tsx
-skeleton_hash: 979674ac2716239b
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\use-mobile.tsx
+skeleton_hash: c94c2c5b5ec4ae5e
 entity_hashes:
   func:useIsMobile: a6742235a7536cbb
   overview: e7e6eb331c36bd56
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T08:34:15Z
 ---
 
 ## Genel Bakış

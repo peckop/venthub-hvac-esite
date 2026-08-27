@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\authority\AuthorityRenderer.tsx
-skeleton_hash: 42bf50c4af3b80d8
+source_path: C:\tmp\vh-altyapi-t165\src\components\authority\AuthorityRenderer.tsx
+skeleton_hash: 5182d5555a42c724
 entity_hashes:
   func:AuthorityRenderer: b497d8ee6938f090
   func:ComparisonBlock: 3b92c32ed036d564
@@ -14,32 +14,37 @@ entity_hashes:
   func:SpecsBlock: 02f28da6bc471010
   overview: 6f14bbf658674292
   style_tokens: c2dd5bfa6feb94e3
-generated_at: 2026-08-27T13:18:49Z
+generated_at: 2026-08-27T08:47:04Z
 ---
 
 ## Genel Bakış
-`AuthorityRenderer` modülü, dinamik ve çoklu içerik bloklarını (hero bölümü, özellikler, karşılaştırma tabloları vb.) merkezi olarak yöneten bir React bileşenidir. Modül, bir içerik blokları koleksiyonunu alır ve her bir bloğun `type` alanına göre önceden tanımlı, uygun render bileşenine yönlendirerek modüler ve tutarlı bir arayüz üretir.
+`AuthorityRenderer` modülü, dinamik içerik bloklarını merkezi olarak yöneten bir React bileşenidir. Modül, bir içerik koleksiyonunu alır ve her bloğun türüne göre uygun render bileşenine yönlendirerek modüler bir arayüz üretir. Blok bileşenleri bağımsızdır ve her biri kendisine iletilen veri yapısını çözümleyerek ilgili arayüz bölümünü oluşturur.
 
 ## Fonksiyon Grupları
+
 ### Ana Yönlendirici ve Yardımcılar
-Modülün giriş noktası olan ana bileşen, içerik dizisini iterasyona alarak blok tipine göre doğru render bileşenini çağırır. Yardımcı bileşen, bloklar içinde ortak ihtiyaç duyulan ikon gösterimini soyutlayarak tekrar kullanılırlığı sağlar.
+Modülün giriş noktasıdır. İçerik dizisini iterasyona alarak blok tipine göre doğru render bileşenini çağırır. Yardımcı bileşen ise bloklar içinde ortak ihtiyaç duyulan ikon gösterimini soyutlar.
 - `AuthorityRenderer`, `IconRenderer`
 
 ### Blok Bazlı Render Bileşenleri
-Her bir içerik bloğu tipi için özel olarak tasarlanmış bağımsız React bileşenleri. Her biri, kendisine iletilen `block` veri yapısını çözümleyerek o bloğun arayüzünü (örneğin başlık ve açıklama, özellik kartları, karşılaştırma satırları) oluşturur.
+Her içerik bloğu tipi için özel tasarlanmış bağımsız bileşenlerdir. Her biri kendisine iletilen blok verisini çözümleyerek o bloğun arayüzünü (başlık, açıklama, özellik kartları, karşılaştırma satırları vb.) oluşturur.
 - `HeroBlock`, `SpecsBlock`, `FeaturesGridBlock`, `ComparisonBlock`, `CtaBannerBlock`
-
-## AXIOMS – Mimari Varsayımlar
-Bu modül, içerik koleksiyonunu blok tiplerine göre ayırıp ilgili render bileşenlerine yönlendiren bir yapıya sahiptir.
-
-[Aksiyom 1]: Eğer `IconRenderer` bileşenine geçerli bir `name` parametresi (boş string veya undefined) verilmezse, ikon gösterimi başarısız olur.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca tip imzaları ve genel bakıştan çıkarılabilecek varsayımlar yazılabilir.
+
+[Aksiyom 1]: Eğer `content` null ise, `AuthorityRenderer`'ın ne render edeceği fonksiyon gövdesine bağlıdır ve bilinmiyor.
+
+[Aksiyom 2]: Eğer her bloğun `type` alanı tanımlı değilse, `AuthorityRenderer` o bloğu hangi alt bileşene yönlendireceğini bilemez — bu durumda ne olacağı fonksiyon gövdesine bağlıdır ve bilinmiyor.
+
+[Aksiyom 3]: Eğer `IconRenderer` bileşenine `name` parametresi verilmezse, bileşen hangi ikonu çizeceğini bilemez — `name` zorunlu bir parametredir.
+
+[Aksiyom 4]: Eğer `HeroBlock`, `SpecsBlock`, `FeaturesGridBlock`, `ComparisonBlock` veya `CtaBannerBlock` bileşenlerine `block` prop'u verilmezse, bileşen render edeceği veriye sahip olamaz — `block` bu bileşenler için zorunlu bir prop'tur.
+
+[Aksiyom 5]: Eğer `AuthorityContent` yapısı beklenen blok koleksiyonunu içermiyorsa, `AuthorityRenderer`'ın yönlendireceği blok listesi oluşmaz — bu durumda ne olacağı fonksiyon gövdesine bağlıdır ve bilinmiyor.
 
 ---
 
@@ -115,79 +120,88 @@ Bu modül, içerik koleksiyonunu blok tiplerine göre ayırıp ilgili render bil
 ### [N1_NASIL] AST Pointer: AuthorityRenderer.tsx::IconRenderer
 - **params**: `name` (string), `className` (string, opsiyonel)
 - **ic_degiskenler**:
-  - `iconName` — `name` parametresinin ilk harfini büyük harfe çevirip geri kalanıyla birleştirerek LucideIcons içindeki anahtar adı oluşturur
-  - `Icon` — `iconName` ile LucideIcons nesnesinden erişilen bileşen; bulunamazsa `LucideIcons.Zap` kullanılır
-- **Dönüş**: JSX elementi (`Icon` bileşeni `className` prop'u ile render edilir)
+  - `iconName` — `name` parametresinin ilk harfi büyük harfe çevrilip geri kalanı eklenerek oluşturulan Lucide ikon adı; `keyof typeof LucideIcons` tipine dönüştürülür
+  - `Icon` — `LucideIcons[iconName]` erişimiyle elde edilen bileşen; bulunamazsa `LucideIcons.Zap` kullanılır
+- **Dönüş**: `<Icon className={className} />` JSX elementi
 
 ### [N2_NASIL] AST Pointer: AuthorityRenderer.tsx::HeroBlock
 - **params**: `block` (HeroBlockType)
 - **ic_degiskenler**:
-  - `block.config?.fullWidth` — tam genişlik yapılandırması; true ise `w-full`, değilse `max-w-7xl mx-auto rounded-3xl my-12` sınıfı uygulanır
-  - `block.config?.theme` — tema yapılandırması; `'dark'` ise koyu arka plan, değilse açık arka plan sınıfları uygulanır
-  - `block.content.eyebrow` — üst başlık metni; varsa `text-indigo-500` stilinde render edilir
+  - `block.config?.fullWidth` — tam genişlik olup olmadığını belirten opsiyonel yapılandırma; true ise `"w-full"`, değilse `"max-w-7xl mx-auto rounded-3xl my-12"` sınıfı uygulanır
+  - `block.config?.theme` — tema ayarı; `'dark'` ise koyu arka plan, değilse açık arka plan sınıfları uygulanır
+  - `block.content.eyebrow` — üst başlık metni; varsa `<span>` içinde gösterilir
   - `block.content.title` — ana başlık metni
-  - `block.content.description` — açıklama metni; varsa render edilir
-  - `block.content.ctaLabel` — buton etiketi; varsa buton render edilir
-  - `block.content.ctaLink` — buton linki; yoksa `'#'` kullanılır
-  - `block.content.imageUrl` — arka plan resmi URL'si; varsa `Image` bileşeni ile tam ekran arka plan olarak render edilir
-- **Dönüş**: JSX elementi (section)
+  - `block.content.description` — açıklama metni; varsa `<p>` içinde gösterilir
+  - `block.content.ctaLabel` — eylem butonu etiketi; varsa buton oluşturulur
+  - `block.content.ctaLink` — eylem butonu bağlantısı; yoksa `"#"` kullanılır
+  - `block.content.imageUrl` — arka plan görsel URL'si; varsa `<Image>` bileşeni ile gösterilir
+- **Dönüş**: `<section>` içinde yapılandırılmış hero bloğu JSX elementi
 
 ### [N3_NASIL] AST Pointer: AuthorityRenderer.tsx::SpecsBlock
 - **params**: `block` (SpecsBlockType)
 - **ic_degiskenler**:
-  - `block.content.title` — bölüm başlığı
-  - `block.content.description` — açıklama metni; varsa render edilir
-  - `block.content.columns` — sütun sayısı; 4 ise `lg:grid-cols-4`, 3 ise `grid-cols-3`, diğer durumda `grid-cols-2` grid sınıfı uygulanır
-  - `block.content.rows` — satır dizisi; her eleman `row.label`, `row.value`, `row.unit` alanlarına sahiptir
-- **Dönüş**: JSX elementi (div)
+  - `block.content.title` — blok başlığı
+  - `block.content.description` — blok açıklaması; varsa gösterilir
+  - `block.content.columns` — sütun sayısı; 4 ise dört sütunlu, 3 ise üç sütunlu, diğer durumda iki sütunlu grid oluşturulur
+  - `block.content.rows` — spec satırları dizisi; her eleman için `row.label`, `row.value`, `row.unit` kullanılır
+  - `row` — döngüdeki her spec satırı nesnesi
+  - `i` — döngü indeks numarası; `key` prop'u olarak kullanılır
+  - `row.label` — spec etiketi
+  - `row.value` — spec değeri
+  - `row.unit` — spec birimi; varsa değerin yanında gösterilir
+- **Dönüş**: specs grid yapısı JSX elementi
 
 ### [N4_NASIL] AST Pointer: AuthorityRenderer.tsx::FeaturesGridBlock
 - **params**: `block` (FeaturesGridBlockType)
 - **ic_degiskenler**:
-  - `block.content.title` — bölüm başlığı; varsa render edilir
-  - `block.content.items` — özellik öğeleri dizisi; her eleman `item.icon`, `item.title`, `item.description` alanlarına sahiptir
-  - `item.icon` — `IconRenderer` bileşenine `name` prop'u olarak geçirilen ikon adı
-- **Dönüş**: JSX elementi (div)
+  - `block.content.title` — blok başlığı; varsa gösterilir
+  - `block.content.items` — özellik öğeleri dizisi; her eleman için `item.icon`, `item.title`, `item.description` kullanılır
+  - `item` — döngüdeki her özellik öğesi nesnesi
+  - `i` — döngü indeks numarası; `key` prop'u olarak kullanılır
+  - `item.icon` — ikon adı; `IconRenderer` bileşenine `name` prop'u olarak geçilir
+  - `item.title` — özellik başlığı
+  - `item.description` — özellik açıklaması
+- **Dönüş**: özellik grid yapısı JSX elementi
 
 ### [N5_NASIL] AST Pointer: AuthorityRenderer.tsx::ComparisonBlock
 - **params**: `block` (ComparisonBlockType)
 - **ic_degiskenler**:
-  - `block.content.title` — bölüm başlığı; varsa render edilir
+  - `block.content.title` — blok başlığı; varsa gösterilir
   - `block.content.leftLabel` — sol taraf etiketi
-  - `block.content.leftImage` — sol taraf resmi URL'si; varsa `Image` bileşeni ile render edilir, yoksa `LucideIcons.AlertCircle` gösterilir
+  - `block.content.leftImage` — sol taraf görsel URL'si; varsa `<Image>` ile gösterilir, yoksa `LucideIcons.AlertCircle` gösterilir
   - `block.content.rightLabel` — sağ taraf etiketi
-  - `block.content.rightImage` — sağ taraf resmi URL'si; varsa `Image` bileşeni ile render edilir, yoksa `LucideIcons.CheckCircle2` gösterilir
-  - `block.content.differenceText` — fark metni; varsa alt orta kısımda beyaz kutu içinde render edilir
-- **Dönüş**: JSX elementi (div)
+  - `block.content.rightImage` — sağ taraf görsel URL'si; varsa `<Image>` ile gösterilir, yoksa `LucideIcons.CheckCircle2` gösterilir
+  - `block.content.differenceText` — fark metni; varsa alt kısımda gösterilir
+- **Dönüş**: karşılaştırma bloğu JSX elementi
 
 ### [N6_NASIL] AST Pointer: AuthorityRenderer.tsx::CtaBannerBlock
 - **params**: `block` (CtaBannerBlockType)
 - **ic_degiskenler**:
-  - `block.content.title` — banner başlığı
-  - `block.content.description` — açıklama metni
+  - `block.content.title` — CTA başlığı
+  - `block.content.description` — CTA açıklaması
   - `block.content.buttonLabel` — buton etiketi
-  - `block.content.buttonLink` — buton yönlendirme linki
-- **Dönüş**: JSX elementi (div)
+  - `block.content.buttonLink` — buton bağlantısı
+- **Dönüş**: CTA banner bloğu JSX elementi
 
 ### [N7_NASIL] AST Pointer: AuthorityRenderer.tsx::AuthorityRenderer
 - **params**: `content` (AuthorityContent | null)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan alınan çeviri fonksiyonu; `default` case'te ve `drawing` medya tipinde kullanılır
-  - `content` — null kontrolü, dizi kontrolü ve boşluk kontrolü yapılır; geçersizse `null` döner
-  - `block` — `content.map` içindeki her blok elemanı
-  - `block.config?.isHidden` — true ise o blok render edilmez
-  - `block.type` — blok tipi (`'hero'`, `'specs'`, `'features-grid'`, `'comparison'`, `'cta-banner'`, `'media'`, `'rich-text'`)
-  - `block.id` — her blok için benzersiz key değeri
-  - `mediaBlock` — `block`'un `MediaBlockType`'a cast edilmiş hali
-  - `mediaBlock.content.mediaType` — medya türü (`'video'`, `'3d'`, `'drawing'`, `'image'`)
-  - `mediaBlock.content.mediaId` — medya kimliği/URL'si
-  - `mediaBlock.content.title` — medya başlığı
-  - `mediaBlock.content.aspectRatio` — en-boy oranı; `'vertical'` ise dikey, değilse `'16:9'`
-  - `mediaBlock.content.description` — medya açıklaması; varsa render edilir
-  - `mediaBlock.config?.fullWidth` — fullWidth yapılandırması
-  - `rtBlock` — `block`'un `RichTextBlockType`'a cast edilmiş hali
-  - `rtBlock.content.html` — zengin metin HTML içeriği; `DOMPurify.sanitize()` ile temizlenip `dangerouslySetInnerHTML` ile render edilir
-- **Dönüş**: JSX elementi (div) veya `null`
+  - `t` — `useI18n()` hook'undan alınan çeviri fonksiyonu
+  - `content` — gelen içerik dizisi; null, dizi olmayan veya boş ise `null` döner
+  - `block` — `content.map()` döngüsündeki her blok nesnesi
+  - `block.config?.isHidden` — blok gizli mi kontrolü; true ise o blok render edilmez
+  - `block.type` — blok tipi; `'hero'`, `'specs'`, `'features-grid'`, `'comparison'`, `'cta-banner'`, `'media'`, `'rich-text'` değerlerine göre ilgili bileşen render edilir
+  - `block.id` — blok benzersiz tanımlayıcısı; `key` prop'u olarak kullanılır
+  - `mediaBlock` — `block as MediaBlockType` ile dönüştürülen medya bloğu
+  - `mediaBlock.config?.fullWidth` — medya bloğu tam genişlik ayarı
+  - `mediaBlock.content.title` — medya bloğu başlığı
+  - `mediaBlock.content.mediaType` — medya tipi; `'video'`, `'3d'`, `'drawing'`, `'image'` değerlerinden biri
+  - `mediaBlock.content.mediaId` — medya tanımlayıcısı
+  - `mediaBlock.content.aspectRatio` — video en-boy oranı; `'vertical'` ise dikey, değilse `'16:9'` kullanılır
+  - `mediaBlock.content.description` — medya açıklaması
+  - `rtBlock` — `block as RichTextBlockType` ile dönüştürülen zengin metin bloğu
+  - `rtBlock.content.html` — zengin metin HTML içeriği; `DOMPurify.sanitize()` ile temizlenerek `dangerouslySetInnerHTML` ile render edilir
+- **Dönüş**: `content` dizisi null/boş ise `null`, değilse `<div className="authority-content-wrapper space-y-0 bg-white">` içinde blokların render edildiği JSX elementi
 
 ---
 

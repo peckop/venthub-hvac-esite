@@ -2,43 +2,52 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\InventoryQrLabel.tsx
-skeleton_hash: a4438aa3ffa6e79b
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryQrLabel.tsx
+skeleton_hash: bcf16d561ce2cb90
 entity_hashes:
   func:printQrLabel: 1e2155968c16ad3a
   overview: 24734b9ad0c44486
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-27T13:09:58Z
+generated_at: 2026-08-27T08:03:46Z
 ---
 
 ## Genel Bakış
-Bu modül, envanter kalemleri için QR kod etiketlerinin yazdırılmasını yöneten tek bir asenkron fonksiyon sunar. Yazdırma işlemi tetiklendiğinde, kullanıcı arayüzündeki yazdırma durumunu günceller ve sonner kütüphanesi aracılığıyla bildirim gösterir.
+Bu modül, envanter kalemlerine ait QR kod etiketlerinin yazdırılmasını sağlayan tek bir asenkron fonksiyon içerir. Yazdırma işlemi başlatıldığında UI durumunu günceller ve kullanıcıya bildirim gösterir. Modül, yazdırma sürecinin hazırlık, tetikleme ve durum yönetimi aşamalarını tek bir işlevde birleştirir.
 
 ## Fonksiyon Grupları
 ### QR Etiket Yazdırma
-Etiket yazdırma sürecinin tüm aşamalarını — hazırlık, yazdırma tetikleme ve durum yönetimi — tek bir asenkron işlevde gerçekleştirir.
+Envanter ürününe ait QR etiketinin yazdırma işlemini gerçekleştirir ve yazdırma durumunu UI üzerinde yönetir.
 - printQrLabel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için fonksiyon gövdesi verilmediğinden aksiyom üretilememektedir.
+
+Bu modül için fonksiyon gövdesi verilmediğinden, fonksiyon gövdesinden türetilen aksiyom üretilememektedir.
+
+İmzadan çıkarılabilecek bilgiler (aksiyom niteliğinde değildir):
+
+- `printQrLabel` fonksiyonu asenkron (`async`) olarak tanımlanmıştır.
+- Fonksiyon üç parametre alır: `r` (QrLabelProps), `setPrintingQr` (boolean alan callback), `texts` (QrLabelTexts).
+- `setPrintingQr` parametresi, UI üzerinde yazdırma durumunu güncellemek için bir callback fonksiyonu bekler.
+
+Fonksiyon gövdesi sağlanırsa aksiyomlar üretilebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### printQrLabel
-**Ne yapar**: Fonksiyonun kesin görevi kaynakta belirtilmemiştir. Adından ve parametre yapısından, bir QR etiketi yazdırma işlemi gerçekleştirdiği anlaşılmaktadır; ancak bu bir çıkarımdır ve fonksiyonun içeriği hakkında kesin bilgi mevcut değildir.
+**Ne yapar**: QR etiketi yazdırma işlemini başlatan asenkron bir fonksiyondur. Fonksiyonun docstring'i verilmediği için görevi hakkında kesin bir bilgi bulunmamaktadır; ancak parametre yapısından bir QR etiketinin yazdırılması sürecini tetiklediği anlaşılmaktadır.
 
-**Nasıl yapar**: Fonksiyonun iç mantığı hakkında kaynakta herhangi bir bilgi (docstring, gövde kodu) bulunmamaktadır. `async` olarak tanımlanmış olması, asenkron bir işlem (örneğin yazdırma API çağrısı, dosya oluşturma vb.) içerdiğini gösterir. `setPrintingQr` parametresi aracılığıyla yazdırma durumunu dışarıya bildiren bir mekanizma kullandığı anlaşılmaktadır.
+**Nasıl yapar**: Fonksiyon `async` olarak tanımlanmıştır, bu da yazdırma işleminin asenkron bir süreç (örneğin bir yazdırma servisi çağrısı, dosya oluşturma veya tarayıcı yazdırma API'si) içerdiğini gösterir. `setPrintingQr` parametresi aracılığıyla yazdırma durumunu dışarıya bildiren bir durum güncellemesi yaptığı anlaşılmaktadır. Fonksiyonun iç mantığı hakkında kaynakta başka bilgi bulunmamaktadır.
 
 **Parametreler**:
-- `r`: `QrLabelProps` — QR etiketi için gerekli özellikleri taşıyan nesne. Yapısı hakkında detaylı bilgi kaynakta mevcut değildir.
-- `setPrintingQr`: `(v: boolean) => void` — Yazdırma işleminin devam edip etmediğini dışarıya bildirmek için kullanılan state setter fonksiyonu. `true` ve `boolean` değerler alarak yazdırma durumunu günceller.
-- `texts`: `QrLabelTexts` — QR etiketinde kullanılacak metinleri içeren nesne. Yapısı hakkında detaylı bilgi kaynakta mevcut değildir.
+- `r`: `QrLabelProps` — QR etiketinin içeriğini ve yapılandırmasını tanımlayan özellik nesnesi. Tip tanımı `QrLabelProps` olarak belirtilmiştir.
+- `setPrintingQr`: `(v: boolean) => void` — Yazdırma durumunu güncellemek için kullanılan callback fonksiyon. Parametre olarak bir boolean değer alır ve void döner. Yazdırma işlemi başlarken ve tamamlandığında durumu bildirmek için kullanıldığı anlaşılmaktadır.
+- `texts`: `QrLabelTexts` — QR etiketinde kullanılacak metinleri içeren nesne. Tip tanımı `QrLabelTexts` olarak belirtilmiştir.
 
-**Dönüş**: Kaynakta dönüş tipi açıkça belirtilmemiştir. Fonksiyon `async` olduğundan, dönüş değerinin bir `Promise` olması beklenir; ancak bu `Promise`'ın içindeki tip bilinmemektedir.
+**Dönüş**: Fonksiyonun dönüş tipi hakkında kaynakta kesin bir bilgi bulunmamaktadır. `async` fonksiyonlar varsayılan olarak `Promise` döndürür, ancak bu fonksiyonun spesifik dönüş değeri belirtilmemiştir.
 
 ---
 
@@ -70,18 +79,19 @@ Yazdırma belgesi ayrı bir iframe belgesidir — React ağacının dışında o
 
 ### [N1_NASIL] AST Pointer: src/components/admin/InventoryQrLabel.tsx::printQrLabel
 - **params**:
-  - `r` — QrLabelProps tipinde, ürün bilgilerini içerir (product_id, name, warehouse_location alanlarına erişilir)
-  - `setPrintingQr` — boolean parametre alan ve void döndüren fonksiyon, yazdırma durumunu günceller
-  - `texts` — QrLabelTexts tipinde, UI metinlerini içerir (documentTitle, qrAlt, skuLabel, shelfLabel, stockLine, failed alanlarına erişilir)
+  - `r` — QrLabelProps tipinde, QR etiketi için gerekli ürün verilerini içerir
+  - `setPrintingQr` — (v: boolean) => void tipinde, baskı durumunu güncelleyen state setter fonksiyonu
+  - `texts` — QrLabelTexts tipinde, UI metinlerini/çevirilerini içeren nesne
 - **ic_degiskenler**:
-  - `url` — `r.product_id` kullanılarak oluşturulan QR kod API URL'si; `encodeURIComponent` ile kodlanmış product_id'yi 150x150 boyutunda QR kodu olarak almak için kullanılır
-  - `iframe` — `document.createElement('iframe')` ile oluşturulan gizli iframe elementi; `style.display = 'none'` ile gizlenir ve `document.body.appendChild` ile DOM'a eklenir
-  - `safeName` — `r.name`'den türetilen XSS korumalı ürün adı; boş string fallback ile gelir, `<` ve `>` karakterleri HTML entity'lere dönüştürülür
-  - `safeSku` — `r.product_id`'nin ilk 8 karakterinden oluşan büyük harfli SKU kodu; `<` ve `>` karakterleri HTML entity'lere dönüştürülür
-  - `safeLoc` — `r.warehouse_location`'dan türetilen XSS korumalı depo konumu; yoksa `'-'` kullanılır, `<` ve `>` karakterleri HTML entity'lere dönüştürülür
-  - `htmlContent` — template literal ile oluşturulan tam HTML belgesi; QR görseli, ürün adı, SKU, konum ve stok bilgisini içeren yazdırılabilir kart düzeni, CSS stilleri ve `window.print()` onload tetikleyicisi barındırır
-  - `doc` — `iframe.contentWindow?.document` erişimi; varsa `doc.open()`, `doc.write(htmlContent)`, `doc.close()` ile iframe içeriği yazılır
-- **Dönüş**: yok (void) — yan etki olarak gizli iframe içinde QR kodlu etiket HTML'i oluşturulur, QR görseli yüklendiğinde `window.print()` tetiklenir, 5 saniye sonra iframe DOM'dan kaldırılır; hata durumunda `toast.error(texts.failed)` ile bildirim gösterilir; finally bloğunda `setPrintingQr(false)` çağrılır
+  - `url` — `https://api.qrserver.com/v1/create-qr-code/` API'sine gönderilen QR kodu oluşturma URL'si; `r.product_id` değeri `encodeURIComponent` ile kodlanarak `data` parametresine eklenir
+  - `iframe` — `document.createElement('iframe')` ile oluşturulan gizli iframe DOM elementi; `style.display = 'none'` ile görünmez yapılır ve `document.body.appendChild` ile sayfaya eklenir
+  - `safeName` — `r.name` değerinden türetilen XSS güvenli ürün adı; boşsa `''` kullanılır, `<` ve `>` karakterleri HTML entity'lerine dönüştürülür
+  - `safeSku` — `r.product_id`'nin ilk 8 karakteri, `.toUpperCase()` ile büyük harfe çevrilmiş ve `<`/`>` escape edilmiş stok kodu
+  - `safeLoc` — `r.warehouse_location` değerinden türetilen XSS güvenli depo konumu; yoksa `'-'` kullanılır, `<` ve `>` escape edilir
+  - `htmlContent` — Tam HTML belgesi string'i; CSS stilleri (Inter fontu, kart düzeni, baskı medya sorgusu), QR görseli (`<img src="${url}" onload="window.print();">`), ürün adı, SKU, raf konumu ve stok bilgisi içerir
+  - `doc` — `iframe.contentWindow?.document` ile erişilen iframe'in document nesnesi; varsa `doc.open()`, `doc.write(htmlContent)`, `doc.close()` çağrılarıyla HTML içeriği iframe'e yazılır
+  - `setTimeout` callback'i — 5000ms gecikmeyle `iframe.parentNode.removeChild(iframe)` çağırarak iframe'i DOM'dan temizler
+- **Dönüş**: yok (void) — yan etki olarak gizli iframe içinde QR etiketi HTML'i oluşturulur, QR görseli yüklendiğinde `window.print()` ile baskı penceresi açılır, hata durumunda `toast.error(texts.failed)` ile bildirim gösterilir, `finally` bloğunda `setPrintingQr(false)` ile baskı durumu sıfırlanır
 
 ---
 

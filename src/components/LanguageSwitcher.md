@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\LanguageSwitcher.tsx
-skeleton_hash: d6dfc9a8a72992f9
+source_path: C:\tmp\vh-altyapi-t165\src\components\LanguageSwitcher.tsx
+skeleton_hash: 2d13d652bec031c8
 entity_hashes:
   func:LanguageSwitcher: e20e68a6d834aa54
   func:switchLanguage: ceec0990f90068b4
   overview: 2f23c86896c74c04
   style_tokens: 819c78943fe15425
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:27Z
 ---
 
 ## Genel Bakış

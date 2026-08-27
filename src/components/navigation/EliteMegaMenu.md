@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\navigation\EliteMegaMenu.tsx
-skeleton_hash: d834a24ab4ce017b
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\EliteMegaMenu.tsx
+skeleton_hash: 2db6b453cf712056
 entity_hashes:
   func:EliteMegaMenu: 887e772baf4da3df
   func:MobileMegaMenu: 63ce544d1da454df
@@ -11,15 +11,17 @@ entity_hashes:
   func:handleLinkClick: 44a1929f40d26342
   overview: c5c3e5aa35b93483
   style_tokens: 950eb84fcf443cff
-generated_at: 2026-08-27T13:22:54Z
+generated_at: 2026-08-27T08:32:21Z
 ---
 
 ## Genel Bakış
+
 Bu modül, web sitesinin ana navigasyonunu sağlayan çok seviyeli bir mega menü bileşenidir. Hem masaüstü hem de mobil cihazlar için optimize edilmiş iki farklı görünüm sunar. Modül, dışarıdan sağlanan `categories` verisi ve `onNavigate` callback fonksiyonuna bağımlıdır; bu veriler olmadan menü yapısı oluşturulamaz ve kullanıcı yönlendirmesi yapılamaz.
 
 ## Fonksiyon Grupları
+
 ### Menü Bileşenleri
-Masaüstü ve mobil cihazlara özel, veriye dayalı arayüzü render eden iki ana React bileşenini içerir.
+Masaüstü ve mobil cihazlara özel, veriye dayalı arayüzü render eden iki ana React bileşenini içerir. Her iki bileşen de aynı prop yapısını (`categories`, `onNavigate`) alır.
 - `EliteMegaMenu`, `MobileMegaMenu`
 
 ### Etkileşim ve Yönlendirme İşleyicileri
@@ -34,19 +36,15 @@ Menü yapısını oluşturmak için gerekli olan, belirli bir üst kategorinin t
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, çok seviyeli mega menü navigasyonu için masaüstü ve mobil olmak üzere iki ayrı bileşen sunar ve her ikisi de aynı prop yapısına (`categories`, `onNavigate`) bağımlıdır.
+[Aksiyom 1]: Eğer `categories` prop'u sağlanmazsa, menü yapısı oluşturulamaz ve bileşen boş veya hatalı durumda render edilir.
 
-[Aksiyom 1]: Eğer `categories` prop'u sağlanmazsa, menü yapısı oluşturulamaz; bileşen alt kategorileri hiyerarik olarak gösteremez.
+[Aksiyom 2]: Eğer `onNavigate` callback fonksiyonu sağlanmazsa, kullanıcı tıklama işlemleri sonucunda sayfa yönlendirmesi gerçekleştirilemez.
 
-[Aksiyom 2]: Eğer `onNavigate` callback fonksiyonu sağlanmazsa, kullanıcı yönlendirmesi yapılamaz; link tıklamaları bir eylem tetiklemez.
+[Aksiyom 3]: Eğer `getSubCategories` fonksiyonuna geçerli bir `parentId` değeri verilmezse, alt kategori verileri getirilemez.
 
-[Aksiyom 3]: Eğer `getSubCategories` fonksiyonuna geçerli bir `parentId` sağlanmazsa, ilgili alt kategoriler getirilemez; menü dallanması eksik kalır.
+[Aksiyom 4]: Eğer `handleLinkClick` fonksiyonuna geçerli bir `level` ve `slug` değeri sağlanmazsa, link tıklama işlemi düzgün biçimde işlenemez.
 
-[Aksiyom 4]: Eğer `handleLinkClick` fonksiyonuna geçerli bir `level` ve `slug` sağlanmazsa, çok seviyeli navigasyon yapısı doğru şekilde işlenemez.
-
-[Aksiyom 5]: Eğer `MegaMenu3DBackground` bileşeni render edilemezse, menü arka plan efekti gösterilmez; görsel deneyim eksik kalır.
-
-[Aksiyom 6]: Eğer `categories` verisi hiyerarik bir yapıya (parentId-child ilişkisi) sahip değilse, `getSubCategories` fonksiyonu beklenen şekilde çalışamaz; menü dallanması düzgün oluşturulamaz.
+[Aksiyom 5]: Eğer `MegaMenu3DBackground` bileşeni mevcut değilse, menü arka plan efekti görüntülenemez.
 
 ---
 
@@ -77,14 +75,14 @@ Bu modül, çok seviyeli mega menü navigasyonu için masaüstü ve mobil olmak 
 **Dönüş**: Belirtilmemiş (fonksiyonun dönüş tipi dokümantasyonda tanımlı değildir).
 
 ### getSubCategories
-**Ne yapar**: Verilen bir üst kategorinin (`parentId`) alt kategorilerini özyinelemeli (recursive) olarak bulur ve her bir alt kategoriyi hiyerarşik bir JSX ağacı biçiminde render eder. Ana kategori kalın (bold) yazı ve ikonla birlikte gösterilir; alt kategoriler varsa girintili bir şekilde liste olarak eklenir.
+**Ne yapar**: Verilen bir üst kategorinin alt kategorilerini özyinelemeli (recursive) olarak alır ve her bir kategori için bir React JSX yapısı döndürerek hiyerarşik bir menü öğesi oluşturur. Ana kategori bir `Link` bileşeni olarak gösterilirken, var olan alt kategoriler girintili bir şekilde (`pl-6`) listelenir.
 
-**Nasıl yapar**: Fonksiyon bir arrow function olarak tanımlanmıştır ve bir kategori nesnesi alarak çalışır. Önce `getSubCategories(category.id)` çağrısıyla mevcut kategorinin alt kategorilerini özyinelemeli olarak sorgular. Ardından `wrapCategory(category)` ile kategori nesnesini bir görünüm modeline dönüştürür. Dışarıdan gelen `lang` değişkenini kullanarak `getLocalizedCategorySlug` fonksiyonu aracılığıyla yerelleştirilmiş slug'lar üretir ve `Routes.category` ile URL'ler oluşturur. Ana kategori için `getCategoryIcon` ile bir ikon ve `vm?.displayName` ile görünen adı içeren kalın bir `Link` bileşeni render eder. Alt kategoriler (`subs.length > 0` kontrolüyle) mevcutsa, `pl-6` sınıfıyla girintili bir `div` içinde her bir alt kategori için `subVm?.displayName` görünen adını taşıyan daha küçük metin boyutunda `Link` bileşenleri oluşturur. Her iki link seviyesinde de `onNavigate?.()` opsiyonel çağrı ile tıklama olayı tetiklenir.
+**Nasıl yapar**: Fonksiyon bir `category` parametresi alır ve önce `getSubCategories(category.id)` çağrısıyla aynı fonksiyonu özyinelemeli olarak kullanarak alt kategorileri (`subs`) elde eder. Ardından `wrapCategory(category)` ile kategori verisini bir görünüm modeline (`vm`) sarar. Döndürülen JSX yapısında ana kategori için `Routes.category(getLocalizedCategorySlug(category, lang))` ile bir URL oluşturularak `Link` bileşeninde kullanılır; `getCategoryIcon(category.slug, { size: 18 })` ile ikon ve `vm?.displayName` ile görünen ad gösterilir. Alt kategoriler varsa (`subs.length > 0`), her bir alt kategori için `wrapCategory(sub)` ile görünüm modeli oluşturulur ve `Routes.category(getLocalizedCategorySlug(category, lang), getLocalizedCategorySlug(sub, lang))` ile alt kategoriye özel URL ile ayrı `Link` bileşenleri render edilir. Her iki `Link` bileşeninde de `onClick` olayında `onNavigate?.()` çağrısı yapılır; bu, isteğe bağlı bir navigasyon callback'idir ve varsa tetiklenir.
 
 **Parametreler**:
-- `parentId`: `string` — Alt kategorileri sorgulanacak üst kategorinin benzersiz kimlik numarası. Gövde içinde doğrudan kullanılmaz; fonksiyonun çağrıldığı kapsamda bu değere karşılık gelen kategori nesnesi arrow function parametresi olarak iletilir.
+- `parentId`: string — Alt kategorileri alınacak üst kategorinin kimlik numarası. Fonksiyon tanımında bu parametre yer alır; ancak gövde içinde doğrudan `parentId` yerine `category.id` kullanılmaktadır.
 
-**Dönüş**: Belirtilmemiş. Gövde incelendiğinde bir React JSX ağacı (JSX.Element benzeri bir yapı) döndürdüğü görülmektedir; ancak kaynak kodda açık bir dönüş tipi tanımlı değildir.
+**Dönüş**: JSX elementi döndürür. Döndürülen yapı, bir üst `div` içinde ana kategori `Link`'ini ve varsa alt kategorilerin listelendiği girintili bir `div` yapısını içerir. Dönüş tipi açıkça belirtilmemiştir; TypeScript/React ortamında `JSX.Element` veya benzeri bir tip olması beklenir ancak kaynakta tanımlı değildir.
 
 ---
 
@@ -121,50 +119,50 @@ Bu modül, çok seviyeli mega menü navigasyonu için masaüstü ve mobil olmak 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/navigation/EliteMegaMenu.tsx::MobileMegaMenu
+### [N1_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\navigation\EliteMegaMenu.tsx::MobileMegaMenu
 - **params**: `categories`, `onNavigate`
 - **ic_degiskenler**:
-  - `wrapCategory` — `useCategoryViewModel()` hook'undan dönen fonksiyon; kategori nesnesini view model'e dönüştürür
-  - `lang` — `useI18n()` hook'undan dönen mevcut dil kodu
-  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rotalar nesnesi; `Routes.category()` ile kategori URL'leri üretir
-  - `mainCategories` — `categories` dizisinin `parent_id` değeri olmayan (ana kategori) öğelerini filtreler
-  - `getSubCategories` — aldığı `parentId` parametresine eşit `parent_id`'ye sahip kategorileri filtreleyen fonksiyon
-  - `category` — `mainCategories.map()` döngüsündeki her bir ana kategori nesnesi
-  - `subs` — `getSubCategories(category.id)` ile elde edilen alt kategori dizisi
-  - `vm` — `wrapCategory(category)` ile oluşturulan ana kategori view model'i; `vm?.displayName` ile görüntü adı alınır
-  - `sub` — `subs.map()` döngüsündeki her bir alt kategori nesnesi
-  - `subVm` — `wrapCategory(sub)` ile oluşturulan alt kategori view model'i; `subVm?.displayName` ile görüntü adı alınır
-- **Dönüş**: JSX elementi — mobil mega menü yapısını render eder
+  - `wrapCategory` — `useCategoryViewModel` hook'undan dönen, bir kategori nesnesini sarıp görüntü modeline dönüştüren fonksiyon
+  - `lang` — `useI18n` hook'undan dönen, geçerli dil kodunu tutan değişken
+  - `Routes` — `useLocalizedRoutes` hook'undan dönen, yerelleştirilmiş rota oluşturma fonksiyonlarını içeren nesne
+  - `mainCategories` — `categories` dizisinden `parent_id` değeri olmayan (ana) kategorileri filtreleyerek oluşturan dizi
+  - `getSubCategories` — `parentId` parametresiyle eşleşen `parent_id`'ye sahip alt kategorileri `categories` dizisinden filtreleyen fonksiyon
+  - `category` — `.map` döngüsünde kullanılan, ana kategoriler dizisindeki tekil eleman
+  - `subs` — `getSubCategories` fonksiyonu ile hesaplanan, mevcut ana kategorinin alt kategorilerini tutan dizi
+  - `vm` — `wrapCategory(category)` çağrısı ile elde edilen, ana kategorinin görüntü modeli nesnesi
+  - `sub` — alt kategoriler dizisindeki tekil eleman
+  - `subVm` — `wrapCategory(sub)` çağrısı ile elde edilen, alt kategorinin görüntü modeli nesnesi
+- **Dönüş**: JSX (React bileşeni)
 
-### [N2_NASIL] AST Pointer: src/components/navigation/EliteMegaMenu.tsx::EliteMegaMenu
+### [N2_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\navigation\EliteMegaMenu.tsx::EliteMegaMenu
 - **params**: `categories`, `onNavigate`
 - **ic_degiskenler**:
-  - `wrapCategory` — `useCategoryViewModel()` hook'undan dönen fonksiyon; kategori nesnesini view model'e dönüştürür
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('megamenu.elite.defaultDescription')` ve `t('megamenu.elite.viewAll')` anahtarlarıyla metin alır
-  - `lang` — `useI18n()` hook'undan dönen mevcut dil kodu
-  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rotalar nesnesi; `Routes.category()` ile kategori URL'leri üretir
-  - `isMounted` — `useState(false)` ile oluşturulan durum değişkeni; bileşenin mount edilip edilmediğini takip eder
-  - `setIsMounted` — `isMounted` durumunu güncelleyen setter fonksiyonu
-  - `handleLinkClick` — aldığı `level` ve `slug` parametreleriyle `_log` değişkenini oluşturup `onNavigate?.()` çağrısı yapan fonksiyon
-  - `mainCategories` — `categories` dizisinin `parent_id` değeri olmayan (ana kategori) öğelerini filtreler
-  - `getSubCategories` — aldığı `parentId` parametresine eşit `parent_id`'ye sahip kategorileri filtreleyen fonksiyon
-  - `category` — `mainCategories.map()` döngüsündeki her bir ana kategori nesnesi
-  - `subs` — `getSubCategories(category.id)` ile elde edilen alt kategori dizisi
-  - `vm` — `wrapCategory(category)` ile oluşturulan ana kategori view model'i; `vm?.displayName` ve `vm?.description` özellikleri kullanılır
-  - `sub` — `subs.filter(sub => sub.slug !== category.slug).map()` döngüsündeki her bir alt kategori nesnesi
-  - `subVm` — `wrapCategory(sub)` ile oluşturulan alt kategori view model'i; `subVm?.displayName` ile görüntü adı alınır
-- **Dönüş**: `isMounted` false ise `null`, aksi halde JSX elementi — Radix NavigationMenu tabanlı mega menü yapısını render eder
+  - `wrapCategory` — `useCategoryViewModel` hook'undan dönen, bir kategori nesnesini sarıp görüntü modeline dönüştüren fonksiyon
+  - `t` — `useI18n` hook'undan dönen, çeviri anahtarını alıp yerelleştirilmiş metni döndüren fonksiyon
+  - `lang` — `useI18n` hook'undan dönen, geçerli dil kodunu tutan değişken
+  - `Routes` — `useLocalizedRoutes` hook'undan dönen, yerelleştirilmiş rota oluşturma fonksiyonlarını içeren nesne
+  - `isMounted` — `useState(false)` ile oluşturulan, bileşenin tarayıcıda monte edilip edilmediğini takip eden state değişkeni
+  - `setIsMounted` — `isMounted` state'ini güncelleyen setter fonksiyonu
+  - `handleLinkClick` — `level` ve `slug` parametrelerini alıp, bir `_log` değişkeni oluşturduktan sonra `onNavigate` fonksiyonunu çağıran fonksiyon
+  - `mainCategories` — `categories` dizisinden `parent_id` değeri olmayan (ana) kategorileri filtreleyerek oluşturan dizi
+  - `getSubCategories` — `parentId` parametresiyle eşleşen `parent_id`'ye sahip alt kategorileri `categories` dizisinden filtreleyen fonksiyon
+  - `category` — `.map` döngüsünde kullanılan, ana kategoriler dizisindeki tekil eleman
+  - `subs` — `getSubCategories` fonksiyonu ile hesaplanan, mevcut ana kategorinin alt kategorilerini tutan dizi
+  - `vm` — `wrapCategory(category)` çağrısı ile elde edilen, ana kategorinin görüntü modeli nesnesi
+  - `sub` — alt kategoriler dizisindeki tekil eleman
+  - `subVm` — `wrapCategory(sub)` çağrısı ile elde edilen, alt kategorinin görüntü modeli nesnesi
+- **Dönüş**: JSX (React bileşeni) veya `null` (`isMounted` `false` ise)
 
-### [N3_NASIL] AST Pointer: src/components/navigation/EliteMegaMenu.tsx::handleLinkClick
-- **params**: `level` (number), `slug` (string)
+### [N3_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\navigation\EliteMegaMenu.tsx::handleLinkClick
+- **params**: `level`, `slug`
 - **ic_degiskenler**:
-  - `_log` — `level` ve `slug` değerlerini birleştiren template literal string; konsol günlüğü kaldırılmış, yalnızca oluşturulur
-- **Dönüş**: yok — yan etki olarak `onNavigate?.()` çağrısı yapar
+  - `_log` — `level` ve `slug` değişkenlerini birleştirerek oluşturan, ancak kullanılmayan (console log kaldırılmış) string değişken
+- **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: src/components/navigation/EliteMegaMenu.tsx::getSubCategories
-- **params**: `parentId` (string)
-- **ic_degiskenler**: yok — tek satırlık `categories.filter()` işlemi
-- **Dönüş**: `parentId` değeri eşleşen kategori dizisi
+### [N4_NASIL] AST Pointer: C:\tmp\vh-altyapi-t165\src\components\navigation\EliteMegaMenu.tsx::getSubCategories
+- **params**: `parentId`
+- **ic_degiskenler**: yok
+- **Dönüş**: `DomainCategory[]` (filtrelenmiş alt kategoriler dizisi)
 
 ---
 
@@ -176,9 +174,9 @@ graph TD
     EliteMegaMenu_tsx__MobileMegaMenu["MobileMegaMenu"]
     EliteMegaMenu_tsx__getSubCategories["getSubCategories"]
     EliteMegaMenu_tsx__handleLinkClick["handleLinkClick"]
-    EliteMegaMenu_tsx__MobileMegaMenu --> EliteMegaMenu_tsx__getSubCategories
-    EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__getSubCategories
     EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__handleLinkClick
+    EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__getSubCategories
+    EliteMegaMenu_tsx__MobileMegaMenu --> EliteMegaMenu_tsx__getSubCategories
 ```
 
 ## NODE ID STANDARD

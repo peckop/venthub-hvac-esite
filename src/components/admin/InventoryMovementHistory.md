@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\src\components\admin\InventoryMovementHistory.tsx
-skeleton_hash: 1a9219d4492c65d9
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryMovementHistory.tsx
+skeleton_hash: 59cf82b74f629248
 entity_hashes:
   func:InventoryMovementHistory: 4aa730c3557d304e
   overview: 260384a8d41194d3
   style_tokens: 58feab8a69484a8a
-generated_at: 2026-08-27T13:09:16Z
+generated_at: 2026-08-27T08:03:07Z
 ---
 
 ## Genel Bakış
@@ -21,37 +21,34 @@ Bu grup, modülün tek işlevini yerine getirir; envanter hareket geçmişini UI
 
 ---
 
-## Bağımlılıklar ve Mimari Notlar
+## AXIOMS – Mimari Varsayımlar
+Bu modül, `movements` prop'una dayalı olarak çalışır; bu prop'un varlığı ve türü bileşenin doğru render edilmesi için kritiktir.
 
-**Dış Bağımlılıklar**: Modül, `movements` prop'una dayalı olarak çalışır; bu prop'un varlığı ve türü bileşenin doğru render edilmesi için kritiktir.
-
-**Kritik Davranış Kuralları**:
-- `movements` prop'u tanımlı değilse bileşen `.map` gibi bir yöntem çağırarak çalışma zamanı hatası fırlatabilir.
-- `movements` prop'u bir dizi (iterable) değilse yineleme işlevi başarısız olur.
-- `movements` dizisi boşsa bileşen hiçbir hareket öğesi render etmez ve boş bir görünüm gösterir.
-- Dizideki öğeler beklenen veriyi (tarih, ürün, miktar vb.) içermiyorsa eksik veriler undefined veya boş olarak görünebilir.
+[Aksiyom 1]: Eğer `movements` prop'u tanımlı değilse (undefined), bileşen render sırasında `movements.map` gibi bir yöntem çağırarak çalışma zamanı hatası fırlatabilir.
+[Aksiyom 2]: Eğer `movements` prop'u bir dizi (iterable) değilse, `.map` veya benzeri yineleme işlevi başarısız olur ve bileşen hata verir.
+[Aksiyom 3]: Eğer `movements` dizisi boşsa, bileşen hiçbir hareket öğesi render etmez ve boş bir görünüm gösterir.
+[Aksiyom 4]: Eğer `movements` dizisindeki öğeler bileşenin görüntülemesi gereken veriyi (tarih, ürün, miktar vb.) içermiyorsa, bu eksik veriler undefined veya boş olarak görünebilir ve kullanıcıya eksik bilgi sunulur.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, `movements` prop'una bağlıdır; fonksiyon gövdesi verilmediğinden prop'un nasıl kullanıldığı bilinmiyor.
-
-[Aksiyom 1]: Eğer `movements` prop'u sağlanmazsa, bileşen beklenen şekilde render edilemez.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### InventoryMovementHistory
-**Ne yapar**: Envanter hareketlerini (stok değişimlerini) tablo formatında listeleyen bir React fonksiyon bileşenidir. Her bir hareket kaydının tarihini, sebebini ve stok değişim miktarını (delta) gösterir. Hareket listesi boş olduğunda hiçbir şey render etmez.
+**Ne yapar**: Envanter hareket geçmişini tablo formatında görüntüler. Her bir hareket kaydı için tarih, sebep ve stok değişim miktarını (delta) gösteren üç sütunlu bir tablo oluşturur. Hareket listesi boş olduğunda hiçbir şey render etmez.
 
-**Nasıl yapar**: Bileşen, `useI18n` hook'u aracılığıyla uluslararasılaştırma fonksiyonu `t` ve dil bilgisi `lang` değerlerini alır. Önce `movements` dizisinin uzunluğunu kontrol eder; dizi boşsa `null` döndürerek render işlemini sonlandırır. Dizi doluysa, yatay kaydırma desteği olan bir tablo oluşturur. Tablonun başlık satırında tarih, sebep ve delta sütunları yer alır; bu başlıklar `t` fonksiyonuyla çevrilir. Tablo gövdesinde `movements` dizisi `.map()` ile dönülerek her hareket bir satır olarak render edilir. Tarih sütununda `formatDateTime` yardımcı fonksiyonu kullanılarak `m.created_at` değeri ve `lang` parametresi ile biçimlendirilmiş tarih gösterilir. Sebep sütununda `m.reason` değeri, metin taşmasını önlemek için `truncate` ve `max-w-140px` sınıflarıyla kısaltılır; tam metin `title` özniteliğiyle araç ipucu olarak sunulur. Delta sütununda `m.delta` değeri sayıya dönüştürülerek kontrol edilir; pozitifse önüne "+" eklenerek `text-admin-success` (yeşil), negatifse `text-admin-danger` (kırmızı) CSS sınıfıyla renklendirilir. Her satır için `m.id` benzersiz anahtar olarak kullanılır ve satırlar üzerine gelindiğinde arka plan rengi değişir (`hover:bg-admin-surface-2`). Son satırın alt kenarlığı `group-last:border-0` ile kaldırılır.
+**Nasıl yapar**: `useI18n()` hook'u ile uluslararasılaştırma fonksiyonu (`t`) ve aktif dil bilgisini (`lang`) alır. `movements` dizisinin uzunluğu 0 ise `null` döndürerek bileşeni gizler. Aksi halde, yatay kaydırma desteği olan bir kapsayıcı içinde `<table>` elementi render eder. Tablo başlıkları `t()` fonksiyonu ile çevrilir. Her hareket kaydı `movements.map()` ile satıra dönüştürülür; satırlar `m.id` ile benzersiz şekilde anahtarlanır. Tarih sütununda `formatDateTime` yardımcı fonksiyonu kullanılarak `m.created_at` değeri dile uygun biçimde formatlanır. Delta sütununda `Number(m.delta)` değeri sıfırdan büyükse `text-admin-success` (yeşil) CSS sınıfı ve önüne `+` işareti eklenir; aksi halde `text-admin-danger` (kırmızı) CSS sınıfı uygulanır. Sebep sütunu `truncate` ve `max-w-140px` sınıflarıyla metin taşması durumunda kısaltılır; tam metin `title` özelliğiyle araç ipucu olarak sunulur. Son satır hariç tüm satırlarda alt kenarlık (`border-b`) gösterilir; `group-last:border-0` ile son satırın kenarlığı kaldırılır.
 
 **Parametreler**:
-- movements: InventoryMovementHistoryProps — Envanter hareket kayıtlarını içeren dizi. Her elemanda `id`, `created_at`, `reason` ve `delta` alanları bulunur.
+- movements: InventoryMovementHistoryProps — Envanter hareket kayıtlarını içeren dizi. Her eleman `id`, `created_at`, `reason` ve `delta` alanlarına sahiptir.
 
-**Dönüş**: `movements` dizisi boşsa `null` döndürür; aksi takdirde bir JSX tablo yapısı döndürür. Kesin dönüş tipi kaynakta belirtilmemiştir.
+**Dönüş**: Bilinmiyor (return tipi belirtilmemiş; `movements` boşsa `null`, aksi halde JSX tablo elementi döndürdüğü gözlemlenmektedir).
 
 ---
 
@@ -77,13 +74,17 @@ Bu modül, `movements` prop'una bağlıdır; fonksiyon gövdesi verilmediğinden
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/InventoryMovementHistory.tsx::InventoryMovementHistory
-- **params**: `movements` — InventoryMovementHistoryProps tipinde, stok hareketlerinin listesi
+### [N1_NASIL] AST Pointer: InventoryMovementHistory.tsx::InventoryMovementHistory
+- **params**: `movements` — InventoryMovementHistoryProps tipinde, stok hareketlerini içeren dizi
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; tablo başlıklarını (`admin.inventory.table.date`, `admin.inventory.table.reason`, `admin.inventory.table.delta`) yerelleştirmek için kullanılır
-  - `lang` — `useI18n()` hook'undan gelen mevcut dil kodu; `formatDateTime` fonksiyonuna ikinci argüman olarak geçilir
-  - `m` — `movements.map(m => ...)` içindeki her bir hareket nesnesi; `m.id` (satır key'i), `m.created_at` (tarih, `formatDateTime` ile biçimlendirilir), `m.reason` (neden açıklaması, `title` attribute'unda ve hücre metninde kullanılır), `m.delta` (değişim miktarı, `Number(m.delta) > 0` kontrolüyle pozitifse `text-admin-success` sınıfı ve önüne `+` eklenir, aksi halde `text-admin-danger` sınıfı uygulanır)
-- **Dönüş**: `movements.length === 0` ise `null`; aksi halde `overflow-x-auto` sarmalayıcı içinde `<table>` JSX yapısı (thead: tarih/neden/delta başlıkları, tbody: movements dizisi map edilerek satırlar)
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu; tablo başlıklarının metinlerini (`admin.inventory.table.date`, `admin.inventory.table.reason`, `admin.inventory.table.delta`) çevirmek için kullanılır
+  - `lang` — useI18n hook'undan dönen dil kodu; `formatDateTime` fonksiyonuna tarih biçimlendirmesi için iletilir
+  - `m` — `movements.map` callback parametresi; dizideki her hareket nesnesini temsil eder
+  - `m.id` — hareketin benzersiz kimliği; `<tr>` elementinin React `key` prop'u olarak kullanılır
+  - `m.created_at` — hareketin oluşturulma tarihi/zamanı; `formatDateTime(m.created_at, lang)` çağrılarak biçimlendirilmiş olarak ilk sütunda gösterilir
+  - `m.reason` — hareketin nedeni/açıklaması; ikinci sütunda metin içeriği ve `title` attribute'u olarak kullanılır
+  - `m.delta` — stok değişim miktarı; `Number(m.delta) > 0` kontrolüyle pozitifse `text-admin-success` (öneki `+` ile), negatifse `text-admin-danger` CSS sınıfı uygulanır
+- **Dönüş**: `movements.length === 0` ise `null`; aksi halde `overflow-x-auto` sarmalayıcısı içinde `<table>` JSX elementi
 
 ---
 

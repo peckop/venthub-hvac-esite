@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useFavorites.ts
-skeleton_hash: 88946dc0241b1f87
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useFavorites.ts
+skeleton_hash: fe4dedc11d2e5faf
 entity_hashes:
   func:readIds: af9317674fdf837a
   func:useFavorites: dcf6b0f3ad596563
   overview: 0ff10d420319610b
-generated_at: 2026-08-24T12:45:51Z
+generated_at: 2026-08-27T08:35:40Z
 ---
 
 ## Genel Bakış

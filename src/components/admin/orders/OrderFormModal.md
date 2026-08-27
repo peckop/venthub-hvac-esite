@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\orders\OrderFormModal.tsx
-skeleton_hash: 272516b5c45ae867
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\orders\OrderFormModal.tsx
+skeleton_hash: 2a53e1adb861286e
 entity_hashes:
   func:FieldError: 73ce29b5cf8d764a
   func:OrderFormModal: dfc366e8224d3a5a
@@ -15,7 +15,7 @@ entity_hashes:
   func:onSubmit: 1b223598d4c15756
   overview: a2fe9d03e11078fe
   style_tokens: 24ef268b91606a4a
-generated_at: 2026-08-25T07:25:23Z
+generated_at: 2026-08-27T08:10:43Z
 ---
 
 ## Genel Bakış
@@ -256,22 +256,22 @@ graph TD
     OrderFormModal_tsx__handleOpenChange["handleOpenChange"]
     OrderFormModal_tsx__isStatusTransitionAllowed["isStatusTransitionAllowed"]
     OrderFormModal_tsx__onSubmit["onSubmit"]
-    OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__buildOrderFormSchema
     OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__handleClose
     OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__isStatusTransitionAllowed
+    OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__buildOrderFormSchema
 ```
 
 ## NODE ID STANDARD
 
-  file: OrderFormModal.tsx
-  function: OrderFormModal.tsx::buildOrderFormSchema
-  function: OrderFormModal.tsx::FieldError
-  function: OrderFormModal.tsx::focusFirstInvalid
-  function: OrderFormModal.tsx::isStatusTransitionAllowed
-  function: OrderFormModal.tsx::OrderFormModal
-  function: OrderFormModal.tsx::handleClose
-  function: OrderFormModal.tsx::handleOpenChange
-  function: OrderFormModal.tsx::onSubmit
+  file: src\components\admin\orders\OrderFormModal.tsx
+  function: src\components\admin\orders\OrderFormModal.tsx::buildOrderFormSchema
+  function: src\components\admin\orders\OrderFormModal.tsx::FieldError
+  function: src\components\admin\orders\OrderFormModal.tsx::focusFirstInvalid
+  function: src\components\admin\orders\OrderFormModal.tsx::isStatusTransitionAllowed
+  function: src\components\admin\orders\OrderFormModal.tsx::OrderFormModal
+  function: src\components\admin\orders\OrderFormModal.tsx::handleClose
+  function: src\components\admin\orders\OrderFormModal.tsx::handleOpenChange
+  function: src\components\admin\orders\OrderFormModal.tsx::onSubmit
 
 ---
 
