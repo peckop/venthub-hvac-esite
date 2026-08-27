@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx
-skeleton_hash: 71f3f2d0cbdb978b
+source_path: C:\tmp\venthub-wt-t131\src\contexts\CategoryContext.tsx
+skeleton_hash: e9373903572bd5ee
 entity_hashes:
   func:CategoryProvider: 664f5248857922aa
   func:useCategories: bc181eebe7b5a618
   overview: 0e5af7c9035631ab
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış

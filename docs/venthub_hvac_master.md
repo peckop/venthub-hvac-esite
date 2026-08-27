@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T06:37:25.413584+00:00
+compiled_at: 2026-08-27T06:56:44.353569+00:00
 total_compiled_files: 655
-source_commit: 738fc61b
+source_commit: cc0d70c5
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T06:37:25.413584+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-27T06:56:44.353569+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -1184,13 +1184,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\app\admin\data-requests\page.tsx
-skeleton_hash: 59aa6109fe15c67a
+source_path: C:\tmp\venthub-wt-t131\src\app\admin\data-requests\page.tsx
+skeleton_hash: 77c39dbcffa04058
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: df2e08dbc341393f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T08:43:01Z
+generated_at: 2026-08-27T06:48:51Z
 ---
 
 ## Genel Bakış
@@ -2880,14 +2880,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\app\admin\quotes\page.tsx
-skeleton_hash: 37d6aa080da39cfd
+source_path: C:\tmp\venthub-wt-t131\src\app\admin\quotes\page.tsx
+skeleton_hash: 2ecaa489bf9531fc
 entity_hashes:
   func:Loading: 657ee72781ec51d8
-  func:Page: 21a709ac71299cff
+  func:Page: e8cb9cd59886f702
   overview: 5b1a16aab3aba293
-  style_tokens: f00e706f0d7166cc
-generated_at: 2026-08-16T11:35:26Z
+  style_tokens: 08b1938b3f3a81d8
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış
@@ -2908,20 +2908,6 @@ Bu modül minimal bir Next.js sayfa yapısından oluşmaktadır. Aşağıda yaln
 
 ---
 
-**[Aksiyom 1]:** Eğer `AdminQuotesPage` modülü (bileşeni) import edilebilir konumda (module path) değilse, `Page()` bileşeni render edilemez ve uygulama hata verir.
-
-**[Aksiyom 2]:** Eğer `Page()` bileşeni çağrıldığında `AdminRecipesPage` bileşeni bir React/JSX bileşeni değilse (örn: undefined, null veya geçersiz bir modül), React render hatası oluşur.
-
-**[Aksiyom 3]:** Eğer Next.js runtime `loading.tsx` dosyasını desteklemiyorsa, `Loading()` bileşeni asla tetiklenmez ve sayfa yükleme durumunda kullanıcıya geri bildirim verilmez.
-
-**[Aksiyom 4]:** Bu modül, `/admin/quotes` route'u altında çalışmaktadır; eğer Next.js router yapısı bu path'i yönlendirmiyorsa, `Page()` bileşeri hiçbir zaman erişilebilir olmaz.
-
----
-
-> **Not:** Bu modüldeki `Page()` ve `Loading()` fonksiyonlarının gövdesinde herhangi bir logic, prop, state veya API çağrısı tespit edilememiştir. Dolayısıyla fonksiyonel aksiyomlar (veri bağımlılığı, eşik değerleri, kabul kriterleri vb.) üretilememiştir. Modülün mevcut durumu, yalnızca `AdminRecipesPage` bileşenini sarman (wrap) basit bir yer tutucu (placeholder) yapıdadır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### Loading
@@ -2932,11 +2918,14 @@ Bu modül minimal bir Next.js sayfa yapısından oluşmaktadır. Aşağıda yaln
 **Dönüş**: `JSX.Element` — Bileşenin render ettiği yükleme arayüzü JSX yapısını döndürür.
 
 ### Page
-**Ne yapar**: Bu fonksiyon, `/admin/quotes` rotasının temel sayfa bileşenidir. Sayfanın tamamını sarmalayan ve içeriği oluşturan üst düzey yapıdır.
-**Nasıl yapar**: Fonksiyon, doğrudan `AdminQuotesPage` adlı bileşeni döndüren bir React kaplayıcı (wrapper) bileşendir. Next.js sayfa yönlendirmesi mantığıyla çalışır ve rotanın ana içeriğini render eder. Gövdesi basit bir bileşen dönüşümüdür.
+**Ne yapar**: Admin panelindeki teklifler (quotes) sayfasını oluşturan üst düzey sayfa bileşenidir. Bu fonksiyon, Next.js'in dosya tabanlı yönlendirme (file-based routing) sistemi kapsamında bir sayfa rotası olarak görev yapar ve doğrudan `AdminQuotesPage` bileşenini render eder.
+
+**Nasıl yapar**: Fonksiyonun gövdesi son derece sadedir; herhangi bir durum yönetimi, veri çekme veya koşullu render mantığı içermez. Tek işi, `AdminQuotesPage` adlı bileşeni döndürmektir. `src/app/admin/quotes/page.tsx` dosyasında tanımlı olması, Next.js App Router yapısı gereği `/admin/quotes` rotasına karşılık gelmesini sağlar. Kullanıcı bu rotaya eriştiğinde `Page` fonksiyonu çalıştırılır ve sonuç olarak `AdminQuotesPage` bileşeni tarayıcıda görüntülenir.
+
 **Parametreler**:
 - Bu fonksiyon herhangi bir parametre almaz.
-**Dönüş**: `JSX.Element` — `AdminQuotesPage` bileşeninin oluşturduğu tüm sayfa içeriğini (JSX) döndürür.
+
+**Dönüş**: JSX elementi — `AdminQuotesPage` bileşeninin render çıktısını döndürür. Next.js sayfa bileşeni sözleşmesi gereği bu dönüş değeri, ilgili rotanın kullanıcı arayüzünü temsil eder.
 
 ---
 
@@ -2948,23 +2937,22 @@ Bu modül minimal bir Next.js sayfa yapısından oluşmaktadır. Aşağıda yaln
 
 ## SABİTLER
 - **AdminQuotesPage** (call) — `nextDynamic(
-  () => import('../../../views/admin/quotes/AdminQuotesPage'),
- ...`
+  () => import('../../../views/admin/quotes/AdminQuotesPage'),...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/admin/quotes/page.tsx::Loading
-- **params**: ()
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan elde edilen çeviri fonksiyonu; `t('admin.common.loading')` çağrısıyla yüklenme metnini döner
-- **Dönüş**: JSX — `className="p-8 text-center text-slate-400 animate-pulse"` özellikli div, içeriğinde `t('admin.common.loading')` çevirisi; pulse animasyonlu loading göstergesi
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `'admin.common.loading'` anahtarının yerel metnini almak için kullanılır
+- **Dönüş**: JSX — `className="p-8 text-center text-admin-fg-muted animate-pulse"` özellikli `<div>` elementi; içinde `t('admin.common.loading')` çağrısının sonucu metin olarak yerleştirilir
 
 ### [N2_NASIL] AST Pointer: src/app/admin/quotes/page.tsx::Page
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX — `<AdminQuotesPage />` bileşeninin render edilmesi; AdminQuotesPage'i Next.js dynamic import ile sarılmış olarak döner
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX — `<AdminQuotesPage />` bileşeninin render sonucu
 
 ---
 
@@ -2991,7 +2979,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `text-center`, `text-slate-400`
+- **Renkler:** `text-admin-fg-muted`, `text-center`
 - **Layout:** `p-8`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-pulse`
@@ -40566,14 +40554,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\components\quotes\QuoteRequestButton.tsx
-skeleton_hash: edd67155640f8f9f
+source_path: C:\tmp\venthub-wt-t131\src\components\quotes\QuoteRequestButton.tsx
+skeleton_hash: ee037bc0672c0f70
 entity_hashes:
   func:QuoteRequestButton: 1c02d0db31dc1cc0
   func:handleClick: 34afc9e41eb1379f
   overview: 7d23af31ac316cc6
   style_tokens: 871c1a0c89a4b399
-generated_at: 2026-08-17T11:20:13Z
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış
@@ -40689,13 +40677,6 @@ Bu modül, teklif talep düğmesini temsil eden bir React bileşenidir. Aşağı
 
 ---
 
-### [N2_NASIL] AST Pointer: components/quotes/QuoteRequestButton.tsx::handleClick
-- **params**: (yok)
-- **ic_degiskenler**: (yok — closure üzerinden üst kapsam değişkenlerine erişir: `user`, `t`, `router`, `Routes`, `pathname`, `setOpen`)
-- **Dönüş**: yok (yan etkiler: `!user` durumunda `toast.error(t('quotes.request.loginRequired'))` ile hata bildirimi gösterir, `router.push(Routes.auth.login(pathname ?? undefined))` ile login sayfasına yönlendirir; `user` varsa `setOpen(true)` ile modalı açar)
-
----
-
 ## NODE ID STANDARD
 
   file: src\components\quotes\QuoteRequestButton.tsx
@@ -40730,14 +40711,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\components\quotes\QuoteRequestModal.tsx
-skeleton_hash: a7e7280807ba3785
+source_path: C:\tmp\venthub-wt-t131\src\components\quotes\QuoteRequestModal.tsx
+skeleton_hash: e43656ecdf567701
 entity_hashes:
   func:QuoteRequestModal: e72735855c826745
   func:handleSubmit: 72b54eeeae0b55b3
   overview: ee5a6a71b7344ae5
-  style_tokens: 3dcb526ce7d50f48
-generated_at: 2026-08-17T11:20:41Z
+  style_tokens: 59eadc3928b808d6
+generated_at: 2026-08-27T04:29:22Z
 ---
 
 ## Genel Bakış
@@ -40809,7 +40790,7 @@ Bu modül, dışarıdan kontrol edilen bir modal olup, temel işlevselliği içi
 
 ### QuoteRequestModalItem
 Teklif isteme modali — T067-VH v1 (cetvel: docs/standards/quote-standard.md §Q4). Giriş kapıları: PDP (tek kalem, adet düzenlenebilir) + sepet (fiyatsız kalemler). Teklif LOGIN'lidir; oturum yoksa buton katmanı (QuoteRequestButton) login'e yönlendirir, modal hiç açılmaz. Fiyat otoritesi (cetvel R5):
-- `productId: string | null`
+- `productId: string`
 - `productName: string`
 - `qty: number`
 
@@ -40820,6 +40801,11 @@ Teklif isteme modali — T067-VH v1 (cetvel: docs/standards/quote-standard.md §
 - `sourceProjectId?: string | null`
 - `items: QuoteRequestModalItem[]`
 - `qtyEditable?: boolean`
+
+---
+
+## SABİTLER
+- **ALAN_GIRDI_SINIFI** (str) — `'w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-mediu...`
 
 ---
 
@@ -40874,10 +40860,10 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-slate-900/40`, `bg-white`, `border-2`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `border-t-transparent`, `border-white`, `focus-visible:border-primary-navy`, `hover:bg-industrial-gray`, `hover:bg-slate-50`
-- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `gap-1.5`, `gap-2`, `gap-3`, `h-10`, `h-4`, `h-7`, `inline-block`, `inline-flex`, `items-center`, `justify-between`
-- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `align-middle`, `animate-in`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/20`, `focus-visible:ring-primary-navy/30`, `focus-visible:ring-primary-navy/50`, `focus-visible:ring-slate-200`, `font-bold`
+- **Renkler:** `bg-primary-navy`, `bg-slate-50`, `bg-slate-900/40`, `bg-white`, `border-2`, `border-b`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-t`, `border-t-transparent`, `border-white`, `hover:bg-industrial-gray`, `hover:bg-slate-50`, `hover:border-primary-navy`
+- **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `fixed`, `flex`, `gap-1.5`, `gap-2`, `gap-3`, `grid`, `h-10`, `h-4`, `h-7`, `inline-block`, `inline-flex`, `items-center`
+- **Varyant/Responsive:** `disabled:`, `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${ALAN_GIRDI_SINIFI`, `align-middle`, `animate-in`, `animate-spin`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-200`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/30`, `focus-visible:ring-primary-navy/50`, `focus-visible:ring-slate-200`, `font-bold`
 
 ---
 # FILE: src\components\ui\Pagination.md
@@ -41391,14 +41377,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-legal\src\config\admin-resources.ts
-skeleton_hash: 5a6a23e3891482a0
+source_path: C:\tmp\venthub-wt-t131\src\config\admin-resources.ts
+skeleton_hash: ad28254b6551f383
 entity_hashes:
   func:buildBreadcrumbTrail: e45b24520d27372b
   func:findCurrentResource: abacc39d28d65284
   func:isResourceActive: ba63647dd340162a
   overview: d59e42a983b00846
-generated_at: 2026-08-20T09:37:14Z
+generated_at: 2026-08-27T06:53:29Z
 ---
 
 ## Genel Bakış
@@ -41691,11 +41677,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\config\applications.ts
-skeleton_hash: 84fb188054b08725
+source_path: C:\tmp\venthub-wt-t131\src\config\applications.ts
+skeleton_hash: c10b22cb2097b764
 entity_hashes:
   overview: 2544d4d89196ebc3
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:53:29Z
 ---
 
 ## Genel Bakış
@@ -41819,29 +41805,50 @@ file: C:\Users\alize\venthub-hvac\src\config\index.ts
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\config\legal.ts
-skeleton_hash: ec3878e5030a15dd
+source_path: C:\tmp\venthub-wt-t131\src\config\legal.ts
+skeleton_hash: aedbecc50234519f
 entity_hashes:
-  overview: 841e450a0e8713fb
-generated_at: 2026-06-19T20:47:53Z
+  func:hasUnfilledLegalPlaceholders: 4a122d30f4dbb8d6
+  func:isLegalContentReady: 996792c12ebfcfec
+  func:unfilledLegalFields: 9ee6759caeb27178
+  overview: 77dd7ad1bf704224
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin `src/config/legal.ts` modülü, platformun yasal süreçleriyle ilgili tüm yapılandırma değerlerini merkezi olarak tutan statik bir yapılandırma dosyasıdır. Sadece projenin temel site adresini `./siteUrl` modülünden import ederek, kullanım koşulları, gizlilik politikası, çerez politikası gibi standart yasal içeriklerin tüm erişim ve ayar değerlerini `legalConfig` adındaki sabit değişken altında toplar. Herhangi bir dinamik mantık veya çalıştırılabilir fonksiyon barındırmayan bu modül, uygulama genelinde kullanılmak üzere sadece sabit yasal yapılandırmaları dışa aktarır.
+VentHub HVAC projesinin `src/config/legal.ts` modülü, platformun yasal yapılandırma değerlerini merkezi olarak tutar ve bu yapılandırmanın eksiksizliğini doğrulayan yardımcı fonksiyonlar sağlar. Modül, hem statik yasal ayarları barındırır hem de uygulamanın yasal içerik sunumuna hazır olup olmadığını kontrol eden bir arayüz sunar.
+
+## Fonksiyon Grupları
+### Yapılandırma Doğrulama
+Bu grup, verilen bir yasal yapılandırma nesnesinin durumunu analiz ederek eksik veya hazır olup olmadığını sorgulayan fonksiyonları içerir. Bu fonksiyonlar, uygulamanın yasal uyumluluk gereksinimlerini karşılayıp karşılamadığını programatik olarak denetler.
+- unfilledLegalFields, hasUnfilledLegalPlaceholders, isLegalContentReady
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC platformunun yasal uyumluluk süreçlerinde kullanılan sabit yasal konfigürasyon değerlerini barındırır, çalışmasının temeli modül içindeki legalConfig nesnesinin bütünlüğü ve tüm tüketen bileşenler tarafından erişilebilir olmasıdır.
-
-[Aksiyom 1]: Eğer modül içerisindeki legalConfig nesnesi tanımlı değilse, bu modülü içe aktaran tüm ön yüz ve arka yüz bileşenleri yasal konfigürasyon değerlerine erişemez, uygulama içindeki zorunlu yasal bildirimler hiç gösterilemez.
-[Aksiyom 2]: Eğer legalConfig nesnesi içindeki zorunlu yasal konfigürasyon alanları (gizlilik politikası bağlantısı, kullanım şartları sürümü, yerel mevzuat uyumluluk bayrakları vb.) eksik kalırsa, kullanıcılara sunulması gereken yasal metinler hatalı veya eksik gösterilir, hukuki uyumsuzluk riski oluşur.
-[Aksiyom 3]: Eğer bu modül, uygulamanın yasal metinleri, giriş akışı koşulları gibi değerleri kullanan tüm temel bileşenleri tarafından erişilebilir değilse, kullanıcı platform erişimi, hesap yönetimi gibi temel akışlar kesintiye uğrar, uygulama kısmen veya tamamen işlevsiz kalır.
-[Aksiyom 4]: Eğer legalConfig içindeki aktif kullanılan yasal değerler (bağlantılar, sürüm numaraları, uyumluluk bayrakları) güncel değilse, uygulama güncel olmayan yerel regülasyonlara uygun olmayan içerik sunar, hukuki sorumluluk riski ortaya çıkar.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### unfilledLegalFields
+**Ne yapar**: Verilen `LegalConfig` yapılandırmasında henüz doldurulmamış (placeholder içeren) alanların adlarını bir dizi olarak döndürür. Dizi boşsa, metinlerin veri olarak hazır olduğu anlamına gelir.
+
+**Nasıl yapar**: `Object.entries` ile config nesnesinin tüm anahtar-değer çiftlerini bir diziye dönüştürür. Ardından `filter` ile her bir değerin tipini kontrol eder: değer bir `string` ise ve `PLACEHOLDER_PATTERN` ile eşleşiyorsa bu alan henüz doldurulmamış kabul edilir. Son olarak `map` ile sadece eşleşen anahtar (alan adı) değerlerini içeren bir dizi üretir. Varsayılan parametre olarak `legalConfig` kullanılır; böylece parametre verilmezse modül seviyesindeki varsayılan yapılandırma devreye girer.
+
+**Parametreler**:
+- config: `LegalConfig` — Hukuki metinlerin alan adlarını ve değerlerini içeren yapılandırma nesnesi. Varsayılan değeri modül kapsamındaki `legalConfig` değişkenidir.
+
+**Dönüş**: `string[]` — Placeholder kalıbıyla eşleşen (henüz doldurulmamış) alanların adlarından oluşan bir dizi. Dizi boşsa tüm alanların doldurulmuş olduğu anlaşılır.
+
+### hasUnfilledLegalPlaceholders
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### isLegalContentReady
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -41852,20 +41859,33 @@ Bu modül, VentHub HVAC platformunun yasal uyumluluk süreçlerinde kullanılan 
 
 ## INTERFACES
 
-### LegalConfig
+### LegalSellerInfo
+Şirket kimliğine dair, Recep tarafından doldurulacak metin alanları.
 - `sellerTitle: string`
 - `sellerAddress: string`
 - `sellerEmail: string`
 - `sellerPhone: string`
+- `kepAddress: string`
 - `taxOffice: string`
 - `taxNumber: string`
 - `mersis: string`
+- `tradeRegistryNo: string`
+- `chamberOfCommerce: string`
+- `etbisNo: string`
+- `iysBrandCode: string`
+- `verbisNo: string`
 - `websiteUrl: string`
 - `deliveryTime: string`
 - `shippingFee: string`
 - `returnAddress: string`
 - `cargoCompanies: string`
+- `returnShippingBearer: string`
 - `refundTime: string`
+- `warrantyPeriod: string`
+- `usefulLife: string`
+- `afterSalesService: string`
+- `invoiceDeliveryTime: string`
+- `invoiceIdentityThreshold: number`
 - `retentionOrders: string`
 - `retentionSupport: string`
 - `retentionMarketing: string`
@@ -41873,31 +41893,76 @@ Bu modül, VentHub HVAC platformunun yasal uyumluluk süreçlerinde kullanılan 
 - `applicationEmail: string`
 - `lastUpdated: string`
 
+### LegalConfig extends LegalSellerInfo
+- `legalReviewCompleted: boolean`
+
 ---
 
 ## SABİTLER
 - **legalConfig** (object) — `{
-  sellerTitle: '[SATICI_UNVAN]',
-  sellerAddress: '[SATICI_ADRES]',
-  se...`
+  // ── Şirket kimliği (BOŞ — Recep dolduracak) ──────────────────────────...`
+- **EN_OVERRIDES** (object) — `{
+  deliveryTime: '1-5 business days',
+  shippingFee: 'Shown in the order s...`
+- **PLACEHOLDER_PATTERN** (regex) — `/^\[[A-Z0-9_]+\]$/`
 
 ---
 
 ## AST POINTERS
-C:\Users\alize\venthub-hvac\src\config\legal.ts dosyasında analiz edilebilir herhangi bir fonksiyon, sınıf veya metod tanımı bulunmamaktadır. Dosyadaki kayıtlı öğeler:
-- `SITE_URL` — `./siteUrl` modülünden import edilen sabit site adresi değeri
-- `legalConfig` — dosyada tanımlanan yasal yapılandırma nesnesi
+
+### [N1_NASIL] AST Pointer: src/config/legal.ts::unfilledLegalFields
+- **params**: `config` — LegalConfig türünde yapılandırma nesnesi, varsayılan değer `legalConfig` sabiti
+- **ic_degiskenler**:
+  - `config` — Object.entries() ile anahtar-değer çiftlerine ayrılır; her çiftin `value` (ikinci eleman) değeri string türünde ve `PLACEHOLDER_PATTERN` regex'ine uyuyorsa filtrelenir
+  - `PLACEHOLDER_PATTERN` — dışarıdan tanımlı regex sabiti; value üzerinde .test() ile eşleşme kontrolü yapar
+  - `key` — filtrelenen çiftlerin birinci elemanı (alan adı); map ile diziye dönüştürülür
+- **Dönüş**: `string[]` — placeholder kalıbı içeren alan adlarının listesi
+
+### [N2_NASIL] AST Pointer: src/config/legal.ts::hasUnfilledLegalPlaceholders
+- **params**: `config` — LegalConfig türünde yapılandırma nesnesi, varsayılan değer `legalConfig` sabiti
+- **ic_degiskenler**:
+  - `config` — `unfilledLegalFields` fonksiyonuna doğrudan aktarılır
+- **Dönüş**: `boolean` — `unfilledLegalFields(config).length > 0` ifadesinin sonucu; doldurulmamış placeholder içeren alan varsa `true`, yoksa `false`
+
+### [N3_NASIL] AST Pointer: src/config/legal.ts::isLegalContentReady
+- **params**: `config` — LegalConfig türünde yapılandırma nesnesi, varsayılan değer `legalConfig` sabiti
+- **ic_degiskenler**:
+  - `config` — `config.legalReviewCompleted` alanına doğrudan erişilir ve `hasUnfilledLegalPlaceholders` fonksiyonuna aktarılır
+- **Dönüş**: `boolean` — `config.legalReviewCompleted` truthy VE `hasUnfilledLegalPlaceholders(config)` falsy ise `true`; aksi halde `false`
 
 ---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    legal_ts__hasUnfilledLegalPlaceholders["hasUnfilledLegalPlaceholders"]
+    legal_ts__isLegalContentReady["isLegalContentReady"]
+    legal_ts__unfilledLegalFields["unfilledLegalFields"]
+    legal_ts__isLegalContentReady --> legal_ts__hasUnfilledLegalPlaceholders
+    legal_ts__hasUnfilledLegalPlaceholders --> legal_ts__unfilledLegalFields
+```
 
 ## NODE ID STANDARD
 
   file: src\config\legal.ts
+  function: src\config\legal.ts::unfilledLegalFields
+  function: src\config\legal.ts::hasUnfilledLegalPlaceholders
+  function: src\config\legal.ts::isLegalContentReady
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LegalConfig
+  export: LegalSellerInfo
+  export: hasUnfilledLegalPlaceholders
+  export: isLegalContentReady
+  export: unfilledLegalFields
+
+---
+
+## BILEŞIM (CONTAINS)
+  contains: LegalSellerInfo
 
 ---
 # FILE: src\config\orbitalCarouselConfig.md
@@ -41906,11 +41971,11 @@ C:\Users\alize\venthub-hvac\src\config\legal.ts dosyasında analiz edilebilir he
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\config\orbitalCarouselConfig.ts
-skeleton_hash: 42378e633ba440af
+source_path: C:\tmp\venthub-wt-t131\src\config\orbitalCarouselConfig.ts
+skeleton_hash: fae0de3c5b40011e
 entity_hashes:
   overview: eca02fed19b4de2a
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
@@ -42177,11 +42242,11 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\contexts\AuthContextDefinition.ts
-skeleton_hash: 1a3aacb930b82ccf
+source_path: C:\tmp\venthub-wt-t131\src\contexts\AuthContextDefinition.ts
+skeleton_hash: 0d71386b0f531624
 entity_hashes:
   overview: f2f5edb4e854ff35
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
@@ -42262,12 +42327,12 @@ Bu modül, bir React Context nesnesi tanımlayan ve dışa aktaran bir tiptir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\contexts\CartContext.tsx
-skeleton_hash: 9b6e17e844b96d03
+source_path: C:\tmp\venthub-wt-t131\src\contexts\CartContext.tsx
+skeleton_hash: 9f888870eafcb44b
 entity_hashes:
   overview: 5c2e2a3fcb9d0dde
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
@@ -42312,7 +42377,7 @@ Bu modül, yalnızca bir React Context tanımı içererek alışveriş sepeti du
 - `clearCart: (opts?: { silent?: boolean }) => void`
 - `getCartTotal: () => number`
 - `getCartCount: () => number`
-- `applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void`
+- `applyServerPricing: (items: { product_id: string, unit_price: number | null }[]) => void`
 
 ---
 
@@ -42360,13 +42425,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\contexts\CartProvider.tsx
-skeleton_hash: 74a67e0e4c2361e3
+source_path: C:\tmp\venthub-wt-t131\src\contexts\CartProvider.tsx
+skeleton_hash: 6667ade294980519
 entity_hashes:
   func:CartProvider: 8807e7c812fc3463
   overview: 37930ba7d9f73804
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:27:34Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
@@ -42583,8 +42648,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca imzadan ve sabit 
 
 ## NODE ID STANDARD
 
-  file: CartProvider.tsx
-  function: CartProvider.tsx::CartProvider
+  file: src\contexts\CartProvider.tsx
+  function: src\contexts\CartProvider.tsx::CartProvider
 
 ---
 
@@ -42614,14 +42679,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx
-skeleton_hash: 71f3f2d0cbdb978b
+source_path: C:\tmp\venthub-wt-t131\src\contexts\CategoryContext.tsx
+skeleton_hash: e9373903572bd5ee
 entity_hashes:
   func:CategoryProvider: 664f5248857922aa
   func:useCategories: bc181eebe7b5a618
   overview: 0e5af7c9035631ab
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
@@ -42750,12 +42815,12 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\contexts\ProjectContext.tsx
-skeleton_hash: 59a9172118b3d007
+source_path: C:\tmp\venthub-wt-t131\src\contexts\ProjectContext.tsx
+skeleton_hash: 2bf7ab77df4a76ac
 entity_hashes:
   overview: f1d38a9d20d9fa96
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:54:06Z
 ---
 
 ## Genel Bakış
@@ -42855,36 +42920,39 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\contexts\ProjectProvider.tsx
-skeleton_hash: 57f57f8691d6baa3
+source_path: C:\tmp\venthub-wt-t131\src\contexts\ProjectProvider.tsx
+skeleton_hash: cebb3ba11552a27d
 entity_hashes:
   func:ProjectProvider: 48fd4159fdf830c0
-  overview: 56739bf2be524198
+  overview: 10389d4143ea4faf
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-27T06:55:18Z
 ---
 
 ## Genel Bakış
-ProjectProvider, VentHub HVAC projesinde proje verilerinin uygulama genelinde paylaşılmasını sağlayan temel bir React Context sağlayıcı bileşenidir. Bu bileşen, uygulama ağaçının üst katmanlarında yer alarak tüm alt bileşenlere prop drilling (prop iletmek) ihtiyacını ortadan kaldırır ve veriye merkezi bir erişim noktası sunar.
+ProjectProvider, VentHub HVAC uygulamasında proje verilerinin alt bileşenlere prop drilling olmadan aktarılmasını sağlayan bir React Context sağlayıcı bileşendir. Uygulama ağaçının üst katmanlarında konumlandırılarak tüm alt bileşenler için merkezi bir veri erişim noktası oluşturur. Bileşen, `children` prop'u aracılığıyla kapsadığı alt bileşen ağacına proje bağlamını (context) iletir.
 
 ## Fonksiyon Grupları
+
 ### Bağlam Sağlayıcı
-Uygulama genelinde kullanılacak proje verisi ve işlevselliğini tanımlayan bir React bağlamını (context) oluşturarak, tüm alt bileşenlere tutarlı ve erişilebilir bir veri katmanı sağlar.
+Uygulama genelinde kullanılacak proje verisini ve işlevselliğini tanımlayan bir React bağlamını oluşturarak tüm alt bileşenlere tutarlı ve erişilebilir bir veri katmanı sağlar. Bileşen hiyerarşisinde üst seviyede yer alması gerekir; aksi halde alt bileşenlerin bağlam tüketimi başarısız olur veya varsayılan değer döner.
 - ProjectProvider
+
+## Bağımlılıklar ve Mimari Notlar
+
+**Dış bağımlılıklar**: React kütüphanesi (Context API, `children` prop yapısı).
+
+**İç bağımlılıklar**: Modül, `ProjectContext` adlı bir bağlam nesnesi tanımlar veya içe aktarır; bu bağlam alt bileşenler tarafından `useContext` ile tüketilir.
+
+**Mimari önem**: Bu bileşen, uygulama genelinde proje verilerinin tekil ve tutarlı bir kaynaktan sağlanmasından sorumludur. Birden fazla iç içe kullanıldığında içteki sağlayıcı dıştakini geçersiz kılabilir (context override davranışı).
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-ProjectProvider, React Context kullanarak proje verilerini alt bileşenlere ileten bir sağlayıcı bileşendir. Aşağıdaki varsayımlar fonksiyon imzası ve modül sabitlerine dayanmaktadır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `children` prop'u sağlanmazsa, sağlayıcı içeriği render etmeyeceği için alt bileşenler Proje bağlamına erişemez ve uygulama alanı boş kalır.
-
-[Aksiyom 2]: Eğer `ProjectContext` çağrılmazsa (useContext içinde kullanılmazsa), alt bileşenler sağlanan proje verilerine erişemez.
-
-[Aksiyom 3]: Eğer ProjectProvider bileşen hiyerarşisinde üst seviyede yer almazsa, alt bileşenlerin `ProjectContext` tüketimi başarısız olur veya varsayılan değer döner.
-
-[Aksiyom 4]: Eğer ProjectProvider aynı anda birden fazla kez iç içe kullanılırsa, içteki sağlayıcı dıştakini geçersiz kılabilir (context override davranışı).
+**Neden:** Fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzası (`ProjectProvider({ children })`) mevcuttur. Aksiyomlar yalnızca fonksiyon gövdesinden türetilir.
 
 ---
 
@@ -42906,10 +42974,11 @@ ProjectProvider, React Context kullanarak proje verilerini alt bileşenlere ilet
 
 ## İTHALATLAR (IMPORTS)
 - import: ../hooks/useAuth::useAuth
+- import: ./ProjectContext::ProjectContext
+- import: @/i18n/I18nProvider::useI18n
 - import: @/providers/SupabaseProvider::useSupabaseClient
-- import: @/types/ui-models::type { ProjectItem,UserProject }
+- import: @/types/ui-models::type { Product, ProjectItem, UserProject }
 - import: react::React
-- import: react::createContext
 - import: react::useCallback
 - import: react::useEffect
 - import: react::useMemo
@@ -42918,87 +42987,95 @@ ProjectProvider, React Context kullanarak proje verilerini alt bileşenlere ilet
 
 ---
 
-## INTERFACES
-
-### ProjectContextType
-- `projects: UserProject[]`
-- `loading: boolean`
-- `refreshProjects: () => Promise<void>`
-- `addProject: (name: string, description?: string) => Promise<UserProject | null>`
-- `removeProject: (id: string) => Promise<void>`
-- `addItem: (projectId: string, _productId: string, quantity?: number) => Promise<void>`
-- `removeItem: (projectId: string, _productId: string) => Promise<void>`
-- `getProjectItems: (projectId: string) => Promise<ProjectItem[]>`
-
----
-
-## SABİTLER
-- **ProjectContext** (call) — `createContext<ProjectContextType | undefined>(undefined)`
-
----
-
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::ProjectProvider
-- **params**: `{ children }` — React children prop
+- **params**: `children` — React.ReactNode tipinde alt bileşen
 - **ic_degiskenler**:
-  - `supabase` — useSupabaseClient() hook'undan alınan Supabase client instance, veritabanı işlemleri için kullanılır
-  - `projects` — useState ile tanımlı state, kullanıcının projelerini tutan UserProject[] dizisi
-  - `setProjects` — projects state'ini güncellemek için setter fonksiyonu
-  - `loading` — useState ile tanımlı state, projelerin yüklenme durumunu belirten boolean
-  - `setLoading` — loading state'ini güncellemek için setter fonksiyonu
-  - `user` — useAuth() hook'undan alınan mevcut kullanıcının bilgileri
-  - `refreshProjects` — projeleri yenileyen useCallback fonksiyonu
-  - `addProject` — yeni proje ekleyen useCallback fonksiyonu
-  - `removeProject` — proje silen useCallback fonksiyonu
-  - `addItem` — projeye ürün ekleyen useCallback fonksiyonu
-  - `removeItem` - projeden ürün çıkaran useCallback fonksiyonu
-  - `getProjectItems` — projenin ürünlerini getiren useCallback fonksiyonu
-  - `value` — useMemo ile memoize edilmiş context value nesnesi
-- **Dönüş**: `<ProjectContext.Provider value={value}>` JSX elementi
+  - `supabase` — useSupabaseClient() hook'undan alınan Supabase istemcisi
+  - `t` — useI18n() hook'undan alınan çeviri fonksiyonu
+  - `projects` — useState ile tanımlanmış UserProject[] durumu, kullanıcının projelerini tutar
+  - `setProjects` — projects durumunu güncelleyen setter fonksiyonu
+  - `loading` — useState ile tanımlanmış boolean, veri yükleniyor durumunu gösterir
+  - `setLoading` — loading durumunu güncelleyen setter fonksiyonu
+  - `user` — useAuth() hook'undan alınan kullanıcı bilgisi
+  - `refreshProjects` — useCallback ile sarılmış, projeleri Supabase'den yeniden çeken async fonksiyon
+  - `addProject` — useCallback ile sarılmış, yeni proje oluşturan async fonksiyon
+  - `removeProject` — useCallback ile sarılmış, proje silen async fonksiyon
+  - `addItemToProject` — useCallback ile sarılmış, projeye ürün ekleyen async fonksiyon
+  - `removeItemFromProject` — useCallback ile sarılmış, projeden ürün çıkaran async fonksiyon
+  - `getProjectItems` — useCallback ile sarılmış, projenin öğelerini getiren async fonksiyon
+  - `value` — useMemo ile hesaplanmış, ProjectContext.Provider'a sağlanan context nesnesi
+- **Dönüş**: JSX — ProjectContext.Provider ile sarılmış children
 
 ### [N2_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::refreshProjects
 - **params**: yok
 - **ic_degiskenler**:
-  - `data` — listUserProjects(supabase) çağrısının sonucu, kullanıcının projeleri
-- **Dönüş**: void (setProjects ile state günceller)
+  - `user` — dış kapsamdan erişilen kullanıcı bilgisi, yoksa fonksiyon erken döner
+  - `supabase` — dış kapsamdan erişilen Supabase istemcisi
+  - `data` — listUserProjects(supabase) çağrısından dönen proje dizisi
+- **Dönüş**: yok (async, yan etki: setProjects ve setLoading çağırır)
 
-### [N3_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::useEffectCallback
+### [N3_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::useEffect callback
 - **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: void (yan etki: refreshProjects çağırır veya state'i sıfırlar)
+- **ic_degiskenler**:
+  - `user` — dış kapsamdan erişilen kullanıcı bilgisi; varsa refreshProjects çağırır, yoksa projeleri boşaltır
+- **Dönüş**: yok (yan etki: refreshProjects veya setProjects ve setLoading çağırır)
 
 ### [N4_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::addProject
-- **params**: `(name: string, description?: string)` — proje adı ve opsiyonel açıklama
+- **params**: `name` (string) — proje adı, `description` (string, opsiyonel) — proje açıklaması
 - **ic_degiskenler**:
-  - `newProject` — createProject() çağrısının sonucu, newly created project objesi
-- **Dönüş**: UserProject objesi veya null
+  - `user?.id` — dış kapsamdan erişilen kullanıcı ID'si; yoksa hata fırlatır
+  - `supabase` — dış kapsamdan erişilen Supabase istemcisi
+  - `t` — dış kapsamdan erişilen çeviri fonksiyonu
+  - `newProject` — createProject(supabase, { name, description, user_id: user.id }) çağrısından dönen yeni proje nesnesi
+  - `prev` — setProjects callback'indeki önceki proje dizisi
+  - `error` — catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: UserProject (newProject)
 
 ### [N5_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::removeProject
-- **params**: `(id: string)` — silinecek projenin ID'si
-- **ic_degiskenler**: yok
-- **Dönüş**: void (setProjects ile state günceller)
+- **params**: `id` (string) — silinecek proje ID'si
+- **ic_degiskenler**:
+  - `supabase` — dış kapsamdan erişilen Supabase istemcisi
+  - `t` — dış kapsamdan erişilen çeviri fonksiyonu
+  - `p` — setProjects filter callback'indeki her bir proje öğesi; p.id !== id koşuluyla filtrelenir
+- **Dönüş**: yok (async, yan etki: deleteProject, setProjects ve toast çağırır)
 
-### [N6_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::addItem
-- **params**: `(projectId: string, _productId: string, quantity: number = 1)` — proje ID, ürün ID, miktar
-- **ic_degiskenler**: yok
-- **Dönüş**: void
+### [N6_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::addItemToProject
+- **params**: `projectId` (string) — hedef proje ID'si, `productId` (string) — eklenecek ürün ID'si, `quantity` (number, varsayılan 1) — miktar
+- **ic_degiskenler**:
+  - `supabase` — dış kapsamdan erişilen Supabase istemcisi
+  - `t` — dış kapsamdan erişilen çeviri fonksiyonu
+  - `error` — catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: yok (async, yan etki: addProductToProject ve toast çağırır)
 
-### [N7_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::removeItem
-- **params**: `(projectId: string, _productId: string)` — proje ID, ürün ID
-- **ic_degiskenler**: yok
-- **Dönüş**: void
+### [N7_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::removeItemFromProject
+- **params**: `projectId` (string) — hedef proje ID'si, `productId` (string) — çıkarılacak ürün ID'si
+- **ic_degiskenler**:
+  - `supabase` — dış kapsamdan erişilen Supabase istemcisi
+  - `t` — dış kapsamdan erişilen çeviri fonksiyonu
+- **Dönüş**: yok (async, yan etki: removeProductFromProject ve toast çağırır)
 
 ### [N8_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::getProjectItems
-- **params**: `(projectId: string)` — ürünlerin getirileceği projenin ID'si
+- **params**: `projectId` (string) — öğeleri getirilecek proje ID'si
 - **ic_degiskenler**:
-  - `items` — listProjectItems(supabase, projectId) çağrısının sonucu, projenin ürünleri
-- **Dönüş**: ProjectItem[] dizisi
+  - `supabase` — dış kapsamdan erişilen Supabase istemcisi
+  - `items` — listProjectItems(supabase, projectId) çağrısından dönen ProjectItem dizisi
+  - `i` — filter callback'indeki her bir öğe; i.product varlığı kontrol edilir
+- **Dönüş**: `(ProjectItem & { product: Product })[]` — product alanı null olmayan öğeler dizisi; hata durumunda boş dizi
 
-### [N9_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::useMemoCallback
+### [N9_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::useMemo callback
 - **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: context value nesnesi (`{ projects, loading, refreshProjects, addProject, removeProject, addItem, removeItem, getProjectItems }`)
+- **ic_degiskenler**:
+  - `projects` — dış kapsamdan erişilen projeler durumu
+  - `loading` — dış kapsamdan erişilen yükleme durumu
+  - `refreshProjects` — dış kapsamdan erişilen projeleri yenileme fonksiyonu
+  - `addProject` — dış kapsamdan erişilen proje ekleme fonksiyonu
+  - `removeProject` — dış kapsamdan erişilen proje silme fonksiyonu
+  - `addItemToProject` — dış kapsamdan erişilen projeye ürün ekleme fonksiyonu
+  - `removeItemFromProject` — dış kapsamdan erişilen projeden ürün çıkarma fonksiyonu
+  - `getProjectItems` — dış kapsamdan erişilen proje öğelerini getirme fonksiyonu
+- **Dönüş**: object — ProjectContext.Provider'a sağlanan value nesnesi (projects, loading, refreshProjects, addProject, removeProject, addItemToProject, removeItemFromProject, getProjectItems alanlarını içerir)
 
 ---
 
@@ -47748,11 +47825,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-rec80\src\i18n\dictionaries\en.ts
-skeleton_hash: 761178315be27aad
+source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\en.ts
+skeleton_hash: 9d0705a703cca270
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-26T19:38:59Z
+generated_at: 2026-08-27T04:25:30Z
 ---
 
 ## Genel Bakış
@@ -47811,11 +47888,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-rec80\src\i18n\dictionaries\tr.ts
-skeleton_hash: 0f425846c1a7eb72
+source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\tr.ts
+skeleton_hash: 612478c507ab5d21
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-08-26T19:39:02Z
+generated_at: 2026-08-27T04:25:30Z
 ---
 
 ## Genel Bakış
@@ -53283,14 +53360,14 @@ Eğer `Product` tipi modülün çalıştığı bağlamda tanımlı değilse veya
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\rbac.ts
-skeleton_hash: b6e28f3dccf14a94
+source_path: C:\tmp\venthub-wt-t131\src\lib\rbac.ts
+skeleton_hash: 2b942251bb35c0ea
 entity_hashes:
   func:canAccessPage: 502373e4fa126e0a
   func:canWrite: 289f50aba94e238a
   func:isReadOnly: 4b13d0168f4b164b
   overview: f1352d33dc973192
-generated_at: 2026-08-24T11:56:00Z
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış
@@ -53414,6 +53491,31 @@ graph TD
   export: canAccessPage
   export: canWrite
   export: isReadOnly
+
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+ekledi ve cümle yanlış oldu. KARAR değişmedi (yeni politika da `is_admin_user()`
+istiyor, moderator'ü kabul etmiyor) ama GEREKÇE bayatladı. O yüzden burada artık
+dayanağın ADI var, anlık ölçüm değeri yok. Kaynak: canlı `pg_policies` (migration
+dosyası değil), 2026-08-20.
+
+⚠ AÇIK KARAR (Recep): bu ölçüm moderator'ün DB düzeyinde neredeyse yetkisiz olduğunu
+söylüyor — viewer ile aynı sınıf. Rol ya DB'de açılmalı (politikalara moderator
+eklenerek) ya da vaat edilmediği kabul edilmeli. UI'yi geniş tutmak üçüncü bir seçenek
+DEĞİL: sessiz-boş ekran üretir. Ölçemediğim rota FAIL-CLOSED bırakıldı (listede yok).
+```
+
+```text
+AÇIK KARAR (Recep): viewer vaat edilmiş bir yetenek mi, yoksa kaldırılacak mı?
+Cevap "vaat" ise açılacak sayfalar RLS ölçümüyle tek tek eklenir.
+```
+
 
 ---
 # FILE: src\lib\supabase.md
@@ -56454,13 +56556,13 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\kvkk\dueState.ts
-skeleton_hash: b086f545a664056d
+source_path: C:\tmp\venthub-wt-t131\src\lib\kvkk\dueState.ts
+skeleton_hash: 96f3478ea3b8fb0f
 entity_hashes:
   func:computeDueState: 654130d80b0a082a
   func:isTerminalStatus: 804d60cc46a3141a
   overview: e8d1766ba7090536
-generated_at: 2026-08-25T08:44:13Z
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış
@@ -56701,47 +56803,36 @@ type PoStatus = | 'draft'
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\lib\quotes\quoteStatusMachine.ts
-skeleton_hash: e0a1736a17035e65
+source_path: C:\tmp\venthub-wt-t131\src\lib\quotes\quoteStatusMachine.ts
+skeleton_hash: 4893342e90443170
 entity_hashes:
   func:allowedAdminQuoteActions: 527db9e8d24f07d1
   func:allowedCustomerQuoteActions: ff371ca17d0fdcd5
   func:allowedNextQuoteStatuses: 905bc470f37c0a4f
   func:isQuoteStatus: 30e87a91152dfbe2
   func:isTerminalQuoteStatus: 9ed0f176ae307ca3
-  overview: 804e34a9edfeb244
-generated_at: 2026-08-16T10:21:25Z
+  overview: 8bb19c1c6129ad32
+generated_at: 2026-08-27T04:28:01Z
 ---
 
 ## Genel Bakış
-Bu modül, bir teklifin (quote) yaşam döngüsündeki durum geçişlerini ve izin verilen eylemleri tanımlayan merkezi bir durum makinesidir. Tekliflerin farklı durumları (örneğin taslak, beklemede, kabul edildi) arasındaki geçiş kurallarını ve bu durumlarda yönetici veya müşteri tarafından yapılabilecek eylemleri kontrol eder. Modül, teklif iş akışının tutarlılığını sağlamak için kritik bir mimari role sahiptir.
+Bu modül, tekliflerin yaşam döngüsündeki durum geçişlerini merkezi olarak yöneten bir durum makinesi tanımlar. Teklif durumlarının doğrulanması, mevcut durumdan izin verilen sonraki durumların belirlenmesi ve farklı kullanıcı rolleri için geçerli eylemlerin kontrol edilmesi gibi temel işlevleri sağlar. Modül, `QUOTE_STATUSES` ve `QUOTE_TRANSITIONS` sabitlerine dayanır; bu sabitlerin doğru tanımlanmaması durumunda fonksiyonlar tutarsız veya boş sonuçlar üretebilir.
 
 ## Fonksiyon Grupları
 ### Durum Tanımlama ve Doğrulama
-Bu grup, geçerli teklif durumlarını doğrulamak ve belirli durumların son (terminal) olup olmadığını belirlemek için kullanılır.
+Teklif durumlarının geçerliliğini kontrol eder ve belirli durumların süreç sonu (terminal) durum olup olmadığını belirler.
 - isQuoteStatus, isTerminalQuoteStatus
 
 ### Geçiş Kuralları ve İzin Yönetimi
-Bu grup, mevcut duruma bağlı olarak izin verilen sonraki durumları ve farklı kullanıcı rolleri (yönetici, müşteri) için geçerli eylemleri belirler.
+Mevcut duruma bağlı olarak izin verilen sonraki durumları ve yönetici/müşteri rolleri için geçerli eylemleri tanımlar.
 - allowedNextQuoteStatuses, allowedAdminQuoteActions, allowedCustomerQuoteActions
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, quote durum makinesi (state machine) mantığını tanımlayan bir dizi sabit ve bu sabitlerle çalışan işlevlerden oluşur. Doğru çalışması için aşağıdaki mimari varsayımların karşılanması gerekir.
-
-[Aksiyom 1]: Eğer `QUOTE_STATUSES` sabiti (as_expression ile tanımlanan) geçerli bir durum kümesi içermiyorsa, `isQuoteStatus` işlevi her zaman `false` döner ve tüm durum geçiş işlevleri (`allowedNextQuoteStatuses`, `allowedAdminQuoteActions`, `allowedCustomerQuoteActions`) tutarsız veya boş sonuçlar üretebilir.
-
-[Aksiyom 2]: Eğer `QUOTE_TRANSITIONS` nesnesi, `QUOTE_STATUSES` kümesinde tanımlanmamış bir kaynak durum anahtarı içeriyorsa, `allowedNextQuoteStatuses` işlevi o durum için geçerli bir geçiş listesi bulamaz ve boş dizi (`[]`) döner veya tanımsız davranış gösterir.
-
-[Aksiyom 3]: Eğer `QUOTE_ADMIN_TRANSITIONS` veya `QUOTE_CUSTOMER_TRANSITIONS` nesneleri, `QUOTE_STATUSES` kümesinde bulunmayan bir durum anahtarı içeriyorsa, `allowedAdminQuoteActions` veya `allowedCustomerQuoteActions` işlevleri o durum için tanımsız davranış gösterir.
-
-[Aksiyom 4]: Eğer bir durum `QUOTE_TRANSITIONS` nesnesinde bir kaynak durum olarak tanımlı değilse, `isTerminalQuoteStatus` işlevi o durumu son (terminal) durum olarak kabul eder (`true` döner). Bu durum, işlevin mekanizması tarafından belirlenir ve sadece kaynak durum olarak tanımlı olmamaya bağlıdır.
-
-[Aksiyom 5]: Eğer `allowedNextQuoteStatuses`, `allowedAdminQuoteActions` veya `allowedCustomerQuoteActions` işlevlerinden birine, `QUOTE_STATUSES` kümesinde bulunmayan bir `current` parametresi verilirse, işlevin sonucu tanımsızdır veya boş dizi döner.
-
-[Aksiyom 6]: Eğer `QUOTE_TRANSITIONS` nesnesindeki bir geçiş (target state), `QUOTE_STATUSES` kümesinde tanımlı bir durum değilse, durum makinesi tutarsız bir yapıya sahiptir ve `allowedNextQuoteStatuses` işlevi geçersiz bir hedef durum listesi döner.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -56809,56 +56900,55 @@ type QuoteStatus = (typeof QUOTE_STATUSES)[number]
 ---
 
 ## SABİTLER
-- **QUOTE_STATUSES** (as_expression) — `['requested', 'quoted', 'accepted', 'rejected', 'expired'] as const`
+- **QUOTE_STATUSES** (as_expression) — `[
+  'draft',
+  'requested',
+  'quoted',
+  'accepted',
+  'rejected',
+  'expire...`
 - **QUOTE_TRANSITIONS** (object) — `{
-  requested: ['quoted', 'rejected'],
-  quoted: ['accepted', 'rejected', 'ex...`
+  draft: ['quoted', 'cancelled'],
+  requested: ['draft', 'rejected'],
+  quo...`
 - **QUOTE_ADMIN_TRANSITIONS** (object) — `{
-  requested: ['quoted', 'rejected'],
-  quoted: ['expired'],
-  accepted: [],...`
+  draft: ['quoted', 'cancelled'],
+  requested: ['draft', 'rejected'],
+  quo...`
 - **QUOTE_CUSTOMER_TRANSITIONS** (object) — `{
+  draft: [],
   requested: [],
   quoted: ['accepted', 'rejected'],
-  accepted: [],
-  reje...`
+  accepte...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/lib/quotes/quoteStatusMachine.ts::isQuoteStatus`
-- **params**: `value: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `value is QuoteStatus` (type guard) — `QUOTE_STATUSES` sabitinin `readonly string[]` olarak cast edilip `value` değerinin içerip içermediğini kontrol eder; geçerli bir alıntı durumu olup olmadığını belirler
+### [N1_NASIL] AST Pointer: src/lib/quotes/quoteStatusMachine.ts::isQuoteStatus
+- **params**: `value` — string türünde, geçerli bir teklif durumu olup olmadığı kontrol edilen değer
+- **ic_degiskenler**: yok
+- **Dönüş**: boolean — `value` parametresinin `QUOTE_STATUSES` dizisi içinde bulunup bulunmadığını döndürür (type guard: `value is QuoteStatus`)
 
----
+### [N2_NASIL] AST Pointer: src/lib/quotes/quoteStatusMachine.ts::allowedNextQuoteStatuses
+- **params**: `current` — string türünde, mevcut teklif durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: readonly QuoteStatus[] — `current` geçerli bir teklif durumu ise `QUOTE_TRANSITIONS[current]` dizisini, değilse boş dizi döndürür
 
-### [N2_NASIL] AST Pointer: `src/lib/quotes/quoteStatusMachine.ts::allowedNextQuoteStatuses`
-- **params**: `current: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `readonly QuoteStatus[]` — `current` geçerli bir QuoteStatus ise `QUOTE_TRANSITIONS[current]` ile bir sonraki geçilebilecek durumları döndürür; geçersiz ise boş dizi döndürür
+### [N3_NASIL] AST Pointer: src/lib/quotes/quoteStatusMachine.ts::allowedAdminQuoteActions
+- **params**: `current` — string türünde, mevcut teklif durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: readonly QuoteStatus[] — `current` geçerli bir teklif durumu ise `QUOTE_ADMIN_TRANSITIONS[current]` dizisini, değilse boş dizi döndürür
 
----
+### [N4_NASIL] AST Pointer: src/lib/quotes/quoteStatusMachine.ts::allowedCustomerQuoteActions
+- **params**: `current` — string türünde, mevcut teklif durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: readonly QuoteStatus[] — `current` geçerli bir teklif durumu ise `QUOTE_CUSTOMER_TRANSITIONS[current]` dizisini, değilse boş dizi döndürür
 
-### [N3_NASIL] AST Pointer: `src/lib/quotes/quoteStatusMachine.ts::allowedAdminQuoteActions`
-- **params**: `current: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `readonly QuoteStatus[]` — `current` geçerli bir QuoteStatus ise `QUOTE_ADMIN_TRANSITIONS[current]` ile yöneticinin yapabileceği geçişleri döndürür; geçersiz ise boş dizi döndürür
-
----
-
-### [N4_NASIL] AST Pointer: `src/lib/quotes/quoteStatusMachine.ts::allowedCustomerQuoteActions`
-- **params**: `current: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `readonly QuoteStatus[]` — `current` geçerli bir QuoteStatus ise `QUOTE_CUSTOMER_TRANSITIONS[current]` ile müşterinin yapabileceği geçişleri döndürür; geçersiz ise boş dizi döndürür
-
----
-
-### [N5_NASIL] AST Pointer: `src/lib/quotes/quoteStatusMachine.ts::isTerminalQuoteStatus`
-- **params**: `status: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `boolean` — `status` geçerli bir QuoteStatus olup olmadığını (`isQuoteStatus`) ve `QUOTE_TRANSITIONS[status]` uzunluğunun `0` olup olmadığını kontrol eder; geçiş yapılamayan (son durum) durumları tespit eder
+### [N5_NASIL] AST Pointer: src/lib/quotes/quoteStatusMachine.ts::isTerminalQuoteStatus
+- **params**: `status` — string türünde, kontrol edilen teklif durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: boolean — `status` geçerli bir teklif durumu ise ve `QUOTE_TRANSITIONS[status]` dizisinin uzunluğu 0 ise true döndürür (son durum olup olmadığını belirtir)
 
 ---
 
@@ -56871,9 +56961,9 @@ graph TD
     quoteStatusMachine_ts__allowedNextQuoteStatuses["allowedNextQuoteStatuses"]
     quoteStatusMachine_ts__isQuoteStatus["isQuoteStatus"]
     quoteStatusMachine_ts__isTerminalQuoteStatus["isTerminalQuoteStatus"]
-    quoteStatusMachine_ts__allowedCustomerQuoteActions --> quoteStatusMachine_ts__isQuoteStatus
     quoteStatusMachine_ts__isTerminalQuoteStatus --> quoteStatusMachine_ts__isQuoteStatus
     quoteStatusMachine_ts__allowedAdminQuoteActions --> quoteStatusMachine_ts__isQuoteStatus
+    quoteStatusMachine_ts__allowedCustomerQuoteActions --> quoteStatusMachine_ts__isQuoteStatus
     quoteStatusMachine_ts__allowedNextQuoteStatuses --> quoteStatusMachine_ts__isQuoteStatus
 ```
 
@@ -57698,14 +57788,14 @@ MÜŞTERİ-YÜZÜ FORM YAZMA KATMANI — `docs/standards/form-submission-standar
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\dataSubjectRequest.service.ts
-skeleton_hash: 8caba86ddf48a8d7
+source_path: C:\tmp\venthub-wt-t131\src\lib\services\dataSubjectRequest.service.ts
+skeleton_hash: 143b1a876a059a0a
 entity_hashes:
   func:createDataSubjectRequest: e6eabf821fdc0515
   func:listDataSubjectRequests: 68b977600195a53c
   func:updateDataSubjectRequest: 6afb08cf74cd4c9f
   overview: 648fcab7b721f676
-generated_at: 2026-08-25T08:44:27Z
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış
@@ -61389,15 +61479,15 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\lib\services\quoteService.ts
-skeleton_hash: 5b2229e6ba5be8cf
+source_path: C:\tmp\venthub-wt-t131\src\lib\services\quoteService.ts
+skeleton_hash: 7fe1a47f1b261b5f
 entity_hashes:
-  func:createQuoteRequest: 0526cf1c9875b9b7
-  func:decideQuote: 7bc8e35d98813b40
+  func:createQuoteRequest: 49e8e3f38e74479e
+  func:decideQuote: af93070a655d2d39
   func:getQuoteDetail: 6039e8643547210f
   func:listMyQuotes: 37719d65071bbc37
-  overview: 328240015257680c
-generated_at: 2026-08-25T07:28:30Z
+  overview: de06b34e4aba05e8
+generated_at: 2026-08-27T04:30:06Z
 ---
 
 ## Genel Bakış
@@ -61411,7 +61501,7 @@ Yeni bir teklif isteği oluşturur ve veritabanına kaydeder. Oluşturulan tekli
 - createQuoteRequest
 
 ### Teklif Sorgulama
-Kullanıcıya ait teklifleri listeler veya belirli bir teklifin detaylı bilgisini (ilişkili kalemler dahil) getirir. `getQuoteDetail` bulunamayan durumda null döndürür.
+Kullanıcıya ait teklifleri listeler veya belirli bir teklifin detaylı bilgisini (ilişkili kalemler dahil) getirir. `getQuoteDetail` bulunamayan durumda `null` döndürür.
 - listMyQuotes, getQuoteDetail
 
 ### Teklif Karar Verme
@@ -61421,31 +61511,29 @@ Mevcut bir teklifin durumunu kabul veya red olarak günceller. Fonksiyon, teklif
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-**[Aksiyom 1]**: Eğer `quoteId` ile eşleşen bir teklif kaydı yoksa, `getQuoteDetail` fonksiyonu `null` döner.
-
-**[Aksiyom 2]**: Eğer `decision` parametresi `'accepted'` veya `'rejected'` dışında bir değer içeriyorsa, `decideQuote` fonksiyonu çağrılamaz; TypeScript derleme aşamasında tip hatası oluşur.
-
-**[Aksiyom 3]**: Eğer `decideQuote` fonksiyonuna verilen `quote` nesnesi `'id'` ve `'status'` alanlarını içermiyorsa, fonksiyon çağrılamaz; TypeScript derleme aşamasında tip hatası oluşur.
-
-**[Aksiyom 4]**: Eğer `createQuoteRequest` fonksiyonuna geçerli bir `CreateQuoteRequestInput` sağlanmazsa, fonksiyon çağrılamaz; TypeScript derleme aşamasında tip hatası oluşur.
-
-**[Aksiyom 5]**: Eğer `supabase` istemcisi geçerli bir oturumla yapılandırılmamışsa, `listMyQuotes` fonksiyonunun hangi kullanıcıya ait teklifleri döndüreceği belirlenemez; bu bilgi fonksiyon gövdesinden çıkarılamaz.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### createQuoteRequest
-**Ne yapar**: Yeni bir teklif talebi oluşturur. Başlık bilgisini ve en az bir kalem (ürün kalemi) snapshot'ını veritabanına kaydeder. Cetvel Q1 kuralı gereği içerik kopyalanır, ancak kaynak satır ID'leri kopyalanmaz. Kalemsiz teklif talebi oluşturulamaz; bu durumda hata fırlatılır.
+**Ne yapar**: Yeni bir teklif talebi oluşturur. Teklif başlığını ve kalemlerini veritabanına yazar. Kalemsiz talep oluşturmaya izin vermez; en az bir kalem zorunludur ve bu koşul sağlanmazsa hata fırlatılır.
 
-**Nasıl yapar**: Fonksiyon önce `input.items` dizisinin boş olup olmadığını kontrol eder; boşsa `'quote request needs at least one item'` hatası fırlatır. Ardından `venthub_quotes` tablosuna başlık satırını (`user_id`, `source`, `source_project_id`) ekler ve eklenen satırı geri döndürür. `sourceProjectId` tanımsızsa `null` olarak kaydedilir. Başlık başarıyla oluşturulduktan sonra `venthub_quote_items` tablosuna her bir kalem için (`quote_id`, `product_id`, `product_name`, `qty`, `note`) satırları toplu olarak eklenir. Kalem yazımı başarısız olursa hata yükseltilir; yarım başlık veritabanında kalır (ticari kayıt silinmez politikası gereği DELETE politikası bilinçli olarak yoktur) ve kullanıcıdan yeniden denemesi istenir. Bu davranış fail-closed prensibinin görünür bir uygulamasıdır.
+**Nasıl yapar**: Önce `input.items` dizisinin uzunluğunu kontrol eder; boşsa hata fırlatır. Ardından `venthub_quotes` tablosuna teklif başlığını ekler; bu sırada kimlik üçlüsü (ad, e-posta, telefon) doğrudan belgeye yazılır ve profile bağlanmaz — profil sonradan değişse bile teklifin kime verildiği belgede sabit kalır. Başlık başarıyla oluşturulduktan sonra `venthub_quote_items` tablosuna her bir kalem için kayıt ekler. Kalem yazımı başarısız olursa hata yükseltilir; yarım başlık sessizce yutulmaz, kullanıcıya yeniden denemesi için bildirilir (fail-closed yaklaşımı). Ticari kayıt silinmediği için DELETE politikası bilinçli olarak yoktur.
 
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Supabase istemci nesnesi; veritabanı işlemlerini yürütür.
-- `input`: `CreateQuoteRequestInput` — Teklif talebinin tüm verilerini içeren girdi nesnesi. `userId` (talebi oluşturan kullanıcı), `source` (kaynak bilgisi), `sourceProjectId` (opsiyonel kaynak proje ID'si) ve `items` (ürün kalemleri dizisi; her biri `productId`, `productName`, `qty`, `note` alanlarını içerir) alanlarını barındırır.
+- supabase: `SupabaseClient<Database>` — Veritabanı işlemleri için Supabase istemcisi.
+- input: `CreateQuoteRequestInput` — Teklif talebinin tüm verilerini içeren girdi nesnesi. Şu alanları içerir:
+  - userId: string — Talebi oluşturan kullanıcının kimliği.
+  - contact: `{ name: string; email: string; phone: string }` — Kimlik üçlüsü; belgeye doğrudan yazılır.
+  - source: string — Talebin kaynağı.
+  - sourceProjectId: string | null — Kaynak proje kimliği; belirtilmemişse null olarak kaydedilir.
+  - items: `Array<{ productId: string; productName: string; qty: number; note?: string }>` — Teklif kalemleri dizisi; en az bir eleman içermelidir.
 
-**Dönüş**: `Promise<QuoteRow>` — Oluşturulan teklif başlık satırını temsil eden `QuoteRow` nesnesi. Kalem bilgileri bu dönüş değerinde yer almaz; yalnızca başlık satırı döndürülür.
+**Dönüş**: `Promise<QuoteRow>` — Oluşturulan teklif başlık satırını döndürür. Bu satır, `venthub_quotes` tablosuna eklenen kaydı temsil eder.
 
 ### listMyQuotes
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -61467,13 +61555,20 @@ Mevcut bir teklifin durumunu kabul veya red olarak günceller. Fonksiyon, teklif
 ## INTERFACES
 
 ### QuoteRequestItemInput
-- `productId: string | null`
+- `productId: string`
 - `productName: string`
 - `qty: number`
 - `note?: string | null`
 
+### QuoteContactInput
+Muhatap kimliği (cetvel §2.5) — **kimliksiz teklif OLMAZ.** Üçü de DB'de NOT NULL. Hesap ekseninden ayrıdır: `user_id` teklifin ONAYLANABİLMESİ için gerekir, bu üçlü teklifin VAR OLABİLMESİ için.
+- `name: string`
+- `email: string`
+- `phone: string`
+
 ### CreateQuoteRequestInput
 - `userId: string`
+- `contact: QuoteContactInput`
 - `source: QuoteSource`
 - `sourceProjectId?: string | null`
 - `items: QuoteRequestItemInput[]`
@@ -61506,53 +61601,60 @@ type QuoteSource = 'pdp' | 'cart' | 'project'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/services/quoteService.ts::createQuoteRequest
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `input` — CreateQuoteRequestInput tipinde, teklif talebi girdisi
+- **params**: `supabase` — SupabaseClient<Database> tipinde istemci; `input` — CreateQuoteRequestInput tipinde teklif talep girdisi
 - **ic_degiskenler**:
-  - `input.items.length` — gelen kalemlerin sayısı; 0 ise "quote request needs at least one item" hatası fırlatılır
-  - `input.userId` — venthub_quotes tablosuna yazılacak kullanıcı kimliği
-  - `input.source` — venthub_quotes tablosuna yazılacak kaynak bilgisi
-  - `input.sourceProjectId` — venthub_quotes tablosuna yazılacak kaynak proje kimliği; null ise `null` olarak gönderilir (`?? null`)
-  - `quote` — venthub_quotes tablosuna insert sonrası `.select().single()` ile dönen tekil satır (QuoteRow)
-  - `error` — venthub_quotes insert işlemi sonrası oluşan hata; varsa fırlatılır
-  - `itemsError` — venthub_quote_items toplu insert işlemi sonrası oluşan hata; varsa fırlatılır (başlık silinmez, yarım kayıt 'requested' durumunda kalır)
-  - `item` — `input.items.map()` içindeki her bir kalem öğesi
-  - `item.productId` — kalem ürün kimliği, venthub_quote_items.product_id alanına yazılır
-  - `item.productName` — kalem ürün adı, venthub_quote_items.product_name alanına yazılır
-  - `item.qty` — kalem miktarı, venthub_quote_items.qty alanına yazılır
-  - `item.note` — kalem notu; null ise `null` olarak gönderilir (`?? null`), venthub_quote_items.note alanına yazılır
-  - `quote.id` — oluşturulan başlık satırının kimliği, her kalemin quote_id alanına atanır
-- **Dönüş**: `quote` (QuoteRow) — oluşturulan teklif başlık satırı
+  - `input.items` — teklif kalemler dizisi; `.length` ile boş olup olmadığı denetlenir, boşsa hata fırlatılır
+  - `input.userId` — teklifin bağlı olacağı kullanıcı kimliği, `user_id` alanına yazılır
+  - `input.contact.name` — iletişim adı, `contact_name` alanına yazılır
+  - `input.contact.email` — iletişim e-postası, `contact_email` alanına yazılır
+  - `input.contact.phone` — iletişim telefonu, `contact_phone` alanına yazılır
+  - `input.source` — teklif kaynağı, `source` alanına yazılır
+  - `input.sourceProjectId` — kaynak proje kimliği; null ise `null` olarak `source_project_id` alanına yazılır
+  - `quote` — `venthub_quotes` tablosuna insert sonrası dönen tek satır (`.select().single()`)
+  - `error` — `venthub_quotes` insert işleminde oluşan hata; varsa fırlatılır
+  - `itemsError` — `venthub_quote_items` insert işleminde oluşan hata; varsa fırlatılır
+  - `item` — `input.items.map()` içindeki her bir kalem nesnesi
+  - `item.productId` — ürün kimliği, `product_id` alanına yazılır
+  - `item.productName` — ürün adı, `product_name` alanına yazılır
+  - `item.qty` — miktar, `qty` alanına yazılır
+  - `item.note` — not; null ise `null` olarak `note` alanına yazılır
+  - `quote.id` — oluşturulan teklifin kimliği, her kalemin `quote_id` alanına atanır
+- **Dönüş**: `QuoteRow` — oluşturulan teklif satırı (`quote`)
 
 ### [N2_NASIL] AST Pointer: src/lib/services/quoteService.ts::listMyQuotes
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı
+- **params**: `supabase` — SupabaseClient<Database> tipinde istemci
 - **ic_degiskenler**:
-  - `quotes` — venthub_quotes tablosundan `.select()` ile gelen tüm satırlar; `created_at` alanına göre azalan sıralanır
-  - `error` — quotes sorgusu sonrası oluşan hata; varsa fırlatılır
-  - `items` — venthub_quote_items tablosundan `.select()` ile gelen kalemler; `quotes` içindeki tüm `q.id` değerlerine eşleşenler (`.in('quote_id', ...)`) alınır, `created_at` alanına göre artan sıralanır
-  - `itemsError` — items sorgusu sonrası oluşan hata; varsa fırlatılır
-  - `byQuote` — `Map<string, QuoteItemRow[]>` tipinde, `quote_id` anahtarıyla gruplanmış kalem listeleri haritası
-  - `item` — `items ?? []` döngüsündeki her bir kalem satırı
-  - `item.quote_id` — kalem satırının ait olduğu teklif kimliği; Map anahtarı olarak kullanılır
-  - `list` — `byQuote.get(item.quote_id)` sonucu; yoksa boş dizi `[]` ile başlatılır, kalem eklenip Map'e geri yazılır
-  - `q` — `quotes.map()` içindeki her bir teklif satırı
-  - `q.id` — teklif satırının kimliği; Map'ten kalem listesi almak için kullanılır
-- **Dönüş**: `quotes.map((q) => ({ ...q, items: byQuote.get(q.id) ?? [] }))` — her teklif satırına `items` alanı eklenmiş QuoteWithItems dizisi; kalemsiz teklifler boş dizi alır
+  - `quotes` — `venthub_quotes` tablosundan `created_at` azalan sırayla çekilen tüm satırlar
+  - `error` — quotes sorgusundaki hata; varsa fırlatılır
+  - `items` — `venthub_quote_items` tablosundan, quotes dizisindeki tüm `id` değerlerine eşleşen kalemler; `created_at` artan sırayla çekilir
+  - `itemsError` — items sorgusundaki hata; varsa fırlatılır
+  - `byQuote` — `Map<string, QuoteItemRow[]>` tipinde harita; her teklif kimliğini ilgili kalemler listesine eşler
+  - `item` — `items` dizisi üzerinde döngüdeki her bir kalem satırı
+  - `item.quote_id` — kalemin ait olduğu teklif kimliği; Map anahtarı olarak kullanılır
+  - `list` — Map'ten alınan mevcut kalem dizisi; bulunamazsa boş dizi oluşturulur, item eklenip Map'e geri yazılır
+  - `q` — `quotes.map()` içindeki her teklif satırı
+  - `q.id` — teklif kimliği; `byQuote` Map'inden ilgili kalemleri almak için kullanılır
+- **Dönüş**: `QuoteWithItems[]` — her teklif satırına `items` alanı eklenmiş dizi; kalemi olmayan teklifler boş dizi alır
 
 ### [N3_NASIL] AST Pointer: src/lib/services/quoteService.ts::getQuoteDetail
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `quoteId` — string tipinde, sorgulanacak teklif kimliği
+- **params**: `supabase` — SupabaseClient<Database> tipinde istemci; `quoteId` — string tipinde teklif kimliği
 - **ic_degiskenler**:
-  - `quote` — venthub_quotes tablosundan `.eq('id', quoteId).maybeSingle()` ile gelen tekil satır; bulunamazsa `null`
-  - `error` — quote sorgusu sonrası oluşan hata; varsa fırlatılır
-  - `items` — venthub_quote_items tablosundan `.eq('quote_id', quoteId)` ile gelen kalemler; `created_at` alanına göre artan sıralanır
-  - `itemsError` — items sorgusu sonrası oluşan hata; varsa fırlatılır
-- **Dönüş**: `{ ...quote, items: items ?? [] }` (QuoteWithItems) — teklif satırına `items` alanı eklenmiş nesne; quote bulunamazsa `null`
+  - `quote` — `venthub_quotes` tablosundan `id` eşleşmesiyle çekilen tek satır (`.maybeSingle()`); bulunamazsa null döner
+  - `error` — quotes sorgusundaki hata; varsa fırlatılır
+  - `items` — `venthub_quote_items` tablosundan `quote_id` eşleşmesiyle çekilen kalemler; `created_at` artan sırayla
+  - `itemsError` — items sorgusundaki hata; varsa fırlatılır
+- **Dönüş**: `QuoteWithItems | null` — teklif satırına `items` alanı eklenmiş nesne; teklif bulunamazsa `null`
 
 ### [N4_NASIL] AST Pointer: src/lib/services/quoteService.ts::decideQuote
-- **params**: `supabase` — SupabaseClient<Database> tipinde, veritabanı bağlantısı; `quote` — Pick<QuoteRow, 'id' | 'status'> tipinde, mevcut teklif durumu; `decision` — Extract<QuoteStatus, 'accepted' | 'rejected'> tipinde, verilen karar
+- **params**: `supabase` — SupabaseClient<Database> tipinde istemci; `quote` — Pick<QuoteRow, 'id' | 'status' | 'revision_no'> tipinde teklif özeti; `decision` — Extract<QuoteStatus, 'accepted' | 'rejected'> tipinde karar
 - **ic_degiskenler**:
-  - `allowedCustomerQuoteActions(quote.status)` — mevcut duruma izin verilen geçiş aksiyonlarını döndüren fonksiyon çağrısı; `decision` bu listede yoksa "invalid customer quote transition" hatası fırlatılır
-  - `error` — venthub_quotes tablosunda `.update({ status: decision }).eq('id', quote.id)` sonrası oluşan hata; varsa fırlatılır
-- **Dönüş**: yok (void) — yan etki olarak venthub_quotes tablosundaki ilgili satırın `status` alanı `decision` değerine güncellenir
+  - `quote.status` — mevcut teklif durumu; `allowedCustomerQuoteActions()` fonksiyonuna gönderilerek geçerli kararlar listesi alınır, `decision` bu listede yoksa hata fırlatılır
+  - `decision` — müşteri kararı; `'accepted'` veya `'rejected'` değerlerinden biri
+  - `payload` — `venthub_quotes` tablosuna gönderilecek güncelleme nesnesi; `decision === 'accepted'` ise `status`, `accepted_at` (ISO tarih), `accept_channel` (`'site'`), `accepted_revision_no` (`quote.revision_no`) alanlarını içerir; `'rejected'` ise yalnızca `status` alanını içerir
+  - `quote.revision_no` — kabul durumunda belgeye pinlenen revizyon numarası
+  - `quote.id` — güncelleme sorgusunda `.eq('id', quote.id)` ile eşleştirilen teklif kimliği
+  - `error` — update işlemindeki hata; varsa fırlatılır
+- **Dönüş**: yok (void) — yan etki olarak `venthub_quotes` tablosunda satır güncellenir
 
 ---
 
@@ -61568,16 +61670,17 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: quoteService.ts
-  function: quoteService.ts::createQuoteRequest
-  function: quoteService.ts::listMyQuotes
-  function: quoteService.ts::getQuoteDetail
-  function: quoteService.ts::decideQuote
+  file: src\lib\services\quoteService.ts
+  function: src\lib\services\quoteService.ts::createQuoteRequest
+  function: src\lib\services\quoteService.ts::listMyQuotes
+  function: src\lib\services\quoteService.ts::getQuoteDetail
+  function: src\lib\services\quoteService.ts::decideQuote
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: CreateQuoteRequestInput
+  export: QuoteContactInput
   export: QuoteItemRow
   export: QuoteRequestItemInput
   export: QuoteRow
@@ -63144,11 +63247,11 @@ file: C:\Users\alize\venthub-hvac\src\test\setup.d.ts
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\types\admin-shared.ts
-skeleton_hash: 6686f6184710e8c7
+source_path: C:\tmp\venthub-wt-t131\src\types\admin-shared.ts
+skeleton_hash: 138c0f5951c9d422
 entity_hashes:
   overview: 050ebb9fda579a9b
-generated_at: 2026-06-19T20:48:16Z
+generated_at: 2026-08-27T06:55:18Z
 ---
 
 ## Genel Bakış
@@ -63223,11 +63326,11 @@ Bu dosyada (`admin-shared.ts`) fonksiyon imzası veya fonksiyon gövdesi bulunma
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\types\authority.ts
-skeleton_hash: 79d2675712b4ef49
+source_path: C:\tmp\venthub-wt-t131\src\types\authority.ts
+skeleton_hash: 9c039906ccd5b1c0
 entity_hashes:
   overview: 08381c41a177b637
-generated_at: 2026-06-19T20:48:16Z
+generated_at: 2026-08-27T06:55:18Z
 ---
 
 ## Genel Bakış
@@ -63263,48 +63366,39 @@ Bu modül, VentHub HVAC projesinde yetki (authority) sistemiyle ilgili TypeScrip
 - `id: string`
 - `type: AuthorityBlockType`
 - `order: number`
-- `config?: {
-`
+- `config?: {`
 
 ### HeroBlock extends BaseAuthorityBlock
 - `type: 'hero'`
-- `content: {
-`
+- `content: {`
 
 ### SpecsBlock extends BaseAuthorityBlock
 - `type: 'specs'`
-- `content: {
-`
+- `content: {`
 
 ### MediaBlock extends BaseAuthorityBlock
 - `type: 'media'`
-- `content: {
-`
+- `content: {`
 
 ### PerformanceBlock extends BaseAuthorityBlock
 - `type: 'performance'`
-- `content: {
-`
+- `content: {`
 
 ### RichTextBlock extends BaseAuthorityBlock
 - `type: 'rich-text'`
-- `content: {
-`
+- `content: {`
 
 ### FeaturesGridBlock extends BaseAuthorityBlock
 - `type: 'features-grid'`
-- `content: {
-`
+- `content: {`
 
 ### ComparisonBlock extends BaseAuthorityBlock
 - `type: 'comparison'`
-- `content: {
-`
+- `content: {`
 
 ### CtaBannerBlock extends BaseAuthorityBlock
 - `type: 'cta-banner'`
-- `content: {
-`
+- `content: {`
 
 ---
 
@@ -63550,11 +63644,11 @@ Bu dosyada (`src/types/database.ts`) tanımlı fonksiyon bulunmamaktadır. Dosya
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\types\database.types.ts
-skeleton_hash: c2471dd70110decd
+source_path: C:\tmp\venthub-wt-t131\src\types\database.types.ts
+skeleton_hash: da220289893389ca
 entity_hashes:
   overview: ce3fb4ce44f2949f
-generated_at: 2026-08-25T07:30:14Z
+generated_at: 2026-08-27T04:30:18Z
 ---
 
 ## Genel Bakış
@@ -63666,9 +63760,17 @@ type CompositeTypes = <
 
 ---
 
+## AST POINTERS
+
+Bu dosya (`src\types\database.types.ts`) bir TypeScript tip tanımlama dosyasıdır. Dosyada fonksiyon gövdesi bulunmadığından AST Pointer oluşturulacak fonksiyon yoktur.
+
+Dosyada yalnızca `Constants` adında bir sabit tanımlı (`as_expression` olarak belirtilmiş); ancak bu bir fonksiyon değildir ve fonksiyon gövdesi içermez.
+
+---
+
 ## NODE ID STANDARD
 
-  file: database.types.ts
+  file: src\types\database.types.ts
 
 ---
 
@@ -67039,13 +67141,13 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\utils\routes.ts
-skeleton_hash: 15798fbb1ec3f765
+source_path: C:\tmp\venthub-wt-t131\src\utils\routes.ts
+skeleton_hash: 8798c5c4178f0ac2
 entity_hashes:
   func:assertProductSlug: 7cc00756c332a6af
   func:localizedHref: e1a2d461bb32d4d4
   overview: 8cbb4744a23035a6
-generated_at: 2026-08-25T07:59:27Z
+generated_at: 2026-08-27T06:49:05Z
 ---
 
 ## Genel Bakış
@@ -67160,9 +67262,9 @@ Bu modül için fonksiyon gövdeleri sağlanmadığından, gövdeden çıkarım 
 
 ## NODE ID STANDARD
 
-  file: routes.ts
-  function: routes.ts::assertProductSlug
-  function: routes.ts::localizedHref
+  file: src\utils\routes.ts
+  function: src\utils\routes.ts::assertProductSlug
+  function: src\utils\routes.ts::localizedHref
 
 ---
 
@@ -71481,13 +71583,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\account\AccountLayout.tsx
-skeleton_hash: 9648c984d7a1bea3
+source_path: C:\tmp\venthub-wt-t131\src\views\account\AccountLayout.tsx
+skeleton_hash: 9f2e77cc37fa3add
 entity_hashes:
   func:AccountLayout: a90ed56764b85b28
   overview: c9fc556dd386a0a0
   style_tokens: cca55516cfe981ad
-generated_at: 2026-08-25T07:31:37Z
+generated_at: 2026-08-27T06:50:17Z
 ---
 
 ## Genel Bakış
@@ -71548,10 +71650,32 @@ type TabGroup = { label: string; items: TabItem[] }
 
 ---
 
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/views/account/AccountLayout.tsx::AccountLayout
+- **params**: `children` — React.ReactNode tipinde, opsiyonel; layout bileşeninin içeriğini temsil eder
+- **ic_degiskenler**:
+  - `router` — `useRouter()` hook'undan dönen Next.js router nesnesi; sayfa yönlendirmelerinde kullanılır
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; metinlerin yerelleştirilmesinde kullanılır
+  - `routes` — `useLocalizedRoutes()` hook'undan dönen localize edilmiş rotalar proxy nesnesi; dil-önekli URL'lerin oluşturulmasında kullanılır
+  - `user` — `useAuth()` hook'undan dönen kullanıcı bilgisi; oturum durumunun kontrolünde kullanılır
+  - `loading` — `useAuth()` hook'undan dönen yükleme durumu; auth işleminin tamamlanıp tamamlanmadığını belirtir
+  - `pathname` — `usePathname()` hook'undan dönen mevcut URL yolu; aktif sekme kontrolünde kullanılır
+  - `navGroups` — TabGroup tipinde dizi; sidebar navigasyon yapısını tanımlar, her grup `label` ve `items` alanlarından oluşur
+  - `shouldRender` — boolean; geliştirme modunda veya kullanıcı oturum açmışsa true, aksi halde false; bileşenin render edilip edilmeyeceğini belirler
+  - `active` — useEffect içinde tanımlanan boolean bayrak; bileşen unmount olduğunda false yapılır, yönlendirme işleminin iptalinde kullanılır
+  - `group` — navGroups.map callback'indeki her bir TabGroup nesnesi; `label` ve `items` alanlarına erişilir
+  - `gi` — navGroups.map callback'indeki grup indeksi; key prop'u olarak kullanılır
+  - `tab` — group.items.map callback'indeki her bir sekme nesnesi; `to`, `label`, `icon` alanlarına erişilir
+  - `isActive` — boolean; `pathname === tab.to` karşılaştırmasıyla belirlenir; sekmenin aktif olup olmadığını belirler, CSS sınıflarının seçiminde kullanılır
+- **Dönüş**: JSX elementi (React.ReactNode); sidebar ve main content alanını içeren layout yapısı, `shouldRender` false ise null döner
+
+---
+
 ## NODE ID STANDARD
 
-  file: AccountLayout.tsx
-  function: AccountLayout.tsx::AccountLayout
+  file: src\views\account\AccountLayout.tsx
+  function: src\views\account\AccountLayout.tsx::AccountLayout
 
 ---
 
@@ -72527,14 +72651,14 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\account\DataRequestsPage.tsx
-skeleton_hash: bf40f14802552067
+source_path: C:\tmp\venthub-wt-t131\src\views\account\DataRequestsPage.tsx
+skeleton_hash: 639b6c8851b7cec0
 entity_hashes:
   func:DataRequestsPage: a91b40fa1a74fd39
   func:handleSubmit: 460293fdfa9263b6
   overview: 2513cf2ef74b5f92
   style_tokens: 5b0dfe7c560b99c6
-generated_at: 2026-08-25T08:45:15Z
+generated_at: 2026-08-27T06:50:17Z
 ---
 
 ## Genel Bakış
@@ -73384,13 +73508,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\views\account\quotes\AccountQuotesPage.tsx
-skeleton_hash: a73143fe6a704c36
+source_path: C:\tmp\venthub-wt-t131\src\views\account\quotes\AccountQuotesPage.tsx
+skeleton_hash: 8266de8a1c041cd0
 entity_hashes:
   func:AccountQuotesPage: 676b0f814ec2c5da
   overview: c6a0e6e2db5efcaf
   style_tokens: e101b5f2657eda63
-generated_at: 2026-08-16T10:23:55Z
+generated_at: 2026-08-27T06:50:17Z
 ---
 
 ## Genel Bakış
@@ -73560,34 +73684,31 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\views\account\quotes\QuoteDetailPage.tsx
-skeleton_hash: bf02fcbd76ed7fdc
+source_path: C:\tmp\venthub-wt-t131\src\views\account\quotes\QuoteDetailPage.tsx
+skeleton_hash: 62c7fec9786e8d95
 entity_hashes:
-  func:QuoteDetailPage: ad75de9f3250ca48
-  overview: a7b68aa43fac48dc
+  func:QuoteDetailPage: 3d71e18440faf62b
+  overview: 172bfe259539c2cd
   style_tokens: f3eac423c34fd21f
-generated_at: 2026-08-16T10:24:24Z
+generated_at: 2026-08-27T06:51:24Z
 ---
 
 ## Genel Bakış
 
-Bu modül, teklif (quote) detay sayfasını gösteren bir React sayfa bileşenidir. Teklifin tüm bilgilerini ve ilgili ayrıntıları kullanıcılara sunarak, teklif yönetimi sürecinde kritik bir görüntüleme noktası olarak görev yapar.
+Bu modül, teklif (quote) detay sayfasını gösteren bir React sayfa bileşenidir. URL'deki `id` parametresini kullanarak ilgili teklifin tüm bilgilerini yükler ve kullanıcıya sunar. Teklif yönetimi sürecinde görüntüleme noktası olarak görev yapar; duruma göre müşteri için kabul/red karar butonlarını dinamik olarak gösterir.
 
 ## Fonksiyon Grupları
 
 ### Sayfa Bileşeni
-Teklif detay sayfasının tamamını oluşturan ve yöneten ana React bileşenidir. Sayfa yüklenişinde ilgili teklif verisini çeker, düzenler ve kullanıcıya okunabilir bir biçimde sunar.
+
+Teklif detay sayfasının tamamını oluşturan ana React bileşenidir. Ürün kalemleri, fiyatlar ve durum bilgileri dahil teklif verisini çeker, düzenler ve kullanıcıya okunabilir biçimde sunar.
 - QuoteDetailPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için verilen bilgilerden (sadece parametresiz fonksiyon imzası) somut mimari varsayımlar çıkarılamamaktadır.
-
-[Aksiyom 1]: Eğer `QuoteDetailPage` bir React Sayfa (Page) bileşeni olarak çalışıyorsa, bileşenin props almadan (parametresiz) çalıştığı ve gerekli verileri React Router'dan (useParams/useLocation) veya üst bileşenlerden context yoluyla aldığı varsayılır. Aksi takdirde, bileşen bağımsız olarak test edilemez hale gelir.
-
-[Aksiyom 2]: Eğer `QuoteDetailPage` bir quote detay sayfası olarak render ediliyorsa, ilgili quote verisinin (ID, detaylar, kalemler vb.) bileşen içinden erişilebilir bir kaynaktan (API servisi, store veya context) sağlanıyor olması gerekir; aksi takdirde sayfa boş veya hata durumunda render edilir.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca parametresiz `QuoteDetailPage` imzasından somut mimari varsayımlar çıkarılamamaktadır.
 
 ---
 
@@ -73595,39 +73716,16 @@ Bu modül için verilen bilgilerden (sadece parametresiz fonksiyon imzası) somu
 
 ### QuoteDetailPage
 
-**Ne yapar**: Teklif detay sayfasını render eden React fonksiyonel bileşenidir. URL'deki `id` parametresini alarak ilgili teklifin tüm bilgilerini (ürün kalemleri, fiyatlar, durum) yükler ve görüntüler. Ayrıca müşteri için kabul/red karar butonlarını duruma göre dinamik olarak gösterir.
+**Ne yapar**: `/account/quotes/detail?id=<uuid>` yolunda çalışan bir React fonksiyonel bileşenidir. Teklif detayını ve müşteri kararını (kabul/red) görüntüler. Karar düğmeleri SSOT'tan çizilir (`allowedCustomerQuoteActions` fonksiyonu ile belirlenir) — yerel bir geçiş listesi yoktur. Fiyat kolonları bu bileşende yalnızca okunur (cetvel R5). `useSearchParams` tüketicisidir ve uygulama sayfası `<Suspense>` ile sarar (kural 5).
 
-**Nasıl yapar**: Sayfa yüklendiğinde `useSearchParams` hook'u ile URL'den `quoteId` parametresini çeker. `useCallback` ile tanımlanan `load` fonksiyonu, `getQuoteDetail` API çağrısı yaparak teklif verisini çeker ve state'e yazar. `useEffect`, `user` değiştiğinde otomatik olarak `load` fonksiyonunu tetikler. Fiyat hesaplaması, tüm kalemlerin fiyatlı ve aynı para biriminde olup olmadığını kontrol ederek toplam tutarı hesaplar. Karar butonları `allowedCustomerQuoteActions` fonksiyonundan gelen izin listesine göre koşullu olarak render edilir. `handleDecision` fonksiyonu, kullanıcı onayı aldıktan sonra `decideQuote` API çağrısı yapar ve ardından sayfayı yeniler.
+**Nasıl yapar**: Bileşen, URL'deki `id` parametresini `useSearchParams` ile alır ve `quoteId` olarak kullanır. `useCallback` ile tanımlanan `load` fonksiyonu, Supabase üzerinden `getQuoteDetail` çağırarak teklif detayını yükler. `useEffect` içinde kullanıcı (`user`) mevcut olduğunda `load` tetiklenir. Yükleme sırasında spinner gösterilir; teklif bulunamazsa "bulunamadı" ekranı ve listeye dönüş butonu sunulur. Teklif başarıyla yüklendikçe kalemler tablo halinde listelenir. Fiyatlanmış kalemlerin toplamı yalnızca tüm kalemler fiyatlıysa ve tek para birimindeyse hesaplanır ve gösterilir (kısmi toplamı "Toplam" diye sunmak yanıltıcı olacağından — W4b dersi). Duruma göre `allowedCustomerQuoteActions` ile elde edilen aksiyon listesine göre kabul/red düğmeleri render edilir. `handleDecision` fonksiyonu, kullanıcıdan onay aldıktan sonra `decideQuote` çağırır ve ardından tekrar `load` ile veriyi tazeler. Durum etiketleri `statusLabel` ile çevrilir, durum renkleri `statusClass` ile belirlenir.
 
-**Parametreler**:
-Bu bileşen doğrudan parametre almaz — props'suz bir sayfa bileşenidir. Veri kaynağı olarak şu hook'ları kullanır:
+**Parametreler**: Fonksiyon herhangi bir parametre almaz (React bileşeni olarak props'suz tanımlanmıştır).
 
-- `useAuth()` — `{ user }`: Mevcut oturum açmış kullanıcı bilgisini sağlar. Kullanıcı oturum açmamışsa veri yüklenmez.
-- `useI18n()` — `{ t, lang }`: Çoklu dil desteği için çeviri fonksiyonu (`t`) ve dil kodu (`lang`) döndürür.
-- `useLocalizedRoutes()` — `Routes`: Localize edilmiş rota builder'ları sağlar (örn: `Routes.account.quotes()`).
-- `useRouter()` — `router`: Sayfa yönlendirme işlemleri için Next.js router nesnesi.
-- `useSearchParams()` — `searchParams`: URL query string parametrelerine erişim sağlar. `id` parametresi teklif UUID'sini taşır.
-
-**Dönüş**: `JSX.Element` — Teklif detay sayfasının tamamını oluşturan JSX yapısı. Yükleniyor durumunda spinner, teklif bulunamadığında hata kartı, aksi halde teklif detayı tablosu ve karar butonları döndürür. Bileşen `<Suspense>` zarfı içinde kullanılmalıdır zira `useSearchParams` kullanır.
-
-**İç Durum Değişkenleri**:
-- `quote`: `QuoteWithItems | null` — Yüklenen teklif verisi ve kalemleri.
-- `loading`: `boolean` — Veri yükleme durumunu takip eder.
-- `deciding`: `boolean` — Karar (kabul/red) işleminin devam edip etmediğini takip eder, butonları devre dışı bırakmak için kullanılır.
-
-**Yardımcı Fonksiyonlar**:
-
-`statusLabel(s: string): string`
-Durum kodunu çeviri sistemi üzerinden okunabilir etikete dönüştürür. `t('quotes.statusLabels.${s}')` kalıbını kullanır.
-
-`statusClass(s: string): string`
-Durum koduna göre Tailwind CSS sınıfı döndürür. `requested` için sarı, `quoted` için mavi, `accepted` için yeşil, `rejected` için kırmızı, `expired` için gri tonları kullanır.
-
-`handleDecision(decision: 'accepted' | 'rejected'): Promise<void>`
-Müşteri karar işlerini yürütür. Önce `window.confirm` ile kullanıcı onayı alır, ardından `decideQuote` API çağrısı yapar. Başarılıysa toast bildirimi gösterir ve sayfayı yeniler; başarısızsa hata toast'u gösterir.
-
-**Fiyat Hesaplama Mantığı**:
-Toplam tutar, yalnızca tüm kalemlerin `unit_price` değerine sahip olduğu ve tüm kalemlerin aynı para biriminde olduğu durumlarda hesaplanır. Farklı para birimleri varsa veya bazı kalemlerin fiyatı yoksa toplam `null` olarak kalır — bu, kısmi toplamların yanıltıcı olmasını önler.
+**Dönüş**: JSX elementi döndürür. Üç farklı durumda farklı arayüz sunar:
+- Yükleme durumunda: Dönen bir spinner (animate-spin) içeren ortalanmış bir `div`.
+- Teklif bulunamadığında: Dosya ikonu, "bulunamadı" mesajı ve listeye dönüş butonu içeren beyaz kart.
+- Teklif mevcut olduğunda: Başlık satırı (tarih, kaynak, durum etiketi), duruma özel bilgi banner'ı (beklemede veya kabul edildi), kalemler tablosu (ürün adı, not, miktar, birim fiyat, satır toplamı, geçerlilik tarihi) ve toplam satırı (koşullu), ardından kabul/red düğmeleri (aksiyon listesine göre koşullu).
 
 ---
 
@@ -73656,68 +73754,66 @@ Toplam tutar, yalnızca tüm kalemlerin `unit_price` değerine sahip olduğu ve 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: QuoteDetailPage.tsx::QuoteDetailPage
-- **params**: ()
+### [N1_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::QuoteDetailPage
+- **params**: yok
 - **ic_degiskenler**:
-  - `user` — useAuth hook'undan alınan kullanıcı bilgisi, kimlik doğrulama için kullanılır
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, uluslararasılaştırma için kullanılır
-  - `lang` — useI18n hook'undan alınan dil bilgisi, format fonksiyonlarına parametre olarak geçilir
-  - `Routes` — useLocalizedRoutes hook'undan alınan lokalize edilmiş rota nesnesi, navigasyon için kullanılır
-  - `router` — useRouter hook'undan alınan Next.js router nesnesi, programlı navigasyon için kullanılır
-  - `searchParams` — useSearchParams hook'undan alınan URL arama parametreleri nesnesi
-  - `quoteId` — searchParams'dan 'id' parametresinin değeri, teklifin benzersiz tanımlayıcısı
-  - `quote` — useState ile yönetilen QuoteWithItems tipinde teklif verisi veya null
-  - `loading` — useState ile yönetilen boolean, veri yükleme durumunu takip eder
-  - `deciding` — useState ile yönetilen boolean, karar alma işleminin devam ettiğini gösterir
-  - `load` — useCallback ile tanımlanan asenkron fonksiyon, teklif detayını yükler
-  - `statusLabel` — parametre alan fonksiyon, duruma göre çevrilmiş etiket döndürür
-  - `statusClass` — parametre alan fonksiyon, duruma göre CSS sınıf adı döndürür
-  - `handleDecision` — parametre alan asenkron fonksiyon, teklif kabul/red işlemini yönetir
-  - `allPriced` — boolean, tüm kalemlerin fiyatlanıp fiyatlanmadığını kontrol eder
-  - `currencies` — Set nesnesi, kalemlerdeki para birimlerini toplar
-  - `singleCurrency` — string veya null, tüm kalemlerde tek para birimi varsa o birimi tutar
-  - `total` — number veya null, tüm kalemlerin fiyatlı ve tek para biriminde ise toplam tutar
-  - `actions` — string array, mevcut duruma göre izin verilen müşteri aksiyonları
-- **Dönüş**: JSX (React bileşeni)
+  - `user` — `useAuth()` hook'undan dönen kullanıcı nesnesi; useEffect içinde `load` fonksiyonunu tetiklemek için varlığı kontrol edilir
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; tüm metin etiketlerinde, hata/başarı toast mesajlarında kullanılır
+  - `lang` — `useI18n()` hook'undan dönen dil kodu; `formatDate` ve `formatCurrency` çağrılarına aktarılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota nesnesi; `Routes.account.quotes()` ile teklif listesine geri dönüş URL'si üretilir
+  - `router` — `useRouter()` hook'undan dönen Next.js router nesnesi; `router.push()` ile programatik yönlendirme yapılır
+  - `searchParams` — `useSearchParams()` hook'undan dönen URLSearchParams nesnesi; `?.get('id')` ile teklif ID'si alınır
+  - `quoteId` — URL'deki `id` query parametresi; yoksa boş string atanır; `load` fonksiyonuna bağımlılık olarak kullanılır
+  - `quote` — `useState<QuoteWithItems | null>(null)` ile tutulan teklif detayı; yükleme sonrası `setQuote` ile güncellenir; null ise "bulunamadı" ekranı gösterilir
+  - `setQuote` — `quote` state'inin setter fonksiyonu; `load` ve `handleDecision` içinde teklif verisini atamak için kullanılır
+  - `loading` — `useState(true)` ile tutulan yükleme durumu; true iken spinner gösterilir
+  - `setLoading` — `loading` state'inin setter fonksiyonu; `load` içinde yükleme başlangıcında true, bitişinde false yapılır
+  - `deciding` — `useState(false)` ile tutulan karar verme durumu; butonların `disabled` prop'una bağlanır
+  - `setDeciding` — `deciding` state'inin setter fonksiyonu; `handleDecision` içinde işlem başlangıcında true, bitişinde false yapılır
+  - `load` — `useCallback` ile sarılmış async fonksiyon; `quoteId` varsa `getQuoteDetail` çağırarak teklif detayını yükler, state'i günceller
+  - `statusLabel` — durum string'ini alıp `t('quotes.statusLabels.${s}')` ile çevrilmiş etiket döndüren fonksiyon
+  - `statusClass` — durum string'ini alıp ilgili Tailwind CSS sınıfını döndüren fonksiyon; switch-case ile requested/quoted/accepted/rejected/expired/default durumlarını eşler
+  - `handleDecision` — async fonksiyon; `decision` parametresiyle kabul/red işlemi yapar, onay dialogu gösterir, `decideQuote` çağırır, ardından `load` ile veriyi yeniler
+  - `allPriced` — `quote.items.length > 0` VE `quote.items.every((i) => typeof i.unit_price === 'number')` koşullarının sonucu; tüm kalemlerin fiyatlı olup olmadığını belirten boolean
+  - `currencies` — `quote.items.map((i) => i.currency ?? 'TRY')` ile oluşturulan para birimlerini tutan `Set`; tek para birimi kontrolü için kullanılır
+  - `singleCurrency` — `currencies.size === 1` ise tek para birimi string'i, değilse null; toplam hesaplamada ve `formatCurrency` çağrılarında kullanılır
+  - `total` — `allPriced && singleCurrency` koşulu sağlanıyorsa `quote.items.reduce((sum, i) => sum + Number(i.unit_price) * i.qty, 0)` ile hesaplanan toplam fiyat; sağlanmıyorsa null
+  - `actions` — `allowedCustomerQuoteActions(quote.status)` fonksiyonundan dönen izin verilen aksiyon dizisi; butonların gösterilip gösterilmeyeceğini kontrol eder
+- **Dönüş**: JSX (React bileşeni); loading durumunda spinner, quote null ise "bulunamadı" ekranı, aksi halde teklif detay tablosu ve aksiyon butonları render eder
 
-### [N2_NASIL] AST Pointer: QuoteDetailPage.tsx::load
-- **params**: ()
+### [N2_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::load (useCallback)
+- **params**: yok (useCallback içinde tanımlanmış, bağımlılıkları: `[quoteId, t]`)
 - **ic_degiskenler**:
-  - `detail` — getQuoteDetail asenkron fonksiyonundan dönen teklif detay verisi
-- **Dönüş**: Promise<void> (yan etkiler: quote state'ini günceller, hata durumunda toast gösterir)
+  - `detail` — `await getQuoteDetail(supabase, quoteId)` sonucu dönen teklif detayı; `setQuote(detail)` ile state'e atanır
+  - `e` — `catch` bloğunda yakalanan hata nesnesi; `console.warn` ile loglanır
+- **Dönüş**: yok (void); yan etkileri: `setLoading`, `setQuote` state güncellemeleri, hata durumunda `toast.error` gösterimi
 
-### [N3_NASIL] AST Pointer: QuoteDetailPage.tsx::useEffect
-- **params**: ()
-- **ic_degiskenler**:
-  - `user` — useAuth'dan gelen kullanıcı nesnesi, varsa yükleme işlemi başlatılır
-  - `load` — useCallback ile tanımlanan yükleme fonksiyonu, user mevcutsa çağrılır
-- **Dönüş**: void (yan etkiler: component mount veya dependency değiştiğinde load fonksiyonunu çağırır)
+### [N3_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::useEffect callback
+- **params**: yok
+- **ic_degiskenler**: yok (kapsam değişkenleri `user` ve `load` doğrudan erişilir)
+- **Dönüş**: yok; `user` truthy ise `load()` fonksiyonunu çağırır (void ile fire-and-foretch)
 
-### [N4_NASIL] AST Pointer: QuoteDetailPage.tsx::statusLabel
-- **params**: `(s: string)` — durum string'i parametresi
-- **ic_degiskenler**:
-  - `s` — durum değerini temsil eden string parametre
-- **Dönüş**: string (çevrilmiş durum etiketi)
+### [N4_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::statusLabel
+- **params**: `s` — durum string'i (örn: 'requested', 'quoted', 'accepted', 'rejected', 'expired')
+- **ic_degiskenler**: yok
+- **Dönüş**: string — `t('quotes.statusLabels.${s}')` ile çevrilmiş durum etiketi
 
-### [N5_NASIL] AST Pointer: QuoteDetailPage.tsx::statusClass
-- **params**: `(s: string)` — durum string'i parametresi
-- **ic_degiskenler**:
-  - `s` — durum değerini temsil eden string parametre
-- **Dönüş**: string (duruma göre CSS sınıf adı)
+### [N5_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::statusClass
+- **params**: `s` — durum string'i
+- **ic_degiskenler**: yok
+- **Dönüş**: string — Tailwind CSS sınıfı; switch-case ile: 'requested' → 'bg-yellow-100 text-yellow-800', 'quoted' → 'bg-blue-100 text-blue-800', 'accepted' → 'bg-green-100 text-green-800', 'rejected' → 'bg-red-100 text-red-800', 'expired' → 'bg-slate-100 text-slate-600', default → 'bg-air-blue/10 text-primary-navy'
 
-### [N6_NASIL] AST Pointer: QuoteDetailPage.tsx::handleDecision
-- **params**: `(decision: 'accepted' | 'rejected')` — karar tipi parametresi
+### [N6_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::handleDecision
+- **params**: `decision` — `'accepted' | 'rejected'` union tipinde karar değeri
 - **ic_degiskenler**:
-  - `quote` — mevcut teklif verisi (eğer null ise erken dönüş)
-  - `confirmKey` — karar tipine göre çeviri anahtarı
-  - `decision` — parametre olarak gelen karar ('accepted' veya 'rejected')
-- **Dönüş**: Promise<void> (yan etkiler: decideQuote çağırır, toast gösterir, load fonksiyonunu çağırarak state'i günceller)
+  - `confirmKey` — `decision === 'accepted'` ise 'quotes.detail.acceptConfirm', değilse 'quotes.detail.rejectConfirm'; onay dialogu çeviri anahtarı olarak kullanılır
+  - `e` — `catch` bloğunda yakalanan hata nesnesi; `console.error` ile loglanır
+- **Dönüş**: yok (void); yan etkileri: `window.confirm` ile onay dialogu, `setDeciding` state güncellemesi, `decideQuote(supabase, quote, decision)` API çağırısı, `toast.success`/`toast.error` gösterimi, `load()` ile veri yenileme
 
-### [N7_NASIL] AST Pointer: QuoteDetailPage.tsx::quote.items.map
-- **params**: `(item)` — QuoteItem tipinde teklif kalemi parametresi
-- **ic_degiskenler**:
-  - `item` — map fonksiyonuna parametre olarak gelen teklif kalemi nesnesi
-- **Dönüş**: JSX (tablo satırı)
+### [N7_NASIL] AST Pointer: src/views/account/quotes/QuoteDetailPage.tsx::items map callback
+- **params**: `item` — `quote.items` dizisinin elemanı (teklif kalemi nesnesi)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (`<tr>`); `item.id` key olarak kullanılır; `item.product_name`, `item.note`, `item.qty`, `item.unit_price`, `item.currency`, `item.valid_until` alanlarını render eder; `item.unit_price` number ise `formatCurrency` ile fiyat gösterilir, değilse '—' gösterilir; `item.valid_until` varsa `formatDate` ile tarih gösterilir, yoksa '—'
 
 ---
 
@@ -74207,13 +74303,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminDataRequestsPage.tsx
-skeleton_hash: eeaed5291ca40884
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminDataRequestsPage.tsx
+skeleton_hash: 12d6e79a377d0c88
 entity_hashes:
   func:AdminDataRequestsPage: e1dd1f73cd03951d
   overview: 7c61120601772da7
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-08-25T08:45:20Z
+generated_at: 2026-08-27T06:51:24Z
 ---
 
 ## Genel Bakış
@@ -74303,15 +74399,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminDataRequestsTableBody.tsx
-skeleton_hash: 36e587cb7691d7bf
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\AdminDataRequestsTableBody.tsx
+skeleton_hash: 1aa10776b8b74d5a
 entity_hashes:
   func:AdminDataRequestsTableBody: b5d28b85602c376e
   func:handleAdvance: 7d1914eaa5d3a97e
   func:handleCreate: 9301925a0b42520d
   overview: cd75a37133bf76a3
   style_tokens: b03bd00cd88982c4
-generated_at: 2026-08-25T08:46:18Z
+generated_at: 2026-08-27T06:51:24Z
 ---
 
 ## Genel Bakış
@@ -83026,13 +83122,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\quotes\AdminQuotesPage.tsx
-skeleton_hash: 1a87f71a21feb147
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\quotes\AdminQuotesPage.tsx
+skeleton_hash: 603a3f3b881f2c38
 entity_hashes:
   func:AdminQuotesPage: 8f282793cec53879
   overview: ed62e4d1f35d7caa
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-08-25T07:30:46Z
+generated_at: 2026-08-27T06:51:24Z
 ---
 
 ## Genel Bakış
@@ -83095,8 +83191,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## NODE ID STANDARD
 
-  file: AdminQuotesPage.tsx
-  function: AdminQuotesPage.tsx::AdminQuotesPage
+  file: src\views\admin\quotes\AdminQuotesPage.tsx
+  function: src\views\admin\quotes\AdminQuotesPage.tsx::AdminQuotesPage
 
 ---
 
@@ -83126,16 +83222,16 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\views\admin\quotes\QuotesTableBody.tsx
-skeleton_hash: e6d88ca47bc7dd4d
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\quotes\QuotesTableBody.tsx
+skeleton_hash: 92a99eafdea613e5
 entity_hashes:
   func:QuotesTableBody: d1bbb10c17fb9016
   func:fetchCustomerMap: da57b157dcf3adb0
   func:isQuoteSource: ab3489a78af0e7bf
-  func:quotesFetcher: 546c53441445c9f6
-  overview: 8afffce1bd25e1cf
+  func:quotesFetcher: 44b6872dccd2a288
+  overview: 1bb4af583176183f
   style_tokens: 1c66ade338e8765e
-generated_at: 2026-08-25T07:31:08Z
+generated_at: 2026-08-27T04:27:07Z
 ---
 
 ## Genel Bakış
@@ -83182,7 +83278,15 @@ Modül, dışarıdan sağlanan SupabaseClient, Database, FetchParams, FetchResul
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### quotesFetcher
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Admin panelindeki teklifler (quotes) tablosu için Supabase'den veri çeker. Filtreleme, arama, sıralama ve sayfalama işlemlerini uygulayarak her teklifin kalemlerini (items) ve müşteri bilgilerini birleştirip `QuoteAdminRow` formatında sonuç döndürür.
+
+**Nasıl yapar**: Önce `ensureSessionFresh()` ile oturumun güncel olduğundan emin olur. `venthub_quotes` tablosu üzerinde `count: 'exact'` ile toplam kayıt sayısını da alacak bir sorgu oluşturur. URL'den gelen `status` ve `source` filtre değerlerini ilgili doğrulama fonksiyonları (`isQuoteStatus`, `isQuoteSource`) ile daraltır; bilinmeyen değerler sessizce süzülür ve sorguya sızmaz. Tek değer varsa `eq`, birden fazlaysa `in` operatörü kullanılır. Arama terimi (`params.query`) varsa `venthub_quote_items` tablosunda `product_name` alanı üzerinde `ilike` ile eşleşen `quote_id` değerleri bulunur; eşleşme yoksa boş sonuç dönülür. Sıralama `status`, `source` veya `created_at` anahtarlarına göre uygulanır; belirtilmemişse varsayılan olarak `created_at` azalan sıradadır. Sayfalama `offset` ve `range` ile gerçekleştirilir. Ana sorgu tamamlandıktan sonra, bulunan tekliflerin kalem bilgileri `venthub_quote_items` tablosundan toplu olarak çekilir ve `quote_id` bazlı bir `Map` yapısına gruplanır. Ardından `fetchCustomerMap` ile yalnızca `user_id` değeri null olmayan (yani hesaplı) tekliflerin müşteri adı ve e-posta bilgileri çekilir. Son olarak her teklif nesnesine kalem listesi, müşteri adı, müşteri e-postası ve müşteri arama başarısızlık durumu eklenerek `QuoteAdminRow` dizisi oluşturulur.
+
+**Parametreler**:
+- supabase: `SupabaseClient<Database>` — Supabase istemci nesnesi; veritabanı sorguları bu nesne üzerinden yapılır.
+- params: `FetchParams` — Sayfalama (`page`, `pageSize`), filtreler (`filters.status`, `filters.source`), arama terimi (`query`) ve sıralama (`sort.key`, `sort.dir`) bilgilerini içeren yapı.
+
+**Dönüş**: `Promise<FetchResult<QuoteAdminRow>>` — Asenkron olarak çözülen bir Promise. `rows` alanında `QuoteAdminRow` tipinde teklif dizisi, `totalMatched` alanında filtre ve arama koşullarına uyan toplam kayıt sayısı bulunur. Her `QuoteAdminRow` nesnesi orijinal teklif alanlarına ek olarak `items` (kalem listesi), `customer_name`, `customer_email` ve `customerLookupFailed` alanlarını içerir.
 
 ### QuotesTableBody
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -83208,8 +83312,6 @@ Modül, dışarıdan sağlanan SupabaseClient, Database, FetchParams, FetchResul
 - import: ../../../utils/adminUi::adminTableActionPrimaryClass
 - import: @/lib/admin/mutateWithAudit::AdminPermissionError
 - import: @/lib/admin/mutateWithAudit::mutateWithAudit
-- import: @/lib/quotes/quoteStatusMachine::allowedAdminQuoteActions
-- import: @/lib/quotes/quoteStatusMachine::isQuoteStatus
 - import: @/lib/supabase/client::supabaseBrowserClient
 - import: @supabase/supabase-js::type { SupabaseClient }
 - import: react::React
@@ -83243,7 +83345,7 @@ Kalem fiyat taslağı — kaydedilene kadar yerel.
 ---
 
 ## SABİTLER
-- **STATUS_VALUES** (as_expression) — `['requested', 'quoted', 'accepted', 'rejected', 'expired'] as const`
+- **QUOTE_STATUSES** (unknown)
 - **SOURCE_VALUES** (as_expression) — `['pdp', 'cart', 'project'] as const`
 
 ---
@@ -83251,101 +83353,148 @@ Kalem fiyat taslağı — kaydedilene kadar yerel.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::isQuoteSource
-- **params**: `value: string` — kontrol edilecek kaynak değeri
+- **params**: `value: string`
 - **ic_degiskenler**: yok
-- **Dönüş**: `boolean` — value'nun SOURCE_VALUES dizisinde bulunup bulunmadığı
-
----
+- **Dönüş**: `boolean` — `value`'nun `SOURCE_VALUES` dizisi içinde bulunup bulunmadığını döndürür (type guard: `value is QuoteSource`)
 
 ### [N2_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::fetchCustomerMap
-- **params**: `supabase: SupabaseClient<Database>` — Supabase istemcisi, `userIds: string[]` — müşteri kimlikleri dizisi
+- **params**: `supabase: SupabaseClient<Database>`, `userIds: string[]`
 - **ic_degiskenler**:
-  - `map` — `new Map<string, CustomerIdentity>()` ile oluşturulan, kullanıcı ID'sini müşteri kimliğine eşleyen harita
+  - `map` — `new Map<string, CustomerIdentity>()` ile oluşturulur; müşteri kimlik bilgilerini (isim, e-posta) saklar
   - `data` — `supabase.rpc('admin_list_all_users')` çağrısından dönen kullanıcı listesi
-  - `error` — RPC çağrısının hata durumu
-  - `u` — döngüdeki her bir kullanıcı nesnesi; `u.id`, `u.full_name`, `u.email` alanlarına erişilir
+  - `error` — RPC çağrısının hata nesnesi
+  - `u` — `data` dizisindeki her bir kullanıcı nesnesi; `u.id`, `u.full_name`, `u.email` alanlarına erişilir
   - `profiles` — `supabase.from('user_profiles').select('id, full_name').in('id', userIds)` sorgusundan dönen profil listesi (fallback)
-  - `profileError` — user_profiles sorgusunun hata durumu
-  - `p` — döngüdeki her bir profil nesnesi; `p.id`, `p.full_name` alanlarına erişilir
-- **Dönüş**: `Promise<{ map: Map<string, CustomerIdentity>; failed: boolean }>` — müşteri haritası ve başarısızlık durumu
-
----
+  - `profileError` — `user_profiles` sorgusunun hata nesnesi
+  - `p` — `profiles` dizisindeki her bir profil nesnesi; `p.id`, `p.full_name` alanlarına erişilir
+- **Dönüş**: `Promise<{ map: Map<string, CustomerIdentity>; failed: boolean }>` — müşteri kimlik haritası ve arama başarısızlık durumu
 
 ### [N3_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::quotesFetcher
-- **params**: `supabase: SupabaseClient<Database>` — Supabase istemcisi, `params: FetchParams` — filtreleme, sayfalama ve sıralama parametreleri
+- **params**: `supabase: SupabaseClient<Database>`, `params: FetchParams`
 - **ic_degiskenler**:
-  - `query` — `supabase.from('venthub_quotes').select('*', { count: 'exact' })` ile oluşturulan temel sorgu
-  - `statuses` — `params.filters.status` dizisinin `isQuoteStatus` ile daraltılmış hali
-  - `sources` — `params.filters.source` dizisinin `isQuoteSource` ile daraltılmış hali
+  - `query` — `supabase.from('venthub_quotes').select('*', { count: 'exact' })` ile başlatılan Supabase sorgu zinciri
+  - `statuses` — `params.filters.status` dizisinin `isQuoteStatus` ile süzülmüş hali
+  - `sources` — `params.filters.source` dizisinin `isQuoteSource` ile süzülmüş hali
   - `term` — `params.query.trim()` ile elde edilen arama terimi
-  - `matches` — `supabase.from('venthub_quote_items').select('quote_id').ilike('product_name', ...)` sorgusundan dönen eşleşen kalem listesi
-  - `matchError` — kalem arama sorgusunun hata durumu
-  - `ids` — eşleşen kalemlerden çıkarılan benzersiz quote_id dizisi (`new Set` ile)
-  - `sortKey` — `params.sort?.key` ile elde edilen sıralama anahtarı
-  - `ascending` — `params.sort?.dir === 'asc'` kontrolüyle belirlenen sıralama yönü
-  - `offset` — `(params.page - 1) * params.pageSize` ile hesaplanan sayfa başlangıcı
-  - `data` — `query.range(offset, offset + params.pageSize - 1)` sorgusundan dönen teklif satırları
-  - `error` — ana sorgunun hata durumu
-  - `count` — sorgudan dönen toplam eşleşme sayısı
-  - `quotes` — `data ?? []` ile null-safe alınan teklif dizisi
-  - `totalMatched` — `typeof count === 'number' ? count : quotes.length` ile belirlenen toplam eşleşme
-  - `items` — `supabase.from('venthub_quote_items').select('*').in('quote_id', ...)` sorgusundan dönen kalem listesi
-  - `itemsError` — kalem sorgusunun hata durumu
-  - `itemsByQuote` — `new Map<string, QuoteItemRow[]>()` ile oluşturulan, quote_id'ye göre kalemleri gruplayan harita
-  - `item` — döngüdeki her bir kalem nesnesi; `item.quote_id` alanına erişilir
-  - `list` — `itemsByQuote.get(item.quote_id) ?? []` ile elde edilen geçici kalem listesi
-  - `customers` — `fetchCustomerMap` çağrısından dönen müşteri haritası
-  - `failed` — `fetchCustomerMap` çağrısının başarısızlık durumu
-  - `rows` — `quotes.map((q) => ({...}))` ile oluşturulan nihai `QuoteAdminRow` dizisi
-  - `q` — döngüdeki her bir teklif nesnesi; `q.id`, `q.user_id` alanlarına erişilir
-- **Dönüş**: `Promise<FetchResult<QuoteAdminRow>>` — satırlar ve toplam eşleşme sayısı
-
----
+  - `matches` — `supabase.from('venthub_quote_items').select('quote_id').ilike('product_name', ...)` sorgusundan dönen eşleşen kalem kayıtları
+  - `matchError` — kalem arama sorgusunun hata nesnesi
+  - `ids` — `matches` dizisinden çıkarılan benzersiz `quote_id` değerleri (`new Set` ile tekrarlar kaldırılır)
+  - `sortKey` — `params.sort?.key` alanından gelen sıralama anahtarı (`'status'`, `'source'`, `'created_at'`)
+  - `ascending` — `params.sort?.dir === 'asc'` koşulunun sonucu; sıralama yönü
+  - `offset` — `(params.page - 1) * params.pageSize` hesaplamasıyla bulunan sayfa ofseti
+  - `data` — `query.range(offset, offset + params.pageSize - 1)` sorgusundan dönen satır dizisi
+  - `error` — ana sorgunun hata nesnesi
+  - `count` — ana sorgudan dönen toplam eşleşen kayıt sayısı
+  - `quotes` — `data ?? []` ile güvenli hale getirilen teklif satırları
+  - `totalMatched` — `typeof count === 'number' ? count : quotes.length` hesaplaması
+  - `items` — `supabase.from('venthub_quote_items').select('*').in('quote_id', ...)` sorgusundan dönen kalem satırları
+  - `itemsError` — kalem sorgusunun hata nesnesi
+  - `itemsByQuote` — `new Map<string, QuoteItemRow[]>()`; `quote_id` anahtarına göre gruplanmış kalemler haritası
+  - `item` — `items` dizisindeki her bir kalem nesnesi; `item.quote_id` ile gruplanır
+  - `list` — `itemsByQuote.get(item.quote_id)` ile alınan geçici liste; her iterasyonda güncellenir
+  - `customers` — `fetchCustomerMap` fonksiyonundan dönen `map` (müşteri kimlik haritası)
+  - `failed` — `fetchCustomerMap` fonksiyonundan dönen `failed` (arama başarısızlık durumu)
+  - `rows` — `quotes.map(...)` ile oluşturulan `QuoteAdminRow[]` dizisi; her satıra `items`, `customer_name`, `customer_email`, `customerLookupFailed` eklenir
+  - `q` — `quotes` dizisindeki her bir teklif nesnesi; `q.id`, `q.user_id` alanlarına erişilir
+- **Dönüş**: `Promise<FetchResult<QuoteAdminRow>>` — `{ rows, totalMatched }` yapısında
 
 ### [N4_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::QuotesTableBody
 - **params**: yok
 - **ic_degiskenler**:
-  - `supabaseBrowserClient` — import edilen Supabase tarayıcı istemcisi
-  - `t` — çeviri fonksiyonu (i18n)
+  - `drafts`, `setDrafts` — `useState` ile yönetilen kalem fiyat taslakları durumu (her `item.id` için `unit_price`, `currency`, `valid_until` alanları)
+  - `updatingId`, `setUpdatingId` — `useState<string | null>` ile yönetilen, güncelleme işlemi yapılan satırın ID'si
+  - `facetCounts`, `setFacetCounts` — `useState` ile yönetilen `status` ve `source` facet sayıları (`Record<string, number>` yapısı)
+  - `table` — `DataTableKit` bileşeninden dönen tablo örneği; `table.reload()`, `table.filtering.filters`, `table.filtering.setFilter` erişimleri kullanılır
+  - `hasWriteAccess` — admin yazma yetkisi kontrol sonucu (boolean)
+  - `t` — i18n çeviri fonksiyonu
   - `lang` — mevcut dil kodu
-  - `hasWriteAccess` — yazma yetkisi olup olmadığını gösteren boolean
-  - `drafts` — kalem fiyat taslaklarını tutan state; anahtar olarak `item.id`, değer olarak `{ unit_price, currency, valid_until }` nesnesi
-  - `setDrafts` — `drafts` state'ini güncelleyen setter fonksiyonu
-  - `updatingId` — şu anda güncellenen satırın ID'sini tutan state
-  - `setUpdatingId` — `updatingId` state'ini güncelleyen setter fonksiyonu
-  - `facetCounts` — `{ status: Record<string, number>, source: Record<string, number> }` şeklinde facet sayımlarını tutan state
-  - `setFacetCounts` — `facetCounts` state'ini güncelleyen setter fonksiyonu
-  - `table` — `DataTableKit` bileşeninden dönen tablo nesnesi; `table.reload()`, `table.filtering.filters`, `table.filtering.setFilter` metotlarına erişilir
-  - `fetchFacetCounts` — async fonksiyon; `supabaseBrowserClient.from('venthub_quotes').select('status, source')` sorgusuyla facet sayımlarını çeker
-  - `data` — facet sorgusundan dönen satırlar dizisi; `row.status`, `row.source` alanlarına erişilir
-  - `error` — facet sorgusunun hata durumu
-  - `status` — durum sayımlarını tutan `Record<string, number>` nesnesi
-  - `source` — kaynak sayımlarını tutan `Record<string, number>` nesnesi
-  - `row` — döngüdeki her bir facet satırı
-  - `getStatusIcon` — status parametresi alan fonksiyon; duruma göre lucide-react ikonu döner (`Clock`, `FileText`, `CheckCircle`, `XCircle`, `Hourglass`)
-  - `getStatusColor` — status parametresi alan fonksiyon; duruma göre CSS sınıfı döner
-  - `getStatusLabel` — status parametresi alan fonksiyon; duruma göre etiket döner
-  - `savePrices` — async fonksiyon; `row: QuoteAdminRow` parametresi alır, kalem fiyatlarını kaydeder
-  - `updates` — `row.items.map(...)` ile oluşturulan, geçerli fiyat güncellemelerini içeren dizi
-  - `item` — döngüdeki her bir kalem nesnesi; `item.id` alanına erişilir
-  - `draft` — `drafts[item.id]` ile elde edilen taslak nesne; `draft.unit_price`, `draft.currency`, `draft.valid_until` alanlarına erişilir
-  - `price` — `draft.unit_price`'ın sayısal karşılığı (boşsa null)
-  - `u` — döngüdeki her bir güncelleme nesnesi; `u.itemId`, `u.unit_price`, `u.currency`, `u.valid_until` alanlarına erişilir
-  - `e` — yakalanan hata nesnesi; `AdminPermissionError` instance kontrolü yapılır
-  - `handleStatusUpdate` — async fonksiyon; `row: QuoteAdminRow` ve `newStatus: string` parametreleri alır, teklif durumunu günceller
-  - `allowed` — `allowedAdminQuoteActions(row.status)` ile elde edilen izin verilen durumlar dizisi
-  - `oldStatus` — `row.status` ile elde edilen eski durum
-  - `message` — müşteri bildirim mesajı; `newStatus === 'quoted'` veya `newStatus === 'expired` durumuna göre belirlenir
-  - `renderDetail` — fonksiyon; `row: QuoteAdminRow` parametresi alır, detay görünümünü render eder
-  - `editable` — `hasWriteAccess && row.status === 'requested'` kontrolüyle belirlenen düzenleme durumu
-  - `columns` — fonksiyon; tablo sütun tanımlarını döner (`customer`, `items`, `source`, `status`, `created_at`, `actions`)
-  - `r` — sütun cell fonksiyonlarındaki her bir satır nesnesi; `r.customer_name`, `r.user_id`, `r.customer_email`, `r.customerLookupFailed`, `r.items`, `r.source`, `r.status`, `r.created_at` alanlarına erişilir
-  - `next` — `allowedAdminQuoteActions(r.status)` ile elde edilen sonraki durumlar dizisi
-  - `status` — döngüdeki her bir durum değeri
-  - `facets` — fonksiyon; facet filtre tanımlarını döner (`status`, `source`)
-  - `facet` — döngüdeki her bir facet nesnesi; `facet.key` alanına erişilir
-  - `values` — facet filtre değişikliğindeki yeni değerler dizisi
-- **Dönüş**: `React.FC` — teklifler tablosu gövdesini render eden React bileşeni
+  - `supabaseBrowserClient` — tarayıcı tarafı Supabase istemcisi
+  - `fetchFacetCounts` — async arrow fonksiyonu; `supabaseBrowserClient.from('venthub_quotes').select('status, source')` ile facet sayılarını çeker, `status` ve `source` nesnelerini oluşturup `setFacetCounts` ile günceller
+  - `getStatusIcon` — `status: string` parametreli fonksiyon; durum ikonu bileşeni döndürür (`Clock`, `FileText`, `CheckCircle`, `XCircle`, `Hourglass`)
+  - `getStatusColor` — `status: string` parametreli fonksiyon; duruma göre CSS sınıfı dizesi döndürür
+  - `savePrices` — `row: QuoteAdminRow` parametreli async arrow fonksiyonu; `drafts` içindeki fiyat taslaklarını `mutateWithAudit` ile `venthub_quote_items` tablosuna yazar
+  - `updates` — `row.items.map(...)` ile oluşturulan güncelleme dizisi; her eleman `itemId`, `unit_price`, `currency`, `valid_until` içerir
+  - `draft` — `drafts[item.id]` ile erişilen tek bir kalem taslağı
+  - `price` — `draft.unit_price`'ın sayısal dönüşümü; boşsa `null`, geçersizse filtrelenir
+  - `u` — `updates` dizisindeki her bir güncelleme nesnesi
+  - `handleStatusUpdate` — `row: QuoteAdminRow`, `newStatus: string` parametreli async arrow fonksiyonu; teklif durumunu `mutateWithAudit` ile günceller, müşteri bildirimi gönderir
+  - `allowed` — `allowedAdminQuoteActions(row.status)` ile elde edilen izin verilen durum geçişleri dizisi
+  - `oldStatus` — güncelleme öncesi mevcut durum (`row.status`)
+  - `message` — müşteriye gönderilecek e-posta bildirim metni; `newStatus`'a göre `'quoted'` veya `'expired'` içeriği seçilir
+  - `renderDetailPanel` — `row: QuoteAdminRow` parametreli fonksiyon; kalemlerin fiyat düzenleme arayüzünü render eder
+  - `editable` — `hasWriteAccess && row.status === 'quoted'` koşulu; fiyat düzenlemenin etkin olup olmadığını belirler
+  - `item` — `row.items` dizisindeki her bir kalem nesnesi; `item.id`, `item.product_name`, `item.qty`, `item.note`, `item.unit_price`, `item.currency`, `item.valid_until` alanlarına erişilir
+  - `columns` — tablo sütun tanımlarını döndüren arrow fonksiyonu; `customer`, `items`, `source`, `status`, `created_at`, `actions` sütunlarını içerir
+  - `r` — sütun `cell` fonksiyonlarındaki her bir satır nesnesi (`QuoteAdminRow`); `r.contact_name`, `r.customer_name`, `r.user_id`, `r.contact_email`, `r.customer_email`, `r.customerLookupFailed`, `r.items`, `r.source`, `r.status`, `r.created_at` alanlarına erişilir
+  - `next` — `allowedAdminQuoteActions(r.status)` ile elde edilen izin verilen durum geçişleri (actions sütununda)
+  - `status` — `next.map(...)` içindeki her bir hedef durum değeri
+  - `filterFacets` — facet filtre tanımlarını döndüren arrow fonksiyonu; `status` ve `source` facet'lerini içerir
+  - `facet` — `filterFacets` dizisindeki her bir facet nesnesi; `facet.key`, `facet.label`, `facet.options` alanlarına erişilir
+  - `value` — facet seçeneklerindeki her bir değer; `STATUS_VALUES` veya `SOURCE_VALUES` dizilerinden gelir
+- **Dönüş**: `React.FC` — React fonksiyonel bileşeni
+
+### [N5_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::fetchFacetCounts (QuotesTableBody içinde)
+- **params**: yok
+- **ic_degiskenler**:
+  - `data` — `supabaseBrowserClient.from('venthub_quotes').select('status, source')` sorgusundan dönen satır dizisi
+  - `error` — sorgu hatası
+  - `status` — `Record<string, number>`; her durum değerinden kaç adet olduğunu tutar
+  - `source` — `Record<string, number>`; her kaynak değerinden kaç adet olduğunu tutar
+  - `row` — `data` dizisindeki her bir satır; `row.status` ve `row.source` alanlarına erişilir
+  - `err` — `catch` bloğunda yakalanan hata; `console.warn` ile loglanır
+- **Dönüş**: `Promise<void>` — yan etki olarak `setFacetCounts({ status, source })` çağrısı yapar
+
+### [N6_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::getStatusIcon (QuotesTableBody içinde)
+- **params**: `status: string`
+- **ic_degiskenler**: yok (switch-case ile doğrudan JSX döndürür)
+- **Dönüş**: `React.ReactNode` — duruma göre ikon bileşeni (`Clock`, `FileText`, `CheckCircle`, `XCircle`, `Hourglass`)
+
+### [N7_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::getStatusColor (QuotesTableBody içinde)
+- **params**: `status: string`
+- **ic_degiskenler**: yok (switch-case ile doğrudan CSS sınıfı dizesi döndürür)
+- **Dönüş**: `string` — duruma göre Tailwind CSS sınıf dizesi
+
+### [N8_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::savePrices (QuotesTableBody içinde)
+- **params**: `row: QuoteAdminRow`
+- **ic_degiskenler**:
+  - `updates` — `row.items.map(...)` ile oluşturulan geçerli fiyat güncelleme dizisi; `null` olmayan elemanlar filtrelenir
+  - `item` — `row.items` dizisindeki her bir kalem; `item.id` ile `drafts` içindeki taslağa erişilir
+  - `draft` — `drafts[item.id]` ile erişilen kalem taslağı; bulunamazsa `null` döner
+  - `price` — `draft.unit_price`'ın sayısal dönüşümü; boşsa `null`, negatif veya sonlu değilse eleme yapılır
+  - `u` — `updates` dizisindeki her bir güncelleme nesnesi; `u.itemId`, `u.unit_price`, `u.currency`, `u.valid_until` alanlarına sahiptir
+  - `e` — `catch` bloğunda yakalanan hata; `AdminPermissionError` türü kontrol edilir
+- **Dönüş**: `Promise<void>` — yan etki olarak `mutateWithAudit` ile `venthub_quote_items` satırlarını günceller, `toast` bildirimi gösterir, `table.reload()` çağrısı yapar
+
+### [N9_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::handleStatusUpdate (QuotesTableBody içinde)
+- **params**: `row: QuoteAdminRow`, `newStatus: string`
+- **ic_degiskenler**:
+  - `allowed` — `allowedAdminQuoteActions(row.status)` ile elde edilen izin verilen durum geçişleri dizisi
+  - `oldStatus` — güncelleme öncesi mevcut durum (`row.status`)
+  - `message` — müşteriye gönderilecek Türkçe e-posta bildirim metni; `'quoted'` veya `'expired'` durumuna göre içerik seçilir
+  - `e` — `catch` bloğunda yakalanan hata; `AdminPermissionError` türü kontrol edilir
+- **Dönüş**: `Promise<void>` — yan etki olarak `mutateWithAudit` ile `venthub_quotes` durumunu günceller, müşteri e-posta bildirimi gönderir (`supabaseBrowserClient.functions.invoke('notification-service', ...)`), `toast` bildirimi gösterir, `table.reload()` çağrısı yapar
+
+### [N10_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::renderDetailPanel (QuotesTableBody içinde)
+- **params**: `row: QuoteAdminRow`
+- **ic_degiskenler**:
+  - `editable` — `hasWriteAccess && row.status === 'requested'` koşulu; fiyat düzenlemenin etkin olup olmadığını belirler
+  - `item` — `row.items` dizisindeki her bir kalem nesnesi; `item.id`, `item.product_name`, `item.qty`, `item.note`, `item.unit_price`, `item.currency`, `item.valid_until` alanlarına erişilir
+  - `draft` — `drafts[item.id]` ile erişilen kalem taslağı; bulunamazsa varsayılan değerler kullanılır (`unit_price`, `currency: 'TRY'`, `valid_until`)
+- **Dönüş**: `JSX.Element` — kalem fiyat düzenleme arayüzü; `editable` true ise input alanları ve kaydet butonu gösterilir
+
+### [N11_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::columns (QuotesTableBody içinde)
+- **params**: yok
+- **ic_degiskenler**:
+  - `r` — sütun `cell` fonksiyonlarındaki her bir satır nesnesi (`QuoteAdminRow`); `r.contact_name`, `r.customer_name`, `r.user_id`, `r.contact_email`, `r.customer_email`, `r.customerLookupFailed`, `r.items`, `r.source`, `r.status`, `r.created_at` alanlarına erişilir
+  - `next` — `allowedAdminQuoteActions(r.status)` ile elde edilen izin verilen durum geçişleri dizisi (actions sütununda)
+  - `status` — `next.map(...)` içindeki her bir hedef durum değeri
+- **Dönüş**: `Array` — tablo sütun tanımları dizisi (`customer`, `items`, `source`, `status`, `created_at`, `actions` sütunları)
+
+### [N12_NASIL] AST Pointer: src/views/admin/quotes/QuotesTableBody.tsx::filterFacets (QuotesTableBody içinde)
+- **params**: yok
+- **ic_degiskenler**:
+  - `value` — `STATUS_VALUES.map(...)` ve `SOURCE_VALUES.map(...)` içindeki her bir facet değeri; `getStatusLabel(value)` veya `t(...)` ile etiketlenir, `facetCounts.status[value]` veya `facetCounts.source[value]` ile sayı alınır
+- **Dönüş**: `Array` — facet filtre tanımları dizisi (`status` ve `source` facet'leri; her biri `key`, `label`, `options` içerir)
 
 ---
 
@@ -83362,11 +83511,11 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: QuotesTableBody.tsx
-  function: QuotesTableBody.tsx::isQuoteSource
-  function: QuotesTableBody.tsx::fetchCustomerMap
-  function: QuotesTableBody.tsx::quotesFetcher
-  function: QuotesTableBody.tsx::QuotesTableBody
+  file: src\views\admin\quotes\QuotesTableBody.tsx
+  function: src\views\admin\quotes\QuotesTableBody.tsx::isQuoteSource
+  function: src\views\admin\quotes\QuotesTableBody.tsx::fetchCustomerMap
+  function: src\views\admin\quotes\QuotesTableBody.tsx::quotesFetcher
+  function: src\views\admin\quotes\QuotesTableBody.tsx::QuotesTableBody
 
 ---
 

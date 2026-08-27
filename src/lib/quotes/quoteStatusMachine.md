@@ -2,47 +2,36 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\lib\quotes\quoteStatusMachine.ts
-skeleton_hash: e0a1736a17035e65
+source_path: C:\tmp\venthub-wt-t131\src\lib\quotes\quoteStatusMachine.ts
+skeleton_hash: 4893342e90443170
 entity_hashes:
   func:allowedAdminQuoteActions: 527db9e8d24f07d1
   func:allowedCustomerQuoteActions: ff371ca17d0fdcd5
   func:allowedNextQuoteStatuses: 905bc470f37c0a4f
   func:isQuoteStatus: 30e87a91152dfbe2
   func:isTerminalQuoteStatus: 9ed0f176ae307ca3
-  overview: 804e34a9edfeb244
-generated_at: 2026-08-16T10:21:25Z
+  overview: 8bb19c1c6129ad32
+generated_at: 2026-08-27T04:28:01Z
 ---
 
 ## Genel Bakış
-Bu modül, bir teklifin (quote) yaşam döngüsündeki durum geçişlerini ve izin verilen eylemleri tanımlayan merkezi bir durum makinesidir. Tekliflerin farklı durumları (örneğin taslak, beklemede, kabul edildi) arasındaki geçiş kurallarını ve bu durumlarda yönetici veya müşteri tarafından yapılabilecek eylemleri kontrol eder. Modül, teklif iş akışının tutarlılığını sağlamak için kritik bir mimari role sahiptir.
+Bu modül, tekliflerin yaşam döngüsündeki durum geçişlerini merkezi olarak yöneten bir durum makinesi tanımlar. Teklif durumlarının doğrulanması, mevcut durumdan izin verilen sonraki durumların belirlenmesi ve farklı kullanıcı rolleri için geçerli eylemlerin kontrol edilmesi gibi temel işlevleri sağlar. Modül, `QUOTE_STATUSES` ve `QUOTE_TRANSITIONS` sabitlerine dayanır; bu sabitlerin doğru tanımlanmaması durumunda fonksiyonlar tutarsız veya boş sonuçlar üretebilir.
 
 ## Fonksiyon Grupları
 ### Durum Tanımlama ve Doğrulama
-Bu grup, geçerli teklif durumlarını doğrulamak ve belirli durumların son (terminal) olup olmadığını belirlemek için kullanılır.
+Teklif durumlarının geçerliliğini kontrol eder ve belirli durumların süreç sonu (terminal) durum olup olmadığını belirler.
 - isQuoteStatus, isTerminalQuoteStatus
 
 ### Geçiş Kuralları ve İzin Yönetimi
-Bu grup, mevcut duruma bağlı olarak izin verilen sonraki durumları ve farklı kullanıcı rolleri (yönetici, müşteri) için geçerli eylemleri belirler.
+Mevcut duruma bağlı olarak izin verilen sonraki durumları ve yönetici/müşteri rolleri için geçerli eylemleri tanımlar.
 - allowedNextQuoteStatuses, allowedAdminQuoteActions, allowedCustomerQuoteActions
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, quote durum makinesi (state machine) mantığını tanımlayan bir dizi sabit ve bu sabitlerle çalışan işlevlerden oluşur. Doğru çalışması için aşağıdaki mimari varsayımların karşılanması gerekir.
-
-[Aksiyom 1]: Eğer `QUOTE_STATUSES` sabiti (as_expression ile tanımlanan) geçerli bir durum kümesi içermiyorsa, `isQuoteStatus` işlevi her zaman `false` döner ve tüm durum geçiş işlevleri (`allowedNextQuoteStatuses`, `allowedAdminQuoteActions`, `allowedCustomerQuoteActions`) tutarsız veya boş sonuçlar üretebilir.
-
-[Aksiyom 2]: Eğer `QUOTE_TRANSITIONS` nesnesi, `QUOTE_STATUSES` kümesinde tanımlanmamış bir kaynak durum anahtarı içeriyorsa, `allowedNextQuoteStatuses` işlevi o durum için geçerli bir geçiş listesi bulamaz ve boş dizi (`[]`) döner veya tanımsız davranış gösterir.
-
-[Aksiyom 3]: Eğer `QUOTE_ADMIN_TRANSITIONS` veya `QUOTE_CUSTOMER_TRANSITIONS` nesneleri, `QUOTE_STATUSES` kümesinde bulunmayan bir durum anahtarı içeriyorsa, `allowedAdminQuoteActions` veya `allowedCustomerQuoteActions` işlevleri o durum için tanımsız davranış gösterir.
-
-[Aksiyom 4]: Eğer bir durum `QUOTE_TRANSITIONS` nesnesinde bir kaynak durum olarak tanımlı değilse, `isTerminalQuoteStatus` işlevi o durumu son (terminal) durum olarak kabul eder (`true` döner). Bu durum, işlevin mekanizması tarafından belirlenir ve sadece kaynak durum olarak tanımlı olmamaya bağlıdır.
-
-[Aksiyom 5]: Eğer `allowedNextQuoteStatuses`, `allowedAdminQuoteActions` veya `allowedCustomerQuoteActions` işlevlerinden birine, `QUOTE_STATUSES` kümesinde bulunmayan bir `current` parametresi verilirse, işlevin sonucu tanımsızdır veya boş dizi döner.
-
-[Aksiyom 6]: Eğer `QUOTE_TRANSITIONS` nesnesindeki bir geçiş (target state), `QUOTE_STATUSES` kümesinde tanımlı bir durum değilse, durum makinesi tutarsız bir yapıya sahiptir ve `allowedNextQuoteStatuses` işlevi geçersiz bir hedef durum listesi döner.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -110,56 +99,55 @@ type QuoteStatus = (typeof QUOTE_STATUSES)[number]
 ---
 
 ## SABİTLER
-- **QUOTE_STATUSES** (as_expression) — `['requested', 'quoted', 'accepted', 'rejected', 'expired'] as const`
+- **QUOTE_STATUSES** (as_expression) — `[
+  'draft',
+  'requested',
+  'quoted',
+  'accepted',
+  'rejected',
+  'expire...`
 - **QUOTE_TRANSITIONS** (object) — `{
-  requested: ['quoted', 'rejected'],
-  quoted: ['accepted', 'rejected', 'ex...`
+  draft: ['quoted', 'cancelled'],
+  requested: ['draft', 'rejected'],
+  quo...`
 - **QUOTE_ADMIN_TRANSITIONS** (object) — `{
-  requested: ['quoted', 'rejected'],
-  quoted: ['expired'],
-  accepted: [],...`
+  draft: ['quoted', 'cancelled'],
+  requested: ['draft', 'rejected'],
+  quo...`
 - **QUOTE_CUSTOMER_TRANSITIONS** (object) — `{
+  draft: [],
   requested: [],
   quoted: ['accepted', 'rejected'],
-  accepted: [],
-  reje...`
+  accepte...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/lib/quotes/quoteStatusMachine.ts::isQuoteStatus`
-- **params**: `value: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `value is QuoteStatus` (type guard) — `QUOTE_STATUSES` sabitinin `readonly string[]` olarak cast edilip `value` değerinin içerip içermediğini kontrol eder; geçerli bir alıntı durumu olup olmadığını belirler
+### [N1_NASIL] AST Pointer: src/lib/quotes/quoteStatusMachine.ts::isQuoteStatus
+- **params**: `value` — string türünde, geçerli bir teklif durumu olup olmadığı kontrol edilen değer
+- **ic_degiskenler**: yok
+- **Dönüş**: boolean — `value` parametresinin `QUOTE_STATUSES` dizisi içinde bulunup bulunmadığını döndürür (type guard: `value is QuoteStatus`)
 
----
+### [N2_NASIL] AST Pointer: src/lib/quotes/quoteStatusMachine.ts::allowedNextQuoteStatuses
+- **params**: `current` — string türünde, mevcut teklif durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: readonly QuoteStatus[] — `current` geçerli bir teklif durumu ise `QUOTE_TRANSITIONS[current]` dizisini, değilse boş dizi döndürür
 
-### [N2_NASIL] AST Pointer: `src/lib/quotes/quoteStatusMachine.ts::allowedNextQuoteStatuses`
-- **params**: `current: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `readonly QuoteStatus[]` — `current` geçerli bir QuoteStatus ise `QUOTE_TRANSITIONS[current]` ile bir sonraki geçilebilecek durumları döndürür; geçersiz ise boş dizi döndürür
+### [N3_NASIL] AST Pointer: src/lib/quotes/quoteStatusMachine.ts::allowedAdminQuoteActions
+- **params**: `current` — string türünde, mevcut teklif durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: readonly QuoteStatus[] — `current` geçerli bir teklif durumu ise `QUOTE_ADMIN_TRANSITIONS[current]` dizisini, değilse boş dizi döndürür
 
----
+### [N4_NASIL] AST Pointer: src/lib/quotes/quoteStatusMachine.ts::allowedCustomerQuoteActions
+- **params**: `current` — string türünde, mevcut teklif durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: readonly QuoteStatus[] — `current` geçerli bir teklif durumu ise `QUOTE_CUSTOMER_TRANSITIONS[current]` dizisini, değilse boş dizi döndürür
 
-### [N3_NASIL] AST Pointer: `src/lib/quotes/quoteStatusMachine.ts::allowedAdminQuoteActions`
-- **params**: `current: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `readonly QuoteStatus[]` — `current` geçerli bir QuoteStatus ise `QUOTE_ADMIN_TRANSITIONS[current]` ile yöneticinin yapabileceği geçişleri döndürür; geçersiz ise boş dizi döndürür
-
----
-
-### [N4_NASIL] AST Pointer: `src/lib/quotes/quoteStatusMachine.ts::allowedCustomerQuoteActions`
-- **params**: `current: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `readonly QuoteStatus[]` — `current` geçerli bir QuoteStatus ise `QUOTE_CUSTOMER_TRANSITIONS[current]` ile müşterinin yapabileceği geçişleri döndürür; geçersiz ise boş dizi döndürür
-
----
-
-### [N5_NASIL] AST Pointer: `src/lib/quotes/quoteStatusMachine.ts::isTerminalQuoteStatus`
-- **params**: `status: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `boolean` — `status` geçerli bir QuoteStatus olup olmadığını (`isQuoteStatus`) ve `QUOTE_TRANSITIONS[status]` uzunluğunun `0` olup olmadığını kontrol eder; geçiş yapılamayan (son durum) durumları tespit eder
+### [N5_NASIL] AST Pointer: src/lib/quotes/quoteStatusMachine.ts::isTerminalQuoteStatus
+- **params**: `status` — string türünde, kontrol edilen teklif durumu
+- **ic_degiskenler**: yok
+- **Dönüş**: boolean — `status` geçerli bir teklif durumu ise ve `QUOTE_TRANSITIONS[status]` dizisinin uzunluğu 0 ise true döndürür (son durum olup olmadığını belirtir)
 
 ---
 
@@ -172,9 +160,9 @@ graph TD
     quoteStatusMachine_ts__allowedNextQuoteStatuses["allowedNextQuoteStatuses"]
     quoteStatusMachine_ts__isQuoteStatus["isQuoteStatus"]
     quoteStatusMachine_ts__isTerminalQuoteStatus["isTerminalQuoteStatus"]
-    quoteStatusMachine_ts__allowedCustomerQuoteActions --> quoteStatusMachine_ts__isQuoteStatus
     quoteStatusMachine_ts__isTerminalQuoteStatus --> quoteStatusMachine_ts__isQuoteStatus
     quoteStatusMachine_ts__allowedAdminQuoteActions --> quoteStatusMachine_ts__isQuoteStatus
+    quoteStatusMachine_ts__allowedCustomerQuoteActions --> quoteStatusMachine_ts__isQuoteStatus
     quoteStatusMachine_ts__allowedNextQuoteStatuses --> quoteStatusMachine_ts__isQuoteStatus
 ```
 

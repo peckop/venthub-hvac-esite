@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\types\database.types.ts
-skeleton_hash: c2471dd70110decd
+source_path: C:\tmp\venthub-wt-t131\src\types\database.types.ts
+skeleton_hash: da220289893389ca
 entity_hashes:
   overview: ce3fb4ce44f2949f
-generated_at: 2026-08-25T07:30:14Z
+generated_at: 2026-08-27T04:30:18Z
 ---
 
 ## Genel Bakış
@@ -118,9 +118,17 @@ type CompositeTypes = <
 
 ---
 
+## AST POINTERS
+
+Bu dosya (`src\types\database.types.ts`) bir TypeScript tip tanımlama dosyasıdır. Dosyada fonksiyon gövdesi bulunmadığından AST Pointer oluşturulacak fonksiyon yoktur.
+
+Dosyada yalnızca `Constants` adında bir sabit tanımlı (`as_expression` olarak belirtilmiş); ancak bu bir fonksiyon değildir ve fonksiyon gövdesi içermez.
+
+---
+
 ## NODE ID STANDARD
 
-  file: database.types.ts
+  file: src\types\database.types.ts
 
 ---
 

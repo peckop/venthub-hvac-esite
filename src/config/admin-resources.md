@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-legal\src\config\admin-resources.ts
-skeleton_hash: 5a6a23e3891482a0
+source_path: C:\tmp\venthub-wt-t131\src\config\admin-resources.ts
+skeleton_hash: ad28254b6551f383
 entity_hashes:
   func:buildBreadcrumbTrail: e45b24520d27372b
   func:findCurrentResource: abacc39d28d65284
   func:isResourceActive: ba63647dd340162a
   overview: d59e42a983b00846
-generated_at: 2026-08-20T09:37:14Z
+generated_at: 2026-08-27T06:53:29Z
 ---
 
 ## Genel Bakış
