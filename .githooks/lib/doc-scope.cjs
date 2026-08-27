@@ -92,18 +92,29 @@ function kapsamYukle(kok) {
 const UZANTILAR = /\.(ts|tsx|mjs|cjs)$/
 
 /**
- * KAPSAM ALANI — ölçümden çıkarılmış, orion'un kaynağından değil; bu yüzden adıyla yazıyorum.
+ * KAPSAM ALANI — İLK SÜRÜMÜM YANLIŞTI, ÖLÇÜMLE DÜZELTİLDİ (2026-08-27).
  *
- * `.cc_docs.yaml` `source_dirs: [src, .]` diyor. `.`'ın "her şey, özyinelemeli" mi yoksa
- * "kök seviyesindeki dosyalar" mı olduğu yaml'dan ANLAŞILMIYOR. Gözlenen evren (T165-VH
- * süpürmesinde OPS'un `board.cjs` eşleştiricisiyle saydığı 732 companion-kaynağı) `src/**`
- * artı `next.config.mjs` gibi KÖK SEVİYESİ dosyaları içeriyor; `supabase/functions/*.ts`
- * ise kendi ayrı master'ına (`extra_masters`) sahip.
+ * İLK ÇIKARIM (yanlış): `.cc_docs.yaml` `source_dirs: [src, .]` diyor; `.`'ı "kök seviyesindeki
+ * dosyalar" diye yorumladım ve kapsamı `src/**` + kök ile sınırladım. PR'da bunun bir ÇIKARIM
+ * olduğunu adıyla yazmıştım — iyi ki yazmışım, çünkü yanlıştı.
  *
- * Bu yüzden kapsam = `src/**` + KÖK SEVİYESİ dosyalar. Sonuç iki kancayı da hafifçe
- * DÜZELTİR: post-merge'e kök + `mjs/cjs` eklenir, post-commit'ten derin `src` dışı dizinler
- * (ör. `supabase/functions`) çıkar — onlar zaten fonksiyon master'ıyla kapsanıyor.
- * Yanlışsa, yanlışlığı TEK yerde ve adıyla duruyor; iki kancada iki farklı hâlde değil.
+ * ÖLÇÜM (indikten hemen sonra, master'ın kendi ağacından): master'da TRACKED **766 companion**
+ * var (ölçüt: `X.md` yanında `X.{ts,tsx,mjs,cjs}` kardeşi olan `.md`). Benim ilk süzgecim
+ * bunların **66'sını atlıyordu**:
+ *     supabase/functions/**  ~28   ·  tests/e2e + helpers  19   ·  supabase/functions/_shared  12
+ *     e2e/  3  ·  scripts/media  2  ·  scripts/db/migrations  1  ·  .claude/hooks  1
+ * 19'u `tests`/`__tests__` altında, yani skip_dirs gereği ZATEN dışarıda kalmalı (eski
+ * artıklar). Kalan ~46'sı ise GERÇEK kapsamda ve süzgecim onları sessizce dışarıda bırakıyordu.
+ *
+ * NİÇİN CİDDİ: `post-commit`in eski hâli yol kısıtı KOYMUYORDU (`grep -E '\.(ts|tsx|mjs|cjs)$'`),
+ * yani o companion'lar üretiliyordu. Ben kapsamı daraltarak, tam da bu iş emrinde avladığım
+ * "sessizce üretilmeyen companion" sınıfını KENDİ ELİMLE ekledim. Bir gün sonra fark edilse
+ * `supabase/functions/_shared/*.md` bayatlar ve sebebi hiçbir yerde yazılı olmazdı.
+ *
+ * YENİ KURAL: kapsam yol derinliğiyle SINIRLANMAZ. Eleme YALNIZ SSOT'un söylediği eksenlerde
+ * yapılır — `skip_dirs`, `skip_files`, `.d.ts` ve test dosyası kalıbı. Böylece süzgeç
+ * `post-commit`in eski genişliğini korur, `post-merge`e de aynı genişliği getirir (T166'nın
+ * amacı buydu) ve SSOT dışında kendi kısıtını UYDURMAZ.
  */
 function kapsamda(bagil, kapsam) {
   const yol = bagil.replace(/\\/g, '/').replace(/^\.\//, '')
@@ -115,10 +126,6 @@ function kapsamda(bagil, kapsam) {
   const ad = parcalar[parcalar.length - 1]
   const dizinler = parcalar.slice(0, -1)
 
-  const kokSeviyesi = dizinler.length === 0
-  if (!kokSeviyesi && dizinler[0] !== 'src') {
-    return { ok: false, sebep: 'source_dirs disi (src/** ya da kok seviyesi degil)' }
-  }
   for (const d of dizinler) {
     if (kapsam.skipDirs.includes(d)) return { ok: false, sebep: 'skip_dirs: ' + d }
   }
