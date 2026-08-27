@@ -102,7 +102,16 @@ UPDATE product_families SET
 WHERE slug = 'vortice-lineo-quiet';
 
 -- 3.2 DÜZ hat için yeni seri (marka ve tenant mevcut seriden alınır).
-INSERT INTO product_families (name, slug, brand_id, model_code, metadata, tenant_id)
+--     ⚠ KOLON ADLARI ŞEMADAN ÖLÇÜLDÜ — ilk koşumda TAM BURASI patladı (2026-08-27 20:09Z,
+--       "column model_code of relation product_families does not exist"):
+--         · `model_code` PRODUCTS tablosunun kolonudur, product_families'de YOKTUR;
+--           ailedeki karşılığı `series_code`.
+--         · `metadata` CATEGORIES'in kolonudur; ailede serbest JSONB alanı `description`
+--           (NOT NULL, default '{}').
+--       Ürün tablosunun kolon adını aile tablosuna taşımışım. Şema varsayılmaz, ölçülür.
+--       Migration --single-transaction ile sarıldığı için prod'a KISMİ yazım olmadı
+--       (doğrulandı: JET/Lineo/SEAT üçü de eski hâlinde, 39 seri · 375 ürün sabit).
+INSERT INTO product_families (name, slug, brand_id, series_code, description, tenant_id)
 SELECT 'Vortice Lineo Kanal Fanları', 'vortice-lineo', f.brand_id, 'LINEO', '{}'::jsonb, f.tenant_id
 FROM product_families f
 WHERE f.slug = 'vortice-lineo-quiet'
