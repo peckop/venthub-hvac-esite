@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\getDictValue.ts
-skeleton_hash: 5dd3501554501d6b
+source_path: C:\tmp\vh-comp\src\i18n\getDictValue.ts
+skeleton_hash: fb78e2266fb5a28f
 entity_hashes:
-  func:getDictValue: 8458c9d7ff2daa26
+  func:getDictValue: 93fb357a5c54bf54
   overview: 3ad66d5b97f51555
-generated_at: 2026-06-15T11:41:12Z
+generated_at: 2026-08-27T06:51:14Z
 ---
 
 ## Genel Bakış
@@ -43,28 +43,29 @@ Bu modül, iç içe geçmiş nesne yapılarından nokta notasyonuyla (dot notati
 ## FONKSİYON DETAYLARI
 
 ### getDictValue
+**Ne yapar**: Sözlük yapısındaki bir obje üzerinde nokta-yolu (dot-path) ile güvenli bir şekilde değer çözümlemesi yapar. İstenen anahtar bulunamazsa, verilen `path` değerinin kendisini döndürür. Bu davranış, i18n (uluslararasılaştırma) bağlamlarında "ham anahtar" (raw key) semantiği sağlar; çağıran taraf, dönen değerin `path` ile aynı olup olmadığını kontrol ederek çözümlemenin başarısız olduğunu anlayabilir. Saf (pure) bir fonksiyondur ve `'use client'` direktifi içermez; bu sayede hem Server Component'larda hem de Client Component'larda kullanılabilir.
 
-**Ne yapar**: Verilen bir nesne (`obj`) içerisinde, nokta ile ayrılmış yollardan (ör. `"common.categoryList.ac"`) oluşan bir anahtarı (`path`) güvenli bir şekilde çözer. Anahtar yolu geçerli bir değere ulaşamazsa, çözülen değer yerine orijinal `path` dizesinin kendisini döndürür. Bu davranış, i18n sistemlerinde "ham anahtar" semantiğinin temelini oluşturur; çağrı yapan taraf `sonuç === path` karşılaştırması ile değerin çözülüp çözülmediğini anlayabilir.
-
-**Nasıl yapar**: Fonksiyon bir `try-catch` bloğu içinde çalışır. Öncelikle `path` dizesi nokta (`.`) karakteri kullanılarak bir dizi anahtara (`keys`) bölünür. Ardından `obj` nesnesi üzerinde bir döngü başlatılır; her bir alt anahtar (`k`) için mevcut nesnenin (`current`) bir nesne olup olmadığı ve ilgili anahtarın bu nesnenin içinde bulunup bulunmadığı kontrol edilir. Eğer herhangi bir aşamada anahtar bulunamazsa veya mevcut değer beklenen türde (nesne) değilse, döngü kırılır ve orijinal `path` döndürülür. Döngü başarıyla tamamlanırsa, elde edilen son değerin türü kontrol edilir: `string` ise doğrudan, `number` veya `boolean` ise `String()` ile string'e dönüştürülerek döndürülür. Herhangi bir hata oluşursa (`catch` bloğu), fonksiyon yine `path` değerini döndürerek kırılgan bir davranış sergilemez. Fonksiyon saf (pure) bir yapıdadır ve `'use client'` direktifi içermez; bu nedenle hem Server Component'lerde hem de istemci taraflı kodda kullanılabilir.
+**Nasıl yapar**: Fonksiyon, verilen `path` string'ini nokta (`.`) karakterinden parçalara ayırarak bir anahtar dizisi oluşturur. Ardından bu anahtarları sırayla takip ederek obje üzerinde gezinir. Her adımda, mevcut değerin bir obje olup olmadığı ve istenen anahtarı içerip içermediği kontrol edilir. Eğer bir adımda anahtar bulunamazsa, döngüden çıkılarak orijinal `path` değeri geri döndürülür. Tüm anahtarlar başarıyla çözümlendiyse, elde edilen son değer kontrol edilir: eğer `string` türündeyse doğrudan, `number` veya `boolean` türündeyse `String()` ile string'e dönüştürülerek döndürülür. Diğer tüm durumlarda (örneğin değer bir obje veya `undefined` ise) yine `path` döndürülür. Tüm işlem bir `try-catch` bloğu içinde sarılıdır; herhangi bir istisna oluşursa güvenli bir şekilde `path` döndürülür.
 
 **Parametreler**:
-- `obj`: `unknown` — Nokta yolu ile erişilecek olan sözlük (nesne) yapısı. Türü bilinmediği için `unknown` olarak belirtilmiştir; fonksiyon içinde her bir seviyede `typeof current === 'object'` kontrolü yapılarak güvenli bir şekilde işlenir.
-- `path`: `string` — Nokta ile ayrılmış anahtar yolu (ör. `"common.categoryList.ac"`). Fonksiyon bu yolu `.` karakterine göre bölerek her bir bileşeni sırasıyla nesne hiyerarşisinde aşağı doğru takip eder.
+- `obj`: `unknown` — Nokta-yolu ile değer aranacak sözlük yapısındaki kaynak obje. Türü `unknown` olarak belirtilmiştir; fonksiyon çalışma zamanında objenin yapısını kontrol ederek güvenli erişim sağlar.
+- `path`: `string` — Nokta ile ayrılmış anahtar yolu (ör. `"common.categoryList.ac"`). Her nokta, bir iç içe geçmiş obje seviyesini temsil eder.
 
-**Dönüş**: `string` — Çözümleme başarılıysa ilgili sözlük değeri (string, number veya boolean ise string'e dönüştürülmüş hali) döndürülür. Çözümleme başarısız olursa veya herhangi bir hata yakalanırsa, orijinal `path` parametresinin kendisi döndürülür. Bu sayede çağrı yapan kod, dönüş değeri ile orijinal yolu karşılaştırarak i18n anahtarının çözülüp çözülmediğini anlayabilir.
+**Dönüş**: `string` — Çözümlenen değerin string karşılığıdır. Değer bulunamazsa, bulunamama durumunu işaret etmek amacıyla verilen `path` parametresinin kendisi döndürülür. `number` ve `boolean` türündeki değerler otomatik olarak string'e dönüştürülür.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/i18n/getDictValue.ts::getDictValue
-- **params**: (obj: unknown, path: string)
+- **params**:
+  - `obj: unknown` — içinden değer aranacak sözlük/nesne
+  - `path: string` — nokta (`.`) ile ayrılmış erişim yolu (ör. `"menu.title"`)
 - **ic_degiskenler**:
-  - `keys` — path string'ini nokta charakteri ile split ederek elde edilen string dizisi; obje içinde derinlemesine erişim için adım adım kullanılır
-  - `current` — döngü içerisinde her seviyede güncellenen o anki erişilen değer; başlangıçta fonksiyona gelen obj parametresidir
-  - `k` — döngü iterasyonunda mevcut anahtar; keys dizisinden sırayla alınan her bir yol parçası
-- **Dönüş**: string — path ile erişilen değer string ise doğrudan o değer, number veya boolean ise String() ile stringify edilmiş hali, erişim başarısızsa veya hata oluşursa orijinal path döner
+  - `keys` — `path.split('.')` ile elde edilen anahtar dizisi; yol her noktadan bölünerek parçalara ayrılır
+  - `current` — nesne içinde gezinirken mevcut düğümü tutan değişken; başlangıçta `obj` değerine eşitlenir, her döngü adımında bir alt seviyeye iner
+  - `k` — `keys` dizisi üzerinde `for...of` döngüsüyle dolaşılan her bir anahtar
+- **Dönüş**: `string` — bulunan değer; `current` string ise doğrudan, number veya boolean ise `String(current)` ile dönüştürülerek döndürülür. Herhangi bir adımda anahtar bulunamazsa, `current` nesne değilse, değer string/number/boolean değilse ya da bir hata fırlarsa orijinal `path` değeri döndürülür.
 
 ---
 

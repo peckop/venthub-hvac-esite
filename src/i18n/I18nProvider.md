@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\I18nProvider.tsx
-skeleton_hash: 594e65ddf8b00878
+source_path: C:\tmp\vh-comp\src\i18n\I18nProvider.tsx
+skeleton_hash: b6bf55cd8050fe70
 entity_hashes:
   func:I18nProvider: e23d74154d179265
   func:interpolate: 02cc51f0bd59e8d6
   func:useI18n: 7f95c6a8fb408f61
   overview: 7eca34d148d2fa1f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-27T06:50:24Z
 ---
 
 ## Genel Bakış

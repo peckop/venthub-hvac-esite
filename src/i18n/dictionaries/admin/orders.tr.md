@@ -6,7 +6,7 @@ source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\orders.tr.ts
 skeleton_hash: 02db388bdd9a25e2
 entity_hashes:
   overview: f65c48db03384b35
-generated_at: 2026-08-27T04:13:27Z
+generated_at: 2026-08-27T06:50:44Z
 ---
 
 ## Genel Bakış

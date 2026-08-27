@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\i18n\dictionaries\admin\dataTable.tr.ts
-skeleton_hash: 6ac04dbe149770d0
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\dataTable.tr.ts
+skeleton_hash: 50458c43b62b8058
 entity_hashes:
   overview: 929ede5dd9b9aed8
-generated_at: 2026-08-25T07:27:22Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
@@ -43,7 +43,7 @@ Bu dosyada fonksiyon tanımlanmamıştır. Yalnızca `dataTable` adında bir obj
 
 ## NODE ID STANDARD
 
-  file: dataTable.tr.ts
+  file: src\i18n\dictionaries\admin\dataTable.tr.ts
 
 ---
 

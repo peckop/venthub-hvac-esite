@@ -6,7 +6,7 @@ source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\dashboard.tr.ts
 skeleton_hash: ef820fb27ef4f139
 entity_hashes:
   overview: 978b08ca21df4d0c
-generated_at: 2026-08-27T04:12:54Z
+generated_at: 2026-08-27T06:50:42Z
 ---
 
 ## Genel Bakış
