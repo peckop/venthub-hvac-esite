@@ -221,11 +221,33 @@ Kapı (`INV-DOC-5`) **ikisini karşılaştırır**: listede olan bir dosyada iş
 yeniden üretilmiştir → KIRMIZI. İşaret frontmatter'ın **içine** değil hemen ardına konur;
 frontmatter üretecin makine alanıdır.
 
-`gercek-sembol` = parantezsiz `AST Pointer:` başlık sayısı ve değer **master'daki değil TARİHSEL
-EN YÜKSEK** sayıdır. Niçin: geri-alma tabanı "bugünkü süpürmeden önce"ydi ve o taban **daha eski**
-turlarda kaybedilmiş sembolleri taşımıyor — "geri aldım" ≠ "TAM", yalnızca "bugünkü kayıp yok".
-Ölçüldü: dokuz dosyanın ikisi tarihsel maksimumun altındaydı (`InventoryTable` 4→6 `8172fdc9`,
-`FeaturedCommercialBlocks` 4→5 `a013f342`; üç sembol, önceki turların borcu).
+`gercek-sembol` = parantezsiz `AST Pointer:` başlık sayısı.
+
+#### C8.3.1 ⚠ ÇÜRÜTÜLMÜŞ KURAL: "tarihsel en yükseğe geri yükle"
+
+Bu madde ilk hâlinde *"değer master'daki değil TARİHSEL EN YÜKSEK sayıdır"* diyordu. Gerekçe
+sağlam görünüyordu: geri-alma tabanı "bugünkü süpürmeden önce"ydi ve o taban daha eski turlarda
+kaybedilmiş sembolleri taşımıyor — "geri aldım" ≠ "TAM". **Kural yine de yanlıştı ve ölçümle
+çürütüldü.** Zinciri adıyla kaydediyorum, çünkü çürütülmüş bir kural da bilgidir:
+
+| kim | ne dedi | sonuç |
+|---|---|---|
+| I18N | "tarihsel en yükseğe geri yükle" | önerdi, sonra **kendi geri aldı** |
+| AUTH | "kuralın bir sınırı var" + `N commit değişmiş` ölçütü | itiraz **haklı**, ölçütü **vekil** olduğu için kendi geri aldı |
+| I18N | doğru ölçüt: tarihsel sürümdeki tanımlayıcı **bugünkü kaynakta** var mı? | ölçüt **kabul edildi** |
+| ALTYAPI | iki dosyada kendim ölçtüm | geri yüklemeyi **iptal ettim** |
+
+Ölçüm: `InventoryTable`'ın 6 sembollü sürümünde **4** sembol (`sortIndicator`, `TableRow`,
+`groupedRows`, `rows`) bugünkü `.tsx`'te **yok**; `FeaturedCommercialBlocks`'un 5 sembollü
+sürümünde **2** sembol (`tabButton`, `productCard`) yok. Eski sürüm o günün kaynağını belgeliyor;
+kaynak değiştiyse geri yükleme **bugün olmayan şeyleri anlatan** bir dosya üretir.
+
+> **Eksik companion'dan kötüsü YANLIŞ companion'dır:** okuyan, var olduğu söylenen sembolü arar
+> ve bulamaz. Eksiklik "az bilgi"dir; yanlışlık "yanlış yön"dür.
+
+**DOĞRU KURAL:** değer, sembolleri **bugünkü kaynakta hâlâ var olan** en yüksek sayıdır. Ölçüt
+sembol varlığıdır; *"kaynak o günden beri N commit değişmiş"* ölçütü **vekildir** — sürüklenme
+ölçer, yanlışlık ölçmez. Bu ayrım AUTH'un kendi geri alışından çıktı ve §C8 boyunca geçerlidir.
 
 ### C8.4 Koordinasyona bağlı güvenliği, ÖLÇÜME bağlı güvenliğe çevir
 
