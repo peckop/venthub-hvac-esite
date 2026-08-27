@@ -72,7 +72,7 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
         theme: 'light',
         padding: 'medium',
       },
-      content: getInitialContent(type)
+      content: getInitialContent(type, t)
     } as AuthorityBlock;
 
     onChange([...blocks, newBlock]);
@@ -169,15 +169,15 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
   );
 };
 
-function getInitialContent(type: AuthorityBlockType): AuthorityBlock['content'] {
+function getInitialContent(type: AuthorityBlockType, t: ReturnType<typeof useI18n>['t']): AuthorityBlock['content'] {
   switch (type) {
-    case 'hero': return { title: 'Yeni Başlık', subtitle: 'Alt Başlık', description: 'Kısa açıklama metni...' };
-    case 'specs': return { title: 'Teknik Detaylar', rows: [{ label: 'Örnek', value: 'Değer' }] };
+    case 'hero': return { title: t('admin.authority.defaultHeroTitle'), subtitle: t('admin.authority.defaultHeroSubtitle'), description: t('admin.authority.defaultHeroDesc') };
+    case 'specs': return { title: t('admin.authority.defaultSpecsTitle'), rows: [{ label: t('admin.authority.defaultSpecsLabel'), value: t('admin.authority.defaultSpecsValue') }] };
     case 'media': return { mediaId: '', mediaType: 'video', aspectRatio: '16:9' };
-    case 'rich-text': return { html: '<p>Metin buraya gelecek...</p>' };
-    case 'features-grid': return { items: [{ title: 'Önerilen Özellik', description: 'Kısa açıklama...', icon: 'zap' }] };
-    case 'comparison': return { title: 'Önce/Sonra', leftLabel: 'Eski Sistem', rightLabel: 'VentHub Çözümü', leftImage: '', rightImage: '' };
-    case 'cta-banner': return { title: 'Bize Ulaşın', buttonLabel: 'Teklif Al', buttonLink: '/contact' };
+    case 'rich-text': return { html: t('admin.authority.defaultRichTextHtml') };
+    case 'features-grid': return { items: [{ title: t('admin.authority.defaultGridTitle'), description: t('admin.authority.defaultGridDesc'), icon: 'zap' }] };
+    case 'comparison': return { title: t('admin.authority.defaultCompTitle'), leftLabel: t('admin.authority.defaultCompLeft'), rightLabel: t('admin.authority.defaultCompRight'), leftImage: '', rightImage: '' };
+    case 'cta-banner': return { title: t('admin.authority.defaultCtaTitle'), buttonLabel: t('admin.authority.defaultCtaBtn'), buttonLink: '/contact' };
     default: return {} as AuthorityBlock['content'];
   }
 }
