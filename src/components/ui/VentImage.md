@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\ui\VentImage.tsx
-skeleton_hash: c33c889cb5e7319a
+source_path: C:\tmp\vh-altyapi-t165\src\components\ui\VentImage.tsx
+skeleton_hash: 485d928af75510ae
 entity_hashes:
   func:VentImage: 5527f2e63e5e22a5
   overview: ed4ba88e88a612db
-  style_tokens: 1d628435b48e7258
-generated_at: 2026-06-19T20:47:39Z
+  style_tokens: 602daf73ccaf621d
+generated_at: 2026-08-27T08:34:12Z
 ---
 
 ## Genel Bakış
@@ -124,4 +124,4 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Renkler:** `bg-gray-100/50`
 - **Layout:** `absolute`, `h-auto`, `transform-gpu`, `w-full`, `z-0`
 - **Varyant/Responsive:** `:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${className`, `${isFillMode`, `:`, `duration-300`, `ease-in-out`, `inset-0`, `isLoaded`, `object-cover`, `opacity-0`, `opacity-100`, `props.priority`, `transition-opacity`, `||`
+- **Yardımcı Sınıflar:** `$`, `${className`, `${isFillMode`, `/\bobject-/.test(className`, `:`, `duration-300`, `ease-in-out`, `inset-0`, `isLoaded`, `object-cover`, `opacity-0`, `opacity-100`, `props.priority`, `transition-opacity`, `||`

@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\home\CinematicProductShowcase.tsx
-skeleton_hash: f037089d85d30a21
+source_path: C:\tmp\vh-altyapi-t165\src\components\home\CinematicProductShowcase.tsx
+skeleton_hash: 214cf486e4132ff4
 entity_hashes:
   func:CinematicProductShowcase: 3aa8752ddebafcfc
   func:Hotspot: de57d250f854e416
@@ -11,7 +11,7 @@ entity_hashes:
   func:handleMouseMove: 717aaec7fdab40a5
   overview: 543d609da89f6ecb
   style_tokens: f822c8b8db2eb0c1
-generated_at: 2026-08-25T07:25:47Z
+generated_at: 2026-08-27T08:26:33Z
 ---
 
 ## Genel Bakış
@@ -173,11 +173,11 @@ graph TD
 
 ## NODE ID STANDARD
 
-  file: CinematicProductShowcase.tsx
-  function: CinematicProductShowcase.tsx::Hotspot
-  function: CinematicProductShowcase.tsx::CinematicProductShowcase
-  function: CinematicProductShowcase.tsx::handleMouseMove
-  function: CinematicProductShowcase.tsx::handleMouseLeave
+  file: src\components\home\CinematicProductShowcase.tsx
+  function: src\components\home\CinematicProductShowcase.tsx::Hotspot
+  function: src\components\home\CinematicProductShowcase.tsx::CinematicProductShowcase
+  function: src\components\home\CinematicProductShowcase.tsx::handleMouseMove
+  function: src\components\home\CinematicProductShowcase.tsx::handleMouseLeave
 
 ---
 

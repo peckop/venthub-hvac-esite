@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\calculators\StepIndicator.tsx
-skeleton_hash: 36265045b33ab050
+source_path: C:\tmp\vh-altyapi-t165\src\components\calculators\StepIndicator.tsx
+skeleton_hash: f7683af1ffd722c2
 entity_hashes:
   func:StepIndicator: 203f6e11e7ae2ca6
   overview: a00e439886770189
   style_tokens: a71e92d8d5570ada
-generated_at: 2026-06-19T20:47:06Z
+generated_at: 2026-08-27T08:26:30Z
 ---
 
 ## Genel Bakış

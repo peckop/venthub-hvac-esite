@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\UndecidedUserCTA.tsx
-skeleton_hash: 3ecd27f7ef8a142c
+source_path: C:\tmp\vh-altyapi-t165\src\components\UndecidedUserCTA.tsx
+skeleton_hash: dc8706624d47afb5
 entity_hashes:
   func:UndecidedUserCTA: e9ab9b6769bffef9
   overview: fcf28800e004a782
   style_tokens: d1dc68fb1553bbf5
-generated_at: 2026-08-25T07:24:06Z
+generated_at: 2026-08-27T07:58:35Z
 ---
 
 ## Genel Bakış
@@ -72,8 +72,8 @@ Bunlar genel React varsayımları kapsamına girdiğinden (kural gereği yazılm
 
 ## NODE ID STANDARD
 
-  file: UndecidedUserCTA.tsx
-  function: UndecidedUserCTA.tsx::UndecidedUserCTA
+  file: src\components\UndecidedUserCTA.tsx
+  function: src\components\UndecidedUserCTA.tsx::UndecidedUserCTA
 
 ---
 

@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\hooks\useTenant.tsx
-skeleton_hash: dbfcd5af80785735
+source_path: C:\tmp\vh-altyapi-t165\src\hooks\useTenant.tsx
+skeleton_hash: a75eef71f2e931f3
 entity_hashes:
   func:TenantProvider: 55e323a184679af4
   func:useTenant: 1b557639af7ddf07
   overview: ea8d03008ab03037
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T07:27:21Z
+generated_at: 2026-08-27T08:36:25Z
 ---
 
 ## Genel Bakış
@@ -99,9 +99,9 @@ Bu modül, tenant (kiracı) yapılandırma bilgisini React bileşen ağacı boyu
 
 ## NODE ID STANDARD
 
-  file: useTenant.tsx
-  function: useTenant.tsx::TenantProvider
-  function: useTenant.tsx::useTenant
+  file: src\hooks\useTenant.tsx
+  function: src\hooks\useTenant.tsx::TenantProvider
+  function: src\hooks\useTenant.tsx::useTenant
 
 ---
 

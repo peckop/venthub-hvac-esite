@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\MegaMenu.tsx
-skeleton_hash: 94fd26e812855e91
+source_path: C:\tmp\vh-altyapi-t165\src\components\MegaMenu.tsx
+skeleton_hash: 24fa44d9d911fbac
 entity_hashes:
   func:MegaMenu: 73d16c7403c0be73
   overview: 7b77f95abaa36af5
   style_tokens: 607cd2b8b83a451b
-generated_at: 2026-06-19T20:47:09Z
+generated_at: 2026-08-27T07:55:32Z
 ---
 
 ## Genel Bakış

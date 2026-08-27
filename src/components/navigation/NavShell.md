@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavShell.tsx
-skeleton_hash: 0c60bc38ac4baa40
+source_path: C:\tmp\vh-altyapi-t165\src\components\navigation\NavShell.tsx
+skeleton_hash: 5d9902da314e1146
 entity_hashes:
   func:NavShell: 6b1b48f5c901dde6
   overview: 5c6cc2484e8ea784
   style_tokens: fe546e0bed477a10
-generated_at: 2026-06-19T20:47:10Z
+generated_at: 2026-08-27T08:33:34Z
 ---
 
 ## Genel Bakış

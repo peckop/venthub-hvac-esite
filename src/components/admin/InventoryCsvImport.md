@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\InventoryCsvImport.tsx
-skeleton_hash: 768a388cd89758e5
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\InventoryCsvImport.tsx
+skeleton_hash: dd9394357b1fe44d
 entity_hashes:
   func:InventoryCsvImport: 9318bdab1aeb480b
   overview: 8a8e33b88d67f992
   style_tokens: 735539ffb01f0fbd
-generated_at: 2026-08-25T07:25:11Z
+generated_at: 2026-08-27T08:01:22Z
 ---
 
 ## Genel Bakış
@@ -199,8 +199,8 @@ CSV STOK İÇE AKTARMA. `dcc5a895` (Inventory → DataTableKit) göçünde impor
 
 ## NODE ID STANDARD
 
-  file: InventoryCsvImport.tsx
-  function: InventoryCsvImport.tsx::InventoryCsvImport
+  file: src\components\admin\InventoryCsvImport.tsx
+  function: src\components\admin\InventoryCsvImport.tsx::InventoryCsvImport
 
 ---
 

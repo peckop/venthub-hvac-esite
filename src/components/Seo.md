@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\Seo.tsx
-skeleton_hash: 56de44a929f57db0
+source_path: C:\tmp\vh-altyapi-t165\src\components\Seo.tsx
+skeleton_hash: ec5b2ea5a5d381b2
 entity_hashes:
   func:Seo: efb90eeb61c051d0
   overview: c4b11b13e9e25b50
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:47:34Z
+generated_at: 2026-08-27T07:58:30Z
 ---
 
 ## Genel Bakış

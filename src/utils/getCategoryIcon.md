@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\getCategoryIcon.tsx
-skeleton_hash: 3ebb541d03aef2e0
+source_path: C:\tmp\vh-altyapi-t165\src\utils\getCategoryIcon.tsx
+skeleton_hash: cfe275dcae465119
 entity_hashes:
   func:getCategoryIcon: e7e3d3061db761f5
   overview: c7c53a125873016e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-27T08:38:47Z
 ---
 
 ## Genel Bakış

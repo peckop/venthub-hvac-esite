@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\components\calculators\ResultCard.tsx
-skeleton_hash: 0f34bdbbaaf3dded
+source_path: C:\tmp\vh-altyapi-t165\src\components\calculators\ResultCard.tsx
+skeleton_hash: 5dc31bdb489790c9
 entity_hashes:
   func:Recommendations: cb90824638a4b1f2
   func:ResultCard: 3c33f679c49530b1
@@ -11,7 +11,7 @@ entity_hashes:
   func:getStatusConfig: 90a49b86c8e12ce2
   overview: 5c46ca5f553e8511
   style_tokens: 8d8fc38c13829fd7
-generated_at: 2026-08-17T13:20:03Z
+generated_at: 2026-08-27T08:26:29Z
 ---
 
 ## Genel Bakış

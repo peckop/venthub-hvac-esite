@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\wt-supurme\src\components\admin\products\ProductCsvImport.tsx
-skeleton_hash: 84a0e091fa0e547f
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\products\ProductCsvImport.tsx
+skeleton_hash: c0e5d32399c7f0b6
 entity_hashes:
   func:ProductCsvImport: 2d3e91e9df88f214
   overview: 59646c8b18833a0c
   style_tokens: 3b8273019bfac780
-generated_at: 2026-08-25T07:26:37Z
+generated_at: 2026-08-27T08:22:53Z
 ---
 
 ## Genel Bakış
@@ -70,8 +70,8 @@ Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzası
 
 ## NODE ID STANDARD
 
-  file: ProductCsvImport.tsx
-  function: ProductCsvImport.tsx::ProductCsvImport
+  file: src\components\admin\products\ProductCsvImport.tsx
+  function: src\components\admin\products\ProductCsvImport.tsx::ProductCsvImport
 
 ---
 

@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\CommandPalette.tsx
-skeleton_hash: 8953e81a0b0a0976
+source_path: C:\tmp\vh-altyapi-t165\src\components\admin\CommandPalette.tsx
+skeleton_hash: 03b652b86cf7221d
 entity_hashes:
   func:CommandPalette: d6aeed4e7453fe44
   func:handleKeyDown: 1487e8d647499b5f
   func:selectItem: 8a6a6e8e20f5896e
   overview: 0ae0fe4944b487b7
-  style_tokens: 7dfe1be44eebd77e
-generated_at: 2026-06-19T20:47:48Z
+  style_tokens: 7d0ca75a1c75e964
+generated_at: 2026-08-27T08:00:44Z
 ---
 
 ## Genel Bakış
@@ -330,10 +330,10 @@ graph TD
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-xl`, `shadow-glow-md`, `shadow-glow-sm`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-cyan-400/10`, `bg-surface-deep/10`, `bg-surface-deep/60`, `bg-transparent`, `bg-white/5`, `border-b`, `border-cyan-400/20`, `border-none`, `border-t`, `border-white/10`, `border-white/5`, `group-hover:text-cyan-400`, `hover:bg-white/5`, `hover:text-white`
-- **Layout:** `absolute`, `backdrop-blur-md`, `fixed`, `flex`, `flex-1`, `gap-1.5`, `gap-2`, `gap-4`, `h-1.5`, `h-10`, `h-16`, `h-5`, `h-8`, `h-full`, `items-center`
+- **Renkler:** `bg-admin-accent`, `bg-admin-accent-weak`, `bg-admin-surface`, `bg-admin-surface-2`, `bg-surface-deep/10`, `bg-surface-deep/60`, `bg-transparent`, `border-admin-accent/30`, `border-admin-border`, `border-b`, `border-none`, `border-t`, `group-hover:text-admin-accent`, `hover:bg-admin-surface-2`, `hover:text-admin-fg`
+- **Layout:** `absolute`, `fixed`, `flex`, `flex-1`, `gap-1.5`, `gap-2`, `gap-4`, `h-1.5`, `h-10`, `h-16`, `h-5`, `h-8`, `h-full`, `items-center`, `items-start`
 - **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `placeholder:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${isActive`, `:`, `animate-in`, `animate-pulse`, `animate-spin`, `border`, `cursor-default`, `cursor-pointer`, `cyan-glow`, `duration-200`, `font-black`, `font-bold`, `font-medium`, `font-mono`
+- **Yardımcı Sınıflar:** `$`, `${isActive`, `:`, `animate-in`, `animate-pulse`, `animate-spin`, `border`, `cursor-default`, `cursor-pointer`, `cyan-glow`, `duration-200`, `font-bold`, `font-medium`, `font-mono`, `font-semibold`

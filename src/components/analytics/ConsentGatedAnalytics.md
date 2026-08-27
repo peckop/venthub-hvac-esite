@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\analytics\ConsentGatedAnalytics.tsx
-skeleton_hash: 93b9759ea94cac66
+source_path: C:\tmp\vh-altyapi-t165\src\components\analytics\ConsentGatedAnalytics.tsx
+skeleton_hash: 74e2f92e69474c6f
 entity_hashes:
   func:ConsentGatedAnalytics: 9b16ee63b631e51c
   overview: a8de5e3a277277bd
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-08-25T08:43:28Z
+generated_at: 2026-08-27T08:24:01Z
 ---
 
 ## Genel Bakış
