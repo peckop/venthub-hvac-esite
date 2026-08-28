@@ -149,10 +149,13 @@ function yazmaHedefleri(komut) {
       if (digerleri[0] === 'checkout' && ayrac > -1) {
         digerleri.slice(ayrac + 1).forEach((y) => ekle(y, 'git checkout --'))
       } else if (digerleri[0] === 'restore') {
+        // --staged/-S CALISMA KOPYASINI DEGIL INDEXI degistirir: HEAD e dondurme degil,
+        // ayri bir is. Sebep AYRI isaretlenir ki geri-alma muafiyeti bunu KAPSAMASIN.
+        const stagedMi = digerleri.some((t) => t === '--staged' || t === '-S')
         digerleri
           .slice(1)
           .filter((t) => !bayrakMi(t))
-          .forEach((y) => ekle(y, 'git restore'))
+          .forEach((y) => ekle(y, stagedMi ? 'git restore --staged' : 'git restore'))
       }
     } else if (/^(node|python|python3|perl|ruby|pwsh|powershell)$/.test(komutAdi)) {
       const satirIci = digerleri.some((t) => t === '-e' || t === '-c' || t === '-Command')
