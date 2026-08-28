@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T09:44:11.110296+00:00
+compiled_at: 2026-08-28T10:00:34.026939+00:00
 total_compiled_files: 62
-source_commit: 73d59d7b
+source_commit: 0bb075e8
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -8341,6 +8341,165 @@ fark etmeksizin dosyalar asıl haline döner ve sha doğrulanır; (2) test koşu
 doğrudan `node node_modules/vitest/vitest.mjs` çağırır — ölçüldü, `npx` bir koşumu 60 sn'nin
 üstüne çıkarıyordu ve ilk turun zaman aşımına uğramasının sebebi testler değil bu overhead'di.
 Kural: **yarım sabotaj kanıt değildir; kanıt tablosu ancak ATLANAN 0 ile birlikte okunur.**
+
+## 11. KİMLİK — vekil kanıt ile asıl kanıt (E1-v2)
+
+**Ölçüldü 2026-08-28 (ALTYAPI, kendi ağacında, kendi kapısı bloklayınca).** §9.1 kancanın
+**hangi ağacı** ölçtüğünü konu alıyordu. Bu bölüm bir adım öncesini konu alır: **kim olduğunu.**
+
+### 11.1 Olay
+
+`lane-precommit` (E1) kimliği `<git-dir>/venthub-sid` dosyasından okuyordu. Bu dosyayı
+SessionStart kancası yazar — ama oturumun **açıldığı** ağaca, **çalıştığı** ağaca değil. Bir
+oturum ana dizinde açılıp işini bir worktree'de yaparsa, o worktree'deki kimlik orada **en son
+oturum açanın** sid'i olarak kalır.
+
+Sonuç: kapı `vh-altyapi-851` ağacında ALTYAPI'yı "başka şerit" sanıp **kendi claim'indeki**
+dosyada bloklad. Dosyada yazan sid `dc2b0b90` — ağacı kuran, çoktan ölmüş bir oturum.
+
+### 11.2 Körlüğün biçimi ve YÖNÜ
+
+Eski dedektör yalnız **"kimlik dosyası YOK"** hâlini arıyordu (o sabah URUN'un ağacında bunu
+doğru yakaladı). **"Dosya VAR ama YANLIŞ SAHİBE ait"** hâlini görmüyordu. İki hâl aynı arızayı
+doğurur — şerit kontrolü yanlış oturum adına koşar — biri sessizdi.
+
+**Yön önemlidir.** Ölçülen vakada hata *güvenli* yöne düştü: kapı kendi sahibini bloklad, yani
+gürültü yaptı. **Ters yön sessizdir:** bayat sid *canlı* bir şeride aitse, o ağaçta çalışan
+kişi **onun yetkisiyle** yazar ve kapı hiç ses çıkarmaz. Bu yüzden düzeltme "daha çok blok"
+değil, **doğru kimlik + görünür uyarı**dır.
+
+### 11.3 Kural — kanıt sıralaması
+
+| sıra | kaynak | sınıf |
+|---|---|---|
+| 1 | `CLAUDE_CODE_SESSION_ID` (env) | **ASIL** — commit'i tetikleyen sürecin kendi kimliği |
+| 2 | `<git-dir>/venthub-sid` | **VEKİL** — elle/terminalden commit için tek kaynak |
+
+Çelişkide **asıl kazanır**, çelişki **görünür uyarı** olarak basılır ve vekil dosya asıl
+kimlikle **onarılır** (yan etki gizli değildir, uyarısı vardır).
+
+### 11.4 Bilinmeyen kimlik UYARIR ama kontrolü ATLAMAZ
+
+Env yoksa ve dosyadaki sid panoda **hiç görülmemişse**, kapı bunu **söyler** ve şerit
+kontrolünü **yine de koşturur**.
+
+⛔**İLK YAZIMDA BURASI FAIL-OPEN'DI VE YANLIŞTI — kusuru CI buldu, yerel takım bulamadı.**
+Gerekçem "yanlış blok `--no-verify` alışkanlığı kazandırır" idi ve **yanlış blok üretilebileceği
+varsayımına** dayanıyordu. Varsayım ölçümle çöküyor:
+
+> Panoda hiç görülmemiş bir sid, panoya hiç **claim yazmamış** demektir (claim bir olaydır ve
+> olayı yazan sid'i tanınır yapar). Claim yazmamış bir kimlik **hiçbir yolun sahibi değildir.**
+> Dolayısıyla çatışma kontrolü onun adına koşulduğunda **yalnızca başka bir şeridin
+> claim'indeki yolda** blok üretebilir — yani tam da bloklanması gereken hâlde.
+> **Bu kolda yanlış blok yapısal olarak imkânsızdır.**
+
+Eski hâli gerçek bir delikti: kimliği tanınmayan her oturum, başka şeridin dosyalarını
+serbestçe commit'leyebiliyordu. §12.2'nin "muafiyet fail-closed olmalı" ilkesi burada da
+geçerlidir: **bilmemek, başkasının dosyası üzerinde yetki vermez.**
+
+### 11.4.1 Niçin yerel takım göremedi — ÖLÇÜM EVRENİ tuzağı
+
+Yerelde `CLAUDE_CODE_SESSION_ID` ortamda **dolu**dur; kapı env kolunu koşar ve bu dala **hiç
+girilmez**. CI'da o değişken yoktur, dosya kolu koşar ve kusur ortaya çıkar. `lane-precommit-merge`
+fikstürü ortamdan yalnız eski adı (`CLAUDE_SESSION_ID`) eliyordu; yeni ad sızıyor ve
+**geliştiricinin kendi kimliği fikstürün kimliğini eziyordu.**
+
+**Kural:** kimlik taşıyan **her** değişken fikstürde elenir. Bir test neyi ölçeceğine kendisi
+karar verir; koşturan makinenin ortamına bırakmaz. Yerel yeşil, ürünü değil **ortamı**
+ölçüyorsa yeşil değildir.
+
+Bu, §9.5'in "bir kolu test etmek için o kola GİRDİRMEK gerekir" dersinin üçüncü örneğidir —
+ilk ikisi sabotajla bulunmuştu, bu üçüncüsünü **CI** buldu.
+
+### 11.5 ÖLÇEMEDİĞİM ŞEY — adıyla
+
+**"Dosyadaki sid ŞU AN CANLI MI"** sorusu bu kapıda cevaplanmıyor. Denendi ve gösterge
+**ayırt etmedi**: 2026-08-28 07:10 ölçümünde canlı dört şeridin heartbeat yaşı 51 dk, aynı anda
+**kapalı** TEMIZLIK oturumunun da 51 dk'ydı. Ayırt etmeyen gösterge ölçüm değildir; canlılık
+iddiası bu yüzden **kurulmadı**. Ayırt edilebilen daha zayıf ama gerçek ölçüt kullanıldı:
+sid panoda hiç görülmüş mü (bayat `dc2b0b90` hiç görülmemişti).
+
+### 11.6 Test biçimi — kaynak metni değil DAVRANIŞ
+
+`e1-kimlik-kontrolu.test.ts` kapının kaynağında dize aramaz; her kol geçici bir git deposu
+kurar, gerçek bir staged commit dener ve kapının çıktısını okur. Pano `VENTHUB_BOARD_DIR` ile
+izole edilir (testin canlı filo panosuna yazması ölçümü kirletirdi — pytest'in canlı registry'ye
+yazdığı vaka kayıtlı).
+
+⭐**İlk yazışımda bu test SAHTE YEŞİL verdi ve sebebi kayda değer:** geçici depoda hiç commit
+yoktu, `git rev-parse HEAD` patlıyordu, kapı "git okunamadı" koluna düşüp **hiç koşmadan**
+geçiyordu. Beş kol kırmızı yandı ama **negatif kontrol kolları YEŞİL** verdi — çünkü "susuyor"
+ile "hiç çalışmıyor" aynı görünür. Düzeltme iki parçalıdır: fikstüre ilk commit eklendi **ve**
+bir **MEKANİZMA CANLI** kolu yazıldı — aynı fikstürde başka şeridin claim'i kurulup kapının
+**bloklad**ığı ölçülür. **Negatif kontrol, mekanizmanın çalıştığı ayrıca kanıtlanmadan kanıt
+değildir.**
+
+### 11.7 Sabotaj kanıtı — ve ARACIN kendi bulduğu üç körlük
+
+| tur | sabotaj | KIRMIZI | kör | ATLANAN |
+|---|---|---|---|---|
+| 1 | 6 | 3 | **3** | 0 |
+| 2 (test sertleştirildikten sonra) | 6 | **6** | 0 | 0 |
+
+⭐**İlk turda kör kalan üç kol, kapının değil TESTİN zayıflığıydı ve üçü de aynı sınıftı — VEKİL
+KANIT:**
+
+| sökülen kol | test niçin göremedi | düzeltme |
+|---|---|---|
+| `bilinmeyen` bayrağı | uyarı **yine basılıyordu**, değişen şey DAVRANIŞTI | çakışan claim kurulup çıkış kodu ölçüldü |
+| onarım (`writeFileSync`) | `onar()` yine `true` dönüyor, "ONARILDI" yazılıyordu | kimlik **dosyasının içeriği** okundu |
+| fail-open uyarısı | `/fail-open/i` deseni **başka bir mesajda da** geçiyordu | tam cümle deseni + davranış kolu |
+
+Kural olarak yazılıyor: **bir kapının çıktısındaki cümleyi ölçmek, o kapının yaptığı işi ölçmek
+değildir.** Mesaj vekil kanıttır; dosyanın yeni hâli, çıkış kodu ve blok kararı asıl kanıttır.
+Sabotaj bu ayrımı ücretsiz gösterir — koşulmasaydı 8/8 yeşil bir test üç kolunda kör olarak
+depoya inecekti.
+
+### 11.8 ⭐BU BÖLÜM YAZILIRKEN §9.1 TUZAĞINA KENDİM DÜŞTÜM — vaka kaydı
+
+E1-v2'yi yazarken commit komutum **ortak ana dizinde** koştu ve `master` dalına yerel bir commit
+attı; `git add -A` yabancı artıkları (`.playwright-mcp/*`, başka şeritlerin companion'ları) da
+aldı. Sebep tam olarak §9.1'de yazılı olan şeydi: **kabuk cwd'si sessizce ana çalışma dizinine
+resetlenir** — ölçüm için bir kez `cd`'lediğim başka depodan sonra sonraki komutlar 851 ağacında
+değil ana dizinde çalıştı.
+
+Zarar ölçüldü ve geri alındı: commit `reset --mixed` ile çözüldü (dosyalar yerinde kaldı),
+ana dizin `origin/master`'ın önünde **0 commit**, push edilmemişti. İki şerit dalı (`rec86-faz1`
+10 commit, `rec84-denetim-penceresi`) ölçümle doğrulandı, **kayıp yok**.
+
+**Kural — kancalar için yazılmış §9.1, ELLE koşan komutlar için de geçerlidir:** şerit işi yapan
+her git/dosya komutu **`git -C <ağaç>` ya da mutlak yol** kullanır; cwd'ye güvenilmez. Ek olarak
+**`git add -A` şerit işinde kullanılmaz** — ortak ağaçta yabancı artıkları toplar; dosyalar
+adıyla eklenir.
+
+### 11.9 ⭐104 SATIR CETVEL BİR MERGE'DE SESSİZCE SİLİNDİ — vaka kaydı
+
+**Ölçüldü 2026-08-28.** Bu bölüm (§11, 104 satır) `f1705535` ile yazıldı ve bir sonraki taban
+tazeleme merge'inde (`b119049b`) **tamamen düştü.** Sebep: çakışan dosyalara ayrım yapmadan
+"master tarafını al" (`--theirs`) refleksi uygulandı. Refleks **üretilmiş** dosyalar için
+doğrudur; `fleet-mechanism-standard.md` bir **kaynak** dosyadır ve orada aynı komut
+**içerik silmektir**.
+
+**Niçin fark edilmedi:** hiçbir kapı kırmızı yanmadı. Testler yeşildi (cetvel metnini test
+etmiyorlar), artefakt kapısı yeşildi (yeniden üretim master'ın metnini yaydı), PR açıldı ve
+**dokümantasyonsuz** hâliyle inmeye hazırdı. Kayıp sessizdi — §1'deki "sağırlık sessizdir"
+ilkesinin doküman tarafındaki karşılığı.
+
+**Ayırt edici ölçüt (bundan sonra zorunlu):** dalın commit'lerinin dokunduğu her dosya için
+`git diff --name-only origin/master...HEAD` çıktısında o dosya **var mı?** Yoksa, dalın o
+dosyaya kattığı içerik **net olarak sıfırlanmış** demektir. Üretilmiş dosyalarda bu normaldir
+(yeniden üretilirler); **kaynak dosyada KAYIPTIR.**
+
+```bash
+# taban tazeleme merge'inden SONRA koşulur
+git log origin/master..HEAD --no-merges --name-only --format= | sort -u | while read f; do
+  git diff --name-only origin/master...HEAD | grep -qx "$f" || echo "KAYIP ADAYI: $f"
+done
+```
+
+**Kural:** çakışan dosya **önce sınıflandırılır** (üretilmiş mi kaynak mı), sonra reçete
+seçilir; ve taban tazeleme merge'inden sonra yukarıdaki kayıp taraması koşulur. "Kapılar yeşil"
+bir merge'in içerik silmediğini **kanıtlamaz** — hiçbir kapı silinen paragrafı ölçmüyor.
 
 
 ---
