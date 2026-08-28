@@ -462,3 +462,41 @@ Kör kalan kol **fail-closed** koluydu: `catch` dalını "muafiyet açılır" ya
 kalıyordu — çünkü fikstürde ölçüm **hep başarılıydı** ve o dala hiç girilmiyordu. Düzeltme:
 `PATH` boşaltılarak `git` çalıştırılamaz hâle getirildi. **Bir kolu test etmek için o kola
 GİRDİRMEK gerekir; kolun varlığını okumak onu ölçmek değildir.**
+
+### 12.5 İKİNCİ MUAFİYET — birleştirme (`bash-write-audit`)
+
+**Ölçüldü 2026-08-28; aynı gün ÜÇ kez ötdü** (ALTYAPI kendi ağacında 7 dosya, AUTH iki kez,
+URUN bir kez). `git merge origin/master` başka şeritlerin master'a inmiş dosyalarını çalışma
+ağacına getirir; denetim "sonuca bakar" ve bunları bu şeridin yazdığı iş sanar.
+
+⭐**Asıl zarar stderr değil PANO:** alarmın bir kolu ilgisiz şerit sahibine otomatik
+*"senin dosyanı değiştirdim"* notu düşürür. Yani yanlış alarm yalnız beni değil, **hiç ilgisi
+olmayan bir şeridi** meşgul eder. URUN bu notu bağımsız olarak "bu ihlal değil, merge'in
+kendisi" diye teşhis etti — teşhis doğruydu ve kancanın kendisi yanlış etiketliyordu.
+
+**Sınıf:** aynı olguya iki kapının zıt hüküm vermesi. `lane-precommit.cjs` bu muafiyeti
+ZATEN taşıyordu (`MERGE_HEAD`/`CHERRY_PICK_HEAD`/`REVERT_HEAD`), `bash-write-audit.cjs`
+taşımıyordu. §12.1'in kardeşi: normal iş akışını ihlal sayan alarm, birkaç gün içinde
+görmezden gelinir ve **gerçek sinyal onunla birlikte ölür.**
+
+| şart | niçin |
+|---|---|
+| hâl **ağaç başına** ölçülür (`rev-parse --absolute-git-dir`) | çok ağaçlı denetimde bir ağacın merge'i ötekini muaf yapmamalı |
+| ölçülemezse muafiyet **AÇILMAZ** (fail-closed) | §12.2 ile aynı ilke: kapı fail-open olabilir, muafiyet asla |
+| muafiyet **sesli** — hâl + muaf tutulan yol **SAYISI** basılır | sessiz muafiyet ile kancanın hiç koşmaması aynı görünür |
+| kapsam **dar**: yalnız o turun yeni yolları | merge commit'lenince hâl biter, yollar zaten temizlenir — kalıcı kör nokta yok |
+
+**Sabotaj kanıtı:** 6 sabotaj · KIRMIZI **5** · kör **0** · ATLANAN **0** · bilinen sınır **1**.
+
+⚠**BİLİNEN SINIR, "kör nokta" DEĞİL — ve niçin ayırdığımız önemli:** fail-closed kolu bu
+fikstürde **girdirilemiyor**. §12.2'deki "PATH'i boşalt" tekniği burada işlemez, çünkü sıra
+farklı: `git` ölürse `git status` da başarısız olur ve denetim daha yukarıda `okunanAgac === 0`
+ile sessizce çıkar — yani birleştirme ölçümüne **hiç gelinmez**. Kol kodda savunma olarak
+duruyor, testte ve burada adıyla yazılı, ama **kanıtlanmadı**. "Ölçemedim" ile "geçti" ayrı
+şeylerdir; sabotaj tablosunda ayrı sütunda durmasının sebebi budur.
+
+⚠**"Master tarafını al" reçetesi YALNIZ ÜRETİLMİŞ dosya için geçerlidir.** Aynı gün bu
+cetvelin kendisi çakıştı (bir taraf §10, öteki §12) ve orada doğru çözüm **iki tarafı da
+tutmak**tı. Reçeteyi ayrım yapmadan uygulamak, çakışmayı çözerken içerik silmektir; çakışan
+dosyanın **üretilmiş mi kaynak mı** olduğu önce ölçülür (`docs/artefakt_manifest.json`
+içinde mi?), sonra reçete seçilir.
