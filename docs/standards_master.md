@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T06:54:51.035531+00:00
+compiled_at: 2026-08-28T06:59:26.126443+00:00
 total_compiled_files: 62
-source_commit: 6b2796ce
+source_commit: 72fdde38
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -14027,6 +14027,61 @@ büyütmek, kapıyı sökmektir.
 İlgili: `companion-doc-standard.md` (C4/C5 — eksik ve bayat companion) ·
 `measurement-discipline-standard.md` · `collaboration-protocol.md` ·
 tasarım kaydı: orion `docs/t021-artefakt-tazelik-kapisi-tasarim.md` (PR #42)
+
+## AXIOM 7 — Kaynak ile artefakt AYNI dosya olabilir; o zaman build TEK TURDA kapanmaz
+
+**Ölçüldü 2026-08-28 (ALTYAPI, REC-86 dalı).** `docs/system_tree.md` hem
+`.cc_docs.yaml`'ın ürettiği bir **artefakt**, hem de `kayitlar_master.md`'nin
+derlendiği **kaynak** kümesinin bir üyesi. Tek geçişli build şu sırayı izler:
+
+1. `kayitlar_master.md` derlenir — o an diskteki (yani **eski**) `system_tree.md`
+   okunur ve sha'sı manifeste yazılır,
+2. `system_tree.md` yeniden üretilir — sha'sı **değişir**.
+
+Sonuç: manifest yazıldığı anda `kayitlar_master`'ın kaynak kaydı bayattır ve
+INV-DOC-4b kırmızı yanar. Bu bir hata değil, **çift rolün kaçınılmaz sonucudur**.
+
+**Kural:** çift rollü bir dosya varsa `doc build` **iki tur** koşulur ve
+**aralarında commit edilir** (kapı HEAD'i okur, diski değil):
+
+```
+orion doc build --force-sync && git add docs/ && git commit
+orion doc build --force-sync && git add docs/ && git commit
+```
+
+**Yakınsama ölçülmüştür, varsayılmamıştır:** ikinci turda `system_tree.md`
+değişmedi (`git diff --stat` boş) — yani damga alanı her koşumda yeniden
+yazılmıyor, döngü ikinci turda duruyor. Üçüncü tur GEREKMEZ. Yeni bir çift
+rollü dosya eklenirse bu ölçüm **tekrarlanır**; "iki tur yeter" bu depodaki
+bugünkü kümenin ölçümüdür, evrensel bir yasa değildir.
+
+### Bu aksiyomun doğurduğu iki ölçüm kuralı
+
+**(a) Ölçümün ZAMANI ölçümün parçasıdır.** Aynı gün manifesti "855 kaynak
+kaydı, uyuşmaz 0" diye ölçüp temiz ilan ettim; ölçüm **commit'ten önce**
+koştuğu için `system_tree.md`'nin yeni hali diskteydi ama HEAD'de yoktu.
+Kapı HEAD'i okur. Bir kapının ölçütünü taklit eden her ölçüm, kapının
+okuduğu **aynı anı** okumalıdır.
+
+**(b) `generated_at`'in geriye gitmesi tek başına regresyon kanıtı DEĞİLDİR.**
+Aynı imza iki zıt sebepten doğar: bayat tabanda build (regresyon) ya da
+dalda kalmış, master'a hiç inmemiş bir companion halinin düzeltilmesi.
+Ayırt eden ölçüt imza değil, **kaynağın üç hâli**: dosyanın `HEAD`,
+`origin/master` ve disk değeri. Üçü de yeni değeri söylüyorsa geri gidiş
+**düzeltmedir**.
+
+### Manifestteki iki özet TÜRÜ karıştırılmaz
+
+`artefakt_manifest.json` iki farklı özet tutar ve karşılaştırmadan önce
+hangisine bakıldığı **doğrulanır**:
+
+| alan | tür | uzunluk |
+|---|---|---|
+| `artefaktlar[].icerik_sha256` | SHA-256 (CRLF→LF normalize, HEAD blob'undan) | 64 hex |
+| `artefaktlar[].kaynak.dosyalar[yol]` | **git blob SHA-1** | 40 hex |
+
+İkisini aynı sütunda karşılaştırmak, hiçbiri tutmayan sahte bir bilmece
+üretir — bu depoda bir gün kaybettirdi. **Bedava ayırt edici: hex uzunluğu.**
 
 
 ---
