@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T19:35:08.840575+00:00
+compiled_at: 2026-08-28T06:27:04.316105+00:00
 total_compiled_files: 62
-source_commit: 4d4db1de
+source_commit: f2c716c8
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -8138,6 +8138,95 @@ tutmuşken. Betik bunu `UYGULANAMADI (desen tutmadı)` diye bildirdiği için fa
 "iki sabotajdan biri yakalandı" diyen **yanlış bir kanıt** yazılacaktı. Çok satırlı sabotaj deseni
 Windows checkout'unda **EOL-bağımsız** (`\r?\n`) olmalıdır. Bu, §9.5'teki "ölçüm aracının kendisi
 kör olabilir" dersinin ikinci örneğidir; ölçüm aracı da ölçülür.
+
+---
+
+## 10. Compact dayanıklılığı — 4 sabit alan + PreCompact kapısı
+
+**Niçin var — ölçülmüş vakalar, tahmin değil.**
+2026-08-27: compact dönüşünde durum dosyası okunmadı; gün boyu bedel ödendi.
+2026-08-28: kullanıcının geçiş anında yazdığı mesaj yutuldu — 3 tur kayıp + güven hasarı.
+Aynı gün ölçüldü ki bu makinede **PreCompact kancası hiçbir ayar katmanında tanımlı değildi**
+(proje/kullanıcı/local `settings.json` + 11 eklenti `hooks.json` → 0 eşleşme; negatif kontrol
+olarak aynı tarama `SessionStart` için 153 dosya buldu). Yani compact dayanıklılığımız
+tamamen ajan disiplinine dayanıyordu: kural yazılıydı, **mekanizma yoktu**. Bu bölüm o
+boşluğu kapatır ve §4'ün "öz-test değil, ayırt edici test" ilkesini compact'e uygular.
+
+### 10.1 Durum dosyası — DÖRT SABİT ALAN (zorunlu)
+
+Her oturumun bir durum dosyası vardır; adı `lane-day` / `state` / `durum` kalıbını taşır ve
+frontmatter'ında `metadata.originSessionId` oturum kimliğini tutar. Compact bloğu şu dördünü
+**adıyla** içerir:
+
+| alan | cevapladığı soru |
+|---|---|
+| **SON GİRDİ** | kullanıcıdan bana en son ne ulaştı |
+| **AÇIK KUYRUK** | sırada ne var, hangi sırayla |
+| **VERİLEN SÖZLER** | kime ne taahhüt ettim |
+| **BEKLEYEN KARARLAR** | kimde hangi karar bekliyor |
+
+Dördü de **ölçülebilir olsun diye** sabittir: alan adları serbest bırakılırsa "tutarsızlık"
+bir yargı olur, oysa alanın varlığı bir ölçümdür. Kapı bu dördünü arar.
+
+### 10.2 Eşikler — SAYIYLA yazılı
+
+| eşik | değer | ölçüm tabanı |
+|---|---|---|
+| durum dosyası bayatlık | **60 dakika** | 2026-08-28: aktif beş şeridin dosyaları 1/9/17/27/35/39/46 dk yaşındaydı; bir sonraki değer 356 dk (kapanmış gün). 60, en eski aktif dosyaya pay bırakır ve kapanmış günü ayırt eder. 30 seçilseydi o gün AUTH yanlış alarm alırdı. |
+| `MEMORY.md` boyut | **16384 bayt** | indeks ~24.4KB'de okunamaz oluyor, 27.5KB'de sessizce kırpıldığı gözlendi. Ölçü **bayt**, satır değil — kırpma bayta bakar. |
+
+Eşikler koddan **export edilir** ve conformance testi cetveldeki sayıyla eşleştiğini ölçer;
+sihirli sayı bırakmak, sonraki değiştirenin neyi neden değiştirdiğini bilememesi demektir.
+
+### 10.3 Kapının davranışı — ne bloklar, ne uyarır
+
+**BLOKLAR (exit 2):** oturumun hiç durum dosyası yok. Bu halde compact = kesin kayıp.
+**UYARIR (exit 0):** dosya bayat · dört alandan biri eksik · `MEMORY.md` eşiği aşıldı.
+Bayatlık **asla bloklamaz**: compact'i engellemek, kaybettirdiğinden fazlasını maliyet
+yazabilir. Kilitlenmeye karşı kaçış valfi `VENTHUB_PRECOMPACT_KAPALI=1` ve valfin kendisi
+testlidir — kaçış yolu ölçülemiyorsa kaçış yolu yoktur.
+
+### 10.4 Dönüş ayağı — SessionStart(compact)
+
+`SessionStart` kancası `source === 'compact'` kolunda durum dosyasının **son bloğunu**
+bağlama enjekte eder. Gerekçe: "dönüşte durum dosyanı oku" demek ile **okutmak** aynı şey
+değil; 08-27 vakasında kural yazılıydı ve yine okunmadı. Tüm dosya değil son blok basılır —
+kırpılmış bağlamı yeniden doldurmak çözüm değildir.
+
+### 10.5 Bilinen sınır — ÖLÇÜLMEMİŞ, kapı buna güvenmez
+
+Platform belgesi `exit 2` için "blocking error, stderr fed back to Claude" diyor; ancak
+**PreCompact'ta compact'i gerçekten iptal ettiği bu makinede ölçülmedi** — compact'i kullanıcı
+tetikler, ajan tetikleyemez, yani bu ölçüm ajan tarafından yapılamaz (ÖNCÜL-ÖLÇÜM hükmünün
+"ÖLÇÜLEMEZ" kutusu; bir seçim değil, bir özellik). Bu yüzden kapı o davranışa **güvenmeyecek**
+biçimde tasarlandı: blok çalışmasa bile stderr Claude'a beslenir ve uyarı görünür. İlk gerçek
+compact'te davranış ölçülüp bu madde güncellenecek — güncellenene kadar burada "iddia" olarak
+durur, "kanıt" olarak değil.
+
+### 10.6 Kanıt zorunluluğu (§8'in bu bölüme uygulanışı)
+
+Kapı `src/__tests__/conformance/precompact-durum-kapisi.test.ts` ile sekiz koldan ölçülür.
+Kolların **bağlılık** ayağı ayrıca zorunludur: kanca dosyasının var olması yetmez, `settings.json`
+içinde `PreCompact` olayına bağlı olduğu ölçülür — bu depoda "yazıldı ama bağlanmadı" ölçülmüş
+bir sınıftır ve yalnız o kol yakalar. Sabotaj tablosu:
+
+| sabotaj | düşen kol |
+|---|---|
+| `settings.json` bağlaması sökülsün | bağlılık |
+| blok kolu sökülsün (durum dosyası yokken sessizce geçsin) | blok |
+| ad filtresi sökülsün (her dosya durum dosyası sayılsın) | ayırt edicilik |
+| `require.main` koruması sökülsün | modül |
+| güvenlik valfi sökülsün | valf |
+| bayatlık eşiği değiştirilsin | eşik |
+
+⚠ Bu tablonun **ilk turu yanlış hedefi vurdu** ve bunu kaydetmek şart: "ad kalıbı katmanı"
+sabotajı yeşil kaldı ve ilk okuyuşta **kör nokta** sanıldı. Ölçünce **fazlalık** olduğu
+görüldü — gerçek ders dosyaları dört alandan sıfırını taşıyor, yani içerik katmanına hiç
+girmiyorlar ve sabotaj davranışı değiştirmiyordu. Aynı ölçüm ikinci bir kusuru açtı: içerik
+katmanının eşiği 2'ydi ve **gerçek durum dosyalarını da dışlıyordu** (onlar da yalnız bir alan
+tutuyor), yani katman ölüydü. §9.5'in dersi burada üçüncü kez doğrulandı: sabotajın
+**çıktısını** değil **eşdeğerliğini** ölç; yeşil kalan sabotaj kapıyı değil ölçüm aracını
+suçlayabilir.
 
 
 ---
