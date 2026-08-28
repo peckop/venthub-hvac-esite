@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T09:02:50.805192+00:00
+compiled_at: 2026-08-28T09:02:59.870898+00:00
 total_compiled_files: 62
-source_commit: 191d1887
+source_commit: 0a5acfe6
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -3178,6 +3178,49 @@ engeller. Sabotaj iki yönde kırmızı verir.
 Müşteri bir yerde "hangisi?" diye duruyorsa orası bir sayfadır. Durmuyorsa — sadece bir sayı
 değişiyorsa — orası sayfa değil, **aynı sayfadaki seçicidir**. Dağınıklık bu tek cümleyle
 engellenir.
+
+### 1.1 — Anlatının konusu bir SERİ ise, tetikleyici ve kapsam SERİdir (2026-08-28)
+
+> Kural kimliği: **K1.1**. Başlık numarası cetvelin kendi düzenine uyar (`§1`'in alt bölümü);
+> kod ve migration yorumlarında bu maddeye **§1.1 (K1.1)** diye atıf yapılır.
+
+**Kural.** Anlatı ve sihirbaz K1'in yerinde — **kategori sayfasında** — kalır. Ama anlatının
+konusu tek bir seriyse ve o seri kategorisini konu-dışı serilerle paylaşıyorsa:
+
+1. **Görünme koşulu** kategori slug'ı değil, **kategorinin o seriyi içermesidir.**
+2. **Sihirbazın aday kümesi** kategori değil **o serinin ailesidir** (`family_id`).
+3. İkisi **tek bir sabitten** beslenir. Ayrı yazılırlarsa anlatı görünür ama sihirbaz başka
+   ürün önerir — ve bu kusuru **hiçbir sayı göstermez**.
+
+**Niçin var (ölçüldü, 2026-08-28).** Sessiz fan anlatısı + sihirbazı `inline-duct-fans`
+kategorisine bağlıydı; o kategori pasif ve **0 serili**, yani koşul hiçbir zaman açılmadı —
+beş bileşenlik anlatı ve sihirbaz kullanıcıya **bir kez bile görünmedi**. Düzeltirken doğal
+refleks "kategoriye taşı" idi; ölçüm onu çürüttü:
+
+| `duct-fans` altındaki seri | model | anlatının konusu mu |
+|---|---|---|
+| `vortice-lineo-quiet` | 12 | **evet** |
+| `vortice-lineo` | 7 | hayır |
+| `vortice-radon-range-circular` | 5 | hayır |
+| `vortice-vort-commercial-in-line-circular` | 7 | hayır |
+| `vortice-vort-commercial-in-line-rectangular` | 5 | hayır |
+
+Kategori kapsamı **24 sessiz olmayan modeli** de aday sayardı: sihirbaz "sessiz fan öner"
+derken sessiz olmayan ürün önerebilirdi. Bugünkü kusurun aynası — hiç görünmemek yerine
+**yanlış vaat vermek**.
+
+**K1 ile çelişmez.** Sayfa sayısı değişmiyor, üçüncü gezinme kademesi açılmıyor; değişen tek
+şey, kategori sayfasındaki bir bölümün *hangi veriye bakarak* açıldığı.
+
+**Neden ayrı kategori açılmadı.** "Sessiz" bir ürün TİPİ değil, bir ÖZELLİKtir; katalog
+omurgası kararı kategori eksenini ürün tipi olarak sabitledi. Özellik başına kategori açmak
+"ATEX", "asit dayanımlı" için de istenir ve omurgayı zamanla dağıtır. (Recep kararı,
+AskUserQuestion onayı, 2026-08-28.)
+
+**Yürürlük noktası.** `src/views/category/CategoryLandingView.tsx` → `SESSIZ_FAN_SERISI` sabiti;
+`src/lib/services/wizard.service.ts` → `getWizardCandidates(supabase, familySlug)`.
+
+**Bekçi.** `src/__tests__/conformance/silent-fan-series-binding.test.ts` — `INV-SILENTFAN-SERI-1`.
 
 ## 2. K2 — Aile ne zaman bölünür: YAZILABİLİRLİK TESTİ
 
@@ -12229,19 +12272,6 @@ kimse kırmızı görmez). Arayüzdeki kapalı düğme **üçüncü** bir kapıd
 `valid_until`, `draft → quoted` geçişinde **NOT NULL** olmak zorundadır — süresiz teklif
 yayımlanamaz.
 
-**Ek kural — yayım anında `valid_until` GELECEKTE olmalıdır** (REC-54/E5 Faz 1, 2026-08-28).
-NOT NULL tek başına yetmez: geçmişe tarihli bir yayım, **doğduğu anda süresi geçmiş** bir belge
-üretir — Kapı 2 onu hemen reddeder, ama belge yine de "yayımlandı" damgasını almış olur ve
-müşteriye gönderilebilir. Kural yayım ucunda (`admin_publish_quote`) zorlanır. Tetiğe
-konmamasının sebebi adıyla: tetik `expired` yönünü de görür ve orada `valid_until` zaten
-geçmiştedir; şartı tetiğe koymak meşru bir geçişi kırardı.
-
-**⚠ `currency` kolon düzeyinde de kısıtlıdır** (aynı iş): `venthub_quotes.currency` üzerinde
-`^[A-Z]{3}$` CHECK kısıtı vardır. Niçin gerekti — ölçüldü: kolon `character(3)` olduğu için
-**boş değer üç boşluğa dönüşür ve `IS NULL` FALSE verir**; yani yayım kapısının "para birimi
-dolu olsun" şartı boş bir para birimini GEÇİRİYORDU. Kısıt DB'dedir, uygulama gövdesinde değil —
-beyaz listeyi tek bir giriş noktasına koymak diğer yazma yollarını korumaz.
-
 ## 7) Kabul — tek kavram, üç kanal, zorunlu kanıt
 
 ### 7.1 Üç kanal
@@ -12443,17 +12473,10 @@ tetik + revalidate şartı **bu modüle uygulanmaz.** Sınır şartı aynen taş
 gün statik bir yüzeye çıkarsa, o PR aynı gün DB tetiği + revalidate dalını getirmek zorundadır.
 ## 8.5) Ekran yerleşimi — E5 Kompozör (T133 bağı)
 
-> **Kaynak:** `docs/standards/erp-workspace-design-standard.md` §3/E5 — v0, T133-VH,
-> commit `60aacb61` (PR #702, 2026-08-20), 345 satır. **DOSYA İNDİ ve bu satır 2026-08-28'de
-> ölçümle güncellendi.**
->
-> Bu bölüm yazıldığında cetvel henüz gönderilmemişti; kararlar ADMIN'in 08-20 08:50 panosundan
-> alınmış ve bölümün kendi talimatı *"dosya inince kaynağı dosya adına çevir"* demişti. Çevrildi.
-> Aynı talimatın ikinci yarısı **"birebir aynısı okunacak"** idi ve o da ölçüldü: inen dosyadaki
-> E5 yerleşim şeması (üst durum şeridi · sol salt-okunur bağlam · orta kalem tablosu · sağ canlı
-> önizleme · alt eylem çubuğu) ve dört kompozör kuralı, aşağıdaki tabloyla **birebir örtüşüyor**.
-> Sapma yok. (Eski satırdaki `44def9e8` ve *318 satır* değerleri merge öncesi dal durumuna aitti;
-> inen hâlin ölçülen değerleri yukarıdadır.)
+> **Kaynak:** `erp-workspace-design-standard.md` v0 (T133-VH, commit `44def9e8`, 318 satır).
+> Bu belge yazıldığında o cetvel **henüz gönderilmemişti**; kararlar ADMIN'in 08-20 08:50
+> panosundan alındı ve dosya indiğinde birebir aynısı okunacak. Dosya inince bu bölümün
+> kaynağı **dosya adına** çevrilir.
 
 Teklif kompozörü, T133'ün beş kanonik ekran deseninden **E5 (Kompozör)**'dür ve teklif modülü
 o desenin **ilk uygulamasıdır**. ADMIN bunu adıyla işaretledi: E5 ödünç bir desen değil —

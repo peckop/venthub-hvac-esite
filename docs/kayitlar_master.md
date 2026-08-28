@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T09:02:50.971788+00:00
+compiled_at: 2026-08-28T09:03:00.042883+00:00
 total_compiled_files: 99
-source_commit: 191d1887
+source_commit: 0a5acfe6
 source: ['docs/audits', 'docs/plans']
 ---
 

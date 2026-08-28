@@ -55,8 +55,14 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 interface SilentFanWizardProps {
   isOpen: boolean
   onClose: () => void
-  /** Adayların çekileceği kategori (kanonik slug). */
-  categorySlug: string
+  /**
+   * Adayların çekileceği SERİ (aile) — kanonik slug.
+   *
+   * ⭐KATEGORİ DEĞİL SERİ (REC-85, cetvel `catalog-depth-standard.md` §1.1 (K1.1)):
+   * sihirbazın konusu bir seridir; kategori kapsamı o serinin komşularını da aday
+   * sayar ve sessiz olmayan ürün önerilebilir.
+   */
+  familySlug: string
 }
 
 type Adim = 1 | 2 | 3 | 4 | 5
@@ -92,7 +98,7 @@ const KART_TEMEL =
 const KART_PASIF = 'border-light-gray bg-light-gray hover:border-cyan-500/30 hover:bg-white hover:shadow-xl'
 const KART_AKTIF = 'border-cyan-500 bg-white shadow-xl'
 
-export default function SilentFanWizard({ isOpen, onClose, categorySlug }: SilentFanWizardProps) {
+export default function SilentFanWizard({ isOpen, onClose, familySlug }: SilentFanWizardProps) {
   const { t } = useI18n()
   const Routes = useLocalizedRoutes()
 
@@ -110,7 +116,7 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
     setYukleniyor(true)
     setHata(null)
     try {
-      const liste = await getWizardCandidates(supabase, categorySlug)
+      const liste = await getWizardCandidates(supabase, familySlug)
       setAdaylar(liste)
       return liste
     } catch (err) {
@@ -121,7 +127,7 @@ export default function SilentFanWizard({ isOpen, onClose, categorySlug }: Silen
     } finally {
       setYukleniyor(false)
     }
-  }, [adaylar, categorySlug])
+  }, [adaylar, familySlug])
 
   useEffect(() => {
     if (adim !== 5) return
