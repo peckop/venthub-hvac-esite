@@ -90,19 +90,34 @@ if (birlestirmeHali) {
 
 
 let board = null
+let kimlik = null
 try {
   board = require(path.join(__dirname, 'board.cjs'))
+  kimlik = require(path.join(__dirname, 'kimlik.cjs'))
 } catch (e) {
   uyar('[lane-precommit] pano yuklenemedi (' + (e && e.message) + ') — SERIT KONTROLU YAPILMADI (fail-open).')
   process.exit(0)
 }
 
 const kimlikYolu = path.join(gitDir, 'venthub-sid')
-let sid = ''
-try {
-  if (fs.existsSync(kimlikYolu)) sid = fs.readFileSync(kimlikYolu, 'utf8').trim()
-} catch {
-  /* okunamadı → kimliksiz kolda ele alınır */
+
+// ---- E1-v2 KIMLIK COZUMU (2026-08-28): dosya VEKIL kanit, oturumun kendi kimligi ASIL kanit.
+// Eski kol yalniz dosyayi okurdu ve 'dosya VAR ama YANLIS SAHIBE ait' halini goremiyordu.
+// Olculdu: kapi kendi sahibini baska serit sanip KENDI claim indeki dosyada bloklad.
+// Gerekce ve olcum sinirlari: scripts/board/kimlik.cjs
+const kimlikCozum = kimlik.coz(gitDir, board)
+const sid = kimlikCozum.sid
+for (const u of kimlikCozum.uyarilar) uyar('[lane-precommit] ' + u)
+if (kimlikCozum.celisme && kimlik.onar(gitDir, sid)) {
+  uyar('[lane-precommit] kimlik dosyasi ASIL kimlikle ONARILDI (' + sid.slice(0, 8) + ').')
+}
+
+// TANINMAYAN KIMLIK -> FAIL-OPEN. Blok DEGIL: kapi yanlis oturum adina karar veremez ve
+// yanlis blok '--no-verify' aliskanligi kazandirir, GERCEK kapilari da birlikte atlatir
+// (bu dosyanin 2026-08-15 tarihli kendi notunun gerekcesi).
+if (kimlikCozum.bilinmeyen) {
+  uyar('[lane-precommit] SERIT KONTROLU YAPILMADI (fail-open) — taninmayan kimlik.')
+  process.exit(0)
 }
 
 // ---- BOOTSTRAP KOLU: kimlik yok. Fail-open, ama iz bırakarak.
