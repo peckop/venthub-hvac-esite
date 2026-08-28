@@ -29,7 +29,21 @@ import { describe, expect, it } from 'vitest'
  * o sessiz felaketi imkânsız kılmaktır.
  */
 
-const SCRIPT = 'scripts/vercel-ignore-build.sh'
+/**
+ * ⚠️ MUTLAK YOL ZORUNLU — göreli yol bu kapıyı YANLIŞ AĞACA baktırır.
+ *
+ * Bu kapı betiği dosya sisteminden okur ve çalıştırır; yolu göreli bırakırsak
+ * hedef `process.cwd()`'ye göre çözülür. Filo çok-worktree çalışıyor ve
+ * `vitest --root` cwd'yi DEĞİŞTİRMEZ (2026-08-28 ölçümü, ÜRÜN); ayrıca bu
+ * ortamda kabuğun cwd'si arka plan komutundan sonra ana dizine dönebiliyor
+ * (ALTYAPI, aynı gün üç kez). İkisi birleşince kapı, ölçtüğünü sandığı
+ * worktree'nin değil ANA AĞACIN betiğini ölçebilir — yani onardığın dosya ile
+ * kapının onayladığı dosya farklı olur.
+ *
+ * `__dirname` dosyanın kendi konumudur; cwd ne olursa olsun değişmez.
+ */
+const REPO_KOK = resolve(__dirname, '../../..')
+const SCRIPT = join(REPO_KOK, 'scripts/vercel-ignore-build.sh')
 
 /** exit 0 = ATLA, exit 1 = BUILD. */
 type Karar = 'ATLA' | 'BUILD'
@@ -162,7 +176,9 @@ describe('INV-BUILD-SKIP · ignore-build betiği pozitif mantıkla karar verir',
  * elle yazar ve betiği o deponun içinde çalıştırır. Ağ yok, Vercel yok.
  */
 
-const SCRIPT_MUTLAK = resolve(SCRIPT).replace(/\\/g, '/')
+// SCRIPT zaten mutlak (bkz. yukarıdaki REPO_KOK notu); burada yalnız Windows
+// ters bölüleri `sh` için düzleştiriliyor.
+const SCRIPT_MUTLAK = SCRIPT.replace(/\\/g, '/')
 
 function git(cwd: string, ...args: string[]): string {
   return execFileSync(

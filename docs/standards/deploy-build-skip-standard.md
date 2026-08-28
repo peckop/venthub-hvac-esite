@@ -330,35 +330,42 @@ ile ortak ata` → `tum degisiklikler build-disi sinifta -> ATLA`.
 **Aynı gün master koşumu bunu sınamamıştı** (taban zincir 1'den çözülmüştü). Onarımın
 gerektiği vaka **dalın ilk dağıtımıdır**; deney tam o vakayı kurmak için yeni dal açtı.
 
-##### ⚠SINIR — hüküm KOŞULLU, kapsamı aşmayın
-
-Ölçülen üç vakanın **ikisi atlandı, biri atlanmadı**:
+##### SINIR — dört vaka ölçüldü, tek istisna ADLANDIRILDI
 
 | Vaka | Bağlam | Sonuç |
 |---|---|---|
 | `2d4dce40` | **dal** push'u, salt-`.md` | ATLANDI |
 | `3fd8e61b` | **dal** push'u, salt-`.md` | ATLANDI |
-| `4e2e1bdb` | **merge-prod** (master), salt-`.md` | **ATLANMADI**, build koştu |
+| `6d246563` | **dal** push'u, belge-only (cetvel + artefakt + manifest) | ATLANDI |
+| `ef051d43` | **merge-prod** (master), belge-only, *tek başına* | ATLANDI (15 sn) |
+| `4e2e1bdb` | **merge-prod** (master), salt-`.md`, *başka dağıtım koşarken* | **ATLANMADI** |
 
-> **KESİN:** dal push'unda %100 belge-only değişiklik atlanır ve zorunlu check yeşil kalır.
-> **KESİN DEĞİL:** merge sonrası production dağıtımında atlanacağı. Slot planında
-> merge-prod dağıtımları **tüketir** sayılmalıdır.
+> **HÜKÜM:** belge-only değişiklik hem dal push'unda hem merge-prod'da **atlanır** ve
+> zorunlu `Vercel` check'i **yeşil** kalır.
+> **İSTİSNA:** dağıtım, master'da **başka bir dağıtım koşarken** tetiklenmişse atlama
+> kaçırılabilir.
 
-**Üçüncü vakanın sebebi ÖLÇÜLEMEDİ** — o dağıtımın günlüğü uzun olduğu için baştaki
-`ignore-build:` satırlarına erişilemedi (araç son N satırı veriyor). İki hipotez açık,
-ikisi de **ölçülmedi**:
+**İstisnanın açıklaması — desteklendi, kanıtlanmadı.** En makul okuma: ardışık
+dağıtımlarda `VERCEL_GIT_PREVIOUS_SHA` son *başarılı* dağıtımı gösterdiği için taban
+geride kalır; fark kümesine o aradaki commit'lerin **kaynak** dosyaları da girer ve
+betik **doğru** kararla BUILD der. Yani bu bir kusur değil, tabanın doğru ama eski olması.
 
-1. **Taban eskiydi** — dağıtım, bir önceki dağıtım henüz bitmeden başladı; son *başarılı*
-   SHA geriye kaydıysa fark kümesine kaynak dosyaları da girer ve BUILD **doğru** karardır.
-2. **Zincir 2'ye düşüldü** — `MERGE_BASE = HEAD` dalı çalıştıysa (`HEAD varsayilan dalin
-   ucu ... -> BUILD`) bu da bilinçli fail-safe'tir. Ama o dal ancak zincir 1 düşerse
-   çalışır; yani bu hipotez "üretim dağıtımında `VERCEL_GIT_PREVIOUS_SHA` boş gelir"
-   varsayımına dayanır ve o varsayım ölçülmemiştir.
+**Elenen açıklama (ölçümle çürütüldü):** "master üretim dağıtımında HEAD zaten varsayılan
+dalın ucudur, taban çözülemez ve `HEAD varsayilan dalin ucu … -> BUILD` dalı çalışır."
+Bu önerme **her** merge-prod'un BUILD etmesini öngörürdü; `ef051d43` atlandığı için
+yanlıştır — yani üretim dağıtımında da `VERCEL_GIT_PREVIOUS_SHA` **dolu** geliyor.
 
-**AYIRT EDİCİ TEST (yapılacak):** öncesinde başka dağıtım koşmayan, tek başına inen bir
-belge-only merge-prod. Günlüğün ilk satırı `taban = VERCEL_GIT_PREVIOUS_SHA (…)` ise
-hipotez 1, `HEAD varsayilan dalin ucu …` ise hipotez 2, ikisi de yoksa üçüncü bir sebep.
-Sonuç gelmeden bu satırların ikisi de **hüküm değildir**.
+**Nasıl çürütüldü (yöntem kayda değer):** hipotez sahibi onu `HİPOTEZ, ÖLÇMEDİM` diye
+etiketledi *ve* ayırt edici testi de yazdı. Etiket yanlış hükmü engelledi, test onu
+öldürdü. Etiket tek başına yeterli olmazdı — "muhtemel sebep" olarak yaşamaya devam ederdi.
+
+**PRATİK KURAL:** belge-only işler slot açısından ucuzdur; ama merge'i **master'da başka
+dağıtım koşmazken** yap, yoksa atlamayı kaçırırsın. Tek-tetikleme-tek-bekleyiş disiplini
+burada da geçerlidir — sebebi kota değil, taban tazeliğidir.
+
+**Kalan açık kalem (düşük öncelik, araç kısıtı):** uzun build günlüklerinin **başına**
+erişilemiyor (araç son N satırı veriyor), bu yüzden `4e2e1bdb`'nin `ignore-build:` satırı
+doğrudan okunamadı. Açıklama dolaylı kanıtla duruyor.
 
 **HÜKÜM:** taban çözümündeki her başarısız deneme, **adı ve sebebiyle** günlüğe yazılır.
 Bir adımın sessizce düşmesi yasaktır. Kapı bunu `taban çözülemediğinde SEBEP günlüğe
