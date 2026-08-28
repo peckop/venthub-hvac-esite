@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T06:21:48.672166+00:00
+compiled_at: 2026-08-28T08:10:50.662503+00:00
 total_compiled_files: 656
-source_commit: 0ad1a259
+source_commit: baad363a
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-28T06:21:48.672166+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-28T08:10:50.662503+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -73449,13 +73449,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\account\AccountAddressesPage.tsx
-skeleton_hash: f7e7228eef723bcc
+source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx
+skeleton_hash: 6a35ab6f5cca3044
 entity_hashes:
   func:AccountAddressesPage: 8a10c2ba61747811
   overview: cfdfd55850a3c6f9
   style_tokens: 20e5949307a3284f
-generated_at: 2026-08-27T07:10:03Z
+generated_at: 2026-06-19T20:48:21Z
 ---
 
 ## Genel Bakış
@@ -73528,15 +73528,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **emptyForm** (object) — `{
-
   label: '',
-
   full_name: '',
-
   phone: '',
-
   address_line: '',
-
   city:...`
 
 ---
@@ -83640,15 +83635,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\admin\PricingPoliciesTableBody.tsx
-skeleton_hash: 414834293eae7a27
+source_path: C:\Users\alize\venthub-hvac\src\views\admin\PricingPoliciesTableBody.tsx
+skeleton_hash: 6dc08285098d673f
 entity_hashes:
   func:EffectiveLockPanel: f5eb59505e91e68f
   func:PricingPoliciesTableBody: 242122ccd79025dd
   func:policiesFetcher: 3dc61bf26c95820a
   overview: 0735c2f1aad88d41
   style_tokens: 406c48a0ed4c398b
-generated_at: 2026-08-27T07:30:16Z
+generated_at: 2026-08-25T08:46:05Z
 ---
 
 ## Genel Bakış
@@ -83755,15 +83750,10 @@ type ScopeKey = 'variant' | 'product' | 'brand' | 'category' | 'global'
 
 ## SABİTLER
 - **SCOPE_KEYS** (object) — `{
-
   0: 'variant',
-
   1: 'product',
-
   2: 'brand',
-
   3: 'category',
-
   4: 'g...`
 
 ---

@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T06:21:49.258163+00:00
+compiled_at: 2026-08-28T08:10:51.262850+00:00
 total_compiled_files: 62
-source_commit: 0ad1a259
+source_commit: baad363a
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -6455,6 +6455,56 @@ değiştirmek olur — kota duvarı kalkar, check duvarı doğar.
 
 Bu bölüm, "çözüm işe yaradı" denmeden önce **hangi ölçümün yapılacağını** yazar.
 Yazılmayan deney yapılmaz; yapılmayan deneyin yerini varsayım alır.
+
+---
+
+#### ✅D8.3 SONUÇ (2026-08-28, deney koşuldu — ölçüm: `docs/audits/build-skip-canli-olcum-2026-08-28.md`)
+
+**Risk çürüdü: atlanan dağıtım zorunlu `Vercel` check'ini YEŞİL yapıyor.** Kilit
+takası olmadı, geri alma planına gerek kalmadı.
+
+| Ölçüt | Ölçülen |
+|---|---|
+| Dağıtım kaydı | `CANCELED` |
+| GitHub `Vercel` damgası | `success` — *Canceled by Ignored Build Step* |
+| `mergeStateStatus` | `CLEAN`, kırmızı 0, `MERGEABLE` |
+
+Onarım (D8.2) bu koşumda **gerçekten sınandı** — dalın ilk dağıtımı olduğu için
+zincir 2 devreye girdi: `origin uzagi yok, URL ortamdan kuruldu` → `taban = origin/master
+ile ortak ata` → `tum degisiklikler build-disi sinifta -> ATLA`.
+
+**Aynı gün master koşumu bunu sınamamıştı** (taban zincir 1'den çözülmüştü). Onarımın
+gerektiği vaka **dalın ilk dağıtımıdır**; deney tam o vakayı kurmak için yeni dal açtı.
+
+##### ⚠SINIR — hüküm KOŞULLU, kapsamı aşmayın
+
+Ölçülen üç vakanın **ikisi atlandı, biri atlanmadı**:
+
+| Vaka | Bağlam | Sonuç |
+|---|---|---|
+| `2d4dce40` | **dal** push'u, salt-`.md` | ATLANDI |
+| `3fd8e61b` | **dal** push'u, salt-`.md` | ATLANDI |
+| `4e2e1bdb` | **merge-prod** (master), salt-`.md` | **ATLANMADI**, build koştu |
+
+> **KESİN:** dal push'unda %100 belge-only değişiklik atlanır ve zorunlu check yeşil kalır.
+> **KESİN DEĞİL:** merge sonrası production dağıtımında atlanacağı. Slot planında
+> merge-prod dağıtımları **tüketir** sayılmalıdır.
+
+**Üçüncü vakanın sebebi ÖLÇÜLEMEDİ** — o dağıtımın günlüğü uzun olduğu için baştaki
+`ignore-build:` satırlarına erişilemedi (araç son N satırı veriyor). İki hipotez açık,
+ikisi de **ölçülmedi**:
+
+1. **Taban eskiydi** — dağıtım, bir önceki dağıtım henüz bitmeden başladı; son *başarılı*
+   SHA geriye kaydıysa fark kümesine kaynak dosyaları da girer ve BUILD **doğru** karardır.
+2. **Zincir 2'ye düşüldü** — `MERGE_BASE = HEAD` dalı çalıştıysa (`HEAD varsayilan dalin
+   ucu ... -> BUILD`) bu da bilinçli fail-safe'tir. Ama o dal ancak zincir 1 düşerse
+   çalışır; yani bu hipotez "üretim dağıtımında `VERCEL_GIT_PREVIOUS_SHA` boş gelir"
+   varsayımına dayanır ve o varsayım ölçülmemiştir.
+
+**AYIRT EDİCİ TEST (yapılacak):** öncesinde başka dağıtım koşmayan, tek başına inen bir
+belge-only merge-prod. Günlüğün ilk satırı `taban = VERCEL_GIT_PREVIOUS_SHA (…)` ise
+hipotez 1, `HEAD varsayilan dalin ucu …` ise hipotez 2, ikisi de yoksa üçüncü bir sebep.
+Sonuç gelmeden bu satırların ikisi de **hüküm değildir**.
 
 **HÜKÜM:** taban çözümündeki her başarısız deneme, **adı ve sebebiyle** günlüğe yazılır.
 Bir adımın sessizce düşmesi yasaktır. Kapı bunu `taban çözülemediğinde SEBEP günlüğe
