@@ -99,6 +99,7 @@ describe('INV-BUILD-SKIP · ignore-build betiği pozitif mantıkla karar verir',
       ['CI yapılandırması', ['.github/workflows/ci.yml']],
       ['şerit panosu aracı', ['scripts/board/board.cjs']],
       ['panonun alt dizini (yıldız `/` de yutar)', ['scripts/board/lib/x.cjs']],
+      ['ağaç hijyeni aracı', ['scripts/hijyen/agac-silme-kapisi.cjs']],
       ['git kancasının kendisi', ['.githooks/pre-commit']],
     ]
 
@@ -211,6 +212,22 @@ function depodaKararVer(dir: string, env: Record<string, string> = {}): Karar {
   }
 }
 
+/** Betiği koşturur ve KARARDAN bağımsız olarak stdout günlüğünü döndürür. */
+function gunlukAl(dir: string, env: Record<string, string> = {}): string {
+  try {
+    return String(
+      execFileSync('sh', [SCRIPT_MUTLAK], {
+        cwd: dir,
+        stdio: 'pipe',
+        encoding: 'utf8',
+        env: { ...process.env, VERCEL_GIT_PREVIOUS_SHA: '', ...env },
+      }),
+    )
+  } catch (err) {
+    return String((err as { stdout?: string }).stdout ?? '')
+  }
+}
+
 describe('INV-BUILD-SKIP · karşılaştırma tabanı gerçek depoda çözülür', () => {
   it('ölçüm aracı gerçekten çalışıyor: salt-.md dal ATLANIR (vacuous-pass koruması)', () => {
     // Bu test aynı zamanda ASIL DÜZELTMEnin kanıtıdır: VERCEL_GIT_PREVIOUS_SHA
@@ -257,5 +274,65 @@ describe('INV-BUILD-SKIP · karşılaştırma tabanı gerçek depoda çözülür
     git(dir, 'update-ref', '-d', 'refs/remotes/origin/master')
     // Ağ yok, `git fetch` başarısız olacak → taban çözülemez → BUILD.
     expect(depodaKararVer(dir)).toBe('BUILD')
+  })
+
+  /**
+   * ⭐GÖZLENEBİLİRLİK KOLU — 2026-08-27'de ölçülen kusurun kapısı.
+   *
+   * Yukarıdaki kol "çözemezsen BUILD" davranışını sınar ve YEŞİLDİ. Ama üretimde
+   * o dal TEK yoldu: `origin/master` Vercel'in sığ klonunda hiç yok, çekme her
+   * seferinde başarısız oluyordu ve betik başarısızlığı `2>/dev/null || true` ile
+   * YUTUYORDU. Sonuç: pozitif sınıf listesi on gün boyunca BİR KEZ BİLE
+   * değerlendirilmedi, kimse fark etmedi, günlük yalnız "origin/master yok" diyordu.
+   * Ölçüm: üç Vercel dağıtımının build günlüğü (d9f31989 · f4c5c25f · 304a1785),
+   * üçünde de birebir aynı iki satır.
+   *
+   * DOĞRU DAVRANIŞ YETMEZ, GÖREBİLMEK GEREKİR: fail-safe sessizse, "kapı çalışıyor"
+   * ile "kapı hiç sıra bulamıyor" ayırt edilemez. Bu kol, her başarısız çekme
+   * denemesinin SEBEBİYLE birlikte günlüğe düşmesini zorunlu kılar.
+   */
+  it('taban çözülemediğinde SEBEP günlüğe yazılır (sessiz fail-safe yasak)', () => {
+    const dir = depoKur()
+    git(dir, 'checkout', '--quiet', '-b', 'docs/z')
+    commitAt(dir, 'docs/c.md', 'metin\n', 'docs: c')
+    git(dir, 'update-ref', '-d', 'refs/remotes/origin/master')
+
+    const gunluk = gunlukAl(dir)
+
+    // Uzak YOK ve ortam değişkeni de yoksa: neden çekilemediği ADIYLA yazılmalı.
+    expect(gunluk, 'çekilemeyişin sebebi günlüğe yazılmamış').toMatch(
+      /origin uzagi YOK ve VERCEL_GIT_REPO_OWNER\/SLUG bos/,
+    )
+    // Karar satırı da yerinde: sebep yazıldı diye karar kaybolmasın.
+    expect(gunluk).toMatch(/-> BUILD/)
+  })
+
+  /**
+   * ⭐ÜRETİMDEKİ GERÇEK SEBEP — `origin` UZAĞI HİÇ YOK (2026-08-27, dağıtım 5cjXTJWY).
+   *
+   * Görünürlük onarımı ilk koşumunda cevabı verdi:
+   *   `ignore-build: refspec cekmesi basarisiz -> fatal: 'origin' does not appear to be a git repository`
+   * Sorun refspec biçimi ya da derinlik değildi; Vercel'in klonunda uzak tanımlı DEĞİL.
+   * Bu yüzden "origin"e yapılan hiçbir çekme tutamazdı. Betik artık uzağı ortam
+   * değişkenlerinden kurar (depo public, kimlik gerekmez).
+   *
+   * Bu kol o yolu AĞSIZ koşturur: yerel bir bare depo `origin` olarak bağlanır,
+   * `refs/remotes/origin/master` SİLİNİR — yani betik gerçekten ÇEKMEK zorunda kalır.
+   */
+  it('origin/master ref yoksa ama uzak ERİŞİLEBİLİRSE çekip tabanı çözer → salt-.md ATLA', () => {
+    const dir = depoKur()
+    const bare = mkdtempSync(join(tmpdir(), 'inv-build-skip-bare-')).replace(/\\/g, '/')
+    execFileSync('git', ['init', '--bare', '--quiet', bare], { stdio: 'pipe' })
+    git(dir, 'remote', 'add', 'origin', bare)
+    git(dir, 'push', '--quiet', 'origin', 'master')
+
+    git(dir, 'checkout', '--quiet', '-b', 'docs/z')
+    commitAt(dir, 'docs/c.md', 'metin\n', 'docs: c')
+    // Yerel takip referansını SİL: betik çekmezse tabanı çözemez.
+    git(dir, 'update-ref', '-d', 'refs/remotes/origin/master')
+
+    const gunluk = gunlukAl(dir)
+    expect(gunluk, 'çekme yolu hiç koşmamış').toMatch(/taban = /)
+    expect(depodaKararVer(dir)).toBe('ATLA')
   })
 })

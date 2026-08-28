@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T20:07:13.632281+00:00
+compiled_at: 2026-08-27T19:35:08.840575+00:00
 total_compiled_files: 62
-source_commit: 9bc29702
+source_commit: 4d4db1de
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -6188,6 +6188,7 @@ tetikler**; yalnız §D3'te ADIYLA sayılan sınıf atlanır.
 | `registry/**` | İş emri kayıtları |
 | `LICENSE` | Metin |
 | `scripts/board/**` | Şerit panosu araçları. Ölçüldü (2026-08-26): `package.json`, `next.config.mjs`, `vercel.json`, `.github/workflows/*` içinde `scripts/board` geçen **tek bir referans yok**. Pozitif kontrolle doğrulandı — aynı arama `scripts/setup-hooks` için referans **buluyor**. → D3.1 |
+| `scripts/hijyen/**` | Ağaç hijyeni araçları (kirli sayacı, ağaç-silme kapısı). Ölçüldü (2026-08-27): aynı arama, aynı dosyalar — `scripts/hijyen` geçen **0 referans**; pozitif kontrol `scripts/setup-hooks` için **1 referans** buluyor, yani arama gerçekten arıyor. Gerekçe `scripts/board/**` ile aynı sınıf. |
 | `.githooks/**` | Git kancalarının **kendisi** (kancaları kuran betik değil). Derleme hattıyla dolaylı bağı VAR ama üç ölçülmüş sebeple atlanabilir. → D3.1 |
 
 **Bilerek DIŞARIDA (build tetikler):** `supabase/migrations/**` — build'i doğrudan
@@ -6364,8 +6365,9 @@ inandırıcı görünüyordu. *Doğru gerekçe, ölçülmemiş premis.*
 | Sıra | Taban | Koşul |
 |---|---|---|
 | 1 | `VERCEL_GIT_PREVIOUS_SHA` | Yalnız commit **bu klonda gerçekten varsa** |
-| 2 | `git merge-base HEAD origin/<varsayılan dal>` | (1) çözülemezse |
-| — | *(hiçbiri)* | → **BUILD** |
+| 2 | `git merge-base HEAD origin/<varsayılan dal>` | (1) çözülemezse; ref yoksa **refspec çekmesi** denenir |
+| 3 | `git fetch origin <varsayılan dal>` → `FETCH_HEAD` | (2)'nin refspec biçimi reddedilirse |
+| — | *(hiçbiri)* | → **BUILD**, ve **her başarısız denemenin SEBEBİ günlüğe yazılır** |
 
 (1) en doğrusudur: son **başarılı** dağıtımdan bu yana biriken tüm değişiklikleri
 kapsar. Ama **yeni bir dalın ilk dağıtımında yoktur** ve bu depoda kural
@@ -6379,6 +6381,85 @@ arkaya atlanmış commit'lerden sonra daha eski bir kaynak değişikliğini gör
 
 Zincirin **hangi adımının kazandığı günlüğe yazılır**. Bu tesadüfi bir ayrıntı değil:
 yukarıdaki kusur tam olarak "hangi dalın çalıştığını göremediğimiz" için sessiz kaldı.
+
+### ⭐D8.1 — ZİNCİRİN 2. ADIMI ÜRETİMDE HİÇ ÇALIŞMADI (2026-08-27, ölçüldü)
+
+Yukarıdaki hüküm "(2) dalın tamamını kapsar" diyor ve **doğru**; ama üretimde o adıma
+hiç sıra gelmiyordu. Vercel'in **sığ klonunda `origin/master` yok**, ve betiğin çekme
+denemesi `2>/dev/null || true` ile **yutuluyordu** — başarısızlığın sebebi günlüğe hiç
+düşmedi. Sonuç: **pozitif sınıf listesi bir kez bile değerlendirilmedi**, salt-`.md`
+push'lar dağıtım yaktı ve HOBBY günlük kotası doldu, tren durdu.
+
+**Kanıt — üç ayrı dağıtımın build günlüğü, üçünde de birebir aynı iki satır:**
+
+```
+ignore-build: VERCEL_GIT_PREVIOUS_SHA bos (dalin ilk dagitimi) -> ortak ataya dusuyorum
+ignore-build: origin/master bu klonda yok -> BUILD
+```
+
+`d9f31989` (TEMIZLIK companion) · `f4c5c25f` (ALTYAPI 18 companion) · `304a1785` (I18N varyant).
+
+**KUSURUN SINIFI — doğru davranış yetmez, GÖREBİLMEK gerekir.** Fail-safe'in kendisi
+doğruydu: taban çözülemeyince BUILD demek doğru karardır. Kapı da bunu sınıyordu ve
+*"origin/master hiç yoksa BUILD"* kolu **yeşildi**. Ama hiçbir kol şunu sormuyordu:
+**bu dal üretimde İSTİSNA mı, yoksa TEK yol mu?** Sessiz bir fail-safe, "kapı çalışıyor"
+ile "kapı hiç sıra bulamıyor" hallerini ayırt edilemez kılar.
+
+### D8.2 — GERÇEK SEBEP: Vercel klonunda `origin` UZAĞI HİÇ YOK
+
+Görünürlük onarımı **ilk koşumunda** cevabı verdi (dağıtım `5cjXTJWY`, PR #875'in kendi önizlemesi):
+
+```
+ignore-build: refspec cekmesi basarisiz -> fatal: 'origin' does not appear to be a git repository
+```
+
+Sorun refspec biçimi ya da klon derinliği **değildi**: Vercel'in derleme klonunda uzak
+**tanımlı değil**. Yani `origin`'e yapılan hiçbir çekme tutamazdı — hangi refspec'i
+denersek deneyelim. On günlük sessizliğin tek cümlelik sebebi budur.
+
+**Çözüm:** uzak yoksa URL ortamdan kurulur —
+`https://github.com/$VERCEL_GIT_REPO_OWNER/$VERCEL_GIT_REPO_SLUG.git`. Depo **public**
+olduğu için kimlik gerekmez. Repo bir gün private olursa çekme başarısız olur ve
+fail-safe aynen işler (→ BUILD); yani bu çözüm güvenliği gevşetmez.
+
+Kapı bu yolu **ağsız** koşturur: yerel bir bare depo `origin` olarak bağlanır,
+`refs/remotes/origin/master` silinir, betik gerçekten çekmek zorunda kalır.
+Sabotajla kanıtlandı — **her iki** çekme denemesi de kapatılınca kol düştü, geri
+konunca yeşil. (İlk sabotaj denemem yalnız birinci denemeyi kapatmıştı ve kol yeşil
+kaldı; "sabotaj sonuç değiştirmedi" demek yerine sabotajın kendisini ölçtüm, eksik
+olan oydu. Sabotaj, sınanan yeteneği GERÇEKTEN kaldırmalıdır.)
+
+### ⚠D8.3 — BİLİNEN BİLİNMEYEN: atlama çalışınca zorunlu `Vercel` check'i ne olur?
+
+**Bu soru bugüne kadar hiç ortaya çıkmadı, çünkü atlama hiç çalışmadı.** D8.1'den sonra
+çalışacak — ve o an yeni bir risk doğuyor. TEMİZLİK sordu, ölçmeye çalışıldı:
+
+- `master` dal koruması **zorunlu check** listesi: `["ci", "admin-smoke", "Vercel"]` (ölçüldü, `gh api .../branches/master/protection`).
+- Vercel dokümanı `ignoreCommand` exit 0 durumunda dağıtımın **CANCELED**'a geçtiğini yazıyor; **GitHub commit-status'a ne yazıldığını yazmıyor**.
+- **ÖNCÜL-ÖLÇÜM: ÖLÇÜLEMEZ** — ne depoda emsal var (atlama hiç koşmadı), ne vendor dokümanında cevap. Tek yol canlı deney.
+
+**RİSK, AÇIKÇA:** atlanan dağıtım zorunlu `Vercel` check'ini asla SUCCESS yapmazsa,
+salt-doküman PR'ları **merge edilemez** hale gelir. Bu, bir kilidi başka kilitle
+değiştirmek olur — kota duvarı kalkar, check duvarı doğar.
+
+**DENEY VE GERİ ALMA PLANI (D8.1 indikten sonra, merge ETMEDEN önce ölçülür):**
+
+1. Salt-`.md` bir dal açılır, push edilir.
+2. Ölçülür: `gh pr checks` → `Vercel` bağlamı SUCCESS mi, yok mu, FAILURE mı;
+   ve `gh pr view --json mergeStateStatus`.
+3. **SUCCESS ya da check hiç oluşmuyor + merge mümkün** → atlama sağlıklı, devam.
+4. **Check takılı kalıyor / FAILURE** → iki seçenek, ikisi de yazılı:
+   - `Vercel`i zorunlu listeden çıkarmak **ÖNERİLMEZ** (kapı "vitrin derleniyor mu"yu sorar);
+   - onun yerine atlama listesi **daraltılır** ya da atlama tamamen geri alınır
+     (`git revert`), kota sorunu Pro planla çözülür.
+
+Bu bölüm, "çözüm işe yaradı" denmeden önce **hangi ölçümün yapılacağını** yazar.
+Yazılmayan deney yapılmaz; yapılmayan deneyin yerini varsayım alır.
+
+**HÜKÜM:** taban çözümündeki her başarısız deneme, **adı ve sebebiyle** günlüğe yazılır.
+Bir adımın sessizce düşmesi yasaktır. Kapı bunu `taban çözülemediğinde SEBEP günlüğe
+yazılır` koluyla zorlar; kol bilerek bozularak kanıtlanmıştır (görünürlük satırları
+kaldırılınca kırmızı, geri konunca yeşil).
 
 ### Kapı bunu nasıl ölçüyor
 
@@ -12081,24 +12162,13 @@ taşısın" deseydik bugünkü doğru politikaları kırmızıya düşürürdük
 **Korunan değişmez:** teklif tablolarına INSERT eden her politika **ya `is_admin_user()`
 şartı taşır, ya da yazdığı/bağlandığı teklifin durumunu `'requested'` değerine çiviler.**
 
-**Niçin bu sınır (canlı ölçüm, 2026-08-27 — Kol A ile DÜZELTİLDİ):** `'draft'` admin'in
-teklifi yazdığı, **fiyatın oluştuğu** durumdur. `authenticated` rolünün INSERT kolon
-yetkisi `venthub_quotes`'ta **7**, `venthub_quote_items`'ta **8** kolondur — **ama
-`status` o 7'nin içinde, `unit_price`/`currency` de o 8'in içinde DEĞİLDİR.** Yani
-bugün hiçbir `authenticated` istemci ne `'draft'` yazabilir ne fiyat; admin de
-`authenticated` olduğu için **admin de yazamaz**.
-
-> **Öz-düzeltme (yazan: AUTH).** Bu paragrafın ilk hâli "grant zaten `authenticated`'a
-> açık, daraltmak çözüm değildir" diyordu. O cümle **kolon sayısını sayıp hangi kolonlar
-> olduğunu ölçmemişti**; agrega sayı, ters gideni gizlemişti. Doğrusu yukarıdadır.
-
-**Tehlike kalkmadı, ERTELENDİ — bekçinin varlık sebebi tam olarak budur.** Bugün müşteriyi
-`'draft'`ten ayıran şey politikanın çivisi değil, grant'ın darlığıdır. Ama E5 Kompozör'ün
-admin ekranı **tam da bu grant'ın genişletilmesini** gerektirecek (Kol A ölçtü: admin
-bugün draft teklif açamıyor, çünkü `status` yetkisi yok). Grant genişlediği an, müşteriyi
-`'draft'`ten ayıran **tek** katman politikanın gövdesindeki `status = 'requested'`
-çivisi olacaktır. Koruma, geçici bir grant darlığına değil **politikaya** yaslanmalıdır;
-grant daraltmak da çözüm değildir çünkü admin de `authenticated`'tır.
+**Niçin bu sınır (canlı ölçüm, 2026-08-27):** `'draft'` admin'in teklifi yazdığı,
+**fiyatın oluştuğu** durumdur. `authenticated` rolünün INSERT kolon yetkisi
+`venthub_quotes`'ta **7**, `venthub_quote_items`'ta **8** kolondur ve grant admin ile
+müşteriye **aynı anda** verilir — admin de `authenticated`'tır. Durumu çivilemeyen bir
+müşteri-INSERT politikası eklenirse müşteri kendine doğrudan `'draft'` teklif üretip
+fiyat yazabilir ve akışın tamamını atlar. **Grant daraltmak çözüm değildir** (admin'i
+kırar); koruma politikanın gövdesindeki `status = 'requested'` çivisidir.
 
 **Bekçi:** `src/__tests__/conformance/quote-insert-policy-guard.test.ts`. Bütün
 migration'ları okur, seçimi **ada değil içeriğe** göre yapar (yeniden adlandırma
@@ -12121,43 +12191,6 @@ politika kırmızı yakar ve insan gözden geçirmesini zorlar. Sessizce eklenem
 bugün **sıfır çağıranı** vardır — depoda admin `'draft'` teklif üreten kod yolu yoktur
 (tek INSERT yolu `quoteService.ts` `createQuoteRequest`, o da müşteri yoludur). Kapı
 açıktır, geçen henüz yoktur; geçişi E5 Kompozör (REC-54 Kalem 2) yazacaktır.
-
-**Kol A — DAVRANIŞSAL kanıt (2026-08-27, `begin … rollback`, prod'a kalıcı yazma **0**;
-koşum öncesi/sonrası satır sayımı `venthub_quotes` 0→0, `venthub_quote_items` 0→0):**
-
-| kol | beklenen | gözlenen | reddi YAPAN katman |
-|---|---|---|---|
-| müşteri kendi `'requested'` teklifini açar | KABUL | kabul edildi | — |
-| kendi teklifine **fiyatsız** kalem | KABUL | kabul edildi | — |
-| **aynı** kalem + `unit_price` | RED | `42501` | **GRANT** (fiyat kolonu yetkisi yok) |
-| başka müşteri → gerçek teklife kalem | RED | `42501` | **RLS** |
-| admin → `'requested'` teklife kalem | RED | `42501` | **RLS** (politika `'draft'` ister) |
-| sahte tenant claim'i + gerçek tenant satırı | RED | `42501` | **RLS** |
-| başkası adına teklif | RED | `42501` | **RLS** |
-| **admin `'draft'` teklif açar** | KABUL bekleniyordu | `42501` | **GRANT** — ⚠ politika **ulaşılamaz** |
-
-Son satır bu koşumun asıl bulgusudur: `quotes_insert_admin_draft` ve
-`quote_items_insert_admin` **canlıdır ama hiçbir `authenticated` istemci onlara
-ulaşamaz.** E5 Kompozör bugünkü hâliyle PostgREST üzerinden ne draft teklif açabilir ne
-fiyat yazabilir; ya service_role'lü bir Edge Function yolu seçilecek ya da grant
-genişletilecektir. Bu bir **karar** kalemidir (REC-54 Kalem 2).
-
-**Ön koşullar AYIRT EDİCİ kuruldu — yoksa sekiz kolun sekizi de sahte yeşil olurdu:**
-(a) rol `authenticated`, `rolsuper`/`rolbypassrls` **false** ölçüldü; bağlantının kendi
-rolü `postgres`'tir ve tabloların **sahibidir**, `relforcerowsecurity` de `false` —
-yani rol değiştirilmeseydi RLS **hiç** değerlendirilmezdi. (b) `request.jwt.claims`
-**gerçekten okunuyor**: bunu ölçmek için bilerek **var olmayan** bir tenant verildi, çünkü
-depodaki tek tenant `jwt_tenant_id()`'nin sessiz fallback değerinin **ta kendisidir** ve
-"tenant eşleşti" gözlemi claim hiç okunmasa da aynı çıkardı. (c) `42501`'ler **mesajdan**
-ayrıştırıldı: `row-level security policy` ≠ `permission denied for table`; ayrıştırılmasaydı
-grant reddi RLS kanıtı sanılırdı.
-
-⚠ **`is_admin_user()` gövdesinin ilk satırı `service_role`'de koşulsuz `TRUE` döner.**
-Bu doğrulamayı ayrıcalıklı bir bağlantıda koşmak sekiz kolu da yeşil gösterir ve **hiçbir
-şey ölçmez**. Aynı sınıftan iki tuzak daha koşum sırasında yakalandı ve betik düzeltildi:
-`venthub_quotes.source` bir CHECK kısıtına (`pdp|cart|project`) tabidir ve
-`user_id` **`auth.users`'a FK taşır** — sentetik kimlikle kurulan "kabul" kolları
-RLS'e hiç gelmeden `23514`/`23503` ile düşer ve bu, RLS reddi sanılabilirdi.
 
 ### 7.3 Eşik — mekanizma otonom, değer config
 
