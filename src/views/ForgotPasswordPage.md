@@ -12,6 +12,8 @@ entity_hashes:
 generated_at: 2026-06-19T20:50:42Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, kullanıcıların şifrelerini sıfırlamaları için bir e-posta adresi girmelerini gerektiren tek sayfalık bir React bileşenidir. Kullanıcı formu gönderdiğinde, e-posta adresi sunucudaki şifre sıfırlama servisine asenkron olarak iletilerek süreç başlatılır.
 
