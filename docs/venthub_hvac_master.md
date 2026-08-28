@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T06:59:24.756279+00:00
+compiled_at: 2026-08-28T06:59:31.544866+00:00
 total_compiled_files: 656
-source_commit: 72fdde38
+source_commit: e0a6c699
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-28T06:59:24.756279+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-28T06:59:31.544866+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
