@@ -150,6 +150,18 @@
           }
         ]
       }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/precompact-durum-kapisi.cjs",
+            "statusMessage": "durum kapisi"
+          }
+        ]
+      }
     ]
   }
 }

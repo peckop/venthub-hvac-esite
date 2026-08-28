@@ -308,106 +308,105 @@ tutmuşken. Betik bunu `UYGULANAMADI (desen tutmadı)` diye bildirdiği için fa
 Windows checkout'unda **EOL-bağımsız** (`\r?\n`) olmalıdır. Bu, §9.5'teki "ölçüm aracının kendisi
 kör olabilir" dersinin ikinci örneğidir; ölçüm aracı da ölçülür.
 
-## 11. KİMLİK — vekil kanıt ile asıl kanıt (E1-v2)
+---
 
-**Ölçüldü 2026-08-28 (ALTYAPI, kendi ağacında, kendi kapısı bloklayınca).** §9.1 kancanın
-**hangi ağacı** ölçtüğünü konu alıyordu. Bu bölüm bir adım öncesini konu alır: **kim olduğunu.**
+## 10. Compact dayanıklılığı — 4 sabit alan + PreCompact kapısı
 
-### 11.1 Olay
+**Niçin var — ölçülmüş vakalar, tahmin değil.**
+2026-08-27: compact dönüşünde durum dosyası okunmadı; gün boyu bedel ödendi.
+2026-08-28: kullanıcının geçiş anında yazdığı mesaj yutuldu — 3 tur kayıp + güven hasarı.
+Aynı gün ölçüldü ki bu makinede **PreCompact kancası hiçbir ayar katmanında tanımlı değildi**
+(proje/kullanıcı/local `settings.json` + 11 eklenti `hooks.json` → 0 eşleşme; negatif kontrol
+olarak aynı tarama `SessionStart` için 153 dosya buldu). Yani compact dayanıklılığımız
+tamamen ajan disiplinine dayanıyordu: kural yazılıydı, **mekanizma yoktu**. Bu bölüm o
+boşluğu kapatır ve §4'ün "öz-test değil, ayırt edici test" ilkesini compact'e uygular.
 
-`lane-precommit` (E1) kimliği `<git-dir>/venthub-sid` dosyasından okuyordu. Bu dosyayı
-SessionStart kancası yazar — ama oturumun **açıldığı** ağaca, **çalıştığı** ağaca değil. Bir
-oturum ana dizinde açılıp işini bir worktree'de yaparsa, o worktree'deki kimlik orada **en son
-oturum açanın** sid'i olarak kalır.
+### 10.1 Durum dosyası — DÖRT SABİT ALAN (zorunlu)
 
-Sonuç: kapı `vh-altyapi-851` ağacında ALTYAPI'yı "başka şerit" sanıp **kendi claim'indeki**
-dosyada bloklad. Dosyada yazan sid `dc2b0b90` — ağacı kuran, çoktan ölmüş bir oturum.
+Her oturumun bir durum dosyası vardır; adı `lane-day` / `state` / `durum` kalıbını taşır ve
+frontmatter'ında `metadata.originSessionId` oturum kimliğini tutar. Compact bloğu şu dördünü
+**adıyla** içerir:
 
-### 11.2 Körlüğün biçimi ve YÖNÜ
+| alan | cevapladığı soru |
+|---|---|
+| **SON GİRDİ** | kullanıcıdan bana en son ne ulaştı |
+| **AÇIK KUYRUK** | sırada ne var, hangi sırayla |
+| **VERİLEN SÖZLER** | kime ne taahhüt ettim |
+| **BEKLEYEN KARARLAR** | kimde hangi karar bekliyor |
 
-Eski dedektör yalnız **"kimlik dosyası YOK"** hâlini arıyordu (o sabah URUN'un ağacında bunu
-doğru yakaladı). **"Dosya VAR ama YANLIŞ SAHİBE ait"** hâlini görmüyordu. İki hâl aynı arızayı
-doğurur — şerit kontrolü yanlış oturum adına koşar — biri sessizdi.
+Dördü de **ölçülebilir olsun diye** sabittir: alan adları serbest bırakılırsa "tutarsızlık"
+bir yargı olur, oysa alanın varlığı bir ölçümdür. Kapı bu dördünü arar.
 
-**Yön önemlidir.** Ölçülen vakada hata *güvenli* yöne düştü: kapı kendi sahibini bloklad, yani
-gürültü yaptı. **Ters yön sessizdir:** bayat sid *canlı* bir şeride aitse, o ağaçta çalışan
-kişi **onun yetkisiyle** yazar ve kapı hiç ses çıkarmaz. Bu yüzden düzeltme "daha çok blok"
-değil, **doğru kimlik + görünür uyarı**dır.
+### 10.2 Eşikler — SAYIYLA yazılı
 
-### 11.3 Kural — kanıt sıralaması
-
-| sıra | kaynak | sınıf |
+| eşik | değer | ölçüm tabanı |
 |---|---|---|
-| 1 | `CLAUDE_CODE_SESSION_ID` (env) | **ASIL** — commit'i tetikleyen sürecin kendi kimliği |
-| 2 | `<git-dir>/venthub-sid` | **VEKİL** — elle/terminalden commit için tek kaynak |
+| durum dosyası bayatlık | **60 dakika** | 2026-08-28: aktif beş şeridin dosyaları 1/9/17/27/35/39/46 dk yaşındaydı; bir sonraki değer 356 dk (kapanmış gün). 60, en eski aktif dosyaya pay bırakır ve kapanmış günü ayırt eder. 30 seçilseydi o gün AUTH yanlış alarm alırdı. |
+| `MEMORY.md` boyut | **16384 bayt** | indeks ~24.4KB'de okunamaz oluyor, 27.5KB'de sessizce kırpıldığı gözlendi. Ölçü **bayt**, satır değil — kırpma bayta bakar. |
 
-Çelişkide **asıl kazanır**, çelişki **görünür uyarı** olarak basılır ve vekil dosya asıl
-kimlikle **onarılır** (yan etki gizli değildir, uyarısı vardır).
+Eşikler koddan **export edilir** ve conformance testi cetveldeki sayıyla eşleştiğini ölçer;
+sihirli sayı bırakmak, sonraki değiştirenin neyi neden değiştirdiğini bilememesi demektir.
 
-### 11.4 Bilinmeyen kimlik FAIL-OPEN geçer — blok değil
+### 10.3 Kapının davranışı — ne bloklar, ne uyarır
 
-Env yoksa ve dosyadaki sid panoda **hiç görülmemişse**, kapı karar vermez: uyarır ve geçirir.
-Gerekçe bu dosyanın kendi 2026-08-15 notudur — rastgele/yanlış blok `--no-verify` alışkanlığı
-kazandırır ve **gerçek** kapıları da birlikte atlatır. Kapı yanlış oturum adına karar vermektense
-sesli biçimde susmalıdır.
+**BLOKLAR (exit 2):** oturumun hiç durum dosyası yok. Bu halde compact = kesin kayıp.
+**UYARIR (exit 0):** dosya bayat · dört alandan biri eksik · `MEMORY.md` eşiği aşıldı.
+Bayatlık **asla bloklamaz**: compact'i engellemek, kaybettirdiğinden fazlasını maliyet
+yazabilir. Kilitlenmeye karşı kaçış valfi `VENTHUB_PRECOMPACT_KAPALI=1` ve valfin kendisi
+testlidir — kaçış yolu ölçülemiyorsa kaçış yolu yoktur.
 
-### 11.5 ÖLÇEMEDİĞİM ŞEY — adıyla
+### 10.4 Dönüş ayağı — SessionStart(compact)
 
-**"Dosyadaki sid ŞU AN CANLI MI"** sorusu bu kapıda cevaplanmıyor. Denendi ve gösterge
-**ayırt etmedi**: 2026-08-28 07:10 ölçümünde canlı dört şeridin heartbeat yaşı 51 dk, aynı anda
-**kapalı** TEMIZLIK oturumunun da 51 dk'ydı. Ayırt etmeyen gösterge ölçüm değildir; canlılık
-iddiası bu yüzden **kurulmadı**. Ayırt edilebilen daha zayıf ama gerçek ölçüt kullanıldı:
-sid panoda hiç görülmüş mü (bayat `dc2b0b90` hiç görülmemişti).
+`SessionStart` kancası `source === 'compact'` kolunda durum dosyasının **son bloğunu**
+bağlama enjekte eder. Gerekçe: "dönüşte durum dosyanı oku" demek ile **okutmak** aynı şey
+değil; 08-27 vakasında kural yazılıydı ve yine okunmadı. Tüm dosya değil son blok basılır —
+kırpılmış bağlamı yeniden doldurmak çözüm değildir.
 
-### 11.6 Test biçimi — kaynak metni değil DAVRANIŞ
+### 10.5 Bilinen sınır — ÖLÇÜLMEMİŞ, kapı buna güvenmez
 
-`e1-kimlik-kontrolu.test.ts` kapının kaynağında dize aramaz; her kol geçici bir git deposu
-kurar, gerçek bir staged commit dener ve kapının çıktısını okur. Pano `VENTHUB_BOARD_DIR` ile
-izole edilir (testin canlı filo panosuna yazması ölçümü kirletirdi — pytest'in canlı registry'ye
-yazdığı vaka kayıtlı).
+Platform belgesi `exit 2` için "blocking error, stderr fed back to Claude" diyor; ancak
+**PreCompact'ta compact'i gerçekten iptal ettiği bu makinede ölçülmedi** — compact'i kullanıcı
+tetikler, ajan tetikleyemez, yani bu ölçüm ajan tarafından yapılamaz (ÖNCÜL-ÖLÇÜM hükmünün
+"ÖLÇÜLEMEZ" kutusu; bir seçim değil, bir özellik). Bu yüzden kapı o davranışa **güvenmeyecek**
+biçimde tasarlandı: blok çalışmasa bile stderr Claude'a beslenir ve uyarı görünür. İlk gerçek
+compact'te davranış ölçülüp bu madde güncellenecek — güncellenene kadar burada "iddia" olarak
+durur, "kanıt" olarak değil.
 
-⭐**İlk yazışımda bu test SAHTE YEŞİL verdi ve sebebi kayda değer:** geçici depoda hiç commit
-yoktu, `git rev-parse HEAD` patlıyordu, kapı "git okunamadı" koluna düşüp **hiç koşmadan**
-geçiyordu. Beş kol kırmızı yandı ama **negatif kontrol kolları YEŞİL** verdi — çünkü "susuyor"
-ile "hiç çalışmıyor" aynı görünür. Düzeltme iki parçalıdır: fikstüre ilk commit eklendi **ve**
-bir **MEKANİZMA CANLI** kolu yazıldı — aynı fikstürde başka şeridin claim'i kurulup kapının
-**bloklad**ığı ölçülür. **Negatif kontrol, mekanizmanın çalıştığı ayrıca kanıtlanmadan kanıt
-değildir.**
+### 10.6 Kanıt zorunluluğu (§8'in bu bölüme uygulanışı)
 
-### 11.7 Sabotaj kanıtı — ve ARACIN kendi bulduğu üç körlük
+Kapı `src/__tests__/conformance/precompact-durum-kapisi.test.ts` ile sekiz koldan ölçülür.
+Kolların **bağlılık** ayağı ayrıca zorunludur: kanca dosyasının var olması yetmez, `settings.json`
+içinde `PreCompact` olayına bağlı olduğu ölçülür — bu depoda "yazıldı ama bağlanmadı" ölçülmüş
+bir sınıftır ve yalnız o kol yakalar. Sabotaj tablosu:
 
-| tur | sabotaj | KIRMIZI | kör | ATLANAN |
-|---|---|---|---|---|
-| 1 | 6 | 3 | **3** | 0 |
-| 2 (test sertleştirildikten sonra) | 6 | **6** | 0 | 0 |
+| sabotaj | düşen kol |
+|---|---|
+| `settings.json` bağlaması sökülsün | bağlılık |
+| blok kolu sökülsün (durum dosyası yokken sessizce geçsin) | blok |
+| ad filtresi sökülsün (her dosya durum dosyası sayılsın) | ayırt edicilik |
+| `require.main` koruması sökülsün | modül |
+| güvenlik valfi sökülsün | valf |
+| bayatlık eşiği değiştirilsin | eşik |
 
-⭐**İlk turda kör kalan üç kol, kapının değil TESTİN zayıflığıydı ve üçü de aynı sınıftı — VEKİL
-KANIT:**
+⚠ Bu tablonun **ilk turu yanlış hedefi vurdu** ve bunu kaydetmek şart: "ad kalıbı katmanı"
+sabotajı yeşil kaldı ve ilk okuyuşta **kör nokta** sanıldı. Ölçünce **fazlalık** olduğu
+görüldü — gerçek ders dosyaları dört alandan sıfırını taşıyor, yani içerik katmanına hiç
+girmiyorlar ve sabotaj davranışı değiştirmiyordu. Aynı ölçüm ikinci bir kusuru açtı: içerik
+katmanının eşiği 2'ydi ve **gerçek durum dosyalarını da dışlıyordu** (onlar da yalnız bir alan
+tutuyor), yani katman ölüydü. §9.5'in dersi burada üçüncü kez doğrulandı: sabotajın
+**çıktısını** değil **eşdeğerliğini** ölç; yeşil kalan sabotaj kapıyı değil ölçüm aracını
+suçlayabilir.
 
-| sökülen kol | test niçin göremedi | düzeltme |
-|---|---|---|
-| `bilinmeyen` bayrağı | uyarı **yine basılıyordu**, değişen şey DAVRANIŞTI | çakışan claim kurulup çıkış kodu ölçüldü |
-| onarım (`writeFileSync`) | `onar()` yine `true` dönüyor, "ONARILDI" yazılıyordu | kimlik **dosyasının içeriği** okundu |
-| fail-open uyarısı | `/fail-open/i` deseni **başka bir mesajda da** geçiyordu | tam cümle deseni + davranış kolu |
+**ÖLÇÜM SONUCU (2026-08-28, taze koşum):** `6 sabotaj | KIRMIZI 6 | kör 0 | ATLANAN 0`.
+Ön koşul 8/8 yeşil, onarım sonrası 8/8 yeşil, sha doğrulandı. Yani tablodaki altı kolun
+altısı da gerçekten yük taşıyor — hiçbiri süs değil.
 
-Kural olarak yazılıyor: **bir kapının çıktısındaki cümleyi ölçmek, o kapının yaptığı işi ölçmek
-değildir.** Mesaj vekil kanıttır; dosyanın yeni hâli, çıkış kodu ve blok kararı asıl kanıttır.
-Sabotaj bu ayrımı ücretsiz gösterir — koşulmasaydı 8/8 yeşil bir test üç kolunda kör olarak
-depoya inecekti.
-
-### 11.8 ⭐BU BÖLÜM YAZILIRKEN §9.1 TUZAĞINA KENDİM DÜŞTÜM — vaka kaydı
-
-E1-v2'yi yazarken commit komutum **ortak ana dizinde** koştu ve `master` dalına yerel bir commit
-attı; `git add -A` yabancı artıkları (`.playwright-mcp/*`, başka şeritlerin companion'ları) da
-aldı. Sebep tam olarak §9.1'de yazılı olan şeydi: **kabuk cwd'si sessizce ana çalışma dizinine
-resetlenir** — ölçüm için bir kez `cd`'lediğim başka depodan sonra sonraki komutlar 851 ağacında
-değil ana dizinde çalıştı.
-
-Zarar ölçüldü ve geri alındı: commit `reset --mixed` ile çözüldü (dosyalar yerinde kaldı),
-ana dizin `origin/master`'ın önünde **0 commit**, push edilmemişti. İki şerit dalı (`rec86-faz1`
-10 commit, `rec84-denetim-penceresi`) ölçümle doğrulandı, **kayıp yok**.
-
-**Kural — kancalar için yazılmış §9.1, ELLE koşan komutlar için de geçerlidir:** şerit işi yapan
-her git/dosya komutu **`git -C <ağaç>` ya da mutlak yol** kullanır; cwd'ye güvenilmez. Ek olarak
-**`git add -A` şerit işinde kullanılmaz** — ortak ağaçta yabancı artıkları toplar; dosyalar
-adıyla eklenir.
+⚠ **ÖLÇÜM ARACININ KENDİ KUSURU, §9.5'in dördüncü örneği.** Bu tablonun ilk koşumu YARIM
+kaldı: betik çalışırken durduruldu ve `onar()` adımı hiç çalışmadı — depoda sabotaj artığı
+kaldı (`require.main` koruması sökülü). Yani yarım sabotaj yalnızca kanıt üretmemekle
+kalmaz, **depoyu bozuk bırakır** ve bir sonraki koşum "kapı zaten kırmızı" diyerek durur.
+İki onarım yapıldı: (1) sabotaj döngüsü `try/finally` içine alındı, artık kesilme/exception
+fark etmeksizin dosyalar asıl haline döner ve sha doğrulanır; (2) test koşumu `npx` yerine
+doğrudan `node node_modules/vitest/vitest.mjs` çağırır — ölçüldü, `npx` bir koşumu 60 sn'nin
+üstüne çıkarıyordu ve ilk turun zaman aşımına uğramasının sebebi testler değil bu overhead'di.
+Kural: **yarım sabotaj kanıt değildir; kanıt tablosu ancak ATLANAN 0 ile birlikte okunur.**

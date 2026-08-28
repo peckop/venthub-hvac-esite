@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T08:20:53.679100+00:00
+compiled_at: 2026-08-28T08:38:10.993907+00:00
 total_compiled_files: 656
-source_commit: ed0b9872
+source_commit: 8925f907
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-28T08:20:53.679100+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-28T08:38:10.993907+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -9486,8 +9486,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-851\src\app\_components\ProductDetailPageView.tsx
-skeleton_hash: 3c3379e71d1a598c
+source_path: C:\tmp\vh-urun-comp\src\app\_components\ProductDetailPageView.tsx
+skeleton_hash: 696171e81f07b205
 entity_hashes:
   func:PdpSkuBridge: 7eb9545f35ab0fb2
   func:ProductDetailBody: 678d999364789e47
@@ -9500,8 +9500,8 @@ entity_hashes:
   func:pickLang: 946d41753cca4e50
   func:toggleSpecSection: aca256fdc4d20ecb
   overview: 590be9a86b563f9f
-  style_tokens: d8b7561aa4410d27
-generated_at: 2026-08-28T08:20:37Z
+  style_tokens: e157cb22f5459ba5
+generated_at: 2026-08-27T06:54:02Z
 ---
 
 ## Genel Bakış
@@ -9856,8 +9856,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-normal`, `tracking-hvac-snug`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`, `bg-white/80`
-- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`, `gap-8`
+- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`
+- **Layout:** `absolute`, `backdrop-blur-2`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`
 - **Varyant/Responsive:** `:`, `active:`, `disabled:`, `group-hover:`, `hover:`, `last:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
 - **Yardımcı Sınıflar:** `${activeSection`, `${inStock`, `${isNavSticky`, `${isOpen`, `${isWishlisted`, `${section.bgClass`, `:`, `===`, `active:scale-95`, `active:scale-98`, `animate-in`, `animate-ping`, `animate-pulse`, `animate-pulse-subtle`, `animate-spin`
 
@@ -49650,11 +49650,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-851\src\i18n\dictionaries\en.ts
-skeleton_hash: 6bb4a8b2133f5ea5
+source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\en.ts
+skeleton_hash: 9d0705a703cca270
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-28T08:20:42Z
+generated_at: 2026-08-27T04:25:30Z
 ---
 
 ## Genel Bakış
@@ -49713,11 +49713,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-851\src\i18n\dictionaries\tr.ts
-skeleton_hash: 8ef4c6eaa0eea637
+source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\tr.ts
+skeleton_hash: 612478c507ab5d21
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-08-28T08:20:44Z
+generated_at: 2026-08-27T04:25:30Z
 ---
 
 ## Genel Bakış
@@ -53349,11 +53349,11 @@ Fonksiyon gövdesi bulunmadığından AST Pointer üretilmemiştir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-851\src\i18n\dictionaries\admin\ui.en.ts
-skeleton_hash: ca405b3a8be4c7e1
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\ui.en.ts
+skeleton_hash: efd1f7fe409cadc7
 entity_hashes:
   overview: 1ca0cb4cc145d139
-generated_at: 2026-08-28T08:20:39Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
@@ -53416,11 +53416,11 @@ Bu modül, uluslararasılaştırma (i18n) sözlük verisi içeren bir kaynaktır
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-851\src\i18n\dictionaries\admin\ui.tr.ts
-skeleton_hash: 2b67dd0af4b46f23
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\ui.tr.ts
+skeleton_hash: 6d0c5eefe4b263d7
 entity_hashes:
   overview: 1ca0cb4cc145d139
-generated_at: 2026-08-28T08:20:40Z
+generated_at: 2026-08-27T06:50:47Z
 ---
 
 ## Genel Bakış
