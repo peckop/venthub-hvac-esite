@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest'
 /**
  * INV-SILENTFAN-SERI-1 — sessiz fan anlatısı SERİye bağlıdır, kategoriye değil.
  *
- * Cetvel: `docs/standards/catalog-depth-standard.md` §K1.1 (Recep kararı, 2026-08-28).
+ * Cetvel: `docs/standards/catalog-depth-standard.md` §1.1 (K1.1) (Recep kararı, 2026-08-28).
  *
  * NİÇİN BU KAPI VAR — iki ayrı kusur sınıfı, ikisi de yaşandı:
  *

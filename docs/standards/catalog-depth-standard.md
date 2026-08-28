@@ -67,7 +67,10 @@ Müşteri bir yerde "hangisi?" diye duruyorsa orası bir sayfadır. Durmuyorsa �
 değişiyorsa — orası sayfa değil, **aynı sayfadaki seçicidir**. Dağınıklık bu tek cümleyle
 engellenir.
 
-### K1.1 — Anlatının konusu bir SERİ ise, tetikleyici ve kapsam SERİdir (2026-08-28)
+### 1.1 — Anlatının konusu bir SERİ ise, tetikleyici ve kapsam SERİdir (2026-08-28)
+
+> Kural kimliği: **K1.1**. Başlık numarası cetvelin kendi düzenine uyar (`§1`'in alt bölümü);
+> kod ve migration yorumlarında bu maddeye **§1.1 (K1.1)** diye atıf yapılır.
 
 **Kural.** Anlatı ve sihirbaz K1'in yerinde — **kategori sayfasında** — kalır. Ama anlatının
 konusu tek bir seriyse ve o seri kategorisini konu-dışı serilerle paylaşıyorsa:

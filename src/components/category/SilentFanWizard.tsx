@@ -58,7 +58,7 @@ interface SilentFanWizardProps {
   /**
    * Adayların çekileceği SERİ (aile) — kanonik slug.
    *
-   * ⭐KATEGORİ DEĞİL SERİ (REC-85, cetvel `catalog-depth-standard.md` §K1.1):
+   * ⭐KATEGORİ DEĞİL SERİ (REC-85, cetvel `catalog-depth-standard.md` §1.1 (K1.1)):
    * sihirbazın konusu bir seridir; kategori kapsamı o serinin komşularını da aday
    * sayar ve sessiz olmayan ürün önerilebilir.
    */

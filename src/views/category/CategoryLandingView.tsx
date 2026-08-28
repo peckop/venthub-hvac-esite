@@ -31,7 +31,7 @@ import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 /**
  * Sessiz fan anlatısının KONUSU olan seri (kanonik `product_families.slug`).
  *
- * REC-85 / `docs/standards/catalog-depth-standard.md` §K1.1: anlatının konusu bir seriyse,
+ * REC-85 / `docs/standards/catalog-depth-standard.md` §1.1 (K1.1): anlatının konusu bir seriyse,
  * hem görünme koşulu hem sihirbaz kapsamı O SERİdir — kategori değil. Sabit tek yerde yaşar
  * ki tetikleyici ile sihirbaz kapsamı birbirinden AYRILAMASIN (ayrılırsa anlatı görünür ama
  * sihirbaz başka ürün önerir; hiçbir sayı bunu göstermez).
@@ -68,7 +68,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     const isAirCurtain = category.slug === 'air-curtains'
     // ⭐SESSİZ FAN ANLATISI — TETİKLEYİCİ KATEGORİ DEĞİL **SERİ** (REC-85, Recep kararı 2026-08-28).
     //
-    // Cetvel: `docs/standards/catalog-depth-standard.md` §K1.1. Anlatı K1'in yerinde kalır
+    // Cetvel: `docs/standards/catalog-depth-standard.md` §1.1 (K1.1). Anlatı K1'in yerinde kalır
     // (kategori sayfası), ama konusu bir SERİ olduğu için tetikleyicisi de seridir.
     //
     // NİÇİN: bölüm önce `inline-duct-fans` kategorisine bağlıydı; o kategori pasif ve 0 serili,

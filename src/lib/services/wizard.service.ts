@@ -97,7 +97,7 @@ function satiriAdayaCevir(satir: DbProduct): FanAdayi {
  * sayıyordu — yani sihirbaz "sessiz fan öner" derken sessiz olmayan ürün önerebiliyordu.
  * Tutulamayacak bir vaat; kapı da görmezdi çünkü sayılar tutarlı görünür.
  *
- * Cetvel: `docs/standards/catalog-depth-standard.md` §K1.1 (anlatının konusu seri ise
+ * Cetvel: `docs/standards/catalog-depth-standard.md` §1.1 (K1.1) (anlatının konusu seri ise
  * tetikleyici ve kapsam SERİdir). Bekçi: `INV-SILENTFAN-SERI-1`.
  *
  * Aile kanonik slug ile aranır (`product_families.slug`) — görünen/lokalize slug ile DEĞİL.

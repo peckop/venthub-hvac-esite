@@ -2,7 +2,7 @@
 -- ANLATI SAYFALARI — display_mode geri/ileri alınır (REC-85 + omurga regresyonu)
 --
 -- KAYNAK/CETVEL
---   Cetvel        : docs/standards/catalog-depth-standard.md §K1 + §K1.1
+--   Cetvel        : docs/standards/catalog-depth-standard.md §K1 + §1.1 (K1.1)
 --                   docs/standards/category-taxonomy-standard.md
 --   Ölçüm tazeliği: canlı prod DB + canlı vitrin (tarayıcı), 2026-08-28
 --   Linear        : REC-85 · Şerit: ÜRÜN · Tetikleyen: Recep'in canlı vitrin incelemesi
@@ -41,7 +41,7 @@
 --
 -- 2) KANAL TİPİ FANLAR — YENİ KARAR (REC-85'i görünür kılar)
 --
---    Sessiz fan anlatısı REC-85 ile Vortice Lineo Quiet SERİSİNE bağlandı (§K1.1).
+--    Sessiz fan anlatısı REC-85 ile Vortice Lineo Quiet SERİSİNE bağlandı (§1.1 (K1.1)).
 --    Ama o serinin kategorisi `duct-fans` de `series` modunda — yani anlatı doğru yere
 --    bağlandığı hâlde sayfa onu çizmiyor. Kod değişikliği tek başına EKSİK; bu iki satır
 --    olmadan müşteriye hiçbir şey ulaşmaz. (Bu, "iş bitti ama erişilemiyor" sınıfının
@@ -53,6 +53,32 @@
 --
 -- ⚠ GERİ ALINABİLİRLİK: hiçbir satır eklenmez/silinmez/taşınmaz. Kararı geri almak
 --   aynı iki UPDATE'i 'series' ile koşmaktır.
+--
+-- -----------------------------------------------------------------------------
+-- TAZELEME — "DB doğru oldu ama vitrin eski kaldı" riski ÖLÇÜLDÜ
+--
+-- Bu depo "1044 fiyat satırı yazıldı, vitrin değişmedi" vakasını yaşadı;
+-- `rendering-cache-standard.md` bu yüzden var. Aynı tuzağa düşmemek için zinciri
+-- varsaymadım, ÖLÇTÜM — üç bağımsız yol da mevcut:
+--
+--   1. DB TETİĞİ (canlı prod, ölçüldü): `on_categories_change` → `handle_supabase_webhook`,
+--      `pg_trigger.tgenabled = 'O'` (etkin). Aşağıdaki iki UPDATE bu tetiği satır başına
+--      tetikler.
+--   2. WEBHOOK DALI (kaynakta, ölçüldü): `src/app/api/webhook/supabase/route.ts` içinde
+--      `table === 'categories'` dalı var; `revalidateCategoryTree(self)` ile kategorinin
+--      kendi yollarını, ardından ÇOCUK kategorilerin iki segmentli yollarını tazeliyor.
+--   3. ISR TABANI (kaynakta, ölçüldü): `src/app/[lang]/category/[categorySlug]/page.tsx`
+--      → `export const revalidate = 3600`. İlk iki yol sessiz kalsa bile sayfa en geç
+--      bir saat içinde kendini yeniler.
+--
+--   Dördüncüsü: bu PR merge edilince prod dağıtımı yeni bir build üretir ve statik
+--   sayfalar baştan çizilir.
+--
+-- ⚠ SINIR, AÇIKÇA YAZIYORUM: yukarıdakiler mekanizmanın VARLIĞININ kanıtıdır,
+--   ÇALIŞTIĞININ değil. Merge sonrası canlı doğrulama YİNE YAPILACAK (tarayıcıyla,
+--   curl ile değil): /tr/category/hava-perdeleri anlatı + sihirbaz taşımalı,
+--   /tr/category/kanal-tipi-fanlar sessiz fan anlatısını taşımalı.
+--   "Merge canlıda çalıştığını kanıtlamaz."
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------

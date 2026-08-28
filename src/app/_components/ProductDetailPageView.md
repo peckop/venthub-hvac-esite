@@ -16,8 +16,8 @@ entity_hashes:
   func:pickLang: 946d41753cca4e50
   func:toggleSpecSection: aca256fdc4d20ecb
   overview: 590be9a86b563f9f
-  style_tokens: e157cb22f5459ba5
-generated_at: 2026-08-27T06:54:02Z
+  style_tokens: d8b7561aa4410d27
+generated_at: 2026-08-28T08:20:43Z
 ---
 
 ## Genel Bakış
@@ -328,8 +328,8 @@ graph TD
     ProductDetailPageView_tsx__openQuoteRequest["openQuoteRequest"]
     ProductDetailPageView_tsx__pickLang["pickLang"]
     ProductDetailPageView_tsx__toggleSpecSection["toggleSpecSection"]
-    ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__pickLang
     ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__toggleSpecSection
+    ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__pickLang
     ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__mapSlugToTopic
 ```
 
@@ -372,7 +372,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-normal`, `tracking-hvac-snug`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`
-- **Layout:** `absolute`, `backdrop-blur-2`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`
+- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`, `bg-white/80`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`, `gap-8`
 - **Varyant/Responsive:** `:`, `active:`, `disabled:`, `group-hover:`, `hover:`, `last:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
 - **Yardımcı Sınıflar:** `${activeSection`, `${inStock`, `${isNavSticky`, `${isOpen`, `${isWishlisted`, `${section.bgClass`, `:`, `===`, `active:scale-95`, `active:scale-98`, `animate-in`, `animate-ping`, `animate-pulse`, `animate-pulse-subtle`, `animate-spin`
