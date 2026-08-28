@@ -90,13 +90,32 @@ function relPath(globKey: string): string {
  */
 const TERMINALS: QuoteStatus[] = ['rejected', 'expired', 'cancelled', 'superseded', 'converted']
 
+/**
+ * TETİĞİ **TANIMLAYAN** DOSYA — adını ANAN dosya DEĞİL (2026-08-28, plan-challenger bulgusu).
+ *
+ * Eskiden seçim `sql.includes('enforce_quote_status_transition')` ile yapılıyordu ve
+ * `stripSqlComments` bu seçimden SONRA çağrılıyordu. Yani tetiğin adını **yorumunda**
+ * anan herhangi bir yeni migration (ör. "bu RPC tetiği atlamaz, tekrar etmez") listenin
+ * sonuna düşer, seçilir, içinde `old.status = '...'` deseni bulunmadığı için boş harita
+ * döner ve R2/R3 **tamamen alakasız görünen** bir sebeple kırmızı verir.
+ *
+ * Kusurun sınıfı: kapı, ölçmek istediği şeyi (geçiş haritası) değil DOSYA SEÇİMİNİ
+ * ölçüyordu. Onarım iki bacaklı: (1) yorumlar seçimden ÖNCE sıyrılır, (2) eşleşme
+ * "tanım" desenine bağlanır. Kapsam (`touchesQuotes`) bilerek GENİŞ kalır — bir dosyanın
+ * kapsamda olması ayrı, geçiş haritasının OTORİTESİ olması ayrı sorudur.
+ */
+const TETIK_TANIM_DESENI =
+  /create\s+(?:or\s+replace\s+)?function\s+(?:public\.)?enforce_quote_status_transition\b/i
+
 function migrationSource(): { path: string; sql: string } {
   const entries = Object.entries(QUOTE_MIGRATIONS)
-  expect(entries.length, 'quotes migration bulunamadı (*_quotes_*.sql)').toBeGreaterThan(0)
-  // Birden çok quotes migration'ı gelirse geçiş tetiği İLK kurulan dosyada yaşar;
-  // tetiği yeniden tanımlayan sonraki migration da aynı kurallardan geçmek zorunda.
-  const withTrigger = entries.filter(([, sql]) => sql.includes('enforce_quote_status_transition'))
-  expect(withTrigger.length, 'enforce_quote_status_transition tetiği hiçbir quotes migration\'ında yok').toBeGreaterThan(0)
+  expect(entries.length, 'quotes migration bulunamadı').toBeGreaterThan(0)
+  // Tetiği yeniden TANIMLAYAN en son migration otoritedir; onu da aynı kurallar bağlar.
+  const withTrigger = entries.filter(([, sql]) => TETIK_TANIM_DESENI.test(stripSqlComments(sql)))
+  expect(
+    withTrigger.length,
+    'enforce_quote_status_transition tetiğini TANIMLAYAN hiçbir migration yok',
+  ).toBeGreaterThan(0)
   const [path, sql] = withTrigger[withTrigger.length - 1]
   return { path, sql }
 }
@@ -227,6 +246,38 @@ describe('INV-QUOTE-1 · teklif durum-makinesi SSOT', () => {
   })
 
   /* ---- R2: migration tetiği SSOT'un birebir aynası ---- */
+  /**
+   * R2-ön: KAPININ KENDİ SEÇİMİNİ ÖLÇER — "otoriteyi doğru dosyadan mı okuyor".
+   *
+   * R2 yeşil olsa bile YANLIŞ dosyayı okuyor olabilirdi; bu kol tam o boşluğu kapatır.
+   * Üç kolu da POZİTİF ve NEGATİF yönde ölçer — ayırt etmeyen gösterge ölçüm değildir.
+   */
+  it('R2-ön: otorite, tetiği TANIMLAYAN dosyadan okunur (adını ANAN dosya seçilemez)', () => {
+    // (a) POZİTİF: gerçek tanım deseni eşleşir.
+    expect(
+      TETIK_TANIM_DESENI.test('create or replace function public.enforce_quote_status_transition()'),
+      'tanım deseni gerçek tanımı yakalamıyor — kapı hiçbir dosya seçemez',
+    ).toBe(true)
+
+    // (b) NEGATİF: yalnız adı ANAN bir yorum satırı seçilemez. Mekanizma çalışmasaydı
+    //     bu satır seçime girer ve R2 alakasız bir sebeple kırmızı olurdu.
+    const yorumdaGecen = '-- bu RPC enforce_quote_status_transition tetigini atlamaz\nselect 1;'
+    expect(
+      TETIK_TANIM_DESENI.test(stripSqlComments(yorumdaGecen)),
+      'yorumda geçen ad seçime giriyor — bekçi dosya seçimini ölçüyor demektir',
+    ).toBe(false)
+
+    // (c) NEGATİF: tetiği yalnız ÇAĞIRAN satır da tanım sayılmaz.
+    expect(
+      TETIK_TANIM_DESENI.test('  for each row execute function public.enforce_quote_status_transition();'),
+      'çağrı satırı tanım sayılıyor',
+    ).toBe(false)
+
+    // (d) Seçilen dosya gerçekten tanımı içeriyor (canlı ağaç üzerinde).
+    const { path, sql } = migrationSource()
+    expect(TETIK_TANIM_DESENI.test(stripSqlComments(sql)), `${path}: seçilen dosyada tanım yok`).toBe(true)
+  })
+
   it('R2: enforce_quote_status_transition geçişleri SSOT ile birebir aynı', () => {
     const { path, sql } = migrationSource()
     const parsed = parseMigrationTransitions(sql)
