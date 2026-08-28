@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
-import { storagePathToUrl, resolveProductImageUrl, productImagePlaceholder } from '../productImage'
+import { afterEach,describe, expect, it, vi } from 'vitest'
+
+import { productImagePlaceholder,resolveProductImageUrl, storagePathToUrl } from '../productImage'
 
 describe('productImage', () => {
   afterEach(() => {

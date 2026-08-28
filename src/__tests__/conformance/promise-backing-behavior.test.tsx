@@ -107,7 +107,8 @@ describe('INV-PROMISE-1 — vaat eden yüzey gerçekten bir şey yapıyor mu', (
     // "çağrı yok" sonucu çıkardı ve kapı KÖR koşardı.
     const Deneme: React.FC = () => (
       <button type="button" onClick={() => void fetch('/api/deneme')}>
-        {'gonder'}
+        {/* eslint-disable-next-line react/jsx-no-literals */
+          'gonder'}
       </button>
     )
     render(<Deneme />)

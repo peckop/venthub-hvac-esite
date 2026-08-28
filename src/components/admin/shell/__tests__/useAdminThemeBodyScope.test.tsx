@@ -93,7 +93,8 @@ describe('portal ağacı tema kapsamının İÇİNDE', () => {
           description="Kategori bilgilerini yönetin."
           closeLabel="Kapat"
         >
-          <p>gövde</p>
+          <p>{/* eslint-disable-next-line react/jsx-no-literals */
+          'govde'}</p>
         </AdminModal>
       </Kapsam>,
     )
@@ -117,7 +118,8 @@ describe('portal ağacı tema kapsamının İÇİNDE', () => {
           description="Açıklama."
           closeLabel="Kapat"
         >
-          <p>gövde</p>
+          <p>{/* eslint-disable-next-line react/jsx-no-literals */
+          'govde'}</p>
         </AdminModal>
       </Kapsam>,
     )

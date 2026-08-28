@@ -31,9 +31,8 @@ function Harness({
 }) {
   const confirm = useConfirm()
   return (
-    <button type="button" onClick={() => confirm(options).then(onResult)}>
-      tetikle
-    </button>
+    <button type="button" onClick={() => confirm(options).then(onResult)}> {/* eslint-disable-next-line react/jsx-no-literals */
+          'tetikle'} </button>
   )
 }
 

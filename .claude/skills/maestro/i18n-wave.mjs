@@ -21,7 +21,7 @@ YASAKLAR:
 DÖNÜŞ: keys = SADECE yeni eklediğin anahtarlar { keyName: { tr, en } } (keyName = ns altında kısa TEK-PARÇA ad, NOKTASIZ); tr = orijinal Türkçe birebir; en = sadık İngilizce. Her key'in tr VE en'i dolu.
 `
 
-const SURFACE = 'tail' // etiket; gerçek yüzey her hedefin ns'inden türetilir (çoklu-yüzey destekli)
+const _SURFACE = 'tail' // etiket; gerçek yüzey her hedefin ns'inden türetilir (çoklu-yüzey destekli)
 const TARGETS = [
   // Wave E1 — tail metin dosyaları (mevcut top-level ns'lere map; navigation/authority/layout YOK → megamenu/pdp/header)
   { file: 'src/components/products/AddToProjectModal.tsx', ns: 'products.addToProject' },

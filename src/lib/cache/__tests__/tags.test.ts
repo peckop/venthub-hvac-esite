@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect,it } from 'vitest'
+
 import {
-  HOME_DATA_TAG,
-  PRODUCTS_DISCOVERY_TAG,
-  homeDataTag,
   discoveryTag,
   familyTag,
+  HOME_DATA_TAG,
+  homeDataTag,
+  PRODUCTS_DISCOVERY_TAG,
   variantStockTag
 } from '../tags'
 

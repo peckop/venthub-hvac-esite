@@ -40,7 +40,10 @@ export default function ConsentGatedAnalytics() {
         strategy="afterInteractive"
       />
       <Script id="ga-init" strategy="afterInteractive">
-        {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}');`}
+        {
+          // eslint-disable-next-line react/jsx-no-literals
+          `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}');`
+        }
       </Script>
     </>
   )

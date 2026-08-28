@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { isTerminalStatus, computeDueState } from '../dueState'
+import { describe, expect,it } from 'vitest'
+
+import { computeDueState,isTerminalStatus } from '../dueState'
 
 describe('dueState', () => {
   describe('isTerminalStatus', () => {
