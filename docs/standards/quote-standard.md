@@ -275,6 +275,19 @@ kimse kırmızı görmez). Arayüzdeki kapalı düğme **üçüncü** bir kapıd
 `valid_until`, `draft → quoted` geçişinde **NOT NULL** olmak zorundadır — süresiz teklif
 yayımlanamaz.
 
+**Ek kural — yayım anında `valid_until` GELECEKTE olmalıdır** (REC-54/E5 Faz 1, 2026-08-28).
+NOT NULL tek başına yetmez: geçmişe tarihli bir yayım, **doğduğu anda süresi geçmiş** bir belge
+üretir — Kapı 2 onu hemen reddeder, ama belge yine de "yayımlandı" damgasını almış olur ve
+müşteriye gönderilebilir. Kural yayım ucunda (`admin_publish_quote`) zorlanır. Tetiğe
+konmamasının sebebi adıyla: tetik `expired` yönünü de görür ve orada `valid_until` zaten
+geçmiştedir; şartı tetiğe koymak meşru bir geçişi kırardı.
+
+**⚠ `currency` kolon düzeyinde de kısıtlıdır** (aynı iş): `venthub_quotes.currency` üzerinde
+`^[A-Z]{3}$` CHECK kısıtı vardır. Niçin gerekti — ölçüldü: kolon `character(3)` olduğu için
+**boş değer üç boşluğa dönüşür ve `IS NULL` FALSE verir**; yani yayım kapısının "para birimi
+dolu olsun" şartı boş bir para birimini GEÇİRİYORDU. Kısıt DB'dedir, uygulama gövdesinde değil —
+beyaz listeyi tek bir giriş noktasına koymak diğer yazma yollarını korumaz.
+
 ## 7) Kabul — tek kavram, üç kanal, zorunlu kanıt
 
 ### 7.1 Üç kanal
