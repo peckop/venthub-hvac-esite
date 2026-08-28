@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T11:55:23.185520+00:00
+compiled_at: 2026-08-28T12:54:03.044227+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-28T11:55:23.185520+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-28T12:54:03.044227+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -995,7 +995,7 @@ Bu belge, otonom derleyici tarafından 2026-08-28T11:55:23.185520+00:00 tarihind
 │       │   ├── ✅ `AddressSelectModal.tsx`
 │       │   ├── ✅ `CheckoutProgress.tsx`
 │       │   ├── ✅ `InvoiceProfileModal.tsx`
-│       │   ├── ❌ `OdemeKapaliBilgi.tsx`
+│       │   ├── ✅ `OdemeKapaliBilgi.tsx`
 │       │   ├── ✅ `OrderSummarySidebar.tsx`
 │       │   ├── ✅ `PaymentIframeContainer.tsx`
 │       │   ├── ✅ `ReviewSummary.tsx`
@@ -1092,9 +1092,7 @@ Bu belge, otonom derleyici tarafından 2026-08-28T11:55:23.185520+00:00 tarihind
 
 ## Eksik Dokümantasyonlar
 - [ ] `src\components\admin\data-table\DataTablePagination.tsx`
-- [ ] `src\views\checkout\OdemeKapaliBilgi.tsx`
 - [ ] `src\components\admin\data-table\DataTablePagination.tsx`
-- [ ] `src\views\checkout\OdemeKapaliBilgi.tsx`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.

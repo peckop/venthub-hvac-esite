@@ -91,8 +91,13 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
     //
     // AYIRT EDEN: düğmenin METNİ. Aşağıdaki iki kol da FAIL üretebilir; test
     // gevşetilmiyor, iki dünyayı da ölçüyor.
-    const SEPETE_EKLE = 'Sepete Ekle'
-    const TEKNIK_TEKLIF = 'Teknik Teklif İste'
+    // ⚠️ BÜYÜK/KÜÇÜK HARF: düğme metni CSS'te `uppercase` — innerText "SEPETE EKLE"
+    // döner, sözlükteki 'Sepete Ekle' ile ham karşılaştırma TUTMAZ (ilk denemede
+    // tam bu yüzden yanlış kola düştü). Türkçe'de i/İ ayrımı olduğu için
+    // toLocaleUpperCase('tr') şart: 'İste' → 'İSTE', toUpperCase() ise 'ISTE'.
+    const buyut = (s: string) => s.toLocaleUpperCase('tr')
+    const SEPETE_EKLE = buyut('Sepete Ekle')
+    const TEKNIK_TEKLIF = buyut('Teknik Teklif İste')
 
     const addToCartBtn = page.getByTestId('pdp-add-to-cart')
     let bulunan: string | null = null
@@ -104,7 +109,7 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
       await page.waitForURL(/\/products\//, { timeout: 25_000 })
       if (!(await addToCartBtn.isVisible({ timeout: 12_000 }).catch(() => false))) continue
 
-      const metin = (await addToCartBtn.innerText().catch(() => '')).trim()
+      const metin = buyut((await addToCartBtn.innerText().catch(() => '')).trim())
       ctaMetinleri.push(metin)
       if (metin.includes(SEPETE_EKLE)) {
         bulunan = href
