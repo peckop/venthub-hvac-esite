@@ -1657,6 +1657,14 @@ export const en: typeof tr = {
     autoClose: 'This window will close automatically in 5 seconds'
   },
   checkout: {
+    // Shown when the payment path is CLOSED by the ENV flag
+    // (see app/[lang]/checkout/page.tsx — NEXT_PUBLIC_ODEME_ACIK).
+    kapali: {
+      baslik: 'Checkout opening soon',
+      aciklama: 'Our store is being set up. Prices are current; you can request a quote and we will get back to you the same day.',
+      whatsappCta: 'Request a quote on WhatsApp',
+      emailCta: 'Request a quote by email',
+    },
     securePayment: {
       brand: 'Venthub HVAC',
       iyzicoSecure: 'Secure payment with iyzico',

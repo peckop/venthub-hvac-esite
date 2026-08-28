@@ -2,64 +2,79 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\ops-t165\src\app\[lang]\checkout\page.tsx
-skeleton_hash: fbc4074f1145221f
+source_path: C:\tmp\vh-comp\src\app\[lang]\checkout\page.tsx
+skeleton_hash: a7daeb3f8d7f5cfb
 entity_hashes:
-  func:Page: 752ea1d46a136aae
-  overview: cbc240f327cf6544
+  func:Page: f90dce05d687db29
+  overview: cc45e317995ad318
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-08-27T06:53:01Z
+generated_at: 2026-08-28T11:56:12Z
 ---
 
 ## Genel Bakış
-`src/app/[lang]/checkout/page.tsx` modülü, uygulamanın ödeme sayfasının dil destekli ana bileşenini tanımlar. Bu bileşen, kullanıcının ödeme sürecini yönettiği arayüzün tamamını oluşturur ve dil parametresine göre render eder.
+Bu modül, uygulamanın ödeme sayfasının dil destekli ana bileşenini tanımlar. `Page` fonksiyonu, ödeme sürecinin kullanıcı arayüzünü oluşturur ve dil parametresine göre dinamik olarak render eder. Modül, React'ın `Suspense` bileşenini kullanarak asenkron yükleme sağlar ve `CheckoutPage` alt bileşenini yükler.
 
 ## Fonksiyon Grupları
 ### UI Rendering
-Ödeme sayfasının kullanıcı arayüzünü JSX ile oluşturur ve dil parametresine göre dinamik olarak render edilen React bileşenini döndürür.
+Ödeme sayfasının kullanıcı arayüzünü JSX ile oluşturur ve dil parametresine göre dinamik olarak render edilen React bileşenini döndürür. Loading ekranı gösterimi ve `CheckoutPage` bileşeninin yüklenmesini yönetir.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için doğrulanabilir mimari varsayımlar çok sınırlıdır; `Page()` fonksiyon imzası parametresizdir ve modül sabitleri tanımlanmamıştır.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzası ve modül sabitinden doğrulanabilir varsayımlar üretilebilir.
 
-**[Aksiyom 1]:** Eğer `CheckoutPage` adlı alt bileşen mevcut değilse veya modül tarafından import edilemezse, `Page` fonksiyonunun JSX döndürme süreci tamamlanamaz ve çalışma zamanı hatası oluşur.
+**[Aksiyom 1]:** Eğer `ODEME_ACIK` sabiti tanımlı değilse, ödeme sayfasının açık/kapalı durumunu belirleyen binary_expression ifadesi çalışmaz ve sayfa render mantığı eksik kalır.
 
-**[Aksiyom 2]:** Eğer render sırasında loading durumu (animasyonlu ekran) için gerekli UI kaynakları (CSS class'ları, animasyon tanımları veya stil bileşenleri) sağlanamazsa, kullanıcı boş veya bozuk bir geçiş ekranı görür.
+**[Aksiyom 2]:** Eğer `Page()` fonksiyonu parametre almıyorsa, bileşen dışarıdan yapılandırma veya veri almadan kendi başına render edilmelidir; aksi halde bileşen eksik veriyle çalışır.
 
-> **Not:** Fonksiyon imzası `Page()` olarak verilmiş olup herhangi bir parametre göstermemektedir. Dosya yolu `[lang]` dinamik rotası içermesine rağmen, dil parametresinin fonksiyon içeriğine nasıl alındığı (Next.js `params` prop'u mu, context mi, vs.) fonksiyon imzasından çıkarılamadığı için bu konuda varsayımda bulunulamamaktadır.
+**[Aksiyom 3]:** Eğer `[lang]` dinamik rota parametresi mevcut değilse, modül dil destekli ödeme sayfasını oluşturamaz ve uluslararasılaştırma işlevsiz kalır.
+
+---
+
+**Not:** Fonksiyon gövdesi verilmediği için `Page()` içindeki alt bileşen kullanımı, koşullu render mantığı, `ODEME_ACIK` sabitinin hangi bağlamda değerlendirildiği ve ödeme akışının nasıl yönetildiği hakkında ek aksiyom üretilememektedir. Daha detaylı mimari varsayımlar için fonksiyon gövdesi gereklidir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Checkout (ödeme) sayfasının üst düzey sarmalayıcı bileşenidir. Kullanıcı ödeme sayfasına eriştiğinde yüklenme sürecinde animasyonlu bir loading ekranı gösterir ve ardından ana CheckoutPage bileşenini render eder.
+**Ne yapar**: Ödeme sayfasının ana bileşenidir. Ödeme işleminin açık olup olmadığını kontrol ederek kullanıcıyı ilgili sayfaya yönlendirir. Asenkron yükleme sırasında bir yükleme animasyonu gösterir.
 
-**Nasıl yapar**: React'ın `Suspense` bileşenini kullanarak asenkron veri yüklemelerini veya yavaş bileşenleri yüklenirken göstermek üzere bir fallback UI sunar. Fallback olarak screen'i ortalamalı, dönen bir loading spinner animasyonu (primary-navy renkli border-b-2 ile) oluşturulur. Suspense çocuğu olarak `CheckoutPage` bileşenini render eder; bu bileşen muhtemelen içeriği, forma alanlarını ve ödeme süreçlerini yönetir.
+**Nasıl yapar**: React `Suspense` bileşeni kullanarak asenkron içerik yüklenirken bir fallback (yedek) içerik gösterir. Fallback içerik, ekranın ortasında dönen bir yükleme spinner'ıdır (CSS sınıfları ile oluşturulmuş animasyonlu bir daire). `ODEME_ACIK` sabitini/değişkenini kontrol eder; eğer ödeme açıksa `CheckoutPage` bileşenini, kapalıysa `OdemeKapaliBilgi` bileşenini render eder.
 
 **Parametreler**:
-Bu fonksiyon herhangi bir parametre almamaktadır (propsuz bir React Server Component yapısındadır).
+- Bu fonksiyon parametre almaz.
 
-**Dönüş**: JSX elementi döndürür — `Suspense` ile sarılmış `CheckoutPage` bileşeninin render sonucunu verir. Suspense yüklenme esnasında animasyonlu bir spinner div'i, yükleme tamamlandığında ise CheckoutPage içeriğini gösterir.
+**Dönüş**: JSX içeriği döndürür. Kesin dönüş tipi kaynakta belirtilmemiştir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../../views/CheckoutPage::CheckoutPage
+- import: ../../../views/checkout/OdemeKapaliBilgi::OdemeKapaliBilgi
 - import: react::React
 - import: react::Suspense
+
+---
+
+## SABİTLER
+- **ODEME_ACIK** [env-backed] (binary_expression) — `process.env.NEXT_PUBLIC_ODEME_ACIK === '1'`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/[lang]/checkout/page.tsx::Page
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: React JSX elemanı (Suspense içinde CheckoutPage)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `ODEME_ACIK` — koşul ifadesi olarak kullanılır; true ise `CheckoutPage` bileşeni, false ise `OdemeKapaliBilgi` bileşeni render edilir
+  - `Suspense` — React'ten import edilen bileşen; sayfa yüklenirken `fallback` prop'u ile tanımlanmış loading spinner gösterilir
+  - `fallback` — `Suspense` bileşeninin prop'u; ortalanmış dönen bir spinner (animate-spin, border-primary-navy) içeren div olarak tanımlıdır
+  - `CheckoutPage` — `ODEME_ACIK` true olduğunda render edilen bileşen (../../../views/CheckoutPage'den import edilir)
+  - `OdemeKapaliBilgi` — `ODEME_ACIK` false olduğunda render edilen bileşen (../../../views/checkout/OdemeKapaliBilgi'den import edilir)
+- **Dönüş**: JSX elementi — `Suspense` ile sarılmış koşullu render (`ODEME_ACIK ? <CheckoutPage /> : <OdemeKapaliBilgi />`)
 
 ---
 

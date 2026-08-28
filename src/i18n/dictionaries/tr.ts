@@ -1065,6 +1065,14 @@ export const tr = {
     quoteItemsNotice: 'Sepetinizde fiyatı henüz belirlenmemiş ürün var. Toplam yalnızca fiyatlı ürünleri kapsar; ödemeye geçmek için bu ürünler için teklif alın.'
   },
   checkout: {
+    // Ödeme yolu ENV bayrağıyla KAPALI olduğunda gösterilen metinler
+    // (bkz. app/[lang]/checkout/page.tsx — NEXT_PUBLIC_ODEME_ACIK).
+    kapali: {
+      baslik: 'Ödeme yakında açılıyor',
+      aciklama: 'Mağazamız kuruluş aşamasında. Fiyatlar günceldir; sipariş için bizden teklif isteyebilirsiniz — aynı gün dönüş yapıyoruz.',
+      whatsappCta: 'WhatsApp\'tan teklif iste',
+      emailCta: 'E-posta ile teklif iste',
+    },
     securePayment: {
       brand: 'Venthub HVAC',
       iyzicoSecure: 'iyzico ile güvenli ödeme',

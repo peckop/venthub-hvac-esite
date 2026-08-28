@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-t088\e2e\checkout-smoke.e2e.ts
-skeleton_hash: aa83018c0858b176
+source_path: C:\tmp\vh-comp\e2e\checkout-smoke.e2e.ts
+skeleton_hash: 62bc411e2b5acdd4
 entity_hashes:
   overview: 529d691256ce33bd
-generated_at: 2026-08-27T13:04:03Z
+generated_at: 2026-08-28T12:54:04Z
 ---
 
 ## Genel Bakış
