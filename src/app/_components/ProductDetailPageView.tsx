@@ -340,13 +340,19 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
     }
   }
 
+  // ⚠ 2026-08-27 — DORT BÖLÜM KALDIRILDI: 'diagrams' · 'documents' · 'pdf' · 'certificates'.
+  // Dördü de ürün verisinden DEĞİL, koda gömülü sabit listelerden besleniyordu; yani her ürün
+  // sayfasında aynı içerik görünüyordu ve hiçbiri gerçek değildi. En ağırı 'certificates':
+  // CE / ISO 9001 / TSE / Energy Star / UL için UYDURULMUŞ sertifika numaraları yayımlıyordu
+  // (ör. "Sertifika No: CECERTIFICATE-2024"). Bunlar mevzuata tabi uygunluk beyanlarıdır.
+  // Ölçüm: canlı sayfada doğrulandı (venthub-hvac-esite.vercel.app/tr/products/…) ve DB'de
+  // belge/sertifika tablosu YOK — arkasında veri yok, olamaz da.
+  // Gerçek veri geldiğinde bölümler geri gelir; koşulu "veri var mı" olmalı, sabit liste değil.
+  // Not: 'pdf' bölümündeki ÇALIŞAN broşür indirme yan panelde zaten duruyor (handleDownloadPdf),
+  // yani kaldırmakla kaybedilen bir yetenek yok — yalnız ölü "Ürün Kataloğu" düğmesi gitti.
   const sections = [
     { id: 'general', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
     { id: 'specs', title: t('pdp.sections.specs'), icon: Ruler, bgClass: 'bg-white' },
-    { id: 'diagrams', title: t('pdp.sections.diagrams'), icon: FileText, bgClass: 'bg-slate-50/50' },
-    { id: 'documents', title: t('pdp.sections.documents'), icon: FileText, bgClass: 'bg-white' },
-    { id: 'pdf', title: t('pdp.sections.brochure'), icon: Download, bgClass: 'bg-slate-50/50' },
-    { id: 'certificates', title: t('pdp.sections.certificates'), icon: Award, bgClass: 'bg-white' },
     { id: 'models', title: t('pdp.sections.models'), icon: Settings, bgClass: 'bg-slate-50/50' }
   ]
 
@@ -907,84 +913,10 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                     </div>
                   )}
 
-                  {section.id === 'diagrams' && (
-                    <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                        <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-hvac-normal opacity-60">{t('pdp.diagramsExtra.technicalDiagrams')}</h4>
-                        <div className="space-y-4">
-                          {['mounting', 'electrical'].map(type => (
-                            <div key={type} className="group relative aspect-video bg-slate-50 rounded-2xl flex items-center justify-center border-2 border-dashed border-light-gray hover:border-primary-navy/30 transition-colors cursor-pointer overflow-hidden">
-                              <div className="absolute inset-0 bg-white/40 backdrop-blur-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
-                                <div className="p-2.5 bg-primary-navy text-white rounded-full shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform"><Download size={20} /></div>
-                              </div>
-                              <div className="text-center">
-                                <FileText size={28} className="text-primary-navy/40 mx-auto mb-2" />
-                                <p className="text-industrial-gray font-black text-xs uppercase tracking-widest">{t(`pdp.diagramsExtra.${type}`)}</p>
-                                <p className="text-xs text-steel-gray font-bold mt-1 uppercase tracking-tighter">{t('common.pdf')} {t('common.pdfDatasheet')}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                        <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-hvac-normal opacity-60">{t('pdp.diagramsExtra.threeDViews')}</h4>
-                        <div className="space-y-4">
-                          {[ { icon: Settings, label: 'view3DModel', sub: 'interactiveModel' }, { icon: Ruler, label: 'dimensionedDrawing', sub: 'CAD/DWG AVAILABLE' } ].map((item, i) => (
-                            <div key={i} className="p-5 bg-slate-50 rounded-2xl border border-light-gray/50 flex items-center space-x-5 group hover:bg-white hover:shadow-md transition-shadow">
-                              <div className="w-12 h-12 bg-white rounded-xl shadow-xs flex items-center justify-center flex-shrink-0 group-hover:bg-primary-navy group-hover:text-white transition-shadow"><item.icon size={22} /></div>
-                              <div>
-                                <p className="text-xs font-black text-industrial-gray uppercase tracking-tight">{t(`pdp.diagramsExtra.${item.label}`)}</p>
-                                <p className="text-xs text-steel-gray font-bold uppercase tracking-widest mt-1">{item.sub.startsWith('CAD') ? t('pdp.diagramsExtra.cadDwgAvailable') : t(`pdp.diagramsExtra.${item.sub}`)}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {section.id === 'documents' && (
-                    <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {['installationGuide', 'userManual', 'maintenanceManual', 'safetyInfo', 'warrantyTerms', 'technicalSpecsDoc'].map((doc, i) => (
-                        <div key={i} className="bg-white rounded-3xl p-6 border border-light-gray shadow-sm hover:shadow-md transition-shadow group text-center">
-                          <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:bg-air-blue/20 transition-colors"><FileText size={32} className="text-primary-navy/40" /></div>
-                          <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-4 min-h-8">{t(`pdp.docs.${doc}`)}</h4>
-                          <button className="w-full bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white py-3 px-4 rounded-xl transition-colors font-black text-xs uppercase tracking-widest flex items-center justify-center space-x-2">
-                            <Download size={14} /> <span>{t('pdp.actions.download')}</span>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {section.id === 'pdf' && (
-                    <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {['productCatalog', 'technicalBrochure'].map(type => (
-                        <div key={type} className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                          <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-hvac-normal opacity-60">{t(`pdp.docs.${type}`)}</h4>
-                          <div className="aspect-4/3 bg-slate-50 rounded-xl mb-6 flex items-center justify-center border border-light-gray/30"><Download size={40} className="text-primary-navy/20" /></div>
-                          <button onClick={type === 'technicalBrochure' ? handleDownloadPdf : undefined} className="w-full bg-slate-900 hover:bg-primary-navy text-white py-3.5 px-6 rounded-xl transition-colors font-black text-xs uppercase tracking-widest flex items-center justify-center space-x-2">
-                            <Download size={18} /> <span>{t(`pdp.actions.download${type === 'productCatalog' ? 'Catalog' : 'Brochure'}`)}</span>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {section.id === 'certificates' && (
-                    <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {['ceCertificate', 'iso9001', 'tseCertificate', 'energyStar', 'ulCertificate', 'ecoFriendly'].map((cert, i) => (
-                        <div key={i} className="bg-white rounded-3xl p-6 border border-light-gray shadow-sm text-center">
-                          <div className="bg-slate-50 rounded-2xl p-5 mb-5 group-hover:bg-air-blue/10 transition-colors"><Award size={36} className="text-primary-navy/30 mx-auto" /></div>
-                          <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-3">{t(`pdp.cert.${cert}`)}</h4>
-                          <div className="text-xs text-steel-gray space-y-1 font-bold uppercase tracking-widest opacity-60">
-                            <p>{t('pdp.certLabels.certificateNo')}: {cert.toUpperCase()}{t('pdp.certLabels.yearSuffix')}</p>
-                            <p>{t('pdp.certLabels.standard')}: {t('pdp.certLabels.standardValue')}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  {/* 'diagrams' · 'documents' · 'pdf' · 'certificates' bölümleri KALDIRILDI
+                      (2026-08-27). Gerekçe ve ölçüm için yukarıdaki `sections` tanımına bakın:
+                      dördü de üründen bağımsız SABİT listelerdi; sertifika bölümü uydurulmuş
+                      numaralarla mevzuata tabi uygunluk beyanı yayımlıyordu. */}
                 </div>
               </div>
             </section>
