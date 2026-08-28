@@ -1,0 +1,47 @@
+-- =============================================================================
+-- REC-54 (AUTH) — ONARIM: admin_publish_quote üzerinde `anon` EXECUTE yetkisi kaldırılıyor
+-- Şerit: AUTH · Cetvel: docs/standards/quote-standard.md §8 · CLAUDE.md #12
+--
+-- ⛔ KENDİ KUSURUM. Bir önceki migration (20260828120000) şunu yazıyordu:
+--       revoke all on function ... from public;
+--       grant execute on function ... to authenticated;
+--    Amacım yetkiyi YALNIZ oturum açmış kullanıcıya vermekti. **Olmadı.**
+--
+-- MERGE SONRASI ÖLÇTÜM (bu yüzden ölçüyoruz — "indi != çalışıyor"):
+--       has_function_privilege('anon', 'public.admin_publish_quote(...)', 'EXECUTE') = TRUE
+--    ve fonksiyonun ACL'i birebir şuydu:
+--       {postgres=X/postgres, anon=X/postgres, authenticated=X/postgres, service_role=X/postgres}
+--
+-- SEBEP: Supabase bu projede `ALTER DEFAULT PRIVILEGES` ile public şemasında YENİ oluşan
+--   fonksiyonlara `anon` ve `authenticated` için EXECUTE veriyor. Bu **doğrudan role
+--   verilmiş** bir yetkidir; `REVOKE ... FROM public` PUBLIC sözde-rolünü kaldırır ve
+--   doğrudan role verilmiş yetkiye DOKUNMAZ. Yani revoke satırım çalıştı ama yanlış hedefe.
+--
+-- AYIRT EDİCİ ÖLÇÜM (bunun depo geneli bir varsayılan değil BENİM sapmam olduğunun kanıtı):
+--   admin_list_all_users          anon EXECUTE = false
+--   anonymize_user_personal_data  anon EXECUTE = false
+--   set_user_admin_role           anon EXECUTE = false
+--   adjust_stock                  anon EXECUTE = false
+--   admin_publish_quote           anon EXECUTE = TRUE   ← yalnız benimki
+--
+-- ŞİDDET — OLDUĞUNDAN BÜYÜK DE KÜÇÜK DE GÖSTERMİYORUM:
+--   Yetki YÜKSELTME **değil**. Fonksiyon gövdesi ilk iş olarak `is_admin_user()` çağırıyor;
+--   anon bağlamında bu false döner (JWT'de `user_role` yok, `auth.uid()` null olduğu için
+--   `user_profiles` düşüşü de boş) ve çağrı `42501` ile reddedilir. Yani veri yazılmaz.
+--   AMA: kimliksiz bir çağıranın fonksiyonu ÇAĞIRABİLİYOR olması, kapatmayı açıkça
+--   amaçladığım bir yüzeydir. Tek kapıya indirgenmiş savunma, gövde kontrolü bir gün
+--   gevşerse sessizce açık hale gelir. Derinlemesine savunma geri konuluyor.
+--
+-- NOT: Bu onarım `if exists` ile yazılmadı — yetki gerçekten oradaysa kalkmalı, yoksa
+--   REVOKE zaten sessizce başarılıdır. Koşul eklemek, onarımın koştuğunu ölçmeyi zorlaştırır.
+-- =============================================================================
+
+revoke execute on function public.admin_publish_quote(uuid, timestamptz, text) from anon;
+
+-- Doğrulama ölçütü (merge sonrası elle koşulacak, kapının kendisi değil):
+--   select has_function_privilege('anon',
+--     'public.admin_publish_quote(uuid,timestamptz,text)', 'EXECUTE');   -- beklenen: false
+--   select has_function_privilege('authenticated',
+--     'public.admin_publish_quote(uuid,timestamptz,text)', 'EXECUTE');   -- beklenen: true
+-- İkinci satır ŞART: kabul eden kol olmadan red kanıt değildir — yetkiyi kaldırırken
+-- meşru çağıranı da kesmediğimi göstermeden "onarıldı" demem.
