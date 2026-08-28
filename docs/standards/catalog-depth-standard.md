@@ -67,6 +67,46 @@ Müşteri bir yerde "hangisi?" diye duruyorsa orası bir sayfadır. Durmuyorsa �
 değişiyorsa — orası sayfa değil, **aynı sayfadaki seçicidir**. Dağınıklık bu tek cümleyle
 engellenir.
 
+### K1.1 — Anlatının konusu bir SERİ ise, tetikleyici ve kapsam SERİdir (2026-08-28)
+
+**Kural.** Anlatı ve sihirbaz K1'in yerinde — **kategori sayfasında** — kalır. Ama anlatının
+konusu tek bir seriyse ve o seri kategorisini konu-dışı serilerle paylaşıyorsa:
+
+1. **Görünme koşulu** kategori slug'ı değil, **kategorinin o seriyi içermesidir.**
+2. **Sihirbazın aday kümesi** kategori değil **o serinin ailesidir** (`family_id`).
+3. İkisi **tek bir sabitten** beslenir. Ayrı yazılırlarsa anlatı görünür ama sihirbaz başka
+   ürün önerir — ve bu kusuru **hiçbir sayı göstermez**.
+
+**Niçin var (ölçüldü, 2026-08-28).** Sessiz fan anlatısı + sihirbazı `inline-duct-fans`
+kategorisine bağlıydı; o kategori pasif ve **0 serili**, yani koşul hiçbir zaman açılmadı —
+beş bileşenlik anlatı ve sihirbaz kullanıcıya **bir kez bile görünmedi**. Düzeltirken doğal
+refleks "kategoriye taşı" idi; ölçüm onu çürüttü:
+
+| `duct-fans` altındaki seri | model | anlatının konusu mu |
+|---|---|---|
+| `vortice-lineo-quiet` | 12 | **evet** |
+| `vortice-lineo` | 7 | hayır |
+| `vortice-radon-range-circular` | 5 | hayır |
+| `vortice-vort-commercial-in-line-circular` | 7 | hayır |
+| `vortice-vort-commercial-in-line-rectangular` | 5 | hayır |
+
+Kategori kapsamı **24 sessiz olmayan modeli** de aday sayardı: sihirbaz "sessiz fan öner"
+derken sessiz olmayan ürün önerebilirdi. Bugünkü kusurun aynası — hiç görünmemek yerine
+**yanlış vaat vermek**.
+
+**K1 ile çelişmez.** Sayfa sayısı değişmiyor, üçüncü gezinme kademesi açılmıyor; değişen tek
+şey, kategori sayfasındaki bir bölümün *hangi veriye bakarak* açıldığı.
+
+**Neden ayrı kategori açılmadı.** "Sessiz" bir ürün TİPİ değil, bir ÖZELLİKtir; katalog
+omurgası kararı kategori eksenini ürün tipi olarak sabitledi. Özellik başına kategori açmak
+"ATEX", "asit dayanımlı" için de istenir ve omurgayı zamanla dağıtır. (Recep kararı,
+AskUserQuestion onayı, 2026-08-28.)
+
+**Yürürlük noktası.** `src/views/category/CategoryLandingView.tsx` → `SESSIZ_FAN_SERISI` sabiti;
+`src/lib/services/wizard.service.ts` → `getWizardCandidates(supabase, familySlug)`.
+
+**Bekçi.** `src/__tests__/conformance/silent-fan-series-binding.test.ts` — `INV-SILENTFAN-SERI-1`.
+
 ## 2. K2 — Aile ne zaman bölünür: YAZILABİLİRLİK TESTİ
 
 > **Bu bölüm I18N ile ortaktır** (bölme kararı doğrudan çeviri yüküne dönüşür).

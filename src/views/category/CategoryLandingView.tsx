@@ -28,6 +28,18 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
 import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 
+/**
+ * Sessiz fan anlatısının KONUSU olan seri (kanonik `product_families.slug`).
+ *
+ * REC-85 / `docs/standards/catalog-depth-standard.md` §K1.1: anlatının konusu bir seriyse,
+ * hem görünme koşulu hem sihirbaz kapsamı O SERİdir — kategori değil. Sabit tek yerde yaşar
+ * ki tetikleyici ile sihirbaz kapsamı birbirinden AYRILAMASIN (ayrılırsa anlatı görünür ama
+ * sihirbaz başka ürün önerir; hiçbir sayı bunu göstermez).
+ *
+ * Bekçi: `src/__tests__/conformance/silent-fan-series-binding.test.ts` (INV-SILENTFAN-SERI-1).
+ */
+const SESSIZ_FAN_SERISI = 'vortice-lineo-quiet'
+
 interface CategoryLandingProps {
     category: DomainCategory
     /** F5-B W2.1: liste birimi AİLE (varyant kartı basılmaz). */
@@ -54,13 +66,19 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     const parentVm = wrapCategory(parentCategory ?? undefined)
     
     const isAirCurtain = category.slug === 'air-curtains'
-    // Sessiz kanal fanı anlatısı `inline-duct-fans` kategorisine bağlıdır. Kategorinin GÖRÜNEN
-    // adı "Kanal İçi Hayalet Fanlar" ama içeriği tam olarak budur: altındaki ürünlerin HEPSİ
-    // Vortice Lineo Quiet serisidir. Bölüm daha önce hiç var olmamış bir `quiet-duct-fans`
-    // slug'ına bağlıydı; koşul hiçbir zaman açılmadı ve bu beş bileşenlik anlatı kullanıcıya
-    // hiç görünmedi. Kategorinin ADI ile kanonik slug'ı AYRI konulardır — ad değişse de burası
-    // değişmez; slug değişirse `catalog-integrity` kapısı (slug-unresolved) kırmızı verir.
-    const isSilentFan = category.slug === 'inline-duct-fans'
+    // ⭐SESSİZ FAN ANLATISI — TETİKLEYİCİ KATEGORİ DEĞİL **SERİ** (REC-85, Recep kararı 2026-08-28).
+    //
+    // Cetvel: `docs/standards/catalog-depth-standard.md` §K1.1. Anlatı K1'in yerinde kalır
+    // (kategori sayfası), ama konusu bir SERİ olduğu için tetikleyicisi de seridir.
+    //
+    // NİÇİN: bölüm önce `inline-duct-fans` kategorisine bağlıydı; o kategori pasif ve 0 serili,
+    // yani koşul HİÇBİR ZAMAN açılmadı — beş bileşenlik anlatı ve sihirbaz kullanıcıya bir kez
+    // bile görünmedi. Kategoriye (`duct-fans`) taşımak da yanlış olurdu: ölçtüm, o kategoride
+    // Quiet'in yanında 24 sessiz OLMAYAN model var (Lineo düz 7 · Radon 5 · VORT Commercial 7+5).
+    // Doğru bağ, anlatının gerçek konusu olan seridir.
+    //
+    // Seri kanonik slug ile aranır; `catalog-integrity` slug-unresolved kolu bu sabiti korur.
+    const isSilentFan = families.some((aile) => aile.slug === SESSIZ_FAN_SERISI)
     const isDehumidifier = category.slug === 'dehumidifiers'
 
     // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
@@ -223,7 +241,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                 <SilentFanWizard
                     isOpen={wizardOpen}
                     onClose={() => setWizardOpen(false)}
-                    categorySlug={category.slug}
+                    familySlug={SESSIZ_FAN_SERISI}
                 />
             )}
         </div>

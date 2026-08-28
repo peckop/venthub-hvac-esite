@@ -17,7 +17,6 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { FanAdayi } from '@/lib/hvac/ductFanSelection'
 import type { Database } from '@/types/database.types'
 import type { DbJson, DbProduct } from '@/types/db-rows'
-import { eqValue, orConditions } from '@/utils/adminQueryFilters'
 
 import { VARIANT_DETAIL_COLUMNS } from './product.columns'
 
@@ -88,31 +87,42 @@ function satiriAdayaCevir(satir: DbProduct): FanAdayi {
 }
 
 /**
- * Bir kategori slug'ı altındaki aktif ürünleri sihirbaz adayı olarak getirir.
+ * Bir SERİ (aile) slug'ı altındaki aktif ürünleri sihirbaz adayı olarak getirir.
  *
- * Kategori kanonik slug ile aranır (`categories.slug`) — görünen/lokalize slug ile DEĞİL.
- * Kategori bulunamazsa boş dizi döner (sihirbaz "uygun ürün yok" der); sorgu hata
+ * ⭐KAPSAM KATEGORİ DEĞİL SERİDİR (REC-85, 2026-08-28 — Recep kararı).
+ * Önce kategori kapsamlıydı (`category_id` VEYA `subcategory_id`). Ölçüm bunun yanlış
+ * olduğunu gösterdi: sessiz fan sihirbazının konusu **Vortice Lineo Quiet serisi** (12
+ * model) ama o seri `duct-fans` kategorisini **24 sessiz OLMAYAN modelle** paylaşıyor
+ * (Lineo düz 7 · Radon 5 · VORT Commercial 7+5). Kategori kapsamı bu 24'ü de aday
+ * sayıyordu — yani sihirbaz "sessiz fan öner" derken sessiz olmayan ürün önerebiliyordu.
+ * Tutulamayacak bir vaat; kapı da görmezdi çünkü sayılar tutarlı görünür.
+ *
+ * Cetvel: `docs/standards/catalog-depth-standard.md` §K1.1 (anlatının konusu seri ise
+ * tetikleyici ve kapsam SERİdir). Bekçi: `INV-SILENTFAN-SERI-1`.
+ *
+ * Aile kanonik slug ile aranır (`product_families.slug`) — görünen/lokalize slug ile DEĞİL.
+ * Aile bulunamazsa boş dizi döner (sihirbaz "uygun ürün yok" der); sorgu hata
  * verirse hata FIRLATILIR — sessizce boş dönmek, bu ekranı beş ay boş tutan kusurdu.
  */
 export async function getWizardCandidates(
   supabase: SupabaseClient<Database>,
-  categorySlug: string,
+  familySlug: string,
 ): Promise<FanAdayi[]> {
-  const { data: kategori, error: kategoriHatasi } = await supabase
-    .from('categories')
+  const { data: aile, error: aileHatasi } = await supabase
+    .from('product_families')
     .select('id')
-    .eq('slug', categorySlug)
+    .eq('slug', familySlug)
     .maybeSingle()
 
-  if (kategoriHatasi) throw kategoriHatasi
-  if (!kategori) return []
+  if (aileHatasi) throw aileHatasi
+  if (!aile) return []
 
   const { data, error } = await supabase
     .from('products')
     .select(VARIANT_DETAIL_COLUMNS)
-    // INV-FILTER-1: `or()` bir GRAMER; ham interpolasyon yasak. Kaçış tek yerde yaşar
-    // (`adminQueryFilters`), ikinci kopya yazılmaz.
-    .or(orConditions([eqValue('category_id', kategori.id), eqValue('subcategory_id', kategori.id)]))
+    // Ürünün ailesi TEK kaynaktır (kategori aileden türetilir), o yüzden burada
+    // `or()` gramerine gerek yok — tek eşitlik yeter.
+    .eq('family_id', aile.id)
     .eq('status', 'active')
     .is('deleted_at', null)
     .order('name', { ascending: true })
