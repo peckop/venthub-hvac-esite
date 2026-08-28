@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T19:35:08.840575+00:00
+compiled_at: 2026-08-28T06:21:49.258163+00:00
 total_compiled_files: 62
-source_commit: 4d4db1de
+source_commit: 0ad1a259
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -12162,13 +12162,24 @@ taşısın" deseydik bugünkü doğru politikaları kırmızıya düşürürdük
 **Korunan değişmez:** teklif tablolarına INSERT eden her politika **ya `is_admin_user()`
 şartı taşır, ya da yazdığı/bağlandığı teklifin durumunu `'requested'` değerine çiviler.**
 
-**Niçin bu sınır (canlı ölçüm, 2026-08-27):** `'draft'` admin'in teklifi yazdığı,
-**fiyatın oluştuğu** durumdur. `authenticated` rolünün INSERT kolon yetkisi
-`venthub_quotes`'ta **7**, `venthub_quote_items`'ta **8** kolondur ve grant admin ile
-müşteriye **aynı anda** verilir — admin de `authenticated`'tır. Durumu çivilemeyen bir
-müşteri-INSERT politikası eklenirse müşteri kendine doğrudan `'draft'` teklif üretip
-fiyat yazabilir ve akışın tamamını atlar. **Grant daraltmak çözüm değildir** (admin'i
-kırar); koruma politikanın gövdesindeki `status = 'requested'` çivisidir.
+**Niçin bu sınır (canlı ölçüm, 2026-08-27 — Kol A ile DÜZELTİLDİ):** `'draft'` admin'in
+teklifi yazdığı, **fiyatın oluştuğu** durumdur. `authenticated` rolünün INSERT kolon
+yetkisi `venthub_quotes`'ta **7**, `venthub_quote_items`'ta **8** kolondur — **ama
+`status` o 7'nin içinde, `unit_price`/`currency` de o 8'in içinde DEĞİLDİR.** Yani
+bugün hiçbir `authenticated` istemci ne `'draft'` yazabilir ne fiyat; admin de
+`authenticated` olduğu için **admin de yazamaz**.
+
+> **Öz-düzeltme (yazan: AUTH).** Bu paragrafın ilk hâli "grant zaten `authenticated`'a
+> açık, daraltmak çözüm değildir" diyordu. O cümle **kolon sayısını sayıp hangi kolonlar
+> olduğunu ölçmemişti**; agrega sayı, ters gideni gizlemişti. Doğrusu yukarıdadır.
+
+**Tehlike kalkmadı, ERTELENDİ — bekçinin varlık sebebi tam olarak budur.** Bugün müşteriyi
+`'draft'`ten ayıran şey politikanın çivisi değil, grant'ın darlığıdır. Ama E5 Kompozör'ün
+admin ekranı **tam da bu grant'ın genişletilmesini** gerektirecek (Kol A ölçtü: admin
+bugün draft teklif açamıyor, çünkü `status` yetkisi yok). Grant genişlediği an, müşteriyi
+`'draft'`ten ayıran **tek** katman politikanın gövdesindeki `status = 'requested'`
+çivisi olacaktır. Koruma, geçici bir grant darlığına değil **politikaya** yaslanmalıdır;
+grant daraltmak da çözüm değildir çünkü admin de `authenticated`'tır.
 
 **Bekçi:** `src/__tests__/conformance/quote-insert-policy-guard.test.ts`. Bütün
 migration'ları okur, seçimi **ada değil içeriğe** göre yapar (yeniden adlandırma
@@ -12191,6 +12202,43 @@ politika kırmızı yakar ve insan gözden geçirmesini zorlar. Sessizce eklenem
 bugün **sıfır çağıranı** vardır — depoda admin `'draft'` teklif üreten kod yolu yoktur
 (tek INSERT yolu `quoteService.ts` `createQuoteRequest`, o da müşteri yoludur). Kapı
 açıktır, geçen henüz yoktur; geçişi E5 Kompozör (REC-54 Kalem 2) yazacaktır.
+
+**Kol A — DAVRANIŞSAL kanıt (2026-08-27, `begin … rollback`, prod'a kalıcı yazma **0**;
+koşum öncesi/sonrası satır sayımı `venthub_quotes` 0→0, `venthub_quote_items` 0→0):**
+
+| kol | beklenen | gözlenen | reddi YAPAN katman |
+|---|---|---|---|
+| müşteri kendi `'requested'` teklifini açar | KABUL | kabul edildi | — |
+| kendi teklifine **fiyatsız** kalem | KABUL | kabul edildi | — |
+| **aynı** kalem + `unit_price` | RED | `42501` | **GRANT** (fiyat kolonu yetkisi yok) |
+| başka müşteri → gerçek teklife kalem | RED | `42501` | **RLS** |
+| admin → `'requested'` teklife kalem | RED | `42501` | **RLS** (politika `'draft'` ister) |
+| sahte tenant claim'i + gerçek tenant satırı | RED | `42501` | **RLS** |
+| başkası adına teklif | RED | `42501` | **RLS** |
+| **admin `'draft'` teklif açar** | KABUL bekleniyordu | `42501` | **GRANT** — ⚠ politika **ulaşılamaz** |
+
+Son satır bu koşumun asıl bulgusudur: `quotes_insert_admin_draft` ve
+`quote_items_insert_admin` **canlıdır ama hiçbir `authenticated` istemci onlara
+ulaşamaz.** E5 Kompozör bugünkü hâliyle PostgREST üzerinden ne draft teklif açabilir ne
+fiyat yazabilir; ya service_role'lü bir Edge Function yolu seçilecek ya da grant
+genişletilecektir. Bu bir **karar** kalemidir (REC-54 Kalem 2).
+
+**Ön koşullar AYIRT EDİCİ kuruldu — yoksa sekiz kolun sekizi de sahte yeşil olurdu:**
+(a) rol `authenticated`, `rolsuper`/`rolbypassrls` **false** ölçüldü; bağlantının kendi
+rolü `postgres`'tir ve tabloların **sahibidir**, `relforcerowsecurity` de `false` —
+yani rol değiştirilmeseydi RLS **hiç** değerlendirilmezdi. (b) `request.jwt.claims`
+**gerçekten okunuyor**: bunu ölçmek için bilerek **var olmayan** bir tenant verildi, çünkü
+depodaki tek tenant `jwt_tenant_id()`'nin sessiz fallback değerinin **ta kendisidir** ve
+"tenant eşleşti" gözlemi claim hiç okunmasa da aynı çıkardı. (c) `42501`'ler **mesajdan**
+ayrıştırıldı: `row-level security policy` ≠ `permission denied for table`; ayrıştırılmasaydı
+grant reddi RLS kanıtı sanılırdı.
+
+⚠ **`is_admin_user()` gövdesinin ilk satırı `service_role`'de koşulsuz `TRUE` döner.**
+Bu doğrulamayı ayrıcalıklı bir bağlantıda koşmak sekiz kolu da yeşil gösterir ve **hiçbir
+şey ölçmez**. Aynı sınıftan iki tuzak daha koşum sırasında yakalandı ve betik düzeltildi:
+`venthub_quotes.source` bir CHECK kısıtına (`pdp|cart|project`) tabidir ve
+`user_id` **`auth.users`'a FK taşır** — sentetik kimlikle kurulan "kabul" kolları
+RLS'e hiç gelmeden `23514`/`23503` ile düşer ve bu, RLS reddi sanılabilirdi.
 
 ### 7.3 Eşik — mekanizma otonom, değer config
 
