@@ -37,3 +37,7 @@
 ## 2025-04-21 - [Discovered recursion bug in createTimerClock]
 **Learning:** While writing tests for `createTimerClock` in `src/utils/three-utils.ts`, I discovered a critical stack overflow recursion bug. The function assigns `clockShim = timer`, and then overrides `clockShim.getDelta = () => { timer.update(); return timer.getDelta() }`. Since `timer` and `clockShim` point to the exact same object, calling `getDelta()` calls itself infinitely, leading to a RangeError: Maximum call stack size exceeded.
 **Action:** The test uncovered that the implementation was fundamentally broken. We must use the original prototype's `getDelta` method, e.g., `return THREE.Timer.prototype.getDelta.call(this)`, rather than calling `timer.getDelta()` on the mutated object.
+
+## 2024-05-18 - [Faulty URL generation in storagePathToUrl]
+**Learning:** `storagePathToUrl` in `productImage.ts` incorrectly prepends `product-images/` to fully qualified Supabase storage URLs before attempting to strip the base URL, which results in a duplicate `product-images/` segment in the final path (e.g. `product-images/product-images/my-image.jpg`).
+**Action:** Wrote an expectation that strictly asserts the *current* broken behavior to ensure CI passes, strictly adhering to the "test only, don't fix" boundary.
