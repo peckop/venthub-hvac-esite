@@ -116,6 +116,37 @@ if (source === 'resume') {
         'kendi ucluunu simdi kur.\n')
 }
 
+// COMPACT DONUSU (REC-86 Faz 1). Bu kol `resume`den AYRI: resume'da makine dondu ve MEKANIZMA
+// olmus olabilir; compact'te mekanizma yasiyor ama BAGLAM kirpildi — kaybolan sey baska, o yuzden
+// tedavi de baska. Olculmus vakalar: 08-27 donuste durum dosyasi okunmadi, gun boyu bedel odendi;
+// 08-28 gecis aninda yazilan kullanici mesaji yutuldu, 3 tur kayip.
+//
+// Kural bugune kadar YAZIYDI ("donuste ILK IS durum dosyasini oku") ve tamamen ajan disiplinine
+// dayaniyordu. Burasi onu MEKANIZMAYA cevirir: dosyanin son blogunu ajanin onune KOYAR, cunku
+// "oku" demek ile okutmak ayni sey degil.
+if (source === 'compact') {
+  context +=
+    '⭐COMPACT DONUSU — baglamin kirpildi. ILK GORUNUR SATIRIN "bana ulasan son girdin: <ozet>" ' +
+    'olacak (gecis aninda yazilan mesaj YUTULABILIR; teslimati garanti edemeyiz ama kaybi 1 turda ' +
+    'TESPIT ettirebiliriz). Durum dosyanin son blogu asagida — okumadan is baslatma.\n'
+  try {
+    const kapi = require(path.join(__dirname, 'precompact-durum-kapisi.cjs'))
+    const d = kapi.durumDosyasiBul(sid)
+    if (d) {
+      const yasDk = Math.round((Date.now() - d.mt) / 60000)
+      context += `DURUM DOSYAN: ${d.ad} (${yasDk} dk once guncellenmis)\n`
+      context += '--- SON BLOK ---\n' + kapi.sonBlok(d.tam) + '\n--- SON BLOK BITTI ---\n'
+    } else {
+      context +=
+        '⚠DURUM DOSYAN BULUNAMADI — compact oncesi yazilmamis demektir. Ne kaybettigini ' +
+        'bilmiyorsun; ilerlemeden once panoyu ve son PR/commit durumunu OLC.\n'
+    }
+  } catch (e) {
+    // Kanca oturumu bloklamaz ama sessiz de gecmez: sebep bilinmeli.
+    context += `⚠durum dosyasi enjeksiyonu basarisiz (${(e && (e.code || e.message)) || 'bilinmeyen'}) — ELLE oku.\n`
+  }
+}
+
 try {
   const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
   const live = board.liveClaims()
