@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-altyapi-851\scripts\board\lane-precommit.cjs
-skeleton_hash: 679501ecc862ea89
+skeleton_hash: b31f55573f46e74f
 entity_hashes:
   func:git: 54ebb1b91650594e
   func:uyar: 2609a0863cdeff03
   overview: 6661e886022531fb
-generated_at: 2026-08-27T18:03:49Z
+generated_at: 2026-08-28T08:17:39Z
 ---
 
 ## Genel Bakış
@@ -58,6 +58,8 @@ Kullanıcıya uyarı mesajları göstermek için kullanılan fonksiyonu içerir.
 - **birlestirmeHali** (call) — `(() => {
   for (const ad of ['MERGE_HEAD', 'CHERRY_PICK_HEAD', 'REVERT_HEAD'...`
 - **kimlikYolu** (call) — `path.join(gitDir, 'venthub-sid')`
+- **kimlikCozum** (call) — `kimlik.coz(gitDir, board)`
+- **sid** (member_expression) — `kimlikCozum.sid`
 - **kok** (call) — `path.resolve(__dirname, '..', '..')`
 
 ---
