@@ -476,10 +476,17 @@ tetik + revalidate şartı **bu modüle uygulanmaz.** Sınır şartı aynen taş
 gün statik bir yüzeye çıkarsa, o PR aynı gün DB tetiği + revalidate dalını getirmek zorundadır.
 ## 8.5) Ekran yerleşimi — E5 Kompozör (T133 bağı)
 
-> **Kaynak:** `erp-workspace-design-standard.md` v0 (T133-VH, commit `44def9e8`, 318 satır).
-> Bu belge yazıldığında o cetvel **henüz gönderilmemişti**; kararlar ADMIN'in 08-20 08:50
-> panosundan alındı ve dosya indiğinde birebir aynısı okunacak. Dosya inince bu bölümün
-> kaynağı **dosya adına** çevrilir.
+> **Kaynak:** `docs/standards/erp-workspace-design-standard.md` §3/E5 — v0, T133-VH,
+> commit `60aacb61` (PR #702, 2026-08-20), 345 satır. **DOSYA İNDİ ve bu satır 2026-08-28'de
+> ölçümle güncellendi.**
+>
+> Bu bölüm yazıldığında cetvel henüz gönderilmemişti; kararlar ADMIN'in 08-20 08:50 panosundan
+> alınmış ve bölümün kendi talimatı *"dosya inince kaynağı dosya adına çevir"* demişti. Çevrildi.
+> Aynı talimatın ikinci yarısı **"birebir aynısı okunacak"** idi ve o da ölçüldü: inen dosyadaki
+> E5 yerleşim şeması (üst durum şeridi · sol salt-okunur bağlam · orta kalem tablosu · sağ canlı
+> önizleme · alt eylem çubuğu) ve dört kompozör kuralı, aşağıdaki tabloyla **birebir örtüşüyor**.
+> Sapma yok. (Eski satırdaki `44def9e8` ve *318 satır* değerleri merge öncesi dal durumuna aitti;
+> inen hâlin ölçülen değerleri yukarıdadır.)
 
 Teklif kompozörü, T133'ün beş kanonik ekran deseninden **E5 (Kompozör)**'dür ve teklif modülü
 o desenin **ilk uygulamasıdır**. ADMIN bunu adıyla işaretledi: E5 ödünç bir desen değil —
