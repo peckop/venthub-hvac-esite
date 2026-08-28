@@ -922,7 +922,7 @@ export const en: typeof tr = {
   },
   category: {
     family: {
-      variantCount: '{{count}} variants',
+      variantCount: '{{count}} models',
       count: '{{count}} product families',
       viewFamily: 'Explore',
     },
@@ -933,7 +933,7 @@ export const en: typeof tr = {
     sort: {
       title: 'Sort',
       name: 'By Name',
-      variantCount: 'Variant count',
+      variantCount: 'Model count',
     },
     noProductsFound: 'No products found matching these criteria',
     howItWorks: {

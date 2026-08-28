@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T17:47:32.841968+00:00
+compiled_at: 2026-08-28T06:21:48.672166+00:00
 total_compiled_files: 656
-source_commit: 829d6493
+source_commit: 0ad1a259
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T17:47:32.841968+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-28T06:21:48.672166+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -42341,6 +42341,8 @@ entity_hashes:
 generated_at: 2026-08-17T11:20:13Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, teklif talep sürecini başlatmak için kullanılan bir React bileşenidir. Kullanıcıların mevcut ürün listeleri veya proje kaynaklarıyla teklif istemesini sağlayan interaktif bir düğme sunar. Bileşen, prop'lar aracılığıyla esnek bir şekilde yapılandırılabilir ve tıklama olayını yöneterek teklif akışını tetikler.
 
@@ -57991,8 +57993,8 @@ type VariantSelection = <T extends VariantLike>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductFanSelection.ts
-skeleton_hash: cf67fad21ac874be
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductFanSelection.ts
+skeleton_hash: d25b597f76ec7fa0
 entity_hashes:
   func:calismaNoktasi: 477178de8115d130
   func:degerlendir: f750568727981b71
@@ -58001,7 +58003,7 @@ entity_hashes:
   func:secimYap: 4647312ff1acd1ac
   func:sistemKatsayisi: 04ecc41bc675abb4
   overview: 1ad4e3445b46e669
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:57Z
 ---
 
 ## Genel Bakış
@@ -58152,23 +58154,15 @@ type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
 
 ## SABİTLER
 - **MAHAL_KURALLARI** (object) — `{
-
   bathroom: { ach: 8, minimumM3h: 85 },
-
   kitchen: { ach: 15, minimumM3h:...`
 - **GUZERGAH_GEOMETRISI** (object) — `{
-
   short: { uzunlukM: 3, dirsek90: 1, dirsek45: 0 },
-
   medium: { uzunlukM:...`
 - **SESSIZLIK_AGIRLIGI** (object) — `{
-
   normal: 0.2,
-
   important: 0.4,
-
   critical: 0.6,
-
 }`
 
 ---
@@ -58261,11 +58255,11 @@ graph TD
     ductFanSelection_ts__parsePQCurve["parsePQCurve"]
     ductFanSelection_ts__secimYap["secimYap"]
     ductFanSelection_ts__sistemKatsayisi["sistemKatsayisi"]
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
 ```
 
 ## NODE ID STANDARD
@@ -58308,8 +58302,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductPressure.ts
-skeleton_hash: a0b705802650fa34
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductPressure.ts
+skeleton_hash: 1579ba7b4e3d68fe
 entity_hashes:
   func:akisHizi: a87413c22f69c858
   func:dinamikBasinc: 4288bc94c70c6d78
@@ -58317,7 +58311,7 @@ entity_hashes:
   func:reynolds: d87c6fd9c4af1b38
   func:surtunmeFaktoru: 20425e5a77455729
   overview: 1dd122290e85a03e
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:34Z
 ---
 
 ## Genel Bakış
@@ -58414,23 +58408,15 @@ type KanalMalzemesi = keyof typeof PURUZLULUK_M
 
 ## SABİTLER
 - **PURUZLULUK_M** (as_expression) — `{
-
   galvanized: 0.00015,
-
   pvc: 0.00001,
-
   flex: 0.003,
-
 } as const`
 - **FITTING_K** (as_expression) — `{
-
   /** 90° yuvarlak dirsek, eğrilik yarıçapı = 1,5·D (tipik hazır dirsek). ...`
 - **TERMINAL_K** (as_expression) — `{
-
   /** İç mahal egzoz menfezi/ızgarası. */
-
   menfez: 2.5,
-
   /** Geri-akış...`
 - **TERMINAL_K_TOPLAM** (binary_expression) — `TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur`
 
@@ -58494,8 +58480,8 @@ graph TD
     ductPressure_ts__kanalBasincKaybi["kanalBasincKaybi"]
     ductPressure_ts__reynolds["reynolds"]
     ductPressure_ts__surtunmeFaktoru["surtunmeFaktoru"]
-    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
+    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__akisHizi
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__dinamikBasinc
 ```
@@ -71868,6 +71854,8 @@ entity_hashes:
 generated_at: 2026-06-19T20:50:42Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, kullanıcıların şifrelerini sıfırlamaları için bir e-posta adresi girmelerini gerektiren tek sayfalık bir React bileşenidir. Kullanıcı formu gönderdiğinde, e-posta adresi sunucudaki şifre sıfırlama servisine asenkron olarak iletilerek süreç başlatılır.
 
@@ -73102,6 +73090,8 @@ entity_hashes:
 generated_at: 2026-06-19T20:51:31Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 RegisterPage.tsx modülü, kullanıcıların yeni bir hesap oluşturabilmesi için gerekli olan kayıt formunu ve formun yönetim mantığını barındıran bir React bileşenidir. Modül, kullanıcının form alanlarına girdiği verileri tutar, bu verilerin tanımlı kurallara göre geçerliliğini doğrular ve geçerli ise sunucuya göndererek kayıt işlemini tamamlar.
 
@@ -73459,13 +73449,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx
-skeleton_hash: 6a35ab6f5cca3044
+source_path: C:\tmp\venthub-wt-t131\src\views\account\AccountAddressesPage.tsx
+skeleton_hash: f7e7228eef723bcc
 entity_hashes:
   func:AccountAddressesPage: 8a10c2ba61747811
   overview: cfdfd55850a3c6f9
   style_tokens: 20e5949307a3284f
-generated_at: 2026-06-19T20:48:21Z
+generated_at: 2026-08-27T07:10:03Z
 ---
 
 ## Genel Bakış
@@ -73538,10 +73528,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **emptyForm** (object) — `{
+
   label: '',
+
   full_name: '',
+
   phone: '',
+
   address_line: '',
+
   city:...`
 
 ---
@@ -74603,6 +74598,8 @@ entity_hashes:
   style_tokens: 0076231c43efae4d
 generated_at: 2026-08-26T07:15:55Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=8 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 VentHub HVAC projesinin hesap yönetimi modülü bünyesinde yer alan bu bileşen, kullanıcının sevkiyat ve kargo bilgilerini görüntüleyebildiği tek sayfalık bir arayüz sağlar. Supabase veritabanından sipariş verilerini çekerek kargo durumlarına göre filtreleme ve görsel gösterim yapar. Bileşen, kullanıcının oturum durumunu ve dil tercihini bağımlılıklarından alarak sayfayı buna göre yapılandırır.
@@ -79330,6 +79327,8 @@ entity_hashes:
 generated_at: 2026-08-25T07:30:06Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=3 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, yönetici panelindeki fiyatlandırma ayarlarını görüntülemek ve düzenlemek için kullanılan bir sayfa bileşenidir. Para birimi verilerinin doğrulanması ve kullanıcı etkileşimi için modal açılması gibi temel işlevleri içerir.
 
@@ -80444,6 +80443,8 @@ entity_hashes:
   style_tokens: 6e2907e7b7287d77
 generated_at: 2026-08-25T07:30:31Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=5 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 AuditLogTableBody modülü, admin panelinde denetim günlüğü (audit log) kayıtlarının tablo içinde görüntülenmesinden sorumludur. Supabase veritabanından denetim kayıtlarını çeken bir veri erişim fonksiyonu ve bu kayıtları tablo gövdesinde sunan bir React bileşeni içerir.
@@ -83639,15 +83640,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\PricingPoliciesTableBody.tsx
-skeleton_hash: 6dc08285098d673f
+source_path: C:\tmp\venthub-wt-t131\src\views\admin\PricingPoliciesTableBody.tsx
+skeleton_hash: 414834293eae7a27
 entity_hashes:
   func:EffectiveLockPanel: f5eb59505e91e68f
   func:PricingPoliciesTableBody: 242122ccd79025dd
   func:policiesFetcher: 3dc61bf26c95820a
   overview: 0735c2f1aad88d41
   style_tokens: 406c48a0ed4c398b
-generated_at: 2026-08-25T08:46:05Z
+generated_at: 2026-08-27T07:30:16Z
 ---
 
 ## Genel Bakış
@@ -83754,10 +83755,15 @@ type ScopeKey = 'variant' | 'product' | 'brand' | 'category' | 'global'
 
 ## SABİTLER
 - **SCOPE_KEYS** (object) — `{
+
   0: 'variant',
+
   1: 'product',
+
   2: 'brand',
+
   3: 'category',
+
   4: 'g...`
 
 ---
@@ -83881,6 +83887,8 @@ entity_hashes:
   style_tokens: a7db7d920cdcbe94
 generated_at: 2026-08-25T07:30:58Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 
@@ -84972,6 +84980,8 @@ entity_hashes:
   style_tokens: b14d0e3316338d3b
 generated_at: 2026-06-19T20:50:29Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 Bu modül, admin panelindeki webhook olayları tablosunun satırlarını oluşturmak için tasarlanmış bir React bileşeni ve bu verileri Supabase veritabanından asenkron olarak çekmek için gerekli veri getiriciyi içerir. Modül, veri kaynağını (fetcher) ve verinin kullanıcı arayüzündeki sunumunu (bileşen) bir arada tutan tek bir modülden oluşur.
@@ -89072,6 +89082,8 @@ entity_hashes:
   overview: 6ba63efad2b3f3df
 generated_at: 2026-08-25T08:45:55Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 Bu modül, ödeme (checkout) formunu dinamik olarak bir HTML container'a enjekte etme işlemini gerçekleştirir. Enjeksiyon sırasında mevcut render durumunu kontrol eder ve HTML içindeki script elementlerini güvenli biçimde yeniden canlandırır. Modül, DOM manipülasyonu ve script işleme sorumluluklarını üstlenir.
