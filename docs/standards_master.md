@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T10:00:51.188226+00:00
+compiled_at: 2026-08-28T10:16:30.704725+00:00
 total_compiled_files: 62
-source_commit: cec34925
+source_commit: 1b359e6a
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -8500,6 +8500,149 @@ done
 **Kural:** çakışan dosya **önce sınıflandırılır** (üretilmiş mi kaynak mı), sonra reçete
 seçilir; ve taban tazeleme merge'inden sonra yukarıdaki kayıp taraması koşulur. "Kapılar yeşil"
 bir merge'in içerik silmediğini **kanıtlamaz** — hiçbir kapı silinen paragrafı ölçmüyor.
+
+### 11.9.1 Kuralın konsolide hâli — dört ajan, aynı ölçütün dört ayrı kusuru
+
+Bu kural bir günde filoya yayıldı ve **iki turda kendi kendini keskinleştirdi**. Nihai metin:
+
+| katman | ne yapılır | niçin |
+|---|---|---|
+| **1 — ÖN KOŞUL** | `git log --merges origin/master..HEAD` ile dalda taban-tazeleme merge'i **var mı** ölç | merge yoksa tarama tanım gereği boş döner; o "temiz" **kanıt değildir**. Beyan: *"tarama uygulanamaz — merge yok"* |
+| **2 — TARAMA** | aday listesi (yukarıdaki betik) | çıktı **zaten blob düzeyindedir** (`git diff` blob karşılaştırır); aday çıkmaması asıl kanıttır, **üstüne dize/satır/`cat-file` tekrarı YAPILMAZ** |
+| **3 — ADAY ÇIKARSA** | sırayla iki soru: (a) üretilmiş mi kaynak mı (b) kaynaksa içerik master'a **başka bir PR ile** inmiş mi | "net katkı sıfır" hem **kayıp** hem **zaten-inmiş** olabilir; ayırt eden blob değil **TARİH** |
+| **4 — HÜKÜM aracı** | aday için **blob kimliği** (`git rev-parse <dal>:<yol>` = `origin/master:<yol>`) | "net katkı sıfır" tespitini içerik düzeyinde teyit eder; **FARKLI çıkması tek başına kayıp demek değildir** (bayat tabanlı dal doğal olarak farklı verir) |
+
+⛔**"Dal indi, o yüzden tarama uygulanamaz" YANLIŞTIR — ölçüldü (ÜRÜN, 2026-08-28).** Squash
+merge master'da **farklı bir SHA** üretir; dalın kendi commit'leri hâlâ "master'da yok" sayılır,
+dolayısıyla `origin/master..HEAD` **boş dönmez ve tarama koşar.** ÜRÜN kendi inmiş dalında
+koşturdu (11 commit, 3 merge) ve aday üretti; AUTH aynı düzeltmeyi kendi raporuna uyguladı.
+Taramayı uygulanamaz yapan tek şey **1. katmandır** (merge yokluğu), inmiş olmak değil.
+
+⚠**Üç nokta ile iki nokta aynı soruyu sormaz** (ÜRÜN'ün teknik notu): `origin/master...HEAD`
+*"dalın katkısı ne"* diye sorar, *"şu an farklı mı"* diye değil. Bu yüzden tarama sonucu ile
+blob karşılaştırması **çelişkili görünebilir** ve çelişki bir hata değil, iki farklı sorunun
+iki farklı cevabıdır.
+
+**Niçin bu tablo bu kadar uzun sürdü:** dört şerit aynı gün aynı tuzağın **dört ayrı yüzüne**
+düştü ve dördü de kendini düzeltti — dize işareti (ÜRÜN), satır sayısı (AUTH), dosya varlığı
+(I18N), ve "merge yok ama temiz dedim" (ALTYAPI). İlk üçü *vekil kanıt* sınıfıydı: **eşit
+görünüp farklı olabilir.** Dördüncüsü farklı bir sınıftı: **ölçüt doğru, evren boştu.**
+Hiçbiri tek başına tabloyu göremezdi.
+
+### 11.9.2 ⚠SINIFLANDIRICININ KENDİSİ YANILIR — manifestte ad aramak YETMEZ
+
+Çakışan dosyayı "üretilmiş mi kaynak mı" diye ayırmak için **manifest içinde adını aramak
+YANLIŞTIR** ve tam da tehlikeli yönde yanılır: manifest **hem ürünü hem kaynaklarını** kaydeder.
+Ölçüldü (2026-08-28): ham dize araması `docs/standards/fleet-mechanism-standard.md` için
+"ÜRETİLMİŞ" dedi — yani *"`--theirs` güvenli"* dedi — oysa o bir **kaynak** dosyadır ve §11.9'daki
+104 satırlık kayıp **tam olarak bu yanlış sınıflandırmanın sonucudur.**
+
+**Doğru ölçüt — manifestin yapısı:**
+
+| soru | nerede bakılır |
+|---|---|
+| ÜRETİLMİŞ mi | `artefaktlar[].ad` listesinde (bu depoda **4 kalem**) + `artefakt_manifest.json`'un kendisi |
+| KAYNAK mı | `artefaktlar[].kaynak.dosyalar` anahtarlarında |
+| **HEM ÜRÜN HEM KAYNAK** mı | ikisinde birden → **AXIOM 7**, iki tur build |
+
+```bash
+# dogru siniflandirici (dize aramasi DEGIL, yapiya bakar)
+git diff --name-only --diff-filter=U | node -e "…artefaktlar[].ad vs kaynak.dosyalar…"
+```
+
+Ders, §5'in bu bölüme uygulanışıdır: **sınıf atayan bir ölçüt, "kendine ne diyor" sorusunu da
+geçmek zorundadır.** Aynı ailenin ikinci örneği: `artefakt_manifest.json` kendi kaydını tutmaz,
+bu yüzden naif ölçüt onu da yanlış sınıflar.
+
+## 12. GERİ ALMA MUAFİYETİ — bir kapının önerdiği düzeltme öteki kapıdan geçmeli
+
+**Ölçüldü 2026-08-28.** §11 kimliği konu alıyordu; bu bölüm kapılar arası bir çelişkiyi.
+
+### 12.1 Olay — "düzeltme yolu kapalı alarm"
+
+`bash-write-audit` doğru bir dikiş-yeri alarmı verdi (build, başka şeritlerin companion'larını
+yeniden üretmişti) ve çözümünü de yazdı: *"değişikliği geri al — `git checkout -- <yol>`"*.
+Geri almaya kalkıldığında `bash-write-guard` **bloklad**: *"başka bir oturumun şeridinde"*.
+
+**Bir kapının ÖNERDİĞİ düzeltmeyi öteki kapı yasaklıyordu.** Sebep: guard "yazma"yı görür,
+NİYETİ görmez — geri alma da bir yazmadır.
+
+**Kural olarak yazılıyor:** bir alarm yazan kapı, önerdiği düzeltmenin **kendi kapılarından
+geçtiğini ölçmek zorundadır.** Düzeltme yolu kapalı bir alarm, alarm olmaktan çıkar; kullanıcıyı
+ya çaresiz bırakır ya `--no-verify` alışkanlığına iter.
+
+### 12.2 Muafiyetin sınırları — dar, çok şartlı, sesli
+
+| şart | niçin |
+|---|---|
+| komutun **TÜM** hedefleri geri-alma sebepli (`every`, `some` DEĞİL) | karışık komut (`checkout -- x && echo >> x`) muafiyet almaz: tek yabancı yazma bütün komutu kapatır |
+| ağaç **izole worktree** olacak | ana depoda `checkout` başkasının **commit'siz ara işini sessizce siler** (bu depo o dersi 2026-08-20'de yaşadı) |
+| ölçülemezse muafiyet **AÇILMAZ** (fail-closed) | kapının kendisi fail-open olabilir; bir *muafiyet* asla — ölçüm hatası kapıyı delerdi |
+| muafiyet **sesli** | sessiz muafiyet ile kapının hiç koşmaması aynı görünür |
+| `git restore --staged` / `-S` **kapsam dışı** | index'i değiştirir, HEAD'e döndürme değildir |
+
+### 12.3 Ana depo / worktree ölçütü — sabit yol GÖMÜLMEZ
+
+Ölçüt: git-dir ile git-common-dir aynı ise ana depo.
+
+⚠**HİPOTEZ ÖLÇÜMLE ÇÜRÜDÜ ve tam tehlikeli yönde:** ana depoda `--git-common-dir` **GÖRELİ**
+(".git") döner, git-dir ise mutlaktır. Düz karşılaştırma ana dizin için "worktree" der ve
+muafiyeti **tam yasak olduğu yerde** açardı. İki taraf da toplevel'e göre mutlaklaştırılır ve
+üç ağaçta doğrulandı (ana=EVET, iki worktree=hayır). Kod yazmadan ölçüldüğü için kaçtı.
+
+⚠**Ayrıca ölçüldü: bu kapının "ana dizin bloğu" HİÇ YOKTU.** Filo tasarım kararı onu
+"korunacak mevcut koruma" sanıyordu; guard ana depo/worktree ayrımını hiç yapmıyordu. Var
+sanılan koruma, olmayan korumadan tehlikelidir — **"aynen kalsın" denen her koruma ölçülür.**
+
+### 12.4 Sabotaj kanıtı
+
+| tur | sabotaj | KIRMIZI | kör | ATLANAN |
+|---|---|---|---|---|
+| 1 | 6 | 5 | **1** | 0 |
+| 2 (test sertleştirildikten sonra) | 6 | **6** | 0 | 0 |
+
+Kör kalan kol **fail-closed** koluydu: `catch` dalını "muafiyet açılır" yapınca test yeşil
+kalıyordu — çünkü fikstürde ölçüm **hep başarılıydı** ve o dala hiç girilmiyordu. Düzeltme:
+`PATH` boşaltılarak `git` çalıştırılamaz hâle getirildi. **Bir kolu test etmek için o kola
+GİRDİRMEK gerekir; kolun varlığını okumak onu ölçmek değildir.**
+
+### 12.5 İKİNCİ MUAFİYET — birleştirme (`bash-write-audit`)
+
+**Ölçüldü 2026-08-28; aynı gün ÜÇ kez ötdü** (ALTYAPI kendi ağacında 7 dosya, AUTH iki kez,
+URUN bir kez). `git merge origin/master` başka şeritlerin master'a inmiş dosyalarını çalışma
+ağacına getirir; denetim "sonuca bakar" ve bunları bu şeridin yazdığı iş sanar.
+
+⭐**Asıl zarar stderr değil PANO:** alarmın bir kolu ilgisiz şerit sahibine otomatik
+*"senin dosyanı değiştirdim"* notu düşürür. Yani yanlış alarm yalnız beni değil, **hiç ilgisi
+olmayan bir şeridi** meşgul eder. URUN bu notu bağımsız olarak "bu ihlal değil, merge'in
+kendisi" diye teşhis etti — teşhis doğruydu ve kancanın kendisi yanlış etiketliyordu.
+
+**Sınıf:** aynı olguya iki kapının zıt hüküm vermesi. `lane-precommit.cjs` bu muafiyeti
+ZATEN taşıyordu (`MERGE_HEAD`/`CHERRY_PICK_HEAD`/`REVERT_HEAD`), `bash-write-audit.cjs`
+taşımıyordu. §12.1'in kardeşi: normal iş akışını ihlal sayan alarm, birkaç gün içinde
+görmezden gelinir ve **gerçek sinyal onunla birlikte ölür.**
+
+| şart | niçin |
+|---|---|
+| hâl **ağaç başına** ölçülür (`rev-parse --absolute-git-dir`) | çok ağaçlı denetimde bir ağacın merge'i ötekini muaf yapmamalı |
+| ölçülemezse muafiyet **AÇILMAZ** (fail-closed) | §12.2 ile aynı ilke: kapı fail-open olabilir, muafiyet asla |
+| muafiyet **sesli** — hâl + muaf tutulan yol **SAYISI** basılır | sessiz muafiyet ile kancanın hiç koşmaması aynı görünür |
+| kapsam **dar**: yalnız o turun yeni yolları | merge commit'lenince hâl biter, yollar zaten temizlenir — kalıcı kör nokta yok |
+
+**Sabotaj kanıtı:** 6 sabotaj · KIRMIZI **5** · kör **0** · ATLANAN **0** · bilinen sınır **1**.
+
+⚠**BİLİNEN SINIR, "kör nokta" DEĞİL — ve niçin ayırdığımız önemli:** fail-closed kolu bu
+fikstürde **girdirilemiyor**. §12.2'deki "PATH'i boşalt" tekniği burada işlemez, çünkü sıra
+farklı: `git` ölürse `git status` da başarısız olur ve denetim daha yukarıda `okunanAgac === 0`
+ile sessizce çıkar — yani birleştirme ölçümüne **hiç gelinmez**. Kol kodda savunma olarak
+duruyor, testte ve burada adıyla yazılı, ama **kanıtlanmadı**. "Ölçemedim" ile "geçti" ayrı
+şeylerdir; sabotaj tablosunda ayrı sütunda durmasının sebebi budur.
+
+⚠**"Master tarafını al" reçetesi YALNIZ ÜRETİLMİŞ dosya için geçerlidir.** Aynı gün bu
+cetvelin kendisi çakıştı (bir taraf §10, öteki §12) ve orada doğru çözüm **iki tarafı da
+tutmak**tı. Reçeteyi ayrım yapmadan uygulamak, çakışmayı çözerken içerik silmektir; çakışan
+dosyanın **üretilmiş mi kaynak mı** olduğu önce ölçülür (`docs/artefakt_manifest.json`
+içinde mi?), sonra reçete seçilir.
 
 
 ---
