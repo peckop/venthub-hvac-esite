@@ -63,6 +63,53 @@ Kapıyı susturmak **seçenek değildir**. Sırayla:
 3. Zorunlu `Vercel` check'ini dal korumasından ÇIKARMAK önerilmez — o, ölçüyü
    kaybetmek pahasına kırmızıyı yok saymaktır.
 
-## Sonuç
+## Sonuç — 2026-08-28 06:48, ÜÇ ÖLÇÜT DE TUTTU
 
-_(push sonrası doldurulacak — üç ölçüt de yazılacak, biri eksikse hüküm YOK)_
+Push `06:48:17Z` (`2d4dce40`, dal `i18n/d83-canli-olcum`, PR #882).
+
+| # | Ölçüt | Ölçülen | Hüküm |
+|---|-------|---------|-------|
+| 1 | Dağıtım kaydı | `CANCELED` (`dpl_DPk54eQ…`) | atlama ÇALIŞTI |
+| 2 | GitHub `Vercel` damgası | `success` — *Canceled by Ignored Build Step* | kapı YEŞİL |
+| 3 | `mergeStateStatus` | `CLEAN`, kırmızı 0, `MERGEABLE` | merge engellenmiyor |
+
+**Karar tablosunun ilk satırı: atlama çalışıyor VE kapı geçiliyor.** D8.3'te yazılı
+"kilit takası" riski ölçümle çürüdü; geri alma planına gerek kalmadı.
+
+### Onarım gerçekten sınandı — zincir 2 koştu
+
+Build günlüğü, on gün önce tam burada ölen zincirin devamını gösteriyor:
+
+```
+ignore-build: VERCEL_GIT_PREVIOUS_SHA bos (dalin ilk dagitimi) -> ortak ataya dusuyorum
+ignore-build: origin uzagi yok, URL ortamdan kuruldu (https://github.com/peckop/venthub-hvac-esite.git)
+ignore-build: taban = origin/master ile ortak ata (d937fa8c)
+ignore-build: tum degisiklikler build-disi sinifta -> ATLA
+```
+
+Eski hâli: `origin/master bu klonda yok -> BUILD`, üstelik hata `2>/dev/null || true`
+ile yutuluyordu.
+
+**Aynı gün master koşumu bunu sınamamıştı** (`e4557793`): orada taban zincir 1'den
+(`VERCEL_GIT_PREVIOUS_SHA`) çözülmüştü, çünkü master'ın önceki dağıtımı vardı.
+Onarımın gerektiği vaka **dalın ilk dağıtımı**dır ve bu deney tam onu kurdu.
+
+### Yanlış hükmün eşiğinden dönülen yer
+
+`06:51`'de üçüncü ölçüt `BLOCKED` okunuyordu ve "kilit takası var" diye yazılabilirdi.
+**Yanlış olurdu:** `BLOCKED`'in sebebi Vercel değil, henüz koşan `ci`/`admin-smoke`
+idi. Ayırt eden şey durumun kendisi değil, **kırmızı listesinin içeriği**.
+
+> `BLOCKED` tek başına "zorunlu kapı geçilmiyor" demek DEĞİLDİR.
+
+### Sınır — adıyla
+
+Bu vaka **tek dosyalıydı** ve `docs/audits/` altındaydı. Karışık bir PR'da tek bir
+kaynak dosyası bile BUILD ettirir; doğru davranış budur. Bu sonuç, atlama listesini
+genişletmek için gerekçe DEĞİLDİR (D2: bilmiyorsak BUILD).
+
+### Filo için pratik karşılık
+
+%100 atlanabilir push'lar artık **slot yakmıyor ve kapıyı geçiyor** — companion,
+artefakt ve cetvel-dışı `.md` push'ları pencere beklemeden gidebilir. Kaynak dosyaya
+dokunan push'larda pencere disiplini aynen sürer.
