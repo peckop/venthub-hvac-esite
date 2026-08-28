@@ -8,8 +8,8 @@ import { useI18n } from '../i18n/I18nProvider'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import BuildTag from './BuildTag'
 
-const FOOTER_ICON_ADDRESS = '@'
-const FOOTER_ICON_PHONE = 'P'
+// ADDRESS/PHONE ikon sabitleri, adres+telefon satırlarıyla birlikte kaldırıldı
+// (2026-08-28) — kullanılmayan sabit bırakmak lint'i kırardı.
 const FOOTER_ICON_MAIL = 'M'
 const WEEKDAY_HOURS = '09:00 - 18:00'
 const SATURDAY_HOURS = '09:00 - 14:00'
@@ -137,14 +137,8 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="font-semibold mb-4">{t('footer.contact')}</h3>
             <div className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <span className="text-secondary-blue mt-1 flex-shrink-0">{FOOTER_ICON_ADDRESS}</span>
-                <span className="text-gray-300 text-sm whitespace-pre-line">{t('footer.address')}</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-secondary-blue flex-shrink-0">{FOOTER_ICON_PHONE}</span>
-                <span className="text-gray-300 text-sm">{t('footer.phone')}</span>
-              </div>
+              {/* Adres/telefon satırları şirket kuruluşuna kadar bilinçli YOK — uydurma
+                  değer basılmaz (2026-08-28 taraması); gerçek bilgi gelince geri eklenir. */}
               <div className="flex items-center space-x-3">
                 <span className="text-secondary-blue flex-shrink-0">{FOOTER_ICON_MAIL}</span>
                 <span className="text-gray-300 text-sm">{t('footer.email')}</span>
