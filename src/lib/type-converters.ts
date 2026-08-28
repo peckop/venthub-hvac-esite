@@ -68,11 +68,31 @@ export const mapDatabaseProductToDomain = (dbProd: DbProduct): DomainProduct => 
 }
 
 /**
- * List converters for bulk data.
+ * Bulk converts an array of Database Category rows to UI-ready Category models.
+ *
+ * @param cats - The raw array of category data rows from the Supabase database
+ * @returns An array of UI-ready DomainCategory objects
+ *
+ * @example
+ * const dbCats = [{ id: '1', name: 'Fanlar', menu_label: null }]
+ * const uiCats = toUICategoryList(dbCats)
+ * // returns [{ id: '1', name: 'Fanlar', menu_label: 'Fanlar', marketing_title: 'Fanlar', description: '' }]
  */
 export const toUICategoryList = (cats: DbCategory[]): DomainCategory[] => {
   return cats.map(mapDatabaseCategoryToDomain)
 }
+
+/**
+ * Bulk converts an array of Database Product rows to UI-ready Product models.
+ *
+ * @param prods - The raw array of product data rows from the Supabase database
+ * @returns An array of UI-ready DomainProduct objects with localized descriptions resolved
+ *
+ * @example
+ * const dbProds = [{ id: 'p1', name: 'Jet Fan', description_i18n: { tr: 'Güçlü jet fan' }, brand: null }]
+ * const uiProds = toUIProductList(dbProds)
+ * // returns [{ id: 'p1', name: 'Jet Fan', description: 'Güçlü jet fan', brand: 'Venthub' }]
+ */
 export const toUIProductList = (prods: DbProduct[]): DomainProduct[] => {
   return prods.map(mapDatabaseProductToDomain)
 }
