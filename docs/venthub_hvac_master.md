@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T06:21:48.672166+00:00
+compiled_at: 2026-08-28T08:32:38.942684+00:00
 total_compiled_files: 656
-source_commit: 0ad1a259
+source_commit: c0bc6850
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-28T06:21:48.672166+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-28T08:32:38.942684+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -9500,8 +9500,8 @@ entity_hashes:
   func:pickLang: 946d41753cca4e50
   func:toggleSpecSection: aca256fdc4d20ecb
   overview: 590be9a86b563f9f
-  style_tokens: e157cb22f5459ba5
-generated_at: 2026-08-27T06:54:02Z
+  style_tokens: d8b7561aa4410d27
+generated_at: 2026-08-28T08:20:43Z
 ---
 
 ## Genel Bakış
@@ -9812,8 +9812,8 @@ graph TD
     ProductDetailPageView_tsx__openQuoteRequest["openQuoteRequest"]
     ProductDetailPageView_tsx__pickLang["pickLang"]
     ProductDetailPageView_tsx__toggleSpecSection["toggleSpecSection"]
-    ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__pickLang
     ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__toggleSpecSection
+    ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__pickLang
     ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__mapSlugToTopic
 ```
 
@@ -9856,8 +9856,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-normal`, `tracking-hvac-snug`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`
-- **Layout:** `absolute`, `backdrop-blur-2`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`
+- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`, `bg-white/80`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`, `gap-8`
 - **Varyant/Responsive:** `:`, `active:`, `disabled:`, `group-hover:`, `hover:`, `last:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
 - **Yardımcı Sınıflar:** `${activeSection`, `${inStock`, `${isNavSticky`, `${isOpen`, `${isWishlisted`, `${section.bgClass`, `:`, `===`, `active:scale-95`, `active:scale-98`, `animate-in`, `animate-ping`, `animate-pulse`, `animate-pulse-subtle`, `animate-spin`
 
@@ -49650,11 +49650,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\en.ts
-skeleton_hash: 9d0705a703cca270
+source_path: C:\tmp\vh-urun-comp\src\i18n\dictionaries\en.ts
+skeleton_hash: 52188924392dca91
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-27T04:25:30Z
+generated_at: 2026-08-28T08:20:48Z
 ---
 
 ## Genel Bakış
@@ -49713,11 +49713,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\tr.ts
-skeleton_hash: 612478c507ab5d21
+source_path: C:\tmp\vh-urun-comp\src\i18n\dictionaries\tr.ts
+skeleton_hash: 5f4c92dce1a05405
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-08-27T04:25:30Z
+generated_at: 2026-08-28T08:20:50Z
 ---
 
 ## Genel Bakış
@@ -53349,11 +53349,11 @@ Fonksiyon gövdesi bulunmadığından AST Pointer üretilmemiştir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\ui.en.ts
-skeleton_hash: efd1f7fe409cadc7
+source_path: C:\tmp\vh-urun-comp\src\i18n\dictionaries\admin\ui.en.ts
+skeleton_hash: c069639090fb9c88
 entity_hashes:
   overview: 1ca0cb4cc145d139
-generated_at: 2026-08-27T06:50:47Z
+generated_at: 2026-08-28T08:20:45Z
 ---
 
 ## Genel Bakış
@@ -53416,11 +53416,11 @@ Bu modül, uluslararasılaştırma (i18n) sözlük verisi içeren bir kaynaktır
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\ui.tr.ts
-skeleton_hash: 6d0c5eefe4b263d7
+source_path: C:\tmp\vh-urun-comp\src\i18n\dictionaries\admin\ui.tr.ts
+skeleton_hash: b8516320a1dbc7aa
 entity_hashes:
   overview: 1ca0cb4cc145d139
-generated_at: 2026-08-27T06:50:47Z
+generated_at: 2026-08-28T08:20:46Z
 ---
 
 ## Genel Bakış
@@ -57993,8 +57993,8 @@ type VariantSelection = <T extends VariantLike>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductFanSelection.ts
-skeleton_hash: d25b597f76ec7fa0
+source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductFanSelection.ts
+skeleton_hash: cf67fad21ac874be
 entity_hashes:
   func:calismaNoktasi: 477178de8115d130
   func:degerlendir: f750568727981b71
@@ -58003,7 +58003,7 @@ entity_hashes:
   func:secimYap: 4647312ff1acd1ac
   func:sistemKatsayisi: 04ecc41bc675abb4
   overview: 1ad4e3445b46e669
-generated_at: 2026-08-25T08:44:57Z
+generated_at: 2026-08-27T07:32:10Z
 ---
 
 ## Genel Bakış
@@ -58154,15 +58154,23 @@ type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
 
 ## SABİTLER
 - **MAHAL_KURALLARI** (object) — `{
+
   bathroom: { ach: 8, minimumM3h: 85 },
+
   kitchen: { ach: 15, minimumM3h:...`
 - **GUZERGAH_GEOMETRISI** (object) — `{
+
   short: { uzunlukM: 3, dirsek90: 1, dirsek45: 0 },
+
   medium: { uzunlukM:...`
 - **SESSIZLIK_AGIRLIGI** (object) — `{
+
   normal: 0.2,
+
   important: 0.4,
+
   critical: 0.6,
+
 }`
 
 ---
@@ -58255,11 +58263,11 @@ graph TD
     ductFanSelection_ts__parsePQCurve["parsePQCurve"]
     ductFanSelection_ts__secimYap["secimYap"]
     ductFanSelection_ts__sistemKatsayisi["sistemKatsayisi"]
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
     ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
 ```
 
 ## NODE ID STANDARD
@@ -58302,8 +58310,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductPressure.ts
-skeleton_hash: 1579ba7b4e3d68fe
+source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductPressure.ts
+skeleton_hash: a0b705802650fa34
 entity_hashes:
   func:akisHizi: a87413c22f69c858
   func:dinamikBasinc: 4288bc94c70c6d78
@@ -58311,7 +58319,7 @@ entity_hashes:
   func:reynolds: d87c6fd9c4af1b38
   func:surtunmeFaktoru: 20425e5a77455729
   overview: 1dd122290e85a03e
-generated_at: 2026-08-25T08:44:34Z
+generated_at: 2026-08-27T07:32:10Z
 ---
 
 ## Genel Bakış
@@ -58408,15 +58416,23 @@ type KanalMalzemesi = keyof typeof PURUZLULUK_M
 
 ## SABİTLER
 - **PURUZLULUK_M** (as_expression) — `{
+
   galvanized: 0.00015,
+
   pvc: 0.00001,
+
   flex: 0.003,
+
 } as const`
 - **FITTING_K** (as_expression) — `{
+
   /** 90° yuvarlak dirsek, eğrilik yarıçapı = 1,5·D (tipik hazır dirsek). ...`
 - **TERMINAL_K** (as_expression) — `{
+
   /** İç mahal egzoz menfezi/ızgarası. */
+
   menfez: 2.5,
+
   /** Geri-akış...`
 - **TERMINAL_K_TOPLAM** (binary_expression) — `TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur`
 
@@ -58480,8 +58496,8 @@ graph TD
     ductPressure_ts__kanalBasincKaybi["kanalBasincKaybi"]
     ductPressure_ts__reynolds["reynolds"]
     ductPressure_ts__surtunmeFaktoru["surtunmeFaktoru"]
-    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
+    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__akisHizi
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__dinamikBasinc
 ```
@@ -73449,13 +73465,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\account\AccountAddressesPage.tsx
-skeleton_hash: f7e7228eef723bcc
+source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx
+skeleton_hash: 6a35ab6f5cca3044
 entity_hashes:
   func:AccountAddressesPage: 8a10c2ba61747811
   overview: cfdfd55850a3c6f9
   style_tokens: 20e5949307a3284f
-generated_at: 2026-08-27T07:10:03Z
+generated_at: 2026-06-19T20:48:21Z
 ---
 
 ## Genel Bakış
@@ -73528,15 +73544,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **emptyForm** (object) — `{
-
   label: '',
-
   full_name: '',
-
   phone: '',
-
   address_line: '',
-
   city:...`
 
 ---
@@ -83640,15 +83651,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\admin\PricingPoliciesTableBody.tsx
-skeleton_hash: 414834293eae7a27
+source_path: C:\Users\alize\venthub-hvac\src\views\admin\PricingPoliciesTableBody.tsx
+skeleton_hash: 6dc08285098d673f
 entity_hashes:
   func:EffectiveLockPanel: f5eb59505e91e68f
   func:PricingPoliciesTableBody: 242122ccd79025dd
   func:policiesFetcher: 3dc61bf26c95820a
   overview: 0735c2f1aad88d41
   style_tokens: 406c48a0ed4c398b
-generated_at: 2026-08-27T07:30:16Z
+generated_at: 2026-08-25T08:46:05Z
 ---
 
 ## Genel Bakış
@@ -83755,15 +83766,10 @@ type ScopeKey = 'variant' | 'product' | 'brand' | 'category' | 'global'
 
 ## SABİTLER
 - **SCOPE_KEYS** (object) — `{
-
   0: 'variant',
-
   1: 'product',
-
   2: 'brand',
-
   3: 'category',
-
   4: 'g...`
 
 ---
