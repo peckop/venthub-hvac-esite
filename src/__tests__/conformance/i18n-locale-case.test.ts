@@ -42,7 +42,6 @@ const ONEK_PENCERE = 90
  */
 const DONMUS_BORC: ReadonlyArray<readonly [string, number]> = [
   // --- teknik (ASCII dize; locale'siz çağrı DOĞRU) ---
-  ['src/app/_components/ProductDetailPageView.tsx', 1], // teknik: sertifika kodu (CE/TSE)
   ['src/components/authority/AuthorityRenderer.tsx', 1], // teknik: Lucide ikon adı
   ['src/components/authority/TechnicalDrawingAuthority.tsx', 1], // teknik: dosya formatı (pdf→PDF)
   ['src/views/OrdersPage.tsx', 2], // teknik: sipariş kodu + kimlik dilimi (hex)

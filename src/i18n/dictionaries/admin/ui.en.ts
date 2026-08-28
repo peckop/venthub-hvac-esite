@@ -31,7 +31,6 @@ export const ui = {
   searchCommandPlaceholder: 'Search a command or product...',
   scanningSystem: 'Scanning System...',
   navigation: 'Navigation',
-  productCatalog: 'Product Catalog',
   noResultsForTerm: 'No results found for "{{term}}".',
   tryDifferentKeywords: 'Please try different keywords.',
   select: 'Select',

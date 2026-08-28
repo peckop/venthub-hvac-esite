@@ -310,6 +310,63 @@ değiştirmek olur — kota duvarı kalkar, check duvarı doğar.
 Bu bölüm, "çözüm işe yaradı" denmeden önce **hangi ölçümün yapılacağını** yazar.
 Yazılmayan deney yapılmaz; yapılmayan deneyin yerini varsayım alır.
 
+---
+
+#### ✅D8.3 SONUÇ (2026-08-28, deney koşuldu — ölçüm: `docs/audits/build-skip-canli-olcum-2026-08-28.md`)
+
+**Risk çürüdü: atlanan dağıtım zorunlu `Vercel` check'ini YEŞİL yapıyor.** Kilit
+takası olmadı, geri alma planına gerek kalmadı.
+
+| Ölçüt | Ölçülen |
+|---|---|
+| Dağıtım kaydı | `CANCELED` |
+| GitHub `Vercel` damgası | `success` — *Canceled by Ignored Build Step* |
+| `mergeStateStatus` | `CLEAN`, kırmızı 0, `MERGEABLE` |
+
+Onarım (D8.2) bu koşumda **gerçekten sınandı** — dalın ilk dağıtımı olduğu için
+zincir 2 devreye girdi: `origin uzagi yok, URL ortamdan kuruldu` → `taban = origin/master
+ile ortak ata` → `tum degisiklikler build-disi sinifta -> ATLA`.
+
+**Aynı gün master koşumu bunu sınamamıştı** (taban zincir 1'den çözülmüştü). Onarımın
+gerektiği vaka **dalın ilk dağıtımıdır**; deney tam o vakayı kurmak için yeni dal açtı.
+
+##### SINIR — dört vaka ölçüldü, tek istisna ADLANDIRILDI
+
+| Vaka | Bağlam | Sonuç |
+|---|---|---|
+| `2d4dce40` | **dal** push'u, salt-`.md` | ATLANDI |
+| `3fd8e61b` | **dal** push'u, salt-`.md` | ATLANDI |
+| `6d246563` | **dal** push'u, belge-only (cetvel + artefakt + manifest) | ATLANDI |
+| `ef051d43` | **merge-prod** (master), belge-only, *tek başına* | ATLANDI (15 sn) |
+| `4e2e1bdb` | **merge-prod** (master), salt-`.md`, *başka dağıtım koşarken* | **ATLANMADI** |
+
+> **HÜKÜM:** belge-only değişiklik hem dal push'unda hem merge-prod'da **atlanır** ve
+> zorunlu `Vercel` check'i **yeşil** kalır.
+> **İSTİSNA:** dağıtım, master'da **başka bir dağıtım koşarken** tetiklenmişse atlama
+> kaçırılabilir.
+
+**İstisnanın açıklaması — desteklendi, kanıtlanmadı.** En makul okuma: ardışık
+dağıtımlarda `VERCEL_GIT_PREVIOUS_SHA` son *başarılı* dağıtımı gösterdiği için taban
+geride kalır; fark kümesine o aradaki commit'lerin **kaynak** dosyaları da girer ve
+betik **doğru** kararla BUILD der. Yani bu bir kusur değil, tabanın doğru ama eski olması.
+
+**Elenen açıklama (ölçümle çürütüldü):** "master üretim dağıtımında HEAD zaten varsayılan
+dalın ucudur, taban çözülemez ve `HEAD varsayilan dalin ucu … -> BUILD` dalı çalışır."
+Bu önerme **her** merge-prod'un BUILD etmesini öngörürdü; `ef051d43` atlandığı için
+yanlıştır — yani üretim dağıtımında da `VERCEL_GIT_PREVIOUS_SHA` **dolu** geliyor.
+
+**Nasıl çürütüldü (yöntem kayda değer):** hipotez sahibi onu `HİPOTEZ, ÖLÇMEDİM` diye
+etiketledi *ve* ayırt edici testi de yazdı. Etiket yanlış hükmü engelledi, test onu
+öldürdü. Etiket tek başına yeterli olmazdı — "muhtemel sebep" olarak yaşamaya devam ederdi.
+
+**PRATİK KURAL:** belge-only işler slot açısından ucuzdur; ama merge'i **master'da başka
+dağıtım koşmazken** yap, yoksa atlamayı kaçırırsın. Tek-tetikleme-tek-bekleyiş disiplini
+burada da geçerlidir — sebebi kota değil, taban tazeliğidir.
+
+**Kalan açık kalem (düşük öncelik, araç kısıtı):** uzun build günlüklerinin **başına**
+erişilemiyor (araç son N satırı veriyor), bu yüzden `4e2e1bdb`'nin `ignore-build:` satırı
+doğrudan okunamadı. Açıklama dolaylı kanıtla duruyor.
+
 **HÜKÜM:** taban çözümündeki her başarısız deneme, **adı ve sebebiyle** günlüğe yazılır.
 Bir adımın sessizce düşmesi yasaktır. Kapı bunu `taban çözülemediğinde SEBEP günlüğe
 yazılır` koluyla zorlar; kol bilerek bozularak kanıtlanmıştır (görünürlük satırları
