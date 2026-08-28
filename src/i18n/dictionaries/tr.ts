@@ -1280,7 +1280,7 @@ export const tr = {
   },
   category: {
     family: {
-      variantCount: '{{count}} varyant',
+      variantCount: '{{count}} model',
       count: '{{count}} ürün ailesi',
       viewFamily: 'İncele',
     },
@@ -1291,7 +1291,7 @@ export const tr = {
     sort: {
       title: 'Sıralama',
       name: 'İsme Göre',
-      variantCount: 'Varyant sayısı',
+      variantCount: 'Model sayısı',
     },
     noProductsFound: 'Bu kriterlere uygun ürün bulunamadı',
     howItWorks: {
