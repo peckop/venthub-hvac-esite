@@ -18,19 +18,32 @@ import { tr } from '../../i18n/dictionaries/tr'
  * ─────────────────────────────────────────────────────────────────────────────
  * KAPININ EN KRİTİK KURALI — NOKTASIZ ŞABLON
  *
- * Dinamik anahtar önekini AYRAÇLA eşlemek kör nokta yaratır. Kodda iki yer anahtarı
- * **ayraçsız** birleştiriyor:
+ * Dinamik anahtar önekini AYRAÇLA eşlemek kör nokta yaratır. Kodda anahtarı
+ * **ayraçsız** birleştiren çağrı:
  *
- *   t(`pdp.actions.download${type === 'productCatalog' ? 'Catalog' : 'Brochure'}`)
  *   t(`calculators.airCurtain.results.efficiency${...}`)   // ve ...${...}Desc
  *
- * Üretilen anahtarlar `pdp.actions.downloadCatalog`, `...efficiencyOptimal` — hiçbiri
- * `önek.` ile başlamaz. Denetimde bu 10 anahtar "ölü" listesine düşmüştü; silinselerdi
- * indirme düğmesinin etiketi ve hava perdesi verimlilik metni bozulacak ve HİÇBİR KAPI
- * görmeyecekti (sözlükten anahtar eksilince tsc/lint/parite susar).
+ * Üretilen anahtarlar `...efficiencyOptimal` — `önek.` ile başlamaz. Denetimde bu
+ * anahtarlar "ölü" listesine düşmüştü; silinselerdi hava perdesi verimlilik metni
+ * bozulacak ve HİÇBİR KAPI görmeyecekti (sözlükten anahtar eksilince tsc/lint/parite
+ * susar).
  *
- * Bu yüzden önek eşlemesi AYRAÇSIZ yapılır ve o 10 anahtar **KANARYA** olarak tutulur:
+ * Bu yüzden önek eşlemesi AYRAÇSIZ yapılır ve o anahtarlar **KANARYA** olarak tutulur:
  * kapı onları "ölü" görürse sözlük değil **KAPININ KENDİSİ KÖR** demektir.
+ *
+ * ⭐2026-08-27 — KANARYA 10'DAN 8'E İNDİ, SEBEBİ ÖLÇÜLDÜ (sayı gevşetilmedi):
+ * İkinci ayraçsız çağrı yeri şuydu ve ARTIK YOK:
+ *
+ *   t(`pdp.actions.download${type === 'productCatalog' ? 'Catalog' : 'Brochure'}`)
+ *
+ * PDP'de sertifika/belge bölümleri veri-dayanaksız oldukları için kaldırıldı (#866),
+ * o çağrı da onlarla gitti. `pdp.actions.downloadCatalog/downloadBrochure` böylece
+ * GERÇEKTEN ölü kaldı — kapı kör olduğu için değil. Yerine iki başka anahtar
+ * konulamadı, çünkü ÖLÇTÜM: depoda ayraçsız şablon üreten BAŞKA çağrı yeri kalmadı
+ * (`grep -E 't\(`[\w.]*\$\{' src/` → tek yer: AirCurtainCalcPage). Kanaryayı 8'de
+ * tutmak, olmayan bir çağrı yerini varmış gibi göstermekten dürüsttür; 8 anahtar da
+ * aynı körlüğü aynı keskinlikte ölçer. Üçüncü bir ayraçsız çağrı yeri doğarsa
+ * kanaryaya EKLENİR — bu sayı yalnız ölçümle değişir.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -548,8 +561,6 @@ const OPAK_CAGRI_DOSYALARI: ReadonlySet<string> = new Set([
  * önek eşlemesi bozulmuş demektir. Liste uzunluğu da kilitli: sessizce büyütülemez.
  */
 const KANARYA = [
-  'pdp.actions.downloadBrochure',
-  'pdp.actions.downloadCatalog',
   'calculators.airCurtain.results.efficiencyOptimal',
   'calculators.airCurtain.results.efficiencyOptimalDesc',
   'calculators.airCurtain.results.efficiencyMarginal',
@@ -604,8 +615,9 @@ describe('INV-6: sözlükte tüketicisi olmayan anahtar bırakılmaz', () => {
       'Bu anahtarlar kodda `t(`önek${...}`)` ile AYRAÇSIZ üretiliyor. Ölü görünüyorlarsa ' +
         'sözlük değil KAPI kördür: önek eşlemesi ayraç şartı koymuş olabilir.',
     ).toEqual([])
-    // Kanarya seti sessizce boşaltılamaz.
-    expect(KANARYA.length).toBe(10)
+    // Kanarya seti sessizce boşaltılamaz. 10 → 8: ikinci ayraçsız çağrı yeri #866'da
+    // kalktı; gerekçe ve ölçüm dosya başındaki blokta. Bu sayı yalnız ölçümle değişir.
+    expect(KANARYA.length).toBe(8)
   })
 
   it('KANARYA: AYRAÇLI şablonla üretilen DB sürücülü anahtarlar CANLI görülmeli', () => {

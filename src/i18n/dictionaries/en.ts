@@ -121,7 +121,6 @@ export const en: typeof tr = {
     whatsappSupportMessage: 'Quick support from website',
     pdf: 'PDF',
     sku: 'SKU',
-    pdfDatasheet: 'Technical Datasheet',
     share: 'Share',
     requestQuote: 'Request Quote',
     officialGuarantee: 'Official Guarantee',
@@ -1370,34 +1369,7 @@ export const en: typeof tr = {
       sku: 'SKU',
       datasheetPdf: 'DATASHEET (PDF)'
     },
-    diagramsExtra: {
-      technicalDiagrams: 'Technical Diagrams',
-      mounting: 'Mounting Diagram',
-      electrical: 'Electrical Diagram',
-      threeDViews: '3D Views',
-      view3DModel: '3D Model View',
-      interactiveModel: 'Interactive Model',
-      dimensionedDrawing: 'Dimensioned Drawing',
-      cadDwg: 'CAD - DWG Format',
-      cadDwgAvailable: 'CAD - DWG Available'
-    },
-    docs: {
-      installationGuide: 'Installation Guide',
-      userManual: 'User Manual',
-      maintenanceManual: 'Maintenance Manual',
-      safetyInfo: 'Safety Information',
-      warrantyTerms: 'Warranty Terms',
-      technicalSpecsDoc: 'Technical Specifications',
-      productCatalog: 'Product Catalog',
-      technicalBrochure: 'Technical Brochure',
-      productReleaseNotes: 'Product Release Notes',
-      troubleshootingGuide: 'Troubleshooting Guide',
-      sparePartsList: 'Spare Parts List'
-    },
     actions: {
-      download: 'Download',
-      downloadCatalog: 'Download Catalog',
-      downloadBrochure: 'Download Brochure',
       interactive3D: '3D VIEW',
       addToProject: 'Add to Project',
       removeFromWishlist: 'Remove from Favorites',
@@ -1405,31 +1377,12 @@ export const en: typeof tr = {
       favorite: 'Favorite',
       share: 'Share'
     },
-    cert: {
-      ceCertificate: 'CE Certificate',
-      iso9001: 'ISO 9001',
-      tseCertificate: 'TSE Certificate',
-      energyStar: 'Energy Star',
-      ulCertificate: 'UL Certificate',
-      ecoFriendly: 'Eco Friendly',
-      rohsCompliant: 'RoHS Compliant',
-      downloadCenter: 'Certificate Download Center',
-      downloadAllZip: 'Download All Certificates (ZIP)',
-      verify: 'Certificate Verification'
-    },
     certLabels: {
-      yearSuffix: '-2024',
-      standardValue: 'ISO/EN-STD',
-      certificateNo: 'Certificate No',
       standard: 'Standard',
     },
     sections: {
       general: 'General Info',
       models: 'Models',
-      diagrams: 'Diagrams',
-      documents: 'Documents',
-      brochure: 'Brochure/Catalog',
-      certificates: 'Certificates',
       specs: 'Technical Specifications'
     },
     trust: {

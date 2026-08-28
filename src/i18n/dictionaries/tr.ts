@@ -136,7 +136,6 @@ export const tr = {
     whatsappSupportMessage: 'Web sitesinden hızlı destek',
     pdf: 'PDF',
     sku: 'SKU',
-    pdfDatasheet: 'Teknik Döküman',
     share: 'Paylaş',
     requestQuote: 'Teklif İste',
     officialGuarantee: 'Distribütör Garantili',
@@ -1727,34 +1726,7 @@ export const tr = {
       sku: 'SKU',
       datasheetPdf: 'TEKNİK DÖKÜMAN (PDF)'
     },
-    diagramsExtra: {
-      technicalDiagrams: 'Teknik Şemalar',
-      mounting: 'Montaj Şeması',
-      electrical: 'Elektrik Şeması',
-      threeDViews: '3D Görünümler',
-      view3DModel: '3D Modeli Görüntüle',
-      interactiveModel: 'İnteraktif Model',
-      dimensionedDrawing: 'Ölçülü Çizim',
-      cadDwg: 'CAD - DWG Formatı',
-      cadDwgAvailable: 'CAD - DWG Mevcut'
-    },
-    docs: {
-      installationGuide: 'Kurulum Kılavuzu',
-      userManual: 'Kullanım Kılavuzu',
-      maintenanceManual: 'Bakım Kılavuzu',
-      safetyInfo: 'Güvenlik Bilgileri',
-      warrantyTerms: 'Garanti Koşulları',
-      technicalSpecsDoc: 'Teknik Özellikler',
-      productCatalog: 'Ürün Kataloğu',
-      technicalBrochure: 'Teknik Broşür',
-      productReleaseNotes: 'Ürün Sürüm Notları',
-      troubleshootingGuide: 'Sorun Giderme Kılavuzu',
-      sparePartsList: 'Yedek Parça Listesi'
-    },
     actions: {
-      download: 'İndir',
-      downloadCatalog: 'Kataloğu İndir',
-      downloadBrochure: 'Broşürü İndir',
       interactive3D: '3D GÖRÜNÜM',
       addToProject: 'Projeye Ekle',
       removeFromWishlist: 'Favorilerden Kaldır',
@@ -1762,31 +1734,12 @@ export const tr = {
       favorite: 'Favori',
       share: 'Paylaş'
     },
-    cert: {
-      ceCertificate: 'CE Sertifikası',
-      iso9001: 'ISO 9001',
-      tseCertificate: 'TSE Sertifikası',
-      energyStar: 'Energy Star',
-      ulCertificate: 'UL Sertifikası',
-      ecoFriendly: 'Çevre Dostu',
-      rohsCompliant: 'RoHS Uyumlu',
-      downloadCenter: 'Sertifika İndirme Merkezi',
-      downloadAllZip: 'Tüm Sertifikaları İndir (ZIP)',
-      verify: 'Sertifika Doğrulama'
-    },
     certLabels: {
-      yearSuffix: '-2024',
-      standardValue: 'ISO/EN-STD',
-      certificateNo: 'Sertifika No',
       standard: 'Standart',
     },
     sections: {
       general: 'Genel Bilgiler',
       models: 'Modeller',
-      diagrams: 'Şemalar',
-      documents: 'Belgeler',
-      brochure: 'Broşür/Katalog',
-      certificates: 'Sertifikalar',
       specs: 'Teknik Özellikler'
     },
     trust: {
