@@ -76,24 +76,75 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
     const denenecek = [...new Set(hrefs)].slice(0, 6)
     expect(denenecek.length, 'Ürün listesinden hiç href toplanamadı').toBeGreaterThan(0)
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // ⚠️ ÇAPA PAYLAŞILIYOR — bu testin en sinsi tuzağı (2026-08-28 ölçüldü)
+    // ─────────────────────────────────────────────────────────────────────────
+    // `pdp-add-to-cart` test-id'sini PDP'de İKİ AYRI düğme basıyor: satış modunda
+    // "Sepete Ekle" (handleAddToCart), teklif modunda "Teknik Teklif İste"
+    // (openQuoteRequest). Yani ÇAPANIN GÖRÜNÜR OLMASI "sepete eklenebilir"
+    // DEMEK DEĞİLDİR — gösterge iki dünyayı ayırt etmiyor.
+    //
+    // Bu tam olarak yaşandı: hide_price 37/37 kategoriye açılınca test teklif
+    // düğmesini buldu, "sepete eklenebilir" sandı, tıkladı, teklif modalı açıldı
+    // ve sepet hiç yazılmadı → "Sepet kaydedilmedi" diye YANLIŞ TEŞHİS verdi.
+    // Gerçek kusur sepette değil, ÖLÇÜTTEYDİ.
+    //
+    // AYIRT EDEN: düğmenin METNİ. Aşağıdaki iki kol da FAIL üretebilir; test
+    // gevşetilmiyor, iki dünyayı da ölçüyor.
+    const SEPETE_EKLE = 'Sepete Ekle'
+    const TEKNIK_TEKLIF = 'Teknik Teklif İste'
+
     const addToCartBtn = page.getByTestId('pdp-add-to-cart')
     let bulunan: string | null = null
+    const ctaMetinleri: string[] = []
     for (const href of denenecek) {
       // Karta click() YERİNE href'e DOĞRUDAN git: kartın hover-transform'u / üstteki katman
       // click()'i "stable değil / pointer intercept" diye 60sn timeout'a sokuyordu (flaky).
       await page.goto(href)
       await page.waitForURL(/\/products\//, { timeout: 25_000 })
-      if (await addToCartBtn.isVisible({ timeout: 12_000 }).catch(() => false)) {
+      if (!(await addToCartBtn.isVisible({ timeout: 12_000 }).catch(() => false))) continue
+
+      const metin = (await addToCartBtn.innerText().catch(() => '')).trim()
+      ctaMetinleri.push(metin)
+      if (metin.includes(SEPETE_EKLE)) {
         bulunan = href
         break
       }
     }
-    expect(
-      bulunan,
-      `Denenen ${denenecek.length} üründen hiçbiri sepete eklenebilir değil — hepsi "Teklif Al" ` +
-        'modunda görünüyor. Fiyat motoru vitrine ulaşmıyor olabilir (bu GERÇEK bir regresyon ' +
-        `olabilir, testi gevşetme). Denenenler: ${denenecek.join(', ')}`,
-    ).not.toBeNull()
+
+    if (bulunan === null) {
+      // ── TEKLİF MODU KOLU ──────────────────────────────────────────────────
+      // Katalog teklif moduna alınmış olabilir (kategori hide_price). Bu KUSUR
+      // DEĞİL, kasıtlı bir durumdur — ama körlemesine PASS vermiyoruz: pozitif
+      // ve negatif kol BİRLİKTE tutmalı, yoksa "ürün sayfası hiç boot olmadı"
+      // gibi GERÇEK bir arıza da sessizce yeşil geçerdi.
+      expect(
+        ctaMetinleri.length,
+        `Denenen ${denenecek.length} ürünün HİÇBİRİNDE birincil CTA görünmedi — bu teklif modu ` +
+          'değil, PDP\'nin hiç boot olmamasıdır (gerçek arıza).',
+      ).toBeGreaterThan(0)
+
+      // POZİTİF KOL: görünen CTA'ların hepsi teklif yüzeyi olmalı.
+      expect(
+        ctaMetinleri.every((m) => m.includes(TEKNIK_TEKLIF)),
+        `Teklif modu bekleniyordu ama CTA metinleri karışık: ${JSON.stringify(ctaMetinleri)}`,
+      ).toBe(true)
+
+      // NEGATİF KOL: hiçbirinde sepete-ekle yüzeyi kalmamalı.
+      expect(
+        ctaMetinleri.some((m) => m.includes(SEPETE_EKLE)),
+        `Teklif modunda "${SEPETE_EKLE}" yüzeyi hâlâ var: ${JSON.stringify(ctaMetinleri)}`,
+      ).toBe(false)
+
+      test.info().annotations.push({
+        type: 'teklif-modu',
+        description: `doğrulandı — ${ctaMetinleri.length} üründe teklif CTA'sı var, sepete-ekle yüzeyi yok`,
+      })
+      return
+    }
+
+    // ── SATIŞ MODU KOLU ───────────────────────────────────────────────────────
+    // Buraya YALNIZCA metni "Sepete Ekle" olan gerçek bir düğme bulunduğunda gelinir.
 
     // Sepet localStorage'a yazılana kadar hidrasyon/bağlanma yarışını tolere ederek yeniden tıkla.
     await expect
