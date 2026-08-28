@@ -808,8 +808,8 @@ export const tr = {
     weekdays: 'Hafta İçi',
     saturday: 'Cumartesi',
     rights: 'Tüm hakları saklıdır.',
-    address: 'Teknokent Mah. Teknopark Blv.\nNo: 1/4A 34906 Pendik/İstanbul',
-    phone: '+90 (216) 123-45-67',
+    // address/phone BİLİNÇLİ YOK (2026-08-28): uydurma adres ve numara yayınlanmaz.
+    // Gerçek bilgi olunca EN sözlüğüyle BİRLİKTE geri eklenir (parite).
     email: 'info@venthub.com.tr',
     social: {
       facebook: 'Facebook',
@@ -980,9 +980,7 @@ export const tr = {
       cardPhoneLabel: 'Şimdi Ara',
       cardEmailTitle: 'Teknik Teklif',
       cardEmailLabel: 'E-posta Gönder',
-      cardOfficeTitle: 'Merkez Ofis',
-      cardOfficeValue: 'Teknopark İstanbul, Pendik',
-      cardOfficeLabel: 'Yol Tarifi Al',
+      // cardOffice* KALDIRILDI (2026-08-28): gerçek ofis adresi yok, kart da yok.
       directAccessLabel: 'Doğrudan Erişim',
       supportTitle: 'Teknik Destek',
       supportTitleAccent: 'Her An Yanınızda',

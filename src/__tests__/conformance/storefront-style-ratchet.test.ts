@@ -181,7 +181,9 @@ const RATCHETS: Ratchet[] = [
     // her zaman KAPININ KENDİ aracıdır, yan kanaldan alınan sayı değil.
     // 2026-08-28 · 1508 → 1499: PDP'den dört veri-dayanaksız bölüm kaldırıldı (REC-56,
     // uydurma sertifika numaraları); borç bu yüzden düştü, kapı "tavanı indir" dedi.
-    tavan: 1499,
+    // 2026-08-28 · 1499 → 1497: Footer/ContactPage'den uydurma iletişim satırları
+    // kaldırıldı (Recep talimatı, PR #891); iki gri sınıf onlarla gitti.
+    tavan: 1497,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },

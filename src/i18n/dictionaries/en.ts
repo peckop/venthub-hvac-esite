@@ -842,9 +842,9 @@ export const en: typeof tr = {
     weekdays: 'Monday - Friday',
     saturday: 'Saturday',
     rights: 'All rights reserved.',
-    address: 'Teknokent Mah. Teknopark Blv.\nNo: 1/4A 34906 Pendik/Istanbul',
+    // address/phone DELIBERATELY ABSENT (2026-08-28): no fabricated address or number
+    // is published. Restored together with the TR dictionary (parity) once real.
     email: 'info@venthub.com.tr',
-    phone: '+90 (216) 123-45-67',
     social: {
       facebook: 'Facebook',
       instagram: 'Instagram',
@@ -862,9 +862,7 @@ export const en: typeof tr = {
       cardPhoneLabel: 'Call Now',
       cardEmailTitle: 'Technical Quote',
       cardEmailLabel: 'Send Email',
-      cardOfficeTitle: 'Head Office',
-      cardOfficeValue: 'Teknopark İstanbul, Pendik',
-      cardOfficeLabel: 'Get Directions',
+      // cardOffice* REMOVED (2026-08-28): no real office address, so no card.
       directAccessLabel: 'Direct Access',
       supportTitle: 'Technical Support',
       supportTitleAccent: 'By Your Side Anytime',
