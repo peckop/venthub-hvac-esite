@@ -68,7 +68,7 @@ const ADAYLAR: FanAdayi[] = [
 ]
 
 function ac() {
-  return render(<SilentFanWizard isOpen onClose={vi.fn()} categorySlug="inline-duct-fans" />)
+  return render(<SilentFanWizard isOpen onClose={vi.fn()} familySlug="vortice-lineo-quiet" />)
 }
 
 beforeEach(() => {
@@ -78,7 +78,7 @@ beforeEach(() => {
 
 describe('INV-SILENTFAN-WIZARD-1 — açılış ve gezinme', () => {
   it('kapalıyken HİÇBİR şey basmaz ve veri de çekmez', () => {
-    render(<SilentFanWizard isOpen={false} onClose={vi.fn()} categorySlug="inline-duct-fans" />)
+    render(<SilentFanWizard isOpen={false} onClose={vi.fn()} familySlug="vortice-lineo-quiet" />)
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(getWizardCandidatesMock).not.toHaveBeenCalled()
   })
@@ -106,7 +106,9 @@ describe('INV-SILENTFAN-WIZARD-1 — açılış ve gezinme', () => {
     ac()
     fireEvent.click(screen.getByText('silentFanWizard.skipToResult'))
     await waitFor(() => expect(screen.getByText('silentFanWizard.resultTitle')).toBeTruthy())
-    expect(getWizardCandidatesMock).toHaveBeenCalledWith(expect.anything(), 'inline-duct-fans')
+    // REC-85: kapsam KATEGORİ değil SERİ. Eskiden 'inline-duct-fans' (kategori) beklenirdi;
+    // o kategori pasif/boştu ve kategori kapsamı sessiz OLMAYAN 24 modeli de aday sayıyordu.
+    expect(getWizardCandidatesMock).toHaveBeenCalledWith(expect.anything(), 'vortice-lineo-quiet')
   })
 })
 

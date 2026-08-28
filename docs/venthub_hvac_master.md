@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T08:38:10.993907+00:00
+compiled_at: 2026-08-28T09:02:59.281676+00:00
 total_compiled_files: 656
-source_commit: 8925f907
+source_commit: 0a5acfe6
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-28T08:38:10.993907+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-28T09:02:59.281676+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -9500,8 +9500,8 @@ entity_hashes:
   func:pickLang: 946d41753cca4e50
   func:toggleSpecSection: aca256fdc4d20ecb
   overview: 590be9a86b563f9f
-  style_tokens: e157cb22f5459ba5
-generated_at: 2026-08-27T06:54:02Z
+  style_tokens: d8b7561aa4410d27
+generated_at: 2026-08-28T08:20:43Z
 ---
 
 ## Genel Bakış
@@ -9812,8 +9812,8 @@ graph TD
     ProductDetailPageView_tsx__openQuoteRequest["openQuoteRequest"]
     ProductDetailPageView_tsx__pickLang["pickLang"]
     ProductDetailPageView_tsx__toggleSpecSection["toggleSpecSection"]
-    ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__pickLang
     ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__toggleSpecSection
+    ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__pickLang
     ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__mapSlugToTopic
 ```
 
@@ -9856,8 +9856,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-normal`, `tracking-hvac-snug`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`
-- **Layout:** `absolute`, `backdrop-blur-2`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`
+- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`, `bg-white/80`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`, `gap-8`
 - **Varyant/Responsive:** `:`, `active:`, `disabled:`, `group-hover:`, `hover:`, `last:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
 - **Yardımcı Sınıflar:** `${activeSection`, `${inStock`, `${isNavSticky`, `${isOpen`, `${isWishlisted`, `${section.bgClass`, `:`, `===`, `active:scale-95`, `active:scale-98`, `animate-in`, `animate-ping`, `animate-pulse`, `animate-pulse-subtle`, `animate-spin`
 
@@ -27071,17 +27071,17 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-comp\src\components\category\SilentFanWizard.tsx
-skeleton_hash: d2482ad2f7de047f
+skeleton_hash: 91df50870ea874f5
 entity_hashes:
   func:OneriKarti: 97c485c0d2d475d4
-  func:SilentFanWizard: 9f1774f3b17d5e04
-  overview: a6fbe1769b3cb472
+  func:SilentFanWizard: 16a9b20c0d68fe1b
+  overview: cd003b650d44604c
   style_tokens: 152b7536a8556fc2
-generated_at: 2026-08-27T07:00:10Z
+generated_at: 2026-08-28T08:51:55Z
 ---
 
 ## Genel Bakış
-Bu modül, sessiz fan seçimi için etkileşimli bir sihirbaz (wizard) bileşeni sağlar. Kullanıcının tercihlerine göre uygun fan önerilerini sunar ve sonuçları görsel kartlarla görüntüler. Modül, yönlendirme ve yerelleştirme gibi dış bağımlılıkları kullanarak kullanıcı deneyimini destekler.
+Bu modül, sessiz fan seçimi için etkileşimli bir sihirbaz bileşeni sağlar. Kullanıcının tercihlerine göre uygun fan önerilerini hesaplar ve sonuçları görsel kartlarla görüntüler. Modül, yönlendirme ve yerelleştirme gibi dış bağımlılıkları kullanarak kullanıcı deneyimini destekler.
 
 ## Fonksiyon Grupları
 ### Ana Sihirbaz Bileşeni
@@ -27095,27 +27095,25 @@ Tek bir fan önerisini görsel bir kart olarak görüntüler. Rozet, vurgu ve ye
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Neden:** Fonksiyon gövdeleri verilmemiştir. Aksiyomlar yalnızca fonksiyon gövdelerinden türetilir; imza, sabit tanımları veya dosya adından çıkarım yapılmaz.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### SilentFanWizard
+**Ne yapar**: Sessiz fan seçimi için 5 adımlı bir sihirbaz (wizard) bileşeni oluşturur. Kullanıcıdan mahal tipi, oda boyutları, kanal tercihleri ve sessizlik beklentisi gibi girdileri toplayarak uygun fan adaylarını hesaplar ve en uygun, en sessiz ve en verimli seçenekleri öneri kartları olarak sunar. Bileşen, `isOpen` prop'u true olduğunda tam ekran modal bir dialog olarak render edilir; false olduğunda `null` döndürerek DOM'da yer kaplamaz.
 
-**Ne yapar**: Sessiz fan seçimi için 5 adımlık bir sihirbaz (wizard) bileşenidir. Kullanıcıdan mahal tipi, oda büyüklüğü, kanal tercihleri ve sessizlik seviyesi gibi girdileri toplayarak, veritabanından çekilen fan adayları arasından en uygun sonuçları hesaplar ve sunar.
-
-**Nasıl yapar**: Bileşen `isOpen` prop'u `false` olduğunda `null` döner ve hiçbir şey render etmez. Aksi halde tam ekran bir modal dialog oluşturur. Durum yönetimi için `useState` ile adım (`adim`), girdi (`girdi`), aday listesi (`adaylar`), yükleme durumu (`yukleniyor`), hata (`hata`), sonuç (`sonuc`) ve detay açıklığı (`dokumAcik`) state'leri tutulur. `adaylariGetir` fonksiyonu `useCallback` ile sarılmıştır ve `supabase` istemcisi ile `getWizardCandidates` fonksiyonunu çağırarak kategoriye göre fan adaylarını getirir; adaylar bir kez çekildikten sonra tekrar çekilmez. Hata durumunda hata yutulmaz, kullanıcıya gösterilir (yorumda belirtildiği üzere bu, daha önceki sessiz hata gösterme sorununun çözümüdür). 5. adıma gelindiğinde `useEffect` tetiklenir, adaylar getirilir ve `secimYap` fonksiyonu ile girdilere göre sonuç hesaplanır; bileşen unmount edilirse iptal bayrağı ile işlem durdurulur. `ileri` ve `geri` fonksiyonları adım sınırlarını (`1`-`5`) aşmayacak şekilde adım değiştirir. `bastanBasla` fonksiyonu tüm state'leri başlangıç değerlerine sıfırlar. `yaz` fonksiyonu `Partial<SecimGirdisi>` alarak mevcut girdi state'ini parçalı olarak günceller. Adım 1'de mahal seçimi, adım 2'de oda alanı ve tavan yüksekliği slider'ları, adım 3'te kanal güzergahı/malzemesi/çapı seçimi, adım 4'te sessizlik seviyesi seçimi, adım 5'te ise yükleme/hata/sonuç durumlarına göre uygun arayüz gösterilir. Sonuç ekranında `OneriKarti` bileşeni ile en uygun, en sessiz ve en verimli fan önerileri sunulur; detay açıklma butonu ile hacim, debi, basınç gibi hesaplama detayları gösterilir. Footer'da adım 5'ten önce varsayılanlar ipucu ve sonuca atlama butonu bulunur.
+**Nasıl yapar**: Bileşen içinde `useState` hook'u ile `adim` (1-5 arası), `girdi` (kullanıcı seçimleri), `adaylar` (fan listesi), `yukleniyor`, `hata`, `sonuc` ve `dokumAcik` state'leri yönetilir. `useI18n` hook'u uluslararasılaştırma metinlerini, `useLocalizedRoutes` hook'u ise lokalize edilmiş rotaları sağlar. `adaylariGetir` useCallback fonksiyonu, `getWizardCandidates` fonksiyonunu çağırarak Supabase veritabanından fan adaylarını çeker ve önbelleğe alır; aynı listeden tekrar çekilmesini önler. `useEffect` hook'u, `adim` değeri 5 olduğunda `adaylariGetir` fonksiyonunu çağırarak listeyi alır ve `secimYap` fonksiyonu ile hesaplama yaparak sonucu state'e yazar. Her adım için koşullu JSX blokları render edilir: 1. adımda `MAHALLER` dizisinden mahal seçimi, 2. adımda range input'larla alan ve tavan yüksekliği girdisi, 3. adımda `GUZERGAHLAR`, `MALZEMELER` ve `CAPLAR` dizilerinden kanal tercihleri, 4. adımda `SESSIZLIKLER` dizisinden sessizlik seviyesi, 5. adımda ise yükleme durumu, hata veya sonuç ekranı gösterilir. Sonuç ekranında `OneriKarti` bileşeni ile en uygun, en sessiz ve en verimli fanlar sunulur; detay dökümü `dokumAcik` state'i ile açılıp kapatılabilir. Footer'da "sonuca atla" butonu ile doğrudan 5. adıma geçilebilir.
 
 **Parametreler**:
-- isOpen: `SilentFanWizardProps` içindeki `isOpen` alanı — Sihirbazın açık olup olmadığını kontrol eden boolean değer. `false` olduğunda bileşen hiçbir şey render etmez.
-- onClose: `SilentFanWizardProps` içindeki `onClose` alanı — Sihirbazı kapatmak için çağırılacak fonksiyon. Arka plan overlay'e tıklanması ve kapatma butonu ile tetiklenir.
-- categorySlug: `SilentFanWizardProps` içindeki `categorySlug` alanı — Fan adaylarının hangi kategoriden çekileceğini belirten slug değeri. `getWizardCandidates` fonksiyonuna parametre olarak iletilir.
+- `isOpen`: `SilentFanWizardProps['isOpen']` — Sihirbazın açık olup olmadığını belirten değer. false olduğunda bileşen hiç render edilmez ve `null` döner.
+- `onClose`: `SilentFanWizardProps['onClose']` — Sihirbazı kapatmak için çağrılan fonksiyon. Kapatma butonuna (`X` ikonu) ve arka plan overlay'ine (`bg-industrial-gray/60 backdrop-blur-xl`) tıklandığında tetiklenir.
+- `familySlug`: `SilentFanWizardProps['familySlug']` — Fan ailesinin slug değeri. `getWizardCandidates` fonksiyonuna parametre olarak iletilir ve hangi fan ailesinin adaylarının Supabase'den çekileceğini belirler.
 
-**Dönüş**: JSX elementi döner. `isOpen` `false` olduğunda `null` döner.
+**Dönüş**: Kaynakta dönüş tipi belirtilmemiş. Bileşen, `isOpen` false olduğunda `null`, aksi halde `role="dialog"` ve `aria-modal="true"` niteliklerine sahip modal bir dialog yapısı (JSX) döndürür.
 
 ### OneriKarti
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -27141,7 +27139,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### SilentFanWizardProps
 - `isOpen: boolean`
 - `onClose: () => void`
-- `categorySlug: string`
+- `familySlug: string`
 
 ---
 
@@ -27171,157 +27169,157 @@ type Adim = 1 | 2 | 3 | 4 | 5
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::adaylariGetir (anonim async arrow)
+### [N1_NASIL] AST Pointer: SilentFanWizard.tsx::adaylariGetir (anonim async fonksiyon)
 - **params**: yok
 - **ic_degiskenler**:
-  - `adaylar` — daha önce yüklenmiş aday listesi; null değilse tekrar yüklemeden doğrudan döndürülür
-  - `setYukleniyor` — yükleme durumunu güncelleyen state setter; true/false atanır
-  - `setHata` — hata mesajını güncelleyen state setter; null veya hata mesajı string'i atanır
-  - `getWizardCandidates` — wizard servisinden aday listesini getiren async fonksiyon; supabase istemcisi ve kategori slug'ı ile çağrılır
-  - `supabase` — Supabase tarayıcı istemcisi; `getWizardCandidates` fonksiyonuna birinci argüman olarak geçilir
-  - `categorySlug` — kategori slug değeri; `getWizardCandidates` fonksiyonuna ikinci argüman olarak geçilir
-  - `liste` — `getWizardCandidates` çağrısından dönen aday listesi; state'e kaydedilir ve return edilir
-  - `err` — yakalanan hata nesnesi; `instanceof Error` ile kontrol edilir, mesajı veya string karşılığı `setHata` ile state'e yazılır
-- **Dönüş**: `liste` (aday listesi) veya `null` (hata durumunda)
+  - `adaylar` — mevcut aday listesi state'i; null değilse önbellekten döndürülür
+  - `liste` — `getWizardCandidates(supabase, familySlug)` çağrısından dönen aday listesi
+  - `err` — yakalanan hata nesnesi; `instanceof Error` kontrolü yapılır, değilse `String(err)` ile metne çevrilir
+  - `supabase` — Supabase tarayıcı istemcisi (modül kapsamından)
+  - `familySlug` — bileşen prop'u; hangi fan ailesi için aday getirileceğini belirler
+  - `setYukleniyor` — yükleme durumu state setter'ı; girişte `true`, finally'de `false`
+  - `setHata` — hata mesajı state setter'ı; girişte `null`, hata anında hata mesajı atanır
+  - `setAdaylar` — aday listesi state setter'ı; başarılı sorgu sonucu `liste` atanır
+- **Dönüş**: `liste` (başarılıysa) veya `null` (hata durumunda)
 
-### [N2_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::useEffect callback (adim === 5 kontrolü)
+### [N2_NASIL] AST Pointer: SilentFanWizard.tsx::useEffect callback (adim === 5 kontrolü)
 - **params**: yok
 - **ic_degiskenler**:
-  - `adim` — sihirbazın mevcut adım numarası; 5 değilse fonksiyon erken döner
-  - `iptal` — cleanup bayrağı; true olduğunda async işlem sonucu göz ardı edilir
-  - `adaylariGetir` — async fonksiyon; aday listesini getirir
-  - `liste` — `adaylariGetir` sonucu dönen aday listesi
-  - `setSonuc` — sonuç state'ini güncelleyen setter
-  - `secimYap` — aday listesi ve girdi verisine göre seçim yapan fonksiyon
-  - `girdi` — kullanıcının sihirbazda girdiği tüm seçimleri içeren nesne
-- **Dönüş**: cleanup fonksiyonu (`() => { iptal = true }`) veya undefined (adim !== 5 ise)
+  - `adim` — sihirbazın mevcut adım numarası state'i; 5 değilse erken dönüş yapılır
+  - `iptal` — cleanup bayrağı; bileşen unmount edildiğinde async işlemi iptal etmek için kullanılır
+  - `liste` — `adaylariGetir()` sonucu; null veya undefined ise işlem durdurulur
+  - `adaylariGetir` — useCallback ile sarılı async fonksiyon (N1)
+  - `girdi` — kullanıcı seçimlerini içeren state nesnesi
+  - `setSonuc` — hesaplama sonucu state setter'ı; `secimYap(liste, girdi)` sonucu atanır
+  - `secimYap` — aday listesi ve girdiye göre uygun sonucu seçen fonksiyon
+- **Dönüş**: cleanup fonksiyonu (`iptal = true` atayan) veya `undefined` (adim !== 5 ise)
 
-### [N3_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::useEffect içi async IIFE
+### [N3_NASIL] AST Pointer: SilentFanWizard.tsx::useEffect içindeki anonim async fonksiyon
 - **params**: yok
 - **ic_degiskenler**:
-  - `liste` — `adaylariGetir` sonucu dönen aday listesi
-  - `adaylariGetir` — async fonksiyon; aday listesini getirir
-  - `iptal` — cleanup bayrağı; true ise erken dönüş yapılır
-  - `setSonuc` — sonuç state'ini güncelleyen setter
-  - `secimYap` — aday listesi ve girdi verisine göre seçim yapan fonksiyon
-  - `girdi` — kullanıcının sihirbazda girdiği tüm seçimleri içeren nesne
+  - `liste` — `adaylariGetir()` sonucu; null veya undefined ise erken dönüş yapılır
+  - `iptal` — cleanup bayrağı; true ise async işlem durdurulur
+  - `adaylariGetir` — useCallback ile sarılı async fonksiyon (N1)
+  - `girdi` — kullanıcı seçimlerini içeren state nesnesi
+  - `setSonuc` — hesaplama sonucu state setter'ı; `secimYap(liste, girdi)` sonucu atanır
+  - `secimYap` — aday listesi ve girdiye göre uygun sonucu seçen fonksiyon
 - **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::useEffect cleanup
+### [N4_NASIL] AST Pointer: SilentFanWizard.tsx::useEffect cleanup fonksiyonu
 - **params**: yok
 - **ic_degiskenler**:
-  - `iptal` — cleanup bayrağı; true atanarak async işlemin sonucunun göz ardı edilmesi sağlanır
+  - `iptal` — cleanup bayrağı; `true` atanarak devam eden async işlem iptal edilir
 - **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::sifirla (anonim arrow)
+### [N5_NASIL] AST Pointer: SilentFanWizard.tsx::sifirla (sıfırlama fonksiyonu)
 - **params**: yok
 - **ic_degiskenler**:
-  - `setAdim` — adım state'ini güncelleyen setter; 1 değerine sıfırlanır
-  - `setGirdi` — girdi state'ini güncelleyen setter; `VARSAYILAN_GIRDI` sabit nesnesine sıfırlanır
+  - `setAdim` — adım state setter'ı; `1` değerine sıfırlanır
+  - `setGirdi` — girdi state setter'ı; `VARSAYILAN_GIRDI` sabit nesnesine sıfırlanır
+  - `setSonuc` — hesaplama sonucu state setter'ı; `null` değerine sıfırlanır
+  - `setDokumAcik` — döküm açıklık state setter'ı; `false` değerine sıfırlanır
   - `VARSAYILAN_GIRDI` — varsayılan girdi değerlerini içeren sabit nesne
-  - `setSonuc` — sonuç state'ini güncelleyen setter; null'a sıfırlanır
-  - `setDokumAcik` — döküm açıklık state'ini güncelleyen setter; false'a sıfırlanır
 - **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::progress bar render (anonim arrow)
-- **params**: `s` — adım indeksi (number)
+### [N6_NASIL] AST Pointer: SilentFanWizard.tsx::adım göstergesi render fonksiyonu
+- **params**: `s` — adım indeksi (sayı)
 - **ic_degiskenler**:
-  - `s` — mevcut adım indeksi; `adim` ile karşılaştırılarak aktif/pasif renk belirlenir
-  - `adim` — sihirbazın mevcut adım numarası; `s <= adim` koşuluyla çubuğun rengi ve genişliği belirlenir
-- **Dönüş**: JSX element (div)
+  - `s` — mevcut adım indeksi; `adim` state'i ile karşılaştırılarak aktif/pasif durum belirlenir
+  - `adim` — sihirbazın mevcut adım numarası state'i; `s <= adim` koşuluyla aktif adım gösterilir
+- **Dönüş**: JSX elementi (`div` — adım çubuğu)
 
-### [N7_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::mahal kartı render (anonim arrow)
+### [N7_NASIL] AST Pointer: SilentFanWizard.tsx::mahal kartı render fonksiyonu
 - **params**: `{ id, ikon: Ikon }` — mahal kimliği ve ikon bileşeni
 - **ic_degiskenler**:
-  - `id` — mahal kimlik değeri; `yaz` fonksiyonuna `mahal` olarak ve `t` fonksiyonuna çeviri anahtarı olarak geçilir
+  - `id` — mahal kimliği (string); `girdi.mahal` ile karşılaştırılarak aktif/pasif durum belirlenir
   - `Ikon` — mahal ikonu bileşeni; `size={20}` ile render edilir
-  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ mahal: id }` objesi ile çağrılır
-  - `ileri` — bir sonraki adıma geçiş fonksiyonu
-  - `KART_TEMEL` — kart bileşeninin temel CSS sınıfı sabiti
-  - `girdi.mahal` — mevcut seçili mahal değeri; `id` ile eşleşiyorsa aktif stil uygulanır
-  - `KART_AKTIF` — seçili kartın CSS sınıfı sabiti
-  - `KART_PASIF` — seçilmemiş kartın CSS sınıfı sabiti
-  - `t` — çeviri fonksiyonu; `silentFanWizard.room.${id}` ve `silentFanWizard.roomHint.${id}` anahtarlarıyla metin üretir
-- **Dönüş**: JSX element (button)
+  - `girdi` — kullanıcı seçimlerini içeren state nesnesi; `girdi.mahal` erişimi
+  - `KART_TEMEL` — temel kart CSS sınıfı sabiti
+  - `KART_AKTIF` — aktif kart CSS sınıfı sabiti
+  - `KART_PASIF` — pasif kart CSS sınıfı sabiti
+  - `t` — çeviri fonksiyonu; `silentFanWizard.room.${id}` ve `silentFanWizard.roomHint.${id}` anahtarları kullanılır
+- **Dönüş**: JSX elementi (`button` — mahal kartı)
 
-### [N8_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::mahal onClick handler (anonim arrow)
+### [N8_NASIL] AST Pointer: SilentFanWizard.tsx::mahal onClick handler
 - **params**: yok
 - **ic_degiskenler**:
-  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ mahal: id }` objesi ile çağrılır
-  - `id` — mahal kimlik değeri; `yaz` fonksiyonuna `mahal` olarak geçilir
-  - `ileri` — bir sonraki adıma geçiş fonksiyonu
+  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ mahal: id }` nesnesi ile çağrılır
+  - `id` — seçilen mahal kimliği (kapsam değişkeni)
+  - `ileri` — bir sonraki adıma geçiren fonksiyon
 - **Dönüş**: yok
 
-### [N9_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::güzergah kartı render (anonim arrow)
-- **params**: `g` — güzergah değeri (string)
+### [N9_NASIL] AST Pointer: SilentFanWizard.tsx::güzergah butonu render fonksiyonu
+- **params**: `g` — güzergah kimliği (string)
 - **ic_degiskenler**:
-  - `g` — güzergah değeri; `yaz` fonksiyonuna `guzergah` olarak ve `t` fonksiyonuna çeviri anahtarı olarak geçilir
-  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ guzergah: g }` objesi ile çağrılır
-  - `KART_TEMEL` — kart bileşeninin temel CSS sınıfı sabiti
-  - `girdi.guzergah` — mevcut seçili güzergah değeri; `g` ile eşleşiyorsa aktif stil uygulanır
-  - `KART_AKTIF` — seçili kartın CSS sınıfı sabiti
-  - `KART_PASIF` — seçilmemiş kartın CSS sınıfı sabiti
-  - `t` — çeviri fonksiyonu; `silentFanWizard.route.${g}` ve `silentFanWizard.routeHint.${g}` anahtarlarıyla metin üretir
-- **Dönüş**: JSX element (button)
+  - `g` — güzergah kimliği; `girdi.guzergah` ile karşılaştırılarak aktif/pasif durum belirlenir
+  - `girdi` — kullanıcı seçimlerini içeren state nesnesi; `girdi.guzergah` erişimi
+  - `KART_TEMEL` — temel kart CSS sınıfı sabiti
+  - `KART_AKTIF` — aktif kart CSS sınıfı sabiti
+  - `KART_PASIF` — pasif kart CSS sınıfı sabiti
+  - `t` — çeviri fonksiyonu; `silentFanWizard.route.${g}` ve `silentFanWizard.routeHint.${g}` anahtarları kullanılır
+  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ guzergah: g }` nesnesi ile çağrılır
+- **Dönüş**: JSX elementi (`button` — güzergah kartı)
 
-### [N10_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::malzeme kartı render (anonim arrow)
-- **params**: `m` — malzeme değeri (string)
+### [N10_NASIL] AST Pointer: SilentFanWizard.tsx::malzeme butonu render fonksiyonu
+- **params**: `m` — malzeme kimliği (string)
 - **ic_degiskenler**:
-  - `m` — malzeme değeri; `yaz` fonksiyonuna `malzeme` olarak ve `t` fonksiyonuna çeviri anahtarı olarak geçilir
-  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ malzeme: m }` objesi ile çağrılır
-  - `KART_TEMEL` — kart bileşeninin temel CSS sınıfı sabiti
-  - `girdi.malzeme` — mevcut seçili malzeme değeri; `m` ile eşleşiyorsa aktif stil uygulanır
-  - `KART_AKTIF` — seçili kartın CSS sınıfı sabiti
-  - `KART_PASIF` — seçilmemiş kartın CSS sınıfı sabiti
-  - `t` — çeviri fonksiyonu; `silentFanWizard.material.${m}` ve `silentFanWizard.materialHint.${m}` anahtarlarıyla metin üretir
-- **Dönüş**: JSX element (button)
+  - `m` — malzeme kimliği; `girdi.malzeme` ile karşılaştırılarak aktif/pasif durum belirlenir
+  - `girdi` — kullanıcı seçimlerini içeren state nesnesi; `girdi.malzeme` erişimi
+  - `KART_TEMEL` — temel kart CSS sınıfı sabiti
+  - `KART_AKTIF` — aktif kart CSS sınıfı sabiti
+  - `KART_PASIF` — pasif kart CSS sınıfı sabiti
+  - `t` — çeviri fonksiyonu; `silentFanWizard.material.${m}` ve `silentFanWizard.materialHint.${m}` anahtarları kullanılır
+  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ malzeme: m }` nesnesi ile çağrılır
+- **Dönüş**: JSX elementi (`button` — malzeme kartı)
 
-### [N11_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::kanal çapı kartı render (anonim arrow)
-- **params**: `c` — kanal çapı değeri mm cinsinden (number)
+### [N11_NASIL] AST Pointer: SilentFanWizard.tsx::kanal çapı butonu render fonksiyonu
+- **params**: `c` — kanal çapı değeri (mm cinsinden sayı)
 - **ic_degiskenler**:
-  - `c` — kanal çapı değeri; `yaz` fonksiyonuna `kanalCapiMm` olarak geçilir ve buton içinde doğrudan gösterilir
-  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ kanalCapiMm: c }` objesi ile çağrılır
-  - `girdi.kanalCapiMm` — mevcut seçili kanal çapı değeri; `c` ile eşleşiyorsa aktif stil uygulanır
-- **Dönüş**: JSX element (button)
+  - `c` — kanal çapı değeri; `girdi.kanalCapiMm` ile karşılaştırılarak aktif/pasif durum belirlenir
+  - `girdi` — kullanıcı seçimlerini içeren state nesnesi; `girdi.kanalCapiMm` erişimi
+  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ kanalCapiMm: c }` nesnesi ile çağrılır
+- **Dönüş**: JSX elementi (`button` — çap seçici buton)
 
-### [N12_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::sessizlik kartı render (anonim arrow)
-- **params**: `s` — sessizlik seviyesi değeri (string)
+### [N12_NASIL] AST Pointer: SilentFanWizard.tsx::sessizlik kartı render fonksiyonu
+- **params**: `s` — sessizlik seviyesi kimliği (string)
 - **ic_degiskenler**:
-  - `s` — sessizlik seviyesi; `yaz` fonksiyonuna `sessizlik` olarak ve `t` fonksiyonuna çeviri anahtarı olarak geçilir
-  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ sessizlik: s }` objesi ile çağrılır
-  - `ileri` — bir sonraki adıma geçiş fonksiyonu
-  - `KART_TEMEL` — kart bileşeninin temel CSS sınıfı sabiti
-  - `girdi.sessizlik` — mevcut seçili sessizlik değeri; `s` ile eşleşiyorsa aktif stil uygulanır
-  - `KART_AKTIF` — seçili kartın CSS sınıfı sabiti
-  - `KART_PASIF` — seçilmemiş kartın CSS sınıfı sabiti
-  - `t` — çeviri fonksiyonu; `silentFanWizard.quiet.${s}` ve `silentFanWizard.quietHint.${s}` anahtarlarıyla metin üretir
-  - `Volume2` — sessizlik ikonu bileşeni; `size={20}` ile render edilir
-- **Dönüş**: JSX element (button)
+  - `s` — sessizlik seviyesi kimliği; `girdi.sessizlik` ile karşılaştırılarak aktif/pasif durum belirlenir
+  - `girdi` — kullanıcı seçimlerini içeren state nesnesi; `girdi.sessizlik` erişimi
+  - `KART_TEMEL` — temel kart CSS sınıfı sabiti
+  - `KART_AKTIF` — aktif kart CSS sınıfı sabiti
+  - `KART_PASIF` — pasif kart CSS sınıfı sabiti
+  - `t` — çeviri fonksiyonu; `silentFanWizard.quiet.${s}` ve `silentFanWizard.quietHint.${s}` anahtarları kullanılır
+  - `Volume2` — ses ikonu bileşeni; `size={20}` ile render edilir
+- **Dönüş**: JSX elementi (`button` — sessizlik kartı)
 
-### [N13_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::sessizlik onClick handler (anonim arrow)
+### [N13_NASIL] AST Pointer: SilentFanWizard.tsx::sessizlik onClick handler
 - **params**: yok
 - **ic_degiskenler**:
-  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ sessizlik: s }` objesi ile çağrılır
-  - `s` — sessizlik seviyesi değeri; `yaz` fonksiyonuna `sessizlik` olarak geçilir
-  - `ileri` — bir sonraki adıma geçiş fonksiyonu
+  - `yaz` — girdi state'ini güncelleyen fonksiyon; `{ sessizlik: s }` nesnesi ile çağrılır
+  - `s` — seçilen sessizlik seviyesi kimliği (kapsam değişkeni)
+  - `ileri` — bir sonraki adıma geçiren fonksiyon
 - **Dönüş**: yok
 
-### [N14_NASIL] AST Pointer: src/components/category/SilentFanWizard.tsx::OneriKarti
-- **params**: `{ sonuc, rozet, vurgulu, Routes, t }` — sonuc: AdaySonucu | null, rozet: string, vurgulu: boolean (varsayılan false), Routes: ReturnType<typeof useLocalizedRoutes>, t: çeviri fonksiyonu
+### [N14_NASIL] AST Pointer: SilentFanWizard.tsx::OneriKarti
+- **params**: `{ sonuc, rozet, vurgulu = false, Routes, t }`
+  - `sonuc` — `AdaySonucu | null` tipinde; hesaplama sonucu nesnesi veya null
+  - `rozet` — string; kart üst kısmındaki rozet metni
+  - `vurgulu` — boolean (varsayılan `false`); vurgulu kart stili uygulanıp uygulanmayacağını belirler
+  - `Routes` — `ReturnType<typeof useLocalizedRoutes>`; yerelleştirilmiş rotalar nesnesi
+  - `t` — `(key: string, params?: Record<string, string | number>) => string` tipinde çeviri fonksiyonu
 - **ic_degiskenler**:
-  - `sonuc` — aday sonucu nesnesi veya null; null ise erken dönüş yapılır (return null)
-  - `rozet` — kart üst kısmında gösterilen rozet metni
-  - `vurgulu` — vurgulu görünüm bayrağı; true ise cyan kenarlık ve gölge uygulanır
-  - `Routes` — lokalize rotalar nesnesi; `Routes.product(aday.slug)` ile ürün sayfası URL'si üretilir
-  - `t` — çeviri fonksiyonu; kart metinlerini üretmek için kullanılır
-  - `aday` — `sonuc.aday` destructuring ile çıkarılan aday nesnesi; `ad`, `sesDbA`, `capMm`, `slug` alanlarına erişilir
-  - `sonuc.calismaDebisiM3h` — çalışma debisi m³/h cinsinden; `Math.round` ile yuvarlanıp gösterilir
-  - `aday.sesDbA` — ses seviyesi dB(A) cinsinden; null değilse gösterilir
-  - `aday.capMm` — çap mm cinsinden; null değilse gösterilir
-  - `aday.slug` — aday ürünün slug değeri; `Routes.product` fonksiyonuna argüman olarak geçilir
-  - `aday.ad` — aday ürünün adı; h3 başlığında gösterilir
-  - `Wind` — rüzgar ikonu bileşeni; `size={12}` ile rozet yanında render edilir
-- **Dönüş**: JSX element (article) veya null (sonuc null ise)
+  - `sonuc` — null kontrolü yapılır; null ise erken dönüş (`return null`)
+  - `aday` — `sonuc.aday` destructuring ile çıkarılan aday nesnesi
+  - `aday.ad` — aday ürünün adı; `h3` başlığında gösterilir
+  - `sonuc.calismaDebisiM3h` — çalışma debisi (m³/h); `Math.round()` ile yuvarlanır
+  - `aday.sesDbA` — ses seviyesi (dBA); null kontrolü ile koşullu gösterilir
+  - `aday.capMm` — çap (mm); null kontrolü ile koşullu gösterilir
+  - `aday.slug` — aday ürünün URL slug'ı; `Routes.product(aday.slug)` ile ürün sayfası linki oluşturulur
+  - `Wind` — rüzgar ikonu bileşeni; `size={12}` ile render edilir
+  - `Link` — Next.js Link bileşeni; ürün sayfasına yönlendirme için kullanılır
+  - `Routes.product` — ürün sayfası rotası fonksiyonu; `aday.slug` parametresi ile çağrılır
+  - `t` — çeviri fonksiyonu; `silentFanWizard.cardDelivers`, `silentFanWizard.unitM3h`, `silentFanWizard.cardNoise`, `silentFanWizard.unitDbA`, `silentFanWizard.cardDiameter`, `silentFanWizard.unitMm`, `silentFanWizard.cardCta` anahtarları kullanılır
+- **Dönüş**: `null` (sonuc null ise) veya JSX elementi (`article` — öneri kartı)
 
 ---
 
@@ -49650,11 +49648,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\en.ts
-skeleton_hash: 9d0705a703cca270
+source_path: C:\tmp\vh-urun-comp\src\i18n\dictionaries\en.ts
+skeleton_hash: 52188924392dca91
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-27T04:25:30Z
+generated_at: 2026-08-28T08:20:48Z
 ---
 
 ## Genel Bakış
@@ -49713,11 +49711,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\tr.ts
-skeleton_hash: 612478c507ab5d21
+source_path: C:\tmp\vh-urun-comp\src\i18n\dictionaries\tr.ts
+skeleton_hash: 5f4c92dce1a05405
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-08-27T04:25:30Z
+generated_at: 2026-08-28T08:20:50Z
 ---
 
 ## Genel Bakış
@@ -53349,11 +53347,11 @@ Fonksiyon gövdesi bulunmadığından AST Pointer üretilmemiştir.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\ui.en.ts
-skeleton_hash: efd1f7fe409cadc7
+source_path: C:\tmp\vh-urun-comp\src\i18n\dictionaries\admin\ui.en.ts
+skeleton_hash: c069639090fb9c88
 entity_hashes:
   overview: 1ca0cb4cc145d139
-generated_at: 2026-08-27T06:50:47Z
+generated_at: 2026-08-28T08:20:45Z
 ---
 
 ## Genel Bakış
@@ -53416,11 +53414,11 @@ Bu modül, uluslararasılaştırma (i18n) sözlük verisi içeren bir kaynaktır
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\i18n\dictionaries\admin\ui.tr.ts
-skeleton_hash: 6d0c5eefe4b263d7
+source_path: C:\tmp\vh-urun-comp\src\i18n\dictionaries\admin\ui.tr.ts
+skeleton_hash: b8516320a1dbc7aa
 entity_hashes:
   overview: 1ca0cb4cc145d139
-generated_at: 2026-08-27T06:50:47Z
+generated_at: 2026-08-28T08:20:46Z
 ---
 
 ## Genel Bakış
@@ -57993,8 +57991,8 @@ type VariantSelection = <T extends VariantLike>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductFanSelection.ts
-skeleton_hash: d25b597f76ec7fa0
+source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductFanSelection.ts
+skeleton_hash: cf67fad21ac874be
 entity_hashes:
   func:calismaNoktasi: 477178de8115d130
   func:degerlendir: f750568727981b71
@@ -58003,7 +58001,7 @@ entity_hashes:
   func:secimYap: 4647312ff1acd1ac
   func:sistemKatsayisi: 04ecc41bc675abb4
   overview: 1ad4e3445b46e669
-generated_at: 2026-08-25T08:44:57Z
+generated_at: 2026-08-27T07:32:10Z
 ---
 
 ## Genel Bakış
@@ -58154,15 +58152,23 @@ type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
 
 ## SABİTLER
 - **MAHAL_KURALLARI** (object) — `{
+
   bathroom: { ach: 8, minimumM3h: 85 },
+
   kitchen: { ach: 15, minimumM3h:...`
 - **GUZERGAH_GEOMETRISI** (object) — `{
+
   short: { uzunlukM: 3, dirsek90: 1, dirsek45: 0 },
+
   medium: { uzunlukM:...`
 - **SESSIZLIK_AGIRLIGI** (object) — `{
+
   normal: 0.2,
+
   important: 0.4,
+
   critical: 0.6,
+
 }`
 
 ---
@@ -58255,11 +58261,11 @@ graph TD
     ductFanSelection_ts__parsePQCurve["parsePQCurve"]
     ductFanSelection_ts__secimYap["secimYap"]
     ductFanSelection_ts__sistemKatsayisi["sistemKatsayisi"]
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
     ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
 ```
 
 ## NODE ID STANDARD
@@ -58302,8 +58308,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductPressure.ts
-skeleton_hash: 1579ba7b4e3d68fe
+source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductPressure.ts
+skeleton_hash: a0b705802650fa34
 entity_hashes:
   func:akisHizi: a87413c22f69c858
   func:dinamikBasinc: 4288bc94c70c6d78
@@ -58311,7 +58317,7 @@ entity_hashes:
   func:reynolds: d87c6fd9c4af1b38
   func:surtunmeFaktoru: 20425e5a77455729
   overview: 1dd122290e85a03e
-generated_at: 2026-08-25T08:44:34Z
+generated_at: 2026-08-27T07:32:10Z
 ---
 
 ## Genel Bakış
@@ -58408,15 +58414,23 @@ type KanalMalzemesi = keyof typeof PURUZLULUK_M
 
 ## SABİTLER
 - **PURUZLULUK_M** (as_expression) — `{
+
   galvanized: 0.00015,
+
   pvc: 0.00001,
+
   flex: 0.003,
+
 } as const`
 - **FITTING_K** (as_expression) — `{
+
   /** 90° yuvarlak dirsek, eğrilik yarıçapı = 1,5·D (tipik hazır dirsek). ...`
 - **TERMINAL_K** (as_expression) — `{
+
   /** İç mahal egzoz menfezi/ızgarası. */
+
   menfez: 2.5,
+
   /** Geri-akış...`
 - **TERMINAL_K_TOPLAM** (binary_expression) — `TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur`
 
@@ -58480,8 +58494,8 @@ graph TD
     ductPressure_ts__kanalBasincKaybi["kanalBasincKaybi"]
     ductPressure_ts__reynolds["reynolds"]
     ductPressure_ts__surtunmeFaktoru["surtunmeFaktoru"]
-    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
+    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__akisHizi
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__dinamikBasinc
 ```
@@ -64649,31 +64663,29 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-comp\src\lib\services\wizard.service.ts
-skeleton_hash: 451818ca10dc2c37
+skeleton_hash: e0c57ce1beb81f2f
 entity_hashes:
-  func:getWizardCandidates: aae9dee5aed73d85
+  func:getWizardCandidates: 14754a1190c3b7af
   func:satiriAdayaCevir: d0442318772de7a0
   func:sayiOku: 8639d203fda03c7d
-  overview: 12992ade3afe0d87
-generated_at: 2026-08-27T07:34:30Z
+  overview: a5b3334abbea6d3b
+generated_at: 2026-08-28T08:52:31Z
 ---
 
 ## Genel Bakış
 
-Bu modül, HVAC fan seçim sihirbazı için veritabanından gelen ham ürün verilerinin uygun forma dönüştürülmesi ve sihirbazın kullanacağı aday listesinin hazırlanmasıyla ilgilenir. Supabase üzerinden kategori bazlı sorgulama yaparak fan adaylarını getirir ve ham ürün satırlarını sihirbazın beklediği `FanAdayi` yapısına çevirir.
+Bu modül, HVAC fan seçim sihirbazının veri katmanını oluşturur. Supabase veritabanından belirli bir kategoriye ait ürün verilerini çeker, bu ham verileri sihirbazın kullanabileceği `FanAdayi` yapısına dönüştürür ve teknik spesifikasyonlardan sayısal değerleri güvenli bir şekilde okumak için yardımcı bir araç sağlar.
 
 ## Fonksiyon Grupları
 
 ### Veri Getirme ve Dönüştürme
 
-Supabase veritabanından belirli bir kategoriye ait ürünleri sorgular ve bunları sihirbazın kullanabileceği aday listesine dönüştürür. Bu grup, modülün ana işlevini üstlenir.
-
+Supabase veritabanından kategori bazlı ürün sorgulaması yapar ve gelen ham ürün satırlarını sihirbazın beklediği aday listesine dönüştürür. Bu grup, modülün ana işlevini ve veri akışını temsil eder.
 - `getWizardCandidates`, `satiriAdayaCevir`
 
 ### Yardımcı Veri Okuma
 
-Veritabanından gelen JSON yapısındaki teknik spesifikasyonlardan (`specs`) belirtilen anahtarlar altında sayısal değerleri güvenli biçimde okur. Null veya eksik veri durumlarını ele alır.
-
+Veritabanından gelen JSON yapısındaki teknik spesifikasyonlardan belirtilen anahtarlar altında sayısal değerleri güvenli biçimde okur. Null veya eksik veri durumlarını ele alarak dönüşüm süreçlerini destekler.
 - `sayiOku`
 
 ---
@@ -64702,7 +64714,15 @@ Veritabanından gelen JSON yapısındaki teknik spesifikasyonlardan (`specs`) be
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### getWizardCandidates
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Verilen bir seri (aile) slug'ına ait aktif ürünleri, sessiz fan sihirbazı adayı olarak getirir. Kapsam kategori değil seridir (REC-85, 2026-08-28 — Recep kararı). Daha önce kategori kapsamlıydı (`category_id` VEYA `subcategory_id`), ancak ölçüm bunun yanlış olduğunu gösterdi.
+
+**Nasıl yapar**: Fonksiyon iki aşamalı çalışır. İlk olarak `product_families` tablosunda verilen `familySlug` değerine karşılık gelen kaydı arar ve aile ID'sini alır. Eğer aile bulunamazsa boş dizi döner; hata oluşursa fırlatır. İkinci aşamada `products` tablosundan `VARIANT_DETAIL_COLUMNS` sabitinde tanımlı sütunları seçerek, bulunan `aile.id` değerine eşit `family_id`'ye sahip, `status` değeri `'active'` olan ve `deleted_at` değeri `null` olan ürünleri getirir. Ürünler `name` alanına göre artan sırada sıralanır. Sonuçlar `satiriAdayaCevir` fonksiyonu aracılığıyla `FanAdayi` tipine dönüştürülerek döndürülür.
+
+**Parametreler**:
+- supabase: SupabaseClient<Database> — Supabase veritabanı istemcisi. Veritabanı sorgularını bu istemci üzerinden gerçekleştirir.
+- familySlug: string — Ürün ailesinin (serinin) benzersiz slug tanımlayıcısı. Bu değer `product_families` tablosundaki `slug` alanı ile eşleştirilir.
+
+**Dönüş**: Promise<FanAdayi[]> — Bulunan aktif ürünlerin `FanAdayi` tipine dönüştürülmüş dizisini içeren bir Promise döner. Aile bulunamazsa boş dizi, hata oluşursa hata fırlatılır.
 
 ---
 
@@ -64711,8 +64731,6 @@ Veritabanından gelen JSON yapısındaki teknik spesifikasyonlardan (`specs`) be
 - import: @/lib/hvac/ductFanSelection::type { FanAdayi }
 - import: @/types/database.types::type { Database }
 - import: @/types/db-rows::type { DbJson, DbProduct }
-- import: @/utils/adminQueryFilters::eqValue
-- import: @/utils/adminQueryFilters::orConditions
 - import: @supabase/supabase-js::type { SupabaseClient }
 
 ---
@@ -64727,41 +64745,41 @@ Veritabanından gelen JSON yapısındaki teknik spesifikasyonlardan (`specs`) be
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/services/wizard.service.ts::sayiOku
-- **params**:
-  - `specs: Record<string, DbJson> | null` — teknik özellikler sözlüğü; null ise fonksiyon hemen null döner
-  - `anahtarlar: readonly string[]` — aranacak anahtar adlarının sıralı listesi
+- **params**: `specs` — Record<string, DbJson> | null; anahtar-değer çiftlerinden oluşan sözlük veya null, `anahtarlar` — readonly string[]; aranacak anahtar adlarının sıralı listesi
 - **ic_degiskenler**:
-  - `anahtar` — for-of döngüsü değişkeni; `anahtarlar` dizisindeki her bir anahtar sırayla atanır
-  - `ham` — `specs[anahtar]` erişimiyle elde edilen ham değer; null/undefined ise sonraki anahtara geçilir
-  - `sayi` — `ham` değerinden üretilen sayı; `ham` zaten number tipindeyse doğrudan atanır, değilse string'e çevrilip virgül noktaya dönüştürülerek `Number()` ile parse edilir
-- **Dönüş**: `number | null` — ilk geçerli (finite) sayısal değer veya hiç bulunamazsa null
+  - `specs` — fonksiyonun başında null kontrolü yapılır; null ise doğrudan null döner
+  - `anahtarlar` — for-of döngüsüyle tek tek gezilir
+  - `anahtar` — döngüdeki mevcut anahtar adı; `specs[anahtar]` şeklinde erişim sağlanır
+  - `ham` — `specs[anahtar]` erişim sonucu; null/undefined ise bir sonraki anahtara geçilir
+  - `sayi` — `ham` değerinden türetilen sayı; `ham` zaten number tipindeyse doğrudan kullanılır, değilse String'e çevrilip virgül noktaya dönüştürülerek Number ile parse edilir; `Number.isFinite` kontrolünden geçerse döndürülür
+- **Dönüş**: number | null — eşleşen ilk geçerli sayıyı veya hiçbiri bulunamazsa null döner
 
 ### [N2_NASIL] AST Pointer: src/lib/services/wizard.service.ts::satiriAdayaCevir
-- **params**:
-  - `satir: DbProduct` — veritabanından gelen tek ürün satırı
+- **params**: `satir` — DbProduct; veritabanından gelen tek bir ürün satırı
 - **ic_degiskenler**:
-  - `specs` — `satir.technical_specs` alanına atanan değer; DbJson sözlüğü veya undefined olabilir
-- **Dönüş**: `FanAdayi` — şu alanlardan oluşan nesne:
-  - `id` ← `satir.id`
-  - `sku` ← `satir.sku ?? ''`
-  - `ad` ← `satir.name ?? ''`
-  - `slug` ← `satir.slug ?? ''`
-  - `pqCurveHam` ← `specs?.pq_curve ?? null`
-  - `maksDebiM3h` ← `sayiOku(specs, SPEC_ANAHTARLARI.debiM3h)` sonucu
-  - `sesDbA` ← `sayiOku(specs, SPEC_ANAHTARLARI.sesDbA)` sonucu
-  - `gucW` ← `sayiOku(specs, SPEC_ANAHTARLARI.gucW)` sonucu
-  - `capMm` ← `sayiOku(specs, SPEC_ANAHTARLARI.capMm)` sonucu
+  - `satir` — özellikleri okunur: `satir.id`, `satir.sku`, `satir.name`, `satir.slug`, `satir.technical_specs`
+  - `specs` — `satir.technical_specs` atanır; null olabilir (opsiyonel chaining ile `specs?.pq_curve` kullanılır)
+  - `id` — `satir.id` doğrudan atanır
+  - `sku` — `satir.sku` atanır; null/undefined ise boş string `''` kullanılır
+  - `ad` — `satir.name` atanır; null/undefined ise boş string `''` kullanılır
+  - `slug` — `satir.slug` atanır; null/undefined ise boş string `''` kullanılır
+  - `pqCurveHam` — `specs?.pq_curve` atanır; specs null ise null olur
+  - `maksDebiM3h` — `sayiOku(specs, SPEC_ANAHTARLARI.debiM3h)` çağrısı sonucu; debi değeri veya null
+  - `sesDbA` — `sayiOku(specs, SPEC_ANAHTARLARI.sesDbA)` çağrısı sonucu; ses desibel değeri veya null
+  - `gucW` — `sayiOku(specs, SPEC_ANAHTARLARI.gucW)` çağrısı sonucu; güç watt değeri veya null
+  - `capMm` — `sayiOku(specs, SPEC_ANAHTARLARI.capMm)` çağrısı sonucu; çap milimetre değeri veya null
+- **Dönüş**: FanAdayi — ürün bilgileri ve teknik spesifikasyonlardan oluşan fan adayı nesnesi
 
 ### [N3_NASIL] AST Pointer: src/lib/services/wizard.service.ts::getWizardCandidates
-- **params**:
-  - `supabase: SupabaseClient<Database>` — Supabase istemcisi
-  - `categorySlug: string` — kategori slug değeri
+- **params**: `supabase` — SupabaseClient<Database>; veritabanı istemcisi, `familySlug` — string; ürün ailesinin slug değeri
 - **ic_degiskenler**:
-  - `kategori` — `supabase.from('categories').select('id').eq('slug', categorySlug).maybeSingle()` sorgusundan dönen `data` destructuring sonucu; bulunamazsa null
-  - `kategoriHatasi` — aynı sorgunun `error` destructuring sonucu; varsa throw ile fırlatılır
-  - `data` — `supabase.from('products').select(VARIANT_DETAIL_COLUMNS).or(...).eq('status','active').is('deleted_at',null).order('name',{ascending:true})` sorgusundan dönen ürün listesi
-  - `error` — products sorgusunun `error` destructuring sonucu; varsa throw ile fırlatılır
-- **Dönüş**: `Promise<FanAdayi[]>` — kategori bulunamazsa boş dizi `[]`; bulunursa `data` dizisinin her elemanı `satiriAdayaCevir` ile `FanAdayi`'ye dönüştürülerek döner
+  - `supabase` — `.from('product_families')` ve `.from('products')` ile iki ayrı sorgu yapılır
+  - `familySlug` — `product_families` tablosunda `slug` alanı ile eşleştirilir (`.eq('slug', familySlug)`)
+  - `aile` — `product_families` tablosundan `.select('id')` ile çekilen, `.maybeSingle()` ile tek kayıt; sadece `aile.id` kullanılır
+  - `aileHatasi` — ilk sorgunun hata nesnesi; varsa `throw` ile fırlatılır
+  - `data` — `products` tablosundan `VARIANT_DETAIL_COLUMNS` ile seçilen satırlar; `.eq('family_id', aile.id)`, `.eq('status', 'active')`, `.is('deleted_at', null)` filtreleri uygulanır; `.order('name', { ascending: true })` ile sıralanır
+  - `error` — ikinci sorgunun hata nesnesi; varsa `throw` ile fırlatılır
+- **Dönüş**: Promise<FanAdayi[]> — filtrelenmiş ve sıralanmış ürünlerin her biri `satiriAdayaCevir` ile FanAdayi'ye dönüştürülür; aile bulunamazsa boş dizi döner
 
 ---
 
