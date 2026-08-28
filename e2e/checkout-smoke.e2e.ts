@@ -109,7 +109,22 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
       await page.waitForURL(/\/products\//, { timeout: 25_000 })
       if (!(await addToCartBtn.isVisible({ timeout: 12_000 }).catch(() => false))) continue
 
-      const metin = buyut((await addToCartBtn.innerText().catch(() => '')).trim())
+      // ⚠️ HİDRASYON YARIŞI — metni HEMEN okumak SSR'ı ölçer, kullanıcının
+      // gördüğünü değil. Kategoriler client context'ten geldiği için SSR HTML
+      // HER ZAMAN satış modu ("SEPETE EKLE") basar; teklif moduna geçiş
+      // hidrasyondan SONRA olur. 2026-08-28'de tam bu yüzden yanlış ölçtük:
+      // smoke "SEPETE EKLE" gördü, oysa kullanıcının telefonunda "Teknik Teklif
+      // İste" yazıyordu. Bu yüzden metnin teklife DÖNMESİNİ bekliyoruz;
+      // dönmezse gerçekten satış modudur (bekleme boşa geçer, sonuç bozulmaz).
+      const metniOku = async () => buyut((await addToCartBtn.innerText().catch(() => '')).trim())
+      try {
+        await expect
+          .poll(metniOku, { timeout: 8_000, intervals: [300, 600, 1200, 2000] })
+          .toContain(TEKNIK_TEKLIF)
+      } catch {
+        /* teklife dönmedi → satış modu; aşağıda gerçek metinle devam edilir */
+      }
+      const metin = await metniOku()
       ctaMetinleri.push(metin)
       if (metin.includes(SEPETE_EKLE)) {
         bulunan = href
