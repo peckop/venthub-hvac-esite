@@ -135,15 +135,21 @@ describe('E1-v2 — kimlik kontrolü: dosya VEKİL kanıt, oturum ASIL kanıt', 
     expect(r.ciktilar).toMatch(/ONARILDI/)
   })
 
-  it('TANINMAYAN kimlik ÇAKIŞAN CLAIM varken bile BLOKLAMAZ (fail-open DAVRANIŞI)', () => {
-    // ⭐Sabotaj bu kolu da kör yakaladı: `bilinmeyen` bayrağı söküldüğünde uyarı metni yine
-    // basılıyordu, yalnız DAVRANIŞ değişiyordu. Çakışan claim kurulmadan bu ayrım ölçülemez:
-    // fail-open çalışıyorsa çıkış 0, çalışmıyorsa kapı karar verip 1 ile bloklar.
+  it('⭐TANINMAYAN kimlik ÇAKIŞAN CLAIM varken BLOKLAR — uyarır ama kontrolü ATLAMAZ', () => {
+    // ⭐BU KOL BİR KEZ TERS YAZILDI VE KUSURU CI BULDU (2026-08-28). İlk hâli fail-open'ı
+    // (çıkış 0) doğruluyordu; gerekçem "yanlış blok --no-verify alışkanlığı doğurur" idi.
+    // Gerekçe ölçümle çöktü: panoda HİÇ görülmemiş bir sid panoya HİÇ claim yazmamıştır,
+    // dolayısıyla hiçbir yolun sahibi değildir — bu kolda yanlış blok YAPISAL OLARAK
+    // İMKÂNSIZ. Fail-open ise gerçek bir delikti: tanınmayan her oturum başka şeridin
+    // dosyasını serbestçe commit'leyebiliyordu.
+    //
+    // Yerel takım bunu göremedi çünkü ortamda `CLAUDE_CODE_SESSION_ID` doluydu ve env kolu
+    // koşuyordu; bu dala hiç girilmiyordu. Aynı sızıntı `lane-precommit-merge` testinde de
+    // vardı ve orada onarıldı.
     const r = kapiyiKos({ dosyadaki: BAYAT, claimGlob: 'dosya.txt', claimSid: CANLI })
-    expect(r.kod).toBe(0)
-    expect(r.ciktilar).not.toMatch(/COMMIT BLOKLANDI/)
     expect(r.ciktilar).toMatch(/TANINMAYAN KIMLIK/)
-    expect(r.ciktilar).toMatch(/SERIT KONTROLU YAPILMADI \(fail-open\) — taninmayan/)
+    expect(r.ciktilar).toMatch(/kontrol ATLANMIYOR/)
+    expect(r.kod, 'tanınmayan kimlik başkasının claimindeki dosyayı commitleyememeli').toBe(1)
   })
 
   it('TANINAN kimlik (env yok ama sid panoda var) tanınmayan uyarısı ÜRETMEZ', () => {
