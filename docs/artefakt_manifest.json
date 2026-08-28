@@ -2,9 +2,9 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "58cb3c571e259043d16122796e8a1051b5390fd10092d7f5746fbd126fdb1094",
+      "icerik_sha256": "f95149f3176a7b525588875db22acbd491dee9b74e3ee515eac37e3391e3584e",
       "kaynak": {
-        "dosya_sayisi": 98,
+        "dosya_sayisi": 99,
         "dosyalar": {
           "CHANGELOG.md": "eb01e14c93b6de5095df49ecf4e36d500aee787b",
           "CONTEXT.md": "8c21e5ea5bd31a1e362d62526464d7e523b213bf",
@@ -19,6 +19,7 @@
           "docs/audits/admin-cetvel-scores-2026-06-18.md": "655885a1f90d99f1246424fb2833aa5ba0c661ef",
           "docs/audits/admin-panel-audit-2026-06-11.md": "c72bc338ffdace3f8d81d0ebb450a4692a429c93",
           "docs/audits/aile-adi-en-cevirileri-2026-08-23.md": "37304bb18ea07c4c904304aa8fdffb4afff7a47d",
+          "docs/audits/build-skip-canli-olcum-2026-08-28.md": "706e3e8a94c6df60ec6c4822eaeeff2f787cdccd",
           "docs/audits/canliya-alma-hazirlik-2026-08-15.md": "3f1e9b70d4434ac82142a92578b14cdfc791a99e",
           "docs/audits/dealer-data-ground-truth-2026-06-11.md": "cb6db5669a7269f2bc4195d7e8f0d9ba9ad86b59",
           "docs/audits/i18n-sozluk-render-denetimi-2026-08-23.md": "c323cb80d7bbfa0d7396b6a4f0d8ba155ce9bc8f",
@@ -106,9 +107,9 @@
           "docs/system_tree.md": "f4536f06918d35840e0b4a89826886cf96b56167"
         },
         "izlenmeyen": [],
-        "ozet": "2a544aa162da5fe9ccdc149a4b7da227252eccb5625e259a3b4237843c7ecc80"
+        "ozet": "7be1dce9de62a3079f425831f7ff752dbbacb44d74fbabbfbdebe5dc5b65d68b"
       },
-      "kaynak_commit": "2653975655e1958def56823f9ece217748b79d21",
+      "kaynak_commit": "4a52a1384db836cf60772f3d94cc682bb6989a2b",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +126,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "f17fcaeaf2b8fe2bfdcde7bf093b4c4929c01070e9ddb81507e34220c8e3a068",
+      "icerik_sha256": "ddb38b9205fb90d4960675f9f627b5d7b2c080876854d3fbe5e35ed5fbda37fc",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -195,7 +196,7 @@
         "izlenmeyen": [],
         "ozet": "64b9f19c2c62d021c43a2335a62b8a201ed30d24fad60cc3a0445c0e0376a213"
       },
-      "kaynak_commit": "2653975655e1958def56823f9ece217748b79d21",
+      "kaynak_commit": "4a52a1384db836cf60772f3d94cc682bb6989a2b",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +205,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "178a4305ddfe7bd991ef77ce96cd9e78ab00af03e69e45aa116cb62dd4ba6628",
+      "icerik_sha256": "3c774e2fc4f2dc521a41442aee452c47f348128d731d7164ceb0cf4176f30b52",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +252,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "2653975655e1958def56823f9ece217748b79d21",
+      "kaynak_commit": "4a52a1384db836cf60772f3d94cc682bb6989a2b",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,7 +260,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "f5386e47f036d36a3213b3aad278503c2febf38cf5cec59531844223518fbdf6",
+      "icerik_sha256": "9dba8666ab914b47b699b0a8dc038318d558c96778bb3c5b68d28f32b6eaa5e8",
       "kaynak": {
         "dosya_sayisi": 656,
         "dosyalar": {
@@ -923,7 +924,7 @@
         "izlenmeyen": [],
         "ozet": "4a47546e33d26c5bd12a2b58df9c33955852646000d970b943ac2c6c1cdcf4fc"
       },
-      "kaynak_commit": "2653975655e1958def56823f9ece217748b79d21",
+      "kaynak_commit": "4a52a1384db836cf60772f3d94cc682bb6989a2b",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -932,7 +933,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-28T08:19:02.929448+00:00",
-  "kaynak_commit": "2653975655e1958def56823f9ece217748b79d21",
+  "derlendi": "2026-08-28T08:20:49.763763+00:00",
+  "kaynak_commit": "4a52a1384db836cf60772f3d94cc682bb6989a2b",
   "surum": 1
 }
