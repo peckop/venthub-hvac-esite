@@ -193,9 +193,16 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                   <span>{currentContent.eyebrow}</span>
                 </div>
 
-                <h1 className="text-3xl font-light leading-hvac-105 tracking-tighter text-white sm:text-5xl lg:text-8xl mb-4 lg:mb-8">
-                  {currentContent.title}
-                </h1>
+                {/* SEO: sayfada tek h1 olmalı — yalnız ilk slayt h1, diğerleri h2 (Bing URL denetimi 2026-08-29) */}
+                {idx === 0 ? (
+                  <h1 className="text-3xl font-light leading-hvac-105 tracking-tighter text-white sm:text-5xl lg:text-8xl mb-4 lg:mb-8">
+                    {currentContent.title}
+                  </h1>
+                ) : (
+                  <h2 className="text-3xl font-light leading-hvac-105 tracking-tighter text-white sm:text-5xl lg:text-8xl mb-4 lg:mb-8">
+                    {currentContent.title}
+                  </h2>
+                )}
 
                 <p className="max-w-xl text-sm sm:text-xl font-light leading-relaxed text-slate-300 mb-6 lg:mb-12">
                   {currentContent.subtitle}
