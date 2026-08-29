@@ -245,7 +245,7 @@ export const en: typeof tr = {
   },
 
   home: {
-    seoTitle: 'VentHub - Premium HVAC Solutions | Fans, Speed Control, Heating & Cooling',
+    seoTitle: 'VentHub | Industrial Ventilation and HVAC Engineering Solutions',
     seoDesc: 'Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.',
     hero: {
       eyebrow: 'Engineering-Guided HVAC Commerce',
