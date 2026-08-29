@@ -15,12 +15,16 @@ const normUnit = (value: unknown): number | null => {
 }
 
 /**
- * Generates a consistent hash string for the local cart items.
- * Used to detect changes during the checkout process.
+ * Generates a consistent hash string for the local cart items by normalizing product IDs, quantities, and unit prices.
+ * Used to detect changes during the checkout process and ensure local state matches server expectations.
+ * Unpriced items are correctly hashed with a null unit to prevent false positive matches with zero-price fallbacks.
  *
- * W4b: ham `product.price` fallback'i KALDIRILDI. Emekli kolona düşmek, fiyatı
- * bilinmeyen kalemi "0 TL'lik kalem" gibi hash'liyor ve sunucu doğrulamasını
- * yanlış yönlendiriyordu. Fiyatı olmayan kalem artık `unit: null` ile hash'lenir.
+ * @param items - The list of cart items in the user's local session
+ * @returns A JSON stringified representation of the normalized and sorted cart items
+ *
+ * @example
+ * const items = [{ id: 'p1', quantity: 2, unitPrice: 150.5 }];
+ * getPriceHashLocal(items) // returns '[{"id":"p1","qty":2,"unit":150.5}]'
  */
 export const getPriceHashLocal = (items: CartItem[]) => {
   const norm = items.map(i => ({
@@ -33,8 +37,18 @@ export const getPriceHashLocal = (items: CartItem[]) => {
 }
 
 /**
- * Generates a consistent hash string for server-side cart items.
- * Yerel hash ile AYNI normalizasyonu kullanır (fiyatsız kalem → null).
+ * Generates a consistent hash string for the server cart items to compare against the local cart hash.
+ * Falls back to local item quantities if the server response omits them, ensuring structural parity for comparison.
+ * Unpriced items are correctly hashed with a null unit, matching the local normalization logic.
+ *
+ * @param serverItems - The list of cart items returned from the server (e.g., from a pricing calculation)
+ * @param localItems - The list of cart items in the user's local session to use as a fallback for missing quantities
+ * @returns A JSON stringified representation of the normalized and sorted server cart items
+ *
+ * @example
+ * const serverItems = [{ product_id: 'p1', unit_price: 150.5 }];
+ * const localItems = [{ id: 'p1', quantity: 2, unitPrice: 150.5 }];
+ * getPriceHashServer(serverItems, localItems) // returns '[{"id":"p1","qty":2,"unit":150.5}]'
  */
 export const getPriceHashServer = (
   serverItems: Array<{ product_id: string; quantity?: number; unit_price: number | null }> | undefined | null,

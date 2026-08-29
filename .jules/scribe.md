@@ -21,3 +21,6 @@
 ## 2026-08-24 - [TSDoc Type Converters]
 **Learning:** Type converter functions (like `mapDatabaseCategoryToDomain`) that map raw database rows to UI domain models often use implicit defaults (like `||` operators) or JSONB extraction. Adding clear `@example` tags demonstrating how `null` values are resolved makes these functions significantly easier to understand.
 **Action:** When documenting mapping functions, use concrete inputs with `null` fields in the `@example` to show exactly how the fallback logic behaves in practice.
+## 2024-05-18 - [Documentation of Graceful Degradation in Functions]
+**Learning:** Functions that map or group complex types (like `generateEngineeringSummary` processing `product.technical_specs`) often contain robust fallback or implicit default mechanisms (e.g., handling missing or stringified numerical values in legacy JSONB data). Documenting how the function handles these "dirty" inputs is just as crucial as documenting the happy path.
+**Action:** When adding TSDoc to mapper/summarizer functions, explicitly mention in the description how they handle empty records or legacy data structures, and demonstrate a null or unexpected fallback behavior within the `@example` block.

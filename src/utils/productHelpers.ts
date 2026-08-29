@@ -277,10 +277,20 @@ export type ProductFamilySource = {
 const bosMu = (v: string | null | undefined): boolean => !v || v.trim() === ''
 
 /**
- * Müşteriye gösterilecek ÜRÜN ADI. Sepete/siparişe/e-postaya düşecek ad ile
- * AYNI olmalıdır — yüzeyler arası ikinci bir ad üretmez.
+ * Determines the final display name of a product for the customer.
+ * This ensures consistency across cart, orders, and emails.
+ * The resolution order prioritizes the variant name, falls back to the family name, and finally uses a localized default label.
+ * It strictly avoids falling back to raw internal SKUs.
  *
- * Sıra: varyant adı → aile adı → sözlükten genel etiket. Ham SKU'ya ASLA düşmez.
+ * @param variant - The specific product variant object containing identity properties
+ * @param family - The optional parent product family object containing fallback identity properties
+ * @param t - Optional translation function to retrieve the localized default name
+ * @returns The resolved product display name, or an empty string if all sources are unavailable
+ *
+ * @example
+ * getProductDisplayName({ name: 'Jet Fan 500' }, { name: 'Jet Fan Serisi' }) // returns 'Jet Fan 500'
+ * getProductDisplayName({ name: null }, { name: 'Jet Fan Serisi' }) // returns 'Jet Fan Serisi'
+ * getProductDisplayName(null, null, t) // returns t('product.unnamed')
  */
 export const getProductDisplayName = (
   variant: ProductIdentitySource | null | undefined,
@@ -295,12 +305,15 @@ export const getProductDisplayName = (
 }
 
 /**
- * Aile içinde AYIRT EDİCİ etiket (ör. "ADH-200 E2"). Ölçüm: 374 üründen 74'ünde
- * ad, aile içinde başka bir üyeyle çakışıyor — yani ad tek başına ayırt etmiyor,
- * etiket gerçekten gerekli.
+ * Extracts a distinguishing model code label to differentiate products within the same family (e.g., "ADH-200 E2").
+ * Safely avoids returning internal SKUs, prioritizing a missing label (null) over exposing backend codes to the customer.
  *
- * `model_code` yoksa **null döner**: etiketi hiç göstermemek, müşteriye iç kod
- * göstermekten iyidir. `sku`'ya düşmek YASAK.
+ * @param variant - The specific product variant object
+ * @returns The trimmed model code, or null if it is missing or empty
+ *
+ * @example
+ * getProductModelLabel({ model_code: '  ADH-200 E2  ' }) // returns 'ADH-200 E2'
+ * getProductModelLabel({ model_code: null, sku: 'INT-999' }) // returns null
  */
 export const getProductModelLabel = (
   variant: ProductIdentitySource | null | undefined,

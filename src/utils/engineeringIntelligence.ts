@@ -16,7 +16,15 @@ export interface EngineeringInference {
 }
 
 /**
- * Ses basınç seviyesini insan algısına göre yorumlar.
+ * Interprets a sound pressure level (dB) into a human-readable engineering inference category.
+ * Categorizes noise into ultra-quiet, office comfort, standard, or industrial levels.
+ *
+ * @param db - The sound pressure level in decibels (A-weighted)
+ * @returns The structured engineering inference containing i18n keys and the formatted value, or null if the input is invalid
+ *
+ * @example
+ * getNoiseInference(25) // returns { labelKey: 'pdp.engineering.noise.ultraQuiet.label', value: '25 dB(A)', ... }
+ * getNoiseInference(0) // returns null
  */
 export const getNoiseInference = (db: number): EngineeringInference | null => {
   if (!db || db <= 0) return null;
@@ -56,7 +64,15 @@ export const getNoiseInference = (db: number): EngineeringInference | null => {
 };
 
 /**
- * Enerji verimliliğini yorumlar (HRV Isı Geri Kazanımı için).
+ * Interprets energy efficiency percentages (typically for Heat Recovery Ventilation) into tier-based inferences.
+ * Classifies efficiency into diamond (>=92%), platinum (>=88%), or gold (>=80%) standards.
+ *
+ * @param efficiency - The energy efficiency percentage (e.g., 85 for 85%)
+ * @returns The structured engineering inference containing i18n keys and the formatted percentage, or null if below the gold threshold or invalid
+ *
+ * @example
+ * getEfficiencyInference(95) // returns { labelKey: 'pdp.engineering.efficiency.diamond.label', value: '%95', ... }
+ * getEfficiencyInference(70) // returns null
  */
 export const getEfficiencyInference = (efficiency?: number): EngineeringInference | null => {
   if (!efficiency || efficiency <= 0) return null;
@@ -90,7 +106,15 @@ export const getEfficiencyInference = (efficiency?: number): EngineeringInferenc
 };
 
 /**
- * Motor tipine göre teknoloji analizi yapar.
+ * Analyzes the motor technology based on a provided motor type string.
+ * Extracts standard motor designations (e.g., 'EC' or 'AC') for engineering quality summaries.
+ *
+ * @param motorType - The raw motor type string from product specifications
+ * @returns The structured engineering inference containing i18n keys and the motor type, or null if unrecognised or empty
+ *
+ * @example
+ * getMotorInference('High-efficiency EC Motor') // returns { labelKey: 'pdp.engineering.motor.ec.label', value: 'EC', ... }
+ * getMotorInference('Standard') // returns null
  */
 export const getMotorInference = (motorType?: string): EngineeringInference | null => {
   if (!motorType) return null;
@@ -117,7 +141,19 @@ export const getMotorInference = (motorType?: string): EngineeringInference | nu
 };
 
 /**
- * Ürün için tam bir mühendislik özeti üretir.
+ * Generates a complete engineering summary by extracting noise, efficiency, motor, and capacity inferences from a product's technical specifications.
+ * Gracefully handles legacy data structures, empty records, and stringified numerical values.
+ *
+ * @param product - The UI-ready product model containing technical specifications
+ * @returns An array of resolved engineering inferences representing the product's key technical highlights
+ *
+ * @example
+ * const product = { technical_specs: { noise_level_db_a: '42 dB', motor_tipi: 'EC', efficiency: null } };
+ * generateEngineeringSummary(product)
+ * // returns [
+ * //   { type: 'noise', value: '42 dB(A)', labelKey: 'pdp.engineering.noise.officeComfort.label', ... },
+ * //   { type: 'quality', value: 'EC', labelKey: 'pdp.engineering.motor.ec.label', ... }
+ * // ]
  */
 export const generateEngineeringSummary = (product: Product): EngineeringInference[] => {
   const inferences: EngineeringInference[] = [];
