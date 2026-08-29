@@ -306,7 +306,7 @@ export const tr = {
 
   home: {
     seoTitle: 'VentHub - Premium HVAC Çözümleri | Fan, Hız Kontrol, Isıtma & Soğutma',
-    seoDesc: 'VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri, ısı geri kazanım cihazları ve daha fazlası için mühendislik destekli çözümler.',
+    seoDesc: 'VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri ve ısı geri kazanım cihazları için mühendislik destekli çözümler.',
     hero: {
       eyebrow: 'Mühendislik Odaklı HVAC Ticareti',
       title: 'Doğru HVAC seçimine ilk ekranda girin.',
