@@ -246,7 +246,7 @@ export const en: typeof tr = {
 
   home: {
     seoTitle: 'VentHub | Industrial Ventilation and HVAC Engineering Solutions',
-    seoDesc: 'Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.',
+    seoDesc: 'The right product, the right calculation, the right solution. From parking ventilation to heat recovery — engineering-backed selection at VentHub.',
     hero: {
       eyebrow: 'Engineering-Guided HVAC Commerce',
       title: 'Enter the right HVAC path from the first screen.',
@@ -915,7 +915,7 @@ export const en: typeof tr = {
     ctaTitleItalic: 'Your Engineering Partner?',
     ctaContact: 'Contact Us',
     ctaExplore: 'Explore Products',
-    seoDescription: 'VentHub: Premium HVAC distributor of Turkey. 15 years of experience and engineering-oriented ventilation solutions.',
+    seoDescription: 'VentHub: engineering-oriented ventilation solutions. The right product selection in industrial ventilation, backed by 15 years of field experience.',
     vision: 'Our Vision'
   },
   category: {
@@ -1888,7 +1888,7 @@ export const en: typeof tr = {
     pageSubtitle: 'As the authorized representative of the world\'s most prestigious HVAC manufacturers, we bring engineering masterpieces to your projects.',
     eyebrow: 'Global Signatures of Excellence',
     exploreBrand: 'Explore Brand',
-    seoDesc: 'Premium HVAC brands under the VentHub umbrella',
+    seoDesc: 'Industrial ventilation brands under the VentHub umbrella',
     notFound: 'Brand not found',
     backToAll: 'Back to all brands',
     aboutBrand: 'information',

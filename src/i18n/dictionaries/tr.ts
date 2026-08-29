@@ -306,7 +306,7 @@ export const tr = {
 
   home: {
     seoTitle: 'VentHub | Endüstriyel Havalandırma ve HVAC Mühendislik Çözümleri',
-    seoDesc: 'VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri ve ısı geri kazanım cihazları için mühendislik destekli çözümler.',
+    seoDesc: 'Doğru ürün, doğru hesap, doğru çözüm. Otopark havalandırmasından ısı geri kazanımına, mühendislik destekli seçim VentHub\'da.',
     hero: {
       eyebrow: 'Mühendislik Odaklı HVAC Ticareti',
       title: 'Doğru HVAC seçimine ilk ekranda girin.',
@@ -938,7 +938,7 @@ export const tr = {
     pageSubtitle: 'Dünyanın en prestijli HVAC üreticilerinin yetkili temsilcisi olarak, mühendislik harikası çözümleri projelerinizle buluşturuyoruz.',
     eyebrow: 'Mükemmelliğin Global İmzaları',
     exploreBrand: 'Markayı Keşfedin',
-    seoDesc: 'VentHub çatısı altındaki premium HVAC markaları',
+    seoDesc: 'VentHub çatısı altındaki endüstriyel havalandırma markaları',
     notFound: 'Marka bulunamadı',
     backToAll: 'Tüm markalara dön',
     aboutBrand: 'hakkında bilgi',
@@ -1033,7 +1033,7 @@ export const tr = {
     ctaTitleItalic: 'Tanışmaya Hazır mısınız?',
     ctaContact: 'İletişime Geçin',
     ctaExplore: 'Ürünleri Keşfedin',
-    seoDescription: 'VentHub: Türkiye\'nin premium HVAC distribütörü. 15 yıllık tecrübe ve mühendislik odaklı havalandırma çözümleri.',
+    seoDescription: 'VentHub: mühendislik odaklı havalandırma çözümleri. 15 yıllık saha tecrübesiyle endüstriyel havalandırmada doğru ürün seçimi.',
     whySubtitle: 'Güveninize layık olmak için çalışıyoruz',
   },
   cartToast: {
