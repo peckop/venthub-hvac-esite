@@ -37,9 +37,12 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
   }
 
   const stats = [
+    // Sayılar dayanaklı: 15+ = kurucunun saha yılı, 6 = markalar sayfasındaki marka sayısı,
+    // 50+ = katalogdaki ürün çeşidi, 81 = kargoyla tüm illere sevkiyat vaadi.
+    // Eski '500+ Tamamlanan Proje' şirket adına dayanaksızdı (2026-08-30 dürüstlük temizliği).
     { value: '15+', label: t('aboutPage.experience'), icon: Zap },
-    { value: '5', label: t('aboutPage.distributorship'), icon: Award },
-    { value: '500+', label: t('aboutPage.completedProject'), icon: Factory },
+    { value: '6', label: t('aboutPage.distributorship'), icon: Award },
+    { value: '50+', label: t('aboutPage.completedProject'), icon: Factory },
     { value: '81', label: t('aboutPage.shippingNetwork'), icon: Globe }
   ]
 

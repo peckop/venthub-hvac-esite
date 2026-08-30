@@ -556,8 +556,8 @@ export const tr = {
       items: {
         brands: {
           eyebrow: 'Güvence',
-          title: 'Orijinal Ürün ve Marka Güvencesi',
-          description: 'Dünya devi HVAC markalarının en güncel, sertifikalı ve orijinal ürün gamını marka güvencesiyle sunuyoruz.'
+          title: 'Marka ve Garanti Güvencesi',
+          description: 'Dünya devi HVAC markalarının en güncel ve sertifikalı ürün gamını marka güvencesiyle sunuyoruz.'
         },
         guidance: {
           eyebrow: 'Analiz',
@@ -682,7 +682,7 @@ export const tr = {
       authorizedDealer: {
         prefix: 'VentHub,',
         brand: 'Vortice',
-        suffix: 'ürünlerini orijinal ve marka güvencesiyle sunar.'
+        suffix: 'ürünlerini marka güvencesiyle sunar.'
       }
     },
     stats: {
@@ -930,7 +930,7 @@ export const tr = {
       statGlobal: 'Küresel',
     },
     sectionTitle: 'Premium HVAC Markaları',
-    sectionSubtitle: 'Dünyanın önde gelen HVAC markalarının ürünlerini orijinal ve marka güvencesiyle sunuyoruz.',
+    sectionSubtitle: 'Dünyanın önde gelen HVAC markalarının ürünlerini marka güvencesiyle sunuyoruz.',
     subtitlePart1: 'Dünya Devlerinin',
     subtitlePart2: 'Güvenilir Partneri',
     viewAll: 'Tüm Markaları Gör',
@@ -943,10 +943,10 @@ export const tr = {
     backToAll: 'Tüm markalara dön',
     aboutBrand: 'hakkında bilgi',
     trust: {
-      eyebrow: 'Supply Chain Authority',
-      title: 'Doğrudan Üreticiden Güvenceli Tedarik',
-      description: 'Tüm markalarımızla olan doğrudan stratejik ortaklığımız sayesinde, en yeni teknolojilere, tam teknik desteğe ve en rekabetçi termin sürelerine sahip olursunuz.',
-      original: '100% Orijinal Ürün',
+      eyebrow: 'Tedarik Zinciri',
+      title: 'Güvenceli Tedarik',
+      description: 'Kurulu tedarik ağımız sayesinde en yeni teknolojilere, tam teknik desteğe ve rekabetçi termin sürelerine sahip olursunuz.',
+      original: 'Marka Güvencesi',
       standard: 'Global Standart Uyumu',
       imageAlt: 'Teknik Altyapı ve HVAC Kurulumu'
     },
@@ -1009,24 +1009,24 @@ export const tr = {
     vision: 'Vizyonumuz',
     experience: 'Yıllık Tecrübe',
     distributorship: 'Küresel Marka Ağı',
-    completedProject: 'Tamamlanan Proje',
+    completedProject: 'Ürün Çeşidi',
     shippingNetwork: 'İl Sevkiyat Ağı',
     precisionTitle: 'Mühendislik Hassasiyeti',
     precisionDesc: 'Sadece ürün satmıyoruz; her projeye özel debi, basınç ve verimlilik hesaplamalarıyla mühendislik çözümü sunuyoruz.',
     standardsTitle: 'Global Standartlar',
     standardsDesc: 'Dünya devi HVAC markalarının en güncel ve sertifikalı teknolojilerini yerel pazara taşıyoruz.',
     trustTitle: 'Operasyonel Güven',
-    trustDesc: 'Teknopark İstanbul merkezli yönetimimiz ve geniş stok ağımızla, proje takvimlerinize sadık kalarak tam zamanında teslimat yapıyoruz.',
-    heroBadge: 'Engineering Excellence Since 2009',
+    trustDesc: 'Tedarik ve operasyon süreçlerimizi proje takvimlerinize sadık kalacak şekilde titizlikle yönetiyor, zamanında teslimatı hedefliyoruz.',
+    heroBadge: '15+ Yıl Mühendislik Deneyimi',
     heroTitle: 'Havayı',
     heroTitleItalic: 'Yeniden Tanımlıyoruz',
     heroDesc: 'VentHub, modern yaşam ve endüstriyel alanlar için yüksek verimli, teknolojik ve sürdürülebilir havalandırma sistemlerini Türkiye pazarına sunar.',
     storyTitle: 'Geleceğin İklimini',
     storyTitleItalic: 'Bugün Kuruyoruz',
-    storyDesc1: 'VentHub, havalandırma sektöründe sadece bir tedarikçi değil, teknolojik bir çözüm ortağı olarak konumlanmaktadır. 15 yılı aşkın süredir, Avrupa\'nın en prestijli markalarını Türkiye\'nin en büyük projeleriyle buluşturuyoruz.',
-    storyDesc2: 'Teknopark İstanbul\'daki merkezimizden yönettiğimiz operasyonlarımızda, mühendislik etiği ve operasyonel mükemmeliyeti her şeyin önünde tutuyoruz. Bizim için her ürün bir bileşen, her proje ise bir havalandırma sanatı eseridir.',
-    teamTitle: '50+ Uzman Mühendis &',
-    teamSubtitle: 'Teknik Operasyon Kadrosu',
+    storyDesc1: 'VentHub, havalandırma sektöründe sadece bir tedarikçi değil, teknolojik bir çözüm ortağı olarak konumlanmaktadır. 15 yılı aşkın saha deneyimimizle, Avrupa\'nın en prestijli markalarını Türkiye\'nin büyük projeleriyle buluşturuyoruz.',
+    storyDesc2: 'Operasyonlarımızda mühendislik etiğini ve operasyonel mükemmeliyeti her şeyin önünde tutuyoruz. Bizim için her ürün bir bileşen, her proje ise bir havalandırma sanatı eseridir.',
+    teamTitle: 'Mühendislik &',
+    teamSubtitle: 'Teknik Destek Yaklaşımımız',
     brandTitle: 'Marka',
     brandTitleItalic: 'Portföyümüz',
     ctaTitle: 'Mühendislik Ortağınızla',
@@ -1324,7 +1324,7 @@ export const tr = {
     trustSignals: {
       ce: 'CE',
       iso9001: 'ISO 9001',
-      authorizedDealerTitle: 'Orijinal Ürün',
+      authorizedDealerTitle: 'Marka Güvencesi',
       authorizedDealerDesc: 'Marka güvenceli Vortice ürünleri',
       warrantyTitle: '2 Yıl Garanti',
       warrantyDesc: 'Üretici garantisi',
@@ -1557,7 +1557,7 @@ export const tr = {
       ceCertified: 'CE Sertifikalı',
       warranty2y: '2 Yıl Garanti',
       premiumComfort: 'Premium Konfor',
-      authorizedDealerNotice: 'VentHub, Vortice ürünlerini orijinal ve marka güvencesiyle sunar.',
+      authorizedDealerNotice: 'VentHub, Vortice ürünlerini marka güvencesiyle sunar.',
       highlights: [
         {
           value: '70+',
@@ -1714,7 +1714,7 @@ export const tr = {
     techQuote: 'Teknik Teklif İste',
     descFallback: 'Bu ürün için detaylı açıklama yakında eklenecektir.',
     relatedProducts: 'İlgili Ürünler',
-    officialDistributor: 'ORİJİNAL ÜRÜN GÜVENCESİ',
+    officialDistributor: 'MARKA GÜVENCESİ',
     priceAvailability: 'Fiyat & Stok',
     shareCopied: 'Link kopyalandı!',
     messages: {
@@ -2794,7 +2794,7 @@ export const tr = {
       eyebrow: 'MÜHENDİSLİK MİRASI',
       title: 'İtalyan Sessizliği: Vortice Efsanesi',
       description: '1954\'ten beri havalandırma dünyasına yön veren Vortice, Lineo Quiet serisi ile sessiz kanal fanı kategorisinde zirveyi temsil ediyor.',
-      badges: ['Orijinal Ürün', '2 Yıl Marka Garantisi'],
+      badges: ['Marka Güvencesi', '2 Yıl Üretici Garantisi'],
       stats: [
         {
           label: 'Yıllık Deneyim',
