@@ -8,7 +8,23 @@ notebook_id: "235043eb-970f-4a52-9f39-1d02b2621e9c"
 # CLAUDE.md + PROJECT.md burada olmak ZORUNDA: ikisi de 5N1K/AXIOM formatına uymadığı için
 # master derleyicinin format kapısından düşer, yani standalone olmadıkları sürece ikize HİÇ girmez.
 standalone_files: [README.md, CONTEXT.md, CHANGELOG.md, RECOMMENDATIONS.md, VISION.md, CLAUDE.md, PROJECT.md, docs/audits/operasyon-dongusu-denetimi-2026-08-15.md, docs/audits/render-stratejisi-denetimi-2026-08-16.md, docs/audits/vibe-coding-20-madde-v2-2026-08-16.md, docs/database_schema_master.md, docs/design_system_config.md, docs/venthub_skills_master.md, docs/standards/admin-standard.md, docs/standards/admin-capabilities.md, docs/standards/dealer-network-standard.md, docs/standards/dealer-module-blueprint.md, docs/audits/dealer-data-ground-truth-2026-06-11.md, docs/reference/supabase/row-level-security.md, docs/reference/supabase/custom-claims-and-role-based-access-control-rbac.md, docs/reference/supabase/auth-hooks.md, docs/reference/supabase/realtime-authorization.md, docs/plans/faz0-kit-contract-2026-06-13.md, docs/plans/faz1-migration-playbook-2026-06-13.md, docs/plans/seo-transition-blueprint.md, docs/standards/analytics-standard.md, docs/standards/i18n-localization-standard.md, docs/standards/collaboration-protocol.md, docs/standards/category-taxonomy-standard.md, docs/standards/3d-webgl-standard.md, docs/standards/3d-scene-lighting-research.md, docs/standards/3d-showroom-ux-research.md, docs/standards/SOURCES.md, docs/standards/pricing-standard.md, docs/standards/catalog-ingestion-standard.md, docs/standards/csv-import-export-standard.md, docs/standards/work-tracking-ssot-standard.md, docs/plans/saas-funding-and-packaging-2026-06.md, docs/audits/product-schema-ground-truth-2026-06-21.md, docs/standards/product-schema-standard.md, docs/plans/catalog-commerce-pipeline-master-2026-06-20.md, docs/plans/slug-localization-2026-08-10.md, docs/plans/product-schema-master-implementation-plan.md, docs/standards/migration-safety-standard.md, docs/standards/rendering-cache-standard.md, docs/standards/multi-session-coordination-standard.md, docs/standards/storefront-design-standard.md, docs/standards/edge-function-security-standard.md, docs/standards/admin-design-standard.md]
-skip_dirs: [__pycache__, .git, .agent, .agents, cache, .venv, venv, mcp-env, node_modules, tests, __tests__, .pytest_cache, .ruff_cache, build, dist, egg-info, registry]
+# skip_dirs ISIM-TABANLIDIR ve HER DERINLIKTE eslesir (corpus_callosum/cli/docs_tree.py:57
+# `d not in _all_skip`) — kok-sabitleme YOK. Bu yuzden buraya yazilan her ad, ayni adi tasiyan
+# GERCEK kaynak dizinini de kor eder. Liste "zararsiz temizlik" degil, GENIS bir kesicidir.
+#   OLCULDU (2026-08-30, A/B; sizinti dizinleri fiilen yaratilarak, uc kolda tek tek):
+#     · `.agents` -> ETKISIZ. Yurutec zaten nokta-dizinleri atliyor (docs_tree.py:56
+#       `not d.startswith('.')`); listede olsa da olmasa da agacta 0. Savunma derinligi olarak
+#       DURUYOR ama tek basina bir sey COZMUYOR — "kok sebep kapandi" diye OKUMA.
+#     · `cache`   -> KALDIRILDI (REC-84'te eklenmisti). Kok `cache/` sizintisini kapatiyordu
+#       AMA ayni hamlede `src/lib/cache/tags.ts` agactan SILINIYORDU (olculdu: 1 -> 0; tek
+#       degisken, negatif kontrol yapildi). Kok `cache/` gecici, makineye-ozel bir tarama
+#       artigi; `src/lib/cache` ise companion'i olan GERCEK modul. Kozmetik bir satir icin
+#       gercek bir modulu ikizin gozunden saklamak KOTU takas.
+#   ACIK KALAN: kok `cache/` sizintisinin VentHub tarafinda guvenli karsiligi YOK
+#   (`source_dirs: [src, .]` koku de tariyor). Gercek cozum uretec tarafinda kok-sabitli
+#   girdi destegi (`/cache` gibi) — ORION kalemi, bu depoda kapatilamaz.
+#   Ayrinti + olcum tablosu: docs/standards/uretilmis-artefakt-standard.md
+skip_dirs: [__pycache__, .git, .agent, .agents, .venv, venv, mcp-env, node_modules, tests, __tests__, .pytest_cache, .ruff_cache, build, dist, egg-info, registry]
 # README.md ve uretilen master'lar buradadir: kok README'si AYRI kaynak olarak
 # yuklenir (standalone_files), master supurmesine de girerse ikiz ayni belgeyi
 # IKI kaynakta gorur ve hangisinin taze oldugunu bilemez (T020-OR).
