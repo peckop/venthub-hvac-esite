@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T18:39:01.110928+00:00
+compiled_at: 2026-08-28T12:54:03.044227+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T18:39:01.110928+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-28T12:54:03.044227+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -48,6 +48,7 @@ Bu belge, otonom derleyici tarafından 2026-08-27T18:39:01.110928+00:00 tarihind
 │   │   ├── ⚪ `admin-cetvel-scores-2026-06-18.md`
 │   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
 │   │   ├── ⚪ `aile-adi-en-cevirileri-2026-08-23.md`
+│   │   ├── ⚪ `build-skip-canli-olcum-2026-08-28.md`
 │   │   ├── ⚪ `canliya-alma-hazirlik-2026-08-15.md`
 │   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
 │   │   ├── ⚪ `i18n-sozluk-render-denetimi-2026-08-23.md`
@@ -786,6 +787,8 @@ Bu belge, otonom derleyici tarafından 2026-08-27T18:39:01.110928+00:00 tarihind
 │   │   │   └── 📂 **search/**
 │   │   │       └── ✅ `resourceSearchers.ts`
 │   │   ├── ✅ `audit.ts`
+│   │   ├── 📂 **cache/**
+│   │   │   └── ✅ `tags.ts`
 │   │   ├── 📂 **consent/**
 │   │   ├── 📂 **data/**
 │   │   │   ├── ✅ `csvImportGuard.ts`
@@ -992,6 +995,7 @@ Bu belge, otonom derleyici tarafından 2026-08-27T18:39:01.110928+00:00 tarihind
 │       │   ├── ✅ `AddressSelectModal.tsx`
 │       │   ├── ✅ `CheckoutProgress.tsx`
 │       │   ├── ✅ `InvoiceProfileModal.tsx`
+│       │   ├── ✅ `OdemeKapaliBilgi.tsx`
 │       │   ├── ✅ `OrderSummarySidebar.tsx`
 │       │   ├── ✅ `PaymentIframeContainer.tsx`
 │       │   ├── ✅ `ReviewSummary.tsx`

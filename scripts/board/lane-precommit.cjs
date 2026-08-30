@@ -90,19 +90,60 @@ if (birlestirmeHali) {
 
 
 let board = null
+let kimlik = null
 try {
   board = require(path.join(__dirname, 'board.cjs'))
+  kimlik = require(path.join(__dirname, 'kimlik.cjs'))
 } catch (e) {
   uyar('[lane-precommit] pano yuklenemedi (' + (e && e.message) + ') — SERIT KONTROLU YAPILMADI (fail-open).')
   process.exit(0)
 }
 
 const kimlikYolu = path.join(gitDir, 'venthub-sid')
-let sid = ''
-try {
-  if (fs.existsSync(kimlikYolu)) sid = fs.readFileSync(kimlikYolu, 'utf8').trim()
-} catch {
-  /* okunamadı → kimliksiz kolda ele alınır */
+
+// ---- E1-v2 KIMLIK COZUMU (2026-08-28): dosya VEKIL kanit, oturumun kendi kimligi ASIL kanit.
+// Eski kol yalniz dosyayi okurdu ve 'dosya VAR ama YANLIS SAHIBE ait' halini goremiyordu.
+// Olculdu: kapi kendi sahibini baska serit sanip KENDI claim indeki dosyada bloklad.
+// Gerekce ve olcum sinirlari: scripts/board/kimlik.cjs
+const kimlikCozum = kimlik.coz(gitDir, board)
+const sid = kimlikCozum.sid
+for (const u of kimlikCozum.uyarilar) uyar('[lane-precommit] ' + u)
+if (kimlikCozum.celisme && kimlik.onar(gitDir, sid)) {
+  uyar('[lane-precommit] kimlik dosyasi ASIL kimlikle ONARILDI (' + sid.slice(0, 8) + ').')
+}
+
+/**
+ * TANINMAYAN KIMLIK -> UYARIR ama KONTROLU ATLAMAZ.
+ *
+ * ⭐ILK YAZIMDA BURASI FAIL-OPEN'DI (exit 0) VE YANLISTI. Gerekcem "kapi yanlis oturum adina
+ * karar veremez, yanlis blok --no-verify aliskanligi kazandirir" idi. Gerekce, YANLIS BLOK
+ * URETILEBILECEGI varsayimina dayaniyordu — ve o varsayim olcumle cokuyor:
+ *
+ *   Panoda HIC gorulmemis bir sid, panoya HIC claim yazmamis demektir (claim bir olaydir ve
+ *   olayi yazan sid'i taniniyor yapar). Claim yazmamis bir kimlik HICBIR yolun sahibi
+ *   degildir. Dolayisiyla catisma kontrolu onun adina kosuldugunda YALNIZCA baska bir seridin
+ *   claim'indeki yolda blok uretebilir — yani tam da bloklanmasi gereken halde. **Bu kolda
+ *   yanlis blok yapisal olarak IMKANSIZ.**
+ *
+ * Eski hali gercek bir delik aciyordu: kimligi taninmayan her oturum, baska seridin
+ * dosyalarini serbestce commit'leyebiliyordu. Muafiyet fail-closed olmali kuralinin (s12.2)
+ * aynisi burada da gecerli: bilmemek, baskasinin dosyasi uzerinde yetki VERMEZ.
+ *
+ * KUSURU CI BULDU, YEREL TAKIM BULAMADI: yerelde `CLAUDE_CODE_SESSION_ID` ortamda dolu
+ * oldugu icin env kolu kosuyordu ve bu dala HIC girilmiyordu (bkz. lane-precommit-merge
+ * testindeki ortam sizintisi onarimi). "Bir kolu test etmek icin o kola GIRDIRMEK gerekir"
+ * dersinin ucuncu ornegi — bu kez ders bana CI tarafindan verildi.
+ */
+if (kimlikCozum.bilinmeyen) {
+  uyar(
+    '[lane-precommit] TANINMAYAN KIMLIK — kontrol ATLANMIYOR. Bu kimlik panoda hic ' +
+      'gorulmedigi icin HICBIR claim in sahibi olamaz; asagidaki kontrol yalnizca BASKA bir ' +
+      'seridin claim indeki yolda blok uretebilir.',
+  )
+  uyar(
+    '  Bu senin kendi isinse: panoya claim/heartbeat yaz (node scripts/board/board.cjs claim ' +
+      '--sid <sid> ...), kimligin taninir hale gelsin.',
+  )
 }
 
 // ---- BOOTSTRAP KOLU: kimlik yok. Fail-open, ama iz bırakarak.

@@ -42,11 +42,14 @@ const TARANAN_DOSYALAR = [
  * yok). O ikinci sınıfı bu test görmez; ürün sayısını ölçen kapı `catalog-integrity`dir.
  */
 const DOGRULANMIS_SLUGLAR = new Set([
-  'air-curtains',
-  'commercial-ventilation',
-  'heat-recovery-vmc',
-  'industrial-ventilation',
-  'jet-fans',
+  // 2026-08-28, REC-56 katalog omurgası migration'ından SONRA canlı DB'de tek tek ölçüldü.
+  // Her satırın yanındaki sayı, o kategoriye bağlı ürün sayısıdır — "var olmak" ile "ürün
+  // göstermek" ayrı şeyler olduğu için ikisini de ölçtüm; hiçbiri boş sayfa açmıyor.
+  'air-curtains', //     aktif · 8 ürün   (artık ANA kategori, migration onu üst seviyeye aldı)
+  'duct-fans', //        aktif · 36 ürün
+  'fans', //             aktif · 295 ürün (eski 'industrial-ventilation' bu ada dönüştü)
+  'heat-recovery-vmc', // aktif · 16 ürün
+  'parking-jet-fan', //  aktif · 21 ürün  (eski 'jet-fans' bunun karşılığı)
 ])
 
 /**
@@ -54,19 +57,13 @@ const DOGRULANMIS_SLUGLAR = new Set([
  * Her satır bir kararı bekler; karar verilince slug düzeltilir ve satır buradan SİLİNİR.
  * Bu liste yalnız küçülür — büyütmek, kırık bağlantıyı onaylamak demektir.
  */
-const KARAR_BEKLEYENLER = new Map<string, string>([
-  [
-    'fans',
-    'Çipin etiketi "Fanlar" ama bu adda bir kategori yok; hangi kategoriye gitmeli ' +
-      '(en büyük aday industrial-ventilation) bir ticari karardır, ölçümle çözülmez.',
-  ],
-  [
-    'duct-type-fans',
-    'Mutfak senaryosu kartı "kanal tipi fan" vaat ediyor; gerçek kanal tipi alt ' +
-      'kategoriler commercial-ventilation altında (circular-duct-fans, rectangular-duct-fans), ' +
-      'kart ise industrial-ventilation gösteriyor. Hem kategori hem alt kategori değişmeli.',
-  ],
-])
+// 2026-08-28 — LİSTE BOŞALDI. İki kalem de KARARLA çözüldü, ölçümle değil: Recep katalog
+// omurgasını ürün-tipi eksenine geçirmeyi onayladı (REC-56) ve migration ikisini de karşıladı.
+//   · 'fans'          → artık gerçek bir kategori (295 ürün). "Bu adda kategori yok" gerekçesi düştü.
+//   · 'duct-type-fans' → karşılığı 'duct-fans' olarak kuruldu (36 ürün); kart oraya bağlandı.
+// Liste boş kalabilir; boş olması "hiçbir kırık bağlantı af beklemiyor" demektir. Yalnız
+// KÜÇÜLÜR — buraya yeni satır eklemek, kırık bir bağlantıyı onaylamaktır.
+const KARAR_BEKLEYENLER = new Map<string, string>([])
 
 /** `slug: 'x'`, `subSlug: 'x'`, `categorySlug: 'x'` ve `Routes.category('x')` biçimleri. */
 const SLUG_KALIPLARI = [

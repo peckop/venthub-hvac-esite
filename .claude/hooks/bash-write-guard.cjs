@@ -29,6 +29,7 @@
 
 const fs = require('fs')
 const path = require('path')
+const { execFileSync } = require('child_process')
 
 function stdinOku() {
   try {
@@ -106,6 +107,49 @@ for (const hedef of depoHedefleri) {
   }
 }
 
+/**
+ * GERI ALMA MUAFIYETI — 2026-08-28, "duzeltme yolu kapali alarm" sinifi.
+ *
+ * ⭐NICIN VAR, OLCULDU: bash-write-audit dogru bir dikis-yeri alarmi verdi ve cozumunu de
+ * yazdi ("geri al: git checkout -- <yol>"); geri almaya kalkinca BU KAPI bloklad. Bir kapinin
+ * ONERDIGI duzeltmeyi oteki kapi YASAKLIYORDU. Sebep: guard "yazma"yi gorur, NIYETI gormez —
+ * geri alma da bir yazmadir. Duzeltme yolu kapali bir alarm, alarm olmaktan cikar.
+ *
+ * MUAFIYET DAR VE IKI SARTLI (filo tasarim karari, tek basima genisletilmez):
+ *   1. Komutun TUM hedefleri geri-alma sebepli olacak. Karisik komut (checkout + baska yazma)
+ *      muafiyet ALMAZ — tek bir yabanci yazma butun komutu kapatir.
+ *   2. Agac IZOLE WORKTREE olacak. ANA DEPODA muafiyet YOKTUR: orada checkout baskasinin
+ *      COMMITSIZ ara isini SESSIZCE siler (bu depo o dersi 2026-08-20 de yasadi).
+ *
+ * `git restore --staged` KAPSAM DISI: o calisma kopyasini degil INDEXI degistirir; HEAD e
+ * dondurme degil, ayri bir is. Cikarici onu ayri sebep olarak isaretler.
+ */
+const GERI_ALMA_SEBEPLERI = new Set(['git checkout --', 'git restore'])
+
+/**
+ * Ana depo mu, izole worktree mi.
+ *
+ * ⚠OLCULDU VE HIPOTEZ CURUDU: `--git-common-dir` ANA DEPODA GORELI (".git") doner, git-dir
+ * ise mutlaktir. Duz karsilastirma "worktree" der ve muafiyeti TAM YASAK OLDUGU YERDE acardi.
+ * Iki taraf da toplevel e gore mutlaklastirilir.
+ */
+function anaDepoMu(kokDizin) {
+  try {
+    const g = (a) => execFileSync('git', ['-C', kokDizin, ...a], { encoding: 'utf8', timeout: 5000 }).trim()
+    const gitDir = path.resolve(g(['rev-parse', '--absolute-git-dir']))
+    const ortak = path.resolve(g(['rev-parse', '--show-toplevel']), g(['rev-parse', '--git-common-dir']))
+    return gitDir === ortak
+  } catch {
+    // Olculemezse ANA VARSAY: muafiyet FAIL-CLOSED tir. Kapinin kendisi fail-open olabilir,
+    // ama bir MUAFIYET olculemedigi icin acilmaz — aksi hâlde olcum hatasi kapiyi delerdi.
+    return true
+  }
+}
+
+const geriAlmaKomutu =
+  sonuc.sebepler.length > 0 && sonuc.sebepler.every((s) => GERI_ALMA_SEBEPLERI.has(s))
+const geriAlmaMuafiyeti = geriAlmaKomutu && !anaDepoMu(kok)
+
 // ---- lane-guard karşılığı: başka şeridin canlı claim'i.
 let pano
 try {
@@ -131,6 +175,19 @@ for (const hedef of depoHedefleri) {
     process.exit(0)
   }
   if (!catisma) continue
+
+  // GERI ALMA MUAFIYETI: izole agacta HEAD e dondurme. SESSIZ DEGIL — izin verildigi
+  // acikca soylenir, cunku sessiz muafiyet ile kapinin hic kosmamasi ayni gorunur.
+  if (geriAlmaMuafiyeti) {
+    console.error(
+      '[bash-write-guard] GERI ALMA MUAFIYETI — "' + catisma.rel + '" ' + catisma.claim.lane +
+        ' seridinde, ama komut yalnizca HEAD e dondurme yapiyor (' +
+        [...new Set(sonuc.sebepler)].join(', ') +
+        ') ve bu agac izole bir worktree. Icerik URETILMIYOR: dosya sahibinin commitli haline doner.',
+    )
+    console.error('  Ana depoda bu muafiyet YOKTUR — orada commitsiz ara is sessizce silinebilir.')
+    continue
+  }
 
   const { claim, glob, rel } = catisma
   process.stderr.write(

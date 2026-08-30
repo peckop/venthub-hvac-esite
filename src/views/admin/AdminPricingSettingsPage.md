@@ -13,6 +13,8 @@ entity_hashes:
 generated_at: 2026-08-25T07:30:06Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=3 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, yönetici panelindeki fiyatlandırma ayarlarını görüntülemek ve düzenlemek için kullanılan bir sayfa bileşenidir. Para birimi verilerinin doğrulanması ve kullanıcı etkileşimi için modal açılması gibi temel işlevleri içerir.
 

@@ -154,7 +154,7 @@ export default async function RootPage({ params }: Props) {
       "url": siteUrl,
       "potentialAction": {
         "@type": "SearchAction",
-        "target": `${siteUrl}/products?q={search_term_string}`,
+        "target": `${siteUrl}/${lang}/products?q={search_term_string}`,
         "query-input": "required name=search_term_string"
       }
     },
@@ -164,9 +164,11 @@ export default async function RootPage({ params }: Props) {
       "name": "VentHub",
       "url": siteUrl,
       "logo": `${siteUrl}/favicon.svg`,
+      // Telefon şirket kuruluşuna kadar bilinçli YOK — eski değer uydurmaydı ve
+      // gerçek bir vatandaşa denk gelebilirdi (2026-08-30 Rich Results taraması).
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+90-544-245-0205",
+        "email": "info@venthub.com.tr",
         "contactType": "customer service"
       }
     }

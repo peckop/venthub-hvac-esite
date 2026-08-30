@@ -193,9 +193,16 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                   <span>{currentContent.eyebrow}</span>
                 </div>
 
-                <h1 className="text-3xl font-light leading-hvac-105 tracking-tighter text-white sm:text-5xl lg:text-8xl mb-4 lg:mb-8">
-                  {currentContent.title}
-                </h1>
+                {/* SEO: sayfada tek h1 olmalı — yalnız ilk slayt h1, diğerleri h2 (Bing URL denetimi 2026-08-29) */}
+                {idx === 0 ? (
+                  <h1 className="text-3xl font-light leading-hvac-105 tracking-tighter text-white sm:text-5xl lg:text-8xl mb-4 lg:mb-8">
+                    {currentContent.title}
+                  </h1>
+                ) : (
+                  <h2 className="text-3xl font-light leading-hvac-105 tracking-tighter text-white sm:text-5xl lg:text-8xl mb-4 lg:mb-8">
+                    {currentContent.title}
+                  </h2>
+                )}
 
                 <p className="max-w-xl text-sm sm:text-xl font-light leading-relaxed text-slate-300 mb-6 lg:mb-12">
                   {currentContent.subtitle}
@@ -228,7 +235,14 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
         </div>
 
         {/* Right Side: Floating High-Tech Products */}
-        <div className="w-full lg:w-1/2 relative h-320px sm:h-450px lg:h-550px">
+        {/* h-300px: `height` token'ında 320px YOK (320px yalnız minHeight/width/minWidth'te
+            tanımlı). `h-320px` sınıfı hiç üretilmiyordu → mobilde bu kapsayıcı 0px'e çöküyor,
+            içindeki mutlak konumlu ürün görselleri hero metninin ve CTA butonlarının ÜZERİNE
+            biniyordu (REC-89 kusur 1: "buton metinleri görünmüyor" — kontrast değil binişme).
+            Ölçüm: 390px viewport'ta getBoundingClientRect().height = 0; buton merkezinde
+            elementFromPoint → butona ait olmayan IMG. sm/lg kırılımları zaten geçerliydi
+            (450px ve 550px height token'ında VAR), kusur bu yüzden yalnız mobilde görünüyordu. */}
+        <div className="w-full lg:w-1/2 relative h-300px sm:h-450px lg:h-550px">
           {/* Animated Air Flow Particles using optimized CSS */}
           <div className="absolute inset-0 pointer-events-none z-0">
             {[...Array(6)].map((_, i) => (

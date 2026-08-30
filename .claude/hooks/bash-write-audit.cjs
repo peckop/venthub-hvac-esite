@@ -280,7 +280,78 @@ if (taban.surum < 2) {
 }
 
 const tabanKume = new Set(taban.yollar)
-const yeniler = simdiki.filter((y) => !tabanKume.has(y.anahtar))
+const hamYeniler = simdiki.filter((y) => !tabanKume.has(y.anahtar))
+
+/**
+ * BİRLEŞTİRME MUAFİYETİ — ölçülmüş kusur (2026-08-28), aynı gün ÜÇ kez ötdü.
+ *
+ * `git merge origin/master` çalışma ağacına BAŞKA ŞERİTLERİN master'a inmiş dosyalarını
+ * getirir. Bunlar "yeni kirli yol"dur ve bu kanca onları bu şeridin yazması sanıyordu.
+ * Bugünkü üç vaka: ALTYAPI kendi ağacında 7 dosya (URUN + I18N yolları), AUTH iki kez,
+ * URUN bir kez — URUN alarmı bağımsız olarak "bu ihlal değil, merge'in kendisi" diye
+ * teşhis etti ve panoya yazdı. Yani ihlal ETİKETİ yanlış kişiye yapışıyordu: içeriği
+ * YAZAN değil TAŞIYAN cezalanıyordu.
+ *
+ * `lane-precommit.cjs`'te bu muafiyet ZATEN VARDI (MERGE_HEAD/CHERRY_PICK_HEAD/REVERT_HEAD);
+ * burada yoktu. İki kapının aynı olguya farklı hüküm vermesi, bugün adlandırdığımız
+ * "düzeltme yolu kapalı alarm" sınıfının kardeşi: bir kapı normal iş akışını ihlal sayarsa
+ * alarm üç gün içinde görmezden gelinir ve GERÇEK sinyal onunla birlikte ölür.
+ *
+ * FAIL-CLOSED: birleştirme hâli ÖLÇÜLEMEZSE muafiyet AÇILMAZ. Muafiyet bir kapıyı gevşetir;
+ * gevşetmenin ölçülemediği yerde varsayılan sıkı olmalı (guard'daki `anaDepoMu` ile aynı ilke).
+ *
+ * KAPSAM DAR: yalnız birleştirme HÂLİNDEKİ ağacın yeni yolları muaf. Merge commit'lendikten
+ * sonra hâl biter, ağaç temizlenir ve bu yollar zaten `simdiki`den düşer — muafiyet kalıcı
+ * bir kör nokta bırakmaz. Taban her turda güncellendiği için muaf tutulan yollar sonraki
+ * turlarda da alarm üretmez; bu KAYIP değil, aynı olgunun tek kez değerlendirilmesidir.
+ */
+const BIRLESTIRME_ISARETLERI = ['MERGE_HEAD', 'CHERRY_PICK_HEAD', 'REVERT_HEAD']
+
+function birlestirmeHali(agac) {
+  const gitDir = gitOku(agac, '--absolute-git-dir')
+  if (!gitDir) return { hal: null, olculdu: false }
+  for (const ad of BIRLESTIRME_ISARETLERI) {
+    try {
+      if (fs.existsSync(path.join(gitDir, ad))) return { hal: ad, olculdu: true }
+    } catch {
+      return { hal: null, olculdu: false }
+    }
+  }
+  return { hal: null, olculdu: true }
+}
+
+const halCache = new Map()
+const halAl = (agac) => {
+  if (!halCache.has(agac)) halCache.set(agac, birlestirmeHali(agac))
+  return halCache.get(agac)
+}
+
+const muafAgaclar = new Map()
+const olculemeyenAgaclar = new Set()
+const yeniler = hamYeniler.filter((y) => {
+  const { hal, olculdu } = halAl(y.agac)
+  if (!olculdu) {
+    olculemeyenAgaclar.add(y.agac)
+    return true // FAIL-CLOSED: ölçemediysem muaf tutmam
+  }
+  if (!hal) return true
+  muafAgaclar.set(y.agac, { hal, sayi: (muafAgaclar.get(y.agac)?.sayi || 0) + 1 })
+  return false
+})
+
+for (const [agac, { hal, sayi }] of muafAgaclar) {
+  uyarilar.push(
+    '[bash-write-audit] BIRLESTIRME MUAFIYETI — ' + agac + ' su an ' + hal + ' halinde; ' +
+      sayi + ' yeni yol ENTEGRE EDILEN icerik sayildi, serit kapisindan GECIRILMEDI.' +
+      '\n  Bunlar bu seridin YAZDIGI is degil, TASIDIGI is. Muafiyet merge bitince kendiliginden kapanir.',
+  )
+}
+for (const agac of olculemeyenAgaclar) {
+  uyarilar.push(
+    '[bash-write-audit] birlestirme hali OLCULEMEDI (' + agac + ') — muafiyet ACILMADI (fail-closed).' +
+      '\n  Alarm oterse once bu agacin git dizinini kontrol et; sessiz muafiyetten iyidir.',
+  )
+}
 
 if (!yeniler.length) {
   tabanYaz(taban.bildirilen)

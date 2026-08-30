@@ -1,7 +1,15 @@
 import { execFileSync, spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+/**
+ * AĞIR-SINIF ZAMAN AŞIMI EŞİĞİ — 60 sn (global varsayılan 20 sn, `vitest.config.ts`).
+ * Ölçüm 2026-08-30, boş makine: gövde **1,28 sn**, 9 alt süreç çağrısı.
+ * Yük altında gözlenen amplifikasyon ~27× (tek gözlem: `eol` 1,47 → 39,9 sn).
+ * 60 sn'yi aşan kırmızı GERÇEK aşımdır. Gerekçe: `docs/standards/fleet-mechanism-standard.md` §13.
+ */
+vi.setConfig({ testTimeout: 60_000 })
 
 /**
  * INV-BOARD-7 · E1 pre-commit şerit kapısı — MERGE COMMİTİ MUAF, kendi yazımı DEĞİL.
@@ -104,7 +112,18 @@ function kur(): Kurulum {
 }
 
 function e1Kostur(k: Kurulum): { status: number; stderr: string } {
-  const ciftler = Object.entries(process.env).filter(([ad]) => ad !== 'CLAUDE_SESSION_ID')
+  /**
+   * ⭐ORTAM SIZINTISI ONARIMI (2026-08-28, kusuru CI buldu): burada yalniz `CLAUDE_SESSION_ID`
+   * eleniyordu. E1-v2 kimligi ASIL kanit olarak `CLAUDE_CODE_SESSION_ID`'yi okuyor; o degisken
+   * elenmedigi icin GELISTIRICININ kendi oturum kimligi cocuk surece sizip fikstürün kimligini
+   * eziyordu. Sonuc: YEREL takim yesil (env kolu kosuyordu), CI kirmizi (env yok, dosya kolu
+   * kosuyordu) — yani yerel yesil, urunu degil ORTAMI olcuyordu.
+   *
+   * Kural: bir fikstür kimligi ELINDE TUTMALI. Kimlik tasiyan HER degisken elenir; test
+   * neyi olcecegine kendisi karar verir, calistiran makinenin ortamina birakmaz.
+   */
+  const KIMLIK_DEGISKENLERI = new Set(['CLAUDE_SESSION_ID', 'CLAUDE_CODE_SESSION_ID'])
+  const ciftler = Object.entries(process.env).filter(([ad]) => !KIMLIK_DEGISKENLERI.has(ad))
   ciftler.push(['VENTHUB_BOARD_DIR', k.panoDir])
   const env = Object.fromEntries(ciftler) as typeof process.env
   const r = spawnSync('node', [E1_YOLU], { cwd: k.repo, encoding: 'utf8', env })

@@ -14,6 +14,8 @@ entity_hashes:
 generated_at: 2026-08-25T07:30:58Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 
 Bu modül, yönetim panelindeki fiyatlandırma kuralları tablosunun gövdesini oluşturan React bileşenini ve yardımcı fonksiyonlarını içerir. Supabase veritabanından fiyatlandırma kurallarını çeker, her kuralın geçerlilik durumunu hesaplar ve ödeme yöntemlerini kullanıcıya gösterilebilir etiketlere dönüştürür.

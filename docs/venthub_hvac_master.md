@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-27T17:47:32.841968+00:00
-total_compiled_files: 656
-source_commit: 829d6493
+compiled_at: 2026-08-30T18:14:47.696826+00:00
+total_compiled_files: 657
+source_commit: 75d72015
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-27T17:47:32.841968+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-30T18:14:47.696826+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -7228,64 +7228,79 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\ops-t165\src\app\[lang]\checkout\page.tsx
-skeleton_hash: fbc4074f1145221f
+source_path: C:\tmp\vh-comp\src\app\[lang]\checkout\page.tsx
+skeleton_hash: a7daeb3f8d7f5cfb
 entity_hashes:
-  func:Page: 752ea1d46a136aae
-  overview: cbc240f327cf6544
+  func:Page: f90dce05d687db29
+  overview: cc45e317995ad318
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-08-27T06:53:01Z
+generated_at: 2026-08-28T11:56:12Z
 ---
 
 ## Genel Bakış
-`src/app/[lang]/checkout/page.tsx` modülü, uygulamanın ödeme sayfasının dil destekli ana bileşenini tanımlar. Bu bileşen, kullanıcının ödeme sürecini yönettiği arayüzün tamamını oluşturur ve dil parametresine göre render eder.
+Bu modül, uygulamanın ödeme sayfasının dil destekli ana bileşenini tanımlar. `Page` fonksiyonu, ödeme sürecinin kullanıcı arayüzünü oluşturur ve dil parametresine göre dinamik olarak render eder. Modül, React'ın `Suspense` bileşenini kullanarak asenkron yükleme sağlar ve `CheckoutPage` alt bileşenini yükler.
 
 ## Fonksiyon Grupları
 ### UI Rendering
-Ödeme sayfasının kullanıcı arayüzünü JSX ile oluşturur ve dil parametresine göre dinamik olarak render edilen React bileşenini döndürür.
+Ödeme sayfasının kullanıcı arayüzünü JSX ile oluşturur ve dil parametresine göre dinamik olarak render edilen React bileşenini döndürür. Loading ekranı gösterimi ve `CheckoutPage` bileşeninin yüklenmesini yönetir.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için doğrulanabilir mimari varsayımlar çok sınırlıdır; `Page()` fonksiyon imzası parametresizdir ve modül sabitleri tanımlanmamıştır.
+Bu modül için fonksiyon gövdesi verilmediğinden, yalnızca fonksiyon imzası ve modül sabitinden doğrulanabilir varsayımlar üretilebilir.
 
-**[Aksiyom 1]:** Eğer `CheckoutPage` adlı alt bileşen mevcut değilse veya modül tarafından import edilemezse, `Page` fonksiyonunun JSX döndürme süreci tamamlanamaz ve çalışma zamanı hatası oluşur.
+**[Aksiyom 1]:** Eğer `ODEME_ACIK` sabiti tanımlı değilse, ödeme sayfasının açık/kapalı durumunu belirleyen binary_expression ifadesi çalışmaz ve sayfa render mantığı eksik kalır.
 
-**[Aksiyom 2]:** Eğer render sırasında loading durumu (animasyonlu ekran) için gerekli UI kaynakları (CSS class'ları, animasyon tanımları veya stil bileşenleri) sağlanamazsa, kullanıcı boş veya bozuk bir geçiş ekranı görür.
+**[Aksiyom 2]:** Eğer `Page()` fonksiyonu parametre almıyorsa, bileşen dışarıdan yapılandırma veya veri almadan kendi başına render edilmelidir; aksi halde bileşen eksik veriyle çalışır.
 
-> **Not:** Fonksiyon imzası `Page()` olarak verilmiş olup herhangi bir parametre göstermemektedir. Dosya yolu `[lang]` dinamik rotası içermesine rağmen, dil parametresinin fonksiyon içeriğine nasıl alındığı (Next.js `params` prop'u mu, context mi, vs.) fonksiyon imzasından çıkarılamadığı için bu konuda varsayımda bulunulamamaktadır.
+**[Aksiyom 3]:** Eğer `[lang]` dinamik rota parametresi mevcut değilse, modül dil destekli ödeme sayfasını oluşturamaz ve uluslararasılaştırma işlevsiz kalır.
+
+---
+
+**Not:** Fonksiyon gövdesi verilmediği için `Page()` içindeki alt bileşen kullanımı, koşullu render mantığı, `ODEME_ACIK` sabitinin hangi bağlamda değerlendirildiği ve ödeme akışının nasıl yönetildiği hakkında ek aksiyom üretilememektedir. Daha detaylı mimari varsayımlar için fonksiyon gövdesi gereklidir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Checkout (ödeme) sayfasının üst düzey sarmalayıcı bileşenidir. Kullanıcı ödeme sayfasına eriştiğinde yüklenme sürecinde animasyonlu bir loading ekranı gösterir ve ardından ana CheckoutPage bileşenini render eder.
+**Ne yapar**: Ödeme sayfasının ana bileşenidir. Ödeme işleminin açık olup olmadığını kontrol ederek kullanıcıyı ilgili sayfaya yönlendirir. Asenkron yükleme sırasında bir yükleme animasyonu gösterir.
 
-**Nasıl yapar**: React'ın `Suspense` bileşenini kullanarak asenkron veri yüklemelerini veya yavaş bileşenleri yüklenirken göstermek üzere bir fallback UI sunar. Fallback olarak screen'i ortalamalı, dönen bir loading spinner animasyonu (primary-navy renkli border-b-2 ile) oluşturulur. Suspense çocuğu olarak `CheckoutPage` bileşenini render eder; bu bileşen muhtemelen içeriği, forma alanlarını ve ödeme süreçlerini yönetir.
+**Nasıl yapar**: React `Suspense` bileşeni kullanarak asenkron içerik yüklenirken bir fallback (yedek) içerik gösterir. Fallback içerik, ekranın ortasında dönen bir yükleme spinner'ıdır (CSS sınıfları ile oluşturulmuş animasyonlu bir daire). `ODEME_ACIK` sabitini/değişkenini kontrol eder; eğer ödeme açıksa `CheckoutPage` bileşenini, kapalıysa `OdemeKapaliBilgi` bileşenini render eder.
 
 **Parametreler**:
-Bu fonksiyon herhangi bir parametre almamaktadır (propsuz bir React Server Component yapısındadır).
+- Bu fonksiyon parametre almaz.
 
-**Dönüş**: JSX elementi döndürür — `Suspense` ile sarılmış `CheckoutPage` bileşeninin render sonucunu verir. Suspense yüklenme esnasında animasyonlu bir spinner div'i, yükleme tamamlandığında ise CheckoutPage içeriğini gösterir.
+**Dönüş**: JSX içeriği döndürür. Kesin dönüş tipi kaynakta belirtilmemiştir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../../views/CheckoutPage::CheckoutPage
+- import: ../../../views/checkout/OdemeKapaliBilgi::OdemeKapaliBilgi
 - import: react::React
 - import: react::Suspense
+
+---
+
+## SABİTLER
+- **ODEME_ACIK** [env-backed] (binary_expression) — `process.env.NEXT_PUBLIC_ODEME_ACIK === '1'`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/[lang]/checkout/page.tsx::Page
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: React JSX elemanı (Suspense içinde CheckoutPage)
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `ODEME_ACIK` — koşul ifadesi olarak kullanılır; true ise `CheckoutPage` bileşeni, false ise `OdemeKapaliBilgi` bileşeni render edilir
+  - `Suspense` — React'ten import edilen bileşen; sayfa yüklenirken `fallback` prop'u ile tanımlanmış loading spinner gösterilir
+  - `fallback` — `Suspense` bileşeninin prop'u; ortalanmış dönen bir spinner (animate-spin, border-primary-navy) içeren div olarak tanımlıdır
+  - `CheckoutPage` — `ODEME_ACIK` true olduğunda render edilen bileşen (../../../views/CheckoutPage'den import edilir)
+  - `OdemeKapaliBilgi` — `ODEME_ACIK` false olduğunda render edilen bileşen (../../../views/checkout/OdemeKapaliBilgi'den import edilir)
+- **Dönüş**: JSX elementi — `Suspense` ile sarılmış koşullu render (`ODEME_ACIK ? <CheckoutPage /> : <OdemeKapaliBilgi />`)
 
 ---
 
@@ -9500,8 +9515,8 @@ entity_hashes:
   func:pickLang: 946d41753cca4e50
   func:toggleSpecSection: aca256fdc4d20ecb
   overview: 590be9a86b563f9f
-  style_tokens: e157cb22f5459ba5
-generated_at: 2026-08-27T06:54:02Z
+  style_tokens: d8b7561aa4410d27
+generated_at: 2026-08-28T08:20:43Z
 ---
 
 ## Genel Bakış
@@ -9812,8 +9827,8 @@ graph TD
     ProductDetailPageView_tsx__openQuoteRequest["openQuoteRequest"]
     ProductDetailPageView_tsx__pickLang["pickLang"]
     ProductDetailPageView_tsx__toggleSpecSection["toggleSpecSection"]
-    ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__pickLang
     ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__toggleSpecSection
+    ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__pickLang
     ProductDetailPageView_tsx__ProductDetailBody --> ProductDetailPageView_tsx__mapSlugToTopic
 ```
 
@@ -9856,8 +9871,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `tracking-hvac-normal`, `tracking-hvac-snug`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-100`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`
-- **Layout:** `absolute`, `backdrop-blur-2`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`
+- **Renkler:** `bg-air-blue/30`, `bg-gold-accent/10`, `bg-industrial-gray`, `bg-primary-navy`, `bg-red-50`, `bg-secondary-blue`, `bg-slate-50`, `bg-slate-50/30`, `bg-slate-900`, `bg-success-green`, `bg-success-green/10`, `bg-warning-orange`, `bg-warning-orange/10`, `bg-white`, `bg-white/80`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-xl`, `col-span-full`, `fixed`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `flex-wrap`, `gap-1.5`, `gap-2`, `gap-2.5`, `gap-4`, `gap-8`
 - **Varyant/Responsive:** `:`, `active:`, `disabled:`, `group-hover:`, `hover:`, `last:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
 - **Yardımcı Sınıflar:** `${activeSection`, `${inStock`, `${isNavSticky`, `${isOpen`, `${isWishlisted`, `${section.bgClass`, `:`, `===`, `active:scale-95`, `active:scale-98`, `animate-in`, `animate-ping`, `animate-pulse`, `animate-pulse-subtle`, `animate-spin`
 
@@ -42341,6 +42356,8 @@ entity_hashes:
 generated_at: 2026-08-17T11:20:13Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, teklif talep sürecini başlatmak için kullanılan bir React bileşenidir. Kullanıcıların mevcut ürün listeleri veya proje kaynaklarıyla teklif istemesini sağlayan interaktif bir düğme sunar. Bileşen, prop'lar aracılığıyla esnek bir şekilde yapılandırılabilir ve tıklama olayını yöneterek teklif akışını tetikler.
 
@@ -49648,11 +49665,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\en.ts
-skeleton_hash: 9d0705a703cca270
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\en.ts
+skeleton_hash: 19b6b8e0da23add0
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-27T04:25:30Z
+generated_at: 2026-08-28T11:56:12Z
 ---
 
 ## Genel Bakış
@@ -49711,11 +49728,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\i18n\dictionaries\tr.ts
-skeleton_hash: 612478c507ab5d21
+source_path: C:\tmp\vh-comp\src\i18n\dictionaries\tr.ts
+skeleton_hash: 996845368cd1c54d
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-08-27T04:25:30Z
+generated_at: 2026-08-28T11:56:12Z
 ---
 
 ## Genel Bakış
@@ -57991,8 +58008,8 @@ type VariantSelection = <T extends VariantLike>
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductFanSelection.ts
-skeleton_hash: cf67fad21ac874be
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductFanSelection.ts
+skeleton_hash: d25b597f76ec7fa0
 entity_hashes:
   func:calismaNoktasi: 477178de8115d130
   func:degerlendir: f750568727981b71
@@ -58001,7 +58018,7 @@ entity_hashes:
   func:secimYap: 4647312ff1acd1ac
   func:sistemKatsayisi: 04ecc41bc675abb4
   overview: 1ad4e3445b46e669
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:57Z
 ---
 
 ## Genel Bakış
@@ -58152,23 +58169,15 @@ type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
 
 ## SABİTLER
 - **MAHAL_KURALLARI** (object) — `{
-
   bathroom: { ach: 8, minimumM3h: 85 },
-
   kitchen: { ach: 15, minimumM3h:...`
 - **GUZERGAH_GEOMETRISI** (object) — `{
-
   short: { uzunlukM: 3, dirsek90: 1, dirsek45: 0 },
-
   medium: { uzunlukM:...`
 - **SESSIZLIK_AGIRLIGI** (object) — `{
-
   normal: 0.2,
-
   important: 0.4,
-
   critical: 0.6,
-
 }`
 
 ---
@@ -58261,11 +58270,11 @@ graph TD
     ductFanSelection_ts__parsePQCurve["parsePQCurve"]
     ductFanSelection_ts__secimYap["secimYap"]
     ductFanSelection_ts__sistemKatsayisi["sistemKatsayisi"]
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
-    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
-    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__parsePQCurve
+    ductFanSelection_ts__degerlendir --> ductFanSelection_ts__calismaNoktasi
     ductFanSelection_ts__degerlendir --> ductFanSelection_ts__sistemKatsayisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__hesaplaTasarimDebisi
+    ductFanSelection_ts__secimYap --> ductFanSelection_ts__degerlendir
 ```
 
 ## NODE ID STANDARD
@@ -58308,8 +58317,8 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\lib\hvac\ductPressure.ts
-skeleton_hash: a0b705802650fa34
+source_path: C:\Users\alize\venthub-hvac\src\lib\hvac\ductPressure.ts
+skeleton_hash: 1579ba7b4e3d68fe
 entity_hashes:
   func:akisHizi: a87413c22f69c858
   func:dinamikBasinc: 4288bc94c70c6d78
@@ -58317,7 +58326,7 @@ entity_hashes:
   func:reynolds: d87c6fd9c4af1b38
   func:surtunmeFaktoru: 20425e5a77455729
   overview: 1dd122290e85a03e
-generated_at: 2026-08-27T07:32:10Z
+generated_at: 2026-08-25T08:44:34Z
 ---
 
 ## Genel Bakış
@@ -58414,23 +58423,15 @@ type KanalMalzemesi = keyof typeof PURUZLULUK_M
 
 ## SABİTLER
 - **PURUZLULUK_M** (as_expression) — `{
-
   galvanized: 0.00015,
-
   pvc: 0.00001,
-
   flex: 0.003,
-
 } as const`
 - **FITTING_K** (as_expression) — `{
-
   /** 90° yuvarlak dirsek, eğrilik yarıçapı = 1,5·D (tipik hazır dirsek). ...`
 - **TERMINAL_K** (as_expression) — `{
-
   /** İç mahal egzoz menfezi/ızgarası. */
-
   menfez: 2.5,
-
   /** Geri-akış...`
 - **TERMINAL_K_TOPLAM** (binary_expression) — `TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur`
 
@@ -58494,8 +58495,8 @@ graph TD
     ductPressure_ts__kanalBasincKaybi["kanalBasincKaybi"]
     ductPressure_ts__reynolds["reynolds"]
     ductPressure_ts__surtunmeFaktoru["surtunmeFaktoru"]
-    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__reynolds
+    ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__surtunmeFaktoru
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__akisHizi
     ductPressure_ts__kanalBasincKaybi --> ductPressure_ts__dinamikBasinc
 ```
@@ -71868,6 +71869,8 @@ entity_hashes:
 generated_at: 2026-06-19T20:50:42Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, kullanıcıların şifrelerini sıfırlamaları için bir e-posta adresi girmelerini gerektiren tek sayfalık bir React bileşenidir. Kullanıcı formu gönderdiğinde, e-posta adresi sunucudaki şifre sıfırlama servisine asenkron olarak iletilerek süreç başlatılır.
 
@@ -73101,6 +73104,8 @@ entity_hashes:
   style_tokens: b4142733c6599819
 generated_at: 2026-06-19T20:51:31Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 RegisterPage.tsx modülü, kullanıcıların yeni bir hesap oluşturabilmesi için gerekli olan kayıt formunu ve formun yönetim mantığını barındıran bir React bileşenidir. Modül, kullanıcının form alanlarına girdiği verileri tutar, bu verilerin tanımlı kurallara göre geçerliliğini doğrular ve geçerli ise sunucuya göndererek kayıt işlemini tamamlar.
@@ -74603,6 +74608,8 @@ entity_hashes:
   style_tokens: 0076231c43efae4d
 generated_at: 2026-08-26T07:15:55Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=8 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 VentHub HVAC projesinin hesap yönetimi modülü bünyesinde yer alan bu bileşen, kullanıcının sevkiyat ve kargo bilgilerini görüntüleyebildiği tek sayfalık bir arayüz sağlar. Supabase veritabanından sipariş verilerini çekerek kargo durumlarına göre filtreleme ve görsel gösterim yapar. Bileşen, kullanıcının oturum durumunu ve dil tercihini bağımlılıklarından alarak sayfayı buna göre yapılandırır.
@@ -79330,6 +79337,8 @@ entity_hashes:
 generated_at: 2026-08-25T07:30:06Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=3 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, yönetici panelindeki fiyatlandırma ayarlarını görüntülemek ve düzenlemek için kullanılan bir sayfa bileşenidir. Para birimi verilerinin doğrulanması ve kullanıcı etkileşimi için modal açılması gibi temel işlevleri içerir.
 
@@ -80444,6 +80453,8 @@ entity_hashes:
   style_tokens: 6e2907e7b7287d77
 generated_at: 2026-08-25T07:30:31Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=5 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 AuditLogTableBody modülü, admin panelinde denetim günlüğü (audit log) kayıtlarının tablo içinde görüntülenmesinden sorumludur. Supabase veritabanından denetim kayıtlarını çeken bir veri erişim fonksiyonu ve bu kayıtları tablo gövdesinde sunan bir React bileşeni içerir.
@@ -83882,6 +83893,8 @@ entity_hashes:
 generated_at: 2026-08-25T07:30:58Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 
 Bu modül, yönetim panelindeki fiyatlandırma kuralları tablosunun gövdesini oluşturan React bileşenini ve yardımcı fonksiyonlarını içerir. Supabase veritabanından fiyatlandırma kurallarını çeker, her kuralın geçerlilik durumunu hesaplar ve ödeme yöntemlerini kullanıcıya gösterilebilir etiketlere dönüştürür.
@@ -84972,6 +84985,8 @@ entity_hashes:
   style_tokens: b14d0e3316338d3b
 generated_at: 2026-06-19T20:50:29Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 Bu modül, admin panelindeki webhook olayları tablosunun satırlarını oluşturmak için tasarlanmış bir React bileşeni ve bu verileri Supabase veritabanından asenkron olarak çekmek için gerekli veri getiriciyi içerir. Modül, veri kaynağını (fetcher) ve verinin kullanıcı arayüzündeki sunumunu (bileşen) bir arada tutan tek bir modülden oluşur.
@@ -88051,6 +88066,105 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** `${p.profile_type`, `:`, `===`, `border`, `font-black`, `font-bold`, `group`, `individual`, `inset-0`, `italic`, `mb-1`, `mb-2`, `px-2`, `px-8`, `py-0.5`
 
 ---
+# FILE: src\views\checkout\OdemeKapaliBilgi.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\tmp\vh-comp\src\views\checkout\OdemeKapaliBilgi.tsx
+skeleton_hash: 5b4473cedcf55765
+entity_hashes:
+  func:OdemeKapaliBilgi: 93714afd24653501
+  overview: 2040a2ed743aa406
+  style_tokens: 851f356ba32aba85
+generated_at: 2026-08-28T11:56:49Z
+---
+
+## Genel Bakış
+Bu modül, ödeme sürecinin (checkout) kapalı olduğu durumlarda kullanıcıya bilgilendirme mesajı gösteren bir React bileşeni içerir. Tek bir fonksiyonel bileşenden oluşan minimal bir modüldür.
+
+## Fonksiyon Grupları
+
+### Kullanıcı Arayüzü Bileşeni
+Ödeme işleminin kullanılamadığı durumda ekrana bilgilendirici bir içerik render eder.
+- OdemeKapaliBilgi
+
+## Bağımlılıklar ve Mimari Notlar
+
+- **İç bağımlılık:** Tek fonksiyon içerdiğinden iç çağrı ilişkisi bulunmuyor.
+- **Dış bağımlılık:** Kaynak dosyada hangi modüllerin import edildiği belirtilmemiştir; bilinmiyor.
+- **Mimari önem:** Checkout akışının bir parçası olarak, ödeme servisinin kapalı olduğu senaryoda kullanıcı deneyimini koruyan bir kenar durum (edge case) bileşenidir.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### OdemeKapaliBilgi
+**Ne yapar**: Ödeme yolunun kapalı olduğu durumlarda kullanıcıya bilgi kartı gösteren bir React fonksiyonel bileşenidir. Şirket kuruluşu henüz tamamlanmadığında ödeme işleminin gerçekleştirilemeyeceğini kullanıcıya bildirmek amacıyla kullanılır. Recep talimatı doğrultusunda 2026-08-28 tarihinde oluşturulmuştur.
+
+**Nasıl yapar**: Herhangi bir dış parametre almayan bir fonksiyonel bileşen olarak tanımlanmıştır. Fonksiyon çağrıldığında `React.FC` tipinde bir bileşen döndürür. Docstring bilgisine göre bileşen, ödeme yolunun kapalı olduğunu belirten bir bilgi kartı arayüzü render eder. Bileşenin iç yapısı (hangi JSX elemanlarını kullandığı, stil bilgisi, koşullu render mantığı vb.) verilen kaynakta detaylandırılmamıştır.
+
+**Parametreler**:
+- Fonksiyon tanımlamasında herhangi bir parametre belirtilmemiştir.
+
+**Dönüş**: `React.FC` — React fonksiyonel bileşen tipinde bir değer döndürür. Bu, bileşenin JSX olarak render edilebilir bir React elemanı ürettiği anlamına gelir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/whatsapp::getSupportLink
+- import: react::React
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/views/checkout/OdemeKapaliBilgi.tsx::OdemeKapaliBilgi
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `checkout.kapali.baslik`, `checkout.kapali.aciklama`, `checkout.kapali.whatsappCta`, `checkout.kapali.emailCta` anahtarlarıyla metinleri çözümlemek için kullanılır
+  - `lang` — `useI18n()` hook'undan destructure edilen mevcut dil kodu; `getSupportLink` fonksiyonuna ikinci argüman olarak aktarılır
+  - `whatsappLink` — `getSupportLink(t('checkout.kapali.baslik'), lang)` çağrısının dönüş değeri; koşullu olarak `<a>` elementinin `href` niteliğine atanır, falsy ise WhatsApp butonu render edilmez
+- **Dönüş**: JSX — ödeme kapalı bilgi sayfasını gösteren tam sayfa düzeni; beyaz kart içinde başlık (`h1`), açıklama (`p`) ve iki buton (koşullu WhatsApp linki, sabit e-posta linki `mailto:info@venthub.com.tr`) içerir
+
+---
+
+## NODE ID STANDARD
+
+  file: src\views\checkout\OdemeKapaliBilgi.tsx
+  function: src\views\checkout\OdemeKapaliBilgi.tsx::OdemeKapaliBilgi
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: OdemeKapaliBilgi
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `rounded-hvac-2xl`, `rounded-hvac-lg`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-primary-navy`, `bg-white`, `border-light-gray`, `border-primary-navy`, `hover:bg-air-blue`, `hover:bg-secondary-blue`, `text-2xl`, `text-center`, `text-primary-navy`, `text-steel-gray`, `text-white`
+- **Layout:** `flex`, `flex-col`, `gap-3`, `inline-flex`, `items-center`, `justify-center`, `max-w-xl`, `min-h-screen`, `p-8`, `shadow-sm`, `sm:flex-row`, `w-full`
+- **Varyant/Responsive:** `focus-visible:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-secondary-blue`, `font-bold`, `font-semibold`, `mb-3`, `mb-8`, `px-4`, `px-6`, `py-16`, `py-3`, `transition-colors`
+
+---
 # FILE: src\views\checkout\OrderSummarySidebar.md
 
 ---
@@ -89072,6 +89186,8 @@ entity_hashes:
   overview: 6ba63efad2b3f3df
 generated_at: 2026-08-25T08:45:55Z
 ---
+
+<!-- ORION-DONDURULMUS: gercek-sembol=4 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
 
 ## Genel Bakış
 Bu modül, ödeme (checkout) formunu dinamik olarak bir HTML container'a enjekte etme işlemini gerçekleştirir. Enjeksiyon sırasında mevcut render durumunu kontrol eder ve HTML içindeki script elementlerini güvenli biçimde yeniden canlandırır. Modül, DOM manipülasyonu ve script işleme sorumluluklarını üstlenir.
