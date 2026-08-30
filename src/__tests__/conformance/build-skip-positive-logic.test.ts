@@ -3,7 +3,19 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+/**
+ * AĞIR-SINIF ZAMAN AŞIMI EŞİĞİ — 60 sn (global varsayılan 20 sn, `vitest.config.ts`).
+ *
+ * Ölçüm 2026-08-30, **boş makine**: bu dosyanın gövdesi **9,27 sn** — yani 20 sn bütçesinin
+ * **%46'sı**. Bu test yük olmadan da kenardaydı; filo yükü onu yaratmadı, GÖRÜNÜR KILDI.
+ * Yük altında gözlenen amplifikasyon ~27× (tek gözlem: `eol-normalization` 1,47 → 39,9 sn).
+ *
+ * **60 sn'yi aşan bir kırmızı GERÇEK aşımdır** — yükün gürültüsü değil.
+ * Gerekçe zinciri ve adı konmuş artık risk: `docs/standards/fleet-mechanism-standard.md` §13.
+ */
+vi.setConfig({ testTimeout: 60_000 })
 
 /**
  * INV-BUILD-SKIP · Vercel "Ignored Build Step" betiği POZİTİF mantıkla çalışır.

@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-30T17:36:31.496738+00:00
+compiled_at: 2026-08-30T18:14:48.326433+00:00
 total_compiled_files: 62
-source_commit: 50801522
+source_commit: 75d72015
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -8643,6 +8643,67 @@ cetvelin kendisi çakıştı (bir taraf §10, öteki §12) ve orada doğru çöz
 tutmak**tı. Reçeteyi ayrım yapmadan uygulamak, çakışmayı çözerken içerik silmektir; çakışan
 dosyanın **üretilmiş mi kaynak mı** olduğu önce ölçülür (`docs/artefakt_manifest.json`
 içinde mi?), sonra reçete seçilir.
+
+---
+
+## 13. AĞIR-SINIF TEST EŞİĞİ — ve adı konmuş artık risk
+
+**Ölçüldü 2026-08-30.** Filo aynı makinede paralel çalışırken iki conformance testi kırmızı
+verdi (`eol-normalization`, `build-skip-positive-logic`). İkisi de **assertion değil ZAMAN
+AŞIMI**ydı. ÜRÜN aynı olguyu bağımsız olarak, farklı ağaç ve dalda ölçtü — teşhis iki
+kaynaktan doğrulandı.
+
+### 13.1 Ölçüm — sınıf iki değil ON
+
+Alt süreç doğuran 16 conformance testinin tamamı boş makinede, ardışık ölçüldü:
+
+| test | boş gövde | alt süreç | 20 sn bütçesinin |
+|---|---|---|---|
+| `build-skip-positive-logic` | **9,27 sn** | 7 | %46 |
+| `githooks-doc-scope` | **8,38 sn** | 14 | %42 |
+| `bash-write-audit-tree` | 5,96 sn | 10 | %30 |
+| `e1-kimlik-kontrolu` | 5,05 sn | 6 | %25 |
+| `board-invariants` | 2,17 sn | 8 | %11 |
+| `precompact-durum-kapisi` | 1,79 sn | 3 | %9 |
+| `eol-normalization` | 1,47 sn | 2 | %7 |
+| `lane-precommit-merge` | 1,28 sn | 9 | %6 |
+| `companion-dondurulmus` | 1,15 sn | 2 | %6 |
+| `catalog-integrity-gate` | 0,995 sn | 3 | %5 |
+
+Kalan altısı 0,3 sn'nin altında ve rahat.
+
+⭐**Hükmü değiştiren oran:** `eol-normalization` boşta **1,47 sn**, yük altında **39,9 sn** —
+**~27×**. Bu çarpan tabloya uygulanınca boşta ~0,8 sn'yi geçen **her** test 20 sn'yi aşar.
+Yani risk kümesi iki değil **on**. "İki gözlem + on dört bilinmez" hâli böyle kapandı.
+
+⭐**Ve daha keskin bir ayrım:** `build-skip` boş makinede bile bütçenin **%46'sını** yiyordu.
+O test yük olmadan da kenardaydı. **Yük onu yaratmadı, GÖRÜNÜR KILDI.**
+
+### 13.2 Kural — global eşiğe DOKUNULMAZ
+
+Eşik **test dosyası başına** yazılır (`vi.setConfig({ testTimeout: 60_000 })`), global
+`vitest.config.ts` değeri **20 sn olarak kalır**. Gerekçe: 122 testin hepsi için eşiği
+büyütmek, gerçekten **asılmış** bir testin sinyalini de kör eder.
+
+Her eşiğin yanında **o dosyanın ölçülmüş boş-gövde değeri** ve 27× notu yazılıdır — ileride
+60 sn'yi aşan bir kırmızıyı gören kişi, bunun *gerçek* bir aşım olduğunu ve varsayımın
+nereden geldiğini okuyabilsin.
+
+**Mekanizma ayırt edici testle kanıtlandı, beyanla değil:** 25 sn uyuyan bir sınav testi,
+`setConfig` **varken** yeşil (çıkış 0), **sökülünce** kırmızı (`Test timed out in 20000ms`,
+çıkış 1). "Eşiği yazdım" cümlesi, eşiğin uygulandığının kanıtı değildir.
+
+### 13.3 ⚠ADI KONMUŞ ARTIK RİSK — kabul edildi
+
+**Aşırı yük altında `build-skip-positive-logic` 60 sn'yi de aşabilir** (9,27 × 27 ≈ 241 sn).
+Bu risk **bilinerek kabul edilmiştir**: eşiği 240 sn'ye çekmek "hiç kırmızı olmayan" bir kapı
+üretir ve asılma sinyalini tamamen kör eder. Kör kapı, kırılgan kapıdan kötüdür.
+
+⚠**Ölçülmeyen, adıyla:** 27× çarpanı **tek gözlemden** gelir (`eol`). `build-skip`'in gerçek
+amplifiye süresi **ölçülmedi** — 20 sn'de kesildi. Tablo bu varsayımla okunur.
+
+⚠**Kapsam dışı bırakılan, adıyla:** `catalog-integrity-gate` (0,995 sn) eşiğin hemen altında
+ve bu şeridin claim'inde değil — dokunulmadı. Bir sonraki yük dalgasında ilk aday odur.
 
 
 ---

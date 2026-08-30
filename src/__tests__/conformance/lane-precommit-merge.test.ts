@@ -1,7 +1,15 @@
 import { execFileSync, spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+/**
+ * AĞIR-SINIF ZAMAN AŞIMI EŞİĞİ — 60 sn (global varsayılan 20 sn, `vitest.config.ts`).
+ * Ölçüm 2026-08-30, boş makine: gövde **1,28 sn**, 9 alt süreç çağrısı.
+ * Yük altında gözlenen amplifikasyon ~27× (tek gözlem: `eol` 1,47 → 39,9 sn).
+ * 60 sn'yi aşan kırmızı GERÇEK aşımdır. Gerekçe: `docs/standards/fleet-mechanism-standard.md` §13.
+ */
+vi.setConfig({ testTimeout: 60_000 })
 
 /**
  * INV-BOARD-7 · E1 pre-commit şerit kapısı — MERGE COMMİTİ MUAF, kendi yazımı DEĞİL.
