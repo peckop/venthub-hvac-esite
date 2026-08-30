@@ -1,6 +1,20 @@
 import { execFileSync } from 'node:child_process'
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+/**
+ * AĞIR-SINIF ZAMAN AŞIMI EŞİĞİ — 60 sn (global varsayılan 20 sn, `vitest.config.ts`).
+ *
+ * ⭐BU DOSYA SINIFIN ÖLÇÜM KAYNAĞIDIR. 2026-08-30: boş makinede gövde **1,47 sn**, ama filo
+ * yükü altında (aynı makinede ikinci bir tam takım + `pnpm install`) **39,9 sn** ölçüldü ve
+ * 20 sn'de kesildi — yani **~27× amplifikasyon**. Kırmızı bir assertion değil, ZAMAN AŞIMIYDI.
+ * ÜRÜN aynı olguyu bağımsız olarak, farklı ağaç ve dalda doğruladı.
+ *
+ * 27× çarpanı işte bu tek gözlemden gelir; sınıfın diğer dosyalarındaki eşik bu sayıya
+ * dayanır. **60 sn'yi aşan bir kırmızı GERÇEK aşımdır.**
+ * Adı konmuş artık risk: `docs/standards/fleet-mechanism-standard.md` §13.
+ */
+vi.setConfig({ testTimeout: 60_000 })
 
 /**
  * INV-EOL-1 · Satır-sonu fantomu geri gelmesin (T017-VH).
@@ -49,7 +63,30 @@ import { describe, expect, it } from 'vitest'
  * temiz kalır. Doğru durum `i/lf w/crlf`'tir.
  */
 
-const MUAF_ONEKLER = ['.archive/']
+/**
+ * MUAFİYET LİSTESİ BOŞ — ve bu bir eksiklik değil, kapanmış bir borç (2026-08-28, REC-84).
+ *
+ * Burada `.archive/` vardı ve dosya başındaki yorum onu "YÜK TAŞIYOR: kaldıran 40 kırmızı
+ * görür" diye kilitlemişti. Doğruydu: o 40 dosya (36 `.ps1` + 4 `.bat`) `i/crlf w/crlf` idi
+ * ve muafiyet kaldırılsa kapı haklı olarak kırmızı yanacaktı. Muafiyeti kaldırmak için
+ * VERİYİ düzeltmek gerekiyordu, testi değil — ki bu turda yapılan tam olarak budur:
+ * `git add --renormalize .archive/legacy_superpowers_artifacts/`.
+ *
+ * ÖLÇÜLDÜ (commit SONRASI — commit ÖNCESİ ölçüm bu kapı için geçersizdir, aşağıdaki
+ * yanlış-kırmızı notuna bakın): depoda `i/crlf` 0, `i/mixed` 0. İçerik korundu:
+ * `git diff --cached -w --numstat` ile satır düzeyinde değişen 40 arşiv dosyası YOK.
+ *
+ * ⚠ ÖLÇÜT SEÇİMİ, aynı turda tökezleyip düzelttiğim yer: `--ignore-all-space --name-only`
+ * 41 dosya listeliyor, `--numstat -w` ise yalnız 1. İkisi ZIT cevap veriyor çünkü
+ * `--name-only` blob farkına bakıp dosyayı değişmiş sayıyor, hunk üretimini beklemiyor.
+ * "İçerik değişmedi" iddiasının dayanağı `--numstat -w`'dir; `--name-only` ile bakan biri
+ * içeriğin değiştiği sonucuna varır ve renormalize'i haksız yere geri alır.
+ *
+ * Bir sonraki muafiyet eklenecekse: gerekçesini ÖLÇÜMLE yaz ve yanına onu kilitleyen bir
+ * test koy — kaldırılabilir hâle geldiğinde kapının kendisi haber verir. Bu turda tam
+ * olarak öyle oldu: veriyi düzelttim, o test kırmızı yandı ve "artık beni sil" dedi.
+ */
+const MUAF_ONEKLER: string[] = []
 
 interface EolKaydi {
   index: string
@@ -172,27 +209,29 @@ describe('INV-EOL-1 · index satır sonu', () => {
     ).toEqual([])
   })
 
-  it('.archive/ muafiyeti YÜK TAŞIYOR — gerekçesi ölçümle sabit', () => {
-    // Bu test bir İHLALİ değil, muafiyetin GEREKÇESİNİ kilitliyor. Dosya başındaki yorum
-    // uzun süre ".archive'daki .ps1'ler w/-text olduğu için zaten kapsam dışı" diyordu ve bu
-    // yanlıştı — yani muafiyet kaldırılsa 40 dosya kırmızı yanacaktı, oysa yorumu okuyan
-    // "gereksiz, kaldırabilirim" sonucuna varırdı. Ölçüm gerçeği söylüyor.
+  it('.archive/ artık KAPSAM İÇİNDE — muafiyet kaldırıldı, kapı orayı gerçekten görüyor', () => {
+    // Buradaki eski test muafiyetin GEREKÇESİNİ kilitliyordu ve işini yaptı: veri
+    // düzeltilince kırmızı yanıp "artık beni sil" dedi (2026-08-28, REC-84). Yerine bu kol
+    // geldi, çünkü muafiyeti kaldırmak TEK BAŞINA yeterli değil — birisi yarın onu geri
+    // ekleyebilir ya da `.archive` izlemeden düşebilir; iki hâlde de kapı sessizce daralır.
+    //
+    // NİÇİN AYRI KOL: ilk iddia (i/crlf yok) `.archive` hiç izlenmiyorken de YEŞİL kalır —
+    // yani hiçbir şey ölçmeden geçer. Bu kol o boş-geçişi kapatıyor: hem dosyaların VAR
+    // olduğunu hem muafiyet listesinin onları DIŞLAMADIĞINI ölçer.
     const arsiv = eolKayitlari().filter(k => k.yol.startsWith('.archive/'))
-    expect(arsiv.length, '.archive/ altında hiç izlenen dosya yok — ölçüm yolu bozulmuş olabilir').toBeGreaterThan(0)
-
-    const gizlenen = arsiv.filter(k => k.index === 'i/crlf' && k.worktree !== 'w/-text')
     expect(
-      gizlenen.length,
-      'İYİ HABER olabilir: .archive/ altında artık "i/crlf" dosya YOK. Öyleyse bu önek ' +
-        'muafiyeti gereksizleşti — MUAF_ONEKLER listesinden çıkar ve bu testi sil. ' +
-        'Muafiyeti gerekçesiz taşımak, ileride oraya giren gerçek bir ihlali gizler.',
-    ).toBeGreaterThan(0)
+      arsiv.length,
+      '.archive/ altında hiç izlenen dosya yok — ya arşiv silindi ya ölçüm yolu bozuldu. ' +
+        'Her iki hâlde de aşağıdaki "i/crlf yok" iddiası orayı ölçmediği hâlde yeşil kalır.',
+    ).toBeGreaterThan(100)
 
-    // Yanlış gerekçeyi bir daha yazmamak için: bu dosyalar w/-text DEĞİL.
+    const dislanan = arsiv.filter(k => MUAF_ONEKLER.some(onek => k.yol.startsWith(onek)))
     expect(
-      gizlenen.filter(k => k.worktree === 'w/-text').length,
-      'ölçüm çelişkili: filtre w/-text olmayanları seçti ama içinde w/-text var',
-    ).toBe(0)
+      dislanan.map(k => k.yol),
+      '.archive/ yeniden MUAF_ONEKLER kapsamına girmiş. O muafiyet 40 dosyalık gerçek bir ' +
+        'ihlali gizliyordu; veri renormalize ile düzeltildi ve muafiyet KALDIRILDI. ' +
+        'Geri eklemek yerine sebebi ölçün: git ls-files --eol | grep -E "^i/(crlf|mixed)".',
+    ).toEqual([])
   })
 
   it('ölçüm aracı GERÇEKTEN çalışıyor (vacuous-pass koruması)', () => {

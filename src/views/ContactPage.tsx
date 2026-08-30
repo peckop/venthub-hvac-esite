@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckCircle,Clock, Mail, MapPin, Phone } from 'lucide-react'
+import { CheckCircle,Clock, Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 import React, { useState } from 'react'
 
@@ -12,7 +12,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { reportError } from '../lib/errorReporter'
 import { submitContactMessage } from '../lib/services/contactMessageService'
 import { supabaseBrowserClient } from '../lib/supabase/client'
-import { getSupportLink } from '../utils/whatsapp'
+import { getSupportLink, getWhatsAppNumber } from '../utils/whatsapp'
 
 const ContactPage: React.FC = () => {
   const { t, lang } = useI18n()
@@ -32,27 +32,34 @@ const ContactPage: React.FC = () => {
   const [contactGridRef, contactGridVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })
   const [formSuccessRef, formSuccessVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
 
+  /**
+   * ⚠️ UYDURMA İLETİŞİM BİLGİSİ BASILMAZ (2026-08-28, Recep talimatı — canlıya çıkış hazırlığı).
+   *
+   * Burada üç kusur vardı: sabit yazılmış bir telefon numarası, `venthub-hvac.com` gibi
+   * sahip olunmayan bir e-posta alan adı, ve `maps.google.com`'a giden gerçek-dışı bir
+   * ofis kartı. Müşteriye ulaşamayacağı bir numara göstermek, hiç göstermemekten kötüdür.
+   *
+   * KURAL: numara ENV'den gelir; ENV yoksa kart HİÇ ÜRETİLMEZ (boş/uydurma değer yerine
+   * yokluk). Ofis kartı, gerçek adres olana kadar bilinçli olarak YOK.
+   */
+  const whatsappNumber = getWhatsAppNumber()
+
   const contactCards = [
-    {
-      icon: Phone,
-      title: t('contactPage.form.cardPhoneTitle'),
-      value: '+90 (544) 245 02 05',
-      href: 'tel:+905442450205',
-      label: t('contactPage.form.cardPhoneLabel')
-    },
+    ...(whatsappNumber
+      ? [{
+          icon: Phone,
+          title: t('contactPage.form.cardPhoneTitle'),
+          value: `+${whatsappNumber}`,
+          href: `tel:+${whatsappNumber}`,
+          label: t('contactPage.form.cardPhoneLabel')
+        }]
+      : []),
     {
       icon: Mail,
       title: t('contactPage.form.cardEmailTitle'),
-      value: 'info@venthub-hvac.com',
-      href: 'mailto:info@venthub-hvac.com',
+      value: 'info@venthub.com.tr',
+      href: 'mailto:info@venthub.com.tr',
       label: t('contactPage.form.cardEmailLabel')
-    },
-    {
-      icon: MapPin,
-      title: t('contactPage.form.cardOfficeTitle'),
-      value: t('contactPage.form.cardOfficeValue'),
-      href: 'https://maps.google.com',
-      label: t('contactPage.form.cardOfficeLabel')
     }
   ]
 
@@ -119,12 +126,13 @@ const ContactPage: React.FC = () => {
       {/* Quick Contact Grid */}
       <section className="py-24">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
-          <div ref={contactGridRef} className="grid md:grid-cols-3 gap-8">
+          {/* Sütun sayısı 3'ten 2'ye indi: ofis kartı kaldırıldı (uydurma adres) ve
+              telefon kartı ENV'e bağlandı; 3 sütunlu ızgara sağda boşluk bırakırdı. */}
+          <div ref={contactGridRef} className="grid md:grid-cols-2 gap-8">
             {contactCards.map((card, i) => (
               <a
                 key={i}
                 href={card.href}
-                target={card.icon === MapPin ? "_blank" : undefined}
                 className={scrollAnimationClasses.fadeUp(contactGridVisible) + " group p-10 rounded-hvac-2xl bg-white border border-slate-100 transition-colors duration-500 hover:border-cyan-500/20 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]"}
                 style={scrollAnimationClasses.staggerChild(i)}
               >

@@ -275,6 +275,19 @@ kimse kırmızı görmez). Arayüzdeki kapalı düğme **üçüncü** bir kapıd
 `valid_until`, `draft → quoted` geçişinde **NOT NULL** olmak zorundadır — süresiz teklif
 yayımlanamaz.
 
+**Ek kural — yayım anında `valid_until` GELECEKTE olmalıdır** (REC-54/E5 Faz 1, 2026-08-28).
+NOT NULL tek başına yetmez: geçmişe tarihli bir yayım, **doğduğu anda süresi geçmiş** bir belge
+üretir — Kapı 2 onu hemen reddeder, ama belge yine de "yayımlandı" damgasını almış olur ve
+müşteriye gönderilebilir. Kural yayım ucunda (`admin_publish_quote`) zorlanır. Tetiğe
+konmamasının sebebi adıyla: tetik `expired` yönünü de görür ve orada `valid_until` zaten
+geçmiştedir; şartı tetiğe koymak meşru bir geçişi kırardı.
+
+**⚠ `currency` kolon düzeyinde de kısıtlıdır** (aynı iş): `venthub_quotes.currency` üzerinde
+`^[A-Z]{3}$` CHECK kısıtı vardır. Niçin gerekti — ölçüldü: kolon `character(3)` olduğu için
+**boş değer üç boşluğa dönüşür ve `IS NULL` FALSE verir**; yani yayım kapısının "para birimi
+dolu olsun" şartı boş bir para birimini GEÇİRİYORDU. Kısıt DB'dedir, uygulama gövdesinde değil —
+beyaz listeyi tek bir giriş noktasına koymak diğer yazma yollarını korumaz.
+
 ## 7) Kabul — tek kavram, üç kanal, zorunlu kanıt
 
 ### 7.1 Üç kanal
@@ -368,13 +381,24 @@ taşısın" deseydik bugünkü doğru politikaları kırmızıya düşürürdük
 **Korunan değişmez:** teklif tablolarına INSERT eden her politika **ya `is_admin_user()`
 şartı taşır, ya da yazdığı/bağlandığı teklifin durumunu `'requested'` değerine çiviler.**
 
-**Niçin bu sınır (canlı ölçüm, 2026-08-27):** `'draft'` admin'in teklifi yazdığı,
-**fiyatın oluştuğu** durumdur. `authenticated` rolünün INSERT kolon yetkisi
-`venthub_quotes`'ta **7**, `venthub_quote_items`'ta **8** kolondur ve grant admin ile
-müşteriye **aynı anda** verilir — admin de `authenticated`'tır. Durumu çivilemeyen bir
-müşteri-INSERT politikası eklenirse müşteri kendine doğrudan `'draft'` teklif üretip
-fiyat yazabilir ve akışın tamamını atlar. **Grant daraltmak çözüm değildir** (admin'i
-kırar); koruma politikanın gövdesindeki `status = 'requested'` çivisidir.
+**Niçin bu sınır (canlı ölçüm, 2026-08-27 — Kol A ile DÜZELTİLDİ):** `'draft'` admin'in
+teklifi yazdığı, **fiyatın oluştuğu** durumdur. `authenticated` rolünün INSERT kolon
+yetkisi `venthub_quotes`'ta **7**, `venthub_quote_items`'ta **8** kolondur — **ama
+`status` o 7'nin içinde, `unit_price`/`currency` de o 8'in içinde DEĞİLDİR.** Yani
+bugün hiçbir `authenticated` istemci ne `'draft'` yazabilir ne fiyat; admin de
+`authenticated` olduğu için **admin de yazamaz**.
+
+> **Öz-düzeltme (yazan: AUTH).** Bu paragrafın ilk hâli "grant zaten `authenticated`'a
+> açık, daraltmak çözüm değildir" diyordu. O cümle **kolon sayısını sayıp hangi kolonlar
+> olduğunu ölçmemişti**; agrega sayı, ters gideni gizlemişti. Doğrusu yukarıdadır.
+
+**Tehlike kalkmadı, ERTELENDİ — bekçinin varlık sebebi tam olarak budur.** Bugün müşteriyi
+`'draft'`ten ayıran şey politikanın çivisi değil, grant'ın darlığıdır. Ama E5 Kompozör'ün
+admin ekranı **tam da bu grant'ın genişletilmesini** gerektirecek (Kol A ölçtü: admin
+bugün draft teklif açamıyor, çünkü `status` yetkisi yok). Grant genişlediği an, müşteriyi
+`'draft'`ten ayıran **tek** katman politikanın gövdesindeki `status = 'requested'`
+çivisi olacaktır. Koruma, geçici bir grant darlığına değil **politikaya** yaslanmalıdır;
+grant daraltmak da çözüm değildir çünkü admin de `authenticated`'tır.
 
 **Bekçi:** `src/__tests__/conformance/quote-insert-policy-guard.test.ts`. Bütün
 migration'ları okur, seçimi **ada değil içeriğe** göre yapar (yeniden adlandırma
@@ -397,6 +421,43 @@ politika kırmızı yakar ve insan gözden geçirmesini zorlar. Sessizce eklenem
 bugün **sıfır çağıranı** vardır — depoda admin `'draft'` teklif üreten kod yolu yoktur
 (tek INSERT yolu `quoteService.ts` `createQuoteRequest`, o da müşteri yoludur). Kapı
 açıktır, geçen henüz yoktur; geçişi E5 Kompozör (REC-54 Kalem 2) yazacaktır.
+
+**Kol A — DAVRANIŞSAL kanıt (2026-08-27, `begin … rollback`, prod'a kalıcı yazma **0**;
+koşum öncesi/sonrası satır sayımı `venthub_quotes` 0→0, `venthub_quote_items` 0→0):**
+
+| kol | beklenen | gözlenen | reddi YAPAN katman |
+|---|---|---|---|
+| müşteri kendi `'requested'` teklifini açar | KABUL | kabul edildi | — |
+| kendi teklifine **fiyatsız** kalem | KABUL | kabul edildi | — |
+| **aynı** kalem + `unit_price` | RED | `42501` | **GRANT** (fiyat kolonu yetkisi yok) |
+| başka müşteri → gerçek teklife kalem | RED | `42501` | **RLS** |
+| admin → `'requested'` teklife kalem | RED | `42501` | **RLS** (politika `'draft'` ister) |
+| sahte tenant claim'i + gerçek tenant satırı | RED | `42501` | **RLS** |
+| başkası adına teklif | RED | `42501` | **RLS** |
+| **admin `'draft'` teklif açar** | KABUL bekleniyordu | `42501` | **GRANT** — ⚠ politika **ulaşılamaz** |
+
+Son satır bu koşumun asıl bulgusudur: `quotes_insert_admin_draft` ve
+`quote_items_insert_admin` **canlıdır ama hiçbir `authenticated` istemci onlara
+ulaşamaz.** E5 Kompozör bugünkü hâliyle PostgREST üzerinden ne draft teklif açabilir ne
+fiyat yazabilir; ya service_role'lü bir Edge Function yolu seçilecek ya da grant
+genişletilecektir. Bu bir **karar** kalemidir (REC-54 Kalem 2).
+
+**Ön koşullar AYIRT EDİCİ kuruldu — yoksa sekiz kolun sekizi de sahte yeşil olurdu:**
+(a) rol `authenticated`, `rolsuper`/`rolbypassrls` **false** ölçüldü; bağlantının kendi
+rolü `postgres`'tir ve tabloların **sahibidir**, `relforcerowsecurity` de `false` —
+yani rol değiştirilmeseydi RLS **hiç** değerlendirilmezdi. (b) `request.jwt.claims`
+**gerçekten okunuyor**: bunu ölçmek için bilerek **var olmayan** bir tenant verildi, çünkü
+depodaki tek tenant `jwt_tenant_id()`'nin sessiz fallback değerinin **ta kendisidir** ve
+"tenant eşleşti" gözlemi claim hiç okunmasa da aynı çıkardı. (c) `42501`'ler **mesajdan**
+ayrıştırıldı: `row-level security policy` ≠ `permission denied for table`; ayrıştırılmasaydı
+grant reddi RLS kanıtı sanılırdı.
+
+⚠ **`is_admin_user()` gövdesinin ilk satırı `service_role`'de koşulsuz `TRUE` döner.**
+Bu doğrulamayı ayrıcalıklı bir bağlantıda koşmak sekiz kolu da yeşil gösterir ve **hiçbir
+şey ölçmez**. Aynı sınıftan iki tuzak daha koşum sırasında yakalandı ve betik düzeltildi:
+`venthub_quotes.source` bir CHECK kısıtına (`pdp|cart|project`) tabidir ve
+`user_id` **`auth.users`'a FK taşır** — sentetik kimlikle kurulan "kabul" kolları
+RLS'e hiç gelmeden `23514`/`23503` ile düşer ve bu, RLS reddi sanılabilirdi.
 
 ### 7.3 Eşik — mekanizma otonom, değer config
 
@@ -428,10 +489,17 @@ tetik + revalidate şartı **bu modüle uygulanmaz.** Sınır şartı aynen taş
 gün statik bir yüzeye çıkarsa, o PR aynı gün DB tetiği + revalidate dalını getirmek zorundadır.
 ## 8.5) Ekran yerleşimi — E5 Kompozör (T133 bağı)
 
-> **Kaynak:** `erp-workspace-design-standard.md` v0 (T133-VH, commit `44def9e8`, 318 satır).
-> Bu belge yazıldığında o cetvel **henüz gönderilmemişti**; kararlar ADMIN'in 08-20 08:50
-> panosundan alındı ve dosya indiğinde birebir aynısı okunacak. Dosya inince bu bölümün
-> kaynağı **dosya adına** çevrilir.
+> **Kaynak:** `docs/standards/erp-workspace-design-standard.md` §3/E5 — v0, T133-VH,
+> commit `60aacb61` (PR #702, 2026-08-20), 345 satır. **DOSYA İNDİ ve bu satır 2026-08-28'de
+> ölçümle güncellendi.**
+>
+> Bu bölüm yazıldığında cetvel henüz gönderilmemişti; kararlar ADMIN'in 08-20 08:50 panosundan
+> alınmış ve bölümün kendi talimatı *"dosya inince kaynağı dosya adına çevir"* demişti. Çevrildi.
+> Aynı talimatın ikinci yarısı **"birebir aynısı okunacak"** idi ve o da ölçüldü: inen dosyadaki
+> E5 yerleşim şeması (üst durum şeridi · sol salt-okunur bağlam · orta kalem tablosu · sağ canlı
+> önizleme · alt eylem çubuğu) ve dört kompozör kuralı, aşağıdaki tabloyla **birebir örtüşüyor**.
+> Sapma yok. (Eski satırdaki `44def9e8` ve *318 satır* değerleri merge öncesi dal durumuna aitti;
+> inen hâlin ölçülen değerleri yukarıdadır.)
 
 Teklif kompozörü, T133'ün beş kanonik ekran deseninden **E5 (Kompozör)**'dür ve teklif modülü
 o desenin **ilk uygulamasıdır**. ADMIN bunu adıyla işaretledi: E5 ödünç bir desen değil —

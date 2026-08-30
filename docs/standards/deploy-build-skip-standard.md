@@ -42,6 +42,7 @@ tetikler**; yalnız §D3'te ADIYLA sayılan sınıf atlanır.
 | `registry/**` | İş emri kayıtları |
 | `LICENSE` | Metin |
 | `scripts/board/**` | Şerit panosu araçları. Ölçüldü (2026-08-26): `package.json`, `next.config.mjs`, `vercel.json`, `.github/workflows/*` içinde `scripts/board` geçen **tek bir referans yok**. Pozitif kontrolle doğrulandı — aynı arama `scripts/setup-hooks` için referans **buluyor**. → D3.1 |
+| `scripts/hijyen/**` | Ağaç hijyeni araçları (kirli sayacı, ağaç-silme kapısı). Ölçüldü (2026-08-27): aynı arama, aynı dosyalar — `scripts/hijyen` geçen **0 referans**; pozitif kontrol `scripts/setup-hooks` için **1 referans** buluyor, yani arama gerçekten arıyor. Gerekçe `scripts/board/**` ile aynı sınıf. |
 | `.githooks/**` | Git kancalarının **kendisi** (kancaları kuran betik değil). Derleme hattıyla dolaylı bağı VAR ama üç ölçülmüş sebeple atlanabilir. → D3.1 |
 
 **Bilerek DIŞARIDA (build tetikler):** `supabase/migrations/**` — build'i doğrudan
@@ -218,8 +219,9 @@ inandırıcı görünüyordu. *Doğru gerekçe, ölçülmemiş premis.*
 | Sıra | Taban | Koşul |
 |---|---|---|
 | 1 | `VERCEL_GIT_PREVIOUS_SHA` | Yalnız commit **bu klonda gerçekten varsa** |
-| 2 | `git merge-base HEAD origin/<varsayılan dal>` | (1) çözülemezse |
-| — | *(hiçbiri)* | → **BUILD** |
+| 2 | `git merge-base HEAD origin/<varsayılan dal>` | (1) çözülemezse; ref yoksa **refspec çekmesi** denenir |
+| 3 | `git fetch origin <varsayılan dal>` → `FETCH_HEAD` | (2)'nin refspec biçimi reddedilirse |
+| — | *(hiçbiri)* | → **BUILD**, ve **her başarısız denemenin SEBEBİ günlüğe yazılır** |
 
 (1) en doğrusudur: son **başarılı** dağıtımdan bu yana biriken tüm değişiklikleri
 kapsar. Ama **yeni bir dalın ilk dağıtımında yoktur** ve bu depoda kural
@@ -233,6 +235,142 @@ arkaya atlanmış commit'lerden sonra daha eski bir kaynak değişikliğini gör
 
 Zincirin **hangi adımının kazandığı günlüğe yazılır**. Bu tesadüfi bir ayrıntı değil:
 yukarıdaki kusur tam olarak "hangi dalın çalıştığını göremediğimiz" için sessiz kaldı.
+
+### ⭐D8.1 — ZİNCİRİN 2. ADIMI ÜRETİMDE HİÇ ÇALIŞMADI (2026-08-27, ölçüldü)
+
+Yukarıdaki hüküm "(2) dalın tamamını kapsar" diyor ve **doğru**; ama üretimde o adıma
+hiç sıra gelmiyordu. Vercel'in **sığ klonunda `origin/master` yok**, ve betiğin çekme
+denemesi `2>/dev/null || true` ile **yutuluyordu** — başarısızlığın sebebi günlüğe hiç
+düşmedi. Sonuç: **pozitif sınıf listesi bir kez bile değerlendirilmedi**, salt-`.md`
+push'lar dağıtım yaktı ve HOBBY günlük kotası doldu, tren durdu.
+
+**Kanıt — üç ayrı dağıtımın build günlüğü, üçünde de birebir aynı iki satır:**
+
+```
+ignore-build: VERCEL_GIT_PREVIOUS_SHA bos (dalin ilk dagitimi) -> ortak ataya dusuyorum
+ignore-build: origin/master bu klonda yok -> BUILD
+```
+
+`d9f31989` (TEMIZLIK companion) · `f4c5c25f` (ALTYAPI 18 companion) · `304a1785` (I18N varyant).
+
+**KUSURUN SINIFI — doğru davranış yetmez, GÖREBİLMEK gerekir.** Fail-safe'in kendisi
+doğruydu: taban çözülemeyince BUILD demek doğru karardır. Kapı da bunu sınıyordu ve
+*"origin/master hiç yoksa BUILD"* kolu **yeşildi**. Ama hiçbir kol şunu sormuyordu:
+**bu dal üretimde İSTİSNA mı, yoksa TEK yol mu?** Sessiz bir fail-safe, "kapı çalışıyor"
+ile "kapı hiç sıra bulamıyor" hallerini ayırt edilemez kılar.
+
+### D8.2 — GERÇEK SEBEP: Vercel klonunda `origin` UZAĞI HİÇ YOK
+
+Görünürlük onarımı **ilk koşumunda** cevabı verdi (dağıtım `5cjXTJWY`, PR #875'in kendi önizlemesi):
+
+```
+ignore-build: refspec cekmesi basarisiz -> fatal: 'origin' does not appear to be a git repository
+```
+
+Sorun refspec biçimi ya da klon derinliği **değildi**: Vercel'in derleme klonunda uzak
+**tanımlı değil**. Yani `origin`'e yapılan hiçbir çekme tutamazdı — hangi refspec'i
+denersek deneyelim. On günlük sessizliğin tek cümlelik sebebi budur.
+
+**Çözüm:** uzak yoksa URL ortamdan kurulur —
+`https://github.com/$VERCEL_GIT_REPO_OWNER/$VERCEL_GIT_REPO_SLUG.git`. Depo **public**
+olduğu için kimlik gerekmez. Repo bir gün private olursa çekme başarısız olur ve
+fail-safe aynen işler (→ BUILD); yani bu çözüm güvenliği gevşetmez.
+
+Kapı bu yolu **ağsız** koşturur: yerel bir bare depo `origin` olarak bağlanır,
+`refs/remotes/origin/master` silinir, betik gerçekten çekmek zorunda kalır.
+Sabotajla kanıtlandı — **her iki** çekme denemesi de kapatılınca kol düştü, geri
+konunca yeşil. (İlk sabotaj denemem yalnız birinci denemeyi kapatmıştı ve kol yeşil
+kaldı; "sabotaj sonuç değiştirmedi" demek yerine sabotajın kendisini ölçtüm, eksik
+olan oydu. Sabotaj, sınanan yeteneği GERÇEKTEN kaldırmalıdır.)
+
+### ⚠D8.3 — BİLİNEN BİLİNMEYEN: atlama çalışınca zorunlu `Vercel` check'i ne olur?
+
+**Bu soru bugüne kadar hiç ortaya çıkmadı, çünkü atlama hiç çalışmadı.** D8.1'den sonra
+çalışacak — ve o an yeni bir risk doğuyor. TEMİZLİK sordu, ölçmeye çalışıldı:
+
+- `master` dal koruması **zorunlu check** listesi: `["ci", "admin-smoke", "Vercel"]` (ölçüldü, `gh api .../branches/master/protection`).
+- Vercel dokümanı `ignoreCommand` exit 0 durumunda dağıtımın **CANCELED**'a geçtiğini yazıyor; **GitHub commit-status'a ne yazıldığını yazmıyor**.
+- **ÖNCÜL-ÖLÇÜM: ÖLÇÜLEMEZ** — ne depoda emsal var (atlama hiç koşmadı), ne vendor dokümanında cevap. Tek yol canlı deney.
+
+**RİSK, AÇIKÇA:** atlanan dağıtım zorunlu `Vercel` check'ini asla SUCCESS yapmazsa,
+salt-doküman PR'ları **merge edilemez** hale gelir. Bu, bir kilidi başka kilitle
+değiştirmek olur — kota duvarı kalkar, check duvarı doğar.
+
+**DENEY VE GERİ ALMA PLANI (D8.1 indikten sonra, merge ETMEDEN önce ölçülür):**
+
+1. Salt-`.md` bir dal açılır, push edilir.
+2. Ölçülür: `gh pr checks` → `Vercel` bağlamı SUCCESS mi, yok mu, FAILURE mı;
+   ve `gh pr view --json mergeStateStatus`.
+3. **SUCCESS ya da check hiç oluşmuyor + merge mümkün** → atlama sağlıklı, devam.
+4. **Check takılı kalıyor / FAILURE** → iki seçenek, ikisi de yazılı:
+   - `Vercel`i zorunlu listeden çıkarmak **ÖNERİLMEZ** (kapı "vitrin derleniyor mu"yu sorar);
+   - onun yerine atlama listesi **daraltılır** ya da atlama tamamen geri alınır
+     (`git revert`), kota sorunu Pro planla çözülür.
+
+Bu bölüm, "çözüm işe yaradı" denmeden önce **hangi ölçümün yapılacağını** yazar.
+Yazılmayan deney yapılmaz; yapılmayan deneyin yerini varsayım alır.
+
+---
+
+#### ✅D8.3 SONUÇ (2026-08-28, deney koşuldu — ölçüm: `docs/audits/build-skip-canli-olcum-2026-08-28.md`)
+
+**Risk çürüdü: atlanan dağıtım zorunlu `Vercel` check'ini YEŞİL yapıyor.** Kilit
+takası olmadı, geri alma planına gerek kalmadı.
+
+| Ölçüt | Ölçülen |
+|---|---|
+| Dağıtım kaydı | `CANCELED` |
+| GitHub `Vercel` damgası | `success` — *Canceled by Ignored Build Step* |
+| `mergeStateStatus` | `CLEAN`, kırmızı 0, `MERGEABLE` |
+
+Onarım (D8.2) bu koşumda **gerçekten sınandı** — dalın ilk dağıtımı olduğu için
+zincir 2 devreye girdi: `origin uzagi yok, URL ortamdan kuruldu` → `taban = origin/master
+ile ortak ata` → `tum degisiklikler build-disi sinifta -> ATLA`.
+
+**Aynı gün master koşumu bunu sınamamıştı** (taban zincir 1'den çözülmüştü). Onarımın
+gerektiği vaka **dalın ilk dağıtımıdır**; deney tam o vakayı kurmak için yeni dal açtı.
+
+##### SINIR — dört vaka ölçüldü, tek istisna ADLANDIRILDI
+
+| Vaka | Bağlam | Sonuç |
+|---|---|---|
+| `2d4dce40` | **dal** push'u, salt-`.md` | ATLANDI |
+| `3fd8e61b` | **dal** push'u, salt-`.md` | ATLANDI |
+| `6d246563` | **dal** push'u, belge-only (cetvel + artefakt + manifest) | ATLANDI |
+| `ef051d43` | **merge-prod** (master), belge-only, *tek başına* | ATLANDI (15 sn) |
+| `4e2e1bdb` | **merge-prod** (master), salt-`.md`, *başka dağıtım koşarken* | **ATLANMADI** |
+
+> **HÜKÜM:** belge-only değişiklik hem dal push'unda hem merge-prod'da **atlanır** ve
+> zorunlu `Vercel` check'i **yeşil** kalır.
+> **İSTİSNA:** dağıtım, master'da **başka bir dağıtım koşarken** tetiklenmişse atlama
+> kaçırılabilir.
+
+**İstisnanın açıklaması — desteklendi, kanıtlanmadı.** En makul okuma: ardışık
+dağıtımlarda `VERCEL_GIT_PREVIOUS_SHA` son *başarılı* dağıtımı gösterdiği için taban
+geride kalır; fark kümesine o aradaki commit'lerin **kaynak** dosyaları da girer ve
+betik **doğru** kararla BUILD der. Yani bu bir kusur değil, tabanın doğru ama eski olması.
+
+**Elenen açıklama (ölçümle çürütüldü):** "master üretim dağıtımında HEAD zaten varsayılan
+dalın ucudur, taban çözülemez ve `HEAD varsayilan dalin ucu … -> BUILD` dalı çalışır."
+Bu önerme **her** merge-prod'un BUILD etmesini öngörürdü; `ef051d43` atlandığı için
+yanlıştır — yani üretim dağıtımında da `VERCEL_GIT_PREVIOUS_SHA` **dolu** geliyor.
+
+**Nasıl çürütüldü (yöntem kayda değer):** hipotez sahibi onu `HİPOTEZ, ÖLÇMEDİM` diye
+etiketledi *ve* ayırt edici testi de yazdı. Etiket yanlış hükmü engelledi, test onu
+öldürdü. Etiket tek başına yeterli olmazdı — "muhtemel sebep" olarak yaşamaya devam ederdi.
+
+**PRATİK KURAL:** belge-only işler slot açısından ucuzdur; ama merge'i **master'da başka
+dağıtım koşmazken** yap, yoksa atlamayı kaçırırsın. Tek-tetikleme-tek-bekleyiş disiplini
+burada da geçerlidir — sebebi kota değil, taban tazeliğidir.
+
+**Kalan açık kalem (düşük öncelik, araç kısıtı):** uzun build günlüklerinin **başına**
+erişilemiyor (araç son N satırı veriyor), bu yüzden `4e2e1bdb`'nin `ignore-build:` satırı
+doğrudan okunamadı. Açıklama dolaylı kanıtla duruyor.
+
+**HÜKÜM:** taban çözümündeki her başarısız deneme, **adı ve sebebiyle** günlüğe yazılır.
+Bir adımın sessizce düşmesi yasaktır. Kapı bunu `taban çözülemediğinde SEBEP günlüğe
+yazılır` koluyla zorlar; kol bilerek bozularak kanıtlanmıştır (görünürlük satırları
+kaldırılınca kırmızı, geri konunca yeşil).
 
 ### Kapı bunu nasıl ölçüyor
 

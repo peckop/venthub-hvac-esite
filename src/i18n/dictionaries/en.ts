@@ -121,7 +121,6 @@ export const en: typeof tr = {
     whatsappSupportMessage: 'Quick support from website',
     pdf: 'PDF',
     sku: 'SKU',
-    pdfDatasheet: 'Technical Datasheet',
     share: 'Share',
     requestQuote: 'Request Quote',
     officialGuarantee: 'Official Guarantee',
@@ -246,8 +245,8 @@ export const en: typeof tr = {
   },
 
   home: {
-    seoTitle: 'VentHub - Premium HVAC Solutions | Fans, Speed Control, Heating & Cooling',
-    seoDesc: 'Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.',
+    seoTitle: 'VentHub | Industrial Ventilation and HVAC Engineering Solutions',
+    seoDesc: 'The right product, the right calculation, the right solution. From parking ventilation to heat recovery — engineering-backed selection at VentHub.',
     hero: {
       eyebrow: 'Engineering-Guided HVAC Commerce',
       title: 'Enter the right HVAC path from the first screen.',
@@ -271,7 +270,7 @@ export const en: typeof tr = {
         entryPaths: 'guided decision flow'
       },
       trustStrip: {
-        authorizedBrands: 'Authorized premium brands',
+        authorizedBrands: 'World-renowned brands',
         engineeringSupport: 'Engineering guidance',
         nationwideDelivery: 'Nationwide delivery',
         projectGuidance: 'Project-led selection support'
@@ -585,7 +584,7 @@ export const en: typeof tr = {
       support: '24/7 technical support'
     },
     heroTitle: 'Clean Air, Clean Future',
-    heroSubtitle: 'Turkey\'s most trusted HVAC distributor. 6 premium brands, 50+ product types for professional ventilation solutions.',
+    heroSubtitle: 'Engineering-driven ventilation platform. 6 leading brands and 50+ product types for professional ventilation solutions.',
     bottomCtaTitle: 'Let us help you choose the right product.',
     bottomCtaSubtitle: 'Share your project details, our engineering team will guide you quickly.',
     whyParagraph: 'With 15+ years of experience and world-class products, we are your trusted partner in the HVAC industry.',
@@ -621,9 +620,9 @@ export const en: typeof tr = {
         shipping: 'Same Day Shipping'
       },
       authorizedDealer: {
-        prefix: 'VentHub is the authorized dealer of',
+        prefix: 'VentHub supplies',
         brand: 'Vortice',
-        suffix: 'products in Turkey.'
+        suffix: 'products with full brand assurance.'
       }
     },
     stats: {
@@ -843,9 +842,9 @@ export const en: typeof tr = {
     weekdays: 'Monday - Friday',
     saturday: 'Saturday',
     rights: 'All rights reserved.',
-    address: 'Teknokent Mah. Teknopark Blv.\nNo: 1/4A 34906 Pendik/Istanbul',
+    // address/phone DELIBERATELY ABSENT (2026-08-28): no fabricated address or number
+    // is published. Restored together with the TR dictionary (parity) once real.
     email: 'info@venthub.com.tr',
-    phone: '+90 (216) 123-45-67',
     social: {
       facebook: 'Facebook',
       instagram: 'Instagram',
@@ -863,9 +862,7 @@ export const en: typeof tr = {
       cardPhoneLabel: 'Call Now',
       cardEmailTitle: 'Technical Quote',
       cardEmailLabel: 'Send Email',
-      cardOfficeTitle: 'Head Office',
-      cardOfficeValue: 'Teknopark İstanbul, Pendik',
-      cardOfficeLabel: 'Get Directions',
+      // cardOffice* REMOVED (2026-08-28): no real office address, so no card.
       directAccessLabel: 'Direct Access',
       supportTitle: 'Technical Support',
       supportTitleAccent: 'By Your Side Anytime',
@@ -894,36 +891,36 @@ export const en: typeof tr = {
     heroTitle: 'Turkey\'s Trusted HVAC Platform',
     whySubtitle: 'We work to be worthy of your trust',
     experience: 'Years of Experience',
-    distributorship: 'Global Distributorship',
-    completedProject: 'Completed Projects',
+    distributorship: 'Global Brand Network',
+    completedProject: 'Product Types',
     shippingNetwork: 'Province Delivery Network',
     precisionTitle: 'Engineering Precision',
     precisionDesc: 'We do not just sell products; we offer engineering solutions with project-specific airflow, pressure, and efficiency calculations.',
     standardsTitle: 'Global Standards',
-    standardsDesc: 'As the Turkish representative of world-leading HVAC brands, we bring the latest and certified technologies to the local market.',
+    standardsDesc: 'We bring the latest and certified technologies of world-leading HVAC brands to the local market.',
     trustTitle: 'Operational Trust',
-    trustDesc: 'With our Teknopark Istanbul headquarters and wide inventory network, we deliver right on time, remaining loyal to your project schedules.',
-    heroBadge: 'Engineering Excellence Since 2009',
+    trustDesc: 'We manage our supply and operations with discipline, aiming for on-time delivery while staying loyal to your project schedules.',
+    heroBadge: '15+ Years of Engineering Experience',
     heroTitleItalic: 'the Air',
-    heroDesc: 'VentHub is the authority in Turkey for highly efficient, technological, and sustainable ventilation systems for modern living and industrial spaces.',
+    heroDesc: 'VentHub brings highly efficient, technological, and sustainable ventilation systems to the Turkish market for modern living and industrial spaces.',
     storyTitle: 'We Build the Climate',
     storyTitleItalic: 'of the Future Today',
-    storyDesc1: 'VentHub is positioned not just as a supplier but as a technological solution partner in the ventilation sector. For more than 15 years, we bring Europe\'s most prestigious brands together with Turkey\'s largest projects.',
-    storyDesc2: 'In our operations managed from our Teknopark Istanbul headquarters, we prioritize engineering ethics and operational excellence above everything. For us, every product is a component, and every project is a work of ventilation art.',
-    teamTitle: '50+ Expert Engineers &',
-    teamSubtitle: 'Technical Operations Staff',
-    brandTitle: 'Our Authorized Distributor',
-    brandTitleItalic: 'Network',
+    storyDesc1: 'VentHub is positioned not just as a supplier but as a technological solution partner in the ventilation sector. With more than 15 years of field experience, we bring Europe\'s most prestigious brands together with Turkey\'s major projects.',
+    storyDesc2: 'In our operations, we prioritize engineering ethics and operational excellence above everything. For us, every product is a component, and every project is a work of ventilation art.',
+    teamTitle: 'Engineering &',
+    teamSubtitle: 'Technical Support Approach',
+    brandTitle: 'Our Brand',
+    brandTitleItalic: 'Portfolio',
     ctaTitle: 'Are You Ready to Meet',
     ctaTitleItalic: 'Your Engineering Partner?',
     ctaContact: 'Contact Us',
     ctaExplore: 'Explore Products',
-    seoDescription: 'VentHub: Premium HVAC distributor of Turkey. 15 years of experience and engineering-oriented ventilation solutions.',
+    seoDescription: 'VentHub: engineering-oriented ventilation solutions. The right product selection in industrial ventilation, backed by 15 years of field experience.',
     vision: 'Our Vision'
   },
   category: {
     family: {
-      variantCount: '{{count}} variants',
+      variantCount: '{{count}} models',
       count: '{{count}} product families',
       viewFamily: 'Explore',
     },
@@ -934,7 +931,7 @@ export const en: typeof tr = {
     sort: {
       title: 'Sort',
       name: 'By Name',
-      variantCount: 'Variant count',
+      variantCount: 'Model count',
     },
     noProductsFound: 'No products found matching these criteria',
     howItWorks: {
@@ -957,13 +954,13 @@ export const en: typeof tr = {
       q5: 'Does it require maintenance?',
       a5: 'Minimal maintenance is sufficient. Cleaning the filters and dusting the fan blades 1-2 times a year is recommended. Regular maintenance extends the device\'s lifespan and preserves its performance.',
       q6: 'How long is the Vortice warranty?',
-      a6: 'Vortice products are sold with a 2-year manufacturer warranty. Under the warranty, faults arising from manufacturing defects are repaired or replaced free of charge. As an authorized dealer, we handle your warranty processes quickly.',
+      a6: 'Vortice products are sold with a 2-year manufacturer warranty. Under the warranty, faults arising from manufacturing defects are repaired or replaced free of charge. We handle your warranty processes quickly under full brand assurance.',
     },
     trustSignals: {
       ce: 'CE',
       iso9001: 'ISO 9001',
-      authorizedDealerTitle: 'Authorized Dealer',
-      authorizedDealerDesc: 'Official Vortice Türkiye distributor',
+      authorizedDealerTitle: 'Brand Assurance',
+      authorizedDealerDesc: 'Vortice products with brand assurance',
       warrantyTitle: '2-Year Warranty',
       warrantyDesc: 'Manufacturer warranty',
       securePaymentTitle: 'Secure Payment',
@@ -1191,11 +1188,11 @@ export const en: typeof tr = {
       whyVortice: 'Why Vortice?',
       description1: 'Founded in Milan in 1954, Vortice has been the pioneer of ventilation technology worldwide for over 70 years.',
       description2: 'Founded by Attilio Pagani, the company won Italy\'s most prestigious design award, Compasso d\'Oro, with its very first product. Today, it serves millions of users in more than 90 countries.',
-      authorizedDealer: 'Authorized Dealer',
+      authorizedDealer: 'Brand Assurance',
       ceCertified: 'CE Certified',
       warranty2y: '2-Year Warranty',
       premiumComfort: 'Premium Comfort',
-      authorizedDealerNotice: 'VentHub is the authorized dealer of Vortice products in Turkey.',
+      authorizedDealerNotice: 'VentHub supplies Vortice products with full brand assurance.',
       highlights: [
         {
           value: '70+',
@@ -1352,7 +1349,7 @@ export const en: typeof tr = {
     techQuote: 'Request Technical Offer',
     descFallback: 'A detailed description for this product will be added soon.',
     relatedProducts: 'Related Products',
-    officialDistributor: 'OFFICIAL DISTRIBUTOR',
+    officialDistributor: 'BRAND ASSURANCE',
     priceAvailability: 'Price & Availability',
     shareCopied: 'Link copied!',
     messages: {
@@ -1370,34 +1367,7 @@ export const en: typeof tr = {
       sku: 'SKU',
       datasheetPdf: 'DATASHEET (PDF)'
     },
-    diagramsExtra: {
-      technicalDiagrams: 'Technical Diagrams',
-      mounting: 'Mounting Diagram',
-      electrical: 'Electrical Diagram',
-      threeDViews: '3D Views',
-      view3DModel: '3D Model View',
-      interactiveModel: 'Interactive Model',
-      dimensionedDrawing: 'Dimensioned Drawing',
-      cadDwg: 'CAD - DWG Format',
-      cadDwgAvailable: 'CAD - DWG Available'
-    },
-    docs: {
-      installationGuide: 'Installation Guide',
-      userManual: 'User Manual',
-      maintenanceManual: 'Maintenance Manual',
-      safetyInfo: 'Safety Information',
-      warrantyTerms: 'Warranty Terms',
-      technicalSpecsDoc: 'Technical Specifications',
-      productCatalog: 'Product Catalog',
-      technicalBrochure: 'Technical Brochure',
-      productReleaseNotes: 'Product Release Notes',
-      troubleshootingGuide: 'Troubleshooting Guide',
-      sparePartsList: 'Spare Parts List'
-    },
     actions: {
-      download: 'Download',
-      downloadCatalog: 'Download Catalog',
-      downloadBrochure: 'Download Brochure',
       interactive3D: '3D VIEW',
       addToProject: 'Add to Project',
       removeFromWishlist: 'Remove from Favorites',
@@ -1405,31 +1375,12 @@ export const en: typeof tr = {
       favorite: 'Favorite',
       share: 'Share'
     },
-    cert: {
-      ceCertificate: 'CE Certificate',
-      iso9001: 'ISO 9001',
-      tseCertificate: 'TSE Certificate',
-      energyStar: 'Energy Star',
-      ulCertificate: 'UL Certificate',
-      ecoFriendly: 'Eco Friendly',
-      rohsCompliant: 'RoHS Compliant',
-      downloadCenter: 'Certificate Download Center',
-      downloadAllZip: 'Download All Certificates (ZIP)',
-      verify: 'Certificate Verification'
-    },
     certLabels: {
-      yearSuffix: '-2024',
-      standardValue: 'ISO/EN-STD',
-      certificateNo: 'Certificate No',
       standard: 'Standard',
     },
     sections: {
       general: 'General Info',
       models: 'Models',
-      diagrams: 'Diagrams',
-      documents: 'Documents',
-      brochure: 'Brochure/Catalog',
-      certificates: 'Certificates',
       specs: 'Technical Specifications'
     },
     trust: {
@@ -1706,6 +1657,14 @@ export const en: typeof tr = {
     autoClose: 'This window will close automatically in 5 seconds'
   },
   checkout: {
+    // Shown when the payment path is CLOSED by the ENV flag
+    // (see app/[lang]/checkout/page.tsx — NEXT_PUBLIC_ODEME_ACIK).
+    kapali: {
+      baslik: 'Checkout opening soon',
+      aciklama: 'Our store is being set up. Prices are current; you can request a quote and we will get back to you the same day.',
+      whatsappCta: 'Request a quote on WhatsApp',
+      emailCta: 'Request a quote by email',
+    },
     securePayment: {
       brand: 'Venthub HVAC',
       iyzicoSecure: 'Secure payment with iyzico',
@@ -1921,23 +1880,23 @@ export const en: typeof tr = {
       statGlobal: 'Global',
     },
     sectionTitle: 'Premium HVAC Brands',
-    sectionSubtitle: 'As the authorized distributor of leading global HVAC brands in Turkey, we offer top-quality ventilation solutions.',
+    sectionSubtitle: 'We offer products of leading global HVAC brands with full brand assurance.',
     subtitlePart1: 'Trusted Partner of',
     subtitlePart2: 'World Giants',
     viewAll: 'See All Brands',
     pageTitle: 'Brands',
-    pageSubtitle: 'As the authorized representative of the world\'s most prestigious HVAC manufacturers, we bring engineering masterpieces to your projects.',
+    pageSubtitle: 'We bring the engineering masterpieces of the world\'s most prestigious HVAC manufacturers to your projects.',
     eyebrow: 'Global Signatures of Excellence',
     exploreBrand: 'Explore Brand',
-    seoDesc: 'Premium HVAC brands under the VentHub umbrella',
+    seoDesc: 'Industrial ventilation brands under the VentHub umbrella',
     notFound: 'Brand not found',
     backToAll: 'Back to all brands',
     aboutBrand: 'information',
     trust: {
-      eyebrow: 'Supply Chain Authority',
-      title: 'Guaranteed Supply Directly from Manufacturer',
-      description: 'Thanks to our direct strategic partnership with all our brands, you have access to the latest technologies, full technical support, and the most competitive lead times.',
-      original: '100% Original Product',
+      eyebrow: 'Supply Chain',
+      title: 'Assured Supply',
+      description: 'Thanks to our established supply network, you have access to the latest technologies, full technical support, and competitive lead times.',
+      original: 'Brand Assurance',
       standard: 'Global Standard Compliance',
       imageAlt: 'Technical Infrastructure and HVAC Installation'
     },
@@ -2510,7 +2469,7 @@ export const en: typeof tr = {
     valueProp: {
       badge: 'VENTHUB B2B',
       title: 'Professional Solutions\nFor Your Projects',
-      description: 'Get special quotes directly with manufacturer/distributor prices for your industrial ventilation needs. Our engineering support team will get back to you quickly.',
+      description: 'Get special quotes at competitive prices for your industrial ventilation needs. Our engineering support team will get back to you quickly.',
       feature1: 'Free Project Support',
       feature2: 'Fast Pricing & Stock Information',
       feature3: 'Exclusive B2B Conditions'
@@ -2868,7 +2827,7 @@ export const en: typeof tr = {
       eyebrow: 'ENGINEERING HERITAGE',
       title: 'Italian Silence: The Vortice Legend',
       description: 'Directing the ventilation world since 1954, Vortice represents the pinnacle in the silent duct fan category with the Lineo Quiet series.',
-      badges: ['Authorized Distributor', '2 Year Warranty'],
+      badges: ['Brand Assurance', '2 Year Manufacturer Warranty'],
       stats: [
         {
           label: 'Years Experience',

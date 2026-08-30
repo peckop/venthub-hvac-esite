@@ -416,7 +416,7 @@ export default function AccountOverviewPage() {
             </div>
             <h3 className="text-base font-bold text-slate-900 mb-1">{t('account.overview.needHelp')}</h3>
             <p className="text-xs font-medium text-slate-500 mb-4">{t('account.overview.needHelpDesc')}</p>
-            <a href="mailto:support@venthub.com" className="h-9 px-4 rounded-lg bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-primary-navy hover:border-primary-navy transition-shadow shadow-sm flex items-center justify-center">
+            <a href="mailto:info@venthub.com.tr" className="h-9 px-4 rounded-lg bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-primary-navy hover:border-primary-navy transition-shadow shadow-sm flex items-center justify-center">
               {t('account.overview.customerService')}
             </a>
           </div>

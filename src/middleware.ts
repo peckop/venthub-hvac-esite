@@ -78,7 +78,8 @@ export async function middleware(request: NextRequest) {
     // Inject language prefix for user-facing routes missing a locale segments
     const isAuthApi = firstSegment === 'auth' && (segments[1] === 'callback' || segments[1] === 'signout')
     const isSpecialRoute = firstSegment === 'admin' || firstSegment === 'api' || isAuthApi || 
-                           pathname.endsWith('sitemap.xml') || pathname.endsWith('robots.txt')
+                           pathname.endsWith('sitemap.xml') || pathname.endsWith('robots.txt') ||
+                           pathname.endsWith('llms.txt')
     
     if (!isSpecialRoute) {
       const detectedLocale = detectLocale(request)

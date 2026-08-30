@@ -106,9 +106,57 @@ else
     REMOTE_REF="origin/$DEFAULT_BRANCH"
 
     if ! git rev-parse --verify --quiet "$REMOTE_REF" >/dev/null 2>&1; then
-      # Sig klon varsayilan dali tasimayabilir. Sinirli bir cekme DENENIR;
-      # basarisiz olursa hata DEGIL, yalnizca taban cozulemez -> BUILD.
-      git fetch --no-tags --depth=50 origin         "+refs/heads/$DEFAULT_BRANCH:refs/remotes/origin/$DEFAULT_BRANCH" >/dev/null 2>&1 || true
+      # Sig klon varsayilan dali tasimaz. Cekme DENENIR.
+      #
+      # ⭐2026-08-27 — BU BLOK SESSIZDI VE ATLAMAYI ON GUN BOYUNCA OLDURDU.
+      # Onceki surum ciktiyi '>/dev/null 2>&1 || true' ile yutuyordu. Uretimde
+      # cekme HER SEFERINDE basarisiz oluyordu ve gunluge 'origin/master bu
+      # klonda yok -> BUILD' disinda hicbir sey dusmuyordu; yani NIYE olmadigi
+      # HIC yazilmadi. Olcum (Vercel build gunlukleri, uc ayri dagitim:
+      # d9f31989 TEMIZLIK companion · f4c5c25f ALTYAPI 18 companion ·
+      # 304a1785 I18N varyant): UCUNDE DE ayni iki satir, yani pozitif sinif
+      # listesi BIR KEZ BILE degerlendirilmedi. Salt-.md push'lar tam da bu
+      # yuzden dagitim yakti — liste kusuru degil, TABAN kusuruydu.
+      #
+      # DERS: fail-safe dogru olabilir ama SESSIZ fail-safe olcumu oldurur.
+      # Kapi da bunu goremezdi: "origin/master yoksa BUILD" kolu YESILDI —
+      # dogru davranisi sinar ama o dalin URETIMDE TEK yol oldugunu sormaz.
+      # Bu yuzden buradaki her deneme SEBEBIYLE birlikte gunluge yazilir.
+      # ⭐GORUNURLUK ONARIMI ILK KOSUMDA CEVABI VERDI (dagitim 5cjXTJWY, 2026-08-27):
+      #     ignore-build: refspec cekmesi basarisiz -> fatal: 'origin' does not appear to be a git repository
+      # Yani sorun refspec bicimi ya da derinlik DEGIL: Vercel'in klonunda `origin`
+      # UZAGI HIC YOK. Bu yuzden "origin"e yapilan HICBIR cekme tutamazdi ve on gun
+      # boyunca tutmadi. Uzagi kendimiz kurariz — depo PUBLIC oldugu icin kimlik
+      # gerekmez (CLAUDE.md: repo 2026-08-15'ten beri public).
+      UZAK_URL=""
+      if git remote get-url origin >/dev/null 2>&1; then
+        UZAK_URL="origin"
+      elif [ -n "${VERCEL_GIT_REPO_OWNER:-}" ] && [ -n "${VERCEL_GIT_REPO_SLUG:-}" ]; then
+        UZAK_URL="https://github.com/${VERCEL_GIT_REPO_OWNER}/${VERCEL_GIT_REPO_SLUG}.git"
+        echo "ignore-build: origin uzagi yok, URL ortamdan kuruldu ($UZAK_URL)"
+      else
+        echo "ignore-build: origin uzagi YOK ve VERCEL_GIT_REPO_OWNER/SLUG bos -> cekilemez"
+      fi
+
+      if [ -n "$UZAK_URL" ]; then
+        CEKME_HATA=$(git fetch --no-tags --depth=50 "$UZAK_URL" \
+          "+refs/heads/$DEFAULT_BRANCH:refs/remotes/origin/$DEFAULT_BRANCH" 2>&1) || {
+          echo "ignore-build: refspec cekmesi basarisiz -> $(printf '%s' "$CEKME_HATA" | head -n 1)"
+        }
+      fi
+    fi
+
+    # Ikinci deneme: duz cekme + FETCH_HEAD. Refspec bicimi bazi sig klonlarda
+    # reddedilebiliyor; ayni sonucu farkli yoldan istemek ucuz ve fail-safe.
+    if ! git rev-parse --verify --quiet "$REMOTE_REF" >/dev/null 2>&1 && [ -n "${UZAK_URL:-}" ]; then
+      CEKME_HATA=$(git fetch --no-tags --depth=50 "$UZAK_URL" "$DEFAULT_BRANCH" 2>&1) && {
+        if git rev-parse --verify --quiet FETCH_HEAD >/dev/null 2>&1; then
+          REMOTE_REF="FETCH_HEAD"
+          echo "ignore-build: duz cekme tuttu, taban referansi = FETCH_HEAD"
+        fi
+      } || {
+        echo "ignore-build: duz cekme de basarisiz -> $(printf '%s' "$CEKME_HATA" | head -n 1)"
+      }
     fi
 
     if git rev-parse --verify --quiet "$REMOTE_REF" >/dev/null 2>&1; then
@@ -201,6 +249,12 @@ is_build_irrelevant() {
     # Sondaki `/` de kasıtlı: `scripts/board*` yazsaydık `scripts/boardfake.ts`
     # de sessizce atlanırdı.
     scripts/board/*) return 0 ;;
+    # scripts/hijyen/** — TEMIZLIK seridinin agac-hijyeni araclari (kirli sayaci,
+    # agac-silme kapisi). scripts/board/* ile ayni gerekce ve ayni olcum: derleme
+    # hattinda (package.json, next.config.mjs, .github/workflows/*) "scripts/hijyen"
+    # gecen TEK referans yok; pozitif kontrol olarak ayni arama "scripts/setup-hooks"
+    # icin referans BULUYOR, yani arama gercekten ariyor. Sondaki '/' kasitli.
+    scripts/hijyen/*) return 0 ;;
     .githooks/*)     return 0 ;;
     *)               return 1 ;;
   esac

@@ -12,6 +12,8 @@ entity_hashes:
 generated_at: 2026-08-25T07:30:31Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=5 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 AuditLogTableBody modülü, admin panelinde denetim günlüğü (audit log) kayıtlarının tablo içinde görüntülenmesinden sorumludur. Supabase veritabanından denetim kayıtlarını çeken bir veri erişim fonksiyonu ve bu kayıtları tablo gövdesinde sunan bir React bileşeni içerir.
 

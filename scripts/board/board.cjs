@@ -569,15 +569,63 @@ function sidDogrula(sid) {
 if (require.main === module) {
   /** Değer alan bayraklar — değerleri serbest metinden AYIKLANMALI, yoksa nota sızar. */
   const VALUE_FLAGS = new Set(['sid', 'lane', 'globs', 'to', 'text'])
+  /**
+   * TEKRARLANAN bayrağın BİRİKTİĞİ tek bayrak. Ayırıcı virgül olduğu için
+   * `--globs a --globs b` ile `--globs "a,b"` AYNI şeyi demek ister; birleştirmek
+   * kullanıcının kastını korur.
+   */
+  const BIRIKEN_FLAGS = new Set(['globs'])
   const [, , verb, ...rest] = process.argv
   const flags = {}
   const positional = []
+  /**
+   * ⭐TEKRARLANAN BAYRAK SESSİZCE EZİYORDU (ölçüldü 2026-08-30, ALTYAPI).
+   *
+   * Eski satır `flags[name] = rest[i + 1]` idi: `--globs "A/**" --globs "B/**"`
+   * çağrısında SON değer öncekini eziyor, claim yalnız `B/**` ile kaydediliyordu.
+   * Ölçüm: iki globlu tek çağrı → `talep alındı: SINAV → BBB/**`, `who` da tek yol
+   * gösteriyor. (Filo notunda "yalnız İLKİ kaydediliyor" yazıyordu — yön yanlıştı;
+   * son kazanıyor. Kayıp aynı, teşhis değil.)
+   *
+   * Niçin önemli: claim EKSİK kaydolunca şerit, talep ettiğini sandığı yolları
+   * korumuyor; başka bir şerit o yollara girdiğinde kapı çakışmayı GÖREMİYOR —
+   * yani sessiz kayıp doğrudan şerit izolasyonunu deliyor.
+   *
+   * İKİ AYRI DAVRANIŞ, BİLEREK:
+   *   · `globs` BİRİKİR — tekrarın tek anlamlı yorumu birleşimdir.
+   *   · diğer değer bayrakları (`sid`, `lane`, `to`, `text`) tekrarlanırsa HATA.
+   *     Bunlarda "hangisini kastettin" sorusunun doğru cevabı yok; sessizce birini
+   *     seçmek, ezmenin başka bir adıdır. Kimliği ya da hedefi tahmin etmeyiz.
+   */
+  const gorulen = new Set()
   for (let i = 0; i < rest.length; i++) {
     const t = rest[i]
     if (t.startsWith('--')) {
       const name = t.slice(2)
-      if (VALUE_FLAGS.has(name)) { flags[name] = rest[i + 1]; i++ } else flags[name] = true
+      if (VALUE_FLAGS.has(name)) {
+        const deger = rest[i + 1]
+        if (gorulen.has(name)) {
+          if (BIRIKEN_FLAGS.has(name)) {
+            flags[name] = [flags[name], deger].filter(Boolean).join(',')
+          } else {
+            console.error(`--${name} BIRDEN FAZLA KEZ verildi — hangisinin gecerli oldugunu TAHMIN ETMEYIZ.`)
+            console.error(`  onceki: ${JSON.stringify(flags[name])}`)
+            console.error(`  sonraki: ${JSON.stringify(deger)}`)
+            console.error(`  YAPILACAK: tek --${name} ver.`)
+            process.exit(1)
+          }
+        } else {
+          flags[name] = deger
+        }
+        gorulen.add(name)
+        i++
+      } else flags[name] = true
     } else positional.push(t)
+  }
+  if (gorulen.has('globs') && String(flags.globs || '').includes(',')) {
+    // Birleştirmeyi GÖRÜNÜR kıl: sessiz birleştirme de sessiz ezme kadar okunaksızdır.
+    const parcalar = String(flags.globs).split(',').map(s => s.trim()).filter(Boolean)
+    if (parcalar.length > 1) console.error(`[board] --globs ${parcalar.length} yol olarak okundu: ${parcalar.join(' · ')}`)
   }
   const sid = flags.sid || process.env.CLAUDE_SESSION_ID || ''
 

@@ -179,13 +179,18 @@ const RATCHETS: Ratchet[] = [
     // glob'uyla. Fark 2 ve kapsam nüansından geliyor (glob ile git-listesi birebir aynı
     // dosya kümesini vermiyor). Bayatlık kilidi bunu ilk koşuşta yakaladı — otorite
     // her zaman KAPININ KENDİ aracıdır, yan kanaldan alınan sayı değil.
-    tavan: 1508,
+    // 2026-08-28 · 1508 → 1499: PDP'den dört veri-dayanaksız bölüm kaldırıldı (REC-56,
+    // uydurma sertifika numaraları); borç bu yüzden düştü, kapı "tavanı indir" dedi.
+    // 2026-08-28 · 1499 → 1497: Footer/ContactPage'den uydurma iletişim satırları
+    // kaldırıldı (Recep talimatı, PR #891); iki gri sınıf onlarla gitti.
+    tavan: 1497,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
   {
     ad: 'ham rounded-xl|2xl|3xl (§2.4)',
-    tavan: 391,
+    // 2026-08-28 · 391 → 378 (aynı kaldırma).
+    tavan: 378,
     say: () => countMatches(/\brounded-(?:xl|2xl|3xl)\b/g),
     gerekce: 'Köşe yarıçapı rounded-hvac-* skalasından.',
   },
@@ -197,7 +202,8 @@ const RATCHETS: Ratchet[] = [
   },
   {
     ad: 'font-black · display DIŞINDA (§2.5)',
-    tavan: 133,
+    // 2026-08-28 · 133 → 124 (aynı kaldırma).
+    tavan: 124,
     say: countFontBlackOutsideDisplay,
     gerekce: 'font-black yalnız text-display eşliğinde; başlık ağırlığı font-bold.',
   },
