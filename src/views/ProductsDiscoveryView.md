@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\views\ProductsDiscoveryView.tsx
-skeleton_hash: 1b2e97f908816844
+source_path: C:\tmp\vh-urun-rec89\src\views\ProductsDiscoveryView.tsx
+skeleton_hash: 68da9976021c61b1
 entity_hashes:
   func:ProductsDiscoveryView: 7a88740fc2125f5b
   overview: 76bae810c86fe269
   style_tokens: 8ab4f603b12ea696
-generated_at: 2026-08-27T07:35:23Z
+generated_at: 2026-08-30T19:07:13Z
 ---
 
 ## Genel Bakış
