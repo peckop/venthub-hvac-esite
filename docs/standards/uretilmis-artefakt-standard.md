@@ -262,3 +262,53 @@ hangisine bakıldığı **doğrulanır**:
 
 İkisini aynı sütunda karşılaştırmak, hiçbiri tutmayan sahte bir bilmece
 üretir — bu depoda bir gün kaybettirdi. **Bedava ayırt edici: hex uzunluğu.**
+
+---
+
+## AXIOM 8 — Üretecin KAPSAM SÜZGECİ isim tabanlıysa, her ekleme bir KESİNTİDİR
+
+`.cc_docs.yaml → skip_dirs` bir "yok sayılacaklar listesi" gibi okunuyor. Değil.
+`corpus_callosum/cli/docs_tree.py:57` süzgeci `d not in _all_skip` biçiminde uygular:
+**isim tabanlı, her derinlikte, kök-sabitleme yok.** Yani listeye yazılan her ad, aynı
+adı taşıyan **gerçek kaynak dizinini de** ağaçtan siler. Ekleme bedavaya benziyor;
+değil.
+
+### Ölçülmüş vaka (REC-84 · 2026-08-30)
+
+`docs/system_tree.md`'de kök `cache/` ve `.agents/` görünüyordu. Teşhis "skip_dirs
+kaçağı" oldu ve ikisi de listeye eklendi. Sızıntı dizinleri **fiilen yaratılıp** üç kol
+tek tek koşulduğunda hüküm çürüdü:
+
+| `skip_dirs` | `.agents` ağaçta | kök `cache/` | `src/lib/cache/tags.ts` |
+|---|---|---|---|
+| taban (ikisi de yok) | 0 | **1** | 1 |
+| `+ .agents` | 0 | 1 | 1 |
+| `+ .agents, cache` | 0 | 0 | **0** ⚠ |
+
+İki bağımsız sonuç çıktı:
+
+1. **`.agents` ETKİSİZDİ.** Yürüteç nokta-dizinleri zaten atlıyor (`docs_tree.py:56`,
+   `not d.startswith('.')`). Listede olsun olmasın sonuç 0. Yani "kök sebebi kapattık"
+   denen değişikliğin yarısı hiçbir şey yapmıyordu — ve **yeşil çıktı bunu gizledi**,
+   çünkü çıktı zaten temizdi.
+2. **`cache` ZARARLIYDI.** Kozmetik bir kök satırını sildi, karşılığında companion'ı olan
+   gerçek bir modülü (`src/lib/cache/tags.ts`) ikizin kaynağından **yok etti**.
+   `system_tree.md`, `kayitlar_master.md`'nin kaynağıdır: kayıp doğrudan dijital ikize
+   geçer, hiçbir kapı kırmızı vermez.
+
+### Kural
+
+- **Bir adı `skip_dirs`'e eklemeden önce, o adı taşıyan BAŞKA dizin var mı diye ölçülür.**
+  Ölçüt: `find <repo> -type d -name '<ad>'`. Birden fazla eşleşme varsa ekleme yapılmaz.
+- **Süzgeç değişikliği A/B ile kanıtlanır:** sızıntı dizini fiilen yaratılır, kol tek
+  değişkenle koşulur, negatif kontrol alınır. "Çıktı temiz" tek başına kanıt değildir —
+  çıktının sızıntı dizini yokken de temiz olacağını unutma (boş evren, sahte yeşil).
+- **Kök-sabitli sızıntının bu depoda karşılığı YOKTUR.** `source_dirs: [src, .]` kökü de
+  tarar; isim tabanlı listeyle kökü hedefleyip alt ağacı korumak imkânsızdır. Gerçek
+  çözüm üreteç tarafında kök-sabitli girdi desteğidir (`/cache` gibi) — **ORION kalemi**,
+  bu depoda kapatılamaz. O gelene kadar kök artığı KABUL EDİLİR: kozmetik bir satır,
+  gerçek bir modülün kaybından ucuzdur.
+
+**Genel ders:** bir süzgece ekleme yapmak, "gürültüyü azaltmak" değil **görüş alanını
+daraltmak**tır. Daraltmanın neyi kestiğini ölçmeden yapılan her ekleme, kaybı sessiz
+kılan bir kapıdır.
