@@ -138,7 +138,7 @@ export const tr = {
     sku: 'SKU',
     share: 'Paylaş',
     requestQuote: 'Teklif İste',
-    officialGuarantee: 'Distribütör Garantili',
+    officialGuarantee: 'Resmi Garantili',
     fastDelivery: 'Hızlı Teslimat',
     series: 'Seri',
     reset: 'Sıfırla',
@@ -305,8 +305,8 @@ export const tr = {
   },
 
   home: {
-    seoTitle: 'VentHub - Premium HVAC Çözümleri | Fan, Hız Kontrol, Isıtma & Soğutma',
-    seoDesc: 'VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri, ısı geri kazanım cihazları ve daha fazlası için mühendislik destekli çözümler.',
+    seoTitle: 'VentHub | Endüstriyel Havalandırma ve HVAC Mühendislik Çözümleri',
+    seoDesc: 'Doğru ürün, doğru hesap, doğru çözüm. Otopark havalandırmasından ısı geri kazanımına, mühendislik destekli seçim VentHub\'da.',
     hero: {
       eyebrow: 'Mühendislik Odaklı HVAC Ticareti',
       title: 'Doğru HVAC seçimine ilk ekranda girin.',
@@ -330,7 +330,7 @@ export const tr = {
         entryPaths: 'akıllı yönlendirme akışı'
       },
       trustStrip: {
-        authorizedBrands: 'Yetkili premium markalar',
+        authorizedBrands: 'Dünyaca tanınan markalar',
         engineeringSupport: 'Mühendislik yönlendirmesi',
         nationwideDelivery: 'Türkiye geneli sevkiyat',
         projectGuidance: 'Proje odaklı seçim desteği'
@@ -555,9 +555,9 @@ export const tr = {
       visualAlt: 'Teknik Kurulum',
       items: {
         brands: {
-          eyebrow: 'Otorite',
-          title: 'Yetkili Distribütör Güvencesi',
-          description: 'Dünya devi HVAC markalarının doğrudan yetki belgesi ile en güncel, sertifikalı ve orijinal ürün gamına erişim sağlıyoruz.'
+          eyebrow: 'Güvence',
+          title: 'Marka ve Garanti Güvencesi',
+          description: 'Dünya devi HVAC markalarının en güncel ve sertifikalı ürün gamını marka güvencesiyle sunuyoruz.'
         },
         guidance: {
           eyebrow: 'Analiz',
@@ -644,7 +644,7 @@ export const tr = {
       support: '7/24 teknik destek'
     },
     heroTitle: 'Temiz Hava, Temiz Gelecek',
-    heroSubtitle: 'Türkiye\'nin en güvenilir HVAC distribütörü. 6 premium marka, 50+ ürün çeşidi ile profesyonel havalandırma çözümleri.',
+    heroSubtitle: 'Mühendislik odaklı havalandırma platformu. 6 önde gelen marka, 50+ ürün çeşidiyle profesyonel havalandırma çözümleri.',
     bottomCtaTitle: 'Doğru ürünü seçmenize yardımcı olalım.',
     bottomCtaSubtitle: 'Proje detayınızı paylaşın, mühendislik ekibimiz hızlıca yönlendirsin.',
     whyParagraph: '15+ yıllık deneyimimiz ve dünya standartlarındaki ürünlerimizle HVAC sektöründe güvenilir partneriniziz.',
@@ -682,7 +682,7 @@ export const tr = {
       authorizedDealer: {
         prefix: 'VentHub,',
         brand: 'Vortice',
-        suffix: 'ürünlerinin Türkiye yetkili satıcısıdır.'
+        suffix: 'ürünlerini marka güvencesiyle sunar.'
       }
     },
     stats: {
@@ -808,8 +808,8 @@ export const tr = {
     weekdays: 'Hafta İçi',
     saturday: 'Cumartesi',
     rights: 'Tüm hakları saklıdır.',
-    address: 'Teknokent Mah. Teknopark Blv.\nNo: 1/4A 34906 Pendik/İstanbul',
-    phone: '+90 (216) 123-45-67',
+    // address/phone BİLİNÇLİ YOK (2026-08-28): uydurma adres ve numara yayınlanmaz.
+    // Gerçek bilgi olunca EN sözlüğüyle BİRLİKTE geri eklenir (parite).
     email: 'info@venthub.com.tr',
     social: {
       facebook: 'Facebook',
@@ -930,23 +930,23 @@ export const tr = {
       statGlobal: 'Küresel',
     },
     sectionTitle: 'Premium HVAC Markaları',
-    sectionSubtitle: 'Dünyanın önde gelen HVAC markalarının Türkiye distribütörü olarak en kaliteli havalandırma çözümlerini sunuyoruz.',
+    sectionSubtitle: 'Dünyanın önde gelen HVAC markalarının ürünlerini marka güvencesiyle sunuyoruz.',
     subtitlePart1: 'Dünya Devlerinin',
     subtitlePart2: 'Güvenilir Partneri',
     viewAll: 'Tüm Markaları Gör',
     pageTitle: 'Markalar',
-    pageSubtitle: 'Dünyanın en prestijli HVAC üreticilerinin yetkili temsilcisi olarak, mühendislik harikası çözümleri projelerinizle buluşturuyoruz.',
+    pageSubtitle: 'Dünyanın en prestijli HVAC üreticilerinin mühendislik harikası çözümlerini projelerinizle buluşturuyoruz.',
     eyebrow: 'Mükemmelliğin Global İmzaları',
     exploreBrand: 'Markayı Keşfedin',
-    seoDesc: 'VentHub çatısı altındaki premium HVAC markaları',
+    seoDesc: 'VentHub çatısı altındaki endüstriyel havalandırma markaları',
     notFound: 'Marka bulunamadı',
     backToAll: 'Tüm markalara dön',
     aboutBrand: 'hakkında bilgi',
     trust: {
-      eyebrow: 'Supply Chain Authority',
-      title: 'Doğrudan Üreticiden Güvenceli Tedarik',
-      description: 'Tüm markalarımızla olan doğrudan stratejik ortaklığımız sayesinde, en yeni teknolojilere, tam teknik desteğe ve en rekabetçi termin sürelerine sahip olursunuz.',
-      original: '100% Orijinal Ürün',
+      eyebrow: 'Tedarik Zinciri',
+      title: 'Güvenceli Tedarik',
+      description: 'Kurulu tedarik ağımız sayesinde en yeni teknolojilere, tam teknik desteğe ve rekabetçi termin sürelerine sahip olursunuz.',
+      original: 'Marka Güvencesi',
       standard: 'Global Standart Uyumu',
       imageAlt: 'Teknik Altyapı ve HVAC Kurulumu'
     },
@@ -980,9 +980,7 @@ export const tr = {
       cardPhoneLabel: 'Şimdi Ara',
       cardEmailTitle: 'Teknik Teklif',
       cardEmailLabel: 'E-posta Gönder',
-      cardOfficeTitle: 'Merkez Ofis',
-      cardOfficeValue: 'Teknopark İstanbul, Pendik',
-      cardOfficeLabel: 'Yol Tarifi Al',
+      // cardOffice* KALDIRILDI (2026-08-28): gerçek ofis adresi yok, kart da yok.
       directAccessLabel: 'Doğrudan Erişim',
       supportTitle: 'Teknik Destek',
       supportTitleAccent: 'Her An Yanınızda',
@@ -1010,32 +1008,32 @@ export const tr = {
     title: 'Hakkımızda',
     vision: 'Vizyonumuz',
     experience: 'Yıllık Tecrübe',
-    distributorship: 'Global Distribütörlük',
-    completedProject: 'Tamamlanan Proje',
+    distributorship: 'Küresel Marka Ağı',
+    completedProject: 'Ürün Çeşidi',
     shippingNetwork: 'İl Sevkiyat Ağı',
     precisionTitle: 'Mühendislik Hassasiyeti',
     precisionDesc: 'Sadece ürün satmıyoruz; her projeye özel debi, basınç ve verimlilik hesaplamalarıyla mühendislik çözümü sunuyoruz.',
     standardsTitle: 'Global Standartlar',
-    standardsDesc: 'Dünya devi HVAC markalarının Türkiye temsilcisi olarak, en güncel ve sertifikalı teknolojileri yerel pazara taşıyoruz.',
+    standardsDesc: 'Dünya devi HVAC markalarının en güncel ve sertifikalı teknolojilerini yerel pazara taşıyoruz.',
     trustTitle: 'Operasyonel Güven',
-    trustDesc: 'Teknopark İstanbul merkezli yönetimimiz ve geniş stok ağımızla, proje takvimlerinize sadık kalarak tam zamanında teslimat yapıyoruz.',
-    heroBadge: 'Engineering Excellence Since 2009',
+    trustDesc: 'Tedarik ve operasyon süreçlerimizi proje takvimlerinize sadık kalacak şekilde titizlikle yönetiyor, zamanında teslimatı hedefliyoruz.',
+    heroBadge: '15+ Yıl Mühendislik Deneyimi',
     heroTitle: 'Havayı',
     heroTitleItalic: 'Yeniden Tanımlıyoruz',
-    heroDesc: 'VentHub, modern yaşam ve endüstriyel alanlar için yüksek verimli, teknolojik ve sürdürülebilir havalandırma sistemlerinin Türkiye\'deki otoritesidir.',
+    heroDesc: 'VentHub, modern yaşam ve endüstriyel alanlar için yüksek verimli, teknolojik ve sürdürülebilir havalandırma sistemlerini Türkiye pazarına sunar.',
     storyTitle: 'Geleceğin İklimini',
     storyTitleItalic: 'Bugün Kuruyoruz',
-    storyDesc1: 'VentHub, havalandırma sektöründe sadece bir tedarikçi değil, teknolojik bir çözüm ortağı olarak konumlanmaktadır. 15 yılı aşkın süredir, Avrupa\'nın en prestijli markalarını Türkiye\'nin en büyük projeleriyle buluşturuyoruz.',
-    storyDesc2: 'Teknopark İstanbul\'daki merkezimizden yönettiğimiz operasyonlarımızda, mühendislik etiği ve operasyonel mükemmeliyeti her şeyin önünde tutuyoruz. Bizim için her ürün bir bileşen, her proje ise bir havalandırma sanatı eseridir.',
-    teamTitle: '50+ Uzman Mühendis &',
-    teamSubtitle: 'Teknik Operasyon Kadrosu',
-    brandTitle: 'Resmi Distribütör',
-    brandTitleItalic: 'Ağımız',
+    storyDesc1: 'VentHub, havalandırma sektöründe sadece bir tedarikçi değil, teknolojik bir çözüm ortağı olarak konumlanmaktadır. 15 yılı aşkın saha deneyimimizle, Avrupa\'nın en prestijli markalarını Türkiye\'nin büyük projeleriyle buluşturuyoruz.',
+    storyDesc2: 'Operasyonlarımızda mühendislik etiğini ve operasyonel mükemmeliyeti her şeyin önünde tutuyoruz. Bizim için her ürün bir bileşen, her proje ise bir havalandırma sanatı eseridir.',
+    teamTitle: 'Mühendislik &',
+    teamSubtitle: 'Teknik Destek Yaklaşımımız',
+    brandTitle: 'Marka',
+    brandTitleItalic: 'Portföyümüz',
     ctaTitle: 'Mühendislik Ortağınızla',
     ctaTitleItalic: 'Tanışmaya Hazır mısınız?',
     ctaContact: 'İletişime Geçin',
     ctaExplore: 'Ürünleri Keşfedin',
-    seoDescription: 'VentHub: Türkiye\'nin premium HVAC distribütörü. 15 yıllık tecrübe ve mühendislik odaklı havalandırma çözümleri.',
+    seoDescription: 'VentHub: mühendislik odaklı havalandırma çözümleri. 15 yıllık saha tecrübesiyle endüstriyel havalandırmada doğru ürün seçimi.',
     whySubtitle: 'Güveninize layık olmak için çalışıyoruz',
   },
   cartToast: {
@@ -1067,6 +1065,14 @@ export const tr = {
     quoteItemsNotice: 'Sepetinizde fiyatı henüz belirlenmemiş ürün var. Toplam yalnızca fiyatlı ürünleri kapsar; ödemeye geçmek için bu ürünler için teklif alın.'
   },
   checkout: {
+    // Ödeme yolu ENV bayrağıyla KAPALI olduğunda gösterilen metinler
+    // (bkz. app/[lang]/checkout/page.tsx — NEXT_PUBLIC_ODEME_ACIK).
+    kapali: {
+      baslik: 'Ödeme yakında açılıyor',
+      aciklama: 'Mağazamız kuruluş aşamasında. Fiyatlar günceldir; sipariş için bizden teklif isteyebilirsiniz — aynı gün dönüş yapıyoruz.',
+      whatsappCta: 'WhatsApp\'tan teklif iste',
+      emailCta: 'E-posta ile teklif iste',
+    },
     securePayment: {
       brand: 'Venthub HVAC',
       iyzicoSecure: 'iyzico ile güvenli ödeme',
@@ -1313,13 +1319,13 @@ export const tr = {
       q5: 'Bakım gerektirir mi?',
       a5: 'Minimal bakım yeterlidir. Yılda 1-2 kez filtrelerin temizlenmesi ve fan kanatlarının toz alınması önerilir. Düzenli bakım, cihazın ömrünü uzatır ve performansını korur.',
       q6: 'Vortice garantisi ne kadar?',
-      a6: 'Vortice ürünleri 2 yıl üretici garantisi ile satılmaktadır. Garanti kapsamında üretim hatalarından kaynaklanan arızalar ücretsiz onarılır veya değiştirilir. Yetkili bayi olarak garanti işlemlerinizi hızlıca yönetiyoruz.',
+      a6: 'Vortice ürünleri 2 yıl üretici garantisi ile satılmaktadır. Garanti kapsamında üretim hatalarından kaynaklanan arızalar ücretsiz onarılır veya değiştirilir. Garanti işlemlerinizi marka güvencesi kapsamında hızlıca yönetiyoruz.',
     },
     trustSignals: {
       ce: 'CE',
       iso9001: 'ISO 9001',
-      authorizedDealerTitle: 'Yetkili Bayi',
-      authorizedDealerDesc: 'Vortice Türkiye yetkili satıcısı',
+      authorizedDealerTitle: 'Marka Güvencesi',
+      authorizedDealerDesc: 'Marka güvenceli Vortice ürünleri',
       warrantyTitle: '2 Yıl Garanti',
       warrantyDesc: 'Üretici garantisi',
       securePaymentTitle: 'Güvenli Ödeme',
@@ -1547,11 +1553,11 @@ export const tr = {
       whyVortice: 'Neden Vortice?',
       description1: '1954 yılında Milano\'da kurulan Vortice, 70 yılı aşkın süredir dünya genelinde havalandırma teknolojisinin öncüsü olmuştur.',
       description2: 'Attilio Pagani tarafından kurulan şirket, ilk ürünüyle İtalya\'nın en prestijli tasarım ödülü Compasso d\'Oro\'yu kazanmıştır. Bugün 90\'dan fazla ülkede milyonlarca kullanıcıya hizmet vermektedir.',
-      authorizedDealer: 'Yetkili Bayi',
+      authorizedDealer: 'Marka Güvencesi',
       ceCertified: 'CE Sertifikalı',
       warranty2y: '2 Yıl Garanti',
       premiumComfort: 'Premium Konfor',
-      authorizedDealerNotice: 'VentHub, Vortice ürünlerinin Türkiye yetkili satıcısıdır.',
+      authorizedDealerNotice: 'VentHub, Vortice ürünlerini marka güvencesiyle sunar.',
       highlights: [
         {
           value: '70+',
@@ -1708,7 +1714,7 @@ export const tr = {
     techQuote: 'Teknik Teklif İste',
     descFallback: 'Bu ürün için detaylı açıklama yakında eklenecektir.',
     relatedProducts: 'İlgili Ürünler',
-    officialDistributor: 'RESMİ DİSTRİBÜTÖR',
+    officialDistributor: 'MARKA GÜVENCESİ',
     priceAvailability: 'Fiyat & Stok',
     shareCopied: 'Link kopyalandı!',
     messages: {
@@ -2430,7 +2436,7 @@ export const tr = {
     valueProp: {
       badge: 'VENTHUB B2B',
       title: 'Projeleriniz İçin\nProfesyonel Çözümler',
-      description: 'Endüstriyel havalandırma ihtiyaçlarınız için doğrudan üretici/distribütör fiyatlarıyla özel teklif alın. Mühendislik destek ekibimiz hızlıca size dönecektir.',
+      description: 'Endüstriyel havalandırma ihtiyaçlarınız için rekabetçi fiyatlarla özel teklif alın. Mühendislik destek ekibimiz hızlıca size dönecektir.',
       feature1: 'Ücretsiz Projelendirme Desteği',
       feature2: 'Hızlı Fiyatlandırma ve Stok Bilgisi',
       feature3: 'B2B\'ye Özel Avantajlı Koşullar'
@@ -2788,7 +2794,7 @@ export const tr = {
       eyebrow: 'MÜHENDİSLİK MİRASI',
       title: 'İtalyan Sessizliği: Vortice Efsanesi',
       description: '1954\'ten beri havalandırma dünyasına yön veren Vortice, Lineo Quiet serisi ile sessiz kanal fanı kategorisinde zirveyi temsil ediyor.',
-      badges: ['Yetkili Distribütör', '2 Yıl Garanti'],
+      badges: ['Marka Güvencesi', '2 Yıl Üretici Garantisi'],
       stats: [
         {
           label: 'Yıllık Deneyim',
