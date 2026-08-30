@@ -76,7 +76,25 @@ const KAYNAKLAR: Record<string, string> = {
     import: 'default',
     eager: true,
   }),
-  ...import.meta.glob('/supabase/functions/**/*.ts', {
+  /**
+   * `!` deseni ŞART — ve niçin, ölçülmüş vakayla (2026-08-30):
+   *
+   * `tests/e2e/helpers/denoRuntime.ts`, `supabase/functions/_shared/` içine geçici
+   * `*.compiled.<rastgele>.ts` dosyaları yazıp siler. Paralel vitest koşumunda bu glob o
+   * dosyayı LİSTELEYİP okuyamadan kaybediyordu:
+   *   `ENOENT: … supabase/functions/_shared/caller.compiled.8r1lgetw.ts`
+   * Sonuç, dosya düzeyinde bir çökmedir (assertion değil) — özet satırında **kırmızı test
+   * görünmez**, yalnız çıkış kodu 1 olur. Yani bu arıza "yeşil gibi" okunur; ayırt eden
+   * ölçüt çıkış kodudur.
+   *
+   * Eager glob içeriği **filtre çalışmadan** okur; bu yüzden `Object.keys().filter(...)`
+   * ya da bir `isExcluded` kontrolü YETMEZ — dışlama glob'un KENDİSİNDE olmalıdır.
+   *
+   * Bu çözüm depoda zaten kanıtlıydı: `edge-security.test.ts` aynı dizini aynı negatif
+   * desenle okuyor. Kusur teşhis edilmiş ama onarım yalnız oraya uygulanmıştı; kardeş
+   * dosyaya taşınmadığı için arıza burada yaşamaya devam etti.
+   */
+  ...import.meta.glob(['/supabase/functions/**/*.ts', '!**/*.compiled.*.ts'], {
     query: '?raw',
     import: 'default',
     eager: true,
