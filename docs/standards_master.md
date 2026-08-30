@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-30T18:41:44.031932+00:00
+compiled_at: 2026-08-30T19:29:57.363499+00:00
 total_compiled_files: 62
-source_commit: 4260dcf8
+source_commit: f9f4cf5b
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -8705,6 +8705,185 @@ amplifiye süresi **ölçülmedi** — 20 sn'de kesildi. Tablo bu varsayımla ok
 ⚠**Kapsam dışı bırakılan, adıyla:** `catalog-integrity-gate` (0,995 sn) eşiğin hemen altında
 ve bu şeridin claim'inde değil — dokunulmadı. Bir sonraki yük dalgasında ilk aday odur.
 
+---
+
+## 14. `board.cjs` BAYRAK SEMANTİĞİ — tekrarlanan bayrak sessizce ezmez
+
+### Ölçülmüş vaka (2026-08-30)
+
+CLI ayrıştırıcısı `flags[name] = rest[i + 1]` yazıyordu. `--globs "A/**" --globs "B/**"`
+çağrısında ikinci değer birinciyi eziyor, claim **yalnız `B/**` ile** kaydediliyordu.
+Komut `exit 0` verip *"talep alındı"* diyordu — yani **kayıp, başarı gibi görünüyordu.**
+
+**Niçin ciddi:** claim eksik kaydolunca şerit, talep ettiğini sandığı yolları
+**korumuyor**. Başka bir şerit o yollara girdiğinde kapı çakışmayı **göremiyor** — sessiz
+kayıp doğrudan şerit izolasyonunu deliyor. Kapının varlık sebebi tam da bu.
+
+⚠**Filo notu yön olarak yanlıştı:** panoda *"yalnız İLKİ kaydediliyor"* yazıyordu; ölçüm
+**SON kazandığını** gösterdi. Kayıp aynı, teşhis değil. Ölçülmemiş teşhis, ölçülmüş
+kusurdan daha hızlı yayılıyor — nakledilen teşhis, ölçülene kadar **hipotezdir**.
+
+### Kural — iki ayrı davranış, bilerek
+
+| bayrak | tekrarlanırsa | niçin |
+|---|---|---|
+| `--globs` | **BİRİKİR** (birleşim) | ayırıcı zaten virgül; tekrarın tek anlamlı yorumu birleşimdir |
+| `--sid`, `--lane`, `--to`, `--text` | **HATA (exit 1)** | "hangisini kastettin"in doğru cevabı yok; sessizce birini seçmek ezmenin başka adıdır |
+
+- **Birleştirme GÖRÜNÜR olur:** kaç yol okunduğu `stderr`'e yazılır. Sessiz birleştirme de
+  sessiz ezme kadar okunaksızdır — okuyan neyin kaydedildiğini görmeli.
+- **Ret GÖRÜNÜR olur:** hata mesajı hem bayrağı hem **iki değeri birden** yazar; okuyan
+  hangisinin düştüğünü bilmeden karar veremez.
+
+### Kapı ve ayırt ediciliği
+
+`src/__tests__/conformance/board-globs-tekrarlanan-bayrak.test.ts` — 5 kol. Kollar
+**birbirinin yerine geçmez**, çünkü tek kol yanıltır:
+
+- *tekrar birikiyor* kolu — asıl hüküm.
+- *virgüllü tek değer* **gerileme kolu** — onarım eski sözdizimini bozarsa, yalnız birinci
+  kol yeşilken bu fark edilmezdi.
+- *tekrarlanan `--sid` reddediliyor* kolu — birikmenin her bayrağa yayılmadığını kanıtlar.
+- *birleştirme görünür* kolu — sessizliği kusur sayar.
+- *ön koşul* kolu — `board.cjs` gerçekten koşuyor mu (ölçülemedi ≠ geçti).
+
+**Sabotajla kanıtlandı:** birikme satırı eski ezici hâline (`flags[name] = deger`)
+çevrildiğinde **tam 2 kol kırmızı** (birikme + görünürlük), diğer 3 kol yeşil kaldı,
+`FULL_EXIT=1`. Yani kapı doğru şeyi ayırt ediyor, toptan yeşil/kırmızı vermiyor.
+
+### ⭐"İNDİ ≠ ÇALIŞIYOR" — bu onarımda da yaşandı ve kapatıldı
+
+PR merge edildikten **sonra** ölçüldü: ana dizin 6 commit gerideydi ve **koşan kopya hâlâ
+kusurluydu** — `--globs "PPP/**" --globs "QQQ/**"` çağrısı ana dizinde yine
+`talep alındı: CANLI → QQQ/**` veriyordu (`grep -c BIRIKEN_FLAGS` → **0**, master'da 2).
+Yani onarım merge edilmişti ama **filo için canlı değildi**; şeritler claim yaparken hâlâ
+yol kaybediyordu.
+
+Kancalar ve pano aracı **ana dizinden** yüklenir. Bu yüzden bir mekanizma onarımının
+kapanış kanıtı merge değil, **çalışan kopyada ölçüm**dür:
+
+| katman | ölçüt | bu vakada |
+|---|---|---|
+| merge | `mergeCommit` | `52d671df` |
+| içerik (master) | kaynakta dize sayımı | `BIRIKEN_FLAGS` = 2 |
+| **çalışan kopya** | ana dizinde `HEAD` + dize sayımı | 0 geride, = 2 |
+| **davranış (canlı)** | izole panoda gerçek çağrı | `talep alındı: KENDI → PPP/**, QQQ/**` |
+
+⚠ Son iki satır **akran beyanıyla kapatılmaz.** Ana dizini tazeleyen taraf sonucu
+bildirse bile ölçüm yeniden yapılır — kapanışı yazan, ölçen olmalıdır.
+
+⚠ Davranış ölçümü **izole panoda** (`VENTHUB_BOARD_DIR=<geçici dizin>`) koşulur; sınav
+çağrısı canlı panoya sahte claim yazmamalıdır.
+
+---
+
+## 15. ÜRETİLMİŞ ARTEFAKT İHLALİ ≠ DİKİŞ YERİ İHLALİ
+
+### Ölçülmüş vaka (2026-08-30)
+
+`bash-write-audit` tek gün içinde **üç ayrı turda** öttü ve üçünde de bulduğu şey aynıydı:
+`post-commit` üretecinin arka planda yazdığı companion `.md`'ler
+(`bash-write-audit.md`, `lane-precommit.md`, `AboutPage.md`, `board.md`,
+`CategoryLandingView.md`, `OdemeKapaliBilgi.md`). Hiçbiri elle yazılmadı, hiçbiri bir
+şeridin işine dokunmadı. Buna rağmen kanca *"başka şeridin dosyasına SEN yazdın"* deyip
+`exit 2` ile döndü **ve karşı şeride pano notu düştü**.
+
+**Niçin bu bir kusur:** yanlış alarm bedavaya gelmez. Sürekli öten kapı görmezden gelinir
+— **gürültü, kapıyı KÖR ETMENİN yavaş yoludur.** Kancanın kendi baş yorumu bunu zaten
+söylüyordu (*"alarm üç gün içinde görmezden gelinirdi"*); kusur, aynı hükmün üreteç
+çıktısına uygulanmamış olmasıydı.
+
+### Sınıflandırma YAPISALDIR — ad araması değil
+
+| ölçüt | üretilmiş sayılır |
+|---|---|
+| `artefakt_manifest.json` → `artefaktlar[].ad` | evet |
+| manifestin kendisi | evet |
+| `X.md` + yanında aynı adlı **kaynak** dosya (`.ts/.tsx/.js/.jsx/.cjs/.mjs/.py`) | evet (companion) |
+| kardeş kaynağı olmayan `.md` | **hayır** — elle yazılmış belgedir, korunur |
+
+⚠ `kaynak.dosyalar`'a **BAKILMAZ**. Orası kaynak listesidir; oraya bakan bir süzgeç
+kaynağı "üretilmiş" sanar. Bu depoda tam bu hata **104 satır cetvel** kaybettirdi
+(`uretilmis-artefakt-standard.md`, AXIOM 8).
+
+### Davranış
+
+- Üretilmiş olanlar **görünür kalır** (`DUSUK SIDDET` + gerekçe) ama **bloklamaz** ve
+  **panoya not göndermez.** Not, karşı şeridin dikkatini ister; üreteç çıktısı için o
+  dikkat boşa harcanır. *"Sustu"* ile *"böyle sınıflandırdı"* ayırt edilebilir kalmalı —
+  **sessiz muafiyet, sessiz ezme kadar kötüdür.**
+- Gerçek ihlal varsa davranış **aynen** eskisi gibi: `exit 2` + pano notu.
+- **FAIL-CLOSED:** sınıf ölçülemezse (manifest okunamadı, `statSync` patladı) ihlal
+  **gerçek** sayılır ve ölçülemezlik **basılır**. *"Ölçemedim"* ile *"üretilmiş"* aynı
+  kefeye konmaz (§5).
+
+⚠ **Kabul edilen artık risk, adıyla:** başka bir şeridin companion'ını **elle**
+düzenlemek artık bloklanmaz, yalnız düşük şiddetle raporlanır. Bilerek: companion
+üretilmiş dosyadır (AXIOM 3 elle düzenlemeyi zaten yasaklar) ve bir sonraki üretimde
+ezilir — yarıçapı sınırlıdır. Gürültünün bedeli ise sınırsızdı.
+
+### Kapı ve ayırt ediciliği
+
+`src/__tests__/conformance/bash-write-audit-uretilmis-sinifi.test.ts` — 6 kol. Asıl ölçüt
+mesaj değil **panoya düşen not sayısı**; fikstür manifestinde `kaynak.dosyalar` **kasten**
+doldurulur ki süzgecin oraya bakmadığı ölçülsün.
+
+1. **mekanizma canlı** (gerçek dosya → `exit 2` + not 1) — susma kollarını anlamlı kılan kol.
+2. companion susar (`exit 0`, not 0, `DUSUK SIDDET` görünür).
+3. manifestte ürün olan dosya susar.
+4. ⭐**karışık** (gerçek + üretilmiş) → `exit 2` ve not sayısı **tam 1**.
+5. **süzgeç dar**: kardeş kaynağı olmayan `.md` gerçek sayılır.
+6. **fail-closed**: manifest okunamayınca companion bile gerçek sayılır + `OLCULEMEDI` basılır.
+
+**Sabotajla kanıtlandı:** sınıflandırma devre dışı bırakıldığında **tam 3 kol kırmızı**
+(companion · manifest-ürün · karışık), gerçek-ihlal davranışını ölçen 3 kol yeşil kaldı,
+`FULL_EXIT=1`.
+
+---
+
+## 16. MEKANİZMA PR'I İNDİĞİNDE ANA DİZİN TAZELENİR — merge'in ayrılmaz parçası
+
+### Niçin kural oldu: aynı boşluk BİR GÜNDE İKİ KEZ
+
+§14'te *"İNDİ ≠ ÇALIŞIYOR"* bir vaka olarak yazılmıştı. Aynı gün **ikinci kez** yaşandı:
+
+| PR | master'da | ana dizinde koşan kopya |
+|---|---|---|
+| `#903` (`board.cjs` bayrak onarımı) | `BIRIKEN_FLAGS` = 2 | **0** — claim hâlâ yol kaybediyordu |
+| `#906` (`bash-write-audit` sınıfı) | `uretilmisSinifi` = 1 | **0** — yanlış alarm sürüyordu |
+
+İki vakada da PR yeşildi, merge edilmişti, içerik master'daydı. Ve **filo eski kodu
+koşmaya devam etti.** İkincisinde gürültü bir başka şeride (URUN) dört yanlış pano notu
+düşürdü.
+
+Tekrar eden bir arıza artık vaka değil, **sahipsiz adımdır**: kancalar ve pano aracı ana
+dizinden yüklenir, ama ana dizini tazelemek kimsenin görevi değildi — o yüzden unutuluyordu.
+
+### Kural
+
+**Mekanizma dosyalarına dokunan bir PR** (`scripts/board/**`, `.claude/hooks/**`,
+`.githooks/**`) master'a indiğinde:
+
+1. Merge'i duyuran taraf **OPS'a bildirir**.
+2. **OPS aynı turda ana dizini `ff-pull` eder.** Kirli dosyalar **yalnız companion** ise
+   `stash → pull → drop`; **companion olmayan tek bir kirli dosya varsa tazeleme
+   YAPILMAZ**, önce sahibi bulunur (ana dizinde başkasının işi olabilir).
+3. **Tek satır içerik kanıtı basılır:** değişen dosyada ayırt edici bir sembolün grep
+   sayımı (ör. `grep -c 'function uretilmisSinifi' .claude/hooks/bash-write-audit.cjs` → 1).
+4. Bu adım atlanırsa olay **"İNDİ ≠ ÇALIŞIYOR" vakası** sayılır ve §14'teki dört katmanlı
+   kapanış tablosu doldurulmadan PR kapatılmaz.
+
+⚠ **Kanıtı ölçen, kapanışı yazan olmalıdır** (§14). Ana dizini OPS tazelese bile, PR'ı
+kapatan şerit ölçümü **kendisi yeniden koşar**. Bu iki vakada da öyle yapıldı.
+
+### Niçin OTOMATİK değil — reddedilen seçenek, gerekçesiyle
+
+Merge sonrası ana dizini kendiliğinden tazeleyen bir adım düşünüldü ve **reddedildi**:
+ana dizin **paylaşılan** bir ağaçtır ve içinde başka bir oturumun commit'lenmemiş işi
+olabilir. Otomatik bir `pull`/`stash`, tam da bu cetvelin başka yerlerinde yazılı olan
+*"ortak ağaçta commit'siz iş uçar"* sınıfını üretir. İnsan onaylı ritüel, sessiz
+otomasyona **bilerek** tercih edildi: kaybın bedeli, unutmanın bedelinden büyüktür.
+
 
 ---
 # FILE: docs\standards\form-submission-standard.md
@@ -14449,6 +14628,89 @@ karşılaştırma anlamsızdır.
 
 Normalizasyon kapıyı zayıflatmaz: tek karakterlik gerçek fark hâlâ özeti
 değiştirir.
+
+### ⭐ÇİFT-CR FANTOMU — `checkout` kirliliği TEMİZLEMEZ, ÜRETİR
+
+**Ölçülmüş vaka (2026-08-30, `.archive/legacy_superpowers_artifacts/`, 40 dosya).**
+Bir taban tazelemesi bu dosyalar yüzünden bloklandı. `git checkout -- <yol>` koşuldu:
+33 dosya temizlendi, **7'si inatla kirli kaldı**. Ardından `git stash push` denendi —
+o da temizlemedi.
+
+**Mekanizma.** Bu blob'lar **indekste zaten CRLF** tutuyor (`git ls-files --eol` →
+`i/crlf`), `.gitattributes` ise `text eol=crlf` diyor. Checkout, LF→CRLF dönüşümünü
+depodaki `\r\n`'ye **bir kez daha** uyguluyor ve çalışma kopyasında `\r\r\n` oluşuyor.
+Yani:
+
+> **`git checkout` ve `git stash` bu dosyalarda kirliliği temizlemez — ÜRETİR.**
+> İkisi de checkout yapar; her deneme fantomu yeniden doğurur. Döngü kendiliğinden
+> kapanmaz.
+
+Bu, stash yığınındaki onlarca *"eol fantomu / .archive churn"* kaydının tek ortak
+sebebidir: her şerit aynı duvara çarpıp parkediyor, kimse mekanizmayı yazmıyor.
+
+**Ayırt edici ölçütler** (sırayla, ucuzdan pahalıya):
+
+| soru | ölçüt | fantom cevabı |
+|---|---|---|
+| içerik farkı var mı | `git diff -w --numstat` | **boş** (0 satır) |
+| ham fark ne | `git diff --numstat` | simetrik (+N −N) |
+| indeks/çalışma satır sonu | `git ls-files --eol` | `i/crlf` + `attr/text eol=crlf` |
+| çalışma kopyasında çift CR | `grep -c $'\r\r'` | **> 0** |
+
+**REÇETE — tek adımda, araya başka git komutu sokmadan:**
+
+```sh
+git -C <agac> checkout origin/master -- <yol>/ && git -C <agac> commit -m "..."
+```
+
+⚠ **`&&` şart:** araya giren bir `git merge` denemesi **indeksi geri alır** ve
+`checkout`la sahnelenen düzeltme sessizce kaybolur (ölçüldü: commit *"no changes added
+to commit"* dedi, ağaç yine 40 kirli döndü). İki ayrı çağrı = iki ayrı sonuç.
+
+`origin/master`'ın sürümü alınır çünkü master bu blob'ları **renormalize etmiştir**
+(ölçüldü: 7/7 blob farklı). Bu bir `--theirs` refleksi **değildir** — dosya sınıfı
+önce doğrulanır: içerik farkı `-w` ile sıfır olduğu için kaybedilecek yazılmış içerik
+yoktur. Kaynak dosyada aynı refleks bu depoda **104 satır cetvel kaybettirdi**.
+
+---
+
+## ⭐ÖLÇÜM ARACININ KENDİSİ ÖLÇÜLÜR
+
+Bir kapı yanlış ölçerse kırmızı verir ve fark edilir. **Ölçüm aracı yanlış ölçerse
+YEŞİL verir** — ve hüküm, ölçülmemiş bir şey üzerine kurulur. Bu depoda aynı tuzağa
+2026-08-30'da tek oturumda **iki kez**, filoda o hafta **üç kez** düşüldü.
+
+### Ölçülmüş vaka — MSYS yol dönüşümü
+
+Git Bash, argümanda `/` gördüğünde onu Windows yoluna çevirir. `git rev-parse
+origin/master:docs/x.md` çağrısı kabuktan geçerken
+`origin\master;docs\x.md`'ye dönüşür:
+
+1. **Birinci düşüş — sahte FARKLI.** Komut hata verdi, çıktı olarak dönüşmüş dizeyi
+   bastı; karşılaştırma "7/7 blob FARKLI" dedi. Hüküm tersine dönmüştü.
+2. **İkinci düşüş — sahte AYNI (daha tehlikeli).** `MSYS_NO_PATHCONV=1` ile dönüşüm
+   kapatıldı; bu sefer `-C /c/tmp/...` **çözülemedi**, iki komut da hata verip **boş
+   dize** döndürdü ve `boş == boş` karşılaştırması **"AYNI"** çıktı. Yani düzeltme
+   girişimi, hatayı *yeşile* çevirdi.
+
+### Kural
+
+- **Sıfır, eşitlik ve boş küme önce ARAÇ KUSURU şüphesiyle karşılanır.** "Fark yok"
+  ile "ölçemedim" aynı görünür; ayıran şey ölçümün kendisine konan kontroldür.
+- **Karşılaştırmadan önce iki tarafın da DOLU olduğu doğrulanır.** Boş==boş bir hüküm
+  değildir. (Aynı sınıf: boş evrende koşan bir kapı — `grep` 0 döndürdüğünde önce
+  "aranan şey bu ağaçta var mıydı" sorulur.)
+- **Yol/ref taşıyan git çağrıları kabuktan geçirilmez:** `node execFileSync` ile
+  argüman dizisi olarak verilir. Kabuk yorumu yok, dönüşüm yok.
+- **Çelişki, aracın itirafıdır.** Blob kimliği "aynı" derken satır sayımı 0 diyorsa,
+  ikisinden biri değil **ölçüm** bozuktur; çelişkiye güvenilir, tarafa değil.
+
+```js
+// Yol/ref tasiyan olcum — kabuk YOK
+const { execFileSync } = require('child_process')
+const sha = (ref, yol) =>
+  execFileSync('git', ['-C', AGAC, 'rev-parse', `${ref}:${yol}`], { encoding: 'utf8' }).trim()
+```
 
 ---
 
