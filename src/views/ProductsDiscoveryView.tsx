@@ -180,7 +180,12 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                                                 ease: [0.16, 1, 0.3, 1]
                                             }}
                                         >
+                                            {/* priority=false — ÖLÇÜLDÜ (cetvel §R7): bu sayfada
+                                                ilk kart 928 px aşağıda, fold üstü kart SIFIR
+                                                (üstte 3D karusel var). Fold altındaki görseli
+                                                öncelikli yapmak gerçek LCP adayıyla yarışır. */}
                                             <FamilyCard
+                                                priority={false}
                                                 family={family}
                                                 layout={viewMode}
                                             />

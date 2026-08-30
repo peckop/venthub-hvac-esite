@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-30T19:29:57.363499+00:00
+compiled_at: 2026-08-30T19:58:55.671504+00:00
 total_compiled_files: 62
-source_commit: f9f4cf5b
+source_commit: ba9ed216
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -14260,8 +14260,77 @@ Not: `body { overflow-x: clip }` enstrümanı KÖRLEŞTİRMEZ (belge `documentEl
   açık). Kapıya koymak regresyon değil eksik-özellik kırmızısı üretir ve kapı sökülür.
   Admin dar-ekran tasarımı geldiğinde bu muafiyet KALDIRILIR (muafiyet = adlı, süreli).
 
+## Binişme ve görünürlük (v1.1, 2026-08-30, REC-89)
+
+Reflow kuralları belgenin **taşmasını** ölçer. Bu bölüm taşma OLMADAN yaşanan kusur
+sınıfını kapsar: her şey ekranın içindedir ama **üst üstedir**. `INV-REFLOW-1` bu sınıfı
+göremez ve yeşil kalır — bölümün varlık sebebi budur.
+
+**R4. Etkileşimli elemanın metni örtülmez.** Buton/bağlantı metni her kırılım
+genişliğinde okunur olmalıdır. Ölçüt "görünür mü" DEĞİL, **"kendi merkezinde en üstte
+kim var"**: `document.elementFromPoint(merkez)` elemanın kendisini ya da çocuğunu
+döndürmelidir. Yaşandı (REC-89 kusur 1): hero CTA'larının rengi, kontrastı, opaklığı ve
+kırpması ÖLÇÜLDÜ ve **hepsi doğruydu**; buna rağmen metin okunmuyordu, çünkü kapsayıcı
+0 piksele çöküp mutlak konumlu görsel butonun üzerine binmişti. Yani stil ölçümü bu
+kusuru yapısal olarak KAÇIRIR.
+
+**R5. Yapışkan/mutlak katman içerik metnini ezmez.** `sticky`/`absolute` bir katman,
+altından akan metnin üzerine binemez. Konumlandırma sınıfı **kırılım kapsamıyla birlikte**
+yazılır: iki kolonlu düzen için tasarlanmış yapışkanlık tek kolonlu mobilde yürürlükte
+kalmamalıdır. Yaşandı (REC-89 kusur 2): `sticky top-24 z-10` `lg:` öneki olmadan
+yazılmıştı; 390 px'te kaydırma sonrası ÜÇ metin düğümü örtülü ölçüldü.
+
+**R6. Kırpma ve gizleme burada da çözüm değildir** (R3'ün bu bölüme uzantısı). Örtülen
+metni `overflow`/`z-index` ile saklamak ihlali sürdürür; katman düzeni kökünden düzeltilir.
+
+### Yükleme önceliği ve yer tutucu
+
+**R7. Öncelik FOLD ÜSTÜ ölçütüne bağlanır, sabit sayıya DEĞİL.** Liste görünümlerinde
+yalnız ilk ekranda GÖRÜNEN kartlar öncelikli (`priority`) olur; **fold üstünde kart yoksa
+hiçbir karta priority verilmez.** Sabit bir N (ör. `index < 4`) yazmak yasaktır: N, sayfa
+düzeni değiştiğinde sessizce yanlışa döner ve kimse fark etmez.
+
+*Niçin sabit N reddedildi — ölçümle:* önce "ilk 4 karta priority ver" reçetesi önerildi
+ve onaylandı. Uygulamadan önce fold üstü kart sayısı ölçüldü ve reçete ÇÜRÜDÜ:
+`/tr/products` → ilk kart 928 px aşağıda, fold üstü kart **0** (üstte 3D karusel var);
+`/tr/category/kanal-tipi-fanlar` → ilk kart 7960 px aşağıda, fold üstü kart **0**;
+`/tr/products/vortice-lineo-quiet` → ilk kart 4151 px aşağıda, fold üstü kart **0**.
+Fold ALTINDAKİ görseli öncelikli yapmak LCP'yi iyileştirmez; gerçek LCP adayıyla bant
+genişliği için yarışır ve ölçüyü KÖTÜLEŞTİRİR. Yani reçete uygulansaydı görünürde iş
+yapılmış, ölçüm gerilemiş olurdu.
+
+**R8. Yüklenmemiş kart BOŞ bırakılmaz.** Görsel gelene kadar yer tutucu (iskelet ya da
+bulanık önizleme) gösterilir; boş renk bloğu yeterli değildir. Yaşandı: müşteri ürün
+listesinde "ilk sekiz geldi, sonraki dörtlü şerit boş, ondan sonraki daha erken geldi"
+diye bildirdi. Ölçüldü: 42 görselin 42'si `lazy`, hiçbirinde `priority`/`fetchpriority`
+yok; kaydırınca hepsi birden tetikleniyor ve tarayıcının eşzamanlı bağlantı sınırı
+tamamlanma sırasını karıştırıyor. Bu tarayıcının NORMAL davranışıdır — kusur olan,
+bekleyen kartın boş görünmesidir. Yani R8 bir hız kuralı değil **algı** kuralıdır.
+
+**R9. Öncelik kararı BİLİNÇLİ yazılır.** Liste içinde kart render eden her çağrı
+`priority` değerini açıkça verir (`true` ya da `false`); sessiz varsayılana bırakılamaz.
+Yaşandı: `FamilyCard` `priority` desteğini taşıyor ve **bir** çağrı yerinde kullanılmış,
+**altı** çağrı yerinde hiç verilmemişti — kural yazılı olmadığı için hiçbir kapı görmedi.
+
+### Kapı durumu — neyin mekanik, neyin ELLE olduğu
+
+| Kural | Kapı | Tür |
+|---|---|---|
+| R4 · R5 | `INV-BINISME-1` (e2e, `elementFromPoint`) | mekanik |
+| R7 (dolaylı) · token'sız ölçü sınıfı | `INV-TOKEN-SINIF-1` (kaynak, AST) | mekanik |
+| R9 | `INV-KART-ONCELIK-1` (kaynak, AST) | mekanik |
+| R6 | — | **ELLE DENETİM** |
+| R8 (yer tutucunun GÖRSEL kalitesi) | — | **ELLE DENETİM** |
+
+R8'in "yer tutucu VAR mı" kısmı mekanikleştirilebilir; "yeterince iyi mi" kısmı
+ölçülemez ve elle denetime bırakılmıştır. Bunu açıkça yazıyoruz ki kapı listesi
+sahte-yeşil üretmesin: **kapısı olmayan kural, kapısı varmış gibi gösterilmez.**
+
 ## Değişiklik günlüğü
 
+- v1.1 (2026-08-30, REC-89): "Binişme ve görünürlük" bölümü (R4-R6) ve "Yükleme önceliği
+  ve yer tutucu" (R7-R9) eklendi. R7'nin sabit-N hâli, uygulanmadan önce yapılan fold
+  ölçümüyle çürütüldüğü için fold ölçütüne çevrildi.
 - v1.0 (2026-08-16, T050-VH): ilk sürüm — #540'ta elle bulunan taşma sınıfı kalıcı
   kapıya bağlandı; mobil viewport hattı açıldı.
 

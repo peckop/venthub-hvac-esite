@@ -139,8 +139,16 @@ const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, l
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 content-auto">
-          {models.map((model, index) => (
-            <FamilyCard key={model.id} family={model} layout="grid" priority={index < 4} />
+          {/* priority=false — SABİT N'DEN DÖNÜLDÜ (cetvel §R7). Burada `index < 4` yazıyordu;
+              ölçüm onu çürüttü: /tr/products/vortice-lineo-quiet mobil ölçümünde ilk kart
+              4151 px aşağıda, fold üstü kart SIFIR. Sabit N sayfa düzeni değiştiğinde
+              sessizce yanlışa döner; ölçüt fold üstü olmalı.
+              ⚠ÖLÇÜLMEMİŞ GÖZLEM (hüküm değil): aynı sayfada ızgara dalındaki dört kartın
+              dördü de `priority` verili olmasına RAĞMEN canlıda `loading="lazy"` geldi —
+              yani öncelik prop'u yazılıydı ama etkisiz görünüyordu. Sebebi bu turda
+              kesinleştirilemedi; kayda geçirildi. */}
+          {models.map((model) => (
+            <FamilyCard key={model.id} family={model} layout="grid" priority={false} />
           ))}
         </div>
       </div>
