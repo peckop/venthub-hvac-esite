@@ -315,8 +315,11 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
             </div>
           ) : families.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {/* priority=false — cetvel §R7/§R9 gereği karar YAZILI. Marka sayfası için
+                  fold ölçümü YAPILMADI; mevcut davranış korunuyor. Ölçülür ve fold üstünde
+                  kart çıkarsa değer burada değişir. */}
               {families.map((family) => (
-                <FamilyCard key={family.id} family={family} layout="grid" />
+                <FamilyCard key={family.id} family={family} layout="grid" priority={false} />
               ))}
             </div>
           ) : (

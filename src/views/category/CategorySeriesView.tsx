@@ -107,7 +107,11 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 content-auto">
-                        {families.map((family) => <FamilyCard key={family.id} family={family} layout="grid" />)}
+                        {/* priority=false — cetvel §R7/§R9 gereği karar YAZILI. Bu görünüm
+                            için fold ölçümü YAPILMADI; mevcut davranış korunuyor (öncesinde
+                            de öncelik verilmiyordu). Ölçülürse ve fold üstünde kart çıkarsa
+                            değer burada değiştirilir. */}
+                        {families.map((family) => <FamilyCard key={family.id} family={family} layout="grid" priority={false} />)}
                     </div>
                 )}
             </div>

@@ -938,7 +938,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 {t('pdp.relatedProducts')}
               </h2>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                {relatedFamilies.map((f) => <FamilyCard key={f.id} family={f} compact />)}
+                {/* priority=false — "ilgili seriler" bloğu PDP'nin en altında, yani her
+                    kırılımda fold ALTINDA (cetvel §R7). Karar §R9 gereği açıkça yazılı. */}
+                {relatedFamilies.map((f) => <FamilyCard key={f.id} family={f} compact priority={false} />)}
               </div>
             </>
           )}
