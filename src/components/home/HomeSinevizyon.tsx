@@ -235,7 +235,14 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
         </div>
 
         {/* Right Side: Floating High-Tech Products */}
-        <div className="w-full lg:w-1/2 relative h-320px sm:h-450px lg:h-550px">
+        {/* h-300px: `height` token'ında 320px YOK (320px yalnız minHeight/width/minWidth'te
+            tanımlı). `h-320px` sınıfı hiç üretilmiyordu → mobilde bu kapsayıcı 0px'e çöküyor,
+            içindeki mutlak konumlu ürün görselleri hero metninin ve CTA butonlarının ÜZERİNE
+            biniyordu (REC-89 kusur 1: "buton metinleri görünmüyor" — kontrast değil binişme).
+            Ölçüm: 390px viewport'ta getBoundingClientRect().height = 0; buton merkezinde
+            elementFromPoint → butona ait olmayan IMG. sm/lg kırılımları zaten geçerliydi
+            (450px ve 550px height token'ında VAR), kusur bu yüzden yalnız mobilde görünüyordu. */}
+        <div className="w-full lg:w-1/2 relative h-300px sm:h-450px lg:h-550px">
           {/* Animated Air Flow Particles using optimized CSS */}
           <div className="absolute inset-0 pointer-events-none z-0">
             {[...Array(6)].map((_, i) => (

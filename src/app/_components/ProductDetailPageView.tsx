@@ -471,7 +471,13 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Product Image Gallery (60% width on large screens) */}
-          <div className="lg:col-span-7 xl:col-span-8 sticky top-24 self-start z-10">
+          {/* `sticky top-24 z-10` KOŞULSUZ yazılmıştı; niyet iki kolonlu masaüstü düzeniydi
+              ama mobilde de yürürlükteydi. Tek kolonda yapışkan galeri ekranda kalıp ALTINDAN
+              akan metinlerin üzerine biniyordu (REC-89 kusur 2). Ölçüm: 390px viewport,
+              scrollY=1400 — sticky kutu görünür alanda kalıyor ve elementFromPoint ile
+              ÜÇ metin düğümü örtülü çıktı ("TEKNİK VERİ SAYFASI", "TEKNİK DÖKÜMAN (PDF)").
+              lg: önekiyle davranış iki kolonlu düzenle sınırlandı; mobilde normal akış. */}
+          <div className="lg:col-span-7 xl:col-span-8 lg:sticky lg:top-24 self-start z-10">
             <div className="relative group bg-white rounded-3xl border border-light-gray/50 shadow-sm overflow-hidden p-2">
               <ImageGallery
               key={selectedVariant.id}
