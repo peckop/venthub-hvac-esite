@@ -1,6 +1,14 @@
 import { execFileSync } from 'node:child_process'
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+/**
+ * AĞIR-SINIF ZAMAN AŞIMI EŞİĞİ — 60 sn (global varsayılan 20 sn, `vitest.config.ts`).
+ * Ölçüm 2026-08-30, boş makine: gövde **5,05 sn**, 6 alt süreç çağrısı (her kol gerçek bir
+ * geçici depo + gerçek commit kurar). Yük altında gözlenen amplifikasyon ~27×.
+ * 60 sn'yi aşan kırmızı GERÇEK aşımdır. Gerekçe: `docs/standards/fleet-mechanism-standard.md` §13.
+ */
+vi.setConfig({ testTimeout: 60_000 })
 
 /**
  * E1-v2 — "bu commit'i HANGİ oturum yapıyor" sorusunun kapı içindeki cevabı.

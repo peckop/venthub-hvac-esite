@@ -1,6 +1,20 @@
 import { execFileSync } from 'node:child_process'
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+/**
+ * AĞIR-SINIF ZAMAN AŞIMI EŞİĞİ — 60 sn (global varsayılan 20 sn, `vitest.config.ts`).
+ *
+ * ⭐BU DOSYA SINIFIN ÖLÇÜM KAYNAĞIDIR. 2026-08-30: boş makinede gövde **1,47 sn**, ama filo
+ * yükü altında (aynı makinede ikinci bir tam takım + `pnpm install`) **39,9 sn** ölçüldü ve
+ * 20 sn'de kesildi — yani **~27× amplifikasyon**. Kırmızı bir assertion değil, ZAMAN AŞIMIYDI.
+ * ÜRÜN aynı olguyu bağımsız olarak, farklı ağaç ve dalda doğruladı.
+ *
+ * 27× çarpanı işte bu tek gözlemden gelir; sınıfın diğer dosyalarındaki eşik bu sayıya
+ * dayanır. **60 sn'yi aşan bir kırmızı GERÇEK aşımdır.**
+ * Adı konmuş artık risk: `docs/standards/fleet-mechanism-standard.md` §13.
+ */
+vi.setConfig({ testTimeout: 60_000 })
 
 /**
  * INV-EOL-1 · Satır-sonu fantomu geri gelmesin (T017-VH).
