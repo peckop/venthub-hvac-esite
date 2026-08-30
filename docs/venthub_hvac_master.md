@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-30T18:41:43.340854+00:00
+compiled_at: 2026-08-30T18:52:48.009176+00:00
 total_compiled_files: 657
-source_commit: 4260dcf8
+source_commit: badd153a
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-30T18:41:43.340854+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-30T18:52:48.009176+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -45774,12 +45774,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\hooks\useAuth.ts
-skeleton_hash: b0a16f598c5f2e77
+source_path: C:\Users\alize\venthub-hvac\src\hooks\useAuth.ts
+skeleton_hash: 8bee269d3e6af457
 entity_hashes:
   func:useAuth: d77303020f71d360
   overview: 71c8310fd4b630c4
-generated_at: 2026-08-27T08:34:18Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -45825,15 +45825,10 @@ Bu modül için fonksiyon gövdesi verilmediği için mimari aksiyom üretilemem
 
 ## SABİTLER
 - **AUTH_FALLBACK** (object) — `{
-
   user: null,
-
   session: null,
-
   role: null,
-
   loading: false,
-
   roleL...`
 
 ---
