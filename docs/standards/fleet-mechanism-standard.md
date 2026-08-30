@@ -819,3 +819,27 @@ kusurdan daha hızlı yayılıyor — nakledilen teşhis, ölçülene kadar **hi
 **Sabotajla kanıtlandı:** birikme satırı eski ezici hâline (`flags[name] = deger`)
 çevrildiğinde **tam 2 kol kırmızı** (birikme + görünürlük), diğer 3 kol yeşil kaldı,
 `FULL_EXIT=1`. Yani kapı doğru şeyi ayırt ediyor, toptan yeşil/kırmızı vermiyor.
+
+### ⭐"İNDİ ≠ ÇALIŞIYOR" — bu onarımda da yaşandı ve kapatıldı
+
+PR merge edildikten **sonra** ölçüldü: ana dizin 6 commit gerideydi ve **koşan kopya hâlâ
+kusurluydu** — `--globs "PPP/**" --globs "QQQ/**"` çağrısı ana dizinde yine
+`talep alındı: CANLI → QQQ/**` veriyordu (`grep -c BIRIKEN_FLAGS` → **0**, master'da 2).
+Yani onarım merge edilmişti ama **filo için canlı değildi**; şeritler claim yaparken hâlâ
+yol kaybediyordu.
+
+Kancalar ve pano aracı **ana dizinden** yüklenir. Bu yüzden bir mekanizma onarımının
+kapanış kanıtı merge değil, **çalışan kopyada ölçüm**dür:
+
+| katman | ölçüt | bu vakada |
+|---|---|---|
+| merge | `mergeCommit` | `52d671df` |
+| içerik (master) | kaynakta dize sayımı | `BIRIKEN_FLAGS` = 2 |
+| **çalışan kopya** | ana dizinde `HEAD` + dize sayımı | 0 geride, = 2 |
+| **davranış (canlı)** | izole panoda gerçek çağrı | `talep alındı: KENDI → PPP/**, QQQ/**` |
+
+⚠ Son iki satır **akran beyanıyla kapatılmaz.** Ana dizini tazeleyen taraf sonucu
+bildirse bile ölçüm yeniden yapılır — kapanışı yazan, ölçen olmalıdır.
+
+⚠ Davranış ölçümü **izole panoda** (`VENTHUB_BOARD_DIR=<geçici dizin>`) koşulur; sınav
+çağrısı canlı panoya sahte claim yazmamalıdır.
