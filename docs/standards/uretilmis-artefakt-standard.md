@@ -147,6 +147,89 @@ karşılaştırma anlamsızdır.
 Normalizasyon kapıyı zayıflatmaz: tek karakterlik gerçek fark hâlâ özeti
 değiştirir.
 
+### ⭐ÇİFT-CR FANTOMU — `checkout` kirliliği TEMİZLEMEZ, ÜRETİR
+
+**Ölçülmüş vaka (2026-08-30, `.archive/legacy_superpowers_artifacts/`, 40 dosya).**
+Bir taban tazelemesi bu dosyalar yüzünden bloklandı. `git checkout -- <yol>` koşuldu:
+33 dosya temizlendi, **7'si inatla kirli kaldı**. Ardından `git stash push` denendi —
+o da temizlemedi.
+
+**Mekanizma.** Bu blob'lar **indekste zaten CRLF** tutuyor (`git ls-files --eol` →
+`i/crlf`), `.gitattributes` ise `text eol=crlf` diyor. Checkout, LF→CRLF dönüşümünü
+depodaki `\r\n`'ye **bir kez daha** uyguluyor ve çalışma kopyasında `\r\r\n` oluşuyor.
+Yani:
+
+> **`git checkout` ve `git stash` bu dosyalarda kirliliği temizlemez — ÜRETİR.**
+> İkisi de checkout yapar; her deneme fantomu yeniden doğurur. Döngü kendiliğinden
+> kapanmaz.
+
+Bu, stash yığınındaki onlarca *"eol fantomu / .archive churn"* kaydının tek ortak
+sebebidir: her şerit aynı duvara çarpıp parkediyor, kimse mekanizmayı yazmıyor.
+
+**Ayırt edici ölçütler** (sırayla, ucuzdan pahalıya):
+
+| soru | ölçüt | fantom cevabı |
+|---|---|---|
+| içerik farkı var mı | `git diff -w --numstat` | **boş** (0 satır) |
+| ham fark ne | `git diff --numstat` | simetrik (+N −N) |
+| indeks/çalışma satır sonu | `git ls-files --eol` | `i/crlf` + `attr/text eol=crlf` |
+| çalışma kopyasında çift CR | `grep -c $'\r\r'` | **> 0** |
+
+**REÇETE — tek adımda, araya başka git komutu sokmadan:**
+
+```sh
+git -C <agac> checkout origin/master -- <yol>/ && git -C <agac> commit -m "..."
+```
+
+⚠ **`&&` şart:** araya giren bir `git merge` denemesi **indeksi geri alır** ve
+`checkout`la sahnelenen düzeltme sessizce kaybolur (ölçüldü: commit *"no changes added
+to commit"* dedi, ağaç yine 40 kirli döndü). İki ayrı çağrı = iki ayrı sonuç.
+
+`origin/master`'ın sürümü alınır çünkü master bu blob'ları **renormalize etmiştir**
+(ölçüldü: 7/7 blob farklı). Bu bir `--theirs` refleksi **değildir** — dosya sınıfı
+önce doğrulanır: içerik farkı `-w` ile sıfır olduğu için kaybedilecek yazılmış içerik
+yoktur. Kaynak dosyada aynı refleks bu depoda **104 satır cetvel kaybettirdi**.
+
+---
+
+## ⭐ÖLÇÜM ARACININ KENDİSİ ÖLÇÜLÜR
+
+Bir kapı yanlış ölçerse kırmızı verir ve fark edilir. **Ölçüm aracı yanlış ölçerse
+YEŞİL verir** — ve hüküm, ölçülmemiş bir şey üzerine kurulur. Bu depoda aynı tuzağa
+2026-08-30'da tek oturumda **iki kez**, filoda o hafta **üç kez** düşüldü.
+
+### Ölçülmüş vaka — MSYS yol dönüşümü
+
+Git Bash, argümanda `/` gördüğünde onu Windows yoluna çevirir. `git rev-parse
+origin/master:docs/x.md` çağrısı kabuktan geçerken
+`origin\master;docs\x.md`'ye dönüşür:
+
+1. **Birinci düşüş — sahte FARKLI.** Komut hata verdi, çıktı olarak dönüşmüş dizeyi
+   bastı; karşılaştırma "7/7 blob FARKLI" dedi. Hüküm tersine dönmüştü.
+2. **İkinci düşüş — sahte AYNI (daha tehlikeli).** `MSYS_NO_PATHCONV=1` ile dönüşüm
+   kapatıldı; bu sefer `-C /c/tmp/...` **çözülemedi**, iki komut da hata verip **boş
+   dize** döndürdü ve `boş == boş` karşılaştırması **"AYNI"** çıktı. Yani düzeltme
+   girişimi, hatayı *yeşile* çevirdi.
+
+### Kural
+
+- **Sıfır, eşitlik ve boş küme önce ARAÇ KUSURU şüphesiyle karşılanır.** "Fark yok"
+  ile "ölçemedim" aynı görünür; ayıran şey ölçümün kendisine konan kontroldür.
+- **Karşılaştırmadan önce iki tarafın da DOLU olduğu doğrulanır.** Boş==boş bir hüküm
+  değildir. (Aynı sınıf: boş evrende koşan bir kapı — `grep` 0 döndürdüğünde önce
+  "aranan şey bu ağaçta var mıydı" sorulur.)
+- **Yol/ref taşıyan git çağrıları kabuktan geçirilmez:** `node execFileSync` ile
+  argüman dizisi olarak verilir. Kabuk yorumu yok, dönüşüm yok.
+- **Çelişki, aracın itirafıdır.** Blob kimliği "aynı" derken satır sayımı 0 diyorsa,
+  ikisinden biri değil **ölçüm** bozuktur; çelişkiye güvenilir, tarafa değil.
+
+```js
+// Yol/ref tasiyan olcum — kabuk YOK
+const { execFileSync } = require('child_process')
+const sha = (ref, yol) =>
+  execFileSync('git', ['-C', AGAC, 'rev-parse', `${ref}:${yol}`], { encoding: 'utf8' }).trim()
+```
+
 ---
 
 ## Kapı tasarımı — bu işte öğrenilen üç ders
