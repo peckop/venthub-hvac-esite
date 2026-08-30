@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-30T18:41:44.031932+00:00
+compiled_at: 2026-08-30T18:52:48.636472+00:00
 total_compiled_files: 62
-source_commit: 4260dcf8
+source_commit: badd153a
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -8704,6 +8704,52 @@ amplifiye süresi **ölçülmedi** — 20 sn'de kesildi. Tablo bu varsayımla ok
 
 ⚠**Kapsam dışı bırakılan, adıyla:** `catalog-integrity-gate` (0,995 sn) eşiğin hemen altında
 ve bu şeridin claim'inde değil — dokunulmadı. Bir sonraki yük dalgasında ilk aday odur.
+
+---
+
+## 14. `board.cjs` BAYRAK SEMANTİĞİ — tekrarlanan bayrak sessizce ezmez
+
+### Ölçülmüş vaka (2026-08-30)
+
+CLI ayrıştırıcısı `flags[name] = rest[i + 1]` yazıyordu. `--globs "A/**" --globs "B/**"`
+çağrısında ikinci değer birinciyi eziyor, claim **yalnız `B/**` ile** kaydediliyordu.
+Komut `exit 0` verip *"talep alındı"* diyordu — yani **kayıp, başarı gibi görünüyordu.**
+
+**Niçin ciddi:** claim eksik kaydolunca şerit, talep ettiğini sandığı yolları
+**korumuyor**. Başka bir şerit o yollara girdiğinde kapı çakışmayı **göremiyor** — sessiz
+kayıp doğrudan şerit izolasyonunu deliyor. Kapının varlık sebebi tam da bu.
+
+⚠**Filo notu yön olarak yanlıştı:** panoda *"yalnız İLKİ kaydediliyor"* yazıyordu; ölçüm
+**SON kazandığını** gösterdi. Kayıp aynı, teşhis değil. Ölçülmemiş teşhis, ölçülmüş
+kusurdan daha hızlı yayılıyor — nakledilen teşhis, ölçülene kadar **hipotezdir**.
+
+### Kural — iki ayrı davranış, bilerek
+
+| bayrak | tekrarlanırsa | niçin |
+|---|---|---|
+| `--globs` | **BİRİKİR** (birleşim) | ayırıcı zaten virgül; tekrarın tek anlamlı yorumu birleşimdir |
+| `--sid`, `--lane`, `--to`, `--text` | **HATA (exit 1)** | "hangisini kastettin"in doğru cevabı yok; sessizce birini seçmek ezmenin başka adıdır |
+
+- **Birleştirme GÖRÜNÜR olur:** kaç yol okunduğu `stderr`'e yazılır. Sessiz birleştirme de
+  sessiz ezme kadar okunaksızdır — okuyan neyin kaydedildiğini görmeli.
+- **Ret GÖRÜNÜR olur:** hata mesajı hem bayrağı hem **iki değeri birden** yazar; okuyan
+  hangisinin düştüğünü bilmeden karar veremez.
+
+### Kapı ve ayırt ediciliği
+
+`src/__tests__/conformance/board-globs-tekrarlanan-bayrak.test.ts` — 5 kol. Kollar
+**birbirinin yerine geçmez**, çünkü tek kol yanıltır:
+
+- *tekrar birikiyor* kolu — asıl hüküm.
+- *virgüllü tek değer* **gerileme kolu** — onarım eski sözdizimini bozarsa, yalnız birinci
+  kol yeşilken bu fark edilmezdi.
+- *tekrarlanan `--sid` reddediliyor* kolu — birikmenin her bayrağa yayılmadığını kanıtlar.
+- *birleştirme görünür* kolu — sessizliği kusur sayar.
+- *ön koşul* kolu — `board.cjs` gerçekten koşuyor mu (ölçülemedi ≠ geçti).
+
+**Sabotajla kanıtlandı:** birikme satırı eski ezici hâline (`flags[name] = deger`)
+çevrildiğinde **tam 2 kol kırmızı** (birikme + görünürlük), diğer 3 kol yeşil kaldı,
+`FULL_EXIT=1`. Yani kapı doğru şeyi ayırt ediyor, toptan yeşil/kırmızı vermiyor.
 
 
 ---
