@@ -843,3 +843,67 @@ bildirse bile ölçüm yeniden yapılır — kapanışı yazan, ölçen olmalıd
 
 ⚠ Davranış ölçümü **izole panoda** (`VENTHUB_BOARD_DIR=<geçici dizin>`) koşulur; sınav
 çağrısı canlı panoya sahte claim yazmamalıdır.
+
+---
+
+## 15. ÜRETİLMİŞ ARTEFAKT İHLALİ ≠ DİKİŞ YERİ İHLALİ
+
+### Ölçülmüş vaka (2026-08-30)
+
+`bash-write-audit` tek gün içinde **üç ayrı turda** öttü ve üçünde de bulduğu şey aynıydı:
+`post-commit` üretecinin arka planda yazdığı companion `.md`'ler
+(`bash-write-audit.md`, `lane-precommit.md`, `AboutPage.md`, `board.md`,
+`CategoryLandingView.md`, `OdemeKapaliBilgi.md`). Hiçbiri elle yazılmadı, hiçbiri bir
+şeridin işine dokunmadı. Buna rağmen kanca *"başka şeridin dosyasına SEN yazdın"* deyip
+`exit 2` ile döndü **ve karşı şeride pano notu düştü**.
+
+**Niçin bu bir kusur:** yanlış alarm bedavaya gelmez. Sürekli öten kapı görmezden gelinir
+— **gürültü, kapıyı KÖR ETMENİN yavaş yoludur.** Kancanın kendi baş yorumu bunu zaten
+söylüyordu (*"alarm üç gün içinde görmezden gelinirdi"*); kusur, aynı hükmün üreteç
+çıktısına uygulanmamış olmasıydı.
+
+### Sınıflandırma YAPISALDIR — ad araması değil
+
+| ölçüt | üretilmiş sayılır |
+|---|---|
+| `artefakt_manifest.json` → `artefaktlar[].ad` | evet |
+| manifestin kendisi | evet |
+| `X.md` + yanında aynı adlı **kaynak** dosya (`.ts/.tsx/.js/.jsx/.cjs/.mjs/.py`) | evet (companion) |
+| kardeş kaynağı olmayan `.md` | **hayır** — elle yazılmış belgedir, korunur |
+
+⚠ `kaynak.dosyalar`'a **BAKILMAZ**. Orası kaynak listesidir; oraya bakan bir süzgeç
+kaynağı "üretilmiş" sanar. Bu depoda tam bu hata **104 satır cetvel** kaybettirdi
+(`uretilmis-artefakt-standard.md`, AXIOM 8).
+
+### Davranış
+
+- Üretilmiş olanlar **görünür kalır** (`DUSUK SIDDET` + gerekçe) ama **bloklamaz** ve
+  **panoya not göndermez.** Not, karşı şeridin dikkatini ister; üreteç çıktısı için o
+  dikkat boşa harcanır. *"Sustu"* ile *"böyle sınıflandırdı"* ayırt edilebilir kalmalı —
+  **sessiz muafiyet, sessiz ezme kadar kötüdür.**
+- Gerçek ihlal varsa davranış **aynen** eskisi gibi: `exit 2` + pano notu.
+- **FAIL-CLOSED:** sınıf ölçülemezse (manifest okunamadı, `statSync` patladı) ihlal
+  **gerçek** sayılır ve ölçülemezlik **basılır**. *"Ölçemedim"* ile *"üretilmiş"* aynı
+  kefeye konmaz (§5).
+
+⚠ **Kabul edilen artık risk, adıyla:** başka bir şeridin companion'ını **elle**
+düzenlemek artık bloklanmaz, yalnız düşük şiddetle raporlanır. Bilerek: companion
+üretilmiş dosyadır (AXIOM 3 elle düzenlemeyi zaten yasaklar) ve bir sonraki üretimde
+ezilir — yarıçapı sınırlıdır. Gürültünün bedeli ise sınırsızdı.
+
+### Kapı ve ayırt ediciliği
+
+`src/__tests__/conformance/bash-write-audit-uretilmis-sinifi.test.ts` — 6 kol. Asıl ölçüt
+mesaj değil **panoya düşen not sayısı**; fikstür manifestinde `kaynak.dosyalar` **kasten**
+doldurulur ki süzgecin oraya bakmadığı ölçülsün.
+
+1. **mekanizma canlı** (gerçek dosya → `exit 2` + not 1) — susma kollarını anlamlı kılan kol.
+2. companion susar (`exit 0`, not 0, `DUSUK SIDDET` görünür).
+3. manifestte ürün olan dosya susar.
+4. ⭐**karışık** (gerçek + üretilmiş) → `exit 2` ve not sayısı **tam 1**.
+5. **süzgeç dar**: kardeş kaynağı olmayan `.md` gerçek sayılır.
+6. **fail-closed**: manifest okunamayınca companion bile gerçek sayılır + `OLCULEMEDI` basılır.
+
+**Sabotajla kanıtlandı:** sınıflandırma devre dışı bırakıldığında **tam 3 kol kırmızı**
+(companion · manifest-ürün · karışık), gerçek-ihlal davranışını ölçen 3 kol yeşil kaldı,
+`FULL_EXIT=1`.
