@@ -397,7 +397,103 @@ if (!ihlaller.length) {
   process.exit(0)
 }
 
-const satirlar = ihlaller.map(
+/**
+ * ⭐ÜRETİLMİŞ ARTEFAKT İHLALİ ≠ DİKİŞ YERİ İHLALİ (2026-08-30, ölçülmüş alarm gürültüsü).
+ *
+ * Bu kanca bugün üç ayrı turda öttü ve ÜÇÜNDE DE bulduğu şey aynıydı: `post-commit`
+ * üretecinin arka planda yazdığı companion `.md`'ler (`bash-write-audit.md`,
+ * `lane-precommit.md`, `AboutPage.md`, `board.md`...). Hiçbiri elle yazılmadı; hiçbiri
+ * bir şeridin işine dokunmadı.
+ *
+ * NİÇİN ONARILIYOR: alarm "başka şeridin dosyasına SEN yazdın" der ve `exit 2` ile
+ * dönüp okuyanı durdurur. Üretecin çıktısı için bu cümle YANLIŞ — ve yanlış alarm
+ * bedavaya gelmez: bu depoda defalarca yazıldığı gibi, sürekli öten bir kapı üç gün
+ * içinde görmezden gelinir. Yani gürültü, kapıyı KÖR ETMENİN yavaş yoludur.
+ *
+ * SINIFLANDIRMA YAPISALDIR — ad araması DEĞİL (AXIOM 8 dersi: `uretilmis-artefakt-standard.md`):
+ *   · manifestte ÜRÜN olarak ilan edilmiş dosya (`artefaktlar[].ad`) — `kaynak.dosyalar`a
+ *     BAKILMAZ, orası kaynak listesidir ve ona bakan bir süzgeç kaynağı "üretilmiş" sanar.
+ *   · manifestin kendisi.
+ *   · companion: `X.md` ve yanında aynı adlı bir KAYNAK dosya (`X.ts` gibi) duruyorsa.
+ *
+ * ⚠FAIL-CLOSED: sınıf ÖLÇÜLEMEZSE (manifest okunamadı, `statSync` patladı) ihlal GERÇEK
+ * sayılır. "Ölçemedim" ile "üretilmiş" aynı kefeye konmaz — bu kancanın kendi cetveli
+ * (§5) bunu emrediyor.
+ *
+ * ⚠KABUL EDİLEN ARTIK RİSK, ADIYLA: başka bir şeridin companion'ını ELLE düzenlersem bu
+ * artık bloklamaz, yalnız düşük şiddetle raporlanır. Bilerek: companion üretilmiş dosyadır
+ * (AXIOM 3 zaten elle düzenlemeyi yasaklar) ve bir sonraki üretimde ezilir — yani yarıçapı
+ * sınırlı. Buna karşılık gürültünün bedeli sınırsızdı.
+ */
+const KAYNAK_UZANTILARI = ['.ts', '.tsx', '.js', '.jsx', '.cjs', '.mjs', '.py']
+
+/** Manifestin ilan ettiği ÜRÜN adları — ağaç başına bir kez okunur. */
+const manifestOnbellek = new Map()
+function manifestUrunleri(agac) {
+  if (manifestOnbellek.has(agac)) return manifestOnbellek.get(agac)
+  let sonuc = null // null = ÖLÇÜLEMEDİ (fail-closed sinyali)
+  try {
+    const ham = fs.readFileSync(path.join(agac, 'docs', 'artefakt_manifest.json'), 'utf8')
+    const m = JSON.parse(ham)
+    const liste = Array.isArray(m.artefaktlar) ? m.artefaktlar : []
+    sonuc = new Set(liste.map((a) => 'docs/' + String(a.ad)).concat(['docs/artefakt_manifest.json']))
+  } catch {
+    sonuc = null
+  }
+  manifestOnbellek.set(agac, sonuc)
+  return sonuc
+}
+
+/** @returns {{uretilmis: boolean, olculdu: boolean, gerekce: string}} */
+function uretilmisSinifi(agac, bagil) {
+  const yol = String(bagil).replace(/\\/g, '/')
+  const urunler = manifestUrunleri(agac)
+  if (urunler === null) return { uretilmis: false, olculdu: false, gerekce: 'manifest okunamadi' }
+  if (urunler.has(yol)) return { uretilmis: true, olculdu: true, gerekce: 'manifestte URUN' }
+  if (!/\.md$/i.test(yol)) return { uretilmis: false, olculdu: true, gerekce: 'md degil' }
+  const govde = yol.slice(0, -3)
+  for (const uz of KAYNAK_UZANTILARI) {
+    try {
+      if (fs.statSync(path.join(agac, govde + uz)).isFile()) {
+        return { uretilmis: true, olculdu: true, gerekce: 'companion (' + govde.split('/').pop() + uz + ')' }
+      }
+    } catch { /* yok — sonraki uzantı */ }
+  }
+  return { uretilmis: false, olculdu: true, gerekce: 'kardes kaynak dosya YOK' }
+}
+
+const uretilmisIhlaller = []
+const gercekIhlaller = []
+for (const i of ihlaller) {
+  const s = uretilmisSinifi(i.y.agac, i.y.bagil)
+  if (s.uretilmis) uretilmisIhlaller.push({ ...i, gerekce: s.gerekce })
+  else {
+    if (!s.olculdu) uyarilar.push('[bash-write-audit] sinif OLCULEMEDI (' + s.gerekce + ') — ihlal GERCEK sayildi: ' + etiket(i.y))
+    gercekIhlaller.push(i)
+  }
+}
+
+/**
+ * Üretilmiş olanlar GÖRÜNÜR kalır ama BLOKLAMAZ ve panoya not GÖNDERMEZ: not, karşı
+ * şeridin dikkatini ister; üreteç çıktısı için bu dikkat boşa harcanır. "Sustu" ile
+ * "böyle sınıflandırdı" ayırt edilebilsin diye gerekçe basılır.
+ */
+if (uretilmisIhlaller.length) {
+  process.stderr.write(
+    '[bash-write-audit] DUSUK SIDDET — ' + uretilmisIhlaller.length +
+      ' URETILMIS artefakt baska seridin globunda degisti (uretec ciktisi, elle yazma DEGIL; panoya not GONDERILMEDI):\n' +
+      uretilmisIhlaller.map((i) => '  · ' + etiket(i.y) + '  [' + i.gerekce + ']').join('\n') + '\n',
+  )
+}
+
+if (!gercekIhlaller.length) {
+  uyariBas()
+  process.exit(0)
+}
+
+const ihlallerAsil = gercekIhlaller
+
+const satirlar = ihlallerAsil.map(
   (i) => '  · ' + etiket(i.y) + '  ->  ' + i.catisma.claim.lane + ' (' + String(i.catisma.claim.sid).slice(0, 8) + ') · kural: ' + i.catisma.glob,
 )
 
@@ -411,7 +507,7 @@ const satirlar = ihlaller.map(
  * başarısızlık BASILIYOR.
  */
 const lanelereGore = new Map()
-for (const i of ihlaller) {
+for (const i of ihlallerAsil) {
   const anahtar = i.catisma.claim.sid
   if (!lanelereGore.has(anahtar)) lanelereGore.set(anahtar, { claim: i.catisma.claim, satirlar: [] })
   lanelereGore.get(anahtar).satirlar.push('  · ' + etiket(i.y) + ' · kural: ' + i.catisma.glob)
