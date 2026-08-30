@@ -286,6 +286,77 @@ const tabanKume = new Set(taban.yollar)
 const hamYeniler = simdiki.filter((y) => !tabanKume.has(y.anahtar))
 
 /**
+ * BİRLEŞTİRME MUAFİYETİ — ölçülmüş kusur (2026-08-28), aynı gün ÜÇ kez ötdü.
+ *
+ * `git merge origin/master` çalışma ağacına BAŞKA ŞERİTLERİN master'a inmiş dosyalarını
+ * getirir. Bunlar "yeni kirli yol"dur ve bu kanca onları bu şeridin yazması sanıyordu.
+ * Bugünkü üç vaka: ALTYAPI kendi ağacında 7 dosya (URUN + I18N yolları), AUTH iki kez,
+ * URUN bir kez — URUN alarmı bağımsız olarak "bu ihlal değil, merge'in kendisi" diye
+ * teşhis etti ve panoya yazdı. Yani ihlal ETİKETİ yanlış kişiye yapışıyordu: içeriği
+ * YAZAN değil TAŞIYAN cezalanıyordu.
+ *
+ * `lane-precommit.cjs`'te bu muafiyet ZATEN VARDI (MERGE_HEAD/CHERRY_PICK_HEAD/REVERT_HEAD);
+ * burada yoktu. İki kapının aynı olguya farklı hüküm vermesi, bugün adlandırdığımız
+ * "düzeltme yolu kapalı alarm" sınıfının kardeşi: bir kapı normal iş akışını ihlal sayarsa
+ * alarm üç gün içinde görmezden gelinir ve GERÇEK sinyal onunla birlikte ölür.
+ *
+ * FAIL-CLOSED: birleştirme hâli ÖLÇÜLEMEZSE muafiyet AÇILMAZ. Muafiyet bir kapıyı gevşetir;
+ * gevşetmenin ölçülemediği yerde varsayılan sıkı olmalı (guard'daki `anaDepoMu` ile aynı ilke).
+ *
+ * KAPSAM DAR: yalnız birleştirme HÂLİNDEKİ ağacın yeni yolları muaf. Merge commit'lendikten
+ * sonra hâl biter, ağaç temizlenir ve bu yollar zaten `simdiki`den düşer — muafiyet kalıcı
+ * bir kör nokta bırakmaz. Taban her turda güncellendiği için muaf tutulan yollar sonraki
+ * turlarda da alarm üretmez; bu KAYIP değil, aynı olgunun tek kez değerlendirilmesidir.
+ */
+const BIRLESTIRME_ISARETLERI = ['MERGE_HEAD', 'CHERRY_PICK_HEAD', 'REVERT_HEAD']
+
+function birlestirmeHali(agac) {
+  const gitDir = gitOku(agac, '--absolute-git-dir')
+  if (!gitDir) return { hal: null, olculdu: false }
+  for (const ad of BIRLESTIRME_ISARETLERI) {
+    try {
+      if (fs.existsSync(path.join(gitDir, ad))) return { hal: ad, olculdu: true }
+    } catch {
+      return { hal: null, olculdu: false }
+    }
+  }
+  return { hal: null, olculdu: true }
+}
+
+const halCache = new Map()
+const halAl = (agac) => {
+  if (!halCache.has(agac)) halCache.set(agac, birlestirmeHali(agac))
+  return halCache.get(agac)
+}
+
+const muafAgaclar = new Map()
+const olculemeyenAgaclar = new Set()
+const birlestirmeSonrasi = hamYeniler.filter((y) => {
+  const { hal, olculdu } = halAl(y.agac)
+  if (!olculdu) {
+    olculemeyenAgaclar.add(y.agac)
+    return true // FAIL-CLOSED: ölçemediysem muaf tutmam
+  }
+  if (!hal) return true
+  muafAgaclar.set(y.agac, { hal, sayi: (muafAgaclar.get(y.agac)?.sayi || 0) + 1 })
+  return false
+})
+
+for (const [agac, { hal, sayi }] of muafAgaclar) {
+  uyarilar.push(
+    '[bash-write-audit] BIRLESTIRME MUAFIYETI — ' + agac + ' su an ' + hal + ' halinde; ' +
+      sayi + ' yeni yol ENTEGRE EDILEN icerik sayildi, serit kapisindan GECIRILMEDI.' +
+      '\n  Bunlar bu seridin YAZDIGI is degil, TASIDIGI is. Muafiyet merge bitince kendiliginden kapanir.',
+  )
+}
+for (const agac of olculemeyenAgaclar) {
+  uyarilar.push(
+    '[bash-write-audit] birlestirme hali OLCULEMEDI (' + agac + ') — muafiyet ACILMADI (fail-closed).' +
+      '\n  Alarm oterse once bu agacin git dizinini kontrol et; sessiz muafiyetten iyidir.',
+  )
+}
+
+/**
  * ⭐PENCERE AYRIMI (2026-08-28, REC-84) — ölçtüğüm şey ile İDDİA ETTİĞİM şey aynı olmalı.
  *
  * Bu kanca "taban kümesinde yoktu, şimdi var" ölçer. Alarmın metni ise "Bash SONRASI değişti"
@@ -305,6 +376,11 @@ const hamYeniler = simdiki.filter((y) => !tabanKume.has(y.anahtar))
  * TOLERANS: taban yazımı ile dosya yazımı aynı saniyeye düşebilir; 2 sn'lik pay bırakıldı.
  * Pay YÖNÜ bilinçli — şüpheli kalemi "bu pencerede" saymak yanlış-pozitif üretir, tersi
  * yanlış-negatif; ikisi arasında yanlış-pozitifi seçiyoruz çünkü asıl ihlal SESSİZ KALMAMALI.
+ *
+ * ⚠SIRA BİLİNÇLİ (2026-08-30, bu iki katman ilk kez yan yana geldi): önce BİRLEŞTİRME
+ * MUAFİYETİ, sonra PENCERE. Merge'in taşıdığı dosya zaten bu şeridin yazması değildir —
+ * onu önce elemek, "pencere dışı" raporunu merge artıklarıyla şişirmeyi önler. Ters sıra
+ * aynı dosyayı iki kez ve iki farklı gerekçeyle anlatırdı; rapor okunaksızlaşır.
  */
 const TOLERANS_MS = 2000
 const dosyaZamani = (y) => {
@@ -317,7 +393,7 @@ const dosyaZamani = (y) => {
 
 const bayatlar = []
 const yeniler = []
-for (const y of hamYeniler) {
+for (const y of birlestirmeSonrasi) {
   const mt = taban.ts ? dosyaZamani(y) : null
   if (taban.ts && mt !== null && mt < taban.ts - TOLERANS_MS) bayatlar.push({ ...y, mt })
   else yeniler.push(y)
@@ -333,10 +409,10 @@ if (bayatlar.length) {
   )
 }
 
-if (!taban.ts && hamYeniler.length) {
+if (!taban.ts && birlestirmeSonrasi.length) {
   uyarilar.push(
     '[bash-write-audit] taban ZAMAN DAMGASIZ (surum<3) — pencere ayrimi yapilamadi, ' +
-      hamYeniler.length + ' kalem "bu turda olustu" SAYILDI. Bir sonraki tur damgali olacak.',
+      birlestirmeSonrasi.length + ' kalem "bu turda olustu" SAYILDI. Bir sonraki tur damgali olacak.',
   )
 }
 
@@ -384,7 +460,103 @@ if (!ihlaller.length) {
   process.exit(0)
 }
 
-const satirlar = ihlaller.map(
+/**
+ * ⭐ÜRETİLMİŞ ARTEFAKT İHLALİ ≠ DİKİŞ YERİ İHLALİ (2026-08-30, ölçülmüş alarm gürültüsü).
+ *
+ * Bu kanca bugün üç ayrı turda öttü ve ÜÇÜNDE DE bulduğu şey aynıydı: `post-commit`
+ * üretecinin arka planda yazdığı companion `.md`'ler (`bash-write-audit.md`,
+ * `lane-precommit.md`, `AboutPage.md`, `board.md`...). Hiçbiri elle yazılmadı; hiçbiri
+ * bir şeridin işine dokunmadı.
+ *
+ * NİÇİN ONARILIYOR: alarm "başka şeridin dosyasına SEN yazdın" der ve `exit 2` ile
+ * dönüp okuyanı durdurur. Üretecin çıktısı için bu cümle YANLIŞ — ve yanlış alarm
+ * bedavaya gelmez: bu depoda defalarca yazıldığı gibi, sürekli öten bir kapı üç gün
+ * içinde görmezden gelinir. Yani gürültü, kapıyı KÖR ETMENİN yavaş yoludur.
+ *
+ * SINIFLANDIRMA YAPISALDIR — ad araması DEĞİL (AXIOM 8 dersi: `uretilmis-artefakt-standard.md`):
+ *   · manifestte ÜRÜN olarak ilan edilmiş dosya (`artefaktlar[].ad`) — `kaynak.dosyalar`a
+ *     BAKILMAZ, orası kaynak listesidir ve ona bakan bir süzgeç kaynağı "üretilmiş" sanar.
+ *   · manifestin kendisi.
+ *   · companion: `X.md` ve yanında aynı adlı bir KAYNAK dosya (`X.ts` gibi) duruyorsa.
+ *
+ * ⚠FAIL-CLOSED: sınıf ÖLÇÜLEMEZSE (manifest okunamadı, `statSync` patladı) ihlal GERÇEK
+ * sayılır. "Ölçemedim" ile "üretilmiş" aynı kefeye konmaz — bu kancanın kendi cetveli
+ * (§5) bunu emrediyor.
+ *
+ * ⚠KABUL EDİLEN ARTIK RİSK, ADIYLA: başka bir şeridin companion'ını ELLE düzenlersem bu
+ * artık bloklamaz, yalnız düşük şiddetle raporlanır. Bilerek: companion üretilmiş dosyadır
+ * (AXIOM 3 zaten elle düzenlemeyi yasaklar) ve bir sonraki üretimde ezilir — yani yarıçapı
+ * sınırlı. Buna karşılık gürültünün bedeli sınırsızdı.
+ */
+const KAYNAK_UZANTILARI = ['.ts', '.tsx', '.js', '.jsx', '.cjs', '.mjs', '.py']
+
+/** Manifestin ilan ettiği ÜRÜN adları — ağaç başına bir kez okunur. */
+const manifestOnbellek = new Map()
+function manifestUrunleri(agac) {
+  if (manifestOnbellek.has(agac)) return manifestOnbellek.get(agac)
+  let sonuc = null // null = ÖLÇÜLEMEDİ (fail-closed sinyali)
+  try {
+    const ham = fs.readFileSync(path.join(agac, 'docs', 'artefakt_manifest.json'), 'utf8')
+    const m = JSON.parse(ham)
+    const liste = Array.isArray(m.artefaktlar) ? m.artefaktlar : []
+    sonuc = new Set(liste.map((a) => 'docs/' + String(a.ad)).concat(['docs/artefakt_manifest.json']))
+  } catch {
+    sonuc = null
+  }
+  manifestOnbellek.set(agac, sonuc)
+  return sonuc
+}
+
+/** @returns {{uretilmis: boolean, olculdu: boolean, gerekce: string}} */
+function uretilmisSinifi(agac, bagil) {
+  const yol = String(bagil).replace(/\\/g, '/')
+  const urunler = manifestUrunleri(agac)
+  if (urunler === null) return { uretilmis: false, olculdu: false, gerekce: 'manifest okunamadi' }
+  if (urunler.has(yol)) return { uretilmis: true, olculdu: true, gerekce: 'manifestte URUN' }
+  if (!/\.md$/i.test(yol)) return { uretilmis: false, olculdu: true, gerekce: 'md degil' }
+  const govde = yol.slice(0, -3)
+  for (const uz of KAYNAK_UZANTILARI) {
+    try {
+      if (fs.statSync(path.join(agac, govde + uz)).isFile()) {
+        return { uretilmis: true, olculdu: true, gerekce: 'companion (' + govde.split('/').pop() + uz + ')' }
+      }
+    } catch { /* yok — sonraki uzantı */ }
+  }
+  return { uretilmis: false, olculdu: true, gerekce: 'kardes kaynak dosya YOK' }
+}
+
+const uretilmisIhlaller = []
+const gercekIhlaller = []
+for (const i of ihlaller) {
+  const s = uretilmisSinifi(i.y.agac, i.y.bagil)
+  if (s.uretilmis) uretilmisIhlaller.push({ ...i, gerekce: s.gerekce })
+  else {
+    if (!s.olculdu) uyarilar.push('[bash-write-audit] sinif OLCULEMEDI (' + s.gerekce + ') — ihlal GERCEK sayildi: ' + etiket(i.y))
+    gercekIhlaller.push(i)
+  }
+}
+
+/**
+ * Üretilmiş olanlar GÖRÜNÜR kalır ama BLOKLAMAZ ve panoya not GÖNDERMEZ: not, karşı
+ * şeridin dikkatini ister; üreteç çıktısı için bu dikkat boşa harcanır. "Sustu" ile
+ * "böyle sınıflandırdı" ayırt edilebilsin diye gerekçe basılır.
+ */
+if (uretilmisIhlaller.length) {
+  process.stderr.write(
+    '[bash-write-audit] DUSUK SIDDET — ' + uretilmisIhlaller.length +
+      ' URETILMIS artefakt baska seridin globunda degisti (uretec ciktisi, elle yazma DEGIL; panoya not GONDERILMEDI):\n' +
+      uretilmisIhlaller.map((i) => '  · ' + etiket(i.y) + '  [' + i.gerekce + ']').join('\n') + '\n',
+  )
+}
+
+if (!gercekIhlaller.length) {
+  uyariBas()
+  process.exit(0)
+}
+
+const ihlallerAsil = gercekIhlaller
+
+const satirlar = ihlallerAsil.map(
   (i) => '  · ' + etiket(i.y) + '  ->  ' + i.catisma.claim.lane + ' (' + String(i.catisma.claim.sid).slice(0, 8) + ') · kural: ' + i.catisma.glob,
 )
 
@@ -398,7 +570,7 @@ const satirlar = ihlaller.map(
  * başarısızlık BASILIYOR.
  */
 const lanelereGore = new Map()
-for (const i of ihlaller) {
+for (const i of ihlallerAsil) {
   const anahtar = i.catisma.claim.sid
   if (!lanelereGore.has(anahtar)) lanelereGore.set(anahtar, { claim: i.catisma.claim, satirlar: [] })
   lanelereGore.get(anahtar).satirlar.push('  · ' + etiket(i.y) + ' · kural: ' + i.catisma.glob)

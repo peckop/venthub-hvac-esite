@@ -2,6 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { localizedHref, Routes } from '../../utils/routes'
+import { getWhatsAppNumber } from '../../utils/whatsapp'
 import { ClientLeadButton } from './ClientLeadButton'
 
 interface KnowledgeItem {
@@ -63,6 +64,9 @@ interface KnowledgeBlockProps {
 }
 
 const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCtaDict, statsExperience, lang, onQuoteClick }) => {
+  // Numara SSOT = ENV (NEXT_PUBLIC_SHOP_WHATSAPP); eski sabit değer uydurmaydı
+  // ve gerçek bir vatandaşa denk gelebilirdi (2026-08-30 temizliği). ENV yoksa buton çıkmaz.
+  const whatsAppNumber = getWhatsAppNumber()
   return (
     <section className="relative overflow-hidden bg-slate-950 py-24 sm:py-32 text-white">
       {/* Background Elements */}
@@ -149,14 +153,16 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
               onQuoteClick={onQuoteClick} 
             />
             
-            <Link
-              href="https://wa.me/905442450205"
-              target="_blank"
-              className="inline-flex items-center justify-center gap-4 h-16 px-10 rounded-2xl border border-white/10 bg-white/5 text-white font-bold uppercase text-xs tracking-hvac-normal hover:bg-white/10 transition-colors"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              {finalCtaDict.secondaryCta}
-            </Link>
+            {whatsAppNumber && (
+              <Link
+                href={`https://wa.me/${whatsAppNumber}`}
+                target="_blank"
+                className="inline-flex items-center justify-center gap-4 h-16 px-10 rounded-2xl border border-white/10 bg-white/5 text-white font-bold uppercase text-xs tracking-hvac-normal hover:bg-white/10 transition-colors"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                {finalCtaDict.secondaryCta}
+              </Link>
+            )}
           </div>
 
           <div className="relative" data-observe="fade-up">

@@ -147,6 +147,89 @@ karşılaştırma anlamsızdır.
 Normalizasyon kapıyı zayıflatmaz: tek karakterlik gerçek fark hâlâ özeti
 değiştirir.
 
+### ⭐ÇİFT-CR FANTOMU — `checkout` kirliliği TEMİZLEMEZ, ÜRETİR
+
+**Ölçülmüş vaka (2026-08-30, `.archive/legacy_superpowers_artifacts/`, 40 dosya).**
+Bir taban tazelemesi bu dosyalar yüzünden bloklandı. `git checkout -- <yol>` koşuldu:
+33 dosya temizlendi, **7'si inatla kirli kaldı**. Ardından `git stash push` denendi —
+o da temizlemedi.
+
+**Mekanizma.** Bu blob'lar **indekste zaten CRLF** tutuyor (`git ls-files --eol` →
+`i/crlf`), `.gitattributes` ise `text eol=crlf` diyor. Checkout, LF→CRLF dönüşümünü
+depodaki `\r\n`'ye **bir kez daha** uyguluyor ve çalışma kopyasında `\r\r\n` oluşuyor.
+Yani:
+
+> **`git checkout` ve `git stash` bu dosyalarda kirliliği temizlemez — ÜRETİR.**
+> İkisi de checkout yapar; her deneme fantomu yeniden doğurur. Döngü kendiliğinden
+> kapanmaz.
+
+Bu, stash yığınındaki onlarca *"eol fantomu / .archive churn"* kaydının tek ortak
+sebebidir: her şerit aynı duvara çarpıp parkediyor, kimse mekanizmayı yazmıyor.
+
+**Ayırt edici ölçütler** (sırayla, ucuzdan pahalıya):
+
+| soru | ölçüt | fantom cevabı |
+|---|---|---|
+| içerik farkı var mı | `git diff -w --numstat` | **boş** (0 satır) |
+| ham fark ne | `git diff --numstat` | simetrik (+N −N) |
+| indeks/çalışma satır sonu | `git ls-files --eol` | `i/crlf` + `attr/text eol=crlf` |
+| çalışma kopyasında çift CR | `grep -c $'\r\r'` | **> 0** |
+
+**REÇETE — tek adımda, araya başka git komutu sokmadan:**
+
+```sh
+git -C <agac> checkout origin/master -- <yol>/ && git -C <agac> commit -m "..."
+```
+
+⚠ **`&&` şart:** araya giren bir `git merge` denemesi **indeksi geri alır** ve
+`checkout`la sahnelenen düzeltme sessizce kaybolur (ölçüldü: commit *"no changes added
+to commit"* dedi, ağaç yine 40 kirli döndü). İki ayrı çağrı = iki ayrı sonuç.
+
+`origin/master`'ın sürümü alınır çünkü master bu blob'ları **renormalize etmiştir**
+(ölçüldü: 7/7 blob farklı). Bu bir `--theirs` refleksi **değildir** — dosya sınıfı
+önce doğrulanır: içerik farkı `-w` ile sıfır olduğu için kaybedilecek yazılmış içerik
+yoktur. Kaynak dosyada aynı refleks bu depoda **104 satır cetvel kaybettirdi**.
+
+---
+
+## ⭐ÖLÇÜM ARACININ KENDİSİ ÖLÇÜLÜR
+
+Bir kapı yanlış ölçerse kırmızı verir ve fark edilir. **Ölçüm aracı yanlış ölçerse
+YEŞİL verir** — ve hüküm, ölçülmemiş bir şey üzerine kurulur. Bu depoda aynı tuzağa
+2026-08-30'da tek oturumda **iki kez**, filoda o hafta **üç kez** düşüldü.
+
+### Ölçülmüş vaka — MSYS yol dönüşümü
+
+Git Bash, argümanda `/` gördüğünde onu Windows yoluna çevirir. `git rev-parse
+origin/master:docs/x.md` çağrısı kabuktan geçerken
+`origin\master;docs\x.md`'ye dönüşür:
+
+1. **Birinci düşüş — sahte FARKLI.** Komut hata verdi, çıktı olarak dönüşmüş dizeyi
+   bastı; karşılaştırma "7/7 blob FARKLI" dedi. Hüküm tersine dönmüştü.
+2. **İkinci düşüş — sahte AYNI (daha tehlikeli).** `MSYS_NO_PATHCONV=1` ile dönüşüm
+   kapatıldı; bu sefer `-C /c/tmp/...` **çözülemedi**, iki komut da hata verip **boş
+   dize** döndürdü ve `boş == boş` karşılaştırması **"AYNI"** çıktı. Yani düzeltme
+   girişimi, hatayı *yeşile* çevirdi.
+
+### Kural
+
+- **Sıfır, eşitlik ve boş küme önce ARAÇ KUSURU şüphesiyle karşılanır.** "Fark yok"
+  ile "ölçemedim" aynı görünür; ayıran şey ölçümün kendisine konan kontroldür.
+- **Karşılaştırmadan önce iki tarafın da DOLU olduğu doğrulanır.** Boş==boş bir hüküm
+  değildir. (Aynı sınıf: boş evrende koşan bir kapı — `grep` 0 döndürdüğünde önce
+  "aranan şey bu ağaçta var mıydı" sorulur.)
+- **Yol/ref taşıyan git çağrıları kabuktan geçirilmez:** `node execFileSync` ile
+  argüman dizisi olarak verilir. Kabuk yorumu yok, dönüşüm yok.
+- **Çelişki, aracın itirafıdır.** Blob kimliği "aynı" derken satır sayımı 0 diyorsa,
+  ikisinden biri değil **ölçüm** bozuktur; çelişkiye güvenilir, tarafa değil.
+
+```js
+// Yol/ref tasiyan olcum — kabuk YOK
+const { execFileSync } = require('child_process')
+const sha = (ref, yol) =>
+  execFileSync('git', ['-C', AGAC, 'rev-parse', `${ref}:${yol}`], { encoding: 'utf8' }).trim()
+```
+
 ---
 
 ## Kapı tasarımı — bu işte öğrenilen üç ders
@@ -207,3 +290,108 @@ büyütmek, kapıyı sökmektir.
 İlgili: `companion-doc-standard.md` (C4/C5 — eksik ve bayat companion) ·
 `measurement-discipline-standard.md` · `collaboration-protocol.md` ·
 tasarım kaydı: orion `docs/t021-artefakt-tazelik-kapisi-tasarim.md` (PR #42)
+
+## AXIOM 7 — Kaynak ile artefakt AYNI dosya olabilir; o zaman build TEK TURDA kapanmaz
+
+**Ölçüldü 2026-08-28 (ALTYAPI, REC-86 dalı).** `docs/system_tree.md` hem
+`.cc_docs.yaml`'ın ürettiği bir **artefakt**, hem de `kayitlar_master.md`'nin
+derlendiği **kaynak** kümesinin bir üyesi. Tek geçişli build şu sırayı izler:
+
+1. `kayitlar_master.md` derlenir — o an diskteki (yani **eski**) `system_tree.md`
+   okunur ve sha'sı manifeste yazılır,
+2. `system_tree.md` yeniden üretilir — sha'sı **değişir**.
+
+Sonuç: manifest yazıldığı anda `kayitlar_master`'ın kaynak kaydı bayattır ve
+INV-DOC-4b kırmızı yanar. Bu bir hata değil, **çift rolün kaçınılmaz sonucudur**.
+
+**Kural:** çift rollü bir dosya varsa `doc build` **iki tur** koşulur ve
+**aralarında commit edilir** (kapı HEAD'i okur, diski değil):
+
+```
+orion doc build --force-sync && git add docs/ && git commit
+orion doc build --force-sync && git add docs/ && git commit
+```
+
+**Yakınsama ölçülmüştür, varsayılmamıştır:** ikinci turda `system_tree.md`
+değişmedi (`git diff --stat` boş) — yani damga alanı her koşumda yeniden
+yazılmıyor, döngü ikinci turda duruyor. Üçüncü tur GEREKMEZ. Yeni bir çift
+rollü dosya eklenirse bu ölçüm **tekrarlanır**; "iki tur yeter" bu depodaki
+bugünkü kümenin ölçümüdür, evrensel bir yasa değildir.
+
+### Bu aksiyomun doğurduğu iki ölçüm kuralı
+
+**(a) Ölçümün ZAMANI ölçümün parçasıdır.** Aynı gün manifesti "855 kaynak
+kaydı, uyuşmaz 0" diye ölçüp temiz ilan ettim; ölçüm **commit'ten önce**
+koştuğu için `system_tree.md`'nin yeni hali diskteydi ama HEAD'de yoktu.
+Kapı HEAD'i okur. Bir kapının ölçütünü taklit eden her ölçüm, kapının
+okuduğu **aynı anı** okumalıdır.
+
+**(b) `generated_at`'in geriye gitmesi tek başına regresyon kanıtı DEĞİLDİR.**
+Aynı imza iki zıt sebepten doğar: bayat tabanda build (regresyon) ya da
+dalda kalmış, master'a hiç inmemiş bir companion halinin düzeltilmesi.
+Ayırt eden ölçüt imza değil, **kaynağın üç hâli**: dosyanın `HEAD`,
+`origin/master` ve disk değeri. Üçü de yeni değeri söylüyorsa geri gidiş
+**düzeltmedir**.
+
+### Manifestteki iki özet TÜRÜ karıştırılmaz
+
+`artefakt_manifest.json` iki farklı özet tutar ve karşılaştırmadan önce
+hangisine bakıldığı **doğrulanır**:
+
+| alan | tür | uzunluk |
+|---|---|---|
+| `artefaktlar[].icerik_sha256` | SHA-256 (CRLF→LF normalize, HEAD blob'undan) | 64 hex |
+| `artefaktlar[].kaynak.dosyalar[yol]` | **git blob SHA-1** | 40 hex |
+
+İkisini aynı sütunda karşılaştırmak, hiçbiri tutmayan sahte bir bilmece
+üretir — bu depoda bir gün kaybettirdi. **Bedava ayırt edici: hex uzunluğu.**
+
+---
+
+## AXIOM 8 — Üretecin KAPSAM SÜZGECİ isim tabanlıysa, her ekleme bir KESİNTİDİR
+
+`.cc_docs.yaml → skip_dirs` bir "yok sayılacaklar listesi" gibi okunuyor. Değil.
+`corpus_callosum/cli/docs_tree.py:57` süzgeci `d not in _all_skip` biçiminde uygular:
+**isim tabanlı, her derinlikte, kök-sabitleme yok.** Yani listeye yazılan her ad, aynı
+adı taşıyan **gerçek kaynak dizinini de** ağaçtan siler. Ekleme bedavaya benziyor;
+değil.
+
+### Ölçülmüş vaka (REC-84 · 2026-08-30)
+
+`docs/system_tree.md`'de kök `cache/` ve `.agents/` görünüyordu. Teşhis "skip_dirs
+kaçağı" oldu ve ikisi de listeye eklendi. Sızıntı dizinleri **fiilen yaratılıp** üç kol
+tek tek koşulduğunda hüküm çürüdü:
+
+| `skip_dirs` | `.agents` ağaçta | kök `cache/` | `src/lib/cache/tags.ts` |
+|---|---|---|---|
+| taban (ikisi de yok) | 0 | **1** | 1 |
+| `+ .agents` | 0 | 1 | 1 |
+| `+ .agents, cache` | 0 | 0 | **0** ⚠ |
+
+İki bağımsız sonuç çıktı:
+
+1. **`.agents` ETKİSİZDİ.** Yürüteç nokta-dizinleri zaten atlıyor (`docs_tree.py:56`,
+   `not d.startswith('.')`). Listede olsun olmasın sonuç 0. Yani "kök sebebi kapattık"
+   denen değişikliğin yarısı hiçbir şey yapmıyordu — ve **yeşil çıktı bunu gizledi**,
+   çünkü çıktı zaten temizdi.
+2. **`cache` ZARARLIYDI.** Kozmetik bir kök satırını sildi, karşılığında companion'ı olan
+   gerçek bir modülü (`src/lib/cache/tags.ts`) ikizin kaynağından **yok etti**.
+   `system_tree.md`, `kayitlar_master.md`'nin kaynağıdır: kayıp doğrudan dijital ikize
+   geçer, hiçbir kapı kırmızı vermez.
+
+### Kural
+
+- **Bir adı `skip_dirs`'e eklemeden önce, o adı taşıyan BAŞKA dizin var mı diye ölçülür.**
+  Ölçüt: `find <repo> -type d -name '<ad>'`. Birden fazla eşleşme varsa ekleme yapılmaz.
+- **Süzgeç değişikliği A/B ile kanıtlanır:** sızıntı dizini fiilen yaratılır, kol tek
+  değişkenle koşulur, negatif kontrol alınır. "Çıktı temiz" tek başına kanıt değildir —
+  çıktının sızıntı dizini yokken de temiz olacağını unutma (boş evren, sahte yeşil).
+- **Kök-sabitli sızıntının bu depoda karşılığı YOKTUR.** `source_dirs: [src, .]` kökü de
+  tarar; isim tabanlı listeyle kökü hedefleyip alt ağacı korumak imkânsızdır. Gerçek
+  çözüm üreteç tarafında kök-sabitli girdi desteğidir (`/cache` gibi) — **ORION kalemi**,
+  bu depoda kapatılamaz. O gelene kadar kök artığı KABUL EDİLİR: kozmetik bir satır,
+  gerçek bir modülün kaybından ucuzdur.
+
+**Genel ders:** bir süzgece ekleme yapmak, "gürültüyü azaltmak" değil **görüş alanını
+daraltmak**tır. Daraltmanın neyi kestiğini ölçmeden yapılan her ekleme, kaybı sessiz
+kılan bir kapıdır.

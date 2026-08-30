@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-altyapi-851\scripts\board\board.cjs
-skeleton_hash: 2e34f0d6e922416a
+skeleton_hash: a9bb9c165a13c0fa
 entity_hashes:
   func:append: 5216817914dc4f68
   func:bozukKarakterler: f9b3d83d5d591158
@@ -28,7 +28,7 @@ entity_hashes:
   func:warn: c53431813916c5a4
   func:yoklama: 7204691d6fbf799c
   overview: a6397fba3fbe0d7b
-generated_at: 2026-08-27T18:01:39Z
+generated_at: 2026-08-30T19:04:33Z
 ---
 
 ## Genel Bakış
@@ -400,31 +400,31 @@ graph TD
     board_cjs__tumTalepler["tumTalepler"]
     board_cjs__warn["warn"]
     board_cjs__yoklama["yoklama"]
-    board_cjs__readEvents --> board_cjs__ensureDir
-    board_cjs__tumTalepler --> board_cjs__liveClaims
-    board_cjs__append --> board_cjs__ensureDir
-    board_cjs__append --> board_cjs__sessionFile
-    board_cjs__notesFor --> board_cjs__readEvents
-    board_cjs__touch --> board_cjs__sessionFile
-    board_cjs__tumTalepler --> board_cjs__readEvents
-    board_cjs__findConflict --> board_cjs__toRepoRelative
-    board_cjs__readEvents --> board_cjs__warn
     board_cjs__resolveNoteTarget --> board_cjs__liveClaims
-    board_cjs__yoklama --> board_cjs__gozcuDurumu
-    board_cjs__knownSids --> board_cjs__readEvents
-    board_cjs__yoklama --> board_cjs__tumTalepler
-    board_cjs__liveClaims --> board_cjs__readEvents
-    board_cjs__toRepoRelative --> board_cjs__repoRootFor
-    board_cjs__resolveNoteTarget --> board_cjs__readEvents
-    board_cjs__findConflict --> board_cjs__globToRegExp
-    board_cjs__notesFor --> board_cjs__lastSeen
-    board_cjs__sidDogrula --> board_cjs__bozukKarakterler
-    board_cjs__touch --> board_cjs__append
+    board_cjs__append --> board_cjs__sessionFile
     board_cjs__findConflict --> board_cjs__liveClaims
-    board_cjs__summary --> board_cjs__tumTalepler
-    board_cjs__yoklama --> board_cjs__readEvents
+    board_cjs__readEvents --> board_cjs__ensureDir
+    board_cjs__readEvents --> board_cjs__warn
+    board_cjs__tumTalepler --> board_cjs__liveClaims
     board_cjs__markSeen --> board_cjs__append
     board_cjs__resolveNoteTarget --> board_cjs__knownSids
+    board_cjs__notesFor --> board_cjs__lastSeen
+    board_cjs__sidDogrula --> board_cjs__bozukKarakterler
+    board_cjs__findConflict --> board_cjs__toRepoRelative
+    board_cjs__yoklama --> board_cjs__gozcuDurumu
+    board_cjs__resolveNoteTarget --> board_cjs__readEvents
+    board_cjs__toRepoRelative --> board_cjs__repoRootFor
+    board_cjs__knownSids --> board_cjs__readEvents
+    board_cjs__tumTalepler --> board_cjs__readEvents
+    board_cjs__yoklama --> board_cjs__tumTalepler
+    board_cjs__liveClaims --> board_cjs__readEvents
+    board_cjs__notesFor --> board_cjs__readEvents
+    board_cjs__findConflict --> board_cjs__globToRegExp
+    board_cjs__touch --> board_cjs__append
+    board_cjs__yoklama --> board_cjs__readEvents
+    board_cjs__touch --> board_cjs__sessionFile
+    board_cjs__append --> board_cjs__ensureDir
+    board_cjs__summary --> board_cjs__tumTalepler
 ```
 
 ## NODE ID STANDARD

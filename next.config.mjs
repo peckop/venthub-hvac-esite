@@ -11,7 +11,13 @@ const nextConfig = {
     reactStrictMode: true,
     typedRoutes: true,
     images: {
-        // Görsel optimizasyonunu devreye alıyoruz (Lighthouse Performans için kritik)
+        // KÖPRÜ (2026-08-30, Recep butonla onayladı): Vercel görsel optimizasyonu KAPALI.
+        // Sebep: Hobby planın aylık kaynak-görsel sınırı doldu (katalog 1042 görsel) →
+        // /_next/image tüm boyutlarda 402 dönüyor, canlı vitrin GÖRSELSİZ kalıyordu.
+        // Depodaki dosyalar zaten optimize webp (ölçüm: ort. ~25 KB) — doğrudan servis kabul
+        // edilebilir. GERÇEK ÇÖZÜM (REC-91 hattı): ingest'te ön-üretilmiş boyutlar + srcset;
+        // o inince bu bayrak kaldırılır. Pro plan seçeneği bilinçli olarak masada DEĞİL.
+        unoptimized: true,
         remotePatterns: [
             {
                 protocol: 'https',

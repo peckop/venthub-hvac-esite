@@ -2,18 +2,15 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-26T10:15:58.308875+00:00
+compiled_at: 2026-08-28T12:54:03.044227+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-28T12:54:03.044227+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
 📂 venthub-hvac/
-├── 📂 ** .agents/**
-│   └── 📂 **explorer_m4_1_gen2/**
-│       └── ⚠️ `handoff.md`
 ├── ⚪ `CHANGELOG.md`
 ├── ⚪ `CLAUDE.md`
 ├── ⚪ `CONTEXT.md`
@@ -24,7 +21,6 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 ├── ⚠️ `TEST_INFRA.md`
 ├── ⚠️ `TEST_READY.md`
 ├── ⚪ `VISION.md`
-├── 📂 **cache/**
 ├── 📂 **docs/**
 │   ├── ⚪ `DURUM-TAKIP.md`
 │   ├── ⚪ `README.md`
@@ -52,6 +48,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 │   │   ├── ⚪ `admin-cetvel-scores-2026-06-18.md`
 │   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
 │   │   ├── ⚪ `aile-adi-en-cevirileri-2026-08-23.md`
+│   │   ├── ⚪ `build-skip-canli-olcum-2026-08-28.md`
 │   │   ├── ⚪ `canliya-alma-hazirlik-2026-08-15.md`
 │   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
 │   │   ├── ⚪ `i18n-sozluk-render-denetimi-2026-08-23.md`
@@ -62,6 +59,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 │   │   ├── ⚪ `odeme-yolu-denetimi-2026-08-15.md`
 │   │   ├── ⚪ `operasyon-dongusu-denetimi-2026-08-15.md`
 │   │   ├── ⚪ `product-schema-ground-truth-2026-06-21.md`
+│   │   ├── ⚪ `registry-triyaj-2026-08-26.md`
 │   │   ├── ⚪ `render-stratejisi-denetimi-2026-08-16.md`
 │   │   ├── ⚪ `secret-exposure-audit-2026-08-15.md`
 │   │   ├── ⚪ `t021-analytics-coverage-2026-08-19.md`
@@ -191,6 +189,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 │   │   ├── ⚪ `fleet-mechanism-standard.md`
 │   │   ├── ⚪ `form-submission-standard.md`
 │   │   ├── ⚪ `i18n-localization-standard.md`
+│   │   ├── ⚪ `is-kayit-duzeni-standard.md`
 │   │   ├── ⚪ `legal-compliance-standard.md`
 │   │   ├── ⚪ `measurement-discipline-standard.md`
 │   │   ├── ⚪ `migration-safety-standard.md`
@@ -212,6 +211,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 │   │   ├── ⚪ `storefront-design-standard.md`
 │   │   ├── ⚪ `storefront-reflow-standard.md`
 │   │   ├── ⚪ `subagent-delegation-standard.md`
+│   │   ├── ⚪ `uretilmis-artefakt-standard.md`
 │   │   └── ⚪ `work-tracking-ssot-standard.md`
 │   ├── ⚪ `standards_master.md`
 │   ├── ⚪ `supabase_functions_master.md`
@@ -222,8 +222,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 │   ├── ✅ `admin-smoke.e2e.ts`
 │   ├── ✅ `checkout-smoke.e2e.ts`
 │   └── ✅ `reflow.e2e.ts`
-├── 📂 **explorer_m2_3/**
-│   └── ⚠️ `analysis.md`
+├── ⚠️ `eslint.config.md`
 ├── ⚠️ `implementation_plan.md`
 ├── 📂 **memory-engine/**
 │   └── ⚪ `README.md`
@@ -479,6 +478,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 │   │   │   │   ├── ✅ `BulkRolePanel.tsx`
 │   │   │   │   ├── ✅ `DataTableHead.tsx`
 │   │   │   │   ├── ✅ `DataTableKit.tsx`
+│   │   │   │   ├── ❌ `DataTablePagination.tsx`
 │   │   │   │   ├── ✅ `FacetedFilter.tsx`
 │   │   │   │   ├── ✅ `persist.ts`
 │   │   │   │   └── ✅ `types.ts`
@@ -646,8 +646,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
 │   │   │   ├── ✅ `RichTextRenderer.tsx`
-│   │   │   ├── ✅ `VariantSelector.tsx`
-│   │   │   └── 📂 **visual-models/**
+│   │   │   └── ✅ `VariantSelector.tsx`
 │   │   ├── 📂 **quotes/**
 │   │   │   ├── ✅ `QuoteRequestButton.tsx`
 │   │   │   └── ✅ `QuoteRequestModal.tsx`
@@ -821,6 +820,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 │   │   │   ├── ✅ `address.service.ts`
 │   │   │   ├── ✅ `cart.service.ts`
 │   │   │   ├── ✅ `category.service.ts`
+│   │   │   ├── ✅ `contactMessageService.ts`
 │   │   │   ├── ✅ `dataSubjectRequest.service.ts`
 │   │   │   ├── ✅ `displayPrice.service.ts`
 │   │   │   ├── ✅ `family.service.ts`
@@ -995,6 +995,7 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 │       │   ├── ✅ `AddressSelectModal.tsx`
 │       │   ├── ✅ `CheckoutProgress.tsx`
 │       │   ├── ✅ `InvoiceProfileModal.tsx`
+│       │   ├── ✅ `OdemeKapaliBilgi.tsx`
 │       │   ├── ✅ `OrderSummarySidebar.tsx`
 │       │   ├── ✅ `PaymentIframeContainer.tsx`
 │       │   ├── ✅ `ReviewSummary.tsx`
@@ -1090,15 +1091,15 @@ Bu belge, otonom derleyici tarafından 2026-08-26T10:15:58.308875+00:00 tarihind
 ```
 
 ## Eksik Dokümantasyonlar
-Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
+- [ ] `src\components\admin\data-table\DataTablePagination.tsx`
+- [ ] `src\components\admin\data-table\DataTablePagination.tsx`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
-- [⚠️] ` .agents\explorer_m4_1_gen2\handoff.md`
 - [⚠️] `ORIGINAL_REQUEST.md`
 - [⚠️] `TEST_INFRA.md`
 - [⚠️] `TEST_READY.md`
-- [⚠️] `explorer_m2_3\analysis.md`
+- [⚠️] `eslint.config.md`
 - [⚠️] `implementation_plan.md`
 - [⚠️] `next.config.md`
 

@@ -12,6 +12,8 @@ entity_hashes:
 generated_at: 2026-08-17T11:20:13Z
 ---
 
+<!-- ORION-DONDURULMUS: gercek-sembol=2 · kaynak=f7b1ebfd · sebep=uretec-sembol-kaybi · kayit=REC-83 -->
+
 ## Genel Bakış
 Bu modül, teklif talep sürecini başlatmak için kullanılan bir React bileşenidir. Kullanıcıların mevcut ürün listeleri veya proje kaynaklarıyla teklif istemesini sağlayan interaktif bir düğme sunar. Bileşen, prop'lar aracılığıyla esnek bir şekilde yapılandırılabilir ve tıklama olayını yöneterek teklif akışını tetikler.
 

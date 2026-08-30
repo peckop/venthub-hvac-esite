@@ -31,7 +31,6 @@ export const ui = {
   searchCommandPlaceholder: 'Bir komut veya ürün ara...',
   scanningSystem: 'Sistem Taranıyor...',
   navigation: 'Navigasyon',
-  productCatalog: 'Ürün Kataloğu',
   noResultsForTerm: '"{{term}}" için sonuç bulunamadı.',
   tryDifferentKeywords: 'Lütfen farklı anahtar kelimeler deneyin.',
   select: 'Seç',

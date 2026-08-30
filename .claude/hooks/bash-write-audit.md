@@ -3,25 +3,26 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-altyapi-851\.claude\hooks\bash-write-audit.cjs
-skeleton_hash: 45fb7a67e2f11ef8
+skeleton_hash: 59de5bf2b4872bdc
 entity_hashes:
   func:agaclariCoz: e2ad0bdfad4e1aac
   func:anahtarla: 7cd3c26b8a830128
-  func:dosyaZamani: 19779905141deac3
+  func:birlestirmeHali: c624910e584b2c9e
   func:etiket: 80c11e27a1275261
   func:gitOku: 3aa3dd8f3ca42a2a
+  func:halAl: f6bb4955c9cf95c8
   func:kimlikOku: f21b7f6be9e779e8
   func:satirdanYol: 237e0a38e90ed25f
   func:stdinOku: 387e432c5dd5e85f
   func:tabanYaz: eae892a4b91f313c
   func:uyariBas: 9ddaf36cafa67ae2
-  overview: b21218871b113f7e
-generated_at: 2026-08-27T19:05:13Z
+  overview: 5ed2789c04c017ee
+generated_at: 2026-08-28T09:37:38Z
 ---
 
 ## Genel Bakış
 
-Bu modül, Claude CLI'nin bash hook mekanizması üzerinden gerçekleştirilen dosya yazma işlemlerini denetleyen bir audit (izleme) bileşenidir. Modül, stdin üzerinden hook verisini okuyarak yazma işlemini yakalar ve git repository bilgileriyle birlikte kayıt altına alır. Amaç, hangi dosyaların ne zaman ve hangi commit bağlamında değiştirildiğini izlemektir.
+Bu modül, Claude CLI'nin bash hook mekanizması üzerinden gerçekleştirilen dosya yazma işlemlerini denetleyen bir audit bileşenidir. Modül, stdin üzerinden hook verisini okuyarak yazma işlemini yakalar ve git repository bilgileriyle birlikte kayıt altına alır. Amaç, hangi dosyaların ne zaman ve hangi commit bağlamında değiştirildiğini izlemektir.
 
 ## Fonksiyon Grupları
 
@@ -30,23 +31,34 @@ Hook mekanizmasına gelen ham veriyi stdin üzerinden okur ve satır bazlı ayr�
 - stdinOku, satirdanYol
 
 ### Git Entegrasyonu
-Git repository'sinden dizin, commit ve ağaç (tree) bilgilerini okuyarak yazma işleminin bağlamını belirler. Ağaç yapılarını çözerek dosya yollarıyla ilişkilendirir.
-- gitOku, kimlikOku, agaclariCoz, anahtarla
-
-### Dosya Zaman Bilgisi
-Denetlenen dosyanın zaman damgasını okuyarak kayıt altına alınacak bilgiyi tamamlar.
-- dosyaZamani
+Git repository'sinden dizin, commit ve ağaç bilgilerini okuyarak yazma işleminin bağlamını belirler. Ağaç yapılarını çözer, birleştirme durumunu sorgular ve dosya yollarıyla ilişkilendirir.
+- gitOku, kimlikOku, agaclariCoz, anahtarla, birlestirmeHali, halAl
 
 ### Audit Kaydı ve Çıktı
-Denetlenen yazma işlemini yapılandırılmış biçimde kayıt altına alır ve kullanıcıya uyarı/bilgi mesajları sunar.
+Denetlenen yazma işlemini yapılandırılmış biçimde kayıt altına alır ve kullanıcıya uyarı ve bilgi mesajları sunar.
 - tabanYaz, etiket, uyariBas
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, Claude CLI bash hook mekanizması üzerinden dosya yazma işlemlerini izlemek için çalışır ve stdin veri akışı, git repository erişimi ile dosya sistemi yazma yetkisi gerektirir.
+
+[Aksiyom 1]: Eğer `stdinOku()` fonksiyonu stdin'den veri okuyamıyorsa, hook verisi alınamaz ve audit işlemi başlatılamaz.
+
+[Aksiyom 2]: Eğer `gitOku(dizin, arg)` fonksiyonu çalıştırıldığında geçerli bir git repository'si yoksa, commit bağlamı ve repository bilgileri elde edilemez.
+
+[Aksiyom 3]: Eğer `kimlikOku(yol)` fonksiyonuna verilen yol dosya sisteminde mevcut değilse, kimlik bilgisi okunamaz.
+
+[Aksiyom 4]: Eğer `satirdanYol(satir)` fonksiyonuna verilen satır beklenen formatta değilse, dosya yolu ayrıştırılamaz.
+
+[Aksiyom 5]: Eğer `anahtarla(agac, bagil)` fonksiyonuna verilen `agac` veya `bagil` parametrelerinden biri eksik veya geçersizse, dosya yolu birleştirilemez.
+
+[Aksiyom 6]: Eğer `tabanYaz(bildirilen)` fonksiyonu dosya sistemine yazma yetkisine sahip değilse, audit kaydı dosyaya yazılamaz.
+
+[Aksiyom 7]: Eğer `birlestirmeHali(agac)` fonksiyonuna verilen `agac` parametresi tanımlı değilse, birleştirme durumu belirlenemez.
+
+[Aksiyom 8]: Eğer `hal
 
 ---
 
@@ -80,15 +92,18 @@ Denetlenen yazma işlemini yapılandırılmış biçimde kayıt altına alır ve
 ### tabanYaz
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
-### dosyaZamani
-**Ne yapar**: Fonksiyonun görevi belgelenmemiştir. Adından ("dosyaZamani") dosya ile ilişkili bir zaman/tarih işlemi yaptığı çıkarılabilir ancak bu bir tahmindir; kesin görevi bilinmiyor.
+### birlestirmeHali
+**Ne yapar**: Verilen bir `agac` (dizin yolu) için Git birleştirme (merge) durumunu tespit eder. Birleştirme sürecinde olup olmadığını ve bu durumun ölçülüp ölçülemediğini bildiren bir nesne döndürür.
 
-**Nasıl yapar**: İç mantığı hakkında kaynakta herhangi bir bilgi bulunmuyor. Uygulama detayları bilinmiyor.
+**Nasıl yapar**: Önce `gitOku` fonksiyonunu çağırarak `--absolute-git-dir` parametresiyle mutlak Git dizin yolunu elde eder. Git dizini bulunamazsa `{ hal: null, olculdu: false }` döndürerek ölçüm yapılamadığını belirtir. Git dizini bulunduğunda, `BIRLESTIRME_ISARETLERI` sabit dizisindeki her bir dosya adı için `path.join` ile tam yol oluşturup `fs.existsSync` ile dosya varlığını kontrol eder. Dosyalardan biri mevcutsa `{ hal: ad, olculdu: true }` döndürür; burada `ad` bulunan birleştirme işaret dosyasının adıdır. Dosya varlık kontrolü sırasında bir hata oluşursa `{ hal: null, olculdu: false }` döndürür. Hiçbir birleştirme işareti dosyası bulunamazsa `{ hal: null, olculdu: true }` döndürür; bu, ölçümün başarılı olduğunu ancak aktif bir birleştirme durumu olmadığını gösterir.
 
 **Parametreler**:
-- y: bilinmiyor — Parametrenin tipi ve amacı hakkında kaynakta bilgi bulunmuyor.
+- agac: string — Git deposunun bulunduğu dizin yolu
 
-**Dönüş**: Dönüş tipi bilinmiyor. Kaynakta dönüş değerine dair bir bilgi yer almıyor.
+**Dönüş**: `{ hal: string | null, olculdu: boolean }` — `hal` alanı, bulunan birleştirme işaret dosyasının adını veya `null` değerini içerir. `olculdu` alanı, ölçümün başarılı yapılıp yapılamadığını belirtir.
+
+### halAl
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### etiket
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -106,6 +121,12 @@ Denetlenen yazma işlemini yapılandırılmış biçimde kayıt altına alır ve
 - **agaclar** (unknown)
 - **tabanKume** (new_expression) — `new Set(taban.yollar)`
 - **hamYeniler** (call) — `simdiki.filter((y) => !tabanKume.has(y.anahtar))`
+- **halCache** (new_expression) — `new Map()`
+- **muafAgaclar** (new_expression) — `new Map()`
+- **olculemeyenAgaclar** (new_expression) — `new Set()`
+- **yeniler** (call) — `hamYeniler.filter((y) => {
+  const { hal, olculdu } = halAl(y.agac)
+  if (!...`
 - **cokAgac** (binary_expression) — `denetlenecek.length > 1`
 - **bildirilen** (new_expression) — `new Set(taban.bildirilen)`
 - **satirlar** (call) — `ihlaller.map(
@@ -117,61 +138,77 @@ Denetlenen yazma işlemini yapılandırılmış biçimde kayıt altına alır ve
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: bash-write-audit.cjs::stdinOku
-- **params**: (parametre yok)
-- **ic_degiskenler**: (iç değişken yok)
-- **Dönüş**: `string` — stdin'den okunan UTF-8 metin; hata durumunda boş string `''`
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: string — `fs.readFileSync(0, 'utf8')` ile stdin'den okunan UTF-8 içerik; hata durumunda boş string `''`
 
 ### [N2_NASIL] AST Pointer: bash-write-audit.cjs::uyariBas
-- **params**: (parametre yok)
-- **ic_degiskenler**: (iç değişken yok; `uyarilar` modül kapsamından gelir)
-- **Dönüş**: yok — `uyarilar` dizisi doluysa `process.stderr.write` ile uyarıları satır satır yazar
+- **params**: yok
+- **ic_degiskenler**:
+  - `uyarilar` — uyarı mesajlarını içeren dizi; `.length` ile boş olup olmadığı kontrol edilir, `.join('\n')` ile birleştirilerek `process.stderr.write` ile standart hataya yazılır
+- **Dönüş**: yok — yan etki olarak stderr'e çıktı yazar
 
 ### [N3_NASIL] AST Pointer: bash-write-audit.cjs::gitOku
 - **params**: `dizin`, `arg`
-- **ic_degiskenler**: (iç değişken yok)
-- **Dönüş**: `string` — `git rev-parse` çıktısı (trim edilmiş); hata durumunda boş string `''`
+- **ic_degiskenler**: yok
+- **Dönüş**: string — `execFileSync('git', ['-C', dizin, 'rev-parse', arg])` komutunun `.trim()` edilmiş UTF-8 çıktısı; hata durumunda boş string `''`
 
 ### [N4_NASIL] AST Pointer: bash-write-audit.cjs::kimlikOku
 - **params**: `yol`
-- **ic_degiskenler**: (iç değişken yok)
-- **Dönüş**: `string` — dosya içeriği (trim edilmiş); hata durumunda boş string `''`
+- **ic_degiskenler**: yok
+- **Dönüş**: string — `fs.readFileSync(yol, 'utf8')` ile okunan dosya içeriğinin `.trim()` edilmiş hali; hata durumunda boş string `''`
 
 ### [N5_NASIL] AST Pointer: bash-write-audit.cjs::agaclariCoz
-- **params**: (parametre yok)
+- **params**: yok
 - **ic_degiskenler**:
-  - `ortakHam` — `gitOku(cwdKok, '--git-common-dir')` sonucu; ortak git dizininin ham yolu
-  - `ortak` — `path.resolve(cwdKok, ortakHam)` ile çözülmüş mutlak ortak git dizini
-  - `bulunan` — `sid` ile eşleşen ağaç dizinlerinin toplandığı dizi
-  - `adlar` — `path.join(ortak, 'worktrees')` altındaki dizin adlarının listesi; okuma hatasında boş dizi
-  - `dizin` — döngüdeki worktree dizininin tam yolu
-  - `gitdir` — worktree'nin `gitdir` dosyasından okunan içerik
-  - `tekil` — `bulunan` dizisinin normalize edilmiş, tekrarsız, dizin olan yolları
-- **Dönüş**: `object` — `{ agaclar: string[], sebep: string }`; `agaclar` bulunan ağaç yolları, `sebep` boşsa başarı veya açıklayıcı hata mesajı
+  - `ortakHam` — `gitOku(cwdKok, '--absolute-git-dir')` ile elde edilen ortak git dizini ham yolu; boşsa fonksiyon erken döner
+  - `ortak` — `path.resolve(cwdKok, ortakHam)` ile çözümlenmiş tam ortak git dizini yolu
+  - `bulunan` — `sid` ile eşleşen ağaç dizinlerini toplayan dizi
+  - `adlar` — `fs.readdirSync(path.join(ortak, 'worktrees'))` ile okunan worktree adları dizisi; hata durumunda boş dizi
+  - `ad` — döngüdeki her worktree adı
+  - `dizin` — `path.join(ortak, 'worktrees', ad)` ile oluşturulan worktree dizin yolu
+  - `gitdir` — `kimlikOku(path.join(dizin, 'gitdir'))` ile okunan gitdir içeriği; boşsa bu worktree atlanır
+  - `tekil` — `bulunan` dizisinin `path.resolve` ile çözümlenip ters eğik çizgilerin `/` ile değiştirildiği, `new Set` ile tekrarsızlaştırılmış, `fs.statSync(a).isDirectory()` ile dizin olmayanların filtrelendiği dizi
+  - `a` — `.map` ve `.filter` callback'lerindeki her eleman
+- **Dönüş**: object — `{ agaclar: tekil, sebep: string }` — `agaclar` bulunan ağaç dizinlerinin normalize edilmiş yolları; `sebep` hata veya boş durum açıklaması
 
 ### [N6_NASIL] AST Pointer: bash-write-audit.cjs::satirdanYol
 - **params**: `satir`
 - **ic_degiskenler**:
-  - `govde` — `satir.slice(3)` ile ilk 3 karakter atıldıktan kalan kısım
-  - `ok` — `govde.indexOf(' -> ')` sonucu; ok işareti pozisyonu, yoksa `-1`
-  - `ham` — ok varsa ` -> ` sonrasındaki kısım, yoksa `govde`'nin kendisi
-- **Dönüş**: `string` — baştaki ve sondaki çift tırnak temizlenmiş, trim edilmiş dosya yolu
+  - `govde` — `satir.slice(3)` ile satırın ilk 3 karakteri atılarak elde edilen gövde
+  - `ok` — `govde.indexOf(' -> ')` ile bulunan ` -> ` ayırıcısının indeksi; -1 ise ayırıcı yoktur
+  - `ham` — `ok > -1` ise `govde.slice(ok + 4)` (ayırıcıdan sonraki kısım), değilse `govde`'nin kendisi
+- **Dönüş**: string — `ham`'den baştaki ve sondaki çift tırnak işaretleri `'"'` regex ile kaldırılıp `.trim()` edilmiş yol
 
 ### [N7_NASIL] AST Pointer: bash-write-audit.cjs::tabanYaz
 - **params**: `bildirilen`
 - **ic_degiskenler**:
   - `gecici` — `TABAN_YOLU + '.tmp'` ile oluşturulan geçici dosya yolu
-  - `e` — yakalanan hata nesnesi; `e.code` ile hata kodu okunur
-- **Dönüş**: yok — geçici dosyaya JSON yazar, ardından `fs.renameSync` ile atomik olarak `TABAN_YOLU`'na taşır; hata durumunda `process.stderr.write` ile hata mesajı yazar
+  - `simdiki` — dışarıdan erişilen mevcut öğeler dizisi; `.map((s) => s.anahtar)` ile anahtarları çıkarılır
+  - `e` — catch bloğundaki hata nesnesi; `.code` özelliği hata mesajında kullanılır
+- **Dönüş**: yok — yan etki olarak `fs.writeFileSync` ile geçici dosyaya JSON yazar, `fs.renameSync` ile asıl dosyaya taşır; hata durumunda `process.stderr.write` ile hata mesajı yazar
 
-### [N8_NASIL] AST Pointer: bash-write-audit.cjs::dosyaZamani
-- **params**: `y`
-- **ic_degiskenler**: (iç değişken yok)
-- **Dönüş**: `number | null` — `fs.statSync(path.resolve(y.agac, y.bagil)).mtimeMs`; dosya silinmiş veya erişilemezse `null`
+### [N8_NASIL] AST Pointer: bash-write-audit.cjs::birlestirmeHali
+- **params**: `agac`
+- **ic_degiskenler**:
+  - `gitDir` — `gitOku(agac, '--absolute-git-dir')` ile elde edilen mutlak git dizini; boşsa `{ hal: null, olculdu: false }` döner
+  - `ad` — `BIRLESTIRME_ISARETLERI` dizisindeki her bir birleştirme işareti adı; `fs.existsSync(path.join(gitDir, ad))` ile varlığı kontrol edilir
+- **Dönüş**: object — `{ hal: string|null, olculdu: boolean }` — `hal` bulunan birleştirme işareti adı veya `null`; `olculdu` ölçümün başarılı yapılıp yapılmadığı
 
-### [N9_NASIL] AST Pointer: bash-write-audit.cjs::etiket
+### [N9_NASIL] AST Pointer: bash-write-audit.cjs::halAl
+- **params**: `agac`
+- **ic_degiskenler**:
+  - `halCache` — dışarıdan erişilen `Map` önbellek; `.has(agac)` ile kontrol edilir, `.set(agac, ...)` ile değer eklenir, `.get(agac)` ile değer okunur
+- **Dönüş**: object — `birlestirmeHali(agac)` sonucu; `{ hal: string|null, olculdu: boolean }`
+
+### [N10_NASIL] AST Pointer: bash-write-audit.cjs::etiket
 - **params**: `y`
-- **ic_degiskenler**: (iç değişken yok)
-- **Dönüş**: (verilen gövdede etiket fonksiyonunun gövdesi eksik; yalnızca `dosyaZamani` gövdesi verilmiş — bu fonksiyonun dönüşü belirlenemiyor)
+- **ic_degiskenler**:
+  - `hal` — `halAl(y.agac)` sonucundan destructure edilen birleştirme durumu
+  - `olculdu` — `halAl(y.agac)` sonucundan destructure edilen ölçüm yapıldı bilgisi; `false` ise `olculemeyenAgaclar.add(y.agac)` ile ağaç eklenir ve `true` döner (FAIL-CLOSED)
+  - `olculemeyenAgaclar` — dışarıdan erişilen `Set`; ölçülemeyen ağaçları tutar
+  - `muafAgaclar` — dışarıdan erişilen `Map`; muaf ağaçları `{ hal, sayi }` nesneleriyle tutar; `.get(y.agac)?.sayi` ile mevcut sayı okunur, `+1` artırılarak `.set` ile güncellenir
+- **Dönüş**: boolean — `olculdu` false ise `true`; `hal` null ise `true`; aksi halde `false` (muaf durumu)
 
 ---
 
@@ -181,16 +218,19 @@ Denetlenen yazma işlemini yapılandırılmış biçimde kayıt altına alır ve
 graph TD
     bash-write-audit_cjs__agaclariCoz["agaclariCoz"]
     bash-write-audit_cjs__anahtarla["anahtarla"]
-    bash-write-audit_cjs__dosyaZamani["dosyaZamani"]
+    bash-write-audit_cjs__birlestirmeHali["birlestirmeHali"]
     bash-write-audit_cjs__etiket["etiket"]
     bash-write-audit_cjs__gitOku["gitOku"]
+    bash-write-audit_cjs__halAl["halAl"]
     bash-write-audit_cjs__kimlikOku["kimlikOku"]
     bash-write-audit_cjs__satirdanYol["satirdanYol"]
     bash-write-audit_cjs__stdinOku["stdinOku"]
     bash-write-audit_cjs__tabanYaz["tabanYaz"]
     bash-write-audit_cjs__uyariBas["uyariBas"]
-    bash-write-audit_cjs__agaclariCoz --> bash-write-audit_cjs__gitOku
+    bash-write-audit_cjs__halAl --> bash-write-audit_cjs__birlestirmeHali
     bash-write-audit_cjs__agaclariCoz --> bash-write-audit_cjs__kimlikOku
+    bash-write-audit_cjs__birlestirmeHali --> bash-write-audit_cjs__gitOku
+    bash-write-audit_cjs__agaclariCoz --> bash-write-audit_cjs__gitOku
 ```
 
 ## NODE ID STANDARD
@@ -204,7 +244,8 @@ graph TD
   function: .claude\hooks\bash-write-audit.cjs::satirdanYol
   function: .claude\hooks\bash-write-audit.cjs::anahtarla
   function: .claude\hooks\bash-write-audit.cjs::tabanYaz
-  function: .claude\hooks\bash-write-audit.cjs::dosyaZamani
+  function: .claude\hooks\bash-write-audit.cjs::birlestirmeHali
+  function: .claude\hooks\bash-write-audit.cjs::halAl
   function: .claude\hooks\bash-write-audit.cjs::etiket
 
 ---
@@ -212,9 +253,10 @@ graph TD
 ## DISA AKTARILANLAR (EXPORTS)
   export: agaclariCoz
   export: anahtarla
-  export: dosyaZamani
+  export: birlestirmeHali
   export: etiket
   export: gitOku
+  export: halAl
   export: kimlikOku
   export: satirdanYol
   export: stdinOku

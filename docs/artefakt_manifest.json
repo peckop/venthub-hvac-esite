@@ -2,9 +2,9 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "0d575b41209f4da99fdc37fc389e0e96b95a5985588f7fcf577d6177f332462d",
+      "icerik_sha256": "5da22baf8598d443ffcb568c56775649f4bc8c25739039806258604b076981a5",
       "kaynak": {
-        "dosya_sayisi": 98,
+        "dosya_sayisi": 99,
         "dosyalar": {
           "CHANGELOG.md": "eb01e14c93b6de5095df49ecf4e36d500aee787b",
           "CONTEXT.md": "8c21e5ea5bd31a1e362d62526464d7e523b213bf",
@@ -19,6 +19,7 @@
           "docs/audits/admin-cetvel-scores-2026-06-18.md": "655885a1f90d99f1246424fb2833aa5ba0c661ef",
           "docs/audits/admin-panel-audit-2026-06-11.md": "c72bc338ffdace3f8d81d0ebb450a4692a429c93",
           "docs/audits/aile-adi-en-cevirileri-2026-08-23.md": "37304bb18ea07c4c904304aa8fdffb4afff7a47d",
+          "docs/audits/build-skip-canli-olcum-2026-08-28.md": "706e3e8a94c6df60ec6c4822eaeeff2f787cdccd",
           "docs/audits/canliya-alma-hazirlik-2026-08-15.md": "3f1e9b70d4434ac82142a92578b14cdfc791a99e",
           "docs/audits/dealer-data-ground-truth-2026-06-11.md": "cb6db5669a7269f2bc4195d7e8f0d9ba9ad86b59",
           "docs/audits/i18n-sozluk-render-denetimi-2026-08-23.md": "c323cb80d7bbfa0d7396b6a4f0d8ba155ce9bc8f",
@@ -103,12 +104,12 @@
           "docs/plans/venthub_hvac_unified_refactor_plan.md": "91872b3835444bce317477cf0d7c649584630158",
           "docs/plans/venthub_saas_faz1_prompt.md": "c874969b99b46565010882bbd7c198b8de32150f",
           "docs/plans/venthub_saas_master_roadmap.md": "388f9a58a03cf31de453b63eb3b3a9658451122a",
-          "docs/system_tree.md": "b2e91ce9a9b36f18f0ee5e813100aa50340846d9"
+          "docs/system_tree.md": "0b999c9d0976dff77c3ed5750d94896033eb620f"
         },
         "izlenmeyen": [],
-        "ozet": "13aca04c7a35256389064f212cccbf532b90b069fc40fe29bd8e467c6c22e036"
+        "ozet": "3f3f20d49a214c56382f0bbf9b9b61d4f83c698e425f22f86a855c68cf1c1a0e"
       },
-      "kaynak_commit": "829d6493cec3f2f42356bd6998510d8f00960252",
+      "kaynak_commit": "f9f4cf5ba393106e0b2a9060c7277bddfe399189",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -125,7 +126,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "9d24a5d71f82b094234fb6ec10cb6780b6a87368e6587208c571372c24332f70",
+      "icerik_sha256": "2a1923eea71d900f9d5333bb659cc8bfc314a6a830708e69f639bfce7b7cb974",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -144,7 +145,7 @@
           "docs/standards/analytics-standard.md": "690a337fb84183f677c2c56bed6c9550a7a075b4",
           "docs/standards/auth-account-standard.md": "06fac0bcc55d7406119c54b54c670a02285e0707",
           "docs/standards/canonical-url-standard.md": "8f85ad5b532688183d8e88f672e1fd18d6c5f993",
-          "docs/standards/catalog-depth-standard.md": "cfff5f43ad4065f7dbd94ea95ff7302e42edaf37",
+          "docs/standards/catalog-depth-standard.md": "3a62ad8cb588b6abf11b0c59d66f4c75e5116207",
           "docs/standards/catalog-ingestion-standard.md": "5945516cea60f70c676ab321858839fbdcdb0cec",
           "docs/standards/category-taxonomy-standard.md": "a3709f534676c877eea3cca93bd2b5de5fd848dd",
           "docs/standards/checkout-payment-standard.md": "2838d0999cefa00548d83057930a56b81dd4b9d2",
@@ -160,11 +161,11 @@
           "docs/standards/dealer-module-blueprint.md": "568d2ca883f07262c1acf2aa2fa3fc0dec8ef893",
           "docs/standards/dealer-network-standard.md": "b1801b5f5fa9103fb62b2f10a1675a2934b32766",
           "docs/standards/dependency-integrity-standard.md": "2779cdbec8d81cdf0ec55e64b0bc715560c1744e",
-          "docs/standards/deploy-build-skip-standard.md": "5629155ef9ed3f602276cca0a9ba1622fedeb8cd",
+          "docs/standards/deploy-build-skip-standard.md": "435001c9727fcb96a9ab8b1a67cdf7a2e4f82e7f",
           "docs/standards/edge-function-security-standard.md": "fc5e8c0e93dd0d1fcff8c0727b111d00a9c6d19e",
           "docs/standards/erp-workspace-design-standard.md": "0b9c05a654a0eaef701cfac1cb81f9c613fc2565",
           "docs/standards/execution-method-standard.md": "ce0ed4909059b87e2caa4af1ad6430fdfa8ac8ce",
-          "docs/standards/fleet-mechanism-standard.md": "6c8593610895f446bd75f03d912006d7a5326a16",
+          "docs/standards/fleet-mechanism-standard.md": "4cb95d9384f0b7c8c78e2eea8afc94bf3689b93a",
           "docs/standards/form-submission-standard.md": "db8615f18333451cf5ac75dde586079612b91067",
           "docs/standards/i18n-localization-standard.md": "0fadad000d410a3ea8d66fd334a5c061e8d8f8c4",
           "docs/standards/is-kayit-duzeni-standard.md": "575239e83d0a0ce0675f4197d735f85f87bfedeb",
@@ -180,7 +181,7 @@
           "docs/standards/product-image-standard.md": "7144db1142e1b44905bd4cf0b9ada9c5a6963b34",
           "docs/standards/product-schema-standard.md": "5fe179d4b6dbed80b910f7c1c4a55b7525ac9a6f",
           "docs/standards/purchasing-standard.md": "aa9b0aa0c25e105df4dfed59c24653d369dee1a6",
-          "docs/standards/quote-standard.md": "a00561cac1311fdd369eec4112bd26e46b995324",
+          "docs/standards/quote-standard.md": "beae7d78a9a23f0bbcbef3ba79e332b1fc6f8e84",
           "docs/standards/rendering-cache-standard.md": "a025df588c34c1d572b10ae09e78f280c2e386da",
           "docs/standards/runtime-version-alignment-standard.md": "5e1d1ebbf84268f2b2d4fbcbdb893e0fc8e52855",
           "docs/standards/session-loop-ritual.md": "32bcc5c0e9aad0f8ed6f59a18c6ff1a8f30b8e8a",
@@ -189,13 +190,13 @@
           "docs/standards/storefront-design-standard.md": "b28399453f5fca64ea1a1cc42a78b6fe831ecd5e",
           "docs/standards/storefront-reflow-standard.md": "054c0d12a8d2912719fd782ff7ec2615959ab189",
           "docs/standards/subagent-delegation-standard.md": "39e8bfc9a95534f8cd2969e5e9127aaf4d3c6f61",
-          "docs/standards/uretilmis-artefakt-standard.md": "ebca9aea681dd7e6763ff718ecafe1fe1ad76533",
+          "docs/standards/uretilmis-artefakt-standard.md": "78c8c320379a6d7d0a0fb9be37287ba2c08785af",
           "docs/standards/work-tracking-ssot-standard.md": "6a00f894fbc818c9e927e2ced965936c6162475e"
         },
         "izlenmeyen": [],
-        "ozet": "a8f5be51c6768f00b9cb00217c1fe1dda237ec5cab4dd2a2ec1a12485c4333d1"
+        "ozet": "41777dcf18ae15ae5e7a768c076a7d3a1420ca49f6d3da54ef8eb4d9eabb0320"
       },
-      "kaynak_commit": "829d6493cec3f2f42356bd6998510d8f00960252",
+      "kaynak_commit": "f9f4cf5ba393106e0b2a9060c7277bddfe399189",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -204,7 +205,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "43c3374ce2e98f3d862a06eaf130d189d4cad9747f7d77fd691df253e8003d12",
+      "icerik_sha256": "d441384fc4e405f497b3ad90bc0ea6066e40017375cd17a860fefb8877a5fc21",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -251,7 +252,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "829d6493cec3f2f42356bd6998510d8f00960252",
+      "kaynak_commit": "f9f4cf5ba393106e0b2a9060c7277bddfe399189",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -259,9 +260,9 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "1d84b375b9fe2a84b935493ebde36579d23d6aafa348560dcc041671ec512467",
+      "icerik_sha256": "e3923e6e3e69c4ceffb6a8a97b6f91cef8f507cf9dadcbda9789847fa1ccb8c7",
       "kaynak": {
-        "dosya_sayisi": 656,
+        "dosya_sayisi": 657,
         "dosyalar": {
           "eslint.config.md": "a256f1839b250eefdcf1ca81b79a1cfe8e36ed40",
           "next-env.d.md": "360d89410c4ebb89679a43bb745b27a3d0e7924d",
@@ -297,7 +298,7 @@
           "src/app/[lang]/cart/page.md": "ffa2c1dfae461e67caeddff27cd8dcb5b17dd10a",
           "src/app/[lang]/category/[categorySlug]/[subCategorySlug]/page.md": "bc7d5a2fb58034a2f127c967593c5971df1bd0e1",
           "src/app/[lang]/category/[categorySlug]/page.md": "e4a7a11c3df19ab6ef4f00044049b4bf713cf9be",
-          "src/app/[lang]/checkout/page.md": "09edfaab5ff6efd27f2cca67e4a709e40ace747c",
+          "src/app/[lang]/checkout/page.md": "729d5ffd772bc3e74261d04bbc05cb5f8ecfebac",
           "src/app/[lang]/contact/page.md": "296c8148e0cf51895148b7a7f529062c52faa9ad",
           "src/app/[lang]/destek/garanti-servis/page.md": "e8e6fbc5042b24ed3a1cbc0d4c0dd031bd44c212",
           "src/app/[lang]/destek/hesaplayicilar/hava-perdesi/page.md": "632c0ee118dba7183b2fd6fd46141def5e23f6f7",
@@ -320,7 +321,7 @@
           "src/app/[lang]/payment-success/page.md": "4e9db4cacf8177d00a1eef9709164a1ce187f2ed",
           "src/app/[lang]/products/[slug]/page.md": "2319eacb805af8ac87f99d2dbc7e001f1e7d002c",
           "src/app/[lang]/products/page.md": "ca4744f0c7f48f44eebccc8d04433035eacc5b8e",
-          "src/app/_components/ProductDetailPageView.md": "ff3523916a9237961b884467ad99a3214cf4d054",
+          "src/app/_components/ProductDetailPageView.md": "a25ca9e258ceb9d499329a38b96b50dffece0021",
           "src/app/admin/audit-logs/page.md": "8494e1ae40c2fb7634e6af581bcd3f202ef5846d",
           "src/app/admin/categories/[id]/builder/page.md": "b1e2fa86aeeea11545f9b64898927d597cebc229",
           "src/app/admin/categories/page.md": "be0280194b5da0c8be3318f3149d94a044ae9865",
@@ -565,7 +566,7 @@
           "src/components/products/RichTextRenderer.md": "0c766366ac0977fd642bbd6b979cba0de025ebee",
           "src/components/products/VariantSelector.md": "678e4f672e004cf8c02c097e2ea373e134739550",
           "src/components/products/index.md": "bf93e1eaf9c313abcc473afe950208289c96087b",
-          "src/components/quotes/QuoteRequestButton.md": "0232b7f27e0b8aca983cc822bc7e98fa880b9835",
+          "src/components/quotes/QuoteRequestButton.md": "40488bfc2896a8f26d13b6578c3bfd3548419bfc",
           "src/components/quotes/QuoteRequestModal.md": "675ebdaf684f86e91bef23ed6f924c78aceba5f3",
           "src/components/ui/Pagination.md": "7876860e027b3f3a59a38ae0ba24025839e8f0cc",
           "src/components/ui/ScrollObserver.md": "d59c5c9c30172a990b6132b3bad5df9bd7135c54",
@@ -680,8 +681,8 @@
           "src/i18n/dictionaries/admin/users.tr.md": "3caab1204966be283605ec9d6c0d1f8609693940",
           "src/i18n/dictionaries/admin/webhooks.en.md": "dfb24c8f8aa8755af9c94c527b3c46140fa555f2",
           "src/i18n/dictionaries/admin/webhooks.tr.md": "7ec94e6c9e253deb39736874a310a9341a36975c",
-          "src/i18n/dictionaries/en.md": "1d6321a45e558a5c6e97dda982486cfb77591f08",
-          "src/i18n/dictionaries/tr.md": "a947331060d1ecac6370b9236996aa55c478f627",
+          "src/i18n/dictionaries/en.md": "42111edf7d4f9747e844217ab869b5605cd22500",
+          "src/i18n/dictionaries/tr.md": "b2b2e964e86735ae40d9922a4a5f315c11640020",
           "src/i18n/format.md": "1111a07a2cd3711a9838249972fe7f0eb216ba98",
           "src/i18n/getDictValue.md": "833bd9416d6ebf062b30f578d433e07e41f6f117",
           "src/i18n/sort.md": "c6c2a8846f3dc39a614261621569182e6bceb2eb",
@@ -800,14 +801,14 @@
           "src/views/CategoryPage.md": "ffcef35472f63cb8cb74ab83bd77528e38951156",
           "src/views/CheckoutPage.md": "10bef048286835abc58a7911d775d4c35d71530e",
           "src/views/ContactPage.md": "a7db6e93052d93a6774bd2abe521cec65bf7498f",
-          "src/views/ForgotPasswordPage.md": "76baefd6109e7f61c8c474abc90e96e0aea0d009",
+          "src/views/ForgotPasswordPage.md": "b004db4e49b7233b4f99c601ae9baf96e9752ac2",
           "src/views/HomePage.md": "aaed1ce0a7ccc420b040f2ace3069bd33259c13d",
           "src/views/LoginPage.md": "fb1c77b41495ce7c1b7c3506b2bd5bd2cf25d4e8",
           "src/views/OrdersPage.md": "ec659af2b0001ea9b83ce8bf38c56d8244ccdc74",
           "src/views/PaymentSuccessPage.md": "24b0196638985ba74c3d12c62cbe134867409694",
           "src/views/ProductsDiscoveryView.md": "ebc95c4c00403036b71b2f1f6cc2db1ef1a89ba5",
           "src/views/ProductsPage.md": "a8c0838c91439421e60c2c4291a139e596efd09d",
-          "src/views/RegisterPage.md": "135f4dff36befc50ad2988d771dee801f4352c66",
+          "src/views/RegisterPage.md": "33df58bb0026e9c2c4f37a616b843a9dece49560",
           "src/views/ResetPasswordPage.md": "045ffd1afa6b6590f846c736f895837129dffbca",
           "src/views/account/AccountAddressesPage.md": "8050fa92bc883b35bbef172b3c698d24578b92e2",
           "src/views/account/AccountInvoicesPage.md": "36cf97d2ec4e6e24f07398d70123234b171728b8",
@@ -816,7 +817,7 @@
           "src/views/account/AccountProfilePage.md": "add48b1128a617be3905476eeba5ae5a4a2bc7ff",
           "src/views/account/AccountReturnsPage.md": "126edc0258a42167c7750b44d2688165ab6e681e",
           "src/views/account/AccountSecurityPage.md": "1f3163a2cb117f0cf8be42728858e815d732dd60",
-          "src/views/account/AccountShipmentsPage.md": "d694e63902874fd4381557b8f9559f1f0619d07b",
+          "src/views/account/AccountShipmentsPage.md": "3a896c8255e9816d209d6ac09dbfd0b47717bbff",
           "src/views/account/DataRequestsPage.md": "71c317daeb28d2ce371247006c8b2d198b827f74",
           "src/views/account/FavoritesPage.md": "6ef6f3cfff2dc633c80fbf6fe602b40bb2a9386f",
           "src/views/account/OrderDetailPage.md": "f016b0f3065e8321a1d2f75fa2b682e39f99ef8d",
@@ -844,14 +845,14 @@
           "src/views/admin/AdminOrdersPage.md": "8f923f9e525f6051b40783cc7f8c1efb90c02273",
           "src/views/admin/AdminPricePreviewPage.md": "773d7ce91d6fa8d66bb0a65a84ba814ae5a4755a",
           "src/views/admin/AdminPricingRulesPage.md": "79d601494cc8db645d782ff98ecaf2fc5a012c80",
-          "src/views/admin/AdminPricingSettingsPage.md": "c269370469469136c532bc79669a90837c12ae56",
+          "src/views/admin/AdminPricingSettingsPage.md": "c73e3016ac37778e3f14e91c5cfbde548e52ea8b",
           "src/views/admin/AdminProductsPage.md": "f5f5269e26e0657c844c9a1b5c76d2bab7e175d7",
           "src/views/admin/AdminReturnsPage.md": "9fc2cab4fe7fdc56dc6fd99a3b12291c2bb52b73",
           "src/views/admin/AdminSettingsPage.md": "9af35f06a6f5348e6852f270bcac1197a3fc963d",
           "src/views/admin/AdminUsersPage.md": "21697a04c1b615d700791e12d94e9f47c6d0337c",
           "src/views/admin/AdminUsersTableBody.md": "3174b24f33fcd798fd16a88e16f4558439ba98a7",
           "src/views/admin/AdminWebhookEventsPage.md": "c977e62b6e79d3fb4e3dba5495bb1621b57b310b",
-          "src/views/admin/AuditLogTableBody.md": "e3d18ecd3332b37e852758e215bfa93cb5da9717",
+          "src/views/admin/AuditLogTableBody.md": "9f6390e1f5a5e260c29a6cd8b53a02c98386ad81",
           "src/views/admin/CategoriesTableBody.md": "ba075213a4aa400df820d37e8fcd3b18d34f1ccb",
           "src/views/admin/CategoryBuilderView.md": "cd48afff7815219553dd0f6b72937f6ba826bbba",
           "src/views/admin/CouponsTableBody.md": "2db7449dd98b23d9aad3b8003b30553f9dd66609",
@@ -862,10 +863,10 @@
           "src/views/admin/OrdersTableBody.md": "012d7929c41a7317d4c6c6d9234102c25e9d51e4",
           "src/views/admin/PricePreviewPanel.md": "ff2c52dac960a709720a5eb58f6a2926a9e8e8bf",
           "src/views/admin/PricingPoliciesTableBody.md": "6bd6d9933bcd9c4f354d3af18f0643c6642d6787",
-          "src/views/admin/PricingRulesTableBody.md": "055fd5f5b3f6ab33f6c2b7927e92cb186fa01cfc",
+          "src/views/admin/PricingRulesTableBody.md": "e48d6ea6e8cad2cdbfd417445ba1ff4607032e1b",
           "src/views/admin/ProductsTableBody.md": "82836fab045a3b3e738657b2f8e74cdd0202594b",
           "src/views/admin/ReturnsTableBody.md": "2dac050b9fdf6c155b43bf2e414d8309c4212b59",
-          "src/views/admin/WebhookEventsTableBody.md": "48244589b3759d616cb0855258d3960d43890d33",
+          "src/views/admin/WebhookEventsTableBody.md": "514d3018aeb4a3f30e3abc456361c60608de04bf",
           "src/views/admin/purchasing/AdminPurchasingPage.md": "921e81bddb4219dda828349b8f9fbb819698cdd8",
           "src/views/admin/purchasing/PurchasingTableBody.md": "6f2541e8e7622c3b9c5eb484bdcbfe3bdaa3ee68",
           "src/views/admin/quotes/AdminQuotesPage.md": "6bd858a81cd68f3a5336848d634d1694b9f42293",
@@ -883,6 +884,7 @@
           "src/views/checkout/AddressSelectModal.md": "9f1981263b4304b45a3e63d0930de606fa3463a3",
           "src/views/checkout/CheckoutProgress.md": "faeb314466f68f3b77c247ecec50a3cb8ec877cd",
           "src/views/checkout/InvoiceProfileModal.md": "23597b373f0150f73dc313f01f11870aa12fb395",
+          "src/views/checkout/OdemeKapaliBilgi.md": "41094ac5828f44cb02bff5b581b50331b584ef51",
           "src/views/checkout/OrderSummarySidebar.md": "1bad1884c58a6f89c563841ae5058d74e1c7f4e8",
           "src/views/checkout/PaymentIframeContainer.md": "6a2331db9a21956cbcacad7e40abfeaf8d761c32",
           "src/views/checkout/ReviewSummary.md": "69a2b9e85732c8158e7660c203594756c9c356b0",
@@ -890,7 +892,7 @@
           "src/views/checkout/StepAddressInfo.md": "b9ba3bcd3d24fdf1d532fd9435003356c3816c0a",
           "src/views/checkout/StepCustomerInfo.md": "7104d5fb9bdb821cbce78ebe7ca88a90c6403c3b",
           "src/views/checkout/buildPaymentRequest.md": "acd58de3e6c22c78ebeae4a5917caecea21ad17c",
-          "src/views/checkout/injectCheckoutForm.md": "1829128c1192d90f8b9533b62ad6f1aeca435318",
+          "src/views/checkout/injectCheckoutForm.md": "16187cf7b64a1651407efbc5d305cf1681a51703",
           "src/views/knowledge/HubPage.md": "34c30539ae83e9ce8fedeba03a26867e63e791e0",
           "src/views/knowledge/TopicPage.md": "57bd3c03050c7df1e236619ac6d74b39549fbdb8",
           "src/views/legal/CookiePolicyPage.md": "d8315df535e5e01478dc2aa00ef6034320ae04ed",
@@ -921,9 +923,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "bb3fbaef24477db60b0ff305cfb440e5309c0402d1faff2090518dff562f3414"
+        "ozet": "8d1eb353162f89730d8b3d0607342b6ef6b1afcd14bb714c5829d249327d584e"
       },
-      "kaynak_commit": "829d6493cec3f2f42356bd6998510d8f00960252",
+      "kaynak_commit": "f9f4cf5ba393106e0b2a9060c7277bddfe399189",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -932,7 +934,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-27T17:47:33.964328+00:00",
-  "kaynak_commit": "829d6493cec3f2f42356bd6998510d8f00960252",
+  "derlendi": "2026-08-30T19:29:57.907095+00:00",
+  "kaynak_commit": "f9f4cf5ba393106e0b2a9060c7277bddfe399189",
   "surum": 1
 }
