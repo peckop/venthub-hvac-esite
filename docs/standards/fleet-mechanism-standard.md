@@ -907,3 +907,48 @@ doldurulur ki süzgecin oraya bakmadığı ölçülsün.
 **Sabotajla kanıtlandı:** sınıflandırma devre dışı bırakıldığında **tam 3 kol kırmızı**
 (companion · manifest-ürün · karışık), gerçek-ihlal davranışını ölçen 3 kol yeşil kaldı,
 `FULL_EXIT=1`.
+
+---
+
+## 16. MEKANİZMA PR'I İNDİĞİNDE ANA DİZİN TAZELENİR — merge'in ayrılmaz parçası
+
+### Niçin kural oldu: aynı boşluk BİR GÜNDE İKİ KEZ
+
+§14'te *"İNDİ ≠ ÇALIŞIYOR"* bir vaka olarak yazılmıştı. Aynı gün **ikinci kez** yaşandı:
+
+| PR | master'da | ana dizinde koşan kopya |
+|---|---|---|
+| `#903` (`board.cjs` bayrak onarımı) | `BIRIKEN_FLAGS` = 2 | **0** — claim hâlâ yol kaybediyordu |
+| `#906` (`bash-write-audit` sınıfı) | `uretilmisSinifi` = 1 | **0** — yanlış alarm sürüyordu |
+
+İki vakada da PR yeşildi, merge edilmişti, içerik master'daydı. Ve **filo eski kodu
+koşmaya devam etti.** İkincisinde gürültü bir başka şeride (URUN) dört yanlış pano notu
+düşürdü.
+
+Tekrar eden bir arıza artık vaka değil, **sahipsiz adımdır**: kancalar ve pano aracı ana
+dizinden yüklenir, ama ana dizini tazelemek kimsenin görevi değildi — o yüzden unutuluyordu.
+
+### Kural
+
+**Mekanizma dosyalarına dokunan bir PR** (`scripts/board/**`, `.claude/hooks/**`,
+`.githooks/**`) master'a indiğinde:
+
+1. Merge'i duyuran taraf **OPS'a bildirir**.
+2. **OPS aynı turda ana dizini `ff-pull` eder.** Kirli dosyalar **yalnız companion** ise
+   `stash → pull → drop`; **companion olmayan tek bir kirli dosya varsa tazeleme
+   YAPILMAZ**, önce sahibi bulunur (ana dizinde başkasının işi olabilir).
+3. **Tek satır içerik kanıtı basılır:** değişen dosyada ayırt edici bir sembolün grep
+   sayımı (ör. `grep -c 'function uretilmisSinifi' .claude/hooks/bash-write-audit.cjs` → 1).
+4. Bu adım atlanırsa olay **"İNDİ ≠ ÇALIŞIYOR" vakası** sayılır ve §14'teki dört katmanlı
+   kapanış tablosu doldurulmadan PR kapatılmaz.
+
+⚠ **Kanıtı ölçen, kapanışı yazan olmalıdır** (§14). Ana dizini OPS tazelese bile, PR'ı
+kapatan şerit ölçümü **kendisi yeniden koşar**. Bu iki vakada da öyle yapıldı.
+
+### Niçin OTOMATİK değil — reddedilen seçenek, gerekçesiyle
+
+Merge sonrası ana dizini kendiliğinden tazeleyen bir adım düşünüldü ve **reddedildi**:
+ana dizin **paylaşılan** bir ağaçtır ve içinde başka bir oturumun commit'lenmemiş işi
+olabilir. Otomatik bir `pull`/`stash`, tam da bu cetvelin başka yerlerinde yazılı olan
+*"ortak ağaçta commit'siz iş uçar"* sınıfını üretir. İnsan onaylı ritüel, sessiz
+otomasyona **bilerek** tercih edildi: kaybın bedeli, unutmanın bedelinden büyüktür.
