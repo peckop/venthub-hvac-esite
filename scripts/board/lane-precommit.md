@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-851\scripts\board\lane-precommit.cjs
-skeleton_hash: b31f55573f46e74f
+source_path: C:\tmp\vh-altyapi-scrubber\scripts\board\lane-precommit.cjs
+skeleton_hash: d4c0796eed49c7f2
 entity_hashes:
   func:git: 54ebb1b91650594e
   func:uyar: 2609a0863cdeff03
   overview: 6661e886022531fb
-generated_at: 2026-08-28T08:17:39Z
+generated_at: 2026-08-31T10:14:18Z
 ---
 
 ## Genel Bakış
