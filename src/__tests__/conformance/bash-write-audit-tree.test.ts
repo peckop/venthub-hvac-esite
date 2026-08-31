@@ -59,6 +59,16 @@ function benzersizDizin(onek: string): string {
   return `${tmpRoot()}/${onek}-${Date.now()}-${Math.random().toString(36).slice(2)}-${sayac}`
 }
 
+/** Dosyanın mtime'ını geçmişe alır — pencere ayrımı kolları için. Aynı `node:fs`-siz biçem. */
+function mtimeGecmiseAl(yol: string, saatOnce: number): void {
+  execFileSync(process.execPath, [
+    '-e',
+    'const fs=require("fs");const t=new Date(Date.now()-Number(process.argv[2])*3600000);fs.utimesSync(process.argv[1],t,t)',
+    yol,
+    String(saatOnce),
+  ])
+}
+
 /** Dosya yazımı çocuk süreçle — testin kendisi `node:fs` import ETMEZ (dosya başındaki NOT). */
 function dosyaYaz(yol: string, icerik: string): void {
   execFileSync(process.execPath, [
@@ -248,6 +258,63 @@ describe('INV-BASH-WRITE-2 · bash-write-audit hangi ağacı denetliyor', () => 
     ).toBe(0)
     expect(r.stderr, 'bastırma SESSİZ olmamalı — bir tur alarm ötmediği YAZILMALI').toContain(
       'BICIMI DEGISTI',
+    )
+  })
+
+  /**
+   * ⭐PENCERE AYRIMI (2026-08-28, REC-84). Bu kanca "tabanda yoktu, şimdi var" ÖLÇER; ama
+   * alarmın metni "Bash SONRASI değişti" diyerek bir NEDENSELLİK İDDİA EDİYORDU. Taban dosyası
+   * oturumlar arası kalıcı olduğu için, oturum kapalıyken doğan dosya dönüşte "senin Bash'in
+   * yazdı" görünüyordu.
+   *
+   * ÖLÇÜLMÜŞ BEDEL: üç kez "üretim yolu kaçağı" alarmı verildi; iki dosyanın mtime'ı BİR ÖNCEKİ
+   * GÜNDÜ ve doc-scope süzgeci doğru çalışıyordu (GIRDI 3 · CIKAN 1). İki şerit boşuna iş çıkardı.
+   *
+   * İKİ KOL BİRLİKTE DURUYOR: yalnız "eski dosya susturuldu" kolunu yazmak, kancayı tamamen
+   * sağır eden bir uygulamayla da YEŞİL kalırdı. İkinci kol gerçek ihlalin hâlâ öttüğünü ölçer.
+   */
+  it('PENCERE DIŞI: tabandan ESKİ dosya şerit sahibine ALARM ÜRETMEZ (ama sessizce de yutulmaz)', () => {
+    const k = kur('pencere-eski')
+    kimlikYaz(k, k.wtB)
+
+    dosyaYaz(`${k.wtB}/${CLAIM_YOLU}`, 'export const w = 5\n')
+    // Dosyayı GEÇMİŞE al: taban damgası ondan SONRA yazılmış olacak.
+    mtimeGecmiseAl(`${k.wtB}/${CLAIM_YOLU}`, 6)
+
+    dosyaYaz(
+      `${k.panoDir}/.bash-audit-${k.sid.slice(0, 8)}.json`,
+      JSON.stringify({ surum: 3, sid: k.sid, ts: Date.now(), yollar: [], bildirilen: [] }),
+    )
+
+    const r = auditKostur(k)
+
+    expect(r.status, 'pencere dışı kalem exit 2 ile alarm üretmemeli').toBe(0)
+    expect(r.stderr, 'susturma GÖRÜNÜR olmalı — sessiz eleme, elediğini gizler').toContain(
+      'PENCERE DISI',
+    )
+    expect(
+      r.stderr,
+      'hangi dosyanın ne zaman oluştuğu YAZILMALI: okuyan "boşuna mı bakıyorum" sorusunu ölçümle cevaplayabilsin',
+    ).toContain('mtime')
+  })
+
+  it('PENCERE İÇİ: tabandan YENİ dosya hâlâ ALARM ÜRETİR (sağırlaştırma koruması)', () => {
+    const k = kur('pencere-yeni')
+    kimlikYaz(k, k.wtB)
+
+    // Taban ÖNCE yazılır, dosya SONRA doğar — gerçek ihlalin zaman sırası budur.
+    dosyaYaz(
+      `${k.panoDir}/.bash-audit-${k.sid.slice(0, 8)}.json`,
+      JSON.stringify({ surum: 3, sid: k.sid, ts: Date.now() - 60_000, yollar: [], bildirilen: [] }),
+    )
+    dosyaYaz(`${k.wtB}/${CLAIM_YOLU}`, 'export const w = 6\n')
+
+    const r = auditKostur(k)
+
+    expect(r.status, 'pencere içi gerçek ihlal exit 2 ile ötmeli').toBe(2)
+    expect(r.stderr, 'alarm metni ölçtüğü şeyi söylemeli').toContain('PENCEREDE')
+    expect(r.stderr, 'pencere içi kalem "pencere dışı" listesine düşmemeli').not.toContain(
+      'PENCERE DISI',
     )
   })
 })

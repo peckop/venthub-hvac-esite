@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-30T19:07:42.683808+00:00
+compiled_at: 2026-08-30T19:58:55.671504+00:00
 total_compiled_files: 62
-source_commit: 3cdff062
+source_commit: ba9ed216
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -8775,6 +8775,115 @@ bildirse bile ölçüm yeniden yapılır — kapanışı yazan, ölçen olmalıd
 ⚠ Davranış ölçümü **izole panoda** (`VENTHUB_BOARD_DIR=<geçici dizin>`) koşulur; sınav
 çağrısı canlı panoya sahte claim yazmamalıdır.
 
+---
+
+## 15. ÜRETİLMİŞ ARTEFAKT İHLALİ ≠ DİKİŞ YERİ İHLALİ
+
+### Ölçülmüş vaka (2026-08-30)
+
+`bash-write-audit` tek gün içinde **üç ayrı turda** öttü ve üçünde de bulduğu şey aynıydı:
+`post-commit` üretecinin arka planda yazdığı companion `.md`'ler
+(`bash-write-audit.md`, `lane-precommit.md`, `AboutPage.md`, `board.md`,
+`CategoryLandingView.md`, `OdemeKapaliBilgi.md`). Hiçbiri elle yazılmadı, hiçbiri bir
+şeridin işine dokunmadı. Buna rağmen kanca *"başka şeridin dosyasına SEN yazdın"* deyip
+`exit 2` ile döndü **ve karşı şeride pano notu düştü**.
+
+**Niçin bu bir kusur:** yanlış alarm bedavaya gelmez. Sürekli öten kapı görmezden gelinir
+— **gürültü, kapıyı KÖR ETMENİN yavaş yoludur.** Kancanın kendi baş yorumu bunu zaten
+söylüyordu (*"alarm üç gün içinde görmezden gelinirdi"*); kusur, aynı hükmün üreteç
+çıktısına uygulanmamış olmasıydı.
+
+### Sınıflandırma YAPISALDIR — ad araması değil
+
+| ölçüt | üretilmiş sayılır |
+|---|---|
+| `artefakt_manifest.json` → `artefaktlar[].ad` | evet |
+| manifestin kendisi | evet |
+| `X.md` + yanında aynı adlı **kaynak** dosya (`.ts/.tsx/.js/.jsx/.cjs/.mjs/.py`) | evet (companion) |
+| kardeş kaynağı olmayan `.md` | **hayır** — elle yazılmış belgedir, korunur |
+
+⚠ `kaynak.dosyalar`'a **BAKILMAZ**. Orası kaynak listesidir; oraya bakan bir süzgeç
+kaynağı "üretilmiş" sanar. Bu depoda tam bu hata **104 satır cetvel** kaybettirdi
+(`uretilmis-artefakt-standard.md`, AXIOM 8).
+
+### Davranış
+
+- Üretilmiş olanlar **görünür kalır** (`DUSUK SIDDET` + gerekçe) ama **bloklamaz** ve
+  **panoya not göndermez.** Not, karşı şeridin dikkatini ister; üreteç çıktısı için o
+  dikkat boşa harcanır. *"Sustu"* ile *"böyle sınıflandırdı"* ayırt edilebilir kalmalı —
+  **sessiz muafiyet, sessiz ezme kadar kötüdür.**
+- Gerçek ihlal varsa davranış **aynen** eskisi gibi: `exit 2` + pano notu.
+- **FAIL-CLOSED:** sınıf ölçülemezse (manifest okunamadı, `statSync` patladı) ihlal
+  **gerçek** sayılır ve ölçülemezlik **basılır**. *"Ölçemedim"* ile *"üretilmiş"* aynı
+  kefeye konmaz (§5).
+
+⚠ **Kabul edilen artık risk, adıyla:** başka bir şeridin companion'ını **elle**
+düzenlemek artık bloklanmaz, yalnız düşük şiddetle raporlanır. Bilerek: companion
+üretilmiş dosyadır (AXIOM 3 elle düzenlemeyi zaten yasaklar) ve bir sonraki üretimde
+ezilir — yarıçapı sınırlıdır. Gürültünün bedeli ise sınırsızdı.
+
+### Kapı ve ayırt ediciliği
+
+`src/__tests__/conformance/bash-write-audit-uretilmis-sinifi.test.ts` — 6 kol. Asıl ölçüt
+mesaj değil **panoya düşen not sayısı**; fikstür manifestinde `kaynak.dosyalar` **kasten**
+doldurulur ki süzgecin oraya bakmadığı ölçülsün.
+
+1. **mekanizma canlı** (gerçek dosya → `exit 2` + not 1) — susma kollarını anlamlı kılan kol.
+2. companion susar (`exit 0`, not 0, `DUSUK SIDDET` görünür).
+3. manifestte ürün olan dosya susar.
+4. ⭐**karışık** (gerçek + üretilmiş) → `exit 2` ve not sayısı **tam 1**.
+5. **süzgeç dar**: kardeş kaynağı olmayan `.md` gerçek sayılır.
+6. **fail-closed**: manifest okunamayınca companion bile gerçek sayılır + `OLCULEMEDI` basılır.
+
+**Sabotajla kanıtlandı:** sınıflandırma devre dışı bırakıldığında **tam 3 kol kırmızı**
+(companion · manifest-ürün · karışık), gerçek-ihlal davranışını ölçen 3 kol yeşil kaldı,
+`FULL_EXIT=1`.
+
+---
+
+## 16. MEKANİZMA PR'I İNDİĞİNDE ANA DİZİN TAZELENİR — merge'in ayrılmaz parçası
+
+### Niçin kural oldu: aynı boşluk BİR GÜNDE İKİ KEZ
+
+§14'te *"İNDİ ≠ ÇALIŞIYOR"* bir vaka olarak yazılmıştı. Aynı gün **ikinci kez** yaşandı:
+
+| PR | master'da | ana dizinde koşan kopya |
+|---|---|---|
+| `#903` (`board.cjs` bayrak onarımı) | `BIRIKEN_FLAGS` = 2 | **0** — claim hâlâ yol kaybediyordu |
+| `#906` (`bash-write-audit` sınıfı) | `uretilmisSinifi` = 1 | **0** — yanlış alarm sürüyordu |
+
+İki vakada da PR yeşildi, merge edilmişti, içerik master'daydı. Ve **filo eski kodu
+koşmaya devam etti.** İkincisinde gürültü bir başka şeride (URUN) dört yanlış pano notu
+düşürdü.
+
+Tekrar eden bir arıza artık vaka değil, **sahipsiz adımdır**: kancalar ve pano aracı ana
+dizinden yüklenir, ama ana dizini tazelemek kimsenin görevi değildi — o yüzden unutuluyordu.
+
+### Kural
+
+**Mekanizma dosyalarına dokunan bir PR** (`scripts/board/**`, `.claude/hooks/**`,
+`.githooks/**`) master'a indiğinde:
+
+1. Merge'i duyuran taraf **OPS'a bildirir**.
+2. **OPS aynı turda ana dizini `ff-pull` eder.** Kirli dosyalar **yalnız companion** ise
+   `stash → pull → drop`; **companion olmayan tek bir kirli dosya varsa tazeleme
+   YAPILMAZ**, önce sahibi bulunur (ana dizinde başkasının işi olabilir).
+3. **Tek satır içerik kanıtı basılır:** değişen dosyada ayırt edici bir sembolün grep
+   sayımı (ör. `grep -c 'function uretilmisSinifi' .claude/hooks/bash-write-audit.cjs` → 1).
+4. Bu adım atlanırsa olay **"İNDİ ≠ ÇALIŞIYOR" vakası** sayılır ve §14'teki dört katmanlı
+   kapanış tablosu doldurulmadan PR kapatılmaz.
+
+⚠ **Kanıtı ölçen, kapanışı yazan olmalıdır** (§14). Ana dizini OPS tazelese bile, PR'ı
+kapatan şerit ölçümü **kendisi yeniden koşar**. Bu iki vakada da öyle yapıldı.
+
+### Niçin OTOMATİK değil — reddedilen seçenek, gerekçesiyle
+
+Merge sonrası ana dizini kendiliğinden tazeleyen bir adım düşünüldü ve **reddedildi**:
+ana dizin **paylaşılan** bir ağaçtır ve içinde başka bir oturumun commit'lenmemiş işi
+olabilir. Otomatik bir `pull`/`stash`, tam da bu cetvelin başka yerlerinde yazılı olan
+*"ortak ağaçta commit'siz iş uçar"* sınıfını üretir. İnsan onaylı ritüel, sessiz
+otomasyona **bilerek** tercih edildi: kaybın bedeli, unutmanın bedelinden büyüktür.
+
 
 ---
 # FILE: docs\standards\form-submission-standard.md
@@ -14151,8 +14260,77 @@ Not: `body { overflow-x: clip }` enstrümanı KÖRLEŞTİRMEZ (belge `documentEl
   açık). Kapıya koymak regresyon değil eksik-özellik kırmızısı üretir ve kapı sökülür.
   Admin dar-ekran tasarımı geldiğinde bu muafiyet KALDIRILIR (muafiyet = adlı, süreli).
 
+## Binişme ve görünürlük (v1.1, 2026-08-30, REC-89)
+
+Reflow kuralları belgenin **taşmasını** ölçer. Bu bölüm taşma OLMADAN yaşanan kusur
+sınıfını kapsar: her şey ekranın içindedir ama **üst üstedir**. `INV-REFLOW-1` bu sınıfı
+göremez ve yeşil kalır — bölümün varlık sebebi budur.
+
+**R4. Etkileşimli elemanın metni örtülmez.** Buton/bağlantı metni her kırılım
+genişliğinde okunur olmalıdır. Ölçüt "görünür mü" DEĞİL, **"kendi merkezinde en üstte
+kim var"**: `document.elementFromPoint(merkez)` elemanın kendisini ya da çocuğunu
+döndürmelidir. Yaşandı (REC-89 kusur 1): hero CTA'larının rengi, kontrastı, opaklığı ve
+kırpması ÖLÇÜLDÜ ve **hepsi doğruydu**; buna rağmen metin okunmuyordu, çünkü kapsayıcı
+0 piksele çöküp mutlak konumlu görsel butonun üzerine binmişti. Yani stil ölçümü bu
+kusuru yapısal olarak KAÇIRIR.
+
+**R5. Yapışkan/mutlak katman içerik metnini ezmez.** `sticky`/`absolute` bir katman,
+altından akan metnin üzerine binemez. Konumlandırma sınıfı **kırılım kapsamıyla birlikte**
+yazılır: iki kolonlu düzen için tasarlanmış yapışkanlık tek kolonlu mobilde yürürlükte
+kalmamalıdır. Yaşandı (REC-89 kusur 2): `sticky top-24 z-10` `lg:` öneki olmadan
+yazılmıştı; 390 px'te kaydırma sonrası ÜÇ metin düğümü örtülü ölçüldü.
+
+**R6. Kırpma ve gizleme burada da çözüm değildir** (R3'ün bu bölüme uzantısı). Örtülen
+metni `overflow`/`z-index` ile saklamak ihlali sürdürür; katman düzeni kökünden düzeltilir.
+
+### Yükleme önceliği ve yer tutucu
+
+**R7. Öncelik FOLD ÜSTÜ ölçütüne bağlanır, sabit sayıya DEĞİL.** Liste görünümlerinde
+yalnız ilk ekranda GÖRÜNEN kartlar öncelikli (`priority`) olur; **fold üstünde kart yoksa
+hiçbir karta priority verilmez.** Sabit bir N (ör. `index < 4`) yazmak yasaktır: N, sayfa
+düzeni değiştiğinde sessizce yanlışa döner ve kimse fark etmez.
+
+*Niçin sabit N reddedildi — ölçümle:* önce "ilk 4 karta priority ver" reçetesi önerildi
+ve onaylandı. Uygulamadan önce fold üstü kart sayısı ölçüldü ve reçete ÇÜRÜDÜ:
+`/tr/products` → ilk kart 928 px aşağıda, fold üstü kart **0** (üstte 3D karusel var);
+`/tr/category/kanal-tipi-fanlar` → ilk kart 7960 px aşağıda, fold üstü kart **0**;
+`/tr/products/vortice-lineo-quiet` → ilk kart 4151 px aşağıda, fold üstü kart **0**.
+Fold ALTINDAKİ görseli öncelikli yapmak LCP'yi iyileştirmez; gerçek LCP adayıyla bant
+genişliği için yarışır ve ölçüyü KÖTÜLEŞTİRİR. Yani reçete uygulansaydı görünürde iş
+yapılmış, ölçüm gerilemiş olurdu.
+
+**R8. Yüklenmemiş kart BOŞ bırakılmaz.** Görsel gelene kadar yer tutucu (iskelet ya da
+bulanık önizleme) gösterilir; boş renk bloğu yeterli değildir. Yaşandı: müşteri ürün
+listesinde "ilk sekiz geldi, sonraki dörtlü şerit boş, ondan sonraki daha erken geldi"
+diye bildirdi. Ölçüldü: 42 görselin 42'si `lazy`, hiçbirinde `priority`/`fetchpriority`
+yok; kaydırınca hepsi birden tetikleniyor ve tarayıcının eşzamanlı bağlantı sınırı
+tamamlanma sırasını karıştırıyor. Bu tarayıcının NORMAL davranışıdır — kusur olan,
+bekleyen kartın boş görünmesidir. Yani R8 bir hız kuralı değil **algı** kuralıdır.
+
+**R9. Öncelik kararı BİLİNÇLİ yazılır.** Liste içinde kart render eden her çağrı
+`priority` değerini açıkça verir (`true` ya da `false`); sessiz varsayılana bırakılamaz.
+Yaşandı: `FamilyCard` `priority` desteğini taşıyor ve **bir** çağrı yerinde kullanılmış,
+**altı** çağrı yerinde hiç verilmemişti — kural yazılı olmadığı için hiçbir kapı görmedi.
+
+### Kapı durumu — neyin mekanik, neyin ELLE olduğu
+
+| Kural | Kapı | Tür |
+|---|---|---|
+| R4 · R5 | `INV-BINISME-1` (e2e, `elementFromPoint`) | mekanik |
+| R7 (dolaylı) · token'sız ölçü sınıfı | `INV-TOKEN-SINIF-1` (kaynak, AST) | mekanik |
+| R9 | `INV-KART-ONCELIK-1` (kaynak, AST) | mekanik |
+| R6 | — | **ELLE DENETİM** |
+| R8 (yer tutucunun GÖRSEL kalitesi) | — | **ELLE DENETİM** |
+
+R8'in "yer tutucu VAR mı" kısmı mekanikleştirilebilir; "yeterince iyi mi" kısmı
+ölçülemez ve elle denetime bırakılmıştır. Bunu açıkça yazıyoruz ki kapı listesi
+sahte-yeşil üretmesin: **kapısı olmayan kural, kapısı varmış gibi gösterilmez.**
+
 ## Değişiklik günlüğü
 
+- v1.1 (2026-08-30, REC-89): "Binişme ve görünürlük" bölümü (R4-R6) ve "Yükleme önceliği
+  ve yer tutucu" (R7-R9) eklendi. R7'nin sabit-N hâli, uygulanmadan önce yapılan fold
+  ölçümüyle çürütüldüğü için fold ölçütüne çevrildi.
 - v1.0 (2026-08-16, T050-VH): ilk sürüm — #540'ta elle bulunan taşma sınıfı kalıcı
   kapıya bağlandı; mobil viewport hattı açıldı.
 

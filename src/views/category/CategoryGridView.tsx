@@ -98,11 +98,15 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
             ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8" 
             : "flex flex-col gap-6"
           }>
+            {/* priority=false — cetvel §R7/§R9 gereği karar YAZILI. Bu görünüm için fold
+                ölçümü YAPILMADI; mevcut davranış korunuyor. Ölçülür ve fold üstünde kart
+                çıkarsa değer burada değişir. */}
             {families.map(family => (
               <FamilyCard
                 key={family.id}
                 family={family}
                 layout={filters.viewMode}
+                priority={false}
               />
             ))}
           </div>

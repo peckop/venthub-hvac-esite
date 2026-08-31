@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-30T19:07:42.823263+00:00
+compiled_at: 2026-08-30T19:58:55.823181+00:00
 total_compiled_files: 99
-source_commit: 3cdff062
+source_commit: ba9ed216
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -13585,11 +13585,11 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-28T12:54:03.044227+00:00
+compiled_at: 2026-08-30T19:57:50.134556+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-28T12:54:03.044227+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-30T19:57:50.134556+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text

@@ -232,6 +232,7 @@ try {
     if (okunan && Array.isArray(okunan.yollar)) {
       taban = {
         surum: Number(okunan.surum) || 1,
+        ts: Number(okunan.ts) || 0,
         yollar: okunan.yollar,
         bildirilen: Array.isArray(okunan.bildirilen) ? okunan.bildirilen : [],
       }
@@ -247,7 +248,9 @@ const tabanYaz = (bildirilen) => {
     const gecici = TABAN_YOLU + '.tmp'
     fs.writeFileSync(
       gecici,
-      JSON.stringify({ surum: 2, sid, yollar: simdiki.map((s) => s.anahtar), bildirilen }),
+      // `ts` (surum 3): tabanin YAZILDIGI an. Bkz. aşağıdaki pencere ayrımı — bu damga
+      // olmadan "senin Bash'in yazdı" ile "sen yokken oldu" ayırt EDİLEMEZ.
+      JSON.stringify({ surum: 3, sid, ts: Date.now(), yollar: simdiki.map((s) => s.anahtar), bildirilen }),
       'utf8',
     )
     fs.renameSync(gecici, TABAN_YOLU)
@@ -328,7 +331,7 @@ const halAl = (agac) => {
 
 const muafAgaclar = new Map()
 const olculemeyenAgaclar = new Set()
-const yeniler = hamYeniler.filter((y) => {
+const birlestirmeSonrasi = hamYeniler.filter((y) => {
   const { hal, olculdu } = halAl(y.agac)
   if (!olculdu) {
     olculemeyenAgaclar.add(y.agac)
@@ -350,6 +353,66 @@ for (const agac of olculemeyenAgaclar) {
   uyarilar.push(
     '[bash-write-audit] birlestirme hali OLCULEMEDI (' + agac + ') — muafiyet ACILMADI (fail-closed).' +
       '\n  Alarm oterse once bu agacin git dizinini kontrol et; sessiz muafiyetten iyidir.',
+  )
+}
+
+/**
+ * ⭐PENCERE AYRIMI (2026-08-28, REC-84) — ölçtüğüm şey ile İDDİA ETTİĞİM şey aynı olmalı.
+ *
+ * Bu kanca "taban kümesinde yoktu, şimdi var" ölçer. Alarmın metni ise "Bash SONRASI değişti"
+ * diyordu — bu bir NEDENSELLİK iddiasıdır ve ölçüm onu desteklemiyor. Taban dosyası
+ * (`.bash-audit-<sid>.json`) OTURUMLAR ARASI kalıcıdır: oturum kapalıyken doğan bir dosya,
+ * dönüşte "senin Bash'in yazdı" gibi görünür.
+ *
+ * ÖLÇÜLDÜ: bugün üç kez "üretim yolu kaçağı" diye alarm veren iki dosyanın
+ * (`build-skip-positive-logic.test.md`, `search-route-ssot.test.md`) mtime'ı BİR ÖNCEKİ
+ * GÜNDÜ. Süzgeç doğru çalışıyordu (`GIRDI 3 satir · CIKAN 1 yol`), üretim yolu kaçırmıyordu;
+ * yanlış olan alarmın cümlesiydi. İki şerit boşuna iş çıkardı.
+ *
+ * AYRIM: dosyanın mtime'ı tabanın yazıldığı andan ESKİYSE, o dosya bu pencerede doğmadı.
+ * Böyle kalemler ŞERİT SAHİBİNE ALARM OLARAK GİTMEZ — sessizce de yutulmaz, kendi
+ * satırlarıyla uyarı olarak basılır ve tabana alınır (bir daha ötmez).
+ *
+ * TOLERANS: taban yazımı ile dosya yazımı aynı saniyeye düşebilir; 2 sn'lik pay bırakıldı.
+ * Pay YÖNÜ bilinçli — şüpheli kalemi "bu pencerede" saymak yanlış-pozitif üretir, tersi
+ * yanlış-negatif; ikisi arasında yanlış-pozitifi seçiyoruz çünkü asıl ihlal SESSİZ KALMAMALI.
+ *
+ * ⚠SIRA BİLİNÇLİ (2026-08-30, bu iki katman ilk kez yan yana geldi): önce BİRLEŞTİRME
+ * MUAFİYETİ, sonra PENCERE. Merge'in taşıdığı dosya zaten bu şeridin yazması değildir —
+ * onu önce elemek, "pencere dışı" raporunu merge artıklarıyla şişirmeyi önler. Ters sıra
+ * aynı dosyayı iki kez ve iki farklı gerekçeyle anlatırdı; rapor okunaksızlaşır.
+ */
+const TOLERANS_MS = 2000
+const dosyaZamani = (y) => {
+  try {
+    return fs.statSync(path.resolve(y.agac, y.bagil)).mtimeMs
+  } catch {
+    return null // silinmiş/erişilemez: yaşını bilemeyiz, pencere İÇİ sayarız (sessiz kalmaktansa)
+  }
+}
+
+const bayatlar = []
+const yeniler = []
+for (const y of birlestirmeSonrasi) {
+  const mt = taban.ts ? dosyaZamani(y) : null
+  if (taban.ts && mt !== null && mt < taban.ts - TOLERANS_MS) bayatlar.push({ ...y, mt })
+  else yeniler.push(y)
+}
+
+if (bayatlar.length) {
+  const bicim = (ms) => new Date(ms).toISOString().slice(0, 19).replace('T', ' ')
+  uyarilar.push(
+    '[bash-write-audit] PENCERE DISI ' + bayatlar.length + ' kalem — bu Bash cagrisinin ESERI DEGIL, ' +
+      'taban yazildigindan (' + bicim(taban.ts) + ') ONCE olusmuslar. Serit sahibine alarm GITMEDI:\n' +
+      bayatlar.map((b) => '  · ' + b.anahtar + '  (mtime ' + bicim(b.mt) + ')').join('\n') +
+      '\n  Sebep genellikle oturum araligi: taban dosyasi oturumlar arasi kalicidir.',
+  )
+}
+
+if (!taban.ts && birlestirmeSonrasi.length) {
+  uyarilar.push(
+    '[bash-write-audit] taban ZAMAN DAMGASIZ (surum<3) — pencere ayrimi yapilamadi, ' +
+      birlestirmeSonrasi.length + ' kalem "bu turda olustu" SAYILDI. Bir sonraki tur damgali olacak.',
   )
 }
 
@@ -397,7 +460,103 @@ if (!ihlaller.length) {
   process.exit(0)
 }
 
-const satirlar = ihlaller.map(
+/**
+ * ⭐ÜRETİLMİŞ ARTEFAKT İHLALİ ≠ DİKİŞ YERİ İHLALİ (2026-08-30, ölçülmüş alarm gürültüsü).
+ *
+ * Bu kanca bugün üç ayrı turda öttü ve ÜÇÜNDE DE bulduğu şey aynıydı: `post-commit`
+ * üretecinin arka planda yazdığı companion `.md`'ler (`bash-write-audit.md`,
+ * `lane-precommit.md`, `AboutPage.md`, `board.md`...). Hiçbiri elle yazılmadı; hiçbiri
+ * bir şeridin işine dokunmadı.
+ *
+ * NİÇİN ONARILIYOR: alarm "başka şeridin dosyasına SEN yazdın" der ve `exit 2` ile
+ * dönüp okuyanı durdurur. Üretecin çıktısı için bu cümle YANLIŞ — ve yanlış alarm
+ * bedavaya gelmez: bu depoda defalarca yazıldığı gibi, sürekli öten bir kapı üç gün
+ * içinde görmezden gelinir. Yani gürültü, kapıyı KÖR ETMENİN yavaş yoludur.
+ *
+ * SINIFLANDIRMA YAPISALDIR — ad araması DEĞİL (AXIOM 8 dersi: `uretilmis-artefakt-standard.md`):
+ *   · manifestte ÜRÜN olarak ilan edilmiş dosya (`artefaktlar[].ad`) — `kaynak.dosyalar`a
+ *     BAKILMAZ, orası kaynak listesidir ve ona bakan bir süzgeç kaynağı "üretilmiş" sanar.
+ *   · manifestin kendisi.
+ *   · companion: `X.md` ve yanında aynı adlı bir KAYNAK dosya (`X.ts` gibi) duruyorsa.
+ *
+ * ⚠FAIL-CLOSED: sınıf ÖLÇÜLEMEZSE (manifest okunamadı, `statSync` patladı) ihlal GERÇEK
+ * sayılır. "Ölçemedim" ile "üretilmiş" aynı kefeye konmaz — bu kancanın kendi cetveli
+ * (§5) bunu emrediyor.
+ *
+ * ⚠KABUL EDİLEN ARTIK RİSK, ADIYLA: başka bir şeridin companion'ını ELLE düzenlersem bu
+ * artık bloklamaz, yalnız düşük şiddetle raporlanır. Bilerek: companion üretilmiş dosyadır
+ * (AXIOM 3 zaten elle düzenlemeyi yasaklar) ve bir sonraki üretimde ezilir — yani yarıçapı
+ * sınırlı. Buna karşılık gürültünün bedeli sınırsızdı.
+ */
+const KAYNAK_UZANTILARI = ['.ts', '.tsx', '.js', '.jsx', '.cjs', '.mjs', '.py']
+
+/** Manifestin ilan ettiği ÜRÜN adları — ağaç başına bir kez okunur. */
+const manifestOnbellek = new Map()
+function manifestUrunleri(agac) {
+  if (manifestOnbellek.has(agac)) return manifestOnbellek.get(agac)
+  let sonuc = null // null = ÖLÇÜLEMEDİ (fail-closed sinyali)
+  try {
+    const ham = fs.readFileSync(path.join(agac, 'docs', 'artefakt_manifest.json'), 'utf8')
+    const m = JSON.parse(ham)
+    const liste = Array.isArray(m.artefaktlar) ? m.artefaktlar : []
+    sonuc = new Set(liste.map((a) => 'docs/' + String(a.ad)).concat(['docs/artefakt_manifest.json']))
+  } catch {
+    sonuc = null
+  }
+  manifestOnbellek.set(agac, sonuc)
+  return sonuc
+}
+
+/** @returns {{uretilmis: boolean, olculdu: boolean, gerekce: string}} */
+function uretilmisSinifi(agac, bagil) {
+  const yol = String(bagil).replace(/\\/g, '/')
+  const urunler = manifestUrunleri(agac)
+  if (urunler === null) return { uretilmis: false, olculdu: false, gerekce: 'manifest okunamadi' }
+  if (urunler.has(yol)) return { uretilmis: true, olculdu: true, gerekce: 'manifestte URUN' }
+  if (!/\.md$/i.test(yol)) return { uretilmis: false, olculdu: true, gerekce: 'md degil' }
+  const govde = yol.slice(0, -3)
+  for (const uz of KAYNAK_UZANTILARI) {
+    try {
+      if (fs.statSync(path.join(agac, govde + uz)).isFile()) {
+        return { uretilmis: true, olculdu: true, gerekce: 'companion (' + govde.split('/').pop() + uz + ')' }
+      }
+    } catch { /* yok — sonraki uzantı */ }
+  }
+  return { uretilmis: false, olculdu: true, gerekce: 'kardes kaynak dosya YOK' }
+}
+
+const uretilmisIhlaller = []
+const gercekIhlaller = []
+for (const i of ihlaller) {
+  const s = uretilmisSinifi(i.y.agac, i.y.bagil)
+  if (s.uretilmis) uretilmisIhlaller.push({ ...i, gerekce: s.gerekce })
+  else {
+    if (!s.olculdu) uyarilar.push('[bash-write-audit] sinif OLCULEMEDI (' + s.gerekce + ') — ihlal GERCEK sayildi: ' + etiket(i.y))
+    gercekIhlaller.push(i)
+  }
+}
+
+/**
+ * Üretilmiş olanlar GÖRÜNÜR kalır ama BLOKLAMAZ ve panoya not GÖNDERMEZ: not, karşı
+ * şeridin dikkatini ister; üreteç çıktısı için bu dikkat boşa harcanır. "Sustu" ile
+ * "böyle sınıflandırdı" ayırt edilebilsin diye gerekçe basılır.
+ */
+if (uretilmisIhlaller.length) {
+  process.stderr.write(
+    '[bash-write-audit] DUSUK SIDDET — ' + uretilmisIhlaller.length +
+      ' URETILMIS artefakt baska seridin globunda degisti (uretec ciktisi, elle yazma DEGIL; panoya not GONDERILMEDI):\n' +
+      uretilmisIhlaller.map((i) => '  · ' + etiket(i.y) + '  [' + i.gerekce + ']').join('\n') + '\n',
+  )
+}
+
+if (!gercekIhlaller.length) {
+  uyariBas()
+  process.exit(0)
+}
+
+const ihlallerAsil = gercekIhlaller
+
+const satirlar = ihlallerAsil.map(
   (i) => '  · ' + etiket(i.y) + '  ->  ' + i.catisma.claim.lane + ' (' + String(i.catisma.claim.sid).slice(0, 8) + ') · kural: ' + i.catisma.glob,
 )
 
@@ -411,7 +570,7 @@ const satirlar = ihlaller.map(
  * başarısızlık BASILIYOR.
  */
 const lanelereGore = new Map()
-for (const i of ihlaller) {
+for (const i of ihlallerAsil) {
   const anahtar = i.catisma.claim.sid
   if (!lanelereGore.has(anahtar)) lanelereGore.set(anahtar, { claim: i.catisma.claim, satirlar: [] })
   lanelereGore.get(anahtar).satirlar.push('  · ' + etiket(i.y) + ' · kural: ' + i.catisma.glob)
@@ -428,8 +587,9 @@ for (const { claim, satirlar: laneSatirlar } of lanelereGore.values()) {
       type: 'note',
       to: hedef.to,
       text:
-        'OTOMATIK ALARM (bash-write-audit): Bash sonrasi SENIN SERIDINDEKI dosya(lar) benim ' +
-        'calisma agacimda degisti. Kasten olmamis olabilir ama SONUC ayni; haberin olsun diye yaziyorum.\n' +
+        'OTOMATIK ALARM (bash-write-audit): SENIN SERIDINDEKI dosya(lar) benim calisma ' +
+        'agacimda, BU BASH CAGRISININ PENCERESINDE degisti (dosya mtime > taban damgasi; ' +
+        'pencere disi kalemler bu alarma GIRMEZ). Kasten olmamis olabilir ama SONUC ayni.\n' +
         laneSatirlar.join('\n') +
         '\nBu, PreToolUse kapisinin GOREMEDIGI bir yazmadir: komut metninde hedef yoktu ' +
         '(ornek: node betik.cjs, ya da bir git kancasinin calistirdigi ureteci).',
@@ -441,7 +601,7 @@ for (const { claim, satirlar: laneSatirlar } of lanelereGore.values()) {
 
 uyariBas()
 process.stderr.write(
-  '[bash-write-audit] DIKIS YERI ALARMI — Bash sonrasi BASKA SERIDIN dosyalari degisti' +
+  '[bash-write-audit] DIKIS YERI ALARMI — BU PENCEREDE baska seridin dosyalari degisti' +
     (cokAgac ? ' (agac :: yol)' : '') + ':\n' +
     satirlar.join('\n') +
     '\n  Denetlenen agac(lar): ' + denetlenecek.join(', ') +
