@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\home\ApplicationSolutions.tsx
-skeleton_hash: 237ecb9291b78191
+source_path: C:\tmp\vh-urun-rec89\src\components\home\ApplicationSolutions.tsx
+skeleton_hash: aca0f56341b49d27
 entity_hashes:
   func:ApplicationSolutions: 93f4bfc3e2d056b5
   overview: 26527ace9a268eaa
   style_tokens: a60445c0b91a13d5
-generated_at: 2026-08-27T08:26:32Z
+generated_at: 2026-08-31T11:45:42Z
 ---
 
 ## Genel Bakış
@@ -63,7 +63,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 ## INTERFACES
 
 ### SolutionItem
-- `id: 'parking' | 'kitchen' | 'entrance' | 'comfort'`
+- `id: 'parking' | 'entrance' | 'comfort'`
 - `categorySlug: string`
 - `subSlug?: string`
 - `image: string`
@@ -86,8 +86,8 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 - **solutions** (array) — `[
   {
     id: 'parking',
-    categorySlug: 'industrial-ventilation',
-    ...`
+    categorySlug: 'fans',
+    subSlug: 'parking-...`
 
 ---
 

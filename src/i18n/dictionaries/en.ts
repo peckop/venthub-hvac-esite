@@ -1917,7 +1917,16 @@ export const en: typeof tr = {
       allProductGroups: 'All Product Groups',
       noProducts: 'Products for this brand will be added soon.',
       originSuffix: 'Origin',
-      estPrefix: 'EST.'
+      estPrefix: 'EST.',
+      // REC-98: "Corporate Snapshot" satirlarinin ETIKETLERI. Deger tarafi veri olarak
+      // `BRAND_DETAILS` icinde tasinir; etiket burada, cunku arayuz metnidir.
+      statCountries: 'Countries',
+      statGroup: 'Group',
+      statProduction: 'Manufacturing',
+      statWarranty: 'Warranty',
+      statExperience: 'Experience',
+      statExpertise: 'Expertise',
+      statQuality: 'Quality'
     }
   },
   quickView: {

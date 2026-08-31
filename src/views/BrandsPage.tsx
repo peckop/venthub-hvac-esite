@@ -6,7 +6,7 @@ import React from 'react'
 
 import { BrandIcon } from '../components/HVACIcons'
 import Seo from '../components/Seo'
-import { HVAC_BRANDS } from '../data/brands'
+import { brandText, HVAC_BRANDS } from '../data/brands'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import { useI18n } from '../i18n/I18nProvider'
@@ -16,7 +16,7 @@ import { useI18n } from '../i18n/I18nProvider'
  * Modernized with i18n, A11y and Performance optimizations.
  */
 const BrandsPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const Routes = useLocalizedRoutes()
   const brands = HVAC_BRANDS
   const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
@@ -87,16 +87,16 @@ const BrandsPage: React.FC = () => {
                       <h2 className="min-w-0 truncate text-2xl font-bold text-slate-900 tracking-tight">{brand.name}</h2>
                       <div className="h-px flex-1 mx-4 bg-slate-100 group-hover:bg-cyan-500/20 transition-colors" />
                       <span className="shrink-0 text-xs font-black uppercase tracking-widest text-slate-400">
-                        {brand.country}
+                        {brandText(brand.country, lang)}
                       </span>
                     </div>
                     
                     <div className="text-xs font-bold uppercase tracking-hvac-normal text-cyan-600/80">
-                      {brand.specialty}
+                      {brandText(brand.specialty, lang)}
                     </div>
                     
                     <p className="text-sm text-slate-500 font-light leading-relaxed line-clamp-3">
-                      {brand.description}
+                      {brandText(brand.description, lang)}
                     </p>
                   </div>
 

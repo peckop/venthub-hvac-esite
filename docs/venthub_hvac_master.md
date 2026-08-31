@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T10:33:50.411039+00:00
+compiled_at: 2026-08-31T11:46:43.519209+00:00
 total_compiled_files: 657
-source_commit: c7d33e68
+source_commit: e6fa95f6
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-31T10:33:50.411039+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-31T11:46:43.519209+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -29210,13 +29210,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\home\ApplicationSolutions.tsx
-skeleton_hash: 237ecb9291b78191
+source_path: C:\tmp\vh-urun-rec89\src\components\home\ApplicationSolutions.tsx
+skeleton_hash: aca0f56341b49d27
 entity_hashes:
   func:ApplicationSolutions: 93f4bfc3e2d056b5
   overview: 26527ace9a268eaa
   style_tokens: a60445c0b91a13d5
-generated_at: 2026-08-27T08:26:32Z
+generated_at: 2026-08-31T11:45:42Z
 ---
 
 ## Genel Bakış
@@ -29271,7 +29271,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 ## INTERFACES
 
 ### SolutionItem
-- `id: 'parking' | 'kitchen' | 'entrance' | 'comfort'`
+- `id: 'parking' | 'entrance' | 'comfort'`
 - `categorySlug: string`
 - `subSlug?: string`
 - `image: string`
@@ -29294,8 +29294,8 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 - **solutions** (array) — `[
   {
     id: 'parking',
-    categorySlug: 'industrial-ventilation',
-    ...`
+    categorySlug: 'fans',
+    subSlug: 'parking-...`
 
 ---
 
@@ -49665,11 +49665,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\i18n\dictionaries\en.ts
-skeleton_hash: 19b6b8e0da23add0
+source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\en.ts
+skeleton_hash: 065327dc5d8ae655
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-28T11:56:12Z
+generated_at: 2026-08-31T11:45:43Z
 ---
 
 ## Genel Bakış
@@ -49728,11 +49728,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-comp\src\i18n\dictionaries\tr.ts
-skeleton_hash: 996845368cd1c54d
+source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\tr.ts
+skeleton_hash: 119db0355fa35555
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-08-28T11:56:12Z
+generated_at: 2026-08-31T11:45:43Z
 ---
 
 ## Genel Bakış

@@ -12,73 +12,83 @@ import { BrandIcon } from '../components/HVACIcons'
 import Breadcrumb from '../components/navigation/Breadcrumb'
 import FamilyCard from '../components/products/FamilyCard'
 import Seo from '../components/Seo'
-import { HVAC_BRANDS } from '../data/brands'
+import { type BrandText,brandText, HVAC_BRANDS } from '../data/brands'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import { useI18n } from '../i18n/I18nProvider'
 import { getFamiliesEnriched } from '../lib/services/family.service'
 import type { FamilyListItem } from '../types/ui-models'
 
+/**
+ * Marka hikâyesi ve kurumsal özet satırları — VERİ katmanı (bkz. `src/data/brands.ts` başlığı).
+ * REC-98 (2026-08-31): eskiden tek dilliydi; `/en/brands/<slug>` canlıda Türkçe kalıyordu.
+ *
+ * İki ayrım KASITLI:
+ *  · `labelKey` = ARAYÜZ etiketi → sözlükten gelir (`brands.detail.*`).
+ *  · `value`    = VERİ → dile göre burada taşınır; dilden bağımsız olan (yıl, özel ad)
+ *                 düz `string` bırakılır — çevrilecek bir şeyi yok.
+ * Ölü alanlar (founded/headquarters/website) KALDIRILDI: render `brand.*` okuyor,
+ * bunlar hiç kullanılmıyordu (ölçüldü: yalnız `story` ve `stats` okunuyor).
+ */
+type BrandStat = { labelKey: string; value: BrandText | string }
+
 const BRAND_DETAILS: Record<string, {
-  founded?: number
-  headquarters?: string
-  website?: string
-  story?: string
-  stats?: { label: string; value: string }[]
+  story?: BrandText
+  stats?: BrandStat[]
 }> = {
   vortice: {
-    founded: 1954,
-    headquarters: 'Tribiano, İtalya',
-    website: 'https://www.vortice.com',
-    story: 'Vortice, 1954 yılında İtalya\'da kurulmuş, dünya çapında tanınan bir havalandırma çözümleri üreticisidir. 70 yılı aşkın deneyimiyle konut, ticari ve endüstriyel havalandırma sistemlerinde lider konumdadır.',
+    story: {
+      tr: 'Vortice, 1954 yılında İtalya\'da kurulmuş, dünya çapında tanınan bir havalandırma çözümleri üreticisidir. 70 yılı aşkın deneyimiyle konut, ticari ve endüstriyel havalandırma sistemlerinde lider konumdadır.',
+      en: 'Founded in Italy in 1954, Vortice is a globally recognised manufacturer of ventilation solutions. With over 70 years of experience it leads in residential, commercial and industrial ventilation systems.'
+    },
     stats: [
-      { label: 'Kuruluş', value: '1954' },
-      { label: 'Ülke Sayısı', value: '90+' },
-      { label: 'Grup', value: 'Vortice Group' }
+      { labelKey: 'estPrefix', value: '1954' },
+      { labelKey: 'statCountries', value: '90+' },
+      { labelKey: 'statGroup', value: 'Vortice Group' }
     ]
   },
   avens: {
-    founded: 2010,
-    headquarters: 'İstanbul, Türkiye',
-    website: 'https://www.avens.com.tr',
-    story: 'Avens, Türkiye\'nin önde gelen yerli HVAC markasıdır. Yüksek performanslı endüstriyel havalandırma ve klima santralleri çözümleriyle modern mühendislik yaklaşımlarını birleştirir.',
+    story: {
+      tr: 'Avens, Türkiye\'nin önde gelen yerli HVAC markasıdır. Yüksek performanslı endüstriyel havalandırma ve klima santralleri çözümleriyle modern mühendislik yaklaşımlarını birleştirir.',
+      en: 'Avens is a leading domestic HVAC brand in Türkiye, combining modern engineering practice with high-performance industrial ventilation and air handling unit solutions.'
+    },
     stats: [
-      { label: 'Kuruluş', value: '2010' },
-      { label: 'Üretim', value: 'Türkiye' },
-      { label: 'Garanti', value: '2 Yıl' }
+      { labelKey: 'estPrefix', value: '2010' },
+      { labelKey: 'statProduction', value: { tr: 'Türkiye', en: 'Türkiye' } },
+      { labelKey: 'statWarranty', value: { tr: '2 Yıl', en: '2 Years' } }
     ]
   },
   casals: {
-    founded: 1881,
-    headquarters: 'Girona, İspanya',
-    website: 'https://www.casals.com',
-    story: 'Casals, 140 yılı aşkın geçmişiyle İspanya\'nın en köklü fan üreticilerinden biridir. Endüstriyel ve ticari havalandırma çözümlerinde Avrupa\'nın tercih edilen markasıdır.',
+    story: {
+      tr: 'Casals, 140 yılı aşkın geçmişiyle İspanya\'nın en köklü fan üreticilerinden biridir. Endüstriyel ve ticari havalandırma çözümlerinde Avrupa\'nın tercih edilen markasıdır.',
+      en: 'With more than 140 years of history, Casals is one of Spain\'s most established fan manufacturers and a preferred European brand for industrial and commercial ventilation.'
+    },
     stats: [
-      { label: 'Kuruluş', value: '1881' },
-      { label: 'Deneyim', value: '140+ Yıl' },
-      { label: 'Grup', value: 'Vortice' }
+      { labelKey: 'estPrefix', value: '1881' },
+      { labelKey: 'statExperience', value: { tr: '140+ Yıl', en: '140+ Years' } },
+      { labelKey: 'statGroup', value: 'Vortice' }
     ]
   },
   'nicotra-gebhardt': {
-    founded: 1959,
-    headquarters: 'Waldenburg, Almanya',
-    website: 'https://www.nicotra-gebhardt.com',
-    story: 'Nicotra Gebhardt, endüstriyel fan teknolojisinde dünya lideridir. Alman mühendisliği ve İtalyan tasarımını bir araya getirerek en zorlu havalandırma ihtiyaçlarına çözüm sunar.',
+    story: {
+      tr: 'Nicotra Gebhardt, endüstriyel fan teknolojisinde dünya lideridir. Alman mühendisliği ve İtalyan tasarımını bir araya getirerek en zorlu havalandırma ihtiyaçlarına çözüm sunar.',
+      en: 'Nicotra Gebhardt is a world leader in industrial fan technology, bringing German engineering together with Italian design to solve the most demanding ventilation requirements.'
+    },
     stats: [
-      { label: 'Kuruluş', value: '1959' },
-      { label: 'Grup', value: 'Regal Rexnord' },
-      { label: 'Uzmanlık', value: 'Endüstriyel Fan' }
+      { labelKey: 'estPrefix', value: '1959' },
+      { labelKey: 'statGroup', value: 'Regal Rexnord' },
+      { labelKey: 'statExpertise', value: { tr: 'Endüstriyel Fan', en: 'Industrial Fans' } }
     ]
   },
   flexiva: {
-    founded: 2000,
-    headquarters: 'İstanbul, Türkiye',
-    website: 'https://www.flexiva.com.tr',
-    story: 'Flexiva, esnek kanal sistemleri ve havalandırma aksesuarlarında uzmanlaşmış global bir markadır. Patentli sızdırmazlık teknolojileri ve kolay montaj özellikleriyle öne çıkar.',
+    story: {
+      tr: 'Flexiva, esnek kanal sistemleri ve havalandırma aksesuarlarında uzmanlaşmış global bir markadır. Patentli sızdırmazlık teknolojileri ve kolay montaj özellikleriyle öne çıkar.',
+      en: 'Flexiva is a global brand specialising in flexible duct systems and ventilation accessories, distinguished by patented sealing technology and fast installation.'
+    },
     stats: [
-      { label: 'Uzmanlık', value: 'Kanal Sistemleri' },
-      { label: 'Üretim', value: 'Türkiye' },
-      { label: 'Kalite', value: 'CE Sertifikalı' }
+      { labelKey: 'statExpertise', value: { tr: 'Kanal Sistemleri', en: 'Duct Systems' } },
+      { labelKey: 'statProduction', value: { tr: 'Türkiye', en: 'Türkiye' } },
+      { labelKey: 'statQuality', value: { tr: 'CE Sertifikalı', en: 'CE Certified' } }
     ]
   }
 }
@@ -88,7 +98,7 @@ export interface BrandDetailPageProps {
 }
 
 const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   // Localize Routes proxy'si: bileşendeki TÜM Routes.x() çağrıları dil-önekli olur (SSOT).
   const Routes = useLocalizedRoutes()
   const params = useParams()
@@ -153,7 +163,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
 
   return (
     <div className="min-h-screen bg-white">
-      <Seo title={`${brand.name} | VentHub`} description={brand.description} />
+      <Seo title={`${brand.name} | VentHub`} description={brandText(brand.description, lang)} />
 
       {/* STANDARD BREADCRUMB */}
       <Breadcrumb items={breadcrumbItems} variant="transparent" className="pt-6" />
@@ -187,7 +197,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
           <div ref={heroMetaRef} className={scrollAnimationClasses.fadeIn(heroMetaVisible) + " mt-8 flex flex-wrap justify-center gap-8 text-xs font-black uppercase tracking-hvac-loose text-cyan-400"}>
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
-              {brand.country} {t('brands.detail.originSuffix')}
+              {brandText(brand.country, lang)} {t('brands.detail.originSuffix')}
             </div>
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
@@ -195,7 +205,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
             </div>
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
-              {brand.specialty}
+              {brandText(brand.specialty, lang)}
             </div>
           </div>
         </div>
@@ -216,7 +226,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                 </span>
               </h2>
               <p className="text-xl text-slate-500 font-light leading-relaxed mb-12 text-center lg:text-left max-w-3xl">
-                {detail?.story || brand.description}
+                {brandText(detail?.story || brand.description, lang)}
               </p>
               
               <div className="grid sm:grid-cols-2 gap-12">
@@ -246,15 +256,19 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                   <div className="space-y-6">
                     {detail?.stats?.map((stat, i) => (
                       <div key={i} className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">{stat.label}</span>
-                        <span className="text-sm font-medium">{stat.value}</span>
+                        <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">
+                          {t(`brands.detail.${stat.labelKey}`)}
+                        </span>
+                        <span className="text-sm font-medium">
+                          {typeof stat.value === 'string' ? stat.value : brandText(stat.value, lang)}
+                        </span>
                       </div>
                     ))}
                     <div className="flex justify-between items-end border-b border-white/10 pb-4">
                       <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">
                         {t('brands.detail.headquarters')}
                       </span>
-                      <span className="text-sm font-medium">{brand.headquarters}</span>
+                      <span className="text-sm font-medium">{brandText(brand.headquarters, lang)}</span>
                     </div>
                     {brand.website && (
                       <div className="flex justify-between items-end border-b border-white/10 pb-4">

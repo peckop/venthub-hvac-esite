@@ -967,7 +967,16 @@ export const tr = {
       allProductGroups: 'Tüm Ürün Grupları',
       noProducts: 'Bu markaya ait ürünler yakında eklenecektir.',
       originSuffix: 'Menşei',
-      estPrefix: 'Kuruluş'
+      estPrefix: 'Kuruluş',
+      // REC-98: "Kurumsal Özet" satırlarının ETİKETLERİ. Değer tarafı veri olarak
+      // `BRAND_DETAILS` içinde taşınır; etiket burada, çünkü arayüz metnidir.
+      statCountries: 'Ülke Sayısı',
+      statGroup: 'Grup',
+      statProduction: 'Üretim',
+      statWarranty: 'Garanti',
+      statExperience: 'Deneyim',
+      statExpertise: 'Uzmanlık',
+      statQuality: 'Kalite'
     }
   },
   contactPage: {
