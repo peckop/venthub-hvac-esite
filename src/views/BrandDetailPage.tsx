@@ -11,7 +11,6 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { BrandIcon } from '../components/HVACIcons'
 import Breadcrumb from '../components/navigation/Breadcrumb'
 import FamilyCard from '../components/products/FamilyCard'
-import Seo from '../components/Seo'
 import { type BrandText,brandText, HVAC_BRANDS } from '../data/brands'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
@@ -163,7 +162,9 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
 
   return (
     <div className="min-h-screen bg-white">
-      <Seo title={`${brand.name} | VentHub`} description={brandText(brand.description, lang)} />
+      {/* REC-100: <Seo> KALDIRILDI — bu rotanın `generateMetadata`'sı title/description/
+          canonical/og'yi zaten dile göre üretiyor (REC-98'de düzeltildi). İkinci yazıcı
+          canlıda ÜÇ canonical'a yol açıyordu ve sonuncusu `http://localhost:3000` idi. */}
 
       {/* STANDARD BREADCRUMB */}
       <Breadcrumb items={breadcrumbItems} variant="transparent" className="pt-6" />

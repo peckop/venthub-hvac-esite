@@ -4,8 +4,8 @@ import { ChevronRight, Home } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-import { canonicalOrigin } from '@/lib/seo/canonicalOrigin'
 import { useI18n } from '@/i18n/I18nProvider'
+import { canonicalOrigin } from '@/lib/seo/canonicalOrigin'
 import { localizedHref } from '@/utils/routes'
 
 export interface BreadcrumbItem {
