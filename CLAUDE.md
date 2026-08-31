@@ -6,9 +6,11 @@
 
 ## Proje Özeti
 
-HVAC (iklimlendirme/havalandırma) sektörüne özel **e-ticaret platformu**, şu an
-**multi-tenant SaaS**'a dönüşüyor (Shopify modeli). Faz 1 (Foundation) bitti,
-Faz 2 (White-Label) sırada. Birincil dil Türkçe, ikincil İngilizce.
+HVAC (iklimlendirme/havalandırma) sektörüne özel **e-ticaret platformu**.
+**CANLI: `venthub.com.tr`** (kanonik, www'suz; `www` → apex 308; vercel.app = altyapı adresi,
+müşteriye verilmez). Faz 1 (Foundation) bitti; Faz 2 (White-Label/multi-tenant) **PARK'ta**
+(Recep kararı 2026-08-28, REC-88: öncelik kendi şirket + tek operatör; kural 12 yine geçerli).
+Birincil dil Türkçe, ikincil İngilizce.
 
 ## Teknoloji Yığını (özet)
 
@@ -52,7 +54,8 @@ supabase/
 
 Karar: Rota mı → `app/` · Sayfa görünümü mü → `views/` · Tekrar kullanılır UI mı →
 `components/` · Veri/servis mi → `lib/services/` (DI) · Hook mu → `hooks/` ·
-DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
+DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql` — damga **14 hane**;
+8 haneli `YYYYMMDD_` biçimi INV-MIGRATION-2 kapısında KIRMIZI verir, 2026-08-31'de sahada ölçüldü).
 
 ## Mutlak Kurallar (ihlal etme)
 

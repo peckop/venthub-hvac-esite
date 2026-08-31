@@ -1,0 +1,42 @@
+{
+  "surum": 1,
+  "nicin_var": "docs/artefakt_manifest.json URETILMIS bir dosyadir (orion doc build yazar) ve yalniz kendi derledigi 4 artefakti ilan eder. Baska uretecler tarafindan uretilen artefaktlar manifestte GORUNMEZ; gorunmedikleri icin tazelikleri OLCULEMEZ. Bu dosya o boslugu KAPATMAZ ama GORUNUR ve SINIRLI kilar: bilinen her ilan-disi artefakt burada gerekcesiyle durur, yenisi eklenirse kapi KIRMIZI verir. AXIOM 9 (uretilmis-artefakt-standard.md) bu dosyanin cetvelidir.",
+  "kapi": "src/__tests__/conformance/uretilmis-artefakt-ilan-kapsami.test.ts",
+  "olcum_tarihi": "2026-08-31",
+  "istisnalar": [
+    {
+      "yol": "docs/database_schema_master.md",
+      "damga": "compiled_at",
+      "uretec": "orion doc schema (+ scripts/db/migrations/update_schema_master.py)",
+      "nicin_ilan_edilemiyor": "Uretec orion/corpus-callosum tarafinda; manifesti yazan `orion doc build` bu dosyayi derlemedigi icin ilan listesine de koymuyor. Manifest URETILMIS oldugu icin elle satir eklemek AXIOM 3 ihlali olur ve bir sonraki derlemede silinir.",
+      "kapanacagi_taraf": "ORION",
+      "sahibi": "ALTYAPI",
+      "kayit": "REC-84"
+    },
+    {
+      "yol": "docs/system_tree.md",
+      "damga": "compiled_at + otonom olarak derlenmistir",
+      "uretec": "orion doc tree",
+      "nicin_ilan_edilemiyor": "Ayni sebep: `orion doc tree` uretir, `orion doc build` ilan etmez. ⭐EK BOYUT: bu dosya AYNI ZAMANDA kayitlar_master.md'nin KAYNAGIDIR (manifest `kaynak.dosyalar` icinde gecer) — yani manifest onu KAYNAK olarak taniyor, URUN olarak tanimiyor. Cift rollu dosya (AXIOM 7) ilan kapsaminda yalniz YARIM gorunuyor.",
+      "kapanacagi_taraf": "ORION",
+      "sahibi": "ALTYAPI",
+      "kayit": "REC-84"
+    },
+    {
+      "yol": "docs/venthub_skills_master.md",
+      "damga": "Generated automatically from",
+      "uretec": "scripts/compile_skills.py (.agent/skills/ altindan derler)",
+      "nicin_ilan_edilemiyor": "Uretec VentHub deposunda ama orion doc build hattinin PARCASI DEGIL; manifest yalniz o hattin urunlerini sayiyor. Bu kalem orion hattina baglanabilir (digerlerinden farkli olarak depo icinde), ama karar ve uygulama ORION/doc-hatti sahibinde.",
+      "kapanacagi_taraf": "ORION",
+      "sahibi": "ALTYAPI",
+      "kayit": "REC-84"
+    }
+  ],
+  "adiyla_artik_risk": "Olcut URETIM DAMGASIDIR (baslik bolgesinde compiled_at / 'otonom olarak derlenmistir' / 'Generated automatically from'). Damgasiz uretilen bir dosya bu kapidan GORUNMEZ. Bu risk OLCULDU ve ORNEGI VAR: `docs/venthub_hvac_master.md` ILAN EDILMIS oldugu halde hicbir damga tasimiyor — ilan edilmemis olsaydi kapi onu YAKALAMAZDI. Isim-tabanli olcute donmek daha kotudur (AXIOM 8): `docs/design_system_config.md` elle tutulan bir ayna oldugu halde isimden 'uretilmis' sanilirdi; `docs/standards/product-schema-standard.md` de govdesinde 'otomatik uretilmis' ifadesi gectigi icin yanlis-pozitif verdi (bu yuzden damga BASLIK BOLGESINDE aranir, govdede degil).",
+  "orion_kalemleri": [
+    "ILAN MEKANIZMASI: manifest, orion doc build hattinin DISINDA uretilen artefaktlari da ilan edebilmeli (ya da ayri bir ilan kaynagi tanimlanmali). Bu uc kalem o zaman istisna listesinden DUSER.",
+    "KOK-SABITLI skip_dirs girdisi (`/cache` gibi) — AXIOM 8 vakasindan (2026-08-30).",
+    "WORKTREE ADI SIZINTISI (olculmedi, kapsam disi birakildi): docs/database_schema_master.md basligi '# Veritabani Semasi — vh-altyapi-851' seklinde bir WORKTREE adi tasiyor; artefakt icerigi uretildigi agaca gore degisiyor.",
+    "SEMA URETECI EKSIK ALAN (olculmedi, kapsam disi birakildi): ayni dosyada `tables: 41` ve `functions: 41` doluyken `policies: 0` ve `indexes: 0`; uretec bu iki alani okuyamamis olabilir."
+  ]
+}
