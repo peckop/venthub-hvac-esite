@@ -1,5 +1,7 @@
+import type { Metadata } from 'next'
+
 import { SITE_URL } from '../../../../config/siteUrl'
-import { HVAC_BRANDS } from '../../../../data/brands'
+import { brandText, HVAC_BRANDS } from '../../../../data/brands'
 import { Routes } from '../../../../utils/routes'
 import PageComponent from '../../../../views/BrandDetailPage'
 
@@ -24,7 +26,7 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ lang: string, slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ lang: string, slug: string }> }): Promise<Metadata> {
   const { lang, slug } = await params
   const brand = HVAC_BRANDS.find(b => b.slug === slug)
 
@@ -48,9 +50,22 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const enUrl = `${SITE_URL}/en${Routes.brand(slug)}`
   const canonicalUrl = lang === 'en' ? enUrl : trUrl
 
+  // REC-98: başlık/açıklama/locale eskiden SABİT TÜRKÇE idi — `lang` yalnız URL için
+  // okunuyordu. Ölçüm (2026-08-31, canlı): `/en/brands/avens` başlığı "Avens Ürünleri ve
+  // Çözümleri", `og:locale` ise `tr_TR` idi. Sayfa GÖVDESİ İngilizce, kabuğu Türkçe:
+  // metadata dili sayfanın diliyle aynı olmak ZORUNDA, yoksa arama motoru sayfayı
+  // yanlış dilde sınıflar ve iki dil birbirinin kopyası görünür.
+  const isEn = lang === 'en'
+  const metaTitle = isEn
+    ? `${brand.name} Products and Solutions | VentHub`
+    : `${brand.name} Ürünleri ve Çözümleri | VentHub`
+  const metaDescription = isEn
+    ? `${brand.name} ventilation products, technical specifications and competitive pricing at VentHub.`
+    : `${brand.name} markasının en kaliteli havalandırma ürünleri, teknik özellikleri ve avantajlı fiyatları VentHub'da.`
+
   return {
-    title: `${brand.name} Ürünleri ve Çözümleri | VentHub`,
-    description: `${brand.name} markasının en kaliteli havalandırma ürünleri, teknik özellikleri ve avantajlı fiyatları VentHub'da.`,
+    title: metaTitle,
+    description: metaDescription,
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -60,8 +75,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       },
     },
     openGraph: {
-      title: `${brand.name} Ürünleri ve Çözümleri | VentHub`,
-      description: `${brand.name} markasının en kaliteli havalandırma ürünleri, teknik özellikleri ve avantajlı fiyatları VentHub'da.`,
+      title: metaTitle,
+      description: metaDescription,
       url: canonicalUrl,
       siteName: 'VentHub',
       images: [
@@ -71,22 +86,26 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
           height: 630,
         },
       ],
-      locale: 'tr_TR',
+      locale: isEn ? 'en_US' : 'tr_TR',
       type: 'website',
     },
   }
 }
 
 export default async function Page({ params }: { params: Promise<{ lang: string, slug: string }> }) {
-  const { slug } = await params
+  const { lang, slug } = await params
   const brand = HVAC_BRANDS.find(b => b.slug === slug)
-  
+
+  // REC-98: `brand.description` artık iki dilli bir NESNE. Doğrudan yazılsaydı JSON-LD'ye
+  // `{"tr":"...","en":"..."}` gömülürdü — tip hatası vermeden, sessizce bozuk yapısal veri.
+  // URL de dil öneksizdi: `generateMetadata`'daki kanonik yorumu (T083-VH) tam bu hatayı
+  // anlatıyor ama JSON-LD ayağı düzeltilmemişti; sitemap dil önekli adresi bildiriyor.
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Brand",
     "name": brand?.name || slug,
-    "description": brand?.description || `${brand?.name || slug} marka ürünler`,
-    "url": `${SITE_URL}/brands/${slug}`
+    "description": brand ? brandText(brand.description, lang) : `${slug} marka ürünler`,
+    "url": `${SITE_URL}/${lang === 'en' ? 'en' : 'tr'}${Routes.brand(slug)}`
   }
 
   return (
