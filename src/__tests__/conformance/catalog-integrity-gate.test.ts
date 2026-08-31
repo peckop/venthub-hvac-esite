@@ -41,6 +41,34 @@ function baselineKeys(): string[] {
   return Object.keys(parsed.entries)
 }
 
+/**
+ * ⭐BİR KURALIN GÖVDESİ — sınır SIRADAKİ kurala göre, elle yazılmış komşu adına göre DEĞİL.
+ *
+ * ÖLÇÜLMÜŞ KUSUR (2026-08-31, sabotajla bulundu): `family-empty` kolu bloğu
+ * `id: 'family-empty'` → `id: 'product-no-subcategory'` diye kesiyordu. Ama arada
+ * `family-nested` kuralı var: blok **3848 bayt ve İKİ kural** içeriyordu, `parent_family_id`
+ * orada **iki kez** geçiyordu — biri komşu kuraldan. Sonuç: `family-empty`'den o dizeyi
+ * TAMAMEN silsem bile kol yeşil kalıyordu. **O kol, `family-nested` var olduğu sürece
+ * kırmızı olamazdı.**
+ *
+ * Elle yazılmış sınır, araya yeni bir kural eklendiği anda sessizce bozulur ve bozulduğunu
+ * hiçbir şey söylemez. Bu yüzden sınır HESAPLANIR ve blok TEK kural içerdiği DOĞRULANIR —
+ * böylece aynı sınıf araya kural eklenerek geri gelemez.
+ */
+function kuralGovdesi(kuralId: string): string {
+  const kaynak = fs.readFileSync(SCRIPT, 'utf8')
+  const bas = kaynak.indexOf(`id: '${kuralId}'`)
+  expect(bas, `${kuralId} kurali betikte YOK — kol bosluk olcerdi`).toBeGreaterThan(-1)
+  const sonraki = kaynak.indexOf("id: '", bas + `id: '${kuralId}'`.length)
+  const blok = kaynak.slice(bas, sonraki === -1 ? kaynak.length : sonraki)
+  // Dilim mantiginin KENDI sagligi: sinir "siradaki kural" oldugu icin blok YAPI GEREGI tek
+  // kural icerir. Bu bir BEKCI DEGIL, `kuralGovdesi`nin kendi tutarlilik kontrolu — kirmizi
+  // olursa dilim mantigi bozulmus demektir. Sinifin geri gelmesini engelleyen ASIL bekci
+  // asagidaki "elle yazilmis sinir YASAK" kolu.
+  expect((blok.match(/id: '/g) ?? []).length, `${kuralId}: dilim mantigi bozuk`).toBe(1)
+  return blok
+}
+
 describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
   it('betik ve taban dosyası mevcut', () => {
     expect(fs.existsSync(SCRIPT)).toBe(true)
@@ -107,15 +135,23 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
   })
 
   it('T159 — ürünsüz aile kuralı ÇOCUK SAYISINI ölçer (ebeveyni ölü kabukla bir tutmaz)', () => {
-    const kaynak = fs.readFileSync(SCRIPT, 'utf8')
-    const blokBasi = kaynak.indexOf("id: 'family-empty'")
-    expect(blokBasi, 'family-empty kurali betikte yok').toBeGreaterThan(-1)
-    const blok = kaynak.slice(blokBasi, kaynak.indexOf("id: 'product-no-subcategory'"))
+    const blok = kuralGovdesi('family-empty')
     // Kural cocuk sayisini SORMAZSA, iki hali ayirt edemez ve "sil" onerisi ureten
     // okumayi durduramaz — 2026-08-23'te tam bu oldu.
-    expect(blok, 'kural cocuk aileleri saymiyor').toContain('parent_family_id')
+    //
+    // ⭐OLCUT VARLIK DEGIL SEKIL (2026-08-31, sabotajla olculdu): eskiden burada
+    // `toContain('parent_family_id')` vardi ve IKI sabotaj da yesil gecti:
+    //   (a) `... where c.parent_family_id = f.id AND FALSE` — sayim daima 0, dize yerinde,
+    //   (b) `0::int as cocuk` — alt sorgu TAMAMEN silindi, dize komsu kuraldan geldi.
+    // (b)'nin sebebi blok sinirinin YANLIS olmasiydi (bkz. `kuralGovdesi`), (a)'nin sebebi
+    // ise varlik olcmenin anlami olcmemesi. Bu yuzden alt sorgunun TAM SEKLI sabitlenir:
+    // sayim, cocugu EBEVEYNE baglayan kosulun kendisiyle bitmeli — arada baska yuklem YOK.
+    expect(blok, 'cocuk sayimi ebeveyne bagli DEGIL (ya silinmis ya ek yuklemle korlestirilmis)')
+      .toMatch(/count\(\*\)\s+from\s+public\.product_families\s+c\s+where\s+c\.parent_family_id\s*=\s*f\.id\s*\)/)
     // Ve detay satiri o sayiyi KULLANMALI; saymak ama yazmamak okuyucuya ulasmaz.
     expect(blok, 'detay satiri cocuk sayisini kullanmiyor').toMatch(/detail:[\s\S]*cocuk/)
+    // Detay IKI hali AYIRT ETMELI: saymak ama tek cumle yazmak 08-23 hatasini geri getirir.
+    expect(blok, 'detay iki hali ayirt etmiyor (olu kabuk / hiyerarsi ebeveyni)').toMatch(/cocuk\s*>\s*0/)
   })
 
   /* ────────────────────────────────────────────────────────────────────────
@@ -133,10 +169,9 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
   })
 
   it('T160 — kural EBEVEYN bazında sayar (çocuk başına satır üretmez)', () => {
-    const kaynak = fs.readFileSync(SCRIPT, 'utf8')
-    const blokBasi = kaynak.indexOf("id: 'family-nested'")
-    expect(blokBasi, 'family-nested kurali betikte yok').toBeGreaterThan(-1)
-    const blok = kaynak.slice(blokBasi, kaynak.indexOf("id: 'product-no-subcategory'"))
+    // Bu kolun ELLE yazilmis siniri bugun DOGRU cikti (blok tek kural), ama komsuluk
+    // degisirse sessizce bozulur — `family-empty` kolunda tam bu oldu. Hesaplanan sinir.
+    const blok = kuralGovdesi('family-nested')
     // Kusur tek tek cocuklarda DEGIL, hiyerarsinin kurulmus olmasinda. Cocuk bazli anahtar
     // altı gerekcesiz taban satiri uretirdi ve kimse okumazdi (spec-type ile ayni desen).
     expect(blok, 'anahtar ebeveyn bazinda degil').toMatch(/key:.*parent_slug/)
