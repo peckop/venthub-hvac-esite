@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T19:54:05.591001+00:00
+compiled_at: 2026-08-31T20:46:57.244110+00:00
 total_compiled_files: 62
-source_commit: 3ae518d7
+source_commit: a30befa3
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9205,6 +9205,110 @@ yalnız zahmet üretmiyor, o dalın **bütün kapılarını sessizce kapatıyor*
    **koşar**. `tsc --noEmit` **temizdi** (kod 0): tip kapısı bu sınıfı **görmez**, ayırt eden
    yalnız lint. `vitest` modülü **çalıştırır**, lint kaynağı **denetler** — iki ayrı ölçüt.
    Push öncesi kontrol listesine `eslint` girer.
+
+---
+
+## 21. KABUL EDİLMİŞ EKSİK SESSİZ OLAMAZ — companion üreteci vakası (REC-67)
+
+### Karar önce yazılır: taşıyıcı KAPALI, bu Recep'in kararı
+
+Companion üreteci **2026-08-28**'de durdu. Alternatif taşıyıcı (Haiku, `ORION_TASIYICI=cli`)
+**hazır ve testli**, **yeni API anahtarı gerektirmiyor** — ama `claude` CLI üzerinden Recep'in
+**aboneliğini** harcıyor ve kodun kendi notu kararı ona veriyor
+(`scripts/companion_supurme.py`: *"VARSAYILAN KAPALI: haiku Recep'in aboneliğini harcar, açma
+kararı ONUN"*). Kendisine maliyetle birlikte sunuldu (dosya başına 4 LLM pası; birikmiş 59 dosya
+≈ 236 çağrı; sonrası kaynak-dosyalı commit başına ≈ 4) ve **"kapalı kalsın"** dedi.
+
+⭐**Sonuç: companion bayatlığı ARIZA DEĞİL, KABUL EDİLMİŞ EKSİK.** Bir peer'ın *"Haiku denemesi
+kararlıydı"* aktarımı onay yerine **konmadı** — akran aktarımı onay değildir, hele abonelik
+harcayan bir kararda. (08-25 tarihli *"Haiku ile deneyeceğiz bu kesin"* kaydı bu kararla
+**geçersizleşti**; eski satır kanıt sayılmaz.)
+
+### Kök sebep (doğrudan kanıt: `doc batch` elle koşuldu)
+
+```
+[KEYPOOL] TASIYICI YOK — ANAHTAR HAVUZU BOS
+  baglam : son gecerli anahtar 401/403 nedeniyle elendi
+  uc     : https://token-plan-sgp.xiaomimimo.com/v1   model: mimo-v2.5-pro
+Basarili: 0, Basarisiz: 1        (companion md mtime DEGISMEDI)
+```
+Aracın kendi cümlesi: *"Bu bir kapasite ya da kalite sorunu DEĞİL: yapılandırma sorunu."*
+
+**Kırılma günü ölçüldü:** companion bayatlığı, kaynağın değiştiği güne göre — 08-27'ye kadar
+**%0**, sonra **%69 / %100 / %64 / %65**.
+
+⚠**"865 çiftin 806'sı taze (%93)" RAKAMI ÜRETECİN ÇALIŞTIĞININ KANITI DEĞİLDİR.** Bayatların
+`.md` commit mesajları *"T165-VH Faz A: 135 companion"*, *"163 companion tazelendi"* — yani
+**toplu elle kampanyalar**; ölçüm günündeki "taze"lerin bir kısmı da elle koşulan `doc build`.
+Doğru cümle: **üreteç 08-28'den beri koşmuyor, tazeliği kampanyalar taşıyordu.** Bir oranın
+yüksek olması, onu üreten mekanizmanın çalıştığını göstermez.
+
+### ⭐ÜÇ BAĞIMSIZ GÖRÜNÜRLÜK KUSURU — "niçin üç gün fark edilmedi"in cevabı
+
+| # | kusur | sonucu |
+|---|---|---|
+| 1 | `doc batch` **çıkış kodu 0** döner ve `"status": "SUCCESS"` basar, aynı çıktıda `Basarisiz: 1` yazarken | çağıran, çıkış kodundan arızayı **göremez** |
+| 2 | `orion-doc.log` her commit'te **sıfırlanıyordu** (`: > log`) | başarısız commit'in kanıtı **bir sonraki commit** tarafından yok edilir |
+| 3 | ⭐bu iş için **yazılmış** defter + *"N. commit"* sayacı yalnız `run_hook` yolunda; `post-commit` **`batch`** çağırıyor | koruma **hiç koşmadı** — defter dosyası hiçbir ağaçta yoktu |
+
+**(3) BU SINIFIN DÖRDÜNCÜ VAKASIDIR** (hepsi 2026-08-31): `kimlik.cjs`'in `bash-write-audit`'e
+bağlanmamış olması · soğurma katmanının gereksiz yazılması · ortak-ana kolunun ölü doğması ·
+ve bu. **Sınıfın adı: "mekanizma var, çağrı yoluna bağlanmamış."** Ortak deseni: bir geçiş
+yapılır (`run-hook` → `batch`, `size===1` → baskınlık, eski kol → yeni kol) ve **koruma eski
+yolda kalır**. Karşı-tedbir: her geçişte *"bu yolda koşan koruma neydi, yeni yola taşındı mı"*
+sorulur; ve koruma **kaynağı taranarak değil KOŞTURULARAK** doğrulanır (aşağıdaki derse bkz.).
+
+### HÜKÜM
+
+1. **Kabul edilmiş bir eksiğin tek şartı GÖRÜNÜR olmasıdır.** "Arıza değil, karar" demek onu
+   sessizleştirme yetkisi vermez.
+2. **Başarısızlık ÇIKIŞ KODUNDAN değil ÇIKTIDAN sınıflanır** — çağırdığımız araç dürüst bir
+   çıkış kodu vermiyorsa, ölçüt onun **metnidir**. Sınıflandırma **FAIL-CLOSED**: boş çıktı ve
+   tanınmayan çıktı **başarı sayılmaz** (`olculemedi`).
+3. **Kanıt logu KIRPILMAZ.** Her koşum başlıkla eklenir; dosya son 400 satıra budanır.
+   Kırpılan log, bir sonraki commit'i olayın tanığı değil **katili** yapar.
+4. **Kalıcı defter eklemeli tutulur** (`orion-belgesiz.jsonl`, `{ts, dosya, sebep}`) ve
+   **orion'un şemasıyla aynıdır, bilerek**: farklı bir ad seçmek, orion'un ölü yolu bir gün
+   canlanırsa sayacı ikiye bölerdi.
+5. **Sayaç OTURUM AÇILIŞINDA yüzeye çıkar.** Kaydı `post-commit` yazar ama o **arka planda
+   koşan bir alt kabuk** — çıktısı pratikte görülmez (ölçüldü: üç gün görülmedi). Bir ajana
+   gerçekten ulaşan kanal SessionStart'tır.
+6. **Sayı değil EĞİLİM izlenir.** Sayaç durmadan büyüyorsa kabul edilmiş eksik **büyüyen borca**
+   dönüşmüştür ve karar **yeniden Recep'e** gider. Hiçbir oturum taşıyıcıyı kendi başına açmaz.
+
+### Kapı
+
+`companion-defter.test.ts` (11 kol) — yarısı SINIFLANDIRMA, yarısı **BAĞLANMIŞLIK**.
+**Yedi sabotaj, yedisi kırmızı** (her biri kurulduğu **ve** sözdiziminin geçerli kaldığı
+doğrulanarak; bir tur ilk denemede sözdizimini bozdu ve **kanıt sayılmadı**, geçerli hâliyle
+yeniden koşuldu): sınıflandırma fail-open olur · boş çıktı başarı sayılır · log yine kırpılır ·
+defter çağrılmaz (ölü yol) · sayaç enjekte edilmez · bozuk satır sessizce yutulur ·
+`main()` koruması sökülür.
+
+### ⭐Bu işin kendi içinden çıkan ders: METİN TARAMASI SABOTAJI YEŞİL GEÇTİ
+
+`session-board` kolunun ilk hâli kancanın **kaynağında** `/COMPANION BELGESIZ/` arıyordu.
+Sabotaj dizeyi ölü bir ifadenin içine taşıdı ve **kol yeşil kaldı**: metin duruyordu, davranış
+yoktu. Kol **kancayı koşturacak** biçimde yeniden yazıldı (geçici depo + geçici pano + defterli
+git dizini; üretilen `additionalContext` ölçülür).
+
+⭐**Ve o davranış kolu, aynı turda GERÇEK bir sözleşme bugu yakaladı** — üstelik benim yeni
+yazdığım kodda: `companion-defter.cjs` içinde `main()` koşulsuz çağrılıyordu, dolayısıyla
+`session-board` modülü `require` edince `main()` de koştu ve **stdout'a** yazdı; SessionStart
+kancasının `{hookSpecificOutput:…}` JSON sözleşmesi bozuldu ve **bağlam enjeksiyonu bütünüyle
+kaybolacaktı**, sessizce. Onarım: `if (require.main === module) main()`.
+
+**Ders iki cümle:** kaynak tarayan bir kol **varlık** ölçer, **davranış** ölçmez — ve
+sözleşme bozan hatalar tam olarak davranış katmanında yaşar. Kütüphane olarak `require`
+edilebilen her betik **yan etkisiz** olmalıdır.
+
+### Adıyla bırakılan iki kalem (bu şeritte DEĞİL)
+
+Aşağıdakiler ORION deposunda ve bu şeridin ölçülmüş claim'i dışında; sahibine iletildi:
+1. `doc batch` **çıkış kodu dürüstsüzlüğü** — 0 döner ve `SUCCESS` basar, `Basarisiz > 0` iken.
+   Her çağıran bundan yanılır; venthub tarafındaki çözüm bir **etrafından dolaşmadır**, kök fix değil.
+2. `orion-belgesiz.jsonl` defteri ve sayacı **yalnız `run_hook`**'ta (`doc.py:654, 777`),
+   `batch` gövdesinde sıfır referans — koruma **ölü yolda**.
 
 
 ---
