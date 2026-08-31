@@ -47,12 +47,55 @@ if (!sid) process.exit(0)
  * fail-open çalışır ve GÖRÜNÜR uyarı basar (sessizlik kanıt sayılmasın).
  */
 try {
-  const gitDir = execFileSync('git', ['rev-parse', '--absolute-git-dir'], {
-    cwd: input.cwd || process.cwd(),
-    encoding: 'utf8',
-    timeout: 10000,
-  }).trim()
-  if (gitDir) fs.writeFileSync(path.join(gitDir, 'venthub-sid'), sid + '\n', 'utf8')
+  const gitCwd = input.cwd || process.cwd()
+  const oku = (arg) =>
+    execFileSync('git', ['rev-parse', arg], { cwd: gitCwd, encoding: 'utf8', timeout: 10000 }).trim()
+  const gitDir = oku('--absolute-git-dir')
+  const ortakDir = oku('--git-common-dir')
+  /**
+   * ⭐ORTAK AĞACA KİMLİK YAZILMAZ — ölçülmüş kusur (2026-08-31, cetvel §19).
+   *
+   * Ana çalışma dizininde `--absolute-git-dir` ile `--git-common-dir` AYNI yeri gösterir. Yani
+   * ana dizinde açılan/resume olan her oturum kimliğini ORTAK dizine yazıyordu ve şeritler
+   * birbirinin üstüne biniyordu: ölçüldü, ana dizinin kimliği 30 Ağustos'ta ölü bir oturumun
+   * (`974d15cb`), 31 Ağustos'ta bu oturumun sid'iydi. Üç şerit de ana dizinde resume olduğu
+   * için kazananı SIRA belirliyordu — yani paylaşılan ağacın "sahibi" rastgeleydi.
+   *
+   * NİÇİN BU DOSYA HİÇ OLMAMALI, "tazelensin" DEĞİL: kimlik dosyasının cevapladığı soru
+   * "bu ağaç KİMİN şeridinde" — ana dizinin bu soruya doğru cevabı YOKTUR, ana dizin hiçbir
+   * şeridin değildir. Yanlış cevap veren bir kayıt, cevap vermeyenden KÖTÜDÜR: okuyucuların
+   * fail-open kolunu kapatır ve denetim "sahibi var" sanıp hayalete atfeder.
+   *
+   * E1 BLOKLANMAZ — ölçüldü: `scripts/board/kimlik.cjs` ASIL kanıtı `CLAUDE_CODE_SESSION_ID`
+   * env'inden alır (dosya yalnız VEKİL), ve o env Claude Code kabuğunda DOLUDUR. Ana dizinde
+   * elle `git commit` yapan bir insan için kimlik "yok" olur ve E1 fail-open + görünür uyarı
+   * verir; bu, yanlış şerit adına karar vermekten iyidir.
+   */
+  if (gitDir && ortakDir && path.resolve(gitCwd, gitDir) === path.resolve(gitCwd, ortakDir)) {
+    /**
+     * YAZMAYI KESEN MEKANİZMA, KENDİ ESKİ ÇIKTISINI DA TEMİZLER. Yalnız "artık yazmıyorum"
+     * demek yetmez: hâlihazırda orada duran sid, sonraki oturumlar için geçerli bir sahiplik
+     * kaydı gibi okunmaya DEVAM ederdi ve kusur elle bir temizlik adımına bağlı kalırdı
+     * (bu depoda "belge indi, iş bitmedi" sınıfının tipik biçimi).
+     */
+    const eski = path.join(path.resolve(gitCwd, gitDir), 'venthub-sid')
+    let temizlendi = ''
+    try {
+      if (fs.existsSync(eski)) {
+        temizlendi = fs.readFileSync(eski, 'utf8').trim().slice(0, 8)
+        fs.unlinkSync(eski)
+      }
+    } catch (e) {
+      temizlendi = '(SILINEMEDI: ' + (e && (e.code || e.message)) + ')'
+    }
+    process.stderr.write(
+      '[session-board] ORTAK agac — kimlik YAZILMADI (cetvel §19: ana dizin hicbir seridin degil).\n' +
+        (temizlendi ? '  Orada duran ESKI kimlik TEMIZLENDI: ' + temizlendi + '\n' : '') +
+        '  Serit isini kendi worktree inde yap; kimlik orada yazilir.\n',
+    )
+  } else if (gitDir) {
+    fs.writeFileSync(path.join(gitDir, 'venthub-sid'), sid + '\n', 'utf8')
+  }
 } catch (e) {
   // Sessiz geçmeyiz: kimlik yoksa E1 fail-open olur ve sebebinin bilinmesi gerekir.
   process.stderr.write(

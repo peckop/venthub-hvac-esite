@@ -108,8 +108,17 @@ const kimlikYolu = path.join(gitDir, 'venthub-sid')
 const kimlikCozum = kimlik.coz(gitDir, board)
 const sid = kimlikCozum.sid
 for (const u of kimlikCozum.uyarilar) uyar('[lane-precommit] ' + u)
-if (kimlikCozum.celisme && kimlik.onar(gitDir, sid)) {
-  uyar('[lane-precommit] kimlik dosyasi ASIL kimlikle ONARILDI (' + sid.slice(0, 8) + ').')
+if (kimlikCozum.celisme) {
+  if (kimlik.onar(gitDir, sid)) {
+    uyar('[lane-precommit] kimlik dosyasi ASIL kimlikle ONARILDI (' + sid.slice(0, 8) + ').')
+  } else if (!kimlik.bagliWorktreeMi(gitDir)) {
+    // Sessizce atlamayiz: "onarmadim" ile "onardim" ayirt edilebilir olmali (cetvel §19).
+    uyar(
+      '[lane-precommit] kimlik ONARILMADI — ORTAK agac. Ana dizinde kimlik dosyasi tutulmaz: ' +
+        'oraya yazmak yarisi surdurur, sahiplik belirtmez. Commit ASIL kimlikle (' +
+        sid.slice(0, 8) + ') degerlendirildi.',
+    )
+  }
 }
 
 /**
