@@ -5,7 +5,7 @@ import React from 'react'
 import { localizedHref, Routes } from '@/utils/routes';
 
 interface SolutionItem {
-  id: 'parking' | 'kitchen' | 'entrance' | 'comfort'
+  id: 'kitchen' | 'entrance' | 'comfort'
   categorySlug: string
   subSlug?: string
   image: string
@@ -20,15 +20,18 @@ interface SolutionItem {
 // görür, test yoktur, sayfa 200 döner. Migration `industrial-ventilation`ı `fans` yaptı ve
 // `commercial-ventilation`ı pasifleştirdi; ikisi de canlıda ölçülerek yakalandı.
 // Yeni hedefler canlı DB'den okundu (hepsi aktif):
-//   fans/parking-jet-fan · fans/duct-fans · air-curtains (artık ANA kategori) · heat-recovery-vmc
+//   fans/duct-fans · air-curtains (artık ANA kategori) · heat-recovery-vmc
+//
+// ⚠ 2026-09-01 — OTOPARK KARTI KALDIRILDI (Recep onayı, REC-101).
+// SEBEP ÖLÇÜLDÜ, tahmin değil: hedefi olan `fans/parking-jet-fan` kategorisi canlı DB'de
+// `is_active=false` VE içinde 0 ürün var. Pasif kategori sayfası kapanmadığı için
+// (`getCachedCategoryData`'da is_active süzgeci yok — ayrı iş, REC-89) sayfa 200 dönüyor
+// ama BOŞ; yani kart müşteriyi boş bir sayfaya götürüyordu. Yukarıdaki 08-28 uyarısının
+// tarif ettiği kusurun aynısı, sadece "slug yok" değil "ürün yok" biçiminde.
+// Bağımsız ikinci kaynak: 14A tasarım teslim belgesi açık konu #2 — "otopark jet fanı
+// katalogda yok, mevcut sitedeki Otopark Senaryosu boş kategoriye gidiyor".
+// Kategori/senaryonun geleceği 15A fazının konusu; bu PR YALNIZ kartı kaldırır.
 const solutions: SolutionItem[] = [
-  {
-    id: 'parking',
-    categorySlug: 'fans',
-    subSlug: 'parking-jet-fan',
-    image: '/images/bento/parking.jpg',
-    span: 'sm:col-span-2 lg:col-span-2'
-  },
   {
     // Eski değer 'industrial-ventilation'/'duct-type-fans' idi; alt slug DB'de HİÇ yoktu,
     // yani bu kart migration'dan ÖNCE de kırıktı. Doğru karşılığı: fans/duct-fans.
@@ -36,20 +39,23 @@ const solutions: SolutionItem[] = [
     categorySlug: 'fans',
     subSlug: 'duct-fans',
     image: '/images/bento/kitchen.jpg',
-    span: 'sm:col-span-1 lg:col-span-1'
+    // Span'lar 3 karta uyarlandı: eski düzen 2+1+1+2 = 6 kolon (üç kolonluk grid'de iki TAM
+    // satır) idi. Otopark çıkınca 1+1+2 = 4 kolon kalır ve lg'de satır TAŞAR. Yeni düzen
+    // lg'de üç eşit kart (1+1+1), sm'de her kart tam satır (2) — iki kırılımda da boşluk yok.
+    span: 'sm:col-span-2 lg:col-span-1'
   },
   {
     // 'air-curtains' artık ALT değil ANA kategori — alt slug verilmez.
     id: 'entrance',
     categorySlug: 'air-curtains',
     image: '/images/bento/entrance.jpg',
-    span: 'sm:col-span-1 lg:col-span-1'
+    span: 'sm:col-span-2 lg:col-span-1'
   },
   {
     id: 'comfort',
     categorySlug: 'heat-recovery-vmc',
     image: '/images/bento/comfort.jpg',
-    span: 'sm:col-span-2 lg:col-span-2'
+    span: 'sm:col-span-2 lg:col-span-1'
   }
 ]
 

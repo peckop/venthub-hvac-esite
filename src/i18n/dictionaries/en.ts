@@ -425,13 +425,6 @@ export const en: typeof tr = {
       subtitle: 'From parking to entrance comfort, from kitchen extraction to commercial comfort, we present HVAC needs through a solution logic.',
       viewAll: 'View All',
       items: {
-        parking: {
-          eyebrow: 'Parking Scenario',
-          title: 'Parking ventilation and jet fan flow',
-          description: 'Move quickly into the right fan family for parking projects that require CO control, air circulation and high airflow.',
-          point1: 'Jet fan and smoke exhaust entry points',
-          point2: 'High airflow and safe routing'
-        },
         kitchen: {
           eyebrow: 'Kitchen Scenario',
           title: 'Industrial kitchen exhaust and duct flow',

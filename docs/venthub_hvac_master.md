@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T20:46:56.647232+00:00
+compiled_at: 2026-08-31T21:45:39.676734+00:00
 total_compiled_files: 657
-source_commit: a30befa3
+source_commit: 3638bfff
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-31T20:46:56.647232+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-31T21:45:39.676734+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -29211,12 +29211,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\components\home\ApplicationSolutions.tsx
-skeleton_hash: aca0f56341b49d27
+skeleton_hash: 945060eb7fd532ad
 entity_hashes:
   func:ApplicationSolutions: 93f4bfc3e2d056b5
   overview: 26527ace9a268eaa
   style_tokens: a60445c0b91a13d5
-generated_at: 2026-08-31T11:45:42Z
+generated_at: 2026-08-31T21:28:38Z
 ---
 
 ## Genel Bakış
@@ -29271,7 +29271,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 ## INTERFACES
 
 ### SolutionItem
-- `id: 'parking' | 'entrance' | 'comfort'`
+- `id: 'kitchen' | 'entrance' | 'comfort'`
 - `categorySlug: string`
 - `subSlug?: string`
 - `image: string`
@@ -29293,9 +29293,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 ## SABİTLER
 - **solutions** (array) — `[
   {
-    id: 'parking',
-    categorySlug: 'fans',
-    subSlug: 'parking-...`
+    // Eski değer 'industrial-ventilation'/'duct-type-fans' idi; alt ...`
 
 ---
 
