@@ -349,6 +349,35 @@ function knownSids(events) {
  *
  * @returns {{ok:true,to:string,how:string}|{ok:false,reason:string,valid:string[]}}
  */
+/**
+ * Bir sid'in ŞERİT ADI — en son `claim`inden okunur.
+ *
+ * ⭐NİÇİN VAR (ölçülmüş vaka, 2026-08-30/31, üç kez): çıktı `oturum ac03ce11 (kısaltmadan
+ * çözüldü)` diyordu. Bu satırın doğruladığı TEK şey "bu sid'i çözdüm"dür; "bu sid OPS'tur"
+ * kısmını GÖNDEREN varsayıyordu ve araç onu hiç doğrulamıyordu. Üç kez yanlış şeride not
+ * düştü — biri bir iş emrinin sıralama talebi, biri prod migration onayı. Hiçbirinde hata
+ * oluşmadı: **başarılı teslimat, DOĞRU ALICI kanıtı değildir.**
+ *
+ * Çözüm ucuz: hedefi basarken ŞERİDİ de bas. O zaman gönderen "OPS bekliyordum, ALTYAPI
+ * yazıyor" diye GÖNDERİM ANINDA görür — okuyanın fark etmesini beklemeden.
+ * Cetvel: `docs/standards/fleet-mechanism-standard.md` §17.
+ */
+function seritAdi(sid, evs) {
+  let ad = '', enSon = ''
+  for (const e of evs) {
+    if (e.type !== 'claim' || e.sid !== sid || !e.lane) continue
+    if (String(e.ts) >= enSon) { enSon = String(e.ts); ad = String(e.lane) }
+  }
+  return ad
+}
+
+/** `oturum <8hane>` + varsa `[ŞERİT]`. Şerit bilinmiyorsa SESSİZ KALMAZ, "şerit? " der. */
+function hedefEtiketi(sid, evs, ek) {
+  const ad = seritAdi(sid, evs)
+  const serit = ad ? `${ad} ` : 'şerit? '
+  return `${serit}[${sid.slice(0, 8)}]${ek ? ' ' + ek : ''}`
+}
+
 function resolveNoteTarget(rawTo, events) {
   const evs = events || readEvents()
   const raw = String(rawTo == null ? '' : rawTo).trim()
@@ -357,12 +386,12 @@ function resolveNoteTarget(rawTo, events) {
 
   const sids = knownSids(evs)
   const exact = sids.find(s => s === raw)
-  if (exact) return { ok: true, to: exact, how: `oturum ${exact.slice(0, 8)}` }
+  if (exact) return { ok: true, to: exact, how: hedefEtiketi(exact, evs) }
 
   // Kısaltma (8-hane vb.) → tam UUID. Belirsizse hata: yanlış oturuma teslim etmeyiz.
   if (raw.length >= 4) {
     const pref = sids.filter(s => s.startsWith(raw))
-    if (pref.length === 1) return { ok: true, to: pref[0], how: `oturum ${pref[0].slice(0, 8)} (kısaltmadan çözüldü)` }
+    if (pref.length === 1) return { ok: true, to: pref[0], how: hedefEtiketi(pref[0], evs, '(kısaltmadan çözüldü)') }
     if (pref.length > 1) {
       return { ok: false, reason: `"${raw}" kısaltması ${pref.length} oturumla eşleşiyor — tam UUID ver`, valid: pref }
     }
@@ -381,7 +410,7 @@ function resolveNoteTarget(rawTo, events) {
     if (live.length > 1) {
       return { ok: false, reason: `"${raw}" şeridini ${live.length} canlı oturum tutuyor — tam UUID ver`, valid: live.map(([s]) => s) }
     }
-    return { ok: true, to: pick, how: `şerit "${raw}" → oturum ${pick.slice(0, 8)}` }
+    return { ok: true, to: pick, how: hedefEtiketi(pick, evs, `(şerit adı "${raw}" ile verildi)`) }
   }
 
   const lanes = [...new Set(evs.filter(e => e.type === 'claim' && e.lane).map(e => e.lane))]
