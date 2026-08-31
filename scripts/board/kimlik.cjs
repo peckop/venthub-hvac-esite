@@ -97,10 +97,33 @@ function coz(gitDir, board) {
 }
 
 /**
+ * Bu git dizini BAĞLI BİR WORKTREE'ye mi ait? — yapısal ölçüt, ad araması DEĞİL.
+ *
+ * Git'in kendi yerleşimi: bağlı worktree'nin git dizini DAİMA `<ortak>/worktrees/<ad>`tır;
+ * ana ağacınki ise ortak dizinin KENDİSİDİR (`<depo>/.git`). Yani `worktrees` bir yol
+ * BİLEŞENİ olarak varsa bağlı worktree'deyiz. Alt-dize araması yerine bileşen karşılaştırması
+ * yapılır: `.../my-worktrees-backup/.git` gibi bir yol alt-dizeye takılırdı (AXIOM 8 dersi:
+ * ad tabanlı süzgeç kesme yapar, temizlik değil).
+ */
+function bagliWorktreeMi(gitDir) {
+  return String(gitDir)
+    .replace(/\\/g, '/')
+    .split('/')
+    .includes('worktrees')
+}
+
+/**
  * Bayat dosyayı ASIL kimlikle onar. Yan etki GİZLİ DEĞİLDİR: çağıran uyarıyı basar.
  * Onarım başarısızsa sessiz kalır — kapının işi commit'i geçirmek/durdurmak, dosya yazmak değil.
+ *
+ * ⭐ORTAK AĞACA YAZMAZ (2026-08-31, cetvel §19): ana dizinin git dizini ORTAK dizindir ve orada
+ * kimlik "bu ağaç kimin şeridinde" sorusuna YANLIŞ cevap verir — ana dizin hiçbir şeridin
+ * değildir, dosyayı en son yazan oturum kazanır. Ölçüldü: ana dizinin kimliği 30 Ağustos'ta ölü
+ * bir oturumun, 31 Ağustos'ta başka birinin sid'iydi. Onarım burada kimliği DÜZELTMEZ, YARIŞI
+ * SÜRDÜRÜR; bu yüzden yazmıyoruz. E1 zaten env'i ASIL kanıt sayar, dosya yalnız vekildir.
  */
 function onar(gitDir, sid) {
+  if (!bagliWorktreeMi(gitDir)) return false
   try {
     fs.writeFileSync(path.join(gitDir, 'venthub-sid'), sid + '\n', 'utf8')
     return true
@@ -109,4 +132,4 @@ function onar(gitDir, sid) {
   }
 }
 
-module.exports = { coz, onar, envSid, dosyaSid }
+module.exports = { coz, onar, envSid, dosyaSid, bagliWorktreeMi }

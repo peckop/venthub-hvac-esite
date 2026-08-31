@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-851\.claude\hooks\session-board.cjs
-skeleton_hash: 366ddc3722852bb0
+source_path: C:\tmp\vh-altyapi-scrubber\.claude\hooks\session-board.cjs
+skeleton_hash: 271e9df5ee325296
 entity_hashes:
   func:readStdin: c1509ddeb1633aba
   overview: c12df99cb346a75d
-generated_at: 2026-08-28T06:20:53Z
+generated_at: 2026-08-31T10:14:17Z
 ---
 
 ## Genel Bakış
@@ -79,8 +79,8 @@ Bu modül, Node.js ortamında çalışan bir CommonJS modülüdür (`session-boa
 
 ## NODE ID STANDARD
 
-  file: session-board.cjs
-  function: session-board.cjs::readStdin
+  file: .claude\hooks\session-board.cjs
+  function: .claude\hooks\session-board.cjs::readStdin
 
 ---
 

@@ -63,6 +63,12 @@ function kapiyiKos(opts: {
   panodaGorulen?: string
   claimGlob?: string
   claimSid?: string
+  /**
+   * BAĞLI WORKTREE'de mi koşsun? — kimlik ONARIMI artık yalnız orada yapılıyor (cetvel §19:
+   * ortak/ana ağaç hiçbir şeridin değildir, oraya kimlik yazmak yarışı sürdürür). Fikstürün
+   * varsayılanı ANA ağaçtır; onarım kolları bunu açıkça `worktree: true` ile ister.
+   */
+  worktree?: boolean
 }): Sonuc {
   const kimlikYaz = opts.dosyadaki
     ? `fs.writeFileSync(path.join(gitDir, 'venthub-sid'), ${JSON.stringify(opts.dosyadaki)} + '\\n')`
@@ -91,15 +97,24 @@ g(['init', '-q']); g(['config', 'user.email', 't@t']); g(['config', 'user.name',
 // İLK COMMIT: HEAD olmadan kapı 'git okunamadi' koluna düşer ve hiç koşmaz.
 fs.writeFileSync(path.join(kok, 'ilk.txt'), 'ilk')
 g(['add', 'ilk.txt']); g(['-c', 'core.hooksPath=', 'commit', '-q', '-m', 'ilk'])
-fs.writeFileSync(path.join(kok, 'dosya.txt'), 'x')
-g(['add', 'dosya.txt'])
-const gitDir = g(['rev-parse', '--absolute-git-dir']).trim()
+// AGAC SECIMI: kosulanKok kapinin cwd'sidir. Bagli worktree istendiginde git'in KENDI
+// yerlesimi kurulur (ortak/worktrees/ad), taklit EDILMEZ — olcut yapisal oldugu icin
+// fikstur de yapisal olmali.
+const kosulanKok = ${opts.worktree ? `(() => {
+  const wt = path.join(os.tmpdir(), 'e1wt-' + Math.random().toString(36).slice(2, 8))
+  g(['worktree', 'add', '-q', wt])
+  return wt
+})()` : 'kok'}
+const gw = (a) => cp.execFileSync('git', a, { cwd: kosulanKok, encoding: 'utf8' })
+fs.writeFileSync(path.join(kosulanKok, 'dosya.txt'), 'x')
+gw(['add', 'dosya.txt'])
+const gitDir = gw(['rev-parse', '--absolute-git-dir']).trim()
 ${kimlikYaz}
 ${panoYaz}
 ${claimYaz}
 const env = Object.assign({}, process.env, { VENTHUB_BOARD_DIR: pano })
 ${envAyar}
-const r = cp.spawnSync(process.execPath, [kapi], { cwd: kok, env, encoding: 'utf8' })
+const r = cp.spawnSync(process.execPath, [kapi], { cwd: kosulanKok, env, encoding: 'utf8' })
 let kimlikSonrasi = ''
 try { kimlikSonrasi = fs.readFileSync(path.join(gitDir, 'venthub-sid'), 'utf8').trim() } catch {}
 console.log(JSON.stringify({ kod: r.status, ciktilar: (r.stdout || '') + (r.stderr || ''), kimlikSonrasi }))
@@ -138,9 +153,58 @@ describe('E1-v2 — kimlik kontrolü: dosya VEKİL kanıt, oturum ASIL kanıt', 
   it('ÇELİŞKİDE dosyayı ASIL kimlikle onarır — DOSYA İÇERİĞİ ölçülür, mesaj değil', () => {
     // ⭐Sabotaj bu kolu bir kez kör yakaladı: writeFileSync sökülünce onar() yine `true` dönüyor
     // ve "ONARILDI" yazılıyordu. Mesaj VEKİL kanıttır; dosyanın yeni içeriği ASIL kanıttır.
-    const r = kapiyiKos({ dosyadaki: BAYAT, env: CANLI, panodaGorulen: CANLI })
+    // ⭐worktree ZORUNLU (2026-08-31, §19): onarım artık YALNIZ bağlı worktree'de yapılıyor.
+    const r = kapiyiKos({ dosyadaki: BAYAT, env: CANLI, panodaGorulen: CANLI, worktree: true })
     expect(r.kimlikSonrasi).toBe(CANLI)
     expect(r.ciktilar).toMatch(/ONARILDI/)
+  })
+
+  /**
+   * ⭐ORTAK/ANA AĞAÇ — kimlik ONARILMAZ ve bu SESSİZ OLMAZ (2026-08-31, cetvel §19).
+   *
+   * Ölçülen kusur: ana dizinin git dizini ORTAK dizindir; orada açılan/resume olan her oturum
+   * kimliğini oraya yazıyordu ve "sahip" en son açılan oluyordu (30 Ağustos'ta ölü bir oturum,
+   * 31 Ağustos'ta canlı bir başkası). Ana dizin hiçbir şeridin DEĞİLDİR — yanlış cevap veren
+   * bir kayıt, cevap vermeyenden kötüdür: okuyucuların fail-open kolunu kapatır.
+   *
+   * Bu kolun ölçtüğü İKİ ŞEY birlikte gerekli: dosya DEĞİŞMEMİŞ olmalı (yazma gerçekten
+   * kesildi mi) VE atlamanın gerekçesi BASILMIŞ olmalı (sessizce atlamak, bu depoda tekrar
+   * tekrar onarılan sınıf). Yalnız birini ölçmek yarım kapıdır.
+   */
+  it('⭐ORTAK AĞAÇTA kimlik ONARILMAZ — dosya DEĞİŞMEZ ve gerekçe BASILIR', () => {
+    const r = kapiyiKos({ dosyadaki: BAYAT, env: CANLI, panodaGorulen: CANLI })
+    expect(r.kimlikSonrasi, 'ortak agacta kimlik dosyasi YAZILMAMALI').toBe(BAYAT)
+    expect(r.ciktilar, 'atlama SESSIZ olmamali').toMatch(/ONARILMADI/)
+    expect(r.ciktilar).toMatch(/ORTAK agac/)
+    // ASIL kimlik yine de kullanılmalı — yazmayı kesmek karar vermeyi kesmez.
+    expect(r.ciktilar).toMatch(new RegExp(CANLI.slice(0, 8)))
+    expect(r.kod, 'ortak agacta commit BLOKLANMAZ').toBe(0)
+  })
+
+  it('bagliWorktreeMi — ölçüt YOL BİLEŞENİ, alt-dize DEĞİL (AXIOM 8: ad süzgeci kesme yapar)', () => {
+    // Modül ALT SÜREÇTE yüklenir — bu dosyanın bütün kolları gibi. (Doğrudan `require()`
+    // ESLint'te yasak: `@typescript-eslint/no-require-imports`; `pnpm build` lint'i koşar,
+    // yani doğrudan çağrı YEREL testte geçip ÜRETİM derlemesini kırardı — ölçüldü.)
+    // Yol, dosyanın kendi idiyomuyla çözülür (bkz. KAPI): alt süreçte `path.resolve`.
+    const ham = execFileSync(
+      process.execPath,
+      [
+        '-e',
+        `const m = require(require('path').resolve('scripts/board/kimlik.cjs'));
+         const yollar = ['C:/repo/.git/worktrees/vh-x', 'C:\\\\repo\\\\.git\\\\worktrees\\\\vh-x',
+           'C:/repo/.git', 'C:/my-worktrees-backup/.git', 'C:/repo/.git/worktrees-eski'];
+         console.log(JSON.stringify(yollar.map((y) => m.bagliWorktreeMi(y))))`,
+      ],
+      { encoding: 'utf8', timeout: 30000 },
+    )
+    const [wt, wtWin, ana, altDize1, altDize2] = JSON.parse(ham.trim()) as boolean[]
+
+    expect(wt, 'bagli worktree taninmali').toBe(true)
+    expect(wtWin, 'ters bolulu yol da taninmali').toBe(true)
+    expect(ana, 'ana agacin git dizini worktree DEGIL').toBe(false)
+    // ⭐Alt-dize araması bu iki yolu YANLIŞ sınıflandırırdı:
+    expect(altDize1, 'my-worktrees-backup alt-dizeye takilmamali').toBe(false)
+    expect(altDize2, 'worktrees-eski alt-dizeye takilmamali').toBe(false)
   })
 
   it('⭐TANINMAYAN kimlik ÇAKIŞAN CLAIM varken BLOKLAR — uyarır ama kontrolü ATLAMAZ', () => {

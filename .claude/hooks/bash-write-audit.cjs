@@ -119,13 +119,68 @@ const kimlikOku = (yol) => {
  * farklı çözmesi tutarsızlık değil, girdilerinin farklı olmasıdır.
  * (Cetvel: `docs/standards/fleet-mechanism-standard.md` §9.)
  */
+/**
+ * ⭐KİMLİK "SAHİPLİK" DEĞİL "AÇILIŞ" KAYDIDIR — ölçülmüş kusur (2026-08-31, §19).
+ *
+ * Yukarıdaki kimlik→ağaç kuralı bir körlüğü kapattı ama İKİNCİSİNİ açık bıraktı. Ölçüm:
+ *   · Bu oturum bütün günü `vh-altyapi-scrubber`da çalıştı; o ağaçta kimlik dosyası HİÇ YOK
+ *     (worktree oturum ortasında yaratıldı, orada SessionStart hiç koşmadı). Kimlik dört
+ *     BAŞKA ağacı işaretliyordu → denetim alakasız dört ağacı okudu, çalışılan ağacı OKUMADI.
+ *   · Ana dizinin kimliği YARIŞ hâlinde: üç şerit de ana dizinde açılıp resume oluyor,
+ *     `--absolute-git-dir` orada ORTAK dizinin kendisi, ve EN SON açılan sid'i kazanıyor.
+ *     30 Ağustos'ta ölü bir oturumdaydı (`974d15cb`), 31 Ağustos 10:30'da bu oturumun.
+ *     Yani paylaşılan ağacın "sahibi" rastgele bir canlı oturum.
+ *
+ * BEDELİ AYNI GÜN İKİ OLAY: (1) bu oturumun ANA DİZİNDEKİ commit'siz işini kendi denetçisi
+ * GÖRMEDİ (kimliği orada değildi) — iş, §16'nın `stash→drop` adımıyla silinmeye bir adım
+ * kalmıştı. (2) OPS'un denetçisi kimliği hiçbir ağaçta bulamayıp cwd'ye düştü ve ana dizini
+ * KAZARA denetledi; alarmın zemini tasarım değil yedek koldu.
+ *
+ * ⭐ONARIM SEÇİMİ — GENİŞLET, TAHMİN ETME. Denetlenen küme bir BİRLEŞİMDİR:
+ *     kimlik ağaçları  ∪  {cwd'nin ağacı}  ∪  {ORTAK ana ağaç}
+ * Süperküme olduğu için kimse kör kalmaz. Kimliği hiçbir yere YAZMAZ, dolayısıyla kimse
+ * başkasının kimliğini çalmaz — "çalışılan ağaca kimliği yaz" tasarımı ölçülüp REDDEDİLDİ:
+ * bir oturum başkasının ağacına tek satır yazsa o ağacı sahiplenir ve GERÇEK sahibinin
+ * denetçisi körleşir; onarım yeni bir sessiz arıza doğurmamalı.
+ *
+ * ORTAK ANA AĞAÇ NİÇİN KOŞULSUZ: Bash cwd'si bu ortamda sessizce oraya resetlenir (§9), yani
+ * HER oturum oraya kazara yazabilir; ağaç PAYLAŞILDIĞI için oradaki commit'siz iş kimin
+ * olursa olsun filo çapında kayıp riskidir; ve kimlik o ağaç için doğru cevabı hiç veremez —
+ * ana dizin hiçbir şeridin DEĞİLDİR. Bu yüzden oradaki kir şerit ihlali gibi değil,
+ * "SAHİBİ ÖLÇÜLMEDİ — ortak ağaç" diye ayrı raporlanır (aşağıda) ve BLOKLAMAZ.
+ *
+ * KAYNAK ETİKETİ: her ağacın kümeye NİÇİN girdiği taşınır (kimlik/cwd/ortak-ana). Atıf gücü
+ * bulguyla birlikte basılmazsa okuyan "benim yazdığım" sanır — bugün tam bu yanlış atıf oldu.
+ */
+const ORTAK_ANA = 'ortak-ana'
+
 function agaclariCoz() {
   const ortakHam = gitOku(cwdKok, '--git-common-dir')
-  if (!ortakHam) return { agaclar: [], sebep: 'ortak git dizini cozulemedi (cwd: ' + cwdKok + ')' }
+  if (!ortakHam) return { kaynaklar: new Map(), sebep: 'ortak git dizini cozulemedi (cwd: ' + cwdKok + ')' }
   const ortak = path.resolve(cwdKok, ortakHam)
 
-  const bulunan = []
-  if (kimlikOku(path.join(ortak, 'venthub-sid')) === sid) bulunan.push(path.dirname(ortak))
+  // Ağaç yolları EĞİK ÇİZGİYE normalize edilir: bu depodaki bütün kanca çıktıları ve claim
+  // glob'ları eğik çizgi kullanıyor; ters bölülü bir yol raporda kopyala-yapıştır edilemez ve
+  // karşılaştırmalarda sessizce eşleşmez.
+  const duzelt = (a) => path.resolve(a).replace(/\\/g, '/')
+  const kaynaklar = new Map()
+  const ekle = (agac, kaynak) => {
+    if (!agac) return
+    const y = duzelt(agac)
+    try {
+      if (!fs.statSync(y).isDirectory()) return
+    } catch {
+      return
+    }
+    if (!kaynaklar.has(y)) kaynaklar.set(y, new Set())
+    kaynaklar.get(y).add(kaynak)
+  }
+
+  let kimlikSayisi = 0
+  if (kimlikOku(path.join(ortak, 'venthub-sid')) === sid) {
+    ekle(path.dirname(ortak), 'kimlik')
+    kimlikSayisi++
+  }
 
   let adlar = []
   try {
@@ -138,41 +193,117 @@ function agaclariCoz() {
     if (kimlikOku(path.join(dizin, 'venthub-sid')) !== sid) continue
     const gitdir = kimlikOku(path.join(dizin, 'gitdir'))
     if (!gitdir) continue
-    bulunan.push(path.dirname(path.resolve(gitdir)))
+    ekle(path.dirname(path.resolve(gitdir)), 'kimlik')
+    kimlikSayisi++
   }
 
-  // Ağaç yolları EĞİK ÇİZGİYE normalize edilir: bu depodaki bütün kanca çıktıları ve claim
-  // glob'ları eğik çizgi kullanıyor; ters bölülü bir yol raporda kopyala-yapıştır edilemez ve
-  // karşılaştırmalarda sessizce eşleşmez.
-  const tekil = [...new Set(bulunan.map((a) => path.resolve(a).replace(/\\/g, '/')))].filter((a) => {
-    try {
-      return fs.statSync(a).isDirectory()
-    } catch {
-      return false
-    }
-  })
+  // cwd'nin AĞACI — cwd'nin kendisi değil: alt dizinde koşuyorsak `git status` oradan da
+  // çalışır ama yollar ağaç köküne göre gelmez ve taban anahtarları eşleşmez.
+  ekle(gitOku(cwdKok, '--show-toplevel') || cwdKok, 'cwd')
+
+  // ORTAK ana ağaç: ortak git dizininin ÜSTÜ. `--show-toplevel` burada işe yaramaz (worktree
+  // içinden çağrıldığında o worktree'yi verir); ortak dizinin konumu tek güvenilir yoldur.
+  ekle(path.dirname(ortak), ORTAK_ANA)
+
   return {
-    agaclar: tekil,
-    sebep: tekil.length ? '' : 'bu sid hicbir agacin venthub-sid dosyasinda kayitli degil',
+    kaynaklar,
+    kimlikSayisi,
+    sebep: kimlikSayisi ? '' : 'bu sid hicbir agacin venthub-sid dosyasinda kayitli degil',
   }
 }
 
-const { agaclar, sebep } = agaclariCoz()
-let denetlenecek = agaclar
+const { kaynaklar, kimlikSayisi, sebep } = agaclariCoz()
+const denetlenecek = [...kaynaklar.keys()]
+/** Bu ağaç kümeye YALNIZ ortak-ana olduğu için mi girdi? (yani bu şeride atfedilemez) */
+const yalnizOrtak = (agac) => {
+  const k = kaynaklar.get(agac)
+  return Boolean(k && k.size === 1 && k.has(ORTAK_ANA))
+}
+
 if (!denetlenecek.length) {
   uyarilar.push(
-    '[bash-write-audit] KIMLIK COZULEMEDI (' + sebep + ') — cwd tabanina DUSTUM: ' + cwdKok +
-      '\n  Bu agac seridin agaci OLMAYABILIR; denetim yanlis agaci olcuyor olabilir.' +
-      '\n  Onarim: bu worktree de bir oturum acilisi yap (session-board.cjs kimligi yazar).',
+    '[bash-write-audit] HICBIR AGAC COZULEMEDI (' + sebep + ') — DENETIM YAPILMADI.' +
+      '\n  Bu sessizlik degil KORLUK: cwd (' + cwdKok + ') bir git agaci olarak cozulemedi.',
   )
-  denetlenecek = [cwdKok]
-} else if (denetlenecek.length > 1) {
+} else if (!kimlikSayisi) {
   uyarilar.push(
-    '[bash-write-audit] SID TEKIL DEGIL — ' + denetlenecek.length +
-      ' agac ayni kimligi tasiyor. HICBIRINI SECMEDIM, HEPSINI denetliyorum:\n  ' +
-      denetlenecek.join('\n  '),
+    '[bash-write-audit] KIMLIK YOK (' + sebep + ') — cwd agaci + ORTAK ana agac denetlendi.' +
+      '\n  Bu sid hicbir agaci isaretlemiyor; calistigin worktree kimliksiz olabilir (oturum' +
+      '\n  ortasinda yaratilmis agaclarda SessionStart hic kosmaz). Onarim: bu worktree de bir' +
+      '\n  oturum acilisi yap. Kimlik SAHIPLIK degil ACILIS kaydidir (cetvel §19).',
+  )
+} else if (kimlikSayisi > 1) {
+  uyarilar.push(
+    '[bash-write-audit] SID TEKIL DEGIL — ' + kimlikSayisi +
+      ' agac ayni kimligi tasiyor. HICBIRINI SECMEDIM, HEPSINI denetliyorum.',
   )
 }
+
+/**
+ * ⭐ÜRETİLMİŞ ARTEFAKT İHLALİ ≠ DİKİŞ YERİ İHLALİ (2026-08-30, ölçülmüş alarm gürültüsü).
+ *
+ * Bu kanca bugün üç ayrı turda öttü ve ÜÇÜNDE DE bulduğu şey aynıydı: `post-commit`
+ * üretecinin arka planda yazdığı companion `.md`'ler (`bash-write-audit.md`,
+ * `lane-precommit.md`, `AboutPage.md`, `board.md`...). Hiçbiri elle yazılmadı; hiçbiri
+ * bir şeridin işine dokunmadı.
+ *
+ * NİÇİN ONARILIYOR: alarm "başka şeridin dosyasına SEN yazdın" der ve `exit 2` ile
+ * dönüp okuyanı durdurur. Üretecin çıktısı için bu cümle YANLIŞ — ve yanlış alarm
+ * bedavaya gelmez: bu depoda defalarca yazıldığı gibi, sürekli öten bir kapı üç gün
+ * içinde görmezden gelinir. Yani gürültü, kapıyı KÖR ETMENİN yavaş yoludur.
+ *
+ * SINIFLANDIRMA YAPISALDIR — ad araması DEĞİL (AXIOM 8 dersi: `uretilmis-artefakt-standard.md`):
+ *   · manifestte ÜRÜN olarak ilan edilmiş dosya (`artefaktlar[].ad`) — `kaynak.dosyalar`a
+ *     BAKILMAZ, orası kaynak listesidir ve ona bakan bir süzgeç kaynağı "üretilmiş" sanar.
+ *   · manifestin kendisi.
+ *   · companion: `X.md` ve yanında aynı adlı bir KAYNAK dosya (`X.ts` gibi) duruyorsa.
+ *
+ * ⚠FAIL-CLOSED: sınıf ÖLÇÜLEMEZSE (manifest okunamadı, `statSync` patladı) ihlal GERÇEK
+ * sayılır. "Ölçemedim" ile "üretilmiş" aynı kefeye konmaz — bu kancanın kendi cetveli
+ * (§5) bunu emrediyor.
+ *
+ * ⚠KABUL EDİLEN ARTIK RİSK, ADIYLA: başka bir şeridin companion'ını ELLE düzenlersem bu
+ * artık bloklamaz, yalnız düşük şiddetle raporlanır. Bilerek: companion üretilmiş dosyadır
+ * (AXIOM 3 zaten elle düzenlemeyi yasaklar) ve bir sonraki üretimde ezilir — yani yarıçapı
+ * sınırlı. Buna karşılık gürültünün bedeli sınırsızdı.
+ */
+const KAYNAK_UZANTILARI = ['.ts', '.tsx', '.js', '.jsx', '.cjs', '.mjs', '.py']
+
+/** Manifestin ilan ettiği ÜRÜN adları — ağaç başına bir kez okunur. */
+const manifestOnbellek = new Map()
+function manifestUrunleri(agac) {
+  if (manifestOnbellek.has(agac)) return manifestOnbellek.get(agac)
+  let sonuc = null // null = ÖLÇÜLEMEDİ (fail-closed sinyali)
+  try {
+    const ham = fs.readFileSync(path.join(agac, 'docs', 'artefakt_manifest.json'), 'utf8')
+    const m = JSON.parse(ham)
+    const liste = Array.isArray(m.artefaktlar) ? m.artefaktlar : []
+    sonuc = new Set(liste.map((a) => 'docs/' + String(a.ad)).concat(['docs/artefakt_manifest.json']))
+  } catch {
+    sonuc = null
+  }
+  manifestOnbellek.set(agac, sonuc)
+  return sonuc
+}
+
+/** @returns {{uretilmis: boolean, olculdu: boolean, gerekce: string}} */
+function uretilmisSinifi(agac, bagil) {
+  const yol = String(bagil).replace(/\\/g, '/')
+  const urunler = manifestUrunleri(agac)
+  if (urunler === null) return { uretilmis: false, olculdu: false, gerekce: 'manifest okunamadi' }
+  if (urunler.has(yol)) return { uretilmis: true, olculdu: true, gerekce: 'manifestte URUN' }
+  if (!/\.md$/i.test(yol)) return { uretilmis: false, olculdu: true, gerekce: 'md degil' }
+  const govde = yol.slice(0, -3)
+  for (const uz of KAYNAK_UZANTILARI) {
+    try {
+      if (fs.statSync(path.join(agac, govde + uz)).isFile()) {
+        return { uretilmis: true, olculdu: true, gerekce: 'companion (' + govde.split('/').pop() + uz + ')' }
+      }
+    } catch { /* yok — sonraki uzantı */ }
+  }
+  return { uretilmis: false, olculdu: true, gerekce: 'kardes kaynak dosya YOK' }
+}
+
 
 /** `git status --porcelain` satırını yola çevirir. Yeniden adlandırmada HEDEFİ alır. */
 function satirdanYol(satir) {
@@ -282,6 +413,30 @@ if (taban.surum < 2) {
   process.exit(0)
 }
 
+/**
+ * ⭐GENİŞLEYEN KÜME İÇİN AYRI "SOĞURMA" KATMANI YAZILDI VE SÖKÜLDÜ — kaydı burada duruyor.
+ *
+ * Denetlenen küme artık cwd ağacını ve ortak ana ağacı da kapsıyor. İlk düşünce: bir ağaç kümeye
+ * İLK KEZ katıldığında oradaki mevcut kirlilik "taban kümesinde yok" görünür, o yüzden tek turluk
+ * soğurulmalı. Tabana `agaclar` alanı (surum 4) eklendi ve geçiş için ağaçlar taban
+ * ANAHTARLARINDAN türetildi.
+ *
+ * ⭐KAPI ÜÇ KOLDAN KIRMIZI VERDİ VE HAKLIYDI. Türetme çöküyor: taban `yollar: []` olabilir
+ * (ağaç TEMİZKEN yazılmış taban — tamamen meşru hâl), ve o zaman "hiçbir ağaç bilinmiyor" →
+ * HEPSİ yeni → her şey soğuruluyor. Yani katman, gerçek ihlali de yutan tek turluk tam körlük
+ * üretiyordu. Fikstürde ölçüldü: `PENCERE ICI` kolu exit 2 yerine 0 döndü.
+ *
+ * ⭐SÖKÜLME GEREKÇESİ (yalnız "bozuktu" değil): katman GEREKSİZDİ. Eski kirin doğru sınıflandırması
+ * ZATEN VAR — PENCERE AYRIMI (aşağıda): mtime'ı taban damgasından eski olan kalem şerit sahibine
+ * alarm ÜRETMEZ, kendi satırıyla uyarı olarak basılır. Yani genişleyen kümenin getirdiği eski
+ * kirlilik için doğru cevabı veren bir katman zaten işliyordu; ikinci bir katman aynı işi daha
+ * kaba (ağaç bazında, tek turluk, körleştirebilen) yapıyordu.
+ *
+ * DERS, ADIYLA: yeni bir kapı eklemeden önce "bu olguyu ölçen bir katman ZATEN VAR MI" sorulur.
+ * Bugün bu soruyu iki kez atladım — biri buydu, diğeri `kimlik.cjs`in bu kancaya hiç bağlanmamış
+ * olmasıydı. `agaclar` alanı da GERİ ALINDI: hiçbir kolun okumadığı bir taban alanı, ileride
+ * "mekanizma var sanılan" ölü kayıt olur.
+ */
 const tabanKume = new Set(taban.yollar)
 const hamYeniler = simdiki.filter((y) => !tabanKume.has(y.anahtar))
 
@@ -416,6 +571,61 @@ if (!taban.ts && birlestirmeSonrasi.length) {
   )
 }
 
+/**
+ * ⭐ORTAK AĞAÇ KOLU — "sahibi ölçülmedi" ile "sen yazdın" AYNI CÜMLE DEĞİLDİR (2026-08-31, §19).
+ *
+ * Ortak ana ağaç kümeye KOŞULSUZ girer (yukarı bkz.), ama oradaki kir bu şeride ATFEDİLEMEZ:
+ * ağaç paylaşılır, cwd oraya sessizce resetlenir, ve kimliği yarışın kazananı taşır. Bu yüzden
+ * ortak ağaçtaki kalemler dikiş yeri alarmından ÖNCE ayrılır:
+ *   · rapor cümlesi atıf İDDİA ETMEZ ("sahibi ölçülmedi"),
+ *   · `exit 2` ile BLOKLAMAZ — başkasının kirinden bu oturumun Bash'ini durdurmak yanlış olur,
+ *   · buna karşılık SESSİZ DE KALMAZ: ortak ağaçta commit'siz iş kimin olursa olsun kayıp
+ *     riskidir, çünkü §16 tazelemesi `stash → pull → drop` içerir.
+ *
+ * ⭐CLAIM'DEN BAĞIMSIZ, BİLİNÇLİ: dikiş yeri kolu "bu yol BAŞKASININ glob'unda mı" sorar; burada
+ * o soru YETMEZ. §16'nın ön koşulu daha geniştir — "companion olmayan TEK kirli dosya varsa
+ * tazeleme YAPILMAZ" — ve hiç kimsenin glob'una girmeyen bir dosya da o koşulu tetikler. Kolu
+ * claim'e bağlasaydık, sahipsiz bir dosya ortak ağaçta sessizce durur ve ilk tazelemede ölürdü.
+ * Böylece bu kol, §16'nın YALNIZ tazeleme anında ölçülen ön koşulunu SÜREKLİ ölçülür hâle
+ * getiriyor: yeni bir kural değil, var olan kuralın gözü.
+ *
+ * ÜRETİLMİŞ ARTEFAKTLAR DIŞARIDA: `post-commit` üreteci ortak ağaçta durmadan companion `.md`
+ * yazar. Onları rapor etmek kolu üç günde kör eder (bu dosyanın kendi tarihi). Sınıflandırma
+ * FAIL-CLOSED: ölçülemeyen kalem RAPOR EDİLİR.
+ *
+ * TEK KEZ ÖTER: taban her turda `simdiki`nin tamamını (ortak ağaç dahil) yazdığı için her yeni
+ * kirli yol yalnız BİR kez rapor edilir. Sürekli tekrar, tam da kaçınılan gürültü olurdu.
+ */
+const ortakKalemler = []
+if (yeniler.length) {
+  const kalanlar = []
+  for (const y of yeniler) {
+    if (!yalnizOrtak(y.agac)) {
+      kalanlar.push(y)
+      continue
+    }
+    const s = uretilmisSinifi(y.agac, y.bagil)
+    if (s.uretilmis) continue // üreteç çıktısı — ortak ağaçta beklenen hâl
+    ortakKalemler.push({ ...y, gerekce: s.olculdu ? s.gerekce : 'SINIF OLCULEMEDI (' + s.gerekce + ')' })
+  }
+  yeniler.splice(0, yeniler.length, ...kalanlar)
+}
+
+if (ortakKalemler.length) {
+  process.stderr.write(
+    '[bash-write-audit] ⛔ORTAK AGAC UYARISI — ' + ortakKalemler.length +
+      ' commit siz dosya PAYLASILAN ana agacta:\n' +
+      ortakKalemler.map((o) => '  · ' + o.bagil + '  [' + o.gerekce + ']').join('\n') +
+      '\n  Agac: ' + [...new Set(ortakKalemler.map((o) => o.agac))].join(', ') +
+      '\n  ⭐SAHIBI OLCULMEDI: bu, bu oturumun yazdiginin KANITI DEGIL — ortak agaca her oturum' +
+      '\n  yazabilir (Bash cwd si sessizce oraya resetlenir) ve kimlik dosyasi orada sahiplik' +
+      '\n  BELIRTMEZ (yarisin kazanani; cetvel §19). Bloklamadim.' +
+      '\n  ⚠NICIN ONEMLI: §16 tazelemesi stash -> pull -> DROP icerir; buradaki commit siz is' +
+      '\n  bir sonraki tazelemede SILINIR. Is senin ise: kendi worktree ine tasi (patch + taze' +
+      '\n  dal), hash ile dogrula, sonra ana dizini temizle. Senin degilse panoya yaz.\n',
+  )
+}
+
 if (!yeniler.length) {
   tabanYaz(taban.bildirilen)
   uyariBas()
@@ -458,71 +668,6 @@ tabanYaz([...bildirilen])
 if (!ihlaller.length) {
   uyariBas()
   process.exit(0)
-}
-
-/**
- * ⭐ÜRETİLMİŞ ARTEFAKT İHLALİ ≠ DİKİŞ YERİ İHLALİ (2026-08-30, ölçülmüş alarm gürültüsü).
- *
- * Bu kanca bugün üç ayrı turda öttü ve ÜÇÜNDE DE bulduğu şey aynıydı: `post-commit`
- * üretecinin arka planda yazdığı companion `.md`'ler (`bash-write-audit.md`,
- * `lane-precommit.md`, `AboutPage.md`, `board.md`...). Hiçbiri elle yazılmadı; hiçbiri
- * bir şeridin işine dokunmadı.
- *
- * NİÇİN ONARILIYOR: alarm "başka şeridin dosyasına SEN yazdın" der ve `exit 2` ile
- * dönüp okuyanı durdurur. Üretecin çıktısı için bu cümle YANLIŞ — ve yanlış alarm
- * bedavaya gelmez: bu depoda defalarca yazıldığı gibi, sürekli öten bir kapı üç gün
- * içinde görmezden gelinir. Yani gürültü, kapıyı KÖR ETMENİN yavaş yoludur.
- *
- * SINIFLANDIRMA YAPISALDIR — ad araması DEĞİL (AXIOM 8 dersi: `uretilmis-artefakt-standard.md`):
- *   · manifestte ÜRÜN olarak ilan edilmiş dosya (`artefaktlar[].ad`) — `kaynak.dosyalar`a
- *     BAKILMAZ, orası kaynak listesidir ve ona bakan bir süzgeç kaynağı "üretilmiş" sanar.
- *   · manifestin kendisi.
- *   · companion: `X.md` ve yanında aynı adlı bir KAYNAK dosya (`X.ts` gibi) duruyorsa.
- *
- * ⚠FAIL-CLOSED: sınıf ÖLÇÜLEMEZSE (manifest okunamadı, `statSync` patladı) ihlal GERÇEK
- * sayılır. "Ölçemedim" ile "üretilmiş" aynı kefeye konmaz — bu kancanın kendi cetveli
- * (§5) bunu emrediyor.
- *
- * ⚠KABUL EDİLEN ARTIK RİSK, ADIYLA: başka bir şeridin companion'ını ELLE düzenlersem bu
- * artık bloklamaz, yalnız düşük şiddetle raporlanır. Bilerek: companion üretilmiş dosyadır
- * (AXIOM 3 zaten elle düzenlemeyi yasaklar) ve bir sonraki üretimde ezilir — yani yarıçapı
- * sınırlı. Buna karşılık gürültünün bedeli sınırsızdı.
- */
-const KAYNAK_UZANTILARI = ['.ts', '.tsx', '.js', '.jsx', '.cjs', '.mjs', '.py']
-
-/** Manifestin ilan ettiği ÜRÜN adları — ağaç başına bir kez okunur. */
-const manifestOnbellek = new Map()
-function manifestUrunleri(agac) {
-  if (manifestOnbellek.has(agac)) return manifestOnbellek.get(agac)
-  let sonuc = null // null = ÖLÇÜLEMEDİ (fail-closed sinyali)
-  try {
-    const ham = fs.readFileSync(path.join(agac, 'docs', 'artefakt_manifest.json'), 'utf8')
-    const m = JSON.parse(ham)
-    const liste = Array.isArray(m.artefaktlar) ? m.artefaktlar : []
-    sonuc = new Set(liste.map((a) => 'docs/' + String(a.ad)).concat(['docs/artefakt_manifest.json']))
-  } catch {
-    sonuc = null
-  }
-  manifestOnbellek.set(agac, sonuc)
-  return sonuc
-}
-
-/** @returns {{uretilmis: boolean, olculdu: boolean, gerekce: string}} */
-function uretilmisSinifi(agac, bagil) {
-  const yol = String(bagil).replace(/\\/g, '/')
-  const urunler = manifestUrunleri(agac)
-  if (urunler === null) return { uretilmis: false, olculdu: false, gerekce: 'manifest okunamadi' }
-  if (urunler.has(yol)) return { uretilmis: true, olculdu: true, gerekce: 'manifestte URUN' }
-  if (!/\.md$/i.test(yol)) return { uretilmis: false, olculdu: true, gerekce: 'md degil' }
-  const govde = yol.slice(0, -3)
-  for (const uz of KAYNAK_UZANTILARI) {
-    try {
-      if (fs.statSync(path.join(agac, govde + uz)).isFile()) {
-        return { uretilmis: true, olculdu: true, gerekce: 'companion (' + govde.split('/').pop() + uz + ')' }
-      }
-    } catch { /* yok — sonraki uzantı */ }
-  }
-  return { uretilmis: false, olculdu: true, gerekce: 'kardes kaynak dosya YOK' }
 }
 
 const uretilmisIhlaller = []

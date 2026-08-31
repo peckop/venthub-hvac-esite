@@ -217,7 +217,7 @@ describe('INV-BASH-WRITE-2 · bash-write-audit hangi ağacı denetliyor', () => 
     expect(r.stderr, 'wtB daki ihlal raporlanmadı').toContain(`${adB} :: ${CLAIM_YOLU}`)
   })
 
-  it('KİMLİK ÇÖZÜLEMEDİ: cwd ye düşmek meşru ama SESSİZ olamaz — ve gerçekten bir şey ölçmeli', () => {
+  it('KİMLİK YOK: cwd + ortak ağaçla koşmak meşru ama SESSİZ olamaz — ve gerçekten bir şey ölçmeli', () => {
     const k = kur('kimliksiz')
     // Hiçbir ağaca kimlik yazılmıyor.
 
@@ -230,12 +230,106 @@ describe('INV-BASH-WRITE-2 · bash-write-audit hangi ağacı denetliyor', () => 
       r.stderr,
       'kimlik yoksa denetim yanlış ağacı ölçüyor OLABİLİR; bunu bastırmak "kapı koştu" ile ' +
         '"kapı boşa koştu"yu ayırt edilemez yapar',
-    ).toContain('KIMLIK COZULEMEDI')
+    ).toContain('KIMLIK YOK')
     expect(
       r.status,
-      'ABSANS KANITI: geri düşüş gerçekten bir ağacı okuduğunu göstermeli, yoksa "uyardım ve ' +
+      'ABSANS KANITI: kimliksiz koşum gerçekten bir ağacı okuduğunu göstermeli, yoksa "uyardım ve ' +
         'hiçbir şey ölçmedim" hâli yeşil görünür',
     ).toBe(2)
+  })
+
+  /**
+   * ⭐ORTAK ANA AĞAÇ KOŞULSUZ DENETLENİR (2026-08-31, cetvel §19) — ölçülmüş iki olayın kapanışı.
+   *
+   * O gün: (1) ALTYAPI'nın ana dizindeki commit'siz işini KENDİ denetçisi görmedi, çünkü kimliği
+   * orada değildi; iş §16'nın `stash→drop` adımıyla silinmeye bir adım kalmıştı. (2) OPS'un
+   * denetçisi kimliği hiçbir ağaçta bulamayıp cwd'ye düştü ve ana dizini KAZARA denetledi.
+   *
+   * Bu kolun fikstürü ikisini de yeniden üretir: kimlik BAŞKA bir ağaçta (wtB), cwd de orada —
+   * yani ana ağaç kümeye YALNIZ "ortak-ana" olduğu için girer. Kimlikten türeyen bir uygulama
+   * burada HİÇBİR ŞEY göremez.
+   */
+  it('⭐ORTAK ANA AĞAÇ: kimlik başka ağaçta, cwd başka ağaçta — ana ağaçtaki commit siz iş YİNE GÖRÜLÜR', () => {
+    const k = kur('ortak-gorunur')
+    kimlikYaz(k, k.wtB)
+
+    expect(auditKostur(k, k.wtB).status, 'ilk tur taban kurar').toBe(0)
+    dosyaYaz(`${k.ana}/${CLAIM_YOLU}`, 'export const o = 7\n')
+
+    const r = auditKostur(k, k.wtB)
+
+    expect(r.stderr, 'ortak agactaki commit siz is GORUNMEZ kalmamali').toContain('ORTAK AGAC UYARISI')
+    expect(r.stderr, 'dosya adiyla yazilmali').toContain(CLAIM_YOLU)
+    expect(
+      r.stderr,
+      'ATIF GUCU basilmali: bu, bu oturumun yazdiginin kaniti DEGIL — yanlis atif bugun tam ' +
+        'bu bicimde oldu',
+    ).toContain('SAHIBI OLCULMEDI')
+    expect(
+      r.status,
+      'baskasinin kirinden bu oturumun Bash ini DURDURMAK yanlis olur: uyarir, bloklamaz',
+    ).toBe(0)
+  })
+
+  /**
+   * ⭐CLAIM'DEN BAĞIMSIZ — bu kol tasarımı dikiş-yeri kolundan AYIRIR.
+   *
+   * §16'nın ön koşulu "companion olmayan TEK kirli dosya varsa tazeleme YAPILMAZ"; hiç kimsenin
+   * glob'una girmeyen bir dosya da o koşulu tetikler. Kolu claim'e bağlasaydık sahipsiz dosya
+   * ortak ağaçta sessizce durur ve ilk tazelemede ölürdü. Sabotaj: `findConflict` sonucuna
+   * bağlayan bir uygulama bu kolda kırmızı verir.
+   */
+  it('⭐ORTAK AĞAÇ kolu CLAIM ARAMAZ: hiç talep edilmemiş yol da kayıp riski olarak bildirilir', () => {
+    const k = kur('ortak-sahipsiz')
+    kimlikYaz(k, k.wtB)
+
+    expect(auditKostur(k, k.wtB).status).toBe(0)
+    dosyaYaz(`${k.ana}/${SERBEST_YOL}`, 'export const s = 8\n')
+
+    const r = auditKostur(k, k.wtB)
+
+    expect(r.stderr, 'sahipsiz dosya da ortak agacta kayip riskidir').toContain('ORTAK AGAC UYARISI')
+    expect(r.stderr).toContain(SERBEST_YOL)
+    expect(r.status, 'yine bloklamaz').toBe(0)
+  })
+
+  /**
+   * ⭐GÜRÜLTÜ KORUMASI — ortak ağaçta `post-commit` üreteci durmadan companion `.md` yazar.
+   * Onları bildirmek kolu üç günde kör eder (bu kancanın kendi tarihi). Sınıflandırma yapısaldır:
+   * `X.md` + yanında `X.ts` = companion. Manifest ŞART (fail-closed): okunamazsa sınıf ölçülemez
+   * ve kalem BİLDİRİLİR — bu kol o yönü de sabitler, çünkü manifest fikstürde YAZILIYOR.
+   */
+  it('⭐ORTAK AĞAÇTA üretilmiş companion BİLDİRİLMEZ (gürültü kapıyı körleştirir)', () => {
+    const k = kur('ortak-companion')
+    kimlikYaz(k, k.wtB)
+    dosyaYaz(
+      `${k.ana}/docs/artefakt_manifest.json`,
+      JSON.stringify({ artefaktlar: [{ ad: 'venthub_hvac_master.md' }] }),
+    )
+    dosyaYaz(`${k.ana}/zzz-audit-sinavi/modul.ts`, 'export const m = 1\n')
+
+    expect(auditKostur(k, k.wtB).status, 'ilk tur taban kurar (kaynak + manifest tabanda)').toBe(0)
+
+    // companion: modul.md — yanında modul.ts DURUYOR
+    dosyaYaz(`${k.ana}/zzz-audit-sinavi/modul.md`, '# uretilmis\n')
+
+    const r = auditKostur(k, k.wtB)
+
+    expect(r.stderr, 'uretec ciktisi ORTAK AGAC UYARISI na girmemeli').not.toContain('modul.md')
+    expect(r.status).toBe(0)
+  })
+
+  it('⭐cwd AĞACI KÜMEDE: kimlik hiçbir yerde ama cwd nin ağacındaki ihlal GÖRÜLÜR', () => {
+    const k = kur('cwd-kume')
+    // Kimlik YOK — eski uygulama cwd'ye "düşerdi"; yeni uygulama cwd'yi KÜMEYE alır.
+
+    expect(auditKostur(k, k.wtA).status).toBe(0)
+    dosyaYaz(`${k.wtA}/${CLAIM_YOLU}`, 'export const c = 9\n')
+
+    const r = auditKostur(k, k.wtA)
+
+    expect(r.status, 'cwd nin agacindaki gercek ihlal exit 2 ile otmeli').toBe(2)
+    expect(r.stderr).toContain(CLAIM_YOLU)
   })
 
   it('TABAN BİÇİM GEÇİŞİ v1 → v2: nitelenmemiş eski taban sahte alarm YAĞDIRMAZ', () => {

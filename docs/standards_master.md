@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T10:14:30.143572+00:00
+compiled_at: 2026-08-31T10:33:51.047118+00:00
 total_compiled_files: 62
-source_commit: 10e0435f
+source_commit: c7d33e68
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9024,6 +9024,82 @@ beyanı **düzeltmek** üzereydim. Yapısal alanla bakınca o 3'ün, o gün **re
 yazdığım kendi metinlerime** takılan yanlış-pozitif olduğu çıktı; gerçek sayı 0'dı.
 *"Ölçüm aracının kendisi ölçülür"* (`uretilmis-artefakt-standard.md`) kuralının canlı
 örneği: **bozuk bir ölçüm, doğru bir beyanı bozmaya da yeter.**
+
+---
+
+## 19. KİMLİK "AÇILIŞ" KAYDIDIR, "SAHİPLİK" DEĞİL — ortak ağaç kimliksizdir
+
+### Ölçülmüş kusur (2026-08-31)
+
+`session-board.cjs` oturum kimliğini `<absolute-git-dir>/venthub-sid`e yazar. §9 bu dosyayı
+"bu ağaç kimin şeridinde" sorusunun cevabı olarak kullanıyordu. İki şey ölçüldü:
+
+1. **Kimlik, oturumun AÇILDIĞI ağacı işaretler; ÇALIŞTIĞI ağacı DEĞİL — ve hiç tazelenmez.**
+   ALTYAPI bütün günü `vh-altyapi-scrubber`da çalıştı; o ağaçta kimlik dosyası **hiç yoktu**
+   (worktree oturum ortasında yaratıldı, orada `SessionStart` hiç koşmadı). Kimlik dört
+   **başka** ağacı işaretliyordu → denetim alakasız dört ağacı okudu, çalışılan ağacı okumadı.
+
+2. **Ana dizinin kimliği YARIŞ hâlindedir.** Ana çalışma dizininde `--absolute-git-dir` ile
+   `--git-common-dir` **aynı** yeri gösterir, ve üç şerit de ana dizinde açılıp resume olur.
+   Kazananı **sıra** belirler: 30 Ağustos'ta ölü bir oturumun sid'iydi (`974d15cb`),
+   31 Ağustos 10:30'da başka bir şeridin. Yani paylaşılan ağacın "sahibi" rastgeleydi.
+
+⭐**"Ölü sid" özel bir hâl değildi, yarışın o anki sonucuydu.** İlk teşhis ("ana dizinde ölü
+kimlik var") bir gün sonra ölçüldüğünde **değişmişti** — ve teşhisi zayıflatmadı, keskinleştirdi.
+
+### Bedeli: aynı gün iki olay
+
+| olay | mekanizma |
+|---|---|
+| ALTYAPI'nın ana dizindeki commit'siz işini **kendi denetçisi görmedi** | kimliği orada değildi; iş §16'nın `stash → pull → drop` adımıyla silinmeye bir adım kalmıştı |
+| OPS'un denetçisi ana dizini **kazara** denetledi | kimliği hiçbir ağaçta bulamayıp cwd'ye düştü; alarmın zemini tasarım değil **yedek koldu** |
+
+⚠ **Ölü/yabancı kimlik, kimliksizlikten KÖTÜDÜR:** okuyucuların fail-open kolunu **kapatır**,
+denetim "sahibi var" sanıp hayalete atfeder.
+
+### HÜKÜM
+
+1. **Ortak/ana ağaca kimlik YAZILMAZ.** Ölçüt yapısaldır: `absolute-git-dir === git-common-dir`.
+   Yazmayı kesen mekanizma **orada duran eski kaydı da siler** — yoksa kusur elle bir temizlik
+   adımına bağlı kalır ("belge indi, iş bitmedi" sınıfı). `kimlik.onar()` da ortak ağaca yazmaz.
+2. **Denetlenen ağaç kümesi bir BİRLEŞİMDİR:** kimlik ağaçları ∪ {cwd'nin ağacı} ∪ {ortak ana ağaç}.
+   Süperküme olduğu için **kimse kör kalmaz**; hiçbir yere kimlik yazmadığı için **kimse
+   başkasının kimliğini çalmaz**.
+3. **Ortak ana ağaç KOŞULSUZ denetlenir** — Bash cwd'si oraya sessizce resetlenir (§9), ağaç
+   paylaşılır, ve kimlik o ağaç için doğru cevabı **hiç veremez**.
+4. **Ortak ağaçtaki kir ŞERİT İHLALİ GİBİ RAPORLANMAZ:** cümle atıf iddia etmez (*"SAHİBİ
+   ÖLÇÜLMEDİ"*), `exit 2` ile **bloklamaz**, ama **sessiz de kalmaz** — oradaki commit'siz iş
+   kimin olursa olsun kayıp riskidir.
+5. **Bu kol claim'den BAĞIMSIZDIR.** §16'nın ön koşulu daha geniştir: *"companion olmayan tek
+   kirli dosya varsa tazeleme yapılmaz"* — hiç kimsenin glob'una girmeyen dosya da onu tetikler.
+   Böylece bu kol, §16'nın **yalnız tazeleme anında** ölçülen ön koşulunu **sürekli ölçülür**
+   hâle getirir: yeni bir kural değil, var olan kuralın gözü.
+6. **Üretilmiş artefaktlar dışarıdadır** (fail-closed: sınıf ölçülemezse **bildirilir**).
+   Ortak ağaçta `post-commit` üreteci durmadan companion `.md` yazar; onları bildirmek kapıyı
+   üç günde kör eder.
+7. **E1 bloklanmaz** — ölçüldü: `kimlik.cjs` ASIL kanıtı `CLAUDE_CODE_SESSION_ID` env'inden alır
+   (dosya yalnız **vekil**), ve o env Claude Code kabuğunda **doludur**. Ortak ağaçta kimlik
+   "yok" olur, E1 fail-open + **görünür** uyarı verir — yanlış şerit adına karar vermekten iyidir.
+
+### Kapı
+
+`e1-kimlik-kontrolu.test.ts` (10 kol) + `bash-write-audit-tree.test.ts` (11 kol).
+**Altı sabotaj, altısı kırmızı** (her biri kurulduğu + sözdiziminin geçerli kaldığı
+doğrulanarak): ortak-ana ağaç kümeye eklenmez · cwd ağacı eklenmez · ortak kolu claim'e
+bağlanır · companion süzgeci sökülür · `onar()` koruması sökülür · `bagliWorktreeMi` alt-dize
+aramasına döndürülür.
+
+### ⭐Bu işin kendi içinden çıkan iki ders
+
+1. **Yeni kapı eklemeden önce "bu olguyu ölçen katman ZATEN VAR MI" sorulur.** Bu iş sırasında
+   bu soru **iki kez** atlandı: (a) `kimlik.cjs` (E1-v2) env'i asıl kanıt sayan çözümü 08-28'de
+   zaten yazmıştı ama `bash-write-audit.cjs` ona **hiç bağlanmamıştı** — yeni mekanizma icat
+   etmek yerine mevcut zincire bağlanmak doğru hamleydi. (b) "Genişleyen küme için yeni ağaç
+   soğurma katmanı" yazıldı; **kapı üç koldan kırmızı verdi ve haklıydı** — katman hem bozuktu
+   (taban `yollar: []` olabilir, o zaman *her şey* soğurulur) hem de **gereksizdi**: eski kirin
+   doğru sınıflandırmasını **pencere ayrımı** zaten yapıyordu. Söküldü.
+2. **Hiçbir kolun okumadığı taban alanı EKLENMEZ.** Soğurma katmanıyla gelen `agaclar` alanı
+   geri alındı; okunmayan bir alan ileride "mekanizma var sanılan" ölü kayda dönüşür.
 
 
 ---
