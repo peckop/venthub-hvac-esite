@@ -70,6 +70,49 @@ function kuralGovdesi(kuralId: string): string {
 }
 
 describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
+  /**
+   * ⭐ASIL BEKÇİ — sınıfın geri gelmesini bu kol engeller.
+   *
+   * `kuralGovdesi` içindeki "blok tek kural içerir" kontrolü YAPI GEREĞİ hep doğrudur
+   * (sınır zaten "sıradaki kural"a göre hesaplanır) — yani o bir bekçi DEĞİL, kendi
+   * tutarlılık kontrolüdür. Kör kolu doğuran şey, bloğu **elle yazılmış başka bir kural
+   * adına** kadar kesmekti. O desen geri gelirse burası kırmızı verir.
+   *
+   * Ölçülmüş vaka (2026-08-31): `family-empty` bloğu `id: 'product-no-subcategory'`
+   * sınırına kadar kesiliyordu; arada `family-nested` olduğu için blok İKİ kural
+   * içeriyordu ve `parent_family_id` komşudan geliyordu. İki sabotaj (alt sorguyu
+   * `and false` ile körletmek, alt sorguyu tamamen silmek) o hâlde YEŞİL geçti.
+   */
+  it('⭐kaynak tarayan kollar ELLE YAZILMIŞ kural sınırı kullanamaz', () => {
+    const kendi = fs.readFileSync(
+      path.join(process.cwd(), 'src', '__tests__', 'conformance', 'catalog-integrity-gate.test.ts'),
+      'utf8',
+    )
+    // Yalniz `kuralGovdesi` icindeki HESAPLANAN sinir mesru: arama dizesi kural adi
+    // TASIMAZ, yalnizca "id: " onekini arar ve bir SONRAKI kurali bulur.
+    // Yasak olan: arama dizesinin icine bir kural ADININ gomulmesi — boyle bir dilim
+    // sinir kaymasina aciktir.
+    // ⚠YASAK KENDI PROSE'UNDA DA GECEMEZ: bu yorumda ornek olarak duz yazilmis bir
+    // "gomulu dilim" olsaydi, tarama onu da yakalar ve kol kendi aciklamasina takilirdi.
+    // Ilk iki yazimda tam bu oldu (once vacuous-guard ornegi, sonra bu yorum).
+    const gomulu = kendi.match(/indexOf\("id: '[a-z-]+'"\)/g) ?? []
+    expect(
+      gomulu,
+      'blok siniri ELLE YAZILMIS bir kural adina baglanmis. Araya yeni kural eklendigi anda ' +
+        'blok komsuyu da kapsar ve kol SAHTE olarak yesil kalir — 2026-08-31 vakasi tam buydu. ' +
+        'Bunun yerine kuralGovdesi(<id>) kullan (sinir SIRADAKI kurala gore hesaplanir).',
+    ).toEqual([])
+    // Vacuous-guard: desen gercekten eslesebiliyor mu? Eslesemeyen bir yasak, yasak degildir.
+    // ⚠ORNEK PARCALI KURULUR: duz yazilsaydi YASAGIN KENDISI bu satiri yakalardi — ilk
+    // yazimda tam bu oldu ve kol kendi ornegine takilip kirmizi verdi (bekci kendini
+    // yakalamamali; ayni sinifin kucuk hali).
+    const ornek = 'indexOf("id: ' + "'ornek-kural'" + '")'
+    expect(
+      /indexOf\("id: '[a-z-]+'"\)/.test(ornek),
+      'yasak deseni hicbir seye eslesmiyor — kol bosluk olcerdi',
+    ).toBe(true)
+  })
+
   it('betik ve taban dosyası mevcut', () => {
     expect(fs.existsSync(SCRIPT)).toBe(true)
     expect(fs.existsSync(BASELINE)).toBe(true)
