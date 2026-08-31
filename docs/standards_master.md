@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T07:07:03.039564+00:00
+compiled_at: 2026-08-31T07:19:20.781788+00:00
 total_compiled_files: 62
-source_commit: 36b76585
+source_commit: 785b13c4
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -8941,9 +8941,89 @@ Aynı ailenin bu depoda ölçülmüş öbür üyeleri:
 
 Ortak biçim: **araç başarı döndürür, biz aracın doğrulamadığı bir cümleyi ona söyletiriz.**
 
-**İYİLEŞTİRME ADAYI (`scripts/board/**`, ALTYAPI):** `note` çıktısı alıcının **şerit
-adını** da bassın — `not birakildi → OPS [cb0467f1]` gibi. O zaman vaka 1 gönderildiği
-anda görünürdü.
+**UYGULANDI (2026-08-31, aynı gün):** `note` çıktısı artık alıcının şerit adını basıyor —
+`not bırakıldı → OPS [cb0467f1]`. Şerit bilinmiyorsa `şerit?` yazılır, sessiz geçilmez.
+Kapı: `board-hedef-serit-adi.test.ts` (INV-BOARD-9), gerileme kolu eski biçimi yakalar.
+
+---
+
+## 18. İZİN-REDDİ OLAY GÜNLÜĞÜ — dalgalı ret bir şeridi SESSİZCE durdurur
+
+### Ölçülmüş vaka (2026-08-31)
+
+Bir sabahta üç **normalde serbest** eylem reddedildi — `CronCreate`, `gh pr merge`,
+`npx vitest` — ve aynı komut **ikinci denemede geçti**. Yani ayar sorunu değil, **dalgalı
+ret**. Asıl zarar sessizlikti: reddedilen `CronCreate` yüzünden bir şeridin mekanizma
+üçlüsünün **cron ayağı hiç kurulamadı** ve bu yalnız o şeridin transkriptinde kaldı.
+
+### ⭐İlk ölçüt YANLIŞ EVRENİ ölçtü — günlüğün tasarım gerekçesi budur
+
+İlk denemede metin tarandı: `Permission to use ... has been denied`.
+
+| ölçüt | bulduğu | kaçırdığı |
+|---|---|---|
+| metin taraması | **109 kayıt, hepsi `Bash`** | ⚠ aranan `CronCreate` reddini **tamamen** |
+
+Sebep: o sınıfın metni bambaşka — `denied by the Claude Code auto mode classifier`. Metin
+ölçütüyle kurulacak bir günlük **kör kapı** olurdu: sayı üretir, aranan sınıfı kaçırır.
+
+**Doğru ölçüt YAPISALDIR:** transkript kaydında amaca özel bir alan var — **`toolDenialKind`**.
+Metin eşleşmesi gerekmez, `settings.json`'a dokunmak gerekmez (izin/ayar sınırına hiç
+girilmez).
+
+### Dört tür AYNI ŞEY DEĞİLDİR
+
+| tür | ne demek | anomali sayısına girer mi |
+|---|---|---|
+| `user-rejected` | **İNSAN** reddetti — bir KARAR, arıza değil | **hayır** |
+| `permission-rule` | yazılı kural reddetti — beklenen davranış | **hayır** |
+| `automode-blocked` | ⭐sınıflandırıcı reddetti — anomali adayı | **evet** |
+| `automode-unavailable` | sınıflandırıcı ulaşılamadı — altyapı | **evet** |
+
+İnsan kararını anomaliye katmak, günlüğü her gün öten bir alarma çevirir ve doğrudan
+§15'in *"gürültü kapıyı körleştirmenin yavaş yoludur"* sınıfına düşer.
+
+**Ölçülen dağılım (tüm geçmiş, 455 ret):** `permission-rule` 241 · `automode-blocked` 181 ·
+`user-rejected` 27 · `automode-unavailable` 6 → **anomali adayı 187**.
+Araç: `Bash` 144 · `Edit` 23 · `ScheduleWakeup` 11 · `SendMessage` 4 · `Agent` 2 ·
+`CronCreate` 1 · `Monitor` 1.
+
+### Araç adı ret kaydında YOKTUR
+
+Ret kaydı yalnız sınıflandırıcının metnini taşır. Araç adı `sourceToolAssistantUUID`
+üzerinden **çağıran assistant kaydına** gidilip `tool_use` bloğundan çözülür; assistant
+kaydı retten önce geldiği için **tek ileri geçiş** yeter. Çözülemezse `?` yazılır,
+**uydurulmaz**. (Doğrulandı: o sabahın dört reddi bu yolla `CronCreate` + 3× `Bash` çıktı —
+şeridin beyanıyla birebir.)
+
+### Kural — ritüel + mekanizma
+
+1. **Normalde serbest bir iş reddedilirse: bir kez AYNEN yeniden dene.** Geçerse iş devam
+   eder; kayıt zaten transkriptte durur.
+2. **İkinci ret panoya gider** — ve özellikle *mekanizma kuran* bir eylem (Monitor, cron,
+   claim) reddedildiyse **eksik kalan katman adıyla** bildirilir. Sessiz eksik mekanizma,
+   şeridi sağır bırakır.
+3. **Ölçüm:** `node scripts/board/izin-reddi-gunlugu.cjs olc [--gun ...|--tum]` (salt
+   okuma) · `... bildir --sid X [--esik N]` (eşik aşılırsa panoya).
+4. Kapı: `izin-reddi-gunlugu.test.ts` (INV-BOARD-10) — 8 kol; `user-rejected` ve
+   `permission-rule`'ün anomali **sayılmadığını** ayrı ayrı kanıtlar.
+
+### Adıyla yazılan iki sınır
+
+⚠ **"Sonra geçti" BU KAYNAKTAN BİLİNEMEZ.** Transkript yalnız reddi kaydeder. Bu yüzden
+tekrar deseni (aynı oturum + aynı araç, 10 dk içinde ≥2 ret) **ayrı** raporlanır ve
+*"geçti"* diye **yorumlanmaz**. Günlük, kaynağın söylemediği bir şeyi söylemez.
+
+⚠ **Transkripte yazılmayan ret görünmez.** Bu kapı bir örnekleme değil, kaydın kendisidir;
+kayıt yoksa ölçüm de yoktur — *"ölçemedim ≠ olmadı"*.
+
+### ⭐Bu işin kendi içinden çıkan ders
+
+Ölçüm sırasında bir ara sonuç *"bugün bende 3 ret var"* dedi ve neredeyse doğru bir
+beyanı **düzeltmek** üzereydim. Yapısal alanla bakınca o 3'ün, o gün **ret hakkında
+yazdığım kendi metinlerime** takılan yanlış-pozitif olduğu çıktı; gerçek sayı 0'dı.
+*"Ölçüm aracının kendisi ölçülür"* (`uretilmis-artefakt-standard.md`) kuralının canlı
+örneği: **bozuk bir ölçüm, doğru bir beyanı bozmaya da yeter.**
 
 
 ---

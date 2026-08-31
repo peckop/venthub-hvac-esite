@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "d2ede2f44b8d96a0989533b614f52f6280d4c7b568a41636ac2743b13b617b60",
+      "icerik_sha256": "ca44de870a3ee66c1f57795c29433746610afcadd789563853d836996638e101",
       "kaynak": {
         "dosya_sayisi": 99,
         "dosyalar": {
@@ -109,7 +109,7 @@
         "izlenmeyen": [],
         "ozet": "72619f2635452cea0d3e2168171dade67f030035b9d4f5e937b4389f8e1a0125"
       },
-      "kaynak_commit": "36b76585e161a07208a1f57862405051b2daa96e",
+      "kaynak_commit": "785b13c4e7c3ef65635aa13e9eb90b11df14b9f9",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -126,7 +126,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "2e44f0241471f73226654b97f11411c5172db190057ea53b69ecdad9f38273aa",
+      "icerik_sha256": "921cb5455d13d27c72bdd3364bd7dd5496cd987ebac82f2c101c067910551952",
       "kaynak": {
         "dosya_sayisi": 62,
         "dosyalar": {
@@ -165,7 +165,7 @@
           "docs/standards/edge-function-security-standard.md": "fc5e8c0e93dd0d1fcff8c0727b111d00a9c6d19e",
           "docs/standards/erp-workspace-design-standard.md": "0b9c05a654a0eaef701cfac1cb81f9c613fc2565",
           "docs/standards/execution-method-standard.md": "ce0ed4909059b87e2caa4af1ad6430fdfa8ac8ce",
-          "docs/standards/fleet-mechanism-standard.md": "d75bcaca8acbf92364dff6fd02692c9cc93be897",
+          "docs/standards/fleet-mechanism-standard.md": "e094b28dd31b9ee97b70c3c4f4af6417774840cf",
           "docs/standards/form-submission-standard.md": "db8615f18333451cf5ac75dde586079612b91067",
           "docs/standards/i18n-localization-standard.md": "0fadad000d410a3ea8d66fd334a5c061e8d8f8c4",
           "docs/standards/is-kayit-duzeni-standard.md": "575239e83d0a0ce0675f4197d735f85f87bfedeb",
@@ -194,9 +194,9 @@
           "docs/standards/work-tracking-ssot-standard.md": "6a00f894fbc818c9e927e2ced965936c6162475e"
         },
         "izlenmeyen": [],
-        "ozet": "ab87a78e874f91fc0c9e6f712a1656b5b407dd4316862342bb6d7d4563342d44"
+        "ozet": "c4d38605100e9a484a617fe9cfdfb0a02289f7481cf59ac09fe603304ea21f8f"
       },
-      "kaynak_commit": "36b76585e161a07208a1f57862405051b2daa96e",
+      "kaynak_commit": "785b13c4e7c3ef65635aa13e9eb90b11df14b9f9",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -205,7 +205,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "d74c6df0b10de4d45e0fbafa70df6032c8faa137469e79a8ac20806cb307925d",
+      "icerik_sha256": "71585ee8dcb3513f9dfc322c6b81803e44c2b5a1c47f75952fa122ea4532f83e",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -252,7 +252,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "36b76585e161a07208a1f57862405051b2daa96e",
+      "kaynak_commit": "785b13c4e7c3ef65635aa13e9eb90b11df14b9f9",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -260,7 +260,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "f73ca91453acaf2d9fde776a99f17dfbe82236b308564e29a2778b59b5b31e74",
+      "icerik_sha256": "804f763d3e16e198351c50d531b3a93aafd8ef2c5a13b3ebc0d7afcea643a9fe",
       "kaynak": {
         "dosya_sayisi": 657,
         "dosyalar": {
@@ -925,7 +925,7 @@
         "izlenmeyen": [],
         "ozet": "8e187efa1e611d91775eb207d339e1c69b88130e1d96698478721a7087a204a5"
       },
-      "kaynak_commit": "36b76585e161a07208a1f57862405051b2daa96e",
+      "kaynak_commit": "785b13c4e7c3ef65635aa13e9eb90b11df14b9f9",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -934,7 +934,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-08-31T07:07:03.658119+00:00",
-  "kaynak_commit": "36b76585e161a07208a1f57862405051b2daa96e",
+  "derlendi": "2026-08-31T07:19:21.257205+00:00",
+  "kaynak_commit": "785b13c4e7c3ef65635aa13e9eb90b11df14b9f9",
   "surum": 1
 }
