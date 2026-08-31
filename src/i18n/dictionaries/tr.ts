@@ -492,13 +492,6 @@ export const tr = {
           point1: 'Jet fan ve duman egzoz geçişleri',
           point2: 'Yüksek debi ve güvenli yönlendirme'
         },
-        kitchen: {
-          eyebrow: 'Mutfak Senaryosu',
-          title: 'Endüstriyel mutfak egzozu ve kanal akışı',
-          description: 'Yağ buharı, koku yönetimi ve kanal tipi fan ihtiyacında daha doğru ürün ailesine senaryo odaklı ilerleyin.',
-          point1: 'Kanal tipi fan odaklı başlangıç',
-          point2: 'Davlumbaz ve egzoz uyum mantığı'
-        },
         entrance: {
           eyebrow: 'Giriş Konforu',
           title: 'Mağaza girişi ve hava perdesi çözümleri',

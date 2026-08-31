@@ -432,13 +432,6 @@ export const en: typeof tr = {
           point1: 'Jet fan and smoke exhaust entry points',
           point2: 'High airflow and safe routing'
         },
-        kitchen: {
-          eyebrow: 'Kitchen Scenario',
-          title: 'Industrial kitchen exhaust and duct flow',
-          description: 'Advance toward the right product family with a scenario-led path when grease vapor, odor control and duct fan needs matter.',
-          point1: 'Duct fan-led starting point',
-          point2: 'Hood and exhaust alignment logic'
-        },
         entrance: {
           eyebrow: 'Entrance Comfort',
           title: 'Store entrance and air curtain solutions',

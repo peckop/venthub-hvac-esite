@@ -5,13 +5,21 @@ import React from 'react'
 import { localizedHref, Routes } from '@/utils/routes';
 
 interface SolutionItem {
-  id: 'parking' | 'kitchen' | 'entrance' | 'comfort'
+  id: 'parking' | 'entrance' | 'comfort'
   categorySlug: string
   subSlug?: string
   image: string
   span: string
 }
 
+// ⚠ 2026-08-31 — MUTFAK KARTI KALDIRILDI (Recep kararı, REC-94): endüstriyel mutfak
+// aktif işverenin alanı, vitrine şimdi çıkmıyor. Bölüm üç senaryoyla kalıyor
+// (otopark / giriş / konfor) ve span'lar 3'lü grid'e uyarlandı: eskiden 2+1+1+2 = 6
+// kolon (iki tam satır) idi; kart çıkınca 2+1+2 = 5 kolon kalır ve lg'de satır
+// TAŞARDI (üç kolonluk grid'de 5 kolon = boşluklu ikinci satır). Yeni düzen lg'de
+// üç eşit kart (1+1+1), sm'de her kart tam satır (2) — iki kırılımda da boşluk yok.
+// Sözlükteki `items.kitchen` de silindi: ölü anahtar INV-6 kapısında kırmızı verir.
+//
 // Yollar Routes.category() builder'ından kurulur (SSOT); dil öneki render anında
 // localizedHref ile eklenir. Sabit '/category/...' string'i = SSOT + localize kaçağı.
 // ⚠ 2026-08-28 — SLUG'LAR KATALOG OMURGASI MIGRATION'INA GÖRE YENİLENDİ (REC-56).
@@ -27,29 +35,20 @@ const solutions: SolutionItem[] = [
     categorySlug: 'fans',
     subSlug: 'parking-jet-fan',
     image: '/images/bento/parking.jpg',
-    span: 'sm:col-span-2 lg:col-span-2'
-  },
-  {
-    // Eski değer 'industrial-ventilation'/'duct-type-fans' idi; alt slug DB'de HİÇ yoktu,
-    // yani bu kart migration'dan ÖNCE de kırıktı. Doğru karşılığı: fans/duct-fans.
-    id: 'kitchen',
-    categorySlug: 'fans',
-    subSlug: 'duct-fans',
-    image: '/images/bento/kitchen.jpg',
-    span: 'sm:col-span-1 lg:col-span-1'
+    span: 'sm:col-span-2 lg:col-span-1'
   },
   {
     // 'air-curtains' artık ALT değil ANA kategori — alt slug verilmez.
     id: 'entrance',
     categorySlug: 'air-curtains',
     image: '/images/bento/entrance.jpg',
-    span: 'sm:col-span-1 lg:col-span-1'
+    span: 'sm:col-span-2 lg:col-span-1'
   },
   {
     id: 'comfort',
     categorySlug: 'heat-recovery-vmc',
     image: '/images/bento/comfort.jpg',
-    span: 'sm:col-span-2 lg:col-span-2'
+    span: 'sm:col-span-2 lg:col-span-1'
   }
 ]
 

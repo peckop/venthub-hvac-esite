@@ -6,7 +6,7 @@ source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\en.ts
 skeleton_hash: 065327dc5d8ae655
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-31T11:45:43Z
+generated_at: 2026-08-31T11:56:53Z
 ---
 
 ## Genel Bakış
