@@ -190,6 +190,55 @@ if (source === 'compact') {
   }
 }
 
+/**
+ * ⭐BELGESİZ COMMIT SAYACI — kabul edilmiş bir eksik SESSİZ kalmamalı (2026-08-31, REC-67).
+ *
+ * Companion üreteci 08-28'de durdu (model sağlayıcı anahtarı 401, havuz boş) ve **üç gün**
+ * fark edilmedi. Taşıyıcıyı açmak Recep'in kararıydı ve *"kapalı kalsın"* dedi — yani
+ * bayatlık artık **bilinen ve kabul edilmiş eksik**. Kabul edilmiş bir eksiğin tek şartı:
+ * GÖRÜNÜR olması.
+ *
+ * NİÇİN BURADA: kaydı `post-commit` yazıyor ama o **arka planda koşan bir alt kabuk**
+ * (`( … ) &`) — çıktısı komut isteminden sonra düşer ve pratikte kimse görmez. Ölçülmüş
+ * gerçek: üç gün boyunca kimse görmedi. Oturum açılışı, bir ajana GERÇEKTEN ulaşan kanaldır.
+ *
+ * ⚠SAYI DEĞİL EĞİLİM önemli: sayaç durmadan büyüyorsa kabul edilmiş eksik BÜYÜYEN bir borca
+ * dönüşmüştür ve karar yeniden Recep'e gitmelidir. Bu yüzden ilk tarih de basılır.
+ */
+try {
+  const defterModul = require(path.join(__dirname, '..', '..', '.githooks', 'lib', 'companion-defter.cjs'))
+  const gitDirs = []
+  try {
+    gitDirs.push(
+      execFileSync('git', ['rev-parse', '--absolute-git-dir'], {
+        cwd: input.cwd || process.cwd(),
+        encoding: 'utf8',
+        timeout: 10000,
+      }).trim(),
+    )
+  } catch {
+    /* git okunamadı — sayaç atlanır, oturum bloklanmaz */
+  }
+  for (const gd of gitDirs.filter(Boolean)) {
+    const { kayitlar, bozuk } = defterModul.defterOku(path.join(gd, defterModul.DEFTER_ADI))
+    if (!kayitlar.length) continue
+    const ilk = String((kayitlar[0] || {}).ts || '').slice(0, 10)
+    const tasiyicisiz = kayitlar.filter((k) => k.sebep === 'tasiyici-yok').length
+    const dosya = kayitlar.reduce((a, k) => a + (Number(k.dosya) || 0), 0)
+    context +=
+      '⚠COMPANION BELGESIZ: ' + kayitlar.length + ' commit belge URETMEDI' +
+      (ilk ? ' (ilk: ' + ilk + ')' : '') + ' — ' + tasiyicisiz + ' tanesi TASIYICISIZLIK, ' +
+      'toplam ' + dosya + ' dosya belgesiz.\n' +
+      '  Tasiyici KAPALI ve bu RECEP IN KARARI (2026-08-31, "kapali kalsin") — ariza DEGIL, ' +
+      'KABUL EDILMIS EKSIK.\n' +
+      '  Bu satirin isi eksigi gorunur tutmak. Sayi durmadan buyuyorsa karar Recep e YENIDEN ' +
+      'goturulur; kendi basina ACMA.\n' +
+      (bozuk ? '  UYARI: defterde ' + bozuk + ' bozuk satir atlandi.\n' : '')
+  }
+} catch {
+  /* defter modülü yok/bozuk: oturum açılışı bundan etkilenmez */
+}
+
 try {
   const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
   const live = board.liveClaims()
