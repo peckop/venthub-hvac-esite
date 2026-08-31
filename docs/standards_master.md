@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-30T19:58:55.671504+00:00
+compiled_at: 2026-08-31T06:39:36.642952+00:00
 total_compiled_files: 62
-source_commit: ba9ed216
+source_commit: eeb98620
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -14946,6 +14946,63 @@ tek tek koşulduğunda hüküm çürüdü:
 **Genel ders:** bir süzgece ekleme yapmak, "gürültüyü azaltmak" değil **görüş alanını
 daraltmak**tır. Daraltmanın neyi kestiğini ölçmeden yapılan her ekleme, kaybı sessiz
 kılan bir kapıdır.
+
+---
+
+## AXIOM 9 — İLAN EDİLMEMİŞ artefaktın tazeliği ÖLÇÜLEMEZ; ölçülemeyen bayatlık "taze" değildir
+
+### Ölçülmüş boşluk (2026-08-31, REC-84)
+
+Kapı A tek yönü soruyordu: *"ilan edilen her artefakt depoda **İZLENEN** bir dosya mı?"*
+Ters yönü **hiç kimse sormuyordu**: *"depodaki üretilmiş bir dosya **ilan edilmiş** mi?"*
+
+Sonuç sessiz bir kör nokta. `docs/artefakt_manifest.json` **üretilmiş** bir dosyadır
+(`orion doc build` yazar) ve yalnız **kendi derlediği** dört artefaktı sayar. Başka
+üreteçlerin ürettiği artefaktlar manifestte hiç görünmez — görünmedikleri için
+bayatlıkları **ölçülemez**. AXIOM 4 gereği bu "taze" sayılamaz.
+
+Ölçüm **üç** gerçek kalem buldu:
+
+| dosya | üreteç | damga |
+|---|---|---|
+| `docs/database_schema_master.md` | `orion doc schema` | `compiled_at` |
+| `docs/system_tree.md` | `orion doc tree` | `compiled_at` + "otonom olarak derlenmiştir" |
+| `docs/venthub_skills_master.md` | `scripts/compile_skills.py` | "Generated automatically from" |
+
+⚠ `docs/system_tree.md` ayrıca **AXIOM 7 vakası**: manifest onu `kaynak.dosyalar` içinde
+**KAYNAK** olarak tanıyor, **ÜRÜN** olarak tanımıyor. Çift rollü dosya ilan kapsamında
+**yarım** görünüyor.
+
+### "Manifeste elle ekle" ÇÖZÜM DEĞİLDİR
+
+Manifest üretilmiş bir dosyadır: elle satır eklemek **AXIOM 3** ihlalidir ve bir sonraki
+derlemede silinir. Gerçek çözüm üreteç tarafındadır (ilan mekanizmasının `orion doc build`
+hattı dışındaki artefaktları da kapsaması) — **ORION kalemi**, bu depoda kapatılamaz.
+
+### Bu depoda kapatılabilen: BOŞLUĞU GÖRÜNÜR ve SINIRLI kılmak
+
+- **Kapı:** `src/__tests__/conformance/uretilmis-artefakt-ilan-kapsami.test.ts` (INV-DOC-7).
+  Üretim damgası taşıyan her izlenen `docs/**.md` ya manifestte ilan edilmiş olacak ya da
+  gerekçeli bir istisna kaydında duracak.
+- **Kayıt:** `docs/artefakt-ilan-istisnalari.json` — her kalem için üreteç, damga, **niçin
+  ilan edilemiyor**, hangi tarafta kapanacak, sahibi ve iş kaydı. Alanlar zorunlu; gerekçe
+  40 karakterden kısa olamaz — **muafiyet gerekçesiz verilmez.**
+- Kayıt **bayatlamaz**: her satır HEAD'de var olan ve **hâlâ damgalı** bir dosyayı
+  göstermek zorunda. Ayrıca bir dosya hem ilan edilmiş hem istisna **olamaz** (çelişki kolu).
+- Böylece boşluk **kapanmaz ama SESSİZ BÜYÜMEZ**: yeni bir ilan-dışı artefakt kırmızı verir.
+
+### Ölçüt niçin DAMGA, niçin BAŞLIK BÖLGESİNDE — iki ölçülmüş yanlış-pozitif
+
+- **İsim-tabanlı olsaydı** (AXIOM 8): `docs/design_system_config.md` elle tutulan bir
+  aynadır (üreteci **yok**), isimden "üretilmiş" sanılırdı.
+- **Gövdede aransaydı**: `docs/standards/product-schema-standard.md` yanlış-pozitif verdi —
+  orada *"otomatik üretilmiş"* ifadesi **ürün açıklamalarını** anlatıyor, dosyanın kendisini
+  değil. Bu yüzden damga yalnız ilk 40 satırda aranır ve ifadeler **üretece özgüdür**.
+
+⚠ **ADIYLA ARTIK RİSK:** damgasız üretilen bir dosya bu kapıdan **görünmez**. Risk
+teorik değil, **örneği var**: `docs/venthub_hvac_master.md` ilan edilmiş olduğu hâlde
+hiçbir damga taşımıyor — ilan edilmemiş olsaydı kapı onu **yakalamazdı**. İsim ölçütüne
+dönmek bu riski azaltmaz, yukarıdaki iki yanlış-pozitifi geri getirir.
 
 
 ---
