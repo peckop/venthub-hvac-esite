@@ -78,14 +78,20 @@ export const TERMINAL_K = {
 export const TERMINAL_K_TOPLAM = TERMINAL_K.menfez + TERMINAL_K.klape + TERMINAL_K.disPanjur
 
 /**
- * Colebrook-White denklemini çözer → Darcy sürtünme faktörü.
+ * Calculates the Darcy friction factor by solving the Colebrook-White equation.
  *
- * Denklem örtüktür (f iki tarafta); sabit nokta iterasyonu kullanılır — 1/√f için
- * yakınsama hızlıdır ve 20 adımda makine hassasiyetine yaklaşır.
- * Laminer bölgede (Re < 2300) analitik çözüm geçerlidir: f = 64/Re.
+ * The Colebrook-White equation is implicit (f appears on both sides). This function uses
+ * fixed-point iteration to approximate the solution for 1/√f. It converges quickly and
+ * typically reaches near machine precision within 20 iterations. For laminar flow
+ * (Reynolds < 2300), it directly returns the exact analytical solution (64/Re).
  *
- * @param Re Reynolds sayısı
- * @param bagilPuruzluluk ε/D (boyutsuz)
+ * @param Re - The Reynolds number of the flow. Returns 0 if Re is non-positive or invalid.
+ * @param bagilPuruzluluk - The relative roughness of the duct (ε/D, dimensionless).
+ * @returns The calculated Darcy friction factor (dimensionless).
+ *
+ * @example
+ * surtunmeFaktoru(2000, 0.001) // returns 0.032 (Laminar flow, 64/2000)
+ * surtunmeFaktoru(100000, 0.001) // returns ~0.022 (Turbulent flow iterative result)
  */
 export function surtunmeFaktoru(Re: number, bagilPuruzluluk: number): number {
   if (!Number.isFinite(Re) || Re <= 0) return 0
@@ -106,7 +112,17 @@ export function surtunmeFaktoru(Re: number, bagilPuruzluluk: number): number {
   return f
 }
 
-/** Dairesel kanalda verilen debi için akış hızı (m/s). */
+/**
+ * Calculates the air flow velocity in a circular duct given the volumetric flow rate and duct diameter.
+ *
+ * @param debiM3h - Volumetric flow rate in cubic meters per hour (m³/h).
+ * @param capMm - Internal diameter of the circular duct in millimeters (mm).
+ * @returns The average flow velocity in meters per second (m/s). Returns 0 if diameter or area is invalid.
+ *
+ * @example
+ * akisHizi(360, 100) // returns ~12.73 m/s
+ * akisHizi(0, 150) // returns 0 m/s
+ */
 export function akisHizi(debiM3h: number, capMm: number): number {
   if (capMm <= 0) return 0
   const yaricapM = capMm / 2000
@@ -115,12 +131,35 @@ export function akisHizi(debiM3h: number, capMm: number): number {
   return debiM3h / 3600 / alanM2
 }
 
-/** Reynolds sayısı (dairesel kanal). */
+/**
+ * Calculates the Reynolds number for airflow in a circular duct.
+ *
+ * The Reynolds number determines whether the flow is laminar or turbulent.
+ * It is calculated using the established standard kinematic viscosity of air at 20°C.
+ *
+ * @param hizMs - Average flow velocity in meters per second (m/s).
+ * @param capMm - Internal diameter of the duct in millimeters (mm).
+ * @returns The dimensionless Reynolds number.
+ *
+ * @example
+ * reynolds(5, 100) // returns ~33333
+ */
 export function reynolds(hizMs: number, capMm: number): number {
   return (hizMs * (capMm / 1000)) / HAVA_KINEMATIK_VISKOZITE
 }
 
-/** Dinamik basınç ρV²/2 (Pa). Hem sürtünme hem yerel kayıpların ortak çarpanı. */
+/**
+ * Calculates the dynamic pressure (velocity pressure) of the airflow.
+ *
+ * Dynamic pressure represents the kinetic energy of the fluid and acts as the fundamental
+ * multiplier (ρV²/2) for calculating both friction and local resistance losses.
+ *
+ * @param hizMs - Average flow velocity in meters per second (m/s).
+ * @returns The dynamic pressure in Pascals (Pa).
+ *
+ * @example
+ * dinamikBasinc(10) // returns 60 Pa (assuming standard air density of 1.2 kg/m³)
+ */
 export function dinamikBasinc(hizMs: number): number {
   return (HAVA_YOGUNLUGU * hizMs * hizMs) / 2
 }
@@ -150,8 +189,20 @@ export interface BasincDokumu {
 }
 
 /**
- * Verilen debide kanal sisteminin toplam basınç kaybı.
- * Sonuç, seçim motorunda sistem eğrisinin (P = k·Q²) tasarım noktasıdır.
+ * Computes the total pressure loss (friction + local resistances) for a defined ductwork system at a specific flow rate.
+ *
+ * This calculates the operational design point on the system curve (P = k·Q²),
+ * solving Colebrook-White for straight duct friction and summing local `K` factors for fittings
+ * and mandatory terminals (grilles, dampers, louvers).
+ *
+ * @param debiM3h - Volumetric flow rate in cubic meters per hour (m³/h).
+ * @param kanal - Configuration object describing the physical layout and materials of the ductwork.
+ * @returns A detailed breakdown of fluid dynamics metrics and pressure losses (Pa).
+ *
+ * @example
+ * const ductConfig = { uzunlukM: 5, capMm: 150, malzeme: 'galvanized', dirsek90: 2, dirsek45: 0 };
+ * const losses = kanalBasincKaybi(350, ductConfig);
+ * // returns { hizMs: ~5.5, surtunmeKaybiPa: ~12.5, yerelKayipPa: ~117.4, toplamPa: ~129.9, ... }
  */
 export function kanalBasincKaybi(debiM3h: number, kanal: KanalTanimi): BasincDokumu {
   const hizMs = akisHizi(debiM3h, kanal.capMm)
