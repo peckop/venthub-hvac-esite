@@ -4,7 +4,7 @@ import { ChevronRight, Home } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-import { SITE_URL } from '@/config/siteUrl'
+import { canonicalOrigin } from '@/lib/seo/canonicalOrigin'
 import { useI18n } from '@/i18n/I18nProvider'
 import { localizedHref } from '@/utils/routes'
 
@@ -75,7 +75,10 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
             "@type": "ListItem",
             "position": index + 1,
             "name": item.label,
-            "item": item.href ? `${SITE_URL}${localizedHref(item.href, lang)}` : undefined
+            // REC-100: `SITE_URL` bu `'use client'` bileşeninde tarayıcı paketine
+            // `http://localhost:3000` olarak giriyordu — yani BreadcrumbList yapısal
+            // verisi hydrate sonrası localhost adresleri bildiriyordu.
+            "item": item.href ? `${canonicalOrigin()}${localizedHref(item.href, lang)}` : undefined
         }))
     };
 
