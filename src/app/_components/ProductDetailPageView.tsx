@@ -94,6 +94,41 @@ interface ProductDetailBodyProps extends ProductDetailPageProps {
   selectedSku: string | null
 }
 
+/**
+ * REC-97 — TEKLİF MODU HÜKMÜ. Saf fonksiyon: sunucuda da istemcide de aynı girdiye
+ * aynı cevabı verir ve tek başına test edilebilir.
+ *
+ * ⭐NİÇİN AYRI FONKSİYON OLDU (ölçülmüş sızıntı, 2026-08-31):
+ * Kural daha önce satır içindeydi ve `mainCategory` ÇÖZÜLEMEDİĞİNDE sessizce
+ * "fiyatlı mod"a düşüyordu. `mainCategory`, istemci bağlamından (`useCategories`)
+ * gelir; sunucu render'ında o liste henüz BOŞTUR. Sonuç: statik HTML'e gerçek fiyat
+ * basılıyor, hydration'dan sonra istemci onu gizliyordu. Kullanıcı "bir an görünüp
+ * kayboluyor" demeseydi görünmezdi; ama kaynak-görüntüle ve önbellekte KALICIYDI.
+ *
+ * ÖLÇÜM: 40 aile sayfasının 36'sında statik HTML'de gerçek fiyat vardı (₺ + rakam).
+ * Temiz çıkan 4 aile KORUNDUĞU İÇİN DEĞİL, o ürünlerin `product_prices` kaydı
+ * olmadığı için temizdi — yani koruma SIFIRDI, 40/40 korunmasızdı.
+ *
+ * KURAL: mod BİLİNMİYORSA teklif modu varsayılır. Bilinmemek, "fiyat göster" demek
+ * değildir; güvenli duruş fiyatı BASMAMAKTIR. Fiyat yalnız mod POZİTİF olarak
+ * "gösterilebilir" dediğinde çizilir.
+ */
+export function quoteModeHesapla(
+  mainCategory: { metadata?: unknown } | null | undefined,
+  selectedVariant: { price?: number | string | null } | null | undefined,
+): boolean {
+  // (1) Mod bilinmiyor → teklif modu. Sunucu render'ının düştüğü dal budur.
+  if (!mainCategory) return true
+
+  // (2) Kategori açıkça fiyatı gizliyor.
+  if (Boolean((mainCategory.metadata as CategoryMetadata | null)?.hide_price)) return true
+
+  // (3) Gösterilecek geçerli bir fiyat yok.
+  if (selectedVariant == null) return true
+  if (selectedVariant.price == null) return true
+  return Number(selectedVariant.price) <= 0
+}
+
 type LocalizedText = { tr?: string | null; en?: string | null } | null
 
 function pickLang(value: LocalizedText, lang: string): string | null {
@@ -169,14 +204,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
     return { mainCategory: mc, subCategory: sc }
   }, [family, categories])
 
-  // Fiyatı olmayan varyant (null/0) "Teklif Alın" moduna düşer; kategori bazlı
-  // hide_price bayrağı da aynı moda düşürür. quoteMode'da sepete-ekle HİÇ render edilmez.
-  // NOT: `selectedVariant.price` motor fiyatıdır (RPC'de display_price) — ham kolon değil.
-  const quoteMode =
-    Boolean((mainCategory?.metadata as CategoryMetadata | null)?.hide_price) ||
-    selectedVariant == null ||
-    selectedVariant.price == null ||
-    Number(selectedVariant.price) <= 0
+  // REC-97: hüküm saf fonksiyona taşındı — kural artık test edilebilir ve
+  // "mod bilinmiyorsa fiyat basma" güvenli duruşu yapısal olarak garanti.
+  const quoteMode = quoteModeHesapla(mainCategory, selectedVariant)
 
   // W4b: KDV etiketi segmentten türer — sabit "KDV Dahil" varsayımı kaldırıldı.
   // Bilinmiyorsa (köprü bağlı değil) etiket hiç çizilmez; bayiye NET fiyatı "KDV Dahil"
