@@ -9,6 +9,7 @@ import type { Group, Mesh, MeshStandardMaterial } from 'three'
 import { DoubleSide, MathUtils, SRGBColorSpace, Vector3 } from 'three'
 
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
+import { resolveCategoryImageUrl } from '@/lib/images/categoryImage'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -188,14 +189,14 @@ const OrbitalCard: React.FC<{
     }, [isFrontCard, externalShouldShowHint])
 
     // Texture Loading - CORRECT WAY (Cached & Auto-Disposed)
+    // REC-89: adres kurma tek kaynağa taşındı. Buradaki kopya doğruydu ama AYRI bir
+    // kopyaydı — resolver'daki bir düzeltme buraya YANSIMAZDI. `data:` dalı korunuyor:
+    // resolver onu tanımaz, o yüzden karar sırası önce data:, sonra resolver.
     const finalPath = useMemo(() => {
         if (item.categorySlug || !item.image) return null;
-        let p = item.image.trim();
-        if (!p.startsWith('http') && !p.startsWith('/') && !p.startsWith('data:')) {
-            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-            p = `${supabaseUrl}/storage/v1/object/public/category-images/${p}`;
-        }
-        return p;
+        const p = item.image.trim();
+        if (p.startsWith('data:')) return p;
+        return resolveCategoryImageUrl(p);
     }, [item.image, item.categorySlug]);
 
     const triggerAction = useCallback((event?: MouseEvent) => {

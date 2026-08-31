@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\views\category\CategoryLandingView.tsx
-skeleton_hash: decfe188fc865922
+source_path: C:\tmp\vh-urun-rec89\src\views\category\CategoryLandingView.tsx
+skeleton_hash: daefad5484859c96
 entity_hashes:
   func:CategoryLanding: cc9f671a2c4ec223
   func:handleScrollToTarget: ca9eaec6204d6f95
   func:handleShowProducts: 47b7e50dc0139438
   overview: 04f349d9f2569d9e
   style_tokens: f296f474f77270b2
-generated_at: 2026-08-27T07:36:16Z
+generated_at: 2026-08-30T19:07:13Z
 ---
 
 ## Genel Bakış
@@ -138,8 +138,8 @@ graph TD
     CategoryLandingView_tsx__CategoryLanding["CategoryLanding"]
     CategoryLandingView_tsx__handleScrollToTarget["handleScrollToTarget"]
     CategoryLandingView_tsx__handleShowProducts["handleShowProducts"]
-    CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleScrollToTarget
     CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleShowProducts
+    CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleScrollToTarget
 ```
 
 ## NODE ID STANDARD
@@ -169,3 +169,25 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `absolute`, `flex`, `flex-col`, `from-secondary-blue/10`, `gap-16`, `gap-3`, `gap-4`, `gap-8`, `grid`, `grid-cols-1`, `grid-cols-2`, `h-full`, `items-center`, `justify-between`, `lg:grid-cols-2`
 - **Varyant/Responsive:** `:`, `active:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
 - **Yardımcı Sınıflar:** `${disableAnimation`, `${showProducts`, `-inset-10`, `:`, `active:scale-95`, `animate-fadeIn`, `aspect-square`, `blur-3xl`, `border`, `content-auto`, `duration-500`, `duration-hvac-glacial`, `ease-in-out`, `font-black`, `font-bold`
+
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+⭐SESSİZ FAN ANLATISI — TETİKLEYİCİ KATEGORİ DEĞİL **SERİ** (REC-85, Recep kararı 2026-08-28).
+
+Cetvel: `docs/standards/catalog-depth-standard.md` §1.1 (K1.1). Anlatı K1'in yerinde kalır
+(kategori sayfası), ama konusu bir SERİ olduğu için tetikleyicisi de seridir.
+
+NİÇİN: bölüm önce `inline-duct-fans` kategorisine bağlıydı; o kategori pasif ve 0 serili,
+yani koşul HİÇBİR ZAMAN açılmadı — beş bileşenlik anlatı ve sihirbaz kullanıcıya bir kez
+bile görünmedi. Kategoriye (`duct-fans`) taşımak da yanlış olurdu: ölçtüm, o kategoride
+Quiet'in yanında 24 sessiz OLMAYAN model var (Lineo düz 7 · Radon 5 · VORT Commercial 7+5).
+Doğru bağ, anlatının gerçek konusu olan seridir.
+
+Seri kanonik slug ile aranır; `catalog-integrity` slug-unresolved kolu bu sabiti korur.
+```

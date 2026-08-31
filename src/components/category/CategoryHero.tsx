@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import React from 'react'
 
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
+import { resolveCategoryImageUrl } from '@/lib/images/categoryImage'
 import { cn } from '@/lib/utils'
 
 import { useI18n } from '../../i18n/I18nProvider'
@@ -59,9 +60,10 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
     )
   }
 
-  const categoryImageUrl = category.image_url
-    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}`
-    : null
+  // REC-89: adres kurma buradan KALKTI — tek kaynak resolveCategoryImageUrl.
+  // Eskisi image_url'i KOŞULSUZ depo önekiyle sarıyordu; dolu olan iki kayıt yerel
+  // dosya yolu taşıdığı için (`/images/products/...`) sonuç çift eğik çizgili 404'tü.
+  const categoryImageUrl = resolveCategoryImageUrl(category.image_url)
 
   const isMainCategory = !category.parent_id
 

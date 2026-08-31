@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\views\category\SeriesLandingView.tsx
-skeleton_hash: 658f0d9ea0a2cfc5
+source_path: C:\tmp\vh-urun-rec89\src\views\category\SeriesLandingView.tsx
+skeleton_hash: 9f45cb0d2cc5c2e0
 entity_hashes:
   func:SeriesLandingView: 7629549fe574b94e
   overview: afaf8b46a24bca9d
   style_tokens: 168d57f94026ba47
-generated_at: 2026-08-27T07:37:45Z
+generated_at: 2026-08-30T19:07:14Z
 ---
 
 ## Genel Bakış

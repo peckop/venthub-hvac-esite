@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\views\category\CategoryGridView.tsx
-skeleton_hash: d39399f77f45548f
+source_path: C:\tmp\vh-urun-rec89\src\views\category\CategoryGridView.tsx
+skeleton_hash: 779bc62c6812e5b9
 entity_hashes:
   func:CategoryGridView: 18fcb701e0fde17c
   overview: e762b27fc914865e
   style_tokens: 7655619e3195e611
-generated_at: 2026-08-27T07:36:16Z
+generated_at: 2026-08-30T19:07:13Z
 ---
 
 ## Genel Bakış
