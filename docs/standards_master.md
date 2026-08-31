@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T06:39:36.642952+00:00
+compiled_at: 2026-08-31T06:51:18.640012+00:00
 total_compiled_files: 62
-source_commit: eeb98620
+source_commit: 2cca110e
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -8883,6 +8883,67 @@ ana dizin **paylaşılan** bir ağaçtır ve içinde başka bir oturumun commit'
 olabilir. Otomatik bir `pull`/`stash`, tam da bu cetvelin başka yerlerinde yazılı olan
 *"ortak ağaçta commit'siz iş uçar"* sınıfını üretir. İnsan onaylı ritüel, sessiz
 otomasyona **bilerek** tercih edildi: kaybın bedeli, unutmanın bedelinden büyüktür.
+
+---
+
+## 17. ADRES KEŞFEDİLEBİLİRLİĞİ — "sid çözüldü" ≠ "doğru alıcı"
+
+### Üç ölçülmüş vaka, hepsi 24 saat içinde
+
+| # | ne oldu | sonuç |
+|---|---|---|
+| 1 | URUN'ün REC-95 iş emri notu metninde *"OPS'a"* diyordu, sid olarak `ac03ce11` (ALTYAPI) yazılmıştı | **OPS'a hiç ulaşmadı** |
+| 2 | OPS bir notu `venthub-hvac-6b`'ye (ALTYAPI) yazdı, URUN sandı — notun başında *"bu adres URUN penceresiyse"* yazıyordu | yanlış şeride düştü |
+| 3 | #909 için **prod migration GO'su** yine ALTYAPI'ya düştü | onay taşıyan mesaj kayboldu |
+
+Üçünde de araç **başarı** döndürdü. Hiçbirinde hata oluşmadı.
+
+### İki ayrı kök sebep — ve ikisi ayrı ayrı kapanır
+
+**(a) Adres KEŞFEDİLEMİYORDU.** OPS panoda claim tutmuyordu; sid'i panodan bulunamıyor,
+**ezberden** yazılıyordu. Ezber bayatladı.
+→ **Kapandı (2026-08-30):** OPS panoda `cb0467f1 → docs/DURUM-TAKIP.md` olarak görünüyor.
+Gerekçe: **yazılı adres listesi bayatlar, canlı pano kaydı bayatlayamaz — kendini
+tazeler.** Bu yüzden "adres listesi tut" seçeneği reddedildi.
+
+**(b) Oturum ADLARI makine dönüşünde DEĞİŞİYOR — ve mesaj-adres uzayı pano-sid uzayından
+AYRIDIR.** Ölçüldü: `venthub-hvac-b3` (URUN) **ulaşılamaz** hâle geldi, aynı anda pano
+claim'i `4a8eaf9c` **tazeydi**. Yani biri tazelenirken öteki bayatlayabilir.
+
+> **HÜKÜM:** Pano claim'i taze olsa bile **mesaj adresi ayrı bir uzaydır; ikisi AYRI AYRI
+> doğrulanır.** Panoda gördüğün canlılık, gönderdiğin mesajın ulaştığını göstermez.
+
+### Kural
+
+1. **Makine dönüşü sonrası İLK `SendMessage`'tan ÖNCE `ListAgents` ZORUNLU.**
+2. ⭐**`ListAgents` YETMEZ — ad↔şerit eşleşmesi İŞBAŞI NOTUNDAN teyit edilir.** Bu
+   maddenin kaynağı bir öz-düzeltmedir: OPS `ListAgents` koşmuştu ama hangi adın hangi
+   şerit olduğunu **varsaydı** ve yine yanlış şeride yazdı. Kuralın eksik yarısı buydu.
+3. **Adres yanlışsa içerik AKTARILMAZ.** Geri alınamaz sınıfta (migration = prod yazımı)
+   akran aktarımı onay yerine **geçmez**; yanlış adrese düşen bir GO, düştüğü şerit
+   tarafından **taşınmaz** — yalnız *"teslimat kayboldu, kendi kanalından al"* denir.
+   (Vaka 3 böyle kapatıldı.)
+
+### Aracın yanıltan çıktısı — ve ailesi
+
+`not birakildi → oturum ac03ce11 (kisaltmadan cozuldu)`
+
+Bu satırın doğruladığı **tek** şey *"bu sid'i çözdüm"*dür. *"Bu sid OPS'tur"* kısmını
+gönderen **varsaydı**; araç onu hiç doğrulamadı.
+
+> **Başarılı teslimat, DOĞRU ALICI kanıtı değildir.**
+
+Aynı ailenin bu depoda ölçülmüş öbür üyeleri:
+
+- `exit 0` + *"talep alındı"* derken `--globs`'un sessizce düşmesi (§14).
+- `is_active = true`'yu **görünürlük** kanıtı sanmak (canlı menüde 0 link, sitemap'te 0 kayıt).
+- `"status": "SUCCESS"` derken gövdede `Başarılı: 0, Başarısız: 1` (companion üreteci).
+
+Ortak biçim: **araç başarı döndürür, biz aracın doğrulamadığı bir cümleyi ona söyletiriz.**
+
+**İYİLEŞTİRME ADAYI (`scripts/board/**`, ALTYAPI):** `note` çıktısı alıcının **şerit
+adını** da bassın — `not birakildi → OPS [cb0467f1]` gibi. O zaman vaka 1 gönderildiği
+anda görünürdü.
 
 
 ---
