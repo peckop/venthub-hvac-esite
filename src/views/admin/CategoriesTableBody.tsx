@@ -430,7 +430,18 @@ const CategoriesTableBody: React.FC = () => {
           <div className="relative w-12 h-12 rounded-admin-md border border-admin-border overflow-hidden bg-admin-surface group-hover:border-admin-border transition-colors duration-500">
             {r.image_url ? (
               <VentImage
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
+                /* REC-89 — GERİLEME KORUYUCUSU (tek satır, TAM çözüm değil).
+                 * Kategori görselleri migration'ı `image_url`'e TAM ADRES yazıyor
+                 * (https://...supabase.co/.../product-images/...). Aşağıdaki elle
+                 * kurma o değeri de sarmalayıp `.../category-images/https://...`
+                 * üretirdi → admin panelinde 19 kategorinin görseli KIRIK görünür,
+                 * yani "işin sonucu göründü mü" sorusuna panelden bakan kişi YANLIŞ
+                 * cevap alırdı. İşin kırdığı yüzeyi aynı iş onarır.
+                 * Tam çözüm (bu satırın `resolveCategoryImageUrl`e taşınması) ADMIN
+                 * şeridinde — burada yalnız gerilemeyi durduruyorum. */
+                src={/^https?:\/\//i.test(r.image_url) || r.image_url.startsWith('/')
+                  ? r.image_url
+                  : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
                 alt=""
                 fallbackType="category"
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
