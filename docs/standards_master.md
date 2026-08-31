@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T07:07:03.039564+00:00
+compiled_at: 2026-08-31T07:23:54.031620+00:00
 total_compiled_files: 62
-source_commit: 36b76585
+source_commit: 060e9040
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -14882,6 +14882,45 @@ Sebebi **ayrıca** ölçülür. 2026-08-26'da üç yeşil sabotajın:
 - biri **testin kendi körlüğüydü** (yukarıdaki `CliRunner` vakası).
 
 Ölü kodu "önlem" diye bırakmak, okuyana **var olmayan bir koruma** vaat eder.
+
+### ⭐Karşı yön: yeşil kalan sabotaj GERÇEKTEN körlükse, sebebi genellikle SINIRDIR
+
+**Ölçülmüş vaka (2026-08-31, `catalog-integrity-gate`).** Kapının hızı şüpheliydi
+(0,995 sn) ve sabotaj ritüeli koşuldu. Sonuç: kapı **boş değildi** — karar mantığını
+(taban farkı, çıkış kodları) fikstürle gerçekten ölçüyordu. Ama **bir kolu kördü** ve
+körlüğün sebebi mantık değil **dilim sınırıydı**.
+
+Kol, betikteki bir kuralın gövdesini `id: '<kural>'` başlangıcından **elle yazılmış başka
+bir kural adına** kadar kesiyordu. Araya üçüncü bir kural girmişti: blok **3848 bayt ve
+İKİ kural** içeriyordu, aranan dize orada **iki kez** geçiyordu — biri komşu kuraldan.
+İki sabotaj da yeşil geçti:
+
+| sabotaj | sonuç | niçin |
+|---|---|---|
+| alt sorguya `and false` eklendi (sayım daima 0) | ⚠**yeşil** | dize yerinde; ölçüt **varlık** ölçüyordu, **anlam** değil |
+| alt sorgu tamamen silindi (`0::int as cocuk`) | ⚠**yeşil** | dize **komşu kuraldan** geliyordu |
+
+İkinci hâl daha kötüsüdür: o kol, komşu kural var olduğu sürece **kırmızı olamazdı**.
+Sabotajın bozduğu şey ise kozmetik değildi — kural "çocuğu olan aile" ile "ölü kabuk"u
+ayırt etmeyi bırakıyordu; cetvelin kendi notuna göre bu ayrım 2026-08-23'te **yanlış bir
+silme kararı üretmiş ve son anda durdurulmuştu.**
+
+**Üç kural çıktı:**
+
+1. **Kaynak tarayan bir kolun bloğu HESAPLANIR, elle yazılmaz.** Sınır "sıradaki kural"
+   olmalı; elle yazılmış sınır, araya yeni bir kural eklendiği anda sessizce bozulur ve
+   bozulduğunu hiçbir şey söylemez.
+2. **Ölçüt VARLIK değil ŞEKİL olmalı.** `toContain('<dize>')` bir ifadenin *bulunduğunu*
+   söyler, *ne yaptığını* söylemez. İfadenin tam şekli sabitlenirse `and false` sınıfı da
+   yakalanır.
+3. **Yasağı koyan kol, kendi metnine takılmamalı.** Bu vakada yasak iki kez kendi
+   dosyasını yakaladı: önce vacuous-guard örneğine, sonra açıklama yorumuna. Örnek
+   parçalı kurulur, prose'a düz yazılmaz.
+
+⚠ **Adıyla kalan sınır:** kaynak taraması SQL **semantiğini** hiçbir şekilde doğrulamaz.
+Kuralların gerçek davranışı yalnız **canlı DB'ye bakan CI işi** tarafından ölçülür; hızlı
+yol (fikstür) bilerek yalnız karar mantığını kapsar. Bu bir eksik değil, **kapsam
+sınırıdır** — ama yazılı olmadıkça "kapı bu kuralı ölçüyor" sanılır.
 
 ---
 
