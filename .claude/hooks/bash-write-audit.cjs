@@ -214,11 +214,34 @@ function agaclariCoz() {
 
 const { kaynaklar, kimlikSayisi, sebep } = agaclariCoz()
 const denetlenecek = [...kaynaklar.keys()]
-/** Bu ağaç kümeye YALNIZ ortak-ana olduğu için mi girdi? (yani bu şeride atfedilemez) */
-const yalnizOrtak = (agac) => {
-  const k = kaynaklar.get(agac)
-  return Boolean(k && k.size === 1 && k.has(ORTAK_ANA))
-}
+/**
+ * ⭐ORTAK-ANA BASKINDIR — cwd ve kimlik onu BASTIRAMAZ (2026-08-31 akşamı, §20).
+ *
+ * İlk yazımda ölçüt `kaynak sayısı === 1 && ortak-ana` idi: "bu ağaç kümeye YALNIZ ortak-ana
+ * olduğu için girdiyse bu şeride atfedilemez". Aynı gün ölçtüm ve **kol fiilen hiç devreye
+ * girmiyordu**: bu ortamda Bash cwd'si sessizce ana dizine resetlenir (§9), dolayısıyla ortak
+ * ana ağaç neredeyse HER TURDA `cwd` kaynağıyla da kümeye giriyor → `size === 2` → ayrı muamele
+ * kapalı. Yani "SAHİBİ ÖLÇÜLMEDİ" raporu ve bloklamama davranışı, yazıldığı gün ölü doğmuştu.
+ *
+ * Kanıt (kendi tabanımdan): ortak ağaç denetlendi ve 5 yol tabana girdi — ama `cwd` orada
+ * olduğu için ortak-ağaç kolu değil, DİKİŞ YERİ kolu geçerliydi.
+ *
+ * ⭐DÜZELTME BİR TERCİH DEĞİL, §19'un ZORUNLU SONUCU: "ana dizin hiçbir şeridin DEĞİLDİR."
+ * O hüküm doğruysa, ortak ağaç için cwd de kimlik de sahiplik kanıtı ÜRETEMEZ:
+ *   · `cwd` orada olması = **resetin artığı**, niyetin değil.
+ *   · kimlik orada olması = **yarışın kazananı** (ölçüldü: aynı dosya bir gün içinde iki farklı
+ *     oturumun sid'ini taşıdı; sonuncusu bu şeridin merge'inden BİR DAKİKA sonra yazılmıştı).
+ * İkisi de "kim yazdı" sorusunu cevaplamaz. Bu yüzden ortak-ana etiketi DİĞER BÜTÜN
+ * KAYNAKLARI EZER.
+ *
+ * ⚠KABUL EDİLEN BEDEL, ADIYLA: ortak ağaçta yapılan GERÇEK bir şerit ihlali artık `exit 2` ile
+ * BLOKLAMAZ, yalnız görünür uyarı verir. Bilerek: (a) atfedemediğimiz bir kir için bu oturumun
+ * Bash'ini durdurmak yanlış hüküm verir ve alarmı üç günde körleştirir (bu dosyanın kendi
+ * tarihi); (b) yaptırım yolu KAPALI DEĞİL — `lane-precommit` (E1) commit anında hâlâ bloklar ve
+ * kimliğini env'den ASIL kanıt olarak alır. Yani ortak ağaçta kaybedilen şey bloklama değil,
+ * yalnızca YANLIŞ ADRESE yazılmış bir bloklamadır.
+ */
+const ortakAgacMi = (agac) => Boolean(kaynaklar.get(agac)?.has(ORTAK_ANA))
 
 if (!denetlenecek.length) {
   uyarilar.push(
@@ -600,7 +623,7 @@ const ortakKalemler = []
 if (yeniler.length) {
   const kalanlar = []
   for (const y of yeniler) {
-    if (!yalnizOrtak(y.agac)) {
+    if (!ortakAgacMi(y.agac)) {
       kalanlar.push(y)
       continue
     }

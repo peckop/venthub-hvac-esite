@@ -231,11 +231,21 @@ describe('INV-BASH-WRITE-2 · bash-write-audit hangi ağacı denetliyor', () => 
       'kimlik yoksa denetim yanlış ağacı ölçüyor OLABİLİR; bunu bastırmak "kapı koştu" ile ' +
         '"kapı boşa koştu"yu ayırt edilemez yapar',
     ).toContain('KIMLIK YOK')
-    expect(
-      r.status,
-      'ABSANS KANITI: kimliksiz koşum gerçekten bir ağacı okuduğunu göstermeli, yoksa "uyardım ve ' +
-        'hiçbir şey ölçmedim" hâli yeşil görünür',
-    ).toBe(2)
+    /**
+     * ⭐ABSANS KANITI DEĞİŞTİ, ZAYIFLAMADI (2026-08-31 akşamı, §20).
+     *
+     * Bu kol önce `exit 2` bekliyordu. Ortak-ana baskınlığıyla ana dizin artık BLOKLAMIYOR
+     * (gerekçe: atfedemediğimiz kir için bu oturumun Bash'ini durdurmak yanlış hüküm verir).
+     * Dolayısıyla eski ölçüt bu ağaç için geçersiz — ama kolun AMACI aynı: "hiçbir şey
+     * ölçmedim" hâli yeşil görünmemeli.
+     *
+     * Yeni ölçüt aynı gücü verir: kirli dosya ADIYLA raporlanmış olmalı. Boş koşum bunu
+     * üretemez. `exit 2` biçimindeki absans kanıtı KAYBOLMADI — ortak OLMAYAN ağaç için
+     * aşağıdaki "cwd AĞACI KÜMEDE" kolu onu ayrıca sabitliyor.
+     */
+    expect(r.stderr, 'ABSANS KANITI: okunan kir ADIYLA raporlanmali').toContain(CLAIM_YOLU)
+    expect(r.stderr, 'ortak agac oldugu icin atif iddia edilmemeli').toContain('SAHIBI OLCULMEDI')
+    expect(r.status, 'ortak agac bloklamaz (§20)').toBe(0)
   })
 
   /**
@@ -317,6 +327,48 @@ describe('INV-BASH-WRITE-2 · bash-write-audit hangi ağacı denetliyor', () => 
 
     expect(r.stderr, 'uretec ciktisi ORTAK AGAC UYARISI na girmemeli').not.toContain('modul.md')
     expect(r.status).toBe(0)
+  })
+
+  /**
+   * ⭐ORTAK-ANA BASKINDIR — bu iki kol, ilk yazımın ÖLÜ DOĞMUŞ olduğunu gösteren boşluğu kapatır.
+   *
+   * İlk ölçüt "kaynak sayısı === 1 && ortak-ana" idi. Ölçüldü: bu ortamda Bash cwd'si sessizce
+   * ana dizine resetlenir, dolayısıyla ortak ağaç neredeyse her turda `cwd` kaynağıyla DA kümeye
+   * girer → sayı 2 → ayrı muamele hiç devreye girmez. Yani "SAHİBİ ÖLÇÜLMEDİ" raporu yazıldığı
+   * gün çalışmıyordu ve bunu ancak canlı taban dosyasına bakınca gördüm.
+   *
+   * Düzeltme §19'un zorunlu sonucu: ana dizin hiçbir şeridin değilse, cwd'nin orada olması
+   * (resetin artığı) ve kimliğin orada olması (yarışın kazananı) sahiplik kanıtı ÜRETEMEZ.
+   */
+  it('⭐ORTAK-ANA BASKIN (cwd): cwd ANA DİZİN olsa bile ortak ağaç muamelesi görür, BLOKLAMAZ', () => {
+    const k = kur('baskin-cwd')
+    // Kimlik hiçbir yerde; cwd VARSAYILAN olarak k.ana — yani ortak ağaç kümeye cwd ile de girer.
+    expect(auditKostur(k).status, 'ilk tur taban kurar').toBe(0)
+    dosyaYaz(`${k.ana}/${CLAIM_YOLU}`, 'export const b = 1\n')
+
+    const r = auditKostur(k)
+
+    expect(r.stderr, 'ortak agac raporu cwd yuzunden BASTIRILMAMALI').toContain('ORTAK AGAC UYARISI')
+    expect(r.stderr).toContain('SAHIBI OLCULMEDI')
+    expect(
+      r.status,
+      'cwd nin orada olmasi resetin artigidir, sahiplik kaniti DEGIL — bloklamamali',
+    ).toBe(0)
+  })
+
+  it('⭐ORTAK-ANA BASKIN (kimlik): ortak dizine kimlik yazılmış olsa bile ortak sayılır', () => {
+    const k = kur('baskin-kimlik')
+    kimlikYaz(k, k.ana) // ana deponun git dizini = ORTAK dizin; yarışın kazananını taklit eder
+
+    expect(auditKostur(k, k.wtB).status, 'ilk tur taban kurar').toBe(0)
+    dosyaYaz(`${k.ana}/${CLAIM_YOLU}`, 'export const b = 2\n')
+
+    const r = auditKostur(k, k.wtB)
+
+    expect(r.stderr, 'kimlik ortak dizinde olsa da ortak agac muamelesi surer').toContain(
+      'ORTAK AGAC UYARISI',
+    )
+    expect(r.status, 'kimlik yarisin kazanani, sahiplik kaniti DEGIL — bloklamamali').toBe(0)
   })
 
   it('⭐cwd AĞACI KÜMEDE: kimlik hiçbir yerde ama cwd nin ağacındaki ihlal GÖRÜLÜR', () => {

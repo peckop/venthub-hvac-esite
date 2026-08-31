@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T11:46:44.173422+00:00
+compiled_at: 2026-08-31T19:54:05.591001+00:00
 total_compiled_files: 62
-source_commit: e6fa95f6
+source_commit: 3ae518d7
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9080,10 +9080,33 @@ denetim "sahibi var" sanıp hayalete atfeder.
 7. **E1 bloklanmaz** — ölçüldü: `kimlik.cjs` ASIL kanıtı `CLAUDE_CODE_SESSION_ID` env'inden alır
    (dosya yalnız **vekil**), ve o env Claude Code kabuğunda **doludur**. Ortak ağaçta kimlik
    "yok" olur, E1 fail-open + **görünür** uyarı verir — yanlış şerit adına karar vermekten iyidir.
+8. ⭐**ORTAK-ANA BASKINDIR — `cwd` ve kimlik onu BASTIRAMAZ.** Bir ağaç ortak ana ağaçsa, kümeye
+   başka kaynaklarla da girmiş olsa bile **ortak** sayılır. Madde 1–4'ün zorunlu sonucu: ana
+   dizin hiçbir şeridin değilse, orada `cwd` bulunması **resetin artığıdır** (§9) ve kimlik
+   bulunması **yarışın kazananıdır** — ikisi de "kim yazdı" sorusunu cevaplamaz.
+
+### ⚠Madde 8, ÖLÇÜLMÜŞ BİR ÖLÜ DOĞUMUN DÜZELTMESİDİR
+
+İlk uygulama ölçütü *"kaynak sayısı === 1 **ve** ortak-ana"* idi. Aynı gün ölçüldü ve
+**kol fiilen hiç devreye girmiyordu**: Bash cwd'si ana dizine resetlendiği için ortak ağaç
+neredeyse her turda `cwd` kaynağıyla **da** kümeye giriyor → sayı 2 → ayrı muamele kapalı.
+Yani *"SAHİBİ ÖLÇÜLMEDİ"* raporu ve bloklamama davranışı **yazıldığı gün ölü doğmuştu**.
+
+Kanıt kod okumasından değil **canlı taban dosyasından** geldi: ortak ağaç denetleniyordu ve
+5 yol tabana girmişti, ama `cwd` orada olduğu için geçerli olan kol dikiş-yeri koluydu.
+
+⚠**Kabul edilen bedel, adıyla:** ortak ağaçtaki GERÇEK bir şerit ihlali artık `exit 2` ile
+bloklamaz. Bilerek: atfedemediğimiz bir kir için Bash'i durdurmak **yanlış hüküm** verir ve
+alarmı körleştirir; yaptırım yolu kapalı değil — `lane-precommit` (E1) commit anında hâlâ
+bloklar. Ortak ağaçta kaybedilen şey bloklama değil, **yanlış adrese yazılmış** bloklamadır.
+
+⭐**DERS:** *"kolu yazdım ve kapı yeşil"* onun **çalıştığı** anlamına gelmez. Bir kolun devreye
+girip girmediği, kapının değil **canlı çalışma verisinin** (burada: taban dosyası) sorusudur.
+Ölü doğan kol, hiç yazılmamış koldan daha tehlikelidir: kayıt "korunuyor" der.
 
 ### Kapı
 
-`e1-kimlik-kontrolu.test.ts` (10 kol) + `bash-write-audit-tree.test.ts` (11 kol).
+`e1-kimlik-kontrolu.test.ts` (10 kol) + `bash-write-audit-tree.test.ts` (13 kol).
 **Altı sabotaj, altısı kırmızı** (her biri kurulduğu + sözdiziminin geçerli kaldığı
 doğrulanarak): ortak-ana ağaç kümeye eklenmez · cwd ağacı eklenmez · ortak kolu claim'e
 bağlanır · companion süzgeci sökülür · `onar()` koruması sökülür · `bagliWorktreeMi` alt-dize
@@ -9100,6 +9123,88 @@ aramasına döndürülür.
    doğru sınıflandırmasını **pencere ayrımı** zaten yapıyordu. Söküldü.
 2. **Hiçbir kolun okumadığı taban alanı EKLENMEZ.** Soğurma katmanıyla gelen `agaclar` alanı
    geri alındı; okunmayan bir alan ileride "mekanizma var sanılan" ölü kayda dönüşür.
+
+**Madde 8 kapısı:** iki sabotaj, ikisi kırmızı (sözdizimi geçerli kaldığı doğrulanarak) —
+eski ölçüt geri konur (`size === 1`) → 3 kol kırmızı · `ortak-ana` etiketi hiç eklenmez →
+5 kol kırmızı. Ayrıca **absans kanıtı biçim değiştirdi, zayıflamadı**: "KİMLİK YOK" kolunun
+`exit 2` ölçütü ortak ağaç için geçersizleşti, yerine *"kirli dosya ADIYLA raporlanmış"*
+kondu; `exit 2` biçimindeki kanıt ortak **olmayan** ağaç için ayrı bir kolda korunuyor.
+---
+
+## 20. ÇAKIŞIK PR'A HİÇ KAPI KOŞMAZ — ve ekranda "bekliyor"dan ayırt edilemez
+
+### Ölçülmüş kusur (2026-08-31, İKİ bağımsız vaka)
+
+| vaka | ölçüm |
+|---|---|
+| **#917** (URUN) | 07:29'da açıldı, **09:50'ye kadar 2 sa 21 dk sıfır** Actions koşumu (iki damgayla ölçüldü); yalnız Vercel kolları düştü |
+| **#920** (ALTYAPI) | açılış + `close/reopen` + **iki** `push` (=synchronize) → **üç tetikleyici olayda sıfır** koşum |
+
+Aynı saatlerde **başka dallarda** `pull_request` koşumları normal düştü; `actions/permissions`
+`enabled=true`, workflow'lar `active`, kuyruk **0**. Yani Actions sağlıklıydı — sorun **dala özel**.
+
+### Zincir — tek adımda çıkan teşhis
+
+```
+PR cakisik  ->  mergeable_state = dirty  VE  merge_commit_sha = NULL
+            ->  GitHub refs/pull/<N>/merge referansini URETMIYOR
+            ->  merge-ref'i checkout eden pull_request iskaklari HIC PLANLANMIYOR
+            ->  rollup'ta yalniz Vercel gorunur; GH Actions kollari HIC YOK
+```
+
+**AYIRT EDİCİ TEST (ikisi de koştu):** `workflow_dispatch` ile aynı workflow elle tetiklenir.
+Actions çalışıyorsa koşum başlar **ama** `Checkout` adımında düşer — ve hata mekanizmayı adıyla
+söyler:
+
+```
+fatal: couldn't find remote ref refs/pull/920/merge     (uc deneme, ikisi de ayni)
+```
+
+**Karşı-kanıt hipotezi destekliyor:** aynı gün çakışık olan başka bir PR'ın **11 koşumu vardı** —
+çünkü o **yeşil doğmuştu**, çakışma **sonra** oluştu; koşumlar çakışmadan önce planlanmıştı.
+Yani belirleyici olan "şu an çakışık mı" değil, **"doğduğunda çakışık mıydı"**.
+
+### ⚠NİÇİN TEHLİKELİ — sessizliğin en pahalı biçimi
+
+Boş bir rollup **yeşil değildir**, ama ekranda yeşilden ayırt edilemez: *"kapılar henüz gelmedi"*
+ile *"kapılar KOŞAMAZ"* aynı görünür. Bu hâlde self-merge yapan biri **sıfır kapıyla** merge eder.
+Şeritlerin self-merge yetkisi (2026-08-23) tam olarak "kapılar yeşil" ön koşuluna dayanıyordu.
+
+### HÜKÜM
+
+1. **"Kapılar koşmuyor" gözlemi görüldüğünde İLK ölçülecek şey `mergeable` /
+   `mergeStateStatus`tur.** Teşhis oradan tek adımda çıkar (URUN'un önerisi, iki vakada doğrulandı).
+2. **Self-merge ön koşulu İKİ AYRI ölçüm:**
+   - (a) **yapısal:** `mergeable_state != dirty` **ve** `merge_commit_sha != null`
+   - (b) **varlık:** **en az bir GH Actions kolu görüldü** — Vercel kolları tek başına YETMEZ
+   Destekleyici gösterge: *PR açılışından bu yana X dk geçti ve hiç Actions kolu görünmedi.*
+   Süre önemlidir çünkü "henüz başlamadı" açıklamasını çürüten şey **uzunluktur** (2 sa 21 dk).
+3. **Reçete (iki vakada da çalıştı):** `origin/master` merge → çakışan **üretilmiş artefaktları
+   MASTER sürümüyle** kapat (elle birleştirme AXIOM 3 ihlali) → merge commit → `orion doc build
+   --force-sync` → **iki tarafı pozitif sayımla** doğrula → commit → push. Ardından
+   `merge_commit_sha` hesaplanır ve koşumlar **saniyeler içinde** başlar (25 sn / ~1 dk ölçüldü).
+4. **`workflow_dispatch` bir ÇÖZÜM DEĞİL, TEŞHİS ARACIDIR.** Merge-ref yokken zaten `Checkout`ta
+   düşer; ayrıca `ci` adına eşlenen bir dispatch koşumu branch protection'ı **açar** (ci.yml'in
+   kendi notu) — yani onu "kapıyı geçmek" için kullanmak sıfır kapıyla merge etmenin kapısıdır.
+
+### Taban-tazeleme sürtünmesinin gerekçesi YÜKSELDİ
+
+Bu kalem daha önce "her rebase'de üretilmiş artefakt çakışıyor, can sıkıcı" diye kayıtlıydı.
+Ölçüm gerekçeyi değiştiriyor: sürtünme **kozmetik değil KAPI KAYBI**. Çakışık kalan bir dal
+yalnız zahmet üretmiyor, o dalın **bütün kapılarını sessizce kapatıyor**.
+
+### ⭐İki ders, adıyla
+
+1. **"Bunu ben mi bozdum" açıklaması da bir HİPOTEZDİR** ve tekrar üretilebilirlikle sınanır.
+   URUN ilk kırmızıdan sonra *"sebep benim yaptığım yarış — koşum sürerken PR'ı kapatıp açtım"*
+   dedi ve bunu Recep'e iletti; **ikinci koşum hiçbir şeye dokunmadan aynı hatayı verdi** ve
+   açıklamayı çürüttü. Kendi kusuruna atlamak da ölçülmemiş teşhistir.
+2. **"Yerel test yeşil" ÜRETİM DERLEMESİ için kanıt değildir.** Aynı gün yerel **952/952** yeşilken
+   Vercel derlemesi kırmızı verdi: yeni bir test kolundaki çıplak `require()`
+   (`@typescript-eslint/no-require-imports`) — çünkü `pnpm run build` lint'i `src/` üzerinde
+   **koşar**. `tsc --noEmit` **temizdi** (kod 0): tip kapısı bu sınıfı **görmez**, ayırt eden
+   yalnız lint. `vitest` modülü **çalıştırır**, lint kaynağı **denetler** — iki ayrı ölçüt.
+   Push öncesi kontrol listesine `eslint` girer.
 
 
 ---
