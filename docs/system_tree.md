@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T06:32:10.166070+00:00
+compiled_at: 2026-08-31T21:31:45.323085+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-31T06:32:10.166070+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-31T21:31:45.323085+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -816,6 +816,7 @@ Bu belge, otonom derleyici tarafından 2026-08-31T06:32:10.166070+00:00 tarihind
 │   │   │   └── ✅ `quoteStatusMachine.ts`
 │   │   ├── ✅ `rbac.ts`
 │   │   ├── 📂 **seo/**
+│   │   │   ├── ❌ `canonicalOrigin.ts`
 │   │   │   └── ✅ `jsonld.ts`
 │   │   ├── 📂 **services/**
 │   │   │   ├── ✅ `address.service.ts`
@@ -1094,8 +1095,10 @@ Bu belge, otonom derleyici tarafından 2026-08-31T06:32:10.166070+00:00 tarihind
 ## Eksik Dokümantasyonlar
 - [ ] `src\components\admin\data-table\DataTablePagination.tsx`
 - [ ] `src\lib\images\categoryImage.ts`
+- [ ] `src\lib\seo\canonicalOrigin.ts`
 - [ ] `src\components\admin\data-table\DataTablePagination.tsx`
 - [ ] `src\lib\images\categoryImage.ts`
+- [ ] `src\lib\seo\canonicalOrigin.ts`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.

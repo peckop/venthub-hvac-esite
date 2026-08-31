@@ -2,7 +2,7 @@
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
-import { SITE_URL } from '@/config/siteUrl'
+import { canonicalOrigin } from '@/lib/seo/canonicalOrigin'
 
 interface SeoProps {
   title?: string
@@ -27,8 +27,11 @@ const Seo: React.FC<SeoProps> = ({
   const defaultDesc = 'Premium HVAC ve Havalandırma Çözümleri'
   const finalDesc = description || defaultDesc
   
-  // Construct absolute URLs for social sharing
-  const siteUrl = SITE_URL
+  // Construct absolute URLs for social sharing.
+  // REC-100: burası eskiden doğrudan `SITE_URL` okuyordu. Bu bir `'use client'` bileşeni
+  // olduğu için tarayıcı paketinde o değer `http://localhost:3000`'e düşüyordu ve canlıda
+  // ikinci (yanlış) bir canonical/og üretiyordu. Bkz. `lib/seo/canonicalOrigin.ts`.
+  const siteUrl = canonicalOrigin()
   const url = canonical || `${siteUrl}${pathname}`
   const image = ogImage || `${siteUrl}/og-image.png`
 

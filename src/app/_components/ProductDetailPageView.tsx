@@ -31,8 +31,6 @@ import FamilyCard from '../../components/products/FamilyCard'
 import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
-import Seo from '../../components/Seo'
-import { SITE_URL } from '../../config/siteUrl'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
@@ -410,27 +408,21 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
     )
   }
 
-  // ?sku= canonical'a GİRMEZ — aile URL'i tek kanonik adrestir.
+  // KANONİK ADRES ARTIK BURADA ÜRETİLMİYOR — tek kaynak bu rotanın `generateMetadata`'sı.
+  // (REC-100, 2026-09-01) Buradaki `canonicalUrl` + `<Seo>` çifti, sunucunun ZATEN yazdığı
+  // adresi ikinci kez yazıyordu; canlıda ölçüldü: sayfa başına 2 canonical / 2 og:url /
+  // 2 og:image ve ikincileri `http://localhost:3000` — çünkü `SITE_URL` bu `'use client'`
+  // dosyasının TARAYICI paketinde varsayılana düşüyor.
   //
-  // HOST **SSOT'TAN** GELİR, tarayıcıdan DEĞİL. Eskiden `window.location.origin` okunuyordu
-  // (useState + useEffect); iki ayrı arıza üretiyordu: (1) ilk render'da değer boş olduğu için
-  // canonical `/products/slug` gibi HOST'SUZ çıkıyordu, (2) efekt koştuktan sonra da ziyaret
-  // edilen host'u yazıyordu — önizleme deploy'u, alias, staging ne ise o. Yani kanonik adres
-  // "hangi adresten bakıldıysa" ona dönüşüyordu. Bu, 2026-08-15'te K8 olarak kapatılan arızanın
-  // (her deploy'da değişen kanonik adres) aynı sınıfı, başka kılıkta.
-  // Aynı sayfanın `generateMetadata`'sı da bu adresi SITE_URL'den üretir; ikisi artık BİREBİR
-  // aynı. Bekçi: INV-CANONICAL-1.
+  // Bu satırların taşıdığı kurallar KAYBOLMADI, `generateMetadata`'da yaşıyor ve orada
+  // doğru çalışıyor: `?sku=` kanoniğe girmez (aile URL'i tek adrestir) · host SSOT'tan gelir,
+  // tarayıcıdan DEĞİL (eskiden `window.location.origin` okunurdu ve önizleme/alias/staging
+  // host'u kanoniğe yazılırdı — 2026-08-15'te K8 olarak kapatılan sınıf) · dil öneki ŞART
+  // (T083-VH) ve ELLE birleştirilmez, `localizedHref` ile eklenir (CLAUDE.md kural 7).
+  // Cetvel: docs/standards/canonical-url-standard.md §4 · bekçiler: INV-CANONICAL-1/2.
   //
-  // DİL ÖNEKİ ŞART (T083-VH). #620'de host'u SSOT'a bağlamak yetmemiş: adres hâlâ dil öneksizdi
-  // ve `middleware.ts:86` onu 307 ile `Accept-Language`'a göre seçilen bir dile yönlendiriyordu.
-  // Yani kanonik yine ziyaretçiye göre değişiyordu — bu sefer host değil DİL üzerinden.
-  // Cetvel: docs/standards/canonical-url-standard.md §4 · bekçi: INV-CANONICAL-2.
-  //
-  // Dil öneki ELLE birleştirilmez, `localizedHref` ile eklenir (CLAUDE.md kural 7). İlk
-  // düzeltmemde `${SITE_URL}/${lang}${Routes.product(...)}` yazmıştım ve I18N şeridinin
-  // INV-2 bekçisi bunu SSOT kaçağı olarak yakaladı — haklıydı: altyapı katmanında elle
-  // `/${lang}` birleştirmek, dil öneki kuralının tek merkezden değişmesini imkânsız kılar.
-  const canonicalUrl = `${SITE_URL}${localizedHref(Routes.product(family.slug), lang)}`
+  // ⭐Bu yüzden çözüm "origin'i tarayıcıdan al" DEĞİLDİR: öyle yapmak yukarıdaki K8
+  // arızasını geri getirirdi. Doğru çözüm ikinci yazıcıyı kaldırmaktır.
   const variantDescription = selectedVariant.description || pickLang(family.description, lang)
   const metaDesc = variantDescription || t('pdp.descFallback')
   // T098: ham alan okumasi YASAK — kimlik metni tek cozucuden gelir.
@@ -447,7 +439,14 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 
   return (
     <div className="min-h-screen bg-slate-50/30">
-      <Seo title={`${family.brand_name ?? ''} ${family.name} | ${t('header.brandName') || 'VentHub'}`.trim()} description={metaDesc} canonical={canonicalUrl} />
+      {/* REC-100: <Seo> KALDIRILDI. Bu rotanın `generateMetadata`'sı canonical/og/title'ı
+          ZATEN üretiyor — yukarıdaki yorumun kendi ifadesiyle "ikisi BİREBİR aynı".
+          İkinci kez yazmak canlıda ÇİFT canonical üretiyordu ve istemci paketinde
+          SITE_URL `http://localhost:3000`'e düştüğü için ikincisi YANLIŞ adresi
+          bildiriyordu (ölçüldü: ürün sayfasında 2 canonical / 2 og:url / 2 og:image).
+          Çözüm origin'i değiştirmek DEĞİL — çünkü istemcide `window.location.origin`
+          okumak bu dosyanın yukarıda anlattığı "önizleme host'unu kanonik yazma"
+          arızasını geri getirirdi. Tek doğru kaynak sunucu metadata'sıdır. */}
 
       {/* Seamless Integrated Breadcrumb */}
       <div className="relative z-20">
