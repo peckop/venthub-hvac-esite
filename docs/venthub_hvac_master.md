@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T06:51:18.032049+00:00
+compiled_at: 2026-08-31T07:06:58.509772+00:00
 total_compiled_files: 657
-source_commit: 2cca110e
+source_commit: 151d36a1
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-31T06:51:18.032049+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-31T07:06:58.509772+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -9501,8 +9501,8 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\app\_components\ProductDetailPageView.tsx
-skeleton_hash: 696171e81f07b205
+source_path: C:\tmp\vh-urun-rec89\src\app\_components\ProductDetailPageView.tsx
+skeleton_hash: b74b13f9aa56a24f
 entity_hashes:
   func:PdpSkuBridge: 7eb9545f35ab0fb2
   func:ProductDetailBody: 678d999364789e47
@@ -9516,7 +9516,7 @@ entity_hashes:
   func:toggleSpecSection: aca256fdc4d20ecb
   overview: 590be9a86b563f9f
   style_tokens: d8b7561aa4410d27
-generated_at: 2026-08-28T08:20:43Z
+generated_at: 2026-08-30T17:57:06Z
 ---
 
 ## Genel Bakış
@@ -70671,13 +70671,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\BrandDetailPage.tsx
-skeleton_hash: c0fc4e7743218c78
+source_path: C:\tmp\vh-urun-rec89\src\views\BrandDetailPage.tsx
+skeleton_hash: 9a55cabb905a6337
 entity_hashes:
   func:BrandDetailPage: 658e62bc6ce56cad
   overview: 83474bb2d24aa7c3
   style_tokens: 7d26806290344037
-generated_at: 2026-08-27T07:08:51Z
+generated_at: 2026-08-30T19:07:13Z
 ---
 
 ## Genel Bakış
@@ -72817,13 +72817,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\views\ProductsDiscoveryView.tsx
-skeleton_hash: 1b2e97f908816844
+source_path: C:\tmp\vh-urun-rec89\src\views\ProductsDiscoveryView.tsx
+skeleton_hash: 68da9976021c61b1
 entity_hashes:
   func:ProductsDiscoveryView: 7a88740fc2125f5b
   overview: 76bae810c86fe269
   style_tokens: 8ab4f603b12ea696
-generated_at: 2026-08-27T07:35:23Z
+generated_at: 2026-08-30T19:07:13Z
 ---
 
 ## Genel Bakış
@@ -86740,13 +86740,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\views\category\CategoryGridView.tsx
-skeleton_hash: d39399f77f45548f
+source_path: C:\tmp\vh-urun-rec89\src\views\category\CategoryGridView.tsx
+skeleton_hash: 779bc62c6812e5b9
 entity_hashes:
   func:CategoryGridView: 18fcb701e0fde17c
   overview: e762b27fc914865e
   style_tokens: 7655619e3195e611
-generated_at: 2026-08-27T07:36:16Z
+generated_at: 2026-08-30T19:07:13Z
 ---
 
 ## Genel Bakış
@@ -86866,15 +86866,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\views\category\CategoryLandingView.tsx
-skeleton_hash: decfe188fc865922
+source_path: C:\tmp\vh-urun-rec89\src\views\category\CategoryLandingView.tsx
+skeleton_hash: daefad5484859c96
 entity_hashes:
   func:CategoryLanding: cc9f671a2c4ec223
   func:handleScrollToTarget: ca9eaec6204d6f95
   func:handleShowProducts: 47b7e50dc0139438
   overview: 04f349d9f2569d9e
   style_tokens: f296f474f77270b2
-generated_at: 2026-08-27T07:36:16Z
+generated_at: 2026-08-30T19:07:13Z
 ---
 
 ## Genel Bakış
@@ -87002,8 +87002,8 @@ graph TD
     CategoryLandingView_tsx__CategoryLanding["CategoryLanding"]
     CategoryLandingView_tsx__handleScrollToTarget["handleScrollToTarget"]
     CategoryLandingView_tsx__handleShowProducts["handleShowProducts"]
-    CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleScrollToTarget
     CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleShowProducts
+    CategoryLandingView_tsx__CategoryLanding --> CategoryLandingView_tsx__handleScrollToTarget
 ```
 
 ## NODE ID STANDARD
@@ -87033,6 +87033,29 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `absolute`, `flex`, `flex-col`, `from-secondary-blue/10`, `gap-16`, `gap-3`, `gap-4`, `gap-8`, `grid`, `grid-cols-1`, `grid-cols-2`, `h-full`, `items-center`, `justify-between`, `lg:grid-cols-2`
 - **Varyant/Responsive:** `:`, `active:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
 - **Yardımcı Sınıflar:** `${disableAnimation`, `${showProducts`, `-inset-10`, `:`, `active:scale-95`, `animate-fadeIn`, `aspect-square`, `blur-3xl`, `border`, `content-auto`, `duration-500`, `duration-hvac-glacial`, `ease-in-out`, `font-black`, `font-bold`
+
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+⭐SESSİZ FAN ANLATISI — TETİKLEYİCİ KATEGORİ DEĞİL **SERİ** (REC-85, Recep kararı 2026-08-28).
+
+Cetvel: `docs/standards/catalog-depth-standard.md` §1.1 (K1.1). Anlatı K1'in yerinde kalır
+(kategori sayfası), ama konusu bir SERİ olduğu için tetikleyicisi de seridir.
+
+NİÇİN: bölüm önce `inline-duct-fans` kategorisine bağlıydı; o kategori pasif ve 0 serili,
+yani koşul HİÇBİR ZAMAN açılmadı — beş bileşenlik anlatı ve sihirbaz kullanıcıya bir kez
+bile görünmedi. Kategoriye (`duct-fans`) taşımak da yanlış olurdu: ölçtüm, o kategoride
+Quiet'in yanında 24 sessiz OLMAYAN model var (Lineo düz 7 · Radon 5 · VORT Commercial 7+5).
+Doğru bağ, anlatının gerçek konusu olan seridir.
+
+Seri kanonik slug ile aranır; `catalog-integrity` slug-unresolved kolu bu sabiti korur.
+```
+
 
 ---
 # FILE: src\views\category\CategorySeriesView.md
@@ -87389,13 +87412,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\views\category\SeriesLandingView.tsx
-skeleton_hash: 658f0d9ea0a2cfc5
+source_path: C:\tmp\vh-urun-rec89\src\views\category\SeriesLandingView.tsx
+skeleton_hash: 9f45cb0d2cc5c2e0
 entity_hashes:
   func:SeriesLandingView: 7629549fe574b94e
   overview: afaf8b46a24bca9d
   style_tokens: 168d57f94026ba47
-generated_at: 2026-08-27T07:37:45Z
+generated_at: 2026-08-30T19:07:14Z
 ---
 
 ## Genel Bakış
