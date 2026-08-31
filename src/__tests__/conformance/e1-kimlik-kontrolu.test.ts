@@ -182,15 +182,29 @@ describe('E1-v2 — kimlik kontrolü: dosya VEKİL kanıt, oturum ASIL kanıt', 
   })
 
   it('bagliWorktreeMi — ölçüt YOL BİLEŞENİ, alt-dize DEĞİL (AXIOM 8: ad süzgeci kesme yapar)', () => {
-    const kimlik = require('../../../scripts/board/kimlik.cjs') as {
-      bagliWorktreeMi: (p: string) => boolean
-    }
-    expect(kimlik.bagliWorktreeMi('C:/repo/.git/worktrees/vh-x')).toBe(true)
-    expect(kimlik.bagliWorktreeMi('C:\\repo\\.git\\worktrees\\vh-x')).toBe(true)
-    expect(kimlik.bagliWorktreeMi('C:/repo/.git')).toBe(false)
+    // Modül ALT SÜREÇTE yüklenir — bu dosyanın bütün kolları gibi. (Doğrudan `require()`
+    // ESLint'te yasak: `@typescript-eslint/no-require-imports`; `pnpm build` lint'i koşar,
+    // yani doğrudan çağrı YEREL testte geçip ÜRETİM derlemesini kırardı — ölçüldü.)
+    // Yol, dosyanın kendi idiyomuyla çözülür (bkz. KAPI): alt süreçte `path.resolve`.
+    const ham = execFileSync(
+      process.execPath,
+      [
+        '-e',
+        `const m = require(require('path').resolve('scripts/board/kimlik.cjs'));
+         const yollar = ['C:/repo/.git/worktrees/vh-x', 'C:\\\\repo\\\\.git\\\\worktrees\\\\vh-x',
+           'C:/repo/.git', 'C:/my-worktrees-backup/.git', 'C:/repo/.git/worktrees-eski'];
+         console.log(JSON.stringify(yollar.map((y) => m.bagliWorktreeMi(y))))`,
+      ],
+      { encoding: 'utf8', timeout: 30000 },
+    )
+    const [wt, wtWin, ana, altDize1, altDize2] = JSON.parse(ham.trim()) as boolean[]
+
+    expect(wt, 'bagli worktree taninmali').toBe(true)
+    expect(wtWin, 'ters bolulu yol da taninmali').toBe(true)
+    expect(ana, 'ana agacin git dizini worktree DEGIL').toBe(false)
     // ⭐Alt-dize araması bu iki yolu YANLIŞ sınıflandırırdı:
-    expect(kimlik.bagliWorktreeMi('C:/my-worktrees-backup/.git')).toBe(false)
-    expect(kimlik.bagliWorktreeMi('C:/repo/.git/worktrees-eski')).toBe(false)
+    expect(altDize1, 'my-worktrees-backup alt-dizeye takilmamali').toBe(false)
+    expect(altDize2, 'worktrees-eski alt-dizeye takilmamali').toBe(false)
   })
 
   it('⭐TANINMAYAN kimlik ÇAKIŞAN CLAIM varken BLOKLAR — uyarır ama kontrolü ATLAMAZ', () => {
