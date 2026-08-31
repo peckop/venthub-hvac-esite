@@ -44,9 +44,20 @@ GIT_DIR_ABS=$(git rev-parse --absolute-git-dir)
 # Companion kapsam süzgeci — `post-merge` ile PAYLAŞILAN tek uygulama (T166-VH).
 DOC_SCOPE="$REPO_ROOT/.githooks/lib/doc-scope.cjs"
 
+# Companion BAŞARISIZLIK defteri — üretimi geri getirmez, SESSİZ olmaktan çıkarır (REC-67).
+DEFTER="$REPO_ROOT/.githooks/lib/companion-defter.cjs"
+
 (
     "$PYTHON_EXEC" -m orion.cli.main doc tree --repo-root "$REPO_ROOT" > "$GIT_DIR_ABS/orion-tree.log" 2>&1
-    : > "$GIT_DIR_ABS/orion-doc.log"
+    # ⭐LOG ARTIK KIRPILMIYOR — ölçülmüş kusur (2026-08-31, REC-67). Eskiden burada
+    # `: > orion-doc.log` vardı: her commit logu SIFIRLIYORDU, dolayısıyla BAŞARISIZ bir
+    # commit'in kanıtı bir SONRAKİ commit tarafından yok ediliyordu. Üreteç 08-28'de durdu ve
+    # üç gün fark edilmedi; kanıtı ararken logu boş bulmak bu yüzdendi. Artık her koşum bir
+    # BAŞLIKLA eklenir ve log son 400 satıra budanır (kanıt yaşar, dosya şişmez).
+    {
+        echo ""
+        echo "=== $(git rev-parse --short HEAD) $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
+    } >> "$GIT_DIR_ABS/orion-doc.log"
     # ÖLÇÜLDÜ: `doc run-hook` ÇALIŞMA AĞACINDAKİ değişikliklere bakar ("değişen dosyaları
     # belgeler"). Commit'ten SONRA ağaç temizdir → hiçbir şey yapmaz, log 0 bayt kalır.
     # Sessizce hiçbir şey yapan kanca, olmayan kancadan kötüdür. Bu yüzden son commit'in
@@ -65,10 +76,30 @@ DOC_SCOPE="$REPO_ROOT/.githooks/lib/doc-scope.cjs"
     else
         CHANGED=$(git diff-tree --no-commit-id --name-only -r HEAD | DOC_SCOPE_KOK="$REPO_ROOT" node "$DOC_SCOPE" 2>>"$GIT_DIR_ABS/orion-doc.log" || true)
         if [ -n "$CHANGED" ]; then
+            # ⭐ARIZA ÇIKIŞ KODUNDAN TESPİT EDİLEMEZ — ölçüldü (2026-08-31, REC-67):
+            # `doc batch` çıkış kodu 0 döner ve `"status": "SUCCESS"` basar, AYNI ÇIKTIDA
+            # `Basarili: 0, Basarisiz: 1` yazarken. Bu yüzden çıktı bir dosyaya alınır,
+            # loga eklenir ve SINIFLANDIRMA İÇİN deftere borulanır. `|| true` yok:
+            # çıkış kodu zaten bilgi taşımıyor, ona bakmıyoruz.
+            BATCH_CIKTI="$GIT_DIR_ABS/orion-doc.son.txt"
             # shellcheck disable=SC2086
-            "$PYTHON_EXEC" -m orion.cli.main doc batch $CHANGED >> "$GIT_DIR_ABS/orion-doc.log" 2>&1
+            "$PYTHON_EXEC" -m orion.cli.main doc batch $CHANGED > "$BATCH_CIKTI" 2>&1
+            cat "$BATCH_CIKTI" >> "$GIT_DIR_ABS/orion-doc.log"
+            if [ -f "$DEFTER" ]; then
+                DOSYA_SAYISI=$(printf '%s\n' "$CHANGED" | grep -c . || true)
+                node "$DEFTER" --git-dir "$GIT_DIR_ABS" --dosya "$DOSYA_SAYISI" \
+                    < "$BATCH_CIKTI" >> "$GIT_DIR_ABS/orion-doc.log" 2>&1
+            else
+                echo "[post-commit] ⚠ COMPANION DEFTERI YOK ($DEFTER) — basarisizlik KAYDEDILMEDI." \
+                    >> "$GIT_DIR_ABS/orion-doc.log"
+            fi
         else
             echo "[post-commit] belgelenecek kaynak dosya yok" >> "$GIT_DIR_ABS/orion-doc.log"
         fi
+    fi
+    # Log budama: kanıt yaşar, dosya şişmez.
+    if [ -f "$GIT_DIR_ABS/orion-doc.log" ]; then
+        tail -n 400 "$GIT_DIR_ABS/orion-doc.log" > "$GIT_DIR_ABS/orion-doc.log.tmp" 2>/dev/null \
+            && mv "$GIT_DIR_ABS/orion-doc.log.tmp" "$GIT_DIR_ABS/orion-doc.log"
     fi
 ) &
