@@ -485,13 +485,6 @@ export const tr = {
       subtitle: 'Otoparktan giriş konforuna, mutfaktan ticari alan konforuna kadar farklı HVAC ihtiyaçlarını çözüm mantığıyla sunuyoruz.',
       viewAll: 'Tümü Gör',
       items: {
-        parking: {
-          eyebrow: 'Otopark Senaryosu',
-          title: 'Otopark havalandırması ve jet fan akışı',
-          description: 'CO kontrolü, hava sirkulasyonu ve yüksek debi gereksinimi olan otopark projeleri için doğru fan ailesine hızlı geçiş sağlayın.',
-          point1: 'Jet fan ve duman egzoz geçişleri',
-          point2: 'Yüksek debi ve güvenli yönlendirme'
-        },
         kitchen: {
           eyebrow: 'Mutfak Senaryosu',
           title: 'Endüstriyel mutfak egzozu ve kanal akışı',
