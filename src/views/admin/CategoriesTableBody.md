@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\admin\CategoriesTableBody.tsx
-skeleton_hash: d2e069d6a9f62a82
+source_path: C:\tmp\vh-urun-rec89\src\views\admin\CategoriesTableBody.tsx
+skeleton_hash: 8a4d9e9ebe29f12a
 entity_hashes:
   func:CategoriesTableBody: d50fe77bdbd7da87
   func:categoriesFetcher: c2a94f9401915640
   overview: 59e24a4d4621dc2a
   style_tokens: ebc7df49d9d6094c
-generated_at: 2026-08-27T07:23:39Z
+generated_at: 2026-08-31T07:44:00Z
 ---
 
 ## Genel Bakış
