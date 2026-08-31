@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\BrandDetailPage.tsx
-skeleton_hash: c0fc4e7743218c78
+source_path: C:\tmp\vh-urun-rec89\src\views\BrandDetailPage.tsx
+skeleton_hash: 9a55cabb905a6337
 entity_hashes:
   func:BrandDetailPage: 658e62bc6ce56cad
   overview: 83474bb2d24aa7c3
   style_tokens: 7d26806290344037
-generated_at: 2026-08-27T07:08:51Z
+generated_at: 2026-08-30T19:07:13Z
 ---
 
 ## Genel Bakış

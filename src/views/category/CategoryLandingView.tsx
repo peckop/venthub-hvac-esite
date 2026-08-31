@@ -20,6 +20,7 @@ import {
 import SilentFanWizard from '@/components/category/SilentFanWizard'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
 import FamilyCard from '@/components/products/FamilyCard'
+import { resolveCategoryImageUrl } from '@/lib/images/categoryImage'
 import type { FamilyListItem } from '@/types/ui-models'
 
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
@@ -88,7 +89,10 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
         { label: vm?.displayName || category.name, href: '' }
     ]
 
-    const heroImage = category.image_url || '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
+    // REC-89: burası image_url'i HAM kullanıyordu. Canlı veriyle bugün doğru sonuç
+    // veriyor (dolu iki kayıt yerel yol taşıyor) ama depo dosya adı girildiği gün
+    // çözümsüz kalırdı — resolver üç biçimi de tek yerde ayırır.
+    const heroImage = resolveCategoryImageUrl(category.image_url) || '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
 
     useEffect(() => {
         const animTimer = setTimeout(() => setDisableAnimation(false), 300)

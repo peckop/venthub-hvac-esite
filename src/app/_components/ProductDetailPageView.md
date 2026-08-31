@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\app\_components\ProductDetailPageView.tsx
-skeleton_hash: 696171e81f07b205
+source_path: C:\tmp\vh-urun-rec89\src\app\_components\ProductDetailPageView.tsx
+skeleton_hash: b74b13f9aa56a24f
 entity_hashes:
   func:PdpSkuBridge: 7eb9545f35ab0fb2
   func:ProductDetailBody: 678d999364789e47
@@ -17,7 +17,7 @@ entity_hashes:
   func:toggleSpecSection: aca256fdc4d20ecb
   overview: 590be9a86b563f9f
   style_tokens: d8b7561aa4410d27
-generated_at: 2026-08-28T08:20:43Z
+generated_at: 2026-08-30T17:57:06Z
 ---
 
 ## Genel Bakış

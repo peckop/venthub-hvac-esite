@@ -5,6 +5,7 @@ import Link from 'next/link'
 import React, { useState } from 'react'
 
 import VentImage from '@/components/ui/VentImage'
+import { resolveCategoryImageUrl } from '@/lib/images/categoryImage'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -39,7 +40,8 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
     const heroImage = (showcaseImages?.[0]?.desktop) ||
         (isAirCurtain ? '/images/category/hero-vortice.png' : null) ||
         (isQuietFan ? '/images/vortice/vortice_lineo_hero.png' : null) ||
-        (category.image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}` : null)
+        // REC-89: tek kaynak resolver — yerel yol / tam adres / depo dosyası ayrımı orada.
+        resolveCategoryImageUrl(category.image_url)
 
 
 
@@ -293,15 +295,23 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {subCategories.filter(sub => sub.slug !== category.slug).map((sub) => (
+                    {subCategories.filter(sub => sub.slug !== category.slug).map((sub) => {
+                    // REC-89 ⭐ASIL KUSUR BURADAYDI: alt kategori görseli `product-images`
+                    // deposundan isteniyordu, oysa kategori görselleri `category-images`
+                    // deposunda durur. Yani bu dal veri girildiği gün YANLIŞ depoya gidip
+                    // 404 dönecekti. Bugüne dek görünmedi çünkü 37 kategorinin 35'inde alan boş.
+                    // Resolver ayrıca boşluk-dolu değeri de null'a çevirir; koşul artık
+                    // ham alana değil ÇÖZÜLMÜŞ adrese bakıyor.
+                    const subImage = resolveCategoryImageUrl(sub.image_url)
+                    return (
                         <Link
                             key={sub.id}
                             href={Routes.category(categoryUrlSlug, getLocalizedCategorySlug(sub, lang))}
                             className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 border border-gray-100"
                         >
                             <div className="aspect-4/3 bg-light-gray relative overflow-hidden">
-                                {sub.image_url ? (
-                                    <VentImage src={`${(process.env.NEXT_PUBLIC_SUPABASE_URL || '')}/storage/v1/object/public/product-images/${sub.image_url}`}
+                                {subImage ? (
+                                    <VentImage src={subImage}
                                         alt={getCategoryDisplayName(sub)}
                                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                      />
@@ -325,7 +335,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 </div>
                             </div>
                         </Link>
-                    ))}
+                    )})}
                 </div>
             </div>
 
