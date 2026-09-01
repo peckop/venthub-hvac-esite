@@ -351,6 +351,18 @@ orion doc build --force-sync && git add docs/ && git commit
 orion doc build --force-sync && git add docs/ && git commit
 ```
 
+⭐**Bu iki turu ELLE hatırlamak zorunda kalmayın — taban tazelerken tek komut vardır:**
+
+```
+node scripts/hijyen/taban-tazele.cjs --agac <ağaç>
+```
+
+`origin/master` merge'ini, ilan edilmiş artefaktlardaki çakışmanın çözümünü, **AXIOM 7'nin
+iki turunu** ve INV-DOC-4b'yi aynı komutta koşar. Gerekçesi ve reddedilen alternatifi
+(`.gitattributes merge=ours` — INV-DOC-4b'nin damga kör noktası yüzünden **sessiz** geri alma
+üretiyor) `fleet-mechanism-standard.md §22`'de ölçümüyle yazılıdır. Kural: **merge sessizce
+çözülüyorsa, ikinci turu hatırlatan şey bir insan değil bir mekanizma olmalıdır.**
+
 **Yakınsama ölçülmüştür, varsayılmamıştır:** ikinci turda `system_tree.md`
 değişmedi (`git diff --stat` boş) — yani damga alanı her koşumda yeniden
 yazılmıyor, döngü ikinci turda duruyor. Üçüncü tur GEREKMEZ. Yeni bir çift
