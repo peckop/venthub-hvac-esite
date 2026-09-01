@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T08:31:47.371596+00:00
+compiled_at: 2026-09-01T08:34:12.051713+00:00
 total_compiled_files: 63
-source_commit: 8e700809
+source_commit: 73691ce7
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9410,6 +9410,15 @@ edilmişken geçer, ilan edilmemişken **durdurur** — tek fark ilan dosyasın�
    **boş** olmasıydı. Doğrusu yorumlayıcıyı doğrudan çağırmak:
    `node node_modules/vitest/vitest.mjs`. (MSYS yol çevirisiyle aynı sınıf: araç sessizce
    yanlış cevap üretiyor ve ölçüm yaptığını sanırsın.)
+   ⭐**Aynı sınıfın ikinci vakası, aynı gün: `jq` bu makinede KURULU DEĞİL.** PR kapılarını
+   izlemek için kurduğum gözcü `jq` kullanıyordu; her çağrı sessizce başarısız oldu, döngü 45
+   dakika boyunca hiçbir şey basmadan uyudu ve "çıktı üretmeden bitti" diye kapandı. Yani
+   **izlediğimi sandığım şey hiç izlenmiyordu.** Ölçüldü: depoda `jq` yalnız iki CI
+   workflow'unda geçiyor (koşucuda kurulu, sorun yok); **yerel** betiklerin hiçbirinde yok —
+   yani risk kalıcı bir kusur değil, **o anda yazılan geçici betiklerde**. Hüküm: yerelde
+   koşacak bir ölçüm betiği yazarken kullandığın aracın **varlığını ölç** (`command -v`), ya
+   da `node`/`awk` gibi zaten kanıtlanmış olanla yaz. Sessiz gözcü, gözcü yokluğundan daha
+   kötüdür: yokluğu bilirsin, sessizliği bilmezsin.
 3. ⭐**FİKSTÜR YEŞİLDİ, GERÇEK AĞAÇ BUGU BULDU: `git status --porcelain` çıktısı
    `trim()` EDİLEMEZ.** Porcelain satırı **sütun duyarlıdır** (`XY<boşluk><yol>`), ve trim
    **ilk satırın baştaki boşluğunu** yer: ` M docs/x` → `M docs/x` → `slice(3)` → `ocs/x`.
