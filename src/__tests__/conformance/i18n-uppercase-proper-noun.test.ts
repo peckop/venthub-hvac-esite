@@ -207,7 +207,7 @@ let DEGISKENLER: Map<string, ts.Node> = new Map()
  * borcun büyümesini haklı olarak reddediyor. Kapsam kaymasın diye burada YALNIZ benim
  * değişikliğimin kör ettiği çözücü var; diğer ikisi AYRI İŞ EMRİ (bulgu OPS'a bildirildi).
  */
-const COZUCULER = new Set(['familyName'])
+const COZUCULER = new Set(['familyName', 'getCategoryDisplayName', 'getProductDisplayName'])
 
 /** İfade veri alanına dokunuyor mu? Yerel fonksiyon çağrısıysa İÇİNE bakar. */
 function veriTasiyorMu(ifade: ts.Node, fonksiyonlar: Map<string, ts.Node>, derinlik = 0): string | null {
