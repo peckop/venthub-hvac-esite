@@ -246,4 +246,122 @@ describe('INV-KATEGORI-ADI-1 · kategori adı tek kaynaktan', () => {
       'Ham `name` DB\'de Türkçedir; müşteri yüzeyinde getCategoryDisplayName kullanılır.',
     ).toEqual([])
   })
+
+  /**
+   * KÖK 5 (arama önerisi) — REC-114, 2026-09-01.
+   *
+   * `get_search_suggestions` etiketi `c.name::text AS label` ile kuruluyor: ham TR.
+   * SearchOverlay bu etiketi İKİ yerde tüketiyordu — listede render, klavyeyle Enter'da
+   * arama geçmişine yazım — ve ikisi de ham basıyordu. Aynı bileşenin popüler-kategori
+   * çipleri REC-103'te düzeltilmişti; öneri dalı atlanmıştı.
+   *
+   * ⭐KOLLAR NEDEN DÖRT: "oneriEtiketi çağrılıyor mu" tek başına ölçüm DEĞİL. Fonksiyon
+   * boşaltılsa, ya da filtreli kategori setinden çözse, çağrı yine duruyor olurdu ve kapı
+   * yeşil kalırdı. Bugün tam bu sınıftan bir kusur yaşandı (INV-AILE-ADI-1'in servis kolu
+   * "herhangi biri taşıyor mu" diye sorduğu için kördü). Bu yüzden çağrının VARLIĞI,
+   * ham etiketin YOKLUĞU, çözücüye BAĞLILIK ve TAM SET kullanımı ayrı ayrı ölçülür.
+   */
+  describe('KÖK 5 · arama önerisi etiketi (REC-114)', () => {
+    const OVERLAY = join(KOK, 'components', 'SearchOverlay.tsx')
+    const kaynak = (): string => readFileSync(OVERLAY, 'utf8')
+
+    /** AST: `oneriEtiketi` fonksiyonunun gövde metni (yoksa null). */
+    const cozucuGovdesi = (src: string): string | null => {
+      const sf = ts.createSourceFile('x.tsx', src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+      let govde: string | null = null
+      const gez = (n: ts.Node): void => {
+        if (
+          ts.isVariableDeclaration(n) &&
+          ts.isIdentifier(n.name) &&
+          n.name.text === 'oneriEtiketi' &&
+          n.initializer
+        ) {
+          govde = n.initializer.getText(sf)
+        }
+        ts.forEachChild(n, gez)
+      }
+      gez(sf)
+      return govde
+    }
+
+    /** AST: `goToSuggestion(...)` çağrılarının İKİNCİ argümanının kaynak metni. */
+    const gecisArgumanlari = (src: string): string[] => {
+      const sf = ts.createSourceFile('x.tsx', src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+      const args: string[] = []
+      const gez = (n: ts.Node): void => {
+        if (
+          ts.isCallExpression(n) &&
+          ts.isIdentifier(n.expression) &&
+          n.expression.text === 'goToSuggestion' &&
+          n.arguments.length >= 2
+        ) {
+          args.push(n.arguments[1].getText(sf))
+        }
+        ts.forEachChild(n, gez)
+      }
+      gez(sf)
+      return args
+    }
+
+    it('⭐ÇÖZÜCÜ VAR — öneri etiketi için tek giriş noktası tanımlı', () => {
+      expect(
+        cozucuGovdesi(kaynak()),
+        'SearchOverlay içinde `oneriEtiketi` yok — öneri etiketi tek noktadan çözülmüyor.',
+      ).not.toBeNull()
+    })
+
+    it('⭐ÇÖZÜCÜ GERÇEKTEN ÇÖZÜYOR — sözlük çözücüsüne ve TAM kategori setine bağlı', () => {
+      const govde = cozucuGovdesi(kaynak()) ?? ''
+      expect(
+        govde.includes('getCategoryDisplayName'),
+        '`oneriEtiketi` getCategoryDisplayName çağırmıyor — etiket sözlükten geçmiyor demektir.',
+      ).toBe(true)
+      expect(
+        govde.includes('getCategoryBySlug'),
+        '`oneriEtiketi` getCategoryBySlug kullanmıyor. Kategoriyi filtreli `categories` ' +
+          'listesinden aramak SESSİZ bir boşluk açar: öneri RPC\'si yalnız is_active ' +
+          'filtreler, o liste ise ürünü olmayan kategoriyi hiç içermez — eşleşme kaçar ve ' +
+          'ham TR ada düşülür.',
+      ).toBe(true)
+    })
+
+    it('⭐İKİ YÖNLÜ — hiçbir geçiş yolu ham `s.label` taşımaz VE çözücü fiilen geçiliyor', () => {
+      const args = gecisArgumanlari(kaynak())
+      expect(args.length, 'goToSuggestion hiç çağrılmıyor — ölçüt boşa ölçüyor olurdu.')
+        .toBeGreaterThan(0)
+      expect(
+        args.filter((a) => /\bs\.label\b/.test(a)),
+        'Bir goToSuggestion çağrısı ham `s.label` geçiriyor — İngilizce gezen müşterinin ' +
+          'arama geçmişine Türkçe kategori adı yazılır.',
+      ).toEqual([])
+      expect(
+        args.some((a) => a.includes('oneriEtiketi')),
+        'Hiçbir goToSuggestion çağrısı `oneriEtiketi` geçirmiyor — ham etiket kaldırılmış ' +
+          'ama yerine çözülmüş etiket KONMAMIŞ olabilir.',
+      ).toBe(true)
+    })
+
+    it('RENDER — listede basılan etiket çözücüden gelir', () => {
+      const src = kaynak()
+      const sf = ts.createSourceFile('x.tsx', src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+      let atama: string | null = null
+      const gez = (n: ts.Node): void => {
+        if (
+          ts.isVariableDeclaration(n) &&
+          ts.isIdentifier(n.name) &&
+          n.name.text === 'label' &&
+          n.initializer
+        ) {
+          atama = n.initializer.getText(sf)
+        }
+        ts.forEachChild(n, gez)
+      }
+      gez(sf)
+      expect(atama, 'Öneri satırındaki `label` ataması bulunamadı.').not.toBeNull()
+      expect(
+        (atama ?? '').includes('oneriEtiketi'),
+        'Render edilen etiket `oneriEtiketi`den geçmiyor — kategori önerisi ham TR basar.',
+      ).toBe(true)
+    })
+  })
 })
