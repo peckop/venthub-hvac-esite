@@ -13,7 +13,7 @@ import { useI18n } from '@/i18n/I18nProvider'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { DomainCategory } from '../../lib/type-converters'
-import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 
 interface CategoryShowcaseProps {
@@ -53,7 +53,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     // Breadcrumb (VENTHUB SIGNATURE - FIXED LOCATION)
     const breadcrumbItems = [
         { label: t('category.breadcrumbHome'), href: '/' },
-        { label: vm?.displayName || category.name, href: Routes.category(getLocalizedCategorySlug(category, lang)) }
+        { label: vm?.displayName || getCategoryDisplayName(category, t), href: Routes.category(getLocalizedCategorySlug(category, lang)) }
     ]
 
     // Hero image logic
@@ -69,7 +69,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                 <div className="absolute inset-0 z-0">
                     <VentImage
                         src={heroImage}
-                        alt={vm?.displayName || category.name}
+                        alt={vm?.displayName || getCategoryDisplayName(category, t)}
                         fill
                         priority
                         className="object-cover opacity-30 grayscale brightness-50"
@@ -200,7 +200,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
             <BottomCTA 
                 onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
                 showWizard={isAirCurtain}
-                categoryName={vm?.displayName || category.name}
+                categoryName={vm?.displayName || getCategoryDisplayName(category, t)}
             />
 
             <EnhancedNeedsWizard 

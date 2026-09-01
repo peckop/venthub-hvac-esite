@@ -46,7 +46,9 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
 
     // Build breadcrumb items
-    const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, 'Ana Sayfa', lang)
+    // REC-103: 'Ana Sayfa' burada SABİT Türkçe yazılıydı ve `t` hiç geçilmiyordu —
+    // İngilizce sayfada hem "Ana Sayfa" hem Türkçe kategori adı basıyordu.
+    const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, t('common.homeLabel'), lang, t)
 
     return (
         <div className="min-h-screen bg-white">
@@ -59,7 +61,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                     <div className="absolute inset-0">
                         <Image
                             src={heroImage}
-                            alt={getCategoryDisplayName(category)}
+                            alt={getCategoryDisplayName(category, t)}
                             fill
                             priority
                             sizes="100vw"
@@ -76,7 +78,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 {t('category.premiumCollection')}
                             </span>
                             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                                {getCategoryDisplayName(category)}
+                                {getCategoryDisplayName(category, t)}
                             </h1>
                             <p className="text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed">
                                 {getCategoryDescription(category)}
@@ -312,7 +314,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             <div className="aspect-4/3 bg-light-gray relative overflow-hidden">
                                 {subImage ? (
                                     <VentImage src={subImage}
-                                        alt={getCategoryDisplayName(sub)}
+                                        alt={getCategoryDisplayName(sub, t)}
                                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                      />
                                 ) : (
@@ -323,7 +325,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
 
                                 <div className="absolute bottom-4 left-4 right-4">
-                                    <h3 className="text-2xl font-bold text-white mb-1">{getCategoryDisplayName(sub)}</h3>
+                                    <h3 className="text-2xl font-bold text-white mb-1">{getCategoryDisplayName(sub, t)}</h3>
                                     <p className="text-gray-200 text-sm line-clamp-1">{sub.description}</p>
                                 </div>
                             </div>
@@ -344,7 +346,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold text-industrial-gray mb-4">
-                            {t('category.whyCategory', { category: getCategoryDisplayName(category) })}
+                            {t('category.whyCategory', { category: getCategoryDisplayName(category, t) })}
                         </h2>
                         <p className="text-steel-gray max-w-2xl mx-auto">
                             {t('category.whyCategorySubtitle')}
@@ -373,7 +375,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
             <BottomCTA
                 onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
                 showWizard={isAirCurtain}
-                categoryName={getCategoryDisplayName(category)}
+                categoryName={getCategoryDisplayName(category, t)}
             />
         </div >
     )
