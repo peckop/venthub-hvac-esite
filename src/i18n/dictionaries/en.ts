@@ -950,24 +950,15 @@ export const en: typeof tr = {
       a6: 'Vortice products are sold with a 2-year manufacturer warranty. Under the warranty, faults arising from manufacturing defects are repaired or replaced free of charge. We handle your warranty processes quickly under full brand assurance.',
     },
     trustSignals: {
-      ce: 'CE',
-      iso9001: 'ISO 9001',
-      authorizedDealerTitle: 'Brand Assurance',
-      authorizedDealerDesc: 'Vortice products with brand assurance',
-      warrantyTitle: '2-Year Warranty',
-      warrantyDesc: 'Manufacturer warranty',
-      securePaymentTitle: 'Secure Payment',
-      securePaymentDesc: 'SSL-encrypted transaction',
-      fastShippingTitle: 'Fast Shipping',
-      fastShippingDesc: 'Ships from stock',
-      installmentTitle: 'Installment Options',
-      installmentDesc: 'Up to 12 installments',
+      // REC-104: see tr.ts — brand-specific wording, the fixed "2-year" claim and the
+      // certification row were removed.
+      authorizedDealerTitle: 'Authorized Distribution',
+      authorizedDealerDesc: 'Genuine products, official supply chain',
+      warrantyTitle: 'Manufacturer Warranty',
+      warrantyDesc: 'Subject to manufacturer/importer terms',
+      // REC-104: see tr.ts — payment/shipping promise keys removed.
       techSupportTitle: 'Technical Support',
       techSupportDesc: 'Expert consultation',
-      certified: 'Certified',
-      quality: 'Quality',
-      compassoDoro: 'Compasso d\'Oro',
-      designAward: 'Design Award',
     },
     typeComparison: {
       sectionTitle: 'Which Type of Air Curtain Is Right for You?',
@@ -1377,9 +1368,8 @@ export const en: typeof tr = {
       specs: 'Technical Specifications'
     },
     trust: {
-      freeShipping: 'Free Shipping',
-      securePayment: 'Secure Payment',
-      warranty: 'Warranty'
+      // REC-104: see tr.ts — freeShipping / securePayment removed.
+      warranty: 'Manufacturer Warranty'
     },
     engineering: {
       noise: {
@@ -1454,7 +1444,7 @@ export const en: typeof tr = {
     total: 'Total',
     checkout: 'Proceed to Checkout',
     continueShopping: 'Continue Shopping',
-    securePayment: 'Protected by a secure payment system',
+    // REC-104: see tr.ts — securePayment removed.
     itemTotal: 'Total',
     quoteItemsNotice: 'Your cart contains items with no price yet. The total covers priced items only; request a quote for those items to continue to payment.'
   },
@@ -1947,22 +1937,26 @@ export const en: typeof tr = {
     },
     returns: {
       title: 'Returns & Exchanges',
+      // REC-104: see tr.ts — status note above the legal terms.
+      onlineKapaliNotu: 'Online sales are currently closed; the terms below apply once online sales open.',
       desc1: 'You may use your right of withdrawal within 14 days. The product must be unused and resalable with invoice and all accessories included.',
       desc2: 'Please contact our support team with your order number for a return request. After approval, shipping instructions will be provided.'
     },
     shipping: {
       desc1: 'Delivery usually takes 1–5 business days and may vary depending on campaigns and stock.',
-      desc2: 'Shipping fee/provider is shown at checkout. Tracking number will be sent via email.'
+      // REC-104: see tr.ts — checkout reference replaced with the quote.
+      desc2: 'The shipping fee and carrier are stated in your quote. Tracking number will be sent via email.'
     },
     warranty: {
       desc1: 'Warranty coverage may vary by manufacturer/importer. Please keep the warranty card and user manual.',
       desc2: 'For service info or malfunction records, contact our support team.'
     },
     faq: {
-      q1: 'When will my order be shipped?',
-      a1: 'Usually within 1–5 business days after payment approval.',
+      // REC-104: see tr.ts — aligned with the checkout.kapali copy.
+      q1: 'When will I hear back about my quote request?',
+      a1: 'We usually get back to you within the same business day.',
       q2: 'What are the payment methods?',
-      a2: 'You can pay securely with credit/debit cards via iyzico.',
+      a2: 'Our store is still being set up, so online payment is not open yet. You can request a quote from us to place an order.',
       q3: 'Do you provide installation service?',
       a3: 'It may vary by product. Please contact our support team.'
     }

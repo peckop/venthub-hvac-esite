@@ -1062,7 +1062,7 @@ export const tr = {
     total: 'Toplam',
     checkout: 'Ödemeye Geç',
     continueShopping: 'Alışverişe Devam Et',
-    securePayment: 'Güvenli ödeme sistemi ile korunmaktadır',
+    // REC-104: securePayment KALDIRILDI — ödeme kapalıyken korunacak ödeme yok.
     itemTotal: 'Toplam',
     quoteItemsNotice: 'Sepetinizde fiyatı henüz belirlenmemiş ürün var. Toplam yalnızca fiyatlı ürünleri kapsar; ödemeye geçmek için bu ürünler için teklif alın.'
   },
@@ -1324,24 +1324,22 @@ export const tr = {
       a6: 'Vortice ürünleri 2 yıl üretici garantisi ile satılmaktadır. Garanti kapsamında üretim hatalarından kaynaklanan arızalar ücretsiz onarılır veya değiştirilir. Garanti işlemlerinizi marka güvencesi kapsamında hızlıca yönetiyoruz.',
     },
     trustSignals: {
-      ce: 'CE',
-      iso9001: 'ISO 9001',
-      authorizedDealerTitle: 'Marka Güvencesi',
-      authorizedDealerDesc: 'Marka güvenceli Vortice ürünleri',
-      warrantyTitle: '2 Yıl Garanti',
-      warrantyDesc: 'Üretici garantisi',
-      securePaymentTitle: 'Güvenli Ödeme',
-      securePaymentDesc: 'SSL şifreli işlem',
-      fastShippingTitle: 'Hızlı Kargo',
-      fastShippingDesc: 'Stoktan teslimat',
-      installmentTitle: 'Taksit İmkanı',
-      installmentDesc: '12 aya varan taksit',
+      // REC-104 (Recep hükmü 2026-09-01):
+      // · "Marka Güvencesi / Marka güvenceli Vortice ürünleri" TÜM kategorilerde tek
+      //   markanın adını geçiriyordu → markaya özgü cümle kalktı, genel-doğru metin geldi.
+      // · "2 Yıl Garanti" rakamı kalktı: kendi destek sayfamız "garanti kapsamı
+      //   üretici/ithalatçıya göre değişebilir" diyor, rozet ise sabit süre vaat ediyordu.
+      // · ce / iso9001 / compassoDoro sertifika satırı KALDIRILDI (marka sertifikaları
+      //   tüm kategorilerde basılıyordu); 15A'da marka sayfasında ele alınacak.
+      authorizedDealerTitle: 'Yetkili Distribütörlük',
+      authorizedDealerDesc: 'Orijinal ürün, resmi tedarik zinciri',
+      warrantyTitle: 'Üretici Garantisi',
+      warrantyDesc: 'Üretici/ithalatçı koşullarına tabi',
+      // REC-104: securePayment* / fastShipping* / installment* anahtarları KALDIRILDI —
+      // çevrimiçi ödeme kapalıyken "SSL şifreli işlem" ve "12 aya varan taksit" karşılığı
+      // olmayan vaatlerdi. Bkz. docs/standards/vaat-butunlugu-standard.md
       techSupportTitle: 'Teknik Destek',
       techSupportDesc: 'Uzman danışmanlık',
-      certified: 'Sertifikalı',
-      quality: 'Kalite',
-      compassoDoro: 'Compasso d\'Oro',
-      designAward: 'Tasarım Ödülü',
     },
     typeComparison: {
       sectionTitle: 'Hangi Tip Hava Perdesi Size Uygun?',
@@ -1751,9 +1749,11 @@ export const tr = {
       specs: 'Teknik Özellikler'
     },
     trust: {
-      freeShipping: 'Ücretsiz Kargo',
-      securePayment: 'Güvenli Ödeme',
-      warranty: 'Garanti'
+      // REC-104: freeShipping ve securePayment KALDIRILDI — PDP'de tek CTA
+      // "Teknik Teklif İste" iken hemen altında "Ücretsiz Kargo · Güvenli Ödeme"
+      // yazıyordu. Bkz. docs/standards/vaat-butunlugu-standard.md
+      // Kalan rozet "Garanti" değil "Üretici Garantisi" — garantiyi veren biz değiliz.
+      warranty: 'Üretici Garantisi'
     },
     engineering: {
       noise: {
@@ -1835,22 +1835,30 @@ export const tr = {
     },
     returns: {
       title: 'İade ve Değişim',
+      // REC-104: koşullar yasal metin, kalıyor; ama çevrimiçi satış kapalıyken
+      // hangi durumda geçerli olduklarını sayfanın kendisi söylemeli.
+      onlineKapaliNotu: 'Online satış şu an kapalıdır; aşağıdaki koşullar online satış açıldığında geçerlidir.',
       desc1: '14 gün içinde cayma hakkınızı kullanabilirsiniz. Ürün kullanılmamış, faturası ve tüm aksesuarlarıyla birlikte yeniden satılabilir durumda olmalıdır.',
       desc2: 'İade talebi için lütfen sipariş numaranızla birlikte destek ekibimize ulaşın. Onay sonrası kargo talimatları paylaşılacaktır.'
     },
     shipping: {
       desc1: 'Teslimat süresi genellikle 1–5 iş günüdür; kampanya ve stok durumuna göre değişebilir.',
-      desc2: 'Kargo ücreti/firması ödeme adımında gösterilir. Takip numarası e-posta ile iletilir.'
+      // REC-104: "ödeme adımında gösterilir" cümlesi var olmayan bir adıma atıf yapıyordu
+      // (çevrimiçi ödeme kapalı). Bilgi teklifte veriliyor.
+      desc2: 'Kargo ücreti ve firması teklifinizde belirtilir. Takip numarası e-posta ile iletilir.'
     },
     warranty: {
       desc1: 'Garanti kapsamı üretici/ithalatçı firmaya göre değişiklik gösterebilir. Lütfen garanti belgesi ve kullanım kılavuzunu saklayınız.',
       desc2: 'Servis bilgisi veya arıza kaydı için destek ekibimizle iletişime geçin.'
     },
     faq: {
-      q1: 'Siparişim ne zaman kargoya verilir?',
-      a1: 'Ödeme onayından sonra genellikle 1–5 iş günü içinde.',
+      // REC-104: q1/a1 ve a2 çevrimiçi ödeme varmış gibi yazılmıştı. Metinler
+      // checkout.kapali bloğuyla AYNI gerçeği söyleyecek şekilde hizalandı
+      // ("aynı gün dönüş" vaadi oradan alındı, yeni vaat üretilmedi).
+      q1: 'Teklif talebime ne zaman dönüş yapılır?',
+      a1: 'Genellikle aynı iş günü içinde dönüş yapıyoruz.',
       q2: 'Ödeme yöntemleri nelerdir?',
-      a2: 'iyzico aracılığıyla kredi/banka kartları ile güvenli ödeme yapabilirsiniz.',
+      a2: 'Mağazamız kuruluş aşamasında olduğu için çevrimiçi ödeme henüz açık değil. Sipariş için bizden teklif isteyebilirsiniz.',
       q3: 'Kurulum hizmeti veriyor musunuz?',
       a3: 'Ürüne göre değişiklik gösterebilir. Lütfen destek ekibimizle görüşün.'
     }

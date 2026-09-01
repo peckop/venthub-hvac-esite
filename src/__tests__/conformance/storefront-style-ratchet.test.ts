@@ -183,14 +183,18 @@ const RATCHETS: Ratchet[] = [
     // uydurma sertifika numaraları); borç bu yüzden düştü, kapı "tavanı indir" dedi.
     // 2026-08-28 · 1499 → 1497: Footer/ContactPage'den uydurma iletişim satırları
     // kaldırıldı (Recep talimatı, PR #891); iki gri sınıf onlarla gitti.
-    tavan: 1497,
+    // 2026-09-01 · 1497 → 1488: REC-104 — dayanağı olmayan ödeme/kargo vaadi rozetleri
+    // (PDP üçlüsü, kategori güven şeridi, sertifika satırı, sepet ödeme kutusu)
+    // kaldırıldı; taşıdıkları ham gri sınıflar onlarla gitti.
+    tavan: 1488,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
   {
     ad: 'ham rounded-xl|2xl|3xl (§2.4)',
     // 2026-08-28 · 391 → 378 (aynı kaldırma).
-    tavan: 378,
+    // 2026-09-01 · 378 → 377 (REC-104 vaat rozetlerinin kaldırılması).
+    tavan: 377,
     say: () => countMatches(/\brounded-(?:xl|2xl|3xl)\b/g),
     gerekce: 'Köşe yarıçapı rounded-hvac-* skalasından.',
   },
@@ -203,7 +207,8 @@ const RATCHETS: Ratchet[] = [
   {
     ad: 'font-black · display DIŞINDA (§2.5)',
     // 2026-08-28 · 133 → 124 (aynı kaldırma).
-    tavan: 124,
+    // 2026-09-01 · 124 → 122 (REC-104 vaat rozetlerinin kaldırılması).
+    tavan: 122,
     say: countFontBlackOutsideDisplay,
     gerekce: 'font-black yalnız text-display eşliğinde; başlık ağırlığı font-bold.',
   },

@@ -13,10 +13,8 @@ import {
   Ruler,
   Settings,
   Share2,
-  Shield,
   ShoppingCart,
-  Star,
-  Truck} from 'lucide-react'
+  Star} from 'lucide-react'
 import type { Route } from 'next'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -125,6 +123,19 @@ export function quoteModeHesapla(
   if (selectedVariant == null) return true
   if (selectedVariant.price == null) return true
   return Number(selectedVariant.price) <= 0
+}
+
+/**
+ * Rozet sayısı → Tailwind sütun sınıfı.
+ *
+ * NİÇİN SABİT TABLO: Tailwind sınıf adlarını KAYNAKTA statik olarak tarar;
+ * `grid-cols-${n}` gibi şablon dizeleri üretim CSS'ine HİÇ girmez ve ızgara
+ * sessizce tek sütuna düşer. Sayı arttıkça buraya satır eklenir.
+ */
+const SUTUN_SINIFI: Record<number, string> = {
+  1: 'grid-cols-1',
+  2: 'grid-cols-2',
+  3: 'grid-cols-3',
 }
 
 type LocalizedText = { tr?: string | null; en?: string | null } | null
@@ -726,21 +737,39 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 </div>
               </div>
 
-              {/* Trust Signals - Lighter Grid */}
-              <div className="grid grid-cols-3 gap-2.5">
-                <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
-                  <Truck className="text-success-green mb-1.5" size={18} />
-                  <p className="text-xs font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.freeShipping')}</p>
-                </div>
-                <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
-                  <Shield className="text-primary-navy mb-1.5" size={18} />
-                  <p className="text-xs font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.securePayment')}</p>
-                </div>
-                <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
-                  <Award className="text-secondary-blue mb-1.5" size={18} />
-                  <p className="text-xs font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.warranty')}</p>
-                </div>
-              </div>
+              {/*
+                Güven rozetleri — REC-104.
+                ÖLÇÜLDÜ 2026-09-01: bu ızgara "ÜCRETSİZ KARGO · GÜVENLİ ÖDEME · GARANTİ"
+                basıyordu; hemen üstündeki tek CTA ise "TEKNİK TEKLİF İSTE" idi. Aynı ekranda
+                hem "satmıyoruz, teklif verelim" hem "bedava kargo + güvenli ödeme" yazıyordu.
+                Dayanağı da yoktu: 23 aktif kategorinin 23'ünde `hide_price=true` ve çevrimiçi
+                ödeme `NEXT_PUBLIC_ODEME_ACIK` ile KAPALI (canlı /checkout "Ödeme yakında
+                açılıyor" basıyor). Kargo ve ödeme rozetleri bu yüzden kaldırıldı.
+                Cetvel: docs/standards/vaat-butunlugu-standard.md · kapı: INV-VAAT-SIZINTI-1.
+
+                Liste veri-güdümlü: rozet sayısı değiştiğinde ızgara sessizce bozulmasın diye
+                sütun sınıfı sayıdan türetiliyor. (Kalemi silip span'a dokunmamak, 2026-08-31'de
+                ana sayfada ölçülmüş bir sessiz düzen bozulması sınıfıdır.)
+              */}
+              {(() => {
+                // ⭐`t()` ÇAĞRISI LİSTENİN İÇİNDE ve anahtarı LİTERAL: `t(degisken)`
+                // yazsaydım anahtar statik araçlar için izlenemez olurdu — INV-6 ölü-anahtar
+                // bekçisi bu dosyayı "opak çağrı" diye kırmızı verdi ve haklıydı.
+                const guvenRozetleri = [
+                  { kimlik: 'warranty', Icon: Award, renk: 'text-secondary-blue', etiket: t('pdp.trust.warranty') },
+                ]
+                const sutun = SUTUN_SINIFI[guvenRozetleri.length] ?? 'grid-cols-1'
+                return (
+                  <div className={`grid ${sutun} gap-2.5`}>
+                    {guvenRozetleri.map(({ kimlik, Icon, renk, etiket }) => (
+                      <div key={kimlik} className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
+                        <Icon className={`${renk} mb-1.5`} size={18} />
+                        <p className="text-xs font-black text-industrial-gray uppercase tracking-tighter">{etiket}</p>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
 
               {/* Quick Tech PDF Link */}
               <button
