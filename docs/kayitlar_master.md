@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T07:39:54.165436+00:00
+compiled_at: 2026-09-01T08:15:16.271783+00:00
 total_compiled_files: 99
-source_commit: 3965d221
+source_commit: d1fa38e4
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -13585,11 +13585,11 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T07:19:06.657429+00:00
+compiled_at: 2026-09-01T07:39:57.044276+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-01T07:19:06.657429+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-01T07:39:57.044276+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -13725,6 +13725,7 @@ Bu belge, otonom derleyici tarafından 2026-09-01T07:19:06.657429+00:00 tarihind
 │   ├── 📂 **products/**
 │   │   ├── ⚪ `AIR_DOOR_AD_900_MASTER.md`
 │   │   └── ⚪ `AIR_DOOR_AD_900_SEO.md`
+│   ├── ⚪ `recep-komut-rehberi.md`
 │   ├── 📂 **reference/**
 │   │   ├── 📂 **supabase/**
 │   │   │   ├── ⚪ `auth-hooks.md`

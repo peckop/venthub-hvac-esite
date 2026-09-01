@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T07:39:53.996337+00:00
+compiled_at: 2026-09-01T08:15:15.976351+00:00
 total_compiled_files: 63
-source_commit: 3965d221
+source_commit: d1fa38e4
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9378,16 +9378,26 @@ Yine de reddedildi:
    raporlanır, commit **edilmez** — şerit claim'inin dışına izinsiz çıkılmaz.
 5. **ÇIKIŞ KODU DÜRÜSTTÜR:** `0` yalnız merge + üretim + kapı üçü de tamamsa. Kapı koşmadıysa
    `1`, üretim/kapı başarısızsa `3`. Ölçülemeyen adım **"geçti" sayılmaz**.
-6. **Ağaç kirliyse hiç başlanmaz** (merge kirli ağaçta iş kaybettirir).
+6. **Ağaç kirliyse hiç başlanmaz** (merge kirli ağaçta iş kaybettirir) — **tek istisna
+   `docs/artefakt-ilan-istisnalari.json`'un İLAN ETTİĞİ yollardır.** Gerekçe ölçüldü:
+   `post-commit` her commit'ten **sonra** `docs/system_tree.md`'yi yeniden üretir ve damgası
+   değiştiği için ağaç sürekli kirli kalır — yani "temiz ağaç" önkoşulu **kendi kancamız
+   yüzünden** asla sağlanmaz ve araç hiç başlamaz. Tolere edilen liste **gömülü değil ilan
+   dosyasından** okunur (liste değişince araç kendiliğinden hizalanır) ve ilan dosyası
+   okunamaz/bozuksa **hiçbir şey tolere edilmez** — fail-closed. Bu yollar üretim turunda da
+   commit **edilmez**, "beklenen istisna" diye ayrıca raporlanır.
 
 ### Kapı
 
-`src/__tests__/conformance/taban-tazele.test.ts` — 17 kol, çoğu **gerçek depoda gerçek merge**
-koşturur (metin taraması değil davranış). Sabotaj turu: **7 sabotaj, 7'si de doğru sebeple
-kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol düştü"
-üçlüsüyle geçerli sayıldı.
+`src/__tests__/conformance/taban-tazele.test.ts` — **22 kol**, çoğu **gerçek depoda gerçek
+merge** koşturur (metin taraması değil davranış). Sabotaj turu: **9 sabotaj, 9'u da doğru
+sebeple kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol
+düştü" üçlüsüyle geçerli sayıldı. Kollar **iki ortamda** ayrı ayrı yeşil ölçüldü: orion kurulu
+olan (yerel) ve orion **kurulu olmayan** (CI taklidi) — aşağıdaki 4. ders bunun niçin
+gerektiğini anlatıyor. Tolerans kolu **ayırt edici çift** olarak kuruldu: aynı kirlilik, ilan
+edilmişken geçer, ilan edilmemişken **durdurur** — tek fark ilan dosyasının varlığı.
 
-### ⭐Bu işin kendi içinden çıkan üç ders
+### ⭐Bu işin kendi içinden çıkan dört ders
 
 1. ⭐**Sabotaj YEŞİL geçtiyse ilk soru "kapı kör mü" DEĞİL, "o dal koşuldu mu"dur.**
    Çıkış kodunu bozan sabotaj fark edilmedi. Sebep kapının körlüğü değildi: fikstür
@@ -9413,6 +9423,19 @@ kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedef
    ⚠Not: bu kolu yazarken **ölçütü de bir kez yanlış kurdum** — `not.toMatch(/ocs\/...)`
    doğru çıktıda da düşer, çünkü `docs/...` o dizeyi içerir. Doğru ölçüt satır başına
    bağlıdır (`/^\s*ocs\//m`). Ayırt etmeyen ölçüt, ölçüm değildir.
+4. ⭐⭐**ÖNKOŞULU ORTAMA BAĞLI BIRAKAN KOL, O ORTAMDA BAŞKA BİR ŞEYİ ÖLÇER.** "Kapı koşmadıysa
+   çıkış 1'dir" kolu yerelde 18/18 yeşilken **CI'da düştü**: `expected 3 to be 1`. Sebep kolun
+   yanlışlığı değil, **sessiz bir önkoşuldu** — kol "derleme başarılı olur" varsayıyordu,
+   yerelde orion kurulu olduğu için bu doğruydu, **koşucuda orion yok** olduğu için orada
+   derleme başarısız oluyor ve kod 3 dönüyordu. Yani aynı kol iki ortamda **iki farklı şeyi**
+   ölçüyordu ve hangisini ölçtüğü hiçbir yerde yazılı değildi.
+   **Hüküm:** bir kolun ölçtüğü dal, kolun kendisi tarafından **üretilebilir** olmalıdır; dış
+   kuruluma bağlı bırakılamaz. Onarım: derleme komutunun tamamı ezilebilir bir dikişe alındı
+   (`TABAN_TAZELE_BUILD_CMD`, JSON dizi, geçersizse fail-closed hata basar) ve iki dal da
+   deterministik hale getirildi — "başarılı derleme" hiçbir şey yapmayan bir çağrıya, "başarısız
+   derleme" var olmayan bir çalıştırılabilire sabitlendi. Sonuç iki ortamda **ayrı ayrı**
+   ölçüldü. Bu, 2. dersin kardeşi: orada fikstür biçimin bir varyantını üretmiyordu, burada
+   **ortam** dalın birini üretmiyordu; ikisinde de eksik olan şey **üretilebilirlik**.
 
 
 
