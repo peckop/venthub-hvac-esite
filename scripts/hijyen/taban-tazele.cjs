@@ -50,6 +50,7 @@ const fs = require('fs')
 const path = require('path')
 
 const MANIFEST_YOLU = 'docs/artefakt_manifest.json'
+const ISTISNA_YOLU = 'docs/artefakt-ilan-istisnalari.json'
 const TAZELIK_KAPISI = 'src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts'
 
 /**
@@ -98,6 +99,34 @@ function ilanEdilmisYollar(manifestMetni) {
     yollar.add(a.yol.replace(/\\/g, '/').trim())
   }
   return yollar
+}
+
+/**
+ * TOLERE EDILEN KIRLILIK — `docs/artefakt-ilan-istisnalari.json`'un ILAN ETTIGI yollar.
+ *
+ * NICIN VAR: bu dosyalar (`docs/system_tree.md`, `docs/database_schema_master.md`,
+ * `docs/venthub_skills_master.md`) her commit'ten SONRA `post-commit` kancasi tarafindan
+ * yeniden uretilir ve damgalari degistigi icin agac SUREKLI kirli kalir. Yani "agac temiz
+ * olmali" onkosulu, kendi kancamiz yuzunden ASLA saglanamaz — arac hicbir zaman baslamaz.
+ * Bunlari GOMULU bir listeye yazmak yerine ILAN kaynagindan okuyoruz: ilan listesi degisince
+ * arac kendiliginde hizalanir, ve tolere edilen her kalem zaten gerekcesiyle yazili.
+ *
+ * FAIL-CLOSED: ilan dosyasi okunamaz/bozuksa BOS kume donulur — yani hicbir sey tolere
+ * edilmez ve arac kirli agacta DURUR. Olcemedigimiz yerde ihtiyatli davranilir.
+ */
+function tolereEdilenKirlilik(metin) {
+  if (!metin) return new Set()
+  try {
+    const j = JSON.parse(metin)
+    if (!Array.isArray(j.istisnalar)) return new Set()
+    return new Set(
+      j.istisnalar
+        .map((i) => (i && typeof i.yol === 'string' ? i.yol.replace(/\\/g, '/').trim() : ''))
+        .filter(Boolean),
+    )
+  } catch {
+    return new Set()
+  }
 }
 
 /** Cakisanlari ILAN EDILMIS / ILAN DISI diye ayirir. Ilan disi TEK yol bile varsa durulur. */
@@ -227,7 +256,14 @@ function main() {
     return 2
   }
 
-  const kirli = kirliYollar(agac)
+  const tolere = tolereEdilenKirlilik(git(agac, ['show', 'HEAD:' + ISTISNA_YOLU], { yut: true }))
+  const kirliHepsi = kirliYollar(agac)
+  const kirli = kirliHepsi.filter((y) => !tolere.has(y))
+  const tolereEdilen = kirliHepsi.filter((y) => tolere.has(y))
+  if (tolereEdilen.length) {
+    console.log('tolere edilen kirlilik: ' + tolereEdilen.length + ' yol (' + ISTISNA_YOLU + " ILAN ETMIS)")
+    tolereEdilen.forEach((y) => console.log('   tolere: ' + y))
+  }
   if (kirli.length) {
     console.error('DURDU: agac KIRLI (' + kirli.length + ' yol) — merge kirli agacta is kaybettirir.')
     kirli.slice(0, 20).forEach((y) => console.error('   ' + y))
@@ -337,7 +373,12 @@ function main() {
     }
     const degisen = kirliYollar(agac)
     const commitlenecek = degisen.filter((y) => ilanlar.has(y))
-    const disarida = degisen.filter((y) => !ilanlar.has(y))
+    const beklenen = degisen.filter((y) => !ilanlar.has(y) && tolere.has(y))
+    const disarida = degisen.filter((y) => !ilanlar.has(y) && !tolere.has(y))
+    if (beklenen.length) {
+      console.log('AXIOM 7 tur ' + tur + ': ' + beklenen.length + ' ILAN EDILMIS ISTISNA degisti (beklenen, commit YOK):')
+      beklenen.forEach((y) => console.log('   istisna: ' + y))
+    }
     if (disarida.length) {
       console.log(
         'AXIOM 7 tur ' + tur + ': ILAN DISI ' + disarida.length + ' yol degisti — COMMIT EDILMEDI (claim disi):',
@@ -397,6 +438,8 @@ module.exports = {
   porcelainYollari,
   docBuildArgumanlari,
   docBuildKomutu,
+  tolereEdilenKirlilik,
   MANIFEST_YOLU,
+  ISTISNA_YOLU,
   TAZELIK_KAPISI,
 }

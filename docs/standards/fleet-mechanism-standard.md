@@ -1447,16 +1447,24 @@ Yine de reddedildi:
    raporlanır, commit **edilmez** — şerit claim'inin dışına izinsiz çıkılmaz.
 5. **ÇIKIŞ KODU DÜRÜSTTÜR:** `0` yalnız merge + üretim + kapı üçü de tamamsa. Kapı koşmadıysa
    `1`, üretim/kapı başarısızsa `3`. Ölçülemeyen adım **"geçti" sayılmaz**.
-6. **Ağaç kirliyse hiç başlanmaz** (merge kirli ağaçta iş kaybettirir).
+6. **Ağaç kirliyse hiç başlanmaz** (merge kirli ağaçta iş kaybettirir) — **tek istisna
+   `docs/artefakt-ilan-istisnalari.json`'un İLAN ETTİĞİ yollardır.** Gerekçe ölçüldü:
+   `post-commit` her commit'ten **sonra** `docs/system_tree.md`'yi yeniden üretir ve damgası
+   değiştiği için ağaç sürekli kirli kalır — yani "temiz ağaç" önkoşulu **kendi kancamız
+   yüzünden** asla sağlanmaz ve araç hiç başlamaz. Tolere edilen liste **gömülü değil ilan
+   dosyasından** okunur (liste değişince araç kendiliğinden hizalanır) ve ilan dosyası
+   okunamaz/bozuksa **hiçbir şey tolere edilmez** — fail-closed. Bu yollar üretim turunda da
+   commit **edilmez**, "beklenen istisna" diye ayrıca raporlanır.
 
 ### Kapı
 
-`src/__tests__/conformance/taban-tazele.test.ts` — 18 kol, çoğu **gerçek depoda gerçek merge**
-koşturur (metin taraması değil davranış). Sabotaj turu: **7 sabotaj, 7'si de doğru sebeple
-kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol düştü"
-üçlüsüyle geçerli sayıldı. Kollar **iki ortamda** ayrı ayrı yeşil ölçüldü: orion kurulu olan
-(yerel) ve orion **kurulu olmayan** (CI taklidi) — aşağıdaki 4. ders bunun niçin gerektiğini
-anlatıyor.
+`src/__tests__/conformance/taban-tazele.test.ts` — **22 kol**, çoğu **gerçek depoda gerçek
+merge** koşturur (metin taraması değil davranış). Sabotaj turu: **9 sabotaj, 9'u da doğru
+sebeple kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol
+düştü" üçlüsüyle geçerli sayıldı. Kollar **iki ortamda** ayrı ayrı yeşil ölçüldü: orion kurulu
+olan (yerel) ve orion **kurulu olmayan** (CI taklidi) — aşağıdaki 4. ders bunun niçin
+gerektiğini anlatıyor. Tolerans kolu **ayırt edici çift** olarak kuruldu: aynı kirlilik, ilan
+edilmişken geçer, ilan edilmemişken **durdurur** — tek fark ilan dosyasının varlığı.
 
 ### ⭐Bu işin kendi içinden çıkan dört ders
 

@@ -34,7 +34,9 @@ const betik = require_(BETIK_YOLU) as {
   porcelainYollari: (cikti: string) => string[]
   docBuildArgumanlari: (agac: string) => string[]
   docBuildKomutu: (agac: string) => { calistirilabilir: string; args: string[] }
+  tolereEdilenKirlilik: (metin: string) => Set<string>
   MANIFEST_YOLU: string
+  ISTISNA_YOLU: string
   TAZELIK_KAPISI: string
 }
 
@@ -54,7 +56,7 @@ type Fikstur = {
  * `ilanDisiDaCakissin` ile ilan edilmemis bir yolda da cakisma uretilir.
  * Kancalar fikstur deposunda bilerek KAPATILIR (proje kancalari orada yok; ana depoda ACIK).
  */
-function fiksturKur(ilanDisiDaCakissin: boolean): Fikstur {
+function fiksturKur(ilanDisiDaCakissin: boolean, istisnaIlanEt = false): Fikstur {
   const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'tabantazele-'))
   const bosKanca = fs.mkdtempSync(path.join(os.tmpdir(), 'kancasiz-'))
   const g = (...a: string[]) => execFileSync('git', ['-C', kok, ...a], { encoding: 'utf8' })
@@ -74,6 +76,14 @@ function fiksturKur(ilanDisiDaCakissin: boolean): Fikstur {
   fs.writeFileSync(path.join(kok, 'docs/a_master.md'), 'TABAN\n')
   fs.writeFileSync(path.join(kok, 'docs/b_master.md'), 'TABAN\n')
   fs.writeFileSync(path.join(kok, 'kaynak.txt'), 'TABAN\n')
+  // Kanca-uretimi, SUREKLI kirli kalan bir dosyayi taklit eder (gercekte docs/system_tree.md).
+  fs.writeFileSync(path.join(kok, 'docs/istisna.md'), 'TABAN\n')
+  if (istisnaIlanEt) {
+    fs.writeFileSync(
+      path.join(kok, 'docs/artefakt-ilan-istisnalari.json'),
+      JSON.stringify({ surum: 1, istisnalar: [{ yol: 'docs/istisna.md', uretec: 'fikstur' }] }, null, 2) + '\n',
+    )
+  }
   g('add', '--', 'docs', 'kaynak.txt')
   g('commit', '-q', '-m', 'taban')
 
@@ -250,6 +260,46 @@ describe('taban-tazele — CANLI DAVRANIS (gercek depo, gercek merge)', () => {
     expect(r.cikti).not.toMatch(/OTOMATIK cozuldu/)
   })
 
+  it('ILAN EDILMIS ISTISNA kirliyken CALISIR (kancanin urettigi dosya araci kilitlemez)', () => {
+    // Gercek surtunme: `post-commit` her commit'ten SONRA docs/system_tree.md'yi yeniden
+    // uretiyor, damgasi degisiyor ve agac SUREKLI kirli kaliyor — yani "agac temiz olmali"
+    // onkosulu kendi kancamiz yuzunden asla saglanmiyor ve arac HIC baslamiyordu.
+    // Tolere edilen liste GOMULU degil, ILAN dosyasindan okunur.
+    const f = fiksturKur(false, true)
+    fs.writeFileSync(path.join(f.kok, 'docs/istisna.md'), 'KANCA YENIDEN URETTI\n')
+    const r = f.kos(['--kapisiz'], { TABAN_TAZELE_BUILD_CMD: JSON.stringify([process.execPath, '-e', '0']) })
+    expect(r.cikti).toMatch(/tolere: docs\/istisna\.md/)
+    expect(r.cikti).toMatch(/OTOMATIK cozuldu/)
+    expect(r.kod).toBe(1)
+  })
+
+  it('FAIL-CLOSED: ILAN EDILMEMIS ayni kirlilik araci DURDURUR (ayirt edici cift)', () => {
+    // Ustteki kolun ikizi: TEK fark ilan dosyasinin YOKLUGU. Tolerans "her uretilmis
+    // gorunen dosya" degil, YALNIZ ilan edilmis olan icin gecerli olmali.
+    const f = fiksturKur(false, false)
+    fs.writeFileSync(path.join(f.kok, 'docs/istisna.md'), 'KANCA YENIDEN URETTI\n')
+    const r = f.kos(['--kapisiz'])
+    expect(r.kod).toBe(2)
+    expect(r.cikti).toMatch(/agac KIRLI/)
+    expect(r.cikti).toMatch(/docs\/istisna\.md/)
+    expect(r.cikti).not.toMatch(/OTOMATIK cozuldu/)
+  })
+
+  it('FAIL-CLOSED: ilan dosyasi BOZUKSA hicbir sey tolere edilmez', () => {
+    expect(betik.tolereEdilenKirlilik('{bozuk').size).toBe(0)
+    expect(betik.tolereEdilenKirlilik('').size).toBe(0)
+    expect(betik.tolereEdilenKirlilik(JSON.stringify({ istisnalar: 'dizi degil' })).size).toBe(0)
+    expect(betik.tolereEdilenKirlilik(JSON.stringify({ istisnalar: [{ uretec: 'yol alani YOK' }] })).size).toBe(0)
+  })
+
+  it('ilan dosyasindaki GERCEK istisnalar okunur (gomulu liste DEGIL)', () => {
+    const metin = fs.readFileSync(path.join(depoKoku(), betik.ISTISNA_YOLU), 'utf8')
+    const cozulmus = JSON.parse(metin) as { istisnalar: Array<{ yol: string }> }
+    const beklenen = new Set(cozulmus.istisnalar.map((i) => i.yol))
+    expect(beklenen.size).toBeGreaterThan(1)
+    expect([...betik.tolereEdilenKirlilik(metin)].sort()).toEqual([...beklenen].sort())
+  })
+
   it('IZLENEN dosya degistiyse yolu TAM basar (bastaki bosluk kirpilmaz)', () => {
     // Gercek kusurun davranis kolu: porcelain'in ilk satiri ` M <yol>` biciminde gelir.
     // Yol kirpilirsa ekranda `ocs/...` gorunur ve ic mantik yolu hicbir listeyle
@@ -275,7 +325,7 @@ describe('taban-tazele — sozlesme hijyeni', () => {
       'process.stdout.write("IHRACAT:"+Object.keys(m).sort().join(","));'
     const cikti = execFileSync(process.execPath, ['-e', kod], { encoding: 'utf8' })
     expect(cikti).toBe(
-      'IHRACAT:MANIFEST_YOLU,TAZELIK_KAPISI,cakismaSiniflandir,docBuildArgumanlari,docBuildKomutu,ilanEdilmisYollar,porcelainYollari',
+      'IHRACAT:ISTISNA_YOLU,MANIFEST_YOLU,TAZELIK_KAPISI,cakismaSiniflandir,docBuildArgumanlari,docBuildKomutu,ilanEdilmisYollar,porcelainYollari,tolereEdilenKirlilik',
     )
   })
 
