@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T11:51:32.040321+00:00
+compiled_at: 2026-09-01T12:05:31.107394+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-01T11:51:32.040321+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-01T12:05:31.107394+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -127,6 +127,7 @@ Bu belge, otonom derleyici tarafından 2026-09-01T11:51:32.040321+00:00 tarihind
 │   │   ├── ⚪ `product-schema-master-implementation-plan.md`
 │   │   ├── ⚪ `product-schema-standard-brief.md`
 │   │   ├── ⚪ `rec108-aile-adi-dil-zinciri-2026-09-01.md`
+│   │   ├── ⚪ `rec110-114-117-migration-paketi-2026-09-01.md`
 │   │   ├── ⚪ `render-dalga1-plan-2026-08-17.md`
 │   │   ├── ⚪ `saas-funding-and-packaging-2026-06.md`
 │   │   ├── ⚪ `seo-transition-blueprint.md`
