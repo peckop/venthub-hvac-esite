@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "bff0c811e7bddba065a474e8ff1ea119fbd9e7d1b87e62732fff2034405a3736",
+      "icerik_sha256": "e6b7bd9200ebeae31ee867147924a190dbd5a2f0cde01bf3087df17620ca794b",
       "kaynak": {
         "dosya_sayisi": 100,
         "dosyalar": {
@@ -110,7 +110,7 @@
         "izlenmeyen": [],
         "ozet": "e6254a5b129c0773ca2a2d3ee4497950fb828b736d72ef7061fa4e798b34b963"
       },
-      "kaynak_commit": "40b368c0fdfade16228fd15063f8434d850f34cb",
+      "kaynak_commit": "2c5faf7c6de7b3f9caeed1eb1b61809d3fdec653",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -127,7 +127,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "5698e985d7f983eaf472253a10bad32093b9caf8dd60d07faa606e44e2f9ca3c",
+      "icerik_sha256": "fd1c284564580362e476e0249687039e3a62bbff1798815690a9356712d53fa4",
       "kaynak": {
         "dosya_sayisi": 64,
         "dosyalar": {
@@ -199,7 +199,7 @@
         "izlenmeyen": [],
         "ozet": "4b474d6c3da1db1d31e1aa0048edee32f3bea444896b7b3182d611e0c82eebce"
       },
-      "kaynak_commit": "40b368c0fdfade16228fd15063f8434d850f34cb",
+      "kaynak_commit": "2c5faf7c6de7b3f9caeed1eb1b61809d3fdec653",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -208,7 +208,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "1b43bc23225f61121e4312255b1ce0489172d49a5a9209da3336d8771761cf73",
+      "icerik_sha256": "3ed7943b3555fd37b52ebe8621eb09082f900379e27c24240278ca3ba2557511",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -255,7 +255,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "40b368c0fdfade16228fd15063f8434d850f34cb",
+      "kaynak_commit": "2c5faf7c6de7b3f9caeed1eb1b61809d3fdec653",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -263,9 +263,9 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "aa1b229c35b95f11d5f6334d986682fa4cda1c25ad078f27702d36aa54262792",
+      "icerik_sha256": "8330ff913812ae0cab8f07e10629ae6a03b52ae9c0e6fde3f7208904eb23d3f0",
       "kaynak": {
-        "dosya_sayisi": 657,
+        "dosya_sayisi": 656,
         "dosyalar": {
           "eslint.config.md": "a256f1839b250eefdcf1ca81b79a1cfe8e36ed40",
           "next-env.d.md": "360d89410c4ebb89679a43bb745b27a3d0e7924d",
@@ -461,7 +461,6 @@
           "src/components/calculators/index.md": "a352c52c10746544efad06ad95967e5475264145",
           "src/components/category/CategoryAuthoritySection.md": "320cbad40a24bdf4d584ac70cbc95e4ad02a49a0",
           "src/components/category/CategoryFilters.md": "f611595974674b5170ad407636e5a95846cf0a92",
-          "src/components/category/CategoryHero.md": "fdfc9e69a14d354422db4782245c99790461d57f",
           "src/components/category/CategoryShowcase.md": "60d4d0984a1f8bd6e1b765845ce9d760ca8d90ad",
           "src/components/category/EducationalGuide.md": "c07c397a7672fac2d6a354bc4ac40e10031cba45",
           "src/components/category/EnhancedNeedsWizard.md": "40e42b209ed33effa04f56be50845a833ffa1cc1",
@@ -926,9 +925,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "adb5bb7cd4679f2667e8690ada31638a069cf727b9fae25747813dea65d147c2"
+        "ozet": "93b3c96adb1fd595d670b5ebd17534a2355cfbbc55ec639dd0c5862502e7433e"
       },
-      "kaynak_commit": "40b368c0fdfade16228fd15063f8434d850f34cb",
+      "kaynak_commit": "2c5faf7c6de7b3f9caeed1eb1b61809d3fdec653",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -937,7 +936,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-09-01T11:27:17.670626+00:00",
-  "kaynak_commit": "40b368c0fdfade16228fd15063f8434d850f34cb",
+  "derlendi": "2026-09-01T11:51:37.603915+00:00",
+  "kaynak_commit": "2c5faf7c6de7b3f9caeed1eb1b61809d3fdec653",
   "surum": 1
 }
