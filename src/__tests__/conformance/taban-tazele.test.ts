@@ -31,6 +31,7 @@ const BETIK_YOLU = require_.resolve('../../../scripts/hijyen/taban-tazele.cjs')
 const betik = require_(BETIK_YOLU) as {
   ilanEdilmisYollar: (metin: string) => Set<string>
   cakismaSiniflandir: (cakisanlar: string[], ilanlar: Set<string>) => { ilan: string[]; disi: string[] }
+  porcelainYollari: (cikti: string) => string[]
   docBuildArgumanlari: (agac: string) => string[]
   MANIFEST_YOLU: string
   TAZELIK_KAPISI: string
@@ -158,6 +159,25 @@ describe('taban-tazele — ilan listesi MANIFESTTEN okunur', () => {
   })
 })
 
+describe('taban-tazele — porcelain SUTUN duyarli ayristirilir', () => {
+  it('DEGISTIRILMIS (bastan bosluklu) satirin yolu KIRPILMADAN okunur', () => {
+    // 2026-09-01 gercek kusuru: cikti trim edilince ILK satirin bastaki boslugu gidiyor,
+    // ` M docs/x` -> `M docs/x` -> slice(3) -> `ocs/x`. Yol ilan listesiyle hicbir zaman
+    // eslesmiyor, degisen artefakt SESSIZCE commit edilmiyordu.
+    const cikti = ' M docs/artefakt_manifest.json\n?? yeni.txt\nMM docs/a_master.md\n'
+    expect(betik.porcelainYollari(cikti)).toEqual([
+      'docs/artefakt_manifest.json',
+      'yeni.txt',
+      'docs/a_master.md',
+    ])
+  })
+
+  it('yeniden adlandirmada YENI yol alinir, tirnak soyulur', () => {
+    expect(betik.porcelainYollari('R  eski.md -> docs/yeni.md\n')).toEqual(['docs/yeni.md'])
+    expect(betik.porcelainYollari(' M "docs/bosluk lu.md"\n')).toEqual(['docs/bosluk lu.md'])
+  })
+})
+
 describe('taban-tazele — --force-sync gercekten geciliyor', () => {
   it('doc build argumanlari --force-sync ve --repo-root icerir', () => {
     const args = betik.docBuildArgumanlari('C:/x/y')
@@ -216,6 +236,21 @@ describe('taban-tazele — CANLI DAVRANIS (gercek depo, gercek merge)', () => {
     expect(r.cikti).toMatch(/agac KIRLI/)
     expect(r.cikti).not.toMatch(/OTOMATIK cozuldu/)
   })
+
+  it('IZLENEN dosya degistiyse yolu TAM basar (bastaki bosluk kirpilmaz)', () => {
+    // Gercek kusurun davranis kolu: porcelain'in ilk satiri ` M <yol>` biciminde gelir.
+    // Yol kirpilirsa ekranda `ocs/...` gorunur ve ic mantik yolu hicbir listeyle
+    // eslestiremez. Izlenen bir dosyayi degistirip yolun AYNEN basildigini olcuyoruz.
+    const f = fiksturKur(false)
+    fs.writeFileSync(path.join(f.kok, 'docs/b_master.md'), 'ELLE DEGISTI\n')
+    const r = f.kos(['--kapisiz'])
+    expect(r.kod).toBe(2)
+    expect(r.cikti).toMatch(/docs\/b_master\.md/)
+    // ⚠Olcut tuzagi (bizzat yasandi): `not.toMatch(/ocs\/.../)` DOGRU ciktida da duser,
+    // cunku `docs/...` o dizeyi ICERIR. Kusur bicimi yolun SATIR BASINDA kirpilmis
+    // gorunmesidir; olcut satira baglanmali.
+    expect(r.cikti).not.toMatch(/^\s*ocs\//m)
+  })
 })
 
 describe('taban-tazele — sozlesme hijyeni', () => {
@@ -226,7 +261,9 @@ describe('taban-tazele — sozlesme hijyeni', () => {
       'const m=require(' + JSON.stringify(BETIK_YOLU) + ');' +
       'process.stdout.write("IHRACAT:"+Object.keys(m).sort().join(","));'
     const cikti = execFileSync(process.execPath, ['-e', kod], { encoding: 'utf8' })
-    expect(cikti).toBe('IHRACAT:MANIFEST_YOLU,TAZELIK_KAPISI,cakismaSiniflandir,docBuildArgumanlari,ilanEdilmisYollar')
+    expect(cikti).toBe(
+      'IHRACAT:MANIFEST_YOLU,TAZELIK_KAPISI,cakismaSiniflandir,docBuildArgumanlari,ilanEdilmisYollar,porcelainYollari',
+    )
   })
 
   it('betigin isaret ettigi tazelik kapisi dosyasi GERCEKTEN var', () => {

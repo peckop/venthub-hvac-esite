@@ -52,13 +52,21 @@ const path = require('path')
 const MANIFEST_YOLU = 'docs/artefakt_manifest.json'
 const TAZELIK_KAPISI = 'src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts'
 
-/** Her git cagrisi -C ile. cwd'ye ASLA guvenilmez. */
-function git(agac, args, { yut = false } = {}) {
+/**
+ * Her git cagrisi -C ile. cwd'ye ASLA guvenilmez.
+ * `ham: true` -> cikti TRIM EDILMEZ. Bu bir suslemeleme degil: `status --porcelain`
+ * satirlari SUTUN duyarlidir (` M yol` ilk iki sutun durum kodudur) ve trim ilk satirin
+ * BASTAKI BOSLUGUNU yer. 2026-09-01'de tam bu yuzden ` M docs/x` yolu `ocs/x` diye
+ * ayristirildi, ilan listesiyle hicbir zaman eslesmedi ve degisen artefakt SESSIZCE
+ * commit edilmedi. Kusuru fikstur degil GERCEK agacta kosturmak buldu.
+ */
+function git(agac, args, { yut = false, ham = false } = {}) {
   try {
-    return execFileSync('git', ['-C', agac, ...args], {
+    const cikti = execFileSync('git', ['-C', agac, ...args], {
       encoding: 'utf8',
       maxBuffer: 64 * 1024 * 1024,
-    }).trim()
+    })
+    return ham ? cikti : cikti.trim()
   } catch (e) {
     if (yut) return null
     const detay = String((e && e.stdout) || '') + String((e && e.stderr) || '')
@@ -146,9 +154,29 @@ function docBuildKos(agac) {
   }
 }
 
+/**
+ * `git status --porcelain` ciktisindan YOL listesi. Bicim SUTUN duyarlidir:
+ *   XY<bosluk><yol>            (X ve Y durum kodu; biri bosluk OLABILIR)
+ *   XY<bosluk><eski> -> <yeni> (yeniden adlandirma; ilgilendigimiz YENI yol)
+ * Yollar bosluk iceriyorsa git onlari tirnaklar; tirnak soyulur.
+ */
+function porcelainYollari(cikti) {
+  const yollar = []
+  for (const satirHam of String(cikti).split('\n')) {
+    const satir = satirHam.replace(/\r$/, '')
+    if (satir.length < 4) continue
+    let yol = satir.slice(3)
+    const ok = yol.indexOf(' -> ')
+    if (ok >= 0) yol = yol.slice(ok + 4)
+    yol = yol.trim()
+    if (yol.startsWith('"') && yol.endsWith('"')) yol = yol.slice(1, -1)
+    if (yol) yollar.push(yol.replace(/\\/g, '/'))
+  }
+  return yollar
+}
+
 function kirliYollar(agac) {
-  const s = git(agac, ['status', '--porcelain'])
-  return s ? s.split('\n').filter(Boolean).map((l) => l.slice(3).trim()) : []
+  return porcelainYollari(git(agac, ['status', '--porcelain'], { ham: true }))
 }
 
 function main() {
@@ -312,4 +340,11 @@ if (require.main === module) {
   process.exit(kod)
 }
 
-module.exports = { ilanEdilmisYollar, cakismaSiniflandir, docBuildArgumanlari, MANIFEST_YOLU, TAZELIK_KAPISI }
+module.exports = {
+  ilanEdilmisYollar,
+  cakismaSiniflandir,
+  porcelainYollari,
+  docBuildArgumanlari,
+  MANIFEST_YOLU,
+  TAZELIK_KAPISI,
+}
