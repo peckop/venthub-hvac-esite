@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T12:39:58.390692+00:00
+compiled_at: 2026-09-01T12:52:45.329683+00:00
 total_compiled_files: 64
-source_commit: d2c7d698
+source_commit: 3e3c828f
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9704,6 +9704,66 @@ koşmam bile bir `.pyc`'yi kirletti).
   düşmedi" ile **aynı görünüyordu** — yani geçerli bir sabotaj "KAPI KÖR" diye raporlanabilirdi.
   `okundu` bayrağı eklendi; okunamayan koşu artık **"ÖLÇÜLEMEDİ"**dir, "yeşil geçti" değildir.
   Sessizliği başarı sayan her araç, ölçmesi gereken arızada susar.
+
+---
+
+## 25. FİKSTÜR, BİÇİMİN SAHADA KULLANILAN VARYANTINI ÜRETMİYORSA KOL BOŞ KOŞAR
+
+**Ölçülmüş vaka (2026-09-01):** `precompact-durum-kapisi.cjs` **günde iki kez** yanlış alarm
+verdi ("EKSIK ALAN: son girdi, verilen sozler") — oysa alanlar dosyada VARDI. Kapının
+konformans takımı **10/10 yeşildi**. URUN bildirdi, ALTYAPI ölçtü.
+
+### Kök sebep — Türkçe İ, iki katmanlı bir tuzak
+
+`DORT_ALAN` desenleri ASCII yazılıydı (`son girdi` / `SON GIRDI`), şeritlerin başlıkları ise
+Türkçe: **`SON GİRDİ`**.
+
+1. JavaScript'in `/i` bayrağı **noktalı İ'yi i'ye KATLAMAZ** (`u` bayrağıyla da katlamaz).
+2. Ve asıl tuzak: `'SON GİRDİ'.toLowerCase()` düz `'son girdi'` **DEĞİL**,
+   **`'son gi̇rdi̇'`** verir — `i` + **BİRLEŞİK NOKTA** (U+0307). Yani "küçük harfe çevir"
+   **tek başına çözmez**; birleşik işaretlerin de atılması gerekir.
+
+Çözüm: `normalize('NFD')` → birleşik işaretleri (U+0300–U+036F) at → noktasız `ı`'yı elle eşle
+→ küçült. Böylece `İ→i`, `ş→s`, `ğ→g`, `ö→o`, `ü→u`, `ç→c`, `ı→i`. Desenler **sade ASCII**
+kalabilir — çünkü desen başına iki varyant yazmak zorunda kalmak, varyantlardan birini
+unutmanın ta kendisiydi.
+
+### ⭐HÜKÜM — kolun yeşilliği, fikstürün ürettiği biçim kadardır
+
+Kapının bütün fikstürleri ASCII başlık üretiyordu. Yani kol vardı, ama **ölçtüğü şey sahada
+yoktu**. Bu, §22'deki "ölçülmeyen dal, yazılmamış dal kadar korumasızdır" dersinin biçim
+eksenindeki kardeşidir: orada bir KOD DALI hiç koşulmuyordu, burada bir VERİ BİÇİMİ hiç
+üretilmiyordu. **Fikstür, sahada gerçekten yazılan biçimi üretmek zorundadır** — özellikle
+dile bağlı biçimlerde.
+
+### ⭐"YEŞİL GÖRDÜM" ≠ "ÖLÇÜT ÇALIŞIYOR"
+
+Bu kapı **benim kendi durum dosyamda YEŞİLDİ** ve bu beni yanılttı. Sebebi ölçünce çıktı:
+eski bloklarımda ASCII `SON GIRDI` başlığı vardı, yani kapı bende **tesadüfen** geçiyordu.
+Bir kapının kendi dosyanızda yeşil olması, ölçütün doğru olduğunun kanıtı değildir; yalnızca
+sizin verinizin o ölçüte uyduğunun kanıtıdır.
+
+### AYIRT EDİCİ ÇİFT — URUN'un doğru itirazı
+
+URUN yalnız kusuru değil, kolun nasıl yazılması gerektiğini de söyledi: *"alanı gerçekten
+silinmiş örnekte KIRMIZI, dolu dosyada YEŞİL vermeli; şu an yalnız kırmızı veriyor, yani dolu
+ile boşu AYIRT ETMİYOR."* Tek yönlü kol yetmez — **her hâlde yeşil veren bir kapı da
+"Türkçe başlık tanınır" kolunu geçer**. Bu yüzden onarım iki kolla geldi: Türkçe dolu dosya
+YEŞİL, Türkçe dosyadan bir alan gerçekten silinince UYARIR. Sabotaj **5/5**.
+
+### KATLAMA İŞLEVİ DIŞA AÇILIR
+
+`asciiKatla` export edilir ve test **onu** çağırır. Test kendi katlamasını yazsaydı iki ölçüt
+ayrışır, biri bayatlar ve yanlış alarm sessizce geri gelirdi — bu, "kancalar ölçütü
+kopyalamak zorunda kalırsa ölçüt ikiye ayrılır" hükmünün (§23) aynısıdır.
+
+### GÜNÜN SINIFI: BUGÜN DÖRDÜNCÜ TÜRKÇE İ/ı VAKASI
+
+Sırasıyla: `KIMLIK`/`KİMLİK` · `DIŞ`/`dış` · sabotaj betiğinin `ESKI`/`ESKİ` beklentisi · ve
+bu — **bir KAPININ İÇİNDE, bütün şeritleri etkileyerek**. İlk üçü ölçüm sırasında görülüp
+düzeltildi; bu dördüncüsü **günde iki kez sahada** öttü ve testler yeşil kaldı.
+**Hüküm: Türkçe metinle çalışan her eşleştirme ASCII-katlanmış metne karşı koşar.**
+Ve yanlış alarm ucuz değildir: **yanlış alarm veren kapı, bir süre sonra okunmayan kapıdır.**
 
 
 ---
