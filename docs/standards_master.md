@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T07:23:43.608579+00:00
+compiled_at: 2026-09-01T07:30:46.214170+00:00
 total_compiled_files: 62
-source_commit: eff1bed4
+source_commit: 65f9725a
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9312,6 +9312,21 @@ kaybolacaktı**, sessizce. Onarım: `if (require.main === module) main()`.
 **Ders iki cümle:** kaynak tarayan bir kol **varlık** ölçer, **davranış** ölçmez — ve
 sözleşme bozan hatalar tam olarak davranış katmanında yaşar. Kütüphane olarak `require`
 edilebilen her betik **yan etkisiz** olmalıdır.
+
+### ⭐Kardeş vaka (URUN, 2026-09-01): KENDİ REFAKTÖRÜN KENDİ KAPINI KÖR EDEBİLİR
+
+Aynı sınıf, başka şeritte, aynı gün. URUN'un yeni vaat-bütünlüğü kapısının **ilk sürümü
+sabotajda YEŞİL kaldı**. Sebep kolun zayıflığı değildi: **aynı PR'daki bir refaktör**
+literal dizeleri `t(değişken)` çağrısına çevirdi, ve kapının toplayıcısı dizeyi **çağrıdan**
+okuduğu için görecek bir şey kalmadı. Düzeltme: toplayıcı dizeyi çağrıdan değil **dosyadan**
+alır.
+
+**Hüküm:** bir kapı, koruduğu kodun **kendi PR'ındaki değişimine** karşı da ölçülür. Kapıyı
+ve onun koruduğu kodu aynı PR'da değiştiriyorsan, sabotajı **refaktör sonrası** hale karşı
+kur — refaktör öncesi hale karşı kurulmuş sabotaj, artık var olmayan bir kodu sınar.
+Ve daha genel olarak: **sabotaj testi bir ritüel değil, kör-nokta bulucudur**; yeşil kalan
+her sabotaj ya kapıda ya da fikstürde adı konması gereken bir boşluk gösterir (bu belgede
+aynı gün üç kez: metin taraması, koşulmayan dal, fikstürün üretmediği biçim varyantı).
 
 ### Adıyla bırakılan iki kalem (bu şeritte DEĞİL)
 
