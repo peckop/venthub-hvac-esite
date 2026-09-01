@@ -261,8 +261,45 @@ function main() {
     ilan.forEach((y) => console.log('   ours -> ' + y))
   }
 
-  // AXIOM 7 — cift rollu dosya yuzunden build TEK TURDA kapanmaz; iki tur kosulur.
+  /**
+   * TAZELIK KAPISINI kos. `null` = kosulamadi (arac yok / kapi kapatilmis).
+   * `npx` KULLANILMAZ: Windows'ta npx bir .cmd sarmalayicisidir ve execFileSync onu kabuk
+   * olmadan CALISTIRAMAZ — komut sessizce hic kosmaz, ciktisi bos gelir ve "kapi kirmizi"
+   * sanilir. Olculdu (2026-09-01). Dogrusu vitest'in JS girisini dogrudan cagirmak.
+   */
+  const kapiOlc = () => {
+    if (!kapiKos) return null
+    const vitestGirisi = path.join(agac, 'node_modules/vitest/vitest.mjs')
+    if (!fs.existsSync(vitestGirisi)) {
+      console.log('Kapi ATLANDI: vitest girisi yok -> ' + vitestGirisi)
+      return null
+    }
+    try {
+      execFileSync(process.execPath, [vitestGirisi, 'run', TAZELIK_KAPISI], {
+        encoding: 'utf8',
+        cwd: agac,
+        stdio: 'inherit',
+        maxBuffer: 64 * 1024 * 1024,
+      })
+      return 'YESIL'
+    } catch {
+      return 'KIRMIZI'
+    }
+  }
+
+  /**
+   * AXIOM 7 — cift rollu dosya yuzunden build TEK TURDA kapanmayabilir; en cok IKI tur.
+   *
+   * ⭐TURLAR KAPI GUDUMLUDUR, sayi guduml DEGIL. Olculdu (2026-09-01): `doc build`
+   * hicbir zaman "fark yok" haline YAKINSAMAZ — artefakti commit'lemek HEAD'i degistirir,
+   * manifest de `kaynak_commit`/`compiled_at` ile HEAD'i takip eder, yani her tur DAMGA
+   * farki uretir. Icerik ozeti (`ozet`) ise ayni kalir. Kosulsuz iki tur kosmak bu yuzden
+   * her tazelemede GEREKSIZ bir commit uretir — ve o commit uretilmis artefakta dokundugu
+   * icin BASKA dallar icin cakisma olasiligini artirir, yani cozdugumuz problemi besler.
+   * Bu yuzden: tur 1'den sonra kapiyi olc; YESILSE dur.
+   */
   let uretimTamam = true
+  let kapiSonuc = 'KOSULMADI'
   for (const tur of [1, 2]) {
     const r = docBuildKos(agac)
     if (!r.tamam) {
@@ -287,29 +324,16 @@ function main() {
     } else {
       console.log('AXIOM 7 tur ' + tur + ': ilan edilmis artefaktta degisiklik yok.')
     }
-  }
 
-  let kapiSonuc = 'KOSULMADI'
-  if (kapiKos && uretimTamam) {
-    // `npx` KULLANILMAZ: Windows'ta npx bir .cmd sarmalayicisidir ve execFileSync onu
-    // kabuk olmadan CALISTIRAMAZ — komut sessizce hic kosmaz, ciktisi bos gelir ve
-    // "kapi kirmizi" sanilir. Olculdu (2026-09-01). Dogrusu vitest'in JS girisi.
-    const vitestGirisi = path.join(agac, 'node_modules/vitest/vitest.mjs')
-    if (!fs.existsSync(vitestGirisi)) {
-      console.log('Kapi ATLANDI: vitest girisi yok -> ' + vitestGirisi)
-    } else {
-      try {
-        execFileSync(process.execPath, [vitestGirisi, 'run', TAZELIK_KAPISI], {
-          encoding: 'utf8',
-          cwd: agac,
-          stdio: 'inherit',
-          maxBuffer: 64 * 1024 * 1024,
-        })
-        kapiSonuc = 'YESIL'
-      } catch {
-        kapiSonuc = 'KIRMIZI'
-      }
+    const olcum = kapiOlc()
+    if (olcum === null) {
+      // Kapi kosulamadi -> tur sayisiyla karar veremeyiz; AXIOM 7'nin guvenli tarafi
+      // olan IKI turu tamamla. Olcemedigimiz yerde ihtiyatli davranilir.
+      continue
     }
+    kapiSonuc = olcum
+    console.log('AXIOM 7 tur ' + tur + ' sonrasi INV-DOC-4b: ' + olcum)
+    if (olcum === 'YESIL') break
   }
 
   console.log('')
