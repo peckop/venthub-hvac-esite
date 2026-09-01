@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T10:22:07.315055+00:00
+compiled_at: 2026-09-01T10:53:21.193249+00:00
 total_compiled_files: 100
-source_commit: 6975cba5
+source_commit: e6c52e6e
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -13815,11 +13815,11 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T09:43:51.471523+00:00
+compiled_at: 2026-09-01T10:47:45.273741+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-01T09:43:51.471523+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-01T10:47:45.273741+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -14004,6 +14004,7 @@ Bu belge, otonom derleyici tarafından 2026-09-01T09:43:51.471523+00:00 tarihind
 │   │   ├── ⚪ `fleet-mechanism-standard.md`
 │   │   ├── ⚪ `form-submission-standard.md`
 │   │   ├── ⚪ `i18n-localization-standard.md`
+│   │   ├── ⚪ `i18n-ters-yon-standard.md`
 │   │   ├── ⚪ `is-kayit-duzeni-standard.md`
 │   │   ├── ⚪ `legal-compliance-standard.md`
 │   │   ├── ⚪ `measurement-discipline-standard.md`

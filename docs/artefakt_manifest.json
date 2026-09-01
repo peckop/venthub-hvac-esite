@@ -2,7 +2,7 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "29d67873cc09166de1d766916cf57ad01487ced4a187a776f43de4f0a4638ce5",
+      "icerik_sha256": "33f85bf537ca7e04eb1919371e025bd53112798d1f59437645ea494277b8239f",
       "kaynak": {
         "dosya_sayisi": 100,
         "dosyalar": {
@@ -105,12 +105,12 @@
           "docs/plans/venthub_hvac_unified_refactor_plan.md": "91872b3835444bce317477cf0d7c649584630158",
           "docs/plans/venthub_saas_faz1_prompt.md": "c874969b99b46565010882bbd7c198b8de32150f",
           "docs/plans/venthub_saas_master_roadmap.md": "388f9a58a03cf31de453b63eb3b3a9658451122a",
-          "docs/system_tree.md": "421f7ba6fa7b910c1883e72eae99feb09df38719"
+          "docs/system_tree.md": "0f45e123a9332f375c56bb81796fd70c791fa21f"
         },
         "izlenmeyen": [],
-        "ozet": "89e348c2c629bac37f63676eab3fbdb07ef2629ea4f4b9a8ef6d3c522f1b41ff"
+        "ozet": "e6254a5b129c0773ca2a2d3ee4497950fb828b736d72ef7061fa4e798b34b963"
       },
-      "kaynak_commit": "6975cba5849415f8a04011ef9e4ecbb9750622dc",
+      "kaynak_commit": "e6c52e6e6d252e042146afbe058838da0590a27b",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -127,9 +127,9 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "27daf32238a27a845064fafb4140508408a5c4113c8510638386dc8a1cbf931c",
+      "icerik_sha256": "a6d063e676fb46ef0cadd164041a70465d354bf8c91db97dda08ebec93094de1",
       "kaynak": {
-        "dosya_sayisi": 63,
+        "dosya_sayisi": 64,
         "dosyalar": {
           "docs/reference/supabase/auth-hooks.md": "bc0a4d34ede33a271325f3d0c65fb1d92713309a",
           "docs/reference/supabase/custom-claims-and-role-based-access-control-rbac.md": "0ab154329dc304b720152b3fec1b03b5d1c23b36",
@@ -169,6 +169,7 @@
           "docs/standards/fleet-mechanism-standard.md": "ccd5e6498bdd059fb9f7e59f29a27fbc1185d720",
           "docs/standards/form-submission-standard.md": "db8615f18333451cf5ac75dde586079612b91067",
           "docs/standards/i18n-localization-standard.md": "0fadad000d410a3ea8d66fd334a5c061e8d8f8c4",
+          "docs/standards/i18n-ters-yon-standard.md": "7a25fd2c05350408c949bd9a3e97a7281e2c1508",
           "docs/standards/is-kayit-duzeni-standard.md": "575239e83d0a0ce0675f4197d735f85f87bfedeb",
           "docs/standards/legal-compliance-standard.md": "765aa60b58eed3045e9ca4f4a09f9ef27af69ea5",
           "docs/standards/measurement-discipline-standard.md": "198fd71e72acd4c2e99da6788b7822d061c14239",
@@ -196,9 +197,9 @@
           "docs/standards/work-tracking-ssot-standard.md": "6a00f894fbc818c9e927e2ced965936c6162475e"
         },
         "izlenmeyen": [],
-        "ozet": "d29c98938e909da099e6da55257dfef94a2713f2399bfa7cf7c3f2bf1b1cebdb"
+        "ozet": "99c84ebdf73b5fc04990d7b4e99205778eef5260ccefc7804538c4fa32086dcf"
       },
-      "kaynak_commit": "6975cba5849415f8a04011ef9e4ecbb9750622dc",
+      "kaynak_commit": "e6c52e6e6d252e042146afbe058838da0590a27b",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -207,7 +208,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "2e3d6aa778830a0f416ee9bc0bf48a955ec18a265023da35bea0e68e5ce9abba",
+      "icerik_sha256": "c95c22fe2f1fe0b83ded26136f9a2bc07000e7c164623a6a07e8d33845659daf",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -254,7 +255,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "6975cba5849415f8a04011ef9e4ecbb9750622dc",
+      "kaynak_commit": "e6c52e6e6d252e042146afbe058838da0590a27b",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -262,7 +263,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "80fe3dbecad0c600441fcdda3034a5418d38b4377deb2e8e9b5f4930792581b4",
+      "icerik_sha256": "993c974653d7d1319b18136bfc32355fa2dcab750fe10b66cfe36f095b76b9ab",
       "kaynak": {
         "dosya_sayisi": 657,
         "dosyalar": {
@@ -684,7 +685,7 @@
           "src/i18n/dictionaries/admin/webhooks.en.md": "dfb24c8f8aa8755af9c94c527b3c46140fa555f2",
           "src/i18n/dictionaries/admin/webhooks.tr.md": "7ec94e6c9e253deb39736874a310a9341a36975c",
           "src/i18n/dictionaries/en.md": "471af8159daef7e541b93950868f1ce04a595826",
-          "src/i18n/dictionaries/tr.md": "82542ab87de4d0d420abba901cd14055800ab6a4",
+          "src/i18n/dictionaries/tr.md": "3643c17bf7a6a939ab36ddf05861f69a90d44e0d",
           "src/i18n/format.md": "1111a07a2cd3711a9838249972fe7f0eb216ba98",
           "src/i18n/getDictValue.md": "833bd9416d6ebf062b30f578d433e07e41f6f117",
           "src/i18n/sort.md": "c6c2a8846f3dc39a614261621569182e6bceb2eb",
@@ -925,9 +926,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "3982fbaa8fda3883129310c4c174b2b3d84d3e4e052e080adb0280379ae8727d"
+        "ozet": "adb5bb7cd4679f2667e8690ada31638a069cf727b9fae25747813dea65d147c2"
       },
-      "kaynak_commit": "6975cba5849415f8a04011ef9e4ecbb9750622dc",
+      "kaynak_commit": "e6c52e6e6d252e042146afbe058838da0590a27b",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -936,7 +937,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-09-01T10:22:07.775816+00:00",
-  "kaynak_commit": "6975cba5849415f8a04011ef9e4ecbb9750622dc",
+  "derlendi": "2026-09-01T10:53:21.579030+00:00",
+  "kaynak_commit": "e6c52e6e6d252e042146afbe058838da0590a27b",
   "surum": 1
 }
