@@ -1187,7 +1187,8 @@ export const en: typeof tr = {
       description2: 'Founded by Attilio Pagani, the company won Italy\'s most prestigious design award, Compasso d\'Oro, with its very first product. Today, it serves millions of users in more than 90 countries.',
       authorizedDealer: 'Brand Assurance',
       ceCertified: 'CE Certified',
-      warranty2y: '2-Year Warranty',
+      // REC-104 second pass: see tr.ts — the fixed two-year claim survived here.
+      warranty: 'Manufacturer Warranty',
       premiumComfort: 'Premium Comfort',
       authorizedDealerNotice: 'VentHub supplies Vortice products with full brand assurance.',
       highlights: [
