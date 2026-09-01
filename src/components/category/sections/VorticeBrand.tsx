@@ -78,7 +78,7 @@ const VorticeBrand: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
                                 <Star className="text-orange-400" size={16} />
-                                <span className="text-xs sm:text-sm">{bDict.warranty2y}</span>
+                                <span className="text-xs sm:text-sm">{bDict.warranty}</span>
                             </div>
                         </div>
                     </div>

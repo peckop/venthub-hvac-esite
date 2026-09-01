@@ -1555,7 +1555,12 @@ export const tr = {
       description2: 'Attilio Pagani tarafından kurulan şirket, ilk ürünüyle İtalya\'nın en prestijli tasarım ödülü Compasso d\'Oro\'yu kazanmıştır. Bugün 90\'dan fazla ülkede milyonlarca kullanıcıya hizmet vermektedir.',
       authorizedDealer: 'Marka Güvencesi',
       ceCertified: 'CE Sertifikalı',
-      warranty2y: '2 Yıl Garanti',
+      // REC-104 ikinci tur: "2 Yıl Garanti" rakamı Recep hükmüyle kalkmıştı ama YALNIZ
+      // güven şeridinden kaldırılmıştı; AYNI SAYFADAKI bu Vortice rozeti gözden kaçtı ve
+      // canlıda ölçülünce görüldü. Kendi destek sayfamız "garanti kapsamı üretici/
+      // ithalatçıya göre değişebilir" diyor — sabit süre vaat edilemez.
+      // Anahtar adı `warranty2y` yanıltıcı hale geldiği için `warranty` oldu.
+      warranty: 'Üretici Garantisi',
       premiumComfort: 'Premium Konfor',
       authorizedDealerNotice: 'VentHub, Vortice ürünlerini marka güvencesiyle sunar.',
       highlights: [
