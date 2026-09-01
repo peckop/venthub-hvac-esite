@@ -155,8 +155,9 @@ export const tr = {
     sku: 'SKU',
     share: 'Paylaş',
     requestQuote: 'Teklif İste',
-    officialGuarantee: 'Resmi Garantili',
-    fastDelivery: 'Hızlı Teslimat',
+    // REC-115: `common.officialGuarantee` ve `common.fastDelivery` KALDIRILDI —
+    // tek tüketicileri ölü bileşen CategoryHero'ydu, o da silindi (INV-6 ölü anahtar).
+    // NOT: `category.trustSignals.fastDelivery` AYRI bir anahtardır ve YAŞIYOR.
     series: 'Seri',
     reset: 'Sıfırla',
     whatsapp: {
@@ -215,7 +216,7 @@ export const tr = {
     heroTitle: 'HVAC ürünlerini keşfedin: mühendislik odaklı seçim, hızlı teklif',
     heroSubtitle: 'Uygulama yönlendirmeli alanlar, popüler kategoriler ve öne çıkan ürünlerle aradığınızı hızla bulun.',
     itemsListed: 'ürün listeleniyor',
-    resultsFound: 'sonuç bulundu',
+    // REC-115: `products.resultsFound` KALDIRILDI — tek tüketicisi CategoryHero'ydu.
     popularCategories: 'Popüler Kategoriler',
     hubTitle: 'Profesyonel HVAC Çözümleri',
     searchPlaceholder: 'Ürün veya model ara...',
