@@ -68,7 +68,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 href={Routes.category(getLocalizedCategorySlug(parentCategory || category, lang), getLocalizedCategorySlug(sub, lang))}
                 className="block px-3 py-2 text-sm text-slate-600 hover:text-primary-navy hover:bg-slate-50 rounded-lg transition-colors font-medium"
               >
-                {getCategoryDisplayName(sub)}
+                {getCategoryDisplayName(sub, t)}
               </Link>
             ))}
           </div>

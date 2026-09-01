@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import { DomainCategory, mapCategoryWithLocale } from '../lib/type-converters'
 import type { DbCategory } from '../types/db-rows'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 export interface CategoryViewModel {
   id: string
@@ -42,15 +43,15 @@ export function useCategoryViewModel() {
     // Proactively localize category metadata based on current language
     const localizedCategory = mapCategoryWithLocale(category as DbCategory, lang)
 
-    // 1. i18n Resolution via translation_key (Advanced Standard)
-    const tKey = localizedCategory.translation_key || localizedCategory.slug
-    const translationPath = `common.categoryList.${tKey}`
-    const translatedName = t(translationPath)
-    
-    // If translation fails, fallback to DB menu_label or original name
-    const displayName = (translatedName && translatedName !== translationPath) 
-      ? translatedName 
-      : (localizedCategory.menu_label || localizedCategory.name)
+    // 1. Ad çözümü — TEK KAYNAK.
+    //
+    // ⭐REC-103 (2026-09-01): burada `common.categoryList.${tKey}` → menu_label → name
+    // zinciri ELLE YAZILMIŞTI; yani `getCategoryDisplayName` ile BİREBİR aynı kural
+    // ikinci kez, bağımsız olarak duruyordu. Mutlak Kural 7 "kategori ADI daima
+    // getCategoryDisplayName" der — kopyalamak da ihlaldir, çünkü kuralın bir kolu
+    // düzeltilince diğeri sessizce eski davranışta kalır. Menüler, showcase görünümleri
+    // ve orbital karusel bu hook'tan besleniyor; yani kopya zincir müşteri yüzeyindeydi.
+    const displayName = getCategoryDisplayName(localizedCategory as DbCategory, t)
 
     // 2. Marketing Title Logic
     const marketingTitle = localizedCategory.marketing_title || displayName

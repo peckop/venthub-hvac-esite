@@ -76,6 +76,10 @@ export const en: typeof tr = {
       accessories: 'Accessories and Components',
       'smart-home': 'Smart Home',
       'parking-jet': 'Car Park Jet Fans',
+      // REC-103: see tr.ts — 8 of the 23 active DB categories had no key here at all,
+      // so /en pages silently fell back to the Turkish `menu_label`.
+      fans: 'Fans',
+      'control-systems': 'Control Systems',
       sub: {
         bathroom: 'Bathroom and Toilet Fans',
         window: 'Window and Wall Fans',
@@ -94,7 +98,16 @@ export const en: typeof tr = {
         'acid-fans': 'Acid-Resistant Fans',
         'freq-converters': 'Frequency Converters',
         'duct-heaters': 'Electric Duct Heaters',
-        dehumidifier: 'Dehumidifiers'
+        dehumidifier: 'Dehumidifiers',
+        // REC-103: the six missing sub-categories.
+        // ⭐"Duct Type Fans" deliberately differs from `ghost` ("In-line / Duct Fans").
+        // ⭐"Water Coil Duct Heaters" deliberately differs from `duct-heaters` (electric).
+        chimney: 'Chimney and Flue Fans',
+        'duct-fans': 'Duct Type Fans',
+        'ducted-central-hrv': 'Ducted Central Units',
+        'single-room-hrv': 'Single Room Units',
+        'speed-controllers': 'Speed Controllers',
+        'water-coils': 'Water Coil Duct Heaters'
       }
     },
     viewAll: 'View all',

@@ -12,18 +12,38 @@ export type CategorySlugSource = {
 }
 
 /**
+ * Ad çözümü için gereken EN AZ alan kümesi. `DbCategory`, `DomainCategory` ve
+ * `Partial<DbCategory>` (ör. SearchOverlay'in popüler kategori listesi) bunu karşılar.
+ *
+ * ⭐REC-103: bu tip, çağrı yerinde kaba tip dökümü yazmamak için var. Döküm kuralı
+ * sağlamaz, yalnızca derleyiciyi susturur; imzayı gerçekten kullanılan alanlara
+ * genişletmek doğrusudur.
+ */
+export type CategoryNameSource = {
+    name?: string | null
+    menu_label?: string | null
+    translation_key?: string | null
+    slug?: string | null
+}
+
+/**
  * Determines the most appropriate localized display name for a given category.
  * Prioritizes the i18n translation (if a translation function is provided and the key exists),
  * falls back to the database-provided `menu_label`, and finally defaults to the raw `name`.
  *
  * @param category - The database category object to extract the name from
- * @param t - Optional translation function (e.g., from i18next or custom hook)
+ * @param t - Sözlük çözücü. ⭐REC-103 UYARISI: imzada opsiyonel ama ATLANMASI KUSURDUR.
+ *   `t` verilmezse 1. adım (sözlük) HİÇ çalışmaz ve fonksiyon doğrudan `menu_label` /
+ *   `name`'e düşer — ikisi de Türkçedir. 2026-09-01'de canlıda ölçülen kusur buydu:
+ *   sözlükte anahtar OLSA BİLE `t`'siz çağrı İngilizce sayfada Türkçe ad basıyordu.
+ *   Opsiyonelliği yalnız birim testleri için korunuyor; ürün kodunda daima geçilir.
+ *   Kapı: `INV-KATEGORI-ADI-1` (src/__tests__/conformance/kategori-adi-tek-kaynak.test.ts).
  * @returns The resolved display name string
  *
  * @example
  * getCategoryDisplayName(category, t) // returns "Aksesuarlar" (translated)
  */
-export const getCategoryDisplayName = (category: DbCategory | null | undefined, t?: (key: string) => string): string => {
+export const getCategoryDisplayName = (category: CategoryNameSource | DbCategory | null | undefined, t?: (key: string) => string): string => {
     if (!category) return ''
     
     // 1. Try to translate via i18n using translation_key OR slug
@@ -42,8 +62,8 @@ export const getCategoryDisplayName = (category: DbCategory | null | undefined, 
         return category.menu_label
     }
 
-    // 3. Last resort: Original name
-    return category.name
+    // 3. Last resort: Original name (minimal şekilde `name` opsiyonel — yoksa boş dize)
+    return category.name ?? ''
 }
 
 /**
@@ -93,14 +113,21 @@ export const getLocalizedCategorySlug = (
  * @example
  * getCategoryMarketingTitle(category) // returns "Premium Havalandırma Çözümleri"
  */
-export const getCategoryMarketingTitle = (category: DbCategory | null | undefined): string => {
+export const getCategoryMarketingTitle = (
+    category: DbCategory | null | undefined,
+    t?: (key: string) => string,
+): string => {
     if (!category) return ''
 
     if (category.marketing_title) {
         return category.marketing_title
     }
 
-    return getCategoryDisplayName(category)
+    // ⭐REC-103: burası `t`'siz çağırıyordu; yani pazarlama başlığı olmayan her kategori
+    // bu yoldan TÜRKÇE ad alıyordu. Kapı (INV-KATEGORI-ADI-1) bunu ben listeyi
+    // çıkarırken gözden kaçırmışken yakaladı — 12 çağrı sanıyordum, 13'müş.
+    // Ürün kodunda bugün çağıran yok (yalnız birim testi), ama imza sızıntıya açıktı.
+    return getCategoryDisplayName(category, t)
 }
 
 /**

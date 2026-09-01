@@ -104,7 +104,7 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
               )}>
                 <VentImage 
                   src={categoryImageUrl}
-                  alt={getCategoryDisplayName(category)}
+                  alt={getCategoryDisplayName(category, t)}
                   fill
                   className="object-cover"
                 />
@@ -129,14 +129,14 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
                   "text-xs font-bold uppercase tracking-hvac-loose mb-4 block",
                   isMainCategory ? "text-cyan-400" : "text-indigo-600"
                 )}>
-                  {getCategoryDisplayName(parentCategory)}
+                  {getCategoryDisplayName(parentCategory, t)}
                 </span>
               )}
               <h1 className={cn(
                 "font-black tracking-tighter leading-none mb-6",
                 isMainCategory ? "text-5xl lg:text-8xl" : "text-3xl lg:text-5xl"
               )}>
-                {getCategoryDisplayName(category)}
+                {getCategoryDisplayName(category, t)}
               </h1>
               
               {category.description && (
