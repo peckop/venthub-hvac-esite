@@ -136,8 +136,8 @@ export const en: typeof tr = {
     sku: 'SKU',
     share: 'Share',
     requestQuote: 'Request Quote',
-    officialGuarantee: 'Official Guarantee',
-    fastDelivery: 'Fast Delivery',
+    // REC-115: removed with the dead CategoryHero component (INV-6 dead key).
+    // NOTE: `category.trustSignals.fastDelivery` is a DIFFERENT key and is alive.
     series: 'Series',
     reset: 'Reset',
     whatsapp: {
@@ -740,7 +740,7 @@ export const en: typeof tr = {
     heroTitle: 'Discover HVAC products: engineering-led selection, fast quotes',
     heroSubtitle: 'Find the right product quickly with application-guided areas, popular categories and featured products.',
     itemsListed: 'items listed',
-    resultsFound: 'results found',
+    // REC-115: removed with the dead CategoryHero component.
     popularCategories: 'Popular Categories',
     hubTitle: 'Professional HVAC Solutions',
     searchPlaceholder: 'Search product or model...',
