@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\views\support\ReturnsPage.tsx
-skeleton_hash: 2ae7a627443902c3
+source_path: C:\tmp\vh-urun-rec89\src\views\support\ReturnsPage.tsx
+skeleton_hash: 04ef0f48b8a5fbe8
 entity_hashes:
   func:ReturnsPage: 58d2fb57da45461b
   overview: 95b133e51b479d65
-  style_tokens: f66481541679296a
-generated_at: 2026-08-27T07:41:10Z
+  style_tokens: 352aa79c8eb09e14
+generated_at: 2026-09-01T07:19:12Z
 ---
 
 ## Genel Bakış
@@ -87,7 +87,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-white`, `border-light-gray`, `hover:text-primary-navy`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`
+- **Renkler:** `bg-air-blue/40`, `bg-white`, `border-air-blue`, `border-light-gray`, `hover:text-primary-navy`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`
 - **Layout:** `inline-flex`, `items-center`, `max-w-4xl`, `p-6`
 - **Varyant/Responsive:** `hover:`, `lg:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `border`, `font-bold`, `lg:px-8`, `mb-4`, `mb-6`, `mr-1`, `mx-auto`, `px-4`, `py-10`, `rounded-xl`, `sm:px-6`, `space-y-4`, `transition-colors`
+- **Yardımcı Sınıflar:** `border`, `font-bold`, `lg:px-8`, `mb-4`, `mb-6`, `mr-1`, `mx-auto`, `px-4`, `py-10`, `py-3`, `rounded-xl`, `sm:px-6`, `space-y-4`, `transition-colors`

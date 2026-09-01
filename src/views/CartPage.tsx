@@ -6,7 +6,6 @@ import React from 'react'
 
 import { BrandIcon } from '../components/HVACIcons'
 import QuoteRequestButton from '../components/quotes/QuoteRequestButton'
-import SecurityRibbon from '../components/SecurityRibbon'
 import { useCart } from '../hooks/useCartHook'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { formatCurrency } from '../i18n/format'
@@ -54,9 +53,13 @@ const CartPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-light-gray">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-4">
-          <SecurityRibbon />
-        </div>
+        {/*
+          REC-104: burada `<SecurityRibbon />` duruyordu (PCI DSS · 3D Secure · 256-bit SSL).
+          Çevrimiçi ödeme `NEXT_PUBLIC_ODEME_ACIK` ile KAPALI; sepetten ödemeye geçilemiyor,
+          dolayısıyla ödeme güvenliği rozeti burada karşılığı olmayan bir vaat. Bileşen
+          SİLİNMEDİ — ödemenin gerçekten açık olduğu tek yerde, `CheckoutProgress` içinde
+          duruyor ve orada doğrudur. Cetvel: docs/standards/vaat-butunlugu-standard.md
+        */}
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-industrial-gray mb-2">
@@ -252,12 +255,12 @@ const CartPage: React.FC = () => {
                 {t('cart.continueShopping')}
               </Link>
 
-              {/* Security Info */}
-              <div className="mt-6 p-4 bg-air-blue rounded-lg">
-                <p className="text-sm text-steel-gray text-center">
-                  {t('cart.securePayment')}
-                </p>
-              </div>
+              {/*
+                REC-104: burada `cart.securePayment` ("Güvenli ödeme sistemi ile
+                korunmaktadır") kutusu vardı. Çevrimiçi ödeme kapalıyken korunacak bir
+                ödeme yok; kutu kaldırıldı. Sözlük anahtarı, ödeme açıldığında geri
+                konulabilsin diye SİLİNMEDİ.
+              */}
             </div>
           </div>
         </div>
