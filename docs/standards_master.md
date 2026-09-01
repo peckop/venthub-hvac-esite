@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T09:19:08.465567+00:00
+compiled_at: 2026-09-01T09:23:24.823422+00:00
 total_compiled_files: 63
-source_commit: 9893d389
+source_commit: 41d48e37
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9432,6 +9432,9 @@ edilmişken geçer, ilan edilmemişken **durdurur** — tek fark ilan dosyasın�
    koşacak bir ölçüm betiği yazarken kullandığın aracın **varlığını ölç** (`command -v`), ya
    da `node`/`awk` gibi zaten kanıtlanmış olanla yaz. Sessiz gözcü, gözcü yokluğundan daha
    kötüdür: yokluğu bilirsin, sessizliği bilmezsin.
+   ⭐**`gh` sorgularında boru-`jq` yerine `gh`'nin KENDİ `--jq` bayrağını kullan** (URUN'un
+   eklemesi, bu oturumda `gh api --jq` ile ölçüldü: jq kurulu olmadan **çalışıyor**, çünkü
+   `gh` jq'yu içinde taşır). Yani doğru cevap "jq kullanma" değil, "**dış** jq'ya bağlanma".
 3. ⭐**FİKSTÜR YEŞİLDİ, GERÇEK AĞAÇ BUGU BULDU: `git status --porcelain` çıktısı
    `trim()` EDİLEMEZ.** Porcelain satırı **sütun duyarlıdır** (`XY<boşluk><yol>`), ve trim
    **ilk satırın baştaki boşluğunu** yer: ` M docs/x` → `M docs/x` → `slice(3)` → `ocs/x`.
