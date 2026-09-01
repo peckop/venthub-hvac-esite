@@ -199,10 +199,17 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
   const family = detail?.family ?? null
   const variants = detail?.variants ?? []
 
+  // ⭐REC-111: kategori JSON-LD'den ÖNCE çözülür — teklif modu kararı ona bağlı.
+  // Eskiden bu satırlar aşağıda, breadcrumb bloğunda duruyordu ve `buildProductGroupJsonLd`
+  // kategoriyi hiç görmüyordu; sonuç, vitrin "Teklif Alın" derken schema.org'da gerçek
+  // fiyatın yayınlanmasıydı (canlıda 80 adresin 72'si).
+  const mainCategory = family?.category ?? null
+  const subCategory = family?.subcategory ?? null
+
   // W3.1: aile bulunamadıysa (not-found) JSON-LD hiç yazılmaz — tanımlanacak bir
-  // ürün yok; ProductGroup + hasVariant[] (fiyatsız varyanta offers HİÇ yazılmaz).
+  // ürün yok; ProductGroup + hasVariant[] (teklif modunda offers HİÇ yazılmaz).
   const jsonLd = family
-    ? buildProductGroupJsonLd({ family, variants, lang, baseUrl: SITE_URL })
+    ? buildProductGroupJsonLd({ family, variants, lang, baseUrl: SITE_URL, mainCategory })
     : null
 
   if (jsonLd) assertNoUuid(jsonLd)
@@ -219,8 +226,6 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
   const dict = lang === 'en' ? en : tr
   const t = (key: string) => getDictValue(dict, key)
 
-  const mainCategory = family?.category ?? null
-  const subCategory = family?.subcategory ?? null
   const mainName = mainCategory ? getCategoryDisplayName(mainCategory, t) : ''
   const mainSlug = mainCategory ? getLocalizedCategorySlug(mainCategory, lang) : ''
   const subName = subCategory ? getCategoryDisplayName(subCategory, t) : ''
