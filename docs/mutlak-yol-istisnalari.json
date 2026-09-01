@@ -63,7 +63,7 @@
     {
       "yol": "scripts/edge/drift-check.mjs",
       "sinif": "CI kosucusu yolu — KIMLIK DEGIL",
-      "nicin": "Bas yorumda `/home/runner/work/...` gecer; bu GitHub Actions kosucusunun genel hesap yoludur, kisisel kimlik tasimaz ve yorumun amaci tam olarak o yolun nasil kisaltildigini ANLATMAKTIR. Olcut ev-dizini bicimini tanidigi icin yakaliyor; muafiyeti REGEX'i gevsetmek yerine BURAYA yazmak tercih edildi — karar gorunur kalsin, olcut sade kalsin.",
+      "nicin": "Bas yorumda GitHub Actions kosucusunun ev dizini altindaki work yolu geciyor; bu kosucunun GENEL hesap yoludur, kisisel kimlik tasimaz ve yorumun amaci tam olarak o yolun nasil kisaltildigini ANLATMAKTIR. Olcut ev-dizini bicimini tanidigi icin yakaliyor; muafiyeti REGEX'i gevsetmek yerine BURAYA yazmak tercih edildi — karar gorunur kalsin, olcut sade kalsin.",
       "kapanacagi_taraf": "yok (kalici muafiyet)",
       "kayit": "REC-102"
     },

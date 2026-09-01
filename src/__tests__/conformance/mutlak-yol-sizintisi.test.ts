@@ -258,7 +258,7 @@ describe('INV-MUTLAK-YOL-1: kimlik sızdıran mutlak yol yeni giremez', () => {
 /**
  * SINIF A — onarılan iki giriş noktası TAŞINABİLİR yol çözümlüyor.
  *
- * Bu kollar makineden BAĞIMSIZ olmak zorunda: koşucuda `C:\Users\alize` YOKTUR, dolayısıyla
+ * Bu kollar makineden BAĞIMSIZ olmak zorunda: koşucuda geliştiricinin ev dizini YOKTUR, dolayısıyla
  * "eskiyle aynı yolu veriyor" iddiası CI'da ölçülemez. O yüzden ölçülen şey ÇÖZÜMLEME SIRASI:
  * ortam değişkeni ezer, yoksa ev dizini türetmesi devreye girer, ve kaynakta sabit kimlik
  * yolu KALMAMIŞTIR. ("Bu makinede davranış değişmedi" iddiası ayrıca canlı olarak ölçüldü ve
@@ -300,7 +300,17 @@ describe('SINIF A: onarılan giriş noktaları taşınabilir yol çözümlüyor'
     try {
       cikti = execFileSync('python', ['-c', kod], {
         encoding: 'utf8',
-        env: { ...process.env, ORION_ENGINE_DIR: sahte },
+        env: {
+          ...process.env,
+          ORION_ENGINE_DIR: sahte,
+          // ⚠TEST TAKIPLI DOSYAYI KIRLETMEZ: `registry/__pycache__/*.pyc` bu depoda TAKIPLI,
+          // dolayısıyla modülü import eden her koşu bytecode'u yeniden yazıp çalışma ağacını
+          // kirletiyordu (ölçüldü: kendi koşum bir .pyc'yi değiştirdi). Kirli ağaç
+          // `taban-tazele`yi durdurur ve "kim değiştirdi" sorusunu doğurur. Kalıcı çözüm
+          // bytecode'u takipten düşürmek (öneri ilan dosyasında, karar OPS'te); o gelene
+          // kadar test kendi yan etkisini KENDİSİ engeller.
+          PYTHONDONTWRITEBYTECODE: '1',
+        },
         stdio: ['ignore', 'pipe', 'pipe'],
       })
     } catch {

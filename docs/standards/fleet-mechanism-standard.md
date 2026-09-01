@@ -1737,6 +1737,17 @@ Kapı üç katmanlı, gerekçeleri `docs/mutlak-yol-istisnalari.json` içinde **
    üretilmiş dosya elle düzeltilmez) ve sayı **normal işte artar** — mandala bağlanırsa günlük
    işi bloklar.
 
+### ⭐YENİ DOSYA, COMMIT EDİLENE KADAR BU KAPIYA GÖRÜNMEZ
+
+Kapı `git ls-files` okur — yani **takipli** dosyalara bakar. Sonuç: kapıyı yeni yazdığınız
+dosyalarla birlikte koşarsanız **iyimser** bir yeşil alırsınız; o dosyalar henüz index'te
+olmadığı için ölçüm evrenine girmemiştir. Bu tam olarak yaşandı: kapı 9/9 yeşilken, commit'ten
+hemen sonra **iki kendi dosyamı** yakaladı (ilan dosyası ve kapının kendi test dosyası, ikisi de
+açıklama metninde literal bir ev-dizini yolu barındırıyordu).
+**Hüküm: takipli-dosya okuyan her kapı, COMMIT SONRASI bir kez daha koşturulur.** Bu, "tazelik
+kapısı commit'lenmiş durumu okur" dersinin aynısıdır ve iki kez öğrenilmesi bunun sinsi
+olduğunu gösteriyor: yeşil ekran, ölçülmemiş dosyalarla da yeşildir.
+
 ### ⭐KAPININ GÖREMEDİĞİ KALEM YAZILIR (kabul edilmiş eksik sessiz olamaz, §21)
 
 Kapı metin okur ve NUL içeren dosyayı atlar. **Takipli 9 `.pyc`'nin 4'ü kimlik yolunu bytecode
