@@ -72,12 +72,24 @@ const others = hepsi.filter(c => c.sid !== sid)
 // arizayi susarak gecirir. Gozcu kanitli DEGILSE bu satir HER TURDA basilir.
 let mekanizmaSatiri = null
 try {
-  const durum = board.gozcuDurumu ? board.gozcuDurumu(sid, Date.now()) : 'KANITSIZ'
-  if (durum !== 'CANLI') {
+  // §23: iki kavram iki olcum. TARAMA gozcu surecini, TESLIM bildirimin konusmaya ULASTIGINI
+  // olcer; ikisi ayri yone dustugu gun tek sutun SAHTE YESIL verir (olculdu 2026-09-01).
+  const esik = board.esikleriOku ? board.esikleriOku() : null
+  const tarama = board.taramaDurumu
+    ? board.taramaDurumu(sid, Date.now(), esik ? esik.TARAMA_ESIK_TUR : 3)
+    : 'KANITSIZ'
+  const teslim = board.teslimDurumu ? board.teslimDurumu(sid, Date.now()) : 'KANITSIZ'
+  if (tarama !== 'TARIYOR') {
     mekanizmaSatiri =
-      'MEKANIZMA: gozcun KANITLANMADI (' + durum + '). Panoyu okudugun kanitli degil — adresli ' +
-      'emir sana ULASMAYABILIR. Kur ve KANITLA: node scripts/board/mechanism-setup.cjs plan ' +
-      '--sid ' + sid + ' --serit <SERIT>  (sonra: prob, dogrula)'
+      'MEKANIZMA: gozcun KANITLANMADI (TARAMA=' + tarama + '). Panoyu okudugun kanitli degil — ' +
+      'adresli emir sana ULASMAYABILIR. Kur ve KANITLA: node scripts/board/mechanism-setup.cjs ' +
+      'plan --sid ' + sid + ' --serit <SERIT>  (sonra: prob, dogrula)'
+  } else if (teslim === 'KANITSIZ' || (esik && teslim > esik.TESLIM_ESIK_DK)) {
+    mekanizmaSatiri =
+      'MEKANIZMA — YARIM: gozcu panoyu OKUYOR ama TESLIMAT kanitin ' +
+      (teslim === 'KANITSIZ' ? 'HIC YOK' : teslim + 'dk once, bayat') + '. Imlec tazeligi ' +
+      'teslimati kanitlamaz. Kanitla: mechanism-setup.cjs prob --sid ' + sid + ', sonra ' +
+      'dogrula --sid ' + sid + ' --jeton <bildirimde gordugun>'
   }
 } catch { /* olcum aracinin kendisi patlarsa brifing yine aksin (fail-open) */ }
 

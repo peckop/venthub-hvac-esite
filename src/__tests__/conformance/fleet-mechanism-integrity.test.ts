@@ -51,6 +51,16 @@ const panoKaynak = oku(PANO)
 const brifingKaynak = oku(BRIFING)
 const oturumKaynak = oku(OTURUM)
 
+/**
+ * Kaynaktan YORUMLARI soyar — "bu ad artık kullanılmıyor" gibi kolları, o adı ANLATAN
+ * açıklamalardan ayırmak için. Ölçülmüş gerek (2026-09-01): eski adı yasaklayan kol, adın
+ * kendi gerekçe metninde geçmesi yüzünden çıplak dize aramasıyla yazılamıyordu; dar bir
+ * karakter sınıfına kaçınca da takma-ad sabotajını kaçırdı.
+ */
+function yorumsuz(kaynak: string): string {
+  return kaynak.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1')
+}
+
 /** `mechanism-setup.cjs` içindeki şerit→ofset tablosunu kaynaktan ayıklar (SSOT orada). */
 function ofsetleriAyikla(kaynak: string): Record<string, string> {
   const blok = /const OFSETLER = \{([\s\S]*?)\n\}/.exec(kaynak)
@@ -119,13 +129,68 @@ describe('INV-MECH-1: filo mekanizması bütünlüğü', () => {
     ).toBe(true)
   })
 
-  it('board.cjs yoklama (rollcall) fiilini ve gözcü ölçümünü sunar', () => {
+  it('board.cjs yoklama (rollcall) fiilini ve İKİ AYRI ölçümü sunar', () => {
     expect(panoKaynak).toMatch(/verb === 'yoklama' \|\| verb === 'rollcall'/)
-    expect(panoKaynak).toMatch(/function gozcuDurumu\(/)
+    // §23: TARAMA (gözcü süreci panoyu okuyor mu) ile TESLIM (bildirim KONUŞMAYA ulaştı mı)
+    // AYRI kavramlardır ve ayrı ölçülür. 2026-09-01'de tek sütun ("GOZCU = panoyu DUYUYOR mu")
+    // doğru bir şeyi ölçüp yanlış bir şeyi vaat etti: imleç tazeydi, teslimat yoktu, 62 dk
+    // kaybedildi. Bir ölçümün adı, ölçtüğü şeyin sınırını taşımak zorundadır.
+    expect(panoKaynak).toMatch(/function taramaDurumu\(/)
+    expect(panoKaynak).toMatch(/function teslimDurumu\(/)
     expect(
-      /yoklama, gozcuDurumu,/.test(panoKaynak),
-      'gozcuDurumu DIŞA AÇILMALI: kancalar onu kopyalamak zorunda kalırsa ölçüt ikiye ayrılır ve biri bayatlar.',
+      /taramaDurumu, teslimDurumu,/.test(panoKaynak),
+      'İKİSİ DE DIŞA AÇILMALI: kancalar ölçütü kopyalamak zorunda kalırsa ölçüt ikiye ayrılır ve biri bayatlar.',
     ).toBe(true)
+    // ⚠ÖLÇÜT YORUMSUZ KAYNAKTA ARANIR. İlk yazımda `/gozcuDurumu\s*[(,]/` kullandım ve
+    // sabotaj (`gozcuDurumu: taramaDurumu,` diye bir TAKMA AD eklemek) kolu DÜŞÜRMEDİ:
+    // iki nokta `[(,]` sınıfında yok. Dizeyi çıplak aramak da işe yaramaz, çünkü eski ad
+    // bu dosyanın AÇIKLAMA metninde kasten geçiyor. Doğru çözüm: yorumları soy, sonra ara.
+    expect(
+      /gozcuDurumu/.test(yorumsuz(panoKaynak)) === false,
+      'ESKİ AD YAŞAMAYA DEVAM EDEMEZ (takma ad dahil): tek kavrama iki ad, ölçütlerden birinin ' +
+        'sessizce bayatlaması demektir. Kancalar `board.gozcuDurumu ? ... : KANITSIZ` kalıbıyla ' +
+        'çağırdığı için eski ad kalırsa hata VERMEZ — sessizce KANITSIZ e düşer.',
+    ).toBe(true)
+  })
+
+  it('TESLIM ölçümü yalnız AJANIN geri yazdığı damgayı okur (kendi kendine yeşillenemez)', () => {
+    // En sinsi sahte-yeşil burada olurdu: teslimat damgasını `prob` yazsaydı, hiçbir ajan
+    // bildirimi görmeden sütun yeşile dönerdi — yani ölçüm kendi kendini kanıtlardı.
+    // Damga YALNIZCA `dogrula` içinde, jeton EŞLEŞTİKTEN sonra yazılır.
+    expect(panoKaynak).toMatch(/teslimDogrulandiTs/)
+    const dogrulaBlok = kurulumKaynak.slice(kurulumKaynak.indexOf('function dogrula('))
+    expect(
+      /teslimDogrulandiTs/.test(dogrulaBlok),
+      'Damga dogrula() içinde yazılmalı — teslimatın tek kanıtı, kanalın öteki ucundaki ajanın konuşmasıdır.',
+    ).toBe(true)
+    const probBlok = kurulumKaynak.slice(
+      kurulumKaynak.indexOf('function prob('),
+      kurulumKaynak.indexOf('function dogrula('),
+    )
+    expect(
+      /teslimDogrulandiTs/.test(probBlok) === false,
+      'prob() teslimat damgası YAZAMAZ: prob gözcünün panoyu OKUDUĞUNU kanıtlar, bildirimin ' +
+        'ajana ULAŞTIĞINI kanıtlamaz. Yazarsa ölçüm kendi kendini yeşile boyar.',
+    ).toBe(true)
+  })
+
+  it('eşikler CETVELDEN okunur ve okunamazsa SESSİZ VARSAYILANA DÜŞMEZ', () => {
+    // §23 HÜKÜM 4-5: 62 dakikalık sessizlikte ayırt eden sayı satırda ZATEN vardı (SES 64dk);
+    // eksik olan onu bir eşiğe bağlamaktı. Eşik koda gömülürse hüküm görünmez olur.
+    expect(panoKaynak).toMatch(/function esikleriOku\(/)
+    expect(panoKaynak).toMatch(/ESIKLER-BASLANGIC/)
+    expect(
+      /fleet-mechanism-standard\.md/.test(panoKaynak),
+      'Eşikler cetvelden okunmalı; SSOT cetveldir, kod yalnızca okur.',
+    ).toBe(true)
+    // Cetveldeki blok GERÇEKTEN var mı ve üç eşiği de taşıyor mu (kod ile cetvel birlikte ölçülür).
+    const cetvel = oku('docs/standards/fleet-mechanism-standard.md')
+    for (const ad of ['SES_ESIK_DK', 'TESLIM_ESIK_DK', 'TARAMA_ESIK_TUR']) {
+      expect(
+        new RegExp(ad + '\\s*:\\s*\\d+').test(cetvel),
+        `Cetveldeki ESIKLER bloğunda ${ad} yok — board.cjs fail-closed davranır ve yoklama hüküm vermez.`,
+      ).toBe(true)
+    }
   })
 
   it('MEKANİZMA kırmızısı SESSİZLİK KURALINA yem olmaz', () => {

@@ -260,6 +260,27 @@ function dogrula() {
       kirmizi++
     } else {
       yaz('TESLIMAT  : YESIL — bildirimde gorunen jeton son probun jetonuyla ayni.')
+      /**
+       * ⭐TESLIMAT KANITINA YAS VERILIR (§23 HUKUM 3, olculdu 2026-09-01).
+       * Eskiden bu esleşme yalnizca EKRANA basiliyordu: kanit ANLIKTI, yasi yoktu.
+       * Sonucu: compact/park gecisinden sonra "teslimat kanitlanmis miydi" sorusunun
+       * cevabi hicbir yerde OLCULEMIYORDU; yoklama da bu yuzden imlec tazeligini
+       * "DUYUYOR" diye sunmak zorunda kaliyordu. Damgayi diske yazmak, yoklamanin
+       * TESLIM sutununu MUMKUN kilan tek seydir.
+       * Yazma basarisiz olursa SESSIZ KALMAZ: kanit ekranda gecerlidir ama yoklama onu
+       * goremeyecegi icin bunu ACIKCA soyleriz (fail-open ama gorunur).
+       */
+      try {
+        fs.writeFileSync(
+          durumYolu(sid),
+          JSON.stringify({ ...durum, teslimDogrulandiTs: new Date().toISOString() }),
+          'utf8',
+        )
+        yaz('            damga diske yazildi — yoklama artik TESLIM yasini olcebilir.')
+      } catch (e) {
+        yaz('            ⚠UYARI: damga diske YAZILAMADI (' + (e.code || e.message) + ').')
+        yaz('            Kanit bu ekranda gecerli, ama yoklama TESLIM sutununda KANITSIZ gorecek.')
+      }
     }
   } else {
     yaz('TESLIMAT  : OLCULEMEDI — --jeton verilmedi. Gozcunun OKUDUGU kanitli olabilir ama')

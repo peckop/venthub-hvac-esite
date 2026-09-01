@@ -255,13 +255,34 @@ try {
   // birlikte ÖLÜR; yeni oturum onları devralmaz. 2026-08-20 sabahı dört oturum tam bu yüzden
   // SAĞIR açıldı ve Recep her birini elle dürtmek zorunda kaldı. Talimat dört kanaldan
   // ulaşmıştı; kurulum üretmedi. O yüzden hatırlatma artık oturumun kendi açılışına gömülü.
+  //
+  // ⭐2026-09-01 ONARIMI (§23) — BU SATIR BENI YANILTTI, kayda geciyor: compact donusunde bu
+  // kanca "MEKANIZMA: gozcun CANLI (imlec taze)" yazdi ve DOGRUYDU; ardindan sirf o satira
+  // guvenildigi icin 62 dakika boyunca hicbir sey yapilmadi, Recep uyandirdi. Imlec tazeligi
+  // gozcu SURECININ yasadigini kanitlar (surec compact'i sag atlatir); bildirimin KONUSMAYA
+  // ULASTIGINI kanitlamaz. Dahasi: gozcu TEPKISEL katmandir — panoya biri yazmadikca susar,
+  // dolayisiyla "canli" olmasi bir sessizligi KIRACAGI anlamina gelmez.
+  // Bu yuzden satir artik IKI OLCUM basar ve tek kelimeyle "canli" DEMEZ.
   try {
-    const durum = board.gozcuDurumu ? board.gozcuDurumu(sid, Date.now()) : 'KANITSIZ'
-    if (durum === 'CANLI') {
-      context += 'MEKANIZMA: gozcun CANLI (imlec taze).\n'
+    const esik = board.esikleriOku ? board.esikleriOku() : null
+    const tarama = board.taramaDurumu
+      ? board.taramaDurumu(sid, Date.now(), esik ? esik.TARAMA_ESIK_TUR : 3)
+      : 'KANITSIZ'
+    const teslim = board.teslimDurumu ? board.teslimDurumu(sid, Date.now()) : 'KANITSIZ'
+    const teslimBayat =
+      teslim === 'KANITSIZ' || (esik && teslim > esik.TESLIM_ESIK_DK)
+    if (tarama === 'TARIYOR' && !teslimBayat) {
+      context += 'MEKANIZMA: TARAMA taze + TESLIMAT ' + teslim + 'dk once KANITLI.\n'
+    } else if (tarama === 'TARIYOR' && teslimBayat) {
+      context +=
+        'MEKANIZMA — YARIM: gozcu panoyu OKUYOR ama bildirimin sana ULASTIGI KANITSIZ' +
+        (teslim === 'KANITSIZ' ? '' : ' (son kanit ' + teslim + 'dk once, bayat)') + '.\n' +
+        '  Imlec tazeligi TESLIMATI KANITLAMAZ — 2026-09-01 de tam bu farkta 62 dk kaybedildi.\n' +
+        '  ILK IS: node scripts/board/mechanism-setup.cjs prob --sid ' + sid + '\n' +
+        '  sonra jetonu BILDIRIMDE gorup: ... dogrula --sid ' + sid + ' --jeton <jeton>\n'
     } else {
       context +=
-        'MEKANIZMA — ILK IS BU (' + durum + '): uc katmani kur ve KANITLA.\n' +
+        'MEKANIZMA — ILK IS BU (TARAMA=' + tarama + '): uc katmani kur ve KANITLA.\n' +
         '  node scripts/board/mechanism-setup.cjs plan --sid ' + sid + ' --serit <SERIT>\n' +
         '  Kurulumdan sonra: mechanism-setup.cjs prob --sid ' + sid + '\n' +
         '  prob AYIRT EDICI testtir: gozcu olu olsaydi sonuc FARKLI olurdu. Beyan yeterli degil.\n'
