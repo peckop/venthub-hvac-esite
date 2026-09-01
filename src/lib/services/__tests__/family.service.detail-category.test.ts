@@ -45,6 +45,8 @@ function stubClient(
   mevcutSatirlar = KATEGORI_SATIRLARI,
 ) {
   const kategoriSorgulari: string[] = []
+  /** REC-108: aile adı çevirisi sorguları — sayısı kola bağlı (aşağıda). */
+  const adSorgulari: string[] = []
 
   const fakeFetch: typeof fetch = async (input) => {
     const url =
@@ -85,13 +87,21 @@ function stubClient(
       return jsonResponse(mevcutSatirlar.filter((c) => istenen.has(c.id)))
     }
 
+    // REC-108: aile ADI çevirileri (`name_i18n`) RPC'de YOK — kolon DB'de dolu ama
+    // `get_family_detail` ham `f.name` döndürüyor. Ad, kategori satırlarıyla AYNI desende
+    // tek ek sorguyla gömülüyor. Bu dal o sorguyu MEŞRU kılar; sayısı aşağıda kola bağlı.
+    if (url.includes('/product_families')) {
+      adSorgulari.push(url)
+      return jsonResponse([{ name_i18n: { tr: null, en: 'Vortice Lineo Quiet Inline Duct Fans' } }])
+    }
+
     throw new Error('beklenmeyen istek: ' + url)
   }
 
   const supabase = createClient<Database>('https://ornek.supabase.co', 'anon-anahtar', {
     global: { fetch: fakeFetch },
   })
-  return { supabase, kategoriSorgulari }
+  return { supabase, kategoriSorgulari, adSorgulari }
 }
 
 describe('INV-FAMILY-DETAIL-CATEGORY-1 — getFamilyDetail kategori satırını gömer', () => {
@@ -110,6 +120,24 @@ describe('INV-FAMILY-DETAIL-CATEGORY-1 — getFamilyDetail kategori satırını 
     const { supabase, kategoriSorgulari } = stubClient('cat-kok', 'cat-alt')
     await getFamilyDetail(supabase, 'vortice-lineo-150-quiet', 'tr')
     expect(kategoriSorgulari).toHaveLength(1)
+  })
+
+  it('⭐AD ÇEVİRİSİ SORGUSU DA TEK — ek round-trip kabul, SAYISI sözleşme (REC-108)', async () => {
+    // Bu kol, bu kapının itirazına verilen cevabın kendisidir.
+    //
+    // REC-108 aile adını dile bağlarken `getFamilyDetail`e BİR ek sorgu ekledi: RPC
+    // `name_i18n`'i döndürmüyor (ham `f.name` yazıyor) ve RPC'yi yeniden tanımlamak
+    // `returns table` dönüş tipi yüzünden `drop` gerektirirdi. Yani ek sorgu, seçilen
+    // yolun kaçınılmaz bedeli — planda risk olarak yazıldı, sayfalar SSG/ISR olduğu için
+    // maliyet build'de, istekte değil.
+    //
+    // ⭐AMA KAPI GEVŞETİLMEDİ, GENİŞLETİLDİ: yukarıdaki kol kategori sorgusunu tek'e
+    // bağlıyordu; bu kol ad sorgusunu tek'e bağlar. Yarın biri aile başına N sorgu
+    // eklerse kırmızı görür. "Bir tane daha eklendi" ile "sayı serbest bırakıldı"
+    // arasındaki fark budur.
+    const { supabase, adSorgulari } = stubClient('cat-kok', 'cat-alt')
+    await getFamilyDetail(supabase, 'vortice-lineo-150-quiet', 'tr')
+    expect(adSorgulari).toHaveLength(1)
   })
 
   it('kategori id yoksa HİÇ sorgu atmaz ve alanlar null olur', async () => {
