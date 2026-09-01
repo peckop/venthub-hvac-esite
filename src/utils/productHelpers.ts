@@ -264,31 +264,73 @@ export const SPEC_SORT_ORDER: Record<string, number> = {
 /** Çözücünün ihtiyaç duyduğu asgari varyant şekli (RPC satırı da, DB satırı da uyar). */
 export type ProductIdentitySource = {
   name?: string | null
+  /**
+   * REC-110: varyant adı çevirileri (`products.name_i18n`, migration 20260901155000).
+   * `familyName`'in okuduğu `product_families.name_i18n` ile BİREBİR aynı şekil.
+   */
+  name_i18n?: AdCevirileri | null
   model_code?: string | null
   /** BİLEREK opsiyonel ve BİLEREK kullanılmıyor — bkz. yukarıdaki uyarı. */
   sku?: string | null
 }
 
-/** Aile şekli — yalnız ad gerekir. */
+/** `name_i18n` JSONB şekli — aile tarafıyla aynı sözleşme. */
+export type AdCevirileri = {
+  tr?: string | null
+  en?: string | null
+}
+
+/** Aile şekli — ad ve (varsa) çevirileri. */
 export type ProductFamilySource = {
   name?: string | null
+  name_i18n?: AdCevirileri | null
 }
 
 const bosMu = (v: string | null | undefined): boolean => !v || v.trim() === ''
+
+/**
+ * Bir ad kaynağının o dildeki hâli: `name_i18n[lang]` DOLUYSA o, değilse ham `name`.
+ *
+ * ⭐Boş dize DOLU SAYILMAZ. `name_i18n` toplu betikle doldurulur ve boş hücre bırakması
+ * mümkün; boşu "çeviri var" saymak adı görünmez yapardı — sessiz kayıp. `familyName()`
+ * ile aynı kural, kasıtlı olarak aynı cümlelerle.
+ */
+const dildekiAd = (
+  ceviriler: AdCevirileri | null | undefined,
+  ham: string | null | undefined,
+  lang: string,
+): string | null => {
+  const secilen = lang === 'en' ? ceviriler?.en : ceviriler?.tr
+  if (typeof secilen === 'string' && secilen.trim() !== '') return secilen.trim()
+  return bosMu(ham) ? null : ham!.trim()
+}
 
 /**
  * Müşteriye gösterilecek ÜRÜN ADI. Sepete/siparişe/e-postaya düşecek ad ile
  * AYNI olmalıdır — yüzeyler arası ikinci bir ad üretmez.
  *
  * Sıra: varyant adı → aile adı → sözlükten genel etiket. Ham SKU'ya ASLA düşmez.
+ *
+ * ⭐`lang` ZORUNLUDUR — ve bu bilinçli bir maliyettir (REC-110).
+ * Bu dosyanın kardeşi `getCategoryDisplayName(category, t?)` sözlüğü OPSİYONEL almıştı;
+ * ölçüm sonucu 25 çağrının 12'si sözlüksüz koşuyordu ve anahtar eklense bile İngilizce
+ * sayfa TÜRKÇE ad basmaya devam ediyordu (INV-KATEGORI-ADI-1 KÖK 2). Aynı tuzağı burada
+ * kendi elimizle kurmamak için dil opsiyonel DEĞİL: dil vermeyi unutan çağrı sessizce
+ * Türkçeye düşmez, DERLENMEZ. Açık kırmızı, sessiz sapmaya yeğdir.
+ *
+ * Cetvel: `docs/plans/rec110-114-117-migration-paketi-2026-09-01.md`
+ * Kapı: `src/__tests__/conformance/product-identity-resolver.test.ts`
  */
 export const getProductDisplayName = (
   variant: ProductIdentitySource | null | undefined,
-  family?: ProductFamilySource | null,
+  family: ProductFamilySource | null | undefined,
+  lang: string,
   t?: (key: string) => string,
 ): string => {
-  if (variant && !bosMu(variant.name)) return variant.name!.trim()
-  if (family && !bosMu(family.name)) return family.name!.trim()
+  const varyantAdi = variant ? dildekiAd(variant.name_i18n, variant.name, lang) : null
+  if (varyantAdi) return varyantAdi
+  const aileAdi = family ? dildekiAd(family.name_i18n, family.name, lang) : null
+  if (aileAdi) return aileAdi
   // Son çare sözlükten gelir; iç kod YAZILMAZ. `t` yoksa boş dönmek, yanlış bir
   // kimlik göstermekten iyidir — çağıran boş adı render etmemeyi seçebilir.
   return t ? t('product.unnamed') : ''
