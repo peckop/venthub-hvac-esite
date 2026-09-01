@@ -39,6 +39,7 @@ import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { selectVariant } from '../../lib/data/selectVariant'
 import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
+import { quoteModeHesapla } from '../../lib/pricing/quoteMode'
 import type { FamilyDetail, FamilyVariant } from '../../lib/services/family.service'
 import { getFamiliesEnriched } from '../../lib/services/family.service'
 import { getProductById } from '../../lib/services/product.service'
@@ -91,39 +92,18 @@ interface ProductDetailBodyProps extends ProductDetailPageProps {
 }
 
 /**
- * REC-97 — TEKLİF MODU HÜKMÜ. Saf fonksiyon: sunucuda da istemcide de aynı girdiye
- * aynı cevabı verir ve tek başına test edilebilir.
+ * REC-111 (2026-09-01): `quoteModeHesapla` BU DOSYADAN TAŞINDI →
+ * `src/lib/pricing/quoteMode.ts`.
  *
- * ⭐NİÇİN AYRI FONKSİYON OLDU (ölçülmüş sızıntı, 2026-08-31):
- * Kural daha önce satır içindeydi ve `mainCategory` ÇÖZÜLEMEDİĞİNDE sessizce
- * "fiyatlı mod"a düşüyordu. `mainCategory`, istemci bağlamından (`useCategories`)
- * gelir; sunucu render'ında o liste henüz BOŞTUR. Sonuç: statik HTML'e gerçek fiyat
- * basılıyor, hydration'dan sonra istemci onu gizliyordu. Kullanıcı "bir an görünüp
- * kayboluyor" demeseydi görünmezdi; ama kaynak-görüntüle ve önbellekte KALICIYDI.
+ * NİÇİN: hüküm görsel render kolunun içinde yaşadığı sürece, başka bir yüzey (JSON-LD)
+ * kendi fiyat kararını AYRI yazdı ve kuralın yalnız bir dalını uyguladı. Sonuç canlıda
+ * ölçüldü: vitrin "Teklif Alın" derken schema.org `Offer` gerçek fiyatı yayınlıyordu
+ * (80 adresin 72'si, 696 fiyat alanı). Hüküm artık nötr bir modülde; her yüzey oradan
+ * çağırır. Gerekçenin tamamı o dosyanın başında.
  *
- * ÖLÇÜM: 40 aile sayfasının 36'sında statik HTML'de gerçek fiyat vardı (₺ + rakam).
- * Temiz çıkan 4 aile KORUNDUĞU İÇİN DEĞİL, o ürünlerin `product_prices` kaydı
- * olmadığı için temizdi — yani koruma SIFIRDI, 40/40 korunmasızdı.
- *
- * KURAL: mod BİLİNMİYORSA teklif modu varsayılır. Bilinmemek, "fiyat göster" demek
- * değildir; güvenli duruş fiyatı BASMAMAKTIR. Fiyat yalnız mod POZİTİF olarak
- * "gösterilebilir" dediğinde çizilir.
+ * Buradan yeniden dışa aktarılıyor — mevcut çağrı yerleri ve kapılar kırılmasın diye.
  */
-export function quoteModeHesapla(
-  mainCategory: { metadata?: unknown } | null | undefined,
-  selectedVariant: { price?: number | string | null } | null | undefined,
-): boolean {
-  // (1) Mod bilinmiyor → teklif modu. Sunucu render'ının düştüğü dal budur.
-  if (!mainCategory) return true
-
-  // (2) Kategori açıkça fiyatı gizliyor.
-  if (Boolean((mainCategory.metadata as CategoryMetadata | null)?.hide_price)) return true
-
-  // (3) Gösterilecek geçerli bir fiyat yok.
-  if (selectedVariant == null) return true
-  if (selectedVariant.price == null) return true
-  return Number(selectedVariant.price) <= 0
-}
+export { quoteModeHesapla }
 
 /**
  * Rozet sayısı → Tailwind sütun sınıfı.

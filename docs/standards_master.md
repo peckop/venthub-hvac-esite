@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T08:34:12.051713+00:00
+compiled_at: 2026-09-01T08:49:14.551215+00:00
 total_compiled_files: 63
-source_commit: 73691ce7
+source_commit: de48314a
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -15705,6 +15705,36 @@ Terim listesi **ayırt edici** olmak zorundadır. Tek kelime `ödeme` ile taranm
 "ödeme" kelimesi hukuki metinlerde ve admin'de meşru olarak geçer ve ölçüt hiçbir şeyi
 ayırt etmez. Liste, vaadi tek başına taşıyan öbeklerden kurulur ("taksit", "ücretsiz
 kargo", "güvenli ödeme", "SSL", "3D Secure", "PCI DSS").
+
+## 4.5) GERİ DÖNÜŞ LİSTESİ — satış modu açıldığında ne geri gelmeli
+
+Bu bölüm bir soruya cevap veriyor: *"fiyatlı hâle dönüş yolculuğunda aynı sorunları
+yaşayacak mıyız?"*
+
+**Kapının göremediği tek yön budur.** Mod-bağımlı kapılar iki yönlü yazılır (kapalıyken
+yok, açıkken var) ve bir DAVRANIŞIN dönüşünü güvenceye alır. Ama REC-104'te bazı vaatler
+davranış değil **içerik**ti ve sözlükten SİLİNDİ. Silinmiş bir metnin yokluğunu hiçbir
+kapı gösteremez — gösterecek bir şey kalmamıştır. Bu yüzden liste **elle** tutulur:
+
+| Kaldırılan | Neredeydi | Dönüşte ne gerekir |
+|---|---|---|
+| `cart.securePayment` | Sepet özeti | Metin yeniden yazılır (anahtar silindi) |
+| `category.trustSignals.securePayment*` | Kategori güven şeridi | Başlık + açıklama yeniden yazılır |
+| `category.trustSignals.fastShipping*` | Kategori güven şeridi | Kargo vaadi **ölçülmüş** teslim süresiyle yazılır |
+| `category.trustSignals.installment*` | Kategori güven şeridi | Taksit vaadi **anlaşmadaki** vade ile yazılır |
+| `pdp.trust.freeShipping` | PDP rozet ızgarası | Ücretsiz kargo eşiği varsa eşikle birlikte |
+| `pdp.trust.securePayment` | PDP rozet ızgarası | Sağlayıcı adıyla |
+| `SecurityRibbon` (bileşen) | Sepet | **Silinmedi** — `CheckoutProgress`'te duruyor, sepete geri konur |
+| `support.faq.q1/a1`, `a2` | /destek/sss | Sipariş/ödeme diline döndürülür |
+| `support.shipping.desc2` | /destek/teslimat-kargo | "teklifinizde" → "ödeme adımında" |
+| `support.returns.onlineKapaliNotu` | /destek/iade-degisim | **Kaldırılır** (koşullar artık koşulsuz geçerli) |
+
+Izgara sütun sayıları da geri alınır: PDP rozet listesi 1 → 3 (`SUTUN_SINIFI` tablosu),
+güven şeridi `lg:grid-cols-3` → `lg:grid-cols-6`.
+
+**Bu tablo kapıya bağlıdır:** `INV-VAAT-SIZINTI-1` bölümün varlığını ve boş olmadığını
+ölçer. Liste silinirse kapı kırmızı verir — çünkü listenin kaybolması, dönüş yolculuğunda
+sessiz eksik demektir.
 
 ## 5) İlgili
 

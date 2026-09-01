@@ -44,6 +44,14 @@ function makeFamily(overrides: Partial<Parameters<typeof buildProductGroupJsonLd
   }
 }
 
+/**
+ * REC-111: bu birim testleri FIYATIN YAZILDIGI dali dogruluyor; o dal artik yalniz
+ * teklif modu KAPALIYKEN calisir. Kategori `hide_price: false` verilmezse hukum
+ * guvenli tarafa duser (teklif modu) ve testler fiyat gormez. Yani bu sabit bir
+ * kolaylik degil, testin ONKOSULU.
+ */
+const FIYATLI_KATEGORI = { metadata: { hide_price: false } }
+
 describe('buildProductGroupJsonLd', () => {
   it('productGroupID alanını family.slug olarak yazar', () => {
     const jsonLd = buildProductGroupJsonLd({
@@ -51,6 +59,7 @@ describe('buildProductGroupJsonLd', () => {
       variants: [],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
 
     expect(jsonLd.productGroupID).toBe('dds-nano')
@@ -63,6 +72,7 @@ describe('buildProductGroupJsonLd', () => {
       variants: [makeVariant({ slug: 'dds-nano-100' })],
       lang: 'en',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
 
     expect(jsonLd.url).toBe(`${BASE_URL}/en/products/dds-nano`)
@@ -75,6 +85,7 @@ describe('buildProductGroupJsonLd', () => {
       variants: [makeVariant({ price: null })],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
 
     const hasVariant = jsonLd.hasVariant as Record<string, unknown>[]
@@ -88,6 +99,7 @@ describe('buildProductGroupJsonLd', () => {
       variants: [makeVariant({ price: 1234.5, stock_qty: 3 })],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
 
     const hasVariant = jsonLd.hasVariant as Record<string, unknown>[]
@@ -106,6 +118,7 @@ describe('buildProductGroupJsonLd', () => {
       variants: [makeVariant({ price: 99, stock_qty: 0 })],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
 
     const hasVariant = jsonLd.hasVariant as Record<string, unknown>[]
@@ -119,12 +132,14 @@ describe('buildProductGroupJsonLd', () => {
       variants: [makeVariant({ sku: 'SKU-A', model_code: 'MC-100' })],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
     const withoutModelCode = buildProductGroupJsonLd({
       family: makeFamily(),
       variants: [makeVariant({ sku: 'SKU-B', model_code: null })],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
 
     const v1 = (withModelCode.hasVariant as Record<string, unknown>[])[0]
@@ -142,6 +157,7 @@ describe('buildProductGroupJsonLd', () => {
       ],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
 
     const hasVariant = jsonLd.hasVariant as Record<string, unknown>[]
@@ -155,12 +171,14 @@ describe('buildProductGroupJsonLd', () => {
       variants: [],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
     const withoutBrand = buildProductGroupJsonLd({
       family: makeFamily({ brand_name: null }),
       variants: [],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
 
     expect(withBrand.brand).toEqual({ '@type': 'Brand', name: 'Vortice' })
@@ -173,12 +191,14 @@ describe('buildProductGroupJsonLd', () => {
       variants: [],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
     const enOut = buildProductGroupJsonLd({
       family: makeFamily({ description: { tr: 'TR açıklama', en: 'EN description' } }),
       variants: [],
       lang: 'en',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
 
     expect(trOut.description).toBe('TR açıklama')
@@ -191,6 +211,7 @@ describe('buildProductGroupJsonLd', () => {
       variants: [makeVariant({ id: '66666666-7777-8888-9999-000000000000' })],
       lang: 'tr',
       baseUrl: BASE_URL,
+      mainCategory: FIYATLI_KATEGORI,
     })
 
     expect(() => assertNoUuid(jsonLd)).not.toThrow()

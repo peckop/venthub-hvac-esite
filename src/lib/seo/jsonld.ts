@@ -16,6 +16,7 @@
 
 import type { FamilyListItem } from '../../types/ui-models'
 import { storagePathToUrl } from '../images/productImage'
+import { quoteModeHesapla } from '../pricing/quoteMode'
 import type { FamilyDetail, FamilyVariant } from '../services/family.service'
 
 type LocalizedText = { tr?: string | null; en?: string | null } | null
@@ -43,6 +44,15 @@ export interface BuildProductGroupJsonLdParams {
   variants: FamilyVariant[]
   lang: string
   baseUrl: string
+  /**
+   * Ana kategori — TEKLİF MODU kararı için ZORUNLU.
+   *
+   * ⭐REC-111: bu alan eskiden YOKTU ve eksikliği sessiz bir sızıntıydı. Kategori
+   * parametre olmadığı için `hide_price` sorulamıyordu; builder yalnız "fiyat geçerli
+   * mi" dalını uyguluyor, vitrin "Teklif Alın" derken schema.org gerçek fiyatı
+   * yayınlıyordu. `null` geçmek GÜVENLİ tarafa düşer (mod bilinmiyor → teklif modu).
+   */
+  mainCategory: { metadata?: unknown } | null
 }
 
 /**
@@ -56,7 +66,7 @@ export interface BuildProductGroupJsonLdParams {
  * ürünün başka bir yazılışıdır — beyan edilirse arama sonucunda "0,00 ₺" görünür.
  */
 export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): Record<string, unknown> {
-  const { family, variants, lang, baseUrl } = params
+  const { family, variants, lang, baseUrl, mainCategory } = params
   const url = `${baseUrl}/${lang}/products/${family.slug}`
   const description =
     pickLocalized(family.description, lang) ||
@@ -75,10 +85,16 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
       productNode.image = storagePathToUrl(imagePath)
     }
 
-    // Teklif Alın modeli: motor fiyatı yoksa (NULL/≤0) offers alanı hiç yazılmaz
-    // (Merchant uyumsuzluğu ve "0,00 ₺" beyanı önlenir).
+    // ⭐TEKLİF MODU — vitrinle AYNI FONKSİYON, ayrı bir kopya DEĞİL (REC-111).
+    //
+    // Burada eskiden yalnız "fiyat geçerli mi" sorusu vardı ve yorumu "eşik vitrinle
+    // AYNIDIR" diyordu. Değildi: vitrinin hükmü üç dallı (kategori çözülemedi ·
+    // kategori hide_price · fiyat geçersiz), burada yalnız üçüncüsü uygulanıyordu.
+    // Canlı sonuç: 80 ürün adresinin 72'sinde JSON-LD gerçek fiyat yayınlıyordu.
+    // Artık karar `quoteModeHesapla`ya sorulur; iki yüzey aynı kaynaktan besleniyor.
+    const teklifModu = quoteModeHesapla(mainCategory, variant)
     const offerPrice = variant.price == null ? null : Number(variant.price)
-    if (offerPrice != null && Number.isFinite(offerPrice) && offerPrice > 0) {
+    if (!teklifModu && offerPrice != null && Number.isFinite(offerPrice) && offerPrice > 0) {
       productNode.offers = {
         '@type': 'Offer',
         price: offerPrice.toFixed(2),
