@@ -151,6 +151,64 @@ function yerelFonksiyonlar(kaynak: ts.SourceFile): Map<string, ts.Node> {
   return harita
 }
 
+/**
+ * Dosyadaki yerel DEĞİŞKENLER: ad → ilklendirici.
+ *
+ * ⭐NİÇİN EKLENDİ (2026-09-01, REC-108 — ölçülmüş körlük):
+ * `yerelFonksiyonlar` çözümü `variantLabel(v)` sınıfını kapatıyordu: adı veri kelimesi
+ * taşımayan bir ÇAĞRI veri döndürebilir. Ama aynı kaçış DEĞİŞKENLE de olur ve o dal
+ * açıktı. REC-108 aile adını tek giriş noktasına bağlarken
+ * `<h1 className="... uppercase ...">{series.name}</h1>` ifadesi
+ * `const gorunenSeriAdi = familyName(series, lang)` + `{gorunenSeriAdi}` hâline geldi.
+ * Kusur DEĞİŞMEDİ — ad hâlâ `uppercase` altında basılıyor — ama dedektör onu göremez
+ * oldu ve MANDAL bunu "borç azaldı" diye okudu. ⭐Kapının en pahalı yanılgısı budur:
+ * ölçüm penceresinin kapanması, iyileşmeye benzer.
+ *
+ * Fonksiyon çağrısı çözümüyle AYNI felsefe, ikinci taşıyıcı için.
+ */
+function yerelDegiskenler(kaynak: ts.SourceFile): Map<string, ts.Node> {
+  const harita = new Map<string, ts.Node>()
+  const gez = (n: ts.Node): void => {
+    if (
+      ts.isVariableDeclaration(n) &&
+      n.initializer &&
+      ts.isIdentifier(n.name) &&
+      // Fonksiyon değişkenleri zaten `yerelFonksiyonlar`ın işi — burada değer taşıyanlar.
+      !ts.isArrowFunction(n.initializer) &&
+      !ts.isFunctionExpression(n.initializer)
+    ) {
+      harita.set(n.name.getText(), n.initializer)
+    }
+    ts.forEachChild(n, gez)
+  }
+  gez(kaynak)
+  return harita
+}
+
+/**
+ * Taranan DOSYAYA ait yerel değişken haritası. `tara()` her dosyanın başında yeniden
+ * kurar; dosyalar sırayla işlendiği için paylaşılan durum güvenlidir. Parametre olarak
+ * taşınmıyor çünkü `veriTasiyorMu` → `altAgactaVeri` zinciri mevcut imzalarıyla üç
+ * ayrı yerde çağrılıyor ve imza genişletmesi bu kapının kendi kollarını kırardı.
+ */
+let DEGISKENLER: Map<string, ts.Node> = new Map()
+
+/**
+ * DB'den gelen ÖZEL AD döndüren, içe aktarılmış çözücüler.
+ *
+ * Gövdeleri taranan dosyada olmadığı için `yerelFonksiyonlar` bunları göremez; ama
+ * döndürdükleri şey tam da bu kapının koruduğu veridir (marka/aile/kategori adı).
+ * Listeye yeni çözücü eklenirse buraya da yazılır — aksi halde o yüzey kör kalır.
+ *
+ * ⭐NİÇİN ŞİMDİLİK TEK İSİM (ölçüldü, 2026-09-01): listeye `getCategoryDisplayName` ve
+ * `getProductDisplayName` de eklendiğinde kapı, HEP VAR OLAN ama görünmeyen İKİ ihlali
+ * daha buldu — `src/components/category/CategoryHero.tsx` (donmuş listede HİÇ yok) ve
+ * `ProductDetailPageView.tsx` 3 → 4. Bunlar REC-108'in açtığı kusurlar DEĞİL; mandal da
+ * borcun büyümesini haklı olarak reddediyor. Kapsam kaymasın diye burada YALNIZ benim
+ * değişikliğimin kör ettiği çözücü var; diğer ikisi AYRI İŞ EMRİ (bulgu OPS'a bildirildi).
+ */
+const COZUCULER = new Set(['familyName'])
+
 /** İfade veri alanına dokunuyor mu? Yerel fonksiyon çağrısıysa İÇİNE bakar. */
 function veriTasiyorMu(ifade: ts.Node, fonksiyonlar: Map<string, ts.Node>, derinlik = 0): string | null {
   if (derinlik > AZAMI_DERINLIK) return null
@@ -166,6 +224,24 @@ function veriTasiyorMu(ifade: ts.Node, fonksiyonlar: Map<string, ts.Node>, derin
     }
     if (ts.isIdentifier(n) && ALANLAR.has(n.getText())) {
       bulunan = n.getText()
+      return
+    }
+    // ⭐YEREL DEĞİŞKEN TAŞIYICISI (REC-108): `const gorunenSeriAdi = familyName(series, lang)`
+    // gibi bir değişken, adında hiçbir veri kelimesi taşımadan GERÇEK VERİ tutar.
+    // Çağrı çözümüyle aynı mantık; kaçış yolu kapanıyor.
+    if (ts.isIdentifier(n) && DEGISKENLER.has(n.getText())) {
+      const ic = veriTasiyorMu(DEGISKENLER.get(n.getText())!, fonksiyonlar, derinlik + 1)
+      if (ic) {
+        bulunan = `${n.getText()} -> ${ic}`
+        return
+      }
+    }
+    // ⭐İÇE AKTARILMIŞ ÇÖZÜCÜ (REC-108): `familyName(family, lang)` gövdesi BU DOSYADA
+    // DEĞİL, o yüzden `fonksiyonlar` haritasında yok ve içine bakılamaz. Ama sözleşmesi
+    // gereği DB'den gelen bir özel ad DÖNDÜRÜR. Bu isimler bilinerek sayılır — yoksa
+    // "adı tek kaynağa bağlama" iyileştirmesi, bu kapıyı sessizce kör eder.
+    if (ts.isCallExpression(n) && ts.isIdentifier(n.expression) && COZUCULER.has(n.expression.getText())) {
+      bulunan = `${n.expression.getText()}()`
       return
     }
     // Adı veri kelimesi taşımayan yerel yardımcı, veri DÖNDÜREBİLİR (bkz. `variantLabel`).
@@ -216,6 +292,7 @@ function tara(): { bulgular: Bulgu[]; tarananDosya: number } {
     tarananDosya++
     const kaynak = ts.createSourceFile(path, raw, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
     const fonksiyonlar = yerelFonksiyonlar(kaynak)
+    DEGISKENLER = yerelDegiskenler(kaynak)
 
     const elemanTara = (n: ts.Node): void => {
       const acilis = acilisiniAl(n)
@@ -278,7 +355,12 @@ const DONMUS_BORC: ReadonlyArray<readonly [string, number]> = [
  * SATIRA DEĞİL İÇERİĞE bağlı: satır numarası komşu şeridin her düzenlemesinde kayar.
  */
 const KANARYA: ReadonlyArray<readonly [string, string]> = [
-  ['src/views/category/SeriesLandingView.tsx', 'series.name'],
+  // ⭐2026-09-01 (REC-108): parça `series.name` idi. Aile adı tek giriş noktasına
+  // bağlanınca ifade `familyName(series, lang)` sonucunu tutan bir yerel değişkene
+  // dönüştü. KUSUR AYNI YERDE DURUYOR — ad hâlâ `uppercase` altında basılıyor — yalnız
+  // TAŞIYICI değişti. Kanaryanın parçası da taşıyıcıyı gösterir; `DONMUS_BORC` sayısı
+  // BİLEREK 3'te bırakıldı, çünkü borç azalmadı.
+  ['src/views/category/SeriesLandingView.tsx', 'familyName()'],
   ['src/views/category/CategoryLandingView.tsx', 'displayName'],
 ]
 
