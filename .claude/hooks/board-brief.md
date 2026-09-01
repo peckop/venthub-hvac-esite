@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-851\.claude\hooks\board-brief.cjs
-skeleton_hash: d6cd44d6173902b8
+source_path: C:\tmp\vh-altyapi-scrubber\.claude\hooks\board-brief.cjs
+skeleton_hash: e7827f9184781066
 entity_hashes:
   func:readStdin: c1509ddeb1633aba
   overview: c12df99cb346a75d
-generated_at: 2026-08-27T17:56:17Z
+generated_at: 2026-09-01T11:21:23Z
 ---
 
 ## Genel Bakış
