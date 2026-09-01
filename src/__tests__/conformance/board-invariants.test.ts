@@ -1,4 +1,5 @@
 import { execFileSync, spawnSync } from 'node:child_process'
+import fs from 'node:fs'
 import { createRequire } from 'node:module'
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -83,6 +84,11 @@ interface BoardModule {
    * kimligini (--sid) dogrular — olculmus vaka icin INV-BOARD-3 icindeki BOZUK kimlik kolu.
    */
   sidDogrula: (sid: string) => { ok: boolean; tur?: string; sebep?: string; oneri?: string }
+  /** §23: TARAMA (gözcü süreci okuyor mu) ve TESLIM (bildirim KONUŞMAYA ulaştı mı) AYRI ölçümler. */
+  taramaDurumu: (sid: string, now: number, esikTur?: number) => string
+  teslimDurumu: (sid: string, now: number) => number | string
+  esikleriOku: (cetvelYolu?: string) => Record<string, number> | null
+  yoklama: (now?: number) => string
 }
 
 /**
@@ -928,5 +934,195 @@ describe('INV-BOARD-6 · claim semantiği', () => {
       'iki görünüm AYRIŞTI — claim indirgeme mantığı board.cjs içinde İKİ KEZ yazılıdır; birine ' +
         'dokunup ötekini unutmak panonun iki yüzünü farklı gerçeklere böler ve hiçbir kapı görmez',
     ).toEqual(canli?.globs)
+  })
+})
+
+/**
+ * INV-BOARD-YOKLAMA-2 — TARAMA ile TESLIM AYRI ÖLÇÜLÜR, ve eşik CETVELDEN gelir (§23).
+ *
+ * ÖLÇÜLMÜŞ VAKA (2026-09-01, 62 dakika): yoklama tek sütun basıyordu —
+ * `GOZCU = panoyu DUYUYOR mu` — ve o sütun imleç tazeliğini ölçüyordu. Compact sonrası şeride
+ * bir saat boyunca hiçbir bildirim ulaşmadı, Recep uyandırdı; AMA sütun o an YEŞİLDİ ve
+ * yanlış da değildi: gözcü SÜRECİ yaşıyordu (imleç 14 sn önce yazılmıştı). Ölen şey bildirimin
+ * KONUŞMAYA teslimiydi ve imleçte bunun izi yoktu.
+ *
+ * Bu kollar TEXT TARAMASI DEĞİL: gerçek geçici pano dizinine gerçek imleç/damga dosyaları
+ * yazılır ve `yoklama()` çıktısı okunur. Sebep, ölçülmüş bir ders: kaynak-tarayan konformans
+ * yorumla tatmin olur — sabotaj gerçek çağrıyı silse bile dize kaynakta durduğu için kapı
+ * yeşil kalabilir. Ayırt eden şey DAVRANIŞTIR.
+ */
+describe('INV-BOARD-YOKLAMA-2: TARAMA ≠ TESLIM, eşik cetvelden', () => {
+  /** Verilen sid için imleç (gözcü süreci taze) ve istenirse teslimat damgası yazar. */
+  function mekanizmaKur(
+    dir: string,
+    sid: string,
+    opts: { taramaYasSn: number; teslimYasDk?: number | null },
+  ): void {
+    fs.mkdirSync(dir, { recursive: true })
+    fs.writeFileSync(
+      `${dir}/.gozcu-imlec.${sid.slice(0, 8)}.json`,
+      JSON.stringify({
+        sid,
+        aralikSn: 60,
+        sonTarama: isoAgo(opts.taramaYasSn * 1000),
+        ofsetler: {},
+      }),
+      'utf8',
+    )
+    if (opts.teslimYasDk !== null && opts.teslimYasDk !== undefined) {
+      fs.writeFileSync(
+        `${dir}/.mekanizma-durum.${sid.slice(0, 8)}.json`,
+        JSON.stringify({ sid, jeton: 'X', teslimDogrulandiTs: isoAgo(opts.teslimYasDk * 60000) }),
+        'utf8',
+      )
+    }
+  }
+
+  const SID = 'eeeeeeee-1111-4111-8111-000000000009'
+
+  function talepAt(board: BoardModule): void {
+    board.append(SID, { type: 'claim', sid: SID, lane: 'DENEK', globs: ['x/**'] })
+    board.append(SID, { type: 'heartbeat', sid: SID })
+  }
+
+  it('⭐TARAMA taze ama TESLİMAT YOK: yoklama bunu SAKLAMAZ (asıl sahte-yeşil vakası)', () => {
+    const board = loadBoard(boardDir)
+    talepAt(board)
+    // Gözcü süreci CANLI (14 sn önce taradı) — tam olarak 62 dakikalık vakadaki durum.
+    mekanizmaKur(boardDir, SID, { taramaYasSn: 14, teslimYasDk: null })
+
+    const cikti = board.yoklama()
+
+    expect(cikti).toMatch(/TARAMA TARIYOR/)
+    expect(
+      /TESLIM\s+KANITSIZ/.test(cikti),
+      'Teslimat kanıtı yokken sütun bunu SÖYLEMELİ — eski tek sütun bu durumda "CANLI" diyordu.',
+    ).toBe(true)
+    expect(
+      /TESLIMAT KANITI BAYAT\/YOK/.test(cikti),
+      'Satır işareti yetmez: alt uyarı bloğu da çıkmalı. 62 dk vakasında ekranda hiçbir uyarı yoktu.',
+    ).toBe(true)
+    // AYIRT EDİCİLİK: aynı çıktı "gözcü ölü" demiyor — iki arıza karışmamalı.
+    expect(cikti).not.toMatch(/PANOYU OKUDUGU KANITLANAMAYAN 1 serit/)
+  })
+
+  it('⭐DURUM DOSYASI VAR ama damga YOK: yine KANITSIZ (prob sonrası, dogrula öncesi hâli)', () => {
+    // Bu kol bir SABOTAJ turunda keşfedildi: "damga yoksa 0 dön" sabotajı kolları düşürmedi,
+    // çünkü o zamanki fikstür durum dosyasını HİÇ yazmıyordu — dosya yok → catch → KANITSIZ.
+    // Yani sabotajın dokunduğu dal test tarafından HİÇ KOŞULMUYORDU. Oysa bu dal gerçektir ve
+    // tam olarak TEHLİKELİ olandır: `prob` durum dosyasını damgasız yazar; `dogrula`
+    // çalışana kadar dosya VAR, damga YOK. Ölçülmeyen dal, yazılmamış dal kadar korumasızdır.
+    const board = loadBoard(boardDir)
+    talepAt(board)
+    fs.mkdirSync(boardDir, { recursive: true })
+    fs.writeFileSync(
+      `${boardDir}/.gozcu-imlec.${SID.slice(0, 8)}.json`,
+      JSON.stringify({ sid: SID, aralikSn: 60, sonTarama: isoAgo(14_000), ofsetler: {} }),
+      'utf8',
+    )
+    // prob'un yazdığı biçim: jeton var, teslimDogrulandiTs YOK.
+    fs.writeFileSync(
+      `${boardDir}/.mekanizma-durum.${SID.slice(0, 8)}.json`,
+      JSON.stringify({ sid: SID, jeton: 'PROB-XXXX', probTs: isoAgo(30_000), gozcuOkudu: true }),
+      'utf8',
+    )
+
+    expect(
+      board.teslimDurumu(SID, Date.now()),
+      'Jeton yazılmış olması TESLİMATI KANITLAMAZ — probu gözcü okur, teslimatı ajan doğrular.',
+    ).toBe('KANITSIZ')
+    expect(board.yoklama()).toMatch(/TESLIMAT KANITI BAYAT\/YOK/)
+  })
+
+  it('teslimat damgası TAZE ise uyarı ÇIKMAZ (kol iki yöne de ayırt ediyor)', () => {
+    const board = loadBoard(boardDir)
+    talepAt(board)
+    mekanizmaKur(boardDir, SID, { taramaYasSn: 14, teslimYasDk: 5 })
+
+    const cikti = board.yoklama()
+
+    expect(cikti).toMatch(/TESLIM\s+5dk/)
+    expect(
+      /TESLIMAT KANITI BAYAT\/YOK/.test(cikti) === false,
+      'Taze kanıt varken uyarı çıkarsa kol ayırt etmiyor demektir — her hâlde kırmızı yanan ' +
+        'gösterge, hiç yanmayan gösterge kadar bilgisizdir.',
+    ).toBe(true)
+  })
+
+  it('teslimat damgası EŞİKTEN eski ise bayat sayılır (cetveldeki 120dk)', () => {
+    const board = loadBoard(boardDir)
+    talepAt(board)
+    const esik = board.esikleriOku()
+    expect(esik, 'cetveldeki ESIKLER bloğu okunamadı').not.toBeNull()
+    mekanizmaKur(boardDir, SID, {
+      taramaYasSn: 14,
+      teslimYasDk: (esik as Record<string, number>).TESLIM_ESIK_DK + 10,
+    })
+
+    expect(board.yoklama()).toMatch(/TESLIMAT KANITI BAYAT\/YOK/)
+  })
+
+  it('⭐eşik CETVELDEN okunamazsa SESSİZ VARSAYILANA DÜŞMEZ — alarm basar', () => {
+    const board = loadBoard(boardDir)
+    talepAt(board)
+    mekanizmaKur(boardDir, SID, { taramaYasSn: 14, teslimYasDk: null })
+
+    // Bloksuz bir cetvel: eşik okunamaz.
+    const bosCetvel = `${boardDir}/cetvel-bloksuz.md`
+    fs.writeFileSync(bosCetvel, '# cetvel\nESIKLER blogu YOK\n', 'utf8')
+    expect(
+      board.esikleriOku(bosCetvel),
+      'Blok yoksa null dönmeli: sessiz varsayılan, eşiği silen bir değişikliği YEŞİL gösterirdi.',
+    ).toBeNull()
+
+    // Blok var ama BİÇİMİ bozuk (sayı yok) — yarım eşleşme de kabul EDİLMEMELİ.
+    const bozukCetvel = `${boardDir}/cetvel-bozuk.md`
+    fs.writeFileSync(
+      bozukCetvel,
+      'ESIKLER-BASLANGIC\n- `SES_ESIK_DK: cok`\n- `TESLIM_ESIK_DK: 120`\n- `TARAMA_ESIK_TUR: 3`\nESIKLER-BITIS\n',
+      'utf8',
+    )
+    expect(
+      board.esikleriOku(bozukCetvel),
+      'Biçim bozuksa null: yarım okunan eşik, okunmamış eşikten daha tehlikelidir (yanlış hüküm verir).',
+    ).toBeNull()
+
+    // Üç eşikten biri EKSİK olsa da null (hepsi ya da hiçbiri).
+    const eksikCetvel = `${boardDir}/cetvel-eksik.md`
+    fs.writeFileSync(
+      eksikCetvel,
+      'ESIKLER-BASLANGIC\n- `SES_ESIK_DK: 45`\n- `TARAMA_ESIK_TUR: 3`\nESIKLER-BITIS\n',
+      'utf8',
+    )
+    expect(board.esikleriOku(eksikCetvel), 'TESLIM_ESIK_DK eksik — null olmalı').toBeNull()
+  })
+
+  it('SES eşiği aşılınca ALARM basar, altında kalınca BASMAZ (ayırt edici çift)', () => {
+    const board = loadBoard(boardDir)
+    const esik = board.esikleriOku() as Record<string, number>
+
+    // (a) eşiğin ÜSTÜ: not eski
+    board.append(SID, { type: 'claim', sid: SID, lane: 'DENEK', globs: ['x/**'] })
+    board.append(SID, { type: 'heartbeat', sid: SID })
+    board.append(SID, {
+      type: 'note',
+      sid: SID,
+      lane: 'DENEK',
+      text: 'eski not',
+      ts: isoAgo((esik.SES_ESIK_DK + 20) * 60000),
+    })
+    mekanizmaKur(boardDir, SID, { taramaYasSn: 14, teslimYasDk: 5 })
+    const eskiCikti = board.yoklama()
+    expect(eskiCikti).toMatch(/SESSIZ!/)
+    expect(eskiCikti).toMatch(/SESSIZLIK ESIGI ASILDI/)
+
+    // (b) eşiğin ALTI: TAZE not — aynı fikstüre taze not eklenince alarm SÖNMELİ.
+    board.append(SID, { type: 'note', sid: SID, lane: 'DENEK', text: 'taze not' })
+    const yeniCikti = board.yoklama()
+    expect(
+      /SESSIZLIK ESIGI ASILDI/.test(yeniCikti) === false,
+      'Taze not geldiğinde sessizlik alarmı sönmeli; sönmüyorsa ölçüt son notu değil başka ' +
+        'bir şeyi okuyor.',
+    ).toBe(true)
   })
 })

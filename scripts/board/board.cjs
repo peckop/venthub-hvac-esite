@@ -33,6 +33,14 @@ const PRUNE_MS = 24 * 60 * 60 * 1000
 /** Kalp atışı bu sıklıktan daha sık yazılmaz (her tur satır eklemek dosyayı şişirir). */
 const HEARTBEAT_MIN_INTERVAL_MS = 10 * 60 * 1000
 /**
+ * Cetvelden okunması ZORUNLU eşik adları (§23). Üçü de bulunamazsa `esikleriOku` null döner ve
+ * yoklama hüküm vermez — eksik eşik, sessiz varsayılan DEĞİL, alarmdır.
+ * ⚠Burada tanımlıdır çünkü `module.exports` bu dosyada fonksiyon tanımlarından ÖNCE gelir:
+ * `const` hoist EDİLMEZ, aşağıda tanımlansaydı modül TDZ hatasıyla hiç yüklenmezdi. Bunu
+ * `node --check` GÖRMEZ (sözdizimi geçerli); yakalayan şey modülü gerçekten `require` etmektir.
+ */
+const ESIK_ADLARI = ['SES_ESIK_DK', 'TESLIM_ESIK_DK', 'TARAMA_ESIK_TUR']
+/**
  * Panoya YAZAN fiiller — kimliksiz koşamazlar (T079-VH, CLI bloğuna bakınız).
  * DIŞA AÇILIR ki bekçi bu listeyi kopyalamak zorunda kalmasın: buraya yeni bir yazan fiil
  * eklenirse kapı onu kendiliğinden kapsar. Kopyalayan bir bekçi, liste büyüdüğünde kör kalır.
@@ -431,7 +439,8 @@ function markSeen(sid, notes) {
 module.exports = {
   BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS, PANOYA_YAZAN_FIILLER,
   append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary,
-  notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, gozcuDurumu, sidDogrula,
+  notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, sidDogrula,
+  taramaDurumu, teslimDurumu, esikleriOku, ESIK_ADLARI,
   globToRegExp, toRepoRelative, repoRootFor,
 }
 
@@ -443,16 +452,26 @@ module.exports = {
  * "test"ti. Atış oturumun YAŞADIĞINI söyler; panoyu DUYDUĞUNU ya da iş ÜRETTİĞİNİ söylemez.
  * Tek eksenli canlılık bu üç durumu tek kelimeye ("canlı") indirger ve sağırlığı GİZLER.
  *
- *   ATIS  = oturum yaşıyor mu   → board heartbeat yaşı
- *   GOZCU = panoyu DUYUYOR mu   → gozcu.cjs kalıcı imlecinin son tarama yaşı
- *   SES   = iş ÜRETİYOR mu      → son notunun yaşı
+ *   ATIS   = oturum yaşıyor mu        → board heartbeat yaşı
+ *   TARAMA = gözcü panoyu OKUYOR mu   → gozcu.cjs kalıcı imlecinin son tarama yaşı
+ *   TESLIM = bildirim KONUŞMAYA ULAŞTI mı → son DOĞRULANMIŞ teslimat damgasının yaşı
+ *   SES    = iş ÜRETİYOR mu           → son notunun yaşı
  *
- * GOZCU ekseni yoklamanın asıl getirisidir: sağırlık SESSİZDİR ve sessizlik, "sakin gün" ile
- * "kimse duymuyor" arasında ayrım yapmaz. İmleç dosyası o ayrımı diskte görünür kılar.
- * 2026-08-20 sabahı dört oturum sağır kaldı ve bunu kimse panodan göremedi — çünkü pano
- * yalnızca YAZANI ölçüyordu, OKUYANI değil.
+ * TARAMA ekseni 2026-08-20'de kazanılmıştı: o sabah dört oturum sağır kaldı ve bunu kimse
+ * panodan göremedi, çünkü pano yalnızca YAZANI ölçüyordu, OKUYANI değil.
+ *
+ * ⭐TARAMA ile TESLIM NİÇİN AYRI SÜTUN (§23, ölçüldü 2026-09-01 — 62 dakika kayıp):
+ * Bu eksen eskiden tek sütundu ve adı `GOZCU = panoyu DUYUYOR mu`ydu. O gün şerit compact
+ * sonrası bir saat boyunca hiçbir bildirim almadı; Recep uyandırdı. Sütun o an **YEŞİL**
+ * gösteriyordu ve **yanlış da değildi**: imleç 14 saniye öncesine aitti. Çünkü imleci
+ * **gözcü süreci** yazar ve o süreç compact'i bir OS süreci olarak sağ atlatır. Ölen şey
+ * bildirimin **konuşmaya teslimi**dir; imleçte bunun izi YOKTUR.
+ * Yani sütun gerçek bir şeyi doğru ölçüyor, ama okuyucuya **başka bir şeyi** vaat ediyordu.
+ * Bir ölçümün adı, ölçtüğü şeyin sınırını taşımak zorundadır — paneli okuyan, ölçümün
+ * kodunu okumaz. Bu yüzden iki kavram iki sütundur ve `gozcuDurumu` adı kaldırılmıştır
+ * (tek kavrama iki ad, ölçütün birinin bayatlaması demektir).
  */
-function gozcuDurumu(sid, now) {
+function taramaDurumu(sid, now, esikTur = 3) {
   try {
     const iy = path.join(BOARD_DIR, '.gozcu-imlec.' + String(sid).slice(0, 8) + '.json')
     const im = JSON.parse(fs.readFileSync(iy, 'utf8'))
@@ -460,13 +479,72 @@ function gozcuDurumu(sid, now) {
     if (!im.sonTarama) return 'IMLEC BOS'
     const yasSn = (now - Date.parse(im.sonTarama)) / 1000
     // Üç tarama aralığı: bir tur kaçırmak gürültü, üç tur kaçırmak arızadır.
-    return yasSn <= aralikSn * 3 ? 'CANLI' : 'ASILMIS'
+    return yasSn <= aralikSn * esikTur ? 'TARIYOR' : 'ASILMIS'
   } catch {
     // Dosya yok ya da bozuk. DİKKAT: bu "gözcüsü YOK" demek DEĞİL — şeridin kendi
     // izleyicisi olabilir ama ölçülebilir imleç sözleşmesini yazmıyordur. "Ölçemedim" ile
     // "yok" ayrı şeylerdir; etiket bu yüzden KANITSIZ. Fail-closed davranış aynı kalır
     // (kanıtsız katman çökmüş sayılır), ama hüküm doğru adlandırılır.
     return 'KANITSIZ'
+  }
+}
+
+/**
+ * TESLIM — bildirimin KONUŞMAYA ulaştığı en son DOĞRULANMIŞ an (§23 HÜKÜM 3).
+ *
+ * Damgayı `mechanism-setup.cjs dogrula --jeton <bildirimde-görülen>` yazar; yani bu ölçüm
+ * ancak bir AJAN jetonu gerçekten bildirimde GÖRÜP geri yazdıysa doludur. Hiçbir süreç bu
+ * damgayı kendi kendine üretemez — `prob`un yazdığı `jeton` alanı YETMEZ, çünkü prob yalnızca
+ * gözcünün panoyu okuduğunu kanıtlar. Ayrım kasıtlıdır: teslimatın tek kanıtı, kanalın öteki
+ * ucundaki ajanın konuşmasıdır.
+ *
+ * DÖNÜŞ: dakika (sayı) · 'KANITSIZ' (damga hiç yok / okunamadı) — "ölçemedim" ile "yok" ayrı
+ * şeyler olduğu için etiket KANITSIZ'dır, fakat hüküm fail-closed'dır: kanıtsız katman
+ * çökmüş sayılır.
+ */
+function teslimDurumu(sid, now) {
+  try {
+    const dy = path.join(BOARD_DIR, '.mekanizma-durum.' + String(sid).slice(0, 8) + '.json')
+    const d = JSON.parse(fs.readFileSync(dy, 'utf8'))
+    if (!d.teslimDogrulandiTs) return 'KANITSIZ'
+    const yas = Math.round((now - Date.parse(d.teslimDogrulandiTs)) / 60000)
+    return Number.isFinite(yas) ? yas : 'KANITSIZ'
+  } catch {
+    return 'KANITSIZ'
+  }
+}
+
+/**
+ * EŞİKLER CETVELDEN OKUNUR, KODA GÖMÜLMEZ (§23 HÜKÜM 4-5).
+ *
+ * NİÇİN: 62 dakikalık sessizlikte ayırt eden sayı satırda ZATEN vardı (`SES 64dk`); eksik olan
+ * şey onu bir eşiğe bağlamaktı. Eşik koda gömülürse hüküm görünmez olur ve değiştirmek için
+ * kod okumak gerekir. Cetvel SSOT'tur; burası yalnızca okur.
+ *
+ * FAIL-CLOSED: blok yoksa ya da biçimi bozulmuşsa SESSİZ VARSAYILANA DÜŞMEZ — `null` döner ve
+ * yoklama bunu ALARM olarak basar. Sessiz varsayılan, eşiği silen bir değişikliği yeşil
+ * gösterirdi; tam olarak kaçındığımız kusur bu.
+ */
+function esikleriOku(cetvelYolu) {
+  try {
+    const yol = cetvelYolu || path.join(
+      repoRootFor(__filename) || path.join(__dirname, '..', '..'),
+      'docs', 'standards', 'fleet-mechanism-standard.md',
+    )
+    const metin = fs.readFileSync(yol, 'utf8')
+    const bas = metin.indexOf('ESIKLER-BASLANGIC')
+    const son = metin.indexOf('ESIKLER-BITIS')
+    if (bas < 0 || son < 0 || son < bas) return null
+    const blok = metin.slice(bas, son)
+    const cikti = {}
+    for (const ad of ESIK_ADLARI) {
+      const m = blok.match(new RegExp(ad + '\\s*:\\s*(\\d+)'))
+      if (!m) return null
+      cikti[ad] = Number(m[1])
+    }
+    return cikti
+  } catch {
+    return null
   }
 }
 
@@ -485,31 +563,88 @@ function yoklama(now = Date.now()) {
     if (!o || String(e.ts) > String(o)) sonNot.set(e.sid, e.ts)
   }
 
-  const durumlar = hepsi.map((c) => ({ c, gozcu: gozcuDurumu(c.sid, now) }))
+  /**
+   * Eşikler CETVELDEN. Okunamazsa hiçbir satırda hüküm verilmez ve bu SESSİZ KALMAZ:
+   * varsayılana düşmek, eşiği silen değişikliği yeşil göstermek olurdu (§23 HÜKÜM 5).
+   */
+  const esik = esikleriOku()
 
-  const satirlar = durumlar.map(({ c, gozcu }) => {
+  const durumlar = hepsi.map((c) => ({
+    c,
+    tarama: taramaDurumu(c.sid, now, esik ? esik.TARAMA_ESIK_TUR : 3),
+    teslim: teslimDurumu(c.sid, now),
+    sesDk: dk(sonNot.get(c.sid)),
+  }))
+
+  const teslimYaz = (t) => (t === 'KANITSIZ' ? 'KANITSIZ' : t + 'dk')
+
+  const satirlar = durumlar.map(({ c, tarama, teslim, sesDk }) => {
     const bayrak = c.bayat ? ' [BAYAT-TALEP]' : ''
+    // Alarm işareti satırın kendisinde: panoyu okuyan alt satırı kaçırsa da işareti görür.
+    const sesAlarm = esik && sesDk !== null && sesDk > esik.SES_ESIK_DK ? ' <SESSIZ!' : ''
+    const teslimAlarm =
+      esik && (teslim === 'KANITSIZ' || teslim > esik.TESLIM_ESIK_DK) ? ' <TESLIM?' : ''
     return (
       '  ' + String(c.lane).padEnd(16) +
       ' ATIS ' + yasYaz(c.yasDk).padStart(7) +
-      '  GOZCU ' + gozcu.padEnd(13) +
-      ' SES ' + yasYaz(dk(sonNot.get(c.sid))).padStart(7) +
+      '  TARAMA ' + tarama.padEnd(10) +
+      ' TESLIM ' + teslimYaz(teslim).padStart(8) + teslimAlarm +
+      ' SES ' + yasYaz(sesDk).padStart(7) + sesAlarm +
       '  [' + c.sid.slice(0, 8) + ']' + bayrak
     )
   })
 
-  const sagir = durumlar.filter((d) => d.gozcu !== 'CANLI')
   const bas =
-    'YOKLAMA — ' + hepsi.length + ' serit (ATIS=yasiyor, GOZCU=duyuyor, SES=uretiyor)'
-  const alt =
-    sagir.length === 0
-      ? '  Gozcusu kanitlanamayan serit YOK.'
-      : '  UYARI — GOZCUSU KANITLANAMAYAN ' + sagir.length + ' serit: ' +
-        sagir.map((d) => d.c.lane + '/' + d.c.sid.slice(0, 8)).join(', ') +
-        '\n  Bunlar panoya YAZABILIR ama OKUDUKLARI kanitli DEGIL: adresli emir ulasmayabilir.' +
-        '\n  Kurulum: node scripts/board/mechanism-setup.cjs plan --sid <uuid> --serit <SERIT>'
+    'YOKLAMA — ' + hepsi.length +
+    ' serit (ATIS=yasiyor, TARAMA=panoyu okuyor, TESLIM=bildirim ULASTI, SES=uretiyor)'
 
-  return bas + '\n' + satirlar.join('\n') + '\n' + alt
+  const altlar = []
+
+  if (!esik) {
+    altlar.push(
+      '  ⛔ESIK OKUNAMADI — docs/standards/fleet-mechanism-standard.md icindeki ESIKLER blogu' +
+      '\n    yok ya da bicimi bozuk. HICBIR SESSIZLIK/TESLIMAT HUKMU VERILMEDI: asagidaki' +
+      '\n    sayilar cıplak veridir. Fail-closed: bu satirin kendisi alarmdir.',
+    )
+  }
+
+  const asilmis = durumlar.filter((d) => d.tarama !== 'TARIYOR')
+  altlar.push(
+    asilmis.length === 0
+      ? '  Panoyu OKUDUGU kanitlanamayan serit YOK.'
+      : '  UYARI — PANOYU OKUDUGU KANITLANAMAYAN ' + asilmis.length + ' serit: ' +
+        asilmis.map((d) => d.c.lane + '/' + d.c.sid.slice(0, 8)).join(', ') +
+        '\n  Bunlar panoya YAZABILIR ama OKUDUKLARI kanitli DEGIL: adresli emir ulasmayabilir.' +
+        '\n  Kurulum: node scripts/board/mechanism-setup.cjs plan --sid <uuid> --serit <SERIT>',
+  )
+
+  if (esik) {
+    const teslimsiz = durumlar.filter(
+      (d) => d.teslim === 'KANITSIZ' || d.teslim > esik.TESLIM_ESIK_DK,
+    )
+    if (teslimsiz.length) {
+      altlar.push(
+        '  UYARI — TESLIMAT KANITI BAYAT/YOK (' + teslimsiz.length + ' serit): ' +
+        teslimsiz.map((d) => d.c.lane + '/' + d.c.sid.slice(0, 8) + '=' + teslimYaz(d.teslim)).join(', ') +
+        '\n  TARAMA yesil olsa bile bildirim KONUSMAYA ulasmiyor olabilir: gozcu sureci compact i' +
+        '\n  sag atlatir, teslimat kanali atlatmaz (olculdu 2026-09-01, 62 dk kayip).' +
+        '\n  Kanit: mechanism-setup.cjs prob --sid X, sonra dogrula --sid X --jeton <bildirimdeki>',
+      )
+    }
+
+    const sessiz = durumlar.filter((d) => d.sesDk !== null && d.sesDk > esik.SES_ESIK_DK)
+    if (sessiz.length) {
+      altlar.push(
+        '  UYARI — SESSIZLIK ESIGI ASILDI (' + esik.SES_ESIK_DK + 'dk, ' + sessiz.length + ' serit): ' +
+        sessiz.map((d) => d.c.lane + '/' + d.c.sid.slice(0, 8) + '=' + d.sesDk + 'dk').join(', ') +
+        '\n  Sessizlik "sakin gun" ile "durmus serit" arasinda ayrim YAPMAZ; bu satir o ayrimi' +
+        '\n  sorar. Uyandirma tepkisel katmana birakilamaz — tepkisel katman, kimsenin acmadigi' +
+        '\n  sessizligi kiramaz. Bir AKRAN dursun (§23 HUKUM 1-2).',
+      )
+    }
+  }
+
+  return bas + '\n' + satirlar.join('\n') + '\n' + altlar.join('\n')
 }
 
 /**

@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T11:17:23.311063+00:00
+compiled_at: 2026-09-01T11:27:17.138645+00:00
 total_compiled_files: 64
-source_commit: 3bd24f7e
+source_commit: 40b368c0
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9462,6 +9462,145 @@ edilmişken geçer, ilan edilmemişken **durdurur** — tek fark ilan dosyasın�
    ölçüldü. Bu, 2. dersin kardeşi: orada fikstür biçimin bir varyantını üretmiyordu, burada
    **ortam** dalın birini üretmiyordu; ikisinde de eksik olan şey **üretilebilirlik**.
 
+
+---
+
+## 23. YEDEKLİLİK SAYIYLA DEĞİL **TÜRLE** ÖLÇÜLÜR — ve "duyuyor" sütunu duymayı ölçmüyordu
+
+**Ölçülmüş vaka (2026-09-01, ALTYAPI, 62 dakika kayıp):** compact sonrası şerit boşta kaldı,
+hiçbir bildirim ulaşmadı, **Recep uyandırdı**. Aynı anda `yoklama` çıktısı şeridi
+`GOZCU CANLI` gösteriyordu ve bu etiket **yanlış değildi** — gözcü imleci gerçekten 14 saniye
+öncesine aitti. Uyandıktan iki dakika sonra gözcü, prob jetonunu (`PROB-ac03-H1XPZJ`) konuşmaya
+**gerçekten teslim etti**. Yani şerit sağır değildi ve pano da yalan söylemiyordu.
+
+O halde 62 dakika neden geçti? Katmanların **türü** yüzünden:
+
+| katman | durumu | **konuşmayı başlatabilir mi?** |
+|---|---|---|
+| gözcü (Monitor) | canlı, tarıyor, teslim ediyor | **HAYIR** — panoya biri yazmadıkça susar |
+| akran mesajı | kanal sağlam | **HAYIR** — akran meşguldü, kimse yazmadı |
+| `ScheduleWakeup` | kurulu değil | (yalnız `/loop` dinamik modunda var) |
+| cron (`fafdbf68`, `9,29,49`) | `CronList`'te **kayıtlı** | **EVET — ama dört yuva geçti, sıfır teslimat** |
+
+#### CRON: KAYITLI ≠ TESLİM EDİYOR — iki oturumda ölçüldü
+
+İlk teşhiste "cron boştaki oturuma teslim etmiyor olabilir" diye bir hipotez kurulmuştu. Aynı
+gün **iki bağımsız ölçüm** onu çürüttü:
+
+| oturum | yuva | oturumun hâli | teslimat |
+|---|---|---|---|
+| ALTYAPI (`fafdbf68`) | 14:09 | **AKTİF** (konformans koşuyordu) | **0** |
+| OPS/lider (`f6f6dfe5`) | 14:19 | **AKTİF** (akran mesajı işliyordu) | **0** |
+
+Her iki şeritte cron **gün boyu** hiç tetiklenmedi ve `CronList` ikisini de "kayıtlı" göstermeye
+devam etti. **HÜKÜM: cron kendiliğinden-başlayan katman olarak GÜVENİLEMEZ.** Kayıt, teslimatın
+kanıtı değildir; diskten görülemeyen bir katman ölçülemez ve **ölçülemeyen katman yedeklilik
+sayılmaz**. `mechanism-setup.cjs dogrula` bunu baştan doğru adlandırıyordu
+(`CRON: BEYAN — bu bir ÖLÇÜM DEĞİLDİR`); kusur cetvelde değil, o beyanı yedeklilik sayan
+tarafta oldu.
+
+Arızanın kökü (tur-arasına sıkışma mı, baştan bozukluk mu) **operasyonel olarak ikincildir**:
+her iki hâlde de sonuç aynı — kendiliğinden uyanmayı cron'a bağlayan bir şerit, sessizce durur.
+Bu yüzden HÜKÜM 2 (akran katmanı) opsiyonel bir konfor değil, **tek kalan** aktif katmandır.
+Karşılıklı sözleşme yazıya geçti: parka giren şerit lidere tek satır bırakır ("parka giriyorum,
+beklediğim koşul: X"); lider o koşulu her turunun kontrol listesine alır.
+
+### HÜKÜM 1 — tepkisel katman sessizliği kıramaz
+
+"Üçlü yedeklilik" sandığımız şey **1 aktif + 2 tepkisel** katmandı. Tepkisel katman, kimsenin
+yol açmadığı bir sessizliği **tanım gereği** kıramaz: sessizlik zaten "kimse yazmıyor" hâlinin
+adıdır. Tek aktif katman sessizce düştüğünde geriye hiçbir şey kalmaz ve pano bunu **yeşil**
+gösterir, çünkü kalan iki katman gerçekten sağlamdır.
+
+**Yedeklilik sayılırken katman sayısı değil, kaç tanesinin konuşmayı BAŞLATABİLDİĞİ sorulur.**
+Ofsetli üç cron zamanlama çakışmasına karşı korur; **ortak-kipli** arızaya karşı korumaz.
+Compact tam olarak ortak-kipli olaydır: tek seferde bütün oturum-bağlı katmanları aynı anda
+etkiler.
+
+### HÜKÜM 2 — tek gerçekten bağımsız aktif katman BAŞKA BİR OTURUMDUR
+
+Bir oturumun kendi içindeki her katman aynı oturum çalışma zamanına bağlıdır. Bağımsızlık ancak
+**süreç sınırının dışında** başlar. Bu yüzden liderin park-gözetimi kuralı "yedek konfor
+katmanı" değil, **yapısal olarak birincil** katmandır: parka giren şerit, dönüşünü bir akranın
+dürtmesine bağlamalıdır. Parka girerken bırakılan tek satır ("şu koşul olunca beni uyandır")
+mekanizmanın kendisidir; sözlü niyet değildir.
+
+### HÜKÜM 3 — imleç TARAMAYI kanıtlar, DUYMAYI kanıtlamaz
+
+`gozcuDurumu()` imleç tazeliğini ölçüp sütuna `GOZCU = panoyu DUYUYOR mu` yazıyordu. İmleci
+**gözcü süreci** yazar; o süreç compact'i bir OS süreci olarak sağ atlatır. Ölen şey bildirimin
+**konuşmaya teslimi**dir ve imleçte bunun izi yoktur. İki kavram bugün tesadüfen aynı yönde
+yeşildi; ayrı yönde olduğu gün sütun **sahte yeşil** verir.
+
+Hakkını vermek gerekir: `mechanism-setup.cjs dogrula` bu sınırı zaten dürüstçe yazıyordu
+(`CRON: BEYAN — bu bir ÖLÇÜM DEĞİLDİR`). **Kusur cetvelde değil, yoklama sütununun adındaydı.**
+
+Onarım: sütun **ikiye** ayrıldı — `TARAMA` (imleç yaşı, diskten ölçülür) ve `TESLIM`
+(son **doğrulanmış konuşma-teslimi**nin yaşı, `dogrula --jeton` başarıyla eşleştiğinde diske
+yazılır). Bir kavramı ölçen sütun, öteki kavramın adını taşımaz.
+
+### HÜKÜM 4 — ayırt eden sayı eşiğe bağlanmadıkça hüküm değildir
+
+O satırda ayırt eden sayı **zaten vardı**: `SES 64dk`. Kimse onu bir eşikle karşılaştırmadığı
+için alarma dönüşmedi. Recep'in gece-koordinatörü için istediği sessizlik-dedektörü tam budur:
+sayıyı basmak yetmez, **hükme bağlamak** gerekir. Eşikler aşağıda **makine-okunur** biçimde
+yaşar; `board.cjs` onları buradan okur, **koda gömmez** — ve okuyamazsa fail-closed davranır
+(eşik okunamadı = alarm, sessiz varsayılan YOK).
+
+<!-- ESIKLER-BASLANGIC (makine okur: scripts/board/board.cjs — bicimi bozma) -->
+- `SES_ESIK_DK: 45`
+- `TESLIM_ESIK_DK: 120`
+- `TARAMA_ESIK_TUR: 3`
+<!-- ESIKLER-BITIS -->
+
+`SES_ESIK_DK` neden 45: bir şerit normal çalışırken pano notu aralığı 10-30 dakikadır (ölçülen
+gün: ALTYAPI üç PR boyunca düzenli not bıraktı). 45 dakika, yoğun tek bir işi bölmeyecek kadar
+geniş, kaybı bir sonraki cron turunda yakalayacak kadar dar. `TESLIM_ESIK_DK` 120: teslimat
+kanıtı her turda değil, **park/compact/resume geçişlerinde** yenilenir; iki saat bir çalışma
+bloğunu kapsar.
+
+### HÜKÜM 5 — eşik değiştirmek cetveli değiştirmektir
+
+Yukarıdaki blok SSOT'tur. Eşiği koda gömen ya da çağrı satırında ezen bir değişiklik, hükmü
+görünmez kılar; `board-invariants` bunu kol olarak tutar (blok silinirse ya da biçimi bozulursa
+yoklama alarm verir, sessizce varsayılana düşmez).
+
+### SABOTAJ TURU — 8/8 kırmızı, ama ilk turda 2 kol "yeşil geçti" ve **ikisi ayrı sınıftı**
+
+Onarım 54 kol yeşille bitmişti; sekiz sabotajın ikisi ilk turda hiçbir kolu düşürmedi. İkisinin
+teşhisi **farklı** çıktı ve karışmamaları önemli:
+
+1. **S1 — ölçüt dardı (kapı kusuru).** Eski adı (`gozcuDurumu`) yasaklayan kol
+   `/gozcuDurumu\s*[(,]/` ile yazılmıştı; sabotaj `gozcuDurumu: taramaDurumu,` diye bir
+   **takma ad** ekledi ve iki nokta o karakter sınıfında olmadığı için kol görmedi. Dizeyi
+   çıplak aramak da mümkün değildi: eski ad, kendisini yasaklayan **gerekçe metninde** kasten
+   geçiyor. Doğru çözüm ikisinin arasından geçer: **yorumları soy, sonra ara.** Hüküm: bir adı
+   yasaklayan kol, o adın *anlatıldığı* yer ile *kullanıldığı* yeri ayırmak zorundadır.
+2. **S6 — sabotaj geçersizdi (kapı kusuru DEĞİL).** "Damga yoksa 0 dön" sabotajı, yalnızca
+   *durum dosyası var ama damga yok* dalını değiştiriyordu; o günkü fikstür durum dosyasını
+   **hiç yazmıyordu** (dosya yok → `catch` → `KANITSIZ`), yani sabotajın dokunduğu dal test
+   tarafından **hiç koşulmuyordu**. Bu dal ise gerçektir ve tam olarak tehlikeli olandır:
+   `prob` durum dosyasını **damgasız** yazar, `dogrula` çalışana kadar dosya VAR ve damga YOK.
+   Eksik olan sabotaj değil **koldu**; eklendi.
+
+Bu ikisi bugünün en pahalı ayrımını tekrar ediyor: **"sabotaj yeşil geçti" tek başına bir teşhis
+değildir.** İki ayrı şeye işaret edebilir — kapı kör olabilir *ya da* sabotaj hiç dokunmamış
+olabilir. Ayırt eden soru: *sabotajın değiştirdiği satır, testin koştuğu yolda mı?* Sormadan
+"kapı kör" demek, sağlam bir kapıyı gevşetmeye götürür.
+
+Üçüncü küçük kayıt: sabotaj betiğinin **kendi** beklenti dizesi de bir kez yanlıştı — `ESKİ`
+(noktalı İ) yazan mesajı `ESKI` (ASCII I) diye aradı ve "yanlış kol düştü" verdi. Bugünün
+**üçüncü** Türkçe İ/ı vakası (`KIMLIK`/`KİMLİK`, `DIŞ`/`dış`). Hüküm aynı kalıyor: sıfır/ıskalayan
+sonuç **önce ölçütü** suçlar. Sabotaj betiği de bir ölçüm aracıdır ve kendi doğruluğu ölçülmemiş
+bir araçtır — beklentiyi kolun **kimliğine** (test adına) bağlamak, mesaj metnine bağlamaktan
+dayanıklıdır.
+
+### DERSİN GENEL SINIFI
+
+Bu, "kırpılmış çıktı kanıt değildir" ve "ayırt etmeyen gösterge ölçüm değildir" derslerinin
+kardeşidir, ama yeni bir eksende: **gösterge doğruydu, adı yanlıştı.** Sütun gerçek bir şeyi
+doğru ölçüyor, fakat okuyucuya **başka bir şeyi** vaat ediyordu. Bir ölçümün adı, ölçtüğü şeyin
+sınırını taşımak zorundadır — çünkü paneli okuyan, ölçümün kodunu okumaz.
 
 
 ---
