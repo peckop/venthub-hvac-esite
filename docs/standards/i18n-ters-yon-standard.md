@@ -53,6 +53,7 @@ sürekli kırmızı verir ya da eşiği düşürülüp işe yaramaz hale gelir.
 | Varlık yolu / adres | `/images/...` · `info@venthub.com.tr` | Metin değil kaynak |
 | Sosyal ağ ve kargo firması | Facebook · Twitter · X · LinkedIn · Instagram · YouTube · WhatsApp · Yurtiçi · Aras · MNG · PTT · UPS · FedEx · DHL | Özel ad |
 | Ödül / kurum adı | Compasso d'Oro | İtalyanca özel ad |
+| Marka sloganı | Ventilation & HVAC · HVAC Premium | **Recep kararı 2026-09-01:** slogan İngilizce KALIR. Birçok Türk markası sloganını bilerek İngilizce tutar; bu bir tercih, kusur değil. |
 | Klavye tuşu | `Enter ↵` | Tuş adı |
 | Telefon biçim maskesi | `+90 (5xx) xxx xx xx` | Biçim, metin değil |
 
@@ -81,10 +82,16 @@ NOKTASI`), HUD'un noktalı "makine" üslubu korundu, karşılaştırma etiketi k
   o iş inerse bu iki anahtar zaten ölür; şimdi çevirmek boş çakışma üretir.
   ⭐Bu satır kayıttır: 3D kararı verildiğinde bu iki anahtar YA çevrilir YA silinir —
   üçüncü seçenek (unutulmak) yoktur.
-- **Marka sloganları** (`common.brandTagline` = "Ventilation & HVAC",
-  `header.brandTagline` = "HVAC Premium") — **karar sınıfı, ölçümle çözülmez.** Birçok
-  Türk markası sloganını bilerek İngilizce tutar. Recep'in kararı bu dosyaya yazılana
-  kadar kapı bunları meşru sayar; karar geldiğinde ya §3'e sınıfıyla girer ya çevrilir.
+- **Marka sloganları** (`common.brandTagline`, `header.brandTagline`) — ⭐**DİL sorusu
+  KAPANDI, İÇERİK sorusu AÇIK.** İkisi ayrı sorulardır ve karıştırılmamalıdır.
+  · *Dil:* Recep kararı 2026-09-01 — İngilizce kalır; §3'e sınıfıyla yazıldı, bu kapı
+    bir daha sormaz.
+  · *İçerik:* **"HVAC Premium"** ifadesinin KENDİSİ yeniden değerlendirilecek — kanıtsız
+    bir değer iddiasıdır ve abartı-karşıtı ilkemizle gerilimlidir (aynı gün REC-104'te
+    arkasında yetenek olmayan vaatleri tam da bu gerekçeyle kaldırdık). Recep: *"karşıt
+    değilim, sonra bakarız"* → **15A marka/tasarım turunda** ele alınacak.
+  ⭐Bu ayrım kayda geçiyor çünkü dil kapısının susması, içerik sorusunun cevaplandığı
+  anlamına GELMEZ. Kapı sustu diye soru düşerse, kapı soruyu öldürmüş olur.
 
 ## 6) Kapının sınırı (gizlenmiyor)
 
