@@ -11,7 +11,7 @@ import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
-import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 
 interface CategorySeriesViewProps {
     category: DomainCategory
@@ -41,7 +41,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
     const breadcrumbItems = [
         { label: t('category.breadcrumbHome'), href: '/' },
         ...(parentVm ? [{ label: parentVm.displayName, href: Routes.category(getLocalizedCategorySlug(parentVm.raw, lang)) }] : []),
-        { label: vm?.displayName || category.name, href: '' }
+        { label: vm?.displayName || getCategoryDisplayName(category, t), href: '' }
     ]
 
     return (
@@ -94,7 +94,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                             <span className="h-px w-12 bg-secondary-blue" />
                             <span className="text-sm font-black text-secondary-blue uppercase tracking-hvac-relaxed">{t('category.series.seriesDetail')}</span>
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black text-industrial-gray mb-4 tracking-tighter">{vm?.displayName || category.name}</h2>
+                        <h2 className="text-4xl md:text-5xl font-black text-industrial-gray mb-4 tracking-tighter">{vm?.displayName || getCategoryDisplayName(category, t)}</h2>
                         <p className="text-slate-500 font-medium text-lg leading-relaxed">
                             {t('category.family.count', { count: families.length })}
                         </p>

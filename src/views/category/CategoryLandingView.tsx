@@ -27,7 +27,7 @@ import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
-import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 
 /**
  * Sessiz fan anlatısının KONUSU olan seri (kanonik `product_families.slug`).
@@ -86,7 +86,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     const breadcrumbItems = [
         { label: t('category.breadcrumbHome'), href: '/' },
         ...(parentVm ? [{ label: parentVm.displayName, href: Routes.category(getLocalizedCategorySlug(parentVm.raw, lang)) }] : []),
-        { label: vm?.displayName || category.name, href: '' }
+        { label: vm?.displayName || getCategoryDisplayName(category, t), href: '' }
     ]
 
     // REC-89: burası image_url'i HAM kullanıyordu. Canlı veriyle bugün doğru sonuç

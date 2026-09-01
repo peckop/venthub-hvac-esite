@@ -12,7 +12,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { resolveProductImageUrl } from '../lib/images/productImage'
 import { supabaseBrowserClient } from '../lib/supabase/client'
 import type { DbCategory } from '../types/db-rows'
-import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
+import { getCategoryDisplayName,getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { localizedHref } from '../utils/routes'
 import { highlightMatch } from '../utils/searchHighlight'
@@ -316,20 +316,29 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
               className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-colors flex items-center gap-1.5"
             >
               {getCategoryIcon(String(cat.slug), { size: 14 })}
-              {String(cat.name)}
+              {/*
+                REC-103: burada ham `cat.name` basılıyordu — fallback bile yoktu, yani
+                İngilizce sayfada koşulsuz Türkçe ad. Mutlak Kural 7: kategori adı DAİMA
+                getCategoryDisplayName üzerinden. Kapı: INV-KATEGORI-ADI-1.
+              */}
+              {getCategoryDisplayName(cat, t)}
             </button>
           )) : (
+            // REC-103: değişken adı `cat` değil `cip` — buradaki etiketler DB'den değil
+            // SÖZLÜKTEN gelen sabit kısayollar. `cat.name` adı, kategori-adı kapısının
+            // (INV-KATEGORI-ADI-1) haklı olarak ihlal saydığı desenle birebir aynıydı;
+            // kapıyı gevşetmek yerine adı gerçeğe uygun hale getirdim.
             [
-              { name: t('home.hero.quickChips.fans'), slug: 'fans' },
-              { name: t('home.hero.quickChips.airCurtains'), slug: 'air-curtains' },
-              { name: t('home.hero.quickChips.heatRecovery'), slug: 'heat-recovery-vmc' }
-            ].map(cat => (
+              { etiket: t('home.hero.quickChips.fans'), slug: 'fans' },
+              { etiket: t('home.hero.quickChips.airCurtains'), slug: 'air-curtains' },
+              { etiket: t('home.hero.quickChips.heatRecovery'), slug: 'heat-recovery-vmc' }
+            ].map(cip => (
               <button
-                key={cat.slug}
-                onClick={() => { router.push(Routes.category(cat.slug)); handleClose(); }}
+                key={cip.slug}
+                onClick={() => { router.push(Routes.category(cip.slug)); handleClose(); }}
                 className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-colors"
               >
-                {cat.name}
+                {cip.etiket}
               </button>
             ))
           )}

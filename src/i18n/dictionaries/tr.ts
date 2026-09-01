@@ -78,6 +78,14 @@ export const tr = {
       accessories: 'Aksesuarlar ve Bileşenler',
       'smart-home': 'Akıllı Ev Sistemleri',
       'parking-jet': 'Otopark Jet Fanları',
+      // REC-104/REC-103 (2026-09-01): DB'deki 23 aktif kategorinin 8'inin
+      // `translation_key`'i bu sözlükte HİÇ YOKTU; ad çözümü sessizce `menu_label`/`name`
+      // fallback'ine düşüyor ve /en sayfalarında TÜRKÇE ad basıyordu (canlıda ölçüldü:
+      // /en ana sayfada "Fanlar" ve "Kontrol Sistemleri" Türkçe, anahtarı olan
+      // "Air Curtains"/"Accessories" İngilizce). TR değerleri uydurma DEĞİL — DB'deki
+      // mevcut `menu_label`'ların birebir kendisi, yani görünen TR ad değişmiyor.
+      fans: 'Fanlar',
+      'control-systems': 'Kontrol Sistemleri',
       sub: {
         bathroom: 'Banyo ve Tuvalet Fanları',
         window: 'Cam ve Pencere Tipi Fanlar',
@@ -96,7 +104,16 @@ export const tr = {
         'acid-fans': 'Asit Dayanımlı Fanlar',
         'freq-converters': 'Frekans Konvertörleri',
         'duct-heaters': 'Elektrikli Kanal Isıtıcıları',
-        dehumidifier: 'Nem Alma Cihazları'
+        dehumidifier: 'Nem Alma Cihazları',
+        // REC-103: eksik 6 alt kategori (bkz. üstteki not).
+        // ⭐`duct-fans` ile `ghost` AYRI: ghost = "Kanal İçi Hayalet Fanlar".
+        // ⭐`water-coils` ile `duct-heaters` AYRI: biri sulu batarya, diğeri elektrikli.
+        chimney: 'Şömine ve Baca Fanları',
+        'duct-fans': 'Kanal Tipi Fanlar',
+        'ducted-central-hrv': 'Kanallı Merkezi Üniteler',
+        'single-room-hrv': 'Tekil Oda Üniteleri',
+        'speed-controllers': 'Hız Anahtarları',
+        'water-coils': 'Sulu Batarya Kanal Tipi'
       }
     },
     viewAll: 'Tümü',
