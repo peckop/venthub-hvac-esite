@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "14.5"
   }
   graphql_public: {
     Tables: {
@@ -1967,6 +1967,7 @@ export type Database = {
           low_stock_threshold: number | null
           model_code: string | null
           name: string
+          name_i18n: Json | null
           price: number | null
           purchase_currency: string
           purchase_price: number
@@ -2006,6 +2007,7 @@ export type Database = {
           low_stock_threshold?: number | null
           model_code?: string | null
           name: string
+          name_i18n?: Json | null
           price?: number | null
           purchase_currency?: string
           purchase_price?: number
@@ -2045,6 +2047,7 @@ export type Database = {
           low_stock_threshold?: number | null
           model_code?: string | null
           name?: string
+          name_i18n?: Json | null
           price?: number | null
           purchase_currency?: string
           purchase_price?: number
@@ -3178,6 +3181,7 @@ export type Database = {
           coupon_code: string | null
           coupon_discount: number | null
           created_at: string
+          currency: string
           customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
@@ -3216,6 +3220,7 @@ export type Database = {
           coupon_code?: string | null
           coupon_discount?: number | null
           created_at?: string
+          currency?: string
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
@@ -3254,6 +3259,7 @@ export type Database = {
           coupon_code?: string | null
           coupon_discount?: number | null
           created_at?: string
+          currency?: string
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
@@ -3512,10 +3518,73 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "venthub_quotes_accept_confirmed_by_fkey"
+            columns: ["accept_confirmed_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quotes_accept_recorded_by_fkey"
+            columns: ["accept_recorded_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quotes_amended_from_fkey"
+            columns: ["amended_from"]
+            isOneToOne: false
+            referencedRelation: "venthub_quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quotes_converted_order_id_fkey"
+            columns: ["converted_order_id"]
+            isOneToOne: false
+            referencedRelation: "reserved_orders"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "venthub_quotes_converted_order_id_fkey"
+            columns: ["converted_order_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quotes_converted_order_id_fkey"
+            columns: ["converted_order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quotes_converted_order_id_fkey"
+            columns: ["converted_order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_uninvoiced_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quotes_root_quote_id_fkey"
+            columns: ["root_quote_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_quotes"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "venthub_quotes_source_project_id_fkey"
             columns: ["source_project_id"]
             isOneToOne: false
             referencedRelation: "user_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quotes_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "venthub_quotes"
             referencedColumns: ["id"]
           },
           {
@@ -4044,6 +4113,10 @@ export type Database = {
           updated_at: string
         }[]
       }
+      admin_publish_quote: {
+        Args: { p_currency: string; p_quote_id: string; p_valid_until: string }
+        Returns: undefined
+      }
       admin_search_products: {
         Args: {
           p_category_id?: string
@@ -4104,6 +4177,7 @@ export type Database = {
           coupon_code: string | null
           coupon_discount: number | null
           created_at: string
+          currency: string
           customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
@@ -4151,6 +4225,7 @@ export type Database = {
           coupon_code: string | null
           coupon_discount: number | null
           created_at: string
+          currency: string
           customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
