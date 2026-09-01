@@ -125,8 +125,14 @@ describe('INV-FIYAT-SIZINTI-2 · yapısal veri teklif modunda fiyat yayınlamaz'
     expect([...anahtarlar(jsonLd)].includes('offers')).toBe(false)
   })
 
-  it('AYIRT EDİCİ NEGATİF KONTROL — mod açıkken fiyat YAZILIR', () => {
-    // Bu kol olmadan kapı sahte-yeşil olurdu: `offers`i tamamen silsem de geçerdi.
+  it('⭐AYNA İDDİA — SATIŞ MODUNDA fiyat alanı VAR (dönüş yolculuğu güvencesi)', () => {
+    // Bu kol iki işi birden yapar:
+    // (1) AYIRT EDİCİLİK: olmasa kapı sahte-yeşil olurdu — `offers`i tamamen silsem
+    //     de "teklif modunda fiyat yok" iddiası geçerdi.
+    // (2) ⭐DÖNÜŞ YÖNÜ: site bir gün fiyatlı moda dönecek. Kapı yalnız "kapalıyken
+    //     yok" derse, düğme geri çevrildiğinde fiyatın GELMEDİĞİ yerler sessiz kalır
+    //     ve tersine bir sızıntı avı başlar. Bu yüzden mod-bağımlı her kapı İKİ YÖNLÜ
+    //     yazılır: kapalıyken YOK, açıkken VAR.
     const varyant = fiyatliVaryant()
     expect(Number(varyant.price)).toBeGreaterThan(0) // kurgu gerçekten fiyatlı mı
 
