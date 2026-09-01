@@ -28,7 +28,7 @@ const RECENT_SEARCHES_KEY = 'venthub_recent_searches'
 
 const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const { t, lang } = useI18n()
-  const { categories: globalCategories } = useCategories()
+  const { categories: globalCategories, getCategoryBySlug } = useCategories()
   const Routes = useLocalizedRoutes()
   const [q, setQ] = React.useState('')
   const [debounced, setDebounced] = React.useState('')
@@ -180,6 +180,38 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     handleClose()
   }
 
+  /**
+   * Öneri etiketinin GÖRÜNEN hâli — kategori önerisinde ham TR ad basılmaz (REC-114).
+   *
+   * NİÇİN VAR (ölçüldü, 2026-09-01): `get_search_suggestions` etiketi
+   * `c.name::text AS label` ile kuruyor — ham Türkçe ad — ve fonksiyonun `p_lang`
+   * parametresi YOK. Bu bir eksiklik değil, açıkça yazılmış bir tasarım kararı: RPC'nin
+   * kendi yorumu "RPC dili BİLMEZ, bu yüzden sözlüğü verir ve yerelleştirmeyi istemciye
+   * bırakır" diyor ve `url` alanı kanonik EN slug taşıyor. Slug için zaten böyle
+   * yapılıyordu; ADA aynısı uygulanmamıştı. Sonuç: /en'de arama kutusuna yazınca
+   * öneri listesi Türkçe kategori adı basıyordu — REC-103'te düzeltilen popüler-kategori
+   * çipleriyle AYNI ekranda, farklı dilde.
+   *
+   * ⭐Çözüm istemcide çünkü RPC'ye `p_lang` eklemek imza değişikliğidir: `drop` +
+   * `create` gerektirir, yani migration. Kapsam bilerek küçük tutuldu.
+   *
+   * ⭐Eşleşme TAM kategori seti üzerinden: `getCategoryBySlug`, context'teki
+   * `categoriesSlugMap`'ten okur ve o harita `allCategories` ile kurulur — ürünlü-kategori
+   * filtresinden GEÇMEZ. Öneri RPC'si yalnız `is_active` filtreliyor; filtreli seti
+   * kullansaydık ürünü olmayan aktif bir kategori eşleşmez ve sessizce ham TR ada
+   * düşerdi.
+   *
+   * Eşleşme bulunamazsa `s.label`'a düşülür — bugünkü davranış, yani regresyon yok.
+   */
+  const oneriEtiketi = (s: SearchSuggestion): string => {
+    if (s.type === 'category' && s.url) {
+      const slug = s.url.split('/').filter(Boolean).pop()
+      const kategori = slug ? getCategoryBySlug(slug) : undefined
+      if (kategori) return getCategoryDisplayName(kategori, t)
+    }
+    return s.label ?? ''
+  }
+
   const performFullSearch = async (term: string) => {
     if (!term.trim()) return
     setLoading(true)
@@ -215,7 +247,12 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       if (activeIndex > -1) {
         if (viewState === 'SUGGESTING') {
           const s = suggestions[activeIndex]
-          goToSuggestion(s, s.label || '')
+          // ⭐Klavye yolu da çözülmüş etiketi geçirir (REC-114 / NOT-3): eskiden ham
+          // `s.label` gidiyordu ve İngilizce gezen müşterinin arama geçmişine TÜRKÇE
+          // kategori adı yazılıyordu. Fare yolu kullanıcının yazdığı `q`'yu geçirir;
+          // bu ikisinin farklı olması ayrı bir tutarsızlık ve bu turun kapsamı DIŞINDA
+          // — burada yalnız dil sızıntısı kapatıldı.
+          goToSuggestion(s, oneriEtiketi(s))
         } else if (viewState === 'RESULTS') {
           const res = results[activeIndex]
           goToResult(res)
@@ -244,7 +281,10 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
     )
 
-    const label = s.type === 'brand' ? `${t('search.brandPrefix')}${s.label}` : s.label
+    // ⭐Kategori önerisinde ham `s.label` (TR) DEĞİL, çözülmüş ad basılır (REC-114).
+    // Marka öneki kendi dalında kalır; ÜRÜN önerisinin etiketi bu turda ham TR'dir —
+    // ürün adı i18n'i REC-110'un işi ve `products.name_i18n` okuma zinciri henüz yazılmadı.
+    const label = s.type === 'brand' ? `${t('search.brandPrefix')}${s.label}` : oneriEtiketi(s)
 
     return (
       <button
