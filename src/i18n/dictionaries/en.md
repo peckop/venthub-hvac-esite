@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\en.ts
-skeleton_hash: d6fe2ff1b95c4d1f
+source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts
+skeleton_hash: eba8fecca1014207
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-09-01T07:19:11Z
+generated_at: 2026-09-01T08:44:45Z
 ---
 
 ## Genel Bakış
@@ -57,3 +57,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: en
+
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+⭐"Duct Type Fans" deliberately differs from `ghost` ("In-line / Duct Fans").
+⭐"Water Coil Duct Heaters" deliberately differs from `duct-heaters` (electric).
+```

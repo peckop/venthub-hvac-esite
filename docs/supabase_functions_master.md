@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T09:23:24.704298+00:00
+compiled_at: 2026-09-01T09:36:56.353693+00:00
 total_compiled_files: 39
-source_commit: 41d48e37
+source_commit: 0b2514ec
 source: supabase/functions
 ---
 

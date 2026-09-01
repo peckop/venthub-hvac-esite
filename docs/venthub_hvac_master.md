@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T09:23:24.153415+00:00
+compiled_at: 2026-09-01T09:36:55.817406+00:00
 total_compiled_files: 657
-source_commit: 41d48e37
+source_commit: 0b2514ec
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-01T09:23:24.153415+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-01T09:36:55.817406+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -49663,11 +49663,11 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\en.ts
-skeleton_hash: d6fe2ff1b95c4d1f
+source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts
+skeleton_hash: eba8fecca1014207
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-09-01T07:19:11Z
+generated_at: 2026-09-01T08:44:45Z
 ---
 
 ## Genel Bakış
@@ -49719,6 +49719,19 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## DISA AKTARILANLAR (EXPORTS)
   export: en
 
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+⭐"Duct Type Fans" deliberately differs from `ghost` ("In-line / Duct Fans").
+⭐"Water Coil Duct Heaters" deliberately differs from `duct-heaters` (electric).
+```
+
+
 ---
 # FILE: src\i18n\dictionaries\tr.md
 
@@ -49726,11 +49739,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\tr.ts
-skeleton_hash: 0109938b6d1d367a
+source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
+skeleton_hash: f0d3085c09ba0f55
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-09-01T07:19:11Z
+generated_at: 2026-09-01T08:44:47Z
 ---
 
 ## Genel Bakış
@@ -49792,6 +49805,19 @@ Bu dosyada fonksiyon tanımlı değildir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: tr
+
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+⭐`duct-fans` ile `ghost` AYRI: ghost = "Kanal İçi Hayalet Fanlar".
+⭐`water-coils` ile `duct-heaters` AYRI: biri sulu batarya, diğeri elektrikli.
+```
+
 
 ---
 # FILE: src\i18n\dictionaries\admin\a11y.en.md

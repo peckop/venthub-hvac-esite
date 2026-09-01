@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\tr.ts
-skeleton_hash: 0109938b6d1d367a
+source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
+skeleton_hash: f0d3085c09ba0f55
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-09-01T07:19:11Z
+generated_at: 2026-09-01T08:44:47Z
 ---
 
 ## Genel Bakış
@@ -68,3 +68,15 @@ Bu dosyada fonksiyon tanımlı değildir.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: tr
+
+## Tasarım Gerekçeleri (kaynaktan BİREBİR)
+
+> Bu bölüm LLM tarafından **yazılmadı**; kaynaktaki işaretli bloklardan
+> birebir kopyalandı. Özetlenmesi veya yeniden ifade edilmesi YASAKTIR —
+> gerekçenin değeri tam olarak kelimelerindedir.
+
+
+```text
+⭐`duct-fans` ile `ghost` AYRI: ghost = "Kanal İçi Hayalet Fanlar".
+⭐`water-coils` ile `duct-heaters` AYRI: biri sulu batarya, diğeri elektrikli.
+```
