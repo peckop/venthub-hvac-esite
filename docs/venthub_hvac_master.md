@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T07:23:00.734598+00:00
+compiled_at: 2026-09-01T07:46:01.844789+00:00
 total_compiled_files: 657
-source_commit: c2f7959b
+source_commit: 1e1bffc8
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-01T07:23:00.734598+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-01T07:46:01.844789+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -28309,13 +28309,13 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\category\sections\VorticeBrand.tsx
-skeleton_hash: 090b821e260552dd
+source_path: C:\tmp\vh-urun-rec89\src\components\category\sections\VorticeBrand.tsx
+skeleton_hash: 6a1179d0be275c58
 entity_hashes:
   func:VorticeBrand: a8d2715dd40c7de5
   overview: 0819e90fcacb5fea
   style_tokens: 751231d1b5ff9e5b
-generated_at: 2026-08-27T07:00:29Z
+generated_at: 2026-09-01T07:45:45Z
 ---
 
 ## Genel Bakış
@@ -49664,10 +49664,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\en.ts
-skeleton_hash: d6fe2ff1b95c4d1f
+skeleton_hash: 79172e3b4a1e6b2b
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-09-01T07:19:11Z
+generated_at: 2026-09-01T07:45:45Z
 ---
 
 ## Genel Bakış
@@ -49727,10 +49727,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\tr.ts
-skeleton_hash: 0109938b6d1d367a
+skeleton_hash: 4c79c2bbcb128d2d
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-09-01T07:19:11Z
+generated_at: 2026-09-01T07:45:45Z
 ---
 
 ## Genel Bakış
