@@ -1970,6 +1970,8 @@ export const en: typeof tr = {
   account: {
     tabs: {
       overview: 'Overview',
+      ordersAndShipping: 'Orders & Shipping',
+      accountManagement: 'Account Management',
       orders: 'Orders',
       shipments: 'Shipments',
       addresses: 'Addresses',

@@ -21,18 +21,18 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
   // VE aktif-sekme kontrolü (pathname === tab.to) dil-önekli pathname ile eşleşir.
   const navGroups: TabGroup[] = [
     {
-      label: t('account.tabs.overview') || 'Özet',
+      label: t('account.tabs.overview'),
       items: [
-        { to: routes.account.overview(), label: t('account.tabs.overview') || 'Hesap Özeti', icon: <LayoutDashboard size={18} className="shrink-0" /> },
+        { to: routes.account.overview(), label: t('account.tabs.overview'), icon: <LayoutDashboard size={18} className="shrink-0" /> },
       ]
     },
     {
-      label: 'Sipariş & Kargo',
+      label: t('account.tabs.ordersAndShipping'),
       items: [
-        { to: routes.account.orders(), label: t('account.tabs.orders') || 'Siparişler', icon: <Package size={18} className="shrink-0" /> },
-        { to: routes.account.shipments(), label: t('account.tabs.shipments') || 'Kargo Takibi', icon: <Truck size={18} className="shrink-0" /> },
-        { to: routes.account.returns(), label: t('account.tabs.returns') || 'İadeler', icon: <RefreshCcw size={18} className="shrink-0" /> },
-        { to: routes.account.quotes(), label: t('account.tabs.quotes') || 'Tekliflerim', icon: <FileText size={18} className="shrink-0" /> },
+        { to: routes.account.orders(), label: t('account.tabs.orders'), icon: <Package size={18} className="shrink-0" /> },
+        { to: routes.account.shipments(), label: t('account.tabs.shipments'), icon: <Truck size={18} className="shrink-0" /> },
+        { to: routes.account.returns(), label: t('account.tabs.returns'), icon: <RefreshCcw size={18} className="shrink-0" /> },
+        { to: routes.account.quotes(), label: t('account.tabs.quotes'), icon: <FileText size={18} className="shrink-0" /> },
       ]
     },
     {
@@ -43,12 +43,12 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
       ]
     },
     {
-      label: 'Hesap Yönetimi',
+      label: t('account.tabs.accountManagement'),
       items: [
-        { to: routes.account.profile(), label: t('account.tabs.profile') || 'Kişisel Bilgiler', icon: <User size={18} className="shrink-0" /> },
-        { to: routes.account.addresses(), label: t('account.tabs.addresses') || 'Adreslerim', icon: <MapPin size={18} className="shrink-0" /> },
-        { to: routes.account.invoices(), label: t('account.tabs.invoices') || 'Fatura Bilgileri', icon: <FileText size={18} className="shrink-0" /> },
-        { to: routes.account.security(), label: t('account.tabs.security') || 'Güvenlik', icon: <Shield size={18} className="shrink-0" /> },
+        { to: routes.account.profile(), label: t('account.tabs.profile'), icon: <User size={18} className="shrink-0" /> },
+        { to: routes.account.addresses(), label: t('account.tabs.addresses'), icon: <MapPin size={18} className="shrink-0" /> },
+        { to: routes.account.invoices(), label: t('account.tabs.invoices'), icon: <FileText size={18} className="shrink-0" /> },
+        { to: routes.account.security(), label: t('account.tabs.security'), icon: <Shield size={18} className="shrink-0" /> },
         { to: routes.account.dataRequests(), label: t('account.tabs.dataRequests'), icon: <ShieldCheck size={18} className="shrink-0" /> },
       ]
     }
@@ -76,7 +76,7 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
         {/* Sidebar */}
         <aside className="w-full md:w-64 shrink-0">
           <div className="sticky top-24 space-y-6">
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight px-1 hidden md:block">{t('header.account') || 'Hesabım'}</h1>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight px-1 hidden md:block">{t('header.account')}</h1>
 
             <nav className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 space-y-6 overflow-x-auto md:overflow-visible no-scrollbar flex md:block">
               {navGroups.map((group, gi) => (

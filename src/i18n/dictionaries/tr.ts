@@ -1858,6 +1858,8 @@ export const tr = {
   account: {
     tabs: {
       overview: 'Genel Bakış',
+      ordersAndShipping: 'Sipariş & Kargo',
+      accountManagement: 'Hesap Yönetimi',
       orders: 'Siparişlerim',
       shipments: 'Kargolarım',
       addresses: 'Adreslerim',

@@ -336,10 +336,10 @@ export default function OrderDetailPage() {
             <nav className="flex flex-wrap gap-1 p-1 bg-slate-100/80 rounded-xl max-w-fit">
               {(['overview', 'items', 'shipping', 'invoice'] as const).map(tt => (
                 <button key={tt} onClick={() => setTab(tt)} className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${tab === tt ? 'bg-white text-primary-navy shadow-sm' : 'text-slate-500 hover:text-primary-navy hover:bg-slate-200/50'}`}>
-                  {tt === 'overview' && (t('orders.tabs.overview') || 'Özet')}
-                  {tt === 'items' && (t('orders.tabs.items') || 'Ürünler')}
-                  {tt === 'shipping' && (t('orders.tabs.shipping') || 'Kargo Takibi')}
-                  {tt === 'invoice' && (t('orders.tabs.invoice') || 'Fatura')}
+                  {tt === 'overview' && t('orders.tabs.overview')}
+                  {tt === 'items' && t('orders.tabs.items')}
+                  {tt === 'shipping' && t('orders.tabs.shipping')}
+                  {tt === 'invoice' && t('orders.tabs.invoice')}
                 </button>
               ))}
             </nav>
