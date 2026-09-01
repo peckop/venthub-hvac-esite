@@ -37,6 +37,25 @@ export async function getFamiliesEnriched(
 
   if (error) throw error
   const items = (data ?? []) as FamilyListItem[]
+
+  // REC-108: liste RPC'si de ham `f.name` döndürüyor. Dönen id kümesi için ad çevirileri
+  // TEK sorguyla çekilip gömülür; hiç satır yoksa hiç sorgu atılmaz. Çeviri BURADA
+  // ÇÖZÜLMEZ — sayfa verisi `unstable_cache` içinde tutuluyor ve çözüm burada yapılsaydı
+  // önbellek içeriği dile bağımlı olurdu (plan §6.5/B2).
+  if (items.length > 0) {
+    const { data: cevirRows, error: cevirError } = await supabase
+      .from('product_families')
+      .select('id,name_i18n')
+      .in(
+        'id',
+        items.map((i) => i.id)
+      )
+
+    if (cevirError) throw cevirError
+    const cevirById = new Map((cevirRows ?? []).map((r) => [r.id, asAdCevirisi(r.name_i18n)]))
+    for (const item of items) item.name_i18n = cevirById.get(item.id) ?? null
+  }
+
   return { items, total: items[0]?.total_count ?? 0 }
 }
 
@@ -59,6 +78,12 @@ export interface FamilyDetail {
   family: {
     id: string
     name: string
+    /**
+     * REC-108: aile adı çevirileri. RPC bunu DÖNDÜRMEZ (`'name', f.name` — ham kolon);
+     * `getFamilyDetail` aşağıda tek ek sorguyla gömer. Alan yalnız TAŞINIR, çözümü
+     * render anında `familyName()` yapar (plan §6.5/B2).
+     */
+    name_i18n?: { tr?: string | null; en?: string | null } | null
     slug: string
     series_code: string | null
     description: { tr?: string | null; en?: string | null } | null
@@ -141,7 +166,41 @@ export async function getFamilyDetail(
     ? (categoryById.get(detail.family.subcategory_id) ?? null)
     : null
 
+  // REC-108: AD ÇEVİRİLERİ. RPC ham `f.name` döndürüyor; `name_i18n` kolonu DB'de dolu
+  // ama RPC'de hiç referansı yok. RPC'yi yeniden tanımlamak yerine (dönüş tipi değişince
+  // `drop` gerekir ve önceki migration'ların eklediği alanların elle taşınması riski
+  // doğar — bkz. plan §3) alan burada gömülür: kategori satırlarıyla BİREBİR aynı desen.
+  detail.family.name_i18n = await getAileAdCevirisi(supabase, detail.family.id)
+
   return detail
+}
+
+/** `product_families.name_i18n` — tek aile için (PDP yolu). Satır yoksa `null`. */
+async function getAileAdCevirisi(
+  supabase: SupabaseClient<Database>,
+  familyId: string
+): Promise<{ tr?: string | null; en?: string | null } | null> {
+  const { data, error } = await supabase
+    .from('product_families')
+    .select('name_i18n')
+    .eq('id', familyId)
+    .maybeSingle()
+
+  if (error) throw error
+  return asAdCevirisi(data?.name_i18n)
+}
+
+/**
+ * `name_i18n` JSONB'sini daraltan runtime guard. `Json` tipi her şey olabilir; dizi ya
+ * da skaler gelirse `null` döneriz — `familyName()` o zaman ham ada düşer (güvenli).
+ */
+function asAdCevirisi(deger: unknown): { tr?: string | null; en?: string | null } | null {
+  if (typeof deger !== 'object' || deger === null || Array.isArray(deger)) return null
+  const obj = deger as Record<string, unknown>
+  const tr = typeof obj.tr === 'string' ? obj.tr : null
+  const en = typeof obj.en === 'string' ? obj.en : null
+  if (tr === null && en === null) return null
+  return { tr, en }
 }
 
 /**
@@ -163,6 +222,8 @@ export interface SeriesLanding {
   series: {
     id: string
     name: string
+    /** REC-108: ad cevirileri — TASINIR, cozumu render aninda familyName() yapar. */
+    name_i18n?: { tr?: string | null; en?: string | null } | null
     slug: string
     series_code: string | null
     description: { tr?: string | null; en?: string | null } | null
@@ -211,7 +272,7 @@ export async function getSeriesLanding(
   const { data: series, error } = await supabase
     .from('product_families')
     .select(
-      'id,name,slug,series_code,description,category_id,subcategory_id,parent_family_id,brands(name)'
+      'id,name,name_i18n,slug,series_code,description,category_id,subcategory_id,parent_family_id,brands(name)'
     )
     .eq('slug', slug)
     .is('deleted_at', null)
@@ -226,7 +287,7 @@ export async function getSeriesLanding(
   const { data: modelRows, error: modelError } = await supabase
     .from('product_families')
     .select(
-      'id,name,slug,series_code,description,category_id,subcategory_id,brands(name),products!inner(sku,product_images(path,sort_order))'
+      'id,name,name_i18n,slug,series_code,description,category_id,subcategory_id,brands(name),products!inner(sku,product_images(path,sort_order))'
     )
     .eq('parent_family_id', series.id)
     .is('deleted_at', null)
@@ -251,6 +312,7 @@ export async function getSeriesLanding(
     return {
       id: m.id,
       name: m.name,
+      name_i18n: asAdCevirisi(m.name_i18n),
       slug: m.slug,
       series_code: m.series_code,
       description: asLocalizedText(m.description),
@@ -290,6 +352,7 @@ export async function getSeriesLanding(
     series: {
       id: series.id,
       name: series.name,
+      name_i18n: asAdCevirisi(series.name_i18n),
       slug: series.slug,
       series_code: series.series_code,
       description: asLocalizedText(series.description),

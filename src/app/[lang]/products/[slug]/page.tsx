@@ -27,6 +27,7 @@ import {
 } from '../../../../lib/data/preload'
 import type { ProductRouteResolution } from '../../../../lib/data/productRoute'
 import { resolveProductRoute } from '../../../../lib/data/productRoute'
+import { familyName } from '../../../../lib/i18n/familyName'
 import { Routes } from '../../../../utils/routes'
 import { ProductDetailPage as PageComponent } from '../../../_components/ProductDetailPageView'
 
@@ -90,7 +91,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       const trUrl = `${SITE_URL}/tr${Routes.product(family.slug)}`
       const enUrl = `${SITE_URL}/en${Routes.product(family.slug)}`
       const canonicalUrl = lang === 'en' ? enUrl : trUrl
-      const title = pickLang(family.meta_title, lang) || `${family.name} | VentHub`
+      // REC-108: sekme başlığı ve arama sonucu başlığı da dili bilir.
+      const title = pickLang(family.meta_title, lang) || `${familyName(family, lang)} | VentHub`
       const description =
         pickLang(family.meta_description, lang) ||
         pickLang(family.description, lang)?.substring(0, 160) ||
@@ -164,14 +166,17 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
   // `buildSeriesLandingJsonLd` CollectionPage + ItemList üretir (gerekçe: jsonld.ts yorumu).
   if (resolution.kind === 'series') {
     const { series, models } = resolution.landing
+    const gorunenSeriAdi = familyName(series, lang)
     const description =
       pickLang(series.description, lang) ||
-      (lang === 'en' ? `${series.name} models at VentHub` : `VentHub'da ${series.name} modelleri`)
+      (lang === 'en'
+        ? `${gorunenSeriAdi} models at VentHub`
+        : `VentHub'da ${gorunenSeriAdi} modelleri`)
     const seriesJsonLd = buildSeriesLandingJsonLd({
       lang,
       baseUrl: SITE_URL,
       seriesSlug: series.slug,
-      name: series.name,
+      name: gorunenSeriAdi,
       description,
       models,
     })
@@ -235,8 +240,11 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
   // breadcrumb'ın ve CategoryLandingView'ın "parentVm yoksa basamak yok" kuralıyla aynı.
   // Ad boşsa da eklenmez: `buildBreadcrumbJsonLd` boş adda ATAR, ve boş bir basamak
   // zaten makineye hiçbir şey söylemez.
+  // REC-108: kırıntı yolunun son basamağı da görünen addır — hem boşluk kontrolü hem
+  // basılan değer TEK giriş noktasından gelir, ikisi ayrışamaz.
+  const gorunenAileAdi = family ? familyName(family, lang) : ''
   const breadcrumbJsonLd =
-    family && family.name.trim()
+    family && gorunenAileAdi.trim()
       ? buildBreadcrumbJsonLd({
           lang,
           baseUrl: SITE_URL,
@@ -247,7 +255,7 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
               ? [{ name: subName, path: Routes.category(mainSlug, subSlug) }]
               : []),
             // Bulunulan sayfa: path NULL olmak ZORUNDA (helper sözleşmesi).
-            { name: family.name, path: null },
+            { name: gorunenAileAdi, path: null },
           ],
         })
       : null

@@ -38,6 +38,7 @@ import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { selectVariant } from '../../lib/data/selectVariant'
+import { familyName } from '../../lib/i18n/familyName'
 import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
 import { quoteModeHesapla } from '../../lib/pricing/quoteMode'
 import type { FamilyDetail, FamilyVariant } from '../../lib/services/family.service'
@@ -349,7 +350,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
     if (typeof window === 'undefined') return
     if (navigator.share && family) {
       try {
-        await navigator.share({ title: family.name, text: `${family.brand_name ?? ''} - ${family.name}`.trim(), url: window.location.href })
+        // REC-108: paylaşım metni de müşteriye görünen bir yüzeydir — ham ad DEĞİL.
+        const paylasilanAd = familyName(family, lang)
+        await navigator.share({ title: paylasilanAd, text: `${family.brand_name ?? ''} - ${paylasilanAd}`.trim(), url: window.location.href })
       } catch (err) {
         if ((err as Error).name !== 'AbortError') console.warn('Share error:', err)
       }
@@ -423,7 +426,11 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const variantDisplayName = getProductDisplayName(selectedVariant, family)
   const hasMultipleVariants = variants.length > 1
   // Varyant adı aile adıyla aynıysa tekrar basmanın anlamı yok; farklıysa GÖSTERİLİR.
-  const showsVariantIdentity = variantDisplayName !== family.name
+  // REC-108: görünen aile adı TEK giriş noktasından gelir; ham `family.name` render
+  // EDİLMEZ (INV-AILE-ADI-1). Karşılaştırma da görünen ad üzerinden yapılır — yoksa EN
+  // sayfada "varyant adı aile adından farklı mı" sorusu yanlış cevaplanır.
+  const gorunenAileAdi = familyName(family, lang)
+  const showsVariantIdentity = variantDisplayName !== gorunenAileAdi
   const inlineSelector = hasMultipleVariants && variants.length <= VARIANT_PILL_MAX
   const stockQty = selectedVariant.stock_qty
   const inStock = typeof stockQty === 'number' && stockQty > 0
@@ -464,7 +471,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
               </>
             )}
             <span className="text-industrial-gray truncate max-w-150px sm:max-w-none">
-              {family.name}
+              {gorunenAileAdi}
             </span>
           </nav>
         </div>
@@ -550,7 +557,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 taşıyor, o yüzden İKİSİ birlikte.
                 Ölçüm: docs/audits/t099-aile-icerik-uyumu-2026-08-18.md */}
             <h1 className="text-2xl sm:text-3xl font-black text-industrial-gray leading-hvac-11 mb-2 tracking-tight">
-              {family.name}
+              {gorunenAileAdi}
             </h1>
             {showsVariantIdentity && (
               <p className="text-base font-bold text-primary-navy leading-hvac-11 mb-1">
