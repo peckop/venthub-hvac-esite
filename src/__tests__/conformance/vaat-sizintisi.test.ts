@@ -31,6 +31,13 @@
  * kapısı katalog tarafındadır. Ayrıca `NEXT_PUBLIC_ODEME_ACIK` değerini test etmez —
  * kuralı test eder: ödeme vaadi yalnız ödeme akışının ağacında yazılır.
  *
+ * KARDEŞ KAPI — KARIŞTIRILMASIN: `promise-backing-behavior.test.tsx` (INV-PROMISE-1) da
+ * "vaat" der ama BAŞKA EKSENDİR: o, bir EYLEM vaadinin ("Talebiniz Alındı!") gerçekten
+ * ağ/yazma yapıp yapmadığını DAVRANIŞSAL olarak ölçer. Bu kapı ise bir YETENEK iddiasının
+ * ("12 aya varan taksit") vitrinde yazılıp yazılmadığını ölçer. INV-PROMISE-1'in kendi
+ * ölçümü statik taramanın "yüzey ne YAPIYOR" sorusuna cevap veremediğini kanıtlamıştı;
+ * burada sorulan soru "yüzey ne SÖYLÜYOR" olduğu için statik tarama DOĞRU araçtır.
+ *
  * Cetvel: docs/standards/vaat-butunlugu-standard.md
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
