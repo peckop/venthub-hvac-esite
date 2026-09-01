@@ -183,6 +183,33 @@ describe('INV-VAAT-SIZINTI-1 · vitrin ödeme/kargo vaadi yazmaz', () => {
     expect(VAAT_TERIMLERI.some((t2) => kucuk.includes(t2))).toBe(true)
   })
 
+  it('⭐DÖNÜŞ YÖNÜ — geri dönüş listesi cetvelde DURUYOR ve boş değil', () => {
+    // Mod-bağımlı kapılar iki yönlü yazılır (kapalıyken yok, açıkken var) ve bir
+    // DAVRANIŞIN dönüşünü güvenceye alır. Ama buradaki vaatlerin bir kısmı davranış
+    // değil İÇERİKTİ ve sözlükten SİLİNDİ. Silinmiş metnin yokluğunu hiçbir kapı
+    // gösteremez — gösterecek bir şey kalmaz. Tek savunma, neyin geri gelmesi
+    // gerektiğini ADIYLA yazan bir liste ve o listenin kaybolmadığını ölçmek.
+    //
+    // Soru Recep'ten geldi: "fiyatlı hâle dönüş yolculuğunda aynı sorunları
+    // yaşayacak mıyız?" — bu kol o sorunun mekanik cevabı.
+    const cetvel = readFileSync(
+      join(process.cwd(), 'docs', 'standards', 'vaat-butunlugu-standard.md'),
+      'utf8'
+    )
+    expect(cetvel, 'Cetvelde GERİ DÖNÜŞ LİSTESİ bölümü yok').toContain('GERİ DÖNÜŞ LİSTESİ')
+
+    // Liste gerçekten dolu mu? Kaldırılan anahtarlar adıyla geçmeli — bölüm başlığının
+    // tek başına durması (içi boşaltılmış liste) kapıyı geçmemeli.
+    const kaldirilanlar = [
+      'cart.securePayment',
+      'category.trustSignals.installment',
+      'pdp.trust.freeShipping',
+      'support.faq',
+    ]
+    const eksik = kaldirilanlar.filter((k) => !cetvel.includes(k))
+    expect(eksik, `Geri dönüş listesinde bu kalemler ADIYLA yok: ${eksik.join(', ')}`).toEqual([])
+  })
+
   it('MUAFİYET GERÇEK — ödeme akışı ağacı taramanın dışında', () => {
     // Muafiyet olmasaydı kapı, doğru yerde duran vaadi de ihlal sayardı; o zaman
     // ekip kapıyı gevşetmek zorunda kalırdı. Muafiyetin ölçülmesi bunu belgeler.
