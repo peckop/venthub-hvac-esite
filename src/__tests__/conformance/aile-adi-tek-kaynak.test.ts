@@ -129,13 +129,17 @@ describe('INV-AILE-ADI-1 · aile adı tek kaynaktan çözülür', () => {
     const servis = join(KOK, 'lib', 'services', 'family.service.ts')
     const sf = ayrıştır(servis)
 
-    let seriSelectindeVar = false
+    // ⭐"HERHANGİ BİRİ" DEĞİL "HEPSİ" — bu kol ilk yazıldığında `some()` mantığıyla
+    // kuruluydu ve sabotajı YEŞİL geçti (2026-09-01, ölçüldü): iki aile-satırı select'i
+    // var; birinden alan çıkarıldığında diğeri iddiayı tek başına doğruluyordu. Ölçüt
+    // artık SAYIM: `series_code` içeren HER select `name_i18n` de içermeli.
+    const aileSelectleri: string[] = []
     let atamaVar = false
     let servisteCozumVar = false
 
     gez(sf, (n) => {
-      if (ts.isStringLiteral(n) && n.text.includes('name_i18n') && n.text.includes('series_code')) {
-        seriSelectindeVar = true
+      if (ts.isStringLiteral(n) && n.text.includes('series_code')) {
+        aileSelectleri.push(n.text)
       }
       // `detail.family.name_i18n = ...` ya da nesne kurucusunda `name_i18n:` alanı
       if (ts.isBinaryExpression(n) && n.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
@@ -149,7 +153,11 @@ describe('INV-AILE-ADI-1 · aile adı tek kaynaktan çözülür', () => {
       }
     })
 
-    expect(seriSelectindeVar, 'getSeriesLanding select listesinde name_i18n YOK').toBe(true)
+    expect(aileSelectleri.length, 'Hiç aile-satırı select ölçülmedi — kol sahte-yeşil').toBeGreaterThan(0)
+    expect(
+      aileSelectleri.filter((s) => !s.includes('name_i18n')),
+      'Bir aile-satırı select listesi name_i18n TAŞIMIYOR — o yüzey sessizce TR kalır'
+    ).toEqual([])
     expect(atamaVar, 'Servis name_i18n alanını TAŞIMIYOR — tek giriş noktası boşa çalışır').toBe(true)
     expect(
       servisteCozumVar,
