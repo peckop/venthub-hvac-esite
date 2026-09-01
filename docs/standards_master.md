@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T08:36:04.741020+00:00
+compiled_at: 2026-09-01T08:49:00.939958+00:00
 total_compiled_files: 63
-source_commit: 1d4159bc
+source_commit: cde802db
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9193,7 +9193,7 @@ Bu kalem daha önce "her rebase'de üretilmiş artefakt çakışıyor, can sık�
 Ölçüm gerekçeyi değiştiriyor: sürtünme **kozmetik değil KAPI KAYBI**. Çakışık kalan bir dal
 yalnız zahmet üretmiyor, o dalın **bütün kapılarını sessizce kapatıyor**.
 
-### ⭐İki ders, adıyla
+### ⭐Dört ders, adıyla
 
 1. **"Bunu ben mi bozdum" açıklaması da bir HİPOTEZDİR** ve tekrar üretilebilirlikle sınanır.
    URUN ilk kırmızıdan sonra *"sebep benim yaptığım yarış — koşum sürerken PR'ı kapatıp açtım"*
@@ -9205,6 +9205,17 @@ yalnız zahmet üretmiyor, o dalın **bütün kapılarını sessizce kapatıyor*
    **koşar**. `tsc --noEmit` **temizdi** (kod 0): tip kapısı bu sınıfı **görmez**, ayırt eden
    yalnız lint. `vitest` modülü **çalıştırır**, lint kaynağı **denetler** — iki ayrı ölçüt.
    Push öncesi kontrol listesine `eslint` girer.
+3. ⭐**Ritüelin ÖLÇÜM KAYNAĞI adıyla yazılır: `merge_commit_sha` REST'ten okunur.**
+   Yukarıdaki reçete "merge-ref var mı" diye sormayı söylüyordu ama **nereden** okunacağını
+   söylemiyordu; boşluk gerçek: `gh pr view --json mergeCommit` **AÇIK bir PR'da HER ZAMAN
+   `null` döner**. O alana bakan biri her açık PR'ı "çakışık" sanır ve ritüel ayırt etmeyi
+   bırakır. Geçerli tek ölçüm **REST**: `gh api repos/{owner}/{repo}/pulls/{n}` →
+   `merge_commit_sha` + `mergeable_state`. (Ayırt etmeyen gösterge ölçüm değildir.)
+4. ⭐**Ortak ağaca dokunan git komutu `-C <yol>` ile yazılır — istisnasız.**
+   §19 kimlik düzeyinde "ortak ana baskındır" diyor; bunun **komut düzeyi** karşılığı budur.
+   Ölçülmüş bedel: bir şerit oturumunun kabuğu sessizce ana dizine resetlendi ve `rebase`
+   **ana dizinde master'a** koştu. `cwd`'ye güvenen her komut bu kazayı bekliyor demektir;
+   `-C` yazmak bir üslup tercihi değil, kazanın önündeki tek engel.
 
 ---
 
@@ -9302,6 +9313,21 @@ kaybolacaktı**, sessizce. Onarım: `if (require.main === module) main()`.
 sözleşme bozan hatalar tam olarak davranış katmanında yaşar. Kütüphane olarak `require`
 edilebilen her betik **yan etkisiz** olmalıdır.
 
+### ⭐Kardeş vaka (URUN, 2026-09-01): KENDİ REFAKTÖRÜN KENDİ KAPINI KÖR EDEBİLİR
+
+Aynı sınıf, başka şeritte, aynı gün. URUN'un yeni vaat-bütünlüğü kapısının **ilk sürümü
+sabotajda YEŞİL kaldı**. Sebep kolun zayıflığı değildi: **aynı PR'daki bir refaktör**
+literal dizeleri `t(değişken)` çağrısına çevirdi, ve kapının toplayıcısı dizeyi **çağrıdan**
+okuduğu için görecek bir şey kalmadı. Düzeltme: toplayıcı dizeyi çağrıdan değil **dosyadan**
+alır.
+
+**Hüküm:** bir kapı, koruduğu kodun **kendi PR'ındaki değişimine** karşı da ölçülür. Kapıyı
+ve onun koruduğu kodu aynı PR'da değiştiriyorsan, sabotajı **refaktör sonrası** hale karşı
+kur — refaktör öncesi hale karşı kurulmuş sabotaj, artık var olmayan bir kodu sınar.
+Ve daha genel olarak: **sabotaj testi bir ritüel değil, kör-nokta bulucudur**; yeşil kalan
+her sabotaj ya kapıda ya da fikstürde adı konması gereken bir boşluk gösterir (bu belgede
+aynı gün üç kez: metin taraması, koşulmayan dal, fikstürün üretmediği biçim varyantı).
+
 ### Adıyla bırakılan iki kalem (bu şeritte DEĞİL)
 
 Aşağıdakiler ORION deposunda ve bu şeridin ölçülmüş claim'i dışında; sahibine iletildi:
@@ -9309,6 +9335,117 @@ Aşağıdakiler ORION deposunda ve bu şeridin ölçülmüş claim'i dışında;
    Her çağıran bundan yanılır; venthub tarafındaki çözüm bir **etrafından dolaşmadır**, kök fix değil.
 2. `orion-belgesiz.jsonl` defteri ve sayacı **yalnız `run_hook`**'ta (`doc.py:654, 777`),
    `batch` gövdesinde sıfır referans — koruma **ölü yolda**.
+
+---
+
+## 22. ÜRETİLMİŞ ARTEFAKT ÇAKIŞMASI: TEK KOMUT, SESSİZ ÇÖZÜM YOK (`taban-tazele.cjs`)
+
+### Ölçülmüş sürtünme (2026-08-31 / 09-01)
+
+`origin/master` son 20 commit'i sayıldı: **16'sı** ilan edilmiş bir üretilmiş artefakta
+dokunuyor (4 master `.md` + `docs/artefakt_manifest.json`). Geride kalmış bir dalın taban
+tazelemesinde çakışma olasılığı pratikte **%80** ve çakışan dosyaların **%100'ü** artefakt.
+§20 ile birleşince bedel kozmetik değil: çakışık kalan dal **bütün kapılarını** kaybediyor.
+⚠Ölçüt düzeltmesi: "son 100 commit'te kaç kez" metriği **oran değil** (`-n 100` bir sınırdır);
+dayanak alınan sağlam sayı **16/20**.
+
+### ⛔`.gitattributes merge=ours` REDDEDİLDİ — gerekçe adıyla yazılıdır
+
+Bu, akla ilk gelen çözüm ve **denendi** (git 2.49.0, izole depo): sürücü tanımlıyken çakışma
+yok/dalın sürümü alınır, sürücü tanımsızken bugünkü davranışın aynısı (zararsız geri düşüş).
+Yine de reddedildi:
+
+1. ⭐**INV-DOC-4b'nin KÖR NOKTASI ölçüldü.** `merge=ours` master'ın yeni artefakt içeriğini
+   sessizce atar. Kapı bunu çoğu halde kırmızı yapar (kaynak blob SHA ↔ manifest kaydı) **ama**
+   master'ın artefaktı yalnız **DAMGA** yüzünden değiştiyse kaynak SHA'ları eşleşmeye devam eder
+   → kapı **YEŞİL** kalır ve geri alma görünmez. Zararı küçük, **sessizliği** kabul edilemez.
+2. **Sürücü `.git/config`'te yaşar, commit EDİLEMEZ** → GitHub tarafı onu hiç koşmaz. Yani
+   §20'nin "çakışık PR'a hiç kapı koşmaz" problemini **çözmez**; yalnız yerel merge'i kolaylaştırır.
+3. Kalan tek koruma INV-DOC-4b olurdu — **tek katmanlı** koruma, ve unutulan adım tam da
+   AXIOM 7'nin ikinci turu. Gelecekte A'yı isteyen bu üç maddeyi çürütmek zorundadır.
+
+### HÜKÜM
+
+1. **Taban tazeleme TEK KOMUTTUR:** `node scripts/hijyen/taban-tazele.cjs --agac <ağaç>`.
+   Merge + ilan edilmiş artefaktlarda çözüm + **AXIOM 7 ikinci turu** + INV-DOC-4b aynı
+   komutun içindedir. Unutulacak adım bırakılmaz; "adımı hatırla" bir mekanizma değildir.
+2. **İlan listesi MANİFESTTEN okunur.** Gömülü liste manifest büyüdüğünde sessizce eksik kalır
+   ve ilan dışı bir yolu "artefakt" sayarak otomatik çözer. Manifest kaydında `yol` alanı
+   **zorunlu**; `ad`'dan yol türetmek (`'docs/' + ad`) yasak (alan adı birimini taahhüt eder).
+3. **İLAN DIŞI tek bir yolda bile çakışma varsa DURULUR**, merge yarım bırakılır, karar insana
+   kalır. "Çoğu artefakttı" gerekçesiyle devam etmek sessiz kaybın kapısıdır.
+4. **Yeniden üretim yalnız ilan edilmiş artefaktları commit'ler.** Başka bir yol değiştiyse
+   raporlanır, commit **edilmez** — şerit claim'inin dışına izinsiz çıkılmaz.
+5. **ÇIKIŞ KODU DÜRÜSTTÜR:** `0` yalnız merge + üretim + kapı üçü de tamamsa. Kapı koşmadıysa
+   `1`, üretim/kapı başarısızsa `3`. Ölçülemeyen adım **"geçti" sayılmaz**.
+6. **Ağaç kirliyse hiç başlanmaz** (merge kirli ağaçta iş kaybettirir) — **tek istisna
+   `docs/artefakt-ilan-istisnalari.json`'un İLAN ETTİĞİ yollardır.** Gerekçe ölçüldü:
+   `post-commit` her commit'ten **sonra** `docs/system_tree.md`'yi yeniden üretir ve damgası
+   değiştiği için ağaç sürekli kirli kalır — yani "temiz ağaç" önkoşulu **kendi kancamız
+   yüzünden** asla sağlanmaz ve araç hiç başlamaz. Tolere edilen liste **gömülü değil ilan
+   dosyasından** okunur (liste değişince araç kendiliğinden hizalanır) ve ilan dosyası
+   okunamaz/bozuksa **hiçbir şey tolere edilmez** — fail-closed. Bu yollar üretim turunda da
+   commit **edilmez**, "beklenen istisna" diye ayrıca raporlanır.
+
+### Kapı
+
+`src/__tests__/conformance/taban-tazele.test.ts` — **22 kol**, çoğu **gerçek depoda gerçek
+merge** koşturur (metin taraması değil davranış). Sabotaj turu: **9 sabotaj, 9'u da doğru
+sebeple kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol
+düştü" üçlüsüyle geçerli sayıldı. Kollar **iki ortamda** ayrı ayrı yeşil ölçüldü: orion kurulu
+olan (yerel) ve orion **kurulu olmayan** (CI taklidi) — aşağıdaki 4. ders bunun niçin
+gerektiğini anlatıyor. Tolerans kolu **ayırt edici çift** olarak kuruldu: aynı kirlilik, ilan
+edilmişken geçer, ilan edilmemişken **durdurur** — tek fark ilan dosyasının varlığı.
+
+### ⭐Bu işin kendi içinden çıkan dört ders
+
+1. ⭐**Sabotaj YEŞİL geçtiyse ilk soru "kapı kör mü" DEĞİL, "o dal koşuldu mu"dur.**
+   Çıkış kodunu bozan sabotaj fark edilmedi. Sebep kapının körlüğü değildi: fikstür
+   deposunda `doc build` **başarıyla koşuyordu**, dolayısıyla "üretim başarısız" dalına hiç
+   girilmiyordu. Ölçülmeyen dal, yazılmamış dal kadar korumasızdır — çözüm kolu güçlendirmek
+   değil, **başarısızlığı üretilebilir kılmak** oldu (`TABAN_TAZELE_PYTHON` adı konmuş dikişi).
+2. ⭐**Windows'ta `npx`'i `execFileSync` ile çağırmak komutu HİÇ koşmaz.** `npx` bir `.cmd`
+   sarmalayıcısıdır; kabuk olmadan çalıştırılamaz, çıktısı boş gelir ve sonuç **"kapı kırmızı"**
+   diye okunur. Bir tur boyunca taban çizgisini kırmızı sandım; ayırt eden ölçüt çıktının
+   **boş** olmasıydı. Doğrusu yorumlayıcıyı doğrudan çağırmak:
+   `node node_modules/vitest/vitest.mjs`. (MSYS yol çevirisiyle aynı sınıf: araç sessizce
+   yanlış cevap üretiyor ve ölçüm yaptığını sanırsın.)
+   ⭐**Aynı sınıfın ikinci vakası, aynı gün: `jq` bu makinede KURULU DEĞİL.** PR kapılarını
+   izlemek için kurduğum gözcü `jq` kullanıyordu; her çağrı sessizce başarısız oldu, döngü 45
+   dakika boyunca hiçbir şey basmadan uyudu ve "çıktı üretmeden bitti" diye kapandı. Yani
+   **izlediğimi sandığım şey hiç izlenmiyordu.** Ölçüldü: depoda `jq` yalnız iki CI
+   workflow'unda geçiyor (koşucuda kurulu, sorun yok); **yerel** betiklerin hiçbirinde yok —
+   yani risk kalıcı bir kusur değil, **o anda yazılan geçici betiklerde**. Hüküm: yerelde
+   koşacak bir ölçüm betiği yazarken kullandığın aracın **varlığını ölç** (`command -v`), ya
+   da `node`/`awk` gibi zaten kanıtlanmış olanla yaz. Sessiz gözcü, gözcü yokluğundan daha
+   kötüdür: yokluğu bilirsin, sessizliği bilmezsin.
+3. ⭐**FİKSTÜR YEŞİLDİ, GERÇEK AĞAÇ BUGU BULDU: `git status --porcelain` çıktısı
+   `trim()` EDİLEMEZ.** Porcelain satırı **sütun duyarlıdır** (`XY<boşluk><yol>`), ve trim
+   **ilk satırın baştaki boşluğunu** yer: ` M docs/x` → `M docs/x` → `slice(3)` → `ocs/x`.
+   Sonuç sessiz: yol ilan listesiyle hiçbir zaman eşleşmiyor, değişen artefakt **fark
+   edilmiyor ve commit edilmiyor**. 17 kol yeşilken bu kusur duruyordu — çünkü fikstürdeki
+   satırlar hep `??` ile başlıyordu (üç karakter, boşluksuz) ve kol asla ` M` biçimini
+   görmüyordu. **Ders:** fikstür bir biçimin YALNIZ BİR varyantını üretiyorsa, o biçimin
+   diğer varyantı test edilmemiştir; ve otomasyonu **gerçek ağaçta bir kez koşturmak**
+   fikstürün göremediğini gösterir. Kusur bulunduktan sonra hem saf ayrıştırma kolu hem
+   davranış kolu eklendi ve sabotajla (trim'i geri koymak) düşürüldüğü ölçüldü.
+   ⚠Not: bu kolu yazarken **ölçütü de bir kez yanlış kurdum** — `not.toMatch(/ocs\/...)`
+   doğru çıktıda da düşer, çünkü `docs/...` o dizeyi içerir. Doğru ölçüt satır başına
+   bağlıdır (`/^\s*ocs\//m`). Ayırt etmeyen ölçüt, ölçüm değildir.
+4. ⭐⭐**ÖNKOŞULU ORTAMA BAĞLI BIRAKAN KOL, O ORTAMDA BAŞKA BİR ŞEYİ ÖLÇER.** "Kapı koşmadıysa
+   çıkış 1'dir" kolu yerelde 18/18 yeşilken **CI'da düştü**: `expected 3 to be 1`. Sebep kolun
+   yanlışlığı değil, **sessiz bir önkoşuldu** — kol "derleme başarılı olur" varsayıyordu,
+   yerelde orion kurulu olduğu için bu doğruydu, **koşucuda orion yok** olduğu için orada
+   derleme başarısız oluyor ve kod 3 dönüyordu. Yani aynı kol iki ortamda **iki farklı şeyi**
+   ölçüyordu ve hangisini ölçtüğü hiçbir yerde yazılı değildi.
+   **Hüküm:** bir kolun ölçtüğü dal, kolun kendisi tarafından **üretilebilir** olmalıdır; dış
+   kuruluma bağlı bırakılamaz. Onarım: derleme komutunun tamamı ezilebilir bir dikişe alındı
+   (`TABAN_TAZELE_BUILD_CMD`, JSON dizi, geçersizse fail-closed hata basar) ve iki dal da
+   deterministik hale getirildi — "başarılı derleme" hiçbir şey yapmayan bir çağrıya, "başarısız
+   derleme" var olmayan bir çalıştırılabilire sabitlendi. Sonuç iki ortamda **ayrı ayrı**
+   ölçüldü. Bu, 2. dersin kardeşi: orada fikstür biçimin bir varyantını üretmiyordu, burada
+   **ortam** dalın birini üretmiyordu; ikisinde de eksik olan şey **üretilebilirlik**.
+
 
 
 ---
@@ -15327,6 +15464,18 @@ INV-DOC-4b kırmızı yanar. Bu bir hata değil, **çift rolün kaçınılmaz so
 orion doc build --force-sync && git add docs/ && git commit
 orion doc build --force-sync && git add docs/ && git commit
 ```
+
+⭐**Bu iki turu ELLE hatırlamak zorunda kalmayın — taban tazelerken tek komut vardır:**
+
+```
+node scripts/hijyen/taban-tazele.cjs --agac <ağaç>
+```
+
+`origin/master` merge'ini, ilan edilmiş artefaktlardaki çakışmanın çözümünü, **AXIOM 7'nin
+iki turunu** ve INV-DOC-4b'yi aynı komutta koşar. Gerekçesi ve reddedilen alternatifi
+(`.gitattributes merge=ours` — INV-DOC-4b'nin damga kör noktası yüzünden **sessiz** geri alma
+üretiyor) `fleet-mechanism-standard.md §22`'de ölçümüyle yazılıdır. Kural: **merge sessizce
+çözülüyorsa, ikinci turu hatırlatan şey bir insan değil bir mekanizma olmalıdır.**
 
 **Yakınsama ölçülmüştür, varsayılmamıştır:** ikinci turda `system_tree.md`
 değişmedi (`git diff --stat` boş) — yani damga alanı her koşumda yeniden
