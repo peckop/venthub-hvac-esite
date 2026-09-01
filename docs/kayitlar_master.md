@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T07:30:46.367778+00:00
+compiled_at: 2026-09-01T07:38:41.054203+00:00
 total_compiled_files: 99
-source_commit: 65f9725a
+source_commit: 90c42767
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -13585,11 +13585,11 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-31T21:31:45.323085+00:00
+compiled_at: 2026-09-01T07:19:06.657429+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-31T21:31:45.323085+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-01T07:19:06.657429+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -13795,6 +13795,7 @@ Bu belge, otonom derleyici tarafından 2026-08-31T21:31:45.323085+00:00 tarihind
 │   │   ├── ⚪ `storefront-reflow-standard.md`
 │   │   ├── ⚪ `subagent-delegation-standard.md`
 │   │   ├── ⚪ `uretilmis-artefakt-standard.md`
+│   │   ├── ⚪ `vaat-butunlugu-standard.md`
 │   │   └── ⚪ `work-tracking-ssot-standard.md`
 │   ├── ⚪ `standards_master.md`
 │   ├── ⚪ `supabase_functions_master.md`
