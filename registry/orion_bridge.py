@@ -35,8 +35,47 @@ if sys.stderr.encoding and sys.stderr.encoding.lower() not in ('utf-8', 'utf8'):
 REGISTRY_DIR = Path(__file__).parent.absolute()
 LOCK_FILE = REGISTRY_DIR / "ORION_IS_MASTER.lock"
 
-# Orion engine'e path ekle
-ORION_ENGINE_DIR = Path(r"C:\Users\alize\orion-registry\orion_registry\engine")
+# ── ORION ENGINE DİZİNİ ────────────────────────────────────────────────────────
+# Engine bu repoda DEĞİL, KARDEŞ bir repoda yaşar (`orion-registry`). Bu yüzden yol
+# repo-göreli olamaz; adaylar arasından VAR OLANI seçeriz.
+#
+# NİÇİN SABİT YOL KALDIRILDI (REC-102, ölçüldü 2026-09-01): burada
+# engine yolu kullanıcı EV DİZİNİ sabit yazılarak veriliyordu ve repo 2026-08-15'ten beri PUBLIC —
+# yani kullanıcı adı herkese açıktı. Daha ağırı: kod SESSİZCE yalnızca tek bir makinede
+# çalışıyordu; başka bir makinede/CI'da bu dizin yok ve köprü kırılır.
+#
+# ⚠ÖLÇÜLMÜŞ TUZAK — "repo kökünün üstündeki kardeş" TÜRETMESİ WORKTREE'DEN KIRILIR:
+# şerit ağaçları geçici dizin (tmp) altında yaşar, dolayısıyla `registry/../../orion-registry`
+# o geçici dizinin kardeşini gösterir ve YOKTUR. Bu türetme ilk denemede yazılsaydı köprü
+# worktree'lerden sessizce ölürdü (Linear yansıması durur, hata görünmez).
+# `Path.home()` hem bu makinede AYNI yolu verir hem worktree'den etkilenmez hem de
+# kullanıcı adını KODDAN çıkarır — ölçüldü: iki yol `resolve()` sonrası birebir eşit.
+#
+# Sıra: açık ortam değişkeni → ev dizini kardeşi → repo kökü kardeşi (CI/yan-yana yerleşim).
+def _engine_dir_adaylari() -> list[Path]:
+    adaylar = []
+    ortam = os.environ.get("ORION_ENGINE_DIR")
+    if ortam:
+        adaylar.append(Path(ortam))
+    kuyruk = ("orion-registry", "orion_registry", "engine")
+    adaylar.append(Path.home().joinpath(*kuyruk))
+    adaylar.append(REGISTRY_DIR.parent.parent.joinpath(*kuyruk))
+    return adaylar
+
+
+def _engine_dir_sec() -> Path:
+    adaylar = _engine_dir_adaylari()
+    for a in adaylar:
+        if a.exists():
+            return a
+    # FAIL-LOUD: var olmayan bir yolu sessizce döndürmek, hatayı ilk `import`a kadar erteler
+    # ve orada "modül yok" gibi görünür — asıl sebep (yerleşim) gizlenir. İlk adayı döndürüp
+    # DENENENLERİ söylüyoruz; `_get_orion_core` zaten anlaşılır bir ImportError üretiyor.
+    return adaylar[0]
+
+
+ORION_ENGINE_DIR = _engine_dir_sec()
+_ENGINE_DIR_DENENEN = _engine_dir_adaylari()
 
 def _is_orion_active() -> bool:
     """ORION_IS_MASTER.lock dosyası varsa Orion köprüsü aktiftir."""
@@ -45,7 +84,13 @@ def _is_orion_active() -> bool:
 def _get_orion_core():
     """Orion registry_core modülünü dinamik olarak yükler."""
     if not ORION_ENGINE_DIR.exists():
-        raise ImportError(f"Orion engine dizini bulunamadı: {ORION_ENGINE_DIR}")
+        # Hangi yolların DENENDİĞİNİ söylüyoruz: "bulunamadı: <tek yol>" biçimi, yerleşim
+        # sorununu "yanlış yol yazılmış" gibi gösterip teşhisi saatlere yayıyordu.
+        denenen = "\n  ".join(str(a) for a in _ENGINE_DIR_DENENEN)
+        raise ImportError(
+            "Orion engine dizini bulunamadı. Denenen yollar:\n  " + denenen +
+            "\nÇÖZÜM: ORION_ENGINE_DIR ortam değişkeniyle açıkça göster."
+        )
 
     if str(ORION_ENGINE_DIR) not in sys.path:
         sys.path.insert(0, str(ORION_ENGINE_DIR))
