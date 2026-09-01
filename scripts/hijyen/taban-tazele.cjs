@@ -49,6 +49,43 @@ const { execFileSync } = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
+const YARDIM = [
+  'TABAN-TAZELEME — dal agacini origin/master ile TEK KOMUTTA hizalar.',
+  '',
+  'KULLANIM',
+  '  node scripts/hijyen/taban-tazele.cjs [--agac <yol>] [--taban <ref>] [--kapisiz]',
+  '',
+  'BAYRAKLAR',
+  '  --agac <yol>    Hangi calisma agaci (varsayilan: bulundugun dizin).',
+  '  --taban <ref>   Hangi taban (varsayilan: origin/master). Uzak ref ise once fetch edilir.',
+  '  --kapisiz       INV-DOC-4b tazelik kapisini KOSMA. Kapi kosulmazsa cikis 0 DEGIL 1 olur.',
+  '  --help, -h      Bu yardimi bas ve CIK (yan etkisiz).',
+  '',
+  'NE YAPAR (sirayla)',
+  '  1. Agac temiz mi diye bakar; kirliyse HIC baslamaz. Tek istisna:',
+  '     docs/artefakt-ilan-istisnalari.json ILAN ETTIGI yollar (kanca uretimi, surekli kirli).',
+  '  2. Tabani ceker ve merge eder.',
+  '  3. Cakisma varsa YALNIZ manifestin ILAN ETTIGI artefaktlarda ours ile cozer.',
+  '     Ilan DISI tek yolda cakisma varsa DURUR, merge yarim kalir, karar sende.',
+  '  4. AXIOM 7 yeniden uretimini kosar (orion doc build --force-sync) ve ilan edilmis',
+  '     artefaktlari commit eder. Turlar KAPI GUDUMLU: tur 1 sonrasi kapi yesilse DURUR.',
+  '  5. INV-DOC-4b tazelik kapisini kosar.',
+  '',
+  'CIKIS KODLARI (DURUST — kismi basarida 0 DONMEZ)',
+  '  0  merge + uretim + kapi UCU DE tamam.',
+  '  1  is yapildi ama KAPI KOSULMADI — "gecti" DENMIYOR.',
+  '  2  DURDU (kirli agac / ilan disi cakisma / manifest okunamadi / git agaci degil).',
+  '  3  uretim ya da kapi BASARISIZ.',
+  '',
+  'ORTAM DEGISKENLERI',
+  '  TABAN_TAZELE_PYTHON     Yorumlayici yolunu ezer.',
+  '  TABAN_TAZELE_BUILD_CMD  Derleme komutunun TAMAMINI ezer (JSON dizi). Gecersizse',
+  '                          sessizce yok sayilmaz, hata basilir.',
+  '',
+  'CETVEL  docs/standards/fleet-mechanism-standard.md §22',
+  '        docs/standards/uretilmis-artefakt-standard.md (AXIOM 7, INV-DOC-4b)',
+].join('\n')
+
 const MANIFEST_YOLU = 'docs/artefakt_manifest.json'
 const ISTISNA_YOLU = 'docs/artefakt-ilan-istisnalari.json'
 const TAZELIK_KAPISI = 'src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts'
@@ -241,6 +278,16 @@ function main() {
     const i = argv.indexOf(ad)
     return i >= 0 && argv[i + 1] ? argv[i + 1] : varsayilan
   }
+  // ⭐YARDIM BAYRAGI YAN ETKISIZDIR — hicbir is yapmadan, HERHANGI bir git komutu
+  // kosturmadan doner. Kusur sahada bulundu (URUN, 2026-09-01): `--help` yardim basmak
+  // yerine dogrudan merge'i kosuyordu. Bu, "require edilen betik yan etkisiz olmali"
+  // ilkesinin BAYRAK halidir: kullaniciya "ne yapiyor bu" diye sorma imkani taniyan bir
+  // bayrak, sormanin bedeli olarak isi yapiyorsa soru sorulamaz hale gelir.
+  if (argv.includes('--help') || argv.includes('-h') || argv.includes('/?')) {
+    console.log(YARDIM)
+    return 0
+  }
+
   const agacHam = al('--agac', process.cwd())
   const taban = al('--taban', 'origin/master')
   const kapiKos = !argv.includes('--kapisiz')
@@ -268,6 +315,20 @@ function main() {
     console.error('DURDU: agac KIRLI (' + kirli.length + ' yol) — merge kirli agacta is kaybettirir.')
     kirli.slice(0, 20).forEach((y) => console.error('   ' + y))
     return 2
+  }
+
+  // ⭐TOLERE ETMEK YETMIYOR — GIT'IN KENDISI DE REDDEDIYOR.
+  // Ilk surumde bu yollari yalniz KENDI onkosulumda tolere ediyordum; git yine de
+  // "Your local changes to the following files would be overwritten by merge" diyip
+  // merge'i reddetti. Yani kendi kapimi actim ama git'in kapisini gormedim.
+  // Bu yollarin yerel degisikligi TANIM GEREGI atilabilir: ilan dosyasi onlari
+  // "uretec tarafindan her commit'te yeniden uretilen" diye ilan ediyor — icerik
+  // kaybi yok, kanca bir sonraki commit'te yeniden yaziyor. O yuzden ATILIR, ama
+  // SESSIZCE degil: ne atildigi tek tek basilir.
+  if (tolereEdilen.length) {
+    for (const y of tolereEdilen) git(agac, ['checkout', '--', y])
+    console.log('tolere edilen ' + tolereEdilen.length + ' yolun YEREL DEGISIKLIGI ATILDI (uretilmis, yeniden uretilir):')
+    tolereEdilen.forEach((y) => console.log('   atildi: ' + y))
   }
 
   // Taban UZAK bir ref ise (`origin/master`) once cekilir. YEREL bir dal adi verildiyse
