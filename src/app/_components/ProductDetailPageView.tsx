@@ -817,8 +817,12 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
           {isNavSticky && (
             <div className="hidden lg:flex items-center space-x-3 pl-6 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-8 duration-500">
               <div className="flex flex-col items-end mr-2">
-                {/* Satın alma çubuğu: sepete DÜŞECEK ad gösterilir, aile adı değil. */}
-                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px uppercase tracking-tight">{variantDisplayName}</span>
+                {/* Satın alma çubuğu: sepete DÜŞECEK ad gösterilir, aile adı değil.
+                    REC-115: `uppercase` KALDIRILDI. `variantDisplayName` DB'den gelen
+                    varyant/aile adıdır ve CSS text-transform DİLE DUYARLIDIR — lang="tr"
+                    altında "Vortice" → "VORTİCE" olur. Üstelik bu ad sepete/siparişe
+                    düşen adla AYNI olmalı; büyütülmüş hâli o eşitliği görsel olarak bozar. */}
+                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px tracking-tight">{variantDisplayName}</span>
                 <span className="text-xs text-primary-navy font-black tracking-widest">
                   {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                 </span>

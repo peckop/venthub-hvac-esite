@@ -125,8 +125,13 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
               className={scrollAnimationClasses.fadeUp(textVisible)}
             >
               {parentCategory && (
+                // REC-115: `uppercase` KALDIRILDI. Buradaki metin DB'den gelen kategori
+                // adıdır ve CSS text-transform DİLE DUYARLIDIR: lang="tr" altında
+                // "Vortice" → "VORTİCE" olur. Kategori adları marka/model parçası
+                // taşıyabildiği için sınıfın tamamı risklidir; çözüm bu metni büyütmemek
+                // (INV-7'nin kendi hükmü). Harf aralığı korundu — üst-başlık dokusu durur.
                 <span className={cn(
-                  "text-xs font-bold uppercase tracking-hvac-loose mb-4 block",
+                  "text-xs font-bold tracking-hvac-loose mb-4 block",
                   isMainCategory ? "text-cyan-400" : "text-indigo-600"
                 )}>
                   {getCategoryDisplayName(parentCategory, t)}
