@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T07:13:48.711679+00:00
+compiled_at: 2026-09-01T07:23:35.049779+00:00
 total_compiled_files: 62
-source_commit: 91053ed8
+source_commit: 82530005
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9367,12 +9367,12 @@ Yine de reddedildi:
 
 ### Kapı
 
-`src/__tests__/conformance/taban-tazele.test.ts` — 14 kol, çoğu **gerçek depoda gerçek merge**
-koşturur (metin taraması değil davranış). Sabotaj turu: **6 sabotaj, 6'sı da doğru sebeple
+`src/__tests__/conformance/taban-tazele.test.ts` — 17 kol, çoğu **gerçek depoda gerçek merge**
+koşturur (metin taraması değil davranış). Sabotaj turu: **7 sabotaj, 7'si de doğru sebeple
 kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol düştü"
 üçlüsüyle geçerli sayıldı.
 
-### ⭐Bu işin kendi içinden çıkan iki ders
+### ⭐Bu işin kendi içinden çıkan üç ders
 
 1. ⭐**Sabotaj YEŞİL geçtiyse ilk soru "kapı kör mü" DEĞİL, "o dal koşuldu mu"dur.**
    Çıkış kodunu bozan sabotaj fark edilmedi. Sebep kapının körlüğü değildi: fikstür
@@ -9385,6 +9385,19 @@ kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedef
    **boş** olmasıydı. Doğrusu yorumlayıcıyı doğrudan çağırmak:
    `node node_modules/vitest/vitest.mjs`. (MSYS yol çevirisiyle aynı sınıf: araç sessizce
    yanlış cevap üretiyor ve ölçüm yaptığını sanırsın.)
+3. ⭐**FİKSTÜR YEŞİLDİ, GERÇEK AĞAÇ BUGU BULDU: `git status --porcelain` çıktısı
+   `trim()` EDİLEMEZ.** Porcelain satırı **sütun duyarlıdır** (`XY<boşluk><yol>`), ve trim
+   **ilk satırın baştaki boşluğunu** yer: ` M docs/x` → `M docs/x` → `slice(3)` → `ocs/x`.
+   Sonuç sessiz: yol ilan listesiyle hiçbir zaman eşleşmiyor, değişen artefakt **fark
+   edilmiyor ve commit edilmiyor**. 17 kol yeşilken bu kusur duruyordu — çünkü fikstürdeki
+   satırlar hep `??` ile başlıyordu (üç karakter, boşluksuz) ve kol asla ` M` biçimini
+   görmüyordu. **Ders:** fikstür bir biçimin YALNIZ BİR varyantını üretiyorsa, o biçimin
+   diğer varyantı test edilmemiştir; ve otomasyonu **gerçek ağaçta bir kez koşturmak**
+   fikstürün göremediğini gösterir. Kusur bulunduktan sonra hem saf ayrıştırma kolu hem
+   davranış kolu eklendi ve sabotajla (trim'i geri koymak) düşürüldüğü ölçüldü.
+   ⚠Not: bu kolu yazarken **ölçütü de bir kez yanlış kurdum** — `not.toMatch(/ocs\/...)`
+   doğru çıktıda da düşer, çünkü `docs/...` o dizeyi içerir. Doğru ölçüt satır başına
+   bağlıdır (`/^\s*ocs\//m`). Ayırt etmeyen ölçüt, ölçüm değildir.
 
 
 
