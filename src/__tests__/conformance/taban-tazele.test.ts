@@ -33,6 +33,7 @@ const betik = require_(BETIK_YOLU) as {
   cakismaSiniflandir: (cakisanlar: string[], ilanlar: Set<string>) => { ilan: string[]; disi: string[] }
   porcelainYollari: (cikti: string) => string[]
   docBuildArgumanlari: (agac: string) => string[]
+  docBuildKomutu: (agac: string) => { calistirilabilir: string; args: string[] }
   MANIFEST_YOLU: string
   TAZELIK_KAPISI: string
 }
@@ -207,25 +208,37 @@ describe('taban-tazele — CANLI DAVRANIS (gercek depo, gercek merge)', () => {
     expect(fs.readFileSync(path.join(f.kok, 'docs/a_master.md'), 'utf8').trim()).toBe('DAL SURUMU')
   })
 
-  it('CIKIS KODU DURUST: kapi KOSULMADIYSA 0 degil 1 doner ("gecti" DEMEZ)', () => {
-    // Lider sarti (d). Merge cozuldu ama kapi kosulmadi -> bu KISMI basaridir.
+  it('CIKIS KODU DURUST: uretim TAMAM ama kapi KOSULMADIYSA 0 degil 1 ("gecti" DEMEZ)', () => {
+    // Lider sarti (d). Merge cozuldu, uretim tamam, kapi kosulmadi -> KISMI basari.
     // Kismi basarida 0 donmek, olculmemis bir adimi "gecti" saymaktir.
+    //
+    // ⭐ORTAM BAGIMSIZ: derleme komutu hicbir sey yapmayan bir node cagrisina SABITLENIR.
+    // Ilk surumu bunu yapmiyordu ve CI'da DUSTU (yerelde orion kurulu, kosucuda DEGIL ->
+    // derleme basarisiz -> 3 dondu). Onkosulu ortama bagli birakan kol, o ortamda BASKA
+    // bir seyi olcer. (2026-09-01, olculdu.)
     const f = fiksturKur(false)
-    const r = f.kos(['--kapisiz'])
+    const r = f.kos(['--kapisiz'], { TABAN_TAZELE_BUILD_CMD: JSON.stringify([process.execPath, '-e', '0']) })
     expect(r.cikti).toMatch(/OTOMATIK cozuldu/)
+    expect(r.cikti).not.toMatch(/doc build BASARISIZ/)
     expect(r.kod).toBe(1)
     expect(r.cikti).toMatch(/gecti" DEMIYORUM/)
   })
 
   it('CIKIS KODU DURUST: doc build BASARISIZ olursa 3 doner (uretim yolu OLCULUR)', () => {
-    // Bu kol olmadan "uretim basarisiz" dali hic kosulmuyordu ve oraya konan bir
-    // sabotaj FARK EDILMIYORDU (2026-09-01'de sabotaj turunda olculdu: S4 yesil gecti,
-    // sebebi kapinin korlugu DEGIL o dalin hic uyarilmamasiydi). Yorumlayiciyi
-    // olmayan bir yola sabitleyerek basarisizligi URETIYORUZ.
+    // Bu kol olmadan "uretim basarisiz" dali hic kosulmuyordu ve oraya konan bir sabotaj
+    // FARK EDILMIYORDU (sabotaj turunda olculdu: kol YESIL gecti, sebebi kapinin korlugu
+    // DEGIL o dalin hic uyarilmamasiydi). Basarisizligi olmayan bir calistirilabilir ile
+    // URETIYORUZ — bu da ortamdan bagimsizdir.
     const f = fiksturKur(false)
-    const r = f.kos(['--kapisiz'], { TABAN_TAZELE_PYTHON: 'C:/olmayan-yorumlayici-xyzzy' })
+    const r = f.kos(['--kapisiz'], { TABAN_TAZELE_BUILD_CMD: JSON.stringify(['C:/olmayan-derleyici-xyzzy']) })
     expect(r.cikti).toMatch(/doc build BASARISIZ/)
     expect(r.kod).toBe(3)
+  })
+
+  it('FAIL-CLOSED: TABAN_TAZELE_BUILD_CMD gecersizse SESSIZCE yok sayilmaz', () => {
+    const f = fiksturKur(false)
+    const r = f.kos(['--kapisiz'], { TABAN_TAZELE_BUILD_CMD: '{bozuk' })
+    expect(r.cikti).toMatch(/gecersiz JSON/)
   })
 
   it('FAIL-CLOSED: agac KIRLIYSE hic baslamaz (cikis 2, merge YOK)', () => {
@@ -262,7 +275,7 @@ describe('taban-tazele — sozlesme hijyeni', () => {
       'process.stdout.write("IHRACAT:"+Object.keys(m).sort().join(","));'
     const cikti = execFileSync(process.execPath, ['-e', kod], { encoding: 'utf8' })
     expect(cikti).toBe(
-      'IHRACAT:MANIFEST_YOLU,TAZELIK_KAPISI,cakismaSiniflandir,docBuildArgumanlari,ilanEdilmisYollar,porcelainYollari',
+      'IHRACAT:MANIFEST_YOLU,TAZELIK_KAPISI,cakismaSiniflandir,docBuildArgumanlari,docBuildKomutu,ilanEdilmisYollar,porcelainYollari',
     )
   })
 

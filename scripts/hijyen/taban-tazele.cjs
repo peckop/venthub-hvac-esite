@@ -137,10 +137,37 @@ function docBuildArgumanlari(agac) {
   return ['-m', 'orion.cli.main', 'doc', 'build', '--force-sync', '--repo-root', agac]
 }
 
+/**
+ * Derleme komutunu TAMAMEN ezmek icin dikis: `TABAN_TAZELE_BUILD_CMD` bir JSON dizisidir
+ * (ilk oge calistirilabilir, gerisi arguman). Iki mesru kullanimi var:
+ *   1. orion baska bicimde cagrilan bir depoda calistirmak,
+ *   2. ⭐KAPININ KENDISI: "derleme BASARILI ama kapi kosmadi" ile "derleme BASARISIZ" dallari
+ *      ancak ikisi de URETILEBILIYORSA olculebilir. Yorumlayici yolunu ezmek yetmiyordu —
+ *      CI kosucusunda orion KURULU DEGIL, dolayisiyla "basarili derleme" dali orada HIC
+ *      kosmuyordu ve o dala konan bir sabotaj CI'da fark edilmezdi. (2026-09-01'de olculdu:
+ *      yerelde yesil olan kol CI'da 3 dondu, cunku onkosul ORTAMA BAGLIYDI.)
+ * Gecersiz JSON verilirse fail-closed: yok sayilmaz, HATA basilir ve normal yola donulur.
+ */
+function docBuildKomutu(agac) {
+  const ham = process.env.TABAN_TAZELE_BUILD_CMD
+  if (ham) {
+    try {
+      const dizi = JSON.parse(ham)
+      if (Array.isArray(dizi) && dizi.length && dizi.every((x) => typeof x === 'string')) {
+        return { calistirilabilir: dizi[0], args: dizi.slice(1) }
+      }
+      console.error('TABAN_TAZELE_BUILD_CMD dizi-of-string DEGIL — yok sayiliyor.')
+    } catch (e) {
+      console.error('TABAN_TAZELE_BUILD_CMD gecersiz JSON — yok sayiliyor: ' + (e && e.message))
+    }
+  }
+  return { calistirilabilir: pythonSec(agac), args: docBuildArgumanlari(agac) }
+}
+
 function docBuildKos(agac) {
-  const py = pythonSec(agac)
+  const { calistirilabilir: py, args } = docBuildKomutu(agac)
   try {
-    const cikti = execFileSync(py, docBuildArgumanlari(agac), {
+    const cikti = execFileSync(py, args, {
       encoding: 'utf8',
       cwd: agac,
       maxBuffer: 64 * 1024 * 1024,
@@ -369,6 +396,7 @@ module.exports = {
   cakismaSiniflandir,
   porcelainYollari,
   docBuildArgumanlari,
+  docBuildKomutu,
   MANIFEST_YOLU,
   TAZELIK_KAPISI,
 }

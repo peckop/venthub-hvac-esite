@@ -1451,12 +1451,14 @@ Yine de reddedildi:
 
 ### Kapı
 
-`src/__tests__/conformance/taban-tazele.test.ts` — 17 kol, çoğu **gerçek depoda gerçek merge**
+`src/__tests__/conformance/taban-tazele.test.ts` — 18 kol, çoğu **gerçek depoda gerçek merge**
 koşturur (metin taraması değil davranış). Sabotaj turu: **7 sabotaj, 7'si de doğru sebeple
 kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol düştü"
-üçlüsüyle geçerli sayıldı.
+üçlüsüyle geçerli sayıldı. Kollar **iki ortamda** ayrı ayrı yeşil ölçüldü: orion kurulu olan
+(yerel) ve orion **kurulu olmayan** (CI taklidi) — aşağıdaki 4. ders bunun niçin gerektiğini
+anlatıyor.
 
-### ⭐Bu işin kendi içinden çıkan üç ders
+### ⭐Bu işin kendi içinden çıkan dört ders
 
 1. ⭐**Sabotaj YEŞİL geçtiyse ilk soru "kapı kör mü" DEĞİL, "o dal koşuldu mu"dur.**
    Çıkış kodunu bozan sabotaj fark edilmedi. Sebep kapının körlüğü değildi: fikstür
@@ -1482,4 +1484,17 @@ kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedef
    ⚠Not: bu kolu yazarken **ölçütü de bir kez yanlış kurdum** — `not.toMatch(/ocs\/...)`
    doğru çıktıda da düşer, çünkü `docs/...` o dizeyi içerir. Doğru ölçüt satır başına
    bağlıdır (`/^\s*ocs\//m`). Ayırt etmeyen ölçüt, ölçüm değildir.
+4. ⭐⭐**ÖNKOŞULU ORTAMA BAĞLI BIRAKAN KOL, O ORTAMDA BAŞKA BİR ŞEYİ ÖLÇER.** "Kapı koşmadıysa
+   çıkış 1'dir" kolu yerelde 18/18 yeşilken **CI'da düştü**: `expected 3 to be 1`. Sebep kolun
+   yanlışlığı değil, **sessiz bir önkoşuldu** — kol "derleme başarılı olur" varsayıyordu,
+   yerelde orion kurulu olduğu için bu doğruydu, **koşucuda orion yok** olduğu için orada
+   derleme başarısız oluyor ve kod 3 dönüyordu. Yani aynı kol iki ortamda **iki farklı şeyi**
+   ölçüyordu ve hangisini ölçtüğü hiçbir yerde yazılı değildi.
+   **Hüküm:** bir kolun ölçtüğü dal, kolun kendisi tarafından **üretilebilir** olmalıdır; dış
+   kuruluma bağlı bırakılamaz. Onarım: derleme komutunun tamamı ezilebilir bir dikişe alındı
+   (`TABAN_TAZELE_BUILD_CMD`, JSON dizi, geçersizse fail-closed hata basar) ve iki dal da
+   deterministik hale getirildi — "başarılı derleme" hiçbir şey yapmayan bir çağrıya, "başarısız
+   derleme" var olmayan bir çalıştırılabilire sabitlendi. Sonuç iki ortamda **ayrı ayrı**
+   ölçüldü. Bu, 2. dersin kardeşi: orada fikstür biçimin bir varyantını üretmiyordu, burada
+   **ortam** dalın birini üretmiyordu; ikisinde de eksik olan şey **üretilebilirlik**.
 
