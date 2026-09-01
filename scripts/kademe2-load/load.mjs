@@ -13,15 +13,22 @@
 import { createClient } from '@supabase/supabase-js'
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO = resolve(HERE, '../..')
 const APPLY = process.argv.includes('--apply')
+// CSV deposu bu repoda DEĞİL, kardeş bir depoda (`venthub-pdf-ingestor`). Sıra:
+// --csv-root= → VENTHUB_CSV_ROOT → ev dizini kardeşi.
+// Kullanıcı ev dizinini SABİT yazan yol KALDIRILDI (REC-102): repo 2026-08-15'ten beri PUBLIC ve o yol
+// kullanıcı adını yayıyordu; ayrıca kod sessizce tek makineye bağlıydı. `homedir()` bu
+// makinede AYNI yolu veriyor (ölçüldü, `resolve()` sonrası birebir eşit) ve adı koddan çıkarıyor.
 const CSV_ROOT = resolve(
   process.argv.find((a) => a.startsWith('--csv-root='))?.slice(11) ??
-  'C:/Users/alize/venthub-pdf-ingestor/venthub/markalar'
+  process.env.VENTHUB_CSV_ROOT ??
+  join(homedir(), 'venthub-pdf-ingestor', 'venthub', 'markalar')
 )
 const OUT_DIR = join(HERE, 'out')
 mkdirSync(OUT_DIR, { recursive: true })
@@ -92,8 +99,12 @@ function specValue(raw) {
 }
 
 // ---------- ana akış ----------
-// .env: önce repo kökü, yoksa ana çalışma dizini (worktree'lerde .env gitignore'lu/eksik olabilir)
-const ENV_PATH = existsSync(join(REPO, '.env')) ? join(REPO, '.env') : 'C:/Users/alize/venthub-hvac/.env'
+// .env: önce repo kökü, yoksa ana çalışma dizini (worktree'lerde .env gitignore'lu/eksik olabilir).
+// Sıra: VENTHUB_ENV_PATH → repo kökü → ev dizinindeki ana çalışma ağacı.
+// Sabit kullanıcı yolu KALDIRILDI (REC-102); `homedir()` aynı dosyayı çözüyor (ölçüldü).
+const ENV_PATH =
+  process.env.VENTHUB_ENV_PATH ??
+  (existsSync(join(REPO, '.env')) ? join(REPO, '.env') : join(homedir(), 'venthub-hvac', '.env'))
 const env = Object.fromEntries(
   readFileSync(ENV_PATH, 'utf8').split(/\r?\n/)
     .filter((l) => l.includes('=') && !l.startsWith('#'))

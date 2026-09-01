@@ -1,0 +1,94 @@
+{
+  "surum": 1,
+  "nicin_var": "Depo 2026-08-15'ten beri PUBLIC. Takipli dosyalarda gecen `C:\\Users\\<ad>` bicimindeki MUTLAK yollar iki ayri zarar uretir: (1) SIZINTI — kullanici adi ve ic dizin adlari herkese aciktir; (2) TASINABILIRLIK KUSURU — kod sessizce tek bir makinede calisir, baska makinede/CI'da o yol YOKTUR ve kirilma HATA gibi degil 'modul yok' gibi gorunur. Bu dosya bilinen kalemleri GORUNUR ve SINIRLI kilar; yenisi eklenirse kapi KIRMIZI verir. Envanter: 2026-09-01, ALTYAPI (REC-102).",
+  "kapi": "src/__tests__/conformance/mutlak-yol-sizintisi.test.ts",
+  "olcum_tarihi": "2026-09-01",
+  "olcut": "Yalniz KIMLIK sizdiran yollar: /C:[\\\\/]Users[\\\\/]/ ve POSIX karsiliklari (/home/<ad>/, /Users/<ad>/). `C:/tmp/...` KAPSAM DISIDIR ve bu bilinclidir: gecici dizin yollari kimlik tasimaz, ayrica board katmaninin ezilebilir varsayilani (VENTHUB_BOARD_DIR) bilerek oyle yazilmistir. Ham sayimla konusulsa 22 'kod kusuru' gorunurdu; kimlik olcutune gecince gercek sayi 2 cikti (ikisi de bu emirde onarildi).",
+  "kapsam_kararlari": {
+    "kod_konfig": "SIKI. Calistirilabilir kod + makine-okunur konfig icinde kimlik sizdiran yol = KIRMIZI. Gerekce: burada yol hem sizinti hem tasinabilirlik kusurudur, ve duzeltmesi UCUZDUR (ortam degiskeni + akilli varsayilan). Muafiyet listesi asagida, 8 kalem.",
+    "prose_md": "MANDAL (ratchet). 215 .md dosyasinda 323 prose satiri kimlik yolu tasiyor ve bunlarin cogu KAZA DEGIL: CLAUDE.md, CONTEXT.md ve SKILL.md dosyalari 'veri deposu surada' diye BILEREK yol yaziyor. Hepsini temizlemek 215 dosyalik bir commit demek — acik PR'larin tamamini tabanlamaya zorlar (manifest dersi) ve gecmis zaten PUBLIC oldugu icin yayilmis olani geri ALMAZ. Bu yuzden temizlik yerine ARTMAMA sarti: sayi buyurse KIRMIZI. Boylece yeni sizinti durur, churn olmaz.",
+    "companion_source_path": "KAPSAM DISI. Uretilmis companion .md frontmatter'indaki `source_path:` alani (224 satir) oreteci ORION tarafindadir; elle duzeltmek AXIOM 3 ihlalidir ve bir sonraki derlemede geri gelir. Ayrica her yeni kaynak dosya yeni bir companion dogurur, yani bu sayi NORMAL iste artar — mandala baglanirsa gunluk isi bloklar. Kapanacagi taraf ORION (REC-102).",
+    "arsiv": "KAPSAM DISI. `.archive/` altindaki 40 dosya olu miras (legacy_superpowers_artifacts); calistirilmiyor, okunmuyor."
+  },
+  "kod_konfig_istisnalari": [
+    {
+      "yol": ".agent/reports/enterprise-audit-2026-05-29.json",
+      "sinif": "tarihsel kalinti",
+      "nicin": "Gecmis bir denetimin ciktisi; `evidence` alanina test ciktisi HAM olarak gomulu ve o ciktinin ilk satiri pnpm'in yazdigi calisma dizinidir. Yeniden uretilmez, silinmesi de gecmisi geri almaz.",
+      "kapanacagi_taraf": "OPS (arsivleme karari)",
+      "kayit": "REC-102"
+    },
+    {
+      "yol": ".agent/reports/enterprise-audit-2026-05-30.json",
+      "sinif": "tarihsel kalinti",
+      "nicin": "Ayni sebep (gomulu test ciktisi).",
+      "kapanacagi_taraf": "OPS (arsivleme karari)",
+      "kayit": "REC-102"
+    },
+    {
+      "yol": ".agent/reports/enterprise-audit-2026-06-06.json",
+      "sinif": "tarihsel kalinti",
+      "nicin": "Ayni sebep (gomulu test ciktisi).",
+      "kapanacagi_taraf": "OPS (arsivleme karari)",
+      "kayit": "REC-102"
+    },
+    {
+      "yol": ".agent/reports/enterprise-audit-2026-06-07.json",
+      "sinif": "tarihsel kalinti",
+      "nicin": "Ayni sebep (gomulu test ciktisi).",
+      "kapanacagi_taraf": "OPS (arsivleme karari)",
+      "kayit": "REC-102"
+    },
+    {
+      "yol": ".agent/reports/enterprise-audit-2026-06-09.json",
+      "sinif": "tarihsel kalinti",
+      "nicin": "Ayni sebep (gomulu test ciktisi).",
+      "kapanacagi_taraf": "OPS (arsivleme karari)",
+      "kayit": "REC-102"
+    },
+    {
+      "yol": ".antigravitycli/edb4ac2f-0c4c-453f-a84a-6dfe33b8683f.json",
+      "sinif": "arac oturum dosyasi",
+      "nicin": "Antigravity CLI'nin yazdigi oturum kaydi; `folderUri` alani acilan klasoru file:// URI olarak tutuyor. Arac uretir, elle duzeltmek anlamsiz.",
+      "kapanacagi_taraf": "OPS (bu dizin takipte kalmali mi karari)",
+      "kayit": "REC-102"
+    },
+    {
+      "yol": "scripts/db/product-data/avens-content-manifest.json",
+      "sinif": "kaynak kaydi (provenance)",
+      "nicin": "`_kaynak` alani verinin HANGI PDF'in hangi sayfalarindan okundugunu kaydediyor — denetlenebilirlik icin degerli. Yol goreliye cevrilebilir ama PDF deposu bu repoda DEGIL (kardes depo), yani goreli yol tek basina yetmez; ayri bir karar gerekir.",
+      "kapanacagi_taraf": "ALTYAPI (kardes-depo yol sozlesmesi yazilinca)",
+      "kayit": "REC-102"
+    },
+    {
+      "yol": "scripts/edge/drift-check.mjs",
+      "sinif": "CI kosucusu yolu — KIMLIK DEGIL",
+      "nicin": "Bas yorumda GitHub Actions kosucusunun ev dizini altindaki work yolu geciyor; bu kosucunun GENEL hesap yoludur, kisisel kimlik tasimaz ve yorumun amaci tam olarak o yolun nasil kisaltildigini ANLATMAKTIR. Olcut ev-dizini bicimini tanidigi icin yakaliyor; muafiyeti REGEX'i gevsetmek yerine BURAYA yazmak tercih edildi — karar gorunur kalsin, olcut sade kalsin.",
+      "kapanacagi_taraf": "yok (kalici muafiyet)",
+      "kayit": "REC-102"
+    },
+    {
+      "yol": "scripts/security/secret-scan.py",
+      "sinif": "sorunu ANLATAN yorum",
+      "nicin": "Dosyanin bas yorumu tam bu kusuru anlatiyor (bir bulgunun mutlak yol gostermesi). Yani yol bir KUSUR degil, kusurun BELGESI. Metin yeniden yazilabilir ama bilgi kaybi olur.",
+      "kapanacagi_taraf": "ALTYAPI (dusuk oncelik)",
+      "kayit": "REC-102"
+    }
+  ],
+  "prose_mandali": {
+    "sinir": 480,
+    "olculen": 480,
+    "nicin_sayi": "2026-09-01 olcumu: `.md` dosyalarinda (arsiv DISI) kimlik yolu tasiyan satirlardan companion `source_path:` olanlar dusuldukten sonra kalan PROSE satiri = 480. Sinir ARTMAMA sartidir: sayi buyurse biri belgeye elle yol yazmis demektir ve kapi KIRMIZI verir. Sayi DUSERSE kapi yesil kalir ama sinir da guncellenmelidir (mandal geri kacmasin) — bunun kendi kolu var ve cetvelde hukum olarak yazili.",
+    "sayi_nicin_degisti": "⭐ILK ENVANTER 323 DEMISTI, GERCEK 480. Sebep envanterin ELLE yazilmis grep olcutuydu: yalnizca BUYUK harfli `C:` ve yalnizca Windows bicimi araniyordu. Kacanlar: kucuk harfli `c:\\Users\\...` (iki CANLI betikte — scripts/clean_root.ps1 ve scripts/generate/generate-next-routes.js, ikisi de bu emirde onarildi) ve POSIX bicimleri (`/home/<ad>/`, `/Users/<ad>/`). DERS: envanteri ELLE yazilan bir grep ile cikarip sonra kapiyi AYRI bir olcutle yazmak, iki olcut arasinda sessiz bir fark birakir; kapinin kendi taban kosusu bu farki gosterdi. Kapi ile envanter AYNI olcutu paylasmali — bu dosyadaki sayi artik kapinin olcutuyle uretilmistir.",
+    "haric_tutulan_alan": "source_path"
+  },
+  "kapinin_goremedigi_kalem": {
+    "ne": "TAKIPLI .pyc (Python bytecode) — 9 dosya, 4'u kimlik yolu GOMUYOR.",
+    "olculdu": "2026-09-01. Sizanlar: .agent/skills/ui-ux-pro-max/scripts/__pycache__/core.cpython-311.pyc · .../design_system.cpython-311.pyc · registry/__pycache__/engine.cpython-311.pyc · registry/__pycache__/orion_bridge.cpython-311.pyc (3 esleme). Python derleyici KAYNAK YOLUNU bytecode'a gomer, dolayisiyla yol .py temizlense bile .pyc icinde YASAR.",
+    "nicin_kapi_goremiyor": "Kapi dosyalari metin olarak okur ve NUL iceren dosyayi ATLAR (ikili dosyada satir/sutun olcumu anlamsizdir). Yani bu kalem kapinin OLCUT EVRENI DISINDADIR — kapi yesil olsa bile bu sizinti durur.",
+    "ikinci_kusur": "Bytecode ZATEN takipte olmamali: uretilmis artefakttir, her python kosusunda degisir ve churn uretir. Bu envanteri cikarirken benim python kosmam bile bir .pyc'yi kirletti.",
+    "oneri": "9 .pyc index'ten DUSURULSUN + .gitignore'a `__pycache__/` girsin. Bytecode yeniden uretilir, kayip YOK. Karar OPS'te (index'ten dusurmek geri-alinabilir ama benim emrimin kapsami disinda).",
+    "kayit": "REC-102"
+  },
+  "adiyla_artik_risk": "Kapi PROSE tarafinda SAYI olcer, YER olcmez: 323 sinirinda kalarak bir dosyadan yol silip baskasina yol eklemek kapidan GECER. Bu bilincli bir odundur — alternatif 215 dosyalik bir temizlik commitiydi ve bedeli karsiliksizdi (gecmis zaten public). Ikinci artik risk: olcut yalniz Windows/POSIX EV DIZINI bicimlerini taniyor; UNC yolu (\\\\sunucu\\pay) ya da baska bir surucu harfi (D:\\isler\\...) kimlik tasiyabilir ama YAKALANMAZ. Ucuncusu: kapi TAKIPLI dosyalara bakar; .gitignore'lu bir dosyaya yazilan yol gorunmez (ama yayilmaz da)."
+}
