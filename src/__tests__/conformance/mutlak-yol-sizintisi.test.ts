@@ -253,6 +253,18 @@ describe('INV-MUTLAK-YOL-1: kimlik sızdıran mutlak yol yeni giremez', () => {
       ).toBe(true)
     }
   })
+
+  it('⭐NÜKS KOLU: takipli .pyc YOK (bytecode kaynak yolunu GÖMER, kapı ikili dosyayı ATLAR)', () => {
+    const pyc = takipliDosyalar().filter((y) => /\.pyc$/i.test(y))
+    expect(
+      pyc,
+      'Takipli Python bytecode bulundu. Bu kapı dosyaları METİN olarak okur ve NUL içeren ' +
+        'dosyayı atlar; yani .pyc kapının ÖLÇÜT EVRENİ DIŞINDADIR — içine gömülen kaynak ' +
+        'yolu, .py temizlenmiş ve kapı yeşil olsa bile sızmaya devam eder. ' +
+        '⚠.gitignore kuralı bunu ÖNLEMEZ: git yalnız TAKİPSİZ dosyayı yok sayar, kural ' +
+        'konmadan önce commit edilmiş dosya kuraldan etkilenmez. Çözüm: git rm --cached <yol>.',
+    ).toEqual([])
+  })
 })
 
 /**
