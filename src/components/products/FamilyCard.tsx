@@ -8,6 +8,7 @@ import type { FamilyListItem } from '@/types/ui-models'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
+import { familyName } from '../../lib/i18n/familyName'
 import { BrandIcon } from '../HVACIcons'
 import VentImage from '../ui/VentImage'
 
@@ -40,7 +41,9 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
   priority = false,
   compact = false
 }) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
+  // REC-108: ham `family.name` render EDİLMEZ — tek giriş noktası (INV-AILE-ADI-1).
+  const gorunenAd = familyName(family, lang)
   const Routes = useLocalizedRoutes()
   const isList = layout === 'list'
 
@@ -62,7 +65,7 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
           <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 bg-light-gray/50 rounded-xl overflow-hidden p-2">
             <VentImage
               src={imageSrc}
-              alt={family.name}
+              alt={gorunenAd}
               fallbackType="product"
               fill
               sizes="128px"
@@ -80,7 +83,7 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
               </span>
             </div>
             <h3 className="text-base sm:text-lg font-bold text-industrial-gray group-hover:text-primary-navy transition-colors line-clamp-1">
-              {family.name}
+              {gorunenAd}
             </h3>
             <div className="mt-2 flex items-baseline gap-3">
               <div className="text-xl font-bold text-primary-navy">{ctaBlock}</div>
@@ -116,7 +119,7 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-light-gray/30 mb-4 group-hover:bg-light-gray/50 transition-colors">
           <VentImage
             src={imageSrc}
-            alt={family.name}
+            alt={gorunenAd}
             fallbackType="product"
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
@@ -137,7 +140,7 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
           </div>
 
           <h3 className="text-sm font-bold text-industrial-gray leading-snug min-h-10 line-clamp-2 mb-4 group-hover:text-primary-navy transition-colors">
-            {family.name}
+            {gorunenAd}
           </h3>
 
           <div className="mt-auto pt-3 border-t border-light-gray flex items-center justify-between gap-3">

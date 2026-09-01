@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T08:29:40.091202+00:00
+compiled_at: 2026-09-01T09:43:51.471523+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-01T08:29:40.091202+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-01T09:43:51.471523+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -126,6 +126,7 @@ Bu belge, otonom derleyici tarafından 2026-09-01T08:29:40.091202+00:00 tarihind
 │   │   ├── ⚪ `kademe2-clean-rebuild-2026-08-11.md`
 │   │   ├── ⚪ `product-schema-master-implementation-plan.md`
 │   │   ├── ⚪ `product-schema-standard-brief.md`
+│   │   ├── ⚪ `rec108-aile-adi-dil-zinciri-2026-09-01.md`
 │   │   ├── ⚪ `render-dalga1-plan-2026-08-17.md`
 │   │   ├── ⚪ `saas-funding-and-packaging-2026-06.md`
 │   │   ├── ⚪ `seo-transition-blueprint.md`
@@ -803,6 +804,8 @@ Bu belge, otonom derleyici tarafından 2026-09-01T08:29:40.091202+00:00 tarihind
 │   │   │   ├── ✅ `ductFanSelection.ts`
 │   │   │   └── ✅ `ductPressure.ts`
 │   │   ├── ✅ `hvacCalculations.ts`
+│   │   ├── 📂 **i18n/**
+│   │   │   └── ❌ `familyName.ts`
 │   │   ├── 📂 **images/**
 │   │   │   ├── ❌ `categoryImage.ts`
 │   │   │   └── ✅ `productImage.ts`
@@ -1098,10 +1101,12 @@ Bu belge, otonom derleyici tarafından 2026-09-01T08:29:40.091202+00:00 tarihind
 
 ## Eksik Dokümantasyonlar
 - [ ] `src\components\admin\data-table\DataTablePagination.tsx`
+- [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
 - [ ] `src\components\admin\data-table\DataTablePagination.tsx`
+- [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`

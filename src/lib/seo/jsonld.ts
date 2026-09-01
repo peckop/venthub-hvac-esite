@@ -15,6 +15,7 @@
  */
 
 import type { FamilyListItem } from '../../types/ui-models'
+import { familyName } from '../i18n/familyName'
 import { storagePathToUrl } from '../images/productImage'
 import { quoteModeHesapla } from '../pricing/quoteMode'
 import type { FamilyDetail, FamilyVariant } from '../services/family.service'
@@ -113,7 +114,8 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     '@context': 'https://schema.org',
     '@type': 'ProductGroup',
     productGroupID: family.slug,
-    name: family.name,
+    // REC-108: yapısal veri de dili bilir — bot EN sayfada TR ad görmemeli.
+    name: familyName(family, lang),
     description,
     url,
     ...(family.brand_name && {

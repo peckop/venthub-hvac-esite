@@ -73,6 +73,12 @@ export interface FtsProductResult {
 export interface FamilyListItem {
   id: string;
   name: string;
+  /**
+   * REC-108: aile adının dil çevirileri. Model bu alanı yalnız TAŞIR — çözümü
+   * `familyName(item, lang)` render anında yapar (servise koymak `unstable_cache`
+   * içeriğini dile bağımlı hale getirirdi; bkz. plan §6.5/B2).
+   */
+  name_i18n?: { tr?: string | null; en?: string | null } | null;
   slug: string;
   series_code: string | null;
   description: { tr?: string | null; en?: string | null } | null;

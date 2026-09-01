@@ -11,6 +11,7 @@ import type { SeriesLanding } from '@/lib/services/family.service'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
+import { familyName } from '../../lib/i18n/familyName'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 
 /**
@@ -42,6 +43,8 @@ interface SeriesLandingViewProps {
 
 const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, lang }) => {
   const { t } = useI18n()
+  // REC-108: seri adı da aile adıdır (parent satırı) — ham render EDİLMEZ.
+  const gorunenSeriAdi = familyName(series, lang)
   const Routes = useLocalizedRoutes()
 
   const description =
@@ -80,7 +83,7 @@ const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, l
           },
         ]
       : []),
-    { label: series.name, href: '' }
+    { label: gorunenSeriAdi, href: '' }
   ]
 
   return (
@@ -95,7 +98,7 @@ const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, l
                 <span>{series.brand_name ?? t('category.landing.expertiseArea')}</span>
               </div>
               <h1 className="text-5xl md:text-7xl font-bold text-industrial-gray mb-8 leading-hvac-11 tracking-tight">
-                {series.name}
+                {gorunenSeriAdi}
               </h1>
               <p className="text-xl text-steel-gray max-w-prose leading-relaxed">
                 {description}
@@ -111,7 +114,7 @@ const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, l
               <div className="relative aspect-square rounded-hvac-xl overflow-hidden shadow-2xl bg-clean-white">
                 <VentImage
                   src={heroImage}
-                  alt={series.name}
+                  alt={gorunenSeriAdi}
                   fallbackType="product"
                   fill
                   sizes="(max-width: 1024px) 100vw, 500px"
@@ -131,7 +134,7 @@ const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, l
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-4 border-b border-light-gray pb-8">
           <div>
             <h2 className="text-3xl font-bold text-industrial-gray uppercase tracking-tighter">
-              {series.name} {t('category.landing.modelsSuffix')}
+              {gorunenSeriAdi} {t('category.landing.modelsSuffix')}
             </h2>
             <p className="text-sm text-steel-gray mt-2 font-medium uppercase tracking-widest">
               {t('category.family.count', { count: models.length })}
@@ -155,7 +158,7 @@ const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, l
 
       <TrustSignals />
 
-      <BottomCTA showWizard={false} categoryName={series.name} />
+      <BottomCTA showWizard={false} categoryName={gorunenSeriAdi} />
     </div>
   )
 }

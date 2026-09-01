@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T09:36:55.817406+00:00
+compiled_at: 2026-09-01T10:22:06.420621+00:00
 total_compiled_files: 657
-source_commit: 0b2514ec
+source_commit: 6975cba5
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-01T09:36:55.817406+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-01T10:22:06.420621+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -66671,11 +66671,11 @@ Bu dosya (`src\types\media.types.ts`) bir TypeScript tip tanımlama dosyasıdır
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\venthub-wt-t131\src\types\ui-models.ts
-skeleton_hash: fd8c49eb8a81bde9
+source_path: C:\tmp\vh-urun-rec89\src\types\ui-models.ts
+skeleton_hash: 4874e85390a3507f
 entity_hashes:
   overview: 33a9634a40be4fcc
-generated_at: 2026-08-27T07:07:44Z
+generated_at: 2026-09-01T09:44:00Z
 ---
 
 ## Genel Bakış
@@ -66735,6 +66735,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 FamilyListItem: get_product_families_enriched RPC'sinin satır modeli (F5-B W0.2). Aile-bazlı vitrin listelerinin (W2.1) veri birimi; varyant satırı listeye girmez.
 - `id: string`
 - `name: string`
+- `name_i18n?: { tr?: string | null; en?: string | null } | null`
 - `slug: string`
 - `series_code: string | null`
 - `description: { tr?: string | null; en?: string | null } | null`
