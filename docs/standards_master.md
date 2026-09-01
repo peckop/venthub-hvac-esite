@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T07:20:08.289679+00:00
+compiled_at: 2026-09-01T07:23:01.329365+00:00
 total_compiled_files: 63
-source_commit: 23fc15b5
+source_commit: c2f7959b
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -15563,6 +15563,10 @@ kargo", "güvenli ödeme", "SSL", "3D Secure", "PCI DSS").
 - `docs/standards/checkout-payment-standard.md` — ödeme akışı
 - `src/__tests__/conformance/storefront-fiyat-sizintisi.test.ts` — **kardeş kapı**:
   fiyat sızıntısı. Bu kapı vaadi, o kapı rakamı korur; ikisi aynı ailedendir.
+- `src/__tests__/conformance/promise-backing-behavior.test.tsx` (INV-PROMISE-1) +
+  `docs/audits/t104-vaat-dayanagi-olcumu-2026-08-20.md` — **ayrı eksen, karıştırılmasın.**
+  Orada soru "bu EYLEM vaadi gerçekten çalışıyor mu" (davranışsal ölçüm zorunlu);
+  burada soru "bu YETENEK iddiası yazılabilir mi" (metin ölçümü yeterli).
 
 
 ---
