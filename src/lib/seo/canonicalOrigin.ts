@@ -28,6 +28,16 @@
  */
 import { SITE_URL } from '@/config/siteUrl'
 
+/**
+ * Determines the canonical base origin URL for the application.
+ * Returns the browser's current origin on the client side, or falls back to the configured
+ * `SITE_URL` environment variable during server-side rendering.
+ *
+ * @returns The resolved canonical origin URL string without a trailing slash
+ *
+ * @example
+ * canonicalOrigin() // returns "https://venthub.com" on server, or "http://localhost:3000" on client
+ */
 export const canonicalOrigin = (): string =>
   typeof window !== 'undefined' && window.location?.origin
     ? window.location.origin

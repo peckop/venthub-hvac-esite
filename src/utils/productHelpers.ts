@@ -109,6 +109,20 @@ const UNIT_BY_KEY: Readonly<Record<string, string>> = {
   humidity_removed_l_24h: 'L/24h',
 }
 
+/**
+ * Formats a product specification value with its appropriate engineering unit,
+ * using suffix-based type inference on the specification key.
+ * If the value is already a text (e.g., 'Class F', '230/400'), it is returned unmodified to prevent double units.
+ *
+ * @param key - The specification key, optionally containing suffixes like '_kg' or '_mm'
+ * @param value - The raw value to be formatted
+ * @returns The formatted string with the correct unit appended, or '-' if the value is null/undefined
+ *
+ * @example
+ * formatSpecValue('weight_kg', 4.5) // returns "4.5 kg"
+ * formatSpecValue('diameter_mm', 150) // returns "150 mm"
+ * formatSpecValue('voltage', '230/400') // returns "230/400"
+ */
 export const formatSpecValue = (key: string, value: unknown): string => {
   if (value === null || value === undefined) return '-';
   const stringValue = String(value);

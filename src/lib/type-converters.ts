@@ -73,6 +73,18 @@ export const mapDatabaseProductToDomain = (dbProd: DbProduct): DomainProduct => 
 export const toUICategoryList = (cats: DbCategory[]): DomainCategory[] => {
   return cats.map(mapDatabaseCategoryToDomain)
 }
+/**
+ * Converts an array of database product models into an array of UI domain product models.
+ * Applies mapping functions over each item to extract correctly typed values and nested JSONB data.
+ *
+ * @param prods - The array of raw database products returned from Supabase
+ * @returns An array of domain product objects suitable for use in UI components
+ *
+ * @example
+ * const dbProducts = await fetchProducts();
+ * const uiProducts = toUIProductList(dbProducts);
+ * console.log(uiProducts[0].translations.name); // Access mapped domain fields
+ */
 export const toUIProductList = (prods: DbProduct[]): DomainProduct[] => {
   return prods.map(mapDatabaseProductToDomain)
 }

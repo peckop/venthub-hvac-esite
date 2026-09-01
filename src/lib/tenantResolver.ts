@@ -3,6 +3,18 @@ export interface TenantInfo {
   slug: string;
 }
 
+/**
+ * Resolves the tenant information based on the incoming request hostname.
+ * Supports subdomain extraction for multitenant deployments, falling back to a default tenant
+ * for localhost or unrecognized domains.
+ *
+ * @param host - The raw hostname string (e.g., from `request.headers.get('host')`)
+ * @returns A `TenantInfo` object containing the resolved `tenantId` and `slug`
+ *
+ * @example
+ * resolveTenant('b2b.venthub.com') // returns { tenantId: '...', slug: 'b2b' }
+ * resolveTenant('localhost:3000') // returns { tenantId: 'd3b...', slug: 'default' }
+ */
 export function resolveTenant(host: string | null | undefined): TenantInfo {
   const DEFAULT_TENANT_ID = 'd3b07384-d113-495f-a558-8c38634e0000';
   const DEFAULT_SLUG = 'default';

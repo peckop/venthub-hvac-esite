@@ -33,6 +33,23 @@ function readIds(): string[] {
   }
 }
 
+/**
+ * React hook that manages the user's favorite product IDs using `localStorage`.
+ * Synchronizes state across multiple tabs using storage events and provides mutative
+ * functions to toggle or remove favorites.
+ *
+ * @returns An object containing the current favorites list and helper functions to manage them:
+ * - `favorites`: Array of favorited product IDs
+ * - `isFavorite`: Function to check if a specific ID is favorited
+ * - `toggleFavorite`: Function to add or remove an ID
+ * - `removeFavorite`: Function to explicitly remove an ID
+ *
+ * @example
+ * const { favorites, isFavorite, toggleFavorite } = useFavorites();
+ * return <button onClick={() => toggleFavorite(productId)}>
+ *   {isFavorite(productId) ? 'Remove from favorites' : 'Add to favorites'}
+ * </button>
+ */
 export function useFavorites() {
   const [ids, setIds] = useState<string[]>([])
 
