@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T08:08:24.483757+00:00
+compiled_at: 2026-09-01T08:29:48.547336+00:00
 total_compiled_files: 99
-source_commit: 40a3278f
+source_commit: d08a715a
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -13585,11 +13585,11 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T07:19:06.657429+00:00
+compiled_at: 2026-09-01T08:29:40.091202+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-01T07:19:06.657429+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-01T08:29:40.091202+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -13725,6 +13725,7 @@ Bu belge, otonom derleyici tarafından 2026-09-01T07:19:06.657429+00:00 tarihind
 │   ├── 📂 **products/**
 │   │   ├── ⚪ `AIR_DOOR_AD_900_MASTER.md`
 │   │   └── ⚪ `AIR_DOOR_AD_900_SEO.md`
+│   ├── ⚪ `recep-komut-rehberi.md`
 │   ├── 📂 **reference/**
 │   │   ├── 📂 **supabase/**
 │   │   │   ├── ⚪ `auth-hooks.md`
@@ -14394,6 +14395,8 @@ Bu belge, otonom derleyici tarafından 2026-09-01T07:19:06.657429+00:00 tarihind
 │   │   ├── ✅ `orderStatusService.ts`
 │   │   ├── ✅ `pdfAssets.ts`
 │   │   ├── ✅ `pdfGenerator.ts`
+│   │   ├── 📂 **pricing/**
+│   │   │   └── ❌ `quoteMode.ts`
 │   │   ├── 📂 **purchasing/**
 │   │   │   └── ✅ `poStatusMachine.ts`
 │   │   ├── 📂 **quotes/**
@@ -14679,9 +14682,11 @@ Bu belge, otonom derleyici tarafından 2026-09-01T07:19:06.657429+00:00 tarihind
 ## Eksik Dokümantasyonlar
 - [ ] `src\components\admin\data-table\DataTablePagination.tsx`
 - [ ] `src\lib\images\categoryImage.ts`
+- [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
 - [ ] `src\components\admin\data-table\DataTablePagination.tsx`
 - [ ] `src\lib\images\categoryImage.ts`
+- [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
 
 ## Sahipsiz (Orphan) MD Dosyaları
