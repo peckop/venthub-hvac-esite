@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T11:22:47.154822+00:00
+compiled_at: 2026-09-01T11:27:17.138645+00:00
 total_compiled_files: 64
-source_commit: 9e8db00d
+source_commit: 40b368c0
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9481,6 +9481,29 @@ O halde 62 dakika neden geçti? Katmanların **türü** yüzünden:
 | akran mesajı | kanal sağlam | **HAYIR** — akran meşguldü, kimse yazmadı |
 | `ScheduleWakeup` | kurulu değil | (yalnız `/loop` dinamik modunda var) |
 | cron (`fafdbf68`, `9,29,49`) | `CronList`'te **kayıtlı** | **EVET — ama dört yuva geçti, sıfır teslimat** |
+
+#### CRON: KAYITLI ≠ TESLİM EDİYOR — iki oturumda ölçüldü
+
+İlk teşhiste "cron boştaki oturuma teslim etmiyor olabilir" diye bir hipotez kurulmuştu. Aynı
+gün **iki bağımsız ölçüm** onu çürüttü:
+
+| oturum | yuva | oturumun hâli | teslimat |
+|---|---|---|---|
+| ALTYAPI (`fafdbf68`) | 14:09 | **AKTİF** (konformans koşuyordu) | **0** |
+| OPS/lider (`f6f6dfe5`) | 14:19 | **AKTİF** (akran mesajı işliyordu) | **0** |
+
+Her iki şeritte cron **gün boyu** hiç tetiklenmedi ve `CronList` ikisini de "kayıtlı" göstermeye
+devam etti. **HÜKÜM: cron kendiliğinden-başlayan katman olarak GÜVENİLEMEZ.** Kayıt, teslimatın
+kanıtı değildir; diskten görülemeyen bir katman ölçülemez ve **ölçülemeyen katman yedeklilik
+sayılmaz**. `mechanism-setup.cjs dogrula` bunu baştan doğru adlandırıyordu
+(`CRON: BEYAN — bu bir ÖLÇÜM DEĞİLDİR`); kusur cetvelde değil, o beyanı yedeklilik sayan
+tarafta oldu.
+
+Arızanın kökü (tur-arasına sıkışma mı, baştan bozukluk mu) **operasyonel olarak ikincildir**:
+her iki hâlde de sonuç aynı — kendiliğinden uyanmayı cron'a bağlayan bir şerit, sessizce durur.
+Bu yüzden HÜKÜM 2 (akran katmanı) opsiyonel bir konfor değil, **tek kalan** aktif katmandır.
+Karşılıklı sözleşme yazıya geçti: parka giren şerit lidere tek satır bırakır ("parka giriyorum,
+beklediğim koşul: X"); lider o koşulu her turunun kontrol listesine alır.
 
 ### HÜKÜM 1 — tepkisel katman sessizliği kıramaz
 
