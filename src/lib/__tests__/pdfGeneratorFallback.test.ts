@@ -53,6 +53,10 @@ describe('generateProductDatasheet Fallback Handling', () => {
   const mockProduct: Product = {
     id: 'test-uuid-12345678',
     name: 'Test VentHub Fan',
+    // REC-110: products.name_i18n kolonu eklendi (20260901155000). Kolon nullable ama
+    // Row'da VAR, yani her gerçek satır bu alanı taşır — fikstür de taşımalı. Bu satır
+    // olmadan derleme kırılıyordu: fikstür, temsil ettiği sahadan eksikti.
+    name_i18n: null,
     brand: 'VentHub',
     sku: 'VH-12345',
     model_code: 'VH-FAN-01',
