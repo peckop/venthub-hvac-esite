@@ -45,12 +45,25 @@ Yalnız `get_family_detail`'a bakmak "ölçüt keskin ama evren yanlış" tuzağ
 
 **A. RPC yolu (SQL değişikliği gerektirebilir)**
 
-| RPC | Son tanım | Yüzey | `id` döndürüyor mu |
+| RPC | Son tanım | Ne gösteriyor | Faz 1 gömmesi mümkün mü |
 |---|---|---|---|
-| `get_family_detail` | `20260814_pricing_w4b...:152` | PDP | evet (`family.id`) |
-| `get_product_families_enriched` | `20260814_pricing_w4b...:89` | listeler / kategori | evet |
-| `fts_search_products` | `20260814_search_fts_family_slug.sql:24` | arama sonuçları | evet |
-| `get_search_suggestions` | `20260826220000...:58` | arama kutusu | evet |
+| `get_family_detail` | `20260814_pricing_w4b...:152` | PDP — **AİLE adı** | ✅ `family.id` döner |
+| `get_product_families_enriched` | `20260814_pricing_w4b...:89` | listeler / kategori — **AİLE adı** | ✅ `id` döner |
+| `fts_search_products` | `20260814_search_fts_family_slug.sql:24` | arama sonucu — **ÜRÜN adı** | ❌ kapsam dışı, aşağı bak |
+| `get_search_suggestions` | `20260826220000...:58` | arama kutusu — **ÜRÜN/KATEGORİ/MARKA adı** | ❌ kapsam dışı, aşağı bak |
+
+⭐**BU TABLONUN İLK HÂLİ YANLIŞTI — plan-challenger düzeltti.** Dört satıra da "evet, `id`
+döndürüyor" yazmıştım; bunu ÖLÇMEDEN, desenden çıkarmıştım. Ölçünce:
+
+- `fts_search_products` `returns table(id uuid, name text, sku, brand, price, rank,
+  family_slug, cover_image_path)` — buradaki `id` **ÜRÜN** id'si, `name` **ÜRÜN** adı.
+  Aile adı hiç dönmüyor (`family_slug` var, ad yok). Ürün adının `name_i18n` kolonu
+  **hiç yok** → bu yüzey Faz 1 ile ÇÖZÜLEMEZ, REC-110'a aittir.
+- `get_search_suggestions` `returns table(type, label, url, metadata)` — `label`
+  **sunucuda kurulmuş hazır metin** (`p.name`, `c.name`, `p.brand`). Gömülecek bir id
+  yok; fonksiyonun **`p_lang` parametresi bile yok**, yani hiçbir şeyi yerelleştiremez.
+
+Ders: "aynı ailedeki fonksiyonlar aynı şeyi döndürür" bir varsayımdır, ölçüm değil.
 
 **B. Doğrudan tablo yolu (PostgREST `.select` — MIGRATION YOK)**
 
@@ -100,11 +113,16 @@ bunu değiştiremez. Arama eşleşmesi Faz 2'dir ve migration ister.
    Kural: `name_i18n[lang]` doluysa o, değilse `name`. Boş dize dolu SAYILMAZ.
    (Kategori tarafındaki `getCategoryDisplayName` ile aynı felsefe; ikisi kardeş.)
 2. **B kolu:** dört `.select` listesine `name_i18n` eklenir.
-3. **A kolu:** RPC dönüşünden sonra, dönen `id` kümesi için `product_families`'tan
-   `id,name_i18n` tek sorguyla çekilir ve `Map` ile gömülür — `getFamilyDetail`'ın
-   kategori deseninin birebir aynısı. Hiç id yoksa hiç sorgu atılmaz.
+3. **A kolu (yalnız `get_family_detail` + `get_product_families_enriched`):** RPC
+   dönüşünden sonra, dönen `id` kümesi için `product_families`'tan `id,name_i18n` tek
+   sorguyla çekilir ve `Map` ile gömülür — `getFamilyDetail`'ın kategori deseninin birebir
+   aynısı. Hiç id yoksa hiç sorgu atılmaz.
+   ⭐**B2 kısıtı:** servis katmanı `name_i18n`'i yalnız TAŞIR, ÇÖZMEZ. Çözüm render
+   anında olur; böylece `unstable_cache` içeriği dilden bağımsız kalır ve
+   `getFamiliesEnriched` imzası değişmez.
 4. **Render:** PDP başlık/H1, kırıntı yolu 4. basamağı, JSON-LD `name`, liste kartları,
-   arama sonucu satırı — hepsi `familyName()` çağırır.
+   seri landing model kartları — hepsi `familyName()` çağırır.
+   ⭐**Arama yüzeyleri KAPSAM DIŞI** (B1): orada basılan şey ürün adıdır, aile adı değil.
 5. **Kapı `INV-AILE-ADI-1`** (`src/__tests__/conformance/aile-adi-tek-kaynak.test.ts`):
    - ⭐**AST** ile ölçülür, metin taraması DEĞİL. (Bu sınıf 2026-09-01'de dört kez
      yaşandı: `readFileSync(...).includes(...)` kendi açıklama yorumumu bulguya saydı.)
@@ -126,7 +144,8 @@ bunu değiştiremez. Arama eşleşmesi Faz 2'dir ve migration ister.
 
 ## 5) Faz 2 — MIGRATION (ayrı iş, Recep onayı ŞART, bu planla merge EDİLMEZ)
 
-Kapsam: **arama eşleşmesinin** iki dilde çalışması.
+Kapsam: **arama eşleşmesinin** iki dilde çalışması. (Arama sonuçlarının GÖSTERİMİ değil —
+o REC-110'dur; B1'e bak.)
 
 - `get_product_families_enriched` filtresine `f.name_i18n->>lang` dalı; ve/veya
   `fts_search_products` sözlüğüne EN ad eklenmesi.
@@ -148,6 +167,51 @@ o ayrı bir şema işidir (REC-110) ve orada C seçeneği yoktur — gömülecek
 biçiminin (JSONB `{tr,en}` vs `metadata->>lang` vs `name_i18n`) kullanıldığı, ve "yeni bir
 DB metni eklerken hangi kapı bunu görür" sorusunun cevabı. Bugünkü kusur tam bu cetvelin
 yokluğunda yaşadı: kolon açıldı, dolduruldu, kimse bağlamadı, hiçbir kapı sormadı.
+
+## 6.5) PLAN-CHALLENGER BULGULARI (2026-09-01, planın kendi üzerinde koşuldu)
+
+**Yöntem sapması — yazıyorum:** cetvel (A2) çürütmenin BAĞIMSIZ bir alt-ajana
+yaptırılmasını ister (üretici ≠ yargıç). Bu oturumun ayarı alt-ajan çağırmayı kullanıcı
+istemedikçe yasaklıyor ve akran isteği kullanıcı izni yerine geçmez. Bu yüzden çürütme
+oturum içinde koşuldu; **bağımsızlık ayağı EKSİK**, Recep isterse ayrıca koşulmalı.
+Aşağıdaki dört bulgu buna rağmen planı maddeten değiştirdi.
+
+**B1 (KRİTİK — kabul edildi, plan değişti).** §2 tablosunun ilk hâli dört RPC için de
+"`id` döndürüyor" diyordu; ikisi yanlıştı. Arama yüzeyleri AİLE adı değil ÜRÜN adı
+basıyor, ve `products.name_i18n` kolonu YOK. Faz 1'in kapsamı daraldı: **PDP + listeler +
+seri landing**. Arama, REC-108'in işi değil.
+
+**B2 (YÜKSEK — plana kısıt olarak eklendi).** "Dil TypeScript'te çözülür" cümlesi iki
+türlü okunabiliyordu ve biri tehlikeliydi. `src/app/[lang]/category/[categorySlug]/page.tsx`
+liste verisini `unstable_cache` içinde tutuyor; anahtar `['category-families', lang,
+tenantId, categoryId, page]` — `lang` ZATEN anahtarda (kural 12 ihlali yok). Ama önbelleğe
+GİREN veri bugün dilden bağımsız. Çözümü servis içine koyarsak önbellek içeriği dile
+bağımlı hale gelir ve `getFamiliesEnriched` imzası `lang` almak zorunda kalır.
+⭐**Kısıt:** servis katmanı `name_i18n`'i yalnız **TAŞIR**; dil çözümü **render anında**
+`familyName()` ile yapılır. Böylece önbellek dilden bağımsız kalır, tek anahtar iki dile
+hizmet eder ve imza değişmez.
+
+**B3 (ORTA — dürüst sınır olarak yazıldı).** `getSeriesLanding` model listesini
+`.order('name')` ile sunucuda sıralıyor. Faz 1 sonrası EN sayfada adlar İngilizce görünür
+ama **sıralama Türkçe ada göre** kalır. Kusur değil, bilinen sınır; düzeltmesi ya istemci
+sıralaması ya Faz 2.
+
+**B4 (YÜKSEK — YENİ KUSUR, REC-108'in dışında).** `get_search_suggestions` öneri
+etiketini `c.name::text AS label` ile kuruyor — **ham kategori adı**, yani REC-103'te
+kapattığım kusurun beşinci yüzeyi. Fonksiyonun `p_lang` parametresi yok, yerelleştirmesi
+fiziken mümkün değil. ⭐Bugün yazdığım `INV-KATEGORI-ADI-1` kapısı bunu GÖREMEZ: kapı
+TypeScript kaynağını AST ile tarıyor, bu kusur ise SQL'de yaşıyor. "Her kapı tek katmana
+bakar, kusur katmanlar arasında yaşar" sınıfının aynı gün içindeki üçüncü örneği.
+Arama kutusunda EN dilde Türkçe kategori adı görünüyor. **Ayrı iş emri gerekir** —
+migration ister (fonksiyona `p_lang` eklenmesi = imza değişikliği = `drop` + `create`).
+
+**Doğrulanan (itiraz düştü):** aile değişiminde tazeleme yolu SAĞLAM. Tetik
+`on_product_families_change` kolon listesi olmadan `after insert or delete or update`
+kuruluyor, yani `name_i18n` yazımı da tetikler; webhook dalı hem `/tr/products/<slug>`
+hem `/en/products/<slug>` yolunu `revalidatePath` ile tazeliyor, seri zinciri de
+yürünüyor, liste sayfaları `PRODUCTS_DISCOVERY_TAG` ile bayatlanıyor. REC-109 içeriği
+yazıldığında vitrin sessiz kalmaz. (Bu tam olarak 2026-08-15'te 1044 fiyat satırının
+düştüğü tuzaktı; bu yolda kapalı.)
 
 ## 7) Riskler
 
