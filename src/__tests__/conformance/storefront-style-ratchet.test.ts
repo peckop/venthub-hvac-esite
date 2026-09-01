@@ -186,7 +186,8 @@ const RATCHETS: Ratchet[] = [
     // 2026-09-01 · 1497 → 1488: REC-104 — dayanağı olmayan ödeme/kargo vaadi rozetleri
     // (PDP üçlüsü, kategori güven şeridi, sertifika satırı, sepet ödeme kutusu)
     // kaldırıldı; taşıdıkları ham gri sınıflar onlarla gitti.
-    tavan: 1488,
+    // 2026-09-01 · 1488 -> 1474: REC-115 olu bilesen CategoryHero silindi.
+    tavan: 1474,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
@@ -194,13 +195,15 @@ const RATCHETS: Ratchet[] = [
     ad: 'ham rounded-xl|2xl|3xl (§2.4)',
     // 2026-08-28 · 391 → 378 (aynı kaldırma).
     // 2026-09-01 · 378 → 377 (REC-104 vaat rozetlerinin kaldırılması).
-    tavan: 377,
+    // 2026-09-01 · 377 -> 375: REC-115 olu bilesen CategoryHero silindi.
+    tavan: 375,
     say: () => countMatches(/\brounded-(?:xl|2xl|3xl)\b/g),
     gerekce: 'Köşe yarıçapı rounded-hvac-* skalasından.',
   },
   {
     ad: 'ham vurgu: blue-*/indigo-* (§2.3)',
-    tavan: 148,
+    // 2026-09-01 · 148 -> 144: REC-115 olu bilesen CategoryHero silindi.
+    tavan: 144,
     say: () => countMatches(/\b(?:blue|indigo)-\d{2,3}\b/g),
     gerekce: 'Vurgu rengi marka token üzerinden; ham Tailwind paleti hiyerarşiyi bozar.',
   },
@@ -208,7 +211,8 @@ const RATCHETS: Ratchet[] = [
     ad: 'font-black · display DIŞINDA (§2.5)',
     // 2026-08-28 · 133 → 124 (aynı kaldırma).
     // 2026-09-01 · 124 → 122 (REC-104 vaat rozetlerinin kaldırılması).
-    tavan: 122,
+    // 2026-09-01 · 122 -> 120: REC-115 olu bilesen CategoryHero silindi.
+    tavan: 120,
     say: countFontBlackOutsideDisplay,
     gerekce: 'font-black yalnız text-display eşliğinde; başlık ağırlığı font-bold.',
   },

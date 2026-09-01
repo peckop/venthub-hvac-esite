@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T10:47:45.273741+00:00
+compiled_at: 2026-09-01T11:51:32.040321+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-01T10:47:45.273741+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-01T11:51:32.040321+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -531,7 +531,6 @@ Bu belge, otonom derleyici tarafından 2026-09-01T10:47:45.273741+00:00 tarihind
 │   │   ├── 📂 **category/**
 │   │   │   ├── ✅ `CategoryAuthoritySection.tsx`
 │   │   │   ├── ✅ `CategoryFilters.tsx`
-│   │   │   ├── ✅ `CategoryHero.tsx`
 │   │   │   ├── ✅ `CategoryShowcase.tsx`
 │   │   │   ├── ✅ `EducationalGuide.tsx`
 │   │   │   ├── ✅ `EnhancedNeedsWizard.tsx`
