@@ -1455,6 +1455,13 @@ Yine de reddedildi:
    dosyasından** okunur (liste değişince araç kendiliğinden hizalanır) ve ilan dosyası
    okunamaz/bozuksa **hiçbir şey tolere edilmez** — fail-closed. Bu yollar üretim turunda da
    commit **edilmez**, "beklenen istisna" diye ayrıca raporlanır.
+   ⭐**Tolere etmek YETMEZ — git'in kendisi de reddeder.** İlk sürüm bu yolları yalnız
+   **kendi** önkoşulunda tolere ediyordu; git yine de *"Your local changes to the following
+   files would be overwritten by merge"* diyip merge'i reddetti. Yani kendi kapımı açıp
+   **git'in kapısını görmemişim** — bir önkoşulu kaldırmak, aynı şeyi kontrol eden ikinci bir
+   mekanizmayı kaldırmaz. Doğrusu: merge'den önce tolere edilen yolların yerel değişikliği
+   `git checkout --` ile **atılır** (tanım gereği üretilmiş ve yeniden üretilebilir, içerik
+   kaybı yok) ve **sessizce değil** — ne atıldığı tek tek basılır.
 7. ⭐**YARDIM BAYRAĞI YAN ETKİSİZDİR.** `--help` / `-h`, hiçbir git komutu koşturmadan yardımı
    basar ve çıkar. Kusur sahada bulundu (URUN, 2026-09-01): ilk sürüm `--help` verildiğinde
    yardım basmak yerine **doğrudan merge'i koşuyordu**. Bu, "`require` edilen betik yan
@@ -1464,8 +1471,8 @@ Yine de reddedildi:
 
 ### Kapı
 
-`src/__tests__/conformance/taban-tazele.test.ts` — **23 kol**, çoğu **gerçek depoda gerçek
-merge** koşturur (metin taraması değil davranış). Sabotaj turu: **10 sabotaj, 10'u da doğru
+`src/__tests__/conformance/taban-tazele.test.ts` — **24 kol**, çoğu **gerçek depoda gerçek
+merge** koşturur (metin taraması değil davranış). Sabotaj turu: **11 sabotaj, 11'i de doğru
 sebeple kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol
 düştü" üçlüsüyle geçerli sayıldı. Kollar **iki ortamda** ayrı ayrı yeşil ölçüldü: orion kurulu
 olan (yerel) ve orion **kurulu olmayan** (CI taklidi) — aşağıdaki 4. ders bunun niçin

@@ -295,6 +295,29 @@ describe('taban-tazele — CANLI DAVRANIS (gercek depo, gercek merge)', () => {
     expect(r.kod).toBe(1)
   })
 
+  it('TOLERE ETMEK YETMEZ: git de reddediyor — yerel degisiklik ATILIR ve BASILIR', () => {
+    // Sahada coktu (2026-09-01, aracin kendi PR'inda): yolu KENDI onkosulumda tolere
+    // ettim ama git "local changes would be overwritten by merge" diyip merge'i reddetti.
+    // Kendi kapimi actim, git'in kapisini gormedim. Bu kol tam o hali uretir: tolere
+    // edilen dosya MASTER'DA DA degismis olmali ki git uzerine yazmak zorunda kalsin.
+    const f = fiksturKur(false, true)
+    const g = (...a: string[]) => execFileSync('git', ['-C', f.kok, ...a], { encoding: 'utf8' })
+    // master tarafinda istisna dosyasini DEGISTIR + commit -> merge onun uzerine yazacak
+    g('checkout', '-q', 'master')
+    fs.writeFileSync(path.join(f.kok, 'docs/istisna.md'), 'MASTER YENI SURUM\n')
+    g('add', '--', 'docs/istisna.md')
+    g('commit', '-q', '-m', 'master istisna')
+    g('checkout', '-q', 'dal')
+    // dalda YEREL (commit'siz) degisiklik: kancanin yeni damga yazmasini taklit eder
+    fs.writeFileSync(path.join(f.kok, 'docs/istisna.md'), 'KANCA YEREL DAMGA\n')
+
+    const r = f.kos(['--kapisiz'], { TABAN_TAZELE_BUILD_CMD: JSON.stringify([process.execPath, '-e', '0']) })
+    expect(r.cikti).toMatch(/atildi: docs\/istisna\.md/)
+    expect(r.cikti).not.toMatch(/would be overwritten by merge/)
+    expect(r.cikti).not.toMatch(/DURDU/)
+    expect(r.kod).toBe(1)
+  })
+
   it('FAIL-CLOSED: ILAN EDILMEMIS ayni kirlilik araci DURDURUR (ayirt edici cift)', () => {
     // Ustteki kolun ikizi: TEK fark ilan dosyasinin YOKLUGU. Tolerans "her uretilmis
     // gorunen dosya" degil, YALNIZ ilan edilmis olan icin gecerli olmali.

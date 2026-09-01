@@ -317,6 +317,20 @@ function main() {
     return 2
   }
 
+  // ⭐TOLERE ETMEK YETMIYOR — GIT'IN KENDISI DE REDDEDIYOR.
+  // Ilk surumde bu yollari yalniz KENDI onkosulumda tolere ediyordum; git yine de
+  // "Your local changes to the following files would be overwritten by merge" diyip
+  // merge'i reddetti. Yani kendi kapimi actim ama git'in kapisini gormedim.
+  // Bu yollarin yerel degisikligi TANIM GEREGI atilabilir: ilan dosyasi onlari
+  // "uretec tarafindan her commit'te yeniden uretilen" diye ilan ediyor — icerik
+  // kaybi yok, kanca bir sonraki commit'te yeniden yaziyor. O yuzden ATILIR, ama
+  // SESSIZCE degil: ne atildigi tek tek basilir.
+  if (tolereEdilen.length) {
+    for (const y of tolereEdilen) git(agac, ['checkout', '--', y])
+    console.log('tolere edilen ' + tolereEdilen.length + ' yolun YEREL DEGISIKLIGI ATILDI (uretilmis, yeniden uretilir):')
+    tolereEdilen.forEach((y) => console.log('   atildi: ' + y))
+  }
+
   // Taban UZAK bir ref ise (`origin/master`) once cekilir. YEREL bir dal adi verildiyse
   // (fikstur, deney) fetch HIC denenmez — olmayan uzagi yoklamak gurultu uretir.
   if (taban.includes('/')) {
