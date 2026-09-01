@@ -15,9 +15,18 @@ $garbage = @(
 ".tmp2.txt", ".tmp_status.txt"
 )
 
+# Kök, betiğin KENDİ konumundan türetilir (scripts/ -> repo kökü).
+# NİÇİN: burada kullanıcı ev dizini SABİT yazılıydı (REC-102). İki zararı vardı — depo
+# 2026-08-15'ten beri PUBLIC olduğu için kullanıcı adı açıktaydı, VE bu betik yıkıcı
+# (Remove-Item) olduğu halde hangi ağaçtan çağrıldığına bakmaksızın DAİMA ana dizini
+# siliyordu. Şerit ağacından koşan biri "kendi kökünü temizliyorum" sanıp ANA dizinden
+# dosya silerdi. Repo-göreli kök, betiği hem taşınabilir hem DAHA GÜVENLİ yapar.
+$repoRoot = Split-Path -Parent $PSScriptRoot
+
 foreach ($f in $garbage) {
-    if (Test-Path "c:\Users\alize\venthub-hvac\$f") {
-        Remove-Item "c:\Users\alize\venthub-hvac\$f" -Force
+    $tam = Join-Path $repoRoot $f
+    if (Test-Path $tam) {
+        Remove-Item $tam -Force
     }
 }
 

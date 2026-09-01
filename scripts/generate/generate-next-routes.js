@@ -1,7 +1,17 @@
-import _fs from '_fs';
-import _path from '_path';
+// ⚠BU BETİK ÇALIŞMIYOR — silme adayı (REC-102 ölçümü, 2026-09-01):
+// import adları geçersizdi (`_fs`/`_path` diye modül yoktur), hedef düzen App Router ÖNCESİNE
+// ait (`../../pages/...`) ve depoda HİÇBİR YERDEN anılmıyor (0 atıf, package.json'da kaydı yok).
+// Bu düzeltme yalnızca sabit kullanıcı yolunu kaldırır (depo PUBLIC, REC-102); betiği
+// diriltmez. Silme kararı OPS'te.
+// Kimlik adları (`_fs`/`_path`) AYNEN korunuyor: gövde onlara atıf yapıyor ve bu düzeltmenin
+// kapsamı yol sızıntısıdır, yeniden adlandırma değil. Düzeltilen şey MODÜL adlarıydı.
+import _fs from 'node:fs';
+import _path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const base = 'c:/Users/alize/venthub-hvac/src/app';
+// Kök, betiğin kendi konumundan türetilir (scripts/generate/ -> repo kökü).
+const HERE = _path.dirname(fileURLToPath(import.meta.url));
+const base = _path.join(HERE, '..', '..', 'src', 'app');
 
 const layouts = [
     { _path: 'admin', component: '../../pages/admin/AdminLayout' },

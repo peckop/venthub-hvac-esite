@@ -1670,3 +1670,95 @@ Bu, "kırpılmış çıktı kanıt değildir" ve "ayırt etmeyen gösterge ölç
 kardeşidir, ama yeni bir eksende: **gösterge doğruydu, adı yanlıştı.** Sütun gerçek bir şeyi
 doğru ölçüyor, fakat okuyucuya **başka bir şeyi** vaat ediyordu. Bir ölçümün adı, ölçtüğü şeyin
 sınırını taşımak zorundadır — çünkü paneli okuyan, ölçümün kodunu okumaz.
+
+---
+
+## 24. KİMLİK SIZDIRAN MUTLAK YOL — ve envanteri kapıdan AYRI ölçmenin bedeli (REC-102)
+
+Depo **2026-08-15'ten beri PUBLIC**. Envanter (2026-09-01, salt-okuma): takipli **951 dosya /
+2091 satır** mutlak yol taşıyor. Sızan şey kullanıcı adı + 25 ayrı iç dizin adı; **sır YOK**.
+
+> ⓘ Bu bölümün hükümleri NUMARASIZ, betimsel başlıklarla yazıldı (§21/§22 biçimi). Sebebi
+> ölçülmüş bir kapı kusuru: `INV-CETVEL-YAPI` `### HÜKÜM N` başlıklarını **dosya çapında**
+> tekil sanıyor (§23 zaten HÜKÜM 1-5 kullandığı için §24 çakıştı), bölüm-kapsamlı `24.1`
+> biçimine geçince de "`HÜKÜM24` ana bölümü yok" diye ikinci bir kol yandı. Üstelik `⭐` ile
+> başlayan başlıkları HİÇ görmüyor — yani aynı dosyada bir kısım başlık ölçülüyor, bir kısmı
+> sessizce atlanıyor. İki kapsam kusuru OPS'e bildirildi (kapı bu şeridin claim'inde DEĞİL).
+> Numarasız başlık burada bir kaçamak değil: hüküm numarası zaten bölümün İÇİNDE anlamlıydı ve
+> betimsel başlık atıf yapmayı kolaylaştırıyor.
+
+### SIZINTI İKİNCİ SIRADA — birinci sırada TAŞINABİLİRLİK kusuru var
+
+Ölçümün sürprizi buydu. Mutlak yol taşıyan **canlı kod**, sadece "ad sızdırmıyor" — **sessizce
+tek bir makineye bağlı** demektir. Bulunan dört dosyanın hepsi bu sınıftaydı:
+
+| dosya | ne yapıyordu |
+|---|---|
+| `registry/orion_bridge.py` | engine dizini sabit; başka makinede köprü **ImportError** ile ölür → Linear yansıması durur ve hata "modül yok" gibi görünür |
+| `scripts/kademe2-load/load.mjs` | CSV kökü + `.env` yedeği sabit |
+| `scripts/clean_root.ps1` | **yıkıcı** (`Remove-Item`) ve DAİMA ana dizini siliyordu — şerit ağacından koşan biri "kendi kökümü temizliyorum" sanıp ANA dizinden dosya silerdi |
+| `scripts/generate/generate-next-routes.js` | zaten koşamıyordu (geçersiz modül adları), 0 atıf |
+
+Onarım deseni: **ortam değişkeniyle ezilebilir + akıllı varsayılan**, davranış bu makinede
+DEĞİŞMEZ (ölçüldü: köprü aktif, `registry_core` yüklendi, yollar `resolve()` sonrası birebir eşit).
+
+### ⭐"REPO KÖKÜNÜN KARDEŞİ" TÜRETMESİ WORKTREE'DEN KIRILIR
+
+İlk akla gelen düzeltme `registry/../../orion-registry` idi. **Ölçüldü: yok.** Şerit ağaçları
+geçici dizin altında yaşadığı için o türetme oradan çözülmez ve köprü **sessizce** ölürdü —
+yani sabit yolu kaldıran "düzeltme", yerine daha sinsi bir kırılma koyacaktı.
+`Path.home()` / `os.homedir()` üç şeyi birden verir: bu makinede AYNI yol, worktree'den de
+çözülür, ve kullanıcı adı **koddan** çıkar. Sıra: **açık ortam değişkeni → ev dizini → repo
+kardeşi**, ve hiçbiri yoksa **denenen adayları sayarak** hata ver (tek yol basan hata mesajı,
+yerleşim sorununu "yanlış yol yazılmış" gibi gösterip teşhisi saatlere yayıyordu).
+
+### ⭐ENVANTERİ KAPIDAN AYRI ÖLÇÜT İLE ÇIKARMAK, İKİ ÖLÇÜT ARASINDA SESSİZ FARK BIRAKIR
+
+Envanteri elle yazılmış `git grep` ile çıkardım, kapıyı sonra AYRI bir düzenli ifadeyle yazdım.
+Kapının kendi **taban koşusu** farkı gösterdi:
+- envanter yalnız **büyük harfli** sürücü harfini arıyordu → **iki canlı betik kaçtı** (küçük
+  harfli sürücü harfiyle yazılmışlardı),
+- envanter yalnız Windows biçimini arıyordu → POSIX ev-dizini biçimleri kaçtı,
+- sonuç: "2 gerçek kod kusuru" diye rapor ettim, **gerçek 4**; prose sayısı 323 sanılıyordu, **480**.
+
+**Hüküm: ilan dosyasındaki sayı, KAPININ ölçütüyle üretilmelidir.** İki ölçüt tek konuyu
+ölçüyorsa biri mutlaka bayatlar — ve bayatlayan taraf genellikle raporu yazan taraftır.
+
+### KAPSAM DIŞI BIRAKMAK BİR KARARDIR ve bedava değildir
+
+Kapı üç katmanlı, gerekçeleri `docs/mutlak-yol-istisnalari.json` içinde **makine-okunur**:
+1. **KOD/KONFİG → SIKI.** Yeni kalem = KIRMIZI. 9 ilan edilmiş muafiyet (8 tarihsel kalıntı +
+   CI koşucusunun ev dizinini anan bir yorum — o koşucunun genel hesabı, kimlik değil).
+2. **PROSE (.md) → MANDAL** (480, artmama şartı). Temizlik 215 dosyalık bir commit demekti:
+   açık PR'ların hepsini tabanlamaya zorlar (§23 manifest dersi) ve **geçmiş zaten public
+   olduğu için yayılmışı geri ALMAZ**. Bedeli var, karşılığı yok. Mandalın kendi kolu var:
+   sayı çok düşerse "sınırı da indir" der, yoksa kazanılan alan sessizce geri verilir.
+3. **companion `source_path:` + `.archive/` → KAPSAM DIŞI**, üreteç ORION tarafında (AXIOM 3:
+   üretilmiş dosya elle düzeltilmez) ve sayı **normal işte artar** — mandala bağlanırsa günlük
+   işi bloklar.
+
+### ⭐KAPININ GÖREMEDİĞİ KALEM YAZILIR (kabul edilmiş eksik sessiz olamaz, §21)
+
+Kapı metin okur ve NUL içeren dosyayı atlar. **Takipli 9 `.pyc`'nin 4'ü kimlik yolunu bytecode
+içine gömüyor** — Python derleyici kaynak yolunu saklar, dolayısıyla `.py` temizlense bile yol
+`.pyc` içinde yaşar. Bu kalem kapının **ölçüt evreni dışındadır** ve ilan dosyasında
+`kapinin_goremedigi_kalem` alanında adıyla duruyor. İkinci kusur: bytecode zaten takipte
+olmamalı (üretilmiş artefakt, her koşuda değişir — bu envanteri çıkarırken benim python
+koşmam bile bir `.pyc`'yi kirletti).
+
+### SABOTAJ TURU — 8/8, ama iki tur sürdü ve ikisi de ÖLÇÜT kusuruydu
+
+- **S3 kör geçti**: `Path.home()` varlığını arayan kol, sabotaj o satırı sildiği hâlde yeşil
+  kaldı — çünkü ad **açıklama metninde** de geçiyor. Yorum-soyucu yazdım, **yine** geçmedi.
+  Kök sebep: **JavaScript'te `.` karakteri `\r`'yi KAPSAMAZ** (satır sonlandırıcı sayılır), bu
+  yüzden CRLF'li bir dosyada `#.*$` deseni `$`'a hiç ULAŞAMAZ ve yorum soyulmadan kalır.
+  Kardeş test (`fleet-mechanism-integrity`) bu tuzağa düşmüyor çünkü **okurken** CRLF'i
+  normalize ediyor. Çözüm: `split(/\r?\n/)`.
+  ⚠Ve bir öz-eleştiri: aynı soruyu `$`'sız desenle sorduğumda **doğru cevap gelmişti** ve bu
+  farkı bir kez göz ardı ettim. "İki ölçüm zıt sonuç veriyorsa **farkı önce oku**."
+- **S4 geçersizdi**: gerekçe dizesinin yalnız BAŞINI değiştiriyordum, kalan uzun metin yerinde
+  kalıyordu → gerekçe hâlâ eşiğin üstündeydi, sabotaj **hiçbir şey yapmadı**.
+- **Ve tezgâhın kendi kusuru**: rapor okunamadığında `dusen: []` dönüyordu ve bu "hiç kol
+  düşmedi" ile **aynı görünüyordu** — yani geçerli bir sabotaj "KAPI KÖR" diye raporlanabilirdi.
+  `okundu` bayrağı eklendi; okunamayan koşu artık **"ÖLÇÜLEMEDİ"**dir, "yeşil geçti" değildir.
+  Sessizliği başarı sayan her araç, ölçmesi gereken arızada susar.
