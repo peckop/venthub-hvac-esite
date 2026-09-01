@@ -83,6 +83,19 @@ const TAM_DURUM =
   `## Durum\n**SON GIRDI:** kullanici X dedi\n**ACIK KUYRUK:** iki kalem\n` +
   `**VERILEN SOZLER:** rapor\n**BEKLEYEN KARARLAR:** Recep'te bir onay\n`
 
+/**
+ * ⭐AYNI DOSYA, TÜRKÇE BAŞLIKLARLA — sahadaki gerçek biçim.
+ *
+ * NİÇİN VAR: kapı testte YEŞİLDİ ama sahada GÜNDE İKİ KEZ yanlış alarm verdi. Sebep
+ * fikstürdü: bütün fikstürler ASCII başlık (`SON GIRDI`) üretiyordu, oysa şeritler Türkçe
+ * yazıyor (`SON GİRDİ`). Yani fikstür, biçimin sahada KULLANILAN varyantını hiç üretmiyordu —
+ * kol vardı, ölçtüğü şey yoktu. (URUN bildirdi, ALTYAPI ölçtü, 2026-09-01.)
+ */
+const TAM_DURUM_TR =
+  `---\nname: kol-lane-day\nmetadata:\n  originSessionId: ${SID}\n---\n\n` +
+  `## Durum\n## SON GİRDİ\nkullanıcı X dedi\n## AÇIK KUYRUK\niki kalem\n` +
+  `## VERİLEN SÖZLER\nrapor\n## BEKLEYEN KARARLAR\nRecep'te bir onay\n`
+
 describe('INV-COMPACT-1 — PreCompact durum kapısı', () => {
   it('BAĞLILIK: kanca settings.json içinde PreCompact olayına bağlı — dosyanın var olması yetmez', () => {
     const ayarlar = require_(AYARLAR) as { hooks?: Record<string, Array<{ hooks?: Array<{ command?: string }> }>> }
@@ -124,6 +137,51 @@ describe('INV-COMPACT-1 — PreCompact durum kapısı', () => {
     expect(r.status, 'bayatlık/eksiklik compact\'i BLOKLAMAMALI — engellemek kaybettiğinden fazlasına mal olur').toBe(0)
     expect(r.stdout).toMatch(/EKSIK ALAN/)
     expect(r.stdout).toMatch(/bekleyen kararlar/i)
+  })
+
+  it('⭐TÜRKÇE BAŞLIK: `SON GİRDİ` biçimi de TANINIR (sahadaki yanlış alarmın kökü)', () => {
+    // Bu kol OLMADAN kapı yeşildi ve sahada günde iki kez yanlış alarm veriyordu.
+    // JavaScript'in /i bayrağı noktalı İ'yi i'ye KATLAMAZ; dahası 'İ'.toLowerCase() düz 'i'
+    // değil, 'i' + BİRLEŞİK NOKTA (U+0307) verir — küçültmek TEK BAŞINA yetmez.
+    const { transcript } = projeKur([['kol-lane-day-2026-08-28.md', TAM_DURUM_TR]])
+
+    const r = kapiKos(transcript)
+
+    expect(r.status).toBe(0)
+    expect(r.stdout, `Türkçe başlıklı dosya EKSİK sanıldı; stdout=${r.stdout}`).not.toMatch(/EKSIK ALAN/)
+    expect(r.stdout).toMatch(/TEMIZ/)
+  })
+
+  it('⭐AYIRT EDİCİ ÇİFT: Türkçe dosyadan bir alan GERÇEKTEN silinirse UYARIR', () => {
+    // URUN'un istediği kol: "dolu dosyada yeşil, gerçekten silinmiş örnekte kırmızı" —
+    // yoksa kapı doluyla boşu AYIRT ETMİYOR demektir. Yukarıdaki kol tek başına yetmez:
+    // her hâlde yeşil veren bir kapı da o kolu geçer.
+    const eksik = TAM_DURUM_TR.replace(/## VERİLEN SÖZLER\nrapor\n/, '')
+    expect(eksik, 'fikstür değişmedi — sabotaj hiçbir şey yapmadı').not.toBe(TAM_DURUM_TR)
+    const { transcript } = projeKur([['kol-lane-day-2026-08-28.md', eksik]])
+
+    const r = kapiKos(transcript)
+
+    expect(r.status, 'eksiklik BLOKLAMAMALI').toBe(0)
+    expect(r.stdout).toMatch(/EKSIK ALAN/)
+    expect(r.stdout).toMatch(/verilen sozler/i)
+  })
+
+  it('KATLAMA: Türkçe harfler ASCII\'ye iner ve kapı ile test AYNI işlevi kullanır', () => {
+    const kapi = require_(KAPI) as { asciiKatla?: (s: string) => string }
+    expect(
+      typeof kapi.asciiKatla,
+      'asciiKatla DIŞA AÇILMALI: test kendi katlamasını yazarsa iki ölçüt ayrışır ve biri bayatlar',
+    ).toBe('function')
+    const katla = kapi.asciiKatla as (s: string) => string
+    expect(katla('SON GİRDİ')).toBe('son girdi')
+    expect(katla('VERİLEN SÖZLER')).toBe('verilen sozler')
+    expect(katla('AÇIK KUYRUK')).toBe('acik kuyruk')
+    expect(katla('bana ulaşan son girdin')).toBe('bana ulasan son girdin')
+    // Noktasız ı ayrıştırılamaz (NFD onu bölmez), bu yüzden elle eşlenmek ZORUNDA.
+    expect(katla('KIRMIZI ışık')).toBe('kirmizi isik')
+    // ⚠Birleşik nokta gerçekten atılıyor mu? Küçültmenin ürettiği ara biçim doğrudan sınanır.
+    expect('SON GİRDİ'.toLowerCase()).not.toBe('son girdi')
   })
 
   it('AYIRT EDİCİLİK: ders dosyası durum dosyası sanılmaz (ilk uygulama burada yanlış alarm verdi)', () => {

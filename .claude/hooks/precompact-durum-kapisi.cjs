@@ -41,14 +41,43 @@ const BAYAT_ESIK_DK = 60
 // eşiği seçti; uyarı onun üstünde başlar. Ölçü BAYT, satır DEĞİL — kırpma bayta bakıyor.
 const MEMORY_ESIK_BAYT = 16384
 
+/**
+ * ⭐TÜRKÇE HARFLERİ ASCII'YE KATLAR — ölçülmüş kusur (2026-09-01, URUN bildirdi, ALTYAPI ölçtü).
+ *
+ * VAKA: Bu kapı GÜNDE İKİ KEZ yanlış alarm verdi. `DORT_ALAN` desenleri ASCII yazılıydı
+ * (`son girdi` / `SON GIRDI`), oysa şeritlerin başlıkları Türkçe: **`SON GİRDİ`**.
+ * JavaScript'in `/i` bayrağı **noktalı İ'yi i'ye KATLAMAZ** (`u` bayrağıyla da katlamaz).
+ * Dahası — ve asıl tuzak bu — `'SON GİRDİ'.toLowerCase()` düz `'son girdi'` DEĞİL,
+ * **`'son gi̇rdi̇'`** verir: `i` + BİRLEŞİK NOKTA (U+0307). Yani "küçük harfe çevir" TEK BAŞINA
+ * ÇÖZMEZ; birleşik işaretlerin de atılması gerekir.
+ *
+ * ÇÖZÜM: NFD ile ayrıştır → birleşik işaretleri (U+0300-U+036F) at → `ı`/`İ` gibi
+ * ayrıştırılamayanları elle eşle → küçült. Böylece `İ→i`, `ş→s`, `ğ→g`, `ö→o`, `ü→u`, `ç→c`,
+ * `ı→i` olur ve desenler SADE ASCII kalabilir (desen başına iki varyant yazmak zorunda
+ * kalmak, varyantlardan birini unutmanın ta kendisiydi).
+ *
+ * ⚠KENDİ DOSYAM TESADÜFEN GEÇİYORDU: eski bloklarımda ASCII `SON GIRDI` başlığı vardı, yani
+ * kapı bende YEŞİLDİ ama **sebebi doğru değildi**. "Yeşil gördüm" ≠ "ölçüt çalışıyor".
+ */
+function asciiKatla(s) {
+  return String(s)
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/ı/g, 'i')
+    .replace(/I/g, 'i')
+    .toLowerCase()
+}
+
 // 4 SABİT ALAN (filo standardı, REC-86). Compact bloğu bu dördünü taşımazsa dönüşte
 // "neredeydim" sorusu cevapsız kalır. Eşleştirme gevşek: başlık metni şeritten şeride
 // değişebiliyor, aranan şey ALANIN VARLIĞI.
+// Desenler ASCII-KATLANMIŞ metne karşı koşar (bkz. asciiKatla) — o yüzden burada yalnız
+// küçük harfli ASCII biçim yazılır, Türkçe varyant YAZILMAZ.
 const DORT_ALAN = [
-  { ad: 'son girdi', desen: /son\s+girdi|SON GIRDI|bana ulasan son/i },
-  { ad: 'acik kuyruk', desen: /acik\s+kuyruk|ACIK KUYRUK|sonraki\s+is|kuyruk/i },
-  { ad: 'verilen sozler', desen: /verilen\s+soz|VERILEN SOZLER|taahhut/i },
-  { ad: 'bekleyen kararlar', desen: /bekleyen\s+karar|BEKLEYEN KARARLAR|recep(te|'te)\s+bekleyen/i },
+  { ad: 'son girdi', desen: /son\s+girdi|bana ulasan son/ },
+  { ad: 'acik kuyruk', desen: /acik\s+kuyruk|sonraki\s+is|kuyruk/ },
+  { ad: 'verilen sozler', desen: /verilen\s+soz|taahhut/ },
+  { ad: 'bekleyen kararlar', desen: /bekleyen\s+karar|recep(te|'te)\s+bekleyen/ },
 ]
 
 function girdiOku() {
@@ -137,7 +166,7 @@ function oturumunDosyalari(memoryDir, sid) {
       // dizin-kapi-test-dersleri: 0). Yani 1, durum dosyasını yakalar ve dersi yine dışlar;
       // 2 ise ikisini birden dışlıyordu — katman hiç iş görmüyordu ve bunu ancak ölçünce gördüm.
       if (AD_KALIBI.test(ad)) adEsleseni.push(kayit)
-      else if (DORT_ALAN.filter(a => a.desen.test(govde)).length >= 1) icerikEsleseni.push(kayit)
+      else if (DORT_ALAN.filter(a => a.desen.test(asciiKatla(govde))).length >= 1) icerikEsleseni.push(kayit)
     } catch { /* okunamayan dosya kapıyı düşürmez */ }
   }
   const secilen = adEsleseni.length ? adEsleseni : icerikEsleseni
@@ -230,7 +259,8 @@ if (yasDk > BAYAT_ESIK_DK) {
 // KOL 3 — dört sabit alan var mı? (uyarır, bloklamaz)
 try {
   const govde = fs.readFileSync(enTaze.tam, 'utf8')
-  const eksik = DORT_ALAN.filter(a => !a.desen.test(govde)).map(a => a.ad)
+  const katlanmis = asciiKatla(govde)
+  const eksik = DORT_ALAN.filter(a => !a.desen.test(katlanmis)).map(a => a.ad)
   if (eksik.length) {
     uyarilar.push('EKSIK ALAN (' + enTaze.ad + '): ' + eksik.join(', ') + ' — donuste bu sorular cevapsiz kalir.')
   }
@@ -265,5 +295,10 @@ process.exit(0)
 
 // `require` edildiğinde kapı KOŞMAMALI: session-board.cjs bu dosyayı modül olarak çağırıyor ve
 // stdin okuyup process.exit çağıran bir modül, çağıranın oturumunu öldürürdü.
-module.exports = { durumDosyasiBul, sonBlok, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI }
+module.exports = {
+  durumDosyasiBul, sonBlok, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI,
+  // Testin ölçütü KOPYALAMAMASI için dışa açık: kapının katlaması ile testin katlaması
+  // ayrışırsa biri bayatlar ve yanlış alarm sessizce geri gelir.
+  asciiKatla,
+}
 if (require.main === module) main()
