@@ -249,7 +249,9 @@ export const tr = {
     hub: {
       title: 'Bilgi, Mühendisliğin Ham Maddesidir',
       subtitle: 'Doğru HVAC kararları için hazırladığımız teknik rehberler, hesaplama araçları ve uygulama senaryolarını keşfedin.',
-      eyebrow: 'Technical Intelligence Unit',
+      // REC-113: TR yüzeyde EN sızıntısıydı. Komşu üst-başlıkların üslubu büyük harfli
+      // Türkçe ('MÜHENDİSLİK ODAK NOKTASI'); karşılık ona uyduruldu.
+      eyebrow: 'TEKNİK BİLGİ MERKEZİ',
       searchPlaceholder: 'Konu, teknik terim veya ürün ailesi ara...',
       readStart: 'Okumaya Başla',
       heroAlt: 'Mühendislik Bilgi Merkezi Görseli',
@@ -418,7 +420,9 @@ export const tr = {
       }
     },
     cinematicShowcase: {
-      hudStatus: 'System.Data.Live',
+      // REC-113: dekoratif HUD metni ama YİNE DE ekranda okunan Türkçe-sayfa metnidir.
+      // Noktalı "makine" üslubu korunarak çevrildi.
+      hudStatus: 'Sistem.Veri.Canlı',
       eyebrow: 'MÜHENDİSLİK ODAK NOKTASI',
       title: 'Vortice Lineo Quiet Serisi',
       subtitle: 'Aero-akustik gövde tasarımı ile sessizliğin yeni dijital standardı.',
@@ -1466,7 +1470,9 @@ export const tr = {
     productCount: 'Ürün Sayısı',
     showcase: {
       defaultDescription: 'Yüksek performanslı, akıllı ve sürdürülebilir havalandırma sistemlerinin teknik otoritesi.',
-      premiumTitle: 'Premium Engineering Solutions',
+      // REC-113: TR yüzeyde EN sızıntısıydı. Aynı sözlükte zaten 'Premium Kalite'
+      // örneği var — 'Premium' Türkçede yerleşik, çevrilen kısım geri kalanı.
+      premiumTitle: 'Premium Mühendislik Çözümleri',
       catalog: 'Kategori Katalogu',
       subGroups: 'Alt Ürün Grupları',
       exploreSeries: 'Serileri İncele',
@@ -2778,7 +2784,10 @@ export const tr = {
     },
     comparison: {
       standardLabel: 'Standart:',
-      quietLabel: 'Quiet:',
+      // REC-113: karşılığı 'Standart:' olan ETİKET; İngilizce kalması tabloyu iki dilli
+      // gösteriyordu. Ürün hattı adı ('Vortice Lineo Quiet') AYNEN kalır — çevrilen şey
+      // etiket, özel ad değil.
+      quietLabel: 'Sessiz:',
       title: 'Neden Lineo Quiet?',
       standard: 'Standart Fanlar',
       quiet: 'Vortice Lineo Quiet',
