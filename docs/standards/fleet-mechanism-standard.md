@@ -1262,7 +1262,7 @@ Bu kalem daha önce "her rebase'de üretilmiş artefakt çakışıyor, can sık�
 Ölçüm gerekçeyi değiştiriyor: sürtünme **kozmetik değil KAPI KAYBI**. Çakışık kalan bir dal
 yalnız zahmet üretmiyor, o dalın **bütün kapılarını sessizce kapatıyor**.
 
-### ⭐İki ders, adıyla
+### ⭐Dört ders, adıyla
 
 1. **"Bunu ben mi bozdum" açıklaması da bir HİPOTEZDİR** ve tekrar üretilebilirlikle sınanır.
    URUN ilk kırmızıdan sonra *"sebep benim yaptığım yarış — koşum sürerken PR'ı kapatıp açtım"*
@@ -1274,6 +1274,17 @@ yalnız zahmet üretmiyor, o dalın **bütün kapılarını sessizce kapatıyor*
    **koşar**. `tsc --noEmit` **temizdi** (kod 0): tip kapısı bu sınıfı **görmez**, ayırt eden
    yalnız lint. `vitest` modülü **çalıştırır**, lint kaynağı **denetler** — iki ayrı ölçüt.
    Push öncesi kontrol listesine `eslint` girer.
+3. ⭐**Ritüelin ÖLÇÜM KAYNAĞI adıyla yazılır: `merge_commit_sha` REST'ten okunur.**
+   Yukarıdaki reçete "merge-ref var mı" diye sormayı söylüyordu ama **nereden** okunacağını
+   söylemiyordu; boşluk gerçek: `gh pr view --json mergeCommit` **AÇIK bir PR'da HER ZAMAN
+   `null` döner**. O alana bakan biri her açık PR'ı "çakışık" sanır ve ritüel ayırt etmeyi
+   bırakır. Geçerli tek ölçüm **REST**: `gh api repos/{owner}/{repo}/pulls/{n}` →
+   `merge_commit_sha` + `mergeable_state`. (Ayırt etmeyen gösterge ölçüm değildir.)
+4. ⭐**Ortak ağaca dokunan git komutu `-C <yol>` ile yazılır — istisnasız.**
+   §19 kimlik düzeyinde "ortak ana baskındır" diyor; bunun **komut düzeyi** karşılığı budur.
+   Ölçülmüş bedel: bir şerit oturumunun kabuğu sessizce ana dizine resetlendi ve `rebase`
+   **ana dizinde master'a** koştu. `cwd`'ye güvenen her komut bu kazayı bekliyor demektir;
+   `-C` yazmak bir üslup tercihi değil, kazanın önündeki tek engel.
 
 ---
 
@@ -1378,3 +1389,69 @@ Aşağıdakiler ORION deposunda ve bu şeridin ölçülmüş claim'i dışında;
    Her çağıran bundan yanılır; venthub tarafındaki çözüm bir **etrafından dolaşmadır**, kök fix değil.
 2. `orion-belgesiz.jsonl` defteri ve sayacı **yalnız `run_hook`**'ta (`doc.py:654, 777`),
    `batch` gövdesinde sıfır referans — koruma **ölü yolda**.
+
+---
+
+## 22. ÜRETİLMİŞ ARTEFAKT ÇAKIŞMASI: TEK KOMUT, SESSİZ ÇÖZÜM YOK (`taban-tazele.cjs`)
+
+### Ölçülmüş sürtünme (2026-08-31 / 09-01)
+
+`origin/master` son 20 commit'i sayıldı: **16'sı** ilan edilmiş bir üretilmiş artefakta
+dokunuyor (4 master `.md` + `docs/artefakt_manifest.json`). Geride kalmış bir dalın taban
+tazelemesinde çakışma olasılığı pratikte **%80** ve çakışan dosyaların **%100'ü** artefakt.
+§20 ile birleşince bedel kozmetik değil: çakışık kalan dal **bütün kapılarını** kaybediyor.
+⚠Ölçüt düzeltmesi: "son 100 commit'te kaç kez" metriği **oran değil** (`-n 100` bir sınırdır);
+dayanak alınan sağlam sayı **16/20**.
+
+### ⛔`.gitattributes merge=ours` REDDEDİLDİ — gerekçe adıyla yazılıdır
+
+Bu, akla ilk gelen çözüm ve **denendi** (git 2.49.0, izole depo): sürücü tanımlıyken çakışma
+yok/dalın sürümü alınır, sürücü tanımsızken bugünkü davranışın aynısı (zararsız geri düşüş).
+Yine de reddedildi:
+
+1. ⭐**INV-DOC-4b'nin KÖR NOKTASI ölçüldü.** `merge=ours` master'ın yeni artefakt içeriğini
+   sessizce atar. Kapı bunu çoğu halde kırmızı yapar (kaynak blob SHA ↔ manifest kaydı) **ama**
+   master'ın artefaktı yalnız **DAMGA** yüzünden değiştiyse kaynak SHA'ları eşleşmeye devam eder
+   → kapı **YEŞİL** kalır ve geri alma görünmez. Zararı küçük, **sessizliği** kabul edilemez.
+2. **Sürücü `.git/config`'te yaşar, commit EDİLEMEZ** → GitHub tarafı onu hiç koşmaz. Yani
+   §20'nin "çakışık PR'a hiç kapı koşmaz" problemini **çözmez**; yalnız yerel merge'i kolaylaştırır.
+3. Kalan tek koruma INV-DOC-4b olurdu — **tek katmanlı** koruma, ve unutulan adım tam da
+   AXIOM 7'nin ikinci turu. Gelecekte A'yı isteyen bu üç maddeyi çürütmek zorundadır.
+
+### HÜKÜM
+
+1. **Taban tazeleme TEK KOMUTTUR:** `node scripts/hijyen/taban-tazele.cjs --agac <ağaç>`.
+   Merge + ilan edilmiş artefaktlarda çözüm + **AXIOM 7 ikinci turu** + INV-DOC-4b aynı
+   komutun içindedir. Unutulacak adım bırakılmaz; "adımı hatırla" bir mekanizma değildir.
+2. **İlan listesi MANİFESTTEN okunur.** Gömülü liste manifest büyüdüğünde sessizce eksik kalır
+   ve ilan dışı bir yolu "artefakt" sayarak otomatik çözer. Manifest kaydında `yol` alanı
+   **zorunlu**; `ad`'dan yol türetmek (`'docs/' + ad`) yasak (alan adı birimini taahhüt eder).
+3. **İLAN DIŞI tek bir yolda bile çakışma varsa DURULUR**, merge yarım bırakılır, karar insana
+   kalır. "Çoğu artefakttı" gerekçesiyle devam etmek sessiz kaybın kapısıdır.
+4. **Yeniden üretim yalnız ilan edilmiş artefaktları commit'ler.** Başka bir yol değiştiyse
+   raporlanır, commit **edilmez** — şerit claim'inin dışına izinsiz çıkılmaz.
+5. **ÇIKIŞ KODU DÜRÜSTTÜR:** `0` yalnız merge + üretim + kapı üçü de tamamsa. Kapı koşmadıysa
+   `1`, üretim/kapı başarısızsa `3`. Ölçülemeyen adım **"geçti" sayılmaz**.
+6. **Ağaç kirliyse hiç başlanmaz** (merge kirli ağaçta iş kaybettirir).
+
+### Kapı
+
+`src/__tests__/conformance/taban-tazele.test.ts` — 14 kol, çoğu **gerçek depoda gerçek merge**
+koşturur (metin taraması değil davranış). Sabotaj turu: **6 sabotaj, 6'sı da doğru sebeple
+kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol düştü"
+üçlüsüyle geçerli sayıldı.
+
+### ⭐Bu işin kendi içinden çıkan iki ders
+
+1. ⭐**Sabotaj YEŞİL geçtiyse ilk soru "kapı kör mü" DEĞİL, "o dal koşuldu mu"dur.**
+   Çıkış kodunu bozan sabotaj fark edilmedi. Sebep kapının körlüğü değildi: fikstür
+   deposunda `doc build` **başarıyla koşuyordu**, dolayısıyla "üretim başarısız" dalına hiç
+   girilmiyordu. Ölçülmeyen dal, yazılmamış dal kadar korumasızdır — çözüm kolu güçlendirmek
+   değil, **başarısızlığı üretilebilir kılmak** oldu (`TABAN_TAZELE_PYTHON` adı konmuş dikişi).
+2. ⭐**Windows'ta `npx`'i `execFileSync` ile çağırmak komutu HİÇ koşmaz.** `npx` bir `.cmd`
+   sarmalayıcısıdır; kabuk olmadan çalıştırılamaz, çıktısı boş gelir ve sonuç **"kapı kırmızı"**
+   diye okunur. Bir tur boyunca taban çizgisini kırmızı sandım; ayırt eden ölçüt çıktının
+   **boş** olmasıydı. Doğrusu yorumlayıcıyı doğrudan çağırmak:
+   `node node_modules/vitest/vitest.mjs`. (MSYS yol çevirisiyle aynı sınıf: araç sessizce
+   yanlış cevap üretiyor ve ölçüm yaptığını sanırsın.)
+
