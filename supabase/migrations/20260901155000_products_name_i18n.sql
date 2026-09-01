@@ -1,0 +1,45 @@
+-- REC-110 · products.name dil taşıyamıyor — name_i18n jsonb eklenir
+--
+-- SORUN (ölçüldü, 2026-09-01, canlı prod):
+--   product_families.name_i18n 2026-08-23'te eklendi (20260823120000) ve REC-109'da
+--   40/40 aile için EN adı yazıldı. Ama VARYANT adları hâlâ düz `products.name` —
+--   yani aile başlığı İngilizce basarken altındaki varyant listesi Türkçe kalıyor.
+--   Aynı sayfada iki dil. Ölçülen: 24 varyant adı çeviri bekliyor.
+--
+-- BU MIGRATION NE YAPAR / NE YAPMAZ
+--   YAPAR : name_i18n kolonunu ekler. Hepsi bu.
+--   YAPMAZ: backfill YOK. Emsal migration (20260823120000) TR'yi doldurmuştu; burada
+--           gerekmiyor çünkü okuma yolu name_i18n[lang] -> name sırasıyla düşecek:
+--           name_i18n null iken bugünkü davranış birebir korunur.
+--   YAPMAZ: EN karşılıkları YAZMAZ. Onlar müşteri-görünür metindir; taslak → OPS →
+--           Recep onayı → ancak ondan sonra ayrı bir veri adımıyla yazılır (REC-109'daki
+--           akışın aynısı).
+--   YAPMAZ: okuma yolunu DEĞİŞTİRMEZ. Kod hâlâ `name` okur. Bu migration tek başına
+--           ekranda HİÇBİR ŞEYİ değiştirmez — kasıtlı: yapı önce, atarsız girer.
+--   YAPMAZ: `get_family_detail` dahil hiçbir fonksiyonu yeniden tanımlamaz, hiçbir dönüş
+--           tipi değiştirmez, hiçbir `drop` içermez.
+--
+-- KISIT YOK — BİLEREK
+--   NOT NULL ya da CHECK (name_i18n ? 'tr') YAZILMADI. Kısıt YAZMA yolunu da bağlar:
+--   name_i18n vermeyen bir INSERT o andan itibaren patlar ve yazma yolu henüz güncel
+--   değil. Sertleştirme, yazma yolu bu kolonu doldurmaya başladıktan SONRA ayrı migration.
+--
+-- İNDEKS YOK — BİLEREK
+--   Emsalde GIN indeksi var çünkü orada dil-anahtarlı arama planlanmıştı. Burada okuma
+--   `id` kümesiyle gömme yapacak (WHERE id = ANY(...)), jsonb içinde arama YOK. Gereksiz
+--   indeks yazma yolunu yavaşlatır; ihtiyaç ölçülünce ayrıca eklenir.
+--
+-- ONAY YÜZEYİ TEK SATIRDA TUTULDU
+--   `comment on column` bilerek eklenmedi: Recep'e onaylatılan metin tam olarak aşağıdaki
+--   tek ALTER satırıdır ve PR'ın uyguladığı şey ondan fazlası olmamalıdır.
+--
+-- GERİ ALMA
+--   alter table public.products drop column if exists name_i18n;
+--   (Veri kaybı yalnız bu kolona yazılmış çevirilerde; henüz içerik yazılmadığı için 0.)
+--
+-- TAZELEME
+--   products üzerindeki değişiklik-tetiği kolon kapsamlı değil; ileride name_i18n'e
+--   yazıldığında webhook zaten atar, ek tetik/dal gerekmez. Bu migration hiçbir satırı
+--   UPDATE etmediği için ŞU AN sıfır webhook atışı ve sıfır updated_at dokunuşu üretir.
+
+alter table public.products add column if not exists name_i18n jsonb;
