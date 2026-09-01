@@ -73,7 +73,15 @@ function fiksturKur(ilanDisiDaCakissin: boolean): Fikstur {
   fs.writeFileSync(path.join(kok, 'docs/a_master.md'), 'TABAN\n')
   fs.writeFileSync(path.join(kok, 'docs/b_master.md'), 'TABAN\n')
   fs.writeFileSync(path.join(kok, 'kaynak.txt'), 'TABAN\n')
-  g('add', '--', 'docs', 'kaynak.txt')
+  fs.writeFileSync(path.join(kok, '.gitignore'), '.venv\n')
+
+  const venvBin = path.join(kok, '.venv', process.platform === 'win32' ? 'Scripts' : 'bin')
+  fs.mkdirSync(venvBin, { recursive: true })
+  const pyPath = path.join(venvBin, 'python')
+  fs.writeFileSync(pyPath, '#!/bin/sh\nexit 0\n')
+  fs.chmodSync(pyPath, 0o755)
+
+  g('add', '--', 'docs', 'kaynak.txt', '.gitignore')
   g('commit', '-q', '-m', 'taban')
 
   g('checkout', '-q', '-b', 'dal')
