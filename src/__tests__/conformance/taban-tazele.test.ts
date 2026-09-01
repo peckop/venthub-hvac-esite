@@ -251,6 +251,28 @@ describe('taban-tazele — CANLI DAVRANIS (gercek depo, gercek merge)', () => {
     expect(r.cikti).toMatch(/gecersiz JSON/)
   })
 
+  it('--help YAN ETKISIZ: yardim basar, HICBIR IS YAPMAZ (merge olmaz)', () => {
+    // Kusur sahada bulundu (URUN, 2026-09-01): `--help` yardim basmak yerine dogrudan
+    // merge'i kosuyordu. Bu, "require edilen betik yan etkisiz olmali" ilkesinin BAYRAK
+    // hali: "ne yapiyor bu" diye sormanin bedeli isin yapilmasi olamaz.
+    const f = fiksturKur(false)
+    const oncekiHead = execFileSync('git', ['-C', f.kok, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+    const r = f.kos(['--help'])
+    expect(r.kod).toBe(0)
+    expect(r.cikti).toMatch(/KULLANIM/)
+    expect(r.cikti).toMatch(/CIKIS KODLARI/)
+    // Is YAPILMADIGININ kanitlari: baslik basilmadi, merge olmadi, HEAD oynamadi.
+    expect(r.cikti).not.toMatch(/== TABAN-TAZELEME ==/)
+    expect(r.cikti).not.toMatch(/MERGE:/)
+    const sonrakiHead = execFileSync('git', ['-C', f.kok, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+    expect(sonrakiHead).toBe(oncekiHead)
+    // Fikstur master'in 1 commit gerisindedir; --help sonrasi HALA geride olmali.
+    const geride = execFileSync('git', ['-C', f.kok, 'rev-list', '--count', 'HEAD..master'], {
+      encoding: 'utf8',
+    }).trim()
+    expect(Number(geride)).toBeGreaterThan(0)
+  })
+
   it('FAIL-CLOSED: agac KIRLIYSE hic baslamaz (cikis 2, merge YOK)', () => {
     const f = fiksturKur(false)
     fs.writeFileSync(path.join(f.kok, 'kirli.txt'), 'x\n')
@@ -270,6 +292,29 @@ describe('taban-tazele — CANLI DAVRANIS (gercek depo, gercek merge)', () => {
     const r = f.kos(['--kapisiz'], { TABAN_TAZELE_BUILD_CMD: JSON.stringify([process.execPath, '-e', '0']) })
     expect(r.cikti).toMatch(/tolere: docs\/istisna\.md/)
     expect(r.cikti).toMatch(/OTOMATIK cozuldu/)
+    expect(r.kod).toBe(1)
+  })
+
+  it('TOLERE ETMEK YETMEZ: git de reddediyor — yerel degisiklik ATILIR ve BASILIR', () => {
+    // Sahada coktu (2026-09-01, aracin kendi PR'inda): yolu KENDI onkosulumda tolere
+    // ettim ama git "local changes would be overwritten by merge" diyip merge'i reddetti.
+    // Kendi kapimi actim, git'in kapisini gormedim. Bu kol tam o hali uretir: tolere
+    // edilen dosya MASTER'DA DA degismis olmali ki git uzerine yazmak zorunda kalsin.
+    const f = fiksturKur(false, true)
+    const g = (...a: string[]) => execFileSync('git', ['-C', f.kok, ...a], { encoding: 'utf8' })
+    // master tarafinda istisna dosyasini DEGISTIR + commit -> merge onun uzerine yazacak
+    g('checkout', '-q', 'master')
+    fs.writeFileSync(path.join(f.kok, 'docs/istisna.md'), 'MASTER YENI SURUM\n')
+    g('add', '--', 'docs/istisna.md')
+    g('commit', '-q', '-m', 'master istisna')
+    g('checkout', '-q', 'dal')
+    // dalda YEREL (commit'siz) degisiklik: kancanin yeni damga yazmasini taklit eder
+    fs.writeFileSync(path.join(f.kok, 'docs/istisna.md'), 'KANCA YEREL DAMGA\n')
+
+    const r = f.kos(['--kapisiz'], { TABAN_TAZELE_BUILD_CMD: JSON.stringify([process.execPath, '-e', '0']) })
+    expect(r.cikti).toMatch(/atildi: docs\/istisna\.md/)
+    expect(r.cikti).not.toMatch(/would be overwritten by merge/)
+    expect(r.cikti).not.toMatch(/DURDU/)
     expect(r.kod).toBe(1)
   })
 
