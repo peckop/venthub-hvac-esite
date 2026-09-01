@@ -1455,11 +1455,17 @@ Yine de reddedildi:
    dosyasından** okunur (liste değişince araç kendiliğinden hizalanır) ve ilan dosyası
    okunamaz/bozuksa **hiçbir şey tolere edilmez** — fail-closed. Bu yollar üretim turunda da
    commit **edilmez**, "beklenen istisna" diye ayrıca raporlanır.
+7. ⭐**YARDIM BAYRAĞI YAN ETKİSİZDİR.** `--help` / `-h`, hiçbir git komutu koşturmadan yardımı
+   basar ve çıkar. Kusur sahada bulundu (URUN, 2026-09-01): ilk sürüm `--help` verildiğinde
+   yardım basmak yerine **doğrudan merge'i koşuyordu**. Bu, "`require` edilen betik yan
+   etkisiz olmalı" ilkesinin **bayrak hâli**: kullanıcıya *"bu ne yapıyor"* diye sorma imkânı
+   tanıyan bir bayrak, sormanın bedeli olarak işi yapıyorsa soru sorulamaz hâle gelir — ve
+   soruyu soran kişi genellikle tam da işin yapılmasını istemeyen kişidir.
 
 ### Kapı
 
-`src/__tests__/conformance/taban-tazele.test.ts` — **22 kol**, çoğu **gerçek depoda gerçek
-merge** koşturur (metin taraması değil davranış). Sabotaj turu: **9 sabotaj, 9'u da doğru
+`src/__tests__/conformance/taban-tazele.test.ts` — **23 kol**, çoğu **gerçek depoda gerçek
+merge** koşturur (metin taraması değil davranış). Sabotaj turu: **10 sabotaj, 10'u da doğru
 sebeple kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol
 düştü" üçlüsüyle geçerli sayıldı. Kollar **iki ortamda** ayrı ayrı yeşil ölçüldü: orion kurulu
 olan (yerel) ve orion **kurulu olmayan** (CI taklidi) — aşağıdaki 4. ders bunun niçin

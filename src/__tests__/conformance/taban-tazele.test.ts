@@ -251,6 +251,28 @@ describe('taban-tazele — CANLI DAVRANIS (gercek depo, gercek merge)', () => {
     expect(r.cikti).toMatch(/gecersiz JSON/)
   })
 
+  it('--help YAN ETKISIZ: yardim basar, HICBIR IS YAPMAZ (merge olmaz)', () => {
+    // Kusur sahada bulundu (URUN, 2026-09-01): `--help` yardim basmak yerine dogrudan
+    // merge'i kosuyordu. Bu, "require edilen betik yan etkisiz olmali" ilkesinin BAYRAK
+    // hali: "ne yapiyor bu" diye sormanin bedeli isin yapilmasi olamaz.
+    const f = fiksturKur(false)
+    const oncekiHead = execFileSync('git', ['-C', f.kok, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+    const r = f.kos(['--help'])
+    expect(r.kod).toBe(0)
+    expect(r.cikti).toMatch(/KULLANIM/)
+    expect(r.cikti).toMatch(/CIKIS KODLARI/)
+    // Is YAPILMADIGININ kanitlari: baslik basilmadi, merge olmadi, HEAD oynamadi.
+    expect(r.cikti).not.toMatch(/== TABAN-TAZELEME ==/)
+    expect(r.cikti).not.toMatch(/MERGE:/)
+    const sonrakiHead = execFileSync('git', ['-C', f.kok, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+    expect(sonrakiHead).toBe(oncekiHead)
+    // Fikstur master'in 1 commit gerisindedir; --help sonrasi HALA geride olmali.
+    const geride = execFileSync('git', ['-C', f.kok, 'rev-list', '--count', 'HEAD..master'], {
+      encoding: 'utf8',
+    }).trim()
+    expect(Number(geride)).toBeGreaterThan(0)
+  })
+
   it('FAIL-CLOSED: agac KIRLIYSE hic baslamaz (cikis 2, merge YOK)', () => {
     const f = fiksturKur(false)
     fs.writeFileSync(path.join(f.kok, 'kirli.txt'), 'x\n')
