@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T08:49:14.551215+00:00
+compiled_at: 2026-09-01T09:19:08.465567+00:00
 total_compiled_files: 63
-source_commit: de48314a
+source_commit: 9893d389
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9386,11 +9386,24 @@ Yine de reddedildi:
    dosyasından** okunur (liste değişince araç kendiliğinden hizalanır) ve ilan dosyası
    okunamaz/bozuksa **hiçbir şey tolere edilmez** — fail-closed. Bu yollar üretim turunda da
    commit **edilmez**, "beklenen istisna" diye ayrıca raporlanır.
+   ⭐**Tolere etmek YETMEZ — git'in kendisi de reddeder.** İlk sürüm bu yolları yalnız
+   **kendi** önkoşulunda tolere ediyordu; git yine de *"Your local changes to the following
+   files would be overwritten by merge"* diyip merge'i reddetti. Yani kendi kapımı açıp
+   **git'in kapısını görmemişim** — bir önkoşulu kaldırmak, aynı şeyi kontrol eden ikinci bir
+   mekanizmayı kaldırmaz. Doğrusu: merge'den önce tolere edilen yolların yerel değişikliği
+   `git checkout --` ile **atılır** (tanım gereği üretilmiş ve yeniden üretilebilir, içerik
+   kaybı yok) ve **sessizce değil** — ne atıldığı tek tek basılır.
+7. ⭐**YARDIM BAYRAĞI YAN ETKİSİZDİR.** `--help` / `-h`, hiçbir git komutu koşturmadan yardımı
+   basar ve çıkar. Kusur sahada bulundu (URUN, 2026-09-01): ilk sürüm `--help` verildiğinde
+   yardım basmak yerine **doğrudan merge'i koşuyordu**. Bu, "`require` edilen betik yan
+   etkisiz olmalı" ilkesinin **bayrak hâli**: kullanıcıya *"bu ne yapıyor"* diye sorma imkânı
+   tanıyan bir bayrak, sormanın bedeli olarak işi yapıyorsa soru sorulamaz hâle gelir — ve
+   soruyu soran kişi genellikle tam da işin yapılmasını istemeyen kişidir.
 
 ### Kapı
 
-`src/__tests__/conformance/taban-tazele.test.ts` — **22 kol**, çoğu **gerçek depoda gerçek
-merge** koşturur (metin taraması değil davranış). Sabotaj turu: **9 sabotaj, 9'u da doğru
+`src/__tests__/conformance/taban-tazele.test.ts` — **24 kol**, çoğu **gerçek depoda gerçek
+merge** koşturur (metin taraması değil davranış). Sabotaj turu: **11 sabotaj, 11'i de doğru
 sebeple kırmızı**; her biri "hedef dize tek kez bulundu + sözdizimi geçerli + hedeflenen kol
 düştü" üçlüsüyle geçerli sayıldı. Kollar **iki ortamda** ayrı ayrı yeşil ölçüldü: orion kurulu
 olan (yerel) ve orion **kurulu olmayan** (CI taklidi) — aşağıdaki 4. ders bunun niçin
