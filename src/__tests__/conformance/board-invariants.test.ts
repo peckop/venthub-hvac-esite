@@ -1323,3 +1323,93 @@ describe('INV-BOARD-EKSEN-1: eksen adları TEK KAYNAK, başlık ve --help ÜRET�
     expect(board.kullanimMetni(), 'Sınama sonrası liste eski hâline dönmedi.').toBe(oncekiHelp)
   })
 })
+
+/**
+ * INV-BOARD-KONUM-1 — YAZAN fiil, KOŞAN DOSYANIN yolunu beyan eder (§27).
+ *
+ * ⭐ÖLÇÜLMÜŞ VAKA — DÖRT kez, 2026-09-01/02 (URUN 3 + ALTYAPI 1): kabuk sessizce birincil
+ * çalışma dizinine kaydı ve `node scripts/board/board.cjs claim` ANA DİZİNDEKİ kopyayı
+ * koştu. Üç vakada zarar SIFIRDI — ve tam o yüzden hiçbiri bir kapı doğurmadı. İki ajan
+ * "dikkatli olacağım" dedi; 3. ve 4. yine oldu. **Dikkat bir mekanizma değildir.**
+ *
+ * ⚠NİÇİN KÖK DEĞİL, DOSYA: ilk tasarım "kullandığın KÖKÜ bas" idi; ölçünce YETERSİZ çıktı.
+ * O vakada yanlış ağacın VERİSİ ölçülmedi (pano paylaşımlıdır, veri doğruydu); zarar
+ * BAYAT SÜRÜMÜN koşmasıydı ve bayat sürüm de doğru kökü basar. Ölçüldü: ana dizin
+ * `origin/master`'dan 0 GERİDE iken iki `board.cjs` kopyası FARKLIYDI — yani
+ * **"ağaç güncel" ile "aynı araç koşuyor" AYRI iddialardır.** Ayırt eden şey KOŞAN DOSYA.
+ *
+ * ⚠NİÇİN YALNIZ YAZAN FİİLLER: okuyan fiillerin (`yoklama`/`who`) çıktısı insan tarafından
+ * taranır; gürültü onları okunmaz kılar ve okunmayan kapı kapı değildir. Durum DEĞİŞTİREN
+ * fiil ise nereden koştuğunu söylemek zorundadır. Beyan stderr'e yazılır ki stdout
+ * ayrıştıran çağıranlar bozulmasın.
+ */
+describe('INV-BOARD-KONUM-1: YAZAN fiil koştuğu DOSYAYI beyan eder (§27)', () => {
+  /** Gerçek alt süreç — beyan ancak CLI koşarken üretilir, modülü require etmek yetmez. */
+  function cliKos(args: string[]): { stdout: string; stderr: string } {
+    const r = spawnSync('node', [BOARD_MODULE_PATH, ...args], {
+      encoding: 'utf8',
+      env: { ...process.env, VENTHUB_BOARD_DIR: boardDir },
+    })
+    return { stdout: r.stdout ?? '', stderr: r.stderr ?? '' }
+  }
+
+  const SID = '11111111-2222-4333-8444-555555555555'
+
+  it('⭐YAZAN fiillerin HEPSİ koşan dosyayı beyan eder (biri unutulamaz)', () => {
+    // Fiil listesi modülün KENDİ dışa açtığı kümeden gelir — test kendi listesini yazsaydı
+    // iki ölçüt ayrışır, yeni bir yazan fiil eklendiğinde bu kol sessizce eksik ölçerdi.
+    const board = loadBoard(boardDir)
+    const eksik: string[] = []
+    for (const fiil of board.PANOYA_YAZAN_FIILLER) {
+      const args = fiil === 'note' ? [fiil, '--sid', SID, '--text', 'sinama'] : [fiil, '--sid', SID]
+      if (fiil === 'claim') args.push('--lane', 'KONUM-SINAMA', '--globs', 'src/konum-sinama/**')
+      const { stderr } = cliKos(args)
+      if (!stderr.includes('[board] kosan:')) eksik.push(fiil)
+    }
+    expect(
+      eksik,
+      `Bu YAZAN fiiller koştukları dosyayı beyan ETMİYOR: ${eksik.join(', ')}. Beyan tek bir ` +
+        'ortak noktada durmalı; fiil başına eklenirse biri unutulur ve o fiil sessizce yanlış ' +
+        'ağaçtan koşabilir.',
+    ).toEqual([])
+  })
+
+  it('⭐BEYAN EDİLEN YOL, GERÇEKTEN KOŞAN DOSYA (sabit literal değil)', () => {
+    // ⚠BAĞIMSIZ REFERANS (bugünkü tautoloji dersi, §26): beklenen yolu betiğin kendi
+    // bastığı değerden okumak ölçüm değildir. Yol BURADA ayrıca çözülür.
+    const beklenen = BOARD_MODULE_PATH.replace(/\\/g, '/')
+    const { stderr } = cliKos(['heartbeat', '--sid', SID])
+    const satir = stderr.split('\n').find((s) => s.includes('[board] kosan:')) ?? ''
+    const basilan = satir.replace('[board] kosan:', '').trim().replace(/\\/g, '/')
+    expect(
+      basilan,
+      `Beyan edilen yol koşan dosyaya EŞİT DEĞİL.\n  beyan   : ${basilan}\n  gerçek  : ${beklenen}\n` +
+        'Sabit bir literal basılıyorsa beyan işe yaramaz: yanlış ağaçtan koşan bayat kopya da ' +
+        'doğru yolu basar ve kayma görünmez kalır.',
+    ).toBe(beklenen)
+  })
+
+  it('⭐OKUYAN fiiller beyan ETMEZ (ayırt edici çift — gürültü kapıyı okunmaz kılar)', () => {
+    // Tek yönlü kol yetmez: HER çıktıya beyan basan bir uygulama da yukarıdaki iki kolu
+    // geçerdi. Ayırt edici soru: okuyan fiil SESSİZ mi?
+    for (const fiil of ['yoklama', 'who']) {
+      const args = fiil === 'who' ? [fiil, '--sid', SID] : [fiil]
+      const { stdout, stderr } = cliKos(args)
+      expect(
+        (stdout + stderr).includes('[board] kosan:'),
+        `OKUYAN fiil "${fiil}" konum beyanı basıyor. Yoklama çıktısı insan tarafından taranır; ` +
+          'gürültü onu okunmaz kılar ve okunmayan kapı kapı değildir (§26: yanlış alarm ucuz değildir).',
+      ).toBe(false)
+    }
+  })
+
+  it('beyan STDERR\'e gider (stdout ayrıştıran çağıranlar bozulmaz)', () => {
+    const { stdout, stderr } = cliKos(['heartbeat', '--sid', SID])
+    expect(stderr.includes('[board] kosan:'), 'beyan stderr\'de YOK').toBe(true)
+    expect(
+      stdout.includes('[board] kosan:'),
+      'Beyan STDOUT\'a düşmüş. Bu çıktıyı ayrıştıran kancalar/betikler beklenmedik satırla ' +
+        'karşılaşır; tanı bilgisi stderr\'e yazılır.',
+    ).toBe(false)
+  })
+})
