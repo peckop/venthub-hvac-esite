@@ -861,6 +861,25 @@ if (require.main === module) {
   // KIMLIGIN VARLIGI YETMEZ, BICIMI DE DOGRULANIR (2026-08-20 vakasi — sidDogrula yorumuna bak).
   // Eski hali yalniz "sid var mi" diye bakiyordu; bozuk bir kimlik sessizce YENI bir pano
   // dosyasi doguruyor ve komut yine "not birakildi" diyordu. Ayni sahte-yesil ailesi.
+  if (PANOYA_YAZAN_FIILLER.has(verb)) {
+    // ⭐KONUM BEYANI (§27) — YAZAN fiil, KOŞAN DOSYANIN yolunu söyler.
+    //
+    // Ölçülmüş vaka (2026-09-01/02, DÖRT kez: URUN 3 + ALTYAPI 1): kabuk sessizce birincil
+    // çalışma dizinine kaydı ve `node scripts/board/board.cjs claim` ANA DİZİNDEKİ kopyayı
+    // koştu. Üç vakada zarar sıfırdı — ve tam o yüzden hiçbiri bir kapı doğurmadı; iki ajan
+    // "dikkatli olacağım" dedi, 3. ve 4. yine oldu. Dikkat bir mekanizma değildir.
+    //
+    // ⚠NİÇİN KÖK DEĞİL DOSYA: ilk tasarım "kullandığın KÖKÜ bas" idi, ölçünce YETERSİZ çıktı.
+    // O vakada yanlış ağacın VERİSİ ölçülmedi (pano paylaşımlıdır, veri doğruydu); zarar
+    // BAYAT SÜRÜMÜN koşmasıydı ve bayat sürüm de doğru kökü basar. Ayırt eden şey KOŞAN
+    // DOSYADIR. Ölçüldü: ana dizin `origin/master`'dan 0 GERİDE iken iki kopya FARKLIYDI —
+    // yani "ağaç güncel" ile "aynı araç koşuyor" AYRI iddialardır.
+    //
+    // ⚠NİÇİN YALNIZ YAZAN FİİLLER: `yoklama`/`who` okuyan fiildir, çıktıları insan tarafından
+    // taranır ve gürültü onları okunmaz kılar. Durum DEĞİŞTİREN fiil ise nereden koştuğunu
+    // söylemek zorundadır. stderr'e yazılır ki stdout ayrıştıran çağıranlar bozulmasın.
+    console.error('[board] kosan: ' + __filename)
+  }
   if (sid && PANOYA_YAZAN_FIILLER.has(verb)) {
     const kimlik = sidDogrula(sid)
     // KAÇIŞ KAPISI YOK — ve bu bilinçli. İlk sürümde `--yeni-kimlik` bayrağı vardı; kendi

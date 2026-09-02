@@ -1885,3 +1885,53 @@ ayrı ayrı okunur.
 Başlığı ölçen ilk kol kırmızı verdi: **boş panoda** `yoklama()` erken dönüyor
 (*"panoda talep yok"*) ve **başlığı hiç basmıyor**. Kol var olmayan bir metni arıyordu.
 Başlık ancak en az bir şerit varken üretilir; fikstür onu üretmek zorundadır.
+
+
+---
+
+## 27. BEDELSİZ HATA KAPI DOĞURMAZ — ve ölçüm tarafında kapı yoktu
+
+**Ölçülmüş vaka (2026-09-01/02, DÖRT kez: URUN 3 + ALTYAPI 1):** kabuk sessizce birincil
+çalışma dizinine kaydı; `node scripts/board/board.cjs claim` ANA DİZİNDEKİ kopyayı koştu.
+**Üç vakada zarar SIFIRDI** — ana dizin temizdi, komutlar no-op düştü, ölçümler doğru çıktı.
+
+### ⭐HÜKÜM — zarar sıfır olduğu için kapı doğmadı; sıfır zarar bir muafiyet değildir
+
+Yazma tarafını `bash-write-guard` koruyordu; **ölçüm tarafı korumasızdı.** Dört vakanın
+hiçbiri bir kapıya dönüşmedi ve sebep basit: **hiçbiri bir bedel ödetmedi.** İki ajan ilk
+vakalardan sonra "dikkatli olacağım" dedi; üçüncü ve dördüncü yine oldu.
+**Dikkat bir mekanizma değildir.** Bir hatanın sizi yanıltmaması, bir dahakine
+yanıltacağının işaretini de vermez — ve tam bu yüzden bedelsiz hata en uzun yaşayandır.
+
+### ⭐HÜKÜM — beyan KÖK değil KOŞAN DOSYA olur
+
+İlk tasarım *"ölçüm betiği kullandığı KÖKÜ bassın"* idi. **Ölçünce yetersiz çıktı:**
+o vakada yanlış ağacın VERİSİ ölçülmedi (pano paylaşımlıdır, veri doğruydu); zarar
+**bayat sürümün koşmasıydı** ve **bayat sürüm de doğru kökü basar.**
+
+Ve keskini: ölçüldü, ana dizin `origin/master`'dan **0 GERİDE** iken iki `board.cjs`
+kopyası **FARKLIYDI**. Yani *"ağaç güncel"* ile *"aynı araç koşuyor"* **ayrı iddialardır**;
+tazelik sorusu bayat-araç riskini ölçmez. Ayırt eden şey **koşan dosyanın kimliğidir**
+(`__filename`).
+
+### HÜKÜM — beyan YAZAN fiillere konur, okuyanlara KONMAZ
+
+Okuyan fiillerin (`yoklama`/`who`) çıktısı insan tarafından taranır; gürültü onları okunmaz
+kılar ve **okunmayan kapı kapı değildir** (§25: yanlış alarm veren kapı, bir süre sonra
+okunmayan kapıdır). Durum DEĞİŞTİREN fiil ise nereden koştuğunu söylemek zorundadır.
+Beyan **stderr'e** yazılır: stdout'u ayrıştıran kancalar beklenmedik satırla karşılaşmasın.
+
+### HÜKÜM — beyan TEK ortak noktada durur, fiil başına eklenmez
+
+Fiil başına eklenirse biri unutulur ve o fiil sessizce yanlış ağaçtan koşar. Kol da fiil
+listesini **modülün kendi dışa açtığı kümeden** okur; kendi listesini yazsaydı iki ölçüt
+ayrışır ve yeni bir yazan fiil eklendiğinde kol sessizce eksik ölçerdi (§26'nın tek-kaynak
+hükmünün bu işteki biçimi).
+
+### Bu bölümün kolları ve sabotajı
+
+`INV-BOARD-KONUM-1`, 4 kol: yazan fiillerin **hepsi** beyan eder · beyan edilen yol
+**gerçekten koşan dosya** (beklenen yol testte `require.resolve` ile **bağımsız** çözülür —
+§26'nın tautoloji dersi) · **okuyan fiiller beyan ETMEZ** (ayırt edici çift) · beyan
+**stderr'e** gider. Sabotaj **4/4**: beyan kaldırılır · sabit literal basar · stdout'a
+yazılır · okuyan fiillere de basar.
