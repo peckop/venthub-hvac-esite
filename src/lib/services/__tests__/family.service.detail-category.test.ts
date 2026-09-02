@@ -47,6 +47,8 @@ function stubClient(
   const kategoriSorgulari: string[] = []
   /** REC-108: aile adı çevirisi sorguları — sayısı kola bağlı (aşağıda). */
   const adSorgulari: string[] = []
+  /** REC-110: varyant adı çevirisi sorguları — id kümesi başına TEK olmalı (aşağıda). */
+  const varyantAdSorgulari: string[] = []
 
   const fakeFetch: typeof fetch = async (input) => {
     const url =
@@ -95,13 +97,21 @@ function stubClient(
       return jsonResponse([{ name_i18n: { tr: null, en: 'Vortice Lineo Quiet Inline Duct Fans' } }])
     }
 
+    // REC-110: VARYANT adı çevirileri (`products.name_i18n`) — aile adıyla aynı desen, aynı
+    // gerekçe. `/product_families` dalı YUKARIDA ve önce eşleşir; bu dal yalnız `products`
+    // tablosunu yakalar. Sayısı aşağıda kola bağlı (id kümesi başına TEK sorgu).
+    if (url.includes('/products?')) {
+      varyantAdSorgulari.push(url)
+      return jsonResponse([{ id: 'v-1', name_i18n: { tr: null, en: 'Lineo 150 Quiet Inline Fan' } }])
+    }
+
     throw new Error('beklenmeyen istek: ' + url)
   }
 
   const supabase = createClient<Database>('https://ornek.supabase.co', 'anon-anahtar', {
     global: { fetch: fakeFetch },
   })
-  return { supabase, kategoriSorgulari, adSorgulari }
+  return { supabase, kategoriSorgulari, adSorgulari, varyantAdSorgulari }
 }
 
 describe('INV-FAMILY-DETAIL-CATEGORY-1 — getFamilyDetail kategori satırını gömer', () => {
@@ -138,6 +148,17 @@ describe('INV-FAMILY-DETAIL-CATEGORY-1 — getFamilyDetail kategori satırını 
     const { supabase, adSorgulari } = stubClient('cat-kok', 'cat-alt')
     await getFamilyDetail(supabase, 'vortice-lineo-150-quiet', 'tr')
     expect(adSorgulari).toHaveLength(1)
+  })
+
+  it('⭐VARYANT AD ÇEVİRİSİ: id kümesi başına TEK sorgu VE alan gerçekten TAŞINIYOR (REC-110)', async () => {
+    // Aynı sözleşme, varyant tarafı: RPC ham `p.name` döndürür, `products.name_i18n` tek
+    // `in` sorgusuyla gömülür. İKİ iddia ayrı ölçülür — sorgu sayısı (N+1 patlamaz) ve
+    // taşıma (alan gerçekten satıra iniyor). "Sorgu atıldı" tek başına yetmez: atılıp
+    // sonucu yere düşürülseydi sayı yine 1 olur, kapı yeşil kalır, EN sayfa TR basardı.
+    const { supabase, varyantAdSorgulari } = stubClient('cat-kok', 'cat-alt')
+    const detay = await getFamilyDetail(supabase, 'vortice-lineo-150-quiet', 'tr')
+    expect(varyantAdSorgulari).toHaveLength(1)
+    expect(detay?.variants[0]?.name_i18n?.en).toBe('Lineo 150 Quiet Inline Fan')
   })
 
   it('kategori id yoksa HİÇ sorgu atmaz ve alanlar null olur', async () => {
