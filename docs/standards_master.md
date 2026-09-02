@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T13:33:57.235163+00:00
+compiled_at: 2026-09-02T07:11:47.624477+00:00
 total_compiled_files: 64
-source_commit: 3402abc8
+source_commit: 91883ce8
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -16049,6 +16049,62 @@ hattı dışındaki artefaktları da kapsaması) — **ORION kalemi**, bu depoda
 teorik değil, **örneği var**: `docs/venthub_hvac_master.md` ilan edilmiş olduğu hâlde
 hiçbir damga taşımıyor — ilan edilmemiş olsaydı kapı onu **yakalamazdı**. İsim ölçütüne
 dönmek bu riski azaltmaz, yukarıdaki iki yanlış-pozitifi geri getirir.
+
+
+## AXIOM 10 — Damgasız ve kimliksiz ARAÇ ÖNBELLEĞİ, iki kapının da evreni DIŞINDADIR; kendi kapısı olmadan "yeşil" sayılamaz
+
+**Ölçülmüş vaka (2026-09-01, REC-102):** `supabase/.temp` altında **8 takipli** dosya.
+`.gitignore`'da hiç kural yoktu; `cli-latest` geçmişte **10 kez** değişmişti; dört dosya
+canlı altyapı sürümünü (postgres/gotrue/rest/storage) public repoda ilan ediyordu.
+Kimlik bilgisi yoktu. Ve **iki kapı da yeşildi.**
+
+### Niçin iki kapı da görmedi — evren sorusu
+
+- **INV-DOC-7** ölçütü **damgadır** (AXIOM 8: isim değil damga). Araç önbelleği damga
+  taşımaz. Ölçüldü: sekiz dosyanın hiçbirinde yok.
+- **INV-MUTLAK-YOL-1** ölçütü **kimlik yoludur**. Ölçüldü: sıfır.
+
+Bu bir ölçüt kusuru değildir; iki ölçüt de kendi sorusuna doğru cevap veriyordu. Kusur,
+**bu sınıfın hiçbir ölçütün sorusuna girmemesiydi.** "Kapı yeşil" cümlesi yalnız kapının
+evreni içinde anlamlıdır; evrenin dışındaki bir dosya için o cümle **boştur**.
+
+### Hüküm — yeni sınıf, yeni soru; mevcut kola sıkıştırılmaz
+
+Damgasız + kimliksiz araç önbelleği **üçüncü bir sınıftır** ve kendi değişmezini alır:
+**INV-ARAC-ONBELLEGI-1** (`uretilmis-artefakt-ilan-kapsami.test.ts`). Onu INV-MUTLAK-YOL-1'e
+eklemek cazipti — aynı mekanik (`git rm --cached` + nüks kolu) — ama o kapının adı
+"kimlik sızıntısı" der; kimlik yolu sıfır olan bir dosyayı oraya koymak, **kapının adı
+ile ölçtüğü şeyi ayırmak** olurdu (bkz. `fleet-mechanism-standard.md` §23 "gösterge
+doğruydu, adı yanlıştı"). Sınıf doğruyken ev yanlış olabilir; ikisi ayrı ayrı ölçülür.
+
+### Hüküm — "kural yazıldı" ile "koruma çalışıyor" ayrı iddialardır
+
+`.pyc` vakasında `.gitignore` kuralı **zaten vardı** (satır 83) ve dokuz dosyayı hiç
+korumamıştı: dosyalar kural konmadan **önce** commit edilmişti ve git yalnız **takipsiz**
+dosyayı yok sayar. İlan dosyası yine de "kural eklensin" öneriyordu — hiçbir kapı
+tarafından okunmadığı için o yanlış sessizce yaşadı.
+
+Bu yüzden INV-ARAC-ONBELLEGI-1 kuralı **metinde aramaz**, `git check-ignore` ile
+**çalıştırır**: kural yanlış dizinde, yanlış biçimde ya da yorum satırında kalmışsa metin
+araması yeşil, bu ölçüm kırmızı verir. Nüks iki taraftan kapanır — index tarafını kol,
+takipsiz tarafı çalıştığı ölçülmüş `.gitignore` tutar.
+
+### Hüküm — tekil describe'ın KENDİ boş-evren koruması olur
+
+"Takipli önbellek YOK" iddiası, `git ls-files` bir sebeple boş dönerse de yeşildir — kapı
+kırılınca "geçti" der. INV-MUTLAK-YOL-1'de bu tehlike yoktu, çünkü **kardeş kollar**
+("ölü muafiyet", "mandal geri kaçmaz") boş evrende düşer (ölçüldü). Kardeşi olmayan her
+"X yoktur" kolu kendi vacuous-guard'ını taşır (INV-DOC-7 ile aynı desen: *"boş evrende
+koşan kapı ölçüm değildir"*).
+
+### Bu aksiyomun ölçüm disiplini
+
+Bu sınıfı kapatmadan önce **ölçülmesi zorunlu** olan şey: **CI bu dosyaları okuyor mu?**
+Burada project-ref `secrets`'ten geliyor ve prod migration `psql` + `SUPABASE_DB_URL`
+kullanıyordu — yani silmek güvenliydi. **Aynı ölçüm ters çıksaydı** (ör. `project-ref`
+migration hattında okunuyor olsaydı) bu "temizlik", prod'a yazan hattı sessizce kırardı.
+Silmenin bedeli, kimin okuduğuna bağlıdır; okuyanı ölçmeden silinmez (AXIOM 6'nın
+akrabası: yıkıcı adım, onarıcı adımın yapılabilirliği ölçülmeden koşmaz).
 
 
 ---

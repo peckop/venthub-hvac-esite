@@ -197,3 +197,107 @@ describe('INV-DOC-7 · uretilmis artefakt ILAN EDILMIS mi (Kapi A ters yon)', ()
     ).toEqual([])
   })
 })
+
+/**
+ * INV-ARAC-ONBELLEGI-1 — takipli ARAÇ ÖNBELLEĞİ / GEÇİCİ DURUM dosyası yoktur.
+ *
+ * ⭐NİÇİN AYRI BİR SORU (2026-09-01, REC-102): bu sınıf mevcut İKİ kapının da ÖLÇÜT
+ * EVRENİ DIŞINDA kalıyordu.
+ *  · INV-DOC-7'nin ölçütü DAMGA'dır (AXIOM 8) — araç önbelleği damga TAŞIMAZ; ölçüldü:
+ *    `supabase/.temp` altındaki 8 dosyanın hiçbirinde damga yok.
+ *  · INV-MUTLAK-YOL-1'in ölçütü KİMLİK YOLU'dur — aynı 8 dosyada kimlik yolu SIFIR.
+ * Yani iki kapı da yeşilken bu dosyalar takipte kalmaya devam edebiliyordu. Kapının
+ * sebebi bir sızıntı değil, bir KÖR ALAN. Mevcut bir kolun içine sıkıştırmak, kapının
+ * ADI ile ÖLÇTÜĞÜ şeyi ayırmak olurdu.
+ *
+ * Ölçülmüş vaka: 8 takipli dosya, `.gitignore`'da HİÇ kural yok, `cli-latest` geçmişte
+ * 10 kez değişmiş (churn); 4 dosya canlı altyapı sürümünü ilan ediyordu (public repoda
+ * hafif bilgi açığı). Kimlik bilgisi YOK. CI hiçbirini okumuyor (project-ref `secrets`'ten,
+ * prod migration `psql` + `SUPABASE_DB_URL`) — bu ölçüm şarttı, aksi hâlde silmek
+ * canlıyı kırardı.
+ *
+ * ⚠ÖLÇÜT NİÇİN INDEX (ls-files), HEAD DEĞİL: bu dosyanın diğer kolları HEAD okur, çünkü
+ * İÇERİK tazeliği ölçer. Bu kol ise TAKİP durumunu ölçer ve takibin tanımı index'tir;
+ * `git rm --cached` ile düşürülmüş bir dosya commit'ten önce de "takipsiz"dir. Böylece
+ * kol, commit'ten ÖNCE koşulabilir ve sabotajı commit'siz ölçmek mümkün olur.
+ *
+ * ⚠KENDİ BOŞ-EVREN KORUMASI ZORUNLU: "takipli önbellek YOK" iddiası, `git ls-files` bir
+ * sebeple BOŞ dönerse de yeşil verir — kapı kırılınca "geçti" der. INV-MUTLAK-YOL-1'de
+ * kardeş kollar ("ölü muafiyet", "mandal geri kaçmaz") boş evrende DÜŞTÜĞÜ için bu tehlike
+ * yoktu (ölçüldü). Bu describe'ın böyle kardeşi yok; vacuous-guard kolu o yüzden var.
+ */
+const ARAC_ONBELLEGI_DESENLERI: { desen: RegExp; ornek: string; nicin: string }[] = [
+  {
+    desen: /^supabase\/\.temp\//,
+    ornek: 'supabase/.temp/cli-latest',
+    nicin:
+      'Supabase CLI önbelleği: bağlı proje/sürüm bilgisini her komutta yeniden yazar. ' +
+      'Depoda tutulması churn üretir ve canlı altyapı sürümlerini public repoda ilan eder. ' +
+      'CI bu dosyaları OKUMAZ (ölçüldü: project-ref secrets üzerinden, migration psql ile).',
+  },
+  {
+    desen: /(^|\/)__pycache__\//,
+    ornek: 'registry/__pycache__/engine.cpython-311.pyc',
+    nicin:
+      'Python bytecode: üretilmiş artefakt, her koşuda değişir ve KAYNAK YOLUNU içine gömer ' +
+      '(4/9 dosya kimlik yolu sızdırıyordu). REC-102 ile index dışına alındı; INV-MUTLAK-YOL-1 ' +
+      'nüksü KİMLİK ekseninde, bu kol SINIF düzeyinde kapatır.',
+  },
+]
+
+/** Index'teki takipli dosyalar (HEAD değil — gerekçe yukarıda). */
+function takipliDosyalar(): string[] {
+  return git(['ls-files', '-z']).split('\0').filter(Boolean)
+}
+
+/** `git check-ignore`: yol yok sayılıyorsa 0 döner, sayılmıyorsa 1. Kuralın VARLIĞI değil, ÇALIŞMASI ölçülür. */
+function yokSayiliyor(yol: string): boolean {
+  try {
+    execFileSync('git', ['-C', KOK, 'check-ignore', '-q', yol], { stdio: 'ignore' })
+    return true
+  } catch {
+    return false
+  }
+}
+
+describe('INV-ARAC-ONBELLEGI-1 · takipli ARAÇ ÖNBELLEĞİ yoktur (damgasız + kimliksiz sınıf)', () => {
+  it('vacuous-guard: tarama GERÇEKTEN takipli dosya buldu (boş evrende koşan kapı ölçüm değildir)', () => {
+    const n = takipliDosyalar().length
+    expect(
+      n,
+      `git ls-files yalnız ${n} dosya döndü. Depo binlerce dosya izler; bu sayı ya git çağrısının ` +
+        'kırıldığını ya da yanlış kökte koştuğunu gösterir. Boş evrende "önbellek yok" demek ölçüm değildir.',
+    ).toBeGreaterThan(500)
+  })
+
+  it('desen listesinin HER kaydı gerekçeli ve örnekli (sınıf ilanı bedava değildir)', () => {
+    for (const k of ARAC_ONBELLEGI_DESENLERI) {
+      expect(k.nicin.length, `${k.desen} gerekçesi çok kısa`).toBeGreaterThan(60)
+      expect(k.desen.test(k.ornek), `${k.desen} kendi örneğiyle EŞLEŞMİYOR: ${k.ornek}`).toBe(true)
+    }
+  })
+
+  it('⭐HİÇBİR takipli dosya araç-önbelleği desenine uymaz', () => {
+    const takipli = takipliDosyalar()
+    const ihlal = takipli.filter((y) => ARAC_ONBELLEGI_DESENLERI.some((k) => k.desen.test(y)))
+    expect(
+      ihlal,
+      'Takipli araç önbelleği/geçici durum dosyası bulundu. Bu sınıf ne damga taşır (INV-DOC-7 ' +
+        'görmez) ne kimlik yolu (INV-MUTLAK-YOL-1 görmez); yalnız bu kol görür. ' +
+        '⚠.gitignore kuralı zaten takipteki dosyayı KORUMAZ — git yalnız takipsiz dosyayı yok ' +
+        'sayar. Çözüm: git rm --cached <yol>.',
+    ).toEqual([])
+  })
+
+  it('⭐.gitignore her deseni GERÇEKTEN yok sayıyor (kuralın varlığı değil, ÇALIŞMASI ölçülür)', () => {
+    // Ölçüt `git check-ignore`: kural yanlış dizinde, yanlış biçimde ya da yorumda kalmışsa
+    // metin araması yeşil verir, bu ölçüm KIRMIZI verir. "Kural yazıldı" ≠ "koruma çalışıyor".
+    const korumasiz = ARAC_ONBELLEGI_DESENLERI.filter((k) => !yokSayiliyor(k.ornek))
+    expect(
+      korumasiz.map((k) => k.ornek),
+      'Bu örnek yollar .gitignore tarafından YOK SAYILMIYOR: bir sonraki araç koşusu dosyayı ' +
+        'yeniden takibe sokabilir (git add -A / IDE otomatik ekleme). Nüks kapısı yalnız index ' +
+        'tarafını tutar; takipsiz tarafı .gitignore tutmalı.',
+    ).toEqual([])
+  })
+})

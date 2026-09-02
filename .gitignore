@@ -122,3 +122,6 @@ TAM-RAPOR.txt
 # Silme ilani = KOSUM DURUMU (itiraz penceresi zaman damgasi), kaynak degil.
 # Commitlenirse bayat bir pencere "gecmis" gorunur ve kapi sahte yesil verir.
 scripts/hijyen/silme-ilani.json
+
+# Supabase CLI onbellegi/gecici durum (INV-ARAC-ONBELLEGI-1): link/surum bilgisini her komutta yeniden yazar, CI okumaz
+supabase/.temp/
