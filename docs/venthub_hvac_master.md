@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-02T07:11:47.011364+00:00
+compiled_at: 2026-09-02T07:39:32.941393+00:00
 total_compiled_files: 656
-source_commit: 91883ce8
+source_commit: 45ffd4d8
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-02T07:11:47.011364+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-02T07:39:32.941393+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -29063,12 +29063,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\components\home\ApplicationSolutions.tsx
-skeleton_hash: 945060eb7fd532ad
+skeleton_hash: c6af829286ad6b0f
 entity_hashes:
   func:ApplicationSolutions: 93f4bfc3e2d056b5
   overview: 26527ace9a268eaa
   style_tokens: a60445c0b91a13d5
-generated_at: 2026-08-31T21:28:38Z
+generated_at: 2026-09-02T07:39:32Z
 ---
 
 ## Genel Bakış
@@ -29123,7 +29123,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 ## INTERFACES
 
 ### SolutionItem
-- `id: 'kitchen' | 'entrance' | 'comfort'`
+- `id: 'entrance' | 'comfort'`
 - `categorySlug: string`
 - `subSlug?: string`
 - `image: string`
@@ -29145,7 +29145,7 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 ## SABİTLER
 - **solutions** (array) — `[
   {
-    // Eski değer 'industrial-ventilation'/'duct-type-fans' idi; alt ...`
+    // 'air-curtains' artık ALT değil ANA kategori — alt slug verilme...`
 
 ---
 
@@ -49516,10 +49516,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\en.ts
-skeleton_hash: bb08ea961a9ffada
+skeleton_hash: 1f92f0c5cf4f3fdb
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-09-01T11:51:33Z
+generated_at: 2026-09-02T07:39:32Z
 ---
 
 ## Genel Bakış
@@ -49592,10 +49592,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\tr.ts
-skeleton_hash: 5c09d1d3d9693938
+skeleton_hash: 0d6f5599b81a045f
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-09-01T11:51:33Z
+generated_at: 2026-09-02T07:39:33Z
 ---
 
 ## Genel Bakış
@@ -66527,7 +66527,7 @@ source_path: C:\tmp\vh-urun-rec89\src\types\ui-models.ts
 skeleton_hash: 4874e85390a3507f
 entity_hashes:
   overview: 33a9634a40be4fcc
-generated_at: 2026-09-01T09:44:00Z
+generated_at: 2026-09-01T11:27:55Z
 ---
 
 ## Genel Bakış
@@ -80535,7 +80535,7 @@ entity_hashes:
   func:categoriesFetcher: c2a94f9401915640
   overview: 59e24a4d4621dc2a
   style_tokens: ebc7df49d9d6094c
-generated_at: 2026-08-31T07:44:00Z
+generated_at: 2026-09-01T11:27:56Z
 ---
 
 ## Genel Bakış
@@ -91761,7 +91761,7 @@ entity_hashes:
   func:ReturnsPage: 58d2fb57da45461b
   overview: 95b133e51b479d65
   style_tokens: 352aa79c8eb09e14
-generated_at: 2026-09-01T07:19:12Z
+generated_at: 2026-09-01T11:27:58Z
 ---
 
 ## Genel Bakış
