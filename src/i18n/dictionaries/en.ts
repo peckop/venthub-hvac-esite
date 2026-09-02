@@ -435,16 +435,9 @@ export const en: typeof tr = {
     applicationSolutions: {
       eyebrow: 'Scenario-Led Solutions',
       title: 'You can also start from the use case, not only from the product.',
-      subtitle: 'From parking to entrance comfort, from kitchen extraction to commercial comfort, we present HVAC needs through a solution logic.',
+      subtitle: 'From store entrance comfort to commercial space comfort, we present HVAC needs through a solution logic.',
       viewAll: 'View All',
       items: {
-        kitchen: {
-          eyebrow: 'Kitchen Scenario',
-          title: 'Industrial kitchen exhaust and duct flow',
-          description: 'Advance toward the right product family with a scenario-led path when grease vapor, odor control and duct fan needs matter.',
-          point1: 'Duct fan-led starting point',
-          point2: 'Hood and exhaust alignment logic'
-        },
         entrance: {
           eyebrow: 'Entrance Comfort',
           title: 'Store entrance and air curtain solutions',
