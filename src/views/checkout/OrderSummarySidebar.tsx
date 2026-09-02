@@ -135,7 +135,7 @@ const OrderSummarySidebar: React.FC<OrderSummarySidebarProps> = ({
             <div className="bg-air-blue rounded-lg p-3 text-center">
                 <div className="flex items-center justify-center space-x-2 text-primary-navy mb-1">
                     <Lock size={16} />
-                    <span className="text-sm font-medium">256-bit SSL</span>
+                    <span className="text-sm font-medium">{t('checkout.ssl256')}</span>
                 </div>
                 <p className="text-xs text-steel-gray">
                     {t('checkout.security.secureNote')}
