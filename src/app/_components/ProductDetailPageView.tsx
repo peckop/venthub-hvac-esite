@@ -423,7 +423,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   // `|| sku` yedegi musteriye IC KODU gosterebiliyordu; getProductModelLabel kod yoksa
   // null doner ve asagidaki model etiketi satiri HIC cizilmez (bos etiket basmaktansa yokluk).
   const variantLabel = getProductModelLabel(selectedVariant)
-  const variantDisplayName = getProductDisplayName(selectedVariant, family)
+  // REC-110: `lang` ZORUNLU — dil vermeyen çağrı derlenmez (sessiz TR düşüşü yerine açık
+  // kırmızı). Çözücü varyantın çevirisi → ailenin çevirisi → ham ad sırasıyla düşer.
+  const variantDisplayName = getProductDisplayName(selectedVariant, family, lang)
   const hasMultipleVariants = variants.length > 1
   // Varyant adı aile adıyla aynıysa tekrar basmanın anlamı yok; farklıysa GÖSTERİLİR.
   // REC-108: görünen aile adı TEK giriş noktasından gelir; ham `family.name` render

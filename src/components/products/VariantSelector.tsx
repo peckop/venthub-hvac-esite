@@ -6,7 +6,7 @@ import React, { useMemo, useState } from 'react'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { FamilyVariant } from '../../lib/services/family.service'
-import { formatSpecValue } from '../../utils/productHelpers'
+import { formatSpecValue, getProductDisplayName } from '../../utils/productHelpers'
 import { specFieldLabel } from '../../utils/specLabel'
 
 /**
@@ -237,7 +237,9 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                     <span className="text-xs font-black text-industrial-gray uppercase tracking-widest truncate">
                       {variantLabel(v)}
                     </span>
-                    <span className="text-xs font-medium text-steel-gray truncate">{v.name}</span>
+                    {/* REC-110: ham `v.name` DEĞİL — listedeki ad da PDP başlığıyla aynı çözücüden
+                        gelir; aile burada yok, varyant adı her satırda dolu (fallback gerekmez). */}
+                    <span className="text-xs font-medium text-steel-gray truncate">{getProductDisplayName(v, null, lang)}</span>
                   </span>
                   <span className="text-xs font-black text-primary-navy whitespace-nowrap">
                     {priceCell(v)}
