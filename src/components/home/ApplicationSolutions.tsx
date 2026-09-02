@@ -5,7 +5,7 @@ import React from 'react'
 import { localizedHref, Routes } from '@/utils/routes';
 
 interface SolutionItem {
-  id: 'kitchen' | 'entrance' | 'comfort'
+  id: 'entrance' | 'comfort'
   categorySlug: string
   subSlug?: string
   image: string
@@ -31,19 +31,18 @@ interface SolutionItem {
 // Bağımsız ikinci kaynak: 14A tasarım teslim belgesi açık konu #2 — "otopark jet fanı
 // katalogda yok, mevcut sitedeki Otopark Senaryosu boş kategoriye gidiyor".
 // Kategori/senaryonun geleceği 15A fazının konusu; bu PR YALNIZ kartı kaldırır.
+//
+// ⚠ 2026-09-02 — MUTFAK KARTI KALDIRILDI (Recep kararı 2026-08-31, REC-94; ilk denemesi
+// PR #922 çakışmaya düştüğü için taze master üzerinde yeniden yapıldı).
+// SEBEP KATEGORİ DEĞİL TİCARİ: endüstriyel mutfak AKTİF İŞVERENİN alanı, vitrine şimdi
+// çıkmıyor ("kesinlikle şimdi değil"). Hedef `fans/duct-fans` canlıda SAĞLAM — yani bu
+// kaldırma REC-101'in (otopark) kırık-hedef gerekçesinden FARKLI bir gerekçeye dayanır;
+// ikisini aynı sepete koyup "kırıktı" diye özetleme.
+// ⚠ GRID lg'de 3 → 2 KOLONA İNDİ. Bu satırı atlamak sessiz bir düzen bozulması üretirdi:
+// üç kolonluk grid'de iki kart 1+1 = 2 kolon doldurur ve lg'de ÜÇÜNCÜ KOLON BOŞ kalırdı.
+// Kart sayısı ile lg kolon sayısı bu bileşende elle eşleniyor — kart eklerken/çıkarırken
+// ikisini BİRLİKTE değiştir (hiçbir kapı bu eşleşmeyi görmüyor, ölçüm yalnız gözle).
 const solutions: SolutionItem[] = [
-  {
-    // Eski değer 'industrial-ventilation'/'duct-type-fans' idi; alt slug DB'de HİÇ yoktu,
-    // yani bu kart migration'dan ÖNCE de kırıktı. Doğru karşılığı: fans/duct-fans.
-    id: 'kitchen',
-    categorySlug: 'fans',
-    subSlug: 'duct-fans',
-    image: '/images/bento/kitchen.jpg',
-    // Span'lar 3 karta uyarlandı: eski düzen 2+1+1+2 = 6 kolon (üç kolonluk grid'de iki TAM
-    // satır) idi. Otopark çıkınca 1+1+2 = 4 kolon kalır ve lg'de satır TAŞAR. Yeni düzen
-    // lg'de üç eşit kart (1+1+1), sm'de her kart tam satır (2) — iki kırılımda da boşluk yok.
-    span: 'sm:col-span-2 lg:col-span-1'
-  },
   {
     // 'air-curtains' artık ALT değil ANA kategori — alt slug verilmez.
     id: 'entrance',
@@ -109,7 +108,7 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
         </div>
 
         <div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6"
         >
           {solutions.map((item, index) => {
             const itemDict = t.items[item.id] || { title: '', eyebrow: '', description: '', point1: '', point2: '' };
