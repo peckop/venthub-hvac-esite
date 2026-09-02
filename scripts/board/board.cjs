@@ -41,6 +41,47 @@ const HEARTBEAT_MIN_INTERVAL_MS = 10 * 60 * 1000
  */
 const ESIK_ADLARI = ['SES_ESIK_DK', 'TESLIM_ESIK_DK', 'TARAMA_ESIK_TUR']
 /**
+ * Yoklamanın EKSENLERİ — TEK KAYNAK. Başlık dizesi ve `--help` metni BUNDAN üretilir;
+ * `board-invariants` kolu ikisini de buna karşı ölçer. Sıra SÜTUN SIRASIDIR.
+ *
+ * ⭐NİÇİN TEK KAYNAK (ölçülmüş vaka, 2026-09-01): eksen adları ÜÇ yerde tekrar ediyordu —
+ * açıklama yorumu, `yoklama()` başlığı ve `--help` metni. #942'de eksen `GOZCU` → `TARAMA`
+ * oldu ve dördüncü eksen `TESLIM` eklendi; başlık güncellendi, **help geride kaldı** ve
+ * günlerce "UC EKSENLI ... GOZCU=duyuyor" dedi. Eski adı yasaklayan konformans kolu bunu
+ * GÖRMEDİ çünkü kol TANIMLAYICI arıyordu, kullanıcıya görünen METNİ ölçmüyordu.
+ * Bu, §23'ün "gösterge doğruydu, adı yanlıştı" sınıfının aynısıdır: **kullanıcıya görünen
+ * metin ölçütün adını TEKRAR ETMEZ, ondan ÜRETİLİR.** Tek satır yamamak kaymayı geri
+ * getirirdi; kaymanın İMKÂNSIZ olması gerekiyordu.
+ *
+ * ⚠`ESIK_ADLARI` ile aynı yerde tanımlıdır ve aynı sebeple: `module.exports` aşağıdaki
+ * fonksiyon tanımlarından ÖNCE gelir, `const` hoist edilmez (TDZ).
+ */
+const EKSENLER = [
+  { ad: 'ATIS', aciklama: 'yasiyor' },
+  { ad: 'TARAMA', aciklama: 'panoyu okuyor' },
+  { ad: 'TESLIM', aciklama: 'bildirim ULASTI' },
+  { ad: 'SES', aciklama: 'uretiyor' },
+]
+/** Eksen sayısının Türkçe sözcüğü — help metni "DORT EKSENLI" derken sayıyı da ÜRETİR. */
+const SAYI_SOZU = { 1: 'TEK', 2: 'IKI', 3: 'UC', 4: 'DORT', 5: 'BES', 6: 'ALTI' }
+
+/** `ATIS=yasiyor, TARAMA=panoyu okuyor, ...` — başlık ve help AYNI bu dizeyi kullanır. */
+function eksenOzeti() {
+  return EKSENLER.map((e) => e.ad + '=' + e.aciklama).join(', ')
+}
+
+/** `--help` metni. Eksen adı/sayısı ELLE YAZILMAZ; `EKSENLER`den üretilir (yukarıdaki vaka). */
+function kullanimMetni() {
+  const sayi = SAYI_SOZU[EKSENLER.length] || String(EKSENLER.length)
+  return [
+    'kullanım: board.cjs <claim|heartbeat|release|note|who|yoklama> --sid X [--lane Y] [--globs "a/**,b/**"] [--exact] [--to Z] [--text "..."]',
+    '  --globs AYIRICISI VIRGUL — bosluk iceren deger REDDEDILIR (tek dev glob hicbir seyle eslesmez).',
+    '  --exact: verilen listeyi KESIN kilar (birlestirme yok) ve KIDEMI KORUR; daraltmak icin release KULLANMA.',
+    'yoklama (rollcall): filonun ' + sayi + ' EKSENLI canlilik fotografi — ' + eksenOzeti() + '. --sid istemez.',
+    '--sid YAZAN fiillerde (claim/heartbeat/release/note) ZORUNLUDUR; CLAUDE_SESSION_ID doluysa oradan okunur.',
+  ].join('\n')
+}
+/**
  * Panoya YAZAN fiiller — kimliksiz koşamazlar (T079-VH, CLI bloğuna bakınız).
  * DIŞA AÇILIR ki bekçi bu listeyi kopyalamak zorunda kalmasın: buraya yeni bir yazan fiil
  * eklenirse kapı onu kendiliğinden kapsar. Kopyalayan bir bekçi, liste büyüdüğünde kör kalır.
@@ -441,6 +482,7 @@ module.exports = {
   append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary,
   notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, sidDogrula,
   taramaDurumu, teslimDurumu, esikleriOku, ESIK_ADLARI,
+  EKSENLER, SAYI_SOZU, eksenOzeti, kullanimMetni,
   globToRegExp, toRepoRelative, repoRootFor,
 }
 
@@ -596,7 +638,7 @@ function yoklama(now = Date.now()) {
 
   const bas =
     'YOKLAMA — ' + hepsi.length +
-    ' serit (ATIS=yasiyor, TARAMA=panoyu okuyor, TESLIM=bildirim ULASTI, SES=uretiyor)'
+    ' serit (' + eksenOzeti() + ')'
 
   const altlar = []
 
@@ -909,10 +951,8 @@ if (require.main === module) {
     // dışarıda bırakırdı. Yazan fiiller kimliksiz koşmaz; okuyan fiiller koşar.
     console.log(yoklama())
   } else {
-    console.log('kullanım: board.cjs <claim|heartbeat|release|note|who|yoklama> --sid X [--lane Y] [--globs "a/**,b/**"] [--exact] [--to Z] [--text "..."]')
-    console.log('  --globs AYIRICISI VIRGUL — bosluk iceren deger REDDEDILIR (tek dev glob hicbir seyle eslesmez).')
-    console.log('  --exact: verilen listeyi KESIN kilar (birlestirme yok) ve KIDEMI KORUR; daraltmak icin release KULLANMA.')
-    console.log('yoklama (rollcall): filonun UC EKSENLI canlilik fotografi — ATIS=yasiyor, GOZCU=duyuyor, SES=uretiyor. --sid istemez.')
-    console.log('--sid YAZAN fiillerde (claim/heartbeat/release/note) ZORUNLUDUR; CLAUDE_SESSION_ID doluysa oradan okunur.')
+    // Eksen adı/sayısı BURADA YAZILMAZ — `kullanimMetni()` onu `EKSENLER`den üretir.
+    // Elle yazıldığı sürece help, eksen değişince sessizce bayatlıyordu (bkz. EKSENLER yorumu).
+    console.log(kullanimMetni())
   }
 }

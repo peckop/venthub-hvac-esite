@@ -89,6 +89,11 @@ interface BoardModule {
   teslimDurumu: (sid: string, now: number) => number | string
   esikleriOku: (cetvelYolu?: string) => Record<string, number> | null
   yoklama: (now?: number) => string
+  /** §23: yoklamanın eksenleri TEK KAYNAK — başlık ve `--help` bundan ÜRETİLİR. */
+  EKSENLER: { ad: string; aciklama: string }[]
+  SAYI_SOZU: Record<number, string>
+  eksenOzeti: () => string
+  kullanimMetni: () => string
 }
 
 /**
@@ -1124,5 +1129,197 @@ describe('INV-BOARD-YOKLAMA-2: TARAMA ≠ TESLIM, eşik cetvelden', () => {
       'Taze not geldiğinde sessizlik alarmı sönmeli; sönmüyorsa ölçüt son notu değil başka ' +
         'bir şeyi okuyor.',
     ).toBe(true)
+  })
+})
+
+/**
+ * INV-BOARD-EKSEN-1 — yoklamanın EKSEN ADLARI tek kaynaktan; başlık ve `--help` ÜRETİLİR.
+ *
+ * ⭐ÖLÇÜLMÜŞ VAKA (2026-09-01/02): #942'de eksen `GOZCU` → `TARAMA` oldu ve dördüncü eksen
+ * `TESLIM` eklendi. Başlık güncellendi, **`--help` geride kaldı** ve günlerce
+ * *"UC EKSENLI ... GOZCU=duyuyor"* dedi — hem SAYI hem AD yanlıştı.
+ *
+ * ⭐NİÇİN MEVCUT KOL GÖRMEDİ: eski adı yasaklayan konformans kolu `gozcuDurumu` gibi bir
+ * TANIMLAYICI arıyordu; `--help` içindeki `GOZCU=duyuyor` bir DİZE literalidir. Kol,
+ * ölçtüğünü sandığı şeyin yalnızca bir yüzünü ölçüyordu. Bu, §23'ün "gösterge doğruydu,
+ * adı yanlıştı" sınıfının aynısıdır — bu kez göstergenin ADI değil, ADI ANLATAN METİN bayattı.
+ *
+ * ⭐NİÇİN TEK SATIR YAMAMADIK: help'i elle düzeltmek kaymayı GERİ GETİRİRDİ (bir sonraki
+ * eksen değişikliğinde aynı üç yer yine ayrışır). Kayma İMKÂNSIZ olmalı: tek `EKSENLER`
+ * listesi, başlık ve help ondan üretilir, ve bu kol üretildiğini ÖLÇER.
+ */
+describe('INV-BOARD-EKSEN-1: eksen adları TEK KAYNAK, başlık ve --help ÜRETİLİR', () => {
+  it('EKSENLER dolu ve her kaydın adı + açıklaması var (liste kendisi ölçülebilir olmalı)', () => {
+    const board = loadBoard(boardDir)
+    expect(Array.isArray(board.EKSENLER) && board.EKSENLER.length > 0).toBe(true)
+    for (const e of board.EKSENLER) {
+      expect(typeof e.ad === 'string' && e.ad.length > 0, `eksen adı boş: ${JSON.stringify(e)}`).toBe(true)
+      expect(
+        typeof e.aciklama === 'string' && e.aciklama.length > 0,
+        `${e.ad} açıklaması boş — help metni "${e.ad}=" yazıp yarım kalırdı`,
+      ).toBe(true)
+    }
+  })
+
+  it('⭐--help HER eksen adını içerir (eksen eklenip help unutulamaz)', () => {
+    const board = loadBoard(boardDir)
+    const help = board.kullanimMetni()
+    const eksik = board.EKSENLER.map((e) => e.ad).filter((ad) => !help.includes(ad))
+    expect(
+      eksik,
+      'Bu eksenler --help metninde YOK. Help elle yazılmış olabilir; EKSENLER listesinden ' +
+        'ÜRETİLMELİ — yoksa eksen değişince help sessizce bayatlar (2026-09-01 vakası).',
+    ).toEqual([])
+  })
+
+  it('⭐--help içindeki SAYI SÖZCÜĞÜ eksen sayısıyla uyuşur (BAĞIMSIZ referansla — tautoloji değil)', () => {
+    const board = loadBoard(boardDir)
+    const help = board.kullanimMetni()
+    // ⚠BAĞIMSIZ REFERANS ZORUNLU (sabotaj S4 ile ölçüldü): beklenen sözcüğü `board.SAYI_SOZU`'ndan
+    // okumak TAUTOLOJİDİR — tablo bozulursa (4:'UC') beklenti DE bozulur ve kol yeşil kalır.
+    // Ölçüt, ölçtüğü tabloyu referans olarak kullanamaz; doğru sayı sözcükleri BURADA durur.
+    const BAGIMSIZ_SAYI: Record<number, string> = { 1: 'TEK', 2: 'IKI', 3: 'UC', 4: 'DORT', 5: 'BES', 6: 'ALTI' }
+    const beklenen = BAGIMSIZ_SAYI[board.EKSENLER.length]
+    expect(beklenen, `Bu testin bağımsız tablosunda ${board.EKSENLER.length} karşılığı YOK — tabloyu genişlet`).toBeTruthy()
+    expect(
+      board.SAYI_SOZU[board.EKSENLER.length],
+      `board.SAYI_SOZU[${board.EKSENLER.length}] bağımsız referansla UYUŞMUYOR: ` +
+        `"${board.SAYI_SOZU[board.EKSENLER.length]}" ≠ "${beklenen}". Sayı sözcüğü tablosu bozuk.`,
+    ).toBe(beklenen)
+    expect(
+      help.includes(beklenen + ' EKSENLI'),
+      `--help "${beklenen} EKSENLI" demiyor. Eksen sayısı ${board.EKSENLER.length} ama metin ` +
+        'başka bir sayı taşıyor — tam olarak 2026-09-01\'deki "UC EKSENLI ama dört eksen" hatası.',
+    ).toBe(true)
+  })
+
+  it('⭐yoklama BAŞLIĞI ile --help AYNI kaynaktan (iki metin ayrışamaz)', () => {
+    const board = loadBoard(boardDir)
+    const ozet = board.eksenOzeti()
+    expect(board.kullanimMetni().includes(ozet), '--help, eksenOzeti() dizesini içermiyor').toBe(true)
+    // ⚠FİKSTÜR, ÖLÇÜLECEK DURUMU ÜRETMEK ZORUNDA (§25): boş panoda yoklama() erken döner
+    // ("panoda talep yok") ve BAŞLIĞI HİÇ BASMAZ — o hâlde bu kol, var olmayan bir metni
+    // arayıp kırmızı verirdi. Başlık ancak en az bir şerit varken üretilir; onu üretiyoruz.
+    board.append('session-eksen', {
+      ts: isoAgo(1000),
+      type: 'claim',
+      lane: 'EKSEN-SINAMA',
+      globs: ['src/eksen-sinama/**'],
+    })
+    expect(
+      board.yoklama().includes(ozet),
+      'yoklama başlığı eksenOzeti() dizesini içermiyor. Başlık ile help AYRI yazılmışsa biri ' +
+        'güncellenip diğeri bayatlar — bu değişmezin tam kapatmak istediği durum.',
+    ).toBe(true)
+  })
+
+  it('⭐LİSTE BEYAN, SATIR GERÇEK: yoklama şerit satırı HER eksen adını basar', () => {
+    // ⚠SABOTAJ S3 BU KOLU DOĞURDU: `EKSENLER`den TESLIM silindiğinde her şey TUTARLI kalıyordu
+    // (liste 3, sayı UC, adlar geçiyor) — çünkü listenin yoklamanın GERÇEKTEN bastığı sütunlarla
+    // bağı hiç ölçülmüyordu. Liste bir BEYANDIR; şerit satırı GERÇEKTİR. İkisi ayrışırsa
+    // yoklama, adı ilan edilmemiş bir sütun basar ya da ilan edilmiş bir eksen hiç görünmez.
+    const board = loadBoard(boardDir)
+    board.append('session-satir', {
+      ts: isoAgo(1000),
+      type: 'claim',
+      lane: 'SATIR-SINAMA',
+      globs: ['src/satir-sinama/**'],
+    })
+    const satirlar = board.yoklama().split('\n')
+    const seritSatiri = satirlar.find((s) => s.includes('SATIR-SINAMA'))
+    expect(seritSatiri, 'yoklama çıktısında şerit satırı bulunamadı — fikstür durumu üretmedi').toBeTruthy()
+    const gorunmeyen = board.EKSENLER.map((e) => e.ad).filter((ad) => !(seritSatiri ?? '').includes(ad))
+    expect(
+      gorunmeyen,
+      `Bu eksenler ilan edilmiş ama şerit satırında BASILMIYOR: ${gorunmeyen.join(', ')}. ` +
+        'EKSENLER listesi ile yoklamanın gerçek sütunları AYRIŞMIŞ — biri beyan, diğeri davranış.',
+    ).toEqual([])
+
+    // ⚠TERS YÖN, BAĞIMSIZ REFERANSLA (sabotaj S3 bunu doğurdu): yukarıdaki kol yalnız
+    // "listedeki her ad satırda var mı" der. Listeden bir eksen SİLİNİRSE liste küçülür,
+    // kalanlar hâlâ satırdadır ve kol YEŞİL kalır — kayma tam da bu yönde olur. O yüzden
+    // beklenen eksen KÜMESİ burada, ölçülen tablodan BAĞIMSIZ olarak durur. Yeni bir eksen
+    // eklemek bu satırı da güncellemeyi gerektirir; bu sürtünme KASITLIDIR — eksen kümesi
+    // §23'te hükme bağlı bir karardır, sessizce değişmemeli.
+    const BEKLENEN_EKSENLER = ['ATIS', 'TARAMA', 'TESLIM', 'SES']
+    const ilanEdilenler = board.EKSENLER.map((e) => e.ad)
+    const kaybolan = BEKLENEN_EKSENLER.filter((ad) => !ilanEdilenler.includes(ad))
+    expect(
+      kaybolan,
+      `Bu eksenler EKSENLER listesinden DÜŞMÜŞ: ${kaybolan.join(', ')}. Yoklamanın eksen kümesi ` +
+        '§23 ile hükme bağlıdır; bir eksen kaldırılacaksa cetvel ve bu kol birlikte güncellenir. ' +
+        'Sessiz düşüş, ölçülen bir sağırlık boyutunun sessizce ölçülmez olması demektir.',
+    ).toEqual([])
+  })
+
+  it('⭐KAYNAKTA eski eksen adı ve elle yazılmış sayı YOK (yorumlar hariç — orada AÇIKLANIR)', () => {
+    // Bu kol modülü YÜKLEMEZ: ölçtüğü şey çalışma zamanı davranışı değil, KAYNAK METNİ.
+    // Yasak, adın KULLANIMINA konur; adın ANLATILDIĞI yorum serbesttir. Ayrım yapılmazsa
+    // ya kol kendi gerekçesini yasaklar ya da yasak hiç konamaz (fleet-mechanism-integrity
+    // aynı `yorumsuz` desenini kullanır).
+    const kaynak = fs.readFileSync(BOARD_MODULE_PATH, 'utf8')
+    const kod = kaynak.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1')
+    expect(
+      /GOZCU\s*=/.test(kod),
+      'Kaynak KODda "GOZCU=" geçiyor. Eksen #942\'de TARAMA oldu; kullanıcıya görünen metinde ' +
+        'eski ad kalmışsa gösterge doğru, adı yanlış demektir (§23).',
+    ).toBe(false)
+    expect(
+      /(UC|IKI|DORT|BES)\s+EKSENLI/.test(kod),
+      'Kaynak KODda eksen sayısı ELLE yazılmış. Sayı SAYI_SOZU[EKSENLER.length] ile ÜRETİLMELİ; ' +
+        'elle yazılan sayı eksen eklenince bayatlar.',
+    ).toBe(false)
+  })
+
+  it('⭐AYIRT EDİCİ: eksen listesi değişirse help DE değişir (üretildiğinin kanıtı)', () => {
+    const board = loadBoard(boardDir)
+    // Tek yönlü kol yetmez: help'i sabit bir literal döndüren bir uygulama da yukarıdaki
+    // "her ad geçiyor" kolunu BUGÜNKÜ listeyle geçerdi. Ayırt edici soru: liste değişince
+    // metin DE değişiyor mu? Bu kol onu gerçekten listeyi değiştirerek ölçer.
+    const oncekiHelp = board.kullanimMetni()
+    const oncekiOzet = board.eksenOzeti()
+    const yedek = board.EKSENLER.slice()
+    try {
+      board.EKSENLER.push({ ad: 'ZZTEST', aciklama: 'sinama ekseni' })
+      const yeniHelp = board.kullanimMetni()
+      expect(yeniHelp.includes('ZZTEST'), 'Eksen eklendi ama --help onu göstermedi: metin ÜRETİLMİYOR.').toBe(true)
+      // ⚠SABOTAJ S2 BU SATIRLARI DOĞURDU: başlığı literal yapmak BUGÜN aynı dizeyi verdiği için
+      // "içeriyor" kolunu geçiyordu. Ayırt edici soru başlık için de sorulmalı: liste değişince
+      // BAŞLIK da değişiyor mu? Değişmiyorsa başlık dondurulmuş bir kopyadır ve yarın ayrışır.
+      expect(
+        board.eksenOzeti().includes('ZZTEST'),
+        'Eksen eklendi ama eksenOzeti() onu göstermedi — özet ÜRETİLMİYOR.',
+      ).toBe(true)
+      expect(
+        board.eksenOzeti() === oncekiOzet,
+        'Liste değişti ama eksenOzeti() AYNI kaldı: özet dondurulmuş literal göstergesi.',
+      ).toBe(false)
+      // ⚠ASIL ÖLÇÜT BAŞLIĞIN KENDİSİ: S2 `eksenOzeti()`'ni bozmadı, başlığın onu KULLANMASINI
+      // bozdu (literal yazdı). Fonksiyonu ölçmek yetmez — başlığın o fonksiyondan ÜRETİLDİĞİ
+      // ölçülür. Başlık ancak şerit varken basılır, o yüzden durumu üretiyoruz.
+      board.append('session-ayirt', {
+        ts: isoAgo(1000),
+        type: 'claim',
+        lane: 'AYIRT-SINAMA',
+        globs: ['src/ayirt-sinama/**'],
+      })
+      expect(
+        board.yoklama().includes('ZZTEST'),
+        'Eksen eklendi ama yoklama BAŞLIĞI onu göstermedi: başlık eksenOzeti()\'nden ÜRETİLMİYOR, ' +
+          'dondurulmuş bir literal taşıyor. Bugün aynı dizeye eşit olsa bile yarın ayrışır.',
+      ).toBe(true)
+      const yeniSayi = board.SAYI_SOZU[yedek.length + 1]
+      if (yeniSayi) {
+        expect(
+          yeniHelp.includes(yeniSayi + ' EKSENLI'),
+          `Eksen sayısı ${yedek.length + 1} oldu ama --help "${yeniSayi} EKSENLI" demiyor: sayı da üretilmeli.`,
+        ).toBe(true)
+      }
+      expect(yeniHelp === oncekiHelp, 'Liste değişti ama --help AYNI kaldı — sabit literal göstergesi.').toBe(false)
+    } finally {
+      board.EKSENLER.length = 0
+      board.EKSENLER.push(...yedek)
+    }
+    expect(board.kullanimMetni(), 'Sınama sonrası liste eski hâline dönmedi.').toBe(oncekiHelp)
   })
 })
