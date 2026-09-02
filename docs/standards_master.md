@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-02T07:11:47.624477+00:00
+compiled_at: 2026-09-02T07:46:06.447826+00:00
 total_compiled_files: 64
-source_commit: 91883ce8
+source_commit: 42d09147
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9764,6 +9764,58 @@ bu — **bir KAPININ İÇİNDE, bütün şeritleri etkileyerek**. İlk üçü ö
 düzeltildi; bu dördüncüsü **günde iki kez sahada** öttü ve testler yeşil kaldı.
 **Hüküm: Türkçe metinle çalışan her eşleştirme ASCII-katlanmış metne karşı koşar.**
 Ve yanlış alarm ucuz değildir: **yanlış alarm veren kapı, bir süre sonra okunmayan kapıdır.**
+
+
+---
+
+## 26. KULLANICIYA GÖRÜNEN METİN, ÖLÇÜTÜN ADINI TEKRAR ETMEZ — ONDAN ÜRETİLİR
+
+**Ölçülmüş vaka (2026-09-01/02):** §23 ile yoklamanın ekseni `GOZCU` → `TARAMA` oldu ve
+dördüncü eksen `TESLIM` eklendi. Başlık güncellendi; **`--help` geride kaldı** ve günlerce
+*"UC EKSENLI … GOZCU=duyuyor"* dedi — hem **sayı** hem **ad** yanlıştı. Eski adı yasaklayan
+konformans kolu bunu görmedi: kol bir **tanımlayıcı** (`gozcuDurumu`) arıyordu, help içindeki
+`GOZCU=duyuyor` ise bir **dize literali**.
+
+Bu, §23'ün *"gösterge doğruydu, adı yanlıştı"* sınıfının bir adım ilerisi: burada göstergenin
+adı da doğruydu, **adı ANLATAN METİN** bayattı.
+
+### ⭐HÜKÜM — ad üç yerde tekrar ediyorsa üç yerde ayrışır
+
+Eksen adları açıklama yorumunda, başlık dizesinde ve help metninde ayrı ayrı yazılıydı; tek
+kaynak yoktu. Tek satırı yamamak kaymayı **geri getirirdi**. Doğru onarım kaymayı
+**imkânsız** kılar: tek `EKSENLER` listesi, başlık ve help ondan üretilir, ve bir kol
+**üretildiğini** ölçer. Yasak metne de genişletilir — `yorumsuz` kaynakta `GOZCU=` ve elle
+yazılmış eksen sayısı aranır, çünkü adın **anlatıldığı** yorum serbest, **kullanıldığı** yer
+değildir.
+
+### ⭐ÖLÇÜT, ÖLÇTÜĞÜ TABLOYU REFERANS OLARAK KULLANAMAZ (tautoloji)
+
+İlk yazımda kol, beklenen sayı sözcüğünü `board.SAYI_SOZU`'ndan okuyordu. Sabotaj tabloyu
+bozdu (`4: 'UC'`) ve **kol yeşil kaldı**: bozulan tablo hem ölçülen hem referanstı, ikisi
+birlikte kaydı. Doğru kurulum, beklenen değerin **testin içinde bağımsız** durmasıdır.
+Bu, ölçüm disiplininin genel biçimidir: *bir şeyi kendisiyle karşılaştırmak ölçüm değildir.*
+
+### ⭐LİSTE BEYAN, SATIR GERÇEK — ve ters yön ayrıca ölçülür
+
+`EKSENLER`den `TESLIM` silindiğinde her şey **tutarlı** kaldı: liste üç, sayı `UC`, adların
+hepsi satırda. Çünkü kol yalnız *"listedeki her ad basılıyor mu"* diyordu — **liste ⊆ satır**.
+Kayma tam ters yönde olur: bir eksen listeden düşer, kalanlar hâlâ basılır, kol yeşil kalır ve
+**ölçülen bir sağırlık boyutu sessizce ölçülmez olur.** Bu yüzden beklenen eksen **kümesi** de
+bağımsız durur. Yeni eksen eklemek o satırı güncellemeyi gerektirir; bu sürtünme **kasıtlıdır**
+— eksen kümesi §23'te hükme bağlı bir karardır, sessizce değişmemeli.
+
+### ⭐SABOTAJ TEZGÂHININ KENDİ BEKLENTİSİ DE BİR ÖLÇÜTTÜR
+
+S3 düzeltildikten sonra tezgâh onu *"YANLIS KOL"* diye raporladı: kapı **doğru sebeple**
+kırmızıydı, tezgâhın beklenti deseni yeni kolun adını kapsamıyordu. Yani sabotaj raporu da
+yanlış olabilir — *"yeşil geçti"* ile *"beklediğim kol düşmedi"* ayrı sonuçlardır ve ikisi
+ayrı ayrı okunur.
+
+### Fikstür, ölçülecek durumu ÜRETMEK zorunda (§25'in bu işteki tekrarı)
+
+Başlığı ölçen ilk kol kırmızı verdi: **boş panoda** `yoklama()` erken dönüyor
+(*"panoda talep yok"*) ve **başlığı hiç basmıyor**. Kol var olmayan bir metni arıyordu.
+Başlık ancak en az bir şerit varken üretilir; fikstür onu üretmek zorundadır.
 
 
 ---
