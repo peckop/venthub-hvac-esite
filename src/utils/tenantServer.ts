@@ -44,6 +44,22 @@ export const DEFAULT_TENANT_CONFIG: TenantConfig = {
   },
 };
 
+/**
+ * Fetches and returns the configuration for the current tenant in a Next.js Server Component environment.
+ * Extracts the tenant ID from the 'x-tenant-id' HTTP header (typically set by middleware).
+ * Fallbacks to a default configuration if the header is missing, the tenant is inactive, or a fetch error occurs.
+ * The result is cached per request using React's cache.
+ *
+ * @returns A promise that resolves to the TenantConfig object containing features, styles, and metadata
+ * @throws {never} This function catches and suppresses database/header errors, always returning a valid config
+ *
+ * @example
+ * // Inside a Server Component
+ * const tenantConfig = await getTenantConfig()
+ * if (tenantConfig.features.viewer3d) {
+ *   // render 3D viewer
+ * }
+ */
 export const getTenantConfig = cache(async function getTenantConfig(): Promise<TenantConfig> {
   let tenantId: string | null = null;
   

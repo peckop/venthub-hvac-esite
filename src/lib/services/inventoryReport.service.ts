@@ -10,6 +10,21 @@ const movementQueryFn = (supabase: SupabaseClient<Database>) => supabase
 
 export type InventoryMovementRow = QueryData<ReturnType<typeof movementQueryFn>>[number]
 
+/**
+ * Fetches inventory movements within an optional date range.
+ * Results are ordered by creation date descending (newest first).
+ *
+ * @param supabase - The Supabase client instance
+ * @param params - Optional date range filters (`from` and `to` dates)
+ * @returns A promise that resolves to an array of inventory movement records including joined product names
+ * @throws {PostgrestError} If a database error occurs
+ *
+ * @example
+ * const movements = await getInventoryMovements(supabase, {
+ *   from: new Date('2024-01-01'),
+ *   to: new Date('2024-12-31')
+ * })
+ */
 export async function getInventoryMovements(
   supabase: SupabaseClient<Database>,
   params: { from?: Date; to?: Date }
