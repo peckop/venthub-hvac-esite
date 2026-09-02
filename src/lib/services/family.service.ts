@@ -64,6 +64,13 @@ export interface FamilyVariant {
   id: string
   sku: string
   name: string
+  /**
+   * REC-110: varyant adı çevirileri (`products.name_i18n`). RPC bunu DÖNDÜRMEZ
+   * (`'name', p.name` — ham kolon); `getFamilyDetail` id kümesi için tek ek sorguyla
+   * gömer. Aile tarafıyla AYNI desen: alan yalnız TAŞINIR, çözümü render anında
+   * `getProductDisplayName(variant, family, lang)` yapar.
+   */
+  name_i18n?: { tr?: string | null; en?: string | null } | null
   slug: string | null
   model_code: string | null
   price: number | null
@@ -172,7 +179,32 @@ export async function getFamilyDetail(
   // doğar — bkz. plan §3) alan burada gömülür: kategori satırlarıyla BİREBİR aynı desen.
   detail.family.name_i18n = await getAileAdCevirisi(supabase, detail.family.id)
 
+  // REC-110: VARYANT AD ÇEVİRİLERİ — aile adıyla birebir aynı gerekçe ve desen. RPC ham
+  // `p.name` döndürüyor; `products.name_i18n` (20260901155000) tek `in` sorgusuyla gömülür.
+  // Varyant yoksa hiç sorgu atılmaz.
+  if (detail.variants.length > 0) {
+    const cevirById = await getVaryantAdCevirileri(
+      supabase,
+      detail.variants.map((v) => v.id)
+    )
+    for (const v of detail.variants) v.name_i18n = cevirById.get(v.id) ?? null
+  }
+
   return detail
+}
+
+/** `products.name_i18n` — varyant id kümesi için (PDP yolu). Tek sorgu, harita döner. */
+async function getVaryantAdCevirileri(
+  supabase: SupabaseClient<Database>,
+  ids: string[]
+): Promise<Map<string, { tr?: string | null; en?: string | null } | null>> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('id, name_i18n')
+    .in('id', ids)
+
+  if (error) throw error
+  return new Map((data ?? []).map((r) => [r.id, asAdCevirisi(r.name_i18n)]))
 }
 
 /** `product_families.name_i18n` — tek aile için (PDP yolu). Satır yoksa `null`. */

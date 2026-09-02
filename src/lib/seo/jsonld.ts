@@ -15,6 +15,7 @@
  */
 
 import type { FamilyListItem } from '../../types/ui-models'
+import { getProductDisplayName } from '../../utils/productHelpers'
 import { familyName } from '../i18n/familyName'
 import { storagePathToUrl } from '../images/productImage'
 import { quoteModeHesapla } from '../pricing/quoteMode'
@@ -75,9 +76,12 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
 
   const hasVariant = variants.map((variant) => {
     const imagePath = variant.images[0]?.path
+    // REC-110: ham `variant.name` YAZILMAZ — bu düğüm arama motoruna gider ve /en
+    // sayfasının JSON-LD'si Türkçe ad taşıyordu (SEO'ya dil sızıntısı, #936'daki fiyat
+    // sızıntısının kardeşi). Vitrinle AYNI çözücü, ayrı bir kopya değil.
     const productNode: Record<string, unknown> = {
       '@type': 'Product',
-      name: variant.name,
+      name: getProductDisplayName(variant, family, lang),
       sku: variant.sku,
       mpn: variant.model_code ?? variant.sku,
     }
