@@ -44,14 +44,52 @@ import pg from 'pg'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const REPO_KOK = path.join(__dirname, '..', '..')
 
-/** `catalog-integrity.mjs` ile AYNI çözüm — kopya değil, aynı tuzağın aynı cevabı. */
-function resolveTls() {
-  const caPath = process.env.PGSSLROOTCERT
-  if (!caPath) return { rejectUnauthorized: true }
+/** Depodaki doğrulanmış kök sertifika — `PGSSLROOTCERT` verilmediğinde kullanılır. */
+export const VARSAYILAN_CA = path.join(REPO_KOK, 'scripts', 'db', 'checks', 'supabase-root-2021-ca.pem')
+
+/**
+ * TLS kökünü çözer.
+ *
+ * ⭐NİÇİN VARSAYILANA DÜŞÜYOR (2026-09-04, ALTYAPI hükmü + ölçüm):
+ * Ev geleneği (`catalog-integrity.mjs`) bilerek düşmüyordu ve gerekçesi yazılıydı:
+ * *"sessizce sistem deposuna düşmek YANLIŞ olurdu — hata mesajı o zaman sertifikayı değil
+ * SUNUCUYU suçlar ve saatler kaybettirir."* O gerekçe doğru, ama **başka bir şeyi**
+ * anlatıyor: sistem güven deposuna düşmeyi. Buradaki varsayılan sistem deposu değil,
+ * **depoda duran tek ve doğrulanmış bir dosya**.
+ *
+ * Ayırt edici soru şu: varsayılan, **doğru davranışı** mı kolaylaştırıyor yoksa **yanlış
+ * bir varsayımı** mı gizliyor? Cevap birincisi — ve bedeli ölçüldü: 2026-09-04'te bu
+ * değişken unutulduğu için iki koşum yandı, biri canlı iş akışıydı.
+ *
+ * ⚠**SESSİZ DEĞİL.** Hangi kökün kullanıldığı **her koşuda basılır**. Böylece ev
+ * geleneğinin korktuğu şey (hata mesajının yanlış yeri suçlaması) olmaz: satır zaten
+ * hangi CA'nın devrede olduğunu söyler.
+ *
+ * ⚠**FAIL-CLOSED korunur:** dosya PEM değilse (bozuk/kırpılmış) hata fırlatılır —
+ * varsayılana düşmek, bozuk bir köke sessizce güvenmek DEĞİLDİR.
+ */
+export function resolveTls() {
+  const verilen = process.env.PGSSLROOTCERT
+  const caPath = verilen || VARSAYILAN_CA
+
+  if (!verilen) {
+    if (!fs.existsSync(caPath)) {
+      // Varsayılan da yoksa: sistem deposuna sessizce düşmüyoruz, DURUYORUZ.
+      throw new Error(
+        `PGSSLROOTCERT verilmedi ve depodaki varsayilan CA bulunamadi: ${caPath}\n` +
+          'Sistem guven deposuna sessizce dusulmuyor — o halde hata mesaji sertifikayi degil ' +
+          'sunucuyu suclar.',
+      )
+    }
+    console.error(`katalog-sayim: PGSSLROOTCERT verilmedi — depodaki varsayilan CA kullanildi (${caPath})`)
+  } else {
+    console.error(`katalog-sayim: kok sertifika PGSSLROOTCERT'ten alindi (${caPath})`)
+  }
+
   const provided = fs.readFileSync(caPath, 'utf8')
   const blocks = (provided.match(/-----BEGIN CERTIFICATE-----/g) ?? []).length
   if (blocks === 0) {
-    throw new Error(`PGSSLROOTCERT bir PEM sertifikasi degil (BEGIN CERTIFICATE blogu yok, ${provided.length} bayt).`)
+    throw new Error(`Kok sertifika bir PEM degil (BEGIN CERTIFICATE blogu yok, ${provided.length} bayt): ${caPath}`)
   }
   return { ca: [...tls.rootCertificates, provided], rejectUnauthorized: true }
 }
@@ -214,7 +252,18 @@ async function main() {
   }
 }
 
-main().catch((e) => {
-  console.error('katalog-sayim: HATA —', e.message)
-  process.exit(1)
-})
+/**
+ * YALNIZ doğrudan çalıştırıldığında koşar.
+ *
+ * NİÇİN: bu modül artık `resolveTls`'i dışa açıyor ve kapı onu **import ederek** ölçüyor.
+ * Koruma olmasaydı import anında `main()` çalışır, prod'a bağlanmaya kalkar ve testi
+ * ölçtüğü şeyden bağımsız biçimde düşürürdü — kapının kendisi yan etki üretemez.
+ */
+const dogrudanCalistirildi = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])
+
+if (dogrudanCalistirildi) {
+  main().catch((e) => {
+    console.error('katalog-sayim: HATA —', e.message)
+    process.exit(1)
+  })
+}
