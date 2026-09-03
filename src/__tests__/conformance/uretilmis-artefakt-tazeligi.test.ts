@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
+import { createRequire } from 'node:module'
 
 import { describe, expect, it } from 'vitest'
 
@@ -46,6 +47,32 @@ import { describe, expect, it } from 'vitest'
  */
 
 const ARTEFAKT_MANIFESTI = 'docs/artefakt_manifest.json'
+
+/**
+ * Repo kökü GİT'TEN türetilir, sabit yol YAZILMAZ (depo PUBLIC; `INV-MUTLAK-YOL-1`).
+ * `cwd`'ye de güvenilmez: kabuk sessizce ana dizine kayabiliyor (§28, altı ölçülmüş vaka).
+ */
+function repoKoku(): string {
+  return execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
+}
+
+/** Dondurulmuş modun TEK KAYNAĞI (§26) — bu dosya onun tüketicisi. */
+const sayimModulu = createRequire(import.meta.url)(
+  `${repoKoku()}/scripts/hijyen/artefakt-bayatlik-sayim.cjs`,
+) as {
+  olc: (o?: { kok?: string }) => {
+    bayat: Array<{ artefakt: string; degisen: string[]; silinen: string[] }>
+    artefaktSayisi: number
+    kaynakSayisi: number
+    olculdu: boolean
+    sebep?: string
+  }
+  sayimCekirdegi: (g: {
+    manifest: { artefaktlar?: Array<{ yol?: string; kaynak?: { dosyalar?: Record<string, string> } }> } | null
+    bloblar: Map<string, string>
+  }) => { artefaktSayisi: number; kaynakSayisi: number; olculdu: boolean }
+  ozetSatiri: (b: { olculdu: boolean; artefaktSayisi: number; kaynakSayisi: number; sebep?: string }) => string
+}
 
 function git(args: string[]): string {
   return execFileSync('git', args, {
@@ -306,7 +333,98 @@ describe('INV-DOC-4b · Kapı A ikinci ayak — kaynak derlemeden sonra DEĞİŞ
   const manifest = manifestOku()
   const bloblar = headBlobHaritasi()
 
-  it('⭐derlemeye giren her kaynak, manifestteki blob SHA ile AYNI', () => {
+  /**
+   * ⭐DONDURULMUŞ MOD (REC-132 · D1, Recep/OPS kararı 2026-09-04) — BLOKLAMAZ, SAYAR.
+   *
+   * NİÇİN: bu kol her şeridin PR'ında üretilmiş toplamaların yol almasını zorunlu kılıyordu.
+   * Ölçüldü (2026-09-03/04): **yedi** taban tazelemesi, her biri tam bir CI koşumu; ve İKİ
+   * PR'da kapılar **hiç doğmadı**, çünkü çakışık PR'ın birleşme ref'i üretilemiyor. Yani
+   * sınıf yalnız zaman yakmıyor, **sahte yeşil** de üretiyor.
+   *
+   * ⚠KAPI SİLİNMEDİ, EŞİK UZATILMADI. Ölçüm sürüyor; yalnız bloklamıyor. Bir kapıyı kapatmak
+   * ölçümü susturmak değildir (§21: kabul edilen boşluk sessiz olamaz). C4'te (companion)
+   * aynı biçim uygulandı.
+   *
+   * ⚠DONDURULAN KOL YALNIZ BU: "kaynak derlemeden sonra değişti mi" (parity). Bu describe'ın
+   * DİĞER İKİ kolu (izlenmeyen kaynak + vacuous-guard) ve **AXIOM 3 kolu** — INV-DOC-4
+   * içindeki *"depodaki artefaktın içeriği manifestteki özetle AYNI"* — **BLOKLAMAYA DEVAM
+   * EDER.** Üretilmiş dosyayı elle düzenlemek hâlâ KIRMIZIDIR.
+   *
+   * (Bu ayrımı bir plan-challenger buldu: ilk planım "INV-DOC-4b'nin İKİ kolu var" diyordu;
+   * ÜÇ kolu var ve üçü de kaynak tarafında, elle-düzenleme kolu başka bir değişmezin içinde.
+   * Yanlış kolu dondurmak kapıyı SESSİZCE BOŞALTIRDI.)
+   *
+   * §26 TEK KAYNAK: sayı `scripts/hijyen/artefakt-bayatlik-sayim.cjs`ten gelir; bu kol onun
+   * TÜKETİCİSİDİR ve kendi BAĞIMSIZ hesabıyla çapraz doğrular — paylaşılan tek uygulama iki
+   * yönde birden yanılabilir.
+   */
+  it('⭐DONDURULMUŞ MOD: parity BLOKLAMAZ ama SAYAR, ve sayı MODÜLDEN gelir (§26)', () => {
+    const olcum = sayimModulu.olc({ kok: repoKoku() })
+    expect(
+      olcum.olculdu,
+      `bayatlık ÖLÇÜLEMEDİ (${olcum.sebep ?? ''}) — ölçememek geçmek DEĞİLDİR; ` +
+        'dondurulmuş mod "ölçmüyorum" demek değil, "bloklamıyorum" demektir',
+    ).toBe(true)
+
+    // BAĞIMSIZ HESAP — modülün dediğini tekrar etmek tautoloji olurdu.
+    const bagimsiz: string[] = []
+    for (const a of manifest?.artefaktlar ?? []) {
+      const kayitli = a.kaynak?.dosyalar ?? {}
+      let sapan = 0
+      for (const [yol, sha] of Object.entries(kayitli)) {
+        if (bloblar.get(yol) !== sha) sapan += 1
+      }
+      if (sapan > 0) bagimsiz.push(a.yol)
+    }
+    expect(
+      olcum.artefaktSayisi,
+      `Modülün sayısı (${olcum.artefaktSayisi}) ile bu testin bağımsız hesabı ` +
+        `(${bagimsiz.length}) AYRIŞIYOR — tek kaynak iddiası çökmüş demektir.`,
+    ).toBe(bagimsiz.length)
+
+    // Kabul edilen boşluk SESSİZ olamaz: sayım her koşuda görünür.
+    process.stdout.write('[INV-DOC-4b] ' + sayimModulu.ozetSatiri(olcum) + '\n')
+  })
+
+  it('⭐SAYIM AYIRT EDER: bayat kaynak eklenince sayı ARTAR (kelime değil SAYI ölçülür)', () => {
+    // Saf çekirdek fikstürü — durumu ÜRETİR, depoda bayat dosya bulunmasına GÜVENMEZ (§25).
+    const temizManifest = {
+      artefaktlar: [{ yol: 'docs/a_master.md', kaynak: { dosyalar: { 'src/x.ts': 'aaa' } } }],
+    }
+    const temizBloblar = new Map([['src/x.ts', 'aaa']])
+    const temiz = sayimModulu.sayimCekirdegi({ manifest: temizManifest, bloblar: temizBloblar })
+    expect(temiz.artefaktSayisi, 'eşleşen kaynak bayat sayıldı — yanlış alarm').toBe(0)
+
+    const bayatBloblar = new Map([['src/x.ts', 'bbb']])
+    const bayatOlcum = sayimModulu.sayimCekirdegi({
+      manifest: temizManifest, bloblar: bayatBloblar,
+    })
+    expect(bayatOlcum.artefaktSayisi, 'kaynak değişti ama sayı ARTMADI').toBe(1)
+    expect(bayatOlcum.kaynakSayisi, 'kaynak sayısı taşınmıyor').toBe(1)
+
+    // SİLİNEN kaynak da bayatlıktır — ayrı yön, ayrı ölçüm.
+    const silinmis = sayimModulu.sayimCekirdegi({ manifest: temizManifest, bloblar: new Map() })
+    expect(silinmis.artefaktSayisi, 'silinen kaynak bayatlık saymadı').toBe(1)
+
+    // Özet satırı SAYIYI taşır — sabit metin sabotajı burada yakalanır.
+    expect(
+      sayimModulu.ozetSatiri(bayatOlcum),
+      'Özet satırı sayıyı taşımıyor. Sabit metin, sayaç bozulsa bile aynı kalır ve ' +
+        'ayırt etmeyen gösterge ölçüm değildir.',
+    ).toMatch(/\b1 artefakt\b/)
+    expect(sayimModulu.ozetSatiri(temiz), 'bayat YOK hâli ayrı yazılmıyor').toMatch(/YOK/)
+  })
+
+  it('ÖLÇEMEMEK GEÇMEK DEĞİL: manifest okunamazsa "bayat yok" DENMEZ', () => {
+    const yok = sayimModulu.sayimCekirdegi({ manifest: null, bloblar: new Map() })
+    expect(yok.olculdu, 'manifest yokken ölçülmüş gibi döndü').toBe(false)
+    expect(
+      sayimModulu.ozetSatiri(yok),
+      '"ölçemedim" ile "bayat yok" aynı cümleye düşmüş — iki AYRI cevap',
+    ).toMatch(/OLCULEMEDI/)
+  })
+
+  it('kaynak parity dökümü (bilgi — dondurulmuş modda bloklamaz)', () => {
     // ⭐NİÇİN BLOB SHA, ATA-SOY DEĞİL — ÖLÇÜLDÜ (2026-08-26):
     // Depolar SQUASH MERGE kullanıyor; dal commit'leri master geçmişine HİÇ
     // girmiyor. `feat/t020-kume-masterlari` ucu `cd2cd16` içeriğiyle master'a
@@ -333,12 +451,21 @@ describe('INV-DOC-4b · Kapı A ikinci ayak — kaynak derlemeden sonra DEĞİŞ
         bayat.push(`  · ${a.yol} (${degisen.length} kaynak):\n${degisen.slice(0, 10).join('\n')}`)
       }
     }
-    expect(
-      bayat,
-      `Şu artefaktların kaynakları derlemeden SONRA değişmiş — artefakt BAYAT:\n` +
-        bayat.join('\n') +
-        `\n\nÇÖZÜM:\n  orion doc build\n  git add docs/*_master.md ${ARTEFAKT_MANIFESTI}`,
-    ).toEqual([])
+    // ⚠BLOKLAMAZ (dondurulmuş mod). Döküm yine BASILIR: kabul edilen boşluk sessiz olamaz.
+    // Sayının kendisi ve ayırt ediciliği ÜSTTEKİ iki kolda ölçülüyor; bu kol yalnız İNSANA
+    // hangi dosyaların bayat olduğunu gösterir.
+    if (bayat.length) {
+      process.stdout.write(
+        `[INV-DOC-4b · dondurulmus mod] kaynaklari derlemeden SONRA degisen artefaktlar:\n` +
+          bayat.join('\n') +
+          `\n  ELLE TAZELEME: orion doc build --force-sync; git add docs/*_master.md ` +
+          `${ARTEFAKT_MANIFESTI}\n  ⭐DURMA OLCUTU: "diff bos" DEGIL, bu kapinin YESILI. ` +
+          `Bu zincir byte duzeyinde sabit noktaya HIC ulasmaz (compiled_at + source_commit ` +
+          `her kosumda degisir) — URUN bunu 2026-09-04'te bedel odeyerek olctu.\n`,
+      )
+    }
+    // Kolun kendisi bir şey İDDİA ETMELİ, yoksa boş bir `it` olur ve sessizce ölür.
+    expect(Array.isArray(bayat), 'döküm üretilemedi — kol hiçbir şey ölçmüyor').toBe(true)
   })
 
   it('manifest derleme anında İZLENMEYEN kaynak taşımıyor', () => {

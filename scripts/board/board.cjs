@@ -757,6 +757,25 @@ function yoklama(now = Date.now()) {
     )
   }
 
+  /**
+   * ARTEFAKT BAYATLIK SAYIMI — REC-132 D1: kapi DONDURULDU, olcum SURUYOR.
+   *
+   * NICIN PANODA: uretim dondurulunca bayatlik artik CI'da kirmizi vermiyor. Gorunurlugu
+   * hicbir yere yazmazsak "kabul edilen boskuk" SESSIZLESIR ve s21'in yasagina duseriz.
+   * Kapiyi kapatmak olcumu susturmak DEGILDIR; bu satir borcun kac oldugunu her yoklamada
+   * soyler. Metin sayimdan URETILIR (s26 tek kaynak), burada TEKRAR YAZILMAZ.
+   */
+  try {
+    const bayatlik = require('../hijyen/artefakt-bayatlik-sayim.cjs')
+    altlar.push(
+      '  ' + bayatlik.ozetSatiri(bayatlik.olc({ kok: repoRootFor(__filename) || undefined })))
+  } catch (e) {
+    altlar.push(
+      '  artefakt bayatligi OLCULEMEDI (' + String((e && e.message) || e).slice(0, 90) + ')' +
+      '\n  Olcememek gecmek DEGILDIR.',
+    )
+  }
+
   return bas + '\n' + satirlar.join('\n') + '\n' + altlar.join('\n')
 }
 

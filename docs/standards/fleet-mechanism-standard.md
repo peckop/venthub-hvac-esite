@@ -2054,3 +2054,42 @@ birleşiminde uyarır ve **sayar**, diğer iki hâlde sessiz kalır (iki ayırt 
 ⚠**KAPSAM SINIRI, adıyla:** yeni bir Stop kancası **kaydedilmedi**; ölçüm zaten kayıtlı olan
 kancaya eklendi. Sebep: yeni kanca kaydı `.claude/settings.json` düzenlemek demektir, yani
 **config** — ve bu iş akran iletisiyle geldi. **Config'e akran sözüyle dokunulmaz.**
+
+---
+
+## 29. KARARA GİDEN ÖLÇÜM BETİKTEN GELİR — kaynak gösterilmeyen sayı karar dayanağı değildir
+
+### Niçin kural oldu — bir günde ÜÇ yanlış sayı, üçü de karara girmişti
+
+Ölçüldü (2026-09-04). Aynı gün, üç ayrı şeritte:
+
+1. **"375 ürünün TAMAMI kökte, hiçbir alt dal dolu değil"** — elden atılmış bir sorgu yalnız
+   `category_id`'ye bakmış. Gerçek: atama `subcategory_id`'de yaşıyor ve 375 ürünün **365'i
+   dolu**. Bu sayı üzerine 375 kalemlik bir iş emri açılmıştı; ölçüm düzeltilince iş **sıfıra**
+   indi.
+2. **"624 galeri alt metni bozuk"** — üç ayrı ölçüt üç ayrı cevap verdi (624 / 286 / 904) ve
+   kayıttaki etiket yanlıştı. Prod yazımı planlanmıştı; ölçüm düzeltilince **iptal** edildi.
+3. **"şu iki dosyanın sıfır tüketicisi var"** (benim ölçümüm) — 8 ve 10 dosyada geçiyorlardı.
+   Bu sayı **geri alınamaz** bir işlemi (`git rm --cached`) gerekçelendiriyordu.
+
+Recep'in tepkisi kuralın kendisidir: *"ölçümler hem tekrar hem hatalı, bu nasıl iş."*
+
+### HÜKÜM
+
+1. **Karara giden her sayı bir BETİKTEN gelir.** Elden atılan sorgu ve tek seferlik `grep`
+   yalnız **keşif** aracıdır: bir hipotez kurar, karar dayanağı olamaz.
+2. **Sayısal iddia KAYNAK GÖSTERİR:** hangi betik, hangi çıktı dosyası, hangi tarih. Kaynağı
+   olmayan sayı, karar toplantısına giremez — iş emrine de giremez (kural 1'in KAYNAK/CETVEL
+   bloğunun sayısal karşılığı).
+3. **Aynı soruyu iki ölçüt farklı cevaplıyorsa, cevap "hangisi doğru" değil "ölçüt hangi
+   evreni tarıyor"dur.** Üç ölçütün üç cevap verdiği bir alanda tek sayı raporlamak yanıltmadır.
+4. **Geri alınamaz bir işlemi gerekçelendiren sayı, işlemden HEMEN ÖNCE yeniden ölçülür.**
+   Bir tur önce ölçülmüş olması yetmez.
+5. **"Kaç yerde geçiyor" ile "kaç yer OKUYOR" AYRI ölçümlerdir.** İlkini söyleyip ikincisini
+   ima etmek, kendi kendini yanıltmaktır.
+
+### Kapsam sınırı — adıyla
+
+Bu madde **sayısal** iddiaları yönetir. Bir dosyanın var olup olmaması, bir kolun düşüp
+düşmemesi gibi ikili gözlemler için betik zorunluluğu yoktur — ama onlar da ölçülür, tahmin
+edilmez. Ayrıca bu madde **ölçümü yasaklamaz**, kaynaksız **karar**ı yasaklar: keşif serbesttir.
