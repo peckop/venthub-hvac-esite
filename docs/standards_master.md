@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T12:49:32.795278+00:00
+compiled_at: 2026-09-03T13:25:27.762404+00:00
 total_compiled_files: 64
-source_commit: 78fd7750
+source_commit: 9c6314ea
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -4679,11 +4679,43 @@ Bu yüzden ters yön ayrı bir bekçiye taşındı: **§C4 + §C5, `INV-DOC-2`**
 
 İlgili ama HENÜZ YOK: `.cc_docs.yaml` ↔ NotebookLM defteri paritesi (§C6, aşağıda).
 
-## C4 — Companion'ı olmayan ESKİ kaynak = ihlal (yaş eşikli)
+## C4 — Companion'ı olmayan ESKİ kaynak = SAYILIR, bloklamaz (yaş eşikli)
 
 Kapsamdaki bir kaynak dosyanın son commit'i **7 günden eskiyse** ve companion'ı yoksa
-bu bir ihlaldir. 7 gün ve altı, asenkron üretim penceresi olarak **muaftır**.
+bu bir borçtur. 7 gün ve altı, asenkron üretim penceresi olarak **muaftır**.
 Etki: ikiz o dosyayı hiç bilmez, "bu kod nasıl çalışıyor" sorusuna eksik cevap verir.
+
+**Bu borç 2026-09-03'ten beri BLOKLAMAZ; sayılır ve adlarıyla raporlanır** — Recep'in
+**2026-08-31** kararıyla companion üretici taşıyıcı KAPALI tutulduğu için (abonelik
+maliyeti). Bu, **bilinen ve kabul edilmiş bir eksiktir**: taşıyıcı kapalıyken kapı borcu
+**önleyemez**, yalnız cezalandırır.
+
+**Niçin değişti — ölçülmüş vaka (2026-09-03).** `DataTablePagination.tsx` 2026-08-26'da
+geldi; 09-03'te 8. gününü doldurdu ve **hiçbir commit atılmadan**, yalnızca takvim
+ilerlediği için o gün açık olan **bütün PR'ları** kırmızıya çevirdi. Aynı ölçümde
+üretim hattının **28 Ağustos'tan beri ölü** olduğu görüldü (20–28 Ağustos arası 81
+companion eklenmiş, sonrasında 1). Yani kapı, kimsenin kapatamayacağı bir borcu
+haftada bir filo kilidine dönüştürüyordu.
+
+⚠**Eşik UZATILMADI, bilerek:** 7'yi 30'a çekmek aynı tuzağı **erteler**, kaldırmaz —
+30. günde aynı kilit gelir ve o gün sebebi hatırlayan kimse olmaz.
+⚠**Kapı SİLİNMEDİ, bilerek:** silinen kapı **kapatılmış borç** sanılır. Kalan biçim
+"say, adlarıyla raporla, bloklama"dır; sayı `board.cjs yoklama` çıktısında da görünür.
+Sayının **ayırt ettiği** ayrı bir kolla kilitlidir (companion'sız dosya eklenince sayı
+artmıyorsa test kırmızı verir) — çünkü bloklamayan bir kolun tek değeri budur.
+
+**C5 BLOKLAMAYA DEVAM EDER** ve bu tutarsızlık değil: bayat companion, ikize *emin
+biçimde yanlış* cevap verdirir (§C5) ve çözümü taşıyıcıya bağlı değildir — companion
+silinebilir ya da kaynak geri alınabilir. Eksik companion ise yalnız taşıyıcı açılarak
+kapanır.
+
+### ⭐HÜKÜM — üretilmiş dosyaya dokunan iş İKİ COMMIT'tir
+
+Kaynağı (ya da üretilmiş bir dosyayı) commit et → **sonra** derle → üretilmiş artefaktları
+**ayrı** commit'le. İkisini aynı commit'e koymak tazelik kapısını (`INV-DOC-4b`) **yapısal
+olarak** kırmızı yapar: derleme kaynağın **commit'lenmiş** blob SHA'sını yazar, o an yeni
+hâl henüz commit'li değildir, manifest bir önceki blob'u kaydeder ve kaynak commit'lenir
+commit'lenmez manifest bayat olur. 2026-09-03'te bu bedel **tek günde iki kez** ödendi.
 
 ## C5 — Kaynağından ESKİ companion = ihlal (yaş eşikli)
 
@@ -4697,16 +4729,22 @@ ilk ölçümde `.agent/` altındaki betikler sayılmış ve sonuç 84/211 çıkm
 yaml'da `skip_dirs` içinde, yani doküman hattı oraya hiç bakmıyor. **Bekçi üreticiden
 farklı kapsam kullanırsa ölçtüğü şey gerçek değildir.**
 
-**Ratchet, sıfır değil.** Mevcut borç (C4=1, C5=34) taban olarak dondurulur: yeni borç
-eklenemez, azalınca taban düşürülmelidir (stale-guard bunu zorlar). Niçin tam-kapalı
-kurulmadı: bekçi ilk günden kırmızı yanarsa görmezden gelinir — bu depoda yaşandı
-(rastgele patlayan `pre-commit` `--no-verify` alışkanlığı doğurdu, T033).
+**Ratchet, sıfır değil.** İlk ölçümün borcu (2026-08-17: C4=1, C5=34) taban olarak
+donduruldu: yeni borç eklenemez, azalınca taban düşürülmelidir (stale-guard bunu zorlar).
+Niçin tam-kapalı kurulmadı: bekçi ilk günden kırmızı yanarsa görmezden gelinir — bu depoda
+yaşandı (rastgele patlayan `pre-commit` `--no-verify` alışkanlığı doğurdu, T033).
+
+⚠**Bu paragraf artık YALNIZ C5 için geçerlidir.** `C4_TABAN` 2026-09-03'te kaldırıldı, çünkü
+C4 bloklamayı bıraktı (§C4). Taban kavramının C4'teki yerini **sayacın canlılığı** aldı:
+korunan şey bir sayı değil, sayının **ayırt ettiği**. Bu satır, ratchet'in tek başına
+kalması hâlinde okuyucuya *"C4'ün de bir tavanı var"* dedirtmesin diye eklendi — cetvelde
+yaşayan yanlış iddianın bedeli aynı belgede §C6'da ölçüldü.
 
 **Ölçüm kaynağı = `git`, disk değil** (§C1 ile aynı gerekçe). Ek ölçüm: 2026-08-17'de
 17 companion **diskte güncel ama git'te eskiydi**. Bu ayrışma kendisi bir bulgudur ama
 bu bekçinin sorusu değildir; ikize giden şey depo hâlidir.
 
-## C6 — `.cc_docs.yaml` ↔ NotebookLM defteri paritesi (KAPI YAZILDI, SİLAHLANDIRMA BEKLİYOR)
+## C6 — `.cc_docs.yaml` ↔ NotebookLM defteri paritesi (MASTER'DA KAPI YOK — AÇIK PR'DA BEKLİYOR)
 
 Yaml'da listelenen bir kaynağın deftere gerçekten yüklendiği (ve defterde yaml'da
 olmayan artık kaynak bulunmadığı) ölçülmelidir. 2026-08-17'de elle yapıldı ve **5 eksik
@@ -4717,10 +4755,11 @@ defter durumu ise yalnız ağ üzerinden görülür. Bu yüzden iki parçalı:
 
 1. **Üretim (Orion, `orion@fc0aec0` — yapıldı):** sync, yüklemelerden **sonra defteri
    yeniden listeleyip** `docs/nlm_sync_manifest.json` yazar.
-2. **Bekçi (`INV-DOC-3`, `src/__tests__/conformance/nlm-manifest-parity.test.ts` — yazıldı,
-   PR #640):** yaml ile manifest'i karşılaştırır; beş iddia — manifest var mı ·
-   `olcum_basarili` mı · yaml'daki her kaynak manifest'in beklenen listesinde mi (bayat
-   manifest tespiti) · `eksik` boş mu · `fazla` boş mu.
+2. **Bekçi — KİMLİK HENÜZ VERİLMEDİ, MASTER'DA YOK** (`src/__tests__/conformance/nlm-manifest-parity.test.ts`,
+   yalnız PR #640 dalında yazıldı)**:** yaml ile manifest'i karşılaştırır; beş iddia —
+   manifest var mı · `olcum_basarili` mı · yaml'daki her kaynak manifest'in beklenen
+   listesinde mi (bayat manifest tespiti) · `eksik` boş mu · `fazla` boş mu.
+   Gerekçesi ve kimlik hikâyesi bu bölümün sonundaki DÜZELTME notundadır.
 
 **Manifest NİYETİ değil ÖLÇÜMÜ yazar.** Niyet listesinden üretilse, yükleme yarıda kalsa
 bile "hepsi yüklendi" derdi — T075'te yakalanan sınıfın aynısı (başarısız işlem denetim
@@ -4728,7 +4767,12 @@ defterine `success` yazıyordu) ve o sınıfın en sinsi tarafı kaydın **kanı
 Ölçüm yapılamazsa manifest `olcum_basarili: false` + sebep yazar ve karşılaştırma alanlarını
 **boş bırakır**; boş listeyi "parite tam" diye okumak yasaktır (Orion tarafında 7 testle kilitli).
 
-**Kapı şu an bilinçli KIRMIZI ve bu doğru:** manifest ancak gerçek bir
+**İKİ DURUM AYRIDIR — karıştırılırsa risk yanlış okunur.** `#640` DALINDA kapı bilinçli
+KIRMIZI ve bu doğru. **MASTER'DA ise kapı hiç YOK**, ve bu aynı şey değildir: kırmızı kapı
+bağırır, **olmayan kapı sessizdir.** Bu maddenin eski hâli "şu an bilinçli kırmızı" diyerek
+okuyucuya *"korumamız var, sadece geçmiyor"* izlenimi veriyordu; gerçek durum
+*"bu eksende hiçbir koruma koşmuyor"*. Aşağıdaki gerekçe `#640` dalındaki kırmızıyı
+açıklar: manifest ancak gerçek bir
 `orion tree --nlm-sync` koşumuyla doğar, o komut da **canlı deftere** yazar (eski kaynakları
 silip yeniden yükler). Yani **silahlandırma bir yetki kararıdır**, testin işi değil — Recep
 onayı bekliyor. Fail-open eklenmedi: "defteri göremedim ama geçtim" diyen bir parite kapısı,
@@ -4738,6 +4782,34 @@ kapının hiç olmamasından kötüdür çünkü yeşil görünür.
 **elle uydurdu** (`olcum_basarili: true`, uydurma zaman damgası, icat edilmiş `source-1…N`
 id'leri; PR #643, kapatıldı). Türev kural `collaboration-protocol.md` **K7**'ye yazıldı:
 denetim artefaktı **elle yazılmaz** — onu üreten şey ölçümü yapan araç olmalıdır.
+
+### ⭐DÜZELTME (2026-09-03, ölçüldü) — bu bölüm İKİ yanlış iddia taşıyordu
+
+**(1) "yazıldı" master'ı işaret ediyordu; ölçüldü, dosya master'da da çalışma ağacında da
+YOK** — yalnız `#640` dalında var, o da 16 gündür açık. Bir cetvelin "yazıldı" demesi
+dosyayı var etmez: **"kural yazıldı" ile "koruma çalışıyor" ayrı iddialardır** ve ikincisi
+ayrıca ölçülür (aynı sınıf: `uretilmis-artefakt-standard.md` AXIOM 10). Bu yanlış iddianın
+yıllanabilmesinin sebebi de kayda değer — **bu satırı hiçbir kapı okumuyordu.**
+
+**(2) Kimlik `INV-DOC-3` idi ve o kimlik BAŞKA bir kapıda CANLI:**
+`src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts` içindeki Kapı C, üstelik
+`uretilmis-artefakt-standard.md`'nin hüküm tablosunda kayıtlı. **Aynı kimlik iki şeyi
+işaret ediyordu.** Bedeli çakışmanın kendisinden büyüktür: *"INV-DOC-3 yeşil"* cümlesinin
+hangi kapı için söylendiği belirsizleşir ve **yeşil, var olmayan kapıya mal edilebilir.**
+Tazelik kapısının kimliği KORUNUR.
+
+**Kimlik ATANMADI, bilerek.** Var olmayan bir kapıya şimdiden numara vermek, düzelttiğimiz
+kusurun küçük hâlini tekrar üretirdi: gerçek bir korumaya karşılık gelmeyen bir ad.
+Kolaylık için ölçülen şudur — bugün kullanımdaki kimlikler `INV-DOC-1, 2, 3, 4, 4b, 5, 7`;
+**`INV-DOC-6` boştur.** Kimliği `#640`'ı indiren verir, doğrulayarak.
+
+⚠**`#640`'ın PR BAŞLIĞI da çakışan kimliği taşıyor.** İniş anında başlık ve test içindeki
+kimlik BİRLİKTE değiştirilmeli; yalnız bu bölümü düzeltmek çakışmayı geri getirir.
+
+**Bu düzeltmeyi yakalayacak kol YAZILMADI, kapsam dışı bırakıldı** (iş emri: silahlandırma
+yok). Eksen bellidir ve kayıtlıdır: *cetvelde adı geçen test dosyası depoda gerçekten var
+mı.* Bu, `INV-CETVEL-YAPI` kapsamına girer ve REC-120 ile ele alınacaktır — §21 gereği
+kabul edilen boşluk **sessiz bırakılmaz**, adıyla yazılır.
 
 ## C7 — COMMIT AÇIĞI: üretim çalışıyor, kayıt tutulmuyor (2026-08-18 ölçümü)
 

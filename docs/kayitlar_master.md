@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T12:49:32.962747+00:00
+compiled_at: 2026-09-03T13:25:27.919799+00:00
 total_compiled_files: 101
-source_commit: 78fd7750
+source_commit: 9c6314ea
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -14139,11 +14139,11 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T12:25:23.497501+00:00
+compiled_at: 2026-09-03T12:47:04.301239+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-03T12:25:23.497501+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-03T12:47:04.301239+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -14620,7 +14620,7 @@ Bu belge, otonom derleyici tarafından 2026-09-03T12:25:23.497501+00:00 tarihind
 │   │   │   │   ├── ✅ `BulkRolePanel.tsx`
 │   │   │   │   ├── ✅ `DataTableHead.tsx`
 │   │   │   │   ├── ✅ `DataTableKit.tsx`
-│   │   │   │   ├── ❌ `DataTablePagination.tsx`
+│   │   │   │   ├── ✅ `DataTablePagination.tsx`
 │   │   │   │   ├── ✅ `FacetedFilter.tsx`
 │   │   │   │   ├── ✅ `persist.ts`
 │   │   │   │   └── ✅ `types.ts`
@@ -14962,7 +14962,6 @@ Bu belge, otonom derleyici tarafından 2026-09-03T12:25:23.497501+00:00 tarihind
 │   │   ├── ✅ `rbac.ts`
 │   │   ├── 📂 **seo/**
 │   │   │   ├── ❌ `canonicalOrigin.ts`
-│   │   │   ├── ❌ `indexnow.ts`
 │   │   │   └── ✅ `jsonld.ts`
 │   │   ├── 📂 **services/**
 │   │   │   ├── ✅ `address.service.ts`
@@ -15239,18 +15238,14 @@ Bu belge, otonom derleyici tarafından 2026-09-03T12:25:23.497501+00:00 tarihind
 ```
 
 ## Eksik Dokümantasyonlar
-- [ ] `src\components\admin\data-table\DataTablePagination.tsx`
 - [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
-- [ ] `src\lib\seo\indexnow.ts`
-- [ ] `src\components\admin\data-table\DataTablePagination.tsx`
 - [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
-- [ ] `src\lib\seo\indexnow.ts`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
