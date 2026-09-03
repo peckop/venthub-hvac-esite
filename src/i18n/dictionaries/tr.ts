@@ -405,7 +405,7 @@ export const tr = {
           {
             eyebrow: 'HASSAS HVAC SİSTEMLERİ',
             title: 'Teknik Mükemmeliyet ve Akıllı Akış',
-            subtitle: 'Endüstriyel mutfak, otopark ve konfor alanları için uçtan uca determisitik havalandırma mühendisliği.',
+            subtitle: 'Endüstriyel mutfak, otopark ve konfor alanları için uçtan uca deterministik havalandırma mühendisliği.',
             products: [
               {
                 label: 'Endüstriyel Çözümler',
@@ -645,12 +645,6 @@ export const tr = {
       secondaryCta: 'Uzmanla Görüş',
       tertiaryCta: 'Ürünleri Keşfet'
     },
-    features: {
-      euQuality: 'Avrupa kalite standartları',
-      fastDelivery: 'Hızlı teslimat',
-      warranty: '2 yıl garanti',
-      support: '7/24 teknik destek'
-    },
     heroTitle: 'Temiz Hava, Temiz Gelecek',
     heroSubtitle: 'Mühendislik odaklı havalandırma platformu. 6 önde gelen marka, 50+ ürün çeşidiyle profesyonel havalandırma çözümleri.',
     bottomCtaTitle: 'Doğru ürünü seçmenize yardımcı olalım.',
@@ -663,35 +657,6 @@ export const tr = {
       expertText: 'HVAC uzmanlarımız size en uygun çözümü bulmak için 7/24 teknik destek sağlar.',
       fastTitle: 'Hızlı Teslimat',
       fastText: 'Türkiye genelinde hızlı ve güvenli teslimat.'
-    },
-    whyVentHub: {
-      title: 'Neden',
-      subtitle: 'Türkiye\'nin güvenilir HVAC e-ticaret platformu',
-      features: {
-        brands: {
-          title: 'Premium Markalar',
-          description: 'Vortice, Casals ve sektörün lider markalarının ürünleri'
-        },
-        support: {
-          title: 'Uzman Desteği',
-          description: 'Profesyonel teknik danışmanlık hizmeti'
-        },
-        delivery: {
-          title: 'Hızlı Teslimat',
-          description: 'Türkiye geneli 2-5 iş günü içinde kapınızda'
-        }
-      },
-      badges: {
-        premium: 'Premium Markalar',
-        ce: 'CE Sertifikalı',
-        warranty: '2 Yıl Garanti',
-        shipping: 'Aynı Gün Kargo'
-      },
-      authorizedDealer: {
-        prefix: 'VentHub,',
-        brand: 'Vortice',
-        suffix: 'ürünlerini marka güvencesiyle sunar.'
-      }
     },
     stats: {
       premiumBrands: 'Premium Marka',

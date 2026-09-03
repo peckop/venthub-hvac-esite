@@ -576,12 +576,6 @@ export const en: typeof tr = {
       secondaryCta: 'Talk to an Expert',
       tertiaryCta: 'Explore Products'
     },
-    features: {
-      euQuality: 'European quality standards',
-      fastDelivery: 'Fast delivery',
-      warranty: '2-year warranty',
-      support: '24/7 technical support'
-    },
     heroTitle: 'Clean Air, Clean Future',
     heroSubtitle: 'Engineering-driven ventilation platform. 6 leading brands and 50+ product types for professional ventilation solutions.',
     bottomCtaTitle: 'Let us help you choose the right product.',
@@ -594,35 +588,6 @@ export const en: typeof tr = {
       expertText: 'Our HVAC experts provide 24/7 technical support to find the best solution.',
       fastTitle: 'Fast Delivery',
       fastText: 'Rapid and reliable delivery across Turkey.'
-    },
-    whyVentHub: {
-      title: 'Why',
-      subtitle: 'Turkey\'s trusted HVAC e-commerce platform',
-      features: {
-        brands: {
-          title: 'Premium Brands',
-          description: 'Vortice, Casals and industry leading brands products'
-        },
-        support: {
-          title: 'Expert Support',
-          description: 'Professional technical consultancy service'
-        },
-        delivery: {
-          title: 'Fast Delivery',
-          description: 'Delivered to your door in 2-5 business days across Turkey'
-        }
-      },
-      badges: {
-        premium: 'Premium Brands',
-        ce: 'CE Certified',
-        warranty: '2 Years Warranty',
-        shipping: 'Same Day Shipping'
-      },
-      authorizedDealer: {
-        prefix: 'VentHub supplies',
-        brand: 'Vortice',
-        suffix: 'products with full brand assurance.'
-      }
     },
     stats: {
       premiumBrands: 'Premium Brands',
