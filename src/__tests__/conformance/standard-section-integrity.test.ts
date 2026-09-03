@@ -36,16 +36,75 @@ const KOK = 'docs/standards'
  * Dar bir desen buranın %90'ını sessizce atlar; bu bir kez yaşandı (aşağıdaki
  * "kendi kapsamını ölçer" testinin varlık sebebi).
  */
-const BASLIK = /^(#{2,4})\s+(?:§\s*)?([A-ZÇĞİÖŞÜ]{0,6})[\s-]*(\d+(?:\.\d+)*)\s*[.):\-—–]?\s/
+const BASLIK =
+  /^(#{2,4})\s+(?:[^\p{L}\p{N}\s]+\s*)?(?:§\s*)?([A-ZÇĞİÖŞÜ]{0,6})[\s-]*(\d+(?:\.\d+)*(?:\.[a-zA-Z])?)\s*[.):\-—–]?\s/u
 
-type Bolum = { seviye: number; no: string; satir: number }
+/**
+ * ⭐REC-120 · DESEN İKİ YERDEN KÖRDÜ — ölçülerek bulundu, varsayımla değil (2026-09-03).
+ *
+ * **(1) BAŞTAKİ SÜSLEME.** Bu depoda başlıklar sık sık bir işaretle başlıyor
+ * (`### ⭐D8.1`, `### ⚠D8.3`, `#### ✅D8.3 SONUÇ`). Eski desen ilk karakterin harf ya da
+ * rakam olmasını bekliyordu, dolayısıyla bunların **hiçbirini görmüyordu.**
+ *
+ * Bedeli soyut değil: `deploy-build-skip-standard.md` içinde **`D8.3` İKİ KEZ tanımlıydı**
+ * (satır 286 `⚠D8.3`, satır 315 `✅D8.3 SONUÇ`) ve bu kapı — *"aynı bölüm numarası iki kez
+ * yazılmasın"* diye **tam bu dosyadaki `## D13` ikizlemesinden doğan** kapı — ikisini de
+ * göremiyordu. Yani kapı, kendi doğuş sebebine kör kalmıştı.
+ *
+ * **(2) HARF SONEKİ.** `#### B2.1.b` gibi kimlikler (`notification-standard.md:60`) sayı
+ * grubuna uymuyordu; kardeşi `### B2.1` ölçülürken o atlanıyordu. Aynı dosyada bir kısım
+ * başlığın ölçülüp bir kısmının **sessizce** atlanması, bu depoda adı konmuş sınıftır:
+ * ayırt etmeyen gösterge ölçüm değildir.
+ *
+ * ÖLÇÜM (üç senaryo, tüm cetveller): eski desen 743 başlık / 0 mükerrer · yeni desen
+ * 747 başlık (**+4**) / **1 mükerrer** — yani genişleme gürültü değil, GERÇEK bir ihlal
+ * açığa çıkardı. Sahipsiz alt bölüm her iki desende de 0.
+ *
+ * ⚠GENİŞLEME NİÇİN GÜRÜLTÜ ÜRETMEDİ: süsleme atlandıktan sonra kalan metin yine sayı
+ * kuralına uymak zorunda. `### ⭐Dört ders` gibi **numarasız** düz metin başlıkları hâlâ
+ * kapsam dışıdır — ki öyle kalmalı: numaralandırma kullanmayan başlığı numaraya zorlamak
+ * kusur onarımı değil biçim dayatmasıdır (dosya başındaki gerekçe).
+ */
+
+type Bolum = { seviye: number; no: string; satir: number; ust: string }
 
 function bolumleriCikar(metin: string): Bolum[] {
-  return metin.split(/\r?\n/).flatMap((satir, i) => {
+  const out: Bolum[] = []
+  let ustL2 = ''
+  metin.split(/\r?\n/).forEach((satir, i) => {
     const m = BASLIK.exec(satir)
-    if (!m) return []
-    return [{ seviye: m[1].length, no: `${m[2] ?? ''}${m[3]}`, satir: i + 1 }]
+    if (!m) return
+    const seviye = m[1].length
+    const no = `${m[2] ?? ''}${m[3]}`
+    if (seviye === 2) ustL2 = no
+    out.push({ seviye, no, satir: i + 1, ust: seviye === 2 ? '' : ustL2 })
   })
+  return out
+}
+
+/**
+ * ⭐REC-120 · TEKİLLİK ANAHTARI — kimlik ebeveynini KODLUYOR mu?
+ *
+ * ÖLÇÜLMÜŞ YANLIŞ ALARM (2026-09-01): `fleet-mechanism-standard.md`'de §23 ile §24'ün
+ * **kendi** hükümleri vardı (`### HÜKÜM 1`, `### HÜKÜM 2`, …). Desen bunları `HÜKÜM1`
+ * diye okuyor ve **dosya çapında** tekil sanıyordu; sonuç: farklı bölümlerin hükümleri
+ * birbirine numara kilitliyordu. Sahadaki geçici çözüm §24'ün başlıklarını numarasız
+ * yazmak olmuştu — yani cetvel, kapının kusuru yüzünden şeklini değiştirmişti. Kapı
+ * belgeye biçim dayatmaya başladığında ölçüt olmaktan çıkar.
+ *
+ * ⚠DÜZ "hepsini bölüme göre kapsa" ÇÖZÜMÜ REDDEDİLDİ: `2.4` numarası `## 2` altında ve
+ * `## 3` altında ayrı ayrı meşru sayılırdı, oysa ikincisi gerçek bir kusurdur. O yüzden
+ * ayrım kimliğin KENDİSİNDEN okunur:
+ *   · ebeveynini KODLAYAN kimlik (nokta içerir ya da üst kimliğin önekiyle başlar:
+ *     `D8.3`, `2.4`, `B2.1.b`) → **DOSYA ÇAPINDA** tekil. Eski güç birebir korunur.
+ *   · ÇIPLAK kimlik (`HÜKÜM 1`) → **en yakın ana bölüme** göre tekil.
+ *
+ * Ölçüldü: bu ayrım `D8.3` ikizlemesini yakalamaya devam ediyor (kayıp yok) ve HÜKÜM
+ * fikstüründe çakışmayı 1'den 0'a indiriyor. İki kol aşağıda bunu ayrı ayrı kanıtlıyor.
+ */
+function tekillikAnahtari(b: Bolum): string {
+  const ebeveyniKodluyor = b.no.includes('.') || (b.ust !== '' && b.no.startsWith(b.ust))
+  return ebeveyniKodluyor || b.seviye === 2 ? b.no : `${b.ust}::${b.no}`
 }
 
 function cetvelDosyalari(): string[] {
@@ -70,12 +129,85 @@ describe('INV-CETVEL-YAPI · cetvellerin bölüm yapısı', () => {
   it('aynı bölüm numarası bir cetvelde İKİ KEZ tanımlanmaz', () => {
     const ihlaller = olculenler().flatMap(({ yol, bolumler }) => {
       const sayim = new Map<string, number[]>()
-      for (const b of bolumler) sayim.set(b.no, [...(sayim.get(b.no) ?? []), b.satir])
+      for (const b of bolumler) {
+        const k = tekillikAnahtari(b)
+        sayim.set(k, [...(sayim.get(k) ?? []), b.satir])
+      }
       return [...sayim.entries()]
         .filter(([, satirlar]) => satirlar.length > 1)
         .map(([no, satirlar]) => `${yol} → ${no} (satır ${satirlar.join(', ')})`)
     })
-    expect(ihlaller, 'mükerrer bölüm numarası').toEqual([])
+    expect(
+      ihlaller,
+      'mükerrer bölüm numarası. Kimlik ebeveynini kodluyorsa (D8.3, 2.4, B2.1.b) dosya ' +
+      'çapında tekil olmalı; çıplak kimlik (HÜKÜM 1) yalnız kendi ana bölümünde tekildir.',
+    ).toEqual([])
+  })
+
+  it('⭐REC-120 · SÜSLEMELİ ve HARF SONEKLİ başlıklar GÖRÜLÜR (kapı kendi doğuş sebebine kör kalmasın)', () => {
+    // Fikstür şart: gerçek cetveller bugün 0 mükerrer veriyor ve 0, hem "ihlal yok"un hem
+    // "desen kör"ün cevabıdır. Ayırt etmeyen gösterge ölçüm değildir.
+    const gorulen = bolumleriCikar([
+      '## D8 — ana bölüm',
+      '### ⭐D8.1 — yıldız önekli',
+      '### ⚠D8.3 — uyarı önekli',
+      '#### ✅D8.3 SONUÇ — onay önekli, AYNI numara',
+      '### B2.1 — sayı',
+      '#### B2.1.b — harf sonekli',
+      '### ⭐Dört ders — NUMARASIZ, kapsam dışı kalmalı',
+    ].join('\n')).map(b => b.no)
+
+    expect(gorulen, 'yıldız önekli numaralı başlık ATLANDI').toContain('D8.1')
+    expect(gorulen, 'harf sonekli numara ATLANDI').toContain('B2.1.b')
+    expect(
+      gorulen.filter(n => n === 'D8.3').length,
+      'Aynı numarayı taşıyan İKİ süslemeli başlığın ikisi de görülmeli — yoksa mükerrer ' +
+      'tespiti (bu kapının doğuş sebebi) süslemeyle atlatılabilir.',
+    ).toBe(2)
+    expect(
+      gorulen.some(n => /ders/i.test(n)),
+      'NUMARASIZ düz metin başlığı kapsama girdi — numaralandırma kullanmayan başlığı ' +
+      'numaraya zorlamak kusur onarımı değil biçim dayatmasıdır.',
+    ).toBe(false)
+  })
+
+  it('⭐REC-120 · ÇIPLAK kimlik iki AYRI ana bölümde çakışmaz, AYNI bölümde çakışır (ayırt edici çift)', () => {
+    const anahtarlari = (metin: string): string[] => bolumleriCikar(metin).map(tekillikAnahtari)
+    const cakisanlar = (ks: string[]): string[] => {
+      const s = new Map<string, number>()
+      for (const k of ks) s.set(k, (s.get(k) ?? 0) + 1)
+      return [...s.entries()].filter(([, n]) => n > 1).map(([k]) => k)
+    }
+
+    // YANLIŞ ALARM OLMAMALI: iki ayrı ana bölümün KENDİ hükümleri.
+    expect(
+      cakisanlar(anahtarlari([
+        '## 23. Bir bölüm', '### HÜKÜM 1 — birinci', '### HÜKÜM 2 — ikinci',
+        '## 24. Başka bölüm', '### HÜKÜM 1 — bunun kendi hükmü',
+      ].join('\n'))),
+      'Farklı ana bölümlerin ÇIPLAK kimlikleri birbirine numara kilitliyor — ölçülmüş ' +
+      'yanlış alarm (§23/§24). Kapı belgeye biçim dayatmaya başlar.',
+    ).toEqual([])
+
+    // GERÇEK İHLAL YAKALANMALI: aynı ana bölümde aynı çıplak kimlik. Bu kol olmasan
+    // "hiç çakışma görmeyen" bir anahtar da yukarıdaki iddiayı geçerdi.
+    expect(
+      cakisanlar(anahtarlari([
+        '## 23. Bir bölüm', '### HÜKÜM 1 — birinci', '### HÜKÜM 1 — yanlışlıkla İKİNCİ kez',
+      ].join('\n'))),
+      'AYNI ana bölümde aynı çıplak kimlik İKİ KEZ yazıldı ve yakalanmadı — kapsamlama ' +
+      'kapıyı sökmüş olurdu.',
+    ).toEqual(['23::HÜKÜM1'])
+
+    // EBEVEYNİNİ KODLAYAN kimlik DOSYA ÇAPINDA tekil kalmalı: aksi hâlde `2.4` iki ayrı
+    // ana bölüm altında meşru sayılırdı, oysa ikincisi gerçek kusurdur.
+    expect(
+      cakisanlar(anahtarlari([
+        '## 2. Bölüm', '### 2.4 — burada', '## 3. Başka bölüm', '### 2.4 — YANLIŞ yerde',
+      ].join('\n'))),
+      'Ebeveynini KODLAYAN kimlik iki ayrı bölümde meşru sayıldı — kapsamlama eski gücü ' +
+      'yok etmiş olurdu.',
+    ).toEqual(['2.4'])
   })
 
   it('her alt bölüm (X<n>.<m>) kendi ana bölümüne sahiptir', () => {
