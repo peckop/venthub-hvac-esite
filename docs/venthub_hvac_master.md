@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T17:47:18.863494+00:00
-total_compiled_files: 657
-source_commit: 51a8b126
+compiled_at: 2026-09-03T17:59:14.618665+00:00
+total_compiled_files: 658
+source_commit: e332259f
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-03T17:47:18.863494+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-03T17:59:14.618665+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -13894,15 +13894,15 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\StickyHeader.tsx
-skeleton_hash: 62eb7d3cbf77d9a4
+source_path: C:\tmp\vh-urun-rec89\src\components\StickyHeader.tsx
+skeleton_hash: 2d71c2585f71b144
 entity_hashes:
   func:CategoryHubOverlaySkeleton: 09095f7c03bb95f0
   func:MegaMenuSkeleton: 43156bd7843421f5
   func:SearchOverlaySkeleton: 6695469d4cdbd037
   overview: 620cf1a29f42e258
   style_tokens: a87cdf58739596c8
-generated_at: 2026-08-27T07:58:32Z
+generated_at: 2026-09-03T17:33:42Z
 ---
 
 ## Genel Bakış
@@ -43593,6 +43593,33 @@ Bu dosya (**applications.ts**) sadece bir yapılandırma dosyasıdır ve **fonks
   export: ApplicationIcon
 
 ---
+# FILE: src\config\features.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\tmp\vh-urun-rec89\src\config\features.ts
+skeleton_hash: ac08aadf5df99483
+generated_at: 2026-09-03T17:33:44.084077+00:00
+---
+
+## Genel Bakış
+
+Vitrin yetenek bayrakları — derleme zamanı sabitleri. NİÇİN ENV DEĞİL SABİT (REC-94, 2026-09-04 kararı, gerekçesi yazılı): Bu bayrağı tüketen bileşenlerin HEPSİ `'use client'`. İstemciye ulaşan bir env değişkeni `NEXT_PUBLIC_` öneki İSTER; önek unutulursa değer sessizce `undefined` olur ve bayrak "k
+
+## AXIOMS – Mimari Varsayımlar
+- [Aksiyom 1]: Bu modül yan-etki için yüklenir; kaldırılması veya yan-etkisinin değişmesi onu import eden giriş noktalarını etkiler.
+- [Aksiyom 2]: Dışa açılan API olmadığından tüketiciler doğrudan çağrıyla değil, yalnızca yükleme sırası/yan-etkisi üzerinden bağımlıdır.
+
+## AST POINTERS
+(Dışa açılan çağrılabilir öğe yok — modül-düzeyi yan-etki; AST işaretçisi gerektiren fonksiyon/metot yok.)
+
+## NODE ID STANDARD
+file: C:\tmp\vh-urun-rec89\src\config\features.ts
+
+
+---
 # FILE: src\config\index.md
 
 ---
@@ -49628,10 +49655,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\en.ts
-skeleton_hash: ba3ada89eb1a0bee
+skeleton_hash: dcd79fbc031f0588
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-09-03T16:07:00Z
+generated_at: 2026-09-03T17:33:44Z
 ---
 
 ## Genel Bakış
@@ -49704,10 +49731,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\tr.ts
-skeleton_hash: 1860e7269fa91dd3
+skeleton_hash: 119db0355fa35555
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-09-03T16:07:00Z
+generated_at: 2026-09-03T17:33:44Z
 ---
 
 ## Genel Bakış
