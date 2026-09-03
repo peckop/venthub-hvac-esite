@@ -2,9 +2,9 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "0ac48724e073459ae06058e63ba36fd716b82b63718e58879b7f3c491e0497f9",
+      "icerik_sha256": "164214325b238abf2da04283904dcd26dd040269265d473e88102d922c25fa93",
       "kaynak": {
-        "dosya_sayisi": 101,
+        "dosya_sayisi": 105,
         "dosyalar": {
           "CHANGELOG.md": "eb01e14c93b6de5095df49ecf4e36d500aee787b",
           "CONTEXT.md": "8c21e5ea5bd31a1e362d62526464d7e523b213bf",
@@ -93,6 +93,9 @@
           "docs/plans/product-schema-standard-brief.md": "c8c1717ce00437886f4126608bf43203c643112a",
           "docs/plans/rec108-aile-adi-dil-zinciri-2026-09-01.md": "c253fa5964e315fff94d2da131a238b0468bfbfe",
           "docs/plans/rec110-114-117-migration-paketi-2026-09-01.md": "dac5fe9d1073e4557416d973639eb8cecfbc163e",
+          "docs/plans/rec129-faz1-kabuk-plani-2026-09-04.md": "4602dd1cb63201e441140921fecbadfb91a4d141",
+          "docs/plans/red-team-rec129-faz1-2026-09-04.md": "d099567a778eca1ba0e2c3ecd557ee87dfafa852",
+          "docs/plans/red-team-teklif-modu-2026-09-04.md": "7d4eb76311ce408cf2f8714fd8ff89e9a968a30a",
           "docs/plans/render-dalga1-plan-2026-08-17.md": "2f2bb7f9c6997cab746a0496ee6c4e3a7da67e99",
           "docs/plans/saas-funding-and-packaging-2026-06.md": "26d8cccb21f2c4c9c21b1a523ba767a1275825df",
           "docs/plans/seo-transition-blueprint.md": "0b1ecc1c3a96a68c534fdf167ed9e3cd67dd2d83",
@@ -101,17 +104,18 @@
           "docs/plans/t080-odeme-ekrani-bos-2026-08-17.md": "2ef40cec824eb77f5fa7b813fa4c429eb0b40371",
           "docs/plans/t093-adres-il-ilce-2026-08-18.md": "fca4426741e7ff1404e0475ce8138a957f390c00",
           "docs/plans/t116-odeme-defteri-tasarim-2026-08-20.md": "487172fdd196b806984df74ea11903f505c1f169",
+          "docs/plans/teklif-modu-tutarlilik-paketi-2026-09-04.md": "f9e02a9e2aa2a2de7d008390f1af72df891e2701",
           "docs/plans/tenant-id-hardening-2026-08-15.md": "78fd8af0cca56ee5d546c09b488311a5d6cb3a51",
           "docs/plans/urun-kimlik-duzeltme-2026-08-22.md": "95c542dc670a90d39f15827cfd6ad13483caa7e1",
           "docs/plans/venthub_hvac_unified_refactor_plan.md": "91872b3835444bce317477cf0d7c649584630158",
           "docs/plans/venthub_saas_faz1_prompt.md": "c874969b99b46565010882bbd7c198b8de32150f",
           "docs/plans/venthub_saas_master_roadmap.md": "388f9a58a03cf31de453b63eb3b3a9658451122a",
-          "docs/system_tree.md": "c8b70f28ec2445a877f26055e57fe43254f15aa0"
+          "docs/system_tree.md": "4976d11d568ea2cf9eae592529b9ff1e67a1c6a4"
         },
         "izlenmeyen": [],
-        "ozet": "5e20f1bc8e37be4c19d30c89fe320dac1d9ae466a72548b4ed054c4e9c3241e8"
+        "ozet": "563ea200a57e56ddb72d65d6fb0c7a6672e5611ebab488fad1eabf36b952503b"
       },
-      "kaynak_commit": "fa40064a340110c3756b517f2d1933a209cbd783",
+      "kaynak_commit": "d0df3ded068b8f0d078ad3ee6fffc353c8629d4e",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -128,7 +132,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "1eda2e86c73650c5869bc2a10f0d36cfa5ffb67de8eade6def571194d306fc06",
+      "icerik_sha256": "2a6897f8c87592c3379fc3a09bad922542d5cacbac366334ab360fdc212a3348",
       "kaynak": {
         "dosya_sayisi": 64,
         "dosyalar": {
@@ -194,13 +198,13 @@
           "docs/standards/storefront-reflow-standard.md": "02a6808366fa369d03c1241d06218309f8047731",
           "docs/standards/subagent-delegation-standard.md": "39e8bfc9a95534f8cd2969e5e9127aaf4d3c6f61",
           "docs/standards/uretilmis-artefakt-standard.md": "a34f848b7cf658a8b489a8ad4b1ccf8b0df7f7b3",
-          "docs/standards/vaat-butunlugu-standard.md": "e8cee6364e75a3fa4919825361a2160e086a1d24",
+          "docs/standards/vaat-butunlugu-standard.md": "937a9df35a9ec30f967c2c40efb78f7791e97d49",
           "docs/standards/work-tracking-ssot-standard.md": "6a00f894fbc818c9e927e2ced965936c6162475e"
         },
         "izlenmeyen": [],
-        "ozet": "0449f1cdc2cc06d1a7309a08ba50b629dbf33244bc0a184dfe5c9141ba6368a0"
+        "ozet": "85e670f7a55d6790d718ac008811bf441f712e8305a6e29879029fcd545e81df"
       },
-      "kaynak_commit": "fa40064a340110c3756b517f2d1933a209cbd783",
+      "kaynak_commit": "d0df3ded068b8f0d078ad3ee6fffc353c8629d4e",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -209,7 +213,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "8987aa93542a06a3e8fe5428a9b649d17223360ce379bbdc130a3cb0ac93433e",
+      "icerik_sha256": "4370d9765c2880c65bcf95def5f4329dc5f2509f147221754306ee09b06289fc",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -256,7 +260,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "fa40064a340110c3756b517f2d1933a209cbd783",
+      "kaynak_commit": "d0df3ded068b8f0d078ad3ee6fffc353c8629d4e",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -264,9 +268,9 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "eb7e514246dbae56048786ebed802f1fc1ff752298522a31891f56f063e61aef",
+      "icerik_sha256": "1ea9d4efc5b7096f936081bb375b6ad104668bffa3fbb564bf7b308790ee5908",
       "kaynak": {
-        "dosya_sayisi": 657,
+        "dosya_sayisi": 658,
         "dosyalar": {
           "eslint.config.md": "a256f1839b250eefdcf1ca81b79a1cfe8e36ed40",
           "next-env.d.md": "360d89410c4ebb89679a43bb745b27a3d0e7924d",
@@ -388,7 +392,7 @@
           "src/components/SecurityRibbon.md": "5c153e73a10869e769357f3287ac56c3c9152737",
           "src/components/Seo.md": "ef8affe61e4bc1670d5ce856991a1e7b636e345f",
           "src/components/SpotlightHeroOverlay.md": "695221ed5d86e2498d1e6afa682a73b665e3e785",
-          "src/components/StickyHeader.md": "988c388183c8af2b6cad03a53982f31e83c9c4cf",
+          "src/components/StickyHeader.md": "acec684c359db44f49c5fe35a2abae27806269c1",
           "src/components/TiltCard.md": "9ee46c0fa811f92b84700569b66749066b3d092a",
           "src/components/UndecidedUserCTA.md": "3290b565c40ea0f8699c288c34704dde7d8fd20d",
           "src/components/VisualShowcase.md": "2e1cc8f64da8efaef1fa8607e42bab378fc4389a",
@@ -579,6 +583,7 @@
           "src/config/admin-resources.md": "5846f329723e5a4a5bd92cc4c5802e67cd8d72e2",
           "src/config/admin.md": "ea64193087570b602be4953598e266fc9bb2acf6",
           "src/config/applications.md": "707e6e4e394b5b62117f0018835b16e6e313cb5b",
+          "src/config/features.md": "d37c8fd6b33941bbfa468ceaa72040f069b72153",
           "src/config/index.md": "86fb3c2d8f2e596b380dee47ade7c3dfb93c1ef5",
           "src/config/legal.md": "7d2df46abe0efcb7576d7c3e8e17c81ff43c7f1f",
           "src/config/orbitalCarouselConfig.md": "4f33ef3ddf4021e6a7a6c27faa24c7e8724a0593",
@@ -685,8 +690,8 @@
           "src/i18n/dictionaries/admin/users.tr.md": "3caab1204966be283605ec9d6c0d1f8609693940",
           "src/i18n/dictionaries/admin/webhooks.en.md": "dfb24c8f8aa8755af9c94c527b3c46140fa555f2",
           "src/i18n/dictionaries/admin/webhooks.tr.md": "7ec94e6c9e253deb39736874a310a9341a36975c",
-          "src/i18n/dictionaries/en.md": "347dbe1608c28da285b3258429a26b414da9e29b",
-          "src/i18n/dictionaries/tr.md": "34d46bec52ff6389aadba8656a8bce38fe7c00bb",
+          "src/i18n/dictionaries/en.md": "07d8838be4e21ff6a7b5157a9431c067d56d5358",
+          "src/i18n/dictionaries/tr.md": "74e442d32a7381870ff5db33983667b682c8f95b",
           "src/i18n/format.md": "1111a07a2cd3711a9838249972fe7f0eb216ba98",
           "src/i18n/getDictValue.md": "833bd9416d6ebf062b30f578d433e07e41f6f117",
           "src/i18n/sort.md": "c6c2a8846f3dc39a614261621569182e6bceb2eb",
@@ -927,9 +932,9 @@
           "vitest.setup.md": "9aeb7579eef42fdc5147320126fb057464835f78"
         },
         "izlenmeyen": [],
-        "ozet": "c2220cb55c7c251263575d9af87678657a5723b297470c0a2dc2e33bba2ac837"
+        "ozet": "ea5afdcb0fe9336b065e9a8f230d62805451f00389ea044fba82e0384094eadd"
       },
-      "kaynak_commit": "fa40064a340110c3756b517f2d1933a209cbd783",
+      "kaynak_commit": "d0df3ded068b8f0d078ad3ee6fffc353c8629d4e",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -938,7 +943,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-09-03T17:21:35.049665+00:00",
-  "kaynak_commit": "fa40064a340110c3756b517f2d1933a209cbd783",
+  "derlendi": "2026-09-03T17:44:21.070753+00:00",
+  "kaynak_commit": "d0df3ded068b8f0d078ad3ee6fffc353c8629d4e",
   "surum": 1
 }

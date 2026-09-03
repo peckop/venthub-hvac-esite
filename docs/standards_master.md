@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T17:21:34.426916+00:00
+compiled_at: 2026-09-03T17:44:20.482513+00:00
 total_compiled_files: 64
-source_commit: fa40064a
+source_commit: d0df3ded
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -16406,6 +16406,34 @@ Uygulaması üç maddede:
    marka-özel bir iddia (ör. tek markanın Compasso d'Oro ödülü) vaat sızıntısıdır.
    Bu sınıf **karar gerektirir** — kapı onu kırmızı yapmaz, envantere yazar.
 
+## 1.4) YETENEK vaadi — ticari vaadin kardeşi (REC-94, 2026-09-04)
+
+Yukarıdaki üç madde **ticari** vaadi yönetir (ödeme, taksit, kargo). 2026-09-04'te aynı
+sınıfın ikinci yüzü ölçüldü: **yetenek vaadi.**
+
+> **Bir vitrin yüzeyi, arkasında bugün çalışan bir yetenek olmayan hiçbir EYLEM ya da
+> ÖZELLİK iddiasını gösteremez.**
+
+Ölçülmüş iki örnek:
+
+- **"Hızlı Sipariş" düğmesi** site kabuğunda duruyordu — sipariş verilemeyen bir sitede.
+  Üstelik gittiği yer `?sort=bestsellers`, yani REC-92'de **veri-dayanaksız** bulunan
+  sıralama. Tek düğme, iki kusur.
+- **"Etkileşimli 3D" rozeti ve 3D galeri düğmesi.** *"Tıklanmadıkça yüklenmiyor"*
+  savunması müşteri tarafında **geçersizdir**: müşteri düğmeyi görür ve tıklar.
+  Bir **tetikleyici de vaattir.**
+
+**Uygulama:** böyle bir yetenek kapatılırken tetikleyicisi, rozeti ve sözlük metni
+**birlikte** kapanır; hepsi **tek bayrağa** bağlanır ki yüzeyler ayrı ayrı karar veremesin
+(bugünkü kusurun kök sebebi tam olarak yüzeylerin birbirinden habersiz olmasıydı).
+
+**Kapsam sınırı:** bayrak **müşteri** yüzeyini yönetir. Admin editörleri (ör. kategori
+kurucusunun 3D önizlemesi) buna **bağlanmaz** — orası bir vaat değil, bir çalışma aracıdır.
+
+**Kapı:** `INV-UCBOYUT-KAPALI-1` → `src/__tests__/conformance/uc-boyut-musteri-yuzeyi.test.ts`
+Kapı bayrağın **değerini** değil **bağını** ölçer; açma kararı insana aittir ve §4.5
+tablosuyla birlikte verilir.
+
 ## 2) Vaat kapatılırken düzen de kapatılır
 
 Rozet/kart listesinden kalem silmek **ızgarayı sessizce bozar** (2026-08-31'de ana
@@ -16463,6 +16491,24 @@ kapı gösteremez — gösterecek bir şey kalmamıştır. Bu yüzden liste **el
 
 Izgara sütun sayıları da geri alınır: PDP rozet listesi 1 → 3 (`SUTUN_SINIFI` tablosu),
 güven şeridi `lg:grid-cols-3` → `lg:grid-cols-6`.
+
+### 4.5.b — YETENEK vaatleri (REC-94, 2026-09-04)
+
+| Kaldırılan | Neredeydi | Dönüşte ne gerekir |
+|---|---|---|
+| `header.quickOrder` | Site kabuğu (`StickyHeader`) | **Anahtar SİLİNDİ** — metin yeniden yazılır. ⚠Eski hedefi `?sort=bestsellers` idi; o sıralama REC-92'de veri-dayanaksız bulundu, **aynı hedefle geri konmaz** |
+| PDP "Etkileşimli 3D" rozeti | Ürün sayfası galeri üstü | Bayrak `true` — rozet kendiliğinden döner |
+| Galeri 3D düğmesi | `ImageGallery` | Bayrak `true` |
+| Kategori paneli 3D ikon sahnesi | `CategoryHubOverlay` | Bayrak `true` |
+| Mega menü 3D arkaplanı | `EliteMegaMenu` | Bayrak `true` |
+| `/products` orbital 3D şerit | `ProductsDiscoveryView` | Bayrak `true`. ⚠Şerit dönerse `tests/smoke/ssr-html.spec.ts`'te `/tr/products` **`maxBailouts` 0 → 1** geri alınır |
+| `common.view3D` · `pdp.threeDAuthority.*` · `home.hero` içindeki "3D keşif" ifadeleri | Sözlük | **Anahtarlar SİLİNMEDİ** — bileşenler bayrağın arkasında duruyor, metin onlarla birlikte döner. ⚠Ama bayrak kapalıyken bu metinler **hiçbir yerde görünmüyor**; ölü-anahtar kapısı onları borç olarak sayabilir |
+
+⛔**Karıştırılmayacak:** `securedBy3d`, `bank3d`, `paymentLoading` içindeki "3D" **3D
+Secure**'dür — ödeme doğrulaması, görsel yetenek değil. Bu satırlara dokunulmaz.
+
+**Bayrak:** `src/config/features.ts` → `UC_BOYUT_MUSTERI_YUZEYINDE`.
+Derleme-zamanı sabittir (env değil), gerekçesi dosyanın kendi başlığında yazılı.
 
 **Bu tablo kapıya bağlıdır:** `INV-VAAT-SIZINTI-1` bölümün varlığını ve boş olmadığını
 ölçer. Liste silinirse kapı kırmızı verir — çünkü listenin kaybolması, dönüş yolculuğunda
