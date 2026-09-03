@@ -8,8 +8,14 @@ import { SITE_URL } from '@/config/siteUrl'
  * kendi tarama takvimi gelince görüyordu. Zincirin son halkası eksikti.
  *
  * ⚠ANAHTAR YOKSA SESSİZCE HİÇBİR ŞEY YAPMAZ — ve bu BİLEREK böyle.
- * `INDEXNOW_KEY` tanımlı değilse (yerel geliştirme, önizleme dağıtımı, anahtar henüz
- * girilmemiş) çağrı no-op'tur. Bildirim BEST-EFFORT bir yan etkidir: başarısız olması
+ * ⭐RECEP KARARI (2026-09-03): anahtar ve `public/<anahtar>.txt` ŞİMDİ girilmiyor —
+ * kategori adresleri kısa slug'a geçtiğinde aynı yayında girilecek, çünkü Bing'i birazdan
+ * DEĞİŞECEK adreslerle beslemek işe yaramaz. Yani bu modül aylarca anahtarsız yaşayacak;
+ * sessizlik geçici bir hâl değil, NORMAL hâl. Sözleşme `INV-INDEXNOW-1` ile kapı altında:
+ * ağ isteği denenmez, hata günlüğüne yazılmaz, ama yanıtta "atlandi" olarak GÖRÜNÜR —
+ * sessiz olmak görünmez olmak değildir (görünmez olsaydı çalışmayan bildirimi çalışıyor
+ * sanardık).
+ * `INDEXNOW_KEY` tanımlı değilse çağrı no-op'tur. Bildirim BEST-EFFORT bir yan etkidir: başarısız olması
  * webhook'u ASLA düşürmemeli, çünkü webhook'un asıl işi önbellek tazelemektir ve o iş
  * arama motoru bildiriminden çok daha kritiktir. Bu yüzden burada hiçbir hata yukarı
  * fırlatılmaz; yutulan hata GÜNLÜĞE yazılır (sessiz yutma on gün gizlenir — ölçüldü).
