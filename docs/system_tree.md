@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T15:52:00.130735+00:00
+compiled_at: 2026-09-03T17:41:47.615852+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-03T15:52:00.130735+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-03T17:41:47.615852+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -128,6 +128,9 @@ Bu belge, otonom derleyici tarafından 2026-09-03T15:52:00.130735+00:00 tarihind
 │   │   ├── ⚪ `product-schema-standard-brief.md`
 │   │   ├── ⚪ `rec108-aile-adi-dil-zinciri-2026-09-01.md`
 │   │   ├── ⚪ `rec110-114-117-migration-paketi-2026-09-01.md`
+│   │   ├── ⚪ `rec129-faz1-kabuk-plani-2026-09-04.md`
+│   │   ├── ⚪ `red-team-rec129-faz1-2026-09-04.md`
+│   │   ├── ⚪ `red-team-teklif-modu-2026-09-04.md`
 │   │   ├── ⚪ `render-dalga1-plan-2026-08-17.md`
 │   │   ├── ⚪ `saas-funding-and-packaging-2026-06.md`
 │   │   ├── ⚪ `seo-transition-blueprint.md`
@@ -136,6 +139,7 @@ Bu belge, otonom derleyici tarafından 2026-09-03T15:52:00.130735+00:00 tarihind
 │   │   ├── ⚪ `t080-odeme-ekrani-bos-2026-08-17.md`
 │   │   ├── ⚪ `t093-adres-il-ilce-2026-08-18.md`
 │   │   ├── ⚪ `t116-odeme-defteri-tasarim-2026-08-20.md`
+│   │   ├── ⚪ `teklif-modu-tutarlilik-paketi-2026-09-04.md`
 │   │   ├── ⚪ `tenant-id-hardening-2026-08-15.md`
 │   │   ├── ⚪ `urun-kimlik-duzeltme-2026-08-22.md`
 │   │   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
@@ -663,6 +667,7 @@ Bu belge, otonom derleyici tarafından 2026-09-03T15:52:00.130735+00:00 tarihind
 │   │   ├── ✅ `admin-resources.ts`
 │   │   ├── ✅ `admin.ts`
 │   │   ├── ✅ `applications.ts`
+│   │   ├── ✅ `features.ts`
 │   │   ├── ✅ `legal.ts`
 │   │   ├── ✅ `orbitalCarouselConfig.ts`
 │   │   └── ✅ `siteUrl.ts`
