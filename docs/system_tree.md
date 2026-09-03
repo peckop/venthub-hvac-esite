@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T17:41:47.615852+00:00
+compiled_at: 2026-09-03T18:11:53.220213+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-03T17:41:47.615852+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-03T18:11:53.220213+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -124,6 +124,7 @@ Bu belge, otonom derleyici tarafından 2026-09-03T17:41:47.615852+00:00 tarihind
 │   │   ├── ⚪ `j8-coupons-refactor-brief.md`
 │   │   ├── ⚪ `j9-categorybuilder-refactor-brief.md`
 │   │   ├── ⚪ `kademe2-clean-rebuild-2026-08-11.md`
+│   │   ├── ⚪ `kategori-esleme-2026-09-04.md`
 │   │   ├── ⚪ `product-schema-master-implementation-plan.md`
 │   │   ├── ⚪ `product-schema-standard-brief.md`
 │   │   ├── ⚪ `rec108-aile-adi-dil-zinciri-2026-09-01.md`
