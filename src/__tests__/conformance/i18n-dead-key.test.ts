@@ -141,11 +141,25 @@ const BARE_WORD = /(['"])([A-Za-z][\w]*)\1/g
  */
 const I18N_DOKUNAN = /(?:from\s+['"][^'"]*i18n[^'"]*['"])|useI18n|(?<![\w$])_?t\(/
 
+/**
+ * 7. EKSENİN DOSYA-BAĞI (REC-127 kalem 2b, 2026-09-04).
+ *
+ * Çıplak yaprak adı TEK BAŞINA "canlı" saymaz artık. Rescue ancak sözcüğün geçtiği
+ * dosya ANAHTARIN ATASINI da anıyorsa geçerli. `yollar` = o dosyada görülen sözlük
+ * yolları (statik anahtar + şablon öneki + dict erişimi).
+ */
+interface DosyaIzi {
+  yol: string
+  bareWords: Set<string>
+  yollar: string[]
+}
+
 interface Tarama {
   staticKeys: Set<string>
   prefixes: string[]
   dictPaths: string[]
   bareWords: Set<string>
+  dosyalar: DosyaIzi[]
   opaque: { file: string; line: number }[]
   tarananDosya: number
   bareWordDosya: number
@@ -157,6 +171,7 @@ function tara(): Tarama {
   const prefixes: string[] = []
   const dictPaths: string[] = []
   const bareWords = new Set<string>()
+  const dosyalar: DosyaIzi[] = []
   const opaque: { file: string; line: number }[] = []
   let tarananDosya = 0
   let bareWordDosya = 0
@@ -169,43 +184,53 @@ function tara(): Tarama {
     // 7. eksenin kapsamı: çeviriye DOKUNAN dosyalar. Bkz. I18N_DOKUNAN açıklaması.
     const i18nDokunan = I18N_DOKUNAN.test(src)
     if (i18nDokunan) bareWordDosya++
+    // Bu dosyanın KENDİ izi — 7. eksenin dosya-bağı için (bkz. DosyaIzi).
+    const buDosya: DosyaIzi = { yol: path.replace(/^\//, ''), bareWords: new Set<string>(), yollar: [] }
     src.split('\n').forEach((line, i) => {
       for (const m of line.matchAll(T_STATIC)) {
         staticKeys.add(m[2])
+        buDosya.yollar.push(m[2])
         eslesmeSayisi++
       }
       for (const m of line.matchAll(T_TEMPLATE)) {
         prefixes.push(m[1].replace(/\.$/, ''))
+        buDosya.yollar.push(m[1].replace(/\.$/, ''))
         eslesmeSayisi++
       }
       for (const m of line.matchAll(ANY_TEMPLATE)) {
         prefixes.push(m[1].replace(/\.$/, ''))
+        buDosya.yollar.push(m[1].replace(/\.$/, ''))
         eslesmeSayisi++
       }
       for (const m of line.matchAll(T_CONCAT)) {
         prefixes.push(m[2].replace(/\.$/, ''))
+        buDosya.yollar.push(m[2].replace(/\.$/, ''))
         eslesmeSayisi++
       }
       for (const m of line.matchAll(DICT_ACCESS)) {
         dictPaths.push(m[1])
+        buDosya.yollar.push(m[1])
         eslesmeSayisi++
       }
       for (const m of line.matchAll(BARE_KEY)) {
         staticKeys.add(m[2])
+        buDosya.yollar.push(m[2])
         eslesmeSayisi++
       }
       if (i18nDokunan) {
         for (const m of line.matchAll(BARE_WORD)) {
           bareWords.add(m[2])
+          buDosya.bareWords.add(m[2])
         }
       }
       for (const _m of line.matchAll(T_OPAQUE)) {
         opaque.push({ file: path.replace(/^\//, ''), line: i + 1 })
       }
     })
+    if (buDosya.bareWords.size > 0) dosyalar.push(buDosya)
   }
 
-  return { staticKeys, prefixes, dictPaths, bareWords, opaque, tarananDosya, bareWordDosya, eslesmeSayisi }
+  return { staticKeys, prefixes, dictPaths, bareWords, dosyalar, opaque, tarananDosya, bareWordDosya, eslesmeSayisi }
 }
 
 /**
@@ -222,9 +247,32 @@ function canli(key: string, t: Tarama): boolean {
   for (const p of t.prefixes) if (key.startsWith(p)) return true
   // `dict.a.b` görüldüyse o alt ağaç (ve o yola giden üst yollar) tüketiliyordur
   for (const d of t.dictPaths) if (key === d || key.startsWith(d + '.') || d.startsWith(key + '.')) return true
-  // 7. eksen: alt ağaç yaprak adıyla indeksleniyor olabilir (whatsapp.ts deseni)
+  /**
+   * 7. eksen — alt ağaç yaprak adıyla indeksleniyor olabilir (whatsapp.ts deseni).
+   *
+   * ⭐DOSYA-BAĞI ŞARTI (REC-127 kalem 2b, 2026-09-04). Çıplak yaprak adı TEK BAŞINA
+   * yetmez: sözcüğün geçtiği dosya, anahtarın ATASINI da anmalı.
+   *
+   * ÖLÇÜLMÜŞ KUSUR: `ProductDetailPageView.tsx` içinde `kimlik: 'warranty'` diye bir
+   * SEÇENEK KİMLİĞİ var (gerçek tüketici yanındaki `t('pdp.trust.warranty')`). Eski kural
+   * bu tek dizeyle sözlükteki HER `.warranty` yaprağını — hangi ağaçta olursa olsun —
+   * canlı sayıyordu. `home.whyVentHub.badges.warranty` tam bu yüzden ölü olduğu hâlde
+   * kapıdan geçti; ölçüm gösterdi ki o dosyada `whyVentHub` da `badges` da `home` da
+   * HİÇ geçmiyor (0 isabet).
+   *
+   * ŞARTIN whatsapp.ts'İ KIRMADIĞI ÖLÇÜLDÜ: o dosya `dict.whatsappMessages` yazıyor
+   * (DICT_ACCESS eşleşmesi), yani atayı ANIYOR — 7. eksen orada aynen çalışmaya devam eder.
+   *
+   * Gevşeklik hâlâ kasıtlı: ata eşlemesi ayraçsız `startsWith`, çünkü amaç ölüyü yakalamak
+   * değil, yanlış-kırmızı vermemek. Daraltma yalnız "alakasız dosyadan aklama"yı kesiyor.
+   */
   const son = key.slice(key.lastIndexOf('.') + 1)
-  if (t.bareWords.has(son)) return true
+  for (const d of t.dosyalar) {
+    if (!d.bareWords.has(son)) continue
+    for (const y of d.yollar) {
+      if (key === y || key.startsWith(y + '.') || y.startsWith(key + '.')) return true
+    }
+  }
   return false
 }
 
@@ -519,6 +567,176 @@ const DONMUS_BORC: ReadonlySet<string> = new Set([
   'quotes.admin.navLabel',
   'search.placeholder',
   'support.home.warrantyDesc',
+
+  // ============================================================================
+  // 2026-09-04 · REC-127 kalem 2b — 7. EKSENE DOSYA-BAĞI ŞARTI KONUNCA GÖRÜNEN 149 ANAHTAR
+  // ============================================================================
+  // Bunlar YENİ ölü anahtar DEĞİL: hepsi zaten ölüydü, kapı GÖRMÜYORDU. Eski kural çıplak
+  // yaprak adını tek başına "canlı" sayıyordu, yani ALAKASIZ bir dosyadaki tek dize
+  // (ör. `kimlik: 'warranty'`) sözlükteki her aynı-adlı yaprağı akliyordu. Şart artık
+  // sözcüğün geçtiği dosyanın anahtarın ATASINI da anması.
+  //
+  // Borç 355 -> 504 BÜYÜDÜ. "Liste yalnız küçülür" kuralı VERİ değişince geçerlidir;
+  // KAPI KESKİNLEŞTİĞİNDE gizli borcun görünür olması BEKLENEN sonuçtur — bu dosyanın
+  // 2026-08-23 notu da aynı şeyi söylüyor. Gizli kalması daha kötüydü.
+  //
+  // ÖRNEKLEM ELLE DOĞRULANDI (8 kalem): üçünde tam yol kaynakta "geçiyor" göründü ve
+  // üçü de ÖNEK ÇAKIŞMASI çıktı — `common.actions` için kaynakta `admin.common.actions`,
+  // `admin.inventory.table.location` için `...locationCol`, `admin.settings.logo` için
+  // `...logoUrlPlaceholder` var. Yani gevşek olan kapı değil, doğrulama grep'iydi.
+  //
+  // Dağılım: admin 113 · common 14 · category 8 · account 6 · returns 2 · diğer 6.
+  // SİLME AYRI KARAR: her anahtar için iki kanıt (erişilebilirlik ağacında 0 + sözlük dışı
+  // grep 0) gerekiyor; 113'ü admin yüzeyinde ve oturum açmayı gerektiriyor.
+  'account.addresses.ph.label',
+  'account.invoices.cancel',
+  'account.invoices.created',
+  'account.invoices.delete',
+  'account.invoices.title',
+  'account.invoices.type',
+  'admin.a11y.delete',
+  'admin.a11y.settings',
+  'admin.common.all',
+  'admin.common.ready',
+  'admin.common.search',
+  'admin.common.success',
+  'admin.coupons.table.actions',
+  'admin.dashboard.recent.title',
+  'admin.dashboard.table.order',
+  'admin.dataTable.pagination.page',
+  'admin.dataTable.states.loading',
+  'admin.errorGroups.table.actions',
+  'admin.inventory.movements',
+  'admin.inventory.status.normal',
+  'admin.inventory.status.reserved',
+  'admin.inventory.subtitle',
+  'admin.inventory.supplier',
+  'admin.inventory.table.abc',
+  'admin.inventory.table.available',
+  'admin.inventory.table.location',
+  'admin.inventory.table.physical',
+  'admin.inventory.table.reserved',
+  'admin.inventory.table.supplier',
+  'admin.inventory.table.threshold',
+  'admin.invoices.tabs.pending',
+  'admin.menu.categories',
+  'admin.menu.coupons',
+  'admin.menu.errorGroups',
+  'admin.menu.errors',
+  'admin.menu.inventory',
+  'admin.menu.movements',
+  'admin.menu.pricing',
+  'admin.menu.products',
+  'admin.menu.settings',
+  'admin.menu.users',
+  'admin.orders.actions.cancel',
+  'admin.orders.columns.amount',
+  'admin.orders.columns.conversationId',
+  'admin.orders.columns.created',
+  'admin.orders.columns.orderId',
+  'admin.orders.columns.status',
+  'admin.orders.export.headers.conversationId',
+  'admin.orders.export.headers.created',
+  'admin.orders.export.headers.products',
+  'admin.orders.filters.status',
+  'admin.orders.modals.logs.table.carrier',
+  'admin.orders.modals.logs.table.to',
+  'admin.orders.modals.logs.table.tracking',
+  'admin.orders.modals.shipping.advancedTable.carrier',
+  'admin.orders.modals.shipping.advancedTable.orderId',
+  'admin.orders.modals.shipping.advancedTable.tracking',
+  'admin.orders.states.loading',
+  'admin.orders.statusLabels.all',
+  'admin.orders.tooltips.notes',
+  'admin.orders.tooltips.shipping',
+  'admin.products.edit.actions.delete',
+  'admin.products.edit.actions.new',
+  'admin.products.edit.images.delete',
+  'admin.products.edit.images.down',
+  'admin.products.edit.images.none',
+  'admin.products.edit.images.up',
+  'admin.products.edit.info.brand',
+  'admin.products.edit.info.category',
+  'admin.products.edit.info.featured',
+  'admin.products.edit.info.name',
+  'admin.products.edit.info.sku',
+  'admin.products.edit.info.status',
+  'admin.products.edit.seo.slug',
+  'admin.products.edit.stock.stock',
+  'admin.products.edit.tabs.info',
+  'admin.products.edit.tabs.pricing',
+  'admin.products.edit.tabs.seo',
+  'admin.products.edit.tabs.stock',
+  'admin.products.form.price',
+  'admin.purchasing.detail.product',
+  'admin.purchasing.table.currency',
+  'admin.returns.empty.none',
+  'admin.search.categories',
+  'admin.search.coupons',
+  'admin.search.errorGroups',
+  'admin.search.inventory',
+  'admin.search.users',
+  'admin.settings.logo',
+  'admin.titles.inventory',
+  'admin.ui.add',
+  'admin.ui.failed',
+  'admin.ui.loading',
+  'admin.ui.next',
+  'admin.ui.prev',
+  'admin.ui.ready',
+  'admin.users.actions.admin',
+  'admin.users.actions.moderator',
+  'admin.users.actions.superadmin',
+  'admin.users.actions.user',
+  'admin.users.empty.admins',
+  'admin.users.empty.all',
+  'admin.users.info.items.admin',
+  'admin.users.info.items.moderator',
+  'admin.users.info.items.superadmin',
+  'admin.users.info.items.user',
+  'admin.webhooks.emailsTable.date',
+  'admin.webhooks.emailsTable.order',
+  'admin.webhooks.emailsTable.provider',
+  'admin.webhooks.emailsTable.to',
+  'admin.webhooks.returnsTable.carrier',
+  'admin.webhooks.returnsTable.order',
+  'admin.webhooks.returnsTable.received',
+  'admin.webhooks.search.returns',
+  'admin.webhooks.search.shipping',
+  'admin.webhooks.subtitle',
+  'admin.webhooks.tabs.returns',
+  'admin.webhooks.tabs.shipping',
+  'admin.webhooks.title',
+  'auth.features.mobile',
+  'category.airflow',
+  'category.feature',
+  'category.loading',
+  'category.noProducts',
+  'category.noise',
+  'category.notFound',
+  'category.open',
+  'category.pressure',
+  'checkout.emptyCart.desc',
+  'common.actions',
+  'common.all',
+  'common.amount',
+  'common.date',
+  'common.delete',
+  'common.featured',
+  'common.id',
+  'common.no',
+  'common.pdf',
+  'common.remove',
+  'common.series',
+  'common.sku',
+  'common.status',
+  'common.yes',
+  'header.adminBar.brand',
+  'orders.empty',
+  'pdp.certLabels.standard',
+  'returns.created',
+  'returns.status',
+  'support.home.subtitle',
 ])
 
 /**
@@ -672,6 +890,10 @@ describe('INV-6: sözlükte tüketicisi olmayan anahtar bırakılmaz', () => {
 
   it('sözlükte tüketicisi olmayan YENİ anahtar yok', () => {
     const olu = yapraklar.filter((k) => !canli(k, tarama) && !DONMUS_BORC.has(k))
+    // Vitest assertion mesajı diziyi ~1 kaleme KIRPIYOR; 149 kalemlik bir bulguda liste
+    // görünmezse bulgu doğrulanamaz. Bu döküm ortam değişkeniyle KAPALI gelir, ölçüm
+    // yaparken açılır: OLU_ANAHTAR_DOK=1 npx vitest run <bu dosya>
+    if (process.env.OLU_ANAHTAR_DOK === '1') console.warn('OLU_LISTE_BASI\n' + olu.join('\n') + '\nOLU_LISTE_SONU')
     expect(
       olu,
       `Tüketicisi olmayan ${olu.length} YENİ anahtar var. Ölü anahtar GÖRÜNMEZ bir kusurdur: ` +
@@ -695,5 +917,35 @@ describe('INV-6: sözlükte tüketicisi olmayan anahtar bırakılmaz', () => {
       'Bu anahtarlar artık ölü değil (kaldırıldı ya da tüketicisi yazıldı). ' +
         'DONMUS_BORC listesinden de çıkar — borç kaydı yalnız küçülebilir.',
     ).toEqual([])
+  })
+
+  /**
+   * 7. EKSENİN DOSYA-BAĞI, KENDİ BEKÇİSİYLE (REC-127 kalem 2b).
+   *
+   * Bu kol `canli()`yi SENTETİK bir taramayla çağırır: yalnız 7. ekseni izole eder
+   * (dictPaths/staticKeys/prefixes BOŞ). Niçin gerekli: daraltma tek bir `for` döngüsü
+   * ve biri onu sadeleştirmek isteyip eski tek-satırlık hâline döndürebilir — sözlükteki
+   * borç listesi bunu YAKALAMAZ, çünkü liste büyüdüğünde yeşil kalır. Kural kendi
+   * bekçisini taşımalı.
+   */
+  it('⭐DOSYA-BAĞI — çıplak yaprak adı, ATASINI anmayan dosyadan CANLI saymaz', () => {
+    const bos = { staticKeys: new Set<string>(), prefixes: [], dictPaths: [], bareWords: new Set(['warranty']), opaque: [], tarananDosya: 1, bareWordDosya: 1, eslesmeSayisi: 1 }
+
+    // ÖLÇÜLMÜŞ VAKA: ProductDetailPageView.tsx `kimlik: 'warranty'` yazıyor ve o dosyada
+    // `whyVentHub`/`badges`/`home` HİÇ geçmiyor. Alakasız dosya aklama YAPAMAZ.
+    const alakasiz: Tarama = { ...bos, dosyalar: [{ yol: 'ProductDetailPageView.tsx', bareWords: new Set(['warranty']), yollar: ['pdp.trust.warranty'] }] }
+    expect(
+      canli('home.whyVentHub.badges.warranty', alakasiz),
+      'Alakasız dosyadaki çıplak sözcük anahtarı canlı saydı — 7. eksenin dosya-bağı kalkmış. ' +
+        'Bu körlük 149 ölü anahtarı gizliyordu.',
+    ).toBe(false)
+
+    // whatsapp.ts DESENİ KORUNUYOR: dosya atayı anıyorsa (dict.whatsappMessages) rescue geçerli.
+    const whatsapp: Tarama = { ...bos, bareWords: new Set(['stockInquiry']), dosyalar: [{ yol: 'utils/whatsapp.ts', bareWords: new Set(['stockInquiry']), yollar: ['whatsappMessages'] }] }
+    expect(
+      canli('whatsappMessages.stockInquiry', whatsapp),
+      '7. eksen KIRILDI: yaprak adıyla indeksleyen whatsapp.ts deseni artık korunmuyor — ' +
+        'bu daraltma değil, ekseni yok etmek olur.',
+    ).toBe(true)
   })
 })
