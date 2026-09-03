@@ -117,10 +117,16 @@ ilk ölçümde `.agent/` altındaki betikler sayılmış ve sonuç 84/211 çıkm
 yaml'da `skip_dirs` içinde, yani doküman hattı oraya hiç bakmıyor. **Bekçi üreticiden
 farklı kapsam kullanırsa ölçtüğü şey gerçek değildir.**
 
-**Ratchet, sıfır değil.** Mevcut borç (C4=1, C5=34) taban olarak dondurulur: yeni borç
-eklenemez, azalınca taban düşürülmelidir (stale-guard bunu zorlar). Niçin tam-kapalı
-kurulmadı: bekçi ilk günden kırmızı yanarsa görmezden gelinir — bu depoda yaşandı
-(rastgele patlayan `pre-commit` `--no-verify` alışkanlığı doğurdu, T033).
+**Ratchet, sıfır değil.** İlk ölçümün borcu (2026-08-17: C4=1, C5=34) taban olarak
+donduruldu: yeni borç eklenemez, azalınca taban düşürülmelidir (stale-guard bunu zorlar).
+Niçin tam-kapalı kurulmadı: bekçi ilk günden kırmızı yanarsa görmezden gelinir — bu depoda
+yaşandı (rastgele patlayan `pre-commit` `--no-verify` alışkanlığı doğurdu, T033).
+
+⚠**Bu paragraf artık YALNIZ C5 için geçerlidir.** `C4_TABAN` 2026-09-03'te kaldırıldı, çünkü
+C4 bloklamayı bıraktı (§C4). Taban kavramının C4'teki yerini **sayacın canlılığı** aldı:
+korunan şey bir sayı değil, sayının **ayırt ettiği**. Bu satır, ratchet'in tek başına
+kalması hâlinde okuyucuya *"C4'ün de bir tavanı var"* dedirtmesin diye eklendi — cetvelde
+yaşayan yanlış iddianın bedeli aynı belgede §C6'da ölçüldü.
 
 **Ölçüm kaynağı = `git`, disk değil** (§C1 ile aynı gerekçe). Ek ölçüm: 2026-08-17'de
 17 companion **diskte güncel ama git'te eskiydi**. Bu ayrışma kendisi bir bulgudur ama
