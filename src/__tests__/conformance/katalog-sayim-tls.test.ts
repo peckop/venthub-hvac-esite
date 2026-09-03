@@ -40,8 +40,15 @@ const KOK = process.cwd()
 const BETIK = join(KOK, 'scripts', 'katalog', 'katalog-sayim.mjs')
 const VARSAYILAN_CA = join(KOK, 'scripts', 'db', 'checks', 'supabase-root-2021-ca.pem')
 
-/** Prod'a DOKUNMAZ: ulaşılamaz adres; TLS çözümü bağlantı denemesinden önce koşar. */
-const SAHTE_DB = 'postgresql://kullanici:parola@127.0.0.1:1/olmayan'
+/**
+ * Prod'a DOKUNMAZ: ulaşılamaz adres; TLS çözümü bağlantı denemesinden önce koşar.
+ *
+ * ⭐KİMLİK BİLGİSİ YOK — ve bu kozmetik değil: ilk hâli `kullanici:parola@` taşıyordu ve
+ * CI'nin "Secret guard" kolu onu HAKLI olarak yakaladı (desen: sabit gömülü bağlantı
+ * dizesi). Kapı ALTYAPI'nındır, gevşetilmedi; ölçüldü ki kimlik bilgisi buraya hiç
+ * gerekmiyormuş — betik yalnız dizenin BOŞ OLMAMASINI arıyor, bağlantı zaten kurulmuyor.
+ */
+const SAHTE_DB = 'postgresql://127.0.0.1:1/olmayan'
 
 function kos(env: Record<string, string | undefined>) {
   // Ortamı SIFIRDAN kurmuyoruz: proje `ProcessEnv`'i zorunlu alanlarla genişletiyor ve
