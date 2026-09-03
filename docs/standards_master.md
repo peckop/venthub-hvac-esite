@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T17:42:48.093240+00:00
+compiled_at: 2026-09-03T17:21:34.426916+00:00
 total_compiled_files: 64
-source_commit: ef78428a
+source_commit: fa40064a
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9945,6 +9945,70 @@ hükmünün bu işteki biçimi).
 **stderr'e** gider. Sabotaj **4/4**: beyan kaldırılır · sabit literal basar · stdout'a
 yazılır · okuyan fiillere de basar.
 
+---
+
+## 28. BEYAN YETMEZ — AYRIŞMA TUR BAŞINA ÖLÇÜLÜR (uyarı + sayım, kapı DEĞİL)
+
+**Ölçülmüş vaka sayısı: ALTI** (2026-09-01…04; URUN 4 + ALTYAPI 2). Kabuk sessizce
+paylaşılan **ANA dizine** kaydı ve şerit işi orada koştu. **Beşinde zarar SIFIRDI.**
+
+§27 bu sınıfın ilk yarısını kapatmıştı: yazan fiil **koştuğu dosyayı beyan eder**. Altıncı
+vaka o kapının **sınırını** gösterdi.
+
+### ⭐HÜKÜM — tehlike ölçüm komutunda değil, ARADAKİ masum yardımcı komutta
+
+URUN ölçtü: `node scripts/board/board.cjs` **göreli** yolla çağrılınca, bulunduğun
+dizindeki kopya koşar ve **kabuğun cwd'sini oraya çeker**. Sonraki komutlar sessizce
+yanlış ağaçta çalışır. Yani **komut başına beyan yetmez** — beyan eden komut doğru koşar,
+**ondan sonraki** komut kayar. Bu yüzden durum **tur başına** ölçülür: tur-sonu kancası
+oturumun dizini ile şerit ağacını karşılaştırır.
+
+### ⭐HÜKÜM — kuralı İNSANA değil KOMUTA göm
+
+URUN'un aynı vakadan çıkardığı ders, hükmün en kullanışlı hâli: *"beyan hatırlanması
+gereken bir şey, `git -C` hatırlanmaması gereken bir şey."* **Kanonik biçim:** komutlarda
+**mutlak yol**, git için **daima `git -C <ağaç>`**. Bir kural ancak hatırlanmayı
+gerektirmediğinde mekanizmadır.
+
+Aynı vakanın dürüstlük notu da kayda geçti: bu kural URUN'un hafızasında **zaten yazılıydı**;
+eksik olan bilgi değil **uygulamaydı**. Kapının değeri tam burasıdır — *bilinen ama
+uygulanmayan* kuralı araç hatırlatır.
+
+### ⭐HÜKÜM — KAPI DEĞİL, UYARI + SAYIM (Recep onaylı)
+
+Altı vakanın **beşinde** zarar sıfır olduğu için bloklamak **gürültü** üretir; gürültülü
+kapı bir süre sonra **okunmayan** kapıdır (§25). Ama uyarı tek başına da yetmez, çünkü
+**bedelsiz hata en uzun yaşayandır** (§27) — bu yüzden **sayaç** tutulur ve uyarı
+*"N. kayıtlı vaka"* der. Sayaç, zararsız tekrarların da bir maliyeti olduğunu görünür kılar:
+sınıfın kapı kazanmasını *o gün ne kadar can yaktığına* bırakmaz.
+
+### ⭐HÜKÜM — ayırt edici ölçüt `--git-dir` ≠ `--git-common-dir`
+
+Bağlı bir worktree'de bu ikisi **farklıdır** (`<ana>/.git/worktrees/<ad>` ve `<ana>/.git`);
+ana worktree'de **aynıdır**. **Kök eşitliği bu ayrımı YAPAMAZ:** `--show-toplevel` her iki
+hâlde de bir kök döndürür ve iki ayrı worktree'nin kökleri de farklıdır — yani kök
+karşılaştırması *"iki ayrı worktree"* ile *"worktree vs ana dizin"* arasında ayrım yapmaz.
+Aranan ayrım ikincisidir, çünkü tehlikeli olan **paylaşılan** ağaçta çalışmaktır.
+Sabit yol listesi yazılmaz: konum git'in kendi durumundan okunur, yoksa ölçüt makineye
+bağlanır ve başka makinede sessizce yanlış cevap verir.
+
+### İKİ KOŞUL BİRLİKTE — ana dizinde olmak tek başına ihlal değildir
+
+Uyarı ancak **(a)** dizin ana worktree **ve (b)** oturumun canlı bir şerit talebi varsa
+verilir. Talebi olmayan bir oturumun ana dizinde olması olağandır; tek koşulla uyarmak
+yanlış alarm üretirdi.
+
+### Bu bölümün kolları ve sınırı
+
+`INV-BOARD-KONUM-2`, 4 kol: `agacKonumu` worktree ile ana dizini **ayırt eder** ·
+ölçülemeyince **sebep yazar** (sessiz "temiz" dönmez) · yazan fiil **ayrışmada uyarır,
+ayrışma yokken uyarmaz** (ayırt edici çift) · tur-sonu kancası **ana dizin + talep**
+birleşiminde uyarır ve **sayar**, diğer iki hâlde sessiz kalır (iki ayırt edici karşı-kol).
+
+⚠**KAPSAM SINIRI, adıyla:** yeni bir Stop kancası **kaydedilmedi**; ölçüm zaten kayıtlı olan
+kancaya eklendi. Sebep: yeni kanca kaydı `.claude/settings.json` düzenlemek demektir, yani
+**config** — ve bu iş akran iletisiyle geldi. **Config'e akran sözüyle dokunulmaz.**
+
 
 ---
 # FILE: docs\standards\form-submission-standard.md
@@ -16342,34 +16406,6 @@ Uygulaması üç maddede:
    marka-özel bir iddia (ör. tek markanın Compasso d'Oro ödülü) vaat sızıntısıdır.
    Bu sınıf **karar gerektirir** — kapı onu kırmızı yapmaz, envantere yazar.
 
-## 1.4) YETENEK vaadi — ticari vaadin kardeşi (REC-94, 2026-09-04)
-
-Yukarıdaki üç madde **ticari** vaadi yönetir (ödeme, taksit, kargo). 2026-09-04'te aynı
-sınıfın ikinci yüzü ölçüldü: **yetenek vaadi.**
-
-> **Bir vitrin yüzeyi, arkasında bugün çalışan bir yetenek olmayan hiçbir EYLEM ya da
-> ÖZELLİK iddiasını gösteremez.**
-
-Ölçülmüş iki örnek:
-
-- **"Hızlı Sipariş" düğmesi** site kabuğunda duruyordu — sipariş verilemeyen bir sitede.
-  Üstelik gittiği yer `?sort=bestsellers`, yani REC-92'de **veri-dayanaksız** bulunan
-  sıralama. Tek düğme, iki kusur.
-- **"Etkileşimli 3D" rozeti ve 3D galeri düğmesi.** *"Tıklanmadıkça yüklenmiyor"*
-  savunması müşteri tarafında **geçersizdir**: müşteri düğmeyi görür ve tıklar.
-  Bir **tetikleyici de vaattir.**
-
-**Uygulama:** böyle bir yetenek kapatılırken tetikleyicisi, rozeti ve sözlük metni
-**birlikte** kapanır; hepsi **tek bayrağa** bağlanır ki yüzeyler ayrı ayrı karar veremesin
-(bugünkü kusurun kök sebebi tam olarak yüzeylerin birbirinden habersiz olmasıydı).
-
-**Kapsam sınırı:** bayrak **müşteri** yüzeyini yönetir. Admin editörleri (ör. kategori
-kurucusunun 3D önizlemesi) buna **bağlanmaz** — orası bir vaat değil, bir çalışma aracıdır.
-
-**Kapı:** `INV-UCBOYUT-KAPALI-1` → `src/__tests__/conformance/uc-boyut-musteri-yuzeyi.test.ts`
-Kapı bayrağın **değerini** değil **bağını** ölçer; açma kararı insana aittir ve §4.5
-tablosuyla birlikte verilir.
-
 ## 2) Vaat kapatılırken düzen de kapatılır
 
 Rozet/kart listesinden kalem silmek **ızgarayı sessizce bozar** (2026-08-31'de ana
@@ -16427,24 +16463,6 @@ kapı gösteremez — gösterecek bir şey kalmamıştır. Bu yüzden liste **el
 
 Izgara sütun sayıları da geri alınır: PDP rozet listesi 1 → 3 (`SUTUN_SINIFI` tablosu),
 güven şeridi `lg:grid-cols-3` → `lg:grid-cols-6`.
-
-### 4.5.b — YETENEK vaatleri (REC-94, 2026-09-04)
-
-| Kaldırılan | Neredeydi | Dönüşte ne gerekir |
-|---|---|---|
-| `header.quickOrder` | Site kabuğu (`StickyHeader`) | **Anahtar SİLİNDİ** — metin yeniden yazılır. ⚠Eski hedefi `?sort=bestsellers` idi; o sıralama REC-92'de veri-dayanaksız bulundu, **aynı hedefle geri konmaz** |
-| PDP "Etkileşimli 3D" rozeti | Ürün sayfası galeri üstü | Bayrak `true` — rozet kendiliğinden döner |
-| Galeri 3D düğmesi | `ImageGallery` | Bayrak `true` |
-| Kategori paneli 3D ikon sahnesi | `CategoryHubOverlay` | Bayrak `true` |
-| Mega menü 3D arkaplanı | `EliteMegaMenu` | Bayrak `true` |
-| `/products` orbital 3D şerit | `ProductsDiscoveryView` | Bayrak `true`. ⚠Şerit dönerse `tests/smoke/ssr-html.spec.ts`'te `/tr/products` **`maxBailouts` 0 → 1** geri alınır |
-| `common.view3D` · `pdp.threeDAuthority.*` · `home.hero` içindeki "3D keşif" ifadeleri | Sözlük | **Anahtarlar SİLİNMEDİ** — bileşenler bayrağın arkasında duruyor, metin onlarla birlikte döner. ⚠Ama bayrak kapalıyken bu metinler **hiçbir yerde görünmüyor**; ölü-anahtar kapısı onları borç olarak sayabilir |
-
-⛔**Karıştırılmayacak:** `securedBy3d`, `bank3d`, `paymentLoading` içindeki "3D" **3D
-Secure**'dür — ödeme doğrulaması, görsel yetenek değil. Bu satırlara dokunulmaz.
-
-**Bayrak:** `src/config/features.ts` → `UC_BOYUT_MUSTERI_YUZEYINDE`.
-Derleme-zamanı sabittir (env değil), gerekçesi dosyanın kendi başlığında yazılı.
 
 **Bu tablo kapıya bağlıdır:** `INV-VAAT-SIZINTI-1` bölümün varlığını ve boş olmadığını
 ölçer. Liste silinirse kapı kırmızı verir — çünkü listenin kaybolması, dönüş yolculuğunda

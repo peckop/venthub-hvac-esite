@@ -1,6 +1,7 @@
 import { execFileSync, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
+import { resolve } from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -84,6 +85,20 @@ interface BoardModule {
    * kimligini (--sid) dogrular — olculmus vaka icin INV-BOARD-3 icindeki BOZUK kimlik kolu.
    */
   sidDogrula: (sid: string) => { ok: boolean; tur?: string; sebep?: string; oneri?: string }
+  /**
+   * §28: "burası ANA dizin mi, yoksa worktree mi?" — ayırt edici ölçüt `--git-dir` ile
+   * `--git-common-dir` farkı; kök eşitliği bu ayrımı YAPAMAZ. Ölçülemezse `olculdu:false`
+   * + `sebep` döner (sessiz "temiz" dönmez).
+   */
+  agacKonumu: (dir?: string) => {
+    olculdu: boolean
+    sebep?: string
+    gitDir: string
+    ortakGitDir: string
+    anaMi: boolean
+    kok: string
+    anaAgac: string
+  }
   /** §23: TARAMA (gözcü süreci okuyor mu) ve TESLIM (bildirim KONUŞMAYA ulaştı mı) AYRI ölçümler. */
   taramaDurumu: (sid: string, now: number, esikTur?: number) => string
   teslimDurumu: (sid: string, now: number) => number | string
@@ -146,6 +161,52 @@ let dirCounter = 0
 function uniqueTempDir(prefix: string): string {
   dirCounter += 1
   return `${tmpRoot()}/${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}-${dirCounter}`
+}
+
+/**
+ * ⭐GEÇİCİ BAĞLI WORKTREE FİKSTÜRÜ — ortamı VARSAYMAK yerine durumu ÜRETİR.
+ *
+ * ⚠BU BİR DÜZELTMEDİR ve düzeltilen şey ORTAM VARSAYIMIYDI. İlk hâlinde §28 kolları
+ * "makinede zaten bir bağlı worktree ve bir ana dizin VAR" varsayımıyla ölçüyordu.
+ * O varsayım yerelde doğru, **CI'da yanlış**: koşucu tek bir checkout yapar, yani ana
+ * worktree ile "şeridin ağacı" AYNI dizindir ve ayrışma ortamda **hiç bulunmaz**.
+ * Kollar ölçmek istediği durumu üretemeyince kırmızı verdi — haklı olarak.
+ *
+ * ⚠REDDEDİLEN ALTERNATİF: *"worktree yoksa ATLA"*. O çözüm kolu CI'da hiçbir şey
+ * ölçmez hâle getirir ve **yeşil gösterir** — yani tam kaçındığımız sahte-yeşil sınıfı.
+ * Bir kol ölçemiyorsa atlamaz, AÇIKÇA "ölçülemedi" der ya da — burada olduğu gibi —
+ * ölçeceği durumu KENDİSİ kurar.
+ *
+ * ⚠GERÇEK DEPOYA DOKUNULMAZ: fikstür kendi `git init` deposunu kurar ve worktree'yi
+ * ONA ekler. Paylaşılan `.git/worktrees` altına geçici kayıt yazmak, aynı `.git`'i
+ * kullanan canlı şerit ağaçlarının yanına test çöpü bırakmak olurdu.
+ *
+ * Sabit yol YAZILMAZ: hem ana ağaç hem worktree geçici kökten türetilir. (Bu dosyada
+ * bir kez sabit yol yazdım, `INV-MUTLAK-YOL-1` CI'da yakaladı ve haklıydı — depo
+ * PUBLIC, sabit yol kullanıcı adını sızdırır ve ölçütü tek makineye bağlar. İkinci
+ * turda yorumda kalan kalıntıyı da aynı kapı yakaladı: sızıntı yorumda da sızıntıdır.)
+ */
+function sahteDepoWorktree(prefix: string): { ana: string; worktree: string } {
+  const ana = uniqueTempDir(`${prefix}-ana`)
+  const worktree = uniqueTempDir(`${prefix}-wt`)
+  // Kimlik `-c` ile VERİLİR: CI koşucusunda global `user.email` olmayabilir ve
+  // `commit` o zaman sessizce değil, HATA ile düşer.
+  const g = (args: string[]): string =>
+    execFileSync('git', ['-c', 'user.email=kapi@venthub.test', '-c', 'user.name=kapi', ...args], {
+      encoding: 'utf8',
+    })
+  g(['init', '-q', ana])
+  // `worktree add` en az bir commit ister; boş commit yeterli — içerik ölçülmüyor, KONUM ölçülüyor.
+  g(['-C', ana, 'commit', '-q', '--allow-empty', '-m', 'fikstur'])
+  g(['-C', ana, 'worktree', 'add', '-q', '--detach', worktree])
+  return { ana, worktree }
+}
+
+/** Bir dizinin git kökü — fikstürün BAĞIMSIZ referansı (uygulamanın kendi türetmesi değil). */
+function gitKoku(dir: string): string {
+  return execFileSync('git', ['-C', dir, 'rev-parse', '--path-format=absolute', '--show-toplevel'], {
+    encoding: 'utf8',
+  }).trim()
 }
 
 let boardDir: string
@@ -1410,6 +1471,157 @@ describe('INV-BOARD-KONUM-1: YAZAN fiil koştuğu DOSYAYI beyan eder (§27)', ()
       stdout.includes('[board] kosan:'),
       'Beyan STDOUT\'a düşmüş. Bu çıktıyı ayrıştıran kancalar/betikler beklenmedik satırla ' +
         'karşılaşır; tanı bilgisi stderr\'e yazılır.',
+    ).toBe(false)
+  })
+})
+
+/**
+ * INV-BOARD-KONUM-2 · §28 — AĞAÇ AYRIŞMASI: UYARI + SAYIM (kapı DEĞİL)
+ *
+ * ⭐NİÇİN VAR: 2026-09-01..04 arasında ALTI vaka ölçüldü (URUN 4 + ALTYAPI 2) — kabuk
+ * sessizce paylaşılan ANA dizine kaydı. §27 koşan dosyayı BEYAN ettiriyordu; URUN'un 6.
+ * vakası beyanın YETMEDİĞİNİ gösterdi: tehlike ölçüm komutunun kendisinde değil, ARADAKİ
+ * masum yardımcı komutta. `node scripts/board/board.cjs` GÖRELİ yolla çağrılınca
+ * bulunduğun dizindeki kopya koşar ve kabuğun cwd'sini oraya ÇEKER — beyan eden komut
+ * doğru koşar, ONDAN SONRAKİ komut kayar.
+ *
+ * ⚠NİÇİN KAPI DEĞİL: altı vakanın BEŞİNDE zarar sıfırdı. Bloklamak gürültü yapar ve
+ * gürültülü kapı bir süre sonra OKUNMAYAN kapıdır (§25). Recep onaylı hüküm: UYARI + SAYIM.
+ * SAYIM'ın işlevi de tam buradan gelir: bedelsiz hata en uzun yaşayandır (§27), sayaç
+ * zararsız tekrarları GÖRÜNÜR kılar.
+ *
+ * NİÇİN KANCA KOLLARI DA BURADA: ölçümün TEK KAYNAĞI `board.agacKonumu`; kanca onun
+ * tüketicisidir. İki yerde iki ayrı ölçüm yazmak §26'nın yasağıdır — kolları aynı
+ * dosyada tutmak, ayrışmayı ilk turda yakalatır.
+ */
+describe('INV-BOARD-KONUM-2 · §28 ağaç ayrışması (uyarı + sayım)', () => {
+  const board = loadBoard(uniqueTempDir('konum2'))
+
+  it('agacKonumu AYIRT EDER: worktree ile ANA dizin (kök eşitliği bu ayrımı yapamaz)', () => {
+    // Durum ÜRETİLİR: iki hâl de aynı koşuda ölçülür, ortamda ne bulunduğuna bakılmaz.
+    const { ana, worktree } = sahteDepoWorktree('konum2-ayirt')
+
+    const w = board.agacKonumu(worktree)
+    const a = board.agacKonumu(ana)
+    expect(w.olculdu, `worktree ÖLÇÜLEMEDİ: ${w.sebep ?? ''}`).toBe(true)
+    expect(a.olculdu, `ana ağaç ÖLÇÜLEMEDİ: ${a.sebep ?? ''}`).toBe(true)
+
+    // ⭐AYIRT EDİCİ ÇİFT: tek yön ölçmek yetmez. "Her zaman false dönen" bir uygulama da
+    // yalnız worktree kolunu geçerdi; "her zaman true dönen" de yalnız ana kolunu.
+    expect(w.anaMi, 'bağlı worktree ANA dizin sanıldı — ölçüt ayrışmayı göremez').toBe(false)
+    expect(a.anaMi, 'ana worktree ANA sayılmadı — ölçüt her yerde ayrışma uydurur').toBe(true)
+
+    // Mekanizma: --git-dir ile --git-common-dir bağlı worktree'de FARKLI, ana ağaçta AYNI.
+    // ⚠Kök eşitliği (--show-toplevel) bu ayrımı YAPAMAZ: iki ayrı worktree'nin kökleri de
+    // farklıdır, yani kök karşılaştırması "worktree vs ANA dizin" ayrımını vermez.
+    expect(
+      w.gitDir.toLowerCase() === w.ortakGitDir.toLowerCase(),
+      'worktree olduğu hâlde git-dir ile ortak git-dir AYNI — ölçüt ayırt etmiyor',
+    ).toBe(false)
+    expect(
+      a.gitDir.toLowerCase(),
+      'ana ağaçta git-dir ile ortak git-dir farklı çıktı — ölçüt yanlış eksende',
+    ).toBe(a.ortakGitDir.toLowerCase())
+
+    // anaAgac TÜRETİLİR (sabit yol yazılmaz) ve doğruluğu BAĞIMSIZ referansla ölçülür:
+    // uygulamanın kendi ifadesini tekrar etmek tautoloji olurdu.
+    expect(
+      w.anaAgac.replace(/\\/g, '/').toLowerCase(),
+      'worktree\'den okunan anaAgac, ana ağacın gerçek kökünü vermiyor',
+    ).toBe(gitKoku(ana).replace(/\\/g, '/').toLowerCase())
+  })
+
+  it('ÖLÇEMEMEK GEÇMEK DEĞİL: git olmayan dizinde sessiz "temiz" dönmez, SEBEP yazar', () => {
+    const yok = board.agacKonumu(`${tmpRoot()}/kesinlikle-git-olmayan-${Date.now()}`)
+    expect(yok.olculdu, 'git olmayan dizin ölçülmüş gibi döndü').toBe(false)
+    expect(
+      String(yok.sebep ?? ''),
+      'ölçüm başarısız ama SEBEP yazılmadı — sessiz fail-open, "temiz" sanılır',
+    ).not.toBe('')
+  })
+
+  it('YAZAN fiil AYRIŞMADA uyarır, ayrışma YOKKEN uyarmaz (ayırt edici çift)', () => {
+    const boardDir2 = uniqueTempDir('konum2-uyari')
+    const sid = '5a1c0000-1111-4222-8333-44445555cccc'
+    const env = { ...process.env, VENTHUB_BOARD_DIR: boardDir2 }
+    const agac = resolve(BOARD_MODULE_PATH, '..', '..', '..')
+
+    // A) AYRIŞMA: koşan dosya BU ağaçta, cwd BAŞKA bir ağaç. Ayrışma ÜRETİLİR — makinede
+    // hazır bir ikinci ağaç bulunmasına güvenilmez (CI'da tek checkout vardır).
+    const { worktree: baskaAgac } = sahteDepoWorktree('konum2-uyari')
+    const a = spawnSync(process.execPath, [BOARD_MODULE_PATH, 'heartbeat', '--sid', sid], {
+      encoding: 'utf8', cwd: baskaAgac, env, timeout: 60_000,
+    })
+    expect(
+      a.stderr,
+      'Ayrışma VAR ama uyarı YOK. §27 beyanı tek başına yetmez: beyan eden komut doğru ' +
+      'koşar, ondan sonraki komut kayar (URUN 6. vaka).',
+    ).toMatch(/AYRISMA/)
+
+    // B) AYRIŞMA YOK: cwd koşan dosyanın ağacı. Bu kol olmasa "her çıktıya uyarı basan"
+    // bir uygulama da A'yı geçerdi — ve gürültülü uyarı okunmaz olur (§25).
+    const b = spawnSync(process.execPath, [BOARD_MODULE_PATH, 'heartbeat', '--sid', sid], {
+      encoding: 'utf8', cwd: agac, env, timeout: 60_000,
+    })
+    expect(
+      /AYRISMA/.test(b.stderr),
+      'Ayrışma YOKKEN uyarı basıldı — yanlış alarm. Gürültülü uyarı, bir süre sonra ' +
+      'okunmayan uyarıdır; ölçüt ayırt etmek zorundadır.',
+    ).toBe(false)
+  })
+
+  it('TUR-SONU kancası: ANA dizinde + şerit talebi varsa UYARIR ve SAYAR; aksi hâlde sessiz', () => {
+    // ⭐Üç hâlin ÜÇÜ de üretilir. Önceki hâli makinede hazır bir ana ağaç + worktree
+    // arıyordu ve CI'da (tek checkout) o ikisi AYNI dizin olduğu için kollar ölçmek
+    // istediği durumu üretemiyordu. "Yoksa atla" seçilmedi: atlayan kol yeşil görünür.
+    const { ana: sahteAna, worktree: sahteWt } = sahteDepoWorktree('konum2-kanca')
+    const boardDir3 = uniqueTempDir('konum2-kanca-pano')
+    const env = { ...process.env, VENTHUB_BOARD_DIR: boardDir3 }
+    const kanca = resolve(BOARD_MODULE_PATH, '..', '..', '..', '.claude/hooks/verify-on-stop.cjs')
+    const sid = '5a1c0000-1111-4222-8333-44445555dddd'
+    const yabanci = '99999999-1111-4222-8333-444455556666'
+    const agac = resolve(BOARD_MODULE_PATH, '..', '..', '..')
+
+    // FİKSTÜR: kanca "şerit talebi VAR" durumunu ölçüyor — talep yazılmazsa kol boş
+    // kümede ölçüm yapar ve hiçbir şey kanıtlamaz (§25).
+    const talep = spawnSync(
+      process.execPath,
+      [BOARD_MODULE_PATH, 'claim', '--sid', sid, '--lane', 'KONUM2', '--globs', 'src/konum2/**'],
+      { encoding: 'utf8', cwd: agac, env, timeout: 60_000 },
+    )
+    expect(talep.status, `FİKSTÜR ÖNKOŞULU: claim yazılamadı (${talep.stderr})`).toBe(0)
+
+    const kos = (cwd: string, s: string): string => {
+      const r = spawnSync(process.execPath, [kanca], {
+        encoding: 'utf8', cwd, env, input: JSON.stringify({ session_id: s }), timeout: 120_000,
+      })
+      return r.stdout ?? ''
+    }
+
+    // A) ANA dizin + talep → UYARIR ve sayı taşır
+    const a = kos(sahteAna, sid)
+    expect(a, 'Ana dizinde şerit talebi varken tur-sonu uyarısı ÇIKMADI').toMatch(/AYRI[ŞS]MASI/)
+    // ⚠ÖLÇÜT SAYIYA BAĞLI, KELİMEYE DEĞİL — ilk hâli `/vaka/` idi ve SABOTAJI GEÇTİ:
+    // uyarı metninin başka bir cümlesinde ("vakaların beşinde olmadı") aynı kelime
+    // geçiyordu, yani sayaç silinse bile kol yeşil kalıyordu. Ayırt etmeyen gösterge
+    // ölçüm değildir; aranan şey SAYININ kendisi.
+    expect(
+      a,
+      'Uyarıda SAYIM yok — bedelsiz tekrarlar görünür olmalı (§27). Ölçüt "N. kayıtlı vaka" ' +
+      'biçimindeki SAYIYI arar; yalnız "vaka" kelimesini aramak sabotajı geçiriyordu.',
+    ).toMatch(/\d+\.\s*kay[ıi]tl[ıi]\s*vaka/)
+
+    // B) worktree + talep → SESSİZ
+    expect(
+      /AYRI[ŞS]MASI/.test(kos(sahteWt, sid)),
+      'Şerit kendi worktree\'sindeyken uyarı basıldı — yanlış alarm',
+    ).toBe(false)
+
+    // C) ANA dizin ama talep YOK → SESSİZ. Bu kol olmasa "ana dizinde her zaman uyaran"
+    // bir uygulama da A'yı geçerdi; oysa ölçüt İKİ koşulun BİRLİKTE sağlanmasıdır.
+    expect(
+      /AYRI[ŞS]MASI/.test(kos(sahteAna, yabanci)),
+      'Şerit talebi olmayan oturum için uyarı basıldı — ana dizinde olmak tek başına ihlal değil',
     ).toBe(false)
   })
 })
