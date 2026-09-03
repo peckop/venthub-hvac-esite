@@ -94,7 +94,7 @@ kurulmadı: bekçi ilk günden kırmızı yanarsa görmezden gelinir — bu depo
 17 companion **diskte güncel ama git'te eskiydi**. Bu ayrışma kendisi bir bulgudur ama
 bu bekçinin sorusu değildir; ikize giden şey depo hâlidir.
 
-## C6 — `.cc_docs.yaml` ↔ NotebookLM defteri paritesi (KAPI YAZILDI, SİLAHLANDIRMA BEKLİYOR)
+## C6 — `.cc_docs.yaml` ↔ NotebookLM defteri paritesi (MASTER'DA KAPI YOK — AÇIK PR'DA BEKLİYOR)
 
 Yaml'da listelenen bir kaynağın deftere gerçekten yüklendiği (ve defterde yaml'da
 olmayan artık kaynak bulunmadığı) ölçülmelidir. 2026-08-17'de elle yapıldı ve **5 eksik
@@ -105,10 +105,33 @@ defter durumu ise yalnız ağ üzerinden görülür. Bu yüzden iki parçalı:
 
 1. **Üretim (Orion, `orion@fc0aec0` — yapıldı):** sync, yüklemelerden **sonra defteri
    yeniden listeleyip** `docs/nlm_sync_manifest.json` yazar.
-2. **Bekçi (`INV-DOC-3`, `src/__tests__/conformance/nlm-manifest-parity.test.ts` — yazıldı,
-   PR #640):** yaml ile manifest'i karşılaştırır; beş iddia — manifest var mı ·
-   `olcum_basarili` mı · yaml'daki her kaynak manifest'in beklenen listesinde mi (bayat
-   manifest tespiti) · `eksik` boş mu · `fazla` boş mu.
+2. **Bekçi (kimlik HENÜZ VERİLMEDİ — `src/__tests__/conformance/nlm-manifest-parity.test.ts`,
+   yalnız PR #640 dalında yazıldı, **master'da YOK**):** yaml ile manifest'i karşılaştırır;
+   beş iddia — manifest var mı · `olcum_basarili` mı · yaml'daki her kaynak manifest'in
+   beklenen listesinde mi (bayat manifest tespiti) · `eksik` boş mu · `fazla` boş mu.
+
+### ⭐DÜZELTME (2026-09-03, ölçüldü) — bu madde İKİ yanlış iddia taşıyordu
+
+**(1) "yazıldı" master'ı işaret ediyordu; ölçüldü, dosya master'da da çalışma ağacında da
+YOK** — yalnız `#640` dalında var, o da 16 gündür açık. Bir cetvelin "yazıldı" demesi
+dosyayı var etmez; **"kural yazıldı" ile "koruma çalışıyor" ayrı iddialardır** ve ikincisi
+ayrıca ölçülür (aynı sınıf: `uretilmis-artefakt-standard.md` AXIOM 10).
+
+**(2) Kimlik `INV-DOC-3` idi ve o kimlik BAŞKA bir kapıda CANLI:**
+`src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts` içindeki Kapı C — üstelik
+`uretilmis-artefakt-standard.md`'nin hüküm tablosunda kayıtlı. Yani **aynı kimlik iki
+şeyi işaret ediyordu.** Bunun bedeli, kimlik çakışmasının kendisinden büyüktür: "INV-DOC-3
+yeşil" cümlesi hangi kapı için söylendiği belirsiz hâle gelir ve **yeşil, olmayan kapıya
+mal edilebilir.** Tazelik kapısının kimliği KORUNUR; yeni kimlik #640 inerken verilir.
+
+**Kimlik ATANMADI, bilerek.** Var olmayan bir kapıya şimdiden numara vermek, düzelttiğimiz
+kusurun küçük hâlini tekrar üretirdi: gerçek bir korumaya karşılık gelmeyen bir ad.
+Kolaylık olsun diye ölçülen şey şudur — bugün kullanımdaki kimlikler `INV-DOC-1, 2, 3, 4,
+4b, 5, 7`; **`INV-DOC-6` boştur.** #640'ı indiren kişi bunu doğrulayıp kullanabilir.
+
+⚠**`#640`'ın PR BAŞLIĞI da çakışan kimliği taşıyor** (`[BILINCLI-KIRMIZI] feat(gate):
+INV-DOC-3 yaml-defter paritesi`). İniş anında başlık ve test içindeki kimlik birlikte
+değiştirilmeli; yalnız bu satırı düzeltmek çakışmayı geri getirir.
 
 **Manifest NİYETİ değil ÖLÇÜMÜ yazar.** Niyet listesinden üretilse, yükleme yarıda kalsa
 bile "hepsi yüklendi" derdi — T075'te yakalanan sınıfın aynısı (başarısız işlem denetim
@@ -116,7 +139,12 @@ defterine `success` yazıyordu) ve o sınıfın en sinsi tarafı kaydın **kanı
 Ölçüm yapılamazsa manifest `olcum_basarili: false` + sebep yazar ve karşılaştırma alanlarını
 **boş bırakır**; boş listeyi "parite tam" diye okumak yasaktır (Orion tarafında 7 testle kilitli).
 
-**Kapı şu an bilinçli KIRMIZI ve bu doğru:** manifest ancak gerçek bir
+**İKİ DURUM AYRIDIR — karıştırılırsa risk yanlış okunur.** `#640` DALINDA kapı bilinçli
+KIRMIZI ve bu doğru. **MASTER'DA ise kapı hiç YOK**, ve bu aynı şey değildir: kırmızı kapı
+bağırır, **olmayan kapı sessizdir.** Bu maddenin eski hâli "şu an bilinçli kırmızı" diyerek
+okuyucuya *"korumamız var, sadece geçmiyor"* izlenimi veriyordu; gerçek durum
+*"bu eksende hiçbir koruma koşmuyor"*. Aşağıdaki gerekçe `#640` dalındaki kırmızıyı
+açıklar: manifest ancak gerçek bir
 `orion tree --nlm-sync` koşumuyla doğar, o komut da **canlı deftere** yazar (eski kaynakları
 silip yeniden yükler). Yani **silahlandırma bir yetki kararıdır**, testin işi değil — Recep
 onayı bekliyor. Fail-open eklenmedi: "defteri göremedim ama geçtim" diyen bir parite kapısı,
