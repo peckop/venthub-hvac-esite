@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
+import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../../config/features'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -129,7 +130,8 @@ const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate })
                                 <div className="m-0 grid list-none gap-x-8 p-8 sm:w-hvac-mega-sm sm:grid-cols-hvac-layout-split md:w-hvac-mega-md lg:w-hvac-mega-lg">
                                     <div className="row-span-3">
                                         <div className="flex h-full w-full select-none flex-col justify-end rounded-hvac-sm bg-slate-50/80 backdrop-blur-md border border-slate-100/50 shadow-inner p-6 no-underline outline-none focus-visible:ring-2 focus-visible:ring-slate-300 relative overflow-hidden rounded-xl">
-                                            <MegaMenu3DBackground categorySlug={category.slug} />
+                                            {/* REC-94: dekoratif de olsa 3D sahnesidir — kapalı. */}
+                                            {UC_BOYUT_MUSTERI_YUZEYINDE && <MegaMenu3DBackground categorySlug={category.slug} />}
                                             <div className="relative z-10">
                                                 <div className="text-primary-navy mb-4">
                                                     {getCategoryIcon(category.slug, { size: 48 })}

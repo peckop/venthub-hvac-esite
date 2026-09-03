@@ -265,7 +265,11 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
             <div className="flex-1 max-w-xl hidden sm:flex justify-center md:px-4"><NavSearchTrigger label={t('header.commandSearchCompact')} shortcutLabel="/" ariaLabel={t('common.search')} onClick={openSearchOverlay} /></div>
             <NavUtilityRail>
               <div className="hidden xl:flex items-center gap-1.5 w-auto opacity-100">
-                <NavActionButton ariaLabel={t('header.quickOrder')} title={t('header.quickOrder')} onClick={() => router.push(`${Routes.products()}?all=1&sort=bestsellers`)} tone="warning" icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" /></svg>} label={t('header.quickOrder')} />
+                {/* REC-94: "Hızlı Sipariş" KALDIRILDI. İki ayrı kusuru tek düğmede taşıyordu:
+                    (1) sipariş verilemeyen bir sitede SİPARİŞ vaat ediyordu (vaat-bütünlüğü
+                    cetveli §1.4 — yetenek vaadi); (2) gittiği yer `?sort=bestsellers` idi,
+                    yani REC-92'de veri-dayanaksız bulunan "çok satanlar" sıralaması.
+                    Geri dönüşte ne gerektiği cetvelin §4.5 tablosunda yazılı. */}
                 {recentProducts.length > 0 && (<NavActionButton ariaLabel={t('header.recentlyViewed')} title={t('header.recentlyViewed')} onClick={() => { if (recentProducts.length > 0) router.push(Routes.legacyProduct(recentProducts[0])) }} icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,6 12,12 16,14" /></svg>} />)}
                 <NavActionButton ariaLabel={t('header.favorites')} title={t('header.favorites')} onClick={() => router.push(Routes.account.favorites())} icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" /></svg>} />
               </div>

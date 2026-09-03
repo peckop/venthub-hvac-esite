@@ -25,8 +25,14 @@ interface Rule {
 
 const RULES: Rule[] = [
   { path: '/tr', markers: [/<h1[\s>]/], maxBailouts: 0 },
-  // 1 bailout bilinçli: CategoryOrbitCarousel (3D) kendi Suspense'inde ssr:false.
-  { path: '/tr/products', markers: [/<h2[\s>]/, /data-ssr="family-card"/], maxBailouts: 1 },
+  // REC-94: 3D orbital şerit müşteri yüzeyinden kaldırıldı → o ssr:false adası da yok,
+  // bailout beklentisi 1'den 0'a İNDİ. Eşiği indirmek işin parçası: assertion
+  // `toBeLessThanOrEqual` olduğu için 1'de bırakılsaydı kazanç kayda GEÇMEZDİ ve
+  // yarın biri şeridi geri koysa kapı sessiz kalırdı (ratchet kurgusu).
+  // ⭐Ayrıca marker `<h2` idi ve BAYATTI: #959 ile bu sayfanın başlığı h1 yapıldı ve
+  // sayfada başka h2 kalmadı — spec koşsaydı DÜŞERDİ. Düşmedi çünkü hiç koşmuyor
+  // (SMOKE_BASE_URL hiçbir workflow'da tanımlı değil; kapı boşluğu ALTYAPI'ya bildirildi).
+  { path: '/tr/products', markers: [/<h1[\s>]/, /data-ssr="family-card"/], maxBailouts: 0 },
   // Üst kategori: alt-kategori kartları basar (aile kartı değil) — yalnız başlık marker'ı.
   { path: '/tr/category/konut-tipi-havalandirma', markers: [/<h1[\s>]|<h2[\s>]/], maxBailouts: 0 },
   // Yaprak alt-kategori: aile kartları SSR'da olmalı.

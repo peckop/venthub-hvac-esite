@@ -65,6 +65,10 @@ const VITRIN_YOLLARI = [
   'views/support',
   'views/CartPage.tsx',
   'views/BrandsPage.tsx',
+  // REC-94 (2026-09-04): site kabuğu KAPSAMA ALINDI. Buraya "Hızlı Sipariş" düğmesi
+  // yazılmıştı ve kapı GÖRMÜYORDU — çünkü StickyHeader hiçbir taranan yolun altında
+  // değildi. Kusuru insan gözü buldu, kapı değil; boşluk kapatıldı.
+  'components/StickyHeader.tsx',
 ]
 
 /** Ödeme akışının kendi ağacı — vaat burada meşrudur, taranmaz. */

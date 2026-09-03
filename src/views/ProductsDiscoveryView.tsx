@@ -20,6 +20,7 @@ import React, { Suspense, useCallback, useRef, useState } from 'react'
 import type { FamilyListItem } from '@/types/ui-models'
 
 import FamilyCard from '../components/products/FamilyCard'
+import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../config/features'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
 import type { DomainCategory } from '../lib/type-converters'
@@ -76,8 +77,12 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
     return (
         <div className="bg-surface-darker min-h-screen relative pb-12 w-full pt-16 md:pt-24">
             
-            <div className={`
-                transition-max-height-opacity duration-700 ease-hvac-ease z-30 w-full overflow-hidden 
+            {/* REC-94: 3D orbital kategori seçimi müşteri yüzeyinden kaldırıldı.
+                Kutu KOŞULLU: bayrak kapalıyken sarmalayıcı da render EDİLMEZ — aksi halde
+                sayfanın üstünde boş bir şerit ve gereksiz kenarlık kalırdı. Yerine gelecek
+                kategori kartları ayrı PR'da (sıfır yeni bileşen, mevcut kanıtlı desen). */}
+            {UC_BOYUT_MUSTERI_YUZEYINDE && <div className={`
+                transition-max-height-opacity duration-700 ease-hvac-ease z-30 w-full overflow-hidden
                 bg-surface-darker border-b border-white/5 shadow-2xl relative
             `}>
                 <div className="relative w-full">
@@ -98,7 +103,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                         />
                     </Suspense>
                 </div>
-            </div>
+            </div>}
 
             {/* --- Ürün Grid --- */}
             <AnimatePresence>
