@@ -559,3 +559,78 @@ kullanıyordu — yani silmek güvenliydi. **Aynı ölçüm ters çıksaydı** (
 migration hattında okunuyor olsaydı) bu "temizlik", prod'a yazan hattı sessizce kırardı.
 Silmenin bedeli, kimin okuduğuna bağlıdır; okuyanı ölçmeden silinmez (AXIOM 6'nın
 akrabası: yıkıcı adım, onarıcı adımın yapılabilirliği ölçülmeden koşmaz).
+
+---
+
+## AXIOM 11 — KAPIYI DONDURMAK, ÖLÇÜMÜ SUSTURMAK DEĞİLDİR (REC-132 · D1)
+
+### Karar ve ölçülmüş gerekçe
+
+Üretilmiş toplamalar (`docs/*_master.md` + `artefakt_manifest.json`) her şeridin PR'ında yol
+alıyordu. Ölçüm (2026-09-03/04, tek şerit): **yedi** taban tazelemesi, her biri tam bir CI
+koşumu. İki PR'da (`#962`, `#965`) kapılar **hiç doğmadı**, çünkü çakışık PR'ın birleşme ref'i
+üretilemiyor — yani bu sınıf yalnız zaman yakmıyor, **sahte yeşil** de üretiyor. Aynı gün
+`#966` (URUN) ve `#967` (ALTYAPI) de aynı sebeple DIRTY'ye düştü.
+
+**Recep/OPS kararı (2026-09-04): üretim DONDURULUR.** `INV-DOC-4b`'nin parity kolu
+**bloklamaktan SAYIMA** döner.
+
+### HÜKÜM
+
+1. **Eşik uzatılmaz, kapı silinmez.** Ölçüm her koşuda yapılır ve sayı basılır; yalnız çıkış
+   kodunu düşürmez. Bir kapıyı kapatmak ölçümü susturmak değildir (§21).
+2. **Sayı TEK KAYNAKTAN gelir:** `scripts/hijyen/artefakt-bayatlik-sayim.cjs`. Kol ve pano
+   onun **tüketicisidir**; kol ayrıca kendi **bağımsız** hesabıyla çapraz doğrular — paylaşılan
+   tek uygulama iki yönde birden yanılabilir.
+3. **Görünürlük zorunlu:** sayı `board.cjs yoklama` çıktısında yaşar. Hiçbir yere yazılmayan
+   bir "kabul edilmiş boşluk" sessizleşir.
+4. ⭐**DONDURULAN KOL ADIYLA YAZILIR.** Dondurulan **tek** kol
+   `uretilmis-artefakt-tazeligi.test.ts` içindeki *"⭐derlemeye giren her kaynak, manifestteki
+   blob SHA ile AYNI"* kolunun **bloklama** davranışıdır. Şunlar **BLOKLAMAYA DEVAM EDER:**
+   - `INV-DOC-4b`'nin diğer iki kolu (izlenmeyen kaynak · vacuous-guard),
+   - **AXIOM 3 kolu** — `INV-DOC-4` içindeki *"⭐depodaki artefaktın içeriği manifestteki
+     özetle AYNI"*. **Üretilmiş dosyayı elle düzenlemek hâlâ KIRMIZIDIR** ve bu, üretilmiş
+     dosya diskte kalmaya devam ettiği için daha da önemlidir.
+   - `INV-DOC-3` ve `INV-DOC-7`.
+5. ⭐**ELLE TAZELEMENİN DURMA ÖLÇÜTÜ "DIFF BOŞ" DEĞİL, KAPININ YEŞİLİDİR.** Bu zincir byte
+   düzeyinde sabit noktaya **hiç ulaşmaz**: `compiled_at` ve `source_commit` her koşumda
+   değişir. "Fark kalmayana kadar üret" diyen bir ritüel sonsuz döner. (URUN 2026-09-04'te
+   bedelini ödedi.)
+
+### ⚠BU HÜKMÜN İLK HÂLİ YANLIŞTI — plan-challenger düzeltti, kayda geçiyor
+
+İlk plan *"`INV-DOC-4b`'nin iki kolu var: parity ve elle-düzenleme"* diyordu. Bağımsız bir
+plan-challenger ölçtü: **üç** kolu var ve **üçü de kaynak tarafında**; elle-düzenleme kolu
+başka bir değişmezin (`INV-DOC-4`) içinde. Yani "şu kapıyı dondur" emri hangi kolu
+dondurduğunu söylemiyordu ve vacuous-guard kolu da dondurulursa kapı **sessizce boşalırdı**.
+
+**Ders:** bir kapıyı dondurma emri, dondurulan kolu **`it` adıyla** göstermek zorundadır.
+"Kapıyı dondur" bir emir değil, bir belirsizliktir.
+
+### ⚠REDDEDİLEN YARIM ÇÖZÜM — ve niçin reddedildi
+
+Aynı işin ilk hâli iki dosyayı (`standards_master.md`, `kayitlar_master.md`) **takipten
+düşürmeyi** de içeriyordu (2,18 MB). **Ölçümle düştü:** `origin/master` son 40 commit'inde
+beş üretilmiş dosyadan birine dokunan **35/40 (%87,5)**; o iki dosya çıktıktan sonra kalan üç
+dosyaya dokunan da **35/40 (%87,5)**. **Fark SIFIR** — çakışma yüzeyi hiç daralmıyor, çünkü
+`artefakt_manifest.json` ve `venthub_hvac_master.md` zaten aynı commit'lerde değişiyor.
+
+Bedeli ise ölçüldü: `INV-DOC-3` ve `INV-DOC-4` kırmızı olur; `artefakt-ilan-istisnalari.json`
+kaçış yolu *"istisna kaydı BAYATLAMAZ"* kolunu anında kırmızı yapar; yeşile dönmenin tek
+dürüst yolu manifesti **yeniden üretmektir** (manifest üretilmiş bir dosyadır — elle satır
+silmek AXIOM 3 ihlali), yani iş şeridin sınırını aşar.
+
+**Hüküm:** takipten düşürme bu işten **düştü**. İstenirse ayrı iş olarak açılır ve gerekçesi
+**"depo boyutu"** yazılır — *"çakışmayı çözüyor"* diye açılamaz, çünkü çözmüyor.
+
+⚠**Yazılı tuzak:** `.cc_docs.yaml`'ın `skip_files` satırındaki o iki ad **KALIR**. Silinirse
+`source_dirs: [src, "."]` süpürmesi 2,2 MB'ı `venthub_hvac_master.md`'nin içine **emer**.
+
+### Kapsam sınırı — bu maddede YAPILMAYAN
+
+**Üretimin kancalardan çıkarılması (D2) bu maddenin kapsamında DEĞİLDİR.** Ölçüldü:
+`orion doc build`in tek çağıranı `scripts/hijyen/taban-tazele.cjs` (satır 203) —
+`.githooks/post-commit`/`post-merge` bu dört master'ı üretmiyor, `lane-precommit.cjs` ise bu
+dosyaları ne üretiyor ne okuyor. D2 ayrı bir PR'da, `taban-tazele`nin kendi kollarıyla
+birlikte yapılır. **Bu madde tek başına yeterlidir:** kapı artık bloklamadığı için üretim
+yapılmasa da kırmızı doğmaz.
