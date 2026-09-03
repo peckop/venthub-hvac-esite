@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-02T08:15:53.369005+00:00
+compiled_at: 2026-09-03T12:26:17.004943+00:00
 total_compiled_files: 101
-source_commit: e5f15dcc
+source_commit: 43884161
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -14139,11 +14139,11 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-01T12:05:31.107394+00:00
+compiled_at: 2026-09-03T12:25:23.497501+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-01T12:05:31.107394+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-03T12:25:23.497501+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -14962,6 +14962,7 @@ Bu belge, otonom derleyici tarafından 2026-09-01T12:05:31.107394+00:00 tarihind
 │   │   ├── ✅ `rbac.ts`
 │   │   ├── 📂 **seo/**
 │   │   │   ├── ❌ `canonicalOrigin.ts`
+│   │   │   ├── ❌ `indexnow.ts`
 │   │   │   └── ✅ `jsonld.ts`
 │   │   ├── 📂 **services/**
 │   │   │   ├── ✅ `address.service.ts`
@@ -15243,11 +15244,13 @@ Bu belge, otonom derleyici tarafından 2026-09-01T12:05:31.107394+00:00 tarihind
 - [ ] `src\lib\images\categoryImage.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
+- [ ] `src\lib\seo\indexnow.ts`
 - [ ] `src\components\admin\data-table\DataTablePagination.tsx`
 - [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
+- [ ] `src\lib\seo\indexnow.ts`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
