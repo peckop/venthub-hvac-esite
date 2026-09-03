@@ -48,9 +48,10 @@ concurrency:
 
 permissions:
   # ⚠`contents: read` bu blok yazıldığı anda ZORUNLU — varsayılanlar düşer ve checkout
-  # "Repository not found" verir (2026-08-14'te ölçüldü). `write` PR dalını itmek için.
+  # "Repository not found" verir (2026-08-14'te ölçüldü). `write` dalı itmek için.
   contents: write
-  pull-requests: write
+  # ⚠`pull-requests: write` KALDIRILDI: bu iş artık PR açmıyor (OPS kararı b). Kullanılmayan
+  # izin, gerekmediği hâlde duran yüzeydir — ve repo PUBLIC. İzin, işin yaptığı kadar olur.
 
 jobs:
   sayim:
@@ -138,10 +139,21 @@ jobs:
             echo "docs/audits/ degismedi — PR ACILMAYACAK (gurultu uretmez)."
           fi
 
-      - name: PR ac
+      # ⭐PR ACILMAZ — DAL ITILIR, PR'I INSAN ACAR (OPS karari 2026-09-04, secenek b).
+      #
+      # NICIN: ilk gercek kosumda (run 33796658029) tablo URETILDI ve dal ITILDI, ama PR
+      # adimi sunu dedi:
+      #   GitHub Actions is not permitted to create or approve pull requests
+      # Bu bir REPO AYARI (Settings -> Actions), `permissions:` blogu ile ASILMAZ.
+      #
+      # Iki yol vardi: (a) ayari ac, (b) PR'i insana birak. (b) secildi — daha az izin,
+      # daha az yuzey; ve degisiklik yoksa zaten dal bile itilmiyor. Ayara DOKUNULMADI:
+      # yapilandirma degisikligi bu isin kapsaminda degil.
+      #
+      # ⚠VERI KAYBI YOK ve bu onemli: tablo hem DALDA hem ARTEFAKTTA duruyor. Teslim ayagi
+      # bir insan adimi; olcum ayagi tam otomatik.
+      - name: Dali it (PR'i insan acar)
         if: steps.fark.outputs.var == 'evet'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           TARIH="$(date -u +%Y-%m-%d)"
@@ -163,18 +175,6 @@ jobs:
           } > /tmp/katalog-commit.txt
           git commit -F /tmp/katalog-commit.txt
           git push -u origin "$DAL"
-          # ⚠Govde DOSYADAN verilir: cok satirli bir `--body` argumaninin devam satirlari
-          # YAML blok skalarindan cikar ve dosyayi bozar (bu isi yazarken olculdu).
-          {
-            printf 'Gunluk katalog sayimi. Kaynak: `scripts/katalog/katalog-sayim.mjs` (REC-136).\n\n'
-            printf 'Bu tablo, sayisal katalog iddialarinin TEK kaynagidir; elden SQL yalniz\n'
-            printf 'kesiftir (`fleet-mechanism-standard.md` s29).\n\n'
-            printf 'Uretilmis toplamalara **dokunulmadi** — uretim dondurulmus (AXIOM 11);\n'
-            printf 'PR yalniz `docs/audits/` tasir.\n\n'
-            printf 'Baglanti ya da sorgu duserse bu is **kirmizi** verir ve **hicbir sey**\n'
-            printf 'yazmaz; bos tablo uretmez.\n'
-          } > /tmp/katalog-pr-govde.md
-          gh pr create \
-            --title "(OTOMASYON) katalog sayimi ${TARIH}" \
-            --body-file /tmp/katalog-pr-govde.md \
-            --base master --head "$DAL"
+          # Insanin ne yapacagi CIKTIDA yazili olsun — "dal itildi" tek basina eylem cagirmaz.
+          echo "::notice title=Katalog Sayimi::Dal itildi: ${DAL}. PR'i ACMAK INSANA AIT (OPS karari b)."
+          echo "PR acmak icin:  gh pr create --base master --head ${DAL} --title \"(OTOMASYON) katalog sayimi ${TARIH}\""
