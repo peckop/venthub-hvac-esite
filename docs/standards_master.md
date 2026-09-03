@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T12:15:54.777704+00:00
+compiled_at: 2026-09-03T12:24:12.423901+00:00
 total_compiled_files: 64
-source_commit: e511ff6c
+source_commit: 6c6298e0
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -4717,33 +4717,11 @@ defter durumu ise yalnız ağ üzerinden görülür. Bu yüzden iki parçalı:
 
 1. **Üretim (Orion, `orion@fc0aec0` — yapıldı):** sync, yüklemelerden **sonra defteri
    yeniden listeleyip** `docs/nlm_sync_manifest.json` yazar.
-2. **Bekçi (kimlik HENÜZ VERİLMEDİ — `src/__tests__/conformance/nlm-manifest-parity.test.ts`,
-   yalnız PR #640 dalında yazıldı, **master'da YOK**):** yaml ile manifest'i karşılaştırır;
-   beş iddia — manifest var mı · `olcum_basarili` mı · yaml'daki her kaynak manifest'in
-   beklenen listesinde mi (bayat manifest tespiti) · `eksik` boş mu · `fazla` boş mu.
-
-### ⭐DÜZELTME (2026-09-03, ölçüldü) — bu madde İKİ yanlış iddia taşıyordu
-
-**(1) "yazıldı" master'ı işaret ediyordu; ölçüldü, dosya master'da da çalışma ağacında da
-YOK** — yalnız `#640` dalında var, o da 16 gündür açık. Bir cetvelin "yazıldı" demesi
-dosyayı var etmez; **"kural yazıldı" ile "koruma çalışıyor" ayrı iddialardır** ve ikincisi
-ayrıca ölçülür (aynı sınıf: `uretilmis-artefakt-standard.md` AXIOM 10).
-
-**(2) Kimlik `INV-DOC-3` idi ve o kimlik BAŞKA bir kapıda CANLI:**
-`src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts` içindeki Kapı C — üstelik
-`uretilmis-artefakt-standard.md`'nin hüküm tablosunda kayıtlı. Yani **aynı kimlik iki
-şeyi işaret ediyordu.** Bunun bedeli, kimlik çakışmasının kendisinden büyüktür: "INV-DOC-3
-yeşil" cümlesi hangi kapı için söylendiği belirsiz hâle gelir ve **yeşil, olmayan kapıya
-mal edilebilir.** Tazelik kapısının kimliği KORUNUR; yeni kimlik #640 inerken verilir.
-
-**Kimlik ATANMADI, bilerek.** Var olmayan bir kapıya şimdiden numara vermek, düzelttiğimiz
-kusurun küçük hâlini tekrar üretirdi: gerçek bir korumaya karşılık gelmeyen bir ad.
-Kolaylık olsun diye ölçülen şey şudur — bugün kullanımdaki kimlikler `INV-DOC-1, 2, 3, 4,
-4b, 5, 7`; **`INV-DOC-6` boştur.** #640'ı indiren kişi bunu doğrulayıp kullanabilir.
-
-⚠**`#640`'ın PR BAŞLIĞI da çakışan kimliği taşıyor** (`[BILINCLI-KIRMIZI] feat(gate):
-INV-DOC-3 yaml-defter paritesi`). İniş anında başlık ve test içindeki kimlik birlikte
-değiştirilmeli; yalnız bu satırı düzeltmek çakışmayı geri getirir.
+2. **Bekçi — KİMLİK HENÜZ VERİLMEDİ, MASTER'DA YOK** (`src/__tests__/conformance/nlm-manifest-parity.test.ts`,
+   yalnız PR #640 dalında yazıldı)**:** yaml ile manifest'i karşılaştırır; beş iddia —
+   manifest var mı · `olcum_basarili` mı · yaml'daki her kaynak manifest'in beklenen
+   listesinde mi (bayat manifest tespiti) · `eksik` boş mu · `fazla` boş mu.
+   Gerekçesi ve kimlik hikâyesi bu bölümün sonundaki DÜZELTME notundadır.
 
 **Manifest NİYETİ değil ÖLÇÜMÜ yazar.** Niyet listesinden üretilse, yükleme yarıda kalsa
 bile "hepsi yüklendi" derdi — T075'te yakalanan sınıfın aynısı (başarısız işlem denetim
@@ -4766,6 +4744,34 @@ kapının hiç olmamasından kötüdür çünkü yeşil görünür.
 **elle uydurdu** (`olcum_basarili: true`, uydurma zaman damgası, icat edilmiş `source-1…N`
 id'leri; PR #643, kapatıldı). Türev kural `collaboration-protocol.md` **K7**'ye yazıldı:
 denetim artefaktı **elle yazılmaz** — onu üreten şey ölçümü yapan araç olmalıdır.
+
+### ⭐DÜZELTME (2026-09-03, ölçüldü) — bu bölüm İKİ yanlış iddia taşıyordu
+
+**(1) "yazıldı" master'ı işaret ediyordu; ölçüldü, dosya master'da da çalışma ağacında da
+YOK** — yalnız `#640` dalında var, o da 16 gündür açık. Bir cetvelin "yazıldı" demesi
+dosyayı var etmez: **"kural yazıldı" ile "koruma çalışıyor" ayrı iddialardır** ve ikincisi
+ayrıca ölçülür (aynı sınıf: `uretilmis-artefakt-standard.md` AXIOM 10). Bu yanlış iddianın
+yıllanabilmesinin sebebi de kayda değer — **bu satırı hiçbir kapı okumuyordu.**
+
+**(2) Kimlik `INV-DOC-3` idi ve o kimlik BAŞKA bir kapıda CANLI:**
+`src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts` içindeki Kapı C, üstelik
+`uretilmis-artefakt-standard.md`'nin hüküm tablosunda kayıtlı. **Aynı kimlik iki şeyi
+işaret ediyordu.** Bedeli çakışmanın kendisinden büyüktür: *"INV-DOC-3 yeşil"* cümlesinin
+hangi kapı için söylendiği belirsizleşir ve **yeşil, var olmayan kapıya mal edilebilir.**
+Tazelik kapısının kimliği KORUNUR.
+
+**Kimlik ATANMADI, bilerek.** Var olmayan bir kapıya şimdiden numara vermek, düzelttiğimiz
+kusurun küçük hâlini tekrar üretirdi: gerçek bir korumaya karşılık gelmeyen bir ad.
+Kolaylık için ölçülen şudur — bugün kullanımdaki kimlikler `INV-DOC-1, 2, 3, 4, 4b, 5, 7`;
+**`INV-DOC-6` boştur.** Kimliği `#640`'ı indiren verir, doğrulayarak.
+
+⚠**`#640`'ın PR BAŞLIĞI da çakışan kimliği taşıyor.** İniş anında başlık ve test içindeki
+kimlik BİRLİKTE değiştirilmeli; yalnız bu bölümü düzeltmek çakışmayı geri getirir.
+
+**Bu düzeltmeyi yakalayacak kol YAZILMADI, kapsam dışı bırakıldı** (iş emri: silahlandırma
+yok). Eksen bellidir ve kayıtlıdır: *cetvelde adı geçen test dosyası depoda gerçekten var
+mı.* Bu, `INV-CETVEL-YAPI` kapsamına girer ve REC-120 ile ele alınacaktır — §21 gereği
+kabul edilen boşluk **sessiz bırakılmaz**, adıyla yazılır.
 
 ## C7 — COMMIT AÇIĞI: üretim çalışıyor, kayıt tutulmuyor (2026-08-18 ölçümü)
 
