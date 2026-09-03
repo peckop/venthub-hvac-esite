@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T16:48:02.721924+00:00
-total_compiled_files: 101
-source_commit: 3a1a8783
+compiled_at: 2026-09-03T17:41:29.832326+00:00
+total_compiled_files: 105
+source_commit: 619ac444
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -10521,6 +10521,915 @@ Bugün bu kural yazısız; REC-117 onu ilk kez sınayan iş.
 
 
 ---
+# FILE: docs\plans\rec129-faz1-kabuk-plani-2026-09-04.md
+
+# REC-129 Faz 1 — Kabuk (renk değişkenleri + logo + header/footer) · PLAN v2
+
+> **Durum: PLAN — kod yazılmadı.** v1 bağımsız red-team'den **BLOK** aldı; sekiz iddiadan
+> yedisi çürüdü ya da ciddi zayıfladı. Bu v2, çürüyen iddiaları **kaldırıyor** ve BLOK'u
+> kaldırmak için gereken minimumu yazıyor. Rapor:
+> `docs/plans/red-team-rec129-faz1-2026-09-04.md`
+> Merge: Recep onayı.
+
+## KAYNAK/CETVEL
+
+| | |
+|---|---|
+| **Yöneten cetveller** | `docs/standards/rendering-cache-standard.md` · `docs/standards/storefront-reflow-standard.md` · CLAUDE.md kural 8 |
+| **⚠Anılmayan mevcut cetvel (v1'in ihlali)** | [eslint.config.cjs:47-51](../../eslint.config.cjs#L47-L51) — **storefront ve R3F için HEX yasağı zaten KAPSAM DIŞI** yazılı. v1 bunu anmadan tersine çeviriyordu (kural 1 ihlali). |
+| **Cetvel EKSİĞİ (bu işin kapsamında)** | "marka kılavuzu → kod token eşlemesi" cetveli YOK |
+| **Karne tazeliği** | 2026-09-04, `C:/tmp/vh-urun-rec89`, taban `origin/master@480352bd`. Kontrast sayıları **iki bağımsız hesapla** doğrulandı (red-team + kendi WCAG hesabım). |
+| **YÖNTEM** | Şerit (URUN), tek dal, tek PR; plan-challenger her faz planında. |
+
+---
+
+## 1) v1'de YANLIŞ olan üç iddia — düzeltildi
+
+### ⛔1.1 "Depoda VentHub logosu YOK" — **ÇÜRÜDÜ**
+Kanıtım `find -iname '*logo*'` idi: **dosya-adı vekili**, marka değil.
+Gerçek: [NavBrand.tsx:18-22](../../src/components/navigation/NavBrand.tsx#L18-L22) her sayfada
+"VH" marka kilidi render ediyor ve **token tüketiyor** — palet çevrilince kendiliğinden döner.
+`public/favicon.svg` ise tam bir VH wordmark, içinde **sabit `#2563eb`** (palet dışı;
+`public/**` ESLint ignore'da, hiçbir kapı görmüyor).
+
+**Sonuç:** "Faz 1 ikiye ayrılır" önerisinin v1'deki gerekçesi düştü. Ayrım **yine de
+geçerli** ama dar bir sebeple: REC-129'un **yeni** logosu (14A-3 eğik kanatçık, altı sürüm)
+Design export'unu bekler; **mevcut** marka kilidi beklemez, paletle birlikte döner.
+
+### ⛔1.2 "index.css HSL bloğu renk SSOT'udur" — **ÇÜRÜDÜ**
+En az **altı** kaynak var: `:root` HSL · `.light` sınıfı aynı 12 token'ı yeniden tanımlıyor
+([index.css:328-341](../../src/index.css#L328-L341)) · `[data-admin-theme]` 24×2 token ·
+`@media (prefers-contrast: more)` · **[tailwind.config.js:77-80](../../tailwind.config.js#L77-L80)'de
+4 ham HEX** · favicon.
+
+⭐**Bunlardan biri doğrudan REC-129'un kapalı kararına çarpıyor:**
+`'warning-orange': '#F59E0B'` — REC-129'un "uyarı amberi"nin **ta kendisi**, ama sabit HEX
+olarak, tema dışında, 19 admin-dışı `.tsx` tarafından tüketiliyor.
+
+### ⛔1.3 "İki farklı lacivert riski" — **ÇÜRÜDÜ, tersi doğru**
+Legacy blok **ölü**: `--navy-800/700/600/500`, `--cyan-400/500`, `--amber-400`, `--glass-*`
+için `var(--X)` tüketicisi **0** (ölçüldü). Yani çevrilmediğinde iki lacivert doğmaz.
+Doğru iş "eşlemek" değil **silmek**.
+
+---
+
+## 2) ⭐AYAKTA KALAN VE KARARA GİDEN BULGU — palet kontrastı
+
+Hedef paletin beyaz üzerindeki kontrast oranları (WCAG 2.1; **kendi hesabımla doğrulandı**):
+
+| Renk | Beyaz üzerinde | AA normal metin (4.5) | AA büyük/bold metin + arayüz öğesi (3.0) |
+|---|---|---|---|
+| Kiremit `#D95D0E` | **3.80** | ✗ düşer | ✓ geçer |
+| Turkuaz `#0088B0` | **4.08** | ✗ düşer | ✓ geçer |
+| Amber `#F59E0B` | **2.15** | ✗ | ✗ **düşer** |
+| *(bugünkü `primary-navy`)* | *8.83* | ✓ | ✓ |
+
+**Dürüst okuma — "palet AA'yı geçmiyor" demek fazla sert olur:** kiremit **ana eylem
+düğmesi** olarak, üzerindeki yazı büyük/kalın ise 3.0 eşiğini geçer ve meşrudur. Sorun
+ikisinde:
+1. **Amber (2.15)** beyaz üzerinde tek başına anlam taşıyamaz — uyarı ikonu/metni olarak
+   kullanılırsa görülmez. Koyu zeminli bir rozet içinde kullanılmalı.
+2. Bugünkü 8.83'ten 3.80'e inmek **bilinçli bir takas**: marka sıcaklığı kazanılır,
+   okunabilirlik payı daralır. Bu **tasarım kararıdır, benim vereceğim karar değil.**
+
+→ **Recep'e soru olarak gider** (bölüm 6).
+
+---
+
+## 3) ⭐"axe yeşil" kabul ölçütü SAHTE-YEŞİL — v1'in en tehlikeli maddesi
+
+İki bağımsız sebeple bu kapı kontrast gerilemesini **hiçbir koşulda** göremez:
+- `vitest.setup.ts` `index.css`'i **import etmiyor** (ölçüldü) → jsdom'da hiç CSS yok.
+- axe-core'un `color-contrast` kuralı jsdom'da zaten koşmaz.
+
+**Düzeltme:** kontrast ölçümü **gerçek tarayıcıya** taşınır (`e2e/reflow.e2e.ts` deseni
+hazır). Ölçüt "axe yeşil" değil, **hesaplanmış oran sayısı** olur.
+Bu, dünkü dersin aynısı: *ayırt etmeyen gösterge ölçüm değildir.*
+
+---
+
+## 4) Kapsam v2
+
+### Faz 1a — tasarımdan bağımsız, şimdi yapılabilir
+1. **Ölü legacy renk bloğunu sil** (tüketici 0, ölçüldü).
+2. **Renk kaynaklarını sayıya bağla:** `tailwind.config.js`'teki 4 sabit HEX ve
+   `favicon.svg`'nin `#2563eb`'si **envantere yazılır**; hangisi token'a çekilecek,
+   hangisi kasıtlı kalacak — cetvelde **isim isim** listelenir.
+3. **"Marka kılavuzu → kod token eşlemesi" cetvelini yaz.**
+4. **Kontrast kapısını tarayıcıya kur** (bölüm 3).
+
+⚠**v1'in "görsel-nötr" iddiası düzeltildi:** ölü blok silmek nötrdür, ama HEX→token çekmek
+**piksel değiştirir** (`#38BDF8` ile `--brand-cyan` aynı renk değil). Bu yüzden HEX→token
+işi Faz 1a'dan **çıkarıldı**, Faz 1b'ye alındı — orada zaten renkler değişiyor.
+
+**Bu daraltmanın yan faydası:** Faz 1a `StickyHeader`'a hiç dokunmaz → **teklif-modu paketiyle
+paralel gidebilir**, sıra çakışması kalmaz (v1'in §5 hükmü artık gereksiz).
+
+### Faz 1b — Design export'una bağlı
+Palet değerlerinin çevrilmesi · HEX→token · yeni logo · header/footer kabuğu.
+
+### Kapsam DIŞI (açıkça)
+- `src/components/admin/**` ve `[data-admin-theme]` — **ADMIN şeridi.**
+- `LoginPage.tsx:201-213` HEX'leri — **Google G logosunun marka renkleri**; token'a çekmek
+  marka ihlalidir. "0 gömülü HEX" ölçütü bu yüzden **kaldırıldı**.
+- R3F malzeme sabitleri — `className` kabul etmezler; eslint cetveli zaten muaf tutuyor.
+
+---
+
+## 5) Kapılar v2
+
+| Kapı | Ne ölçer | Niçin ölçülebilir |
+|---|---|---|
+| `INV-PALET-KAYNAK-1` (**yeni**) | Renk tanımlayan kaynakların **sayısı ve yeri** bilinen listeyle aynı mı | Yeni bir renk kaynağı doğarsa kırmızı — liste sayıya bağlı, semantiğe değil |
+| Kontrast kapısı (**tarayıcıda**) | Ana eylem / uyarı yüzeylerinin **hesaplanmış oranı** | Gerçek CSS çözülür; jsdom sahte-yeşili yok |
+| `tailwind-token-sinif-gecerliligi` (mevcut) | Uydurma token sınıfı | — |
+
+⛔**`INV-PALET-SINIR-1` KALDIRILDI.** "Kiremit yalnız ana eylemde" **semantik** bir kuraldır;
+mevcut token kapısının kendi yorumu "yalnız `className` atamalarını okur, `cn()` gömülü
+dizeler bilinen boşluk" diyor ve `toneClasses[tone]` dolaylı üretimi bunu kesinleştiriyor.
+Ölçülemeyecek kapıyı plana yazmak, yazıldı sanılan ama var olmayan kapı üretir.
+
+---
+
+## 6) Recep'e giden TEK karar sorusu
+
+**Kiremit `#D95D0E` ana eylem rengi olarak beyaz üzerinde 3.80:1 veriyor; bugünkü lacivert
+8.83.** Büyük/kalın düğme yazısında standarda uyar, normal boy metinde uymaz; amber `#F59E0B`
+(2.15) beyaz üzerinde tek başına kullanılamaz. Palet kapalı karar olduğu için **ben
+değiştirmiyorum** — sorulan şey: kiremit yalnız büyük düğme yazısıyla mı sınırlansın, yoksa
+ton bir miktar koyulaştırılsın mı?
+
+---
+
+## 7) Kabul ölçütleri v2
+
+1. Renk tanımlayan kaynaklar **sayılmış ve cetvelde listelenmiş**; yeni kaynak doğarsa kapı kırmızı.
+2. Ölü legacy blok silinmiş; silme sonrası tüketici sayısı **hâlâ 0** (negatif kontrol).
+3. Kontrast oranları **tarayıcıda ölçülmüş sayı** olarak raporda — "axe yeşil" yeterli sayılmaz.
+4. Cetvel yazılı ve kapıya bağlı.
+5. Beş maddelik merge ritüeli + **Recep onayı**.
+
+
+---
+# FILE: docs\plans\red-team-rec129-faz1-2026-09-04.md
+
+# Red Team Mimari Denetim Raporu: REC-129 Faz 1 — Kabuk (renk değişkenleri + logo + header/footer)
+
+> **Rol:** bağımsız red-team denetçisi (A2). Amaç planı ÇÜRÜTMEK, onaylamak değil.
+> **Kod yazılmadı/değiştirilmedi/silinmedi.** Salt okuma + ölçüm.
+
+## 1. Giriş ve Metodoloji
+
+**Denetlenen plan:** [rec129-faz1-kabuk-plani-2026-09-04.md](rec129-faz1-kabuk-plani-2026-09-04.md)
+**Depo/dal:** `C:/tmp/vh-urun-rec89` · `urun/rec94-teklif-modu-tutarliligi` @ `17be76e1`
+**Tarih:** 2026-09-04
+
+**Ölçülen kaynaklar:** [src/index.css](../../src/index.css) (688 satır, tamamı tarandı) ·
+[tailwind.config.js](../../tailwind.config.js) · [src/design-system/tokens.js](../../src/design-system/tokens.js) ·
+[eslint.config.cjs](../../eslint.config.cjs) · [vitest.config.ts](../../vitest.config.ts) ·
+[vitest.setup.ts](../../vitest.setup.ts) · [src/utils/testA11y.tsx](../../src/utils/testA11y.tsx) ·
+[src/__tests__/conformance/tailwind-token-sinif-gecerliligi.test.ts](../../src/__tests__/conformance/tailwind-token-sinif-gecerliligi.test.ts) ·
+[src/components/navigation/NavBrand.tsx](../../src/components/navigation/NavBrand.tsx) ·
+[public/favicon.svg](../../public/favicon.svg) · HEX taşıyan 21 `.tsx` + 4 `.ts` dosyasının tamamı ·
+WCAG kontrast hesabı (hedef paletin dört rengi, programatik).
+
+**Kapsam ayrımı (çakışma önleme):** bu rapor **renk / token / kabuk** eksenindedir.
+`products/3d/**`, `navigation/**` ve `StickyHeader.tsx`'in *teklif-modu* boyutu paralel
+denetçidedir; burada yalnız **renk kaynağı** yönüyle değinildi.
+
+**Özet hüküm:** planın **ölçüm disiplini iyi** (134/50 sayıları doğrulandı, 21 HEX dosyası
+doğrulandı) — ama **üç temel iddiası ölçümle çöküyor**: (a) tek renk SSOT'u yok, en az **beş**
+kaynak var; (b) depoda VentHub marka işareti **VAR**, yani "Faz 1 bloke" gerekçesi dayanaksız;
+(c) kilitli paletin iki rengi **WCAG AA'yı geçmiyor** ve planın önerdiği a11y kapısı bunu
+**yapısal olarak göremez**. Sonuç: **BLOK**.
+
+---
+
+## 2. Detaylı Teknik Analiz ve Çürütmeler
+
+### 2.1. ÇÜRÜTÜLDÜ — "Renk SSOT'u index.css:275-290" yanlış: en az BEŞ paralel renk kaynağı var
+
+* **Bulgu:** Plan tek bir HSL bloğunu SSOT ilan ediyor ve "değerleri çevir, 134+50 dosya döner"
+  kaldıracını buna dayandırıyor. Ölçüm beş ayrı tanım noktası gösteriyor:
+
+  | # | Kaynak | Kanıt |
+  |---|---|---|
+  | 1 | `:root` HSL bloğu (planın gördüğü tek yer) | [index.css:274-296](../../src/index.css#L274) |
+  | 2 | `Legacy Variables` HEX bloğu (plan biliyor) | [index.css:298-312](../../src/index.css#L298) |
+  | 3 | **`.light` sınıfı — aynı 12 token'ı YENİDEN tanımlar** | [index.css:328-341](../../src/index.css#L328) |
+  | 4 | **`[data-admin-theme]` / `[data-admin-theme='dark']` — 24×2 renk token'ı** | [index.css:381-431](../../src/index.css#L381) |
+  | 5 | **`tailwind.config.js` "Korunan renkler" — SABİT HAM HEX** | [tailwind.config.js:76-79](../../tailwind.config.js#L76) |
+  | + | `@media (prefers-contrast: more)` içinde 2 token override | [index.css:502-506](../../src/index.css#L502) |
+
+* **En sert alt-bulgu:** planın "kapalı karar" diye yazdığı **uyarı amberi `#F59E0B`
+  ZATEN VAR** — ama index.css'te değil, Tailwind config'inde ham HEX olarak:
+  `'warning-orange': '#F59E0B'` ([tailwind.config.js:77](../../tailwind.config.js#L77)).
+  Yanında `'gold-accent': '#D97706'` var — hedef kiremit `#D95D0E`'ye **çok yakın bir beşinci
+  turuncu**. Bu dördü `src` içinde **20 `.tsx` dosyasında** tüketiliyor, **19'u admin DIŞI**
+  (ölçüm: `grep -rl 'success-green\|warning-orange\|gold-accent\|silver-accent' src --include=*.tsx`).
+  Yani "yalnız arayüz uyarısı" sınırı daha yazılmadan 19 yerde delinmiş durumda.
+* **Kabuğun kendisi de bu kaynaktan besleniyor:** header'ın sepet tutarı
+  `text-success-green` ([StickyHeader.tsx:272](../../src/components/StickyHeader.tsx#L272)),
+  "Hızlı Sipariş" `tone="warning"` → `hover:text-warning-orange`
+  ([NavActionButton.tsx:25-26](../../src/components/navigation/NavActionButton.tsx#L25)).
+  Faz 1b "tek lacivert bant + kiremit tek sıcak nokta" hükmü bu iki rengi hiç saymıyor.
+* **Tailwind ↔ HSL bağı doğru:** `'primary-navy': 'hsl(var(--primary-navy) / <alpha-value>)'`
+  ([tailwind.config.js:39](../../tailwind.config.js#L39)) — yani token sınıfları gerçekten CSS
+  custom property'den okuyor. Planın bu kısmı **ayakta**. Çöken kısım "**tek**" iddiası.
+* **Hangi kural:** CLAUDE.md #8 (design token / SSOT) · plan §2 "Merkezî bulgu".
+* **Risk Derecesi: Kritik** — plan §3.1'in tanımı ("iki blok arasında değer çakışması kalmaz")
+  gerçek işin **beşte birini** kapsıyor. Bu tanımla iş "bitmiş" ilan edilir, palet çoğul kalır.
+
+---
+
+### 2.2. AYAKTA — "134 / 50" sayıları doğru, şişkin değil
+
+* **Bulgu:** Şüphe haklıydı ama ölçüm planı doğruluyor.
+  `grep -rl primary-navy src` = **266** (132'si `.md` companion). Kod-only
+  (`.tsx`+`.ts`+`.css`) = **134** (133 tsx + 1 css). `secondary-blue`: toplam 89, 39'u `.md`,
+  kod-only = **50** (49 tsx + 1 css). Planın yazdığı sayılar **tam olarak kod sayılarıdır**.
+* **Tek uyarı (Düşük):** 133 tsx'in bir kısmı **admin** yüzeyi, yani URUN şeridi değil.
+  Plan "134 dosyanın görünümünü tek hamlede çevirir" derken bu **şerit sınırını** saymıyor
+  — §3.2'de admin'e dokunmamayı doğru şekilde taahhüt ederken §2'de admin'i kaldıraç
+  sayısına dahil ediyor. İç tutarsızlık, ama zararsız.
+* **Risk Derecesi: Düşük** (bu iddia çürütülemedi).
+
+---
+
+### 2.3. ÇÜRÜTÜLDÜ — "21 gömülü HEX / 10'u müşteri yüzeyi" dağılımı yanlış; HEX'lerin çoğu MEŞRU
+
+* **Bulgu A — aritmetik tutmuyor.** 21 dosya doğru; dağılım değil.
+  Ölçülen: **7 = 3D** (`products/3d/**`) · **5 = admin** (plan "4" diyor;
+  [AbcPieChart](../../src/components/admin/dashboard/AbcPieChart.tsx),
+  [ActivityHeatmap](../../src/components/admin/dashboard/ActivityHeatmap.tsx),
+  [SalesChart](../../src/components/admin/dashboard/SalesChart.tsx),
+  [InventoryQrLabel](../../src/components/admin/InventoryQrLabel.tsx),
+  [AdminInventoryReportPage](../../src/views/admin/AdminInventoryReportPage.tsx))
+  · **9 = kalan** (plan "10" diyor ama kendi listesinde de **9 ad** sayıyor). 7+5+9=21.
+* **Bulgu B — `.ts` dosyaları hiç sayılmamış.** 4 `.ts` dosyası daha HEX taşıyor; biri
+  doğrudan müşteri yüzeyi konfigürasyonu:
+  [orbitalCarouselConfig.ts:86-103](../../src/config/orbitalCarouselConfig.ts#L86)
+  (`glowColor: '#22d3ee'`, `backgroundColor: '#020617'`, radial-gradient içinde 3 HEX).
+  `--include=*.tsx` süzgeci evreni yanlış kurmuş.
+* **Bulgu C — "9 müşteri yüzeyi"nin 4'ü aslında R3F/3D.** `@react-three` import eden dosyalar:
+  [BentPlaneGeometry.tsx:22](../../src/components/products/BentPlaneGeometry.tsx#L22)
+  (`new Color('#22d3ee')`), [BlueprintCanvas.tsx:112](../../src/components/products/BlueprintCanvas.tsx#L112)
+  (`<meshBasicMaterial color="#0066ff">`), [InfiniteProductsShowcase.tsx:191-228](../../src/components/products/InfiniteProductsShowcase.tsx#L191),
+  [OrbitalProductsShowcase.tsx:76-132](../../src/components/products/OrbitalProductsShowcase.tsx#L76).
+  Bunlar `className` kabul etmez — WebGL materyal/`<color attach="background">` değerleridir.
+  Token'a çekmenin tek yolu runtime `getComputedStyle` okuması; bu, SSR'da yok, ilk-boya
+  yarışı yaratır ve 3D cetveliyle (CLAUDE.md #9) ayrı bir tartışmadır. Gerçek "düz DOM
+  müşteri yüzeyi" sayısı **5**: HomeSinevizyon, HVACIcons, AirCurtainCalcPage,
+  JetFanCalcPage, LoginPage.
+* **Bulgu D — "0 gömülü HEX" ölçütü İMKANSIZ ve YANLIŞ.**
+  [LoginPage.tsx:201-213](../../src/views/LoginPage.tsx#L201) → `#4285F4 · #34A853 · #FBBC05 ·
+  #EA4335`. Bunlar **Google "G" logosunun marka renkleridir**. Token'a çekmek = üçüncü taraf
+  marka kimliğini VentHub paletiyle bozmak; Google marka kılavuzu bunu yasaklar. Bu HEX'ler
+  **doğru** ve kalmalıdır. Aynı sınıf: [HVACIcons.tsx](../../src/components/HVACIcons.tsx)
+  içindeki teknik şema renkleri (`#10B981` yeşil / `#EF4444` kırmızı / `#F59E0B` amber =
+  durum kodlaması, kategorik palet).
+* **Bulgu E — ve bu ZATEN yazılı bir karar.** Depoda konu hakkında **mevcut cetvel var** ve
+  plan onu hiç anmıyor: [eslint.config.cjs:47-51](../../eslint.config.cjs#L47) —
+  > *"HEX-in-JSX yasağı (design-token kuralı / cetvel #8) … **YALNIZ admin yüzeyinde error:
+  > 3D materyal renkleri (R3F) ve storefront KAPSAM DIŞI.** Chart dosyaları (Recharts) Faz 2
+  > token-göçüne kadar karantinalı."*
+
+  Yani proje daha önce ölçüp karar vermiş: storefront ve R3F, HEX yasağının **dışında**.
+  Plan bu kararı **geri çeviriyor** ama ne kaynak gösteriyor ne de gerekçe veriyor; kendi
+  KAYNAK/CETVEL tablosunda `eslint.config.cjs` **yok**. Kural 1'in "yöneten cetveli beyan et"
+  şartı, mevcut cetveli **atlayarak** karşılanmış görünüyor.
+* **Hangi kural:** CLAUDE.md #1 (KAYNAK/CETVEL beyanı) · #8 (design token) · #9 (3D).
+* **Risk Derecesi: Kritik** — kabul ölçütü 1 bugünkü hâliyle ya asla yeşile dönmez
+  (Google logosu) ya da yeşile dönmek için **görünür bir marka hatası** işlenir.
+
+---
+
+### 2.4. ÇÜRÜTÜLDÜ — "Depoda VentHub logosu YOK" yanlış; ölçüm dosya-adı vekiline dayanıyor
+
+* **Bulgu:** Planın kanıtı `find public src -iname '*logo*'`. Bu **dosya adı** arar, **marka
+  işareti** değil — klasik vekil-kanıt. Gerçek marka işareti iki yerde, ikisi de canlıda:
+
+  1. **Ekrandaki logo:** [NavBrand.tsx:18-22](../../src/components/navigation/NavBrand.tsx#L18) —
+     `rounded-2xl bg-gradient-to-br from-primary-navy via-primary-navy to-secondary-blue`
+     zemin üzerinde **"VH"** kilit işareti + marka adı. Her sayfanın header'ında render edilir.
+  2. **Sekme/tarayıcı logosu:** [public/favicon.svg](../../public/favicon.svg) — 64×64,
+     `#0f172a → #2563eb` gradyanlı yuvarlak kare üzerinde **"VH"** wordmark.
+     Ayrıca `public/favicon.ico` mevcut.
+* **Sonucu iki katmanlı:**
+  - **Plan §4'ün ana önerisi ("Faz 1 ikiye ayrılır, çünkü logo BLOKE") dayanağını
+    kaybediyor.** Logo bloke değil; **var** ve **token tüketiyor**. §3.3 palet değerlerini
+    çevirdiği anda NavBrand logosu — Design'dan hiçbir şey gelmese bile — **kendiliğinden
+    değişir**. Yani logo Faz 1b'nin *çıktısı* değil, Faz 1b'nin *yan etkisi*.
+  - **favicon.svg gözden kaçan altıncı renk kaynağıdır:** `#2563eb` (hsl 221 83% 53%) hedef
+    palette yok, `--primary-navy`'ye de eşit değil. Palet çevrildiğinde sekme ikonu **eski
+    markada kalır** — planın §2'de "10 dosya için" saydığı sızıntının tam örneği, ama
+    listesinde yok. `public/**` ESLint `ignores`'ında ([eslint.config.cjs:126](../../eslint.config.cjs#L126)),
+    yani hiçbir kapı da görmez.
+* **Hangi kural:** A1/A4 (kanıt + kod kazanır) · CLAUDE.md #8.
+* **Risk Derecesi: Yüksek** — planın **en somut önerisi** (kendi ifadesiyle) yanlış bir
+  absans ölçümüne dayanıyor. Design turu beklenmeden çok daha fazlası yapılabilir.
+
+---
+
+### 2.5. ÇÜRÜTÜLDÜ (iki yönlü) — "Faz 1a görsel-nötr" hem GEREKSİZ karamsar hem de kabul ölçütüyle ÇELİŞİK
+
+Bu maddede plan aynı anda iki yönden yanılıyor.
+
+**(a) §3.1 sanıldığından çok daha ucuz — legacy blok neredeyse ÖLÜ.**
+
+`var(--X)` tüketicileri ölçüldü (tüm `src`):
+
+| Değişken | `var(--…)` eşleşmesi |
+|---|---|
+| `--navy-900` | **1** (yalnız index.css'in kendisi) |
+| `--navy-800 / -700 / -600 / -500` | **0** |
+| `--cyan-400 / --cyan-500 / --cyan-glow` | **0** |
+| `--amber-400` | **0** |
+| `--text-primary` | **1** (index.css) |
+| `--glass-bg / -border / -hover` | **0** |
+
+Tek gerçek tüketici: [index.css:479-480](../../src/index.css#L479) — `select option { background-color: var(--navy-900) }`.
+Yani plan §2'nin "sitenin **iki farklı laciverti** aynı anda göstermesi" korkusu **ölçümle
+düşüyor**: ikinci palet hiçbir yerde çizilmiyor. `--navy-900` (#0A0F1E) ile `--surface-deep`
+(224 52% 8% → **#0A0F1F**) arasındaki fark **1/255 mavi** — gözle ayırt edilemez.
+§3.1 bir "sızıntı kanalı kapatma" değil, **ölü kod temizliğidir**; kaldıraç iddiası abartılı.
+
+**(b) Buna karşılık §3.2, Faz 1a'yı görsel-nötr olmaktan ÇIKARIYOR.**
+
+Plan §7 madde 4: *"Faz 1a müşteriye görünen değişiklik üretmiyor — preview'da **fark yok**."*
+Ama Faz 1a'ya **§3.2 (gömülü HEX → token)** de dahil. Ölçülmüş değerler:
+
+| Kaynak | HEX | Karşılık aday token | Token'ın HEX'i | Aynı mı? |
+|---|---|---|---|---|
+| [HomeSinevizyon.tsx:127](../../src/components/home/HomeSinevizyon.tsx#L127) | `#38BDF8` | `--brand-cyan` | `#2AC9E5` | **HAYIR** |
+| [BlueprintCanvas.tsx:112](../../src/components/products/BlueprintCanvas.tsx#L112) | `#0066ff` | — | — | **HAYIR** |
+| [OrbitalProductsShowcase.tsx:76](../../src/components/products/OrbitalProductsShowcase.tsx#L76) | `#0891c2` sınıfı cyan | `--brand-cyan` | `#2AC9E5` | **HAYIR** |
+| [AirCurtainCalcPage.tsx:228](../../src/views/calculators/AirCurtainCalcPage.tsx#L228) | `#0EA5E9` | `--secondary-blue` | `#0281C5` | **HAYIR** |
+| legacy `--cyan-400` | `#22D3EE` (188 86% 53) | `--brand-cyan` (189 78% 53) | doygunlukta **8 puan** fark | **HAYIR** |
+| legacy `--amber-400` | `#FBBF24` (43 96% 56) | HSL blokta amber **YOK** | — | eşlenemez |
+
+Yani ya (i) HEX'ler mevcut token'lara çekilir → **piksel değişir, "fark yok" ölçütü yalan
+olur**; ya da (ii) her HEX için birebir yeni token açılır → **palet 6 kaynaktan 30 token'a
+çıkar**, "tek palet" amacı ters döner. Plan bu ikilemi hiç kurmuyor.
+
+* **Statik kapı körlüğü (A5):** "preview'da fark yok" hiçbir otomatik kapıyla ölçülmüyor;
+  `tsc`/`lint`/`vitest` renk değerini görmez. Depoda görsel regresyon (screenshot diff) kapısı
+  **yok** — `e2e/` altında yalnız `admin-smoke`, `checkout-smoke`, `reflow` var.
+* **Hangi kural:** A5 · CLAUDE.md #1 (ölçülmemiş kabul ölçütü).
+* **Risk Derecesi: Yüksek** — kabul ölçütü 4 tanım gereği doğrulanamaz; iyimser okumayla
+  "kimse bakmadı" diye yeşil sayılır.
+
+---
+
+### 2.6. ÇÜRÜTÜLDÜ — `INV-PALET-SINIR-1` statik bir kaynak taramasıyla ÖLÇÜLEMEZ
+
+* **Bulgu:** Plan §6, "kiremit **yalnız** logo + ana eylemde" kuralını bir kapının ölçmesini
+  öngörüyor. Depodaki en yakın örnek gate'in kendi yazılı kapsam sınırı bunun mümkün
+  olmadığını gösteriyor:
+  [tailwind-token-sinif-gecerliligi.test.ts:31-34](../../src/__tests__/conformance/tailwind-token-sinif-gecerliligi.test.ts#L31) —
+  > *"bu kapı yalnız `className` ATAMALARINI okur … `cn()`/`clsx()` içine gömülü dizeler de
+  > şimdilik görülmez (**bilinen boşluk**)."*
+
+  Yani mevcut tarayıcı, sınıfın hangi **bileşende** ve hangi **rolde** kullanıldığını değil,
+  metinde geçip geçmediğini bilir.
+* **Neden ölçülemez:** "ana eylem" **semantik** bir kavramdır — kaynakta işaretli değil.
+  Kiremit sınıfını taşıyan `<button>`'un birincil CTA mı, ikincil bir bağlantı mı, yoksa
+  bir rozet mi olduğunu AST bilmiyor. Üstelik sınıf çoğu yerde dolaylı üretiliyor:
+  `toneClasses[tone]` ([NavActionButton.tsx:22-26](../../src/components/navigation/NavActionButton.tsx#L22)) —
+  kaynak metninde `text-warning-orange` var, ama **hangi çağıranın** onu aldığı ancak
+  çağrı-grafiği veya runtime ile bilinir. Planın "**bu sınırı kapı ölçer, insan hatırlamaz**"
+  cümlesi bugün karşılıksızdır.
+* **Ölçülebilir alternatif (bkz. §3):** kuralı *renk* üzerinden değil, **rol token'ı**
+  üzerinden yazmak — `--accent-primary-action` gibi tek amaçlı bir token tanımlayıp
+  "kiremit HSL'i **yalnız** bu token'da geçer" invaryantını ölçmek. O, saf metin taramasıyla
+  **ayırt edici** olur (metin-taraması-yorumla-tatmin-olur tuzağından çıkar).
+* **`INV-PALET-TEKLIK-1` ise ölçülebilir** — ama planın tanımıyla değil: "ikinci bir HEX bloğu"
+  değil, §2.1'deki **beş** kaynağın tamamı (`.light`, `[data-admin-theme]`, tailwind config
+  ham HEX'leri, `public/favicon.svg`) sayılmalı; aksi hâlde kapı yeşil yanarken palet çoğul kalır.
+* **Hangi kural:** CLAUDE.md #8 · A5 (statik kapı runtime'ı görmez).
+* **Risk Derecesi: Yüksek** — plan, tutulamayacak bir kapı sözü veriyor; söz "kapı var" diye
+  kayda geçerse kural insana kalır ve sessizce çürür.
+
+---
+
+### 2.7. KISMEN ÇÜRÜTÜLDÜ — Kural 8 çelişkisi: legacy blok ihlal DEĞİL, ama Tailwind config ham HEX'i tartışmalı
+
+* **Bulgu:** Şüphe "mevcut legacy HEX bloğu zaten kural 8 ihlali mi?" idi. Ölçüm: **hayır.**
+  Kural 8'in mekanik karşılığı `hexJsxRestrictions` ve o yalnız **JSX/obje literal**lerini,
+  yalnız **admin** dosyalarında error olarak okur ([eslint.config.cjs:52-63, 155-163](../../eslint.config.cjs#L52)).
+  CSS dosyaları bu kuralın kapsamında değil; ayrıca `--navy-900` **bir custom property'dir**
+  — kuralın "renkleri CSS custom property üzerinden ver" ifadesinin tam olarak istediği şey.
+  Yani plan §2'nin *"Bu, kural 8 ihlalinin bugüne kadar sessiz duran bedelidir"* cümlesi
+  legacy blok için **yanlış atıf**tır.
+* **Gerçek kural-8 gerilimi başka yerde:** `tailwind.config.js:76-79`'daki dört **ham HEX**
+  (`#10B981`, `#F59E0B`, `#D97706`, `#9CA3AF`) — token katmanının kendisinde, tema-bağımsız,
+  19 müşteri-yüzeyi dosyasında tüketilen renkler. Bunlar `.light`/`.dark`/`prefers-contrast`
+  ile **dönmez**; admin katmanı için aynı sorun daha önce ölçülüp
+  [index.css:355-362](../../src/index.css#L355) ile çözülmüş, storefront için çözülmemiş.
+  Plan bu kalemi hiç görmüyor.
+* **`tailwindcss/no-arbitrary-value: "error"`** global olarak açık
+  ([eslint.config.cjs:76](../../eslint.config.cjs#L76)) — arbitrary değer tarafında plan ile
+  çelişki **yok**.
+* **Risk Derecesi: Orta** — plan yanlış hedefi "ihlal" ilan edip gerçek ihlali atlıyor;
+  iş bittiğinde kural 8 açığı yerinde kalır.
+
+---
+
+### 2.8. ÇÜRÜTÜLDÜ — "a11y axe yeşil" kabul ölçütü YAPISAL SAHTE-YEŞİL; üstelik kilitli palet AA'yı GEÇMİYOR
+
+Bu maddedeki iki bulgu birbirini besliyor ve raporun en ağır kalemi.
+
+**(a) Kilitli palet, WCAG 2.2 AA'yı geçmiyor.** Programatik kontrast ölçümü (WCAG relative
+luminance):
+
+| Ön plan | Zemin | Oran | AA normal metin (4.5:1) | AA UI/büyük (3:1) |
+|---|---|---|---|---|
+| **kiremit `#D95D0E`** | beyaz | **3.80** | ❌ **DÜŞER** | ✓ |
+| **turkuaz `#0088B0`** | beyaz | **4.08** | ❌ **DÜŞER** | ✓ |
+| **amber `#F59E0B`** | beyaz | **2.15** | ❌ **DÜŞER** | ❌ **DÜŞER** |
+| lacivert `#1A2B4A` | beyaz | 14.11 | ✓ | ✓ |
+| kiremit `#D95D0E` | lacivert `#1A2B4A` | **3.71** | ❌ **DÜŞER** | ✓ |
+| **bugünkü** `--primary-navy` `#1E3FAE` | beyaz | **8.83** | ✓ | ✓ |
+
+Sonuç net: plan §3.3 "kiremit yalnız **ana eylem**" diyor. Ana eylem = beyaz yazılı birincil
+CTA. Bugün o buton `primary-navy` zemininde **8.83:1**; kiremide geçince **3.80:1** olur —
+yani **AA'dan düşen bir gerileme**. Aynı şekilde "aydınlık gövde" üzerinde turkuaz bağlantı
+metni 4.08 ile AA'nın altındadır. Bunlar "tartışılmaz kapalı kararlar" olarak yazılmış;
+**ölçülmeden** kapatılmışlar.
+
+**(b) Planın kapısı bunu göremez — iki bağımsız sebeple.**
+
+1. **Testlerde CSS hiç yüklenmiyor.** `environment: "jsdom"`
+   ([vitest.config.ts:21](../../vitest.config.ts#L21)); `setupFiles: ['vitest.setup.ts',
+   'vitest-setup.tsx']` ([vitest.config.ts:22](../../vitest.config.ts#L22)) ve
+   [vitest.setup.ts](../../vitest.setup.ts) içinde `index.css` **import edilmiyor**
+   (ölçüm: `grep -n css vitest.setup.ts vitest-setup.tsx` → **boş**). Tailwind sınıfları ve
+   `--primary-navy` gibi custom property'ler jsdom'da **hiç tanımlı değil**;
+   `getComputedStyle` renk için varsayılan döner.
+2. **axe-core'un `color-contrast` kuralı jsdom'da zaten koşmaz** — layout/canvas gerektirir,
+   sonuç "incomplete" olur ve `toHaveNoViolations` bunu **ihlal saymaz**.
+   Koşum yolu: [testA11y.tsx:12-15](../../src/utils/testA11y.tsx#L12) → `axe(container)`
+   üzerinden, hiçbir stylesheet olmadan.
+
+Yani planın kabul ölçütü 3 ("a11y axe yeşil; kontrast **sayı** olarak raporda") — birinci
+yarısı **her koşulda yeşil yanar**, ikinci yarısını üretecek hiçbir otomatik kaynak yok.
+Kontrast sayısı **elle** yazılacaktır; ve elle yazılan sayı bir kapı değildir.
+Bu, tam olarak `merge-canlida-calistigini-kanitlamaz` / `ayirt-etmeyen-gosterge` sınıfı bir
+vekil kanıttır.
+
+* **Hangi kural:** A5 (statik kapı runtime'ı görmez) · CLAUDE.md #8 (a11y `focus-visible` /
+  kontrast) · WCAG 2.2 SC 1.4.3 / 1.4.11.
+* **Risk Derecesi: Kritik** — müşteri yüzeyinde erişilebilirlik gerilemesi, "yeşil kapı"
+  raporuyla birlikte iner.
+
+---
+
+### 2.9. Ek — planın kendi kanıt linkleri kırık (A3)
+
+* **Bulgu:** Plan `[index.css:275-290](src/index.css#L275-L290)` yazıyor. Dosya
+  `docs/plans/` altında olduğundan bu göreli yol `docs/plans/src/index.css`'e çözülür —
+  **tıklanamaz**. Doğrusu `../../src/index.css#L275`. Aynı hata §1 tablosundaki tüm
+  satırlarda ve §2/§5 atıflarında tekrarlıyor.
+* **Hangi kural:** plan-challenger A3.
+* **Risk Derecesi: Düşük** (biçimsel) — ama bir sonraki okuyucunun kanıtı **doğrulamamasına**
+  yol açar; bu raporun bulgularının yarısı, kanıt doğrulanmadığı için ayakta kalmıştı.
+
+---
+
+## 3. Stratejik Öneriler ve Aksiyon Planı
+
+Öneriler **kalıcı katman** (cetvel + INV kapısı) biçiminde; hand-patch önerilmiyor.
+
+### Ö1 — Palet envanterini ÖNCE tamamla, sonra "tek kaynak" de *(§2.1, §2.4)*
+`INV-PALET-TEKLIK-1`'in evreni **altı** kaynağı kapsamalı: `:root` · `.light` ·
+`[data-admin-theme]{,='dark'}` · `@media (prefers-contrast: more)` · `tailwind.config.js`
+`colors` altındaki **ham HEX** girdileri · `public/*.svg` (favicon). Kapı, "renk-benzeri
+literal (`#rrggbb` / `H S% L%`) tanımlayan yer sayısı = beyan edilen liste" biçiminde
+**SAYIM** yapsın (dize varlığı değil — `ayirt-etmeyen-gosterge` dersi).
+`public/**` ESLint `ignores`'ında olduğu için favicon ayağı **conformance testiyle**
+ölçülmeli, lint'le değil.
+
+### Ö2 — "0 gömülü HEX" ölçütünü, MEŞRU HEX sınıflarını tanıyan bir cetvelle değiştir *(§2.3)*
+Yeni cetvel (`docs/standards/marka-token-eslemesi-standard.md` — plan bunu zaten teslimatına
+almış) **izinli HEX sınıflarını** açıkça saysın:
+(1) üçüncü-taraf marka renkleri (Google G, Vortice) — **token'a çekilmez**;
+(2) R3F/WebGL materyal ve `<color attach>` değerleri — CLAUDE.md #9 kapsamı, ayrı karar;
+(3) veri görselleştirme kategorik paleti (Recharts) — ESLint'te zaten karantinalı;
+(4) teknik şema/durum kodlaması (HVACIcons).
+Kabul ölçütü "0" değil, **"izinli sınıf dışında 0, hariç tutulanlar ad ad listeli"** olsun.
+Ve **`.ts` dosyaları evrene dahil edilsin** (`orbitalCarouselConfig.ts`).
+Ayrıca: bu cetvel `eslint.config.cjs:47-51`'deki mevcut kararla **açıkça hesaplaşsın** —
+storefront'u kapsama almak bir *değişiklik*tir, gerekçesi yazılmalı (kural 1).
+
+### Ö3 — Kontrastı KAPALI KARARIN ÖNÜNE al; palet Recep'e ölçümle geri gitsin *(§2.8a)*
+Kiremit `#D95D0E` beyaz yazıyla **3.80:1** — birincil CTA olarak AA'yı geçmiyor.
+Üç seçenek ölçülüp Recep'e **karar sorusu** olarak gitmeli (tercih, olgu değil):
+(a) kiremit yalnız **logo + ikon/kenarlık** (≥3:1 UI bileşeni yeter), CTA lacivert kalır;
+(b) CTA metni koyu lacivert olur (kiremit zemin + `#1A2B4A` yazı → 3.71, yine düşer → elenir);
+(c) kiremidin luminansı düşürülür (ör. `#B34A0B` civarı) → 4.5:1'e çıkar, marka tonu kayar.
+Bu **geri-alınamaz olmayan ama görünür** bir marka kararıdır; plan bunu "tartışılmaz" diye
+kapatamaz çünkü kapatan taraf ölçmemiş.
+
+### Ö4 — Kontrast için GERÇEK kapı: jsdom değil, Playwright *(§2.8b)*
+Depoda zaten `playwright.config.ts` + `e2e/reflow.e2e.ts` var ve `reflow` testi
+**"ölçülemedi ≠ geçti"** enstrüman kanıtı desenini uyguluyor
+([reflow.e2e.ts:15-20](../../e2e/reflow.e2e.ts#L15)) — kopyalanacak doğru şablon budur.
+Yeni kapı `INV-PALET-KONTRAST-1`, gerçek tarayıcıda `@axe-core/playwright` ile
+**`color-contrast` kuralını açıkça** koştursun ve enstrüman kanıtı taşısın (bilerek
+düşük-kontrastlı bir eleman enjekte et; araç onu **göremezse** test KIRMIZI).
+`vitest`+`jsdom` axe'i kontrast için **kabul ölçütü olarak yazılmasın** — bugünkü hâliyle
+sahte-yeşildir.
+
+### Ö5 — `INV-PALET-SINIR-1`'i renk yerine ROL TOKEN'ı üzerinden ölç *(§2.6)*
+Kaynakta `--accent-cta` ve `--accent-warning` gibi **tek amaçlı rol token'ları** tanımla;
+invaryant: *"kiremit HSL üçlüsü yalnız `--accent-cta` tanımında geçer; `--accent-cta`
+sınıfı yalnız `<beyan edilen bileşen listesi>` içinde kullanılır."* Böylece kural
+`className` metin taramasıyla **ayırt edici** olur. `toneClasses[tone]` gibi dolaylı
+üretimler için kapı, **bileşen beyaz listesi** üzerinden ölçsün (kim `tone="primary"`
+geçiyor) — yoksa `cn()` boşluğu bu kapıyı da yutar.
+
+### Ö6 — Faz 1a/1b ayrımını YENİDEN kur *(§2.4, §2.5)*
+Logo bloke değil; bloke olan **Design'ın yeni logosu**dur. Ayrım şöyle daha dürüst:
+- **Faz 1a (bugün, gerçekten düşük riskli):** ölü legacy değişkenlerin **silinmesi**
+  (`--navy-800…500`, `--cyan-*`, `--amber-400`, `--glass-*`, `--text-secondary/-muted` →
+  ölçülen tüketici sayısı **0**), `--navy-900`/`--text-primary`'nin `select option`'da HSL
+  karşılığına çevrilmesi (fark 1/255, ölçüldü), tailwind ham HEX'lerinin HSL token'a
+  taşınması, cetvelin yazımı. **Bu paket gerçekten görsel-nötr ve savunulabilir.**
+- **§3.2 (gömülü HEX) Faz 1a'dan ÇIKARILSIN** — görsel-nötr değil (§2.5b), üstelik hedef
+  palet belli olmadan yapılırsa **iki kez** yapılır.
+- **Faz 1b:** palet değerleri + kabuk + NavBrand + **favicon.svg** (unutulmuştu) + logo.
+
+### Ö7 — Faz 1a'nın "fark yok" iddiasına ölçülebilir bir karşılık ver
+Görsel regresyon kapısı yoksa "preview'da fark yok" **kabul ölçütü olamaz**. En ucuz
+dürüst biçim: Faz 1a'yı **yalnız ölü-kod silmeye** daraltmak (Ö6) ve ölçütü
+*"silinen her değişkenin `var(--X)` tüketici sayısı = 0, testte SAYIyla kanıtlı"*
+yapmak. Bu, statik olarak ölçülebilir ve ayırt edicidir.
+
+---
+
+## 4. Sonuç
+
+### Genel risk: **BLOK**
+
+Plan iyi ölçülmüş bir çekirdek (§2.2 doğrulandı) etrafında **dört yanlış temel** taşıyor:
+
+| # | İddia | Hüküm | Risk |
+|---|---|---|---|
+| 2.1 | Renk SSOT'u tek blok | **ÇÜRÜK** — en az 5, favicon ile 6 kaynak | Kritik |
+| 2.3 | 21 HEX / 10'u müşteri / hedef "0" | **ÇÜRÜK** — dağılım yanlış, `.ts` atlanmış, "0" imkansız (Google logosu), mevcut cetvel atlanmış | Kritik |
+| 2.4 | Depoda VentHub logosu yok → Faz 1 bloke | **ÇÜRÜK** — NavBrand + favicon.svg canlıda | Yüksek |
+| 2.8 | a11y axe yeşil = kontrast güvencesi | **ÇÜRÜK** — jsdom'da CSS yok + color-contrast koşmaz; **üstelik palet AA'yı geçmiyor (3.80 / 4.08 / 2.15)** | Kritik |
+| 2.5 | Faz 1a görsel-nötr | **ÇELİŞİK** — §3.2 dahil olduğu sürece nötr değil | Yüksek |
+| 2.6 | Kiremit sınırını kapı ölçer | **ÇÜRÜK** — statik tarama semantik rolü bilmez | Yüksek |
+| 2.7 | Legacy blok = kural 8 ihlali | **YANLIŞ ATIF** — gerçek ihlal tailwind config'te | Orta |
+| 2.2 | 134 / 50 | **AYAKTA** | Düşük |
+| 2.9 | Kanıt linkleri | **KIRIK (A3)** | Düşük |
+
+**BLOK gerekçesi tek cümleyle:** plan, **erişilebilirlik gerilemesi taşıyan** bir paleti
+"tartışılmaz kapalı karar" olarak alıp, o gerilemeyi **yapısal olarak göremeyecek** bir kapıyı
+("axe yeşil") kabul ölçütü yazıyor. Bu birleşim, kusurun kapıdan **yeşil** geçmesini garanti
+eder — projenin daha önce bedelini ödediği tam desen.
+
+**Bloğu kaldırmak için gereken minimum (KOŞULLU'ya geçiş şartları):**
+1. **Ö3** — kiremit/turkuaz/amber kontrast ölçümleri Recep'e karar sorusu olarak gitsin,
+   palet ölçümle onaylansın veya düzeltilsin. *(BLOĞUN ASIL SEBEBİ — bu olmadan diğerleri anlamsız.)*
+2. **Ö4** — kontrast kapısı Playwright'a taşınsın, jsdom axe kabul ölçütünden çıkarılsın.
+3. **Ö2** — "0 gömülü HEX" ölçütü izinli-sınıf cetveliyle değiştirilsin, `eslint.config.cjs`
+   KAYNAK/CETVEL bloğuna eklensin ve mevcut kararla hesaplaşılsın (kural 1).
+4. **Ö1 + Ö6** — palet envanteri altı kaynağa genişletilsin; Faz 1a **yalnız ölü-kod +
+   cetvel**e daraltılsın; favicon.svg Faz 1b kapsamına yazılsın; "logo YOK" ifadesi düzeltilsin.
+5. **Ö5** — `INV-PALET-SINIR-1` rol-token'ı üzerinden yeniden tanımlansın veya
+   "bugün ölçülemez, insan kuralı" diye **dürüstçe** yazılsın.
+
+§5'teki sıra hükmü (teklif-modu paketi önce iner) **ayakta** — bu rapor onu çürütmedi;
+Ö6'daki daraltma o hükmü daha da güçlendirir, çünkü daraltılmış Faz 1a `StickyHeader`'a
+hiç dokunmaz ve iki paket **paralel** ilerleyebilir.
+
+
+---
+# FILE: docs\plans\red-team-teklif-modu-2026-09-04.md
+
+# Red Team Mimari Denetim Raporu: Teklif Modu Tutarlılık Paketi (2026-09-04)
+
+> **Bağımsız denetim (cetvel A2: üretici ≠ yargıç).** Hedef: planı ÇÜRÜTMEK.
+> Kod yazılmadı/değiştirilmedi/silinmedi — bu belge tek çıktıdır.
+
+## 1. Giriş ve Metodoloji
+
+| | |
+|---|---|
+| **Denetlenen plan** | [teklif-modu-tutarlilik-paketi-2026-09-04.md](teklif-modu-tutarlilik-paketi-2026-09-04.md) |
+| **Depo / taban** | `C:/tmp/vh-urun-rec89`, dal `urun/rec94-teklif-modu-tutarliligi`, HEAD `480352bd` (çalışma ağacı temiz; tek değişiklik = plan belgesinin kendisi) |
+| **Cetvel** | [plan-challenger/SKILL.md](../../.claude/skills/plan-challenger/SKILL.md) — A1 kanıt zorunlu · A3 tıklanabilir göreli link · A4 kod kazanır · A5 statik kapı runtime'ı görmez |
+| **Yardımcı cetveller** | [vaat-butunlugu-standard.md](../standards/vaat-butunlugu-standard.md) · [3d-webgl-standard.md](../standards/3d-webgl-standard.md) · `CLAUDE.md` Mutlak Kurallar |
+
+**Fiilen koşulan ölçümler (hepsi bu depoda, bugün):**
+
+- `grep -rln 'VentHubCanvas\|MegaMenu3DBackground\|ThreeDAuthority\|Category3DIcon\|@react-three' src` → **72** dosya (kod-only `--include='*.ts(x)'` → **39**)
+- Her 3D bileşeninin **tüketici zinciri** (import + `dynamic()` + JSX çağrı yeri) tek tek izlendi
+- `grep -rn 'quickOrder\|Hızlı Sipariş\|Quick Order' src supabase` → **3** isabet
+- `npx vitest run src/__tests__/conformance/i18n-dead-key.test.ts` → **8/8 YEŞİL** (canlı koşuldu)
+- `.github/workflows/*.yml` + `.husky/` içinde `knip` araması → **0 isabet**
+- 3D kapıları okundu: `3d-single-canvas` · `3d-asset-validity` · `3d-csp` · `3d-model-recipe` · `3d-procedural-env`
+- SSR ölçüm dosyası okundu: [tests/smoke/ssr-html.spec.ts](../../tests/smoke/ssr-html.spec.ts)
+- Bayrak deseni ölçüldü: [checkout/page.tsx:21](../../src/app/[lang]/checkout/page.tsx#L21)
+
+**Özet hüküm:** Planın *niyeti* ve *sınır çizme disiplini* (§2.4'ün pakete gömülmemesi) sağlam.
+Ama **kabul ölçütü 1 ayırt edici değil** (sahte-yeşil sınıfı), **giriş noktası envanteri hem
+fazla hem eksik sayıyor**, ve **asıl ayırt edici ölçüm dosyası plan kapsamının tamamen dışında.**
+
+---
+
+## 2. Detaylı Teknik Analiz ve Çürütmeler
+
+### 2.1. Kabul ölçütü 1 AYIRT EDİCİ DEĞİL — bayrak açıkken de kapalıyken de "0" verir
+
+* **Bulgu:** Plan §5.1: *"Müşteri yüzeyinde 3D giriş noktası sayısı **0** — erişilebilirlik
+  ağacıyla ölçülür (ham HTML değil)."* Ölçtüm: 3D yüzey bileşenlerinin **hiçbirinde**
+  `aria-*`, `role=` veya `alt=` yok. WebGL `<canvas>` erişilebilirlik ağacına kendiliğinden
+  hiçbir düğüm katmaz. Yani erişilebilirlik ağacı, bayrak `true` iken de `false` iken de aynı
+  şeyi görür: **hiçbir şey.** Ölçüt iki hâlde aynı değeri verdiği için bir ölçüm değildir.
+* **Somut Kanıt:** `grep -n "aria-\|role=\|alt=" ` şu dört dosyada **sıfır satır** döndü:
+  [OrbitalProductsShowcase.tsx](../../src/components/products/OrbitalProductsShowcase.tsx) ·
+  [MegaMenu3DBackground.tsx](../../src/components/navigation/MegaMenu3DBackground.tsx) ·
+  [Category3DIcon.tsx](../../src/components/products/Category3DIcon.tsx) ·
+  [CategoryOrbitCarousel.tsx](../../src/components/products/CategoryOrbitCarousel.tsx).
+  Tek istisna, erişilebilirlik ağacında **gerçekten** görünen PDP galeri düğmesidir:
+  [ImageGallery.tsx:153](../../src/components/ImageGallery.tsx#L153) (`aria-label={t('common.view3D')}`).
+* **Hangi Kural:** Bu deponun kendi dersi — [[ayirt-etmeyen-gosterge-olcum-degildir]]; ayrıca
+  planın kendi §3 tablosunun *"Sabotaj (ayırt edici olmak zorunda)"* sütunu.
+* **Risk Derecesi:** **Kritik** (sahte-yeşil: paket "kabul edildi" damgası alır, 6 yüzeyin
+  4'ü ölçülmemiş kalır).
+
+### 2.2. Asıl ayırt edici ölçüm dosyası plan kapsamının DIŞINDA — ve sessizce bayatlayacak
+
+* **Bulgu:** Depoda, 3D yüzeylerin SSR'daki varlığını **sayıyla** ölçen bir dosya zaten var:
+  `BAILOUT_TO_CLIENT_SIDE_RENDERING` sayacı. `/tr/products` için tavan **1** ve yorumu
+  açıkça *"1 bailout bilinçli: CategoryOrbitCarousel (3D) kendi Suspense'inde ssr:false"*
+  diyor; PDP için tavan **2** (*"galeri + 3D bloğu"*). Plan bu dosyayı hiç anmıyor.
+  Dahası assertion `toBeLessThanOrEqual` — yani şerit kaldırıldığında sayaç 1→0 düşer,
+  **kapı yeşil kalır** ve ratchet kurgu hâline gelir. Ölçütün ta kendisi burada duruyor
+  ve plan onu ne kullanıyor ne de sıkıştırıyor.
+* **Somut Kanıt:** [ssr-html.spec.ts:29](../../tests/smoke/ssr-html.spec.ts#L29) (`maxBailouts: 1`),
+  [ssr-html.spec.ts:39](../../tests/smoke/ssr-html.spec.ts#L39) (`maxBailouts: 2`),
+  [ssr-html.spec.ts:61](../../tests/smoke/ssr-html.spec.ts#L61) (`toBeLessThanOrEqual`).
+* **Hangi Kural:** A5 (statik kapı runtime'ı görmez) + `rendering-cache-standard.md`.
+* **Risk Derecesi:** **Yüksek** — düzeltmesi ucuz, atlanması pahalı.
+
+### 2.3. Kabul ölçütü 1 ve 3'ün **hiçbir CI kapısı yok** (A5)
+
+* **Bulgu:** §5.1 "erişilebilirlik ağacı", §5.3 "SSR HTML'de ölçülür" diyor. Ama SSR-HTML
+  ölçümü `describe.skipIf(!SMOKE_BASE_URL)` ile korunuyor ve `SMOKE_BASE_URL` hiçbir
+  workflow'da tanımlı değil → CI'da **atlanır**. Playwright koşusu ise yalnız
+  `**/*.e2e.ts` (admin + checkout + reflow) çalıştırıyor; vitrin/3D yüzeyi kapsamda değil.
+  Yani ikisi de **elle** ölçümdür; "kabul ölçütü yeşil" cümlesi CI'dan doğrulanamaz.
+* **Somut Kanıt:** [ssr-html.spec.ts:45](../../tests/smoke/ssr-html.spec.ts#L45) ·
+  [playwright.config.ts:15](../../playwright.config.ts#L15) (`testMatch: '**/*.e2e.ts'`) ·
+  `grep -rn "SMOKE_BASE_URL" .github/workflows/` → 0 isabet.
+* **Hangi Kural:** A5.
+* **Risk Derecesi:** **Orta** (plan bunu açıkça yazarsa kabul edilebilir; şu an yazmıyor →
+  okuyan "kapı var" sanır).
+
+### 2.4. "Müşteri yüzeyinde 3D giriş noktası 6" — sayı hem FAZLA hem EKSİK
+
+Envanteri tek tek izledim. Ölçülen tablo:
+
+| # | Plan'ın adı | Gerçek kod noktası | Hüküm |
+|---|---|---|---|
+| 1 | PDP rozeti | [ProductDetailPageView.tsx:527](../../src/app/_components/ProductDetailPageView.tsx#L527) | **KOŞULLU** — yalnız `topicSlug === 'hava-perdesi'` iken basılıyor |
+| 2 | galeri düğmesi | [ImageGallery.tsx:151](../../src/components/ImageGallery.tsx#L151) | canlı |
+| 3 | otorite bloğu | [AuthorityRenderer.tsx:234](../../src/components/authority/AuthorityRenderer.tsx#L234) | **MÜŞTERİ YÜZEYİNDE ERİŞİLEMEZ** (aşağıda) |
+| 4 | kategori paneli | [CategoryHubOverlay.tsx:15](../../src/components/navigation/CategoryHubOverlay.tsx#L15) | canlı |
+| 5 | mega menü arkaplanı | [EliteMegaMenu.tsx:132](../../src/components/navigation/EliteMegaMenu.tsx#L132) | canlı; **yalnız masaüstü** (`MobileMegaMenu` 3D basmıyor) |
+| 6 | /products orbital şerit | [ProductsDiscoveryView.tsx:95](../../src/views/ProductsDiscoveryView.tsx#L95) | canlı — ama **iki rotada** (aşağıda) |
+
+**(a) 3 numara müşteri yüzeyinde yok.** `AuthorityRenderer`'ın 3D dalını müşteriye taşıyan
+tek sarmalayıcı [CategoryAuthoritySection.tsx](../../src/components/category/CategoryAuthoritySection.tsx)'dır
+ve o bileşenin **sıfır tüketicisi** var (`grep -rn "CategoryAuthoritySection" src --include='*.tsx'`
+→ yalnız kendi dosyası). Bugün `AuthorityRenderer`'ı canlı çağıran tek yer **admin**:
+[CategoryBuilderView.tsx:519](../../src/views/admin/CategoryBuilderView.tsx#L519).
+**Sonuç:** tek küresel bayrak (`UC_BOYUT_MUSTERI_YUZEYINDE`) buraya uygulanırsa,
+müşteride zaten görünmeyen bir yüzeyi kapatmış olmaz; kapattığı şey **admin'in 3D blok
+önizlemesi** olur — yani bir *yetenek vaadi* değil, bir *editör aracı*. Plan bunu ayırt etmiyor.
+
+**(b) 6 numara tek kod noktası ama iki rota.** `ProductsDiscoveryView` yalnız `/products`
+sayfasında değil, kategori master görünümünde de render ediliyor:
+[CategoryMasterView.tsx:130](../../src/views/CategoryMasterView.tsx#L130) (dinamik import
+[satır 23](../../src/views/CategoryMasterView.tsx#L23)). §2.2'nin *"yerine kategori kartları"*
+önerisi kategori rotasında **mükerrer kategori kartı** üretir (zaten alt-kategori kartları basan
+bir sayfada ikinci bir kategori şeridi). Plan bu ikinci rotayı hiç saymamış.
+
+* **Hangi Kural:** A4 (kod kazanır) + `vaat-butunlugu-standard.md` §2.
+* **Risk Derecesi:** **Yüksek** — "hepsi kapandı" kabul ölçütü, yanlış kümeyi sayıyor
+  ([[olcut-keskin-ama-evren-yanlis]] sınıfı).
+
+### 2.5. §2.2'nin "sıfır yeni bileşen, mevcut kanıtlı desen" iddiası KANITSIZ
+
+* **Bulgu:** Plan, orbital şeridin yerine *"mevcut kanıtlı desenle kategori kartları — sıfır
+  yeni bileşen"* koyacağını söylüyor ama **hangi bileşen** olduğunu yazmıyor. Ölçtüm:
+  `ProductsDiscoveryView`'ın bugün kullandığı tek kart bileşeni `FamilyCard`'dır
+  ([satır 22](../../src/views/ProductsDiscoveryView.tsx#L22)) ve o bir **aile** kartıdır,
+  kategori kartı değil. Kategori kartı deseni bu görünümde **yok**. `initialCategories`
+  prop'u tanımlı ([satır 41](../../src/views/ProductsDiscoveryView.tsx#L41)) ama gövdede
+  destructure bile edilmiyor ([satır 53-58](../../src/views/ProductsDiscoveryView.tsx#L53)) —
+  yani "kategori kartı basacak veri zaten akıyor" varsayımı da ölçülmemiş.
+* **Hangi Kural:** A1 (kanıt zorunlu) + `CLAUDE.md` #1 (plan kendisini yöneten cetveli söylemeli).
+* **Risk Derecesi:** **Yüksek** — "sıfır yeni bileşen" iddiası PR'da çökerse paket büyür ve
+  §4'teki "tek PR taşır" gerekçesi düşer.
+
+### 2.6. Yeni bayrak: depoda KANITLI desen var, plan ona uymuyor ve **env mi sabit mi** demiyor
+
+* **Bulgu:** Depoda ödeme için çalışan, ölçülmüş bir bayrak deseni var:
+  `const ODEME_ACIK = process.env.NEXT_PUBLIC_ODEME_ACIK === '1'` — **tüketici dosyasının
+  kendi içinde**, `src/config/` altında değil; ve açma prosedürü *"kod değişmez, Vercel'de
+  env tanımlanır"* diye belgeli. Plan ise `src/config/features.ts` + `UC_BOYUT_MUSTERI_YUZEYINDE`
+  diyor ama **sabit mi env-bağlı mı** söylemiyor. İki dal da tuzaklı:
+  - **Sabit yazılırsa:** geri açma "tek satır kod değişikliği + PR + deploy" olur; ödeme
+    bayrağının kanıtlı "kodsuz açma" davranışıyla çelişir; ayrıca planın §4 "Geri açma: tek
+    satır" satırı bir **deploy** gerektirdiğini gizler.
+  - **Env-bağlı yazılırsa:** tüm 6 tüketici **istemci** ağacında (`ProductDetailPageView`,
+    `StickyHeader`, `EliteMegaMenu`, `AuthorityRenderer` hepsi `'use client'`), dolayısıyla
+    `NEXT_PUBLIC_` öneki **zorunlu**. Öneksiz yazılırsa değer istemci demetinde `undefined`
+    olur, bayrak sessizce hep aynı dala düşer ve **hiçbir kapı görmez** — depoda bu tuzağın
+    yazılı kaydı zaten var: [siteUrl.ts:20](../../src/config/siteUrl.ts#L20).
+  Ek: `src/config/index.ts` bir barrel'dır ([4 satır](../../src/config/index.ts)); yeni dosya
+  oraya eklenirse mevcut desene uyar, eklenmezse desen çatallanır.
+* **Somut Kanıt:** [checkout/page.tsx:16-21](../../src/app/[lang]/checkout/page.tsx#L16-L21) ·
+  [siteUrl.ts:20](../../src/config/siteUrl.ts#L20) · [config/index.ts](../../src/config/index.ts)
+* **Hangi Kural:** `CLAUDE.md` #4 (RSC/'use client' sınırı) + plan-challenger başlık 2.
+* **Risk Derecesi:** **Yüksek** (env dalı seçilir ve önek unutulursa: sessiz, kapısız kusur).
+
+### 2.7. Teklif modu SSOT'u ÇATALLANIYOR — planın kendi teşhisiyle çelişiyor
+
+* **Bulgu:** Plan §0'da kusuru *"iki yüzeyin birbirinden habersiz konuşması"* diye teşhis
+  ediyor. Depoda bu sınıfın çözümü zaten yazılı: teklif modu hükmü **tek** saf fonksiyonda
+  yaşıyor ve dosyanın kendi yorumu şunu emrediyor: *"Yeni bir yüzey fiyat basacaksa kendi
+  kuralını YAZMAZ, bunu çağırır."* Hüküm **veriden** gelir (`hide_price`). Plan ise 3D için
+  veriye hiç bakmayan, elle çevrilen **ikinci bir küresel sabit** koyuyor. Yarın bir kategori
+  `hide_price=false` olduğunda fiyat açılır ama 3D bayrağı elle çevrilene kadar kapalı kalır —
+  yani plan, kapatmayı vaat ettiği sınıfın **yeni bir örneğini üretiyor.**
+* **Somut Kanıt:** [quoteMode.ts:28-33](../../src/lib/pricing/quoteMode.ts#L28-L33)
+  (*"aynı hüküm İKİ YÜZEYDE ayrı ayrı yazılırsa, biri düzeltilince diğeri sessizce eski
+  davranışta kalır"*) · [quoteMode.ts:38](../../src/lib/pricing/quoteMode.ts#L38).
+* **Hangi Kural:** `vaat-butunlugu-standard.md` §4.5 + `quote-standard.md`.
+* **Risk Derecesi:** **Orta** — savunulabilir bir tercih (3D bir *yetenek*, fiyat değil), ama
+  plan bu tercihi **açıkça gerekçelendirmiyor**; §2.1'in üç gerekçesi arasında yok.
+
+### 2.8. Envanter, bayrağın GÖREMEYECEĞİ metin-düzeyi 3D vaatlerini atlıyor
+
+* **Bulgu:** Bir render bayrağı yalnız **bileşen** kapatır; sözlükte duran vaat metnini kapatmaz.
+  Ölçülen, plan envanterinde bulunmayan 3D vaat metinleri:
+  - [tr.ts:335](../../src/i18n/dictionaries/tr.ts#L335) `home.hero.subtitle` = *"**3D keşif**, kategori akışı ve teklif yönlendirmesi tek odakta birleşir."*
+  - [tr.ts:341](../../src/i18n/dictionaries/tr.ts#L341) `home.hero.visualTitle` = *"**3D keşif** ile kategori kararını ilk ekranda başlatın."*
+  - [tr.ts:132](../../src/i18n/dictionaries/tr.ts#L132) `common.view3D` = *"3D görüntüle"*
+  - [tr.ts:1683-1723](../../src/i18n/dictionaries/tr.ts#L1683-L1723) `pdp.threeDAuthority.*` ad-alanı (`interactiveView`, `loadingModel`, `interactive3D` …)
+
+  Ek ölçüm — bu iki ana sayfa anahtarının **kaynakta hiçbir tüketicisi yok**
+  (`grep -rn "visualTitle" src` → yalnız `tr.ts`/`en.ts`), yani ana sayfa hero'su bugün
+  o metni **basmıyor**; buna rağmen ölü-anahtar kapısı YEŞİL koşuyor (8/8, canlı ölçtüm).
+  Yani bu vaatler *"kapı görmüyor + ekranda yok + sözlükte duruyor"* konumundadır: hero
+  yeniden bağlandığı gün vaat geri gelir ve hiçbir kapı ötmez. Bu tam olarak
+  `vaat-butunlugu-standard.md` §4.5'in *"kapının göremediği tek yön"* diye tarif ettiği sınıftır.
+* **Hangi Kural:** `vaat-butunlugu-standard.md` §4.5 · `CLAUDE.md` #7.
+* **Risk Derecesi:** **Orta**.
+
+### 2.9. "Hızlı Sipariş = 1 kod + 2 anahtar" — DOĞRULANDI, ama kapı o yüzeyi taramıyor
+
+* **Bulgu (planı destekleyen):** İddia ölçümle **doğrulandı**. Depo genelinde
+  `quickOrder|Hızlı Sipariş|Quick Order|quick-order` üç isabet veriyor, başka geçiş yok:
+  mobil menüde, footer'da, ana sayfada, `sitemap`'te ve analytics olay taksonomisinde **sıfır**.
+* **Somut Kanıt:** [StickyHeader.tsx:268](../../src/components/StickyHeader.tsx#L268) ·
+  [tr.ts:720](../../src/i18n/dictionaries/tr.ts#L720) · [en.ts:744](../../src/i18n/dictionaries/en.ts#L744).
+* **Çürütme (kalıcılık ekseninde):** Ama `INV-VAAT-SIZINTI-1`'in taradığı vitrin ağacı
+  `components/StickyHeader.tsx`'i ve `views/ProductsDiscoveryView.tsx`'i **içermiyor**
+  ([vaat-sizintisi.test.ts:59-68](../../src/__tests__/conformance/vaat-sizintisi.test.ts#L59-L68)).
+  Yani düğme bugün kaldırılır, yarın aynı yere "Hemen Sipariş Ver" yazılır ve kapı görmez.
+  Plan §3 tablosunda `INV-6`'ya (ölü anahtar) yaslanıyor — o kapı anahtarı ölçer, **dili** değil.
+* **Risk Derecesi:** **Orta** (kalıcı katman eksiği; tekil iş doğru).
+
+### 2.10. §2.2'nin Suspense/SEO kaygısı — ÖLÇTÜM, TERSİ DOĞRU (planı düzelten bulgu)
+
+* **Bulgu:** Şeridi kaldırmanın Suspense/bailout yapısını bozacağı ve SEO'ya zarar vereceği
+  endişesi **yersiz**: `ProductsDiscoveryView` **zaten baştan sona `'use client'`**
+  ([satır 1](../../src/views/ProductsDiscoveryView.tsx#L1)); oradaki `<Suspense>` yalnız
+  `ssr:false` dinamik importun yarattığı CSR bailout'unu **karusele hapsetmek** için var.
+  Karusel gidince bailout adası **tamamen kaybolur** → `/tr/products` SSR HTML'i **iyileşir**.
+  Ancak iki test dosyası karuseli mock'luyor; import kalkınca bu mock'lar **bayat** kalır
+  (kırmızı vermez — sessiz kapı körlüğü):
+  [seo-h1-tekilligi.test.tsx:37](../../src/__tests__/conformance/seo-h1-tekilligi.test.tsx#L37) ·
+  [ProductsDiscoveryView.test.tsx:23](../../src/views/__tests__/ProductsDiscoveryView.test.tsx#L23).
+* **Risk Derecesi:** **Düşük** (temizlik kalemi) — ama plan §2.2'deki uyarı yanlış hedefte.
+
+### 2.11. §4'ün knip/ölü-kod riski — ÖLÇTÜM, RİSK YOK (planı gevşeten bulgu)
+
+* **Bulgu:** *"3D kodu ölü sayılıp knip tarafından silinmeye aday görünür"* riski ölçüldü ve
+  **CI'da karşılığı yok**: `knip` ne bir workflow'da ne de `.husky/` kancasında koşuyor
+  (`grep -rn "knip" .github/workflows/ .husky/` → 0 isabet); yalnız elle `pnpm knip`.
+  Ayrıca beş 3D kapısının hepsi **kaynak-tarayıcı**dır (asset geçerliliği, tek-Canvas,
+  CSP origin, recipe, prosedürel environment) — bayrakla kapatmak hiçbirini kırmaz;
+  bileşen dosyaları yerinde kaldığı sürece hepsi aynı sonucu verir.
+  Ek not: planın "39 dosyanın hiçbiri silinmiyor" cümlesi doğru, ama o kümede **zaten
+  sıfır tüketicili** iki bileşen var — `InfiniteProductsShowcase.tsx` ve `BlueprintCanvas.tsx`
+  (yalnız test yorumlarında anılıyorlar).
+* **Risk Derecesi:** **Düşük** — plan bu satırı abartıyor; zararsız ama ölçüm gibi sunuluyor.
+
+### 2.12. "Migration YOK" — DOĞRULANDI
+
+* **Bulgu:** Doğru. Dal `origin/master@480352bd` üzerinde temiz; `supabase/migrations/` altında
+  değişiklik yok, plan hiçbir şema değişikliği önermiyor. `CLAUDE.md` #13 (merge = prod'a
+  otomatik uygulama) **tetiklenmiyor**. Bu iddiaya itirazım yok.
+* **Risk Derecesi:** **Yok** (PASS).
+
+### 2.13. "39 dosya" — planın kendi kanıt komutu bu sayıyı üretmiyor (A1)
+
+* **Bulgu:** Plan §1, ölçümün yanına komutu da yazıyor:
+  `grep -rln '…' src`. O komut bu depoda **72** döndürüyor; 39'a inmek için
+  `--include='*.ts' --include='*.tsx'` gerekiyor (fark = 33 üretilmiş companion `.md`).
+  Sayı yanlış değil, **kanıt komutu yanlış** — üçüncü bir kişi doğrulamaya kalkarsa 72 görür.
+* **Hangi Kural:** A1 · [[kirpilmis-cikti-kanit-degildir]] sınıfı.
+* **Risk Derecesi:** **Düşük** (ama kolay düzeltilir ve karnenin güvenilirliğini etkiler).
+
+---
+
+## 3. Stratejik Öneriler ve Aksiyon Planı
+
+Hepsi **kalıcı katman** önerisidir (hand-patch değil):
+
+1. **Kabul ölçütü 1'i değiştir** (2.1 · 2.2 için tek çözüm):
+   *"Erişilebilirlik ağacı"* yerine ölçüt **`tests/smoke/ssr-html.spec.ts` ratchet'i** olsun:
+   `/tr/products` → `maxBailouts: 1 → 0`, PDP → `2 → 1` (galeri kapanırsa `→ 0`).
+   Bu ölçüt ayırt edicidir: bayrak açıkken sayı düşmez, kapalıyken düşer, ve **sayıdır**.
+   Erişilebilirlik ağacı ölçümü yalnız **tek** yüzey için geçerlidir (galeri düğmesinin
+   `aria-label`'ı) — ölçüt metnine bu sınır açıkça yazılsın.
+2. **§5'e "bu ölçüt CI'da koşmuyor" satırı ekle** (2.3): SSR smoke `SMOKE_BASE_URL`
+   olmadan atlanıyor. Ya PR'da elle koşulup çıktısı PR gövdesine yapıştırılsın, ya da
+   `e2e-smoke.yml`'e vitrin rotası eklensin. Yazılmazsa "kabul ölçütü yeşil" ölçülemez.
+3. **Envanteri yeniden say ve tabloya CANLILIK sütunu ekle** (2.4): "otorite bloğu"
+   müşteri yüzeyinde erişilemez → ya envanterden çıkar ya da *"admin önizlemesi;
+   bayrak kapsamı dışında"* diye işaretle. `/products` şeridinin **iki rota** beslediğini
+   (`ProductsPage` + `CategoryMasterView`) §2.2'ye yaz — "kategori kartları" önerisi
+   kategori rotasında mükerrer üretir.
+4. **§2.2'nin "kanıtlı desen"ini adlandır ya da iddiayı düşür** (2.5): dosya adı yazılmalı.
+   Bugün o görünümde kategori kartı deseni **yok**; `initialCategories` prop'u
+   destructure bile edilmiyor. En dürüst yol: bu turda şeridi **yerine bir şey koymadan**
+   kaldırmak (sarmalayıcı da koşullu — plan bunu zaten doğru söylüyor) ve kategori kartı
+   kararını §2.4 gibi ayrı bir tasarım kararına bırakmak.
+5. **Bayrak yazımını cetvele bağla** (2.6): planda tek cümleyle karara bağlansın —
+   *"bayrak `process.env.NEXT_PUBLIC_UC_BOYUT === '1'` desenini izler
+   ([checkout/page.tsx:21](../../src/app/[lang]/checkout/page.tsx#L21) ile aynı), `src/config/features.ts`'te
+   tanımlanır ve `src/config/index.ts` barrel'ından export edilir."* `NEXT_PUBLIC_` öneki
+   **zorunlu** (altı tüketicinin altısı da `'use client'` ağacında).
+   Sabit tercih edilirse §4'teki *"geri açma: tek satır"* satırı *"tek satır + PR + deploy"*
+   diye düzeltilmeli.
+6. **§2.1'e 4. gerekçe ekle** (2.7): *"Niçin veri değil sabit"* — 3D bir yetenek vaadidir,
+   `hide_price` gibi kategori-başına veri değildir; bu yüzden `quoteModeHesapla` çağrılmaz.
+   Gerekçe yazılmazsa plan, kapatmayı vaat ettiği "iki yüzey habersiz" sınıfını yeniden üretir.
+7. **§4.5 geri-dönüş tablosuna 4 satır daha** (2.8): `home.hero.subtitle`,
+   `home.hero.visualTitle` ("3D keşif" metni), `common.view3D`, `pdp.threeDAuthority.*`.
+   Bayrak bunları kapatmaz; kaldırılıyorsa tabloya, kalıyorsa "metin duruyor, yüzey kapalı"
+   notuyla yazılmalı.
+8. **`INV-VAAT-SIZINTI-1`'in vitrin ağacını genişlet** (2.9): `VITRIN_YOLLARI`'na
+   `components/StickyHeader.tsx` ve `views/ProductsDiscoveryView.tsx` eklensin — aksi
+   hâlde "Hızlı Sipariş" bugün gider, yarın aynı yere sipariş dili geri yazılır ve kapı görmez.
+   Terim listesine yetenek-vaadi öbekleri ("hızlı sipariş", "hemen satın al", "etkileşimli 3D")
+   girsin; planın kendi §1'de söz verdiği **cetvel §1.4** eki tam olarak budur.
+9. **Bayat mock temizliği** (2.10): karusel importu kalkarsa
+   `seo-h1-tekilligi.test.tsx:37` ve `ProductsDiscoveryView.test.tsx:23` mock'ları da
+   silinsin (kırmızı vermezler → gözden kaçarlar).
+10. **§4'teki knip satırını ölçüme çevir** (2.11): knip CI'da koşmuyor; satır
+    *"knip elle koşuluyor; bayrakla kapalı ≠ ölü notu REC-119 turuna düşülür"* olsun.
+11. **§1'deki kanıt komutunu düzelt** (2.13): `--include='*.ts' --include='*.tsx'` eklensin
+    (aksi hâlde komut 72 döndürür, tablo 39 der).
+
+---
+
+## 4. Sonuç
+
+### Genel risk: **KOŞULLU** — üç ön şart yerine gelmeden kod yazılmamalı
+
+Plan yapısal olarak sağlam ve iki yerde **örnek** disiplin gösteriyor: §2.4'ün yapısal kararı
+pakete gömmemesi ve §3'ün *"kapının göremeyeceği: bayrağın değeri"* itirafı. Migration
+iddiası doğru, "Hızlı Sipariş tek kod noktası" iddiası doğru, knip korkusu ise gereksiz.
+
+Ama **uygulamaya bu hâliyle geçilirse paket sahte-yeşil alır.** Bloklayıcı üç şart:
+
+| # | Ön şart | Kaynak |
+|---|---|---|
+| **B1** | Kabul ölçütü 1, erişilebilirlik ağacından **SSR bailout ratchet'ine** çevrilir (`maxBailouts` 1→0 / 2→1) | §2.1 · §2.2 |
+| **B2** | Giriş noktası envanteri yeniden sayılır: otorite bloğu **admin** diye işaretlenir, `/products` şeridinin **iki rota** beslediği yazılır | §2.4 |
+| **B3** | Bayrağın **env-bağlı mı sabit mi** olduğu ve `NEXT_PUBLIC_` önekinin zorunluluğu planda karara bağlanır | §2.6 |
+
+Kalan sekiz öneri (3.4–3.11) **KOŞULLU** kalemlerdir: PR'da karşılanmazsa merge ritüelinde
+tek tek gerekçelendirilmelidir.
+
+> **Denetçi notu (A2):** Bu rapor planı yazan bağlamdan ayrı, salt-okunur bir oturumda üretildi.
+> Ölçemediğim tek iddia `hide_price=true` × 23 kategoridir (canlı DB okuması yapılmadı);
+> o sayı [vaat-butunlugu-standard.md](../standards/vaat-butunlugu-standard.md) ve
+> [vaat-sizintisi.test.ts:14](../../src/__tests__/conformance/vaat-sizintisi.test.ts#L14)
+> üzerinden **alıntı** olarak kabul edildi, bağımsız doğrulanmadı.
+
+
+---
 # FILE: docs\plans\render-dalga1-plan-2026-08-17.md
 
 # Render Dalga-1 — Tazeleme Zinciri Onarımı (uygulama planı)
@@ -11560,6 +12469,195 @@ ilk ölçümü olmalı.
    ayrı `payment-ledger-standard.md` mi olacak?
 
 Hiçbiri tek başıma verilecek karar değil. Uygulama, bu üç cevap gelmeden başlamaz.
+
+
+---
+# FILE: docs\plans\teklif-modu-tutarlilik-paketi-2026-09-04.md
+
+# Teklif Modu Tutarlılık Paketi — plan (URUN, 2026-09-04)
+
+> **Durum: PLAN — kod yazılmadı.** Kural 1 (No-Plan-No-Code) gereği önce bu belge,
+> sonra plan-challenger red-team, sonra Recep'e sunum, sonra kod.
+> **Merge: Recep onayı zorunlu** (vitrinde müşteriye görünür değişiklik).
+
+## KAYNAK/CETVEL
+
+| | |
+|---|---|
+| **Yöneten cetvel** | `docs/standards/vaat-butunlugu-standard.md` — *"Bir vitrin yüzeyi, arkasında bugün çalışan bir yetenek olmayan hiçbir ticari vaadi yazamaz."* |
+| **Yardımcı cetveller** | `docs/standards/3d-webgl-standard.md` (3D yüzeyi) · `docs/standards/quote-standard.md` (teklif modu semantiği) · `docs/standards/rendering-cache-standard.md` (üretim/tazeleme) |
+| **Kapı** | `INV-VAAT-SIZINTI-1` → `src/__tests__/conformance/vaat-sizintisi.test.ts` |
+| **Karne tazeliği** | Ölçümler 2026-09-04, bu depoda (`C:/tmp/vh-urun-rec89`, taban `origin/master@480352bd`) koşuldu. |
+| **YÖNTEM** | Tek şerit (URUN), tek dal, tek PR. Plan aşaması için plan-challenger alt-ajanı (cetvel A2: üretici ≠ yargıç). |
+
+**Cetvel boşluğu — bu işin kapsamında yazılacak:** mevcut cetvel *ticari vaadi* (ödeme,
+taksit, kargo) yönetiyor. Bu paket bir sınıf daha ekliyor: **yetenek vaadi** — "Etkileşimli
+3D", "Hızlı Sipariş" gibi, arkasında çalışan bir yetenek olmadan **eylem** vaat eden yüzeyler.
+Cetvele §1.4 olarak eklenecek ve §4.5 geri-dönüş tablosu genişletilecek.
+
+---
+
+## 0) Niçin — tek cümlelik teşhis
+
+Site teklif modunda: 23 aktif kategorinin 23'ünde `hide_price=true`, çevrimiçi ödeme kapalı.
+Buna rağmen vitrin hâlâ **sipariş dili** konuşuyor ("Hızlı Sipariş") ve **var olmayan bir
+yetenek** gösteriyor ("Etkileşimli 3D" rozeti + 3D galeri düğmesi). Bu, REC-104'te ölçülen
+kusurun aynı sınıfı: *iki yüzeyin birbirinden habersiz konuşması.*
+
+---
+
+## 1) Ölçülmüş mevcut durum (varsayım değil)
+
+| Ne | Ölçüm | Nerede |
+|---|---|---|
+| 3D'ye referans veren **kaynak** dosya | **39** | aynı grep `--include='*.ts' --include='*.tsx'` **ile**. ⚠Include'suz hâli **72** döner (companion `.md`'leri sayar) — red-team A1 ihlali olarak yakaladı, düzeltildi. |
+| Müşteri yüzeyinde 3D **giriş noktası** | **5** (~~6~~) | PDP rozeti · galeri düğmesi · kategori paneli · mega menü arkaplanı · /products orbital şerit |
+| ⛔**Otorite bloğu — LİSTEDEN ÇIKARILDI** | `AuthorityRenderer`'ın canlı tek çağıranı **admin** ([CategoryBuilderView.tsx:519](src/views/admin/CategoryBuilderView.tsx#L519)); müşteri sarmalayıcısı `CategoryAuthoritySection` **sıfır tüketicili** (ölü kod) | Küresel bayrak orayı kapatsaydı bir vaadi değil **admin editörünü** kapatırdı — üstelik `src/components/admin/**` benim şeridim değil. Ölü sarmalayıcı REC-119'a bildirilir, dokunulmaz. |
+| "Hızlı Sipariş" yüzeyi | **1 kod + 2 sözlük anahtarı** | [StickyHeader.tsx:268](src/components/StickyHeader.tsx#L268) · `tr.ts:720` · `en.ts:744` |
+| `/products` üst şeridi | `CategoryOrbitCarousel`, `ssr:false` dinamik | [ProductsDiscoveryView.tsx:79-100](src/views/ProductsDiscoveryView.tsx#L79-L100) |
+| Katalog giriş noktası sayısı | **3** (CategoryHubOverlay · EliteMegaMenu · Hızlı Sipariş) | `StickyHeader.tsx:264-292` |
+| `src/config/features.ts` | **YOK** — donmuş yama onu içe aktarıyor | `ls src/config/features.ts` → yok |
+
+### ⭐Donmuş yamanın gerçek durumu (tahmin değil, ölçüm)
+
+`stash@{0}` (6 dosya, 168 satır) **taze master üzerinde 6 dosyanın 5'inde temiz uygulanıyor**;
+yalnız `ProductDetailPageView.tsx` düşüyor (import bloğu kaydı — tek hunk, elle taşınır).
+Yama **bayrak-tabanlı** yazılmış (`UC_BOYUT_MUSTERI_YUZEYINDE`) ama bayrağın yaşadığı
+`src/config/features.ts` **hiç yaratılmamış**. Yani yama tek başına derlenmez.
+
+**Sonuç:** "sıfırdan yaz" gerekmiyor; iş = bayrak dosyasını yaz + 5 dosyayı uygula + 1 hunk'ı
+elle taşı. Bu, "temiz uygulanması RİSK" şeklindeki önceki tahminimi ölçümle daralttı.
+
+---
+
+## 2) Kapsam — dört alt-iş
+
+### 2.1 · 3D müşteri yüzeyinden tam kapatma
+
+**Ne:** Altı giriş noktasının hepsi tek bayrağın (`UC_BOYUT_MUSTERI_YUZEYINDE = false`)
+arkasına alınır. **Bileşenler SİLİNMEZ** — 3D kod ağacı (39 dosya) yerinde kalır.
+
+**Niçin bayrak, niçin silme değil:** (a) 3D geri açılacak bir yetenek, silme geri dönüşü
+pahalılaştırır; (b) `3d-webgl-standard.md` yürürlükte bir cetvel — kodu silmek cetveli
+öksüz bırakır; (c) tek bayrak, altı yüzeyin **birlikte** açılıp kapanmasını garanti eder —
+bugünkü kusur tam da yüzeylerin ayrı ayrı karar vermesiydi.
+
+**Niçin tetikleyici de kapanır:** "tıklanmadıkça yüklenmiyor" savunması müşteri tarafında
+geçersiz — müşteri düğmeyi **görür ve tıklar**. Rozet ("Etkileşimli 3D") de bir vaattir.
+
+### 2.2 · `/products` sadeleştirme
+
+**Ne:** Orbital 3D karusel şeridi kaldırılır (bayrakla).
+
+⛔**v1'in "sıfır yeni bileşen, mevcut kanıtlı desen" iddiası KANITSIZDI ve geri çekildi.**
+Ölçüldü: o görünümde kategori kartı deseni **yok** (var olan `FamilyCard` = *aile* kartı,
+başka şey), ve `initialCategories` prop'u bileşende **destructure bile edilmiyor**.
+Yerine ne geleceği **ayrı bir tasarım kararıdır**; bu paket şeridi **kaldırmakla yetinir**.
+Boşluk bırakmamak için sarmalayıcı da koşullu (aşağıda).
+
+⚠**İkinci render yolu var:** `ProductsDiscoveryView`, `/products` dışında
+[CategoryMasterView.tsx:130](../../src/views/CategoryMasterView.tsx#L130)'da da render
+ediliyor (kategori **bulunamadı** dalı). Buraya kart eklenseydi mükerrer üretirdi —
+şeridi kaldırmak bu dalda da doğru davranır.
+
+⚠**Sarmalayıcı da koşullu olmalı.** Yalnız içeriği kapatmak, sayfanın üstünde boş bir şerit
+ve kenarlık bırakır. Bu, cetvel §2'nin ("vaat kapatılırken düzen de kapatılır") aynı sınıfı.
+
+⚠**h1 korunur.** [ProductsDiscoveryView.tsx](src/views/ProductsDiscoveryView.tsx) içindeki
+h1 dün REC-127 ile eklendi (#959); sadeleştirme onu düşürmemeli. Kapı: `INV-SEO-H1-1`.
+
+### 2.3 · "Hızlı Sipariş" kaldırma
+
+**Ne:** Nav düğmesi + iki sözlük anahtarı kaldırılır.
+
+**Niçin:** Sipariş verilemeyen bir sitede "Hızlı Sipariş" **yetenek vaadi**dir; üstelik
+gittiği yer `?all=1&sort=bestsellers` — REC-92'de veri-dayanaksız bulunan "çok satanlar"
+sıralaması. İki kusur tek düğmede.
+
+**Cetvel §3 gereği:** anahtar silinir, yerine anahtar bırakılmaz; niçin kaldırıldığı
+**yorumda** yazılır ve §4.5 geri-dönüş tablosuna satır eklenir.
+
+### 2.4 · Navigasyon birleştirme
+
+**Ne:** Katalog için üç giriş noktası var (kategori paneli, mega menü, Hızlı Sipariş).
+2.3 birini zaten kaldırıyor. Kalan ikisinin **hangisi kalacağı bir TASARIM kararıdır** —
+bu paket onu **kendi başına vermez**.
+
+⚠**Yapısal karar pakete gömülmez.** Menü yeri/mimarisi Recep'e **tek başına** sorulur.
+Bu paket yalnız 3D arkaplanları kapatır; iki menünün birleştirilmesi ayrı karara,
+ayrı PR'a bırakılır.
+
+---
+
+## 3) Kapılar — bu paket neyi ölçülebilir yapar
+
+| Kapı | Ne ölçer | Sabotaj (ayırt edici olmak zorunda) |
+|---|---|---|
+| `INV-UCBOYUT-KAPALI-1` (**yeni**) | Müşteri ağacındaki 3D giriş noktalarının **hepsi** bayrağa bağlı mı | Tek giriş noktasını bayraktan çıkar → KIRMIZI. *Hedef, değişen kuralın YÖNETTİĞİ yüzey olmalı.* |
+| `INV-VAAT-SIZINTI-1` | §4.5 tablosunun varlığı + boş olmaması | Tabloya eklenen satırlar silinsin → KIRMIZI |
+| `INV-6` (ölü anahtar) | `quickOrder` anahtarı kodda kullanılmadan kalırsa | Anahtarı bırak, kullanımı sil → KIRMIZI |
+| `INV-SEO-H1-1` | `/products` h1 tekilliği | h1'i h2'ye düşür → KIRMIZI |
+
+**Kapının göremeyeceği (açıkça yazılıyor):** bayrağın **değeri**. Kapı "her giriş noktası
+bayrağa bağlı mı" der, bayrağın `false` olduğunu değil — cetvel §4'ün aynı sınırı.
+
+---
+
+## 4) Risk ve geri alma
+
+| Risk | Karşılık |
+|---|---|
+| ~~knip 3D kodunu ölü sayar~~ **ABARTILMIŞTI** — knip ne CI'da ne husky'de koşuyor; beş 3D kapısı da kaynak-tarayıcı ve bayrak onları kırmıyor (ölçüldü) | Yine de REC-119 ölü-kod turuna not: **bayrakla kapalı ≠ ölü** |
+| ⭐**Bayrak env mi sabit mi — v1 SÖYLEMİYORDU** | Depodaki kanıtlı desen `process.env.NEXT_PUBLIC_ODEME_ACIK === '1'`. Beş tüketicinin hepsi `'use client'` → env seçilirse `NEXT_PUBLIC_` **zorunlu**, unutulursa sessiz kusur. **Hüküm: derleme-zamanı SABİT** (`export const UC_BOYUT_MUSTERI_YUZEYINDE = false`). Bedeli dürüstçe yazıyorum: geri açma "tek satır" değil, **tek satır + PR + deploy**. Karşılığında sessiz env tuzağı yok. |
+| **SSOT çatallanması** — `quoteMode.ts` "hüküm TEK yerde yaşar" diyor, bu bayrak ikinci bir küresel sabit | Kabul ediliyor ve gerekçesi yazılıyor: teklif modu **veriye** bağlı (`hide_price`), 3D ise veriye bağlı değil, **kurumsal bir sunum kararı**. Farklı eksen olduğu için ayrı sabit meşru. |
+| **Sözlükte bayrağın göremeyeceği metin vaatleri** | `home.hero` içindeki "3D keşif" ifadeleri, `common.view3D`, `pdp.threeDAuthority.*` — bayrak bunları kapatmaz. §4.5 tablosuna **satır satır** girer. |
+| **`INV-VAAT-SIZINTI-1` `StickyHeader`'ı taramıyor** (ölçüldü: `VITRIN_YOLLARI`'nda yok) | Yarın aynı yere sipariş dili geri yazılır ve kapı görmez → `StickyHeader.tsx` **kapsama eklenir** |
+| Boş şerit/ızgara bozulması | Sarmalayıcı koşullu; görsel doğrulama **erişilebilirlik ağacıyla** (ham HTML sayımı yeterli değil — 09-03 dersi) |
+| Paket büyür, tek PR taşımaz | 2.4 zaten ayrıldı; kalan üç alt-iş tek PR'da mantıklı çünkü **hepsi aynı bayrağı/aynı tabloyu** paylaşıyor |
+| Geri açma | Tek satır: `UC_BOYUT_MUSTERI_YUZEYINDE = true` + §4.5 tablosundaki satırların geri yazımı |
+
+**Migration: YOK.** Bu paket DB'ye dokunmaz.
+
+---
+
+## 5) Kabul ölçütleri (red-team sonrası düzeltildi)
+
+⛔**v1'in 1. ölçütü SAHTE-YEŞİLDİ ve kaldırıldı.** "Erişilebilirlik ağacıyla 3D giriş noktası
+0" diyordum. Ölçüldü: `OrbitalProductsShowcase`, `MegaMenu3DBackground`, `Category3DIcon`,
+`CategoryOrbitCarousel` dosyalarında **sıfır** `aria-*`/`role`/`alt` var ve WebGL canvas
+a11y ağacına düğüm katmaz — yani ölçüt bayrak **açıkken de kapalıyken de 0** verirdi.
+*Ayırt etmeyen gösterge ölçüm değildir* — dünkü dersin aynısı, bu kez kendi planımda.
+
+**Yerine geçen ölçütler:**
+
+1. **Kaynak düzeyinde:** beş 3D giriş noktasının **hepsi** bayrağa bağlı (yeni kapı ölçer).
+2. **Davranış düzeyinde:** `/tr/products` SSR **CSR-bailout sayısı 1 → 0'a düşer.**
+   ⚠[tests/smoke/ssr-html.spec.ts:29](../../tests/smoke/ssr-html.spec.ts#L29) bunu
+   `maxBailouts: 1` ve `toBeLessThanOrEqual` ile yazıyor — şerit kalkınca sayı düşer ama
+   **kapı yeşil kalır**, yani kazanç kayda geçmez. Eşiğin `0`'a **indirilmesi** işin parçası.
+3. `quickOrder` kodda **0**, sözlükte **0**, §4.5 tablosunda **1 satır**.
+4. `/products` h1 sayısı **1**.
+5. Yeni kapı geçerli bir sabotajla **kırmızı** verir; sabotaj geri alınınca yeşile döner.
+6. Beş maddelik merge ritüeli yeşil **ve Recep onayı yazılı.**
+
+### ⚠Bu kabul ölçütlerinin CI kapısı BUGÜN YOK — işin parçası
+`ssr-html.spec.ts` `describe.skipIf(!SMOKE_BASE_URL)` ile korunuyor ve **`SMOKE_BASE_URL`
+hiçbir workflow'da tanımlı değil** (ölçüldü). Yani 2. ve 4. ölçüt CI'da hiç koşmuyor.
+Ölçütü yazıp koşmayan kapıya bağlamak, "yazıldı sanılan ama var olmayan kapı"dır.
+
+### ⭐Kendi borcum, dün doğdu ve bu pakette kapanır
+Aynı spec `/tr/products` için `markers: [/<h2[\s>]/]` bekliyor. **#959 ile o h2'yi h1
+yaptım ve sayfada başka h2 kalmadı** — yani belirteç bayat, spec koşulsa **düşerdi**.
+Düşmedi çünkü hiç koşmuyor. Belirteç `<h1`'e çekilecek.
+
+---
+
+## 6) Sıra
+
+1. Bu plan → **plan-challenger red-team** (bağımsız alt-ajan, cetvel A2).
+2. Red-team raporu + plan → **Recep'e 5 satırlık sunum**.
+3. Onay gelirse kod: bayrak dosyası → yamanın uygulanması → kapı → sözlük → cetvel eki.
+4. Merge: beş madde + **Recep onayı**.
 
 
 ---
