@@ -4,6 +4,7 @@ import { ArrowLeft, ChevronRight,Grid3X3, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { Suspense,useCallback, useEffect, useState } from 'react'
 
+import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../../config/features'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
@@ -155,8 +156,9 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                         style={{ background: "rgba(56, 189, 248, 0.2)" }}
                                         aria-hidden="true"
                                     />
+                                    {/* REC-94: kategori panelindeki 3D ikon sahnesi kapalı. */}
                                     <div className="w-full h-full absolute inset-0 pointer-events-none">
-                                        <VentHubCanvas 
+                                        {UC_BOYUT_MUSTERI_YUZEYINDE && <VentHubCanvas
                                             preset="nav"
                                             camera={{ position: [0, 0, 2.2], fov: 40 }} 
                                             frameloop="demand"
@@ -166,7 +168,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                                 <Category3DIcon categorySlug={hoveredCategory.slug} scale={1.2} />
                                                 <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={2} />
                                             </Suspense>
-                                        </VentHubCanvas>
+                                        </VentHubCanvas>}
                                     </div>
                                 </div>
 

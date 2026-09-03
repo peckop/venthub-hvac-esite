@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\en.ts
-skeleton_hash: ba3ada89eb1a0bee
+skeleton_hash: dcd79fbc031f0588
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-09-03T16:07:00Z
+generated_at: 2026-09-03T17:33:44Z
 ---
 
 ## Genel Bakış

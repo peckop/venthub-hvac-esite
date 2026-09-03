@@ -29,6 +29,7 @@ import FamilyCard from '../../components/products/FamilyCard'
 import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
+import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../../config/features'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
@@ -516,7 +517,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
               modelType={(mainCategory?.metadata as CategoryMetadata | null)?.model_type}
               />
 
-              {topicSlug === 'hava-perdesi' && (
+              {/* REC-94: "Etkileşimli 3D" rozeti de bir TETİKLEYİCİDİR — galeri düğmesi
+                  kapanınca bu rozet kalsaydı müşteriye olmayan bir yetenek vaat ederdi. */}
+              {UC_BOYUT_MUSTERI_YUZEYINDE && topicSlug === 'hava-perdesi' && (
                 <div className="absolute top-6 left-6 z-20 pointer-events-none">
                   <div className="bg-white/95 backdrop-blur-md border border-primary-navy/20 px-3 py-2 rounded-full shadow-hvac flex items-center space-x-2 animate-pulse-subtle">
                     <div className="flex h-2 w-2 relative">

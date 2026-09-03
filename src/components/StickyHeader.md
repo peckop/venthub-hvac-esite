@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-t165\src\components\StickyHeader.tsx
-skeleton_hash: 62eb7d3cbf77d9a4
+source_path: C:\tmp\vh-urun-rec89\src\components\StickyHeader.tsx
+skeleton_hash: 2d71c2585f71b144
 entity_hashes:
   func:CategoryHubOverlaySkeleton: 09095f7c03bb95f0
   func:MegaMenuSkeleton: 43156bd7843421f5
   func:SearchOverlaySkeleton: 6695469d4cdbd037
   overview: 620cf1a29f42e258
   style_tokens: a87cdf58739596c8
-generated_at: 2026-08-27T07:58:32Z
+generated_at: 2026-09-03T17:33:42Z
 ---
 
 ## Genel Bakış
