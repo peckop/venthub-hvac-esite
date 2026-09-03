@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T13:25:27.762404+00:00
+compiled_at: 2026-09-03T16:01:15.298504+00:00
 total_compiled_files: 64
-source_commit: 9c6314ea
+source_commit: b3141375
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -6573,7 +6573,13 @@ Yazılmayan deney yapılmaz; yapılmayan deneyin yerini varsayım alır.
 
 ---
 
-#### ✅D8.3 SONUÇ (2026-08-28, deney koşuldu — ölçüm: `docs/audits/build-skip-canli-olcum-2026-08-28.md`)
+#### ✅D8.3.a — SONUÇ (2026-08-28, deney koşuldu; ölçüm: `docs/audits/build-skip-canli-olcum-2026-08-28.md`)
+
+> ⭐**Niçin `D8.3.a` oldu (2026-09-03, REC-120):** bu başlık `D8.3` numarasını **ikinci kez**
+> kullanıyordu ve `INV-CETVEL-YAPI` bunu **göremiyordu** — desen baştaki `⚠`/`✅` süslemesine
+> takılıp iki başlığı da atlıyordu. Kapı düzeltilince ihlal ortaya çıktı ve mükerrer numara
+> kapatıldı. `§D8.3`'e yapılan dış atıflar (`docs/audits/build-skip-canli-olcum-2026-08-28.md`)
+> **sorunun** kendisini işaret ediyor, bu sonuç bölümünü değil; o yüzden atıflar bozulmadı.
 
 **Risk çürüdü: atlanan dağıtım zorunlu `Vercel` check'ini YEŞİL yapıyor.** Kilit
 takası olmadı, geri alma planına gerek kalmadı.
