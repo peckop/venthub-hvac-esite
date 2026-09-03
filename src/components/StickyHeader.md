@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-rec89\src\components\StickyHeader.tsx
-skeleton_hash: 2d71c2585f71b144
+source_path: C:\Users\alize\venthub-hvac\src\components\StickyHeader.tsx
+skeleton_hash: b16be679a9cd6107
 entity_hashes:
   func:CategoryHubOverlaySkeleton: 09095f7c03bb95f0
   func:MegaMenuSkeleton: 43156bd7843421f5
   func:SearchOverlaySkeleton: 6695469d4cdbd037
   overview: 620cf1a29f42e258
   style_tokens: a87cdf58739596c8
-generated_at: 2026-09-03T17:33:42Z
+generated_at: 2026-09-03T18:09:58Z
 ---
 
 ## Genel Bakış

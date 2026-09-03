@@ -2,9 +2,9 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-urun-rec89\src\config\features.ts
-skeleton_hash: ac08aadf5df99483
-generated_at: 2026-09-03T17:33:44.084077+00:00
+source_path: C:\Users\alize\venthub-hvac\src\config\features.ts
+skeleton_hash: befea9f4261e50b1
+generated_at: 2026-09-03T18:10:05.705255+00:00
 ---
 
 ## Genel Bakış
@@ -19,4 +19,4 @@ Vitrin yetenek bayrakları — derleme zamanı sabitleri. NİÇİN ENV DEĞİL S
 (Dışa açılan çağrılabilir öğe yok — modül-düzeyi yan-etki; AST işaretçisi gerektiren fonksiyon/metot yok.)
 
 ## NODE ID STANDARD
-file: C:\tmp\vh-urun-rec89\src\config\features.ts
+file: C:\Users\alize\venthub-hvac\src\config\features.ts
