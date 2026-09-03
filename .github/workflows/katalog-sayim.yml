@@ -94,6 +94,24 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           set -euo pipefail
+          # ⭐CA SERTIFIKASI DEPODAKI DOSYADAN — ve bu satir bir ARIZANIN duzeltmesidir.
+          #
+          # Bu workflow'un ILK GERCEK KOSUMU (run 33794234029) tam burada dustu:
+          #   katalog-sayim: HATA — self-signed certificate in certificate chain
+          # Sebep: betik `PGSSLROOTCERT` yoksa sistem CA'lariyla `rejectUnauthorized: true`
+          # kosuyor; Supabase'in zinciri sistem kokleriyle dogrulanmiyor.
+          #
+          # Ev gelenegi ZATEN VARDI ve ben onu ATLAMISTIM: `db-advisor.yml`in
+          # `catalog-integrity` ve `rls-role-coverage` isleri ayni degiskeni ayni dosyayla
+          # veriyor. Sertifika bir SIR DEGIL, depoda gozden gecirilebilir bir dosya —
+          # o dosyanin kendi yorumu niçinini yaziyor: rotasyon "gorunmez bir pano ayari"
+          # olarak degil, gozden gecirilebilir bir COMMIT olarak yapilir.
+          #
+          # ⚠DERS (bu isin kendi PR govdesine yazdigim cumlenin dogrulanmasi):
+          # "merge canlida calistigini KANITLAMAZ." Workflow indi, YAML gecerliydi,
+          # fail-closed dali olculmustu — ve ilk gercek kosumda yine de dustu. Kirmizi
+          # DOGRU davranisti: bos tablo yazilmadi, PR acilmadi.
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/katalog/katalog-sayim.mjs --yaz
 
       # Artefakt HER HALDE yuklenir ki kirmizi bir kosumda bile elde ne varsa gorunsun.
