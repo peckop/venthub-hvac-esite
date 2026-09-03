@@ -686,6 +686,31 @@ function yoklama(now = Date.now()) {
     }
   }
 
+  /**
+   * ⭐COMPANION BORCU — SAYILIR, BLOKLANMAZ (Recep karari 2026-08-31 + 09-03).
+   *
+   * NICIN BURADA: companion uretici tasiyici KAPALI. Kapali tasiyiciyla INV-DOC-2 C4
+   * borcu ONLEYEMEZ, yalniz cezalandirir — 09-03'te olculdu: bir dosya HICBIR COMMIT
+   * olmadan, yalniz TAKVIM ilerledigi icin butun acik PR'lari kirmiziya cevirdi. Kapi
+   * bloklamaktan SAYIMA dondu; sayinin GORUNUR kalacagi yer burasi.
+   *
+   * NICIN METIN BURADA YAZILMIYOR: cumleyi sayac modulu URETIR (s26). Pano kendi
+   * cumlesini yazsa iki metin ayrisir ve hangisinin hukum oldugu belirsizlesir.
+   * Bir konformans kolu bu iki ciktiyi karsilastirir.
+   *
+   * NICIN try/catch: sayac git okur; git olmayan bir dizinde yoklama COKMEMELI. Ama
+   * hata SESSIZ KALMAZ — "olculemedi" ACIKCA basilir, cunku olcememek gecmek degildir.
+   */
+  try {
+    const sayac = require('../hijyen/companion-sayim.cjs')
+    altlar.push('  ' + sayac.ozetSatiri(sayac.olc({ kok: repoRootFor(__filename) || undefined })))
+  } catch (e) {
+    altlar.push(
+      '  companion borcu OLCULEMEDI (' + String((e && e.message) || e).slice(0, 90) + ')' +
+      '\n  Olcememek gecmek DEGILDIR: bu satir alarmdir, sayinin sifir oldugu anlamina gelmez.',
+    )
+  }
+
   return bas + '\n' + satirlar.join('\n') + '\n' + altlar.join('\n')
 }
 

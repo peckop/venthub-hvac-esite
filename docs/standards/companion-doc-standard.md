@@ -67,11 +67,43 @@ Bu yüzden ters yön ayrı bir bekçiye taşındı: **§C4 + §C5, `INV-DOC-2`**
 
 İlgili ama HENÜZ YOK: `.cc_docs.yaml` ↔ NotebookLM defteri paritesi (§C6, aşağıda).
 
-## C4 — Companion'ı olmayan ESKİ kaynak = ihlal (yaş eşikli)
+## C4 — Companion'ı olmayan ESKİ kaynak = SAYILIR, bloklamaz (yaş eşikli)
 
 Kapsamdaki bir kaynak dosyanın son commit'i **7 günden eskiyse** ve companion'ı yoksa
-bu bir ihlaldir. 7 gün ve altı, asenkron üretim penceresi olarak **muaftır**.
+bu bir borçtur. 7 gün ve altı, asenkron üretim penceresi olarak **muaftır**.
 Etki: ikiz o dosyayı hiç bilmez, "bu kod nasıl çalışıyor" sorusuna eksik cevap verir.
+
+**Bu borç 2026-09-03'ten beri BLOKLAMAZ; sayılır ve adlarıyla raporlanır** — Recep'in
+**2026-08-31** kararıyla companion üretici taşıyıcı KAPALI tutulduğu için (abonelik
+maliyeti). Bu, **bilinen ve kabul edilmiş bir eksiktir**: taşıyıcı kapalıyken kapı borcu
+**önleyemez**, yalnız cezalandırır.
+
+**Niçin değişti — ölçülmüş vaka (2026-09-03).** `DataTablePagination.tsx` 2026-08-26'da
+geldi; 09-03'te 8. gününü doldurdu ve **hiçbir commit atılmadan**, yalnızca takvim
+ilerlediği için o gün açık olan **bütün PR'ları** kırmızıya çevirdi. Aynı ölçümde
+üretim hattının **28 Ağustos'tan beri ölü** olduğu görüldü (20–28 Ağustos arası 81
+companion eklenmiş, sonrasında 1). Yani kapı, kimsenin kapatamayacağı bir borcu
+haftada bir filo kilidine dönüştürüyordu.
+
+⚠**Eşik UZATILMADI, bilerek:** 7'yi 30'a çekmek aynı tuzağı **erteler**, kaldırmaz —
+30. günde aynı kilit gelir ve o gün sebebi hatırlayan kimse olmaz.
+⚠**Kapı SİLİNMEDİ, bilerek:** silinen kapı **kapatılmış borç** sanılır. Kalan biçim
+"say, adlarıyla raporla, bloklama"dır; sayı `board.cjs yoklama` çıktısında da görünür.
+Sayının **ayırt ettiği** ayrı bir kolla kilitlidir (companion'sız dosya eklenince sayı
+artmıyorsa test kırmızı verir) — çünkü bloklamayan bir kolun tek değeri budur.
+
+**C5 BLOKLAMAYA DEVAM EDER** ve bu tutarsızlık değil: bayat companion, ikize *emin
+biçimde yanlış* cevap verdirir (§C5) ve çözümü taşıyıcıya bağlı değildir — companion
+silinebilir ya da kaynak geri alınabilir. Eksik companion ise yalnız taşıyıcı açılarak
+kapanır.
+
+### ⭐HÜKÜM — üretilmiş dosyaya dokunan iş İKİ COMMIT'tir
+
+Kaynağı (ya da üretilmiş bir dosyayı) commit et → **sonra** derle → üretilmiş artefaktları
+**ayrı** commit'le. İkisini aynı commit'e koymak tazelik kapısını (`INV-DOC-4b`) **yapısal
+olarak** kırmızı yapar: derleme kaynağın **commit'lenmiş** blob SHA'sını yazar, o an yeni
+hâl henüz commit'li değildir, manifest bir önceki blob'u kaydeder ve kaynak commit'lenir
+commit'lenmez manifest bayat olur. 2026-09-03'te bu bedel **tek günde iki kez** ödendi.
 
 ## C5 — Kaynağından ESKİ companion = ihlal (yaş eşikli)
 
