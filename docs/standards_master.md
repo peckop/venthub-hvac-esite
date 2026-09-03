@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T17:21:34.426916+00:00
+compiled_at: 2026-09-03T17:47:19.464741+00:00
 total_compiled_files: 64
-source_commit: fa40064a
+source_commit: 51a8b126
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9294,6 +9294,61 @@ yalnız zahmet üretmiyor, o dalın **bütün kapılarını sessizce kapatıyor*
    Ölçülmüş bedel: bir şerit oturumunun kabuğu sessizce ana dizine resetlendi ve `rebase`
    **ana dizinde master'a** koştu. `cwd`'ye güvenen her komut bu kazayı bekliyor demektir;
    `-C` yazmak bir üslup tercihi değil, kazanın önündeki tek engel.
+
+### 20.1 ⭐RİTÜEL ARTIK BİR BETİK — ve beklenen kapı kümesi TÜRETİLİR (REC-131)
+
+Yukarıdaki hüküm bir süre **hatırlanacak beş madde** olarak yaşadı. 2026-09-04'te sınırı
+görüldü: madde sırası doğru koşulduğunda bir merge'i **önledi** (izleyici yeşil dedikten
+*sonra* PR yeniden `DIRTY` olmuştu), ama betik `scratchpad/`te yaşıyordu — **oturum ölür,
+araç ölür.** Kuralı insana gömmek yerine komuta gömmenin (§28) merge kararındaki karşılığı:
+
+> `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> [--agac=<yol>]`
+> Çıkış: `0` = beş madde sağlandı (self-merge serbest) · `1` = sağlanmadı **ya da ÖLÇÜLEMEDİ`.
+
+**Beklenen kapı kümesi ELLE YAZILMAZ, TÜRETİLİR — ama naif türetme çalışmaz.**
+Ölçüldü (2026-09-04): `pull_request` tetikli **9** workflow'da **18** job var, PR #965'te
+gerçekten doğan kapı **9** (ikisi Vercel). "Tüm job'ları bekle" demek her koşuda **yanlış
+alarm** demektir, ve yanlış alarm veren kapı bir süre sonra **okunmayan** kapıdır (§25).
+
+Bu yüzden türetilen küme **ZORUNLU ÇEKİRDEK**. Bir job çekirdektedir ⇔ `on.pull_request`
+tetikli **ve** `types` ya yok ya `synchronize` içerir **ve** `paths`/`paths-ignore` süzgeci
+yok **ve** job'da `if:` yok. Üç süzgecin üçü de gerçek bir workflow'da ölçüldü:
+
+| süzgeç | ölçülen workflow | niçin elenir |
+|---|---|---|
+| `types: [opened]` | `auto-label`, `auto-reviewer` | yalnız PR **açılışında** koşar, itişte doğmaz |
+| `paths:` | `rls-guard`, `edge-shared-input-drift` | ilgisiz PR'da doğmaması **DOĞRUdur** |
+| `if:` | `gemini-dispatch` (7 job), `db-advisor` (2 job) | `skipping` kovasına düşer — **`skipping` düşen DEĞİLDİR** |
+
+Bu kriterle türetilen küme, PR #965'te doğan workflow kapılarının **tam olarak aynısı** çıktı.
+
+#### ⭐Madde 1 İKİ EKSENLİDİR — etiket dolaylı, sha yapısal
+
+§20'nin 3. dersi `gh pr view --json mergeCommit`in açık PR'da **her zaman `null`** döndüğünü
+söylüyordu. 2026-09-04 ölçümü bunu doğruladı **ve ayrımı keskinleştirdi**: açık PR #966'da
+`mergeCommit=null` iken REST `merge_commit_sha` **gerçek bir sha** verdi. Yani:
+
+- `mergeStateStatus` **ayırt eder** (aynı gün `DIRTY → MERGEABLE` geçişi ölçüldü) ama dolaylıdır;
+- birleşme ref'inin **varlığı** yalnız REST `merge_commit_sha`dan okunur ve yapısaldır.
+
+Ritüel **ikisini de** arar. Boş sha, durum etiketi temiz olsa bile kırmızıdır — o hâlde merge
+**sıfır kapıyla** yapılır. Okunamayan sha "var" sayılmaz (fail-closed).
+
+#### ⚠Kapsam sınırı, adıyla (§21)
+
+**Vercel kapıları türetilemez** — harici entegrasyondur, hiçbir workflow dosyasında yoktur.
+Çekirdeğe **konmaz**; görüldüğü hâlde düşerse madde 3 sayar. Bu sınır betiğin **çıktısında**
+her koşuda yazılır, çünkü kabul edilmiş eksik sessiz olamaz. YAML düz regex ile okunur;
+çözülemeyen bir biçim çıkarsa dosya **sessizce atlanmaz**, `sinirlar` listesine yazılır ve
+o dosyanın job'ları fail-closed olarak çekirdek dışında bırakılır.
+
+#### Kanıt
+
+Kollar: `src/__tests__/conformance/merge-ritueli.test.ts` (**19 kol**). Sabotaj **9/9** doğru
+sebeple kırmızı — aralarında *"türetmeyi tüm job'lara çevir"* (naif türetme yakalanır),
+*"`skipping`i düşen say"* (yanlış alarm geri gelir), *"boş `merge_commit_sha`yı var say"* ve
+*"PR okunamadı ama geçti işaretle"* (fail-closed) var. Çekirdek **saf**tır (`turetCekirdek`
+bir dizin, `degerlendir` ölçülmüş değerler alır), böylece kollar ölçtüğü durumu **üretir** (§25).
 
 ---
 
