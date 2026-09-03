@@ -1450,7 +1450,23 @@ describe('INV-BOARD-KONUM-1: YAZAN fiil koştuğu DOSYAYI beyan eder (§27)', ()
  */
 describe('INV-BOARD-KONUM-2 · §28 ağaç ayrışması (uyarı + sayım)', () => {
   const board = loadBoard(uniqueTempDir('konum2'))
-  const ANA_AGAC = 'C:/Users/alize/venthub-hvac'
+
+  /**
+   * ⚠ANA AĞAÇ YOLU TÜRETİLİR, YAZILMAZ — ve bu satır bir hatanın düzeltmesidir.
+   *
+   * İlk hâlinde buraya kullanıcı ana dizinini içeren **sabit** bir yol yazmıştım.
+   * `INV-MUTLAK-YOL-1` bunu CI'da kırmızı verdi ve haklıydı: depo **PUBLIC**, sabit yol
+   * kullanıcı adını sızdırır ve testi tek makineye bağlar. Üstelik aynı işin cetvel
+   * bölümünde (§28) *"sabit yol listesi yazılmaz, konum git'in kendi durumundan okunur"*
+   * hükmünü ben yazmıştım — **kural yazmak, kuralı uygulamak DEĞİLDİR.**
+   *
+   * ⚠İkinci tur: yolu koddan çıkardım ama **bu yorumun içinde** bıraktım ve kapı yine
+   * kırmızı verdi — yine haklı. Sızıntı yorumda da sızıntıdır; ders **yolu yazmadan**
+   * anlatılır.
+   *
+   * `agacKonumu().anaAgac` bu türetmeyi zaten yapıyor: ortak `.git`'in ebeveyni.
+   */
+  const ANA_AGAC = board.agacKonumu(resolve(BOARD_MODULE_PATH, '..', '..', '..')).anaAgac
 
   it('agacKonumu AYIRT EDER: worktree ile ANA dizin (kök eşitliği bu ayrımı yapamaz)', () => {
     const buradaki = board.agacKonumu(resolve(BOARD_MODULE_PATH, '..', '..', '..'))
