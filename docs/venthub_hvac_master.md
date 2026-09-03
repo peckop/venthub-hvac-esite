@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T15:52:13.070133+00:00
+compiled_at: 2026-09-03T16:07:56.622856+00:00
 total_compiled_files: 657
-source_commit: e1678767
+source_commit: 5a32ff48
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-03T15:52:13.070133+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-03T16:07:56.622856+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -49628,10 +49628,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\en.ts
-skeleton_hash: 1f92f0c5cf4f3fdb
+skeleton_hash: ba3ada89eb1a0bee
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-09-02T07:39:32Z
+generated_at: 2026-09-03T16:07:00Z
 ---
 
 ## Genel Bakış
@@ -49704,10 +49704,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\tmp\vh-urun-rec89\src\i18n\dictionaries\tr.ts
-skeleton_hash: 0d6f5599b81a045f
+skeleton_hash: 1860e7269fa91dd3
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-09-02T07:39:33Z
+generated_at: 2026-09-03T16:07:00Z
 ---
 
 ## Genel Bakış
