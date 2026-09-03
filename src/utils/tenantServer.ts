@@ -1,4 +1,6 @@
-import { headers } from 'next/headers';
+// ⚠ ÖLÇÜM DALI: `next/headers` importu kaldırıldı — aşağıdaki deneyin bir parçası.
+// Import kalsaydı kullanılmayan-değişken kapısı düşerdi; ayrıca deneyin amacı tam olarak
+// bu modülün istek-başına başlık okumasını KESMEK.
 import { cache } from 'react';
 
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static';
@@ -45,14 +47,24 @@ export const DEFAULT_TENANT_CONFIG: TenantConfig = {
 };
 
 export const getTenantConfig = cache(async function getTenantConfig(): Promise<TenantConfig> {
-  let tenantId: string | null = null;
-  
-  try {
-    const headersList = await headers();
-    tenantId = headersList.get('x-tenant-id');
-  } catch (error) {
-    console.warn('[Tenant Server] Failed to read headers, using default tenant ID.', error);
-  }
+  // ⚠⚠ ÖLÇÜM DALI — BU DEĞİŞİKLİK MERGE EDİLMEYECEK (REC-59 Adım A, 2026-09-04) ⚠⚠
+  //
+  // NE ÖLÇÜYOR: canlıda `getTenantConfig`'i çağıran dört yüzey (ana sayfa, ürün listesi,
+  // kategori, alt kategori) `X-Vercel-Cache: MISS` + `no-store` veriyor; çağırmayan iki
+  // yüzey (PDP, marka) `PRERENDER` + `public` veriyor. Ayrışma bu fonksiyonda.
+  // Buradaki `await headers()` istek-başına başlık okur ve sayfayı istek-zamanına düşürür.
+  //
+  // DENEY: satırı yapı-zamanı sabitiyle değiştir, preview'da aynı dört yüzeyi ölç.
+  //  · Dördü de HIT olursa  → tek tıkaç buymuş.
+  //  · Ana sayfa HIT ama liste/kategori MISS kalırsa → ikinci tıkaç `await searchParams`
+  //    (o iki yüzeyde ayrıca var) ve tek düzeltme YETMİYOR demektir.
+  //
+  // NİÇİN DAVRANIŞ AÇISINDAN BUGÜN NÖTR: `src/lib/tenantResolver.ts:44-47` her host için
+  // zaten `DEFAULT_TENANT_ID` döndürüyor; okunan başlık da aşağıda (eski satırlarda) her
+  // hâlükârda ona düşürülüyordu. Yani bugün okunan değer sabitin ta kendisiydi.
+  //
+  // KALICI ÇÖZÜM DEĞİL: kalıcı hâli Recep'in SORU-1 cevabına bağlı (yetenek env ile korunur).
+  let tenantId: string | null = DEFAULT_TENANT_ID;
 
   if (!tenantId || tenantId === DEFAULT_TENANT_ID || tenantId === 'default') {
     tenantId = DEFAULT_TENANT_ID;
