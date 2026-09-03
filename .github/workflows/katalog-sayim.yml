@@ -1,0 +1,162 @@
+# Katalog sayımı — SAYISAL KATALOG İDDİASININ TEK KAYNAĞI (REC-136)
+#
+# NİÇİN VAR
+# =========
+# 2026-09-04'te aynı gün ÜÇ ayrı şeritte üç yanlış katalog sayısı karara girdi. Biri
+# ("375 ürünün tamamı kökte") 375 kalemlik bir iş emri açtırdı; ölçüm düzeltilince iş
+# SIFIRA indi — elden atılmış sorgu yalnız `category_id`'ye bakmıştı, atama
+# `subcategory_id`'de yaşıyordu ve 375 ürünün 365'i doluydu. Bir diğeri prod yazımı
+# planlattı ve iptal edildi. Recep'in hükmü: karara giden ölçüm BETİKTEN gelir, elden
+# sorgu yalnız keşiftir (`fleet-mechanism-standard.md` §29).
+#
+# Bu iş, `scripts/katalog/katalog-sayim.mjs`i gerçek veriyle koşturup tabloyu üretir.
+# Tablo üretilmedikçe sayısal katalog iddiası yapılamaz.
+#
+# ⚠FAIL-CLOSED — SÜS DEĞİL, ASIL ŞART
+# ===================================
+# Bağlantı yoksa ya da sorgu düşerse iş KIRMIZI verir ve HİÇBİR ŞEY YAZILMAZ. Boş ya da
+# kısmi bir tabloyu "ölçüm" diye kaydetmek, bu depoda en pahalı sınıftır: bugün bir kapı
+# `describe.skipIf` yüzünden SIFIR test kaydedip "0 failed" diye yeşil görünüyordu (REC-134).
+# **Ölçememek geçmek DEĞİLDİR.**
+#
+# ⚠Bu yüzden `db-advisor.yml`in "secret yoksa SKIP" deseni burada KASITEN kullanılmadı.
+# Orada atlama meşru (o iş bir kapı ve fork PR'ında secret yoktur); burada atlama, kaynağı
+# olmayan bir kararın önünü açar. Betiğin kendisi de aynı hükmü taşıyor: bağlantı dizesi
+# yoksa `process.exit(1)` ve "Sayi URETILMEDI" der.
+#
+# ⚠ÜRETİLMİŞ TOPLAMALARA DOKUNMAZ (REC-132 / AXIOM 11)
+# ====================================================
+# PR yalnız `docs/audits/katalog-sayim-<tarih>.{md,json}` taşır. `docs/*_master.md` ve
+# `docs/artefakt_manifest.json` bu işin kapsamında DEĞİLDİR — üretim dondurulmuştur ve bir
+# ölçüm işi onu geri açamaz. Bayatlık artık bloklamaz, SAYILIR.
+#
+# Yöneten cetveller: `docs/standards/katalog-sayim-standard.md` (URUN yazdı),
+# `docs/standards/fleet-mechanism-standard.md` §29 ve §21.
+
+name: Katalog Sayimi
+
+on:
+  schedule:
+    # Günlük, 06:10 UTC. Dakika 0 KASITEN değil: GitHub'ın saat başı kuyruğu yoğun ve
+    # schedule işleri orada gecikir/düşer.
+    - cron: '10 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: katalog-sayim
+  cancel-in-progress: false
+
+permissions:
+  # ⚠`contents: read` bu blok yazıldığı anda ZORUNLU — varsayılanlar düşer ve checkout
+  # "Repository not found" verir (2026-08-14'te ölçüldü). `write` PR dalını itmek için.
+  contents: write
+  pull-requests: write
+
+jobs:
+  sayim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --prefer-offline --config.allow-scripts true
+
+      # ⭐ÖNKOŞUL AYRI ADIM: "secret yok" ile "sorgu düştü" AYRI ARIZALARDIR ve ayrı
+      # satırda görünmeleri, kırmızıyı okuyanın doğru yere bakmasını sağlar.
+      - name: Onkosul — baglanti dizesi VAR mi (fail-closed)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "::error title=Katalog Sayimi::SUPABASE_DB_URL secret'i YOK — sayi URETILMEDI."
+            echo "Bu is ATLANMAZ: kaynagi olmayan sayi karara giremez (s29). Olcememek gecmek DEGILDIR."
+            exit 1
+          fi
+          echo "baglanti dizesi VAR (uzunluk ${#SUPABASE_DB_URL})"
+
+      - name: Sayimi kos ve tabloyu YAZ
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          node scripts/katalog/katalog-sayim.mjs --yaz
+
+      # Artefakt HER HALDE yuklenir ki kirmizi bir kosumda bile elde ne varsa gorunsun.
+      - name: Tabloyu artefakt olarak yukle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: katalog-sayim
+          path: docs/audits/katalog-sayim-*
+          if-no-files-found: ignore
+          retention-days: 30
+
+      # ⭐DEGISIKLIK YOKSA PR ACILMAZ. Her gun ayni tabloyla PR acmak, okunmayan PR uretir
+      # ve okunmayan bildirim bildirim degildir (s25).
+      - name: Degisiklik var mi (olc, varsayma)
+        id: fark
+        run: |
+          set -euo pipefail
+          if [ -n "$(git status --porcelain -- docs/audits/)" ]; then
+            echo "var=evet" >> "$GITHUB_OUTPUT"
+            git status --porcelain -- docs/audits/
+          else
+            echo "var=hayir" >> "$GITHUB_OUTPUT"
+            echo "docs/audits/ degismedi — PR ACILMAYACAK (gurultu uretmez)."
+          fi
+
+      - name: PR ac
+        if: steps.fark.outputs.var == 'evet'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TARIH="$(date -u +%Y-%m-%d)"
+          DAL="otomasyon/katalog-sayim-${TARIH}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DAL"
+          # ⚠YALNIZ docs/audits: `git add -A` YASAK (depo kurali). Uretilmis toplamalar
+          # bu PR'a GIRMEZ — uretim dondurulmustur (AXIOM 11).
+          git add docs/audits/katalog-sayim-*
+          # ⚠Commit mesaji da DOSYADAN: cok satirli `-m` argumaninin devam satirlari
+          # girintisiz kalir, YAML blok skalarindan cikar ve dosyayi BOZAR. Bu isi
+          # yazarken tam bu hataya dustum ve YAML cozucusu yakaladi.
+          {
+            printf 'chore(katalog): gunluk katalog sayimi %s\n\n' "$TARIH"
+            printf 'Kaynak: scripts/katalog/katalog-sayim.mjs, workflow katalog-sayim.yml.\n'
+            printf 'Sayisal katalog iddiasi bu tabloyu kaynak gostermeden yapilmaz (s29).\n'
+            printf 'Uretilmis toplamalara DOKUNULMADI (AXIOM 11: uretim dondurulmus).\n'
+          } > /tmp/katalog-commit.txt
+          git commit -F /tmp/katalog-commit.txt
+          git push -u origin "$DAL"
+          # ⚠Govde DOSYADAN verilir: cok satirli bir `--body` argumaninin devam satirlari
+          # YAML blok skalarindan cikar ve dosyayi bozar (bu isi yazarken olculdu).
+          {
+            printf 'Gunluk katalog sayimi. Kaynak: `scripts/katalog/katalog-sayim.mjs` (REC-136).\n\n'
+            printf 'Bu tablo, sayisal katalog iddialarinin TEK kaynagidir; elden SQL yalniz\n'
+            printf 'kesiftir (`fleet-mechanism-standard.md` s29).\n\n'
+            printf 'Uretilmis toplamalara **dokunulmadi** — uretim dondurulmus (AXIOM 11);\n'
+            printf 'PR yalniz `docs/audits/` tasir.\n\n'
+            printf 'Baglanti ya da sorgu duserse bu is **kirmizi** verir ve **hicbir sey**\n'
+            printf 'yazmaz; bos tablo uretmez.\n'
+          } > /tmp/katalog-pr-govde.md
+          gh pr create \
+            --title "(OTOMASYON) katalog sayimi ${TARIH}" \
+            --body-file /tmp/katalog-pr-govde.md \
+            --base master --head "$DAL"
