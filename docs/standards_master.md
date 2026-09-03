@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T16:18:26.570495+00:00
+compiled_at: 2026-09-03T16:43:10.083044+00:00
 total_compiled_files: 64
-source_commit: 7331ce8e
+source_commit: 8bc29a4f
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -9944,6 +9944,70 @@ hükmünün bu işteki biçimi).
 §26'nın tautoloji dersi) · **okuyan fiiller beyan ETMEZ** (ayırt edici çift) · beyan
 **stderr'e** gider. Sabotaj **4/4**: beyan kaldırılır · sabit literal basar · stdout'a
 yazılır · okuyan fiillere de basar.
+
+---
+
+## 28. BEYAN YETMEZ — AYRIŞMA TUR BAŞINA ÖLÇÜLÜR (uyarı + sayım, kapı DEĞİL)
+
+**Ölçülmüş vaka sayısı: ALTI** (2026-09-01…04; URUN 4 + ALTYAPI 2). Kabuk sessizce
+paylaşılan **ANA dizine** kaydı ve şerit işi orada koştu. **Beşinde zarar SIFIRDI.**
+
+§27 bu sınıfın ilk yarısını kapatmıştı: yazan fiil **koştuğu dosyayı beyan eder**. Altıncı
+vaka o kapının **sınırını** gösterdi.
+
+### ⭐HÜKÜM — tehlike ölçüm komutunda değil, ARADAKİ masum yardımcı komutta
+
+URUN ölçtü: `node scripts/board/board.cjs` **göreli** yolla çağrılınca, bulunduğun
+dizindeki kopya koşar ve **kabuğun cwd'sini oraya çeker**. Sonraki komutlar sessizce
+yanlış ağaçta çalışır. Yani **komut başına beyan yetmez** — beyan eden komut doğru koşar,
+**ondan sonraki** komut kayar. Bu yüzden durum **tur başına** ölçülür: tur-sonu kancası
+oturumun dizini ile şerit ağacını karşılaştırır.
+
+### ⭐HÜKÜM — kuralı İNSANA değil KOMUTA göm
+
+URUN'un aynı vakadan çıkardığı ders, hükmün en kullanışlı hâli: *"beyan hatırlanması
+gereken bir şey, `git -C` hatırlanmaması gereken bir şey."* **Kanonik biçim:** komutlarda
+**mutlak yol**, git için **daima `git -C <ağaç>`**. Bir kural ancak hatırlanmayı
+gerektirmediğinde mekanizmadır.
+
+Aynı vakanın dürüstlük notu da kayda geçti: bu kural URUN'un hafızasında **zaten yazılıydı**;
+eksik olan bilgi değil **uygulamaydı**. Kapının değeri tam burasıdır — *bilinen ama
+uygulanmayan* kuralı araç hatırlatır.
+
+### ⭐HÜKÜM — KAPI DEĞİL, UYARI + SAYIM (Recep onaylı)
+
+Altı vakanın **beşinde** zarar sıfır olduğu için bloklamak **gürültü** üretir; gürültülü
+kapı bir süre sonra **okunmayan** kapıdır (§25). Ama uyarı tek başına da yetmez, çünkü
+**bedelsiz hata en uzun yaşayandır** (§27) — bu yüzden **sayaç** tutulur ve uyarı
+*"N. kayıtlı vaka"* der. Sayaç, zararsız tekrarların da bir maliyeti olduğunu görünür kılar:
+sınıfın kapı kazanmasını *o gün ne kadar can yaktığına* bırakmaz.
+
+### ⭐HÜKÜM — ayırt edici ölçüt `--git-dir` ≠ `--git-common-dir`
+
+Bağlı bir worktree'de bu ikisi **farklıdır** (`<ana>/.git/worktrees/<ad>` ve `<ana>/.git`);
+ana worktree'de **aynıdır**. **Kök eşitliği bu ayrımı YAPAMAZ:** `--show-toplevel` her iki
+hâlde de bir kök döndürür ve iki ayrı worktree'nin kökleri de farklıdır — yani kök
+karşılaştırması *"iki ayrı worktree"* ile *"worktree vs ana dizin"* arasında ayrım yapmaz.
+Aranan ayrım ikincisidir, çünkü tehlikeli olan **paylaşılan** ağaçta çalışmaktır.
+Sabit yol listesi yazılmaz: konum git'in kendi durumundan okunur, yoksa ölçüt makineye
+bağlanır ve başka makinede sessizce yanlış cevap verir.
+
+### İKİ KOŞUL BİRLİKTE — ana dizinde olmak tek başına ihlal değildir
+
+Uyarı ancak **(a)** dizin ana worktree **ve (b)** oturumun canlı bir şerit talebi varsa
+verilir. Talebi olmayan bir oturumun ana dizinde olması olağandır; tek koşulla uyarmak
+yanlış alarm üretirdi.
+
+### Bu bölümün kolları ve sınırı
+
+`INV-BOARD-KONUM-2`, 4 kol: `agacKonumu` worktree ile ana dizini **ayırt eder** ·
+ölçülemeyince **sebep yazar** (sessiz "temiz" dönmez) · yazan fiil **ayrışmada uyarır,
+ayrışma yokken uyarmaz** (ayırt edici çift) · tur-sonu kancası **ana dizin + talep**
+birleşiminde uyarır ve **sayar**, diğer iki hâlde sessiz kalır (iki ayırt edici karşı-kol).
+
+⚠**KAPSAM SINIRI, adıyla:** yeni bir Stop kancası **kaydedilmedi**; ölçüm zaten kayıtlı olan
+kancaya eklendi. Sebep: yeni kanca kaydı `.claude/settings.json` düzenlemek demektir, yani
+**config** — ve bu iş akran iletisiyle geldi. **Config'e akran sözüyle dokunulmaz.**
 
 
 ---
