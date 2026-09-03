@@ -23,15 +23,76 @@ let input = {};
 try { input = JSON.parse(readStdin() || '{}'); } catch { /* yoksay */ }
 const sessionId = (input && input.session_id) || 'nosession';
 
+/**
+ * ⭐§28 · TUR-SONU AĞAÇ AYRIŞMA UYARISI — Recep onaylı hüküm: KAPI DEĞİL, UYARI + SAYIM.
+ *
+ * NİÇİN TUR SONU: tehlike ölçüm komutunun kendisinde değil, ARADAKİ masum yardımcı
+ * komutta (URUN ölçtü, 6. vaka): `node scripts/board/board.cjs` GÖRELİ yolla çağrılınca
+ * bulunduğun dizindeki kopya koşar ve kabuğun cwd'sini oraya ÇEKER. Yani komut başına
+ * beyan YETMEZ — beyan eden komut doğru koşar, ondan SONRAKİ komut kayar. Durumu tur
+ * başına ölçmek, komut başına ölçmekten bu yüzden üstündür.
+ *
+ * NİÇİN SAYIM: altı vakanın BEŞİNDE zarar sıfırdı ve tam bu yüzden hiçbiri bir mekanizma
+ * doğurmadı — bedelsiz hata en uzun yaşayandır (§27). Sayaç, sınıfı GÖRÜNÜR kılar:
+ * "N. vaka" yazısı, zararsız tekrarların da bir maliyeti olduğunu gösterir.
+ *
+ * NİÇİN BU KANCAYA EKLENDİ, yeni kanca kaydedilmedi: yeni kanca `.claude/settings.json`
+ * düzenlemek demektir, yani CONFIG. Bu iş akran iletisiyle geldi ve config'e akran sözüyle
+ * dokunulmaz. Zaten kayıtlı olan Stop kancasını genişletmek aynı sonucu verir.
+ */
+let konumUyarisi = '';
+try {
+  const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'));
+  const konum = board.agacKonumu(process.cwd());
+  if (!konum.olculdu) {
+    // ÖLÇEMEMEK GEÇMEK DEĞİLDİR — sessiz kalmaz.
+    konumUyarisi = `⚠️ §28: çalışma dizini ÖLÇÜLEMEDİ (${konum.sebep}). Bu satır alarmdır, "temiz" demek değil.`;
+  } else if (konum.anaMi) {
+    const talepler = (board.tumTalepler ? board.tumTalepler() : []) || [];
+    const benim = talepler.filter((c) => String(c.sid) === String(sessionId));
+    if (benim.length > 0) {
+      // SAYIM: pano dizininde birikir, filo geneli görünür olsun.
+      let sayi = 0;
+      const sayacYolu = path.join(board.BOARD_DIR, '.cwd-ayrisma-sayaci.json');
+      try {
+        const d = JSON.parse(fs.readFileSync(sayacYolu, 'utf8'));
+        sayi = Number(d.toplam) || 0;
+        const kayit = { toplam: sayi + 1, son: { sid: sessionId, ts: new Date().toISOString(), dizin: process.cwd() } };
+        fs.writeFileSync(sayacYolu, JSON.stringify(kayit), 'utf8');
+        sayi = kayit.toplam;
+      } catch {
+        try {
+          fs.writeFileSync(sayacYolu, JSON.stringify({ toplam: 1, son: { sid: sessionId, ts: new Date().toISOString(), dizin: process.cwd() } }), 'utf8');
+        } catch { /* sayaç yazılamazsa uyarı yine verilir */ }
+        sayi = sayi + 1;
+      }
+      konumUyarisi =
+        `⚠️ §28 AĞAÇ AYRIŞMASI (${sayi}. kayıtlı vaka) — ŞU AN PAYLAŞILAN ANA DİZİNDESİN.\n` +
+        `   dizin: ${process.cwd()}\n` +
+        `   Şerit talebin var (${benim.map((c) => c.lane).join(', ')}) ve şerit işi kendi worktree'sinde koşar.\n` +
+        `   Zarar OLMAMIŞ olabilir — vakaların beşinde olmadı, ve kapı doğmamasının sebebi tam buydu.\n` +
+        `   Kanonik biçim: komutlarda MUTLAK yol, git için daima "git -C <ağaç>".`;
+    }
+  }
+} catch { /* kanca hiçbir koşulda turu düşürmez */ }
+
+/** Uyarıyı KAYBETMEDEN çık: erken çıkışlar da bu kapıdan geçer. */
+function cikis(kod) {
+  if (konumUyarisi) {
+    try { process.stdout.write(JSON.stringify({ systemMessage: konumUyarisi }) + '\n'); } catch { /* geç */ }
+  }
+  process.exit(kod);
+}
+
 const acc = path.join(os.tmpdir(), `venthub-edited-${sessionId}.txt`);
 let raw = '';
-try { raw = fs.readFileSync(acc, 'utf8'); } catch { process.exit(0); } // accumulator yok → bu turda TS edit yok → sessiz
+try { raw = fs.readFileSync(acc, 'utf8'); } catch { cikis(0); } // accumulator yok → bu turda TS edit yok
 try { fs.unlinkSync(acc); } catch { /* geç */ }
 
 const repoRoot = process.cwd();
 const uniq = [...new Set(raw.split('\n').map((s) => s.trim()).filter(Boolean))]
   .filter((f) => /\.(ts|tsx|js|jsx|cjs|mjs)$/i.test(f) && fs.existsSync(f));
-if (uniq.length === 0) process.exit(0);
+if (uniq.length === 0) cikis(0);
 
 // 1) eslint --fix (best-effort; hook'u asla düşürmesin)
 spawnSync('pnpm', ['exec', 'eslint', '--fix', ...uniq], { shell: true, stdio: 'ignore' });
@@ -60,6 +121,11 @@ if (typeErrors.length > 0) {
     `⚠️ verify-on-stop: bu turda düzenlenen dosyalarda tip hatası var:\n` +
     typeErrors.slice(0, 20).join('\n') +
     (typeErrors.length > 20 ? `\n… (+${typeErrors.length - 20} daha)` : '');
-  process.stdout.write(JSON.stringify({ systemMessage: summary }) + '\n');
+  // İKİ UYARI VARSA İKİSİ DE GÖRÜNÜR: tek JSON satırında birleştirilir, yoksa biri
+  // diğerini bastırır ve "sessizce kaybolan uyarı" sınıfı doğar.
+  process.stdout.write(JSON.stringify({
+    systemMessage: konumUyarisi ? konumUyarisi + '\n\n' + summary : summary,
+  }) + '\n');
+  process.exit(0);
 }
-process.exit(0);
+cikis(0);

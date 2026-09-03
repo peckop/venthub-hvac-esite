@@ -285,6 +285,52 @@ function repoRootFor(filePath) {
   } catch { return '' }
 }
 
+/**
+ * AĞAÇ KONUMU — "burası ANA dizin mi, yoksa bir worktree mi?" (§28)
+ *
+ * ⭐NİÇİN VAR: 2026-09-01..04 arasında ALTI vaka ölçüldü (URUN 4 + ALTYAPI 2) — kabuk
+ * sessizce ANA dizine kaydı ve şerit işi paylaşılan ağaçta koştu. Altı vakanın beşinde
+ * zarar SIFIRDI ve tam bu yüzden hiçbiri bir mekanizma doğurmadı: **bedelsiz hata en
+ * uzun yaşayandır** (§27).
+ *
+ * ⭐AYIRT EDİCİ ÖLÇÜT, ölçülerek bulundu: `--git-dir` ile `--git-common-dir`.
+ * Bağlı bir worktree'de bunlar FARKLIDIR (`<ana>/.git/worktrees/<ad>` ve `<ana>/.git`);
+ * ana worktree'de AYNIDIR. Yani konum, dizin ADINDAN ya da sabit bir yol listesinden
+ * değil, git'in kendi durumundan okunur — sabit yol yazmak bu ölçütü makineye bağlar
+ * ve başka makinede sessizce yanlış cevap verir.
+ *
+ * ⚠NİÇİN "kök eşitliği" YETMEZ: `rev-parse --show-toplevel` her iki hâlde de bir kök
+ * döndürür ve iki farklı worktree'nin kökleri de farklıdır — yani kök karşılaştırması
+ * "iki ayrı worktree" ile "worktree vs ana dizin" arasında AYRIM YAPMAZ. Aranan ayrım
+ * ikincisidir, çünkü tehlikeli olan paylaşılan ağaçta çalışmaktır.
+ */
+function agacKonumu(dir) {
+  const hedef = String(dir || process.cwd()).replace(/\\/g, '/')
+  try {
+    const cikti = execFileSync(
+      'git',
+      ['-C', hedef, 'rev-parse', '--path-format=absolute', '--git-dir', '--git-common-dir'],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+    )
+    const [gitDir, ortakGitDir] = cikti.trim().split('\n').map(s => s.trim().replace(/\\/g, '/'))
+    if (!gitDir || !ortakGitDir) return { olculdu: false, sebep: 'git-dir okunamadi' }
+    return {
+      olculdu: true,
+      gitDir,
+      ortakGitDir,
+      /** Ana worktree'de git-dir ile ortak git-dir AYNIDIR. */
+      anaMi: gitDir.toLowerCase() === ortakGitDir.toLowerCase(),
+      kok: repoRootFor(hedef + '/'),
+      /** Ana worktree yolu = ortak .git'in ebeveyni. Sabit yol YAZILMAZ, türetilir. */
+      anaAgac: ortakGitDir.replace(/\/\.git$/i, ''),
+    }
+  } catch (e) {
+    // FAIL-OPEN AMA GÖRÜNÜR: git yoksa/dizin yoksa çağıran karar verir; sessiz "temiz"
+    // dönmek, ölçememeyi geçmek saymak olurdu.
+    return { olculdu: false, sebep: String((e && e.message) || e).slice(0, 120) }
+  }
+}
+
 /** Mutlak/göreli yolu repo-göreli hâle getir (pano yolları repo-göreli tutulur). */
 function toRepoRelative(filePath, repoRoot) {
   const norm = String(filePath).replace(/\\/g, '/')
@@ -483,7 +529,7 @@ module.exports = {
   notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, sidDogrula,
   taramaDurumu, teslimDurumu, esikleriOku, ESIK_ADLARI,
   EKSENLER, SAYI_SOZU, eksenOzeti, kullanimMetni,
-  globToRegExp, toRepoRelative, repoRootFor,
+  globToRegExp, toRepoRelative, repoRootFor, agacKonumu,
 }
 
 /**
@@ -904,6 +950,33 @@ if (require.main === module) {
     // taranır ve gürültü onları okunmaz kılar. Durum DEĞİŞTİREN fiil ise nereden koştuğunu
     // söylemek zorundadır. stderr'e yazılır ki stdout ayrıştıran çağıranlar bozulmasın.
     console.error('[board] kosan: ' + __filename)
+
+    /**
+     * ⭐§28 — AYRISMA UYARISI: kosan DOSYANIN agaci ile CAGIRANIN dizini ayni mi?
+     *
+     * NICIN GEREKLI (URUN olctu, 2026-09-04, 6. vaka): tehlike olcum komutunun
+     * KENDISINDE degil, ARADAKI masum yardimci komutta. `node scripts/board/board.cjs`
+     * GORELI yolla cagrilinca hangi dizinde bulunuyorsan ORADAKI kopya kosar ve kabugun
+     * cwd'si oraya CEKILIR — sonraki komutlar da sessizce yanlis agacta calisir.
+     * §27 kosan dosyayi BEYAN ediyordu; beyan tek basina yetmiyor, cunku beyan eden
+     * komut dogru kosar, ONDAN SONRAKI komut kayar.
+     *
+     * NICIN KAPI DEGIL UYARI: alti vakanin BESINDE zarar sifirdi. Bloklamak gurultu
+     * yapar ve gurultulu kapi bir sure sonra OKUNMAYAN kapidir (s25). Recep onayli
+     * hukum: UYARI + SAYIM.
+     */
+    const kosanAgac = repoRootFor(__filename)
+    const cagiranAgac = repoRootFor(process.cwd() + '/')
+    if (kosanAgac && cagiranAgac && kosanAgac.toLowerCase() !== cagiranAgac.toLowerCase()) {
+      console.error(
+        '[board] ⚠AYRISMA: kosan dosya ' + kosanAgac + ' agacinda, ' +
+        'bulundugun dizin ' + cagiranAgac + ' agacinda.\n' +
+        '[board]   Bu komut DOGRU kostu, ama kabugun cwd si kayabilir ve SONRAKI komutlar ' +
+        'yanlis agacta calisir.\n' +
+        '[board]   Kanonik cagri: MUTLAK yol kullan (node <agac>/scripts/board/board.cjs) ' +
+        've git icin daima git -C <agac>.',
+      )
+    }
   }
   if (sid && PANOYA_YAZAN_FIILLER.has(verb)) {
     const kimlik = sidDogrula(sid)

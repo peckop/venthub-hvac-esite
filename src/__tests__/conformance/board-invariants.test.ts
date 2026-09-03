@@ -1,6 +1,7 @@
 import { execFileSync, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
+import { resolve } from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -84,6 +85,20 @@ interface BoardModule {
    * kimligini (--sid) dogrular — olculmus vaka icin INV-BOARD-3 icindeki BOZUK kimlik kolu.
    */
   sidDogrula: (sid: string) => { ok: boolean; tur?: string; sebep?: string; oneri?: string }
+  /**
+   * §28: "burası ANA dizin mi, yoksa worktree mi?" — ayırt edici ölçüt `--git-dir` ile
+   * `--git-common-dir` farkı; kök eşitliği bu ayrımı YAPAMAZ. Ölçülemezse `olculdu:false`
+   * + `sebep` döner (sessiz "temiz" dönmez).
+   */
+  agacKonumu: (dir?: string) => {
+    olculdu: boolean
+    sebep?: string
+    gitDir: string
+    ortakGitDir: string
+    anaMi: boolean
+    kok: string
+    anaAgac: string
+  }
   /** §23: TARAMA (gözcü süreci okuyor mu) ve TESLIM (bildirim KONUŞMAYA ulaştı mı) AYRI ölçümler. */
   taramaDurumu: (sid: string, now: number, esikTur?: number) => string
   teslimDurumu: (sid: string, now: number) => number | string
@@ -1410,6 +1425,142 @@ describe('INV-BOARD-KONUM-1: YAZAN fiil koştuğu DOSYAYI beyan eder (§27)', ()
       stdout.includes('[board] kosan:'),
       'Beyan STDOUT\'a düşmüş. Bu çıktıyı ayrıştıran kancalar/betikler beklenmedik satırla ' +
         'karşılaşır; tanı bilgisi stderr\'e yazılır.',
+    ).toBe(false)
+  })
+})
+
+/**
+ * INV-BOARD-KONUM-2 · §28 — AĞAÇ AYRIŞMASI: UYARI + SAYIM (kapı DEĞİL)
+ *
+ * ⭐NİÇİN VAR: 2026-09-01..04 arasında ALTI vaka ölçüldü (URUN 4 + ALTYAPI 2) — kabuk
+ * sessizce paylaşılan ANA dizine kaydı. §27 koşan dosyayı BEYAN ettiriyordu; URUN'un 6.
+ * vakası beyanın YETMEDİĞİNİ gösterdi: tehlike ölçüm komutunun kendisinde değil, ARADAKİ
+ * masum yardımcı komutta. `node scripts/board/board.cjs` GÖRELİ yolla çağrılınca
+ * bulunduğun dizindeki kopya koşar ve kabuğun cwd'sini oraya ÇEKER — beyan eden komut
+ * doğru koşar, ONDAN SONRAKİ komut kayar.
+ *
+ * ⚠NİÇİN KAPI DEĞİL: altı vakanın BEŞİNDE zarar sıfırdı. Bloklamak gürültü yapar ve
+ * gürültülü kapı bir süre sonra OKUNMAYAN kapıdır (§25). Recep onaylı hüküm: UYARI + SAYIM.
+ * SAYIM'ın işlevi de tam buradan gelir: bedelsiz hata en uzun yaşayandır (§27), sayaç
+ * zararsız tekrarları GÖRÜNÜR kılar.
+ *
+ * NİÇİN KANCA KOLLARI DA BURADA: ölçümün TEK KAYNAĞI `board.agacKonumu`; kanca onun
+ * tüketicisidir. İki yerde iki ayrı ölçüm yazmak §26'nın yasağıdır — kolları aynı
+ * dosyada tutmak, ayrışmayı ilk turda yakalatır.
+ */
+describe('INV-BOARD-KONUM-2 · §28 ağaç ayrışması (uyarı + sayım)', () => {
+  const board = loadBoard(uniqueTempDir('konum2'))
+  const ANA_AGAC = 'C:/Users/alize/venthub-hvac'
+
+  it('agacKonumu AYIRT EDER: worktree ile ANA dizin (kök eşitliği bu ayrımı yapamaz)', () => {
+    const buradaki = board.agacKonumu(resolve(BOARD_MODULE_PATH, '..', '..', '..'))
+    expect(buradaki.olculdu, `ağaç konumu ÖLÇÜLEMEDİ: ${buradaki.sebep ?? ''}`).toBe(true)
+    expect(
+      typeof buradaki.anaMi,
+      'anaMi alanı yok — ölçüt "ana dizin mi" sorusunu cevaplamıyor',
+    ).toBe('boolean')
+    // Ayırt edicilik: git-dir ile ortak-git-dir bağlı worktree'de FARKLI olmalı.
+    if (!buradaki.anaMi) {
+      expect(
+        buradaki.gitDir.toLowerCase() === buradaki.ortakGitDir.toLowerCase(),
+        'worktree olduğu hâlde git-dir ile ortak git-dir AYNI — ölçüt ayırt etmiyor',
+      ).toBe(false)
+    }
+    expect(
+      buradaki.anaAgac,
+      'anaAgac türetilmedi — sabit yol yazmamak için ortak .git\'in ebeveyninden türetilir',
+    ).toBeTruthy()
+  })
+
+  it('ÖLÇEMEMEK GEÇMEK DEĞİL: git olmayan dizinde sessiz "temiz" dönmez, SEBEP yazar', () => {
+    const yok = board.agacKonumu(`${tmpRoot()}/kesinlikle-git-olmayan-${Date.now()}`)
+    expect(yok.olculdu, 'git olmayan dizin ölçülmüş gibi döndü').toBe(false)
+    expect(
+      String(yok.sebep ?? ''),
+      'ölçüm başarısız ama SEBEP yazılmadı — sessiz fail-open, "temiz" sanılır',
+    ).not.toBe('')
+  })
+
+  it('YAZAN fiil AYRIŞMADA uyarır, ayrışma YOKKEN uyarmaz (ayırt edici çift)', () => {
+    const boardDir2 = uniqueTempDir('konum2-uyari')
+    const sid = '5a1c0000-1111-4222-8333-44445555cccc'
+    const env = { ...process.env, VENTHUB_BOARD_DIR: boardDir2 }
+    const agac = resolve(BOARD_MODULE_PATH, '..', '..', '..')
+
+    // A) AYRIŞMA: cwd BAŞKA bir ağaç (ana ağaç), koşan dosya bu ağaçta.
+    const anaVar = fs.existsSync(ANA_AGAC)
+    if (anaVar) {
+      const a = spawnSync(process.execPath, [BOARD_MODULE_PATH, 'heartbeat', '--sid', sid], {
+        encoding: 'utf8', cwd: ANA_AGAC, env, timeout: 60_000,
+      })
+      expect(
+        a.stderr,
+        'Ayrışma VAR ama uyarı YOK. §27 beyanı tek başına yetmez: beyan eden komut doğru ' +
+        'koşar, ondan sonraki komut kayar (URUN 6. vaka).',
+      ).toMatch(/AYRISMA/)
+    }
+
+    // B) AYRIŞMA YOK: cwd koşan dosyanın ağacı. Bu kol olmasa "her çıktıya uyarı basan"
+    // bir uygulama da A'yı geçerdi — ve gürültülü uyarı okunmaz olur (§25).
+    const b = spawnSync(process.execPath, [BOARD_MODULE_PATH, 'heartbeat', '--sid', sid], {
+      encoding: 'utf8', cwd: agac, env, timeout: 60_000,
+    })
+    expect(
+      /AYRISMA/.test(b.stderr),
+      'Ayrışma YOKKEN uyarı basıldı — yanlış alarm. Gürültülü uyarı, bir süre sonra ' +
+      'okunmayan uyarıdır; ölçüt ayırt etmek zorundadır.',
+    ).toBe(false)
+  })
+
+  it('TUR-SONU kancası: ANA dizinde + şerit talebi varsa UYARIR ve SAYAR; aksi hâlde sessiz', () => {
+    if (!fs.existsSync(ANA_AGAC)) return // ana ağaç yoksa bu kol ölçemez; sessizce geçmez, atlar
+    const boardDir3 = uniqueTempDir('konum2-kanca')
+    const env = { ...process.env, VENTHUB_BOARD_DIR: boardDir3 }
+    const kanca = resolve(BOARD_MODULE_PATH, '..', '..', '..', '.claude/hooks/verify-on-stop.cjs')
+    const sid = '5a1c0000-1111-4222-8333-44445555dddd'
+    const yabanci = '99999999-1111-4222-8333-444455556666'
+    const agac = resolve(BOARD_MODULE_PATH, '..', '..', '..')
+
+    // FİKSTÜR: kanca "şerit talebi VAR" durumunu ölçüyor — talep yazılmazsa kol boş
+    // kümede ölçüm yapar ve hiçbir şey kanıtlamaz (§25).
+    const talep = spawnSync(
+      process.execPath,
+      [BOARD_MODULE_PATH, 'claim', '--sid', sid, '--lane', 'KONUM2', '--globs', 'src/konum2/**'],
+      { encoding: 'utf8', cwd: agac, env, timeout: 60_000 },
+    )
+    expect(talep.status, `FİKSTÜR ÖNKOŞULU: claim yazılamadı (${talep.stderr})`).toBe(0)
+
+    const kos = (cwd: string, s: string): string => {
+      const r = spawnSync(process.execPath, [kanca], {
+        encoding: 'utf8', cwd, env, input: JSON.stringify({ session_id: s }), timeout: 120_000,
+      })
+      return r.stdout ?? ''
+    }
+
+    // A) ANA dizin + talep → UYARIR ve sayı taşır
+    const a = kos(ANA_AGAC, sid)
+    expect(a, 'Ana dizinde şerit talebi varken tur-sonu uyarısı ÇIKMADI').toMatch(/AYRI[ŞS]MASI/)
+    // ⚠ÖLÇÜT SAYIYA BAĞLI, KELİMEYE DEĞİL — ilk hâli `/vaka/` idi ve SABOTAJI GEÇTİ:
+    // uyarı metninin başka bir cümlesinde ("vakaların beşinde olmadı") aynı kelime
+    // geçiyordu, yani sayaç silinse bile kol yeşil kalıyordu. Ayırt etmeyen gösterge
+    // ölçüm değildir; aranan şey SAYININ kendisi.
+    expect(
+      a,
+      'Uyarıda SAYIM yok — bedelsiz tekrarlar görünür olmalı (§27). Ölçüt "N. kayıtlı vaka" ' +
+      'biçimindeki SAYIYI arar; yalnız "vaka" kelimesini aramak sabotajı geçiriyordu.',
+    ).toMatch(/\d+\.\s*kay[ıi]tl[ıi]\s*vaka/)
+
+    // B) worktree + talep → SESSİZ
+    expect(
+      /AYRI[ŞS]MASI/.test(kos(agac, sid)),
+      'Şerit kendi worktree\'sindeyken uyarı basıldı — yanlış alarm',
+    ).toBe(false)
+
+    // C) ANA dizin ama talep YOK → SESSİZ. Bu kol olmasa "ana dizinde her zaman uyaran"
+    // bir uygulama da A'yı geçerdi; oysa ölçüt İKİ koşulun BİRLİKTE sağlanmasıdır.
+    expect(
+      /AYRI[ŞS]MASI/.test(kos(ANA_AGAC, yabanci)),
+      'Şerit talebi olmayan oturum için uyarı basıldı — ana dizinde olmak tek başına ihlal değil',
     ).toBe(false)
   })
 })
