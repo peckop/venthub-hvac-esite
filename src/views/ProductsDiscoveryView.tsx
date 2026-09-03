@@ -114,9 +114,15 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                         {/* Başlık ve Toolbars */}
                         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-10 pb-6 border-b border-slate-100">
                             <div>
-                                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight capitalize mb-2">
+                                {/* ⭐h1, h2 DEĞİL (REC-127). Bu sayfanın (/[lang]/products) EN ÜST başlığı
+                                    budur ve sayfada başka h1 YOKTU — canlıda ölçüldü: /tr/products ve
+                                    /en/products SSR HTML'inde h1 sayısı SIFIRDI, ilk başlık h2, altında
+                                    h3'ler vardı. Yani belge ana başlıksız bir gövdeyle başlıyordu.
+                                    Görünüm DEĞİŞMEZ: boyut/ağırlık sınıflardan geliyor, etiketten değil.
+                                    Kategori sayfalarında h1 ZATEN vardı (1/1 ölçüldü) — kusur yalnız burada. */}
+                                <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight capitalize mb-2">
                                     {t('products.allProductsTitle')}
-                                </h2>
+                                </h1>
                                 {!isLoading && (
                                     <p className="text-slate-500 font-medium text-sm">
                                         {t('products.systemTotalPrefix')} <span className="text-cyan-600 font-bold px-1">{total ?? families.length}</span> {t('products.itemsListed')}
