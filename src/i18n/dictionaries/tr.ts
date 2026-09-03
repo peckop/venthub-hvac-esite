@@ -717,7 +717,9 @@ export const tr = {
     account: 'Hesabım',
     adminPanel: 'Yönetim Paneli',
     menu: 'Menü',
-    quickOrder: 'Hızlı Sipariş',
+    // REC-94: `quickOrder` KALDIRILDI — sipariş verilemeyen bir sitede sipariş vaadiydi
+    // (vaat-bütünlüğü cetveli §1.4). Anahtar bilerek bırakılmadı; geri dönüşte ne
+    // gerektiği cetvelin §4.5 tablosunda yazılı.
     recentlyViewed: 'Son Görüntülenen',
     favorites: 'Favoriler',
     cart: 'Sepet',

@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic'
 import React, { useCallback,useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
+import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../config/features'
 import { useI18n } from '../i18n/I18nProvider'
 import VentImage from './ui/VentImage'
 
@@ -25,6 +26,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
     const [activeIdx, setActiveIdx] = useState(0)
     const [isLightboxOpen, setIsLightboxOpen] = useState(false)
     const [is3DMode, setIs3DMode] = useState(false)
+    /** REC-94: 3D müşteri yüzeyinde kapalı. Model yolu olsa bile giriş verilmez. */
+    const ucBoyutAcik = UC_BOYUT_MUSTERI_YUZEYINDE && Boolean(slug)
     const [is3DFullscreen, setIs3DFullscreen] = useState(false)
     const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({})
     const imageContainerRef = useRef<HTMLDivElement>(null)
@@ -146,7 +149,10 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                     </div>
                 )}
 
-                {!is3DMode && slug && (
+                {/* REC-94: 3D müşteri yüzeyinde KAPALI. Tetikleyiciyi "tıklanmadıkça
+                    yüklenmiyor" diye açık bırakmak da gösterimdir — müşteri düğmeyi görür
+                    ve tıklar. Geri açma: config/features.ts'te bayrak. */}
+                {!is3DMode && ucBoyutAcik && (
                     <button
                         onClick={(e) => { e.stopPropagation(); setIs3DMode(true); }}
                         className="absolute top-3 right-3 z-50 bg-white/95 backdrop-blur-sm hover:bg-white text-primary-navy px-2 py-1.5 rounded-lg shadow-lg border border-gray-200 flex flex-col items-center gap-0.5 transition-shadow"

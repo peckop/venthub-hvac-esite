@@ -741,7 +741,9 @@ export const en: typeof tr = {
     account: 'My Account',
     adminPanel: 'Admin Panel',
     menu: 'Menu',
-    quickOrder: 'Quick Order',
+    // REC-94: `quickOrder` removed — it promised ordering on a site that cannot take
+    // orders (promise-integrity standard §1.4). The key was deliberately deleted rather
+    // than left behind; what must return with it is listed in the standard's §4.5 table.
     recentlyViewed: 'Recently Viewed',
     favorites: 'Favorites',
     cart: 'Cart',
