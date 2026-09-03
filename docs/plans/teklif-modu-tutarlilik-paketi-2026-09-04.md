@@ -34,8 +34,9 @@ kusurun aynı sınıfı: *iki yüzeyin birbirinden habersiz konuşması.*
 
 | Ne | Ölçüm | Nerede |
 |---|---|---|
-| 3D'ye referans veren dosya | **39** | `grep -rln 'VentHubCanvas\|MegaMenu3DBackground\|ThreeDAuthority\|Category3DIcon\|@react-three' src` |
-| Müşteri yüzeyinde 3D **giriş noktası** | **6** | PDP rozeti · galeri düğmesi · otorite bloğu · kategori paneli · mega menü arkaplanı · /products orbital şerit |
+| 3D'ye referans veren **kaynak** dosya | **39** | aynı grep `--include='*.ts' --include='*.tsx'` **ile**. ⚠Include'suz hâli **72** döner (companion `.md`'leri sayar) — red-team A1 ihlali olarak yakaladı, düzeltildi. |
+| Müşteri yüzeyinde 3D **giriş noktası** | **5** (~~6~~) | PDP rozeti · galeri düğmesi · kategori paneli · mega menü arkaplanı · /products orbital şerit |
+| ⛔**Otorite bloğu — LİSTEDEN ÇIKARILDI** | `AuthorityRenderer`'ın canlı tek çağıranı **admin** ([CategoryBuilderView.tsx:519](src/views/admin/CategoryBuilderView.tsx#L519)); müşteri sarmalayıcısı `CategoryAuthoritySection` **sıfır tüketicili** (ölü kod) | Küresel bayrak orayı kapatsaydı bir vaadi değil **admin editörünü** kapatırdı — üstelik `src/components/admin/**` benim şeridim değil. Ölü sarmalayıcı REC-119'a bildirilir, dokunulmaz. |
 | "Hızlı Sipariş" yüzeyi | **1 kod + 2 sözlük anahtarı** | [StickyHeader.tsx:268](src/components/StickyHeader.tsx#L268) · `tr.ts:720` · `en.ts:744` |
 | `/products` üst şeridi | `CategoryOrbitCarousel`, `ssr:false` dinamik | [ProductsDiscoveryView.tsx:79-100](src/views/ProductsDiscoveryView.tsx#L79-L100) |
 | Katalog giriş noktası sayısı | **3** (CategoryHubOverlay · EliteMegaMenu · Hızlı Sipariş) | `StickyHeader.tsx:264-292` |
@@ -70,8 +71,18 @@ geçersiz — müşteri düğmeyi **görür ve tıklar**. Rozet ("Etkileşimli 3
 
 ### 2.2 · `/products` sadeleştirme
 
-**Ne:** Orbital 3D karusel şeridi kaldırılır (bayrakla). Yerine **mevcut kanıtlı desenle**
-kategori kartları — sıfır yeni bileşen.
+**Ne:** Orbital 3D karusel şeridi kaldırılır (bayrakla).
+
+⛔**v1'in "sıfır yeni bileşen, mevcut kanıtlı desen" iddiası KANITSIZDI ve geri çekildi.**
+Ölçüldü: o görünümde kategori kartı deseni **yok** (var olan `FamilyCard` = *aile* kartı,
+başka şey), ve `initialCategories` prop'u bileşende **destructure bile edilmiyor**.
+Yerine ne geleceği **ayrı bir tasarım kararıdır**; bu paket şeridi **kaldırmakla yetinir**.
+Boşluk bırakmamak için sarmalayıcı da koşullu (aşağıda).
+
+⚠**İkinci render yolu var:** `ProductsDiscoveryView`, `/products` dışında
+[CategoryMasterView.tsx:130](../../src/views/CategoryMasterView.tsx#L130)'da da render
+ediliyor (kategori **bulunamadı** dalı). Buraya kart eklenseydi mükerrer üretirdi —
+şeridi kaldırmak bu dalda da doğru davranır.
 
 ⚠**Sarmalayıcı da koşullu olmalı.** Yalnız içeriği kapatmak, sayfanın üstünde boş bir şerit
 ve kenarlık bırakır. Bu, cetvel §2'nin ("vaat kapatılırken düzen de kapatılır") aynı sınıfı.
@@ -120,7 +131,11 @@ bayrağa bağlı mı" der, bayrağın `false` olduğunu değil — cetvel §4'ü
 
 | Risk | Karşılık |
 |---|---|
-| 3D kodu ölü sayılıp knip tarafından silinmeye aday görünür | REC-119 ölü-kod turuna **istisna notu** düşülür: bayrakla kapalı ≠ ölü |
+| ~~knip 3D kodunu ölü sayar~~ **ABARTILMIŞTI** — knip ne CI'da ne husky'de koşuyor; beş 3D kapısı da kaynak-tarayıcı ve bayrak onları kırmıyor (ölçüldü) | Yine de REC-119 ölü-kod turuna not: **bayrakla kapalı ≠ ölü** |
+| ⭐**Bayrak env mi sabit mi — v1 SÖYLEMİYORDU** | Depodaki kanıtlı desen `process.env.NEXT_PUBLIC_ODEME_ACIK === '1'`. Beş tüketicinin hepsi `'use client'` → env seçilirse `NEXT_PUBLIC_` **zorunlu**, unutulursa sessiz kusur. **Hüküm: derleme-zamanı SABİT** (`export const UC_BOYUT_MUSTERI_YUZEYINDE = false`). Bedeli dürüstçe yazıyorum: geri açma "tek satır" değil, **tek satır + PR + deploy**. Karşılığında sessiz env tuzağı yok. |
+| **SSOT çatallanması** — `quoteMode.ts` "hüküm TEK yerde yaşar" diyor, bu bayrak ikinci bir küresel sabit | Kabul ediliyor ve gerekçesi yazılıyor: teklif modu **veriye** bağlı (`hide_price`), 3D ise veriye bağlı değil, **kurumsal bir sunum kararı**. Farklı eksen olduğu için ayrı sabit meşru. |
+| **Sözlükte bayrağın göremeyeceği metin vaatleri** | `home.hero` içindeki "3D keşif" ifadeleri, `common.view3D`, `pdp.threeDAuthority.*` — bayrak bunları kapatmaz. §4.5 tablosuna **satır satır** girer. |
+| **`INV-VAAT-SIZINTI-1` `StickyHeader`'ı taramıyor** (ölçüldü: `VITRIN_YOLLARI`'nda yok) | Yarın aynı yere sipariş dili geri yazılır ve kapı görmez → `StickyHeader.tsx` **kapsama eklenir** |
 | Boş şerit/ızgara bozulması | Sarmalayıcı koşullu; görsel doğrulama **erişilebilirlik ağacıyla** (ham HTML sayımı yeterli değil — 09-03 dersi) |
 | Paket büyür, tek PR taşımaz | 2.4 zaten ayrıldı; kalan üç alt-iş tek PR'da mantıklı çünkü **hepsi aynı bayrağı/aynı tabloyu** paylaşıyor |
 | Geri açma | Tek satır: `UC_BOYUT_MUSTERI_YUZEYINDE = true` + §4.5 tablosundaki satırların geri yazımı |
@@ -129,13 +144,35 @@ bayrağa bağlı mı" der, bayrağın `false` olduğunu değil — cetvel §4'ü
 
 ---
 
-## 5) Kabul ölçütleri
+## 5) Kabul ölçütleri (red-team sonrası düzeltildi)
 
-1. Müşteri yüzeyinde 3D giriş noktası sayısı **0** — erişilebilirlik ağacıyla ölçülür (ham HTML değil).
-2. `quickOrder` kodda **0**, sözlükte **0**, §4.5 tablosunda **1 satır**.
-3. `/products` h1 sayısı **1** (SSR HTML'de ölçülür).
-4. Yeni kapı, geçerli bir sabotajla **kırmızı** verir; sabotaj geri alınınca yeşile döner.
-5. Beş maddelik merge ritüeli yeşil **ve Recep onayı yazılı.**
+⛔**v1'in 1. ölçütü SAHTE-YEŞİLDİ ve kaldırıldı.** "Erişilebilirlik ağacıyla 3D giriş noktası
+0" diyordum. Ölçüldü: `OrbitalProductsShowcase`, `MegaMenu3DBackground`, `Category3DIcon`,
+`CategoryOrbitCarousel` dosyalarında **sıfır** `aria-*`/`role`/`alt` var ve WebGL canvas
+a11y ağacına düğüm katmaz — yani ölçüt bayrak **açıkken de kapalıyken de 0** verirdi.
+*Ayırt etmeyen gösterge ölçüm değildir* — dünkü dersin aynısı, bu kez kendi planımda.
+
+**Yerine geçen ölçütler:**
+
+1. **Kaynak düzeyinde:** beş 3D giriş noktasının **hepsi** bayrağa bağlı (yeni kapı ölçer).
+2. **Davranış düzeyinde:** `/tr/products` SSR **CSR-bailout sayısı 1 → 0'a düşer.**
+   ⚠[tests/smoke/ssr-html.spec.ts:29](../../tests/smoke/ssr-html.spec.ts#L29) bunu
+   `maxBailouts: 1` ve `toBeLessThanOrEqual` ile yazıyor — şerit kalkınca sayı düşer ama
+   **kapı yeşil kalır**, yani kazanç kayda geçmez. Eşiğin `0`'a **indirilmesi** işin parçası.
+3. `quickOrder` kodda **0**, sözlükte **0**, §4.5 tablosunda **1 satır**.
+4. `/products` h1 sayısı **1**.
+5. Yeni kapı geçerli bir sabotajla **kırmızı** verir; sabotaj geri alınınca yeşile döner.
+6. Beş maddelik merge ritüeli yeşil **ve Recep onayı yazılı.**
+
+### ⚠Bu kabul ölçütlerinin CI kapısı BUGÜN YOK — işin parçası
+`ssr-html.spec.ts` `describe.skipIf(!SMOKE_BASE_URL)` ile korunuyor ve **`SMOKE_BASE_URL`
+hiçbir workflow'da tanımlı değil** (ölçüldü). Yani 2. ve 4. ölçüt CI'da hiç koşmuyor.
+Ölçütü yazıp koşmayan kapıya bağlamak, "yazıldı sanılan ama var olmayan kapı"dır.
+
+### ⭐Kendi borcum, dün doğdu ve bu pakette kapanır
+Aynı spec `/tr/products` için `markers: [/<h2[\s>]/]` bekliyor. **#959 ile o h2'yi h1
+yaptım ve sayfada başka h2 kalmadı** — yani belirteç bayat, spec koşulsa **düşerdi**.
+Düşmedi çünkü hiç koşmuyor. Belirteç `<h1`'e çekilecek.
 
 ---
 
