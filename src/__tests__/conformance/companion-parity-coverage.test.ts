@@ -1,6 +1,56 @@
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
+import { createRequire } from 'node:module'
+import { resolve } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
+
+/**
+ * SAYAÇ MODÜLÜ — kullanıcıya görünen METİN ve panonun SAYISI buradan gelir (§26).
+ *
+ * NİÇİN AYRI MODÜL: C4 artık BLOKLAMIYOR, SAYIYOR (Recep kararı 2026-08-31: companion
+ * üretici taşıyıcı KAPALI kalır). Sayı iki yerde gösterilecek — bu kolun çıktısında ve
+ * `board.cjs yoklama` satırında. İki yere iki ayrı sayım yazmak §26'nın yasağıdır:
+ * kullanıcıya görünen metin ölçütü TEKRAR ETMEZ, ondan ÜRETİLİR.
+ *
+ * ⭐NİÇİN TESTİN KENDİ HESABI YİNE DURUYOR (emirden bilinçli SAPMA, gerekçesi burada):
+ * Emir "test ve board modülü çağırsın" diyordu; saf devretme tek uygulama bırakırdı ve
+ * modül yanlış sayarsa kapı ile pano BİRLİKTE ve SESSİZCE yanlış olurdu — çapraz kontrol
+ * kalmazdı. Bu depoda ölçülmüş ders şudur: paylaşılan tek ölçüt İKİ YÖNLÜ yanıltır
+ * (dört ajan aynı ölçütü benimsedi, günde dört kez düzeltildi). Bu yüzden testin
+ * bağımsız hesabı REFERANS olarak korunuyor ve modülle UYUŞTUĞU ölçülüyor. Modül
+ * bozulursa bu kol kırmızı verir; ikisi sessizce ayrışamaz.
+ * Eşik DEĞERLERİ tek kaynaktır (modülden okunur) — ayrışabilecek şey sayı değil, hesap.
+ */
+interface Sayim {
+  kaynakSayisi: number
+  eksik: { yol: string; yasGun: number }[]
+  bayat: string[]
+  eksikTaze: number
+  bayatTaze: number
+  tarihselEksik: string[]
+  tarihselBayat: string[]
+  kapidakiKaynak: number
+  enEskiYasGun: number
+}
+
+interface SayimModulu {
+  olc: (o?: { kok?: string; bugun?: Date; yasEsigiGun?: number; kapiBaslangici?: string }) => Sayim
+  sayimCekirdegi: (g: {
+    izlenen: string[]
+    kapsam: { koklerRecursive: string[]; skipDirs: Set<string>; skipBasenames: Set<string> }
+    tarihler: Map<string, string>
+    bugun: Date
+    yasEsigiGun: number
+    kapiBaslangici: string
+  }) => Sayim
+  ozetSatiri: (b: Sayim) => string
+  YAS_ESIGI_GUN: number
+  KAPI_BASLANGIC: string
+}
+
+const require_ = createRequire(import.meta.url)
+const SAYAC_YOLU = resolve(process.cwd(), 'scripts/hijyen/companion-sayim.cjs')
+const sayac = require_(SAYAC_YOLU) as SayimModulu
 
 /**
  * INV-DOC-2 · Companion KAPSAM paritesi — eksik ve bayat companion birikmesin.
@@ -44,7 +94,8 @@ import { describe, expect, it } from 'vitest'
  * kullanırsa ölçtüğü şey gerçek değildir.
  */
 
-const YAS_ESIGI_GUN = 7
+/** DEĞER modülden gelir (tek kaynak); aşağıdaki gerekçe metni burada kalır. */
+const YAS_ESIGI_GUN = sayac.YAS_ESIGI_GUN
 
 /**
  * KAPI KAPSAMININ BAŞLANGIÇ TARİHİ — ölçülmüş bir kusurun düzeltmesi (2026-08-18).
@@ -67,13 +118,29 @@ const YAS_ESIGI_GUN = 7
  *   · yeni bir commit companion'ını bayat bırakırsa 7 gün sonra KIRMIZI (asıl amaç korundu)
  *   · tabanlar SIFIR olur — ratchet'in en güçlü hâli, sessiz bütçe yok
  */
-const KAPI_BASLANGIC = '2026-08-18'
+/** DEĞER modülden gelir (tek kaynak); yukarıdaki gerekçe metni burada kalır. */
+const KAPI_BASLANGIC = sayac.KAPI_BASLANGIC
 
-// Tabanlar SIFIR: kapı yalnız KAPI_BASLANGIC sonrası dokunulan kaynakları denetliyor, yani
-// tarihsel borç kapsam dışı. Bu sayılar HEDEF değil TAVAN ve YÜKSELTİLEMEZ — yükseltmek
+// C5 tabanı SIFIR: kapı yalnız KAPI_BASLANGIC sonrası dokunulan kaynakları denetliyor, yani
+// tarihsel borç kapsam dışı. Bu sayı HEDEF değil TAVAN ve YÜKSELTİLEMEZ — yükseltmek
 // "yeni borca izin ver" demektir. Tarihsel borç ayrı testte görünür kalıyor.
-const C4_TABAN = 0
 const C5_TABAN = 0
+
+/**
+ * ⭐C4_TABAN KALDIRILDI — C4 artık BLOKLAMIYOR (Recep kararı 2026-09-03).
+ *
+ * NİÇİN: companion üretici taşıyıcının süresi 2026-08-28'de bitti ve Recep 08-31'de
+ * "taşıyıcı KAPALI kalsın" dedi (abonelik maliyeti). Taşıyıcı kapalıyken C4 bir borcu
+ * ÖNLEYEMEZ, yalnız CEZALANDIRIR: companion üretilemediği için her yeni kaynak dosya
+ * 7 gün sonra tüm filoyu bloklar. Bu 2026-09-03'te ölçülerek yaşandı — bir dosya
+ * (`DataTablePagination.tsx`) hiçbir commit olmadan, yalnız TAKVİM ilerlediği için
+ * bütün açık PR'ları kırmızıya çevirdi.
+ *
+ * ⚠NİÇİN EŞİK UZATILMADI: 7'yi 30'a çekmek aynı tuzağı ERTELER, kaldırmaz — 30. günde
+ * aynı kilit gelir ve o gün sebebi hatırlayan kimse olmaz.
+ * ⚠NİÇİN KAPI SİLİNMEDİ: borç GÖRÜNÜR kalmalı. Silinen kapı, kapatılmış borç sanılır.
+ * Kalan biçim: SAY, ADLARIYLA RAPORLA, BLOKLAMA — "bilinen ve kabul edilmiş eksik".
+ */
 
 /**
  * ÖLÇÜM ÖNKOŞULU: TAM GİT GEÇMİŞİ.
@@ -255,13 +322,163 @@ describe('INV-DOC-2 · companion kapsam paritesi', () => {
     ).toBeGreaterThan(ASGARI_COMMIT_SAYISI)
   })
 
-  it('C4 — companion\'ı olmayan ESKİ kaynak sayısı tabanı aşmıyor', () => {
+  it('C4 — companion\'ı olmayan ESKİ kaynak SAYILIR ve adlarıyla raporlanır (BLOKLAMAZ)', () => {
+    const m = sayac.olc()
+    // NİÇİN `process.stdout.write`: bu dosyada `no-console` yalnız `warn`/`error`a izin
+    // veriyor ve rapor bir uyarı değil. Kuralı inline kapatmak yerine gerçek mekanizma
+    // kullanıldı — kural bükülmedi.
+    process.stdout.write(
+      `[INV-DOC-2 · C4] ${sayac.ozetSatiri(m)}\n` +
+      (m.eksik.length
+        ? m.eksik.map(e => `  ${String(e.yasGun).padStart(5)} gün  ${e.yol}\n`).join('')
+        : '') +
+      `[INV-DOC-2 · C4] Bu sayı BLOKLAMAZ — Recep kararı 2026-08-31: companion üretici ` +
+      `taşıyıcı KAPALI. Taşıyıcı kapalıyken kapı borcu ÖNLEYEMEZ, yalnız cezalandırırdı. ` +
+      `Sayı büyüyorsa "bilinen ve kabul edilmiş eksik" büyüyor demektir; ikiz bu dosyaları ` +
+      `HİÇ bilmez, "o kod nasıl çalışıyor" sorusuna eksik cevap verir.\n`,
+    )
+
+    // BLOKLAMAYAN KOL, BOŞ KOL DEĞİLDİR: sayının kendi içinde tutarlı olduğu ölçülür.
+    // Assert'i tümden silip yerine yalnız bir yazdırma koymak, kolu ÖLÇMEYEN bir şeye
+    // çevirir ve biz "kapı var" sanardık — bu depoda adı konmuş sınıf.
     expect(
-      b.eksik.length,
-      `Companion'ı olmayan ${YAS_ESIGI_GUN} günden eski kaynak sayısı ${b.eksik.length}, ` +
-      `taban ${C4_TABAN}. Bu dosyalar ikizde HİÇ YOK, yani "o kod nasıl çalışıyor" ` +
-      `sorusuna ikiz eksik cevap verir.\nDosyalar:\n  ${b.eksik.join('\n  ')}`,
-    ).toBeLessThanOrEqual(C4_TABAN)
+      m.eksik.filter(e => e.yasGun <= YAS_ESIGI_GUN).map(e => e.yol),
+      `Listede eşik İÇİ (${YAS_ESIGI_GUN} gün ve altı) dosya var — taze pencere muafiyeti ` +
+      'bozulmuş; sayaç asenkron üretim penceresini borç sayıyor.',
+    ).toEqual([])
+    expect(
+      m.enEskiYasGun,
+      'enEskiYasGun listeyle UYUŞMUYOR — rapor kendi verisiyle çelişiyor.',
+    ).toBe(m.eksik.length ? m.eksik[0].yasGun : 0)
+  })
+
+  it('⭐SAYIM AYIRT EDER: companion\'sız dosya eklenince sayı ARTAR ve ad listeye girer', () => {
+    // Bloklamayan bir kolun tek gerçek kanıtı budur. Fikstür ŞART: gerçek depoya dayanan
+    // ölçüm "bugün sıfır" olduğunda sayacın ÇALIŞTIĞINI kanıtlamaz — sıfır, hem "borç yok"un
+    // hem "sayaç ölü"nün cevabıdır. Ayırt etmeyen gösterge ölçüm değildir.
+    const kapsam = {
+      koklerRecursive: ['src'],
+      skipDirs: new Set<string>(),
+      skipBasenames: new Set<string>(),
+    }
+    const bugun = new Date('2026-09-03T00:00:00Z')
+    const eski = '2026-08-20' // demir sonrası VE eşiği aşmış (14 gün)
+
+    const taban = sayac.sayimCekirdegi({
+      izlenen: ['src/a/Var.tsx', 'src/a/Var.md'],
+      kapsam,
+      tarihler: new Map([['src/a/Var.tsx', eski], ['src/a/Var.md', eski]]),
+      bugun,
+      yasEsigiGun: YAS_ESIGI_GUN,
+      kapiBaslangici: KAPI_BASLANGIC,
+    })
+    expect(taban.eksik.length, 'FİKSTÜR ÖNKOŞULU: companion\'ı OLAN dosya borç sayılmamalı').toBe(0)
+
+    const sonra = sayac.sayimCekirdegi({
+      izlenen: ['src/a/Var.tsx', 'src/a/Var.md', 'src/a/Yok.tsx'],
+      kapsam,
+      tarihler: new Map([
+        ['src/a/Var.tsx', eski], ['src/a/Var.md', eski], ['src/a/Yok.tsx', eski],
+      ]),
+      bugun,
+      yasEsigiGun: YAS_ESIGI_GUN,
+      kapiBaslangici: KAPI_BASLANGIC,
+    })
+    expect(
+      sonra.eksik.length,
+      'Companion\'sız ESKİ dosya eklendi ama sayı ARTMADI — sayaç ölü. Bloklamayan kolun tüm ' +
+      'değeri sayının ayırt etmesindedir; ayırt etmeyen sayı rapor değil dekordur.',
+    ).toBe(taban.eksik.length + 1)
+    expect(
+      sonra.eksik.map(e => e.yol),
+      'Sayı arttı ama AD listede yok — "N dosya" demek ama hangileri olduğunu söylememek ' +
+      'borcu kapatılamaz kılar.',
+    ).toContain('src/a/Yok.tsx')
+    expect(sonra.enEskiYasGun, 'en eski yaş hesaplanmadı').toBe(14)
+
+    // TERS YÖN — muafiyet CANLI mı: eşik İÇİ (taze) companion'sız dosya borç SAYILMAZ.
+    // Bu kol olmasa "her şeyi borç sayan" bir sayaç da yukarıdaki iddiaları geçerdi.
+    const taze = sayac.sayimCekirdegi({
+      izlenen: ['src/a/Yeni.tsx'],
+      kapsam,
+      tarihler: new Map([['src/a/Yeni.tsx', '2026-09-01']]), // 2 gün
+      bugun,
+      yasEsigiGun: YAS_ESIGI_GUN,
+      kapiBaslangici: KAPI_BASLANGIC,
+    })
+    expect(
+      taze.eksik.length,
+      'Taze (eşik içi) dosya borç SAYILDI — asenkron üretim penceresi muafiyeti ölmüş; bu, ' +
+      'kapının ilk günden yanlış-kırmızı üretmesine geri dönerdi.',
+    ).toBe(0)
+    expect(taze.eksikTaze, 'taze sayaç dolmadı — muafiyet görünmez oldu').toBe(1)
+  })
+
+  it('⭐TEK KAYNAK (§26): modülün sayısı, testin BAĞIMSIZ hesabıyla uyuşur', () => {
+    // Emirdeki "test modülü çağırsın" saf devretmesinden bilinçli SAPMA (gerekçe dosya
+    // başında): testin kendi hesabı REFERANS olarak duruyor. Modül bozulursa burası kırmızı
+    // verir; paylaşılan TEK ölçüt iki yönlü yanıltır (bu depoda ölçülmüş ders).
+    const m = sayac.olc()
+    expect(
+      m.eksik.map(e => e.yol).sort(),
+      'Modülün C4 listesi, testin BAĞIMSIZ hesabıyla AYRIŞTI. İkisi de aynı kapsamı ' +
+      '(.cc_docs.yaml SSOT) ve aynı eşiği ölçmek zorunda; ayrışma ya kapsam süzgecinde ya ' +
+      'yaş hesabında kusur demektir.',
+    ).toEqual([...b.eksik].sort())
+    expect(
+      m.bayat.slice().sort(),
+      'Modülün C5 listesi testin bağımsız hesabıyla ayrıştı',
+    ).toEqual([...b.bayat].sort())
+    expect(
+      m.kaynakSayisi,
+      'Modülün kapsam EVRENİ testin evreninden farklı — biri yaml\'ı yanlış okuyor',
+    ).toBe(b.kaynakSayisi)
+  })
+
+  it('⭐panodaki satır MODÜLDEN gelir, board.cjs onu YENİDEN YAZMAZ (§26)', () => {
+    const kok = process.cwd()
+    const board = resolve(kok, 'scripts/board/board.cjs')
+    const beklenen = sayac.ozetSatiri(sayac.olc())
+
+    /**
+     * FİKSTÜR, ÖLÇÜLEN DURUMU ÜRETMEK ZORUNDA (§25 — bu tuzağa bir kez düşüldü).
+     * `yoklama` panoda TALEP YOKSA "panoda talep yok" deyip ERKEN DÖNER ve alt satırların
+     * hiçbirini basmaz. Gerçek panoya bakmak da olmaz: CI'da o dizin yoktur, yerelde ise
+     * başka şeritlerin verisi teste sızar. Bu yüzden İZOLE bir pano dizini kurulur ve
+     * içine gerçek `claim` fiiliyle bir talep yazılır.
+     */
+    const tmp = (
+      process.env.RUNNER_TEMP || process.env.TMPDIR || process.env.TEMP || process.env.TMP || '/tmp'
+    ).replace(/\\/g, '/').replace(/\/$/, '')
+    const boardDir = `${tmp}/companion-sayim-yoklama-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    const env = { ...process.env, VENTHUB_BOARD_DIR: boardDir }
+    // Sabit ve GEÇERLİ uuid: board.cjs kimliğin BİÇİMİNİ doğruluyor (INV-BOARD-3).
+    const sid = '5a1c0000-1111-4222-8333-444455556666'
+
+    const talep = spawnSync(
+      process.execPath,
+      [board, 'claim', '--sid', sid, '--lane', 'SAYIM-SINAMA', '--globs', 'src/sayim-sinama/**'],
+      { encoding: 'utf8', cwd: kok, env, timeout: 120_000 },
+    )
+    expect(
+      talep.status,
+      `FİKSTÜR ÖNKOŞULU: claim yazılamadı (${talep.stderr || talep.stdout || talep.error?.message})`,
+    ).toBe(0)
+
+    const r = spawnSync(process.execPath, [board, 'yoklama'], {
+      encoding: 'utf8', cwd: kok, env, timeout: 120_000,
+    })
+    expect(r.error, `board.cjs yoklama koşturulamadı: ${r.error?.message ?? ''}`).toBeUndefined()
+    expect(
+      r.stdout.includes('panoda talep yok'),
+      'FİKSTÜR ÖNKOŞULU: yoklama erken döndü — talep yazılmamış, alt satırlar hiç basılmadı.',
+    ).toBe(false)
+    expect(
+      r.stdout,
+      'Yoklama çıktısı, sayaç modülünün ÜRETTİĞİ cümleyi birebir içermiyor. §26: kullanıcıya ' +
+      'görünen metin ölçütü TEKRAR ETMEZ, ondan ÜRETİLİR. Pano kendi cümlesini yazarsa iki ' +
+      'metin ayrışır ve hangisinin hüküm olduğu belirsizleşir.',
+    ).toContain(beklenen)
   })
 
   it('C5 — kaynağından ESKİ companion sayısı tabanı aşmıyor', () => {
@@ -302,7 +519,11 @@ describe('INV-DOC-2 · companion kapsam paritesi', () => {
     // Sayı-tabanlı ratchet'in yerini bu aldı. Eski sürümde "borç azaldıysa tabanı düşür"
     // diyordu; taban artık 0 olduğu için düşürülecek bir şey yok — korunması gereken şey
     // tabanın YÜKSELTİLMEMESİ. Biri kırmızıyı susturmak için sayıyı büyütürse burası yanar.
-    expect(C4_TABAN, 'C4_TABAN yükseltilmiş — kırmızıyı susturmak için taban büyütmek, kapıyı sökmektir').toBe(0)
+    // C4_TABAN kaldırıldı (C4 artık bloklamıyor, sayıyor — gerekçe dosya başında). C4'ün
+    // ratchet'inin yerini "SAYIM AYIRT EDER" kolu aldı: taban yerine sayacın canlılığı
+    // korunuyor. C5 hâlâ BLOKLUYOR, çünkü bayat companion ikize EMİN BİÇİMDE YANLIŞ cevap
+    // verdirir — eksik bilgiden daha zararlıdır ve üretici taşıyıcı kapalı olsa bile
+    // companion'ı SİLMEK ya da kaynağı geri almak elde olan bir çözümdür.
     expect(C5_TABAN, 'C5_TABAN yükseltilmiş — kırmızıyı susturmak için taban büyütmek, kapıyı sökmektir').toBe(0)
   })
 

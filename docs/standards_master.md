@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T13:06:35.977698+00:00
+compiled_at: 2026-09-03T13:25:27.762404+00:00
 total_compiled_files: 64
-source_commit: 717baed9
+source_commit: 9c6314ea
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -4679,11 +4679,43 @@ Bu yüzden ters yön ayrı bir bekçiye taşındı: **§C4 + §C5, `INV-DOC-2`**
 
 İlgili ama HENÜZ YOK: `.cc_docs.yaml` ↔ NotebookLM defteri paritesi (§C6, aşağıda).
 
-## C4 — Companion'ı olmayan ESKİ kaynak = ihlal (yaş eşikli)
+## C4 — Companion'ı olmayan ESKİ kaynak = SAYILIR, bloklamaz (yaş eşikli)
 
 Kapsamdaki bir kaynak dosyanın son commit'i **7 günden eskiyse** ve companion'ı yoksa
-bu bir ihlaldir. 7 gün ve altı, asenkron üretim penceresi olarak **muaftır**.
+bu bir borçtur. 7 gün ve altı, asenkron üretim penceresi olarak **muaftır**.
 Etki: ikiz o dosyayı hiç bilmez, "bu kod nasıl çalışıyor" sorusuna eksik cevap verir.
+
+**Bu borç 2026-09-03'ten beri BLOKLAMAZ; sayılır ve adlarıyla raporlanır** — Recep'in
+**2026-08-31** kararıyla companion üretici taşıyıcı KAPALI tutulduğu için (abonelik
+maliyeti). Bu, **bilinen ve kabul edilmiş bir eksiktir**: taşıyıcı kapalıyken kapı borcu
+**önleyemez**, yalnız cezalandırır.
+
+**Niçin değişti — ölçülmüş vaka (2026-09-03).** `DataTablePagination.tsx` 2026-08-26'da
+geldi; 09-03'te 8. gününü doldurdu ve **hiçbir commit atılmadan**, yalnızca takvim
+ilerlediği için o gün açık olan **bütün PR'ları** kırmızıya çevirdi. Aynı ölçümde
+üretim hattının **28 Ağustos'tan beri ölü** olduğu görüldü (20–28 Ağustos arası 81
+companion eklenmiş, sonrasında 1). Yani kapı, kimsenin kapatamayacağı bir borcu
+haftada bir filo kilidine dönüştürüyordu.
+
+⚠**Eşik UZATILMADI, bilerek:** 7'yi 30'a çekmek aynı tuzağı **erteler**, kaldırmaz —
+30. günde aynı kilit gelir ve o gün sebebi hatırlayan kimse olmaz.
+⚠**Kapı SİLİNMEDİ, bilerek:** silinen kapı **kapatılmış borç** sanılır. Kalan biçim
+"say, adlarıyla raporla, bloklama"dır; sayı `board.cjs yoklama` çıktısında da görünür.
+Sayının **ayırt ettiği** ayrı bir kolla kilitlidir (companion'sız dosya eklenince sayı
+artmıyorsa test kırmızı verir) — çünkü bloklamayan bir kolun tek değeri budur.
+
+**C5 BLOKLAMAYA DEVAM EDER** ve bu tutarsızlık değil: bayat companion, ikize *emin
+biçimde yanlış* cevap verdirir (§C5) ve çözümü taşıyıcıya bağlı değildir — companion
+silinebilir ya da kaynak geri alınabilir. Eksik companion ise yalnız taşıyıcı açılarak
+kapanır.
+
+### ⭐HÜKÜM — üretilmiş dosyaya dokunan iş İKİ COMMIT'tir
+
+Kaynağı (ya da üretilmiş bir dosyayı) commit et → **sonra** derle → üretilmiş artefaktları
+**ayrı** commit'le. İkisini aynı commit'e koymak tazelik kapısını (`INV-DOC-4b`) **yapısal
+olarak** kırmızı yapar: derleme kaynağın **commit'lenmiş** blob SHA'sını yazar, o an yeni
+hâl henüz commit'li değildir, manifest bir önceki blob'u kaydeder ve kaynak commit'lenir
+commit'lenmez manifest bayat olur. 2026-09-03'te bu bedel **tek günde iki kez** ödendi.
 
 ## C5 — Kaynağından ESKİ companion = ihlal (yaş eşikli)
 
@@ -4697,10 +4729,16 @@ ilk ölçümde `.agent/` altındaki betikler sayılmış ve sonuç 84/211 çıkm
 yaml'da `skip_dirs` içinde, yani doküman hattı oraya hiç bakmıyor. **Bekçi üreticiden
 farklı kapsam kullanırsa ölçtüğü şey gerçek değildir.**
 
-**Ratchet, sıfır değil.** Mevcut borç (C4=1, C5=34) taban olarak dondurulur: yeni borç
-eklenemez, azalınca taban düşürülmelidir (stale-guard bunu zorlar). Niçin tam-kapalı
-kurulmadı: bekçi ilk günden kırmızı yanarsa görmezden gelinir — bu depoda yaşandı
-(rastgele patlayan `pre-commit` `--no-verify` alışkanlığı doğurdu, T033).
+**Ratchet, sıfır değil.** İlk ölçümün borcu (2026-08-17: C4=1, C5=34) taban olarak
+donduruldu: yeni borç eklenemez, azalınca taban düşürülmelidir (stale-guard bunu zorlar).
+Niçin tam-kapalı kurulmadı: bekçi ilk günden kırmızı yanarsa görmezden gelinir — bu depoda
+yaşandı (rastgele patlayan `pre-commit` `--no-verify` alışkanlığı doğurdu, T033).
+
+⚠**Bu paragraf artık YALNIZ C5 için geçerlidir.** `C4_TABAN` 2026-09-03'te kaldırıldı, çünkü
+C4 bloklamayı bıraktı (§C4). Taban kavramının C4'teki yerini **sayacın canlılığı** aldı:
+korunan şey bir sayı değil, sayının **ayırt ettiği**. Bu satır, ratchet'in tek başına
+kalması hâlinde okuyucuya *"C4'ün de bir tavanı var"* dedirtmesin diye eklendi — cetvelde
+yaşayan yanlış iddianın bedeli aynı belgede §C6'da ölçüldü.
 
 **Ölçüm kaynağı = `git`, disk değil** (§C1 ile aynı gerekçe). Ek ölçüm: 2026-08-17'de
 17 companion **diskte güncel ama git'te eskiydi**. Bu ayrışma kendisi bir bulgudur ama
