@@ -51,25 +51,27 @@ try {
     const talepler = (board.tumTalepler ? board.tumTalepler() : []) || [];
     const benim = talepler.filter((c) => String(c.sid) === String(sessionId));
     if (benim.length > 0) {
-      // SAYIM: pano dizininde birikir, filo geneli görünür olsun.
-      let sayi = 0;
+      /**
+       * SAYIM: pano dizininde birikir, filo geneli görünür olsun.
+       *
+       * ⭐SAYIM MANTIĞI BURADA DEĞİL, `board.ayrismaSay`da (§26 TEK KAYNAK). Bu kanca onun
+       * TÜKETİCİSİDİR — sayı iki yerde iki kez hesaplanırsa ikisi sessizce ayrışır.
+       *
+       * ⚠VAKA ile TUR AYRI BİRİMLER: ilk hâlinde bu sayaç her tur sonu artıyordu ama metin
+       * "N. kayıtlı VAKA" diyordu. Ölçüldü: "6. vaka" → iki saat sonra "32. vaka", arada
+       * 26 yeni ayrışma OLMADI, 26 TUR geçti. Alan adı BİRİMİ taahhüt eder.
+       */
       const sayacYolu = path.join(board.BOARD_DIR, '.cwd-ayrisma-sayaci.json');
-      try {
-        const d = JSON.parse(fs.readFileSync(sayacYolu, 'utf8'));
-        sayi = Number(d.toplam) || 0;
-        const kayit = { toplam: sayi + 1, son: { sid: sessionId, ts: new Date().toISOString(), dizin: process.cwd() } };
-        fs.writeFileSync(sayacYolu, JSON.stringify(kayit), 'utf8');
-        sayi = kayit.toplam;
-      } catch {
-        try {
-          fs.writeFileSync(sayacYolu, JSON.stringify({ toplam: 1, son: { sid: sessionId, ts: new Date().toISOString(), dizin: process.cwd() } }), 'utf8');
-        } catch { /* sayaç yazılamazsa uyarı yine verilir */ }
-        sayi = sayi + 1;
-      }
+      let onceki = null;
+      try { onceki = JSON.parse(fs.readFileSync(sayacYolu, 'utf8')); } catch { onceki = null; }
+      const sayim = board.ayrismaSay(onceki, sessionId, process.cwd(), new Date().toISOString());
+      // Yazılamazsa uyarı YİNE verilir: sayaç bir kolaylık, uyarı ise asıl iş.
+      try { fs.writeFileSync(sayacYolu, JSON.stringify(sayim), 'utf8'); } catch { /* yoksay */ }
       konumUyarisi =
-        `⚠️ §28 AĞAÇ AYRIŞMASI (${sayi}. kayıtlı vaka) — ŞU AN PAYLAŞILAN ANA DİZİNDESİN.\n` +
+        `⚠️ §28 AĞAÇ AYRIŞMASI (${sayim.vaka}. vaka · ${sayim.tur}. tur) — ŞU AN PAYLAŞILAN ANA DİZİNDESİN.\n` +
         `   dizin: ${process.cwd()}\n` +
         `   Şerit talebin var (${benim.map((c) => c.lane).join(', ')}) ve şerit işi kendi worktree'sinde koşar.\n` +
+        `   VAKA = ayrışmanın kendisi (aynı yerde kaldıkça artmaz) · TUR = ne kadar sürdüğü.\n` +
         `   Zarar OLMAMIŞ olabilir — vakaların beşinde olmadı, ve kapı doğmamasının sebebi tam buydu.\n` +
         `   Kanonik biçim: komutlarda MUTLAK yol, git için daima "git -C <ağaç>".`;
     }

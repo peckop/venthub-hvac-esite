@@ -99,6 +99,13 @@ interface BoardModule {
     kok: string
     anaAgac: string
   }
+  /** VAKA = ayrışmanın kendisi · TUR = ne kadar sürdüğü. İki AYRI birim (REC-130). */
+  ayrismaSay: (
+    onceki: { vaka?: number; tur?: number; toplam?: number; son?: { sid?: string; dizin?: string } } | null,
+    sid: string,
+    dizin: string,
+    ts: string,
+  ) => { vaka: number; tur: number; son: { sid: string; ts: string; dizin: string } }
   /** §23: TARAMA (gözcü süreci okuyor mu) ve TESLIM (bildirim KONUŞMAYA ulaştı mı) AYRI ölçümler. */
   taramaDurumu: (sid: string, now: number, esikTur?: number) => string
   teslimDurumu: (sid: string, now: number) => number | string
@@ -1570,6 +1577,68 @@ describe('INV-BOARD-KONUM-2 · §28 ağaç ayrışması (uyarı + sayım)', () =
     ).toBe(false)
   })
 
+  /**
+   * ⭐VAKA ile TUR AYRI BİRİMLER — REC-130 düzeltmesi (Recep emri 2026-09-04).
+   *
+   * NİÇİN VAR: sayaç ilk hâlinde her TUR SONU artıyordu ama metin "N. kayıtlı VAKA"
+   * diyordu. Ölçüldü: "6. vaka" → iki saat sonra "32. vaka"; arada 26 yeni ayrışma OLMADI,
+   * 26 TUR geçti. Kusuru kendim buldum ve ölçtüm; ihlal ettiğim kendi dersim **"alan adı
+   * BİRİMİ taahhüt eder."**
+   *
+   * Bu kol SAF çekirdeği ölçer (`board.ayrismaSay`), diske/saate dokunmaz — durumu ÜRETİR,
+   * ortamda bir sayaç dosyası bulunmasına GÜVENMEZ (§25).
+   */
+  it('⭐VAKA ile TUR AYRI SAYILIR: aynı yerde tur ARTAR, vaka ARTMAZ', () => {
+    const sid = 'aaaa1111-2222-4333-8444-555566667777'
+    const yer = '/c/ana'
+
+    const bir = board.ayrismaSay(null, sid, yer, 't1')
+    expect(bir.vaka, 'ilk ayrışma 1. vaka olmalı').toBe(1)
+    expect(bir.tur, 'ilk ayrışma 1. tur olmalı').toBe(1)
+
+    // AYNI oturum, AYNI dizin → maruziyet sürüyor: tur artar, vaka SABİT.
+    const iki = board.ayrismaSay(bir, sid, yer, 't2')
+    expect(
+      iki.vaka,
+      'Aynı yerde kalmak YENİ vaka sayıldı — bu, sayının olduğundan büyük görünmesine ' +
+        'yol açan kusurun ta kendisi (26 tur, 26 "vaka" diye raporlanmıştı).',
+    ).toBe(1)
+    expect(iki.tur, 'tur artmadı — maruziyet ölçüsü kayboldu').toBe(2)
+
+    const uc = board.ayrismaSay(iki, sid, yer, 't3')
+    expect(uc.vaka).toBe(1)
+    expect(uc.tur).toBe(3)
+  })
+
+  it('⭐TERS YÖN: dizin DEĞİŞİP geri dönülürse YENİ vaka başlar', () => {
+    // Bu kol olmasa "vakayı hiç artırmayan" bir uygulama da üstteki kolu geçerdi ve sayaç
+    // ölü bir 1'de kalırdı — ayırt etmeyen gösterge ölçüm değildir.
+    const sid = 'bbbb1111-2222-4333-8444-555566667777'
+    const a1 = board.ayrismaSay(null, sid, '/c/ana', 't1')
+    const worktree = board.ayrismaSay(a1, sid, '/c/tmp/serit', 't2')
+    const a2 = board.ayrismaSay(worktree, sid, '/c/ana', 't3')
+    expect(a2.vaka, 'ana dizine GERİ DÖNÜŞ yeni vaka saymadı').toBe(3)
+    expect(a2.tur, 'tur sayısı kesintisiz artmalı').toBe(3)
+
+    // BAŞKA oturum aynı dizinde → ayrı vaka (sayaç filo geneli).
+    const baskasi = board.ayrismaSay(a2, 'cccc1111-2222-4333-8444-555566667777', '/c/ana', 't4')
+    expect(baskasi.vaka, 'başka oturumun ayrışması aynı vaka sayıldı').toBe(4)
+  })
+
+  it('GERİYE UYUM: eski kayıtta `vaka` alanı yoktu — eski turlar TEK vaka sayılır', () => {
+    // Eski biçim: { toplam: N }. Kaç ayrı vaka olduğu BİLİNMİYOR; uydurmak, ölçülmemiş bir
+    // geçmişi ölçülmüş gibi gösterirdi. En muhafazakâr seçim: hepsi tek vaka.
+    const sid = 'dddd1111-2222-4333-8444-555566667777'
+    const eski = { toplam: 33, son: { sid, ts: 't0', dizin: '/c/ana' } }
+    const yeni = board.ayrismaSay(eski, sid, '/c/ana', 't1')
+    expect(yeni.tur, 'eski `toplam` TUR olarak devralınmadı — 33 tur kaydı kayboldu').toBe(34)
+    expect(
+      yeni.vaka,
+      'eski turlardan bir vaka sayısı UYDURULDU. Ölçülmemiş bir geçmiş, ölçülmüş gibi ' +
+        'gösterilemez; bilinmeyen için en muhafazakâr değer alınır.',
+    ).toBe(1)
+  })
+
   it('TUR-SONU kancası: ANA dizinde + şerit talebi varsa UYARIR ve SAYAR; aksi hâlde sessiz', () => {
     // ⭐Üç hâlin ÜÇÜ de üretilir. Önceki hâli makinede hazır bir ana ağaç + worktree
     // arıyordu ve CI'da (tek checkout) o ikisi AYNI dizin olduğu için kollar ölçmek
@@ -1605,11 +1674,20 @@ describe('INV-BOARD-KONUM-2 · §28 ağaç ayrışması (uyarı + sayım)', () =
     // uyarı metninin başka bir cümlesinde ("vakaların beşinde olmadı") aynı kelime
     // geçiyordu, yani sayaç silinse bile kol yeşil kalıyordu. Ayırt etmeyen gösterge
     // ölçüm değildir; aranan şey SAYININ kendisi.
+    // ⚠ÖLÇÜT METİNLE BİRLİKTE GÜNCELLENDİ. Metin "N. kayıtlı vaka"dan "N. vaka · M. tur"a
+    // döndü; eski ölçüt bırakılsaydı kol SESSİZCE ayrışır ve hiçbir şey ölçmez hâle gelirdi
+    // (aynı gün "araç körlüğü" sınıfını üç kez ödedim). İKİ birim de aranır, çünkü tek sayı
+    // "kaç kez oldu" ile "ne kadar sürdü" sorularını birden anlatamaz.
     expect(
       a,
-      'Uyarıda SAYIM yok — bedelsiz tekrarlar görünür olmalı (§27). Ölçüt "N. kayıtlı vaka" ' +
-      'biçimindeki SAYIYI arar; yalnız "vaka" kelimesini aramak sabotajı geçiriyordu.',
-    ).toMatch(/\d+\.\s*kay[ıi]tl[ıi]\s*vaka/)
+      'Uyarıda VAKA sayısı yok — bedelsiz tekrarlar görünür olmalı (§27). Ölçüt SAYIYI arar; ' +
+      'yalnız "vaka" kelimesini aramak sabotajı geçiriyordu.',
+    ).toMatch(/\d+\.\s*vaka/)
+    expect(
+      a,
+      'Uyarıda TUR sayısı yok — ayrışmanın NE KADAR SÜRDÜĞÜ ölçüsü kayboldu. Birimi ' +
+      'karıştırmak bu kolun doğuş sebebiydi: sayaç tur sayıyordu, metin "vaka" diyordu.',
+    ).toMatch(/\d+\.\s*tur/)
 
     // B) worktree + talep → SESSİZ
     expect(
