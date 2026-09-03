@@ -707,6 +707,24 @@ export const tr = {
     },
     productCategories: 'Ürün Kategorileri',
   },
+  altSekme: {
+    // REC-129 Faz 1b — mobil alt sekme çubuğu (tasarım v13, ekran 01/02/12).
+    // Anahtarlar NESTED: `getDictValue` nokta içeren düz anahtarı çözemez ve ham
+    // anahtarı ekrana basar (CLAUDE.md kural 7 · i18n-dead-key kapısı).
+    etiket: 'Alt gezinme',
+    anasayfa: 'Ana sayfa',
+    urunler: 'Ürünler',
+    teklif: 'Teklif',
+    // Rozetteki sayıyı SÖZLE de söyler (ekran okuyucu). Rozet tek başına anlam
+    // taşımaz — renk/konum tek bilgi taşıyıcı olamaz.
+    teklifSayisi: 'teklif listesinde {n} kalem',
+    destek: 'Destek',
+    hesap: 'Hesap',
+    tumUrunler: 'Tüm ürünler',
+    markalar: 'Markalar',
+    teknikDestek: 'Teknik destek',
+    iletisim: 'İletişim',
+  },
   header: {
     adminBar: {
       brand: 'VH / ADMIN',

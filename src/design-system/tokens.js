@@ -187,6 +187,13 @@ export const maxHeight = {
   /* Admin popover/açılır takvim tavanları — aynı svh gerekçesi (§2.2). */
   'admin-popover': '85svh',
   'admin-popover-section': '60svh',
+  /**
+   * Mobil alt sekme çubuğunun yaprak paneli (REC-129 Faz 1b).
+   * `svh` KASITLI, `vh` DEĞİL — yukarıdaki admin-modal gerekçesinin aynısı: `vh` ≡ `lvh`,
+   * mobil araç çubuğu görünürken alttan açılan panel viewport'u taşar ve panelin ÜST
+   * kısmı (başlığı) erişilemez olur. Bu panel tam da mobilde ve tam da alttan açılıyor.
+   */
+  'mobil-yaprak': '80svh',
   'hvac-menu':    '300px',
   'hvac-panel':   '480px',  // 60×8
   'hvac-modal':   '85vh',

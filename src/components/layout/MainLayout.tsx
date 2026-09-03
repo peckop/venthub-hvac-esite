@@ -7,9 +7,10 @@ import { useScrollThrottle } from '../../hooks/useScrollThrottle'
 import BackToTopButton from '../BackToTopButton'
 import Footer from '../Footer'
 import LanguageSwitcher from '../LanguageSwitcher'
+// Bileşenler
+import MobilAltSekmeCubugu from '../navigation/MobilAltSekmeCubugu'
 import PaymentWatcher from '../PaymentWatcher'
 import ScrollToTop from '../ScrollToTop'
-// Bileşenler
 import StickyHeader from '../StickyHeader'
 
 
@@ -105,6 +106,13 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
             <PaymentWatcher />
             <Footer />
+
+            {/* REC-129 Faz 1b — mobil alt sekme çubuğu.
+                BAYRAK KAPALIYKEN bileşen `null` döner; yani bugün müşteri hiçbir şey
+                görmez. Buna rağmen BAĞLANIYOR: bağlanmamış bir bileşen "indi" sayılır
+                ama erişilebilir olmaz ve bayrak açıldığı gün eksik olduğu fark edilir.
+                Kapı (INV-ALTSEKME-1) bu bağın varlığını da ölçer. */}
+            <MobilAltSekmeCubugu />
 
             {enableToaster && (
                 <Suspense fallback={null}>
