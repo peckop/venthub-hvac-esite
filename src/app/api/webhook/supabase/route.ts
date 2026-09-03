@@ -9,6 +9,7 @@ import {
   PRODUCTS_DISCOVERY_TAG,
   variantStockTag,
 } from '@/lib/cache/tags'
+import { indexNowBildir } from '@/lib/seo/indexnow'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 // Yalnız `type` import eden saf yardımcı (React/i18n/client bağımlılığı YOK — ölçüldü),
 // bu yüzden route handler'da güvenle kullanılır.
@@ -562,11 +563,24 @@ export async function POST(request: NextRequest) {
       revalidatedPaths.push('/sitemap.xml')
     }
 
+    /**
+     * REC-127 — IndexNow: tazelenen yolları arama motoruna ANINDA bildir.
+     * Tek çağrı, tek yer: `revalidatedPaths` zaten bu isteğin biriktiricisi, dolayısıyla
+     * her dala ayrı ayrı dokunmaya gerek yok (dokunsaydım 14+ çağrı yerinde risk üretirdim).
+     * `await` ediliyor ki serverless çalışma zamanı isteği bitirip fetch'i KESMESİN;
+     * modül ASLA throw etmez ve anahtar yoksa no-op'tur, yani bu satır webhook'un asıl
+     * işini (önbellek tazeleme) hiçbir koşulda düşüremez.
+     */
+    const indexNow = await indexNowBildir(revalidatedPaths)
+
     return NextResponse.json({
       revalidated: true,
       event: { table, type },
       revalidatedPaths,
       revalidatedTags,
+      // Bildirimin ne yaptığı yanıtta GÖRÜNÜR: "atlandi/anahtar-yok" ile "gonderildi" ayrımı
+      // olmadan, çalışmayan bir bildirim çalışıyormuş gibi sessizce durur.
+      indexNow,
       // PS-042: products UPDATE'inde old_record yoksa alan-bazlı karşılaştırma yapılamadı —
       // bu durumda mevcut davranış (her zaman keşif tag'i tetikle) korunur.
       discoveryComparisonSkipped,

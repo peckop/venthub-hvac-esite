@@ -41,10 +41,15 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: dict.meta.siteTitle,
     description: dict.meta.siteDesc,
+    // hreflang TABANI — kendi `alternates`ini yazmayan HER alt sayfa bunu miras alır
+    // (ör. /tr/products canlıda `tr-TR`/`en-US` basıyordu, REC-127'de ölçüldü).
+    // Bu yüzden biçim burada da alt sayfalarla aynı olmalı: `tr` / `en` / `x-default`.
+    // Sayfa kendi `alternates`ini yazarsa bu blok geçersiz kalır — miras eden yüzeyler için.
     alternates: {
       languages: {
-        'tr-TR': `${SITE_URL}/tr`,
-        'en-US': `${SITE_URL}/en`,
+        tr: `${SITE_URL}/tr`,
+        en: `${SITE_URL}/en`,
+        'x-default': `${SITE_URL}/tr`,
       },
     },
     openGraph: {
