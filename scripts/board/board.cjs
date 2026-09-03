@@ -304,6 +304,47 @@ function repoRootFor(filePath) {
  * "iki ayrı worktree" ile "worktree vs ana dizin" arasında AYRIM YAPMAZ. Aranan ayrım
  * ikincisidir, çünkü tehlikeli olan paylaşılan ağaçta çalışmaktır.
  */
+/**
+ * ⭐AYRISMA SAYIMI — VAKA ile TUR AYRI BIRIMLERDIR (REC-130 duzeltmesi, Recep emri 09-04).
+ *
+ * ⚠NICIN VAR: bu sayac ilk halinde her TUR SONU artiyordu ama metin "N. kayitli VAKA"
+ * diyordu. OLCULDU: bana once "6. vaka", iki saat sonra "32. vaka" dedi — arada 26 yeni
+ * ayrisma OLMADI, 26 TUR gecti. Yani sayi olceginin ADI yanlisti ve sinifin ne kadar can
+ * yaktigi hakkinda buyutulmus bir izlenim veriyordu.
+ *
+ * Bu, kendi yazdigim dersin ihlaliydi: **alan adi BIRIMI taahhut eder.** Kusuru kendim
+ * buldum, olctum ve Recep siradan cikarip duzeltmemi soyledi.
+ *
+ * IKI BIRIM, IKISI DE ANLAMLI (OPS karari: (b)+(c)):
+ *   · VAKA = ayrismanin KENDISI. Ayni oturum ayni dizinde kaldigi surece TEK vakadir;
+ *     dizin degisip GERI DONULURSE yeni vaka baslar.
+ *   · TUR  = MARUZIYET olcusu. Her tur sonu artar; ayrismanin ne kadar SURDUGUNU soyler.
+ * Metin ikisini birden gosterir ("3. vaka · 33. tur") cunku biri "kac kez oldu", oteki
+ * "ne kadar surdu" sorusunu cevaplar ve tek sayi ikisini birden anlatamaz.
+ *
+ * ⚠SAF TUTULDU (s25/s26): girdi onceki KAYIT, cikti yeni kayit. Disk/saat okumaz —
+ * `ts` parametre olarak gelir. Boylece kol durumu URETEBILIR ve kanca bu fonksiyonun
+ * TUKETICISI olur; sayim iki yerde iki kez hesaplanmaz.
+ *
+ * GERIYE UYUM: eski kayitta yalniz `toplam` vardi, `vaka` alani YOKTU. Eski turlarin kac
+ * ayri vaka oldugu BILINMIYOR — o yuzden en MUHAFAZAKAR secim yapilir ve hepsi TEK vaka
+ * sayilir (uydurulmus bir sayi, olculmemis bir gecmisi olculmus gibi gosterirdi).
+ */
+function ayrismaSay(onceki, sid, dizin, ts) {
+  const yer = String(dizin || '').replace(/\\/g, '/').toLowerCase()
+  const o = onceki && typeof onceki === 'object' ? onceki : null
+  // `tur` yoksa eski `toplam` alanindan devralinir — eski kayit TUR sayiyordu.
+  const turOnce = Number(o && (o.tur !== undefined ? o.tur : o.toplam)) || 0
+  const vakaOnce = Number(o && o.vaka) || 0
+  const sonYer = String((o && o.son && o.son.dizin) || '').replace(/\\/g, '/').toLowerCase()
+  const ayniYer = !!(o && o.son && String(o.son.sid) === String(sid) && sonYer === yer)
+  return {
+    vaka: ayniYer ? Math.max(vakaOnce, 1) : vakaOnce + 1,
+    tur: turOnce + 1,
+    son: { sid: String(sid), ts: String(ts), dizin: String(dizin) },
+  }
+}
+
 function agacKonumu(dir) {
   const hedef = String(dir || process.cwd()).replace(/\\/g, '/')
   try {
@@ -529,7 +570,7 @@ module.exports = {
   notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, sidDogrula,
   taramaDurumu, teslimDurumu, esikleriOku, ESIK_ADLARI,
   EKSENLER, SAYI_SOZU, eksenOzeti, kullanimMetni,
-  globToRegExp, toRepoRelative, repoRootFor, agacKonumu,
+  globToRegExp, toRepoRelative, repoRootFor, agacKonumu, ayrismaSay,
 }
 
 /**
