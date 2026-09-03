@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T18:05:05.310738+00:00
+compiled_at: 2026-09-03T17:59:15.459367+00:00
 total_compiled_files: 105
-source_commit: 9d471446
+source_commit: e332259f
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -10651,23 +10651,13 @@ dizeler bilinen boşluk" diyor ve `toneClasses[tone]` dolaylı üretimi bunu kes
 
 ---
 
-## 6) ⭐KARAR GELDİ (Recep, 2026-09-04) — soru KAPANDI
+## 6) Recep'e giden TEK karar sorusu
 
-Soru şuydu: kiremit `#D95D0E` beyaz üzerinde 3.80:1 (bugünkü lacivert 8.83); tonu
-koyulaştıralım mı, yoksa kullanımını mı sınırlayalım?
-
-**Recep'in kararı — ton DEĞİŞMEZ, kullanım SINIRLANIR:**
-
-1. **Kiremit** yalnız **büyük/kalın düğme yazısı** ve **dolgu** olarak kullanılır.
-2. **Normal boy metin daima lacivert.** Kiremit gövde metnine hiç girmez.
-3. **Amber tek başına asla** — yanında koyu yazı/ikon ile kullanılır.
-
-Bu karar paleti WCAG'a uyumlu kılıyor çünkü 3.0 eşiği büyük/kalın metin ve arayüz
-öğeleri için geçerlidir; 4.5 eşiğini gerektiren normal metin laciverte (8.83) bırakılıyor.
-Yani marka sıcaklığı korunuyor, okunabilirlik payı feda edilmiyor.
-
-**Bu kararın kapıya dönüşü bölüm 5'te** — ve orada dürüst bir sınır var: kuralın
-"yalnız ana eylemde" kısmı **statik olarak ölçülemiyor.**
+**Kiremit `#D95D0E` ana eylem rengi olarak beyaz üzerinde 3.80:1 veriyor; bugünkü lacivert
+8.83.** Büyük/kalın düğme yazısında standarda uyar, normal boy metinde uymaz; amber `#F59E0B`
+(2.15) beyaz üzerinde tek başına kullanılamaz. Palet kapalı karar olduğu için **ben
+değiştirmiyorum** — sorulan şey: kiremit yalnız büyük düğme yazısıyla mı sınırlansın, yoksa
+ton bir miktar koyulaştırılsın mı?
 
 ---
 
@@ -15247,11 +15237,11 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T18:04:46.836305+00:00
+compiled_at: 2026-09-03T17:41:47.615852+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-03T18:04:46.836305+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-03T17:41:47.615852+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -15444,8 +15434,6 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:04:46.836305+00:00 tarihind
 │   │   ├── ⚪ `i18n-ters-yon-standard.md`
 │   │   ├── ⚪ `is-kayit-duzeni-standard.md`
 │   │   ├── ⚪ `legal-compliance-standard.md`
-│   │   ├── ⚪ `marka-token-eslemesi-standard.md`
-│   │   ├── ⚪ `matris-gorunum-standard.md`
 │   │   ├── ⚪ `measurement-discipline-standard.md`
 │   │   ├── ⚪ `migration-safety-standard.md`
 │   │   ├── ⚪ `mockup-gelisim-hatti-standardi.md`
