@@ -44,11 +44,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: dict.home.seoTitle,
     description: dict.home.seoDesc,
+    // hreflang: alt sayfalarla AYNI desen — `tr` / `en` / `x-default` (x-default = TR).
+    // ⚠ Eskiden burada `tr-TR` / `en-US` vardı ve `x-default` HİÇ YOKTU (REC-127'de canlıda
+    // ölçüldü). İki kusur birden: (1) x-default yokken arama motoruna "dili belirsiz
+    // ziyaretçiyi hangi sayfaya götüreyim" sorusunun cevabı verilmiyordu; (2) bölge kodlu
+    // (`tr-TR`) ile yalın (`tr`) biçim sitede YAN YANA kullanılıyordu — kategori/ürün
+    // sayfaları yalın, ana sayfa bölge kodlu. Aynı sitede iki biçim tutarsız sinyal üretir.
     alternates: {
       canonical: canonical,
       languages: {
-        'tr-TR': `${siteUrl}/tr`,
-        'en-US': `${siteUrl}/en`,
+        tr: `${siteUrl}/tr`,
+        en: `${siteUrl}/en`,
+        'x-default': `${siteUrl}/tr`,
       },
     },
     openGraph: {

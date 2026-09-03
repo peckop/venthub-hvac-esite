@@ -16,6 +16,13 @@ import { describe, expect, it } from 'vitest'
  * `sitemap.ts` doğruyu bildiriyordu; sayfa onu çürütüyordu. Yani iki yüzey AYRIŞMIŞTI ve
  * hiçbir test bunu görmüyordu — tsc/lint göremez, çünkü ikisi de geçerli string.
  *
+ * ⚠GÜNCELLEME (2026-09-03, REC-127): yukarıdaki "307 ile yönlendirir" tarifi artık YALNIZ
+ * dil öneksiz DERİN yollar için geçerli. KÖK yol (`/`) deterministik **308** ile `/tr`ye
+ * gider. Ayrım kasıtlı: 308 tarayıcıda kalıcı önbelleklenir, dolayısıyla ancak sonucu
+ * istekten BAĞIMSIZ olan dalda kullanılabilir. Derin yollar `detectLocale`ye (çerez +
+ * `Accept-Language`) bağlı olduğu için 307 kalmıştır; onları 308 yapmak ziyaretçiyi ilk
+ * isteğinde düştüğü dile kilitler ve düzeltme sunucuda değil TARAYICIDA gerekir.
+ *
  * KARDEŞ BEKÇİ: `INV-CANONICAL-1` (`canonical-url-ssot.test.ts`) kanonik adresin KAYNAĞINI
  * (SSOT `SITE_URL`, tarayıcı host'u yasak) korur. Bu dosya ŞEKLİNİ korur (dil öneki + hreflang
  * + sitemap ile aynı ifade). İkisi bilerek ayrıdır.

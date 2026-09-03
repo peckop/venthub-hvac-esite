@@ -68,23 +68,47 @@ export async function middleware(request: NextRequest) {
     locale = firstSegment
     effectiveSegments = segments.slice(1)
     
-    // Redirect locale-prefixed admin pages back to non-prefixed roots
+    // Redirect locale-prefixed admin pages back to non-prefixed roots.
+    // ⚠ 308 (KALICI), 307 DEĞİL — REC-127. Bu dal DETERMİNİSTİK: sonucu yalnız yolun
+    // kendisinden türüyor, istek başlığına/çereze BAKMIYOR. Kalıcı yönlendirme tarayıcıda
+    // kalıcı önbelleklenir; bunu ancak sonucu sabit olan dallarda yapabiliriz. Aşağıdaki
+    // dil-enjeksiyon kolu bu ölçütü SAĞLAMIYOR, oraya bak.
     if (effectiveSegments[0] === 'admin') {
       const url = request.nextUrl.clone()
       url.pathname = `/admin${pathname.substring(3 + firstSegment.length)}`
-      return redirectResponse(url, 307)
+      return redirectResponse(url, 308)
     }
   } else {
     // Inject language prefix for user-facing routes missing a locale segments
     const isAuthApi = firstSegment === 'auth' && (segments[1] === 'callback' || segments[1] === 'signout')
-    const isSpecialRoute = firstSegment === 'admin' || firstSegment === 'api' || isAuthApi || 
-                           pathname.endsWith('sitemap.xml') || pathname.endsWith('robots.txt') ||
-                           pathname.endsWith('llms.txt')
-    
+    // ⚠ `.txt` MUAFİYETİ TEK KURALA İNDİRİLDİ (REC-127). Eskiden robots.txt ve llms.txt
+    // tek tek sayılıyordu; IndexNow doğrulama dosyası (`public/<anahtar>.txt`) da aynı
+    // muafiyete ihtiyaç duyuyor ve ADI ANAHTARIN KENDİSİ olduğu için önceden yazılamaz.
+    // Kök seviyedeki her `.txt` muaf: hepsi bot/araç dosyası, hiçbiri dile göre değişmiyor.
+    const isRootTextFile = segments.length === 1 && pathname.endsWith('.txt')
+    const isSpecialRoute = firstSegment === 'admin' || firstSegment === 'api' || isAuthApi ||
+                           pathname.endsWith('sitemap.xml') || isRootTextFile
+
     if (!isSpecialRoute) {
-      const detectedLocale = detectLocale(request)
       const url = request.nextUrl.clone()
-      url.pathname = `/${detectedLocale}${pathname === '/' ? '' : pathname}`
+
+      // ⭐KÖK YOL — DETERMİNİSTİK 308 (REC-127, Bing paketi).
+      // Arama motoru siteyi `/` üzerinden tanır; oradaki geçici yönlendirme "kanonik adres
+      // belirsiz" sinyali verir. `/` DAİMA `/tr`ye gider (kanonik zaten `/tr`), sonuç istekten
+      // BAĞIMSIZ, dolayısıyla kalıcı yönlendirme güvenli.
+      if (pathname === '/') {
+        url.pathname = `/${DEFAULT_LOCALE}`
+        return redirectResponse(url, 308)
+      }
+
+      // ⚠DERİN YOLLAR 307 KALIYOR — BİLEREK, "unutulmuş" değil.
+      // Buradaki hedef `detectLocale`den geliyor: NEXT_LOCALE çerezi + Accept-Language ile
+      // AYNI URL için FARKLI sonuç üretir. 308 tarayıcıda kalıcı önbelleklenir; değişken
+      // sonuçlu bir dalı 308 yapmak ziyaretçiyi ilk isteğinde çıktığı dile KİLİTLER ve
+      // düzeltme sunucuda değil ziyaretçinin tarayıcısında gerekir — yani geri alınamaz.
+      // Kalıcı yönlendirmenin ön koşulu SABİT SONUÇTUR; bu kol onu sağlamıyor.
+      const detectedLocale = detectLocale(request)
+      url.pathname = `/${detectedLocale}${pathname}`
       return redirectResponse(url, 307)
     }
   }
