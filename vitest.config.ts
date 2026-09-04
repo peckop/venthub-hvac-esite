@@ -31,7 +31,10 @@ export default defineConfig({
     // CI'da `.env` yoktur → ENOENT. Birim/bileşen paketinin parçası değiller;
     // yerelde elle koşulacak ampirik DB denetimleridir:
     //   pnpm vitest run tests/e2e/empirical_db.test.ts   (repo kökünde .env varken)
-    // `tests/smoke/**` AYRI koşar (`vitest.smoke.config.ts` · `pnpm test:smoke`):
+    // `tests/smoke/**` AYRI koşar (`vitest.smoke.config.ts` · `pnpm test:ssr-smoke`):
+    // ⚠BU AD BİR KEZ BAYATLADI: burada `pnpm test:smoke` yazıyordu, oysa o ad repo'da
+    // ZATEN Playwright'ın (`playwright test`). Betik adı `test:ssr-smoke` olduğunda bu
+    // yorum güncellenmemişti — yani yorum, olmayan bir komuta yönlendiriyordu.
     // ayakta bir sunucu ister ve SMOKE_BASE_URL yoksa fail-closed DÜŞER (REC-134).
     // Burada kalsaydı `ci`'nin Test adımı onu sunucusuz toplayıp kırmızı verirdi.
     // Eskiden buradaydı ve `describe.skipIf` ile SIFIR test topluyordu — yani
