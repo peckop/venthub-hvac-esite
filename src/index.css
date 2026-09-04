@@ -281,6 +281,27 @@ textarea:focus-visible {
 
 @layer base {
   :root {
+    /* ── MARKA PALETİ (REC-129, Recep kararı 2026-09-04) ─────────────────
+       SSOT: docs/standards/marka-token-eslemesi-standard.md §1.
+       Biçim HSL'dir (CLAUDE.md kural 8: renkler HEX değil CSS custom property).
+       Yanlarındaki HEX yalnız KAYNAK KİMLİĞİDİR — cetveldeki kapalı kararın hangi
+       değer olduğunu söyler ve `INV-PALET-1` kapısı HSL'yi o HEX'e geri çevirip
+       doğrular. Yani yorum süs değil, kapının okuduğu sözleşmedir.
+
+       KULLANIM SINIRI (cetvel §1, ölçülmüş WCAG oranlarıyla):
+         · lacivert (8.83) — gövde metni, başlık, ikincil eylem. Serbest.
+         · turkuaz  (4.08) — vurgu, bağlantı, ikincil yüzey. NORMAL BOY METİNDE YASAK.
+         · kiremit  (3.80) — YALNIZ logo + ana eylem düğmesi dolgusu + o düğmenin
+                              büyük/kalın yazısı. Normal metinde/gövdede/bağlantıda YASAK.
+         · amber    (2.15) — YALNIZ arayüz uyarısı ve YANINDA koyu yazı/ikon ile.
+                              Tek başına anlam taşıyan hiçbir yerde kullanılamaz.
+       ⚠Bu sınırı KAPI ÖLÇEMEZ ("ana eylem" semantik bir roldür) — cetvel §3'te
+       yazılı, incelemeye bağlıdır. Gizlenmiyor. */
+    --marka-lacivert: 218.8 48% 19.6%;  /* #1A2B4A */
+    --marka-turkuaz: 193.6 100% 34.5%;  /* #0088B0 */
+    --marka-kiremit: 23.3 87.9% 45.3%;    /* #D95D0E */
+    --marka-amber: 38 92% 50%;      /* #F59E0B */
+
     /* ── Design System Tokens ──────────────────────────── */
     --surface-deep: 224 52% 8%;
     --surface-darker: 224 71% 4%;
@@ -305,22 +326,17 @@ textarea:focus-visible {
     accent-color: hsl(var(--brand-cyan));
     color-scheme: dark light;
 
-    /* ── Legacy Variables (backward compat) ──────────── */
+    /* ── Legacy Variables (backward compat) ──────────────────────────────
+       2026-09-04'te ÖLÇÜLDÜ ve kırpıldı: bu blokta 15 değişken vardı, 13'ünün
+       depoda `var(--…)` kullanımı SIFIRDI. Kalan ikisi (`--navy-900`,
+       `--text-primary`) yalnız aşağıdaki `select option` kuralında kullanılıyor
+       ve orada gerekçesi yazılı (tema-bağımsız kalmaları KASITLI).
+       Silinenler: navy-800/700/600/500 · cyan-400/500 · cyan-glow · amber-400 ·
+       text-secondary · text-muted · glass-bg · glass-border · glass-hover.
+       ⚠`#22D3EE` LİTERALİ index.css'te doğrudan hâlâ geçiyor (satır ~607/641);
+       o ayrı bir kalem, bu silme onu kapsamaz ve kapsıyormuş gibi yapmıyoruz. */
     --navy-900: #0A0F1E;
-    --navy-800: #0D1426;
-    --navy-700: #111830;
-    --navy-600: #162040;
-    --navy-500: #1E2D55;
-    --cyan-400: #22D3EE;
-    --cyan-500: #06B6D4;
-    --cyan-glow: rgba(34, 211, 238, 0.15);
-    --amber-400: #FBBF24;
     --text-primary: rgba(255,255,255,0.92);
-    --text-secondary: rgba(255,255,255,0.55);
-    --text-muted: rgba(255,255,255,0.30);
-    --glass-bg: rgba(255,255,255,0.04);
-    --glass-border: rgba(255,255,255,0.07);
-    --glass-hover: rgba(255,255,255,0.07);
 
     /* ── Sidebar Variables ──────────────────────────── */
     --radius: 0.5rem;
