@@ -22,6 +22,65 @@
 /** Rotanın SINIFI — dinamik seçimde sınıf korunur (temsilci değişir, sınıf değişmez). */
 export type Sinif = 'anasayfa' | 'liste' | 'kok-kategori' | 'alt-kategori' | 'pdp'
 
+/** PDP'de bilinçli olarak istemciye düşen bir ada — İLAN kalemi. */
+export interface BilincliAda {
+  /** Adanın kısa adı (insan için; kapı bunu HTML'de ARAMAZ — bkz. aşağıdaki niçin). */
+  ada: string
+  /** Niçin istemcide olması MEŞRU. Boş bırakılamaz (kol zorlar). */
+  nicin: string
+  /** Bu adanın SSR HTML'ine kattığı `BAILOUT` markerı sayısı — ÖLÇÜLEN değer. */
+  marker: number
+}
+
+/**
+ * PDP'DE BİLİNÇLİ ADALAR — İLAN + MANDAL.
+ *
+ * ⭐NİÇİN İLAN, NİÇİN ÇIPLAK SAYI DEĞİL: tavan tek bir sayı olarak yazıldığında onu
+ * büyütmek bedava olur — biri kapıyı kırmızı görür, sayıyı bir artırır, gerekçe yazmak
+ * zorunda kalmaz ve kapı sessizce körleşir. Tavan bu listeden TÜRETİLDİĞİ için sayıyı
+ * büyütmenin tek yolu **hangi ada** ve **niçin meşru** yazmaktır.
+ *
+ * ⭐NİÇİN MARKER SAYIMI ADA ADIYLA YAPILMIYOR (muafiyet niçin uygulanamaz):
+ * `BAILOUT_TO_CLIENT_SIDE_RENDERING` markerının HTML'de KİMLİĞİ YOK — hangi Suspense
+ * sınırından doğduğu ayırt edilemez. Bu yüzden "şu adayı muaf tut" yazılabilir bir ölçüt
+ * değildir; uygulanabilir tek ölçüt SAYIdır. İlan, sayının arkasındaki muhakemeyi
+ * insan tarafında tutar — makine tarafında ölçülen hâlâ sayıdır.
+ *
+ * ⭐`marker` NİÇİN AYRI ALAN: "her ada 1 marker" bir yasa değil, bugün ÖLÇÜLEN bir
+ * eşleşme. Yarın iki marker doğuran bir ada gelirse ada sayısı ile marker sayısı ayrışır;
+ * alan ayrı olduğu için o durum İLAN EDİLEBİLİR, uydurma bir "ada" eklemek gerekmez.
+ *
+ * ⚠SINIF: bu liste PDP sınıfına aittir. `analytics` kök layout'ta olduğu için ilkece
+ * TÜM prerender edilen sınıfları etkiler; bugün ölçümde yalnız PDP'de marker doğuyor
+ * (anasayfa/liste/alt-kategori tavan 0 ile geçti — 2026-09-04, koşum 33864696266).
+ * Başka bir sınıf prerender'a geçerse kapı KIRMIZI verir; o kırmızıyı sayıyı büyüterek
+ * kapatmayın — önce markerın hangi adadan geldiğini ölçün, sonra buraya yazın.
+ */
+export const PDP_BILINCLI_ADALAR: readonly BilincliAda[] = [
+  {
+    ada: 'galeri',
+    nicin: 'Ürün görsel galerisi etkileşimli (kaydırma/yakınlaştırma) — sunucuda anlamı yok.',
+    marker: 1,
+  },
+  {
+    ada: '3d-gorunum',
+    nicin: 'R3F/Drei sahnesi WebGL bağlamı ister; sunucuda render edilemez (kural 9).',
+    marker: 1,
+  },
+  {
+    ada: 'vercel-analytics',
+    nicin:
+      'Kök layout içindeki <Analytics/> bileşeni useSearchParams() çağırıyor; Suspense ' +
+      'sınırı markerı KALDIRMIYOR ama KAPSIYOR — sayfa gövdesi sunucudan gelmeye devam ' +
+      'ediyor. 2026-09-04 ölçümü: #989 (a1d7d4f4, Suspense İÇERİDEYKEN) PDP bailout 3, ' +
+      'içerik markerları (h1, >Model Seçimi<) GEÇTİ. Sınır olmadan tüm ağaç düşüyordu.',
+    marker: 1,
+  },
+]
+
+/** İlan edilen adaların kattığı toplam marker — PDP tavanı budur. */
+export const PDP_MAX_BAILOUT = PDP_BILINCLI_ADALAR.reduce((n, a) => n + a.marker, 0)
+
 export interface Kural {
   yol: string
   sinif: Sinif
@@ -194,15 +253,15 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
       kapida: true,
     },
 
-    // PDP: 2 bailout BİLİNÇLİ (galeri + 3D adaları). `>Model Seçimi<` DOM-only eşleşir —
-    // RSC payload'ında metin tırnak-escape'li geçtiği için yalnız gerçek DOM'da bulunur.
-    // Ölçüldü: üç ayrı PDP'de de h1=1, `>Model Seçimi<`=1, bailout=2 → beklenti sayfaya
-    // değil PDP SINIFINA ait.
+    // PDP: bailout tavanı İLAN'dan türetilir (`PDP_BILINCLI_ADALAR`) — çıplak sayı yok.
+    // `>Model Seçimi<` DOM-only eşleşir — RSC payload'ında metin tırnak-escape'li geçtiği
+    // için yalnız gerçek DOM'da bulunur. Ölçüldü: üç ayrı PDP'de de h1=1,
+    // `>Model Seçimi<`=1 → beklenti sayfaya değil PDP SINIFINA ait.
     {
       yol: t.pdp as string,
       sinif: 'pdp',
       markerlar: [/<h1[\s>]/, />Model Seçimi</],
-      maxBailout: 2,
+      maxBailout: PDP_MAX_BAILOUT,
       kapida: true,
     },
   ]
