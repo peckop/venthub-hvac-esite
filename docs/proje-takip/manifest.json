@@ -1,0 +1,41 @@
+{
+  "surum": 1,
+  "nicin_var": "Proje YURUTME kaynaklarinin (cetvel, plan, olcum, karar, brief, hafiza) TEK listesi. NotebookLM 'Venthub Proje Takip' defteri bu listeden uretilir; listede olmayan sey deftere girmez, koddan uretilen md'ler (master'lar, companion'lar, config .md'leri) HICBIR ZAMAN girmez. Cetvel: docs/standards/proje-takip-defteri-standard.md",
+  "defter": { "ad": "Venthub Proje Takip", "id": "a5f382a4-b4e7-450c-84e0-9b7c082e2502" },
+  "kokler": {
+    "repo": ".",
+    "hafiza": "C:/Users/alize/.claude/projects/c--Users-alize-venthub-hvac/memory"
+  },
+  "demet_ust_siniri_bayt": 900000,
+  "demetler": [
+    { "ad": "01-cekirdek-ve-durum", "baslik": "Cekirdek belgeler + durum takip + kucuk klasorler", "kok": "repo",
+      "dahil": ["CLAUDE.md", "CONTEXT.md", "PROJECT.md", "VISION.md", "RECOMMENDATIONS.md", "CHANGELOG.md", "README.md", "ORIGINAL_REQUEST.md", "implementation_plan.md",
+                "docs/README.md", "docs/DURUM-TAKIP.md", "docs/recep-komut-rehberi.md",
+                "docs/legal/*.md", "docs/products/*.md", "docs/reference/*.md", "docs/research/*.md"] },
+    { "ad": "02-cetveller-standards", "baslik": "Cetveller (docs/standards)", "kok": "repo", "dahil": ["docs/standards/*.md"] },
+    { "ad": "03-planlar", "baslik": "Planlar ve yol haritalari (docs/plans)", "kok": "repo", "dahil": ["docs/plans/*.md"] },
+    { "ad": "04-olcumler-audits", "baslik": "Olcumler ve denetimler (docs/audits)", "kok": "repo", "dahil": ["docs/audits/*.md"] },
+    { "ad": "05-arsiv", "baslik": "Arsiv (docs/archive)", "kok": "repo", "dahil": ["docs/archive/*.md"] },
+    { "ad": "06-hafiza-notlari", "baslik": "Orkestrator hafiza notlari (feedback / project / reference)", "kok": "hafiza",
+      "dahil": ["*.md"], "haric": ["ops-cycle-audit-state.md"] },
+    { "ad": "07-hafiza-gunluk-ops", "baslik": "Orkestrator gunluk durum dosyasi (ops-cycle-audit-state)", "kok": "hafiza",
+      "dahil": ["ops-cycle-audit-state.md"] },
+    { "ad": "08-linear-kararlar", "baslik": "Linear disa aktarimi: Kararlar belgeleri", "kok": "repo",
+      "dahil": ["docs/proje-takip/linear/kararlar-*.md"] },
+    { "ad": "09-linear-anahtar-ve-is-kayitlari", "baslik": "Linear disa aktarimi: Anahtar ve Kip Haritasi + is kayitlari", "kok": "repo",
+      "dahil": ["docs/proje-takip/linear/anahtar-*.md", "docs/proje-takip/linear/is-kayitlari-*.md"] },
+    { "ad": "10-design-15a-briefler", "baslik": "Design 15A: OPS brief'leri + Design bulgu dosyalari", "kok": "repo",
+      "dahil": ["docs/proje-takip/design-15a/*.md"] },
+    { "ad": "11-proje-takip-analizler", "baslik": "Proje takip analizleri (celiski/mukerrerlik taramalari, esitleme kayitlari)", "kok": "repo",
+      "dahil": ["docs/proje-takip/*.md"] }
+  ],
+  "asla_dahil_etme": {
+    "nicin": "koddan / aractan URETILMIS; tazelik kapisi ayri (uretilmis-artefakt-standard). Deftere girerse NLM cevaplari kod snapshot'ina baglanir ve drift eder.",
+    "desenler": ["docs/*_master.md", "docs/system_tree.md", "docs/design_system_config.md", "src/**/*.md", "supabase/**/*.md", "scripts/**/*.md",
+                 "*.config.md", "next-env.d.md", "vitest-setup.md", "vitest.setup.md", "TEST_INFRA.md", "TEST_READY.md", "docs/artefakt_manifest.json"]
+  },
+  "linear_disa_aktarim": {
+    "nicin": "Linear MCP betikten cagrilamaz; OPS karar/anahtar belgesi degisince docs/proje-takip/linear/ altindaki kopyayi yeniler (elle ya da oturumdan). Kopya tarihi dosya basinda durur.",
+    "belgeler": ["Kararlar — Vitrin 15A", "Anahtar ve Kip Haritası — aç/kapa envanteri"]
+  }
+}
