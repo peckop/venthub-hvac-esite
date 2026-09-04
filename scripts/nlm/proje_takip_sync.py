@@ -40,7 +40,12 @@ def yaz_json(p, v):
 
 def kok_yolu(m, ad):
     k = m["kokler"][ad]
-    return REPO if k == "." else k
+    if k == ".":
+        return REPO
+    # INV-MUTLAK-YOL-1: manifest kimlik sizdiran mutlak yol tasimaz; "~" ev dizinine acilir,
+    # ortam degiskeni (VENTHUB_PROJE_TAKIP_<AD>) verilirse o kazanir.
+    ezme = os.environ.get("VENTHUB_PROJE_TAKIP_" + ad.upper())
+    return os.path.expanduser(ezme or k)
 
 
 def haric_mi(rel, desenler):

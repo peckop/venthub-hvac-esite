@@ -4,7 +4,8 @@
   "defter": { "ad": "Venthub Proje Takip", "id": "a5f382a4-b4e7-450c-84e0-9b7c082e2502" },
   "kokler": {
     "repo": ".",
-    "hafiza": "C:/Users/alize/.claude/projects/c--Users-alize-venthub-hvac/memory"
+    "hafiza": "~/.claude/projects/c--Users-alize-venthub-hvac/memory",
+    "_not": "~ ev dizinine acilir (os.path.expanduser); VENTHUB_PROJE_TAKIP_HAFIZA ortam degiskeni verilirse o kazanir (INV-MUTLAK-YOL-1: kimlik sizdiran mutlak yol depoya girmez)"
   },
   "demet_ust_siniri_bayt": 900000,
   "demetler": [
