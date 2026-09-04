@@ -1,0 +1,21 @@
+{
+  "surum": 1,
+  "nicin_var": "anon anahtari prod istemci paketinde ACIK (olculdu 2026-09-04: 17 chunk'tan 2'si tasiyor, rol=anon, 2035'e kadar gecerli) ve oyle TASARLANMIS. anon o anahtarla vitrin tablolarini OKUYABILIYOR. Yazmayi engelleyen tek sey RLS politikasi yoklugu — cunku tablo duzeyinde anon rolune DELETE/INSERT/UPDATE GRANT'i VERILMIS. Yani koruma TEK KATMANDA. Grant'lari geri almak migration ister (Recep kapisi); bu ilan + nobetci o karar gelene kadar sinifi GORUNUR tutar ve REGRESYONU yakalar: listede olmayan yeni bir yazma politikasi cikarsa kapi KIRMIZI verir.",
+  "kapi": "scripts/db/checks/anon-yazma-nobetcisi.mjs (db-advisor.yml -> advisor job'i)",
+  "olcum_tarihi": "2026-09-04",
+  "olcut": "Evren SABIT LISTE DEGIL, TURETILIR: anon'un SELECT grant'i oldugu tablolar (bugun 19). O tablolarda 'anon' ya da 'public' rolune tanimli INSERT/UPDATE/DELETE/ALL politikalari aranir. Sabit tablo listesi yazmak bayatlar — ayni gun bu sinifin bedeli iki kez odendi (duman kilidinde bayat slug 404 verdi; ve bu ilanin kendi ilk olcumu 10 tabloyla yapilip 19'luk evreni kacirdi).",
+  "nicin_ilan_ve_mandal": "Nobetci 'politika VARSA kirmizi' diye yazilsaydi ILK kosumda sahte kirmizi verirdi ve kapi dogar dogmaz guvenilmez olurdu — asagidaki tek kalem MESRU. Onun yerine mutlak-yol istisnalari deseni kullanildi: bilinen kalemler gerekcesiyle ilan edilir, YENISI cikarsa kirmizi. Boylece bugunku mesru politika is akisini bloklamaz ama yarin anon'a gercek yazma acilirsa kapi yakalar.",
+  "sinir": "Bu nobetci POLITIKA VARLIGINI olcer, politikanin KOSULUNU degerlendirmez. `with_check` icindeki fonksiyonun anon icin gercekten false dondugunu SQL statik olarak kanitlayamaz; asagidaki kalemde bu ADIYLA yazildi ve elle dogrulandi. Yeni bir kalem eklenirken ayni dogrulama ELLE yapilmali — 'ilan edildi' otomatik 'guvenli' demek DEGILDIR.",
+  "ilan_edilen_politikalar": [
+    {
+      "tablo": "order_invoices",
+      "politika": "order_invoices_admin_insert",
+      "cmd": "INSERT",
+      "roller": "{public}",
+      "with_check": "is_admin_user()",
+      "nicin_mesru": "Politika 'public' rolune yazilmis, yani anon da kapsamda GORUNUYOR — ama kosulu is_admin_user(). anon icin bu fonksiyon false doner, dolayisiyla anon YAZAMAZ. Yanlis pozitif; kaldirilmasi gereken bir sey degil. NOT: 'public' role yerine 'authenticated' yazilmasi daha dar ve daha okunur olurdu; bu bir SERTLESTIRME onerisi, kusur degil.",
+      "dogrulandi": "2026-09-04, ALTYAPI — pg_policies uzerinden okundu ve kosulu elle degerlendirildi",
+      "kayit": "REC-138 yan bulgusu"
+    }
+  ]
+}
