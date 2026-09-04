@@ -49,6 +49,11 @@ bulgu dosyaları `docs/proje-takip/design-15a/` altında yaşar (önceden yalnı
   haritası); çıktı `docs/proje-takip/celiski-mukerrerlik-analizi-<tarih>.md` olarak depoya girer ve deftere yüklenir.
 
 ## 5. Kapı (v1: yok; v1.1 adayı)
+**Dışa aktarım damgası (09-04 olayı):** `docs/proje-takip/linear/*.md` başında makine-okur satır bulunur:
+`kaynak_id · kaynak_updatedAt · kopya`. Bayatlık metin uyarısıyla değil KARŞILAŞTIRMAYLA ölçülür: Linear belgesinin
+`updatedAt` değeri damgadan büyükse kopya bayattır. Olay: 13:15 sürümlü ikinci bir kopya (`design-15a/` altında) üç ayrı
+"Linear kazanır" uyarısı taşımasına rağmen URUN tarafından kanonik sanıldı; kopya kaldırıldı, tek kopya kuralı. v1.1
+kapı adayı: OPS açılış rutini iki damgayı karşılaştırır, ayrışınca uyarı (ALTYAPI kapı tarafını yazar).
 Bugün kapı yok; `olc` çıkış 3 iken merge'i durduran bir CI kolu NLM girişi olmadan kurulamaz. Aday: manifest kapsamındaki
 dosya değişen PR'da `state.json` da değişmemişse UYARI (kırmızı değil) — "eşitleme borcu" görünür kılınır.
 
