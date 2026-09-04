@@ -269,6 +269,16 @@ textarea:focus-visible {
   animation: whatsappPulse 2s infinite;
 }
 
+/* Güvenli alan dolgusu — iPhone alt çubuğu (home indicator) altında kalan bölge.
+   NİÇİN ARBITRARY TAILWIND DEĞİL SINIF: `env(safe-area-inset-bottom)` bir tasarım
+   ÖLÇÜSÜ değil, cihazın bildirdiği bir DEĞERDİR; tokens.js'te karşılığı olamaz
+   (sabit bir sayı değil). CLAUDE.md kural 8 sabit ölçülerin token'dan gelmesini
+   ister; bu onun kapsamına girmez ve kaçamak yapılmıyor — burada tek yerde,
+   adıyla tanımlı. Kullanan: mobil alt sekme çubuğu (REC-129 Faz 1b). */
+.pb-guvenli-alan {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 @layer base {
   :root {
     /* ── MARKA PALETİ (REC-129, Recep kararı 2026-09-04) ─────────────────

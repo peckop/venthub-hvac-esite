@@ -28,3 +28,23 @@
  * gerektiği vaat-bütünlüğü cetvelinin §4.5 tablosunda satır satır yazılı.
  */
 export const UC_BOYUT_MUSTERI_YUZEYINDE = false
+
+/**
+ * Mobil alt sekme çubuğu (REC-129 Faz 1b, tasarım v13 ekran 01/02/12).
+ *
+ * Beş sekme: Ana sayfa · Ürünler · Teklif (rozet) · Destek · Hesap.
+ * Yalnız mobil kırılımda (`md` altı) çizilir; masaüstünde HİÇ render edilmez.
+ *
+ * NİÇİN KAPALI DOĞUYOR: kabuk fazlı üretiliyor ve bu çubuk tek başına eksik bir
+ * deneyimdir — header hâlâ eski altı eylemi taşıyor, ikisi aynı anda açık olursa
+ * ziyaretçi aynı işi iki yerde görür (geri-bildirim §36'nın tam olarak reddettiği şey).
+ * Bayrak, header paneli (Faz 1c) de indikten sonra TEK seferde açılır.
+ *
+ * NİÇİN ENV DEĞİL SABİT: yukarıdaki gerekçenin aynısı — bu bayrağı tüketen bileşen
+ * `'use client'`; `NEXT_PUBLIC_` öneki unutulursa değer sessizce `undefined` olur ve
+ * bayrak kapalı gibi davranır, kimse fark etmez.
+ *
+ * Geri açma: bu değeri `true` yap. Açmadan ÖNCE header'ın eski eylem kümesinin
+ * Faz 1c ile tek öğeye indiği doğrulanmalı — yoksa çift gezinme doğar.
+ */
+export const MOBIL_ALT_SEKME_CUBUGU = false

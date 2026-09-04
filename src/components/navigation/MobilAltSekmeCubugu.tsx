@@ -1,0 +1,234 @@
+'use client'
+
+/**
+ * Mobil alt sekme çubuğu — REC-129 Faz 1b (tasarım v13, ekran 01/02/12).
+ *
+ * Beş sekme: Ana sayfa · Ürünler · Teklif (rozet) · Destek · Hesap.
+ * `MOBIL_ALT_SEKME_CUBUGU` bayrağı KAPALIYKEN hiç render edilmez (bileşen `null` döner),
+ * ve açıkken de yalnız `md` altı kırılımda görünür — masaüstünde `hidden`.
+ *
+ * ⭐NİÇİN KENDİ PANELİNİ TAŞIYOR (ölçüldü, varsayılmadı):
+ * "Ürünler'e dokununca header'ın menüsü açılsın" tasarlanabilirdi ama AÇILAMAZ:
+ * `useNavigationState` bir CONTEXT değil, bileşen-yerel `useState`'tir (ölçüldü:
+ * depoda `NavigationContext`/`NavigationProvider` YOK). Bu çubuktan çağrılsa
+ * StickyHeader'ınkinden AYRI bir durum açardı ve header'ın menüsü açılmazdı.
+ * Bu yüzden çubuk kendi alt panelini yönetir. Durumu birleştirmek Faz 1c'nin işidir
+ * (header tek öğeye inerken); burada sahte bir birleşme taklidi yapılmıyor.
+ *
+ * ⛔BU BİLEŞENİN VAAT ETMEDİĞİ ŞEY: "Teklif" sekmesindeki sayı teklif listesindeki
+ * kalem sayısıdır — sipariş değil. Site teklif modundadır ve buradaki hiçbir metin
+ * satın alma/sipariş vaat etmez (vaat-bütünlüğü cetveli §1.4).
+ */
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
+
+import { MOBIL_ALT_SEKME_CUBUGU } from '../../config/features'
+import { useCart } from '../../hooks/useCartHook'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
+import { useI18n } from '../../i18n/I18nProvider'
+
+type SekmeKimlik = 'anasayfa' | 'urunler' | 'teklif' | 'destek' | 'hesap'
+
+/** 44px dokunma hedefi — v13 ekran 01. Token: `min-h-11` = 2.75rem = 44px. */
+const DOKUNMA_HEDEFI = 'min-h-11 min-w-11'
+
+function Ikon({ d, dolu = false }: { d: string; dolu?: boolean }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width={22}
+      height={22}
+      viewBox="0 0 24 24"
+      fill={dolu ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d={d} />
+    </svg>
+  )
+}
+
+const YOLLAR: Record<SekmeKimlik, string> = {
+  anasayfa: 'M3 10.5 12 3l9 7.5M5.25 9.75V21h13.5V9.75',
+  // "Ürünler" ikonu marka işaretinin sadeleştirilmiş hâli (eğik kanatçık) — v13.
+  urunler: 'M4 7.5h10.5a3.5 3.5 0 1 1-3.5 3.5M4 12h6.5M4 16.5h13a3.5 3.5 0 1 0-3.5-3.5',
+  teklif: 'M6 7V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1M4 7h16l-1.2 12.1a2 2 0 0 1-2 1.9H7.2a2 2 0 0 1-2-1.9L4 7Z',
+  destek: 'M12 18.75a6.75 6.75 0 1 0-6.75-6.75v4.5A2.25 2.25 0 0 0 7.5 18.75h.75v-6h-3M18.75 12.75h-3v6h.75a2.25 2.25 0 0 0 2.25-2.25v-3.75',
+  hesap: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z',
+}
+
+export default function MobilAltSekmeCubugu() {
+  // Bayrak kapalıyken HİÇBİR şey render edilmez — hook'lardan önce dönmüyoruz ki
+  // React hook sırası bozulmasın; erken dönüş en aşağıda, tüm hook'lardan sonra.
+  const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
+  const pathname = usePathname()
+  const { getCartCount } = useCart()
+
+  const [destekAcik, setDestekAcik] = useState(false)
+  const [urunlerAcik, setUrunlerAcik] = useState(false)
+  const [gomulu, setGomulu] = useState(false)
+  const destekBaslikId = useId()
+  const urunlerBaslikId = useId()
+  const destekDugmesi = useRef<HTMLButtonElement>(null)
+  const urunlerDugmesi = useRef<HTMLButtonElement>(null)
+
+  // Rozet SUNUCUDA çizilmez: sepet sayısı istemci durumudur ve sunucu HTML'ine
+  // yazılırsa hidrasyon uyuşmazlığı olur. StickyHeader'daki `isMounted` deseni.
+  useEffect(() => setGomulu(true), [])
+
+  // Yol değişince açık panelleri kapat — yoksa gezindikten sonra panel havada kalır.
+  useEffect(() => {
+    setDestekAcik(false)
+    setUrunlerAcik(false)
+  }, [pathname])
+
+  const kapat = useCallback(() => {
+    setDestekAcik(false)
+    setUrunlerAcik(false)
+  }, [])
+
+  // Escape ile kapanma + odağı açan düğmeye geri verme (a11y: klavye tuzağı yok).
+  useEffect(() => {
+    if (!destekAcik && !urunlerAcik) return
+    const el = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      const geriDonulecek = destekAcik ? destekDugmesi.current : urunlerDugmesi.current
+      kapat()
+      geriDonulecek?.focus()
+    }
+    document.addEventListener('keydown', el)
+    return () => document.removeEventListener('keydown', el)
+  }, [destekAcik, urunlerAcik, kapat])
+
+  const sayi = gomulu ? getCartCount() : 0
+  const aktif = (yol: string) => pathname === yol || pathname.startsWith(`${yol}/`)
+
+  if (!MOBIL_ALT_SEKME_CUBUGU) return null
+
+  const sekmeSinifi = (secili: boolean) =>
+    [
+      'flex flex-1 flex-col items-center justify-center gap-1 px-1 py-2',
+      DOKUNMA_HEDEFI,
+      'text-xs font-medium leading-none',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-1',
+      secili ? 'text-primary-navy' : 'text-steel-gray',
+    ].join(' ')
+
+  const yaprakOgesi =
+    'flex items-center gap-3 rounded-lg px-4 py-3 min-h-11 text-sm text-industrial-gray ' +
+    'hover:bg-light-gray focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy'
+
+  return (
+    <>
+      {(destekAcik || urunlerAcik) && (
+        // Perde: panel açıkken arkaya dokunmak kapatır. `aria-hidden` çünkü perdenin
+        // kendisi okunacak bir içerik değil; kapatma yolu Escape ve düğme ile de var.
+        <div
+          aria-hidden="true"
+          onClick={kapat}
+          className="fixed inset-0 z-40 bg-industrial-gray/40 md:hidden"
+        />
+      )}
+
+      {urunlerAcik && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={urunlerBaslikId}
+          className="fixed inset-x-0 bottom-0 z-50 max-h-mobil-yaprak overflow-y-auto rounded-t-2xl bg-clean-white p-4 shadow-2xl md:hidden"
+        >
+          <h2 id={urunlerBaslikId} className="mb-3 text-base font-semibold text-primary-navy">
+            {t('altSekme.urunler')}
+          </h2>
+          <nav className="flex flex-col gap-1">
+            <Link href={Routes.products()} onClick={kapat} className={yaprakOgesi}>
+              {t('altSekme.tumUrunler')}
+            </Link>
+            <Link href={Routes.brands()} onClick={kapat} className={yaprakOgesi}>
+              {t('altSekme.markalar')}
+            </Link>
+          </nav>
+        </div>
+      )}
+
+      {destekAcik && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={destekBaslikId}
+          className="fixed inset-x-0 bottom-0 z-50 max-h-mobil-yaprak overflow-y-auto rounded-t-2xl bg-clean-white p-4 shadow-2xl md:hidden"
+        >
+          <h2 id={destekBaslikId} className="mb-3 text-base font-semibold text-primary-navy">
+            {t('altSekme.destek')}
+          </h2>
+          <nav className="flex flex-col gap-1">
+            <Link href={Routes.destek.home()} onClick={kapat} className={yaprakOgesi}>
+              {t('altSekme.teknikDestek')}
+            </Link>
+            <Link href={Routes.contact()} onClick={kapat} className={yaprakOgesi}>
+              {t('altSekme.iletisim')}
+            </Link>
+          </nav>
+        </div>
+      )}
+
+      <nav
+        aria-label={t('altSekme.etiket')}
+        className="fixed inset-x-0 bottom-0 z-50 flex border-t border-light-gray bg-clean-white pb-guvenli-alan md:hidden"
+      >
+        <Link href={Routes.home()} className={sekmeSinifi(pathname === Routes.home())}>
+          <Ikon d={YOLLAR.anasayfa} />
+          {t('altSekme.anasayfa')}
+        </Link>
+
+        <button
+          ref={urunlerDugmesi}
+          type="button"
+          aria-expanded={urunlerAcik}
+          onClick={() => { setDestekAcik(false); setUrunlerAcik((a) => !a) }}
+          className={sekmeSinifi(aktif(Routes.products()) || urunlerAcik)}
+        >
+          <Ikon d={YOLLAR.urunler} />
+          {t('altSekme.urunler')}
+        </button>
+
+        <Link href={Routes.cart()} className={sekmeSinifi(aktif(Routes.cart()))}>
+          <span className="relative">
+            <Ikon d={YOLLAR.teklif} />
+            {sayi > 0 && (
+              <span
+                // Rozet TEK BAŞINA anlam taşımaz: yanındaki metin ("Teklif") ve
+                // aria-label sayıyı sözle de söyler. Renk tek bilgi taşıyıcı değil.
+                className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-navy px-1 text-xs font-bold text-clean-white"
+              >
+                {sayi}
+              </span>
+            )}
+          </span>
+          <span>{t('altSekme.teklif')}</span>
+          <span className="sr-only">{t('altSekme.teklifSayisi').replace('{n}', String(sayi))}</span>
+        </Link>
+
+        <button
+          ref={destekDugmesi}
+          type="button"
+          aria-expanded={destekAcik}
+          onClick={() => { setUrunlerAcik(false); setDestekAcik((a) => !a) }}
+          className={sekmeSinifi(destekAcik)}
+        >
+          <Ikon d={YOLLAR.destek} />
+          {t('altSekme.destek')}
+        </button>
+
+        <Link href={Routes.account.overview()} className={sekmeSinifi(aktif(Routes.account.overview()))}>
+          <Ikon d={YOLLAR.hesap} />
+          {t('altSekme.hesap')}
+        </Link>
+      </nav>
+    </>
+  )
+}

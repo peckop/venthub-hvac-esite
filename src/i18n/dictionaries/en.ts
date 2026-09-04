@@ -731,6 +731,24 @@ export const en: typeof tr = {
     },
     productCategories: 'Product Categories',
   },
+  altSekme: {
+    // REC-129 Faz 1b — mobile bottom tab bar (design v13, screens 01/02/12).
+    // Keys are NESTED: `getDictValue` cannot resolve a flat dotted key and would
+    // render the raw key (CLAUDE.md rule 7 · i18n-dead-key gate).
+    etiket: 'Bottom navigation',
+    anasayfa: 'Home',
+    urunler: 'Products',
+    teklif: 'Quote',
+    // Also states the badge number in WORDS (screen readers). The badge alone
+    // carries no meaning — colour/position cannot be the only information carrier.
+    teklifSayisi: '{n} items in quote list',
+    destek: 'Support',
+    hesap: 'Account',
+    tumUrunler: 'All products',
+    markalar: 'Brands',
+    teknikDestek: 'Technical support',
+    iletisim: 'Contact',
+  },
   header: {
     adminBar: {
       brand: 'VH / ADMIN',
