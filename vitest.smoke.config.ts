@@ -18,6 +18,13 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['tests/smoke/**/*.spec.ts'],
+    /**
+     * `verbose` BİLİNÇLİ: hangi temsilci rotanın seçildiği her koşumda GÖRÜNMELİ
+     * (katalog her gün değişiyor; "dün geçti bugün düştü" sorusunun cevabı kayıtta
+     * dursun). Ölçüldü: varsayılan reporter YEŞİL koşumda `console.log`'u bastırıyor,
+     * yani temsilci satırı yalnız kırmızıda görünürdü — tam ihtiyaç duyulmayan anda.
+     */
+    reporters: ['verbose'],
     testTimeout: 30000,
     hookTimeout: 30000,
   },
