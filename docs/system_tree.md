@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T18:22:26.278144+00:00
+compiled_at: 2026-09-04T11:07:42.307028+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-04T11:07:42.307028+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -53,15 +53,18 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
 │   │   ├── ⚪ `i18n-sozluk-render-denetimi-2026-08-23.md`
 │   │   ├── ⚪ `kasa-ve-siralama-denetimi-2026-08-23.md`
+│   │   ├── ⚪ `katalog-sayim-2026-09-03.md`
 │   │   ├── ⚪ `legal-i18n-scope-antigravity-2026-06-16.md`
 │   │   ├── ⚪ `lighthouse_diagnostic_2026-06-10.md`
 │   │   ├── ⚪ `locale-kasa-envanteri-2026-08-23.md`
 │   │   ├── ⚪ `odeme-yolu-denetimi-2026-08-15.md`
 │   │   ├── ⚪ `operasyon-dongusu-denetimi-2026-08-15.md`
 │   │   ├── ⚪ `product-schema-ground-truth-2026-06-21.md`
+│   │   ├── ⚪ `rec124-katalog-veri-kusurlari-2026-09-04.md`
 │   │   ├── ⚪ `registry-triyaj-2026-08-26.md`
 │   │   ├── ⚪ `render-stratejisi-denetimi-2026-08-16.md`
 │   │   ├── ⚪ `secret-exposure-audit-2026-08-15.md`
+│   │   ├── ⚪ `sir-ekrana-basma-olayi-2026-09-04.md`
 │   │   ├── ⚪ `t021-analytics-coverage-2026-08-19.md`
 │   │   ├── ⚪ `t077-ad-arayan-iddia-taramasi-2026-08-17.md`
 │   │   ├── ⚪ `t099-aile-icerik-uyumu-2026-08-18.md`
@@ -201,6 +204,8 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ⚪ `is-kayit-duzeni-standard.md`
 │   │   ├── ⚪ `katalog-sayim-standard.md`
 │   │   ├── ⚪ `legal-compliance-standard.md`
+│   │   ├── ⚪ `marka-token-eslemesi-standard.md`
+│   │   ├── ⚪ `matris-gorunum-standard.md`
 │   │   ├── ⚪ `measurement-discipline-standard.md`
 │   │   ├── ⚪ `migration-safety-standard.md`
 │   │   ├── ⚪ `mockup-gelisim-hatti-standardi.md`
@@ -232,7 +237,8 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 ├── 📂 **e2e/**
 │   ├── ✅ `admin-smoke.e2e.ts`
 │   ├── ✅ `checkout-smoke.e2e.ts`
-│   └── ✅ `reflow.e2e.ts`
+│   ├── ✅ `reflow.e2e.ts`
+│   └── ✅ `ssr-html.e2e.ts`
 ├── ⚠️ `eslint.config.md`
 ├── ⚠️ `implementation_plan.md`
 ├── 📂 **memory-engine/**
@@ -582,6 +588,7 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   │   ├── ✅ `CategoryHubOverlay.tsx`
 │   │   │   ├── ✅ `EliteMegaMenu.tsx`
 │   │   │   ├── ✅ `MegaMenu3DBackground.tsx`
+│   │   │   ├── ❌ `MobilAltSekmeCubugu.tsx`
 │   │   │   ├── ✅ `NavActionButton.tsx`
 │   │   │   ├── ✅ `NavBrand.tsx`
 │   │   │   ├── ✅ `NavPrimaryRail.tsx`
@@ -1105,15 +1112,18 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   └── 📂 **tcmb-rates-sync/**
 │   └── 📂 **migrations/**
 ├── 📂 **support/**
-└── ✅ `tailwind.config.js`
+├── ✅ `tailwind.config.js`
+└── ✅ `vitest.smoke.config.ts`
 ```
 
 ## Eksik Dokümantasyonlar
+- [ ] `src\components\navigation\MobilAltSekmeCubugu.tsx`
 - [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
 - [ ] `src\lib\seo\indexnow.ts`
+- [ ] `src\components\navigation\MobilAltSekmeCubugu.tsx`
 - [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
