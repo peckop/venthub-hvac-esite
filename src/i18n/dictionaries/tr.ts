@@ -733,17 +733,10 @@ export const tr = {
     // taşımaz — renk/konum tek bilgi taşıyıcı olamaz.
     teklifSayisi: 'teklif listesinde {n} kalem',
     destek: 'Destek',
-    hesap: 'Hesap',
     tumUrunler: 'Tüm ürünler',
     markalar: 'Markalar',
     teknikDestek: 'Teknik destek',
     iletisim: 'İletişim',
-    // Hesap yaprağı (REC-129 Faz 1c, Recep hükmü 2026-09-04): yüzen dil seçici
-    // kaldırıldı; mobilde dilin tek girişi bu yaprağın en üstüdür.
-    dil: 'Dil',
-    hesabim: 'Hesabım',
-    girisYapin: 'Giriş yapın',
-    kilitli: '(giriş gerekir)',
   },
   header: {
     adminBar: {

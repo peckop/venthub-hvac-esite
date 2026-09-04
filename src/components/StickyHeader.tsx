@@ -273,20 +273,44 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
                   (mobilde bunların yerini alt sekme çubuğu alır, Faz 1b).
                   Bayrak KAPALIYKEN aşağıdaki eski küme aynen çizilir — bugünkü hâl. */}
               {YENI_KABUK_GEZINMESI ? (
-                /* ⭐MOBİLDE GİZLİ — `hidden md:block`. Bayrak açık hâliyle ekran
-                   görüntüsü alındığında GÖRÜLDÜ ki mobilde "Teklif" hem burada hem
-                   alt sekme çubuğunda duruyor: aynı ad, aynı iş, iki farklı davranış.
-                   Tasarım v13 (K5/K9) bu öğeyi MASAÜSTÜ kuralı sayıyor; mobilde üstte
-                   yalnız logo + arama kalır ve panelin girişi alt çubuğun Teklif
-                   sekmesidir. Bunu hiçbir statik kapı göremezdi — göz gördü. */
-                <div className="hidden md:flex items-center gap-2">
-                  {/* Tasarım sırası: arama · TR/EN · Teklif(n). Arama zaten solda
-                      duruyor; burada TR/EN ile Teklif yan yana gelir.
-                      Dil seçici artık YÜZMÜYOR (Recep hükmü 12:30) — masaüstündeki
-                      yeri burası, mobildeki yeri Hesap yaprağının en üstü. */}
-                  <LanguageSwitcher id="header-dil-secici" />
-                  <HeaderTeklifPaneli />
-                </div>
+                <>
+                  {/* MASAÜSTÜ kümesi — tasarım sırası: arama · TR/EN · Teklif(n).
+                      Arama solda duruyor; burada TR/EN ile Teklif yan yana gelir.
+
+                      ⭐"Teklif" MOBİLDE GİZLİ (`hidden md:flex`): bayrak açık hâliyle
+                      görüntülendiğinde mobilde "Teklif" hem burada hem alt sekme
+                      çubuğunda duruyordu — aynı ad, aynı iş, iki farklı davranış.
+                      Panelin mobil girişi alt çubuğun Teklif sekmesidir. */}
+                  <div className="hidden md:flex items-center gap-2">
+                    <LanguageSwitcher id="header-dil-secici" />
+                    <HeaderTeklifPaneli />
+                  </div>
+
+                  {/* ⭐MOBİL SAĞ ÜST — dil + giriş/hesap (Recep hükmü 2026-09-04).
+                      Önce ikisi de alt çubuğun Hesap yaprağındaydı; Recep bunların
+                      mobilde de SAĞ ÜSTTE olmasını istedi. Bu, 12:30'daki "mobilde
+                      üstte yalnız logo" kararından BİLEREK dönüştür.
+
+                      Sonucu var ve göze alındı: alt çubuktaki "Hesap" sekmesi
+                      KALDIRILDI (çubuk beş sekmeden dörde indi). Yoksa giriş hem
+                      burada hem orada dururdu — bugün temizlediğimiz "aynı iş iki
+                      yerde" kusurunun aynısı doğardı.
+
+                      Hedef giriş durumuna göre: girişliyse hesap, değilse giriş
+                      sayfası. Ölü kapı açılmıyor. */}
+                  <div className="flex items-center gap-1 md:hidden">
+                    <LanguageSwitcher id="mobil-dil-secici" />
+                    <Link
+                      href={user ? Routes.account.overview() : Routes.auth.login()}
+                      aria-label={user ? t('header.account') : t('common.signIn')}
+                      className="flex items-center justify-center min-h-11 min-w-11 rounded-lg text-primary-navy hover:bg-light-gray focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy"
+                    >
+                      <svg width={22} height={22} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
+                      </svg>
+                    </Link>
+                  </div>
+                </>
               ) : (
                 <>
               <div className="hidden xl:flex items-center gap-1.5 w-auto opacity-100">

@@ -91,9 +91,12 @@ describe('INV-ALTSEKME-1 — alt sekme çubuğu bayrağa bağlı ve yalnız mobi
   })
 
   it('sekme metinleri sözlükten geliyor — hiçbiri gövdeye gömülü değil', () => {
+    // `hesap` YOK ve bu bilinçli: giriş mobilde SAĞ ÜSTE taşındı (Recep, 2026-09-04),
+    // çubuk dört sekmeye indi. Anahtar da sözlükten kaldırıldı — kullanılmayan anahtar
+    // bırakmak ölü-anahtar bekçisini besler.
     const ANAHTARLAR = [
       'etiket', 'anasayfa', 'urunler', 'teklif', 'teklifSayisi',
-      'destek', 'hesap', 'tumUrunler', 'markalar', 'teknikDestek', 'iletisim',
+      'destek', 'tumUrunler', 'markalar', 'teknikDestek', 'iletisim',
     ]
     for (const a of ANAHTARLAR) {
       expect(

@@ -177,25 +177,44 @@ describe('INV-HEADER-TEKLIF-1 — header teklif paneli', () => {
     ).toBe(false)
   })
 
-  it('⭐alt çubuğun Hesap sekmesi YAPRAK açıyor, girişsizde ÖLÜ KAPI yok', () => {
+  it('⭐giriş ve dil MOBİLDE SAĞ ÜSTTE — hesap alt çubukta TEKRAR ETMİYOR', () => {
+    // Recep hukmu (2026-09-04): giris ve dil mobilde de sag ust. Bunun ZORUNLU
+    // sonucu alt cubuktaki "Hesap" sekmesinin KALKMASI — yoksa giris iki yerde
+    // olur ve bugun temizledigimiz kusur geri doner.
+    const mobilKume = HEADER_GOVDE.slice(HEADER_GOVDE.indexOf('md:hidden'))
     expect(
-      /<Link\s+href=\{Routes\.account\.overview\(\)\}[\s\S]{0,300}?altSekme\.hesap'\)\}\s*<\/Link>/.test(CUBUK_GOVDE),
-      'Hesap sekmesi hala dogrudan /account a giden bir Link — Recep hukmu yaprak acilmasi.',
-    ).toBe(false)
-    // Girissiz dalda hesap rotalari BAGLANTI olmamali; "kilitli" metin olarak durur.
-    const i = CUBUK_GOVDE.indexOf('user ?')
-    expect(i, 'Hesap yapraginda "user ?" dallanmasi YOK.').toBeGreaterThan(-1)
-    const sonrasi = CUBUK_GOVDE.slice(i)
-    const ayirici = sonrasi.indexOf(') : (')
-    const girissizDal = sonrasi.slice(ayirici)
-    expect(
-      /<Link[^>]*Routes\.account\./.test(girissizDal.slice(0, girissizDal.indexOf('</nav>'))),
-      'Girissiz dalda /account a giden bir Link var — olu kapi.',
-    ).toBe(false)
-    expect(
-      girissizDal.includes('altSekme.kilitli') && girissizDal.includes('aria-disabled'),
-      'Kilitli kalemler yok ya da ekran okuyucuya kilitli DENMIYOR.',
+      HEADER_GOVDE.includes('md:hidden'),
+      'Header da MOBILE ozel kume yok — giris/dil mobilde sag uste konmamis.',
     ).toBe(true)
+    expect(
+      mobilKume.includes('<LanguageSwitcher'),
+      'Mobil kumede dil secici YOK.',
+    ).toBe(true)
+    expect(
+      /href=\{user\s*\?\s*Routes\.account\.overview\(\)\s*:\s*Routes\.auth\.login\(\)\}/.test(HEADER_GOVDE),
+      'Mobil giris baglantisi giris durumuna gore dallanmiyor — girissizde /account a ' +
+        'gonderirse OLU KAPI olur.',
+    ).toBe(true)
+    // Alt cubukta "Hesap" sekmesi OLMAMALI (ne baglanti ne dugme).
+    expect(
+      CUBUK_GOVDE.includes("altSekme.hesap'"),
+      'Alt cubukta hala Hesap sekmesi var. Giris sag uste tasindi; ikisi birden ' +
+        'durursa ayni is IKI YERDE sunulur.',
+    ).toBe(false)
+    expect(
+      CUBUK_GOVDE.includes('Routes.account.'),
+      'Alt cubuk hala hesap rotasi tasiyor.',
+    ).toBe(false)
+  })
+
+  it('⭐alt çubuk DÖRT sekme — beşincisi sessizce geri gelmesin', () => {
+    const sekmeler = CUBUK_GOVDE.match(/altSekme\.(anasayfa|urunler|teklif|destek|hesap)'\)/g) || []
+    const tekil = [...new Set(sekmeler)]
+    expect(
+      tekil.length,
+      `Sekme sayisi 4 degil (${tekil.join(', ')}). Cubugun kac sekme tasidigi TASARIM ` +
+        'kararidir; degisiyorsa bilerek degismeli.',
+    ).toBe(4)
   })
 
   it('⭐yüzen yığın mobilde çubuğun ÜSTÜNDE — Hesap sekmesi tıklanabilir kalıyor', () => {
@@ -208,21 +227,23 @@ describe('INV-HEADER-TEKLIF-1 — header teklif paneli', () => {
     ).toBe(true)
   })
 
-  it('⭐yüzen dil seçici bayrak açıkken YOK — header ve Hesap yaprağına taşındı', () => {
+  it('⭐yüzen dil seçici YOK — dil her iki kırılımda da HEADER’da', () => {
     expect(
       new RegExp(`\\{!\\s*${BAYRAK}\\s*&&`).test(YERLESIM_GOVDE),
       'MainLayout taki yuzen dil secici bayrak acikken hala ciziliyor. Recep hukmu ' +
-        '(2026-09-04 12:30): yeni tasarimda YUZEN dil secici YOK.',
+        '(2026-09-04): yeni tasarimda YUZEN dil secici YOK.',
     ).toBe(true)
+    // Iki AYRI ornek: masaustu kumesi ve mobil kumesi. Biri eksikse o kirilimda dil
+    // DEGISTIRILEMEZ olur — ve bunu hicbir render testi tek dalda goremezdi.
+    const ornekSayisi = (HEADER_GOVDE.match(/<LanguageSwitcher/g) || []).length
     expect(
-      HEADER_GOVDE.includes('<LanguageSwitcher'),
-      'Masaustu header inde dil secici YOK — yuzen dugme kaldirildi, yerine konmadi: ' +
-        'masaustunde dil DEGISTIRILEMEZ olurdu.',
-    ).toBe(true)
+      ornekSayisi,
+      'Header da dil secici iki kez (masaustu + mobil kume) cizilmeli; bulunan: ' + ornekSayisi,
+    ).toBe(2)
     expect(
-      CUBUK_GOVDE.includes('<LanguageSwitcher') && CUBUK_GOVDE.includes('altSekme.dil'),
-      'Hesap yapraginda dil secici YOK — mobilde dil DEGISTIRILEMEZ olurdu.',
-    ).toBe(true)
+      CUBUK_GOVDE.includes('<LanguageSwitcher'),
+      'Alt cubuk hala dil secici tasiyor — dil ARTIK header da, iki yerde olmamali.',
+    ).toBe(false)
   })
 
   it('⭐panel içeriği TEK KAYNAK — iki yüzey kopyalanmıyor', () => {
