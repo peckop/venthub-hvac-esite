@@ -731,6 +731,20 @@ export const en: typeof tr = {
     },
     productCategories: 'Product Categories',
   },
+  teklifPaneli: {
+    // REC-129 Faz 1c — header "Quote" element and panel (design v13, screen 12).
+    teklif: 'Quote',
+    kalemSayisi: '{n} items in quote list',
+    baslik: 'Quote list · {n} items',
+    bosBaslik: 'Quote list is empty',
+    bosAciklama: 'Add items from products.',
+    urunlereGit: 'Go to products',
+    tumListe: 'See all ({n})',
+    tekliflerim: 'My quotes',
+    projelerim: 'My projects',
+    favorilerim: 'My favourites',
+    girisDaveti: 'Sign in to see your quotes and projects',
+  },
   altSekme: {
     // REC-129 Faz 1b — mobile bottom tab bar (design v13, screens 01/02/12).
     // Keys are NESTED: `getDictValue` cannot resolve a flat dotted key and would
@@ -748,6 +762,12 @@ export const en: typeof tr = {
     markalar: 'Brands',
     teknikDestek: 'Technical support',
     iletisim: 'Contact',
+    // Account sheet (REC-129 Faz 1c): the floating language switcher was removed;
+    // on mobile this sheet's top row is the only entry point for language.
+    dil: 'Language',
+    hesabim: 'My account',
+    girisYapin: 'Sign in',
+    kilitli: '(sign-in required)',
   },
   header: {
     adminBar: {

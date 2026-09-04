@@ -30,7 +30,7 @@ import { describe, expect, it } from 'vitest'
 const KOK = process.cwd()
 const oku = (...p: string[]) => readFileSync(join(KOK, ...p), 'utf8')
 
-const BAYRAK = 'MOBIL_ALT_SEKME_CUBUGU'
+const BAYRAK = 'YENI_KABUK_GEZINMESI'
 const CUBUK = oku('src', 'components', 'navigation', 'MobilAltSekmeCubugu.tsx')
 const FEATURES = oku('src', 'config', 'features.ts')
 const LAYOUT = oku('src', 'components', 'layout', 'MainLayout.tsx')

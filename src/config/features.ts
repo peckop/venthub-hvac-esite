@@ -30,21 +30,29 @@
 export const UC_BOYUT_MUSTERI_YUZEYINDE = false
 
 /**
- * Mobil alt sekme çubuğu (REC-129 Faz 1b, tasarım v13 ekran 01/02/12).
+ * REC-129 Faz 1 kabuk gezinmesi — mobil alt sekme çubuğu **VE** header "Teklif" paneli.
+ * (Tasarım v13, ekran 01/02/12.)
  *
- * Beş sekme: Ana sayfa · Ürünler · Teklif (rozet) · Destek · Hesap.
- * Yalnız mobil kırılımda (`md` altı) çizilir; masaüstünde HİÇ render edilmez.
+ * ⭐NİÇİN ADI DEĞİŞTİ (Faz 1c, 2026-09-04): bayrak `MOBIL_ALT_SEKME_CUBUGU` adıyla
+ * doğdu ve Faz 1b'de yalnız onu yönetiyordu. Faz 1c aynı bayrağın arkasına header
+ * değişikliğini de koyuyor — çünkü ikisi TEK SEFERDE açılmalı (yoksa aynı iş iki
+ * yerde görünür). Ama o hâlde eski ad YALAN SÖYLER: "mobil alt sekme çubuğu" diye
+ * okunan bir sabit, masaüstü header'ını da kapatıyor olurdu. **Alan adı taşıdığı
+ * birimi taahhüt eder**; ad, yönettiği kapsamla birlikte büyütüldü.
  *
- * NİÇİN KAPALI DOĞUYOR: kabuk fazlı üretiliyor ve bu çubuk tek başına eksik bir
- * deneyimdir — header hâlâ eski altı eylemi taşıyor, ikisi aynı anda açık olursa
+ * NE YÖNETİR (ikisi birlikte, tek anahtar — kasıtlı):
+ *  · Mobil alt sekme çubuğu (5 sekme) — `md` altı.
+ *  · Header eylem kümesinin TEK öğeye inmesi + "Teklif" paneli — her kırılımda.
+ *
+ * NİÇİN KAPALI DOĞUYOR: yarısı açık bir kabuk, kapalı bir kabuktan KÖTÜDÜR —
  * ziyaretçi aynı işi iki yerde görür (geri-bildirim §36'nın tam olarak reddettiği şey).
- * Bayrak, header paneli (Faz 1c) de indikten sonra TEK seferde açılır.
  *
- * NİÇİN ENV DEĞİL SABİT: yukarıdaki gerekçenin aynısı — bu bayrağı tüketen bileşen
- * `'use client'`; `NEXT_PUBLIC_` öneki unutulursa değer sessizce `undefined` olur ve
- * bayrak kapalı gibi davranır, kimse fark etmez.
+ * NİÇİN ENV DEĞİL SABİT: bu bayrağı tüketen bileşenlerin hepsi `'use client'`;
+ * `NEXT_PUBLIC_` öneki unutulursa değer sessizce `undefined` olur ve bayrak kapalı
+ * gibi davranır, kimse fark etmez.
  *
- * Geri açma: bu değeri `true` yap. Açmadan ÖNCE header'ın eski eylem kümesinin
- * Faz 1c ile tek öğeye indiği doğrulanmalı — yoksa çift gezinme doğar.
+ * Geri açma: bu değeri `true` yap. Açmadan ÖNCE ölçülmesi gereken: mobil kırılımda
+ * alt çubuk ile header'ın AYNI işi iki kez sunmadığı (Faz 1c bunu header tarafında
+ * çözüyor, ama açılış bir GÖZLE doğrulama ister — kapı semantik çakışmayı göremez).
  */
-export const MOBIL_ALT_SEKME_CUBUGU = false
+export const YENI_KABUK_GEZINMESI = false

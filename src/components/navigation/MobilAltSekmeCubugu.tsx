@@ -4,7 +4,7 @@
  * Mobil alt sekme çubuğu — REC-129 Faz 1b (tasarım v13, ekran 01/02/12).
  *
  * Beş sekme: Ana sayfa · Ürünler · Teklif (rozet) · Destek · Hesap.
- * `MOBIL_ALT_SEKME_CUBUGU` bayrağı KAPALIYKEN hiç render edilmez (bileşen `null` döner),
+ * `YENI_KABUK_GEZINMESI` bayrağı KAPALIYKEN hiç render edilmez (bileşen `null` döner),
  * ve açıkken de yalnız `md` altı kırılımda görünür — masaüstünde `hidden`.
  *
  * ⭐NİÇİN KENDİ PANELİNİ TAŞIYOR (ölçüldü, varsayılmadı):
@@ -23,10 +23,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 
-import { MOBIL_ALT_SEKME_CUBUGU } from '../../config/features'
+import { YENI_KABUK_GEZINMESI } from '../../config/features'
+import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
+import LanguageSwitcher from '../LanguageSwitcher'
+import TeklifPaneliIcerigi from './TeklifPaneliIcerigi'
 
 type SekmeKimlik = 'anasayfa' | 'urunler' | 'teklif' | 'destek' | 'hesap'
 
@@ -67,14 +70,21 @@ export default function MobilAltSekmeCubugu() {
   const Routes = useLocalizedRoutes()
   const pathname = usePathname()
   const { getCartCount } = useCart()
+  const { user } = useAuth()
 
   const [destekAcik, setDestekAcik] = useState(false)
   const [urunlerAcik, setUrunlerAcik] = useState(false)
+  const [teklifAcik, setTeklifAcik] = useState(false)
+  const [hesapAcik, setHesapAcik] = useState(false)
   const [gomulu, setGomulu] = useState(false)
   const destekBaslikId = useId()
   const urunlerBaslikId = useId()
+  const teklifBaslikId = useId()
+  const hesapBaslikId = useId()
   const destekDugmesi = useRef<HTMLButtonElement>(null)
   const urunlerDugmesi = useRef<HTMLButtonElement>(null)
+  const teklifDugmesi = useRef<HTMLButtonElement>(null)
+  const hesapDugmesi = useRef<HTMLButtonElement>(null)
 
   // Rozet SUNUCUDA çizilmez: sepet sayısı istemci durumudur ve sunucu HTML'ine
   // yazılırsa hidrasyon uyuşmazlığı olur. StickyHeader'daki `isMounted` deseni.
@@ -84,30 +94,40 @@ export default function MobilAltSekmeCubugu() {
   useEffect(() => {
     setDestekAcik(false)
     setUrunlerAcik(false)
+    setTeklifAcik(false)
+    setHesapAcik(false)
   }, [pathname])
 
   const kapat = useCallback(() => {
     setDestekAcik(false)
     setUrunlerAcik(false)
+    setTeklifAcik(false)
+    setHesapAcik(false)
   }, [])
 
   // Escape ile kapanma + odağı açan düğmeye geri verme (a11y: klavye tuzağı yok).
   useEffect(() => {
-    if (!destekAcik && !urunlerAcik) return
+    if (!destekAcik && !urunlerAcik && !teklifAcik && !hesapAcik) return
     const el = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return
-      const geriDonulecek = destekAcik ? destekDugmesi.current : urunlerDugmesi.current
+      const geriDonulecek = destekAcik
+        ? destekDugmesi.current
+        : urunlerAcik
+          ? urunlerDugmesi.current
+          : teklifAcik
+            ? teklifDugmesi.current
+            : hesapDugmesi.current
       kapat()
       geriDonulecek?.focus()
     }
     document.addEventListener('keydown', el)
     return () => document.removeEventListener('keydown', el)
-  }, [destekAcik, urunlerAcik, kapat])
+  }, [destekAcik, urunlerAcik, teklifAcik, hesapAcik, kapat])
 
   const sayi = gomulu ? getCartCount() : 0
   const aktif = (yol: string) => pathname === yol || pathname.startsWith(`${yol}/`)
 
-  if (!MOBIL_ALT_SEKME_CUBUGU) return null
+  if (!YENI_KABUK_GEZINMESI) return null
 
   const sekmeSinifi = (secili: boolean) =>
     [
@@ -124,7 +144,7 @@ export default function MobilAltSekmeCubugu() {
 
   return (
     <>
-      {(destekAcik || urunlerAcik) && (
+      {(destekAcik || urunlerAcik || teklifAcik) && (
         // Perde: panel açıkken arkaya dokunmak kapatır. `aria-hidden` çünkü perdenin
         // kendisi okunacak bir içerik değil; kapatma yolu Escape ve düğme ile de var.
         <div
@@ -176,6 +196,82 @@ export default function MobilAltSekmeCubugu() {
         </div>
       )}
 
+      {hesapAcik && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={hesapBaslikId}
+          className="fixed inset-x-0 bottom-0 z-50 max-h-mobil-yaprak overflow-y-auto rounded-t-2xl bg-clean-white p-4 shadow-2xl md:hidden"
+        >
+          <h2 id={hesapBaslikId} className="mb-3 text-base font-semibold text-primary-navy">
+            {t('altSekme.hesap')}
+          </h2>
+
+          {/* ⭐DİL EN ÜSTTE — yüzen seçici kaldırıldığı için mobildeki TEK dil girişi
+              burasıdır. Aşağı konsaydı ve liste uzasaydı görünmeyebilirdi. */}
+          <div className="mb-3 flex items-center justify-between border-b border-light-gray pb-3">
+            <span className="text-sm text-steel-gray">{t('altSekme.dil')}</span>
+            <LanguageSwitcher id="alt-sekme-dil-secici" />
+          </div>
+
+          <nav className="flex flex-col gap-1">
+            {user ? (
+              <>
+                <Link href={Routes.account.overview()} onClick={kapat} className={yaprakOgesi}>
+                  {t('altSekme.hesabim')}
+                </Link>
+                <Link href={Routes.account.quotes()} onClick={kapat} className={yaprakOgesi}>
+                  {t('teklifPaneli.tekliflerim')}
+                </Link>
+                <Link href={Routes.account.projects()} onClick={kapat} className={yaprakOgesi}>
+                  {t('teklifPaneli.projelerim')}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href={Routes.auth.login()} onClick={kapat} className={yaprakOgesi}>
+                  {t('altSekme.girisYapin')}
+                </Link>
+                {/* ⭐KİLİTLİ — bağlantı DEĞİL: Recep hükmü "Tekliflerim/Projelerim
+                    kilitli". Görünürler ki hesapla ne kazanılacağı bilinsin, ama
+                    tıklanamazlar; tıklanabilir olsalar giriş duvarına çarpan ÖLÜ KAPI
+                    olurlardı. `aria-disabled` ile ekran okuyucuya da kilitli denir. */}
+                {/* Anahtarlar LİTERAL yazılı, döngüyle değil: `t(değişken)` çağrısında
+                    ölü-anahtar bekçisi anahtarı GÖREMEZ ve sözlükten silinse kimse
+                    fark etmez. Kapı bunu yakaladı; iki satır tekrar, bir kör nokta. */}
+                <span
+                  aria-disabled="true"
+                  className="flex items-center gap-3 rounded-lg px-4 py-3 min-h-11 text-sm text-steel-gray opacity-60"
+                >
+                  {t('teklifPaneli.tekliflerim')}
+                  <span className="text-xs">{t('altSekme.kilitli')}</span>
+                </span>
+                <span
+                  aria-disabled="true"
+                  className="flex items-center gap-3 rounded-lg px-4 py-3 min-h-11 text-sm text-steel-gray opacity-60"
+                >
+                  {t('teklifPaneli.projelerim')}
+                  <span className="text-xs">{t('altSekme.kilitli')}</span>
+                </span>
+              </>
+            )}
+          </nav>
+        </div>
+      )}
+
+      {teklifAcik && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={teklifBaslikId}
+          className="fixed inset-x-0 bottom-0 z-50 max-h-mobil-yaprak overflow-y-auto rounded-t-2xl bg-clean-white p-4 shadow-2xl md:hidden"
+        >
+          {/* İçerik header panelininkiyle AYNI BİLEŞEN — kopyalanmadı. İki yüzey
+              zamanla ayrışsaydı hiçbir kapı bunu görmezdi; tek kaynak bunu imkânsız kılar. */}
+          <TeklifPaneliIcerigi kapat={kapat} baslikId={teklifBaslikId} />
+        </div>
+      )}
+
       <nav
         aria-label={t('altSekme.etiket')}
         className="fixed inset-x-0 bottom-0 z-50 flex border-t border-light-gray bg-clean-white pb-guvenli-alan md:hidden"
@@ -196,7 +292,20 @@ export default function MobilAltSekmeCubugu() {
           {t('altSekme.urunler')}
         </button>
 
-        <Link href={Routes.cart()} className={sekmeSinifi(aktif(Routes.cart()))}>
+        {/* ⭐DÜĞME, BAĞLANTI DEĞİL — ve bu düzeltme ölçüme dayanıyor:
+            Önce `/cart`'a giden bir `Link`'ti. Bayrak açık hâliyle görüntülendiğinde
+            mobilde header'daki "Teklif" öğesiyle YAN YANA duruyordu; ikisi aynı işi
+            iki farklı davranışla sunuyordu (biri panel, biri sayfa). Header öğesi
+            mobilde gizlendi, panelin girişi BURASI oldu — böylece "Teklif" mobilde
+            TEK yerde ve TEK davranışta. Tam liste hâlâ panelin içinden `/cart`'a gider. */}
+        <button
+          ref={teklifDugmesi}
+          type="button"
+          aria-expanded={teklifAcik}
+          aria-haspopup="dialog"
+          onClick={() => { setUrunlerAcik(false); setDestekAcik(false); setTeklifAcik((a) => !a) }}
+          className={sekmeSinifi(aktif(Routes.cart()) || teklifAcik)}
+        >
           <span className="relative">
             <Ikon d={YOLLAR.teklif} />
             {sayi > 0 && (
@@ -211,7 +320,7 @@ export default function MobilAltSekmeCubugu() {
           </span>
           <span>{t('altSekme.teklif')}</span>
           <span className="sr-only">{t('altSekme.teklifSayisi').replace('{n}', String(sayi))}</span>
-        </Link>
+        </button>
 
         <button
           ref={destekDugmesi}
@@ -224,10 +333,23 @@ export default function MobilAltSekmeCubugu() {
           {t('altSekme.destek')}
         </button>
 
-        <Link href={Routes.account.overview()} className={sekmeSinifi(aktif(Routes.account.overview()))}>
+        {/* ⭐YAPRAK AÇAR — Recep hükmü (2026-09-04 12:30). Önce koşulsuz `/account`'a
+            bağlıyordu ve girişsiz ziyaretçi giriş duvarına çarpıyordu (görüntüde
+            görüldü). Ara çözüm olarak girişsizde doğrudan girişe yollamıştım; hüküm
+            bundan farklı: yaprak açılır, EN ÜSTÜNDE dil seçici (yüzen düğme kalktığı
+            için mobildeki tek dil girişi burasıdır), altında giriş daveti ya da
+            hesap kısayolları. */}
+        <button
+          ref={hesapDugmesi}
+          type="button"
+          aria-expanded={hesapAcik}
+          aria-haspopup="dialog"
+          onClick={() => { setUrunlerAcik(false); setDestekAcik(false); setTeklifAcik(false); setHesapAcik((a) => !a) }}
+          className={sekmeSinifi(aktif(Routes.account.overview()) || hesapAcik)}
+        >
           <Ikon d={YOLLAR.hesap} />
           {t('altSekme.hesap')}
-        </Link>
+        </button>
       </nav>
     </>
   )
