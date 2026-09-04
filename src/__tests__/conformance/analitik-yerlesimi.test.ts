@@ -66,6 +66,10 @@ describe('INV-ANALITIK-1 — çerezsiz sayım ve rıza kapısı', () => {
     // SSR HTML'ine BAILOUT_TO_CLIENT_SIDE_RENDERING markeri giriyor (REC-138 kapisi PDP'de
     // 3 > 2 ile yakaladi). Dinamik rotalarda marker DOGMUYOR — yani "ana sayfada sorun yok"
     // demek yaniltici olurdu; kusur yalniz statik sinifta gorunur.
+    // ⚠Suspense markeri KALDIRMAZ, KAPSAR: sinirdan sonra da PDP'de marker 3'tur; sinir
+    // istemciye dusen parcayi bu adaya hapseder (icerik markerlari sunucuda kalir). Tavani
+    // (2->3) tests/smoke/ssr-kurallari.ts SAHIBI cikardi — bu kapi tavanla ilgilenmez,
+    // yalnizca Suspense sinirinin YERINDE oldugunu olcer.
     const i = LAYOUT_GOVDE.indexOf('<Analytics')
     expect(i, 'Analytics render edilmiyor.').toBeGreaterThan(-1)
     const oncesi = LAYOUT_GOVDE.slice(0, i)

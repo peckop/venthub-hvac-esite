@@ -84,8 +84,21 @@ export default function RootLayout({
                       `<Analytics/>` içeride `useSearchParams()` çağırıyor. Suspense'siz
                       bırakılınca, STATİK üretilen sayfalarda tüm ağaç istemciye düşüyor:
                       SSR HTML'ine `BAILOUT_TO_CLIENT_SIDE_RENDERING` markerı giriyor.
-                      REC-138 kapısı bunu PDP'de yakaladı (3 > 2) — eşik yükseltilmedi,
-                      çünkü sorun eşikte değil, kuralın ihlalindeydi (CLAUDE.md kural 5).
+                      REC-138 kapısı bunu PDP'de yakaladı (3 > 2).
+
+                      ⚠SUSPENSE MARKERI KALDIRMAZ, **KAPSAR** — bu ayrımı yanlış yazmıştım,
+                      düzeltiyorum: Suspense eklendikten SONRA da PDP'de marker sayısı 3'tür
+                      (bu commit'in kendisi 3 > 2 ile kırmızı koştu). Suspense'in yaptığı,
+                      istemciye düşen parçayı bu küçük adaya HAPSETMEK: sınır olmasaydı sayfanın
+                      tamamı istemciye düşerdi. Kanıtı aynı HTML'de: `<h1>` ve `>Model Seçimi<`
+                      markerları hâlâ sunucudan geliyor, kolun tek şikâyeti SAYI idi.
+
+                      Tavan (2 → 3) `tests/smoke/ssr-kurallari.ts` SAHİBİ tarafından çıkarıldı;
+                      ben kendi işime uydurmak için kapıya dokunmadım. Muafiyet yazılamıyor,
+                      çünkü markerın HTML'de kimliği yok — hangi adadan geldiği ayırt edilemez;
+                      uygulanabilir tek ölçüt SAYIdır ve boşluk yine 0 (yarın kazara doğacak
+                      4. bailout gene kırmızı verir).
+
                       Dinamik rotalarda marker doğmuyordu; kusur YALNIZ statik sınıfta
                       görünür — bu yüzden "ana sayfada sorun yok" yanıltıcı olurdu.
                       `fallback={null}`: bu bileşenin görsel çıktısı yok, bekletecek bir şey yok.
