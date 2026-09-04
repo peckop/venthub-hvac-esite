@@ -1,10 +1,10 @@
 # Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı)
 
-<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-04T12:25:35.219Z · kopya: 2026-09-04T13:30:00Z
+<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-04T12:25:35.219Z · kopya: 2026-09-04T13:07:44Z
      Bayatlık ölçütü METİN değil KARŞILAŞTIRMA: Linear updatedAt bu damgadan büyükse bu dosya BAYATTIR (ALTYAPI gözlemi, 09-04). -->
 
 > KOPYA. Kaynak: Linear belgesi `Kararlar — Vitrin 15A` (id 061e6113…, slug kararlar-vitrin-15a-df573c7c8148).
-> Kopya tarihi: **2026-09-04 16:30 (+03) = 13:30Z** (Linear updatedAt 12:25Z). Damga daima Z (UTC) yazılır; +03:00 ofsetli alana yerel saat yazılınca değer üç saat kaydı ve dosya doğduğu anda "bayat" çıktı (ALTYAPI ölçtü, 09-04). v1.1: damgayı betik üretir, elle yazılmaz. Çelişkide Linear kazanır. Bu dosya OPS tarafından
+> Kopya damgası `date -u` ile ÖLÇÜLDÜ: 2026-09-04T13:07:44Z (dış saat api.github.com 13:07:23 GMT ile tutarlı). Önceki iki değer (13:30+03:00, sonra 13:30Z) OPS'un ~5 saat ileri saat VARSAYIMIYLA elle yazılmıştı; ilki dosyayı doğduğu anda bayat, ikincisi GELECEKTE (kapıyı sonsuza kadar yeşil = kör) yapıyordu — ALTYAPI ölçtü. Kural: damga elle yazılmaz, ölçülür; v1.1'de eşitleyici üretir; kapı "kopya > şimdi" hâlini de HATA sayar. Çelişkide Linear kazanır. Bu dosya OPS tarafından
 > karar belgesi her değiştiğinde yenilenir (proje-takip-defteri-standard §2); başka kopya tutulmaz — 09-04'te
 > `design-15a/kararlar-vitrin-15a.md` (13:15 sürümü, K1–K16) URUN'u yanılttı ve kaldırıldı.
 
