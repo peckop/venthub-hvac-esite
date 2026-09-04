@@ -1,0 +1,99 @@
+# SSR DUMAN ALARMI — PROD (REC-134)
+#
+# ⭐BU BİR PR KAPISI DEĞİL, ALARMDIR. Ölçtüğü şey CANLI master'ın ürettiği HTML'dir;
+# bir PR'ın kodu hakkında HİÇBİR ŞEY söylemez. "SSR kilidi CI'da koşuyor" cümlesi bu
+# workflow için YANLIŞTIR. PR kapısı (CI kendi sunucusunu kaldırır, PR kodunu ölçer)
+# AYRI iştir ve burada yapılmaz.
+#
+# NİÇİN VAR: `tests/smoke/ssr-html.spec.ts` yazıldığı günden beri BİR KEZ BİLE
+# koşmadı — `describe.skipIf(!SMOKE_BASE_URL)` sıfır test topluyordu ve hiçbir
+# workflow bu env'i tanımlamıyordu. Kanıtı spec'in kendi yorumundaydı: `<h2`
+# marker'ı #959'da bayatlamıştı, spec koşsaydı düşerdi. Düşmedi çünkü hiç koşmadı.
+#
+# ⭐NİÇİN `environment_url` KULLANILMIYOR (ÖLÇÜLDÜ, 2026-09-04): deployment_status
+# olayının taşıdığı dağıtım-özgü adres KORUMA ARKASINDADIR. Ölçüm:
+#   venthub-hvac-esite-1fk7v482n-peckops-projects.vercel.app/tr -> 302 vercel.com/sso-api
+#   venthub.com.tr/tr                                           -> 200
+# Proje ayarı `ssoProtection: all_except_custom_domains` — yani yalnız ÖZEL ALAN ADI
+# korumasız. Olayın verdiği adresi beslemek, sayfayı değil koruma ekranını ölçerdi.
+# Bu yüzden taban adres SABİT ve özel alan adıdır.
+name: SSR Duman Alarmı (PROD)
+
+on:
+  schedule:
+    # Günlük — katalog-sayim (06:10 UTC) ile çakışmasın diye 06:40.
+    - cron: '40 6 * * *'
+  deployment_status:
+  workflow_dispatch:
+
+concurrency:
+  group: ssr-duman-alarmi
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  duman:
+    # deployment_status HER dağıtımda ateşler (Preview dahil) ve her DURUM için
+    # (pending/failure/success) bir olay gelir. Prod alarmı yalnız BAŞARILI PROD
+    # dağıtımından sonra anlamlıdır: preview'ı tetiklemek koruma ekranını ölçerdi,
+    # pending'i tetiklemek henüz yayında olmayan sürümü ölçerdi.
+    # schedule/dispatch'te `github.event.deployment_status` YOKTUR — o yüzden koşul
+    # "olay deployment_status DEĞİLSE geç" biçiminde yazıldı; tersi yazılsaydı
+    # zamanlanmış koşum sessizce hiç çalışmazdı.
+    if: >-
+      github.event_name != 'deployment_status' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # FAIL-CLOSED ÖN KOŞUL — AYRI ADIM olarak duruyor ki kırmızının sebebi
+      # koşum listesinde ADIYLA okunsun. db-advisor'ın "env yoksa atla" deseni
+      # BİLEREK taklit edilmedi: ölçememek geçmek değildir (§29).
+      - name: Taban adres ön koşulu (fail-closed)
+        env:
+          TABAN: ${{ vars.SMOKE_BASE_URL || 'https://venthub.com.tr' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${TABAN}" ]; then
+            echo "::error::SMOKE_BASE_URL boş — duman alarmı ölçmeden geçemez (REC-134)."
+            exit 1
+          fi
+          echo "taban adres: ${TABAN}"
+
+      - name: SSR duman koşumu
+        env:
+          SMOKE_BASE_URL: ${{ vars.SMOKE_BASE_URL || 'https://venthub.com.tr' }}
+        run: pnpm test:ssr-smoke 2>&1 | tee ssr-duman.log
+
+      - name: Günlüğü yükle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ssr-duman-log
+          path: ssr-duman.log
+          if-no-files-found: warn
+          retention-days: 14

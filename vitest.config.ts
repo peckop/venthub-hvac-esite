@@ -31,7 +31,12 @@ export default defineConfig({
     // CI'da `.env` yoktur → ENOENT. Birim/bileşen paketinin parçası değiller;
     // yerelde elle koşulacak ampirik DB denetimleridir:
     //   pnpm vitest run tests/e2e/empirical_db.test.ts   (repo kökünde .env varken)
-    exclude: ['**/node_modules/**', '**/dist/**', 'tests/e2e/empirical_*.test.ts'],
+    // `tests/smoke/**` AYRI koşar (`vitest.smoke.config.ts` · `pnpm test:smoke`):
+    // ayakta bir sunucu ister ve SMOKE_BASE_URL yoksa fail-closed DÜŞER (REC-134).
+    // Burada kalsaydı `ci`'nin Test adımı onu sunucusuz toplayıp kırmızı verirdi.
+    // Eskiden buradaydı ve `describe.skipIf` ile SIFIR test topluyordu — yani
+    // kilit hiç koşmadı ve kontrol listesinde yeşil göründü.
+    exclude: ['**/node_modules/**', '**/dist/**', 'tests/e2e/empirical_*.test.ts', 'tests/smoke/**'],
     // Use threads pool (default) for better stability on Windows/CI
     pool: 'threads',
     testTimeout: 20000,
