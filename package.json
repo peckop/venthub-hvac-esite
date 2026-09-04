@@ -15,6 +15,7 @@
     "lint": "node scripts/assert-node-major.mjs && cross-env NODE_OPTIONS='--max-old-space-size=8192' eslint .",
     "lint:ci": "cross-env NODE_OPTIONS='--max-old-space-size=8192' eslint .",
     "test": "node scripts/assert-node-major.mjs && vitest",
+    "test:ssr-smoke": "vitest run --config vitest.smoke.config.ts",
     "test:i18n": "vitest run src/i18n/__tests__/i18n.test.ts",
     "test:watch": "vitest dev",
     "test:coverage": "vitest run --coverage",
