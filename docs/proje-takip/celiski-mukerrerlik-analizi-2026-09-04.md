@@ -60,7 +60,7 @@ zaten kayıtlı) · **KOD/VERİ İŞİ** (belge değil, uygulama bekliyor) · **
 | D5 | companion "tarihsel en yüksek sembol" ↔ §C8.3 | §C8.3 | — | YANLIŞ POZİTİF: cetvel düzeltmeyi kendisi taşıyor |
 | D6 | tek turda build ↔ AXIOM 7 iki commit | AXIOM 7 | — | YANLIŞ POZİTİF (eski akış belgede yok) |
 | D7 | multi-session-coordination "--sid zorunlu değil" | K6 | — | YANLIŞ POZİTİF: dosyada "sid" 9 geçiş |
-| D8 | **"FAZ" kelimesi 4 ayrı katmanda** (SaaS Faz 1-4 · 15A üretim Faz 1-4 · admin göç Faz 0-6 · bayi R0-B2) | — | CLAUDE.md "Faz 1 bitti, Faz 2 park" = SaaS fazı; 15A brief'lerinde "Faz 1 kabuk" = üretim fazı | GERÇEK, KÖK SORUN: yeni kural — belgede/emirde "Faz" tek başına yazılmaz: **SaaS-F2 · 15A-F2 · ADMIN-F3 · BAYİ-R4**. Uygulama: bu PR cetvel §7; mevcut belgelere geriye dönük dokunulmaz, yeni yazımda zorunlu |
+| D8 | **"FAZ" kelimesi 4 ayrı katmanda** (SaaS Faz 1-4 · 15A üretim Faz 1-4 · admin göç Faz 0-6 · bayi R0-B2) | — | CLAUDE.md "Faz 1 bitti, Faz 2 park" = SaaS fazı; 15A brief'lerinde "Faz 1 kabuk" = üretim fazı | GERÇEK, KÖK SORUN: yeni kural — belgede/emirde "Faz" tek başına yazılmaz: **SaaS-F2 · 15A-F2 · ADMIN-F3 · BAYİ-R4**. Uygulama: bu PR cetvel §6; mevcut belgelere geriye dönük dokunulmaz, yeni yazımda zorunlu |
 | D9 | deploy-build-skip ↔ gitattributes merge=ours | AXIOM 7 | `deploy-build-skip-standard.md` | TAKİPTE (REC-132) |
 | D10 | PPR aktif (CONTEXT satır 59) ↔ kullanılmıyor | 08-15 | CONTEXT.md üretilmiş, elle not var (satır 61-64) | GİDERİLDİ (not var; üretilmiş metne dokunulmaz) |
 

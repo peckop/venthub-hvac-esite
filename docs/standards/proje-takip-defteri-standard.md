@@ -52,12 +52,12 @@ bulgu dosyaları `docs/proje-takip/design-15a/` altında yaşar (önceden yalnı
 Bugün kapı yok; `olc` çıkış 3 iken merge'i durduran bir CI kolu NLM girişi olmadan kurulamaz. Aday: manifest kapsamındaki
 dosya değişen PR'da `state.json` da değişmemişse UYARI (kırmızı değil) — "eşitleme borcu" görünür kılınır.
 
-## 7. Terim kuralı: "Faz" tek başına yazılmaz (ilk taramanın kök bulgusu, D8)
+## 6. Terim kuralı: "Faz" tek başına yazılmaz (ilk taramanın kök bulgusu, D8)
 Belgelerde "Faz" dört ayrı katmanı anlatıyor ve okuyan hangisi olduğunu bilemiyor: SaaS dönüşümü (Faz 1 Foundation …
 Faz 4 Marketplace), 15A vitrin üretimi (Faz 1 kabuk … Faz 4), admin DataTableKit göçü (Faz 0-6), bayi modülü (R0-R5,
 B1-B2). CLAUDE.md'deki "Faz 1 bitti, Faz 2 PARK" SaaS fazıdır; aynı gün brief'lerdeki "Faz 1 kabuk" üretim fazıdır.
 **Kural (yeni yazımda zorunlu):** faz adı kapsam belirteciyle yazılır — `SaaS-F2`, `15A-F2`, `ADMIN-F3`, `BAYİ-R4`.
 Mevcut belgelere geriye dönük dokunulmaz; kapı yok, tarama sırasında görünür kılınır.
 
-## 6. Değişiklik kaydı
+## 7. Değişiklik kaydı
 v1.0 (2026-09-04) — ilk sürüm; defter `Venthub Proje Takip` (a5f382a4) 13 demetle kuruldu, ilk çelişki taraması başladı.
