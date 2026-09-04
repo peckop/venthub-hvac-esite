@@ -1,5 +1,30 @@
 # REC-124 — katalog veri kusurları: CANLI ÖLÇÜM ve kalan liste
 
+> ## ✅ KAPANDI — 2026-09-04, 31/31 satır prod'a yazıldı ve doğrulandı
+>
+> Bu belge **ölçüm turunda** yazıldı ve o hâliyle *"yazım YOK"* diyordu. Yazım aynı gün,
+> ayrı bir onay zinciriyle yapıldı: **Recep 10:40 (kapsam) → OPS iki-göz (SQL okundu) →
+> Recep ekranda izin onayı → yazım.** Aşağıdaki §2 listesi artık **kapanmıştır**.
+>
+> - **Yedek (yazımdan ÖNCE alındı):** `C:/tmp/rec124-yedek-2026-09-04.json` — 31/31 satırın
+>   önceki değeri, sapma 0. Geri alma cümlesi dosyanın içinde.
+> - **Üretilmiş SQL:** `C:/tmp/rec124-yazim.sql` — tek `do $$` bloğu, her UPDATE
+>   `and name = <önceki>` kilidi taşır, sayaç tutmazsa `raise exception` ile **tümü** geri alınır.
+> - **Kaynak (SSOT):** `scripts/katalog/rec124-duzeltme-listesi.json` +
+>   `scripts/katalog/rec124-metin-duzeltme.mjs` (`--sql` kipi listeden deterministik üretir).
+> - **Doğrulama:** 31/31 **birebir dize** karşılaştırması. Ölçüt sayımı ikincil kanıttır ve
+>   tek başına **sahte-yeşil** olurdu (Vortice satırlarında yalnız birim değişti; ölçüt
+>   "düzeldi" der ama model adına dokunulmamıştır).
+> - **Vitrin tazelendi:** prod ürün sayfası yeni adı gösteriyor (eski ad 0), aile sayfası
+>   TR adını gösteriyor. Veri ile sayfa **ayrı ayrı** ölçüldü.
+>
+> **⚠KAPSAM DIŞI KALDI (bilerek, onay 31 satırdı):** `product_images.alt` hâlâ eski adı
+> taşıyor — **9 alt metin / 5 ürün** (`VRT-43152/43160/43162/43164`, `NIC-11907`). Ayrıca
+> `products.brand` kolonu hâlâ `AVENS`. İkisi de ayrı kalem.
+>
+> **⭐Bu turun asıl dersi §2'nin altında:** "23" sayısının **ölçütü hiçbir yere yazılmamıştı**;
+> ertesi gün aynı soru 95 satır döndürdü. Ölçüt artık liste dosyasının `_olcum` alanında yazılı.
+
 **Tarih:** 2026-09-04 · **Şerit:** URUN · **Yöntem:** salt-okuma SQL (prod), yazım YOK.
 **Cetvel:** `docs/standards/catalog-ingestion-standard.md` · `docs/standards/product-schema-standard.md`
 
