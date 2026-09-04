@@ -55,6 +55,25 @@ Bugün en az altı kaynak var (ölçüldü, 2026-09-04):
 **Kural:** yeni bir renk kaynağı **açılamaz**. Mevcutlardan hangisinin kalacağı ve
 hangisinin token'a çekileceği Faz 1'de **isim isim** listelenir; liste bu cetvele girer.
 
+### 2.1 İsim isim liste (Faz 1, 2026-09-04'te ölçüldü ve uygulandı)
+
+| Kaynak | Karar | Gerekçe |
+|---|---|---|
+| `src/index.css` `:root` HSL bloğu | **KALIR — SSOT budur** | Palet token'ları (`--marka-lacivert/turkuaz/kiremit/amber`) buraya kondu |
+| `src/index.css` "Legacy Variables" HEX bloğu | **13 değişken SİLİNDİ, 2'si kaldı** | Ölçüldü: 13'ünün depoda `var(--…)` kullanımı **sıfır**. Kalan `--navy-900` + `--text-primary` yalnız `select option` kuralında ve tema-bağımsız kalmaları **kasıtlı** (gerekçesi kodda yazılı) |
+| `.light` sınıfı | **BU FAZDA DOKUNULMADI** | Yalnız `AdminThemeToggle` referans veriyor — **ADMIN şeridi**, kapsam dışı (cetvel "Kapsam" satırı) |
+| `[data-admin-theme]` | **DOKUNULMAZ** | Kapsam dışı, ADMIN |
+| `@media (prefers-contrast: more)` | **BU FAZDA DOKUNULMADI** | Erişilebilirlik dalı; palet kararı onu ezmez, ayrı kalem |
+| `tailwind.config.js` 4 sabit HEX | **BU FAZDA DOKUNULMADI, kapı ile ÇİTLENDİ** | `INV-PALET-1` paletin **ikinci kez** palet adıyla orada tanımlanmasını engelliyor. Mevcut `'warning-orange': '#F59E0B'` satırının kendisi ayrı bir kalem — kaldırmak kullanan yüzeyleri tarar, bu PR'ın kapsamı değil |
+| `public/favicon.svg` `#2563eb` | **DOKUNULMADI** | `public/**` ESLint ignore'da; §2'nin **bilinen kör noktası**, aşağıda zaten yazılı |
+
+**Silinenler (isim isim):** `--navy-800` · `--navy-700` · `--navy-600` · `--navy-500` ·
+`--cyan-400` · `--cyan-500` · `--cyan-glow` · `--amber-400` · `--text-secondary` ·
+`--text-muted` · `--glass-bg` · `--glass-border` · `--glass-hover`.
+
+⚠**Silmenin kapsamadığı şey (gizlenmiyor):** `#22D3EE` **literali** `index.css` içinde
+doğrudan hâlâ geçiyor (~satır 607/641). Değişkeni silmek literali kaldırmaz; o ayrı kalem.
+
 ⚠**`public/**` ESLint ignore'da** — favicon'daki renk hiçbir kapının görüş alanında
 değil. Bu, kuralın bilinen kör noktasıdır ve gizlenmiyor.
 
@@ -62,7 +81,19 @@ değil. Bu, kuralın bilinen kör noktasıdır ve gizlenmiyor.
 
 ## 3) Kapı — ve ölçemediği şey (gizlenmiyor)
 
-**Ölçülebilen:** paletin **kaynak sayısı ve yeri**. Yeni bir renk kaynağı doğarsa kırmızı.
+**Kapı: `INV-PALET-1`** → `src/__tests__/conformance/marka-palet-tokenlari.test.ts` (2026-09-04).
+
+**Ölçülebilen — dört kol:**
+1. Dört token **tanımlı ve HSL biçiminde** (CLAUDE.md kural 8).
+2. ⭐Token'ın HSL değeri **çevrilince §1'in HEX'ini veriyor** (kanal farkı ≤ 2). *Niçin dize
+   karşılaştırması değil:* `23.3` yerine `33.3` yazılsa dize karşılaştırması yeni değeri
+   "beklenen" sayıp yeşil kalırdı; çevrim bunu yakalar.
+3. Palet **ikinci bir kaynaktan** (tailwind) palet adıyla tanımlanmamış.
+4. Silinen 13 ölü değişken **geri gelmemiş**.
+
+**Sabotajla ölçüldü (2026-09-04), üç yönlü:** kiremit tek hane kaydırıldı → **kırmızı** ·
+ölü değişken geri eklendi → **kırmızı** · token tamamen silindi → **kırmızı (2 kol)** ·
+geri alınca **yeşil** · tam takımda başka hiçbir kol düşmedi.
 
 ⛔**Ölçülemeyen: "kiremit yalnız ana eylemde" kuralı.** "Ana eylem" **semantik** bir roldür;
 statik tarama bir token'ın hangi bileşende, hangi rolde kullanıldığını bilmez. Mevcut token
