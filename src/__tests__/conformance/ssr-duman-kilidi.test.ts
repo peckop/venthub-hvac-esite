@@ -19,6 +19,13 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import {
+  ihlaller,
+  kurallar,
+  PDP_BILINCLI_ADALAR,
+  PDP_MAX_BAILOUT,
+} from '../../../tests/smoke/ssr-kurallari'
+
 /** Depo kökü GIT'ten türetilir — sabit yol yazmak INV-MUTLAK-YOL-1 ihlalidir. */
 function repoKoku(): string {
   return execFileSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], {
@@ -296,5 +303,73 @@ describe('INV-DUMAN-5: PR kapısı gerçekten ZORUNLU kontrolün içinde', () =>
       /dummy\.supabase\.co/.test(w),
       'admin-smoke dummy Supabase kullanıyor — SSR kolları veri olmadan sahte kırmızı verir'
     ).toBe(false)
+  })
+})
+
+describe('INV-DUMAN-6: PDP bailout tavanı İLAN edilmiş adalardan türer (mandal)', () => {
+  /**
+   * NİÇİN VAR: tavan çıplak bir sayı olarak yazıldığında onu büyütmek BEDAVA olur.
+   * Bugün tam bu durum yaşandı — #989 dördüncü bir bilinçli ada (Vercel Analytics)
+   * ekledi, kapı `3 > 2` ile kırmızı verdi ve en kolay çözüm "2'yi 3 yap" idi. O yol
+   * kapının hafızasını siler: yarın KAZAYLA doğan bir bailout, dün gerekçesiz açılmış
+   * boşluğun içinde saklanır. Tavan ilandan türediği için sayıyı büyütmenin tek yolu
+   * "hangi ada, niçin meşru" yazmaktır.
+   *
+   * ⭐MUAFİYET NİÇİN YOK: `BAILOUT_TO_CLIENT_SIDE_RENDERING` markerının HTML'de kimliği
+   * yoktur; hangi Suspense sınırından doğduğu ayırt edilemez. "Şu adayı muaf tut"
+   * yazılabilir bir ölçüt değildir — uygulanabilir tek ölçüt sayıdır.
+   */
+  const fakeTemsilciler = {
+    kokKategori: '/tr/category/a',
+    altKategori: '/tr/category/a/b',
+    pdp: '/tr/products/x',
+    sayimlar: { kokKategori: 1, altKategori: 1, pdp: 1 },
+  }
+
+  it('her ilan kalemi DOLU ve TEKİL — boş kalemle sayı şişirilemez', () => {
+    expect(PDP_BILINCLI_ADALAR.length, 'ilan boş — tavan gerekçesiz kalır').toBeGreaterThan(0)
+    for (const a of PDP_BILINCLI_ADALAR) {
+      expect(a.ada.trim().length, `ada adı boş: ${JSON.stringify(a)}`).toBeGreaterThan(2)
+      // Gerekçe uzunluğu: bir cümle yazmayı zorlar. "ok"/"gerekli" gibi doldurma geçmez.
+      expect(a.nicin.trim().length, `"${a.ada}" gerekçesi yok/çok kısa`).toBeGreaterThan(40)
+      expect(a.marker, `"${a.ada}" en az 1 marker katmalı`).toBeGreaterThanOrEqual(1)
+    }
+    const adlar = PDP_BILINCLI_ADALAR.map((a) => a.ada)
+    expect(new Set(adlar).size, `ilan mükerrer ada içeriyor: ${adlar.join(', ')}`).toBe(adlar.length)
+  })
+
+  it('PDP kuralının tavanı ilan toplamına EŞİT — literal sayı kaçağı yakalanır', () => {
+    // Ölçüt türetime DEĞİL sonuca bağlı: biri `maxBailout: 4` yazsa da bu kol kırmızı
+    // olur, çünkü karşılaştırılan şey ilanın kendi toplamıdır.
+    const toplam = PDP_BILINCLI_ADALAR.reduce((n, a) => n + a.marker, 0)
+    const pdp = kurallar(fakeTemsilciler).find((k) => k.sinif === 'pdp')
+    expect(pdp, 'pdp kuralı kayıp').toBeTruthy()
+    expect(
+      pdp?.maxBailout,
+      `PDP tavanı (${pdp?.maxBailout}) ilan toplamıyla (${toplam}) uyuşmuyor — ` +
+        'sayı ilan edilmeden büyütülmüş'
+    ).toBe(toplam)
+    expect(PDP_MAX_BAILOUT, 'dışa verilen sabit ilanla uyuşmuyor').toBe(toplam)
+  })
+
+  it('DAVRANIŞ, sınırda: tavan kadar marker geçer, bir fazlası KIRMIZI', () => {
+    /**
+     * ⭐NİÇİN TEK SATIRDA: sayımın SATIR değil GEÇİŞ saydığını da kanıtlar. Üretilen
+     * HTML tek satırdır; satır sayan bir ölçüt (`grep -c`) burada 1 döner ve üç
+     * bailout'u bir sanır. Bu hata bugün sahada yapıldı — kol onu kalıcı olarak
+     * yakalar.
+     */
+    const pdp = kurallar(fakeTemsilciler).find((k) => k.sinif === 'pdp')
+    if (!pdp) throw new Error('pdp kuralı kayıp — kol ölçemez')
+    // İçerik markerları KASITLI olarak sağlanıyor: bu kol bailout SAYIMINI ölçüyor,
+    // marker eksikliğinin ürettiği ihlalle karışmaması gerekir.
+    const icerik = '<h1 class="x">Ürün</h1><div>Model Seçimi</div>'
+    const govde = (n: number): string =>
+      `<html><body>${icerik}${'<!--BAILOUT_TO_CLIENT_SIDE_RENDERING-->'.repeat(n)}</body></html>`
+
+    expect(ihlaller(pdp, govde(pdp.maxBailout)), 'tavan kadar bailout ihlal saymamalı').toEqual([])
+    const fazla = ihlaller(pdp, govde(pdp.maxBailout + 1))
+    expect(fazla.length, 'tavanın bir fazlası ihlal DOĞURMADI — sayım kör').toBe(1)
+    expect(fazla[0]).toContain(`${pdp.maxBailout + 1} > ${pdp.maxBailout}`)
   })
 })
