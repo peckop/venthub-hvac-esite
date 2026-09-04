@@ -60,6 +60,8 @@ export const CookiePolicyContentTr: React.FC<{ lang: string }> = ({ lang }) => {
           </table>
         </div>
         <p className="text-sm mt-3"><strong>Analitik ve pazarlama çerezleri:</strong> Site hâlihazırda analitik, reklam veya profilleme amaçlı çerez <strong>kullanmamaktadır</strong>. Bu tür çerezler ileride devreye alınırsa yalnızca <strong>açık rızanızla</strong> çalışır ve bu tablo güncellenir. Rıza vermediğiniz kategoriye ait etiket/script sayfaya <strong>hiç yüklenmez</strong> — yalnızca olay gönderimi değil, çerezi yazan kodun kendisi engellenir.</p>
+
+        <p className="text-sm mt-3"><strong>Çerezsiz ziyaret sayımı:</strong> Hangi sayfaların ne kadar görüntülendiğini anlamak için barındırma sağlayıcımızın <strong>çerez kullanmayan</strong> ölçüm hizmetini (Vercel Web Analytics) kullanıyoruz. Bu ölçüm cihazınıza <strong>hiçbir çerez veya yerel kayıt yazmaz</strong>, size kalıcı bir kimlik atamaz ve profil oluşturmaz; yalnızca görüntülenen sayfanın adresi, geldiğiniz bağlantı ve zaman bilgisi sayılır. Bu sebeple yukarıdaki &quot;analitik çerez kullanılmıyor&quot; ifadesi geçerliliğini korur ve bu sayım rızaya bağlı değildir. Ayrıntı için <Link className="text-primary-navy underline" href={localizedHref(Routes.legal.kvkk(), lang)}>KVKK Aydınlatma Metni</Link>&apos;ne bakabilirsiniz.</p>
       </section>
 
       <section>

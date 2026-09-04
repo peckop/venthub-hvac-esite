@@ -60,6 +60,8 @@ export const CookiePolicyContentEn: React.FC<{ lang: string }> = ({ lang }) => {
           </table>
         </div>
         <p className="text-sm mt-3"><strong>Analytics and marketing cookies:</strong> the Site currently does <strong>not</strong> use cookies for analytics, advertising or profiling. Should such cookies be introduced, they will run only with your <strong>explicit consent</strong> and this table will be updated. Where you have not consented to a category, its tag/script is <strong>never loaded</strong> — not merely prevented from sending events, but blocked before the code that writes the cookie can run.</p>
+
+        <p className="text-sm mt-3"><strong>Cookieless visit counting:</strong> to understand which pages are viewed and how often, we use our hosting provider&apos;s <strong>cookie-free</strong> measurement service (Vercel Web Analytics). It writes <strong>no cookie and no local storage entry</strong> to your device, assigns you no persistent identifier and builds no profile; it counts only the address of the page viewed, the link you arrived from and the time. This is why the statement above — that no analytics cookies are used — remains accurate, and why this counting is not subject to consent. See the <Link className="text-primary-navy underline" href={localizedHref(Routes.legal.kvkk(), lang)}>KVKK Privacy Notice</Link> for details.</p>
       </section>
 
       <section>
