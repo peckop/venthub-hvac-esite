@@ -123,7 +123,13 @@ function aralikKarsilar(aralik: string, kuruluHam: string): Sonuc {
   if (!kurulu) return 'olculemedi'
   let olculemeyenDalVar = false
   for (const dal of aralik.split('||')) {
-    const jetonlar = dal.trim().split(/\s+/).filter(Boolean)
+    // ⭐OPERATÖR İLE SÜRÜM ARASINDAKİ BOŞLUK ÖNCE KAPATILIR — yoksa `">= 13"` iki
+    // ayrı jetona bölünür (`">="` ve `"13"`), ilki hiçbir biçime uymaz ve dal
+    // ÖLÇÜLEMEDİ döner. Bu geçerli bir semver yazımıdır; kapı onu tanımadığı için
+    // kırmızı veriyordu. Ölçülen örnek: `@vercel/analytics@2.0.1` → `next: ">= 13"`
+    // (2026-09-04). Gevşetme DEĞİL: yalnız ayrıştırıcı eksiği kapatılıyor, hiçbir
+    // iddia zayıflamıyor — biçim tanınınca karşılaştırma yine tam yapılır.
+    const jetonlar = dal.trim().replace(/([<>]=?|=|\^|~)\s+/g, '$1').split(/\s+/).filter(Boolean)
     if (jetonlar.length === 0) return 'karsilar'
     let hepsiTamam = true
     let dalOlculemedi = false

@@ -1,5 +1,6 @@
 import '../index.css'
 
+import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
@@ -54,6 +55,30 @@ export default function RootLayout({
                         />
                         {children}
                     </ClientLayout>
+
+                    {/*
+                      Vercel Web Analytics — anonim sayfa sayımı (REC, 2026-09-04 Recep onayı).
+
+                      ⭐NİÇİN RIZA KAPISININ DIŞINDA — ÖLÇÜLDÜ, VARSAYILMADI:
+                      Bu depoda kural yazılı: analitik etiketi rıza kapısının ARKASINDA durur
+                      (`ConsentGatedAnalytics`), çünkü GA yüklendiği anda `_ga`/`_gid` çerezlerini
+                      yazar — kapı "olay gönderimi" değil "script yükleme" seviyesinde olmak zorunda.
+                      O gerekçe ÇEREZ yazan bir etiket içindir. Vercel'inki yazmıyor:
+                      canlı betik (`/_vercel/insights/script.js`, 2026-09-04'te indirildi) içinde
+                      `document.cookie` · `localStorage` · `sessionStorage` · `indexedDB` geçişi
+                      **SIFIR**; taşıdığı alanlar yalnız `href` · `pathname` · `referrer` · `route`
+                      · zaman damgası. Yani cihaza hiçbir şey yazılmıyor ve kalıcı kimlik üretilmiyor.
+                      Ayırt edici soru "analitik mi" değil, **"cihaza bir şey yazıyor ve kişiyi
+                      izliyor mu"** idi; cevap hayır olduğu için rıza kapısı gerekmiyor.
+
+                      ⚠BU İDDİA BAYATLAYABİLİR: paket sürümü yükselince betik değişebilir.
+                      Kapı (`INV-ANALITIK-1`) bu gerekçeyi ve yerleşimi ölçüyor; iddianın kendisi
+                      ise sürüm yükseltmesinde YENİDEN ölçülmeli — kapı betiği indirip bakamaz.
+
+                      Çerez Politikası §2'de bu durum yazılı: çerezli analitik YOK, çerezsiz
+                      sayım VAR. Politika "hiç analitik yok" demiyor — sayfa yanıltmıyor.
+                    */}
+                    <Analytics />
                 </Providers>
             </body>
         </html>
