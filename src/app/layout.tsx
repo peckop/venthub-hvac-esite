@@ -3,6 +3,7 @@ import '../index.css'
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Suspense } from 'react'
 
 import { SITE_URL } from '@/config/siteUrl'
 
@@ -78,7 +79,20 @@ export default function RootLayout({
                       Çerez Politikası §2'de bu durum yazılı: çerezli analitik YOK, çerezsiz
                       sayım VAR. Politika "hiç analitik yok" demiyor — sayfa yanıltmıyor.
                     */}
-                    <Analytics />
+                    {/*
+                      ⭐SUSPENSE ZORUNLU — ve bunu KAPI ÖĞRETTİ, tahmin etmedim:
+                      `<Analytics/>` içeride `useSearchParams()` çağırıyor. Suspense'siz
+                      bırakılınca, STATİK üretilen sayfalarda tüm ağaç istemciye düşüyor:
+                      SSR HTML'ine `BAILOUT_TO_CLIENT_SIDE_RENDERING` markerı giriyor.
+                      REC-138 kapısı bunu PDP'de yakaladı (3 > 2) — eşik yükseltilmedi,
+                      çünkü sorun eşikte değil, kuralın ihlalindeydi (CLAUDE.md kural 5).
+                      Dinamik rotalarda marker doğmuyordu; kusur YALNIZ statik sınıfta
+                      görünür — bu yüzden "ana sayfada sorun yok" yanıltıcı olurdu.
+                      `fallback={null}`: bu bileşenin görsel çıktısı yok, bekletecek bir şey yok.
+                    */}
+                    <Suspense fallback={null}>
+                        <Analytics />
+                    </Suspense>
                 </Providers>
             </body>
         </html>
