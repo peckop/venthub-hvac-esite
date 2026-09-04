@@ -19,6 +19,13 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import {
+  ihlaller,
+  kurallar,
+  PDP_BILINCLI_ADALAR,
+  PDP_MAX_BAILOUT,
+} from '../../../tests/smoke/ssr-kurallari'
+
 /** Depo kökü GIT'ten türetilir — sabit yol yazmak INV-MUTLAK-YOL-1 ihlalidir. */
 function repoKoku(): string {
   return execFileSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], {
@@ -55,11 +62,33 @@ function yorumsuz(metin: string): string {
  * Gerekçe yazmak ile kod yazmak aynı evrende ölçülmez.
  */
 function tsYorumsuz(metin: string): string {
-  return metin.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+  /**
+   * ⭐SATIR BAZLI, BLOK-REGEX DEĞİL — bu da bir ölçümle öğrenildi.
+   *
+   * İlk hâli blok yorumları tek bir regex ile siliyordu ve INV-DUMAN-5 KIRMIZI verdi.
+   * Sebep: `playwright.config.ts` içindeki `testMatch` deseni glob olduğu için DİZENİN
+   * İÇİNDE bir yorum-başlangıcı alt dizesi barındırıyor. Kaba regex onu gerçek yorum
+   * sandı, bir sonraki yorum-kapanışına kadar her şeyi sildi ve aradığım kodu götürdü.
+   * Yani yorum temizleyicinin kendisi ölçümü bozuyordu — "ölçüm aracının kendisi
+   * ölçülür" dersinin bir örneği daha.
+   *
+   * Satır bazlı yaklaşım dize içeriğine dokunmaz: yalnız yorum OLARAK BAŞLAYAN
+   * satırlar düşer (satır başı iki eğik çizgi, blok açılışı, yıldız devamı ve blok
+   * kapanışı — bu dosyanın kendisi de yorumda o dizeleri YAZAMIYOR, çünkü yazınca
+   * kendi bloğunu kapatıyor; iki kez yaşandı). Gövde içinde satır sonuna eklenmiş
+   * yorumları atmaz — o eksik bilinçli: bu dosyanın aradığı şeyler anahtar-değer
+   * satırları, ve fazladan silmek sahte-yeşilden daha az risklidir.
+   */
+  return metin
+    .split('\n')
+    .filter((s) => !/^\s*(\/\/|\/\*|\*)/.test(s))
+    .join('\n')
 }
 
 const SPEC = 'tests/smoke/ssr-html.spec.ts'
 const WF = '.github/workflows/ssr-duman-alarmi.yml'
+const MODUL = 'tests/smoke/ssr-kurallari.ts'
+const KAPI = 'e2e/ssr-html.e2e.ts'
 
 describe('INV-DUMAN-1: duman kilidi ölçmeden geçemez', () => {
   it('spec FAIL-CLOSED — SMOKE_BASE_URL yoksa DÜŞEN bir kol vardır', () => {
@@ -148,6 +177,15 @@ describe("INV-DUMAN-3: alarm workflow'u kilidi gerçekten çağırır", () => {
     expect(/venthub\.com\.tr/.test(w), 'özel alan adı taban olarak yazılmamış').toBe(true)
   })
 
+  it('PR KAPISI ile ALARM aynı workflow\'a KARIŞMAZ (alarm PR\'da koşmaz)', () => {
+    // Alarm master'ı ölçer; PR'da koşarsa PR'ın kodu hakkında yanlış izlenim verir
+    // ("SSR kilidi bu PR'da yeşil" gibi okunur, oysa ölçtüğü şey canlı master).
+    const w = yorumsuz(oku(WF))
+    expect(/pull_request/.test(w), 'alarm workflow\'u pull_request\'te tetikleniyor — kapı ile alarm karışır').toBe(
+      false
+    )
+  })
+
   it('yalnız BAŞARILI PROD dağıtımında tetiklenir, schedule/dispatch ise geçer', () => {
     const w = yorumsuz(oku(WF))
     expect(/deployment_status\.state == 'success'/.test(w)).toBe(true)
@@ -158,5 +196,180 @@ describe("INV-DUMAN-3: alarm workflow'u kilidi gerçekten çağırır", () => {
       /github\.event_name != 'deployment_status'/.test(w),
       'schedule/workflow_dispatch koşulu düşürüyor: alarm yalnız dağıtımda çalışır, günlük hiç koşmaz'
     ).toBe(true)
+  })
+})
+
+describe('INV-DUMAN-4: kurallar TEK KAYNAKTAN gelir (§26)', () => {
+  it('ALARM ve KAPI aynı modülü tüketir — kural iki yerde iki kopya DEĞİL', () => {
+    /**
+     * ⭐NİÇİN: aynı kural iki dosyada yaşarsa biri güncellenir, öteki bayatlar ve kimse
+     * görmez. Bu iş tam o bedelle başladı: kilit hiç koşmadığı için `<h2` marker'ı ve
+     * `seat-storm-jet` slug'ı bayatlamıştı. Tek kaynak, sabotajın İKİ tüketiciyi birden
+     * kırmızıya çevirmesini de sağlar (OPS şartı).
+     */
+    const alarm = tsYorumsuz(oku(SPEC))
+    const kapi = tsYorumsuz(oku(KAPI))
+    for (const [ad, metin] of [
+      ['alarm', alarm],
+      ['kapı', kapi],
+    ] as const) {
+      expect(
+        /from '(\.\.\/tests\/smoke\/|\.\/)ssr-kurallari'/.test(metin),
+        `${ad} kuralları tek kaynaktan almıyor — kendi kopyasını taşıyorsa sessizce ayrışır`
+      ).toBe(true)
+    }
+    // Kural gövdesi (marker/eşik) YALNIZ modülde durmalı; tüketicide tekrar edilmemeli.
+    for (const [ad, metin] of [
+      ['alarm', alarm],
+      ['kapı', kapi],
+    ] as const) {
+      expect(
+        /BAILOUT_TO_CLIENT_SIDE_RENDERING/.test(metin),
+        `${ad} bailout sayımını KENDİ içinde yapıyor — o mantık modülde (ihlaller) durmalı`
+      ).toBe(false)
+    }
+  })
+
+  it('SLUG SABİT YAZILMAZ: temsilciler sitemap\'ten türetilir, fail-closed', () => {
+    const m = tsYorumsuz(oku(MODUL))
+    expect(/sitemap\.xml/.test(m), 'temsilci kaynağı sitemap değil').toBe(true)
+    // Bayat slug / pasif kategori sınıfı: sabit slug yazmak dün iki kusur doğurdu
+    // (404 ve boş sayfada bedava yeşil). Modülde canlı slug SABİTİ olmamalı.
+    for (const olu of ['seat-storm-jet', 'konut-tipi-havalandirma']) {
+      expect(m.includes(olu), `modülde sabit slug var: ${olu} — sitemap kaynağı devre dışı kalmış`).toBe(
+        false
+      )
+    }
+    /**
+     * Sıfır rotayla yeşil dönmek YASAK. Ölçüt VARLIK DEĞİL SAYIM.
+     *
+     * ⭐İlk hâli `/throw new Error/.test(m)` idi ve SABOTAJI GEÇİRDİ: modülde üç ayrı
+     * fail-closed yolu var (sitemap okunamadı · sitemap boş · zorunlu sınıfın temsilcisi
+     * yok); birini `console.warn`'a çevirdim, kol YEŞİL kaldı çünkü öteki ikisi hâlâ
+     * "bir throw var" diyordu. Ayırt etmeyen gösterge ölçüm değildir — üç yolun ÜÇÜ de
+     * sayılır. Yol eklenirse bu sayı bilinçli olarak yükseltilir (ratchet).
+     */
+    const failClosed = (m.match(/throw new Error/g) ?? []).length
+    expect(
+      failClosed,
+      `fail-closed yolu sayısı ${failClosed} (< 3): sitemap okunamadı / boş / zorunlu sınıf yok ` +
+        'hâllerinden biri sessizce geçiyor'
+    ).toBeGreaterThanOrEqual(3)
+  })
+
+  it('KAPI, kırılgan ölçütlü sınıfı ZORUNLU kontrole sokmaz', () => {
+    /**
+     * Kök kategorinin ayırt edici tek işareti i18n sözlüğünden gelen bir başlık; sözlük
+     * de VERİDİR. Onu zorunlu kapıya koymak, URUN bir anahtarı yeniden adlandırdığında
+     * tüm filonun merge'ini durdurur. Depo bu kararı zaten vermiş: playwright.config.ts
+     * `checkout-smoke`'u aynı gerekçeyle kapının dışında tutuyor.
+     */
+    const m = tsYorumsuz(oku(MODUL))
+    expect(/kapida:\s*false/.test(m), 'her sınıf kapıya alınmış — kırılgan ölçüt ayrımı kaybolmuş').toBe(
+      true
+    )
+    const kapi = tsYorumsuz(oku(KAPI))
+    expect(
+      /kurallar\([^)]*,\s*true\s*\)/.test(kapi),
+      'kapı yalnizKapi=true ile süzmüyor — kırılgan sınıf zorunlu kontrole girer'
+    ).toBe(true)
+    expect(kapi.includes("'kok-kategori'"), 'kapı kök kategori sınıfını koşuyor').toBe(false)
+  })
+})
+
+describe('INV-DUMAN-5: PR kapısı gerçekten ZORUNLU kontrolün içinde', () => {
+  it('kapı dosyası playwright kapsamındadır (admin-smoke onu toplar)', () => {
+    // playwright.config.ts `testDir: ./e2e` + `testMatch: **/*.e2e.ts`; ad bu deseni
+    // tutmazsa dosya SESSİZCE hiç koşmaz — "kapı var, koşum yok" sınıfı.
+    expect(KAPI.startsWith('e2e/'), 'kapı dosyası e2e/ dizininde değil').toBe(true)
+    expect(KAPI.endsWith('.e2e.ts'), 'kapı dosyası .e2e.ts deseninde değil — playwright toplamaz').toBe(
+      true
+    )
+    const cfg = tsYorumsuz(oku('playwright.config.ts'))
+    expect(/testDir:\s*'\.\/e2e'/.test(cfg) && /\*\*\/\*\.e2e\.ts/.test(cfg)).toBe(true)
+  })
+
+  it('admin-smoke GERÇEK Supabase env ile build eder (dummy ile SSR ölçülemez)', () => {
+    /**
+     * ÖLÇÜLDÜ (2026-09-04): `ci`'nin Build adımı `dummy.supabase.co` kullanıyor ve o
+     * sunucuda /tr/products ile /tr/category/... 500 veriyor — veri yok, sayfa
+     * üretilemiyor. Kilidi oraya bağlamak SAHTE KIRMIZI üretirdi. `e2e-smoke.yml`
+     * ise gerçek variable'larla build ediyor; kapı bu yüzden orada.
+     */
+    const w = yorumsuz(oku('.github/workflows/e2e-smoke.yml'))
+    expect(/vars\.E2E_SUPABASE_URL/.test(w), 'gerçek Supabase URL beslenmiyor').toBe(true)
+    expect(/vars\.E2E_SUPABASE_ANON_KEY/.test(w), 'gerçek anon key beslenmiyor').toBe(true)
+    expect(
+      /dummy\.supabase\.co/.test(w),
+      'admin-smoke dummy Supabase kullanıyor — SSR kolları veri olmadan sahte kırmızı verir'
+    ).toBe(false)
+  })
+})
+
+describe('INV-DUMAN-6: PDP bailout tavanı İLAN edilmiş adalardan türer (mandal)', () => {
+  /**
+   * NİÇİN VAR: tavan çıplak bir sayı olarak yazıldığında onu büyütmek BEDAVA olur.
+   * Bugün tam bu durum yaşandı — #989 dördüncü bir bilinçli ada (Vercel Analytics)
+   * ekledi, kapı `3 > 2` ile kırmızı verdi ve en kolay çözüm "2'yi 3 yap" idi. O yol
+   * kapının hafızasını siler: yarın KAZAYLA doğan bir bailout, dün gerekçesiz açılmış
+   * boşluğun içinde saklanır. Tavan ilandan türediği için sayıyı büyütmenin tek yolu
+   * "hangi ada, niçin meşru" yazmaktır.
+   *
+   * ⭐MUAFİYET NİÇİN YOK: `BAILOUT_TO_CLIENT_SIDE_RENDERING` markerının HTML'de kimliği
+   * yoktur; hangi Suspense sınırından doğduğu ayırt edilemez. "Şu adayı muaf tut"
+   * yazılabilir bir ölçüt değildir — uygulanabilir tek ölçüt sayıdır.
+   */
+  const fakeTemsilciler = {
+    kokKategori: '/tr/category/a',
+    altKategori: '/tr/category/a/b',
+    pdp: '/tr/products/x',
+    sayimlar: { kokKategori: 1, altKategori: 1, pdp: 1 },
+  }
+
+  it('her ilan kalemi DOLU ve TEKİL — boş kalemle sayı şişirilemez', () => {
+    expect(PDP_BILINCLI_ADALAR.length, 'ilan boş — tavan gerekçesiz kalır').toBeGreaterThan(0)
+    for (const a of PDP_BILINCLI_ADALAR) {
+      expect(a.ada.trim().length, `ada adı boş: ${JSON.stringify(a)}`).toBeGreaterThan(2)
+      // Gerekçe uzunluğu: bir cümle yazmayı zorlar. "ok"/"gerekli" gibi doldurma geçmez.
+      expect(a.nicin.trim().length, `"${a.ada}" gerekçesi yok/çok kısa`).toBeGreaterThan(40)
+      expect(a.marker, `"${a.ada}" en az 1 marker katmalı`).toBeGreaterThanOrEqual(1)
+    }
+    const adlar = PDP_BILINCLI_ADALAR.map((a) => a.ada)
+    expect(new Set(adlar).size, `ilan mükerrer ada içeriyor: ${adlar.join(', ')}`).toBe(adlar.length)
+  })
+
+  it('PDP kuralının tavanı ilan toplamına EŞİT — literal sayı kaçağı yakalanır', () => {
+    // Ölçüt türetime DEĞİL sonuca bağlı: biri `maxBailout: 4` yazsa da bu kol kırmızı
+    // olur, çünkü karşılaştırılan şey ilanın kendi toplamıdır.
+    const toplam = PDP_BILINCLI_ADALAR.reduce((n, a) => n + a.marker, 0)
+    const pdp = kurallar(fakeTemsilciler).find((k) => k.sinif === 'pdp')
+    expect(pdp, 'pdp kuralı kayıp').toBeTruthy()
+    expect(
+      pdp?.maxBailout,
+      `PDP tavanı (${pdp?.maxBailout}) ilan toplamıyla (${toplam}) uyuşmuyor — ` +
+        'sayı ilan edilmeden büyütülmüş'
+    ).toBe(toplam)
+    expect(PDP_MAX_BAILOUT, 'dışa verilen sabit ilanla uyuşmuyor').toBe(toplam)
+  })
+
+  it('DAVRANIŞ, sınırda: tavan kadar marker geçer, bir fazlası KIRMIZI', () => {
+    /**
+     * ⭐NİÇİN TEK SATIRDA: sayımın SATIR değil GEÇİŞ saydığını da kanıtlar. Üretilen
+     * HTML tek satırdır; satır sayan bir ölçüt (`grep -c`) burada 1 döner ve üç
+     * bailout'u bir sanır. Bu hata bugün sahada yapıldı — kol onu kalıcı olarak
+     * yakalar.
+     */
+    const pdp = kurallar(fakeTemsilciler).find((k) => k.sinif === 'pdp')
+    if (!pdp) throw new Error('pdp kuralı kayıp — kol ölçemez')
+    // İçerik markerları KASITLI olarak sağlanıyor: bu kol bailout SAYIMINI ölçüyor,
+    // marker eksikliğinin ürettiği ihlalle karışmaması gerekir.
+    const icerik = '<h1 class="x">Ürün</h1><div>Model Seçimi</div>'
+    const govde = (n: number): string =>
+      `<html><body>${icerik}${'<!--BAILOUT_TO_CLIENT_SIDE_RENDERING-->'.repeat(n)}</body></html>`
+
+    expect(ihlaller(pdp, govde(pdp.maxBailout)), 'tavan kadar bailout ihlal saymamalı').toEqual([])
+    const fazla = ihlaller(pdp, govde(pdp.maxBailout + 1))
+    expect(fazla.length, 'tavanın bir fazlası ihlal DOĞURMADI — sayım kör').toBe(1)
+    expect(fazla[0]).toContain(`${pdp.maxBailout + 1} > ${pdp.maxBailout}`)
   })
 })

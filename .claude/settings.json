@@ -18,13 +18,13 @@
       "mcp__claude_ai_Vercel__get_deployment_build_logs",
       "mcp__orion__orion_twin",
       "mcp__claude_ai_Vercel__list_teams",
-      "mcp__supabase__get_edge_function",
+      "mcp__plugin_supabase_supabase__get_edge_function",
       "mcp__github__get_pull_request",
       "mcp__codegraph__codegraph_callers",
-      "mcp__supabase__list_edge_functions",
+      "mcp__plugin_supabase_supabase__list_edge_functions",
       "mcp__claude_ai_Vercel__list_projects",
       "mcp__claude_ai_Vercel__get_project",
-      "mcp__supabase__query_logs",
+      "mcp__plugin_supabase_supabase__query_logs",
       "mcp__github__get_pull_request_status",
       "mcp__notebooklm-py__chat_ask",
       "mcp__notebooklm-py__notebook_list",
@@ -37,11 +37,11 @@
       "Bash(git push --force-with-lease*)",
       "mcp__claude_ai_Vercel__search_vercel_documentation",
       "mcp__claude_ai_Vercel__get_deployment",
-      "mcp__supabase__get_project_url",
-      "mcp__supabase__search_docs",
-      "mcp__supabase__get_publishable_keys",
-      "mcp__supabase__generate_typescript_types",
-      "mcp__supabase__get_advisors",
+      "mcp__plugin_supabase_supabase__get_project_url",
+      "mcp__plugin_supabase_supabase__search_docs",
+      "mcp__plugin_supabase_supabase__get_publishable_keys",
+      "mcp__plugin_supabase_supabase__generate_typescript_types",
+      "mcp__plugin_supabase_supabase__get_advisors",
       "mcp__codegraph__codegraph_status"
     ]
   },
@@ -163,5 +163,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "supabase@claude-plugins-official": true
   }
 }

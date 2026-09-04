@@ -50,6 +50,38 @@ const komut = (girdi.tool_input && girdi.tool_input.command) || ''
 const sid = girdi.session_id || ''
 if (!komut || !sid) process.exit(0)
 
+/**
+ * ⭐İKİNCİ SINIF: SIR DEĞERİNİ EKRANA BASAN KALIP (2026-09-04, ALTYAPI olayı).
+ *
+ * NİÇİN BU DOSYADA, yeni bir kanca DEĞİL: yeni kanca kaydetmek `.claude/settings.json`
+ * düzenlemek demektir, yani CONFIG — ve config'e ajan eli değmez (bu kararı bugün bir
+ * kez daha uyguladım: Recep'in `enabledPlugins` satırına dokunmadım). Bash komutlarını
+ * gören TEK kayıtlı kanca bu; `sensitive-path-guard` yalnız Edit/Write/MultiEdit
+ * matcher'ında ve `file_path` okuyor, komutu hiç görmüyor. Dosyanın adı bu yüzden
+ * TARİHSELDİR: artık iki sınıfı birden bekliyor.
+ *
+ * Kalıp mantığı ayrı modülde (`sir-basan-kalip.cjs`) — saf fonksiyon, konformans
+ * kolundan doğrudan ölçülebilsin ve mantık iki yerde iki kopya olmasın (§26).
+ */
+try {
+  const { sirBasanKaliplar } = require(path.join(__dirname, 'sir-basan-kalip.cjs'))
+  const bulgular = sirBasanKaliplar(komut)
+  if (bulgular.length > 0) {
+    const satirlar = bulgular.map((b) => `  • ${b.ad}: ${b.kalip}\n    ${b.neden}`).join('\n')
+    process.stderr.write(
+      '[bash-write-guard] SIR DEGERI EKRANA BASILIYOR — reddedildi:\n' +
+        satirlar +
+        '\n  NICIN: 2026-09-04\'te bu kalip prod DB baglanti dizesini (parola dahil) oturum\n' +
+        '  ciktisina ve transkripte dusurdu. Olcum yaparken DEGERI degil OLGUYU bas.\n'
+    )
+    process.exit(2)
+  }
+} catch (e) {
+  // Kalip modulu yuklenemezse kanca YAZMA kontrolunu bloklamamali (fail-open) — ama
+  // SESSIZ de kalmaz: olcememek gecmek degildir, sebep gorunur.
+  process.stderr.write('[bash-write-guard] sir-kalip modulu yuklenemedi (fail-open): ' + (e && e.message) + '\n')
+}
+
 let cikarici
 try {
   cikarici = require(path.join(__dirname, 'bash-write-targets.cjs'))

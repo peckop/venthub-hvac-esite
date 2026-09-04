@@ -310,6 +310,22 @@ jobs:
           export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/db/checks/rls-role-coverage.mjs
 
+      # ⭐INV-ANON-YAZMA-1 — NICIN BU ISE EKLENDI, `advisor`a DEGIL (olculdu 2026-09-04):
+      # `advisor` isi BILEREK TAVSIYE veriyor (`|| true` + `continue-on-error: true`,
+      # satir 153 ve 164'teki gerekce) — yani orada bir adim duserse is YINE YESIL kalir.
+      # Nobetciyi oraya koymak "kapi var, koser ama hicbir seyi durdurmaz" sinifi
+      # uretirdi. Bu is ise gercek kapi: `set -Eeuo pipefail` + fail-closed betik.
+      # Konu da ayni: RLS kapsamasi. Yeni bir is ADI acilmadi — yeni ad, acik PR'lari
+      # "beklenen kontrol gelmedi"de kilitler ya da kapinin disinda kalir.
+      - name: Anon yazma nobetcisi (INV-ANON-YAZMA-1)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          # Kok sertifikanin TEK kaynagi depo dosyasidir (kardes adimla ayni gerekce).
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          node scripts/db/checks/anon-yazma-nobetcisi.mjs
+
       # TLS teshisi BILEREK TEKRARLANMADI: kardes is ayni sunucuya ayni sertifikayla
       # baglaniyor ve zincir teshisini o basiyor. Ayni teshisi iki yere kopyalamak,
       # birini guncelleyip digerini unutmanin davetidir.

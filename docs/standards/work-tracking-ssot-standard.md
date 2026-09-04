@@ -1,5 +1,11 @@
 # VentHub — İş-Takibi & Dokümantasyon SSOT Standardı (Cetvel) — v1.0
 
+> ⚠️ **YÜRÜRLÜK NOTU (OPS, 2026-09-04):** Bu cetvelin §3 "Model A: registry tasks = work-order SSOT" hükmü
+> **2026-08-26'da geçersiz kaldı**. Canlı iş takibinin tek kaynağı **Linear**'dır; orion registry donmuş tarihçe
+> arşividir (REC-42/REC-53). Güncel katman haritası: `docs/standards/is-kayit-duzeni-standard.md` §1. "DURUM-TAKIP.md
+> KIBridge ile üretilir" satırı da hiç uygulanmadı (§3 notu). Aşağıdaki metin tarihçe olarak korunur; çelişkide
+> is-kayit-duzeni kazanır. Kaynak: `docs/proje-takip/celiski-mukerrerlik-analizi-2026-09-04.md` D1/D2.
+
 > **Bu dosya nedir?** *"Bir iş / karar / durum bilgisi NEREDE yaşar ve mükerrerlik nasıl önlenir?"* sorusunun
 > karar veren cetveli. Amaç: aynı bilgi iki yerde **elle** tutulmasın — yoksa drift olur, takip ölür, işler
 > birbirine girer.

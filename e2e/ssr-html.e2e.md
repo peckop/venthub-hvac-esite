@@ -2,9 +2,9 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\tmp\vh-altyapi-scrubber\vitest.smoke.config.ts
-skeleton_hash: b321d756eb3346fd
-generated_at: 2026-09-04T08:01:56.922600+00:00
+source_path: C:\tmp\vh-altyapi-scrubber\e2e\ssr-html.e2e.ts
+skeleton_hash: 19e2e734c87fae78
+generated_at: 2026-09-04T08:01:56.911678+00:00
 ---
 
 ## Genel Bakış
@@ -19,4 +19,4 @@ Bu modül dışa açılan fonksiyon/sınıf/sabit/tip içermez; saf yan-etki (ba
 (Dışa açılan çağrılabilir öğe yok — modül-düzeyi yan-etki; AST işaretçisi gerektiren fonksiyon/metot yok.)
 
 ## NODE ID STANDARD
-file: C:\tmp\vh-altyapi-scrubber\vitest.smoke.config.ts
+file: C:\tmp\vh-altyapi-scrubber\e2e\ssr-html.e2e.ts

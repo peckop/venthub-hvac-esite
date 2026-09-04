@@ -1,0 +1,19 @@
+{
+  "surum": 1,
+  "demetler": {
+    "01-cekirdek-ve-durum": "a682cdce852b44aa94cc96605c5dc5dd4a5abd2a15f64b06f4257a7480a2ec8b",
+    "02-cetveller-standards-1": "f9559f1242f5587e30fa0a61ed24f4db15aefd33b8a4c937f8747fe9e413520a",
+    "02-cetveller-standards-2": "9714649c97a7788190ada45ea0ba7ddc0d18b1673e76df9d98376edbd2438a27",
+    "03-planlar": "4a2e5718db05fbb6efa6c5a492923fe368a9e3ae5b260b7ce2238f877559ca25",
+    "04-olcumler-audits": "c96ce26b9b207b7a103d478343c37c2999ad5caf17ed76180b6c322e7fba31cd",
+    "05-arsiv": "de99a6033b921171334913dcc1e7e9a92b3368e723c87f4ab3161effc47d2753",
+    "06-hafiza-notlari-1": "fcbbfdafd6ddde65e6e2ca21322b172e678746f33dccefb0e19a97dc531d590b",
+    "06-hafiza-notlari-2": "694590d9f480530ebfa55bf0086c78f4c2f68287347533e244ea3b12dbafdc20",
+    "06-hafiza-notlari-3": "fdccc6064b4aa0d9248eaff5891963c4006273560998995edcb1d86e0413c6b0",
+    "07-hafiza-gunluk-ops": "5843a19a8788cea1197b35b16c8c507649d5544b4ca74245591d6667955084d6",
+    "08-linear-kararlar": "8d72ad5eaa8351117b0219b150a9d2762fe17f3b76f4916b01c5e14dae50f611",
+    "09-linear-anahtar-ve-is-kayitlari": "a142af3dcc3c110e0fee1a3a7003cc17daf9d2db8643e1629020266c51e1993c",
+    "10-design-15a-briefler": "87e17401101a0732c22edf3410257bee3906f15394f0d21f9505fdcd18fbe313",
+    "11-proje-takip-analizler": "22c073e5d3ba303fc91b52b62e254cad20435c9622951074656166230bafc452"
+  }
+}
