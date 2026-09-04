@@ -20,6 +20,7 @@ import { trackEvent } from '../utils/analytics'
 import { NAVIGATION_PRIMARY_ITEMS, NAVIGATION_SECONDARY_ITEMS } from '../utils/navigationConfig'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { localizedHref } from '../utils/routes'
+import LanguageSwitcher from './LanguageSwitcher'
 import HeaderTeklifPaneli from './navigation/HeaderTeklifPaneli'
 import NavActionButton from './navigation/NavActionButton'
 import NavBrand from './navigation/NavBrand'
@@ -272,7 +273,20 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
                   (mobilde bunların yerini alt sekme çubuğu alır, Faz 1b).
                   Bayrak KAPALIYKEN aşağıdaki eski küme aynen çizilir — bugünkü hâl. */}
               {YENI_KABUK_GEZINMESI ? (
-                <HeaderTeklifPaneli />
+                /* ⭐MOBİLDE GİZLİ — `hidden md:block`. Bayrak açık hâliyle ekran
+                   görüntüsü alındığında GÖRÜLDÜ ki mobilde "Teklif" hem burada hem
+                   alt sekme çubuğunda duruyor: aynı ad, aynı iş, iki farklı davranış.
+                   Tasarım v13 (K5/K9) bu öğeyi MASAÜSTÜ kuralı sayıyor; mobilde üstte
+                   yalnız logo + arama kalır ve panelin girişi alt çubuğun Teklif
+                   sekmesidir. Bunu hiçbir statik kapı göremezdi — göz gördü. */
+                <div className="hidden md:flex items-center gap-2">
+                  {/* Tasarım sırası: arama · TR/EN · Teklif(n). Arama zaten solda
+                      duruyor; burada TR/EN ile Teklif yan yana gelir.
+                      Dil seçici artık YÜZMÜYOR (Recep hükmü 12:30) — masaüstündeki
+                      yeri burası, mobildeki yeri Hesap yaprağının en üstü. */}
+                  <LanguageSwitcher id="header-dil-secici" />
+                  <HeaderTeklifPaneli />
+                </div>
               ) : (
                 <>
               <div className="hidden xl:flex items-center gap-1.5 w-auto opacity-100">

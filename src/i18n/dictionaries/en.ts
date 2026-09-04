@@ -762,6 +762,12 @@ export const en: typeof tr = {
     markalar: 'Brands',
     teknikDestek: 'Technical support',
     iletisim: 'Contact',
+    // Account sheet (REC-129 Faz 1c): the floating language switcher was removed;
+    // on mobile this sheet's top row is the only entry point for language.
+    dil: 'Language',
+    hesabim: 'My account',
+    girisYapin: 'Sign in',
+    kilitli: '(sign-in required)',
   },
   header: {
     adminBar: {

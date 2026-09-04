@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import React, { lazy, Suspense, useEffect, useState } from 'react'
 
+import { YENI_KABUK_GEZINMESI } from '../../config/features'
 import { useScrollThrottle } from '../../hooks/useScrollThrottle'
 import BackToTopButton from '../BackToTopButton'
 import Footer from '../Footer'
@@ -86,7 +87,21 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 {children}
             </main>
 
-            <div className="fixed bottom-6 right-6 z-toast flex flex-col items-end gap-3 pointer-events-none">
+            {/* ⭐YÜZEN YIĞIN MOBİLDE ÇUBUĞUN ÜSTÜNE ÇIKAR — ve bu KOZMETİK DEĞİL:
+                Dil seçici buradan kaldırıldıktan sonra bile yığın (geri-yukarı,
+                WhatsApp) alt sekme çubuğunun sağ ucuna biniyor ve **"Hesap" sekmesi
+                TIKLANAMIYOR**. Ekran görüntüsünde görünmüyordu — düğmeler o an
+                görünmezdi ama kapsayıcıları dokunuşu yutuyordu; kusuru ancak sekmeye
+                DOKUNMAYA çalışınca gördük (Playwright "subtree intercepts pointer
+                events" dedi). Göz de kaçırabilir; etkileşim yakaladı.
+                `bottom-24` (6rem) çubuğun 44px dokunma hedefi + güvenli alanını aşar.
+                Ölçek değeri, keyfi Tailwind değeri değil (kural 8).
+                Bayrak KAPALIYKEN bugünkü konum aynen sürer. */}
+            <div
+                className={`fixed right-6 z-toast flex flex-col items-end gap-3 pointer-events-none ${
+                    YENI_KABUK_GEZINMESI ? 'bottom-24 md:bottom-6' : 'bottom-6'
+                }`}
+            >
                 <div className="pointer-events-auto">
                     <BackToTopButton />
                 </div>
@@ -99,9 +114,17 @@ export default function MainLayout({ children }: MainLayoutProps) {
                     </div>
                 )}
 
-                <div className="pointer-events-auto">
-                    <LanguageSwitcher />
-                </div>
+                {/* ⭐YÜZEN DİL SEÇİCİ BAYRAK AÇIKKEN YOK — Recep hükmü (2026-09-04 12:30):
+                    "yeni tasarımda yüzen dil seçici yok." Kaldırılmıyor, TAŞINIYOR:
+                    masaüstünde header'ın sağ kümesine, mobilde alt çubuğun Hesap
+                    yaprağının en üstüne. Önce yalnız yukarı kaydırmıştım (alt çubuğu
+                    kapatmasın diye); o çakışmayı çözerdi ama tasarım kararına uymazdı.
+                    Bayrak KAPALIYKEN bugünkü yüzen hâl aynen sürer. */}
+                {!YENI_KABUK_GEZINMESI && (
+                    <div className="pointer-events-auto">
+                        <LanguageSwitcher />
+                    </div>
+                )}
             </div>
 
             <PaymentWatcher />

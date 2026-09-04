@@ -30,7 +30,10 @@ const oku = (...p: string[]) => readFileSync(join(KOK, ...p), 'utf8')
 
 const BAYRAK = 'YENI_KABUK_GEZINMESI'
 const PANEL = oku('src', 'components', 'navigation', 'HeaderTeklifPaneli.tsx')
+const ICERIK = oku('src', 'components', 'navigation', 'TeklifPaneliIcerigi.tsx')
+const CUBUK = oku('src', 'components', 'navigation', 'MobilAltSekmeCubugu.tsx')
 const HEADER = oku('src', 'components', 'StickyHeader.tsx')
+const YERLESIM = oku('src', 'components', 'layout', 'MainLayout.tsx')
 const FEATURES = oku('src', 'config', 'features.ts')
 const TR = oku('src', 'i18n', 'dictionaries', 'tr.ts')
 const EN = oku('src', 'i18n', 'dictionaries', 'en.ts')
@@ -39,7 +42,10 @@ const EN = oku('src', 'i18n', 'dictionaries', 'en.ts')
 const govde = (k: string) => k.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
 
 const PANEL_GOVDE = govde(PANEL)
+const ICERIK_GOVDE = govde(ICERIK)
+const CUBUK_GOVDE = govde(CUBUK)
 const HEADER_GOVDE = govde(HEADER)
+const YERLESIM_GOVDE = govde(YERLESIM)
 
 describe('INV-HEADER-TEKLIF-1 — header teklif paneli', () => {
   it('bayrak features.ts içinde ve KAPALI doğuyor', () => {
@@ -77,22 +83,22 @@ describe('INV-HEADER-TEKLIF-1 — header teklif paneli', () => {
   })
 
   it('ÜÇ HÂL de kaynakta var: dolu · boş · girişsiz', () => {
-    expect(PANEL_GOVDE.includes('teklifPaneli.baslik'), 'DOLU hal yok.').toBe(true)
+    expect(ICERIK_GOVDE.includes('teklifPaneli.baslik'), 'DOLU hal yok.').toBe(true)
     expect(
-      PANEL_GOVDE.includes('teklifPaneli.bosBaslik') && PANEL_GOVDE.includes('teklifPaneli.bosAciklama'),
+      ICERIK_GOVDE.includes('teklifPaneli.bosBaslik') && ICERIK_GOVDE.includes('teklifPaneli.bosAciklama'),
       'BOS hal yok — listesi bos ziyaretci bombos bir kutu gorur.',
     ).toBe(true)
     expect(
-      PANEL_GOVDE.includes('teklifPaneli.girisDaveti'),
+      ICERIK_GOVDE.includes('teklifPaneli.girisDaveti'),
       'GIRISSIZ hal yok.',
     ).toBe(true)
   })
 
   it('⭐girişsizde ÖLÜ KAPI yok — hesap kısayolları user dalının İÇİNDE', () => {
     // Ayirt edici olcum: hesap rotalari `user ?` ucusunun DOGRU dalinda mi.
-    const ucluIndex = PANEL_GOVDE.indexOf('user ?')
-    expect(ucluIndex, 'Panelde "user ?" dallanmasi YOK — giris durumu hic sorulmuyor.').toBeGreaterThan(-1)
-    const sonrasi = PANEL_GOVDE.slice(ucluIndex)
+    const ucluIndex = ICERIK_GOVDE.indexOf('user ?')
+    expect(ucluIndex, 'Icerikte "user ?" dallanmasi YOK — giris durumu hic sorulmuyor.').toBeGreaterThan(-1)
+    const sonrasi = ICERIK_GOVDE.slice(ucluIndex)
     const ayirici = sonrasi.indexOf(') : (')
     expect(ayirici, 'Ucluda aksi dal (":") bulunamadi.').toBeGreaterThan(-1)
     const girisliDal = sonrasi.slice(0, ayirici)
@@ -109,13 +115,17 @@ describe('INV-HEADER-TEKLIF-1 — header teklif paneli', () => {
   })
 
   it('metinler sözlükten ve TR/EN paritesi tam', () => {
-    const ANAHTARLAR = [
-      'teklif', 'kalemSayisi', 'baslik', 'bosBaslik', 'bosAciklama', 'urunlereGit',
+    // Düğmenin metni panelde, panelin içeriği ICERIK'te — anahtar hangi dosyada
+    // aranacaksa orada aranır; "herhangi bir yerde geçiyor" ölçütü ayırt etmezdi.
+    const PANEL_ANAHTARLARI = ['teklif', 'kalemSayisi']
+    const ICERIK_ANAHTARLARI = [
+      'baslik', 'bosBaslik', 'bosAciklama', 'urunlereGit',
       'tumListe', 'tekliflerim', 'projelerim', 'favorilerim', 'girisDaveti',
     ]
-    for (const a of ANAHTARLAR) {
+    for (const a of [...PANEL_ANAHTARLARI, ...ICERIK_ANAHTARLARI]) {
+      const kaynak = PANEL_ANAHTARLARI.includes(a) ? PANEL_GOVDE : ICERIK_GOVDE
       expect(
-        PANEL_GOVDE.includes(`teklifPaneli.${a}`),
+        kaynak.includes(`teklifPaneli.${a}`),
         `t('teklifPaneli.${a}') kullanilmiyor — metin gomulu olabilir (kural 7).`,
       ).toBe(true)
       for (const [ad, sozluk] of [['tr', TR], ['en', EN]] as const) {
@@ -132,5 +142,104 @@ describe('INV-HEADER-TEKLIF-1 — header teklif paneli', () => {
       PANEL_GOVDE.includes('sr-only') && PANEL_GOVDE.includes('teklifPaneli.kalemSayisi'),
       'Rozet sayisi ekran okuyucuya soylenmiyor.',
     ).toBe(true)
+  })
+
+  /*
+   * Aşağıdaki dört kural GÖZLE bulundu, kapıyla değil: bayrak açık hâliyle ekran
+   * görüntüsü alındı ve mobilde "Teklif" İKİ yerde çıktı. Kapı o gün bunu göremezdi
+   * çünkü ikisi de tek başına doğruydu; kusur BİRLİKTELİKTE idi. Artık ölçülüyor.
+   */
+  it('⭐header Teklif öğesi MOBİLDE GİZLİ — çift gezinme geri gelemez', () => {
+    const i = HEADER_GOVDE.indexOf('<HeaderTeklifPaneli')
+    expect(i, 'Header paneli render edilmiyor.').toBeGreaterThan(-1)
+    // Sarmalayici, ogeden ONCE gelen en yakin acilis etiketinde aranir.
+    const oncesi = HEADER_GOVDE.slice(0, i)
+    const sonSarmalayici = oncesi.slice(oncesi.lastIndexOf('<div'))
+    expect(
+      // `md:block` ya da `md:flex` — kural "mobilde gizli", kapsayicinin masaustu
+      // duzeni degil. Dil secici yaninda cizilince `flex` oldu; kural degismedi.
+      /hidden\s+md:(block|flex)/.test(sonSarmalayici),
+      'Header Teklif ogesi mobilde GIZLENMIYOR (`hidden md:block` yok). Alt cubukta da ' +
+        'Teklif sekmesi var; ikisi birden gorunurse ziyaretci ayni isi IKI YERDE gorur ' +
+        '— bu kusur 2026-09-04 te ekran goruntusunde OLCULDU.',
+    ).toBe(true)
+  })
+
+  it('⭐alt çubuğun Teklif sekmesi PANEL açıyor — /cart bağlantısı DEĞİL', () => {
+    expect(
+      CUBUK_GOVDE.includes('aria-haspopup="dialog"'),
+      'Alt cubugun Teklif sekmesi panel acmiyor.',
+    ).toBe(true)
+    expect(
+      /<Link\s+href=\{Routes\.cart\(\)\}[\s\S]{0,400}?altSekme\.teklif/.test(CUBUK_GOVDE),
+      'Teklif sekmesi hala dogrudan /cart e giden bir Link. Header ogesi mobilde gizlendigi ' +
+        'icin panelin TEK girisi bu sekmedir; sayfaya atlarsa panel mobilde ERISILEMEZ olur.',
+    ).toBe(false)
+  })
+
+  it('⭐alt çubuğun Hesap sekmesi YAPRAK açıyor, girişsizde ÖLÜ KAPI yok', () => {
+    expect(
+      /<Link\s+href=\{Routes\.account\.overview\(\)\}[\s\S]{0,300}?altSekme\.hesap'\)\}\s*<\/Link>/.test(CUBUK_GOVDE),
+      'Hesap sekmesi hala dogrudan /account a giden bir Link — Recep hukmu yaprak acilmasi.',
+    ).toBe(false)
+    // Girissiz dalda hesap rotalari BAGLANTI olmamali; "kilitli" metin olarak durur.
+    const i = CUBUK_GOVDE.indexOf('user ?')
+    expect(i, 'Hesap yapraginda "user ?" dallanmasi YOK.').toBeGreaterThan(-1)
+    const sonrasi = CUBUK_GOVDE.slice(i)
+    const ayirici = sonrasi.indexOf(') : (')
+    const girissizDal = sonrasi.slice(ayirici)
+    expect(
+      /<Link[^>]*Routes\.account\./.test(girissizDal.slice(0, girissizDal.indexOf('</nav>'))),
+      'Girissiz dalda /account a giden bir Link var — olu kapi.',
+    ).toBe(false)
+    expect(
+      girissizDal.includes('altSekme.kilitli') && girissizDal.includes('aria-disabled'),
+      'Kilitli kalemler yok ya da ekran okuyucuya kilitli DENMIYOR.',
+    ).toBe(true)
+  })
+
+  it('⭐yüzen yığın mobilde çubuğun ÜSTÜNDE — Hesap sekmesi tıklanabilir kalıyor', () => {
+    // Dil secici tasindiktan SONRA bile yigin (geri-yukari, WhatsApp) cubugun sag
+    // ucuna biniyordu ve Hesap sekmesi TIKLANAMIYORDU. Gorunmez bir kapsayici
+    // dokunusu yutuyordu; ekran goruntusu bunu gostermedi, ETKILESIM gosterdi.
+    expect(
+      new RegExp(`${BAYRAK}\\s*\\?\\s*'bottom-24 md:bottom-6'\\s*:\\s*'bottom-6'`).test(YERLESIM_GOVDE),
+      'Yuzen yigin bayraga gore yukselmiyor — alt cubugun sag ucundaki sekme tiklanamaz olur.',
+    ).toBe(true)
+  })
+
+  it('⭐yüzen dil seçici bayrak açıkken YOK — header ve Hesap yaprağına taşındı', () => {
+    expect(
+      new RegExp(`\\{!\\s*${BAYRAK}\\s*&&`).test(YERLESIM_GOVDE),
+      'MainLayout taki yuzen dil secici bayrak acikken hala ciziliyor. Recep hukmu ' +
+        '(2026-09-04 12:30): yeni tasarimda YUZEN dil secici YOK.',
+    ).toBe(true)
+    expect(
+      HEADER_GOVDE.includes('<LanguageSwitcher'),
+      'Masaustu header inde dil secici YOK — yuzen dugme kaldirildi, yerine konmadi: ' +
+        'masaustunde dil DEGISTIRILEMEZ olurdu.',
+    ).toBe(true)
+    expect(
+      CUBUK_GOVDE.includes('<LanguageSwitcher') && CUBUK_GOVDE.includes('altSekme.dil'),
+      'Hesap yapraginda dil secici YOK — mobilde dil DEGISTIRILEMEZ olurdu.',
+    ).toBe(true)
+  })
+
+  it('⭐panel içeriği TEK KAYNAK — iki yüzey kopyalanmıyor', () => {
+    for (const [ad, kaynak] of [['HeaderTeklifPaneli', PANEL_GOVDE], ['MobilAltSekmeCubugu', CUBUK_GOVDE]] as const) {
+      expect(
+        kaynak.includes('<TeklifPaneliIcerigi'),
+        `${ad} ortak icerigi kullanmiyor — iki yuzey zamanla AYRISIR ve hicbir kapi gormez.`,
+      ).toBe(true)
+    }
+    // Header paneli icerigi KOPYALAMAMALI — kendi hesap kisayolunu yazmamali.
+    // ⚠Alt cubuk BU KURALIN DISINDA ve bu bilerek: Recep hukmuyle (12:30) Hesap
+    // YAPRAGI ayri bir yuzey ve kendi kisayollarini tasir. Kural "teklif panelinin
+    // icerigi tek kaynaktan gelsin"dir, "hicbir yerde hesap rotasi gecmesin" degil —
+    // ikincisi dogru olsa Hesap yapragi hic yazilamazdi.
+    expect(
+      PANEL_GOVDE.includes('Routes.account.quotes()'),
+      'Header paneli hesap kisayolunu KENDI yaziyor — ortak icerigin kopyasi var.',
+    ).toBe(false)
   })
 })

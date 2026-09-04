@@ -6,7 +6,13 @@ import React from 'react'
 
 import { useI18n } from '../i18n/I18nProvider'
 
-const LanguageSwitcher: React.FC = () => {
+/**
+ * `id` NİÇİN PROP OLDU (REC-129 Faz 1c): bayrak açıkken bu bileşen İKİ yerde çizilir —
+ * masaüstü header'ında ve mobil Hesap yaprağında. İkisi de DOM'da aynı anda bulunabilir
+ * (header `hidden md:block` ile gizlenir ama DOM'dan silinmez), sabit bir `id` o an
+ * ÇİFTLENİRDİ. Varsayılan korunuyor; ikinci örnek kendi id'sini verir.
+ */
+const LanguageSwitcher: React.FC<{ id?: string }> = ({ id = 'language-switcher' }) => {
   const { lang, setLang, t } = useI18n()
   const pathname = usePathname()
   const router = useRouter()
@@ -45,7 +51,7 @@ const LanguageSwitcher: React.FC = () => {
 
   return (
     <div
-      id="language-switcher"
+      id={id}
       className="bg-white/90 backdrop-blur border border-light-gray rounded-full shadow-sm p-1 flex items-center gap-1"
       role="group"
       aria-label={t('common.languageSwitcher')}
