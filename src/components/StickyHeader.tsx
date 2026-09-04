@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useCallback,useEffect, useMemo, useRef, useState } from 'react'
 
+import { YENI_KABUK_GEZINMESI } from '../config/features'
 import { useCategories } from '../contexts/CategoryContext'
 import { useAuth } from '../hooks/useAuth'
 import { useCart } from '../hooks/useCartHook'
@@ -19,6 +20,7 @@ import { trackEvent } from '../utils/analytics'
 import { NAVIGATION_PRIMARY_ITEMS, NAVIGATION_SECONDARY_ITEMS } from '../utils/navigationConfig'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { localizedHref } from '../utils/routes'
+import HeaderTeklifPaneli from './navigation/HeaderTeklifPaneli'
 import NavActionButton from './navigation/NavActionButton'
 import NavBrand from './navigation/NavBrand'
 import NavPrimaryRail from './navigation/NavPrimaryRail'
@@ -264,6 +266,15 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
             <NavPrimaryRail items={primaryItems} isCategoriesLoading={isCategoriesLoading} isCategoryHubOpen={isCategoryHubOpen} onCategoryClick={handleOpenCategoryHub} onItemHover={handleNavItemHover} />
             <div className="flex-1 max-w-xl hidden sm:flex justify-center md:px-4"><NavSearchTrigger label={t('header.commandSearchCompact')} shortcutLabel="/" ariaLabel={t('common.search')} onClick={openSearchOverlay} /></div>
             <NavUtilityRail>
+              {/* REC-129 Faz 1c — bayrak AÇIKKEN header eylem kümesi TEK ÖĞEYE iner.
+                  Tasarım v13 ekran 12: sağda yalnız "Teklif (n)" + paneli kalır; son
+                  bakılanlar / favoriler / sepet / hesap menüsü / hamburger KALKAR
+                  (mobilde bunların yerini alt sekme çubuğu alır, Faz 1b).
+                  Bayrak KAPALIYKEN aşağıdaki eski küme aynen çizilir — bugünkü hâl. */}
+              {YENI_KABUK_GEZINMESI ? (
+                <HeaderTeklifPaneli />
+              ) : (
+                <>
               <div className="hidden xl:flex items-center gap-1.5 w-auto opacity-100">
                 {/* REC-94: "Hızlı Sipariş" KALDIRILDI. İki ayrı kusuru tek düğmede taşıyordu:
                     (1) sipariş verilemeyen bir sitede SİPARİŞ vaat ediyordu (vaat-bütünlüğü
@@ -277,6 +288,8 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
               <div className="hidden lg:block">{renderUserMenu()}</div>
               <div className="transition-opacity-transform duration-300 overflow-hidden sm:hidden"><NavActionButton ariaLabel={t('common.search')} onClick={openSearchOverlay} icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>} /></div>
               <NavActionButton ariaLabel={t('header.menu')} onClick={() => { trackEvent('nav_click', { target: 'menu', mode }); openMenu(); }} icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>} tone={activeSurface === 'menu' ? 'accent' : 'default'} className="lg:hidden" />
+                </>
+              )}
             </NavUtilityRail>
           </>
         }

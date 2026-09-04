@@ -731,6 +731,20 @@ export const en: typeof tr = {
     },
     productCategories: 'Product Categories',
   },
+  teklifPaneli: {
+    // REC-129 Faz 1c — header "Quote" element and panel (design v13, screen 12).
+    teklif: 'Quote',
+    kalemSayisi: '{n} items in quote list',
+    baslik: 'Quote list · {n} items',
+    bosBaslik: 'Quote list is empty',
+    bosAciklama: 'Add items from products.',
+    urunlereGit: 'Go to products',
+    tumListe: 'See all ({n})',
+    tekliflerim: 'My quotes',
+    projelerim: 'My projects',
+    favorilerim: 'My favourites',
+    girisDaveti: 'Sign in to see your quotes and projects',
+  },
   altSekme: {
     // REC-129 Faz 1b — mobile bottom tab bar (design v13, screens 01/02/12).
     // Keys are NESTED: `getDictValue` cannot resolve a flat dotted key and would

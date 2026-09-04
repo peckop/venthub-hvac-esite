@@ -4,7 +4,7 @@
  * Mobil alt sekme çubuğu — REC-129 Faz 1b (tasarım v13, ekran 01/02/12).
  *
  * Beş sekme: Ana sayfa · Ürünler · Teklif (rozet) · Destek · Hesap.
- * `MOBIL_ALT_SEKME_CUBUGU` bayrağı KAPALIYKEN hiç render edilmez (bileşen `null` döner),
+ * `YENI_KABUK_GEZINMESI` bayrağı KAPALIYKEN hiç render edilmez (bileşen `null` döner),
  * ve açıkken de yalnız `md` altı kırılımda görünür — masaüstünde `hidden`.
  *
  * ⭐NİÇİN KENDİ PANELİNİ TAŞIYOR (ölçüldü, varsayılmadı):
@@ -23,7 +23,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 
-import { MOBIL_ALT_SEKME_CUBUGU } from '../../config/features'
+import { YENI_KABUK_GEZINMESI } from '../../config/features'
 import { useCart } from '../../hooks/useCartHook'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -107,7 +107,7 @@ export default function MobilAltSekmeCubugu() {
   const sayi = gomulu ? getCartCount() : 0
   const aktif = (yol: string) => pathname === yol || pathname.startsWith(`${yol}/`)
 
-  if (!MOBIL_ALT_SEKME_CUBUGU) return null
+  if (!YENI_KABUK_GEZINMESI) return null
 
   const sekmeSinifi = (secili: boolean) =>
     [

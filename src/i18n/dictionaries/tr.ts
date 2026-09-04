@@ -707,6 +707,20 @@ export const tr = {
     },
     productCategories: 'Ürün Kategorileri',
   },
+  teklifPaneli: {
+    // REC-129 Faz 1c — header "Teklif" ögesi ve paneli (tasarım v13, ekran 12).
+    teklif: 'Teklif',
+    kalemSayisi: 'teklif listesinde {n} kalem',
+    baslik: 'Teklif listesi · {n} kalem',
+    bosBaslik: 'Teklif listesi boş',
+    bosAciklama: 'Ürünlerden ekleyin.',
+    urunlereGit: 'Ürünlere git',
+    tumListe: 'Tümünü gör ({n})',
+    tekliflerim: 'Tekliflerim',
+    projelerim: 'Projelerim',
+    favorilerim: 'Favorilerim',
+    girisDaveti: 'Tekliflerinizi ve projelerinizi görmek için giriş yapın',
+  },
   altSekme: {
     // REC-129 Faz 1b — mobil alt sekme çubuğu (tasarım v13, ekran 01/02/12).
     // Anahtarlar NESTED: `getDictValue` nokta içeren düz anahtarı çözemez ve ham
