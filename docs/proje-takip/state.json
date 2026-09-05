@@ -2,18 +2,24 @@
   "surum": 1,
   "demetler": {
     "01-cekirdek-ve-durum": "a682cdce852b44aa94cc96605c5dc5dd4a5abd2a15f64b06f4257a7480a2ec8b",
-    "02-cetveller-standards-1": "858ee6e0fd247e8053bac9b286b9b4bae0110b15f824a07c2ffd317435c39af7",
+    "02-cetveller-standards-1": "fac5f74b48bb4745047beef501b81ce68aef824183d0c962e5f689156a589c7a",
     "02-cetveller-standards-2": "9714649c97a7788190ada45ea0ba7ddc0d18b1673e76df9d98376edbd2438a27",
     "03-planlar": "4a2e5718db05fbb6efa6c5a492923fe368a9e3ae5b260b7ce2238f877559ca25",
     "04-olcumler-audits": "c96ce26b9b207b7a103d478343c37c2999ad5caf17ed76180b6c322e7fba31cd",
     "05-arsiv": "de99a6033b921171334913dcc1e7e9a92b3368e723c87f4ab3161effc47d2753",
     "06-hafiza-notlari-1": "1c5c760cfc69835bb256229eac9e9629c49c00ed09b69c281f2f0439d8839405",
-    "06-hafiza-notlari-2": "d79f76a5e4d7a9d40995406b088e99d314eb0d425a7a2119bf1938f3528b4a8f",
-    "06-hafiza-notlari-3": "67e168f6f886d6c7028c24d44484c26898e4301af234db85e4cdb640a691c132",
-    "07-hafiza-gunluk-ops": "1c6a65a7d5cbe010ccb3b5d938f7e7a8209d9a706fa25f4e2c7b63b9e22fe6b0",
+    "06-hafiza-notlari-2": "55907e1114e50c374d7e9076b35d905e3fd0de8db6009ea969a3d637d342f3d1",
+    "06-hafiza-notlari-3": "acd6c64510d418aeebeabbb191f71c9867dc50f0feb9d532f1c72745f88615e3",
+    "07-hafiza-gunluk-ops": "414f9ec8bf5b7676236b7040c632aefaee689e6e3ea01cc8de94a3eba96516ba",
     "08-linear-kararlar": "8f3c78993fcf8dc2cbf1c767699c218c3f6d3592abb1c34855e5653ae88ba8f1",
     "09-linear-anahtar-ve-is-kayitlari": "a142af3dcc3c110e0fee1a3a7003cc17daf9d2db8643e1629020266c51e1993c",
     "10-design-15a-briefler": "42004b01f2f31aebd7bcf47fa6d15310606adf2bebe38df4227ddaf664e78b12",
-    "11-proje-takip-analizler": "66798132c5310426565b276ee3249767481315de76d20378864d524740892e1f"
+    "11-proje-takip-analizler": "8df42afee28d7b41bd7b73b63d1608df8481f9e2f2e04b6aa899d32317d06411",
+    "12-konusma-gunlugu-1": "2ef91d7986c98d73e54b7a784e422d6c4b077a8758920d9100f1dea07b9d9585",
+    "12-konusma-gunlugu-2": "2f1258f73ca62930083eb968cb2668ce2b91fcdd174828a964b4fad16824cf01",
+    "12-konusma-gunlugu-3": "a9f6cff3f653830270a6103a978067c9172475c4106fbc896cba5539c42524e1",
+    "12-konusma-gunlugu-4": "f7a41ce0ee3ac010b74b0aa8cd6eb9512435208da82eb8b74d7e24f0542a57af",
+    "12-konusma-gunlugu-5": "a2f915c1f277e64a787b1a16f4632aca23fb538a429158f2b954c7018ef1e4c5",
+    "12-konusma-gunlugu-6": "5ead0f771d3858648444fe7ed16a57566b7b459151b87c58002695f5f8d1dc87"
   }
 }
