@@ -143,3 +143,102 @@ bu kural onun **nerede görünmek zorunda olduğunu** söyler.
 
 `docs/standards/catalog-ingestion-standard.md` (§6 kapılar) · `category-taxonomy-standard.md` ·
 T098 (I18N — ad-gösterim SSOT) · memory `catalog-ingestion-system`, `documents-are-the-decision`.
+
+---
+
+## EK — 2026-08-19: KÖK SEBEP KAYNAKTAN OKUNDU, KAPSAM BÜYÜDÜ
+
+> Bu ek, Recep'in "bu aile adları uydurma mı, CSV'de mi var" sorusu üzerine yapılan
+> **kaynak-belge ölçümünün** sonucudur. Aşağıdaki her satır ya AVenS 2026 fiyat kataloğunun
+> sayfa görüntüsünden ya da prod DB'den okunmuştur; çıkarım olan yerler ayrıca işaretlidir.
+
+**Kaynak:** `venthub-pdf-ingestor/venthub/ticaret/avensair-fiyat-listesi-2026/`
+· PDF: `01-input/avens_fiyat_listesi_2026_HQ.pdf` · Sayfa görüntüleri: `02-work/pages/page_1..74.png`
+· Çıkarılan veri: `03-output/avensair-fiyat.csv` (`model_code;model_name;price_eur;avensair_section;page_num`)
+
+### 1. Aile adı UYDURMA DEĞİL — kataloğun BÖLÜM başlığından miras
+
+Aile adı `avensair_section` kolonundan geliyor; o kolon kataloğun bölüm başlığı.
+**Kusur:** kataloğun İKİ katmanı var, biz üst katmanı aile sanmışız.
+
+```
+36  Davlumbaz Fanlar          ← BÖLÜM  = kategori
+    - VORT QBK SAL KC EVO     ← ALT SATIR = ürün hattı = AİLE
+46  Plug Fanlar
+    - ENKELFAN · KENTALFAN    ← İKİ ayrı hat
+41  Santrifüj Fanlar
+    - SEAT · STORM · JET · SEAT ATEX · STORM ATEX · JET ATEX · NIMUS · NIMAX  ← SEKİZ hat
+```
+
+**Ayırt edici:** bölümde **tek** hat varsa aile KAZARA doğru çıkmış (Nicotra ADH/RDH/AT,
+Vortice QBK). Hata yalnız bölüm **çok hatlıyken** görünüyor. Bu yüzden bugüne kadar fark edilmedi.
+
+### 2. Marka alanı üreticiyi değil DAĞITICIYI gösteriyor
+
+Sayfa 50: başlık `KENTALFAN - IEC MOTORLU PLUG FAN`, açıklama "**OEM fan**", sayfada **Casals**
+logosu. Yani üretici Casals, AVenS TR distribütörü. DB'de `brand = AVenS`.
+→ **B1 maddesi DÜZELTİLDİ:** "14 üyenin tamamı Kentalfan markalı" ifadesi YANLIŞTI; marka alanı
+hem CSV'de hem DB'de `AVenS`. Doğru bulgu: **ürün ADI bir markayı, marka ALANI başkasını söylüyor.**
+
+### 3. "AVenS Davlumbaz Fanları" HAYALET AİLE
+
+Sayfa 36 = `DAVLUMBAZ FANLAR`: üstte fanlar (`VORT QBK SAL KC EVO`, Vortice), altta **paylaşılan
+aksesuar tablosu** (hız anahtarları + frekans konvertörleri). Hat doğru şekilde
+`Vortice VORT QBK SAL KC Evo` ailesine gitmiş (**21 ürün, DB'de duruyor**); aksesuarlar AVenS
+altında kalıp bölüm adını aile adı yapmış.
+Aynı hız anahtarları (`60006`, `01801`) **sayfa 27'de de** var → **ortak aksesuar**, hiçbir
+ailenin üyesi değil.
+
+### 4. ASIL BULGU — katalogun dörtte biri İÇE AKTARILMAMIŞ
+
+| | Adet |
+|---|---|
+| Çıkarılan CSV'deki benzersiz kod | **484** |
+| prod DB'deki benzersiz kod | **374** |
+| **Katalogda var, DB'de YOK** | **136** |
+| DB'de var, fiyat listesinde yok | 26 — **hata DEĞİL**, Vortice üretici kataloglarından (5/5 örnek doğrulandı) |
+
+En ağır bölümler: Nordik HVLS 21 · Mini Aksiyel (Ghost/Notus) 16 · Yatay Atışlı Çatı 11 ·
+Nicotra RDH 10 · Mini Aksiyel 10 · Nicotra ADH 8 · Gold 8 · Dikey Atışlı Çatı 7 · Çift Yönlü Aksiyel 7.
+
+### 5. ⚠ 484 GERÇEK DEĞİL, TABAN — çıkarma KUSURLU
+
+Recep'in gönderdiği sayfa görüntüsüyle sınandı: `SULU BATARYALAR` tablosunda sayfada **8 satır**
+(13050–13057), CSV'de yalnız **2** (13050, 13051). **6 satır kayıp.**
+→ Gerçek katalog ≥484; **136 eksik bir ALT SINIRDIR.**
+→ İş emri "eksikleri aktar" ile sınırlı olamaz; **çıkarmanın yeniden doğrulanması** şart.
+
+### 6. Sonuç
+
+T099 "dokuz ailede ad uyuşmuyor" diye açılmıştı. Ölçülen gerçek: **taksonomi yanlış + kataloğun
+≥%28'i hiç içe aktarılmamış + çıkarma kusurlu.** Aile adlarını düzeltmek vitrini doğru gösterir
+ama satılacak ürünün dörtte biri sitede yoktur.
+
+**Önerilen sıra:** (1) çıkarmayı doğrula/yenile → (2) eksik kodları içe aktar (en yüksek ticari
+etki) → (3) aileleri kataloğun ALT satırlarına göre böl, ortak aksesuarları aileden çıkar →
+(4) kuralı cetvele yaz: *aile = katalog alt satırı; kategori = bölüm başlığı; aile adı bölüm
+başlığından TÜRETİLEMEZ.*
+### 7. ÜÇÜNCÜ SINIF — ZORUNLU TAMAMLAYICI ("ürün eşleşmesi") MODELLENMEMİŞ
+
+Recep'in gönderdiği sayfalarla ölçüldü. Bazı ürünler **tek başına kullanılamaz**; katalog bu
+ilişkiyi açıkça kodluyor ama veri modelimizde böyle bir kavram YOK.
+
+| Ana ürün | Katalogda ne diyor | Zorunlu tamamlayıcı | CSV | DB |
+|---|---|---|---|---|
+| `VORT QUADRO EVO` (QE, 24 kod `11521–11547`) | **"Lütfen kasa seçiniz…"** · *"İki modül olarak satılır"* | kasa `11560–11569` | **1/10** | **0/10** |
+| `VARIO` / `VARIO I` | *"Çift yönlü çalışma CR5N Hız Anahtarı ile sağlanmaktadır"* | `12941` CR5N | var | **yok** |
+| `VORT QUADRO` / `QUADRO I` | HIZ ANAHTARI kolonu `C 1,5` | `12966` | var | **yok** |
+| `PUNTO` | *"Fan ile birlikte kullanılır"* | cam kiti `22131–22133` | var | **yok** |
+| `AVenS BVU` | *"BVU üniteleri ile birlikte kullanılır"* | `30110/30111` BVU-LS | var | var ✔ |
+
+**Ticari sonuç:** QE ailesinin 24 ürünü sitede satılabilir görünüyor ama **kasasız çalışmaz** ve
+kasa katalogda hiç yok. Müşteri eksik ürün alır.
+
+**Ayrıca ikinci bir çıkarma kaybı kanıtı:** kasa satırlarının 9'u CSV'ye HİÇ girmemiş
+(`11560–11568`), yalnız `11569` var. §5'teki SULU BATARYA kaybıyla aynı sınıf → çıkarma
+doğrulaması T119'un ilk adımı olmalı.
+
+**Model önerisi (T119 kapsamına):** ürünler arası `zorunlu-tamamlayıcı` ve `uyumlu-aksesuar`
+ilişkisi. Katalog kaynağı hazır: "HIZ ANAHTARI" kolonu, "UYGUN MODEL" kolonu, "Lütfen kasa
+seçiniz" blokları. Bu ilişki kurulmadan aile düzeltmesi tek başına müşteriyi doğru ürüne
+götürmez.
