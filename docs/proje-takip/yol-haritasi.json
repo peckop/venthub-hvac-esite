@@ -89,9 +89,10 @@
       "sebep": "v1 09-04, v1.1 09-05; anahtar YAZILI kararlardan", "sorumlu": "OPS", "karar": "proje-takip-defteri-standard §5",
       "kanit": [ {"tur": "kod", "yol": "scripts/nlm/hafiza_sinavi.py", "desen": "beklenen_biri", "beklenen": "var"}, {"tur": "kod", "yol": "docs/proje-takip/hafiza-sinavi-sonuc.md", "beklenen": "var"} ] },
     { "id": "YH-43", "faz": "SUREC", "yetenek": "Companion (yardimci belge) uretimi DONDURULDU; C4 bloklamaz", "durum": "ACIK",
-      "sebep": "Recep 09-03: tasiyici kapali, kapi onleyemez cezalandirir; C5 ayni siniftan 09-05'te kirmizi (ALTYAPI'ya not)", "sorumlu": "ALTYAPI", "karar": "Recep 09-03",
-      "kanit": [ {"tur": "kod", "yol": "src/__tests__/conformance/companion-dondurulmus.test.ts", "beklenen": "var"},
-                 {"tur": "kod", "yol": "src/__tests__/conformance/companion-parity-coverage.test.ts", "desen": "C5_TABAN = 0", "beklenen": "var"} ] },
+      "sebep": "Recep 09-03 (C4) + 09-05 K9 UYKU KIPI (REC-142, #997): tek tasiyici anahtari KAPALI; tum companion kapilari sayar+raporlar+bloklamaz, kancalar uretmez; uyandirma = anahtar ACIK", "sorumlu": "ALTYAPI", "karar": "Kararlar-Altyapi K9 · REC-142",
+      "kanit": [ {"tur": "kod", "yol": ".companion-tasiyici.json", "desen": "KAPALI", "beklenen": "var"},
+                 {"tur": "kod", "yol": "scripts/hijyen/tasiyici-anahtari.cjs", "beklenen": "var"},
+                 {"tur": "kod", "yol": "src/__tests__/conformance/companion-dondurulmus.test.ts", "beklenen": "var"} ] },
 
     { "id": "YH-50", "faz": "GUVENLIK", "yetenek": "Design (15A) yalniz OKUR: Supabase SELECT, Linear'a tur sonu yorumu", "durum": "ACIK",
       "sebep": "Recep 09-04 13:45", "sorumlu": "OPS", "karar": "K 09-04 13:45", "kanit": [ {"tur": "belge", "sinav": "S18"} ] },

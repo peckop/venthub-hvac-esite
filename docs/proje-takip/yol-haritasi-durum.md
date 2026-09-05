@@ -1,4 +1,4 @@
-# VentHub Yol Haritasi ve Durum — 2026-09-05T07:40:39Z (uretilmis; elle duzenlenmez; kaynak yol-haritasi.json)
+# VentHub Yol Haritasi ve Durum — 2026-09-05T07:41:31Z (uretilmis; elle duzenlenmez; kaynak yol-haritasi.json)
 
 Satir 23/40 · YESIL 22 · KIRMIZI 0 · KANITSIZ 1 · olculmemis kanit 4 (saglik olcusu; haftalik dusmeli) · canli OLCULMEDI
 
@@ -49,7 +49,7 @@ Renk KANITTAN turer: YESIL = kanitlar bekleneni verdi · KIRMIZI = belge celiski
 | YH-40 | YESIL | ACIK | Migration iceren PR yalniz Recep onayiyla birlesir (merge = prod'a otomatik) | CLAUDE.md kural 13; supabase-migrate.yml master'a otomatik uygular | OPS | CLAUDE.md 13 | YESIL: sinav S15 = YESIL<br>YESIL: .github/workflows/supabase-migrate.yml var (beklenen var) |
 | YH-41 | YESIL | ACIK | Is takibi SSOT = Linear; registry salt arsiv | 08-26 goc bitti (REC-42/53); work-tracking-ssot yururluk notu | OPS | is-kayit-duzeni-standard | YESIL: sinav S17 = YESIL<br>YESIL: docs/standards/is-kayit-duzeni-standard.md var (beklenen var)<br>YESIL: docs/standards/work-tracking-ssot-standard.md desen /tek kaynağı \*\*Linear/ var (beklenen var) |
 | YH-42 | YESIL | ACIK | Belgeler icin kapi: hafiza sinavi (compact/resume donusu) | v1 09-04, v1.1 09-05; anahtar YAZILI kararlardan | OPS | proje-takip-defteri-standard §5 | YESIL: scripts/nlm/hafiza_sinavi.py desen /beklenen_biri/ var (beklenen var)<br>YESIL: docs/proje-takip/hafiza-sinavi-sonuc.md var (beklenen var) |
-| YH-43 | YESIL | ACIK | Companion (yardimci belge) uretimi DONDURULDU; C4 bloklamaz | Recep 09-03: tasiyici kapali, kapi onleyemez cezalandirir; C5 ayni siniftan 09-05'te kirmizi (ALTYAPI'ya not) | ALTYAPI | Recep 09-03 | YESIL: src/__tests__/conformance/companion-dondurulmus.test.ts var (beklenen var)<br>YESIL: src/__tests__/conformance/companion-parity-coverage.test.ts desen /C5_TABAN = 0/ var (beklenen var) |
+| YH-43 | YESIL | ACIK | Companion (yardimci belge) uretimi DONDURULDU; C4 bloklamaz | Recep 09-03 (C4) + 09-05 K9 UYKU KIPI (REC-142, #997): tek tasiyici anahtari KAPALI; tum companion kapilari sayar+raporlar+bloklamaz, kancalar uretmez; uyandirma = anahtar ACIK | ALTYAPI | Kararlar-Altyapi K9 · REC-142 | YESIL: .companion-tasiyici.json desen /KAPALI/ var (beklenen var)<br>YESIL: scripts/hijyen/tasiyici-anahtari.cjs var (beklenen var)<br>YESIL: src/__tests__/conformance/companion-dondurulmus.test.ts var (beklenen var) |
 
 ## SaaS-F1
 
