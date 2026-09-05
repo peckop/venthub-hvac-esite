@@ -78,7 +78,9 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 4. **RSC öncelikli:** `page.tsx` varsayılan Server Component; `'use client'` sadece
    etkileşimli uç bileşenlerde. Ana rotalarda `ssr: false` yasak.
 5. **Suspense sınırı:** `useSearchParams` kullanan her bileşen `<Suspense fallback={<Skeleton/>}>`
-   ile sarılmalı (SSR zehirlenmesini engellemek için).
+   ile sarılmalı (SSR zehirlenmesini engellemek için). **Sınır yalnız o uç bileşeni sarar, sayfayı değil**
+   (2026-09-05 ölçümü, REC-150 Adım 0: hrv ve hava-perdesi sayfalarında sınır sayfa kökündeydi → sunucu gövdeyi
+   0 kelime verdi, dört hesaplayıcı istemcide açıldı; kanal sayfasında sınır uçtaydı → 400+ kelime).
 6. **React.cache():** RSC ağacında tekrarlanabilen Supabase sorguları `React.cache()` ile tekilleştirilir.
 7. **i18n:** Kullanıcıya görünen metin sözlükten gelir; URL'ler `useLocalizedRoutes`
    ile (manuel `/tr/` ekleme yasak); DB çevirileri JSONB (`metadata->>lang`).
