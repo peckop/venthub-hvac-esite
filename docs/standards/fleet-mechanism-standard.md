@@ -1069,12 +1069,17 @@ kaydı retten önce geldiği için **tek ileri geçiş** yeter. Çözülemezse `
 
 1. **Normalde serbest bir iş reddedilirse: bir kez AYNEN yeniden dene.** Geçerse iş devam
    eder; kayıt zaten transkriptte durur.
-2. **İkinci ret panoya gider** — ve özellikle *mekanizma kuran* bir eylem (Monitor, cron,
+2. ⛔**Ret kılık değiştirilerek dolanılmaz:** reddedilen bir komut yeniden sözcüklenerek,
+   parçalara bölünerek, başka söz dizimiyle ya da başka araçla tekrar denenmez — *aynen*
+   tekrar (madde 1) serbesttir, *kılık değiştirmiş* tekrar reddin amacını dolanmaktır ve
+   yol ancak panodan ya da insandan açılır. (Ölçülmüş vaka 2026-09-05: 40+ dosyalık toplu
+   silme araç kapısından döndü; komut bölünmedi, karar sahibine soruldu.)
+3. **İkinci ret panoya gider** — ve özellikle *mekanizma kuran* bir eylem (Monitor, cron,
    claim) reddedildiyse **eksik kalan katman adıyla** bildirilir. Sessiz eksik mekanizma,
    şeridi sağır bırakır.
-3. **Ölçüm:** `node scripts/board/izin-reddi-gunlugu.cjs olc [--gun ...|--tum]` (salt
+4. **Ölçüm:** `node scripts/board/izin-reddi-gunlugu.cjs olc [--gun ...|--tum]` (salt
    okuma) · `... bildir --sid X [--esik N]` (eşik aşılırsa panoya).
-4. Kapı: `izin-reddi-gunlugu.test.ts` (INV-BOARD-10) — 8 kol; `user-rejected` ve
+5. Kapı: `izin-reddi-gunlugu.test.ts` (INV-BOARD-10) — 8 kol; `user-rejected` ve
    `permission-rule`'ün anomali **sayılmadığını** ayrı ayrı kanıtlar.
 
 ### Adıyla yazılan iki sınır
