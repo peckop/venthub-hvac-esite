@@ -52,11 +52,23 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
     })
 
     it('⭐DÖRT ARACIN ADRESİ YÖNLENDİRİLMİYOR — erken 301 kazası engelli', () => {
+        // ⚠İKİ KAYNAK BİRDEN taranır. İlk sürüm yalnız next.config.mjs'e bakıyordu; kod
+        // incelemesi (2026-09-05) haklı olarak sordu: middleware.ts'te altı ayrı yönlendirme
+        // noktası var, oraya konan bir kural bu kapıyı SESSİZCE atlardı. Kapının amacı
+        // "yönlendirme yok" demek; hangi dosyadan geldiği amacı değiştirmez.
+        // ⚠GÖVDEDE ara: next.config.mjs'in KENDİ YORUMU gerekçe olarak
+        // "/tr/destek/hesaplayicilar/kanal 200 dönüyor" cümlesini taşıyor. Ham metinde
+        // arayınca kapı kendi belgesini ihlal sandı — ölçütün yanlış evrende çalışmasının
+        // bugünkü ikinci örneği. Yorum ANLATIR, kural UYGULAR; kapı yalnız uygulayana bakar.
+        const MIDDLEWARE = oku('src', 'middleware.ts')
+        const YONLENDIRME_KAYNAKLARI = govde(NEXT_CONFIG) + '\n' + govde(MIDDLEWARE)
         for (const arac of ARACLAR) {
-            const desen = new RegExp(`source:\\s*['\`][^'\`]*hesaplayicilar/${arac}`, 'i')
+            const desen = new RegExp(`hesaplayicilar/${arac}`, 'i')
             expect(
-                desen.test(NEXT_CONFIG),
-                `next.config.mjs "${arac}" aracini YONLENDIRIYOR. Karar metnindeki "dort yol tek yola ` +
+                desen.test(YONLENDIRME_KAYNAKLARI),
+                `next.config.mjs YA DA src/middleware.ts "${arac}" aracini YONLENDIRIYOR (ikisi de ` +
+                    'tarandi, hangisinde oldugunu o dosyalarda "hesaplayicilar/' + arac + '" arayarak ' +
+                    'bul). Karar metnindeki "dort yol tek yola ' +
                     'iner" hukmu K18 e baglidir ve K18 ISTISARE, KARAR DEGIL. Motor hazir olmadan ' +
                     'yonlendirme, calisan bir araci olu sayfaya gonderir. Yonlendirme mesrulastiginda ' +
                     'ONCE bu kapi bilerek guncellenir.',

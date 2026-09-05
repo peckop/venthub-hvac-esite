@@ -2515,8 +2515,9 @@ export const en: typeof tr = {
   urunSecici: {
     ustBaslik: 'Product Selector',
     baslik: 'Size the right product for your space',
-    aciklama:
-      'Run a pre-assessment from volume, airflow and pressure inputs. Results carry over into your quote request.',
+    // ⛔"Results carry over into your quote request" REMOVED (2026-09-05, code review):
+    // no such hand-off exists. The PR that removes promise boxes was introducing a new promise.
+    aciklama: 'Run a pre-assessment from volume, airflow and pressure inputs.',
     araclar: {
       kanal: {
         ad: 'Duct fan sizing',

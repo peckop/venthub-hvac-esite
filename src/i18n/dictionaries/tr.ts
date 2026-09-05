@@ -628,7 +628,7 @@ export const tr = {
         // Kart artık tek bir araca değil, dört aracı toplayan giriş sayfasına gidiyor.
         calculators: {
           eyebrow: 'Ürün Seçici',
-          title: 'Mahalinize uygun ürünü hesaplayarak bulun',
+          title: 'Mahallinize uygun ürünü hesaplayarak bulun',
           description: 'Kanal, HRV, hava perdesi ve jet fan hesaplarını tek yerden yapın.'
         },
         support: {
@@ -2512,9 +2512,11 @@ export const tr = {
   // fan dışı gruplar da motor kazanacak. Tek ad, tek hedef.
   urunSecici: {
     ustBaslik: 'Ürün Seçici',
-    baslik: 'Mahalinize uygun ürünü hesaplayarak bulun',
-    aciklama:
-      'Hacim, debi ve basınç girdilerinizle ön değerlendirme yapın. Sonuçlar teklif talebinize taşınır.',
+    baslik: 'Mahallinize uygun ürünü hesaplayarak bulun',
+    // ⛔"Sonuçlar teklif talebinize taşınır" CÜMLESİ KALDIRILDI (2026-09-05, kod incelemesi):
+    // böyle bir aktarım YOK — hesaplayıcılar sonucu teklif akışına taşımıyor. Vaat kutularını
+    // temizleyen PR'ın kendisi yeni bir vaat getiriyordu; aynı K1 hatası, bu kez benden.
+    aciklama: 'Hacim, debi ve basınç girdilerinizle ön değerlendirme yapın.',
     araclar: {
       kanal: {
         ad: 'Kanal fanı hesabı',

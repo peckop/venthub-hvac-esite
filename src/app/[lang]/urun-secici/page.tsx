@@ -73,8 +73,14 @@ export default async function UrunSeciciPage({ params }: { params: Promise<Param
         { anahtar: 'jet-fan', ad: dict.urunSecici.araclar.jetFan.ad, aciklama: dict.urunSecici.araclar.jetFan.aciklama },
     ] as const
 
+    /*
+      Kök öğe <section>, <main> DEĞİL — MainLayout zaten `<main id="main-content">` çiziyor.
+      İç içe iki <main>, ekran okuyucuda ÇİFT ANA BÖLGE demektir (axe:
+      landmark-no-duplicate-main) ve "ana içeriğe atla" bağlantısını belirsizleştirir.
+      İlk yazımda <main> koymuştum; kod incelemesi yakaladı.
+    */
     return (
-        <main className="mx-auto w-full max-w-5xl px-4 py-10 md:py-14">
+        <section className="mx-auto w-full max-w-5xl px-4 py-10 md:py-14">
             <header className="mb-8 md:mb-10">
                 <p className="mb-2 text-sm font-medium uppercase tracking-wide text-steel-gray">
                     {dict.urunSecici.ustBaslik}
@@ -102,6 +108,6 @@ export default async function UrunSeciciPage({ params }: { params: Promise<Param
             </ul>
 
             <p className="mt-8 text-sm text-steel-gray">{dict.urunSecici.not}</p>
-        </main>
+        </section>
     )
 }
