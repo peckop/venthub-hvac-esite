@@ -33,15 +33,15 @@ const RegisterPage: React.FC = () => {
   }
 
   const passwordRules = [
-    { key: 'length',  label: t('auth.pwRule.length')  || 'En az 8 karakter',     test: (p: string) => p.length >= 8 },
-    { key: 'upper',   label: t('auth.pwRule.upper')   || 'En az 1 büyük harf',   test: (p: string) => /[A-Z]/.test(p) },
-    { key: 'digit',   label: t('auth.pwRule.digit')   || 'En az 1 rakam',        test: (p: string) => /[0-9]/.test(p) },
-    { key: 'special', label: t('auth.pwRule.special') || 'En az 1 özel karakter', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+    { key: 'length',  label: t('auth.pwRule.length'),     test: (p: string) => p.length >= 8 },
+    { key: 'upper',   label: t('auth.pwRule.upper'),   test: (p: string) => /[A-Z]/.test(p) },
+    { key: 'digit',   label: t('auth.pwRule.digit'),        test: (p: string) => /[0-9]/.test(p) },
+    { key: 'special', label: t('auth.pwRule.special'), test: (p: string) => /[^A-Za-z0-9]/.test(p) },
   ]
 
   const passedRules = passwordRules.filter(r => r.test(formData.password)).length
   const strengthColor = passedRules <= 1 ? 'bg-red-500' : passedRules === 2 ? 'bg-orange-400' : passedRules === 3 ? 'bg-yellow-400' : 'bg-green-500'
-  const strengthLabel = passedRules <= 1 ? (t('auth.pwStrength.weak') || 'Zayıf') : passedRules === 2 ? (t('auth.pwStrength.fair') || 'Orta') : passedRules === 3 ? (t('auth.pwStrength.good') || 'İyi') : (t('auth.pwStrength.strong') || 'Güçlü')
+  const strengthLabel = passedRules <= 1 ? (t('auth.pwStrength.weak')) : passedRules === 2 ? (t('auth.pwStrength.fair')) : passedRules === 3 ? (t('auth.pwStrength.good')) : (t('auth.pwStrength.strong'))
 
   const validateForm = () => {
     if (!formData.name.trim()) {
@@ -55,7 +55,7 @@ const RegisterPage: React.FC = () => {
     }
 
     if (passedRules < 4) {
-      toast.error(t('auth.pwRule.allRequired') || 'Şifreniz tüm güvenlik kurallarını karşılamalıdır')
+      toast.error(t('auth.pwRule.allRequired'))
       return false
     }
 
@@ -78,7 +78,7 @@ const RegisterPage: React.FC = () => {
       // HIBP sızıntı kontrolü (k-Anonymity). Ağ hatasında geçer, sızıntıda engeller.
       const pwned = await hibpPwnedCount(formData.password)
       if (pwned > 0) {
-        toast.error(t('auth.passwordPwned') || 'Password appears in known data breaches')
+        toast.error(t('auth.passwordPwned'))
         setLoading(false)
         return
       }
@@ -86,7 +86,7 @@ const RegisterPage: React.FC = () => {
 
       if (error) {
         if (error.message?.includes('already registered')) {
-          toast.error(t('auth.emailAlready') || 'Already registered')
+          toast.error(t('auth.emailAlready'))
         } else if (error.message?.includes('Password should be at least')) {
           toast.error(t('auth.passwordMin'))
         } else {
@@ -245,7 +245,7 @@ const RegisterPage: React.FC = () => {
                     ))}
                   </div>
                   <p className="text-xs text-steel-gray">
-                    {t('auth.pwStrength.label') || 'Güvenlik'}: <span className="font-semibold">{strengthLabel}</span>
+                    {t('auth.pwStrength.label')}: <span className="font-semibold">{strengthLabel}</span>
                   </p>
                   <ul className="space-y-1">
                     {passwordRules.map(rule => (

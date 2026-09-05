@@ -21,7 +21,7 @@ const ForgotPasswordPage: React.FC = () => {
     e.preventDefault()
 
     if (!email) {
-      toast.error(t('auth.email') + ' ' + t('auth.required') || 'Required')
+      toast.error(t('auth.email') + ' ' + t('auth.required'))
       return
     }
 
@@ -36,7 +36,7 @@ const ForgotPasswordPage: React.FC = () => {
         toast.error(t('auth.resetError'))
       } else {
         setEmailSent(true)
-        toast.success(t('auth.resetEmailSent') || 'Email sent')
+        toast.success(t('auth.resetEmailSent'))
       }
     } catch (error) {
       toast.error(t('auth.unexpectedError'))
@@ -141,10 +141,10 @@ const ForgotPasswordPage: React.FC = () => {
               {loading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                  {t('auth.submitting') || 'Gönderiliyor...'}
+                  {t('auth.submitting')}
                 </div>
               ) : (
-                t('auth.sendResetLink') || 'Şifre Sıfırlama Linki Gönder'
+                t('auth.sendResetLink')
               )}
             </button>
           </form>

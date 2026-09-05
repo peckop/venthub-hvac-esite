@@ -338,10 +338,10 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
         translateSpecKey,
         lang
       )
-      toast.success(t('pdp.messages.pdfStarted') || 'PDF üretiliyor...')
+      toast.success(t('pdp.messages.pdfStarted'))
     } catch (error) {
       console.warn('PDF generation error:', error)
-      toast.error(t('pdp.errors.pdfFailed') || 'PDF üretilemedi.')
+      toast.error(t('pdp.errors.pdfFailed'))
     } finally {
       setIsGeneratingPdf(false)
     }
@@ -359,7 +359,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
       }
     } else {
       await navigator.clipboard.writeText(window.location.href)
-      toast.success(t('pdp.shareCopied') || 'Link kopyalandı!')
+      toast.success(t('pdp.shareCopied'))
     }
   }
 
@@ -602,7 +602,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                   key={`jump-${s.id}`}
                   onClick={() => scrollToSection(s.id)}
                   className="px-3 py-1.5 bg-air-blue/30 hover:bg-air-blue text-primary-navy rounded-lg text-xs font-black uppercase tracking-widest transition-colors border border-secondary-blue/10"
-                  aria-label={`${s.title} ${t('common.scrollTo') || 'bölümüne git'}`}
+                  aria-label={`${s.title} ${t('common.scrollTo')}`}
                 >
                   {s.title}
                 </button>
@@ -641,7 +641,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
             {/* Price Area - Elegant & Technical */}
             <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
               <div className="flex flex-col relative z-10">
-                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{t('pdp.priceAvailability') || 'Price & Availability'}</span>
+                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{t('pdp.priceAvailability')}</span>
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
@@ -736,7 +736,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                   <button
                     onClick={handleShare}
                     className="flex-1 flex items-center justify-center space-x-2 py-2.5 border border-light-gray text-steel-gray hover:border-primary-navy hover:text-primary-navy rounded-xl font-bold text-xs uppercase tracking-widest transition-colors"
-                    aria-label={t('common.share') || 'Paylaş'}
+                    aria-label={t('common.share')}
                   >
                     <Share2 size={14} />
                     <span>{t('pdp.actions.share')}</span>

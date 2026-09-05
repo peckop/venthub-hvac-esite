@@ -68,13 +68,13 @@ const AddressFormModal: React.FC<AddressFormModalProps> = ({
                     is_default_billing: form.is_default_billing,
                 }
                 await createAddress(supabaseBrowserClient, newAddressPayload)
-                toast.success(t('account.addresses.toasts.created') || 'Address created')
+                toast.success(t('account.addresses.toasts.created'))
             }
             onSaved()
             onClose()
         } catch (e) {
             console.error(e)
-            toast.error(address ? t('checkout.saved.updateError') : (t('account.addresses.toasts.saveError') || 'Error while saving'))
+            toast.error(address ? t('checkout.saved.updateError') : (t('account.addresses.toasts.saveError')))
         } finally {
             setSaving(false)
         }

@@ -142,7 +142,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                         <button
                             onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(true); }}
                             className="bg-white/95 backdrop-blur-sm p-2 rounded-xl border border-gray-200 shadow-lg text-gray-700 hover:text-blue-600 hover:bg-white transition-shadow"
-                            aria-label={t('common.viewFullscreen') || 'Tam Ekran Gör'}
+                            aria-label={t('common.viewFullscreen')}
                         >
                             <Maximize2 size={20} />
                         </button>
@@ -156,7 +156,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                     <button
                         onClick={(e) => { e.stopPropagation(); setIs3DMode(true); }}
                         className="absolute top-3 right-3 z-50 bg-white/95 backdrop-blur-sm hover:bg-white text-primary-navy px-2 py-1.5 rounded-lg shadow-lg border border-gray-200 flex flex-col items-center gap-0.5 transition-shadow"
-                        aria-label={t('common.view3D') || '3D Model'}
+                        aria-label={t('common.view3D')}
                     >
                         <Box size={18} className="text-blue-600" />
                         <span className="text-xs font-bold">{THREE_D_LABEL}</span>
@@ -168,14 +168,14 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                         <button
                             onClick={prevImage}
                             className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary-navy p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-transform z-30"
-                            aria-label={t('common.prev') || 'Geri'}
+                            aria-label={t('common.prev')}
                         >
                             <ChevronLeft size={24} />
                         </button>
                         <button
                             onClick={nextImage}
                             className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary-navy p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-transform z-30"
-                            aria-label={t('common.next') || 'İleri'}
+                            aria-label={t('common.next')}
                         >
                             <ChevronRight size={24} />
                         </button>
@@ -213,7 +213,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                     <button
                         onClick={() => setIsLightboxOpen(false)}
                         className="absolute top-6 right-6 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-colors z-50"
-                        aria-label={t('common.close') || 'Kapat'}
+                        aria-label={t('common.close')}
                     >
                         <X size={28} />
                     </button>
@@ -233,10 +233,10 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
 
                     {images.length > 1 && (
                         <>
-                            <button onClick={prevImage} className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-transform" aria-label={t('common.prev') || 'Geri'}>
+                            <button onClick={prevImage} className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-transform" aria-label={t('common.prev')}>
                                 <ChevronLeft size={32} />
                             </button>
-                            <button onClick={nextImage} className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-transform" aria-label={t('common.next') || 'İleri'}>
+                            <button onClick={nextImage} className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-transform" aria-label={t('common.next')}>
                                 <ChevronRight size={32} />
                             </button>
 

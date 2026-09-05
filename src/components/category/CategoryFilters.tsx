@@ -41,7 +41,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
       <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-6 flex items-center gap-3 border-b border-slate-100 pb-4">
         <Filter size={16} className="text-primary-ocean" />
-        {t('category.filters') || 'Filtreler'}
+        {t('category.filters')}
       </h3>
 
       {/* Local Search */}
@@ -59,7 +59,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
       {subCategories.length > 0 && (
         <div className="mb-8">
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
-            {t('category.subcategories') || 'Alt Kategoriler'}
+            {t('category.subcategories')}
           </h4>
           <div className="space-y-1">
             {subCategories.map((sub) => (
@@ -83,7 +83,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
       {availableBrands.length > 0 && (
         <div className="mb-8">
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
-            {t('category.brands') || 'Markalar'}
+            {t('category.brands')}
           </h4>
           <div className="space-y-2.5 max-h-48 overflow-y-auto custom-scrollbar pr-2">
             {availableBrands.map((brand) => (
