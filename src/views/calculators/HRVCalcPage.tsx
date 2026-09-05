@@ -1,6 +1,6 @@
 import { DollarSign,Leaf, RotateCcw, Snowflake, ThermometerSun, TrendingUp, Users } from 'lucide-react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React, { useEffect,useMemo, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import React, { Suspense, useCallback, useEffect,useMemo, useState } from 'react'
 
 import {
   CalculatorLayout,
@@ -9,6 +9,7 @@ import {
   Recommendations,
   ResultCard,
   ResultGrid} from '../../components/calculators'
+import UrlParametreOkuyucu from '../../components/calculators/UrlParametreOkuyucu'
 import { useCalculatorUsage } from '../../hooks/useCalculatorUsage'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
@@ -21,7 +22,6 @@ const HRVCalcPage: React.FC = () => {
   const { t } = useI18n()
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
 
   // Dynamic Options
   const systemOptions = useMemo(() => [
@@ -51,22 +51,54 @@ const HRVCalcPage: React.FC = () => {
     { value: 'hot', label: t('calculators.hrv.form.hot'), description: 'South/Coast' }
   ], [t])
 
-  // Form state
-  const [recoveryType, setRecoveryType] = useState<RecoveryType>(
-    (searchParams?.get('recoveryType') as RecoveryType) || 'hrv'
-  )
-  const [buildingType, setBuildingType] = useState<BuildingType>(
-    (searchParams?.get('buildingType') as BuildingType) || 'office'
-  )
-  const [climateZone, setClimateZone] = useState<ClimateZone>(
-    (searchParams?.get('climateZone') as ClimateZone) || 'temperate'
-  )
-  const [area, setArea] = useState(searchParams?.get('area') || '100')
-  const [occupancy, setOccupancy] = useState(searchParams?.get('occupancy') || '10')
-  const [operatingHours, setOperatingHours] = useState(searchParams?.get('operatingHours') || '10')
-  const [sensibleEfficiency, setSensibleEfficiency] = useState(searchParams?.get('sensibleEfficiency') || '75')
-  const [latentEfficiency, setLatentEfficiency] = useState(searchParams?.get('latentEfficiency') || '65')
-  const [electricityCost, setElectricityCost] = useState(searchParams?.get('electricityCost') || '3.5')
+  /**
+   * FORM DURUMU VARSAYILANLA BAŞLAR — URL parametreleri BAĞLANDIKTAN SONRA uygulanır
+   * (REC-150 PR-0, 2026-09-05).
+   *
+   * ESKİDEN: `useState(searchParams?.get('...'))` ile render sırasında okunuyordu. O okuma
+   * bileşeni CSR bailout'una sokuyordu ve sayfa SUNUCUDA HİÇ RENDER EDİLMİYORDU — canlıda
+   * ölçüldü: bu sayfa arama motoruna 0 kelime gövde ve jenerik açıklama veriyordu.
+   *
+   * ŞİMDİ: varsayılanlar sunucuda çizilir; `UrlParametreOkuyucu` bağlandıktan sonra bir kez
+   * okuyup değerleri uygular. "Hesabımı paylaş" yeteneği KORUNUR — yalnız okumanın ZAMANI
+   * değişti, kendisi değil.
+   */
+  const [recoveryType, setRecoveryType] = useState<RecoveryType>('hrv')
+  const [buildingType, setBuildingType] = useState<BuildingType>('office')
+  const [climateZone, setClimateZone] = useState<ClimateZone>('temperate')
+  const [area, setArea] = useState('100')
+  const [occupancy, setOccupancy] = useState('10')
+  const [operatingHours, setOperatingHours] = useState('10')
+  const [sensibleEfficiency, setSensibleEfficiency] = useState('75')
+  const [latentEfficiency, setLatentEfficiency] = useState('65')
+  const [electricityCost, setElectricityCost] = useState('3.5')
+
+  /**
+   * ⚠GERİ-YAZMA KİLİDİ — sessiz veri kaybını önler.
+   *
+   * URL sync effect'i, gelen parametreler OKUNMADAN çalışırsa varsayılanları URL'e yazar ve
+   * paylaşılan bağlantıyı okumadan SİLER. Kullanıcı linke tıklar, adres çubuğu bir anda
+   * boşalır, hesap varsayılanlara döner — ve hiçbir test bunu görmez.
+   * Bu bayrak, okuma bitmeden yazmayı yasaklar.
+   */
+  const [parametrelerOkundu, setParametrelerOkundu] = useState(false)
+
+  const urlParametreleriniUygula = useCallback((p: URLSearchParams) => {
+    const kur = <T,>(anahtar: string, ata: (deger: T) => void) => {
+      const deger = p.get(anahtar)
+      if (deger) ata(deger as T)
+    }
+    kur<RecoveryType>('recoveryType', setRecoveryType)
+    kur<BuildingType>('buildingType', setBuildingType)
+    kur<ClimateZone>('climateZone', setClimateZone)
+    kur<string>('area', setArea)
+    kur<string>('occupancy', setOccupancy)
+    kur<string>('operatingHours', setOperatingHours)
+    kur<string>('sensibleEfficiency', setSensibleEfficiency)
+    kur<string>('latentEfficiency', setLatentEfficiency)
+    kur<string>('electricityCost', setElectricityCost)
+    setParametrelerOkundu(true)
+  }, [])
 
   // T021-VH · `calculator_used`. Taban çizgisi mount anıdır — paylaşılmış bir bağlantıyı
   // (?area=120) açıp hiçbir şeye dokunmayan ziyaretçi olay üretmez. Bkz. hook.
@@ -85,6 +117,10 @@ const HRVCalcPage: React.FC = () => {
   // URL Sync Effect
   useEffect(() => {
     if (typeof window === 'undefined') return
+    // ⚠GELEN BAĞLANTI OKUNMADAN YAZMA (REC-150 PR-0): bu koruma olmasa, bileşen bağlandığı
+    // anda varsayılanlar URL'e yazılır ve paylaşılan bağlantı OKUNMADAN silinirdi.
+    // Kullanıcı linke tıklar, adres çubuğu boşalır, hesap varsayılana döner.
+    if (!parametrelerOkundu) return
     const params = new URLSearchParams()
     if (recoveryType !== 'hrv') params.set('recoveryType', recoveryType)
     if (buildingType !== 'office') params.set('buildingType', buildingType)
@@ -99,8 +135,9 @@ const HRVCalcPage: React.FC = () => {
     const query = params.toString()
     router.replace(`${pathname}${query ? `?${query}` : ''}` as import('next').Route, { scroll: false })
   }, [
-    recoveryType, buildingType, climateZone, area, occupancy, 
-    operatingHours, sensibleEfficiency, latentEfficiency, electricityCost, 
+    parametrelerOkundu,
+    recoveryType, buildingType, climateZone, area, occupancy,
+    operatingHours, sensibleEfficiency, latentEfficiency, electricityCost,
     pathname, router
   ])
 
@@ -147,6 +184,14 @@ const HRVCalcPage: React.FC = () => {
       icon={<Leaf size={32} />}
       infoText={t('calculators.hrv.infoText')}
     >
+      {/* ⭐SUSPENSE SINIRI BURADA — sayfanın tamamında DEĞİL (REC-150 PR-0).
+          Parametreyi okuyan tek uç bu bileşen; bailout yalnız onu kapsıyor ve o da
+          hiçbir şey çizmiyor. Sayfanın geri kalanı sunucuda render edilmeye devam eder.
+          Eskiden sınır `page.tsx`'te sayfanın TAMAMINI sarıyordu ve sonuç, bu sayfanın
+          arama motoruna 0 kelime gövdeyle görünmesiydi (canlıda ölçüldü). */}
+      <Suspense fallback={null}>
+        <UrlParametreOkuyucu onOku={urlParametreleriniUygula} />
+      </Suspense>
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="space-y-6">
           <div className="bg-white rounded-2xl border border-light-gray shadow-sm p-6">
