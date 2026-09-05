@@ -59,6 +59,16 @@ olay: damga elle yazılınca önce yanlış ofset (dosya doğuştan bayat), sonr
 Bugün kapı yok; `olc` çıkış 3 iken merge'i durduran bir CI kolu NLM girişi olmadan kurulamaz. Aday: manifest kapsamındaki
 dosya değişen PR'da `state.json` da değişmemişse UYARI (kırmızı değil) — "eşitleme borcu" görünür kılınır.
 
+**Hafıza sınavı (belgeler için kapı, v1.1):** `scripts/nlm/hafiza_sinavi.py` + `docs/proje-takip/hafiza-sinavi.json`
+(20 soru). Her soru deftere sorulur; cevap anahtarı Recep'ten değil YAZILI kararlardan gelir (Linear Kararlar, VISION,
+SaaS yol haritası, Anahtar ve Kip Haritası). Ölçüt: `beklenen` ifadelerin hepsi + `beklenen_biri` kümesinden en az biri
+geçer; `yasak` ifadelerin hiçbiri geçmez. **`yasak` bir İDDİA CÜMLESİDİR, kelime değil** — ilk koşumda (09-05 sabah)
+"self-merge" kelimesi "self-merge yapılmaz" doğru cevabını kırmızıya boyadı; ölçüt hatası belge hatasıyla aynı renkte
+göründü. Defter cevabı değişkendir; kırmızıda soru bir kez daha sorulur, iki denemede de kırmızıysa KIRMIZI. Ne zaman
+koşar: compact/resume dönüşünde (OPS açılış rutini, 5 çekirdek soru) ve karar belgesi değişince (ilgili alan). KIRMIZI iki
+şeyden biridir ve ikisi de görünür: belge çelişkisi (belge düzeltilir) ya da karar değişti (sınav güncellenir). Sonuç
+`docs/proje-takip/hafiza-sinavi-sonuc.md`, damga `date -u` eşdeğeri, elle yazılmaz.
+
 ## 6. Terim kuralı: "Faz" tek başına yazılmaz (ilk taramanın kök bulgusu, D8)
 Belgelerde "Faz" dört ayrı katmanı anlatıyor ve okuyan hangisi olduğunu bilemiyor: SaaS dönüşümü (Faz 1 Foundation …
 Faz 4 Marketplace), 15A vitrin üretimi (Faz 1 kabuk … Faz 4), admin DataTableKit göçü (Faz 0-6), bayi modülü (R0-R5,
@@ -68,3 +78,10 @@ Mevcut belgelere geriye dönük dokunulmaz; kapı yok, tarama sırasında görü
 
 ## 7. Değişiklik kaydı
 v1.0 (2026-09-04) — ilk sürüm; defter `Venthub Proje Takip` (a5f382a4) 13 demetle kuruldu, ilk çelişki taraması başladı.
+v1.1 (2026-09-05) — §5'e hafıza sınavı eklendi: `yasak` = iddia cümlesi, `beklenen_biri` kümesi, kırmızıda ikinci deneme;
+sebep: ilk koşumda iki doğru cevap ölçüt yüzünden kırmızı çıktı (S01 "şirket kurul" zorunlu tutuluyordu, S15 "self-merge"
+kelimesi). Sınav compact/resume dönüş rutinine bağlandı.
+v1.2 (2026-09-05, aynı sabah) — tam koşum 20 soru: 16 yeşil / 4 kırmızı, dördü de ölçüt hatası ("kaldırılıyor" ≠ "kalkar";
+"Supabase'e yazabilir mi? Hayır" cevabında yasak ifade geçti). Kural: değişmez adlar dışında anlam taşıyan ifade eşanlamlı
+kümeye (`beklenen_biri`); yasak ifade sorunun parçası olamaz, yalnız olumlu iddia biçimi. Her kırmızıda ÖNCE cevap okunur,
+sonra belge suçlanır; ölçüt hatası ile belge hatası aynı renkte görünür.

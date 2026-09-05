@@ -1,9 +1,17 @@
 #!/usr/bin/env python
-"""HAFIZA SINAVI — belgeler icin kapi (v1).
+"""HAFIZA SINAVI — belgeler icin kapi (v1.1).
 
 docs/proje-takip/hafiza-sinavi.json'daki her soru 'Venthub Proje Takip' defterine sorulur; cevap 'beklenen' anahtar
-ifadelerin HEPSINI icermeli, 'yasak' ifadelerin HICBIRINI icermemeli. Sapma = KIRMIZI. Cevap anahtari Recep'ten degil
-YAZILI kararlardan gelir (Linear Kararlar, VISION, SaaS yol haritasi, Anahtar ve Kip Haritasi).
+ifadelerin HEPSINI ve 'beklenen_biri' kumesinden EN AZ BIRINI icermeli, 'yasak' ifadelerin HICBIRINI icermemeli.
+Sapma = KIRMIZI. Cevap anahtari Recep'ten degil YAZILI kararlardan gelir (Linear Kararlar, VISION, SaaS yol haritasi,
+Anahtar ve Kip Haritasi).
+v1.1 (2026-09-05, ilk kosum dersi): yasak ifadeler IDDIA CUMLESIDIR — "self-merge" kelimesi "self-merge YAPILMAZ"
+cumlesinde de gecer ve dogru cevabi kirmiziya boyar; ayrica defter cevabi degiskendir, kirmizida bir kez daha sorulur.
+v1.2 (ayni sabah, tam kosum 16/20 dersi): 4 kirmizinin 4'u de olcut hatasi ("kaldiriliyor" ≠ "kalkar"). Kural: tek kelimeye
+BAGLANMA — degismez adlar disinda (Recep, Linear, technical_specs) anlam tasiyan ifade 'beklenen_biri' esanlamli kumesine
+yazilir; yasak ifade SORUNUN PARCASI olamaz ("Supabase'e yazabilir mi? Hayir" cevabinda "supabase'e yazabilir" gecer),
+yalniz olumlu iddia bicimi ("yazma yetkisi vardir"). Olcut hatasi ile belge hatasi ayni renkte gorunur; bu yuzden her
+kirmizida ONCE cevap okunur, sonra belge suclanir.
 
 Kullanim:
   python scripts/nlm/hafiza_sinavi.py            # tum sorular
@@ -46,10 +54,31 @@ def sor(soru: str) -> str | None:
 
 
 def degerlendir(s: dict, cevap: str):
+    """beklenen: HEPSI gecmeli · beklenen_biri: EN AZ BIRI gecmeli · yasak: iddia cumlesi, HICBIRI gecmemeli (v1.1)."""
     c = sadelestir(cevap)
     eksik = [b for b in s.get("beklenen", []) if sadelestir(b) not in c]
+    biri = s.get("beklenen_biri", [])
+    if biri and not any(sadelestir(b) in c for b in biri):
+        eksik.append("biri: " + "|".join(biri))
     ihlal = [y for y in s.get("yasak", []) if sadelestir(y) in c]
     return eksik, ihlal
+
+
+DENEME = 2  # v1.1: defter cevabi degisken; kirmizida soru bir kez daha sorulur, iki denemede de kirmiziysa KIRMIZI
+
+
+def sor_ve_degerlendir(s: dict):
+    """(cevap, eksik, ihlal, deneme_no). Cevapsizsa cevap None."""
+    son = (None, [], [], 0)
+    for n in range(1, DENEME + 1):
+        cevap = sor(s["soru"])
+        if not cevap:
+            return None, [], [], n
+        eksik, ihlal = degerlendir(s, cevap)
+        son = (cevap, eksik, ihlal, n)
+        if not eksik and not ihlal:
+            return son
+    return son
 
 
 def main(argv):
@@ -62,26 +91,40 @@ def main(argv):
     if secili:
         sorular = [s for s in sorular if s["id"] in secili]
     damga = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # v1.2: kismi kosum onceki sonuclari SILMEZ — mevcut tablo okunur, kosan sorular yenilenir, digerleri korunur.
+    # (Aksi halde 'S09 S18' kosumu 20 satirlik sonucu 2 satira indiriyordu; yol haritasi belge-kaniti kor kaliyordu.)
+    eski = {}
+    if os.path.exists(SONUC):
+        for satir in open(SONUC, encoding="utf-8"):
+            m = re.match(r"\|\s*(S\d+)\s*\|", satir)
+            if m:
+                eski[m.group(1)] = satir.rstrip("\n")
     satirlar, kirmizi, cevapsiz = [], 0, 0
     for s in sorular:
-        cevap = sor(s["soru"])
+        cevap, eksik, ihlal, deneme = sor_ve_degerlendir(s)
         if not cevap:
             cevapsiz += 1
             durum, not_ = "CEVAPSIZ", "defter cevap vermedi"
         else:
-            eksik, ihlal = degerlendir(s, cevap)
             if eksik or ihlal:
                 kirmizi += 1
                 durum = "KIRMIZI"
                 not_ = ("eksik: " + ", ".join(eksik) if eksik else "") + (" · yasak gecti: " + ", ".join(ihlal) if ihlal else "")
+                not_ += f" · {deneme} deneme"
             else:
-                durum, not_ = "YESIL", ""
+                durum, not_ = "YESIL", (f"{deneme}. denemede" if deneme > 1 else "")
         print(f"{durum:<8} {s['id']} [{s['alan']}] {s['soru'][:70]}  {not_}")
-        ozet = (cevap or "").replace("\n", " ")[:220]
-        satirlar.append(f"| {s['id']} | {s['alan']} | {durum} | {s['soru']} | {not_} | {ozet} |")
+        ozet = (cevap or "").replace("\n", " ").replace("|", "/")[:220]
+        eski[s["id"]] = f"| {s['id']} | {s['alan']} | {durum} | {s['soru']} | {not_} | {ozet} |"
+    satirlar = [eski[k] for k in sorted(eski, key=lambda x: int(x[1:]))]
+    toplam_yesil = sum(1 for v in satirlar if "| YESIL |" in v)
+    toplam_kirmizi = sum(1 for v in satirlar if "| KIRMIZI |" in v)
+    toplam_cevapsiz = sum(1 for v in satirlar if "| CEVAPSIZ |" in v)
     rapor = [f"# Hafiza sinavi sonucu — {damga} (olculmus, `date -u` esdegeri)", "",
-             f"Defter: `{DEFTER}` · soru {len(sorular)} · yesil {len(sorular)-kirmizi-cevapsiz} · kirmizi {kirmizi} · cevapsiz {cevapsiz}",
-             "Kural: KIRMIZI = ya belge celiskisi (belge duzeltilir) ya karar degisti (sinav guncellenir); ikisi de GORUNUR.", "",
+             f"Defter: `{DEFTER}` · tabloda {len(satirlar)} soru · yesil {toplam_yesil} · kirmizi {toplam_kirmizi} · cevapsiz {toplam_cevapsiz} · "
+             f"bu kosumda {len(sorular)} soru ({', '.join(s['id'] for s in sorular)})",
+             "Kural: KIRMIZI = ya belge celiskisi (belge duzeltilir) ya karar degisti (sinav guncellenir) ya OLCUT hatasi (once cevap okunur); ucu de GORUNUR.",
+             "Kismi kosum onceki satirlari korur; satirin tarihi bu baslik degil, o sorunun son kosumudur.", "",
              "| id | alan | durum | soru | not | cevap (ilk 220) |", "|---|---|---|---|---|---|", *satirlar, ""]
     with open(SONUC, "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(rapor))
