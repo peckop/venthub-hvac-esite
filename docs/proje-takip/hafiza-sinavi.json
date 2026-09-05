@@ -93,16 +93,15 @@
       "alan": "vitrin",
       "soru": "Mobil alt cubukta kac sekme var ve adlari ne?",
       "beklenen": [
-        "4"
+        "Iletisim"
       ],
-      "yasak": [
-        "5 sekme",
-        "bes sekme",
-        "Destek sekmesi var"
-      ],
+      "yasak": [],
       "kaynak": "K9 (09-04 #7, #9); not: cevap eski adi 'Destek' diye tarihce olarak anabilir, yasak IDDIA cumlesidir",
       "beklenen_biri": [
-        "Iletisim"
+        "4 sekme",
+        "dort sekme",
+        "4 adet sekme",
+        "4 sekmeden"
       ]
     },
     {
@@ -347,5 +346,5 @@
       ]
     }
   ],
-  "olcut_notu": "v1.2 (09-05, tam kosum dersi): 20 sorunun 4 kirmizisi da OLCUT hatasiydi — defter 'kaldiriliyor' dedi, olcut 'kalkar' aradi. Kural: tek bir kelimeye BAGLANMA; 'beklenen' yalniz degismez adlar icin (Recep, Linear, technical_specs), anlam tasiyan ifadeler 'beklenen_biri' esanlamli kumesine yazilir. Ikinci ders (ayni sabah): yasak ifade SORUNUN PARCASI olmamali — 'supabase'e yazabilir' yasagi 'Supabase'e yazabilir mi? Hayir' cevabinda gecer. Yasak = yalniz olumlu iddia bicimi ('yazma yetkisi vardir')."
+  "olcut_notu": "v1.2 (09-05, tam kosum dersi): 20 sorunun 4 kirmizisi da OLCUT hatasiydi — defter 'kaldiriliyor' dedi, olcut 'kalkar' aradi. Kural: tek bir kelimeye BAGLANMA; 'beklenen' yalniz degismez adlar icin (Recep, Linear, technical_specs), anlam tasiyan ifadeler 'beklenen_biri' esanlamli kumesine yazilir. Ikinci ders (ayni sabah): yasak ifade SORUNUN PARCASI olmamali — 'supabase'e yazabilir' yasagi 'Supabase'e yazabilir mi? Hayir' cevabinda gecer. Yasak = yalniz olumlu iddia bicimi ('yazma yetkisi vardir'). Ucuncu ders: yasak ifade TARIHCE cumlesinde de gecer ('daha onceki planlarda 5 sekme vardi'); yasak, GUNCEL DURUM iddiasi bicimine baglanir ('cubukta 5 sekme bulunmaktadir'). Dorduncu ders: tarihce iceren cevapta HER yasak bicimi gecebilir; boyle sorularda yasak KULLANILMAZ, olcut olumlu ve sayili ifadeye baglanir ('4 sekme')."
 }
