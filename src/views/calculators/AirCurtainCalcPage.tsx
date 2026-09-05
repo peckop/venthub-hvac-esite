@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight, DoorOpen, RotateCcw,Thermometer, Wind, Zap } from 'lucide-react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React, { useEffect, useMemo,useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import React, { Suspense, useCallback, useEffect, useMemo,useState } from 'react'
 
 import {
   CalculatorLayout,
@@ -10,6 +10,7 @@ import {
   ResultCard,
   ResultGrid,
   StepIndicator} from '../../components/calculators'
+import UrlParametreOkuyucu from '../../components/calculators/UrlParametreOkuyucu'
 import { useCalculatorUsage } from '../../hooks/useCalculatorUsage'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
@@ -22,7 +23,6 @@ const AirCurtainCalcPage: React.FC = () => {
   const { t } = useI18n()
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
 
   // Dynamic Step Configuration
   const steps = useMemo(() => [
@@ -69,19 +69,36 @@ const AirCurtainCalcPage: React.FC = () => {
     { value: 'high', label: t('calculators.airCurtain.conditions.traffic.high'), description: t('calculators.airCurtain.trafficHighDesc') }
   ], [t])
 
-  // Form State
-  const [currentStep, setCurrentStep] = useState(Number(searchParams?.get('step')) || 1)
-  const [doorWidth, setDoorWidth] = useState(searchParams?.get('doorWidth') || '1.5')
-  const [doorHeight, setDoorHeight] = useState(searchParams?.get('doorHeight') || '2.5')
-  const [application, setApplication] = useState<AirCurtainApplication>(
-    (searchParams?.get('application') as AirCurtainApplication) || 'comfort'
-  )
-  const [windCondition, setWindCondition] = useState<WindCondition>(
-    (searchParams?.get('windCondition') as WindCondition) || 'none'
-  )
-  const [trafficIntensity, setTrafficIntensity] = useState<TrafficIntensity>(
-    (searchParams?.get('trafficIntensity') as TrafficIntensity) || 'medium'
-  )
+  /**
+   * FORM DURUMU VARSAYILANLA BAŞLAR — URL parametreleri BAĞLANDIKTAN SONRA uygulanır
+   * (REC-150 PR-0, 2026-09-05). Gerekçe `UrlParametreOkuyucu` başlığında; özet: render
+   * sırasında `useSearchParams` okumak sayfayı CSR bailout'una sokuyordu ve bu sayfa
+   * arama motoruna 0 kelime gövdeyle görünüyordu (canlıda ölçüldü).
+   */
+  const [currentStep, setCurrentStep] = useState(1)
+  const [doorWidth, setDoorWidth] = useState('1.5')
+  const [doorHeight, setDoorHeight] = useState('2.5')
+  const [application, setApplication] = useState<AirCurtainApplication>('comfort')
+  const [windCondition, setWindCondition] = useState<WindCondition>('none')
+  const [trafficIntensity, setTrafficIntensity] = useState<TrafficIntensity>('medium')
+
+  /** ⚠GERİ-YAZMA KİLİDİ — okuma bitmeden URL'e yazmak paylaşılan bağlantıyı SİLER. */
+  const [parametrelerOkundu, setParametrelerOkundu] = useState(false)
+
+  const urlParametreleriniUygula = useCallback((p: URLSearchParams) => {
+    const adim = Number(p.get('step'))
+    if (adim) setCurrentStep(adim)
+    const kur = <T,>(anahtar: string, ata: (deger: T) => void) => {
+      const deger = p.get(anahtar)
+      if (deger) ata(deger as T)
+    }
+    kur<string>('doorWidth', setDoorWidth)
+    kur<string>('doorHeight', setDoorHeight)
+    kur<AirCurtainApplication>('application', setApplication)
+    kur<WindCondition>('windCondition', setWindCondition)
+    kur<TrafficIntensity>('trafficIntensity', setTrafficIntensity)
+    setParametrelerOkundu(true)
+  }, [])
 
   // T021-VH · `calculator_used`. `currentStep` BILEREK dışarıda: olay hesaplama GİRDİLERİNİ
   // anlatır, sihirbazın hangi adımda olduğunu değil. Taban çizgisi mount anı olduğu için
@@ -97,6 +114,9 @@ const AirCurtainCalcPage: React.FC = () => {
   // URL Sync Effect
   useEffect(() => {
     if (typeof window === 'undefined') return
+    // ⚠GELEN BAĞLANTI OKUNMADAN YAZMA (REC-150 PR-0): koruma olmasa bağlanma anında
+    // varsayılanlar URL'e yazılır ve paylaşılan bağlantı OKUNMADAN silinirdi.
+    if (!parametrelerOkundu) return
     const params = new URLSearchParams()
     if (currentStep !== 1) params.set('step', currentStep.toString())
     if (doorWidth !== '1.5') params.set('doorWidth', doorWidth)
@@ -107,7 +127,7 @@ const AirCurtainCalcPage: React.FC = () => {
 
     const query = params.toString()
     router.replace(`${pathname}${query ? `?${query}` : ''}` as import('next').Route, { scroll: false })
-  }, [currentStep, doorWidth, doorHeight, application, windCondition, trafficIntensity, pathname, router])
+  }, [parametrelerOkundu, currentStep, doorWidth, doorHeight, application, windCondition, trafficIntensity, pathname, router])
 
   // Result State
   const [result, setResult] = useState<ReturnType<typeof calculateAirCurtain> | null>(null)
@@ -173,6 +193,12 @@ const AirCurtainCalcPage: React.FC = () => {
       icon={<DoorOpen size={32} />}
       infoText={t('calculators.airCurtain.infoText')}
     >
+      {/* ⭐SUSPENSE SINIRI BURADA — sayfanın tamamında DEĞİL (REC-150 PR-0).
+          Parametreyi okuyan tek uç bu bileşen; bailout yalnız onu kapsıyor ve hiçbir şey
+          çizmiyor. Sayfanın geri kalanı sunucuda render edilmeye devam eder. */}
+      <Suspense fallback={null}>
+        <UrlParametreOkuyucu onOku={urlParametreleriniUygula} />
+      </Suspense>
       <StepIndicator
         steps={steps}
         currentStep={currentStep}
