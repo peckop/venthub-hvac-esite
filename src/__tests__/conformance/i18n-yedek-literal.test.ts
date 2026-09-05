@@ -33,7 +33,7 @@
  * üretimi dondurulmuş (REC-132) ve INV-DOC-4b kaynak+üretilmişi aynı commit'te yasaklıyor,
  * bu yüzden bilerek dokunulmadı; kapı `.ts/.tsx` dışına bakmaz.
  */
-import { readFileSync, readdirSync } from 'node:fs'
+import { readdirSync,readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
