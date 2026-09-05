@@ -1074,13 +1074,29 @@ kaydı retten önce geldiği için **tek ileri geçiş** yeter. Çözülemezse `
    tekrar (madde 1) serbesttir, *kılık değiştirmiş* tekrar reddin amacını dolanmaktır ve
    yol ancak panodan ya da insandan açılır. (Ölçülmüş vaka 2026-09-05: 40+ dosyalık toplu
    silme araç kapısından döndü; komut bölünmedi, karar sahibine soruldu.)
-3. **İkinci ret panoya gider** — ve özellikle *mekanizma kuran* bir eylem (Monitor, cron,
+3. ⭐⛔**`ask` ile `deny` AYNI ŞEY DEĞİLDİR — ve bu, madde 1'in SINIRIDIR.** `ask`
+   kullanıcıya istem **düşürür**; `deny` doğrudan reddeder ve **izin kipini DİNLEMEZ**.
+   Bir `deny` kuralına çarpan iş; kip değiştirilerek, *"izin bana düşsün"* denerek ya da
+   beklenerek **açılmaz** — düşecek istem yoktur. Böyle bir iş **İNSAN ELİNE geçer**:
+   karar sahibi işi kendi terminalinden yapar ya da yapmamaya karar verir.
+   ⛔**Ayar GEVŞETİLMEZ** — `deny` listesini düzenlemek bu maddenin çözümü değil,
+   **ihlalidir**; kural 12'nin (`settings.json`'a dokunulmaz) buradaki karşılığıdır.
+   (Ölçülmüş vaka 2026-09-05: dört ret, dördü de madde 1'e uyularak AYNEN denendi, **ikisi
+   izin kipi değiştirildikten SONRA**ydı ve hiçbirinde istem düşmedi. Kök sebep tahmin
+   edilmedi, **dosyadan okundu**: `~/.claude/settings.json` → `permissions.deny`. Bu bir
+   saat yedi; **yazılı olsaydı ilk denemede bilinirdi** — madde o saatin bedelidir.)
+4. **İkinci ret panoya gider** — ve özellikle *mekanizma kuran* bir eylem (Monitor, cron,
    claim) reddedildiyse **eksik kalan katman adıyla** bildirilir. Sessiz eksik mekanizma,
    şeridi sağır bırakır.
-4. **Ölçüm:** `node scripts/board/izin-reddi-gunlugu.cjs olc [--gun ...|--tum]` (salt
+5. **Ölçüm:** `node scripts/board/izin-reddi-gunlugu.cjs olc [--gun ...|--tum]` (salt
    okuma) · `... bildir --sid X [--esik N]` (eşik aşılırsa panoya).
-5. Kapı: `izin-reddi-gunlugu.test.ts` (INV-BOARD-10) — 8 kol; `user-rejected` ve
+6. Kapı: `izin-reddi-gunlugu.test.ts` (INV-BOARD-10) — 8 kol; `user-rejected` ve
    `permission-rule`'ün anomali **sayılmadığını** ayrı ayrı kanıtlar.
+
+⚠**Sınıf ayrımı, yukarıdaki dört-tür tablosuyla birlikte okunur:** `permission-rule`
+anomali **değildir** — beklenen davranıştır. Yani `deny`'e çarpmak bir arıza değil,
+**kuralın çalışmasıdır**; madde 3 arızayı değil, **arıza sanıp ayarı gevşetme refleksini**
+yasaklar.
 
 ### Adıyla yazılan iki sınır
 
@@ -2098,3 +2114,58 @@ Recep'in tepkisi kuralın kendisidir: *"ölçümler hem tekrar hem hatalı, bu n
 Bu madde **sayısal** iddiaları yönetir. Bir dosyanın var olup olmaması, bir kolun düşüp
 düşmemesi gibi ikili gözlemler için betik zorunluluğu yoktur — ama onlar da ölçülür, tahmin
 edilmez. Ayrıca bu madde **ölçümü yasaklamaz**, kaynaksız **karar**ı yasaklar: keşif serbesttir.
+
+---
+
+## 30. "DAL ORIGIN'DE VAR" İŞİN YEDEKLENDİĞİNİ SÖYLEMEZ — kayıp ölçütü YÖNLÜDÜR
+
+Bir ağacı emekliye ayırmadan, bir dalı silmeden, bir temizliği onaylamadan önce sorulan
+soru şudur: **"bu ağaçta yalnızca burada yaşayan iş var mı?"** O soruyu yanlış ölçmek,
+sessizce iş öldürür — ve sessizliğin sebebi, yanlış ölçütün **yeşil** görünmesidir.
+
+### Ölçülmüş vaka (2026-09-05) — ölçüt keskindi, SORU yanlıştı
+
+Sabah yapılan kurtarma taraması **varlık** sorusu sordu: `git ls-remote --heads origin
+<dal>` — *"dalın origin'de karşılığı var mı?"* İkili, hızlı, ve o gün dokuz dalı gerçekten
+kurtardı.
+
+Akşam aynı ağaçlar ikinci kez, **yönlü** ölçütle tarandı. `venthub-wt-t086`'nın dalı
+origin'de **VARDI** — ama **ucu 8 commit geriydi**. O sekiz commit'in üçü bir konformans
+kapısı ekliyordu, beşi bir dağıtım cetveli yazıyordu; hepsi **yalnızca yerel diskte**
+yaşıyordu ve sabahki ölçüt onları **"yedeklenmiş"** saymıştı.
+
+| ölçüt | sorduğu soru | t086'da cevabı | gerçek |
+|---|---|---|---|
+| `ls-remote --heads` | dal **adı** var mı | ✅VAR | ⛔8 commit yalnız diskte |
+| `rev-list --count origin/<dal>..HEAD` | **yerelde fazladan commit** var mı | **8** | ⛔KAYIP RİSKİ |
+
+### HÜKÜM
+
+1. ⭐**Kayıp ölçütü tektir:** `git rev-list --count origin/<dal>..HEAD == 0`. Bir dalın
+   **adının** uzakta bulunması, **ucunun** orada olduğunu söylemez; varlık sorusu
+   sürekliliği ölçmez.
+2. ⭐**Farkın YÖNÜ ayrı sütundur.** *Yerel ileri* = **kayıp riski**; *uzak ileri* = yalnızca
+   **bayat** (zararsız). Yönü ayırmayan bir gösterge riski **şişirir**: aynı gün sekiz ağaç
+   *"uç farklı"* diye işaretlendi, yönlü bakılınca gerçekten yerelde ileri olan **iki**
+   taneydi. Bir kapının yanlış alarmı da maliyetlidir — insanı gereksiz karara çağırır.
+3. **Sha eşitliği amaçtan DARDIR; "master atası olmak" YETERLİ ama GEREKLİ değildir.**
+   Şart yazarken amaç yazılır (*"kayıp olmasın"*), amacın bir örneği değil. Bu ayrım aynı
+   gün ölçüldü: yedi ağacın yalnız ikisi sha eşitliğini sağlıyordu, ama **beşinde daha**
+   `yerel_ileri = 0`'dı — yani sha ölçütü beş ağacı gereksiz yere şüpheli sayıyordu.
+4. ⛔**Yedekleme deseni:** başkasının **dal ucu OYNATILMAZ**. Kurtarılacak iş **ayrı bir
+   yedek dalına** gönderilir (`yedek/<ad>-<tarih>`), SHA eşitliğiyle doğrulanır, ve
+   **kaynak ağaç ELLENMEZ**. Sahibinin dalını "düzeltmek", sahibine haber vermeden onun
+   geçmişini değiştirmektir.
+5. ⚠**Upstream'i olmayan dal, ölçütün kör noktasıdır.** `git log @{u}..` böyle bir dalda
+   **hata** verir; hatayı yutan bir sarmalayıcı **boş** döner ve sayı **0** çıkar — yani
+   riskin **en yüksek** hâli *"temiz"* görünür. Ölçüt, upstream yokluğunu **0'dan ayırt
+   etmek** zorundadır; edemiyorsa ölçüm değil, süstür. (§5: ölçülen ile beyan edilen ayrılır.)
+6. **Silmeden önce ölçüm TAZEDİR.** Bir tur önce alınmış "temiz" cevabı, geri alınamaz bir
+   silmeyi gerekçelendirmez — §29 madde 4'ün ağaç karşılığı.
+
+### Kapsam ve komşuları
+
+Bu madde **filo davranışıdır** (başkasının ağacına dokunmama + kayıp ölçütü), artefakt
+sınıfı değil: bir ağaçta ne üretildiğini değil, **kimin işinin nerede yaşadığını** yönetir.
+Komşuları: §28 (ayrışma tur başına ölçülür) · §22 (ağaç tazeleme) ·
+`uretilmis-artefakt-standard.md` **AXIOM 5** (worktree yasak değil, görünmezliği yasak).
