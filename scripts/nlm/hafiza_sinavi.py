@@ -1,9 +1,12 @@
 #!/usr/bin/env python
-"""HAFIZA SINAVI — belgeler icin kapi (v1).
+"""HAFIZA SINAVI — belgeler icin kapi (v1.1).
 
 docs/proje-takip/hafiza-sinavi.json'daki her soru 'Venthub Proje Takip' defterine sorulur; cevap 'beklenen' anahtar
-ifadelerin HEPSINI icermeli, 'yasak' ifadelerin HICBIRINI icermemeli. Sapma = KIRMIZI. Cevap anahtari Recep'ten degil
-YAZILI kararlardan gelir (Linear Kararlar, VISION, SaaS yol haritasi, Anahtar ve Kip Haritasi).
+ifadelerin HEPSINI ve 'beklenen_biri' kumesinden EN AZ BIRINI icermeli, 'yasak' ifadelerin HICBIRINI icermemeli.
+Sapma = KIRMIZI. Cevap anahtari Recep'ten degil YAZILI kararlardan gelir (Linear Kararlar, VISION, SaaS yol haritasi,
+Anahtar ve Kip Haritasi).
+v1.1 (2026-09-05, ilk kosum dersi): yasak ifadeler IDDIA CUMLESIDIR — "self-merge" kelimesi "self-merge YAPILMAZ"
+cumlesinde de gecer ve dogru cevabi kirmiziya boyar; ayrica defter cevabi degiskendir, kirmizida bir kez daha sorulur.
 
 Kullanim:
   python scripts/nlm/hafiza_sinavi.py            # tum sorular
@@ -46,10 +49,31 @@ def sor(soru: str) -> str | None:
 
 
 def degerlendir(s: dict, cevap: str):
+    """beklenen: HEPSI gecmeli · beklenen_biri: EN AZ BIRI gecmeli · yasak: iddia cumlesi, HICBIRI gecmemeli (v1.1)."""
     c = sadelestir(cevap)
     eksik = [b for b in s.get("beklenen", []) if sadelestir(b) not in c]
+    biri = s.get("beklenen_biri", [])
+    if biri and not any(sadelestir(b) in c for b in biri):
+        eksik.append("biri: " + "|".join(biri))
     ihlal = [y for y in s.get("yasak", []) if sadelestir(y) in c]
     return eksik, ihlal
+
+
+DENEME = 2  # v1.1: defter cevabi degisken; kirmizida soru bir kez daha sorulur, iki denemede de kirmiziysa KIRMIZI
+
+
+def sor_ve_degerlendir(s: dict):
+    """(cevap, eksik, ihlal, deneme_no). Cevapsizsa cevap None."""
+    son = (None, [], [], 0)
+    for n in range(1, DENEME + 1):
+        cevap = sor(s["soru"])
+        if not cevap:
+            return None, [], [], n
+        eksik, ihlal = degerlendir(s, cevap)
+        son = (cevap, eksik, ihlal, n)
+        if not eksik and not ihlal:
+            return son
+    return son
 
 
 def main(argv):
@@ -64,18 +88,18 @@ def main(argv):
     damga = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     satirlar, kirmizi, cevapsiz = [], 0, 0
     for s in sorular:
-        cevap = sor(s["soru"])
+        cevap, eksik, ihlal, deneme = sor_ve_degerlendir(s)
         if not cevap:
             cevapsiz += 1
             durum, not_ = "CEVAPSIZ", "defter cevap vermedi"
         else:
-            eksik, ihlal = degerlendir(s, cevap)
             if eksik or ihlal:
                 kirmizi += 1
                 durum = "KIRMIZI"
                 not_ = ("eksik: " + ", ".join(eksik) if eksik else "") + (" · yasak gecti: " + ", ".join(ihlal) if ihlal else "")
+                not_ += f" · {deneme} deneme"
             else:
-                durum, not_ = "YESIL", ""
+                durum, not_ = "YESIL", (f"{deneme}. denemede" if deneme > 1 else "")
         print(f"{durum:<8} {s['id']} [{s['alan']}] {s['soru'][:70]}  {not_}")
         ozet = (cevap or "").replace("\n", " ")[:220]
         satirlar.append(f"| {s['id']} | {s['alan']} | {durum} | {s['soru']} | {not_} | {ozet} |")
