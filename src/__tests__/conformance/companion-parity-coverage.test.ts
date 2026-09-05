@@ -124,7 +124,38 @@ const KAPI_BASLANGIC = sayac.KAPI_BASLANGIC
 // C5 tabanı SIFIR: kapı yalnız KAPI_BASLANGIC sonrası dokunulan kaynakları denetliyor, yani
 // tarihsel borç kapsam dışı. Bu sayı HEDEF değil TAVAN ve YÜKSELTİLEMEZ — yükseltmek
 // "yeni borca izin ver" demektir. Tarihsel borç ayrı testte görünür kalıyor.
+// ⚠Taban yalnız taşıyıcı AÇIK iken hüküm kurar; uyku kipinde kol sayar ama bloklamaz.
 const C5_TABAN = 0
+
+/**
+ * ⭐UYKU KİPİ — TAŞIYICI ANAHTARI (REC-142, Recep kararı 2026-09-05).
+ *
+ * NİÇİN BU KOL ARTIK KOŞULLU: taşıyıcı 2026-08-28'de kapandı, ama companion'a bakan
+ * kapılar açık kaldı. Aradaki çelişki her hafta başka bir koldan filoyu kilitledi
+ * (09-03 C4, 09-04 INV-DOC-4b, 09-05 C5 — üçü de HİÇ COMMIT OLMADAN, yalnız takvim
+ * ilerlediği için). Kök çözüm: davranış tek anahtardan TÜRESİN.
+ *
+ * ⚠NİÇİN "SİL" ÇÖZÜMÜ SEÇİLMEDİ — bu cetvelin eski hükmüydü ve ÖLÇÜMLE düştü:
+ * cetvel "C5'in çaresi taşıyıcıya bağlı değil, companion silinebilir" diyordu. Tek
+ * dosyada doğru. Ama 2026-09-05 ölçümü: bloklayan 8'in arkasında 7 günlük pencerede
+ * **49** tane daha vardı — yani çare 57 belgeyi silmeye çıkıyordu ve ikizi o dosyalar
+ * hakkında tamamen kör bırakacaktı. Bilgi yok ederek aynı "bloklamama" sonucuna varmak
+ * olurdu. Recep kararı: belge üretimi bir süre durur, dönüşte KALDIĞIMIZ YERDEN devam
+ * edilir — yani companion'lar YERİNDE KALIR.
+ *
+ * ⚠NİÇİN EŞİK UZATILMADI / KAPI SİLİNMEDİ: ikisi de bu dosyada zaten yazılı (7→30
+ * ertelemedir; silinen kapı kapatılmış borç sanılır). Uyku kipi üçüncü yol: kapı yaşar,
+ * sayar, adlarıyla raporlar — yalnız DURDURMAZ.
+ */
+interface AnahtarModulu {
+  oku: (kok: string) => { durum: 'ACIK' | 'KAPALI'; yol: string; okundu: boolean; sebep: string }
+  durumSatiri: (kok: string) => string
+}
+const anahtar = require_(
+  resolve(process.cwd(), 'scripts/hijyen/tasiyici-anahtari.cjs'),
+) as AnahtarModulu
+const TASIYICI = anahtar.oku(process.cwd())
+const UYKUDA = TASIYICI.durum === 'KAPALI'
 
 /**
  * ⭐C4_TABAN KALDIRILDI — C4 artık BLOKLAMIYOR (Recep kararı 2026-09-03).
@@ -322,7 +353,7 @@ describe('INV-DOC-2 · companion kapsam paritesi', () => {
     ).toBeGreaterThan(ASGARI_COMMIT_SAYISI)
   })
 
-  it('C4 — companion\'ı olmayan ESKİ kaynak SAYILIR ve adlarıyla raporlanır (BLOKLAMAZ)', () => {
+  it('C4 — companion\'ı olmayan ESKİ kaynak: taşıyıcı AÇIK ise bloklar, UYKUDA ise sayar', () => {
     const m = sayac.olc()
     // NİÇİN `process.stdout.write`: bu dosyada `no-console` yalnız `warn`/`error`a izin
     // veriyor ve rapor bir uyarı değil. Kuralı inline kapatmak yerine gerçek mekanizma
@@ -332,11 +363,31 @@ describe('INV-DOC-2 · companion kapsam paritesi', () => {
       (m.eksik.length
         ? m.eksik.map(e => `  ${String(e.yasGun).padStart(5)} gün  ${e.yol}\n`).join('')
         : '') +
-      `[INV-DOC-2 · C4] Bu sayı BLOKLAMAZ — Recep kararı 2026-08-31: companion üretici ` +
-      `taşıyıcı KAPALI. Taşıyıcı kapalıyken kapı borcu ÖNLEYEMEZ, yalnız cezalandırırdı. ` +
-      `Sayı büyüyorsa "bilinen ve kabul edilmiş eksik" büyüyor demektir; ikiz bu dosyaları ` +
-      `HİÇ bilmez, "o kod nasıl çalışıyor" sorusuna eksik cevap verir.\n`,
+      `[INV-DOC-2 · C4] ${anahtar.durumSatiri(process.cwd())}\n` +
+      `[INV-DOC-2 · C4] Bu sayı ${UYKUDA ? 'BLOKLAMAZ' : 'BLOKLAR'}. Taşıyıcı kapalıyken ` +
+      `kapı borcu ÖNLEYEMEZ, yalnız cezalandırırdı (09-03'te ölçüldü: bir dosya hiçbir ` +
+      `commit olmadan tüm PR'ları kırmızıya çevirdi). Sayı büyüyorsa "bilinen ve kabul ` +
+      `edilmiş eksik" büyüyor demektir; ikiz bu dosyaları HİÇ bilmez, "o kod nasıl ` +
+      `çalışıyor" sorusuna eksik cevap verir.\n`,
     )
+
+    /**
+     * ⭐TAŞIYICI AÇIKSA C4 YENİDEN BLOKLAR (REC-142).
+     *
+     * NİÇİN: `C4_TABAN` 2026-09-03'te kaldırıldı ve gerekçesi TEK BİR ŞEYDİ — taşıyıcı
+     * kapalıydı, yani borç ödenemezdi. O koşul ortadan kalktığında (taşıyıcı AÇIK)
+     * gerekçe de kalkar; kapıyı kalıcı olarak susturmak, geçici bir sebeple kalıcı bir
+     * yetenek kaybetmek olurdu. Uyku kipi tam da bunu önlemek için var: kapı silinmedi,
+     * ŞARTA bağlandı ve şart TEK ANAHTARDAN okunuyor.
+     */
+    if (!UYKUDA) {
+      expect(
+        m.eksik.length,
+        `Companion'ı olmayan ${m.eksik.length} kaynak var ve taşıyıcı AÇIK — companion ` +
+        `üretilebiliyor, yani bu borç ÖDENEBİLİR ve bloklar.\nDosyalar:\n  ` +
+        `${m.eksik.map(e => e.yol).join('\n  ')}`,
+      ).toBe(0)
+    }
 
     // BLOKLAMAYAN KOL, BOŞ KOL DEĞİLDİR: sayının kendi içinde tutarlı olduğu ölçülür.
     // Assert'i tümden silip yerine yalnız bir yazdırma koymak, kolu ÖLÇMEYEN bir şeye
@@ -481,13 +532,52 @@ describe('INV-DOC-2 · companion kapsam paritesi', () => {
     ).toContain(beklenen)
   })
 
-  it('C5 — kaynağından ESKİ companion sayısı tabanı aşmıyor', () => {
+  it('C5 — kaynağından ESKİ companion: taşıyıcı AÇIK ise bloklar, UYKUDA ise sayar', () => {
+    // BORÇ LİSTESİ — uyku kipinde de HER KOŞUMDA basılır (URUN isteği, REC-142).
+    // NİÇİN `process.stdout.write`: bu dosyada `no-console` yalnız warn/error'a izin
+    // veriyor ve bu bir uyarı değil, rapor. Kuralı inline kapatmak yerine gerçek
+    // mekanizma kullanıldı — C4 kolundaki ile aynı biçim.
+    process.stdout.write(
+      `[INV-DOC-2 · C5] ${anahtar.durumSatiri(process.cwd())}\n` +
+      `[INV-DOC-2 · C5] bayat companion: ${b.bayat.length} (eşik dışı) + ${b.bayatTaze} ` +
+      `(${YAS_ESIGI_GUN} gün penceresinde, sıradaki borç)\n` +
+      (b.bayat.length ? b.bayat.map(y => `  ${y}\n`).join('') : '') +
+      `[INV-DOC-2 · C5] Bu sayı ${UYKUDA ? 'BLOKLAMAZ' : 'BLOKLAR'} — kaynak: ` +
+      `${TASIYICI.yol}\n`,
+    )
+
+    if (!UYKUDA) {
+      // TAŞIYICI AÇIK: eski davranış AYNEN. Companion üretilebiliyorsa bayat companion
+      // gerçek bir ihmaldir ve ikize EMİN BİÇİMDE YANLIŞ cevap verdirir.
+      expect(
+        b.bayat.length,
+        `Kaynağından eski companion sayısı ${b.bayat.length}, taban ${C5_TABAN}. ` +
+        `Taşıyıcı AÇIK (${TASIYICI.yol}) — companion üretilebilir, yani bu borç ÖDENEBİLİR ` +
+        `ve bloklar.\nDosyalar:\n  ${b.bayat.join('\n  ')}`,
+      ).toBeLessThanOrEqual(C5_TABAN)
+      return
+    }
+
+    // UYKU KİPİ — BLOKLAMAYAN KOL, BOŞ KOL DEĞİLDİR.
+    // Assert'i tümden silip yerine yalnız bir yazdırma koymak, kolu ÖLÇMEYEN bir şeye
+    // çevirir ve biz "kapı var" sanardık — bu depoda adı konmuş sınıf. Bloklamayan bir
+    // kolun tek değeri, SAYININ AYIRT ETTİĞİdir; onu ölçüyoruz:
+    //   (1) sınıflandırma bir BÖLÜNTÜ olmalı — aynı dosya hem "eksik" hem "bayat" sayılamaz
+    //       (sayılırsa borç iki kez raporlanır ve sayı gerçeği anlatmaz),
+    //   (2) listelenen her şey gerçekten bir companion (.md) olmalı — C4/C5 karışırsa
+    //       "eksik" borcu "bayat" gibi görünür ve uyanışta yanlış iş üretilir.
+    // `b.eksik` KAYNAK yollarını, `b.bayat` COMPANION yollarını tutar — karşılaştırma
+    // için kaynak, companion adına çevrilir (sayaç çekirdeğindeki dönüşümün aynısı).
+    const kesisim = b.bayat.filter(y => b.eksik.some(e => `${e.replace(/\.[^./]+$/, '')}.md` === y))
     expect(
-      b.bayat.length,
-      `Kaynağından eski companion sayısı ${b.bayat.length}, taban ${C5_TABAN}. ` +
-      `Bunlar ikize dosyanın ESKİ hâlini anlatır — eksik bilgiden daha yanıltıcıdır, ` +
-      `çünkü ikiz emin biçimde yanlış cevap verir.\nDosyalar:\n  ${b.bayat.join('\n  ')}`,
-    ).toBeLessThanOrEqual(C5_TABAN)
+      kesisim,
+      'Bir dosya hem C4 (eksik) hem C5 (bayat) sayılmış — sınıflandırma bölüntü değil, ' +
+      'borç iki kez görünüyor.',
+    ).toEqual([])
+    expect(
+      b.bayat.filter(y => !y.endsWith('.md')),
+      'C5 listesinde companion olmayan yol var — C4/C5 ayrımı bozulmuş.',
+    ).toEqual([])
   })
 
   it('TARİHSEL borç GÖRÜNÜR kalır (kapsam dışı ≠ yok sayıldı)', () => {
@@ -521,10 +611,39 @@ describe('INV-DOC-2 · companion kapsam paritesi', () => {
     // tabanın YÜKSELTİLMEMESİ. Biri kırmızıyı susturmak için sayıyı büyütürse burası yanar.
     // C4_TABAN kaldırıldı (C4 artık bloklamıyor, sayıyor — gerekçe dosya başında). C4'ün
     // ratchet'inin yerini "SAYIM AYIRT EDER" kolu aldı: taban yerine sayacın canlılığı
-    // korunuyor. C5 hâlâ BLOKLUYOR, çünkü bayat companion ikize EMİN BİÇİMDE YANLIŞ cevap
-    // verdirir — eksik bilgiden daha zararlıdır ve üretici taşıyıcı kapalı olsa bile
-    // companion'ı SİLMEK ya da kaynağı geri almak elde olan bir çözümdür.
+    // korunuyor.
+    //
+    // ⭐C5 ARTIK KOŞULLU BLOKLAR (REC-142, Recep kararı 2026-09-05). Eski hüküm şuydu:
+    // "C5 bloklamaya devam eder, çünkü çaresi taşıyıcıya bağlı değil — companion
+    // silinebilir." Tek dosyada doğruydu; ÖLÇEKTE düştü: 09-05'te bloklayan 8'in
+    // arkasında 7 gün penceresinde 49 tane daha vardı, yani "çare" 57 belgeyi silmek ve
+    // ikizi o dosyalarda tamamen kör bırakmaktı. Recep kararı: üretim bir süre durur,
+    // dönüşte kaldığımız yerden devam edilir → companion'lar YERİNDE KALIR.
+    //
+    // ⚠TABAN YİNE 0 VE YÜKSELTİLEMEZ: uyku kipi tabanı gevşetmez, tabanın ne zaman
+    // HÜKÜM KURDUĞUNU değiştirir. Taşıyıcı açıldığı an sıfır tavan geri gelir; biri
+    // uyku kipini fırsat bilip tabanı büyütürse burası yanar.
     expect(C5_TABAN, 'C5_TABAN yükseltilmiş — kırmızıyı susturmak için taban büyütmek, kapıyı sökmektir').toBe(0)
+  })
+
+  it('uyku kipi ANAHTARDAN türer: kolun davranışı sabit kodlanmamış', () => {
+    /**
+     * NİÇİN BU KOL: asıl kusur "C5 blokluyordu" değildi — davranışın koda GÖMÜLÜ
+     * olmasıydı. Taşıyıcı kapandığında kimse kapıyı çeviremedi, çünkü çevrilecek bir
+     * şey yoktu; durum beş dosyada düz metindi. Bu kol, o kusurun geri gelmesini
+     * engeller: davranış tek anahtardan OKUNMALI.
+     */
+    expect(
+      TASIYICI.okundu,
+      `Taşıyıcı anahtarı okunamadı (${TASIYICI.sebep}). Fail-closed davrandık (AÇIK ` +
+      `varsayıldı, kapılar blokluyor) — ama anahtarın kendisi onarılmalı: ${TASIYICI.yol}`,
+    ).toBe(true)
+    expect(
+      ['ACIK', 'KAPALI'],
+      'Anahtar tanınmayan bir durum taşıyor.',
+    ).toContain(TASIYICI.durum)
+    // Anahtar dosyası GERÇEKTEN bu kolun okuduğu yer mi: yolu depo kökünde ve kanonik adda.
+    expect(TASIYICI.yol.endsWith('.companion-tasiyici.json')).toBe(true)
   })
 
   it('vacuous-guard: kapsam gerçekten dolu (yaml/kapsam bozulunca test sessizce yeşile kaçmasın)', () => {
