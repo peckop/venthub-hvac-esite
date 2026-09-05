@@ -142,7 +142,76 @@ yaşayan yanlış iddianın bedeli aynı belgede §C6'da ölçüldü.
 17 companion **diskte güncel ama git'te eskiydi**. Bu ayrışma kendisi bir bulgudur ama
 bu bekçinin sorusu değildir; ikize giden şey depo hâlidir.
 
-## C6 — `.cc_docs.yaml` ↔ NotebookLM defteri paritesi (MASTER'DA KAPI YOK — AÇIK PR'DA BEKLİYOR)
+## C6 — `.cc_docs.yaml` ↔ defter paritesi
+
+> ## ⛔C6 v1 ÖLDÜ — 2026-09-05, ölçümle. Yerine **C6.1 tazelik paritesi** geçti (aşağıda).
+>
+> Aşağıdaki v1 metni **tarihçe olarak korunur**; hükmü yoktur. Silinmedi, çünkü silinen bir
+> kural yarın *"hiç var mıydı"* sorusunu doğurur — ve bu bölümün kendisi, yanlış bir iddianın
+> belgede yaşamasının bedelini ölçen bir örnek.
+>
+> **NİÇİN ÖLDÜ:** v1 *ad paritesi* ölçüyordu — "yaml'daki her dosya adı defterde AYRI kaynak
+> olarak var mı?". O evren **2026-08-26'da öldü**: `.cc_docs.yaml`'ın kendi notu
+> ("KÜME MASTER'LARI, T020-OR") defterin tekil dosyadan **toplayıcı master**'a geçtiğini
+> yazıyor (96 kaynak → 20). Bekçi silahlandırılsaydı **76 sahte kırmızı** verirdi ve
+> **hiçbiri gerçek bir eksiklik olmazdı.**
+> ⭐**Ölçüt keskindi; EVREN yanlıştı.** Bu, bu depoda adı konmuş bir hata sınıfıdır.
+>
+> **GERÇEK PARİTE** aynı gün **ağsız** ölçüldü (7 küme master gövdesi = 140.720 satır; her
+> beklenen dosyadan 45+ karakterlik üç ayırt edici satır tam-metin arandı): beklenen
+> **85 belgenin 84'ü kapsanıyordu.** Tek gerçek açık `work-tracking-ssot-standard.md`'ydi —
+> ve **eksik değil, BAYAT**: `standards_master.md` 09-03'te derlenmiş, cetvel 09-04'te
+> değişmişti (#991 YÜRÜRLÜK NOTU: *"registry değil, LINEAR"*). Yani ikiz o cetveli hâlâ eski
+> hâliyle görüyordu ve **iş takibinin nerede yaşadığı sorusuna eski cevabı** veriyordu.
+> Ad paritesi bunu **göremez**, çünkü ad **eşleşiyor**.
+>
+> Kayıt: PR #640 (kapatıldı, ölçüm özeti yorumunda) · REC-118 (Done) · REC-144.
+
+## C6.1 — KÜME MASTER TAZELİK PARİTESİ (INV-DOC-3 v2, yürürlükte)
+
+**Sorulan soru değişti:** *"dosya defterde var mı"* değil → **"dosyayı emen küme master, o
+dosyadan YENİ mi?"**
+
+| | |
+|---|---|
+| Bekçi | `src/__tests__/conformance/kume-master-tazeligi.test.ts` |
+| Ölçen | `scripts/hijyen/kume-master-tazeligi.cjs` |
+| Kapsam SSOT'u | `.cc_docs.yaml` → `extra_masters` + `master_md` (bekçi kendi listesini **uydurmaz**) |
+| Ağ | **YOK** — hem master hem kaynak depoda; "hangisi yeni" git'ten deterministik |
+
+**Ölçüt:** master'ın son commit'i ile HEAD arasında, o master'ın emdiği kaynak yollarında
+değişiklik varsa master **BAYAT**tır; bayatlatan dosyalar **adıyla** raporlanır.
+*Sayı "ne kadar" der, liste "ne yapacağım" der.*
+
+⛔**BU KAPI BLOKLAMAZ** — sayar ve raporlar. Gerekçe **K8: toplamalar donduruldu**. Üretici
+durmuşken bloklayan bir tazelik kapısı, kimsenin ödeyemeyeceği bir borç için filoyu kilitler;
+bu tam olarak 2026-09-05 sabahı yaşanan ve §C9 (uyku kipi) ile onarılan arızadır. **Aynı
+hatayı ters yönden tekrar etmiyoruz.**
+
+⭐**"Bloklamaz" ≠ "hiçbir şey ölçmez".** Bloklamayan bir kolun tek gerçek kanıtı mekanizmanın
+ayakta olmasıdır; şu üç durum **KIRMIZI** yanar:
+1. bildirim ayrıştırılamazsa (biçim değişimi → kapı sessizce körleşirdi),
+2. hiç küme master bulunamazsa (**vacuous-guard**),
+3. ayırt edicilik kaybolursa (bayat çift verildiği hâlde görünmüyorsa).
+
+Sabotajla doğrulandı (2026-09-05): çekirdek "hiç bayat yok" diyecek şekilde bozulunca
+**yalnız ayırt edicilik kolu**, bildirim okuyucusu körleştirilince **yalnız vacuous-guard
+kolu** düştü — hedefli sabotaj, hedefli kırmızı.
+
+**İLK KOŞUM (2026-09-05):** bildirilen 4 master → **taze 1, BAYAT 3**
+(`venthub_hvac_master` 26 kaynak · `standards_master` 8 · `kayitlar_master` 8).
+
+⚠**Niçin önemli, tahminle değil ölçümle:** aynı gün ikizden üretilen çelişki raporunda
+**iki yanlış pozitif** çıktı (C9 → URUN çürüttü, A8 → ALTYAPI çürüttü). Bayat master, ikizin
+belgeleri eski hâliyle görmesi demektir; yanlış pozitifler **dikkatsizlik değil, ölçülebilir
+bir sebebe** bağlanabilir.
+
+**Bu kolun BLOKLAYAN hâle gelmesi AYRI bir karardır** (toplamalar çözüldüğünde). Kapı
+silinmez — **şarta bağlanır**; §C9'un uyku kipiyle aynı desen.
+
+---
+
+### C6 v1 metni (TARİHÇE — hükmü yoktur)
 
 Yaml'da listelenen bir kaynağın deftere gerçekten yüklendiği (ve defterde yaml'da
 olmayan artık kaynak bulunmadığı) ölçülmelidir. 2026-08-17'de elle yapıldı ve **5 eksik
