@@ -68,3 +68,20 @@ Mevcut belgelere geriye dönük dokunulmaz; kapı yok, tarama sırasında görü
 
 ## 7. Değişiklik kaydı
 v1.0 (2026-09-04) — ilk sürüm; defter `Venthub Proje Takip` (a5f382a4) 13 demetle kuruldu, ilk çelişki taraması başladı.
+v1.2 (2026-09-05) — §8 konuşma günlüğü demeti (12) eklendi; kaynak transkript, çıktı ev dizini, sır süzgeci zorunlu.
+
+## 8. Konuşma günlüğü demeti (12) — Recep 09-04: "konuşma geçmişini de NLM'e koysak"
+**Ne:** `scripts/nlm/konusma_gunlugu.py` oturum transkriptlerinden (`~/.claude/projects/<proje>/*.jsonl`) gün bazlı
+(Türkiye günü) konuşma dosyası üretir; manifest demeti `12-konusma-gunlugu` bunları deftere taşır.
+**Neyi alır, neyi atar (09-05 ölçümüyle):** yalnız Recep'in yazdığı metin + her turun SON Claude cevabı (Recep'in okuduğu).
+Araç çağrısı/çıktısı, düşünme, araç arası anlatım, alt-ajan, pano/akran mesajı, kanca çıktısı, cron/uyandırma promptu,
+compact özeti, otomatik güvenlik incelemesi isteği ALINMAZ. Ölçüm: ham "user" satırlarının 9,4 MB'ı vardı, insan izi
+süzgeci (klavye kaynağı ya da `origin=human`) sonrası 0,9 MB; Claude cevaplarıyla 4,2 MB / 32 gün.
+**Nerede durur:** depoda DEĞİL (repo PUBLIC; konuşma kişisel ve sır taşıyabilir). Çıktı `~/.claude/projects/<proje>/konusma-gunlugu/`,
+manifest kökü `gunluk` (INV-MUTLAK-YOL-1: `~`, env `VENTHUB_PROJE_TAKIP_GUNLUK` ezer).
+**Sır süzgeci ZORUNLU ve kapatılamaz:** bağlantı dizesi parolası, JWT, bilinen anahtar önekleri, "parola/anahtar = değer"
+kalıpları, 60+ karakter bitişik base64 → `[SIR-KALDIRILDI]`. Değer hiç basılmaz; rapor sayı verir. Yanlış pozitif (örn.
+uzun hash) kabul edilir: yanlışlıkla silinen hash zararsız, yanlışlıkla kalan sır değil.
+**Determinizm:** aynı transkript → aynı dosya (sıralı, damgasız). Günlük yeniden üretim + `esitle` OPS gün-sonu rutini.
+**Ne işe yarar:** defter "bunu konuşmuş muyduk, Recep ne demişti" sorusuna tarih ve oturumla cevap verir; hafıza notu
+yorumdur, günlük kaynaktır (ikisi de defterde; çelişirse günlük kazanır).

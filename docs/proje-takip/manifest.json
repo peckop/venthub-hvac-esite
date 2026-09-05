@@ -5,6 +5,7 @@
   "kokler": {
     "repo": ".",
     "hafiza": "~/.claude/projects/c--Users-alize-venthub-hvac/memory",
+    "gunluk": "~/.claude/projects/c--Users-alize-venthub-hvac/konusma-gunlugu",
     "_not": "~ ev dizinine acilir (os.path.expanduser); VENTHUB_PROJE_TAKIP_HAFIZA ortam degiskeni verilirse o kazanir (INV-MUTLAK-YOL-1: kimlik sizdiran mutlak yol depoya girmez)"
   },
   "demet_ust_siniri_bayt": 900000,
@@ -28,7 +29,10 @@
     { "ad": "10-design-15a-briefler", "baslik": "Design 15A: OPS brief'leri + Design bulgu dosyalari", "kok": "repo",
       "dahil": ["docs/proje-takip/design-15a/*.md"] },
     { "ad": "11-proje-takip-analizler", "baslik": "Proje takip analizleri (celiski/mukerrerlik taramalari, esitleme kayitlari)", "kok": "repo",
-      "dahil": ["docs/proje-takip/*.md"] }
+      "dahil": ["docs/proje-takip/*.md"] },
+    { "ad": "12-konusma-gunlugu", "baslik": "Konusma gunlugu: Recep ile Claude arasindaki gun bazli konusma (sir suzgecinden gecmis, depoya girmez)", "kok": "gunluk",
+      "dahil": ["*.md"],
+      "_not": "scripts/nlm/konusma_gunlugu.py uret --kip ozet ile uretilir (Recep metni tam + her turun son Claude cevabi). Repo PUBLIC oldugu icin dosyalar depoda DEGIL, ev dizininde; deftere buradan gider. Recep 09-04: 'konusma gecmisini de NLM e koysak'." }
   ],
   "asla_dahil_etme": {
     "nicin": "koddan / aractan URETILMIS; tazelik kapisi ayri (uretilmis-artefakt-standard). Deftere girerse NLM cevaplari kod snapshot'ina baglanir ve drift eder.",
