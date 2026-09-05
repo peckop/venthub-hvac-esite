@@ -225,7 +225,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       const rows = await ftsSearchProducts(supabaseBrowserClient, term, 20)
       setResults(rows)
     } catch {
-      setError(t('search.noResults') || 'Arama sırasında hata oluştu.')
+      setError(t('search.noResults'))
     } finally {
       setLoading(false)
     }

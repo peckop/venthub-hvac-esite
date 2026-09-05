@@ -146,7 +146,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
         <div className="absolute top-3 left-3 right-3 z-20 flex justify-between items-start pointer-events-none">
           {product.is_featured && (
             <div className="bg-gold-accent backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wider px-2 py-1 rounded shadow-sm">
-              {t('pdp.featured') || 'ÖNE ÇIKAN'}
+              {t('pdp.featured')}
             </div>
           )}
           <div className="bg-white/90 backdrop-blur-sm rounded-lg p-1 border border-light-gray shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">

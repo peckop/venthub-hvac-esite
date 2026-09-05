@@ -139,7 +139,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
 
   const breadcrumbItems = [
     { label: t('category.breadcrumbHome'), href: Routes.home() },
-    { label: t('brands.pageTitle') || 'Markalar', href: Routes.brands() },
+    { label: t('brands.pageTitle'), href: Routes.brands() },
     { label: brand?.name || slug }
   ]
 

@@ -28,7 +28,7 @@ const ProductsHero: React.FC<ProductsHeroProps> = ({
             <div className="absolute inset-0 z-0">
                 <Image
                     src="/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg"
-                    alt={t('products.heroAlt') || 'Industrial HVAC Systems'}
+                    alt={t('products.heroAlt')}
                     fill
                     sizes="(max-width: 1280px) 100vw, 1280px"
                     className="object-cover opacity-20"
@@ -62,7 +62,7 @@ const ProductsHero: React.FC<ProductsHeroProps> = ({
             <div className="relative z-10 px-8 py-16 md:py-24 flex flex-col items-center justify-center text-center">
                 {/* Title */}
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8 tracking-tight max-w-3xl drop-shadow-md">
-                    {t('products.hubTitle') || 'Profesyonel HVAC Çözümleri'}
+                    {t('products.hubTitle')}
                 </h1>
 
                 {/* Search Bar Container */}
@@ -76,15 +76,15 @@ const ProductsHero: React.FC<ProductsHeroProps> = ({
                                 type="search"
                                 value={searchValue}
                                 onChange={(e) => onSearchChange(e.target.value)}
-                                placeholder={t('products.searchPlaceholder') || 'Ürün veya kategori arayın...'}
-                                aria-label={t('products.searchAriaLabel') || 'Ürün ara'}
+                                placeholder={t('products.searchPlaceholder')}
+                                aria-label={t('products.searchAriaLabel')}
                                 className="w-full pl-12 pr-6 py-4 bg-transparent text-gray-800 placeholder-gray-400 border-0 focus-visible:outline-none text-base md:text-lg"
                             />
                         </div>
                     </div>
                     {/* Optional Help Text */}
                     <p className="mt-4 text-white/50 text-sm">
-                        {t('products.searchHelp') || 'Binlerce ürün arasında hızlıca bulun'}
+                        {t('products.searchHelp')}
                     </p>
                 </div>
             </div>

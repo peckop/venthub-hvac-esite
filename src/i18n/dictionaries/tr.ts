@@ -1908,6 +1908,13 @@ export const tr = {
       quotes: 'Tekliflerim',
       profile: 'Profilim',
       security: 'Güvenlik',
+      // GRUP başlıkları (sekme değil): sol menüde öğeleri toplayan ara başlıklar.
+      // `listsGroup` deseninin devamı — REC-125'te iki grup başlığı koda SABİT
+      // yazılmıştı ('Sipariş & Kargo', 'Hesap Yönetimi'), yani EN kullanıcıya da
+      // Türkçe düşüyordu ve hiçbir kapı görmüyordu (sözlükte olmayan metin,
+      // parite testinin de INV-5'in de evreni dışındadır).
+      ordersGroup: 'Sipariş & Kargo',
+      accountGroup: 'Hesap Yönetimi',
       listsGroup: 'Listelerim',
       favorites: 'Favorilerim',
       projects: 'Projelerim',

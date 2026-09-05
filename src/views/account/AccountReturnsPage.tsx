@@ -399,7 +399,7 @@ export default function AccountReturnsPage() {
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-3">
-              <button onClick={() => setOpenModal(false)} className="h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200">{t('common.cancel') || 'İptal'}</button>
+              <button onClick={() => setOpenModal(false)} className="h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200">{t('common.cancel')}</button>
               <button onClick={handleCreate} className="h-10 px-5 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-102 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/50">{t('returns.submit')}</button>
             </div>
           </div>

@@ -44,7 +44,7 @@ const Hotspot: React.FC<HotspotProps> = ({ x, y, label, detail, isActive, onTogg
               className="absolute bottom-full mb-4 w-64 bg-slate-900/95 backdrop-blur-xl border border-cyan-500/30 p-4 rounded-2xl shadow-elevation-4 z-50 pointer-events-none"
             >
               <div className="text-xs font-black uppercase tracking-hvac-normal text-cyan-400 mb-1">
-                {t('home.cinematicShowcase.componentLabel') || 'System Component'}
+                {t('home.cinematicShowcase.componentLabel')}
               </div>
               <div className="text-white text-sm font-bold mb-2">{label}</div>
               <div className="h-px w-8 bg-cyan-500/50 mb-2" />
@@ -250,7 +250,7 @@ const CinematicProductShowcase: React.FC = () => {
                 <div className="flex items-center gap-4 text-white/40">
                   <div className="h-px w-12 bg-white/10" />
                   <span className="text-xs font-bold uppercase tracking-widest italic">
-                    {t('home.cinematicShowcase.badge') || 'Industrial Grade'}
+                    {t('home.cinematicShowcase.badge')}
                   </span>
                 </div>
               </div>

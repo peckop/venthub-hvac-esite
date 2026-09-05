@@ -67,14 +67,14 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
                 <button 
                   onClick={() => onUpdateFilters({ viewMode: 'grid' })}
                   className={`p-2 rounded-lg transition-colors ${filters.viewMode === 'grid' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
-                  title={t('category.view.grid') || 'Izgara Görünümü'}
+                  title={t('category.view.grid')}
                 >
                   <Grid size={18} />
                 </button>
                 <button 
                   onClick={() => onUpdateFilters({ viewMode: 'list' })}
                   className={`p-2 rounded-lg transition-colors ${filters.viewMode === 'list' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
-                  title={t('category.view.list') || 'Liste Görünümü'}
+                  title={t('category.view.list')}
                 >
                   <List size={18} />
                 </button>
@@ -84,7 +84,7 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
                 value={filters.sortBy}
                 onChange={(e) => onUpdateFilters({ sortBy: e.target.value })}
                 className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus-visible:ring-primary-ocean/20 transition-colors shadow-sm"
-                aria-label={t('category.sort.title') || 'Sıralama'}
+                aria-label={t('category.sort.title')}
               >
                 {/* Fiyat sıralaması gizli: min_price Fiyat Motoru açılana dek ~hep NULL (F5-B §5.3). */}
                 <option value="name">{t('category.sort.name')}</option>

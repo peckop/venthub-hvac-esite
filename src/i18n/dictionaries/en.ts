@@ -1987,6 +1987,8 @@ export const en: typeof tr = {
       quotes: 'My Quotes',
       profile: 'Profile',
       security: 'Security',
+      ordersGroup: 'Orders & Shipping',
+      accountGroup: 'Account Management',
       listsGroup: 'My Lists',
       favorites: 'Favorites',
       projects: 'Projects',
