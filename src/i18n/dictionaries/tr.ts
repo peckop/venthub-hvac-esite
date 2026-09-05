@@ -2713,7 +2713,10 @@ export const tr = {
       }
     },
     jetFan: {
-      pageTitle: 'Jet Fan Hesap Makinesi',
+      // REC-148 B1 / K17 — TEK AD: üç kardeşi "… Hesaplayıcı" derken bu tek başına
+      // "Hesap Makinesi" diyordu. İngilizcede dördü de "Calculator" idi; ayrışma yalnız
+      // Türkçedeydi ve tam da bu yüzden kimse fark etmemişti.
+      pageTitle: 'Jet Fan Hesaplayıcı',
       pageDescription: 'Otopark ve tünel jet fan itki ve havalandırma hesabı',
       pageInfoText: 'Kapalı otopark veya tünellerde gerekli jet fan sayısı, itki kuvveti ve havalandırma debisini hesaplar. NFPA 502 ve BS 7346 standartlarına uygun.',
       smokeWarning: 'Duman tahliye hesabı ön tasarım amaçlıdır. Profesyonel yangın mühendisi danışmanlığı gereklidir.',

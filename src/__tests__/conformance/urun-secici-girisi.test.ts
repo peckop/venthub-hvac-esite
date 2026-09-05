@@ -184,6 +184,82 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
         }
     })
 
+    it('⭐TEK AD — yetenek tek adla anılır, sekme başlığı dahil (K17)', () => {
+        // NİÇİN (REC-148 B1, 2026-09-05): bu yeteneğin ONDAN fazla adı vardı. İkisi ölçüldü
+        // ve düzeltildi; bu kol ikisinin de geri gelmesini engeller.
+        //
+        // (1) "Hesap Makinesi": Türkçede üç araç "… Hesaplayıcı" derken jet fan tek başına
+        //     "Hesap Makinesi" diyordu. İngilizcede dördü de "Calculator" idi — ayrışma
+        //     yalnız TR'deydi, bu yüzden parite kapısı da göremezdi (iki dilde de anahtar
+        //     vardı, değerler farklı ayrışıyordu).
+        // (2) "VentHub Mühendislik Araçları": her hesaplayıcı sayfasının SEKME başlığında
+        //     duruyordu, sabit kodlu ve TÜRKÇE. Sayfanın gövdesinde görünmediği için hiçbir
+        //     inceleme fark etmemişti; İngilizce ziyaretçi sekmesinde Türkçe ad görüyordu.
+        const LAYOUT = govde(oku('src', 'components', 'calculators', 'CalculatorLayout.tsx'))
+
+        expect(
+            /Hesap Makinesi/.test(govde(TR)),
+            'Sozlukte (tr) "Hesap Makinesi" geri gelmis. K17 tek ad: kardesleri "Hesaplayici" ' +
+                'derken bir arac baska turlu adlandirilamaz.',
+        ).toBe(false)
+
+        expect(
+            /Mühendislik Araçları/.test(LAYOUT),
+            'Hesaplayici sayfasinin sekme basligina SABIT KODLU ad geri konmus. Iki kusur: ' +
+                'yetenegin onuncu adi olur (K17) ve Turkce sabit, Ingilizce ziyaretcinin ' +
+                'sekmesinde Turkce cikar (kural 7).',
+        ).toBe(false)
+
+        expect(
+            LAYOUT.includes("t('urunSecici.ustBaslik')"),
+            'Sekme basligi TEK ADI sozlukten almiyor. Ad koda yazilirsa dil ile birlikte ' +
+                'degismez ve tekillik sessizce bozulur.',
+        ).toBe(true)
+
+        // ⭐SİTE ADI İKİ KEZ YAZILMAZ — önizlemede ölçülerek yakalandı (2026-09-05).
+        // `Seo` bileşeni başlığın sonuna zaten "| VentHub" ekliyor. Bu satıra bir daha
+        // "VentHub" yazmak "… | Ürün Seçici · VentHub | VentHub" üretiyordu: mükerrerliği
+        // temizleyen PR'ın kendisi mükerrerlik getiriyordu. Ölçmeseydim inecekti.
+        const seoBasligiSatiri = /title=\{`\$\{title\}[^`]*`\}/.exec(LAYOUT)?.[0] ?? ''
+        expect(seoBasligiSatiri, 'Hesaplayici SEO baslik satiri BULUNAMADI — olcut kor.').not.toBe('')
+        expect(
+            /VentHub/.test(seoBasligiSatiri),
+            'Hesaplayici SEO basligina site adi ELLE yazilmis. `Seo` zaten "| VentHub" ekliyor; ' +
+                'ikisi birlesince sekmede site adi IKI KEZ cikar.',
+        ).toBe(false)
+
+        // AYIRT EDİCİ: ölçüt gerçekten TR sözlüğüne bakıyor mu — dosya boş/kırık gelirse
+        // üstteki iki "false" beklentisi sahte-yeşil verirdi.
+        expect(govde(TR).includes('Hesaplayıcı'), 'TR sozlukte hicbir "Hesaplayici" yok — tarayici kor.').toBe(true)
+    })
+
+    it('⭐KART ÜST BAŞLIĞI ÇİZİLİYOR — tek ad ana sayfada görünür (B5)', () => {
+        // NİÇİN: sözlükte üç kartın da `eyebrow` alanı vardı ama bileşenin props tipi
+        // yalnız title+description kabul ediyordu; üçü de HİÇ çizilmiyordu ve derleyici
+        // susuyordu (fazla alan taşıyan nesneyi dar tipe geçirmek hata değildir).
+        // Sonuç: K17'nin tek adı "Ürün Seçici" ana sayfada hiçbir yerde görünmüyordu.
+        const g = govde(ANA_SAYFA_BLOK)
+        // ⭐ÖLÇÜT `items` TİPİNİN İÇİNE BAKAR — sabotajla düzeltildi (2026-09-05):
+        // ilk yazdığım ölçüt düz `eyebrow: string` arıyordu ve AYIRT ETMİYORDU, çünkü
+        // aynı dize props tipinin ÜST DÜZEYİNDE de var (bölümün kendi üst başlığı,
+        // `t.eyebrow`). Kart alanını silip sabotaj koştuğumda kol AYAKTA KALDI — yani
+        // gerçek kusurda yeşil verirdi. Ölçüt artık `items` kaydının gövdesini okur.
+        const itemsTipi = /items:\s*Record<string,\s*\{([^}]*)\}/.exec(g)?.[1] ?? ''
+        expect(
+            /\beyebrow\s*:\s*string/.test(itemsTipi),
+            'KnowledgeBlock props tipinde KART kaydi (`items`) `eyebrow` alanini KABUL ETMIYOR — ' +
+                'sozlukteki ad yine olu kalir ve kimse fark etmez (tip hatasi vermez).',
+        ).toBe(true)
+        expect(
+            /\.eyebrow\b/.test(g.split('interface KnowledgeBlockProps')[1] ?? ''),
+            'Kart `eyebrow` degeri hicbir yerde OKUNMUYOR — tipe eklemek tek basina cizmez.',
+        ).toBe(true)
+        expect(
+            /eyebrow:\s*'Ürün Seçici'/.test(TR),
+            'TR sozlukte Urun Secici kartinin ust basligi YOK — cizilecek ad kalmaz.',
+        ).toBe(true)
+    })
+
     it('iki sözlükte de urunSecici bölümü var ve dört aracı adlandırıyor', () => {
         for (const [ad, metin] of [['tr', TR], ['en', EN]] as const) {
             expect(/urunSecici:\s*\{/.test(metin), `Sozluk (${ad}) urunSecici bolumu YOK.`).toBe(true)
