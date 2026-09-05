@@ -51,7 +51,7 @@ const HubPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       <Seo 
-        title={`${t('knowledge.hub.title')} | VentHub`} 
+        /* site adi Seo bileseninde eklenir — REC-148 */ title={t('knowledge.hub.title')} 
         description={t('knowledge.hub.subtitle')} 
       />
 

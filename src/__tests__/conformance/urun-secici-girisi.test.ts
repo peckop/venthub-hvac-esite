@@ -228,6 +228,55 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
                 'ikisi birlesince sekmede site adi IKI KEZ cikar.',
         ).toBe(false)
 
+        // ⭐KAPSAM TÜM `<Seo>` KULLANICILARINA GENİŞLETİLDİ (2026-09-05, OPS hükmü).
+        // NİÇİN: yukarıdaki kol yalnız hesaplayıcıya bakıyordu ve aynı kusur canlıda BEŞ
+        // yüzeyde daha duruyordu — "Hakkımızda | VentHub | VentHub", "Markalar | …",
+        // "İletişim | …", "Bilgi, Mühendisliğin Ham Maddesidir | …" ve "Hava Perdesi |
+        // VentHub Teknik Bilgi | VentHub" (sonuncusu ayrıca fazladan bir AD varyantıydı).
+        // Tek dosyayı kilitlemek kusuru DEĞİL yalnız o dosyadaki örneğini kapatır.
+        const SEO_KULLANICILARI = [
+            ['src', 'views', 'AboutPage.tsx'],
+            ['src', 'views', 'BrandsPage.tsx'],
+            ['src', 'views', 'ContactPage.tsx'],
+            ['src', 'views', 'BrandDetailPage.tsx'],
+            ['src', 'views', 'knowledge', 'HubPage.tsx'],
+            ['src', 'views', 'knowledge', 'TopicPage.tsx'],
+            ['src', 'app', '_components', 'ProductDetailPageView.tsx'],
+            ['src', 'components', 'calculators', 'CalculatorLayout.tsx'],
+        ] as const
+        const elleYazanlar: string[] = []
+        let bulunanBaslikSayisi = 0
+        for (const yol of SEO_KULLANICILARI) {
+            const g = govde(oku(...yol))
+            /**
+             * ⭐ÖLÇÜT SATIR TEMELLİ — sabotajla düzeltildi (2026-09-05).
+             *
+             * İlk yazdığım desen `title=\{[^}]*\}` idi ve AYIRT ETMİYORDU: şablon dizesindeki
+             * `${t('...')}` parçası kendi `}`'ini taşıyor, desen orada KESİLİYOR ve satırın
+             * geri kalanındaki "| VentHub" hiç görülmüyordu. Sabotaj koştum (hesaplayıcı
+             * DIŞINDA bir yüzeye site adını geri koydum) ve kol YEŞİL kaldı — yani gerçek
+             * kusurda susacaktı. Bu depoda `title` prop'u tek satırda yazılıyor; satırın
+             * tamamını okumak hem basit hem de iç içe süslü parantezden etkilenmiyor.
+             */
+            for (const satir of g.split(/\r?\n/)) {
+                if (!satir.includes('title={')) continue
+                bulunanBaslikSayisi++
+                if (/VentHub/.test(satir)) elleYazanlar.push(`${yol.join('/')} · ${satir.trim()}`)
+            }
+        }
+        expect(
+            elleYazanlar,
+            'SEO basligina site adi ELLE yazilmis. `Seo` bileseni sonuna zaten "| VentHub" ' +
+                'ekliyor; ikisi birlesince sekmede ve arama sonucunda site adi IKI KEZ cikar:\n' +
+                elleYazanlar.join('\n'),
+        ).toEqual([])
+        // BOŞLUK MUHAFIZI: dosya adları değişirse ya da regex tutmazsa liste boş kalır ve
+        // kol sessizce yeşil verirdi. Kaç başlık gerçekten görüldüğü ÖLÇÜLÜR.
+        expect(
+            bulunanBaslikSayisi,
+            'Hicbir `title={...}` bulunamadi — tarayici kor, kol sahte-yesil verir.',
+        ).toBeGreaterThan(4)
+
         // AYIRT EDİCİ: ölçüt gerçekten TR sözlüğüne bakıyor mu — dosya boş/kırık gelirse
         // üstteki iki "false" beklentisi sahte-yeşil verirdi.
         expect(govde(TR).includes('Hesaplayıcı'), 'TR sozlukte hicbir "Hesaplayici" yok — tarayici kor.').toBe(true)

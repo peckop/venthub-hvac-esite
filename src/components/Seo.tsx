@@ -23,6 +23,23 @@ const Seo: React.FC<SeoProps> = ({
 }) => {
   const pathname = usePathname()
   const siteName = 'VentHub'
+  /**
+   * ⭐SİTE ADINI EKLEYEN TEK YER BURASI — çağıran ASLA yazmaz (REC-148, 2026-09-05).
+   *
+   * ÖLÇÜLDÜ, canlıda: beş yüzey site adını bir kez daha ELLE yazıyordu ve sekmede iki kez
+   * çıkıyordu — "Hakkımızda | VentHub | VentHub", "Markalar | VentHub | VentHub",
+   * "İletişim | VentHub | VentHub", "Bilgi, Mühendisliğin Ham Maddesidir | VentHub | VentHub",
+   * ve "Hava Perdesi | VentHub Teknik Bilgi | VentHub" (sonuncusu ayrıca fazladan bir AD
+   * varyantı taşıyordu — K17: tek ad).
+   *
+   * NİÇİN HİÇBİR KAPI GÖRMEDİ: her çağrı tek başına geçerli bir dizedir; `tsc`, `lint`,
+   * i18n paritesi ve ölü-anahtar kapılarının hepsi tek dosyaya bakar. Kusur ÇAĞIRAN ile
+   * BURASI arasındaki sözleşmede yaşıyordu — yani dosyalar arası bir tutarlılık iddiası.
+   * Bekçisi INV-SECICI-1'in "site adı elle yazılamaz" kolu.
+   *
+   * Kural: `title` yalnız SAYFANIN kendi adını taşır. Bölüm adı gerekiyorsa sözlükten
+   * gelir (`CalculatorLayout` → `urunSecici.ustBaslik` gibi), site adı ise DAİMA buradan.
+   */
   const fullTitle = title ? `${title} | ${siteName}` : siteName
   const defaultDesc = 'Premium HVAC ve Havalandırma Çözümleri'
   const finalDesc = description || defaultDesc

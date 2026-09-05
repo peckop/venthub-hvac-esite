@@ -61,7 +61,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
   return (
     <div className="min-h-screen bg-white">
       <Seo 
-        title={`${title} | VentHub Teknik Bilgi`} 
+        /* site adi Seo bileseninde eklenir — REC-148 */ title={title} 
         description={t(`${base}.summary`)} 
       />
 
