@@ -81,6 +81,10 @@ Bu yüzden:
 - Depo içi kapılar (A ve C) PR üzerinde CI'da koşar; ölçtükleri şey **birleşme
   hedefinin geçmişidir** ve koşumun hangi ağaçta yapıldığından bağımsızdır.
 
+⭐**Bir ağacın emekliye ayrılabilir olduğunu ölçen ölçüt ayrı bir cetvelde yazılıdır:**
+`fleet-mechanism-standard.md` **§30** — kayıp ölçütü `rev-list --count origin/<dal>..HEAD
+== 0`'dır; dal adının uzakta bulunması (`ls-remote`) işin yedeklendiğini **söylemez**.
+
 ## AXIOM 6 — Yıkıcı adım, onarıcı adımın yapılabilirliği ölçülmeden koşmaz
 
 Senkron **önce siler sonra yükler**. Yükleme kaynağı yoksa defter boşalır.

@@ -70,6 +70,13 @@ const OFSETLER = {
   // tablo olmadan KANITSIZ kalıyordu — adresli emir ulaşmayabilirdi. Sayı OPS'tan
   // gelmedi, çakışma kuralından TÜRETİLDİ ve OPS'a yazıldı; OPS başka değer derse değişir.
   TEMIZLIK: '2,22,42',
+  // URUN-KATALOG (2026-09-05, REC-146 alt şeridi). Çift taban havuzunun sıradaki serbesti.
+  // ⭐TEMIZLIK satırından FARKI, adıyla: o sayıyı ALTYAPI türetmişti (OPS'tan gelmemişti,
+  // sonradan yazılmıştı); BU sayıyı OPS ATADI ve emirde yazdı. Aynı değere iki yoldan
+  // varılması tesadüf değil — tablonun kendi notu ("sıradaki serbest: 4,24,44") ölçütü
+  // taşıyordu; yani not, kuralı iki tarafın da bağımsız uygulayabileceği kadar açıktı.
+  // (Sıradaki serbest artık: 6,26,46 · 8,28,48 ...)
+  'URUN-KATALOG': '4,24,44',
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
