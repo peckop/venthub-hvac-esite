@@ -1,3 +1,16 @@
+'use client'
+/**
+ * ⭐İSTEMCİ SINIRI BURADA BAŞLAR (REC-150 PR-1, 2026-09-05).
+ *
+ * Bu rotanın `page.tsx`'i artık Server Component (metadata'yı `generateMetadata` yazıyor).
+ * Eskiden istemci sınırını ROTA ilan ediyordu ve bu görünüm onu MİRAS ALIYORDU — dosyada
+ * kendi `'use client'`'ı hiç yoktu. Rota sunucuya dönünce miras kesildi ve `next build`
+ * "useState yalnız Client Component'te çalışır" diyerek patladı (CI'da ölçüldü).
+ *
+ * Depodaki desen buydu: dört hesaplayıcı rotası `'use client'` taşır, dört görünüm taşımaz.
+ * Kalan üç rota göç ederken bu satır da onların görünümlerine taşınmalı — yoksa aynı
+ * kırılma tekrarlanır. Kapı: INV-METADATA-TEK-YAZICI-1 (göç eden görünüm sınırı ilan eder).
+ */
 import { Circle, RotateCcw, Ruler, Square,Wind } from 'lucide-react'
 import React, { useMemo,useState } from 'react'
 
@@ -92,6 +105,11 @@ const DuctCalcPage: React.FC = () => {
       description={t('calculators.duct.description')}
       icon={<Ruler size={32} />}
       infoText={t('calculators.duct.infoText')}
+      /* REC-150 PR-1 PİLOTU: bu rotanın metadata'sını artık `page.tsx` üretiyor
+         (`generateMetadata`), yani layout ikinci yazıcı olmamalı. Dört hesaplayıcıdan
+         YALNIZ bu rota göç etti; diğer üçü bugünkü davranışını sürdürüyor. Bayrak,
+         dördü de göç edince silinecek geçici bir dikiştir. */
+      metadataRotadanMi
     >
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-2xl border border-light-gray shadow-sm p-6">
