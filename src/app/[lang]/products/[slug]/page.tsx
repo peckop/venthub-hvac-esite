@@ -14,6 +14,7 @@ import {
 import { getAllFamilySlugs } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
+import { musteriyeGorunurAciklama } from '@/utils/icIngestNotu'
 import SeriesLandingView from '@/views/category/SeriesLandingView'
 
 import { SITE_URL } from '../../../../config/siteUrl'
@@ -93,9 +94,14 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       const canonicalUrl = lang === 'en' ? enUrl : trUrl
       // REC-108: sekme başlığı ve arama sonucu başlığı da dili bilir.
       const title = pickLang(family.meta_title, lang) || `${familyName(family, lang)} | VentHub`
+      // ⭐İÇ INGEST NOTU ARAMA SONUCUNA DA ÇIKAMAZ (canlı olay, 2026-09-05): aile
+      // açıklaması bu zincirin İKİNCİ halkası, yani 11/40 ailede Google'a "Avensair 2026
+      // fiyat listesinden aktarılan temel ürün (Tier C)." diye açıklama gidebilirdi.
+      // Süzgeç null döndürünce zincir bir sonraki halkaya düşer — davranış "açıklama yok"
+      // ile aynıdır, uydurma metin ÜRETİLMEZ.
       const description =
         pickLang(family.meta_description, lang) ||
-        pickLang(family.description, lang)?.substring(0, 160) ||
+        musteriyeGorunurAciklama(pickLang(family.description, lang))?.substring(0, 160) ||
         // Son çare SEO açıklaması — sözlük yok (RSC metadata), dil koşuluyla çözülür.
         (lang === 'en' ? 'VentHub Product Details' : 'VentHub Ürün Detayı')
       const coverPath = variants.find((v) => v.images.length > 0)?.images[0]?.path
