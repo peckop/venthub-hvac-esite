@@ -67,7 +67,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
   return (
     <div className="min-h-screen bg-white">
       <Seo
-        title={`${t('aboutPage.title')} | VentHub`}
+        /* site adi Seo bileseninde eklenir — REC-148 */ title={t('aboutPage.title')}
         description={t('aboutPage.seoDescription')}
       />
 

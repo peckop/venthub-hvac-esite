@@ -25,7 +25,7 @@ const BrandsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       <Seo
-        title={`${t('brands.pageTitle')} | VentHub`}
+        /* site adi Seo bileseninde eklenir — REC-148 */ title={t('brands.pageTitle')}
         description={t('brands.seoDesc')}
       />
 
