@@ -54,7 +54,19 @@ interface KnowledgeBlockProps {
     headingAccent: string;
     statsPipelineLabel: string;
     statsOptimization: string;
-    items: Record<string, { title: string; description: string }>;
+    /**
+     * ⭐`eyebrow` TİPE EKLENDİ (REC-148 B5, 2026-09-05) — ÖLÜ ANAHTARDI.
+     *
+     * Sözlükte üç kartın da `eyebrow` alanı vardı ("Bilgi Merkezi", "Ürün Seçici",
+     * "Destek") ama bu tip yalnız `title`+`description` kabul ettiği için ÜÇÜ DE HİÇ
+     * ÇİZİLMİYORDU. Sessizdi: fazla alan taşıyan bir nesneyi dar bir tipe geçirmek
+     * TypeScript hatası değildir (tazelik denetimi yalnız değişmez nesne edebiyatına
+     * uygulanır), yani derleyici de sustu.
+     *
+     * Niçin silmek değil ÇİZMEK: K17 "tek ad" diyor ve o tek ad — "Ürün Seçici" —
+     * ana sayfada HİÇBİR YERDE görünmüyordu. Anahtarı silmek adı büsbütün kaybettirirdi.
+     */
+    items: Record<string, { eyebrow: string; title: string; description: string }>;
   };
   finalCtaDict: {
     primaryCta: string;
@@ -126,6 +138,13 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                   </div>
 
                   <div className="mt-12">
+                    {/* Kartın kendi üst başlığı (REC-148 B5). Yeteneğin ADI burada görünür;
+                        başlık ne YAPTIĞINI anlatır, üst başlık ADININ ne olduğunu söyler. */}
+                    {t.items[item.id]?.eyebrow ? (
+                      <div className="mb-3 text-xs font-bold uppercase tracking-hvac-normal text-cyan-400/80">
+                        {t.items[item.id]?.eyebrow}
+                      </div>
+                    ) : null}
                     <h3 className="text-2xl font-bold text-white transition-colors group-hover:text-cyan-400">
                       {t.items[item.id]?.title}
                     </h3>

@@ -52,7 +52,19 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
     return (
         <div className="min-h-screen bg-gradient-to-b from-light-gray to-white">
             <Seo
-                title={`${title} | VentHub Mühendislik Araçları`}
+                /**
+                 * SEKME/ARAMA BAŞLIĞI TEK ADA BAĞLANDI (REC-148 B1, 2026-09-05).
+                 *
+                 * Buraya "VentHub Mühendislik Araçları" SABİT KODLANMIŞTI ve iki ayrı
+                 * kusur taşıyordu:
+                 *  1. Yeteneğin ONUNCU adıydı — K17 tek ad diyor, oysa bu ad sözlükte
+                 *     hiç geçmiyordu; kimse "burada da bir ad var" diye bakmamıştı çünkü
+                 *     sayfanın gövdesinde görünmüyor, yalnız sekmede ve arama sonucunda.
+                 *  2. TÜRKÇE SABİTTİ — İngilizce ziyaretçi, sayfanın geri kalanı İngilizce
+                 *     iken sekmesinde Türkçe bir ad görüyordu (CLAUDE.md kural 7 ihlali:
+                 *     kullanıcıya görünen metin sözlükten gelir).
+                 */
+                title={`${title} | ${t('urunSecici.ustBaslik')} · VentHub`}
                 description={description}
             />
 
