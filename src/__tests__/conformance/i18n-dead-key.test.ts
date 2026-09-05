@@ -288,7 +288,22 @@ function canli(key: string, t: Tarama): boolean {
  * buradan da silinmek ZORUNDA (aşağıdaki "borç listesi bayatlamaz" testi bunu zorlar).
  * Böylece kayıt gerçeği yansıtır; sessizce şişemez.
  *
- * Dağılım: admin 200 · pdp 61 · common 47 · category 39 · account 29 · products 21 · diğer 34
+ * ⭐DAĞILIM — ÖLÇÜM TARİHİYLE BİRLİKTE (REC-133, 2026-09-06): **415 benzersiz anahtar**;
+ * admin **314** (%76, ADMIN şeridinin işi) · vitrin **101** — common 26 · account 24 ·
+ * category 19 · auth 7 · orders 6 · products 5 · checkout 3 · header 3 · support 2 ·
+ * returns 2 · brands/quotes/search/pdp 1'er.
+ *
+ * ⛔ÖNCEKİ SATIR BAYATTI, DÜZELTİLDİ: burada 431-döneminin (08-23) dağılımı yazılıydı
+ * ("admin 200 · pdp 61 · common 47 …"). Bugün pdp **1**, admin **314**. Sayılar yanlış
+ * değil ESKİYDİ — ama kapının kendi belgesi kapının kendi listesini yanlış tarif ediyordu.
+ * Bu yüzden dağılım artık ölçüm TARİHİYLE yazılır. Ayrıntı + tarihçe:
+ * `docs/audits/olu-sozluk-anahtari-olcumu-2026-09-06.md`
+ *
+ * ⭐LİSTE 266'DAN 415'E ÇIKTI — SUSTURMA DEĞİL, KESKİNLEŞME: 09-03'te (REC-127) kapıya
+ * DOSYA-BAĞI şartı eklendi ve **+149** gizli ölü anahtar ortaya çıktı; onlar 09-03'ten
+ * önce de ölüydü, zayıf ölçüt "canlı" sayıyordu. Kuralın anlamı: liste CANLIYA DÖNEN
+ * anahtarı tutamaz (bayatlık testi zorlar); daha keskin ölçümün ortaya çıkardığı anahtarın
+ * eklenmesi meşrudur — ama her ekleme SEBEBİYLE birlikte commit edilir.
  */
 const DONMUS_BORC: ReadonlySet<string> = new Set([
   // --- 2026-08-23: 7. eksen kapsami daraltilinca ORTAYA CIKAN uc olu anahtar ---
