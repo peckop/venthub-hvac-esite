@@ -1,3 +1,16 @@
+'use client'
+/**
+ * ⭐İSTEMCİ SINIRI BURADA BAŞLAR (REC-150 PR-1, 2026-09-05).
+ *
+ * Bu rotanın `page.tsx`'i artık Server Component (metadata'yı `generateMetadata` yazıyor).
+ * Eskiden istemci sınırını ROTA ilan ediyordu ve bu görünüm onu MİRAS ALIYORDU — dosyada
+ * kendi `'use client'`'ı hiç yoktu. Rota sunucuya dönünce miras kesildi ve `next build`
+ * "useState yalnız Client Component'te çalışır" diyerek patladı (CI'da ölçüldü).
+ *
+ * Depodaki desen buydu: dört hesaplayıcı rotası `'use client'` taşır, dört görünüm taşımaz.
+ * Kalan üç rota göç ederken bu satır da onların görünümlerine taşınmalı — yoksa aynı
+ * kırılma tekrarlanır. Kapı: INV-METADATA-TEK-YAZICI-1 (göç eden görünüm sınırı ilan eder).
+ */
 import { Circle, RotateCcw, Ruler, Square,Wind } from 'lucide-react'
 import React, { useMemo,useState } from 'react'
 

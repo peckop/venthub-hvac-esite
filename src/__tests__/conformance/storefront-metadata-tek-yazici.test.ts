@@ -43,6 +43,29 @@ const GOC_ETMEYENLER = [
   ['src', 'views', 'calculators', 'JetFanCalcPage.tsx'],
 ] as const
 
+/** Dört hesaplayıcının rota↔görünüm çiftleri — istemci sınırı ölçümü için. */
+const CIFTLER = [
+  { ad: 'kanal', rota: KANAL_ROTA, gorunum: KANAL_GORUNUM },
+  {
+    ad: 'jet-fan',
+    rota: ['src', 'app', '[lang]', 'destek', 'hesaplayicilar', 'jet-fan', 'page.tsx'],
+    gorunum: ['src', 'views', 'calculators', 'JetFanCalcPage.tsx'],
+  },
+  {
+    ad: 'hrv',
+    rota: ['src', 'app', '[lang]', 'destek', 'hesaplayicilar', 'hrv', 'page.tsx'],
+    gorunum: ['src', 'views', 'calculators', 'HRVCalcPage.tsx'],
+  },
+  {
+    ad: 'hava-perdesi',
+    rota: ['src', 'app', '[lang]', 'destek', 'hesaplayicilar', 'hava-perdesi', 'page.tsx'],
+    gorunum: ['src', 'views', 'calculators', 'AirCurtainCalcPage.tsx'],
+  },
+] as const
+
+/** `'use client'` yönergesi — yorumda değil, GÖVDEDE, dosyanın başında. */
+const istemciMi = (kaynak: string) => /^\s*['"]use client['"]/.test(govde(kaynak))
+
 describe('INV-METADATA-TEK-YAZICI-1 · rotanın metadatasını tek katman yazar', () => {
   it('⭐PİLOT ROTA metadatasını KENDİ üretir ve Server Component', () => {
     const g = govde(oku(...KANAL_ROTA))
@@ -86,6 +109,40 @@ describe('INV-METADATA-TEK-YAZICI-1 · rotanın metadatasını tek katman yazar'
       'canonical yaziliyor ama hreflang languages YOK — INV-CANONICAL-2 bunu ister ve ' +
         'iki dil birbirine baglanmaz.',
     ).toBe(true)
+  })
+
+  it('⭐⭐İSTEMCİ SINIRI KAYBOLMAZ — her hesaplayıcıda rota YA DA görünüm ilan eder', () => {
+    // NICIN BU KOL VAR (CI de olculdu, 2026-09-05): bu depoda istemci sinirini ROTALAR
+    // ilan ediyordu; dort hesaplayici gorunumunun hicbirinde 'use client' YOKTU, hepsi
+    // rotadan MIRAS aliyordu. Rota metadata icin sunucuya cevrilince o miras kesildi ve
+    // `next build` "useState yalniz Client Component te calisir" diye patladi.
+    //
+    // Kusur sinifi "gorunum bozuldu" degil, SINIR TASINDI AMA YENIDEN ILAN EDILMEDI dir.
+    // Olcut o yuzden tek rotaya degil DORDUNE birden bakar: kalan uc rota goc ederken
+    // ayni hata tekrarlanirsa burasi kirmizi verir — kapinin evreni dogru kume.
+    for (const { ad, rota, gorunum } of CIFTLER) {
+      const rotaIstemci = istemciMi(oku(...rota))
+      const gorunumIstemci = istemciMi(oku(...gorunum))
+      expect(
+        rotaIstemci || gorunumIstemci,
+        `${ad}: ne rota ne gorunum 'use client' ILAN ETMIYOR. Gorunum hook kullaniyor; ` +
+          'sinirsiz kalirsa `next build` patlar. tsc/lint/vitest bunu GORMEZ.',
+      ).toBe(true)
+    }
+  })
+
+  it('⭐GÖÇ EDEN ROTANIN GÖRÜNÜMÜ sınırı KENDİ taşır', () => {
+    // Goc etmis rota (generateMetadata var, 'use client' yok) icin "ya rota ya gorunum"
+    // yetmez: rota artik ilan EDEMEZ. O halde yuk gorunumdedir ve bu ayrica olculur.
+    for (const { ad, rota, gorunum } of CIFTLER) {
+      const gRota = govde(oku(...rota))
+      if (!/export\s+async\s+function\s+generateMetadata/.test(gRota)) continue
+      expect(
+        istemciMi(oku(...gorunum)),
+        `${ad}: rota generateMetadata yaziyor (yani Server Component) ama gorunum ` +
+          "'use client' ILAN ETMIYOR — miras kesildi, sinir yeniden ilan edilmedi.",
+      ).toBe(true)
+    }
   })
 
   it('⭐AYIRT EDİCİ — göç etmeyen üç rota bayrağı AÇMAMIŞ olmalı', () => {

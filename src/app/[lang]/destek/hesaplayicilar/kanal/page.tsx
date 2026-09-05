@@ -21,7 +21,13 @@ import PageComponent from '../../../../../views/calculators/DuctCalcPage'
  * ⚠`'use client'` KALKTI — mecburiyetten değil, ZORUNLULUKTAN: Next.js bir `'use client'`
  * dosyasından `generateMetadata` export edilmesine izin vermez. Bu aynı zamanda CLAUDE.md
  * **kural 4** borcunu (page.tsx varsayılan Server Component) bu rota için kapatır.
- * Görünüm kendi `'use client'`'ını taşımaya devam eder — desenin kendisi budur.
+ *
+ * ⭐SINIR AŞAĞI TAŞINDI, KALDIRILMADI: bu depoda istemci sınırını ROTALAR ilan ediyordu,
+ * görünümler değil — dört hesaplayıcı görünümünün hiçbirinde `'use client'` yoktu, hepsi
+ * rotadan miras alıyordu. Burayı sunucuya çevirmek o mirası kesti ve ilk denemede
+ * `next build` patladı ("useState yalnız Client Component'te çalışır"). Bu yüzden sınır
+ * artık `DuctCalcPage`'in kendi başında ilan ediliyor. Kalan üç rota göç ederken aynı
+ * taşıma onların görünümlerinde de yapılmalı.
  *
  * ⭐BAŞLIK BİÇİMİ BİLEREK AYNI BIRAKILDI: canlı bugün
  * "Kanal Basınç Kaybı Hesaplayıcı | Ürün Seçici | VentHub" basıyor. Göç bir SEO
