@@ -50,6 +50,34 @@ Uygulaması üç maddede:
    marka-özel bir iddia (ör. tek markanın Compasso d'Oro ödülü) vaat sızıntısıdır.
    Bu sınıf **karar gerektirir** — kapı onu kırmızı yapmaz, envantere yazar.
 
+## 1.6) ZAMAN vaadi — üçüncü kardeş (REC-148, 2026-09-05)
+
+Ticari vaat bir **yetenek** iddia eder, yetenek vaadi bir **özellik**. Üçüncü sınıf bir
+**tarih** iddia eder ve en sinsisi odur:
+
+> **Hiçbir yüzey "yakında" diyemez.** Bir şeyin ne zaman geleceği bilinmiyorsa, vitrin
+> onun YOKLUĞUNU söyler; gelme sözü vermez.
+
+Niçin ayrı bir madde: "yakında eklenecektir" cümlesi yazıldığı gün **yanlış değildir** —
+o yüzden hiçbir inceleme onu yakalamaz. Yalan olması zaman alır. Ürün açıklaması altı ay
+boş kalırsa, o cümle altı aydır ziyaretçiye söylenen bir sözdür ve tutulmamıştır. Kimse
+fark etmez, çünkü ortada hata yoktur — yalnızca eskimiş bir vaat vardır.
+
+Doğru iki cevap vardır, üçüncüsü yoktur:
+
+1. **Olgu dili** — "Bu markanın ürünleri henüz katalogda değil." Durumu söyler, söz vermez.
+2. **Satırın hiç basılmaması** (K7: *varsa satır, yoksa satır hiç yok*) — açıklaması olmayan
+   ürünün açıklama kartı çizilmez. Yer boş kalacaksa düzen de kapanır (§2).
+
+**Ödeme akışı bu maddede MUAF DEĞİLDİR.** Ticari vaat orada meşrudur ("güvenli ödeme"
+doğrudur, çünkü orası ödeme yapar); zaman vaadi hiçbir yerde meşru değildir. Nitekim
+REC-148'de yakalanan dört cümleden biri tam oradaydı: *"Ödeme yakında açılıyor."*
+Yerine K1a dili geldi: **"Şu an teklif kipindeyiz; sipariş ve ödeme kapalı."**
+
+Kapı: **INV-VAAT-SIZINTI-2** (`src/__tests__/conformance/vaat-sizintisi.test.ts`).
+Kardeşiyle aynı dosyada durur ama **muafiyeti farklıdır** — tek kapıya sıkıştırmak,
+ikisinden birini gevşetmek olurdu.
+
 ## 1.4) YETENEK vaadi — ticari vaadin kardeşi (REC-94, 2026-09-04)
 
 Yukarıdaki üç madde **ticari** vaadi yönetir (ödeme, taksit, kargo). 2026-09-04'te aynı
@@ -135,6 +163,20 @@ kapı gösteremez — gösterecek bir şey kalmamıştır. Bu yüzden liste **el
 
 Izgara sütun sayıları da geri alınır: PDP rozet listesi 1 → 3 (`SUTUN_SINIFI` tablosu),
 güven şeridi `lg:grid-cols-3` → `lg:grid-cols-6`.
+
+### 4.5.c — ZAMAN vaatleri (REC-148, 2026-09-05)
+
+⚠Bu tablo diğer ikisinden **farklı okunur**: buradaki kalemler satış modu açılınca geri
+GELMEZ. Zaman vaadi hiçbir modda doğru değildir; liste, silinen metnin ne olduğunu ve
+yerine ne konduğunu kayda geçirmek için vardır — yarın "burada bir cümle vardı" diye
+eskisinin geri konmasını engellemek üzere.
+
+| Kaldırılan | Neredeydi | Yerine ne kondu |
+|---|---|---|
+| `pdp.descFallback` | Ürün detayı, açıklama kartı | **Anahtar SİLİNDİ** — açıklama yoksa kart hiç çizilmez; yandaki "hızlı detaylar" paneli tam genişliğe geçer (yoksa 12'lik ızgarada 7-8 sütun ölü alan kalırdı) |
+| `quickView.descFallback` | Hızlı önizleme | **Anahtar SİLİNDİ** — açıklama yoksa paragraf çizilmez |
+| `brands.detail.noProducts` | Marka detayı, boş durum | Olgu dili: "Bu markanın ürünleri henüz katalogda değil." (anahtar DURUYOR) |
+| `checkout.kapali.baslik` | Ödeme kapalı ekranı | K1a dili: "Şu an teklif kipindeyiz; sipariş ve ödeme kapalı." (anahtar DURUYOR). ⚠Bu metin WhatsApp ön-doldurmasına konu olarak gidiyordu; konu `common.requestQuote`'a ayrıldı — tam cümle konu satırında saçmalıyordu |
 
 ### 4.5.b — YETENEK vaatleri (REC-94, 2026-09-04)
 

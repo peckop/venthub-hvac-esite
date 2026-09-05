@@ -1343,7 +1343,8 @@ export const en: typeof tr = {
     qty: 'Quantity:',
     addToCart: 'Add to Cart',
     techQuote: 'Request Technical Offer',
-    descFallback: 'A detailed description for this product will be added soon.',
+    // ⛔descFallback REMOVED (REC-148 A4, 2026-09-05) — it was a promise; the card is now
+    // simply not rendered when there is no description.
     relatedProducts: 'Related Products',
     officialDistributor: 'BRAND ASSURANCE',
     priceAvailability: 'Price & Availability',
@@ -1655,7 +1656,8 @@ export const en: typeof tr = {
     // Shown when the payment path is CLOSED by the ENV flag
     // (see app/[lang]/checkout/page.tsx — NEXT_PUBLIC_ODEME_ACIK).
     kapali: {
-      baslik: 'Checkout opening soon',
+      // REC-148 A7 — OPS ruling, K1a: the sales mode is CLOSED, not absent.
+      baslik: 'We are in quote mode; ordering and payment are closed.',
       aciklama: 'Our store is being set up. Prices are current; you can request a quote and we will get back to you the same day.',
       whatsappCta: 'Request a quote on WhatsApp',
       emailCta: 'Request a quote by email',
@@ -1910,7 +1912,8 @@ export const en: typeof tr = {
       requestCatalog: 'Request Brand Catalogs',
       featuredSystems: 'Featured Systems',
       allProductGroups: 'All Product Groups',
-      noProducts: 'Products for this brand will be added soon.',
+      // REC-148 A6: was "will be added soon" — a promise with no guarantee behind it.
+      noProducts: 'This brand has no products in the catalogue yet.',
       originSuffix: 'Origin',
       estPrefix: 'EST.',
       // REC-98: "Corporate Snapshot" satirlarinin ETIKETLERI. Deger tarafi veri olarak
@@ -1929,7 +1932,7 @@ export const en: typeof tr = {
     close: 'Close',
     addToCart: 'Add to Cart',
     viewProduct: 'View Product',
-    descFallback: 'Product description will be added soon.'
+    // ⛔descFallback REMOVED (REC-148 A5) — no description, no paragraph.
   },
   support: {
     contactCta: {
