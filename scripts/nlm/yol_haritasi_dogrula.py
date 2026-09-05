@@ -27,7 +27,7 @@ from datetime import datetime, timezone
 sys.stdout.reconfigure(encoding="utf-8")
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 YOL = os.path.join(REPO, "docs", "proje-takip", "yol-haritasi.json")
-SINAV_SONUC = os.path.join(REPO, "docs", "proje-takip", "hafiza-sinavi-sonuc.md")
+SINAV_SONUC = os.environ.get("HAFIZA_SINAV_SONUC") or os.path.join(REPO, "docs", "proje-takip", "hafiza-sinavi-sonuc.md")
 DURUM = os.path.join(REPO, "docs", "proje-takip", "yol-haritasi-durum.md")
 
 

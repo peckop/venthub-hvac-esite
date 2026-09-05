@@ -19,6 +19,7 @@ Kullanim:
   python scripts/nlm/hafiza_sinavi.py --alan vitrin
 Cikis kodu: 0 hepsi yesil · 3 en az bir kirmizi · 2 defter cevap vermedi.
 Rapor: docs/proje-takip/hafiza-sinavi-sonuc.md (her kosumda ustune yazilir; damga date -u ile olculur, elle yazilmaz).
+  HAFIZA_SINAV_SONUC=<yol> ile baska yere yazilir — paylasilan ana dizinde (ritüel kosumu) ZORUNLU; depo kopyasi PR ile.
 Cetvel: docs/standards/proje-takip-defteri-standard.md
 """
 from __future__ import annotations
@@ -28,7 +29,10 @@ from datetime import datetime, timezone
 sys.stdout.reconfigure(encoding="utf-8")
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 SINAV = os.path.join(REPO, "docs", "proje-takip", "hafiza-sinavi.json")
-SONUC = os.path.join(REPO, "docs", "proje-takip", "hafiza-sinavi-sonuc.md")
+# v1.3: sonuc yolu ortamdan ezilebilir (HAFIZA_SINAV_SONUC). Sebep: ritüel koşumu (compact/resume dönüşü) PAYLAŞILAN
+# ana dizinde koşuyordu ve depodaki üretilmiş dosyayı commit'siz kirletiyordu (09-05, iki kez checkout ile geri alındı).
+# Kural: depo kopyası yalnız şerit PR'ında güncellenir; ritüel koşumu scratchpad'e yazar (OPS açılış rutini).
+SONUC = os.environ.get("HAFIZA_SINAV_SONUC") or os.path.join(REPO, "docs", "proje-takip", "hafiza-sinavi-sonuc.md")
 DEFTER = json.load(open(os.path.join(REPO, "docs", "proje-takip", "manifest.json"), encoding="utf-8"))["defter"]["id"]
 
 
