@@ -124,10 +124,10 @@ function ozetSatiri(b) {
     return `artefakt bayatligi OLCULEMEDI (${b.sebep || 'sebep yok'}) — ` +
       'Olcememek gecmek DEGILDIR.'
   }
-  if (b.artefaktSayisi === 0) return 'artefakt bayatligi: YOK (uretim dondurulmus, REC-132)'
+  if (b.artefaktSayisi === 0) return 'artefakt bayatligi: YOK'
   return `artefakt bayatligi: ${b.artefaktSayisi} artefakt, ${b.kaynakSayisi} kaynak — ` +
-    'BLOKLAMAZ, SAYAR (uretim DONDURULDU, Recep/OPS karari 2026-09-04). ' +
-    'Elle tazeleme: docs/standards/uretilmis-artefakt-standard.md'
+    'borc SAYILIYOR; bloklayip bloklamadigini TASIYICI ANAHTARI soyler ' +
+    '(.companion-tasiyici.json). Elle tazeleme: docs/standards/uretilmis-artefakt-standard.md'
 }
 
 module.exports = { olc, sayimCekirdegi, ozetSatiri, headBloblari, manifestOku, MANIFEST_YOLU }

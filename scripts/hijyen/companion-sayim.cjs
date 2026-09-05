@@ -168,7 +168,8 @@ function ozetSatiri(b) {
   if (!b.eksik.length) return 'companion: eksik YOK (kapı kapsamında)'
   return (
     `companion'siz ${b.eksik.length} dosya, en eskisi ${b.enEskiYasGun} gun — ` +
-    `BLOKLAMAZ, SAYAR (Recep karari 2026-08-31: uretici tasiyici KAPALI)`
+    `borc SAYILIYOR; bloklayip bloklamadigini TASIYICI ANAHTARI soyler ` +
+    `(.companion-tasiyici.json)`
   )
 }
 
