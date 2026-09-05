@@ -92,6 +92,11 @@ const DuctCalcPage: React.FC = () => {
       description={t('calculators.duct.description')}
       icon={<Ruler size={32} />}
       infoText={t('calculators.duct.infoText')}
+      /* REC-150 PR-1 PİLOTU: bu rotanın metadata'sını artık `page.tsx` üretiyor
+         (`generateMetadata`), yani layout ikinci yazıcı olmamalı. Dört hesaplayıcıdan
+         YALNIZ bu rota göç etti; diğer üçü bugünkü davranışını sürdürüyor. Bayrak,
+         dördü de göç edince silinecek geçici bir dikiştir. */
+      metadataRotadanMi
     >
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-2xl border border-light-gray shadow-sm p-6">

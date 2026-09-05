@@ -139,7 +139,7 @@ describe('INV-SSR-GOVDE-1 · hesaplayıcı sayfaları sunucuda render edilir', (
     }
   })
 
-  it('BOŞLUK MUHAFIZI — dosyalar gerçekten okunuyor', () => {
+  it('BOŞLUK MUHAFIZI — dosyalar gerçekten okunuyor (INV-SSR-GOVDE-1)', () => {
     // Yol listesi bozulsa ya da dosyalar tasinsa, ustteki "false" beklentileri SAHTE-YESIL
     // verirdi. Okunan govdelerin gercekten dolu oldugu OLCULUR.
     for (const { ad, rota, gorunum } of ETKILENEN) {
