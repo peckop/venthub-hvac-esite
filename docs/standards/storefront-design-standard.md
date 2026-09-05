@@ -39,12 +39,24 @@ kapı zorlamıyor. Bu cetvel kompozisyonu tanımlar; §4 kapıları zorlar.
   *Gerekçe (karar):* token zaten `page`'i tanımlıyor; iki genişliğin karışımı bitişik sayfalarda
   görünür hiza kırığı yaratıyor. 1600px geniş vitrin (3D/hero) için bilinçli seçimdi — korunuyor.
 
-### 2.2 Gri: TEK aile = tema-farkındalı token
+### 2.2 Gri: TEK aile = token
 
 - Ham Tailwind grileri (`slate-*`, `gray-*`, `zinc-*`, `neutral-*`) **yeni kodda yasak.**
-  *Gerekçe (karar):* tema `darkMode: 'selector'` + CSS değişkeni ile dönüyor (`index.css` light/dark
-  blokları aynı değişkeni yeniden tanımlar); ham `slate-600` temayla **dönmez** → dark-mode kırığı.
-  Üstelik üç ailenin ton eğrileri farklı (slate mavi-gri, gray nötr) → yan yana kirli görünüm.
+  *Gerekçe (karar):* **(a)** üç ailenin ton eğrileri farklı (slate mavi-gri, gray nötr) → yan yana
+  kirli görünüm; **(b)** token bir CSS değişkenidir, ham gri sabit bir değerdir — değişken
+  **tek yerden** değişir, sabit değer **her dosyada tek tek** aranır; **(c)** erişilebilirlik
+  anahtarları yalnız değişkeni çevirir: `@media (prefers-contrast: more)` bugün `--surface-deep`
+  ve `--steel-gray`'i güçlendiriyor, ham `slate-600` bu anahtardan **etkilenmez**.
+
+  > ⛔**GEREKÇE DÜZELTİLDİ (2026-09-05).** Burada eskiden «tema `darkMode: 'selector'` ile
+  > dönüyor, ham gri dönmez → dark-mode kırığı» yazıyordu. **Vitrin için doğru değildi:**
+  > ölçüldü (`docs/audits/tasarim-sozlesmesi-fark-2026-09-05.md` F1) — vitrinde hiçbir renk
+  > tokeninin koyu karşılığı yok; `.light` (31 değişken) ve `.dark` (8) blokları duruyor ama
+  > **hiçbir şey o sınıfları uygulamıyor** (className ve `classList` ölçüldü: 0).
+  > **KARAR (Recep, 2026-09-05): vitrinde koyu tema YAPILMAYACAK** — koyu/aydınlık yalnız
+  > admin panelde, orada `[data-admin-theme]` ile **çalışıyor** (23/23 token döner).
+  > Kural **aynen duruyor**; değişen yalnız gerekçesidir. Niçin önemli: gerekçesi yanlış olan
+  > kural, ilk itirazda düşer — kuralı ayakta tutan şey dayanağıdır.
 - **Rol → token eşlemesi:**
 
 | Rol | Token |

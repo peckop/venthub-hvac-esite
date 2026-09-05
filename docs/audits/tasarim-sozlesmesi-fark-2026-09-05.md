@@ -48,36 +48,50 @@ değişkene bakmıyor. Fark, "eksik" değil **"fazlalık ve dayanaksız gerekçe
 
 ## 2. BULGULAR
 
-### F1 — ⭐AĞIR: koyu tema **yapılandırılmış ama token katmanında uygulanmamış**; §2.2'nin gerekçesi bugün dayanaksız
+### F1 — ⛔**BU BULGUNUN ADMİN YARISI YANLIŞTI — DÜZELTİLDİ (2026-09-05, aynı gün)**
 
-**Cetvel ne diyor (§2.2):** ham Tailwind grileri yasak, *çünkü* «tema `darkMode: 'selector'` +
-CSS değişkeni ile dönüyor (`index.css` light/dark blokları **aynı değişkeni yeniden tanımlar**);
-ham `slate-600` temayla **dönmez** → dark-mode kırığı».
+> **Ne yanlıştı:** ilk sürümde «**Admin** renk tokeni / koyu temada yeniden tanımlı olmayan:
+> **23 / 23**» yazıyordu. **Bu YANLIŞ.** Admin teması çalışıyor; 23 tokenin **23'ü** koyu
+> karşılığa sahip.
+>
+> **Niçin yanlış çıktı — ölçütüm değil EVRENİM hatalıydı:** tarayıcım "koyu bağlam"ı
+> `\.dark`, `prefers-color-scheme: dark` ve `data-theme="dark"` diye **isim listesiyle**
+> arıyordu. Admin ise `[data-admin-theme='dark']` kullanıyor — listede yoktu, dolayısıyla
+> admin'in koyu bloğu **hiç görülmedi** ve "yok" diye raporlandı. Yani seçici adını
+> **VARSAYDIM**. Düzeltilmiş yöntem hiçbir ad varsaymaz: her `--değişken` tanımı, onu
+> içeren seçici bağlamıyla toplanır ve **birden çok bağlamda tanımlı olan** = "dönüyor".
+>
+> Hatayı Recep yakaladı ("koyu tema sadece admin panelde ve zaten çalışıyor"). Belge o an
+> master'a inmişti; **sessizce düzeltmek yerine** yanlış iddia burada adıyla duruyor.
+> → ders: [[olcut-keskin-ama-evren-yanlis]]
 
-**Ölçülen:**
+**DÜZELTİLMİŞ ÖLÇÜM** (yöntem: seçici adı varsayılmadan, bağlam sayarak):
+
+| Katman | Renk tokeni | Teması DÖNÜYOR mu | Hangi seçicilerle |
+|---|---|---|---|
+| **Admin** | 23 | ✅ **23 / 23 DÖNÜYOR** | `[data-admin-theme]` ↔ `[data-admin-theme='dark']` |
+| **Vitrin** | 16 | ❌ koyu karşılık **yok** | `:root` · `.light` · `@media (prefers-contrast: more)` |
+
+**Vitrin tarafında ayrıca ölçülen — ULAŞILAMAZ CSS:**
 
 | Ölçüm | Sayı |
 |---|---|
-| `tailwind.config.js`'te `darkMode: 'selector'` | var |
-| `index.css`'teki **tek** koyu bağlam | `@layer base > .dark` |
-| O blokta yeniden tanımlanan değişken | **8** — hepsi `--sidebar-*` (shadcn kalıntısı) |
-| **Vitrin** renk tokeni / koyu temada yeniden tanımlı **olmayan** | **16 / 16** |
-| **Admin** renk tokeni / koyu temada yeniden tanımlı **olmayan** | **23 / 23** (olgu; hüküm admin cetvelinin) |
-| `dark:` yardımcı sınıfı — vitrin / admin | **12** / **0** |
+| `.light` bloğunda tanımlı değişken | **31** |
+| `.dark` bloğunda tanımlı değişken | **8** (hepsi `--sidebar-*`, shadcn kalıntısı) |
+| Vitrinde `light` sınıfını **uygulayan** yer | **0** (className **ve** `classList` ölçüldü) |
+| Vitrinde `dark` sınıfını **uygulayan** yer | **0** |
+| `prefers-contrast: more` altında dönen değişken | **2** (`--surface-deep`, `--steel-gray`) |
 
-**Fark:** cetvelin yasağı, *token döner / ham gri dönmez* karşıtlığına dayandırılmış.
-Bugün **ikisi de dönmüyor**, çünkü hiçbir tasarım token'ı koyu blokta yeniden tanımlanmamış.
+Yani vitrinde 39 satırlık bir alternatif palet duruyor ve **hiçbir şey onu açmıyor**.
 
-**Bu, kuralın yanlış olduğu anlamına GELMEZ.** §2.2'nin ikinci gerekçesi — üç ailenin ton
-eğrileri farklı, yan yana kirli görünüyor — ölçümden bağımsız ve ayakta. Sorun **yazılı
-gerekçenin bugünkü kodu tarif etmemesi**: cetveli okuyan biri "token'lar zaten tema-farkındalı"
-sanır. Koyu tema gerçekten açılacağı gün, 39 değişkenin tamamı için koyu karşılık **yazılmamış**
-olduğu o gün keşfedilir.
+**⭐KARAR (Recep, 2026-09-05): vitrinde koyu tema YAPILMAYACAK.** Koyu/aydınlık yalnız
+admin panelde kalır — orada zaten çalışıyor. Dolayısıyla bu bir "eksik iş" değil,
+**kapanmış bir konudur**; F1 artık bir borç kalemi değil, bir kayıttır.
 
-**Önerim (tek):** §2.2'nin gerekçe cümlesi **bugünkü hâli anlatacak** biçimde düzeltilsin
-(«token'lar tema-farkındalı olacak ŞEKİLDE kurulmuştur; koyu karşılıklar henüz yazılmamıştır»)
-ve koyu tema bir iş kalemi olarak açılsın. Cetvel değişikliği benim tek başıma yapacağım şey
-değil — cetvelin sahibi karar verir.
+**Kararın cetvele etkisi:** §2.2'nin ham gri yasağı **duruyor**, ama yazılı gerekçesi
+(«tema dönüyor, ham gri dönmez») vitrin için doğru değil ve okuyucuyu yanıltıyor. Bu
+düzeltmeyle birlikte cetvelin gerekçesi de gerçek dayanağıyla değiştirildi (bkz. aynı
+PR'daki `storefront-design-standard.md` §2.2).
 
 ---
 
@@ -190,7 +204,7 @@ ihlal değil, **tablo eksiği**. Rol yazılırsa "hangi yüzey 40px ister" sorus
 
 | # | Bulgu | Ağırlık | Kime ait |
 |---|---|---|---|
-| F1 | Koyu tema token katmanında **uygulanmamış**; §2.2 gerekçesi bugünkü kodu tarif etmiyor | ⭐**Ağır** | cetvel sahibi + (koyu tema iş kalemi) |
+| F1 | ⛔**admin yarısı YANLIŞTI, düzeltildi** — admin teması **23/23 ÇALIŞIYOR**; vitrinde koyu yok ve **Recep kararıyla yapılmayacak**; vitrindeki `.light`/`.dark` blokları (39 değişken) **ulaşılamaz** | Kayıt (borç değil) | kapandı — cetvel §2.2 gerekçesi bu PR'da düzeltildi |
 | F2 | 4 semantik renk **HEX** (kural 8) — biri ölü | Orta | vitrin (K8: canlıda görünür) |
 | F3 | 10 kaçak `maxWidth` + `7px` + `hvac-22` token dosyasına taşınmış | Orta | kapı: ALTYAPI · ölçüm: URUN |
 | F4 | 14 gölge token'ı cetvelde **rolsüz** | Düşük | cetvel sahibi |
