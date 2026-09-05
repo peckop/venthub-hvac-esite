@@ -1,28 +1,350 @@
 {
-  "surum": "v1-taslak",
+  "surum": "v1.2",
   "tarih": "2026-09-04",
   "nicin": "Belgeler icin kapi: sorular Venthub Proje Takip defterine otomatik sorulur; beklenen cevap YAZILI karardan gelir (Linear Kararlar / VISION / SaaS yol haritasi / Anahtar ve Kip Haritasi). Sapma = kirmizi. Cevap anahtari Recep'ten degil, kararlardan.",
-  "olcut": "Her sorunun 'beklenen' alanindaki anahtar ifadelerin HEPSI defter cevabinda gecmeli; 'yasak' ifadelerin HICBIRI gecmemeli.",
+  "olcut": "Her sorunun 'beklenen' ifadelerinin HEPSI ve 'beklenen_biri' kumesinden EN AZ BIRI defter cevabinda gecmeli; 'yasak' ifadeleri IDDIA CUMLESIDIR (sorunun tekrari degil), HICBIRI gecmemeli. Kirmizida soru bir kez daha sorulur (defter cevabi degisken); iki denemede de kirmiziysa KIRMIZI.",
   "sorular": [
-    {"id": "S01", "alan": "ticari", "soru": "Sepet kaldirildi mi?", "beklenen": ["kapali", "sirket kurul"], "yasak": ["kaldirildi", "silindi"], "kaynak": "K1a"},
-    {"id": "S02", "alan": "ticari", "soru": "Site bugun hangi kipte calisiyor ve satis kipi ne zaman acilir?", "beklenen": ["teklif", "sirket kurul", "anahtar"], "yasak": [], "kaynak": "K1/K1a, Anahtar Haritasi"},
-    {"id": "S03", "alan": "ticari", "soru": "Fiyat hangi sayfada gorunur?", "beklenen": ["urun detay", "PDP"], "yasak": ["kart", "kategori"], "kaynak": "rendering-cache §2 (08-15)"},
-    {"id": "S04", "alan": "ticari", "soru": "Teklif icin uyelik zorunlu mu?", "beklenen": ["zorunlu degil", "misafir"], "yasak": ["zorunlu"], "kaynak": "REC-117 (09-01)"},
-    {"id": "S05", "alan": "ticari", "soru": "Teklif listesinin web adresi ne ve /cart ne olur?", "beklenen": ["/tr/teklif-listesi", "silinmez"], "yasak": [], "kaynak": "K 09-04 15:55"},
-    {"id": "S06", "alan": "vitrin", "soru": "Mobil alt cubukta kac sekme var ve adlari ne?", "beklenen": ["4", "Iletisim"], "yasak": ["5 sekme", "Destek sekmesi var"], "kaynak": "K9 (09-04 #7, #9); not: cevap eski adi 'Destek' diye tarihce olarak anabilir, yasak IDDIA cumlesidir"},
-    {"id": "S07", "alan": "vitrin", "soru": "Mobilde hesap simgesi ve dil secimi nerede?", "beklenen": ["sag ust", "uyusmazl"], "yasak": ["yalniz logo"], "kaynak": "K 16:50"},
-    {"id": "S08", "alan": "vitrin", "soru": "Urun secici nerede yasar, urun sayfasinda hesaplama var mi?", "beklenen": ["tek sayfa", "ayri"], "yasak": [], "kaynak": "K17, K18"},
-    {"id": "S09", "alan": "vitrin", "soru": "Kategori agaci kac kategori kac dal, ucuncu seviye var mi, Siginak nerede?", "beklenen": ["7", "26", "yok", "ust kategori"], "yasak": [], "kaynak": "K3"},
-    {"id": "S10", "alan": "vitrin", "soru": "Vitrinde 3D urun gorunumu acik mi?", "beklenen": ["kapali"], "yasak": ["acik"], "kaynak": "K8, UC_BOYUT_MUSTERI_YUZEYINDE"},
-    {"id": "S11", "alan": "vitrin", "soru": "Header'da tek fiil ne, 'Teklif al' kullanilir mi?", "beklenen": ["Teklif iste"], "yasak": ["Teklif al kullan"], "kaynak": "K5"},
-    {"id": "S12", "alan": "vitrin", "soru": "Alt bilgide marka logolari duracak mi?", "beklenen": ["kalkar", "Markalar"], "yasak": [], "kaynak": "K 09-04 aksam (Recep+Design+OPS)"},
-    {"id": "S13", "alan": "saas", "soru": "Cok kiracili (SaaS) yapi ne durumda; Faz 1 bitti mi?", "beklenen": ["park", "altyapi", "izolasyon"], "yasak": [], "kaynak": "REC-88, saas roadmap, Anahtar Haritasi"},
-    {"id": "S14", "alan": "saas", "soru": "'Faz 2' denince hangi fazlar kastedilebilir ve nasil yazilmali?", "beklenen": ["SaaS", "15A", "belirte"], "yasak": [], "kaynak": "proje-takip-defteri-standard §6"},
-    {"id": "S15", "alan": "surec", "soru": "Veritabani degisikligi (migration) iceren PR kim onaylayinca birlesir?", "beklenen": ["Recep"], "yasak": ["self-merge"], "kaynak": "CLAUDE.md kural 13"},
-    {"id": "S16", "alan": "surec", "soru": "Bir seridin kuyrugu bitince ne yapar?", "beklenen": ["yeni is baslatmaz", "Recep"], "yasak": [], "kaynak": "Recep 09-02"},
-    {"id": "S17", "alan": "surec", "soru": "Is takibinin tek kaynagi nedir; orion registry ne?", "beklenen": ["Linear", "arsiv"], "yasak": ["registry SSOT"], "kaynak": "is-kayit-duzeni, work-tracking yururluk notu"},
-    {"id": "S18", "alan": "guvenlik", "soru": "Design (15A) Supabase'e yazabilir mi, Linear'a karar yazabilir mi?", "beklenen": ["yalniz okur", "SELECT", "yazmaz"], "yasak": [], "kaynak": "K 13:45"},
-    {"id": "S19", "alan": "guvenlik", "soru": "Rolun tek otoritesi hangi alan; user_metadata rol icin kullanilir mi?", "beklenen": ["user_profiles.role", "yasak"], "yasak": [], "kaynak": "auth-account A11"},
-    {"id": "S20", "alan": "katalog", "soru": "Secici sonuc kartinda sayi nereden gelir; verisi olmayan urun nasil gosterilir?", "beklenen": ["technical_specs", "degerlendirilemedi"], "yasak": ["uymaz"], "kaynak": "K18a"}
-  ]
+    {
+      "id": "S01",
+      "alan": "ticari",
+      "soru": "Sepet kaldirildi mi?",
+      "beklenen": [
+        "kapali"
+      ],
+      "yasak": [
+        "evet, kaldirildi",
+        "sepet silindi",
+        "sepet yok",
+        "tamamen kaldirildi"
+      ],
+      "kaynak": "K1a",
+      "beklenen_biri": [
+        "sirket kurul",
+        "sirket acil",
+        "satis kipi",
+        "anahtar"
+      ]
+    },
+    {
+      "id": "S02",
+      "alan": "ticari",
+      "soru": "Site bugun hangi kipte calisiyor ve satis kipi ne zaman acilir?",
+      "beklenen": [
+        "teklif"
+      ],
+      "yasak": [],
+      "kaynak": "K1/K1a, Anahtar Haritasi",
+      "beklenen_biri": [
+        "sirket kurul",
+        "sirket acil",
+        "anahtar",
+        "bayrak"
+      ]
+    },
+    {
+      "id": "S03",
+      "alan": "ticari",
+      "soru": "Fiyat hangi sayfada gorunur?",
+      "beklenen": [
+        "urun detay"
+      ],
+      "yasak": [
+        "kartta gorunur",
+        "kategori sayfasinda gorunur",
+        "listede gorunur"
+      ],
+      "kaynak": "rendering-cache §2 (08-15)",
+      "beklenen_biri": [
+        "PDP",
+        "detay sayfas"
+      ]
+    },
+    {
+      "id": "S04",
+      "alan": "ticari",
+      "soru": "Teklif icin uyelik zorunlu mu?",
+      "beklenen": [
+        "zorunlu degil"
+      ],
+      "yasak": [
+        "uyelik zorunludur",
+        "giris yapmak zorunlu"
+      ],
+      "kaynak": "REC-117 (09-01)",
+      "beklenen_biri": [
+        "misafir",
+        "uye olmadan",
+        "uyelik gerekmez"
+      ]
+    },
+    {
+      "id": "S05",
+      "alan": "ticari",
+      "soru": "Teklif listesinin web adresi ne ve /cart ne olur?",
+      "beklenen": [
+        "/tr/teklif-listesi",
+        "silinmez"
+      ],
+      "yasak": [],
+      "kaynak": "K 09-04 15:55"
+    },
+    {
+      "id": "S06",
+      "alan": "vitrin",
+      "soru": "Mobil alt cubukta kac sekme var ve adlari ne?",
+      "beklenen": [
+        "Iletisim"
+      ],
+      "yasak": [],
+      "kaynak": "K9 (09-04 #7, #9); not: cevap eski adi 'Destek' diye tarihce olarak anabilir, yasak IDDIA cumlesidir",
+      "beklenen_biri": [
+        "4 sekme",
+        "dort sekme",
+        "4 adet sekme",
+        "4 sekmeden"
+      ]
+    },
+    {
+      "id": "S07",
+      "alan": "vitrin",
+      "soru": "Mobilde hesap simgesi ve dil secimi nerede?",
+      "beklenen": [
+        "sag ust"
+      ],
+      "yasak": [
+        "yalniz logo"
+      ],
+      "kaynak": "K 16:50",
+      "beklenen_biri": [
+        "uyusmazl",
+        "akilli dil",
+        "dil cipi",
+        "dil secimi"
+      ]
+    },
+    {
+      "id": "S08",
+      "alan": "vitrin",
+      "soru": "Urun secici nerede yasar, urun sayfasinda hesaplama var mi?",
+      "beklenen": [
+        "tek sayfa",
+        "ayri"
+      ],
+      "yasak": [],
+      "kaynak": "K17, K18"
+    },
+    {
+      "id": "S09",
+      "alan": "vitrin",
+      "soru": "Kategori agaci kac kategori kac dal, ucuncu seviye var mi, Siginak nerede?",
+      "beklenen": [
+        "7",
+        "26"
+      ],
+      "yasak": [
+        "ucuncu seviye mevcuttur",
+        "uc seviye vardir",
+        "ucuncu seviye de var",
+        "ucuncu seviye bulunur"
+      ],
+      "kaynak": "K3",
+      "beklenen_biri": [
+        "ucuncu seviye yok",
+        "yok",
+        "faset"
+      ]
+    },
+    {
+      "id": "S10",
+      "alan": "vitrin",
+      "soru": "Vitrinde 3D urun gorunumu acik mi?",
+      "beklenen": [
+        "kapali"
+      ],
+      "yasak": [
+        "3d acik",
+        "musteri yuzeyinde acik",
+        "vitrinde acik"
+      ],
+      "kaynak": "K8, UC_BOYUT_MUSTERI_YUZEYINDE"
+    },
+    {
+      "id": "S11",
+      "alan": "vitrin",
+      "soru": "Header'da tek fiil ne, 'Teklif al' kullanilir mi?",
+      "beklenen": [
+        "Teklif iste"
+      ],
+      "yasak": [
+        "teklif al kullanilir",
+        "teklif al tercih"
+      ],
+      "kaynak": "K5"
+    },
+    {
+      "id": "S12",
+      "alan": "vitrin",
+      "soru": "Alt bilgide marka logolari duracak mi?",
+      "beklenen": [],
+      "yasak": [
+        "logolar kalir",
+        "logolar duracak",
+        "logolar korun"
+      ],
+      "kaynak": "K 09-04 aksam (Recep+Design+OPS)",
+      "beklenen_biri": [
+        "kalkar",
+        "kaldiril",
+        "durmayacak",
+        "kaldirilacak"
+      ]
+    },
+    {
+      "id": "S13",
+      "alan": "saas",
+      "soru": "Cok kiracili (SaaS) yapi ne durumda; Faz 1 bitti mi?",
+      "beklenen": [
+        "park"
+      ],
+      "yasak": [
+        "faz 2 basladi",
+        "faz 2 devam"
+      ],
+      "kaynak": "REC-88, saas roadmap, Anahtar Haritasi",
+      "beklenen_biri": [
+        "altyapi",
+        "izolasyon",
+        "foundation",
+        "faz 1"
+      ]
+    },
+    {
+      "id": "S14",
+      "alan": "saas",
+      "soru": "'Faz 2' denince hangi fazlar kastedilebilir ve nasil yazilmali?",
+      "beklenen": [
+        "SaaS",
+        "15A"
+      ],
+      "yasak": [],
+      "kaynak": "proje-takip-defteri-standard §6",
+      "beklenen_biri": [
+        "belirte",
+        "ayrim",
+        "kapsam"
+      ]
+    },
+    {
+      "id": "S15",
+      "alan": "surec",
+      "soru": "Veritabani degisikligi (migration) iceren PR kim onaylayinca birlesir?",
+      "beklenen": [
+        "Recep"
+      ],
+      "yasak": [
+        "self-merge yapilabilir",
+        "self-merge ile birles",
+        "serit kendi birlestirir",
+        "onay gerekmez"
+      ],
+      "kaynak": "CLAUDE.md kural 13"
+    },
+    {
+      "id": "S16",
+      "alan": "surec",
+      "soru": "Bir seridin kuyrugu bitince ne yapar?",
+      "beklenen": [
+        "Recep"
+      ],
+      "yasak": [
+        "kendi kendine yeni is",
+        "yeni is acar"
+      ],
+      "kaynak": "Recep 09-02",
+      "beklenen_biri": [
+        "yeni is baslatmaz",
+        "kuyruk bitince dur",
+        "baslatmaz",
+        "durur",
+        "beklemeye"
+      ]
+    },
+    {
+      "id": "S17",
+      "alan": "surec",
+      "soru": "Is takibinin tek kaynagi nedir; orion registry ne?",
+      "beklenen": [
+        "Linear"
+      ],
+      "yasak": [
+        "registry ssot",
+        "registry tek kaynak",
+        "registry is emri"
+      ],
+      "kaynak": "is-kayit-duzeni, work-tracking yururluk notu",
+      "beklenen_biri": [
+        "arsiv",
+        "salt okunur",
+        "gecmis"
+      ]
+    },
+    {
+      "id": "S18",
+      "alan": "guvenlik",
+      "soru": "Design (15A) Supabase'e yazabilir mi, Linear'a karar yazabilir mi?",
+      "beklenen": [],
+      "yasak": [
+        "yazma yetkisi vardir",
+        "supabase'e yazma yetkisine sahip",
+        "karar yazma yetkisi vardir",
+        "linear'a dogrudan karar yazar"
+      ],
+      "kaynak": "K 13:45",
+      "beklenen_biri": [
+        "yalniz okur",
+        "yazmaz",
+        "yazamaz",
+        "yetkisi yok",
+        "salt okuma",
+        "SELECT"
+      ]
+    },
+    {
+      "id": "S19",
+      "alan": "guvenlik",
+      "soru": "Rolun tek otoritesi hangi alan; user_metadata rol icin kullanilir mi?",
+      "beklenen": [
+        "user_profiles"
+      ],
+      "yasak": [
+        "user_metadata rol icin kullanilir"
+      ],
+      "kaynak": "auth-account A11",
+      "beklenen_biri": [
+        "yasak",
+        "kullanilmaz",
+        "guvenilmez",
+        "otorite degil"
+      ]
+    },
+    {
+      "id": "S20",
+      "alan": "katalog",
+      "soru": "Secici sonuc kartinda sayi nereden gelir; verisi olmayan urun nasil gosterilir?",
+      "beklenen": [
+        "technical_specs"
+      ],
+      "yasak": [
+        "uymaz olarak",
+        "uygun degil olarak"
+      ],
+      "kaynak": "K18a",
+      "beklenen_biri": [
+        "degerlendirilemedi",
+        "degerlendirilemez",
+        "veri yok"
+      ]
+    }
+  ],
+  "olcut_notu": "v1.2 (09-05, tam kosum dersi): 20 sorunun 4 kirmizisi da OLCUT hatasiydi — defter 'kaldiriliyor' dedi, olcut 'kalkar' aradi. Kural: tek bir kelimeye BAGLANMA; 'beklenen' yalniz degismez adlar icin (Recep, Linear, technical_specs), anlam tasiyan ifadeler 'beklenen_biri' esanlamli kumesine yazilir. Ikinci ders (ayni sabah): yasak ifade SORUNUN PARCASI olmamali — 'supabase'e yazabilir' yasagi 'Supabase'e yazabilir mi? Hayir' cevabinda gecer. Yasak = yalniz olumlu iddia bicimi ('yazma yetkisi vardir'). Ucuncu ders: yasak ifade TARIHCE cumlesinde de gecer ('daha onceki planlarda 5 sekme vardi'); yasak, GUNCEL DURUM iddiasi bicimine baglanir ('cubukta 5 sekme bulunmaktadir'). Dorduncu ders: tarihce iceren cevapta HER yasak bicimi gecebilir; boyle sorularda yasak KULLANILMAZ, olcut olumlu ve sayili ifadeye baglanir ('4 sekme')."
 }
