@@ -625,10 +625,12 @@ export const tr = {
           title: 'Seçim rehberleri ve teknik içerikler',
           description: 'Kategori bazlı rehberler ve konu sayfaları ile ürün seçimini daha bilinçli hale getirin.'
         },
+        // Ad "Hesaplayıcılar" değil "Ürün Seçici" (karar K17): tek ad, tek hedef.
+        // Kart artık tek bir araca değil, dört aracı toplayan giriş sayfasına gidiyor.
         calculators: {
-          eyebrow: 'Hesaplayıcılar',
-          title: 'Hızlı hesaplama araçları',
-          description: 'HRV, hava perdesi ve kanal gibi araçlarla teknik ön değerlendirmeyi hızlandırın.'
+          eyebrow: 'Ürün Seçici',
+          title: 'Mahalinize uygun ürünü hesaplayarak bulun',
+          description: 'Kanal, HRV, hava perdesi ve jet fan hesaplarını tek yerden yapın.'
         },
         support: {
           eyebrow: 'Destek',
@@ -2505,6 +2507,34 @@ export const tr = {
       submitFailed: 'Talebiniz kaydedilemedi. Lütfen tekrar deneyin; sorun sürerse bize doğrudan ulaşın.'
     },
     defaultMessage: '{{productName}} için detaylı teknik teklif...',
+  },
+  // ÜRÜN SEÇİCİ giriş sayfası (karar K17 · "Ürün Seçici", 2026-09-04).
+  // Ad KASITLI: "fan seçici" değil "ürün seçici" — karar metni fan demiyor, çünkü ileride
+  // fan dışı gruplar da motor kazanacak. Tek ad, tek hedef.
+  urunSecici: {
+    ustBaslik: 'Ürün Seçici',
+    baslik: 'Mahalinize uygun ürünü hesaplayarak bulun',
+    aciklama:
+      'Hacim, debi ve basınç girdilerinizle ön değerlendirme yapın. Sonuçlar teklif talebinize taşınır.',
+    araclar: {
+      kanal: {
+        ad: 'Kanal fanı hesabı',
+        aciklama: 'Hacim ve hava değişim sayısından gerekli debiyi ve basıncı çıkarın.',
+      },
+      hrv: {
+        ad: 'Isı geri kazanım (HRV) hesabı',
+        aciklama: 'Konut ve ofis mahalleri için taze hava ihtiyacını ve ünite büyüklüğünü belirleyin.',
+      },
+      havaPerdesi: {
+        ad: 'Hava perdesi hesabı',
+        aciklama: 'Kapı genişliği ve yüksekliğine göre gerekli perde debisini ve modelini bulun.',
+      },
+      jetFan: {
+        ad: 'Jet fan hesabı',
+        aciklama: 'Kapalı otopark ve benzeri hacimlerde itki ihtiyacını ve fan sayısını hesaplayın.',
+      },
+    },
+    not: 'Hesaplar ön değerlendirmedir; kesin seçim için teknik ekibimizden görüş isteyin.',
   },
   calculators: {
     recommendations: 'Öneriler',

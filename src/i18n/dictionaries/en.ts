@@ -556,10 +556,11 @@ export const en: typeof tr = {
           title: 'Selection guides and technical content',
           description: 'Use category-based guides and topic pages to make product selection more informed.'
         },
+        // "Product Selector", not "Calculators" (decision K17): one name, one destination.
         calculators: {
-          eyebrow: 'Calculators',
-          title: 'Fast calculation tools',
-          description: 'Speed up technical pre-evaluation with HRV, air-curtain and duct tools.'
+          eyebrow: 'Product Selector',
+          title: 'Size the right product for your space',
+          description: 'Duct, HRV, air-curtain and jet fan sizing in one place.'
         },
         support: {
           eyebrow: 'Support',
@@ -2509,6 +2510,33 @@ export const en: typeof tr = {
       submitFailed: 'We could not save your request. Please try again; if the problem persists, contact us directly.'
     },
     defaultMessage: 'Detailed technical quote for {{productName}}...',
+  },
+  // PRODUCT SELECTOR entry page (decision K17, 2026-09-04). Deliberately not "fan
+  // selector": other product groups will get engines later. One name, one destination.
+  urunSecici: {
+    ustBaslik: 'Product Selector',
+    baslik: 'Size the right product for your space',
+    aciklama:
+      'Run a pre-assessment from volume, airflow and pressure inputs. Results carry over into your quote request.',
+    araclar: {
+      kanal: {
+        ad: 'Duct fan sizing',
+        aciklama: 'Derive the required airflow and pressure from room volume and air change rate.',
+      },
+      hrv: {
+        ad: 'Heat recovery (HRV) sizing',
+        aciklama: 'Determine fresh-air demand and unit size for homes and offices.',
+      },
+      havaPerdesi: {
+        ad: 'Air curtain sizing',
+        aciklama: 'Find the required curtain airflow and model from door width and height.',
+      },
+      jetFan: {
+        ad: 'Jet fan sizing',
+        aciklama: 'Calculate the thrust demand and fan count for car parks and similar spaces.',
+      },
+    },
+    not: 'These are pre-assessments; ask our technical team before making a final selection.',
   },
   calculators: {
     recommendations: 'Recommendations',
