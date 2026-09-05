@@ -15,6 +15,20 @@ interface CalculatorLayoutProps {
     backLabel?: string
     infoText?: string
     warningText?: string
+    /**
+     * ⏳GEÇİCİ — metadata'yı ROTA üretiyorsa bu layout `<Seo>` basmaz (REC-150 PR-1, 2026-09-05).
+     *
+     * NİÇİN GEREKLİ: `CalculatorLayout` TEK bileşen ama **dört rotayı birden** çeviriyor.
+     * `<Seo>`'yu buradan kaldırmak dört rotayı aynı anda göç ettirmek demekti; oysa plan
+     * adım adım ilerlemeyi ve her adımı ölçmeyi söylüyor. Bu bayrak, pilotun yarıçapını
+     * TEK rotaya (`kanal`) daraltır: o rota `generateMetadata` yazar ve bayrağı açar,
+     * diğer üçü bugünkü davranışını aynen sürdürür.
+     *
+     * ⚠BU BAYRAK KALICI DEĞİL: dört rota da göç ettiğinde `<Seo>` bu dosyadan tümden
+     * kalkar ve bayrak SİLİNİR (REC-150 Adım 5). Geçici dikişi burada adıyla yazıyorum ki
+     * yarın "bu ne işe yarıyordu" diye durmasın — geçici olduğu unutulan dikiş kalıcı olur.
+     */
+    metadataRotadanMi?: boolean
     children: React.ReactNode
 }
 
@@ -30,6 +44,7 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
     backLabel,
     infoText,
     warningText,
+    metadataRotadanMi = false,
     children
 }) => {
     const { t } = useI18n()
@@ -51,6 +66,10 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
     const geriYol = backLink ?? Routes.urunSecici()
     return (
         <div className="min-h-screen bg-gradient-to-b from-light-gray to-white">
+            {/* Rota kendi metadata'sını üretiyorsa İKİNCİ YAZICI olmayız (REC-150 PR-1).
+                İki yazıcı aynı anda çalışınca sayfa iki <title> ve iki <meta description>
+                basıyordu ve hangisinin kazandığı ORTAMA göre değişiyordu. */}
+            {metadataRotadanMi ? null : (
             <Seo
                 /**
                  * SEKME/ARAMA BAŞLIĞI TEK ADA BAĞLANDI (REC-148 B1, 2026-09-05).
@@ -72,6 +91,7 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
                 title={`${title} | ${t('urunSecici.ustBaslik')}`}
                 description={description}
             />
+            )}
 
             {/* Header */}
             <div className="bg-primary-navy text-white">
