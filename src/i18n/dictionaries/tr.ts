@@ -2543,7 +2543,9 @@ export const tr = {
       progress: 'Adım {{current}} / {{total}}',
     },
     layout: {
-      backLabel: 'Ürünlere Dön',
+      // Etiket hedefle birlikte değişti (REC-148 B2): araçtan çıkış artık Ürünler'e değil
+      // Ürün Seçici'ye dönüyor; halka kapansın, ikinci aracı denemek isteyen kaybolmasın.
+      backLabel: 'Ürün Seçici’ye dön',
       disclaimer: 'Bu hesap makinesi ön boyutlandırma amaçlıdır. Kesin proje hesapları için bir HVAC mühendisine danışın.',
       contactPrompt: 'Teknik sorularınız için',
       contactLink: 'iletişime geçin',

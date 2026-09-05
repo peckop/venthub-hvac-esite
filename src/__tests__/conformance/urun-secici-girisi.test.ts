@@ -135,6 +135,24 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
         ).toBe(false)
     })
 
+    it('⭐HALKA KAPANIYOR — araçtan çıkış Ürün Seçici’ye döner, ham yol yok', () => {
+        // NİÇİN (REC-148 B2/B3): giriş Ürün Seçici, çıkış "/products" idi — ikinci aracı
+        // denemek isteyen ziyaretçi seçiciye dönemiyordu. Üstelik o yol DİL ÖNEKSİZ ham
+        // yoldu; aynı sayfadaki diğer bağlantılar /tr/... taşırken bu taşımıyordu
+        // (CLAUDE.md kural 7). İkisi de sessiz kusurdu: sayfa açılıyor, kimse fark etmiyor.
+        const LAYOUT = govde(oku('src', 'components', 'calculators', 'CalculatorLayout.tsx'))
+        expect(
+            LAYOUT.includes('Routes.urunSecici()'),
+            'Hesaplayici layout varsayilan geri yolu Urun Secici DEGIL. Halka kapanmazsa ziyaretci ' +
+                'ikinci araci denemek icin yolu bastan aramak zorunda kalir.',
+        ).toBe(true)
+        expect(
+            /backLink\s*=\s*'\/products'/.test(LAYOUT),
+            "Varsayilan geri yol hala ham '/products'. Dil oneksiz ham yol kural 7 ihlalidir ve " +
+                'ziyaretciye fazladan yonlendirme yedirir.',
+        ).toBe(false)
+    })
+
     it('⭐Bilgi Merkezi “yakında” VAAT ETMİYOR — var olanı yok gösteremez', () => {
         // NİÇİN: 2026-09-05'e kadar Bilgi Merkezi'nde İKİ vaat kutusu duruyordu —
         // "Hesaplayıcılar Yakında" (geliştirme aşamasında rozetiyle) ve "Ürün Seçici Yakında"

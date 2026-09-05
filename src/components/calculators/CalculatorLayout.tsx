@@ -26,7 +26,7 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
     title,
     description,
     icon,
-    backLink = '/products',
+    backLink,
     backLabel,
     infoText,
     warningText,
@@ -34,6 +34,21 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
 }) => {
     const { t } = useI18n()
     const Routes = useLocalizedRoutes()
+    /**
+     * GERİ DÖNÜŞ = ÜRÜN SEÇİCİ (REC-148 B2/B3, 2026-09-05).
+     *
+     * NİÇİN DEĞİŞTİ — iki kusur birden vardı:
+     *  1. HALKA KAPANMIYORDU: giriş Ürün Seçici, çıkış "/products". Bir aracı deneyip
+     *     ikincisini denemek isteyen ziyaretçi seçiciye dönemiyordu; başka bir sayfaya
+     *     düşüp yolu baştan aramak zorundaydı.
+     *  2. Varsayılan `'/products'` DİL ÖNEKSİZ ham yoldu — aynı sayfadaki diğer bağlantılar
+     *     `/tr/products` taşırken bu taşımıyordu (CLAUDE.md kural 7: elle yol yasak,
+     *     `useLocalizedRoutes` kullanılır). Kural ihlali sessizdi çünkü middleware öneki
+     *     sonradan ekliyor; ziyaretçi fazladan bir yönlendirme yiyordu.
+     *
+     * Çağıran açıkça `backLink` verirse ona saygı duyulur; varsayılan artık seçicidir.
+     */
+    const geriYol = backLink ?? Routes.urunSecici()
     return (
         <div className="min-h-screen bg-gradient-to-b from-light-gray to-white">
             <Seo
@@ -46,7 +61,7 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Breadcrumb */}
                     <Link
-                        href={backLink as import('next').Route}
+                        href={geriYol as import('next').Route}
                         className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-4 transition-colors"
                     >
                         <ArrowLeft size={16} />

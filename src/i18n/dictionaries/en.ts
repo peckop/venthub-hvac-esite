@@ -2544,7 +2544,9 @@ export const en: typeof tr = {
       progress: 'Step {{current}} / {{total}}',
     },
     layout: {
-      backLabel: 'Back to Products',
+      // Label follows the target (REC-148 B2): the tools now return to the Product Selector,
+      // not to Products — the loop closes so trying a second tool no longer strands the visitor.
+      backLabel: 'Back to the Product Selector',
       disclaimer: 'This calculator is intended for preliminary sizing. Consult an HVAC engineer for precise project calculations.',
       contactPrompt: 'For your technical questions',
       contactLink: 'get in touch',
