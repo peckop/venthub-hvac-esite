@@ -47,6 +47,32 @@ DOC_SCOPE="$REPO_ROOT/.githooks/lib/doc-scope.cjs"
 # Companion BAŞARISIZLIK defteri — üretimi geri getirmez, SESSİZ olmaktan çıkarır (REC-67).
 DEFTER="$REPO_ROOT/.githooks/lib/companion-defter.cjs"
 
+# ⭐UYKU KİPİ — TAŞIYICI ANAHTARI (REC-142, Recep kararı 2026-09-05).
+#
+# NİÇİN: taşıyıcı 2026-08-28'de kapandı ama bu kanca ÜRETMEYE DEVAM ETTİ. Sonuç ölçüldü
+# (09-05): 37 çalışma ağacında 412 bekleyen değişiklik, 368'i .md — yani kanca her commit'te
+# üretemediği companion'ın yerine ağacı kirletti ve kimse temizlemedi. Ayrıca üretilen
+# `system_tree.md` şeritlerin ağacını kirletip "kim dosyamı değiştirdi" alarmı doğurdu.
+# Uyku kipinde bu kanca HİÇBİR ŞEY üretmez; tek satır log bırakır.
+#
+# ⚠OKUNAMAZSA "ACIK" VARSAYILIR — kapılarla AYNI yön, tek kural: *anahtar okunamıyorsa
+# sistem uyanık davranır.* Üretim çalışır (eski davranış) ve kapılar bloklar; yani hata
+# gürültülü olur. Ters yön sessizce üretimi durdurup kimseye söylemezdi.
+ANAHTAR_MODUL="$REPO_ROOT/scripts/hijyen/tasiyici-anahtari.cjs"
+TASIYICI_DURUM="ACIK"
+if [ -f "$ANAHTAR_MODUL" ]; then
+    TASIYICI_DURUM=$(node -e "process.stdout.write(require(process.argv[1]).oku(process.argv[2]).durum)" "$ANAHTAR_MODUL" "$REPO_ROOT" 2>/dev/null || echo "ACIK")
+fi
+if [ "$TASIYICI_DURUM" = "KAPALI" ]; then
+    {
+        echo ""
+        echo "=== $(git rev-parse --short HEAD) $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
+        echo "[post-commit] UYKU KIPI — companion/tree URETIMI YOK (anahtar: .companion-tasiyici.json)."
+        echo "[post-commit]   Borc silinmedi, ertelendi; kapilar sayiyor. Uyandirma: docs/standards/companion-doc-standard.md"
+    } >> "$GIT_DIR_ABS/orion-doc.log"
+    exit 0
+fi
+
 (
     "$PYTHON_EXEC" -m orion.cli.main doc tree --repo-root "$REPO_ROOT" > "$GIT_DIR_ABS/orion-tree.log" 2>&1
     # ⭐LOG ARTIK KIRPILMIYOR — ölçülmüş kusur (2026-08-31, REC-67). Eskiden burada
