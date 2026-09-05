@@ -63,8 +63,13 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
                  *  2. TÜRKÇE SABİTTİ — İngilizce ziyaretçi, sayfanın geri kalanı İngilizce
                  *     iken sekmesinde Türkçe bir ad görüyordu (CLAUDE.md kural 7 ihlali:
                  *     kullanıcıya görünen metin sözlükten gelir).
+                 *
+                 * ⚠SİTE ADI BURAYA YAZILMAZ: `Seo` bileşeni başlığın sonuna zaten
+                 * "| VentHub" ekliyor. İlk yazışımda "· VentHub" koymuştum; önizlemede
+                 * ölçtüğümde "… | Ürün Seçici · VentHub | VentHub" çıktı — kendi eklediğim
+                 * fazlalık. Ölçmeseydim, mükerrerliği temizleyen PR mükerrerlik getirecekti.
                  */
-                title={`${title} | ${t('urunSecici.ustBaslik')} · VentHub`}
+                title={`${title} | ${t('urunSecici.ustBaslik')}`}
                 description={description}
             />
 

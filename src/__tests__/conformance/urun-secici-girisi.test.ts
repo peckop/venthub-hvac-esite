@@ -216,6 +216,18 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
                 'degismez ve tekillik sessizce bozulur.',
         ).toBe(true)
 
+        // ⭐SİTE ADI İKİ KEZ YAZILMAZ — önizlemede ölçülerek yakalandı (2026-09-05).
+        // `Seo` bileşeni başlığın sonuna zaten "| VentHub" ekliyor. Bu satıra bir daha
+        // "VentHub" yazmak "… | Ürün Seçici · VentHub | VentHub" üretiyordu: mükerrerliği
+        // temizleyen PR'ın kendisi mükerrerlik getiriyordu. Ölçmeseydim inecekti.
+        const seoBasligiSatiri = /title=\{`\$\{title\}[^`]*`\}/.exec(LAYOUT)?.[0] ?? ''
+        expect(seoBasligiSatiri, 'Hesaplayici SEO baslik satiri BULUNAMADI — olcut kor.').not.toBe('')
+        expect(
+            /VentHub/.test(seoBasligiSatiri),
+            'Hesaplayici SEO basligina site adi ELLE yazilmis. `Seo` zaten "| VentHub" ekliyor; ' +
+                'ikisi birlesince sekmede site adi IKI KEZ cikar.',
+        ).toBe(false)
+
         // AYIRT EDİCİ: ölçüt gerçekten TR sözlüğüne bakıyor mu — dosya boş/kırık gelirse
         // üstteki iki "false" beklentisi sahte-yeşil verirdi.
         expect(govde(TR).includes('Hesaplayıcı'), 'TR sozlukte hicbir "Hesaplayici" yok — tarayici kor.').toBe(true)
