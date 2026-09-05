@@ -19,7 +19,7 @@ zaten kayıtlı) · **KOD/VERİ İŞİ** (belge değil, uygulama bekliyor) · **
 | A5 | brief §78 "/cart teklif listesine dönüşür (adres açık)" ↔ K 15:55 "/tr/teklif-listesi EKLE, /cart kalır" | 15:55 kararı | brief 7 §78 (eski boşluk listesi satırı) | GİDERİLDİ (brief 9 §78 yeni hâli yazdı) |
 | A6 | checkout-payment-standard başlık "A/B kararı beklemede" ↔ aynı belge §6 "A: gömülü form (Recep 08-18)" | §6 | `docs/standards/checkout-payment-standard.md` satır 7 | GERÇEK (tek satır; sahip PRICING-STOK/ALTYAPI) |
 | A7 | dealer-network §3 "storefront combined price list okur" ↔ K1 "bayi fiyatı hiçbir ekranda geçmez" | K1 (bayi hattı PARK) | — | DÜŞÜK: §3 kendi içinde "uygulanan ≠ ideal" diyor |
-| A8 | quote-standard v2 §14 "talebiniz alındı e-postası v1'de yok" ↔ Ç10 "request_email_sent_at canlı" | Ç10 | `quote-standard.md` §14 tablosu | GERÇEK (belge kendi içinde çelişkiyi işaretlemiş, tablo düzeltilmemiş) |
+| A8 | quote-standard v2 §14 "talebiniz alındı e-postası v1'de yok" ↔ Ç10 "request_email_sent_at canlı" | Ç10 | `quote-standard.md` §14 tablosu | **YANLIŞ POZİTİF** (ALTYAPI ölçtü 09-05: §14 tablosunda o kesim YOK; belge çelişkiyi Ç10 + §12 + §14 girişinde üç yerde kapatmış; #1002) |
 | A9 | dealer-blueprint §2 "iki çözücü aynı kurala iner" ↔ ground-truth 06-11 "iki uyumsuz çözücü" | plan hedef, ölçüm gerçek | — | KOD İŞİ (R2, bayi hattı PARK) |
 
 ## B. Katalog ve ürün verisi
@@ -47,7 +47,7 @@ zaten kayıtlı) · **KOD/VERİ İŞİ** (belge değil, uygulama bekliyor) · **
 | C6 | vaat-butunlugu "quickOrder" satırları | REC-94 | — | YANLIŞ POZİTİF: cetvel kaldırılanı tarihçe olarak yazıyor |
 | C7 | arama ayrı sayfa (CONTEXT "kategori ve ürün arama sayfaları") ↔ K14 liste şablonu + şerit | K14 | CONTEXT üretilmiş | DÜŞÜK |
 | C8 | matris eşiği tek başına (matris-gorunum §0) ↔ K13 iki kat | K13 | — | YANLIŞ POZİTİF: matris-gorunum §0 zaten "ham kural yetmiyor, iki kat" diyor |
-| C9 | vaat-butunlugu "K9 mobil üstte yalnız logo+arama" ↔ 16:50 | 16:50 | `vaat-butunlugu-standard.md` K9 alıntısı | GERÇEK (tek cümle; URUN cetveli) |
+| C9 | vaat-butunlugu "K9 mobil üstte yalnız logo+arama" ↔ 16:50 | 16:50 | `vaat-butunlugu-standard.md` K9 alıntısı | **YANLIŞ POZİTİF** (URUN ölçtü 09-05: alıntı belgede yok / güncel; düzeltme yapılmadı) |
 | C10 | "Hesaplayıcılar index linki TBD" (arşiv) ↔ Ürün Seçici | 16:10 | — | YANLIŞ POZİTİF (arşiv) |
 
 ## D. İş yönetimi, işbirliği, altyapı
@@ -86,7 +86,14 @@ K9/K16 Kararlar metni düzeltildi (C5) · REC-51 iptal (E3) · work-tracking-sso
 belirteci kuralı cetvele (D8) · K1a + Anahtar ve Kip Haritası (A1) · bu rapor deftere.
 
 ## H. Sahiplere düşen (Linear: tek paket kaydı)
-URUN: B2 (K3 uygulanınca 4 cetvel), C1 README cümlesi, C9 vaat-bütünlüğü K9 alıntısı, B6/B4 csv §2A notları.
-ALTYAPI/PRICING: A6 checkout-payment başlığı, A8 quote §14 tablosu (REC-117 ile birlikte), E8 SaaS plan notu.
+URUN: B2 (K3 uygulanınca 4 cetvel), C1 README cümlesi, ~~C9~~ (yanlış pozitif), B6/B4 csv §2A notları.
+ALTYAPI/PRICING: A6 checkout-payment başlığı [GİDERİLDİ #1002], ~~A8~~ (yanlış pozitif), E8 SaaS plan notu [GİDERİLDİ #1002 — rapordan farklı: eksik olan R4 notu değil, 08-28 PARK kararıydı].
 OPS: A3 plan notu, E7 hafıza notu, B7 3d-webgl başlık notu.
 Recep kararı: B4 model_code bileşik anahtar mı / çakışma kırmızı mı (ingestion §1'de bekleyen soru).
+
+## I. Düzeltme sonrası (2026-09-05, OPS)
+İki bulgu sahiplerince **düzeltmeden önce ölçüldü** ve yanlış pozitif çıktı: **C9** (URUN) ve **A8** (ALTYAPI). Üçüncüsü
+(**E8**) gerçekti ama raporun gösterdiği yerde değildi. Ortak kök sebep adayı: rapor ikizin cevaplarından üretildi, ikiz
+**bayat küme master** okuyor (`standards_master.md` 09-03 derlenmiş, cetveller 09-04 değişmiş) → **REC-144** (küme master
+tazelik paritesi). Kural (cetvel §4'e girecek): defter bulgusu **düzeltme emrine dönüşmeden önce** sahibi metni ölçer;
+ölçmeden düzeltme YOK. Sayı: 50 aday → GERÇEK sayısı bu turla 2 azaldı.
