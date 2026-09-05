@@ -92,10 +92,20 @@ haftada bir filo kilidine dönüştürüyordu.
 Sayının **ayırt ettiği** ayrı bir kolla kilitlidir (companion'sız dosya eklenince sayı
 artmıyorsa test kırmızı verir) — çünkü bloklamayan bir kolun tek değeri budur.
 
-**C5 BLOKLAMAYA DEVAM EDER** ve bu tutarsızlık değil: bayat companion, ikize *emin
-biçimde yanlış* cevap verdirir (§C5) ve çözümü taşıyıcıya bağlı değildir — companion
-silinebilir ya da kaynak geri alınabilir. Eksik companion ise yalnız taşıyıcı açılarak
-kapanır.
+⚠**BU HÜKÜM 2026-09-05'te DEĞİŞTİ — eski hâli aşağıda, niçin düştüğü de.**
+Eskiden şöyle yazıyordu: *"C5 BLOKLAMAYA DEVAM EDER ve bu tutarsızlık değil: bayat
+companion ikize emin biçimde yanlış cevap verdirir ve çözümü taşıyıcıya bağlı değildir —
+companion silinebilir ya da kaynak geri alınabilir."*
+
+Muhakemesi **tek dosyada doğruydu, ÖLÇEKTE düştü.** 09-05 sabahı ölçüldü: bloklayan 8
+bayat companion'ın arkasında 7 günlük pencerede **49** tane daha vardı. Yani "companion'ı
+sil" çaresi 57 belgeyi silmeye çıkıyordu ve ikizi o 57 dosya hakkında **tamamen kör**
+bırakacaktı — bilgi YOK EDEREK, C4'ün zaten kabul ettiği "bloklamama" sonucuna varmak.
+Recep kararı (09-05): *belge üretimi bir süre durur, üretime dönüldüğünde KALDIĞIMIZ
+YERDEN sorunsuz devam edilir.* Yani companion'lar **yerinde kalır**.
+
+**Yeni hüküm:** C4 de C5 de — ve companion'a bakan bütün kollar — davranışını
+**§C9 UYKU KİPİ** anahtarından alır.
 
 ### ⭐HÜKÜM — üretilmiş dosyaya dokunan iş İKİ COMMIT'tir
 
@@ -376,3 +386,78 @@ Gerçek kolun boş geçmediği **sabotajla** kanıtlandı; her turdan sonra sağ
 sınıfını üretip yakalandığını gösterir. Gerçek kol ise ayrı kanıt ister, çünkü liste bir gün
 haklı olarak boşalabilir (üreteç düzelirse kayıtlar silinir) ve o hâlde **hiçbir şey ölçmeden
 yeşil** görünürdü — ölçüm aracının kendi körlüğü sınıfı (bkz. `fleet-mechanism-standard.md` §9.6).
+
+## C9 — UYKU KİPİ: taşıyıcı anahtarı (REC-142, Recep kararı 2026-09-05)
+
+**Kural:** companion üretiminin açık mı kapalı mı olduğu **tek dosyada** yazılıdır —
+`.companion-tasiyici.json` (depo kökü). Companion'a bakan **her** kapı ve **her** kanca
+davranışını YALNIZ oradan okur. Başka hiçbir yerde ikinci bir "kapalı" kaydı tutulmaz.
+
+### C9.1 Niçin var — ölçülmüş kök sebep
+
+Taşıyıcı 2026-08-28'de kapandı (Recep maliyet kararı), ama *"companion taze olsun"* diyen
+kapılar ve *"her commit'te companion üret"* diyen kancalar **açık kaldı**. Aradaki çelişki
+her hafta başka bir koldan filoyu kilitledi ve üçü de **hiçbir commit olmadan**, yalnız
+takvim ilerlediği için:
+
+| tarih | kilitleyen kol | ne oldu |
+|---|---|---|
+| 2026-09-03 | C4 | tek dosya (`DataTablePagination.tsx`) tüm açık PR'ları kırmızıya çevirdi |
+| 2026-09-04 | INV-DOC-4b | parity kolu yedi taban tazelemesi yaktı, iki PR'da kapı hiç doğmadı |
+| 2026-09-05 | C5 | 8 bayat companion; master dün yeşildi, bugün commit yokken kırmızı |
+
+Her seferinde yama yapıldı (o kolu bloklamaktan çıkar). Sıradaki #640'ta C6 idi. Yama
+bitmiyordu, çünkü **durum bir DEĞER değil, beş dosyaya dağılmış DÜZ METİNDİ** ve kapılar
+davranışlarını sabit kodluyordu.
+
+### C9.2 İki hâl
+
+| | taşıyıcı **KAPALI** (uyku) | taşıyıcı **AÇIK** |
+|---|---|---|
+| kancalar (`post-commit`, `post-merge`) | companion/tree/schema **ÜRETMEZ**; log'a tek satır | üretir (eski davranış) |
+| C4 · C5 · INV-DOC-4b · tazelik · `board.cjs yoklama` | **SAY + adlarıyla RAPORLA + BLOKLAMA** | eski **bloklayan** davranış aynen |
+| companion `.md` dosyaları | **SİLİNMEZ** — bilgi korunur, uyanışta kaldığı yerden devam | — |
+
+⚠**"Bloklamıyor" ≠ "borç yok".** Sayı her koşumda basılır (ad ad). Kabul edilen boşluk
+sessiz olamaz (§21).
+
+### C9.3 Anahtar okunamazsa: **AÇIK** varsayılır (fail-closed yönü)
+
+Dosya yoksa, JSON bozuksa ya da `durum` tanınmıyorsa okuyucu **AÇIK** döner: kapılar
+**bloklar**, kancalar üretir. Ters yön daha nazik görünür ve felakettir — anahtar bir gün
+silinse ya da adı değişse **bütün companion kapıları sessizce susardı** ve kimse fark
+etmezdi. Bu depoda adı konmuş sınıf: *susan kapı ile olmayan kapı aynı şeydir.* Gürültülü
+kırmızı görülür ve düzeltilir; sessiz yeşil görülmez.
+
+### C9.4 UYANDIRMA PROSEDÜRÜ — tek çevirme
+
+Recep'in şartı: *"üretime dönüldüğünde kaldığımız yerden sorunsuz devam"*. Adımlar:
+
+1. Taşıyıcı gerçekten çalışır durumda mı **ÖLÇ** (REC-67; aday: Haiku). Beyan yetmez:
+   bir dosyada `doc batch` koştur ve companion'ın gerçekten üretildiğini gör.
+   ⚠`doc batch` çıkış kodu 0 dönerken `Basarili: 0, Basarisiz: 1` yazabiliyor — çıkış
+   koduna DEĞİL çıktıya bak (§C8 ölçümü).
+2. `.companion-tasiyici.json` → `"durum": "ACIK"`. **Tek değişiklik budur**; kapılarda,
+   kancalarda, testlerde ayarlanacak ikinci bir yer YOKTUR.
+3. Borcu **toplu** kapat: iş emri `docs/proje-takip/companion-borc.md` dosyasından çıkar
+   (OPS gün sonu üretir; ad, kaynağın son commit'i, borcun yaşı). Uyandırma günü o liste
+   yapılacaklar listesidir.
+4. Kapılar kendiliğinden bloklamaya döner. Borç kapanmadan koşarsan **kırmızı alırsın** —
+   bu doğru davranıştır, borç gerçekten vardır.
+5. Uyanış tarihini ve kapanan borç sayısını bu bölümün altına yaz (bir sonraki uyku
+   kararı bu sayıya bakacak).
+
+### C9.5 Niçin öteki iki yol seçilmedi
+
+- **Eşik uzatma (7→30):** aynı tuzağı **erteler**, kaldırmaz — 30. günde aynı kilit gelir
+  ve o gün sebebi hatırlayan kimse olmaz.
+- **Kapıyı silme:** silinen kapı **kapatılmış borç** sanılır. Uyku kipi üçüncü yoldur:
+  kapı yaşar, sayar, adlarıyla raporlar — yalnız **durdurmaz**.
+- **Companion'ları silme:** §C5 başındaki ölçüm — 57 belge, ikiz o dosyalarda tamamen kör.
+
+### C9.6 Değişiklik kaydı
+
+- **2026-09-05** — C9 eklendi; `.companion-tasiyici.json` + `scripts/hijyen/tasiyici-anahtari.cjs`
+  kuruldu; C4/C5/INV-DOC-4b/tazelik/yoklama anahtara bağlandı; `post-commit`/`post-merge`
+  uykuda üretmiyor. Ayırt edicilik kanıtı: anahtar AÇIK fixture'ında C5 kolu KIRMIZI,
+  KAPALI iken yeşil + borç listesi. Karar kaydı: Linear "Kararlar — Altyapı" K9 (09-05).
