@@ -49,6 +49,7 @@ import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
 import type { FamilyListItem,Product } from '../../types/ui-models'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { musteriyeGorunurAciklama } from '../../utils/icIngestNotu'
 import {
   formatSpecValue,
   getProductDisplayName,
@@ -434,7 +435,14 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
    * Yani bu vaat cümlesi arama sonucuna HİÇ çıkmıyordu — ölçüldü 2026-09-05. Ad, ölçülmemiş
    * bir teşhise yol açtı; bu yüzden ad da düzeltildi. → [[alan-adi-birimi-taahhut-eder]]
    */
-  const aciklamaMetni = variantDescription || null
+  /**
+   * ⭐İÇ INGEST NOTU SÜZÜLÜR (canlı olay, 2026-09-05): 187/375 ürünün açıklaması aslında
+   * içeri aktarma notuydu ("Avensair 2026 fiyat listesinden aktarılan temel ürün (Tier C).")
+   * ve müşteri bunu "Ürün Açıklaması" başlığı altında OKUYORDU. Süzgeç `null` döndürünce
+   * aşağıdaki kart hiç çizilmez — yani yukarıdaki "açıklama yoksa satır çizilmez" kuralı
+   * bu sınıfı da kapsar. Süzgeç veriyi DEĞİŞTİRMEZ; veri temizliği ayrı iş (prod yazımı).
+   */
+  const aciklamaMetni = musteriyeGorunurAciklama(variantDescription)
   // T098: ham alan okumasi YASAK — kimlik metni tek cozucuden gelir.
   // `|| sku` yedegi musteriye IC KODU gosterebiliyordu; getProductModelLabel kod yoksa
   // null doner ve asagidaki model etiketi satiri HIC cizilmez (bos etiket basmaktansa yokluk).
