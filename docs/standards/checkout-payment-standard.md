@@ -1,10 +1,15 @@
 # Checkout & Ödeme Cetveli
 
-> **Durum:** TASLAK v0.1 · 2026-08-17 · Şerit: PRICING-STOK
+> **Durum:** TASLAK v0.2 · 2026-08-17 (başlık düzeltmesi 2026-09-05) · Şerit: PRICING-STOK
 > **Niçin var:** T080'de ölçüldü ki ödeme ekranı **boş açılıyor** ve bunu hiçbir kapı görmüyor.
 > Sebep bir kod hatası değil, **cetvel boşluğu**: ödeme yüzeyinin neyi göstermek zorunda
 > olduğunu söyleyen bir kural hiç yazılmamıştı.
-> **A/B kararı beklemede** (§6) — §1-§5 karardan bağımsızdır ve şimdiden bağlayıcıdır.
+> **A/B kararı VERİLDİ: A — Gömülü form** (Recep, 2026-08-18; gerekçesi §6). §1-§5 zaten
+> karardan bağımsızdır ve bağlayıcıdır.
+>
+> ⚠ **Hâlâ TASLAK olmasının sebebi karar değil, KAPI:** §5'in şartnamesi hazır ama
+> `INV-PAY-RENDER-1` **yazılmadı** — yani bu cetvelin merkezî iddiasını (ödeme yüzeyi boş
+> açılamaz) bugün ölçen bir kapı yok. Bu satır, kapı inene kadar burada kalır.
 
 ## 1. Kapsam ve roller
 
@@ -165,3 +170,13 @@ açılır. **Ölçülene kadar bu satır cetvelde AÇIK kalır** — kapatılmı
   bekliyor. Kapı henüz YAZILMADI (INV-PAY-RENDER-1, §5 şartnamesi hazır).
   Cetvel, kendisini doğuran kusurdan **daha geniştir**: T080 tek bir dalın hatasıydı,
   buradaki kurallar sınıfı kapatır.
+- **v0.2 (2026-09-05, ALTYAPI)** — **başlık düzeltmesi, hüküm değişikliği DEĞİL.** Başlık
+  bloğu *"A/B kararı beklemede"* diyordu; oysa karar **2026-08-18'de verilmişti** ve §6
+  gerekçesiyle birlikte 18 gündür belgede duruyordu. Yani cetvel **kendi kendisiyle**
+  çelişiyordu: girişini okuyan "karar yok" der, gövdesini okuyan "karar var" derdi.
+  ⭐**Niçin bu sınıf tehlikeli:** çelişki belgenin *en çok okunan* yerindeydi (ilk yedi
+  satır). Bir cetvelin girişi, gövdesinden daha çok okunur; oradaki bayat cümle,
+  gövdedeki doğru hükmü fiilen görünmez kılar.
+  ⚠Aynı turda **"kapı hâlâ yok"** uyarısı başlığa **eklendi**: karar verilmiş olmasının
+  cetveli yürürlüğe koyduğu sanılmasın — `INV-PAY-RENDER-1` yazılmadığı sürece bu cetvelin
+  ana iddiasını ölçen bir şey yoktur. (Kaynak: REC-141 çelişki taraması, satır A6.)

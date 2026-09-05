@@ -85,3 +85,39 @@ v1.2 (2026-09-05, aynı sabah) — tam koşum 20 soru: 16 yeşil / 4 kırmızı,
 "Supabase'e yazabilir mi? Hayır" cevabında yasak ifade geçti). Kural: değişmez adlar dışında anlam taşıyan ifade eşanlamlı
 kümeye (`beklenen_biri`); yasak ifade sorunun parçası olamaz, yalnız olumlu iddia biçimi. Her kırmızıda ÖNCE cevap okunur,
 sonra belge suçlanır; ölçüt hatası ile belge hatası aynı renkte görünür.
+v1.3 (2026-09-05) — §8 konuşma günlüğü demeti (12) eklendi; kaynak transkript, çıktı ev dizini, sır süzgeci zorunlu.
+v1.4 (2026-09-05) — §9 yol haritasının test dosyası: `yol-haritasi.json` (satır + kanıt) + `yol_haritasi_dogrula.py` + üretilmiş
+`yol-haritasi-durum.md`; ilk koşum 23 satır: 14 yeşil / 3 kırmızı / 6 kanıtsız, ölçülmemiş kanıt 21.
+
+## 8. Konuşma günlüğü demeti (12) — Recep 09-04: "konuşma geçmişini de NLM'e koysak"
+**Ne:** `scripts/nlm/konusma_gunlugu.py` oturum transkriptlerinden (`~/.claude/projects/<proje>/*.jsonl`) gün bazlı
+(Türkiye günü) konuşma dosyası üretir; manifest demeti `12-konusma-gunlugu` bunları deftere taşır.
+**Neyi alır, neyi atar (09-05 ölçümüyle):** yalnız Recep'in yazdığı metin + her turun SON Claude cevabı (Recep'in okuduğu).
+Araç çağrısı/çıktısı, düşünme, araç arası anlatım, alt-ajan, pano/akran mesajı, kanca çıktısı, cron/uyandırma promptu,
+compact özeti, otomatik güvenlik incelemesi isteği ALINMAZ. Ölçüm: ham "user" satırlarının 9,4 MB'ı vardı, insan izi
+süzgeci (klavye kaynağı ya da `origin=human`) sonrası 0,9 MB; Claude cevaplarıyla 4,2 MB / 32 gün.
+**Nerede durur:** depoda DEĞİL (repo PUBLIC; konuşma kişisel ve sır taşıyabilir). Çıktı `~/.claude/projects/<proje>/konusma-gunlugu/`,
+manifest kökü `gunluk` (INV-MUTLAK-YOL-1: `~`, env `VENTHUB_PROJE_TAKIP_GUNLUK` ezer).
+**Sır süzgeci ZORUNLU ve kapatılamaz:** bağlantı dizesi parolası, JWT, bilinen anahtar önekleri, "parola/anahtar = değer"
+kalıpları, 60+ karakter bitişik base64 → `[SIR-KALDIRILDI]`. Değer hiç basılmaz; rapor sayı verir. Yanlış pozitif (örn.
+uzun hash) kabul edilir: yanlışlıkla silinen hash zararsız, yanlışlıkla kalan sır değil.
+**Determinizm:** aynı transkript → aynı dosya (sıralı, damgasız). Günlük yeniden üretim + `esitle` OPS gün-sonu rutini.
+**Ne işe yarar:** defter "bunu konuşmuş muyduk, Recep ne demişti" sorusuna tarih ve oturumla cevap verir; hafıza notu
+yorumdur, günlük kaynaktır (ikisi de defterde; çelişirse günlük kazanır).
+
+## 9. Yol haritasının test dosyası (Recep fikri, 09-04: "kodun test dosyası gibi planın test dosyası olur mu?")
+**Ne:** `docs/proje-takip/yol-haritasi.json` her satırda yetenek · faz belirteci (§6) · durum (BEYAN) · sebep · sorumlu ·
+karar referansı · KANIT listesi taşır. `scripts/nlm/yol_haritasi_dogrula.py` kanıtı koşar, rengi KANITTAN türetir ve
+`docs/proje-takip/yol-haritasi-durum.md` ("neredeyiz" sayfası) üretir; sayfa deftere demet 11 ile gider.
+**Kanıt türleri:** `anahtar` (features.ts sabiti değeri) · `kod` (dosya/klasör var-yok, desen) · `belge` (hafıza sınavı
+sorusunun son sonucu) · `canli` (HTTP, yalnız `--canli`) · `veri` (SQL; v1'de koşulmaz, KANITSIZ olarak görünür).
+**Renk:** YEŞİL = kanıtlar bekleneni verdi · KIRMIZI = belge çelişkisi YA DA karar değişti (ikisi de görünür; biri düzeltilir) ·
+KANITSIZ = borç · YEŞİL* = ölçülen kanıtlar yeşil, bir kısmı ölçülemedi. "durum" sütunu beyandır, renk beyanın kanıtıdır.
+**Yönetilebilirlik kuralları (Recep: "bu yönetilebilir mi?"):** satır tavanı 40 (betik aşımda durur) · kanıt mevcut kod
+testini GÖSTERİR, kopyalamaz · düzyazı test edilmez, satıra bağlı etiket alır · karar belgesi değişip satır değişmezse
+kırmızı (belge kanıtı bunu yakalar) · kanıtsız satıra kanıt UYDURULMAZ, "kanıtsız" yazılır · haftalık sağlık ölçüsü =
+ölçülmemiş kanıt sayısı (ilk ölçüm 09-05: 21) · ne zaman koşar: PR öncesi (kod/anahtar), gün sonu (canlı), compact dönüşü (belge).
+**Karar ölçüsü (2 hafta, Recep "kazanımdan emin değilim"):** "konuşmuştuk / yapıldı sanmıştım / neredeyiz" türü bir saatlik
+tartışma sayısı (09-04: 3). Sıfıra yakınsa kalır; aynıysa kaldırılır (bedel 2-3 gün). İlk koşumun kendisi ayırt edici çıktı:
+YH-42 kırmızı verdi çünkü dal v1.1 sınavını henüz taşımıyordu; YH-11 kırmızı verdi çünkü sınav sonucu dosyası bayattı —
+ikisi de "beyan ile depo hâli ayrışıyor" sınıfı, tam olarak yakalaması istenen şey.
