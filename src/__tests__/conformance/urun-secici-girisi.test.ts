@@ -123,6 +123,37 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
         ).toBe(false)
     })
 
+    it('⭐Bilgi Merkezi “yakında” VAAT ETMİYOR — var olanı yok gösteremez', () => {
+        // NİÇİN: 2026-09-05'e kadar Bilgi Merkezi'nde İKİ vaat kutusu duruyordu —
+        // "Hesaplayıcılar Yakında" (geliştirme aşamasında rozetiyle) ve "Ürün Seçici Yakında"
+        // (planlama aşamasında). İKİSİ DE YALANDI: dört hesaplayıcı canlıda çalışıyordu ve
+        // Ürün Seçici aynı gün yayına girdi. Recep yakaladı: "ikilik üçlük olmamalı".
+        // K1: "'Yakında', boş dal, vaat kutusu YOK; vitrin yalnız var olanı gösterir."
+        const HUB = oku('src', 'views', 'knowledge', 'HubPage.tsx')
+        for (const olu of ['calculatorsSoon', 'selectorSoon', 'inDevelopment', 'inPlanning']) {
+            expect(
+                govde(HUB).includes(olu),
+                `Bilgi Merkezi yeniden "${olu}" anahtarini kullaniyor. Bu anahtarlar VAR OLAN bir ` +
+                    'yetenegi "yakinda" diye ilan ediyordu ve kaldirildi. Geri gelirse ayni celiski ' +
+                    'dogar: ana sayfa Urun Secici ye goturur, Bilgi Merkezi "planlaniyor" der.',
+            ).toBe(false)
+        }
+        expect(
+            govde(HUB).includes('Routes.urunSecici()'),
+            'Bilgi Merkezi Urun Secici ye GERCEK bir baglanti vermiyor. Vaat kutusunun yerine ' +
+                'calisan bir kapi kondu; kapi kaldirilirsa yetenek yine ulasilmaz olur.',
+        ).toBe(true)
+        for (const [ad, metin] of [['tr', TR], ['en', EN]] as const) {
+            for (const olu of ['calculatorsSoon:', 'selectorSoon:', 'inDevelopment:', 'inPlanning:']) {
+                expect(
+                    metin.includes(olu),
+                    `Sozluk (${ad}) "${olu}" anahtarini geri getirmis. Bu metinler iki yerde birden ` +
+                        'tanimliydi (biri ekranda, biri olu); ikisi de silindi.',
+                ).toBe(false)
+            }
+        }
+    })
+
     it('iki sözlükte de urunSecici bölümü var ve dört aracı adlandırıyor', () => {
         for (const [ad, metin] of [['tr', TR], ['en', EN]] as const) {
             expect(/urunSecici:\s*\{/.test(metin), `Sozluk (${ad}) urunSecici bolumu YOK.`).toBe(true)

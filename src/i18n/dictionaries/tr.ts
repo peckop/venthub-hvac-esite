@@ -257,12 +257,13 @@ export const tr = {
       readStart: 'Okumaya Başla',
       heroAlt: 'Mühendislik Bilgi Merkezi Görseli',
       readTime: '{{count}} dk okuma',
-      calculatorsSoon: 'Hesaplayıcılar Yakında',
-      calculatorsSoonDesc: 'Mühendislik hesaplamalarınızı saniyeler içinde yapın.',
-      selectorSoon: 'Ürün Seçici Yakında',
-      selectorSoonDesc: 'İhtiyacınıza en uygun modeli akıllı algoritmalarımızla bulun.',
-      inDevelopment: 'Geliştirme Aşamasında',
-      inPlanning: 'Planlama Aşamasında',
+      // ⛔ESKİ ANAHTARLAR KALDIRILDI (2026-09-05): calculatorsSoon · selectorSoon ·
+      // inDevelopment · inPlanning. Hepsi VAR OLAN bir şeyi "yakında" diye ilan ediyordu:
+      // dört hesaplayıcı canlıda çalışıyor, Ürün Seçici girişi de aynı gün yayına girdi.
+      // K1: "'Yakında', boş dal, vaat kutusu YOK; vitrin yalnız var olanı gösterir."
+      selectorTitle: 'Ürün Seçici',
+      selectorDesc: 'Kanal, ısı geri kazanım, hava perdesi ve jet fan hesaplarını tek yerden yapın.',
+      selectorCta: 'Ürün Seçici’yi aç',
       notFoundTitle: 'Aradığınız teknik bilgiyi bulamadınız mı?',
       notFoundDesc: 'Mühendislik ekibimiz karmaşık projeleriniz için özel dökümantasyon desteği sağlamaya hazırdır.',
       contactExpert: 'Uzmanla Görüşün',
@@ -603,12 +604,10 @@ export const tr = {
         subtitle: 'Doğru HVAC kararları için hazırladığımız teknik rehberler, hesaplama araçları ve uygulama senaryolarını keşfedin.',
         searchPlaceholder: 'Konu, teknik terim veya ürün ailesi ara...',
         readStart: 'Okumaya Başla',
-        calculatorsSoon: 'Hesaplayıcılar Yakında',
-        calculatorsSoonDesc: 'HRV, hava perdesi ve jet fan hesaplamalarınızı saniyeler içinde yapın.',
-        selectorSoon: 'Ürün Seçici Yakında',
-        selectorSoonDesc: 'İhtiyacınıza en uygun modeli akıllı algoritmalarımızla bulun.',
-        inDevelopment: 'Geliştirme Aşamasında',
-        inPlanning: 'Planlama Aşamasında',
+        // ⛔MÜKERRER "yakında" KOPYASI KALDIRILDI (2026-09-05). Bu blok `home.knowledge.hub`
+        // altındaydı ve HİÇ ÇİZİLMİYORDU — `KnowledgeBlock` props tipinde `hub` yok, depoda
+        // `home.knowledge` ile çağrı yok. Yani aynı yalan iki yerde duruyordu: biri ekranda,
+        // biri ölü. Ölü olanı da sildim; yarın biri "burada duruyor" deyip geri koymasın.
         notFoundTitle: 'Aradığınız teknik bilgiyi bulamadınız mı?',
         notFoundDesc: 'Mühendislik ekibimiz karmaşık projeleriniz için özel dökümantasyon desteği sağlamaya hazırdır.',
         contactExpert: 'Uzmanla Görüşün',

@@ -190,12 +190,13 @@ export const en: typeof tr = {
       readStart: 'Start Reading',
       heroAlt: 'Engineering Knowledge Hub Visual',
       readTime: '{{count}} min read',
-      calculatorsSoon: 'Calculators Soon',
-      calculatorsSoonDesc: 'Perform your engineering calculations in seconds.',
-      selectorSoon: 'Product Selector Soon',
-      selectorSoonDesc: 'Find the most suitable model for your needs with our smart algorithms.',
-      inDevelopment: 'In Development',
-      inPlanning: 'In Planning',
+      // ⛔OLD KEYS REMOVED (2026-09-05): calculatorsSoon · selectorSoon · inDevelopment ·
+      // inPlanning. All of them announced something that ALREADY EXISTS as "coming soon":
+      // the four calculators are live and the Product Selector entry shipped the same day.
+      // K1: no "coming soon", no promise boxes — the storefront shows only what exists.
+      selectorTitle: 'Product Selector',
+      selectorDesc: 'Duct, heat recovery, air curtain and jet fan sizing in one place.',
+      selectorCta: 'Open the Product Selector',
       notFoundTitle: 'Couldn\'t find the technical info you\'re looking for?',
       notFoundDesc: 'Our engineering team is ready to provide custom documentation support for your complex projects.',
       contactExpert: 'Talk to an Expert',
@@ -534,12 +535,10 @@ export const en: typeof tr = {
         subtitle: 'Discover technical guides, calculation tools, and application scenarios we prepared for right HVAC decisions.',
         searchPlaceholder: 'Search for topic, technical term or product family...',
         readStart: 'Start Reading',
-        calculatorsSoon: 'Calculators Soon',
-        calculatorsSoonDesc: 'Perform your engineering calculations in seconds.',
-        selectorSoon: 'Product Selector Soon',
-        selectorSoonDesc: 'Find the most suitable model for your needs with our smart algorithms.',
-        inDevelopment: 'In Development',
-        inPlanning: 'In Planning',
+        // ⛔DUPLICATE "coming soon" COPY REMOVED (2026-09-05). This block lives under
+        // `home.knowledge.hub` and was NEVER rendered — `KnowledgeBlock`'s props type has no
+        // `hub`, and nothing in the repo reads `home.knowledge`. The same untruth existed
+        // twice: once on screen, once dead. The dead one is gone too, so nobody restores it.
         notFoundTitle: 'Couldn\'t find the technical info you\'re looking for?',
         notFoundDesc: 'Our engineering team is ready to provide custom documentation support for your complex projects.',
         contactExpert: 'Talk to an Expert',

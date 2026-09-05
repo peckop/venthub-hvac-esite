@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence,motion } from 'framer-motion'
-import { ArrowRight, BookOpen, Calculator, Clock,Search, Settings } from 'lucide-react'
+import { ArrowRight, BookOpen, Calculator, Clock,Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useMemo,useState } from 'react'
@@ -173,40 +173,35 @@ const HubPage: React.FC = () => {
             </AnimatePresence>
           </div>
 
-          {/* Tools & Future Section */}
-          <div className="grid lg:grid-cols-2 gap-12">
-            <div className="relative group overflow-hidden rounded-hvac-3xl bg-slate-900 p-12 text-white">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-100 rounded-full group-hover:bg-cyan-500/20 transition-colors" />
-              <div className="relative z-10">
-                <Calculator className="text-cyan-400 mb-8" size={40} strokeWidth={1.5} />
-                <h3 className="text-3xl font-bold tracking-tight mb-4">{t('knowledge.hub.calculatorsSoon')}</h3>
-                <p className="text-slate-400 font-light leading-relaxed mb-8 max-w-md">
-                  {t('knowledge.hub.calculatorsSoonDesc')}
-                </p>
-                <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="text-xs font-bold uppercase tracking-widest">
-                    {t('knowledge.hub.inDevelopment')}
-                  </span>
-                </div>
-              </div>
-            </div>
+          {/*
+            ÜRÜN SEÇİCİ — eskiden burada İKİ VAAT KUTUSU vardı ve ikisi de YALANDI:
+            "Hesaplayıcılar Yakında" (yanıp sönen "geliştirme aşamasında" rozetiyle) ve
+            "Ürün Seçici Yakında" ("planlama aşamasında"). 2026-09-05'te ölçüldü:
+            dört hesaplayıcı CANLIDA ÇALIŞIYOR (/tr/destek/hesaplayicilar/kanal → 200) ve
+            Ürün Seçici girişi aynı gün yayına girdi. Yani sayfa, VAR OLAN bir şeyi
+            "yok, yakında" diye ilan ediyordu.
 
-            <div className="relative group overflow-hidden rounded-hvac-3xl bg-slate-50 p-12 text-slate-900 border border-slate-100">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-slate-200/50 blur-100 rounded-full" />
-              <div className="relative z-10">
-                <Settings className="text-slate-950 mb-8" size={40} strokeWidth={1.5} />
-                <h3 className="text-3xl font-bold tracking-tight mb-4">{t('knowledge.hub.selectorSoon')}</h3>
-                <p className="text-slate-500 font-light leading-relaxed mb-8 max-w-md">
-                  {t('knowledge.hub.selectorSoonDesc')}
-                </p>
-                <div className="inline-flex items-center gap-3 px-4 py-2 bg-slate-200/50 border border-slate-200 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-500">
-                    {t('knowledge.hub.inPlanning')}
-                  </span>
-                </div>
-              </div>
+            İki kural birden çiğneniyordu:
+             · K1 — "'Yakında', boş dal, vaat kutusu YOK; vitrin yalnız var olanı gösterir."
+             · K17 — "tek ad, tek hedef": aynı yetenek sitede ÜÇ ayrı durumda görünüyordu
+               (ana sayfada çalışır hâlde, burada "planlanıyor", araç sayfalarında canlı).
+
+            Yerine TEK ve GERÇEK bir giriş kondu: aynı yere götüren, çalışan bir bağlantı.
+          */}
+          <div className="relative group overflow-hidden rounded-hvac-3xl bg-slate-900 p-12 text-white">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-100 rounded-full group-hover:bg-cyan-500/20 transition-colors" />
+            <div className="relative z-10">
+              <Calculator className="text-cyan-400 mb-8" size={40} strokeWidth={1.5} />
+              <h3 className="text-3xl font-bold tracking-tight mb-4">{t('knowledge.hub.selectorTitle')}</h3>
+              <p className="text-slate-400 font-light leading-relaxed mb-8 max-w-md">
+                {t('knowledge.hub.selectorDesc')}
+              </p>
+              <Link
+                href={Routes.urunSecici()}
+                className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/20 text-sm font-semibold transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
+              >
+                {t('knowledge.hub.selectorCta')}
+              </Link>
             </div>
           </div>
         </div>
