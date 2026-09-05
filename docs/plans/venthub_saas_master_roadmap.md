@@ -1,8 +1,17 @@
 # VentHub SaaS Dönüşüm — Master Yol Haritası
 
 > **Oluşturma:** 2026-05-30
-> **Durum:** Faz 1 başlatılacak, Faz 2-4 planlanmış
+> **Durum:** ⛔ **PARK** (Recep kararı, 2026-08-28 · REC-88) — aşağıdaki park notuna bak
 > **Model:** Opus 4.6 (Planlama), Teamwork (Uygulama)
+
+> ⛔ **PARK KARARI (Recep, 2026-08-28 · REC-88):** Faz 2 (White-Label / multi-tenant)
+> **durduruldu**. Öncelik kendi şirket + tek operatör. Bu belgedeki Faz 2-4 planı
+> **iptal değil, PARK** — geçerliliğini korur, ama bugün kimse üzerinde çalışmıyor ve
+> "sıradaki iş" diye okunmamalıdır.
+> ⚠**Park, kuralı düşürmez:** çok-kiracılı kural (CLAUDE.md kural 12 — tenant-scoped okuma/
+> yazma, `app_metadata`, önbellek anahtarlarında `tenantId`) **yürürlükte kalır**. Bugün
+> yazılan kod yarın izolasyon açıldığında sessizce sızdırmasın diye.
+> Kaynak: `CLAUDE.md` (Proje Özeti) · REC-88.
 
 > ⚠️ **GÜNCEL GERÇEK (2026-06-12 — gerçek-zemin notu):** Faz 1 *altyapısı* uzak DB'ye uygulandı, AMA tenant
 > **izolasyonu STUB** durumunda: `tenantResolver` hardcoded `DEFAULT_TENANT_ID`'ye düşüyor, 3 tablo
@@ -192,6 +201,14 @@
 ---
 
 ## 📋 Olgunluk Tablosu
+
+> ⚠️ **BU TABLO HEDEFİ GÖSTERİR, ÖLÇÜMÜ DEĞİL** (not: ALTYAPI, 2026-09-05 · REC-141/E8).
+> "Faz 1 Sonrası" sütunundaki `Multi-tenant ✅` **planlanan** durumdur. **Ölçülen** durum
+> yukarıdaki gerçek-zemin notudur: izolasyon **STUB**, üç tablo `tenant_id` taşımıyor,
+> hedef **ENFORCE EDİLMİYOR**. Yani bu satırı "Faz 1 bitti, çok-kiracılılık var" diye
+> okumak **yanlıştır** — çelişki tam buradan doğdu ve tarama A/E8 satırında yakalandı.
+> Sütun adı bilinçli olarak değiştirilmedi: tablo bir **plan** belgesidir; düzeltilmesi
+> gereken şey tablo değil, onu ölçüm sanma alışkanlığıydı.
 
 | Özellik | Shopify | VentHub Şu An | Faz 1 Sonrası | Faz 2 | Faz 3 | Faz 4 |
 |---|---|---|---|---|---|---|
