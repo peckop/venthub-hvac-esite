@@ -67,7 +67,10 @@ geçer; `yasak` ifadelerin hiçbiri geçmez. **`yasak` bir İDDİA CÜMLESİDİR
 göründü. Defter cevabı değişkendir; kırmızıda soru bir kez daha sorulur, iki denemede de kırmızıysa KIRMIZI. Ne zaman
 koşar: compact/resume dönüşünde (OPS açılış rutini, 5 çekirdek soru) ve karar belgesi değişince (ilgili alan). KIRMIZI iki
 şeyden biridir ve ikisi de görünür: belge çelişkisi (belge düzeltilir) ya da karar değişti (sınav güncellenir). Sonuç
-`docs/proje-takip/hafiza-sinavi-sonuc.md`, damga `date -u` eşdeğeri, elle yazılmaz.
+`docs/proje-takip/hafiza-sinavi-sonuc.md`, damga `date -u` eşdeğeri, elle yazılmaz. **Yazım yeri (v1.3, 09-05):** depo
+kopyası yalnız şerit PR'ında güncellenir; ritüel koşumu (compact/resume dönüşü, paylaşılan ana dizin) `HAFIZA_SINAV_SONUC`
+ile scratchpad'e yazar — aksi hâlde üretilmiş dosya commit'siz kirlenir ve hiçbir kapı görmez (09-05'te iki kez yaşandı,
+checkout ile geri alındı). `yol_haritasi_dogrula.py` aynı değişkeni okur.
 
 ## 6. Terim kuralı: "Faz" tek başına yazılmaz (ilk taramanın kök bulgusu, D8)
 Belgelerde "Faz" dört ayrı katmanı anlatıyor ve okuyan hangisi olduğunu bilemiyor: SaaS dönüşümü (Faz 1 Foundation …
