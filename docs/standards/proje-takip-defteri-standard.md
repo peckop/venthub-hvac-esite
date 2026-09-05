@@ -81,3 +81,7 @@ v1.0 (2026-09-04) — ilk sürüm; defter `Venthub Proje Takip` (a5f382a4) 13 de
 v1.1 (2026-09-05) — §5'e hafıza sınavı eklendi: `yasak` = iddia cümlesi, `beklenen_biri` kümesi, kırmızıda ikinci deneme;
 sebep: ilk koşumda iki doğru cevap ölçüt yüzünden kırmızı çıktı (S01 "şirket kurul" zorunlu tutuluyordu, S15 "self-merge"
 kelimesi). Sınav compact/resume dönüş rutinine bağlandı.
+v1.2 (2026-09-05, aynı sabah) — tam koşum 20 soru: 16 yeşil / 4 kırmızı, dördü de ölçüt hatası ("kaldırılıyor" ≠ "kalkar";
+"Supabase'e yazabilir mi? Hayır" cevabında yasak ifade geçti). Kural: değişmez adlar dışında anlam taşıyan ifade eşanlamlı
+kümeye (`beklenen_biri`); yasak ifade sorunun parçası olamaz, yalnız olumlu iddia biçimi. Her kırmızıda ÖNCE cevap okunur,
+sonra belge suçlanır; ölçüt hatası ile belge hatası aynı renkte görünür.

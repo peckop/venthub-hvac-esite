@@ -1,5 +1,5 @@
 {
-  "surum": "v1.1",
+  "surum": "v1.2",
   "tarih": "2026-09-04",
   "nicin": "Belgeler icin kapi: sorular Venthub Proje Takip defterine otomatik sorulur; beklenen cevap YAZILI karardan gelir (Linear Kararlar / VISION / SaaS yol haritasi / Anahtar ve Kip Haritasi). Sapma = kirmizi. Cevap anahtari Recep'ten degil, kararlardan.",
   "olcut": "Her sorunun 'beklenen' ifadelerinin HEPSI ve 'beklenen_biri' kumesinden EN AZ BIRI defter cevabinda gecmeli; 'yasak' ifadeleri IDDIA CUMLESIDIR (sorunun tekrari degil), HICBIRI gecmemeli. Kirmizida soru bir kez daha sorulur (defter cevabi degisken); iki denemede de kirmiziysa KIRMIZI.",
@@ -110,13 +110,18 @@
       "alan": "vitrin",
       "soru": "Mobilde hesap simgesi ve dil secimi nerede?",
       "beklenen": [
-        "sag ust",
-        "uyusmazl"
+        "sag ust"
       ],
       "yasak": [
         "yalniz logo"
       ],
-      "kaynak": "K 16:50"
+      "kaynak": "K 16:50",
+      "beklenen_biri": [
+        "uyusmazl",
+        "akilli dil",
+        "dil cipi",
+        "dil secimi"
+      ]
     },
     {
       "id": "S08",
@@ -135,12 +140,20 @@
       "soru": "Kategori agaci kac kategori kac dal, ucuncu seviye var mi, Siginak nerede?",
       "beklenen": [
         "7",
-        "26",
-        "yok",
-        "ust kategori"
+        "26"
       ],
-      "yasak": [],
-      "kaynak": "K3"
+      "yasak": [
+        "ucuncu seviye mevcuttur",
+        "uc seviye vardir",
+        "ucuncu seviye de var",
+        "ucuncu seviye bulunur"
+      ],
+      "kaynak": "K3",
+      "beklenen_biri": [
+        "ucuncu seviye yok",
+        "yok",
+        "faset"
+      ]
     },
     {
       "id": "S10",
@@ -173,24 +186,38 @@
       "id": "S12",
       "alan": "vitrin",
       "soru": "Alt bilgide marka logolari duracak mi?",
-      "beklenen": [
-        "kalkar",
-        "Markalar"
+      "beklenen": [],
+      "yasak": [
+        "logolar kalir",
+        "logolar duracak",
+        "logolar korun"
       ],
-      "yasak": [],
-      "kaynak": "K 09-04 aksam (Recep+Design+OPS)"
+      "kaynak": "K 09-04 aksam (Recep+Design+OPS)",
+      "beklenen_biri": [
+        "kalkar",
+        "kaldiril",
+        "durmayacak",
+        "kaldirilacak"
+      ]
     },
     {
       "id": "S13",
       "alan": "saas",
       "soru": "Cok kiracili (SaaS) yapi ne durumda; Faz 1 bitti mi?",
       "beklenen": [
-        "park",
-        "altyapi",
-        "izolasyon"
+        "park"
       ],
-      "yasak": [],
-      "kaynak": "REC-88, saas roadmap, Anahtar Haritasi"
+      "yasak": [
+        "faz 2 basladi",
+        "faz 2 devam"
+      ],
+      "kaynak": "REC-88, saas roadmap, Anahtar Haritasi",
+      "beklenen_biri": [
+        "altyapi",
+        "izolasyon",
+        "foundation",
+        "faz 1"
+      ]
     },
     {
       "id": "S14",
@@ -198,11 +225,15 @@
       "soru": "'Faz 2' denince hangi fazlar kastedilebilir ve nasil yazilmali?",
       "beklenen": [
         "SaaS",
-        "15A",
-        "belirte"
+        "15A"
       ],
       "yasak": [],
-      "kaynak": "proje-takip-defteri-standard §6"
+      "kaynak": "proje-takip-defteri-standard §6",
+      "beklenen_biri": [
+        "belirte",
+        "ayrim",
+        "kapsam"
+      ]
     },
     {
       "id": "S15",
@@ -224,11 +255,20 @@
       "alan": "surec",
       "soru": "Bir seridin kuyrugu bitince ne yapar?",
       "beklenen": [
-        "yeni is baslatmaz",
         "Recep"
       ],
-      "yasak": [],
-      "kaynak": "Recep 09-02"
+      "yasak": [
+        "kendi kendine yeni is",
+        "yeni is acar"
+      ],
+      "kaynak": "Recep 09-02",
+      "beklenen_biri": [
+        "yeni is baslatmaz",
+        "kuyruk bitince dur",
+        "baslatmaz",
+        "durur",
+        "beklemeye"
+      ]
     },
     {
       "id": "S17",
@@ -253,24 +293,40 @@
       "id": "S18",
       "alan": "guvenlik",
       "soru": "Design (15A) Supabase'e yazabilir mi, Linear'a karar yazabilir mi?",
-      "beklenen": [
-        "yalniz okur",
-        "SELECT",
-        "yazmaz"
+      "beklenen": [],
+      "yasak": [
+        "yazma yetkisi vardir",
+        "supabase'e yazma yetkisine sahip",
+        "karar yazma yetkisi vardir",
+        "linear'a dogrudan karar yazar"
       ],
-      "yasak": [],
-      "kaynak": "K 13:45"
+      "kaynak": "K 13:45",
+      "beklenen_biri": [
+        "yalniz okur",
+        "yazmaz",
+        "yazamaz",
+        "yetkisi yok",
+        "salt okuma",
+        "SELECT"
+      ]
     },
     {
       "id": "S19",
       "alan": "guvenlik",
       "soru": "Rolun tek otoritesi hangi alan; user_metadata rol icin kullanilir mi?",
       "beklenen": [
-        "user_profiles.role",
-        "yasak"
+        "user_profiles"
       ],
-      "yasak": [],
-      "kaynak": "auth-account A11"
+      "yasak": [
+        "user_metadata rol icin kullanilir"
+      ],
+      "kaynak": "auth-account A11",
+      "beklenen_biri": [
+        "yasak",
+        "kullanilmaz",
+        "guvenilmez",
+        "otorite degil"
+      ]
     },
     {
       "id": "S20",
@@ -290,5 +346,6 @@
         "veri yok"
       ]
     }
-  ]
+  ],
+  "olcut_notu": "v1.2 (09-05, tam kosum dersi): 20 sorunun 4 kirmizisi da OLCUT hatasiydi — defter 'kaldiriliyor' dedi, olcut 'kalkar' aradi. Kural: tek bir kelimeye BAGLANMA; 'beklenen' yalniz degismez adlar icin (Recep, Linear, technical_specs), anlam tasiyan ifadeler 'beklenen_biri' esanlamli kumesine yazilir. Ikinci ders (ayni sabah): yasak ifade SORUNUN PARCASI olmamali — 'supabase'e yazabilir' yasagi 'Supabase'e yazabilir mi? Hayir' cevabinda gecer. Yasak = yalniz olumlu iddia bicimi ('yazma yetkisi vardir')."
 }
