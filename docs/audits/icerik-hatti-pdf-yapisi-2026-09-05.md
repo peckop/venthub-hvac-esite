@@ -2,7 +2,7 @@
 
 **Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** Linear REC-146, OPS yorumu 2026-09-05 12:32 + düzeltme 12:41
 **Ölçüm zamanı:** 2026-09-05T13:04Z (`date -u`) · **Kapsam:** salt okuma, kod yok, prod yok, DB yazma yok
-**Kaynak:** `C:/Users/alize/venthub-pdf-ingestor/venthub/**` (74 CSV artığı emekli — ölçülmedi)
+**Kaynak:** `~/venthub-pdf-ingestor/venthub/**` (74 CSV artığı emekli — ölçülmedi)
 **Ölçüm aracı:** PyMuPDF 1.27.2 (betik: `pdf_yapisi_olc.py` + `tur2.py`, oturum scratchpad'i)
 **Karşılaştırma tabanı:** `product_families` (40 aile) — canlı DB, salt okuma sorgusu
 
