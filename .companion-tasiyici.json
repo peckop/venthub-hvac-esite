@@ -1,0 +1,26 @@
+{
+  "_nicin_bu_dosya": "Companion (belge) uretiminin TEK anahtari. Kapilar ve kancalar taşıyıcının acik mi kapali mi oldugunu YALNIZ buradan okur. Once bu bilgi bes ayri dosyada DUZ METIN olarak yaziliydi (kancalar, pano, sayac, cetvel); hicbiri makine-okur degildi ve kapilar davranislarini sabit kodluyordu. Sonuc: uretici 2026-08-28'de kapandi, kapilar acik kaldi ve celiski her hafta baska bir koldan filoyu kilitledi (09-03 C4, 09-04 INV-DOC-4b, 09-05 C5). REC-142.",
+  "durum": "KAPALI",
+  "_durum_degerleri": ["ACIK", "KAPALI"],
+  "_kapali_ne_demek": "Companion/tree/schema URETILMEZ (post-commit, post-merge). Companion'a bakan kapilar SAYAR + ADLARIYLA RAPORLAR + BLOKLAMAZ. Var olan .md dosyalari SILINMEZ: bilgi korunur, uyanista kaldigi yerden devam eder.",
+  "_acik_ne_demek": "Uretim calisir ve kapilar ESKI bloklayan davranisina doner. Tek cevirme yeter; kapilarda ikinci bir ayar YOKTUR.",
+  "_eksik_dosya_ne_olur": "Bu dosya yoksa, okunamiyorsa ya da durum taninmiyorsa okuyucu ACIK varsayar (fail-closed). NICIN BU YON: KAPALI varsaymak, anahtar kaybolunca butun companion kapilarini SESSIZCE susturur; susan kapi ile olmayan kapi ayni seydir. ACIK varsaymak gurultulu ve hemen duzeltilir.",
+  "kararlar": [
+    {
+      "tarih": "2026-08-31",
+      "kim": "Recep",
+      "ne": "Tasiyici KAPALI kalsin — abonelik maliyeti. (mimo uyeligi 08-28'de bitti)"
+    },
+    {
+      "tarih": "2026-09-05",
+      "kim": "Recep",
+      "ne": "Belirli bir sure belge uretimi YAPILMAYACAK; uretime donuldugunde KALDIGIMIZ YERDEN sorunsuz devam edilecek. Kapilar uretici durumuna baglanir (1. yol)."
+    }
+  ],
+  "yeniden_acilis": {
+    "is": "REC-67",
+    "tasiyici_adayi": "Haiku",
+    "prosedur": "docs/standards/companion-doc-standard.md — 'Uyku kipi' bolumu, UYANDIRMA adimlari"
+  },
+  "bu_anahtari_kuran_is": "REC-142"
+}

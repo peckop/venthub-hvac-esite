@@ -56,6 +56,23 @@ function repoKoku(): string {
   return execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
 }
 
+/**
+ * ⭐DONDURULMUŞ MOD ARTIK TAŞIYICI ANAHTARINDAN TÜRER (REC-142, Recep kararı 2026-09-05).
+ *
+ * Önce bu kolun "bloklamıyor" hâli KODA GÖMÜLÜYDÜ ve gerekçesi bir TARİHTİ (09-04 kararı).
+ * Aynı kusur companion kapılarında da vardı: taşıyıcı kapandı, kapılar açık kaldı ve
+ * çelişki her hafta başka bir koldan filoyu kilitledi. Artık üretimin açık/kapalı olduğu
+ * TEK yerde yazılı; bu kol onu OKUR. Taşıyıcı açıldığı gün donmuş kollar kendiliğinden
+ * bloklamaya döner — kimsenin hatırlaması gerekmez, tek çevirme yeter.
+ */
+const tasiyici = createRequire(import.meta.url)(
+  `${repoKoku()}/scripts/hijyen/tasiyici-anahtari.cjs`,
+) as {
+  oku: (kok: string) => { durum: 'ACIK' | 'KAPALI'; yol: string; okundu: boolean; sebep: string }
+  durumSatiri: (kok: string) => string
+}
+const UYKUDA = tasiyici.oku(repoKoku()).durum === 'KAPALI'
+
 /** Dondurulmuş modun TEK KAYNAĞI (§26) — bu dosya onun tüketicisi. */
 const sayimModulu = createRequire(import.meta.url)(
   `${repoKoku()}/scripts/hijyen/artefakt-bayatlik-sayim.cjs`,
@@ -383,7 +400,19 @@ describe('INV-DOC-4b · Kapı A ikinci ayak — kaynak derlemeden sonra DEĞİŞ
     ).toBe(bagimsiz.length)
 
     // Kabul edilen boşluk SESSİZ olamaz: sayım her koşuda görünür.
+    process.stdout.write('[INV-DOC-4b] ' + tasiyici.durumSatiri(repoKoku()) + '\n')
     process.stdout.write('[INV-DOC-4b] ' + sayimModulu.ozetSatiri(olcum) + '\n')
+
+    // ⭐TAŞIYICI AÇIKSA DONMA BİTER: üretim çalışıyorsa bayat artefakt gerçek bir ihmaldir
+    // ve bloklar. Donmanın gerekçesi "üretemiyoruz" idi; o koşul kalkınca gerekçe de kalkar.
+    if (!UYKUDA) {
+      expect(
+        olcum.artefaktSayisi,
+        `Bayat artefakt ${olcum.artefaktSayisi} ve taşıyıcı AÇIK — üretim çalışıyor, ` +
+          `yani bu borç ÖDENEBİLİR ve bloklar.\nArtefaktlar:\n  ` +
+          `${olcum.bayat.map(a => a.artefakt).join('\n  ')}`,
+      ).toBe(0)
+    }
   })
 
   it('⭐SAYIM AYIRT EDER: bayat kaynak eklenince sayı ARTAR (kelime değil SAYI ölçülür)', () => {

@@ -45,6 +45,25 @@ fi
 # Companion kapsam süzgeci — `post-commit` ile PAYLAŞILAN tek uygulama (T166-VH).
 DOC_SCOPE="$REPO_ROOT/.githooks/lib/doc-scope.cjs"
 
+# ⭐UYKU KİPİ — TAŞIYICI ANAHTARI (REC-142, Recep kararı 2026-09-05).
+# Gerekçesi `post-commit` ile AYNI ve orada uzun yazılı: taşıyıcı 08-28'de kapandı,
+# kancalar üretmeye devam etti, 37 ağaçta 412 bekleyen değişiklik birikti (368'i .md).
+# ⚠Bu kanca ÖZELLİKLE tehlikeliydi: `pull` ile tetiklendiği için ŞERİDİN ağacını
+# şeridin haberi olmadan kirletiyordu — "kim dosyamı değiştirdi" alarmının gerçek yazarı.
+# ⚠Okunamazsa ACIK varsayılır (kapılarla aynı yön; hata gürültülü olsun).
+ANAHTAR_MODUL="$REPO_ROOT/scripts/hijyen/tasiyici-anahtari.cjs"
+TASIYICI_DURUM="ACIK"
+if [ -f "$ANAHTAR_MODUL" ]; then
+    TASIYICI_DURUM=$(node -e "process.stdout.write(require(process.argv[1]).oku(process.argv[2]).durum)" "$ANAHTAR_MODUL" "$REPO_ROOT" 2>/dev/null || echo "ACIK")
+fi
+if [ "$TASIYICI_DURUM" = "KAPALI" ]; then
+    {
+        echo "=== post-merge $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
+        echo "[post-merge] UYKU KIPI — companion/tree/registry URETIMI YOK (anahtar: .companion-tasiyici.json)."
+    } >> "$LOG"
+    exit 0
+fi
+
 CHANGED=$(git diff --name-only ORIG_HEAD HEAD 2>/dev/null)
 [ -z "$CHANGED" ] && exit 0
 

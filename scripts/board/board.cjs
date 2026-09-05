@@ -789,8 +789,14 @@ function yoklama(now = Date.now()) {
    * hata SESSIZ KALMAZ — "olculemedi" ACIKCA basilir, cunku olcememek gecmek degildir.
    */
   try {
+    const kokDizin = repoRootFor(__filename) || undefined
+    // ⭐ANAHTAR SATIRI ONCE: sayiyi okuyan once "bu sayi bloklar mi" sorusunun cevabini
+    // gorsun. Once bu bilgi yoklamada HIC yoktu; borc gorunuyordu ama bloklayip
+    // bloklamadigi gorunmuyordu ve okuyan kendi varsayimini uyduruyordu (REC-142).
+    const anahtar = require('../hijyen/tasiyici-anahtari.cjs')
+    if (kokDizin) altlar.push('  ' + anahtar.durumSatiri(kokDizin))
     const sayac = require('../hijyen/companion-sayim.cjs')
-    altlar.push('  ' + sayac.ozetSatiri(sayac.olc({ kok: repoRootFor(__filename) || undefined })))
+    altlar.push('  ' + sayac.ozetSatiri(sayac.olc({ kok: kokDizin })))
   } catch (e) {
     altlar.push(
       '  companion borcu OLCULEMEDI (' + String((e && e.message) || e).slice(0, 90) + ')' +
