@@ -55,6 +55,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/contact',
     '/about',
     '/destek/merkez',
+    // Ürün Seçici (karar K17): hesaplama araçlarının tek kalıcı girişi. Dört aracın
+    // KENDİ adresleri sitemap'te YOK ve bu kasıtlı — arama motoruna verilen kapı tek
+    // olsun; araçlar bu sayfadan bulunur.
+    '/urun-secici',
     '/cart',
     '/legal/kvkk',
     '/legal/gizlilik-politikasi',

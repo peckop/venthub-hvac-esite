@@ -257,12 +257,13 @@ export const tr = {
       readStart: 'Okumaya Başla',
       heroAlt: 'Mühendislik Bilgi Merkezi Görseli',
       readTime: '{{count}} dk okuma',
-      calculatorsSoon: 'Hesaplayıcılar Yakında',
-      calculatorsSoonDesc: 'Mühendislik hesaplamalarınızı saniyeler içinde yapın.',
-      selectorSoon: 'Ürün Seçici Yakında',
-      selectorSoonDesc: 'İhtiyacınıza en uygun modeli akıllı algoritmalarımızla bulun.',
-      inDevelopment: 'Geliştirme Aşamasında',
-      inPlanning: 'Planlama Aşamasında',
+      // ⛔ESKİ ANAHTARLAR KALDIRILDI (2026-09-05): calculatorsSoon · selectorSoon ·
+      // inDevelopment · inPlanning. Hepsi VAR OLAN bir şeyi "yakında" diye ilan ediyordu:
+      // dört hesaplayıcı canlıda çalışıyor, Ürün Seçici girişi de aynı gün yayına girdi.
+      // K1: "'Yakında', boş dal, vaat kutusu YOK; vitrin yalnız var olanı gösterir."
+      selectorTitle: 'Ürün Seçici',
+      selectorDesc: 'Kanal, ısı geri kazanım, hava perdesi ve jet fan hesaplarını tek yerden yapın.',
+      selectorCta: 'Ürün Seçici’yi aç',
       notFoundTitle: 'Aradığınız teknik bilgiyi bulamadınız mı?',
       notFoundDesc: 'Mühendislik ekibimiz karmaşık projeleriniz için özel dökümantasyon desteği sağlamaya hazırdır.',
       contactExpert: 'Uzmanla Görüşün',
@@ -603,12 +604,10 @@ export const tr = {
         subtitle: 'Doğru HVAC kararları için hazırladığımız teknik rehberler, hesaplama araçları ve uygulama senaryolarını keşfedin.',
         searchPlaceholder: 'Konu, teknik terim veya ürün ailesi ara...',
         readStart: 'Okumaya Başla',
-        calculatorsSoon: 'Hesaplayıcılar Yakında',
-        calculatorsSoonDesc: 'HRV, hava perdesi ve jet fan hesaplamalarınızı saniyeler içinde yapın.',
-        selectorSoon: 'Ürün Seçici Yakında',
-        selectorSoonDesc: 'İhtiyacınıza en uygun modeli akıllı algoritmalarımızla bulun.',
-        inDevelopment: 'Geliştirme Aşamasında',
-        inPlanning: 'Planlama Aşamasında',
+        // ⛔MÜKERRER "yakında" KOPYASI KALDIRILDI (2026-09-05). Bu blok `home.knowledge.hub`
+        // altındaydı ve HİÇ ÇİZİLMİYORDU — `KnowledgeBlock` props tipinde `hub` yok, depoda
+        // `home.knowledge` ile çağrı yok. Yani aynı yalan iki yerde duruyordu: biri ekranda,
+        // biri ölü. Ölü olanı da sildim; yarın biri "burada duruyor" deyip geri koymasın.
         notFoundTitle: 'Aradığınız teknik bilgiyi bulamadınız mı?',
         notFoundDesc: 'Mühendislik ekibimiz karmaşık projeleriniz için özel dökümantasyon desteği sağlamaya hazırdır.',
         contactExpert: 'Uzmanla Görüşün',
@@ -625,10 +624,12 @@ export const tr = {
           title: 'Seçim rehberleri ve teknik içerikler',
           description: 'Kategori bazlı rehberler ve konu sayfaları ile ürün seçimini daha bilinçli hale getirin.'
         },
+        // Ad "Hesaplayıcılar" değil "Ürün Seçici" (karar K17): tek ad, tek hedef.
+        // Kart artık tek bir araca değil, dört aracı toplayan giriş sayfasına gidiyor.
         calculators: {
-          eyebrow: 'Hesaplayıcılar',
-          title: 'Hızlı hesaplama araçları',
-          description: 'HRV, hava perdesi ve kanal gibi araçlarla teknik ön değerlendirmeyi hızlandırın.'
+          eyebrow: 'Ürün Seçici',
+          title: 'Mahallinize uygun ürünü hesaplayarak bulun',
+          description: 'Kanal, HRV, hava perdesi ve jet fan hesaplarını tek yerden yapın.'
         },
         support: {
           eyebrow: 'Destek',
@@ -2505,6 +2506,36 @@ export const tr = {
       submitFailed: 'Talebiniz kaydedilemedi. Lütfen tekrar deneyin; sorun sürerse bize doğrudan ulaşın.'
     },
     defaultMessage: '{{productName}} için detaylı teknik teklif...',
+  },
+  // ÜRÜN SEÇİCİ giriş sayfası (karar K17 · "Ürün Seçici", 2026-09-04).
+  // Ad KASITLI: "fan seçici" değil "ürün seçici" — karar metni fan demiyor, çünkü ileride
+  // fan dışı gruplar da motor kazanacak. Tek ad, tek hedef.
+  urunSecici: {
+    ustBaslik: 'Ürün Seçici',
+    baslik: 'Mahallinize uygun ürünü hesaplayarak bulun',
+    // ⛔"Sonuçlar teklif talebinize taşınır" CÜMLESİ KALDIRILDI (2026-09-05, kod incelemesi):
+    // böyle bir aktarım YOK — hesaplayıcılar sonucu teklif akışına taşımıyor. Vaat kutularını
+    // temizleyen PR'ın kendisi yeni bir vaat getiriyordu; aynı K1 hatası, bu kez benden.
+    aciklama: 'Hacim, debi ve basınç girdilerinizle ön değerlendirme yapın.',
+    araclar: {
+      kanal: {
+        ad: 'Kanal fanı hesabı',
+        aciklama: 'Hacim ve hava değişim sayısından gerekli debiyi ve basıncı çıkarın.',
+      },
+      hrv: {
+        ad: 'Isı geri kazanım (HRV) hesabı',
+        aciklama: 'Konut ve ofis mahalleri için taze hava ihtiyacını ve ünite büyüklüğünü belirleyin.',
+      },
+      havaPerdesi: {
+        ad: 'Hava perdesi hesabı',
+        aciklama: 'Kapı genişliği ve yüksekliğine göre gerekli perde debisini ve modelini bulun.',
+      },
+      jetFan: {
+        ad: 'Jet fan hesabı',
+        aciklama: 'Kapalı otopark ve benzeri hacimlerde itki ihtiyacını ve fan sayısını hesaplayın.',
+      },
+    },
+    not: 'Hesaplar ön değerlendirmedir; kesin seçim için teknik ekibimizden görüş isteyin.',
   },
   calculators: {
     recommendations: 'Öneriler',

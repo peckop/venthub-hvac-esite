@@ -187,7 +187,10 @@ const RATCHETS: Ratchet[] = [
     // (PDP üçlüsü, kategori güven şeridi, sertifika satırı, sepet ödeme kutusu)
     // kaldırıldı; taşıdıkları ham gri sınıflar onlarla gitti.
     // 2026-09-01 · 1488 -> 1474: REC-115 olu bilesen CategoryHero silindi.
-    tavan: 1474,
+    // 2026-09-05 · 1474 -> 1464: Bilgi Merkezi'ndeki iki "yakinda" vaat kutusu kalkti
+    // (HubPage), yerine tek gercek baglanti kondu — kutularin ham slate/gray siniflari da
+    // onlarla birlikte gitti. Borc azaldi, tavan indirildi.
+    tavan: 1464,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },

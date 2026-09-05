@@ -113,6 +113,21 @@ export const Routes = {
     users: () => '/admin/users' as Route
   },
 
+  /**
+   * ÜRÜN SEÇİCİ — hesaplama araçlarının TEK kalıcı girişi (karar K17, 2026-09-04).
+   *
+   * NİÇİN AYRI BİR YOL: karar "tek ad, tek hedef" diyor; ana sayfa, menü ve gelecekteki
+   * senaryo sayfaları buraya bağlanır. Eskiden hesaplayıcıya giden TEK iç bağlantı vardı
+   * (ana sayfa → doğrudan HRV aracı); yani araçların ortak bir kapısı hiç yoktu.
+   *
+   * ⚠DÖRT ARAÇ YERİNDE DURUYOR: `destek.hesaplayicilar(slug)` adresleri SİLİNMEDİ ve
+   * yönlendirilmedi. Onları tek motora indirmek K18'e bağlı ve K18 "istişare, karar
+   * değil" diye işaretli; canlıda çalışan dört hesaplayıcıyı motor hazır olmadan tek
+   * sayfaya yönlendirmek YETENEK KAYBI olurdu (2026-09-05'te ölçüldü: /tr/destek/
+   * hesaplayicilar/kanal canlıda 200 veriyor).
+   */
+  urunSecici: () => '/urun-secici' as Route,
+
   // Destek / Bilgi Merkezi
   destek: {
     home: () => '/destek/merkez' as Route,

@@ -190,12 +190,13 @@ export const en: typeof tr = {
       readStart: 'Start Reading',
       heroAlt: 'Engineering Knowledge Hub Visual',
       readTime: '{{count}} min read',
-      calculatorsSoon: 'Calculators Soon',
-      calculatorsSoonDesc: 'Perform your engineering calculations in seconds.',
-      selectorSoon: 'Product Selector Soon',
-      selectorSoonDesc: 'Find the most suitable model for your needs with our smart algorithms.',
-      inDevelopment: 'In Development',
-      inPlanning: 'In Planning',
+      // ⛔OLD KEYS REMOVED (2026-09-05): calculatorsSoon · selectorSoon · inDevelopment ·
+      // inPlanning. All of them announced something that ALREADY EXISTS as "coming soon":
+      // the four calculators are live and the Product Selector entry shipped the same day.
+      // K1: no "coming soon", no promise boxes — the storefront shows only what exists.
+      selectorTitle: 'Product Selector',
+      selectorDesc: 'Duct, heat recovery, air curtain and jet fan sizing in one place.',
+      selectorCta: 'Open the Product Selector',
       notFoundTitle: 'Couldn\'t find the technical info you\'re looking for?',
       notFoundDesc: 'Our engineering team is ready to provide custom documentation support for your complex projects.',
       contactExpert: 'Talk to an Expert',
@@ -534,12 +535,10 @@ export const en: typeof tr = {
         subtitle: 'Discover technical guides, calculation tools, and application scenarios we prepared for right HVAC decisions.',
         searchPlaceholder: 'Search for topic, technical term or product family...',
         readStart: 'Start Reading',
-        calculatorsSoon: 'Calculators Soon',
-        calculatorsSoonDesc: 'Perform your engineering calculations in seconds.',
-        selectorSoon: 'Product Selector Soon',
-        selectorSoonDesc: 'Find the most suitable model for your needs with our smart algorithms.',
-        inDevelopment: 'In Development',
-        inPlanning: 'In Planning',
+        // ⛔DUPLICATE "coming soon" COPY REMOVED (2026-09-05). This block lives under
+        // `home.knowledge.hub` and was NEVER rendered — `KnowledgeBlock`'s props type has no
+        // `hub`, and nothing in the repo reads `home.knowledge`. The same untruth existed
+        // twice: once on screen, once dead. The dead one is gone too, so nobody restores it.
         notFoundTitle: 'Couldn\'t find the technical info you\'re looking for?',
         notFoundDesc: 'Our engineering team is ready to provide custom documentation support for your complex projects.',
         contactExpert: 'Talk to an Expert',
@@ -556,10 +555,11 @@ export const en: typeof tr = {
           title: 'Selection guides and technical content',
           description: 'Use category-based guides and topic pages to make product selection more informed.'
         },
+        // "Product Selector", not "Calculators" (decision K17): one name, one destination.
         calculators: {
-          eyebrow: 'Calculators',
-          title: 'Fast calculation tools',
-          description: 'Speed up technical pre-evaluation with HRV, air-curtain and duct tools.'
+          eyebrow: 'Product Selector',
+          title: 'Size the right product for your space',
+          description: 'Duct, HRV, air-curtain and jet fan sizing in one place.'
         },
         support: {
           eyebrow: 'Support',
@@ -2509,6 +2509,34 @@ export const en: typeof tr = {
       submitFailed: 'We could not save your request. Please try again; if the problem persists, contact us directly.'
     },
     defaultMessage: 'Detailed technical quote for {{productName}}...',
+  },
+  // PRODUCT SELECTOR entry page (decision K17, 2026-09-04). Deliberately not "fan
+  // selector": other product groups will get engines later. One name, one destination.
+  urunSecici: {
+    ustBaslik: 'Product Selector',
+    baslik: 'Size the right product for your space',
+    // ⛔"Results carry over into your quote request" REMOVED (2026-09-05, code review):
+    // no such hand-off exists. The PR that removes promise boxes was introducing a new promise.
+    aciklama: 'Run a pre-assessment from volume, airflow and pressure inputs.',
+    araclar: {
+      kanal: {
+        ad: 'Duct fan sizing',
+        aciklama: 'Derive the required airflow and pressure from room volume and air change rate.',
+      },
+      hrv: {
+        ad: 'Heat recovery (HRV) sizing',
+        aciklama: 'Determine fresh-air demand and unit size for homes and offices.',
+      },
+      havaPerdesi: {
+        ad: 'Air curtain sizing',
+        aciklama: 'Find the required curtain airflow and model from door width and height.',
+      },
+      jetFan: {
+        ad: 'Jet fan sizing',
+        aciklama: 'Calculate the thrust demand and fan count for car parks and similar spaces.',
+      },
+    },
+    not: 'These are pre-assessments; ask our technical team before making a final selection.',
   },
   calculators: {
     recommendations: 'Recommendations',

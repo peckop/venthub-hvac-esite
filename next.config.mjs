@@ -46,6 +46,21 @@ const nextConfig = {
                 destination: '/:lang/products/vortice-lineo-quiet',
                 permanent: true,
             })),
+            // ── Ürün Seçici (karar K17, 2026-09-05) — ÖLÜ DİZİN ADRESİNİN ONARIMI.
+            // `/destek/hesaplayicilar` canlıda 404 veriyordu, AMA `Routes.destek.hesaplayicilar()`
+            // slug'sız çağrılınca tam o adresi üretebiliyordu: kodda üretilebilen, sitede
+            // olmayan bir adres. Artık Ürün Seçici girişine kalıcı olarak yönlenir.
+            // ⚠Dört ARACIN kendi adresleri (`/destek/hesaplayicilar/<araç>`) YÖNLENDİRİLMEZ —
+            // hepsi canlıda çalışıyor (2026-09-05 ölçümü: /tr/destek/hesaplayicilar/kanal 200).
+            // Onların tek sayfaya inmesi K18'e bağlı ve K18 "istişare, karar değil".
+            // ⚠DİLSİZ KURAL YOK — ve bu KASITLI (2026-09-05, kod incelemesi düzeltmesi):
+            // `/destek/hesaplayicilar` (dil öneksiz) için `permanent: true` ile `/tr/...`e
+            // göndermek, İNGİLİZCE ziyaretçiyi kalıcı olarak Türkçe sayfaya çiviler ve tarayıcı
+            // bunu önbelleğe alır — geri alınamaz. middleware.ts zaten dil önekini kendisi
+            // ekliyor (değişken sonuçlu dal, orada 308 açıkça yasak); önek eklendikten sonra
+            // aşağıdaki dilli kural devreye girer. Yani dilsiz kurala gerek YOK.
+            { source: '/:lang(tr|en)/destek/hesaplayicilar', destination: '/:lang/urun-secici', permanent: true },
+
             { source: '/category/fanlar/:path*', destination: '/category/fans/:path*', permanent: true },
             { source: '/category/hava-perdeleri/:path*', destination: '/category/air-curtains/:path*', permanent: true },
             { source: '/category/isi-geri-kazanim-cihazlari/:path*', destination: '/category/heat-recovery-units/:path*', permanent: true },
