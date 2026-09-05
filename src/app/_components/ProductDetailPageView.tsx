@@ -419,7 +419,22 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   // ⭐Bu yüzden çözüm "origin'i tarayıcıdan al" DEĞİLDİR: öyle yapmak yukarıdaki K8
   // arızasını geri getirirdi. Doğru çözüm ikinci yazıcıyı kaldırmaktır.
   const variantDescription = selectedVariant.description || pickLang(family.description, lang)
-  const metaDesc = variantDescription || t('pdp.descFallback')
+  /**
+   * AÇIKLAMA YOKSA SATIR HİÇ ÇİZİLMEZ (REC-148 A4, 2026-09-05) — K7 / K1.
+   *
+   * Eskiden pdp sözlüğünde bir yedek metin vardı: *"Bu ürün için detaylı açıklama
+   * yakında eklenecektir."* Bu bir VAAT'ti ve tutulacağının garantisi yoktu — açıklaması
+   * olmayan ürün aylardır öyle duruyor olabilir. Vitrin var olanı gösterir; olmayanı
+   * "yakında" diye ilan etmez.
+   *
+   * ⚠ADI YANILTICIYDI: değişken `metaDesc` adını taşıyordu ama meta etiketiyle İLGİSİ YOK.
+   * `<meta name="description">` bu bileşende üretilmiyor; RSC tarafında
+   * `app/[lang]/products/[slug]/page.tsx` içindeki generateMetadata üretiyor ve zinciri
+   * ayrı: family.meta_description → family.description(160) → "VentHub Ürün Detayı".
+   * Yani bu vaat cümlesi arama sonucuna HİÇ çıkmıyordu — ölçüldü 2026-09-05. Ad, ölçülmemiş
+   * bir teşhise yol açtı; bu yüzden ad da düzeltildi. → [[alan-adi-birimi-taahhut-eder]]
+   */
+  const aciklamaMetni = variantDescription || null
   // T098: ham alan okumasi YASAK — kimlik metni tek cozucuden gelir.
   // `|| sku` yedegi musteriye IC KODU gosterebiliyordu; getProductModelLabel kod yoksa
   // null doner ve asagidaki model etiketi satiri HIC cizilmez (bos etiket basmaktansa yokluk).
@@ -882,20 +897,26 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
                   {section.id === 'general' && (
                     <>
-                      <div className="lg:col-span-7 xl:col-span-8 space-y-8">
-                        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm hover:shadow-md transition-shadow">
-                          <h4 className="font-black text-industrial-gray mb-6 flex items-center text-xs uppercase tracking-hvac-normal opacity-60">
-                            <Info className="text-primary-navy mr-2.5" size={16} />
-                            {t('pdp.labels.productDescription')}
-                          </h4>
-                          <div className="prose prose-slate max-w-none text-steel-gray leading-relaxed text-sm font-medium">
-                            {/* RPC dil çözümünü ve aile fallback'ini zaten yaptı. */}
-                            <RichTextRenderer content={metaDesc} />
+                      {/* Açıklama YOKSA bu kart hiç çizilmez (REC-148 A4) — yerine vaat basmak
+                          yerine boşluk bırakılır. Boşluk gerçekten boş kalmasın diye yandaki
+                          "hızlı detaylar" paneli tam genişliğe geçer: kart kaldırılıp sütun
+                          genişliği sabit bırakılsaydı 12'lik ızgarada 7-8 sütun ÖLÜ ALAN olurdu. */}
+                      {aciklamaMetni ? (
+                        <div className="lg:col-span-7 xl:col-span-8 space-y-8">
+                          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm hover:shadow-md transition-shadow">
+                            <h4 className="font-black text-industrial-gray mb-6 flex items-center text-xs uppercase tracking-hvac-normal opacity-60">
+                              <Info className="text-primary-navy mr-2.5" size={16} />
+                              {t('pdp.labels.productDescription')}
+                            </h4>
+                            <div className="prose prose-slate max-w-none text-steel-gray leading-relaxed text-sm font-medium">
+                              {/* RPC dil çözümünü ve aile fallback'ini zaten yaptı. */}
+                              <RichTextRenderer content={aciklamaMetni} />
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      ) : null}
 
-                      <div className="lg:col-span-5 xl:col-span-4">
+                      <div className={aciklamaMetni ? 'lg:col-span-5 xl:col-span-4' : 'lg:col-span-12'}>
                         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm sticky top-36">
                           <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-hvac-normal opacity-60">{t('common.quickDetails')}</h4>
                           <div className="space-y-4">

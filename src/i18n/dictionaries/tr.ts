@@ -979,7 +979,9 @@ export const tr = {
       requestCatalog: 'Marka Kataloglarını İste',
       featuredSystems: 'Öne Çıkan Sistemler',
       allProductGroups: 'Tüm Ürün Grupları',
-      noProducts: 'Bu markaya ait ürünler yakında eklenecektir.',
+      // REC-148 A6: eskiden "yakında eklenecektir" idi — eklenip eklenmeyeceği belli
+      // olmayan bir VAAT. Artık olgu: marka katalogda var, ürünleri henüz yok.
+      noProducts: 'Bu markanın ürünleri henüz katalogda değil.',
       originSuffix: 'Menşei',
       estPrefix: 'Kuruluş',
       // REC-98: "Kurumsal Özet" satırlarının ETİKETLERİ. Değer tarafı veri olarak
@@ -1091,7 +1093,10 @@ export const tr = {
     // Ödeme yolu ENV bayrağıyla KAPALI olduğunda gösterilen metinler
     // (bkz. app/[lang]/checkout/page.tsx — NEXT_PUBLIC_ODEME_ACIK).
     kapali: {
-      baslik: 'Ödeme yakında açılıyor',
+      // REC-148 A7 — OPS hükmü, K1a: satış kipi KAPALI, YOK değil. Eski başlık
+      // "Ödeme yakında açılıyor" bir TARİH vaat ediyordu; o tarih kimsede yok.
+      // Yeni cümle durumu söylüyor ve ziyaretçiye ne YAPABİLECEĞİNİ altındaki metin veriyor.
+      baslik: 'Şu an teklif kipindeyiz; sipariş ve ödeme kapalı.',
       aciklama: 'Mağazamız kuruluş aşamasında. Fiyatlar günceldir; sipariş için bizden teklif isteyebilirsiniz — aynı gün dönüş yapıyoruz.',
       whatsappCta: 'WhatsApp\'tan teklif iste',
       emailCta: 'E-posta ile teklif iste',
@@ -1740,7 +1745,8 @@ export const tr = {
     qty: 'Adet:',
     addToCart: 'Sepete Ekle',
     techQuote: 'Teknik Teklif İste',
-    descFallback: 'Bu ürün için detaylı açıklama yakında eklenecektir.',
+    // ⛔descFallback KALDIRILDI (REC-148 A4, 2026-09-05): "yakında eklenecektir" bir vaatti.
+    // Açıklama yoksa artık kart HİÇ çizilmiyor (K7: varsa satır, yoksa satır hiç yok).
     relatedProducts: 'İlgili Ürünler',
     officialDistributor: 'MARKA GÜVENCESİ',
     priceAvailability: 'Fiyat & Stok',
@@ -1843,7 +1849,7 @@ export const tr = {
     close: 'Kapat',
     addToCart: 'Sepete Ekle',
     viewProduct: 'Ürünü Gör',
-    descFallback: 'Ürün açıklaması yakında eklenecektir.'
+    // ⛔descFallback KALDIRILDI (REC-148 A5) — açıklama yoksa paragraf hiç çizilmiyor.
   },
   support: {
     contactCta: {

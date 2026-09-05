@@ -57,9 +57,15 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
             {quoteMode ? (
               <div className="text-2xl font-bold text-primary-navy mb-4">{t('common.requestQuote')}</div>
             ) : null}
-            <p className="text-sm text-steel-gray line-clamp-4 mb-6">
-              {product.description || t('quickView.descFallback')}
-            </p>
+            {/* Açıklama yoksa paragraf HİÇ çizilmez (REC-148 A5) — eskiden yedek metin
+                "Ürün açıklaması yakında eklenecektir." idi, yani tutulacağı belli olmayan
+                bir VAAT. Vitrin var olanı gösterir (K1/K7). Alttaki düğme satırı `mt-auto`
+                taşıdığı için paragraf düşünce boşluk kalmaz, düğmeler yukarı gelmez. */}
+            {product.description ? (
+              <p className="text-sm text-steel-gray line-clamp-4 mb-6">
+                {product.description}
+              </p>
+            ) : null}
             <div className="mt-auto flex gap-2">
               <button onClick={handleAdd} disabled={quoteMode} aria-disabled={quoteMode} className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
                 <ShoppingCart size={18} className="mr-2" /> {t('quickView.addToCart')}

@@ -24,7 +24,15 @@ import { getSupportLink } from '../../utils/whatsapp'
  */
 const OdemeKapaliBilgi: React.FC = () => {
   const { t, lang } = useI18n()
-  const whatsappLink = getSupportLink(t('checkout.kapali.baslik'), lang)
+  /**
+   * WhatsApp KONUSU başlıktan AYRILDI (REC-148 A7, 2026-09-05).
+   *
+   * Başlık K1a hükmüyle tam cümleye döndü ("Şu an teklif kipindeyiz; sipariş ve ödeme
+   * kapalı."). O cümle sayfada doğru, ama WhatsApp ön-doldurmasında konu satırı olarak
+   * saçmalar — müşteri kendi durumunu bize bildiriyormuş gibi görünürdü. Konu artık
+   * ziyaretçinin NE İSTEDİĞİNİ söylüyor: "Teklif İste".
+   */
+  const whatsappLink = getSupportLink(t('common.requestQuote'), lang)
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-16">
