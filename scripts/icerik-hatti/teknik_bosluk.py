@@ -307,8 +307,8 @@ def main() -> int:
     ç.append("| Marka | Ürün | Kaynak nerede | Kim getirir | Bilinen tuzak |")
     ç.append("|---|---|---|---|---|")
     ç.append("| **AVenS** | 34 | Bizim markamız. `avensair.com/kataloglar`'daki 24 katalog **Vortice + fiyat listesi**ydi (dizine alınan küme); AVenS föyleri orada görünmedi. Kaynak: Recep'in arşivi — ya da föy sitede varsa **linki** | **Recep** (link ya da PDF) | ajanı üretici sitesi aramaya gönderirsen 34 üründe sıfır sonuç alır ve bunu \"bulunamadı\" diye raporlar — üretici biziz |")
-    ç.append("| **Nicotra Gebhardt** | 35 | `avensair.com/nicotra-gebhardt` (ÜRÜN 08-21: 28/35 eşleşti); resmî site yalnız AT serisi | FAZ 2 ajanı (ya da Recep'in katalog PDF'i varsa o, daha iyi) | **koda değil MODEL TANIMLAYICIYA** eşle — sipariş kodu iki kaynakta farklı yazılıyor, 7 ürün kodla düştü; site araması sorgu başına sonuç sınırlıyor (1000 satır tavanının web kardeşi) |")
-    ç.append("| **Danfoss** | 2 | `danfoss.com` FC-51 sayfası (ÜRÜN 08-21) | FAZ 2 ajanı | — |")
+    ç.append("| **Nicotra Gebhardt** | 35 | `avensair.com/nicotra-gebhardt` (ÜRÜN 08-21: 28/35 eşleşti). Resmî sitenin **ürün sayfalarında** yalnız AT serisi görüldü — bu gözlem **Download-Center'ı (katalog/PDF yüzeyi) KAPSAMAZ**, orası ölçülmedi; Recep'in verdiği iki download adresi bu gözlemle **elenemez** | FAZ 2 ajanı (ya da Recep'in katalog PDF'i varsa o, daha iyi) | **koda değil MODEL TANIMLAYICIYA** eşle — sipariş kodu iki kaynakta farklı yazılıyor, 7 ürün kodla düştü; site araması sorgu başına sonuç sınırlıyor (1000 satır tavanının web kardeşi) |")
+    ç.append("| **Danfoss** | 2 | `danfoss.com` FC-51 **ürün sayfası** (ÜRÜN 08-21, 33/34 sayımı o yüzeyde). Recep'in verdiği documentation merkezi ve `store.danfoss.com` **ayrı yüzeyler**, o sayımla elenmez | FAZ 2 ajanı | — |")
     ç.append("")
     ç.append("**Sınır (ÜRÜN'ün kendi ifadesiyle):** bu harita **görsel** kaynağı için çıkarıldı, "
              "teknik özellik için değil; bir sayfanın görseli taşıması teknik tabloyu da "
