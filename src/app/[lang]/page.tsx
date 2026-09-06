@@ -13,7 +13,7 @@ import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
 import { compareText } from '../../i18n/sort'
 import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
-import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import HomePage from '../../views/HomePage'
 
 /**
@@ -147,7 +147,10 @@ export default async function RootPage({ params }: Props) {
       // Görünen slug dile göre (kanonik EN kolon → TR sayfada TR slug)
       slug: getLocalizedCategorySlug(c, lang),
       displayName: getCategoryDisplayName(c, t),
-      description: c.description || '',
+      // REC-161: ham kolon okuması dile kördü — çözücü SSOT'tan geçiyoruz.
+      // (`CategoryViewModelLite.description` bundan sonra ÇÖZÜLMÜŞ metindir;
+      // tüketicisi GuidedCategoryDiscovery yeniden çözmez, yalnız basar.)
+      description: getCategoryDescription(c, lang),
       image_url: c.image_url
     }))
 

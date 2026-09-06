@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import type { DbCategory } from '../../types/db-rows'
+import type { CategoryDescriptionSource } from '../categoryHelpers'
 import {
     getCategoryDescription,
     getCategoryDisplayName,
@@ -68,28 +69,63 @@ describe('categoryHelpers', () => {
         })
     })
 
+    // ⭐REC-161: `lang` ZORUNLU. Fixture'lar `CategoryDescriptionSource`'u karşıladığı
+    // için artık tip dökümü GEREKMİYOR — döküm kuralı susturur, sağlamaz.
     describe('getCategoryDescription', () => {
          it('should return empty string if category is null or undefined', () => {
-             expect(getCategoryDescription(null)).toBe('')
-             expect(getCategoryDescription(undefined)).toBe('')
+             expect(getCategoryDescription(null, 'tr')).toBe('')
+             expect(getCategoryDescription(undefined, 'en')).toBe('')
          })
 
          it('should return hero_description from metadata if present', () => {
-             const cat = { metadata: { hero_description: 'Hero Desc' }, description: 'Normal Desc' } as unknown as DbCategory
-             expect(getCategoryDescription(cat)).toBe('Hero Desc')
+             const cat: CategoryDescriptionSource = { metadata: { hero_description: 'Hero Desc' }, description: 'Normal Desc' }
+             expect(getCategoryDescription(cat, 'tr')).toBe('Hero Desc')
          })
 
          it('should fallback to description if metadata or hero_description is absent', () => {
-             const cat = { description: 'Normal Desc' } as DbCategory
-             expect(getCategoryDescription(cat)).toBe('Normal Desc')
+             const cat: CategoryDescriptionSource = { description: 'Normal Desc' }
+             expect(getCategoryDescription(cat, 'tr')).toBe('Normal Desc')
 
-             const cat2 = { metadata: {}, description: 'Normal Desc 2' } as DbCategory
-             expect(getCategoryDescription(cat2)).toBe('Normal Desc 2')
+             const cat2: CategoryDescriptionSource = { metadata: {}, description: 'Normal Desc 2' }
+             expect(getCategoryDescription(cat2, 'tr')).toBe('Normal Desc 2')
          })
 
          it('should return empty string if both hero_description and description are absent', () => {
-             const cat = {} as DbCategory
-             expect(getCategoryDescription(cat)).toBe('')
+             const cat: CategoryDescriptionSource = {}
+             expect(getCategoryDescription(cat, 'tr')).toBe('')
+         })
+
+         // ⭐REC-161 — dile göre çözüm (yeni davranış)
+         it('description_i18n varsa aktif dilin metnini doner', () => {
+             const cat: CategoryDescriptionSource = {
+                 metadata: { description_i18n: { tr: 'Turkce metin', en: 'English text' }, hero_description: 'Hero TR' },
+                 description: 'Kolon',
+             }
+             expect(getCategoryDescription(cat, 'tr')).toBe('Turkce metin')
+             expect(getCategoryDescription(cat, 'en')).toBe('English text')
+         })
+
+         it('aktif dilin metni yoksa legacy zincire duser (geriye uyum)', () => {
+             const sadeceTr: CategoryDescriptionSource = {
+                 metadata: { description_i18n: { tr: 'Sadece TR' }, hero_description: 'Hero TR' },
+                 description: 'Kolon',
+             }
+             // EN karsiligi yok → bugunku davranis (hero_description) aynen korunur
+             expect(getCategoryDescription(sadeceTr, 'en')).toBe('Hero TR')
+
+             const bosDize: CategoryDescriptionSource = {
+                 metadata: { description_i18n: { tr: '', en: '' } },
+                 description: 'Kolon',
+             }
+             // Bos dize "yok" sayilir — bos paragraf basmak yerine kolona duser
+             expect(getCategoryDescription(bosDize, 'en')).toBe('Kolon')
+         })
+
+         it('bilinmeyen dil kodu TR gibi cozulur (getLocalizedCategorySlug ile ayni kural)', () => {
+             const cat: CategoryDescriptionSource = {
+                 metadata: { description_i18n: { tr: 'Turkce metin', en: 'English text' } },
+             }
+             expect(getCategoryDescription(cat, 'de')).toBe('Turkce metin')
          })
     })
 

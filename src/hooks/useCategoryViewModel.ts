@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import { DomainCategory, mapCategoryWithLocale } from '../lib/type-converters'
 import type { DbCategory } from '../types/db-rows'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { getCategoryDescription, getCategoryDisplayName } from '../utils/categoryHelpers'
 
 export interface CategoryViewModel {
   id: string
@@ -76,7 +76,13 @@ export function useCategoryViewModel() {
       slug: localizedCategory.slug,
       displayName,
       marketingTitle,
-      description: localizedCategory.description || '',
+      // ⭐REC-161: burası ham kolon okuyordu (`localizedCategory.description`) ve dile
+      // KÖRDÜ. Emirde listelenmemişti; ölçtüm — CANLI kategori sayfasının GERÇEK yolu
+      // burası: CategoryMasterView → CategoryShowcaseView → vm.description. (Emirde
+      // gösterilen `components/category/CategoryShowcase.tsx`'i hiçbir dosya import
+      // ETMİYOR = ölü kod.) Yalnız emirdeki üç yer düzeltilseydi katalog şeridinin
+      // 23 paragrafı kategori sayfasında HİÇ görünmezdi.
+      description: getCategoryDescription(localizedCategory, lang),
       imageUrl: localizedCategory.image_url,
       parentId: localizedCategory.parent_id,
       level: localizedCategory.level || 0,
