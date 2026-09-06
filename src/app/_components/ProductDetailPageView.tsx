@@ -333,11 +333,19 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
       const coverUrl = galleryImages[0]
         ? storagePathToUrl(galleryImages[0].path)
         : resolveProductImageUrl(actionProduct)
+      // REC-158 Faz 1 · BEŞİNCİ ARGÜMAN `t` — föy etiketleri vitrinle aynı olsun diye.
+      // Etiketin gerçek kaynağı `specFieldLabel(key, t)` ve o i18n sözlüğünü OKUR.
+      // `t` verilmezse üretici eski `translateSpecKey` yoluna düşer ve föydeki alan adı
+      // vitrinden AYRIŞIR (ölçüldü: föyde "Ip Rating", vitrinde "Koruma Sınıfı (IP)").
+      // `translateSpecKey` yine geçiliyor — kaldırılmadı: `t` sözlükte karşılık
+      // bulamazsa üretici ona düşer, yani yedek yol KORUNUYOR (bkz. specLabel.ts §76).
+      // Bu satır PDP'de görünür hiçbir şeyi değiştirmez; yalnız indirilen föyü düzeltir.
       await generateProductDatasheet(
         actionProduct,
         coverUrl || undefined,
         translateSpecKey,
-        lang
+        lang,
+        t
       )
       toast.success(t('pdp.messages.pdfStarted'))
     } catch (error) {
