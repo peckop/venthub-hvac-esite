@@ -63,6 +63,37 @@ def rest(url: str, basliklar: dict):
         return json.loads(y.read().decode("utf-8"))
 
 
+def kesin_sayi(U: str, h: dict, tablo: str) -> int:
+    """Sunucunun bildirdigi GERCEK satir sayisi (Content-Range) — sayfalamayi dogrulamak icin."""
+    istek = urllib.request.Request(f"{U}/rest/v1/{tablo}?select=id&limit=1",
+                                   headers={**h, "Prefer": "count=exact"})
+    with urllib.request.urlopen(istek) as y:
+        cr = y.headers.get("Content-Range") or ""
+    return int(cr.split("/")[-1]) if "/" in cr and cr.split("/")[-1].isdigit() else -1
+
+
+def tumunu_cek(U: str, h: dict, yol: str, tablo: str):
+    """⭐1000 SATIR TAVANI KORUMASI — olculdu 2026-09-06 (OPS filo notu):
+    PostgREST tek cagrida en cok 1000 satir doner; `limit=2000` yazmak ISE YARAMAZ
+    (olctum: 2000 istedim, 1000 geldi, product_prices'ta 44 satir SESSIZCE dustu).
+    Sessiz oldugu icin en tehlikeli sinif: sayim kucuk cikar, kimse kirmizi gormez.
+    Bu yuzden hem SAYFALANIR hem de sonunda sunucunun KESIN SAYISIYLA karsilastirilir."""
+    top, bas = [], 0
+    while True:
+        parca = rest(f"{U}/rest/v1/{yol}&offset={bas}&limit=1000", h)
+        if not parca:
+            break
+        top += parca
+        if len(parca) < 1000:
+            break
+        bas += 1000
+    kesin = kesin_sayi(U, h, tablo)
+    if kesin >= 0 and len(top) != kesin:
+        raise SystemExit(f"⛔ EKSIK VERI: {tablo} — cekilen {len(top)}, sunucu {kesin}. "
+                         "Olcum GECERSIZ; sayfalama bozuk.")
+    return top
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Fiyatsiz urun ayrimi (REC-168)")
     ap.add_argument("--dizin", default=str(DIZIN_VARSAYILAN))
@@ -79,31 +110,15 @@ def main() -> int:
     h = {"apikey": K, "Authorization": "Bearer " + K}
 
     # --- 1) URUNLER (evren) --------------------------------------------------
-    urunler, bas = [], 0
-    while True:
-        parca = rest(
-            f"{U}/rest/v1/products?select=slug,model_code,name,family_id,deleted_at,status&order=slug"
-            f"&offset={bas}&limit=1000", h)
-        if not parca:
-            break
-        urunler += parca
-        if len(parca) < 1000:
-            break
-        bas += 1000
+    urunler = tumunu_cek(
+        U, h, "products?select=slug,model_code,name,family_id,deleted_at,status&order=slug",
+        "products")
     canli = [u for u in urunler if not u.get("deleted_at")]
 
     # --- 2) FIYATLAR ---------------------------------------------------------
-    fiyatlar, bas = [], 0
-    while True:
-        parca = rest(
-            f"{U}/rest/v1/product_prices?select=product_id,gross_price,net_price,is_active"
-            f"&offset={bas}&limit=1000", h)
-        if not parca:
-            break
-        fiyatlar += parca
-        if len(parca) < 1000:
-            break
-        bas += 1000
+    fiyatlar = tumunu_cek(
+        U, h, "product_prices?select=product_id,gross_price,net_price,is_active",
+        "product_prices")
 
     def poz(x):
         try:
@@ -114,15 +129,7 @@ def main() -> int:
     fiyatli_id = {f["product_id"] for f in fiyatlar if poz(f.get("gross_price")) or poz(f.get("net_price"))}
 
     # products.id lazim — slug->id icin ikinci cekim yerine ilk cekime id ekleyelim
-    kimlikler, bas = [], 0
-    while True:
-        parca = rest(f"{U}/rest/v1/products?select=id,slug&order=slug&offset={bas}&limit=1000", h)
-        if not parca:
-            break
-        kimlikler += parca
-        if len(parca) < 1000:
-            break
-        bas += 1000
+    kimlikler = tumunu_cek(U, h, "products?select=id,slug&order=slug", "products")
     slug_id = {k["slug"]: k["id"] for k in kimlikler}
 
     fiyatsiz = [u for u in canli if slug_id.get(u["slug"]) not in fiyatli_id]
