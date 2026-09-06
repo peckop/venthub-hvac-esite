@@ -69,7 +69,15 @@ def kesin_sayi(U: str, h: dict, tablo: str) -> int:
                                    headers={**h, "Prefer": "count=exact"})
     with urllib.request.urlopen(istek) as y:
         cr = y.headers.get("Content-Range") or ""
-    return int(cr.split("/")[-1]) if "/" in cr and cr.split("/")[-1].isdigit() else -1
+    son = cr.split("/")[-1] if "/" in cr else ""
+    if not son.isdigit():
+        # ⛔FAIL-CLOSED: kesin sayi ALINAMADIYSA denetim ATLANMAZ, olcum GECERSIZ sayilir.
+        # Ilk halim -1 dondurup denetimi sessizce atliyordu — yani kapi, en cok ihtiyac
+        # duyuldugu anda (sayim guvenilmezken) kendini KAPATIYORDU. Fail-open kapi,
+        # kapi degildir. (ALTYAPI ayni tuzagi supabase-js tarafinda olctu, 2026-09-06.)
+        raise SystemExit(f"⛔ OLCUM GUVENILIR DEGIL: {tablo} icin kesin sayi alinamadi "
+                         f"(Content-Range: {cr!r}). Rapor uretilmedi.")
+    return int(son)
 
 
 def tumunu_cek(U: str, h: dict, yol: str, tablo: str):
@@ -78,8 +86,16 @@ def tumunu_cek(U: str, h: dict, yol: str, tablo: str):
     (olctum: 2000 istedim, 1000 geldi, product_prices'ta 44 satir SESSIZCE dustu).
     Sessiz oldugu icin en tehlikeli sinif: sayim kucuk cikar, kimse kirmizi gormez.
     Bu yuzden hem SAYFALANIR hem de sonunda sunucunun KESIN SAYISIYLA karsilastirilir."""
-    top, bas = [], 0
+    # Kesin sayi ONCE alinir: hem dongu tavani olur hem de sonda karsilastirilir.
+    # (ALTYAPI olctu: tavansiz dongu sabotaj taklidinde SONSUZ dongune girip bellegi doldurdu.)
+    kesin = kesin_sayi(U, h, tablo)
+    tur_tavani = kesin // 1000 + 2
+    top, bas, tur = [], 0, 0
     while True:
+        tur += 1
+        if tur > tur_tavani:
+            raise SystemExit(f"⛔ DONGU TAVANI asildi: {tablo} — {tur} tur, beklenen en cok "
+                             f"{tur_tavani}. Sayfalama bozuk; rapor uretilmedi.")
         parca = rest(f"{U}/rest/v1/{yol}&offset={bas}&limit=1000", h)
         if not parca:
             break
@@ -87,8 +103,7 @@ def tumunu_cek(U: str, h: dict, yol: str, tablo: str):
         if len(parca) < 1000:
             break
         bas += 1000
-    kesin = kesin_sayi(U, h, tablo)
-    if kesin >= 0 and len(top) != kesin:
+    if len(top) != kesin:
         raise SystemExit(f"⛔ EKSIK VERI: {tablo} — cekilen {len(top)}, sunucu {kesin}. "
                          "Olcum GECERSIZ; sayfalama bozuk.")
     return top
