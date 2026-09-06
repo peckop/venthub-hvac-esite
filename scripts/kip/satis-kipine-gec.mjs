@@ -61,55 +61,87 @@ function hata(mesaj) {
   process.exit(1)
 }
 
-if (!DOGRULA && !GERI_AL && YON !== 'ac' && YON !== 'kapat') {
-  hata("--yon ac | --yon kapat zorunlu (ya da --dogrula / --geri-al <dosya>). Yön verilmeden hiçbir şey planlanmaz.")
+// Argüman/env/yedek-dizini kontrolleri IMPORT ANINDA DEĞİL, main() içinde koşar: kapı (INV-SATIS-KIPI-4)
+// bu modülü import edip olc/hepsiniCek'i sahte istemciyle çağırır; import anında process.exit olsaydı
+// hiçbir test yazılamazdı (ilk sürümde öyleydi — ölçüldü, düzeltildi).
+function argumanlariDogrula() {
+  if (!DOGRULA && !GERI_AL && YON !== 'ac' && YON !== 'kapat') {
+    hata("--yon ac | --yon kapat zorunlu (ya da --dogrula / --geri-al <dosya>). Yön verilmeden hiçbir şey planlanmaz.")
+  }
+  if (UYGULA && !ONAY) {
+    hata('--uygula için --onay "<kim, tarih>" zorunlu. Canlı yazım Recep kapısıdır; onay metni rapora ve DB satırına damgalanır.')
+  }
+  if (GERI_AL && !existsSync(GERI_AL)) hata('geri alma dosyası yok: ' + GERI_AL)
 }
-if (UYGULA && !ONAY) {
-  hata('--uygula için --onay "<kim, tarih>" zorunlu. Canlı yazım Recep kapısıdır; onay metni rapora ve DB satırına damgalanır.')
-}
-if (GERI_AL && !existsSync(GERI_AL)) hata('geri alma dosyası yok: ' + GERI_AL)
 
 // ---------- env ----------
 // .env sırası: VENTHUB_ENV_PATH → repo kökü → ev dizinindeki ana çalışma ağacı (worktree'lerde .env yok).
-// Sabit kullanıcı yolu YOK (REC-102; repo public, homedir() aynı yolu çözer).
-const ENV_PATH =
-  process.env.VENTHUB_ENV_PATH ??
-  (existsSync(join(REPO, '.env')) ? join(REPO, '.env') : join(homedir(), 'venthub-hvac', '.env'))
-if (!existsSync(ENV_PATH)) hata('.env bulunamadı: ' + ENV_PATH + ' (VENTHUB_ENV_PATH ile ver)')
-const env = Object.fromEntries(
-  readFileSync(ENV_PATH, 'utf8')
-    .split(/\r?\n/)
-    .filter((l) => l.includes('=') && !l.startsWith('#'))
-    .map((l) => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()])
-)
-const SUPABASE_URL = env.SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL
-const SERVICE_KEY = env.SUPABASE_SERVICE_ROLE_KEY
-if (!SUPABASE_URL || !SERVICE_KEY) hata('.env içinde SUPABASE_URL/NEXT_PUBLIC_SUPABASE_URL ve SUPABASE_SERVICE_ROLE_KEY gerekli (değerler basılmaz)')
+// Sabit kullanıcı yolu YOK (REC-102; repo public, homedir() aynı yolu çözer). Değerler hiçbir yere basılmaz.
+function envYukle() {
+  const ENV_PATH =
+    process.env.VENTHUB_ENV_PATH ??
+    (existsSync(join(REPO, '.env')) ? join(REPO, '.env') : join(homedir(), 'venthub-hvac', '.env'))
+  if (!existsSync(ENV_PATH)) hata('.env bulunamadı: ' + ENV_PATH + ' (VENTHUB_ENV_PATH ile ver)')
+  const env = Object.fromEntries(
+    readFileSync(ENV_PATH, 'utf8')
+      .split(/\r?\n/)
+      .filter((l) => l.includes('=') && !l.startsWith('#'))
+      .map((l) => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()])
+  )
+  const url = env.SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL
+  const key = env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) hata('.env içinde SUPABASE_URL/NEXT_PUBLIC_SUPABASE_URL ve SUPABASE_SERVICE_ROLE_KEY gerekli (değerler basılmaz)')
+  return { url, key }
+}
 
-// Kapı (INV-SATIS-KIPI-4) istemciyi enjekte edebilsin diye tek fabrika. Değer hiçbir yere basılmaz.
+// Kapı (INV-SATIS-KIPI-4) istemciyi enjekte edebilsin diye tek fabrika.
 export function istemciKur() {
-  return createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } })
+  const { url, key } = envYukle()
+  return createClient(url, key, { auth: { persistSession: false } })
 }
 
 // ---------- yedek dizini (repo DIŞI) ----------
-const YEDEK_DIR = process.env.VENTHUB_KIP_YEDEK_DIR ?? join(homedir(), 'venthub-hvac-kip-yedek')
-mkdirSync(YEDEK_DIR, { recursive: true })
+function yedekDizini() {
+  const d = process.env.VENTHUB_KIP_YEDEK_DIR ?? join(homedir(), 'venthub-hvac-kip-yedek')
+  mkdirSync(d, { recursive: true })
+  return d
+}
 const DAMGA = new Date().toISOString().replace(/[:.]/g, '-')
 
 // ---------- ölçüm ----------
 /**
- * Tabloyu SAYFALAYARAK tamamen çeker. supabase-js varsayılan olarak 1000 satır döndürür ve
- * fazlasını SESSİZCE keser — ilk kuru koşumda (2026-09-06) 1044 fiyat satırının 44'ü düştü, 14 ürün
- * "fiyatsız" sayıldı (334/41 yerine 348/27). Ölçüt doğruydu, evren eksikti; bu yardımcı o yüzden var.
+ * Tabloyu SAYFALAYARAK tamamen çeker ve ÇEKTİĞİNİ SUNUCUNUN KESİN SAYISIYLA DOĞRULAR.
+ *
+ * NİÇİN: supabase-js/PostgREST tek çağrıda EN ÇOK 1000 satır döndürür ve fazlasını SESSİZCE keser;
+ * `limit=2000` yazmak da işe yaramaz (Katalog ölçtü, 2026-09-06). İlk kuru koşumda 1044 fiyat satırının
+ * 44'ü düştü, 14 ürün "fiyatsız" sayıldı (334/41 yerine 348/27). Ölçüt doğruydu, evren eksikti.
+ *
+ * NİÇİN SAYFALAMAK YETMEZ (Katalog reçetesi): sayfalamanın DOĞRU çalıştığı da ölçülmeli — döngü bittikten
+ * sonra aynı filtrelerle `count=exact` (HEAD) istenir; çekilen ≠ kesin ise KIRMIZI ve ÇIK, rapor ÜRETME.
+ * Sessiz olduğu için en tehlikeli sınıf: sayım küçük çıkar, hiçbir kapı kırmızı vermez.
  * `kur` her sayfada YENİ sorgu üretir (PostgREST builder tek kullanımlık).
  */
-async function hepsiniCek(ad, kur, sayfa = 1000) {
+/**
+ * `kur(secenek)`: AYNI filtrelerle sorgu üretir; `secenek` `.select()`'in ikinci argümanına geçer.
+ * Kesin sayı için `{ count: 'exact', head: true }` ile çağrılır — filtreler TEK yerde tanımlıdır.
+ * (İlk sürüm sayıyı filtre zincirinin SONUNA `.select()` ekleyerek istiyordu; supabase-js o seçeneği
+ * yutuyor, Content-Range gelmiyor → "her zaman kırmızı", ayırt etmiyor. Ölçüldü, düzeltildi.)
+ * Sayı ÖNCE alınır: döngü ona kadar koşar; boş sayfa gelirse durur → uyuşmazlık KIRMIZI. Döngü sınırsız değil
+ * (ilk sabotaj taklidi sonsuz döngüye girip belleği doldurdu — tavan bu yüzden var).
+ */
+export async function hepsiniCek(ad, kur, sayfa = 1000) {
+  const { count, error: sayimHatasi } = await kur({ count: 'exact', head: true })
+  if (sayimHatasi) throw new Error(ad + ' kesin sayı alınamadı: ' + sayimHatasi.message)
+  if (typeof count !== 'number') throw new Error(ad + ' kesin sayı gelmedi (Content-Range yok) — ölçüm GÜVENİLİR DEĞİL')
   const hepsi = []
-  for (let baslangic = 0; ; baslangic += sayfa) {
+  for (let baslangic = 0; hepsi.length < count; baslangic += sayfa) {
     const { data, error } = await kur().range(baslangic, baslangic + sayfa - 1)
     if (error) throw new Error(ad + ' okunamadı: ' + error.message)
-    hepsi.push(...(data ?? []))
-    if (!data || data.length < sayfa) break
+    if (!data || data.length === 0) break // sunucu daha fazla vermiyor → aşağıda uyuşmazlık yakalanır
+    hepsi.push(...data)
+  }
+  if (count !== hepsi.length) {
+    throw new Error(`⛔ EKSİK VERİ: ${ad} — çekilen ${hepsi.length}, sunucu ${count}. Rapor üretilmedi.`)
   }
   return hepsi
 }
@@ -120,11 +152,11 @@ async function hepsiniCek(ad, kur, sayfa = 1000) {
  */
 export async function olc(sb) {
   const [kategoriler, ayar, urunler, fiyatlar, aileler] = await Promise.all([
-    hepsiniCek('categories', () => sb.from('categories').select('id, slug, is_active, metadata').order('slug')),
+    hepsiniCek('categories', (o) => sb.from('categories').select('id, slug, is_active, metadata', o).order('slug')),
     sb.from('site_settings').select('id, key, value, updated_at').eq('key', ANAHTAR_KEY).maybeSingle(),
-    hepsiniCek('products', () => sb.from('products').select('id, family_id').is('deleted_at', null).order('id')),
-    hepsiniCek('product_prices', () => sb.from('product_prices').select('product_id, is_active, gross_price, net_price').eq('is_active', true).order('id')),
-    hepsiniCek('product_families', () => sb.from('product_families').select('id, slug').order('id')),
+    hepsiniCek('products', (o) => sb.from('products').select('id, family_id', o).is('deleted_at', null).order('id')),
+    hepsiniCek('product_prices', (o) => sb.from('product_prices').select('product_id, is_active, gross_price, net_price', o).eq('is_active', true).order('id')),
+    hepsiniCek('product_families', (o) => sb.from('product_families').select('id, slug', o).order('id')),
   ])
   if (ayar.error) throw new Error('site_settings okunamadı: ' + ayar.error.message)
   const fiyatliUrunIdleri = new Set(
@@ -199,7 +231,7 @@ function planla(d, yon) {
 
 // ---------- yedek ----------
 function yedekYaz(d, etiket) {
-  const yol = join(YEDEK_DIR, `${DAMGA}-${etiket}.json`)
+  const yol = join(yedekDizini(), `${DAMGA}-${etiket}.json`)
   const icerik = {
     damga: d.damga,
     etiket,
@@ -238,6 +270,7 @@ async function anahtariYaz(sb, d, acik, onay, kaynak) {
 function yaz(s) { process.stdout.write(s + '\n') }
 
 async function main() {
+  argumanlariDogrula()
   const sb = istemciKur()
   const once = await olc(sb)
   const kip = UYGULA ? 'UYGULA' : 'KURU KOŞUM'
@@ -291,7 +324,7 @@ async function main() {
   if (!UYGULA) {
     yaz('')
     yaz('KURU KOŞUM — canlıya HİÇBİR ŞEY yazılmadı. Uygulamak için: --uygula --onay "<kim, tarih>"')
-    writeFileSync(join(YEDEK_DIR, `rapor-${DAMGA}-kuru.json`), JSON.stringify(rapor, null, 2))
+    writeFileSync(join(yedekDizini(), `rapor-${DAMGA}-kuru.json`), JSON.stringify(rapor, null, 2))
     return
   }
 
@@ -308,7 +341,7 @@ async function main() {
   yaz(`fiyat görünür ürün (veri): ${sonra.anahtar.acik ? sonra.urun.fiyatli : 0} / ${sonra.urun.toplam} — canlı sayfa ölçümü ayrı (K8 prova, son READY master SHA ile)`)
   rapor.sonra = { ...sonra, _kategoriler: undefined }
   rapor.tutarli = t1.tutarli
-  writeFileSync(join(YEDEK_DIR, `rapor-${DAMGA}-uygula.json`), JSON.stringify(rapor, null, 2))
+  writeFileSync(join(yedekDizini(), `rapor-${DAMGA}-uygula.json`), JSON.stringify(rapor, null, 2))
   process.exit(t1.tutarli ? 0 : 2)
 }
 
