@@ -50,3 +50,18 @@ Depoda 2045 `.md`: **427 kapsanan / 1618 kapsanmayan**. Kapsanmayanın sınıfı
 **Çelişki bulundu ve düzeltildi:** `docs/plans/README.md` "NLM ikizine yalnız CANLI/REFERANS gider" derken manifest demet 03 klasörün tamamını yüklüyordu → iki defter iki kapsam olarak netleştirildi (kod hafızası ikizi vs. takip defteri). Cetvel §10 (temizlik kuralı) yazıldı.
 
 — OPS · 2026-09-06 (kaynak: defter cevabı, konuşma 584506ca; kapsam denetimi alt ajan raporu)
+
+## 7 · İkinci tarama (2026-09-06 13:05Z, Recep: "mükerrerlik/çelişki/tutarsızlık, dosyaları güncelle") — 4 soru, 32 madde; OPS her maddeyi kodda/dosyada ÖLÇTÜ
+
+Sorgu betiği `scratchpad/defter_celiski_sorgu.py` (4 soru: günün özeti · çelişki · mükerrer · tutarsızlık). Sınıflandırma:
+
+| Sınıf | Adet | Ne | Eylem |
+|---|---:|---|---|
+| **Gerçek, düzeltildi (bu PR)** | 2 | `linear/kararlar-vitrin-15a-2026-09-04.md` ikinci kopya (kaynak_updatedAt 09-05, 28 başlık; 09-06 kopyası 52 başlık) — §10.2 tek kopya ihlali · defter kopyaları bayat (work-tracking [ESKİ] başlıkları, quote-standard REC-117 notu, K37-c/K38 — hepsi #1059'la master'da, defter esitle koşmamıştı) | dosya SİLİNDİ · `esitle` koştu |
+| **Gerçek, sahibine** | 2 | REC-52 whsec rotasyonu: registry arşivi `kayitlar_master` "YAPILMIŞ" der, Linear **In Progress** (kanonik Linear; registry donmuş — kural var, eylem yok) · Katalog ölçüm belgelerinde varsayım→ölçüm çiftleri etiketsiz (AD 2000 debi 2.700/3.600 · CA hız kademesi · HF/FW tahrik · V0 gövde) | Katalog: §10.9(a) [ÇÜRÜDÜ] etiketi, kendi PR'ında |
+| **Belge içi tarihçe (çelişki değil)** | 9 | checkout başlık bloğu "beklemede" (satır 174 zaten düzeltmeyi anlatıyor) · quote Ç10/Ç11 (belgenin kendi çelişki tablosu, v2'de çözülmüş) · DURUM-TAKIP 06-19 moderator satırları · vortice MEV PDF · FC-51/FC-101 · Danfoss · çağrı sayısı 7/3/5→1 · pano kimlik doğrulama (08-24 test) | §10.9 kuralı yazıldı; belgelere dokunulmadı |
+| **ÇÜRÜDÜ (defter yanıldı)** | 2 | "CategoryShowcase ölü kod" — `CategoryShowcaseView.tsx` ve `CategoryMasterView.tsx` import ediyor (grep 7 dosya) · "design/menu/kararlar-*.md kopyaları" — dosya sisteminde YOK (find: yalnız linear/ altında 4), defter hijyen raporundaki anmayı kaynak sandı (§10.9(c)) | yok |
+| **Kanonik açıklaması (sorun değil)** | 8 | Linear canlı belge > repo aynası · CLAUDE.md > CONTEXT.md · tokens.js/index.css SSOT · pano anlık / Linear kalıcı · csv-standard ana depo · SaaS planları git | yok |
+| **Günün özeti** | — | K7.10 · K17/K17-a/K17-b · K18/K37 · K24 · K25/K25-b · K28 · K30 · K35 eki doğru; **K37-b/K37-c/K38 YOK** (esitle öncesi bayatlık, beklenen) | esitle sonrası yeniden sorulur |
+
+**Ders:** "çelişki" sorusu belge tarihçesini yakalıyor; kaynak ayrımı sorguya yazılmalı (§10.9(b)). Defterin 32 maddesinden **4'ü** iş doğurdu; ölçülmeden hiçbiri işe dönüşmedi.

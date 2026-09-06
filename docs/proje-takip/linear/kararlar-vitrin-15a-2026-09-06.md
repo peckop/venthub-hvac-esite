@@ -1,6 +1,6 @@
-# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-06 ayna: K1–K37-a)
+# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-06 ayna: K1–K38)
 
-<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-06T11:11:45.078Z · kopya: 2026-09-06T11:20Z -->
+<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-06T13:14:17.228Z · kopya: 2026-09-06T13:19Z -->
 <!-- Dosya adındaki 2026-09-04 ilk dışa aktarım günüdür, kopyanın tarihi DEĞİLDİR; tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -308,3 +308,20 @@ Recep: "statik istemiyorum, dinamik istiyorum ki doğru şekilde analiz edebiley
 ### K37-a · Recep'in UI iyileştirmeleri (2026-09-06, Recep → Menü; kayda OPS aldı)
 
 **U1** Ekran 11 karşılaştırma "farkı göster": aynı satırlar katlanır, seçili model sabitlenir. **U2** Bilgi Merkezi (ekran 14) iç tasarımı: içindekiler · arama · ilgili makale · ürün bağı. **U3** Ekran 58 panel mi kalıcı sütun mu: Menü iki hâli tek karede önerir, karar Recep'in (yapısal, tek başına sorulur). Hepsi Menü #10 paketinde, prototipten sonra aynı sohbette. Emir #8 (yetenek envanteri) KAPANDI: `kabuk-v2-notlar.md` "Yetenekler" 19/0.
+
+### K37-c uygulama notu · Kip anahtarı teslim edildi (2026-09-06, Menü; OPS ölçtü ve KABUL)
+
+Menü `emir-10-notlar.md` "Kip anahtarı gerçekten döndü": kabuk tek kaynaktan (`kipSayacAdi` · `kipSekmeAdi`) — header sayacı 28 bant, alt çubuk sekmesi 34 çerçeve; eylem sözlüğü kare kare sınıflandırıldı — kart eylemi 35 · PDP kiremit 11 · PDP çerçeveli 16 · liste ana eylemi 6. DOM ölçümü (kip=Satış): header Teklif 31→3, Sepet 8→36; "Sepete ekle" 3→49, "Teklif listesine ekle" 57→6. Teklif karelerinde ₺ **0** (33 ₺ yalnız S1–S6 · M6 · ekran 13 sağ yarı). Dönmeyen yerler gerekçeli: ekran 10 ve M-serisi "Teklif Listesi" başlıkları sayfa adıdır (satış karşılığı S1/M6 ayrı kare); ekran 13 ve S1–S6 kipin belgesidir, çıktısı değil. "ARŞİV" kalıntısı 0. Emir #12 madde 2 KAPANDI; sıra prototip yeniden (kare 13 kalıbı).
+
+### K38 · Satış kipi kimlik hükmü (2026-09-06, DESIGN-MARKA sorusu "m"; OPS hükmü — ticari kısım K1a ile verili, Recep beklenmez)
+
+Marka: satış kipi K5 (tek kiremit, fiil "Teklif iste") ve K7 (fiyat/stok/sepet yok) ile çarpışıyor, dört kimlik sorusu. Ticari cevap zaten K1a'da (satış kipi "kapalı bekler", kodda `NEXT_PUBLIC_ODEME_ACIK`); Recep bugün Menü'ye "artık teklif de istenebilir sepete de eklenebilir" dedi. Hüküm:
+
+1. **Kiremit → satış kipinde `Sepete ekle`;** `Teklif iste` çerçeveli. Teklif kipinde bugünkü hâl. (Marka önerisi = Menü v17 uygulaması, 11 + 16 yer.)
+2. **Fiil ailesi = KOD SÖZLÜĞÜ (kural 7, `tr.ts` SSOT):** satır eylemi **"Sepete Ekle"**, listeyi/paneli bitiren eylem **"Ödemeye Geç"** (`cart.checkout`, `checkout.proceedPayment`). **"Siparişi tamamla" / "Satın al" / "Sipariş ver" AÇILMAZ** (sözlükte yok; ikinci yazım yasağı Marka'nın kendi ilkesi). Menü'nün seçimi sözlükle aynı.
+3. **Fiyat tipografisi:** IBM Plex Mono `tabular-nums`, `--text-strong`, para birimi aynı boy; indirim/kırmızı rozet yok; yeni renk yok. Fiyat DEĞERİ ve biçimi `src/lib/pricing`'in; Marka yalnız tipografiyi yazar.
+4. **Stok:** K30 rozet sınıfları ("stokta" nesnel · "tedarik süreli" soluk); yeşil/kırmızı stok noktası açılmaz (K31).
+
+Marka'dan: K5'e "satış kipi eki" + kılavuza tek kart; ölçüm: yeni hex 0 · "Siparişi tamamla" 0 · fiil yazımı sözlükle eşit. Emir: `ops-cevap-2026-09-06-marka-m.md` (Marka projesi).
+
+**K38 uygulandı (DESIGN-MARKA notu "n", 2026-09-06; OPS KABUL):** K5 eki + kılavuz F9 yazıldı; ölçüm: yeni hex 0 · yeni token 0 · "Siparişi tamamla" 0 (yalnız yasak listesinde) · fiil sözcükleri sözlükle eşit. **Harf düzeni notu:** kılavuz kuralı büyük harfi yalnız etiket/rozete verir → düğme etiketi cümle düzeni ("Sepete ekle" · "Ödemeye geç"); sözlük bugün başlık düzeninde ("Sepete Ekle" · "Ödemeye Geç"). Kabuk kodlanırken (Faz 2, URUN) sözlük değerleri kılavuz düzenine çevrilir; sözcük değişmez, ikinci fiil doğmaz. Marka'da açık kalem yok.
