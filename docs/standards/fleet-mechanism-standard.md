@@ -1326,6 +1326,29 @@ sürecinden.** Betik kırmızıda stderr'e de yazar (`| tail` kırpsa bile gör�
 merge etmez. Kural insana değil komuta gömülü (§28 ile aynı ilke); pipe'ın arkasına konan hiçbir kapı
 kapı değildir — `set -o pipefail` bile `&&`'yi kurtarmaz, çünkü karar veren betik değil zincirdir.
 
+**⭐20.1-b MIGRATION'LI PR YALNIZ `--onay` İLE, ve metin RECEP'İN KENDİ SÖZÜ (2026-09-06, REC-156/#1032).**
+Kural 13 kalkmıyor: migration'lı merge kararı **Recep'indir**. Ölçülmüş vaka aynı gün: Recep *"sen merge
+et"* dedi, ritüel madde 5'te KIRMIZI verdi, ve iş **istisnayla `gh pr merge`** ile indi — yani 20.1-a'nın
+kapattığı yol, onay yüzünden yeniden açıldı. Sözlü onay ile betiğin ölçütü arasında köprü olmayınca,
+köprüyü **kapıyı dolanmak** kurdu. Hüküm:
+
+> `--onay="<Recep'in sözü · yer · tarih>"` — migration'lı PR'da **madde 5'i açan tek yol**.
+> Metin asgari **20 karakter** (kim · nerede · ne zaman), `--merge` ile birlikte verilirse
+> **merge'den ÖNCE** PR'a yorum olarak yazılır: kanıt PR'da kalır, transkriptte değil.
+
+Dört sınır adıyla yazılıdır, çünkü bir kapıyı açan bayrak, kapının kendisi kadar ölçülür:
+1. ⛔**Diğer dört madde kırmızıysa `--onay` hiçbir şeyi açmaz** — kapsamı madde 5'tir, "merge" değil.
+2. ⛔**Ölçülemeyen onaylanamaz:** migration diff'i okunamıyorsa onay kapıyı AÇMAZ. Onay *"n migration'ı
+   biliyorum ve kabul ediyorum"* demektir; **n bilinmiyorken** verilen onay neyin onayı olduğunu söylemez.
+3. **İçeriksiz onay reddedilir** (`ok`, `evet`): eşik metnin doğruluğunu ölçmez — ölçemez — yalnız
+   refleks-onayı pahalılaştırır. *Yazmak zorunda kalan, ne yazdığına bakar.*
+4. **Migration yokken verilen onay uyarılır** (gereksiz), sessizce yutulmaz: gereksiz onay, bir sonraki
+   migration'lı PR'da refleks olacak alışkanlığın ilk adımıdır.
+
+Kapı: `merge-ritueli.test.ts` — yedi kol, ikisi ayırt edici çift (onaylı YEŞİL ↔ onaysız KIRMIZI).
+Sabotaj iki turda ölçüldü: eşik 20→1 yapılınca **yalnız** "kısa onay reddedilir" kolu düştü; onay tüm
+kırmızıları ezecek şekilde sızdırılınca **yalnız** "onay başka maddeyi açmaz" kolu düştü.
+
 **Beklenen kapı kümesi ELLE YAZILMAZ, TÜRETİLİR — ama naif türetme çalışmaz.**
 Ölçüldü (2026-09-04): `pull_request` tetikli **9** workflow'da **18** job var, PR #965'te
 gerçekten doğan kapı **9** (ikisi Vercel). "Tüm job'ları bekle" demek her koşuda **yanlış

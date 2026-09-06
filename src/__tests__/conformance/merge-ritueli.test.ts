@@ -29,7 +29,10 @@ const ritual = require_(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs')
     uzakSha: string | null
     migrationlar: string[] | null
     mergeCommitSha: string | null
+    onay?: string | null
   }) => { maddeler: Array<{ no: number; ad: string; gecti: boolean; detay: string }>; kirmizi: number }
+  onayGecerli: (ham: unknown) => { gecerli: boolean; sebep: string; metin: string }
+  ONAY_ASGARI: number
 }
 
 /** Geçici workflow dizini kuran fikstür — durumu VARSAYMAZ, ÜRETİR. */
@@ -245,5 +248,84 @@ describe('INV-RITUEL-1 · beş madde AYIRT EDER (her kol bir sahte-yeşili kapat
   it('migration diff\'i okunamazsa madde 5 KIRMIZI (0 sanılmaz)', () => {
     const s = ritual.degerlendir(tamGirdi({ migrationlar: null }))
     expect(madde(s, 5).gecti, 'okunamayan migration diff\'i "0 migration" sayıldı').toBe(false)
+  })
+})
+
+/**
+ * `--onay` — migration'lı PR'da madde 5'i açan TEK yol (2026-09-06, REC-156/#1032).
+ *
+ * NİÇİN VAR: kural 13 (merge = prod'a otomatik uygulama) kalkmıyor; kapı hâlâ Recep'te.
+ * Değişen şey, onayın AĞIZDAN değil YAZIDAN geçmesi ve PR'da KALMASI. Bu bayrak olmadan
+ * onay veren bir söz, betiği kırmızı bulup `gh pr merge` ile kapıyı DOLANMAYA itiyordu —
+ * ölçülmüş vaka, aynı gün.
+ *
+ * ⭐Kolların hepsi tek soruyu ayırt eder: bayrak neyi AÇAR, neyi AÇMAZ?
+ */
+const MIGRATION_VAR = ['supabase/migrations/20260906120000_x.sql']
+const ONAY_GERCEK = "Recep, kendi penceresinde: '1032 icin merge et' · 2026-09-06"
+
+describe('INV-RITUEL-1 · --onay YALNIZ madde 5\'i ve YALNIZ kanıtlıysa açar', () => {
+  it('⭐onaylı migration → madde 5 YEŞİL ve başlık onayı ADIYLA söyler', () => {
+    const s = ritual.degerlendir(tamGirdi({ migrationlar: MIGRATION_VAR, onay: ONAY_GERCEK }))
+    expect(madde(s, 5).gecti, 'geçerli Recep onayı verildiği hâlde migration kapısı açılmadı').toBe(true)
+    expect(madde(s, 5).ad, 'onay açtı ama rapor bunu SÖYLEMİYOR — okuyan "migration 0" sanır').toMatch(/RECEP ONAYI KANITLI/)
+    expect(madde(s, 5).detay, 'onay metni rapora girmemiş; kanıt kayboldu').toContain('1032')
+    expect(s.kirmizi).toBe(0)
+  })
+
+  it('⭐AYIRT EDİCİ ÇİFT: aynı girdi onaysız → madde 5 KIRMIZI', () => {
+    const s = ritual.degerlendir(tamGirdi({ migrationlar: MIGRATION_VAR }))
+    expect(madde(s, 5).gecti, 'onaysız migration self-merge\'e serbest bırakıldı').toBe(false)
+    expect(madde(s, 5).detay).toMatch(/RECEP KAPISI/)
+  })
+
+  it('⭐KISA onay REDDEDİLİR: bayrak var diye kapı açılmaz (onay KANIT olmalı)', () => {
+    for (const kisa of ['ok', 'evet', 'Recep onayladi']) {
+      const s = ritual.degerlendir(tamGirdi({ migrationlar: MIGRATION_VAR, onay: kisa }))
+      expect(madde(s, 5).gecti, `"${kisa}" gibi içeriksiz bir dize migration kapısını açtı`).toBe(false)
+      expect(madde(s, 5).detay, 'onay reddedildi ama SEBEBİ yazılmamış').toMatch(/--onay REDDEDILDI/)
+    }
+    expect(ritual.onayGecerli('evet').gecerli).toBe(false)
+    expect(ritual.onayGecerli(ONAY_GERCEK).gecerli).toBe(true)
+  })
+
+  it('⭐BOŞ onay, onay DEĞİLDİR (boş dize "verildi" sayılmaz)', () => {
+    const s = ritual.degerlendir(tamGirdi({ migrationlar: MIGRATION_VAR, onay: '   ' }))
+    expect(madde(s, 5).gecti).toBe(false)
+    expect(ritual.onayGecerli('   ').sebep).toMatch(/BOS/)
+  })
+
+  it('⭐ÖLÇEMEMEK ONAYLANAMAZ: migration diff\'i okunamazken onay madde 5\'i AÇMAZ', () => {
+    const s = ritual.degerlendir(tamGirdi({ migrationlar: null, onay: ONAY_GERCEK }))
+    expect(
+      madde(s, 5).gecti,
+      'kaç migration olduğu bilinmiyorken verilen onay kapıyı açtı — onay NEYİN onayı belirsiz',
+    ).toBe(false)
+    expect(madde(s, 5).detay).toMatch(/SAYI BILINMEDEN/)
+  })
+
+  it('⭐ONAY BAŞKA MADDEYİ AÇMAZ: dört madde kırmızıyken onay hiçbir şeyi kurtarmaz', () => {
+    const s = ritual.degerlendir(tamGirdi({
+      pv: { ...PV_IYI, mergeStateStatus: 'DIRTY' },
+      kapilar: [{ name: 'ci', bucket: 'fail' }],
+      cekirdek: ['ci', 'admin-smoke'],
+      uzakSha: 'BASKA',
+      migrationlar: MIGRATION_VAR,
+      onay: ONAY_GERCEK,
+    }))
+    expect(madde(s, 5).gecti, 'madde 5 onayla açıldı — beklenen').toBe(true)
+    expect(
+      s.kirmizi,
+      'onay bayrağı madde 5 dışındaki maddeleri de yeşile çevirdi — kapı bayrakla dolanılabilir hâle geldi',
+    ).toBeGreaterThan(0)
+    for (const no of [1, 2, 3, 4]) {
+      expect(madde(s, no).gecti, `madde ${no} --onay ile açıldı; onayın kapsamı madde 5'tir`).toBe(false)
+    }
+  })
+
+  it('migration YOKKEN onay: kapı zaten açık ama SESSİZ geçmez (gereksiz onay uyarılır)', () => {
+    const s = ritual.degerlendir(tamGirdi({ onay: ONAY_GERCEK }))
+    expect(madde(s, 5).gecti).toBe(true)
+    expect(madde(s, 5).detay, 'gereksiz onay sessizce yutuldu — bir sonraki sefer refleks olur').toMatch(/GEREKSIZ/)
   })
 })
