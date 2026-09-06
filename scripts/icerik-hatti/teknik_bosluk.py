@@ -269,10 +269,33 @@ def main() -> int:
     ç.append("Yoksul ailelerin **model kodları**. Arama bunlarla başlar; kod üreticinin "
              "kendi kataloğunda birebir geçer ve marka adıyla arama yapmaktan çok daha kesindir.")
     ç.append("")
-    ç.append("⚠**Marka sitesi adayı YAZMIYORUM.** Doğrulamadığım bir adresi rapora koymak, "
+    ç.append("⚠**Marka sitesi adayı UYDURMUYORUM.** Doğrulamadığım bir adresi rapora koymak, "
              "bütün bu hattın kurulma sebebine aykırı olurdu: uydurulmuş bir kaynak, "
              "kaynaksızlıktan daha tehlikelidir çünkü kanıtlıymış gibi görünür. "
-             "Resmî kaynağı FAZ 2 ajanı **ölçerek** bulur ve URL'yi alıntıyla birlikte getirir.")
+             "Aşağıdaki yönlendirme **ölçülmüş** kayıtlardan geliyor ve her satır kaynağını "
+             "ve sınırını taşıyor.")
+    ç.append("")
+    ç.append("### 6.0 · Kaynak yönlendirmesi — üç marka, üç farklı yol")
+    ç.append("")
+    ç.append("ÜRÜN şeridinin **2026-08-21 tarihli ölçülmüş marka-kaynak haritası** "
+             "(`brand-image-sources.md`) planımdaki bir varsayımı çürüttü; kendi kayıtlarımızla "
+             "doğruladım (`catalog-ingestion-standard.md` satır 94: *\"avens/ — AVenS kendi "
+             "üretimi\"*; K7.10'da iki AVenS ailesi zaten Recep'ten föy bekliyordu).")
+    ç.append("")
+    ç.append("| Marka | Ürün | Kaynak nerede | Kim getirir | Bilinen tuzak |")
+    ç.append("|---|---|---|---|---|")
+    ç.append("| **AVenS** | 34 | **Web'de YOK** — bizim markamız; kaynak Recep'in arşivi/föyleri | **Recep** | ajanı web'e gönderirsen 34 üründe sıfır sonuç alır ve bunu \"bulunamadı\" diye raporlar — oysa aranacak yer yok |")
+    ç.append("| **Nicotra Gebhardt** | 35 | `avensair.com/nicotra-gebhardt` (ÜRÜN 08-21: 28/35 eşleşti); resmî site yalnız AT serisi | FAZ 2 ajanı (ya da Recep'in katalog PDF'i varsa o, daha iyi) | **koda değil MODEL TANIMLAYICIYA** eşle — sipariş kodu iki kaynakta farklı yazılıyor, 7 ürün kodla düştü; site araması sorgu başına sonuç sınırlıyor (1000 satır tavanının web kardeşi) |")
+    ç.append("| **Danfoss** | 2 | `danfoss.com` FC-51 sayfası (ÜRÜN 08-21) | FAZ 2 ajanı | — |")
+    ç.append("")
+    ç.append("**Sınır (ÜRÜN'ün kendi ifadesiyle):** bu harita **görsel** kaynağı için çıkarıldı, "
+             "teknik özellik için değil; bir sayfanın görseli taşıması teknik tabloyu da "
+             "taşıdığını kanıtlamaz; ölçüm 16 gün önce. Yani \"kaynak listesi\" değil, "
+             "**\"aranacak yer + bilinen tuzaklar\"**.")
+    ç.append("")
+    ç.append("**Bunun karar için anlamı:** 71 ürünün **34'ü (yaklaşık yarısı) web fazına hiç "
+             "girmez.** O 34 için tek yol Recep'in AVenS föylerini teslim etmesi. FAZ 2 ajan "
+             "kotası yalnız Nicotra + Danfoss'a (37 ürün) harcanmalı.")
     ç.append("")
     for s2 in sorted(yoksul, key=lambda x: (x["marka"], x["aile"])):
         ç.append(f"### `{s2['aile']}` — {s2['marka']} · {s2['urun']} ürün · "
