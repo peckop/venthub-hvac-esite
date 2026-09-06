@@ -155,6 +155,8 @@ Yoksul ailelerin **model kodları**. Arama bunlarla başlar; kod üreticinin ken
 
 Aşağıdaki adresleri **Recep verdi** (2026-09-06 gece, compact öncesi). Ben hiçbirini açmadım: HTTP durumu, PDF varlığı, içeriğin teknik tablo taşıyıp taşımadığı **doğrulanmadı**. FAZ 2 ajanı için başlangıç noktası; kanıt değil. Ajan her birini indirir, sha256 alır, `KAYNAKLAR.md`'ye URL + sağlama yazar — o andan sonra kaynak olur.
 
+⚠ **SSOT bu liste DEĞİL:** Recep 2. ve 3. partiyi de verdi (toplam 37 tekil adres); tek kayıt OPS'un `docs/plans/rec172-kaynak-adresleri-2026-09-06.md` dosyasıdır (OPS hükmü 2026-09-06 15:1xZ). Aşağıdaki 1. parti satırları tarihçe olarak kalır; indirme KATALOG'da, çıkarım FAZ 2 iş akışında.
+
 **SEAT**
 
 - https://seat-ventilation.fr/en/pages/download-catalogs

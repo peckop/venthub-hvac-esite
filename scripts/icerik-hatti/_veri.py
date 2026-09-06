@@ -55,7 +55,9 @@ def rest(U: str, h: dict, yol: str):
 
 
 def kesin_sayi(U: str, h: dict, tablo: str) -> int:
-    istek = urllib.request.Request(f"{U}/rest/v1/{tablo}?select=id&limit=1",
+    # select=* : 'id' kolonu OLMAYAN tablolarda (rate_limits, _migration_ledger, gorunumler)
+    # select=id 400 verir ve olcum "olculemedi"ye duser (2026-09-06 filo taramasinda 8 nesne).
+    istek = urllib.request.Request(f"{U}/rest/v1/{tablo}?select=*&limit=1",
                                    headers={**h, "Prefer": "count=exact"})
     with urllib.request.urlopen(istek) as y:
         cr = y.headers.get("Content-Range") or ""

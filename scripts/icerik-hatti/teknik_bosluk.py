@@ -329,6 +329,10 @@ def main() -> int:
              "**doğrulanmadı**. FAZ 2 ajanı için başlangıç noktası; kanıt değil. Ajan her birini "
              "indirir, sha256 alır, `KAYNAKLAR.md`'ye URL + sağlama yazar — o andan sonra kaynak olur.")
     ç.append("")
+    ç.append("⚠ **SSOT bu liste DEĞİL:** Recep 2. ve 3. partiyi de verdi (toplam 37 tekil adres); tek kayıt OPS'un "
+             "`docs/plans/rec172-kaynak-adresleri-2026-09-06.md` dosyasıdır (OPS hükmü 2026-09-06 15:1xZ). "
+             "Aşağıdaki 1. parti satırları tarihçe olarak kalır; indirme KATALOG'da, çıkarım FAZ 2 iş akışında.")
+    ç.append("")
     for marka, adresler in RECEP_ADRESLERI:
         ç.append(f"**{marka}**")
         ç.append("")
