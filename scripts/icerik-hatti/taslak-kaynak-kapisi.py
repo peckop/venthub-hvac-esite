@@ -97,6 +97,10 @@ JETON_DESENLERI = [
 ]
 
 
+# Yapisal blok isareti — kanit satirindaki "alan" sutunu bundan okunur (REC-163).
+BLOK_ISARETI = re.compile(r"\*\*(Gövde|Çark|Motor|Koruma|Kontrol|Montaj)\.\*\*")
+
+
 def sayfa_metni_getir(pdf_ad, sayfa, onbellek):
     anahtar = (pdf_ad, sayfa)
     if anahtar in onbellek:
@@ -176,10 +180,11 @@ def taslagi_denetle(yol, ayrinti=False):
     zayif_iddia = 0
     eksik_pdf = set()
     hatalar = []
+    kanitlar = []   # REC-163: her iddia icin kalici kanit satiri
 
     # Referansla BITEN her parcayi bir "iddia" say: metin ... [KAYNAK s.NN]
-    for kaynak_ad, sayfalar_ham, once in [
-        (mm.group(1), mm.group(2), metin[max(0, mm.start() - 400):mm.start()])
+    for kaynak_ad, sayfalar_ham, once, ref_konum in [
+        (mm.group(1), mm.group(2), metin[max(0, mm.start() - 400):mm.start()], mm.start())
         for mm in REF.finditer(metin)
     ]:
         if not kaynak_ad:
@@ -320,6 +325,25 @@ def taslagi_denetle(yol, ayrinti=False):
             dogrulanan += 1
             if ayrinti:
                 print(f"    OK [{kaynak_ad} s.{sayfalar_ham}] {'·'.join(jetonlar)}")
+        # ⭐KANIT SATIRI (REC-163 Adim 2). Bu bilgi kapida ZATEN hesaplaniyordu, yalnizca
+        # basiliyor ve atiliyordu; kalicilastirmak yeni bir olcum degil, mevcut olcumun
+        # SAKLANMASIDIR. "alan" = iddianin gectigi yapisal blok (Govde/Cark/Motor/...),
+        # iddiadan ONCE gelen son **Blok.** isaretinden okunur — deterministik metin taramasi.
+        _alan = None
+        for _b in BLOK_ISARETI.finditer(metin[:ref_konum]):
+            _alan = _b.group(1)
+        kanitlar.append(
+            {
+                "alan": _alan,
+                "guc": "DUSEN" if kayip else ("ZAYIF" if len(zayif) > _zayif_once else "GUCLU"),
+                "iddia": iddia,
+                "jetonlar": jetonlar,
+                "kaynak": kaynak_ad,
+                "kayip_jetonlar": kayip,
+                "pdf": pdf_ad,
+                "sayfalar": sayfalar,
+            }
+        )
 
     return {
         "dosya": Path(yol).name,
@@ -338,6 +362,7 @@ def taslagi_denetle(yol, ayrinti=False):
         "zayif_ornek": zayif[:4],
         "eksik_pdf": sorted(eksik_pdf),
         "hatalar": hatalar,
+        "kanitlar": kanitlar,
     }
 
 

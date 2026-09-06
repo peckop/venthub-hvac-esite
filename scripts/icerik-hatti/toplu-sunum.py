@@ -78,6 +78,32 @@ def bos_bloklar(blok):
     return dolu, bos
 
 
+def blok_metinleri(blok):
+    """Dolu yapisal bloklarin METNINI dondurur (DB yuku icin).
+
+    ⚠ BOS BLOK ANAHTARI YAZILMAZ (K7 + OPS hukmu): "kaynakta karsiligi yok" diyen blok
+    veritabaninda ANAHTAR OLARAK BILE bulunmaz. Bos dize yazmak, ileride "burada bir sey
+    vardi ama silindi" ile "hic olmadi"yi ayirt edilemez kilar; ayrica bos basligi vitrinde
+    goruntuleme riski dogurur.
+    """
+    m = re.search(r"### Yapısal bloklar\s*\n(.*?)(?=\n### |\n## |\Z)", blok, re.S)
+    if not m:
+        return {}
+    govde = m.group(1)
+    out = {}
+    for ad in BLOKLAR:
+        p = re.search(rf"\*\*{ad}\.\*\*(.*?)(?=\n\*\*(?:{'|'.join(BLOKLAR)})\.\*\*|\Z)", govde, re.S)
+        if not p:
+            continue
+        icerik = p.group(1).strip()
+        if "aynakta karşılığı yok" in icerik:
+            continue
+        # Kaynak referanslari ([AVenS s.28]) DB metninde KALIR: vitrinde gosterilip
+        # gosterilmeyecegi render karari (URUN); veriden silmek kaniti yok etmek olurdu.
+        out[ad] = re.sub(r"\s*\n\s*", " ", icerik).strip()
+    return out
+
+
 def kaynak_ozeti(blok):
     gorulen = {}
     for m in REF.finditer(blok):
@@ -163,6 +189,7 @@ def main():
                 "maddeler": maddeler(blok),
                 "kaynak": kaynak_ozeti(blok),
                 "dolu": dolu, "bos": bos,
+                "blok_metni": blok_metinleri(blok),
                 "kapi": kapi_kos(baslik, blok),
             })
     return kayitlar
@@ -330,6 +357,41 @@ if __name__ == "__main__":
         if not bulundu_mu:
             print(f"aile bulunamadi: {hedef_slug}")
             sys.exit(2)
+        sys.exit(0)
+    # --yuk <yol>: DB yazimi icin YUK DOSYASI uretir. Yazan betik taslak .md'leri OKUMAZ;
+    # yalniz bu dosyayi okur. Nicin: yazilacak metin, insanin ONAYLADIGI sunumu ureten AYNI
+    # koddan cikmali; iki ayri ayristirici olsaydi "onaylanan metin" ile "yazilan metin"
+    # sessizce ayrisabilirdi — bugunun en pahali dersi tam bu sinif.
+    if "--yuk" in sys.argv:
+        import json as _json
+        hedef = Path(sys.argv[sys.argv.index("--yuk") + 1])
+        kararlar = {}
+        kj = Path(__file__).resolve().parent / "karar-k710.json"
+        if kj.exists():
+            kararlar = _json.loads(kj.read_text(encoding="utf-8")).get("kararlar", {})
+        yazilmaz = {s for s, v in kararlar.items() if v.get("durum") == "SAYFA YAZILMAYACAK"}
+        yuk = []
+        for k in kayitlar:
+            if k["slug"] in yazilmaz:
+                continue      # K7.10 — Recep karari, sayfa yazilmaz
+            kp = k["kapi"] or {}
+            yuk.append(
+                {
+                    "slug": k["slug"],
+                    "kimlik_tr": k["kimlik"],
+                    "maddeler_tr": k["maddeler"],
+                    "bloklar_tr": k["blok_metni"],
+                    "kaynak": k["kaynak"],
+                    "kapi": {x: kp.get(x) for x in
+                             ("dogrulanan", "dusen", "zayif_iddia", "guclu_iddia")},
+                }
+            )
+        hedef.parent.mkdir(parents=True, exist_ok=True)
+        hedef.write_text(_json.dumps(yuk, ensure_ascii=False, indent=2, sort_keys=True) + chr(10),
+                         encoding="utf-8")
+        atlanan = sorted(yazilmaz)
+        print(f"YUK YAZILDI: {hedef}  ·  {len(yuk)} aile")
+        print(f"K7.10 geregi ATLANAN {len(atlanan)}: {', '.join(atlanan) or '-'}")
         sys.exit(0)
     if "--yaz" in sys.argv:
         hedef = KOK / "docs" / "audits" / "icerik-hatti-toplu-sunum-2026-09-06.md"
