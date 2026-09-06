@@ -284,7 +284,7 @@ def main() -> int:
     ç.append("")
     ç.append("| Marka | Ürün | Kaynak nerede | Kim getirir | Bilinen tuzak |")
     ç.append("|---|---|---|---|---|")
-    ç.append("| **AVenS** | 34 | **Web'de YOK** — bizim markamız; kaynak Recep'in arşivi/föyleri | **Recep** | ajanı web'e gönderirsen 34 üründe sıfır sonuç alır ve bunu \"bulunamadı\" diye raporlar — oysa aranacak yer yok |")
+    ç.append("| **AVenS** | 34 | Bizim markamız. `avensair.com/kataloglar`'daki 24 katalog **Vortice + fiyat listesi**ydi (dizine alınan küme); AVenS föyleri orada görünmedi. Kaynak: Recep'in arşivi — ya da föy sitede varsa **linki** | **Recep** (link ya da PDF) | ajanı üretici sitesi aramaya gönderirsen 34 üründe sıfır sonuç alır ve bunu \"bulunamadı\" diye raporlar — üretici biziz |")
     ç.append("| **Nicotra Gebhardt** | 35 | `avensair.com/nicotra-gebhardt` (ÜRÜN 08-21: 28/35 eşleşti); resmî site yalnız AT serisi | FAZ 2 ajanı (ya da Recep'in katalog PDF'i varsa o, daha iyi) | **koda değil MODEL TANIMLAYICIYA** eşle — sipariş kodu iki kaynakta farklı yazılıyor, 7 ürün kodla düştü; site araması sorgu başına sonuç sınırlıyor (1000 satır tavanının web kardeşi) |")
     ç.append("| **Danfoss** | 2 | `danfoss.com` FC-51 sayfası (ÜRÜN 08-21) | FAZ 2 ajanı | — |")
     ç.append("")
