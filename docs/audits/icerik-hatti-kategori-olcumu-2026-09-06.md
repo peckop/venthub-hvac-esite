@@ -122,8 +122,28 @@ kırmızı bile vermez.
 
 ## 5 · `display_mode` ↔ 15A üç mod eşlemesi (emrin ikinci teslimatı)
 
-Bugün **37 kategorinin hepsi varsayılan `series`** (sütun varsayılanı `'series'`).
-15A'nın üç modu (series / showcase / landing) hiçbir kategoriye bilinçli atanmamış.
+~~Bugün 37 kategorinin hepsi varsayılan `series`; üç mod hiçbir kategoriye bilinçli
+atanmamış.~~ **← BU İDDİA YANLIŞTI, DÜZELTİLDİ (aynı gün, 17:30Z).**
+
+**Sebep: ÖLÇMEDİM, SÜTUN VARSAYILANINA BAKIP GENELLEDİM.** `column_default = 'series'`
+görüp "hepsi öyledir" dedim; dağılımı hiç sorgulamadım. Bu, aynı gün başkalarında
+eleştirdiğim hatanın kendisi: **hatırlanan/çıkarsanan sayıyı ölçülmüş gibi yazmak.**
+
+**Ölçülen gerçek dağılım:**
+
+| `display_mode` | Kategori | Hangileri |
+|---|---|---|
+| `series` | **22** | — |
+| `showcase` | **11** | fans · air-treatment · control-systems · heat-recovery-vmc · air-conditioning · commercial-ventilation · electric-heating · hygiene-sanitizer · residential-ventilation · smart-home · summer-ventilation |
+| `landing` | **4** | air-curtains · dehumidifiers · duct-fans · inline-duct-fans |
+
+Yani eşleme **yapılmış**, hem de anlamlı görünüyor: ürünü olan altı üst kategorinin beşi
+`showcase`, dört alt kategori `landing`. Eksik olan şey eşleme değil, **eşlemenin yazılı
+gerekçesi** — hangi kategori niçin o modda, bir yerde yazmıyor.
+
+Bunu ilk okuyan biri "eşleme yok, yapılmalı" diye iş açacaktı; **var olan işi ikinci kez
+yaptıracaktı.** Ölçüm buradan çıkan sayıyı üreten komutla birlikte durur:
+`SELECT display_mode, count(*) FROM categories GROUP BY display_mode;`
 Eşleme yazılmadan paragraf yazmak eksik iş olur: landing modundaki kategori paragrafı
 başka yerde, başka uzunlukta görünür.
 
