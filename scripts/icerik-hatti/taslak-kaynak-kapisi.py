@@ -114,6 +114,13 @@ def sayfa_metni_getir(pdf_ad, sayfa, onbellek):
 
 def norm(s):
     """Aksan/boşluk farklarını eritir; sayı ve kod karşılaştırması için."""
+    # ⚠ DERECE ISARETI IKI FARKLI KARAKTERLE YAZILIYOR — esitlenir:
+    #   U+00B0 (°, DEGREE SIGN)  ile  U+00BA (º, MASCULINE ORDINAL INDICATOR)
+    # AVenS fiyat listesi s.69 "90/70ºC" biciminde ORDINAL kullaniyor; taslak dogru
+    # derece isaretini yazinca kapi "70 °C sayfada YOK" diyip YANLIS KIRMIZI verdi.
+    # Iki karakter ayni baglamda ayni seyi ifade eder; esitlemek gevsetme degil,
+    # olcutun dogru evrende calismasidir. (Alt-ajan bu farki kendisi de raporlamisti.)
+    s = s.replace("º", "°").replace("°", "°")
     s = unicodedata.normalize("NFKD", s)
     s = "".join(c for c in s if not unicodedata.combining(c))
     return re.sub(r"\s+", "", s).upper().replace("M3/H", "M³/H")
