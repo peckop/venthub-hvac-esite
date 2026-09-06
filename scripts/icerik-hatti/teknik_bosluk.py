@@ -45,6 +45,28 @@ DIZIN_VARSAYILAN = Path.home() / "venthub-pdf-ingestor" / "kaynak-dizini" / "say
 FIYAT_LISTESI = "avens_fiyat_listesi_2026_HQ.pdf"
 K13_ESIK = 0.60
 
+# Recep'in verdigi baslangic adresleri (2026-09-06 gece, compact oncesi). OLCULMEDI:
+# HTTP durumu, PDF varligi, teknik tablo tasiyip tasimadigi dogrulanmadi. FAZ 2 ajani
+# icin baslangic noktasi; kanit degil. Ajan indirir + sha256 alir, o andan sonra kaynak olur.
+RECEP_ADRESLERI = [
+    ("SEAT", [
+        "https://seat-ventilation.fr/en/pages/download-catalogs",
+        "https://seat-ventilation.com/pages/download-catalogs",
+        "https://seat-ventilation.com/collections/seat-30-series",
+        "https://seat-ventilation.com/collections/storm-series",
+    ]),
+    ("Nicotra Gebhardt", [
+        "https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues.html",
+        "https://www.nicotra-gebhardt.com/Resources/Download-Center",
+    ]),
+    ("Danfoss", [
+        "https://www.danfoss.com/en/service-and-support/documentation/",
+        "https://store.danfoss.com/tr/tr/S%C3%BCr%C3%BCc%C3%BC/D%C3%BC%C5%9F%C3%BCk-Gerilim-S%C3%BCr%C3%BCc%C3%BCleri/VLT%C2%AE-Micro-Drive-FC-51/FC-051P22KT4E20HXBXCXXXSXXX/p/136N8941",
+        "https://www.danfoss.com/en/products/dds/low-voltage-drives/vlt-drives/vlt-hvac-basic-drive-fc-101/",
+        "https://www.danfoss.com/en/products/dds/low-voltage-drives/vlt-drives/vlt-hvac-drive-fc-102/",
+    ]),
+]
+
 
 def dolu(v) -> bool:
     return v not in (None, "", [], {}) and not (isinstance(v, str) and not v.strip())
@@ -297,6 +319,22 @@ def main() -> int:
              "girmez.** O 34 için tek yol Recep'in AVenS föylerini teslim etmesi. FAZ 2 ajan "
              "kotası yalnız Nicotra + Danfoss'a (37 ürün) harcanmalı.")
     ç.append("")
+    ç.append("**⭐Recep kararı (2026-09-06 gece):** *\"AVenS'e odaklanmayın, diğerlerine bakın.\"* "
+             "AVenS 34 ürün **park**; hedef Nicotra + Danfoss + SEAT (K13 boşlukları).")
+    ç.append("")
+    ç.append("### 6.1 · Recep'in verdiği başlangıç adresleri — ÖLÇÜLMEDİ, etiketli")
+    ç.append("")
+    ç.append("Aşağıdaki adresleri **Recep verdi** (2026-09-06 gece, compact öncesi). Ben hiçbirini "
+             "açmadım: HTTP durumu, PDF varlığı, içeriğin teknik tablo taşıyıp taşımadığı "
+             "**doğrulanmadı**. FAZ 2 ajanı için başlangıç noktası; kanıt değil. Ajan her birini "
+             "indirir, sha256 alır, `KAYNAKLAR.md`'ye URL + sağlama yazar — o andan sonra kaynak olur.")
+    ç.append("")
+    for marka, adresler in RECEP_ADRESLERI:
+        ç.append(f"**{marka}**")
+        ç.append("")
+        for u in adresler:
+            ç.append(f"- {u}")
+        ç.append("")
     for s2 in sorted(yoksul, key=lambda x: (x["marka"], x["aile"])):
         ç.append(f"### `{s2['aile']}` — {s2['marka']} · {s2['urun']} ürün · "
                  f"ort. {s2['ort_alan']} alan")

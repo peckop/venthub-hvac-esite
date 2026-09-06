@@ -149,6 +149,31 @@ Yoksul ailelerin **model kodları**. Arama bunlarla başlar; kod üreticinin ken
 
 **Bunun karar için anlamı:** 71 ürünün **34'ü (yaklaşık yarısı) web fazına hiç girmez.** O 34 için tek yol Recep'in AVenS föylerini teslim etmesi. FAZ 2 ajan kotası yalnız Nicotra + Danfoss'a (37 ürün) harcanmalı.
 
+**⭐Recep kararı (2026-09-06 gece):** *"AVenS'e odaklanmayın, diğerlerine bakın."* AVenS 34 ürün **park**; hedef Nicotra + Danfoss + SEAT (K13 boşlukları).
+
+### 6.1 · Recep'in verdiği başlangıç adresleri — ÖLÇÜLMEDİ, etiketli
+
+Aşağıdaki adresleri **Recep verdi** (2026-09-06 gece, compact öncesi). Ben hiçbirini açmadım: HTTP durumu, PDF varlığı, içeriğin teknik tablo taşıyıp taşımadığı **doğrulanmadı**. FAZ 2 ajanı için başlangıç noktası; kanıt değil. Ajan her birini indirir, sha256 alır, `KAYNAKLAR.md`'ye URL + sağlama yazar — o andan sonra kaynak olur.
+
+**SEAT**
+
+- https://seat-ventilation.fr/en/pages/download-catalogs
+- https://seat-ventilation.com/pages/download-catalogs
+- https://seat-ventilation.com/collections/seat-30-series
+- https://seat-ventilation.com/collections/storm-series
+
+**Nicotra Gebhardt**
+
+- https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues.html
+- https://www.nicotra-gebhardt.com/Resources/Download-Center
+
+**Danfoss**
+
+- https://www.danfoss.com/en/service-and-support/documentation/
+- https://store.danfoss.com/tr/tr/S%C3%BCr%C3%BCc%C3%BC/D%C3%BC%C5%9F%C3%BCk-Gerilim-S%C3%BCr%C3%BCc%C3%BCleri/VLT%C2%AE-Micro-Drive-FC-51/FC-051P22KT4E20HXBXCXXXSXXX/p/136N8941
+- https://www.danfoss.com/en/products/dds/low-voltage-drives/vlt-drives/vlt-hvac-basic-drive-fc-101/
+- https://www.danfoss.com/en/products/dds/low-voltage-drives/vlt-drives/vlt-hvac-drive-fc-102/
+
 ### `avens-bvu-ls` — AVenS · 2 ürün · ort. 1.0 alan
 
 ```
