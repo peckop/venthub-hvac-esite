@@ -98,6 +98,34 @@ function renderAlanlari(kod: string): string[] {
     .filter((a) => /^\w+$/.test(a))
 }
 
+/**
+ * Şablon DOSYASI olmayan uçta (`return-status-notification`) müşteriye giden HTML,
+ * `const html = ` ile başlayan ters-tırnaklı şablon değişmezidir. Ölçüt evreni ODUR.
+ *
+ * ⚠NİÇİN dosyanın tamamına bakmıyoruz: sabotaj denemesinde ölçüldü — HTML gövdesinden
+ * `${supportEmail}` SİLİNDİĞİ hâlde kapı YEŞİL kaldı, çünkü aynı değişken DÜZ METİN
+ * gövdesinde duruyordu. "Dosyada bir yerde geçiyor" ölçütü ayırt ETMİYOR; müşterinin
+ * gördüğü HTML gövdesi ayrı ölçülmek zorunda.
+ */
+function satirIciHtmlGovdesi(kod: string): string {
+  const m = kod.match(/const\s+html\s*=\s*`/)
+  if (!m || m.index === undefined) return ''
+  const bas = m.index + m[0].length
+  // ⚠İLK ters-tırnağı aramak YETMEZ: gövde `${description ? `<p>…` : ''}` gibi İÇ İÇE
+  // şablon değişmezleri taşıyor ve tarama 203 karakterde erken kapanıyordu (ölçüldü).
+  // Bu yüzden `${…}` derinliği sayılır; kapanış yalnız derinlik 0'daki ters-tırnaktır.
+  let derinlik = 0
+  for (let i = bas; i < kod.length; i++) {
+    const c = kod[i]
+    if (c === '\\') { i++; continue }
+    if (derinlik === 0 && c === '`') return kod.slice(bas, i)
+    if (c === '$' && kod[i + 1] === '{') { derinlik++; i++; continue }
+    if (derinlik > 0 && c === '{') derinlik++
+    else if (derinlik > 0 && c === '}') derinlik--
+  }
+  return ''
+}
+
 /** Şablondaki `{{alan}}` + `{{#if alan}}` adları (tekilleştirilmiş). */
 function sablonAlanlari(html: string): string[] {
   const küme = new Set<string>()
@@ -119,6 +147,8 @@ const OLCUM = ISLEVLER.map((islev) => {
     html,
     sablonKume: sablonVar ? sablonAlanlari(html) : [],
     renderKume: sablonVar ? renderAlanlari(kod).sort() : [],
+    // Sablonsuz ucta musteriye giden HTML govdesi (bkz. satirIciHtmlGovdesi yorumu).
+    satirIciHtml: sablonVar ? '' : satirIciHtmlGovdesi(kod),
   }
 })
 
@@ -177,14 +207,15 @@ describe('INV-EPOSTA-SABLON-1 · e-posta şablonu ↔ render alan sözleşmesi',
         expect(o.sablonKume, `${o.sablonAdi}: {{support_email}} yok.`).toContain('support_email')
         expect(o.sablonKume, `${o.sablonAdi}: {{company_footer}} yok.`).toContain('company_footer')
       } else {
-        // Sablonsuz uc (return-status-notification): govde satir-ici kuruluyor.
+        // Sablonsuz uc (return-status-notification): olcut evreni MUSTERIYE GIDEN HTML
+        // govdesidir — dosyanin tamami DEGIL. Dosyaya bakmak ayirt etmiyordu (yorum: ust taraf).
         expect(
-          /\$\{supportEmail\}/.test(o.kod),
-          `${o.islev}: sablonsuz uc, satir-ici govdede \${supportEmail} yok.`,
+          /\$\{supportEmail\}/.test(o.satirIciHtml),
+          `${o.islev}: satir-ici HTML govdesinde \${supportEmail} yok — musteri nereye yazacak?`,
         ).toBe(true)
         expect(
-          /\$\{companyFooter\}/.test(o.kod),
-          `${o.islev}: sablonsuz uc, satir-ici govdede \${companyFooter} yok.`,
+          /\$\{companyFooter\}/.test(o.satirIciHtml),
+          `${o.islev}: satir-ici HTML govdesinde \${companyFooter} yok.`,
         ).toBe(true)
       }
     }
@@ -256,6 +287,14 @@ describe('INV-EPOSTA-SABLON-1 · e-posta şablonu ↔ render alan sözleşmesi',
       if (o.sablonVar) {
         expect(o.sablonKume.length, `${o.sablonAdi}: hic {{alan}} bulunamadi — evren yanlis.`).toBeGreaterThan(3)
         expect(o.renderKume.length, `${o.islev}: render cagrisi ayristirilamadi — evren yanlis.`).toBeGreaterThan(3)
+      } else {
+        // Satir-ici HTML govdesi AYRISTIRILABILDI mi: bos donerse ustteki kol yalanci-kirmizi
+        // degil, yalanci-YESIL uretir (bos dizgede hicbir sey bulunmaz -> assert patlardi),
+        // ama yine de evrenin gercekten okundugunu ayri olcuyoruz.
+        expect(
+          o.satirIciHtml.length,
+          `${o.islev}: satir-ici HTML govdesi ayristirilamadi — evren yanlis.`,
+        ).toBeGreaterThan(500)
       }
     }
   })

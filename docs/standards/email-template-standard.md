@@ -161,3 +161,14 @@ tenant config (DB)  →  Deno ortam değişkeni  →  sistem varsayılanı
 
 ⚠**"Kapı yeşil" ≠ "e-posta doğru görünüyor".** Kapı statiktir; alan sözleşmesini ölçer,
 render çıktısını değil.
+
+### Kapının ÖLÇÜM EVRENİ — sabotajda düzeltildi
+
+Şablon dosyası olmayan uçta (`return-status-notification`) ölçüt evreni **dosyanın tamamı
+değil**, `const html = \`…\`` şablon değişmezidir. Niçin: sabotaj denemesinde HTML gövdesinden
+`${supportEmail}` silindiği hâlde kapı **YEŞİL kaldı** — çünkü aynı değişken *düz metin*
+gövdesinde duruyordu. "Dosyada bir yerde geçiyor" ölçütü **ayırt etmiyordu**. Müşterinin
+gördüğü HTML gövdesi ayrı ölçülür.
+
+Yedi kolun her biri kasten bozuldu, KIRMIZI olduğu görüldü, geri alındı. Sabotajın
+uygulandığı `grep -c` ile ayrıca ölçüldü — uygulanmamış sabotaj "kapı kör" yanılgısı üretir.
