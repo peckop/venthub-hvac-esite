@@ -115,6 +115,14 @@ Aynı gün **dört** vaka çıktı:
 
 Ortak ad: ⭐**ölçüt keskin, evren yanlış.** Bedeli ucuz değil — yanlış evren **iş emri doğurur**.
 
+⭐**BEŞİNCİ VAKA, aynı gün, ve kurbanı BU CETVELİN yazıldığı işin ardından açılan emir oldu:**
+REC-162 *"`vercel.json` `ignoreCommand` ile belge-only atlama kur"* diyordu. Ölçüm: (a) atlama
+**zaten var ve çalışıyor** (`scripts/vercel-ignore-build.sh`; bir belge-only PR *"Canceled by
+Ignored Build Step"* ile geçti), (b) depoda **`vercel.json` diye bir dosya yok** — ayar panelde.
+Yani emir hem var olanı yeniden yazdırıyor hem de **olmayan bir dosyayı** işaret ediyordu.
+İş *"mevcudun kapsamı"* olarak yeniden tanımlandı. Kardeş vaka: aynı gün *"24 saat bekle"*
+kuralı da ölçüme değil **hata mesajını okumaya** dayanıyordu — **mesajı okumak ölçüm değildir.**
+
 ### 6.2 §4'ün alt-ajan maddesi ÖDEDİ — çift yönlü (kanıt)
 
 Altı alt-ajan koştu. Örnekleme **iki yönde** kazandırdı: bir ajan **benim** plan premisimi deldi
