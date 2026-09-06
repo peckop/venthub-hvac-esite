@@ -685,8 +685,39 @@ def yuzde_str(d, t, c_):
 
 
 # ---------------------------------------------------------------- tek ekran
+BEKLEYEN_DESEN = re.compile(r"(tek ba[sş][iı]na sorul|Recep'?e (tek ba[sş][iı]na )?sor|karar bekliyor|Recep karar[ıi] (gerek|bekl)|SENDEN BEKLEYEN|Recep kap[ıi]s[ıi]|Recep'?ten .{0,30}karar|Recep onay[ıi] (gerek|bekl))", re.I)
+
+
+def senden_bekleyen(c, rows):
+    """§0 SENDEN BEKLEYEN (REC-175, WrongStack 3/3): Recep'in karar/onayi gereken kalemler UC kaynaktan tek listeye.
+    (a) Linear: acik is + 'Recep kapisi' etiketi ya da basliginda Recep gecen; (b) Kararlar aynalari (linear/kararlar-*.md):
+    BEKLEYEN_DESEN ile eslesen satirlar; (c) docs/proje-takip/recep-bekleyen.md: OPS'un elle tuttugu liste ('- ' satirlari).
+    Kaynak adi her kalemin basinda; hicbiri digerini elemez (ayni karar iki kaynakta gorunebilir — cift gorunmek, gorunmemekten iyidir)."""
+    L = []
+    for r in sorted([r for r in (rows or []) if r.get("_acik") and (RECEP in r.get("_serit", ()) or "Recep" in (r.get("title") or ""))], key=oncelik):
+        L.append(("Linear", f"{r['identifier']} · {r['title'][:140]} · {r['status']} · {r['updatedAt'][:10]}"))
+    for p in sorted(glob.glob(os.path.join(c["linear_dir"], "kararlar-*.md"))):
+        slug = os.path.basename(p).replace("kararlar-", "").rsplit("-", 3)[0]
+        try:
+            with io.open(p, encoding="utf-8") as f:
+                for i, ln in enumerate(f, 1):
+                    t = ln.strip()
+                    if t and BEKLEYEN_DESEN.search(t) and not t.startswith("*20"):
+                        L.append((f"Kararlar/{slug}:{i}", temiz(t)[:180]))
+        except OSError:
+            continue
+    ep = os.path.join(c["hedef"], "recep-bekleyen.md")
+    if os.path.exists(ep):
+        with io.open(ep, encoding="utf-8") as f:
+            for ln in f:
+                if ln.startswith("- "):
+                    L.append(("OPS listesi", temiz(ln[2:].strip())[:180]))
+    return L
+
+
 def ekran(c, adimlar):
     s = santiye(c)
+    bekleyen = senden_bekleyen(c, (s or {}).get("rows"))
     yol, sn, df, bd, kr, ay = c.get("yol"), c.get("sinav"), c.get("defter"), c.get("budama"), c.get("kararlar"), c.get("ayna")
     kirmizi_adimlar = [a for a in adimlar if a["durum"] == "KIRMIZI"]
     kosum = "KURU" if c["kuru"] else ("KIRMIZI" if kirmizi_adimlar else "YESIL")
@@ -729,7 +760,13 @@ def ekran(c, adimlar):
         sev.append("sınav sonucu YOK")
     sev.append(f"Linear ayna {ay['linear']}" if ay else "Linear ayna ÖLÇÜLMEDİ")
     sev.append(f"kırmızı adım {len(kirmizi_adimlar)}")
+    sev.append(f"senden bekleyen {len(bekleyen)}")
     L += ["**SEVİYE:** " + " · ".join(sev), ""]
+    # --- §0 SENDEN BEKLEYEN (REC-175): Recep once bunu okur; uc kaynak (Linear etiket/baslik · Kararlar aynalari · OPS listesi)
+    L += [f"## §0 SENDEN BEKLEYEN ({len(bekleyen)}) — karar ya da onayın gereken kalemler", "",
+          "Kaynak: Linear (açık iş + \"Recep kapısı\" etiketi ya da başlıkta Recep) · Kararlar aynaları (satırda \"tek başına sorulur / karar bekliyor / Recep'e sor\") · OPS listesi (`recep-bekleyen.md`, elle). Aynı karar iki kaynakta görünebilir; görünmemekten iyidir.", ""]
+    L += [f"- [{k}] {t}" for k, t in bekleyen] or ["- (yok)"]
+    L.append("")
     # --- ayrintili satirlar
     if s:
         L.append(f"- ŞANTİYE: Linear %{s['yuzde']} bitti ({s['done']} Done / {s['toplam'] - s['canceled']} = {s['toplam']}−{s['canceled']} Canceled) · açık {s['acik']} (In Progress {s['started']} + Todo {s['unstarted']}; Backlog {s['backlog']} ayrı) · bayat açık (>{BAYAT_GUN} gün) {s['bayat']} · bloklu açık {s['bloklu']} · Recep kapısında bekleyen {s['recep']} · etiketsiz açık {s['etiketsiz']} (sahipsiz iş = borç) · kaynak damgası {s['damga']}" + (" **BAYAT JSON**" if s["bayat_json"] else ""))
