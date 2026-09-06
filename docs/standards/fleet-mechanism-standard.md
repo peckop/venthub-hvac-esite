@@ -1314,8 +1314,17 @@ görüldü: madde sırası doğru koşulduğunda bir merge'i **önledi** (izleyi
 *sonra* PR yeniden `DIRTY` olmuştu), ama betik `scratchpad/`te yaşıyordu — **oturum ölür,
 araç ölür.** Kuralı insana gömmek yerine komuta gömmenin (§28) merge kararındaki karşılığı:
 
-> `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> [--agac=<yol>]`
-> Çıkış: `0` = beş madde sağlandı (self-merge serbest) · `1` = sağlanmadı **ya da ÖLÇÜLEMEDİ`.
+> `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<yol> --merge`
+> Çıkış: `0` = beş madde sağlandı ve merge YAPILDI · `1` = sağlanmadı **ya da ÖLÇÜLEMEDİ** (merge yapılmaz) · `3` = kapı yeşil, `gh pr merge` başarısız.
+
+**⭐20.1-a Kapı ile eylem AYNI SÜREÇTE (2026-09-06, Katalog'un kendi ihlal bildirimi).** Dört merge'de
+`ritual | tail -4 && gh pr merge` kalıbı kullanıldı; pipe çıkış kodunu **yutar**, `&&` kırmızıyı hiç görmez.
+#1027 KIRMIZI'ya (taban 2 commit geride) rağmen merge oldu; zararsızdı (iki belge dosyası, CI yeşil) ama bu
+**şans**, kapı değil. Üç yeşil vakada da kapı fiilen devrede değildi: yerine ajanın gözü geçiyordu, göz kapı
+değildir. Hüküm: **`gh pr merge` doğrudan ÇAĞRILMAZ; merge yalnız `--merge` bayrağıyla, ritüelin kendi
+sürecinden.** Betik kırmızıda stderr'e de yazar (`| tail` kırpsa bile görünür) ve `--merge` verilse de
+merge etmez. Kural insana değil komuta gömülü (§28 ile aynı ilke); pipe'ın arkasına konan hiçbir kapı
+kapı değildir — `set -o pipefail` bile `&&`'yi kurtarmaz, çünkü karar veren betik değil zincirdir.
 
 **Beklenen kapı kümesi ELLE YAZILMAZ, TÜRETİLİR — ama naif türetme çalışmaz.**
 Ölçüldü (2026-09-04): `pull_request` tetikli **9** workflow'da **18** job var, PR #965'te
