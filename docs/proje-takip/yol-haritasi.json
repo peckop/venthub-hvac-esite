@@ -98,6 +98,32 @@
       "sebep": "Recep 09-04 13:45", "sorumlu": "OPS", "karar": "K 09-04 13:45", "kanit": [ {"tur": "belge", "sinav": "S18"} ] },
     { "id": "YH-51", "faz": "GUVENLIK", "yetenek": "Rol otoritesi user_profiles.role / app_metadata; raw_user_meta_data YASAK", "durum": "ACIK",
       "sebep": "auth-account A11; CLAUDE.md kural 12", "sorumlu": "ALTYAPI", "karar": "auth-account-standard A11",
-      "kanit": [ {"tur": "belge", "sinav": "S19"}, {"tur": "kod", "yol": "src/middleware.ts", "desen": "raw_user_meta_data", "beklenen": "yok"} ] }
+      "kanit": [ {"tur": "belge", "sinav": "S19"}, {"tur": "kod", "yol": "src/middleware.ts", "desen": "raw_user_meta_data", "beklenen": "yok"} ] },
+
+    { "id": "YH-21", "faz": "15A-F2", "yetenek": "Urun Secici girisi header'da kendi ogesi (izgara alternatifi ARSIV)", "durum": "PLANLI",
+      "sebep": "K24 (09-06, Recep OPS'a devretti); Menu v17 B4 karesinde uygulandi; tek giris sayfasi /urun-secici 09-05 indi (Adim 1), header ogesi kod Faz 2 — inince navigation kaniti 'var'a cevrilir", "sorumlu": "DESIGN-MENU → URUN", "karar": "K24 · K 09-04 16:10",
+      "kanit": [ {"tur": "belge", "sinav": "S08"}, {"tur": "kod", "yol": "src/app/[lang]/urun-secici", "beklenen": "var"}, {"tur": "kod", "yol": "src/components/navigation", "desen": "urun-secici", "beklenen": "yok"} ] },
+    { "id": "YH-22", "faz": "15A-F2", "yetenek": "Renk tokenleri: turkuaz metin degil; --brand-cyan-ink #00708F + --action-terracotta-deep #BF5309 (AA)", "durum": "PLANLI",
+      "sebep": "K25/K25-b (09-06); Marka kaynaga yazdi, DS turetti, Menu v17 uyguladi (ink 251 · deep 36); kod tarafi tokens.js'e girmedi", "sorumlu": "DESIGN-MARKA → URUN", "karar": "K25 · K25-b · K26",
+      "kanit": [ {"tur": "kod", "yol": "src/design-system/tokens.js", "desen": "cyan-ink|cyanInk", "beklenen": "yok"} ] },
+    { "id": "YH-32", "faz": "KATALOG", "yetenek": "Ic ingest notu ('Tier C') musteri yuzeyinde YOK: veri temizlendi + render muhafizi", "durum": "ACIK",
+      "sebep": "REC-155 (09-06): 187 urun + 11 aile temizlendi (OPS kostu), #1023 muhafiz; canli 8 sayfa 0 kalinti", "sorumlu": "URUN-KATALOG · URUN", "karar": "K7 · vaat-butunlugu",
+      "kanit": [ {"tur": "kod", "yol": "src/utils/icIngestNotu.ts", "beklenen": "var"}, {"tur": "kod", "yol": "scripts/icerik-hatti/tier-c-temizlik.mjs", "beklenen": "var"},
+                 {"tur": "veri", "sql": "select count(*) from products where description_i18n::text ilike '%Tier C%'"} ] },
+    { "id": "YH-33", "faz": "KATALOG", "yetenek": "Aile metnindeki sayi ailenin urunlerinden turemis ARALIK (tek model sayisi yasak)", "durum": "PLANLI",
+      "sebep": "REC-157 (09-06): 10 aile / 109 urun tek model sayisi; veri Katalog 2b-2'de, kapi URUN'da (REC-156 sonrasi)", "sorumlu": "URUN", "karar": "K1 · K7.4 · REC-157",
+      "kanit": [ {"tur": "kod", "yol": "src/__tests__/conformance", "desen": "aile-metni-aralik", "beklenen": "yok"} ] },
+    { "id": "YH-05", "faz": "TICARI", "yetenek": "Siparis numarasi gunun sira sayaci (saat degil); tam numara her yerde", "durum": "YAPILIYOR",
+      "sebep": "REC-156 (09-06): EPOCH%10000 cakisma riski; PR #1032 migration ACIK, Recep 'sen merge et' dedi — inince bu satirin kaniti 'var'a, durumu ACIK'a cevrilir (kirmizi = beyan ile depo ayristi sinyali)", "sorumlu": "URUN · Recep", "karar": "REC-156 · kural 13",
+      "kanit": [ {"tur": "kod", "yol": "supabase/migrations", "desen": "siparis_no_gunluk_sayac", "beklenen": "yok"}, {"tur": "kod", "yol": "src/utils/siparisNo.ts", "beklenen": "yok"} ] },
+    { "id": "YH-06", "faz": "TICARI", "yetenek": "Iade semasi: kalem/adet + refund_amount + return_no (IA-YYYYMMDD-NNNN)", "durum": "PLANLI",
+      "sebep": "REC-159 (09-06, Belge sema olcumu): venthub_returns dar; satis kipi acilmadan; migration Recep", "sorumlu": "URUN · Recep", "karar": "REC-159 · 153-7",
+      "kanit": [ {"tur": "kod", "yol": "supabase/migrations", "desen": "venthub_return_items", "beklenen": "yok"} ] },
+    { "id": "YH-44", "faz": "SUREC", "yetenek": "Merge yalniz merge-ritueli.cjs --merge ile (kapi ile eylem ayni surecte); gh pr merge dogrudan cagrilmaz", "durum": "ACIK",
+      "sebep": "Katalog ihlal bildirimi 09-06 (pipe cikis kodunu yuttu, #1027 kirmiziya ragmen indi); #1029 + #1031; --onay bayragi ALTYAPI'da", "sorumlu": "ALTYAPI", "karar": "fleet-mechanism §20.1-a",
+      "kanit": [ {"tur": "kod", "yol": "scripts/hijyen/merge-ritueli.cjs", "desen": "--merge", "beklenen": "var"}, {"tur": "kod", "yol": "docs/standards/fleet-mechanism-standard.md", "desen": "20.1-a", "beklenen": "var"} ] },
+    { "id": "YH-45", "faz": "SUREC", "yetenek": "Gozcu yalniz Monitor araciyla; teslimat kaniti baska oturumun jetonu + sure (beyan degil); acilista SendMessage (cron yok)", "durum": "YAPILIYOR",
+      "sebep": "09-06 sabah: Katalog Bash-arka-plan gozcusu bildirim uretmedi (5 not kacti); dogrula ajan beyanina guveniyor; ALTYAPI kuyrugunda", "sorumlu": "ALTYAPI · OPS", "karar": "Recep 09-06 (cron yok) · wake-peers-via-sendmessage",
+      "kanit": [ {"tur": "kod", "yol": "scripts/board/mechanism-setup.cjs", "desen": "--gordum", "beklenen": "yok"}, {"tur": "kod", "yol": "docs/standards/fleet-mechanism-standard.md", "desen": "run_in_background", "beklenen": "yok"} ] }
   ]
 }
