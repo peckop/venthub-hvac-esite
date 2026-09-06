@@ -11,7 +11,7 @@
   "demet_ust_siniri_bayt": 900000,
   "demetler": [
     { "ad": "01-cekirdek-ve-durum", "baslik": "Cekirdek belgeler + durum takip + kucuk klasorler", "kok": "repo",
-      "dahil": ["CLAUDE.md", "CONTEXT.md", "PROJECT.md", "VISION.md", "RECOMMENDATIONS.md", "CHANGELOG.md", "README.md", "ORIGINAL_REQUEST.md", "implementation_plan.md",
+      "dahil": ["CLAUDE.md", "PROJECT.md", "VISION.md", "RECOMMENDATIONS.md", "CHANGELOG.md", "README.md", "ORIGINAL_REQUEST.md", "implementation_plan.md",
                 "docs/README.md", "docs/DURUM-TAKIP.md", "docs/recep-komut-rehberi.md",
                 "docs/legal/*.md", "docs/products/*.md", "docs/reference/*.md", "docs/research/*.md"] },
     { "ad": "02-cetveller-standards", "baslik": "Cetveller (docs/standards)", "kok": "repo", "dahil": ["docs/standards/*.md"] },
