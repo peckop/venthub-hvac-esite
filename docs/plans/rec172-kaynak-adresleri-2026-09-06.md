@@ -1,10 +1,11 @@
 # REC-172 · Teknik kaynak adresleri (Recep, 2026-09-06) — TEK KAYIT
 
 > **Amaç:** Recep'in verdiği her kaynak adresi burada; hiçbiri kaybolmaz. Faz 2 iş akışı (`rec172-faz2-workflow.js`) ajanları bu dosyayı okur, önce bu adresleri indirir, sonra gerekirse arar.
+> **İş bölümü (Recep 18:35 TR "çakışmayın"; Katalog 18:40 TR "hiçbiri açılmadı, indirme/staging OPS'un"):** İNDİRME + ÇIKARIM (staging CSV) = Faz 2 iş akışı (OPS). Katalog = kayıt tutma, inceleme, faz 4'te `kaynak-dizini`ne alma.
 > **Kural:** İndirilen her dosya ingestor deposunda `venthub/markalar/<marka>/<aile>/01-input/` altına konur; sha256 + URL + tarih aynı klasördeki `KAYNAKLAR.md`'ye yazılır. `kaynak-dizini/**` Katalog şeridinindir, dokunulmaz. Aynı belge iki adreste varsa sha256 karşılaştırılır, **bir kez** indirilir. Mükerrer adres burada silinmez, "mükerrer" diye işaretlenir (kayıt kaybolmasın diye).
 > **Durum sütunu:** `hedef` = değer çekilecek · `ayrım` = yalnız seri ayrımı için, değer çekilmez · `şüpheli` = marka/kapsam kapaktan doğrulanacak · `mükerrer` = daha önce verildi.
 
-Partiler: **P1** 17:55 TR (10 adres) · **P2** 18:20 TR (24 adres) · **P3** 18:30 TR (7 adres, 4 yeni). Toplam tekil: **38**.
+Partiler: **P1** 17:55 TR (10 adres) · **P2** 18:20 TR (24 adres, 23 yeni) · **P3** 18:30 TR (7 adres, 4 yeni). Toplam tekil: **37** (Katalog sayımıyla eşleşti; OPS'un ilk sayımı 38 yanlıştı: Nicotra katalog dizini P1'de de vardı).
 
 ## 1. Nicotra Gebhardt (aileler: ADH 8 · AT 8 · DD 13 · RDH 6 ürün)
 
@@ -18,7 +19,7 @@ Partiler: **P1** 17:55 TR (10 adres) · **P2** 18:20 TR (24 adres) · **P3** 18:
 | DD | https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues/centrifugal-fans-double-inlet-with-direct-drive-forward-curved-blades/493-series-dd/file.html | katalog PDF (motor tablosu: 13 varyant buradan) | P2 | hedef |
 | RDH | https://eu.nicotra-gebhardt.com/en/products/fans-for-ventilation-and-air-conditioning/276-rdh.html | ürün sayfası | P2 | hedef |
 | RDH | https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues/belt-driven-centrifugal-fans/481-series-rdh/file.html | katalog PDF | P2 | hedef |
-| genel | https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues.html | katalog dizini | P1, P2 | hedef (dizin) |
+| genel | https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues.html | katalog dizini | P1, P2 | hedef (dizin) · P2 mükerrer |
 | genel | https://www.nicotra-gebhardt.com/Resources/Download-Center | indirme merkezi | P1 | hedef (dizin) |
 
 ## 2. Danfoss (aile: FC-51, 2 ürün — 220 V ve 230 V 0,37 kW)
@@ -67,6 +68,6 @@ Partiler: **P1** 17:55 TR (10 adres) · **P2** 18:20 TR (24 adres) · **P3** 18:
 | Parti | Verilen | Yeni tekil | Mükerrer |
 |---|---|---|---|
 | P1 | 10 | 10 | 0 |
-| P2 | 24 | 24 | 0 |
+| P2 | 24 | 23 | 1 (eu.nicotra catalogues.html, P1'de vardı) |
 | P3 | 7 | 4 | 3 (fantechtrade sorgulu, baltspektr ×2) |
-| **Toplam** | **41** | **38** | **3** |
+| **Toplam** | **41** | **37** | **4** |
