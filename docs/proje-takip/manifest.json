@@ -17,7 +17,6 @@
     { "ad": "02-cetveller-standards", "baslik": "Cetveller (docs/standards)", "kok": "repo", "dahil": ["docs/standards/*.md"] },
     { "ad": "03-planlar", "baslik": "Planlar ve yol haritalari (docs/plans)", "kok": "repo", "dahil": ["docs/plans/*.md"] },
     { "ad": "04-olcumler-audits", "baslik": "Olcumler ve denetimler (docs/audits)", "kok": "repo", "dahil": ["docs/audits/*.md"] },
-    { "ad": "05-arsiv", "baslik": "Arsiv (docs/archive)", "kok": "repo", "dahil": ["docs/archive/*.md"] },
     { "ad": "06-hafiza-notlari", "baslik": "Orkestrator hafiza notlari (feedback / project / reference)", "kok": "hafiza",
       "dahil": ["*.md"], "haric": ["ops-cycle-audit-state.md"] },
     { "ad": "07-hafiza-gunluk-ops", "baslik": "Orkestrator gunluk durum dosyasi (ops-cycle-audit-state)", "kok": "hafiza",

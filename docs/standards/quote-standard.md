@@ -476,6 +476,7 @@ Teklif iletilen **her** müşteri, kendi tekliflerini **korumalı girişle geçm
 
 - **Giriş:** mevcut hesap oturumu. E-postadaki teklif linki, oturum yoksa **hesap girişine
   düşer** (dönüş yoluyla) — v0.1 Q4'ün login şartı korunur, misafir kabul yok.
+  - **NOT (2026-09-01, REC-117):** misafir teklif (üyeliksiz) kararı verildi; anon INSERT için RLS migration Recep kapısı; migration inince Q4 güncellenir.
 - **Yüzey:** `views/account` altında yeni bir alan; SaaS **Proje paketi bayrağına** bağlanır.
 - **İçerik:** durumlar · **revizyon geçmişi** (arşiv PDF'ler dahil, §5/5) · güncel PDF ·
   kabul/red eylemleri (yalnız güncel revizyonda ve süre içindeyse etkin).

@@ -13,6 +13,8 @@
 | 5 | `docs/standards/checkout-payment-standard.md` | Başlıkta "A/B kararı beklemede", gövdede 08-18 karar (gömülü form) | Başlık satırı düzeltilir (ALTYAPI claim'i) |
 | 6 | `05-arsiv` demeti | Eski planlar (014-kategori-ssr-plan, legacy_homepage_enhancements_2025) güncel ölçümlerle çelişiyor | Arşiv demeti defterden ÇIKAR ya da her dosyanın başına "ARŞİV — karar değildir" damgası (OPS; manifest) |
 
+**Aynı gece kapananlar (alt ajan, `git diff --stat` ile ölçüldü):** #1 YAPILDI — yürürlük bloğu dosyanın başına, §2–§7 başlıklarına `[ESKİ — tarihçe]` (25 satır) · #2 NOT EKLENDİ — quote-standard satır 478'in altına REC-117 notu (aynı login şartı 611 ve 634'te de var, migration inince üçü birlikte güncellenir) · #4 ÇÜRÜDÜ — `venthub-architecture` SKILL.md zaten "PPR KULLANILMIYOR" diyor (grep 4/4, kurulum adımı yok): defter BAYAT kopyayı görmüştü; bu, eşitlemenin niçin günlük olması gerektiğinin kanıtı · #3 ve #5 ALTYAPI claim'i (yarın) · #6 05-arşiv demeti manifestten düşürüldü (aşağıda §5).
+
 ## 2 · Gürültü
 
 - **Konuşma günlükleri (12-konusma-gunlugu-1..6, ~4,2 MB):** "Recep ne demişti" için kıymetli, ama RAG'de gürültü. Karar: **kalır**, ancak yalnız son 14 gün; eskisi ayrı "arşiv defteri"ne (OPS, `konusma_gunlugu.py` pencere parametresi).
