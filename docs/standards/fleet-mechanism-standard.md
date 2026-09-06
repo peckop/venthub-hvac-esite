@@ -2277,3 +2277,84 @@ Kapı: `fleet-mechanism-integrity.test.ts` — altı kol; çekirdek saf olduğu 
 beslenir ve saat dışarıdan verilir. Sabotaj iki turda ölçüldü: bağımsızlık kontrolü
 kaldırılınca **yalnız** ona bağlı iki kol düştü; tazelik eşiği kaldırılınca **yalnız** bayat
 kolu düştü.
+
+## 32. CANLI DURUM OKUYAN KAPI **PİNLENİR**, FİKSTÜRE ÇEVRİLMEZ — fikstür kapıyı canlıya kör eder
+
+**Vaka (2026-09-06, ALTYAPI).** Elde "paralel koşumda yarışan **4 kararsız kapı**" listesi vardı
+ve tercih edilen çözüm **fikstür yolu**ydu. Ölçüm önce **listeyi** çürüttü, sonra **çözümü**.
+
+### 32.1 — Önce premis: "4 kapı" 2 dosyaydı
+
+| listedeki ad | ölçüm | sonuç |
+|---|---|---|
+| `taban-tazele.test.ts` | paylaşılan ağacı **3** noktada diskten okur (`:147`, `:341`, `:384`) | ⚠gerçek |
+| `uretilmis-artefakt-ilan-kapsami.test.ts` | paylaşılan repoyu **8** noktada okur (`:59, :96, :104, :112, :118, :174, :250, :256`) | ⚠gerçek |
+| **INV-DOC-7** | ayrı dosya DEĞİL — aynı dosyanın içinde `describe` (`uretilmis-artefakt-ilan-kapsami.test.ts:126`) | ⛔aynı dosya |
+| `bash-write-audit-merge-muafiyeti.test.ts` | paylaşılan git durumunu **hiç** okumaz: üç ayrı `fs.mkdtempSync` ile izole depo (`:63-66`); paylaşılana tek teması kanca **dosyasının** yolu (`:34`) | ⛔**yarışamaz** |
+
+⭐**Ders:** kararsızlık listesi *gözlemlenen kırmızı adlarından* derlenmişti; **adın yarışabilir
+olduğu ölçülmemişti**. İzole bir kapıyı "kararsız" sayıp fikstüre çevirmek, var olmayan bir
+hastalığa ilaç yazmaktır — ve o kapı zaten fikstürdü (dönüşüm maliyeti 0, çünkü iş bitmişti).
+Bu, *"ölçüt keskin ama evren yanlış"* ailesinin bir üyesidir: düşen kolların adı doğru
+gözlemdi, **o adların neden düştüğü** ölçülmemiş varsayımdı.
+
+⚠**KAPATILMAMIŞ UÇ — adıyla kayda geçer.** `bash-write-audit-merge-muafiyeti.test.ts`'in bir
+koşumda düştüğü **gözlemi duruyor**; ama yukarıdaki ölçüm o dosyanın paylaşılan git durumuyla
+yarışamayacağını gösteriyor. Demek ki düşme **başka bir mekanizmadan** geliyor (aday: geçici
+dizin çakışması, kaynak tükenmesi, alt süreç zaman aşımı) — **ölçülmedi, ad konmadı, kapanmış
+sayılmaz.** Pin hükmü bu üçüncü adı **çözmez**; onu çözdüğünü söylemek sahte kapanış olurdu.
+
+### 32.2 — Sonra çözüm: üç yol, ikisi yanlış
+
+| yol | yarışı bitirir mi | kapı canlıyı görmeye devam eder mi | maliyet |
+|---|---|---|---|
+| **fikstür** (damgalı paket) | ✅evet | ⛔**HAYIR — körleşir** | ~100+ satır + tazeleme betiği + **kalıcı sahip** |
+| **sıralama** (seri koşum) | ⚠yalnız **seyreltir** | ✅evet | ~0 |
+| ⭐**pin** (tek SHA'ya sabitle) | ✅evet | ✅**evet** | **~10-15 satır** |
+
+**Niçin fikstür körleştirir — kapıların KENDİ İDDİASIYLA:**
+- `taban-tazele.test.ts:144` kolun adı: *"**GOMULU LISTE SABOTAJINI DUSURUR** — depodaki GERCEK
+  manifestin icerigiyle eslesmeli"*; `:145-146` yorumu: *"Beklenen kume **DOSYADAN okunur,
+  yazilmaz**."* Bu kolu fikstüre çevirmek, kolun yakalamak için var olduğu **dondurulmuş
+  kopyayı testin içine geri koymaktır**.
+- `taban-tazele.test.ts:340` kolun adı: *"ilan dosyasindaki GERCEK istisnalar okunur
+  (**gomulu liste DEGIL**)"* — ad, fikstürü doğrudan reddediyor.
+- `uretilmis-artefakt-ilan-kapsami.test.ts:149` assertion metni: *"URETILMIS ama NE ILAN EDILMIS
+  NE ISTISNADA olan dosya(lar) var"* — bu kapının işi **bu haftanın gerçek `docs/` ağacında**
+  ilansız üretilmiş dosya aramaktır. Damgalı pakete bakarsa, damgadan **sonra** eklenen kaçağı
+  bir daha asla göremez.
+
+**Niçin sıralama yetmez:** durumu değiştiren şey vitest'in kendi paralelliği değil, **aynı ağaca
+dokunan başka süreçler** (akran oturum, `post-commit` companion üreteci, elle düzenleme). Vitest'i
+seri koşturmak akranın commit'ini durdurmaz — pencere daralır, **kapanmaz**.
+
+### 32.3 — KURAL
+
+> **Canlı depo durumunu okuyan kapı, okumasını TEK BİR ANA sabitler (`git rev-parse HEAD` →
+> SHA) ve tüm okumalarını o SHA'dan yapar; sonuçları modül düzeyinde memoize eder.**
+> Kapı **canlı kalır** (yeni ihlali görür), ama **iç tutarsızlığı** biter.
+
+Pinlenmemiş kapının somut kusuru: `uretilmis-artefakt-ilan-kapsami.test.ts:112` **listeyi**
+(`ls-tree HEAD docs/`) alır, `:118` her dosyanın **içeriğini** (`git show HEAD:<yol>`) ayrı
+süreçlerle okur — bu ikisi **atomik değildir** ve `HEAD` arada ilerleyebilir. Aynı şekilde
+boş-koşum kolu (`:128`) ile asıl assertion (`:145`) `HEAD`'i **ayrı ayrı** çözer: iki kol farklı
+commit'i ölçebilir.
+
+⚠**PİNLENEMEYEN İSTİSNA — INDEX.** `:250`'deki `git ls-files` bilerek HEAD'i değil **index**'i
+okur (`:248` gerekçesi: commit'ten önce ölçülebilsin). Index pinlenemez; paylaşılan, değişken bir
+kaynaktır. Bu kol için ölçüt **iki kez oku, eşitse kabul et**; eşit değilse yarış **adıyla**
+raporlanır — sessiz bir hüküm verilmez. ⭐Bunun gerçek olduğu aynı gün ölçüldü: paylaşılan ana
+dizinde `ff-merge` sonrası index **2 girdi bayat** kaldı (3791 ≠ 3793) ve `git status` az önce
+inen dosyaları **silinmiş** gösterdi.
+
+### 32.4 — Fikstür ne zaman DOĞRU (§25 ile sınır)
+
+Fikstür **saf çekirdeği** ve **biçim varyantlarını** beslemek için doğrudur (§25) — girdi
+kümesi kapalı ve anlamı zamanla değişmiyorsa. **Denetim kapısı** için yanlıştır: denetimin
+evreni **açık** ve **büyüyen**dir (yarın eklenecek dosya), fikstür o büyümeyi göremez.
+
+⭐**Kardeş canlı vaka (aynı gün, URUN şeridi):** `INV-AILE-SAYI-1`, canlı DB yerine damgalı bir
+pakete bakıyor (`src/__tests__/fixtures/aile-metni-sayisal-2026-09-06.json`, damga
+`2026-09-06T05:25:54Z`). Metinler DB'ye yazıldığında kapı **düzelmeyi göremeyecek, yeşil kalacak
+ve ödenmiş borcu borç sanacak.** Fikstürün bedeli teorik değil: seçilirse yanına **tazeleme
+sahibi + tazeleme tetiği** yazılır, yoksa kapı sessizce bayatlar.

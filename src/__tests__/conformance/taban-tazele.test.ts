@@ -46,6 +46,29 @@ function depoKoku(): string {
   }).trim()
 }
 
+/**
+ * ⭐PİN (§32) — manifest ve istisna kaydı ÇALIŞMA AĞACINDAN değil, TEK BİR SHA'dan okunur.
+ *
+ * Sebep: paylaşılan ağaçta eşzamanlı bir yazma sırasında dosya YARIM okunabilir (torn read);
+ * JSON çözülemez ve kapı **yanlış kırmızı** verir — kodda hiçbir bozukluk yokken.
+ * Kardeş ilke zaten yazılıydı ama bu kapı ondan sapmıştı:
+ * `uretilmis-artefakt-ilan-kapsami.test.ts` → *"HEAD'den oku — DİSK DEĞİL. Kapı commit'lenmiş
+ * durumu ölçer."*
+ *
+ * ⚠PİN FİKSTÜR DEĞİLDİR: SHA her koşumda yeniden hesaplanır, yani gerçek manifest değişince
+ * beklenen küme de değişir — aşağıdaki **"gömülü liste sabotajını düşürür"** iddiası KORUNUR.
+ * Fikstüre çevirmek o iddiayı yok ederdi (§32.2).
+ */
+const KOK = depoKoku()
+const PIN = execFileSync('git', ['-C', KOK, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+
+function pindenOku(yol: string): string {
+  return execFileSync('git', ['-C', KOK, 'show', `${PIN}:${yol}`], {
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  })
+}
+
 type Fikstur = {
   kok: string
   kos: (ekArgs?: string[], ortam?: Record<string, string>) => { kod: number; cikti: string }
@@ -144,7 +167,7 @@ describe('taban-tazele — ilan listesi MANIFESTTEN okunur', () => {
   it('GOMULU LISTE SABOTAJINI DUSURUR — depodaki GERCEK manifestin icerigiyle eslesmeli', () => {
     // Ilan listesini kaynaga gomen bir sabotaj bu kolda dusor: gomulu liste depodaki
     // gercek manifest degisince ayrisir. Beklenen kume DOSYADAN okunur, yazilmaz.
-    const metin = fs.readFileSync(path.join(depoKoku(), betik.MANIFEST_YOLU), 'utf8')
+    const metin = pindenOku(betik.MANIFEST_YOLU)
     const beklenen = new Set<string>([betik.MANIFEST_YOLU])
     const cozulmus = JSON.parse(metin) as { artefaktlar: Array<{ yol: string }> }
     for (const a of cozulmus.artefaktlar) beklenen.add(a.yol)
@@ -338,7 +361,7 @@ describe('taban-tazele — CANLI DAVRANIS (gercek depo, gercek merge)', () => {
   })
 
   it('ilan dosyasindaki GERCEK istisnalar okunur (gomulu liste DEGIL)', () => {
-    const metin = fs.readFileSync(path.join(depoKoku(), betik.ISTISNA_YOLU), 'utf8')
+    const metin = pindenOku(betik.ISTISNA_YOLU)
     const cozulmus = JSON.parse(metin) as { istisnalar: Array<{ yol: string }> }
     const beklenen = new Set(cozulmus.istisnalar.map((i) => i.yol))
     expect(beklenen.size).toBeGreaterThan(1)
@@ -381,6 +404,10 @@ describe('taban-tazele — sozlesme hijyeni', () => {
   it('her git cagrisi -C ile: -C siz execFileSync(git) KALMAMIS', () => {
     // Lider sarti (b). Yapisal olcut: `git` cagrisinin ilk argumani '-C' olmali.
     // cwd sessizce ana dizine resetlenebiliyor (2026-08-31'de defalarca olculdu).
+    // ⚠BURADA DİSK **KASITLI** (§32'nin istisnası): bu kol, modülün GERÇEKTEN yüklediği
+    // kaynağı taramalı. Modül yukarıda `require_(BETIK_YOLU)` ile DİSKTEN yükleniyor; kaynağı
+    // PİN'den okumak, davranışı ölçen kollarla FARKLI SÜRÜMÜ karşılaştırmak olurdu.
+    // Ölçüt "aynı an" değil, "aynı sürüm" olduğu için pin burada yanlış araçtır.
     const kaynak = fs.readFileSync(BETIK_YOLU, 'utf8')
     const cagrilar = [...kaynak.matchAll(/execFileSync\(\s*'git'\s*,\s*\[([^\]]*)\]/g)]
     expect(cagrilar.length).toBeGreaterThan(0)

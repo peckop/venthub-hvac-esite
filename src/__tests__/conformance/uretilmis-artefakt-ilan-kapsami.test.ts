@@ -53,10 +53,23 @@ function git(args: string[]): string {
   })
 }
 
-/** HEAD'den oku — DİSK DEĞİL. Kapı commit'lenmiş durumu ölçer (tazelik kapısıyla aynı ilke). */
+/**
+ * ⭐PİN (§32) — ölçüm TEK BİR ANA sabitlenir.
+ *
+ * Ham `HEAD` her çağrıda YENİDEN çözülür ve kapı KENDİ İÇİNDE tutarsızlaşır: dosya LİSTESİ
+ * (`ls-tree`) ile İÇERİK (`git show`) ayrı süreçlerdir, aralarında paylaşılan ağaca bir commit
+ * düşebilir (akran oturum, `post-commit` companion üreteci). Boş-koşum kolu ile asıl assertion
+ * da `HEAD`'i ayrı ayrı çözerse FARKLI commit'leri ölçebilir.
+ *
+ * ⚠PİN, FİKSTÜR DEĞİLDİR: SHA her koşumda yeniden hesaplanır, yani kapı CANLI kalır ve yarın
+ * eklenen ilansız artefaktı görür. Sabitlenen tek şey "hangi an" sorusudur (§32.3).
+ */
+const PIN = git(['rev-parse', 'HEAD']).trim() // §32-MUAF: PİN'in KENDİ tanımı — ham HEAD tam burada ÇÖZÜLÜR
+
+/** PİN'den oku — DİSK DEĞİL. Kapı commit'lenmiş durumu ölçer (tazelik kapısıyla aynı ilke). */
 function headOku(yol: string): string | null {
   try {
-    return git(['show', `HEAD:${yol}`])
+    return git(['show', `${PIN}:${yol}`])
   } catch {
     return null
   }
@@ -92,24 +105,37 @@ const ZORUNLU_ALANLAR: ReadonlyArray<keyof Istisna> = [
   'yol', 'damga', 'uretec', 'nicin_ilan_edilemiyor', 'kapanacagi_taraf', 'sahibi', 'kayit',
 ]
 
-function manifestUrunleri(): Set<string> {
+/**
+ * ⭐TEKİLLEŞTİRME (§32.3) — aynı okuma birden çok `it()` içinde tekrarlanıyordu. PİN sayesinde
+ * sonuç zaten değişmez; tekilleştirme hem ~380 git alt sürecini keser hem de "iki kol farklı
+ * an görür" ihtimalini yapısal olarak imkânsız kılar.
+ */
+function birKez<T>(uret: () => T): () => T {
+  let tutuldu: { deger: T } | null = null
+  return () => {
+    if (tutuldu === null) tutuldu = { deger: uret() }
+    return tutuldu.deger
+  }
+}
+
+const manifestUrunleri = birKez(function manifestUrunleriOku(): Set<string> {
   const ham = headOku(MANIFEST)
   if (ham === null) return new Set()
   const m = JSON.parse(ham) as { artefaktlar?: Array<{ ad?: string }> }
   const liste = Array.isArray(m.artefaktlar) ? m.artefaktlar : []
   return new Set(liste.map((a) => 'docs/' + String(a.ad)))
-}
+})
 
-function istisnalar(): Istisna[] {
+const istisnalar = birKez(function istisnalarOku(): Istisna[] {
   const ham = headOku(ISTISNA_KAYDI)
   if (ham === null) return []
   const k = JSON.parse(ham) as { istisnalar?: Istisna[] }
   return Array.isArray(k.istisnalar) ? k.istisnalar : []
-}
+})
 
 /** docs/ altındaki İZLENEN her `.md` — damgası olanlar süzülür. */
-function damgaliDosyalar(): Array<{ yol: string; damga: string[] }> {
-  const yollar = git(['ls-tree', '-r', '--name-only', 'HEAD', 'docs/'])
+const damgaliDosyalar = birKez(function damgaliDosyalarOku(): Array<{ yol: string; damga: string[] }> {
+  const yollar = git(['ls-tree', '-r', '--name-only', PIN, 'docs/'])
     .trim()
     .split('\n')
     .filter((p) => p.endsWith('.md'))
@@ -121,7 +147,7 @@ function damgaliDosyalar(): Array<{ yol: string; damga: string[] }> {
     if (d.length) out.push({ yol, damga: d })
   }
   return out
-}
+})
 
 describe('INV-DOC-7 · uretilmis artefakt ILAN EDILMIS mi (Kapi A ters yon)', () => {
   it('vacuous-guard: tarama GERCEKTEN damgali dosya buldu (bos evrende kosan kapi olcum degildir)', () => {
@@ -245,10 +271,35 @@ const ARAC_ONBELLEGI_DESENLERI: { desen: RegExp; ornek: string; nicin: string }[
   },
 ]
 
-/** Index'teki takipli dosyalar (HEAD değil — gerekçe yukarıda). */
-function takipliDosyalar(): string[] {
+/**
+ * Index'teki takipli dosyalar (HEAD değil — gerekçe yukarıda).
+ *
+ * ⚠PİNLENEMEYEN İSTİSNA (§32.3): index bilerek okunuyor ki sabotaj commit'ten ÖNCE ölçülebilsin.
+ * Ama index paylaşılan ve değişken bir kaynaktır — eşzamanlı bir `git add`/`checkout` listeyi
+ * okuma anında değiştirebilir. ⭐Aynı gün ölçüldü: paylaşılan ana dizinde `ff-merge` sonrası
+ * index 2 girdi BAYAT kaldı ve `git status` az önce inen dosyaları SİLİNMİŞ gösterdi.
+ *
+ * Ölçüt: **iki kez oku, eşitse kabul et.** Eşit değilse sessiz bir hüküm verilmez — yarış
+ * ADIYLA raporlanır (§21: kabul edilen boşluk sessiz olamaz).
+ */
+function indexOku(): string[] {
   return git(['ls-files', '-z']).split('\0').filter(Boolean)
 }
+
+const takipliDosyalar = birKez(function takipliDosyalarKararli(): string[] {
+  const birinci = indexOku()
+  const ikinci = indexOku()
+  if (birinci.length !== ikinci.length || birinci.some((y, i) => y !== ikinci[i])) {
+    throw new Error(
+      'INDEX OKUMA YARISI: iki ardisik `git ls-files` FARKLI sonuc verdi ' +
+        `(${birinci.length} vs ${ikinci.length} girdi). Bu agacta eszamanli bir git islemi var ` +
+        '(akran oturum, kanca ya da elle komut). Olcum GUVENILIR DEGIL — hukum verilmedi.\n' +
+        'YAPILACAK: agacta eszamanli is bittikten sonra tekrar kos. Serit isi PAYLASILAN ana ' +
+        'dizinde kosmaz (§28) — bu kol o kuralin karsiligidir.',
+    )
+  }
+  return birinci
+})
 
 /** `git check-ignore`: yol yok sayılıyorsa 0 döner, sayılmıyorsa 1. Kuralın VARLIĞI değil, ÇALIŞMASI ölçülür. */
 function yokSayiliyor(yol: string): boolean {
@@ -299,5 +350,67 @@ describe('INV-ARAC-ONBELLEGI-1 · takipli ARAÇ ÖNBELLEĞİ yoktur (damgasız +
         'yeniden takibe sokabilir (git add -A / IDE otomatik ekleme). Nüks kapısı yalnız index ' +
         'tarafını tutar; takipsiz tarafı .gitignore tutmalı.',
     ).toEqual([])
+  })
+})
+
+/**
+ * §32 — kuralın KENDİSİNİ ölçen kol. Cetvele yazılmış bir kural, onu ölçen bir kol yoksa
+ * bir sonraki düzenlemede sessizce geri alınır (bu depoda ölçülmüş sınıf).
+ */
+describe('INV-KAPI-PIN-1 · canli durum okuyan kapi PINLENIR (§32)', () => {
+  const KENDI_YOLU = 'src/__tests__/conformance/uretilmis-artefakt-ilan-kapsami.test.ts'
+
+  it('vacuous-guard: kendi kaynagi PINDEN okunabildi (okunamazsa asagidaki kol bosluk olcer)', () => {
+    expect(
+      headOku(KENDI_YOLU),
+      `${KENDI_YOLU} PIN'den okunamadi — asagidaki tarama BOS kosardi ve "ihlal yok" derdi.`,
+    ).not.toBeNull()
+  })
+
+  /**
+   * ⚠MUAFİYET BÜTÇESİ — ölçüt METİN tarar, ve iki meşru satır da metindir: PİN'in kendi tanımı
+   * (`rev-parse HEAD`) ve aşağıdaki sabotaj kolunun SAHTE örneği. İlk yazımda ikisi de yanlış
+   * pozitif verdi (ölçüldü). Muafiyet **açık işaretle** verilir, ama **sayısı sabittir**:
+   * üçüncü bir muaf satır eklenirse kapı KIRMIZI olur — kaçak kapı sessizce genişleyemez.
+   */
+  const MUAF_ISARET = '§32-MUAF'
+  const BEKLENEN_MUAF = 2
+
+  it('MUAFIYET BUTCESI: muaf satir sayisi SABIT (kacak kapi sessizce buyumez)', () => {
+    const kaynak = headOku(KENDI_YOLU) ?? ''
+    const muaflar = kaynak.split('\n').filter((s) => s.includes(MUAF_ISARET) && !s.includes('MUAF_ISARET ='))
+    expect(
+      muaflar.length,
+      `Muaf satir sayisi ${BEKLENEN_MUAF} olmali. Yeni bir muafiyet eklendiyse GEREKCESI ` +
+        'yazilmali ve bu sayi BILEREK yukseltilmeli — muafiyet sessizce buyurse olcut olmekten ' +
+        'once ANLAMINI kaybeder.',
+    ).toBe(BEKLENEN_MUAF)
+  })
+
+  it('⭐git argumaninda HAM "HEAD" gecmez — PIN kullanilir', () => {
+    // Ölçüt YAPISAL: `git([...])` çağrılarının argüman listesinde ham 'HEAD' ya da `HEAD:` aranır.
+    // ⚠Ölçüm COMMIT'LENMİŞ kaynağa karşıdır (bu dosya `node:fs` kullanmıyor, bkz. ortam notu):
+    // düzeltmeyi commit'lemeden bu kol KIRMIZI kalır — tazelik kapılarıyla aynı ilke.
+    const kaynak = (headOku(KENDI_YOLU) ?? '')
+      .split('\n')
+      .filter((s) => !s.includes(MUAF_ISARET))
+      .join('\n')
+    const cagrilar = [...kaynak.matchAll(/git\(\s*\[([^\]]*)\]/g)].map((m) => m[1])
+    const ihlal = cagrilar.filter((a) => /'HEAD'|HEAD:/.test(a))
+    expect(
+      ihlal,
+      'Bu kapida ham HEAD ile git cagrisi var. HAM HEAD HER CAGRIDA YENIDEN COZULUR: liste ' +
+        '(ls-tree) ile icerik (git show) ayri sureclerdir ve arada paylasilan agaca commit ' +
+        'dusebilir; iki kol FARKLI commit olcer.\n' +
+        'YAPILACAK: PIN sabitini kullan (git rev-parse HEAD, modul basinda BIR KEZ). ' +
+        'PIN fikstur DEGILDIR — her kosumda yeniden hesaplanir, kapi CANLI kalir (§32.3).',
+    ).toEqual([])
+  })
+
+  it('SABOTAJ KOLU: olcut ham HEAD kalibini GERCEKTEN yakaliyor', () => {
+    // Ölçütün kendisi ölçülür: yukarıdaki kol boş bir regex'le de "yeşil" görünebilirdi.
+    const sahte = `git(['show', \`HEAD:${MANIFEST}\`])` // §32-MUAF: ölçütü sınayan SAHTE örnek
+    const yakalanan = [...sahte.matchAll(/git\(\s*\[([^\]]*)\]/g)].map((m) => m[1])
+    expect(yakalanan.filter((a) => /'HEAD'|HEAD:/.test(a)).length).toBe(1)
   })
 })
