@@ -2005,7 +2005,7 @@ export const tr = {
       consentPreInfo: 'Ön Bilgilendirme',
       consentOrderConfirm: 'Sipariş Onayı',
       consentMarketing: 'Pazarlama İzni',
-      orderNoSuffix: ': #{{code}}',
+      orderNoSuffix: ': {{code}}',
       demoBadge: 'DEMO',
     },
     returns: {
@@ -2062,7 +2062,7 @@ export const tr = {
       needHelpDesc: 'Sipariş, iade veya bakiye konularında anında yardım alın.',
       customerService: 'Müşteri Hizmetleri',
       wave: '👋',
-      orderHash: '#{{code}}',
+      orderHash: '{{code}}',
       shipStatus: {
         delivered: 'Teslim Edildi',
         shipped: 'Kargoda',
@@ -2260,7 +2260,7 @@ export const tr = {
   orders: {
     page: {
       showingCount: '{{shown}} / {{total}} sipariş gösteriliyor',
-      orderLabel: 'Sipariş #',
+      orderLabel: 'Sipariş',
       demoBadge: 'DEMO',
     },
     title: 'Siparişlerim',

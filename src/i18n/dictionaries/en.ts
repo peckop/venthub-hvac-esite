@@ -1464,7 +1464,7 @@ export const en: typeof tr = {
   orders: {
     page: {
       showingCount: 'Showing {{shown}} / {{total}} orders',
-      orderLabel: 'Order #',
+      orderLabel: 'Order',
       demoBadge: 'DEMO',
     },
     title: 'My Orders',
@@ -2079,7 +2079,7 @@ export const en: typeof tr = {
       consentPreInfo: 'Preliminary Information',
       consentOrderConfirm: 'Order Confirmation',
       consentMarketing: 'Marketing Consent',
-      orderNoSuffix: ': #{{code}}',
+      orderNoSuffix: ': {{code}}',
       demoBadge: 'DEMO',
     },
     returns: {
@@ -2136,7 +2136,7 @@ export const en: typeof tr = {
       needHelpDesc: 'Get instant help with orders, returns, or balance.',
       customerService: 'Customer Service',
       wave: '👋',
-      orderHash: '#{{code}}',
+      orderHash: '{{code}}',
       shipStatus: {
         delivered: 'Delivered',
         shipped: 'Shipped',

@@ -182,7 +182,9 @@ serve(async (req) => {
     const brandPrimary = branding.brandPrimaryColor
     const brandLogoUrl = branding.brandLogoUrl
 
-    const prettyOrderNo = order_number ? `#${order_number.split('-')[1]}` : `#${order_id?.slice(-8).toUpperCase() || 'N/A'}`
+    // REC-156: TAM numara — kesme YOK. Gerekçe ve kapı: order-confirmation/index.ts
+    // aynı satır + `src/utils/siparisNo.ts` + INV-SIPARIS-NO-1.
+    const siparisNo = order_number ? String(order_number).trim() : `${order_id?.slice(-8).toUpperCase() || 'N/A'}`
     
     const getStatusLabel = (status: string): string => {
       const labels: Record<string, string> = {
@@ -198,7 +200,7 @@ serve(async (req) => {
     }
 
     const statusLabel = getStatusLabel(new_status)
-    const subject = `${brandName} | İade durumu güncellendi - ${prettyOrderNo}`
+    const subject = `${brandName} | İade durumu güncellendi - ${siparisNo}`
 
     // Duruma özel müşteri mesajı + "Sonraki Adımlar" (prod v-frozen davranışı)
     const getStatusMessage = (status: string): { message: string; nextSteps?: string } => {
@@ -244,7 +246,7 @@ serve(async (req) => {
     const emailContent = `
 Merhaba ${customer_name},
 
-${prettyOrderNo} numaralı siparişinizin iade durumu güncellendi.
+${siparisNo} numaralı siparişinizin iade durumu güncellendi.
 
 📦 İade Sebebi: ${reason}
 ${description ? `📝 Açıklama: ${description}` : ''}
@@ -269,7 +271,7 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
         <h2 style="color: ${brandPrimary};">${brandName} — İade Durumu Güncellendi</h2>
         ${brandLogoUrl ? `<p><img src="${brandLogoUrl}" alt="${brandName}" style="max-height:40px;"/></p>` : ''}
         <p>Merhaba <strong>${customer_name}</strong>,</p>
-        <p><strong>${prettyOrderNo}</strong> numaralı siparişinizin iade durumu güncellendi.</p>
+        <p><strong>${siparisNo}</strong> numaralı siparişinizin iade durumu güncellendi.</p>
 
         <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3 style="margin-top: 0; color: #374151;">İade Bilgileri</h3>

@@ -202,8 +202,10 @@ serve(async (req) => {
     const brandPrimary = branding.brandPrimaryColor
     const brandLogoUrl = branding.brandLogoUrl
 
-    const prettyOrderNo = order_number ? `#${order_number.split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
-    const subject = `${brandName} | Siparişiniz teslim edildi - ${prettyOrderNo}`
+    // REC-156: TAM numara — kesme YOK. Gerekçe ve kapı: order-confirmation/index.ts
+    // aynı satır + `src/utils/siparisNo.ts` + INV-SIPARIS-NO-1.
+    const siparisNo = order_number ? String(order_number).trim() : `${order_id.slice(-8).toUpperCase()}`
+    const subject = `${brandName} | Siparişiniz teslim edildi - ${siparisNo}`
 
     let html = (await loadTemplate()) || ''
     if (!html) {
@@ -211,13 +213,13 @@ serve(async (req) => {
         '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">',
         `<h2 style="color: ${brandPrimary};">${brandName} — Teslimat Tamamlandı</h2>`,
         `<p>Merhaba <strong>${customer_name}</strong>,</p>`,
-        `<p><strong>${prettyOrderNo}</strong> numaralı siparişiniz başarıyla teslim edilmiştir.</p>`,
+        `<p><strong>${siparisNo}</strong> numaralı siparişiniz başarıyla teslim edilmiştir.</p>`,
         '<p>Herhangi bir sorunuz olursa bizimle iletişime geçebilirsiniz.</p>',
         `<p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>`,
         '</div>'
       ].join('')
     } else {
-      html = render(html, { customer_name, order_number: prettyOrderNo, brand_name: brandName, brand_primary_color: brandPrimary, brand_logo_url: brandLogoUrl })
+      html = render(html, { customer_name, order_number: siparisNo, brand_name: brandName, brand_primary_color: brandPrimary, brand_logo_url: brandLogoUrl })
     }
 
     if (!resendApiKey) {

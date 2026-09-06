@@ -9,6 +9,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { formatDate } from '../../i18n/datetime'
 import { useI18n } from '../../i18n/I18nProvider'
+import { siparisNoGoster } from '../../utils/siparisNo'
 
 interface ReturnRow {
   id: string
@@ -271,7 +272,7 @@ export default function AccountReturnsPage() {
         <div className="space-y-4">
           {rows.filter(r => statusFilter === 'all' || r.status === statusFilter).map(r => {
             const o = orders.find(x => x.id === r.order_id)
-            const code = o?.order_number ? `#${o.order_number.split('-')[1]}` : `#${r.order_id.slice(-8).toUpperCase()}`
+            const code = siparisNoGoster(o?.order_number, r.order_id)
             const timeline = getReturnTimeline(r.status)
 
             return (
@@ -381,7 +382,7 @@ export default function AccountReturnsPage() {
                 <select value={form.order_id} onChange={e => setForm(s => ({ ...s, order_id: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors">
                   <option value="">{t('returns.selectOrder')}</option>
                   {orders.map(o => (
-                    <option key={o.id} value={o.id}>{o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`} • {formatDate(o.created_at, lang)}</option>
+                    <option key={o.id} value={o.id}>{siparisNoGoster(o.order_number, o.id)} • {formatDate(o.created_at, lang)}</option>
                   ))}
                 </select>
               </div>

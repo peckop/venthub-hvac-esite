@@ -163,21 +163,26 @@ serve(async (req) => {
     let bcc = [...bccList]
     if (toList.length === 0 && bcc.length > 0) { toList.push(bcc[0]); bcc = bcc.slice(1) }
 
-    const prettyOrderNo = order_number ? `#${String(order_number).split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
-    const subject = `${brandName} | Siparişiniz alındı - ${prettyOrderNo}`
+    // REC-156: TAM numara. Eskiden `split('-')[1]` vardı ve bu, `VH-20260818-4215`
+    // içinden **20260818**'i (TARİHİ) basıyordu — aynı gün sipariş veren herkese aynı
+    // "numara" gidiyordu ve destek iki müşteriyi ayırt edemiyordu. Kesme YOK.
+    // Vitrin karşılığı: `src/utils/siparisNo.ts` (Deno bundle oradan import edemez;
+    // kapı INV-SIPARIS-NO-1 dördünün AYNI biçimde olduğunu zorlar).
+    const siparisNo = order_number ? String(order_number).trim() : `${order_id.slice(-8).toUpperCase()}`
+    const subject = `${brandName} | Siparişiniz alındı - ${siparisNo}`
 
     // Load template
     let html = ''
     try {
       const tpl = await loadTemplate()
-      if (tpl) html = renderTemplate(tpl, { brand_name: brandName, brand_primary_color: brandPrimary, brand_logo_url: brandLogoUrl, customer_name, order_number: prettyOrderNo })
+      if (tpl) html = renderTemplate(tpl, { brand_name: brandName, brand_primary_color: brandPrimary, brand_logo_url: brandLogoUrl, customer_name, order_number: siparisNo })
     } catch {}
     if (!html) {
       html = [
         '<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;">',
         `<h2 style=\"color:${brandPrimary}\">${brandName} — Siparişiniz alındı</h2>`,
         `<p>Merhaba <strong>${customer_name || ''}</strong>,</p>`,
-        `<p><strong>${prettyOrderNo}</strong> numaralı siparişiniz için ödemeniz başarıyla alındı ve siparişiniz kargoya hazırlanmaya alındı. Hazır olur olmaz kargo ve takip bilgilerini ayrıca ileteceğiz.</p>`,
+        `<p><strong>${siparisNo}</strong> numaralı siparişiniz için ödemeniz başarıyla alındı ve siparişiniz kargoya hazırlanmaya alındı. Hazır olur olmaz kargo ve takip bilgilerini ayrıca ileteceğiz.</p>`,
         `<p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>`,
         '</div>'
       ].join('')
