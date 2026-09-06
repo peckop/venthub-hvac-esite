@@ -19,7 +19,11 @@
     <p><strong>{{order_number}}</strong> numaralı siparişiniz için ödemeniz başarıyla alındı ve siparişiniz kargoya hazırlanmaya alındı. Hazır olur olmaz kargo ve takip bilgilerini ayrıca ileteceğiz.</p>
     <p>Teşekkürler,<br><strong>{{brand_name}} Ekibi</strong></p>
     <hr />
-    <p class="muted">Bu otomatik bir e‑postadır. Lütfen yanıtlamayın.</p>
+    <p class="muted">Bu otomatik bir e‑postadır. Lütfen yanıtlamayın.
+      Sorularınız için <a href="mailto:{{support_email}}">{{support_email}}</a> adresine yazabilirsiniz.</p>
+    {{#if company_footer}}
+    <p class="muted">{{company_footer}}</p>
+    {{/if}}
   </div>
 </body>
 </html>

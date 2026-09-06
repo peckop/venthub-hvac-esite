@@ -30,6 +30,11 @@ function callerFailure(error: unknown): { status: number; error: string } | null
   return null
 }
 
+/**
+ * Şablon motoru — `{{alan}}` + `{{#if alan}}…{{/if}}`. Döngü (`each`) YOKTUR ve
+ * EKLENMEYECEKTİR: liste gerekiyorsa HTML'i çağıran taraf hazırlar.
+ * Cetvel: `docs/standards/email-template-standard.md` §2.
+ */
 function renderTemplate(tpl: string, _data: Record<string, unknown>): string {
   tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
     const v = _data[key]
@@ -115,6 +120,9 @@ serve(async (req) => {
     const brandName = branding.brandName
     const brandPrimary = branding.brandPrimaryColor
     const brandLogoUrl = branding.brandLogoUrl
+    // REC-154: marka değerleriyle AYNI kaynaktan (getTenantBranding) gelir — ayrı yol yok.
+    const supportEmail = branding.supportEmail
+    const companyFooter = branding.companyFooter
 
     if (!supabaseUrl || !serviceKey || !resendApiKey) {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -175,7 +183,15 @@ serve(async (req) => {
     let html = ''
     try {
       const tpl = await loadTemplate()
-      if (tpl) html = renderTemplate(tpl, { brand_name: brandName, brand_primary_color: brandPrimary, brand_logo_url: brandLogoUrl, customer_name, order_number: siparisNo })
+      if (tpl) html = renderTemplate(tpl, {
+        brand_name: brandName,
+        brand_primary_color: brandPrimary,
+        brand_logo_url: brandLogoUrl,
+        customer_name,
+        order_number: siparisNo,
+        support_email: supportEmail,
+        company_footer: companyFooter,
+      })
     } catch {}
     if (!html) {
       html = [
@@ -184,6 +200,8 @@ serve(async (req) => {
         `<p>Merhaba <strong>${customer_name || ''}</strong>,</p>`,
         `<p><strong>${siparisNo}</strong> numaralı siparişiniz için ödemeniz başarıyla alındı ve siparişiniz kargoya hazırlanmaya alındı. Hazır olur olmaz kargo ve takip bilgilerini ayrıca ileteceğiz.</p>`,
         `<p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>`,
+        `<p style="color:#6b7280;font-size:14px;">Sorularınız için <a href="mailto:${supportEmail}">${supportEmail}</a> adresine yazabilirsiniz.</p>`,
+        companyFooter ? `<p style="color:#6b7280;font-size:12px;">${companyFooter}</p>` : '',
         '</div>'
       ].join('')
     }

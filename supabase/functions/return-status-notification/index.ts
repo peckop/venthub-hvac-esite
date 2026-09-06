@@ -181,6 +181,11 @@ serve(async (req) => {
     const brandName = branding.brandName
     const brandPrimary = branding.brandPrimaryColor
     const brandLogoUrl = branding.brandLogoUrl
+    // REC-154: marka değerleriyle AYNI kaynaktan (getTenantBranding) gelir — ayrı yol yok.
+    // ⚠Bu uçta HTML ŞABLON DOSYASI YOK; gövde satır-içi şablon değişmeziyle kuruluyor.
+    // Kapı bunu bilir ve "şablon yok" hâlini adıyla ölçer (eposta-sablon-alanlari.test.ts).
+    const supportEmail = branding.supportEmail
+    const companyFooter = branding.companyFooter
 
     // REC-156: TAM numara — kesme YOK. Gerekçe ve kapı: order-confirmation/index.ts
     // aynı satır + `src/utils/siparisNo.ts` + INV-SIPARIS-NO-1.
@@ -257,13 +262,14 @@ ${message}
 
 ${nextSteps ? `\n📋 Sonraki Adımlar:\n${nextSteps}` : ''}
 
-İade süreci ile ilgili sorularınız için destek ekibimizle iletişime geçebilirsiniz.
+İade süreci ile ilgili sorularınız için ${supportEmail} adresinden destek ekibimizle iletişime geçebilirsiniz.
 
 Teşekkürler,
 ${brandName} Ekibi
 
 ---
 Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
+${companyFooter}
     `.trim()
 
     const html = `
@@ -293,11 +299,12 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
         </div>
         ` : ''}
 
-        <p>İade süreci ile ilgili sorularınız için destek ekibimizle iletişime geçebilirsiniz.</p>
+        <p>İade süreci ile ilgili sorularınız için <a href="mailto:${supportEmail}">${supportEmail}</a> adresinden destek ekibimizle iletişime geçebilirsiniz.</p>
         <p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>
 
         <hr style="margin-top: 30px; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın.</p>
+        ${companyFooter ? `<p style="color: #6b7280; font-size: 12px;">${companyFooter}</p>` : ''}
       </div>
     `
 

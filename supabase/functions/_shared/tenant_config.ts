@@ -10,6 +10,24 @@ export interface TenantBranding {
   brandLogoUrl: string
   brandPrimaryColor: string
   emailFrom: string
+  /**
+   * REC-154 — müşterinin YAZABİLECEĞİ adres. `emailFrom` bunun yerine GEÇMEZ:
+   * gönderim adresi `onboarding@resend.dev`'e düşebiliyor (order-confirmation/index.ts
+   * domain-doğrulama yedeği) ve o kutu okunmuyor. Şablonların altbilgisi "yanıtlamayın"
+   * diyorsa, nereye yazılacağını da SÖYLEMEK zorunda.
+   */
+  supportEmail: string
+  /**
+   * REC-154 — e-postanın altına basılacak ŞİRKET KİMLİĞİ satırı (unvan · adres · vergi no).
+   * ⚠VARSAYILANI BOŞTUR ve bu KASITLIDIR: kaynağı `src/config/legal.ts`'tir, orada
+   * `sellerTitle`/`sellerAddress`/`taxNumber` dahil **19 alan** hâlâ `'[SATICI_UNVAN]'`
+   * biçiminde doldurulmamış (2026-09-06 ölçümü). O dosyanın kendi kuralı: "gerçekmiş gibi
+   * duran sahte değer KOYMA". Müşteriye giden e-postada uydurma bir ticaret unvanı basmak,
+   * boş bırakmaktan KÖTÜDÜR. Şablon bu yüzden `{{#if company_footer}}` ile sarar: değer
+   * gelmezse altbilgi hiç çizilmez. Recep bilgileri verdiğinde `COMPANY_FOOTER` ortam
+   * değişkeni ya da tenant config'i doldurulur — kod DEĞİŞMEZ.
+   */
+  companyFooter: string
 }
 
 // T026-VH Adım 6 (2026-08-15): `resolveTenantId` BURADAN SİLİNDİ.
@@ -77,16 +95,37 @@ export async function getTenantBranding(tenantId: string): Promise<TenantBrandin
     Deno.env.get('BRAND_PRIMARY_COLOR') || 
     '#2563eb'
 
-  const emailFrom = 
-    dbConfig.email_from || 
-    dbConfig.EMAIL_FROM || 
-    Deno.env.get('EMAIL_FROM') || 
+  const emailFrom =
+    dbConfig.email_from ||
+    dbConfig.EMAIL_FROM ||
+    Deno.env.get('EMAIL_FROM') ||
     'VentHub <onboarding@resend.dev>'
+
+  // REC-154 · destek adresi. Zincir yukarıdakilerle BİREBİR AYNI (tenant config → ortam →
+  // sistem varsayılanı); yeni bir yol açılmadı, çünkü ayrı yol = ayrı bayatlama noktası.
+  // Sistem varsayılanı UYDURULMADI, ÖLÇÜLDÜ: `info@venthub.com.tr` vitrinde 7 dosyada
+  // 9 kez geçiyor (i18n tr/en `contact.email`, ContactPage, LeadModal, AccountOverviewPage,
+  // OdemeKapaliBilgi, ana sayfa JSON-LD) — yani sitenin ilan ettiği iletişim adresi bu.
+  const supportEmail =
+    dbConfig.support_email ||
+    dbConfig.supportEmail ||
+    Deno.env.get('SUPPORT_EMAIL') ||
+    'info@venthub.com.tr'
+
+  // REC-154 · şirket altbilgisi. Zincirin SONU BOŞ — gerekçe `TenantBranding.companyFooter`
+  // yorumunda: kaynağı `src/config/legal.ts` ve orası bilinçli olarak doldurulmamış.
+  const companyFooter =
+    dbConfig.company_footer ||
+    dbConfig.companyFooter ||
+    Deno.env.get('COMPANY_FOOTER') ||
+    ''
 
   return {
     brandName,
     brandLogoUrl,
     brandPrimaryColor,
-    emailFrom
+    emailFrom,
+    supportEmail,
+    companyFooter
   }
 }
