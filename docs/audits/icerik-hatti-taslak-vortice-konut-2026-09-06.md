@@ -112,7 +112,10 @@ MEX 120/5" LL 1S T [DB]
 ### Dört madde
 
 * İki sürüm vardır: Standart ve zaman saatli (T); seri aralıklı ya da sürekli havalandırma için uygundur. [RES s.24]
-* Debi 100 mm modellerde 90 m³/h, 120 mm modellerde 175 m³/h'tir. [AVenS s.10]
+* Debi MEX 100/4" modellerinde 90 m³/h, MEX 120/5" modellerinde 175 m³/h'tir. [AVenS s.10]
+  *(Kaynak s.10 model adını `MEX 100/4"` biçiminde, **inç işaretiyle** yazar ve o sayfada "mm"
+  birimi hiç geçmez. Önceki yazım "100 mm modellerde" diyordu — birim kaynakta olmayan bir
+  tamamlamaydı; kapı sıkılaştırılınca yakalandı ve model adına çevrildi.)*
 * IP45 koruma sınıfı; banyoların Zone 1 bölgesi dâhil ıslak hacimlere montaja uygundur. [PEF s.3]
 * Ses seviyesi 100 mm modellerde 26.9 dB(A), 120 mm modellerde 32.3 dB(A)'dır (Lp, 3 m). [PEF s.3]
 

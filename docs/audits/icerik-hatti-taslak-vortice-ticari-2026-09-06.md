@@ -148,7 +148,10 @@ sabitleme sistemiyle donatılmıştır; temizlik, bakım ve ürünün yeniden ya
 kolayca sökülüp takılabilir. [QBK s.5] Paneller birbirinin yerine takılabilir ve ayar panelleri
 kulplu gelir. [QBK s.5] Basma kanallarına daha kolay bağlanabilmesi için dairesel emiş ağızları
 bulunur. [QBK s.5] Kabinde paslanmaz tahliyeli kondens suyu toplama tavası vardır. [QBK s.5]
-Kabin ölçüleri en küçük modelde 585x585x525 mm, en büyük modelde 1120x1120x1060 mm'dir. [QBK s.8]
+Kabin ölçüleri en küçük modelde 585×585×525, en büyük modelde 1120×1120×1060'tır. [QBK s.8]
+*(Kaynak s.8'deki ölçü tablosunun sütun başlıkları **birimsizdir** — A, B, C, D… — ve o sayfada
+"mm" hiç geçmez. Önceki yazım "mm" ekliyordu; birim kaynakta olmadığı için çıkarıldı. Ölçüler
+büyük olasılıkla mm'dir ama bu **varsayım**, kaynak iddiası değil.)*
 Ürün ağırlıkları 37 kg ile 151 kg arasındadır. [QBK s.6] Türkçe ürün tanımında kabin su geçirmez
 olarak nitelenir ve standart drenaj tahliye somunu belirtilir. [AVenS s.36]
 

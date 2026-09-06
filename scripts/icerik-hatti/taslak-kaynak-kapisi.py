@@ -155,6 +155,9 @@ def taslagi_denetle(yol, ayrinti=False):
     onbellek = {}
     dogrulanan = dusen = olculemeyen = 0
     adsiz_ref = 0
+    # "zayif dogrulanan" = sayi ve birim sayfada AYRI AYRI bulundu, BIRLIKTE oldugu
+    # dogrulanmadi. Gizlenmez, raporda ayri sayilir (bkz. bulundu() icindeki gerekce).
+    zayif = []
     eksik_pdf = set()
     hatalar = []
 
@@ -234,8 +237,30 @@ def taslagi_denetle(yol, ayrinti=False):
                 return re.search(rf"(?<![A-Za-z0-9]){re.escape(j.strip())}(?![A-Za-z0-9])", havuz) is not None
             if norm(j) in havuz_n:
                 return True
-            m = re.match(r"^([0-9]{1,5}(?:[.,][0-9]{1,3})?)\s*[A-Za-zÇĞİÖŞÜçğıöşü³²/°%]+$", j.strip())
-            return bool(m) and norm(m.group(1)) in havuz_n
+            # SAYI-GERI-DUSUSU (birim baslik hucresindeyse tam jeton bitisik gecmez) —
+            # ⛔ AMA BIRIM DE SAYFADA GECMELI. Olculmus kor nokta (alt-ajan SABOTAJ D, 2026-09-06):
+            # uydurma "Motor 400 °C dayanikli, 315 mm cark" iddiasi YESIL gecti, cunku "400" ve
+            # "315" o sayfada MODEL ADI olarak duruyordu (HF/S 400, HF/S 315). Yani yanlis
+            # kirmiziyi cozerken yanlis YESIL riski acmisim.
+            # → opening-a-gate-creates-new-hazards: bir kapiyi gevsetmek yeni tehlike dogurur.
+            m = re.match(r"^([0-9]{1,5}(?:[.,][0-9]{1,3})?)\s*([A-Za-zÇĞİÖŞÜçğıöşü³²/°%]+)$", j.strip())
+            if not m:
+                return False
+            sayi, birim = m.group(1), m.group(2)
+            if norm(sayi) not in havuz_n:
+                return False
+            # birim sayfada HIC gecmiyorsa, ciplak sayi tesaduf demektir
+            if norm(birim) not in havuz_n:
+                return False
+            # ⚠ BURADA ESLESME ZAYIFTIR VE BUNU GIZLEMIYORUZ.
+            # Sayi ve birim sayfada AYRI AYRI bulundu; BIRLIKTE oldugu dogrulanmadi.
+            # Olculdu (2026-09-06): yakinlik sarti (±60 karakter) KULLANILAMAZ, cunku PDF
+            # tablosunda birim BASLIK hucresinde, deger satirda durur — s.41'de "0,18" ile
+            # "kW" arasinda yakin eslesme YOK, yani gercek bir iddiayi da dusururdu.
+            # Sonuc: bu sinif iddia "zayif dogrulandi" diye SAYILIR ve raporda gorunur.
+            # Bilinen kacak: "315 mm" gibi, sayinin sayfada MODEL ADI olarak gectigi durumlar.
+            zayif.append(j)
+            return True
 
         kayip = [j for j in jetonlar if not bulundu(j)]
         if kayip:
@@ -257,6 +282,8 @@ def taslagi_denetle(yol, ayrinti=False):
         # kaynagini acikca yazmak icin kullandi (dogru davranis) ama kapi PDF'e bakar, DB'ye
         # bakmaz — yani bu iddialar kapinin KOR NOKTASINDA. Sessiz kalmasin diye sayilir.
         "db_etiketi": len(re.findall(r"\[DB\]", metin)),
+        "zayif": len(zayif),
+        "zayif_ornek": zayif[:4],
         "eksik_pdf": sorted(eksik_pdf),
         "hatalar": hatalar,
     }
@@ -300,6 +327,12 @@ def main():
         elif hic_olcum:
             print("      ⛔ HIC IDDIA OLCULEMEDI — jeton tasiyan tek cumle yok; kapi bu dosyada KOR.")
             toplam_dusen += 1
+        if r["zayif"]:
+            print(f"      ⚠ ZAYIF DOGRULANAN {r['zayif']} iddia — sayi ve birim sayfada AYRI AYRI")
+            print(f"         bulundu, BIRLIKTE oldugu dogrulanmadi: {', '.join(r['zayif_ornek'])}")
+            print("         (PDF tablosunda birim BASLIK hucresindedir; yakinlik sarti gercek")
+            print("          iddialari da dusurdugu icin kullanilamadi. Bilinen kacak: sayinin")
+            print("          sayfada MODEL ADI olarak gectigi durumlar — ornek 'HF/S 315' vs '315 mm'.)")
         if r["db_etiketi"]:
             print(f"      ⓘ [DB] etiketli {r['db_etiketi']} iddia — KAPI BUNLARI OLCMEZ.")
             print("         (kaynak PDF degil, canli DB. Dogrulamasi SQL ile ELLE yapilir;")
