@@ -59,7 +59,18 @@
 | B | Localize-rota | `useLocalizedRoutes`/`localizedHref` | **INV-2** `localized-route-ssot.test.ts` (3 kural: elle önek · sabit app-yolu · ham Routes) | ✅ KAPALI (54 dosya migrate) |
 | C | i18n literal → t() | `t()` + `en: typeof tr` | eslint `react/jsx-no-literals` + `test:i18n` parite + `prebuild` | ⚠️ KISMÎ — kapsam-içi kapalı; **admin (~256) + legal (~235) ertelendi** |
 | D | Para/sayı/tarih biçimi | `formatCurrency`/`formatNumber`/`formatDate` | **INV-3** `numeric-format-ssot.test.ts` (ham `Intl.*Format` · `toLocale*String` yasak; muaf = SSOT 2 dosya) | ✅ KAPALI (6 saha migrate) |
-| E | DB JSONB çeviri (display) | `getCategoryDescription` / `mapCategoryWithLocale` | **INV-4** `category-metadata-i18n-ssot.test.ts` (ham `hero_*` / `technical_summary` okuması yasak) | ✅ KAPALI (`CategoryShowcase` helper'a bağlandı) |
+| E | DB JSONB çeviri (display) | `getCategoryDescription` / `mapCategoryWithLocale` | **INV-4** `category-metadata-i18n-ssot.test.ts` + **INV-KATEGORI-ACIKLAMA-1** `kategori-aciklama-dil-cozumu.test.ts` | ✅ KAPALI (`useCategoryViewModel.ts:79` hunisi — 5 dosya / 6 render yeri) |
+
+> ⛔**BU SATIR 2026-09-06'DA YANLIŞTI VE DÜZELTİLDİ — kayda geçiyor, çünkü hatanın SINIFI
+> tekrarlanabilir.** Önceki hâli *"✅ KAPALI (`CategoryShowcase` helper'a bağlandı)"* diyordu.
+> REC-161 ölçümünde çıktı ki **`components/category/CategoryShowcase.tsx`'i hiçbir dosya
+> import etmiyor** — ölü kod. Yani cetvel, **var olmayan bir kapsamı** kapalı ilan ediyordu;
+> canlı yol o sırada `useCategoryViewModel.ts:79`'daki **ham kolon okumasıydı** ve dile kördü.
+>
+> ⭐**DERS:** *"bu kural zaten yazılı mı"* diye sormak **tek başına yetmez** — yazılı olan
+> **yanlış** olabilir. Bir cetvelin **KAPALI** dediği her madde, kapatan dosyanın **CANLI**
+> olduğunu (import ediliyor / çağrılıyor, ölü değil) da göstermelidir; göstermeyen bir
+> "KAPALI" iddiası **hatırlanan** sayılır, ölçülmüş değil.
 | E2 | **Kategori açıklaması — dil çözümü** | `getCategoryDescription(cat, lang)` | **INV-KATEGORI-ACIKLAMA-1** `kategori-aciklama-dil-cozumu.test.ts` (K1 dil ayrışması · K2 geriye uyum · K3 çağrı arity · K4 ham `metadata.description_i18n` yasak · K5 ayırt edicilik · K6 boşluk muhafızı) | ✅ KAPALI (REC-161) |
 | F | Hreflang/SEO | hreflang seti | — manuel denetim | ⚠️ blueprint var (`seo-transition-blueprint.md`) |
 | G | **i18n key-çözünürlük** | `getDictValue` nested-only | **INV-5** `i18n-key-resolution.test.ts` (her statik `t('a.b.c')` sözlükte çözülmeli; içinde-nokta düz anahtar = ham-key render) | ✅ KAPALI (ratchet: 2026-06-16'da 32 debt donduruldu → admin literal batch #364 15'ini çözünce 32→17 sıkıştı; yeni kırılma kırar) |
