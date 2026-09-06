@@ -181,7 +181,16 @@ def taslagi_denetle(yol, ayrinti=False):
         # durur — "0,18 kW" metin akisinda BITISIK gecmez. Olctum: s.41'de "0,18" 5 kez var,
         # "kW" 1 kez (baslikta). Ilk surum bu yuzden DOGRU bir cumleye yanlis KIRMIZI verdi.
         # Ayirt edicilik korunur: uydurma sayi ("850", "3200", "48") sayfada HIC gecmez.
+        # ⚠ KISA ALFABETIK KODLAR HAM METINDE, KELIME SINIRIYLA ARANIR.
+        # Olculmus zaaf (alt-ajan buldu, 2026-09-06): norm() aksani eritiyor, boylece
+        # Turkce "aç / AÇ" hecesi "AC" oluyor ve `AC` jetonu YANLIS ESLESIYOR — kapi
+        # yanlis POZITIF yesil veriyordu. Uzun jetonlarda (IP55, 400 °C) bu risk yok;
+        # yalniz 2-3 harfli kodlarda var, o yuzden ayri yol.
+        KISA_KOD = {"AC", "EC", "G3", "V0", "MD", "RF", "ES"}
+
         def bulundu(j):
+            if j.strip().upper() in KISA_KOD:
+                return re.search(rf"(?<![A-Za-z0-9]){re.escape(j.strip())}(?![A-Za-z0-9])", havuz) is not None
             if norm(j) in havuz_n:
                 return True
             m = re.match(r"^([0-9]{1,5}(?:[.,][0-9]{1,3})?)\s*[A-Za-zÇĞİÖŞÜçğıöşü³²/°%]+$", j.strip())
@@ -203,6 +212,10 @@ def taslagi_denetle(yol, ayrinti=False):
         "olculemeyen": olculemeyen,
         "adsiz_ref": adsiz_ref,
         "ref_toplam": len(REF.findall(metin)),
+        # [DB] = kaynagi PDF degil canli veritabani olan iddia. Ajanlar bunu UYDURMAK YERINE
+        # kaynagini acikca yazmak icin kullandi (dogru davranis) ama kapi PDF'e bakar, DB'ye
+        # bakmaz — yani bu iddialar kapinin KOR NOKTASINDA. Sessiz kalmasin diye sayilir.
+        "db_etiketi": len(re.findall(r"\[DB\]", metin)),
         "eksik_pdf": sorted(eksik_pdf),
         "hatalar": hatalar,
     }
@@ -246,6 +259,10 @@ def main():
         elif hic_olcum:
             print("      ⛔ HIC IDDIA OLCULEMEDI — jeton tasiyan tek cumle yok; kapi bu dosyada KOR.")
             toplam_dusen += 1
+        if r["db_etiketi"]:
+            print(f"      ⓘ [DB] etiketli {r['db_etiketi']} iddia — KAPI BUNLARI OLCMEZ.")
+            print("         (kaynak PDF degil, canli DB. Dogrulamasi SQL ile ELLE yapilir;")
+            print("          sessiz gecmesin diye burada sayiliyor.)")
         if r["eksik_pdf"]:
             print(f"      ⚠ kaynak bulunamadi: {', '.join(r['eksik_pdf'][:5])}")
         for kaynak, sf, kayip, hepsi, iddia in r["hatalar"]:
