@@ -121,6 +121,14 @@ def norm(s):
     # Iki karakter ayni baglamda ayni seyi ifade eder; esitlemek gevsetme degil,
     # olcutun dogru evrende calismasidir. (Alt-ajan bu farki kendisi de raporlamisti.)
     s = s.replace("º", "°").replace("°", "°")
+    # ⚠ ONDALIK AYIRICI AYNI SAYFADA BILE DEGISIYOR — olculdu (AVenS s.28, 2026-09-06):
+    # ayni tabloda "5,5K" ve "5.5K" birlikte gecer (alt-ajan da rapor etmisti). Kapi bunlari
+    # FARKLI sayinca "5,5 kW" iddiasi zayif esleseni dusuyordu; Recep'in "HF/FW yazilirsa
+    # kapidan GUCLU gecmeli" sarti bu yuzden karsilanamiyordu — oysa sayi kaynakta AYNEN vardi.
+    # Yalniz IKI RAKAM ARASINDAKI virgul noktaya cevrilir: "IP55" gibi jetonlar etkilenmez,
+    # ve uydurma bir sayi bu donusumle sayfada belirmez (850 hala yok). Gevsetme degil,
+    # ayni sayinin iki yazimini ayni saymaktir.
+    s = re.sub(r"(?<=[0-9]),(?=[0-9])", ".", s)
     s = unicodedata.normalize("NFKD", s)
     s = "".join(c for c in s if not unicodedata.combining(c))
     return re.sub(r"\s+", "", s).upper().replace("M3/H", "M³/H")

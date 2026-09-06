@@ -18,8 +18,8 @@ Onay sonrası bunlar veritabanına yazılır ve vitrinde görünür.
 |---|---|
 | Aile | **40** |
 | Kaynağıyla doğrulanan iddia | **279** |
-| — bunların GÜÇLÜ olanı | 222 |
-| — bunların ZAYIF olanı | 57 |
+| — bunların GÜÇLÜ olanı | 225 |
+| — bunların ZAYIF olanı | 54 |
 | Kaynağıyla çelişen iddia (DÜŞEN) | **0** |
 | Kapının ölçemediği cümle | 437 |
 | Kaynağı olmadığı için BOŞ bırakılan blok | 75 |
@@ -46,6 +46,20 @@ referanslar bu toplamın dışındadır — onlar vitrine çıkmıyor.*
 Üstüne yazılacak metinlerin bir kısmı zaten hatalıydı: seri metni tek bir modelin
 verisini taşıyordu (ölçüldü, ayrı raporda). Yeni metin bunu da düzeltiyor.
 
+## Senin verdiğin kararlar işlendi (K7.10)
+
+AVenS için verdiğin karar bu dosyaya **elle değil** veri dosyasından işlendi
+(`scripts/icerik-hatti/karar-k710.json`) — karar değişirse tek yer değişir.
+
+| Aile | Karar | Gerekçe / ölçüm |
+|---|---|---|
+| `avens-bvu-ls` | **SAYFA YAZILMAYACAK** | Kaynakta satilabilir anlatim yok (yalniz kod ve fiyat). AVenS'ten teknik foy istenecek; gelene kadar sayfa kod+fiyat kisa kimlik halinde kalir. Tarama listesinden DUSMEZ. |
+| `avens-hiz-anahtarlari` | **SAYFA YAZILMAYACAK** | BVU-LS ile ayni: kaynak satilabilir anlatim vermiyor. Teknik foy beklenir; kisa kimlik halinde kalir, tarama listesinde kalir. |
+| `avens-elektrikli-isiticilar` | **YALNIZ AKSESUAR** | Bagimsiz urun olarak degil, kanal tesisatinin aksesuari olarak sunulur; metin bu cerceveyi asmaz. |
+| `avens-sulu-batarya` | **YAZILIR** | Kaynak yeterli. |
+| `avens-hucreli-aspiratorler` | **YAZILIR — SART OLCULDU** | Sinirdaydi; sart 'kapidan GUCLU gecmeli'. Olcum: 12 dogrulanan, 0 zayif, 12 GUCLU. Sart karsilandi. |
+| `avens-hucreli-hf-s` | **YAZILIR — SART OLCULDU** | Sinirdaydi; sart 'kapidan GUCLU gecmeli'. Olcum: 13 dogrulanan, 0 zayif, 13 GUCLU. Sart karsilandi. |
+
 ## ⛔ SENDEN KARAR BEKLEYEN AİLELER
 
 Bu ailelerde kaynak, satılabilir tek bir cümle bile vermiyor (yalnız kod ve fiyat).
@@ -69,7 +83,7 @@ Uydurmadık, boş bıraktık. İki seçenek var: **(a)** üreticiden teknik föy
 
 **Ürün:** 6 · **Kaynak:** AVenS s.28
 
-**Kapı:** doğrulanan 12 (güçlü 9 · zayıf 3) · düşen 0 · ölçülemeyen 3
+**Kapı:** doğrulanan 12 (güçlü 12 · zayıf 0) · düşen 0 · ölçülemeyen 3
 **Dolu blok:** Gövde, Çark
 **Kaynağı olmadığı için BOŞ:** Motor, Koruma, Kontrol, Montaj
 

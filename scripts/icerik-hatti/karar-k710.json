@@ -1,0 +1,30 @@
+{
+  "_aciklama": "K7.10 — Recep'in AVenS karari (2026-09-06, OPS uzerinden iletildi ve Kararlar/Katalog belgesine 935079bf ile yazildi). Sunum bu kararlari ELLE degil BURADAN okur; karar degisirse tek yer degisir.",
+  "_kaynak": "Kararlar - Katalog belgesi K7.10",
+  "kararlar": {
+    "avens-bvu-ls": {
+      "durum": "SAYFA YAZILMAYACAK",
+      "gerekce": "Kaynakta satilabilir anlatim yok (yalniz kod ve fiyat). AVenS'ten teknik foy istenecek; gelene kadar sayfa kod+fiyat kisa kimlik halinde kalir. Tarama listesinden DUSMEZ."
+    },
+    "avens-hiz-anahtarlari": {
+      "durum": "SAYFA YAZILMAYACAK",
+      "gerekce": "BVU-LS ile ayni: kaynak satilabilir anlatim vermiyor. Teknik foy beklenir; kisa kimlik halinde kalir, tarama listesinde kalir."
+    },
+    "avens-elektrikli-isiticilar": {
+      "durum": "YALNIZ AKSESUAR",
+      "gerekce": "Bagimsiz urun olarak degil, kanal tesisatinin aksesuari olarak sunulur; metin bu cerceveyi asmaz."
+    },
+    "avens-sulu-batarya": {
+      "durum": "YAZILIR",
+      "gerekce": "Kaynak yeterli."
+    },
+    "avens-hucreli-aspiratorler": {
+      "durum": "YAZILIR — SART OLCULDU",
+      "gerekce": "Sinirdaydi; sart 'kapidan GUCLU gecmeli'. Olcum: 12 dogrulanan, 0 zayif, 12 GUCLU. Sart karsilandi."
+    },
+    "avens-hucreli-hf-s": {
+      "durum": "YAZILIR — SART OLCULDU",
+      "gerekce": "Sinirdaydi; sart 'kapidan GUCLU gecmeli'. Olcum: 13 dogrulanan, 0 zayif, 13 GUCLU. Sart karsilandi."
+    }
+  }
+}
