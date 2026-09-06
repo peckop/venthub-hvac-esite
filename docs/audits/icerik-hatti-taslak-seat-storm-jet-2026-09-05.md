@@ -6,6 +6,11 @@
 **Kaynak:** AVenS Ürün Fiyat Kataloğu 2026, s. 41–45 (TR) · **Çeviri YOK** — kaynak zaten Türkçe.
 **Referans biçimi:** her cümlenin sonunda `[s.NN]` = kaynak PDF sayfası.
 
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf -->
+<!-- VARSAYILAN-KAYNAK: AVenS -->
+<!-- Bu iki satır makine içindir: taslak-kaynak-kapisi.py adsız [s.NN] referanslarını
+     bu kaynağa bağlar. Yoksa kapı dosyayı SESSİZCE atlar ve "temiz" görünür. -->
+
 ## KAYNAK / CETVEL
 
 * `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
