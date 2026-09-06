@@ -1,0 +1,316 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""TOPLU SUNUM URETICI — REC-146 Adim 2b, K7.8
+
+NICIN BETIK, NICIN ELLE DEGIL:
+Bu dosya Recep'in TEK ONAY verecegi yuzey. Icindeki her sayi (kac iddia dogrulandi,
+kaci zayif, hangi blok bos) elle yazilirsa uydurmaya acik olur; olculmus bir sayiyi
+elle kopyalamak da "saydim ama olcmedim" hatasinin ta kendisidir. Bu yuzden sunum
+taslak dosyalarindan MAKINEYLE cikarilir ve kapi AILE BASINA kosturulur.
+
+AILE BASINA KAPI: kapi dosya duzeyinde rapor verir. Aile basina sayi icin her ailenin
+blogu, dosyanin BASLIGI (kaynak haritasi burada) ile birlestirilip gecici dosyaya
+yazilir ve kapi ona kosar. Boylece kapinin kendisi degismeden aile kirilimi elde edilir.
+"""
+import os
+import re
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+for _akis in (sys.stdout, sys.stderr):
+    try:
+        _akis.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
+KOK = Path(__file__).resolve().parents[2]
+TASLAK_DIZIN = KOK / "docs" / "audits"
+KAPI = Path(__file__).resolve().parent / "taslak-kaynak-kapisi.py"
+
+REF = re.compile(r"\[(?:([A-Za-zÇĞİÖŞÜçğıöşü]+)\s+)?s\.\s*([0-9]+(?:\s*[,–-]\s*(?:s\.\s*)?[0-9]+)*)\]")
+BLOKLAR = ["Gövde", "Çark", "Motor", "Koruma", "Kontrol", "Montaj"]
+
+
+def aile_bloklari(metin):
+    """Dosyayi (baslik, [aile blogu...]) diye ayirir. Aile = icinde 'Kimlik cümlesi' olan '## ' bolumu."""
+    parcalar = re.split(r"(?m)^## ", metin)
+    baslik = parcalar[0]
+    return baslik, ["## " + p for p in parcalar[1:] if "### Kimlik cümlesi" in p]
+
+
+def kimlik_cumlesi(blok):
+    m = re.search(r"### Kimlik cümlesi\s*\n(.*?)(?=\n### |\n## |\Z)", blok, re.S)
+    if not m:
+        return ""
+    ham = m.group(1)
+    satirlar = [re.sub(r"^>\s?", "", s).strip() for s in ham.strip().splitlines()]
+    return " ".join(s for s in satirlar if s)
+
+
+def maddeler(blok, adet=3):
+    m = re.search(r"### (?:Dört madde|Maddeler[^\n]*)\s*\n(.*?)(?=\n### |\n## |\Z)", blok, re.S)
+    if not m:
+        return []
+    out = []
+    for satir in m.group(1).splitlines():
+        s = satir.strip()
+        if s.startswith("*") and not s.startswith("**"):
+            out.append(re.sub(r"^\*\s*", "", s).strip())
+    return out[:adet]
+
+
+def bos_bloklar(blok):
+    m = re.search(r"### Yapısal bloklar\s*\n(.*?)(?=\n### |\n## |\Z)", blok, re.S)
+    if not m:
+        return [], []
+    govde = m.group(1)
+    dolu, bos = [], []
+    for ad in BLOKLAR:
+        p = re.search(rf"\*\*{ad}\.\*\*(.*?)(?=\n\*\*(?:{'|'.join(BLOKLAR)})\.\*\*|\Z)", govde, re.S)
+        if not p:
+            bos.append(ad)
+        elif "Kaynakta karşılığı yok" in p.group(1) or "kaynakta karşılığı yok" in p.group(1):
+            bos.append(ad)
+        else:
+            dolu.append(ad)
+    return dolu, bos
+
+
+def kaynak_ozeti(blok):
+    gorulen = {}
+    for m in REF.finditer(blok):
+        ad = m.group(1) or "?"
+        for s in re.findall(r"[0-9]+", m.group(2)):
+            gorulen.setdefault(ad, set()).add(int(s))
+    return " · ".join(f"{ad} s.{','.join(str(x) for x in sorted(sf))}" for ad, sf in sorted(gorulen.items()))
+
+
+def kapi_kos(baslik, blok):
+    """Kapiyi YALNIZ bu ailenin blogu icin kosar; sayilar aileye ait olur."""
+    with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False, encoding="utf-8") as fh:
+        fh.write(baslik + "\n" + blok)
+        gecici = fh.name
+    try:
+        p = subprocess.run([sys.executable, str(KAPI), gecici], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        cikti = (p.stdout or "") + (p.stderr or "")
+        m = re.search(r"dogrulanan (\d+) · DUSEN (\d+) · olculemeyen (\d+)", cikti)
+        # ⚠ IKI FARKLI BIRIM: jeton ve iddia. Yalniz IDDIA birimi dogrulanan'dan cikarilabilir.
+        z = re.search(r"ZAYIF ESLESEN (\d+) JETON, (\d+) iddiada", cikti)
+        if not m:
+            return None
+        d, du, o = map(int, m.groups())
+        zj = int(z.group(1)) if z else 0
+        zi = int(z.group(2)) if z else 0
+        return {"dogrulanan": d, "dusen": du, "olculemeyen": o,
+                "zayif_jeton": zj, "zayif_iddia": zi, "guclu_iddia": d - zi,
+                "kirmizi": p.returncode != 0}
+    finally:
+        os.unlink(gecici)
+
+
+SLUG = re.compile(r"`([a-z0-9]+(?:-[a-z0-9]+){1,})`")
+
+
+def slug_bul(blok, baslik_sluglari, sira, dosya_sluglari=()):
+    """Aile slug'i once BLOKTA aranir; bazi taslaklarda slug yalniz dosya basindaki
+    'DB'de ne var' tablosunda gecer — o zaman SIRAYLA eslestirilir (blok sayisi ile
+    baslik slug sayisi esitse guvenlidir; esit degilse '?' birakilir, uydurulmaz)."""
+    m = SLUG.search(blok)
+    if m:
+        return m.group(1)
+    # Bazi bloklar slug'i KISALTARAK yazar: `…-circular`. Uydurmak yerine, dosyanin
+    # tamaminda gecen TAM slug'lar icinde ayni son eki tasiyani ararız; tek aday varsa
+    # eslesme kesindir, birden fazlaysa '?' birakilir.
+    kisa = re.search(r"`…?-?([a-z0-9]+(?:-[a-z0-9]+)*)`", blok)
+    if kisa and dosya_sluglari:
+        adaylar = [x for x in dosya_sluglari if x.endswith(kisa.group(1))]
+        if len(adaylar) == 1:
+            return adaylar[0]
+    if baslik_sluglari and sira < len(baslik_sluglari):
+        return baslik_sluglari[sira]
+    return "?"
+
+
+def main():
+    kayitlar = []
+    for yol in sorted(TASLAK_DIZIN.glob("icerik-hatti-taslak-*.md")):
+        metin = yol.read_text(encoding="utf-8")
+        baslik, bloklar = aile_bloklari(metin)
+        bs, gor = [], set()
+        for m in SLUG.finditer(baslik):
+            if m.group(1) not in gor:
+                gor.add(m.group(1))
+                bs.append(m.group(1))
+        if len(bs) != len(bloklar):
+            bs = []
+        tum_sluglar = []
+        for m in SLUG.finditer(metin):
+            if m.group(1) not in tum_sluglar:
+                tum_sluglar.append(m.group(1))
+        for sira, blok in enumerate(bloklar):
+            db = re.search(r"\*\*DB:\*\*.*?(?:\*\*)?([0-9]+)(?:\*\*)?\s*ürün", blok)
+            ad = re.match(r"## [0-9]+\s*·\s*(.+)", blok.splitlines()[0])
+            dolu, bos = bos_bloklar(blok)
+            kayitlar.append({
+                "dosya": yol.name,
+                "slug": slug_bul(blok, bs, sira, tum_sluglar),
+                "urun": db.group(1) if db else "?",
+                "ad": (ad.group(1).strip() if ad else blok.splitlines()[0][3:].strip()),
+                "kimlik": kimlik_cumlesi(blok),
+                "maddeler": maddeler(blok),
+                "kaynak": kaynak_ozeti(blok),
+                "dolu": dolu, "bos": bos,
+                "kapi": kapi_kos(baslik, blok),
+            })
+    return kayitlar
+
+
+DOSYA_ADI = {
+    "seat-storm-jet": "SEAT · STORM · JET (AVenS çatı fanları)",
+    "lineo": "VORTICE LINEO (yuvarlak kanal fanları)",
+    "heatmaster-slimroof": "VORTICE HEATMASTER / SLIMROOF (çatı fanları)",
+    "isi-geri-kazanim": "VORTICE ısı geri kazanım (VORT HR · VORT MONO)",
+    "radon": "VORTICE RADON (radon tahliye fanları)",
+    "commercial-inline": "VORTICE ticari kanal fanları (CA MD · CA IL ES)",
+    "endustriyel-atex": "VORTICE endüstriyel aksiyel + ATEX",
+    "hava-perdesi": "VORTICE hava perdeleri",
+    "vortice-konut": "VORTICE konut tipi (QUADRO · PUNTO)",
+    "vortice-ticari": "VORTICE ticari (NORDIK HVLS · QBK/SAL/KC)",
+    "vortice-tekiller": "VORTICE tekil ürünler (DEUMIDO · BRA.VO · TIRACAMINO)",
+    "nicotra": "NICOTRA GEBHARDT radyal fanlar",
+    "danfoss": "DANFOSS frekans konvertörleri",
+    "avens-hucreli-siginak": "AVenS hücreli aspiratörler + sığınak üniteleri",
+    "avens-isitici": "AVenS ısıtıcılar + hız anahtarları",
+    "avens-plug-hrv": "AVenS plug fanlar + ısı geri kazanım",
+}
+
+
+def grup_adi(dosya):
+    kok = dosya.replace("icerik-hatti-taslak-", "").rsplit("-2026-", 1)[0]
+    return DOSYA_ADI.get(kok, kok)
+
+
+def sunum_yaz(kayitlar, hedef, db_durum=None):
+    tD = sum(k["kapi"]["dogrulanan"] for k in kayitlar if k["kapi"])
+    tG = sum(k["kapi"]["guclu_iddia"] for k in kayitlar if k["kapi"])
+    tZ = sum(k["kapi"]["zayif_iddia"] for k in kayitlar if k["kapi"])
+    tDus = sum(k["kapi"]["dusen"] for k in kayitlar if k["kapi"])
+    tOlc = sum(k["kapi"]["olculemeyen"] for k in kayitlar if k["kapi"])
+    olculemeyen_aile = [k for k in kayitlar if k["kapi"] and k["kapi"]["kirmizi"]]
+    bos_toplam = sum(len(k["bos"]) for k in kayitlar)
+
+    L = []
+    A = L.append
+    A("# İçerik hattı — 40 ailenin metni, TEK SAYFADA (onay için)")
+    A("")
+    A("**Şerit:** URUN-KATALOG · **İş:** REC-146 Adım 2b · **Tarih:** 2026-09-06")
+    A("**Durum:** hiçbiri veritabanına yazılmadı. Bu dosya **senin tek onayın** için (K7.8).")
+    A("**Bu dosya elle yazılmadı** — taslaklardan makineyle üretildi:")
+    A("`python scripts/icerik-hatti/toplu-sunum.py --yaz`. Sayılar kapının çıktısıdır.")
+    A("")
+    A("## Ne onaylıyorsun")
+    A("")
+    A("Aşağıdaki 40 ailenin her biri için bir **kimlik cümlesi** (ürün sayfasının ilk cümlesi),")
+    A("birkaç madde ve altı yapısal blok (Gövde · Çark · Motor · Koruma · Kontrol · Montaj) yazıldı.")
+    A("Onayın: **bu dil ve bu seviye doğru** demektir; aile aile okuman gerekmez.")
+    A("Onay sonrası bunlar veritabanına yazılır ve vitrinde görünür.")
+    A("")
+    A("## Sayılarla (ölçülmüş, elle yazılmadı)")
+    A("")
+    A("| | |")
+    A("|---|---|")
+    A(f"| Aile | **{len(kayitlar)}** |")
+    A(f"| Kaynağıyla doğrulanan iddia | **{tD}** |")
+    A(f"| — bunların GÜÇLÜ olanı | {tG} |")
+    A(f"| — bunların ZAYIF olanı | {tZ} |")
+    A(f"| Kaynağıyla çelişen iddia (DÜŞEN) | **{tDus}** |")
+    A(f"| Kapının ölçemediği cümle | {tOlc} |")
+    A(f"| Kaynağı olmadığı için BOŞ bırakılan blok | {bos_toplam} |")
+    A("")
+    A("**GÜÇLÜ / ZAYIF ne demek:** kapı, cümledeki sayıyı ve birimi kaynak sayfada arar.")
+    A("İkisi yan yana bulunursa GÜÇLÜ; ayrı ayrı bulunur ama yan yana olduğu")
+    A("doğrulanamazsa ZAYIF sayılır (PDF tablosunda birim başlık hücresinde durur,")
+    A("bu yüzden yan yana şartı gerçek cümleleri de düşürüyordu). ZAYIF **yanlış demek değil**,")
+    A("*kapı bu cümleyi tam kanıtlayamadı* demek. Gizlemiyoruz, sayıyoruz.")
+    A("")
+    A("**Kapının ölçemediği cümle:** içinde sayı/kod olmayan cümle (ör. \"bakımı kolaydır\").")
+    A("Bunlar kaynaktan çevrildi ama makine doğrulayamaz — insan gözü gerekir.")
+    A("")
+    A("*Sayılar yalnız AİLE METİNLERİNE aittir: kapı burada her ailenin kendi bölümüne")
+    A("ayrı ayrı koşturuldu. Taslak dosyalarının karşılaştırma/bulgu bölümlerindeki")
+    A("referanslar bu toplamın dışındadır — onlar vitrine çıkmıyor.*")
+    A("")
+    if db_durum:
+        yok = [k for k, v in db_durum.items() if not v.get("db_de_var")]
+        uzerine = [k for k, v in db_durum.items() if v.get("aciklama_dolu")]
+        sayi_farki = [k["slug"] for k in kayitlar
+                      if k["slug"] in db_durum and db_durum[k["slug"]].get("db_de_var")
+                      and str(db_durum[k["slug"]].get("urun")) != str(k["urun"])]
+        A("## Veritabanıyla tutuyor mu (canlıdan ölçüldü)")
+        A("")
+        A(f"* Slug'ı veritabanında bulunamayan aile: **{len(yok)}**"
+          + (f" — {', '.join(yok)}" if yok else " (hepsi bulundu)"))
+        A(f"* Ürün sayısı taslakla tutmayan aile: **{len(sayi_farki)}**"
+          + (f" — {', '.join(sayi_farki)}" if sayi_farki else " (hepsi tutuyor)"))
+        A(f"* Bugün vitrinde metni olan, yani **üstüne yazılacak** aile: **{len(uzerine)}**")
+        A("")
+        A("Üstüne yazılacak metinlerin bir kısmı zaten hatalıydı: seri metni tek bir modelin")
+        A("verisini taşıyordu (ölçüldü, ayrı raporda). Yeni metin bunu da düzeltiyor.")
+        A("")
+    if olculemeyen_aile:
+        A("## ⛔ SENDEN KARAR BEKLEYEN AİLELER")
+        A("")
+        A("Bu ailelerde kaynak, satılabilir tek bir cümle bile vermiyor (yalnız kod ve fiyat).")
+        A("Uydurmadık, boş bıraktık. İki seçenek var: **(a)** üreticiden teknik föy isteyelim,")
+        A("**(b)** kendi teknik metnimizi yazalım.")
+        A("")
+        for k in olculemeyen_aile:
+            A(f"* `{k['slug']}` — {k['ad']} ({k['urun']} ürün)")
+        A("")
+    A("---")
+    A("")
+    son_grup = None
+    for k in kayitlar:
+        g = grup_adi(k["dosya"])
+        if g != son_grup:
+            A(f"## {g}")
+            A("")
+            son_grup = g
+        kp = k["kapi"] or {}
+        A(f"### `{k['slug']}` — {k['ad']}")
+        A("")
+        A(f"> {k['kimlik']}")
+        A("")
+        for m in k["maddeler"]:
+            A(f"* {m}")
+        if k["maddeler"]:
+            A("")
+        A(f"**Ürün:** {k['urun']} · **Kaynak:** {k['kaynak'] or '—'}")
+        A("")
+        if kp:
+            A(f"**Kapı:** doğrulanan {kp['dogrulanan']} (güçlü {kp['guclu_iddia']} · "
+              f"zayıf {kp['zayif_iddia']}) · düşen {kp['dusen']} · ölçülemeyen {kp['olculemeyen']}")
+        A(f"**Dolu blok:** {', '.join(k['dolu']) or '—'}")
+        A(f"**Kaynağı olmadığı için BOŞ:** {', '.join(k['bos']) or 'yok'}")
+        A("")
+    Path(hedef).write_text(chr(10).join(L) + chr(10), encoding="utf-8")
+    return len(L)
+
+
+if __name__ == "__main__":
+    kayitlar = main()
+    if "--yaz" in sys.argv:
+        hedef = KOK / "docs" / "audits" / "icerik-hatti-toplu-sunum-2026-09-06.md"
+        dd = None
+        for i, a in enumerate(sys.argv):
+            if a == "--db" and i + 1 < len(sys.argv):
+                import json
+                dd = json.loads(Path(sys.argv[i + 1]).read_text(encoding="utf-8"))
+        n = sunum_yaz(kayitlar, hedef, dd)
+        print(f"YAZILDI: {hedef.name} · {len(kayitlar)} aile · {n} satir")
+    else:
+        for k in kayitlar:
+            print(k["slug"], k["kapi"])
