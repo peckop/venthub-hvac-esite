@@ -26,8 +26,6 @@
       "dahil": ["docs/proje-takip/linear/kararlar-*.md"] },
     { "ad": "09-linear-anahtar-ve-is-kayitlari", "baslik": "Linear disa aktarimi: Anahtar ve Kip Haritasi + is kayitlari", "kok": "repo",
       "dahil": ["docs/proje-takip/linear/anahtar-*.md", "docs/proje-takip/linear/is-kayitlari-*.md"] },
-    { "ad": "10-design-15a-briefler", "baslik": "Design 15A: OPS brief'leri + Design bulgu dosyalari", "kok": "repo",
-      "dahil": ["docs/proje-takip/design-15a/*.md"] },
     { "ad": "11-proje-takip-analizler", "baslik": "Proje takip analizleri (celiski/mukerrerlik taramalari, esitleme kayitlari)", "kok": "repo",
       "dahil": ["docs/proje-takip/*.md"] },
     { "ad": "12-konusma-gunlugu", "baslik": "Konusma gunlugu: Recep ile Claude arasindaki gun bazli konusma (sir suzgecinden gecmis, depoya girmez)", "kok": "gunluk",
@@ -39,12 +37,19 @@
       "dahil": ["docs/proje-takip/design/*/*.md", "docs/proje-takip/design/*/*/*.md", "docs/proje-takip/design/*/*/*/*.md", "docs/proje-takip/design/*.md"],
       "haric": ["kararlar-*.md", "anahtar-ve-kip-haritasi-*.md", "venthub-canli-durum.md"] },
     { "ad": "15-linear-is-dagilimi", "baslik": "Linear disa aktarimi: TUM isler proje/kilometre tasi/durum/serit ile (santiye durumu; % bitti)", "kok": "repo",
-      "dahil": ["docs/proje-takip/linear/is-dagilimi-*.md"] }
+      "dahil": ["docs/proje-takip/linear/is-dagilimi-*.md"] },
+    { "ad": "16-kurulum-ve-kapi-notlari", "baslik": "Elle yazilmis kurulum/kapi/karar notlari (kod disi; kapsam denetimi 2026-09-06 buldu)", "kok": "repo",
+      "dahil": [".githooks/README.md", "public/decoders/README.md", "supabase/baselines/README.md",
+                ".claude/skills/venthub-20-eksen-denetimi/references/kapanmis-bulgular.md"] }
   ],
   "asla_dahil_etme": {
     "nicin": "koddan / aractan URETILMIS; tazelik kapisi ayri (uretilmis-artefakt-standard). Deftere girerse NLM cevaplari kod snapshot'ina baglanir ve drift eder.",
-    "desenler": ["docs/*_master.md", "docs/system_tree.md", "docs/design_system_config.md", "src/**/*.md", "supabase/**/*.md", "scripts/**/*.md",
-                 "*.config.md", "next-env.d.md", "vitest-setup.md", "vitest.setup.md", "TEST_INFRA.md", "TEST_READY.md", "docs/artefakt_manifest.json"]
+    "desenler": ["docs/*_master.md", "docs/system_tree.md", "docs/design_system_config.md", "CONTEXT.md", "src/**/*.md",
+                 "supabase/functions/**/*.md", "supabase/migrations/**/*.md", "scripts/**/*.md",
+                 "*.config.md", "next-env.d.md", "vitest-setup.md", "vitest.setup.md", "TEST_INFRA.md", "TEST_READY.md", "docs/artefakt_manifest.json",
+                 "registry/**/*.md", ".archive/**/*.md", "docs/archive/**/*.md", "artifacts/**/*.md", "docs/reference/supabase/**/*.md",
+                 "docs/proje-takip/design-15a/*.md"],
+    "_not_2026_09_06": "kapsam denetimi (2045 .md): registry 331 + .archive 51 + docs/archive 15 + artifacts 5 = donmus arsiv, deftere GIRMEZ; design-15a = 09-04 donmus fotograf, canli surumler demet 14; supabase/baselines/README.md elle yazilmis karar kaydi -> demet 16 (bu yuzden supabase yasagi functions/migrations'a daraltildi)"
   },
   "linear_disa_aktarim": {
     "nicin": "Linear MCP betikten cagrilamaz; OPS karar/anahtar belgesi degisince docs/proje-takip/linear/ altindaki kopyayi yeniler (elle ya da oturumdan). Kopya tarihi dosya basinda durur.",

@@ -39,4 +39,14 @@
 
 Ölçüm komutu: manifest demetlerinde `_master|system_tree|CONTEXT|design_system_config|\.config\.md` deseni. **Ölçüm (2026-09-06):** 12 demette tek isabet: `01-cekirdek-ve-durum` → `CONTEXT.md`. CONTEXT.md NotebookLM'in koddan ürettiği belgedir (CLAUDE.md: "elle yeniden yazma"); Recep kuralı (09-04) gereği bu deftere girmez, kod hafızası defterinde (235043eb) zaten vardır. **Karar: manifestten düşürüldü**, bir sonraki `esitle` ile defterden çıkar. `*_master.md` / `system_tree.md` isabeti 0.
 
-— OPS · 2026-09-06 (kaynak: defter cevabı, konuşma 584506ca)
+## 6 · Kapsam denetimi (alt ajan, HEAD a209183f; komutları ajan raporunda, özet burada)
+
+Depoda 2045 `.md`: **427 kapsanan / 1618 kapsanmayan**. Kapsanmayanın sınıfı: üretilmiş sidecar 871 · üretilmiş master/registry briefing/audit motoru 26 · araç yapılandırması (skill/hook/agent/workflow) 285 · donmuş arşiv (`registry/` 331 · `.archive/` 51 · `docs/archive/` 15 · `artifacts/` 5) 399 · üçüncü taraf 4 · kasıtlı hariç 19 · **elle yazılmış aday 4** (+7 kararsız). Ölçüm semantiği: eşitleyici `glob.glob` kullanır, `*` `/` geçmez; `fnmatch` ile ölçüm yanlış "kapsandı" verir.
+
+**Sızma:** sıkı damgayla 0; ama **demet 10 (`design-15a/`, 09-04 donmuş fotoğraf) 15 dosyanın 15'i demet 14'teki canlı sürümle aynı adda farklı içerikti** → iki sürüm, çelişki üretir → **demet 10 KALDIRILDI**, `design-15a/*.md` `asla_dahil_etme`'ye girdi (repoda tarihçe olarak kalır).
+
+**README kararı (16 dosya):** GİRER 5 (kök README, docs/README, docs/plans/README, iki logo şartnamesi) · **GİRMELİ 3 → demet 16** (`.githooks/README.md` kanca politikası + ölçülmüş olay · `supabase/baselines/README.md` baseline/drift karar kaydı · `public/decoders/README.md` yerel wasm kararı) + `kapanmis-bulgular.md` (kapanmış bulgu cetveli) · GİRMEZ 8 (screenshots kullanım notu, memory-engine başka proje, src modül README kural yasağı, registry kartı arşiv, 4 dış kaynak skill README). `supabase/**` yasağı `functions/` + `migrations/`'a daraltıldı (baselines README girsin diye); `registry/ .archive/ docs/archive/ artifacts/ docs/reference/supabase/` yasağa **yazılı** olarak eklendi (davranış değişmez, niyet yazılı).
+
+**Çelişki bulundu ve düzeltildi:** `docs/plans/README.md` "NLM ikizine yalnız CANLI/REFERANS gider" derken manifest demet 03 klasörün tamamını yüklüyordu → iki defter iki kapsam olarak netleştirildi (kod hafızası ikizi vs. takip defteri). Cetvel §10 (temizlik kuralı) yazıldı.
+
+— OPS · 2026-09-06 (kaynak: defter cevabı, konuşma 584506ca; kapsam denetimi alt ajan raporu)

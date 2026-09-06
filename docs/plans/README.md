@@ -2,8 +2,9 @@
 
 > **Amaç:** Bu klasördeki ~40 plan/brief'in hangisi CANLI, hangisi BİTMİŞ tarihsel evrak — tek bakışta.
 > Kaynak: `docs/DURUM-TAKIP.md` panosu (anlatı SSOT). Yeni plan eklerken buraya satır ekle.
-> NLM ikizine yalnız **CANLI/REFERANS** satırındakiler gider (`.cc_docs.yaml standalone_files`);
-> bitmiş brief'ler bilinçli olarak yüklenmez (RAG'i geçmişe kilitler).
+> NLM **kod hafızası** ikizine (235043eb) yalnız **CANLI/REFERANS** satırındakiler gider (`.cc_docs.yaml standalone_files`);
+> **proje takip defterine** (a5f382a4) ise bu klasörün tamamı `docs/proje-takip/manifest.json` demet 03 ile gider
+> (kural 2026-09-06 kapsam denetimiyle netleşti: iki defter, iki kapsam; bitmiş brief'ler orada "tarihçe" olarak durur, karar SSOT'u Linear).
 
 ## 🟢 CANLI (aktif iş / güncel SSOT)
 

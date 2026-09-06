@@ -3,18 +3,18 @@
   "demetler": {
     "01-cekirdek-ve-durum": "9964a78649f4d39536893d4fdef6c11f6639da1b28be6bf2a2a12be987ae8d55",
     "02-cetveller-standards-1": "61662d04eb2d90b4c3d28baa5e9b0827d35c57b660e29e82b274c768a8694134",
-    "02-cetveller-standards-2": "42d0dcacb37841f865b9c381599f3e04c51ab81de15ac1aee43a2bd19f38d138",
-    "03-planlar": "4334fda82cbc869bb883541707e484ff4612dc12a0b35e80fab263fb89b78ea0",
+    "02-cetveller-standards-2": "50a6fd25aed8169e6642fb6ee137d4de447a45aa4e3568b8268c5a77c389e23c",
+    "03-planlar": "bb40ff1205b21974939ebb9e221180961c7eac3a0af69962ce0fa835edc1db4e",
     "04-olcumler-audits": "9389cac80fd356e5c10984404191058aad82efc8033f75a08af029e5acf380af",
     "05-arsiv": "de99a6033b921171334913dcc1e7e9a92b3368e723c87f4ab3161effc47d2753",
     "06-hafiza-notlari-1": "546233db0e16eff7bc7aa38206dfdb7364be69710dff8b8f350f4961f8440a19",
     "06-hafiza-notlari-2": "324eb26628e5affdc52d5fe656fe3d5ec7fb4a53af699f6de3c17dad3418e666",
     "06-hafiza-notlari-3": "dde96fbdba6aa775c23705759424ab3862302a5598bcf953619e29f08a5559d7",
-    "07-hafiza-gunluk-ops": "7717297c0d308a07d8590417744ca5a01cb0c68c33baf67c8bf3b68a1a57124f",
+    "07-hafiza-gunluk-ops": "f8958cd76b3e0a534d4c7b5605bf1108c8af8c0003b537780a5deacde206eb28",
     "08-linear-kararlar": "038023b667ab67f551e3aaf15882e0c53513f80a63ff698f856310db84438bf0",
     "09-linear-anahtar-ve-is-kayitlari": "a142af3dcc3c110e0fee1a3a7003cc17daf9d2db8643e1629020266c51e1993c",
     "10-design-15a-briefler": "42004b01f2f31aebd7bcf47fa6d15310606adf2bebe38df4227ddaf664e78b12",
-    "11-proje-takip-analizler": "cc81af8a9255c820071a8d6bcea72a1d6296d5e17e859359aed7c7de2b120d73",
+    "11-proje-takip-analizler": "f934845de874c181effe552063c2ae4e4e72a09cb0b4b03d514d810893428181",
     "12-konusma-gunlugu-1": "2ef91d7986c98d73e54b7a784e422d6c4b077a8758920d9100f1dea07b9d9585",
     "12-konusma-gunlugu-2": "2f1258f73ca62930083eb968cb2668ce2b91fcdd174828a964b4fad16824cf01",
     "12-konusma-gunlugu-3": "a9f6cff3f653830270a6103a978067c9172475c4106fbc896cba5539c42524e1",
@@ -26,6 +26,7 @@
     "13-pano-olaylari": "41529fd71f1464eabeb7b5ee69d5bb05f3ea58cbdeaeadc89a20a01f180ef242",
     "14-design-notlari-1": "6b019da227a68de832564f272ae605ee4a96eb9c3ba3f03658fd78a69e632fca",
     "14-design-notlari-2": "b03cbb35fbacc04a6f7dd4b30e05f4984cdfdb93392d151d43f6a815fe79a93b",
-    "15-linear-is-dagilimi": "a5939bad3cdf2384bb21eeeb852ba5507ed69ad3b5d93992a6b1ae819c53cab8"
+    "15-linear-is-dagilimi": "a5939bad3cdf2384bb21eeeb852ba5507ed69ad3b5d93992a6b1ae819c53cab8",
+    "16-kurulum-ve-kapi-notlari": "e9678667841e257f961b0d03acfd4fa3611a52ffd48ba8866246ff0e49b35629"
   }
 }
