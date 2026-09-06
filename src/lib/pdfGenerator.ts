@@ -4,16 +4,81 @@ import autoTable from 'jspdf-autotable';
 import type { Product } from '@/types/ui-models';
 
 import { SITE_URL } from '../config/siteUrl';
+import { formatSpecValue, groupTechnicalSpecs, SPEC_SORT_ORDER } from '../utils/productHelpers';
+import { specFieldLabel, specGroupLabel } from '../utils/specLabel';
 import { getAbsoluteAssetUrl,getBase64ImageFromUrl, PDF_COLORS, PDF_FONTS } from './pdfAssets';
+
+/** `specLabel.ts` ile AYNI imza — ikinci bir tip tanımı, ikinci bir davranış kapısıdır. */
+type TranslateFn = (key: string, paramsOrAlt?: Record<string, unknown> | string) => string
+
+/**
+ * ⭐SAF ÇEKİRDEK — föyün teknik özellik satırlarını üretir. `jsPDF`'e DOKUNMAZ.
+ *
+ * NİÇİN SAF: parite iddiası ancak **aynı fikstür iki yüzeye verilip çıktılar
+ * karşılaştırılarak** kanıtlanır. Bunu `jsPDF` içine gömülü bir döngüyle yapamazsın —
+ * ölçmek için PDF ikilisini geri okumak gerekirdi. Ayrı fonksiyon, kapının var olabilmesinin
+ * ön koşuludur (`INV-FOY-PARITE-1`).
+ *
+ * ⚠SIRA `groupTechnicalSpecs`'ten gelir: vitrin de grupları o sırayla basar. Föy Faz 1'de
+ * **tek tablo** çizer (grup BAŞLIĞI basmaz) ama satır SIRASI vitrinle aynıdır — grup başlıklı
+ * çok bölümlü düzen Faz 2'dir, çünkü `autoTable` bugün tek çağrı ve `didDrawPage` hook'u YOK:
+ * dört bölüme çıkmak sayfa taşmasında başlık kaybı riskini dörde katlar (ölçüldü).
+ */
+export function buildSpecRows(
+    specs: Record<string, unknown>,
+    opts: { t?: TranslateFn; translateKey?: (key: string) => string } = {},
+): string[][] {
+    const { t, translateKey } = opts;
+    const gruplar = groupTechnicalSpecs(specs) || {};
+    const satirlar: string[][] = [];
+
+    for (const [, group] of Object.entries(gruplar)) {
+        const alanlar = Object.entries((group as { specs?: Record<string, unknown> }).specs || {});
+        alanlar.sort(([a], [b]) => (SPEC_SORT_ORDER[a] ?? 99) - (SPEC_SORT_ORDER[b] ?? 99));
+        for (const [key, value] of alanlar) {
+            // ETİKET: `t` varsa vitrinin TAM yolu (i18n sözlüğü → küratörlü → humanize).
+            // Yoksa eski parametre yolu — ayrışır, ve bu ayrışma kapıda ADIYLA ölçülür.
+            const label = t ? specFieldLabel(key, t) : (translateKey ? translateKey(key) : key);
+            // DEĞER: `t` GEREKTİRMEZ — birim eklemesi her hâlde uygulanır.
+            satirlar.push([label, formatSpecValue(key, value)]);
+        }
+    }
+    return satirlar;
+}
+
+/** Grup başlıkları Faz 2'de kullanılacak; şimdiden tek kaynağa bağlı olduğu ölçülebilsin. */
+export function buildSpecGroupLabels(specs: Record<string, unknown>, t: TranslateFn): string[] {
+    const gruplar = groupTechnicalSpecs(specs) || {};
+    return Object.entries(gruplar).map(([groupKey, group]) =>
+        specGroupLabel(groupKey, t, (group as { label?: string }).label),
+    );
+}
 
 /**
  * PDF Üretim Servisi (Premium Tasarım & Türkçe Karakter Destekli)
+ *
+ * ⭐FÖY, VİTRİNLE AYNI BİÇİMLENDİRİCİYİ KULLANIR (REC-158 Faz 1, 2026-09-06).
+ *
+ * NİÇİN: föy `technical_specs`'i zaten okuyordu ama değeri **ham** basıyordu
+ * (`String(value)`), vitrin ise `formatSpecValue`'dan geçiriyordu. `formatSpecValue`
+ * **birim ekler** (°C, dB(A), RPM, W) — sonuç: aynı ürünün aynı alanı vitrinde
+ * `45 dB(A)`, **müşteriye giden föyde** `45`. Bu, bu depoda ölçülmüş bir hata sınıfıydı
+ * ("aynı ölçüt, iki uygulama") ve bu kez bir MÜŞTERİ BELGESİNDEYDİ.
+ *
+ * ⚠PARİTE İKİ PARÇALIDIR ve ikisi AYNI ANDA gelmez:
+ *   · **değer + sıra** → `t` GEREKTİRMEZ, bu PR ile geldi.
+ *   · **etiket** → `specFieldLabel(key, t)` i18n sözlüğünü okur, yani `t` ŞARTTIR.
+ *     `t` verilmezse eski `translateKey` yoluna düşülür ve etiket vitrinden AYRIŞIR
+ *     (`"Ip Rating"` ↔ `"Koruma Sınıfı (IP)"`). Çağıran taraf (`ProductDetailPageView`)
+ *     URUN şeridinin claim'inde olduğu için `t`'yi geçirecek tek satır ONUN PR'ında.
+ *     Bu boşluk SESSİZ DEĞİL: `INV-FOY-PARITE-1` iki hâli de ayrı ölçer.
  */
 export async function generateProductDatasheet(
     product: Product,
     imageUrl?: string,
     translateKey?: (key: string) => string,
-    lang: string = 'tr'
+    lang: string = 'tr',
+    t?: TranslateFn
 ): Promise<void> {
     const doc = new jsPDF({
         orientation: 'portrait',
@@ -193,7 +258,14 @@ export async function generateProductDatasheet(
     }
 
     // Teknik Özellikler Tablosu
-    if (product.technical_specs && Object.keys(product.technical_specs).length > 0) {
+    // ⚠DAVRANIŞ DEĞİŞİKLİĞİ, adıyla: `groupTechnicalSpecs` BOŞ değerleri (null/undefined/'')
+    // ELER — eski föy onları `'-'` ile basıyordu. Vitrin de elediği için parite bakımından
+    // DOĞRU olan bu; ama sonuç, hepsi boşsa satır kalmamasıdır. O hâlde tablo HİÇ çizilmez:
+    // başlığı basıp altını boş bırakmak, okuyana "veri yok" değil "üretim bozuk" dedirtir.
+    const specRows = product.technical_specs
+        ? buildSpecRows(product.technical_specs as Record<string, unknown>, { t, translateKey })
+        : [];
+    if (specRows.length > 0) {
         // Sayfa sonu kontrolü
         if (currentY > pageHeight - 60) {
             doc.addPage();
@@ -211,12 +283,7 @@ export async function generateProductDatasheet(
         doc.text(lang === 'tr' ? 'Teknik Özellikler' : 'Technical Specifications', margin + 4, currentY);
         currentY += 8;
 
-        const tableData: string[][] = [];
-        Object.entries(product.technical_specs).forEach(([key, value]) => {
-            const label = translateKey ? translateKey(key) : key;
-            const valText = value !== null && value !== undefined ? String(value) : '-';
-            tableData.push([label, valText]);
-        });
+        const tableData = specRows;
 
         autoTable(doc, {
             startY: currentY,
