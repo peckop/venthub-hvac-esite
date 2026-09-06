@@ -22,6 +22,7 @@ KULLANIM:
 ÇIKIŞ KODU: 0 = kapı YEŞİL · 1 = KIRMIZI (en az bir doğrulanabilir cümle düştü) · 2 = önkoşul
 CI'DA KOŞMAZ: PyMuPDF ve yerel PDF deposu gerekir; bu YEREL bir kapıdır, şerit sahibi koşar.
 """
+import os
 import re
 import sys
 import unicodedata
@@ -45,7 +46,13 @@ except ImportError:
     print("ONKOSUL-HATASI: PyMuPDF yok. 'pip install pymupdf' ile kurun.")
     sys.exit(2)
 
-KOK = Path("C:/Users/alize/venthub-pdf-ingestor/venthub")
+# PDF deposunun koku. ORTAM DEGISKENIYLE EZILEBILIR + akilli varsayilan (ev dizini).
+# Nicin boyle: ilk surumde buraya kullanici adi iceren MUTLAK YOL yazmistim ve
+# INV-MUTLAK-YOL-1 kapisi CI'da beni DUSURDU — hakliydi. Iki zarar uretiyordu:
+# depo PUBLIC oldugu icin kimlik sizintisi, ve betik sessizce TEK MAKINEYE baglaniyordu.
+# Bu makinede davranis DEGISMEZ (home = ayni dizin), baska makinede ise
+# VENTHUB_PDF_KOK ile gosterilebilir.
+KOK = Path(os.environ.get("VENTHUB_PDF_KOK") or (Path.home() / "venthub-pdf-ingestor" / "venthub"))
 
 # Kısaltma -> PDF dosya adı. Taslak kendi haritasını şu yorumla verebilir (öncelikli):
 #   <!-- KAYNAK-HARITASI: HSK=heat-master-slimroof-cati-fanlari-yeni.pdf, VLK=LINEO_QUITE_KATALOG.pdf -->
