@@ -2194,6 +2194,15 @@ yaşıyordu ve sabahki ölçüt onları **"yedeklenmiş"** saymıştı.
    etmek** zorundadır; edemiyorsa ölçüm değil, süstür. (§5: ölçülen ile beyan edilen ayrılır.)
 6. **Silmeden önce ölçüm TAZEDİR.** Bir tur önce alınmış "temiz" cevabı, geri alınamaz bir
    silmeyi gerekçelendirmez — §29 madde 4'ün ağaç karşılığı.
+7. ⭐**BAĞLAM: yukarıdaki ölçüt MERGE EDİLMEMİŞ ağaç/dal içindir.** Merge SONRASI dal silmede
+   ölçüt **ağaç farkıdır** (`git diff --name-only origin/master origin/<dal>` = 0), commit
+   sayısı DEĞİL. (Ölçülmüş vaka 2026-09-05, bu maddenin yazıldığı günün akşamı: kendi PR'ımın
+   dalında `rev-list --count` **2** dedi, ağaç farkı **0 dosya** çıktı. Sebep **squash**:
+   master'da tek squash commit var, dalın iki commit'i ayrı sha taşır ve patch-id eşleşmez —
+   `git cherry` de aynı yanlışı verir.) Aynı gün URUN de aynı kökten bir vaka yaşadı: iki
+   noktalı diff 809 satır "fark" gösteriyordu. **Genel soru: ölçütüm COMMIT KİMLİĞİNE mi
+   İÇERİĞE mi bakıyor?** Tarih squash/rebase/cherry-pick gördüyse commit kimliği korunmaz ve
+   tek geçerli kanıt içerik karşılaştırmasıdır.
 
 ### Kapsam ve komşuları
 
@@ -2201,3 +2210,70 @@ Bu madde **filo davranışıdır** (başkasının ağacına dokunmama + kayıp �
 sınıfı değil: bir ağaçta ne üretildiğini değil, **kimin işinin nerede yaşadığını** yönetir.
 Komşuları: §28 (ayrışma tur başına ölçülür) · §22 (ağaç tazeleme) ·
 `uretilmis-artefakt-standard.md` **AXIOM 5** (worktree yasak değil, görünmezliği yasak).
+
+---
+
+## 31. TESLİMAT KANITI BAĞIMSIZ TANIK İSTER — sınavın cevabı sınava girene verilmez
+
+Mekanizmanın üç katmanından ikisi (gözcü, teslimat) ölçülebilir. Bu bölüm, **ölçülebilir olanın
+nasıl ölçüldüğünü** yönetir — çünkü 2026-09-06'da ölçüldü ki kapı, denetlediği ajanın *beyanına*
+güveniyordu ve **cevabı ona kendi eliyle veriyordu**.
+
+### 31.1 ⭐Kanıt = bağımsız tanık + eşleşme + tazelik (üçü birden)
+
+**Ölçülmüş vaka:** bir şerit jetonu gözcü bildiriminden değil başka bir yerden görüp geri yazdı
+ve **geçerli bir damga üretti**. Kusur ajanda değil TASARIMDAYDI: `prob` jetonu **kendi
+stdout'una basıyordu**, `dogrula` ise yalnız **string eşitliğine** bakıyordu (ölçüldü: `probTs`
+alanı `dogrula` gövdesinde **hiç okunmuyordu**, `prob` bir `--to` hedefi **almıyordu**).
+
+> **Hüküm:** teslimat kanıtı ancak şu **üçü birlikte** sağlanırsa YEŞİL sayılır:
+> 1. jetonu **BAŞKA** bir oturum attı (`prob --to <hedef>`; `atanSid !== kendi sid`),
+> 2. geri yazılan jeton **eşleşiyor** (`dogrula --gordum <jeton>`),
+> 3. geri yazım **TAZE** (≤ **180 sn**; gözcü aralığı 60 sn, üç tur pay).
+
+⛔**Jeton hedefin ekranına BASILMAZ.** `prob --to` çıktısı jetonu **atanın** ekranına yazar;
+hedef onu yalnızca **gözcü bildiriminde** görebilir. Bu, kanıtın tek gerçek dayanağıdır —
+jetonu hedefe kolaylık olsun diye basmak, bağımsızlığı **koda dokunmadan** buharlaştırır.
+⛔`--to` **kendine** verilemez: tanık, tanıklık ettiği kişi olamaz.
+
+⚠**BAYAT jeton kanıt değildir.** Eski bir jeton, kanalın *bugün* çalıştığını söylemez.
+Zaman okunamıyorsa (`atildiTs` bozuk/yok) ya da damga **gelecekteyse** sonuç KIRMIZI —
+ölçememek geçmek değildir (§5).
+
+### 31.2 ⚠Eski yol ÖLDÜRÜLMEDİ: `ZAYIF` sınıfı — ve niçin
+
+Mevcut `--jeton` yolu (kendi probunun jetonu) **kırmızıya çevrilmedi**; `⚠ZAYIF — bağımsız
+tanık yok` sınıfına alındı: yeşil değil, ama filoyu da kilitlemiyor.
+
+**Niçin:** bir ölçütü yükseltirken bütün filoyu aynı anda kırmızıya düşürmek, tam olarak
+2026-09-05 sabahı yaşanan ve #997 ile onarılan arızadır (K8). Kimsenin o an ödeyemeyeceği bir
+borç için kapatılan kapı, kapatılmaz — **devre dışı bıraktırılır**. Ölçüt yükselir, geçiş
+görünür kalır: rapor `ZAYIF`in **sebebini** yazar (*"jeton senin ekranına da basar"*).
+
+### 31.3 Gözcü YALNIZ `Monitor` aracıyla kurulur
+
+**Ölçülmüş vaka (Katalog, 2026-09-05/06):** gözcü `Bash run_in_background` ile kuruldu; süreç
+bitmediği için **hiç bildirim üretmedi**. İmleç dosyası tazeydi, `dogrula` gözcüyü YEŞİL
+görüyordu — **ama kanal ölüydü ve beş not kaçtı.**
+
+> **Hüküm:** gözcü `Monitor(persistent: true)` ile kurulur. `Bash run_in_background` gözcü
+> kurmaz: o araç **süreç bitince** tek bildirim üretir, gözcü ise hiç bitmez.
+
+⭐Ayrım adıyla: **imleç tazeliği "okudum"u ölçer, "bana ulaştı"yı ölçmez.** İkisi ayrı eksendir
+ve tek bir yeşil ikisini birden kanıtlamaz — §31.1 tam bu yüzden bağımsız tanık ister.
+
+### 31.4 Açılış rutini: uyandırma `SendMessage` ile, **cron YOK**
+
+**Recep kararı (2026-09-06, tekrarlandı):** cron irtibatı koparıyor, **kurulmayacak**.
+Sonucu adıyla yazılır: `dogrula` cron kalemini kanıtlayamadığı için **fail-closed KIRMIZI**
+verir. Bu **bilinen ve kabul edilmiş** bir kırmızıdır — şerit bunu her açılışta panoya yazar ki
+sonradan *"kırmızıydı, kimse görmedi"* olmasın (§21: kabul edilen boşluk sessiz olamaz).
+
+Cron olmayınca uyandırma insana ya da lidere kalır: **Recep oturumu açar, OPS `ListAgents` +
+`SendMessage` ile uyandırır**; pano notu, o notu okuyan bir tur olmadan görülmez.
+Uyandırmadan sonra sıra: claim → gözcü (Monitor) → **bağımsız teslimat sınavı** (§31.1).
+
+Kapı: `fleet-mechanism-integrity.test.ts` — altı kol; çekirdek saf olduğu için fikstürle
+beslenir ve saat dışarıdan verilir. Sabotaj iki turda ölçüldü: bağımsızlık kontrolü
+kaldırılınca **yalnız** ona bağlı iki kol düştü; tazelik eşiği kaldırılınca **yalnız** bayat
+kolu düştü.

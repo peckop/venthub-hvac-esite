@@ -138,10 +138,107 @@ function plan() {
  * FARKLI olur. Öz-test değildir: olayı yazan süreç gözcüden ayrıdır ve farklı bir sid kullanır
  * (gözcü kendi sid'ini eler; kendi kendine not atmak tanım gereği yanlış negatif verirdi).
  */
+/** Bağımsız teslimat kanıtının yaş eşiği. 3 dk: gözcü aralığı 60 sn, üç tur pay. */
+const TESLIM_TAZELIK_SN = 180
+
+/**
+ * ⭐SAF ÇEKİRDEK — TESLİMAT KANITI. Dosyaya, saate, panoya DOKUNMAZ; fikstürle beslenir.
+ *
+ * NİÇİN VAR — ölçülmüş vaka 2026-09-06: kapı, denetlediği ajanın *"jetonu bildirimde gördüm"*
+ * BEYANINA güveniyordu. Bir şerit jetonu bildirimden değil başka bir yerden görüp geri yazdı
+ * ve **kendi eliyle geçerli damga üretti**. Kusur ajanda değil TASARIMDA: eski akışta jetonu
+ * ajana veren şeyin kendisi `prob`'un stdout'uydu (satır ~170) — yani kapı, sınavın cevabını
+ * sınava giren kişinin eline veriyordu.
+ *
+ * ⭐AYIRT EDEN ŞEY: kanıt artık ÜÇ koşulun birlikte sağlanması.
+ *   1. jetonu BAŞKA bir oturum attı (`atanSid !== kendiSid`) — bağımsız tanık,
+ *   2. jeton eşleşiyor,
+ *   3. ve geri yazım TAZE (≤ eşik) — bayat jeton, kanalın BUGÜN çalıştığını söylemez.
+ *
+ * ⚠GERİYE UYUM BİLEREK KIRILMADI: eski "kendi probum" yolu KIRMIZI'ya çevrilmiyor, `ZAYIF`
+ * sınıfına alınıyor. Bir ölçütü yükseltirken bütün filoyu aynı anda kırmızıya düşürmek, bu
+ * sabah yaşanan ve #997 ile onarılan arızanın ta kendisidir (K8): kimsenin o an ödeyemeyeceği
+ * bir borç için kapıyı kapatmak, kapıyı devre dışı bıraktırır.
+ *
+ * @param damga  `.mekanizma-durum.<sid8>.json` içeriği (null olabilir)
+ * @param gordum alıcının geri yazdığı jeton (null = verilmedi)
+ * @param kendiSid doğrulamayı koşan oturum
+ * @param simdiMs şimdi (ms) — SAAT DIŞARIDAN VERİLİR, fikstür kurulabilsin diye
+ * @returns {{sinif:'YESIL'|'ZAYIF'|'KIRMIZI', sebep:string, gecenSn:number|null}}
+ */
+function teslimatKaniti({ damga, gordum, kendiSid, simdiMs, esikSn = TESLIM_TAZELIK_SN }) {
+  if (!gordum) {
+    return { sinif: 'KIRMIZI', sebep: '--gordum/--jeton verilmedi; olcemedim GECTI degildir', gecenSn: null }
+  }
+  if (!damga) {
+    return { sinif: 'KIRMIZI', sebep: 'karsilastirilacak prob kaydi YOK', gecenSn: null }
+  }
+
+  // Yeni yol: BAŞKA bir oturumun attığı jeton (bağımsız tanık).
+  if (damga.bekleyenJeton) {
+    if (damga.bekleyenJeton !== gordum) {
+      return { sinif: 'KIRMIZI', sebep: 'jeton uyusmuyor (beklenen ' + damga.bekleyenJeton + ')', gecenSn: null }
+    }
+    // ⛔KENDİ JETONUNU KABUL ETMEZ: tanık, tanıklık ettiği kişi olamaz.
+    if (!damga.atanSid || damga.atanSid === kendiSid) {
+      return {
+        sinif: 'KIRMIZI',
+        sebep: 'jetonu ATAN da SEN'
+          + 'sin — bagimsiz tanik yok; kendi kendine kanit uretilmez',
+        gecenSn: null,
+      }
+    }
+    const atildi = Date.parse(damga.atildiTs || '')
+    if (!Number.isFinite(atildi)) {
+      return { sinif: 'KIRMIZI', sebep: 'atildiTs OKUNAMADI — yas olculemez (fail-closed)', gecenSn: null }
+    }
+    const gecenSn = Math.round((simdiMs - atildi) / 1000)
+    if (gecenSn < 0) {
+      return { sinif: 'KIRMIZI', sebep: 'atildiTs GELECEKTE — saat tutarsiz, kanit sayilmaz', gecenSn }
+    }
+    if (gecenSn > esikSn) {
+      return {
+        sinif: 'KIRMIZI',
+        sebep: 'BAYAT: jeton ' + gecenSn + ' sn once atildi (esik ' + esikSn + ') — '
+          + 'eski jeton kanalin BUGUN calistigini soylemez',
+        gecenSn,
+      }
+    }
+    return {
+      sinif: 'YESIL',
+      sebep: 'BAGIMSIZ tanik: jetonu ' + String(damga.atanSid).slice(0, 8) + ' atti, '
+        + gecenSn + ' sn icinde geri yazildi',
+      gecenSn,
+    }
+  }
+
+  // Eski yol: kendi probunun jetonu. Kanal canlı olabilir ama BAĞIMSIZ tanık yok.
+  if (damga.jeton && damga.jeton === gordum) {
+    return {
+      sinif: 'ZAYIF',
+      sebep: 'KENDI probunun jetonu — prob jetonu senin ekranina da basar, yani bu esleme '
+        + '"bildirimde gordum"u KANITLAMAZ. Bagimsiz kanit icin baska bir oturum '
+        + '`prob --to <sid>` atsin, sen `dogrula --gordum <jeton>` ile yaz.',
+      gecenSn: null,
+    }
+  }
+  return { sinif: 'KIRMIZI', sebep: 'jeton hicbir kayitla eslesmiyor', gecenSn: null }
+}
+
 async function prob() {
   const sid = sidAl()
   const beklesn = Number(arg('--bekle') || 150)
-  const iy = imlecYolu(sid)
+  /**
+   * ⭐`--to <hedef-sid>`: BAŞKA bir oturum için jeton atmak (bağımsız tanık).
+   * Bu bayrak olmadan teslimat kanıtı ancak ZAYIF olabilir — çünkü jetonu üreten ile
+   * geri yazan aynı kişi olur. Tanık, tanıklık ettiği kişi olamaz.
+   */
+  const hedefSid = arg('--to') || null
+  if (hedefSid && !UUID.test(hedefSid)) oldur('--to tam uuid olmali, alinan: ' + hedefSid)
+  if (hedefSid === sid) oldur('--to KENDINE verilemez: bagimsiz tanik olmaz.')
+  // Gözcüsü ölçülecek olan HEDEFtir; kendi imlecim onun kanalını kanıtlamaz.
+  const olculen = hedefSid || sid
+  const iy = imlecYolu(olculen)
 
   if (!fs.existsSync(iy)) {
     yaz('KIRMIZI — GOZCU KURULU DEGIL: imlec dosyasi yok (' + iy + ').')
@@ -149,8 +246,8 @@ async function prob() {
     process.exit(1)
   }
 
-  const jeton = 'PROB-' + sid.slice(0, 4) + '-' + Math.random().toString(36).slice(2, 8).toUpperCase()
-  const probSid = '00000000-0000-4000-8000-' + sid.replace(/-/g, '').slice(-12)
+  const jeton = 'PROB-' + olculen.slice(0, 4) + '-' + Math.random().toString(36).slice(2, 8).toUpperCase()
+  const probSid = '00000000-0000-4000-8000-' + olculen.replace(/-/g, '').slice(-12)
   const probDosya = 'events.mekanizma-probu.jsonl'
   const probTam = path.join(PANO, probDosya)
 
@@ -159,7 +256,7 @@ async function prob() {
     ts: new Date().toISOString(),
     sid: probSid,
     lane: 'MEKANIZMA-PROBU',
-    to: sid,
+    to: olculen,
     text:
       'MEKANIZMA PROBU — DIGER SERITLER YOK SAYIN. Jeton: ' + jeton +
       '. Bu not bir gozcunun canli olup olmadigini olcmek icin yazildi; is emri degil.',
@@ -189,11 +286,15 @@ async function prob() {
 
   const gecen = Math.round((Date.now() - basla) / 1000)
   try {
-    fs.writeFileSync(
-      durumYolu(sid),
-      JSON.stringify({ sid, jeton, probTs: olay.ts, gozcuOkudu: ulasti, gecenSn: gecen }),
-      'utf8',
-    )
+    // Hedefin ONCEKI damgasi KORUNUR: ustune yazmak, onun kendi prob kaydini siler.
+    let onceki = {}
+    try { onceki = JSON.parse(fs.readFileSync(durumYolu(olculen), 'utf8')) } catch { onceki = {} }
+    const yeni = hedefSid
+      // ⭐BAGIMSIZ PROB: jeton HEDEFIN kaydina "bekleyen" olarak yazilir, ATAN adiyla.
+      // `jeton` alanina YAZILMAZ — yoksa hedef onu kendi probu sanip ZAYIF kanit uretir.
+      ? { ...onceki, bekleyenJeton: jeton, atanSid: sid, atildiTs: olay.ts, atanGozcuOkudu: ulasti }
+      : { ...onceki, sid, jeton, probTs: olay.ts, gozcuOkudu: ulasti, gecenSn: gecen }
+    fs.writeFileSync(durumYolu(olculen), JSON.stringify(yeni), 'utf8')
   } catch {
     /* durum yazılamazsa jeton eşleştirmesi çalışmaz, ama prob sonucu yine geçerli */
   }
@@ -206,10 +307,19 @@ async function prob() {
 
   yaz('YESIL — GOZCU PROBU OKUDU (' + gecen + ' sn icinde, imlec ' + sonOfset + ' >= ' + hedef + ').')
   yaz('')
-  yaz('DIKKAT — BU TESTIN SINIRI, ADIYLA: bu kanit gozcunun panoyu OKUDUGUNU gosterir,')
-  yaz('bildirimin AJANA ULASTIGINI gostermez. Teslimat kanitini ancak jetonu bildirimde GORUP')
-  yaz('geri yazarak verirsin:')
-  yaz('   node scripts/board/mechanism-setup.cjs dogrula --sid ' + sid + ' --jeton <bildirimde-gordugun>')
+  if (hedefSid) {
+    // ⭐JETON BURADA, ATANIN ekraninda. HEDEFE basilmaz — hedef onu YALNIZ bildirimden gorebilsin.
+    yaz('BAGIMSIZ PROB — hedef ' + hedefSid.slice(0, 8) + ', jeton ' + jeton)
+    yaz('Jeton HEDEFE bu ekrandan verilmez; o jetonu ancak GOZCU BILDIRIMINDE gorebilir.')
+    yaz('Hedef sunu kossun (' + TESLIM_TAZELIK_SN + ' sn icinde, yoksa BAYAT sayilir):')
+    yaz('   node scripts/board/mechanism-setup.cjs dogrula --sid ' + hedefSid + ' --gordum <bildirimde-gordugun>')
+  } else {
+    yaz('DIKKAT — BU TESTIN SINIRI, ADIYLA: bu kanit gozcunun panoyu OKUDUGUNU gosterir,')
+    yaz('bildirimin AJANA ULASTIGINI gostermez. ⚠Ustelik jeton BU EKRANDA da yaziyor, yani')
+    yaz('kendi probunla verecegin kanit ZAYIF sayilir (kendi kendine tanikliktir).')
+    yaz('BAGIMSIZ kanit icin BASKA bir oturum sunu atsin:')
+    yaz('   node scripts/board/mechanism-setup.cjs prob --sid <kendi-sid> --to ' + sid)
+  }
 }
 
 // ============================================================================ dogrula
@@ -250,8 +360,9 @@ function dogrula() {
     }
   }
 
-  // --- 2) teslimat: jeton eşleşmesi (ölçüm DEĞİL, TESLİMAT kanıtı)
-  const jeton = arg('--jeton')
+  // --- 2) teslimat: BAĞIMSIZ tanık + tazelik (ölçüm DEĞİL, TESLİMAT kanıtı)
+  // `--gordum` yeni ve güçlü yol; `--jeton` eski yol, geriye uyum için YAŞIYOR ama ZAYIF sayılır.
+  const jeton = arg('--gordum') || arg('--jeton')
   if (jeton) {
     let durum = null
     try {
@@ -259,14 +370,17 @@ function dogrula() {
     } catch {
       /* yok */
     }
-    if (!durum || !durum.jeton) {
-      yaz('TESLIMAT  : KIRMIZI — karsilastirilacak prob kaydi yok; once prob calistir.')
+    const k = teslimatKaniti({ damga: durum, gordum: jeton, kendiSid: sid, simdiMs: Date.now() })
+    if (k.sinif === 'KIRMIZI') {
+      yaz('TESLIMAT  : KIRMIZI — ' + k.sebep)
       kirmizi++
-    } else if (durum.jeton !== jeton) {
-      yaz('TESLIMAT  : KIRMIZI — jeton uyusmuyor (beklenen ' + durum.jeton + ', verilen ' + jeton + ').')
+    } else if (k.sinif === 'ZAYIF') {
+      // ⚠YEŞİL DEĞİL ama KIRMIZI da değil: ölçütü yükseltirken filoyu kilitlemiyoruz (K8).
+      yaz('TESLIMAT  : ⚠ZAYIF — ' + k.sebep)
+      yaz('            Bu kanit YOKTAN iyidir ama BAGIMSIZ DEGILDIR; yesil sayilmaz.')
       kirmizi++
     } else {
-      yaz('TESLIMAT  : YESIL — bildirimde gorunen jeton son probun jetonuyla ayni.')
+      yaz('TESLIMAT  : YESIL — ' + k.sebep)
       /**
        * ⭐TESLIMAT KANITINA YAS VERILIR (§23 HUKUM 3, olculdu 2026-09-01).
        * Eskiden bu esleşme yalnizca EKRANA basiliyordu: kanit ANLIKTI, yasi yoktu.
@@ -280,7 +394,13 @@ function dogrula() {
       try {
         fs.writeFileSync(
           durumYolu(sid),
-          JSON.stringify({ ...durum, teslimDogrulandiTs: new Date().toISOString() }),
+          // Kanıtın KİMDEN geldiği ve KAÇ SANİYEDE yazıldığı damgaya girer: sonradan
+          // "yeşildi" demek yetmez, yeşilin DAYANAĞI okunabilir olmalı.
+          JSON.stringify({
+            ...durum,
+            teslimDogrulandiTs: new Date().toISOString(),
+            teslimKanit: { kimden: durum.atanSid || null, gecenSn: k.gecenSn },
+          }),
           'utf8',
         )
         yaz('            damga diske yazildi — yoklama artik TESLIM yasini olcebilir.')
@@ -290,8 +410,10 @@ function dogrula() {
       }
     }
   } else {
-    yaz('TESLIMAT  : OLCULEMEDI — --jeton verilmedi. Gozcunun OKUDUGU kanitli olabilir ama')
+    yaz('TESLIMAT  : OLCULEMEDI — --gordum verilmedi. Gozcunun OKUDUGU kanitli olabilir ama')
     yaz('            bildirimin sana ULASTIGI kanitli DEGIL. Olcemedim != gecti.')
+    yaz('            Bagimsiz kanit: baska bir oturum `prob --to ' + sid.slice(0, 8) + '...` atsin,')
+    yaz('            jetonu BILDIRIMDE gorunce `dogrula --gordum <jeton>` yaz.')
     kirmizi++
   }
 
@@ -315,15 +437,24 @@ function dogrula() {
   yaz('SONUC: YESIL — olculebilir katmanlar olculdu, beyan edilenler beyan olarak isaretlendi.')
 }
 
+// Saf çekirdek DIŞARI AÇILIR: fikstürle beslenebilmesi kolun tek gerçek kanıtıdır.
+module.exports = { teslimatKaniti, TESLIM_TAZELIK_SN, OFSETLER }
+
 // ============================================================================ giriş
-const fiil = process.argv[2]
-if (fiil === 'plan') plan()
-else if (fiil === 'prob') prob()
-else if (fiil === 'dogrula') dogrula()
-else {
-  yaz('kullanim: mechanism-setup.cjs <plan|prob|dogrula> --sid <uuid> [--serit ALTYAPI] [--cron id] [--jeton X]')
-  yaz('  plan    : kurulumun tam metnini uretir (serit ofset tablosu burada SSOT)')
-  yaz('  prob    : DIS OLAYLA ayirt edici test — gozcu canli mi, mekanik olcum')
-  yaz('  dogrula : uc katmanin durumunu raporlar; OLCULEN ile BEYAN EDILEN i ayirir, fail-closed')
-  process.exit(2)
+if (require.main === module) {
+  const fiil = process.argv[2]
+  if (fiil === 'plan') plan()
+  else if (fiil === 'prob') prob()
+  else if (fiil === 'dogrula') dogrula()
+  else {
+    yaz('kullanim: mechanism-setup.cjs <plan|prob|dogrula> --sid <uuid> [secenekler]')
+    yaz('  plan    : kurulumun tam metnini uretir (serit ofset tablosu burada SSOT)')
+    yaz('  prob    : DIS OLAYLA ayirt edici test — gozcu canli mi, mekanik olcum')
+    yaz('            --to <hedef-sid> : BASKA bir oturum icin jeton at (BAGIMSIZ tanik).')
+    yaz('                               Jeton ATANIN ekranina basilir, hedefe BASILMAZ.')
+    yaz('  dogrula : uc katmanin durumunu raporlar; OLCULEN ile BEYAN EDILEN i ayirir, fail-closed')
+    yaz('            --gordum <jeton> : bildirimde gorunen jetonu geri yaz (BAGIMSIZ kanit)')
+    yaz('            --jeton  <jeton> : ESKI yol; kendi probun — ⚠ZAYIF sayilir, yesil DEGIL')
+    process.exit(2)
+  }
 }
