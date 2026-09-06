@@ -1,0 +1,224 @@
+{
+  "tarih": "2026-09-06",
+  "sonuc": {
+    "ozet": [
+      {
+        "urun": "375",
+        "aile": "40",
+        "kategori": "37",
+        "kok": "13",
+        "dal": "24",
+        "aktif_kategori": "23",
+        "marka": "5"
+      }
+    ],
+    "agac": [
+      {
+        "kok": "Fanlar",
+        "slug": "fans",
+        "is_active": true,
+        "dal_sayisi": "14",
+        "urun": "295",
+        "dalda_urun": "295"
+      },
+      {
+        "kok": "Kontrol Sistemleri",
+        "slug": "control-systems",
+        "is_active": true,
+        "dal_sayisi": "2",
+        "urun": "37",
+        "dalda_urun": "37"
+      },
+      {
+        "kok": "İklimlendirme ve Hava Şartlandırma",
+        "slug": "air-treatment",
+        "is_active": true,
+        "dal_sayisi": "3",
+        "urun": "17",
+        "dalda_urun": "17"
+      },
+      {
+        "kok": "Isı Geri Kazanım (VMC)",
+        "slug": "heat-recovery-vmc",
+        "is_active": true,
+        "dal_sayisi": "2",
+        "urun": "16",
+        "dalda_urun": "16"
+      },
+      {
+        "kok": "Hava Perdeleri",
+        "slug": "air-curtains",
+        "is_active": true,
+        "dal_sayisi": "0",
+        "urun": "8",
+        "dalda_urun": "0"
+      },
+      {
+        "kok": "Aksesuarlar",
+        "slug": "accessories",
+        "is_active": true,
+        "dal_sayisi": "0",
+        "urun": "2",
+        "dalda_urun": "0"
+      },
+      {
+        "kok": "Air Conditioning",
+        "slug": "air-conditioning",
+        "is_active": false,
+        "dal_sayisi": "0",
+        "urun": "0",
+        "dalda_urun": "0"
+      },
+      {
+        "kok": "Commercial Ventilation",
+        "slug": "commercial-ventilation",
+        "is_active": false,
+        "dal_sayisi": "2",
+        "urun": "0",
+        "dalda_urun": "0"
+      },
+      {
+        "kok": "Electric Heating",
+        "slug": "electric-heating",
+        "is_active": false,
+        "dal_sayisi": "0",
+        "urun": "0",
+        "dalda_urun": "0"
+      },
+      {
+        "kok": "Hygiene and Sanitizer",
+        "slug": "hygiene-sanitizer",
+        "is_active": false,
+        "dal_sayisi": "0",
+        "urun": "0",
+        "dalda_urun": "0"
+      },
+      {
+        "kok": "Residential Ventilation",
+        "slug": "residential-ventilation",
+        "is_active": false,
+        "dal_sayisi": "1",
+        "urun": "0",
+        "dalda_urun": "0"
+      },
+      {
+        "kok": "Smart Home",
+        "slug": "smart-home",
+        "is_active": false,
+        "dal_sayisi": "0",
+        "urun": "0",
+        "dalda_urun": "0"
+      },
+      {
+        "kok": "Summer Ventilation",
+        "slug": "summer-ventilation",
+        "is_active": false,
+        "dal_sayisi": "0",
+        "urun": "0",
+        "dalda_urun": "0"
+      }
+    ],
+    "dalsiz": [
+      {
+        "dalsiz_urun": "10",
+        "dalsiz_aile": "3",
+        "yetim_referans": "0",
+        "ust_uyusmazligi": "0"
+      }
+    ],
+    "bos_dal": [
+      {
+        "ust": "Commercial Ventilation",
+        "dal": "Dikdörtgen Kanal Tipi Fanlar",
+        "slug": "rectangular-duct-fans",
+        "is_active": false
+      },
+      {
+        "ust": "Commercial Ventilation",
+        "dal": "İklimlendirme Çözümleri",
+        "slug": "air-conditioning-solutions",
+        "is_active": false
+      },
+      {
+        "ust": "Fanlar",
+        "dal": "Cam ve Pencere Tipi Fanlar",
+        "slug": "window-fans",
+        "is_active": false
+      },
+      {
+        "ust": "Fanlar",
+        "dal": "Ex-Proof (ATEX) Fanlar",
+        "slug": "ex-proof-atex-fans",
+        "is_active": false
+      },
+      {
+        "ust": "Fanlar",
+        "dal": "Jet Fans",
+        "slug": "jet-fans",
+        "is_active": false
+      },
+      {
+        "ust": "Fanlar",
+        "dal": "Otopark Jet Fanları",
+        "slug": "parking-jet-fan",
+        "is_active": false
+      },
+      {
+        "ust": "Residential Ventilation",
+        "dal": "Kanal İçi Hayalet Fanlar",
+        "slug": "inline-duct-fans",
+        "is_active": false
+      }
+    ],
+    "spec_doluluk": [
+      {
+        "kok": "Fanlar",
+        "specli_urun": "295",
+        "en_az_anahtar": 1,
+        "ortalama_anahtar": "13.6",
+        "en_cok_anahtar": 23,
+        "seyrek_urun": "44"
+      },
+      {
+        "kok": "Kontrol Sistemleri",
+        "specli_urun": "35",
+        "en_az_anahtar": 1,
+        "ortalama_anahtar": "9.5",
+        "en_cok_anahtar": 10,
+        "seyrek_urun": "2"
+      },
+      {
+        "kok": "Isı Geri Kazanım (VMC)",
+        "specli_urun": "16",
+        "en_az_anahtar": 7,
+        "ortalama_anahtar": "17.6",
+        "en_cok_anahtar": 21,
+        "seyrek_urun": "0"
+      },
+      {
+        "kok": "İklimlendirme ve Hava Şartlandırma",
+        "specli_urun": "11",
+        "en_az_anahtar": 3,
+        "ortalama_anahtar": "8.2",
+        "en_cok_anahtar": 16,
+        "seyrek_urun": "2"
+      },
+      {
+        "kok": "Hava Perdeleri",
+        "specli_urun": "8",
+        "en_az_anahtar": 19,
+        "ortalama_anahtar": "19.5",
+        "en_cok_anahtar": 20,
+        "seyrek_urun": "0"
+      },
+      {
+        "kok": "Aksesuarlar",
+        "specli_urun": "2",
+        "en_az_anahtar": 1,
+        "ortalama_anahtar": "1.0",
+        "en_cok_anahtar": 1,
+        "seyrek_urun": "2"
+      }
+    ]
+  }
+}
