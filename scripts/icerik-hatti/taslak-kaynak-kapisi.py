@@ -165,6 +165,7 @@ def taslagi_denetle(yol, ayrinti=False):
     # "zayif dogrulanan" = sayi ve birim sayfada AYRI AYRI bulundu, BIRLIKTE oldugu
     # dogrulanmadi. Gizlenmez, raporda ayri sayilir (bkz. bulundu() icindeki gerekce).
     zayif = []
+    zayif_iddia = 0
     eksik_pdf = set()
     hatalar = []
 
@@ -193,6 +194,21 @@ def taslagi_denetle(yol, ayrinti=False):
         # "> " ile basliyorsa, bolme sonrasi son parca sadece ">" oluyordu; iddia bu karaktere
         # iniyor, jeton bulunamiyor ve olcum SESSIZCE atlaniyordu. Artik anlamli metni olmayan
         # parcalar elenir ve bir ONCEKI gercek cumle iddia sayilir.
+        # ⚠ IDDIA, BIR ONCEKI REFERANSTAN SONRA BASLAR.
+        # Olculmus kusur (2026-09-06, kendi elle yazdigim taslakta): bir cumle iki referans
+        # tasidiginda ("… (40 kg/m³) … [VMC s.46] ve … asma tavan unitesi [VMC s.58].") cumle
+        # icinde nokta olmadigi icin bolme calismiyor; s.58'in iddiasi s.46'ya ait jetonu
+        # (40 kg) da kapsiyor ve kapi "s.58'de 40 kg YOK" diye YANLIS KIRMIZI veriyordu.
+        # Kaynakta olctum: 40 kg/m3 s.46'da, 125 mm s.58'de GERCEKTEN var — metin dogruydu,
+        # kapi yaniliyordu. Yanlis kirmizi, yanlis yesil kadar tehlikelidir: kapiyi
+        # gormezden gelmeyi ogretir. Cozum: her referansin iddiasi bir ONCEKI referansin
+        # bittigi yerden baslar.
+        _onceki = None
+        for _r in REF.finditer(once):
+            _onceki = _r
+        if _onceki:
+            once = once[_onceki.end():]
+
         parcalar = [
             p.strip()
             for p in re.split(r"(?<=[.!?])\s+|\n[*\-|>]\s*|\n\n", once)
@@ -244,6 +260,15 @@ def taslagi_denetle(yol, ayrinti=False):
                 return re.search(rf"(?<![A-Za-z0-9]){re.escape(j.strip())}(?![A-Za-z0-9])", havuz) is not None
             if norm(j) in havuz_n:
                 return True
+            # ⚠ YUZDE ISARETININ YERI DILE BAGLIDIR — kapinin temel varsayimindaki tek gedik.
+            # "Sayilar dile bagli degildir" dogru, ama YUZDE ISARETI sayinin parcasi degil,
+            # dilin parcasi: Turkce "%90", Ingilizce "90%". Olculdu (2026-09-06): VMC s.58
+            # "Recovers almost 90% of the thermal energy" diyor, taslak "%90'a yakini" yazmis;
+            # iddia DOGRUYDU, kapi YANLIS KIRMIZI verdi. Iki biciminin denk sayilmasi
+            # gevsetme degildir: sayi ayni, yalnizca isaretin yani degisiyor.
+            _y = re.match(r"^%\s?([0-9]{1,3})$", j.strip())
+            if _y and norm(_y.group(1) + "%") in havuz_n:
+                return True
             # SAYI-GERI-DUSUSU (birim baslik hucresindeyse tam jeton bitisik gecmez) —
             # ⛔ AMA BIRIM DE SAYFADA GECMELI. Olculmus kor nokta (alt-ajan SABOTAJ D, 2026-09-06):
             # uydurma "Motor 400 °C dayanikli, 315 mm cark" iddiasi YESIL gecti, cunku "400" ve
@@ -269,7 +294,17 @@ def taslagi_denetle(yol, ayrinti=False):
             zayif.append(j)
             return True
 
+        # ⚠ BIRIM AYRIMI (olculmus hata, 2026-09-06): `zayif` listesi JETON biriktirir,
+        # `dogrulanan` ise IDDIA (cumle) sayar. Ikisini cikarmak — "GUCLU = dogrulanan - zayif"
+        # — FARKLI BIRIMLERI cikarmaktir ve sonucu EKSIYE dusurur (olculdu: -17). Rapor
+        # bugune kadar zayif jetonlari "iddia" diye etiketliyordu; yanlisti. Artik iki sayac:
+        #   zayif        = zayif eslesen JETON sayisi
+        #   zayif_iddia  = icinde en az bir zayif jeton bulunan IDDIA sayisi  ← dogrulanan ile
+        #                  ayni birim, yalniz bu cikarilabilir.
+        _zayif_once = len(zayif)
         kayip = [j for j in jetonlar if not bulundu(j)]
+        if len(zayif) > _zayif_once:
+            zayif_iddia += 1
         if kayip:
             dusen += 1
             hatalar.append((kaynak_ad, sayfalar_ham, kayip, jetonlar, iddia))
@@ -290,6 +325,8 @@ def taslagi_denetle(yol, ayrinti=False):
         # bakmaz — yani bu iddialar kapinin KOR NOKTASINDA. Sessiz kalmasin diye sayilir.
         "db_etiketi": len(re.findall(r"\[DB\]", metin)),
         "zayif": len(zayif),
+        "zayif_iddia": zayif_iddia,
+        "guclu_iddia": dogrulanan - zayif_iddia,
         "zayif_ornek": zayif[:4],
         "eksik_pdf": sorted(eksik_pdf),
         "hatalar": hatalar,
@@ -335,7 +372,8 @@ def main():
             print("      ⛔ HIC IDDIA OLCULEMEDI — jeton tasiyan tek cumle yok; kapi bu dosyada KOR.")
             toplam_dusen += 1
         if r["zayif"]:
-            print(f"      ⚠ ZAYIF DOGRULANAN {r['zayif']} iddia — sayi ve birim sayfada AYRI AYRI")
+            print(f"      ⚠ ZAYIF ESLESEN {r['zayif']} JETON, {r['zayif_iddia']} iddiada "
+                  f"(GUCLU iddia {r['guclu_iddia']}) — sayi ve birim sayfada AYRI AYRI")
             print(f"         bulundu, BIRLIKTE oldugu dogrulanmadi: {', '.join(r['zayif_ornek'])}")
             print("         (PDF tablosunda birim BASLIK hucresindedir; yakinlik sarti gercek")
             print("          iddialari da dusurdugu icin kullanilamadi. Bilinen kacak: sayinin")
