@@ -91,11 +91,11 @@ geri emilmesini önler. [HSK s.27][AVenS s.33]
 > radyal (yatay) atışlı çatı tipi santrifüj fan. [HSK s.4]
 
 ### Dört madde
-* **F400 sertifikası: 400 °C sıcaklıkta 2 saat** çalışma (S2 servisi) [HSK s.5]
+* **F400 sertifikası: 400 °C sıcaklıkta 2 saat** çalışma (S2 servisi) [HSK s.4, s.5]
 * Sürekli çalışmada (S1) işlenen hava sıcaklığı **80 °C**, istek üzerine **120 °C** [HSK s.5]
 * Geriye eğimli kanatlı santrifüj çark; monofaze veya trifaze asenkron motor, tek ya da çift devir
   (Dahlander) [HSK s.4]
-* EN 12101-3:2015 — duman ve ısı kontrol sistemleri standardına uygunluk [HSK s.4]
+* 12101-3:2015 — duman ve ısı kontrol sistemleri standardına uygunluk [HSK s.4]
 
 ### Yapısal bloklar
 
@@ -116,7 +116,7 @@ trifaze modellerde boya göre 230–400 V/50 Hz veya 400–690 V/50 Hz; çift de
 sürekli çalışmadaki (S1) azami sıcaklığı 80 °C, istek üzerine 120 °C'dir. Yangın halinde **400 °C'de
 2 saat** (S2 servisi) çalışır. [HSK s.5] Kuş ve yabani hayvanlara karşı koruma, hizmet kesintisine yol
 açabilecek arızaları önler. [HSK s.7] Elektrikli ekipman muhafazalarının koruma derecesi (CEI EN
-60529/1997) ve duman-ısı kontrol sistemleri (EN 12101-3:2015) standartlarına uygundur. [HSK s.4]
+60529/1997) ve duman-ısı kontrol sistemleri (12101-3:2015) standartlarına uygundur. [HSK s.4]
 
 **Kontrol.** Motor tipine göre tek hızlı veya çift hızlı (Dahlander) çalışma. [HSK s.4] Fanların geniş
 ayar aralığı, sağlanan performansın değişen ihtiyaca uyarlanmasına ve enerji israfının sınırlanmasına
