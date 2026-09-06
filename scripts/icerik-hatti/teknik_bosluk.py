@@ -84,7 +84,7 @@ def main() -> int:
         U, h, "products?select=slug,brand,model_code,family_id,technical_specs,deleted_at&order=slug",
         "products")
     canli = [u for u in urunler if not u.get("deleted_at")]
-    aileler = _veri.rest(U, h, "product_families?select=id,slug")
+    aileler = _veri.tumunu_cek(U, h, "product_families?select=id,slug", "product_families")
     aile_slug = {f["id"]: f["slug"] for f in aileler}
 
     # --- dizindeki kaynaklar (takma ad cozumu dahil) -------------------------

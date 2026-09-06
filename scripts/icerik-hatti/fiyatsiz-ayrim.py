@@ -57,56 +57,19 @@ def env_oku() -> dict:
     return o
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _veri  # noqa: E402  — ORTAK kapi: kesin sayi + sirali sayfalama + fail-closed (kopya YOK)
+
+
 def rest(url: str, basliklar: dict):
+    """Ham URL ile tek cagri (kucuk, filtreli okumalar icin; coklu satir icin _veri.tumunu_cek)."""
     istek = urllib.request.Request(url, headers=basliklar)
     with urllib.request.urlopen(istek) as y:
         return json.loads(y.read().decode("utf-8"))
 
 
-def kesin_sayi(U: str, h: dict, tablo: str) -> int:
-    """Sunucunun bildirdigi GERCEK satir sayisi (Content-Range) — sayfalamayi dogrulamak icin."""
-    istek = urllib.request.Request(f"{U}/rest/v1/{tablo}?select=id&limit=1",
-                                   headers={**h, "Prefer": "count=exact"})
-    with urllib.request.urlopen(istek) as y:
-        cr = y.headers.get("Content-Range") or ""
-    son = cr.split("/")[-1] if "/" in cr else ""
-    if not son.isdigit():
-        # ⛔FAIL-CLOSED: kesin sayi ALINAMADIYSA denetim ATLANMAZ, olcum GECERSIZ sayilir.
-        # Ilk halim -1 dondurup denetimi sessizce atliyordu — yani kapi, en cok ihtiyac
-        # duyuldugu anda (sayim guvenilmezken) kendini KAPATIYORDU. Fail-open kapi,
-        # kapi degildir. (ALTYAPI ayni tuzagi supabase-js tarafinda olctu, 2026-09-06.)
-        raise SystemExit(f"⛔ OLCUM GUVENILIR DEGIL: {tablo} icin kesin sayi alinamadi "
-                         f"(Content-Range: {cr!r}). Rapor uretilmedi.")
-    return int(son)
-
-
 def tumunu_cek(U: str, h: dict, yol: str, tablo: str):
-    """⭐1000 SATIR TAVANI KORUMASI — olculdu 2026-09-06 (OPS filo notu):
-    PostgREST tek cagrida en cok 1000 satir doner; `limit=2000` yazmak ISE YARAMAZ
-    (olctum: 2000 istedim, 1000 geldi, product_prices'ta 44 satir SESSIZCE dustu).
-    Sessiz oldugu icin en tehlikeli sinif: sayim kucuk cikar, kimse kirmizi gormez.
-    Bu yuzden hem SAYFALANIR hem de sonunda sunucunun KESIN SAYISIYLA karsilastirilir."""
-    # Kesin sayi ONCE alinir: hem dongu tavani olur hem de sonda karsilastirilir.
-    # (ALTYAPI olctu: tavansiz dongu sabotaj taklidinde SONSUZ dongune girip bellegi doldurdu.)
-    kesin = kesin_sayi(U, h, tablo)
-    tur_tavani = kesin // 1000 + 2
-    top, bas, tur = [], 0, 0
-    while True:
-        tur += 1
-        if tur > tur_tavani:
-            raise SystemExit(f"⛔ DONGU TAVANI asildi: {tablo} — {tur} tur, beklenen en cok "
-                             f"{tur_tavani}. Sayfalama bozuk; rapor uretilmedi.")
-        parca = rest(f"{U}/rest/v1/{yol}&offset={bas}&limit=1000", h)
-        if not parca:
-            break
-        top += parca
-        if len(parca) < 1000:
-            break
-        bas += 1000
-    if len(top) != kesin:
-        raise SystemExit(f"⛔ EKSIK VERI: {tablo} — cekilen {len(top)}, sunucu {kesin}. "
-                         "Olcum GECERSIZ; sayfalama bozuk.")
-    return top
+    return _veri.tumunu_cek(U, h, yol, tablo)
 
 
 def main() -> int:
@@ -150,7 +113,7 @@ def main() -> int:
     fiyatsiz = [u for u in canli if slug_id.get(u["slug"]) not in fiyatli_id]
 
     # --- 3) AILE ADLARI ------------------------------------------------------
-    aileler = rest(f"{U}/rest/v1/product_families?select=id,slug", h)
+    aileler = tumunu_cek(U, h, "product_families?select=id,slug", "product_families")
     aile_slug = {f["id"]: f["slug"] for f in aileler}
 
     # --- 4) FIYAT LISTESI SAYFALARI -----------------------------------------
@@ -200,7 +163,9 @@ def main() -> int:
                      if any(norm(u["model_code"]) in s["n"] for s in sayfalar))
     print(f"POZITIF KONTROL   : fiyatli {len(ornek)} urunun {pk_bulunan}'i listede GECIYOR")
     if ornek and pk_bulunan < len(ornek) * 0.8:
-        print("⛔ POZITIF KONTROL DUSUK — esleştirici kor olabilir, 'ticari bosluk' iddiasi GUVENILMEZ")
+        # FAIL-CLOSED: esleştirici kor ise 'ticari bosluk' iddiasi gecersiz — rapor YAZILMAZ.
+        # (Onceki hal uyari basip raporu yine yaziyordu; workflow curutmesi buldu 2026-09-06.)
+        raise SystemExit("⛔ POZITIF KONTROL DUSUK — esleştirici kor olabilir; rapor uretilmedi (cikis 1).")
 
     a_ = sum(1 for s in satirlar if s["sinif"] == "ICE ALIM BOSLUGU")
     b_ = sum(1 for s in satirlar if s["sinif"] == "TICARI BOSLUK")
