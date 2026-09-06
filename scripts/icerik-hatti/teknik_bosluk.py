@@ -59,7 +59,7 @@ def main() -> int:
 
     U, h = _veri.baglan()
     urunler = _veri.tumunu_cek(
-        U, h, "products?select=slug,brand,family_id,technical_specs,deleted_at&order=slug",
+        U, h, "products?select=slug,brand,model_code,family_id,technical_specs,deleted_at&order=slug",
         "products")
     canli = [u for u in urunler if not u.get("deleted_at")]
     aileler = _veri.rest(U, h, "product_families?select=id,slug")
@@ -114,6 +114,8 @@ def main() -> int:
         sinif_sayaci[sinif] += hucre
         satirlar.append({
             "aile": aile, "urun": len(urs), "marka": (urs[0].get("brand") or "—"),
+            "kodlar": sorted({(u.get("model_code") or "").strip()
+                              for u in urs if (u.get("model_code") or "").strip()}),
             "beklenen_alan": len(beklenen), "bosluk_hucre": hucre,
             "bosluk": bosluk, "sinif": sinif,
             "ort_alan": round(sum(len([1 for v in (u.get("technical_specs") or {}).values()
@@ -262,7 +264,29 @@ def main() -> int:
              "yazmak **birim hatasını kapatırken semantik hata üretiyordu**. "
              "Yani ikisini birleştirmek düzeltme değil, **bozma** olurdu.")
     ç.append("")
-    ç.append("## 6 · Bu ölçümün kapatmadığı")
+    ç.append("## 6 · FAZ 2 arama listesi — ajanlar koddan başlasın")
+    ç.append("")
+    ç.append("Yoksul ailelerin **model kodları**. Arama bunlarla başlar; kod üreticinin "
+             "kendi kataloğunda birebir geçer ve marka adıyla arama yapmaktan çok daha kesindir.")
+    ç.append("")
+    ç.append("⚠**Marka sitesi adayı YAZMIYORUM.** Doğrulamadığım bir adresi rapora koymak, "
+             "bütün bu hattın kurulma sebebine aykırı olurdu: uydurulmuş bir kaynak, "
+             "kaynaksızlıktan daha tehlikelidir çünkü kanıtlıymış gibi görünür. "
+             "Resmî kaynağı FAZ 2 ajanı **ölçerek** bulur ve URL'yi alıntıyla birlikte getirir.")
+    ç.append("")
+    for s2 in sorted(yoksul, key=lambda x: (x["marka"], x["aile"])):
+        ç.append(f"### `{s2['aile']}` — {s2['marka']} · {s2['urun']} ürün · "
+                 f"ort. {s2['ort_alan']} alan")
+        ç.append("")
+        if s2["kodlar"]:
+            ç.append("```")
+            for i in range(0, len(s2["kodlar"]), 6):
+                ç.append("  ".join(s2["kodlar"][i:i + 6]))
+            ç.append("```")
+        else:
+            ç.append("*(model kodu yok — arama ürün adıyla yapılacak)*")
+        ç.append("")
+    ç.append("## 7 · Bu ölçümün kapatmadığı")
     ç.append("")
     ç.append("* Hangi web kaynağının **kullanılabilir** olduğu (üretici sitesinde PDF var mı) — FAZ 2.")
     ç.append("* `PDF_TEKNIK_VAR` sınıfındaki boşlukların **gerçekten** o PDF'te bulunup "

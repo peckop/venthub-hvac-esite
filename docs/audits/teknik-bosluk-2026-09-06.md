@@ -129,7 +129,91 @@ Soru şöyle geldi: *"`max_delivery_m3h` 243 vs `nominal_delivery_m3h` 89 — ha
 
 Cetvel ayrıca **yasak** koyuyor: *"Nominal noktayı `max_` alanına yazmak yasak."* Gerekçesi ölçülmüş (2026-08-21, SEAT föyleri): nominal değeri `max_` alanına yazmak **birim hatasını kapatırken semantik hata üretiyordu**. Yani ikisini birleştirmek düzeltme değil, **bozma** olurdu.
 
-## 6 · Bu ölçümün kapatmadığı
+## 6 · FAZ 2 arama listesi — ajanlar koddan başlasın
+
+Yoksul ailelerin **model kodları**. Arama bunlarla başlar; kod üreticinin kendi kataloğunda birebir geçer ve marka adıyla arama yapmaktan çok daha kesindir.
+
+⚠**Marka sitesi adayı YAZMIYORUM.** Doğrulamadığım bir adresi rapora koymak, bütün bu hattın kurulma sebebine aykırı olurdu: uydurulmuş bir kaynak, kaynaksızlıktan daha tehlikelidir çünkü kanıtlıymış gibi görünür. Resmî kaynağı FAZ 2 ajanı **ölçerek** bulur ve URL'yi alıntıyla birlikte getirir.
+
+### `avens-bvu-ls` — AVenS · 2 ürün · ort. 1.0 alan
+
+```
+30110  30111
+```
+
+### `avens-elektrikli-isiticilar` — AVenS · 6 ürün · ort. 6.0 alan
+
+```
+13032  13033  13034  13037  13038  13039
+```
+
+### `avens-hiz-anahtarlari` — AVenS · 2 ürün · ort. 1.0 alan
+
+```
+01801  60006
+```
+
+### `avens-hucreli-aspiratorler` — AVenS · 6 ürün · ort. 2.7 alan
+
+```
+20100  20110  20120  20130  20140  20150
+```
+
+### `avens-hucreli-hf-s` — AVenS · 7 ürün · ort. 4.0 alan
+
+```
+20200  20210  20220  20230  20240  20250
+20260
+```
+
+### `avens-siginak-havalandirma-uniteleri` — AVenS · 3 ürün · ort. 2.0 alan
+
+```
+30100  30101  30102
+```
+
+### `avens-sulu-batarya` — AVenS · 8 ürün · ort. 0.8 alan
+
+```
+13050  13051  13052  13053  13054  13055
+13056  13057
+```
+
+### `danfoss-fc51` — Danfoss · 2 ürün · ort. 0.0 alan
+
+```
+80101  80141
+```
+
+### `nicotra-gebhardt-adh` — Nicotra Gebhardt · 8 ürün · ort. 1.0 alan
+
+```
+11942  11943  11947  11948  11949  11950
+11951  11956
+```
+
+### `nicotra-gebhardt-at` — Nicotra Gebhardt · 8 ürün · ort. 1.0 alan
+
+```
+11930  11931  11932  11933  11934  11935
+11938  11939
+```
+
+### `nicotra-gebhardt-dd` — Nicotra Gebhardt · 13 ürün · ort. 1.0 alan
+
+```
+11901  11902  11905  11907  11908  11909
+11910  11911  11912  11913  11916  11920
+11921
+```
+
+### `nicotra-gebhardt-rdh` — Nicotra Gebhardt · 6 ürün · ort. 1.0 alan
+
+```
+11960  11961  11962  11963  11964  11969
+```
+
+## 7 · Bu ölçümün kapatmadığı
 
 * Hangi web kaynağının **kullanılabilir** olduğu (üretici sitesinde PDF var mı) — FAZ 2.
 * `PDF_TEKNIK_VAR` sınıfındaki boşlukların **gerçekten** o PDF'te bulunup bulunmadığı — vekil, kanıt değil.
