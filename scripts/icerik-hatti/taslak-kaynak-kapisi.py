@@ -27,6 +27,18 @@ import sys
 import unicodedata
 from pathlib import Path
 
+# ⚠ CIKTI AKISI KODDA UTF-8'E ZORLANIR — ORTAM DEGISKENINE GUVENILMEZ.
+# Olculmus kusur (alt-ajan buldu, 2026-09-06): Windows konsolu cp1254 ile acilinca "⛔"
+# karakteri UnicodeEncodeError firlatiyordu ve betik TAM KIRMIZI RAPORU BASARKEN COKUYORDU.
+# Yani kapi, en cok konusmasi gereken anda SUSUYORDU; cikis kodu da 1 yerine 1 (traceback)
+# oluyor, mesaj gorunmuyordu. Gozcu.cjs ayni tuzagi ayni sekilde cozer (bkz. o dosyanin
+# "tuzak 1" notu): akis KODDA zorlanir, PYTHONIOENCODING'e birakilmaz.
+for _akis in (sys.stdout, sys.stderr):
+    try:
+        _akis.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 try:
     import fitz  # PyMuPDF
 except ImportError:
