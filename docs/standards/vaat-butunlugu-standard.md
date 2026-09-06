@@ -78,6 +78,34 @@ Kapı: **INV-VAAT-SIZINTI-2** (`src/__tests__/conformance/vaat-sizintisi.test.ts
 Kardeşiyle aynı dosyada durur ama **muafiyeti farklıdır** — tek kapıya sıkıştırmak,
 ikisinden birini gevşetmek olurdu.
 
+## 1.7) KAPASİTE vaadi — dördüncü kardeş (REC-157, 2026-09-06)
+
+Ticari vaat bir **yetenek**, yetenek vaadi bir **özellik**, zaman vaadi bir **tarih**
+iddia eder. Dördüncüsü bir **sayı** iddia eder: ürünün ne kadar çektiği, ne kadar
+bastığı, kaç mm olduğu. Aynı aileye girer, çünkü kaynağı olmayan sayı da kaynağı olmayan
+cümle kadar yanıltıcıdır.
+
+> **Çok ürünlü bir ailenin (serinin) metni, bir eksende yayılma ≥ 2 kat ise o eksen için
+> tek bir değer yazamaz.** Ya ARALIK yazar ("460–18.600 m³/h"), ya o sayıyı hiç vermez.
+
+⭐**Bu maddenin diğer üçünden farkı — ölçülerek bulundu:** burada yazılan sayı **yanlış
+değil, EKSİK**. `slimroof-roof` metni "nominal debisi 460 m3/h" diyordu ve 460 gerçekten
+serinin bir modelinin değeriydi; serinin aralığı ise 460–18.600 (**40 kat**). Yani
+"iddia doğru mu" diye soran bir kapı bunu **yeşil** geçer. Doğru soru "iddia seriyi mi
+yoksa tek modeli mi anlatıyor" olmalıydı. Nitekim ilk tasarlanan ölçüt ("metindeki sayı
+`technical_specs` aralığının dışındaysa kırmızı") prod'da koşuldu ve **bilinen ailelerin
+hiçbirini yakalamadı** — 460, 460–18.600'ün İÇİNDEDİR.
+
+Zararı vaat sızıntısıyla aynı sınıftır: alıcı 18.600 m³/h çekebilen bir seriyi
+"460 m³/h'lik fan" sanıp listeden çıkarır; arama motoru seriyi yanlış indeksler.
+
+Kapı: **INV-AILE-SAYI-1** (`src/__tests__/conformance/aile-metni-sayisal-deger.test.ts`).
+Eşik, ölçüm evreni, veri paketinin nasıl üretildiği ve kapının **ölçmedikleri** ayrı
+cetvelde: **`docs/standards/aile-metni-sayisal-standard.md`**. Oradaki iki sınır burada da
+geçerlidir: kapı damgalı bir veri paketi üzerinde koşar (**canlı veriyi ölçmez**), ve
+"aralık ifadesi var" kolu bilerek gevşektir — yani gerçek borç ölçülenden **biraz büyük**
+olabilir, asla daha küçük değil.
+
 ## 1.4) YETENEK vaadi — ticari vaadin kardeşi (REC-94, 2026-09-04)
 
 Yukarıdaki üç madde **ticari** vaadi yönetir (ödeme, taksit, kargo). 2026-09-04'te aynı
@@ -202,6 +230,9 @@ sessiz eksik demektir.
 
 ## 5) İlgili
 
+- `docs/standards/aile-metni-sayisal-standard.md` — **§1.7'nin tam cetveli**: eşik, veri
+  paketinin üretim sorgusu, ölçülen borç ve kapının ölçmedikleri. §1.7 kuralı söyler,
+  o dosya nasıl ölçüldüğünü söyler.
 - `docs/standards/quote-standard.md` — teklif modunun kendi semantiği
 - `docs/standards/checkout-payment-standard.md` — ödeme akışı
 - `src/__tests__/conformance/storefront-fiyat-sizintisi.test.ts` — **kardeş kapı**:

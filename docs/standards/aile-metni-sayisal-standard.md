@@ -3,6 +3,8 @@
 > **SSOT.** Bir ürün ailesinin (serinin) açıklama metninde teknik bir sayı nasıl yazılır.
 > v1.0 · 2026-09-06 — REC-157 ölçümü sonrası.
 > Zorlayan kapı: `src/__tests__/conformance/aile-metni-sayisal-deger.test.ts` (INV-AILE-SAYI-1).
+> **Kuralın durduğu yer:** `docs/standards/vaat-butunlugu-standard.md` **§1.7 (KAPASİTE
+> vaadi)** — vaadin dördüncü kardeşi. Orası kuralı söyler, burası nasıl ölçüldüğünü.
 
 ---
 
