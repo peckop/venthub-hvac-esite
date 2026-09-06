@@ -25,6 +25,8 @@
 | **Navigasyon URL'i** | client: `useLocalizedRoutes()` · RSC/paylaşılan: `localizedHref(url, lang)` | `src/hooks/useLocalizedRoutes.ts`, `src/utils/routes.ts` |
 | **Entity adı (display)** | `getCategoryDisplayName(cat, t)` (`translation_key`→dict) | `src/utils/categoryHelpers.ts` |
 | **DB JSONB çeviri** | `mapCategoryWithLocale(dbCat, lang)` (`metadata[lang]`) | `src/lib/type-converters.ts` |
+| **Kategori açıklaması (display)** | `getCategoryDescription(cat, lang)` (`metadata.description_i18n[lang]`) | `src/utils/categoryHelpers.ts` |
+| **Kategori görünen slug'ı** | `getLocalizedCategorySlug(cat, lang)` (`metadata.slug[lang]`) | `src/utils/categoryHelpers.ts` |
 | **Para** | `formatCurrency(value, lang)` | `@/i18n/format` |
 | **Sayı (para-dışı)** | `formatNumber(value, lang)` (adet, hacim m³, hesap sonucu) | `@/i18n/format` |
 | **Tarih** | `formatDate(iso, lang)` / `formatDateTime` | `@/i18n/datetime` |
@@ -38,7 +40,8 @@
 2. **Manuel `/${lang}/...` YASAK** — URL dil öneki yalnız `useLocalizedRoutes`/`localizedHref` ile. Sabit app-yolu literal'i (`href="/category/..."`) de yasak.
 3. **Client'ta ham `Routes` YASAK** — `import { Routes }` tek başına nav render eden bileşende olmaz; `useLocalizedRoutes()` proxy'si ya da `localizedHref` zorunlu. (İstisna: `/admin*` dil-öneki almaz; R3F Canvas context'i geçmez.)
 4. **Entity adı SSOT'tan** — `categoryList` sözlüğünü `slug` ile doğrudan indeksleme yasak (slug ≠ `translation_key`); `getCategoryDisplayName` kullan.
-5. **DB JSONB çeviri locale-mapper'dan** — `metadata.hero_description` vb. ham okuma yasak; `mapCategoryWithLocale` / `getCategoryDescription` kullan.
+5. **DB JSONB çeviri locale-mapper'dan** — `metadata.hero_description` / `metadata.description_i18n` vb. ham okuma yasak; `mapCategoryWithLocale` / `getCategoryDescription` kullan.
+5b. **Dile-bağlı DB metni `<alan>_i18n = {tr,en}` kalıbıyla taşınır ve çözücüsü `lang`'ı ZORUNLU alır** (REC-161, 2026-09-06). Kanonik/legacy tek-dilli alan yerinde kalır, dile-bağlı metin `metadata.<alan>_i18n`'e yazılır; çözüm sırası `…_i18n[lang]` → legacy alan → düz kolon → `''`. Ayrıntı ve gerekçe: §3.1.
 6. **Para/sayı/tarih format helper'dan** — ham `Intl.*Format`/`toLocale*String`/elle `₺` birleştirme yasak; `formatCurrency`/`formatNumber`/`formatDate`. (Tek muaf: SSOT'un kendisi — `i18n/format.ts`, `i18n/datetime.ts`.)
 7. **Hiyerarşik anahtar** — `section.subsection.key`. Paylaşılan metin → `common`. Çakışan anahtarı körlemesine yeniden-tanımlama.
 8. **Hreflang** — self-referencing + reciprocal (A→B ⇒ B→A) + ISO kodları (`en-GB` ✓) + `x-default`. Canonical, locale URL'i ile eşleşir.
@@ -57,6 +60,7 @@
 | C | i18n literal → t() | `t()` + `en: typeof tr` | eslint `react/jsx-no-literals` + `test:i18n` parite + `prebuild` | ⚠️ KISMÎ — kapsam-içi kapalı; **admin (~256) + legal (~235) ertelendi** |
 | D | Para/sayı/tarih biçimi | `formatCurrency`/`formatNumber`/`formatDate` | **INV-3** `numeric-format-ssot.test.ts` (ham `Intl.*Format` · `toLocale*String` yasak; muaf = SSOT 2 dosya) | ✅ KAPALI (6 saha migrate) |
 | E | DB JSONB çeviri (display) | `getCategoryDescription` / `mapCategoryWithLocale` | **INV-4** `category-metadata-i18n-ssot.test.ts` (ham `hero_*` / `technical_summary` okuması yasak) | ✅ KAPALI (`CategoryShowcase` helper'a bağlandı) |
+| E2 | **Kategori açıklaması — dil çözümü** | `getCategoryDescription(cat, lang)` | **INV-KATEGORI-ACIKLAMA-1** `kategori-aciklama-dil-cozumu.test.ts` (K1 dil ayrışması · K2 geriye uyum · K3 çağrı arity · K4 ham `metadata.description_i18n` yasak · K5 ayırt edicilik · K6 boşluk muhafızı) | ✅ KAPALI (REC-161) |
 | F | Hreflang/SEO | hreflang seti | — manuel denetim | ⚠️ blueprint var (`seo-transition-blueprint.md`) |
 | G | **i18n key-çözünürlük** | `getDictValue` nested-only | **INV-5** `i18n-key-resolution.test.ts` (her statik `t('a.b.c')` sözlükte çözülmeli; içinde-nokta düz anahtar = ham-key render) | ✅ KAPALI (ratchet: 2026-06-16'da 32 debt donduruldu → admin literal batch #364 15'ini çözünce 32→17 sıkıştı; yeni kırılma kırar) |
 
@@ -133,6 +137,47 @@
 
 ---
 
+## 3.1 Dile-bağlı DB metni kalıbı — `<alan>_i18n = {tr,en}` (REC-161)
+
+> Kanonik kalıp `metadata.slug = {tr,en}`'den gelir (`docs/plans/slug-localization-2026-08-10.md` §1).
+> **Açıklama da AYNI kalıbı kullanır.** Yeni bir dile-bağlı DB metni eklerken bu kalıp uygulanır.
+
+**Kural.** Dile-bağlı bir DB metni için:
+
+1. **Sütun ekleme, `metadata` JSONB'sine yaz.** `categories.metadata` zaten `jsonb`; sütunu
+   `jsonb`'ye çevirmek migration gerektirir ve VentHub'da **migration merge = prod'a otomatik
+   iner** (Mutlak Kural 13). Şema değişikliği olmadan çözülebilen i18n işi migration
+   ile çözülmez.
+2. **Kanonik/legacy tek-dilli alan YERİNDE KALIR.** (`hero_description` silinmez.) Yeni alan
+   `metadata.<alan>_i18n = { "tr": "…", "en": "…" }`.
+3. **Şekli tipte BEYAN ET** — `CategoryMetadata` (`src/types/db-rows.ts`). Beyansız alan,
+   yazan tarafın (admin formu / katalog betiği) uydurmasına açıktır.
+4. **Tek çözücü, `lang` ZORUNLU.** Çözüm sırası:
+   `metadata.<alan>_i18n[lang]` → legacy tek-dilli alan → düz kolon → `''`.
+   Boş dize "yok" sayılır (boş paragraf basmaktansa yedeğe düşülür).
+   Bilinmeyen dil kodu TR'ye çözülür (`getLocalizedCategorySlug` ile aynı kural).
+5. **Render katmanı ham okumaz.** `metadata.<alan>_i18n` erişimi yalnız çözücü dosyasında.
+
+**`lang` neden ZORUNLU (opsiyonel değil).** Ölçülmüş vaka: aynı dosyadaki
+`getCategoryDisplayName(cat, t?)`'nin **opsiyonel** `t`'si 2026-09-01'de canlıda tam bu kusuru
+üretti — çağıran atladı, fonksiyon sessizce `menu_label`/`name`'e (ikisi de Türkçe) düştü ve
+İngilizce sayfada Türkçe ad bastı (REC-103). Opsiyonel imzada kusur **sessizdir**; zorunlu
+imzada **derleyici hatasıdır** (tsc strict). Statik tarama kapısı ikinci, bağımsız koldur —
+tek kol değil, çünkü tarama dolaylı çağrıyla atlatılabilir, tsc atlatılamaz.
+
+**Geriye uyum şartı.** Yeni alan DB'de yokken davranış eskisiyle **birebir** aynı olmalı;
+bunu kapı, eski algoritmayı referans olarak koşup sonuçları karşılaştırarak ölçer
+(INV-KATEGORI-ACIKLAMA-1 · K2) — elle seçilmiş beklentilerle değil.
+
+**Ölçüm (2026-09-06, canlı DB · SELECT).** 37 kategori (23 aktif) · `description_i18n`
+**0** satır · `hero_description` **2** satır · `metadata.tr`/`metadata.en` **0** satır
+(yani `mapCategoryWithLocale`'in `meta[lang]` kolu sahada hiç veri görmüyor) ·
+`metadata.slug` 37/37 · **`description` kolonu 37/37 satırda NULL**. Yani kusur o tarihte
+GÖRÜNMÜYORDU (vitrin sözlük yedeğine düşüyordu) ama **latent**ti: içerik yazıldığı an
+İngilizce vitrinde Türkçe metin çıkacaktı.
+
+---
+
 
 ## 4. DoD — Canlı UI'da ASLA görünmemeli
 
@@ -148,6 +193,6 @@
 ## 5. İlgili
 
 - **Playbook (nasıl):** `.claude/skills/i18n-conventions` · toplu göç makinesi `docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md`
-- **Kapı kaynak:** `src/__tests__/conformance/` (INV-1 entity-adı · INV-2 localize-rota · INV-3 sayısal/zamansal biçim · INV-4 metadata JSONB-çeviri · INV-5 key-çözünürlük/keycheck)
+- **Kapı kaynak:** `src/__tests__/conformance/` (INV-1 entity-adı · INV-2 localize-rota · INV-3 sayısal/zamansal biçim · INV-4 metadata JSONB-çeviri · INV-5 key-çözünürlük/keycheck · INV-KATEGORI-ACIKLAMA-1 kategori açıklaması dil çözümü)
 - **Komşu cetveller:** `admin-standard.md`, `dealer-network-standard.md` · **SEO:** `docs/plans/seo-transition-blueprint.md`
 - **CLAUDE.md** Kural #7 (i18n) bu cetvelin özetidir.

@@ -76,6 +76,22 @@
 4. **Doğrulama:** tsc+lint+build (RSC prerender kapısı) + preview'da: `/tr/category/konut-tipi-havalandirma/banyo-ve-tuvalet-fanlari`
    çalışır; `/tr/category/residential-ventilation/...` → 301 TR'ye; `/en/...` EN slug'larla.
 
+## 3.1 Aynı kalıbın ikinci kullanıcısı: kategori AÇIKLAMASI (REC-161, 2026-09-06)
+
+Bu plandaki `metadata.slug = {tr,en}` kalıbı **genel bir kalıp** oldu: dile-bağlı her kategori
+metni `metadata.<alan>_i18n = {tr,en}` ile taşınır ve `lang`'ı **zorunlu** alan tek bir çözücüden
+okunur. İlk türev: **kategori açıklaması** → `metadata.description_i18n` +
+`getCategoryDescription(category, lang)`.
+
+- **Kuralın SSOT'u burası DEĞİL** — cetvel: `docs/standards/i18n-localization-standard.md` **§3.1**
+  (kalıbın tanımı, `lang` neden zorunlu, geriye uyum şartı, canlı DB ölçümü).
+  Bu dosya bir *plan*'dır (tek seferlik slug göçünün eşleme tablosu); kural *cetvel*'de yaşar.
+- **Migration YOK.** `metadata` zaten `jsonb`; sütunu `jsonb`'ye çevirmek Kural 13 gereği
+  prod'a otomatik inerdi. Slug göçünün aksine bu iş şema değiştirmez.
+- **Kapı:** `INV-KATEGORI-ACIKLAMA-1` — `src/__tests__/conformance/kategori-aciklama-dil-cozumu.test.ts`.
+
+---
+
 ## 4. Kapsam dışı / ertelenen
 
 - Ürün slug'ları (dil-nötr, ideal durumda).
