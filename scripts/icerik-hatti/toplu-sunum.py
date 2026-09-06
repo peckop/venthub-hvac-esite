@@ -106,7 +106,7 @@ def kapi_kos(baslik, blok):
         zi = int(z.group(2)) if z else 0
         return {"dogrulanan": d, "dusen": du, "olculemeyen": o,
                 "zayif_jeton": zj, "zayif_iddia": zi, "guclu_iddia": d - zi,
-                "kirmizi": p.returncode != 0}
+                "kirmizi": p.returncode != 0, "cikti": cikti}
     finally:
         os.unlink(gecici)
 
@@ -260,6 +260,22 @@ def sunum_yaz(kayitlar, hedef, db_durum=None):
         A("Üstüne yazılacak metinlerin bir kısmı zaten hatalıydı: seri metni tek bir modelin")
         A("verisini taşıyordu (ölçüldü, ayrı raporda). Yeni metin bunu da düzeltiyor.")
         A("")
+    kararlar = {}
+    kj = Path(__file__).resolve().parent / "karar-k710.json"
+    if kj.exists():
+        import json as _json
+        kararlar = _json.loads(kj.read_text(encoding="utf-8")).get("kararlar", {})
+    if kararlar:
+        A("## Senin verdiğin kararlar işlendi (K7.10)")
+        A("")
+        A("AVenS için verdiğin karar bu dosyaya **elle değil** veri dosyasından işlendi")
+        A("(`scripts/icerik-hatti/karar-k710.json`) — karar değişirse tek yer değişir.")
+        A("")
+        A("| Aile | Karar | Gerekçe / ölçüm |")
+        A("|---|---|---|")
+        for s, v in kararlar.items():
+            A(f"| `{s}` | **{v['durum']}** | {v['gerekce']} |")
+        A("")
     if olculemeyen_aile:
         A("## ⛔ SENDEN KARAR BEKLEYEN AİLELER")
         A("")
@@ -302,6 +318,19 @@ def sunum_yaz(kayitlar, hedef, db_durum=None):
 
 if __name__ == "__main__":
     kayitlar = main()
+    # --aile <slug>: TEK ailenin kapi raporunu tam basar. K7.10 gibi "bu aile kapidan
+    # GUCLU gecmeli" turu sartlar aile duzeyinde olculur; dosya duzeyi cevap vermez.
+    if "--aile" in sys.argv:
+        hedef_slug = sys.argv[sys.argv.index("--aile") + 1]
+        bulundu_mu = False
+        for k in kayitlar:
+            if k["slug"] == hedef_slug:
+                bulundu_mu = True
+                print((k["kapi"] or {}).get("cikti", "(kapi kosmadi)"))
+        if not bulundu_mu:
+            print(f"aile bulunamadi: {hedef_slug}")
+            sys.exit(2)
+        sys.exit(0)
     if "--yaz" in sys.argv:
         hedef = KOK / "docs" / "audits" / "icerik-hatti-toplu-sunum-2026-09-06.md"
         dd = None
