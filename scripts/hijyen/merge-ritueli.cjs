@@ -411,8 +411,14 @@ if (require.main === module) {
   if (MERGE) {
     // Kapi ve eylem AYNI surecte: kirmizi burada olamaz (yukarida cikildi).
     try {
-      const cikti = gh(['pr', 'merge', pr, '--squash', '--delete-branch'])
-      yaz('MERGE YAPILDI (bu betik, --merge): ' + cikti.trim().split('\n')[0])
+      // Ilk gercek kosum (#1029) olctu: worktree icinden `--delete-branch` yerel master'i checkout
+      // etmeye kalkiyor ve "master is already used by worktree" ile patliyor. Merge uzakta olur:
+      // cwd depo DISI (os.tmpdir) + --repo, gh yerel git'e dokunmaz.
+      const depo = JSON.parse(gh(['repo', 'view', '--json', 'nameWithOwner'])).nameWithOwner
+      const cikti = execFileSync('gh',
+        ['pr', 'merge', pr, '--squash', '--delete-branch', '--repo', depo],
+        { encoding: 'utf8', cwd: require('os').tmpdir() })
+      yaz('MERGE YAPILDI (bu betik, --merge, uzak dal silindi): ' + (cikti.trim().split('\n')[0] || depo + '#' + pr))
     } catch (e) {
       process.stderr.write('merge-ritueli: kapi YESIL ama gh pr merge BASARISIZ: ' +
         String(e.message).slice(0, 200) + '\n')
