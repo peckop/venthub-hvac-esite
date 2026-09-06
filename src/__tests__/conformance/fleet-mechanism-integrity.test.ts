@@ -21,6 +21,7 @@
  * Cetvel: docs/standards/fleet-mechanism-standard.md
  */
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 
 import { describe, expect,it } from 'vitest'
@@ -239,6 +240,111 @@ describe('INV-MECH-1: filo mekanizması bütünlüğü', () => {
     expect(
       /Olcemedim != gecti|OLCULEMEZ/.test(kurulumKaynak),
       'Betik ölçülemeyeni geçmiş saymadığını açıkça söylemeli.',
+    ).toBe(true)
+  })
+})
+
+/**
+ * ⭐TESLİMAT KANITI BAĞIMSIZ TANIK İSTER (2026-09-06 ölçümü).
+ *
+ * NİÇİN: eski kapı, denetlediği ajanın *"jetonu bildirimde gördüm"* BEYANINA güveniyordu ve
+ * jetonu ajana **kendi eliyle** veriyordu (`prob` onu stdout'a basar). Bir şerit jetonu
+ * bildirimden değil başka bir yerden görüp geri yazdı ve geçerli damga üretti. Kusur ajanda
+ * değil TASARIMDA: sınavın cevabı, sınava girenin elindeydi.
+ *
+ * Çekirdek SAF olduğu için burada FİKSTÜRLE beslenir — saat de dışarıdan verilir. Diske,
+ * panoya, saate bağlı bir fonksiyona fikstür veremezsin; veremezsen ayırt ediciliği de
+ * kanıtlayamazsın (§25).
+ */
+const require_ = createRequire(import.meta.url)
+const mech = require_(path.join(KOK, 'scripts', 'board', 'mechanism-setup.cjs')) as {
+  teslimatKaniti: (g: {
+    damga: Record<string, unknown> | null
+    gordum: string | null
+    kendiSid: string
+    simdiMs: number
+    esikSn?: number
+  }) => { sinif: 'YESIL' | 'ZAYIF' | 'KIRMIZI'; sebep: string; gecenSn: number | null }
+  TESLIM_TAZELIK_SN: number
+}
+
+const BEN = 'ac03ce11-c975-478d-bf30-66afb7c00f15'
+const OPS = 'cb0467f1-f1a3-437d-bc15-52c0bd90feb3'
+const T0 = Date.parse('2026-09-06T09:00:00Z')
+/** OPS'un attığı, taze, bağımsız jeton — taban fikstür. */
+const bagimsizDamga = (uzerine: Record<string, unknown> = {}) => ({
+  bekleyenJeton: 'PROB-ac03-XYZ123',
+  atanSid: OPS,
+  atildiTs: '2026-09-06T09:00:00Z',
+  ...uzerine,
+})
+
+describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil kapatıldı)', () => {
+  it('taban: başka oturumun attığı TAZE jeton → YEŞİL', () => {
+    const k = mech.teslimatKaniti({
+      damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
+    })
+    expect(k.sinif, 'bağımsız ve taze kanıt yeşil sayılmadı — taban kol düşerse alttakiler bir şey kanıtlamaz').toBe('YESIL')
+    expect(k.gecenSn).toBe(30)
+    expect(k.sebep, 'yeşilin DAYANAĞI yazılmamış; sonradan "yeşildi" demek kanıt değil').toMatch(/BAGIMSIZ/)
+  })
+
+  it('⭐AYIRT EDİCİ ÇİFT: jetonu ATAN da kendisiyse → KIRMIZI (tanık, tanıklık ettiği kişi olamaz)', () => {
+    const k = mech.teslimatKaniti({
+      damga: bagimsizDamga({ atanSid: BEN }), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
+    })
+    expect(k.sinif, 'ajan kendi attığı jetonla kendine kanıt üretti — ölçülmüş sahte-yeşil vakası').toBe('KIRMIZI')
+    expect(k.sebep).toMatch(/bagimsiz tanik yok|ATAN da SEN/)
+  })
+
+  it('⭐BAYAT jeton kanıt değildir: eşiği aşan geri yazım KIRMIZI', () => {
+    const taze = mech.teslimatKaniti({
+      damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 179_000,
+    })
+    const bayat = mech.teslimatKaniti({
+      damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 181_000,
+    })
+    expect(taze.sinif, 'eşiğin ALTINDAKİ geri yazım reddedildi — eşik yanlış tarafa kapanıyor').toBe('YESIL')
+    expect(bayat.sinif, 'eski jeton kanalın BUGÜN çalıştığını söylemez ama yeşil sayıldı').toBe('KIRMIZI')
+    expect(bayat.sebep).toMatch(/BAYAT/)
+    expect(mech.TESLIM_TAZELIK_SN, 'eşik 180 sn değil — cetvelle betik ayrışmış').toBe(180)
+  })
+
+  it('⭐ESKİ YOL ÖLDÜRÜLMEDİ, ZAYIF sayıldı: kendi probunun jetonu yeşil DEĞİL, kırmızı da DEĞİL', () => {
+    const k = mech.teslimatKaniti({
+      damga: { jeton: 'PROB-ac03-ESKI99' }, gordum: 'PROB-ac03-ESKI99', kendiSid: BEN, simdiMs: T0,
+    })
+    expect(k.sinif, 'geriye uyum kırıldı ya da eski yol hâlâ yeşil sayılıyor').toBe('ZAYIF')
+    expect(k.sebep, 'ZAYIF sınıfı sebebini söylemeli: jeton ajanın kendi ekranına da basılıyor').toMatch(/KENDI probunun/)
+  })
+
+  it('⭐ÖLÇEMEMEK GEÇMEK DEĞİL: damga yok · jeton yok · zaman okunamıyor · gelecekte → hepsi KIRMIZI', () => {
+    const haller: Array<[string, Record<string, unknown> | null, string | null, number]> = [
+      ['damga yok', null, 'PROB-ac03-XYZ123', T0],
+      ['jeton verilmedi', bagimsizDamga(), null, T0],
+      ['jeton uyuşmuyor', bagimsizDamga(), 'PROB-ac03-BASKA1', T0],
+      ['atildiTs bozuk', bagimsizDamga({ atildiTs: 'olmayan-tarih' }), 'PROB-ac03-XYZ123', T0],
+      ['atildiTs YOK', bagimsizDamga({ atildiTs: undefined }), 'PROB-ac03-XYZ123', T0],
+      ['damga GELECEKTE', bagimsizDamga(), 'PROB-ac03-XYZ123', T0 - 60_000],
+      ['atanSid YOK', bagimsizDamga({ atanSid: undefined }), 'PROB-ac03-XYZ123', T0 + 10_000],
+    ]
+    for (const [ad, damga, gordum, simdi] of haller) {
+      const k = mech.teslimatKaniti({ damga, gordum, kendiSid: BEN, simdiMs: simdi })
+      expect(k.sinif, `"${ad}" hâlinde kanıt ölçülemez ama KIRMIZI dönmedi — ölçemediğini geçmiş saydı`).toBe('KIRMIZI')
+    }
+  })
+
+  it('⭐prob, BAĞIMSIZ jetonu HEDEFİN ekranına basmaz (yapısal: sınavın cevabı sınava girene verilmez)', () => {
+    // Davranışsal kol yukarıda; bu kol tasarımın kendisini korur. Biri "kolaylık olsun" diye
+    // jetonu hedefe basarsa, bağımsızlık koda dokunmadan BUHARLAŞIR ve çekirdek bunu göremez.
+    expect(kurulumKaynak, '--to bayrağı kaybolmuş').toMatch(/arg\('--to'\)/)
+    expect(
+      /Jeton HEDEFE bu ekrandan verilmez/.test(kurulumKaynak),
+      'prob artık jetonu hedefe vermediğini AÇIKÇA söylemiyor — sınır sessizleşti',
+    ).toBe(true)
+    expect(
+      /--to KENDINE verilemez/.test(kurulumKaynak),
+      'prob --to kendine atmayı reddetmiyor: bağımsızlık tek komutla dolanılabilir',
     ).toBe(true)
   })
 })
