@@ -37,6 +37,7 @@ for _akis in (sys.stdout, sys.stderr):
         pass
 
 DIZIN_VARSAYILAN = Path.home() / "venthub-pdf-ingestor" / "kaynak-dizini" / "sayfalar.jsonl"
+HARITA_VARSAYILAN = Path(__file__).resolve().parent / "aile-kaynak-haritasi.json"
 
 
 def norm(s: str) -> str:
@@ -60,8 +61,9 @@ def dizini_yukle(yol: Path):
             for t in k.get("tablo") or []:
                 for r in t.get("satirlar") or []:
                     metin += "\n" + " ".join(str(h) for h in r if h)
-            sayfalar.append({"dosya": k["dosya"], "sayfa": k["sayfa"],
-                             "pdf_hash": k["pdf_hash"], "n": norm(metin)})
+            sayfalar.append({"dosya": k["dosya"], "taban": os.path.basename(k["dosya"]),
+                             "sayfa": k["sayfa"], "pdf_hash": k["pdf_hash"],
+                             "n": norm(metin)})
     return sayfalar
 
 
@@ -75,6 +77,8 @@ def main() -> int:
     ap.add_argument("--dizin", default=str(DIZIN_VARSAYILAN))
     ap.add_argument("--veri", required=True, help="products JSON (slug, family_slug, technical_specs)")
     ap.add_argument("--cikti-dizin", default=".")
+    ap.add_argument("--aile-harita", default=str(HARITA_VARSAYILAN),
+                    help="aile_slug -> kendi kaynak PDF'leri (aile-kaynak-cikar.py uretir)")
     a = ap.parse_args()
 
     dizin_yol = Path(a.dizin)
@@ -89,8 +93,36 @@ def main() -> int:
     urunler = json.loads(Path(a.veri).read_text(encoding="utf-8"))
     print(f"veri : {len(urunler)} urun")
 
-    kanit, kanitsiz = [], []
+    # --- AILE -> KENDI KAYNAKLARI (artim 1) -------------------------------
+    harita_yol = Path(a.aile_harita)
+    if not harita_yol.exists():
+        print(f"⛔ aile-kaynak haritasi YOK: {harita_yol}")
+        print("   Once: python scripts/icerik-hatti/aile-kaynak-cikar.py ...")
+        return 2
+    harita = json.loads(harita_yol.read_text(encoding="utf-8"))
+    # ⭐TAKMA AD COZUMU — bu adim OLCUMLE eklendi (2026-09-06):
+    # Dizin, bayt-ayni PDF'leri tek kayda indirger ve otekini manifest'te takma ad olarak
+    # tutar. Taban ada gore filtre takma adlara KORDUR: MONO ailesinin 101 degeri
+    # "kendi kaynaginda yok" sayilmisti — oysa ayni PDF baska adla dizinde DURUYOR.
+    takma = {}
+    manifest_yol = dizin_yol.parent / "manifest.json"
+    if manifest_yol.exists():
+        for kanonik, adlar in (json.loads(
+                manifest_yol.read_text(encoding="utf-8")).get("takma_adlar") or {}).items():
+            for ad in adlar:
+                takma[os.path.basename(ad)] = os.path.basename(kanonik)
+    dizindeki_tabanlar = {s["taban"] for s in sayfalar}
+    istenen = {takma.get(t, t) for v in harita.values() for t in v}
+    dizinde_olmayan = sorted(istenen - dizindeki_tabanlar)
+    # Sayfa kumelerini aile basina ONCEDEN kur (urun basina taramak O(n*m) olurdu).
+    aile_sayfalari = {}
+    for aile, pdfler in harita.items():
+        kume = {takma.get(t, t) for t in pdfler}
+        aile_sayfalari[aile] = [s for s in sayfalar if s["taban"] in kume]
+
+    kanit, kanitsiz, yabanci = [], [], []
     olculemez = 0
+    kapsamsiz_aile = set()
     for u in urunler:
         ozellikler = u.get("technical_specs") or {}
         for alan, deger in sorted(ozellikler.items()):
@@ -104,19 +136,40 @@ def main() -> int:
             if len(hedef) < 2:
                 olculemez += 1
                 continue
-            bulunanlar = [s for s in sayfalar if hedef in s["n"]]
+            aile = u.get("family_slug")
+            evren = aile_sayfalari.get(aile)
+            if evren is None:
+                # Haritasiz aile: DARALTILMADI. Satir bunu SOYLER; sessizce dar sayilmaz.
+                kapsamsiz_aile.add(aile)
+                evren = sayfalar
+                kapsam = "TUM_DIZIN"
+            else:
+                kapsam = "AILENIN_KENDI_KAYNAGI"
+
+            ortak = {"urun": u["slug"], "aile": aile, "tenant_id": u.get("tenant_id"),
+                     "alan": alan, "deger": metin}
+            bulunanlar = [s for s in evren if hedef in s["n"]]
             if bulunanlar:
                 ilk = bulunanlar[0]
                 kanit.append({
-                    "urun": u["slug"], "aile": u.get("family_slug"), "alan": alan,
-                    "deger": metin, "pdf_hash": ilk["pdf_hash"], "dosya": ilk["dosya"],
+                    **ortak, "pdf_hash": ilk["pdf_hash"], "dosya": ilk["dosya"],
                     "sayfa": ilk["sayfa"], "aday_sayfa_sayisi": len(bulunanlar),
+                    "kapsam": kapsam,
                     # ⚠ GECMEK DOGRULUK DEGILDIR — alan adi bunu itiraf eder.
                     "esleme_yontemi": "SAYFA_ICINDE_GECIYOR",
                 })
             else:
-                kanitsiz.append({"urun": u["slug"], "aile": u.get("family_slug"),
-                                 "alan": alan, "deger": metin})
+                # Kendi kaynaginda YOK ama BASKA bir katalogda geciyor mu? Bu ucuncu bir
+                # siniftir: v1'de bu satirlar KANIT sayiliyordu (baska markanin sayfasinda
+                # ayni sayi gectigi icin). Rastlanti kanit degildir — ayri sayilir.
+                if kapsam == "AILENIN_KENDI_KAYNAGI":
+                    disarida = [s for s in sayfalar if hedef in s["n"]]
+                    if disarida:
+                        yabanci.append({**ortak, "yabanci_dosya": disarida[0]["dosya"],
+                                        "yabanci_sayfa": disarida[0]["sayfa"],
+                                        "yabanci_aday_sayisi": len(disarida)})
+                        continue
+                kanitsiz.append(ortak)
 
     cd = Path(a.cikti_dizin)
     cd.mkdir(parents=True, exist_ok=True)
@@ -127,16 +180,30 @@ def main() -> int:
         "".join(json.dumps(k, ensure_ascii=False, sort_keys=True) + chr(10) for k in kanitsiz),
         encoding="utf-8", newline="\n")
 
-    toplam = len(kanit) + len(kanitsiz)
+    (cd / "yabanci-kaynak.jsonl").write_text(
+        "".join(json.dumps(k, ensure_ascii=False, sort_keys=True) + chr(10) for k in yabanci),
+        encoding="utf-8", newline="\n")
+    toplam = len(kanit) + len(kanitsiz) + len(yabanci)
+    tek_aday = sum(1 for k in kanit if k["aday_sayfa_sayisi"] == 1)
+    dar = sum(1 for k in kanit if k["kapsam"] == "AILENIN_KENDI_KAYNAGI")
     print()
-    print("== KANIT TABLOSU ==")
-    print(f"  aranabilir deger      : {toplam}")
-    print(f"  kaynakta BULUNAN      : {len(kanit)}  ({100*len(kanit)//max(toplam,1)}%)")
-    print(f"  ⛔ KANITSIZ KALAN      : {len(kanitsiz)}  ← tek yonlu mandal, yalniz kuculur")
-    print(f"  aranamaz (sayi/kod yok): {olculemez}  (ayri sinif, kanitsizla karistirilmaz)")
+    print("== KANIT TABLOSU (v2 — aileye daraltilmis) ==")
+    print(f"  aranabilir deger        : {toplam}")
+    print(f"  KENDI kaynaginda BULUNAN: {len(kanit)}  ({100*len(kanit)//max(toplam,1)}%)")
+    print(f"    - bunun TEK ADAYLI    : {tek_aday}  ({100*tek_aday//max(len(kanit),1)}%)  <- tek sayfa gosterebildigimiz kisim")
+    print(f"    - daraltma uygulanan  : {dar}/{len(kanit)}")
+    print(f"  ⚠ YABANCI kaynakta gecen: {len(yabanci)}  <- v1'de KANIT sayiliyordu; rastlanti kanit degildir")
+    print(f"  ⛔ KANITSIZ KALAN        : {len(kanitsiz)}  <- tek yonlu mandal, yalniz kuculur")
+    print(f"  aranamaz (sayi/kod yok) : {olculemez}  (ayri sinif, kanitsizla karistirilmaz)")
+    if kapsamsiz_aile:
+        print(f"  ⚠ HARITASIZ aile        : {len(kapsamsiz_aile)} — {sorted(kapsamsiz_aile)[:5]}")
+    if dizinde_olmayan:
+        print(f"  ⚠ haritada olup DIZINDE OLMAYAN kaynak: {len(dizinde_olmayan)}")
+        for d in dizinde_olmayan:
+            print(f"      - {d}   (o aileler kaynaksiz olculuyor)")
     print()
-    print("  NOT: 'bulundu' = deger, dizindeki bir sayfada GECIYOR. O sayfanin bu urun icin")
-    print("       DOGRU sayfa oldugunu KANITLAMAZ (esleme_yontemi alani bunu soyler).")
+    print("  NOT: 'bulundu' = deger, ailenin KENDI kaynak PDF'inde GECIYOR. Tek adayli")
+    print("       degilse hangi sayfa oldugunu hala GOSTEREMEYIZ (esleme_yontemi soyler).")
     return 0
 
 
