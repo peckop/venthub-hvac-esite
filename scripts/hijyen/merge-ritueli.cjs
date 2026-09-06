@@ -206,6 +206,34 @@ function turetCekirdek(kok) {
  *   açık PR'da her zaman null döner ve ayırt etmeyi bırakır.
  * @returns {{maddeler:Array<{no:number,ad:string,gecti:boolean,detay:string}>, kirmizi:number}}
  */
+/** `--onay` metninin en kısa kabul uzunluğu. Sebep aşağıda, `onayGecerli` başlığında. */
+const ONAY_ASGARI = 20
+
+/**
+ * ⭐ONAY GECERLILIGI — TEK UYGULAMA. Hem çekirdek hem CLI buradan sorar; iki yerde iki
+ * eşik yazmak bu depoda ölçülmüş bir hata sınıfıdır ("aynı ölçüt iki uygulama").
+ *
+ * NİÇİN UZUNLUK EŞİĞİ: onay metni bir KANITTIR, bayrak değil. `--onay=ok` ya da `--onay=evet`
+ * hiçbir şeyi kanıtlamaz — kimin, nerede, ne zaman dediğini taşımaz ve PR'a yazıldığında
+ * okuyana hiçbir şey söylemez. 20 karakter, *"Recep · <yer> · <tarih>"* biçimindeki en kısa
+ * gerçek alıntının altına düşmez. Eşik metnin DOĞRULUĞUNU ölçmez (ölçemez); yalnız
+ * refleks-onayı pahalılaştırır: yazmak zorunda kalan, ne yazdığına bakar.
+ */
+function onayGecerli(ham) {
+  if (ham === undefined || ham === null) return { gecerli: false, sebep: 'verilmedi', metin: '' }
+  const metin = String(ham).trim()
+  if (!metin) return { gecerli: false, sebep: 'BOS', metin: '' }
+  if (metin.length < ONAY_ASGARI) {
+    return {
+      gecerli: false,
+      metin,
+      sebep: metin.length + ' karakter (asgari ' + ONAY_ASGARI + ') — onay bir KANIT olmali: ' +
+        'kimin sozu, nerede, ne zaman',
+    }
+  }
+  return { gecerli: true, sebep: '', metin }
+}
+
 function degerlendir(girdi) {
   const maddeler = []
   const ekle = (no, ad, gecti, detay) => maddeler.push({ no, ad, gecti, detay: detay || '' })
@@ -299,12 +327,26 @@ function degerlendir(girdi) {
   }
 
   // 5
+  const onay = onayGecerli(girdi.onay)
   if (girdi.migrationlar === null) {
-    ekle(5, 'MIGRATION 0', false, 'migration diff\'i OKUNAMADI — olculemedi')
+    // ⛔ONAY OLCULEMEYENI ACMAZ. Onay "n migration'i biliyorum ve kabul ediyorum" demektir;
+    // n bilinmiyorken verilen onay NEYIN onayi oldugunu soylemez. Fail-closed korunur.
+    ekle(5, 'MIGRATION 0', false, 'migration diff\'i OKUNAMADI — olculemedi' +
+      (girdi.onay ? '  (--onay verildi ama SAYI BILINMEDEN onay ACMAZ)' : ''))
   } else if (girdi.migrationlar.length) {
-    ekle(5, 'MIGRATION 0', false,
-      girdi.migrationlar.length + ' migration — MERGE RECEP KAPISI (kural 13: merge = prod\'a ' +
-      'OTOMATIK uygulama). Serit KENDI indirmez.')
+    if (onay.gecerli) {
+      ekle(5, 'MIGRATION ' + girdi.migrationlar.length + ' — RECEP ONAYI KANITLI', true,
+        onay.metin)
+    } else {
+      ekle(5, 'MIGRATION 0', false,
+        girdi.migrationlar.length + ' migration — MERGE RECEP KAPISI (kural 13: merge = prod\'a ' +
+        'OTOMATIK uygulama). Serit KENDI indirmez.' +
+        (girdi.onay !== undefined && girdi.onay !== null ? '  ⚠--onay REDDEDILDI: ' + onay.sebep : ''))
+    }
+  } else if (girdi.onay !== undefined && girdi.onay !== null) {
+    // Migration YOKKEN onay: kapiyi acmaz (zaten acik), ama SESSIZ de gecmez — gereksiz onay,
+    // "onay aliskanligi" doguracak ilk adimdir ve bir sonraki sefer migration'li PR'da refleks olur.
+    ekle(5, 'MIGRATION 0', true, '⚠--onay GEREKSIZ verildi: migration 0, acilacak kapi yok')
   } else {
     ekle(5, 'MIGRATION 0', true)
   }
@@ -312,7 +354,10 @@ function degerlendir(girdi) {
   return { maddeler, kirmizi: maddeler.filter((m) => !m.gecti).length }
 }
 
-module.exports = { turetCekirdek, workflowCoz, degerlendir, DUSEN_KOVALARI, BEKLEYEN_KOVALARI }
+module.exports = {
+  turetCekirdek, workflowCoz, degerlendir, onayGecerli,
+  DUSEN_KOVALARI, BEKLEYEN_KOVALARI, ONAY_ASGARI,
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CLI
@@ -326,17 +371,37 @@ if (require.main === module) {
   // YUTTU, KIRMIZI'ya ragmen merge oldu. Kapi ile eylem ayni surecte olmali: --merge verilirse
   // merge'i BU betik yapar, yalniz kirmizi === 0 ise. Ayri "gh pr merge" cagrisi YASAK (cetvel §20.1).
   const MERGE = argv.includes('--merge')
+  // --onay="<Recep'in sozu · yer · tarih>": migration'li PR'da madde 5'i ACAN TEK yol.
+  // Kural 13 kalkmiyor — kapi hala Recep'te; degisen sey, onayin AGIZDAN degil YAZIDAN
+  // gecmesi ve PR'da KALMASI. (2026-09-06, REC-156/#1032: Recep "sen merge et" dedi, betik
+  // kirmizi verdi, is istisnayla `gh pr merge` ile indi — yani kapi dolanildi. Bir daha olmasin.)
+  const onayBayragi = argv.find((a) => a.startsWith('--onay='))
+  const ONAY = onayBayragi ? onayBayragi.slice('--onay='.length) : null
   if (!pr || !dal) {
     process.stderr.write(
       'MERGE RITUELI — bes maddelik self-merge olcumu.\n\n' +
-      'KULLANIM\n  node scripts/hijyen/merge-ritueli.cjs <PR> <dal> [--agac=<yol>] [--merge]\n' +
+      'KULLANIM\n  node scripts/hijyen/merge-ritueli.cjs <PR> <dal> [--agac=<yol>] [--merge] [--onay="..."]\n' +
       '  --merge : bes madde YESIL ise merge\'i bu betik yapar (gh pr merge --squash --delete-branch).\n' +
-      '            Kapi ve eylem AYNI surecte; pipe/&& zincirine kapi konmaz (cikis kodu yutulur).\n\n' +
+      '            Kapi ve eylem AYNI surecte; pipe/&& zincirine kapi konmaz (cikis kodu yutulur).\n' +
+      '  --onay  : migration\'li PR\'da madde 5\'i acar. Metin RECEP\'IN KENDI SOZU olmali\n' +
+      '            (kim · nerede · ne zaman), asgari ' + ONAY_ASGARI + ' karakter. --merge ile\n' +
+      '            birlikte verilirse metin PR\'a YORUM olarak yazilir (kanit PR\'da kalir).\n' +
+      '            Diger dort madde kirmizi ise --onay HICBIR SEYI acmaz.\n\n' +
       'CIKIS\n  0 = bes madde saglandi (self-merge serbest / --merge ile merge YAPILDI)\n' +
       '  1 = saglanmadi ya da OLCULEMEDI (fail-closed; --merge verilse de merge YAPILMAZ)\n' +
       '  2 = kullanim hatasi\n  3 = --merge: kapi yesil ama gh pr merge basarisiz\n',
     )
     process.exit(2)
+  }
+  // Bicimsel ret CLI'da ve ERKEN: gecersiz onayla olcume girip "kirmizi" gormek, kullaniciya
+  // sebebi soylemez. Olcut TEK yerden sorulur (onayGecerli), burada yalniz CAGRILIR.
+  if (onayBayragi) {
+    const kontrol = onayGecerli(ONAY)
+    if (!kontrol.gecerli) {
+      process.stderr.write('merge-ritueli: --onay REDDEDILDI — ' + kontrol.sebep + '\n' +
+        '  Ornek: --onay="Recep, kendi penceresinde: \'1032 icin merge et\' · 2026-09-06"\n')
+      process.exit(2)
+    }
   }
   // Sabit yol YAZILMAZ (depo PUBLIC, INV-MUTLAK-YOL-1): agac bayraktan ya da cwd'den.
   const AGAC = agacBayragi ? agacBayragi.slice('--agac='.length) : process.cwd()
@@ -387,7 +452,7 @@ if (require.main === module) {
   for (const s of sinirlar) yaz('  ⚠sinir : ' + s)
 
   const { maddeler, kirmizi } = degerlendir({
-    pv, pvHata, kapilar, cekirdek, uzakSha, migrationlar, mergeCommitSha,
+    pv, pvHata, kapilar, cekirdek, uzakSha, migrationlar, mergeCommitSha, onay: ONAY,
   })
   for (const m of maddeler) {
     yaz((m.gecti ? '  YESIL   ' : '  ⛔KIRMIZI ') + m.no + '. ' + m.ad + (m.detay ? '  — ' + m.detay : ''))
@@ -409,6 +474,24 @@ if (require.main === module) {
     process.exit(1)
   }
   if (MERGE) {
+    // ⭐KANIT MERGE'DEN ONCE PR'A YAZILIR. Sebep: merge sonrasi yazilan bir kanit, merge
+    // patlarsa hic yazilmaz — oysa onayin verildigi o zaman da dogrudur. Ayrica bu yorum
+    // "merge edildi" DEMEZ, "onay sudur" der; sirasi yuzunden yanlis bir sey iddia etmez.
+    // ⚠Yorum YALNIZ --merge ile yazilir: --onay tek basina bir OLCUMDUR, eylem degil.
+    if (onayGecerli(ONAY).gecerli && migrationlar && migrationlar.length) {
+      try {
+        gh(['pr', 'comment', pr, '--body',
+          'MIGRATION ONAYI (merge-ritueli.cjs --onay) — ' + migrationlar.length +
+          ' migration bu PR ile prod\'a OTOMATIK uygulanacak (kural 13).\n\n> ' + ONAY +
+          '\n\nBu satir betik tarafindan, merge\'den ONCE yazildi; kanit PR\'da kalir.'])
+        yaz('  bilgi   onay metni PR\'a yorum olarak yazildi')
+      } catch (e) {
+        // Kanit yazilamiyorsa MERGE ETME: kanitsiz acilan kapi, acilmamis sayilir.
+        process.stderr.write('merge-ritueli: onay yorumu PR\'a YAZILAMADI, merge IPTAL: ' +
+          String(e.message).slice(0, 160) + '\n')
+        process.exit(3)
+      }
+    }
     // Kapi ve eylem AYNI surecte: kirmizi burada olamaz (yukarida cikildi).
     try {
       // Ilk gercek kosum (#1029) olctu: worktree icinden `--delete-branch` yerel master'i checkout
