@@ -385,17 +385,63 @@ kısım görünmez olur — "katalogda ne eksik" sorusunun ölçülebilir cevab�
 **KANITSIZ sayısı tek yönlü mandaldır: yalnız küçülür.** Büyüdüyse ya yeni veri geldi
 (açıklanır) ya bir kaynak bağlantısı koptu (kırmızı).
 
-İlk ölçüm (2026-09-06): 4887 değer → aranabilir 3733 · bulunan 3434 · **KANITSIZ 299** ·
+İlk ölçüm (2026-09-06 v1): 4887 değer → aranabilir 3733 · bulunan 3434 · **KANITSIZ 299** ·
 aranamaz (sayı/kod taşımayan) 1154 **ayrı sınıf**.
+
+#### Arama, ailenin KENDİ kaynağıyla sınırlıdır (v2, aynı gün)
+
+v1 değeri **dizinin tamamında** arıyordu; bir AVenS ürününün gücü Vortice'nin başka bir
+ailesinin broşüründe "bulunmuş" sayılabiliyordu. Artık her aile yalnız **kendi kaynak
+PDF'lerinde** aranır. Harita elle yazılmaz — `aile-kaynak-cikar.py` onu **taslaklardan**
+üretir (taslak, ailenin hangi sayfalardan yazıldığının kaydıdır).
+
+| | v1 | v2 |
+|---|---|---|
+| Kendi kaynağında bulunan | 3434 (herhangi bir kaynakta) | **3127** |
+| Tek adaylı | 88 | **267** |
+| Aday sayfa ortancası | 100 | **13** |
+| Yabancı kaynakta geçen | kanıt sayılıyordu | **307** (ayrı sınıf) |
+| KANITSIZ | 299 | **299** (mandal korundu) |
+
+**Takma ad kuralı:** dizin bayt-aynı PDF'leri tek kayda indirger, ötekini `manifest.json` →
+`takma_adlar` altında tutar. **Dosya adıyla filtreleyen her tüketici manifest'i okumak
+ZORUNDADIR** — okumazsa takma adlı kaynak "yok" görünür (ölçüldü: MONO ailesinin 101 değeri
+böyle kayboldu).
+
+#### Birim dönüşümü kanıtsızı KAPATIR, gizlemez (artım 2)
+
+DB bazı değerleri türev birimde tutar (`max_delivery_ls`), katalog başka birimde basar
+(m³/h). Dönüşümle bulunan satırın `esleme_yontemi`'i **ayrıdır**
+(`BIRIM_DONUSUMUYLE_BIRIME_BITISIK`) ve uygulanan dönüşüm satırda yazar — doğrudan
+eşleşmeyle aynı kefeye konmaz.
+
+**İki kural ölçümle konuldu, ikisi de sınavdan doğdu:**
+
+1. **Sayı birimle BİTİŞİK aranır**, çıplak değil. Çıplak arama ayırt etmiyordu — katsayı
+   kasten bozulduğunda bile 41–56 satır "kapanıyordu". Bitişik aramada doğru katsayı
+   **109**, sabotaj katsayıları **0 · 1 · 0 · 1**.
+2. **Asgari belirginlik:** dönüşümlü eşleme için gösterim en az **3 basamak** taşımalı.
+   `11000 W → "11"` araması 46 sayfada "buluyordu"; 11 her katalogda geçer.
+
+Yuvarlama toleransı bağıl ve dardır (%0,1): `719.44 l/s × 3,6 = 2589,984`, katalogda
+**2590**; fark değerin kendi yuvarlanmasındandır. Geniş tolerans komşu modelin değerini
+yakalar ve kanıt uydurur.
+
+Sonuç (2026-09-06): **KANITSIZ 299 → 208**, tek adaylı 88 → **312**.
+Kalan 208'in **166'sı eğri** — katalogda yalnız grafik; sayısallaştırma **Recep kararıdır**.
 
 **Dürüst sınır — alan adı bunu itiraf eder:** "bulundu" satırındaki alan `kanit_gucu`
 değil **`esleme_yontemi`** ve bugünkü değeri `SAYFA_ICINDE_GECIYOR`. Geçmek doğruluğu
-**kanıtlamaz**: 3434 satırın yalnız 88'inde tek aday sayfa var. Sayı sayfada model adı
-olarak da geçebilir (`HF/S 315` ↔ `315 mm`).
+**kanıtlamaz**: v2'de bile 3127 satırın yalnız 267'sinde tek aday sayfa var. Sayı sayfada
+model adı olarak da geçebilir (`HF/S 315` ↔ `315 mm`). Sabotaj sınavı (aileye kasten yanlış
+kaynak) satırların yalnız **%63'ünü** düşürdü: `100`, `230` gibi jenerik değerler her
+katalogda geçtiği için **daraltma rastlantıyı azaltır, bitirmez**.
+Ayrıntı → `docs/audits/icerik-hatti-kanit-daraltma-2026-09-06.md`
 
 ### `tenant_id`
 
-Kanıt tablosu `tenant_id` alanını **taşır** (bugün tek değer: `venthub`). Kiracı ayrımı
+Kanıt tablosu `tenant_id` alanını **taşır** — 2026-09-06'da ölçüldü: 3127/3127 satır dolu,
+bugün tek kiracı (`d3b07384-d113-495f-a558-8c38634e0000`). Kiracı ayrımı
 sonradan eklenirse veri geriye dönük yeniden üretilmek zorunda kalmasın diye alan baştan var.
 
 ---
