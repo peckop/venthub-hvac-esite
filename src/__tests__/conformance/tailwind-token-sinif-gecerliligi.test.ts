@@ -130,14 +130,38 @@ describe('INV-TOKEN-SINIF-1 — token-bağımlı Tailwind sınıfları gerçekte
 
   it('DEPO — hiçbir className token tablosunda olmayan bir ölçü sınıfı kullanmıyor', () => {
     const ihlaller: string[] = []
-    for (const dosya of tsxDosyalari(KOK)) {
+    const dosyalar = tsxDosyalari(KOK)
+    let olculenDize = 0
+
+    // BOŞLUK MUHAFIZI — sabotajla ölçüldü (2026-09-06): yürüme kökü `src` yerine
+    // `supabase`e çevrildiğinde evren **941 → 44 dosya** düştü ve kapı 3/3 YEŞİL kaldı.
+    // Dikkat: evren SIFIR değildi — 44 dosya gerçekten tarandı, içlerinde `className`
+    // olmadığı için `ihlaller` boş çıktı. Yani kapı "ihlal yok" derken aslında kusurun
+    // yaşadığı 897 dosyayı hiç görmemişti; sahte-yeşilin sinsi biçimi budur.
+    // Taban değerler ölçülen sayının çok altında — olağan dalgalanmayı kırmızıya
+    // boyamaz, evrenin çöküşünü yakalar.
+    expect(
+      dosyalar.length,
+      'Depo taraması hiç dosya bulamadı (ya da neredeyse hiç) — yürüme kökü taşınmış olabilir. ' +
+        'Bu hâlde kapı "ihlal yok" der ama aslında HİÇBİR ŞEY ölçmemiştir.',
+    ).toBeGreaterThan(100)
+
+    for (const dosya of dosyalar) {
       const icerik = fs.readFileSync(dosya, 'utf8')
       for (const dize of classNameDizeleri(icerik)) {
+        olculenDize++
         for (const sinif of gecersizSiniflar(dize, kumeler)) {
           ihlaller.push(`${path.relative(KOK, dosya).replace(/\\/g, '/')} :: ${sinif}`)
         }
       }
     }
+    // İkinci muhafız: dosyalar bulundu ama `classNameDizeleri` deseni bozulduysa yine
+    // sıfır ölçüm olur ve kapı sessizce yeşile döner. Desen ayrı bir kırılma yüzeyidir.
+    expect(
+      olculenDize,
+      'Hiç className dizesi ölçülmedi — çıkarım deseni bozulmuş olabilir; kapı sahte-yeşil.',
+    ).toBeGreaterThan(1000)
+
     expect(
       [...new Set(ihlaller)],
       'tokens.js\'te karşılığı olmayan ölçü sınıfı: Tailwind bunlar için CSS ÜRETMEZ, ' +
