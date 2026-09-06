@@ -322,12 +322,19 @@ if (require.main === module) {
   const argv = process.argv.slice(2)
   const [pr, dal] = argv.filter((a) => !a.startsWith('--'))
   const agacBayragi = argv.find((a) => a.startsWith('--agac='))
+  // 2026-09-06 (Katalog ihlal bildirimi): `ritual | tail && gh pr merge` kalibi cikis kodunu
+  // YUTTU, KIRMIZI'ya ragmen merge oldu. Kapi ile eylem ayni surecte olmali: --merge verilirse
+  // merge'i BU betik yapar, yalniz kirmizi === 0 ise. Ayri "gh pr merge" cagrisi YASAK (cetvel §20.1).
+  const MERGE = argv.includes('--merge')
   if (!pr || !dal) {
     process.stderr.write(
       'MERGE RITUELI — bes maddelik self-merge olcumu.\n\n' +
-      'KULLANIM\n  node scripts/hijyen/merge-ritueli.cjs <PR> <dal> [--agac=<yol>]\n\n' +
-      'CIKIS\n  0 = bes madde saglandi (self-merge serbest)\n' +
-      '  1 = saglanmadi ya da OLCULEMEDI (fail-closed)\n  2 = kullanim hatasi\n',
+      'KULLANIM\n  node scripts/hijyen/merge-ritueli.cjs <PR> <dal> [--agac=<yol>] [--merge]\n' +
+      '  --merge : bes madde YESIL ise merge\'i bu betik yapar (gh pr merge --squash --delete-branch).\n' +
+      '            Kapi ve eylem AYNI surecte; pipe/&& zincirine kapi konmaz (cikis kodu yutulur).\n\n' +
+      'CIKIS\n  0 = bes madde saglandi (self-merge serbest / --merge ile merge YAPILDI)\n' +
+      '  1 = saglanmadi ya da OLCULEMEDI (fail-closed; --merge verilse de merge YAPILMAZ)\n' +
+      '  2 = kullanim hatasi\n  3 = --merge: kapi yesil ama gh pr merge basarisiz\n',
     )
     process.exit(2)
   }
@@ -395,5 +402,22 @@ if (require.main === module) {
   yaz(kirmizi === 0
     ? 'SONUC: YESIL — bes madde saglandi, self-merge serbest.'
     : 'SONUC: ⛔KIRMIZI — ' + kirmizi + ' madde saglanmadi. MERGE ETME.')
-  process.exit(kirmizi === 0 ? 0 : 1)
+  if (kirmizi !== 0) {
+    // Kirmizi STDERR'e de yazilir: `| tail` ile kirpilan stdout'ta kaybolmasin.
+    process.stderr.write('merge-ritueli: KIRMIZI (' + kirmizi + ' madde)' +
+      (MERGE ? ' — --merge verildi ama MERGE YAPILMADI.' : '') + '\n')
+    process.exit(1)
+  }
+  if (MERGE) {
+    // Kapi ve eylem AYNI surecte: kirmizi burada olamaz (yukarida cikildi).
+    try {
+      const cikti = gh(['pr', 'merge', pr, '--squash', '--delete-branch'])
+      yaz('MERGE YAPILDI (bu betik, --merge): ' + cikti.trim().split('\n')[0])
+    } catch (e) {
+      process.stderr.write('merge-ritueli: kapi YESIL ama gh pr merge BASARISIZ: ' +
+        String(e.message).slice(0, 200) + '\n')
+      process.exit(3)
+    }
+  }
+  process.exit(0)
 }
