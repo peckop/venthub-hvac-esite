@@ -109,7 +109,7 @@
 | 11 | T021-OR | Companion yaşam döngüsü kalıcı çözümü (otomatik commit) | companion-doc-standard.md'ye "periyodik commit-sweep" bölümü eklenmiş; bugün git status temiz (2 dosya, 95 değil). |
 | 12 | T021-VH | GA4 kurulumu + CSP | CSP script-src'de googletagmanager whitelist edilmiş + analytics.ts(gtag)+ConsentGatedAnalytics rıza-kapılı bileşeni mevcut. |
 | 13 | T023-VH | Kanonik SITE_URL — conformance bekçisi eksikliği | src/config/siteUrl.ts SSOT + src/__tests__/conformance/canonical-url-ssot.test.ts (INV-CANONICAL-1) tam istenen bekçiyi uyguluyor |
-| 14 | T031-VH | webhook secret rotasyonu | PR #584 (commit ba01937a) master'a merge, Vault taşıma+rotasyon penceresi canlı doğrulanmış. |
+| 14 | T031-VH | webhook secret rotasyonu | PR #584 (commit ba01937a) master'a merge, Vault taşıma+rotasyon penceresi canlı doğrulanmış. **DÜZELTME (OPS, 2026-09-06, REC-52):** bu satır yalnız KOD tarafını anlatır — rotasyon penceresi kodda çalışıyor (`route.ts` 234-237); **sır değeri DÖNMEDİ**, 5 elle adım Recep'te (commit mesajı ve `docs/plans/rec52-whsec-rotasyon-plani-2026-09-06.md` bunu söyler). "Yapılmış" = kod bitti, iş bitmedi; ALTYAPI ölçtü, terim karışıklığı. |
 | 15 | T055-VH | Fatura belgesi üretilmiyor (VUK) | supabase/migrations/20260820090000_order_invoices.sql + src/lib/services/orderInvoice.service.ts (T132-VH) gerçekten yazılmış. |
 | 16 | T058-VH | Kargo ops: takip no, delivered_at, idempotency | PR #554 (UI) + #563 (EDGE) merged; shipping-webhook'ta idempotent delivered_at guard mevcut. |
 | 17 | T063-VH | KVKK anonimleştirme + veri sahibi talep defteri | Commit ca537d87 (#564) merge, migration+RLS+conformance testi canlı; kalan sadece placeholder e-posta (iş dışı) |
