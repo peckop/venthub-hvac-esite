@@ -2,10 +2,10 @@
 
 > **Amaç:** Recep'in verdiği her kaynak adresi burada; hiçbiri kaybolmaz. Faz 2 iş akışı (`rec172-faz2-workflow.js`) ajanları bu dosyayı okur, önce bu adresleri indirir, sonra gerekirse arar.
 > **İş bölümü (Recep 18:35 TR "çakışmayın"; Katalog 18:40 TR "hiçbiri açılmadı, indirme/staging OPS'un"):** İNDİRME + ÇIKARIM (staging CSV) = Faz 2 iş akışı (OPS). Katalog = kayıt tutma, inceleme, faz 4'te `kaynak-dizini`ne alma.
-> **Kural:** İndirilen her dosya ingestor deposunda `venthub/markalar/<marka>/<aile>/01-input/` altına konur; sha256 + URL + tarih aynı klasördeki `KAYNAKLAR.md`'ye yazılır. `kaynak-dizini/**` Katalog şeridinindir, dokunulmaz. Aynı belge iki adreste varsa sha256 karşılaştırılır, **bir kez** indirilir. Mükerrer adres burada silinmez, "mükerrer" diye işaretlenir (kayıt kaybolmasın diye).
-> **Durum sütunu:** `hedef` = değer çekilecek · `ayrım` = yalnız seri ayrımı için, değer çekilmez · `şüpheli` = marka/kapsam kapaktan doğrulanacak · `mükerrer` = daha önce verildi.
+> **Kural:** İndirilen her dosya ingestor deposunda `venthub/markalar/<marka>/<aile>/01-input/` altına konur; sha256 + URL + tarih aynı klasördeki `KAYNAKLAR.md`'ye yazılır. `kaynak-dizini/**` Katalog şeridinindir, dokunulmaz. Aynı belge iki adreste varsa sha256 karşılaştırılır, **bir kez** indirilir. Recep'in birden fazla partide tekrar verdiği adresler tek satırda tutulur (Recep 18:45 TR: "mükerrerler silinsin, kafa karıştırmasın").
+> **Durum sütunu:** `hedef` = değer çekilecek · `ayrım` = yalnız seri ayrımı için, değer çekilmez · `şüpheli` = marka/kapsam kapaktan doğrulanacak.
 
-Partiler: **P1** 17:55 TR (10 adres) · **P2** 18:20 TR (24 adres, 23 yeni) · **P3** 18:30 TR (7 adres, 4 yeni). Toplam tekil: **37** (Katalog sayımıyla eşleşti; OPS'un ilk sayımı 38 yanlıştı: Nicotra katalog dizini P1'de de vardı).
+Partiler: **P1** 17:55 TR · **P2** 18:20 TR · **P3** 18:30 TR. Toplam tekil adres: **37** (Katalog sayımıyla eşleşti). İndirme durumu: 36 diskte, 1 erişilemedi (403) — dizin `venthub/markalar/REC172-INDIRILENLER-2026-09-06.md` (ingestor).
 
 ## 1. Nicotra Gebhardt (aileler: ADH 8 · AT 8 · DD 13 · RDH 6 ürün)
 
@@ -19,7 +19,7 @@ Partiler: **P1** 17:55 TR (10 adres) · **P2** 18:20 TR (24 adres, 23 yeni) · *
 | DD | https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues/centrifugal-fans-double-inlet-with-direct-drive-forward-curved-blades/493-series-dd/file.html | katalog PDF (motor tablosu: 13 varyant buradan) | P2 | hedef |
 | RDH | https://eu.nicotra-gebhardt.com/en/products/fans-for-ventilation-and-air-conditioning/276-rdh.html | ürün sayfası | P2 | hedef |
 | RDH | https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues/belt-driven-centrifugal-fans/481-series-rdh/file.html | katalog PDF | P2 | hedef |
-| genel | https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues.html | katalog dizini | P1, P2 | hedef (dizin) · P2 mükerrer |
+| genel | https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues.html | katalog dizini | P1, P2 | hedef (dizin) |
 | genel | https://www.nicotra-gebhardt.com/Resources/Download-Center | indirme merkezi | P1 | hedef (dizin) |
 
 ## 2. Danfoss (aile: FC-51, 2 ürün — 220 V ve 230 V 0,37 kW)
@@ -46,8 +46,8 @@ Partiler: **P1** 17:55 TR (10 adres) · **P2** 18:20 TR (24 adres, 23 yeni) · *
 | hepsi | https://seat-ventilation.fr/en/pages/download-catalogs | resmi katalog indirme (FR site) | P1 | hedef |
 | SEAT | https://seat-ventilation.com/collections/seat-30-series | Shopify koleksiyon (`/products.json` ile yapılandırılmış) | P1 | hedef |
 | STORM | https://seat-ventilation.com/collections/storm-series | Shopify koleksiyon | P1 | hedef |
-| SEAT/STORM | https://fantechtrade.com.au/wp-content/uploads/2026/01/Seat_V5-catalogue_lr.pdf | katalog V5 (Fantech AU aynası, 2026-01); P3'te `?product=SEAT%20Extraction%20Fans` sorgulu hâli aynı dosya | P2, P3 | hedef · P3 mükerrer |
-| SEAT/STORM | https://www.baltspektr.lv/data/user_files/uploaded_files/SEAT%20CATALOGUE.pdf | katalog (Letonya aynası); P3'te iki kez | P2, P3 | hedef · P3 mükerrer ×2 |
+| SEAT/STORM | https://fantechtrade.com.au/wp-content/uploads/2026/01/Seat_V5-catalogue_lr.pdf | katalog V5 (Fantech AU aynası, 2026-01) | P2, P3 | hedef |
+| SEAT/STORM | https://www.baltspektr.lv/data/user_files/uploaded_files/SEAT%20CATALOGUE.pdf | katalog (Letonya aynası) | P2, P3 | hedef |
 | SEAT/STORM | https://vent-park.ru/files/seat/seat-katalog.pdf | katalog (Rusya aynası) | P2 | hedef |
 | SEAT/STORM | https://www.kaffe.gr/pdf/SEAT.pdf | katalog (Yunanistan aynası; sürüm kapaktan) | P3 | hedef |
 | SEAT | https://slingerlandtechniek.nl/shop/storage/uploads/categories/seat-serie-1/FXQejq7tfTOtLQypNJrYMGjORsBaF6yz0G208fqW.pdf | SEAT serisi föy (Hollanda dağıtıcı) | P3 | hedef |
@@ -65,9 +65,9 @@ Partiler: **P1** 17:55 TR (10 adres) · **P2** 18:20 TR (24 adres, 23 yeni) · *
 
 ## 5. Sayım
 
-| Parti | Verilen | Yeni tekil | Mükerrer |
-|---|---|---|---|
-| P1 | 10 | 10 | 0 |
-| P2 | 24 | 23 | 1 (eu.nicotra catalogues.html, P1'de vardı) |
-| P3 | 7 | 4 | 3 (fantechtrade sorgulu, baltspektr ×2) |
-| **Toplam** | **41** | **37** | **4** |
+| Marka | Adres | Hedef | Ayrım | Şüpheli |
+|---|---|---|---|---|
+| Nicotra Gebhardt | 10 | 10 | 0 | 0 |
+| Danfoss | 11 | 7 | 4 | 0 |
+| SEAT Ventilation | 16 | 14 | 1 | 1 |
+| **Toplam** | **37** | **31** | **5** | **1** |
