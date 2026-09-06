@@ -91,15 +91,33 @@ koda ham `#00708F` yazıldı → kırmızı · tailwind'de `hsl(var(…))` yerin
 ⛔**"Doğru yerde mi kullanılıyor" ölçülmez** — §3'teki semantik-rol sınırı burada da geçerli.
 
 ⭐**TEK İSTİSNA — sepet sayacı rozeti (2026-09-06'da eklendi, ölçümle).** Kapının ilk hâli
-tokeni koruyordu ama **kullanımını korumuyordu**: rozet eski `bg-gradient-to-r from-cyan-400
-to-blue-600` hâline geri çevrildiğinde kapı **10/10 yeşil kalıyordu** — yani K25-b'nin
-müşteriye dönük tek kazanımı sessizce geri verilebilirdi. `KAZANIM GERİ VERİLEMEZ` kolu bunu
-kapatır: kaynakta `{cartCount}` yazan satır `bg-brand-cyan-ink` taşımak **zorunda** ve degrade
-sınıfı taşıyamaz. Sabotajla iki yönlü doğrulandı (normal 11/11 · degrade geri konunca 1 kırmızı).
+tokeni koruyordu ama **kullanımını korumuyordu**: rozete herhangi bir degrade sınıfı geri
+konulduğunda kapı **10/10 yeşil kalıyordu** — yani K25-b'nin müşteriye dönük tek kazanımı
+sessizce geri verilebilirdi. `KAZANIM GERİ VERİLEMEZ` kolu bunu kapatır: kaynakta
+`{cartCount}` yazan satır `bg-brand-cyan-ink` taşımak **zorunda** ve degrade sınıfı taşıyamaz.
+Sabotajla iki yönlü doğrulandı (normal 11/11 · degrade geri konunca 1 kırmızı).
 
-Bu bir **semantik rol çıkarımı değildir** — genel sınır yerinde duruyor. Adı kaynakta yazılı
-**tek bir yüzey** çakılmıştır; degradenin kusur olma sebebi de ölçülebilirliktir: kontrast zemin
-boyunca değiştiği için "bu rozet AA mı" sorusunun tek bir cevabı olmaz.
+### Eski zeminin GERÇEK değeri ve kusurun GERÇEK büyüklüğü (canlıdan ölçüldü)
+
+⛔**Önce yazdığım `from-cyan-400 to-blue-600` YANLIŞTI** — ölçülmeden yazılmıştı, düzeltiliyor.
+`venthub.com.tr` üzerinde `getComputedStyle` ile ölçülen gerçek değer:
+`bg-gradient-to-r from-primary-navy to-secondary-blue` =
+`linear-gradient(to right, rgb(30,63,174), rgb(2,129,197))`.
+
+| Degrade boyunca | Beyaz yazıyla kontrast |
+|---|---|
+| sol uç `#1E3FAE` | **8.83:1** |
+| orta `#1060BA` | 6.17:1 |
+| sağ uç `#0281C5` | **4.24:1** ✗ |
+| **yeni düz `#00708F`** | **5.65:1 — her yerde aynı** |
+
+⚖**Kusurun büyüklüğü de adıyla:** rozet **yalnız en sağ ucunda** ve **az** (4.24 vs 4.5)
+AA altına düşüyor; "okunaksız" değildi. Asıl kusur büyüklük değil **ölçülemezlik**:
+kontrast zemin boyunca değiştiği için *"bu rozet AA mı"* sorusunun **tek bir cevabı yoktur**.
+Düz ton o soruyu cevaplanabilir kılar.
+
+Bu bir **semantik rol çıkarımı değildir** — genel sınır yerinde duruyor; adı kaynakta yazılı
+**tek bir yüzey** çakılmıştır.
 
 ---
 

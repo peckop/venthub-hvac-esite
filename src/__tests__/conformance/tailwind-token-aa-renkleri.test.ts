@@ -231,14 +231,22 @@ describe('INV-TOKEN-AA-RENK-1 — AA koyu tonları tek kaynakta, kararın değer
 
   it('⭐KAZANIM GERİ VERİLEMEZ — sepet sayacı rozetinin zemini DEGRADE olamaz', () => {
     // NICIN BU KOL VAR (olcum, kapinin ilk hali uzerinde yapildi): kapi TOKENI
-    // koruyordu ama KULLANIMI korumuyordu. Rozet eski
-    // `bg-gradient-to-r from-cyan-400 to-blue-600` haline geri cevrildiginde kapi
-    // 10/10 YESIL kaldi — yani K25-b'nin musteriye donuk TEK kazanimi (rozetteki
-    // beyaz rakamin okunur olmasi) korumasizdi ve sessizce geri verilebilirdi.
+    // koruyordu ama KULLANIMI korumuyordu. Rozete herhangi bir degrade sinifi geri
+    // konuldugunda kapi 10/10 YESIL kaliyordu — yani K25-b'nin musteriye donuk TEK
+    // kazanimi korumasizdi ve sessizce geri verilebilirdi.
     //
-    // DEGRADE NICIN KUSUR: kontrast zemin boyunca DEGISIR, dolayisiyla "bu rozet AA
-    // mi" sorusunun tek bir cevabi yoktur; rakam degradenin acik ucunda esigin
-    // altina duser. Duz ton, sorunun cevaplanabilir olmasinin sartidir.
+    // ⚠ESKI ZEMININ GERCEK DEGERI, CANLIDAN OLCULDU (getComputedStyle, venthub.com.tr,
+    // 2026-09-06): `bg-gradient-to-r from-primary-navy to-secondary-blue`, yani
+    // linear-gradient(to right, rgb(30,63,174), rgb(2,129,197)).
+    // ⛔ONCEKI YAZDIGIM "from-cyan-400 to-blue-600" YANLISTI ve olculmeden yazilmisti;
+    // duzeltiliyor. Sabotaj hangi degrade ile yapilirsa yapilsin kolu dogruluyor,
+    // ama TARIH dogru yazilmali.
+    //
+    // DEGRADE NICIN KUSUR — BUYUKLUGU DE ADIYLA: beyaz yaziyla kontrast sol uctan sag
+    // uca 8.83:1 -> 4.24:1 iniyor. Yani rozet SADECE EN SAG UCUNDA ve AZ (4.24 vs 4.5)
+    // AA altina duser; "okunaksiz" degildir. Asil kusur BUYUKLUK degil OLCULEMEZLIK:
+    // kontrast zemin boyunca degistigi icin "bu rozet AA mi" sorusunun TEK BIR CEVABI
+    // yoktur. Duz ton her yerde 5.65:1 verir — sorunun cevaplanabilir olmasinin sarti.
     //
     // ⚠BU KOLUN SINIRI: yalniz SEPET rozetini olcer — kaynakta `{cartCount}` yazan
     // satir. Genel "token dogru yerde mi" sorusu HALA kapi disidir (bkz. baslikta
