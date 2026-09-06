@@ -49,6 +49,24 @@ def kimlik_cumlesi(blok):
     return " ".join(s for s in satirlar if s)
 
 
+def _ic_not_mu(s):
+    """Madde, MUSTERI cumlesi mi yoksa BENIM denetim notum mu.
+
+    ⛔ OLCULMUS KUSUR (2026-09-06): punto-evo-flexo ailesinde
+    "(Kaynak s.10 model adini `MEX 100/4\"` biciminde, inc isaretiyle yazar…)" maddesi
+    canliya gitti — bu bir MUSTERI cumlesi degil, kaynagin yazim bicimi hakkinda BENIM
+    notum. Madde cikarici "* " ile baslayan her satiri aliyordu.
+
+    ⚠ KURAL DAR TUTULDU, BILEREK: "kaynak" kelimesi gecen her maddeyi elemek YANLIS olurdu —
+    olctum, e-atex ailesinde "Etiketteki tam kod …; kaynaga gore 'h' yapisal guvenlik…"
+    maddesi GERCEK musteri icerigi (ATEX isaretlemesi) ve o da "kaynag" iceriyor. Genis bir
+    suzgec dogru icerigi de silerdi. Bu yuzden olcut: PARANTEZLE BASLAYAN ve KAYNAGA ATIF
+    yapan madde. 113 maddede yalniz 1'ini eliyor ve o 1 dogru olan.
+    """
+    s = s.strip()
+    return s.startswith("(") and re.search(r"[Kk]aynak\s*s\.", s) is not None
+
+
 def maddeler(blok, adet=3):
     m = re.search(r"### (?:Dört madde|Maddeler[^\n]*)\s*\n(.*?)(?=\n### |\n## |\Z)", blok, re.S)
     if not m:
@@ -57,7 +75,10 @@ def maddeler(blok, adet=3):
     for satir in m.group(1).splitlines():
         s = satir.strip()
         if s.startswith("*") and not s.startswith("**"):
-            out.append(re.sub(r"^\*\s*", "", s).strip())
+            aday = re.sub(r"^\*\s*", "", s).strip()
+            if _ic_not_mu(aday):
+                continue    # benim denetim notum, musteri cumlesi degil
+            out.append(aday)
     return out[:adet]
 
 
@@ -76,6 +97,37 @@ def bos_bloklar(blok):
         else:
             dolu.append(ad)
     return dolu, bos
+
+
+def blok_metinleri(blok):
+    """Dolu yapisal bloklarin METNINI dondurur (DB yuku icin).
+
+    ⚠ BOS BLOK ANAHTARI YAZILMAZ (K7 + OPS hukmu): "kaynakta karsiligi yok" diyen blok
+    veritabaninda ANAHTAR OLARAK BILE bulunmaz. Bos dize yazmak, ileride "burada bir sey
+    vardi ama silindi" ile "hic olmadi"yi ayirt edilemez kilar; ayrica bos basligi vitrinde
+    goruntuleme riski dogurur.
+    """
+    m = re.search(r"### Yapısal bloklar\s*\n(.*?)(?=\n### |\n## |\Z)", blok, re.S)
+    if not m:
+        return {}
+    govde = m.group(1)
+    out = {}
+    for ad in BLOKLAR:
+        p = re.search(rf"\*\*{ad}\.\*\*(.*?)(?=\n\*\*(?:{'|'.join(BLOKLAR)})\.\*\*|\Z)", govde, re.S)
+        if not p:
+            continue
+        icerik = p.group(1).strip()
+        if "aynakta karşılığı yok" in icerik:
+            continue
+        # ⛔ BLOK ICINDEKI DENETIM NOTU AYIKLANIR (olculdu: qbk-sal-kc-evo Govde blogu —
+        # "*(Kaynak s.8'deki olcu tablosunun sutun basliklari …)*"). Ic notlar yalniz
+        # maddelerde degil, blok metninin ICINDE de parantezli olarak duruyor. Kapi bunu
+        # yakaladi ve yazimi DURDURDU; kapinin olmadigi halde canliya giderdi.
+        icerik = re.sub(r"\*?\([^)]*[Kk]aynak\s*s\.[^)]*\)?\*?", "", icerik)
+        # Kaynak referanslari ([AVenS s.28]) DB metninde KALIR: vitrinde gosterilip
+        # gosterilmeyecegi render karari (URUN); veriden silmek kaniti yok etmek olurdu.
+        out[ad] = re.sub(r"\s*\n\s*", " ", icerik).strip()
+    return out
 
 
 def kaynak_ozeti(blok):
@@ -163,6 +215,7 @@ def main():
                 "maddeler": maddeler(blok),
                 "kaynak": kaynak_ozeti(blok),
                 "dolu": dolu, "bos": bos,
+                "blok_metni": blok_metinleri(blok),
                 "kapi": kapi_kos(baslik, blok),
             })
     return kayitlar
@@ -330,6 +383,53 @@ if __name__ == "__main__":
         if not bulundu_mu:
             print(f"aile bulunamadi: {hedef_slug}")
             sys.exit(2)
+        sys.exit(0)
+    # --yuk <yol>: DB yazimi icin YUK DOSYASI uretir. Yazan betik taslak .md'leri OKUMAZ;
+    # yalniz bu dosyayi okur. Nicin: yazilacak metin, insanin ONAYLADIGI sunumu ureten AYNI
+    # koddan cikmali; iki ayri ayristirici olsaydi "onaylanan metin" ile "yazilan metin"
+    # sessizce ayrisabilirdi — bugunun en pahali dersi tam bu sinif.
+    if "--yuk" in sys.argv:
+        import json as _json
+
+        def _referanssiz(s):
+            """Kaynak referanslarini ([AVenS s.28]) VITRIN METNINDEN temizler.
+
+            ⛔ OLCULMUS KUSUR (2026-09-06, ilk yazimda 38/38 aileye sizdi): kimlik cumlesi
+            taslaktan OLDUGU GIBI aliniyordu ve sonunda "[s.41]" duruyordu — yani musteri
+            urun sayfasinda bizim IC KAYNAK NOTUMUZU okuyacakti. Kanit taslakta ve kanit
+            satirlarinda durur; VITRINDE DURMAZ. Iki yer ayni metni tasimaz.
+            """
+            s = re.sub(r"\s*\[(?:[A-Za-zÇĞİÖŞÜçğıöşü]+\s+)?s\.\s*[0-9][^\]]*\]", "", s)
+            s = re.sub(r"\s*\[DB\]", "", s)
+            return re.sub(r"\s{2,}", " ", s).strip()
+        hedef = Path(sys.argv[sys.argv.index("--yuk") + 1])
+        kararlar = {}
+        kj = Path(__file__).resolve().parent / "karar-k710.json"
+        if kj.exists():
+            kararlar = _json.loads(kj.read_text(encoding="utf-8")).get("kararlar", {})
+        yazilmaz = {s for s, v in kararlar.items() if v.get("durum") == "SAYFA YAZILMAYACAK"}
+        yuk = []
+        for k in kayitlar:
+            if k["slug"] in yazilmaz:
+                continue      # K7.10 — Recep karari, sayfa yazilmaz
+            kp = k["kapi"] or {}
+            yuk.append(
+                {
+                    "slug": k["slug"],
+                    "kimlik_tr": _referanssiz(k["kimlik"]),
+                    "maddeler_tr": [_referanssiz(x) for x in k["maddeler"]],
+                    "bloklar_tr": {a: _referanssiz(m) for a, m in k["blok_metni"].items()},
+                    "kaynak": k["kaynak"],
+                    "kapi": {x: kp.get(x) for x in
+                             ("dogrulanan", "dusen", "zayif_iddia", "guclu_iddia")},
+                }
+            )
+        hedef.parent.mkdir(parents=True, exist_ok=True)
+        hedef.write_text(_json.dumps(yuk, ensure_ascii=False, indent=2, sort_keys=True) + chr(10),
+                         encoding="utf-8")
+        atlanan = sorted(yazilmaz)
+        print(f"YUK YAZILDI: {hedef}  ·  {len(yuk)} aile")
+        print(f"K7.10 geregi ATLANAN {len(atlanan)}: {', '.join(atlanan) or '-'}")
         sys.exit(0)
     if "--yaz" in sys.argv:
         hedef = KOK / "docs" / "audits" / "icerik-hatti-toplu-sunum-2026-09-06.md"

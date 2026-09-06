@@ -132,10 +132,10 @@ zengin göstermek vaat ihlali olur. Aksesuar yelpazesi genişlediğinde paragraf
 
 * **i18n yolu** — açılmadan hiçbiri DB'ye yazılamaz (ölçüm §3).
 * **EN çevirileri** — TR onayından sonra, `i18n-conventions` cetveli okunarak.
-* **`display_mode` eşlemesi** — 37 kategorinin hepsi bugün varsayılan `series`;
-  hangi kategorinin landing/showcase olacağı **Recep'in yapısal kararı** (ölçüm §5).
-* **EN çevirileri** — TR onayından sonra, `i18n-conventions` cetveli okunarak.
-* **`display_mode` eşlemesi** — 37 kategorinin hepsi bugün varsayılan `series`.
+* **`display_mode` eşlemesi** — ~~hepsi varsayılan `series`~~ **YANLIŞTI, düzeltildi:**
+  ölçülen dağılım **22 `series` · 11 `showcase` · 4 `landing`** — eşleme YAPILMIŞ.
+  Sütun varsayılanına bakıp genellemişim (ölçüm §5, düzeltme aynı gün).
+  Eksik olan eşleme değil, **eşlemenin yazılı gerekçesi**.
 
 ---
 
