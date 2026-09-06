@@ -124,3 +124,26 @@ kırmızı (belge kanıtı bunu yakalar) · kanıtsız satıra kanıt UYDURULMAZ
 tartışma sayısı (09-04: 3). Sıfıra yakınsa kalır; aynıysa kaldırılır (bedel 2-3 gün). İlk koşumun kendisi ayırt edici çıktı:
 YH-42 kırmızı verdi çünkü dal v1.1 sınavını henüz taşımıyordu; YH-11 kırmızı verdi çünkü sınav sonucu dosyası bayattı —
 ikisi de "beyan ile depo hâli ayrışıyor" sınıfı, tam olarak yakalaması istenen şey.
+
+## 10. Defter hijyeni — temiz tutma kuralı (Recep 09-06: "defteri temiz tut, bayatlığını deftere ölçtür"; deftere kendi kaynaklarını denetlettik, `docs/proje-takip/defter-hijyen-2026-09-06.md`)
+
+1. **Yalnız manifest.** Deftere giren her dosya `docs/proje-takip/manifest.json`'daki bir demetten gelir; elle yükleme yok.
+   Üretilmiş `.md` (`*_master.md`, `system_tree.md`, `CONTEXT.md`, `design_system_config.md`, `*.config.md`, companion/sidecar,
+   `registry/**`, `.archive/**`, `docs/archive/**`, `artifacts/**`, üçüncü taraf doküman kopyaları) `asla_dahil_etme`'dedir.
+   **İzinli üretilmiş istisnası:** `yol-haritasi-durum.md`, `hafiza-sinavi-sonuc.md`, `linear/is-dagilimi-*.md`, `linear/kararlar-*.md`
+   koddan değil JSON/Linear'dan üretilir ve damga taşır; sızma taramasında beyaz listedir.
+2. **Tek kopya.** Aynı belgenin donmuş fotoğrafı ile canlı sürümü aynı deftere girmez (09-06: `design-15a/` 15 dosyanın 15'i
+   `design/menu/` ile aynı adda farklı içerikti → demet 10 kaldırıldı; Design projelerindeki `kararlar-*` kopyaları demet 14'te hariç).
+3. **Eşitleme her gün kapanışta** (`proje_takip_sync.py esitle`; ölçüldü: 09-06'da 8 saat bayat kalan defter, düzeltilmiş skill
+   dosyasını hâlâ bozuk gösterdi). Kapsamdaki dosya master'a inince ya da Kararlar değişince aynı gün.
+4. **Haftalık öz-denetim:** aynı soru deftere sorulur ("hangi kaynaklar çelişiyor/bayat, gürültü, eksik"); bulgular tarihli bölüm
+   olarak hijyen dosyasına eklenir, kapanan satır silinmez "KAPANDI + PR" yazılır. Çelişkiden çıkan her düzeltme bir işe bağlanır (sahip şeridi).
+5. **Kapsam denetimi ayda bir** (`git ls-files "*.md"` × manifest glob semantiği = `glob.glob`, `*` `/` geçmez; `fnmatch` ile ölçüm yanlış
+   "kapsandı" verir — 09-06 bulgusu): kapsanmayan elle yazılmış belge varsa demete girer, sızma varsa düşer. README kuralı: elle
+   yazılmış karar/kurulum notu taşıyan README girer (demet 16), şablon/araç/üçüncü taraf README girmez.
+6. **Gürültü sınırı:** konuşma günlüğü demeti son 14 gün (eskisi arşiv defterine); pano demeti son 7 gün; ikisi de ev dizininde (repo PUBLIC).
+8. **Günlük notu kısaltma yazmaz (09-06 olayı):** OPS günlüğünde "model yönlendirme (sabah cetvel)" yazınca defter bunu
+   "sabah cetvele işlendi = yapıldı" diye okudu; gerçek durum "yarın sabah yazılacak"tı. Deftere giden her not kalemi
+   durum sözcüğü taşır: **YAPILDI / AÇIK / YARIN / ÇÜRÜDÜ**; parantez içi kısaltma durum belirtmez.
+7. **Bayatlık ölçümü deftere sorulur:** "hangi kaynağın damgası en eski / hangi kaynak kendi içinde çelişiyor" — cevap `source list`
+   damgalarıyla doğrulanır; kaynak damgası (`kaynak_updatedAt`, `kopya`) taşımayan dışa aktarım dosyası kabul edilmez.
