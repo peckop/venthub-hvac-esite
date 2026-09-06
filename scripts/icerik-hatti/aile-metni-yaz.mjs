@@ -101,6 +101,25 @@ if (dusenli.length) {
 }
 console.log('  KAPI 4 YESIL — dusen iddia tasiyan aile yok')
 
+// ---- KAPI 5: vitrine cikacak metinde IC KAYNAK REFERANSI kalmis mi
+// ⛔ OLCULMUS KUSUR: ilk yazimda 38/38 ailenin kimlik cumlesi "[s.41]" gibi bir referansla
+// canliya gitti — musteri bizim ic kaynak notumuzu okuyacakti. Kanit taslakta ve kanit
+// satirlarinda durur, VITRINDE durmaz. Bu kapi o hatanin tekrarini imkansiz kilar.
+// "Kaynak s.NN" bicimi de kapsanir: bir madde bu ATIF bicimini tasiyorsa musteri cumlesi
+// degil, taslaktaki denetim notudur (olculdu: punto-evo-flexo, canliya gitmisti).
+const REF_DESENI = /\[(?:[A-Za-zÇĞİÖŞÜçğıöşü]+\s+)?s\.\s*[0-9][^\]]*\]|\[DB\]|[Kk]aynak\s*s\.\s*[0-9]/
+const refliler = yuk.filter((y) => {
+  const parcalar = [y.kimlik_tr, ...(y.maddeler_tr || []), ...Object.values(y.bloklar_tr || {})]
+  return parcalar.some((s) => REF_DESENI.test(s || ''))
+})
+if (refliler.length) {
+  console.error(`⛔ KAPI 5 KIRMIZI — vitrine cikacak metinde ic kaynak referansi kalmis: ${refliler.length} aile`)
+  for (const r of refliler.slice(0, 5)) console.error(`   ${r.slug}: ${r.kimlik_tr.slice(0, 90)}`)
+  console.error('   Referanslar taslakta KALIR, DB metnine GIRMEZ. toplu-sunum.py --yuk temizler.')
+  process.exit(1)
+}
+console.log('  KAPI 5 YESIL — vitrin metninde ic kaynak referansi yok')
+
 // ---- YEDEK: yazmadan once mevcut degerler diske
 writeFileSync(
   YEDEK_YOL,

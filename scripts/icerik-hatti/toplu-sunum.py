@@ -49,6 +49,24 @@ def kimlik_cumlesi(blok):
     return " ".join(s for s in satirlar if s)
 
 
+def _ic_not_mu(s):
+    """Madde, MUSTERI cumlesi mi yoksa BENIM denetim notum mu.
+
+    ⛔ OLCULMUS KUSUR (2026-09-06): punto-evo-flexo ailesinde
+    "(Kaynak s.10 model adini `MEX 100/4\"` biciminde, inc isaretiyle yazar…)" maddesi
+    canliya gitti — bu bir MUSTERI cumlesi degil, kaynagin yazim bicimi hakkinda BENIM
+    notum. Madde cikarici "* " ile baslayan her satiri aliyordu.
+
+    ⚠ KURAL DAR TUTULDU, BILEREK: "kaynak" kelimesi gecen her maddeyi elemek YANLIS olurdu —
+    olctum, e-atex ailesinde "Etiketteki tam kod …; kaynaga gore 'h' yapisal guvenlik…"
+    maddesi GERCEK musteri icerigi (ATEX isaretlemesi) ve o da "kaynag" iceriyor. Genis bir
+    suzgec dogru icerigi de silerdi. Bu yuzden olcut: PARANTEZLE BASLAYAN ve KAYNAGA ATIF
+    yapan madde. 113 maddede yalniz 1'ini eliyor ve o 1 dogru olan.
+    """
+    s = s.strip()
+    return s.startswith("(") and re.search(r"[Kk]aynak\s*s\.", s) is not None
+
+
 def maddeler(blok, adet=3):
     m = re.search(r"### (?:Dört madde|Maddeler[^\n]*)\s*\n(.*?)(?=\n### |\n## |\Z)", blok, re.S)
     if not m:
@@ -57,7 +75,10 @@ def maddeler(blok, adet=3):
     for satir in m.group(1).splitlines():
         s = satir.strip()
         if s.startswith("*") and not s.startswith("**"):
-            out.append(re.sub(r"^\*\s*", "", s).strip())
+            aday = re.sub(r"^\*\s*", "", s).strip()
+            if _ic_not_mu(aday):
+                continue    # benim denetim notum, musteri cumlesi degil
+            out.append(aday)
     return out[:adet]
 
 
@@ -98,6 +119,11 @@ def blok_metinleri(blok):
         icerik = p.group(1).strip()
         if "aynakta karşılığı yok" in icerik:
             continue
+        # ⛔ BLOK ICINDEKI DENETIM NOTU AYIKLANIR (olculdu: qbk-sal-kc-evo Govde blogu —
+        # "*(Kaynak s.8'deki olcu tablosunun sutun basliklari …)*"). Ic notlar yalniz
+        # maddelerde degil, blok metninin ICINDE de parantezli olarak duruyor. Kapi bunu
+        # yakaladi ve yazimi DURDURDU; kapinin olmadigi halde canliya giderdi.
+        icerik = re.sub(r"\*?\([^)]*[Kk]aynak\s*s\.[^)]*\)?\*?", "", icerik)
         # Kaynak referanslari ([AVenS s.28]) DB metninde KALIR: vitrinde gosterilip
         # gosterilmeyecegi render karari (URUN); veriden silmek kaniti yok etmek olurdu.
         out[ad] = re.sub(r"\s*\n\s*", " ", icerik).strip()
@@ -364,6 +390,18 @@ if __name__ == "__main__":
     # sessizce ayrisabilirdi — bugunun en pahali dersi tam bu sinif.
     if "--yuk" in sys.argv:
         import json as _json
+
+        def _referanssiz(s):
+            """Kaynak referanslarini ([AVenS s.28]) VITRIN METNINDEN temizler.
+
+            ⛔ OLCULMUS KUSUR (2026-09-06, ilk yazimda 38/38 aileye sizdi): kimlik cumlesi
+            taslaktan OLDUGU GIBI aliniyordu ve sonunda "[s.41]" duruyordu — yani musteri
+            urun sayfasinda bizim IC KAYNAK NOTUMUZU okuyacakti. Kanit taslakta ve kanit
+            satirlarinda durur; VITRINDE DURMAZ. Iki yer ayni metni tasimaz.
+            """
+            s = re.sub(r"\s*\[(?:[A-Za-zÇĞİÖŞÜçğıöşü]+\s+)?s\.\s*[0-9][^\]]*\]", "", s)
+            s = re.sub(r"\s*\[DB\]", "", s)
+            return re.sub(r"\s{2,}", " ", s).strip()
         hedef = Path(sys.argv[sys.argv.index("--yuk") + 1])
         kararlar = {}
         kj = Path(__file__).resolve().parent / "karar-k710.json"
@@ -378,9 +416,9 @@ if __name__ == "__main__":
             yuk.append(
                 {
                     "slug": k["slug"],
-                    "kimlik_tr": k["kimlik"],
-                    "maddeler_tr": k["maddeler"],
-                    "bloklar_tr": k["blok_metni"],
+                    "kimlik_tr": _referanssiz(k["kimlik"]),
+                    "maddeler_tr": [_referanssiz(x) for x in k["maddeler"]],
+                    "bloklar_tr": {a: _referanssiz(m) for a, m in k["blok_metni"].items()},
                     "kaynak": k["kaynak"],
                     "kapi": {x: kp.get(x) for x in
                              ("dogrulanan", "dusen", "zayif_iddia", "guclu_iddia")},
