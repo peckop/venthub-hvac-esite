@@ -45,9 +45,21 @@ const DESEN = /Tier C/i
 const IMZA_TR = 'fiyat listesinden aktarılan temel ürün'
 const IMZA_EN = 'imported from Avensair'
 
-/** Ölçülmüş beklenen sayılar. Sapma = evren değişmiş demektir; betik DURUR (--zorla ile geçilir).
- *  Niçin: "düşen 0" yetmez, beklenen küme listede mi — var-olmayan-kapi-pending-gorunmez dersi. */
+/** Ölçülmüş beklenen sayılar (ilk koşum, 2026-09-06). Bulunan sayı bunlardan FAZLAysa evren
+ *  büyümüş demektir ve betik DURUR (--zorla ile geçilir). AZ ise iş kısmen yapılmış demektir;
+ *  0 ise zaten temizdir — ikisi de hata DEĞİLDİR (ilk koşumda öyle sayılıyordu, düzeltildi).
+ *  Niçin sapma kapısı var: "düşen 0" yetmez, beklenen küme listede mi — bkz.
+ *  var-olmayan-kapi-pending-gorunmez. */
 const BEKLENEN = { urun: 187, aile: 11 }
+
+/** BOŞ DEĞER TABLOSU — ŞEMADAN ÖLÇÜLDÜ, VARSAYILMADI (2026-09-06).
+ *  İlk sürüm iki alana da `null` yazıyordu; `product_families.description` NOT NULL olduğu için
+ *  11 ailenin hepsi "violates not-null constraint" ile düştü, ürün tarafı (nullable) geçti.
+ *  Hata bendeydi: şemayı ölçmeden varsaydım. Ölçüm:
+ *    products.description_i18n        jsonb, NULLABLE,  varsayılan yok      -> boş = null
+ *    product_families.description     jsonb, NOT NULL,  varsayılan '{}'     -> boş = {}
+ *  Kolonun KENDİ varsayılanı `{}` — doğru boş değeri şema zaten söylüyordu. */
+const BOS = { urun: null, aile: {} }
 
 const arg = (ad) => {
   const i = process.argv.indexOf(ad)
@@ -72,16 +84,17 @@ if (!url || !anahtar) {
 
 const db = createClient(url, anahtar, { auth: { persistSession: false } })
 
-/** Bir i18n objesinden desenli anahtarları çıkarır. Hepsi düşerse null döner (alan boşalır). */
-function temizlenmis(obj) {
-  if (!obj || typeof obj !== 'object') return { yeni: null, dusen: [] }
+/** Bir i18n objesinden desenli anahtarları çıkarır. Hepsi düşerse alanın ŞEMAYA UYGUN boş
+ *  değeri döner (`bosDeger`) — bkz. BOS tablosu; tek bir "null" her iki tabloya uymaz. */
+function temizlenmis(obj, bosDeger) {
+  if (!obj || typeof obj !== 'object') return { yeni: bosDeger, dusen: [] }
   const yeni = {}
   const dusen = []
   for (const [k, v] of Object.entries(obj)) {
     if (typeof v === 'string' && DESEN.test(v)) dusen.push(k)
     else yeni[k] = v
   }
-  return { yeni: Object.keys(yeni).length ? yeni : null, dusen }
+  return { yeni: Object.keys(yeni).length ? yeni : bosDeger, dusen }
 }
 
 async function tumSayfalar(tablo, alanlar, filtre) {
@@ -141,21 +154,39 @@ const aileler = [...aileHarita.values()]
 console.log(`BULUNAN — urun ${urunHarita.size} (beklenen ${BEKLENEN.urun}) · ` +
             `aile ${aileler.length} (beklenen ${BEKLENEN.aile})`)
 
-const sapma =
-  urunHarita.size !== BEKLENEN.urun || aileler.length !== BEKLENEN.aile
-if (sapma) {
-  console.warn('⚠ SAPMA: bulunan sayi beklenenden farkli — evren degismis olabilir.')
-  console.warn('  Bu bir hata DEGIL, bir SORU: aradan yeni urun eklendi mi, baskasi temizledi mi?')
+// SAPMA KAPISI — YÖN AYRIMI YAPAR (ilk surumde yapmiyordu, duzeltildi):
+//   bulunan > beklenen  -> evren BUYUMUS, bilmedigimiz kayit var  -> DUR
+//   bulunan < beklenen  -> is kismen yapilmis (ornegin urun gecti, aile dustu) -> DEVAM, bilgi ver
+//   bulunan = 0         -> zaten temiz -> yapilacak yok, BASARIYLA cik
+// Niçin: ikinci kosumda 0 bulmak BEKLENEN sonuctur; ilk surum bunu "sapma" sayip --zorla
+// istiyordu ve temiz bir veritabaninda basarisiz gibi gorunuyordu.
+const fazla = urunHarita.size > BEKLENEN.urun || aileler.length > BEKLENEN.aile
+const eksik = urunHarita.size < BEKLENEN.urun || aileler.length < BEKLENEN.aile
+const sapma = fazla || eksik
+
+if (urunHarita.size === 0 && aileler.length === 0) {
+  console.log('TEMIZ — desen eslesen kayit YOK, yapilacak is yok.')
+  rapor.ozet = { urun_bulunan: 0, aile_bulunan: 0, urun_yazilan: 0, aile_yazilan: 0, sapma: false,
+                 sonuc: 'zaten temiz' }
+  writeFileSync(CIKTI, JSON.stringify(rapor, null, 1), 'utf8')
+  console.log(`RAPOR -> ${CIKTI}`)
+  process.exit(0)
+}
+if (fazla) {
+  console.warn('⚠ BEKLENENDEN FAZLA kayit bulundu — evren buyumus, bilmedigimiz kayitlar var.')
+  console.warn('  Bu bir hata DEGIL, bir SORU: aradan yeni urun mu eklendi?')
   if (YAZ && !ZORLA) {
     console.error('YAZIM DURDURULDU. Sayiyi dogrulayip --zorla ile tekrar kosun.')
     process.exit(3)
   }
+} else if (eksik) {
+  console.log('bilgi: beklenenden AZ kayit var — is kismen yapilmis olabilir. Yazim DEVAM EDIYOR.')
 }
 
 // ---------------------------------------------------------------- 3) PLAN / YAZIM
 let urunYazilan = 0
 for (const u of urunHarita.values()) {
-  const { yeni, dusen } = temizlenmis(u.description_i18n)
+  const { yeni, dusen } = temizlenmis(u.description_i18n, BOS.urun)
   rapor.urunler.push({ id: u.id, slug: u.slug, dusen_anahtar: dusen, onceki: u.description_i18n, yeni })
   if (!YAZ) continue
   const { error } = await db.from('products').update({ description_i18n: yeni }).eq('id', u.id)
@@ -165,7 +196,7 @@ for (const u of urunHarita.values()) {
 
 let aileYazilan = 0
 for (const a of aileler) {
-  const { yeni, dusen } = temizlenmis(a.description)
+  const { yeni, dusen } = temizlenmis(a.description, BOS.aile)
   rapor.aileler.push({ id: a.id, slug: a.slug, dusen_anahtar: dusen, onceki: a.description, yeni })
   if (!YAZ) continue
   const { error } = await db.from('product_families').update({ description: yeni }).eq('id', a.id)
