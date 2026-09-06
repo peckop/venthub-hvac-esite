@@ -1,8 +1,9 @@
-# AYNA · Kararlar — Kurumsal Belgeler · dışa aktarım 2026-09-06 (OPS)
+# Kararlar — Kurumsal Belgeler (Linear belgesinin TAM dışa aktarımı · 2026-09-06 ayna: K1–K17-b)
 
-> Kaynak: Linear belgesi `Kararlar — Kurumsal Belgeler` (id 9e95d258-98a2-4c51-9a2d-40576c87a7bf), `updatedAt 2026-09-05T16:43:01Z`.
-> Bu dosya kopyadır; çelişirse Linear kazanır. Bayat sinyali (`bayat-*.md`) bu aynadan sonraki değişiklikleri taşır.
-> 153-7 numaralandırma taslak hükmü ve 153-12/13/14 hükümleri henüz belgeye K olarak girmedi (proje yorumu + REC-153, 2026-09-06); Recep itirazı yoksa K17–K18 olarak girer.
+<!-- kaynak_id: 9e95d258-98a2-4c51-9a2d-40576c87a7bf · kaynak_updatedAt: 2026-09-06T11:09:42.064Z · kopya: 2026-09-06T11:20Z -->
+<!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
+
+> Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır.
 
 Tek kaynak; karar buraya yazılmadan verilmiş sayılmaz. Yazan: OPS. Design eklemesi Recep "evet" demeden karar değildir.
 
@@ -80,5 +81,14 @@ Aynı belgenin iki durumu (ödeme alındı/bekleniyor · sevk/teslim · iade tal
 
 *2026-09-05 akşam: K13, K14, K15, K16 eklendi; K11 uygulandı + kimlik yuvası düzeltmesi (OPS).*
 
----
-*Ayna notu (OPS, 2026-09-06): 2 ve 3 BİTTİ (e-posta beşli + föy şablonu), 4 SÜRÜYOR (yasal set emri verildi). K23-b (soluk işaret dosyadan) Vitrin 15A belgesinde, bu projeyi de bağlar.*
+## K17 · Belge sırasının kalanı ve şema bekleyen belgeler (2026-09-06 12:15Z, OPS hükmü; Belge soruları 153-23…26)
+
+**K3'ün sonucu:** canlı tablosu olup belgesi olmayan yüzey varken "kuyruk bitti" denmez. **Sevk irsaliyesi ve garanti belgesi:** kolon karşılığı yok → şema/veri bekler, listeden düşmez; e-irsaliye GİB'den (e-fatura gibi), garanti şeması satış kipiyle karar. `data_subject_requests` **→ KVKK seti Belge'nin işi:** Başvuru Formu (önek taslak **KV**) + Başvuru Yanıt Yazısı (30 gün); sıradaki iş. `payment_transactions` **→** bugün belge yok; satış kipi açılınca Tahsilat Makbuzu/Ödeme Bildirimi adayı (K1a kapalı-bekler). **6. adım:** KVKK setinden sonra antetli kâğıt + e-posta imzası; **kartvizit Recep kararı** (basılı ürün). Baskı provasından (153-9) bağımsız.
+
+### K17-a · Kartvizit = KARAR (2026-09-06, Recep: "yapılsın")
+
+K17'deki "kartvizit Recep kararı" kalemi kapandı: kartvizit yapılır. Sıra: antetli + e-posta imzası SONRA. Kapsam ve ölçüm satırı: Belge emir #5 (`ops-emir-2026-09-06-5-belge.md`, proje yorumu). Kişi verisi Recep'ten; gelene kadar yer tutucu, sahte veri yazılmaz.
+
+### K17-b · Keşif Raporu (2026-09-06, Recep isteği; OPS hükmü 153-28/29/30)
+
+Keşif Raporu v1 KABUL (alanlar `wizard_selections`, hesap sonuçları boş, sahte veri 0). **153-28:** yedi alanın (müşteri/yetkili · keşfi yapan · mahal ölçüleri · bulgu notu · müşteri onayı · rapor no · kroki) kaydı KOD İŞİ (`site_surveys` + `wizard_selections` bağı); Linear kaydı OPS açar (09-07 sabah), "şema bekler" kümesi (REC-159/160 yanı); migration Recep kapısı, öncelik Recep'e sorulur. Rapor no öneki KS taslak → 153-7. **153-29:** sıra bozulmadı, sıradaki iş kartvizit (emir #5); devreye alma/servis raporları Recep'in kurulum-bakım kurgusunu bekler, Recep istemeden çizilmez. **153-30:** rapor kabuğu ikinci raporla açılır, bugün açılmaz. Kağıt provası 153-9 = 17 belge + antetli (Recep).

@@ -1,6 +1,6 @@
-# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-06 ayna: K1–K25-b)
+# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-06 ayna: K1–K37-a)
 
-<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-05T22:09:37.981Z · kopya: 2026-09-06T04:50Z -->
+<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-06T11:11:45.078Z · kopya: 2026-09-06T11:20Z -->
 <!-- Dosya adındaki 2026-09-04 ilk dışa aktarım günüdür, kopyanın tarihi DEĞİLDİR; tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -251,3 +251,60 @@ Menü ölçtü: `--brand-cyan` (#0088B0) küçük metin olarak beyazda 4,02 · s
 ## K25-b · Sayaç ve kiremit düğme zemini koyulaşır (2026-09-06, K25'in düzeltmesi)
 
 OPS'un "turkuaz üstüne lacivert" hükmü ölçümsüzdü; Menü ölçtü: 3,47 (beyazdan kötü), geri alındı. Doğru yol zemini koyulaştırmak: Teklif/Sepet sayacı zemini `--brand-cyan-ink` (beyaz metinle ≥4,5:1, hedef ≈#00708F), metin beyaz. Kiremit düğme zemini `--action-terracotta-deep` (beyaz metinle ≥4,5:1; bugünkü kiremit 3,87), `AnaEylemDugmesi` bu tokene geçer; görünür sonuç: kiremit düğme bir ton koyu. Sayılar Marka'nın; token yayınlanıp çip yeniden seçilince Menü tek turda uygular.
+
+**K25-b kapsam sınırı ve değerler (DESIGN-MARKA ölçümü, OPS kabul 2026-09-06 sabah):** `--brand-cyan-ink` = **#00708F** (beyazda 5,65 · #F4F4F2'de 5,13 · zemin olarak beyaz metinle 5,65); `--action-terracotta-deep` = **#BF5309** (beyaz metinle 4,71; ham kiremit 3,80). `--brand-cyan-ink` **koyu zeminde metin olarak KULLANILMAZ** (#1A2B4A üstünde 2,50 · #0F1723 üstünde 3,18); koyu bantta küçük metin `--text-on-dark-muted` #8FA2BD kalır. K23 eki: kılavuzun kendi logo örnekleri de `brand/logo/` dosyasından gösterilir, `clip-path` ile çizilmez (kılavuz dahil).
+
+## K26 · Değer emri KAYNAĞA gider, DS türetir (DESIGN-MARKA süreç raporu, OPS kabul 2026-09-06; Recep raporlanmasını istedi)
+
+Olay: OPS emir 09-06 #2/#3 iki token DEĞERİNİ DS'e yazdırdı; kaynak (`DESIGN-MARKA` `brand/tokens.css`) bir tur boş kaldı, tüketiciler kaynakta olmayan değeri gördü. Hata OPS'un (emir yanlış kapıya). **Kural:** renk · ölçü · yazım · kural · token değeri → **DESIGN-MARKA** (kaynak); bileşen · kart · şablon · derleme → **DS**; ekran/bilgi mimarisi → DESIGN-MENU (K11); belge şablonu → DESIGN-BELGE. Sınav sorusu: çıktı DEĞER mi BİLEŞEN mi. DS'in ölçümü gerekirse emir "ölç ve DESIGN-MARKA'ya bildir, kaynağa o yazar" der. Akış tek yön: MARKA → DS → tüketici (çip). Düzeltme: DS `brand/` kopyasını kaynaktan tazeler (emir 09-06 #4), sonra Recep üç projede çipi yeniden seçer.
+
+## K27 · Tekrar eden desen DS'e ÇIKAR; ekran DS'e GİRMEZ (Recep sorusu 2026-09-06 "DS'e yalnız kabuk almışız"; Marka ölçümü, OPS hükmü)
+
+Ölçüm: DESIGN-MENU'de 5 canlı ekran dosyası, DS'te 6 bileşen, ekranlarda 15+ tekrar eden desen (ürün kartı · filtre paneli · matris tablo · hüküm kutusu · çip şeridi · alt sekme çubuğu · kategori paneli · arama şeridi · boş sonuç · teklif paneli). K11 aynen kalır (ekran kaynağı DESIGN-MENU). **Sıra:** (1) DESIGN-MENU desen envanteri çıkarır (ölçüm, çizim yok; emir 09-06 #4) → (2) eşik: **≥2 ekranda geçen desen bileşen adayı** → (3) kimlik kuralı gerekenler Marka kılavuzuna → (4) DS bileşen + prompt + kart → (5) ekranlar bileşene döner (elle çizim 0). Envanter çıkmadan bileşen yazılmaz; bu iş ekran turlarını bloklamaz.
+
+## K28 · Ham hex ölçütü (2026-09-06 06:05Z, OPS hükmü; kaynak DESIGN-MENU `ham-hex-beyani-2026-09-06.md`)
+
+**Ham hex ihlaldir ancak ve ancak DS'te yayınlanmış bir token karşılığı varsa.** "Ham hex 0" hedef değildir; doğru beyan **A kümesi 0** (token karşılığı olan değer ham yazılmış). DS'in ölçüp tanımladığı ama token yayınlamadığı değer (B kümesi) ham kalır ve **token isteği K26 yoluyla DESIGN-MARKA'ya** gider; uydurma token adı yazılmaz (çözülmeyen değişken = sessiz boya kaybı). Tek kullanımlık kabuk varyantları (C) ve DS'in "bilinçli eksik" saydığı semantik çiftler (D) ihlal değildir. v17 ölçümü: 999 → A 132→0 · B 676 · C 64 · D 125. İlk uygulama: Marka emir 09-06 #6 (`--border-input` #D8D8D4 · `--border-row` #F2F2EE · `--surface-subtle` #FBFBF9; adlar Marka'nın).
+
+## K29 · Desen envanteri kabul + bileşen sırası (2026-09-06 06:20Z, OPS hükmü; kaynak DESIGN-MENU `desen-envanteri-2026-09-06.md`)
+
+Beş ekran dosyasında **24 desen ölçüldü; eşik ≥2 ekran (K27) → 17 bileşen adayı**, 7 ekranın kendi işi. DS'te tam karşılık 3 (`KabukBandi` 92 · `CerceveliDugme` 57 · `TeknikTablo` 44), kısmi 4 (`Cip` ×2, `Kart` ×2), hiç yok 10. **Bulgu → kural:** `Kart` · `Cip` · `TeknikTablo` DS'te var, v17'de mount 0 — *bundle yüklemek yetmez, bileşen mount edilir* (üçüncü tekrar). **Sıra:** (1) Menü emir #5 uzlaştırması → (2) Menü mevcut üçü mount eder (emir 09-06 #6; ölçüt elle çizim 0) → (3) Marka kimlik kuralları 9 desen, önce rozet yazımı · hüküm/semantik kutu tonları · fotoğraf kutusu (emir #7) → (4) DS Marka-bağımsız üçü yazar: `Cip` varyant rolü · `AdetKontrolu` · `KatliCagriSatiri` (emir #6) → (5) DS kimlik kurallı bileşenler → (6) ekranlar mount. **Semantik/işlevsel renklerin sahibi MARKA** (palet dışı "İşlevsel renkler" bölümü); DS'in "bilinçli eksik" bırakması doğruydu, sahipsiz kalması değil. Ekran DS'e girmez (K11/K27 aynen).
+
+## K30 · Rozet tonu üç sınıf + `--surface-dark-inset` (2026-09-06 06:22Z, DESIGN-MARKA yazdı, OPS kabul; numara OPS'un — Marka "K29" demişti, K29 envanterdir)
+
+Rozet veri taşır ya da hüküm bildirir, ikisi aynı tonda yazılmaz; yeni renk yok. **Nesnel** (`UL-94` · `ErP` · `IP54`): zemin YOK · 1 px `--border-control` · `--text-body` (7,53). **Hüküm** (`ÖNERİLEN`): dolu `--brand-cyan-ink` · beyaz (5,65). **Soluk** (`DEĞERLENDİRİLEMEDİ` · `ARŞİV`): `--surface-inset` zemin · `--text-muted` (4,83). Kiremit rozette yok (K5), ham turkuaz yok (K25). Arama şeridi zemini token oldu: `--surface-dark-inset` **#24395C** (banttan 1,22 ayrılır → kenar/konum şart; üstünde metin beyaz 11,57, muted ink 4,45 yetersiz). K28 üç token de yayınlandı: `--border-control` (ad Marka'nın, `border-input` değil) · `--border-row` · `--surface-subtle` (tek başına sınır bildirmez, 1 px kenarla); kenar kademesi control 1,43 > hairline 1,28 > inset 1,20 > row 1,12.
+
+## K31 · Hüküm kutusu ve semantik kutu tonları — renk eklenmez (2026-09-06 06:30Z, OPS hükmü; Marka'nın karar sorusu)
+
+Marka paletinde kırmızı yok, yeşil Hava Arıtma kategorisine ayrılmış; dördüncü renk icat edilmez. Hüküm kutusu geri bildirimi metinle verir (K7); üç hâl **3 px sol kuralın tonuyla** ayrılır: **YETER** `--primary-navy` **· SINIRDA** `--warn-amber` **· YETMEZ** `--action-terracotta-deep`. Semantik kutu aynı kalemle: bilgi `--brand-cyan-ink` · uyarı amber · hata terracotta-deep · "başarı" ayrı kutu değil (YETER = navy). **Sınır:** kiremit-deep bu kutularda yalnız sol kural + metin tonu olarak; **dolu zemin olarak asla** (dolu kiremit = eylem sinyali, K5 gevşemez). Sonuç: v17'deki yeşil hüküm kutuları (#256540 40 kullanım) navy'ye döner — görünür değişiklik, Recep v17 incelemesinde görür (K8). Kılavuza "İşlevsel renkler" bölümü olarak girer, DS hüküm kutusu bileşenini bundan sonra yazar.
+
+## K31-a · Mobil alt sekme çubuğu hâl renkleri (2026-09-06 06:45Z, DESIGN-MARKA yazdı, OPS kabul)
+
+Sekme sayısı ve adları bilgi mimarisidir (K19, MENU): Ana sayfa · Ürünler · Teklif · Hesap. Marka yalnız hâl rengini yazdı: **seçili** ikon + etiket `--text-strong` + üstte 2 px lacivert kural (14,11) · **seçilmemiş** `--text-muted` (4,83 beyazda / 4,67 `--surface-subtle`). Turkuaz seçili hâl olamaz (açık zeminde 4,08), kiremit olamaz (K5). Sekme sayacı gerekirse K30 hüküm sınıfı. Sönük işaret dosyadan (`venthub-isaret-soluk.svg`, K23). Açık zemin varsayımıyla ölçüldü; koyu zemin kullanılırsa yeniden ölçüm. **Sayı düzeltmesi:** `--brand-cyan` beyaz kontrastı 3,02/2,74 değil **4,08 / 3,94** (hüküm değişmez, 4,5 altı); DS `tokens/renk.css` aynı yanlış sayıyı taşıyor, DS emir #5 ile düzelir.
+
+## K32–K35 · Kimlik kuralları Bölüm F5–F8 (2026-09-06 12:30Z, DESIGN-MARKA yazdı, OPS kabul; kaynak `1 Venthub Marka Kilavuzu.dc.html` Bölüm F, `brand/README.md`)
+
+* **K32 · Ürün fotoğrafı kutusu (F5):** beyaz yüzey, 1 px `--border-hairline`, yarıçap 0, gölge yok; fotoğraf beyaz fonlu, kutu içinde ortalı, koyu zemine konmaz. Fotoğraf yoksa kutu KALKAR, kart 2 px lacivert üst kuralla başlar (boş kutu/yer tutucu yok, K7). Yasak: filtre, gri-ton, hover dönüşümü, alfa (K22). Fotoğraf üstüne rozet/metin bindirilmez. Kutu oranı ve ızgara MENU'nün (K11).
+* **K33 · Yarıçap istisnasının sınırı (F6):** `--radius-panel` 8 px yalnız yüzen panelin üst iki köşesi (teklif paneli, mobil alt panel); alt köşeler 0; panel içindeki hiçbir öğe yarıçap almaz. Gölge yok: 1 px kenar + `rgba(26,43,74,0.45)` perde + altında kısılmış gerçek kabuk. Panelde tek dolu kiremit düğme (K5). İstisna genişletilmez; yeni 8 px isteği ayrı karar.
+* **K34 · Mono bölüm etiketi (F7):** IBM Plex Mono, büyük harf, 9/11/12 px, harf aralığı 0,08–0,14em, `tabular-nums`; sarmaz, kısaltılır. Renk zemine göre: kart/beyaz turkuaz etiket `--brand-cyan-ink` (5,65) · ikincil `--text-muted` (4,83) · sayfa zemini `--text-body` (6,83; muted 4,39 yetersiz) · koyu bant `--text-on-dark-muted` · `--surface-dark-inset` beyaz (11,57). Büyük harf yalnız etiket/rozet.
+* **K35 · P-Q eğrisi çizim dili (F8):** ana eğri 2 px lacivert · ikincil 1,5 px turkuaz · ızgara 1 px `--border-row` · eksen 1 px `--border-control`; dördüncü seri kesikli lacivert, yeni renk yok. Çalışma noktası KİREMİT (5 px daire + 1 px iniş + mono etiket), grafikteki tek kiremit; eğri asla kiremit değil (K5). Yasak: dolgu, gradyan, gölge, 3B, yuvarlatılmış uç, animasyon, ok başı. Ölçü 520×260 / 330×200; mobilde ikincil seri düşer, çalışma noktası düşmez; verisi olmayan modelde eğri çizilmez (K7). DS `PQEgrisi` bu kuralı uygular.
+
+*Numara notu:* Kararlar numaralarını OPS verir; Marka'nın K32–K35 numaraları bu kez çakışmadı, aynen alındı. v17 kabuk kararı (Recep'te) verilirse **K36** olur.
+
+**K35 eki · K5 istisnası ve çizgi ağırlığı (2026-09-06 14:00Z, OPS):** P-Q eğrisinin çalışma noktası kiremidin üçüncü ve SON izinli kullanımıdır (K5: logo üst dilimi · sayfanın tek ana eylemi · P-Q çalışma noktası); ton `--action-terracotta` (deep değil; deep düğme zemini). Ana eğri **2 px** lacivert, ikincil 1,5 px turkuaz (F8). **Ölçüt notu:** token değerinin kaynağı HSL üçlüsüdür; kılavuzdaki hex yalnız etikettir — HSL→hex yuvarlaması (örn. #24395C → #24385C) ihlal değildir, ham-hex denetimi HSL karşılığıyla ölçer.
+
+## K18 · BAŞLIK DÜZELTMESİ — K18 KARARDIR (Recep: "önce A, geliştikçe C", üç kez; son teyit 2026-09-06 ~17:40 TR; OPS 14:45Z)
+
+**Kayıt kusuru OPS'ta:** Recep'in A + C kararı K18 ekinde 09-05'te yazılmış, ama K18 başlığı "İSTİŞARE — KARAR DEĞİL" kalmıştı; Menü ve DS bu yüzden "A+C kararı bekliyor" diye üç kez sordu, Recep üç kez cevapladı. **K18 KARARDIR:** Ürün Seçici = **A** (tek sayfa form, K18-a kanonik girdi kümesi) + **C** (rehberli sorular kabuğu, kip anahtarı; Faz 3'te açılır, çizimde "kural tablosu sonrası" etiketiyle); **B çizilmez, arşiv.** Yukarıdaki K18 başlığındaki "İSTİŞARE" ibaresi geçersizdir. Uygulama: Menü emir 09-06 #7 (v17'ye kare). Bir daha sorulmaz.
+
+### K18-c · Ürün Seçici prototipi = ölçüm aracı (2026-09-06, OPS hükmü; Recep bilgi)
+
+Menü'nün 6 maddesi: **(1)+(2) KABUL şimdi** — A+C çalışan prototip, veri Supabase'den alınmış JSON dosyası (damga + üreten sorgu; uydurma sayı 0, K18a). **Kural motoru ayrı dosya** `secim-kurallari.json` **= tek kaynak**; prototip ve kod (URUN seçim motoru) aynı dosyadan, iki motor olmaz. **(4) KABUL** (1) bitince (localStorage, yalnız izleyenin tarayıcısı). **(5) KABUL** (#7 kapsamı). **(6) KABUL** prototip hazır olunca (canlı ↔ prototip sayıları). **(3) RET bugün:** kare dış ağa çıkamaz; API anahtarı proje dosyasına girer = sır; C'nin serbest-metin değeri 10 örnek cümle → kanonik girdi eşleme tablosuyla deterministik ölçülür; gerçek dil modeli çevirisi sunucuda, ayrı kayıt. Emir: Menü #9.
+
+### K37 · Yöntem: dinamik, statik değil (2026-09-06, Recep KARARI; OPS kayda aldı — geç kaldı, DEVIR.md'den ölçüldü)
+
+Recep: "statik istemiyorum, dinamik istiyorum ki doğru şekilde analiz edebileyim." Tasarım kararı çalıştırılarak verilir. Ürün Seçici A+C **çalışan prototip** (K18 kuralları geçerli). Paket sırası: gerçek veri JSON (damga+sorgu, uydurma 0) → kural motoru `secim-kurallari.json` TEK KAYNAK (kod aynı dosyadan) → prototip → localStorage oturum kaydı → D5 tweak anahtarları (kip · Hesap · hareket). **Claude API adımı YOK** (Recep + OPS hemfikir): serbest metin 10 örnek cümle → kanonik girdi eşleme tablosuyla ölçülür. K18-c bu maddeyle birleşti. Emir: Menü #10.
+
+### K37-a · Recep'in UI iyileştirmeleri (2026-09-06, Recep → Menü; kayda OPS aldı)
+
+**U1** Ekran 11 karşılaştırma "farkı göster": aynı satırlar katlanır, seçili model sabitlenir. **U2** Bilgi Merkezi (ekran 14) iç tasarımı: içindekiler · arama · ilgili makale · ürün bağı. **U3** Ekran 58 panel mi kalıcı sütun mu: Menü iki hâli tek karede önerir, karar Recep'in (yapısal, tek başına sorulur). Hepsi Menü #10 paketinde, prototipten sonra aynı sohbette. Emir #8 (yetenek envanteri) KAPANDI: `kabuk-v2-notlar.md` "Yetenekler" 19/0.

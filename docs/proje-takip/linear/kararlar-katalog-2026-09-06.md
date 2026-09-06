@@ -1,7 +1,9 @@
-# AYNA · Kararlar — Katalog ve Ürün Verisi · dışa aktarım 2026-09-06 (OPS)
+# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-06 ayna: K1–K7.10)
 
-> Kaynak: Linear belgesi `Kararlar — Katalog ve Ürün Verisi` (id 935079bf-b265-49d2-854a-a334abea07af), `updatedAt 2026-09-05T15:14:34Z`.
-> Bu dosya kopyadır; çelişirse Linear kazanır. Not: URUN-KATALOG'un 2026-09-06 gece andığı "K7.7" (Tier C temizliği Recep onayı) ve "K7.9" (Heatmaster/Slimroof sırası) bu belgede YOK — REC-155/REC-146 yorumlarında; OPS bugün belgeye taşıyacak.
+<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-06T07:31:18.470Z · kopya: 2026-09-06T11:20Z -->
+<!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
+
+> Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır.
 
 Tek kaynak; karar buraya yazılmadan verilmiş sayılmaz.
 
@@ -49,5 +51,10 @@ REC-146 Adım 1/1b/2a raporları sunuldu, Recep yedi maddelik sorun listesine ka
 
 *2026-09-04 ilk sürüm (OPS). 2026-09-05 K7 eklendi (URUN-KATALOG, Recep'in doğrudan kararı).*
 
----
-*Ayna notu (OPS, 2026-09-06): Tier C iç notu temizliği KOŞULDU (187 ürün + 11 aile, 2026-09-06 00:44–00:47 TR, REC-155); seri metinleri Lineo/Lineo Quiet/Slimroof/Heatmaster taslak (PR #1025/#1027, DB'ye yazılmadı); 10 aile/109 ürün "tek model sayısı" bulgusu (PR #1027 raporu) → konformans kapısı URUN kuyruğunda.*
+## K7.10 · AVenS: kaynağı olmayan aileye satılabilir sayfa yazılmaz (2026-09-06 09:50Z, **Recep kararı**: "Avens için de onay verdim" — OPS önerisi kabul; kaynak: URUN-KATALOG üç bağımsız ajan ölçümü, dalga 3)
+
+* **BVU-LS serisi + hız anahtarları:** kaynakta anlatım yok, yalnız kod + fiyat → **satılabilir sayfa YAZILMAZ**. AVenS'ten teknik föy istenir (K7.6 kanalıyla Recep iletir); gelene kadar sayfalar kod + fiyat kısa kimlik hâlinde kalır, tarama listesinden düşmez, satış anlatımı olmaz.
+* **Sulu batarya:** yazılır.
+* **Elektrikli ısıtıcı:** yalnız **aksesuar** olarak; bağımsız ürün sayfası değil.
+* **HF/FW + HF/S:** sınırda — kaynak yetersizse yazılmaz; yazılırsa kapıdan GÜÇLÜ geçmeli (ZAYIF doğrulama yetmez).
+* "Kendi markamız" uydurma izni **değildir** (K7 aynen). Dalga 4 diye iş yok; taslak işi 40/40 bitti (31 sayımdı, ölçüm 40).
