@@ -142,8 +142,9 @@ ikisi de "beyan ile depo hâli ayrışıyor" sınıfı, tam olarak yakalaması i
    "kapsandı" verir — 09-06 bulgusu): kapsanmayan elle yazılmış belge varsa demete girer, sızma varsa düşer. README kuralı: elle
    yazılmış karar/kurulum notu taşıyan README girer (demet 16), şablon/araç/üçüncü taraf README girmez.
 6. **Gürültü sınırı:** konuşma günlüğü demeti son 14 gün (eskisi arşiv defterine); pano demeti son 7 gün; ikisi de ev dizininde (repo PUBLIC).
+7. **Bayatlık ölçümü deftere sorulur:** "hangi kaynağın damgası en eski / hangi kaynak kendi içinde çelişiyor" — cevap `source list`
+   damgalarıyla doğrulanır; kaynak damgası (`kaynak_updatedAt`, `kopya`) taşımayan dışa aktarım dosyası kabul edilmez.
 8. **Günlük notu kısaltma yazmaz (09-06 olayı):** OPS günlüğünde "model yönlendirme (sabah cetvel)" yazınca defter bunu
    "sabah cetvele işlendi = yapıldı" diye okudu; gerçek durum "yarın sabah yazılacak"tı. Deftere giden her not kalemi
    durum sözcüğü taşır: **YAPILDI / AÇIK / YARIN / ÇÜRÜDÜ**; parantez içi kısaltma durum belirtmez.
-7. **Bayatlık ölçümü deftere sorulur:** "hangi kaynağın damgası en eski / hangi kaynak kendi içinde çelişiyor" — cevap `source list`
-   damgalarıyla doğrulanır; kaynak damgası (`kaynak_updatedAt`, `kopya`) taşımayan dışa aktarım dosyası kabul edilmez.
+9. **Belge içi düzeltme tarihçesi çelişki DEĞİLDİR; çürüyen satır etiketlenir (09-06 taraması, `defter-hijyen-2026-09-06.md` §7):** deftere "çelişki listele" denince 12 maddenin 9'u aynı belgenin "X diyordu → ölçüm Y" anlatımıydı (checkout başlık bloğu, quote Ç10/Ç11 çelişki tablosu, katalog varsayım→ölçüm satırları). Üç kural: (a) bir belge kendi eski iddiasını düzeltiyorsa eski satır **[ÇÜRÜDÜ · tarih]** etiketi taşır ya da tarihçe bloğuna iner; (b) defter sorgusu "aynı belgenin kendi düzeltme tarihçesini çelişki sayma; yalnız iki AYRI kaynağın bugün farklı hüküm verdiği yerleri yaz" cümlesiyle sorulur; (c) defterin başka kaynağın anlattığı dosyayı (örn. hijyen raporunda anılan `design/menu/kararlar-*`) kaynak sanması **ikinci el anma**dır, bulgu dosya sisteminde ölçülmeden işe dönüşmez.
