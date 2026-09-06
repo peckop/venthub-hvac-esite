@@ -81,7 +81,10 @@ REF = re.compile(
 
 # Doğrulanabilir jetonlar — dile bağlı OLMAYAN işaretler:
 JETON_DESENLERI = [
-    re.compile(r"\bIP\s?[0-9X][0-9]\b", re.I),                 # IP55, IPX5
+    # IP55 · IPX5 · IP-55 (AVenS fiyat listesi TIRELI yazar; tire tanınmayınca o cümle
+    # sessizce "olculemeyen"e düşüyordu — alt-ajan fark etti ve kaynağa sadık kalıp
+    # "IP-55" yazdı, doğru davranış. Kapı artık iki biçimi de görür.)
+    re.compile(r"\bIP\s?[-]?\s?[0-9X][0-9]\b", re.I),
     re.compile(r"\bEN\s?[0-9]{3,5}(?:-[0-9]+)?\b"),            # EN 12101-3, EN 60335
     # ⚠ ONDALIK AYIRICI SAYININ PARCASIDIR. Ilk surum `0,18 kW` icinden `18 kW` cikariyordu
     # ve kaynakta "0,18 kW" yazdigi halde "sayfada YOK: 18 kW" diye YANLIS KIRMIZI veriyordu.
