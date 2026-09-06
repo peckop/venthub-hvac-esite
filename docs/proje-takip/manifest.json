@@ -6,6 +6,7 @@
     "repo": ".",
     "hafiza": "~/.claude/projects/c--Users-alize-venthub-hvac/memory",
     "gunluk": "~/.claude/projects/c--Users-alize-venthub-hvac/konusma-gunlugu",
+    "pano": "~/.claude/projects/c--Users-alize-venthub-hvac/pano-gunlugu",
     "_not": "~ ev dizinine acilir (os.path.expanduser); VENTHUB_PROJE_TAKIP_HAFIZA ortam degiskeni verilirse o kazanir (INV-MUTLAK-YOL-1: kimlik sizdiran mutlak yol depoya girmez)"
   },
   "demet_ust_siniri_bayt": 900000,
@@ -31,7 +32,14 @@
       "dahil": ["docs/proje-takip/*.md"] },
     { "ad": "12-konusma-gunlugu", "baslik": "Konusma gunlugu: Recep ile Claude arasindaki gun bazli konusma (sir suzgecinden gecmis, depoya girmez)", "kok": "gunluk",
       "dahil": ["*.md"],
-      "_not": "scripts/nlm/konusma_gunlugu.py uret --kip ozet ile uretilir (Recep metni tam + her turun son Claude cevabi). Repo PUBLIC oldugu icin dosyalar depoda DEGIL, ev dizininde; deftere buradan gider. Recep 09-04: 'konusma gecmisini de NLM e koysak'." }
+      "_not": "scripts/nlm/konusma_gunlugu.py uret --kip ozet ile uretilir (Recep metni tam + her turun son Claude cevabi). Repo PUBLIC oldugu icin dosyalar depoda DEGIL, ev dizininde; deftere buradan gider. Recep 09-04: 'konusma gecmisini de NLM e koysak'." },
+    { "ad": "13-pano-olaylari", "baslik": "Ajanlar arasi pano (telsiz) notlari, son 7 gun; prob notlari haric; repo PUBLIC oldugu icin dosya ev dizininde (scripts/nlm/pano_disa_aktar.py --hedef <pano-koku>/pano-olaylari-son7gun-<tarih>.md)", "kok": "pano",
+      "dahil": ["*.md"] },
+    { "ad": "14-design-notlari", "baslik": "Claude Design 4 projesinin elle yazilmis notlari (emirler, teslim notlari, olcumler); Kararlar kopyalari haric (tek kopya = 08)", "kok": "repo",
+      "dahil": ["docs/proje-takip/design/*/*.md", "docs/proje-takip/design/*/*/*.md", "docs/proje-takip/design/*/*/*/*.md", "docs/proje-takip/design/*.md"],
+      "haric": ["kararlar-*.md", "anahtar-ve-kip-haritasi-*.md", "venthub-canli-durum.md"] },
+    { "ad": "15-linear-is-dagilimi", "baslik": "Linear disa aktarimi: TUM isler proje/kilometre tasi/durum/serit ile (santiye durumu; % bitti)", "kok": "repo",
+      "dahil": ["docs/proje-takip/linear/is-dagilimi-*.md"] }
   ],
   "asla_dahil_etme": {
     "nicin": "koddan / aractan URETILMIS; tazelik kapisi ayri (uretilmis-artefakt-standard). Deftere girerse NLM cevaplari kod snapshot'ina baglanir ve drift eder.",
