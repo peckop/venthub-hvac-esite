@@ -1,5 +1,7 @@
 import { unstable_cache } from 'next/cache'
 
+import { resolveTenant } from '../tenantResolver'
+
 /**
  * SATIŞ KİPİ ANAHTARI — tek okuma noktası (REC-168).
  * Cetvel: docs/standards/satis-kipi-gecis-standard.md §3 (arayüz sözleşmesi).
@@ -29,10 +31,20 @@ import { unstable_cache } from 'next/cache'
  * YOK SAYILIR (kapı: INV-SATIS-KIPI-3). Preview aynı prod DB'yi okur; provayı DB'de açmak
  * prod'u da açardı — zorlama bu yüzden var.
  *
- * KURAL 12 NOTU: tag bugün tenant'sız (`satis-kipi`); Faz 2 açılırsa `satis-kipi-${tenantId}`
- * ve okuma tenant'a göre — bu dosya o gün değişir, çağıranlar değişmez.
+ * KURAL 12 (OPS hükmü 2026-09-06, URUN sorusu üzerine): `unstable_cache` ANAHTARI `tenantId` İÇERİR —
+ * kuralın özü kiracılar arası sızıntı; Faz 2 açıldığında global bir anahtar bir kiracının satış kipini
+ * ötekine servis ederdi. `lang` anahtara GİRMEZ: değer dilden bağımsız bir boolean, kuralın lang şartı
+ * dile bağlı içerik içindir (cetvel §3.6'da yazılı istisna). TAG global kalır (`SATIS_KIPI_TAG`) — tazeleme
+ * öyle çalışır; ayrıca tenant'a özel tag da eklenir (`satisKipiTag(tenantId)`, homeDataTag deseni).
+ * Veri bugün site geneli (tek satır, tek kiracı — REC-88 PARK); sorgu tenant'a bağlandığı gün bu dosya
+ * değişir, çağıranlar değişmez.
  */
 export const SATIS_KIPI_TAG = 'satis-kipi'
+
+/** Tenant'a özel tag (kural 12; homeDataTag deseni). Global tag ile birlikte kullanılır. */
+export function satisKipiTag(tenantId: string): string {
+  return `${SATIS_KIPI_TAG}-${tenantId}`
+}
 
 export type SatisKipiKaynak = 'db' | 'onizleme-zorlama' | 'kapali-varsayilan'
 
@@ -74,12 +86,18 @@ async function dbdenOku(): Promise<SatisKipi> {
   }
 }
 
-const onbellekli = unstable_cache(dbdenOku, ['satis-kipi'], { tags: [SATIS_KIPI_TAG] })
+// Anahtar tenant başına kurulur (getCachedHomeData deseni): aynı tenantId → aynı önbellek girdisi.
+const onbellekli = (tenantId: string) =>
+  unstable_cache(dbdenOku, ['satis-kipi', tenantId], { tags: [SATIS_KIPI_TAG, satisKipiTag(tenantId)] })
 
-/** Satış kipini okur. RSC / route handler / sitemap içinden çağrılır; istemci bileşenine PROP ile geçilir. */
-export async function satisKipiOku(): Promise<SatisKipi> {
+/**
+ * Satış kipini okur. RSC / route handler / sitemap içinden çağrılır; istemci bileşenine PROP ile geçilir.
+ * `tenantId` verilmezse resolver'ın VARSAYILAN tenant'ı (bugün tek kiracı). Host'tan çözülen tenant'ı
+ * bilen çağıran (layout) onu geçer; bilmeyen (sitemap) varsayılanla kalır.
+ */
+export async function satisKipiOku(tenantId: string = resolveTenant(undefined).tenantId): Promise<SatisKipi> {
   if (process.env.VERCEL_ENV === 'preview' && process.env.SATIS_KIPI_ONIZLEME === '1') {
     return { acik: true, damga: null, kaynak: 'onizleme-zorlama' }
   }
-  return onbellekli()
+  return onbellekli(tenantId)()
 }
