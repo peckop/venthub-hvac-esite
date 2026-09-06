@@ -268,7 +268,7 @@ skills:
     exclusions: []
     commands: {}
     recovery:
-      on_auth_expired: notebooklm login  # 2026-08-17: urun degisti (teng-lin/notebooklm-py); eski nlm-*.ps1 SILINDI
+      on_auth_expired: notebooklm login
   - name: notebooklm-sync
     path: .agent/skills/notebooklm-sync/SKILL.md
     description: Projedeki Markdown (.md) dosyalarını NotebookLM ile senkronize (nlm
@@ -289,9 +289,9 @@ skills:
     exclusions: []
     commands: {}
     recovery:
-      on_auth_expired: notebooklm login  # 2026-08-17: urun degisti (teng-lin/notebooklm-py); eski nlm-*.ps1 SILINDI
+      on_auth_expired: notebooklm login
     prerequisites:
-    - nlm login
+    - notebooklm login
   - name: orion-cli
     path: .agent/skills/orion-cli/SKILL.md
     description: Orion CLI dokümantasyon pipeline komutlarını öğretir, tree veya şema
@@ -312,7 +312,7 @@ skills:
     exclusions: []
     commands: {}
     recovery:
-      on_auth_expired: notebooklm login  # 2026-08-17: urun degisti (teng-lin/notebooklm-py); eski nlm-*.ps1 SILINDI
+      on_auth_expired: notebooklm login
     prerequisites:
     - OPENROUTER_API_KEY
     - nlm login (NotebookLM sync için)
@@ -444,26 +444,6 @@ skills:
     depends_on: []
     next_steps:
     - web-design-guidelines
-    run_last: false
-    exclusions: []
-    commands: {}
-  - name: venthub-architecture
-    path: .agent/skills/venthub-architecture/SKILL.md
-    description: Defines VentHub architecture, component patterns, and Next.js App
-      Router rules. Trigger for creating new components (yeni bileşen oluştur), React
-      Server Components (RSC render), or PPR configuration (PPR config). Do NOT use
-      for git commands, database resets, or running unit tests.
-    triggers_on:
-    - yeni bileşen oluştur
-    - RSC render
-    - PPR config
-    inputs:
-    - code design query
-    outputs:
-    - architecture compliance guidelines
-    depends_on: []
-    next_steps:
-    - venthub-auditor
     run_last: false
     exclusions: []
     commands: {}
@@ -610,8 +590,8 @@ skills:
     path: .agent/skills/plan-challenger/SKILL.md
     description: 'VentHub teknik PLANLARINI (docs/plans/*.md) uygulamadan ÖNCE bağımsız
       red-team denetiminden geçirir: plandaki varsayımları somut koda dayanarak ÇÜRÜTÜR
-      (RLS/tenant izolasyon, RSC/use-client sınırı, PPR/Suspense, Edge runtime kısıtları,
-      webhook idempotency, migration auto-apply, DI, i18n parity) ve red_team_report.md
+      (RLS/tenant izolasyon, RSC/use-client sınırı, Suspense sınırı, Edge runtime
+      kısıtları, webhook idempotency, migration auto-apply, DI, i18n parity) ve red_team_report.md
       üretir. Tetik: planı çürüt, red team denetle, plan challenge, planı stress-test
       et. Kod integrity check için venthub-auditor, enterprise teslim denetimi için
       venthub-enterprise-audit, git/test/db işlemleri için KULLANMA.'

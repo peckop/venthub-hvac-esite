@@ -1,0 +1,59 @@
+{
+  "_not": "12 egitim (8 should + 4 should_not) + 8 test (4 + 4) = 20; test kumesi optimizasyon dongusunun DISINDA tutulur",
+  "train": {
+    "should_trigger": [
+      "vitrin tasarımında kart eylemi çerçeveli mi dolu mu olmalı?",
+      "Menü projesine yeni emir yaz: ekran 07 gerçek SEAT verisiyle",
+      "bu kare kabul edilir mi, ölçüm satırını yaz",
+      "ürün sayfasında fiyatsız ürün satış kipinde nasıl görünür?",
+      "kurumsal belge kartviziti tasarım kurallarına uyuyor mu",
+      "design system kuralı: turkuaz metin rengi olabilir mi",
+      "Claude Design'a giden emir dosyasının kalıbı ne",
+      "tasarım dili: kip anahtarı nerede tanımlı"
+    ],
+    "should_not_trigger": [
+      "ürün fiyatlarını veritabanına yükle",
+      "git commit at ve PR aç",
+      "vitest testlerini koştur",
+      "bana bir logo görseli üret"
+    ]
+  },
+  "test": {
+    "should_trigger": [
+      "karşılaştırma sayfasında durum sönükleştirmesi alfa ile yapılmış, doğru mu?",
+      "Marka projesinden gelen ikon kontur kalınlığı sözleşmeye uygun mu",
+      "ürün seçici prototipi karesini değerlendir",
+      "Kararlar K39 vitrinde nasıl uygulanır"
+    ],
+    "should_not_trigger": [
+      "Supabase migration yaz",
+      "hazır bir landing page teması öner",
+      "notebooklm defterini eşitle",
+      "i18n sözlüğüne yeni anahtar ekle"
+    ]
+  },
+  "should_trigger": [
+    "vitrin tasarımında kart eylemi çerçeveli mi dolu mu olmalı?",
+    "Menü projesine yeni emir yaz: ekran 07 gerçek SEAT verisiyle",
+    "bu kare kabul edilir mi, ölçüm satırını yaz",
+    "ürün sayfasında fiyatsız ürün satış kipinde nasıl görünür?",
+    "kurumsal belge kartviziti tasarım kurallarına uyuyor mu",
+    "design system kuralı: turkuaz metin rengi olabilir mi",
+    "Claude Design'a giden emir dosyasının kalıbı ne",
+    "tasarım dili: kip anahtarı nerede tanımlı",
+    "karşılaştırma sayfasında durum sönükleştirmesi alfa ile yapılmış, doğru mu?",
+    "Marka projesinden gelen ikon kontur kalınlığı sözleşmeye uygun mu",
+    "ürün seçici prototipi karesini değerlendir",
+    "Kararlar K39 vitrinde nasıl uygulanır"
+  ],
+  "should_not_trigger": [
+    "ürün fiyatlarını veritabanına yükle",
+    "git commit at ve PR aç",
+    "vitest testlerini koştur",
+    "bana bir logo görseli üret",
+    "Supabase migration yaz",
+    "hazır bir landing page teması öner",
+    "notebooklm defterini eşitle",
+    "i18n sözlüğüne yeni anahtar ekle"
+  ]
+}
