@@ -1,11 +1,8 @@
 {
- "damga": "2026-09-06T11:46:36Z",
- "kaynak": "Linear MCP list_issues",
+ "damga": "2026-09-06T12:18:22Z",
+ "kaynak": "Linear GraphQL issues",
  "toplam": 167,
- "takim": "Recep's Workspace (be9158e8-d73a-48d9-8f12-01de477731da)",
- "cagri_sayisi": 3,
- "hasNextPage": false,
- "isler": [
+ "kayitlar": [
   {
    "identifier": "REC-1",
    "title": "Get familiar with Linear",
@@ -15,8 +12,7 @@
    "project": null,
    "projectMilestone": null,
    "labels": [],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-11T09:43:38.107Z",
    "updatedAt": "2026-03-11T09:43:38.107Z",
    "completedAt": null,
@@ -31,8 +27,7 @@
    "project": null,
    "projectMilestone": null,
    "labels": [],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-11T09:43:38.107Z",
    "updatedAt": "2026-03-11T09:43:38.107Z",
    "completedAt": null,
@@ -47,8 +42,7 @@
    "project": null,
    "projectMilestone": null,
    "labels": [],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-11T09:43:38.107Z",
    "updatedAt": "2026-03-11T09:43:38.107Z",
    "completedAt": null,
@@ -63,8 +57,7 @@
    "project": null,
    "projectMilestone": null,
    "labels": [],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-11T09:43:38.107Z",
    "updatedAt": "2026-03-11T09:43:38.107Z",
    "completedAt": null,
@@ -79,8 +72,7 @@
    "project": "Q-Validator",
    "projectMilestone": "P01-Data-Foundation",
    "labels": [],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-03-27T20:39:00.498Z",
    "updatedAt": "2026-03-27T21:28:50.449Z",
    "completedAt": "2026-03-27T20:51:48.416Z",
@@ -95,8 +87,7 @@
    "project": "Q-Validator",
    "projectMilestone": "P01-Data-Foundation",
    "labels": [],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-03-27T20:39:26.043Z",
    "updatedAt": "2026-03-27T20:51:49.375Z",
    "completedAt": "2026-03-27T20:51:49.362Z",
@@ -111,8 +102,7 @@
    "project": "Q-Validator",
    "projectMilestone": "P01-Data-Foundation",
    "labels": [],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-03-27T20:39:27.060Z",
    "updatedAt": "2026-03-27T20:51:50.571Z",
    "completedAt": "2026-03-27T20:51:50.561Z",
@@ -127,8 +117,7 @@
    "project": "Q-Validator",
    "projectMilestone": "P01-Data-Foundation",
    "labels": [],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-03-27T20:39:28.145Z",
    "updatedAt": "2026-03-27T20:51:51.711Z",
    "completedAt": "2026-03-27T20:51:51.697Z",
@@ -143,8 +132,7 @@
    "project": "Q-Validator",
    "projectMilestone": "P01-Data-Foundation",
    "labels": [],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-03-27T20:39:28.971Z",
    "updatedAt": "2026-03-27T20:51:52.701Z",
    "completedAt": "2026-03-27T20:51:52.688Z",
@@ -161,8 +149,7 @@
    "labels": [
     "P01-Data"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:30:53.623Z",
    "updatedAt": "2026-03-28T21:30:53.623Z",
    "completedAt": "2026-03-28T21:30:53.651Z",
@@ -179,8 +166,7 @@
    "labels": [
     "P01-Data"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:30:54.817Z",
    "updatedAt": "2026-03-28T21:30:54.817Z",
    "completedAt": "2026-03-28T21:30:54.846Z",
@@ -197,8 +183,7 @@
    "labels": [
     "P01-Data"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:30:56.744Z",
    "updatedAt": "2026-03-28T21:30:56.744Z",
    "completedAt": "2026-03-28T21:30:56.764Z",
@@ -215,8 +200,7 @@
    "labels": [
     "P02-Constraint"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:30:58.364Z",
    "updatedAt": "2026-03-28T21:30:58.364Z",
    "completedAt": "2026-03-28T21:30:58.476Z",
@@ -233,8 +217,7 @@
    "labels": [
     "P02-Constraint"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:30:59.796Z",
    "updatedAt": "2026-03-28T21:30:59.796Z",
    "completedAt": "2026-03-28T21:30:59.814Z",
@@ -251,8 +234,7 @@
    "labels": [
     "P02-Constraint"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:31:02.509Z",
    "updatedAt": "2026-03-28T21:31:02.509Z",
    "completedAt": "2026-03-28T21:31:02.531Z",
@@ -269,8 +251,7 @@
    "labels": [
     "P02-Constraint"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:31:06.412Z",
    "updatedAt": "2026-03-28T21:31:06.412Z",
    "completedAt": "2026-03-28T21:31:06.805Z",
@@ -287,8 +268,7 @@
    "labels": [
     "P02-Constraint"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:31:08.676Z",
    "updatedAt": "2026-03-28T21:31:08.676Z",
    "completedAt": "2026-03-28T21:31:08.723Z",
@@ -305,8 +285,7 @@
    "labels": [
     "P02-Constraint"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:31:09.951Z",
    "updatedAt": "2026-03-28T21:57:24.930Z",
    "completedAt": "2026-03-28T21:57:24.921Z",
@@ -323,8 +302,7 @@
    "labels": [
     "P03-API"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:31:11.156Z",
    "updatedAt": "2026-03-28T21:31:11.156Z",
    "completedAt": null,
@@ -341,8 +319,7 @@
    "labels": [
     "P03-API"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:31:12.236Z",
    "updatedAt": "2026-03-28T21:31:12.236Z",
    "completedAt": null,
@@ -359,8 +336,7 @@
    "labels": [
     "P03-API"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-28T21:31:13.120Z",
    "updatedAt": "2026-03-28T21:31:13.120Z",
    "completedAt": null,
@@ -375,8 +351,7 @@
    "project": "Q-Validator",
    "projectMilestone": null,
    "labels": [],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-03-28T21:57:41.028Z",
    "updatedAt": "2026-03-29T05:57:14.720Z",
    "completedAt": "2026-03-29T05:57:14.710Z",
@@ -393,8 +368,7 @@
    "labels": [
     "P01-Data"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-03-28T21:57:41.935Z",
    "updatedAt": "2026-03-29T06:32:48.917Z",
    "completedAt": null,
@@ -409,8 +383,7 @@
    "project": "Q-Validator",
    "projectMilestone": null,
    "labels": [],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-03-28T22:44:52.592Z",
    "updatedAt": "2026-03-29T05:57:12.929Z",
    "completedAt": "2026-03-29T05:57:12.914Z",
@@ -425,8 +398,7 @@
    "project": "Q-Validator",
    "projectMilestone": null,
    "labels": [],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-03-28T22:56:47.280Z",
    "updatedAt": "2026-03-28T23:06:58.447Z",
    "completedAt": "2026-03-28T23:06:58.432Z",
@@ -443,8 +415,7 @@
    "labels": [
     "P04-Research"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-03-31T11:49:46.774Z",
    "updatedAt": "2026-03-31T11:49:46.774Z",
    "completedAt": "2026-03-31T11:49:47.526Z",
@@ -461,8 +432,7 @@
    "labels": [
     "P04-Research"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-03-31T12:20:14.459Z",
    "updatedAt": "2026-03-31T13:34:07.229Z",
    "completedAt": "2026-03-31T13:34:07.214Z",
@@ -477,8 +447,7 @@
    "project": "Q-Validator",
    "projectMilestone": null,
    "labels": [],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-31T13:00:55.895Z",
    "updatedAt": "2026-03-31T13:12:46.725Z",
    "completedAt": null,
@@ -493,8 +462,7 @@
    "project": "Q-Validator",
    "projectMilestone": null,
    "labels": [],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-31T13:00:57.636Z",
    "updatedAt": "2026-03-31T13:00:57.636Z",
    "completedAt": null,
@@ -509,8 +477,7 @@
    "project": "Q-Validator",
    "projectMilestone": null,
    "labels": [],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-31T13:00:59.500Z",
    "updatedAt": "2026-03-31T13:00:59.500Z",
    "completedAt": null,
@@ -525,8 +492,7 @@
    "project": "Q-Validator",
    "projectMilestone": null,
    "labels": [],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-03-31T13:01:01.250Z",
    "updatedAt": "2026-03-31T13:01:01.250Z",
    "completedAt": null,
@@ -543,8 +509,7 @@
    "labels": [
     "P04-Research"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-03-31T17:59:36.857Z",
    "updatedAt": "2026-03-31T18:19:55.221Z",
    "completedAt": "2026-03-31T18:19:55.212Z",
@@ -559,8 +524,7 @@
    "project": null,
    "projectMilestone": null,
    "labels": [],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-04-05T11:27:34.132Z",
    "updatedAt": "2026-04-05T11:27:34.132Z",
    "completedAt": null,
@@ -577,8 +541,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T09:15:35.289Z",
    "updatedAt": "2026-09-03T13:37:49.469Z",
    "completedAt": "2026-08-27T12:16:23.283Z",
@@ -595,8 +558,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T09:15:38.486Z",
    "updatedAt": "2026-09-03T13:37:52.366Z",
    "completedAt": "2026-08-27T12:16:26.715Z",
@@ -611,11 +573,10 @@
    "project": "Teklif Akışı ve Müşteri Paneli",
    "projectMilestone": "Satış kipi (şirket sonrası)",
    "labels": [
-    "Recep kapısı",
-    "ALTYAPI"
+    "ALTYAPI",
+    "Recep kapısı"
    ],
-   "priority": "Urgent",
-   "priorityValue": 1,
+   "priority": 1,
    "createdAt": "2026-08-24T09:15:41.146Z",
    "updatedAt": "2026-09-03T13:38:54.081Z",
    "completedAt": "2026-08-27T12:16:30.900Z",
@@ -632,8 +593,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T09:15:54.204Z",
    "updatedAt": "2026-09-03T13:37:46.625Z",
    "completedAt": "2026-08-27T12:16:33.651Z",
@@ -650,8 +610,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T09:15:56.681Z",
    "updatedAt": "2026-09-03T13:37:54.880Z",
    "completedAt": "2026-08-27T12:16:36.149Z",
@@ -668,8 +627,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-08-24T09:15:59.298Z",
    "updatedAt": "2026-09-03T13:35:55.110Z",
    "completedAt": "2026-08-27T12:16:38.584Z",
@@ -686,8 +644,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T09:16:02.148Z",
    "updatedAt": "2026-09-03T13:38:56.658Z",
    "completedAt": "2026-08-27T12:16:41.911Z",
@@ -704,8 +661,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T09:16:12.926Z",
    "updatedAt": "2026-09-03T13:37:14.603Z",
    "completedAt": "2026-08-25T06:39:12.804Z",
@@ -722,8 +678,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T09:16:17.464Z",
    "updatedAt": "2026-09-03T13:38:06.063Z",
    "completedAt": "2026-08-26T17:31:02.940Z",
@@ -740,8 +695,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T09:53:52.666Z",
    "updatedAt": "2026-09-03T13:38:26.805Z",
    "completedAt": null,
@@ -758,8 +712,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T09:53:55.147Z",
    "updatedAt": "2026-09-03T13:35:57.737Z",
    "completedAt": null,
@@ -776,8 +729,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T09:53:57.980Z",
    "updatedAt": "2026-09-03T13:38:34.697Z",
    "completedAt": null,
@@ -794,8 +746,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T09:54:00.477Z",
    "updatedAt": "2026-09-03T13:38:32.109Z",
    "completedAt": null,
@@ -812,8 +763,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T09:54:03.241Z",
    "updatedAt": "2026-09-03T13:38:48.579Z",
    "completedAt": null,
@@ -830,8 +780,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T09:54:05.961Z",
    "updatedAt": "2026-09-03T13:38:45.272Z",
    "completedAt": null,
@@ -848,8 +797,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T09:54:14.316Z",
    "updatedAt": "2026-09-03T13:38:59.010Z",
    "completedAt": null,
@@ -864,11 +812,10 @@
    "project": "SEO ve Yayın",
    "projectMilestone": "Bing kökü ve hreflang",
    "labels": [
-    "Recep kapısı",
-    "OPS"
+    "OPS",
+    "Recep kapısı"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T09:54:17.237Z",
    "updatedAt": "2026-09-03T13:36:25.483Z",
    "completedAt": null,
@@ -883,11 +830,10 @@
    "project": "Altyapı, Kapılar ve Belge Hattı",
    "projectMilestone": "Kapı kör kolları",
    "labels": [
-    "Recep kapısı",
-    "OPS"
+    "OPS",
+    "Recep kapısı"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T09:54:19.959Z",
    "updatedAt": "2026-09-04T12:28:10.911Z",
    "completedAt": null,
@@ -904,8 +850,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T09:54:22.557Z",
    "updatedAt": "2026-09-06T06:59:53.186Z",
    "completedAt": null,
@@ -922,8 +867,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T09:54:28.370Z",
    "updatedAt": "2026-09-03T13:38:02.857Z",
    "completedAt": "2026-08-26T17:22:53.457Z",
@@ -940,8 +884,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T10:05:28.554Z",
    "updatedAt": "2026-09-03T13:38:19.235Z",
    "completedAt": "2026-08-28T09:41:07.402Z",
@@ -958,8 +901,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T10:05:34.552Z",
    "updatedAt": "2026-09-03T13:39:01.546Z",
    "completedAt": null,
@@ -976,8 +918,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T10:05:41.161Z",
    "updatedAt": "2026-09-03T18:03:25.730Z",
    "completedAt": null,
@@ -994,8 +935,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Urgent",
-   "priorityValue": 1,
+   "priority": 1,
    "createdAt": "2026-08-24T10:11:50.154Z",
    "updatedAt": "2026-09-03T13:38:42.717Z",
    "completedAt": null,
@@ -1012,8 +952,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Urgent",
-   "priorityValue": 1,
+   "priority": 1,
    "createdAt": "2026-08-24T10:33:48.991Z",
    "updatedAt": "2026-09-03T13:36:44.046Z",
    "completedAt": null,
@@ -1030,8 +969,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T10:33:57.183Z",
    "updatedAt": "2026-09-04T04:17:16.666Z",
    "completedAt": null,
@@ -1048,8 +986,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T10:34:03.135Z",
    "updatedAt": "2026-09-03T18:10:12.115Z",
    "completedAt": null,
@@ -1066,8 +1003,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T10:34:10.999Z",
    "updatedAt": "2026-09-03T13:34:40.328Z",
    "completedAt": null,
@@ -1084,8 +1020,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T10:45:28.236Z",
    "updatedAt": "2026-09-03T13:38:37.370Z",
    "completedAt": null,
@@ -1102,8 +1037,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T10:54:59.206Z",
    "updatedAt": "2026-09-03T13:37:59.603Z",
    "completedAt": "2026-08-24T12:49:41.781Z",
@@ -1120,8 +1054,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-24T12:03:29.747Z",
    "updatedAt": "2026-09-03T13:37:23.775Z",
    "completedAt": null,
@@ -1138,8 +1071,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T12:14:27.147Z",
    "updatedAt": "2026-09-03T13:34:08.022Z",
    "completedAt": null,
@@ -1156,8 +1088,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-24T13:30:55.797Z",
    "updatedAt": "2026-09-03T13:37:11.796Z",
    "completedAt": "2026-08-25T08:23:23.924Z",
@@ -1174,8 +1105,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-25T07:42:40.941Z",
    "updatedAt": "2026-09-05T06:17:22.987Z",
    "completedAt": null,
@@ -1192,8 +1122,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-08-25T07:43:31.309Z",
    "updatedAt": "2026-09-03T13:37:06.883Z",
    "completedAt": "2026-08-25T09:19:23.249Z",
@@ -1210,8 +1139,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-26T16:15:18.556Z",
    "updatedAt": "2026-09-05T06:17:23.581Z",
    "completedAt": null,
@@ -1228,8 +1156,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-26T16:15:22.284Z",
    "updatedAt": "2026-09-03T13:37:31.742Z",
    "completedAt": null,
@@ -1246,8 +1173,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-26T16:15:25.008Z",
    "updatedAt": "2026-09-03T13:37:29.052Z",
    "completedAt": null,
@@ -1264,8 +1190,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-26T17:17:33.580Z",
    "updatedAt": "2026-09-03T13:34:43.210Z",
    "completedAt": null,
@@ -1282,8 +1207,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-26T17:17:39.289Z",
    "updatedAt": "2026-09-03T13:38:51.305Z",
    "completedAt": null,
@@ -1300,8 +1224,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-26T17:17:42.264Z",
    "updatedAt": "2026-09-03T13:36:52.813Z",
    "completedAt": null,
@@ -1318,8 +1241,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-26T17:17:45.523Z",
    "updatedAt": "2026-09-03T13:39:04.157Z",
    "completedAt": null,
@@ -1336,8 +1258,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-26T17:18:00.106Z",
    "updatedAt": "2026-09-03T13:37:43.422Z",
    "completedAt": null,
@@ -1354,8 +1275,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-08-26T17:18:58.876Z",
    "updatedAt": "2026-09-03T13:38:29.520Z",
    "completedAt": null,
@@ -1372,8 +1292,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-26T17:21:12.997Z",
    "updatedAt": "2026-09-03T13:37:26.672Z",
    "completedAt": null,
@@ -1390,8 +1309,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-26T17:30:36.725Z",
    "updatedAt": "2026-09-03T13:34:52.002Z",
    "completedAt": "2026-08-27T12:16:53.892Z",
@@ -1408,8 +1326,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-26T18:35:21.125Z",
    "updatedAt": "2026-09-03T13:34:49.582Z",
    "completedAt": "2026-08-27T12:16:56.452Z",
@@ -1426,8 +1343,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-26T19:46:58.918Z",
    "updatedAt": "2026-09-03T13:34:54.501Z",
    "completedAt": "2026-08-26T22:04:16.850Z",
@@ -1444,8 +1360,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-27T08:53:00.517Z",
    "updatedAt": "2026-09-03T13:37:34.411Z",
    "completedAt": null,
@@ -1462,8 +1377,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-27T09:09:43.342Z",
    "updatedAt": "2026-09-03T13:37:17.031Z",
    "completedAt": "2026-08-28T06:32:51.727Z",
@@ -1480,8 +1394,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-27T17:43:38.725Z",
    "updatedAt": "2026-09-05T06:17:23.530Z",
    "completedAt": null,
@@ -1498,8 +1411,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-27T18:24:34.722Z",
    "updatedAt": "2026-09-03T13:34:59.965Z",
    "completedAt": "2026-08-28T09:12:17.359Z",
@@ -1516,8 +1428,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-27T18:38:04.282Z",
    "updatedAt": "2026-09-03T13:37:40.425Z",
    "completedAt": null,
@@ -1534,8 +1445,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-28T06:21:13.588Z",
    "updatedAt": "2026-09-03T13:37:37.813Z",
    "completedAt": "2026-08-30T18:09:09.055Z",
@@ -1552,8 +1462,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-28T09:10:44.646Z",
    "updatedAt": "2026-09-04T12:28:10.911Z",
    "completedAt": null,
@@ -1570,8 +1479,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-28T13:11:12.396Z",
    "updatedAt": "2026-09-03T13:35:26.684Z",
    "completedAt": null,
@@ -1588,8 +1496,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-30T17:23:16.623Z",
    "updatedAt": "2026-09-03T13:36:16.913Z",
    "completedAt": "2026-08-30T17:23:16.659Z",
@@ -1606,8 +1513,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-30T18:38:26.636Z",
    "updatedAt": "2026-09-03T13:36:01.409Z",
    "completedAt": null,
@@ -1624,8 +1530,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-30T20:06:28.581Z",
    "updatedAt": "2026-09-03T13:34:21.280Z",
    "completedAt": null,
@@ -1642,8 +1547,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-30T20:06:38.778Z",
    "updatedAt": "2026-09-03T13:34:27.469Z",
    "completedAt": null,
@@ -1660,8 +1564,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-30T20:09:39.351Z",
    "updatedAt": "2026-09-03T13:34:18.616Z",
    "completedAt": null,
@@ -1678,8 +1581,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-30T20:56:13.716Z",
    "updatedAt": "2026-09-03T13:34:11.234Z",
    "completedAt": null,
@@ -1696,8 +1598,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-08-31T06:53:29.944Z",
    "updatedAt": "2026-09-03T13:36:04.514Z",
    "completedAt": null,
@@ -1714,8 +1615,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-31T07:09:30.849Z",
    "updatedAt": "2026-09-03T13:34:13.707Z",
    "completedAt": "2026-09-02T08:08:51.488Z",
@@ -1732,8 +1632,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-31T07:13:54.537Z",
    "updatedAt": "2026-09-03T13:35:15.769Z",
    "completedAt": "2026-09-02T08:08:53.877Z",
@@ -1750,8 +1649,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-08-31T10:30:45.001Z",
    "updatedAt": "2026-09-03T13:34:29.817Z",
    "completedAt": null,
@@ -1768,8 +1666,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-31T11:10:34.134Z",
    "updatedAt": "2026-09-03T13:36:14.273Z",
    "completedAt": "2026-08-31T22:09:05.610Z",
@@ -1786,8 +1683,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-31T20:36:16.461Z",
    "updatedAt": "2026-09-03T18:08:56.028Z",
    "completedAt": "2026-08-31T22:09:02.281Z",
@@ -1804,8 +1700,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-08-31T22:35:19.775Z",
    "updatedAt": "2026-09-04T06:58:53.846Z",
    "completedAt": null,
@@ -1822,8 +1717,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-31T22:36:54.966Z",
    "updatedAt": "2026-09-03T13:35:02.492Z",
    "completedAt": "2026-09-01T09:16:51.861Z",
@@ -1840,8 +1734,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-08-31T22:37:08.902Z",
    "updatedAt": "2026-09-03T13:35:31.783Z",
    "completedAt": "2026-09-01T09:16:54.168Z",
@@ -1858,8 +1751,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-01T06:58:49.176Z",
    "updatedAt": "2026-09-03T13:36:19.852Z",
    "completedAt": null,
@@ -1876,8 +1768,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-01T07:12:59.261Z",
    "updatedAt": "2026-09-05T08:57:04.548Z",
    "completedAt": null,
@@ -1894,8 +1785,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-09-01T07:42:41.194Z",
    "updatedAt": "2026-09-05T09:43:29.744Z",
    "completedAt": null,
@@ -1912,8 +1802,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-01T08:14:13.253Z",
    "updatedAt": "2026-09-03T13:35:05.259Z",
    "completedAt": "2026-09-01T10:37:16.983Z",
@@ -1930,8 +1819,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-01T08:14:21.094Z",
    "updatedAt": "2026-09-03T13:35:46.764Z",
    "completedAt": null,
@@ -1948,8 +1836,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-01T08:15:57.917Z",
    "updatedAt": "2026-09-04T04:35:59.088Z",
    "completedAt": "2026-09-02T07:22:51.006Z",
@@ -1966,8 +1853,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Urgent",
-   "priorityValue": 1,
+   "priority": 1,
    "createdAt": "2026-09-01T08:17:56.649Z",
    "updatedAt": "2026-09-03T13:36:22.531Z",
    "completedAt": "2026-09-01T09:16:56.590Z",
@@ -1984,8 +1870,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-01T09:24:56.546Z",
    "updatedAt": "2026-09-03T13:38:24.273Z",
    "completedAt": "2026-09-01T10:14:04.251Z",
@@ -2002,8 +1887,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-01T09:25:07.880Z",
    "updatedAt": "2026-09-03T13:35:09.675Z",
    "completedAt": "2026-09-01T11:11:19.661Z",
@@ -2020,8 +1904,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-01T09:29:13.117Z",
    "updatedAt": "2026-09-03T13:35:21.050Z",
    "completedAt": "2026-09-01T13:30:42.664Z",
@@ -2038,8 +1921,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-01T10:09:34.455Z",
    "updatedAt": "2026-09-03T13:35:12.739Z",
    "completedAt": "2026-09-02T08:08:56.472Z",
@@ -2056,8 +1938,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-01T10:14:40.827Z",
    "updatedAt": "2026-09-03T13:35:34.532Z",
    "completedAt": null,
@@ -2074,8 +1955,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-01T10:23:15.513Z",
    "updatedAt": "2026-09-04T12:28:10.911Z",
    "completedAt": null,
@@ -2092,8 +1972,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-09-01T11:38:02.228Z",
    "updatedAt": "2026-09-05T07:54:59.964Z",
    "completedAt": "2026-09-05T07:53:50.668Z",
@@ -2110,8 +1989,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-01T12:03:30.549Z",
    "updatedAt": "2026-09-03T13:36:38.843Z",
    "completedAt": null,
@@ -2128,8 +2006,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-01T12:39:22.058Z",
    "updatedAt": "2026-09-03T16:19:58.451Z",
    "completedAt": null,
@@ -2146,8 +2023,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-01T13:15:51.884Z",
    "updatedAt": "2026-09-03T16:19:58.451Z",
    "completedAt": null,
@@ -2164,8 +2040,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-01T13:30:59.299Z",
    "updatedAt": "2026-09-06T08:54:16.531Z",
    "completedAt": null,
@@ -2182,8 +2057,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-01T13:37:01.124Z",
    "updatedAt": "2026-09-03T13:35:23.737Z",
    "completedAt": null,
@@ -2200,8 +2074,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-01T13:40:15.491Z",
    "updatedAt": "2026-09-04T08:19:22.183Z",
    "completedAt": null,
@@ -2218,8 +2091,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-02T07:02:43.693Z",
    "updatedAt": "2026-09-05T20:17:55.011Z",
    "completedAt": null,
@@ -2236,8 +2108,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-02T07:04:29.507Z",
    "updatedAt": "2026-09-03T13:38:12.057Z",
    "completedAt": null,
@@ -2254,8 +2125,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-02T07:39:19.757Z",
    "updatedAt": "2026-09-03T13:36:11.434Z",
    "completedAt": null,
@@ -2272,8 +2142,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-02T07:40:15.111Z",
    "updatedAt": "2026-09-03T13:38:30.708Z",
    "completedAt": null,
@@ -2290,8 +2159,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-03T07:42:53.605Z",
    "updatedAt": "2026-09-05T14:31:10.497Z",
    "completedAt": null,
@@ -2308,8 +2176,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-03T15:59:18.249Z",
    "updatedAt": "2026-09-03T20:06:19.153Z",
    "completedAt": null,
@@ -2326,8 +2193,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-03T16:16:42.320Z",
    "updatedAt": "2026-09-06T05:05:33.812Z",
    "completedAt": "2026-09-06T05:05:33.799Z",
@@ -2344,8 +2210,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-03T16:19:58.451Z",
    "updatedAt": "2026-09-05T06:17:23.458Z",
    "completedAt": null,
@@ -2362,8 +2227,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-09-03T16:28:26.242Z",
    "updatedAt": "2026-09-05T21:28:24.065Z",
    "completedAt": null,
@@ -2380,8 +2244,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-03T17:28:58.797Z",
    "updatedAt": "2026-09-06T05:44:10.575Z",
    "completedAt": "2026-09-06T05:44:10.565Z",
@@ -2398,8 +2261,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-03T18:03:25.730Z",
    "updatedAt": "2026-09-05T08:01:16.314Z",
    "completedAt": null,
@@ -2416,8 +2278,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-03T18:10:12.115Z",
    "updatedAt": "2026-09-06T08:54:16.531Z",
    "completedAt": null,
@@ -2434,8 +2295,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-03T18:38:30.919Z",
    "updatedAt": "2026-09-03T18:38:30.919Z",
    "completedAt": null,
@@ -2452,8 +2312,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-04T04:17:16.666Z",
    "updatedAt": "2026-09-06T04:45:30.655Z",
    "completedAt": null,
@@ -2470,8 +2329,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-09-04T04:35:59.088Z",
    "updatedAt": "2026-09-04T04:35:59.088Z",
    "completedAt": null,
@@ -2486,8 +2344,7 @@
    "project": null,
    "projectMilestone": null,
    "labels": [],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-04T07:31:30.092Z",
    "updatedAt": "2026-09-06T04:55:46.494Z",
    "completedAt": null,
@@ -2502,8 +2359,7 @@
    "project": "Altyapı, Kapılar ve Belge Hattı",
    "projectMilestone": null,
    "labels": [],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-04T12:28:10.911Z",
    "updatedAt": "2026-09-06T11:39:00.060Z",
    "completedAt": null,
@@ -2518,8 +2374,7 @@
    "project": "Altyapı, Kapılar ve Belge Hattı",
    "projectMilestone": null,
    "labels": [],
-   "priority": "Urgent",
-   "priorityValue": 1,
+   "priority": 1,
    "createdAt": "2026-09-05T06:17:22.987Z",
    "updatedAt": "2026-09-05T07:42:59.756Z",
    "completedAt": null,
@@ -2534,8 +2389,7 @@
    "project": "Teklif Akışı ve Müşteri Paneli",
    "projectMilestone": null,
    "labels": [],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-05T07:33:32.776Z",
    "updatedAt": "2026-09-05T10:39:45.280Z",
    "completedAt": null,
@@ -2552,8 +2406,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-05T07:54:34.704Z",
    "updatedAt": "2026-09-05T08:29:08.678Z",
    "completedAt": null,
@@ -2568,8 +2421,7 @@
    "project": "Katalog ve Ürün Verisi",
    "projectMilestone": null,
    "labels": [],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-05T08:00:51.648Z",
    "updatedAt": "2026-09-06T04:45:50.776Z",
    "completedAt": null,
@@ -2584,8 +2436,7 @@
    "project": "Katalog ve Ürün Verisi",
    "projectMilestone": null,
    "labels": [],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-05T08:01:13.205Z",
    "updatedAt": "2026-09-06T09:47:56.950Z",
    "completedAt": null,
@@ -2602,8 +2453,7 @@
    "labels": [
     "OPS"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-05T08:57:04.548Z",
    "updatedAt": "2026-09-06T06:55:30.202Z",
    "completedAt": null,
@@ -2618,8 +2468,7 @@
    "project": "Vitrin 15A Yeniden Tasarım (DESIGN-MENU)",
    "projectMilestone": null,
    "labels": [],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-05T09:48:32.107Z",
    "updatedAt": "2026-09-05T12:41:27.808Z",
    "completedAt": null,
@@ -2634,11 +2483,10 @@
    "project": "Marka Kılavuzu (DESIGN-MARKA)",
    "projectMilestone": null,
    "labels": [
-    "OPS",
-    "DESIGN"
+    "DESIGN",
+    "OPS"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-05T10:56:07.579Z",
    "updatedAt": "2026-09-06T09:35:01.072Z",
    "completedAt": null,
@@ -2653,8 +2501,7 @@
    "project": "Vitrin 15A Yeniden Tasarım (DESIGN-MENU)",
    "projectMilestone": null,
    "labels": [],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-05T12:41:27.808Z",
    "updatedAt": "2026-09-05T15:14:15.093Z",
    "completedAt": null,
@@ -2672,8 +2519,7 @@
     "DESIGN",
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-05T13:40:13.387Z",
    "updatedAt": "2026-09-05T13:40:55.328Z",
    "completedAt": null,
@@ -2691,8 +2537,7 @@
     "DESIGN",
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-05T13:40:17.518Z",
    "updatedAt": "2026-09-05T21:56:43.587Z",
    "completedAt": null,
@@ -2710,8 +2555,7 @@
     "DESIGN",
     "OPS"
    ],
-   "priority": "No priority",
-   "priorityValue": 0,
+   "priority": 0,
    "createdAt": "2026-09-05T13:40:20.766Z",
    "updatedAt": "2026-09-06T09:53:51.222Z",
    "completedAt": null,
@@ -2728,8 +2572,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-05T16:51:25.919Z",
    "updatedAt": "2026-09-06T09:53:51.379Z",
    "completedAt": null,
@@ -2746,8 +2589,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Urgent",
-   "priorityValue": 1,
+   "priority": 1,
    "createdAt": "2026-09-05T20:49:31.974Z",
    "updatedAt": "2026-09-05T21:49:15.780Z",
    "completedAt": null,
@@ -2764,8 +2606,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-06T04:33:18.054Z",
    "updatedAt": "2026-09-06T09:51:25.442Z",
    "completedAt": null,
@@ -2782,8 +2623,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-06T04:45:30.655Z",
    "updatedAt": "2026-09-06T08:54:16.531Z",
    "completedAt": null,
@@ -2800,8 +2640,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-06T04:45:50.776Z",
    "updatedAt": "2026-09-06T06:12:00.178Z",
    "completedAt": null,
@@ -2818,8 +2657,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Medium",
-   "priorityValue": 3,
+   "priority": 3,
    "createdAt": "2026-09-06T04:55:46.494Z",
    "updatedAt": "2026-09-06T04:55:46.494Z",
    "completedAt": null,
@@ -2836,8 +2674,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-09-06T06:13:36.259Z",
    "updatedAt": "2026-09-06T09:51:25.442Z",
    "completedAt": null,
@@ -2854,8 +2691,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-06T07:25:39.192Z",
    "updatedAt": "2026-09-06T10:41:29.518Z",
    "completedAt": null,
@@ -2872,8 +2708,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-06T08:38:53.500Z",
    "updatedAt": "2026-09-06T11:30:34.144Z",
    "completedAt": null,
@@ -2890,8 +2725,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "Urgent",
-   "priorityValue": 1,
+   "priority": 1,
    "createdAt": "2026-09-06T08:54:16.531Z",
    "updatedAt": "2026-09-06T11:30:37.653Z",
    "completedAt": null,
@@ -2908,8 +2742,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-06T09:18:25.085Z",
    "updatedAt": "2026-09-06T09:18:25.085Z",
    "completedAt": null,
@@ -2926,8 +2759,7 @@
    "labels": [
     "URUN"
    ],
-   "priority": "High",
-   "priorityValue": 2,
+   "priority": 2,
    "createdAt": "2026-09-06T09:35:44.747Z",
    "updatedAt": "2026-09-06T09:37:58.446Z",
    "completedAt": null,
@@ -2942,8 +2774,7 @@
    "project": "Katalog ve Ürün Verisi",
    "projectMilestone": null,
    "labels": [],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-09-06T09:38:57.355Z",
    "updatedAt": "2026-09-06T09:38:57.355Z",
    "completedAt": null,
@@ -2960,8 +2791,7 @@
    "labels": [
     "ALTYAPI"
    ],
-   "priority": "Low",
-   "priorityValue": 4,
+   "priority": 4,
    "createdAt": "2026-09-06T09:51:25.442Z",
    "updatedAt": "2026-09-06T09:51:38.960Z",
    "completedAt": null,
