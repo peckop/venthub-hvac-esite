@@ -142,6 +142,38 @@ describe('INV-FOY-PARITE-1 · föy ile vitrin AYNI çıktıyı üretir', () => {
     expect(foy.every(([, v]) => v !== '-'), 'föyde boş değer satırı var').toBe(true)
   })
 
+  /**
+   * ⚠MANDAL — BENİM DÜZELTMEDİĞİM, AMA FÖYE YAYILAN BİR KUSUR (2026-09-06, URUN-KATALOG uyarısı).
+   *
+   * `formatSpecValue` metin değerleri `/[a-zA-Z]/` ile ayırıyor — **ASCII** harf arıyor.
+   * Değer zaten birim taşıyorsa ama o birim ASCII harf İÇERMİYORSA (`25°`, `25º`), erken çıkış
+   * TETİKLENMEZ ve birim **bir kez daha** eklenir → `25° °C`.
+   *
+   * ⭐İki ayrı karakter var ve gözle aynı görünüyorlar: `°` U+00B0 (derece) ile `º` U+00BA
+   * (masculine ordinal). Kaynak PDF'lerde ikincisi de geçiyor (URUN-KATALOG ölçtü, kendi
+   * kapısında yanlış kırmızı üretmiş).
+   *
+   * ⛔BU KOL DÜZELTMİYOR, SABİTLİYOR: `formatSpecValue` URUN şeridinin claim'inde, benim
+   * düzeltme yetkim yok. Ama föy artık o fonksiyonu kullandığı için kusur **müşteri belgesine
+   * de yayıldı** ve sessiz kalamaz (§21). Davranış düzeltilirse bu kol DÜŞER — düşmesi
+   * "bozuldu" değil "borç ödendi" demektir; o zaman kol güncellenir.
+   */
+  it('⚠MANDAL: birim taşıyan ASCII-dışı değerde ÇİFT BİRİM üretiliyor — bugünkü davranış SABİTLENDİ', () => {
+    const ciftBirim = buildSpecRows({ max_ambient_temp_c: '25°' }, { t })
+    expect(
+      ciftBirim[0]?.[1],
+      'davranış DEĞİŞMİŞ — formatSpecValue artık ASCII-dışı birimi tanıyorsa bu kol güncellenmeli (borç ödendi)',
+    ).toBe('25° °C')
+    // Aynı tuzağın ikizi: gözle ayırt edilemeyen U+00BA.
+    const ordinal = buildSpecRows({ max_ambient_temp_c: '25º' }, { t })
+    expect(ordinal[0]?.[1], 'U+00BA U+00B0dan farklı işlenmiş — iki karakter ayrı davranıyor').toBe('25º °C')
+    // ⭐PARİTE YİNE BOZULMUYOR: vitrin de aynı fonksiyonu kullandığı için iki yüzey EŞİT kalır.
+    expect(
+      ciftBirim,
+      'kusur föy ile vitrini AYRIŞTIRIYOR — o zaman bu artık mandal değil, parite ihlalidir',
+    ).toEqual(vitrinSatirlari({ max_ambient_temp_c: '25°' }))
+  })
+
   it('grup başlıkları da tek kaynaktan gelir (Faz 2 hazırlığı, bugünden ölçülür)', () => {
     const foyGruplar = buildSpecGroupLabels(URUN_17160, t)
     const gruplar = groupTechnicalSpecs(URUN_17160) || {}
