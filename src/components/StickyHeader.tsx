@@ -163,10 +163,31 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
 
   // Nav config ham (dilsiz) yol tutar; dil öneki burada SSOT localizedHref ile eklenir.
   // href opsiyonel olabildiğinden undefined-geçişi korunur (yalnız tanımlıysa localize).
-  const primaryItems = useMemo(
-    () => NAVIGATION_PRIMARY_ITEMS.map((item) => ({ id: item.id, href: item.href ? localizedHref(item.href, lang) : item.href, label: t(item.labelKey) })),
-    [t, lang]
-  )
+  //
+  // K24 — "Ürün Seçici" header öğesi, `YENI_KABUK_GEZINMESI` bayrağının ARKASINDA.
+  //
+  // NİÇİN EYLEM KÜMESİNE DEĞİL GEZİNME RAYINA: bu bir EYLEM değil bir HEDEF — kalıcı
+  // bir sayfa (`/urun-secici`, karar K17). Sağdaki eylem kümesi tasarım v13 (ekran 12)
+  // gereği bayrak açıkken TEK öğeye iniyor; oraya dördüncü bir şey koymak o kuralı
+  // bozardı. Kategoriler · Ürünler ile aynı rayda durması doğrusu: ürün keşfinin
+  // üçüncü kapısı, sepetin komşusu değil.
+  //
+  // NİÇİN BAYRAK ARKASINDA: ray bugün canlıda iki öğe taşıyor ve bu iş kabuk
+  // tasarımının parçası. Bayrak KAPALI doğduğu için bu PR vitrinde HİÇBİR ŞEY
+  // değiştirmez — aşağıdaki erken dönüş bunun tek ve ölçülebilir garantisi.
+  //
+  // ⚠KAPSAM (gizlenmiyor): `NavPrimaryRail` `lg` altında gizlidir; öğe MASAÜSTÜ
+  // kuralıdır. Mobilde üst şerit tasarım gereği yalnız logo + arama taşır, mobil
+  // giriş alt sekme çubuğunun işidir (Faz 1b) — orası bu işin kapsamı değil.
+  const primaryItems = useMemo(() => {
+    const temel = NAVIGATION_PRIMARY_ITEMS.map((item) => ({ id: item.id, href: item.href ? localizedHref(item.href, lang) : item.href, label: t(item.labelKey) }))
+    if (!YENI_KABUK_GEZINMESI) return temel
+    // Adres ELLE kurulmaz: `Routes` = `useLocalizedRoutes()` vekili, dil önekini SSOT
+    // `localizedHref` üzerinden ekler (kural 7). Etiket de sözlükten gelir — sayfanın
+    // kendi üst başlığıyla AYNI anahtar, çünkü gezinmenin vaat ettiği ad ile sayfanın
+    // taşıdığı ad ayrışırsa ziyaretçi tıkladığı yere vardığını anlamaz.
+    return [...temel, { id: 'urunSecici', href: Routes.urunSecici(), label: t('urunSecici.ustBaslik') }]
+  }, [t, lang, Routes])
 
   const secondaryItems = useMemo(
     () => NAVIGATION_SECONDARY_ITEMS.map((item) => ({ id: item.id, href: item.href ? localizedHref(item.href, lang) : item.href, label: t(item.labelKey) })),
