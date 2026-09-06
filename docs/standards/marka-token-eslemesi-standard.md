@@ -45,6 +45,53 @@ marka sıcaklığı korunur, okunabilirlik payı feda edilmez.
 
 ---
 
+### 1.1) AA koyu tonları (K25 / K25-b, 2026-09-06) — palet genişlemesi DEĞİL, düzeltmesi
+
+§1'in tablosu turkuaz ve kiremidi normal boy metinde yasaklıyordu, çünkü ikisi de 4.5
+eşiğinin altındaydı. K25/K25-b bu boşluğu **tonu değiştirerek değil, zemini
+koyulaştırarak** kapattı: aynı iki rengin AA eşiğini geçen koyu eşleri token'landı.
+
+| Token | Değer | Beyaz metinle | `#F4F4F2` zeminde | Nerede kullanılır |
+|---|---|---|---|---|
+| `--brand-cyan-ink` | `#00708F` | **5.65** ✓ | 5.13 ✓ | Teklif/Sepet **sayaç rozeti zemini**, metin beyaz |
+| `--action-terracotta-deep` | `#BF5309` | **4.71** ✓ | 4.28 | **Ana eylem düğmesi dolgusu** |
+
+Karşılaştırma (aynı hesapla, aynı dalda yeniden koşuldu — §1'in 4.08/3.80 rakamlarını
+birebir üretti): turkuaz `#0088B0` → 4.08 · kiremit `#D95D0E` → 3.80. **Yeni marka rengi
+açılmadı**, ton üretilmedi, palet genişletilmedi; K25-b'nin verdiği iki değer aynen alındı.
+
+**HSL karşılıkları (çevrim TAM — kanal farkı 0):**
+`#00708F` → `193 100% 28%` · `#BF5309` → `24.4 91% 39.2%`.
+
+⚠**`--action-terracotta-deep`in kodda ÇAĞRI YERİ YOK ve bu gizlenmiyor.** K25-b
+"`AnaEylemDugmesi` bu tokene geçer" diyor; 2026-09-06'da ölçüldü: `AnaEylemDugmesi` diye
+bir bileşen bu depoda **yok** (ad yalnız karar belgesinde geçiyor), ve "ana eylem" işlevini
+gören tek bir bileşen de yok — `bg-primary-navy` **72 dosyada 142 kez** doğrudan yazılmış
+durumda. `--marka-kiremit` de aynı sebeple bugün **0 kullanımda**. Token yayınlandı;
+uygulaması bileşen doğduğunda yapılır. Hangi yüzeye ineceği **karar konusudur**, tahmin
+değil — bu yüzden bu dalda uygulanmadı.
+
+**Kapı: `INV-TOKEN-AA-RENK-1`** → `src/__tests__/conformance/tailwind-token-aa-renkleri.test.ts`.
+
+**Ölçülebilen — beş kol:** (1) iki token `index.css`te tanımlı ve HSL biçiminde ·
+(2) ⭐HSL değeri çevrilince kapalı kararın HEX'ini veriyor (kanal farkı ≤ 2; dize
+karşılaştırması bir hane şaşınca yeşil kalırdı) · (3) `tailwind.config.js` her ikisine
+`hsl(var(--…) / <alpha-value>)` ile bağlı — **sabit HEX ile değil** (§2: yeni kaynak
+açılamaz) · (4) kullanıcı kodunda değerler **ham HEX** olarak yazılmamış (CLAUDE.md kural 8) ·
+(5) ön-koşul + ayırt edicilik kolları (boş evren ve yorum/kod ayrımı kanıtlanıyor).
+
+**Sabotajla ölçüldü (2026-09-06), dört yönlü — hepsi KIRMIZI, geri alınca yeşil:**
+token silindi → kırmızı (2 kol) · `24.4` → `34.4` kaydırıldı → kırmızı (kanal farkı 30) ·
+koda ham `#00708F` yazıldı → kırmızı · tailwind'de `hsl(var(…))` yerine sabit HEX → kırmızı.
+
+⛔**KONTRAST BU KAPININ ÖLÇTÜĞÜ ŞEY DEĞİL.** §3'teki gerekçe aynen geçerli: jsdom'da
+ölçülemez. Yukarıdaki 5.65/4.71 sayıları kararın **gerekçesi**, kapının **çıktısı** değil.
+"Kapı yeşil" ⇒ "kontrast AA" **demek değildir**; doğrulama gerçek tarayıcıya bağlıdır.
+
+⛔**"Doğru yerde mi kullanılıyor" ölçülmez** — §3'teki semantik-rol sınırı burada da geçerli.
+
+---
+
 ## 2) Paletin TEK kaynağı olur
 
 Bugün en az altı kaynak var (ölçüldü, 2026-09-04):

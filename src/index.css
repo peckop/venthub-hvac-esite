@@ -302,6 +302,35 @@ textarea:focus-visible {
     --marka-kiremit: 23.3 87.9% 45.3%;    /* #D95D0E */
     --marka-amber: 38 92% 50%;      /* #F59E0B */
 
+    /* ── AA KOYU TONLARI (K25 / K25-b, Recep-kararlar 2026-09-06) ────────
+       Kararlar: docs/proje-takip/linear/kararlar-vitrin-15a-2026-09-06.md K25 · K25-b.
+
+       NİÇİN VARLAR — ölçülmüş sayılarla (WCAG 2.1, beyaz metin bu zeminin üstünde):
+         · turkuaz  #0088B0 → 4.08  (AA altı)  ⟹ koyu eşi #00708F → **5.65** ✓
+         · kiremit  #D95D0E → 3.80  (AA altı)  ⟹ koyu eşi #BF5309 → **4.71** ✓
+       Sayfa zemini #F4F4F2 üstünde: 5.13 ve 4.28 — ikisi de ≥4.5. Ölçüm bu dalda
+       yeniden koşuldu, cetveldeki 4.08/3.80 rakamlarını birebir yeniden üretti.
+
+       ⭐BUNLAR PALETİ GENİŞLETMEZ, ONU DÜZELTİR: yeni bir marka rengi değil, mevcut
+       turkuaz ve kiremidin **AA eşiğini geçen koyu eşleridir**. Ton üretilmedi,
+       palet açılmadı — K25-b'nin verdiği iki değer aynen alındı.
+
+       Biçim HSL'dir (CLAUDE.md kural 8: renk HEX değil CSS custom property).
+       Yanlarındaki HEX yalnız KAYNAK KİMLİĞİDİR; `INV-TOKEN-AA-RENK-1` kapısı
+       HSL'yi o HEX'e geri çevirip doğrular (çevrim TAM: kanal farkı 0).
+
+       KULLANIM SINIRI:
+         · --brand-cyan-ink        → Teklif/Sepet **sayaç rozeti zemini**, metin beyaz.
+                                     (K25-b) Uygulandı: 3 sayaç rozeti.
+         · --action-terracotta-deep → ana eylem düğmesi dolgusu (K25-b: "AnaEylemDugmesi
+                                     bu tokene geçer"). ⚠KODDA HENÜZ ÇAĞRI YERİ YOK —
+                                     `AnaEylemDugmesi` diye bir bileşen bu depoda ölçüldü
+                                     ve YOK (yalnız karar belgesinde geçiyor); `--marka-kiremit`
+                                     de aynı sebeple bugün 0 kullanımda. Token yayınlanıyor,
+                                     uygulaması bileşen doğduğunda yapılır. Gizlenmiyor. */
+    --brand-cyan-ink: 193 100% 28%;        /* #00708F */
+    --action-terracotta-deep: 24.4 91% 39.2%;  /* #BF5309 */
+
     /* ── Design System Tokens ──────────────────────────── */
     --surface-deep: 224 52% 8%;
     --surface-darker: 224 71% 4%;

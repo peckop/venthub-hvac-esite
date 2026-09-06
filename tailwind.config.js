@@ -44,6 +44,15 @@ const tailwindConfig = {
         'clean-white':       'hsl(var(--clean-white) / <alpha-value>)',
         'air-blue':          'hsl(var(--air-blue) / <alpha-value>)',
 
+        /* ── AA koyu tonları (K25 / K25-b, 2026-09-06) ─────────────────
+           Değişkenler `src/index.css` `:root`ta tanımlı — SSOT orasıdır,
+           burada SABİT HEX YOK (cetvel marka-token-eslemesi-standard.md §2:
+           "yeni bir renk kaynağı açılamaz"; `hsl(var(--…))` yeni kaynak
+           değil, aynı kaynağa referanstır).
+           Kapı: src/__tests__/conformance/tailwind-token-aa-renkleri.test.ts */
+        'brand-cyan-ink':        'hsl(var(--brand-cyan-ink) / <alpha-value>)',
+        'action-terracotta-deep': 'hsl(var(--action-terracotta-deep) / <alpha-value>)',
+
         /* ── Admin semantik renkleri ──────────────────────────────────
            Değişkenler `src/index.css`te `[data-admin-theme]` kapsamında
            tanımlı (varsayılan açık, `='dark'` ile koyu). Admin yüzeylerinde
