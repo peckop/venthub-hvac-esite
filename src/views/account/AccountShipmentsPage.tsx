@@ -11,6 +11,7 @@ import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDate as formatOnlyDate } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
+import { siparisNoGoster } from '../../utils/siparisNo'
 
 interface ShipmentRow {
   id: string
@@ -231,7 +232,7 @@ export default function AccountShipmentsPage() {
           {displayed.map((o) => {
             const shipStatus = getShipStatus(o)
             const activeStepIdx = getStepIndex(shipStatus)
-            const orderCode = o.order_number ? `#${o.order_number.split('-').pop()}` : `#${o.id.slice(-8).toUpperCase()}`
+            const orderCode = siparisNoGoster(o.order_number, o.id)
 
             return (
               <div key={o.id} className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden hover:shadow-md transition-shadow">

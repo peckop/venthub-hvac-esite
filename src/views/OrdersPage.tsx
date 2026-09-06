@@ -15,6 +15,7 @@ import { formatDateTime } from '../i18n/datetime'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import { isRecord } from '../lib/type-converters'
+import { siparisNoGoster } from '../utils/siparisNo'
 
 
 interface Order {
@@ -225,7 +226,7 @@ const OrdersPage: React.FC = () => {
       if (new Date(o.created_at) > new Date(dateTo)) return false
     }
     if (searchCode) {
-      const code = o.order_number?.split('-').pop() || o.id.slice(-8).toUpperCase()
+      const code = siparisNoGoster(o.order_number, o.id)
       if (!code.includes(searchCode.toUpperCase())) return false
     }
     return true
@@ -346,7 +347,7 @@ const OrdersPage: React.FC = () => {
                       <div>
                         <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                           <Package className="text-primary-navy" size={20} />
-                          {t('orders.page.orderLabel')}{order.order_number?.split('-').pop() || order.id.slice(-8).toUpperCase()}
+                          {t('orders.page.orderLabel')} {siparisNoGoster(order.order_number, order.id)}
                           {order.is_demo && (
                             <span className="ml-2 px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-xs uppercase font-bold tracking-wider rounded-lg shadow-sm">
                               {t('orders.page.demoBadge')}

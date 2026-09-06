@@ -229,14 +229,16 @@ serve(async (req) => {
     const brandPrimary = branding.brandPrimaryColor
     const brandLogoUrl = branding.brandLogoUrl
 
-    const prettyOrderNo = order_number ? `#${String(order_number).split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
-    const subject = `${brandName} | Siparişiniz kargoya verildi - ${prettyOrderNo}`
+    // REC-156: TAM numara — kesme YOK. Gerekçe ve kapı: order-confirmation/index.ts
+    // aynı satır + `src/utils/siparisNo.ts` + INV-SIPARIS-NO-1.
+    const siparisNo = order_number ? String(order_number).trim() : `${order_id.slice(-8).toUpperCase()}`
+    const subject = `${brandName} | Siparişiniz kargoya verildi - ${siparisNo}`
 
     // ---- Plain-text body (Resend `text:`) ----
     const emailContent = `
 Merhaba ${customer_name || ''},
 
-${prettyOrderNo} numaralı siparişiniz kargoya verildi! 📦
+${siparisNo} numaralı siparişiniz kargoya verildi! 📦
 
 🚛 Kargo Firması: ${carrier}
 📋 Takip Numarası: ${tracking_number}
@@ -258,7 +260,7 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
       if (tpl) {
         html = renderTemplate(tpl, {
           customer_name,
-          order_number: prettyOrderNo,
+          order_number: siparisNo,
           carrier,
           tracking_number,
           tracking_url,
@@ -275,7 +277,7 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
         `<h2 style="color: ${brandPrimary};">${brandName} — Siparişiniz kargoya verildi! 📦</h2>`,
         brandLogoUrl ? `<p><img src="${brandLogoUrl}" alt="${brandName}" style="max-height:40px;"/></p>` : '',
         `<p>Merhaba <strong>${customer_name || ''}</strong>,</p>`,
-        `<p><strong>${prettyOrderNo}</strong> numaralı siparişiniz kargoya verildi!</p>`,
+        `<p><strong>${siparisNo}</strong> numaralı siparişiniz kargoya verildi!</p>`,
         '<div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">',
         '<h3 style="margin-top: 0; color: #374151;">Kargo Bilgileri</h3>',
         `<p><strong>🚛 Kargo Firması:</strong> ${carrier}</p>`,
@@ -398,7 +400,7 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
       }
     } catch { /* best effort */ }
 
-    console.warn(`📧 Shipping notification sent to ${toList[0]} for order ${prettyOrderNo}`)
+    console.warn(`📧 Shipping notification sent to ${toList[0]} for order ${siparisNo}`)
 
     return new Response(JSON.stringify({
       success: true,

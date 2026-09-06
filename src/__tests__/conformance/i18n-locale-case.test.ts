@@ -44,7 +44,11 @@ const DONMUS_BORC: ReadonlyArray<readonly [string, number]> = [
   // --- teknik (ASCII dize; locale'siz çağrı DOĞRU) ---
   ['src/components/authority/AuthorityRenderer.tsx', 1], // teknik: Lucide ikon adı
   ['src/components/authority/TechnicalDrawingAuthority.tsx', 1], // teknik: dosya formatı (pdf→PDF)
-  ['src/views/OrdersPage.tsx', 2], // teknik: sipariş kodu + kimlik dilimi (hex)
+  // REC-156 (2026-09-06): 2 → 1. Sipariş numarası artık ELLE kesilip büyütülmüyor;
+  // biçimlendirme `src/utils/siparisNo.ts` içine taşındı, o yüzden bu dosyadaki iki
+  // `toUpperCase()` isabetinden biri kayboldu. Kalan 1 isabet hâlâ teknik (kimlik
+  // diliminin hex gösterimi) — kullanıcı METNİ değil, o yüzden borç olarak duruyor.
+  ['src/views/OrdersPage.tsx', 1], // teknik: kimlik dilimi (hex)
   ['src/views/admin/quotes/QuotesTableBody.tsx', 1], // teknik: kullanıcı kimliği dilimi (hex)
   ['src/views/checkout/injectCheckoutForm.ts', 2], // teknik: DOM nodeName / tagName
 

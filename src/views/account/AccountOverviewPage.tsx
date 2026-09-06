@@ -13,6 +13,7 @@ import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDate } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
+import { siparisNoGoster } from '../../utils/siparisNo'
 
 
 interface OrderRecord {
@@ -230,7 +231,7 @@ export default function AccountOverviewPage() {
                 </h3>
                 {activeShipment ? (
                   <p className="text-sm font-medium text-slate-500 mt-1">
-                    {t('account.overview.orderPrefix')} <span className="font-bold text-slate-900">{t('account.overview.orderHash', { code: activeShipment.order_number?.split('-').pop() || activeShipment.id.slice(-8).toUpperCase() })}</span> {t('account.overview.inTransitSuffix')}
+                    {t('account.overview.orderPrefix')} <span className="font-bold text-slate-900">{t('account.overview.orderHash', { code: siparisNoGoster(activeShipment.order_number, activeShipment.id) })}</span> {t('account.overview.inTransitSuffix')}
                   </p>
                 ) : (
                   <p className="text-sm font-medium text-slate-500 mt-1">{t('account.overview.noActiveShipment')}</p>
@@ -312,7 +313,7 @@ export default function AccountOverviewPage() {
               <div className="divide-y divide-slate-100">
                 {orders.slice(0, 4).map((o) => {
                   const isDelivered = o.status.toLowerCase() === 'delivered'
-                  const code = o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`
+                  const code = siparisNoGoster(o.order_number, o.id)
                   return (
                     <div key={o.id} className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors">
                       <div className="flex items-start gap-4">

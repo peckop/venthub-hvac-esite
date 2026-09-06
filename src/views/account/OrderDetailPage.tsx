@@ -18,6 +18,7 @@ import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { VARIANT_DETAIL_COLUMNS } from '../../lib/services/product.columns'
+import { siparisNoGoster } from '../../utils/siparisNo'
 
 interface ShippingAddress {
   fullAddress?: string
@@ -188,7 +189,7 @@ export default function OrderDetailPage() {
         import('jspdf-autotable')
       ])
       const doc = new jsPDF({ unit: 'pt', format: 'a4' })
-      const orderNo = o.order_number ? o.order_number.split('-')[1] : o.id.slice(-8).toUpperCase()
+      const orderNo = siparisNoGoster(o.order_number, o.id)
       doc.setFont('helvetica', 'bold'); doc.setFontSize(16)
       doc.text('PROFORMA', 40, 40)
       doc.setFont('helvetica', 'normal'); doc.setFontSize(10)
@@ -291,7 +292,7 @@ export default function OrderDetailPage() {
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
                   <Package size={24} className="text-primary-navy" />
-                  {t('orders.orderNumber')}{t('account.orderDetail.orderNoSuffix', { code: order.order_number?.split('-').pop() || order.id.slice(-8).toUpperCase() })}
+                  {t('orders.orderNumber')}{t('account.orderDetail.orderNoSuffix', { code: siparisNoGoster(order.order_number, order.id) })}
                   {order.is_demo && (
                     <span className="px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-xs uppercase font-bold tracking-wider rounded-lg shadow-sm">
                       {t('account.orderDetail.demoBadge')}
