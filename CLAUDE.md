@@ -120,16 +120,25 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 - `RECOMMENDATIONS.md` · `CHANGELOG.md` — durum ve değişiklik geçmişi.
 - **Katalog→ticaret hattı SSOT:** `docs/plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan-uca pano)
   + `docs/standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`.
-  Veri deposu: `C:/Users/alize/venthub-pdf-ingestor` (CSV'ler). NLM auth bozulursa → memory `nlm-auth-issue`
+  Veri deposu: `C:/Users/alize/venthub-pdf-ingestor` (CSV'ler). **KATALOG PDF'İNDE NE YAZDIĞI
+  sorusu → önce KAYNAK DİZİNİ:** `<ingestor>/kaynak-dizini/sayfalar.jsonl` (+ `manifest.json`);
+  **PDF doğrudan taranmaz** — dizinde yoksa önce dizine eklenir (`scripts/kaynak_dizini/cikar.py`,
+  tazelik kapısı `tazelik.py`). Cetvel: `catalog-ingestion-standard.md` §6.3.
+  NLM auth bozulursa → memory `nlm-auth-issue`
   (**2026-08-17 ürün değişti:** paket `notebooklm-py`, CLI `notebooklm`, MCP sunucusu `notebooklm-py`;
   çözüm `notebooklm login`. `auth check` tek başına kanıt DEĞİL — `notebooklm list` ile ölç).
 - `docs/` (kök) — **üretilmiş** master MD'ler (frontend, edge functions, DB şema) — elle düzenleme.
 - `.claude/skills/` = Claude Code yetenekleri · `.agent/skills/` = Antigravity/worker yetenekleri — **İKİSİ DE AKTİF ve KASITLI** (çift ağaç); birleştirme/silme ÖNERME.
 
-## Bilgi Kaynağı İş Akışı (üç katman)
+## Bilgi Kaynağı İş Akışı (dört katman)
 
 - **Kod yapısı / "ne çağırıyor, neyi etkiler, nerede" sorusu** → önce **CodeGraph** (AST grafiği,
   ~1sn taze, kesin). grep'ten önce buna bak.
+- **"Katalog PDF'inde ne yazıyor" sorusu** → **KAYNAK DİZİNİ**, PDF'i AÇMA:
+  `<venthub-pdf-ingestor>/kaynak-dizini/sayfalar.jsonl` (sayfa metni + tablo hücreleri, hash'li,
+  deterministik). Dizinde yoksa **önce dizine eklenir** (`scripts/kaynak_dizini/cikar.py`);
+  tazelik `tazelik.py` ile ölçülür. Cetvel: `catalog-ingestion-standard.md` §6.3.
+  *(Niçin kural: PDF'i doğrudan tarayan her iş, aynı kataloğu üçüncü kez okur — patinajın sebebi buydu.)*
 - **Kural / niçin / mimari karar / SaaS plan sorusu** → **NotebookLM dijital ikiz** (`chat_ask` — 08-17'ye kadar `notebook_query`,
   ID `235043eb-970f-4a52-9f39-1d02b2621e9c`) veya `CONTEXT.md`.
 - **Çelişirse kod kazanır.** NLM ikizi snapshot'tır, drift edebilir (ör. tablo sayısı); kod

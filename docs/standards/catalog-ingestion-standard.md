@@ -307,6 +307,99 @@ markayı taşımaz; kesin olmayan bir çıkarımı **RED** yapmak, doğru satır
 
 ---
 
+## 6.3 KAYNAK DİZİNİ — PDF doğrudan taranmaz, dizin okunur (REC-163, 2026-09-06)
+
+### Niçin var
+
+Her iş kataloğu **sıfırdan** okuyordu. Bitiş ölçütü "taradık" olduğu için kayıt kapanıyor,
+üç gün sonra aynı PDF baştan taranıyordu. Ara ürün (sayfa metni, tablo hücreleri) her
+seferinde atılıyordu. Recep'in tarifi: *"deterministik hâle gelmeli; boş tekrarlar nedeniyle
+uzun zamandır patinaj yapıyoruz."*
+
+**Kaynak dizini o ara ürünü kalıcı kılar.** Aynı hash → aynı çıktı; hash değişmediyse
+yeniden çıkarım **yok**.
+
+### Nerede
+
+Veri deposu: **`venthub-pdf-ingestor`** (bu repoda değil — kaynak PDF'ler orada).
+
+| Dosya | Ne |
+|---|---|
+| `kaynak-dizini/sayfalar.jsonl` | sayfa başına bir satır: `pdf_hash · dosya · sayfa · sayfa_sayisi · metin · tablo(satırlar) · arac · arac_surum` |
+| `kaynak-dizini/manifest.json` | belge/sayfa sayıları, tablo/metinsiz sayfa, **takma adlar**, araç sürümü |
+| `scripts/kaynak_dizini/cikar.py` | çıkarıcı |
+| `scripts/kaynak_dizini/tazelik.py` | tazelik kapısı |
+
+Ölçülen ilk sürüm (2026-09-06): **24 dosya → 23 belge · 1171 sayfa · 580 tablolu sayfa ·
+12 metinsiz sayfa · 2,6 MB · çıkarım 6 dk 37 sn.**
+
+### Nasıl koşulur
+
+```bash
+cd <ingestor>
+python scripts/kaynak_dizini/cikar.py            # dizini üret (tablolu)
+python scripts/kaynak_dizini/tazelik.py          # kapı: dizin kaynakla örtüşüyor mu
+```
+
+### ⛔ KURAL — hiçbir şerit/alt ajan PDF'i DOĞRUDAN taramaz
+
+Katalog PDF'inde ne yazdığı sorusu **dizinden** cevaplanır. Dizinde yoksa **önce dizine
+eklenir**, sonra okunur. K2 ikinci çıkarım turu da dizinden koşar, PDF'ten değil.
+
+*Niçin kural: dizin kurulduğu gün ölçüldü — hiçbir cetvelde anılmıyordu. Bir ajan işe
+başlayınca dizini bulamaz, PDF'leri açar ve baştan tarar; yani **kırmaya çalıştığımız
+döngü, kendi ürettiğimiz artefaktın üzerinde yeniden kurulur**. Kurmak işin kolay yarısı;
+kuralın yazılı olması asıl iş.*
+
+### Determinizm (kabul şartı)
+
+Aynı PDF iki kez → **byte-eşit** çıktı. Sınav: dizini iki kez üret, `sha256` karşılaştır.
+
+**Bunu mümkün kılan karar: çıktı satırlarında ZAMAN DAMGASI YOK.** Damga yalnız
+manifestte durur. Damga dizine konsaydı sınav her koşumda kırmızı verirdi — yani kapıyı
+kendimiz öldürürdük.
+
+Aynı sebeple `.gitattributes` dizini **LF**'e sabitler: `core.autocrlf=true` olan bir
+depoda taze klon CRLF açar, çıkarıcı LF yazar ve dosya *hiçbir şey değişmeden* "değişmiş"
+görünür — kapı ölçmesi gereken şeyi değil kendi ortamını ölçmüş olur.
+
+### Tazelik kapısı — üç kırmızı sınıfı AYRI AYRI
+
+| Sınıf | Ne demek | Ne yapılır |
+|---|---|---|
+| **DEGISMIS** | dosya dizinde var, hash farklı | üretici kataloğu güncellemiş → yeniden çıkarım |
+| **EKSIK** | diskte PDF var, dizinde yok | dizine eklenir |
+| **ARTIK** | dizinde kayıt var, diskte PDF yok | kaynak silinmiş/taşınmış → o kanıt **dayanaksız** |
+
+"Bir şey değişti" demek yetmez; hangi sınıf olduğu **adıyla** basılır.
+**Takma adlar EKSIK sayılmaz:** aynı hash'e sahip ikinci dosya dizinde kayıt olarak
+bulunmaz, manifestte durur (ölçüldü: `vortice-brochure-mev.pdf` == `vortice_vort_mono_range_new.pdf`).
+Bu ayrımı yapmayan kapı her koşumda yanlış kırmızı verirdi.
+
+### Kanıt tablosu ve KANITSIZ mandalı
+
+Her DB değeri bir kaynak sayfasına bağlanmaya çalışılır; **bağlanamayanlar sayılır ve
+yayımlanır**. Dizin yalnız *içerdiğiyle* değerlendirilirse hep iyi görünür ve kanıtsız
+kısım görünmez olur — "katalogda ne eksik" sorusunun ölçülebilir cevabı hiç doğmaz.
+
+**KANITSIZ sayısı tek yönlü mandaldır: yalnız küçülür.** Büyüdüyse ya yeni veri geldi
+(açıklanır) ya bir kaynak bağlantısı koptu (kırmızı).
+
+İlk ölçüm (2026-09-06): 4887 değer → aranabilir 3733 · bulunan 3434 · **KANITSIZ 299** ·
+aranamaz (sayı/kod taşımayan) 1154 **ayrı sınıf**.
+
+**Dürüst sınır — alan adı bunu itiraf eder:** "bulundu" satırındaki alan `kanit_gucu`
+değil **`esleme_yontemi`** ve bugünkü değeri `SAYFA_ICINDE_GECIYOR`. Geçmek doğruluğu
+**kanıtlamaz**: 3434 satırın yalnız 88'inde tek aday sayfa var. Sayı sayfada model adı
+olarak da geçebilir (`HF/S 315` ↔ `315 mm`).
+
+### `tenant_id`
+
+Kanıt tablosu `tenant_id` alanını **taşır** (bugün tek değer: `venthub`). Kiracı ayrımı
+sonradan eklenirse veri geriye dönük yeniden üretilmek zorunda kalmasın diye alan baştan var.
+
+---
+
 ## 7. Provenance / ilişki
 
 Kaynak: çapraz-sorgu (`cross_notebook_query` Vortice-Full + Avensair, 2026-06-19) → Avensair'in 27 gerçek bölümü atıfla.
