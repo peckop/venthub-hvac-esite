@@ -1,0 +1,103 @@
+{
+  "damga": "2026-09-06T09:45:48Z",
+  "kaynak": "prod DB (SELECT), product_families.description->>'tr' + products.technical_specs",
+  "uretim": "docs/standards/aile-metni-sayisal-standard.md §3 — SQL orada yazılı, yeniden koşulabilir",
+  "kapsam": "ürün sayısı > 1 olan ve TR metninde rakam geçen aileler",
+  "onceki_paket": "aile-metni-sayisal-2026-09-06.json (damga 05:25:54Z) — Katalog'un 38 aile metin yazımından ÖNCEKİ hâl",
+  "nicin_yeniden_uretildi": "URUN-KATALOG 38 ailenin TR metnini prod'a yazdı (REC-146 / K7.8). Paket o yazımdan önceki fotoğraftı; tazelenmeseydi kapı DÜZELMİŞ borcu hâlâ borç sanacaktı.",
+  "olculen_borc": 0,
+  "not": "max_delivery_m3h değerlerinin bir kısmı birimi değerin İÇİNE gömüyor ('10500 m³/h'); paket üretilirken rakam-dışı karakterler ayıklandı (cetvel §3).",
+  "aileler": [
+    {
+      "slug": "avens-elektrikli-isiticilar",
+      "urun": 6,
+      "cap_min": null, "cap_max": null,
+      "debi_min": null, "debi_max": null,
+      "metin_tr": "AVenS ısı geri kazanım cihazlarıyla birlikte kullanılan, trifaze 380V 50Hz beslemeli elektrikli ısıtıcı serisi."
+    },
+    {
+      "slug": "avens-hucreli-aspiratorler",
+      "urun": 6,
+      "cap_min": null, "cap_max": null,
+      "debi_min": 18000, "debi_max": 18000,
+      "metin_tr": "Sık kanatlı, kayış kasnaklı, çift cidar hücreli radyal fan ailesi; yüksek debi ve yüksek basınç gerektiren havalandırma uygulamaları için 50 mm standart hücre paneliyle üretilir."
+    },
+    {
+      "slug": "avens-hucreli-hf-s",
+      "urun": 7,
+      "cap_min": 250, "cap_max": 500,
+      "debi_min": null, "debi_max": null,
+      "metin_tr": "Seyrek kanatlı, kayış kasnaklı, çift cidar hücreli radyal fan ailesi; HF/FW ile aynı 50 mm hücre gövdesini kullanır, kapasitesi 25000 m³/h ve 11 kW seviyesine kadar uzanır."
+    },
+    {
+      "slug": "avens-isi-geri-kazanim",
+      "urun": 3,
+      "cap_min": null, "cap_max": null,
+      "debi_min": null, "debi_max": null,
+      "metin_tr": "Eurovent sertifikalı alüminyum eşanjör, G4 filtre ve plug fan ile kurulmuş, kanal bağlantılı ısı geri kazanım cihazı ailesidir."
+    },
+    {
+      "slug": "avens-siginak-havalandirma-uniteleri",
+      "urun": 3,
+      "cap_min": null, "cap_max": null,
+      "debi_min": 1200, "debi_max": 3200,
+      "metin_tr": "Sığınak havalandırması için kompakt kanal tipi, plug fanlı ve by-pass damperli filtreli havalandırma ünitesi; radyoaktif nükleer serpinti tutucu H13 filtre, G4 kaba filtre ve aktif karbon filtre ile 1200 m³/h ile 3200 m³/h arasında maksimum debi sunar."
+    },
+    {
+      "slug": "avens-sulu-batarya",
+      "urun": 8,
+      "cap_min": null, "cap_max": null,
+      "debi_min": null, "debi_max": null,
+      "metin_tr": "AVenS ısı geri kazanım cihazlarıyla birlikte kullanılan, 90/70 °C sıcak su ile çalışan kanal tipi sulu ısıtma bataryası serisi."
+    },
+    {
+      "slug": "danfoss-fc101",
+      "urun": 16,
+      "cap_min": null, "cap_max": null,
+      "debi_min": null, "debi_max": null,
+      "metin_tr": "Danfoss VLT HVAC Basic Drive FC101, HVAC uygulamalarına özel fonksiyonlar, EMC filtre, otomatik enerji optimizasyonu ve akıllı logic kontrolör sunan bir frekans konvertörü (motor sürücüsü) serisidir."
+    },
+    {
+      "slug": "danfoss-fc102",
+      "urun": 17,
+      "cap_min": null, "cap_max": null,
+      "debi_min": null, "debi_max": null,
+      "metin_tr": "Danfoss VLT HVAC Drive FC102, HVAC uygulamalarına özel fonksiyonlar, %98 temel enerji verimliliği, uyku modu ve otomatik enerji optimizasyonu sunan bir frekans konvertörü (motor sürücüsü) serisidir."
+    },
+    {
+      "slug": "danfoss-fc51",
+      "urun": 2,
+      "cap_min": null, "cap_max": null,
+      "debi_min": null, "debi_max": null,
+      "metin_tr": "Danfoss FC-51, AVenS kataloğunda küçük güçlü çatı ve davlumbaz fanlarının hız kontrolü için hız anahtarı olarak listelenen kompakt bir frekans konvertörüdür."
+    },
+    {
+      "slug": "vortice-punto-evo-flexo",
+      "urun": 4,
+      "cap_min": 100, "cap_max": 120,
+      "debi_min": 90, "debi_max": 175,
+      "metin_tr": "Duvar ve tavan montajına uygun, duvardan ya da kısa kanallardan doğrudan hava atışı için tasarlanmış mini aksiyel fan serisi; 100 mm ve 120 mm olmak üzere iki anma çapı sunulur."
+    },
+    {
+      "slug": "vortice-vort-e-atex",
+      "urun": 14,
+      "cap_min": 250, "cap_max": 630,
+      "debi_min": 1145, "debi_max": 6550,
+      "metin_tr": "Gaz veya toz nedeniyle patlayıcı ortam oluşabilen — ATEX sınıflandırmasına göre Grup II — sanayi hacimlerinde kullanılmak üzere tasarlanmış, ATEX 2014/34/EU direktifine uygun, plaka tipi patlama korumalı endüstriyel aksiyel fan ailesi."
+    },
+    {
+      "slug": "vortice-vort-qbk-sal-kc-evo",
+      "urun": 21,
+      "cap_min": 315, "cap_max": 630,
+      "debi_min": 2540, "debi_max": 22100,
+      "metin_tr": "Sıcak, nemli ve kirli havayı dışarı atmak için tasarlanmış; emiş ve basma ağızları 90° olan, yağ ve is yüklü havanın işlenmesine uygun hücreli (kabinli) davlumbaz ve mutfak egzoz fanı ailesi."
+    },
+    {
+      "slug": "vortice-vort-quadro-evo",
+      "urun": 23,
+      "cap_min": 80, "cap_max": 100,
+      "debi_min": 60, "debi_max": 100,
+      "metin_tr": "Banyo ve WC gibi ıslak hacimler için, duvar/tavan yüzeyine veya sıva altına gömme monte edilebilen konut tipi radyal (santrifüj) aspiratör serisi; koruma derecesi IP45'tir."
+    }
+  ]
+}
