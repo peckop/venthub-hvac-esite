@@ -243,6 +243,75 @@ describe('INV-KATEGORI-ACIKLAMA-1 · kategori açıklaması dile göre çözül�
   })
 
   // -------------------------------------------------------------------------
+  it('⭐K4b · YENİ ham `category.description` okuyucusu DOĞAMAZ (şerit sahibi ölçümü)', () => {
+    // NİÇİN BU KOL SONRADAN EKLENDİ — ölçülerek bulundu, kapının ilk hâli üzerinde:
+    // `src/components/category/` altına, ham `category.description` okuyan YENİ bir
+    // dosya koydum ve kapı **7/7 YEŞİL kaldı**. Yani kapı BİLİNEN çağrı yerlerini
+    // koruyordu ama YARIN eklenecek kodu görmüyordu — anlık görüntü, mandal değil.
+    // K3 çözücüyü `lang`siz çağıranı yakalar; K7 huniden beslenmeyen yüzeyi yakalar;
+    // ama çözücüyü HİÇ çağırmayıp kolonu doğrudan okuyan bir dosya ikisinin de
+    // arasından geçiyordu. Kusurun tamamı zaten buydu (REC-161'in kendi olayı:
+    // `useCategoryViewModel.ts:79` tam olarak böyle bir ham okumaydı).
+    //
+    // ⚖MUAFİYET, ADIYLA VE GEREKÇESİYLE (ölçüldü, uydurulmadı):
+    //  · `app/[lang]/category/[categorySlug]/page.tsx` — burada `s.description`
+    //    RENDER EDİLMİYOR; `mapDatabaseCategoryToDomain`'e GEÇİRİLİYOR, yani alan
+    //    huniye giden yolun üzerinde taşınıyor. Taşımak okumak değildir.
+    //  · `admin/**` ve `lib/admin/**` — BAŞKA ŞERİDİN CLAIM'İ. Admin bir vitrin değil
+    //    bir düzenleme aracıdır; ham kolonu görmesi meşrudur. Bu kapı oraya DOKUNMAZ.
+    //  · SSOT_FILE — çözücünün kendisi; zincirin son yedeği olarak ham kolonu okur.
+    //
+    // ⚠SINIR — İKİ TANE, ikisi de ölçülerek bulundu:
+    //  1. Bu kol `<değişken>.description` biçimini arar. Alan başka bir isme atanıp
+    //     (`const d = cat; d.description`) okunursa GÖRMEZ. Gevşeklik bilinçli: amaç
+    //     yanlış-KIRMIZI vermemek. Gerçek koruma ölçülenden biraz DAR olabilir.
+    //  2. ⭐METİN TARAMASI TİP AYRIMI YAPAMAZ. `category.description` iki AYRI şey
+    //     olabilir: ham DB kolonu (kusur) ya da bir görünüm-modelinin ÇÖZÜLMÜŞ metin
+    //     alanı (meşru). İkisi kaynakta AYNI görünür. Bu yüzden aşağıdaki muafiyet
+    //     kaçınılmaz — ve tam da bu sebeple GEREKÇESİ yazılmak zorunda.
+    const MUAF = [
+      SSOT_FILE,
+      // Burada `s.description` RENDER EDİLMİYOR; `mapDatabaseCategoryToDomain`'e
+      // GEÇİRİLİYOR — alan huniye giden yolun üzerinde taşınıyor. Taşımak okumak değil.
+      'app/[lang]/category/[categorySlug]/page.tsx',
+      // ⭐ÖLÇÜLDÜ, VARSAYILMADI: bu kol ilk koşumda BU DOSYAYI yakaladı ve
+      // YANLIŞ-KIRMIZIydı. Sebebi: `app/[lang]/page.tsx:153` artık metni
+      // `getCategoryDescription(c, lang)` ile ÇÖZÜP `CategoryViewModelLite`e koyuyor;
+      // buradaki `category` o görünüm-modelidir, `DbCategory` DEĞİL. Yani okunan şey
+      // ham kolon değil ZATEN ÇÖZÜLMÜŞ metin — tüketici yeniden çözmez, yalnız basar.
+      // ⚠BU MUAFİYETİN BEDELİ: yarın biri buraya GERÇEK bir `DbCategory` geçirirse
+      // kapı SUSAR. Onu tutan şey K3+K7'dir (üretici taraf `lang`siz çağıramaz ve
+      // yüzey huniden beslenmek zorundadır), bu kol değil.
+      'components/home/GuidedCategoryDiscovery.tsx',
+    ]
+    const HAM_KOLON = /\b(?:category|categoryRow|localizedCategory|dbCategory|cat|subCategory)\s*(?:\?\.|\.)\s*description\b(?!_i18n)/
+
+    const offenders = SCANNED
+      .filter((f) => !MUAF.includes(f.rel))
+      .filter((f) => !f.rel.startsWith('components/admin/'))
+      .filter((f) => !f.rel.startsWith('views/admin/'))
+      .filter((f) => !f.rel.startsWith('lib/admin/'))
+      .filter((f) => HAM_KOLON.test(f.clean))
+      .map((f) => f.rel)
+
+    expect(
+      offenders,
+      'Ham (dil-çözümsüz) `category.description` okunuyor. Kategori açıklaması artık\n' +
+        'DİLE GÖRE çözülür: getCategoryDescription(category, lang) kullan, ya da metni\n' +
+        'useCategoryViewModel hunisinden al. Muafiyet gerekiyorsa MUAF listesine\n' +
+        'GEREKÇESİYLE eklenir — sessizce değil. İhlaller:\n  ' +
+        (offenders.join('\n  ') || '—'),
+    ).toEqual([])
+
+    // AYIRT EDİCİLİK — desen hem yakalamalı hem serbest bırakmalı:
+    expect(HAM_KOLON.test('const m = category.description || ""'), 'ham okumayi YAKALAMADI').toBe(true)
+    expect(HAM_KOLON.test('localizedCategory?.description'), 'opsiyonel zinciri YAKALAMADI').toBe(true)
+    expect(HAM_KOLON.test('category.description_i18n'), 'i18n alanini YANLISLIKLA yakaladi').toBe(false)
+    expect(HAM_KOLON.test('product.description'), 'urun alanini YANLISLIKLA yakaladi').toBe(false)
+    expect(HAM_KOLON.test('vm.description'), 'huni ciktisini YANLISLIKLA yakaladi').toBe(false)
+  })
+
+  // -------------------------------------------------------------------------
   it('K5 · AYIRT EDİCİ: tarayıcı sentetik kusuru YAKALAR, temizi SERBEST BIRAKIR', () => {
     // --- K3 tarayıcısı: yakalamalı ---
     const kotu = [
