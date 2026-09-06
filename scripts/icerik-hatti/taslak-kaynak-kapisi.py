@@ -71,7 +71,13 @@ VARSAYILAN_HARITA = {
 # NICIN: ilk surum yalniz birinciyi taniyordu ve SEAT taslagini SESSIZCE atladi — kapsama
 # %0 ciktigi halde "YESIL" yazdi. Sessiz atlama, kapinin en tehlikeli hatasidir:
 # "bakmadim" ile "temiz" ayni gorunur. → var-olmayan-kapi-pending-gorunmez
-REF = re.compile(r"\[(?:([A-Za-zÇĞİÖŞÜçğıöşü]+)\s+)?s\.\s*([0-9]+(?:\s*[,–-]\s*[0-9]+)*)\]")
+# ⚠ SAYFA LISTESINDE "s." TEKRARI DA TANINIR: "[AVenS s.54, s.55]" ve "[AVenS s.54, 55]".
+# Olculmus tuzak (alt-ajan buldu, 2026-09-06): ilk bicim regex'e UYMUYORDU ve referans
+# SESSIZCE ATLANIYORDU — o taslakta 3 iddia boyle kaybolmustu, kapi yine de "0 dusen" diyordu.
+# Sessiz atlama, kapinin en tehlikeli hatasidir: "bakmadim" ile "temiz" ayni gorunur.
+REF = re.compile(
+    r"\[(?:([A-Za-zÇĞİÖŞÜçğıöşü]+)\s+)?s\.\s*([0-9]+(?:\s*[,–-]\s*(?:s\.\s*)?[0-9]+)*)\]"
+)
 
 # Doğrulanabilir jetonlar — dile bağlı OLMAYAN işaretler:
 JETON_DESENLERI = [
@@ -169,7 +175,16 @@ def taslagi_denetle(yol, ayrinti=False):
         # bolme sonrasi son parca BOS kalir ve iddia sessizce ATLANIRDI. Kapinin ilk surumu
         # bu yuzden noktayla biten her cumleyi gormuyordu — kasitli sahte iddia sinavi
         # olmasaydi fark edilmezdi. "0 dusen" ile "hic bakmadim" ayni gorunuyordu.
-        parcalar = [p.strip() for p in re.split(r"(?<=[.!?])\s+|\n[*\-|>]\s*|\n\n", once) if p.strip()]
+        # ⚠ SUSLEME KARAKTERLERINDEN IBARET PARCALAR ATLANIR.
+        # Olculmus tuzak (alt-ajan buldu, 2026-09-06): referans blockquote icinde YENI SATIRDA
+        # "> " ile basliyorsa, bolme sonrasi son parca sadece ">" oluyordu; iddia bu karaktere
+        # iniyor, jeton bulunamiyor ve olcum SESSIZCE atlaniyordu. Artik anlamli metni olmayan
+        # parcalar elenir ve bir ONCEKI gercek cumle iddia sayilir.
+        parcalar = [
+            p.strip()
+            for p in re.split(r"(?<=[.!?])\s+|\n[*\-|>]\s*|\n\n", once)
+            if len(re.sub(r"[\s>*|\-–—:·`]+", "", p)) >= 3
+        ]
         iddia = parcalar[-1] if parcalar else ""
         if not iddia:
             continue
@@ -180,7 +195,11 @@ def taslagi_denetle(yol, ayrinti=False):
                 print(f"    olculemedi (jeton yok): {iddia[:70]}")
             continue
 
-        sayfalar = [int(x.strip()) for x in sayfalar_ham.split(",")]
+        # "s.54, s.55" biciminde ikinci parca "s.55" gelir -> rakam disi her sey atilir.
+        # (Regex'i genisletip BURAYI unutmustum: betik ValueError ile COKTU ve cikis kodu 1
+        #  oldugu icin disaridan "KIRMIZI" gibi gorunuyordu. Cokme ile kirmizi ayni renge
+        #  boyaniyorsa kapi yalan soyluyor demektir.)
+        sayfalar = [int(re.sub(r"[^0-9]", "", x)) for x in sayfalar_ham.split(",") if re.search(r"[0-9]", x)]
         havuz = ""
         for sf in sayfalar:
             t = sayfa_metni_getir(pdf_ad, sf, onbellek)
