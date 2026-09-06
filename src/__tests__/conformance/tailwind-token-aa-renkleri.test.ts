@@ -24,6 +24,9 @@
  *     rozeti" SEMANTİK rollerdir; statik tarama bir sınıfın hangi rolde durduğunu
  *     bilemez (`cn()` içine gömülü dizeler ve `toneClasses[tone]` gibi dolaylı üretim
  *     bunu kesinleştiriyor). §Kullanım sınırı incelemeye bağlıdır, kapıya değil.
+ *     ⚠TEK İSTİSNA, adıyla çakılı: sepet sayacı rozeti (`{cartCount}`) — aşağıdaki
+ *     "KAZANIM GERİ VERİLEMEZ" kolu o TEK yüzeyin degradeye dönmesini engeller. Bu bir
+ *     semantik rol çıkarımı değil, kaynakta adı yazılı tek bir yüzeydir.
  *  ⛔ HAM HEX taraması YORUMLARI GÖRMEZ (bilerek). Sebep ölçülmüş bir yanlış
  *     pozitiftir ve INV-TOKEN-SINIF-1 aynı sınırı aynı gerekçeyle yazıyor: token'ı
  *     AÇIKLAYAN yorumda kaynak kimliği olarak HEX geçer (index.css'teki token
@@ -224,5 +227,39 @@ describe('INV-TOKEN-AA-RENK-1 — AA koyu tonları tek kaynakta, kararın değer
     expect(hamHexIhlalleri(urlluSatir, HEXLER)).toEqual(['#00708F'])
     // 3) Gercek yorum yine de siyriliyor — kapi zayiflamadi:
     expect(hamHexIhlalleri(`const u = 'https://a.b/c' // zemin #00708F`, HEXLER)).toEqual([])
+  })
+
+  it('⭐KAZANIM GERİ VERİLEMEZ — sepet sayacı rozetinin zemini DEGRADE olamaz', () => {
+    // NICIN BU KOL VAR (olcum, kapinin ilk hali uzerinde yapildi): kapi TOKENI
+    // koruyordu ama KULLANIMI korumuyordu. Rozet eski
+    // `bg-gradient-to-r from-cyan-400 to-blue-600` haline geri cevrildiginde kapi
+    // 10/10 YESIL kaldi — yani K25-b'nin musteriye donuk TEK kazanimi (rozetteki
+    // beyaz rakamin okunur olmasi) korumasizdi ve sessizce geri verilebilirdi.
+    //
+    // DEGRADE NICIN KUSUR: kontrast zemin boyunca DEGISIR, dolayisiyla "bu rozet AA
+    // mi" sorusunun tek bir cevabi yoktur; rakam degradenin acik ucunda esigin
+    // altina duser. Duz ton, sorunun cevaplanabilir olmasinin sartidir.
+    //
+    // ⚠BU KOLUN SINIRI: yalniz SEPET rozetini olcer — kaynakta `{cartCount}` yazan
+    // satir. Genel "token dogru yerde mi" sorusu HALA kapi disidir (bkz. baslikta
+    // ⛔ blogu); burada semantik rol cikarimi yapilmaz, TEK yuzey adiyla cakilidir.
+    const sticky = readFileSync(join(KOK, 'src', 'components', 'StickyHeader.tsx'), 'utf8')
+    const rozetSatirlari = sticky.split(/\r?\n/).filter((s) => s.includes('{cartCount}'))
+    expect(
+      rozetSatirlari.length,
+      'StickyHeader.tsx icinde `{cartCount}` render eden satir YOK — rozet tasindi ya da ' +
+        'yeniden adlandirildi. BU KOL GUNCELLENMELI, silinmemeli (yoksa kapi susar).',
+    ).toBeGreaterThan(0)
+    for (const satir of rozetSatirlari) {
+      expect(
+        satir.includes('bg-brand-cyan-ink'),
+        `Sepet rozetinin zemini bg-brand-cyan-ink DEGIL: ${satir.trim()}`,
+      ).toBe(true)
+      expect(
+        /bg-gradient|from-[a-z]+-\d|to-[a-z]+-\d/.test(satir),
+        `Sepet rozetine degrade geri konmus: ${satir.trim()} — beyaz rakam degradenin ` +
+          'acik ucunda AA altina duser; K25-b bunu duzeltmisti.',
+      ).toBe(false)
+    }
   })
 })

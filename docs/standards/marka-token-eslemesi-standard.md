@@ -90,6 +90,17 @@ koda ham `#00708F` yazıldı → kırmızı · tailwind'de `hsl(var(…))` yerin
 
 ⛔**"Doğru yerde mi kullanılıyor" ölçülmez** — §3'teki semantik-rol sınırı burada da geçerli.
 
+⭐**TEK İSTİSNA — sepet sayacı rozeti (2026-09-06'da eklendi, ölçümle).** Kapının ilk hâli
+tokeni koruyordu ama **kullanımını korumuyordu**: rozet eski `bg-gradient-to-r from-cyan-400
+to-blue-600` hâline geri çevrildiğinde kapı **10/10 yeşil kalıyordu** — yani K25-b'nin
+müşteriye dönük tek kazanımı sessizce geri verilebilirdi. `KAZANIM GERİ VERİLEMEZ` kolu bunu
+kapatır: kaynakta `{cartCount}` yazan satır `bg-brand-cyan-ink` taşımak **zorunda** ve degrade
+sınıfı taşıyamaz. Sabotajla iki yönlü doğrulandı (normal 11/11 · degrade geri konunca 1 kırmızı).
+
+Bu bir **semantik rol çıkarımı değildir** — genel sınır yerinde duruyor. Adı kaynakta yazılı
+**tek bir yüzey** çakılmıştır; degradenin kusur olma sebebi de ölçülebilirliktir: kontrast zemin
+boyunca değiştiği için "bu rozet AA mı" sorusunun tek bir cevabı olmaz.
+
 ---
 
 ## 2) Paletin TEK kaynağı olur
