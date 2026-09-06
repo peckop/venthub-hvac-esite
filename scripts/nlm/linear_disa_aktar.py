@@ -13,8 +13,17 @@ Ciktilar (varsayilan docs/proje-takip/linear/):
 
 Kullanim: python scripts/nlm/linear_disa_aktar.py [--tarih YYYY-MM-DD] [--hedef-dizin DIR] [--simdi ISO]
 Determinizm: ayni Linear durumu + ayni --simdi -> bayt-ayni cikti (siralama: proje adi, kilometre tasi, identifier no).
+--simdi 'Z'siz verilirse UTC varsayilir (yerel saat DEGIL; iso_utc — gun_kapanisi/kararlar ile ayni yardimci).
+Iliskiler: blockedBy (bu isi bloklayanlar = inverseRelations type 'blocks') ve blocks JSON'a girer (2026-09-06 olculdu:
+REC-168 blocks REC-169 → REC-169.blockedBy = [REC-168]).
+Sir suzgeci: is basligi pano_disa_aktar.sir_suz + yol_suz'dan gecer (repo PUBLIC); OZET satirinda 'sir N · yol N'.
+Cikis: 0 · 1 anahtar yok / Linear HTTP-ag hatasi (okunur mesaj, traceback yok).
 """
-import argparse, datetime as dt, io, json, os, sys, urllib.request
+import argparse, datetime as dt, io, json, os, sys, urllib.error, urllib.request
+
+BURASI = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, BURASI)
+from pano_disa_aktar import sir_suz, yol_suz  # noqa: E402  (deger basilmaz; repo PUBLIC)
 
 API = "https://api.linear.app/graphql"
 QUERY = """
@@ -28,10 +37,18 @@ query($after: String) {
       project { name }
       projectMilestone { name }
       labels { nodes { name } }
+      relations { nodes { type relatedIssue { identifier } } }
+      inverseRelations { nodes { type issue { identifier } } }
     }
   }
 }
 """
+
+
+def iso_utc(s):
+    """ISO-8601 → aware UTC. 'Z' ya da ofset yoksa UTC VARSAYILIR (yerel saat degil): ayni --simdi uc betikte ayni damga."""
+    d = dt.datetime.fromisoformat(s.replace("Z", "+00:00"))
+    return (d.replace(tzinfo=dt.timezone.utc) if d.tzinfo is None else d).astimezone(dt.timezone.utc)
 
 
 def anahtar():
@@ -50,15 +67,22 @@ def anahtar():
     sys.exit("LINEAR_API_KEY yok (ortam degiskeni ya da HKCU\\Environment).")
 
 
-def sorgu(key, variables):
-    body = json.dumps({"query": QUERY, "variables": variables}).encode("utf-8")
+def sorgu(key, variables, query=QUERY):
+    body = json.dumps({"query": query, "variables": variables}).encode("utf-8")
     req = urllib.request.Request(API, data=body, headers={"Content-Type": "application/json", "Authorization": key})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:  # govde basilmaz (anahtar/istek yansiyabilir); yalniz kod
+        sys.exit(f"Linear HTTP {e.code} ({'anahtar/yetki' if e.code in (400, 401, 403) else 'sunucu'}); anahtar basilmadi")
+    except urllib.error.URLError as e:
+        sys.exit(f"Linear'a ulasilamadi (ag): {type(e.reason).__name__ if hasattr(e, 'reason') else 'URLError'}")
+    except TimeoutError:
+        sys.exit("Linear zaman asimi (60 sn)")
 
 
 def cek(key):
-    after, out, cagri = None, [], 0
+    after, out, cagri, sir, yol = None, [], 0, 0, 0
     while True:
         j = sorgu(key, {"after": after})
         cagri += 1
@@ -66,8 +90,11 @@ def cek(key):
             sys.exit("Linear hatasi: " + json.dumps(j["errors"])[:300])
         blk = j["data"]["issues"]
         for n in blk["nodes"]:
+            baslik, y = yol_suz(n["title"] or "")
+            baslik, s = sir_suz(baslik)
+            sir += s; yol += y
             out.append({
-                "identifier": n["identifier"], "title": n["title"],
+                "identifier": n["identifier"], "title": baslik,
                 "status": n["state"]["name"], "statusType": n["state"]["type"],
                 "assignee": (n.get("assignee") or {}).get("name"),
                 "project": (n.get("project") or {}).get("name"),
@@ -75,11 +102,13 @@ def cek(key):
                 "labels": sorted(l["name"] for l in n["labels"]["nodes"]),
                 "priority": n["priority"], "createdAt": n["createdAt"], "updatedAt": n["updatedAt"],
                 "completedAt": n.get("completedAt"), "url": n["url"],
+                "blockedBy": sorted({r["issue"]["identifier"] for r in (n.get("inverseRelations") or {}).get("nodes", []) if r.get("type") == "blocks" and r.get("issue")}),
+                "blocks": sorted({r["relatedIssue"]["identifier"] for r in (n.get("relations") or {}).get("nodes", []) if r.get("type") == "blocks" and r.get("relatedIssue")}),
             })
         if not blk["pageInfo"]["hasNextPage"]:
             break
         after = blk["pageInfo"]["endCursor"]
-    return out, cagri
+    return out, cagri, sir, yol
 
 
 def no(i):
@@ -139,7 +168,7 @@ def md_uret(rows, damga, simdi, cagri):
                 continue
             L.append(f"**{k}**\n\n| İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |\n|---|---|---|---|---:|---|")
             for r in kr:
-                L.append(f"| {r['identifier']} | {r['status']} | {r['title'][:80]} | {', '.join(r['labels']) or '-'} | {r['priority']} | {r['updatedAt'][:10]} |")
+                L.append(f"| {r['identifier']} | {r['status']} | {r['title'][:80]} | {', '.join(r['labels']) or '-'} | {r['priority']} | {r['updatedAt'][:10]}{' · BEKLİYOR: ' + ', '.join(r['blockedBy']) if r.get('blockedBy') else ''} |")
             L.append("")
         done = sorted([r for r in pr if r["statusType"] == "completed"], key=no)
         if done:
@@ -167,10 +196,10 @@ def main():
     ap.add_argument("--hedef-dizin", default="docs/proje-takip/linear")
     ap.add_argument("--simdi", default=None, help="ISO UTC; determinizm icin sabitlenebilir")
     a = ap.parse_args()
-    simdi = dt.datetime.fromisoformat(a.simdi.replace("Z", "+00:00")) if a.simdi else dt.datetime.now(dt.timezone.utc)
+    simdi = iso_utc(a.simdi) if a.simdi else dt.datetime.now(dt.timezone.utc)
     damga = simdi.strftime("%Y-%m-%dT%H:%M:%SZ")
     tarih = a.tarih or simdi.strftime("%Y-%m-%d")
-    rows, cagri = cek(anahtar())
+    rows, cagri, sir, yol = cek(anahtar())
     rows.sort(key=no)
     os.makedirs(a.hedef_dizin, exist_ok=True)
     jp = os.path.join(a.hedef_dizin, f"is-dagilimi-{tarih}.json")
@@ -180,7 +209,7 @@ def main():
         f.write("\n")
     with io.open(mp, "w", encoding="utf-8", newline="\n") as f:
         f.write(md_uret(rows, damga, simdi, cagri))
-    print(f"OZET: kayit {len(rows)} · cagri {cagri} · {mp}")
+    print(f"OZET: kayit {len(rows)} · cagri {cagri} · sir {sir} · yol {yol} · {yol_suz(mp.replace(chr(92), '/'))[0]}")  # makine yolu basilmaz
 
 
 if __name__ == "__main__":
