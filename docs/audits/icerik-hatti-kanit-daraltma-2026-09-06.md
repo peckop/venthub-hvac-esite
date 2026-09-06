@@ -1,4 +1,4 @@
-# İçerik hattı — kanıt eşlemesini ailenin KENDİ kaynağına daraltma (REC-163 artım 1)
+# İçerik hattı — kanıt eşlemesi: aileye daraltma + birim dönüşümü (REC-163 artım 1 + 2)
 
 **Şerit:** URUN-KATALOG (sid 3a7976a1) · **Tarih:** 2026-09-06 · **Durum:** ölçüm + betik; DB'ye hiçbir şey yazılmadı.
 
@@ -115,11 +115,78 @@ python scripts/icerik-hatti/aile-kaynak-cikar.py docs/audits urunler.json \
 python scripts/icerik-hatti/kanit-tablosu.py --veri urunler.json --cikti-dizin <dizin>
 ```
 
-## 7 · Bu ölçümün kapatmadığı
+---
 
-* **307 yabancı satır** ne demek — bir kısmı gerçek boşluk, bir kısmı harita darlığı olabilir;
+# ARTIM 2 — birim dönüşümü
+
+## 7 · Kanıtsızın gerçek bileşimi (daraltma sonrası ölçüldü)
+
+299 kanıtsız değer **tek bir yığın değil**; üç ayrı sorun:
+
+| Alan | Adet | Ne demek |
+|---|---|---|
+| `pq_curve` · `thermal_efficiency_curve` · `discharge_velocity_curve` | **166** | katalogda yalnız **grafik** olarak var — metinde sayı yok |
+| `max_delivery_ls` | **123** | DB l/s tutuyor, katalog m³/h basıyor → **birim farkı** |
+| diğer (`rated_power_w`, `max_delivery_m3h`, `absorbed_current_a`, `filter_classes`) | 10 | tekil |
+
+(Daha önce "132 dönüşüm" demiştim; daraltma sonrası ölçülen sayı **123**.)
+
+## 8 · Dönüşüm kanıtsızı KAPATIR, gizlemez
+
+Dönüşümle bulunan satırın `esleme_yontemi`'i ayrıdır
+(`BIRIM_DONUSUMUYLE_BIRIME_BITISIK`) ve hangi dönüşümün uygulandığı satırda yazar.
+Doğrudan eşleşmeyle aynı kefeye konmaz.
+
+**Yuvarlama toleransı gerekti:** `719.44 l/s × 3.6 = 2589.984`, katalogda yazan **2590**.
+Fark (%0,0006) değerin **kendi yuvarlanmasından** gelir. Tolerans bağıl ve dardır (%0,1) —
+geniş tolerans komşu modelin değerini yakalar ve kanıt uydurur.
+
+## 9 · ⛔ İlk kuralım AYIRT ETMİYORDU — sınav yakaladı, manşeti düşürdüm
+
+İlk sürüm dönüştürülen sayıyı **çıplak** arıyordu ve 105 satır "kapandı". İki yönlü sınav
+(katsayıyı kasten bozup koşmak) bunu çürüttü:
+
+| l/s → m³/h katsayısı | ÇIPLAK sayı arayınca | **BİRİMLE BİTİŞİK** arayınca |
+|---|---|---|
+| **3,6 (doğru)** | 105 | **91** |
+| 3,5 (sabotaj) | 56 | **0** |
+| 3,7 (sabotaj) | 46 | **1** |
+| 3,4 (sabotaj) | 41 | **0** |
+| 4,0 (sabotaj) | 49 | **0** |
+| 2,0 (sabotaj) | 54 | **0** |
+
+Çıplak arama **yanlış katsayıyla da 41–56 satır kapatıyordu** — yani ölçüt ayırt etmiyordu,
+sayfadaki yüzlerce sayıdan birine çarpıp kanıt uyduruyordu. Kural değiştirildi: dönüşümlü
+eşleme **sayının birimle bitişik geçmesini** ister (`2590 m³/h`). Son sürümde tam koşum:
+doğru katsayı **109**, sabotaj katsayıları **0 · 1 · 0 · 1**.
+
+Ayrıca **asgari belirginlik** kuralı kondu: `11000 W → "11"` araması 46 sayfada "bulunuyordu";
+11 her katalogda geçer. Dönüşümlü eşleme için gösterim **en az 3 basamak** taşımalı. Bu kural
+ilk sürümdeki 180 dönüşümün 37'sini düşürdü. (Doğrudan eşleşmeye uygulanmaz — orada değer
+DB'nin kendi yazımıdır.)
+
+## 10 · Artım 1 + 2 birlikte — son tablo
+
+| Ölçüt | v1 | v2 (daraltma) | **v3 (+dönüşüm)** |
+|---|---|---|---|
+| Kendi kaynağında bulunan | 3434\* | 3127 | **3238** |
+| — doğrudan eşleşen | 3434\* | 3127 | 3127 |
+| — birim dönüşümüyle | — | — | **111** |
+| **Tek adaylı** | **88** | 267 | **312** (3,5×) |
+| Aday sayfa ortancası | 100 | 13 | 13 |
+| Yabancı kaynakta geçen | kanıt sayılıyordu | 307 | 287 |
+| ⛔ **KANITSIZ** | **299** | 299 | **208** |
+
+\*v1'de "herhangi bir kaynakta". Korunum: 3238 + 287 + 208 = 3733 ✔
+
+Mandal **91 birim küçüldü** ve küçülmenin tamamı ayırt eden bir sınavdan geçti.
+
+## 11 · Bu ölçümün kapatmadığı
+
+* **287 yabancı satır** ne demek — bir kısmı gerçek boşluk, bir kısmı harita darlığı olabilir;
   ayrıştırılmadı.
-* **Artım 2 (birim dönüşümü)** hâlâ açık: 299 kanıtsızın 132'si kW↔W, l/s↔m³/h dönüşümü.
-  Dönüşüm kuralı kanıtsızı **kapatmalı**, gizlememeli.
-* **166 eğri değeri** yalnız grafik olarak var; sayısallaştırma **Recep kararıdır**.
+* **Kalan 208 kanıtsızın 166'sı eğri** — katalogda yalnız grafik. Sayısallaştırma
+  **Recep kararıdır** (emek/fayda dengesi ticari karar).
+* Kalan 15 `max_delivery_ls` birimle bitişik geçmiyor — sayfada tablo başlığında olabilir;
+  güçlü eşleme (satır/sütun) yazılana kadar açık.
 * Güçlü eşleme (tablo hücresi / satır-sütun) yazılmadı — o gün `esleme_yontemi` değişir.

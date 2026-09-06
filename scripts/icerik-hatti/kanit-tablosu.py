@@ -71,6 +71,55 @@ def dizini_yukle(yol: Path):
 # aranamaz — bunlar AYRI sinifta sayilir, "kanitsiz" ile karistirilmaz.
 ARANABILIR = re.compile(r"[0-9]|IP\s?[0-9X]|ATEX|EC|IE[3-5]", re.I)
 
+# --- BIRIM DONUSUMU (artim 2) --------------------------------------------------
+# NICIN: DB bazi degerleri TUREV birimde tutuyor; katalog baska birimde basiyor.
+# Olculdu 2026-09-06: 123 kanitsiz max_delivery_ls degerinin 108'i l/s -> m3/h ile
+# KAPANDI. Ornek: 719.44 l/s tuhaf bir sayidir cunku tam olarak 2590 m3/h / 3.6 —
+# ve 2590 AVenS s.34'te duruyor. Bu rastlanti degil, birim farki.
+#
+# ⭐KURAL: donusum KANITSIZI KAPATIR, GIZLEMEZ. Donusumle bulunan satirin
+# esleme_yontemi'i AYRIDIR (BIRIM_DONUSUMUYLE_SAYFA_ICINDE) ve hangi donusumun
+# uygulandigi satirda yazar. Dogrudan eslesme ile ayni kefeye KONMAZ.
+BIRIM_DONUSUMLERI = [
+    # (alan deseni, aciklama, carpan, HEDEF BIRIM)
+    (re.compile(r"_ls$"), "l/s -> m3/h", 3.6, "m³/h"),
+    (re.compile(r"_w$"), "W -> kW", 0.001, "kW"),
+    (re.compile(r"_kw$"), "kW -> W", 1000.0, "W"),
+    (re.compile(r"_m3h$"), "m3/h -> l/s", 1.0 / 3.6, "l/s"),
+]
+
+
+def donusum_adaylari(alan: str, deger: str):
+    """(gosterim, aciklama) uretir. Sayiya cevrilemeyen deger sessizce atlanir."""
+    try:
+        v = float(str(deger).replace(",", "."))
+    except ValueError:
+        return
+    for desen, aciklama, carpan, birim in BIRIM_DONUSUMLERI:
+        if not desen.search(alan):
+            continue
+        y = v * carpan
+        if y <= 0:
+            continue
+        # ⭐YUVARLAMA TOLERANSI — olcumle eklendi: DB degeri ZATEN yuvarlidir.
+        # 719.44 l/s x 3.6 = 2589.984; katalogda yazan 2590. Fark (%0.0006) degerin
+        # kendi yuvarlanmasindan gelir, baska bir sayi degildir. Tolerans BAGIL ve
+        # dardir (%0.1); genis tolerans komsu model degerini yakalar ve kanit uydurur.
+        gosterimler = {f"{y:.3f}".rstrip("0").rstrip(".")}
+        for basamak in (0, 1):
+            yuv = round(y, basamak)
+            if abs(y - yuv) <= 0.001 * abs(y):
+                gosterimler.add(str(int(yuv)) if basamak == 0
+                                else f"{yuv:.1f}".rstrip("0").rstrip("."))
+        # ⭐ASGARI BELIRGINLIK — olcumle eklendi: donusum kisa gosterim uretirse arama
+        # ANLAMSIZ olur. 11000 W -> "11" 46 sayfada "bulunuyor"; 11 her katalogda gecer.
+        # Ilk surumde 180 donusumun 37'si boyleydi. Kural: donusumlu esleme icin
+        # gosterim EN AZ 3 BASAMAK tasimali (2590 gecerli, 7.5 ve 11 gecersiz).
+        # Dogrudan eslesmeye bu kural uygulanmaz — orada deger DB'nin kendi yazimidir.
+        for g in gosterimler:
+            if sum(c.isdigit() for c in g) >= 3:
+                yield g, aciklama, birim
+
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Kanit tablosu + kanitsiz mandal (REC-163)")
@@ -159,6 +208,31 @@ def main() -> int:
                     "esleme_yontemi": "SAYFA_ICINDE_GECIYOR",
                 })
             else:
+                # ⭐ARTIM 2: dogrudan bulunamadi — BIRIM DONUSUMU ile kendi kaynaginda
+                # kapaniyor mu? Kapaniyorsa KANITTIR ama esleme_yontemi AYRIDIR.
+                donusen = None
+                for gosterim, aciklama, birim in donusum_adaylari(alan, metin):
+                    # ⭐BIRIMLE BITISIK ARANIR — ciplak sayi degil.
+                    # Iki yonlu sinav (2026-09-06): l/s -> m3/h donusumu
+                    #   ciplak sayi ile : dogru katsayi 105, YANLIS katsayilar 41-56  (AYIRT ETMIYOR)
+                    #   birimle bitisik : dogru katsayi  91, YANLIS katsayilar   0-1  (AYIRT EDIYOR)
+                    # Ciplak arama sayfadaki yuzlerce sayidan birine carpip kanit uyduruyordu.
+                    h2 = norm(gosterim + birim)
+                    ad = [s for s in evren if h2 in s["n"]]
+                    if ad:
+                        donusen = (ad, gosterim, aciklama, birim)
+                        break
+                if donusen:
+                    ad, gosterim, aciklama, birim = donusen
+                    ilk = ad[0]
+                    kanit.append({
+                        **ortak, "pdf_hash": ilk["pdf_hash"], "dosya": ilk["dosya"],
+                        "sayfa": ilk["sayfa"], "aday_sayfa_sayisi": len(ad),
+                        "kapsam": kapsam, "donusum": aciklama, "aranan_gosterim": gosterim + " " + birim,
+                        "esleme_yontemi": "BIRIM_DONUSUMUYLE_BIRIME_BITISIK",
+                    })
+                    continue
+
                 # Kendi kaynaginda YOK ama BASKA bir katalogda geciyor mu? Bu ucuncu bir
                 # siniftir: v1'de bu satirlar KANIT sayiliyordu (baska markanin sayfasinda
                 # ayni sayi gectigi icin). Rastlanti kanit degildir — ayri sayilir.
@@ -186,12 +260,16 @@ def main() -> int:
     toplam = len(kanit) + len(kanitsiz) + len(yabanci)
     tek_aday = sum(1 for k in kanit if k["aday_sayfa_sayisi"] == 1)
     dar = sum(1 for k in kanit if k["kapsam"] == "AILENIN_KENDI_KAYNAGI")
+    dogrudan = sum(1 for k in kanit if k["esleme_yontemi"] == "SAYFA_ICINDE_GECIYOR")
+    donusumlu = len(kanit) - dogrudan
     print()
-    print("== KANIT TABLOSU (v2 — aileye daraltilmis) ==")
+    print("== KANIT TABLOSU (v3 — aileye daraltilmis + birim donusumu) ==")
     print(f"  aranabilir deger        : {toplam}")
     print(f"  KENDI kaynaginda BULUNAN: {len(kanit)}  ({100*len(kanit)//max(toplam,1)}%)")
     print(f"    - bunun TEK ADAYLI    : {tek_aday}  ({100*tek_aday//max(len(kanit),1)}%)  <- tek sayfa gosterebildigimiz kisim")
     print(f"    - daraltma uygulanan  : {dar}/{len(kanit)}")
+    print(f"    - DOGRUDAN eslesen    : {dogrudan}")
+    print(f"    - BIRIM DONUSUMUYLE   : {donusumlu}  (ayri esleme_yontemi — gizlenmedi)")
     print(f"  ⚠ YABANCI kaynakta gecen: {len(yabanci)}  <- v1'de KANIT sayiliyordu; rastlanti kanit degildir")
     print(f"  ⛔ KANITSIZ KALAN        : {len(kanitsiz)}  <- tek yonlu mandal, yalniz kuculur")
     print(f"  aranamaz (sayi/kod yok) : {olculemez}  (ayri sinif, kanitsizla karistirilmaz)")

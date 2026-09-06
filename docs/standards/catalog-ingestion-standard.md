@@ -408,6 +408,28 @@ PDF'lerinde** aranır. Harita elle yazılmaz — `aile-kaynak-cikar.py` onu **ta
 ZORUNDADIR** — okumazsa takma adlı kaynak "yok" görünür (ölçüldü: MONO ailesinin 101 değeri
 böyle kayboldu).
 
+#### Birim dönüşümü kanıtsızı KAPATIR, gizlemez (artım 2)
+
+DB bazı değerleri türev birimde tutar (`max_delivery_ls`), katalog başka birimde basar
+(m³/h). Dönüşümle bulunan satırın `esleme_yontemi`'i **ayrıdır**
+(`BIRIM_DONUSUMUYLE_BIRIME_BITISIK`) ve uygulanan dönüşüm satırda yazar — doğrudan
+eşleşmeyle aynı kefeye konmaz.
+
+**İki kural ölçümle konuldu, ikisi de sınavdan doğdu:**
+
+1. **Sayı birimle BİTİŞİK aranır**, çıplak değil. Çıplak arama ayırt etmiyordu — katsayı
+   kasten bozulduğunda bile 41–56 satır "kapanıyordu". Bitişik aramada doğru katsayı
+   **109**, sabotaj katsayıları **0 · 1 · 0 · 1**.
+2. **Asgari belirginlik:** dönüşümlü eşleme için gösterim en az **3 basamak** taşımalı.
+   `11000 W → "11"` araması 46 sayfada "buluyordu"; 11 her katalogda geçer.
+
+Yuvarlama toleransı bağıl ve dardır (%0,1): `719.44 l/s × 3,6 = 2589,984`, katalogda
+**2590**; fark değerin kendi yuvarlanmasındandır. Geniş tolerans komşu modelin değerini
+yakalar ve kanıt uydurur.
+
+Sonuç (2026-09-06): **KANITSIZ 299 → 208**, tek adaylı 88 → **312**.
+Kalan 208'in **166'sı eğri** — katalogda yalnız grafik; sayısallaştırma **Recep kararıdır**.
+
 **Dürüst sınır — alan adı bunu itiraf eder:** "bulundu" satırındaki alan `kanit_gucu`
 değil **`esleme_yontemi`** ve bugünkü değeri `SAYFA_ICINDE_GECIYOR`. Geçmek doğruluğu
 **kanıtlamaz**: v2'de bile 3127 satırın yalnız 267'sinde tek aday sayfa var. Sayı sayfada
