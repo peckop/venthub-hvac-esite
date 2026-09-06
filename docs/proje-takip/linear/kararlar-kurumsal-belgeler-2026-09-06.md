@@ -1,9 +1,9 @@
 # Kararlar — Kurumsal Belgeler (Linear belgesinin TAM dışa aktarımı · 2026-09-06 ayna: K1–K17-b)
 
-<!-- kaynak_id: 9e95d258-98a2-4c51-9a2d-40576c87a7bf · kaynak_updatedAt: 2026-09-06T11:09:42.064Z · kopya: 2026-09-06T11:20Z -->
+<!-- kaynak_id: 9e95d258-98a2-4c51-9a2d-40576c87a7bf · kaynak_updatedAt: 2026-09-06T13:21:35.837Z · kopya: 2026-09-06T14:30Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
-> Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır.
+> Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
 
 Tek kaynak; karar buraya yazılmadan verilmiş sayılmaz. Yazan: OPS. Design eklemesi Recep "evet" demeden karar değildir.
 
@@ -92,3 +92,5 @@ K17'deki "kartvizit Recep kararı" kalemi kapandı: kartvizit yapılır. Sıra: 
 ### K17-b · Keşif Raporu (2026-09-06, Recep isteği; OPS hükmü 153-28/29/30)
 
 Keşif Raporu v1 KABUL (alanlar `wizard_selections`, hesap sonuçları boş, sahte veri 0). **153-28:** yedi alanın (müşteri/yetkili · keşfi yapan · mahal ölçüleri · bulgu notu · müşteri onayı · rapor no · kroki) kaydı KOD İŞİ (`site_surveys` + `wizard_selections` bağı); Linear kaydı OPS açar (09-07 sabah), "şema bekler" kümesi (REC-159/160 yanı); migration Recep kapısı, öncelik Recep'e sorulur. Rapor no öneki KS taslak → 153-7. **153-29:** sıra bozulmadı, sıradaki iş kartvizit (emir #5); devreye alma/servis raporları Recep'in kurulum-bakım kurgusunu bekler, Recep istemeden çizilmez. **153-30:** rapor kabuğu ikinci raporla açılır, bugün açılmaz. Kağıt provası 153-9 = 17 belge + antetli (Recep).
+
+**K17-a uygulandı (DESIGN-BELGE bildirimi, 2026-09-06; OPS KABUL):** `Kartvizit v1.dc.html` (prova, A4 yatay, 4 kare) + `Kartvizit v1-print.dc.html`. Ölçüm: kesim 85 × 55 mm · taşma 3 mm → 91 × 61 · 32 kesim işareti ayrı katman · iki varyant · taşan içerik 0 · sahte veri 0 · kiremit dolgu 0 (arka yüzde tek 22 × 1,2 mm çizgi). **Bilinçli sapma kabul:** ad 11 pt, unvan/iletişim 8 pt (10 pt taban kartta geçmez; Recep 153-9 kâğıt provasında görür, itirazda iki satır iletişim). **CMYK sınır:** tarayıcı RGB üretir, ICC gömemez; dönüşüm matbaa profiliyle, iki not PDF ile gider. Yan bulgu: `--weight-wordmark` yanlış token adı (doğrusu `--wordmark-weight`) üç belgede düzeltildi; kural "şablonda `src` asla hole olmaz". Belge kuyruğu boş; sonrası 153-9 provası (Recep).

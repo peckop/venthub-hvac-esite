@@ -1,32 +1,32 @@
-<!-- uretilmis: Linear GraphQL disa aktarimi (scripts/nlm/linear_disa_aktar.py) · damga 2026-09-06T12:18:22Z · elle duzenlenmez; yenileme: gun kapanisi ritueli -->
+<!-- uretilmis: Linear GraphQL disa aktarimi (scripts/nlm/linear_disa_aktar.py) · damga 2026-09-06T14:30:00Z · elle duzenlenmez; yenileme: gun kapanisi ritueli -->
 # Linear İş Dağılımı — Şantiye Durumu (2026-09-06)
 
-**Damga:** 2026-09-06T12:18:22Z · **Kaynak:** Linear GraphQL `issues` (sayfalama 2 çağrı) · **Toplam iş:** 167
+**Damga:** 2026-09-06T14:30:00Z · **Kaynak:** Linear GraphQL `issues` (sayfalama 2 çağrı) · **Toplam iş:** 172
 
 > Okuma kılavuzu: her proje bir kat, her kilometre taşı bir dükkân sırası, her iş bir dükkân. **% bitti = Done / (Toplam − Canceled)**. Sorumluluk = şerit etiketi (assignee alanı çoğunlukla boş).
 
-Durum dağılımı: Done 57 · In Progress 41 · Todo/Backlog 67 · Canceled 2 → **genel % bitti 35%**
+Durum dağılımı: Done 57 · In Progress 42 · Todo/Backlog 71 · Canceled 2 → **genel % bitti 34%**
 
 ## §1 ÖZET — proje başına
 
 | Proje | Toplam | Done | In Progress | Todo/Backlog | Canceled | % bitti |
 |---|---:|---:|---:|---:|---:|---:|
 | (projesiz) | 6 | 0 | 0 | 6 | 0 | 0% |
-| Altyapı, Kapılar ve Belge Hattı | 47 | 15 | 18 | 13 | 1 | 33% |
-| Katalog ve Ürün Verisi | 20 | 1 | 9 | 10 | 0 | 5% |
-| Kurumsal Belgeler (DESIGN-BELGE) | 1 | 0 | 0 | 1 | 0 | 0% |
+| Altyapı, Kapılar ve Belge Hattı | 48 | 15 | 19 | 13 | 1 | 32% |
+| Katalog ve Ürün Verisi | 21 | 1 | 9 | 11 | 0 | 5% |
+| Kurumsal Belgeler (DESIGN-BELGE) | 2 | 0 | 0 | 2 | 0 | 0% |
 | Marka Kılavuzu (DESIGN-MARKA) | 2 | 0 | 0 | 2 | 0 | 0% |
 | Q-Validator | 28 | 20 | 0 | 8 | 0 | 71% |
 | SEO ve Yayın | 6 | 3 | 1 | 1 | 1 | 60% |
 | Teklif Akışı ve Müşteri Paneli | 22 | 4 | 3 | 15 | 0 | 18% |
-| Vitrin 15A Yeniden Tasarım (DESIGN-MENU) | 35 | 14 | 10 | 11 | 0 | 40% |
-| **TOPLAM** | 167 | 57 | 41 | 67 | 2 | 35% |
+| Vitrin 15A Yeniden Tasarım (DESIGN-MENU) | 37 | 14 | 10 | 13 | 0 | 38% |
+| **TOPLAM** | 172 | 57 | 42 | 71 | 2 | 34% |
 
 ## §2 ŞERİT (etiket) başına
 
 | Etiket | Toplam | Done | In Progress | Todo/Backlog | % bitti |
 |---|---:|---:|---:|---:|---:|
-| ALTYAPI | 34 | 14 | 10 | 10 | 41% |
+| ALTYAPI | 36 | 14 | 11 | 11 | 39% |
 | DESIGN | 4 | 0 | 0 | 4 | 0% |
 | OPS | 29 | 4 | 10 | 14 | 14% |
 | P01-Data | 4 | 3 | 0 | 1 | 75% |
@@ -34,7 +34,7 @@ Durum dağılımı: Done 57 · In Progress 41 · Todo/Backlog 67 · Canceled 2 �
 | P03-API | 3 | 0 | 0 | 3 | 0% |
 | P04-Research | 3 | 3 | 0 | 0 | 100% |
 | Recep kapısı | 3 | 1 | 0 | 1 | 50% |
-| URUN | 62 | 19 | 16 | 26 | 31% |
+| URUN | 65 | 19 | 16 | 29 | 30% |
 | (etiketsiz) | 26 | 8 | 5 | 13 | 31% |
 
 ## §3 Proje → kilometre taşı → iş (açık işler; Done ayrı)
@@ -65,6 +65,7 @@ Durum dağılımı: Done 57 · In Progress 41 · Todo/Backlog 67 · Canceled 2 �
 | REC-160 | Backlog | Satınalma belge kimlikleri: purchase_orders.po_no + goods_receipts.grn_no (K19 k | ALTYAPI | 4 | 2026-09-06 |
 | REC-162 | In Progress | Vercel günlük derleme sınırı: kapıda "rate limited" kolu = ÖLÇÜLEMEZ (madde 3 dı | ALTYAPI | 2 | 2026-09-06 |
 | REC-167 | Backlog | KVKK başvuru kaydı şeması: başvuru no (K19 önek KV), talep metni, ad soyad, tele | ALTYAPI | 4 | 2026-09-06 |
+| REC-168 | In Progress | ALTYAPI: Satış kipine TEK ANAHTARLA geçiş — hide_price (37 kategori) + NEXT_PUBL | ALTYAPI | 3 | 2026-09-06 |
 
 **Belge hattı**
 
@@ -146,6 +147,7 @@ Durum dağılımı: Done 57 · In Progress 41 · Todo/Backlog 67 · Canceled 2 �
 | REC-163 | In Progress | KAYNAK DİZİNİ: tedarikçi PDF'leri bir kez, deterministik, sayfa+tablo düzeyinde  | URUN | 1 | 2026-09-06 |
 | REC-164 | Backlog | Aile sayfasında altı yapısal blok (Gövde · Çark · Motor · Koruma · Kontrol · Mon | URUN | 2 | 2026-09-06 |
 | REC-166 | Backlog | Admin kategori formu description_i18n {tr,en} yazamıyor — kategori paragrafları  | - | 4 | 2026-09-06 |
+| REC-172 | Backlog | KATALOG + OPS: Teknik özellik tamamlama hattı — boşluk haritası (aile × alan) →  | URUN | 2 | 2026-09-06 |
 
 **Görsel tamamlama**
 
@@ -160,10 +162,10 @@ Durum dağılımı: Done 57 · In Progress 41 · Todo/Backlog 67 · Canceled 2 �
 | İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
 |---|---|---|---|---:|---|
 | REC-56 | In Progress | Ürün-katalog hattı — cetveller indi, içerik/derinlik işleri açık | OPS | 2 | 2026-09-03 |
-| REC-60 | Todo | Kapsama: ~210 eksik kod + sürekli sayım kapısı | URUN | 2 | 2026-09-03 |
+| REC-60 | Todo | Kapsama: ~210 eksik kod + sürekli sayım kapısı | URUN | 2 | 2026-09-06 |
 | REC-109 | Todo | 16 ailenin EN adı eksik/sahte (9 hiç yok + 7 en==tr) — çeviri üretimi + Recep iç | URUN | 2 | 2026-09-03 |
 | REC-122 | Todo | EN marka şeridinde "Frekans Konvertörü" marka olarak listeleniyor + 6 marka 3x t | URUN | 0 | 2026-09-06 |
-| REC-124 | In Progress | Katalog veri kusurları paketi: "Frenkans"/"Inventoru" yazımları CANLIDA + DAN-80 | URUN | 0 | 2026-09-04 |
+| REC-124 | In Progress | Katalog veri kusurları paketi: "Frenkans"/"Inventoru" yazımları CANLIDA + DAN-80 | URUN | 0 | 2026-09-06 |
 | REC-135 | In Progress | Kategori ağacı boşlukları: 10 dalsız ürün + 7 boş alt dal (365/375 zaten dalında | URUN | 2 | 2026-09-05 |
 | REC-136 | In Progress | Katalog sayımı TEK KAYNAK: sitenin okuduğu yolla sayan betik + günlük tablo; say | URUN | 2 | 2026-09-06 |
 
@@ -180,6 +182,7 @@ Durum dağılımı: Done 57 · In Progress 41 · Todo/Backlog 67 · Canceled 2 �
 | İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
 |---|---|---|---|---:|---|
 | REC-153 | Backlog | Sorular — DESIGN-BELGE (sürekli açık soru/öneri kaydı) | DESIGN, OPS | 0 | 2026-09-06 |
+| REC-170 | Backlog | ALTYAPI: Keşif raporu veri modeli — site_surveys tablosu (KS-YYYYMMDD-NNNN numar | ALTYAPI | 4 | 2026-09-06 |
 
 ### Marka Kılavuzu (DESIGN-MARKA)
 
@@ -279,12 +282,12 @@ Durum dağılımı: Done 57 · In Progress 41 · Todo/Backlog 67 · Canceled 2 �
 
 | İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
 |---|---|---|---|---:|---|
-| REC-47 | Todo | Kargo ücreti: sepet+checkout sabit "Ücretsiz" | URUN | 2 | 2026-09-03 |
+| REC-47 | Todo | Kargo ücreti: sepet+checkout sabit "Ücretsiz" | URUN | 2 | 2026-09-06 |
 | REC-48 | Todo | Fatura belgesi üretilmiyor (e-arşiv taahhüdü açıkta) | URUN | 2 | 2026-09-03 |
 | REC-49 | Backlog | Admin UX elden geçirme — kalan fazlar | URUN | 3 | 2026-09-03 |
 | REC-55 | Todo | Satınalma modülü — v1 tamam, karne + v2 kalemleri açık | OPS | 3 | 2026-09-03 |
 | REC-57 | Todo | LANSMAN ENGELİ: iyzico-refund müşteri self-iadesi | URUN | 1 | 2026-09-03 |
-| REC-73 | Todo | Ödeme & Finans açık işleri (registry taşıması) | OPS | 0 | 2026-09-03 |
+| REC-73 | Todo | Ödeme & Finans açık işleri (registry taşıması) | OPS | 0 | 2026-09-06 |
 | REC-75 | In Progress | ERP & Admin açık işleri (registry taşıması) | OPS | 0 | 2026-09-03 |
 
 **Teklif kipi**
@@ -313,6 +316,8 @@ Durum dağılımı: Done 57 · In Progress 41 · Todo/Backlog 67 · Canceled 2 �
 | REC-150 | In Progress | Çift title: Seo bileşeni ile App Router metadata tek yazıcıya iner (generateMeta | - | 2 | 2026-09-05 |
 | REC-152 | Backlog | Sorular — DESIGN-MENU (sürekli açık soru/öneri kaydı) | DESIGN, OPS | 0 | 2026-09-05 |
 | REC-165 | In Progress | Tasarım→Kod Faz 2+3: DS token köprüsü (57 token → index.css türev + tailwind eşl | URUN | 2 | 2026-09-06 |
+| REC-169 | Backlog | URUN: Satış kipinin GÖRÜNEN YÜZÜ — kapalı/açık metinleri, sepet ve PDP vaat satı | URUN | 3 | 2026-09-06 · BEKLİYOR: REC-168 |
+| REC-171 | Backlog | URUN + KATALOG: Ürün Seçici kural tablosu v2 — kişi başına debi (ASHRAE 62.1), S | URUN | 4 | 2026-09-06 |
 
 **Faz 1 — Kabuk**
 
@@ -385,5 +390,5 @@ Durum dağılımı: Done 57 · In Progress 41 · Todo/Backlog 67 · Canceled 2 �
 
 ## §5 Ölçüm satırı
 
-çağrı 2 · kayıt 167 · proje 9 · etiket 9 · bayat açık 4/74 · damga 2026-09-06T12:18:22Z
+çağrı 2 · kayıt 172 · proje 9 · etiket 9 · bayat açık 4/75 · damga 2026-09-06T14:30:00Z
 

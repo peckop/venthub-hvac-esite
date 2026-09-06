@@ -38,12 +38,15 @@ SERIT_ONEK = re.compile(r"^([A-Z][A-Z0-9-]{1,24})\s*(?:->|\u2192|\(|:)")
 KISA_SID = re.compile(r"^[0-9a-f]{8}")
 MAKINE_YOLU = re.compile(r"[A-Za-z]:[\\/]+Users[\\/]+[^\\/\s\"'`]+[\\/]+")
 MAKINE_YOLU_POSIX = re.compile(r"/c/Users/[^/\s\"'`]+/")
+MAKINE_YOLU_GORELI = re.compile(r"(?:\.\.[\\/])+Users[\\/]+[^\\/\s\"'`]+[\\/]+")  # ..\..\Users\<ad>\ (os.path.relpath sizintisi; 09-06 olculdu)
 # konusma_gunlugu.py SIR listesiyle birebir ayni (tek kaynak olmasi icin oradan kopyalandi; degisirse ikisi birlikte degisir)
+# 2026-09-06: bu hattin KENDI anahtari (lin_api_…) ve 'Authorization: <deger>' / 'LINEAR_API_KEY=<deger>' kaliplari eklendi —
+# onceki liste bunlari 0 vurusla geciriyordu (olculdu).
 SIR = [
     re.compile(r"postgres(?:ql)?://[^:@\s/]+:[^@\s]+@"),
     re.compile(r"eyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"),
-    re.compile(r"\b(?:sk-[A-Za-z0-9_-]{20,}|sk_(?:live|test)_[A-Za-z0-9]{16,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,}|sbp_[a-f0-9]{30,}|xox[baprs]-[A-Za-z0-9-]{20,}|AKIA[0-9A-Z]{16}|re_[A-Za-z0-9]{20,}|whsec_[A-Za-z0-9]{20,})\b"),
-    re.compile(r"(?i)\b(parola|password|passwd|secret|token|api[_ -]?key|service[_ -]?role[_ -]?key|anon[_ -]?key)\b\s*[:=]\s*[\"']?([^\s\"',;]{8,})"),
+    re.compile(r"\b(?:sk-[A-Za-z0-9_-]{20,}|sk_(?:live|test)_[A-Za-z0-9]{16,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,}|sbp_[a-f0-9]{30,}|xox[baprs]-[A-Za-z0-9-]{20,}|AKIA[0-9A-Z]{16}|re_[A-Za-z0-9]{20,}|whsec_[A-Za-z0-9]{20,}|lin_api_[A-Za-z0-9]{20,}|lin_oauth_[A-Za-z0-9]{20,})\b"),
+    re.compile(r"(?i)\b(parola|password|passwd|secret|token|authorization|service[_ -]?role[_ -]?key|anon[_ -]?key|\w*api[_ -]?key\w*)\b\s*[:=]\s*[\"']?(?:Bearer\s+)?([^\s\"',;]{8,})"),
     re.compile(r"(?<![A-Za-z0-9+/=])[A-Za-z0-9+/]{60,}={0,2}(?![A-Za-z0-9+/=])"),
 ]
 
@@ -81,7 +84,8 @@ def sir_suz(t: str):
 def yol_suz(t: str):
     t, a = MAKINE_YOLU.subn("~/", t)
     t, b = MAKINE_YOLU_POSIX.subn("~/", t)
-    return t, a + b
+    t, c = MAKINE_YOLU_GORELI.subn("~/", t)
+    return t, a + b + c
 
 
 def oku(kaynak: str):
@@ -222,7 +226,8 @@ def main() -> int:
         os.makedirs(os.path.dirname(os.path.abspath(a.hedef)) or ".", exist_ok=True)
         with open(a.hedef, "w", encoding="utf-8", newline="\n") as f:
             f.write(cikti)
-        print(f"YESIL: {len(notlar)} not → {os.path.relpath(a.hedef)} ({len(cikti.encode('utf-8'))} bayt) · mukerrer {mukerrer} · prob {prob} · yol {yol_say} · sir {sir_say}")
+        hedef_gosterim, _ = yol_suz(os.path.abspath(a.hedef).replace("\\", "/"))  # relpath '..\..\Users\<ad>' sizdiriyordu → '~/'
+        print(f"YESIL: {len(notlar)} not → {hedef_gosterim} ({len(cikti.encode('utf-8'))} bayt) · mukerrer {mukerrer} · prob {prob} · yol {yol_say} · sir {sir_say}")
     else:
         sys.stdout.write(cikti)
     return 0

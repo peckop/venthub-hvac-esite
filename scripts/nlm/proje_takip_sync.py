@@ -22,7 +22,9 @@ import fnmatch, glob, hashlib, json, os, subprocess, sys, tempfile
 sys.stdout.reconfigure(encoding="utf-8")
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 MANIFEST = os.path.join(REPO, "docs", "proje-takip", "manifest.json")
-STATE = os.path.join(REPO, "docs", "proje-takip", "state.json")
+# VENTHUB_PROJE_TAKIP_STATE: gun_kapanisi --hedef ile ayni state dosyasi (aksi halde iki ayri state; 09-06 olculdu)
+STATE = os.environ.get("VENTHUB_PROJE_TAKIP_STATE") or os.path.join(REPO, "docs", "proje-takip", "state.json")
+NLM_ZAMAN = int(os.environ.get("VENTHUB_NLM_ZAMAN") or 600)  # notebooklm cagrisi ust siniri (sn); asilirsa rc 124
 
 
 def oku_json(p, varsayilan):
@@ -98,7 +100,12 @@ def sha(t):
 
 def nlm(*args, girdi=None):
     cmd = ["notebooklm", *args]
-    r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", input=girdi)
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", input=girdi, timeout=NLM_ZAMAN)
+    except subprocess.TimeoutExpired:
+        return 124, f"zaman asimi ({NLM_ZAMAN} sn): notebooklm {' '.join(args[:2])}"
+    except FileNotFoundError:
+        return 127, "notebooklm komutu bulunamadi"
     return r.returncode, (r.stdout or "") + (r.stderr or "")
 
 
@@ -143,6 +150,8 @@ def komut_esitle(m, state):
         if baslik in mevcut and mevcut[baslik]:
             rc, out = nlm("source", "delete", "-n", nid, mevcut[baslik], "-y")
             print(f"  sil   {baslik}: {'ok' if rc == 0 else out[:120]}")
+            if rc != 0:  # eski kaynak silinemediyse yenisi EKLENMEZ: ayni baslikli mukerrer kaynak olusmasin (§10.2)
+                print(f"  SILINEMEDI {baslik}: ekleme atlandi, cikis 2"); return 2
         rc, out = nlm("source", "add", "-n", nid, yol, "--type", "file", "--title", baslik, "--request-timeout", "120")
         if rc != 0:
             print(f"  EKLENEMEDI {baslik}: {out[:200]}"); return 2

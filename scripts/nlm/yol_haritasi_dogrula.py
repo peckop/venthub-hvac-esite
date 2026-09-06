@@ -16,7 +16,10 @@ canli (HTTP, yalniz --canli) · veri (SQL, v1'de kosulmaz → KANITSIZ).
 Kullanim:
   python scripts/nlm/yol_haritasi_dogrula.py            # cevrimdisi kanitlar (kod/anahtar/belge)
   python scripts/nlm/yol_haritasi_dogrula.py --canli    # + HTTP kanitlari
-Cikis: 0 kirmizi yok · 3 kirmizi var. Rapor damgasi date -u esdegeri (elle yazilmaz).
+  python scripts/nlm/yol_haritasi_dogrula.py --simdi 2026-09-06T14:30:00Z --hedef docs/proje-takip
+      --simdi: rapor damgasi buradan (determinizm: gun_kapanisi ayni --simdi ile bayt-ayni durum md ister)
+      --hedef: durum md'nin yazilacagi dizin (vars. docs/proje-takip; gun_kapanisi --hedef ile ayni)
+Cikis: 0 kirmizi yok · 3 kirmizi var. Rapor damgasi date -u esdegeri (elle yazilmaz; --simdi yalniz betikten gelir).
 Cetvel: docs/standards/proje-takip-defteri-standard.md §9
 """
 from __future__ import annotations
@@ -29,6 +32,11 @@ REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 YOL = os.path.join(REPO, "docs", "proje-takip", "yol-haritasi.json")
 SINAV_SONUC = os.environ.get("HAFIZA_SINAV_SONUC") or os.path.join(REPO, "docs", "proje-takip", "hafiza-sinavi-sonuc.md")
 DURUM = os.path.join(REPO, "docs", "proje-takip", "yol-haritasi-durum.md")
+
+
+def secenek(argv, ad):
+    """--ad DEGER (yoksa None)."""
+    return argv[argv.index(ad) + 1] if ad in argv and argv.index(ad) + 1 < len(argv) else None
 
 
 def sinav_sonuclari() -> dict[str, str]:
@@ -104,14 +112,27 @@ def satir_rengi(renkler: list[str]) -> str:
 
 
 def main(argv):
+    global DURUM
     canli = "--canli" in argv
+    simdi_arg = secenek(argv, "--simdi")
+    hedef_arg = secenek(argv, "--hedef")
+    if hedef_arg:
+        DURUM = os.path.join(os.path.abspath(hedef_arg), "yol-haritasi-durum.md")
+    if simdi_arg:
+        try:
+            d = datetime.fromisoformat(simdi_arg.replace("Z", "+00:00"))
+        except ValueError:
+            print("HATA: --simdi ISO-8601 degil"); return 3
+        simdi = (d.replace(tzinfo=timezone.utc) if d.tzinfo is None else d).astimezone(timezone.utc)  # naif → UTC (yerel degil)
+    else:
+        simdi = datetime.now(timezone.utc)
     yol = json.load(open(YOL, encoding="utf-8"))
     satirlar = yol["satirlar"]
     if len(satirlar) > yol.get("tavan_satir", 40):
         print(f"HATA: satir sayisi {len(satirlar)} tavani ({yol['tavan_satir']}) asiyor — kirp ya da cetveli degistir")
         return 3
     sinav = sinav_sonuclari()
-    damga = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    damga = simdi.strftime("%Y-%m-%dT%H:%M:%SZ")
     sayac, fazlar, detay = Counter(), defaultdict(list), []
     for s in satirlar:
         sonuc = [kanit_kos(k, sinav, canli) for k in s.get("kanit", [])]
@@ -137,7 +158,10 @@ def main(argv):
         rapor.append("")
     with open(DURUM, "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(rapor))
-    print(f"\nOZET: yesil {sayac['YESIL']} / kirmizi {sayac['KIRMIZI']} / kanitsiz {sayac['KANITSIZ']} · olculmemis kanit {kanitsiz_kanit} → {os.path.relpath(DURUM, REPO)}")
+    ev = os.path.expanduser("~")
+    gosterim = (os.path.relpath(DURUM, REPO) if DURUM.lower().startswith(REPO.lower()) else
+                "~/" + os.path.relpath(DURUM, ev) if DURUM.lower().startswith(ev.lower()) else DURUM).replace("\\", "/")  # makine yolu basilmaz
+    print(f"\nOZET: yesil {sayac['YESIL']} / kirmizi {sayac['KIRMIZI']} / kanitsiz {sayac['KANITSIZ']} · olculmemis kanit {kanitsiz_kanit} → {gosterim}")
     return 3 if sayac["KIRMIZI"] else 0
 
 
