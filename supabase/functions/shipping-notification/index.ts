@@ -30,7 +30,11 @@ function callerFailure(error: unknown): { status: number; error: string } | null
   return null
 }
 
-// Tiny template renderer for {{var}} and {{#if var}} ... {{/if}}
+/**
+ * Şablon motoru — `{{alan}}` + `{{#if alan}}…{{/if}}`. Döngü (`each`) YOKTUR ve
+ * EKLENMEYECEKTİR: liste gerekiyorsa HTML'i çağıran taraf hazırlar.
+ * Cetvel: `docs/standards/email-template-standard.md` §2.
+ */
 function renderTemplate(tpl: string, data: Record<string, unknown>): string {
   // if-blocks
   tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
@@ -228,6 +232,9 @@ serve(async (req) => {
     const brandName = branding.brandName
     const brandPrimary = branding.brandPrimaryColor
     const brandLogoUrl = branding.brandLogoUrl
+    // REC-154: marka değerleriyle AYNI kaynaktan (getTenantBranding) gelir — ayrı yol yok.
+    const supportEmail = branding.supportEmail
+    const companyFooter = branding.companyFooter
 
     // REC-156: TAM numara — kesme YOK. Gerekçe ve kapı: order-confirmation/index.ts
     // aynı satır + `src/utils/siparisNo.ts` + INV-SIPARIS-NO-1.
@@ -251,6 +258,8 @@ ${brandName} Ekibi
 
 ---
 Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
+Sorularınız için: ${supportEmail}
+${companyFooter}
     `.trim()
 
     // ---- HTML body: file template first, rich inline fallback second ----
@@ -267,6 +276,8 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
           brand_name: brandName,
           brand_primary_color: brandPrimary,
           brand_logo_url: brandLogoUrl,
+          support_email: supportEmail,
+          company_footer: companyFooter,
         })
       }
     } catch { /* ignore, fall back to inline */ }
@@ -287,7 +298,8 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
         '<p>Siparişinizi takip edebilir ve teslimat durumunu kontrol edebilirsiniz.</p>',
         `<p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>`,
         '<hr style="margin-top: 30px; border: none; border-top: 1px solid #e5e7eb;">',
-        '<p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın.</p>',
+        `<p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın. Sorularınız için <a href="mailto:${supportEmail}">${supportEmail}</a> adresine yazabilirsiniz.</p>`,
+        companyFooter ? `<p style="color: #6b7280; font-size: 12px;">${companyFooter}</p>` : '',
         '</div>'
       ].join('')
     }

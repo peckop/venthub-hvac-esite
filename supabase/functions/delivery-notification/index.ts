@@ -106,8 +106,26 @@ async function damgala(supabaseUrl: string, serviceKey: string, satirId: string 
   }
 }
 
-function render(tpl: string, _data: Record<string, unknown>) {
-  return tpl.replace(/{{(\w+)}}/g, (_m, k) => String(_data[k] ?? ''))
+/**
+ * Şablon motoru — `{{alan}}` + `{{#if alan}}…{{/if}}`. BAŞKA HİÇBİR ŞEY.
+ *
+ * REC-154: bu işlevdeki sürüm `{{#if}}` DESTEKLEMİYORDU; diğer üç uçtaki `renderTemplate`
+ * destekliyordu. Aynı isimli iki farklı motor demek, aynı şablonun hangi dosyadan
+ * çağrıldığına göre farklı HTML üretmesi demek. Birebir aynıya çekildi — motor
+ * BÜYÜTÜLMEDİ, EŞİTLENDİ. Döngü (`each`) bilerek yoktur:
+ * cetvel `docs/standards/email-template-standard.md` §2.
+ */
+function renderTemplate(tpl: string, data: Record<string, unknown>): string {
+  tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
+    const v = data[key]
+    const truthy = !!(typeof v === 'string' ? v : v)
+    return truthy ? inner : ''
+  })
+  tpl = tpl.replace(/{{(\w+)}}/g, (_m, key: string) => {
+    const v = data[key]
+    return v == null ? '' : String(v)
+  })
+  return tpl
 }
 
 async function loadTemplate() {
@@ -201,6 +219,9 @@ serve(async (req) => {
     const brandName = branding.brandName
     const brandPrimary = branding.brandPrimaryColor
     const brandLogoUrl = branding.brandLogoUrl
+    // REC-154: marka değerleriyle AYNI kaynaktan (getTenantBranding) gelir — ayrı yol yok.
+    const supportEmail = branding.supportEmail
+    const companyFooter = branding.companyFooter
 
     // REC-156: TAM numara — kesme YOK. Gerekçe ve kapı: order-confirmation/index.ts
     // aynı satır + `src/utils/siparisNo.ts` + INV-SIPARIS-NO-1.
@@ -214,12 +235,21 @@ serve(async (req) => {
         `<h2 style="color: ${brandPrimary};">${brandName} — Teslimat Tamamlandı</h2>`,
         `<p>Merhaba <strong>${customer_name}</strong>,</p>`,
         `<p><strong>${siparisNo}</strong> numaralı siparişiniz başarıyla teslim edilmiştir.</p>`,
-        '<p>Herhangi bir sorunuz olursa bizimle iletişime geçebilirsiniz.</p>',
+        `<p>Herhangi bir sorunuz olursa <a href="mailto:${supportEmail}">${supportEmail}</a> adresinden bizimle iletişime geçebilirsiniz.</p>`,
         `<p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>`,
+        companyFooter ? `<p style="color:#6b7280;font-size:12px;">${companyFooter}</p>` : '',
         '</div>'
       ].join('')
     } else {
-      html = render(html, { customer_name, order_number: siparisNo, brand_name: brandName, brand_primary_color: brandPrimary, brand_logo_url: brandLogoUrl })
+      html = renderTemplate(html, {
+        customer_name,
+        order_number: siparisNo,
+        brand_name: brandName,
+        brand_primary_color: brandPrimary,
+        brand_logo_url: brandLogoUrl,
+        support_email: supportEmail,
+        company_footer: companyFooter,
+      })
     }
 
     if (!resendApiKey) {

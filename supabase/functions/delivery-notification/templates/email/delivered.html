@@ -8,7 +8,9 @@
       body { font-family: Arial, Helvetica, sans-serif; background:#f6f7fb; margin:0; padding:0; }
       .container { max-width: 640px; margin: 0 auto; padding: 24px; }
       .card { background:#ffffff; border-radius:12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow:hidden; }
-      .header { background: #2563eb; color: #fff; padding: 20px 24px; display:flex; align-items:center; gap:12px; }
+      /* REC-154: başlık rengi #2563eb olarak SABİTTİ; renk artık satır-içi
+         {{brand_primary_color}}'dan gelir (aşağıda). Buradaki değer yalnız yedek. */
+      .header { color: #fff; padding: 20px 24px; display:flex; align-items:center; gap:12px; }
       .brand { font-size: 18px; font-weight: 700; margin: 0; }
       .content { padding: 24px; color:#111827; }
       .content h2 { margin: 0 0 12px; color:#111827; font-size: 20px; }
@@ -19,18 +21,28 @@
   <body>
     <div class="container">
       <div class="card">
-        <div class="header">
-          <h1 class="brand">VentHub</h1>
+        <!-- REC-154: marka adı "VentHub" ve logo burada SABİT KODLUYDU. index.ts zaten
+             brand_name / brand_primary_color / brand_logo_url geçiyordu ama şablonda
+             KARŞILIĞI YOKTU — üç alan sessizce çöpe gidiyordu. -->
+        <div class="header" style="background: {{brand_primary_color}};">
+          {{#if brand_logo_url}}
+          <img src="{{brand_logo_url}}" alt="{{brand_name}}" style="max-height:32px;" />
+          {{/if}}
+          <h1 class="brand">{{brand_name}}</h1>
         </div>
         <div class="content">
           <h2>Teslimat Tamamlandı</h2>
           <p>Merhaba <strong>{{customer_name}}</strong>,</p>
           <p><strong>{{order_number}}</strong> numaralı siparişiniz başarıyla teslim edilmiştir.</p>
-          <p>Herhangi bir sorunuz olursa bizimle iletişime geçebilirsiniz.</p>
-          <p>Teşekkürler,<br /><strong>VentHub Ekibi</strong></p>
+          <p>Herhangi bir sorunuz olursa <a href="mailto:{{support_email}}">{{support_email}}</a>
+            adresinden bizimle iletişime geçebilirsiniz.</p>
+          <p>Teşekkürler,<br /><strong>{{brand_name}} Ekibi</strong></p>
         </div>
       </div>
       <p class="footer">Bu otomatik bir e-postadır. Lütfen yanıtlamayın.</p>
+      {{#if company_footer}}
+      <p class="footer">{{company_footer}}</p>
+      {{/if}}
     </div>
   </body>
 </html>

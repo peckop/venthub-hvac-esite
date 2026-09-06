@@ -8,15 +8,16 @@
       /* Inline-safe email styles */
       .container{font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;color:#111827}
       .card{background:#f8fafc;padding:20px;border-radius:8px;margin:20px 0}
-      .brand{color:#2563eb}
+      /* REC-154: marka rengi HEX olarak iki yerde SABİTTİ (#2563eb). Artık her ikisi de
+         satır-içi `style` ile {{brand_primary_color}}'dan gelir — bu blok yalnız yedek. */
       .muted{color:#6b7280;font-size:14px}
-      .btn{display:inline-block;background:#2563eb;color:#fff;text-decoration:none;padding:10px 16px;border-radius:6px}
+      .btn{display:inline-block;color:#fff;text-decoration:none;padding:10px 16px;border-radius:6px}
       code{background:#e5e7eb;padding:2px 6px;border-radius:4px}
     </style>
   </head>
   <body>
     <div class="container">
-      <h2 class="brand" style="color: {{brand_primary_color}};">{{brand_name}} — Siparişiniz kargoya verildi! 📦</h2>
+      <h2 style="color: {{brand_primary_color}};">{{brand_name}} — Siparişiniz kargoya verildi! 📦</h2>
       {{#if brand_logo_url}}
       <p><img src="{{brand_logo_url}}" alt="{{brand_name}}" style="max-height:40px;"/></p>
       {{/if}}
@@ -30,15 +31,21 @@
         {{#if tracking_url}}
         <p>
           <strong>🔗 Takip Linki:</strong>
-          <a class="btn" href="{{tracking_url}}" target="_blank">Kargo Takip</a>
+          <a class="btn" style="background: {{brand_primary_color}};" href="{{tracking_url}}" target="_blank">Kargo Takip</a>
         </p>
         {{/if}}
       </div>
 
       <p>Siparişinizi takip edebilir ve teslimat durumunu kontrol edebilirsiniz.</p>
-      <p>Teşekkürler,<br><strong>VentHub Ekibi</strong></p>
+      <!-- REC-154: burada "VentHub Ekibi" SABİT KODLUYDU. İşlev brand_name'i geçiyordu ama
+           şablon onu kullanmıyordu; marka değişse e-posta değişmezdi (sessiz sapma). -->
+      <p>Teşekkürler,<br><strong>{{brand_name}} Ekibi</strong></p>
       <hr style="margin-top:30px;border:none;border-top:1px solid #e5e7eb" />
-      <p class="muted">Bu otomatik bir e‑postadır. Lütfen yanıtlamayın.</p>
+      <p class="muted">Bu otomatik bir e‑postadır. Lütfen yanıtlamayın.
+        Sorularınız için <a href="mailto:{{support_email}}">{{support_email}}</a> adresine yazabilirsiniz.</p>
+      {{#if company_footer}}
+      <p class="muted">{{company_footer}}</p>
+      {{/if}}
     </div>
   </body>
 </html>
