@@ -312,7 +312,9 @@ export default function MobilAltSekmeCubugu() {
               <span
                 // Rozet TEK BAŞINA anlam taşımaz: yanındaki metin ("Teklif") ve
                 // aria-label sayıyı sözle de söyler. Renk tek bilgi taşıyıcı değil.
-                className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-navy px-1 text-xs font-bold text-clean-white"
+                // Zemin `--brand-cyan-ink` (#00708F): beyaz metinle ölçülen kontrast
+                // 5.65:1 (AA üstü). K25-b, "Teklif/Sepet sayacı zemini" hükmü.
+                className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-cyan-ink px-1 text-xs font-bold text-clean-white"
               >
                 {sayi}
               </span>

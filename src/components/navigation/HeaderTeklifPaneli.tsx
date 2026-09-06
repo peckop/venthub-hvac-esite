@@ -82,7 +82,11 @@ export default function HeaderTeklifPaneli() {
       >
         <span>{t('teklifPaneli.teklif')}</span>
         {sayi > 0 && (
-          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-navy px-1 text-xs font-bold text-clean-white">
+          // Zemin `--brand-cyan-ink` (#00708F): beyaz metinle ölçülen kontrast 5.65:1
+          // (AA 4.5 eşiğinin üstünde). K25-b: "Teklif/Sepet sayacı zemini
+          // --brand-cyan-ink, metin beyaz". Ham turkuaz (#0088B0, 4.08) burada
+          // KULLANILMAZ — bu yüzden ayrı bir koyu token var.
+          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-cyan-ink px-1 text-xs font-bold text-clean-white">
             {sayi}
           </span>
         )}
