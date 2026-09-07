@@ -85,8 +85,12 @@ pass = missingKeys boş && parityOk && kalan literal yok && JSX sağlam.`
 
 const results = await pipeline(
   TARGETS,
-  (t) => agent(migratePrompt(t), { label: 'migrate:' + t.ns, phase: 'Migrate', schema: MIGRATE_SCHEMA }),
-  (mr, t) => agent(judgePrompt(t, mr), { label: 'judge:' + t.ns, phase: 'Judge', schema: JUDGE_SCHEMA })
+  // MODEL AÇIKÇA YAZILI (REC-174, Recep 2026-09-06): model alanı boş bırakılırsa ajan oturumun
+  // modelini miras alır ve pahalı modele düşebilir. Göç = kalıba göre mekanik düzenleme → sonnet.
+  (t) => agent(migratePrompt(t), { label: 'migrate:' + t.ns, phase: 'Migrate', model: 'sonnet', schema: MIGRATE_SCHEMA }),
+  // Yargıç da sonnet: tek dosya üzerinde SINIRLI kontrol listesi (kalan literal / eksik anahtar /
+  // parity) — yargı değil doğrulama. Kaçırma ölçülürse yükseltilir; ölçmeden yükseltmek maliyet.
+  (mr, t) => agent(judgePrompt(t, mr), { label: 'judge:' + t.ns, phase: 'Judge', model: 'sonnet', schema: JUDGE_SCHEMA })
     .then(v => ({ target: t, migrate: mr, verdict: v })),
 )
 return results.filter(Boolean)

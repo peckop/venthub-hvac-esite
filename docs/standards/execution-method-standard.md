@@ -79,7 +79,43 @@ sonra tabloya bak. Şüphede: **ölç** (dosya sayısını, hedef sayısını, s
 
 ---
 
-## 5. Bilinen sınırlar (dürüstçe)
+## 5. Model yönlendirme (REC-174) — yöntem seçildi, sıra MODELDE
+
+> **Niçin bu bölüm var:** Recep, 2026-09-06'da **ikinci kez** söyledi: *workflow betiklerinde
+> `model:` boş bırakılırsa ajan modeli **miras alır**; boş bırakmak "varsayılan" değil, **ölçülmemiş
+> bir maliyet kararıdır**.* Ölçtüm (09-07): depodaki iki maestro workflow betiğinde **4 `agent()`
+> çağrısı, 0 `model:`** — yani kural yazılıydı ama koşan hiçbir yerde uygulanmıyordu.
+> Yöntem cetveli "hangi araç" sorusunu çözüyordu; "o araç hangi modelle koşar" sorusu boştaydı.
+
+### 5.1 Hüküm
+
+**Koşan bir workflow betiğindeki HER `agent()` çağrısı `model:` alanını AÇIKÇA yazar.**
+Miras almak bir seçim değil, seçim yapmamaktır. Kapı: `src/__tests__/conformance/workflow-model-yonlendirme.test.ts`.
+
+### 5.2 Hangi iş hangi modele
+
+| İşin şekli | Model | Niçin |
+|---|---|---|
+| Kalıba göre **mekanik düzenleme/göç** (i18n çıkarımı, aynı dönüşümü N dosyaya) | **sonnet** | Kalıp verilmiş, yargı yok; pahalı model kaliteyi artırmaz |
+| **Sınırlı kontrol listesiyle doğrulama** (kalan literal var mı, anahtar eksik mi, parity) | **sonnet** | Doğrulama ≠ yargı; ölçüt yazılı ve dar |
+| **Salt-okuma ölçüm / envanter / tarama** | **sonnet** | Filo kuralı 08-20: mekanik okuma Sonnet'e |
+| **Çürütme (adversaryal), açık uçlu "gerçek mi"** | **opus** ya da sonnet ×N oy | Ölçülmüş kaçırma varsa yükselt; **ölçmeden yükseltmek maliyet, ölçmeden düşürmek risk** |
+| **Yargı, sentez, hüküm** | **şerit** (alt-ajana verilmez) | §4: alt-ajan yargı vermez |
+
+**Yükseltme kuralı:** bir aşama sonnet'te kaçırıyorsa bu **ölçülür** (kaç bulgu kaçtı, hangi
+sınıf) ve gerekçe pano notuna yazılır; ancak o zaman model yükselir. Tersi de geçerli: opus'ta
+koşan bir aşama ölçümle sonnet'e düşürülebilir.
+
+### 5.3 Sınır (dürüstçe)
+
+Kapı, seçenekleri **değişkenden** gelen çağrıyı (`agent(p, opts)`) "model yok" sayar ve kırmızı
+verir — kasıtlı: dolaylı seçenek modeli okunamaz kılar. Kapı ayrıca yalnız **koşan** betikleri
+(`export const meta` içeren) ölçer; belgedeki örnekler evrenin dışındadır, çünkü belge koşmaz ve
+onu saymak kapıyı yalancı kırmızıya boğar.
+
+---
+
+## 6. Bilinen sınırlar (dürüstçe)
 
 - Cetvel, ajanın **hatırlamasına** bağlı kalmasın diye CLAUDE.md'den işaretlenir ve emir şablonuna
   satır olarak girer; yine de ajan satırı boş geçebilir — bunu yalnız haftalık sapma sayımı yakalar.
