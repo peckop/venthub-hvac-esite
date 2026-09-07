@@ -126,7 +126,11 @@ describe('buildProductGroupJsonLd', () => {
     expect(offers.availability).toBe('https://schema.org/OutOfStock')
   })
 
-  it('mpn = model_code ?? sku', () => {
+  // REC-272 — ESKİ HÂLİ: `mpn = model_code ?? sku` ve bu test onu DOĞRULUYORDU, yani
+  // kusuru sabitlemişti. `mpn` ÜRETİCİ kodudur; iç SKU'yu oraya yazmak arama motoruna
+  // yanlış beyandır ve productHelpers'ın hükmü ("sku'ya düşmek YASAK") bunu zaten
+  // yasaklıyordu. Test artık yasağı ölçüyor: kod yoksa alan HİÇ YAZILMAZ.
+  it('mpn yalnız model_code ile yazılır; kod yoksa alan hiç eklenmez (sku YEDEK DEĞİL)', () => {
     const withModelCode = buildProductGroupJsonLd({
       family: makeFamily(),
       variants: [makeVariant({ sku: 'SKU-A', model_code: 'MC-100' })],
@@ -145,7 +149,11 @@ describe('buildProductGroupJsonLd', () => {
     const v1 = (withModelCode.hasVariant as Record<string, unknown>[])[0]
     const v2 = (withoutModelCode.hasVariant as Record<string, unknown>[])[0]
     expect(v1.mpn).toBe('MC-100')
-    expect(v2.mpn).toBe('SKU-B')
+    // Alan YOK — `undefined` yeterli değil, anahtarın kendisi bulunmamalı ki
+    // serialize edilen JSON-LD'de boş bir mpn görünmesin.
+    expect(v2).not.toHaveProperty('mpn')
+    // `sku` yayınlanmaya devam eder: o SATICININ kendi kodudur, yanlış beyan değildir.
+    expect(v2.sku).toBe('SKU-B')
   })
 
   it('görseli olan varyanta image alanı ekler, olmayana eklemez', () => {

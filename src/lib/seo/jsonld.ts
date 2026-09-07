@@ -15,7 +15,7 @@
  */
 
 import type { FamilyListItem } from '../../types/ui-models'
-import { getProductDisplayName } from '../../utils/productHelpers'
+import { getProductDisplayName, getProductModelLabel } from '../../utils/productHelpers'
 import { familyName } from '../i18n/familyName'
 import { storagePathToUrl } from '../images/productImage'
 import { quoteModeHesapla } from '../pricing/quoteMode'
@@ -82,8 +82,17 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     const productNode: Record<string, unknown> = {
       '@type': 'Product',
       name: getProductDisplayName(variant, family, lang),
+      // `sku` SATICININ kendi kodudur — bizim olduğu için yayınlanması doğrudur.
       sku: variant.sku,
-      mpn: variant.model_code ?? variant.sku,
+    }
+
+    // REC-272: `mpn` ÜRETİCİ kodudur. `model_code` yoksa iç SKU'ya düşmek, arama
+    // motoruna "üreticinin kodu budur" diye YANLIŞ BEYAN etmektir. productHelpers'ın
+    // kendi hükmü zaten bunu yasaklıyor: "sku'ya düşmek YASAK." Alan hiç yazılmaz —
+    // eksik alan, yanlış alandan iyidir (schema.org'da `mpn` zorunlu değil).
+    const modelKodu = getProductModelLabel(variant)
+    if (modelKodu) {
+      productNode.mpn = modelKodu
     }
 
     if (imagePath) {
