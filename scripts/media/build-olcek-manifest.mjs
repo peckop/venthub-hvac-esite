@@ -6,15 +6,15 @@
  *     --url <SUPABASE_URL> --key <ANON_KEY>
  */
 import fs from 'node:fs';
+import { tumSatirlar } from '../icerik-hatti/_veri.mjs';  // 1000 satir tavani (REC-178)
 const arg = (n) => { const i = process.argv.indexOf(`--${n}`); return i > -1 ? process.argv[i + 1] : null; };
 const map = JSON.parse(fs.readFileSync(arg('map'), 'utf8'));
 const url = arg('url'), key = arg('key'), outPath = arg('out');
 const codes = Object.keys(map.found);
-const res = await fetch(`${url}/rest/v1/products?select=id,name,model_code,tenant_id&brand=ilike.vortice&deleted_at=is.null&model_code=in.(${codes.join(',')})`, {
-  headers: { apikey: key, authorization: `Bearer ${key}` },
-});
-if (!res.ok) { console.error('DB okuma hatasi', res.status, await res.text()); process.exit(1); }
-const rows = await res.json();
+// 1000 satir tavani (REC-178): liste sinirli bir sorgu bile tavana takilabilir (codes uzarsa).
+// Ortak kapi sayfalar VE sunucunun kesin sayisiyla karsilastirir; uyusmazsa firlatir.
+const rows = await tumSatirlar(url, { apikey: key, authorization: `Bearer ${key}` },
+  `products?select=id,name,model_code,tenant_id&brand=ilike.vortice&deleted_at=is.null&model_code=in.(${codes.join(',')})`);
 const tenants = new Set(rows.map(r => r.tenant_id));
 if (tenants.size !== 1) { console.error('tenant tekil degil:', [...tenants]); process.exit(1); }
 const pilots = rows.map(r => ({

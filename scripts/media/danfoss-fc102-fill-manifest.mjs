@@ -10,6 +10,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { tumSatirlar } from '../icerik-hatti/_veri.mjs';  // 1000 satir tavani: sayfalama + kesin sayi karsilastirmasi (REC-178)
 
 const arg = (n) => { const i = process.argv.indexOf(`--${n}`); return i > -1 ? process.argv[i + 1] : null; };
 const outDir = arg('out'), imgFile = arg('img'), dbUrl = arg('url'), dbKey = arg('key');
@@ -17,9 +18,8 @@ const SOURCE = 'https://www.danfoss.com/media/t5xdo2rv/untitled-1.jpg (vlt-hvac-
 if (!outDir || !imgFile || !dbUrl || !dbKey) { console.error('kullanım: --out --img --url --key'); process.exit(2); }
 if (!fs.existsSync(imgFile)) { console.error('kaynak jpg yok: ' + imgFile); process.exit(1); }
 
-const res = await fetch(`${dbUrl}/rest/v1/products?select=id,name,sku,tenant_id&brand=ilike.*danfoss*&deleted_at=is.null&name=like.FC102*`, {
-  headers: { apikey: dbKey, authorization: `Bearer ${dbKey}` } });
-const rows = await res.json();
+const rows = await tumSatirlar(dbUrl, { apikey: dbKey, authorization: `Bearer ${dbKey}` }, `products?select=id,name,sku,tenant_id&brand=ilike.*danfoss*&deleted_at=is.null&name=like.FC102*`);
+
 console.log(`db FC102: ${rows.length} sku`);
 if (!rows.length) process.exit(1);
 

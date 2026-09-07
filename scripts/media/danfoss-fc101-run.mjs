@@ -11,6 +11,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { tumSatirlar } from '../icerik-hatti/_veri.mjs';  // 1000 satir tavani: sayfalama + kesin sayi karsilastirmasi (REC-178)
 
 const BASE = 'https://www.avensair.com';
 const DANFOSS_IMG = 'https://www.danfoss.com/media/7655/fc101-basic-120x747.jpg';
@@ -42,9 +43,8 @@ const KW_TO_P = { '0.75':'pk75','1.1':'p1k1','1.5':'p1k5','2.2':'p2k2','3':'p3k0
   '55':'p55k','75':'p75k','90':'p90k' };
 
 // DB Danfoss ürünleri
-const res = await fetch(`${dbUrl}/rest/v1/products?select=id,name,sku,tenant_id&brand=ilike.*danfoss*&deleted_at=is.null`, {
-  headers: { apikey: dbKey, authorization: `Bearer ${dbKey}` } });
-const rows = await res.json();
+const rows = await tumSatirlar(dbUrl, { apikey: dbKey, authorization: `Bearer ${dbKey}` }, `products?select=id,name,sku,tenant_id&brand=ilike.*danfoss*&deleted_at=is.null`);
+
 console.log(`db: ${rows.length} Danfoss sku`);
 const tenants = new Set(rows.map(r => r.tenant_id));
 if (tenants.size !== 1) { console.error('tenant tekil degil'); process.exit(1); }

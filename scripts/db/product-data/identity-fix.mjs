@@ -36,6 +36,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { tumSatirlar } from '../../icerik-hatti/_veri.mjs';  // 1000 satir tavani (REC-178)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const arg = (n, def = null) => { const i = process.argv.indexOf(`--${n}`); return i > -1 ? process.argv[i + 1] : def; };
@@ -66,7 +67,11 @@ const rest = async (p, method = 'GET', body) => {
 
 /** Değişmez ölçümü: kaç ürün `sku == <MARKA_ONEKI>-<model_code>` kuralına uyuyor. */
 async function invariantCount() {
-  const rows = await rest('products?deleted_at=is.null&select=sku,model_code');
+  // 1000 satir tavani (REC-178): bu okuma bir DEGISMEZ olcusu besliyor — eksik veri
+  // "kural ihlali yok" gibi gorunur ve kapi sessizce yanlis yesil verir. Ortak kapi:
+  // kesin sayi + sirali sayfalama + fark KIRMIZI.
+  const rows = await tumSatirlar(dbUrl, { apikey: dbKey, authorization: `Bearer ${dbKey}` },
+    'products?deleted_at=is.null&select=sku,model_code');
   let ok = 0, total = 0;
   for (const r of rows) {
     if (!r.sku || !r.model_code) continue;
