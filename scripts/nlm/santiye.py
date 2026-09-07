@@ -7,8 +7,10 @@ Hafizadan degil kayittan: tablo yalniz Linear'daki DURUM alanindan uretilir; pan
 dosyasi kaynak DEGILDIR. Serit panoya ne yazarsa yazsin, Linear'da durum degismediyse tabloda gorunmez.
 
 Kurallar (cetvel: docs/standards/work-tracking-ssot-standard.md, 2026-09-07 eki):
-  - serit basina In Progress <= 1  (asim = KIRMIZI, cikis 1)
+  - serit basina In Progress <= 1  (asim = KIRMIZI, cikis 1); "Recep kapisi" etiketli kayit limitten MUAF
+  - In Review = TESLIM: is bitti, PR acik, yalniz merge bekler (ALTYAPI hukmu 2026-09-07); limite girmez
   - serit basina Todo <= 3         (asim = SARI, uyari)
+  - sahiplik olcutu ETIKET; etiketsiz kayit SAHIPSIZ (proje sessizce sahip yapmaz)
   - Recep'ten bir sey bekleyen kayit "Recep kapisi" etiketi tasir; tasimayan gorunmez
   - blockedBy dolu kayit "BLOKLU" sutununda
 
@@ -26,18 +28,20 @@ LIMIT_IP, LIMIT_TODO = 1, 3
 
 
 def serit_of(k):
+    """Sahiplik olcutu ETIKET'tir, proje degil (URUN-KATALOG duzeltmesi 2026-09-07 09:2xZ:
+    proje olcutu Katalog projesinde duran URUN isini Katalog seridine yaziyordu — 8 gorundu, gercek 1).
+    Etiketi olmayan kayit SAHIPSIZ'dir; proje yalnizca tabloda not olarak gecer, sessizce atanmaz."""
     labels = set(k.get("labels") or [])
     if "URUN-KATALOG" in labels or "KATALOG" in labels:
         return "URUN-KATALOG"
     for s in ("ALTYAPI", "URUN", "OPS", "DESIGN"):
         if s in labels:
-            # Katalog projesindeki URUN etiketli kayitlar Katalog seridinindir (etiket borcu, tabloda not)
-            if s == "URUN" and (k.get("project") or "") == KATALOG_PROJE:
-                return "URUN-KATALOG"
             return s
-    if (k.get("project") or "") == KATALOG_PROJE:
-        return "URUN-KATALOG"
     return "SAHIPSIZ"
+
+
+def recep_kapisi(k):
+    return "Recep kapısı" in (k.get("labels") or [])
 
 
 def kisa(t, n=78):
@@ -46,6 +50,10 @@ def kisa(t, n=78):
 
 
 def main():
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")   # Windows cp1254 konsolu "≤" ve "…"de patliyor (olculdu 09-07)
+    except Exception:
+        pass
     ap = argparse.ArgumentParser()
     ap.add_argument("--json")
     ap.add_argument("--tarih")
@@ -64,7 +72,7 @@ def main():
     kaynak_damga = d.get("damga", "?")
 
     rows = [k for k in rows if (k.get("project") or "") not in DIS_PROJELER and k.get("status") != "Canceled"]
-    by = {s: {"In Progress": [], "Todo": [], "Backlog": [], "Done": [], "BLOKLU": [], "RECEP": []} for s in SERITLER + ["SAHIPSIZ"]}
+    by = {s: {"In Progress": [], "In Review": [], "Todo": [], "Backlog": [], "Done": [], "BLOKLU": [], "RECEP": []} for s in SERITLER + ["SAHIPSIZ"]}
     for k in rows:
         s = serit_of(k)
         st = k.get("status") or "?"
@@ -73,7 +81,7 @@ def main():
         by[s][st].append(k)
         if k.get("blockedBy") and st != "Done":
             by[s]["BLOKLU"].append(k)
-        if "Recep kapısı" in (k.get("labels") or []) and st != "Done":
+        if recep_kapisi(k) and st != "Done":
             by[s]["RECEP"].append(k)
 
     L = []
@@ -84,12 +92,13 @@ def main():
     L.append("")
     L.append("## §0 Özet")
     L.append("")
-    L.append("| Şerit | Yapılıyor | Sırada | Backlog | Bloklu | Recep'ten bekleyen | Uyum |")
-    L.append("|---|---:|---:|---:|---:|---:|---|")
+    L.append("| Şerit | Yapılıyor | Teslim (PR açık) | Sırada | Backlog | Bloklu | Recep'ten bekleyen | Uyum |")
+    L.append("|---|---:|---:|---:|---:|---:|---:|---|")
     kirmizi = []
     for s in SERITLER + ["SAHIPSIZ"]:
         b = by[s]
-        ip, td = len(b["In Progress"]), len(b["Todo"])
+        ip_all, td, rv = len(b["In Progress"]), len(b["Todo"]), len(b["In Review"])
+        ip = len([k for k in b["In Progress"] if not recep_kapisi(k)])   # Recep kapisi limitten muaf
         uyum = "YEŞİL"
         if ip > LIMIT_IP:
             uyum = f"KIRMIZI (yapılıyor {ip} > {LIMIT_IP})"; kirmizi.append((s, ip))
@@ -97,7 +106,7 @@ def main():
             uyum = f"SARI (sırada {td} > {LIMIT_TODO})"
         if s == "SAHIPSIZ" and (ip or td or len(b["Backlog"])):
             uyum = "KIRMIZI (sahipsiz kayıt)"; kirmizi.append((s, ip + td + len(b["Backlog"])))
-        L.append(f"| {s} | {ip} | {td} | {len(b['Backlog'])} | {len(b['BLOKLU'])} | {len(b['RECEP'])} | {uyum} |")
+        L.append(f"| {s} | {ip_all} | {rv} | {td} | {len(b['Backlog'])} | {len(b['BLOKLU'])} | {len(b['RECEP'])} | {uyum} |")
     L.append("")
     recep = [k for s in by for k in by[s]["RECEP"]]
     L.append(f"## §1 Recep'ten bekleyen ({len(recep)})")
@@ -107,23 +116,24 @@ def main():
     L.append("")
     for s in SERITLER + ["SAHIPSIZ"]:
         b = by[s]
-        if not any(b[x] for x in ("In Progress", "Todo", "BLOKLU")) and s != "SAHIPSIZ":
+        if not any(b[x] for x in ("In Progress", "In Review", "Todo", "BLOKLU")) and s != "SAHIPSIZ":
             L.append(f"## {s} — yapılıyor 0 · sırada 0 (backlog {len(b['Backlog'])})"); L.append(""); continue
         L.append(f"## {s}")
         L.append("")
-        for st, ad in (("In Progress", "YAPILIYOR"), ("Todo", "SIRADA"), ("BLOKLU", "BLOKLU")):
+        for st, ad in (("In Progress", "YAPILIYOR"), ("In Review", "TESLİM — PR açık, merge bekler"), ("Todo", "SIRADA"), ("BLOKLU", "BLOKLU")):
             items = b[st]
             if not items and st != "In Progress":
                 continue
             L.append(f"**{ad} ({len(items)})**")
             for k in sorted(items, key=lambda x: (-(x.get('priority') or 0), x['identifier'])):
                 blk = f" · bloklu: {', '.join(x if isinstance(x, str) else x.get('identifier', '?') for x in k.get('blockedBy') or [])}" if k.get("blockedBy") else ""
-                L.append(f"- {k['identifier']} · {kisa(k['title'])}{blk}")
+                rk = " · [Recep kapısı]" if recep_kapisi(k) else ""
+                L.append(f"- {k['identifier']} · {kisa(k['title'])}{rk}{blk}")
             L.append("")
         if s == "SAHIPSIZ" and b["Backlog"]:
-            L.append(f"**BACKLOG ({len(b['Backlog'])}) — etiket borcu**")
+            L.append(f"**BACKLOG ({len(b['Backlog'])}) — etiket borcu (proje yalnız not)**")
             for k in sorted(b["Backlog"], key=lambda x: x["identifier"]):
-                L.append(f"- {k['identifier']} · {kisa(k['title'])}")
+                L.append(f"- {k['identifier']} · {kisa(k['title'])} · proje: {k.get('project') or '-'}")
             L.append("")
     L.append("## §9 Hüküm")
     L.append("")

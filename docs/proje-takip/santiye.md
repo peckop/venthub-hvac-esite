@@ -1,148 +1,102 @@
-<!-- uretilmis: scripts/nlm/santiye.py · damga 2026-09-07T09:09Z · Linear disa aktarimi 2026-09-07T09:09:09Z · elle duzenlenmez -->
-# ŞANTİYE — kimde ne iş var (2026-09-07T09:09Z)
+<!-- uretilmis: scripts/nlm/santiye.py · damga 2026-09-07T09:19Z · Linear disa aktarimi 2026-09-07T09:18:59Z · elle duzenlenmez -->
+# ŞANTİYE — kimde ne iş var (2026-09-07T09:19Z)
 
-Kaynak: Linear (2026-09-07T09:09:09Z). Kural: şerit başına yapılıyor ≤1, sırada ≤3. Pano/sohbet kaynak değildir.
+Kaynak: Linear (2026-09-07T09:18:59Z). Kural: şerit başına yapılıyor ≤1, sırada ≤3. Pano/sohbet kaynak değildir.
 
 ## §0 Özet
 
-| Şerit | Yapılıyor | Sırada | Backlog | Bloklu | Recep'ten bekleyen | Uyum |
-|---|---:|---:|---:|---:|---:|---|
-| URUN | 10 | 13 | 16 | 1 | 4 | KIRMIZI (yapılıyor 10 > 1) |
-| URUN-KATALOG | 8 | 6 | 7 | 0 | 3 | KIRMIZI (yapılıyor 8 > 1) |
-| ALTYAPI | 16 | 8 | 6 | 0 | 4 | KIRMIZI (yapılıyor 16 > 1) |
-| OPS | 15 | 9 | 9 | 1 | 3 | KIRMIZI (yapılıyor 15 > 1) |
-| DESIGN | 0 | 0 | 0 | 0 | 0 | YEŞİL |
-| SAHIPSIZ | 4 | 5 | 3 | 0 | 1 | KIRMIZI (sahipsiz kayıt) |
+| Şerit | Yapılıyor | Teslim (PR açık) | Sırada | Backlog | Bloklu | Recep'ten bekleyen | Uyum |
+|---|---:|---:|---:|---:|---:|---:|---|
+| URUN | 0 | 7 | 3 | 47 | 1 | 5 | YEŞİL |
+| URUN-KATALOG | 1 | 1 | 2 | 3 | 0 | 3 | YEŞİL |
+| ALTYAPI | 1 | 5 | 3 | 23 | 0 | 4 | YEŞİL |
+| OPS | 1 | 4 | 3 | 29 | 1 | 3 | YEŞİL |
+| DESIGN | 0 | 0 | 0 | 0 | 0 | 0 | YEŞİL |
+| SAHIPSIZ | 0 | 0 | 0 | 0 | 0 | 0 | YEŞİL |
 
 ## §1 Recep'ten bekleyen (15)
 
-- REC-117 · Misafir teklif akışı: teklif için üyelik zorunluluğu kalkıyor (Recep kararı) — anon INSERT/RLS = MIGRATION · URUN · Todo
-- REC-135 · Kategori ağacı boşlukları: 10 dalsız ürün + 7 boş alt dal (365/375 zaten dalında) · URUN-KATALOG · In Progress
-- REC-138 · SSR duman kilidi PR KAPISI olarak: CI kendi sunucusunu kaldırır — ama gerçek Supabase okuma erişimi ister (Re… · ALTYAPI · In Progress
-- REC-156 · Sipariş numarası saatten değil günlük sayaçtan üretilsin — generate_order_number NNNN = EPOCH % 10000 çakışma… · URUN · In Progress
-- REC-168 · ALTYAPI: Satış kipine TEK ANAHTARLA geçiş — hide_price (37 kategori) + NEXT_PUBLIC_ODEME_ACIK + yeniden doğru… · ALTYAPI · In Progress
-- REC-172 · KATALOG + OPS: Teknik özellik tamamlama hattı — boşluk haritası (aile × alan) → marka sitesi / PDF'ten KANITL… · URUN-KATALOG · Backlog
-- REC-173 · Tasarım arşivi ve taşınabilirlik: 4 Claude Design projesi depoya günlük çekilir, tasarım kuralları bizim skil… · ALTYAPI · In Progress
-- REC-184 · REC-178/Katalog: generate-sitemap.mjs (limit 5000, çağıran yok = ÖLÜ ADAY ölçümü) + extract_brands.py + scrip… · SAHIPSIZ · Todo
-- REC-186 · URUN (K12): DD ailesi 6N090P → 61090P ad + slug düzeltmesi, eski slug 301, kanonik/sitemap etkisi ölçülür · URUN · Todo
-- REC-191 · URUN: Adres şeması + kategori ağacı + nitelik katmanı TEK YAYIN — geçiş planı (K3 + K4 + REC-95 kesişimi, 80 … · URUN · In Progress
+- REC-117 · Misafir teklif akışı: teklif için üyelik zorunluluğu kalkıyor (Recep kararı) — anon INSERT/RLS = MIGRATION · URUN · Backlog
+- REC-135 · Kategori ağacı boşlukları: 10 dalsız ürün + 7 boş alt dal (365/375 zaten dalında) · URUN · Todo
+- REC-138 · SSR duman kilidi PR KAPISI olarak: CI kendi sunucusunu kaldırır — ama gerçek Supabase okuma erişimi ister (Re… · ALTYAPI · Backlog
+- REC-156 · Sipariş numarası saatten değil günlük sayaçtan üretilsin — generate_order_number NNNN = EPOCH % 10000 çakışma… · URUN · In Review
+- REC-168 · ALTYAPI: Satış kipine TEK ANAHTARLA geçiş — hide_price (37 kategori) + NEXT_PUBLIC_ODEME_ACIK + yeniden doğru… · ALTYAPI · In Review
+- REC-172 · KATALOG + OPS: Teknik özellik tamamlama hattı — boşluk haritası (aile × alan) → marka sitesi / PDF'ten KANITL… · URUN-KATALOG · In Progress
+- REC-173 · Tasarım arşivi ve taşınabilirlik: 4 Claude Design projesi depoya günlük çekilir, tasarım kuralları bizim skil… · ALTYAPI · Backlog
+- REC-184 · REC-178/Katalog: generate-sitemap.mjs (limit 5000, çağıran yok = ÖLÜ ADAY ölçümü) + extract_brands.py + scrip… · URUN-KATALOG · In Review
+- REC-186 · URUN (K12): DD ailesi 6N090P → 61090P ad + slug düzeltmesi, eski slug 301, kanonik/sitemap etkisi ölçülür · URUN · In Review
+- REC-191 · URUN: Adres şeması + kategori ağacı + nitelik katmanı TEK YAYIN — geçiş planı (K3 + K4 + REC-95 kesişimi, 80 … · URUN · In Review
 - REC-193 · KATALOG: AVE-20150 fiyatı canlıda 0,00 — içe alımda düşen tek satır; yazımı Recep'in kendi sözüyle · URUN-KATALOG · Backlog
 - REC-194 · Mekanizma CRON katmanı: Recep 2026-09-06 "cron kurulmasın, irtibat kopuyor, ayrıca konuşulacak" — kalıcı hükü… · OPS · Backlog
 - REC-50 · venthub.com.tr DNS + kanonik SITE_URL · OPS · Todo
-- REC-52 · whsec_ webhook secret rotasyonu (repo PUBLIC) · ALTYAPI · In Progress
+- REC-52 · whsec_ webhook secret rotasyonu (repo PUBLIC) · ALTYAPI · Backlog
 - REC-88 · Açık kaynak CRM/ERP taraması + wacrm incelemesi — karar bekliyor · OPS · Todo
 
 ## URUN
 
-**YAPILIYOR (10)**
-- REC-133 · Ölü anahtar kapısı: bileşene devredilen sözlük alt ağacı (dictionary={dict.ho…
-- REC-154 · E-posta şablonu kod tarafı: sipariş no biçimi e-postada kırpık (#000318 ≠ 202…
-- REC-127 · Bing kökü dizinleyemiyor: / → /tr 307 GEÇİCİ yönlendirme + hreflang x-default…
-- REC-156 · Sipariş numarası saatten değil günlük sayaçtan üretilsin — generate_order_num…
-- REC-165 · Tasarım→Kod Faz 2+3: DS token köprüsü (57 token → index.css türev + tailwind …
-- REC-191 · URUN: Adres şeması + kategori ağacı + nitelik katmanı TEK YAYIN — geçiş planı…
-- REC-59 · SSG/ISR Dalga-2: 4 ana rota gerçekten statik olsun + SSR kapısı CI'a
-- REC-94 · Ana sayfa yeniden tasarımı — tam kapsamlı tarama + tasarım programı (Faz B yü…
-- REC-125 · Consul bot bulguları: hardcoded TR literal → sözlük — SecurityRibbon, OrderSu…
-- REC-89 · Mobil vitrin kusurları: hero buton metinleri görünmüyor + PDP scroll'da görse…
+**YAPILIYOR (0)**
 
-**SIRADA (13)**
-- REC-116 · Kayıt sayfası revizyonu: Google-ile-kayıt YOK (girişte var, kayıtta yok) + ta…
-- REC-186 · URUN (K12): DD ailesi 6N090P → 61090P ad + slug düzeltmesi, eski slug 301, ka…
-- REC-43 · KVKK: hesap silme/anonimleştirme + veri sahibi talep akışı
-- REC-61 · Sayfa görselleri Gemini üretim hattı — hava perdesi şablonundaki gibi
-- REC-117 · Misafir teklif akışı: teklif için üyelik zorunluluğu kalkıyor (Recep kararı) …
+**TESLİM — PR açık, merge bekler (7)**
+- REC-186 · URUN (K12): DD ailesi 6N090P → 61090P ad + slug düzeltmesi, eski slug 301, ka… · [Recep kapısı]
+- REC-203 · URUN: INV-TOKEN-SINIF-1 fail-open çıktı — sabotajla ölçüldü, boşluk muhafızı …
+- REC-156 · Sipariş numarası saatten değil günlük sayaçtan üretilsin — generate_order_num… · [Recep kapısı]
+- REC-157 · Konformans kapısı: aile açıklamasındaki sayısal değer, ailenin ürünlerinden t…
+- REC-161 · Kategori açıklaması i18n yolu: metadata.description_i18n {tr,en} + getCategor…
 - REC-182 · REC-178/URUN: pricingMaterialize.ts:126 refreshCostInBase (YAZMA yolu) + :317…
+- REC-191 · URUN: Adres şeması + kategori ağacı + nitelik katmanı TEK YAYIN — geçiş planı… · [Recep kapısı]
+
+**SIRADA (3)**
+- REC-135 · Kategori ağacı boşlukları: 10 dalsız ürün + 7 boş alt dal (365/375 zaten dalı… · [Recep kapısı]
 - REC-188 · REC-179/URUN: 11 fail-open konformans kapısına evren muhafızı — 3d-asset-vali…
-- REC-47 · Kargo ücreti: sepet+checkout sabit "Ücretsiz"
-- REC-48 · Fatura belgesi üretilmiyor (e-arşiv taahhüdü açıkta)
-- REC-65 · Ürün kartı + PDP fiyat/teknik özellik düzeni revizyonu
-- REC-57 · LANSMAN ENGELİ: iyzico-refund müşteri self-iadesi
-- REC-123 · Arama/filtre eşleşmesi ham TR ad üzerinden — EN yazan müşteri eşleşmez (iki i…
-- REC-128 · Ana sayfa /tr ve /en DİNAMİK render: Cache-Control no-store + X-Vercel-Cache …
+- REC-155 · CANLI: 126/375 ürün sayfasında "Ürün Açıklaması" altında iç kademe notu görün…
 
 **BLOKLU (1)**
 - REC-169 · URUN: Satış kipinin GÖRÜNEN YÜZÜ — kapalı/açık metinleri, sepet ve PDP vaat s… · bloklu: REC-168
 
 ## URUN-KATALOG
 
-**YAPILIYOR (8)**
-- REC-146 · İçerik hattı: 40 aile anlatımı + yapısal altı blok (Gövde·Çark·Motor·Koruma·K…
-- REC-135 · Kategori ağacı boşlukları: 10 dalsız ürün + 7 boş alt dal (365/375 zaten dalı…
-- REC-136 · Katalog sayımı TEK KAYNAK: sitenin okuduğu yolla sayan betik + günlük tablo; …
-- REC-157 · Konformans kapısı: aile açıklamasındaki sayısal değer, ailenin ürünlerinden t…
-- REC-161 · Kategori açıklaması i18n yolu: metadata.description_i18n {tr,en} + getCategor…
-- REC-155 · CANLI: 126/375 ürün sayfasında "Ürün Açıklaması" altında iç kademe notu görün…
-- REC-163 · KAYNAK DİZİNİ: tedarikçi PDF'leri bir kez, deterministik, sayfa+tablo düzeyin…
-- REC-124 · Katalog veri kusurları paketi: "Frenkans"/"Inventoru" yazımları CANLIDA + DAN…
+**YAPILIYOR (1)**
+- REC-172 · KATALOG + OPS: Teknik özellik tamamlama hattı — boşluk haritası (aile × alan)… · [Recep kapısı]
 
-**SIRADA (6)**
+**TESLİM — PR açık, merge bekler (1)**
+- REC-184 · REC-178/Katalog: generate-sitemap.mjs (limit 5000, çağıran yok = ÖLÜ ADAY ölç… · [Recep kapısı]
+
+**SIRADA (2)**
+- REC-146 · İçerik hattı: 40 aile anlatımı + yapısal altı blok (Gövde·Çark·Motor·Koruma·K…
 - REC-190 · Katalog: canlıda 38 teknik hücre sayısal anahtarda birim-gömülü metin taşıyor…
-- REC-109 · 16 ailenin EN adı eksik/sahte (9 hiç yok + 7 en==tr) — çeviri üretimi + Recep…
-- REC-44 · Ürün görseli edinme hattı — 35 ürün kaldı (339/374 tamam)
-- REC-60 · Kapsama: ~210 eksik kod + sürekli sayım kapısı
-- REC-91 · Görsel hattı gerçek çözümü: ön-üretilmiş boyutlar + bağımsız yedek yol (402 k…
-- REC-122 · EN marka şeridinde "Frekans Konvertörü" marka olarak listeleniyor + 6 marka 3…
 
 ## ALTYAPI
 
-**YAPILIYOR (16)**
-- REC-102 · Orion companion üreteci: 3 kalem — çıkış kodu dürüstlüğü, defter/batch yolu, …
-- REC-138 · SSR duman kilidi PR KAPISI olarak: CI kendi sunucusunu kaldırır — ama gerçek …
-- REC-144 · INV-DOC-3 v2 — küme master TAZELİK paritesi (ad paritesi yerine); bloklamaz, …
-- REC-158 · Föy PDF'i ile vitrin AYNI biçimlendiriciyi kullansın (INV-FOY-PARITE-1) — önc…
-- REC-168 · ALTYAPI: Satış kipine TEK ANAHTARLA geçiş — hide_price (37 kategori) + NEXT_P…
+**YAPILIYOR (1)**
+- REC-192 · ALTYAPI: mekanizma teslimat kanıtı "atıldı" ile "ULAŞTI"yı ayırt etmiyor — gö…
+
+**TESLİM — PR açık, merge bekler (5)**
+- REC-168 · ALTYAPI: Satış kipine TEK ANAHTARLA geçiş — hide_price (37 kategori) + NEXT_P… · [Recep kapısı]
 - REC-174 · Model yönlendirme cetvel satırı (WrongStack 2/3): mekanik iş ucuz modele/beti…
 - REC-183 · REC-178/ALTYAPI: supabase/functions order-housekeeping:63 (limit 1000, cron) …
-- REC-130 · Ölçüm komutları çalışma dizinini beyan eder; oturum dizini şerit ağacından ay…
-- REC-132 · Üretilmiş toplamalar (master md + manifest) özellik PR'larında yol almasın; m…
 - REC-162 · Vercel günlük derleme sınırı: kapıda "rate limited" kolu = ÖLÇÜLEMEZ (madde 3…
-- REC-173 · Tasarım arşivi ve taşınabilirlik: 4 Claude Design projesi depoya günlük çekil…
 - REC-177 · Hafıza kancaları: eylem defteri (mv/rm → state) · soru yönlendirme (hatırlıyo…
-- REC-192 · ALTYAPI: mekanizma teslimat kanıtı "atıldı" ile "ULAŞTI"yı ayırt etmiyor — gö…
-- REC-52 · whsec_ webhook secret rotasyonu (repo PUBLIC)
-- REC-120 · INV-CETVEL-YAPI iki kapsam kusuru: HÜKÜM başlığı dosya-çapında tekil sanılıyo…
-- REC-69 · T021 — Üretilen belge tazelik kapıları, venthub ayağı (Kapı A + Kapı C + cetv…
 
-**SIRADA (8)**
-- REC-119 · Sistematik ölü kod temizliği: knip 30 dosya + 67 export — CodeGraph çapraz do…
+**SIRADA (3)**
 - REC-185 · REC-180/ALTYAPI: araç envanteri KAPISI — scripts/hijyen/arac-envanteri.cjs (f…
 - REC-189 · REC-179/ALTYAPI: 3 fail-open kapıya evren muhafızı — pricing-money-append-onl…
-- REC-58 · Onaysız tehlikeli butonlar: tekil iade + tekil rol değişikliği
 - REC-121 · Tip-drift kapısı: migration inince database.types.ts canlı şemayla senkron mu…
-- REC-70 · T019 — 21 zaman-aşımısız dış çağrıya bütçe + AST konformans kapısı
-- REC-71 · T018 — Köprü içe alma açıklığı: 129 raporlandı / 126 oluştu
-- REC-78 · Sayaç üçlüsü: atılan ölçümleri yakala (T018 ardılı)
 
 ## OPS
 
-**YAPILIYOR (15)**
-- REC-147 · DEĞERLENDİRME: Tasarım yetenek (skill) envanteri — 31 dış yetenek kuruldu, bi…
+**YAPILIYOR (1)**
 - REC-175 · Tek ekran pano (WrongStack 3/3): gün kapanışı betiği her akşam tek dosya üret… · bloklu: REC-141
-- REC-67 · Companion üreteci taşıyıcısı — mimo üyeliği iptal, 28'inden sonra Haiku masada
-- REC-129 · Kimlik + vitrin yeniden tasarımı — tek dil, fazlı üretim (logo/palet/ikon KAP…
+
+**TESLİM — PR açık, merge bekler (4)**
 - REC-176 · venthub-tasarim-dili skill DOĞRULAMA: 14 kural × Kararlar gövdesi × Design do…
 - REC-178 · 1000 satır tavanı — sahipsiz 8 kalemin sahip ataması (pricingMaterialize:126 …
 - REC-179 · Evren muhafızı sınavı: 53 aday konformans kapısı × sabotaj (evreni daralt, ye…
 - REC-180 · Araç envanteri: 27 hook (9'u bağlı) · 119 betik · 64 skill · 5 git kancası · …
-- REC-56 · Ürün-katalog hattı — cetveller indi, içerik/derinlik işleri açık
-- REC-86 · Ajan hafıza sistemi — araştırma, karar ve Faz 1 (PreCompact kapısı)
-- REC-72 · Vitrin & Ürün açık işleri (registry taşıması)
-- REC-74 · Güvenlik açık işleri (registry taşıması)
-- REC-75 · ERP & Admin açık işleri (registry taşıması)
-- REC-76 · Altyapı & Araç açık işleri (registry taşıması)
-- REC-84 · Belge Tazeleme — companion + master MD + NLM ikizi, SIFIRLANANA KADAR
 
-**SIRADA (9)**
-- REC-77 · applicationEmail + kepAddress hâlâ yer tutucu — kanal olmadan KVKK defteri ça…
-- REC-55 · Satınalma modülü — v1 tamam, karne + v2 kalemleri açık
-- REC-64 · İkiz taraması: 20 aday eksik — koda karşı doğrula, haritaya işle
+**SIRADA (3)**
 - REC-187 · Gün kapanışı v2: şerit dilim kaydı (DEVAM+ANLAM, numaralı) · iş kalemi sipari…
-- REC-50 · venthub.com.tr DNS + kanonik SITE_URL
-- REC-62 · ERP çalışma alanı + CRM nesne katmanı — cetveller yazılı, kod sıfır
-- REC-126 · Jules Darwin/Bolt önerileri — kapatılan #879/#878'in fikir kaydı (atama değil…
-- REC-73 · Ödeme & Finans açık işleri (registry taşıması)
-- REC-88 · Açık kaynak CRM/ERP taraması + wacrm incelemesi — karar bekliyor
+- REC-50 · venthub.com.tr DNS + kanonik SITE_URL · [Recep kapısı]
+- REC-88 · Açık kaynak CRM/ERP taraması + wacrm incelemesi — karar bekliyor · [Recep kapısı]
 
 **BLOKLU (1)**
 - REC-175 · Tek ekran pano (WrongStack 3/3): gün kapanışı betiği her akşam tek dosya üret… · bloklu: REC-141
@@ -151,24 +105,8 @@ Kaynak: Linear (2026-09-07T09:09:09Z). Kural: şerit başına yapılıyor ≤1, 
 
 ## SAHIPSIZ
 
-**YAPILIYOR (4)**
-- REC-141 · (OPS) Belge çelişki temizliği paketi — 2026-09-04 taraması (13 kalem, sahipli)
-- REC-148 · Vitrin vaat envanteri ve mükerrer girişler — ölçülmüş bulgu listesi
-- REC-150 · Çift title: Seo bileşeni ile App Router metadata tek yazıcıya iner (generateM…
-- REC-142 · Companion sistemi UYKU KİPİ — tek taşıyıcı anahtarı, tüm kapılar say-raporla,…
-
-**SIRADA (5)**
-- REC-184 · REC-178/Katalog: generate-sitemap.mjs (limit 5000, çağıran yok = ÖLÜ ADAY ölç…
-- REC-1 · Get familiar with Linear
-- REC-2 · Set up your teams
-- REC-3 · Connect your tools
-- REC-4 · Import your data
-
-**BACKLOG (3) — etiket borcu**
-- REC-140 · (ALTYAPI) anon rolüne tablo düzeyinde yazma GRANT'ları — derinlik savunması y…
-- REC-143 · Teklif kalemine seçim kaynağı (tür · girdiler · dayanak) kolonu + quote_no'nu…
-- REC-33 · P07-Enterprise-Search: Faz 0 - Envanter ve Zemin Etüdü
+**YAPILIYOR (0)**
 
 ## §9 Hüküm
 
-KIRMIZI — URUN: 10 · URUN-KATALOG: 8 · ALTYAPI: 16 · OPS: 15 · SAHIPSIZ: 4 · SAHIPSIZ: 12. Şerit Linear'ı gerçek duruma çekmeden yeni iş almaz.
+YEŞİL — her şerit sınırın içinde.
