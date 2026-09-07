@@ -144,7 +144,7 @@ onu saymak kapıyı yalancı kırmızıya boğar.
 
 ---
 
-## 6. ÖLÇÜLMÜŞ VAKALAR (2026-09-06) — ve üçün **ikisi zaten yazılıydı**
+## 7. ÖLÇÜLMÜŞ VAKALAR (2026-09-06) — ve üçün **ikisi zaten yazılıydı**
 
 ⭐Bu bölüm "üç ders yazılsın" diye açıldı; ölçünce ikisinin **bu cetvelde hâlihazırda yazılı**
 olduğu görüldü (§4 alt-ajan maddesi · §2'nin `plan-challenger` satırı). Eksik olan **kural
