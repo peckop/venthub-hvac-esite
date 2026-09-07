@@ -1,0 +1,13 @@
+# Recep'ten bekleyen kararlar — OPS listesi (elle; gün kapanışı §0 kaynaklarından biri)
+
+> Kural: her satır `- ` ile başlar; NE · nerede karar verilecek · KANIT/kaynak · açıldığı tarih. Karar verilince satır SİLİNİR (tarihçe Kararlar belgesinde). Kısaltma ve parantez durum belirtmez. Cetvel: proje-takip-defteri-standard §10 (REC-175 ile eklenecek madde).
+
+- Ürün Seçici yerleşimi (K37-a U3) · bugünkü 13s prototip mi, 1a Kokpit masaüstü + 1c Diyalog mobil mi · YAPISAL, tek başına sorulur, prototip ölçümüyle birlikte (acele değil) · KANIT: Design MENU "Urun Secici Yerlesim Alternatifleri.dc.html" + ops-cevap-2026-09-06-menu-u3.md · Kararlar: Vitrin 15A · açıldı 2026-09-06
+- Yol haritası tavanı · yol-haritasi.json 37 + 4 yeni satır = 41 > tavan 40 · OPS önerisi 2026-09-07: SÜREÇ fazındaki 8 satır ayrı "süreç kuralları" dosyasına taşınır (aynı kanıt betiği koşar), tavan 40 kalır; seçenekler: birleştirme ya da tavan 45 · KANIT: PR #1062 keşif notu, yol_haritasi_dogrula.py satır 131 · Kararlar: Altyapı · açıldı 2026-09-06, Recep'e düz dille açıklandı 2026-09-07
+- Tasarım arşivi yeri (REC-173 adım 2) · ana depo içinde design-arsivi/ (PUBLIC repo) mi, ayrı PRIVATE depo mu · YAPISAL, tek başına sorulur · OPS önerisi: ayrı PRIVATE depo · KANIT: Linear REC-173 · açıldı 2026-09-06
+- STORM 2 üründe güç çelişkisi · 2018 föyü 0,25 kW, 2026 üretici sitesi 0,18 kW; hangisi esas (ya da üreticiye sorulsun) · KANIT: docs/audits/rec172-faz2-sonuc-2026-09-06.md §3 · Kararlar: Katalog · açıldı 2026-09-06
+- Ölü doğrulanan 61 araç kaleminin silinmesi (REC-180 envanteri §1 listesi; karantina OPS yaptı, silme Recep kapısı) · KANIT: docs/audits/arac-envanteri-2026-09-07.md · Kararlar: Altyapı · açıldı 2026-09-07
+- Faz 4 canlıya yazım: 725 satır (706 + 19 ATEX) / ~330 hücre / ~105 ürün `products.technical_specs`'e yazılsın mı · yükleyici beş kapılı, idempotent, iki anahtarlı (--yaz + CANLI_YAZIM_ONAYI), migration yok · KANIT: docs/audits/icerik-hatti-faz4-hazirlik-2026-09-07.md · Kararlar: Katalog K1/K9–K12 · açıldı 2026-09-07
+- REC-135 · 7 boş eski üst kategori + boş alt dalların temizliği (K4 Katalog satır 24: canlı ağaç 15A'ya göçer, Sığınak üst kategori) · URUN ölçtü: asit-dayanıklı-fanlar 81 ürün AKTİF, hepsi SEAT = marka hattı, kategori değil (REC-95 nitelik hükmüyle uyumlu) · KESİŞİM: K3 adres + K4 ağaç + REC-95 TEK YAYIN olmalı (URUN planı geliyor) · KANIT: URUN pano notu 2026-09-07 09:0xZ, Kararlar SEO K3/K4 · Kararlar: Katalog + SEO · açıldı 2026-09-07
+
+<!-- Karar verilip silinenler (tarihçe Kararlar belgesinde): 2026-09-07 07:35Z REC-172 faz 3 üç isimlendirme kararı → Kararlar Katalog K9/K10/K11; 6N090P ad+slug → K12. -->

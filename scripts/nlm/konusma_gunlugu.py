@@ -31,11 +31,13 @@ HEDEF = os.path.expanduser(os.environ.get("VENTHUB_PROJE_TAKIP_GUNLUK") or "~/.c
 TR = timezone(timedelta(hours=3))
 SERIT = {"cb0467f1": "OPS-AUDIT", "4a8eaf9c": "URUN", "ac03ce11": "ALTYAPI"}
 
+# pano_disa_aktar.py SIR listesiyle birebir ayni (degisirse ikisi birlikte degisir). 2026-09-06: lin_api_/lin_oauth_ onekleri,
+# 'authorization' ve bilesik '*api_key*' adlari (LINEAR_API_KEY=…) eklendi — onceki liste bunlari 0 vurusla geciriyordu (olculdu).
 SIR = [
     re.compile(r"postgres(?:ql)?://[^:@\s/]+:[^@\s]+@"),
     re.compile(r"eyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"),
-    re.compile(r"\b(?:sk-[A-Za-z0-9_-]{20,}|sk_(?:live|test)_[A-Za-z0-9]{16,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,}|sbp_[a-f0-9]{30,}|xox[baprs]-[A-Za-z0-9-]{20,}|AKIA[0-9A-Z]{16}|re_[A-Za-z0-9]{20,}|whsec_[A-Za-z0-9]{20,})\b"),
-    re.compile(r"(?i)\b(parola|password|passwd|secret|token|api[_ -]?key|service[_ -]?role[_ -]?key|anon[_ -]?key)\b\s*[:=]\s*[\"']?([^\s\"',;]{8,})"),
+    re.compile(r"\b(?:sk-[A-Za-z0-9_-]{20,}|sk_(?:live|test)_[A-Za-z0-9]{16,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,}|sbp_[a-f0-9]{30,}|xox[baprs]-[A-Za-z0-9-]{20,}|AKIA[0-9A-Z]{16}|re_[A-Za-z0-9]{20,}|whsec_[A-Za-z0-9]{20,}|lin_api_[A-Za-z0-9]{20,}|lin_oauth_[A-Za-z0-9]{20,})\b"),
+    re.compile(r"(?i)\b(parola|password|passwd|secret|token|authorization|service[_ -]?role[_ -]?key|anon[_ -]?key|\w*api[_ -]?key\w*)\b\s*[:=]\s*[\"']?(?:Bearer\s+)?([^\s\"',;]{8,})"),
     re.compile(r"(?<![A-Za-z0-9+/=])[A-Za-z0-9+/]{60,}={0,2}(?![A-Za-z0-9+/=])"),
 ]
 GURULTU = [

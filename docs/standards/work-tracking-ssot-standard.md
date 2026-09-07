@@ -66,3 +66,21 @@ standart/plan docs · `CHANGELOG`/git · agent-memory. **İki+ yüzey aynı bilg
 - **Çıktı:** `DURUM-TAKIP.md`-şekilli MD (kesin kontrat **Aşama 2'de** registry doldurulunca netleşir — "standart-önce: önce cetvel, sonra jeneratör").
 - **Mevcut yapı taşları:** `session recall` zaten yapısal durum render ediyor · `_update_capability_map` MD'yi otomatik yazıyor · doc-pipeline (`migrator/parser.reassemble_markdown`) MD reassemble ediyor.
 - **Robustluk şartı:** KIBridge sonrası bile `DURUM-TAKIP.md` git-diff'li + twin-sync'li **fallback** kalır (registry tek-sepete-yumurta değil).
+
+## 8. İş dağılımı kuralları — 2026-09-07 (YÜRÜRLÜKTE; Recep: "sistem olana kadar iş yok", "hiçbir iş VentHub dışında değil")
+
+Kaynak: Recep'in 2026-09-07 sabah hükmü (bir haftadır "iş açıldı mı, kimde, nerede" sorusuna cevap alamıyordu; sabah Linear'da 53 kayıt "yapılıyor" görünürken gerçek sayı 3'tü) + Katalog şeridinin yığın ölçümü (203 kayıt: 58 bitti · 4 iptal · 31 aktif · 110 backlog) + Recep düzeltmesi (Mart kayıtları arşivlenmez, bağlanır). Uygulayan betik: `scripts/nlm/santiye.py` → `docs/proje-takip/santiye.md` (ad "iş dağılımı"na dönecek). Kaynak yalnız Linear; pano notu, sohbet, durum dosyası kaynak DEĞİLDİR.
+
+1. **Sahiplik = etiket.** Şerit etiketleri: URUN · URUN-KATALOG · ALTYAPI · OPS · DESIGN. Etiketsiz kayıt SAHİPSİZ'dir ve tabloyu KIRMIZI yapar; proje sessizce sahip yapmaz (09-07 ölçümü: proje ölçütü Katalog'a 8 iş sayıyordu, gerçek 1).
+2. **Şerit başına "yapılıyor" (In Progress) ≤ 1, "sırada" (Todo) ≤ 3.** Aşım KIRMIZI; şerit Linear'ı gerçek duruma çekmeden yeni iş almaz. "Recep kapısı" etiketli kayıt "yapılıyor" limitinden muaftır (bekleyen Recep'tir, şerit değil).
+3. **"Teslim" = In Review:** iş bitti, PR açık, yalnız merge bekler. Merge olmadan Done denmez (iş master'da yoktur). Merge olunca Done.
+4. **Durum değişikliği panoya yazılmaz, Linear'da YAPILIR.** Pano notu REC numarası taşır; taşımayan not iş sayılmaz.
+5. **Recep'ten bir şey bekleyen kayıt "Recep kapısı" etiketi taşır;** taşımayan görünmez ve Recep'e sunulmaz.
+6. **Kayıt açmanın bedeli:** yeni kayıt yalnız (a) canlıda ÖLÇÜLMÜŞ kusur, (b) Recep kararı, (c) aktif işin alt adımı ise açılır. "İyi olurdu" fikri yol haritası satırıdır, kayıt değil.
+7. **Bakılmadı işareti (Recep düzeltmesi 09-07: "iş varsa iştir"):** 14 gündür kimsenin bakmadığı Backlog kaydı "bakılmadı" listesine düşer (§8 tablo). Bu bir İPTAL mekanizması DEĞİLDİR; sahibine "bir bak" işaretidir. Gerekçe yazma zorunluluğu yok; yorum/gövde spreyi yapılmaz. Ölçüt son yorum / PR eki / açılış tarihi (updatedAt, startedAt, completedAt DEĞİL: etiket, bakım ve durum gezdirme saati sıfırlamaz). İptal yalnız Recep sözüyle.
+8. **Eski kayıt arşivlenmez, BAĞLANIR.** Her eski kayıt için tek soru: "bu iş bugünkü mimaride hâlâ duruyor mu" → devam ediyor (bugünkü kayda bağla, eskisini kapat) / devralındı (hangi kayıt) / mimari değişti (gerekçe yaz, kapat). Kayıt silinmez, gerekçe kayıtta kalır.
+9. **Kova kayıt yasak:** bitiş ölçütü yazılamayan kayıt kayıt değildir; parçalanır ya da kapanır.
+10. **Kayıt gerçek mi?** Sahiplendirme "sahibi var mı" ile yetinmez; iş olmayan kayıt (şablon, deneme) iptal edilir (09-07: Linear onboarding şablonu iki kayıt OPS etiketi almıştı).
+11. **Açılış kapısı:** sabah tablo KIRMIZI ise ya da şeritlerin panoda anlattığıyla uyuşmuyorsa iş başlamaz.
+
+Değişiklik kaydı: 2026-09-07 OPS — bölüm eklendi (commit ile). Kapı/saatlik yenileme: REC-187.
