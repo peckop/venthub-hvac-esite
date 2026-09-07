@@ -324,13 +324,36 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     expect(k.sebep, 'sebep "kimlik taklidi" demiyor; okuyan niçin düştüğünü anlamaz').toMatch(/KIMLIK TAKLIDI/)
   })
 
-  it('GERÇEK akran hâlâ YEŞİL (kol fazla geniş olmasın — kuyruk benzerliği tesadüf değil, EŞİTLİK aranıyor)', () => {
-    // OPS'un sid'i benimkiyle aynı son 12 haneyi PAYLAŞMIYOR; kol onu vurmamalı.
+  it('GERÇEK akran hâlâ YEŞİL (kol gerçek bağımsız tanığı vurmuyor)', () => {
     expect(OPS.slice(-12)).not.toBe(BEN.slice(-12))
     const k = mech.teslimatKaniti({
       damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
     })
     expect(k.sinif, 'yeni kol gerçek bağımsız tanığı da düşürdü — kapı fazla geniş').toBe('YESIL')
+  })
+
+  /**
+   * ⭐ÖLÇÜT EŞİTLİK, BENZERLİK DEĞİL — ve bu kol onu AYIRT EDER.
+   * Yukarıdaki "gerçek akran yeşil" kolu genişlemeyi yakalamıyordu: ölçütü 12 haneden 2 haneye
+   * indirdim (sabotaj) ve test yine geçti, çünkü OPS'un sid'i benimkiyle son 2 hanede de
+   * uyuşmuyordu. Yani o kol "kapı fazla geniş değil" demiyor, yalnız o fikstürü sabitliyordu —
+   * ayırt etmeyen bir kol ölçüm değildir (bugünün tekrar eden dersi, kendi kapımda yakaladım).
+   * Bu kol, son 11 haneyi PAYLAŞAN ama 12'nci hanede AYRIŞAN gerçek bir oturum kullanır:
+   * ölçüt eşitlikse YEŞİL kalır, ölçüt "benzerlik"e kaydırılırsa KIRMIZI olur ve sabotaj görünür.
+   */
+  it('SON 11 HANE aynı, 12. hane FARKLI olan akran → YEŞİL (ölçüt eşitlik olduğu için)', () => {
+    const kuyruk = BEN.slice(-12)
+    const farkli = (kuyruk[0] === 'a' ? 'b' : 'a') + kuyruk.slice(1)
+    const akran = '7f3c9d21-1111-4111-8111-' + farkli
+    expect(akran.slice(-12), 'fikstür yanlış: kuyruk aynı çıktı, kol taklit vakasını ölçer').not.toBe(kuyruk)
+    expect(akran.slice(-11), 'fikstür yanlış: son 11 hane aynı olmalı ki genişleme görünsün').toBe(BEN.slice(-11))
+    const k = mech.teslimatKaniti({
+      damga: bagimsizDamga({ atanSid: akran }), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
+    })
+    expect(
+      k.sinif,
+      'ölçüt eşitlikten benzerliğe kaymış — bu hâlde sid kuyruğu tesadüfen yakın olan GERÇEK akranlar da reddedilir',
+    ).toBe('YESIL')
   })
 
   it('⭐BAYAT jeton kanıt değildir: eşiği aşan geri yazım KIRMIZI', () => {
