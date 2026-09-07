@@ -51,3 +51,31 @@ Körlemesine "10'dan küçükse ×1000" deseydik **10 doğru ürünü bozardık*
 ## Durum
 
 Yazım **Recep kapısında**. Bu commit yalnız ölçüm + hazır betiktir.
+
+---
+
+## CANLIYA YAZILDI — 2026-09-07
+
+**Recep'in sözü, lafzıyla:** "birim ölçek yaz"
+
+- Yazım: **29 ürün / 31 hücre** güncellendi
+- **İdempotentlik:** ikinci koşum → onarılır **0 hücre / 0 ürün** ✓
+- Dokunulmayan **3 hücre** (aralık) olduğu gibi duruyor — şema kararı bekliyor
+
+### Canlı doğrulama (yazım sonrası okundu)
+
+| SKU | Alan | Önce | Sonra |
+|---|---|---|---|
+| SEA-51201003 | `max_absorbed_power_w` | `0.18` | **180** |
+| SEA-51201003 | `voltage_v` | `"380 V"` | **380** |
+| SEA-61103110 | `max_absorbed_power_w` | `0.06` | **60** |
+| SEA-61103110 | `voltage_v` | `"220 V"` | **220** |
+| NIC-11901 | `max_delivery_m3h` | `"1550 m³/h"` | **1550** |
+| NIC-11935 | `max_delivery_m3h` | `"10500 m³/h"` | **10500** |
+
+SEAT 20 ATEX'in gücü artık 0,18 W değil **180 W** — bin kat hata canlıda kapandı.
+
+### Kalan iş
+
+3 aralık hücresi (`operating_temperature_c = "5 - 32"`, üç Vortice nem alma cihazı).
+Şema kararı: `operating_temperature_min_c` / `_max_c`. Karar ÜRÜN/OPS'ta, veri yazımı Recep kapısında.
