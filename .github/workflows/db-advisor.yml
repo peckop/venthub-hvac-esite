@@ -326,6 +326,27 @@ jobs:
           export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/db/checks/anon-yazma-nobetcisi.mjs
 
+      # ⭐INV-RLS-SARMA-1 — NICIN BU ISE ADIM OLARAK EKLENDI (REC-216):
+      # Kardes adim `Anon yazma nobetcisi`nin gerekcesi burada da AYNEN gecerli ve o gerekce
+      # zaten yukarida yazili: yeni bir IS ADI acmak acik PR'lari "beklenen kontrol gelmedi"de
+      # kilitler ya da kapinin disinda birakir. Konu da ayni is'in konusu: RLS.
+      # Ayrica bu adim MEVCUT SUPABASE_DB_URL baglantisini kullanir — YENI BIR ERISIM KARARI
+      # GEREKTIRMEZ (olculdu 2026-09-07: bu is bugun PR'larda PASS verdi). REC-138 engel degil.
+      #
+      # OLCUM (2026-09-07, canli): public semasinda 11 politikanin ifadesi ic ice sarilmisti,
+      # en derini 153 katman. Kok sebep supabase/migrations/20250910_rls_initplan_rewrite.sql
+      # ve alti kardesi: "idempotent" oldugunu IDDIA eden ama olmayan regexp donusumu.
+      # ONARIM MIGRATION'DIR ve Recep kapisidir; bu kapi olcer, onarmaz. Kapi ONCE iner ki
+      # onarim indiginde onu tekrar bozulmaktan koruyan bir sey olsun.
+      - name: RLS politika sarma kapisi (INV-RLS-SARMA-1)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          # Kok sertifikanin TEK kaynagi depo dosyasidir (kardes adimlarla ayni gerekce).
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          node scripts/db/checks/rls-politika-sarma.mjs
+
       # TLS teshisi BILEREK TEKRARLANMADI: kardes is ayni sunucuya ayni sertifikayla
       # baglaniyor ve zincir teshisini o basiyor. Ayni teshisi iki yere kopyalamak,
       # birini guncelleyip digerini unutmanin davetidir.
