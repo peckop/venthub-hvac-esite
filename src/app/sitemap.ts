@@ -53,11 +53,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     categoryCountMap.set(row.category_id, row.product_count ?? 0)
   }
   const categoriesWithProducts = categories.filter((cat) => (categoryCountMap.get(cat.id) ?? 0) > 0)
-  const categoriesById = new Map(categories.map((cat) => [cat.id, cat]))
-  // Ebeveyni bulunamayan (silinmiş/pasif üst kategori) alt kategoriler hariç tutulur — kırık /category// URL üretilmez.
-  const subCategoriesWithProducts = categoriesWithProducts.filter(
-    (cat) => !!cat.parent_id && categoriesById.has(cat.parent_id)
-  )
+  // NOT (REC-205): `categoriesById` ve `subCategoriesWithProducts` yalnız iki seviyeli adres
+  // üretimi için vardı; o blok kaldırıldığı için ikisi de gereksizleşti. Alt kategoriler
+  // `categoriesWithProducts` içinde zaten yer alıyor ve tek seviyeli adresle ilan ediliyor.
 
   // 1. Static Routes
   const staticRoutesList = [
@@ -108,33 +106,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   )
 
-  // 2b. Alt-Kategori Routes (/[lang]/category/[parentSlug]/[subSlug]) — yalnız ürünü olan alt kategoriler
-  const subCategoryRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
-    subCategoriesWithProducts.map((cat) => {
-      const parent = categoriesById.get(cat.parent_id!)!  // filtre categoriesById.has() garantiledi
-      return {
-        url: `${baseUrl}/${lang}${Routes.category(
-          getLocalizedCategorySlug(parent, lang),
-          getLocalizedCategorySlug(cat, lang)
-        )}`,
-        lastModified: new Date(cat.updated_at || new Date()),
-        changefreq: 'weekly',
-        priority: 0.65,
-        alternates: {
-          languages: {
-            tr: `${baseUrl}/tr${Routes.category(
-              getLocalizedCategorySlug(parent, 'tr'),
-              getLocalizedCategorySlug(cat, 'tr')
-            )}`,
-            en: `${baseUrl}/en${Routes.category(
-              getLocalizedCategorySlug(parent, 'en'),
-              getLocalizedCategorySlug(cat, 'en')
-            )}`,
-          }
-        }
-      }
-    })
-  )
+  // 2b. KALDIRILDI (REC-205, 2026-09-07) — alt kategoriler için İKİNCİ, iki seviyeli adres
+  // üretiliyordu: `/[lang]/category/[üst]/[alt]`. Ama yukarıdaki 2. blok (`categoryRoutes`)
+  // `categoriesWithProducts` üzerinden ZATEN üst ve alt kategorilerin HEPSİNİ tek seviyeli
+  // adresle ekliyor. Sonuç: aynı sayfa site haritasında iki kez, iki farklı adresle
+  // (TR: 23 tek seviyeli + 17 iki seviyeli → 17 × 2 dil = 34 çift adres) ve her iki sayfa
+  // da kendini kanonik ilan ediyordu.
+  //
+  // Google bunu ölçtü ve iki seviyeli olanı ELEDİ (GSC: "Kopya, Google kullanıcıdan farklı
+  // bir standart sayfa seçti" → /tr/category/fanlar/endustriyel-tavan-vantilatorleri).
+  // Haklıydı: iki seviyeli varyantta `og:url` ve `CollectionPage` yapısal verisi yoktu.
+  //
+  // Kanonik artık TEK SEVİYELİ; iki seviyeli adres 301 ile oraya gider (o rota yalnız
+  // yönlendirme yapar). Site haritası kanonik olmayan adresi İLAN ETMEZ.
 
   // 3. Brand Routes
   const brandRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
@@ -172,5 +156,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }))
   )
 
-  return [...staticRoutes, ...categoryRoutes, ...subCategoryRoutes, ...brandRoutes, ...productRoutes]
+  // `subCategoryRoutes` KALDIRILDI (REC-205) — alt kategoriler `categoryRoutes` içinde
+  // zaten tek seviyeli kanonik adresleriyle var; ikinci kez eklemek çift yayın demekti.
+  return [...staticRoutes, ...categoryRoutes, ...brandRoutes, ...productRoutes]
 }
