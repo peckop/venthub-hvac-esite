@@ -117,7 +117,27 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({
 
                       <div className="w-12 h-px bg-white/30 group-hover:w-24 group-hover:bg-cyan-500 transition-width-bg duration-700" />
                       
-                      <div className="mt-6 max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-700 overflow-hidden">
+                      {/* ⚠MOBİLDE DAİMA AÇIK — Recep kararı (2026-09-07): "görünmeyen
+                          açıklamalar mobilde görünmesi lazım, bunu da çözün".
+
+                          ÖLÇÜLMÜŞ KUSUR: bu kutu `max-h-0 opacity-0` ile başlayıp yalnız
+                          `group-hover` ile açılıyordu. DOKUNMATİK CİHAZDA HOVER YOKTUR —
+                          390×844'te ölçüldü: altı kartın altısında da max-height 0px,
+                          opacity 0. Yani paragraf mobil ziyaretçide HİÇ açılmıyordu.
+                          Etkisi somut: URUN-KATALOG aynı gün 23 kategori paragrafını canlı
+                          veritabanına yazdı (REC-146, 0/37 → 23/37) ve bu yüzeyde hiçbiri
+                          mobilde görünmüyordu. Metin DOM'daydı — bot görüyor, insan görmüyor.
+
+                          ÇÖZÜM MOBİL ÖNCELİKLİ: varsayılan (küçük ekran) AÇIK; `md:` ve
+                          üstünde eski hover davranışı AYNEN korunur. Böylece masaüstü
+                          tasarımı hiç değişmez, yalnız hover'ı OLMAYAN cihaz kazanır.
+                          Tek dokunuşla açma seçeneği ELENDİ: kart zaten bir bağlantı,
+                          ilk dokunuş sayfayı açar — açma/kapama jesti bağlantıyla çakışırdı.
+
+                          `line-clamp-2` (aşağıdaki p) zaten var, yani metin uzasa bile kart
+                          iki satırdan fazla büyümez — ızgara düzeni korunur.
+                          Bekçi: INV-KART-ACIKLAMA-MOBIL-1. */}
+                      <div className="mt-6 max-h-24 opacity-100 md:max-h-0 md:opacity-0 md:group-hover:max-h-24 md:group-hover:opacity-100 transition-opacity duration-700 overflow-hidden">
                         <p className="text-xs text-slate-200 font-light leading-relaxed tracking-wider mb-6 max-w-200px line-clamp-2">
                           {category.description || t('home.guidedDiscovery.cardFallback')}
                         </p>
