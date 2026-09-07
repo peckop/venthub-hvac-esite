@@ -1090,8 +1090,9 @@ export const tr = {
     quoteItemsNotice: 'Sepetinizde fiyatı henüz belirlenmemiş ürün var. Toplam yalnızca fiyatlı ürünleri kapsar; ödemeye geçmek için bu ürünler için teklif alın.'
   },
   checkout: {
-    // Ödeme yolu ENV bayrağıyla KAPALI olduğunda gösterilen metinler
-    // (bkz. app/[lang]/checkout/page.tsx — NEXT_PUBLIC_ODEME_ACIK).
+    // Ödeme yolu KAPALI olduğunda gösterilen metinler.
+    // Karar tek yerde: app/[lang]/checkout/page.tsx. Kapalılığın TAŞIYICISI burada
+    // yazılmıyor — taşıyıcı değiştiğinde bu satır sessizce yanlış kalmasın.
     kapali: {
       // REC-148 A7 — OPS hükmü, K1a: satış kipi KAPALI, YOK değil. Eski başlık
       // "Ödeme yakında açılıyor" bir TARİH vaat ediyordu; o tarih kimsede yok.

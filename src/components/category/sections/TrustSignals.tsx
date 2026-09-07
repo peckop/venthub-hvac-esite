@@ -9,9 +9,10 @@ import { useI18n } from '@/i18n/I18nProvider'
  *
  * REC-104 (2026-09-01): Bu şerit "Güvenli Ödeme / SSL şifreli işlem", "Hızlı Kargo /
  * Stoktan teslimat" ve "Taksit İmkanı / 12 aya varan taksit" rozetlerini basıyordu.
- * ÖLÇÜLDÜ: 23 aktif kategorinin 23'ünde `hide_price=true`, çevrimiçi ödeme
- * `NEXT_PUBLIC_ODEME_ACIK` ile kapalı ve canlı /checkout "Ödeme yakında açılıyor"
- * diyor. Yani site bir yüzeyde ödemenin kapalı olduğunu söylerken bu şerit 12 aylık
+ * ÖLÇÜLDÜ: 23 aktif kategorinin 23'ünde `hide_price=true`, çevrimiçi ödeme KAPALI ve
+ * canlı /checkout "Ödeme yakında açılıyor" diyor. (Kapalılığın taşıyıcısı bilerek
+ * yazılmıyor — karar tek yerde, `checkout/page.tsx`; taşıyıcı değişince bu cümle
+ * yanlış olmasın.) Yani site bir yüzeyde ödemenin kapalı olduğunu söylerken bu şerit 12 aylık
  * taksit vaat ediyordu. Üç rozet de kaldırıldı; kalan üçü (marka güvencesi, garanti,
  * teknik destek) sınır-vaka olarak Recep'in hükmünü bekliyor.
  * Cetvel: docs/standards/vaat-butunlugu-standard.md · kapı: INV-VAAT-SIZINTI-1.
