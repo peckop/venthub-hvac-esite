@@ -99,6 +99,43 @@ const nextConfig = {
                     },
                 ],
             },
+            {
+                // REC-205 · ÖZEL YÜZEYLER ARAMA SONUCUNA ÇIKMAZ
+                //
+                // NİÇİN: Google Search Console (2026-09-07) `/tr/auth/login` adresini
+                // "kullanıcı tarafından seçilen standart sayfa olmadan kopya" diye işaretledi.
+                // Canlı ölçüm: `/tr/auth/login`, `/tr/auth/register`, `/tr/account`, `/tr/cart`
+                // sayfalarının HİÇBİRİNDE `<meta name="robots">` YOK — dördü de dizine
+                // girebilir durumdaydı. Giriş/kayıt/hesap/sepet sayfasının arama sonucunda
+                // işi yok: kullanıcıya değer vermez, tarama bütçesi yer, "ince içerik" sinyali üretir.
+                //
+                // NİÇİN META DEĞİL BAŞLIK: `account/layout.tsx` bir istemci bileşeni
+                // (`'use client'`) ve Next.js istemci bileşeninden `metadata` export edilmesine
+                // izin vermez. HTTP başlığı `X-Robots-Tag` bu ayrımı hiç umursamaz, sunucu/istemci
+                // fark etmeksizin her yanıtta bulunur ve Google onu meta etiketle EŞDEĞER sayar.
+                // Böylece kural tek yerde durur, beş auth sayfasına + hesap ağacına ayrı ayrı
+                // serpiştirilmez.
+                //
+                // `follow` KASITLI: sayfa dizine girmesin ama içindeki bağlantılar izlensin —
+                // hesap/sepet sayfasından vitrine giden yollar kapanmasın.
+                //
+                // KAPSAM SINIRI: `/checkout` bilerek YOK — o yüzey ALTYAPI şeridinin claim'inde
+                // (`src/app/[lang]/checkout/**`). Aynı kusuru taşıyorsa sahibi kapatır; başka
+                // şeridin dosyasına buradan uzanılmaz.
+                source: '/:lang(tr|en)/:yuzey(auth|account|cart)/:path*',
+                headers: [
+                    { key: 'X-Robots-Tag', value: 'noindex, follow' },
+                ],
+            },
+            {
+                // Yüzeyin kendisi (alt yol olmadan): /tr/account · /tr/cart · /en/cart …
+                // Yukarıdaki desen `:path*` ile eşleşiyor ama kökü ayrıca yazmak, deseni
+                // okuyanın "kök dahil mi" diye tereddüt etmesini önler.
+                source: '/:lang(tr|en)/:yuzey(auth|account|cart)',
+                headers: [
+                    { key: 'X-Robots-Tag', value: 'noindex, follow' },
+                ],
+            },
         ];
     },
 };
