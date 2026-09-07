@@ -83,8 +83,10 @@ pass = (missingKeys boş) ve (parityOk) ve (kalan literal yok) ve (JSX sağlam).
 
 const results = await pipeline(
   TARGETS,
-  (t) => agent(migratePrompt(t), { label: 'migrate:' + t.ns, phase: 'Migrate', schema: MIGRATE_SCHEMA }),
-  (mr, t) => agent(judgePrompt(t, mr), { label: 'judge:' + t.ns, phase: 'Judge', schema: JUDGE_SCHEMA })
+  // MODEL AÇIKÇA YAZILI (REC-174, Recep 2026-09-06): boş model = oturumun modeli miras alınır =
+  // pahalı modele düşme riski. Göç mekanik düzenleme, yargıç sınırlı kontrol listesi → ikisi sonnet.
+  (t) => agent(migratePrompt(t), { label: 'migrate:' + t.ns, phase: 'Migrate', model: 'sonnet', schema: MIGRATE_SCHEMA }),
+  (mr, t) => agent(judgePrompt(t, mr), { label: 'judge:' + t.ns, phase: 'Judge', model: 'sonnet', schema: JUDGE_SCHEMA })
     .then(v => ({ target: t, migrate: mr, verdict: v })),
 )
 
