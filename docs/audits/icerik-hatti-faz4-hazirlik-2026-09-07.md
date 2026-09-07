@@ -10,8 +10,8 @@ sapma yok. **Canlıya yazım: 0** (kuru koşum; yazım kolu iki ayrı anahtara b
 
 ## 0. Hüküm
 
-Hazırlık **bitti**: 764 satırın **706'sı yüklenebilir**, **35'i karar bekliyor**, 23'ü çıkarıldı
-ya da tekilleştirildi. Kuru koşum **320 hücre / 102 ürün** diyor. Ama reçetenin kendisinde
+Hazırlık **bitti**: 764 satırın **725'i yüklenebilir**, **16'sı karar bekliyor**, 23'ü çıkarıldı
+ya da tekilleştirildi. Kuru koşum **339 hücre / 109 ürün** diyor. Ama reçetenin kendisinde
 **üç ölçülmüş kusur** var (§1) ve **üç yeni karar kalemi** doğdu (§4) — ikisi vitrine yanlış
 değer yazdırabilecek cinsten.
 
@@ -33,7 +33,7 @@ doğrulama: alan bazlı seçim reçetenin kendi saydığı **22** (K9) ve **8** 
 |---|---|---|
 | **K9** — kayış tahrikli gövdede izinli motor gücü **ayrı alan** | `max_absorbed_power_w` → `permissible_motor_power_w` (ADH 8 + AT 8 + RDH 6) | **22** |
 | **K10** — Nicotra eğrisi **toplam basınç**, statiğe çevrilmez | `max_static_pressure_pa` → `max_total_pressure_pa` (ADH) | **8** |
-| **K11** — ATEX kodu teknik tabloda + cümle açıklamada | ⚠**uygulanamadı**, bkz. §4.1 | 19 (JET 7 + SEAT 12) |
+| **K11-a** — ATEX: `atex_marking` (grup kodu) + `atex_zone` (bölge) **iki ayrı alan** | 19 satır `atex_zone`'a taşındı, yüklemeye girdi | **19** (JET 7 + SEAT 12) |
 
 **Migration gerekmiyor** (ölçüldü): `products.technical_specs` **JSONB**, düz anahtar→değer.
 Yeni alan adı DB şeması değiştirmeden yaşar. Gereken tek şey **cetvel satırı**
@@ -49,13 +49,13 @@ girdi   764 satır (8 dosya)
  ± 0    STORM 24 gerilim satırı ayrıştırıldı: 12 voltage_v=400 + 12 voltage_alt_v=230
         (ilk yazımda 230 V'u ATMIŞTIM; cetvel §11 "Gerilim: bir alan bir bilgi" onu
          voltage_alt_v'ye koyuyor — 12 değer çöpe gitmedi, cetvel okununca yakalandı)
- -35    KARAR BEKLİYOR (yüklemeye girmez, silinmez de):
-          19  ATEX bölge beyanı — JET 7 + SEAT 12  (§4.1)
+ -16    KARAR BEKLİYOR (yüklemeye girmez, silinmez de):
            8  AT weight_kg, sürüm belirsiz          (§4.2)
            4  STORM çelişen güç                     (§4.3)
            2  STORM IP20 (§1 kusur 2)  ·  2  Danfoss frequency_hz (alan kararı yok)
-=  706  yüklenebilir  ->  kuru koşum: 320 hücre / 102 ürün değişecek
-                          (706'nın 386'sı canlıda zaten aynı değer = idempotent)
+   ±0    ATEX 19 satır (JET 7 + SEAT 12) -> atex_zone; K11-a ile yüklemeye GİRDİ
+=  725  yüklenebilir  ->  kuru koşum: 339 hücre / 109 ürün değişecek
+                          (725'in 386'sı canlıda zaten aynı değer = idempotent)
 ```
 
 ⚠**Bu blokta önce "23 karar bekliyor" yazmıştım — YANLIŞ, betik 35 diyor.** Sayıyı yeniden
@@ -66,13 +66,15 @@ değil hatırdan yazmak) bugün **üçüncü** tekrarı → [[olcut-dogru-evren-
 
 ## 4. ⚠Üç yeni karar kalemi (ölçümle doğdu, reçetede yoktu)
 
-### 4.1 ATEX — K11 biçim sorusunu çözüyor ama JET'in değeri **kod değil**
+### 4.1 ATEX — ✅ ÇÖZÜLDÜ (Recep K11-a, 09:2xZ): iki ayrı alan
 Canlıda `atex_marking` = **14 Vortice ürününde ekipman-grubu işaretlemesi**
 (`II 2G/D h T3/125°C X Gb/Db`). JET'in 7 satırı ise **kurulum bölgesi beyanı**
 (`Zone II, Category 3G (Directive 94/9/CE)`). İkisi de "II" ile başlıyor; biri **grup**,
 diğeri **bölge**. Aynı alana konursa alan iki anlam taşır ve üzerindeki her karşılaştırma
 sessizce anlamsızlaşır — reçetenin §5-8'de işaret ettiği kusurun ta kendisi.
-**Karar gerekli:** ayrı anahtar (`atex_zone`) mı, yoksa yalnız açıklama cümlesi mi.
+**Karar (Recep, 2026-09-07 09:2xZ): (a) — iki ayrı alan.** `atex_marking` grup kodunu,
+`atex_zone` bölge beyanını taşır. Cetvele yazıldı; 19 satır `atex_zone`'a taşındı ve
+yükleme listesine girdi. Böylece alan tek anlam taşıyor ve hiçbir satır çöpe gitmedi.
 
 ### 4.2 AT ailesi ağırlıkları — sürüm belirsiz
 DB adı "AT 7/7" sürüm harfi taşımıyor, sipariş kodu PDF'in tamamında **0 kez** geçiyor;

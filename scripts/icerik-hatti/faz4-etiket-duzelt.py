@@ -94,11 +94,14 @@ def duzelt(dosya: Path):
         # basliyor ama biri GRUP, digeri BOLGE; ayni alana konursa alan iki anlam tasir ve
         # uzerindeki her karsilastirma sessizce anlamsizlasir. KARAR bekler (ayri anahtar mi,
         # yoksa yalniz aciklama cumlesi mi).
+        # KARAR VERILDI (Recep, K11-a, 2026-09-07 09:2xZ): IKI ALAN.
+        #   atex_marking = ekipman grubu KODU  (canlida 14 Vortice urunu, "II 2G/D h T3...")
+        #   atex_zone    = kullanim BOLGESI beyani ("Zone II, Category 3G")
+        # Boylece 19 satir (JET 7 + SEAT 12) yuklemeye GIRER ve alan tek anlam tasir.
         if s["alan"] == "atex_marking" and s["deger"].strip().lower().startswith("zone"):
-            bekleyen.append((s["sku"], s["alan"], s["deger"],
-                             "BOLGE beyani; canlidaki atex_marking ekipman-grubu KODU (14 Vortice) — ayni alanda iki anlam"))
-            rapor["karar_bekliyor"] += 1
-            continue
+            s["alan"] = "atex_zone"
+            s["not"] = (s["not"] + " | " if s["not"] else "") +                 "K11-a (Recep 2026-09-07): kullanim bolgesi beyani; ekipman grubu KODU degil (o atex_marking)."
+            rapor["atex_zone_ayristirildi"] += 1
         if s["alan"] in ("frequency_hz",):
             bekleyen.append((s["sku"], s["alan"], s["deger"], "50/60 Hz -> min_/max_ alan karari yok"))
             rapor["karar_bekliyor"] += 1

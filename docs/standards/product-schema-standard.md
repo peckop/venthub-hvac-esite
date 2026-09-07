@@ -370,9 +370,20 @@ verisi ise **kurulum bölgesi beyanı** (`Zone II, Category 3G`). İkisi de "II"
 baştaki "II" birinde **ekipman grubu**, diğerinde **bölge**. Aynı alanda toplanırsa alan iki
 anlam taşır — §11'in ses ve gerilim bölümlerinde kapatılan kusurun aynısı.
 
-**Durum: KARAR BEKLİYOR (Recep).** Seçenekler: (a) ayrı anahtar `atex_zone`, (b) bölge beyanı
-yalnız açıklama metninde. Karar verilene kadar **19 satır** (JET 7 + SEAT 12) yüklenmez.
-❌ Bölge beyanını `atex_marking`'e yazmak — karar çıkana kadar — yasaktır.
+**Kural (Recep kararı K11-a, 2026-09-07): İKİ AYRI ALAN.**
+
+| Alan | Anlamı | Kaynak tipik ifadesi | Örnek |
+|---|---|---|---|
+| `atex_marking` | Ekipman **grubu/kategorisi** işaretlemesi — ürünün üstündeki damga | "ATEX marking" | `II 2G/D h T3/125°C X Gb/Db` |
+| `atex_zone` | Ürünün kurulabileceği **kullanım bölgesi** beyanı | "suitable for Zone …" | `Zone II, Category 3G (Directive 94/9/CE)` |
+
+- ❌ Bölge beyanını `atex_marking`'e yazmak yasak (ve tersi).
+- Baştaki `II` iki alanda **farklı şey** demektir: `atex_marking`'te ekipman grubu,
+  `atex_zone`'da bölge numarası. Ayrım tam olarak bu yüzden alan düzeyinde yapılır.
+- ATEX bilgisi teknik tabloda **kod olarak** yaşar; ürün açıklamasındaki **cümle** ayrı
+  yüzeydir ve bu alanların yerine geçmez (K11).
+
+**Uygulandı:** 19 satır (JET 7 + SEAT 12) `atex_zone`'a taşındı ve yükleme listesine girdi.
 
 ### Sayısal alanda birim, DEĞERE gömülmez
 
