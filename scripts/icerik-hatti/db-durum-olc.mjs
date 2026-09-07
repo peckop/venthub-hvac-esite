@@ -63,10 +63,17 @@ for (const s of sluglar) {
     `${URL_}/rest/v1/products?select=id&family_id=eq.${a.id}`,
     { headers: { ...basliklar, Prefer: 'count=exact', Range: '0-0' } },
   )
-  const aralik = sayimYanit.headers.get('content-range') || '/0'
+  // FAIL-CLOSED: Content-Range yoksa/sayi degilse 'urun: 0' DEGIL, cikis 1 (onceki `|| '/0'` fail-open'di;
+  // workflow curutmesi 2026-09-06). Olcemedigi hal GECTI degil KALDI'dir.
+  const aralik = sayimYanit.headers.get('content-range') || ''
+  const kesinStr = aralik.split('/').pop() || ''
+  if (!/^\d+$/.test(kesinStr)) {
+    console.error(`OLCUM GUVENILIR DEGIL: ${s} icin kesin sayi alinamadi (Content-Range: ${JSON.stringify(aralik)})`)
+    process.exit(1)
+  }
   cikti[s] = {
     db_de_var: true,
-    urun: Number(aralik.split('/')[1] || 0),
+    urun: Number(kesinStr),
     // "dolu" = bugun vitrinde metin GORUNUYOR demektir; yazim bunun UZERINE yazar.
     aciklama_dolu: !!(a.description && JSON.stringify(a.description) !== '{}'),
   }

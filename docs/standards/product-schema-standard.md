@@ -324,6 +324,77 @@ tipi (`'star-delta'`, `'direct'`) · `voltage_alt_v` = varsa ikinci gerilim (`69
 çiftinin tutarlılığı (`min ≤ max`) ve `nominal_` değerinin aralık içinde kalması, veri
 yazımı yapan betiğin ön koşuludur (`scripts/db/product-data/*`), tek tek satırda doğrulanır.
 
+### Motor gücü: "izinli tavan" ile "emilen güç" ayrı alanlardır
+
+**Nereden çıktı (ölçüm, 2026-09-07 · REC-172 Faz 2):** kayış tahrikli gövde katalogları
+(Nicotra ADH/AT/RDH) motorun **izinli anma gücü tavanını** verir — gövdeye takılabilecek en
+büyük motor. Bu, fanın o noktada **çektiği** güç değildir. Değer `max_absorbed_power_w`
+alanına zorlanınca **22 satır** çürüdü: alan "emilen güç" diyor, kaynak "takılabilir en büyük
+motor" diyor. İkisi aynı kutuda toplanırsa "hangi fan daha az elektrik yakar" sorusu sessizce
+anlamsızlaşır.
+
+**Kural (Recep kararı K9, 2026-09-07):**
+
+| Alan | Anlamı | Kaynak tipik ifadesi |
+|---|---|---|
+| `permissible_motor_power_w` | Gövdenin **izin verdiği** motor anma gücü tavanı | "max. permissible motor power" |
+| `max_absorbed_power_w` | Fanın çalışma noktasında **çektiği** güç | "max. absorbed power / power consumption" |
+| `rated_power_w` | Motorun **anma mil gücü** (etiket değeri) | "motor power (kW)" |
+
+- ❌ İzinli tavanı `max_absorbed_power_w`'a yazmak yasak.
+- ⚠**Legacy borç (ölçüldü, bu cetvel değişikliğinin getirdiği değil):** SEAT'te **39**,
+  STORM'da **29** `max_absorbed_power_w` değeri kaynağın *"Motor Power (kW)"* sütunundan
+  geliyor — doğru karşılığı `rated_power_w`. Alan adı göçü listesine yazıldı.
+
+### Basınç: "toplam" ile "statik" ayrı alanlardır
+
+**Nereden çıktı (ölçüm, 2026-09-07):** Nicotra katalogları fan eğrisini **toplam basınç**
+(p_F) olarak veriyor; statik basınç bundan **türetilir** (p_sF = p_F − p_d2). "Statik"
+niteliği hiçbir kaynaktan gelmiyordu — dönüşüm yapılmadan `max_static_pressure_pa` alanına
+yazılmıştı (**8 satır**).
+
+**Kural (Recep kararı K10, 2026-09-07):** kaynak toplam basınç veriyorsa
+`max_total_pressure_pa` yazılır. **Statiğe çevrilmez** — dinamik bileşen (p_d2) çıkış kesitine
+ve debiye bağlıdır; kesit bilinmeden yapılan dönüşüm uydurmadır.
+
+| Alan | Anlamı |
+|---|---|
+| `max_total_pressure_pa` | Eğrinin verdiği **toplam** basınç (p_F) |
+| `max_static_pressure_pa` | **Statik** basınç (p_sF) — yalnız kaynak açıkça statik diyorsa |
+
+### ATEX: işaretleme KODU ile kurulum BÖLGESİ aynı alana girmez
+
+**Nereden çıktı (ölçüm, 2026-09-07):** canlıda `atex_marking` **14 Vortice ürününde**
+ekipman-grubu işaretlemesi taşıyor (`II 2G/D h T3/125°C X Gb/Db`). Yüklenmek istenen JET/SEAT
+verisi ise **kurulum bölgesi beyanı** (`Zone II, Category 3G`). İkisi de "II" ile başlıyor ama
+baştaki "II" birinde **ekipman grubu**, diğerinde **bölge**. Aynı alanda toplanırsa alan iki
+anlam taşır — §11'in ses ve gerilim bölümlerinde kapatılan kusurun aynısı.
+
+**Kural (Recep kararı K11-a, 2026-09-07): İKİ AYRI ALAN.**
+
+| Alan | Anlamı | Kaynak tipik ifadesi | Örnek |
+|---|---|---|---|
+| `atex_marking` | Ekipman **grubu/kategorisi** işaretlemesi — ürünün üstündeki damga | "ATEX marking" | `II 2G/D h T3/125°C X Gb/Db` |
+| `atex_zone` | Ürünün kurulabileceği **kullanım bölgesi** beyanı | "suitable for Zone …" | `Zone II, Category 3G (Directive 94/9/CE)` |
+
+- ❌ Bölge beyanını `atex_marking`'e yazmak yasak (ve tersi).
+- Baştaki `II` iki alanda **farklı şey** demektir: `atex_marking`'te ekipman grubu,
+  `atex_zone`'da bölge numarası. Ayrım tam olarak bu yüzden alan düzeyinde yapılır.
+- ATEX bilgisi teknik tabloda **kod olarak** yaşar; ürün açıklamasındaki **cümle** ayrı
+  yüzeydir ve bu alanların yerine geçmez (K11).
+
+**Uygulandı:** 19 satır (JET 7 + SEAT 12) `atex_zone`'a taşındı ve yükleme listesine girdi.
+
+### Sayısal alanda birim, DEĞERE gömülmez
+
+**Ölçüm (2026-09-07, 375 ürün):** canlının teamülü sayıdır — `int` 2990 hücre, `float` 639.
+Buna karşın **38 hücre** sayısal anahtarda birimi değerin içinde taşıyor
+(`max_delivery_m3h = "6530 m³/h"`, `voltage_v = "220 V"`). Birim **alan adında** yaşar
+(§11.6); değere gömülünce her aritmetik, sıralama ve filtre sessizce bozulur.
+
+**Kural:** sayısal son ekli (`_w`, `_pa`, `_m3h`, `_kg`, `_mm`, `_v`, `_a`, `_hz`) her alan
+sayı tutar. Metin değer yazan betik **kırmızı verir**. Mevcut 38 hücre ayrı onarım kalemidir.
+
 ## 12. Referanslar
 
 1.  **Medusa.js v2 Pricing & Attribute Architecture:** [medusajs.com/docs/modules/pricing](https://docs.medusajs.com) (Multi-currency PriceSets and Rule Engines).
