@@ -74,6 +74,28 @@ const nextConfig = {
             { source: '/category/konut-tipi-havalandirma/:path*', destination: '/category/residential-ventilation/:path*', permanent: true },
             { source: '/category/duman-egzoz-fanlari/:path*', destination: '/category/smoke-exhaust-fans/:path*', permanent: true },
             { source: '/category/otopark-jet-fanlari/:path*', destination: '/category/jet-fans/:path*', permanent: true },
+            // ── K12 (Recep kararı 2026-09-07): NIC-11921'in adındaki model kodu yanlıştı.
+            // Kaynak katalogda `61090P` yazıyor, bizde `6N090P` idi (OCR benzeri okuma hatası;
+            // Katalog ölçtü, 493-series-dd.pdf s.47 satır 93). Ad ve slug düzeltildi.
+            //
+            // ⚠NİÇİN BU SATIR ŞART — ÖLÇÜLDÜ (2026-09-07, canlı):
+            //   ESKİ slug bugün 404 DEĞİL, `308 → /tr/products/nicotra-gebhardt-dd?sku=NIC-11921`.
+            // Bu 308'i next.config ÜRETMİYOR: `resolveProductRoute` adımı 3, varyant slug'ını
+            // DB'den bulup kanonik aile URL'ine gönderiyor. Yani yönlendirme VERİYE bağlı.
+            // Slug DB'de değiştiği an `variantBySlug` eski slug'ı BULAMAZ ve aynı adres
+            // sessizce **404**'e döner — dışarıdan bakan için sayfa kaybolmuş olur.
+            // Kural bu yüzden koda yazılır: veri değişince kaybolmayan tek katman burası.
+            //
+            // Hedef YENİ VARYANT slug'ı (Recep kararının lafzı). Sonuç iki adımlı bir zincir:
+            // 301 (bu satır) → 308 (`resolveProductRoute`) → aile sayfası. Zinciri ölçtüm ve
+            // yazıyorum: tek adım isteseydik hedefi doğrudan aile URL'i yapardık, ama o zaman
+            // bugünkü yönlendirme davranışını koda ÇİVİLERDİK; varyant slug'ları bir gün
+            // gerçek sayfa olursa bu satır kendiliğinden doğru kalır.
+            {
+                source: '/:lang(tr|en)/products/dd-12-12-1500w-3f-4p-2v-6n090p-11921',
+                destination: '/:lang/products/dd-12-12-1500w-3f-4p-2v-61090p-11921',
+                permanent: true,
+            },
         ];
     },
     async headers() {
