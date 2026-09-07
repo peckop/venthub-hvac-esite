@@ -21,6 +21,7 @@ import type { FamilyListItem } from '@/types/ui-models'
 
 import GuidedCategoryDiscovery, { type CategoryViewModelLite } from '../components/home/GuidedCategoryDiscovery'
 import FamilyCard from '../components/products/FamilyCard'
+import { ScrollObserver } from '../components/ui/ScrollObserver'
 import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../config/features'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
@@ -132,7 +133,22 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                 vaat şişirir (K5 ruhu: sayfada tek ana ses).
 
                 KOŞULLU: kategori yoksa blok hiç çizilmez — boş başlık bırakmak, yukarıdaki 3D
-                kutusunun düştüğü tuzağın aynısı olurdu. */}
+                kutusunun düştüğü tuzağın aynısı olurdu.
+
+                ⚠SCROLLOBSERVER ŞART — ÖLÇÜLDÜ (2026-09-07, yerel Playwright):
+                GuidedCategoryDiscovery'nin yedi öğesi `data-observe="fade-up"` + `opacity-0`
+                ile başlar ve yalnız `data-in-view="true"` gelince açılır. O niteliği yazan tek
+                şey `ScrollObserver` ve o BİLEŞEN AĞACA MOUNT EDİLMEZSE HİÇ ÇALIŞMAZ.
+                Bu sayfaya taşındığında sağlayıcı beraberinde gelmedi: yedi öğenin YEDİSİ de
+                opaklık 0'da kaldı — kaydırmak da açmadı (gözlemci hiç kurulmuyordu).
+                Sonuç müşteri gözüyle: 3D'nin yerinde BOŞ BEYAZ ALAN. (Recep aynı ekranı
+                bağımsız olarak gördü ve "üstte beyaz alan var" diye bildirdi.)
+                Ayırt edici kontrol: aynı bileşen anasayfada ÇALIŞIYOR — çünkü HomePage
+                ScrollObserver'ı mount ediyor. Yani bileşen bozuk değil, SAĞLAYICI EKSİKTİ.
+                `data-observe` sessiz bir SÖZLEŞMEDİR: onu kullanan her ağaç sağlayıcıyı da
+                mount etmek zorundadır, yoksa içerik render EDİLİR ama GÖRÜNMEZ.
+                Bekçi: INV-GOZLEMCI-1 (src/__tests__/conformance/gozlemci-sozlesmesi.test.ts). */}
+            {kategoriler.length > 0 && <ScrollObserver />}
             {kategoriler.length > 0 && (
                 <GuidedCategoryDiscovery
                     displayCategories={kategoriler}

@@ -22,6 +22,53 @@ vi.mock('@/components/products/FamilyCard', () => ({
 }))
 
 /**
+ * jsdom'da `IntersectionObserver` YOKTUR; `ScrollObserver` onsuz mount anında patlar.
+ * (Bu kapı 2026-09-07'de tam bu satırda kırmızı verdi — görünürlük onarımı geldiğinde.)
+ *
+ * ⚠TAKLİDİN NE YAPTIĞI, AÇIKÇA: gerçeğe UYUMLU davranır — gözlenen her öğeyi "görünür"
+ * sayıp geri çağırıyı `isIntersecting: true` ile çağırır, yani tarayıcıda kaydırma sonrası
+ * oluşan DOM'un aynısını üretir. Böylece test sahte bir "hiç açılmayan" dünyada değil,
+ * gerçeğin karşılığı olan dünyada ölçer.
+ *
+ * ⚠TAKLİDİN NE YAPMADIĞI, AYNI AÇIKLIKLA: jsdom düzen/boyama yapmaz — bu taklit bloğun
+ * GÖRÜNDÜĞÜNÜ kanıtlamaz, yalnız ağacın çizildiğini. Görünürlüğün gerçek kanıtı tarayıcı
+ * ölçümüdür (2026-09-07, Playwright: 7 öğenin 7'si opaklık 1) ve yapısal güvencesi
+ * INV-GOZLEMCI-1'dir (gozlemci-sozlesmesi.test.ts). Bu satır o ikisinin YERİNE GEÇMEZ.
+ *
+ * Arayüz TAM uygulanır (`root`/`rootMargin`/`thresholds` dahil): eksik bırakıp tip
+ * dökümüyle geçmek, taklidin gerçekten IntersectionObserver yerine geçtiğini SÖYLER ama
+ * KANITLAMAZ — derleyicinin itirazı burada bilgidir, susturulacak gürültü değil.
+ */
+class SahteIntersectionObserver implements IntersectionObserver {
+  readonly root: Element | Document | null = null
+  readonly rootMargin: string = '0px'
+  readonly thresholds: ReadonlyArray<number> = [0]
+  private readonly geriCagri: IntersectionObserverCallback
+
+  constructor(geriCagri: IntersectionObserverCallback) {
+    this.geriCagri = geriCagri
+  }
+
+  observe(hedef: Element): void {
+    const kayit: IntersectionObserverEntry = {
+      boundingClientRect: hedef.getBoundingClientRect(),
+      intersectionRatio: 1,
+      intersectionRect: hedef.getBoundingClientRect(),
+      isIntersecting: true,
+      rootBounds: null,
+      target: hedef,
+      time: 0,
+    }
+    this.geriCagri([kayit], this)
+  }
+
+  unobserve(): void {}
+  disconnect(): void {}
+  takeRecords(): IntersectionObserverEntry[] { return [] }
+}
+vi.stubGlobal('IntersectionObserver', SahteIntersectionObserver)
+
+/**
  * INV-URUNLER-KATEGORI-1 — Ürünler sayfası kategori ağacına GİDEN bir kapı taşır.
  *
  * NİÇİN VAR (REC-213-A · canlı ölçüm 2026-09-07):
