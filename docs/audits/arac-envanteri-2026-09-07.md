@@ -271,6 +271,9 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/kayip-urun-aile-bagla.mjs` | KAYIP ÜRÜN AKTARIMI — İKİNCİ YARI: AİLE BAĞI + KATEGORİ ONARIMI (REC-226) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/icerik-hatti/kayip-urun-aktar.mjs` | KAYIP ÜRÜN AKTARIMI — REC-226 | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/kip/satis-kipine-gec.mjs` | Satış kipi geçiş betiği — TEK KOMUTLA aç/kapat, yedekli, geri alınabilir (REC-168). | OPS | docs/standards/satis-kipi-gecis-standard.md, src/__tests__/conformance/build-skip-positive-logic.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/build-skip-positive-logic.test.ts, src/__tests__/conformance/satis-kipi-anahtari.test.ts | YENI |
+| `scripts/icerik-hatti/katalog-disa-aktar.mjs` | TAŞINABİLİR KATALOG — DIŞA AKTARICI (REC-212) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-tasinabilir-katalog-2026-09-07.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/katalog-geri-yukle.mjs` | TAŞINABİLİR KATALOG — GERİ YÜKLEYİCİ (REC-212, ikinci yarı) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-tasinabilir-katalog-2026-09-07.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/katalog-karnesi.mjs` | KATALOG KARNESİ — hattın dokuz satırı, TEK komutla (KOL 6 ilk çıktısı) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
