@@ -110,6 +110,15 @@
             "command": "node .claude/hooks/board-brief.cjs"
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/hafiza-sorusu-yonlendirme.cjs"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -131,6 +140,16 @@
             "statusMessage": "bash-write-audit"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/eylem-defteri.cjs",
+            "statusMessage": "eylem-defteri"
+          }
+        ]
       }
     ],
     "Stop": [
@@ -147,6 +166,13 @@
             "timeout": 120,
             "statusMessage": "verify (eslint --fix + tsc)",
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/defter-bayatlik-olcumu.cjs",
+            "timeout": 90,
+            "async": true,
+            "statusMessage": "defter bayatlik olcumu"
           }
         ]
       }
