@@ -19,11 +19,33 @@ export interface CategoryViewModelLite {
 
 interface GuidedCategoryDiscoveryProps {
   displayCategories?: CategoryViewModelLite[]
+  /**
+   * Başlık kümesinin sözlük ANAHTARLARI — hazır metin DEĞİL (kural 7: çeviri bu
+   * bileşenin içinde, `t()` ile çözülür; çağıran çözülmüş metin geçirirse dil
+   * sağlayıcısı devre dışı kalırdı).
+   *
+   * NİÇİN VAR (REC-213-A): bu blok artık İKİ sayfada çiziliyor — ana sayfa ve
+   * `/products`. Ana sayfanın başlığı ("Ürün Ailelerimiz" ekseni) ürün listesi
+   * sayfasında yanlış konuşur; orada blok bir keşif kısayolu, sayfanın tezi değil.
+   * Varsayılanlar ana sayfanın bugünkü anahtarları olduğu için ana sayfa BİREBİR
+   * aynı kalır — davranış değişikliği yalnız yeni çağıranda.
+   *
+   * `null` geçmek o satırı hiç çizmez (ör. `/products` üstünde göz/giriş cümlesi
+   * istemiyoruz; sayfanın kendi h1'i zaten var, ikinci bir tez kurmak vaat şişirir).
+   */
+  eyebrowKey?: string | null
+  headingKey?: string
+  introKey?: string | null
 }
 
 const FALLBACK_CATEGORY_IMAGE = '/images/vortice_lineo_futuristic.webp'
 
-const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displayCategories = [] }) => {
+const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({
+  displayCategories = [],
+  eyebrowKey = 'home.guidedDiscovery.eyebrowLabel',
+  headingKey = 'home.guidedDiscovery.heading',
+  introKey = 'home.guidedDiscovery.intro',
+}) => {
   const { t } = useI18n()
   const Routes = useLocalizedRoutes()
   return (
@@ -31,25 +53,29 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-3xl">
-            <div 
-              data-observe="fade-up"
-              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-opacity-transform duration-700 ease-out text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-600 mb-4"
-            >
-              {t('home.guidedDiscovery.eyebrowLabel')}
-            </div>
+            {eyebrowKey && (
+              <div
+                data-observe="fade-up"
+                className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-opacity-transform duration-700 ease-out text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-600 mb-4"
+              >
+                {t(eyebrowKey)}
+              </div>
+            )}
             <h2 
               data-observe="fade-up"
               className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
             >
-              {t('home.guidedDiscovery.heading')}
+              {t(headingKey)}
             </h2>
           </div>
-          <p 
-            data-observe="fade-up"
-            className="opacity-0 data-[in-view=true]:opacity-100 transition-opacity duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
-          >
-            {t('home.guidedDiscovery.intro')}
-          </p>
+          {introKey && (
+            <p
+              data-observe="fade-up"
+              className="opacity-0 data-[in-view=true]:opacity-100 transition-opacity duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
+            >
+              {t(introKey)}
+            </p>
+          )}
         </div>
 
         {/* Mobile: Horizontal Scroll | Desktop: Grid */}
@@ -91,7 +117,27 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
 
                       <div className="w-12 h-px bg-white/30 group-hover:w-24 group-hover:bg-cyan-500 transition-width-bg duration-700" />
                       
-                      <div className="mt-6 max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-700 overflow-hidden">
+                      {/* ⚠MOBİLDE DAİMA AÇIK — Recep kararı (2026-09-07): "görünmeyen
+                          açıklamalar mobilde görünmesi lazım, bunu da çözün".
+
+                          ÖLÇÜLMÜŞ KUSUR: bu kutu `max-h-0 opacity-0` ile başlayıp yalnız
+                          `group-hover` ile açılıyordu. DOKUNMATİK CİHAZDA HOVER YOKTUR —
+                          390×844'te ölçüldü: altı kartın altısında da max-height 0px,
+                          opacity 0. Yani paragraf mobil ziyaretçide HİÇ açılmıyordu.
+                          Etkisi somut: URUN-KATALOG aynı gün 23 kategori paragrafını canlı
+                          veritabanına yazdı (REC-146, 0/37 → 23/37) ve bu yüzeyde hiçbiri
+                          mobilde görünmüyordu. Metin DOM'daydı — bot görüyor, insan görmüyor.
+
+                          ÇÖZÜM MOBİL ÖNCELİKLİ: varsayılan (küçük ekran) AÇIK; `md:` ve
+                          üstünde eski hover davranışı AYNEN korunur. Böylece masaüstü
+                          tasarımı hiç değişmez, yalnız hover'ı OLMAYAN cihaz kazanır.
+                          Tek dokunuşla açma seçeneği ELENDİ: kart zaten bir bağlantı,
+                          ilk dokunuş sayfayı açar — açma/kapama jesti bağlantıyla çakışırdı.
+
+                          `line-clamp-2` (aşağıdaki p) zaten var, yani metin uzasa bile kart
+                          iki satırdan fazla büyümez — ızgara düzeni korunur.
+                          Bekçi: INV-KART-ACIKLAMA-MOBIL-1. */}
+                      <div className="mt-6 max-h-24 opacity-100 md:max-h-0 md:opacity-0 md:group-hover:max-h-24 md:group-hover:opacity-100 transition-opacity duration-700 overflow-hidden">
                         <p className="text-xs text-slate-200 font-light leading-relaxed tracking-wider mb-6 max-w-200px line-clamp-2">
                           {category.description || t('home.guidedDiscovery.cardFallback')}
                         </p>

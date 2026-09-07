@@ -578,7 +578,9 @@ const DONMUS_BORC: ReadonlySet<string> = new Set([
   'products.heroSubtitle',
   'products.heroTitle',
   'products.noResults',
-  'products.popularCategories',
+  // 'products.popularCategories' — REC-213-A ile DİRİLDİ (2026-09-07): /products
+  // sayfasının kategori kapısı bu anahtarı başlık olarak kullanıyor. Listeden
+  // çıkarıldı; anahtar yeniden ölürse kapı bunu KIRMIZI ile söyler.
   'quotes.admin.navLabel',
   'search.placeholder',
   'support.home.warrantyDesc',
@@ -774,6 +776,13 @@ const OPAK_CAGRI_DOSYALARI: ReadonlySet<string> = new Set([
   'src/components/admin/products/ProductCsvImport.tsx',
   'src/components/admin/shell/AdminSidebar.tsx',
   'src/components/admin/shell/AdminThemeToggle.tsx',
+  // REC-213-A (2026-09-07) — kapının SORDUĞU soruyu cevaplayarak ekliyorum, susturmak için değil:
+  // "anahtar literal olarak keşfedilebilir mi?" → EVET, üçü de. Bileşen `t(headingKey)` biçiminde
+  // çağırıyor ama anahtarların KENDİSİ literal: varsayılanlar bu dosyanın prop imzasında
+  // ('home.guidedDiscovery.*'), tek override ise ProductsDiscoveryView.tsx'te JSX prop'u olarak
+  // ('products.popularCategories'). Yani ölü-anahtar taraması üçünü de literal olarak görür;
+  // opak olan yalnız ÇAĞRI biçimi. Bileşen iki sayfada çizildiği için başlıklar prop'a taşındı.
+  'src/components/home/GuidedCategoryDiscovery.tsx',
   'src/components/home/HomeSinevizyon.tsx',
   'src/components/product/ProductSmartInference.tsx',
   'src/hooks/useCategoryViewModel.ts',

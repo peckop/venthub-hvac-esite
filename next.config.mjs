@@ -86,14 +86,32 @@ const nextConfig = {
             // sessizce **404**'e döner — dışarıdan bakan için sayfa kaybolmuş olur.
             // Kural bu yüzden koda yazılır: veri değişince kaybolmayan tek katman burası.
             //
-            // Hedef YENİ VARYANT slug'ı (Recep kararının lafzı). Sonuç iki adımlı bir zincir:
-            // 301 (bu satır) → 308 (`resolveProductRoute`) → aile sayfası. Zinciri ölçtüm ve
-            // yazıyorum: tek adım isteseydik hedefi doğrudan aile URL'i yapardık, ama o zaman
-            // bugünkü yönlendirme davranışını koda ÇİVİLERDİK; varyant slug'ları bir gün
-            // gerçek sayfa olursa bu satır kendiliğinden doğru kalır.
+            // ⛔HEDEF DÜZELTİLDİ (2026-09-07, CANLI 404 ÖLÇÜLDÜ) — sıralama hatasıydı.
+            //
+            // Bu kural ilk hâlinde hedefi YENİ VARYANT slug'ı yapıyordu ve gerekçesi şuydu:
+            // "varyant slug'ları bir gün gerçek sayfa olursa bu satır kendiliğinden doğru kalır."
+            // Gerekçe kendi içinde tutarlıydı ama BİR VARSAYIMA yaslanıyordu: yeniden adlandırma
+            // aynı yayında olacak. OLMADI — ad/slug düzeltmesi bir PROD DB YAZIMI ve Recep
+            // kapısında bekliyor. Kural veriden ÖNCE indi ve şu zinciri üretti:
+            //
+            //   /tr/products/…-6n090p-11921  →308→  /tr/products/…-61090p-11921  →  404
+            //
+            // Yani merge ÖNCESİ çalışan bir adres (308 → aile sayfası, 200) merge SONRASI
+            // ölü uca düştü. next.config yönlendirmesi uygulamanın veri-sürücülü çözümünden
+            // ÖNCE koşar, o yüzden `resolveProductRoute`ın kurtarma adımı hiç devreye giremedi.
+            //
+            // NİÇİN HEDEF AİLE SAYFASI (kuralı silmek DEĞİL): silmek bugünü düzeltir ama
+            // yeniden adlandırma yapıldığı an eski slug DB'den kaybolur ve adres yine 404
+            // olur — düzeltmeyi ikinci bir yayına borçlanmış oluruz. Aile sayfası ise
+            // ADLANDIRMADAN BAĞIMSIZ olarak var; kural her iki hâlde de canlı bir hedefe
+            // gider. Kalıcı (308) bir yönlendirmenin hedefi, tarayıcıda önbelleklendiği için,
+            // "yarın doğru olacak" bir adres DEĞİL "bugün de yarın da doğru" bir adres olmalı.
+            //
+            // Varyant slug'ları ileride gerçek sayfa olursa hedef o zaman güncellenir; bu bir
+            // kayıp değil, çünkü o gün zaten bu satıra dokunulacak.
             {
                 source: '/:lang(tr|en)/products/dd-12-12-1500w-3f-4p-2v-6n090p-11921',
-                destination: '/:lang/products/dd-12-12-1500w-3f-4p-2v-61090p-11921',
+                destination: '/:lang/products/nicotra-gebhardt-dd?sku=NIC-11921',
                 permanent: true,
             },
         ];
@@ -119,6 +137,43 @@ const nextConfig = {
                         key: 'Content-Security-Policy-Report-Only',
                         value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.iyzipay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-insights.com https://raw.githubusercontent.com https://raw.githack.com https://*.google-analytics.com https://api.pwnedpasswords.com https://*.iyzipay.com; frame-src 'self' https://www.youtube.com https://*.cloudflarestream.com https://*.iyzipay.com; frame-ancestors 'none'; form-action 'self' https://*.iyzipay.com; base-uri 'self'; object-src 'none'"
                     },
+                ],
+            },
+            {
+                // REC-205 · ÖZEL YÜZEYLER ARAMA SONUCUNA ÇIKMAZ
+                //
+                // NİÇİN: Google Search Console (2026-09-07) `/tr/auth/login` adresini
+                // "kullanıcı tarafından seçilen standart sayfa olmadan kopya" diye işaretledi.
+                // Canlı ölçüm: `/tr/auth/login`, `/tr/auth/register`, `/tr/account`, `/tr/cart`
+                // sayfalarının HİÇBİRİNDE `<meta name="robots">` YOK — dördü de dizine
+                // girebilir durumdaydı. Giriş/kayıt/hesap/sepet sayfasının arama sonucunda
+                // işi yok: kullanıcıya değer vermez, tarama bütçesi yer, "ince içerik" sinyali üretir.
+                //
+                // NİÇİN META DEĞİL BAŞLIK: `account/layout.tsx` bir istemci bileşeni
+                // (`'use client'`) ve Next.js istemci bileşeninden `metadata` export edilmesine
+                // izin vermez. HTTP başlığı `X-Robots-Tag` bu ayrımı hiç umursamaz, sunucu/istemci
+                // fark etmeksizin her yanıtta bulunur ve Google onu meta etiketle EŞDEĞER sayar.
+                // Böylece kural tek yerde durur, beş auth sayfasına + hesap ağacına ayrı ayrı
+                // serpiştirilmez.
+                //
+                // `follow` KASITLI: sayfa dizine girmesin ama içindeki bağlantılar izlensin —
+                // hesap/sepet sayfasından vitrine giden yollar kapanmasın.
+                //
+                // KAPSAM SINIRI: `/checkout` bilerek YOK — o yüzey ALTYAPI şeridinin claim'inde
+                // (`src/app/[lang]/checkout/**`). Aynı kusuru taşıyorsa sahibi kapatır; başka
+                // şeridin dosyasına buradan uzanılmaz.
+                source: '/:lang(tr|en)/:yuzey(auth|account|cart)/:path*',
+                headers: [
+                    { key: 'X-Robots-Tag', value: 'noindex, follow' },
+                ],
+            },
+            {
+                // Yüzeyin kendisi (alt yol olmadan): /tr/account · /tr/cart · /en/cart …
+                // Yukarıdaki desen `:path*` ile eşleşiyor ama kökü ayrıca yazmak, deseni
+                // okuyanın "kök dahil mi" diye tereddüt etmesini önler.
+                source: '/:lang(tr|en)/:yuzey(auth|account|cart)',
+                headers: [
+                    { key: 'X-Robots-Tag', value: 'noindex, follow' },
                 ],
             },
         ];
