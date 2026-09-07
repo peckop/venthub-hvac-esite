@@ -303,6 +303,36 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     expect(k.sebep).toMatch(/bagimsiz tanik yok|ATAN da SEN/)
   })
 
+  /**
+   * ⛔KİMLİK TAKLİDİ (REC-192 · ölçüm 2026-09-07): eşitlik kontrolü YETMEZ.
+   * `events.mekanizma-probu.jsonl` içindeki 185 kaydın 185'i de
+   * `00000000-0000-4000-8000-<hedefin son 12 hanesi>` biçimli sentetik bir sid'den atılmıştı;
+   * gerçek bir akran oturumundan atılan prob SIFIR. Böyle bir sid `atanSid !== kendiSid`
+   * şartını GEÇER ve "bağımsız tanık" görünür — oysa hedefin kendi kanalıdır.
+   * Bu kol, kanıt tanımının kandırılabilir olmadığını ölçer (OPS hükmü, 2026-09-07).
+   */
+  it('SENTETİK KİMLİK bağımsız sayılmaz: aynı uuid kuyruğu → KIRMIZI', () => {
+    const sentetik = '00000000-0000-4000-8000-' + BEN.slice(-12)
+    expect(sentetik, 'fikstür yanlış: sentetik sid gerçek sid ile aynı olmamalı').not.toBe(BEN)
+    const k = mech.teslimatKaniti({
+      damga: bagimsizDamga({ atanSid: sentetik }), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
+    })
+    expect(
+      k.sinif,
+      'sentetik kimlikli öz-prob YEŞİL sayıldı — bağımsızlık şartı taklit edilebiliyor demektir (vekil kanıt)',
+    ).toBe('KIRMIZI')
+    expect(k.sebep, 'sebep "kimlik taklidi" demiyor; okuyan niçin düştüğünü anlamaz').toMatch(/KIMLIK TAKLIDI/)
+  })
+
+  it('GERÇEK akran hâlâ YEŞİL (kol fazla geniş olmasın — kuyruk benzerliği tesadüf değil, EŞİTLİK aranıyor)', () => {
+    // OPS'un sid'i benimkiyle aynı son 12 haneyi PAYLAŞMIYOR; kol onu vurmamalı.
+    expect(OPS.slice(-12)).not.toBe(BEN.slice(-12))
+    const k = mech.teslimatKaniti({
+      damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
+    })
+    expect(k.sinif, 'yeni kol gerçek bağımsız tanığı da düşürdü — kapı fazla geniş').toBe('YESIL')
+  })
+
   it('⭐BAYAT jeton kanıt değildir: eşiği aşan geri yazım KIRMIZI', () => {
     const taze = mech.teslimatKaniti({
       damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 179_000,
