@@ -108,6 +108,12 @@ describe('INV-BUILD-SKIP · ignore-build betiği pozitif mantıkla karar verir',
       ['kancaları KURAN betik (koşan dosya bu, kancalar değil)', ['scripts/setup-hooks.mjs']],
       ['board ADINA benzeyen ama farklı yol', ['scripts/boardfake.ts']],
       ['githooks ADINA benzeyen ama farklı dizin', ['.githooksfake/pre-commit']],
+      // --- scripts/kip eklenirken (2026-09-07, REC-168) ---
+      // Aynı kapsam-darlığı sınavı: `scripts/kip*` yazılsaydı bu satır sessizce atlanırdı.
+      ['kip ADINA benzeyen ama farklı yol', ['scripts/kipfake.ts']],
+      // ⭐SINIF SINIRI: betiğin KENDİSİ atlanır ama onu SINAYAN kapı `src/**` altında
+      // ve `src/**` bilerek atlanmaz — yani kapı değişirse build KOŞAR.
+      ['kip betiğinin kapısı (src/** atlanmaz)', ['src/__tests__/conformance/satis-kipi-anahtari.test.ts']],
     ]
 
     for (const [ad, dosyalar] of buildGerektiren) {
@@ -126,6 +132,10 @@ describe('INV-BUILD-SKIP · ignore-build betiği pozitif mantıkla karar verir',
       ['şerit panosu aracı', ['scripts/board/board.cjs']],
       ['panonun alt dizini (yıldız `/` de yutar)', ['scripts/board/lib/x.cjs']],
       ['ağaç hijyeni aracı', ['scripts/hijyen/agac-silme-kapisi.cjs']],
+      // REC-168: satış kipi geçiş betiği — elle koşulan operasyon aracı, hiçbir yerden
+      // import edilmiyor (ölçüm betiğin yanındaki yorumda: derleme hattında 0 referans,
+      // aynı arama `scripts/setup-hooks` için BULUYOR — yani arama gerçekten arıyor).
+      ['satış kipi geçiş betiği', ['scripts/kip/satis-kipine-gec.mjs']],
       ['git kancasının kendisi', ['.githooks/pre-commit']],
     ]
 
