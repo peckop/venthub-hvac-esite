@@ -1,5 +1,6 @@
 // Çağıran sınıfı: (b) cron/sunucu→sunucu service_role + (a) oturumlu admin — resolveCaller kapısı
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { supabaseSayfaOkuyucu, tumSatirlar } from '../_shared/tum_satirlar.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import {
@@ -178,14 +179,24 @@ async function checkAllProducts(supabase: SupabaseClient) {
 
   const enBuyukEsik = Math.max(Number(esikSatiri?.low_stock_threshold ?? 0) || 0, VARSAYILAN_ESIK)
 
-  const { data: allLowStock, error: fetchErr } = await supabase
-    .from('products')
-    .select('id, name, stock_qty, low_stock_threshold')
-    .filter('stock_qty', 'lte', enBuyukEsik)
+  // ── SESSİZ 1000 SATIR TAVANI (REC-183) ──────────────────────────────────────
+  // Bu sorgu eskiden sayfalanmıyordu. PostgREST bir sorguya en çok 1000 satır döner ve bunu
+  // HATA İLE BİLDİRMEZ: 1001. üründen sonrası hiç GELMEZ, uyarı üretilmez ve fonksiyon yine
+  // 200 döner. Yani stok uyarısı, katalog büyüdüğü gün kod hiç değişmeden sessizce kör olurdu.
+  // 2026-09-07 ölçümü: 375 ürün, ön-filtreye takılan 1 satır → tavan bugün ISIRMIYOR, kusur
+  // GİZLİ. Katalog hattı 694 satır yüklemeye hazırlanıyor; bu yüzden önleyici, spekülatif değil.
+  const allLowStock = await tumSatirlar<Product>(
+    supabaseSayfaOkuyucu<Product>((secenek) =>
+      supabase
+        .from('products')
+        // ⚠count SELECT çağrısına verilir; filtre zincirinin sonuna eklenirse sessizce yutulur.
+        .select('id, name, stock_qty, low_stock_threshold', secenek)
+        .filter('stock_qty', 'lte', enBuyukEsik),
+    ),
+    { ad: 'stock-alert/products' },
+  )
 
-  if (fetchErr) throw fetchErr
-
-  const productsToAlert = ((allLowStock || []) as Product[]).filter(p => p.stock_qty <= (p.low_stock_threshold || VARSAYILAN_ESIK))
+  const productsToAlert = allLowStock.filter(p => p.stock_qty <= (p.low_stock_threshold || VARSAYILAN_ESIK))
   console.warn(`[JOB] Found ${productsToAlert.length} products requiring alerts`)
 
   // Fetch recipients once globally (N+1 query optimization)
