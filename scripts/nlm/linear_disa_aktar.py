@@ -31,7 +31,9 @@ query($after: String) {
   issues(first: 100, after: $after, includeArchived: false) {
     pageInfo { hasNextPage endCursor }
     nodes {
-      identifier title priority createdAt updatedAt completedAt url
+      identifier title priority createdAt updatedAt completedAt startedAt url
+      comments(last: 1) { nodes { createdAt } }
+      attachments(last: 1) { nodes { createdAt } }
       state { name type }
       assignee { name }
       project { name }
@@ -102,6 +104,11 @@ def cek(key):
                 "labels": sorted(l["name"] for l in n["labels"]["nodes"]),
                 "priority": n["priority"], "createdAt": n["createdAt"], "updatedAt": n["updatedAt"],
                 "completedAt": n.get("completedAt"), "url": n["url"],
+                # SON ANLAMLI DOKUNUS (Katalog uyarisi 2026-09-07): updatedAt etiket/bakim/betikle tazelenir, curume olcutu olamaz.
+                # Anlamli = son yorum · son PR/ek baglama · ise baslama · bitis · acilis. Aciklama govdesi degisikligi API'de ucuz izlenemiyor, KAPSAM DISI (yazili).
+                "sonAnlamli": max([x for x in [n["createdAt"], n.get("startedAt"), n.get("completedAt")]
+                                   + [c["createdAt"] for c in (n.get("comments") or {}).get("nodes", [])]
+                                   + [a["createdAt"] for a in (n.get("attachments") or {}).get("nodes", [])] if x]),
                 "blockedBy": sorted({r["issue"]["identifier"] for r in (n.get("inverseRelations") or {}).get("nodes", []) if r.get("type") == "blocks" and r.get("issue")}),
                 "blocks": sorted({r["relatedIssue"]["identifier"] for r in (n.get("relations") or {}).get("nodes", []) if r.get("type") == "blocks" and r.get("relatedIssue")}),
             })

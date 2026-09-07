@@ -1,7 +1,7 @@
-<!-- uretilmis: scripts/nlm/santiye.py · damga 2026-09-07T09:33Z · Linear disa aktarimi 2026-09-07T09:33:32Z · elle duzenlenmez -->
-# ŞANTİYE — kimde ne iş var (2026-09-07T09:33Z)
+<!-- uretilmis: scripts/nlm/santiye.py · damga 2026-09-07T09:36Z · Linear disa aktarimi 2026-09-07T09:36:47Z · elle duzenlenmez -->
+# ŞANTİYE — kimde ne iş var (2026-09-07T09:36Z)
 
-Kaynak: Linear (2026-09-07T09:33:32Z). Kural: şerit başına yapılıyor ≤1, sırada ≤3. Pano/sohbet kaynak değildir.
+Kaynak: Linear (2026-09-07T09:36:47Z). Kural: şerit başına yapılıyor ≤1, sırada ≤3. Pano/sohbet kaynak değildir.
 
 ## §0 Özet
 

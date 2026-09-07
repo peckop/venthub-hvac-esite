@@ -25,7 +25,9 @@ SERITLER = ["URUN", "URUN-KATALOG", "ALTYAPI", "OPS", "DESIGN"]
 DIS_PROJELER = set()   # Recep 2026-09-07: "hicbir is VentHub disinda degil" — proje disi tutma YOK (Q-Validator eski mimari, kayitlari baglandi/kapandi)
 KATALOG_PROJE = "Katalog ve Ürün Verisi"
 LIMIT_IP, LIMIT_TODO = 1, 3
-CURUME_GUN = 14   # Backlog'da bu kadar gun dokunulmamis kayit "curudu adayi" (Katalog onerisi, OPS hukmu 2026-09-07)
+CURUME_GUN = 14   # Backlog'da bu kadar gun ANLAMLI dokunus gormemis kayit "curudu adayi" (Katalog onerisi, OPS hukmu 2026-09-07)
+# Olcut updatedAt DEGIL "sonAnlamli" (son yorum / PR eki / baslama / bitis / acilis): etiket, toplu bakim, betik dokunusu yasi TAZELEMEZ.
+# Sinav: bir kayda yalniz etiket ekle -> yas degismemeli (updatedAt degisir, sonAnlamli degismez). Katalog uyarisi 09-07.
 
 
 def serit_of(k):
@@ -75,7 +77,7 @@ def main():
     rows = [k for k in rows if (k.get("project") or "") not in DIS_PROJELER and k.get("status") != "Canceled"]
     simdi_dt = datetime.datetime.strptime(damga[:16], "%Y-%m-%dT%H:%M").replace(tzinfo=datetime.timezone.utc)
     def curudu(k):
-        u = k.get("updatedAt") or k.get("createdAt") or ""
+        u = k.get("sonAnlamli") or k.get("createdAt") or ""   # updatedAt bilerek KULLANILMAZ
         try:
             dt = datetime.datetime.fromisoformat(u.replace("Z", "+00:00"))
         except ValueError:
@@ -150,7 +152,7 @@ def main():
     L.append(f"## §8 Çürüdü adayları ({len(curu)}) — Backlog'da ≥{CURUME_GUN} gün dokunulmamış; sahibi tek cümleyle savunamazsa iptal")
     L.append("")
     for k in sorted(curu, key=lambda x: (serit_of(x), x["identifier"])):
-        L.append(f"- {k['identifier']} · {kisa(k['title'], 100)} · {serit_of(k)} · son dokunuş {(k.get('updatedAt') or '?')[:10]}")
+        L.append(f"- {k['identifier']} · {kisa(k['title'], 100)} · {serit_of(k)} · son anlamlı dokunuş {(k.get('sonAnlamli') or '?')[:10]}")
     L.append("")
     L.append("## §9 Hüküm")
     L.append("")
