@@ -1,6 +1,6 @@
 # Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-07 ayna: K1–K12)
 
-<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-07T07:16:38.283Z · kopya: 2026-09-07T08:42Z -->
+<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-07T08:47:15.686Z · kopya: 2026-09-07T21:02Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -81,3 +81,7 @@ Sertifika kodu (ör. `II 2G Ex h IIB T4`) `technical_specs`'te olduğu gibi (ala
 ## K12 · Yanlış ürün kodu ad+slug'da düzeltilir, eski slug 301 (2026-09-07 07:35Z, Recep KARARI; Katalog faz 2 incelemesi 6-A)
 
 DD ailesinde ad ve slug'da `6N090P` yazan ürün (`model_code` 11921) kaynak kodu `61090P` ile düzeltilir; eski slug yeni slug'a 301 yönlendirilir; kanonik/sitemap etkisi PR'da ölçülür. Şerit: URUN. Teknik özellik yüklemesi (faz 4) bunu BEKLEMEZ (satırlar sku ile bağlı). Genel kural: vitrindeki kod kaynak koduyla çelişirse düzeltme ad+slug+301'dir, yalnız tabloya doğru kod eklemek yeterli değildir (vaat bütünlüğü).
+
+## K11-a · ATEX iki eksen, iki alan: `atex_marking` (ekipman grubu kodu) + `atex_zone` (kullanım bölgesi) (2026-09-07 09:2xZ, Recep KARARI "A")
+
+Kataloglar ATEX'i iki biçimde verir: ekipman grubu/kategori kodu (ör. `II 2G/D h T3/125C X Gb/Db`, Vortice 14 ürün) ve kullanım bölgesi beyanı (ör. `Zone 2, Category 3G`, JET 7 ürün; SEAT 12 satır aynı sınıf). İkisi farklı eksendir (K3 aynı eksen kıyas kuralı): aynı alana konmaz. Teknik tabloda iki ayrı satır: "ATEX sınıfı" ve "ATEX bölgesi"; hangisi varsa o görünür (K7 yoksa satır yok). Faset: bugün 375 üründe ~21 dolu (%6) → K13 gereği filtre olmaz, yalnız PDP tablosunda. K11 (kod + açıklama cümlesi) geçerli kalır; cümle her iki alan için de yazılır. Faz 4: 19 ATEX satırı yükleme listesine girer.
