@@ -483,9 +483,22 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     // Davranışsal kol yukarıda; bu kol tasarımın kendisini korur. Biri "kolaylık olsun" diye
     // jetonu hedefe basarsa, bağımsızlık koda dokunmadan BUHARLAŞIR ve çekirdek bunu göremez.
     expect(kurulumKaynak, '--to bayrağı kaybolmuş').toMatch(/arg\('--to'\)/)
+    /**
+     * ⚠ÖLÇÜT 2026-09-07'de GERÇEĞE BAĞLANDI (REC-192). Eski hâli şu CÜMLEYİ birebir arıyordu:
+     * "Jeton HEDEFE bu ekrandan verilmez". O gün garanti **güçlendirildi** — jeton artık
+     * hedefin değil ATANIN da ekranına basılmıyor (atanın ekranı bir aklama yoluydu: atan
+     * jetonu hedefe iletirse kapı "bağımsız tanık" der). Cümle değişti, kol düştü, oysa
+     * korunan şey iyileşmişti. *Ölçüt ada değil GERÇEĞE bağlanır* — bugün bu sınıfın
+     * dördüncü tekrarı, bu sefer kendi kapımızda.
+     * Yeni ölçüt: bağımsız dal jetonu BASMADIĞINI söylüyor, ve basma çağrısı KOŞULLU.
+     */
     expect(
-      /Jeton HEDEFE bu ekrandan verilmez/.test(kurulumKaynak),
-      'prob artık jetonu hedefe vermediğini AÇIKÇA söylemiyor — sınır sessizleşti',
+      /jeton BASILMADI|jeton YAZILMADI/.test(kurulumKaynak),
+      'prob artık jetonu basmadığını AÇIKÇA söylemiyor — sınır sessizleşti',
+    ).toBe(true)
+    expect(
+      /hedefSid \?[\s\S]{0,200}jeton YAZILMADI[\s\S]{0,120}:[\s\S]{0,60}jeton/.test(kurulumKaynak),
+      'jeton basımı KOŞULSUZ — bağımsız probda da değer ekrana düşer, bağımsızlık buharlaşır',
     ).toBe(true)
     expect(
       /--to KENDINE verilemez/.test(kurulumKaynak),

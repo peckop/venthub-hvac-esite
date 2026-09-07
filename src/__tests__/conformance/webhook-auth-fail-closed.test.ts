@@ -109,14 +109,40 @@ describe('INV-WEBHOOK-1/R2 · webhook sırrı kaynakta düz metin olamaz', () =>
     expect(SECRET_LITERAL.test("'<<REDACTED>>'")).toBe(false)
   })
 
-  it('kapsam sağlığı: taranan dosya kümesi boş değil (glob sessizce düşmesin)', () => {
-    const migrationCount = Object.keys(scannedSources).filter((p) =>
-      p.startsWith('/supabase/migrations/'),
-    ).length
+  /**
+   * ⭐EVREN MUHAFIZI — SIKILAŞTIRILDI (REC-189, kaynak REC-179 sabotaj sınavı).
+   *
+   * ÖNCE NE VARDI, DÜRÜSTÇE: bu kolun kendisi ZATEN vardı ve eşiği `> 10`'du. REC-179
+   * kaydı bu alt bloğu "ağaç yürüyor ve eşiksiz" diye tarif ediyor; ölçtüm, tarif bugünkü
+   * hâl için DOĞRU DEĞİL — eşik var. Yani emrin bir kalemi çürük çıktı ve bunu yazıyorum
+   * ki sonraki okuyan "eşik eklendi" sanmasın.
+   *
+   * GERÇEK DELİK İKİ TANE ve ikisi de ölçüldü (2026-09-07):
+   *   (a) Eşik ÇOK GEVŞEK: taranan 234 migration'a karşı `> 10`. Kökü tek bir aya
+   *       daraltmak (`2026081*`) eşiği hâlâ sağlar ve kural sessizce 200+ dosyayı görmez.
+   *   (b) Glob'un ÜÇ ayağı var (`migrations`, `functions`, `src`) ama YALNIZ BİRİ ölçülüyordu.
+   *       `functions` ya da `src` ayağı düşse toplam sayı hâlâ büyük kalır ve kol GÖRMEZ —
+   *       oysa webhook sırrının yaşayacağı en olası yer tam o iki ayak.
+   */
+  it('EVREN MUHAFIZI: ÜÇ glob ayağının ÜÇÜ DE tarandı (biri sessizce düşmesin)', () => {
+    const say = (onek: string) => Object.keys(scannedSources).filter((p) => p.startsWith(onek)).length
+
     expect(
-      migrationCount,
-      'Hiç migration taranmadı — glob yolu değiştiyse bu kural sessizce denetlenmez hâle gelir.',
+      say('/supabase/migrations/'),
+      'Migration ayağı dar/boş (ölçülen 2026-09-07: 234). Eski eşik `> 10` idi ve kökü tek ' +
+        'aya daraltmak onu geçiyordu; kural 200+ dosyayı sessizce görmez hâle gelirdi.',
+    ).toBeGreaterThan(150)
+
+    expect(
+      say('/supabase/functions/'),
+      'EDGE ayağı taranmadı — webhook sırrının yaşayacağı EN OLASI yer burası ve eski kol ' +
+        'bu ayağı hiç ölçmüyordu. Toplam sayı büyük kalsa bile kural burada kör olurdu.',
     ).toBeGreaterThan(10)
+
+    expect(
+      say('/src/'),
+      'Uygulama kaynağı taranmadı — `/src/**` ayağı düşmüş.',
+    ).toBeGreaterThan(100)
   })
 
   it('hiçbir migration/kaynak dosyası düz-metin webhook sırrı taşımıyor', () => {

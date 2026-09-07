@@ -1,0 +1,18 @@
+{
+  "_nicin": "REC-216 BILINEN BORC. Bu tabandaki 11 politika 2026-09-07'de OLCULDU ve ic ice sarilmis durumda. Onarim MIGRATION'dir ve Recep kapisindadir (kural 13). Kapi onlarin YUZUNDEN master'i kirmizi tutup butun filoyu kilitlemez; ama YENI hicbir ic ice sarma gecemez. Onarim inince bu satirlar diskteki gercekle ESLESMEZ ve kapi 'tabandan dus' diyerek KIRMIZI verir — yani taban CURUYEMEZ.",
+  "_olcum": "2026-09-07, canli DB, salt okuma. Rapor: REC-216 kayit yorumu (11 politika + hedef ifadeler + olcum sorgulari).",
+  "_kaldirma_kosulu": "Onarim migration'i indikten sonra bu dosya BOSALTILIR (girdiler: {}). Kapi zaten bos olmayan bir taban satirini gercekle esleyemezse kirmizi verir.",
+  "girdiler": {
+    "user_projects.Users can view their own projects": 153,
+    "user_projects.Users can insert their own projects": 153,
+    "user_projects.Users can update their own projects": 153,
+    "user_projects.Users can delete their own projects": 153,
+    "project_items.Users can view items in their projects": 153,
+    "project_items.Users can insert items in their projects": 153,
+    "project_items.Users can update items in their projects": 153,
+    "project_items.Users can delete items from their projects": 153,
+    "product_authorities.Product authorities are manageable by admins.": 144,
+    "brands.merged_brands_authenticated_select": 14,
+    "product_families.merged_product_families_authenticated_select": 14
+  }
+}
