@@ -73,7 +73,15 @@ export type CategoryMetadata = {
    * Migration uygulanmamışsa alan yoktur → kanonik slug'a düşülür.
    */
   slug?: { tr?: string; en?: string };
-  [key: string]: Json | AuthorityContent | undefined; 
+  /**
+   * REC-161: Kategori vitrin paragrafının dile göre metni. `metadata.slug` ile
+   * BİREBİR aynı kalıp — kanonik/legacy metin `hero_description`'da (tek dilli,
+   * Türkçe) kalır, dile-bağlı metin buraya yazılır.
+   * Çözücü: `getCategoryDescription(category, lang)` (src/utils/categoryHelpers.ts).
+   * Alan yoksa davranış eskisiyle AYNIdır → `hero_description` → `description`.
+   */
+  description_i18n?: { tr?: string; en?: string };
+  [key: string]: Json | AuthorityContent | undefined;
 }
 
 export type LocalizedCategoryMetadata = {

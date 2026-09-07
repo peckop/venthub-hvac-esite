@@ -81,7 +81,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 {getCategoryDisplayName(category, t)}
                             </h1>
                             <p className="text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed">
-                                {getCategoryDescription(category)}
+                                {getCategoryDescription(category, lang)}
                             </p>
 
                             {/* Quick Start Wizard Button (only for air curtains) */}
@@ -326,7 +326,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
                                 <div className="absolute bottom-4 left-4 right-4">
                                     <h3 className="text-2xl font-bold text-white mb-1">{getCategoryDisplayName(sub, t)}</h3>
-                                    <p className="text-gray-200 text-sm line-clamp-1">{sub.description}</p>
+                                    <p className="text-gray-200 text-sm line-clamp-1">{getCategoryDescription(sub, lang)}</p>
                                 </div>
                             </div>
 

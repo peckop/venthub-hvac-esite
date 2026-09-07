@@ -131,23 +131,64 @@ export const getCategoryMarketingTitle = (
 }
 
 /**
- * Extracts the primary descriptive text for a category.
- * It first checks the JSON `metadata` for a `hero_description`, falling back to the standard `description` field.
+ * Açıklama çözümü için gereken EN AZ alan kümesi. `DbCategory`, `DomainCategory` ve
+ * `metadata`'sı henüz tiplenmemiş ham Supabase satırları bunu karşılar.
+ */
+export type CategoryDescriptionSource = {
+    description?: string | null
+    metadata?: unknown
+}
+
+/**
+ * Kategori vitrin paragrafını AKTİF DİLE göre çözer.
  *
- * @param category - The database category object
- * @returns The resolved description string, or an empty string if none exists
+ * Çözüm sırası:
+ *   1. `metadata.description_i18n[lang]` — dile-bağlı metin (REC-161 ile eklendi)
+ *   2. `metadata.hero_description`      — legacy, TEK DİLLİ (Türkçe) hero metni
+ *   3. `category.description`           — düz kolon
+ *   4. `''`
+ *
+ * ⭐REC-161 NİÇİN (2026-09-06 ölçümü): bu fonksiyon dile HİÇ bakmıyordu. Kusur o gün
+ * GÖRÜNMÜYORDU çünkü canlıda `description` kolonu 37/37 satırda NULL ve `hero_description`
+ * yalnız 2 kategoride vardı; yani vitrin sözlük yedeğine düşüyordu. Kusur LATENT'ti:
+ * katalog şeridi 23 kategori paragrafını yazdığı an, tek-dilli alana yazılan Türkçe metin
+ * İngilizce vitrinde de Türkçe görünecekti.
+ *
+ * @param lang - Aktif dil. ⭐ZORUNLU (opsiyonel DEĞİL) — bilinçli karar:
+ *   aynı dosyadaki `getCategoryDisplayName`'in opsiyonel `t`'si 2026-09-01'de canlıda
+ *   tam bu kusuru üretti (çağıran atladı → sessizce Türkçe bastı, REC-103). Kardeş
+ *   çözücü `getLocalizedCategorySlug(category, lang)` de `lang`'ı zorunlu alır.
+ *   Zorunlu imza ile "çağıran unutur" riskini DERLEYİCİ kapatır (tsc strict = build
+ *   hatası); statik tarama kapısı (INV-KATEGORI-ACIKLAMA-1 · K3) ikinci, bağımsız koldur.
+ * @returns Dile göre çözülmüş açıklama, yoksa boş dize
  *
  * @example
- * getCategoryDescription(category) // returns "Endüstriyel mutfaklar için yüksek performanslı..."
+ * getCategoryDescription(cat, 'tr') // 'Endüstriyel mutfaklar için yüksek performanslı...'
+ * getCategoryDescription(cat, 'en') // 'High-performance solutions for industrial kitchens...'
  */
-export const getCategoryDescription = (category: DbCategory | null | undefined): string => {
+export const getCategoryDescription = (
+    category: DbCategory | DomainCategory | CategoryDescriptionSource | null | undefined,
+    lang: string
+): string => {
     if (!category) return ''
 
     const meta = category.metadata
-    if (meta?.hero_description) {
-        return meta.hero_description as string
+
+    if (meta && typeof meta === 'object') {
+        // 1. Dile-bağlı metin (metadata.slug ile birebir aynı kalıp)
+        const i18n = (meta as { description_i18n?: unknown }).description_i18n
+        if (i18n && typeof i18n === 'object') {
+            const key = lang === 'en' ? 'en' : 'tr'
+            const value = (i18n as Record<string, unknown>)[key]
+            if (typeof value === 'string' && value.length > 0) return value
+        }
+
+        // 2. Legacy tek-dilli hero metni (alan yoksa davranış eskisiyle AYNI)
+        const hero = (meta as { hero_description?: unknown }).hero_description
+        if (typeof hero === 'string' && hero.length > 0) return hero
     }
 
+    // 3. Düz kolon → 4. boş dize
     return category.description || ''
 }
 
