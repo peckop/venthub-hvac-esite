@@ -2,6 +2,7 @@
 
 > **Kapsam:** teklif kipi ↔ satış kipi geçişinin **tek anahtarla**, yedekli ve geri alınabilir yapılması;
 > anahtarın **tek kaynağı**, okuma arayüzü, tazeleme zinciri, prova ve açılış günü kontrol listesi.
+> **v1.1 — 2026-09-07 (§13-14): kapı dosyası yazıldı, ölçüt keskinleştirildi, sınırlar güncellendi.**
 > **Bekçi (ikinci PR'da yazılır, §9):** `src/__tests__/conformance/satis-kipi-*.test.ts` (INV-SATIS-KIPI-1…5)
 > + `scripts/db/checks/satis-kipi-canli.mjs` (canlıya bakan kollar).
 > **Betik:** `scripts/kip/satis-kipine-gec.mjs` (§6) · **Okuma:** `src/lib/kip/satisKipi.ts` (§3).
@@ -236,3 +237,90 @@ Sıra güvenli: B, C'siz çalışır (fail-closed); C, B'siz zararsız (fonksiyo
 - **v1.0 (2026-09-06, ALTYAPI, REC-168):** ilk sürüm — öncül düzeltmesi (§0), iki seçenek ölçümü ve hüküm (§2),
   arayüz sözleşmesi (§3), tazeleme zinciri + PDP bulgusu (§4), hide_price hükmü + K39 (§5), betik (§6),
   prova/K3 (§7), kontrol listesi (§8), kapılar (§9), PR sırası (§10).
+
+## 13. v1.1 EKLERİ — ikinci PR'da ölçülenler (2026-09-07)
+
+### 13.1 §3.6 istisnası, adıyla: `lang` anahtara GİRMEZ
+
+Kural 12 `unstable_cache` anahtarına `lang` **ve** `tenantId` yazılmasını ister. Burada `lang`
+**bilerek yok** ve gerekçesi şu: değer **dilden bağımsız bir boolean**dır. Kuralın `lang` şartı
+**dile bağlı içerik** içindir (kategori adı, açıklama, sözlük metni); `{acik, damga}` iki dilde
+aynıdır. `lang` eklemek önbelleği ikiye böler ve tazelemeyi iki kat yapar, tek kazancı yoktur.
+
+`tenantId` ise ANAHTARDA (OPS hükmü, URUN sorusu üzerine): kuralın özü kiracılar arası sızıntı.
+Faz 2 açıldığında global bir anahtar bir kiracının satış kipini ötekine servis ederdi. Bugün tek
+kiracı var (REC-88 PARK), yani ölçülebilir bir fark yok — ama anahtarın şekli **bugünün veri
+durumuna değil, kuralın gerekçesine** göre kurulur.
+
+### 13.2 §6 eki: KESİN SAYI ÖNCE (sessiz tavan)
+
+Betiğin okuma yardımcısı `hepsiniCek`, **önce** kesin sayıyı alır (`count: 'exact', head: true`),
+döngüyü ona bağlar, sonunda çekilen ≠ kesin ise **KIRMIZI verir ve rapor ÜRETMEZ**.
+
+Ölçülmüş gerekçe: PostgREST/supabase-js **1000 satırda sessizce keser**. İlk kuru koşum 334 ürün /
+41 fiyatsız dedi; sayfalama eklenince **348 / 27** çıktı — yani rapor yanlıştı ve hiçbir hata
+oluşmamıştı. `limit=2000` yazmak işe yaramaz.
+
+⚠**İkinci tuzak, ayrıca yazılı:** aynı `count` seçeneği supabase-js'te filtre zincirinin
+**sonunda** `.select()` ile istenirse **yutulur** ve sayı hiç gelmez — ilk düzeltmem bu yüzden
+"her zaman kırmızı" veriyordu, yani ayırt etmiyordu. Doğrusu seçeneği `.from().select(cols, o)`
+çağrısına vermek. Kural: *"istemcin seçeneği NEREDE kabul ediyor, ÖLÇ."*
+
+Döngü tavanı da şart: sabotaj taklidi sonsuz döngüyle belleği doldurdu.
+
+### 13.3 §9 eki: kapı dosyası ve ÖLÇÜT KESKİNLEŞTİRMESİ
+
+Kapılar `src/__tests__/conformance/satis-kipi-anahtari.test.ts` dosyasında, **8 kol** (evren
+muhafızı · 1 · 1b · 3 · 3b · 4 · 4b · 5). Ortam `@vitest-environment node` — kapı DOM'a dokunmaz.
+
+⭐**ÖLÇÜT İKİ KEZ KESKİNLEŞTİRİLDİ, ikisi de ölçümle:**
+
+1. İlk hâli **çıplak adı** (`NEXT_PUBLIC_ODEME_ACIK`) arıyordu → **9 dosya** düştü ve
+   **hiçbiri okuma değildi**: dört yorum/companion satırı, üç vitrin yüzeyinde "ödeme şu env ile
+   kapalı" diyen açıklama, iki sözlük yorumu. Ölçüt ihlali değil **kelimeyi** sayıyordu.
+2. `process.env.` öneki eklendi → hâlâ **4** düşüyordu, hepsi **prose** (kapının kendi sabotaj
+   açıklaması dahil).
+
+**KURAL:** *kod tarayan kapı YORUMLARI ÇIKARIR, sonra ölçer.* Aksi hâlde kapı **kendi
+gerekçesinin yazılmasını cezalandırır** ve ajan çareyi "yorumu sil"de arar — yani belge, kapıya
+kurban edilir. Aynı sınıfa 2026-09-07'de üç kez düşüldü (mekanizma kapısı, bu kapı, bir de test
+tip beyanı).
+
+### 13.4 §11 eki: ölçülen sınırlar (v1.0'daki satır güncellendi)
+
+- `tsc --noEmit`: **0 hata** (v1.0'da 2 satır `tsconfig` deprecation yazılıydı; onarımdan sonra
+  temiz ölçüldü).
+- ⚠**Yerel test ortamı kırılgan:** ana çalışma dizininin bağımlılık yerleşimi bozulmuştu
+  (paket depoda var, bağlantısı kopuk) ve **hiçbir test koşmuyordu**. Çıktı "hata" değil
+  **"no tests"** diyordu — yani *fail-open bir yüz*: "düşen 0" diye okunabilir. Onarım
+  `pnpm install --force` (düz `pnpm install` ENOENT ile düştü); sonra 124 test geçti.
+  **Ders kapıya yazıldı (REC-185):** `Test Files 0 / no tests` **KIRMIZI** sayılmalı.
+- Yerel Node ana sürümü (22) `package.json engines` (24) ile **ayrışık**. Kapıların ölçtüğü
+  çalışma zamanı ile yayına gideni farklıysa, ölçülen şey prod değildir. Envanter kalemi.
+
+### 13.5 §5 eki: env okuması KALDIRILDI, ama METİN borcu var
+
+`src/app/[lang]/checkout/page.tsx` artık `satisKipiOku()` çağırıyor; `process.env` okuması yok.
+**Davranış bugün değişmez:** migration inmeden RPC yoktur, okuma fail-closed KAPALI döner.
+
+⚠**Metin borcu (URUN'un claim'i, ALTYAPI dokunmaz):** üç vitrin yüzeyi hâlâ eski mekanizmayı
+anlatıyor — `ProductDetailPageView.tsx:769`, `TrustSignals.tsx:13`, `CartPage.tsx:58` "ödeme
+`NEXT_PUBLIC_ODEME_ACIK` ile KAPALI" diyor. PR-B indikten sonra bu cümle **yanlış** olur.
+Kod değil metin; OPS üzerinden URUN'a bildirildi.
+
+### 13.6 Atlama listesi: `scripts/kip/*`
+
+Betik Vercel derlemesini tetiklemez. Ölçüm (dosyanın kendi istediği pozitif kontrolle): derleme
+hattında `scripts/kip` referansı **0**, aynı arama `scripts/setup-hooks` için **buluyor**, `src/`
+(testler hariç) **0**. ⚠"Derlemeyi ilgilendirmez" **"test edilmez" demek değildir** — betiği
+INV-SATIS-KIPI-4/4b/5 gerçek koşumla sınar. Kapıya üç kol eklendi; sabotajla kanıtlı.
+
+**İsraf kesilir, kilit AÇILMAZ:** bu değişiklik tavan kotasını geri getirmez, yalnız gereksiz
+dağıtımı önler.
+
+## 14. Değişiklik kaydı (ek)
+
+- **v1.1 (2026-09-07, ALTYAPI, REC-168 / PR-B):** §13 eklendi — `lang` istisnası gerekçesiyle,
+  kesin-sayı-önce ve iki tuzağı, kapı dosyası + ölçüt keskinleştirmesi kuralı, ölçülen sınırların
+  güncellenmesi (tsc 0; yerel test ortamı arızası ve "no tests" fail-open yüzü), env okumasının
+  kaldırılması + metin borcu, atlama listesi kalemi.

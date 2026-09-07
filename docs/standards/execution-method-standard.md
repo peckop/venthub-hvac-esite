@@ -27,6 +27,7 @@
 | **maestro** (skill) | Çok dosyaya **aynı** yapısal değişikliği paralel dalgalarla uygulama + yargıç + merkezi kapı | Tek koşum, çok PR | YÜKSEK ama elle yapmaktan ucuz |
 | **agy-orchestrate** (skill) | Antigravity/Gemini filosuyla ucuz geniş tarama; Claude CodeGraph ile doğrular | Tek koşum | DÜŞÜK (Claude kotası yerine Gemini) |
 | **Tekil skill** (plan-challenger, diff-review, code-review, 20-eksen, prd-complexity, supabase-security…) | Paketlenmiş tek amaçlı prosedür | Tek koşum | DÜŞÜK-ORTA |
+| **Plan modu** (`EnterPlanMode`) | Kapsamı belirsiz işi ÖNCE ölçüp planlamak: paralel salt-okuma `Explore` ajanları + `AskUserQuestion` ile kapsam sorusu → plan | Tek koşum; plan Linear kaydına ve `docs/plans/`e kalır | DÜŞÜK-ORTA (ajanlar sonnet, yazma yok) |
 | **Elle** (oturumun kendisi) | Doğrudan okuma/düzenleme | — | En ucuz, en dar |
 
 ---
@@ -45,11 +46,28 @@
 | **Lansman öncesi / büyük katman değişti** | **venthub-20-eksen-denetimi** (karne) | Tek kusur avı | `docs/audits/` karne |
 | "Neyi silebiliriz, vizyona sadık mı" | **prd-complexity-audit** | Bug avı | `docs/audits/` |
 | RLS / politika / migration yazımı | **supabase-security** + plan-challenger | — | migration + INV |
-| Tek dosya, tek PR, net iş | **Elle** | Dosya sayısı 5'i geçince yukarıdakilerden birine | PR |
+| **Çok-eksenli envanter + KAPSAM KARARI gerektiren tasarım/plan işi** ("neresi eksik, ne kadarını bu turda yapacağız") | **PLAN MODU:** `EnterPlanMode` → paralel salt-okuma `Explore` ajanları (**`model: 'sonnet'`**) + canlı ölçüm → `AskUserQuestion` ile kapsam sorusu **Recep'e** → plan Linear kayıt gövdesine + `docs/plans/` dosyası | Kapsam belliyse (tek eksen, tek soru) → şerit içinde elle · yazma gerektiren adımlar plan modunda KOŞULMAZ | Linear kaydı + `docs/plans/` |
+| Tek dosya, tek PR, net iş | **Elle** | Dosya sayısı 5'i geçince yukarıdakilerden birine · **kapsam kararı gerekiyorsa PLAN MODU** (bu sınıf 2026-09-07'ye kadar yanlışlıkla "elle" sayılıyordu) | PR |
 
 **Seçim ilkesi:** önce *şekli* tanı (kaç dosya? salt-okuma mı yazım mı? yargı mı tarama mı? kaç gün?),
 sonra tabloya bak. Şüphede: **ölç** (dosya sayısını, hedef sayısını, süreyi) — cetvel tahminle değil
 ölçümle kullanılır.
+
+### 2.1 Plan modu satırı niçin eklendi (Recep kararı, 2026-09-07)
+
+Bu sınıf cetvelde YOKTU ve fiilen **"elle"** sayılıyordu; oysa plan modu aynı gün sahada kullanıldı
+ve ölçülebilir fark üretti: URUN-KATALOG'un REC-206 planında **üç paralel `Explore` ajanı yaklaşık
+20 dakikada yarım günlük envanteri çıkardı ve daha önce bilinmeyen 6 kusur buldu** (liste
+REC-206'nın pano notunda ve kayıt gövdesinde; buraya kopyalanmadı — kaynak orada, kopya bayatlar).
+
+Cetvelin kendi kuralı bu boşlukta çuvalladı: *"yöntemsiz emir eksik emirdir"* diyen belge,
+kullanılan bir yöntemi tarif etmiyordu. **Ders: cetvel yazıldığı gün doğruydu; kullanım değişince
+bayatladı ve bunu kimse ölçmüyordu.** Bir yöntem sahada ikinci kez kullanıldığında bu tabloya
+girer — girmezse "elle" kovasına düşer ve maliyeti hiç ölçülmez.
+
+⚠**Sınır:** plan modunda **yazma yapılmaz**; plan onaylandıktan sonra uygulama normal yöntemle
+koşar. Kapsam sorusu **Recep'e** gider ve *yapısal karar pakete gömülmez* — menü yeri, URL şeması,
+sayfa mimarisi gibi kalemler tek tek sorulur, toplu onaya eklenmez.
 
 ---
 
@@ -123,6 +141,58 @@ onu saymak kapıyı yalancı kırmızıya boğar.
   çıkarılınca v1.1.
 - Workflow'un opt-in kilidi araç düzeyindedir; cetvel onu kaldıramaz, yalnız emirde cümleyi
   hatırlatır.
+
+---
+
+## 6. ÖLÇÜLMÜŞ VAKALAR (2026-09-06) — ve üçün **ikisi zaten yazılıydı**
+
+⭐Bu bölüm "üç ders yazılsın" diye açıldı; ölçünce ikisinin **bu cetvelde hâlihazırda yazılı**
+olduğu görüldü (§4 alt-ajan maddesi · §2'nin `plan-challenger` satırı). Eksik olan **kural
+değil, uygulamaydı** — *cetveli yazmak, cetveli kullanmak değildir.* Bu yüzden aşağıda **bir**
+yeni kural var; diğer ikisine **kanıt** eklendi. Aynı satırı ikinci kez yazmak cetveli
+şişirir ve okunmaz kılar.
+
+### 6.1 YENİ KURAL — **İSİM LİSTESİ ÖLÇÜM DEĞİLDİR**
+
+> Bir listedeki **adlar** doğru gözlem olabilir; **o adların neden listede olduğu** ölçülmemiş
+> varsayımdır. İş emri açılmadan önce listenin **evreni** ölçülür: her ad, iddia edilen
+> mekanizmaya gerçekten maruz mu?
+
+Aynı gün **dört** vaka çıktı:
+
+| şerit | liste ne diyordu | ölçüm ne dedi |
+|---|---|---|
+| ALTYAPI | "paralelde yarışan **4 kararsız kapı**" | **2 dosya** — INV-DOC-7 ayrı dosya değil (aynı dosyada `describe`), `bash-write-audit-merge-muafiyeti` izole (`mkdtempSync`) → **yarışamaz** |
+| URUN | "**24** alt kategoride doğrudan ürün yok" | yalnız `category_id` ölçülmüş; `subcategory_id` ile **17'sinde ürün var** (365 ürün) |
+| URUN-KATALOG | aile sayımı **31** | **40** (ölçüt: kimlik cümlesi başlığı) |
+| OPS | "yeniden yüklendi" (iki kez) | `design_push` mutlak yol çöpü — alıcının okuduğu yerden ölçülmemişti |
+
+Ortak ad: ⭐**ölçüt keskin, evren yanlış.** Bedeli ucuz değil — yanlış evren **iş emri doğurur**.
+
+⭐**BEŞİNCİ VAKA, aynı gün, ve kurbanı BU CETVELİN yazıldığı işin ardından açılan emir oldu:**
+REC-162 *"`vercel.json` `ignoreCommand` ile belge-only atlama kur"* diyordu. Ölçüm: (a) atlama
+**zaten var ve çalışıyor** (`scripts/vercel-ignore-build.sh`; bir belge-only PR *"Canceled by
+Ignored Build Step"* ile geçti), (b) depoda **`vercel.json` diye bir dosya yok** — ayar panelde.
+Yani emir hem var olanı yeniden yazdırıyor hem de **olmayan bir dosyayı** işaret ediyordu.
+İş *"mevcudun kapsamı"* olarak yeniden tanımlandı. Kardeş vaka: aynı gün *"24 saat bekle"*
+kuralı da ölçüme değil **hata mesajını okumaya** dayanıyordu — **mesajı okumak ölçüm değildir.**
+
+### 6.2 §4'ün alt-ajan maddesi ÖDEDİ — çift yönlü (kanıt)
+
+Altı alt-ajan koştu. Örnekleme **iki yönde** kazandırdı: bir ajan **benim** plan premisimi deldi
+(yukarıdaki 4→2 vakası ondan çıktı); başka bir ajan **yanıldı** (*"PDF üretim kütüphanesi yok"* —
+`jspdf` duruyordu). İkisi de aynı kuralın karşılığı: **ajan hızlı ölçer, yargı şeritte kalır.**
+
+### 6.3 §2'nin `plan-challenger` satırı ÖDEDİ (kanıt)
+
+REC-158 planı red-team'den geçti ve **düştü**: *"tek biçim kaynağı `productHelpers.ts`"* denmişti,
+etiketin gerçek kaynağı `specLabel.ts`'ti. Plan o hâliyle uygulansaydı iş **"yeşil" biter,
+parite yine sağlanmazdı** — kapı bile fark etmezdi, çünkü kapı da aynı yanlış kaynağa bakardı.
+
+⚠**Sapma notu:** emir "üç satır" diyordu; ikisi zaten yazılı olduğu için **bir kural + iki kanıt**
+yazıldı. Sebep burada, kararı veren ALTYAPI (§3.2: yazılmamış sapma hatadır, yazılmış sapma değil).
+
+---
 
 İlgili: `collaboration-protocol.md` §2.1 · `measurement-discipline-standard.md` ·
 `session-loop-ritual.md` · CLAUDE.md kural 1 (No-Plan-No-Code: plan hangi cetvelle yönetildiğini söyler —

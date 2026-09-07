@@ -255,6 +255,16 @@ is_build_irrelevant() {
     # gecen TEK referans yok; pozitif kontrol olarak ayni arama "scripts/setup-hooks"
     # icin referans BULUYOR, yani arama gercekten ariyor. Sondaki '/' kasitli.
     scripts/hijyen/*) return 0 ;;
+    # scripts/kip/** — satis kipi gecis betigi (REC-168). Uygulama kodu DEGIL: elle
+    # kosulan bir operasyon araci, hicbir yerden import EDILMIYOR.
+    # OLCUM (2026-09-07, bu dosyanin kendi istedigi pozitif kontrolle):
+    #   `grep -rn "scripts/kip" package.json next.config.mjs .github/workflows/` -> BOS
+    #   ayni arama "scripts/setup-hooks" icin -> package.json:10 BULUYOR (arama calisiyor)
+    #   `grep -rn "scripts/kip" src/` (testler haric) -> BOS (uygulama cagirmiyor)
+    # ⚠"Derlemeyi ilgilendirmez" DEMEK "test edilmez" DEMEK DEGILDIR: INV-SATIS-KIPI-4/4b/5
+    # bu betigi dinamik import ve gercek kosumla sinar, o kapilar CI'da kosar. Atlanan sey
+    # yalniz VERCEL DERLEMESI. Sondaki '/' kasitli (scripts/kipfake.ts sessizce atlanmasin).
+    scripts/kip/*)   return 0 ;;
     .githooks/*)     return 0 ;;
     *)               return 1 ;;
   esac

@@ -11,13 +11,26 @@ import { CartProvider } from '../../contexts/CartProvider'
 import { CategoryProvider } from '../../contexts/CategoryContext'
 import { ProjectProvider } from '../../contexts/ProjectProvider'
 import { I18nProvider } from '../../i18n/I18nProvider'
+import { yoldanDilCoz } from '../../i18n/yoldanDil'
 import CookieConsent from './CookieConsent'
 import MainLayout from './MainLayout'
 
+/**
+ * REC-210: Site ÇATISI (Header + Footer) bu sağlayıcının altında yaşıyor ve buraya
+ * `lang` HİÇ verilmiyordu → `I18nProvider` sessizce `'tr'`ye düşüyor, `/en/…` sayfasında
+ * menü ve altbilgi Türkçe basılıyordu (canlı ölçüm: 26 tekil Türkçe kelime / 32 geçiş).
+ * Dil artık yoldan çözülür; varsayılan `yoldanDil.ts`'te tek yerde ve adıyla durur.
+ *
+ * `usePathname` bilinçli seçim: bu dosya zaten `'use client'` ve kök yerleşim `params`
+ * almıyor. `useSearchParams` DEĞİL — o Suspense sınırı ister (CLAUDE.md kural 5).
+ */
 export function Providers({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname()
+    const dil = yoldanDilCoz(pathname)
+
     return (
         <SupabaseProvider>
-            <I18nProvider>
+            <I18nProvider lang={dil}>
                 <AuthProvider>
                     <CategoryProvider>
                         <CartProvider>
