@@ -239,6 +239,26 @@ function teslimatKaniti({ damga, gordum, kendiSid, simdiMs, esikSn = TESLIM_TAZE
         gecenSn: null,
       }
     }
+    /**
+     * ⛔KİMLİK TAKLİDİ (REC-192, ölçüm 2026-09-07): eşitlik kontrolü YETMİYOR.
+     * Prob kanalındaki 185 kaydın 185'i de `00000000-0000-4000-8000-<hedefin son 12 hanesi>`
+     * biçimli SENTETİK bir sid'den atılmıştı; gerçek bir akran oturumundan atılan prob SIFIR.
+     * Böyle bir sid `atanSid !== kendiSid` şartını GEÇER ama bağımsız değildir — hedefin kendi
+     * kanalıdır, yalnız kimlik değiştirmiştir. Yani korumaya çalıştığımız şeyin kendisi: vekil kanıt.
+     * ÖLÇÜT: sid'in son 12 hanesi (uuid'in düğüm kısmı) hedefinkiyle aynıysa bağımsız SAYILMAZ.
+     * Bu, adı değil GERÇEĞİ ölçer — sentetik üretici hangi ön eki kullanırsa kullansın kuyruk aynı kalır.
+     */
+    const kuyrukAtan = String(eslesen.atanSid).slice(-12)
+    const kuyrukKendi = String(kendiSid).slice(-12)
+    if (kuyrukAtan && kuyrukAtan === kuyrukKendi) {
+      return {
+        sinif: 'KIRMIZI',
+        sebep: 'KIMLIK TAKLIDI: jetonu atan sid (' + String(eslesen.atanSid).slice(0, 8)
+          + ') senin sid inin son 12 hanesini PAYLASIYOR — sentetik kimlik takmis oz-prob, '
+          + 'bagimsiz tanik DEGIL. Gercek bir akran oturumu atsin.',
+        gecenSn: null,
+      }
+    }
     if (eslesen.tuketildi) {
       return {
         sinif: 'KIRMIZI',
@@ -316,8 +336,25 @@ async function prob() {
    * Bu bayrak olmadan teslimat kanıtı ancak ZAYIF olabilir — çünkü jetonu üreten ile
    * geri yazan aynı kişi olur. Tanık, tanıklık ettiği kişi olamaz.
    */
-  const hedefSid = arg('--to') || null
-  if (hedefSid && !UUID.test(hedefSid)) oldur('--to tam uuid olmali, alinan: ' + hedefSid)
+  /**
+   * ⭐KISALTMA ÇÖZÜLÜR — `note --to` ile AYNI fonksiyondan (REC-192, 2026-09-07).
+   * Ölçülmüş vaka: `prob --to` tam uuid dayatırken `note --to` kısaltmayı çözüyordu; panoda
+   * yalnız 8 haneli kısaltma göründüğü için İKİ ŞERİT (URUN ve URUN-KATALOG) aynı gün bana
+   * bağımsız prob ATAMADI ve "tam sid'ini yaz" diye not bıraktı. Yani araç, kendi kanıt
+   * mekanizmasını kullanılmaz kılıyordu. Aynı alanda iki fiil farklı davranırsa, kullanıcı
+   * ikisini de yanlış hatırlar. Belirsiz kısaltma yine ÖLDÜRÜR: yanlış oturuma jeton atmak,
+   * kanıtı yanlış yere yazar ve iki tarafı da kör bırakır.
+   */
+  const hamHedef = arg('--to') || null
+  let hedefSid = null
+  if (hamHedef) {
+    const { resolveNoteTarget } = require('./board.cjs')
+    const c = resolveNoteTarget(hamHedef)
+    if (!c.ok) oldur('--to cozulemedi: ' + c.reason + (c.valid && c.valid.length ? '\n  adaylar: ' + c.valid.join(', ') : ''))
+    if (!c.to) oldur('--to yayin (broadcast) olamaz: prob TEK bir hedefe atilir.')
+    hedefSid = c.to
+    if (hedefSid !== hamHedef) yaz('[prob] --to cozuldu: ' + hamHedef + ' -> ' + c.how)
+  }
   if (hedefSid === sid) oldur('--to KENDINE verilemez: bagimsiz tanik olmaz.')
   // Gözcüsü ölçülecek olan HEDEFtir; kendi imlecim onun kanalını kanıtlamaz.
   const olculen = hedefSid || sid

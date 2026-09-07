@@ -303,6 +303,59 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     expect(k.sebep).toMatch(/bagimsiz tanik yok|ATAN da SEN/)
   })
 
+  /**
+   * ⛔KİMLİK TAKLİDİ (REC-192 · ölçüm 2026-09-07): eşitlik kontrolü YETMEZ.
+   * `events.mekanizma-probu.jsonl` içindeki 185 kaydın 185'i de
+   * `00000000-0000-4000-8000-<hedefin son 12 hanesi>` biçimli sentetik bir sid'den atılmıştı;
+   * gerçek bir akran oturumundan atılan prob SIFIR. Böyle bir sid `atanSid !== kendiSid`
+   * şartını GEÇER ve "bağımsız tanık" görünür — oysa hedefin kendi kanalıdır.
+   * Bu kol, kanıt tanımının kandırılabilir olmadığını ölçer (OPS hükmü, 2026-09-07).
+   */
+  it('SENTETİK KİMLİK bağımsız sayılmaz: aynı uuid kuyruğu → KIRMIZI', () => {
+    const sentetik = '00000000-0000-4000-8000-' + BEN.slice(-12)
+    expect(sentetik, 'fikstür yanlış: sentetik sid gerçek sid ile aynı olmamalı').not.toBe(BEN)
+    const k = mech.teslimatKaniti({
+      damga: bagimsizDamga({ atanSid: sentetik }), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
+    })
+    expect(
+      k.sinif,
+      'sentetik kimlikli öz-prob YEŞİL sayıldı — bağımsızlık şartı taklit edilebiliyor demektir (vekil kanıt)',
+    ).toBe('KIRMIZI')
+    expect(k.sebep, 'sebep "kimlik taklidi" demiyor; okuyan niçin düştüğünü anlamaz').toMatch(/KIMLIK TAKLIDI/)
+  })
+
+  it('GERÇEK akran hâlâ YEŞİL (kol gerçek bağımsız tanığı vurmuyor)', () => {
+    expect(OPS.slice(-12)).not.toBe(BEN.slice(-12))
+    const k = mech.teslimatKaniti({
+      damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
+    })
+    expect(k.sinif, 'yeni kol gerçek bağımsız tanığı da düşürdü — kapı fazla geniş').toBe('YESIL')
+  })
+
+  /**
+   * ⭐ÖLÇÜT EŞİTLİK, BENZERLİK DEĞİL — ve bu kol onu AYIRT EDER.
+   * Yukarıdaki "gerçek akran yeşil" kolu genişlemeyi yakalamıyordu: ölçütü 12 haneden 2 haneye
+   * indirdim (sabotaj) ve test yine geçti, çünkü OPS'un sid'i benimkiyle son 2 hanede de
+   * uyuşmuyordu. Yani o kol "kapı fazla geniş değil" demiyor, yalnız o fikstürü sabitliyordu —
+   * ayırt etmeyen bir kol ölçüm değildir (bugünün tekrar eden dersi, kendi kapımda yakaladım).
+   * Bu kol, son 11 haneyi PAYLAŞAN ama 12'nci hanede AYRIŞAN gerçek bir oturum kullanır:
+   * ölçüt eşitlikse YEŞİL kalır, ölçüt "benzerlik"e kaydırılırsa KIRMIZI olur ve sabotaj görünür.
+   */
+  it('SON 11 HANE aynı, 12. hane FARKLI olan akran → YEŞİL (ölçüt eşitlik olduğu için)', () => {
+    const kuyruk = BEN.slice(-12)
+    const farkli = (kuyruk[0] === 'a' ? 'b' : 'a') + kuyruk.slice(1)
+    const akran = '7f3c9d21-1111-4111-8111-' + farkli
+    expect(akran.slice(-12), 'fikstür yanlış: kuyruk aynı çıktı, kol taklit vakasını ölçer').not.toBe(kuyruk)
+    expect(akran.slice(-11), 'fikstür yanlış: son 11 hane aynı olmalı ki genişleme görünsün').toBe(BEN.slice(-11))
+    const k = mech.teslimatKaniti({
+      damga: bagimsizDamga({ atanSid: akran }), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
+    })
+    expect(
+      k.sinif,
+      'ölçüt eşitlikten benzerliğe kaymış — bu hâlde sid kuyruğu tesadüfen yakın olan GERÇEK akranlar da reddedilir',
+    ).toBe('YESIL')
+  })
+
   it('⭐BAYAT jeton kanıt değildir: eşiği aşan geri yazım KIRMIZI', () => {
     const taze = mech.teslimatKaniti({
       damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 179_000,
