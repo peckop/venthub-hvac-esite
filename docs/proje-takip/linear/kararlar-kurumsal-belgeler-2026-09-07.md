@@ -1,6 +1,6 @@
 # Kararlar — Kurumsal Belgeler (Linear belgesinin TAM dışa aktarımı · 2026-09-07 ayna: K1–K17-b)
 
-<!-- kaynak_id: 9e95d258-98a2-4c51-9a2d-40576c87a7bf · kaynak_updatedAt: 2026-09-06T13:21:35.837Z · kopya: 2026-09-07T06:52Z -->
+<!-- kaynak_id: 9e95d258-98a2-4c51-9a2d-40576c87a7bf · kaynak_updatedAt: 2026-09-06T13:21:35.837Z · kopya: 2026-09-07T08:42Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.

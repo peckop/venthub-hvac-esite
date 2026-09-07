@@ -1,6 +1,6 @@
-# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-07 ayna: K1–K8)
+# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-07 ayna: K1–K12)
 
-<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-06T20:01:10.763Z · kopya: 2026-09-07T06:52Z -->
+<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-07T07:16:38.283Z · kopya: 2026-09-07T08:42Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -65,3 +65,19 @@ REC-146 Adım 1/1b/2a raporları sunuldu, Recep yedi maddelik sorun listesine ka
 * **Biçim:** tek kaynak yapılandırılmış tablo (CSV; satır = ürün · alan · değer · birim · kaynak dosya · sayfa · birebir alıntı). Okunabilir föy (MD) **bu tablodan üretilir**, elle yazılmaz (üretilmiş artefakt kuralı). Veritabanına (Supabase ya da ileride başka bir DB) yükleme yalnız tablodan yapılır.
 * **Güncelleme:** üretici yeni katalog çıkarınca yeni sürüm indirilir, sha256 ile eskisiyle karşılaştırılır, yalnız değişen sayfalar yeniden çıkarılır, fark staging'e düşer, Katalog kapısı + Recep onayıyla föy ve DB güncellenir. Excel fiyat listesi akışıyla aynı mantık.
 * İlk uygulama: REC-172 faz 2 staging'i (8 aile, 764 satır) Katalog kabulünden sonra Nicotra/Danfoss/SEAT aile föylerine dönüşür. Cetvel: `catalog-ingestion-standard` §2 + faz 2'nin yazdığı web kaynağı cetvel eki taslağı (Katalog yazar).
+
+## K9 · Kayışlı fanlarda "takılabilecek en büyük motor gücü" AYRI ALAN (2026-09-07 07:35Z, Recep KARARI; REC-172 faz 3 soru 1)
+
+Kayış-kasnaklı ailelerde (Nicotra DD vb.) üreticinin verdiği motor gücü üst sınırı, takılı motor gücüyle karıştırılmaz; `technical_specs`'te ayrı alan (öneri: `max_motor_power_kw`) ve teknik tabloda ayrı satır ("En fazla motor gücü"). Açıklama cümlesine gömülmez. Gerekçe: tesisatçı "kaç kW'a kadar" diye arar; karşılaştırma tablosunda görünmeli.
+
+## K10 · Nicotra toplam basınç AYRI ALAN, statik'e çevrilmez (2026-09-07 07:35Z, Recep KARARI; REC-172 faz 3 soru 2)
+
+Katalog "toplam basınç" verdiğinde değer ayrı alana yazılır (öneri: `total_pressure_pa`); statik basınç sütununa dönüştürülerek YAZILMAZ (dönüşüm hız/çıkış alanına bağlı, kaynaklarda her zaman yok; yanlış hesap = müşteriye yanlış rakam). Vitrin iki alanı ayrı etiketle gösterir.
+
+## K11 · ATEX: teknik tabloda KOD + açıklamada CÜMLE (2026-09-07 07:35Z, Recep KARARI; REC-172 faz 3 soru 3)
+
+Sertifika kodu (ör. `II 2G Ex h IIB T4`) `technical_specs`'te olduğu gibi (alan önerisi `atex_marking`) ve teknik tabloda satır olarak; ürün anlatımında "patlayıcı ortamlar için uygundur (ATEX)" cümlesi. İkisi birlikte; biri diğerinin yerine geçmez.
+
+## K12 · Yanlış ürün kodu ad+slug'da düzeltilir, eski slug 301 (2026-09-07 07:35Z, Recep KARARI; Katalog faz 2 incelemesi 6-A)
+
+DD ailesinde ad ve slug'da `6N090P` yazan ürün (`model_code` 11921) kaynak kodu `61090P` ile düzeltilir; eski slug yeni slug'a 301 yönlendirilir; kanonik/sitemap etkisi PR'da ölçülür. Şerit: URUN. Teknik özellik yüklemesi (faz 4) bunu BEKLEMEZ (satırlar sku ile bağlı). Genel kural: vitrindeki kod kaynak koduyla çelişirse düzeltme ad+slug+301'dir, yalnız tabloya doğru kod eklemek yeterli değildir (vaat bütünlüğü).

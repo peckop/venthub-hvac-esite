@@ -130,18 +130,26 @@ ikisi de "beyan ile depo hâli ayrışıyor" sınıfı, tam olarak yakalaması i
 1. **Yalnız manifest.** Deftere giren her dosya `docs/proje-takip/manifest.json`'daki bir demetten gelir; elle yükleme yok.
    Üretilmiş `.md` (`*_master.md`, `system_tree.md`, `CONTEXT.md`, `design_system_config.md`, `*.config.md`, companion/sidecar,
    `registry/**`, `.archive/**`, `docs/archive/**`, `artifacts/**`, üçüncü taraf doküman kopyaları) `asla_dahil_etme`'dedir.
-   **İzinli üretilmiş istisnası:** `yol-haritasi-durum.md`, `hafiza-sinavi-sonuc.md`, `linear/is-dagilimi-*.md`, `linear/kararlar-*.md`
-   koddan değil JSON/Linear'dan üretilir ve damga taşır; sızma taramasında beyaz listedir.
+   **İzinli üretilmiş istisnası:** `yol-haritasi-durum.md`, `hafiza-sinavi-sonuc.md`, `gun-kapanisi-*.md`, `linear/is-dagilimi-*.md`,
+   `linear/kararlar-*.md` koddan değil JSON/Linear'dan üretilir ve damga taşır; sızma taramasında beyaz listedir.
+   `linear/venthub-yol-haritasi-ve-durum.md` (Linear AYNA belgesinin kopyası, YH-47 kanıtı) üretilmiştir ama deftere GİRMEZ —
+   aynı içerik `yol-haritasi-durum.md` ile demet 11'de zaten var (kural 2, tek kopya).
 2. **Tek kopya.** Aynı belgenin donmuş fotoğrafı ile canlı sürümü aynı deftere girmez (09-06: `design-15a/` 15 dosyanın 15'i
    `design/menu/` ile aynı adda farklı içerikti → demet 10 kaldırıldı; Design projelerindeki `kararlar-*` kopyaları demet 14'te hariç).
 3. **Eşitleme her gün kapanışta** (`proje_takip_sync.py esitle`; ölçüldü: 09-06'da 8 saat bayat kalan defter, düzeltilmiş skill
-   dosyasını hâlâ bozuk gösterdi). Kapsamdaki dosya master'a inince ya da Kararlar değişince aynı gün.
+   dosyasını hâlâ bozuk gösterdi). Kapsamdaki dosya master'a inince ya da Kararlar değişince aynı gün. **Eşitleme kapanışın kendi
+   çıktılarını da kapsar:** `gun_kapanisi.py` iki tur eşitler — 1. tur (adım 5) günün belgeleri, 2. tur (adım 12) kapanışın ürettiği
+   demet 11 dosyaları (yol-haritasi-durum, hafiza-sinavi-sonuc, gun-kapanisi); tek turlu koşumda defter her gün bir kapanış geride kalır
+   (09-06 ölçüldü). `--kuru` koşum eşitlemez ve ekranda "DEFTER BAYAT" yazar; açılış kapısı (`acilis_kapisi.py`) kuru kaydı saymaz.
 4. **Haftalık öz-denetim:** aynı soru deftere sorulur ("hangi kaynaklar çelişiyor/bayat, gürültü, eksik"); bulgular tarihli bölüm
    olarak hijyen dosyasına eklenir, kapanan satır silinmez "KAPANDI + PR" yazılır. Çelişkiden çıkan her düzeltme bir işe bağlanır (sahip şeridi).
 5. **Kapsam denetimi ayda bir** (`git ls-files "*.md"` × manifest glob semantiği = `glob.glob`, `*` `/` geçmez; `fnmatch` ile ölçüm yanlış
    "kapsandı" verir — 09-06 bulgusu): kapsanmayan elle yazılmış belge varsa demete girer, sızma varsa düşer. README kuralı: elle
    yazılmış karar/kurulum notu taşıyan README girer (demet 16), şablon/araç/üçüncü taraf README girmez.
 6. **Gürültü sınırı:** konuşma günlüğü demeti son 14 gün (eskisi arşiv defterine); pano demeti son 7 gün; ikisi de ev dizininde (repo PUBLIC).
+   **Mekanizma:** pencereyi `gun_kapanisi.py` uygular — adım 1 pano için `--gun 7` + tek kopya; adım 2 günlük kökündeki 14 günden eski
+   `YYYY-MM-DD.md` dosyalarını `<kök>/arsiv/` altına taşır (silmez; demet 12 yalnız kökteki `*.md`'yi görür, dolayısıyla defter 14 güne
+   iner). Arşiv defteri ayrı iş (Linear). `konusma_gunlugu.py`'nin kendisi pencere taşımaz (`uret --gun` yalnız o günü yazar).
 7. **Bayatlık ölçümü deftere sorulur:** "hangi kaynağın damgası en eski / hangi kaynak kendi içinde çelişiyor" — cevap `source list`
    damgalarıyla doğrulanır; kaynak damgası (`kaynak_updatedAt`, `kopya`) taşımayan dışa aktarım dosyası kabul edilmez.
 8. **Günlük notu kısaltma yazmaz (09-06 olayı):** OPS günlüğünde "model yönlendirme (sabah cetvel)" yazınca defter bunu

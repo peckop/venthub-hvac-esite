@@ -809,6 +809,12 @@
           "yol": "docs/proje-takip/linear/venthub-yol-haritasi-ve-durum.md",
           "desen": "AYNA",
           "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "scripts/nlm/acilis_kapisi.py",
+          "desen": "gun_kapanisi",
+          "beklenen": "var"
         }
       ]
     }

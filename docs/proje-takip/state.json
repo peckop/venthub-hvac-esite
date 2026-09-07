@@ -28,5 +28,100 @@
     "14-design-notlari-2": "b03cbb35fbacc04a6f7dd4b30e05f4984cdfdb93392d151d43f6a815fe79a93b",
     "15-linear-is-dagilimi": "c8c56bcb75dbc7667093b2f9bb389e7dda30e94218f0d3da5fe7fd9d8f4e0f08",
     "16-kurulum-ve-kapi-notlari": "e9678667841e257f961b0d03acfd4fa3611a52ffd48ba8866246ff0e49b35629"
+  },
+  "gun_kapanisi_kuru": {
+    "damga": "2026-09-06T14:30:00Z",
+    "kuru": true,
+    "adimlar": {
+      "01-Pano disa aktarimi (son 7 gun)": "YESIL",
+      "02-Konusma gunlugu (dun + bugun; §10.6 arsiv)": "YESIL",
+      "03-Linear is dagilimi": "YESIL",
+      "04-Linear Kararlar aynasi": "YESIL",
+      "05-Defter olc → esitle (1. tur)": "KIRMIZI",
+      "06-Defter budama (yetim/eksik/mukerrer kaynak)": "ATLANDI",
+      "07-Yol haritasi dogrula": "YESIL",
+      "08-Hafiza sinavi": "ATLANDI",
+      "09-Tek ekran (gun-kapanisi md)": "YESIL",
+      "10-state.json kaydi": "YESIL",
+      "11-Linear ayna (yol haritasi → Linear belge + depo aynasi)": "YESIL",
+      "12-Defter esitle (2. tur: demet 11)": "ATLANDI"
+    },
+    "seviye": {
+      "kosum": "KURU",
+      "kuru": true,
+      "linear_yuzde": 34,
+      "linear_toplam": 172,
+      "done": 57,
+      "acik": 75,
+      "in_progress": 42,
+      "todo": 33,
+      "backlog": 38,
+      "bayat_acik": 4,
+      "bloklu_acik": 1,
+      "recep_kapisi_acik": 1,
+      "etiketsiz_acik": 9,
+      "linear_bayat": false,
+      "asama": [
+        "Belge hattı 4/10",
+        "Kapı kör kolları 3/12",
+        "İkinci çıkarım turu — SEAT, Nicotra, AVenS 0/7",
+        "Faz 2 — Ana Sayfa, Menü ve Adresler 12/22"
+      ],
+      "yh_satir": 37,
+      "yh_yesil": 33,
+      "yh_kirmizi": 3,
+      "yh_kanitsiz": 1,
+      "yh_olculmemis_kanit": 6,
+      "yh_kirmizi_ids": [
+        "YH-41",
+        "YH-45",
+        "YH-46"
+      ],
+      "defter_kaynak": null,
+      "defter_beklenen": null,
+      "defter_degisen": 11,
+      "defter_esitlenen": 0,
+      "defter_esitle": "ATLANDI (auth)",
+      "defter_tur2": {
+        "degisen": [
+          "02-cetveller-standards-2",
+          "06-hafiza-notlari-1",
+          "06-hafiza-notlari-2",
+          "06-hafiza-notlari-3",
+          "07-hafiza-gunluk-ops",
+          "08-linear-kararlar",
+          "11-proje-takip-analizler",
+          "12-konusma-gunlugu-6",
+          "12-konusma-gunlugu-7",
+          "13-pano-olaylari",
+          "15-linear-is-dagilimi"
+        ],
+        "esitlenen": 0,
+        "durum": "ATLANDI (auth)"
+      },
+      "defter_bekleyen": 11,
+      "defter_eksik": null,
+      "defter_budanan": null,
+      "defter_auth": false,
+      "sinav_yesil": 20,
+      "sinav_kirmizi": 0,
+      "sinav_cevapsiz": 0,
+      "sinav_damga": "2026-09-06T11:28:15Z",
+      "sinav_kosuldu": false,
+      "linear_ayna": "KURU-BAYAT"
+    },
+    "sureler": {
+      "01": 0.4,
+      "02": 30.0,
+      "03": 1.2,
+      "04": 1.9,
+      "05": 3.9,
+      "07": 0.4,
+      "11": 1.1,
+      "12": 0.7
+    },
+    "sure_toplam": 39.6,
+    "ekran": "docs/proje-takip/gun-kapanisi-2026-09-06.md",
+    "sonraki_en_gec": "2026-09-07T14:30:00Z"
   }
 }
