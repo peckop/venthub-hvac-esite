@@ -80,3 +80,58 @@ diğerleri listeyi yayımlayan AVenS'e.
 2. QE-B 9 kaleminin fiyatı belirsiz (sayfa 21'de fiyatlar ayrı blokta, eşleme kesin değil) —
    fiyat zaten yazılmadığı için bu şimdilik bloke değil.
 3. `avensair-fiyat.csv` hâlâ Haziran tarihli — düzeltilmiş araçla yeniden üretilmeli.
+
+---
+
+## ⛔ İKİNCİ YARI — "canlıya yazıldı" ile "müşteri görebiliyor" ayrı iddialardır
+
+Yukarıdaki bölümde **"67 ürün canlıda"** yazdım. DB için doğruydu, **vitrin için değildi.**
+
+URUN şeridi üç bağımsız yüzeyde ölçtü: ürün sayfası **404** · sitemap'te **sıfır** · kategori
+sayfasında adı **hiç geçmiyor**. `catalog-integrity` kapısı aynı şeyi kendi cümlesiyle söyledi:
+
+> `[orphan]` Aile URL kanonik adrestir; **ailesiz ürünün kanonik bir vitrin adresi yoktur.**
+> `[product-no-subcategory]` `subcategory_id` boş olan ürün hiçbir yaprak kategori sayfasında
+> görünemez. Boş alan burada "eksik veri" değil, **görünmez ürün** demektir.
+
+Ben birinci iddiayı ölçüp ikincisini duyurdum. Bugün bu dersin dördüncü tekrarı — ve bu sefer
+67 kalemle.
+
+### Onarım
+
+**Yedi aile açıldı** (metinleri kaynak sayfalardan alındı, üretilmedi):
+
+| Aile | Ürün | Kategori |
+|---|---|---|
+| AVenS QE-B Kasa Serisi | 9 | Fanlar / Banyo ve Tuvalet Fanları |
+| AVenS Dikdörtgen Kanal Tipi Radyal Fanlar | 7 | Commercial Ventilation / Dikdörtgen Kanal Tipi |
+| Vortice VORTICENT CMS ATEX Santrifüj Fanlar | 11 | Fanlar / Ex-Proof (ATEX) |
+| SEAT ATEX PTC Sensörü | 1 | Fanlar / Ex-Proof (ATEX) |
+| AVenS NIMUS Santrifüj Fanlar | 15 | Fanlar / Santrifüj-Radyal |
+| AVenS NIMAX Santrifüj Fanlar | 15 | Fanlar / Santrifüj-Radyal |
+| AVenS ENKELFAN EC Motorlu Plug Fanlar | 9 | Fanlar / Santrifüj-Radyal |
+
+**İki kategori kusuru onarıldı** — ikisi de ilk yazımda benim hatamdı:
+
+1. `rectangular-duct-fans` yaprağı **`commercial-ventilation` altında**, `fans` altında değil.
+   Ağacı ölçmeden "fans" varsaymıştım; 7 ürünün üst kategorisi yanlıştı.
+2. `accessories` kökünün **hiç yaprağı yok**. Oraya yazdığım 10 ürün görünmez kalırdı.
+   **Yeni kategori açmadım** (yapısal karar, tek başına sorulur) — kaynak sayfanın işaret
+   ettiği mevcut yapraklara taşıdım:
+   - QE-B kasaları → Banyo ve Tuvalet Fanları (kaynak: DIN 18017-3, konut banyo havalandırma)
+   - PTC sensörü → Ex-Proof (ATEX) (kaynak sayfa 44 "SEAT ATEX SERİSİ")
+
+### Ölçüm — kapının kendi ölçütleriyle
+
+| | Önce | Sonra |
+|---|---|---|
+| `family_id` NULL | **67** | **0** |
+| `subcategory_id` NULL | 20 | **10** |
+| Aile sayısı | 40 | **47** |
+
+Kalan 10 yapraksız ürün **benim yazdıklarım değil** — hava perdeleri ve BVU-LS, önceden öyleydi
+ve üçü de `catalog-integrity-baseline.json`'da ilan edilmiş (`avens-bvu-ls`,
+`vortice-h-ad-elektrikli`, `vortice-hava-perdesi`). Kapı onları kırmızı saymaz.
+
+**Sonuç:** kapının blokeri (`orphan`) kalktı. Vitrin ölçümü (ürün sayfası 200 + sitemap) URUN
+şeridinde.

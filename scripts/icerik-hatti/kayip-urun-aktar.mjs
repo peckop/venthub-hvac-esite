@@ -25,7 +25,8 @@
  */
 import { readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const env = Object.fromEntries(
   readFileSync(process.env.VENTHUB_ENV || join(homedir(), 'venthub-hvac', '.env'), 'utf8')
@@ -36,8 +37,10 @@ const K = env.SUPABASE_SERVICE_ROLE_KEY
 if (!U || !K) { console.error('SUPABASE_URL / SERVICE_ROLE_KEY yok'); process.exit(1) }
 const H = { apikey: K, authorization: `Bearer ${K}`, 'content-type': 'application/json' }
 
-const RAPOR = process.env.T119_RAPOR || 'C:/Users/alize/venthub-hvac/docs/audits/t119-katalog-cikarim-dogrulama-2026-08-20.md'
-const DIZIN = process.env.KAYNAK_DIZINI || 'C:/Users/alize/venthub-pdf-ingestor/kaynak-dizini/sayfalar.jsonl'
+// Yollar KIMLIK TASIMAZ: depo koku ve ev dizini uzerinden turetilir (INV-MUTLAK-YOL-1).
+const DEPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const RAPOR = process.env.T119_RAPOR || join(DEPO, 'docs', 'audits', 't119-katalog-cikarim-dogrulama-2026-08-20.md')
+const DIZIN = process.env.KAYNAK_DIZINI || join(homedir(), 'venthub-pdf-ingestor', 'kaynak-dizini', 'sayfalar.jsonl')
 
 // Sayfa -> (kök kategori, alt kategori, marka, SKU öneki).
 // Kaynak sayfa BAŞLIKLARINA dayanır, tahmine değil:
