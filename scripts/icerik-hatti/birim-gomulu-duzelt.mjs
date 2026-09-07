@@ -56,8 +56,30 @@ for (const x of p) {
     if (!BIRIMLI.test(k) || typeof v !== 'string') continue
     const s = v.trim()
     if (/^-?\d+([.,]\d+)?$/.test(s)) continue // zaten sayı-metin: ayrı kusur, burada değil
-    // ARALIK: iki sayı arasında ayırıcı — çevirmeye ÇALIŞMA.
-    if (/\d\s*[-–—]\s*\d/.test(s)) { dokunulmaz.push({ x, k, v: s, sebep: 'ARALIK — tek sayıya çevrilemez, şema kararı gerekir' }); continue }
+    // ARALIK: iki sayı arasında ayırıcı. Artık DOKUNULMAZ değil — cetvel hükmü uygulanır.
+    //
+    // 2026-09-07: bu kol önce "şema kararı gerekir" deyip duruyordu. URUN şeridi ölçtü,
+    // karar ZATEN YAZILIYMIŞ — `product-schema-standard.md`, "Ön ek → anlam":
+    //   "Aralığı TEK ALANA sıkıştırmak yasak: min_/max_ çifti yazılır."
+    //   "min_… Aynı aralığın alt sınırı. Kaynak aralık veriyorsa ÇİFT OLARAK yazılır."
+    // Yani yeni karar üretilmedi; yazılı hüküm uygulandı.
+    //
+    // Üç ayrıntı bilerek: (1) ön ek, son ek değil (cetvelin örneği `min_delivery_m3h`)
+    // (2) birim son eki korunur (`_c`) (3) değer SAYI.
+    // ESKİ ALAN SİLİNİR: bırakılırsa aynı büyüklük iki yerde yaşar, biri bayatlar ve vitrin
+    // hangisini okuyorsa onu gösterir — bugün üç kez yaşadığımız sınıfın aynısı.
+    const aralik = s.match(/^(-?\d+(?:[.,]\d+)?)\s*[-–—]\s*(-?\d+(?:[.,]\d+)?)\s*[^\d]*$/)
+    if (aralik) {
+      const alt = Number(aralik[1].replace(',', '.'))
+      const ust = Number(aralik[2].replace(',', '.'))
+      if (!(alt < ust)) { dokunulmaz.push({ x, k, v: s, sebep: `ARALIK SINIRI TERS/EŞİT (${alt} ≥ ${ust}) — okunuş şüpheli, dokunulmadı` }); continue }
+      yeni[`min_${k}`] = alt
+      yeni[`max_${k}`] = ust
+      delete yeni[k]
+      degisti = true
+      continue
+    }
+    if (/\d\s*[-–—]\s*\d/.test(s)) { dokunulmaz.push({ x, k, v: s, sebep: 'ARALIK ama biçim çözülemedi — UYDURULMADI' }); continue }
     const m = s.match(/^(-?\d+(?:[.,]\d+)?)\s*[^\d]*$/)
     if (!m) { dokunulmaz.push({ x, k, v: s, sebep: 'ÇÖZÜLEMEDİ — beklenmeyen biçim' }); continue }
     yeni[k] = Number(m[1].replace(',', '.'))
@@ -91,10 +113,17 @@ const hucre = onarilacak.reduce((n, o) => n + Object.keys(o.yeni).filter(k => o.
 console.log(`ÜRÜN     : ${p.length} (kesin sayı ile doğrulandı)`)
 console.log(`ONARILIR : ${hucre} hücre / ${onarilacak.length} ürün`)
 console.log(`DOKUNULMAZ: ${dokunulmaz.length} hücre\n`)
-for (const { x, yeni } of onarilacak)
+// Rapor, aralık kolundan sonra ÜÇ hâli ayırmalı: değişen · YENİ eklenen (min_/max_) ·
+// SİLİNEN (aralığın eski tek alanı). Tek satırlık "eski -> yeni" bunu anlatamaz.
+for (const { x, yeni } of onarilacak) {
+  const eski = x.technical_specs || {}
   for (const k of Object.keys(yeni))
-    if (yeni[k] !== x.technical_specs[k])
-      console.log(`  ${x.sku.padEnd(16)} ${k.padEnd(24)} ${JSON.stringify(x.technical_specs[k]).padEnd(16)} -> ${yeni[k]}`)
+    if (yeni[k] !== eski[k])
+      console.log(`  ${x.sku.padEnd(16)} ${k.padEnd(30)} ${(k in eski ? JSON.stringify(eski[k]) : '(yok)').padEnd(16)} -> ${yeni[k]}`)
+  for (const k of Object.keys(eski))
+    if (!(k in yeni))
+      console.log(`  ${x.sku.padEnd(16)} ${k.padEnd(30)} ${JSON.stringify(eski[k]).padEnd(16)} -> SİLİNDİ (aralık min_/max_ çiftine ayrıldı)`)
+}
 if (dokunulmaz.length) {
   console.log(`\n⚠ DOKUNULMAYANLAR — bu betik BİLEREK durdu:`)
   for (const d of dokunulmaz) console.log(`  ${d.x.sku.padEnd(16)} ${d.k.padEnd(24)} = ${JSON.stringify(d.v).padEnd(12)} ${d.sebep}`)
