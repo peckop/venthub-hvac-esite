@@ -7,5 +7,6 @@
 - Tasarım arşivi yeri (REC-173 adım 2) · ana depo içinde design-arsivi/ (PUBLIC repo) mi, ayrı PRIVATE depo mu · YAPISAL, tek başına sorulur · OPS önerisi: ayrı PRIVATE depo · KANIT: Linear REC-173 · açıldı 2026-09-06
 - STORM 2 üründe güç çelişkisi · 2018 föyü 0,25 kW, 2026 üretici sitesi 0,18 kW; hangisi esas (ya da üreticiye sorulsun) · KANIT: docs/audits/rec172-faz2-sonuc-2026-09-06.md §3 · Kararlar: Katalog · açıldı 2026-09-06
 - Ölü doğrulanan 61 araç kaleminin silinmesi (REC-180 envanteri §1 listesi; karantina OPS yaptı, silme Recep kapısı) · KANIT: docs/audits/arac-envanteri-2026-09-07.md · Kararlar: Altyapı · açıldı 2026-09-07
+- ATEX değer türü (Katalog faz 4 hazırlığı 2026-09-07): K11 kodu varsayıyor; JET'in 7 satırı BÖLGE beyanı ('Zone II, Category 3G'), canlıdaki 14 Vortice ise ekipman GRUBU kodu ('II 2G/D h T3…'). Aynı alana konursa alan iki anlam taşır. Seçenekler: ayrı anahtar atex_zone (OPS önerisi) · yalnız açıklama cümlesi · KANIT: docs/audits/icerik-hatti-faz4-hazirlik-2026-09-07.md · Kararlar: Katalog (K11-a) · açıldı 2026-09-07
 
 <!-- Karar verilip silinenler (tarihçe Kararlar belgesinde): 2026-09-07 07:35Z REC-172 faz 3 üç isimlendirme kararı → Kararlar Katalog K9/K10/K11; 6N090P ad+slug → K12. -->
