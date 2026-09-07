@@ -17,6 +17,11 @@ import { homedir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+// ⭐KIMLIK KURALI TEK KAYNAKTA (REC-275, OPS hukmu: "iki yerde iki kural yasak").
+// sku/slug turetme ve slugifyTr burada DEGIL, ortak modulde yasar; icerik-hatti betikleri de
+// ayni modulu kullanir. Kopya tutulursa biri bayatladigi an "ayni urun, iki kimlik" dogar.
+import { kimlikTuret, slugifyTr } from '../icerik-hatti/kimlik-kurali.mjs'
+
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO = resolve(HERE, '../..')
 const APPLY = process.argv.includes('--apply')
@@ -45,7 +50,9 @@ const SUBCAT_SUFFIX = {
 // ---------- yardımcılar ----------
 function parseCsv(text, delim = ';') {
   if (text.charCodeAt(0) === 0xfeff) text = text.slice(1)
-  const rows = []; let row = []; let field = ''; let q = false
+  const rows = []
+// Kodsuz satirlar SESSIZ DUSMEZ: adiyla toplanir ve raporda gorunur.
+let row = []; let field = ''; let q = false
   for (let i = 0; i < text.length; i++) {
     const ch = text[i]
     if (q) {
@@ -63,12 +70,6 @@ function parseCsv(text, delim = ';') {
   if (field !== '' || row.length) { row.push(field); rows.push(row) }
   const header = rows.shift()
   return rows.map((r) => Object.fromEntries(header.map((h, i) => [h, (r[i] ?? '').trim()])))
-}
-
-function slugifyTr(s) {
-  const map = { ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u', Ç: 'c', Ğ: 'g', İ: 'i', I: 'i', Ö: 'o', Ş: 's', Ü: 'u' }
-  return s.replace(/[çğıöşüÇĞİIÖŞÜ]/g, (c) => map[c]).toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 }
 
 function parseYamlMap(text) {
@@ -137,11 +138,22 @@ const catBySlug = new Map(cats.map((c) => [c.slug, c]))
 
 // 2) CSV'leri oku ve satırları modele çevir
 const csvFiles = await findCsvs(CSV_ROOT)
+// Kodsuz satirlar SESSIZ DUSMEZ: adiyla toplanir, raporda ve konsolda gorunur.
+// (Modul kapsaminda olmali — ilk yazimda parseCsv'nin ICINE dusmustu ve rapor satiri
+//  calisma aninda ReferenceError verdi; `node --check` bunu YAKALAMAZ, kuru kosum yakaladi.)
+const kodsuzSatir = []
 const rows = []
 for (const f of csvFiles) {
   const base = basename(f, '.csv')
   for (const r of parseCsv(readFileSync(f, 'utf8'))) {
-    if (!r.model_code) { errors.push(`${base}: model_code boş satır`); continue }
+    // ⭐KODSUZ SATIR ARTIK DÜŞMEZ (REC-275). Kaynakta kodu OLMAYAN gerçek ürün var
+    // (ölçüldü: avensair s.26'da beş CA IL satırının kod hücresi boş). Eskiden satır tam
+    // burada atılıyordu ve bu, çıkarımı boşluğu UYDURMAYLA doldurmaya itiyordu —
+    // `16076..16080` ardışık kodları böyle doğdu. Zorunlu alan, kaçış valfi olmadan
+    // uydurma üretir. Kimlik artık kod yoksa ADDAN türer (kimlik-kurali.mjs).
+    // Ad da yoksa kimlik gerçekten üretilemez; satır o zaman düşer.
+    if (!r.model_code && !r.name) { errors.push(`${base}: model_code VE name bos — kimlik uretilemez`); continue }
+    if (!r.model_code) kodsuzSatir.push(`${base}: ${r.name}`)
     rows.push({ ...r, __csv: base, __dir: dirname(f) })
   }
 }
@@ -168,7 +180,10 @@ for (const r of rows) {
     if (sub.parent_id !== cat.id) { errors.push(`${r.__csv}/${r.model_code}: '${r.subcategory_slug}' kategorisi '${catSlug}' altında değil`); continue }
   }
 
-  const sku = `${prefix}-${r.model_code.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`
+  // Kimlik TEK KURALDAN gelir: kod varsa koddan, yoksa addan (kimlik-kurali.mjs).
+  const kimlik = kimlikTuret({ onek: prefix, ad: r.name, marka: brand, model_code: r.model_code })
+  if (!kimlik) { errors.push(`${r.__csv}/${r.name || '(adsiz)'}: kimlik uretilemedi`); continue }
+  const sku = kimlik.sku
   if (skuSeen.has(sku)) { errors.push(`${r.__csv}/${r.model_code}: SKU çakışması ${sku} (ilk: ${skuSeen.get(sku)})`); continue }
   skuSeen.set(sku, `${r.__csv}/${r.model_code}`)
 
@@ -209,15 +224,16 @@ for (const r of rows) {
   if (imgAbs && !existsSync(imgAbs)) warnings.push(`${sku}: görsel dosyası yok: ${r.image_url}`)
 
   products.push({
-    sku, model_code: r.model_code, name: r.name, brand,
+    sku, model_code: kimlik.model_code, name: r.name, brand,
     famSlug, category_id: cat.id, subcategory_id: sub?.id ?? null,
-    status: r.confidence === 'ok' ? 'active' : 'draft',
+    // kod yoksa kimlik guveni dusuktur -> draft (kimlik.confidence 'not-ok')
+    status: r.confidence === 'ok' && kimlik.confidence === 'ok' ? 'active' : 'draft',
     purchase_price: price ?? 0, purchase_currency: r.currency || 'EUR',
     description_i18n: { tr: r.description_tr || null, en: r.description_en || null },
     description: r.description_tr || null,           // geçiş: mevcut vitrin TR metni okur (F5'e dek)
     technical_specs: specs,
     weight_kg: num(r.spec_weight_kg),
-    slug: `${slugifyTr(r.name)}-${slugifyTr(r.model_code)}`.slice(0, 120),
+    slug: kimlik.slug,
     imageFile: imgAbs && existsSync(imgAbs) ? imgAbs : null,
     price: null, stock_qty: 0,
   })
@@ -239,9 +255,18 @@ const report = {
   with_purchase_price: products.filter((p) => p.purchase_price > 0).length,
   with_image: products.filter((p) => p.imageFile).length,
   families: [...families.values()].map((f) => ({ slug: f.slug, rows: f.rowCount, brand: f.brand })),
+  // Kodsuz satirlar: DUSMEDILER, kimlikleri addan turedi ve draft olarak girdiler.
+  // Sayiyi raporda tutuyoruz cunku "sessizce dusme" bu hattin en pahali kusuruydu.
+  kodsuz_satir: kodsuzSatir.length, kodsuz_ornek: kodsuzSatir.slice(0, 20),
   errors, warnings,
 }
 writeFileSync(join(OUT_DIR, `report-${APPLY ? 'apply' : 'dry'}.json`), JSON.stringify(report, null, 2))
+if (kodsuzSatir.length) {
+  console.log(`
+⚠KODSUZ SATIR: ${kodsuzSatir.length} — kaynakta model_code YOK, kimlik ADDAN turetildi, status=draft`)
+  for (const k of kodsuzSatir.slice(0, 20)) console.log(`   ${k}`)
+  if (kodsuzSatir.length > 20) console.log(`   ... +${kodsuzSatir.length - 20} satir (raporda tam liste)`)
+}
 console.log(`CSV: ${report.csv_files} dosya, ${report.rows_read} satır → plan: ${report.brands_planned} marka, ${report.families_planned} aile, ${report.products_planned} ürün (active=${report.by_status.active} draft=${report.by_status.draft}, fiyatlı=${report.with_purchase_price}, görselli=${report.with_image})`)
 if (errors.length) { console.error(`❌ ${errors.length} hata — rapor: out/report-*.json`); errors.slice(0, 10).forEach((e) => console.error('  -', e)) }
 if (warnings.length) console.warn(`⚠️ ${warnings.length} uyarı (rapora yazıldı)`)

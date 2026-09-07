@@ -277,6 +277,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/uydurma-kod-bosalt.mjs` | UYDURMA `model_code` BOŞALTICISI — REC-226 (kaynak kanıtına dayalı) | URUN-KATALOG | elle (kuru koşum varsayılan; `--yaz` + `CANLI_YAZIM_ONAYI`) | PR #1109 (üç yönlü sabotaj koşuldu) | kendi ön koşul kapısı içinde (üç yüzeyde `sku` yedeği varsa yazmaz) | KAYIP (onceki: KAL) |
 | `scripts/icerik-hatti/kimlik-kurali.mjs` | ÜRÜN KİMLİK KURALI — TEK KAYNAK (REC-226 / REC-272 / REC-275) | URUN-KATALOG | import edilir (kural tek kaynak; kademe2-load + icerik-hatti kullanir) | PR #1109 · 442 urunde cakisma 0 olculdu | cagiranin on kosul kapisi | KAL |
 | `scripts/icerik-hatti/uydurma-kimlik-tek-kural.mjs` | UYDURMA KİMLİĞİ TEK KURALA GETİRİR — REC-226 / REC-272 / REC-275 | URUN-KATALOG | elle (kuru kosum varsayilan; --yaz + CANLI_YAZIM_ONAYI) | PR #1109 · uc yonlu sabotaj | iki on kosul kapisi (sku yedegi + benzersizlik) | KAL |
+| `scripts/icerik-hatti/kimlik-kurali-kapisi.mjs` | KİMLİK KURALI KAPISI — INV-KIMLIK-TEK-KURAL-1 (REC-275) | URUN-KATALOG | elle / CI (ALTYAPI'dan baglanmasi istenecek) | PR #1109 · iki yonlu sabotaj: ardisik-sayi uydurma ve kodsuz-satir dusurme KIRMIZI verdirdi | INV-KIMLIK-TEK-KURAL-1 (kendisi kapi) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
