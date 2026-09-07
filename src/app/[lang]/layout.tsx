@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import React from 'react'
 
+import { EN_YAYIN } from '@/config/features'
 import { SITE_URL } from '@/config/siteUrl'
 
 import { en } from '../../i18n/dictionaries/en'
@@ -41,6 +42,23 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: dict.meta.siteTitle,
     description: dict.meta.siteDesc,
+    /**
+     * REC-204 — INGILIZCE VITRININ GECICI DIZIN-DISILIGI.
+     *
+     * `EN_YAYIN` kapaliyken `/en/...` agacinin TAMAMI `noindex, follow` basar. Sayfa
+     * ACILMAYA DEVAM EDER; degisen tek sey Google'a "bunu dizine ekleme" demesi.
+     * `follow` bilerek acik: sayfadaki baglantilar TR muadillerine gidiyor, onlarin
+     * kesfini kesmek istemiyoruz.
+     *
+     * NICIN BURADA: bu layout [lang] agacinin KOKU. Next metadata'yi segment agacinda
+     * birlestirir ve alt sayfalar `robots` YAZMADIGI icin burasi 47 sayfanin hepsini
+     * kapsar (yukaridaki OLCULMUS KAPSAM notuyla ayni mekanizma). Alt sayfalardan biri
+     * ileride kendi `robots`unu yazarsa BURAYI EZER — kapi (INV-EN-YAYIN-1) bunu olcer.
+     *
+     * TR tarafi DOKUNULMAZ: `undefined` birakildigimizda Next hicbir robots etiketi
+     * basmaz, yani varsayilan (indexlenebilir) davranis korunur.
+     */
+    robots: lang === 'en' && !EN_YAYIN ? { index: false, follow: true } : undefined,
     // hreflang TABANI — kendi `alternates`ini yazmayan HER alt sayfa bunu miras alır
     // (ör. /tr/products canlıda `tr-TR`/`en-US` basıyordu, REC-127'de ölçüldü).
     // Bu yüzden biçim burada da alt sayfalarla aynı olmalı: `tr` / `en` / `x-default`.
