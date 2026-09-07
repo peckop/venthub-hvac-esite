@@ -161,7 +161,7 @@ def main():
     else:
         L.append("YEŞİL — her şerit sınırın içinde.")
     metin = "\n".join(L) + "\n"
-    hedef = a.hedef or os.path.join(REPO, "docs", "proje-takip", "santiye.md")
+    hedef = a.hedef or os.path.join(REPO, "docs", "proje-takip", "is-dagilimi.md")
     os.makedirs(os.path.dirname(hedef), exist_ok=True)
     open(hedef, "w", encoding="utf-8", newline="\n").write(metin)
     print(metin)
