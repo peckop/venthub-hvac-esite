@@ -92,5 +92,8 @@ export const dashboard = {
     pendingShipments: 'Sevk Bekleyen Siparişler',
     lowStock: 'Kritik Stok Alarmları',
     unresolvedErrors: 'Çözülmemiş Hatalar',
+    /** Sayaç okunamadığında rozet metni — "0" göstermek yerine ölçülemediğini SÖYLER. */
+    olculemedi: 'ölçülemedi',
+    olculemediAciklama: 'Bu sayaç şu an okunamadı; sıfır olduğu anlamına GELMEZ.',
   },
 };

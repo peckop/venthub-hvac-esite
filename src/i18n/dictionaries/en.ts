@@ -1653,8 +1653,9 @@ export const en: typeof tr = {
     autoClose: 'This window will close automatically in 5 seconds'
   },
   checkout: {
-    // Shown when the payment path is CLOSED by the ENV flag
-    // (see app/[lang]/checkout/page.tsx — NEXT_PUBLIC_ODEME_ACIK).
+    // Shown when the payment path is CLOSED.
+    // The decision lives in one place: app/[lang]/checkout/page.tsx. The CARRIER of that
+    // decision is deliberately not named here, so this line does not go quietly stale.
     kapali: {
       // REC-148 A7 — OPS ruling, K1a: the sales mode is CLOSED, not absent.
       baslik: 'We are in quote mode; ordering and payment are closed.',

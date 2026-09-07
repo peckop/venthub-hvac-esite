@@ -92,5 +92,8 @@ export const dashboard = {
     pendingShipments: 'Pending Shipments',
     lowStock: 'Critical Stock Alarms',
     unresolvedErrors: 'Unresolved Errors',
+    /** Badge text when the counter could not be read — says so instead of showing "0". */
+    olculemedi: 'unavailable',
+    olculemediAciklama: 'This counter could not be read; it does NOT mean zero.',
   },
 };

@@ -102,10 +102,30 @@ function stubClient(tables: StubTables, calls: CapturedWrite[], gets?: URL[]): S
 
     if (method === 'GET') {
       gets?.push(url)
-      const rows = lookup[table] ?? []
-      return Promise.resolve(
-        new Response(JSON.stringify(rows), { status: 200, headers: { 'Content-Type': 'application/json' } }),
-      )
+      const tumu = lookup[table] ?? []
+
+      // ⛔SAHTE SUNUCU `Range` VE `Content-Range`i TAŞIMALI (INV-TAVAN-1, 2026-09-07).
+      //
+      // Eskiden bu dal, istenen aralığı YOK SAYIP tabloyu olduğu gibi döndürüyor ve
+      // `Content-Range` başlığını HİÇ basmıyordu. İkisi de gerçek PostgREST'ten sapma:
+      //  · `count: 'exact'` istendiğinde kesin toplam **Content-Range başlığında** gelir;
+      //    başlık yoksa supabase-js `count` alanını `null` bırakır.
+      //  · `range()` istendiğinde sunucu SADECE o dilimi döner.
+      // Sapmanın bedeli ölçüldü: sayfalı çekim kapısı eklendiğinde bu paket CI'da
+      // düştü — kod doğruydu, YALANCI OLAN STUB'DI. Bir stub gerçeği taklit etmiyorsa,
+      // üstünde koşan test neyi ölçtüğünü bilmiyor demektir.
+      const araligi = /(\d+)-(\d+)/.exec(init?.headers ? String(new Headers(init.headers).get('Range') ?? '') : '')
+      const bas = araligi ? Number(araligi[1]) : 0
+      const son = araligi ? Number(araligi[2]) : tumu.length - 1
+      const rows = araligi ? tumu.slice(bas, son + 1) : tumu
+
+      const basliklar: Record<string, string> = { 'Content-Type': 'application/json' }
+      const prefer = init?.headers ? String(new Headers(init.headers).get('Prefer') ?? '') : ''
+      if (prefer.includes('count=exact')) {
+        basliklar['Content-Range'] =
+          rows.length > 0 ? `${bas}-${bas + rows.length - 1}/${tumu.length}` : `*/${tumu.length}`
+      }
+      return Promise.resolve(new Response(JSON.stringify(rows), { status: 200, headers: basliklar }))
     }
 
     let body: unknown = null

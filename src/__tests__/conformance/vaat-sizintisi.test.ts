@@ -9,8 +9,8 @@
  *   · hava perdeleri iniş sayfasında "Taksit İmkanı — 12 aya varan taksit" ve
  *     "Güvenli Ödeme — SSL şifreli işlem" (tarayıcıda 6/6 rozet sayıldı)
  *   · /destek/sss "iyzico aracılığıyla ... güvenli ödeme yapabilirsiniz"
- * Dayanak ölçümü: 23 aktif kategorinin 23'ünde `hide_price=true`; çevrimiçi ödeme
- * `NEXT_PUBLIC_ODEME_ACIK` ile kapalı.
+ * Dayanak ölçümü: 23 aktif kategorinin 23'ünde `hide_price=true`; çevrimiçi ödeme KAPALI
+ * (kapalılığın taşıyıcısı burada yazılmıyor — karar tek yerde, `checkout/page.tsx`).
  *
  * NİÇİN HİÇBİR KAPI GÖRMEDİ: vaat tek dosyanın içinde YANLIŞ DEĞİL. "12 aya varan taksit"
  * geçerli bir dizedir; `tsc`, `lint`, i18n parite ve ölü-anahtar kapıları hepsi tek dosyaya
@@ -28,8 +28,9 @@
  *
  * KAPSAM SINIRI (gizlenmiyor): bu kapı KAYNAK metni ölçer. DB'den gelen içeriğe
  * (kategori hero_description, ürün açıklaması) yazılmış bir vaadi GÖRMEZ; o katmanın
- * kapısı katalog tarafındadır. Ayrıca `NEXT_PUBLIC_ODEME_ACIK` değerini test etmez —
- * kuralı test eder: ödeme vaadi yalnız ödeme akışının ağacında yazılır.
+ * kapısı katalog tarafındadır. Ayrıca ödemenin AÇIK/KAPALI değerini test etmez —
+ * kuralı test eder: ödeme vaadi yalnız ödeme akışının ağacında yazılır. (Değeri test
+ * etmemek bilinçli: kapı, bayrak hangi taşıyıcıda durursa dursun aynı kuralı ölçer.)
  *
  * KARDEŞ KAPI — KARIŞTIRILMASIN: `promise-backing-behavior.test.tsx` (INV-PROMISE-1) da
  * "vaat" der ama BAŞKA EKSENDİR: o, bir EYLEM vaadinin ("Talebiniz Alındı!") gerçekten
@@ -53,7 +54,7 @@ const KOK = join(process.cwd(), 'src')
 /**
  * VİTRİN AĞACI — müşteriye görünen, ödeme kapısının ARKASINDA OLMAYAN yüzeyler.
  * `views/checkout/**` ve `PaymentSuccessPage` KASITLI OLARAK DIŞARIDA: orası zaten
- * `NEXT_PUBLIC_ODEME_ACIK` kapısının arkasında çalışır ve orada ödeme vaadi DOĞRUDUR.
+ * ödeme kapısının ARKASINDA çalışır ve orada ödeme vaadi DOĞRUDUR.
  */
 const VITRIN_YOLLARI = [
   'app/_components/ProductDetailPageView.tsx',

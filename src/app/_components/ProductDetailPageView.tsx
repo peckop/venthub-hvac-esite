@@ -766,8 +766,10 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 basıyordu; hemen üstündeki tek CTA ise "TEKNİK TEKLİF İSTE" idi. Aynı ekranda
                 hem "satmıyoruz, teklif verelim" hem "bedava kargo + güvenli ödeme" yazıyordu.
                 Dayanağı da yoktu: 23 aktif kategorinin 23'ünde `hide_price=true` ve çevrimiçi
-                ödeme `NEXT_PUBLIC_ODEME_ACIK` ile KAPALI (canlı /checkout "Ödeme yakında
-                açılıyor" basıyor). Kargo ve ödeme rozetleri bu yüzden kaldırıldı.
+                ödeme KAPALI (canlı /checkout "Ödeme yakında açılıyor" basıyor). Kargo ve ödeme
+                rozetleri bu yüzden kaldırıldı. Kapalılığın TAŞIYICISI burada kasıtlı olarak
+                yazılmıyor: karar tek yerde (`checkout/page.tsx`) ve taşıyıcısı değişebilir —
+                mekanizma adını buraya yazmak, o gün bu cümleyi sessizce yanlış yapardı.
                 Cetvel: docs/standards/vaat-butunlugu-standard.md · kapı: INV-VAAT-SIZINTI-1.
 
                 Liste veri-güdümlü: rozet sayısı değiştiğinde ızgara sessizce bozulmasın diye

@@ -55,7 +55,8 @@ const CartPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/*
           REC-104: burada `<SecurityRibbon />` duruyordu (PCI DSS · 3D Secure · 256-bit SSL).
-          Çevrimiçi ödeme `NEXT_PUBLIC_ODEME_ACIK` ile KAPALI; sepetten ödemeye geçilemiyor,
+          Çevrimiçi ödeme KAPALI (açık/kapalı kararının tek kaynağı `checkout/page.tsx`;
+          taşıyıcısı değişebilir, bu cümlenin dayanağı değişmez); sepetten ödemeye geçilemiyor,
           dolayısıyla ödeme güvenliği rozeti burada karşılığı olmayan bir vaat. Bileşen
           SİLİNMEDİ — ödemenin gerçekten açık olduğu tek yerde, `CheckoutProgress` içinde
           duruyor ve orada doğrudur. Cetvel: docs/standards/vaat-butunlugu-standard.md
