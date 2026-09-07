@@ -11,6 +11,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { tumSatirlar } from '../icerik-hatti/_veri.mjs';  // 1000 satir tavani: sayfalama + kesin sayi karsilastirmasi (REC-178)
 
 const arg = (n) => { const i = process.argv.indexOf(`--${n}`); return i > -1 ? process.argv[i + 1] : null; };
 const outDir = arg('out'), imgFile = arg('img'), dbUrl = arg('url'), dbKey = arg('key');
@@ -18,9 +19,8 @@ const SOURCE = 'https://casals-fanware-prod-static.s3.eu-west-1.amazonaws.com/me
 if (!outDir || !imgFile || !dbUrl || !dbKey) { console.error('kullanım: --out --img --url --key'); process.exit(2); }
 if (!fs.existsSync(imgFile)) { console.error('kaynak jpg yok: ' + imgFile); process.exit(1); }
 
-const res = await fetch(`${dbUrl}/rest/v1/products?select=id,name,sku,tenant_id&brand=ilike.*avens*&deleted_at=is.null&name=like.KENTALFAN*`, {
-  headers: { apikey: dbKey, authorization: `Bearer ${dbKey}` } });
-const rows = await res.json();
+const rows = await tumSatirlar(dbUrl, { apikey: dbKey, authorization: `Bearer ${dbKey}` }, `products?select=id,name,sku,tenant_id&brand=ilike.*avens*&deleted_at=is.null&name=like.KENTALFAN*`);
+
 console.log(`db KENTALFAN: ${rows.length} sku`);
 if (rows.length !== 14) { console.error(`beklenen 14, gelen ${rows.length} — kapsami dogrula`); process.exit(1); }
 

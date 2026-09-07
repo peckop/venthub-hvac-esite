@@ -6,6 +6,7 @@ Fixes the issue where all products have brand='AVenS' but actual brand is in pro
 
 import os
 import re
+import sys
 from supabase import create_client, Client
 from dotenv import load_dotenv
 import logging
@@ -66,10 +67,35 @@ def main():
     logger.info("="*60)
     
     # Fetch all products
+    # ⭐1000 SATIR TAVANI (REC-178, olculdu 2026-09-06): PostgREST tek cagrida en cok 1000 satir
+    # doner ve FAZLASINI SESSIZCE DUSURUR. Bu betik urunlerin markasini GUNCELLIYOR; eksik
+    # okuma = bir kisim urun hic islenmez ve kimse fark etmez. Bu yuzden: once sunucunun KESIN
+    # sayisi, sonra sayfali cekim, sonunda karsilastirma; uyusmazsa CIKIS 1 (fail-closed).
     logger.info("\n1. Fetching all products...")
-    response = supabase.table('products').select('id,name,brand').execute()
-    products = response.data
-    logger.info(f"✓ Loaded {len(products)} products")
+    sayfa_boyu = int(os.environ.get('SAYFA_BOYU') or 1000)  # sinav icin kucultulebilir
+    sayim = supabase.table('products').select('id', count='exact').limit(1).execute()
+    kesin = sayim.count
+    if not isinstance(kesin, int) or kesin < 0:
+        logger.error(f"OLCUM GUVENILIR DEGIL: kesin sayi alinamadi (count={kesin!r}) — cikildi")
+        sys.exit(1)
+    products = []
+    tur, tur_tavani = 0, kesin // sayfa_boyu + 2
+    while True:
+        tur += 1
+        if tur > tur_tavani:
+            logger.error(f"DONGU TAVANI asildi: {tur} tur, beklenen en cok {tur_tavani} — cikildi")
+            sys.exit(1)
+        parca = (supabase.table('products').select('id,name,brand')
+                 .order('id').range(len(products), len(products) + sayfa_boyu - 1).execute()).data
+        if not parca:
+            break
+        products += parca
+        if len(parca) < sayfa_boyu:
+            break
+    if len(products) != kesin:
+        logger.error(f"EKSIK VERI: cekilen {len(products)}, sunucu {kesin} — guncelleme YAPILMADI")
+        sys.exit(1)
+    logger.info(f"✓ Loaded {len(products)} products (kesin sayi {kesin} ile dogrulandi)")
     
     # Analyze and prepare updates
     logger.info("\n2. Analyzing product names...")

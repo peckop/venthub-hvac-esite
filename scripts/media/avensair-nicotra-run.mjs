@@ -17,6 +17,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { tumSatirlar } from '../icerik-hatti/_veri.mjs';  // 1000 satir tavani: sayfalama + kesin sayi karsilastirmasi (REC-178)
 
 const BASE = 'https://www.avensair.com';
 const DELAY_MS = 1500;
@@ -53,10 +54,8 @@ for (const u of DISCOVERY) {
 console.log(`kesif: ${slugs.size} slug`);
 
 // 2) DB Nicotra ürünleri (public SELECT, anon)
-const res = await fetch(`${dbUrl}/rest/v1/products?select=id,name,sku,tenant_id&brand=ilike.*nicotra*&deleted_at=is.null`, {
-  headers: { apikey: dbKey, authorization: `Bearer ${dbKey}` } });
-if (!res.ok) { console.error('DB okuma hatasi', res.status); process.exit(1); }
-const rows = await res.json();
+const rows = await tumSatirlar(dbUrl, { apikey: dbKey, authorization: `Bearer ${dbKey}` }, `products?select=id,name,sku,tenant_id&brand=ilike.*nicotra*&deleted_at=is.null`);
+
 console.log(`db: ${rows.length} Nicotra sku`);
 const tenants = new Set(rows.map(r => r.tenant_id));
 if (tenants.size !== 1) { console.error('tenant tekil degil'); process.exit(1); }

@@ -12,6 +12,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { tumSatirlar } from '../icerik-hatti/_veri.mjs';  // 1000 satir tavani: sayfalama + kesin sayi karsilastirmasi (REC-178)
 
 const arg = (n) => { const i = process.argv.indexOf(`--${n}`); return i > -1 ? process.argv[i + 1] : null; };
 const seatOut = arg('seat-out'), outDir = arg('out'), dbUrl = arg('url'), dbKey = arg('key');
@@ -22,9 +23,8 @@ const atex = seatState.unmatched.filter(u => / ATEX$/i.test(u.name.trim()));
 console.log(`atex aday: ${atex.length} (unmatched ${seatState.unmatched.length} icinden; XRM kapsam disi)`);
 
 // SKU -> product_id/tenant için DB
-const res = await fetch(`${dbUrl}/rest/v1/products?select=id,name,sku,tenant_id&brand=eq.SEAT&deleted_at=is.null`, {
-  headers: { apikey: dbKey, authorization: `Bearer ${dbKey}` } });
-const rows = await res.json();
+const rows = await tumSatirlar(dbUrl, { apikey: dbKey, authorization: `Bearer ${dbKey}` }, `products?select=id,name,sku,tenant_id&brand=eq.SEAT&deleted_at=is.null`);
+
 const bySku = new Map(rows.map(r => [r.sku, r]));
 
 const state = { tenant_id: seatState.tenant_id, products: {}, skipped: [] };
