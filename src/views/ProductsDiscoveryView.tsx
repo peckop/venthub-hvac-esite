@@ -89,8 +89,19 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
         }
     }, [router, Routes])
 
+    // ⚠ÜST DOLGU 3D SAHNESİNE AİTTİ — ÖLÇÜLDÜ (2026-09-07, yerel tarayıcı):
+    // `pt-16 md:pt-24` aşağıdaki koyu kutuya 3D karusel için verilmişti. Karusel REC-94'te
+    // kapandı; dolgu kaldı ve artık İÇİ BOŞ 96px'lik koyu bir şerit olarak duruyor
+    // (kutu 96px'te başlıyor, ilk beyaz bölüm 192px'te — arada hiçbir şey yok).
+    // Hemen altındaki bölüm kendi `py-24 sm:py-32`sini zaten getiriyor, yani başlık
+    // 320px'e itiliyordu: 224px boşluk. Recep bunu canlı ekranda "üstte beyaz alan" diye
+    // bildirdi; ölçüm onun tarifiyle örtüştü.
+    // Aşağıdaki REC-94 yorumu aynı tuzağın BİR KAT AŞAĞISINI çözmüş ("bayrak kapalıyken
+    // sarmalayıcı da render EDİLMEZ — aksi halde üstte boş bir şerit kalırdı"), ama dolgu
+    // sarmalayıcının DIŞINDA durduğu için gözden kaçmış.
+    // KOŞULLU: bayrak açılırsa 3D sahnesi geri gelir ve dolguya yine ihtiyaç duyar.
     return (
-        <div className="bg-surface-darker min-h-screen relative pb-12 w-full pt-16 md:pt-24">
+        <div className={`bg-surface-darker min-h-screen relative pb-12 w-full ${UC_BOYUT_MUSTERI_YUZEYINDE ? 'pt-16 md:pt-24' : ''}`}>
             
             {/* REC-94: 3D orbital kategori seçimi müşteri yüzeyinden kaldırıldı.
                 Kutu KOŞULLU: bayrak kapalıyken sarmalayıcı da render EDİLMEZ — aksi halde
