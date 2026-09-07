@@ -122,13 +122,14 @@ def duzelt(dosya: Path):
             rapor["k10_tasindi"] += 1
 
         # --- STORM cift gerilim: min_ at, max_ -> voltage_v
+        # Cetvel §11 "Gerilim: bir alan bir bilgi" bu vakanin cevabini ZATEN veriyor:
+        # voltage_v = calisma gerilimi (tek sayi) · voltage_alt_v = varsa ikinci gerilim.
+        # Ilk yazimda 230 V'u ATMISTIM; cetvel onu voltage_alt_v'ye koyuyor -> 12 deger
+        # cope gitmiyor. (Kendi kusurum, 2026-09-07 08:1xZ'de cetvel okunarak yakalandi.)
         elif ad.startswith("teknik-storm") and s["alan"] in ("min_voltage_v", "max_voltage_v"):
-            if s["alan"] == "min_voltage_v":
-                rapor["storm_min_voltage_atildi"] += 1
-                continue
-            s["alan"] = "voltage_v"
+            s["alan"] = "voltage_alt_v" if s["alan"] == "min_voltage_v" else "voltage_v"
             s["not"] = (s["not"] + " | " if s["not"] else "") + STORM_NOT
-            rapor["storm_voltage_birlestirildi"] += 1
+            rapor["storm_gerilim_ayristirildi"] += 1
 
         # --- ADH not duzeltmesi: sf.40 -> sf.41
         if "sf.40" in s["not"]:

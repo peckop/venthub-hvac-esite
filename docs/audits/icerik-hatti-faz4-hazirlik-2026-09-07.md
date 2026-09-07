@@ -10,8 +10,8 @@ sapma yok. **Canlıya yazım: 0** (kuru koşum; yazım kolu iki ayrı anahtara b
 
 ## 0. Hüküm
 
-Hazırlık **bitti**: 764 satırın **694'ü yüklenebilir**, **23'ü karar bekliyor**, 47'si çıkarıldı
-ya da tekilleştirildi. Kuru koşum **308 hücre / 100 ürün** diyor. Ama reçetenin kendisinde
+Hazırlık **bitti**: 764 satırın **706'sı yüklenebilir**, **35'i karar bekliyor**, 23'ü çıkarıldı
+ya da tekilleştirildi. Kuru koşum **320 hücre / 102 ürün** diyor. Ama reçetenin kendisinde
 **üç ölçülmüş kusur** var (§1) ve **üç yeni karar kalemi** doğdu (§4) — ikisi vitrine yanlış
 değer yazdırabilecek cinsten.
 
@@ -33,11 +33,12 @@ doğrulama: alan bazlı seçim reçetenin kendi saydığı **22** (K9) ve **8** 
 |---|---|---|
 | **K9** — kayış tahrikli gövdede izinli motor gücü **ayrı alan** | `max_absorbed_power_w` → `permissible_motor_power_w` (ADH 8 + AT 8 + RDH 6) | **22** |
 | **K10** — Nicotra eğrisi **toplam basınç**, statiğe çevrilmez | `max_static_pressure_pa` → `max_total_pressure_pa` (ADH) | **8** |
-| **K11** — ATEX kodu teknik tabloda + cümle açıklamada | ⚠**uygulanamadı**, bkz. §4.1 | 7 |
+| **K11** — ATEX kodu teknik tabloda + cümle açıklamada | ⚠**uygulanamadı**, bkz. §4.1 | 19 (JET 7 + SEAT 12) |
 
 **Migration gerekmiyor** (ölçüldü): `products.technical_specs` **JSONB**, düz anahtar→değer.
 Yeni alan adı DB şeması değiştirmeden yaşar. Gereken tek şey **cetvel satırı**
-(`product-schema-standard.md` — o dosya benim claim'imde değil, cetvel sahibine gider).
+(`product-schema-standard.md`). **OPS 08:1xZ: o dosya claim'ime alındı, cetvel sahibi benim** —
+K9/K10 kuralları + ATEX açık kalemi + birim kuralı aynı dalda yazıldı.
 
 ## 3. Sayılar
 
@@ -45,11 +46,23 @@ Yeni alan adı DB şeması değiştirmeden yaşar. Gereken tek şey **cetvel sat
 girdi   764 satır (8 dosya)
  -15    SEAT 50: 3 dayanaksız wiring + 12 min_/max_ semantik ihlali
  - 8    STORM mükerrer (aynı değer, iki kaynak) tekilleştirildi
- -12    STORM min_voltage_v atıldı (24 satır -> 12 voltage_v=400 + çift-gerilim notu)
- -23    KARAR BEKLİYOR (yüklemeye girmez, silinmez de)
-=  694  yüklenebilir  ->  kuru koşum: 308 hücre / 100 ürün değişecek
-                          (694'ün 386'sı canlıda zaten aynı değer = idempotent)
+ ± 0    STORM 24 gerilim satırı ayrıştırıldı: 12 voltage_v=400 + 12 voltage_alt_v=230
+        (ilk yazımda 230 V'u ATMIŞTIM; cetvel §11 "Gerilim: bir alan bir bilgi" onu
+         voltage_alt_v'ye koyuyor — 12 değer çöpe gitmedi, cetvel okununca yakalandı)
+ -35    KARAR BEKLİYOR (yüklemeye girmez, silinmez de):
+          19  ATEX bölge beyanı — JET 7 + SEAT 12  (§4.1)
+           8  AT weight_kg, sürüm belirsiz          (§4.2)
+           4  STORM çelişen güç                     (§4.3)
+           2  STORM IP20 (§1 kusur 2)  ·  2  Danfoss frequency_hz (alan kararı yok)
+=  706  yüklenebilir  ->  kuru koşum: 320 hücre / 102 ürün değişecek
+                          (706'nın 386'sı canlıda zaten aynı değer = idempotent)
 ```
+
+⚠**Bu blokta önce "23 karar bekliyor" yazmıştım — YANLIŞ, betik 35 diyor.** Sayıyı yeniden
+koşmadan, önceki koşumun 16'sına ATEX'in 7'sini ekleyerek hesapladım; ATEX kuralı JET'in
+7 satırı yanında **SEAT'in 12 ATEX satırını** da tutuyordu. Aynı hatanın (sayıyı betikten
+değil hatırdan yazmak) bugün **üçüncü** tekrarı → [[olcut-dogru-evren-yanlis-is-emri-dogurur]].
+**694 rakamı o an doğruydu; gerilim düzeltmesinden sonra 706 oldu** — çünkü o, betiğin kendi çıktısından alınmıştı.
 
 ## 4. ⚠Üç yeni karar kalemi (ölçümle doğdu, reçetede yoktu)
 
