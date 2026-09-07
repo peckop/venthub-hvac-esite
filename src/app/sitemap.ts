@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 
+import { EN_YAYIN } from '../config/features'
 import { SITE_URL } from '../config/siteUrl'
 import { HVAC_BRANDS } from '../data/brands'
 import { getCategories } from '../lib/services/category.service'
@@ -23,7 +24,18 @@ export const revalidate = 21600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL
-  const locales = ['tr', 'en']
+  /**
+   * REC-204 — site haritasına HANGİ dillerin yazılacağı.
+   *
+   * `EN_YAYIN` kapalıyken `/en/…` adresleri site haritasından TAMAMEN çıkar: Google'a
+   * "bunları tara" diye bir talep gitmez. Sayfalar çalışmaya devam eder (bkz. bayrağın
+   * kendi gerekçesi, `src/config/features.ts`).
+   *
+   * ⚠`alternates.languages` blokları BİLEREK DOKUNULMADI: hreflang beyanı sayfa var
+   * olduğu sürece doğrudur ve onu bozmak TR sayfaların dil eşleşmesini de bozar.
+   * Bayrağın "BİLİNEN SINIR" maddesi tam olarak bunu yazıyor.
+   */
+  const locales = EN_YAYIN ? ['tr', 'en'] : ['tr']
 
   // Fetch all categories, product families and per-category product counts
   const [categories, familySlugs, countRes] = await Promise.all([
