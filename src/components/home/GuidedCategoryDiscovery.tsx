@@ -89,65 +89,86 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({
               <div
                 key={category.id}
                 data-observe="fade-up"
-                className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass} group relative flex-shrink-0 w-280px sm:w-320px md:w-auto snap-center overflow-hidden bg-slate-100 aspect-square lg:aspect-orbit`}
+                /* Kart artık SABİT ORANLI DEĞİL: görsel alanı `aspect-square` ile kendi
+                   oranını taşıyor, metin paneli içeriğine göre uzuyor. Eskiden kartın
+                   kendisi sabit orandaydı ve panel büyüyünce görselden yer çalıyordu —
+                   ölçülen sonuç: aynı satırdaki kartların görsel yükseklikleri 164px ile
+                   140px arasında değişiyordu. Izgara zaten hücreleri eşit yükseklikte
+                   uzatır, yani kartlar yine hizalı kalır. */
+                className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass} group relative flex-shrink-0 w-280px sm:w-320px md:w-auto snap-center overflow-hidden bg-white`}
               >
-                <Link href={Routes.category(category.slug)} className="block w-full h-full relative z-10">
-                  {/* Background Image with Fallback Logic */}
-                  <div className="absolute inset-0 z-0 bg-slate-950">
+                {/* ⭐RECEP KARARI (2026-09-07), lafzıyla: "zaten bizdeki A seçeneği ve ben
+                    bundan rahatsızım.. Yani B". İki varyant canlı sayfa üzerine uygulanıp
+                    390px'te fotoğraflandı, Recep yan yana görüp seçti.
+
+                    B = metin fotoğrafın ÜSTÜNDE DEĞİL, ALTINDA düz zeminde.
+
+                    NİÇİN: eski hâlde yazı doğrudan koyu görselin üstündeydi ve karartma
+                    katmanı yoktu; okunurluk HER KARTIN KENDİ FOTOĞRAFINA bağlıydı, yani
+                    tesadüfe bırakılmıştı. WCAG AA metin/zemin kontrastının en az 4,5:1
+                    olmasını ister — düz fotoğraf üstüne yazıda bu GARANTİ EDİLEMEZ, çünkü
+                    fotoğraf kartlar arasında değişir. Canlı a11y taramasında anasayfa
+                    96/100 ve üç kırmızıdan biri kontrasttı.
+
+                    YAN SONUÇ: masaüstü ve mobil artık AYNI. Hover'a bağlı gizleme kalmadı,
+                    yani REC-266'da eklenen `md:` kırılımı gereksizleşti ve kaldırıldı.
+                    Bekçi de yeni kurala uyarlandı: INV-KART-ACIKLAMA-MOBIL-1. */}
+                <Link href={Routes.category(category.slug)} className="flex h-full w-full flex-col relative z-10">
+                  {/* Görsel bölgesi — metin ARTIK BURAYA BİNMİYOR.
+                      ⭐ZEMİN AÇIK, FİLTRE YOK (Recep, 2026-09-07): "resimler neden arka
+                      planı beyaz değil… arka plan beyaz olan ilgili ürünle olmalı".
+                      Eski hâl `bg-slate-950` + `grayscale-30` idi ve bu A düzeninin
+                      GEREĞİYDİ: yazı fotoğrafın üstünde olduğu için fotoğrafı karartmak
+                      zorunluydu. B'ye geçince o gerekçe ortadan kalktı; karartma kaldı ve
+                      beyaz zeminli temiz ürün fotoğraflarını bile karanlık/soluk
+                      gösteriyordu. Ürün fotoğrafı artık kendi zemininde görünür. */}
+                  <div className="relative aspect-square w-full shrink-0 overflow-hidden bg-white">
+                    {/* ⭐ÜÇ ÖLÇÜLMÜŞ KUSUR BURADA ONARILDI (Recep, 2026-09-07):
+                        1. MERKEZLEME — hesaplanan `object-position` `50% 0%` idi, yani
+                           görseller ortadan değil ÜSTTEN hizalanıyordu. `object-center`
+                           açıkça yazıldı.
+                        2. KIRPMA — `object-cover` ürünün kenarlarını kesiyordu. Beyaz
+                           zeminli ürün fotoğrafında doğrusu ürünün TAMAMINI göstermektir;
+                           `object-contain` + iç boşluk.
+                        3. ORANTISIZLIK — görsel alanı `flex-1` idi, yani yüksekliği
+                           BAŞLIĞIN KAÇ SATIR OLDUĞUNA bağlıydı: beş kartta 164px, uzun
+                           başlıklı "Isı Geri Kazanım Üniteleri (VMC)" kartında 140px
+                           ölçüldü. Artık `aspect-square` — başlık ne olursa olsun eşit. */}
                     <Image
                       src={finalSrc}
                       alt={category.displayName}
                       fill
                       sizes="(max-width: 640px) 280px, (max-width: 768px) 320px, (max-width: 1200px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-1.5s ease-out group-hover:scale-110 grayscale-30 group-hover:grayscale-0"
+                      className="object-contain object-center p-6 transition-transform duration-1.5s ease-out group-hover:scale-105"
                     />
-                    {/* Architectural Overlay */}
-                    <div className="absolute inset-0 bg-slate-950/40 group-hover:bg-slate-950/20 transition-colors duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-80" />
+                    {/* Köşe vurguları görselin İÇİNDE kalır; metin paneline taşmaz.
+                        Renk açık zemine göre: beyaz üzerine beyaz kenar GÖRÜNMEZ olurdu. */}
+                    <div className="absolute top-6 right-6 w-4 h-4 border-t border-r border-steel-gray/25 group-hover:border-secondary-blue/60 transition-colors duration-500" />
+                    <div className="absolute bottom-6 left-6 w-4 h-4 border-b border-l border-steel-gray/25 group-hover:border-secondary-blue/60 transition-colors duration-500" />
                   </div>
 
-                  {/* Content Overlay - Centered and Minimal */}
-                  <div className="absolute inset-0 z-10 p-10 flex flex-col items-center justify-center text-center">
-                    <div 
-                      className="flex flex-col items-center opacity-90 transition-opacity duration-700"
-                    >
-                      <h3 className="text-xl lg:text-2xl font-extralight text-white tracking-hvac-tight mb-4 transition-transform duration-700 group-hover:-translate-y-2">
+                  {/* Metin paneli — düz zemin, sabit ve bilinen bir arka plan rengi.
+                      Kontrast artık fotoğrafa değil bu tek renge bağlı, yani ölçülebilir. */}
+                  <div className="bg-white px-5 py-4 text-left">
+                    <div className="flex flex-col items-start">
+                      <h3 className="text-base lg:text-lg font-light text-industrial-gray tracking-hvac-tight mb-2">
                         {category.displayName}
                       </h3>
 
-                      <div className="w-12 h-px bg-white/30 group-hover:w-24 group-hover:bg-cyan-500 transition-width-bg duration-700" />
+                      <div className="w-12 h-px bg-steel-gray/30 group-hover:w-24 group-hover:bg-secondary-blue transition-width-bg duration-700" />
                       
-                      {/* ⚠MOBİLDE DAİMA AÇIK — Recep kararı (2026-09-07): "görünmeyen
-                          açıklamalar mobilde görünmesi lazım, bunu da çözün".
-
-                          ÖLÇÜLMÜŞ KUSUR: bu kutu `max-h-0 opacity-0` ile başlayıp yalnız
-                          `group-hover` ile açılıyordu. DOKUNMATİK CİHAZDA HOVER YOKTUR —
-                          390×844'te ölçüldü: altı kartın altısında da max-height 0px,
-                          opacity 0. Yani paragraf mobil ziyaretçide HİÇ açılmıyordu.
-                          Etkisi somut: URUN-KATALOG aynı gün 23 kategori paragrafını canlı
-                          veritabanına yazdı (REC-146, 0/37 → 23/37) ve bu yüzeyde hiçbiri
-                          mobilde görünmüyordu. Metin DOM'daydı — bot görüyor, insan görmüyor.
-
-                          ÇÖZÜM MOBİL ÖNCELİKLİ: varsayılan (küçük ekran) AÇIK; `md:` ve
-                          üstünde eski hover davranışı AYNEN korunur. Böylece masaüstü
-                          tasarımı hiç değişmez, yalnız hover'ı OLMAYAN cihaz kazanır.
-                          Tek dokunuşla açma seçeneği ELENDİ: kart zaten bir bağlantı,
-                          ilk dokunuş sayfayı açar — açma/kapama jesti bağlantıyla çakışırdı.
-
-                          `line-clamp-2` (aşağıdaki p) zaten var, yani metin uzasa bile kart
-                          iki satırdan fazla büyümez — ızgara düzeni korunur.
-                          Bekçi: INV-KART-ACIKLAMA-MOBIL-1. */}
-                      <div className="mt-6 max-h-24 opacity-100 md:max-h-0 md:opacity-0 md:group-hover:max-h-24 md:group-hover:opacity-100 transition-opacity duration-700 overflow-hidden">
-                        <p className="text-xs text-slate-200 font-light leading-relaxed tracking-wider mb-6 max-w-200px line-clamp-2">
+                      {/* ⭐AÇIKLAMA HER GENİŞLİKTE AÇIK — gizleme kuralı KALMADI.
+                          Eski hâl (REC-266) mobili açıp masaüstünde hover'a bırakıyordu;
+                          B kararıyla ikisi de aynı oldu, yani `md:` kırılımına gerek yok.
+                          `line-clamp-2` korunuyor: metin uzasa bile panel iki satırdan
+                          fazla büyümez, ızgara düzeni bozulmaz. */}
+                      <div className="mt-3">
+                        <p className="text-xs text-steel-gray font-light leading-relaxed line-clamp-2">
                           {category.description || t('home.guidedDiscovery.cardFallback')}
                         </p>
                       </div>
                     </div>
                   </div>
-
-                  {/* Corner Accent */}
-                  <div className="absolute top-8 right-8 w-4 h-4 border-t border-r border-white/20 group-hover:border-cyan-500/50 transition-colors duration-500" />
-                  <div className="absolute bottom-8 left-8 w-4 h-4 border-b border-l border-white/20 group-hover:border-cyan-500/50 transition-colors duration-500" />
                 </Link>
               </div>
             )

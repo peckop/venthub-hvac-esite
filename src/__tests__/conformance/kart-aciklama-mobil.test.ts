@@ -4,79 +4,112 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 /**
- * INV-KART-ACIKLAMA-MOBIL-1 — hover'a bağlı içerik, hover'ı OLMAYAN cihazda da görünür.
+ * INV-KART-ACIKLAMA-MOBIL-1 — kategori kartının açıklaması HER cihazda görünür ve
+ * okunurluğu tesadüfe bırakılmaz.
  *
- * RECEP KARARI (2026-09-07, lafzıyla): *"görünmeyen açıklamalar mobilde görünmesi lazım,
- * bunu da çözün"*. (Karar bana OPS aktarımıyla ulaştı — kaynağı adıyla yazıyorum ki
- * yarın okuyan "kim dedi" diye aramasın.)
+ * ── KURALIN İKİ SÜRÜMÜ VAR; İKİNCİSİ BİRİNCİYİ KAPSIYOR ──
  *
- * ÖLÇÜLMÜŞ KUSUR (yerel tarayıcı, 390×844): kategori kartındaki açıklama kutusu
- * `max-h-0 opacity-0` ile başlayıp yalnız `group-hover` ile açılıyordu. Dokunmatik cihazda
- * hover YOKTUR; altı kartın altısında da max-height 0px, opacity 0 ölçüldü. Yani paragraf
- * mobil ziyaretçide HİÇ açılmıyordu — anasayfada da, ve anasayfa CANLI.
+ * v1 (2026-09-07 öğleden sonra, REC-266). Recep: *"görünmeyen açıklamalar mobilde
+ * görünmesi lazım, bunu da çözün"*. Kutu `max-h-0 opacity-0` ile başlayıp yalnız
+ * `group-hover` ile açılıyordu; dokunmatik cihazda hover YOKTUR. 390×844'te ölçüldü:
+ * altı kartın altısında max-height 0px, opacity 0. Çözüm mobil-öncelikliydi: küçük ekran
+ * açık, `md:` ve üstünde eski hover davranışı korunuyordu. Kapı o gün `md:` ön ekinin
+ * silinmesini yasaklıyordu.
  *
- * ETKİSİ SOMUTTU: URUN-KATALOG aynı gün 23 kategori paragrafını canlı DB'ye yazdı
- * (REC-146, 0/37 → 23/37). Bu yüzeyde hiçbiri mobilde görünmüyordu. Metin DOM'daydı —
- * arama motoru görüyor, insan görmüyordu.
+ * v2 (2026-09-07 akşam, RECEP KARARI — lafzıyla): *"zaten bizdeki A seçeneği ve ben
+ * bundan rahatsızım.. Yani B"*. İki varyant canlı sayfaya uygulanıp 390px'te fotoğraflandı,
+ * Recep yan yana görüp seçti. **B = metin fotoğrafın ÜSTÜNDE DEĞİL, ALTINDA düz zeminde.**
  *
- * KAPININ SINIRI, ADIYLA: bu kapı STATİKTİR — sınıf dizesini okur, PİKSEL ÖLÇMEZ.
- * Gerçek görünürlük kanıtı tarayıcı ölçümüdür (aynı gün: 390px'te /products 6/6 ve
- * anasayfa 8/8 opaklık 1; 846px'te 0/6 = masaüstü hover davranışı korunuyor).
- * Bu kapı yalnız kusur SINIFININ sessizce geri gelmesini engeller: biri `md:` ön ekini
- * silip mobili yeniden kapatırsa kırmızı verir.
+ * NİÇİN v1 YETMEDİ: v1 metni GÖRÜNÜR yaptı ama hâlâ fotoğrafın üstündeydi ve karartma
+ * katmanı yoktu. Yani okunurluk HER KARTIN KENDİ FOTOĞRAFINA bağlıydı — birinde okunur,
+ * diğerinde kaybolur. WCAG AA metin/zemin kontrastının en az 4,5:1 olmasını ister ve düz
+ * fotoğraf üstüne yazıda bu GARANTİ EDİLEMEZ. Canlı a11y taramasında anasayfa 96/100'dü
+ * ve üç kırmızıdan biri kontrasttı. "Görünüyor" ile "okunuyor" ayrı iddialar.
+ *
+ * v2'nin YAN SONUCU: masaüstü ve mobil artık AYNI. Hover'a bağlı gizleme kalmadığı için
+ * v1'in `md:` kırılımı gereksizleşti ve KALDIRILDI. Bu kapı o yüzden GENİŞLEDİ: artık
+ * "mobilde açık olsun" değil, **"hiçbir genişlikte gizli başlamasın VE metin fotoğrafın
+ * üstünde durmasın"** ölçülüyor. Kapı silinmedi; kural büyüdü.
+ *
+ * ── KAPININ SINIRI, ADIYLA ──
+ * Bu kapı STATİKTİR: sınıf dizesini okur, PİKSEL ÖLÇMEZ ve KONTRAST HESAPLAMAZ. Gerçek
+ * okunurluk kanıtı tarayıcı ölçümüdür ve yayın sonrası ayrıca yapılır. Buradaki ölçüm
+ * yalnız kusur SINIFININ sessizce geri gelmesini engeller.
  */
 
 const DOSYA = join(process.cwd(), 'src', 'components', 'home', 'GuidedCategoryDiscovery.tsx')
 const kaynak = readFileSync(DOSYA, 'utf8')
 
-/** Açıklama kutusunun sınıf dizesi — `max-h`/`opacity` taşıyan tek sarmal. */
-function aciklamaSarmaliniBul(): string {
-  const satirlar = kaynak.split('\n')
-  const satir = satirlar.find(
-    (s) => s.includes('max-h-') && s.includes('opacity-') && s.includes('<div'),
-  )
-  if (!satir) throw new Error('Açıklama sarmalı bulunamadı — bileşenin yapısı değişmiş olabilir.')
-  return satir
+/** `className="..."` dizelerinin tamamı — kural bunların üzerinde ölçülür. */
+function sinifDizeleri(): string[] {
+  return [...kaynak.matchAll(/className="([^"]*)"/g)].map((m) => m[1])
 }
 
-describe('INV-KART-ACIKLAMA-MOBIL-1 — kart açıklaması dokunmatikte görünür', () => {
+/** Açıklama paragrafını taşıyan sarmalın bulunduğu satır. */
+function aciklamaSatiri(): string {
+  const satirlar = kaynak.split('\n')
+  const i = satirlar.findIndex((s) => s.includes('category.description'))
+  if (i < 0) throw new Error('Açıklama paragrafı bulunamadı — bileşenin yapısı değişmiş olabilir.')
+  // Paragrafın kendisi ve onu saran kutu: ikisi birlikte ölçülür.
+  return satirlar.slice(Math.max(0, i - 3), i + 2).join('\n')
+}
+
+/** Gizleme sınıfı: ön ekli (`md:`, `lg:`, `hover:` …) ya da ön eksiz, ikisi de yasak. */
+const GIZLEME = /(^|\s|:)(max-h-0|opacity-0)(\s|"|$)/
+
+describe('INV-KART-ACIKLAMA-MOBIL-1 — kart açıklaması her cihazda görünür, fotoğraf üstünde durmaz', () => {
   it('K1 (ön-koşul) — ölçtüğüm yapı GERÇEKTEN duruyor (evren boş değil)', () => {
-    // Bileşen yeniden yazılırsa bu kapı sessizce anlamsızlaşır; önce varlığını kanıtlar.
-    expect(kaynak).toContain('group-hover')
-    expect(() => aciklamaSarmaliniBul()).not.toThrow()
+    // Bileşen yeniden yazılırsa kapı sessizce anlamsızlaşır; önce varlığını kanıtlar.
+    // Bu kol OLMADAN aşağıdaki "ihlal yok" sonucu, "dosya boş" ile aynı şeye benzerdi.
+    expect(kaynak).toContain('category.description')
+    expect(kaynak).toContain('GuidedCategoryDiscovery')
+    expect(sinifDizeleri().length).toBeGreaterThan(5)
   })
 
-  it('K2 — varsayılan (mobil) hâl AÇIK: koşulsuz max-h-0 / opacity-0 YOK', () => {
-    const sarmal = aciklamaSarmaliniBul()
-
-    // Ön eksiz `max-h-0` ve `opacity-0` = her genişlikte kapalı = bugünkü kusur.
-    // Ön ekli (`md:max-h-0`) hâller SERBEST: masaüstünde hover davranışı korunmalı.
-    const kosulsuzKapali = /(^|\s)(max-h-0|opacity-0)(\s|"|$)/.test(sarmal)
-
+  it('K2 (kural) — açıklama HİÇBİR genişlikte gizli başlamaz', () => {
+    // v1'de yalnız ön EKSİZ `max-h-0`/`opacity-0` yasaktı (mobil açık kalsın diye).
+    // v2'de metin fotoğraftan indiği için gizlemenin HİÇBİR sürümü meşru değil:
+    // `md:opacity-0` da, `lg:max-h-0` da aynı kusuru başka bir ekranda üretir.
+    const parca = aciklamaSatiri()
     expect(
-      kosulsuzKapali,
-      'Açıklama kutusu ön eksiz `max-h-0`/`opacity-0` taşıyor: bu, HER genişlikte kapalı ' +
-        'demektir ve dokunmatik cihazda paragraf hiç açılmaz (2026-09-07 ölçümü: 390px, ' +
-        '6/6 kart opaklık 0). Kapatma kuralı `md:` gibi bir ekranı ön ekiyle sınırlanmalı.\n' +
-        'Bulunan sınıf: ' + sarmal.trim(),
+      GIZLEME.test(parca),
+      'Kart açıklaması gizli başlıyor. Recep kararı (B): metin fotoğrafın altında, ' +
+        'her genişlikte AÇIK. Gizleme kuralı hiçbir ön ekle geri gelemez.',
     ).toBe(false)
   })
 
-  it('K3 — masaüstü hover davranışı KORUNUYOR (onarım, silme değil)', () => {
-    const sarmal = aciklamaSarmaliniBul()
-    // Kusuru "hover'ı tamamen kaldırarak" da çözebilirdik; çözmedik. Bu kol o sapmayı yakalar:
-    // masaüstünde açılma yine hover'a bağlı kalmalı, yoksa tasarım sessizce değişmiş olur.
-    expect(sarmal).toMatch(/md:group-hover:(max-h|opacity)/)
-    expect(sarmal).toMatch(/md:(max-h-0|opacity-0)/)
+  it('K3 (kural) — açıklama metni fotoğrafın ÜZERİNE binmez', () => {
+    // B'nin özü bu: yazı görselin üstünde YÜZMEZ, kontrast fotoğrafa kalmaz.
+    //
+    // ⚠BU KOL BİR KEZ FAIL-OPEN YAZILDI ve sabotaj onu yakaladı: ilk hâli yalnız
+    // paragrafın ±3 satırına bakıyordu, oysa metin panelinin sınıfı daha yukarıdaydı —
+    // yani "ihlal yok" diyordu çünkü İHLALİN DURDUĞU YERE BAKMIYORDU. Ölçüt keskindi,
+    // evren yanlıştı. Şimdi TÜM sınıf dizeleri taranıyor.
+    //
+    // Ayırt edici imza: mutlak kaplama + metin yığını (`flex-col` / ortalama / hizalama).
+    // Köşe vurguları (`absolute top-6 right-6`) ve görsel sarmalı bu desene UYMAZ.
+    const metinKaplamasi = sinifDizeleri().filter(
+      (c) =>
+        /\babsolute\b/.test(c) &&
+        /\binset-0\b/.test(c) &&
+        /(flex-col|text-center|justify-center|items-center)/.test(c),
+    )
+    expect(
+      metinKaplamasi,
+      'Metin yığını mutlak konumla fotoğrafın üstüne yerleştirilmiş (A düzeninin imzası). ' +
+        'Recep kararı B: kontrast fotoğrafa değil, düz bir zemine bağlı olmalı.',
+    ).toEqual([])
   })
 
-  it('K4 (ayırt edicilik) — eski hâl bu kapıdan GEÇEMEZ', () => {
-    // Kapının gerçekten ölçtüğünü kanıtlar: bugünkü kusurlu sınıf dizesi kırmızı vermeli.
-    const eskiHal = 'mt-6 max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100'
-    const yeniHal = 'mt-6 max-h-24 opacity-100 md:max-h-0 md:opacity-0 md:group-hover:max-h-24 md:group-hover:opacity-100'
-    const kosulsuzKapali = (s: string) => /(^|\s)(max-h-0|opacity-0)(\s|"|$)/.test(s)
-
-    expect(kosulsuzKapali(eskiHal)).toBe(true)   // eski hâl → yakalanır
-    expect(kosulsuzKapali(yeniHal)).toBe(false)  // yeni hâl → geçer
+  it('K4 (ayırt edicilik) — kural gerçekten ölçüyor, her dizeyi geçirmiyor', () => {
+    // K2/K3 yeşilse bunun sebebi "desen hiçbir şeyi eşleştiremiyor" olabilir.
+    // Bu kol, desenlerin bilinen kusurlu yazılışları YAKALADIĞINI kanıtlar.
+    expect(GIZLEME.test('mt-6 max-h-0 opacity-0 group-hover:max-h-24')).toBe(true)
+    expect(GIZLEME.test('mt-6 md:max-h-0 md:opacity-0')).toBe(true)
+    expect(GIZLEME.test('mt-3 text-xs line-clamp-2')).toBe(false)
+    // `opacity-90` gibi masum değerler yanlışlıkla yakalanmamalı.
+    expect(GIZLEME.test('flex flex-col opacity-90')).toBe(false)
+    expect(/absolute[^"]*inset-0/.test('absolute inset-0 z-10 p-10 flex')).toBe(true)
+    expect(/absolute[^"]*inset-0/.test('bg-white px-5 py-4 text-left')).toBe(false)
   })
 })

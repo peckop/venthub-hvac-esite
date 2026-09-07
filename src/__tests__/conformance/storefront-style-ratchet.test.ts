@@ -193,7 +193,11 @@ const RATCHETS: Ratchet[] = [
     // 2026-09-07 · 1464 -> 1463: REC-205 — iki seviyeli alt kategori rotasi yalnizca
     // yonlendirme yapan bir dosyaya indi (govde, metadata ve onbellek katmani kalkti);
     // govdeyle birlikte bir ham gri sinif da gitti.
-    tavan: 1463,
+    // 2026-09-07 · 1463 -> 1458: REC-266 devamı (Recep kararı "B") — kategori kartında
+    // metin fotoğrafın altına indi. Karartma katmanları (`bg-slate-950/40`, gradyan) ve
+    // koyu zemin gerekçesini kaybedip SİLİNDİ; beyaz üzerine okunan metin ham `slate-*`
+    // yerine token renklerini kullanıyor. Kazanç yan üründür, hedef değildi.
+    tavan: 1457,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
