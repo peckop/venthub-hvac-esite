@@ -22,7 +22,7 @@ metadata:
   - kare kabul/ret hukmu + olcum satiri
   - ops-emir-<tarih>-<n>-<proje>.md
   recovery:
-    Kararlar ayna BAYAT: python scripts/nlm/kararlar_disa_aktar.py --tarih <bugun>
+    Kararlar ayna BAYAT: python scripts/nlm/kararlar_disa_aktar.py --tarih <bugun> (betik PR #1062 ile gelir)
   sahip: OPS (Kararlar'i OPS tutar; Design seritleri yazar, OPS olcer ve kabul eder)
   kaynak: REC-173 adim 3 (2026-09-06, Recep: tasarimlar bizim tarafimizda koruma altina alinmali; yarin baska bir AI araci kullanilabilir)
 ---
@@ -50,22 +50,24 @@ metadata:
 | Claude Design projeleri (kum havuzu; kod değil) | MENU `be615496…` · BELGE `4e491d28…` · LOGO/MARKA `670f9f75…` · DS `31b0824c…` | Onaylanan tasarım koda geçince gerçek değer depodadır (REC-173 günlük arşiv) |
 | Marka kılavuzu | LOGO projesinde `1 Venthub Marka Kilavuzu.dc.html` (K32–K35: bölüm F5–F8) + `brand/logo/*.svg` | Logo elle çizilmez (K23) |
 
+> Doğrulama: docs/audits/rec176-skill-dogrulama-2026-09-07.md — her satır Kararlar gövdesiyle karşılaştırıldı (2026-09-07).
+
 ## 2. Sert kurallar (K numarasıyla; ihlal = kare RET)
 
-- **K21 · Her şey veriden.** Karede görünen ürün adı, kod, sayı gerçek veridir (Supabase'den ölçülmüş). Olmayan ürün çizilmez ("SEAT 40" dersi, vaat bütünlüğü). Örnek ürün değişirse kimlik + çip + anlatım + eksen aynı turda değişir.
-- **K7 · Teknik satır kaynaklı.** Teknik tabloya yalnız `technical_specs`'te olan alan girer; şemada olmayan bilgi (malzeme gibi) teknik satır olmaz, anlatımda kalır ve o da kaynağa bağlanır.
+- **K21 · Örnek ürün değişirse her şey veriden.** Çizimde örnek ürün DEĞİŞİRSE aynı turda kimlik satırı + sertifika çipleri + açıklama + hesap gerekçesi + seçici eksenleri `technical_specs`/`description_i18n`'den yeniden yazılır; anahtarsız eksen seçici olarak çizilmez (K7 uzantısı). (K21 uygulama notu: SEAT 40 ve STORM 40 katalogda YOK → gerçek kardeşle, SEAT 35 / JET 25, değişir; var olmayan model çizilmez.)
+- **K7 · Teknik alan yalnız dolu.** Teknik tabloda varsa satır, yoksa satır hiç yok ("—" / "belirtilmemiş" yazılmaz); süzgeçler de yalnız dolu alanlardan kurulur. Şema dışı alan (malzeme/montaj/sertifika gibi) katalog K2'nin konusu: şemada yok, genişletme migration'ı Recep kapısından geçer.
 - **K18a · Değerlendirilemeyen gizlenmez.** Eğrisi/verisi olmayan ürün "değerlendirilemedi" hükmüyle görünür; "uymaz" denmez, saklanmaz.
-- **K5 · Kiremit ve düğme.** Kartta tek dolu kiremit yok; kart eylemleri çerçeveli. Kiremit sayfada tek (ana eylem).
-- **K37-c · Kip anahtarı tek kaynaktan.** Teklif kipi / satış kipi kabuğu tek kaynaktan döner (`kipSayacAdi`, `kipSekmeAdi`); ekranlarda elle yazılmaz.
-- **K38 · Satış kipi kimliği.** ₺ ve "Sepete ekle" yalnız satış kipinde; teklif kipinde ₺ 0.
-- **K39 · Fiyatsız ürün satış kipinde "Teklif iste".** Gizlenmez, sepete eklenmez, fiyat satırı yok; "fiyat yok / —" yazılmaz. Karma ailede "…'den başlayan" yalnız fiyatlı üyelerden.
-- **K22 · Durum alfa ile anlatılmaz;** pasif hâl opaklıkla değil, dosyadan gelen tonla (K23-b).
+- **K5 · Kiremit ve düğme.** Her sayfada TEK dolu kiremit, o da sayfanın işini bitiren eylem; diğer her düğme çerçeveli. Eylem asla ince metin bağlantısı olmaz. Kart eylemleri çerçeveli: Karşılaştır + Teklif listesine ekle. Tek fiil "Teklif iste" ("Teklif al" yok); gövde düğmeleri bağlama özel etiketli (hero/ürün/liste/senaryo ayrı metin).
+- **K37-c · Recep'in üç hükmü.** U3 = PANEL (karar, kalıcı sütun hâli ARŞİV). Öncelik: v17 kip anahtarı (Teklif ↔ Satış) tek yerden bütün karelere uygulanır, kısmi adaptasyon kabul değil. Prototip kare 13 kalıbına yeniden kurulur. (K37-c uygulama notu — teslim/ölçüm kaydı, ayrı bir yasak değil: kip anahtarı kabuğu tek kaynaktan döndüğü DOM'da doğrulandı, `kipSayacAdi`/`kipSekmeAdi`; teklif karelerinde ₺ ölçümü 0. Kuralın kendisi K37/K18-c'de: kural motoru `secim-kurallari.json` tek kaynak.)
+- **K38 · Satış kipi kimliği.** Satış kipinde kiremit "Sepete ekle", "Teklif iste" çerçeveli (teklif kipinde bugünkü hâl kalır). Fiil ailesi kod sözlüğünden (`tr.ts` SSOT): satır eylemi "Sepete Ekle", listeyi bitiren eylem "Ödemeye Geç"; "Siparişi tamamla"/"Satın al"/"Sipariş ver" açılmaz. Fiyat tipografisi IBM Plex Mono `tabular-nums`, yeni renk/rozet yok. Stok K30 rozet sınıflarıyla (yeşil/kırmızı nokta açılmaz).
+- **K39 · Fiyatsız ürün satış kipinde "Teklif iste".** `product_prices`'ta geçerli fiyatı olmayan her ürün satış kipinde kart ve PDP'de "Teklif iste" eylemiyle görünür (K5 kiremit, tek fiil), fiyat satırı yok, sepete eklenemez, gizlenmez. Fiyatsız ailede "…'den başlayan" satırı çizilmez (K7); aile eylemi de "Teklif iste". Teklif kipinde değişen yok.
+- **K22 · Durum alfa ile anlatılmaz;** çizilmez/arşiv/yetersiz/kapalı gibi durumlar `opacity` ile değil **soluk hex + zemin + rozet** ile gösterilir; metin her zaman tam opaklık, tek istisna görsel (`<img>`) şeritleri. (K23-b, yalnız marka işareti/logo için: sönükleştirme de kaynak dosyadan gelir — `venthub-isaret-soluk*.svg` — CSS filtre/opacity ile üretilmez; bu K22'nin genel UI durumlarına değil, logoya özeldir.)
 - **K25 · Turkuaz metin rengi değildir;** metinde `--brand-cyan-ink`. **K25-b:** sayaç ve kiremit düğme zemini koyulaşır.
-- **K28 · Ham hex 0.** Karede ham renk kodu sayısı sıfır; renk token'dan gelir.
+- **K28 · Ham hex ölçütü.** Ham hex ihlaldir ancak ve ancak DS'te yayınlanmış bir token karşılığı varsa. **"Ham hex 0" hedef DEĞİLDİR**; doğru beyan A kümesi 0 (token karşılığı olan değer ham yazılmış). DS'in ölçüp tanımladığı ama token yayınlamadığı değer (B) ham kalır ve token isteği K26 yoluyla DESIGN-MARKA'ya gider; tek kullanımlık kabuk varyantları (C) ve bilinçli semantik çiftler (D) ihlal değildir.
 - **K26 / K27 · Değer emri kaynağa gider, DS türetir; tekrar eden desen DS'e çıkar, ekran DS'e girmez.**
 - **K23 / K23-a · Logo elle çizilmez; ikon kontur kalınlığı sözleşmedir.**
 - **K37 · Dinamik, statik değil.** Tasarım kararı çalıştırılarak verilir (Ürün Seçici prototipi); kural motoru tek kaynak (`secim-kurallari.json`).
-- **Yapısal karar tek başına sorulur.** Menü yeri, URL şeması, sayfa mimarisi, panel/kalıcı sütun gibi kararlar toplu onaya gömülmez; Recep'e tek soru olarak gider (K37-a U3 örneği).
+- **K37-a U3 · Yapısal karar tek başına sorulur.** Ekran 58 panel mi kalıcı sütun mu sorusunda Menü iki hâli tek karede önerir, karar Recep'in — yapısal, tek başına sorulur, toplu onaya gömülmez. (Bu ilke şimdilik yalnız bu örneğe bağlı; genel bir "menü yeri/URL şeması/sayfa mimarisi" kategorisi Kararlar gövdesinde YOK.)
 
 ## 3. Kare kabul ölçümü (Instructions — OPS böyle ölçer, Design böyle raporlar)
 

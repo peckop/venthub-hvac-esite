@@ -1,9 +1,9 @@
-# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-06 ayna: K1–K7.10)
+# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-07 ayna: K1–K8)
 
-<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-06T07:31:18.470Z · kopya: 2026-09-06T11:20Z -->
+<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-06T20:01:10.763Z · kopya: 2026-09-07T06:52Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
-> Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır.
+> Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
 
 Tek kaynak; karar buraya yazılmadan verilmiş sayılmaz.
 
@@ -58,3 +58,10 @@ REC-146 Adım 1/1b/2a raporları sunuldu, Recep yedi maddelik sorun listesine ka
 * **Elektrikli ısıtıcı:** yalnız **aksesuar** olarak; bağımsız ürün sayfası değil.
 * **HF/FW + HF/S:** sınırda — kaynak yetersizse yazılmaz; yazılırsa kapıdan GÜÇLÜ geçmeli (ZAYIF doğrulama yetmez).
 * "Kendi markamız" uydurma izni **değildir** (K7 aynen). Dalga 4 diye iş yok; taslak işi 40/40 bitti (31 sayımdı, ölçüm 40).
+
+## K8 · Aile föyü: her ürün ailesinin kendi belgesi olur, tablo esas (2026-09-06 23:15 TR, **Recep kararı**: "girsin evet"; OPS hükmü kabul)
+
+* Okuduğumuz her üretici kaynağından **kendimize ait aile föyü** üretilir; ürün föyü onun içindeki satırdır. Yeri: ingestor deposunda aile klasörünün çıktı kademesi (`03-output/`), kaynak kademesindeki PDF/HTML'in yanında.
+* **Biçim:** tek kaynak yapılandırılmış tablo (CSV; satır = ürün · alan · değer · birim · kaynak dosya · sayfa · birebir alıntı). Okunabilir föy (MD) **bu tablodan üretilir**, elle yazılmaz (üretilmiş artefakt kuralı). Veritabanına (Supabase ya da ileride başka bir DB) yükleme yalnız tablodan yapılır.
+* **Güncelleme:** üretici yeni katalog çıkarınca yeni sürüm indirilir, sha256 ile eskisiyle karşılaştırılır, yalnız değişen sayfalar yeniden çıkarılır, fark staging'e düşer, Katalog kapısı + Recep onayıyla föy ve DB güncellenir. Excel fiyat listesi akışıyla aynı mantık.
+* İlk uygulama: REC-172 faz 2 staging'i (8 aile, 764 satır) Katalog kabulünden sonra Nicotra/Danfoss/SEAT aile föylerine dönüşür. Cetvel: `catalog-ingestion-standard` §2 + faz 2'nin yazdığı web kaynağı cetvel eki taslağı (Katalog yazar).
