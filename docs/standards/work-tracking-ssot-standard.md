@@ -82,5 +82,11 @@ Kaynak: Recep'in 2026-09-07 sabah hükmü (bir haftadır "iş açıldı mı, kim
 9. **Kova kayıt yasak:** bitiş ölçütü yazılamayan kayıt kayıt değildir; parçalanır ya da kapanır.
 10. **Kayıt gerçek mi?** Sahiplendirme "sahibi var mı" ile yetinmez; iş olmayan kayıt (şablon, deneme) iptal edilir (09-07: Linear onboarding şablonu iki kayıt OPS etiketi almıştı).
 11. **Açılış kapısı:** sabah tablo KIRMIZI ise ya da şeritlerin panoda anlattığıyla uyuşmuyorsa iş başlamaz.
+12. **Şerit sıralaması (Recep 09-07: "her şerit kendi içinde sıralayıp sunar"):** her şerit açık kayıtlarını iki sütunla sunar — ÖNEM (müşteri bugün görüyor mu · Google görüyor mu · arka plan) ve YAPILABİLİR (bugün başlanabilir mi; engel: karar / başka iş / altyapı). Her satırda ETKİ (ölçülmüş mü) · BÜYÜKLÜK (Linear tahmin puanı) · ENGEL. Tek liste iki soruya cevap veremez: "ne önemli" ile "sıradaki iş ne" ayrı sütundur (URUN, 09-07). Biçim örneği: `C:/tmp/ops-rapor/musteri-google-oncelik-2026-09-07.md`.
+13. **Sıralamaya giren satır eyleme dönmeden ölçümü tazelenir.** "Kayıtta yazıyor" ölçüm değildir (09-07: REC-155 iki raporda 1 numaraydı, ölçülünce işin 2 gün önce bittiği çıktı).
+14. **Recep'in sözü hangi pencereye düşerse düşsün aynı turda kayda girer:** şerit, ilgili kayda "Recep sözü, tarih, tırnak içinde" yorum yazar ve panoya OPS'a not düşer. Yazılmayan karar OPS için yoktur ve Recep'e ikinci kez sorulur (09-07: boş kategoriler kararı Katalog penceresindeydi, OPS yeniden sordu). OPS de Recep'e karar götürmeden önce kaydın yorumlarını ve son 2 saatin pano notlarını tarar.
+15. **Karar devredildiği turda "Recep kapısı" etiketi düşer.** Etiket bayat kalırsa Recep'ten bekleyen listesi yalan söyler (09-07: REC-207/193).
+16. **Kayıt açmadan önce aynı konuyu anlatan kayıt aranır** (etiket + anahtar kelime). Bulunursa yeni kayıt açılmaz; mevcut kayıt daraltılır ya da bağlanır (09-07: REC-214, REC-135'in 14 kategorisini yeniden anlattı).
+17. **Recep'e tık ya da karar götürülürken üç satır:** SORUN (tek cümle, hangi sistem) · BU TIK NEYİ DEĞİŞTİRİR · BEDEL. İki değişiklik varsa her birinin TEK BAŞINA ne çözdüğü ayrı yazılır (09-07 Vercel: çözüm sorundan önce anlatıldı, üç kez yön değişti).
 
-Değişiklik kaydı: 2026-09-07 OPS — bölüm eklendi (commit ile). Kapı/saatlik yenileme: REC-187.
+Değişiklik kaydı: 2026-09-07 OPS — bölüm eklendi (commit ile); aynı gün akşam 12–17 eklendi (şerit sıralaması, ölçüm tazeleme, Recep sözü aynı turda, etiket düşer, mükerrer kayıt araması, üç satır kuralı). Kapı/saatlik yenileme: REC-187.

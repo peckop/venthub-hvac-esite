@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic'
 import React, { useMemo } from 'react'
 
+import { type CategoryViewModelLite } from '../components/home/GuidedCategoryDiscovery'
 import Pagination from '../components/ui/Pagination'
 import { useCategoryGateway } from '../hooks/useCategoryGateway'
 import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
@@ -59,6 +60,12 @@ interface CategoryMasterViewProps {
   /** Sunucu tarafındaki sayfa boyutu (24). */
   pageSize?: number
   initialSubCategories?: DomainCategory[]
+  /**
+   * REC-213-A — YALNIZ keşif (kategorisiz) hâlinde kullanılır: `/products` sayfasının
+   * kategori kapısı. Kategori sayfalarında anlamsızdır ve oraya geçilmez; kırıntı yolu
+   * ve alt kategori kartları o hâlin kendi kapısıdır.
+   */
+  kategoriler?: CategoryViewModelLite[]
 }
 
 const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
@@ -67,7 +74,8 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
   total = 0,
   page = 1,
   pageSize = 24,
-  initialSubCategories
+  initialSubCategories,
+  kategoriler
 }) => {
   const { lang } = useI18n()
 
@@ -127,7 +135,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
   if (!category && !loading) {
     return (
       <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy" /></div>}>
-        <ProductsDiscoveryView families={visibleFamilies} total={total} isLoading={loading} />
+        <ProductsDiscoveryView kategoriler={kategoriler} families={visibleFamilies} total={total} isLoading={loading} />
         {pagination}
       </React.Suspense>
     )
