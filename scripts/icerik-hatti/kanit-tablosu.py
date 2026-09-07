@@ -36,6 +36,11 @@ for _akis in (sys.stdout, sys.stderr):
     except Exception:
         pass
 
+# Betigin KENDI dizini yola eklenir: aksi halde yalniz o dizinden kosunca calisir,
+# depo kokunden kosulunca "No module named _kaynak" ile duser.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _kaynak  # noqa: E402
+
 DIZIN_VARSAYILAN = Path.home() / "venthub-pdf-ingestor" / "kaynak-dizini" / "sayfalar.jsonl"
 HARITA_VARSAYILAN = Path(__file__).resolve().parent / "aile-kaynak-haritasi.json"
 
@@ -138,6 +143,9 @@ def main() -> int:
 
     sayfalar = dizini_yukle(dizin_yol)
     print(f"dizin: {len(sayfalar)} sayfa yuklendi ({dizin_yol.name})")
+    # EVREN KAPISI: dar/yanlis dizin "KANITSIZ" sayisini sisirir ve olmayan bir bosluk
+    # ilan eder; sinavda 208 -> 909 olcuuldu, cikis yine 0'di (2026-09-07).
+    _kaynak.taban_dogrula(dizin_yol, len(sayfalar))
 
     urunler = json.loads(Path(a.veri).read_text(encoding="utf-8"))
     print(f"veri : {len(urunler)} urun")

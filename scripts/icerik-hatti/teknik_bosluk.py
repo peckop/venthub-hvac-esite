@@ -37,6 +37,7 @@ from pathlib import Path
 # bagli betik, bir gun baska bir yerden cagrildiginda sessizce kirilir.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import _kaynak  # noqa: E402
 import _veri  # noqa: E402
 
 _veri.utf8_akis()
@@ -90,9 +91,14 @@ def main() -> int:
     # --- dizindeki kaynaklar (takma ad cozumu dahil) -------------------------
     dizin_yol = Path(a.dizin)
     tabanlar = set()
+    _sayfa = 0
     for satir in open(dizin_yol, encoding="utf-8"):
+        _sayfa += 1
         if satir.strip():
             tabanlar.add(os.path.basename(json.loads(satir)["dosya"]))
+    # EVREN KAPISI: yuklenen sayfa sayisi manifest'in bildirdigi taban ile ayni mi?
+    # (Dar/yanlis dizinle uretilen rapor OLMAYAN bir bosluk ilan eder — 2026-09-07 sinavi.)
+    _kaynak.taban_dogrula(dizin_yol, _sayfa)
     manifest = dizin_yol.parent / "manifest.json"
     takma = {}
     if manifest.exists():
