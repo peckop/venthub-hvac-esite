@@ -55,12 +55,27 @@ type Paket = { damga: string; kaynak: string; aileler: Aile[] }
 
 const PAKET_YOLU = join(
   process.cwd(),
-  'src', '__tests__', 'fixtures', 'aile-metni-sayisal-2026-09-06.json',
+  'src', '__tests__', 'fixtures', 'aile-metni-sayisal-2026-09-06T0945Z.json',
 )
 const paket: Paket = JSON.parse(readFileSync(PAKET_YOLU, 'utf8'))
 
-/** Metinde aralık ifadesi: "100–315", "460-18600" ya da "arası/ile/kadar". */
-const ARALIK_IFADESI = /[0-9][0-9.\s]*[–—-][0-9]|aras[ıi]|ile|kadar/i
+/**
+ * Metinde aralık ifadesi: "100–315", "460-18600" ya da "arası / ile / kadar".
+ *
+ * ⛔**KELİME SINIRI ŞART — bu desen 2026-09-06'da SESSİZCE BOZUKTU ve sabotajla bulundu.**
+ * Önceki hâli `ile` ve `kadar`ı **kelime içinde** de eşleştiriyordu. Türkçede bu felaket:
+ * `ailesi`, `abilen`, `edilebilen`, `ileri`, `vesile` — hepsi `ile` içerir. Sonuç: aile
+ * "aralık yazmış" sayılıp muaf tutuluyor, yani kapı ONU HİÇ ÖLÇMÜYORDU.
+ *
+ * ÖLÇÜLDÜ (13 ailelik paket üzerinde): eski desen **8** aileyi muaf sayıyordu, doğrusu
+ * **4**. Yani evrenin **%31'i sessizce atlanıyordu** — ve atlananların ikisi (`vort-e-atex`,
+ * `qbk-sal-kc-evo`) tam da bu kapının izlediği eski borç kalemleriydi. Kapı onları
+ * "düzeldi" diye değil, "bakmadım" diye temiz gösteriyor olabilirdi.
+ *
+ * Bugün filoda sekizinci kez aynı sınıf: **alt-dize eşleşmesi ölçüm değildir**
+ * (`returns.created` ↔ `returns.createdToast` vakasının birebir kardeşi).
+ */
+const ARALIK_IFADESI = /[0-9][0-9.\s]*[–—-][0-9]|\baras[ıi]|\bile\b|\bkadar\b/i
 
 /** Eşik: yayılma bu katı BULURSA tek değer yazmak yanıltıcıdır. */
 const YAYILMA_ESIGI = 2
@@ -94,18 +109,26 @@ export function ihlalleriBul(aileler: Aile[]): Ihlal[] {
 }
 
 /**
- * DONDURULMUŞ BORÇ — 2026-09-06'da ÖLÇÜLEN, henüz düzeltilmemiş aile metinleri.
- * Düzeltme Katalog şeridinin taslak işinde; metin düzelince buradan da SİLİNMEK ZORUNDA
- * (aşağıdaki "borç bayatlamaz" kolu bunu zorlar). Liste yalnız KÜÇÜLEBİLİR.
+ * DONDURULMUŞ BORÇ — ⭐**BOŞ. Altı kalemin ALTISI DA KAPANDI (2026-09-06 16:00).**
+ *
+ * Liste tek yönlü mandaldır: yalnız küçülebilir. Bugün sıfıra indi, çünkü URUN-KATALOG
+ * 38 ailenin TR metnini yeniden yazıp prod'a uyguladı (REC-146 / K7.8) ve paket o
+ * yazımdan SONRA yeniden üretildi.
+ *
+ * NASIL KAPANDI — iki farklı meşru yolla, ölçüldü:
+ *  · `vort-e-atex` ve `qbk-sal-kc-evo`: metin artık o eksende **hiç sayı vermiyor**
+ *    (mm / m³/h geçmiyor) — cetvel §2'nin ikinci seçeneği: *söylenmemiş şey yanıltmaz*.
+ *  · `slimroof-roof`, `slimroof-smoke`, `plug-fanlar`, `industrial-ventilation-axial`:
+ *    yeni metinlerinde **hiç rakam yok**, bu yüzden paketin evrenine (`metin ~ '[0-9]'`)
+ *    girmiyorlar. Dördünü de ayrıca DB'den doğruladım: metin DOLU, uzunluk 150–318,
+ *    yalnızca rakamsız. Yani "kayboldular" değil, DÜZELDİLER.
+ *
+ * ⚠**BOŞ LİSTE KAPIYI KÖRLEŞTİRMEZ:** aşağıdaki "ÖLÇÜT HÂLÂ GÖRÜYOR" kolu, kapanan iki
+ * saha vakasının **eski metinlerini** kalıcı olarak taşır ve ölçütün onları hâlâ
+ * yakaladığını her koşumda kanıtlar. Borç bittiğinde ayırt edicilik kanıtı da bitmesin
+ * diye böyle: gerçek vaka listeden çıkar, ama SINAV olarak kalır.
  */
-const DONMUS_BORC: ReadonlySet<string> = new Set([
-  'avens-plug-fanlar|cap_mm',                          // metinde 315; aralık 315–630 (2,0×)
-  'vortice-vort-e-atex|cap_mm',                        // metinde 250; aralık 250–630 (2,5×)
-  'vortice-vort-heatmaster-slimroof-roof|debi_m3h',    // metinde 460; aralık 460–18.600 (40,4×)
-  'vortice-vort-heatmaster-slimroof-smoke|debi_m3h',   // metinde 2580; aralık 2.580–22.550 (8,7×)
-  'vortice-vort-industrial-ventilation-axial|cap_mm',  // metinde 350; aralık 300–600 (2,0×)
-  'vortice-vort-qbk-sal-kc-evo|cap_mm',                // metinde 315 (+25 izolasyon); aralık 315–630 (2,0×)
-])
+const DONMUS_BORC: ReadonlySet<string> = new Set<string>([])
 
 const anahtar = (i: Ihlal) => `${i.slug}|${i.eksen}`
 
@@ -136,6 +159,50 @@ describe('INV-AILE-SAYI-1 · aile metni tek modelin sayısını serinin sayısı
     ).toEqual([])
   })
 
+  it('⭐⭐MUAFİYET KELİME İÇİNDE TETİKLENEMEZ (alt-dize eşleşmesi ölçüm değildir)', () => {
+    // NİÇİN: bu kol, ölçülmüş bir kusurun kalıcı bekçisidir. `ARALIK_IFADESI` deseni
+    // 2026-09-06'da `ile`/`kadar`ı KELİME İÇİNDE de eşleştiriyordu; Türkçede `ailesi`,
+    // `abilen`, `edilebilen` hepsi `ile` içerir. Ölçüldü: 13 ailelik pakette eski desen
+    // 8 aileyi muaf sayıyordu, doğrusu 4 — evrenin %31'i SESSİZCE atlanıyordu, üstelik
+    // atlananların ikisi bu kapının izlediği borç kalemleriydi.
+    //
+    // Sabotajla bulundu: pakete "Sabotaj ailesi: 200 mm nominal çaplı…" diye AÇIK bir
+    // ihlal koydum ve kapı YEŞİL kaldı — çünkü "ailesi" kelimesi muafiyeti tetikliyordu.
+    const kelimeIcinde = [
+      'Sabotaj ailesi: 200 mm nominal çaplı fan.',      // "ailesi"      içinde "ile"
+      'Patlayıcı ortam oluşabilen 200 mm çaplı fan.',   // "oluşabilen"  içinde "ile"
+      'Gömme monte edilebilen 200 mm çaplı aspiratör.', // "edilebilen"  içinde "ile"
+      'İleri teknoloji 200 mm çaplı fan.',              // "İleri"       içinde "ile"
+    ]
+    for (const metin of kelimeIcinde) {
+      expect(
+        ARALIK_IFADESI.test(metin),
+        `MUAFİYET KELİME İÇİNDEN TETİKLENDİ: "${metin}" — desen kelime sınırı kullanmıyor, ` +
+          'bu aile sessizce ÖLÇÜLMEDEN geçer.',
+      ).toBe(false)
+    }
+
+    // TERS YÖN — gerçek aralık ifadeleri HÂLÂ muaf tutulmalı (kol fazla sıkılaşmasın):
+    for (const metin of [
+      '100–315 mm çap seçenekleri sunar.',
+      '1200 m³/h ile 3200 m³/h arasında debi sunar.',
+      'Kapasitesi 11 kW seviyesine kadar uzanır.',
+      'Çap aralığı 250 ile 630 mm arasıdır.',
+    ]) {
+      expect(ARALIK_IFADESI.test(metin), `GERÇEK aralık ifadesi TANINMADI: "${metin}"`).toBe(true)
+    }
+
+    // Ve uçtan uca: kelime-içi eşleşme artık ihlali GİZLEYEMEZ.
+    expect(
+      ihlalleriBul([{
+        slug: 'sinama-kelime-ici', urun: 9,
+        cap_min: 200, cap_max: 600, debi_min: null, debi_max: null,
+        metin_tr: 'Sabotaj ailesi: 200 mm nominal çaplı endüstriyel fan serisi.',
+      }]).length,
+      'Kelime-içi "ile" ihlali GİZLEDİ — muafiyet kelime sınırı ile korunmalı.',
+    ).toBe(1)
+  })
+
   it('⭐AYIRT EDİCİ — ölçüt sentetik vakalarda doğru karar veriyor', () => {
     const kur = (metin: string, min: number, max: number): Aile => ({
       slug: 'sinama', urun: 5, cap_min: min, cap_max: max, debi_min: null, debi_max: null, metin_tr: metin,
@@ -152,14 +219,65 @@ describe('INV-AILE-SAYI-1 · aile metni tek modelin sayısını serinin sayısı
     expect(ihlalleriBul([{ ...kur('250 mm çaplı.', 250, 630), urun: 1 }]).length).toBe(0)
   })
 
-  it('⭐BİLİNEN KUSURLAR GERÇEKTEN YAKALANIYOR (sabotaj değil, saha vakası)', () => {
-    // Kapinin "0 ihlal" demesi, olcutun KOR olmasindan da gelebilirdi. Bu kol, bilinen
-    // iki saha vakasinin GERCEKTEN yakalandigini olcer.
-    const olculen = new Set(ihlaller.map(anahtar))
-    expect(olculen.has('vortice-vort-heatmaster-slimroof-roof|debi_m3h'), 'slimroof-roof yakalanmadi').toBe(true)
-    expect(olculen.has('vortice-vort-heatmaster-slimroof-smoke|debi_m3h'), 'slimroof-smoke yakalanmadi').toBe(true)
-    // Ve lineo-quiet YESIL kalmali (OPS'un dogru ornegi).
-    expect([...olculen].some((k) => k.startsWith('vortice-lineo-quiet')), 'lineo-quiet yanlislikla kirmizi').toBe(false)
+  it('⭐⭐ÖLÇÜT HÂLÂ GÖRÜYOR — kapanan saha vakaları KALICI SINAV olarak duruyor', () => {
+    // NİÇİN BU KOL BÖYLE DEĞİŞTİ (2026-09-06 16:00): önceki hâli, iki saha vakasının
+    // CANLI pakette yakalandığını ölçüyordu. Katalog metinleri düzeltti, borç sıfıra
+    // indi — ve o kol düşmeye başladı. **Doğru tepki kolu SİLMEK DEĞİL**: silseydik
+    // "0 ihlal" demesi ölçütün KÖR olmasından mı geliyor sorusunu bir daha hiç
+    // soramazdık. Bunun yerine vakaların METİNLERİ dondurularak buraya taşındı.
+    //
+    // Yani: gerçek kusur listeden çıktı, ama SINAV olarak kaldı. Borç bitince ayırt
+    // edicilik kanıtı da bitmesin diye. Bu metinler TARİHTİR, değiştirilmez.
+    const KAPANMIS_SAHA_VAKALARI: ReadonlyArray<{ ad: string; aile: Aile; eksen: string }> = [
+      {
+        ad: 'slimroof-roof (eski metin, 40,4× sapma)',
+        eksen: 'debi_m3h',
+        aile: {
+          slug: 'tarihsel-slimroof-roof', urun: 10,
+          cap_min: 155, cap_max: 630, debi_min: 460, debi_max: 18600,
+          metin_tr: 'Çatı tipi montaja uygun, radyal atışlı, yüksek verimli EC motorlu Slimroof ES çatı fanı. Nominal debisi 460 m3/h olup, IP54 koruma sınıfına sahiptir.',
+        },
+      },
+      {
+        ad: 'slimroof-smoke (eski metin, 8,7× sapma)',
+        eksen: 'debi_m3h',
+        aile: {
+          slug: 'tarihsel-slimroof-smoke', urun: 10,
+          cap_min: 315, cap_max: 630, debi_min: 2580, debi_max: 22550,
+          metin_tr: '400°C/2h sıcaklık dayanım sertifikalı (F400), çift amaçlı (genel havalandırma ve duman egzozu) radyal atışlı çatı fanı. Maksimum debisi 2580 m3/h olup, IP55 koruma sınıfına sahiptir.',
+        },
+      },
+    ]
+
+    for (const vaka of KAPANMIS_SAHA_VAKALARI) {
+      const bulunan = ihlalleriBul([vaka.aile])
+      expect(
+        bulunan.map((i) => i.eksen),
+        `ÖLÇÜT KÖRLEŞTİ — ${vaka.ad} artık YAKALANMIYOR. Bu metin tarihsel bir KUSURDUR ` +
+          've ölçüt onu görmek ZORUNDA; görmüyorsa kapının "0 ihlal" demesi hiçbir şey ifade etmez.',
+      ).toContain(vaka.eksen)
+    }
+
+    // TERS YÖN — doğru yazılmış metin SERBEST kalmalı (lineo-quiet, aralık yazan vaka).
+    const lineoQuiet: Aile = {
+      slug: 'tarihsel-lineo-quiet', urun: 12,
+      cap_min: 100, cap_max: 315, debi_min: 260, debi_max: 2890,
+      metin_tr: 'Ultra sessiz çalışan, akustik susturucu gövdeli kanal tipi karma akışlı havalandırma fanı serisi. 100–315 mm çap seçenekleri ve 260–2890 m³/h debi aralığı ile konut ve ticari havalandırma uygulamalarına uygundur.',
+    }
+    expect(
+      ihlalleriBul([lineoQuiet]),
+      'lineo-quiet YANLIŞLIKLA kırmızı — metni aralık yazıyor (11× yayılmanın farkında), serbest kalmalı.',
+    ).toEqual([])
+  })
+
+  it('⭐BORÇ SIFIR — canlı pakette ihlal YOK (kapanışın kendi ölçümü)', () => {
+    // Bu kol, yukarıdaki "ölçüt hâlâ görüyor" kolunun KARDEŞİDİR ve ancak onunla
+    // birlikte anlam taşır: ölçütün gördüğü kanıtlı, ve gördüğü halde 0 buluyor.
+    expect(
+      ihlalleriBul(paket.aileler).map(anahtar),
+      'Canlı pakette ihlal DOĞDU. Borç 2026-09-06 16:00 itibarıyla SIFIRDI; yeni bir\n' +
+        'kalem çıktıysa ya metin bozuldu ya paket bayat. Önce paketin damgasına bak.',
+    ).toEqual([])
   })
 
   it('BOŞLUK MUHAFIZI — veri paketi gerçekten okundu ve damgalı', () => {

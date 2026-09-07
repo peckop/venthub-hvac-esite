@@ -85,20 +85,59 @@ vermemek içindir — yani gerçek borç ölçülenden **biraz büyük** olabili
 
 ---
 
-## 5. Ölçülen borç (2026-09-06)
+## 5. Ölçülen borç — ⭐**SIFIR** (2026-09-06 16:00, paket damgası `09:45:48Z`)
 
-**6 aile-eksen çifti.** Düzeltme, Katalog şeridinin taslak işinde; metin düzelince kapıdaki
-`DONMUS_BORC` listesinden de **silinmek zorunda** (tek yönlü mandal).
+Sabah ölçülen **6 aile-eksen çifti**nin **altısı da kapandı.** URUN-KATALOG 38 ailenin TR
+metnini yeniden yazıp prod'a uyguladı (REC-146 / K7.8); paket o yazımdan **sonra** yeniden
+üretildi ve `DONMUS_BORC` listesi **boşaltıldı** (tek yönlü mandal, yalnız küçülür).
 
-| Aile | Eksen | Metinde | Aralık | Yayılma |
-|---|---|---|---|---|
-| `vortice-vort-heatmaster-slimroof-roof` | debi | 460 | 460–18.600 | **40,4×** |
-| `vortice-vort-heatmaster-slimroof-smoke` | debi | 2580 | 2.580–22.550 | **8,7×** |
-| `vortice-vort-e-atex` | çap | 250 | 250–630 | 2,5× |
-| `avens-plug-fanlar` | çap | 315 | 315–630 | 2,0× |
-| `vortice-vort-industrial-ventilation-axial` | çap | 350 | 300–600 | 2,0× |
-| `vortice-vort-qbk-sal-kc-evo` | çap | 315 | 315–630 | 2,0× |
+| Aile (sabah borçtaydı) | Eksen | Sabah | Nasıl kapandı |
+|---|---|---|---|
+| `vortice-vort-heatmaster-slimroof-roof` | debi | 460 / 460–18.600 (**40,4×**) | yeni metinde **hiç rakam yok** |
+| `vortice-vort-heatmaster-slimroof-smoke` | debi | 2580 / 2.580–22.550 (8,7×) | yeni metinde **hiç rakam yok** |
+| `avens-plug-fanlar` | çap | 315 / 315–630 | yeni metinde **hiç rakam yok** |
+| `vortice-vort-industrial-ventilation-axial` | çap | 350 / 300–600 | yeni metinde **hiç rakam yok** |
+| `vortice-vort-e-atex` | çap | 250 / 250–630 | metin o eksende **sayı vermiyor** (mm geçmiyor) |
+| `vortice-vort-qbk-sal-kc-evo` | çap | 315 / 315–630 | metin o eksende **sayı vermiyor** |
 
-> Panoda bu sınıf **"10 aile"** diye bildirilmişti; bu cetvelin ölçütüyle bugün **6**
-> çıkıyor. Fark, ölçütün farkıdır — yukarıdaki eşik ve "aralık ifadesi" kolu bilerek
-> gevşektir. Sayı değişirse **ölçüt yazılı olduğu için** sebebi de bilinir.
+İki meşru yol da §2'de yazılıdır: ya **aralık** yazarsın, ya **o sayıyı hiç vermezsin.**
+Katalog ikincisini seçti. Dört ailenin metin uzunluğu 150–318 karakter, yani **boşaltılmadı**,
+yalnızca sayısızlaştırıldı — DB'den ayrıca doğrulandı.
+
+---
+
+## 5.1 ⛔Kapının SESSİZ bir kusuru vardı — sabotajla bulundu, düzeltildi
+
+Borcun kapandığını ilan etmeden önce kapıya **sahte bir ihlal** verdim:
+*"Sabotaj **ailesi**: 200 mm nominal çaplı fan."* — açık bir ihlal. **Kapı yeşil kaldı.**
+
+Sebep: `ARALIK_IFADESI` deseni `ile` ve `kadar`ı **kelime içinde** de eşleştiriyordu.
+Türkçede bu felakettir — `ailesi`, `abilen`, `edilebilen`, `ileri`, `vesile` hepsi `ile`
+içerir. Aile "aralık yazmış" sayılıp muaf tutuluyor, yani **hiç ölçülmüyordu.**
+
+**Ölçüm (13 ailelik paket):** eski desen **8** aileyi muaf sayıyordu, doğrusu **4**.
+Evrenin **%31'i sessizce atlanıyordu** — ve atlananların ikisi (`vort-e-atex`,
+`qbk-sal-kc-evo`) tam da bu kapının izlediği **borç kalemleriydi**. Yani kapı onları
+"düzeldi" diye değil, **"bakmadım"** diye temiz gösteriyor olabilirdi.
+
+Düzeltme: kelime sınırı (`\bile\b`, `\bkadar\b`, `\baras[ıi]`). Düzeltmeden **sonra** da
+canlı pakette ihlal **0** — yani borcun kapandığı, artık **keskin** bir ölçütle doğrulandı.
+Kalıcı bekçi eklendi: *"MUAFİYET KELİME İÇİNDE TETİKLENEMEZ"* kolu, dört kelime-içi vakayı
+ve dört gerçek aralık ifadesini **iki yönlü** sınar.
+
+⭐**Ders (bugün filoda sekizinci kez):** **alt-dize eşleşmesi ölçüm değildir.**
+Aynı sınıfın kardeşi: `returns.created`ın `returns.createdToast` içinde eşleşmesi.
+
+---
+
+## 5.2 Borç bittiğinde ayırt edicilik kanıtı da bitmesin
+
+`DONMUS_BORC` boşalınca kapının *"0 ihlal"* demesi anlamsızlaşabilirdi — ölçüt kör olsa da
+aynı şeyi derdi. Bu yüzden kapanan iki saha vakasının **eski metinleri** kapıya kalıcı
+**sınav** olarak taşındı (*"ÖLÇÜT HÂLÂ GÖRÜYOR"* kolu). Gerçek kusur listeden çıktı, sınav
+olarak kaldı. Sabotajla doğrulandı: eşik 2'den 100'e çekilince kol *"ÖLÇÜT KÖRLEŞTİ"* diye
+vaka adıyla düşüyor.
+
+> Panoda bu sınıf **"10 aile"** diye bildirilmişti; sabah bu cetvelin ölçütüyle **6**
+> çıkmıştı. Fark, ölçütün farkıdır — eşik ve "aralık ifadesi" kolu bilerek gevşektir.
+> Sayı değişirse **ölçüt yazılı olduğu için** sebebi de bilinir.
