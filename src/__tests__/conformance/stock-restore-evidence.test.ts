@@ -189,6 +189,103 @@ describe('INV-STOCK-1 — sipariş kaynaklı stok geri-vermesi kanıta bağlı',
     expect(isOrderScopedStockWriter(saltOkuma), 'salt-okuma ihlal sayılmamalı').toBe(false)
   })
 
+  /**
+   * ⭐EVREN MUHAFIZI (REC-189, kaynak REC-179 evren muhafızı sınavı).
+   *
+   * OPS'un 53 kapıyı sabotajla sınadığı ölçümde bu kapı **fail-open** çıktı ve sebebi
+   * şuydu: aşağıdaki iki kol `stockWriters` üzerinde döner, ve o küme BOŞALIRSA ikisi de
+   * "ihlal yok" der. Boş kümede dönen döngü hiçbir şey ölçmez ama yeşil yanar.
+   *
+   * Küme iki yoldan boşalabilir ve ikisi de sessizdir:
+   *   · glob kökü kayar (`/src/**` → başka dizin, ya da `supabase/functions` kapsamdan düşer)
+   *   · tanıma deseni (`stock_qty:` / `inventory_movements` + `.insert(`) kod biçimi
+   *     değişince eşleşmez olur — ör. alan adı değişir, yazım bir yardımcıya taşınır.
+   * İkisinde de kapı "sipariş kaynaklı stok yazan dosya YOK" der; oysa gerçek "artık
+   * bakamıyorum"dur. *Ölçemediğini geçmiş sayan kapı, kapı değildir.*
+   *
+   * BU KOL EŞİĞİ ÖLÇÜLEN DEĞERİN BİR KADEME ALTINA KOYAR (emrin reçetesi): bugün ölçülen
+   * sayı mesajda yazılıdır, eşik ondan küçüktür. Böylece meşru bir azalma (bir yazar RPC'ye
+   * taşınınca kümeden düşer) kapıyı kızartmaz, ama kümenin ÇÖKMESİ yakalanır.
+   */
+  it('EVREN MUHAFIZI: tarama gerçekten dosya buldu — boş/dar küme KIRMIZI', () => {
+    // Önce taramanın kendisi: kaynak havuzu okunamıyorsa sonraki her ölçüm anlamsız.
+    expect(
+      Object.keys(productionSources).length,
+      'Kaynak havuzu şüpheli derecede küçük — glob kökü kaymış olabilir. ' +
+        'Kapı KÖR koşmaktansa KIRMIZI döner.',
+    ).toBeGreaterThan(200)
+
+    // ⭐İKİ AYAK AYRI ÖLÇÜLÜR: `src` ve `supabase/functions`. Karma evrenin bir ayağı
+    // sessizce düşerse toplam sayı hâlâ büyük kalır ve muhafız bunu GÖRMEZ — sipariş
+    // kaynaklı stok yazımının ağırlığı Edge tarafındadır (iyzico-refund, order-housekeeping).
+    expect(
+      Object.keys(productionSources).filter((p) => p.startsWith('/supabase/functions/')).length,
+      'Edge kaynakları evrende YOK — `supabase/functions` globu düşmüş. Sipariş kaynaklı ' +
+        'stok yazımının ağırlığı orada; bu ayak olmadan kapı yarım evren ölçer.',
+    ).toBeGreaterThan(10)
+    expect(
+      Object.keys(productionSources).filter((p) => p.startsWith('/src/')).length,
+      'Uygulama kaynakları evrende YOK — `/src/**` globu düşmüş.',
+    ).toBeGreaterThan(100)
+
+    /**
+     * ⭐İLK TASLAĞIM YANLIŞTI VE ÖLÇÜM DÜZELTTİ — bu, kolun en öğretici kısmı.
+     * Önce `stockWriters.length > 0` yazmıştım (emrin "eşik" reçetesi böyle okunuyordu).
+     * Koşturdum: sayı **0** çıktı. Sonra sebebini ölçtüm ve 0'ın ANLAMI şu:
+     *   `process_order_stock_restore` RPC'si `src/lib/orderStatusService.ts:353` ve
+     *   `supabase/functions/iyzico-refund/index.ts:442`'den ÇAĞRILIYOR;
+     *   `release-expired-reservations` da stok geri-vermesini o RPC'ye devretmiş.
+     * Yani sipariş bağlamında DOĞRUDAN stok yazan dosya kalmamış — göç TAMAMLANMIŞ.
+     * `stockWriters === 0` bu kapının BAŞARI hâlidir.
+     *
+     * Dolayısıyla "küme boş olmasın" diye kol yazmak TERSİNE bir şey ister: *birileri hâlâ
+     * doğrudan stok yazsın.* Kapı, korumaya çalıştığı kuralın ihlalini şart koşamaz.
+     *
+     * DOĞRU MUHAFIZ İHLALİN VARLIĞINI DEĞİL DEDEKTÖRÜN SAĞLIĞINI ÖLÇER: tanıyıcı, tanıması
+     * gereken bir kaynağı HÂLÂ tanıyor mu (pozitif fikstür) ve tanımaması gerekeni reddediyor
+     * mu (negatif fikstür). Küme meşru biçimde boşalabilir; tanıyıcının kör olması meşru değil.
+     */
+    /**
+     * ⛔DEDEKTÖR SAĞLIĞINI BURADA TEKRAR ÖLÇMÜYORUM — YUKARIDAKİ KOL ZATEN ÖLÇÜYOR.
+     * İlk yazımda pozitif/negatif fikstür kolları eklemiştim; sonra dosyayı okudum ve
+     * "parser sağlığı" kolunun 2026-08-16'da tam bu iş için eklendiğini gördüm (hatta aynı
+     * gerekçeyle: "liste sıfıra indiğinde kapı doğru düzeltmeyi ihlal gibi gösteriyordu").
+     * Kolları SİLDİM. Aynı kuralı iki yere yazmak, ikisini ayrı ayrı bayatlatmaktır — bu
+     * akşam URUN de aynı gerekçeyle ikinci bir `orphan` kapısı yazmayı reddetti ve haklıydı.
+     *
+     * ⭐BUNUN SONUCU EMRİ DE DARALTIYOR: REC-179 sınavı bu kapıyı "çalışma kümesi 0, vakumda
+     * yeşil" diye fail-open saymıştı. Ölçtüm — dedektör körlüğü ZATEN kapılı; açık kalan
+     * delik daha dar ve iki tane: (a) DOSYA EVRENİ (glob ayakları) hiç ölçülmüyordu,
+     * (b) kapının KONUSUNUN yaşadığı (RPC çağrısı) hiç ölçülmüyordu. Aşağıdaki iki blok
+     * yalnız o ikisini kapatır.
+     *
+     * TEK EKLEDİĞİM AYIRT ETME EKSENİ: sipariş bağlamı OLMAYAN yazım. Mevcut kolun negatifi
+     * "sipariş bağlamı VAR + salt-okuma"; bu ise "yazım VAR + sipariş bağlamı YOK". İkisi
+     * farklı yönde kayma ölçer ve mevcut kolda yoktu.
+     */
+    expect(
+      isOrderScopedStockWriter(
+        "await supabase.from('products').update({ stock_qty: 5 }).eq('id', 1)",
+      ),
+      'DEDEKTÖR AŞIRI GENİŞ: sipariş bağlamı OLMAYAN elle stok düzeltmesi yazım sayıldı — ' +
+        'admin panelindeki meşru düzeltme (InventoryCsvImport, adjust_stock) bu kuralın ' +
+        'konusu değil; ihlal listesi meşru işle dolar ve kapı gürültüye boğulur.',
+    ).toBe(false)
+
+    /**
+     * ⭐KAPININ KONUSU HÂLÂ VAR MI: `stockWriters === 0` ancak RPC yolunun YAŞADIĞI sürece
+     * "göç tamamlandı" demektir. RPC çağrısı sıfıra düşerse anlam tersine döner — o zaman
+     * "kimse doğrudan yazmıyor" cümlesi "kimse stok geri vermiyor"a dönüşür ve kapı yine
+     * boşluğu ölçer. Bugün ölçülen: iki üretim dosyası (orderStatusService, iyzico-refund).
+     */
+    const rpcCagiran = Object.entries(productionSources).filter(([, src]) => callsRestoreRpc(src))
+    expect(
+      rpcCagiran.length,
+      'STOK GERİ-VERME RPC ÇAĞRISI KALMAMIŞ (' + RESTORE_RPC + '). `stockWriters === 0` artık ' +
+        '"göç tamamlandı" DEĞİL "geri-verme yolu kayboldu" anlamına gelir; kapı yine boşluk ölçer.',
+    ).toBeGreaterThan(1)
+  })
+
   it('muafiyet listesi BAYAT değil: her satır hâlâ var ve hâlâ doğrudan yazıyor', () => {
     const bayat: string[] = []
     for (const [path, gerekce] of Object.entries(PENDING_MIGRATION)) {
