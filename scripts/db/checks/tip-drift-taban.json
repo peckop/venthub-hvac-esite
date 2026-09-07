@@ -1,0 +1,12 @@
+{
+  "_nicin": "INV-TIP-DRIFT-1 icin BILINEN BORC listesi (REC-121, 2026-09-07 olculdu). Bu kalemler canli semada VAR ama commit'li src/types/database.types.ts'te YOK. Onarim `pnpm supabase:gen` ile yapilir ve o dosya URUN seridinin mulku olan bir URETILMIS ARTEFAKT'tir (AXIOM 3) - ALTYAPI kapisini yazar, dosyayi sahibi tazeler. Taban, master'i baska seridin kuyrugu yuzunden kirmiziya cevirmemek icin var.",
+  "_bayatlama_kurali": "Taban satiri ARTIK DRIFT DEGILSE kapi KIRMIZI verir ve o satirin DUSURULMESINI ister. Yoksa taban sessizce buyur ve kapinin evrenini daraltir; o an kapi durur ama yesil gorunur.",
+  "_kaynak_migration": "order_number_counters + generate_order_number_saat_tabanli_20260906: 2026-09-06 tarihli siparis numarasi saat-tabanli uretim isi (URUN-KATALOG/URUN hatti).",
+  "_olcum": "2026-09-07: commit'li 61 tablo/gorunum + 784 kolon, canli 62 + 786. Fark yalnizca asagidaki 4 kalem; diff'in kalani (6 yer) CLI surum parantezlemesiydi ve olcut disi.",
+  "bilinen_borc": [
+    "fonksiyon:public.generate_order_number_saat_tabanli_20260906",
+    "kolon:public.order_number_counters.gun",
+    "kolon:public.order_number_counters.son_no",
+    "tablo:public.order_number_counters"
+  ]
+}
