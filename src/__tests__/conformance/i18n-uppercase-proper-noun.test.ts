@@ -207,7 +207,16 @@ let DEGISKENLER: Map<string, ts.Node> = new Map()
  * borcun büyümesini haklı olarak reddediyor. Kapsam kaymasın diye burada YALNIZ benim
  * değişikliğimin kör ettiği çözücü var; diğer ikisi AYRI İŞ EMRİ (bulgu OPS'a bildirildi).
  */
-const COZUCULER = new Set(['familyName', 'getCategoryDisplayName', 'getProductDisplayName'])
+// REC-272 (URUN, 2026-09-07): `getProductModelLabel` EKLENDİ. O da DB'den gelen bir
+// değer döndürür (`products.model_code`) ve bu kapının kapsamına aynen girer. Listede
+// olmasaydı, onu doğrudan `uppercase` altında basan bir bileşen kapıya GÖRÜNMEZDİ —
+// körlük, çözücü kullanmaya geçildiği anda doğuyordu.
+const COZUCULER = new Set([
+  'familyName',
+  'getCategoryDisplayName',
+  'getProductDisplayName',
+  'getProductModelLabel',
+])
 
 /** İfade veri alanına dokunuyor mu? Yerel fonksiyon çağrısıysa İÇİNE bakar. */
 function veriTasiyorMu(ifade: ts.Node, fonksiyonlar: Map<string, ts.Node>, derinlik = 0): string | null {
@@ -411,9 +420,16 @@ describe('INV-7: veri kaynaklı özel ad CSS uppercase ile basılmaz', () => {
   it('YARDIMCI KANARYASI: `variantLabel` üzerinden veri GÖRÜLMELİ', () => {
     // Ayrı kol: yukarıdaki kanarya doğrudan interpolasyonu ölçer, bu kol ÇÖZÜMLEMEYİ.
     // İkisi ayrı ayrı ölür; tek kolda birleştirilirse biri diğerini maskeler.
+    // REC-272 (URUN, 2026-09-07): kanarya eskiden `model_code` KELİMESİNİ arıyordu,
+    // çünkü `variantLabel` gövdesi `v.model_code || v.sku` idi. O yedek YASAKTI
+    // (productHelpers: "sku'ya düşmek YASAK") ve kaldırıldı; gövde artık çözücüyü
+    // çağırıyor: `getProductModelLabel(v) ?? getProductDisplayName(v, null, lang)`.
+    // Veri akışı DEĞİŞMEDİ, yalnız adı değişti — kanaryanın koruduğu körlük aynen
+    // duruyor, bu yüzden aranan kelime çözücünün adına çevrildi. Kelimeyi sabit
+    // bırakmak, kanaryayı gerçek bir kusur olmadan kırmızı tutardı.
     const cozulen = bulgular.filter(
       (b) => b.yer.startsWith('src/components/products/VariantSelector.tsx:') &&
-        b.ornek.includes('variantLabel()') && b.ornek.includes('model_code'),
+        b.ornek.includes('variantLabel()') && b.ornek.includes('getProductModelLabel'),
     )
     expect(cozulen.length, MESAJ_YARDIMCI).toBeGreaterThan(0)
   })

@@ -6,7 +6,7 @@ import React, { useMemo, useState } from 'react'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { FamilyVariant } from '../../lib/services/family.service'
-import { formatSpecValue, getProductDisplayName } from '../../utils/productHelpers'
+import { formatSpecValue, getProductDisplayName, getProductModelLabel } from '../../utils/productHelpers'
 import { specFieldLabel } from '../../utils/specLabel'
 
 /**
@@ -64,8 +64,18 @@ export interface VariantSelectorProps {
   priceTaxIncluded?: boolean | null
 }
 
-function variantLabel(v: FamilyVariant): string {
-  return v.model_code || v.sku
+/**
+ * REC-272 — varyantın GÖRÜNEN etiketi. `model_code` yoksa iç SKU'ya düşmek YASAK
+ * (productHelpers.getProductModelLabel'ın hükmü: "etiketi hiç göstermemek, müşteriye
+ * iç kod göstermekten iyidir"). Yedek, müşteriye zaten gösterilen ADdır — çözücüsü
+ * `getProductDisplayName`, ham `v.name` DEĞİL (i18n kural 7).
+ *
+ * Bugün uykuda: 374 ürünün 374'ünde `model_code` dolu, sıfırında boş. Yani bu dal
+ * görünürde bir şey değiştirmez; kaynakta kodu OLMAYAN ürün geldiğinde (REC-272'nin
+ * beş Vortice ürünü gibi) iç kodun vitrine sızmasını engeller.
+ */
+function variantLabel(v: FamilyVariant, lang: string): string {
+  return getProductModelLabel(v) ?? getProductDisplayName(v, null, lang)
 }
 
 /**
@@ -211,7 +221,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                   ? 'bg-primary-navy text-white border-primary-navy'
                   : 'bg-white text-industrial-gray border-light-gray hover:border-primary-navy hover:text-primary-navy'}`}
               >
-                {variantLabel(v)}
+                {variantLabel(v, lang)}
               </button>
             )
           })}
@@ -235,7 +245,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                 >
                   <span className="flex flex-col min-w-0">
                     <span className="text-xs font-black text-industrial-gray uppercase tracking-widest truncate">
-                      {variantLabel(v)}
+                      {variantLabel(v, lang)}
                     </span>
                     {/* REC-110: ham `v.name` DEĞİL — listedeki ad da PDP başlığıyla aynı çözücüden
                         gelir; aile burada yok, varyant adı her satırda dolu (fallback gerekmez). */}
@@ -281,7 +291,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                     type="button"
                     onClick={() => onSelect(v.sku)}
                     aria-pressed={active}
-                    aria-label={t('pdp.variant.selectAria', { model: variantLabel(v) })}
+                    aria-label={t('pdp.variant.selectAria', { model: variantLabel(v, lang) })}
                     className={`w-full grid gap-2 items-center px-3 py-2.5 rounded-xl border text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${active
                       ? 'bg-air-blue/40 border-primary-navy'
                       : 'bg-white border-transparent hover:bg-slate-50 hover:border-light-gray'}`}
@@ -289,7 +299,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                   >
                     <span className="flex flex-col min-w-0">
                       <span className="text-xs font-black text-industrial-gray uppercase tracking-widest truncate">
-                        {variantLabel(v)}
+                        {variantLabel(v, lang)}
                       </span>
                       <span className="text-xs font-medium text-steel-gray truncate">{v.sku}</span>
                     </span>

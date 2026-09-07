@@ -4,7 +4,7 @@ import autoTable from 'jspdf-autotable';
 import type { Product } from '@/types/ui-models';
 
 import { SITE_URL } from '../config/siteUrl';
-import { formatSpecValue, groupTechnicalSpecs, SPEC_SORT_ORDER } from '../utils/productHelpers';
+import { formatSpecValue, getProductModelLabel, groupTechnicalSpecs, SPEC_SORT_ORDER } from '../utils/productHelpers';
 import { specFieldLabel, specGroupLabel } from '../utils/specLabel';
 import { getAbsoluteAssetUrl,getBase64ImageFromUrl, PDF_COLORS, PDF_FONTS } from './pdfAssets';
 
@@ -200,9 +200,14 @@ export async function generateProductDatasheet(
     doc.setFont(fontName, 'normal');
     doc.setFontSize(11);
     doc.setTextColor(PDF_COLORS.lightText[0], PDF_COLORS.lightText[1], PDF_COLORS.lightText[2]);
+    // REC-272: model kodu yoksa İÇ SKU'ya düşmek YASAK (getProductModelLabel'ın hükmü).
+    // Kod yoksa satır yalnız markayı taşır — eksik bilgi, yanlış bilgiden iyidir.
+    // Yalnız `model_code` okunuyor; `ProductIdentitySource`'un tüm alanları opsiyonel
+    // olduğu için daraltılmış nesne yeterli — tip zorlaması (`as`) gerekmez.
+    const modelKodu = getProductModelLabel({ model_code: product.model_code });
     const brandModelText = lang === 'tr'
-        ? `Marka: ${product.brand} | Model Kodu: ${product.model_code || product.sku}`
-        : `Brand: ${product.brand} | Model Code: ${product.model_code || product.sku}`;
+        ? (modelKodu ? `Marka: ${product.brand} | Model Kodu: ${modelKodu}` : `Marka: ${product.brand}`)
+        : (modelKodu ? `Brand: ${product.brand} | Model Code: ${modelKodu}` : `Brand: ${product.brand}`);
     doc.text(brandModelText, margin, currentY);
     currentY += 15;
 

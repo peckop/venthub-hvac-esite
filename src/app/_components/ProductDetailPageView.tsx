@@ -604,7 +604,10 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 ve kimliği tam da aile adının yanlış olduğu tek-üyeli ailede yutuyordu. */}
             {variantLabel && (
               <p className="text-xs font-bold text-steel-gray uppercase tracking-widest mb-4">
-                {t('pdp.variant.selectedModel')}: <span className="text-primary-navy">{variantLabel}</span>
+                {/* REC-272: `uppercase` ETİKETE ait; DEĞER veriden gelir ve CSS ile
+                    büyütülmez (INV-7). Türkçede `text-transform:uppercase` "i" harfini
+                    "I" yapar, doğrusu "İ"dir — veri kaynaklı ad böyle bozulur. */}
+                {t('pdp.variant.selectedModel')}: <span className="text-primary-navy normal-case">{variantLabel}</span>
               </p>
             )}
 
