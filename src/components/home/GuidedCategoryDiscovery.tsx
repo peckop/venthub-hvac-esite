@@ -19,11 +19,33 @@ export interface CategoryViewModelLite {
 
 interface GuidedCategoryDiscoveryProps {
   displayCategories?: CategoryViewModelLite[]
+  /**
+   * Başlık kümesinin sözlük ANAHTARLARI — hazır metin DEĞİL (kural 7: çeviri bu
+   * bileşenin içinde, `t()` ile çözülür; çağıran çözülmüş metin geçirirse dil
+   * sağlayıcısı devre dışı kalırdı).
+   *
+   * NİÇİN VAR (REC-213-A): bu blok artık İKİ sayfada çiziliyor — ana sayfa ve
+   * `/products`. Ana sayfanın başlığı ("Ürün Ailelerimiz" ekseni) ürün listesi
+   * sayfasında yanlış konuşur; orada blok bir keşif kısayolu, sayfanın tezi değil.
+   * Varsayılanlar ana sayfanın bugünkü anahtarları olduğu için ana sayfa BİREBİR
+   * aynı kalır — davranış değişikliği yalnız yeni çağıranda.
+   *
+   * `null` geçmek o satırı hiç çizmez (ör. `/products` üstünde göz/giriş cümlesi
+   * istemiyoruz; sayfanın kendi h1'i zaten var, ikinci bir tez kurmak vaat şişirir).
+   */
+  eyebrowKey?: string | null
+  headingKey?: string
+  introKey?: string | null
 }
 
 const FALLBACK_CATEGORY_IMAGE = '/images/vortice_lineo_futuristic.webp'
 
-const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displayCategories = [] }) => {
+const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({
+  displayCategories = [],
+  eyebrowKey = 'home.guidedDiscovery.eyebrowLabel',
+  headingKey = 'home.guidedDiscovery.heading',
+  introKey = 'home.guidedDiscovery.intro',
+}) => {
   const { t } = useI18n()
   const Routes = useLocalizedRoutes()
   return (
@@ -31,25 +53,29 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-3xl">
-            <div 
-              data-observe="fade-up"
-              className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-opacity-transform duration-700 ease-out text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-600 mb-4"
-            >
-              {t('home.guidedDiscovery.eyebrowLabel')}
-            </div>
+            {eyebrowKey && (
+              <div
+                data-observe="fade-up"
+                className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-opacity-transform duration-700 ease-out text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-600 mb-4"
+              >
+                {t(eyebrowKey)}
+              </div>
+            )}
             <h2 
               data-observe="fade-up"
               className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
             >
-              {t('home.guidedDiscovery.heading')}
+              {t(headingKey)}
             </h2>
           </div>
-          <p 
-            data-observe="fade-up"
-            className="opacity-0 data-[in-view=true]:opacity-100 transition-opacity duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
-          >
-            {t('home.guidedDiscovery.intro')}
-          </p>
+          {introKey && (
+            <p
+              data-observe="fade-up"
+              className="opacity-0 data-[in-view=true]:opacity-100 transition-opacity duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
+            >
+              {t(introKey)}
+            </p>
+          )}
         </div>
 
         {/* Mobile: Horizontal Scroll | Desktop: Grid */}

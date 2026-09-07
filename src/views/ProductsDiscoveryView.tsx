@@ -19,11 +19,11 @@ import React, { Suspense, useCallback, useRef, useState } from 'react'
 
 import type { FamilyListItem } from '@/types/ui-models'
 
+import GuidedCategoryDiscovery, { type CategoryViewModelLite } from '../components/home/GuidedCategoryDiscovery'
 import FamilyCard from '../components/products/FamilyCard'
 import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../config/features'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
-import type { DomainCategory } from '../lib/type-converters'
 
 const CategoryOrbitCarousel = dynamic(
     () => import('../components/products/CategoryOrbitCarousel'),
@@ -39,7 +39,20 @@ const CategoryOrbitCarousel = dynamic(
 )
 
 interface ProductsDiscoveryViewProps {
-    initialCategories?: DomainCategory[]
+    /**
+     * REC-213-A — keşif sayfasının KATEGORİ KAPISI.
+     *
+     * Eskiden burada `initialCategories?: DomainCategory[]` diye bir prop vardı ve bu
+     * bileşen onu HİÇ OKUMUYORDU — tanımlıydı, destructure bile edilmiyordu. Tek geçen
+     * yer `views/ProductsPage.tsx` idi; o da uygulama ağacında çizilmeyen, yalnız
+     * `utils/prefetch.ts` tarafından paket ısıtmak için `import()` edilen bir sarmalayıcı.
+     * Yani prop uçtan uca ölüydü. (İlk taramamda yalnız iki dosyaya bakıp "hiçbir yerden
+     * geçilmiyor" demiştim; `tsc` beni düzeltti — kayda geçsin.)
+     *
+     * Yerine gerçekten çizilen bu prop geldi; tipi de kartın ihtiyacı olan şey (çözülmüş
+     * ad/açıklama/slug), ham satır değil.
+     */
+    kategoriler?: CategoryViewModelLite[]
     /** F5-B W2.1: keşif listesi de AİLE satırı basar (mükerrer varyant kartı yok). */
     families?: FamilyListItem[]
     /** Sunucu sayfalamasının toplamı — başlık sayacı sayfa uzunluğunu değil TOPLAMI gösterir. */
@@ -52,6 +65,7 @@ type ViewMode = 'grid' | 'list'
 
 
 const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
+    kategoriler = [],
     families = [],
     total,
     isLoading = false
@@ -104,6 +118,29 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                     </Suspense>
                 </div>
             </div>}
+
+            {/* ⭐REC-213-A — KATEGORİ KAPISI. Yukarıdaki yorumun "yerine gelecek kategori
+                kartları ayrı PR'da" sözü BUDUR; o PR gelmemişti ve arada sayfa kategorisiz
+                kaldı. Ölçüldü (canlı, 2026-09-07): /tr/products sayfasının HAM HTML'inde
+                `/tr/category/…` bağlantısı SIFIRDI — kategori adları metin olarak vardı ama
+                hiçbiri tıklanmıyordu. Yani 3D kapatılınca kategori ağacına giden kapı da
+                kapanmış, kimse fark etmemişti.
+
+                SIFIR YENİ BİLEŞEN: ana sayfanın kanıtlı kart ızgarası (GuidedCategoryDiscovery)
+                aynen kullanılır; yalnız başlık anahtarları bu sayfaya göre verilir. Göz satırı
+                ve giriş cümlesi BİLEREK yok — sayfanın kendi h1'i zaten tezi kuruyor, ikincisi
+                vaat şişirir (K5 ruhu: sayfada tek ana ses).
+
+                KOŞULLU: kategori yoksa blok hiç çizilmez — boş başlık bırakmak, yukarıdaki 3D
+                kutusunun düştüğü tuzağın aynısı olurdu. */}
+            {kategoriler.length > 0 && (
+                <GuidedCategoryDiscovery
+                    displayCategories={kategoriler}
+                    eyebrowKey={null}
+                    headingKey="products.popularCategories"
+                    introKey={null}
+                />
+            )}
 
             {/* --- Ürün Grid --- */}
             <AnimatePresence>
