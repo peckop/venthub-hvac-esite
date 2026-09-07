@@ -40,40 +40,90 @@ const sessionId = (input && input.session_id) || 'nosession';
  * düzenlemek demektir, yani CONFIG. Bu iş akran iletisiyle geldi ve config'e akran sözüyle
  * dokunulmaz. Zaten kayıtlı olan Stop kancasını genişletmek aynı sonucu verir.
  */
+/**
+ * ⭐REC-130 · İKİ KUSUR ONARILDI (2026-09-07) — lamba artık AYIRT EDİYOR.
+ *
+ * KUSUR 1 — EVREN YANLIŞTI: bu blok `board.agacKonumu(process.cwd())` ile KENDİ cwd'sini
+ * okuyordu. Cetvel §9.1 tam bunu yasaklıyor: kabuk cwd'si sessizce ana çalışma dizinine
+ * resetlenir, yani kancanın gördüğü dizin komutların KOŞTUĞU dizin değildir. Ana dizinde
+ * açılmış bir şerit oturumu için lamba HİÇBİR KOŞULDA sönmüyordu.
+ * ÖLÇÜLDÜ, iki şerit BAĞIMSIZ (2026-09-07): ALTYAPI bütün komutlarını `vh-altyapi-envanter`,
+ * OPS bütün komutlarını `ops-gun-kapanisi` ağacında koştu; lamba İKİSİNE DE yandı ve aynı
+ * "752. vaka"yı gösterdi. Her şeyi doğru yapan oturumu yanlış yapandan ayırt edemeyen bir
+ * gösterge ölçüm değildir — ve sürekli yanan lamba birkaç gün içinde mobilyaya döner.
+ * ONARIM: hüküm artık BU TURDA GERÇEKTEN KOŞAN komutlara dayanıyor. `bash-write-audit.cjs`
+ * her Bash çağrısında komut metnini ölçer ve dizinini BEYAN ETMEYEN ölçüm komutlarını
+ * kaydeder; burada o kayıt okunur. Kayıt boşsa lamba SUSAR — yani doğru davranmakla
+ * söndürülebilir hâle geldi.
+ *
+ * KUSUR 2 — SAYAÇ FİLO-GENELİ PAYLAŞILIYORDU: tek dosyada tek `son` alanı vardı ve
+ * `ayrismaSay`ın "aynı yer mi" kontrolü `son.sid`e bağlı. Dört şerit dönüşümlü tur bitirdiği
+ * için `son.sid` neredeyse her turda değişiyor, `vaka` da her turda artıyordu. Ölçüldü:
+ * 752 vaka / 1322 tur — gerçekte 752 ayrı ayrışma YOK, `vaka` şerit DEĞİŞİMİNİ sayıyordu.
+ * Bu, #977'nin kardeşi: o PR `vaka` ile `tur`un BİRİMİNİ ayırdı, sayacın PAYLAŞILDIĞINI
+ * görmedi. Birim düzeldi, evren düzelmedi.
+ * ONARIM: durum dosya İÇİNDE şerit başına ayrıldı (`seritler[sid]`). Dosya ADI korunuyor —
+ * `docs/audits/arac-envanteri-*.md` bu adı verify-on-stop'un koşum izi olarak gösteriyor ve
+ * o üretilmiş belgeye elle dokunulmaz (AXIOM 3); ayrıca tek dosya filo görünürlüğünü sürdürür.
+ *
+ * ⭐SAYIM MANTIĞI YİNE `board.ayrismaSay`da (§26 TEK KAYNAK) — imzası DEĞİŞMEDİ. Burada
+ * yalnız ona verilen dilim şerit-özel oldu. Sayı iki yerde iki kez hesaplanırsa ikisi
+ * sessizce ayrışır.
+ *
+ * ⚠VAKA ile TUR AYRI BİRİMLER: ilk hâlinde sayaç her tur sonu artıyordu ama metin "N. kayıtlı
+ * VAKA" diyordu. Alan adı BİRİMİ taahhüt eder (#977).
+ *
+ * ⚠TUR BAŞINA ÖLÇÜM KORUNDU: yukarıdaki gerekçe hâlâ geçerli — tehlike beyan eden komutta
+ * değil, ondan SONRAKİ göreli komutta. O yüzden hüküm komut başına verilmiyor, tur sonunda
+ * veriliyor; komut kaydı yalnızca KANIT. Ve o göreli komut (`node scripts/...`) kaydedicinin
+ * ölçüm kalıbının tam içindedir, yani 6. vakanın kendisi artık görünür.
+ */
 let konumUyarisi = '';
 try {
   const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'));
-  const konum = board.agacKonumu(process.cwd());
-  if (!konum.olculdu) {
-    // ÖLÇEMEMEK GEÇMEK DEĞİLDİR — sessiz kalmaz.
-    konumUyarisi = `⚠️ §28: çalışma dizini ÖLÇÜLEMEDİ (${konum.sebep}). Bu satır alarmdır, "temiz" demek değil.`;
-  } else if (konum.anaMi) {
-    const talepler = (board.tumTalepler ? board.tumTalepler() : []) || [];
-    const benim = talepler.filter((c) => String(c.sid) === String(sessionId));
-    if (benim.length > 0) {
-      /**
-       * SAYIM: pano dizininde birikir, filo geneli görünür olsun.
-       *
-       * ⭐SAYIM MANTIĞI BURADA DEĞİL, `board.ayrismaSay`da (§26 TEK KAYNAK). Bu kanca onun
-       * TÜKETİCİSİDİR — sayı iki yerde iki kez hesaplanırsa ikisi sessizce ayrışır.
-       *
-       * ⚠VAKA ile TUR AYRI BİRİMLER: ilk hâlinde bu sayaç her tur sonu artıyordu ama metin
-       * "N. kayıtlı VAKA" diyordu. Ölçüldü: "6. vaka" → iki saat sonra "32. vaka", arada
-       * 26 yeni ayrışma OLMADI, 26 TUR geçti. Alan adı BİRİMİ taahhüt eder.
-       */
+  const kisaSid = String(sessionId).slice(0, 8);
+  const beyansizYolu = path.join(board.BOARD_DIR, '.beyansiz-olcum.' + kisaSid + '.json');
+
+  let beyansiz = [];
+  try {
+    const o = JSON.parse(fs.readFileSync(beyansizYolu, 'utf8'));
+    if (Array.isArray(o)) beyansiz = o;
+  } catch { beyansiz = []; }
+  // Kayıt TUR BAŞINA tüketilir: bu turun ölçümü bir sonraki tura sarkmasın, yoksa lamba
+  // tek bir vakadan sonra yine sürekli yanar hâle gelirdi.
+  try { fs.unlinkSync(beyansizYolu); } catch { /* yoksay */ }
+
+  const talepler = (board.tumTalepler ? board.tumTalepler() : []) || [];
+  const benim = talepler.filter((c) => String(c.sid) === String(sessionId));
+
+  if (benim.length > 0 && beyansiz.length > 0) {
+    // Komutun KOŞTUĞU dizin ölçülür, kancanın kendi cwd'si DEĞİL (§9.1).
+    const olculenDizin = String((beyansiz[beyansiz.length - 1] || {}).cwd || '');
+    const konum = board.agacKonumu(olculenDizin);
+    if (!konum.olculdu) {
+      // ÖLÇEMEMEK GEÇMEK DEĞİLDİR — sessiz kalmaz.
+      konumUyarisi = `⚠️ §28: ölçüm komutunun dizini ÖLÇÜLEMEDİ (${konum.sebep}). Bu satır alarmdır, "temiz" demek değil.`;
+    } else if (konum.anaMi) {
       const sayacYolu = path.join(board.BOARD_DIR, '.cwd-ayrisma-sayaci.json');
-      let onceki = null;
-      try { onceki = JSON.parse(fs.readFileSync(sayacYolu, 'utf8')); } catch { onceki = null; }
-      const sayim = board.ayrismaSay(onceki, sessionId, process.cwd(), new Date().toISOString());
+      let dosya = null;
+      try { dosya = JSON.parse(fs.readFileSync(sayacYolu, 'utf8')); } catch { dosya = null; }
+      const kok = dosya && typeof dosya === 'object' ? dosya : {};
+      const seritler = kok.seritler && typeof kok.seritler === 'object' ? kok.seritler : {};
+      const sayim = board.ayrismaSay(seritler[sessionId] || null, sessionId, olculenDizin, new Date().toISOString());
       // Yazılamazsa uyarı YİNE verilir: sayaç bir kolaylık, uyarı ise asıl iş.
-      try { fs.writeFileSync(sayacYolu, JSON.stringify(sayim), 'utf8'); } catch { /* yoksay */ }
+      try {
+        fs.writeFileSync(sayacYolu, JSON.stringify({ ...kok, seritler: { ...seritler, [sessionId]: sayim } }), 'utf8');
+      } catch { /* yoksay */ }
+
+      const ornekler = beyansiz.slice(-2).map((k) => '     · ' + String(k.komut || '')).join('\n');
       konumUyarisi =
-        `⚠️ §28 AĞAÇ AYRIŞMASI (${sayim.vaka}. vaka · ${sayim.tur}. tur) — ŞU AN PAYLAŞILAN ANA DİZİNDESİN.\n` +
-        `   dizin: ${process.cwd()}\n` +
+        `⚠️ §28 BEYANSIZ ÖLÇÜM (${sayim.vaka}. vaka · ${sayim.tur}. tur · bu turda ${beyansiz.length} komut) — ANA DİZİNDE KOŞTU.\n` +
+        `   dizin: ${olculenDizin}\n` +
         `   Şerit talebin var (${benim.map((c) => c.lane).join(', ')}) ve şerit işi kendi worktree'sinde koşar.\n` +
+        `   Dizinini BEYAN ETMEYEN ölçüm komutları:\n${ornekler}\n` +
         `   VAKA = ayrışmanın kendisi (aynı yerde kaldıkça artmaz) · TUR = ne kadar sürdüğü.\n` +
         `   Zarar OLMAMIŞ olabilir — vakaların beşinde olmadı, ve kapı doğmamasının sebebi tam buydu.\n` +
-        `   Kanonik biçim: komutlarda MUTLAK yol, git için daima "git -C <ağaç>".`;
+        `   Kanonik biçim: komutlarda MUTLAK yol, git için daima "git -C <ağaç>". Beyan edersen BU SATIR SUSAR.`;
     }
   }
 } catch { /* kanca hiçbir koşulda turu düşürmez */ }

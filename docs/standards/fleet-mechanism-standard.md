@@ -2097,12 +2097,65 @@ Uyarı ancak **(a)** dizin ana worktree **ve (b)** oturumun canlı bir şerit ta
 verilir. Talebi olmayan bir oturumun ana dizinde olması olağandır; tek koşulla uyarmak
 yanlış alarm üretirdi.
 
+### ⭐HÜKÜM — LAMBA SÖNEBİLMELİ: gösterge, doğru davranışı yanlıştan AYIRT ETMELİ (REC-130, 2026-09-07)
+
+Yukarıdaki uyarı üç gün çalıştı ve **hiçbir şeyi ayırt etmedi.** İki kusur ölçüldü:
+
+**KUSUR 1 — evren yanlıştı.** Tur-sonu kancası ağacı **kendi `process.cwd()`'sinden** çözüyordu.
+**§9.1 tam bunu yasaklar:** kabuk cwd'si sessizce ana çalışma dizinine resetlenir, yani kancanın
+gördüğü dizin komutların **koştuğu** dizin değildir. Ana dizinde açılmış bir şerit oturumu için
+lamba **hiçbir koşulda sönmüyordu**.
+
+> **İki şerit BAĞIMSIZ ölçtü (2026-09-07 ~22:30Z):** ALTYAPI bütün komutlarını
+> `vh-altyapi-envanter` ağacında, OPS bütün komutlarını `ops-gun-kapanisi` ağacında koştu.
+> Lamba **ikisine de** yandı ve **aynı "752. vaka"yı** gösterdi.
+
+**KUSUR 2 — sayaç filo-geneli paylaşılıyordu.** Tek dosyada tek `son` alanı vardı ve
+`ayrismaSay`ın "aynı yer mi" kontrolü `son.sid`e bağlı. Dört şerit dönüşümlü tur bitirdiği için
+`son.sid` neredeyse her turda değişiyor, `vaka` da her turda artıyordu. **752 vaka / 1322 tur** —
+gerçekte 752 ayrı ayrışma yok; `vaka`, **şerit değişimini** sayıyordu.
+Bu, **#977'nin kardeşi**: o PR `vaka` ile `tur`un *birimini* ayırdı, sayacın *paylaşıldığını*
+görmedi. **Birim düzeldi, evren düzelmedi.**
+
+**ONARIM — ölçüt komutun KENDİ METNİDİR:**
+
+1. `bash-write-audit.cjs` (PostToolUse/Bash — komutu gören tek yer) her çağrıda komut metnini
+   ölçer; **ölçüm komutu olup dizinini BEYAN ETMEYEN**leri `.beyansiz-olcum.<sid>.json`'a yazar.
+   Beyan = `git -C <ağaç>`, `cd <yol>` ya da mutlak yol.
+2. Tur-sonu kancası o kaydı okur, **tur başına tüketir** ve hükmü **kaydın cwd'sine** göre verir.
+   **Kayıt boşsa lamba SUSAR.**
+3. Sayaç durumu dosya **içinde** şerit başına ayrıldı (`seritler[sid]`). Dosya **adı korunur**:
+   `docs/audits/arac-envanteri-*.md` bu adı koşum izi olarak gösterir ve o üretilmiş belgeye elle
+   dokunulmaz (AXIOM 3); tek dosya filo görünürlüğünü de sürdürür.
+
+⚠**`cd` HAFIZASI TUTULMAZ, ve bu bilinçli:** kabuk cwd'si çağrılar arası korunduğu için bir kez
+`cd` yapıp sonraki komutlarda ona güvenmek *mümkündür* — ama §9.1'in belgelediği sessiz reset tam
+o güveni kıran şeydir. Ortam cwd'sine yaslanan komut, resetten sonra ana dizinde koşar ve bunu
+kimse görmez. **Ortam cwd'sine yaslanmak ihlalin kendisidir**, ölçütün kaçırdığı bir hâl değil.
+
+⚠**TUR BAŞINA ÖLÇÜM KORUNDU.** Yukarıdaki gerekçe hâlâ geçerli: tehlike beyan eden komutta değil
+ondan **sonraki** göreli komuttadır. Hüküm yine tur sonunda verilir; komut kaydı yalnızca **kanıt**.
+Üstelik o göreli komut (`node scripts/…`) kaydedicinin ölçüm kalıbının **tam içindedir** — yani
+§28'in kurucu 6. vakası artık görünür.
+
+⭐**GENEL DERS:** *ayırt etmeyen gösterge ölçüm değildir.* Sürekli yanan lamba birkaç gün içinde
+mobilyaya döner ve gerçek vaka geldiğinde kimse bakmaz. Bir uyarının değeri yandığı hâlde değil,
+**sönebildiği** hâldedir — o yüzden `INV-BEYANSIZ-OLCUM-1`'in en önemli kolu susan hâli ölçer.
+
 ### Bu bölümün kolları ve sınırı
 
 `INV-BOARD-KONUM-2`, 4 kol: `agacKonumu` worktree ile ana dizini **ayırt eder** ·
 ölçülemeyince **sebep yazar** (sessiz "temiz" dönmez) · yazan fiil **ayrışmada uyarır,
 ayrışma yokken uyarmaz** (ayırt edici çift) · tur-sonu kancası **ana dizin + talep**
 birleşiminde uyarır ve **sayar**, diğer iki hâlde sessiz kalır (iki ayırt edici karşı-kol).
+
+`INV-BEYANSIZ-OLCUM-1`, 8 kol (REC-130): kaydedici **beyansız ölçümü yazar** · **göreli
+`node scripts/…` çağrısını yazar** (6. vakanın kendisi) · **beyan edeni yazmaz** · **ölçüm
+olmayanı yazmaz** · tur sonu **ana dizinde yanar** ve örnek komutu gösterir · **şerit ağacında
+SUSAR** · **kayıt yokken SUSAR** · sayaç **aynı yerde `vaka` artırmaz, `tur` artırır**.
+Kancalar izole panoda ve **`git init` + `git worktree add` ile kurulmuş geçici gerçek bir depoda**
+koşturulur; kapı `process.cwd()`'ye yaslansaydı yerelde (worktree) ve CI'da (ana checkout) farklı
+cevap verirdi — yani ölçülen kusur testin içinde tekrarlanırdı.
 
 ⚠**KAPSAM SINIRI, adıyla:** yeni bir Stop kancası **kaydedilmedi**; ölçüm zaten kayıtlı olan
 kancaya eklendi. Sebep: yeni kanca kaydı `.claude/settings.json` düzenlemek demektir, yani

@@ -1667,9 +1667,38 @@ describe('INV-BOARD-KONUM-2 · §28 ağaç ayrışması (uyarı + sayım)', () =
       return r.stdout ?? ''
     }
 
-    // A) ANA dizin + talep → UYARIR ve sayı taşır
+    /**
+     * ⭐SÖZLEŞME DEĞİŞTİ (REC-130, 2026-09-07) — ÜÇ KOŞUL, İKİSİ DEĞİL.
+     *
+     * Bu kol eskiden "ana dizin + talep → uyarır" diyordu ve o hâl ÖLÇÜLDÜ: uyarı, bütün
+     * komutlarını kendi ağacında koşan bir oturuma da yanıyordu (iki şerit bağımsız, aynı
+     * "752. vaka"). Sebep, kancanın ağacı KENDİ `process.cwd()`'sinden çözmesiydi — cetvel
+     * §9.1 tam bunu yasaklar. Ayırt etmeyen gösterge ölçüm değildir.
+     *
+     * Yeni sözleşme: uyarı (a) şerit talebi VAR **ve** (b) o turda dizinini BEYAN ETMEYEN bir
+     * ölçüm komutu KAYDEDİLMİŞ **ve** (c) o komutun dizini ANA ağaç ise verilir. Hüküm artık
+     * kancanın bulunduğu yere değil, KOMUTUN koştuğu yere bakar.
+     *
+     * ⚠Kaydı kanca TÜKETİR (tur başına), o yüzden her ölçümden önce yeniden yazılır.
+     */
+    const beyansizYaz = (komutCwd: string, s: string) => {
+      fs.writeFileSync(
+        resolve(boardDir3, '.beyansiz-olcum.' + s.slice(0, 8) + '.json'),
+        JSON.stringify([{ ts: new Date().toISOString(), cwd: komutCwd, komut: 'npx vitest run x' }]),
+        'utf8',
+      )
+    }
+    const UYARI = /BEYANSIZ ÖLÇÜM|BEYANSIZ OLCUM/
+
+    // A) ANA dizin + talep + beyansız kayıt → UYARIR ve sayı taşır
+    beyansizYaz(sahteAna, sid)
     const a = kos(sahteAna, sid)
-    expect(a, 'Ana dizinde şerit talebi varken tur-sonu uyarısı ÇIKMADI').toMatch(/AYRI[ŞS]MASI/)
+    expect(a, 'Ana dizinde şerit talebi varken tur-sonu uyarısı ÇIKMADI').toMatch(UYARI)
+    expect(
+      a,
+      'Uyarı hangi komutun beyansız koştuğunu GÖSTERMİYOR — ajan neyi düzelteceğini bilemez, ' +
+      'uyarı da "bir şey oldu" demekten öteye geçmez.',
+    ).toContain('vitest')
     // ⚠ÖLÇÜT SAYIYA BAĞLI, KELİMEYE DEĞİL — ilk hâli `/vaka/` idi ve SABOTAJI GEÇTİ:
     // uyarı metninin başka bir cümlesinde ("vakaların beşinde olmadı") aynı kelime
     // geçiyordu, yani sayaç silinse bile kol yeşil kalıyordu. Ayırt etmeyen gösterge
@@ -1689,17 +1718,28 @@ describe('INV-BOARD-KONUM-2 · §28 ağaç ayrışması (uyarı + sayım)', () =
       'karıştırmak bu kolun doğuş sebebiydi: sayaç tur sayıyordu, metin "vaka" diyordu.',
     ).toMatch(/\d+\.\s*tur/)
 
-    // B) worktree + talep → SESSİZ
+    // B) komut ŞERİT AĞACINDA koştu → SESSİZ. ⭐Kancanın kendi dizini ANA ağaç olduğu hâlde
+    // sessiz kalmalı: onarımın özü tam bu: hüküm komutun yerine bakar, kancanın yerine değil.
+    beyansizYaz(sahteWt, sid)
     expect(
-      /AYRI[ŞS]MASI/.test(kos(sahteWt, sid)),
-      'Şerit kendi worktree\'sindeyken uyarı basıldı — yanlış alarm',
+      UYARI.test(kos(sahteAna, sid)),
+      'Ölçüm komutu şerit ağacında koştuğu hâlde uyarı basıldı — ayırt etmeme kusuru DURUYOR: ' +
+      'her şeyi doğru yapan oturum yanlış yapandan ayırt edilemiyor ve lamba mobilyaya döner.',
     ).toBe(false)
 
     // C) ANA dizin ama talep YOK → SESSİZ. Bu kol olmasa "ana dizinde her zaman uyaran"
-    // bir uygulama da A'yı geçerdi; oysa ölçüt İKİ koşulun BİRLİKTE sağlanmasıdır.
+    // bir uygulama da A'yı geçerdi; oysa ölçüt koşulların BİRLİKTE sağlanmasıdır.
+    beyansizYaz(sahteAna, yabanci)
     expect(
-      /AYRI[ŞS]MASI/.test(kos(sahteAna, yabanci)),
+      UYARI.test(kos(sahteAna, yabanci)),
       'Şerit talebi olmayan oturum için uyarı basıldı — ana dizinde olmak tek başına ihlal değil',
+    ).toBe(false)
+
+    // D) ANA dizin + talep ama BEYANSIZ KAYIT YOK → SESSİZ. Üçüncü koşulun ayırt edici
+    // karşı-kolu: bu olmasa eski KOŞULSUZ uyarı da A'yı geçer ve REC-130 sessizce geri alınır.
+    expect(
+      UYARI.test(kos(sahteAna, sid)),
+      'Beyansız ölçüm kaydı YOKKEN uyarı basıldı — koşulsuz uyarı geri gelmiş demektir.',
     ).toBe(false)
   })
 })
