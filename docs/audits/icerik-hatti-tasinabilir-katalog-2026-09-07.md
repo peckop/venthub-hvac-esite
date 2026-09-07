@@ -66,3 +66,50 @@ Onarım: iki faz — önce hepsi okunup doğrulanır, **sonra** yazılır. Ya he
 Recep'in kendi sıralaması (2026-09-07): *"taşınabilir katalog tarafını halledip sonra benim
 veya senin kontrolümden geçirdikten sonra yüklememiz daha doğru değil mi?"* — yani geri
 yükleyici + doğrulama, yüklemeden önce.
+
+---
+
+## İkinci yarı — geri yükleyici ve ROUND-TRIP kanıtı (aynı gün, 18:xxZ)
+
+`scripts/icerik-hatti/katalog-geri-yukle.mjs` eklendi. **Yazma kolu bilerek kapalı**; betik
+bugün yalnız ölçer.
+
+### Asıl değeri: dışa aktarımın TAMLIĞINI ölçer
+
+Paket canlıdan çıktıysa, aynı canlıya karşı kuru koşum **sıfır fark** vermelidir. Fark
+çıkarsa suçlu geri yükleyici değil, **dışa aktarıcıdır** — bir kolonu ya da tabloyu pakete
+koymamış demektir.
+
+**Ölçüm (2026-09-07):**
+
+| Tablo | Paket | Aynı | Değişik | Yeni | Canlıda fazla |
+|---|---|---|---|---|---|
+| brands | 5 | 5 | 0 | 0 | 0 |
+| categories | 37 | 37 | 0 | 0 | 0 |
+| product_families | 40 | 40 | 0 | 0 | 0 |
+| price_lists | 3 | 3 | 0 | 0 | 0 |
+| products | 375 | 375 | 0 | 0 | 0 |
+| product_prices | 1044 | 1044 | 0 | 0 | 0 |
+| product_images | 1042 | 1042 | 0 | 0 | 0 |
+| **toplam** | **2546** | **2546** | **0** | **0** | **0** |
+
+**ROUND-TRIP: sıfır fark.** Paket bu veritabanını eksiksiz tarif ediyor.
+
+Bu, "dosya üretildi" ile "katalog taşındı" arasındaki farkı gösteren tek ölçümdür.
+
+### Üç sabotaj
+
+| Sınav | Sonuç |
+|---|---|
+| Pakette tek satır değiştirildi | sha256 tutmadı → çıkış 1, hiçbir şey okunmadı |
+| Manifest'siz dizin verildi | reddedildi → çıkış 1 ("hangi tablodan kaç satır beklendiği bilinmeden eksik yükleme, tam yüklemeden ayırt edilemez") |
+| `--yaz` + onay verildi | **yazma kolu açılmadı** → çıkış 1 |
+
+### Yazma kolu niçin kapalı
+
+Yükleme sırası, çakışma kuralı (upsert mi, sil-yaz mı) ve `tenant_id` yeniden eşlemesi
+**karara bağlı**. Kararsız bir yükleyici canlıyı bozar. Betik bunu gizlemiyor: `--yaz`
+verildiğinde sebebini yazıp duruyor.
+
+Yani REC-212 bugün şurada: **paket üretilebiliyor, bütünlüğü doğrulanabiliyor, tamlığı
+kanıtlanmış** — geri yazma, kararlar verildikten sonra ve Recep kapısında.
