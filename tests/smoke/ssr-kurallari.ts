@@ -177,16 +177,33 @@ export async function temsilcileriSec(
   const altPrefixleri = new Set(alt.map((p) => p.split('/').slice(0, 4).join('/')))
   const kokAltli = kok.filter((p) => altPrefixleri.has(p))
 
+  /**
+   * ⭐HİYERARŞİ ARTIK YOLDA KODLANMIYOR — ölçüt yol derinliğine bağlı kalamaz (2026-09-07).
+   *
+   * REC-205 iki seviyeli kategori adreslerini KALDIRDI: aynı sayfa iki adresten yayınlanıyor,
+   * ikisi de kendini kanonik ilan ediyordu ve Google iki seviyeliyi eliyordu (17 alt kategori
+   * × 2 dil = 34 çift adres). Sonuç: `alt` kümesi SIFIRA düştü ve bu kapı "zorunlu sınıfın
+   * temsilcisi yok" diyerek KIRMIZI verdi — oysa alt kategori sayfaları duruyor ve çalışıyor,
+   * yalnız adresleri tek seviyeli. **Regresyon değil, EVREN DEĞİŞTİ.** Ölçüt keskindi, evren
+   * kaydı — bu dosyanın yukarıdaki yorumunda yazan dersin aynısı, bu kez bana çarptı.
+   *
+   * Çare: iki seviyeli yol VARSA eski davranış korunur (geriye dönük); yoksa temsilciler tek
+   * seviyeli kategorilerden seçilir ve AYRIM İÇERİKTEN yapılır (aşağıdaki kural bloğunda:
+   * "aile kartı BASAR ya da alt grup başlığı BASAR" — ikisi de yoksa boş kabuk demektir).
+   */
+  const kategoriler = [...kok].sort()
   const t: Temsilciler = {
-    kokKategori: ilk(kokAltli),
-    altKategori: ilk(alt),
+    kokKategori: ilk(kokAltli) ?? kategoriler[1] ?? kategoriler[0] ?? null,
+    altKategori: ilk(alt) ?? kategoriler[0] ?? null,
     pdp: ilk(pdp),
     sayimlar,
   }
   if (!t.altKategori || !t.pdp) {
     throw new Error(
       'SSR duman kuralları: zorunlu sınıfların temsilcisi YOK ' +
-        `(alt-kategori=${sayimlar.altKategori}, pdp=${sayimlar.pdp}). Kapı KIRMIZI.`
+        `(kategori=${sayimlar.kokKategori}, alt-kategori=${sayimlar.altKategori}, pdp=${sayimlar.pdp}). ` +
+        'Kapı KIRMIZI. NOT: sitemap\'te HİÇ kategori yolu yoksa bu gerçek bir kusurdur; ' +
+        'yalnız iki seviyeli yol yoksa (REC-205) kapı tek seviyeliden temsilci seçer.'
     )
   }
   return t
@@ -244,11 +261,22 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
         ]
       : []),
 
-    // Yaprak alt-kategori: aile kartları SSR'da olmalı (sağlam işaret → kapıda).
+    /**
+     * Kategori sayfası: SSR'da GÖVDE basmalı — kapıda kalır.
+     *
+     * ⚠MARKER "YA/YA DA" OLDU ve BEDELİ BURAYA YAZILIYOR (2026-09-07): eskiden yalnız
+     * `family-card` aranıyordu, çünkü bu sınıf yol derinliğiyle "yaprak" diye seçiliyordu.
+     * REC-205 sonrası hiyerarşi yolda kodlanmadığı için seçilen sayfa yaprak DA olabilir,
+     * alt grupları olan DA. İkisinin SSR imzası farklı: yaprak `family-card` basar, üstteki
+     * `Alt Ürün Grupları` başlığını. Bu yüzden ölçüt "ikisinden BİRİ" oldu.
+     * **Ne kaybettik:** artık "bu sayfa YAPRAK ve aile kartı basıyor" diye kesin bir şey
+     * söylemiyoruz. **Ne korunuyor:** boş kabuk (ikisi de yok) hâlâ KIRMIZI, bailout tavanı 0.
+     * Daha güçlü hâli, temsilciyi içerikten seçmeyi gerektirir (bir tur ön-getirme) — ayrı iş.
+     */
     {
       yol: t.altKategori as string,
       sinif: 'alt-kategori',
-      markerlar: [/data-ssr="family-card"/],
+      markerlar: [/<h1[\s>]/, /(data-ssr="family-card"|>Alt Ürün Grupları<)/],
       maxBailout: 0,
       kapida: true,
     },
