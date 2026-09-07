@@ -1,6 +1,13 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 
+import { tumSatirlariCek } from '@/lib/supabase/tumSatirlar'
 import { Database } from '@/types/database.types'
+
+/** Düşük stok sayacının okuduğu kolonlar. */
+type DusukStokSatiri = Pick<
+  Database['public']['Tables']['products']['Row'],
+  'stock_qty' | 'low_stock_threshold'
+>
 
 export interface InboxCounts {
   pendingReturnsCount: number
@@ -23,7 +30,27 @@ export async function fetchInboxCounts(supabase: SupabaseClient<Database>): Prom
     supabase.from('venthub_orders').select('id', { count: 'exact', head: true }).is('shipped_at', null).in('status', ['confirmed', 'processing']),
 
     // 3. Low stock products (stock_qty <= low_stock_threshold)
-    supabase.from('products').select('stock_qty, low_stock_threshold'),
+    //
+    // ⛔SAYFALAMA ŞART (INV-TAVAN-1). Bu sayaç istemcide hesaplanıyor, yani TÜM satırlar
+    // gerekiyor; sayfalanmamış tek okuma PostgREST'in 1000 satır tavanına takılır ve
+    // alarm sayısı SESSİZCE eksik çıkar. Eksik alarm, hiç alarm olmamasından beterdir:
+    // panel "her şey yolunda" der. Ölçüldü (2026-09-07, prod): 375 ürün — tavan bugün
+    // ısırmıyor, sınır ise yoktu.
+    //
+    // Diğer üç sorgu `head: true` + `count: 'exact'` ile SUNUCUDA sayıyor, bu yüzden
+    // tavandan etkilenmiyor. Bu sorgu sunucuda sayılamıyor çünkü ölçüt iki KOLONU
+    // karşılaştırıyor (stock_qty <= low_stock_threshold) ve PostgREST filtreleri
+    // kolon-kolon karşılaştırma yapmaz. Sunucu tarafına taşımak bir RPC ister
+    // (migration → Recep onayı); o gelene kadar doğru çözüm sayfalamaktır.
+    tumSatirlariCek<DusukStokSatiri>(
+      'products (düşük stok alarmı)',
+      (bas, son) =>
+        supabase
+          .from('products')
+          .select('stock_qty, low_stock_threshold', { count: 'exact' })
+          .order('id', { ascending: true })
+          .range(bas, son),
+    ),
 
     // 4. Unresolved error groups (status != 'resolved')
     supabase.from('error_groups').select('id', { count: 'exact', head: true }).neq('status', 'resolved')
@@ -33,8 +60,16 @@ export async function fetchInboxCounts(supabase: SupabaseClient<Database>): Prom
   const pendingShipmentsCount = shipRes.status === 'fulfilled' && !shipRes.value.error ? (shipRes.value.count ?? 0) : 0
 
   let lowStockAlarmsCount = 0
-  if (productsRes.status === 'fulfilled' && !productsRes.value.error && productsRes.value.data) {
-    const rawProducts = productsRes.value.data
+  if (productsRes.status === 'fulfilled') {
+    // ⚠BURADA HÂLÂ FAIL-OPEN VAR VE BİLEREK DOKUNULMADI, SINIR SEBEBİYLE:
+    // `tumSatirlariCek` eksik çekimde fırlatır, yani `rejected` dalı artık GERÇEK bir
+    // arıza demek. Ama o dalda sayaç 0 kalıyor ve panel "alarm yok" gösteriyor —
+    // ölçülemeyen bir şeyi "yok" diye göstermek fail-open'ın ta kendisi.
+    // Doğru düzeltme sayacı `number | null` yapıp panelde "ölçülemedi" göstermektir;
+    // bu, tüketicisi olan ADMIN bileşenini (AdminRealtimeNotifications.tsx) değiştirmeyi
+    // gerektirir ve o yüzey bu şeridin sınırı DIŞINDA. Sessizce daraltmıyorum:
+    // kalem sahibine ayrı bulgu olarak bildirildi (2026-09-07, URUN → OPS).
+    const rawProducts = productsRes.value
     for (let i = 0; i < rawProducts.length; i++) {
       const p = rawProducts[i]
       const stockQty = typeof p.stock_qty === 'number' ? p.stock_qty : 0

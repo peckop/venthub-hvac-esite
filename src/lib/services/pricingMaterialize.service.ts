@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
+import { tumSatirlariCek, VARSAYILAN_SAYFA_BOYU } from '../supabase/tumSatirlar'
 import { resolveFxRate } from './fxRate.service'
 import { type PricingRuleRow, resolvePriceWithRules, type RuleEvaluationInputs } from './pricing.service'
 import {
@@ -10,6 +11,12 @@ import {
   toPricingProductInput,
 } from './pricingAdmin.service'
 import { fetchActivePolicies, resolveFxLocks, resolveFxLockWithPolicies } from './pricingPolicy.service'
+
+/** `refreshCostInBase`'in okuduğu ürün kolonları (products.Row'un alt kümesi). */
+type CostRefreshProductRow = Pick<
+  Database['public']['Tables']['products']['Row'],
+  'id' | 'brand' | 'category_id' | 'purchase_price' | 'purchase_currency' | 'cost_in_base' | 'purchase_rate_to_base'
+>
 
 /**
  * W1b · Materialize servisi (T001-VH).
@@ -94,6 +101,13 @@ export interface MaterializeOptions {
   dryRun?: boolean
   today?: string
   sampleSize?: number
+  /**
+   * Cache fotoğrafının sayfa boyu. YALNIZ SINAV İÇİN dışarı açıldı: sayfalama yolunun
+   * gerçekten koştuğunu kanıtlamak için sınav bunu tablodan küçük bir değere çeker
+   * (500'lük sayfa 375 satırlık bir tabloda ilk sayfada biter, sabotaj hiçbir yere
+   * değmez). Üretimde verilmez; varsayılan `VARSAYILAN_SAYFA_BOYU`.
+   */
+  cacheSayfaBoyu?: number
 }
 
 function todayIso(): string {
@@ -117,21 +131,38 @@ const COST_UPDATE_CONCURRENCY = 20
  */
 export async function refreshCostInBase(
   supabase: SupabaseClient<Database>,
-  options?: { dryRun?: boolean; today?: string },
+  // `sayfaBoyu` YALNIZ SINAV İÇİN dışarı açıldı: sayfalama yolunun gerçekten koştuğunu
+  // kanıtlamak için sınav onu tablodan küçük bir değere çeker. Üretimde verilmez.
+  options?: { dryRun?: boolean; today?: string; sayfaBoyu?: number },
 ): Promise<CostRefreshSummary> {
   const dryRun = options?.dryRun ?? true
   const today = options?.today ?? todayIso()
+  const sayfaBoyu = options?.sayfaBoyu ?? VARSAYILAN_SAYFA_BOYU
 
-  const { data: productsData, error: productsErr } = await supabase
-    .from('products')
-    // `brand` + `category_id` ŞART: fx-lock merdiveni scope 2 (marka) ve 3 (kategori)
-    // için bu alanları ister. Eskiden çekilmiyordu ve kilit çözümüne yalnız `id`
-    // geçiyordu — iki kapsam bu halkada SESSİZCE yok sayılıyordu (aşağıya bak).
-    .select('id, brand, category_id, purchase_price, purchase_currency, cost_in_base, purchase_rate_to_base')
-    .is('deleted_at', null)
-    .eq('status', 'active')
-  if (productsErr) throw productsErr
-  const products = productsData ?? []
+  // ⛔SAYFALAMA ŞART (INV-TAVAN-1). Burası bir YAZMA yolu: aşağıda `cost_in_base`
+  // güncellenir. Sayfalanmamış tek okuma PostgREST'in 1000 satır tavanına takılır ve
+  // tavanın dışında kalan ürünler HİÇ görülmez — yani maliyetleri eski kurla donmuş
+  // kalır ve hiçbir hata verilmez. Ölçüldü (2026-09-07, prod): aktif ürün 375, yani
+  // tavan BUGÜN ısırmıyor; ama sınır yoktu ve katalog büyüdüğü gün sessizce ısıracaktı.
+  // Kardeş halka (materialize) zaten sayfalıydı; bu halka atlanmıştı.
+  const products = await tumSatirlariCek<CostRefreshProductRow>(
+    'products (aktif, cost_in_base tazeleme)',
+    (bas, son) =>
+      supabase
+        .from('products')
+        // `brand` + `category_id` ŞART: fx-lock merdiveni scope 2 (marka) ve 3 (kategori)
+        // için bu alanları ister. Eskiden çekilmiyordu ve kilit çözümüne yalnız `id`
+        // geçiyordu — iki kapsam bu halkada SESSİZCE yok sayılıyordu (aşağıya bak).
+        .select(
+          'id, brand, category_id, purchase_price, purchase_currency, cost_in_base, purchase_rate_to_base',
+          { count: 'exact' },
+        )
+        .is('deleted_at', null)
+        .eq('status', 'active')
+        .order('id', { ascending: true })
+        .range(bas, son),
+    sayfaBoyu,
+  )
 
   // Her para birimi için EN GÜNCEL kur bir kez çekilir (bellekte önbelleklenir).
   const rateByCcy = new Map<string, { rate: number; effectiveDate: string } | null>()
@@ -229,8 +260,13 @@ export async function refreshCostInBase(
 
 type ProductPriceUpsertRow = Database['public']['Tables']['product_prices']['Insert']
 
+/** `product_prices` cache fotoğrafının okunan kolonları. */
+type CachedPriceRow = Pick<
+  Database['public']['Tables']['product_prices']['Row'],
+  'id' | 'product_id' | 'price_list_id' | 'currency' | 'is_derived' | 'is_active'
+>
+
 const PRODUCTS_PAGE_SIZE = 1000
-const CACHE_PAGE_SIZE = 1000
 const UPSERT_BATCH_SIZE = 500
 const DEACTIVATE_BATCH_SIZE = 200
 /** Cetvel §8.1: tekil anahtar para birimini İÇERİR. */
@@ -258,6 +294,7 @@ export async function materializePrices(
   const dryRun = options?.dryRun ?? true
   const today = options?.today ?? todayIso()
   const sampleSize = options?.sampleSize ?? 10
+  const cacheSayfaBoyu = options?.cacheSayfaBoyu ?? VARSAYILAN_SAYFA_BOYU
 
   // 1) Kural havuzu — bir kez.
   const { data: ruleRows, error: rulesErr } = await supabase.from('pricing_rule').select('*')
@@ -309,27 +346,31 @@ export async function materializePrices(
   //    okuma PostgREST satır tavanına (varsayılan 1000) takılır ve koruma SESSİZCE çöker
   //    (tavanın dışında kalan elle-ezme satırı ezilir, bayat satır aktif kalır). Sıra da şart:
   //    order olmadan hangi satırların düştüğü belirsizdir, hata tekrarlanamaz olur.
+  //
+  // ⛔SAYFALAMA VARDI, DOĞRULAMA YOKTU (INV-TAVAN-1). Döngü sayfalıyordu ama "çektiğim
+  // satır sayısı sunucunun bildirdiği kesin sayıya eşit mi" diye HİÇ sormuyordu. Sayfalayan
+  // bir döngü de eksik çekebilir (kısa sayfa erken kırar, eşzamanlı yazma sayfaları kaydırır)
+  // ve sonuç yine sessizce yanlış olur. Ölçüldü (2026-09-07, prod): product_prices = 1044
+  // satır, yani bu tablo tavanı ZATEN aşıyor — burası varsayımsal değil, canlı bir yüzey.
   const manualKeys = new Set<string>()
   const derivedActiveIdByKey = new Map<string, string>()
-  let snapshotOffset = 0
-  for (;;) {
-    const { data: existingRows, error: existingErr } = await supabase
-      .from('product_prices')
-      .select('id, product_id, price_list_id, currency, is_derived, is_active')
-      .eq('valid_from', DERIVED_VALID_FROM)
-      .order('id', { ascending: true })
-      .range(snapshotOffset, snapshotOffset + CACHE_PAGE_SIZE - 1)
-    if (existingErr) throw existingErr
-    const rows = existingRows ?? []
-    for (const row of rows) {
-      const key = cacheKey(row.product_id, row.price_list_id, row.currency)
-      // Pasifleştirilmiş elle-ezme satırı dokunulmaz DEĞİLDİR: admin onu kapattıysa
-      // türetilmiş fiyat devralmalı, yoksa ürün o segmentte kalıcı olarak fiyatsız kalır.
-      if (row.is_derived === false && row.is_active !== false) manualKeys.add(key)
-      else if (row.is_derived !== false && row.is_active !== false) derivedActiveIdByKey.set(key, row.id)
-    }
-    if (rows.length < CACHE_PAGE_SIZE) break
-    snapshotOffset += CACHE_PAGE_SIZE
+  const existingRows = await tumSatirlariCek<CachedPriceRow>(
+    'product_prices (cache fotoğrafı)',
+    (bas, son) =>
+      supabase
+        .from('product_prices')
+        .select('id, product_id, price_list_id, currency, is_derived, is_active', { count: 'exact' })
+        .eq('valid_from', DERIVED_VALID_FROM)
+        .order('id', { ascending: true })
+        .range(bas, son),
+    cacheSayfaBoyu,
+  )
+  for (const row of existingRows) {
+    const key = cacheKey(row.product_id, row.price_list_id, row.currency)
+    // Pasifleştirilmiş elle-ezme satırı dokunulmaz DEĞİLDİR: admin onu kapattıysa
+    // türetilmiş fiyat devralmalı, yoksa ürün o segmentte kalıcı olarak fiyatsız kalır.
+    if (row.is_derived === false && row.is_active !== false) manualKeys.add(key)
+    else if (row.is_derived !== false && row.is_active !== false) derivedActiveIdByKey.set(key, row.id)
   }
 
   // Materialize daima TRY yazar (product_prices.currency='TRY') → gösterim kuru gerekmez.
