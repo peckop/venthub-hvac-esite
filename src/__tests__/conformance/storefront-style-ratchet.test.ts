@@ -190,7 +190,10 @@ const RATCHETS: Ratchet[] = [
     // 2026-09-05 · 1474 -> 1464: Bilgi Merkezi'ndeki iki "yakinda" vaat kutusu kalkti
     // (HubPage), yerine tek gercek baglanti kondu — kutularin ham slate/gray siniflari da
     // onlarla birlikte gitti. Borc azaldi, tavan indirildi.
-    tavan: 1464,
+    // 2026-09-07 · 1464 -> 1463: REC-205 — iki seviyeli alt kategori rotasi yalnizca
+    // yonlendirme yapan bir dosyaya indi (govde, metadata ve onbellek katmani kalkti);
+    // govdeyle birlikte bir ham gri sinif da gitti.
+    tavan: 1463,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },

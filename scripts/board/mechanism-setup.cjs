@@ -148,6 +148,12 @@ function plan() {
  */
 /** Bağımsız teslimat kanıtının yaş eşiği. 3 dk: gözcü aralığı 60 sn, üç tur pay. */
 const TESLIM_TAZELIK_SN = 180
+/**
+ * Atan basina saklanan en fazla bekleyen atis (REC-192). Liste olmadan ayni atanin ikinci
+ * probu birincisini eziyordu; sinirsiz liste de durum dosyasini sisirir. Bes atis, bir
+ * oturumun makul yeniden-deneme sayisinin ustunde.
+ */
+const EN_FAZLA_BEKLEYEN = 5
 
 /**
  * ⭐SAF ÇEKİRDEK — TESLİMAT KANITI. Dosyaya, saate, panoya DOKUNMAZ; fikstürle beslenir.
@@ -201,8 +207,25 @@ function bekleyenleri(damga) {
   if (sozluk && typeof sozluk === 'object') {
     for (const atanSid of Object.keys(sozluk)) {
       const k = sozluk[atanSid]
-      if (!k || typeof k !== 'object') continue
-      cikti.push({ atanSid, jeton: k.jeton, atildiTs: k.atildiTs, tuketildi: k.tuketildi === true })
+      if (!k) continue
+      /**
+       * ⭐ATAN BASINA LISTE (kusur, 2026-09-07 — REC-192, UC BAGIMSIZ SERIT bildirdi).
+       * #1066 KURESEL tek-slotu onarmisti ama ATAN BASINA TEK SLOT birakti. Ayni gonderenin
+       * ikinci probu birincisini SESSIZCE eziyordu ve ezilen jetonu GORMUS olan taraf onu bir
+       * daha kanitlayamiyordu. Olculdu: OPS bana iki prob atti (2Y5YEB, sonra OS4P8W); durum
+       * dosyasinda YALNIZ OS4P8W kaldi, 2Y5YEB hicbir yerde yoktu ve dogrula "jeton eslesmedi"
+       * dedi — okuyan bunu "TESLIMAT KIRIK" diye anlar. Uc oturum saatlerce kendi gozculerinde
+       * hata aradi.
+       * Eski tasarimin gerekcesi yaziliydi: "kendi eski kaydini ezmek serbesttir, kimsenin
+       * kanitini silmez". O cumle YANLISTI — HEDEF o jetonu bildirimde COKTAN gormus olabilir;
+       * ezmek hedefin kanitini siler, atanin degil.
+       * Simdi her atisin kaydi AYRI yasar. Eski tek-nesne bicimi de okunur (geriye uyum).
+       */
+      const kayitlar = Array.isArray(k) ? k : [k]
+      for (const r of kayitlar) {
+        if (!r || typeof r !== 'object') continue
+        cikti.push({ atanSid, jeton: r.jeton, atildiTs: r.atildiTs, tuketildi: r.tuketildi === true })
+      }
     }
   }
   // Eski tek slot: sözlükte AYNI atan zaten varsa tekrar eklenmez (sözlük tazedir, o kazanır).
@@ -416,7 +439,22 @@ async function prob() {
   fs.appendFileSync(probTam, JSON.stringify(olay) + '\n', 'utf8')
   const hedef = fs.statSync(probTam).size
 
-  yaz('PROB YAZILDI: ' + probDosya + ' -> ' + hedef + ' bayt, jeton ' + jeton)
+  /**
+   * ⛔BAGIMSIZ PROBDA JETON ATANIN EKRANINA BASILMAZ (REC-192 onarimi, 2026-09-07).
+   * Eski hali her iki kipte de jetonu basiyordu ve gerekcesi "jeton BURADA, atanin ekraninda"
+   * diye yaziliydi. O tasarim bir AKLAMA YOLU acar: atan jetonu hedefe iletirse hedef onu
+   * `--gordum` ile geri yazar ve kapi BAGIMSIZ TANIK der — oysa hedef hicbir bildirim
+   * gormemistir. Kanitin butun dayanagi "bu degeri ancak gozcu bildiriminde gorebilirsin"
+   * varsayimi; deger atanin ekranindaysa varsayim yoktur.
+   * Olculmus vaka: 2026-09-07'de ben bu satiri elle `grep -v jeton` ile gizlemek zorunda
+   * kaldim ki akranima sizdirmayayim. Kanit hijyeni ajanin disiplinine BIRAKILMAZ, araca yazilir.
+   * OZ-PROBDA (hedef yok) jeton BASILIR — atan ile hedef ayni kisidir, gizlemek anlamsiz;
+   * o kanit zaten ZAYIF isaretlenir.
+   */
+  yaz(
+    'PROB YAZILDI: ' + probDosya + ' -> ' + hedef + ' bayt' +
+      (hedefSid ? ', jeton YAZILMADI (bagimsiz prob — deger atanin ekraninda gorunmez)' : ', jeton ' + jeton),
+  )
   yaz('Gozcunun imleci bu bayta ulasana kadar beklenecek (en cok ' + beklesn + ' sn)...')
 
   const basla = Date.now()
@@ -454,7 +492,20 @@ async function prob() {
        */
       ? {
           ...onceki,
-          bekleyenler: { ...(onceki.bekleyenler || {}), [sid]: { jeton, atildiTs: olay.ts, atanGozcuOkudu: ulasti } },
+          /**
+           * ⭐EKLER, EZMEZ (REC-192 onarimi 2026-09-07): once `[sid]: KAYIT` yaziliyordu ve ayni
+           * atanin ikinci probu birincisini siliyordu. Simdi liste; son EN_FAZLA_BEKLEYEN atis
+           * saklanir (dosya sinirsiz buyumesin). Eski tek-nesne bicimi de okunur.
+           */
+          bekleyenler: {
+            ...(onceki.bekleyenler || {}),
+            [sid]: (() => {
+              const mevcut = (onceki.bekleyenler || {})[sid]
+              const liste = Array.isArray(mevcut) ? mevcut.slice() : mevcut && typeof mevcut === 'object' ? [mevcut] : []
+              liste.push({ jeton, atildiTs: olay.ts, atanGozcuOkudu: ulasti })
+              return liste.slice(-EN_FAZLA_BEKLEYEN)
+            })(),
+          },
           bekleyenJeton: jeton,
           atanSid: sid,
           atildiTs: olay.ts,
@@ -475,9 +526,12 @@ async function prob() {
   yaz('YESIL — GOZCU PROBU OKUDU (' + gecen + ' sn icinde, imlec ' + sonOfset + ' >= ' + hedef + ').')
   yaz('')
   if (hedefSid) {
-    // ⭐JETON BURADA, ATANIN ekraninda. HEDEFE basilmaz — hedef onu YALNIZ bildirimden gorebilsin.
-    yaz('BAGIMSIZ PROB — hedef ' + hedefSid.slice(0, 8) + ', jeton ' + jeton)
-    yaz('Jeton HEDEFE bu ekrandan verilmez; o jetonu ancak GOZCU BILDIRIMINDE gorebilir.')
+    // ⛔JETON HICBIR EKRANDA YOK — ne atanin ne hedefin. Tek gorunecegi yer gozcu bildirimi.
+    // Eski hali burada basiyordu; bkz. yukaridaki gerekce (atanin ekrani = aklama yolu).
+    yaz('BAGIMSIZ PROB — hedef ' + hedefSid.slice(0, 8) + ', jeton BASILMADI (bilerek)')
+    yaz('Jeton SENIN ekraninda da YOK: hedef onu yalniz GOZCU BILDIRIMINDE gorebilir.')
+    yaz('Nicin: deger atanin ekranindaysa atan onu hedefe iletebilir ve kapi bunu')
+    yaz('BAGIMSIZ TANIK sanar. Kanit hijyeni disipline degil araca yazilir.')
     yaz('Hedef sunu kossun (' + TESLIM_TAZELIK_SN + ' sn icinde, yoksa BAYAT sayilir):')
     yaz('   node scripts/board/mechanism-setup.cjs dogrula --sid ' + hedefSid + ' --gordum <bildirimde-gordugun>')
   } else {

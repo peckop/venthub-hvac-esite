@@ -20,7 +20,10 @@ describe('useLocalizedRoutes (proxy)', () => {
     const { result } = renderHook(() => useLocalizedRoutes(), { wrapper: wrapper('tr') });
     expect(result.current.products()).toBe('/tr/products');
     expect(result.current.product('my-product')).toBe('/tr/products/my-product');
-    expect(result.current.category('hvac', 'fans')).toBe('/tr/category/hvac/fans');
+    // REC-205: iki argümanlı çağrı artık İKİ SEVİYELİ adres ÜRETMEZ — alt kategori kendi
+    // tek seviyeli kanonik adresinden yayınlanır. Bu testin ölçtüğü şey DİL ÖNEKİ; adres
+    // biçimi `Routes.category`'nin sözleşmesi ve INV-TEK-ADRES-1 orada tutuluyor.
+    expect(result.current.category('hvac', 'fans')).toBe('/tr/category/fans');
   });
 
   it('iç-içe obje builder\'ını da localize eder (proxy recurse)', () => {
