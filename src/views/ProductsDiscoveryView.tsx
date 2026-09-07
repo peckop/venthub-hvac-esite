@@ -19,11 +19,12 @@ import React, { Suspense, useCallback, useRef, useState } from 'react'
 
 import type { FamilyListItem } from '@/types/ui-models'
 
+import GuidedCategoryDiscovery, { type CategoryViewModelLite } from '../components/home/GuidedCategoryDiscovery'
 import FamilyCard from '../components/products/FamilyCard'
+import { ScrollObserver } from '../components/ui/ScrollObserver'
 import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../config/features'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
-import type { DomainCategory } from '../lib/type-converters'
 
 const CategoryOrbitCarousel = dynamic(
     () => import('../components/products/CategoryOrbitCarousel'),
@@ -39,7 +40,20 @@ const CategoryOrbitCarousel = dynamic(
 )
 
 interface ProductsDiscoveryViewProps {
-    initialCategories?: DomainCategory[]
+    /**
+     * REC-213-A — keşif sayfasının KATEGORİ KAPISI.
+     *
+     * Eskiden burada `initialCategories?: DomainCategory[]` diye bir prop vardı ve bu
+     * bileşen onu HİÇ OKUMUYORDU — tanımlıydı, destructure bile edilmiyordu. Tek geçen
+     * yer `views/ProductsPage.tsx` idi; o da uygulama ağacında çizilmeyen, yalnız
+     * `utils/prefetch.ts` tarafından paket ısıtmak için `import()` edilen bir sarmalayıcı.
+     * Yani prop uçtan uca ölüydü. (İlk taramamda yalnız iki dosyaya bakıp "hiçbir yerden
+     * geçilmiyor" demiştim; `tsc` beni düzeltti — kayda geçsin.)
+     *
+     * Yerine gerçekten çizilen bu prop geldi; tipi de kartın ihtiyacı olan şey (çözülmüş
+     * ad/açıklama/slug), ham satır değil.
+     */
+    kategoriler?: CategoryViewModelLite[]
     /** F5-B W2.1: keşif listesi de AİLE satırı basar (mükerrer varyant kartı yok). */
     families?: FamilyListItem[]
     /** Sunucu sayfalamasının toplamı — başlık sayacı sayfa uzunluğunu değil TOPLAMI gösterir. */
@@ -52,6 +66,7 @@ type ViewMode = 'grid' | 'list'
 
 
 const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
+    kategoriler = [],
     families = [],
     total,
     isLoading = false
@@ -74,8 +89,19 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
         }
     }, [router, Routes])
 
+    // ⚠ÜST DOLGU 3D SAHNESİNE AİTTİ — ÖLÇÜLDÜ (2026-09-07, yerel tarayıcı):
+    // `pt-16 md:pt-24` aşağıdaki koyu kutuya 3D karusel için verilmişti. Karusel REC-94'te
+    // kapandı; dolgu kaldı ve artık İÇİ BOŞ 96px'lik koyu bir şerit olarak duruyor
+    // (kutu 96px'te başlıyor, ilk beyaz bölüm 192px'te — arada hiçbir şey yok).
+    // Hemen altındaki bölüm kendi `py-24 sm:py-32`sini zaten getiriyor, yani başlık
+    // 320px'e itiliyordu: 224px boşluk. Recep bunu canlı ekranda "üstte beyaz alan" diye
+    // bildirdi; ölçüm onun tarifiyle örtüştü.
+    // Aşağıdaki REC-94 yorumu aynı tuzağın BİR KAT AŞAĞISINI çözmüş ("bayrak kapalıyken
+    // sarmalayıcı da render EDİLMEZ — aksi halde üstte boş bir şerit kalırdı"), ama dolgu
+    // sarmalayıcının DIŞINDA durduğu için gözden kaçmış.
+    // KOŞULLU: bayrak açılırsa 3D sahnesi geri gelir ve dolguya yine ihtiyaç duyar.
     return (
-        <div className="bg-surface-darker min-h-screen relative pb-12 w-full pt-16 md:pt-24">
+        <div className={`bg-surface-darker min-h-screen relative pb-12 w-full ${UC_BOYUT_MUSTERI_YUZEYINDE ? 'pt-16 md:pt-24' : ''}`}>
             
             {/* REC-94: 3D orbital kategori seçimi müşteri yüzeyinden kaldırıldı.
                 Kutu KOŞULLU: bayrak kapalıyken sarmalayıcı da render EDİLMEZ — aksi halde
@@ -104,6 +130,44 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                     </Suspense>
                 </div>
             </div>}
+
+            {/* ⭐REC-213-A — KATEGORİ KAPISI. Yukarıdaki yorumun "yerine gelecek kategori
+                kartları ayrı PR'da" sözü BUDUR; o PR gelmemişti ve arada sayfa kategorisiz
+                kaldı. Ölçüldü (canlı, 2026-09-07): /tr/products sayfasının HAM HTML'inde
+                `/tr/category/…` bağlantısı SIFIRDI — kategori adları metin olarak vardı ama
+                hiçbiri tıklanmıyordu. Yani 3D kapatılınca kategori ağacına giden kapı da
+                kapanmış, kimse fark etmemişti.
+
+                SIFIR YENİ BİLEŞEN: ana sayfanın kanıtlı kart ızgarası (GuidedCategoryDiscovery)
+                aynen kullanılır; yalnız başlık anahtarları bu sayfaya göre verilir. Göz satırı
+                ve giriş cümlesi BİLEREK yok — sayfanın kendi h1'i zaten tezi kuruyor, ikincisi
+                vaat şişirir (K5 ruhu: sayfada tek ana ses).
+
+                KOŞULLU: kategori yoksa blok hiç çizilmez — boş başlık bırakmak, yukarıdaki 3D
+                kutusunun düştüğü tuzağın aynısı olurdu.
+
+                ⚠SCROLLOBSERVER ŞART — ÖLÇÜLDÜ (2026-09-07, yerel Playwright):
+                GuidedCategoryDiscovery'nin yedi öğesi `data-observe="fade-up"` + `opacity-0`
+                ile başlar ve yalnız `data-in-view="true"` gelince açılır. O niteliği yazan tek
+                şey `ScrollObserver` ve o BİLEŞEN AĞACA MOUNT EDİLMEZSE HİÇ ÇALIŞMAZ.
+                Bu sayfaya taşındığında sağlayıcı beraberinde gelmedi: yedi öğenin YEDİSİ de
+                opaklık 0'da kaldı — kaydırmak da açmadı (gözlemci hiç kurulmuyordu).
+                Sonuç müşteri gözüyle: 3D'nin yerinde BOŞ BEYAZ ALAN. (Recep aynı ekranı
+                bağımsız olarak gördü ve "üstte beyaz alan var" diye bildirdi.)
+                Ayırt edici kontrol: aynı bileşen anasayfada ÇALIŞIYOR — çünkü HomePage
+                ScrollObserver'ı mount ediyor. Yani bileşen bozuk değil, SAĞLAYICI EKSİKTİ.
+                `data-observe` sessiz bir SÖZLEŞMEDİR: onu kullanan her ağaç sağlayıcıyı da
+                mount etmek zorundadır, yoksa içerik render EDİLİR ama GÖRÜNMEZ.
+                Bekçi: INV-GOZLEMCI-1 (src/__tests__/conformance/gozlemci-sozlesmesi.test.ts). */}
+            {kategoriler.length > 0 && <ScrollObserver />}
+            {kategoriler.length > 0 && (
+                <GuidedCategoryDiscovery
+                    displayCategories={kategoriler}
+                    eyebrowKey={null}
+                    headingKey="products.popularCategories"
+                    introKey={null}
+                />
+            )}
 
             {/* --- Ürün Grid --- */}
             <AnimatePresence>

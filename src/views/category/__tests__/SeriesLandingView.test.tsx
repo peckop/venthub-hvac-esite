@@ -119,7 +119,10 @@ describe('SeriesLandingView breadcrumb', () => {
     // Ana Sayfa + Kategori + Alt kategori = 3 link; seri adı (son basamak) link DEĞİL.
     expect(nav.queryAllByRole('link')).toHaveLength(3)
     const subLink = nav.getByRole('link', { name: 'Kanal Tipi' })
-    expect(subLink.getAttribute('href')).toBe('/tr/category/fanlar/kanal-tipi')
+    // REC-205: kırıntı yolundaki alt kategori basamağı artık alt kategorinin TEK SEVİYELİ
+    // kanonik adresine gider. Üst basamak ("Fanlar") kendi adresine gitmeye devam eder —
+    // yani kırıntı yolu hâlâ hiyerarşiyi ANLATIR, sadece adresler tekilleşti.
+    expect(subLink.getAttribute('href')).toBe('/tr/category/kanal-tipi')
   })
 
   it('lang="en" iken breadcrumb href\'leri /en önekiyle kurulur (elle /tr/ yazılmaz — INV-2)', () => {
