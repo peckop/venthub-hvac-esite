@@ -274,6 +274,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/katalog-disa-aktar.mjs` | TAŞINABİLİR KATALOG — DIŞA AKTARICI (REC-212) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-tasinabilir-katalog-2026-09-07.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/icerik-hatti/katalog-geri-yukle.mjs` | TAŞINABİLİR KATALOG — GERİ YÜKLEYİCİ (REC-212, ikinci yarı) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-tasinabilir-katalog-2026-09-07.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/icerik-hatti/katalog-karnesi.mjs` | KATALOG KARNESİ — hattın dokuz satırı, TEK komutla (KOL 6 ilk çıktısı) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/uydurma-kod-bosalt.mjs` | UYDURMA `model_code` BOŞALTICISI — REC-226 (kaynak kanıtına dayalı) | URUN-KATALOG | elle (kuru koşum varsayılan; `--yaz` + `CANLI_YAZIM_ONAYI`) | PR #1109 (üç yönlü sabotaj koşuldu) | kendi ön koşul kapısı içinde (üç yüzeyde `sku` yedeği varsa yazmaz) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
