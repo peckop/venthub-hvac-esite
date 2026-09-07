@@ -1,4 +1,5 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { restSayfaOkuyucu, tumSatirlar } from '../_shared/tum_satirlar.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 Deno.serve(async (req) => {
@@ -54,16 +55,35 @@ Deno.serve(async (req) => {
     // 1) Token YOK: 30 dk sonra cancelled
     const cancelResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?status=eq.pending&created_at=lt.${encodeURIComponent(th30)}&payment_token=is.null`, {
       method: 'PATCH',
-      headers: { 'Authorization': `Bearer ${serviceRoleKey}`, 'apikey': serviceRoleKey, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      // `count=exact` EKLENDİ (REC-183): `return=representation` gövdesi de 1000 satırda kesilir.
+      // Yazma tamamı yapılır ama RAPOR eksik kalır — "1000 iptal ettim" der, gerçekte 1400 olabilir.
+      // Korunum kimliği kusuru: toplam doğru, sayının kendisi yanlış. Gerçek sayı Content-Range'den.
+      headers: { 'Authorization': `Bearer ${serviceRoleKey}`, 'apikey': serviceRoleKey, 'Content-Type': 'application/json', 'Prefer': 'return=representation,count=exact' },
       body: JSON.stringify({ status: 'cancelled' })
     })
     const cancelled = cancelResp.ok ? await cancelResp.json().catch(() => []) : []
+    /** Sunucunun bildirdiği GERÇEK etkilenen satır sayısı; okunamazsa gövde uzunluğuna düşer. */
+    const cancelledGercekSayi = (() => {
+      const cr = cancelResp.headers.get('content-range') || ''
+      const parca = cr.split('/')[1]
+      if (parca && parca !== '*' && Number.isFinite(Number(parca))) return Number(parca)
+      return Array.isArray(cancelled) ? cancelled.length : 0
+    })()
 
     // 2) Token VAR: 15 dk sonra 1 kez reconcile; SUCCESS değilse failed
-    const listResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?select=id,created_at,payment_token,status&status=eq.pending&created_at=lt.${encodeURIComponent(th15)}&payment_token=not.is.null&limit=1000`, {
-      headers: { 'Authorization': `Bearer ${serviceRoleKey}`, 'apikey': serviceRoleKey }
-    })
-    const pendWithToken = listResp.ok ? await listResp.json().catch(() => []) : []
+    // ── SESSİZ TAVAN (REC-183) ────────────────────────────────────────────────
+    // Bu liste eskiden `&limit=1000` ile çekiliyordu. 1000'inci siparişten sonrası o koşumda
+    // hiç GÖRÜLMEZ, `{ ok: true }` yine dönerdi: hiçbir alarm çalmadan eksik iş. Sayfalama
+    // artık `_shared/tum_satirlar.ts` üzerinden: önce SAY, sonra topla, sonunda KARŞILAŞTIR —
+    // eksik toplanırsa FIRLATIR ve aşağıdaki catch bloğu 500 döner (sessiz "ok" yok).
+    // 2026-09-07 ölçümü: bekleyen tokenli sipariş 0 → tavan bugün ISIRMIYOR, kusur GİZLİ.
+    const pendWithToken = await tumSatirlar<{ id: string }>(
+      restSayfaOkuyucu<{ id: string }>(
+        `${supabaseUrl}/rest/v1/venthub_orders?select=id,created_at,payment_token,status&status=eq.pending&created_at=lt.${encodeURIComponent(th15)}&payment_token=not.is.null`,
+        { 'Authorization': `Bearer ${serviceRoleKey}`, 'apikey': serviceRoleKey },
+      ),
+      { ad: 'order-housekeeping/pending-token' },
+    )
 
     const fnHost = (() => { try { const host = new URL(supabaseUrl).host; const ref = host.split('.')[0]; return `https://${ref}.functions.supabase.co`; } catch { return '' } })();
 
@@ -108,7 +128,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    for (const o of pendWithToken as Array<{ id: string }>) {
+    for (const o of pendWithToken) {
       let sonlandir = false
       try {
         const cb = await fetch(`${fnHost}/iyzico-callback`, {
@@ -146,7 +166,8 @@ Deno.serve(async (req) => {
     // ilerletemediyse "başarılı" demek, çağıranı (cron/izleme) kör eder.
     const govde = {
       ok: yazilamayan.length === 0,
-      cancelled_count: Array.isArray(cancelled) ? cancelled.length : 0,
+      // Sunucunun bildirdiği gerçek sayı (gövde 1000'de kesilse bile doğru kalır — REC-183).
+      cancelled_count: cancelledGercekSayi,
       reconciled,
       failed,
       ...(yazilamayan.length > 0 ? { yazilamayan } : {})
