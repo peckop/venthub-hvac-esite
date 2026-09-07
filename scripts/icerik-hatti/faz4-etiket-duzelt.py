@@ -15,11 +15,15 @@ KARARI VERILMEYEN HICBIR SATIRA DOKUNULMAZ — silinmez de, donusturulmez de; RA
 "KARAR BEKLIYOR" diye listelenir ve yuklemeye GIRMEZ.
 """
 import csv
+import os
 import sys
 from collections import defaultdict
 from pathlib import Path
 
-STAGING = Path(r"C:/Users/alize/venthub-pdf-ingestor/staging")
+# Yol MUTLAK yazilmaz: depo PUBLIC (sizinti) ve kod tek makineye baglanir (CI'da kirilir).
+# Ortam degiskeniyle ezilebilir + akilli varsayilan; bu makinede davranis DEGISMEZ.
+STAGING = Path(os.environ.get("INGESTOR_STAGING")
+               or Path.home() / "venthub-pdf-ingestor" / "staging")
 CIKTI = STAGING / "duzeltilmis"
 
 # ---- Recep kararlari (2026-09-07 07:3xZ, K9/K10/K11) --------------------------------

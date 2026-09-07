@@ -27,7 +27,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 import _veri  # noqa: E402
 
-DUZELTILMIS = Path(r"C:/Users/alize/venthub-pdf-ingestor/staging/duzeltilmis")
+# Mutlak yol YAZILMAZ (depo PUBLIC + tek makineye baglanma); ortam degiskeni + akilli varsayilan.
+DUZELTILMIS = Path(os.environ.get("INGESTOR_STAGING")
+                   or Path.home() / "venthub-pdf-ingestor" / "staging") / "duzeltilmis"
 BEKLENEN_DOSYA = 8
 
 
