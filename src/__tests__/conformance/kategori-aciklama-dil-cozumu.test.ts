@@ -288,6 +288,17 @@ describe('INV-KATEGORI-ACIKLAMA-1 · kategori açıklaması dile göre çözül�
 
     const offenders = SCANNED
       .filter((f) => !MUAF.includes(f.rel))
+      // ⭐KAPI-KAPIYA ÇARPIŞMASI, ÖLÇÜLEREK BULUNDU (2026-09-07 gece, URUN · PR #1114):
+      // Bu kol BAŞKA BİR KAPININ dosyasını ihlal saydı. `kart-aciklama-mobil.test.ts`
+      // deseni OKUMUYOR, ANLATIYOR: ölçtüğü bileşende paragrafın hangi satırda olduğunu
+      // bulmak için adını yazmak zorunda. Yasak deseni ADIYLA anan her yeni bekçi bu
+      // kolu kırmızı yapardı — yani kapı, kendi cinsini vuruyordu.
+      // NİÇİN TEST DOSYASI BU KOLUN EVRENİNE GİRMEZ: bu kol RENDER katmanını korur,
+      // testler müşteriye hiçbir şey basmaz. Kapının K3 kolu bu ayrımı ZATEN yapıyor
+      // (`PRODUCT_CALLS`, test dosyalarını eler); K4b o kuralı atlamıştı — tutarlılık
+      // sağlandı, koruma DARALMADI: bugün desene uyan iki test dosyasının ikisi de
+      // kapı dosyası, üretim okuyucusu DEĞİL (ölçüldü, varsayılmadı).
+      .filter((f) => !f.rel.includes('__tests__') && !f.rel.includes('.test.'))
       .filter((f) => !f.rel.startsWith('components/admin/'))
       .filter((f) => !f.rel.startsWith('views/admin/'))
       .filter((f) => !f.rel.startsWith('lib/admin/'))
