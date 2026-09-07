@@ -50,8 +50,51 @@ function ddlSlices(source: string, table: string): string[] {
 describe('INV-PRICE-4: para float saklanmaz + currency_rates append-only', () => {
   const entries = Object.entries(MIGRATION_SOURCES)
 
-  it('migration kaynakları bulunur', () => {
-    expect(entries.length, 'migration glob boş — yol değiştiyse testi güncelle').toBeGreaterThan(0)
+  /**
+   * ⭐EVREN MUHAFIZI (REC-189, kaynak REC-179 evren muhafızı sınavı).
+   *
+   * Eski hâli `entries.length > 0` idi ve OPS'un sabotaj sınavında bu kapı **fail-open**
+   * çıktı: glob kökü daraltıldığında (tek dosyaya inecek şekilde) eşik hâlâ sağlanıyor ve
+   * aşağıdaki üç kol bir avuç dosya üzerinde dönüp "ihlal yok" diyor. `> 0`, "bakabiliyorum"
+   * demek DEĞİLDİR; "en az bir dosya gördüm" demektir ve o ikisi aynı şey değil.
+   *
+   * ÖLÇÜLEN (2026-09-07): 234 migration dosyası. Eşik bir kademe altına konuldu —
+   * meşru budama (eski migration'ların arşive taşınması) kapıyı kızartmasın, ama kökün
+   * kayması yakalanıyor.
+   */
+  it('EVREN MUHAFIZI: migration havuzu GERÇEKTEN tarandı (dar evren KIRMIZI)', () => {
+    expect(
+      entries.length,
+      'Migration havuzu şüpheli derecede küçük (ölçülen: 2026-09-07 → 234 dosya). ' +
+        'Glob kökü kaymış olabilir; `> 0` eşiği bu kapıyı sabotaj sınavında fail-open ' +
+        'bırakmıştı. Kapı KÖR koşmaktansa KIRMIZI döner.',
+    ).toBeGreaterThan(150)
+  })
+
+  /**
+   * ⭐İKİNCİ MUHAFIZ — VE ASIL DELİK: yukarıdaki dosya sayımı, DDL AYIKLAYICISININ çalıştığını
+   * söylemez. `ddlSlices` hiçbir dilim bulamazsa (tablo yeniden adlandırıldı, DDL biçimi
+   * değişti, `create table` ifadesi bir `DO $$` bloğuna taşındı) float kolu HİÇBİR ŞEY
+   * üzerinde dönmez ve yeşil yanar. Dosya havuzu doluyken bile kapı vakumda olabilir.
+   *
+   * ÖLÇÜLEN (2026-09-07): dört para tablosunun dördünde de en az bir DDL dilimi var
+   * (`pricing_rule` 1 · `currency_rates` 1 · `product_prices` 3 · `price_lists` 2).
+   * Bir tablo için dilim sıfıra düşerse o tablo için float yasağı ölçülmüyor demektir.
+   */
+  it('EVREN MUHAFIZI: her para tablosu için DDL dilimi BULUNUYOR (ayıklayıcı kör değil)', () => {
+    const dilimsiz: string[] = []
+    for (const table of MONEY_TABLES) {
+      let adet = 0
+      for (const [, source] of entries) adet += ddlSlices(source, table).length
+      if (adet === 0) dilimsiz.push(table)
+    }
+    expect(
+      dilimsiz,
+      'Bu para tablolarının DDL dilimi BULUNAMADI: ' + dilimsiz.join(', ') + '. ' +
+        'Float yasağı o tablolar için ÖLÇÜLMÜYOR — kol vakumda yeşil yanar. Tablo yeniden ' +
+        'adlandırıldıysa MONEY_TABLES listesini güncelle; DDL biçimi değiştiyse ayıklayıcıyı. ' +
+        'Kolu gevşetmek, kuralı sessizce kaldırmaktır.',
+    ).toEqual([])
   })
 
   it('para tablolarının DDL\'inde float tipi yok', () => {
