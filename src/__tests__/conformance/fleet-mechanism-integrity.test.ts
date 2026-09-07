@@ -264,7 +264,13 @@ const mech = require_(path.join(KOK, 'scripts', 'board', 'mechanism-setup.cjs'))
     kendiSid: string
     simdiMs: number
     esikSn?: number
-  }) => { sinif: 'YESIL' | 'ZAYIF' | 'KIRMIZI'; sebep: string; gecenSn: number | null }
+  }) => {
+    sinif: 'YESIL' | 'ZAYIF' | 'KIRMIZI'
+    sebep: string
+    gecenSn: number | null
+    /** YALNIZ YESIL'de: kuyrukta hangi atanın kaydı sayıldı (tüketim işareti buna göre konur). */
+    atanSid?: string
+  }
   TESLIM_TAZELIK_SN: number
 }
 
@@ -306,8 +312,94 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     })
     expect(taze.sinif, 'eşiğin ALTINDAKİ geri yazım reddedildi — eşik yanlış tarafa kapanıyor').toBe('YESIL')
     expect(bayat.sinif, 'eski jeton kanalın BUGÜN çalıştığını söylemez ama yeşil sayıldı').toBe('KIRMIZI')
-    expect(bayat.sebep).toMatch(/BAYAT/)
+    expect(bayat.sebep).toMatch(/SURESI GECMIS/)
     expect(mech.TESLIM_TAZELIK_SN, 'eşik 180 sn değil — cetvelle betik ayrışmış').toBe(180)
+  })
+
+  /**
+   * ⭐INV-MECH-JETON-KUYRUK — üç canlı vaka (2026-09-06/07): Katalog 15:1xZ tüketilmiş jeton,
+   * URUN 06:43Z 12 saatlik jeton, ALTYAPI 18:42Z + 06:41Z. Hepsinde ÖLÜ jeton CANLI kapıyı
+   * kilitledi: eski akış `bekleyenJeton` doluysa öz-prob yoluna hiç ulaşmadan dönüyordu.
+   * Sabotaj kolu şu soruya cevap verir: "kuyruk yerine tek slot olsaydı bu testler geçer miydi?"
+   * Hayır — üçü de kırmızı verirdi. Ölçüt ayırt ediyor.
+   */
+  describe('INV-MECH-JETON-KUYRUK: bekleyen jeton bir DURUM değil KUYRUK', () => {
+    const ATAN_A = '4a8eaf9c-9b4f-4470-9761-69c58e2a926a'
+    const ATAN_B = '3a7976a1-6510-43a8-a306-c2942e3d1bc2'
+
+    it('TÜKETİLMİŞ kayıt öz-prob yolunu KESMEZ (Katalog 15:1xZ vakası)', () => {
+      const damga = {
+        jeton: 'PROB-ac03-OZPROB',
+        bekleyenler: { [ATAN_A]: { jeton: 'PROB-ac03-ESKI11', atildiTs: new Date(T0).toISOString(), tuketildi: true } },
+      }
+      const k = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-OZPROB', kendiSid: BEN, simdiMs: T0 + 10_000 })
+      expect(k.sinif, 'tüketilmiş bekleyen kayıt taze öz-probu bloke etti — eski tek-slot davranışı geri gelmiş').toBe('ZAYIF')
+    })
+
+    it('SÜRESİ GEÇMİŞ kayıt öz-prob yolunu KESMEZ (URUN 06:43Z, 12 saatlik jeton)', () => {
+      const damga = {
+        jeton: 'PROB-ac03-OZPROB',
+        bekleyenler: { [ATAN_A]: { jeton: 'PROB-ac03-OLU22', atildiTs: new Date(T0).toISOString() } },
+      }
+      const k = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-OZPROB', kendiSid: BEN, simdiMs: T0 + 43_200_000 })
+      expect(k.sinif, 'süresi geçmiş bekleyen kayıt taze öz-probu bloke etti').toBe('ZAYIF')
+    })
+
+    it('İKİ FARKLI ATAN aynı hedefte YAN YANA yaşar (çarpışma bulgusu)', () => {
+      const damga = {
+        bekleyenler: {
+          [ATAN_A]: { jeton: 'PROB-ac03-AAA111', atildiTs: new Date(T0).toISOString() },
+          [ATAN_B]: { jeton: 'PROB-ac03-BBB222', atildiTs: new Date(T0).toISOString() },
+        },
+      }
+      const a = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-AAA111', kendiSid: BEN, simdiMs: T0 + 5_000 })
+      const b = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-BBB222', kendiSid: BEN, simdiMs: T0 + 5_000 })
+      expect(a.sinif, 'A kaydı okunamadı — tek slot davranışı: son yazan ötekini siliyor').toBe('YESIL')
+      expect(b.sinif, 'B kaydı okunamadı').toBe('YESIL')
+      expect(a.atanSid, 'hangi atanın kaydı sayıldığı dönmüyor — tüketim yanlış kaydı işaretler').toBe(ATAN_A)
+      expect(b.atanSid).toBe(ATAN_B)
+    })
+
+    it('TÜKETİLMİŞ jeton İKİNCİ kez sayılmaz ve sebebi TÜKETİLMİŞ der (uyuşmuyor DEMEZ)', () => {
+      const damga = {
+        bekleyenler: { [ATAN_A]: { jeton: 'PROB-ac03-BIRKEZ', atildiTs: new Date(T0).toISOString(), tuketildi: true } },
+      }
+      const k = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-BIRKEZ', kendiSid: BEN, simdiMs: T0 + 5_000 })
+      expect(k.sinif).toBe('KIRMIZI')
+      expect(k.sebep, 'yanlış sebep: ajan "uyuşmuyor" okuyup jetonu yanlış sanıyor').toMatch(/tuketilmis/)
+    })
+
+    it('⛔BEKLENEN JETON EKRANA BASILMAZ: eşleşmeyen geri yazım cevabı SIZDIRMAZ', () => {
+      const damga = {
+        bekleyenler: { [ATAN_A]: { jeton: 'PROB-ac03-GIZLI9', atildiTs: new Date(T0).toISOString() } },
+      }
+      const k = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-YANLIS', kendiSid: BEN, simdiMs: T0 + 5_000 })
+      expect(k.sinif).toBe('KIRMIZI')
+      expect(
+        k.sebep.includes('PROB-ac03-GIZLI9'),
+        'kapı sınavın CEVABINI ekrana yazdı: bildirimi görmeyen ajan bu satırdan okuyup geçerli damga üretebilir',
+      ).toBe(false)
+      expect(k.sebep, 'ajan neyi bekleyeceğini bilmeli: canlı kayıt SAYISI ve ATAN söylenir').toMatch(/CANLI bekleyen/)
+    })
+
+    it('ESKİ TEK SLOT okunmaya devam eder (geriye uyum — diskteki damgalar filo koşarken yazıldı)', () => {
+      const damga = { bekleyenJeton: 'PROB-ac03-ESKIYOL', atanSid: ATAN_A, atildiTs: new Date(T0).toISOString() }
+      const k = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-ESKIYOL', kendiSid: BEN, simdiMs: T0 + 5_000 })
+      expect(k.sinif, 'eski biçim damga artık okunamıyor — filonun diskteki kayıtları kör kaldı').toBe('YESIL')
+    })
+  })
+
+  /**
+   * ⛔CRON KAPALI (Recep kararı 2026-09-06). Kapalı bir katmanın "kanıtlanmadı" diye kırmızı
+   * yazması fail-closed değil GÜRÜLTÜdür: kararı uygulayan her oturum ceza alır ve gerçek
+   * kırmızılar (gözcü, teslimat) gölgelenir. Karar aracın çıktısına YAZILMAZSA araç kararın
+   * aksini önermeye devam eder — 09-06/07'de dört oturum aynı satırı ayrı ayrı açıklamak zorunda kaldı.
+   */
+  it('⛔CRON katmanı KAPALI etiketi taşır ve plan çıktısı KURMAYI ÖNERMEZ', () => {
+    expect(kurulumKaynak, 'cron kararı betiğe yazılmamış — araç kararın aksini önermeye devam eder').toMatch(/RECEP KARARI 2026-09-06/)
+    const planBlok = kurulumKaynak.slice(kurulumKaynak.indexOf("yaz('2) CRON"), kurulumKaynak.indexOf("yaz('3) TUR-SONU"))
+    expect(planBlok, 'plan çıktısı hâlâ CronCreate öneriyor').not.toMatch(/CronCreate/)
+    expect(planBlok, 'KAPALI etiketi yok — okuyan kurmaya kalkar').toMatch(/KAPALI/)
   })
 
   it('⭐ESKİ YOL ÖLDÜRÜLMEDİ, ZAYIF sayıldı: kendi probunun jetonu yeşil DEĞİL, kırmızı da DEĞİL', () => {

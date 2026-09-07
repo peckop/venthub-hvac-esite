@@ -2358,3 +2358,83 @@ pakete bakıyor (`src/__tests__/fixtures/aile-metni-sayisal-2026-09-06.json`, da
 `2026-09-06T05:25:54Z`). Metinler DB'ye yazıldığında kapı **düzelmeyi göremeyecek, yeşil kalacak
 ve ödenmiş borcu borç sanacak.** Fikstürün bedeli teorik değil: seçilirse yanına **tazeleme
 sahibi + tazeleme tetiği** yazılır, yoksa kapı sessizce bayatlar.
+
+## 33. BEKLEYEN JETON BİR **DURUM** DEĞİL, **KUYRUK**TUR — ölü jeton canlı kapıyı kilitler
+
+**Vaka: 2026-09-06/07, ÜÇ CANLI TANIK, üç ayrı şerit.** Teslimat kanıtı (§31) tek bir alanda
+tutuluyordu: `bekleyenJeton` + `atanSid` + `atildiTs`. Doğrulama akışı bu alan **doluysa**
+öz-prob yoluna **hiç ulaşmadan** dönüyordu. Sonuç: içi ölü bir jetonla dolu bir alan, kanalın
+bugün çalıştığını ölçmenin **tek yolunu** kapatıyordu.
+
+| tanık | vaka | ölçüm |
+|---|---|---|
+| URUN-KATALOG | tüketilmiş jeton | 15:1xZ — bekleyen jeton saatler önce doğrulanmıştı; taze öz-prob "uyuşmuyor (beklenen …)" ile düştü |
+| URUN | **12 saatlik** jeton | 06:43Z — gece oturumu kapandı, bildirim hiç ulaşmadı; jeton düşmedi, yuvayı tuttu (sabotaj DEĞİL, canlı) |
+| ALTYAPI | ikisi de | 18:42Z ve 06:41Z — kendi öz-probumu doğrulayamadım |
+
+### 33.1 — Tek kök, üç belirti
+
+Üçü ayrı kalem sanıldı; **tek kök**: alan, atan başına bir **kuyruk kaydı** olmalıydı.
+
+1. **Çarpışma** — iki farklı atan aynı hedefe atınca ilkinin kanıt atışı **sessizce silinir**.
+2. **Tüketilmeme** — doğrulanan kayıt alanda kalır, sonraki ölçümü keser.
+3. **Süresizlik** — eşiği aşan kayıt da alanda kalır, sonraki ölçümü keser.
+
+(2) ve (3) aynı cümleyle kapanır: **kanıt bir kez sayılır ve yaşlanınca düşer.**
+
+### 33.2 — HÜKÜM
+
+- Bekleyen jetonlar `bekleyenler: { <atanSid>: { jeton, atildiTs, tuketildi } }` sözlüğünde yaşar.
+  Her atanın kaydı **ayrı**dır; aynı atanın yeni atışı yalnız **kendi** kaydını yeniler.
+- Doğrulanan kayıt **TÜKETİLDİ** işaretlenir. Aynı kanıt iki kez sayılmaz.
+- Eşiği (§31, 180 sn) aşan kayıt **kuyruktan düşer** ve hiçbir yolu kesmez.
+- Yalnız **CANLI** (taze + tüketilmemiş + bağımsız) kayıt YEŞİL üretir.
+- Sebep mesajı **doğru fiili** söyler: tüketilmiş · süresi geçmiş · eşleşmedi. "Uyuşmuyor"
+  demek ajana **yanlış teşhis** verir; 09-06'da üç şerit bu mesaj yüzünden aracı kusurlu sandı.
+- ⛔**Beklenen jeton EKRANA BASILMAZ.** Eski mesaj sınavın **cevabını** yazıyordu: bildirimi hiç
+  görmemiş bir ajan o satırdan okuyup **geçerli damga üretebilirdi** — kanıtın bütün dayanağı
+  "bunu ancak bildirimde görebilirsin" varsayımıdır. Yerine **canlı kayıt sayısı + atan sid8**
+  söylenir: ajan neyi beklediğini bilir, cevabı öğrenmez.
+- ⚠**Geriye uyum kırılmaz** (K8): eski tek-yuva alanları hem **yazılmaya** hem **okunmaya**
+  devam eder. Diskteki damgalar filo koşarken yazıldı; onları geçersiz saymak bütün filoyu aynı
+  anda kırmızıya düşürürdü.
+
+### 33.3 — Ezme kontrolü **araçta** olur, ajanın elinde olmaz
+
+09-06'da "üstüne yazarsam kanıt siler miyim" sorusunu **üç şerit elle** yaptı: durum dosyasını
+açıp doğrulama damgasının atıştan sonra mı geldiğine baktılar. **Biri yanlış yuvanın ölçümünü
+taşıdı** ve doğrulanmamış bir jetonu ezdi; o kanıt atışı boşa gitti.
+
+**HÜKÜM:** `prob --to` hedefin kuyruğunu **kendisi** okur. Başkasının **canlı ve
+doğrulanmamış** kaydı varsa **DURUR** (çıkış 2). `--yine-de` ile geçilir — kasıtlı ezme mümkün
+kalır ama **sessiz olmaz**. Kendi kaydını tazelemek serbesttir: kendi jetonun kimsenin kanıtını
+silmez.
+
+### 33.4 — ⛔CRON KATMANI KAPALI (Recep kararı 2026-09-06, yeniden görüşülecek)
+
+Karar sözlüydü ve **araca yazılmamıştı**. Sonuç: `plan` çıktısı 09-06/07 boyunca cron kurmayı
+önermeye devam etti; **dört oturum** aynı satırı okuyup "kurmadım, çünkü Recep" diye **ayrı ayrı**
+açıklamak zorunda kaldı. Üstelik `dogrula`, kurulmayan katmanı **KIRMIZI** sayıyordu: kararı
+uygulayan her oturum ceza alıyor, gerçek kırmızılar (gözcü, teslimat) gölgeleniyordu.
+
+**HÜKÜM:** `plan` cron'u **KURMAYI ÖNERMEZ**, "KAPALI (Recep kararı 2026-09-06, yeniden
+görüşülecek)" der. `dogrula` bu kalemi **kırmızı yazmaz**; ölçülmediğini söyler ve ölçülmesinin
+beklenmediğini ekler. Şerit ofset tablosu **silinmez** — karar yeniden görüşülecek, geri açılırsa
+zamanlama hazır beklesin.
+
+⭐**GENEL DERS:** *Aracın çıktısı karar değildir — ama karar aracın çıktısına yazılmazsa, araç
+kararın aksini önermeye devam eder ve her okuyanda tartışmayı yeniden doğurur.* Sözlü karar,
+onu uygulayacak yüzeye yazılana kadar **yarım** karardır.
+
+### 33.5 — Kapı
+
+`INV-MECH-JETON-KUYRUK` (`src/__tests__/conformance/fleet-mechanism-integrity.test.ts`), altı kol:
+tüketilmiş kayıt öz-probu kesmez · süresi geçmiş kayıt öz-probu kesmez · iki farklı atan yan yana
+yaşar · hangi atanın kaydı sayıldığı döner · tüketilmiş jeton ikinci kez sayılmaz · beklenen jeton
+sızmaz · eski tek yuva okunmaya devam eder. Ayrıca cron etiketi kolu (plan çıktısı cron kurmayı
+önermemeli).
+
+**Sabotaj kanıtı (ölçüldü):** eski tek-yuva davranışı geri konduğunda kolların **4'ü kırmızı**
+verdi (23 testten 4 düştü); geri alındığında 23/23 yeşil. Ezme kontrolü ayrıca **izole pano
+dizininde** uçtan uca ölçüldü: başkasının canlı kaydında **DURDU (çıkış 2)**; kendi kaydını
+tazelemede, tüketilmiş kayıtta ve `--yine-de` ile **yol verdi** — yani ölçüt ayırt ediyor.

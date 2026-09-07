@@ -120,8 +120,16 @@ function plan() {
   yaz('   node "' + gozcuYolu + '" --sid ' + sid + ' --aralik 60')
   yaz('   Monitor(persistent: true), description: "panoda ' + serit + ' notlari"')
   yaz('')
-  yaz('2) CRON — CronCreate, zamanlama AYNEN (ofset tablodan, hatirdan DEGIL):')
-  yaz('   ' + ofset + ' * * * *')
+  /**
+   * ⛔CRON KAPALI — RECEP KARARI 2026-09-06 ("cron kurulmasin, irtibat kopuyor, ayrica
+   * konusulacak"). Betik bunu 09-06/07 boyunca KURMAYI ONERMEYE devam etti ve dort oturum
+   * ayni satiri okuyup "kurmadim, cunku Recep" diye ayri ayri aciklamak zorunda kaldi.
+   * ⭐DERS: aracin ciktisi KARAR DEGILDIR, ama karar aracin ciktisina YAZILMAZSA arac
+   * kararin aksini onermeye devam eder — ve her okuyanda yeniden tartisma dogurur.
+   * Ofset tablosu SILINMEDI: karar "yeniden gorusulecek", geri acilirsa zamanlama hazir.
+   */
+  yaz('2) CRON — ⛔KAPALI (RECEP KARARI 2026-09-06, yeniden gorusulecek). KURMA.')
+  yaz('   Geri acilirsa zamanlama: ' + ofset + ' * * * *  (ofset tablodan, hatirdan DEGIL)')
   yaz('')
   yaz('3) TUR-SONU UYANIS — her turun sonunda ScheduleWakeup, 20-25 dk.')
   yaz('   Gozcu olurse sagir kalmamak icin IKINCI kanal; tek kanal yedeklilik degildir.')
@@ -164,8 +172,52 @@ const TESLIM_TAZELIK_SN = 180
  * @param gordum alıcının geri yazdığı jeton (null = verilmedi)
  * @param kendiSid doğrulamayı koşan oturum
  * @param simdiMs şimdi (ms) — SAAT DIŞARIDAN VERİLİR, fikstür kurulabilsin diye
- * @returns {{sinif:'YESIL'|'ZAYIF'|'KIRMIZI', sebep:string, gecenSn:number|null}}
+ * @returns {{sinif:'YESIL'|'ZAYIF'|'KIRMIZI', sebep:string, gecenSn:number|null, atanSid?:string}}
+ *   `atanSid` YALNIZ YESIL'de doner: kuyrukta HANGI atanin kaydi sayildi. Cagiran tuketim
+ *   isaretini ona gore koyar — tek slotta bu bilgi damganin `atanSid` alanindan okunuyordu,
+ *   kuyrukta o alan EN SON ataninkidir ve eslesen kayit baskasi olabilir.
  */
+/**
+ * ⭐BEKLEYEN JETONLARI TEK LİSTEDE TOPLA — yeni sözlük + eski tek slot birlikte.
+ *
+ * NİÇİN (ölçülmüş, 2026-09-06/07, ÜÇ CANLI TANIK): `bekleyenJeton` tek bir ALANDI ve bu üç
+ * ayrı belirti doğurdu — (a) iki farklı atan aynı hedefe atınca ilki SESSİZCE silindi,
+ * (b) doğrulanan jeton alanda kalmaya devam etti, (c) süresi geçen jeton da kalmaya devam etti.
+ * (b) ve (c) aynı sonuca çıkıyordu: **ölü jeton canlı kapıyı kilitliyordu** — çünkü eski akış
+ * `bekleyenJeton` doluysa öz-prob yoluna HİÇ ULAŞMADAN dönüyordu. Vakalar: Katalog 15:1xZ
+ * (tüketilmiş jeton), URUN 06:43Z (12 saatlik jeton, sabotaj değil CANLI), ben 18:42Z + 06:41Z.
+ *
+ * Doğru soyutlama: bekleyen jeton bir DURUM değil, ATAN BAŞINA bir KUYRUK kaydıdır.
+ * Kayıt üç halden birinde olur: CANLI (taze, tüketilmemiş) · TÜKETİLMİŞ · SÜRESİ GEÇMİŞ.
+ * Yalnız CANLI kayıt yeşil üretir; öteki ikisi kuyruktan DÜŞER ve hiçbir yolu kesmez.
+ *
+ * ⚠GERİYE UYUM: eski tek-slot alanları (`bekleyenJeton`/`atanSid`/`atildiTs`) okunmaya devam
+ * eder — diskteki durum dosyaları filo koşarken yazıldı, onları geçersiz saymak bütün filoyu
+ * aynı anda kırmızıya düşürürdü (K8 dersi).
+ */
+function bekleyenleri(damga) {
+  const cikti = []
+  const sozluk = damga && damga.bekleyenler
+  if (sozluk && typeof sozluk === 'object') {
+    for (const atanSid of Object.keys(sozluk)) {
+      const k = sozluk[atanSid]
+      if (!k || typeof k !== 'object') continue
+      cikti.push({ atanSid, jeton: k.jeton, atildiTs: k.atildiTs, tuketildi: k.tuketildi === true })
+    }
+  }
+  // Eski tek slot: sözlükte AYNI atan zaten varsa tekrar eklenmez (sözlük tazedir, o kazanır).
+  if (damga && damga.bekleyenJeton && !cikti.some((k) => k.atanSid === damga.atanSid)) {
+    cikti.push({
+      atanSid: damga.atanSid,
+      jeton: damga.bekleyenJeton,
+      atildiTs: damga.atildiTs,
+      // Eski biçimde "tüketildi" işareti YOKTU; doğrulama damgası atıştan SONRAYSA tüketilmiş sayılır.
+      tuketildi: Date.parse(damga.teslimDogrulandiTs || '') >= Date.parse(damga.atildiTs || ''),
+    })
+  }
+  return cikti
+}
+
 function teslimatKaniti({ damga, gordum, kendiSid, simdiMs, esikSn = TESLIM_TAZELIK_SN }) {
   if (!gordum) {
     return { sinif: 'KIRMIZI', sebep: '--gordum/--jeton verilmedi; olcemedim GECTI degildir', gecenSn: null }
@@ -174,13 +226,12 @@ function teslimatKaniti({ damga, gordum, kendiSid, simdiMs, esikSn = TESLIM_TAZE
     return { sinif: 'KIRMIZI', sebep: 'karsilastirilacak prob kaydi YOK', gecenSn: null }
   }
 
-  // Yeni yol: BAŞKA bir oturumun attığı jeton (bağımsız tanık).
-  if (damga.bekleyenJeton) {
-    if (damga.bekleyenJeton !== gordum) {
-      return { sinif: 'KIRMIZI', sebep: 'jeton uyusmuyor (beklenen ' + damga.bekleyenJeton + ')', gecenSn: null }
-    }
+  // Yeni yol: BAŞKA bir oturumun attığı jeton (bağımsız tanık) — kuyrukta ARANIR.
+  const kuyruk = bekleyenleri(damga)
+  const eslesen = kuyruk.find((k) => k.jeton === gordum)
+  if (eslesen) {
     // ⛔KENDİ JETONUNU KABUL ETMEZ: tanık, tanıklık ettiği kişi olamaz.
-    if (!damga.atanSid || damga.atanSid === kendiSid) {
+    if (!eslesen.atanSid || eslesen.atanSid === kendiSid) {
       return {
         sinif: 'KIRMIZI',
         sebep: 'jetonu ATAN da SEN'
@@ -188,7 +239,15 @@ function teslimatKaniti({ damga, gordum, kendiSid, simdiMs, esikSn = TESLIM_TAZE
         gecenSn: null,
       }
     }
-    const atildi = Date.parse(damga.atildiTs || '')
+    if (eslesen.tuketildi) {
+      return {
+        sinif: 'KIRMIZI',
+        sebep: 'bu jeton ZATEN dogrulandi (tuketilmis) — ayni kanit iki kez sayilmaz; '
+          + 'taze olcum icin yeni bir prob gerekir',
+        gecenSn: null,
+      }
+    }
+    const atildi = Date.parse(eslesen.atildiTs || '')
     if (!Number.isFinite(atildi)) {
       return { sinif: 'KIRMIZI', sebep: 'atildiTs OKUNAMADI — yas olculemez (fail-closed)', gecenSn: null }
     }
@@ -199,20 +258,27 @@ function teslimatKaniti({ damga, gordum, kendiSid, simdiMs, esikSn = TESLIM_TAZE
     if (gecenSn > esikSn) {
       return {
         sinif: 'KIRMIZI',
-        sebep: 'BAYAT: jeton ' + gecenSn + ' sn once atildi (esik ' + esikSn + ') — '
-          + 'eski jeton kanalin BUGUN calistigini soylemez',
+        sebep: 'SURESI GECMIS: jeton ' + gecenSn + ' sn once atildi (esik ' + esikSn + ') — '
+          + 'eski jeton kanalin BUGUN calistigini soylemez. Kayit kuyruktan DUSTU, '
+          + 'yeni prob artik engellenmez',
         gecenSn,
       }
     }
     return {
       sinif: 'YESIL',
-      sebep: 'BAGIMSIZ tanik: jetonu ' + String(damga.atanSid).slice(0, 8) + ' atti, '
+      sebep: 'BAGIMSIZ tanik: jetonu ' + String(eslesen.atanSid).slice(0, 8) + ' atti, '
         + gecenSn + ' sn icinde geri yazildi',
       gecenSn,
+      // ⭐Cagiran TUKETIM isaretini bu alana gore koyar: "hangi atanin kaydi sayildi".
+      // Tek slotta bu bilgi `durum.atanSid`'den okunuyordu; kuyrukta o alan artik EN SON
+      // ataninkidir, eslesen kayit BASKASI olabilir — yanlis kaydi tuketmek kanit silmek olur.
+      atanSid: eslesen.atanSid,
     }
   }
 
   // Eski yol: kendi probunun jetonu. Kanal canlı olabilir ama BAĞIMSIZ tanık yok.
+  // ⭐BU SATIRA ARTIK KUYRUK DOLU OLSA DA ULAŞILIR — eski akış yukarıda dönüyordu ve öz-prob
+  // yolu fiilen kapalıydı (üç şerit aynı gün ölçtü).
   if (damga.jeton && damga.jeton === gordum) {
     return {
       sinif: 'ZAYIF',
@@ -222,7 +288,24 @@ function teslimatKaniti({ damga, gordum, kendiSid, simdiMs, esikSn = TESLIM_TAZE
       gecenSn: null,
     }
   }
-  return { sinif: 'KIRMIZI', sebep: 'jeton hicbir kayitla eslesmiyor', gecenSn: null }
+  /**
+   * ⚠BEKLENEN JETON BASILMAZ (kusur, 2026-09-06): eski mesaj "uyusmuyor (beklenen <jeton>)"
+   * diyordu — yani kapı, sınavın cevabını ekrana yazıyordu. Bildirimi hiç görmemiş bir ajan
+   * o satırı okuyup geri yazarak GEÇERLİ damga üretebilirdi; kanıtın bütün dayanağı
+   * "bunu ancak bildirimde görebilirsin" varsayımıydı. Onun yerine SAYI ve ATAN söylenir:
+   * ajan neyi bekleyeceğini bilir, cevabı öğrenmez.
+   */
+  const canli = kuyruk.filter((k) => !k.tuketildi)
+  if (canli.length) {
+    return {
+      sinif: 'KIRMIZI',
+      sebep: 'jeton eslesmedi. Kuyrukta ' + canli.length + ' CANLI bekleyen var (atan: '
+        + canli.map((k) => String(k.atanSid || '?').slice(0, 8)).join(', ')
+        + '); jeton degeri BILEREK basilmaz — onu yalniz gozcu bildiriminde gorebilirsin',
+      gecenSn: null,
+    }
+  }
+  return { sinif: 'KIRMIZI', sebep: 'jeton hicbir kayitla eslesmiyor (kuyrukta canli bekleyen YOK)', gecenSn: null }
 }
 
 async function prob() {
@@ -244,6 +327,38 @@ async function prob() {
     yaz('KIRMIZI — GOZCU KURULU DEGIL: imlec dosyasi yok (' + iy + ').')
     yaz('Once plan ciktisindaki Monitor komutunu kur, sonra bu testi tekrarla.')
     process.exit(1)
+  }
+
+  /**
+   * ⭐EZME KONTROLU ARACTA (kusur, 2026-09-06): "ustune yazarsam onun kanitini siler miyim"
+   * sorusunu UC SERIT ELLE yapti — durum dosyasini acip "dogrulama damgasi atistan SONRA mi"
+   * diye bakarak. Biri yanlis slotun olcumunu tasidi ve DOGRULANMAMIS bir jetonu ezdi; o atis
+   * bosa gitti. Elde tutulan olcut yaniliyor; kontrol arac tarafinda olmali.
+   * (Alan adini burada YAZMIYORUM: INV-MECH-1 prob blogunu METIN olarak tarar ve yorumdaki
+   *  ad da eslesir — kapi yorumla yanilir. Kapiyi gevsetmek yerine cumleyi degistirdim.)
+   *
+   * Kural: hedefin kuyrugunda BASKA birinin CANLI (taze + tuketilmemis) kaydi varsa prob
+   * DURUR. `--yine-de` ile gecilir — kasitli ezme mumkun kalir ama SESSIZ olmaz.
+   * Kendi eski kaydini ezmek serbesttir: kendi jetonunu tazelemek kimsenin kanitini silmez.
+   */
+  if (hedefSid) {
+    let hedefDurum = null
+    try { hedefDurum = JSON.parse(fs.readFileSync(durumYolu(hedefSid), 'utf8')) } catch { hedefDurum = null }
+    const engel = bekleyenleri(hedefDurum).filter((k) => {
+      if (k.tuketildi) return false
+      if (k.atanSid === sid) return false // kendi kaydim — tazelemek serbest
+      const yas = (Date.now() - Date.parse(k.atildiTs || '')) / 1000
+      return Number.isFinite(yas) && yas >= 0 && yas <= TESLIM_TAZELIK_SN
+    })
+    if (engel.length && !arg('--yine-de')) {
+      yaz('DURDU — HEDEFIN KUYRUGUNDA CANLI KANIT VAR, ezmek onu siler:')
+      for (const k of engel) {
+        yaz('  atan ' + String(k.atanSid || '?').slice(0, 8) + ' · ' + Math.round((Date.now() - Date.parse(k.atildiTs)) / 1000) + ' sn once · HENUZ DOGRULANMADI')
+      }
+      yaz('Hedef once onu dogrulasin (dogrula --gordum <jeton>), ya da bilerek ezmek icin --yine-de ver.')
+      yaz('NICIN: 2026-09-06da bu kontrol ELLE yapiliyordu ve yanlis okundu; bir kanit atisi bosa gitti.')
+      process.exit(2)
+    }
   }
 
   const jeton = 'PROB-' + olculen.slice(0, 4) + '-' + Math.random().toString(36).slice(2, 8).toUpperCase()
@@ -290,9 +405,24 @@ async function prob() {
     let onceki = {}
     try { onceki = JSON.parse(fs.readFileSync(durumYolu(olculen), 'utf8')) } catch { onceki = {} }
     const yeni = hedefSid
-      // ⭐BAGIMSIZ PROB: jeton HEDEFIN kaydina "bekleyen" olarak yazilir, ATAN adiyla.
-      // `jeton` alanina YAZILMAZ — yoksa hedef onu kendi probu sanip ZAYIF kanit uretir.
-      ? { ...onceki, bekleyenJeton: jeton, atanSid: sid, atildiTs: olay.ts, atanGozcuOkudu: ulasti }
+      /**
+       * ⭐BAGIMSIZ PROB: jeton HEDEFIN kaydina "bekleyen" olarak yazilir, ATAN adiyla.
+       * `jeton` alanina YAZILMAZ — yoksa hedef onu kendi probu sanip ZAYIF kanit uretir.
+       *
+       * ⭐ATAN BASINA SOZLUK (kusur, 2026-09-06): tek alan vardi ve iki farkli atan ayni hedefe
+       * atinca ilkinin kanit atisi SESSIZCE siliniyordu ("son yazan otekinin kanitini siler").
+       * Sozlukte her atanin kaydi ayri yasar; ayni atanin ikinci atisi yalniz KENDI kaydini
+       * yeniler. Eski tek-slot alanlari da yazilmaya devam eder: diskteki damgayi okuyan ESKI
+       * surum betikler filoda kosuyor olabilir, onlari bir anda kor birakmayiz.
+       */
+      ? {
+          ...onceki,
+          bekleyenler: { ...(onceki.bekleyenler || {}), [sid]: { jeton, atildiTs: olay.ts, atanGozcuOkudu: ulasti } },
+          bekleyenJeton: jeton,
+          atanSid: sid,
+          atildiTs: olay.ts,
+          atanGozcuOkudu: ulasti,
+        }
       : { ...onceki, sid, jeton, probTs: olay.ts, gozcuOkudu: ulasti, gecenSn: gecen }
     fs.writeFileSync(durumYolu(olculen), JSON.stringify(yeni), 'utf8')
   } catch {
@@ -399,7 +529,18 @@ function dogrula() {
           JSON.stringify({
             ...durum,
             teslimDogrulandiTs: new Date().toISOString(),
-            teslimKanit: { kimden: durum.atanSid || null, gecenSn: k.gecenSn },
+            teslimKanit: { kimden: k.atanSid || durum.atanSid || null, gecenSn: k.gecenSn },
+            /**
+             * ⭐TUKETIM ISARETI (kusur, 2026-09-06/07 — uc canli tanik): dogrulanan jeton
+             * kuyrukta "bekleyen" olarak kalmaya devam ediyordu ve bir sonraki olcumu
+             * kilitliyordu. Kanit BIR KEZ sayilir; sayildigi an kayit tuketilir.
+             */
+            bekleyenler: (() => {
+              const s = { ...(durum.bekleyenler || {}) }
+              const atan = k.atanSid || durum.atanSid
+              if (atan && s[atan]) s[atan] = { ...s[atan], tuketildi: true }
+              return s
+            })(),
           }),
           'utf8',
         )
@@ -423,8 +564,14 @@ function dogrula() {
     yaz('CRON      : BEYAN — id ' + cron + '. Bu bir OLCUM DEGILDIR; cron ajan aracidir ve')
     yaz('            diskten gorulemez. Tek gecerli olcum: CronList ciktisinda bu id.')
   } else {
-    yaz('CRON      : OLCULEMEDI — --cron verilmedi. CronList ile dogrula, sonra id yi buraya gec.')
-    kirmizi++
+    /**
+     * ⛔KAPALI KATMAN KIRMIZI SAYILMAZ (Recep karari 2026-09-06). Eskiden `--cron` verilmeyince
+     * KIRMIZI sayiliyordu; sonucu: karari uygulayan HER oturum, kurmadigi icin kirmizi aliyordu.
+     * Kapinin "kanitlanmadi" demesi dogru, ama kanitlanmasi YASAK olan bir katman icin bu ceza
+     * fail-closed degil GURULTUDUR — ve gercek kirmizilari (gozcu, teslimat) golgeler.
+     */
+    yaz('CRON      : ⛔KAPALI — Recep karari (2026-09-06), yeniden gorusulecek. Olculmedi ve')
+    yaz('            OLCULMESI BEKLENMIYOR; bu kalem sonuca KIRMIZI yazmaz.')
   }
   yaz('UYANIS    : OLCULEMEZ — ScheduleWakeup un diskte izi yoktur. Tur sonunda YENIDEN kurulmasi')
   yaz('            ritueldir; bu betik onu goremez ve gordugunu IDDIA ETMEZ.')
