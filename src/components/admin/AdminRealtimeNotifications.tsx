@@ -360,7 +360,10 @@ const AdminRealtimeNotifications: React.FC = () => {
             bgColor: 'bg-admin-accent-weak',
             hasAccess: canWrite('error_groups')
         }
-    ].filter(item => item.hasAccess && item.count > 0)
+    // `count === null` = ÖLÇÜLEMEDİ, sıfır değil — bu satır GİZLENMEZ.
+    // Eskiden yalnız `count > 0` süzülüyordu; null da 0 gibi elenirdi ve panel
+    // "ilgi bekleyen yok" derdi. Ölçülemeyeni saklamak, sorunu yokmuş gibi göstermek.
+    ].filter(item => item.hasAccess && (item.count === null || item.count > 0))
 
     return (
         <div className="relative z-popover" ref={dropdownRef}>
@@ -447,9 +450,20 @@ const AdminRealtimeNotifications: React.FC = () => {
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-1">
-                                                <span className="px-2 py-0.5 rounded-full bg-admin-danger text-admin-danger text-xs font-bold ring-1 ring-admin-danger/30">
-                                                    {item.count}
-                                                </span>
+                                                {/* count === null → ÖLÇÜLEMEDİ. Sayı basmak yalan olur ("0" gibi
+                                                    okunur); rozet bunun bir ölçüm boşluğu olduğunu SÖYLER. */}
+                                                {item.count === null ? (
+                                                    <span
+                                                        className="px-2 py-0.5 rounded-full bg-admin-surface-3 text-admin-fg-subtle text-xs font-semibold ring-1 ring-admin-fg-subtle/30"
+                                                        title={t('admin.dashboard.inbox.olculemediAciklama' as never)}
+                                                    >
+                                                        {t('admin.dashboard.inbox.olculemedi' as never)}
+                                                    </span>
+                                                ) : (
+                                                    <span className="px-2 py-0.5 rounded-full bg-admin-danger text-admin-danger text-xs font-bold ring-1 ring-admin-danger/30">
+                                                        {item.count}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     ))}

@@ -12,7 +12,17 @@ type DusukStokSatiri = Pick<
 export interface InboxCounts {
   pendingReturnsCount: number
   pendingShipmentsCount: number
-  lowStockAlarmsCount: number
+  /**
+   * Düşük stok alarmı sayısı — **`null` = ÖLÇÜLEMEDİ**, sıfır DEĞİL.
+   *
+   * Niçin ayrı bir hâl: bu sayaç istemcide, tüm ürün satırları çekilerek hesaplanıyor
+   * (ölçüt iki kolonu karşılaştırıyor, PostgREST bunu sunucuda filtreleyemiyor). Çekim
+   * eksik kalırsa `tumSatirlariCek` fırlatır — ve eskiden o dalda sayaç 0 kalıyordu,
+   * yani panel "alarm yok" diyordu. Ölçülemeyen bir şeyi "yok" diye göstermek
+   * fail-open'ın ta kendisidir: yönetici stoku bitmiş ürünü göremez ve sorun olmadığını
+   * sanır. `null` bu iki hâli ayırır; panel onu "ölçülemedi" diye gösterir.
+   */
+  lowStockAlarmsCount: number | null
   unresolvedErrorsCount: number
 }
 
@@ -59,16 +69,15 @@ export async function fetchInboxCounts(supabase: SupabaseClient<Database>): Prom
   const pendingReturnsCount = returnsRes.status === 'fulfilled' && !returnsRes.value.error ? (returnsRes.value.count ?? 0) : 0
   const pendingShipmentsCount = shipRes.status === 'fulfilled' && !shipRes.value.error ? (shipRes.value.count ?? 0) : 0
 
-  let lowStockAlarmsCount = 0
+  // FAIL-CLOSED: ölçülemeyen sayaç `null` kalır, 0 OLMAZ.
+  //
+  // `tumSatirlariCek` eksik çekimde fırlatır — yani `rejected` dalı GERÇEK bir arıza
+  // demek. Eskiden o dalda sayaç 0'a düşüyordu ve panel "alarm yok" gösteriyordu;
+  // ölçülemeyen bir şeyi "yok" diye göstermek, yöneticinin stoku bitmiş ürünü
+  // görmemesi demekti. Artık `null` dönüyor ve panel "ölçülemedi" rozeti basıyor.
+  let lowStockAlarmsCount: number | null = null
   if (productsRes.status === 'fulfilled') {
-    // ⚠BURADA HÂLÂ FAIL-OPEN VAR VE BİLEREK DOKUNULMADI, SINIR SEBEBİYLE:
-    // `tumSatirlariCek` eksik çekimde fırlatır, yani `rejected` dalı artık GERÇEK bir
-    // arıza demek. Ama o dalda sayaç 0 kalıyor ve panel "alarm yok" gösteriyor —
-    // ölçülemeyen bir şeyi "yok" diye göstermek fail-open'ın ta kendisi.
-    // Doğru düzeltme sayacı `number | null` yapıp panelde "ölçülemedi" göstermektir;
-    // bu, tüketicisi olan ADMIN bileşenini (AdminRealtimeNotifications.tsx) değiştirmeyi
-    // gerektirir ve o yüzey bu şeridin sınırı DIŞINDA. Sessizce daraltmıyorum:
-    // kalem sahibine ayrı bulgu olarak bildirildi (2026-09-07, URUN → OPS).
+    lowStockAlarmsCount = 0
     const rawProducts = productsRes.value
     for (let i = 0; i < rawProducts.length; i++) {
       const p = rawProducts[i]

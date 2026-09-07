@@ -75,7 +75,19 @@ describe('AdminRealtimeNotifications — Inbox Counts, RBAC, and a11y', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockCanWrite.mockReturnValue(true)
-    
+
+    // Varsayılan sayaçlar HER testte yeniden kurulur. Bileşen fetchInboxCounts'u
+    // birden çok kez çağırıyor (mount + açılış + periyodik), bu yüzden testler
+    // `mockResolvedValueOnce` ile güvenilir şekilde override EDEMEZ — ilk çağrı
+    // jetonu tüketir, ikinci çağrı eski değeri döndürür ve test sessizce yanlış
+    // veriyi ölçer. (2026-09-07'de tam bu tuzağa düşüldü ve ölçülerek bulundu.)
+    vi.mocked(fetchInboxCounts).mockResolvedValue({
+      pendingReturnsCount: 3,
+      pendingShipmentsCount: 5,
+      lowStockAlarmsCount: 2,
+      unresolvedErrorsCount: 4,
+    })
+
     // Default Supabase mock responses for recent activity
     mockSupabase.from.mockImplementation((_table) => {
       const chain = {
@@ -110,6 +122,31 @@ describe('AdminRealtimeNotifications — Inbox Counts, RBAC, and a11y', () => {
       expect(screen.getByText('admin.dashboard.inbox.lowStock')).toBeInTheDocument()
       expect(screen.getByText('admin.dashboard.inbox.unresolvedErrors')).toBeInTheDocument()
     })
+  })
+
+  it('ÖLÇÜLEMEDİ — lowStockAlarmsCount null iken satır GİZLENMEZ ve "0" GÖRÜNMEZ', async () => {
+    // REC-178 sabotaj kolu. Eskiden bu sayaç ölçülemediğinde 0 dönüyordu; satır
+    // `count > 0` süzgecinde eleniyor ve panel "ilgi bekleyen yok" diyordu. Yani
+    // ölçüm boşluğu, sorunun YOKLUĞU gibi okunuyordu — stoku bitmiş ürün görünmezdi.
+    // Artık null dönüyor: satır kalır, rozet "ölçülemedi" der.
+    vi.mocked(fetchInboxCounts).mockResolvedValue({
+      pendingReturnsCount: 0,
+      pendingShipmentsCount: 0,
+      lowStockAlarmsCount: null,
+      unresolvedErrorsCount: 0,
+    })
+
+    render(<AdminRealtimeNotifications />)
+    fireEvent.click(screen.getByRole('button', { name: /admin.dashboard.notificationCenter/i }))
+
+    await waitFor(() => {
+      // Satır GÖRÜNÜR — diğer üç sayaç 0 olduğu için elenir, bu elenmemeli.
+      expect(screen.getByText('admin.dashboard.inbox.lowStock')).toBeInTheDocument()
+    })
+    // Rozet ölçülemediğini SÖYLER.
+    expect(screen.getByText('admin.dashboard.inbox.olculemedi')).toBeInTheDocument()
+    // Ve hiçbir yerde "0" rozeti basılmaz — sıfır ile ölçülememiş aynı şey değildir.
+    expect(screen.queryByText('0')).toBeNull()
   })
 
   it('applies RBAC filter correctly — sales role does not see unresolved errors', async () => {
