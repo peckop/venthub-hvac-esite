@@ -264,7 +264,13 @@ const mech = require_(path.join(KOK, 'scripts', 'board', 'mechanism-setup.cjs'))
     kendiSid: string
     simdiMs: number
     esikSn?: number
-  }) => { sinif: 'YESIL' | 'ZAYIF' | 'KIRMIZI'; sebep: string; gecenSn: number | null }
+  }) => {
+    sinif: 'YESIL' | 'ZAYIF' | 'KIRMIZI'
+    sebep: string
+    gecenSn: number | null
+    /** YALNIZ YESIL'de: kuyrukta hangi atanın kaydı sayıldı (tüketim işareti buna göre konur). */
+    atanSid?: string
+  }
   TESLIM_TAZELIK_SN: number
 }
 
