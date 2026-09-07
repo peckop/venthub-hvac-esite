@@ -103,6 +103,10 @@ hatasını tekrarlar.
 | `.claude/hooks/sir-basan-kalip.cjs` | hook (kütüphane) | Bir Bash komutunun SIR değerini basıp basmadığını ölçen saf fonksiyon | ALTYAPI | `require()` ← bash-write-guard.cjs:67 | dolaylı | sir-basan-kalip.test.ts | KAL |
 | `.claude/hooks/son-soz-gate.cjs` | hook | Stop kapısı: turda kullanıcı mesajı varsa SON SÖZ kullanıcıya mı yazılmış | ALTYAPI | `hook:Stop *` | bağlı | yok | KAL |
 | `.claude/hooks/verify-on-stop.cjs` | hook | Stop (async): JS/TS düzenlendiyse eslint --fix + tsc doğrulaması | ALTYAPI | `hook:Stop *` (async, timeout 120) | `.cwd-ayrisma-sayaci.json`, 2026-09-07 | board-invariants.test.ts | KAL |
+| `.claude/hooks/defter-bayatlik-olcumu.cjs` | hook | Stop hook — PROJE TAKİP DEFTERİ BAYATLIK ÖLÇÜMÜ (yalnız ÖLÇER ve UYARIR). | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/defter-bayatlik-olcumu.test.ts | YENI |
+| `.claude/hooks/eylem-defteri.cjs` | hook | PostToolUse hook — EYLEM DEFTERİ (git'in GÖRMEDİĞİ taşıma/silmeleri kaydeder). | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/eylem-defteri.test.ts | YENI |
+| `.claude/hooks/hafiza-sorusu-yonlendirme.cjs` | hook | UserPromptSubmit hook — HAFIZA SORUSU YÖNLENDİRME. | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/hafiza-sorusu-yonlendirme.test.ts | YENI |
+| `.claude/hooks/soguk-okuyucu-sinavi.cjs` | hook | PostToolUse hook — SOĞUK OKUYUCU SINAVI ÇAĞRISI (yalnız HATIRLATIR, sınavı ajan koşar). | OPS | docs/standards/hafiza-kancalari-standard.md, src/__tests__/conformance/soguk-okuyucu-sinavi.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/soguk-okuyucu-sinavi.test.ts | YENI |
 
 **Not (companion, envanter dışı — cetvel §1):** `accumulate-edits.md`, `bash-write-audit.md`,
 `bash-write-guard.md`, `bash-write-targets.md`, `board-brief.md`, `board-release.md`,
@@ -239,7 +243,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/tools/migrate_images.py` | `<img>` → `VentImage` göçü | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme; göç tamamlandı | yok | OLU-DOGRULANDI |
 | `scripts/tools/replace_http.py` | http→https değiştirme taraması | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme; tek-seferlik codemod | yok | OLU-DOGRULANDI |
 | `scripts/vercel-ignore-build.sh` | T086 Vercel "Ignored Build Step" — build gerektirmeyen değişiklikleri atlar | OPS *(devir adayı: ALTYAPI)* | `docs/standards/deploy-build-skip-standard.md` | 2026-08-27 | build-skip-positive-logic.test.ts | KAL |
-| `scripts/archive/generate-sitemap.mjs` | scripts/generate-sitemap.mjs | OPS | docs/proje-takip/linear/is-dagilimi-2026-09-07.json, docs/proje-takip/linear/is-dagilimi-2026-09-07.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/archive/generate-sitemap.mjs` | scripts/generate-sitemap.mjs | OPS | docs/proje-takip/linear/is-dagilimi-2026-09-07.json, docs/proje-takip/linear/is-dagilimi-2026-09-07.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | KAYIP (onceki: YENI) |
 | `scripts/db/migrations/apply_wizard_migration.ts` | (aciklama satiri yok — elle yazilmali) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/db/migrations/distribute_products_smart.ts` | Manual .env parser | OPS | cagiran-yok (betik taramasi; anma: registry/P04-Category-Architecture/completed/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/plan.json) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/db/migrations/fix_category_name.ts` | Load credentials dynamically from environment | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
@@ -262,6 +266,11 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/teknik_bosluk.py` | -*- coding: utf-8 -*- | OPS | scripts/icerik-hatti/_kaynak.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/icerik-hatti/urun-veri-cek.mjs` | URUN VERI CEKME — kanit tablosunun girdisi (REC-163). | OPS | scripts/icerik-hatti/aile-kaynak-cikar.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/nlm/santiye.py` | Olcut updatedAt DEGIL "sonAnlamli" (son yorum / PR eki / baslama / bitis / acilis): etiket, toplu bakim, betik dokunusu yasi TAZELEMEZ. | OPS | docs/standards/work-tracking-ssot-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/birim-gomulu-duzelt.mjs` | BİRİM-GÖMÜLÜ HÜCRE DÜZELTİCİSİ — REC-190 | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-birim-olcek-kusurlari-2026-09-07.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/kategori-metni-yaz.mjs` | KATEGORİ REHBER PARAGRAFLARINI CANLIYA YAZAR — REC-146 madde 3 / REC-161 yolu. | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/kayip-urun-aile-bagla.mjs` | KAYIP ÜRÜN AKTARIMI — İKİNCİ YARI: AİLE BAĞI + KATEGORİ ONARIMI (REC-226) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/kayip-urun-aktar.mjs` | KAYIP ÜRÜN AKTARIMI — REC-226 | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/kip/satis-kipine-gec.mjs` | Satış kipi geçiş betiği — TEK KOMUTLA aç/kapat, yedekli, geri alınabilir (REC-168). | OPS | docs/standards/satis-kipi-gecis-standard.md, src/__tests__/conformance/build-skip-positive-logic.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/build-skip-positive-logic.test.ts, src/__tests__/conformance/satis-kipi-anahtari.test.ts | YENI |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
@@ -470,6 +479,7 @@ gerektirmez).
 | work-tracking-ssot-standard | İş-takibi & dokümantasyon SSOT standardı [ESKİ, tarihçe] | OPS | haritada değil | 2026-09-06 | kume-master-tazeligi.test.ts | KAL |
 | arac-envanteri-standard | Araç Envanteri Standardı (v1.0 — 2026-09-07) | OPS | docs/README.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | satis-kipi-gecis-standard | Satış Kipi Geçiş Cetveli — v1.0 | OPS | cagiran-yok (betik taramasi; anma: docs/plans/rec168-migration-taslagi-2026-09-06.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| hafiza-kancalari-standard | Hafıza Kancaları Standardı (REC-177) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 
 ---
 
