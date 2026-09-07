@@ -58,8 +58,13 @@ describe('Routes', () => {
       expect(Routes.category('hvac')).toBe('/category/hvac');
     });
 
-    it('should include subSlug if provided and valid', () => {
-      expect(Routes.category('hvac', 'fans')).toBe('/category/hvac/fans');
+    // REC-205 (2026-09-07) — SÖZLEŞME DEĞİŞTİ. Eskiden bu çağrı `/category/hvac/fans`
+    // üretiyordu ve aynı sayfa İKİ adresten yayınlanıyordu; ikisi de kendini kanonik ilan
+    // ediyordu. Google iki seviyeli olanı eledi (GSC "Kopya, farklı standart sayfa").
+    // Artık ALT slug kazanır ve adres tek seviyelidir. Argüman imzası KORUNDU (20+ çağrı
+    // yeri var); değişen şey üretilen adres.
+    it('iki argüman verilse de TEK SEVİYELİ adres üretir (alt slug kazanır)', () => {
+      expect(Routes.category('hvac', 'fans')).toBe('/category/fans');
     });
 
     it('should ignore subSlug if it is same as slug', () => {
@@ -165,7 +170,8 @@ describe('localizedHref', () => {
   });
 
   it('Routes builder ile SSOT zinciri doğru localize URL üretir', () => {
-    expect(localizedHref(Routes.category('hvac', 'fans'), 'tr')).toBe('/tr/category/hvac/fans');
+    // Adres tek seviyeli (REC-205); burada ölçülen şey zincirin DİL ÖNEKİ ürettiği.
+    expect(localizedHref(Routes.category('hvac', 'fans'), 'tr')).toBe('/tr/category/fans');
     expect(localizedHref(Routes.products(), 'en')).toBe('/en/products');
     expect(localizedHref(Routes.legal.cerez(), 'tr')).toBe('/tr/legal/cerez-politikasi');
     expect(localizedHref(Routes.account.profile(), 'en')).toBe('/en/account/profile');
