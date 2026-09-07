@@ -63,6 +63,58 @@ const kisaSid = String(sid).slice(0, 8)
 const TABAN_YOLU = path.join(PANO, '.bash-audit-' + kisaSid + '.json')
 
 /**
+ * ⭐§28 İKİNCİ AYAK — BEYANSIZ ÖLÇÜM KAYDI (REC-130, 2026-09-07).
+ *
+ * NİÇİN BURADA: tur-sonu ağaç ayrışma uyarısı (`verify-on-stop.cjs`) kendi `process.cwd()`'sini
+ * okuyordu. Cetvel §9.1 tam bunu YASAKLIYOR, çünkü kabuk cwd'si sessizce ana çalışma dizinine
+ * resetlenir — yani kancanın gördüğü dizin, komutların KOŞTUĞU dizin değildir. Sonuç ölçüldü
+ * (2026-09-07, iki şerit BAĞIMSIZ): ALTYAPI bütün komutlarını `vh-altyapi-envanter` ağacında,
+ * OPS bütün komutlarını `ops-gun-kapanisi` ağacında koştu ve lamba İKİSİNE DE yandı, "752. vaka"
+ * dedi. Her şeyi doğru yapan oturumu yanlış yapandan ayırt edemeyen bir gösterge ölçüm değildir;
+ * sürekli yanan lamba birkaç gün içinde mobilyaya dönüşür.
+ *
+ * BURASI KOMUTU GÖREN TEK YER: PostToolUse/Bash kancası hem komut METNİNİ hem oturum cwd'sini
+ * alır. Kayıt burada tutulur, HÜKÜM tur sonunda verilir (tek git çağrısı, komut başına değil).
+ *
+ * ⚠BU BLOK HİÇBİR KOŞULDA TURU DÜŞÜRMEZ ve çıkış kodunu DEĞİŞTİRMEZ: bu dosyanın asıl işi
+ * yazma denetimi; ölçüm kaydı ona asla bulaşmaz.
+ *
+ * NİÇİN "cd" HAFIZASI TUTULMUYOR: kabuk cwd'si çağrılar arası korunur, dolayısıyla bir kez
+ * `cd` yapıp sonraki komutlarda ona güvenmek MÜMKÜNDÜR — ama §9.1'in belgelediği sessiz
+ * reset tam da o güveni kıran şeydir. Ortam cwd'sine yaslanan komut, resetten SONRA ana
+ * dizinde koşar ve bunu kimse görmez. O yüzden ölçüt komutun KENDİ METNİDİR.
+ */
+const OLCUM_KALIBI =
+  /(?:^|[\n;|&]\s*)(?:npx\s+vitest|pnpm\s+(?:test|lint|type-check|build|knip)|vitest\b|node\s+scripts\/|python\s+scripts\/|orion\b|git\s+(?:status|diff|log|show|rev-parse|branch)\b)/
+/** Beyan = komutun kendi metninde hedef dizin görünür: `git -C <ağaç>`, `cd <yol>` ya da mutlak yol. */
+const BEYAN_KALIBI = /\bgit\s+-C\s+\S|(?:^|[\n;|&]\s*)cd\s+\S|[A-Za-z]:[/\\]|(?:^|\s)\/[a-z]\//
+const BEYANSIZ_YOLU = path.join(PANO, '.beyansiz-olcum.' + kisaSid + '.json')
+const EN_FAZLA_KAYIT = 10
+
+try {
+  const komutMetni = String((girdi.tool_input && girdi.tool_input.command) || '')
+  if (komutMetni && OLCUM_KALIBI.test(komutMetni) && !BEYAN_KALIBI.test(komutMetni)) {
+    let onceki = []
+    try {
+      const o = JSON.parse(fs.readFileSync(BEYANSIZ_YOLU, 'utf8'))
+      if (Array.isArray(o)) onceki = o
+    } catch {
+      onceki = []
+    }
+    onceki.push({
+      ts: new Date().toISOString(),
+      cwd: cwdKok,
+      // Komut KISALTILIR: kayıt bir kanıt satırı, arşiv değil. Sır taşıyan uzun komutları
+      // pano dizinine tam metin yazmak istemeyiz.
+      komut: komutMetni.replace(/\s+/g, ' ').slice(0, 120),
+    })
+    fs.writeFileSync(BEYANSIZ_YOLU, JSON.stringify(onceki.slice(-EN_FAZLA_KAYIT)), 'utf8')
+  }
+} catch {
+  /* ölçüm kaydı asla denetimi bozmaz */
+}
+
+/**
  * Uyarılar TOPLANIR, tek yerden basılır. Erken çıkışlı yollarda basmayı unutmamak için:
  * bu dosyanın tarihi zaten "sessizce atlandı" arızalarıyla dolu.
  */
