@@ -174,7 +174,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/edge/select-functions.mjs` | Değişen dosyalardan deploy edilecek edge fonksiyonlarını seçer | ALTYAPI | `.github/workflows/{deploy-functions,edge-shared-input-drift}.yml` | 2026-08-15 | yok | KAL |
 | `scripts/expand-all-evals.py` | Manifest'teki tüm skill'ler için eval genişletir | OPS | `cagiran-yok` | 0 eşleşme (skill ağaçları dahil) | yok | OLU-DOGRULANDI |
 | `scripts/generate/generate-meta.mjs` | Sondaki slash'ı temizleyip meta üretir | ALTYAPI | `cagiran-yok` | 0 eşleşme; App Router metadata API yerini aldı | yok | OLU-DOGRULANDI |
-| `scripts/generate/generate-sitemap.mjs` | Statik sitemap üretir (halefi `src/app/sitemap.ts`) | ALTYAPI | `cagiran-yok` | pano 2026-09-07T07:00:51Z: "ÖLÜ + TEHLİKELİ, karantina = scripts/archive/" | yok | **KARANTINA** *(bu PR ile `scripts/archive/`'e taşındı — bkz. §4)* |
+| `scripts/generate/generate-sitemap.mjs` | Statik sitemap üretir (halefi `src/app/sitemap.ts`) | ALTYAPI | `cagiran-yok` | pano 2026-09-07T07:00:51Z: "ÖLÜ + TEHLİKELİ, karantina = scripts/archive/" | yok | KAYIP (onceki: KARANTINA (bu PR ile `scripts/archive/`'e taşındı — bkz. §4)) |
 | `scripts/generate/generate-next-routes.js` | ⚠Çalışmıyor — hatalı import'lar, Pre-App-Router hedef düzeni | ALTYAPI | `docs/standards/fleet-mechanism-standard.md` (anılıyor, silme adayı notuyla) | 2026-09-01 | yok | KAL *(not: REC-102 "silme adayı" dedi, henüz silinmedi/karantinada değil)* |
 | `scripts/health-check.ps1` | Lint + Type Check koşumu | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
 | `scripts/hijyen/agac-artik-envanteri.cjs` | Çalışma ağacı artık envanteri (REC-142 DoD4) | ALTYAPI | `cagiran-yok` (elle) | pano 2026-09-05T06:48:22Z: "ENVANTER ÇIKTI …366 üretilmiş" | yok | KAL |
@@ -238,6 +238,29 @@ madde 1 gereği araç sayılmaz.
 | `scripts/tools/migrate_images.py` | `<img>` → `VentImage` göçü | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme; göç tamamlandı | yok | OLU-DOGRULANDI |
 | `scripts/tools/replace_http.py` | http→https değiştirme taraması | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme; tek-seferlik codemod | yok | OLU-DOGRULANDI |
 | `scripts/vercel-ignore-build.sh` | T086 Vercel "Ignored Build Step" — build gerektirmeyen değişiklikleri atlar | OPS *(devir adayı: ALTYAPI)* | `docs/standards/deploy-build-skip-standard.md` | 2026-08-27 | build-skip-positive-logic.test.ts | KAL |
+| `scripts/archive/generate-sitemap.mjs` | scripts/generate-sitemap.mjs | OPS | docs/proje-takip/linear/is-dagilimi-2026-09-07.json, docs/proje-takip/linear/is-dagilimi-2026-09-07.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/apply_wizard_migration.ts` | (aciklama satiri yok — elle yazilmali) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/distribute_products_smart.ts` | Manual .env parser | OPS | cagiran-yok (betik taramasi; anma: registry/P04-Category-Architecture/completed/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/plan.json) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/fix_category_name.ts` | Load credentials dynamically from environment | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/fix_product_categories_client.ts` | Manual .env parser | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/fix_products_select.ts` | (aciklama satiri yok — elle yazilmali) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/restore_categories.ts` | SİLİNEN KATEGORİLERİ GERİ YÜKLE | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/run-direct-migration.ts` | (aciklama satiri yok — elle yazilmali) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/run-migration.ts` | Migration dosyasını oku | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/run_category_migration.ts` | Service role key gerekli - anon key ile silme yapılamayabilir | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/run_migration_remote.ts` | Capture notices | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/run_migration_via_db_url.ts` | Use provided pooler format from .env or fallback to provided working string | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/hijyen/arac-envanteri.cjs` | Envanteri fs'ten üretir ve INV-ARAC-1..3 kapısını koşar (REC-185) | ALTYAPI | `elle` + `src/__tests__/conformance/arac-envanteri.test.ts` | kapı testi 17/17, 2026-09-07 | arac-envanteri.test.ts | KAL |
+| `scripts/icerik-hatti/_kaynak.py` | -*- coding: utf-8 -*- | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/_veri.mjs` | ORTAK VERI ERISIMI (JS) — 1000 satir tavanina karsi sayfalama + veri-tamligi kapisi. | OPS | scripts/db/product-data/identity-fix.mjs, scripts/media/avens-kentalfan-fill-manifest.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/_veri.py` | -*- coding: utf-8 -*- | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-1000-satir-tavani-filo-notu-2026-09-06.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/aile-kaynak-cikar.py` | -*- coding: utf-8 -*- | OPS | docs/standards/catalog-ingestion-standard.md, scripts/icerik-hatti/kanit-tablosu.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/faz4-etiket-duzelt.py` | -*- coding: utf-8 -*- | OPS | scripts/icerik-hatti/faz4-teknik-yukle.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/faz4-teknik-yukle.py` | -*- coding: utf-8 -*- | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-faz4-hazirlik-2026-09-07.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/fiyatsiz-ayrim.py` | -*- coding: utf-8 -*- | OPS | scripts/icerik-hatti/_veri.mjs, scripts/icerik-hatti/_veri.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/teknik_bosluk.py` | -*- coding: utf-8 -*- | OPS | scripts/icerik-hatti/_kaynak.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/urun-veri-cek.mjs` | URUN VERI CEKME — kanit tablosunun girdisi (REC-163). | OPS | scripts/icerik-hatti/aile-kaynak-cikar.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/nlm/santiye.py` | Olcut updatedAt DEGIL "sonAnlamli" (son yorum / PR eki / baslama / bitis / acilis): etiket, toplu bakim, betik dokunusu yasi TAZELEMEZ. | OPS | docs/standards/work-tracking-ssot-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
@@ -307,6 +330,8 @@ madde 1 gereği araç sayılmaz.
 | 62 | maestro-combine | .agent | çakışmasız paralel merge (JSON delta) | orchestration | `skill:maestro-combine` | 2026-06-17 · manifest evet | manifest kaydı | KAL |
 | 63 | maestro-feature | .agent | worker-judge çok-ajan özellik geliştirme | orchestration | `skill:maestro-feature` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
 | 64 | maestro-refactor | .agent | bölünebilir büyük değişikliği paralel dalga | orchestration | `skill:maestro-refactor` | 2026-06-17 · manifest evet | manifest kaydı | KAL |
+| 65 | venthub-tasarim-dili | .agent | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| 66 | venthub-tasarim-dili | .claude | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 
 **Not:** ENVANTER-DIŞI = `.claude` ağacındaki satır ne `venthub-core` manifest'inde (yalnız `.agent`
 yollarını kapsar) ne 09-05 dış envanterinin §3 istisnasında geçiyor. Bu "yanlış" anlamına gelmez —
@@ -442,6 +467,8 @@ gerektirmez).
 | uretilmis-artefakt-standard | Üretilmiş artefakt standardı | ALTYAPI | haritada değil | 2026-09-05 | uretilmis-artefakt-tazeligi.test.ts (5 INV) | KAL |
 | vaat-butunlugu-standard | Vaat bütünlüğü standardı — vitrin neyi vaat edebilir | URUN | haritada değil | 2026-09-06 | uc-boyut-musteri-yuzeyi.test.ts (5 INV) | KAL |
 | work-tracking-ssot-standard | İş-takibi & dokümantasyon SSOT standardı [ESKİ, tarihçe] | OPS | haritada değil | 2026-09-06 | kume-master-tazeligi.test.ts | KAL |
+| arac-envanteri-standard | Araç Envanteri Standardı (v1.0 — 2026-09-07) | OPS | docs/README.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| satis-kipi-gecis-standard | Satış Kipi Geçiş Cetveli — v1.0 | OPS | cagiran-yok (betik taramasi; anma: docs/plans/rec168-migration-taslagi-2026-09-06.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 
 ---
 
