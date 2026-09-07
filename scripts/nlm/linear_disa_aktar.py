@@ -106,7 +106,8 @@ def cek(key):
                 "completedAt": n.get("completedAt"), "url": n["url"],
                 # SON ANLAMLI DOKUNUS (Katalog uyarisi 2026-09-07): updatedAt etiket/bakim/betikle tazelenir, curume olcutu olamaz.
                 # Anlamli = son yorum · son PR/ek baglama · ise baslama · bitis · acilis. Aciklama govdesi degisikligi API'de ucuz izlenemiyor, KAPSAM DISI (yazili).
-                "sonAnlamli": max([x for x in [n["createdAt"], n.get("startedAt"), n.get("completedAt")]
+                # startedAt/completedAt CIKARILDI (Katalog 09-07): durum gezdirmek saati sifirlamasin.
+                "sonAnlamli": max([x for x in [n["createdAt"]]
                                    + [c["createdAt"] for c in (n.get("comments") or {}).get("nodes", [])]
                                    + [a["createdAt"] for a in (n.get("attachments") or {}).get("nodes", [])] if x]),
                 "blockedBy": sorted({r["issue"]["identifier"] for r in (n.get("inverseRelations") or {}).get("nodes", []) if r.get("type") == "blocks" and r.get("issue")}),

@@ -77,7 +77,7 @@ Kaynak: Recep'in 2026-09-07 sabah hükmü (bir haftadır "iş açıldı mı, kim
 4. **Durum değişikliği panoya yazılmaz, Linear'da YAPILIR.** Pano notu REC numarası taşır; taşımayan not iş sayılmaz.
 5. **Recep'ten bir şey bekleyen kayıt "Recep kapısı" etiketi taşır;** taşımayan görünmez ve Recep'e sunulmaz.
 6. **Kayıt açmanın bedeli:** yeni kayıt yalnız (a) canlıda ÖLÇÜLMÜŞ kusur, (b) Recep kararı, (c) aktif işin alt adımı ise açılır. "İyi olurdu" fikri yol haritası satırıdır, kayıt değil.
-7. **Backlog son kullanma:** 14 gün dokunulmamış Backlog kaydı "çürüdü adayı" listesine düşer (§8 tablo); sahibi tek cümleyle savunamazsa iptal edilir.
+7. **Bakılmadı işareti (Recep düzeltmesi 09-07: "iş varsa iştir"):** 14 gündür kimsenin bakmadığı Backlog kaydı "bakılmadı" listesine düşer (§8 tablo). Bu bir İPTAL mekanizması DEĞİLDİR; sahibine "bir bak" işaretidir. Gerekçe yazma zorunluluğu yok; yorum/gövde spreyi yapılmaz. Ölçüt son yorum / PR eki / açılış tarihi (updatedAt, startedAt, completedAt DEĞİL: etiket, bakım ve durum gezdirme saati sıfırlamaz). İptal yalnız Recep sözüyle.
 8. **Eski kayıt arşivlenmez, BAĞLANIR.** Her eski kayıt için tek soru: "bu iş bugünkü mimaride hâlâ duruyor mu" → devam ediyor (bugünkü kayda bağla, eskisini kapat) / devralındı (hangi kayıt) / mimari değişti (gerekçe yaz, kapat). Kayıt silinmez, gerekçe kayıtta kalır.
 9. **Kova kayıt yasak:** bitiş ölçütü yazılamayan kayıt kayıt değildir; parçalanır ya da kapanır.
 10. **Kayıt gerçek mi?** Sahiplendirme "sahibi var mı" ile yetinmez; iş olmayan kayıt (şablon, deneme) iptal edilir (09-07: Linear onboarding şablonu iki kayıt OPS etiketi almıştı).

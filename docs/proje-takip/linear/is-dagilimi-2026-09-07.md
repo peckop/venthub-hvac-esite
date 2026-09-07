@@ -1,7 +1,7 @@
-<!-- uretilmis: Linear GraphQL disa aktarimi (scripts/nlm/linear_disa_aktar.py) · damga 2026-09-07T09:36:47Z · elle duzenlenmez; yenileme: gun kapanisi ritueli -->
+<!-- uretilmis: Linear GraphQL disa aktarimi (scripts/nlm/linear_disa_aktar.py) · damga 2026-09-07T09:40:12Z · elle duzenlenmez; yenileme: gun kapanisi ritueli -->
 # Linear İş Dağılımı — Şantiye Durumu (2026-09-07)
 
-**Damga:** 2026-09-07T09:36:47Z · **Kaynak:** Linear GraphQL `issues` (sayfalama 3 çağrı) · **Toplam iş:** 203
+**Damga:** 2026-09-07T09:40:12Z · **Kaynak:** Linear GraphQL `issues` (sayfalama 3 çağrı) · **Toplam iş:** 203
 
 > Okuma kılavuzu: her proje bir kat, her kilometre taşı bir dükkân sırası, her iş bir dükkân. **% bitti = Done / (Toplam − Canceled)**. Sorumluluk = şerit etiketi (assignee alanı çoğunlukla boş).
 
@@ -422,5 +422,5 @@ Durum dağılımı: Done 58 · In Progress 20 · Todo/Backlog 110 · Canceled 15
 
 ## §5 Ölçüm satırı
 
-çağrı 3 · kayıt 203 · proje 9 · etiket 10 · bayat açık 0/31 · damga 2026-09-07T09:36:47Z
+çağrı 3 · kayıt 203 · proje 9 · etiket 10 · bayat açık 0/31 · damga 2026-09-07T09:40:12Z
 

@@ -25,7 +25,7 @@ SERITLER = ["URUN", "URUN-KATALOG", "ALTYAPI", "OPS", "DESIGN"]
 DIS_PROJELER = set()   # Recep 2026-09-07: "hicbir is VentHub disinda degil" — proje disi tutma YOK (Q-Validator eski mimari, kayitlari baglandi/kapandi)
 KATALOG_PROJE = "Katalog ve Ürün Verisi"
 LIMIT_IP, LIMIT_TODO = 1, 3
-CURUME_GUN = 14   # Backlog'da bu kadar gun ANLAMLI dokunus gormemis kayit "curudu adayi" (Katalog onerisi, OPS hukmu 2026-09-07)
+CURUME_GUN = 14   # Backlog'da bu kadar gun kimsenin bakmadigi kayit "BAKILMADI" isareti. Recep 09-07: "is varsa istir" — iptal YOK, yalniz sahibine "bir bak" isareti.
 # Olcut updatedAt DEGIL "sonAnlamli" (son yorum / PR eki / baslama / bitis / acilis): etiket, toplu bakim, betik dokunusu yasi TAZELEMEZ.
 # Sinav: bir kayda yalniz etiket ekle -> yas degismemeli (updatedAt degisir, sonAnlamli degismez). Katalog uyarisi 09-07.
 
@@ -105,7 +105,7 @@ def main():
     L.append("")
     L.append("## §0 Özet")
     L.append("")
-    L.append(f"| Şerit | Yapılıyor | Teslim (PR açık) | Sırada | Backlog | Çürüdü adayı (≥{CURUME_GUN} gün) | Bloklu | Recep'ten bekleyen | Uyum |")
+    L.append(f"| Şerit | Yapılıyor | Teslim (PR açık) | Sırada | Backlog | Bakılmadı (≥{CURUME_GUN} gün) | Bloklu | Recep'ten bekleyen | Uyum |")
     L.append("|---|---:|---:|---:|---:|---:|---:|---:|---|")
     kirmizi = []
     for s in SERITLER + ["SAHIPSIZ"]:
@@ -149,7 +149,7 @@ def main():
                 L.append(f"- {k['identifier']} · {kisa(k['title'])} · proje: {k.get('project') or '-'}")
             L.append("")
     curu = [k for s in by for k in by[s]["CURUDU"]]
-    L.append(f"## §8 Çürüdü adayları ({len(curu)}) — Backlog'da ≥{CURUME_GUN} gün dokunulmamış; sahibi tek cümleyle savunamazsa iptal")
+    L.append(f"## §8 Bakılmadı ({len(curu)}) — Backlog'da ≥{CURUME_GUN} gündür kimse bakmamış; iş varsa iştir, iptal yok, sahibi bir bakar")
     L.append("")
     for k in sorted(curu, key=lambda x: (serit_of(x), x["identifier"])):
         L.append(f"- {k['identifier']} · {kisa(k['title'], 100)} · {serit_of(k)} · son anlamlı dokunuş {(k.get('sonAnlamli') or '?')[:10]}")

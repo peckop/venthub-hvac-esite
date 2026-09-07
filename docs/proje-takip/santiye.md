@@ -1,11 +1,11 @@
-<!-- uretilmis: scripts/nlm/santiye.py · damga 2026-09-07T09:36Z · Linear disa aktarimi 2026-09-07T09:36:47Z · elle duzenlenmez -->
-# ŞANTİYE — kimde ne iş var (2026-09-07T09:36Z)
+<!-- uretilmis: scripts/nlm/santiye.py · damga 2026-09-07T09:40Z · Linear disa aktarimi 2026-09-07T09:40:12Z · elle duzenlenmez -->
+# ŞANTİYE — kimde ne iş var (2026-09-07T09:40Z)
 
-Kaynak: Linear (2026-09-07T09:36:47Z). Kural: şerit başına yapılıyor ≤1, sırada ≤3. Pano/sohbet kaynak değildir.
+Kaynak: Linear (2026-09-07T09:40:12Z). Kural: şerit başına yapılıyor ≤1, sırada ≤3. Pano/sohbet kaynak değildir.
 
 ## §0 Özet
 
-| Şerit | Yapılıyor | Teslim (PR açık) | Sırada | Backlog | Çürüdü adayı (≥14 gün) | Bloklu | Recep'ten bekleyen | Uyum |
+| Şerit | Yapılıyor | Teslim (PR açık) | Sırada | Backlog | Bakılmadı (≥14 gün) | Bloklu | Recep'ten bekleyen | Uyum |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
 | URUN | 0 | 7 | 3 | 47 | 0 | 1 | 5 | YEŞİL |
 | URUN-KATALOG | 1 | 1 | 2 | 3 | 0 | 0 | 3 | YEŞİL |
@@ -107,7 +107,7 @@ Kaynak: Linear (2026-09-07T09:36:47Z). Kural: şerit başına yapılıyor ≤1, 
 
 **YAPILIYOR (0)**
 
-## §8 Çürüdü adayları (0) — Backlog'da ≥14 gün dokunulmamış; sahibi tek cümleyle savunamazsa iptal
+## §8 Bakılmadı (0) — Backlog'da ≥14 gündür kimse bakmamış; iş varsa iştir, iptal yok, sahibi bir bakar
 
 
 ## §9 Hüküm
