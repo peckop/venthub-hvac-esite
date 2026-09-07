@@ -28,8 +28,11 @@ exclusions: []
 **Kanonik yol:**
 
 ```
-C:/Users/alize/venthub-pdf-ingestor/.agent/skills/venthub-catalog-importer/SKILL.md
+<venthub-pdf-ingestor deposu>/.agent/skills/venthub-catalog-importer/SKILL.md
 ```
+
+O depo bu deponun **kardeşidir** (aynı üst dizin), yani buradan göreli yol:
+`../venthub-pdf-ingestor/.agent/skills/venthub-catalog-importer/SKILL.md`
 
 Tam sözleşme: `venthub-pdf-ingestor/GOREV-katalog-ice-alim.md`
 
