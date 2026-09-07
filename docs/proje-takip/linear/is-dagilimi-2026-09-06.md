@@ -1,18 +1,18 @@
-<!-- uretilmis: Linear GraphQL disa aktarimi (scripts/nlm/linear_disa_aktar.py) · damga 2026-09-06T14:30:00Z · elle duzenlenmez; yenileme: gun kapanisi ritueli -->
+<!-- uretilmis: Linear GraphQL disa aktarimi (scripts/nlm/linear_disa_aktar.py) · damga 2026-09-06T20:48:27Z · elle duzenlenmez; yenileme: gun kapanisi ritueli -->
 # Linear İş Dağılımı — Şantiye Durumu (2026-09-06)
 
-**Damga:** 2026-09-06T14:30:00Z · **Kaynak:** Linear GraphQL `issues` (sayfalama 2 çağrı) · **Toplam iş:** 172
+**Damga:** 2026-09-06T20:48:27Z · **Kaynak:** Linear GraphQL `issues` (sayfalama 2 çağrı) · **Toplam iş:** 179
 
 > Okuma kılavuzu: her proje bir kat, her kilometre taşı bir dükkân sırası, her iş bir dükkân. **% bitti = Done / (Toplam − Canceled)**. Sorumluluk = şerit etiketi (assignee alanı çoğunlukla boş).
 
-Durum dağılımı: Done 57 · In Progress 42 · Todo/Backlog 71 · Canceled 2 → **genel % bitti 34%**
+Durum dağılımı: Done 57 · In Progress 44 · Todo/Backlog 76 · Canceled 2 → **genel % bitti 32%**
 
 ## §1 ÖZET — proje başına
 
 | Proje | Toplam | Done | In Progress | Todo/Backlog | Canceled | % bitti |
 |---|---:|---:|---:|---:|---:|---:|
 | (projesiz) | 6 | 0 | 0 | 6 | 0 | 0% |
-| Altyapı, Kapılar ve Belge Hattı | 48 | 15 | 19 | 13 | 1 | 32% |
+| Altyapı, Kapılar ve Belge Hattı | 55 | 15 | 21 | 18 | 1 | 28% |
 | Katalog ve Ürün Verisi | 21 | 1 | 9 | 11 | 0 | 5% |
 | Kurumsal Belgeler (DESIGN-BELGE) | 2 | 0 | 0 | 2 | 0 | 0% |
 | Marka Kılavuzu (DESIGN-MARKA) | 2 | 0 | 0 | 2 | 0 | 0% |
@@ -20,15 +20,15 @@ Durum dağılımı: Done 57 · In Progress 42 · Todo/Backlog 71 · Canceled 2 �
 | SEO ve Yayın | 6 | 3 | 1 | 1 | 1 | 60% |
 | Teklif Akışı ve Müşteri Paneli | 22 | 4 | 3 | 15 | 0 | 18% |
 | Vitrin 15A Yeniden Tasarım (DESIGN-MENU) | 37 | 14 | 10 | 13 | 0 | 38% |
-| **TOPLAM** | 172 | 57 | 42 | 71 | 2 | 34% |
+| **TOPLAM** | 179 | 57 | 44 | 76 | 2 | 32% |
 
 ## §2 ŞERİT (etiket) başına
 
 | Etiket | Toplam | Done | In Progress | Todo/Backlog | % bitti |
 |---|---:|---:|---:|---:|---:|
-| ALTYAPI | 36 | 14 | 11 | 11 | 39% |
+| ALTYAPI | 39 | 14 | 12 | 13 | 36% |
 | DESIGN | 4 | 0 | 0 | 4 | 0% |
-| OPS | 29 | 4 | 10 | 14 | 14% |
+| OPS | 33 | 4 | 11 | 17 | 12% |
 | P01-Data | 4 | 3 | 0 | 1 | 75% |
 | P02-Constraint | 6 | 6 | 0 | 0 | 100% |
 | P03-API | 3 | 0 | 0 | 3 | 0% |
@@ -66,6 +66,13 @@ Durum dağılımı: Done 57 · In Progress 42 · Todo/Backlog 71 · Canceled 2 �
 | REC-162 | In Progress | Vercel günlük derleme sınırı: kapıda "rate limited" kolu = ÖLÇÜLEMEZ (madde 3 dı | ALTYAPI | 2 | 2026-09-06 |
 | REC-167 | Backlog | KVKK başvuru kaydı şeması: başvuru no (K19 önek KV), talep metni, ad soyad, tele | ALTYAPI | 4 | 2026-09-06 |
 | REC-168 | In Progress | ALTYAPI: Satış kipine TEK ANAHTARLA geçiş — hide_price (37 kategori) + NEXT_PUBL | ALTYAPI | 3 | 2026-09-06 |
+| REC-173 | In Progress | Tasarım arşivi ve taşınabilirlik: 4 Claude Design projesi depoya günlük çekilir, | ALTYAPI | 2 | 2026-09-06 |
+| REC-174 | Backlog | Model yönlendirme cetvel satırı (WrongStack 2/3): mekanik iş ucuz modele/betiğe, | ALTYAPI | 3 | 2026-09-06 |
+| REC-175 | In Progress | Tek ekran pano (WrongStack 3/3): gün kapanışı betiği her akşam tek dosya üretir  | OPS | 3 | 2026-09-06 · BEKLİYOR: REC-141 |
+| REC-176 | Backlog | venthub-tasarim-dili skill DOĞRULAMA: 14 kural × Kararlar gövdesi × Design dosya | OPS | 2 | 2026-09-06 |
+| REC-177 | Backlog | Hafıza kancaları: eylem defteri (mv/rm → state) · soru yönlendirme (hatırlıyor m | ALTYAPI | 2 | 2026-09-06 |
+| REC-178 | Backlog | 1000 satır tavanı — sahipsiz 8 kalemin sahip ataması (pricingMaterialize:126 YAZ | OPS | 2 | 2026-09-06 |
+| REC-179 | Backlog | Evren muhafızı sınavı: 53 aday konformans kapısı × sabotaj (evreni daralt, yeşil | OPS | 2 | 2026-09-06 |
 
 **Belge hattı**
 
@@ -390,5 +397,5 @@ Durum dağılımı: Done 57 · In Progress 42 · Todo/Backlog 71 · Canceled 2 �
 
 ## §5 Ölçüm satırı
 
-çağrı 2 · kayıt 172 · proje 9 · etiket 9 · bayat açık 4/75 · damga 2026-09-06T14:30:00Z
+çağrı 2 · kayıt 179 · proje 9 · etiket 9 · bayat açık 4/77 · damga 2026-09-06T20:48:27Z
 

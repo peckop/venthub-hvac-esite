@@ -54,6 +54,12 @@ BEKLENEN = {
     "061e6113-0f57-4296-a327-4e0f1a07cd76": "vitrin-15a",          # Kararlar — Vitrin 15A
     "9e95d258-98a2-4c51-9a2d-40576c87a7bf": "kurumsal-belgeler",   # Kararlar — Kurumsal Belgeler
     "935079bf-b265-49d2-854a-a334abea07af": "katalog",             # Kararlar — Katalog ve Ürün Verisi
+    # 2026-09-07: URUN olctu — SEO K3 (adres semasi) defterde YOKTU cunku bu tablo dar tutulmustu.
+    # Yedi Kararlar belgesinin YEDISI de aynalanir; kapsam disi Kararlar belgesi kalmaz.
+    "2eb6c0f6-8cc6-4197-9e91-527c59a2e16e": "seo-ve-yayin",        # Kararlar — SEO ve Yayın
+    "9037463c-e2fa-40c8-bbcd-2ab484f38b19": "marka-kilavuzu",      # Kararlar — Marka Kılavuzu
+    "52206cde-64f5-4517-b80b-0bffa9cbcdb4": "teklif-akisi",        # Kararlar — Teklif Akışı ve Müşteri Paneli
+    "5f43fac5-f2a9-40d7-8da5-86bf5235764e": "altyapi",             # Kararlar — Altyapı, Kapılar ve Belge Hattı
 }
 LISTE = """
 query($after: String) {

@@ -1,7 +1,7 @@
 {
- "damga": "2026-09-06T14:30:00Z",
+ "damga": "2026-09-06T20:48:27Z",
  "kaynak": "Linear GraphQL issues",
- "toplam": 172,
+ "toplam": 179,
  "kayitlar": [
   {
    "identifier": "REC-1",
@@ -2645,11 +2645,13 @@
    "labels": [],
    "priority": 3,
    "createdAt": "2026-09-04T12:28:10.911Z",
-   "updatedAt": "2026-09-06T11:39:00.060Z",
+   "updatedAt": "2026-09-06T20:28:50.084Z",
    "completedAt": null,
    "url": "https://linear.app/receps-workspace/issue/REC-141/ops-belge-celiski-temizligi-paketi-2026-09-04-taramasi-13-kalem",
    "blockedBy": [],
-   "blocks": []
+   "blocks": [
+    "REC-175"
+   ]
   },
   {
    "identifier": "REC-142",
@@ -2751,7 +2753,7 @@
    ],
    "priority": 3,
    "createdAt": "2026-09-05T08:57:04.548Z",
-   "updatedAt": "2026-09-06T06:55:30.202Z",
+   "updatedAt": "2026-09-06T20:19:41.999Z",
    "completedAt": null,
    "url": "https://linear.app/receps-workspace/issue/REC-147/degerlendirme-tasarim-yetenek-skill-envanteri-31-dis-yetenek-kuruldu",
    "blockedBy": [],
@@ -3228,9 +3230,144 @@
    ],
    "priority": 2,
    "createdAt": "2026-09-06T14:23:27.574Z",
-   "updatedAt": "2026-09-06T15:14:29.179Z",
+   "updatedAt": "2026-09-06T19:37:17.213Z",
    "completedAt": null,
    "url": "https://linear.app/receps-workspace/issue/REC-172/katalog-ops-teknik-ozellik-tamamlama-hatti-bosluk-haritasi-aile-alan",
+   "blockedBy": [],
+   "blocks": []
+  },
+  {
+   "identifier": "REC-173",
+   "title": "Tasarım arşivi ve taşınabilirlik: 4 Claude Design projesi depoya günlük çekilir, tasarım kuralları bizim skill'lerimiz olur",
+   "status": "In Progress",
+   "statusType": "started",
+   "assignee": "recep varlık",
+   "project": "Altyapı, Kapılar ve Belge Hattı",
+   "projectMilestone": null,
+   "labels": [
+    "ALTYAPI"
+   ],
+   "priority": 2,
+   "createdAt": "2026-09-06T20:19:41.999Z",
+   "updatedAt": "2026-09-06T20:47:23.151Z",
+   "completedAt": null,
+   "url": "https://linear.app/receps-workspace/issue/REC-173/tasarim-arsivi-ve-tasinabilirlik-4-claude-design-projesi-depoya-gunluk",
+   "blockedBy": [],
+   "blocks": []
+  },
+  {
+   "identifier": "REC-174",
+   "title": "Model yönlendirme cetvel satırı (WrongStack 2/3): mekanik iş ucuz modele/betiğe, hüküm güçlü modele; Workflow/Agent çağrılarında model alanı zorunlu, boş=Fable kapısı",
+   "status": "Backlog",
+   "statusType": "backlog",
+   "assignee": null,
+   "project": "Altyapı, Kapılar ve Belge Hattı",
+   "projectMilestone": null,
+   "labels": [
+    "ALTYAPI"
+   ],
+   "priority": 3,
+   "createdAt": "2026-09-06T20:28:31.975Z",
+   "updatedAt": "2026-09-06T20:28:31.975Z",
+   "completedAt": null,
+   "url": "https://linear.app/receps-workspace/issue/REC-174/model-yonlendirme-cetvel-satiri-wrongstack-23-mekanik-is-ucuz",
+   "blockedBy": [],
+   "blocks": []
+  },
+  {
+   "identifier": "REC-175",
+   "title": "Tek ekran pano (WrongStack 3/3): gün kapanışı betiği her akşam tek dosya üretir — iş dağılımı özeti + yol haritası özeti + Recep'ten bekleyen kararlar + şerit kuyrukları",
+   "status": "In Progress",
+   "statusType": "started",
+   "assignee": null,
+   "project": "Altyapı, Kapılar ve Belge Hattı",
+   "projectMilestone": null,
+   "labels": [
+    "OPS"
+   ],
+   "priority": 3,
+   "createdAt": "2026-09-06T20:28:49.646Z",
+   "updatedAt": "2026-09-06T20:38:30.657Z",
+   "completedAt": null,
+   "url": "https://linear.app/receps-workspace/issue/REC-175/tek-ekran-pano-wrongstack-33-gun-kapanisi-betigi-her-aksam-tek-dosya",
+   "blockedBy": [
+    "REC-141"
+   ],
+   "blocks": []
+  },
+  {
+   "identifier": "REC-176",
+   "title": "venthub-tasarim-dili skill DOĞRULAMA: 14 kural × Kararlar gövdesi × Design dosyaları tablo; eşleşmeyen silinir; PR #1065 merge kapısı",
+   "status": "Backlog",
+   "statusType": "backlog",
+   "assignee": null,
+   "project": "Altyapı, Kapılar ve Belge Hattı",
+   "projectMilestone": null,
+   "labels": [
+    "OPS"
+   ],
+   "priority": 2,
+   "createdAt": "2026-09-06T20:47:23.151Z",
+   "updatedAt": "2026-09-06T20:47:23.151Z",
+   "completedAt": null,
+   "url": "https://linear.app/receps-workspace/issue/REC-176/venthub-tasarim-dili-skill-dogrulama-14-kural-kararlar-govdesi-design",
+   "blockedBy": [],
+   "blocks": []
+  },
+  {
+   "identifier": "REC-177",
+   "title": "Hafıza kancaları: eylem defteri (mv/rm → state) · soru yönlendirme (hatırlıyor musun → defter+transkript) · bayatlık (defter > N saat → esitle) · soğuk okuyucu sınavı — hatırlama bana bağlı olmaktan çıkar",
+   "status": "Backlog",
+   "statusType": "backlog",
+   "assignee": null,
+   "project": "Altyapı, Kapılar ve Belge Hattı",
+   "projectMilestone": null,
+   "labels": [
+    "ALTYAPI"
+   ],
+   "priority": 2,
+   "createdAt": "2026-09-06T20:47:43.412Z",
+   "updatedAt": "2026-09-06T20:47:43.412Z",
+   "completedAt": null,
+   "url": "https://linear.app/receps-workspace/issue/REC-177/hafiza-kancalari-eylem-defteri-mvrm-state-soru-yonlendirme-hatirliyor",
+   "blockedBy": [],
+   "blocks": []
+  },
+  {
+   "identifier": "REC-178",
+   "title": "1000 satır tavanı — sahipsiz 8 kalemin sahip ataması (pricingMaterialize:126 YAZMA yolu öncelikli, edge functions, ölü betik adayları)",
+   "status": "Backlog",
+   "statusType": "backlog",
+   "assignee": null,
+   "project": "Altyapı, Kapılar ve Belge Hattı",
+   "projectMilestone": null,
+   "labels": [
+    "OPS"
+   ],
+   "priority": 2,
+   "createdAt": "2026-09-06T20:47:55.612Z",
+   "updatedAt": "2026-09-06T20:47:55.612Z",
+   "completedAt": null,
+   "url": "https://linear.app/receps-workspace/issue/REC-178/1000-satir-tavani-sahipsiz-8-kalemin-sahip-atamasi",
+   "blockedBy": [],
+   "blocks": []
+  },
+  {
+   "identifier": "REC-179",
+   "title": "Evren muhafızı sınavı: 53 aday konformans kapısı × sabotaj (evreni daralt, yeşil kalıyor mu) — Workflow fan-out sonnet, yeşil kalan → opus çürütme → sahibine",
+   "status": "Backlog",
+   "statusType": "backlog",
+   "assignee": null,
+   "project": "Altyapı, Kapılar ve Belge Hattı",
+   "projectMilestone": null,
+   "labels": [
+    "OPS"
+   ],
+   "priority": 2,
+   "createdAt": "2026-09-06T20:48:11.256Z",
+   "updatedAt": "2026-09-06T20:48:11.256Z",
+   "completedAt": null,
+   "url": "https://linear.app/receps-workspace/issue/REC-179/evren-muhafizi-sinavi-53-aday-konformans-kapisi-sabotaj-evreni-daralt",
    "blockedBy": [],
    "blocks": []
   }
