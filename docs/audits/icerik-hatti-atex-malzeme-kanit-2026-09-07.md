@@ -92,3 +92,52 @@ kaynağı AvensAir 2026 s.38 tablosu. Veri yazımı değil, sunum işi → ÜRÜ
   olabilir; bu ölçüm "kaynakta yok" değil, **"dizinde yok"** der.
 * Ürün↔kaynak eşlemesi aile ve model adı üzerinden yapıldı, SKU üzerinden değil — bir ailenin
   sayfası bulunduğunda o ailenin tüm ürünlerine sayıldı.
+
+---
+
+## ⛔ DÜZELTME — "jet-serisi: malzeme kaynağı YOK" iddiası YANLIŞTI (aynı gün, 19:xxZ)
+
+Yukarıdaki tabloda `jet-serisi` için **"kaynakta malzeme ifadesi YOK (0 sayfa)"** yazmıştım.
+**Bu yanlış.** JET serisi, dört ailenin **en ayrıntılı malzeme kaydına sahip** olanıdır.
+
+### Niçin kaçırdım — ölçütün kendisi dardı
+
+İlk tarama şu kelimeleri aradı: *kıvılcım, spark, bakır, copper, alüminyum, alumini, pervane,
+impeller material, polipropilen, polypropylene, gövde, malzeme*. Kaynak metin ise malzemeyi
+**başka kelimelerle** yazıyor: `Housings:` · `Wheels:` · `PPH` · `stainless steel`.
+
+Yani "0 sayfa" sonucu kaynağın değil, **sözlüğümün** ölçüsüydü. Yokluğu kanıtlamak varlığı
+kanıtlamaktan zordur; dar bir sözlükle "yok" demek, ölçüm değil **varsayımdır**.
+
+### Gerçek kayıt — `JET.pdf` s.1 ve `SEAT-CATALOGUE.pdf` s.20 (aynı metin)
+
+> **Housings:** PP Single back strong high density UV treated and recyclable polypropylene
+> (PPH) with no air leakage. All fan mounting hardware in **stainless steel**.
+> **Wheels:** PP Forward curved centrifugal type impeller made of **injection molded PPH**.
+
+Ayrıca `SEAT-CATALOGUE.pdf` s.4 (marka tarihçesi): *"1995: SEAT adds the **JET Series** inline
+fans to its range of **PP fans**."* — JET, PP ailesinin parçası olarak doğmuş.
+
+### Düzeltilmiş aile tablosu
+
+| Aile | Ürün | Kaynakta malzeme |
+|---|---|---|
+| `vortice-vort-e-atex` | 14 | alüminyum göbek (hub), preslenmiş çelik motor kapağı |
+| `seat-serisi` | 13 | polipropilen gövde |
+| `storm-serisi` | 7 | polipropilen gövde |
+| `jet-serisi` | 7 | **PPH gövde (UV işlemli, geri dönüştürülebilir) · paslanmaz çelik montaj donanımı · enjeksiyon kalıplı PPH pervane** |
+
+**Dördünün de malzeme kaynağı var.** Eksik olan tek şey, bu bilginin ürün kaydına ve vitrine
+hiç taşınmamış olması (`material` / `housing_material` alanları **0/375**).
+
+### Değişmeyen hüküm
+
+Kıvılcım/bakır cümlesi hâlâ yalnız **CMS ATEX santrifüj** ailesine ait ve o aile katalogda yok
+(→ REC-226, 74 kayıp kalemin 11'i). Bu düzeltme malzeme **kapsamasını** genişletir, ATEX
+kıvılcım hükmünü değiştirmez.
+
+### Ders (kendi payıma, bugün üçüncü kez aynı sınıf)
+
+Bir şeyin "yok" olduğunu ilan etmeden önce, **aramada kullandığım kelimelerin kaynağın
+kelimeleri olup olmadığını** sormalıyım. Bugün Recep'e sorulmaması gereken bir soru sordum
+("jet için malzeme kaynağı tedarikçiden istensin mi") — cevabı elimizdeki belgede duruyordu.
