@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -55,8 +55,10 @@ function hata(env: Record<string, string>, sid: string): string {
  */
 function stderrOku(env: Record<string, string>, sid: string): string {
   const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'inv-bayat-'))
-  const { execFileSync: e } = require('node:child_process') as typeof import('node:child_process')
-  const cikti = e(process.execPath, ['-e', `
+  // ⚠`require()` KULLANILMAZ (eslint `no-require-imports`): ilk yazımda gövde içinde require
+  // çağırdım, vitest ve tsc temiz geçti, CI'da ESLint düşürdü. Ders: "testler yeşil + tsc temiz"
+  // CI yeşili DEĞİLDİR — lint ayrı bir kapıdır ve yerelde koşulmadıysa ölçülmemiştir.
+  const cikti = execFileSync(process.execPath, ['-e', `
     const { spawnSync } = require('node:child_process')
     const r = spawnSync(process.execPath, [${JSON.stringify(KANCA)}], {
       input: JSON.stringify({ session_id: ${JSON.stringify(sid)} }),
@@ -113,7 +115,6 @@ describe('INV-DEFTER-BAYATLIK: defter yaşı ÖLÇÜLÜR, eşitleme TETİKLENMEZ
     const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'inv-bayat-soguma-'))
     const sid = 'ffffffff-1111-4111-8111-111111111111'
     const calistir = () => {
-      const { spawnSync } = require('node:child_process') as typeof import('node:child_process')
       const r = spawnSync(process.execPath, [KANCA], {
         input: JSON.stringify({ session_id: sid }),
         encoding: 'utf8',
