@@ -1,18 +1,18 @@
-<!-- uretilmis: scripts/nlm/santiye.py · damga 2026-09-07T09:19Z · Linear disa aktarimi 2026-09-07T09:18:59Z · elle duzenlenmez -->
-# ŞANTİYE — kimde ne iş var (2026-09-07T09:19Z)
+<!-- uretilmis: scripts/nlm/santiye.py · damga 2026-09-07T09:33Z · Linear disa aktarimi 2026-09-07T09:33:32Z · elle duzenlenmez -->
+# ŞANTİYE — kimde ne iş var (2026-09-07T09:33Z)
 
-Kaynak: Linear (2026-09-07T09:18:59Z). Kural: şerit başına yapılıyor ≤1, sırada ≤3. Pano/sohbet kaynak değildir.
+Kaynak: Linear (2026-09-07T09:33:32Z). Kural: şerit başına yapılıyor ≤1, sırada ≤3. Pano/sohbet kaynak değildir.
 
 ## §0 Özet
 
-| Şerit | Yapılıyor | Teslim (PR açık) | Sırada | Backlog | Bloklu | Recep'ten bekleyen | Uyum |
-|---|---:|---:|---:|---:|---:|---:|---|
-| URUN | 0 | 7 | 3 | 47 | 1 | 5 | YEŞİL |
-| URUN-KATALOG | 1 | 1 | 2 | 3 | 0 | 3 | YEŞİL |
-| ALTYAPI | 1 | 5 | 3 | 23 | 0 | 4 | YEŞİL |
-| OPS | 1 | 4 | 3 | 29 | 1 | 3 | YEŞİL |
-| DESIGN | 0 | 0 | 0 | 0 | 0 | 0 | YEŞİL |
-| SAHIPSIZ | 0 | 0 | 0 | 0 | 0 | 0 | YEŞİL |
+| Şerit | Yapılıyor | Teslim (PR açık) | Sırada | Backlog | Çürüdü adayı (≥14 gün) | Bloklu | Recep'ten bekleyen | Uyum |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| URUN | 0 | 7 | 3 | 47 | 0 | 1 | 5 | YEŞİL |
+| URUN-KATALOG | 1 | 1 | 2 | 3 | 0 | 0 | 3 | YEŞİL |
+| ALTYAPI | 1 | 5 | 3 | 23 | 0 | 0 | 4 | YEŞİL |
+| OPS | 1 | 4 | 3 | 26 | 0 | 1 | 3 | YEŞİL |
+| DESIGN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | YEŞİL |
+| SAHIPSIZ | 0 | 0 | 0 | 0 | 0 | 0 | 0 | YEŞİL |
 
 ## §1 Recep'ten bekleyen (15)
 
@@ -106,6 +106,9 @@ Kaynak: Linear (2026-09-07T09:18:59Z). Kural: şerit başına yapılıyor ≤1, 
 ## SAHIPSIZ
 
 **YAPILIYOR (0)**
+
+## §8 Çürüdü adayları (0) — Backlog'da ≥14 gün dokunulmamış; sahibi tek cümleyle savunamazsa iptal
+
 
 ## §9 Hüküm
 

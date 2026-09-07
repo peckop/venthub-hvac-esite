@@ -1,26 +1,26 @@
-<!-- uretilmis: Linear GraphQL disa aktarimi (scripts/nlm/linear_disa_aktar.py) · damga 2026-09-07T09:18:59Z · elle duzenlenmez; yenileme: gun kapanisi ritueli -->
+<!-- uretilmis: Linear GraphQL disa aktarimi (scripts/nlm/linear_disa_aktar.py) · damga 2026-09-07T09:33:32Z · elle duzenlenmez; yenileme: gun kapanisi ritueli -->
 # Linear İş Dağılımı — Şantiye Durumu (2026-09-07)
 
-**Damga:** 2026-09-07T09:18:59Z · **Kaynak:** Linear GraphQL `issues` (sayfalama 3 çağrı) · **Toplam iş:** 203
+**Damga:** 2026-09-07T09:33:32Z · **Kaynak:** Linear GraphQL `issues` (sayfalama 3 çağrı) · **Toplam iş:** 203
 
 > Okuma kılavuzu: her proje bir kat, her kilometre taşı bir dükkân sırası, her iş bir dükkân. **% bitti = Done / (Toplam − Canceled)**. Sorumluluk = şerit etiketi (assignee alanı çoğunlukla boş).
 
-Durum dağılımı: Done 58 · In Progress 20 · Todo/Backlog 121 · Canceled 4 → **genel % bitti 29%**
+Durum dağılımı: Done 58 · In Progress 20 · Todo/Backlog 110 · Canceled 15 → **genel % bitti 31%**
 
 ## §1 ÖZET — proje başına
 
 | Proje | Toplam | Done | In Progress | Todo/Backlog | Canceled | % bitti |
 |---|---:|---:|---:|---:|---:|---:|
-| (projesiz) | 6 | 0 | 0 | 4 | 2 | 0% |
+| (projesiz) | 6 | 0 | 0 | 1 | 5 | 0% |
 | Altyapı, Kapılar ve Belge Hattı | 68 | 15 | 14 | 38 | 1 | 22% |
 | Katalog ve Ürün Verisi | 23 | 1 | 3 | 19 | 0 | 4% |
 | Kurumsal Belgeler (DESIGN-BELGE) | 2 | 0 | 0 | 2 | 0 | 0% |
 | Marka Kılavuzu (DESIGN-MARKA) | 3 | 0 | 0 | 3 | 0 | 0% |
-| Q-Validator | 28 | 20 | 0 | 8 | 0 | 71% |
+| Q-Validator | 28 | 20 | 0 | 0 | 8 | 100% |
 | SEO ve Yayın | 7 | 3 | 1 | 2 | 1 | 50% |
 | Teklif Akışı ve Müşteri Paneli | 22 | 4 | 1 | 17 | 0 | 18% |
 | Vitrin 15A Yeniden Tasarım (DESIGN-MENU) | 44 | 15 | 1 | 28 | 0 | 34% |
-| **TOPLAM** | 203 | 58 | 20 | 121 | 4 | 29% |
+| **TOPLAM** | 203 | 58 | 20 | 110 | 15 | 31% |
 
 ## §2 ŞERİT (etiket) başına
 
@@ -28,15 +28,15 @@ Durum dağılımı: Done 58 · In Progress 20 · Todo/Backlog 121 · Canceled 4 
 |---|---:|---:|---:|---:|---:|
 | ALTYAPI | 46 | 14 | 6 | 26 | 30% |
 | DESIGN | 6 | 0 | 0 | 6 | 0% |
-| OPS | 43 | 5 | 5 | 32 | 12% |
-| P01-Data | 4 | 3 | 0 | 1 | 75% |
+| OPS | 43 | 5 | 5 | 29 | 13% |
+| P01-Data | 4 | 3 | 0 | 0 | 100% |
 | P02-Constraint | 6 | 6 | 0 | 0 | 100% |
-| P03-API | 3 | 0 | 0 | 3 | 0% |
+| P03-API | 3 | 0 | 0 | 0 | - |
 | P04-Research | 3 | 3 | 0 | 0 | 100% |
 | Recep kapısı | 17 | 1 | 6 | 9 | 6% |
 | URUN | 77 | 19 | 7 | 50 | 25% |
 | URUN-KATALOG | 7 | 0 | 2 | 5 | 0% |
-| (etiketsiz) | 14 | 8 | 0 | 4 | 67% |
+| (etiketsiz) | 14 | 8 | 0 | 0 | 100% |
 
 ## §3 Proje → kilometre taşı → iş (açık işler; Done ayrı)
 
@@ -47,10 +47,10 @@ Durum dağılımı: Done 58 · In Progress 20 · Todo/Backlog 121 · Canceled 4 
 | İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
 |---|---|---|---|---:|---|
 | REC-1 | Canceled | Get familiar with Linear | - | 0 | 2026-09-07 |
-| REC-2 | Backlog | Set up your teams | OPS | 0 | 2026-09-07 |
-| REC-3 | Backlog | Connect your tools | OPS | 0 | 2026-09-07 |
+| REC-2 | Canceled | Set up your teams | OPS | 0 | 2026-09-07 |
+| REC-3 | Canceled | Connect your tools | OPS | 0 | 2026-09-07 |
 | REC-4 | Canceled | Import your data | - | 0 | 2026-09-07 |
-| REC-33 | Backlog | P07-Enterprise-Search: Faz 0 - Envanter ve Zemin Etüdü | OPS | 0 | 2026-09-07 |
+| REC-33 | Canceled | P07-Enterprise-Search: Faz 0 - Envanter ve Zemin Etüdü | OPS | 0 | 2026-09-07 |
 | REC-140 | Backlog | (ALTYAPI) anon rolüne tablo düzeyinde yazma GRANT'ları — derinlik savunması yok, | ALTYAPI | 3 | 2026-09-07 |
 
 ### Altyapı, Kapılar ve Belge Hattı
@@ -223,14 +223,14 @@ Durum dağılımı: Done 58 · In Progress 20 · Todo/Backlog 121 · Canceled 4 
 
 | İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
 |---|---|---|---|---:|---|
-| REC-19 | Backlog | 001: Hypothesis Engine Scoring API | P03-API | 0 | 2026-03-28 |
-| REC-20 | Backlog | 002: Root Profiler API | P03-API | 0 | 2026-03-28 |
-| REC-21 | Backlog | 003: Hypothesis Test API | P03-API | 0 | 2026-03-28 |
-| REC-23 | Backlog | 004: Populate Technical Function Flags | P01-Data | 3 | 2026-03-29 |
-| REC-28 | Backlog | Implement Remaining 5 Constraint Engines (Phase 1 / V1) | - | 0 | 2026-03-31 |
-| REC-29 | Backlog | Enforce Principle 4: Semantic Void and Randomness Check (Opposition Constraint) | - | 0 | 2026-03-31 |
-| REC-30 | Backlog | Research & Implement Adaptive Alpha (Distance Decay) for Higher Orbits | - | 0 | 2026-03-31 |
-| REC-31 | Backlog | Topological Network Visualization (API & Next.js Bridge) | - | 0 | 2026-03-31 |
+| REC-19 | Canceled | 001: Hypothesis Engine Scoring API | P03-API | 0 | 2026-09-07 |
+| REC-20 | Canceled | 002: Root Profiler API | P03-API | 0 | 2026-09-07 |
+| REC-21 | Canceled | 003: Hypothesis Test API | P03-API | 0 | 2026-09-07 |
+| REC-23 | Canceled | 004: Populate Technical Function Flags | P01-Data | 3 | 2026-09-07 |
+| REC-28 | Canceled | Implement Remaining 5 Constraint Engines (Phase 1 / V1) | - | 0 | 2026-09-07 |
+| REC-29 | Canceled | Enforce Principle 4: Semantic Void and Randomness Check (Opposition Constraint) | - | 0 | 2026-09-07 |
+| REC-30 | Canceled | Research & Implement Adaptive Alpha (Distance Decay) for Higher Orbits | - | 0 | 2026-09-07 |
+| REC-31 | Canceled | Topological Network Visualization (API & Next.js Bridge) | - | 0 | 2026-09-07 |
 
 <details><summary>Done (20)</summary>
 
@@ -422,5 +422,5 @@ Durum dağılımı: Done 58 · In Progress 20 · Todo/Backlog 121 · Canceled 4 
 
 ## §5 Ölçüm satırı
 
-çağrı 3 · kayıt 203 · proje 9 · etiket 10 · bayat açık 0/31 · damga 2026-09-07T09:18:59Z
+çağrı 3 · kayıt 203 · proje 9 · etiket 10 · bayat açık 0/31 · damga 2026-09-07T09:33:32Z
 

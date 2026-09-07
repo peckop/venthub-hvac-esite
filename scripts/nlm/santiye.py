@@ -22,9 +22,10 @@ import argparse, json, os, sys, datetime
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SERITLER = ["URUN", "URUN-KATALOG", "ALTYAPI", "OPS", "DESIGN"]
-DIS_PROJELER = {"Q-Validator"}          # VentHub disi; tabloya girmez
+DIS_PROJELER = set()   # Recep 2026-09-07: "hicbir is VentHub disinda degil" — proje disi tutma YOK (Q-Validator eski mimari, kayitlari baglandi/kapandi)
 KATALOG_PROJE = "Katalog ve Ürün Verisi"
 LIMIT_IP, LIMIT_TODO = 1, 3
+CURUME_GUN = 14   # Backlog'da bu kadar gun dokunulmamis kayit "curudu adayi" (Katalog onerisi, OPS hukmu 2026-09-07)
 
 
 def serit_of(k):
@@ -72,7 +73,15 @@ def main():
     kaynak_damga = d.get("damga", "?")
 
     rows = [k for k in rows if (k.get("project") or "") not in DIS_PROJELER and k.get("status") != "Canceled"]
-    by = {s: {"In Progress": [], "In Review": [], "Todo": [], "Backlog": [], "Done": [], "BLOKLU": [], "RECEP": []} for s in SERITLER + ["SAHIPSIZ"]}
+    simdi_dt = datetime.datetime.strptime(damga[:16], "%Y-%m-%dT%H:%M").replace(tzinfo=datetime.timezone.utc)
+    def curudu(k):
+        u = k.get("updatedAt") or k.get("createdAt") or ""
+        try:
+            dt = datetime.datetime.fromisoformat(u.replace("Z", "+00:00"))
+        except ValueError:
+            return False
+        return (simdi_dt - dt).days >= CURUME_GUN
+    by = {s: {"In Progress": [], "In Review": [], "Todo": [], "Backlog": [], "Done": [], "BLOKLU": [], "RECEP": [], "CURUDU": []} for s in SERITLER + ["SAHIPSIZ"]}
     for k in rows:
         s = serit_of(k)
         st = k.get("status") or "?"
@@ -83,6 +92,8 @@ def main():
             by[s]["BLOKLU"].append(k)
         if recep_kapisi(k) and st != "Done":
             by[s]["RECEP"].append(k)
+        if st == "Backlog" and curudu(k):
+            by[s]["CURUDU"].append(k)
 
     L = []
     L.append(f"<!-- uretilmis: scripts/nlm/santiye.py · damga {damga} · Linear disa aktarimi {kaynak_damga} · elle duzenlenmez -->")
@@ -92,8 +103,8 @@ def main():
     L.append("")
     L.append("## §0 Özet")
     L.append("")
-    L.append("| Şerit | Yapılıyor | Teslim (PR açık) | Sırada | Backlog | Bloklu | Recep'ten bekleyen | Uyum |")
-    L.append("|---|---:|---:|---:|---:|---:|---:|---|")
+    L.append(f"| Şerit | Yapılıyor | Teslim (PR açık) | Sırada | Backlog | Çürüdü adayı (≥{CURUME_GUN} gün) | Bloklu | Recep'ten bekleyen | Uyum |")
+    L.append("|---|---:|---:|---:|---:|---:|---:|---:|---|")
     kirmizi = []
     for s in SERITLER + ["SAHIPSIZ"]:
         b = by[s]
@@ -106,7 +117,7 @@ def main():
             uyum = f"SARI (sırada {td} > {LIMIT_TODO})"
         if s == "SAHIPSIZ" and (ip or td or len(b["Backlog"])):
             uyum = "KIRMIZI (sahipsiz kayıt)"; kirmizi.append((s, ip + td + len(b["Backlog"])))
-        L.append(f"| {s} | {ip_all} | {rv} | {td} | {len(b['Backlog'])} | {len(b['BLOKLU'])} | {len(b['RECEP'])} | {uyum} |")
+        L.append(f"| {s} | {ip_all} | {rv} | {td} | {len(b['Backlog'])} | {len(b['CURUDU'])} | {len(b['BLOKLU'])} | {len(b['RECEP'])} | {uyum} |")
     L.append("")
     recep = [k for s in by for k in by[s]["RECEP"]]
     L.append(f"## §1 Recep'ten bekleyen ({len(recep)})")
@@ -135,6 +146,12 @@ def main():
             for k in sorted(b["Backlog"], key=lambda x: x["identifier"]):
                 L.append(f"- {k['identifier']} · {kisa(k['title'])} · proje: {k.get('project') or '-'}")
             L.append("")
+    curu = [k for s in by for k in by[s]["CURUDU"]]
+    L.append(f"## §8 Çürüdü adayları ({len(curu)}) — Backlog'da ≥{CURUME_GUN} gün dokunulmamış; sahibi tek cümleyle savunamazsa iptal")
+    L.append("")
+    for k in sorted(curu, key=lambda x: (serit_of(x), x["identifier"])):
+        L.append(f"- {k['identifier']} · {kisa(k['title'], 100)} · {serit_of(k)} · son dokunuş {(k.get('updatedAt') or '?')[:10]}")
+    L.append("")
     L.append("## §9 Hüküm")
     L.append("")
     if kirmizi:
