@@ -35,7 +35,27 @@ const path = require('path')
 const { execFileSync } = require('child_process')
 
 const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
-const DEPO = process.env.VENTHUB_REPO || 'C:/Users/alize/venthub-hvac'
+/**
+ * ⛔DEPO YOLU SABİT YAZILMAZ (INV-MUTLAK-YOL-1 bunu CI'da yakaladı, 2026-09-07):
+ * ilk yazımda buraya kimlik taşıyan mutlak bir yol koymuştum. İki zarar birden: depo PUBLIC
+ * olduğu için **kimlik sızıntısı**, ve kod sessizce **tek makineye** bağlanır (CI'da kırıldı —
+ * git komutu boşa düştü, kanca "OLCULEMEDI" bastı, üç kol kırmızı verdi).
+ * Doğrusu: ortam değişkeni EZER, varsayılan bu dosyadan yukarı yürüyüp `.git` arar.
+ * Kendi kapım kendi sızıntımı yakaladı — kapının işe yaradığının kanıtı, ama yazarken
+ * ölçmediğimin de kanıtı.
+ */
+function depoKoku() {
+  if (process.env.VENTHUB_REPO) return process.env.VENTHUB_REPO
+  let d = __dirname
+  for (let i = 0; i < 10; i++) {
+    if (fs.existsSync(path.join(d, '.git'))) return d
+    const ust = path.dirname(d)
+    if (ust === d) break
+    d = ust
+  }
+  return process.cwd()
+}
+const DEPO = depoKoku()
 const DURUM_YOLU = 'docs/proje-takip/state.json'
 /** Eşik: 6 saat (OPS emri). Gün içinde birden çok eşitleme beklenmez, ama gün atlaması affedilmez. */
 const ESIK_SAAT = Number(process.env.VENTHUB_DEFTER_ESIK_SAAT || 6)

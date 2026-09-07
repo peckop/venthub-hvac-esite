@@ -21,6 +21,46 @@ import { describe, expect, it } from 'vitest'
 const KOK = process.cwd()
 const KANCA = path.join(KOK, '.claude', 'hooks', 'defter-bayatlik-olcumu.cjs')
 
+/**
+ * ⭐TEST KENDİ DEPOSUNU KURAR — makinenin git durumuna GÜVENMEZ (CI'da ölçüldü, 2026-09-07).
+ * İlk yazımda testler bu makinedeki gerçek depoya bakıyordu; CI'da `origin/master` ref'i
+ * bulunmadığı için kanca daima "OLCULEMEDI" bastı ve ÜÇ kol kırmızı verdi. Yani testler
+ * "kancayı" değil "bu makineyi" ölçüyordu. Çare: geçici bir git deposu kur, `state.json`'ı
+ * İSTENEN TARİHLE commit'le, `refs/remotes/origin/master` işaretini elle koy. Böylece yaş
+ * deterministik olur ve gerçek kod yolu (git log origin/master) yine koşar.
+ */
+function sahteDepo(commitISO: string): string {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'inv-bayat-depo-'))
+  const durum = path.join(d, 'docs', 'proje-takip')
+  fs.mkdirSync(durum, { recursive: true })
+  fs.writeFileSync(path.join(durum, 'state.json'), JSON.stringify({ surum: 1, demetler: [] }), 'utf8')
+  const git = (...arg: string[]) =>
+    execFileSync('git', ['-C', d, ...arg], {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        GIT_AUTHOR_DATE: commitISO,
+        GIT_COMMITTER_DATE: commitISO,
+        GIT_AUTHOR_NAME: 'inv',
+        GIT_AUTHOR_EMAIL: 'inv@example.invalid',
+        GIT_COMMITTER_NAME: 'inv',
+        GIT_COMMITTER_EMAIL: 'inv@example.invalid',
+      },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+  git('init', '-q')
+  git('add', 'docs/proje-takip/state.json')
+  git('commit', '-q', '-m', 'esitleme')
+  // Kanca `origin/master`a bakar; yerel depoda o ref elle kurulur (uzak gerekmez).
+  git('update-ref', 'refs/remotes/origin/master', 'HEAD')
+  return d
+}
+
+/** N saat önceyi ISO olarak verir (fikstür tarihleri buradan). */
+function saatOnce(n: number): string {
+  return new Date(Date.now() - n * 3_600_000).toISOString()
+}
+
 function kostur(env: Record<string, string>, sid: string) {
   const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'inv-bayat-'))
   const r = execFileSync(process.execPath, [KANCA], {
@@ -92,13 +132,17 @@ describe('INV-DEFTER-BAYATLIK: defter yaşı ÖLÇÜLÜR, eşitleme TETİKLENMEZ
     expect(kaynak, 'ölçüm fiili de yok — kanca hiçbir şey ölçmüyor olabilir').toMatch(/['"]olc['"]/)
   })
 
-  it('EŞİK ALTINDA SESSİZ (gürültü yapmaz)', () => {
-    const c = stderrOku({ VENTHUB_DEFTER_ESIK_SAAT: '99999' }, 'cccccccc-1111-4111-8111-111111111111')
-    expect(c.trim(), 'eşik altında öttü — her turda öten uyarı üç günde görmezden gelinir').toBe('')
+  it('TAZE DEFTER → SESSİZ (gürültü yapmaz)', () => {
+    // Eşitleme 1 saat önce inmiş, eşik 6 saat: kanca susmalı. Yaş FİKSTÜRDEN gelir,
+    // bu makinenin gerçek deposundan değil.
+    const c = stderrOku({ VENTHUB_REPO: sahteDepo(saatOnce(1)), VENTHUB_DEFTER_ESIK_SAAT: '6' }, 'cccccccc-1111-4111-8111-111111111111')
+    expect(c.trim(), 'taze defterde öttü — her turda öten uyarı üç günde görmezden gelinir').toBe('')
   })
 
-  it('EŞİK ÜSTÜNDE UYARIR ve ÖLÇÜTÜNÜ SÖYLER', () => {
-    const c = stderrOku({ VENTHUB_DEFTER_ESIK_SAAT: '0' }, 'dddddddd-1111-4111-8111-111111111111')
+  it('BAYAT DEFTER → UYARIR ve ÖLÇÜTÜNÜ SÖYLER', () => {
+    // Eşitleme 20 saat önce, eşik 6 saat: uyarmalı ve yaşı doğru saymalı.
+    const c = stderrOku({ VENTHUB_REPO: sahteDepo(saatOnce(20)), VENTHUB_DEFTER_ESIK_SAAT: '6' }, 'dddddddd-1111-4111-8111-111111111111')
+    expect(c, 'yaş 20 saat olarak yazılmadı — sayı fikstürden gelmiyor olabilir').toMatch(/(19|20|21) saat once/)
     expect(c, 'bayatlık uyarısı çıkmadı').toContain('DEFTER BAYAT')
     // ⭐Ölçüt yazılı olmalı: okuyan "bu sayı nereden" diye sormasın ve doğrulayabilsin.
     expect(c, 'ölçütü söylenmemiş — sayı kaynaksız kalır').toContain('git log origin/master')
@@ -106,19 +150,22 @@ describe('INV-DEFTER-BAYATLIK: defter yaşı ÖLÇÜLÜR, eşitleme TETİKLENMEZ
   })
 
   it('ÖLÇEMEDİĞİNDE SESSİZ KALMAZ: "ölçemedim" ≠ "taze"', () => {
-    const c = stderrOku({ VENTHUB_REPO: 'C:/tmp/boyle-bir-depo-yok', VENTHUB_DEFTER_ESIK_SAAT: '0' }, 'eeeeeeee-1111-4111-8111-111111111111')
+    // Var olmayan depo yolu — platformdan bağımsız olsun diye tmp altında UYDURMA bir ad.
+    const yokDepo = path.join(os.tmpdir(), 'inv-bayat-boyle-bir-depo-yok')
+    const c = stderrOku({ VENTHUB_REPO: yokDepo, VENTHUB_DEFTER_ESIK_SAAT: '0' }, 'eeeeeeee-1111-4111-8111-111111111111')
     expect(c, 'ölçüm başarısızken sessiz kaldı — bayatlık "yok" gösterilir').toContain('OLCULEMEDI')
     expect(c).toMatch(/AYNI SEY DEGIL/)
   })
 
   it('SOĞUMA: aynı oturumda arka arkaya iki kez ötmez', () => {
     const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'inv-bayat-soguma-'))
+    const depo = sahteDepo(saatOnce(20))
     const sid = 'ffffffff-1111-4111-8111-111111111111'
     const calistir = () => {
       const r = spawnSync(process.execPath, [KANCA], {
         input: JSON.stringify({ session_id: sid }),
         encoding: 'utf8',
-        env: { ...process.env, VENTHUB_BOARD_DIR: pano, VENTHUB_DEFTER_ESIK_SAAT: '0' },
+        env: { ...process.env, VENTHUB_BOARD_DIR: pano, VENTHUB_REPO: depo, VENTHUB_DEFTER_ESIK_SAAT: '6' },
       })
       return String(r.stderr || '')
     }

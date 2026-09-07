@@ -72,7 +72,15 @@ describe('INV-EYLEM-DEFTERI: giṫin görmediği taşıma/silme deftere geçer',
   })
 
   it('PowerShell silmesi de görülür (bu makinede iki kabuk birden koşuyor)', () => {
-    const satirlar = kancayiKostur('Remove-Item C:/Users/alize/.claude/skills/docx -Recurse')
+    /**
+     * ⭐YOL FİKSTÜRÜ KİMLİK TAŞIMAZ ve PLATFORMDAN TÜRETİLİR (CI'da ölçüldü, 2026-09-07):
+     * ilk yazımda burada kullanıcı adı içeren mutlak bir Windows yolu vardı. İki zarar birden —
+     * INV-MUTLAK-YOL-1 kapısı onu kimlik sızıntısı olarak yakaladı (depo PUBLIC), VE Linux
+     * koşucusunda o dize mutlak sayılmadığı için `cwd`ye göre çözülüp "depo içi" sanıldı,
+     * kol kırmızı verdi. `os.homedir()` ikisini birden çözer: kimlik yok, her platformda mutlak.
+     */
+    const evYolu = path.join(os.homedir(), '.claude', 'skills', 'docx').replace(/\\/g, '/')
+    const satirlar = kancayiKostur(`Remove-Item ${evYolu} -Recurse`)
     expect(satirlar.length).toBe(1)
     expect(satirlar[0].fiiller).toContain('Remove-Item')
     expect(satirlar[0].repoDisiYollar.length, 'PowerShell yolu depo dışı sayılmadı').toBeGreaterThan(0)
