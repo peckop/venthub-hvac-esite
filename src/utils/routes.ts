@@ -56,12 +56,32 @@ export const Routes = {
     return `/products/${encodeURIComponent(idOrSlug)}` as Route;
   },
   
-  // Kategoriler
+  /**
+   * Kategori adresi — HER ZAMAN TEK SEVİYELİ.
+   *
+   * NİÇİN (REC-205, 2026-09-07 · GSC + canlı ölçüm):
+   * Bu fonksiyon `subSlug` verilince iki seviyeli adres üretiyordu ve aynı alt kategori
+   * İKİ ayrı adresten yayınlanıyordu — `/category/<alt>` ve `/category/<üst>/<alt>`.
+   * İkisi de 200 dönüyor, **ikisi de kendini kanonik ilan ediyordu**, ikisi de site
+   * haritasındaydı (TR: 23 tek seviyeli + 17 iki seviyeli → 17 × 2 dil = 34 çift adres).
+   *
+   * Google bunu fark etti ve **bizim iki seviyeli adresimizi ELEDİ**: Search Console
+   * "Kopya, Google kullanıcıdan farklı bir standart sayfa seçti" →
+   * `/tr/category/fanlar/endustriyel-tavan-vantilatorleri`.
+   *
+   * Google haklıydı: iki seviyeli varyant `og:url` ve `CollectionPage` yapısal verisi
+   * TAŞIMIYOR, kırıntı yolu 2 satır (tek seviyelide 5). Yani zayıf olanı elemiş.
+   *
+   * KARAR: kanonik = TEK SEVİYELİ. `subSlug` verilirse **o** kullanılır (alt kategori
+   * kendi adresinde yaşar), üst slug adrese girmez. İmza geriye uyumlu kalır ki 20+
+   * çağrı yeri tek tek değiştirilmesin — kusur tek noktada kapanır.
+   *
+   * İki seviyeli eski adresler ölmez: `[categorySlug]/[subCategorySlug]` rotası 301 ile
+   * buraya gönderir (tek hop — REC-191 §5 zincir bütçesi).
+   */
   category: (slug: string, subSlug?: string) => {
-    if (subSlug && subSlug !== slug && subSlug !== 'undefined') {
-      return `/category/${encodeURIComponent(slug)}/${encodeURIComponent(subSlug)}` as Route;
-    }
-    return `/category/${encodeURIComponent(slug)}` as Route;
+    const hedef = subSlug && subSlug !== 'undefined' ? subSlug : slug;
+    return `/category/${encodeURIComponent(hedef)}` as Route;
   },
 
   // Markalar
