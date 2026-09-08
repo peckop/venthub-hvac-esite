@@ -370,7 +370,14 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
   doğrudan veriyor, hook gerekmedi; `settings.json` `statusLine`) · **claude-mem deneme planı**
   `docs/plans/claude-mem-deneme-plani-2026-09-08.md` (kurulum Recep'in makinesinde, `--provider
   host` ŞART, 14 gün, kabul/red ölçütü tabloda) · üç skill başlığına **KAYNAK/ALINAN/BİZDEN** bloğu
-  (Recep: "içeriği mi alıyorsun, bizden mi, ayırt edemiyorum"). Agent-Reach hayır.
+  (Recep: "içeriği mi alıyorsun, bizden mi, ayırt edemiyorum"). Agent-Reach ürün olarak hayır;
+  ihtiyaç **`video-kaynak`** skill'iyle karşılandı (yt-dlp ara → Recep seçer → NLM `source_add` →
+  `chat_ask` doğrulaması).
+- **Karar (Recep "sen istiyorsan yap", 2026-09-08):** **`docs/plans/lansman-oncesi-dayaniklilik-plani-2026-09-08.md`**
+  — ölçülmüş var/yok tablosu + 10 madde, sıra: **yedek tatbikatı (İLK, geri alınamaz tek arıza)** →
+  sessiz-arıza alarmı → olay defteri → hız sınırı yayma (maestro) → uptime → pgTAP RLS → staging+strix
+  → k6 → Stryker → mekanizma budaması. Kod yok; her madde ayrı emir. **OPS: 1 ve 3 doğrudan emir
+  açılabilir (kod yok); 2/4/6 plan-challenger ister.**
 - **Ölçülen kısıt:** uzak Claude Code konteynerinde Chromium dış siteye çıkamıyor (proxy CONNECT
   reddi); orada `qa` hedefi yerel `pnpm start`, preview/prod bakışı yerel makineden. Pano notları
   (`C:/tmp/venthub-board`) konteynerde yerel kalıyor, eş-Controller'a ULAŞMIYOR — bu yüzden not
