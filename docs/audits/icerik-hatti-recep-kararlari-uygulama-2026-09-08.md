@@ -126,3 +126,52 @@ Recep'in emri *"bunlar aksiyel fan çatısında olmalı"* idi ve uygulandı — 
 
 Emir uygulandı (Recep kararı ezer), fakat bu bir **teknik çelişki** ve kayda geçirilir:
 ya aile adı yanlış, ya hedef kategori. Karar Recep'in; ölçüm ve soru burada durur.
+
+---
+
+## ✅MADDE 5 KAPANDI — 25 ürüne gerçek fotoğraf (Recep adres verdi)
+
+**Karar sorusu geri geldi, ama cevap "evet/hayır" değil KAYNAK oldu.** Recep üç adres iletti ve
+"kaynak yok" hükmümün yanlış olduğunu gösterdi.
+
+| küme | ürün | kaynak | görsel |
+|---|---|---|---|
+| Vortice E … ATEX | **14** | `climavents.com.tr` (TR bayi) | Ex etiketli siyah duvar fanı, 840×630 |
+| VORTICENT CMS ATEX | **11** | `avensair.com` → orijinali `fanselectionpro.vortice.com` (S3) | mavi santrifüj gövde, 230×230 |
+
+**Mevcut performans grafikleri SİLİNMEDİ**, `sort_order` bir sıra itildi — fotoğraf öne geçti,
+grafik teknik bilgi olarak kaldı. Kanıt: E ATEX ürün sayfasında `foto.webp` **51** kez,
+VORTICENT sayfasında **42**, aksiyel kategori kartlarında **4**.
+
+**VORTICENT çözünürlüğü:** bayideki 230×230'un orijinali arandı ve bulundu — Vortice'nin kendi
+seçim aracındaki dosya da **230×230**. Yani sınır bizde değil kaynakta; ürün kartı 166px
+olduğundan yeterli, detay sayfasında sınırlı.
+
+### ⛔BUGÜNÜN YEDİNCİ HATASI — "kaynak yok" hükmünü DAR EVRENDE verdim
+Aramayı `site:vortice.com` ile **kısıtladım**. Üreticinin sayfasında fotoğraf yoktu ve
+**"kaynak yok, karar Recep'te"** dedim. Recep saniyeler içinde iki TR bayi adresi buldu.
+
+⭐**Sebep, adıyla:** üreticinin kurumsal sitesi ürünü **satmaz**, katalog yayınlar — ATEX gibi
+niş seride fotoğraf koymayabilir. **Ürünü satan bayi koymak ZORUNDA**, çünkü müşteri görmeden
+almaz. Fotoğrafın en olası yeri üretici değil **satıcıdır**.
+
+**Kural (hafızaya da yazıldı):** görsel/belge ararken `site:` kısıtı KOYULMAZ; sırayla üretici →
+**TR distribütör/bayi** (`climavents.com.tr`, `avensair.com`) → üreticinin **seçim/konfigüratör
+aracı** → katalog PDF'i. **En az iki bayi araması yapılmadan "kaynak yok" beyan edilmez.**
+Bu, `yoklugu-kanitlamak-varligi-kanitlamaktan-zordur` dersinin aynısı: yokluk, aradığım **dar
+evrenin** yokluğuydu.
+
+⚠**Aynı hükmü AVenS için de vermiştim** (78 ürün "kaynak yok"). O ölçüm de dar evrende yapıldı
+(katalog PDF'i + avensair.com); TR bayi taraması yapılmadı → **yeniden ölçülmeli**, bu belge
+onu açık borç olarak kaydeder.
+
+## ⛔SANTRİFÜJ/AKSİYEL — üç bağımsız kaynak SANTRİFÜJ diyor
+| kaynak | ifade |
+|---|---|
+| `fanselectionpro.vortice.com` | *"centrifugal medium pressure ATEX fan"* |
+| `avensair.com` | *"santrifüj çark"* |
+| ürün fotoğrafı | salyangoz gövde = santrifüj |
+| bizim aile adımız | *"VORTICENT CMS ATEX **Santrifüj** Fanlar"* |
+
+Recep emri *"aksiyel fan çatısında olmalı"* uygulandı ve 11 ürün `axial-industrial-fans`'ta.
+**Teknik olarak yanlış raf.** Karar Recep'te: aksiyelde mi kalsın, santrifüj/radyal tarafa mı taşınsın.
