@@ -360,6 +360,11 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
   agency-agents, browser-use, Scrapling/scrapy, unsloth, CL4R1T4S, open-design, archify,
   Agent-Reach) oturumda gerekçelendi; **strix** (dinamik pentest, yalnız staging) "lansman öncesi
   denetim" emri açılınca yeniden gündeme gelir.
+- **Ek (aynı gün, Recep "llm council" dedi):** **`llm-council`** skill'i — karpathy/llm-council fikri
+  (ürün değil) Workflow'a yazıldı: N mercekli üye → **anonim, döndürülmüş sıralı** çapraz puanlama →
+  başkan sentezi + zorunlu muhalefet şerhi; 9 ajan; "workflow kullan" olmadan açılmaz; karar Recep'in.
+  Cetvel tablosuna satır eklendi. Recep'in diğer sorduğu dörtlü: Task Observer + Headroom
+  bağlam-çubuğu "al" (tek dosya) · claude-mem "tek şeritte dene, ölç" · Agent-Reach hayır — karar bekliyor.
 - **Ölçülen kısıt:** uzak Claude Code konteynerinde Chromium dış siteye çıkamıyor (proxy CONNECT
   reddi); orada `qa` hedefi yerel `pnpm start`, preview/prod bakışı yerel makineden. Pano notları
   (`C:/tmp/venthub-board`) konteynerde yerel kalıyor, eş-Controller'a ULAŞMIYOR — bu yüzden not
