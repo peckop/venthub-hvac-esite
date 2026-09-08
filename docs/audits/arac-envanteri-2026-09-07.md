@@ -279,6 +279,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/uydurma-kimlik-tek-kural.mjs` | UYDURMA KİMLİĞİ TEK KURALA GETİRİR — REC-226 / REC-272 / REC-275 | URUN-KATALOG | elle (kuru kosum varsayilan; --yaz + CANLI_YAZIM_ONAYI) | PR #1109 · uc yonlu sabotaj | iki on kosul kapisi (sku yedegi + benzersizlik) | KAL |
 | `scripts/icerik-hatti/kimlik-kurali-kapisi.mjs` | KİMLİK KURALI KAPISI — INV-KIMLIK-TEK-KURAL-1 (REC-275) | URUN-KATALOG | elle / CI (ALTYAPI'dan baglanmasi istenecek) | PR #1109 · iki yonlu sabotaj: ardisik-sayi uydurma ve kodsuz-satir dusurme KIRMIZI verdirdi | INV-KIMLIK-TEK-KURAL-1 (kendisi kapi) | KAL |
 | `scripts/nlm/linear_arsiv.py` | Linear GraphQL: kim / say / arsivle <no...> / arsivle done / arsivle canceled — Done kayitlar 7 gun sonra arsiv (250 sinir); LINEAR_API_KEY ortamdan | OPS | insan (OPS rutin, haftalik) | 2026-09-08 · PR #1118 | yok (cetvel: work-tracking-ssot-standard, arsiv rutini) | KAL-KAPISIZ |
+| `scripts/media/gorsel-envanteri.mjs` | GÖRSEL ENVANTERİ — mükerrer görseller + "yeni fotoğraf gerekli" listesi (REC-282 / REC-284) | URUN-KATALOG | elle (SALT OKUMA; `--yaz` kolu BİLEREK YOK — envanterden çıkacak düzeltme Recep kapısı) | 2026-09-08 koşuldu: 442 ürün · 1042 görsel · 898 hash · 3 kategori-aşan grup · 103 görselsiz ürün; rapor `docs/audits/icerik-hatti-gorsel-envanteri-2026-09-08.{md,json}` | yok — **KAL-KAPISIZ**: çıktısı kapıya bağlı değil, kapı REC-284'te kurulacak | KAL-KAPISIZ |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
