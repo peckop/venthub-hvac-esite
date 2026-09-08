@@ -46,7 +46,16 @@ const DOKUM_ONEK = 'is-dagilimi-'
  * ⭐Kırmızıya geçiş tarihi REC-274'e yazılır; buradaki satır o kararın KODDAKİ karşılığıdır.
  */
 const KIP: Record<string, 'KIRMIZI' | 'UYARI'> = {
-  // 'kararlar-vitrin-15a': 'KIRMIZI',  // OPS doldurmasi master'a ininde ACILACAK (REC-274)
+  // ⛔2026-09-08: KIRMIZI'ya ALINAMADI ve sebebi ÖLÇÜLDÜ — öncül çürüdü.
+  // #1113 ile 57 başlığa DURUM satırı indi, ama kip açılınca **26 ihlal** çıktı; ikisi
+  // ayrı sınıf ve YALNIZ BİRİ bendeydi:
+  //   (a) 21 satır `KURAL → kapı YOK (REC-nnn)` — MEŞRU bir hâl, kapı beni yanlış ölçüyordu.
+  //       Beşinci biçim olarak TANINDI (aşağıda), REC varlık kontrolüyle.
+  //   (b) 8 satır MÜKERRER numara (K1, K18×2, K23×3, K25, K31) — belgenin GERÇEK kusuru ve
+  //       OPS'un dosyası; onarımı onda. Kip, o düzeltme master'a inince açılır.
+  // Kendi CI'ımı başkasının dosyasındaki kusurla kırmızı yapmak, kapıyı susturulası hâle
+  // getirirdi; UYARI kipi bugün o kusuru RAPOR ediyor ve sahibi biliyor.
+  // 'kararlar-vitrin-15a': 'KIRMIZI',  // 7 mukerrer numara onarilinca AÇILACAK — REC-274
 }
 
 type Baslik = { ham: string; satir: number; kararMi: boolean; nolar: number[]; govde: string }
@@ -110,11 +119,25 @@ function dokumKayitlari(): Map<string, string> {
 }
 
 /**
- * DURUM değerini doğrula. Dört biçim (kayıt hükmü):
- *   `KURAL → kapı: <dosya>`  · dosya `src/__tests__/conformance/` altında VAR olmalı
- *   `İŞ → REC-nnn (<state>)` · kayıt dökümde var olmalı, Canceled ise KIRMIZI
+ * DURUM değerini doğrula. BEŞ biçim (kayıt hükmü):
+ *   `KURAL → kapı: <dosya>`      · dosya `src/__tests__/conformance/` altında VAR olmalı
+ *   `KURAL → kapı YOK (REC-nnn)` · kapısı HENÜZ yazılmamış kural; REC dökümde VAR olmalı
+ *   `İŞ → REC-nnn (<state>)`     · kayıt dökümde var olmalı, Canceled ise KIRMIZI
  *   `İSTİŞARE — karar değil`
- *   `AÇIK — karar bekliyor`  · başlıktaki tarih 7 günden eskiyse KIRMIZI
+ *   `AÇIK — karar bekliyor`      · başlıktaki tarih 7 günden eskiyse KIRMIZI
+ *
+ * ⭐BEŞİNCİ BİÇİM SONRADAN EKLENDİ, VE SEBEBİ ÖLÇÜMDÜR (2026-09-08).
+ * Kapı KIRMIZI kipe alınmak istendiğinde vitrin belgesinde 26 ihlal çıktı; **21'i**
+ * `KURAL → kapı YOK (REC-nnn)` biçimindeydi. İlk tepki "OPS yanlış yazmış" olurdu —
+ * DEĞİLDİ. Bu, MEŞRU ve bu depoda ADI KONMUŞ bir hâl: CLAUDE.md kural 1 "cetvel yok
+ * geçerli bir cevaptır ama BEDAVA DEĞİLDİR — o zaman iş, cetveli yazmayı da kapsar"
+ * der. Yani "kural karara bağlandı, kapısı henüz yazılmadı, takibi şu kayıtta" tam
+ * olarak o cümlenin karşılığıdır. Kapı bunu ihlal sayarken **kendi cetvelini** ölçmüyordu.
+ *
+ * ⛔AMA KAÇIŞ DELİĞİ DEĞİL: REC dökümde YOKSA ya da İPTAL ise KIRMIZI. Aksi hâlde
+ * "kapı YOK (REC-9999)" yazmak her kararı susturmanın bedava yolu olurdu — yani
+ * ölçmeyen bir gösterge. Kontrol `İŞ` kolundakinin AYNISI, bilerek: iki yerde iki
+ * kural olmasın.
  */
 export function durumDogrula(
   durum: string,
@@ -126,6 +149,22 @@ export function durumDogrula(
   const d = durum.trim()
 
   let m
+  // ⭐SIRA ÖNEMLİ: "kapı YOK (...)" kolu, "kapı: <dosya>" kolundan ÖNCE denenir. Tersi
+  // olsaydı iki nokta içermeyen bu biçim ikinci kola düşüp "biçimsiz" sayılırdı.
+  if ((m = /^KURAL\s*(?:→|->)\s*kap[ıi]\s+YOK\s*\((REC-\d+)[^)]*\)\s*$/i.exec(d))) {
+    const rec = m[1].toUpperCase()
+    if (!kayitlar.has(rec)) {
+      return 'KURAL kapisi YOK deniyor ama takip kaydi dokumde YOK: ' + rec +
+        ' (kapisiz kural ancak bir kayda bagliysa mesrudur)'
+    }
+    const durumu = kayitlar.get(rec) || ''
+    if (/^cancel/i.test(durumu)) {
+      return 'KURAL kapisi YOK ve takip kaydi IPTAL: ' + rec + ' (' + durumu +
+        ') — kapi da kayit da yok, karar sahipsiz'
+    }
+    return null
+  }
+
   if ((m = /^KURAL\s*(?:→|->)\s*kap[ıi]\s*:\s*(.+)$/i.exec(d))) {
     const dosya = m[1].trim().replace(/^`|`$/g, '')
     if (!/^[\w./-]+$/.test(dosya)) return 'KURAL kapi adi bicimsiz: ' + dosya
@@ -270,7 +309,7 @@ describe('INV-KARAR-KAYIT-1: karar basligi kendisini bir yere baglar', () => {
     const bugun = new Date('2026-09-07T00:00:00Z')
     const olc = (metin: string) => belgeOlc('fikstur.md', metin, kayitlar, kapiVar, bugun)
 
-    it('GECERLI belge: dort DURUM bicimi de kabul edilir, ihlal 0', () => {
+    it('GECERLI belge: BES DURUM bicimi de kabul edilir, ihlal 0', () => {
       const o = olc([
         '## K1 · Kural karari (2026-09-07, Recep)',
         'DURUM: KURAL → kapı: var-olan-kapi.test.ts',
@@ -284,12 +323,31 @@ describe('INV-KARAR-KAYIT-1: karar basligi kendisini bir yere baglar', () => {
         '## K4 · Bekleyen (2026-09-05, Recep)',
         'DURUM: AÇIK — karar bekliyor',
         '',
+        // BEŞİNCİ BİÇİM: kural karara bağlanmış, kapısı henüz YAZILMAMIŞ, takibi bir kayıtta.
+        '## K5 · Kapisi yazilmamis kural (2026-09-07, Recep)',
+        'DURUM: KURAL → kapı YOK (REC-100 açıldı)',
+        '',
         '## Yapisal bolum (OPS)',
         'DURUM satiri YOK ama karar da degil.',
       ].join('\n'))
       expect(o.ihlaller.map((i) => i.sebep), 'gecerli belgede ihlal uretildi — yanlis alarm').toEqual([])
-      expect(o.kararSayisi).toBe(4)
+      expect(o.kararSayisi).toBe(5)
       expect(o.yapisalSayisi, 'yapisal baslik karar sayilmis').toBe(1)
+    })
+
+    /**
+     * ⛔BEŞİNCİ BİÇİM KAÇIŞ DELİĞİ OLMASIN — iki kol tam bunu ölçer. Bunlar olmasaydı
+     * "kapı YOK (REC-9999)" yazmak her kararı susturmanın BEDAVA yolu olurdu; yani
+     * kapı, ölçtüğünü sandığı şeyi ölçmez hâle gelirdi.
+     */
+    it('KAPISIZ KURAL: takip kaydi dokumde YOKSA KIRMIZI', () => {
+      const o = olc(['## K1 · Karar (2026-09-07, Recep)', 'DURUM: KURAL → kapı YOK (REC-9999 açıldı)'].join('\n'))
+      expect(o.ihlaller.map((i) => i.sebep).join(' ')).toContain('takip kaydi dokumde YOK')
+    })
+
+    it('KAPISIZ KURAL: takip kaydi IPTAL ise KIRMIZI (kapi da kayit da yok)', () => {
+      const o = olc(['## K1 · Karar (2026-09-07, Recep)', 'DURUM: KURAL → kapı YOK (REC-1, Canceled)'].join('\n'))
+      expect(o.ihlaller.map((i) => i.sebep).join(' ')).toContain('takip kaydi IPTAL')
     })
 
     it('SABOTAJ 1: DURUM satiri silinirse KIRMIZI', () => {
