@@ -94,3 +94,38 @@ kirli beyaz"* şikayeti tam bu yerel PNG'ye ait.
 4. Merkezleme/orantı — görsel işleme; kalem 1–3 kapanmadan sıraya girmez.
 
 **Bu belgede canlıya hiçbir yazım yapılmamıştır.**
+
+---
+
+## ⛔DÜZELTME — 06:35Z, ÖLÇÜTÜM DOĞRUYDU AMA EVRENİM YANLIŞTI
+
+Yukarıdaki "16 boş kategori" sayısı **iş hacmi olarak yanlış**: `is_active` alanına bakmamıştım.
+
+| | sayı |
+|---|---|
+| `image_url` boş | 16 |
+| bunlardan **pasif** (`is_active=false`, vitrinde YOK) | **13** |
+| **gerçekten görsel gereken AKTİF kategori** | **3** |
+
+Görsel gereken üçü: `accessories` (üst, 2 ürün) · `electric-duct-heaters` (6 ürün) ·
+`industrial-ceiling-fans` (7 ürün).
+
+**Yani tedarik işi 16 değil 3 kalemlik.** Dün gece panoya ve URUN'e "16/37 boş, üst 13'ten 8'i
+boş" diye bildirdiğim sayı bu düzeltmeyle geçersizdir; düzeltme aynı turda panoya yazıldı.
+
+⭐**Ders (tekrarlayan):** ölçüt keskin, evren yanlış → yanlış iş emri doğar. Aynı hatayı BUILD
+vakasında da yapmıştım. Kural: "kaç tane boş" sorusunda **görünürlük alanı** evrenin parçasıdır.
+
+## ⭐YENİ BULGU — 26 ürün PASİF kategoride duruyor
+
+Düzeltmeyi ararken çıktı; görsel işinden ayrı ve muhtemelen daha ağır:
+
+| kategori | ürün (hepsi `status=active`) | `is_active` |
+|---|---|---|
+| `ex-proof-atex-fans` (Ex-Proof / ATEX Fanlar) | **12** | false |
+| `rectangular-duct-fans` (Dikdörtgen Kanal Tipi) | **7** | false |
+| `commercial-ventilation` (ÜST kategori) | **7** | false |
+
+Ürünlerin kendisi aktif ama bulundukları kategori kapalı. **Bu ürünlere kategori üzerinden
+erişilip erişilemediği ÖLÇÜLMEDİ** — kategori sayfası ve menü URUN'ün alanı, ölçümü ona ait.
+Eğer erişilemiyorsa 26 aktif ürün vitrinde görünmüyor demektir. Ayrı kayıt açılacak.
