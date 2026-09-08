@@ -1,12 +1,8 @@
 {
-  "_nicin": "INV-TIP-DRIFT-1 icin BILINEN BORC listesi (REC-121, 2026-09-07 olculdu). Bu kalemler canli semada VAR ama commit'li src/types/database.types.ts'te YOK. Onarim `pnpm supabase:gen` ile yapilir ve o dosya URUN seridinin mulku olan bir URETILMIS ARTEFAKT'tir (AXIOM 3) - ALTYAPI kapisini yazar, dosyayi sahibi tazeler. Taban, master'i baska seridin kuyrugu yuzunden kirmiziya cevirmemek icin var.",
+  "_nicin": "INV-TIP-DRIFT-1 icin BILINEN BORC listesi (REC-121). Bu kalemler canli semada VAR ama commit'li src/types/database.types.ts'te YOK. Onarim `pnpm supabase:gen` ile yapilir ve o dosya URUN seridinin mulku olan bir URETILMIS ARTEFAKT'tir (AXIOM 3) - ALTYAPI kapisini yazar, dosyayi sahibi tazeler. Taban, master'i baska seridin kuyrugu yuzunden kirmiziya cevirmemek icin var.",
   "_bayatlama_kurali": "Taban satiri ARTIK DRIFT DEGILSE kapi KIRMIZI verir ve o satirin DUSURULMESINI ister. Yoksa taban sessizce buyur ve kapinin evrenini daraltir; o an kapi durur ama yesil gorunur.",
-  "_kaynak_migration": "order_number_counters + generate_order_number_saat_tabanli_20260906: 2026-09-06 tarihli siparis numarasi saat-tabanli uretim isi (URUN-KATALOG/URUN hatti).",
-  "_olcum": "2026-09-07: commit'li 61 tablo/gorunum + 784 kolon, canli 62 + 786. Fark yalnizca asagidaki 4 kalem; diff'in kalani (6 yer) CLI surum parantezlemesiydi ve olcut disi.",
-  "bilinen_borc": [
-    "fonksiyon:public.generate_order_number_saat_tabanli_20260906",
-    "kolon:public.order_number_counters.gun",
-    "kolon:public.order_number_counters.son_no",
-    "tablo:public.order_number_counters"
-  ]
+  "_bosaltildi_2026_09_08": "Dort satir (tablo public.order_number_counters + iki kolonu + fonksiyon generate_order_number_saat_tabanli_20260906) DUSURULDU, cunku URUN tipleri tazeledi (dal urun/rec121-tip-tazeleme, commit 426507502) ve o kalemler artik drift DEGIL. Bayatlama kurali geregi listede kalsalardi kapi KIRMIZI verip dusurulmelerini isteyecekti.",
+  "_sira_zorunlulugu": "⛔BU DOSYA URUN'UN TIP TAZELEME PR'INDAN SONRA INMELIDIR. Olculdu 2026-09-08: bos tabanla betik master'in (henuz bayat) tiplerine karsi CIKIS 1 verir ve dort kalemi drift olarak listeler - yani ters sirada inerse kapi hakli olarak kirmizi olur. Ayni pencerede, URUN once. (Bugun CI'a BAGLI DEGIL: .github/workflows ve package.json icinde tip-drift atifi YOK - olculdu; yani ters sira master'i kirmiziya DUSURMEZ, ama dosya da yanlis olur.)",
+  "_olcum": "2026-09-07: commit'li 61 tablo/gorunum + 784 kolon, canli 62 + 786; fark yalnizca dusurulen 4 kalem. 2026-09-08 (URUN, benim olcerimle): commit'li 62/786 = canli 62/786, fark YOK.",
+  "bilinen_borc": []
 }
