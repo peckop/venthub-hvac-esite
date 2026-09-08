@@ -51,8 +51,14 @@ function saglayiciyla(ui: React.ReactElement, lang: Lang = 'tr') {
  * Bileşen SAHTELENMEZ — ölçtüğüm şey gerçek `BrandIcon`ın davranışıdır.
  */
 function MarkaKarti({ dekoratif }: { dekoratif: boolean }) {
+  // `href` BİLEREK bir sayfa adresi DEĞİL. İlk yazılışta `/tr/brands/vortice` yazmıştım ve
+  // `next/no-html-link-for-pages` haklı olarak kırmızı verdi: sayfa adresine `<a>` ile
+  // gidilmez, `next/link` kullanılır. Burada `next/link` getirmek ölçümü zenginleştirmez —
+  // `image-redundant-alt` kuralı bağlantının HEDEFİNE bakmaz, yalnız görselin `alt` metniyle
+  // komşu yazının aynı olup olmadığına bakar. Yani hedefi değiştirmek deseni bozmuyor,
+  // yalnız gerçek bir yönlendirme taklidi yapmaktan vazgeçiyor.
   return (
-    <a href="/tr/brands/vortice">
+    <a href="#marka">
       <BrandIcon brand="Vortice" dekoratif={dekoratif} />
       <span>Vortice</span>
     </a>
