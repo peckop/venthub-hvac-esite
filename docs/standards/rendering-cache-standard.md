@@ -23,6 +23,44 @@
 **`ssr: false` ana rotalarda YASAK** (CLAUDE.md kural 4). İstemci-tarafı veri gerektiren
 parçalar `<Suspense fallback={<Skeleton/>}>` ile akıtılır, sayfanın tamamı CSR'a düşürülmez.
 
+### 1.1 Vitrin rotasını SESSİZCE dinamikleştiren iki desen (REC-59, ölçüm 2026-09-08)
+
+Yukarıdaki tablo bir **beyandır**; rota o sınıfa ait olduğunu `revalidate` yazarak ilan eder.
+Ama iki desen bu beyanı **hiçbir hata vermeden** geçersiz kılar — sayfa yine istek anında
+üretilir, `revalidate` satırı ölü bir cümleye döner ve **hiçbir kapı bunu görmez**:
+
+| desen | niçin dinamikleştirir |
+|---|---|
+| sayfanın `searchParams` alması | Next 15'te `searchParams` alan sayfa build'de prerender EDİLEMEZ |
+| render yolunda `headers()` okunması (ör. tenant çözümü) | build: *"couldn't be rendered statically because it used `headers`"* |
+
+**İkisi VE ilişkisiyle bağlıdır — üç kollu sabotajla ölçüldü (kategori rotası):**
+
+| kol | üretilen HTML |
+|---|---|
+| taban (ikisi de var) | **0** |
+| yalnız `searchParams` kaldırıldı | **0** |
+| yalnız `headers()` kaldırıldı | **0** |
+| **ikisi birden kaldırıldı** | **46** ✔ |
+
+Yani **birini onarmak hiçbir kazanım vermez.** Bir rotayı statiğe döndüren iş, ikisini birden
+kaldırdığını ölçmeden "onarıldı" diyemez.
+
+**⚠BUILD ÇIKTISININ ETİKETİ AYIRT ETMEZ.** `next build` bu rotayı `● (SSG)` işaretliyor ve
+46 yolu listeliyordu — diskte **0 HTML** varken. "Static/ISR işaretli mi" ölçütü bu yüzden
+yetersizdir; **kabul ölçütü ÜRETİLEN DOSYA SAYISIDIR**:
+`find .next/server -path "*category*" -name "*.html" | wc -l`.
+
+**⭐VE MASKE KALKAR:** rota dinamikken her istek taze render edilir, yani **tazeleme webhook'u
+bozuk olsa bile kimse fark etmez.** Statiğe geçen her rota için, geçişten SONRA bir veri
+değişikliğinin sayfaya gerçekten yansıdığı **canlıda** ölçülür (hiç sorulmamış adres,
+`MISS`/`Age 0`). Bu ölçülmeden iş bitmiş sayılmaz — §3'ün tazeleme sözleşmesi ancak o zaman
+kanıtlanmış olur.
+
+**Kapı:** `INV-KATEGORI-STATIK-1` (`kategori-rotasi-statik.test.ts`) iki deseni birden bekler
+ve AST ile ölçer (metin taraması yorumla tatmin olur — ilk sürümü kendi gerekçe yorumunu ihlal
+saydı). Kapının sınırı kendi dosyasında yazılı: kaynak kodu ölçer, `.next` çıktısını değil.
+
 ## 2. Fiyat hangi yüzeyde görünür
 
 **Karar (Recep, 2026-08-15): fiyat YALNIZ ürün satış sayfasında (PDP) gösterilir.**

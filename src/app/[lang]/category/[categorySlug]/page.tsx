@@ -17,11 +17,28 @@ import type { DomainCategory } from '../../../../lib/type-converters'
 import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
 import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../../../types/db-rows'
 import type { FamilyListItem } from '../../../../types/ui-models'
-import { getTenantConfig } from '../../../../utils/tenantServer'
+import { DEFAULT_TENANT_ID } from '../../../../utils/tenantConstants'
 import PageComponent from '../../../../views/CategoryPage'
 
-/** F5-B W2.1 — sunucu sayfalaması: sayfa başına AİLE sayısı. */
-const PAGE_SIZE = 24
+/**
+ * Sayfa başına AİLE sayısı.
+ *
+ * ⭐24 → 48 (REC-59, 2026-09-08). NİÇİN: `?page=` sorgu parametresi bu rotayı DİNAMİK
+ * yapıyordu (Next 15: `searchParams` alan sayfa build'de prerender edilemez). Parametreyi
+ * kaldırmak için iki yol vardı — ayrı bir sayfalama segmenti açmak (`/sayfa/2`), ya da
+ * sayfa boyunu bütün kategoriler tek sayfaya sığacak kadar büyütmek.
+ *
+ * ÖLÇÜM KARARI VERDİ: canlı DB'de 23 aktif kategoriden YALNIZ BİRİ 24'ü aşıyor (fans, 34
+ * aile); ikincisi 12, üçüncüsü 6. Yani sayfalama 46 adresin yalnız birinde tetikleniyordu.
+ * 48 sayfa boyu ile hepsi tek sayfaya sığar, parametre kalkar, ADRES DEĞİŞMEZ ve hiçbir
+ * yönlendirme gerekmez. Segment açmak, bir adres için tüm adres şemasını değiştirmek olurdu.
+ *
+ * ⚠BU SAYI BİR TAVANDIR VE BÜYÜYEBİLİR: en kalabalık kategori 48'i aştığı gün sayfalama
+ * sessizce eksik liste basar (48'den sonrası GÖRÜNMEZ). O yüzden `INV-KATEGORI-STATIK-1`
+ * bir kol olarak "en kalabalık kategori ≤ PAGE_SIZE" ölçer ve aşıldığı gün KIRMIZI verir —
+ * o gün ayrı segment işi açılır. Sessiz eksilme değil, açık kırmızı.
+ */
+const PAGE_SIZE = 48
 
 /**
  * Aile listesi önbelleği. Anahtar SaaS kuralı gereği hem `lang` hem `tenantId`
@@ -45,12 +62,14 @@ const getCachedFamilies = (
   { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
 )()
 
-/** `?page=` değerini 1-tabanlı güvenli tam sayıya çevirir. */
-function parsePageParam(raw: string | string[] | undefined): number {
-  const value = Array.isArray(raw) ? raw[0] : raw
-  const parsed = Number.parseInt(value ?? '1', 10)
-  return Number.isFinite(parsed) && parsed > 1 ? parsed : 1
-}
+/**
+ * ⭐SAYFA DAİMA 1 (REC-59). `?page=` kalktı — `parsePageParam` ile birlikte, çünkü artık
+ * okunacak bir parametre yok. Sabit, `unstable_cache` anahtarında ve JSON-LD'de niçin hâlâ
+ * bir "sayfa" kavramı geçtiğini açıklamak için duruyor: veri katmanı sayfalamayı destekliyor,
+ * bu rota onu KULLANMIYOR. Segment tabanlı sayfalama gerekirse (bkz. PAGE_SIZE notu) burası
+ * yeniden okunur.
+ */
+const SAYFA = 1
 
 // React.cache() ile bağımsız Supabase ORM sorgusu (L10_05 Kurumsal Disiplini)
 const _getCachedSupabaseData = cache((id: string) => {
@@ -132,15 +151,12 @@ export async function generateMetadata({ params }: { params: Promise<{ categoryS
 }
 
 export default async function Page({
-  params,
-  searchParams
+  params
 }: {
   params: Promise<{ categorySlug: string, lang: string }>
-  searchParams: Promise<{ page?: string | string[] }>
 }) {
   const { categorySlug, lang } = await params
-  const { page: pageParam } = await searchParams
-  const page = parsePageParam(pageParam)
+  const page = SAYFA
   preloadCategory(categorySlug)
   const category = await getCachedCategoryData(categorySlug)
 
@@ -163,7 +179,25 @@ export default async function Page({
   let subCategories: DomainCategory[] = []
 
   if (category) {
-    const tenantId = (await getTenantConfig()).id
+    // ⭐DERLEME SABİTİ, `headers()` DEĞİL (REC-59). Eskiden `(await getTenantConfig()).id`
+    // idi ve o çağrı `next/headers` okuduğu için bu rotayı İSTEK ANINDA render edilmeye
+    // zorluyordu — build "Route ... couldn't be rendered statically because it used
+    // `headers`" diyordu ve 46 kategori adresinin HİÇBİRİ önceden üretilmiyordu.
+    //
+    // NİÇİN GÜVENLİ, ÖLÇÜLDÜ (2026-09-08, canlı DB): `categories` (30), `product_families`
+    // (47) ve `products` (442) satırlarının TAMAMI tek `tenant_id` taşıyor ve o değer
+    // `DEFAULT_TENANT_ID` ile BİREBİR aynı. Yani sabit, bugün zaten dönen değerdir.
+    //
+    // ⭐DAHASI: bu değişiklik SESSİZ BİR RİSKİ KAPATIYOR. Tazeleme webhook'u `tenantId`yi
+    // DB SATIRINDAN alıyor (`api/webhook/supabase/route.ts` → `activeRecord.tenant_id`),
+    // sayfa ise BAŞLIKTAN alıyordu. İkisi bir gün ayrışsaydı webhook
+    // `products-discovery-<X>` etiketini tazeler, sayfa `products-discovery-<Y>` ile
+    // önbelleklenmiş olurdu ve tazeleme ISKALARDI — hiçbir kapı görmeden. Tek sabit, iki
+    // kaynağı teke indirir.
+    //
+    // Çok-kiracılı yapı PARK'ta (Recep kararı 2026-08-28, REC-88). Geri açılırsa doğru yol
+    // kiracı başına ayrı yayın olur; RSC render yolunda `headers()` okumak değil.
+    const tenantId = DEFAULT_TENANT_ID
 
     // SSR: Alt kategorilerin tam verisini çek — client-side hydration race'ini ortadan kaldır
     const [{ data: subsData }, { data: countsData }] = await Promise.all([
