@@ -467,4 +467,11 @@ jobs:
           set -Eeuo pipefail
           echo "NOT: bu kapi DEPO DURUMUNU olcer, bu PR'in degisikligini degil."
           echo "     Kirmizi olursa onarim: pnpm supabase:gen (dosya sahibi URUN, AXIOM 3)."
-          node scripts/db/checks/tip-drift.mjs
+          # ⛔GECICI SABOTAJ — REC-121 kabul olcutu "sabotajla CI kirmizi GORULDU".
+          # Bir sonraki commit bu blogu GERI ALIR. URUN'un dosyasina DOKUNULMUYOR: bayat
+          # kopya kosum sirasinda uretiliyor ve yalniz OKUNAN yol degistiriliyor.
+          sed 's/^      order_number_counters: {$/      order_number_counters_SABOTAJ: {/' \
+            src/types/database.types.ts > /tmp/bayat-tipler.ts
+          diff <(grep -c order_number_counters_SABOTAJ /tmp/bayat-tipler.ts) <(echo 1) \
+            || { echo "SABOTAJ UYGULANMADI — bu kosum kanit DEGIL"; exit 3; }
+          node scripts/db/checks/tip-drift.mjs --tip-dosyasi /tmp/bayat-tipler.ts
