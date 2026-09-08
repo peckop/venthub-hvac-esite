@@ -15,9 +15,16 @@ description: >-
 
 # /qa — Gez → Kanıtla → Düzelt → Yeniden ölç
 
-> Kaynak: garrytan/gstack `qa` (MIT) yönteminden VentHub'a uyarlandı, 2026-09-08. gstack'in Aside
-> tarayıcısı, `$B` ikilisi, learnings-log ve telemetrisi ALINMADI; sürücü **Playwright + Chromium**
-> (`@playwright/test` zaten devDependency, `e2e/*.e2e.ts` ile aynı altyapı).
+> **KAYNAK:** garrytan/gstack `qa` (MIT) — 2026-09-08'de SKILL.md (61 KB) + `sections/qa-patterns.md`
+> (17 KB) tamamı okundu.
+> **ALINAN (yöntem):** diff-farkında mod, sayfa başına kontrol listesi, iki kanıt katmanı
+> (etkileşimli/statik), sağlık puanı rubriği ve ağırlıkları, düzeltme döngüsü (bul → asgari fix →
+> commit → yeniden ölç → sınıfla), öz-denetim eşiği (%20) ve 50 üst sınırı, "tarayıcıyı atlama" kuralı.
+> **BİZDEN:** `scripts/gez.mjs` (sıfırdan; Playwright+Chromium, etiketli çıktı, `TEXT_WORDS` = kural 5
+> ölçümü), güvenlik sınırı (prod yalnız bakış, "Ödemeye Geç" yasak), VentHub kontrol listesi (fiyat,
+> kategori adı, SKU sızıntısı, 3D), TR/EN çift gezinti, rapor yeri (`docs/audits/`), uzak konteyner
+> kısıtı, migration → ayrı emir kuralı. **ALINMAYAN:** Aside tarayıcı, `$B` ikilisi, learnings-log,
+> telemetri, TODOS.md, test-bootstrap bölümü.
 
 ## Niçin var
 

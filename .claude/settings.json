@@ -1,5 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "statusLine": {
+    "type": "command",
+    "command": "node .claude/statusline.cjs"
+  },
   "permissions": {
     "allow": [
       "Bash(gh run *)",

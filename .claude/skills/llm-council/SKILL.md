@@ -13,10 +13,13 @@ description: >-
 
 # LLM Council — anonim çapraz puanlamalı konsey
 
-> Kaynak: karpathy/llm-council fikri (MIT; OpenRouter'lı web uygulaması) VentHub'a uyarlandı,
-> 2026-09-08. Ürün alınmadı; **fikrin üç aşaması** bizim Workflow altyapısına yazıldı. Fark:
-> üyeler Claude alt-ajanları (mercek + efor çeşitliliği) ve isteğe bağlı bir Gemini koltuğu (agy);
-> anonimleştirme koddadır, modele bırakılmaz.
+> **KAYNAK:** karpathy/llm-council (MIT) — 2026-09-08'de yalnız README özeti okundu; `main.py`
+> okunMADI. **ALINAN (fikir):** üç aşama (bağımsız ilk görüş → anonim karşılıklı inceleme →
+> başkan sentezi) ve "kimlik gizlenir ki model kayırmasın" ilkesi.
+> **BİZDEN:** betiğin tamamı (Workflow API'si), mercek çeşitliliği, üyeye göre döndürülmüş sıra ile
+> anonimleştirme (kodda, modele bırakılmaz), puan matrisi, zorunlu muhalefet şerhi, kanıt boşluğu,
+> "konsey önerir, karar Recep'in" kuralı, Kararlar-defteri kontrolü, "workflow kullan" kilidi.
+> **ALINMAYAN:** OpenRouter, web arayüzü, çok-sağlayıcı yapı (Gemini koltuğu isteğe bağlı, agy ile).
 
 ## Niçin var
 

@@ -13,9 +13,15 @@ description: >-
 
 # Office Hours — Fikir Sorgusu (plandan önceki basamak)
 
-> Kaynak: garrytan/gstack `office-hours` (MIT) fikrinden VentHub'a uyarlandı, 2026-09-08.
-> gstack'in kendi altyapısı (brain cache, telemetry, Aside, learnings-log) bilinçli olarak
-> ALINMADI; hafıza katmanımız NotebookLM ikizi + `docs/`, karar kaydımız `docs/plans/`.
+> **KAYNAK:** garrytan/gstack `office-hours` (MIT) — 2026-09-08'de SKILL.md (77 KB) +
+> `sections/phase-2a-startup-diagnostic.md` (13 KB) tamamı okundu.
+> **ALINAN (yöntem):** altı zorlayıcı soru ve kırmızı bayrakları, "bir kez daha it" duruşu,
+> yasak yumuşatıcı kalıplar, aşama-akıllı yönlendirme, öncül çürütme, zorunlu 2-3 alternatif
+> ("asgari" + "ideal"), "ödev" fikri, kaçış kapısı, bitiş durumları.
+> **BİZDEN:** mühendislik modu (S1 yerine "hangi ölçülmüş arıza?"), Kararlar-defteri kontrolü,
+> CLAUDE.md kural çatışması ve render/önbellek adımı, şerit çakışması, çıktı yeri (`docs/plans/`),
+> KAYNAK/CETVEL bloğu, DROPPED durumu, tüm Türkçe metin. **ALINMAYAN:** brain cache, telemetry,
+> Aside tarayıcı, learnings-log, cross-model second opinion, builder modu.
 
 ## Niçin var
 

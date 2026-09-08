@@ -363,8 +363,14 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 - **Ek (aynı gün, Recep "llm council" dedi):** **`llm-council`** skill'i — karpathy/llm-council fikri
   (ürün değil) Workflow'a yazıldı: N mercekli üye → **anonim, döndürülmüş sıralı** çapraz puanlama →
   başkan sentezi + zorunlu muhalefet şerhi; 9 ajan; "workflow kullan" olmadan açılmaz; karar Recep'in.
-  Cetvel tablosuna satır eklendi. Recep'in diğer sorduğu dörtlü: Task Observer + Headroom
-  bağlam-çubuğu "al" (tek dosya) · claude-mem "tek şeritte dene, ölç" · Agent-Reach hayır — karar bekliyor.
+  Cetvel tablosuna satır eklendi. Recep "önerdiklerini de yap" dedi → **`task-observer`** skill'i
+  (rebelytics CC BY 4.0 uyarlaması; gözlemler `docs/skill-gozlemleri/acik/`, haftalık inceleme OPS
+  gün kapanışında; ilk iki gözlem bugünkü iki Recep düzeltmesi) · **`.claude/statusline.cjs`**
+  (bağlam doluluk çubuğu; headroom fikri, uygulama bizden — Claude Code `used_percentage`'ı
+  doğrudan veriyor, hook gerekmedi; `settings.json` `statusLine`) · **claude-mem deneme planı**
+  `docs/plans/claude-mem-deneme-plani-2026-09-08.md` (kurulum Recep'in makinesinde, `--provider
+  host` ŞART, 14 gün, kabul/red ölçütü tabloda) · üç skill başlığına **KAYNAK/ALINAN/BİZDEN** bloğu
+  (Recep: "içeriği mi alıyorsun, bizden mi, ayırt edemiyorum"). Agent-Reach hayır.
 - **Ölçülen kısıt:** uzak Claude Code konteynerinde Chromium dış siteye çıkamıyor (proxy CONNECT
   reddi); orada `qa` hedefi yerel `pnpm start`, preview/prod bakışı yerel makineden. Pano notları
   (`C:/tmp/venthub-board`) konteynerde yerel kalıyor, eş-Controller'a ULAŞMIYOR — bu yüzden not

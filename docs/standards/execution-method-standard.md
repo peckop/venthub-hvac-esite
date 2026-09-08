@@ -26,7 +26,7 @@
 | **Workflow** | Deterministik betikle çok ajanı düzenleme: fan-out → çürütme → sentez | Tek koşum | ORTA-YÜKSEK (ajan sayısına göre) |
 | **maestro** (skill) | Çok dosyaya **aynı** yapısal değişikliği paralel dalgalarla uygulama + yargıç + merkezi kapı | Tek koşum, çok PR | YÜKSEK ama elle yapmaktan ucuz |
 | **agy-orchestrate** (skill) | Antigravity/Gemini filosuyla ucuz geniş tarama; Claude CodeGraph ile doğrular | Tek koşum | DÜŞÜK (Claude kotası yerine Gemini) |
-| **Tekil skill** (office-hours, plan-challenger, diff-review, code-review, qa, 20-eksen, prd-complexity, supabase-security…) | Paketlenmiş tek amaçlı prosedür | Tek koşum | DÜŞÜK-ORTA |
+| **Tekil skill** (office-hours, plan-challenger, diff-review, code-review, qa, llm-council, task-observer, 20-eksen, prd-complexity, supabase-security…) | Paketlenmiş tek amaçlı prosedür | Tek koşum (task-observer: oturum boyu arka planda) | DÜŞÜK-ORTA |
 | **Plan modu** (`EnterPlanMode`) | Kapsamı belirsiz işi ÖNCE ölçüp planlamak: paralel salt-okuma `Explore` ajanları + `AskUserQuestion` ile kapsam sorusu → plan | Tek koşum; plan Linear kaydına ve `docs/plans/`e kalır | DÜŞÜK-ORTA (ajanlar sonnet, yazma yok) |
 | **Elle** (oturumun kendisi) | Doğrudan okuma/düzenleme | — | En ucuz, en dar |
 
