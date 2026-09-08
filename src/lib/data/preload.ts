@@ -112,7 +112,15 @@ export function kategoriSatiriSec<T extends SlugAdayi>(rows: T[], slug: string):
     // Çözücü burada doğruyu BİLEMEZ; yapabileceği tek şey seçimi DETERMİNİSTİK kılmak,
     // yani aynı istek iki kez geldiğinde aynı sayfayı vermek. Rastgele salınan bir seçim
     // "bazen doğru" görünür ve tam o yüzden hiçbir ölçüm onu yakalayamaz.
-    return String(a.id ?? a.slug ?? '').localeCompare(String(b.id ?? b.slug ?? ''))
+    // ⭐`localeCompare` BİLEREK KULLANILMIYOR, ve bunu kapı bana ÖLÇEREK gösterdi
+    // (INV-9 madde 3, #1127 ilk koşumunda kırmızı). İlk yazışta `localeCompare` vardı;
+    // kapı "dil argümanı yok" dedi ve haklıydı — ama asıl kusur daha derin: `localeCompare`
+    // çalışma zamanının yerel ayarına göre sonuç değiştirebilir, yani DETERMİNİSTİKLİK
+    // iddiasının kendisini çürütürdü. Burada sıralanan şey insana gösterilen bir metin
+    // değil, bir KİMLİK (uuid ya da slug); doğru araç kod-birimi karşılaştırmasıdır.
+    const ida = String(a.id ?? a.slug ?? '')
+    const idb = String(b.id ?? b.slug ?? '')
+    return ida < idb ? -1 : ida > idb ? 1 : 0
   })
 
   const secilen = sirali[0]
