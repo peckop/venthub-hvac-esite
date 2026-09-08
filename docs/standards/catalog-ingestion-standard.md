@@ -446,6 +446,51 @@ sonradan eklenirse veri geriye dönük yeniden üretilmek zorunda kalmasın diye
 
 ---
 
+## 6.4 ⭐MARKA/SERİ KAYNAK HARİTASI — serbest arama YASAK, önce haritaya bakılır (2026-09-08)
+
+> **Recep kararı, lafzıyla:** *"bu araştırmanı da nerde tutacaksın taşınabilir katalog
+> verilerinde olmalı bence. daha sonra da bence orda tuttuğun serileri sorgulamadan kimse
+> arama yapmamalı."*
+
+**SSOT:** `<ingestor>/kaynak-dizini/marka-kaynak-haritasi.json`
+(taşınabilir katalog verisiyle birlikte taşınır — Recep kararı).
+
+### Kural
+1. Bir serinin **görseli, teknik belgesi ya da kimliği** aranacaksa **ÖNCE harita okunur.**
+   Seri haritada varsa **serbest arama YAPILMAZ**, oradaki adres kullanılır.
+2. Seri haritada **yoksa** arama yapılır ve **sonuç haritaya YAZILIR** — bulunduysa adres,
+   bulunamadıysa *"arandı, yok"* kaydı **ve nerelere bakıldığı**. Aramanın kendisi bir çıktıdır.
+3. ⛔**"Kaynak yok" hükmü, EN AZ İKİ BAYİ araması yapılmadan verilmez.**
+
+### Arama sırası (haritada karşılık yoksa)
+`bu harita` → `kaynak-dizini/sayfalar.jsonl` → üretici ürün sayfası →
+⭐**TR distribütör/bayi** (`climavents.com.tr`, `avensair.com` — `site:` kısıtı **KOYMA**) →
+üreticinin **seçim/konfigüratör aracı** → bayinin **fiyat kataloğu PDF'i**.
+
+### Niçin bu kural doğdu — ölçülmüş bedel
+2026-09-08'de 14 ATEX fanı için **üreticinin sitesine bakılıp "kaynak yok" hükmü verildi** ve
+Recep'e karar sorusu götürüldü. Recep saniyeler içinde iki TR bayi adresi buldu.
+
+⭐**Sebep, adıyla:** üretici ürünü **satmaz**, katalog yayınlar — niş seride (ATEX vb.) fotoğraf
+koymayabilir, hatta yerine `fakeImg.png` placeholder koyar. **Ürünü satan bayi koymak ZORUNDA**,
+çünkü müşteri görmeden almaz. **Fotoğrafın en olası yeri üretici değil satıcıdır.**
+
+Aynı hata AVenS için de yapılmıştı (*"78 ürünün kaynağı yok"*): AVenS'in **2025 fiyat kataloğu**
+kendi sitesinde duruyordu ve **61 ürünün görseli** oradan çıktı. Yokluk beyanı, aranan **evrenin**
+darlığıydı — ürünün yokluğu değil.
+
+### Haritanın taşıdığı iki şey (adres listesinden fazlası)
+- **Marka zincirleri:** aynı ürün birden çok isimle dolaşır. Ölçülmüş örnek:
+  **VORTICE → CASALS → Storm (seri) → AVenS (TR distribütör)** (Vortice 2019-09'da Casals'ın
+  %100'ünü aldı). Bizde *"AVenS"* görünen NIMAX/NIMUS aslında Casals ürünüdür ve fotoğrafında
+  *"Storm Industrial"* logosu bulunur — bu **yabancı marka değildir**, zincirin halkasıdır.
+  Zincir bilinmezse görsel "başka markanın" sanılıp reddedilir.
+- **Kaynağa özgü teknikler:** ör. Casals/Vortice fanware görsellerinde URL'deki `medium-`
+  yerine `original-` yazılınca **250×250 → 700×700** olur; sayfa kaynağı yalnız `medium` verir.
+
+**Kapı önerisi (henüz yazılmadı):** haritadaki `durum: BULUNDU` kayıtlarının adresleri
+periyodik HEAD ile yoklanır; ölü bağlantı **uyarı** üretir (bloklamaz).
+
 ## 7. Provenance / ilişki
 
 Kaynak: çapraz-sorgu (`cross_notebook_query` Vortice-Full + Avensair, 2026-06-19) → Avensair'in 27 gerçek bölümü atıfla.
@@ -463,3 +508,6 @@ skill `.agent/skills/venthub-catalog-importer` (çıkarım aracı) · memory `ca
 > v1.1 · 2026-08-18 · §6.1 INV-CATALOG-1 (aile↔içerik bütünlüğü, cırcır tabanlı) — T099.
 > v1.2 · 2026-08-19 · §6.1 kapı ÖLÇTÜ (07:38Z, PR #666). Kök sertifikanın tek kaynağı depo;
 >   `SUPABASE_CA_CERT` sırrı kaldırıldı, sır-üstüne-geçer yolu testle kapatıldı.
+> v1.3 · 2026-09-08 · §6.4 MARKA/SERİ KAYNAK HARİTASI (Recep kararı). Serbest arama
+>   yasak; harita SSOT `<ingestor>/kaynak-dizini/marka-kaynak-haritasi.json`. Gerekçe ölçüldü:
+>   "kaynak yok" hükmü dar evrende verilmiş, bayide 61 ürünün görseli çıkmıştı.
