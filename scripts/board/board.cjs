@@ -568,7 +568,7 @@ module.exports = {
   BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS, PANOYA_YAZAN_FIILLER,
   append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary,
   notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, sidDogrula,
-  taramaDurumu, teslimDurumu, esikleriOku, ESIK_ADLARI,
+  taramaDurumu, teslimDurumu, teslimKanitSinifi, esikleriOku, ESIK_ADLARI,
   EKSENLER, SAYI_SOZU, eksenOzeti, kullanimMetni,
   globToRegExp, toRepoRelative, repoRootFor, agacKonumu, ayrismaSay,
 }
@@ -621,25 +621,54 @@ function taramaDurumu(sid, now, esikTur = 3) {
 /**
  * TESLIM — bildirimin KONUŞMAYA ulaştığı en son DOĞRULANMIŞ an (§23 HÜKÜM 3).
  *
- * Damgayı `mechanism-setup.cjs dogrula --jeton <bildirimde-görülen>` yazar; yani bu ölçüm
- * ancak bir AJAN jetonu gerçekten bildirimde GÖRÜP geri yazdıysa doludur. Hiçbir süreç bu
- * damgayı kendi kendine üretemez — `prob`un yazdığı `jeton` alanı YETMEZ, çünkü prob yalnızca
- * gözcünün panoyu okuduğunu kanıtlar. Ayrım kasıtlıdır: teslimatın tek kanıtı, kanalın öteki
- * ucundaki ajanın konuşmasıdır.
+ * Damgayı `mechanism-setup.cjs dogrula --gordum <bildirimde-görülen>` yazar; yani bu ölçüm
+ * ancak bir AJAN jetonu geri yazdıysa doludur. Hiçbir süreç bu damgayı kendi kendine üretemez
+ * — `prob`un yazdığı `jeton` alanı YETMEZ, çünkü prob yalnızca gözcünün panoyu okuduğunu
+ * kanıtlar. Ayrım kasıtlıdır: teslimatın tek kanıtı, kanalın öteki ucundaki ajanın konuşmasıdır.
+ *
+ * ⚠REC-287 — BU SÜTUNUN YAŞI, "KANITLANDI"NIN GÜCÜNÜ SÖYLEMEZ. Geri yazılan jeton panoyu
+ * okuyan HERKESE açıktır (gözcü `to` süzmez; pano dosyası `cat`lenebilir), dolayısıyla kanıt
+ * sınıfı en iyi hâlinde `ZAYIF-PAYLASILAN`dır ve YEŞİL yoktur. Yaş TAZE olabilir ve kanıt yine
+ * de iki tarafın işbirliği yapmamasına dayanıyordur. Bu yüzden sınıf AYRI okunur (aşağıda) —
+ * yaşı tek başına basan her yüzey, kaldırılan sahte-yeşili yeniden üretir.
  *
  * DÖNÜŞ: dakika (sayı) · 'KANITSIZ' (damga hiç yok / okunamadı) — "ölçemedim" ile "yok" ayrı
  * şeyler olduğu için etiket KANITSIZ'dır, fakat hüküm fail-closed'dır: kanıtsız katman
  * çökmüş sayılır.
  */
+function damgaOku(sid) {
+  const dy = path.join(BOARD_DIR, '.mekanizma-durum.' + String(sid).slice(0, 8) + '.json')
+  return JSON.parse(fs.readFileSync(dy, 'utf8'))
+}
+
 function teslimDurumu(sid, now) {
   try {
-    const dy = path.join(BOARD_DIR, '.mekanizma-durum.' + String(sid).slice(0, 8) + '.json')
-    const d = JSON.parse(fs.readFileSync(dy, 'utf8'))
+    const d = damgaOku(sid)
     if (!d.teslimDogrulandiTs) return 'KANITSIZ'
     const yas = Math.round((now - Date.parse(d.teslimDogrulandiTs)) / 60000)
     return Number.isFinite(yas) ? yas : 'KANITSIZ'
   } catch {
     return 'KANITSIZ'
+  }
+}
+
+/**
+ * TESLIM KANIT SINIFI — damgaya YAZILANI okur, kendi adını UYDURMAZ (REC-287).
+ *
+ * Sınıfı okuyan yüzey (açılış satırı, yoklama) onu damgadan almak zorundadır: sınıfı yüzeyde
+ * hesaplamak, yarın ölçüt değişince yüzeyin bayat kalması demektir — ve bayat bir kanıt adı,
+ * kanıtın kendisinden daha tehlikelidir (bugünün dersi).
+ *
+ * DÖNÜŞ: 'ZAYIF-PAYLASILAN' | 'ZAYIF-OZ' | null. null = damga yok, okunamadı, ya da REC-287
+ * ÖNCESİ yazılmış ESKİ damga (sınıf alanı yok). Üçünü ayırt etmek çağıranın işi değil: hiçbiri
+ * "yeşil" değildir, ve null'ı yeşil sanmak tam da kapatılan kusurdur.
+ */
+function teslimKanitSinifi(sid) {
+  try {
+    const s = damgaOku(sid).teslimKanitSinifi
+    return typeof s === 'string' && s ? s : null
+  } catch {
+    return null
   }
 }
 
@@ -757,9 +786,22 @@ function yoklama(now = Date.now()) {
         teslimsiz.map((d) => d.c.lane + '/' + d.c.sid.slice(0, 8) + '=' + teslimYaz(d.teslim)).join(', ') +
         '\n  TARAMA yesil olsa bile bildirim KONUSMAYA ulasmiyor olabilir: gozcu sureci compact i' +
         '\n  sag atlatir, teslimat kanali atlatmaz (olculdu 2026-09-01, 62 dk kayip).' +
-        '\n  Kanit: mechanism-setup.cjs prob --sid X, sonra dogrula --sid X --jeton <bildirimdeki>',
+        '\n  Kanit: mechanism-setup.cjs prob --sid X, sonra dogrula --sid X --gordum <bildirimdeki>',
       )
     }
+
+    /**
+     * ⭐REC-287 — TESLIM SUTUNUNUN SINIRI, SUTUNUN YANINDA YAZAR. Bu satir kosulsuzdur:
+     * yalniz teslimatsiz seritler varken basmak, "hepsi taze" gunlerinde tam da yanlis
+     * kanaati (taze = kanitli = yesil) serbest birakmak olurdu. Sutunun yasi TAZE olabilir ve
+     * kanit yine de paylasilan bir jetona dayaniyordur.
+     */
+    altlar.push(
+      '  TESLIM sutunu YAS olcer, GUC olcmez: bu katmanin kanit tavani ZAYIF-PAYLASILAN dir' +
+      '\n  (jeton panoyu okuyan herkese acik; gozcu `to` suzmez, pano dosyasi okunabilir).' +
+      '\n  ⛔Teslimatta YESIL YOKTUR — taze bir TESLIM yasi "bildirim ulasti"yi KANITLAMAZ,' +
+      '\n  iki tarafin isbirligi yapmadigini VARSAYAR (REC-287, olculdu 2026-09-08).',
+    )
 
     const sessiz = durumlar.filter((d) => d.sesDk !== null && d.sesDk > esik.SES_ESIK_DK)
     if (sessiz.length) {

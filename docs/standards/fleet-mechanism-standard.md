@@ -2299,6 +2299,14 @@ Komşuları: §28 (ayrışma tur başına ölçülür) · §22 (ağaç tazeleme)
 
 ## 31. TESLİMAT KANITI BAĞIMSIZ TANIK İSTER — sınavın cevabı sınava girene verilmez
 
+> ⛔**BU BÖLÜMÜN "YEŞİL" HÜKMÜ §34 İLE GEÇERSİZ (2026-09-08, REC-287).** Aşağıdaki üç koşul
+> (bağımsız atan + eşleşme + tazelik) **yürürlüktedir** ve hâlâ gereklidir; **yetersiz** olan,
+> onları sağlayan kanıta **YEŞİL** demekti. Ölçüldü: jeton atanın **kendi gözcü bildirimine de**
+> düşüyor (gözcü `to` süzmez) ve pano dosyası `cat`lenebilir. Kanıt sınıfı bu yüzden
+> **`ZAYIF-PAYLASILAN`**dır ve bu katmanda **yeşil YOKTUR**. §34'ü okumadan bu bölümü kanıt
+> dayanağı olarak kullanma — 2026-09-08'de tam bu bölüme dayanılarak **üç kez** (KATALOG, URUN,
+> OPS) "bağımsız tanık" hükmü verildi.
+
 Mekanizmanın üç katmanından ikisi (gözcü, teslimat) ölçülebilir. Bu bölüm, **ölçülebilir olanın
 nasıl ölçüldüğünü** yönetir — çünkü 2026-09-06'da ölçüldü ki kapı, denetlediği ajanın *beyanına*
 güveniyordu ve **cevabı ona kendi eliyle veriyordu**.
@@ -2522,3 +2530,95 @@ sızmaz · eski tek yuva okunmaya devam eder. Ayrıca cron etiketi kolu (plan ç
 verdi (23 testten 4 düştü); geri alındığında 23/23 yeşil. Ezme kontrolü ayrıca **izole pano
 dizininde** uçtan uca ölçüldü: başkasının canlı kaydında **DURDU (çıkış 2)**; kendi kaydını
 tazelemede, tüketilmiş kayıtta ve `--yine-de` ile **yol verdi** — yani ölçüt ayırt ediyor.
+
+## 34. TESLİMAT KATMANINDA **YEŞİL YOKTUR** — kanıt sınıfı `ZAYIF-PAYLASILAN` (REC-287)
+
+§31 doğru koşulları koydu (bağımsız atan + eşleşme + tazelik) ve o koşullar **yürürlükte**.
+Yanlış olan, onları sağlayan kanıta **YEŞİL** demekti. Bu bölüm o adı geri alır ve **niçin geri
+alınamayacak bir tavan olduğunu** yazar.
+
+### 34.1 Ölçüm (2026-09-08, üç bağımsız gözlem üst üste)
+
+1. **Araç kendi hikâyesiyle çelişiyordu.** `prob --to` yardım metni *"Jeton ATANIN ekranina
+   basilir"* diyordu; kod bağımsız kipte jetonu stdout'a **basmıyordu**. İkisinden biri yanlıştı
+   sanıldı; ölçüm ikisinin de yanlış olduğunu gösterdi — çünkü asıl sorun **stdout değildi**.
+2. **Jeton atanın bildirimine düşüyor.** `gozcu.cjs`, `type:'note'` olan **her** olayı basar;
+   **`to` süzgeci yoktur**. Prob olayının sid'i hedeften türetilmiş **sentetik** bir uuid olduğu
+   için atanın kendi gözcüsü onu elemez. Saha kanıtı: ALTYAPI'nın URUN'a attığı prob **ALTYAPI'nın
+   kendi bildirimine** düştü; OPS gözcüsü de kendisine ait **olmayan** iki probu (3a79 ve 4a8e
+   hedefli) gördü. Yani ekrandan gizlemek bir **hız tümseği**, bariyer değil.
+3. **Ve pano düz bir dosya dizinidir.** Jetonu görmek için hiçbir bildirime gerek yok: `cat`
+   yeter. Bu üçüncüsü ötekileri yutar.
+
+**Sonuç:** kapı fail-open değildi — **sahte-bağımsız**dı. Ve bu, kapının işe yaramadığı anlamına
+gelmez: koşullar gerçek kusurları (öz-prob, kimlik taklidi, bayat/tüketilmiş jeton) hâlâ eliyor.
+Yanlış olan tek şey, geçen kanıtın **ADI**ydı.
+
+### 34.2 Niçin "hedefin kendi koşumunda üretilen ikinci sır" ONARMAZ
+
+Kayıtta üçüncü seçenek olarak duruyordu: jeton, gözcü bildiriminde değil **hedefin kendi
+`dogrula` koşumunda üretilen** ikinci bir sırla eşleşsin; atan onu bilemez.
+
+**Uygulanmadı, ve gerekçesi şudur:** sınanan kanalın **kendisi panodur**, dolayısıyla test
+malzemesi **panodan geçmek zorundadır**. Panodan geçen her şey **dosya erişimiyle okunabilir**.
+İkinci sır, sırrın **yazarını** değiştirir; **okunabilirliğini** değiştirmez. Hangi taraf üretirse
+üretsin, geri yazılan bir jeton şu ikisini **ayırt edemez**:
+
+* bildirim **konuşmaya ulaştı** (ölçmek istediğimiz şey),
+* ajan **dosyayı okudu** (bildirim hiç ulaşmasa da mümkün).
+
+Ayırt etmeyen ölçüt kanıt değildir. Bu yüzden seçenek 3 **reddedildi** ve gerekçesi hem cetvele
+hem `mechanism-setup.cjs` gövdesine yazıldı — yoksa altı ay sonra *"bir nonce ekleyelim"* diye
+yeniden açılır ve aynı yanılsama **daha karmaşık bir kılıkla** geri gelir.
+
+### 34.3 HÜKÜM — üç sınıf, ve en üstteki de yeşil değil
+
+| sınıf | ne zaman | sonuca etkisi |
+|---|---|---|
+| **`ZAYIF-PAYLASILAN`** | akranın attığı **taze** jeton geri yazıldı — bu katmanın **TAVANI** | **kırmızı SAYMAZ**, damga yazılır |
+| **`ZAYIF-OZ`** | kendi probunun jetonu — tavanın **altında**, üstü erişilebilir | **KIRMIZI sayar** |
+| **`KIRMIZI`** | ölçülemedi · eşleşmedi · bayat · kimlik taklidi · tüketilmiş | KIRMIZI |
+
+**`YESIL` sınıfı bu katmanda YOKTUR.** `teslimatKaniti` onu **döndürmez**; `dogrula` ekranına
+**yazmaz**. Tek meşru yeşil **TARAMA** katmanındadır (gözcü imleç ofseti): onu gözcü **süreci**
+yazar, beyanla üretilemez.
+
+**Tavan niçin kırmızı da sayılmıyor:** kanıtlanması **mümkün olmayan** bir katmanı kırmızı saymak
+fail-closed değil **gürültü**dür — her oturum kalıcı ceza alır ve gerçek kırmızılar gölgelenir.
+Aynı hüküm CRON katmanı için **Recep kararıyla** (2026-09-06) zaten verildi; tek fark, orada ölçüm
+**yasak**, burada **imkânsız**.
+
+### 34.4 Sınıf DAMGAYA yazılır — yoksa yeşil yer değiştirir
+
+Kanıt sınıfı `.mekanizma-durum.<sid8>.json` içine **`teslimKanitSinifi`** alanı olarak yazılır ve
+yaşı okuyan her yüzey **sınıfı da** okur (`board.cjs teslimKanitSinifi`). Sebep ölçülmüş:
+`session-board` açılış satırı *"TESLIMAT 45dk once **KANITLI**"* yazıyordu. Sahte-yeşili yalnız
+`mechanism-setup`tan kaldırmak, onu **taşımak** olurdu — ve açılış satırı her oturumun bu katman
+hakkındaki kanaatini tek başına kuran satırdır. `yoklama`nın `TESLIM` sütunu da sınırını
+**koşulsuz** basar: yalnız teslimatsız şerit varken basmak, tam da yanlış kanaatin serbest kaldığı
+günü (hepsi taze) açıkta bırakırdı.
+
+### 34.5 GENEL DERS — adlandırma bir süsleme değil, işin kendisi
+
+Bu vakada **ölçüm doğruydu**: jeton gerçekten eşleşiyordu, gerçekten tazeydi, gerçekten başka bir
+oturum atmıştı. Yanlış olan **tek şey adıydı** — ve üç şerit o ada güvenerek karar verdi.
+`board.cjs`'te zaten yazılı olan ilke (§23) burada bedelini ikinci kez tahsil etti:
+
+> **Bir ölçümün adı, ölçtüğü şeyin sınırını taşımak zorundadır — paneli okuyan, ölçümün kodunu
+> okumaz.**
+
+İkinci ders bunun tersi yönde: **kanıt hijyeni araca yazılamıyorsa, araç bunu SÖYLEMEK
+zorundadır.** `prob --to` artık *"senden istenen, aracın sağlayamadığı şey: jetonu hedefe
+iletme"* der. Disipline dayanan bir garanti, **disipline dayandığını söylediği sürece** meşrudur;
+söylemediği anda sahte kanıt olur.
+
+### 34.6 Kapı
+
+`INV-MECH-BAGIMSIZLIK-1` (`src/__tests__/conformance/fleet-mechanism-integrity.test.ts`):
+çekirdek **hiçbir** fikstürde `YESIL` dönmez (evren kolu) · tavan sınıfı sınırını sebebinde yazar ·
+**CLI gerçekten koşulur** (fikstür pano): akran jetonunda ekranda `TESLIMAT : YESIL` **yok**, sınıf
+adı **var**, çıkış **0**; öz-probda çıkış **1** (ayırt edici çift) · sınıf damgaya yazılır ·
+yardım metninden *"atanin ekranina basilir"* **kalktı** · `gozcu.cjs` basım bloğunda `to` süzgeci
+**yok** (gerekçenin dayanağı; süzgeç eklenirse kol kırmızı verip gerekçenin yeniden ölçülmesini
+ister) · açılış satırı *"KANITLI"* demez ve sınıfı **damgadan** okur · yoklama sınırı koşulsuz
+basar · cetvel bu hükmü taşır.

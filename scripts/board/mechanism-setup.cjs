@@ -169,19 +169,58 @@ const EN_FAZLA_BEKLEYEN = 5
  *   2. jeton eşleşiyor,
  *   3. ve geri yazım TAZE (≤ eşik) — bayat jeton, kanalın BUGÜN çalıştığını söylemez.
  *
- * ⚠GERİYE UYUM BİLEREK KIRILMADI: eski "kendi probum" yolu KIRMIZI'ya çevrilmiyor, `ZAYIF`
+ * ⚠GERİYE UYUM BİLEREK KIRILMADI: eski "kendi probum" yolu KIRMIZI'ya çevrilmiyor, `ZAYIF-OZ`
  * sınıfına alınıyor. Bir ölçütü yükseltirken bütün filoyu aynı anda kırmızıya düşürmek, bu
  * sabah yaşanan ve #997 ile onarılan arızanın ta kendisidir (K8): kimsenin o an ödeyemeyeceği
  * bir borç için kapıyı kapatmak, kapıyı devre dışı bıraktırır.
+ *
+ * ============================================================================
+ * ⭐⭐REC-287 — BU KATMANDA `YESIL` YOKTUR, VE BU BİR EKSİKLİK DEĞİL TAVANDIR.
+ * ============================================================================
+ * Yukarıdaki üç koşul (bağımsız atan + eşleşme + tazelik) doğru koşullardı ama YETERLİ
+ * sanılıyordu. 2026-09-08'de ölçüldü ki değil — ve bu kapı o gün ÜÇ KEZ (KATALOG, URUN, OPS)
+ * "bağımsız tanık" diye kanıt olarak kullanıldı. Ölçüm, üç bağımsız gözlemin üst üste binmesi:
+ *
+ *   1) YARDIM METNİ İLE DAVRANIŞ TERSTİ: `prob --to` yardımı "Jeton ATANIN ekranina basilir"
+ *      diyordu, kod ise bağımsız kipte jetonu stdout'a BASMIYORDU. İkisinden biri yanlıştı;
+ *      ölçüldü, ikisi de yanlıştı — çünkü asıl sorun stdout DEĞİLDİ.
+ *   2) JETON ATANIN BİLDİRİMİNE DÜŞÜYOR: `gozcu.cjs` `type:'note'` olan HER olayı basar,
+ *      `to` süzgeci YOKTUR. Prob olayının sid'i hedeften türetilmiş sentetik bir uuid olduğu
+ *      için ATANIN kendi gözcüsü onu elemez, BASAR. Saha kanıtı: ALTYAPI'nın URUN'a attığı
+ *      PROB-4a8e-QJC8OB ALTYAPI'nın kendi bildirimine düştü; OPS gözcüsü de kendisine ait
+ *      OLMAYAN iki probu (3a79, 4a8e hedefli) gördü. Yani stdout'u gizlemek bir HIZ TÜMSEĞİ.
+ *   3) VE PANO DÜZ BİR DOSYA DİZİNİ: jetonu görmek için hiçbir bildirime gerek yok, `cat`
+ *      yeter. Bu üçüncüsü ötekileri yutar.
+ *
+ * ⛔NİÇİN "HEDEFİN KENDİ KOŞUMUNDA ÜRETİLEN İKİNCİ SIR" (kayıttaki 3. seçenek) ONARMAZ:
+ * Sınanan kanalın KENDİSİ panodur, dolayısıyla test malzemesi panodan geçmek ZORUNDADIR.
+ * Panodan geçen her şey dosya erişimiyle okunabilir. İkinci sır, sırrın YAZARINI değiştirir;
+ * OKUNABİLİRLİĞİNİ değiştirmez. Yani hangi tarafın ürettiğinden bağımsız olarak, geri yazılan
+ * bir jeton "bildirim konuşmaya ULAŞTI" ile "ajan dosyayı OKUDU"yu AYIRT EDEMEZ. Ayırt
+ * etmeyen bir ölçüt kanıt değildir (bugünün tekrar eden dersi). Bu yüzden 3. seçenek
+ * uygulanmadı ve gerekçesi buraya YAZILDI — yoksa altı ay sonra "bir nonce ekleyelim" diye
+ * yeniden açılır ve aynı yanılsama daha karmaşık bir kılıkla geri gelir.
+ *
+ * SONUÇ — ÜÇ SINIF, VE EN ÜSTTEKİ DE YEŞİL DEĞİL:
+ *   `ZAYIF-PAYLASILAN` : akranın attığı taze jeton geri yazıldı. Bu katmanın TAVANI.
+ *                        Kanıt sınıfı "paylaşılan" çünkü jeton panoyu okuyan HERKESE açıktır;
+ *                        gücü mekanizmadan değil iki tarafın İŞBİRLİĞİ YAPMAMASINDAN gelir.
+ *   `ZAYIF-OZ`         : kendi probunun jetonu. Tavanın ALTINDA — daha iyisi erişilebilir.
+ *   `KIRMIZI`          : ölçülemedi / eşleşmedi / bayat / taklit / tüketilmiş.
+ *
+ * ⭐ADLANDIRMA BİR SÜSLEME DEĞİL: `board.cjs`'te yazılı ilke (§23) — "bir ölçümün adı,
+ * ölçtüğü şeyin sınırını taşımak zorundadır; paneli okuyan, ölçümün kodunu okumaz". Sınıfın
+ * adı `YESIL` kaldığı sürece okuyan onu bağımsız kanıt sanar, ve bugün tam bu oldu.
  *
  * @param damga  `.mekanizma-durum.<sid8>.json` içeriği (null olabilir)
  * @param gordum alıcının geri yazdığı jeton (null = verilmedi)
  * @param kendiSid doğrulamayı koşan oturum
  * @param simdiMs şimdi (ms) — SAAT DIŞARIDAN VERİLİR, fikstür kurulabilsin diye
- * @returns {{sinif:'YESIL'|'ZAYIF'|'KIRMIZI', sebep:string, gecenSn:number|null, atanSid?:string}}
- *   `atanSid` YALNIZ YESIL'de doner: kuyrukta HANGI atanin kaydi sayildi. Cagiran tuketim
- *   isaretini ona gore koyar — tek slotta bu bilgi damganin `atanSid` alanindan okunuyordu,
- *   kuyrukta o alan EN SON ataninkidir ve eslesen kayit baskasi olabilir.
+ * @returns {{sinif:'ZAYIF-PAYLASILAN'|'ZAYIF-OZ'|'KIRMIZI', sebep:string, gecenSn:number|null,
+ *   atanSid?:string}} `atanSid` YALNIZ `ZAYIF-PAYLASILAN`da doner: kuyrukta HANGI atanin
+ *   kaydi sayildi. Cagiran tuketim isaretini ona gore koyar — tek slotta bu bilgi damganin
+ *   `atanSid` alanindan okunuyordu, kuyrukta o alan EN SON ataninkidir ve eslesen kayit
+ *   baskasi olabilir. ⛔`YESIL` DONDURULMEZ: bu katmanda o sinif YOKTUR (REC-287).
  */
 /**
  * ⭐BEKLEYEN JETONLARI TEK LİSTEDE TOPLA — yeni sözlük + eski tek slot birlikte.
@@ -307,10 +346,19 @@ function teslimatKaniti({ damga, gordum, kendiSid, simdiMs, esikSn = TESLIM_TAZE
         gecenSn,
       }
     }
+    /**
+     * ⛔BURADA `YESIL` YOKTUR (REC-287). Eski hali `sinif: 'YESIL'` doner ve sebebi
+     * "BAGIMSIZ tanik" diye yazardi. Ikisi de olcumle carpildi: jeton atanin kendi gozcu
+     * bildirimine de dusuyor (gozcu.cjs `to` suzgeci yok) ve pano zaten `cat`lenebilir.
+     * Kanit tavani budur ve ADI tavani soylemek zorundadir.
+     */
     return {
-      sinif: 'YESIL',
-      sebep: 'BAGIMSIZ tanik: jetonu ' + String(eslesen.atanSid).slice(0, 8) + ' atti, '
-        + gecenSn + ' sn icinde geri yazildi',
+      sinif: 'ZAYIF-PAYLASILAN',
+      sebep: 'AKRAN jetonu: ' + String(eslesen.atanSid).slice(0, 8) + ' atti, '
+        + gecenSn + ' sn icinde geri yazildi. ⚠KANIT SINIFI PAYLASILAN — jeton panoyu okuyan '
+        + 'HERKESE aciktir (atanin kendi bildirimine de duser, pano dosyasi cat lenebilir), '
+        + 'yani bu esleme "bildirim KONUSMAYA ulasti" ile "ajan DOSYAYI okudu"yu ayirt ETMEZ. '
+        + 'Gucu mekanizmadan degil iki tarafin isbirligi yapmamasindan gelir; YESIL DEGILDIR.',
       gecenSn,
       // ⭐Cagiran TUKETIM isaretini bu alana gore koyar: "hangi atanin kaydi sayildi".
       // Tek slotta bu bilgi `durum.atanSid`'den okunuyordu; kuyrukta o alan artik EN SON
@@ -324,10 +372,11 @@ function teslimatKaniti({ damga, gordum, kendiSid, simdiMs, esikSn = TESLIM_TAZE
   // yolu fiilen kapalıydı (üç şerit aynı gün ölçtü).
   if (damga.jeton && damga.jeton === gordum) {
     return {
-      sinif: 'ZAYIF',
+      sinif: 'ZAYIF-OZ',
       sebep: 'KENDI probunun jetonu — prob jetonu senin ekranina da basar, yani bu esleme '
-        + '"bildirimde gordum"u KANITLAMAZ. Bagimsiz kanit icin baska bir oturum '
-        + '`prob --to <sid>` atsin, sen `dogrula --gordum <jeton>` ile yaz.',
+        + '"bildirimde gordum"u KANITLAMAZ. Bir ust sinif (ZAYIF-PAYLASILAN) ERISILEBILIR: '
+        + 'baska bir oturum `prob --to <sid>` atsin, sen `dogrula --gordum <jeton>` ile yaz. '
+        + '(O sinif da YESIL degildir — REC-287; ama tavan odur ve bu onun ALTINDADIR.)',
       gecenSn: null,
     }
   }
@@ -449,11 +498,25 @@ async function prob() {
    * Olculmus vaka: 2026-09-07'de ben bu satiri elle `grep -v jeton` ile gizlemek zorunda
    * kaldim ki akranima sizdirmayayim. Kanit hijyeni ajanin disiplinine BIRAKILMAZ, araca yazilir.
    * OZ-PROBDA (hedef yok) jeton BASILIR — atan ile hedef ayni kisidir, gizlemek anlamsiz;
-   * o kanit zaten ZAYIF isaretlenir.
+   * o kanit zaten ZAYIF-OZ isaretlenir.
+   *
+   * ⭐⭐REC-287 DUZELTMESI — YUKARIDAKI GEREKCE YARIM DOGRUYDU, VE YARIM DOGRU BURADA
+   * TEHLIKELIYDI: stdout'u gizlemek jetonu ATANDAN GIZLEMEZ. Olculdu (2026-09-08):
+   *   · `gozcu.cjs` `type:'note'` olan HER olayi basar, `to` suzgeci YOKTUR; prob olayinin
+   *     sid'i hedeften turetilmis sentetik bir uuid oldugu icin ATANIN kendi gozcusu de onu
+   *     eler DEGIL, BASAR. Saha kaniti: ALTYAPI'nin URUN'a attigi PROB-4a8e-QJC8OB atanin
+   *     kendi bildirimine dustu; OPS gozcusu de kendisine ait olmayan iki probu gordu.
+   *   · Ustelik pano duz bir jsonl dizinidir: jetonu gormek icin `cat` yeter.
+   * Yani bu gizleme bir HIZ TUMSEGIDIR, bir bariyer DEGIL — ve o gun "deger atanin ekraninda
+   * gorunmez" cumlesi kanit diye uc kez kullanildi. Cumle DUZELTILDI; gizleme KALDI (zarari
+   * yok, kazasi az), ama artik ne oldugunu SOYLUYOR.
    */
   yaz(
     'PROB YAZILDI: ' + probDosya + ' -> ' + hedef + ' bayt' +
-      (hedefSid ? ', jeton YAZILMADI (bagimsiz prob — deger atanin ekraninda gorunmez)' : ', jeton ' + jeton),
+      (hedefSid
+        ? ', jeton bu ekrana BASILMADI. ⚠Ama GIZLI DEGIL: gozcu `to` suzmez, deger senin'
+          + ' kendi gozcu bildiriminde de gorunur ve pano dosyasi okunabilir (REC-287).'
+        : ', jeton ' + jeton),
   )
   yaz('Gozcunun imleci bu bayta ulasana kadar beklenecek (en cok ' + beklesn + ' sn)...')
 
@@ -523,23 +586,34 @@ async function prob() {
     process.exit(1)
   }
 
+  // ⭐BU YESIL MESRUDUR VE TEK MEKANIK KATMANDIR: imlec ofseti gozcu SURECI tarafindan
+  // yazilir, beyanla uretilemez. Asagidaki teslimat katmaninin yesili YOKTUR (REC-287);
+  // ikisi ayni ciktida yan yana durdugu icin ayrim BURADA adiyla soylenir.
   yaz('YESIL — GOZCU PROBU OKUDU (' + gecen + ' sn icinde, imlec ' + sonOfset + ' >= ' + hedef + ').')
+  yaz('       (Bu, TARAMA katmanidir: gozcu SURECI panoyu okudu. TESLIMAT ayri katmandir.)')
   yaz('')
   if (hedefSid) {
-    // ⛔JETON HICBIR EKRANDA YOK — ne atanin ne hedefin. Tek gorunecegi yer gozcu bildirimi.
-    // Eski hali burada basiyordu; bkz. yukaridaki gerekce (atanin ekrani = aklama yolu).
-    yaz('BAGIMSIZ PROB — hedef ' + hedefSid.slice(0, 8) + ', jeton BASILMADI (bilerek)')
-    yaz('Jeton SENIN ekraninda da YOK: hedef onu yalniz GOZCU BILDIRIMINDE gorebilir.')
-    yaz('Nicin: deger atanin ekranindaysa atan onu hedefe iletebilir ve kapi bunu')
-    yaz('BAGIMSIZ TANIK sanar. Kanit hijyeni disipline degil araca yazilir.')
+    yaz('AKRAN PROBU — hedef ' + hedefSid.slice(0, 8) + ', jeton bu ekrana BASILMADI.')
+    /**
+     * ⭐⭐REC-287: eski hali burada "Jeton SENIN ekraninda da YOK: hedef onu yalniz GOZCU
+     * BILDIRIMINDE gorebilir" yaziyordu. OLCULDU, YANLIS: gozcu `to` suzmez, jeton ATANIN
+     * kendi bildirimine de duser; ustelik pano dosyasi okunabilir. O cumle bu kapinin
+     * "bagimsiz tanik" iddiasinin tek dayanagiydi ve dayanak YOKTU.
+     */
+    yaz('⚠AMA GIZLI DEGIL (REC-287, olculdu): gozcu `to` suzmez — jeton SENIN kendi gozcu')
+    yaz('bildirimine de duser, ve pano dosyasi zaten okunabilir. Ekrandan gizlemek bir HIZ')
+    yaz('TUMSEGIDIR, bariyer DEGIL. Bu yuzden geri yazilan jetonun kanit sinifi YESIL degil')
+    yaz('ZAYIF-PAYLASILAN dir: gucu mekanizmadan degil, senin jetonu HEDEFE ILETMEMENDEN gelir.')
+    yaz('⛔SENDEN ISTENEN, ARACIN SAGLAYAMADIGI SEY: jetonu hedefe iletme.')
     yaz('Hedef sunu kossun (' + TESLIM_TAZELIK_SN + ' sn icinde, yoksa BAYAT sayilir):')
     yaz('   node scripts/board/mechanism-setup.cjs dogrula --sid ' + hedefSid + ' --gordum <bildirimde-gordugun>')
   } else {
     yaz('DIKKAT — BU TESTIN SINIRI, ADIYLA: bu kanit gozcunun panoyu OKUDUGUNU gosterir,')
     yaz('bildirimin AJANA ULASTIGINI gostermez. ⚠Ustelik jeton BU EKRANDA da yaziyor, yani')
-    yaz('kendi probunla verecegin kanit ZAYIF sayilir (kendi kendine tanikliktir).')
-    yaz('BAGIMSIZ kanit icin BASKA bir oturum sunu atsin:')
+    yaz('kendi probunla verecegin kanit ZAYIF-OZ sayilir (kendi kendine tanikliktir).')
+    yaz('Bir UST sinif (ZAYIF-PAYLASILAN) icin BASKA bir oturum sunu atsin:')
     yaz('   node scripts/board/mechanism-setup.cjs prob --sid <kendi-sid> --to ' + sid)
+    yaz('(O sinif da YESIL degildir — bu katmanda yesil YOKTUR, REC-287.)')
   }
 }
 
@@ -595,13 +669,31 @@ function dogrula() {
     if (k.sinif === 'KIRMIZI') {
       yaz('TESLIMAT  : KIRMIZI — ' + k.sebep)
       kirmizi++
-    } else if (k.sinif === 'ZAYIF') {
-      // ⚠YEŞİL DEĞİL ama KIRMIZI da değil: ölçütü yükseltirken filoyu kilitlemiyoruz (K8).
-      yaz('TESLIMAT  : ⚠ZAYIF — ' + k.sebep)
-      yaz('            Bu kanit YOKTAN iyidir ama BAGIMSIZ DEGILDIR; yesil sayilmaz.')
+    } else if (k.sinif === 'ZAYIF-OZ') {
+      // ⚠TAVANIN ALTINDA: daha iyisi (ZAYIF-PAYLASILAN) erişilebilir olduğu için kırmızı sayılır.
+      // Ölçütü yükseltirken filoyu kilitlemiyoruz (K8) ama erişilebilir bir üst sınıf varken
+      // alt sınıfı bedava geçirmek de kapıyı boşa çıkarır.
+      yaz('TESLIMAT  : ⚠ZAYIF-OZ — ' + k.sebep)
+      yaz('            Bu kanit YOKTAN iyidir ama TAVANIN ALTINDADIR; sonuca KIRMIZI yazar.')
       kirmizi++
     } else {
-      yaz('TESLIMAT  : YESIL — ' + k.sebep)
+      /**
+       * ⭐⭐ZAYIF-PAYLASILAN = BU KATMANIN TAVANI — VE KIRMIZI SAYILMAZ (REC-287).
+       *
+       * ⛔"YESIL" KELIMESI BU DALDA GECMEZ. Eski hali `TESLIMAT : YESIL` yaziyordu ve o satir
+       * 2026-09-08'de uc kez bagimsiz kanit diye kullanildi; oysa jeton atanin kendi
+       * bildirimine de dusuyor ve pano cat lenebiliyor (gerekce: teslimatKaniti blogu).
+       *
+       * NICIN KIRMIZI DA SAYILMIYOR: bu sinif erisilebilir olanin EN IYISI. Kanitlanmasi
+       * MUMKUN OLMAYAN bir katmani kirmizi saymak fail-closed degil GURULTUDUR ve gercek
+       * kirmizilari (gozcu, teslimat KIRMIZI kollari) golgeler. Ayni hukum CRON katmani icin
+       * Recep karariyla (2026-09-06) zaten verildi; burada AYNI mantik uygulaniyor — tek fark,
+       * orada olcum YASAK, burada IMKANSIZ.
+       *
+       * Damga YAZILIR: yoklamanin TESLIM sutunu ve acilis satiri bu damganin YASINI olcer.
+       * Damgaya SINIF da yazilir — yoksa asagi akista "kanitli" diye yeniden yesillenir.
+       */
+      yaz('TESLIMAT  : ZAYIF-PAYLASILAN (bu katmanin TAVANI — ⛔YESIL DEGIL) — ' + k.sebep)
       /**
        * ⭐TESLIMAT KANITINA YAS VERILIR (§23 HUKUM 3, olculdu 2026-09-01).
        * Eskiden bu esleşme yalnizca EKRANA basiliyordu: kanit ANLIKTI, yasi yoktu.
@@ -620,6 +712,13 @@ function dogrula() {
           JSON.stringify({
             ...durum,
             teslimDogrulandiTs: new Date().toISOString(),
+            /**
+             * ⭐SINIF DAMGAYA YAZILIR (REC-287): asagi akis (board.cjs TESLIM sutunu,
+             * session-board acilis satiri) yalniz YASI okuyordu ve yasi "KANITLI" diye
+             * sunuyordu. Sinif yazilmazsa kaldirdigimiz sahte-yesil bir sonraki yuzeyde
+             * yeniden dogar. Okuyan, dayanagi damgadan gorebilmelidir.
+             */
+            teslimKanitSinifi: k.sinif,
             teslimKanit: { kimden: k.atanSid || durum.atanSid || null, gecenSn: k.gecenSn },
             /**
              * ⭐TUKETIM ISARETI (kusur, 2026-09-06/07 — uc canli tanik): dogrulanan jeton
@@ -644,8 +743,10 @@ function dogrula() {
   } else {
     yaz('TESLIMAT  : OLCULEMEDI — --gordum verilmedi. Gozcunun OKUDUGU kanitli olabilir ama')
     yaz('            bildirimin sana ULASTIGI kanitli DEGIL. Olcemedim != gecti.')
-    yaz('            Bagimsiz kanit: baska bir oturum `prob --to ' + sid.slice(0, 8) + '...` atsin,')
-    yaz('            jetonu BILDIRIMDE gorunce `dogrula --gordum <jeton>` yaz.')
+    yaz('            En iyi erisilebilir sinif ZAYIF-PAYLASILAN: baska bir oturum')
+    yaz('            `prob --to ' + sid.slice(0, 8) + '...` atsin, jetonu BILDIRIMDE gorunce')
+    yaz('            `dogrula --gordum <jeton>` yaz. ⛔O sinif da YESIL degildir (REC-287):')
+    yaz('            jeton panoyu okuyan herkese aciktir, atanin kendi bildirimine de duser.')
     kirmizi++
   }
 
@@ -672,7 +773,13 @@ function dogrula() {
     yaz('SONUC: KIRMIZI — ' + kirmizi + ' kalem kanitlanmadi. Fail-closed: kanitlanmayan katman COKMUS sayilir.')
     process.exit(1)
   }
-  yaz('SONUC: YESIL — olculebilir katmanlar olculdu, beyan edilenler beyan olarak isaretlendi.')
+  /**
+   * ⚠SONUCUN YESILI TESLIMATIN YESILI DEGILDIR (REC-287). Bu satir "kirmizi kalem yok" der;
+   * teslimat katmaninin TAVANI ise ZAYIF-PAYLASILAN'dir ve orada yesil YOKTUR. Ikisini ayirt
+   * etmeyen bir okuyucu, kaldirdigimiz sahte-yesili bu satirdan geri uretir.
+   */
+  yaz('SONUC: KIRMIZI YOK — olculebilir katmanlar olculdu, beyan edilenler beyan olarak isaretlendi.')
+  yaz('       ⛔TESLIMAT katmaninin tavani ZAYIF-PAYLASILAN dir; bu satir onu YESIL yapmaz.')
 }
 
 // Saf çekirdek DIŞARI AÇILIR: fikstürle beslenebilmesi kolun tek gerçek kanıtıdır.
@@ -688,11 +795,18 @@ if (require.main === module) {
     yaz('kullanim: mechanism-setup.cjs <plan|prob|dogrula> --sid <uuid> [secenekler]')
     yaz('  plan    : kurulumun tam metnini uretir (serit ofset tablosu burada SSOT)')
     yaz('  prob    : DIS OLAYLA ayirt edici test — gozcu canli mi, mekanik olcum')
-    yaz('            --to <hedef-sid> : BASKA bir oturum icin jeton at (BAGIMSIZ tanik).')
-    yaz('                               Jeton ATANIN ekranina basilir, hedefe BASILMAZ.')
+    yaz('            --to <hedef-sid> : BASKA bir oturum icin jeton at (AKRAN probu).')
+    yaz('                               Jeton ATANIN EKRANINA BASILMAZ; ama GIZLI DE DEGILDIR —')
+    yaz('                               gozcu `to` suzmedigi icin atanin kendi BILDIRIMINE duser')
+    yaz('                               ve pano dosyasi okunabilir (REC-287, olculdu 2026-09-08).')
     yaz('  dogrula : uc katmanin durumunu raporlar; OLCULEN ile BEYAN EDILEN i ayirir, fail-closed')
-    yaz('            --gordum <jeton> : bildirimde gorunen jetonu geri yaz (BAGIMSIZ kanit)')
-    yaz('            --jeton  <jeton> : ESKI yol; kendi probun — ⚠ZAYIF sayilir, yesil DEGIL')
+    yaz('            --gordum <jeton> : bildirimde gorunen jetonu geri yaz')
+    yaz('                               → sinif ZAYIF-PAYLASILAN: bu katmanin TAVANI, ⛔YESIL DEGIL.')
+    yaz('                                 Kirmizi da SAYILMAZ (kanitlanmasi imkansiz katman).')
+    yaz('            --jeton  <jeton> : ESKI yol; kendi probun → ZAYIF-OZ, tavanin ALTI, KIRMIZI sayar')
+    yaz('  ⛔BU KATMANDA YESIL YOKTUR: sinanan kanal panodur, panodan gecen her sey `cat`')
+    yaz('     lenebilir. Bu yuzden geri yazilan jeton "bildirim ULASTI" ile "ajan OKUDU"yu')
+    yaz('     AYIRT EDEMEZ — hangi taraf uretirse uretsin (REC-287 gerekcesi kodda yazili).')
     process.exit(2)
   }
 }
