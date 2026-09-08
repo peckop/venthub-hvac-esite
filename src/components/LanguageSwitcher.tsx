@@ -12,6 +12,13 @@ import { useI18n } from '../i18n/I18nProvider'
  * (header `hidden md:block` ile gizlenir ama DOM'dan silinmez), sabit bir `id` o an
  * ÇİFTLENİRDİ. Varsayılan korunuyor; ikinci örnek kendi id'sini verir.
  */
+/**
+ * Düğmelerin GÖRÜNEN yazısı. Erişilebilir ad da buradan kurulur (aşağıya bak) — tek kaynak
+ * olmasının sebebi ölçülmüş bir kusurdur: görünen yazı ile erişilebilir ad ayrı yazılınca
+ * ikisi ayrıştı ve `label-content-name-mismatch` doğdu (REC-268).
+ */
+const DIL_KODU = { tr: 'TR', en: 'EN' } as const
+
 const LanguageSwitcher: React.FC<{ id?: string }> = ({ id = 'language-switcher' }) => {
   const { lang, setLang, t } = useI18n()
   const pathname = usePathname()
@@ -56,18 +63,28 @@ const LanguageSwitcher: React.FC<{ id?: string }> = ({ id = 'language-switcher' 
       role="group"
       aria-label={t('common.languageSwitcher')}
     >
+      {/* ⭐ERİŞİLEBİLİR AD, GÖRÜNEN YAZIYI İÇERİR (REC-268 · WCAG 2.5.3 "Label in Name").
+          ÖLÇÜLDÜ (Lighthouse a11y, `label-content-name-mismatch`, 2 ihlal): düğmelerin
+          görünen yazısı `TR`/`EN` iken erişilebilir adı `Türkçe`/`İngilizce` idi — yani ad,
+          görünen yazıyı HİÇ içermiyordu. Bedeli somut: sesle komut veren kullanıcı ekranda
+          gördüğü "TR"yi söylediğinde düğme BULUNAMAZ.
+          Çözüm ikisini birleştirir: kısa kod okunabilirliği korur, tam ad ekran okuyucuya
+          hangi dil olduğunu söyler. Kod ve görünen yazı TEK yerden gelir ki ileride biri
+          değişip diğeri kalmasın — kusur tam olarak buydu.
+          `TR`/`EN` sözlüğe girmez: bunlar çevrilecek METİN değil, dilin kendi kodudur ve
+          her iki dilde de aynı yazılır (kural 7 kapsamı dışında). */}
       <button
         onClick={() => switchLanguage('tr')}
         className={`px-3 py-1 text-sm rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${lang === 'tr' ? 'bg-primary-navy text-white' : 'text-industrial-gray hover:bg-light-gray'}`}
         aria-pressed={lang === 'tr'}
-        aria-label={t('common.turkish')}
-      >TR</button>
+        aria-label={`${DIL_KODU.tr} — ${t('common.turkish')}`}
+      >{DIL_KODU.tr}</button>
       <button
         onClick={() => switchLanguage('en')}
         className={`px-3 py-1 text-sm rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${lang === 'en' ? 'bg-primary-navy text-white' : 'text-industrial-gray hover:bg-light-gray'}`}
         aria-pressed={lang === 'en'}
-        aria-label={t('common.english')}
-      >EN</button>
+        aria-label={`${DIL_KODU.en} — ${t('common.english')}`}
+      >{DIL_KODU.en}</button>
     </div>
   )
 }

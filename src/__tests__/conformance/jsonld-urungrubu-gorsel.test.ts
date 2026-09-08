@@ -7,6 +7,9 @@ import type { FamilyVariant } from '../../lib/services/family.service'
  * INV-URUNGRUBU-GORSEL-1 — aile sayfasının `ProductGroup` yapısal verisi, ürünün
  * görseli VARSA onu yayınlar; YOKSA alanı hiç yazmaz.
  *
+ * CETVEL: `docs/standards/urun-yapisal-veri-standard.md` §2.1. Bu kapı o belgenin
+ * uygulayıcısıdır; kural orada, ölçümü burada.
+ *
  * NİÇİN (REC-269 bulgu 3, ölçüm 2026-09-07 canlı `venthub.com.tr`): üç aile sayfasının
  * ÜÇÜNDE de `ProductGroup.image` yoktu. Google'ın ürün zengin sonuçlarında görsel fiilen
  * zorunludur — görselsiz kayıt çoğu yüzeyde HİÇ gösterilmez. Yani sayfa yapısal veriyi

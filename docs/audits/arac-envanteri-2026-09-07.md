@@ -487,6 +487,7 @@ gerektirmez).
 | arac-envanteri-standard | Araç Envanteri Standardı (v1.0 — 2026-09-07) | OPS | docs/README.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | satis-kipi-gecis-standard | Satış Kipi Geçiş Cetveli — v1.0 | OPS | cagiran-yok (betik taramasi; anma: docs/plans/rec168-migration-taslagi-2026-09-06.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | hafiza-kancalari-standard | Hafıza Kancaları Standardı (REC-177) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| urun-yapisal-veri-standard | VentHub Ürün Yapısal Verisi Standardı (Cetvel) — v1.0 | URUN | src/__tests__/conformance/jsonld-urungrubu-gorsel.test.ts (INV-URUNGRUBU-GORSEL-1) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 
 ---
 

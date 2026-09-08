@@ -197,7 +197,12 @@ const RATCHETS: Ratchet[] = [
     // metin fotoğrafın altına indi. Karartma katmanları (`bg-slate-950/40`, gradyan) ve
     // koyu zemin gerekçesini kaybedip SİLİNDİ; beyaz üzerine okunan metin ham `slate-*`
     // yerine token renklerini kullanıyor. Kazanç yan üründür, hedef değildi.
-    tavan: 1457,
+    // 2026-09-08 · 1457 -> 1456: REC-268 — anasayfadaki "tümünü gör" bağlantısı
+    // `text-slate-400` ile beyaz zeminde 2,51:1 kontrast veriyordu (WCAG AA eşiği 4,5:1;
+    // Lighthouse ölçümü). `industrial-gray` token'ına geçti, aynı zeminde 9,9:1. Yani
+    // ham gri borcunun bu satırı, bir ERİŞİLEBİLİRLİK kusuruydu — token'a geçmek ikisini
+    // birden kapattı. Kazanç yan ürün değil, tam olarak hedefti.
+    tavan: 1456,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
