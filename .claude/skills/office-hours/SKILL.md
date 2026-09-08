@@ -108,7 +108,7 @@ Adım 3 ve 4 koşar.
 3. **Mevcut kod ne kadarını çözüyor?** CodeGraph ile: hangi servis/bileşen/hesaplayıcı zaten var?
    (Kural: yeniden yazmadan önce yeniden kullan.)
 4. **Kural çatışması var mı?** CLAUDE.md 13 mutlak kural + ilgili cetvel: fikir bunlardan biriyle
-   çelişiyorsa (ör. Edge'de DB sorgusu, PPR, `ssr:false`) burada söylenir, planda değil.
+   çelişiyorsa (ör. Edge'de DB sorgusu, `ssr:false`, PPR — PPR kullanılmıyor, örnek olarak anılır) burada söylenir, planda değil.
 5. **Render/önbellek etkisi:** fikir statik vitrin sayfasında görünen bir veriye dokunuyorsa
    `rendering-cache-standard.md` gereği tetik + revalidate dalı gerekir (2026-08-15 arızası).
 
