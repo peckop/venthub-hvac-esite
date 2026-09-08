@@ -19,8 +19,28 @@
  * marker'lar cevaplar; seçim kaynağını değiştirmek onu çözmez. İkisi ayrı eksen.
  */
 
-/** Rotanın SINIFI — dinamik seçimde sınıf korunur (temsilci değişir, sınıf değişmez). */
-export type Sinif = 'anasayfa' | 'liste' | 'kok-kategori' | 'alt-kategori' | 'pdp'
+/**
+ * Rotanın SINIFI — dinamik seçimde sınıf korunur (temsilci değişir, sınıf değişmez).
+ *
+ * ⭐ADLAR 2026-09-08'DE DEĞİŞTİ, ÇÜNKÜ ESKİ ADLAR YALAN SÖYLÜYORDU (REC-286).
+ * Eski `kok-kategori` / `alt-kategori`, adresin KAÇ SEGMENTLİ olduğunu anlatıyordu.
+ * REC-205 iki seviyeli adresleri kaldırdıktan sonra bu ayrım adreste KALMADI: DB'de kök
+ * olan 6 kategori ile onun altındaki 17 kategori aynı biçimde, tek segmentli adreste
+ * yayınlanıyor. O gün "kok-kategori" adı, ölçülen şeyin adı olmaktan çıktı ve kapı
+ * `aksiyel-sanayi-fanlari`yı (DB'de FANLAR'ın ALTI) "kök kategori" sanıp 09-07 19:14Z'den
+ * itibaren her yayında kırmızı verdi — canlıda hiçbir arıza yokken.
+ *
+ * Yeni adlar sayfanın YAPISINI söyler, adresini değil: bir kategori sayfası ya alt grup
+ * başlığı basar (`altgruplu-kategori`) ya aile kartı basar (`yaprak-kategori`). Ölçülen
+ * şey buydu; ad artık ona uyuyor.
+ */
+export type Sinif = 'anasayfa' | 'liste' | 'altgruplu-kategori' | 'yaprak-kategori' | 'pdp'
+
+/** Bir sınıfın niçin ölçülemediği — ⛔SESSİZ ATLAMA YASAK, sebep tüketiciye TAŞINIR. */
+export interface Atlanan {
+  sinif: Sinif
+  sebep: string
+}
 
 /** PDP'de bilinçli olarak istemciye düşen bir ada — İLAN kalemi. */
 export interface BilincliAda {
@@ -103,10 +123,14 @@ export interface Kural {
 
 /** Sitemap'ten seçilen temsilciler — koşum çıktısında BASILIR (hangi slug seçildi görünsün). */
 export interface Temsilciler {
-  kokKategori: string | null
-  altKategori: string | null
+  altgrupluKategori: string | null
+  yaprakKategori: string | null
   pdp: string | null
-  sayimlar: { kokKategori: number; altKategori: number; pdp: number }
+  sayimlar: { kategori: number; ikiSegmentli: number; pdp: number }
+  /** Seçim İÇERİKTEN mi yapıldı (kaç aday çekildi) — beyan, koşum çıktısına basılır. */
+  secim: { icerikten: boolean; denenenAday: number; adayTavani: number }
+  /** Temsilcisi bulunamayan sınıflar + SEBEP. Boş dizi = her sınıf ölçüldü. */
+  atlananlar: Atlanan[]
 }
 
 const SITEMAP_YOLU = '/sitemap.xml'
@@ -154,59 +178,143 @@ export async function temsilcileriSec(
     })
     .filter(Boolean)
 
-  const kok = yollar.filter((p) => /^\/tr\/category\/[^/]+$/.test(p))
-  const alt = yollar.filter((p) => /^\/tr\/category\/[^/]+\/[^/]+$/.test(p))
+  const kategori = yollar.filter((p) => /^\/tr\/category\/[^/]+$/.test(p))
+  const ikiSegmentli = yollar.filter((p) => /^\/tr\/category\/[^/]+\/[^/]+$/.test(p))
   const pdp = yollar.filter((p) => /^\/tr\/products\/[^/]+$/.test(p))
 
-  const sayimlar = { kokKategori: kok.length, altKategori: alt.length, pdp: pdp.length }
+  const sayimlar = {
+    kategori: kategori.length,
+    ikiSegmentli: ikiSegmentli.length,
+    pdp: pdp.length,
+  }
   // Sıralama SABİTLENİR: sitemap sırası değişse bile aynı taban aynı temsilciyi verir,
   // yoksa "dün geçti bugün düştü" gürültüsünün sebebi ölçülemez hâle gelir.
   const ilk = (l: string[]): string | null => (l.length ? [...l].sort()[0] : null)
 
   /**
-   * ⭐KÖK KATEGORİ TEMSİLCİSİ, ALT KATEGORİSİ OLANLARDAN SEÇİLİR — ölçümle öğrenildi.
+   * ⭐TEMSİLCİ ARTIK ADRESTEN DEĞİL İÇERİKTEN SEÇİLİR — REC-286, 2026-09-08.
    *
-   * İlk hâlinde "ilk kök kategori" seçiliyordu ve `aksesuarlar` geldi; kol DÜŞTÜ.
-   * Ölçtüm (canlı, üç sayfa yan yana): kök kategoriler HOMOJEN DEĞİL —
-   *   · `fanlar` (alt kategorili) → `>Alt Ürün Grupları<` = 1, `family-card` = 0
-   *   · `aksesuarlar` (alt kategorisiz) → `>Alt Ürün Grupları<` = 0, `family-card` = 1
-   * Yani alt kategorisi olmayan kök kategori YAPRAK gibi davranıp aile kartı basıyor.
-   * Sınıfın markerı doğruydu, TEMSİLCİ SEÇİMİ sınıfın tanımına uymuyordu: "kök kategori"
-   * dediğim şey aslında "alt kategorisi olan kök kategori"ydi. Ölçüt keskin, evren yanlış.
+   * ÖNCEKİ HÂL VE BEDELİ: iki seviyeli yol kalmadığı için (REC-205) `ikiSegmentli` kümesi
+   * boştu ve seçim `kategoriler[1]`e, yani ALFABETİK İKİNCİ yola düşüyordu. Canlıda o yol
+   * `aksiyel-sanayi-fanlari` — DB'de kök DEĞİL, FANLAR'ın altı; alt grubu olmadığı için
+   * `>Alt Ürün Grupları<` basmıyor. Sonuç: alarm 09-07 19:14Z'den itibaren HER yayında
+   * kırmızı, canlıda hiçbir arıza yokken. Üç kaynak birebir uyuştu: alarm logu kategori=23 ·
+   * prod DB kök 6 + alt 17 = 23 · katalog şeridinin kendi sayımı. Bir gözlem daha geri
+   * çekildi: "canlı yanlış sayfa döndürüyor" ölçüm hatasıydı (iki ayrı /tmp), site hiç
+   * yanlış sayfa vermedi.
+   *
+   * ⭐DERS, VE NİÇİN TAM BU DOSYADA: bu dosya yukarıda "kök kategoriler HOMOJEN DEĞİL,
+   * ölçüt keskin evren yanlış" dersini ZATEN yazmıştı — ama çareyi yalnız yaprak sınıfının
+   * markerına uygulayıp TEMSİLCİ SEÇİMİNE uygulamayı atlamıştı. Yani ders yazılıydı, sadece
+   * yarısı işletiliyordu. Bu yüzden ayrım artık tek yerde ve ADRESE HİÇ BAKMADAN yapılıyor.
+   *
+   * NASIL: adaylar alfabetik sırayla (deterministik) çekilir; her aday BİR kez indirilir ve
+   * iki desen AYNI gövdede aranır. İkisi de dolduğunda döngü durur, yani ek istek sayısı
+   * `adayTavani`yi geçmez.
+   * ⛔TAVAN SESSİZ DEĞİL: tavana takılırsa `secim.denenenAday` ile birlikte raporlanır ve
+   * bulunamayan sınıf `atlananlar`a SEBEBİYLE yazılır — "bulamadım" hâli yeşile karışmaz.
    */
-  const altPrefixleri = new Set(alt.map((p) => p.split('/').slice(0, 4).join('/')))
-  const kokAltli = kok.filter((p) => altPrefixleri.has(p))
-
   /**
-   * ⭐HİYERARŞİ ARTIK YOLDA KODLANMIYOR — ölçüt yol derinliğine bağlı kalamaz (2026-09-07).
+   * ⭐TAVAN 8 DEĞİL 24 — ÖLÇÜLDÜ, İLK DEĞER SINIFI ÖLÇÜLMEDEN BIRAKIYORDU (2026-09-08).
    *
-   * REC-205 iki seviyeli kategori adreslerini KALDIRDI: aynı sayfa iki adresten yayınlanıyor,
-   * ikisi de kendini kanonik ilan ediyordu ve Google iki seviyeliyi eliyordu (17 alt kategori
-   * × 2 dil = 34 çift adres). Sonuç: `alt` kümesi SIFIRA düştü ve bu kapı "zorunlu sınıfın
-   * temsilcisi yok" diyerek KIRMIZI verdi — oysa alt kategori sayfaları duruyor ve çalışıyor,
-   * yalnız adresleri tek seviyeli. **Regresyon değil, EVREN DEĞİŞTİ.** Ölçüt keskindi, evren
-   * kaydı — bu dosyanın yukarıdaki yorumunda yazan dersin aynısı, bu kez bana çarptı.
+   * İlk hâlinde tavan 8'di. Canlıya karşı koşulduğunda alarm YEŞİL döndü ama çıktısında
+   * şu yazıyordu: "8 aday çekildi, hiçbiri alt grup başlığı basmadı → sınıf ÖLÇÜLMEDİ".
+   * Sebep: sitemap'teki 23 kategori alfabetik ve alt grubu OLAN `fanlar` ilk sekizde
+   * değil. Yani onarım çalışıyordu, tavan kördü — ve tam da bu yüzden atlamanın SEBEBİYLE
+   * raporlanması şart: sessiz olsaydı "yeşil" der geçerdim, sınıf ölçülmeden.
    *
-   * Çare: iki seviyeli yol VARSA eski davranış korunur (geriye dönük); yoksa temsilciler tek
-   * seviyeli kategorilerden seçilir ve AYRIM İÇERİKTEN yapılır (aşağıdaki kural bloğunda:
-   * "aile kartı BASAR ya da alt grup başlığı BASAR" — ikisi de yoksa boş kabuk demektir).
+   * 24 = sitemap'teki kategori sayısının (23) bir fazlası; katalog birkaç kategori büyürse
+   * de tarama tamamlanır. Erken çıkış zaten var (iki temsilci dolunca döngü durur), yani
+   * tipik koşum tavana DEĞMEZ. Tavan sonsuz döngüye değil, KATALOG PATLAMASINA karşı.
+   * ⚠MALİYET ÖLÇÜLDÜ: tavan 8 iken alarm 17.5s (temsilcisiz), taban hâli 5.75s idi.
    */
-  const kategoriler = [...kok].sort()
+  const ADAY_TAVANI = 24
+  const ALTGRUP_DESENI = />Alt Ürün Grupları</
+  const YAPRAK_DESENI = /data-ssr="family-card"/
+
+  const adaylar = [...kategori].sort()
+  const atlananlar: Atlanan[] = []
+
+  // Geriye dönük kol: iki seviyeli yol VARSA eski (ucuz, isteksiz) ayrım korunur.
+  if (ikiSegmentli.length > 0) {
+    const altPrefixleri = new Set(ikiSegmentli.map((p) => p.split('/').slice(0, 4).join('/')))
+    const t: Temsilciler = {
+      altgrupluKategori: ilk(kategori.filter((p) => altPrefixleri.has(p))),
+      yaprakKategori: ilk(ikiSegmentli),
+      pdp: ilk(pdp),
+      sayimlar,
+      secim: { icerikten: false, denenenAday: 0, adayTavani: ADAY_TAVANI },
+      atlananlar,
+    }
+    if (!t.altgrupluKategori) {
+      atlananlar.push({
+        sinif: 'altgruplu-kategori',
+        sebep: 'iki segmentli yol var ama hiçbiri tek segmentli bir kategoriyle eşleşmedi',
+      })
+    }
+    zorunluKontrol(t, sayimlar)
+    return t
+  }
+
+  let altgrupluKategori: string | null = null
+  let yaprakKategori: string | null = null
+  let denenenAday = 0
+
+  for (const yol of adaylar) {
+    if (altgrupluKategori && yaprakKategori) break
+    if (denenenAday >= ADAY_TAVANI) break
+    denenenAday++
+    let html = ''
+    try {
+      const r = await getir(`${taban}${yol}`)
+      if (!r.ok) continue
+      html = await r.text()
+    } catch {
+      // Tek adayın çekilememesi seçimi bitirmez; tavan zaten üst sınırı koyuyor.
+      continue
+    }
+    if (!altgrupluKategori && ALTGRUP_DESENI.test(html)) altgrupluKategori = yol
+    if (!yaprakKategori && YAPRAK_DESENI.test(html)) yaprakKategori = yol
+  }
+
+  if (!altgrupluKategori) {
+    atlananlar.push({
+      sinif: 'altgruplu-kategori',
+      sebep:
+        `${denenenAday} aday çekildi (tavan ${ADAY_TAVANI}, sitemap'te ${sayimlar.kategori} kategori), ` +
+        'hiçbiri alt grup başlığı basmadı — temsilci YOK, sınıf ÖLÇÜLMEDİ (yeşil DEĞİL)',
+    })
+  }
+
   const t: Temsilciler = {
-    kokKategori: ilk(kokAltli) ?? kategoriler[1] ?? kategoriler[0] ?? null,
-    altKategori: ilk(alt) ?? kategoriler[0] ?? null,
+    altgrupluKategori,
+    yaprakKategori,
     pdp: ilk(pdp),
     sayimlar,
+    secim: { icerikten: true, denenenAday, adayTavani: ADAY_TAVANI },
+    atlananlar,
   }
-  if (!t.altKategori || !t.pdp) {
+  zorunluKontrol(t, sayimlar)
+  return t
+}
+
+/**
+ * FAIL-CLOSED: kapıda koşan sınıfların temsilcisi yoksa HATA.
+ *
+ * `altgruplu-kategori` bu listede YOK ve olmaması bilinçli: o sınıf `kapida: false`
+ * (i18n sözlük metnine bağlı, bkz. kural bloğu). Temsilcisi bulunamadığında kapı kırmızı
+ * OLMAZ ama sınıf `atlananlar`a yazılır — ölçülmeyen şey yeşil sayılmaz, GÖRÜNÜR olur.
+ */
+function zorunluKontrol(t: Temsilciler, sayimlar: Temsilciler['sayimlar']): void {
+  if (!t.yaprakKategori || !t.pdp) {
     throw new Error(
-      'SSR duman kuralları: zorunlu sınıfların temsilcisi YOK ' +
-        `(kategori=${sayimlar.kokKategori}, alt-kategori=${sayimlar.altKategori}, pdp=${sayimlar.pdp}). ` +
-        'Kapı KIRMIZI. NOT: sitemap\'te HİÇ kategori yolu yoksa bu gerçek bir kusurdur; ' +
-        'yalnız iki seviyeli yol yoksa (REC-205) kapı tek seviyeliden temsilci seçer.'
+      'SSR duman kuralları: KAPIDA koşan sınıfların temsilcisi YOK ' +
+        `(kategori=${sayimlar.kategori}, iki-segmentli=${sayimlar.ikiSegmentli}, pdp=${sayimlar.pdp}, ` +
+        `içerikten=${t.secim.icerikten}, denenen aday=${t.secim.denenenAday}/${t.secim.adayTavani}). ` +
+        'Kapı KIRMIZI. NOT: sitemap\'te HİÇ kategori/PDP yolu yoksa bu gerçek bir kusurdur; ' +
+        'aday çekilebildiği hâlde hiçbiri aile kartı basmıyorsa bu da gerçek bir kusurdur.'
     )
   }
-  return t
 }
 
 /**
@@ -249,11 +357,11 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
      * "6/6 yeşil" dedim, o yeşilin biri BEDAVAYDI. Artık temsilci sitemap'ten geldiği
      * için pasif kategori zaten seçilemiyor; marker da ayırt edici olana çevrildi.
      */
-    ...(t.kokKategori
+    ...(t.altgrupluKategori
       ? [
           {
-            yol: t.kokKategori,
-            sinif: 'kok-kategori' as Sinif,
+            yol: t.altgrupluKategori,
+            sinif: 'altgruplu-kategori' as Sinif,
             markerlar: [/<h1[\s>]/, />Alt Ürün Grupları</],
             maxBailout: 0,
             kapida: false,
@@ -272,11 +380,22 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
      * **Ne kaybettik:** artık "bu sayfa YAPRAK ve aile kartı basıyor" diye kesin bir şey
      * söylemiyoruz. **Ne korunuyor:** boş kabuk (ikisi de yok) hâlâ KIRMIZI, bailout tavanı 0.
      * Daha güçlü hâli, temsilciyi içerikten seçmeyi gerektirir (bir tur ön-getirme) — ayrı iş.
+     *
+     * ✅O AYRI İŞ YAPILDI (REC-286, 2026-09-08) ve ÖLÇÜT GERİ SIKILAŞTI — RATCHET.
+     * Temsilci artık içerikten seçildiği için "yaprak" sınıfının temsilcisi `family-card`
+     * BASTIĞI ÖLÇÜLEREK seçiliyor; o hâlde ölçüt "ikisinden biri" olmak zorunda değil,
+     * `family-card`ın KENDİSİ. Yukarıda "ne kaybettik" diye yazılan şey geri alındı.
+     * ⛔GEVŞEK KOL NİÇİN DURUYOR: iki segmentli yol varsa (REC-205 öncesi biçim) seçim
+     * içerikten YAPILMAZ, temsilci doğrulanmamış olur — o hâlde eski gevşek ölçüt geçerli.
+     * Yani ölçütün sıkılığı, seçimin gücüne BAĞLI ve bu bağ burada yazılı; sıkı ölçütü
+     * doğrulanmamış temsilciye uygulamak sahte kırmızı üretirdi.
      */
     {
-      yol: t.altKategori as string,
-      sinif: 'alt-kategori',
-      markerlar: [/<h1[\s>]/, /(data-ssr="family-card"|>Alt Ürün Grupları<)/],
+      yol: t.yaprakKategori as string,
+      sinif: 'yaprak-kategori',
+      markerlar: t.secim.icerikten
+        ? [/<h1[\s>]/, /data-ssr="family-card"/]
+        : [/<h1[\s>]/, /(data-ssr="family-card"|>Alt Ürün Grupları<)/],
       maxBailout: 0,
       kapida: true,
     },

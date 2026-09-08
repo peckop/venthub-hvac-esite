@@ -24,6 +24,7 @@ import {
   kurallar,
   PDP_BILINCLI_ADALAR,
   PDP_MAX_BAILOUT,
+  temsilcileriSec,
 } from '../../../tests/smoke/ssr-kurallari'
 
 /** Depo kökü GIT'ten türetilir — sabit yol yazmak INV-MUTLAK-YOL-1 ihlalidir. */
@@ -320,10 +321,12 @@ describe('INV-DUMAN-6: PDP bailout tavanı İLAN edilmiş adalardan türer (mand
    * yazılabilir bir ölçüt değildir — uygulanabilir tek ölçüt sayıdır.
    */
   const fakeTemsilciler = {
-    kokKategori: '/tr/category/a',
-    altKategori: '/tr/category/a/b',
+    altgrupluKategori: '/tr/category/a',
+    yaprakKategori: '/tr/category/a/b',
     pdp: '/tr/products/x',
-    sayimlar: { kokKategori: 1, altKategori: 1, pdp: 1 },
+    sayimlar: { kategori: 1, ikiSegmentli: 1, pdp: 1 },
+    secim: { icerikten: false, denenenAday: 0, adayTavani: 8 },
+    atlananlar: [],
   }
 
   it('her ilan kalemi DOLU ve TEKİL — boş kalemle sayı şişirilemez', () => {
@@ -371,5 +374,153 @@ describe('INV-DUMAN-6: PDP bailout tavanı İLAN edilmiş adalardan türer (mand
     const fazla = ihlaller(pdp, govde(pdp.maxBailout + 1))
     expect(fazla.length, 'tavanın bir fazlası ihlal DOĞURMADI — sayım kör').toBe(1)
     expect(fazla[0]).toContain(`${pdp.maxBailout + 1} > ${pdp.maxBailout}`)
+  })
+})
+
+/**
+ * INV-DUMAN-7 — TEMSİLCİ SEÇİMİ İÇERİKTEN YAPILIR (REC-286).
+ *
+ * NİÇİN BU KOL VAR: 2026-09-08'de alarm 09-07 19:14Z'den beri HER yayında kırmızıydı ve
+ * canlıda hiçbir arıza yoktu. Sebep, temsilcinin ADRESTEN seçilmesiydi: iki segmentli yol
+ * kalmadığı için (REC-205) seçim ALFABETİK İKİNCİ yola düşüyor, o yol da DB'de kök olmayan
+ * bir kategori (`aksiyel-sanayi-fanlari`) oluyordu; alt grubu olmadığı için alt grup başlığı
+ * basmıyor ve sınıf ölçütü onu ihlal sayıyordu.
+ *
+ * ⛔BU KOLLAR OLMASA onarım SESSİZCE geri alınabilirdi: seçim tekrar alfabetiğe dönse
+ * canlıda hiçbir şey değişmez, yalnız alarm yine yanlış sayfayı seçer — yani kusur ancak
+ * bir yayın sonrası, gürültü olarak geri gelirdi.
+ */
+describe('INV-DUMAN-7: temsilci ADRESTEN değil İÇERİKTEN seçilir', () => {
+  const SITEMAP = (yollar: string[]): string =>
+    `<urlset>${yollar.map((y) => `<loc>https://x${y}</loc>`).join('')}</urlset>`
+
+  /** Sahte ağ: her yola verilen gövdeyi döner; hangi yolların çekildiğini KAYDEDER. */
+  const sahteAg = (
+    sitemapYollari: string[],
+    govdeler: Record<string, string>
+  ): { getir: (u: string) => Promise<{ ok: boolean; status: number; text: () => Promise<string> }>; cekilen: string[] } => {
+    const cekilen: string[] = []
+    return {
+      cekilen,
+      getir: async (u: string) => {
+        if (u.endsWith('/sitemap.xml')) {
+          return { ok: true, status: 200, text: async () => SITEMAP(sitemapYollari) }
+        }
+        cekilen.push(u)
+        const g = govdeler[u]
+        if (g === undefined) return { ok: false, status: 404, text: async () => '' }
+        return { ok: true, status: 200, text: async () => g }
+      },
+    }
+  }
+
+  const ALTGRUPLU_GOVDE = '<html><h1>Fanlar</h1><h2>Alt Ürün Grupları</h2></html>'
+  const YAPRAK_GOVDE = '<html><h1>Aksesuarlar</h1><div data-ssr="family-card"></div></html>'
+  const PDP = '/tr/products/x'
+
+  it('⭐ALFABETİK İKİNCİ olan ama alt grubu OLMAYAN yol temsilci SEÇİLMEZ', async () => {
+    // 09-08 vakasının birebir kurgusu: alfabetik ilk iki yol da alt grup basmıyor,
+    // alt grup basan yol listede ÜÇÜNCÜ. Eski kod `[1]`i seçip kırmızı verirdi.
+    const yollar = ['/tr/category/aksesuarlar', '/tr/category/aksiyel-sanayi-fanlari', '/tr/category/fanlar', PDP]
+    const { getir } = sahteAg(yollar, {
+      '/tr/category/aksesuarlar': YAPRAK_GOVDE,
+      '/tr/category/aksiyel-sanayi-fanlari': YAPRAK_GOVDE,
+      '/tr/category/fanlar': ALTGRUPLU_GOVDE,
+    })
+    const t = await temsilcileriSec('', getir)
+    expect(t.secim.icerikten, 'iki segmentli yol yokken seçim İÇERİKTEN olmalı').toBe(true)
+    expect(
+      t.altgrupluKategori,
+      'alt gruplu temsilci alfabetik sıraya göre seçilmiş — 09-08 kusuru GERİ GELDİ'
+    ).toBe('/tr/category/fanlar')
+    expect(t.yaprakKategori, 'yaprak temsilcisi aile kartı basan İLK yol olmalı').toBe(
+      '/tr/category/aksesuarlar'
+    )
+    expect(t.atlananlar, 'her iki sınıf da bulundu, atlanan olmamalı').toEqual([])
+  })
+
+  it('SABOTAJ: hiçbir kategori alt grup basmazsa sınıf SESSİZ GEÇMEZ, SEBEBİYLE atlanır', async () => {
+    const yollar = ['/tr/category/a', '/tr/category/b', PDP]
+    const { getir } = sahteAg(yollar, {
+      '/tr/category/a': YAPRAK_GOVDE,
+      '/tr/category/b': YAPRAK_GOVDE,
+    })
+    const t = await temsilcileriSec('', getir)
+    expect(t.altgrupluKategori, 'temsilci yokken uydurulmuş').toBeNull()
+    // ⛔Kritik: yokluk YEŞİL değil, KAYITLI. Sebep metni koşum günlüğüne basılır.
+    expect(t.atlananlar.length, 'atlama kaydı YOK — sessiz yeşil sınıfı').toBe(1)
+    expect(t.atlananlar[0].sinif).toBe('altgruplu-kategori')
+    expect(t.atlananlar[0].sebep, 'sebep sayıyı taşımıyor').toContain('aday çekildi')
+    // Kural üretimi de o sınıfı ÜRETMEZ (kol "kural kayıp" diye kırmızı olmaz, atlanır).
+    expect(kurallar(t).some((k) => k.sinif === 'altgruplu-kategori')).toBe(false)
+    // Kapıda koşan sınıf ise DURUYOR: atlama yalnız alarm sınıfına özgü.
+    expect(kurallar(t, true).map((k) => k.sinif)).toContain('yaprak-kategori')
+  })
+
+  it('SABOTAJ: aile kartı basan hiçbir yol yoksa kapı KIRMIZI (fail-closed korunur)', async () => {
+    const yollar = ['/tr/category/a', PDP]
+    const { getir } = sahteAg(yollar, { '/tr/category/a': ALTGRUPLU_GOVDE })
+    // Yaprak sınıfı KAPIDA: temsilcisi bulunamazsa atlanmaz, HATA atar.
+    await expect(temsilcileriSec('', getir)).rejects.toThrow(/KAPIDA koşan sınıfların temsilcisi YOK/)
+  })
+
+  it('ADAY TAVANI aşılmaz ve tavan SESSİZ DEĞİL — denenen sayı raporlanır', async () => {
+    // 40 kategori, hiçbiri alt grup basmıyor: tavan devreye girer.
+    const cokYol = Array.from({ length: 40 }, (_, i) => `/tr/category/k${String(i).padStart(2, '0')}`)
+    const govdeler: Record<string, string> = {}
+    for (const y of cokYol) govdeler[y] = YAPRAK_GOVDE
+    const { getir, cekilen } = sahteAg([...cokYol, PDP], govdeler)
+    const t = await temsilcileriSec('', getir)
+    expect(t.secim.denenenAday, 'tavan aşıldı — her yayında 40 istek atan alarm').toBeLessThanOrEqual(
+      t.secim.adayTavani
+    )
+    expect(cekilen.length, 'çekilen istek sayısı tavanı aştı').toBeLessThanOrEqual(t.secim.adayTavani)
+    expect(t.atlananlar[0].sebep, 'tavan bilgisi sebepte YOK — sessiz cap').toContain(
+      `tavan ${t.secim.adayTavani}`
+    )
+  })
+
+  it('⭐YAPRAK ÖLÇÜTÜ İÇERİKTEN SEÇİMDE SIKI, doğrulanmamış seçimde GEVŞEK (ratchet)', async () => {
+    const yollar = ['/tr/category/a', '/tr/category/b', PDP]
+    const { getir } = sahteAg(yollar, {
+      '/tr/category/a': YAPRAK_GOVDE,
+      '/tr/category/b': ALTGRUPLU_GOVDE,
+    })
+    const icerikten = await temsilcileriSec('', getir)
+    const sikiKural = kurallar(icerikten).find((k) => k.sinif === 'yaprak-kategori')
+    if (!sikiKural) throw new Error('yaprak kuralı kayıp')
+    // SIKI: alt grup başlığı basan gövde artık yaprak sınıfını GEÇMEZ.
+    expect(
+      ihlaller(sikiKural, ALTGRUPLU_GOVDE).length,
+      'içerikten seçimde ölçüt gevşek kalmış — REC-286 ratchet kaybı'
+    ).toBe(1)
+    expect(ihlaller(sikiKural, YAPRAK_GOVDE), 'aile kartı basan gövde geçmeliydi').toEqual([])
+
+    // GEVŞEK: iki segmentli yol varsa seçim adrestendir, temsilci doğrulanmamıştır.
+    const { getir: g2 } = sahteAg(['/tr/category/a', '/tr/category/a/b', PDP], {})
+    const adresten = await temsilcileriSec('', g2)
+    expect(adresten.secim.icerikten, 'iki segmentli yol varken içerikten seçim yapılmamalı').toBe(
+      false
+    )
+    const gevsekKural = kurallar(adresten).find((k) => k.sinif === 'yaprak-kategori')
+    if (!gevsekKural) throw new Error('yaprak kuralı kayıp (geriye dönük kol)')
+    expect(
+      ihlaller(gevsekKural, ALTGRUPLU_GOVDE),
+      'doğrulanmamış temsilciye SIKI ölçüt uygulanmış — sahte kırmızı üretir'
+    ).toEqual([])
+  })
+
+  it('DETERMİNİZM: aynı sitemap aynı temsilciyi verir (sıra karışsa da)', async () => {
+    const govdeler = {
+      '/tr/category/a': YAPRAK_GOVDE,
+      '/tr/category/m': ALTGRUPLU_GOVDE,
+      '/tr/category/z': ALTGRUPLU_GOVDE,
+    }
+    const d1 = await temsilcileriSec('', sahteAg(['/tr/category/z', '/tr/category/m', '/tr/category/a', PDP], govdeler).getir)
+    const d2 = await temsilcileriSec('', sahteAg(['/tr/category/a', '/tr/category/z', '/tr/category/m', PDP], govdeler).getir)
+    expect(d1.altgrupluKategori, 'sitemap sırası temsilciyi değiştirdi — gürültü kaynağı').toBe(
+      d2.altgrupluKategori
+    )
+    expect(d1.altgrupluKategori, 'alfabetik ilk UYGUN aday seçilmeli').toBe('/tr/category/m')
   })
 })
