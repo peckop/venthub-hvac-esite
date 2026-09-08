@@ -372,3 +372,99 @@ jobs:
       # TLS teshisi BILEREK TEKRARLANMADI: kardes is ayni sunucuya ayni sertifikayla
       # baglaniyor ve zincir teshisini o basiyor. Ayni teshisi iki yere kopyalamak,
       # birini guncelleyip digerini unutmanin davetidir.
+
+  # ---------------------------------------------------------------------------
+  # INV-TIP-DRIFT-1 — `src/types/database.types.ts` CANLI SEMAYLA SENKRON MU (REC-121).
+  #
+  # NICIN CI'YA BAGLANIYOR: kapi #1125 ile geldi ve HICBIR IS ONU CAGIRMIYORDU — yalniz
+  # elle kosuluyordu. Bu, kardesi INV-RLS-COVERAGE-1'in bire bir tekrari olurdu: o kapi da
+  # #712 ile gelmis, cagiran olmadigi icin yakaladigi kusur (client_errors) 2026-06-02'den
+  # 2026-08-20'ye kadar kimsenin gormedigi bir bosluk olarak yasamisti. Elle kosulan kapi,
+  # kosulmadigi her gun YOKTUR.
+  # Olcum kapinin varlik sebebini de dogruluyor: 2026-09-01'de tipler canli semanin
+  # GERISINDEYDI (diff +76/-1) ve 09-07'de HALA geriydi (order_number_counters tablosu,
+  # saat tabanli fonksiyon). Migration merge edilince prod'a OTOMATIK uygulaniyor (kural 13);
+  # tip dosyasi ELLE uretiliyor. Arada kapi yoktu.
+  #
+  # ⭐NICIN AYRI IS — ve bu karar kardes adimin KENDI KURALINDAN cikiyor:
+  # `Aile-kategori tutarlilik kapisi` adimi ayni ise BAGLANMISTI ve gerekcesi yaziliydi:
+  # "ayni sirri (SUPABASE_DB_URL) ve ayni kok sertifikayi kullaniyor". Bu kapi icin o cumle
+  # TERSINE doner ve olculdu: tip-drift `pg` surucusu KULLANMAZ, kok sertifika OKUMAZ,
+  # SUPABASE_DB_URL'e HIC baglanmaz. Yaptigi is `supabase gen types --project-id` ile
+  # Supabase API'sinden tip URETMEK, ve bunun kimligi BASKA bir sirdir: SUPABASE_ACCESS_TOKEN.
+  # Farkli kimlik + farkli arac + farkli hata kipi = ayri is. `catalog-integrity` isine
+  # eklemek, bu kapinin kosabilmesini ALAKASIZ bir sirrin (DB_URL) varligina baglardi;
+  # o sir yoksa tip-drift atlanir ve ATLANAN IS YESIL SANILIR.
+  #
+  # ⛔KAPSAM DURUSTLUGU — "bagli" ile "bloklayan" AYNI SEY DEGIL: master dal korumasinin
+  # zorunlu baglamlari ["ci","admin-smoke","Vercel"]. Bu is de kardesleri gibi o listede
+  # DEGIL; kirmizi oldugunda GORUNUR ama merge'i mekanik olarak DURDURMAZ. Listeye eklemek
+  # depo AYARI degisikligidir (Recep kapisi) ve bu PR onu YAPMIYOR.
+  #
+  # ⚠KIRMIZININ MUHATABI BU PR OLMAYABILIR, ve bu satir bilerek burada: drift DEPO
+  # DURUMUDUR, PR durumu degil. Bir migration inip tipler yenilenmediyse, o gunden sonraki
+  # HER PR'da bu is kirmizi yanar. Onarim `pnpm supabase:gen` ve dosyanin sahibi URUN'dur
+  # (AXIOM 3: kapi olcer, onarmaz). Adim ciktisi bunu ADIYLA yazar ki kirmiziyi goren kisi
+  # kendi PR'inda sebep aramakla vakit kaybetmesin.
+  #
+  # Cetvel: scripts/db/checks/tip-drift.mjs bas yorumu · docs/standards/uretilmis-artefakt-standard.md
+  # ---------------------------------------------------------------------------
+  tip-drift-precheck:
+    runs-on: ubuntu-latest
+    # Bir sir yoklamasi; kardesiyle ayni gerekce (PRICING'in timeout bulgusu).
+    timeout-minutes: 5
+    outputs:
+      ready: ${{ steps.probe.outputs.ready }}
+    steps:
+      - name: Sir var mi (SUPABASE_ACCESS_TOKEN)
+        id: probe
+        env:
+          ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -Eeuo pipefail
+          # ⛔AYRI ON-YOKLAMA, `db-gate-precheck`e EKLENMEDI: o is DB_URL'i olcuyor ve iki
+          # kapiya hizmet ediyor. Ucuncu kapinin onkosulu BASKA bir sir; ayni ise koymak
+          # "DB_URL var ama ACCESS_TOKEN yok" halinde isi KOSTURUR ve is, sir yokluguyla
+          # ilgisi olmayan bir hatayla (supabase CLI oturum acamadi) kirmizi doner —
+          # yani ATLANMASI gereken bir olcum, ARIZA gibi gorunur.
+          # Fork PR'larinda sirlar YOKTUR: orada bu is ATLANIR ve atlandigi SOYLENIR.
+          if [ -n "${ACCESS_TOKEN:-}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "SUPABASE_ACCESS_TOKEN var -> INV-TIP-DRIFT-1 KOSACAK"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=TIP-DRIFT KAPISI ATLANDI::SUPABASE_ACCESS_TOKEN yok -> INV-TIP-DRIFT-1 ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda tip dosyasinin canli semayla senkron olup olmadigi OLCULMEDI."
+          fi
+
+  tip-drift:
+    needs: tip-drift-precheck
+    if: needs.tip-drift-precheck.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    # Yerel olcum 2026-09-08: 62 tablo/786 kolon iki tarafta, kosum ~40 sn (CLI indirmesi
+    # dahil). Tavan genis tutuldu cunku `npx supabase@latest` indirmesi ag hizina bagli;
+    # ama SINIRSIZ birakilmaz - PRICING'in bulgusu: timeout'suz is havuz asilirsa
+    # GitHub varsayilaniyla 6 saat asili kalir.
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # ⛔`Install pg driver only` adimi BILEREK YOK: bu betik `pg` KULLANMAZ. Kardes
+      # islerden kopyalanan gereksiz bir kurulum, kapinin kirmizisini kendi bagimliligiyla
+      # kirletir (npm peer catismasi yuzunden kirmizi = VERIYLE ilgisi olmayan kirmizi).
+      - name: Tip-drift kapisi (INV-TIP-DRIFT-1)
+        env:
+          # `supabase gen types --project-id` Supabase API'sine baglanir; kimligi budur.
+          # Proje kimligi SIR DEGIL ve ortamdan OKUNMAZ: betik onu package.json'daki
+          # `supabase:gen` komutundan cikarir, boylece kapi ile uretim AYNI projeyi olcer.
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -Eeuo pipefail
+          echo "NOT: bu kapi DEPO DURUMUNU olcer, bu PR'in degisikligini degil."
+          echo "     Kirmizi olursa onarim: pnpm supabase:gen (dosya sahibi URUN, AXIOM 3)."
+          node scripts/db/checks/tip-drift.mjs

@@ -30,8 +30,16 @@
  * ⛔BU BETİK `src/types/database.types.ts`'İ YAZMAZ, yalnız OKUR. O dosya URUN şeridinin
  * mülkü ve üretilmiş bir artefakt; kapı ölçer, onarımı sahibi yapar (AXIOM 3).
  *
- * KULLANIM: node scripts/db/checks/tip-drift.mjs
+ * KULLANIM: node scripts/db/checks/tip-drift.mjs [--tip-dosyasi <yol>]
  * ÇIKIŞ: 0 = senkron · 1 = DRIFT (şema farkı) · 2 = ÖLÇEMEDİM (fail-closed)
+ *
+ * ⭐`--tip-dosyasi` NİÇİN VAR (REC-121 CI bağlama adımı, 2026-09-08): kapının KIRMIZI
+ * tarafını göstermek için commit'li tip dosyasını BOZMAK gerekiyordu — ama o dosya URUN'un
+ * mülkü ve üretilmiş bir artefakt (AXIOM 3). Kardeş kapıda (`aile-kategori-tutarlilik.mjs`)
+ * aynı sorun `--fikstur` ile çözülmüştü, çünkü orada sabotaj PROD'a yazmak olurdu ve o
+ * Recep kapısıdır. Aynı gerekçe burada da geçerli: sabotaj başkasının artefaktına
+ * yazmak olurdu. Bayrak yalnız OKUNAN yolu değiştirir; canlı taraf her zaman API'den
+ * üretilir, yani "iki taraf da fikstür" hâli MÜMKÜN DEĞİLDİR.
  */
 
 import { execFileSync } from 'node:child_process'
@@ -40,7 +48,21 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
-const TIP_DOSYASI = 'src/types/database.types.ts'
+const VARSAYILAN_TIP_DOSYASI = 'src/types/database.types.ts'
+
+/** `--tip-dosyasi <yol>` verilmişse onu okur; yoksa commit'li artefakt. */
+function tipDosyasiSec(argv) {
+  const i = argv.indexOf('--tip-dosyasi')
+  if (i === -1) return VARSAYILAN_TIP_DOSYASI
+  const yol = argv[i + 1]
+  if (!yol) {
+    console.error('[tip-drift] --tip-dosyasi verildi ama YOL YOK — olcemedim (fail-closed).')
+    process.exit(2)
+  }
+  return yol
+}
+
+const TIP_DOSYASI = tipDosyasiSec(process.argv)
 
 /**
  * Ayrıştırıcı sağlık tabanı — ÖLÇÜLDÜ (2026-09-07, canlı şema): 4580 satır üretimde
