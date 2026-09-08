@@ -78,8 +78,25 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({
           )}
         </div>
 
-        {/* Mobile: Horizontal Scroll | Desktop: Grid */}
-        <div className="flex overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar gap-4 md:grid md:grid-cols-2 lg:grid-cols-4 lg:gap-2 md:overflow-visible md:pb-0">
+        {/* ⭐RECEP KARARI (2026-09-08), lafzıyla tek harf: "A".
+            Üç çerçeveli bir karşılaştırma görseli üzerinden seçti (bugünkü karusel · A: iki
+            sütunlu ızgara · B: işaretli karusel). SEÇİLEN: MOBİLDE DE IZGARA — yatay kaydırma
+            KALKAR.
+
+            NİÇİN (ölçüldü, tercih değil):
+            · Vitrinde 6 kart var; iki sütunda ÜÇ SATIR eder ve hepsi aşağı kaydırmayla görünür.
+              Aşağı kaydırma telefonun doğal hareketi, yatay kaydırma değil.
+            · Yatay kaydırmada kullanıcı devamı olduğunu ANLAMIYORDU: çubuğu gizleyen sınıf
+              (`hide-scrollbar`) vardı ama yerine hiçbir işaret konmamıştı — ne yarım görünen
+              sonraki kart, ne nokta, ne kenar solması. Yani içerik saklanıyordu ve bu, ana
+              sayfadaki kategori vitrininde doğrudan kayıptır: burası navigasyonun giriş kapısı.
+            · Masaüstü ZATEN ızgaraydı (`md:grid`); mobili de ızgara yapmak iki ayrı davranışı
+              teke indirir — bakım ve ölçüm yarıya iner.
+
+            BEDELİ, saklamadan: kart 390px ekranda 280px'ten 171px'e iner
+            ((358 − 16) / 2; kap `px-4`, aradaki boşluk `gap-4`). Bu daralmanın #1114 düzenine
+            (yazı fotoğrafın altında) etkisi AYRICA ölçüldü — aşağıdaki başlık notuna bak. */}
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-2">
           {displayCategories.map((category, idx) => {
             const finalSrc = normalizeImageUrl(category.image_url, FALLBACK_CATEGORY_IMAGE, 'category-images');
 
@@ -95,7 +112,11 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({
                    ölçülen sonuç: aynı satırdaki kartların görsel yükseklikleri 164px ile
                    140px arasında değişiyordu. Izgara zaten hücreleri eşit yükseklikte
                    uzatır, yani kartlar yine hizalı kalır. */
-                className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass} group relative flex-shrink-0 w-280px sm:w-320px md:w-auto snap-center overflow-hidden bg-white`}
+                /* Sabit genişlik ve kaydırma-yakalama sınıfları KALKTI (`flex-shrink-0`,
+                   `w-280px`, `sm:w-320px`, `md:w-auto`, `snap-center`): hepsi yatay karuselin
+                   gereğiydi. Izgarada genişliği sütun verir; sabit genişlik bırakmak hücreyi
+                   taşırır. */
+                className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass} group relative overflow-hidden bg-white`}
               >
                 {/* ⭐RECEP KARARI (2026-09-07), lafzıyla: "zaten bizdeki A seçeneği ve ben
                     bundan rahatsızım.. Yani B". İki varyant canlı sayfa üzerine uygulanıp
