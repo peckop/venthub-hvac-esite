@@ -347,6 +347,24 @@ PR kapı takibi (`#578`/`#580`/`#584`) · dalga onayları Recep'ten çıkınca d
 ADMIN-CUSTOMER=`6cc7f2d3` · EDGE=`4397deef` · PRICING=`f68f03d8` · AUTH=`99fa366e` · QUOTE=`e033dc3e` ·
 ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
+### Controller — SKILL şeridi (Fable oturumu `0df102e3`, 2026-09-08, tek gün)
+- **OPS'A NOT (Recep istedi, 2026-09-08):** Recep 11 repo + gstack/strix/Agent-Reach'i "projeye
+  faydası var mı" diye sordu; ölçüm sonucu LLM ekibine iki şey ekliyor, Recep "bu ikisini al" dedi.
+  **PR `#1116`** (`claude/gunaydın-rrt2g1` → master, migration yok): **`office-hours`** skill'i
+  (fikir sorgusu — plandan ÖNCEKİ basamak; altı zorlayıcı soru + öncül çürütme + 2-3 yol →
+  `docs/plans/` tasarım notu; kod/emir/plan yazmaz) ve **`qa`** skill'i (Playwright+Chromium ile
+  gerçek tarayıcı denetimi: gez → kanıt → atomik `fix(qa)` → yeniden ölç; `scripts/gez.mjs`
+  yerelde ölçüldü; prod'da yalnız bakış, "Ödemeye Geç" hiç basılmaz). `execution-method-standard.md`
+  karar tablosuna iki satır işlendi. **OPS'tan beklenen:** gün kapanışında Kararlar defteri +
+  bu pano başlığına "yeni yetenek" kaydı; PR merge'ü Recep onayıyla. Alınmayanlar (ECC, paperclip,
+  agency-agents, browser-use, Scrapling/scrapy, unsloth, CL4R1T4S, open-design, archify,
+  Agent-Reach) oturumda gerekçelendi; **strix** (dinamik pentest, yalnız staging) "lansman öncesi
+  denetim" emri açılınca yeniden gündeme gelir.
+- **Ölçülen kısıt:** uzak Claude Code konteynerinde Chromium dış siteye çıkamıyor (proxy CONNECT
+  reddi); orada `qa` hedefi yerel `pnpm start`, preview/prod bakışı yerel makineden. Pano notları
+  (`C:/tmp/venthub-board`) konteynerde yerel kalıyor, eş-Controller'a ULAŞMIYOR — bu yüzden not
+  buraya yazıldı (kural: kendi bölümüme).
+
 ---
 
 ## Büyük Resim (zincir)
