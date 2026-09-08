@@ -175,3 +175,24 @@ onu açık borç olarak kaydeder.
 
 Recep emri *"aksiyel fan çatısında olmalı"* uygulandı ve 11 ürün `axial-industrial-fans`'ta.
 **Teknik olarak yanlış raf.** Karar Recep'te: aksiyelde mi kalsın, santrifüj/radyal tarafa mı taşınsın.
+
+---
+
+## ✅SANTRİFÜJ ÇELİŞKİSİ KAPANDI — Recep: *"olması gereken adrese taşı"*
+
+11 VORTICENT CMS ATEX ürünü + ailesi → **`centrifugal-fans` (Santrifüj / Radyal Fanlar)**,
+üst kategori `fans`. Hedef aktif ve 122 ürünlü.
+
+⭐**§8 ilk kez BAŞTAN doğru uygulandı:** ürün ve aile **tek işlemde birlikte** taşındı
+(`with u as (update products…), f as (update product_families…)`). Bugünkü iki yarım taşımanın
+aksine tek seferde tuttu.
+
+| ölçüm | sonuç |
+|---|---|
+| taşınan | **11 ürün + 1 aile** |
+| INV-AILE-KATEGORI-1 | **0 ayrışma** |
+| `radyal-fanlar` vitrini | **12 ürün ailesi**, VORTICENT var |
+| `aksiyel-sanayi-fanlari` vitrini | 3 → **2 ürün ailesi**, VORTICENT **yok** |
+
+Her iki taraf da ölçüldü: yalnız "geldi mi" değil **"gitti mi"** de doğrulandı — taşımanın
+kanıtı iki uçludur.
