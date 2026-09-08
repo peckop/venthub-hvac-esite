@@ -26,7 +26,7 @@
 | **Workflow** | Deterministik betikle çok ajanı düzenleme: fan-out → çürütme → sentez | Tek koşum | ORTA-YÜKSEK (ajan sayısına göre) |
 | **maestro** (skill) | Çok dosyaya **aynı** yapısal değişikliği paralel dalgalarla uygulama + yargıç + merkezi kapı | Tek koşum, çok PR | YÜKSEK ama elle yapmaktan ucuz |
 | **agy-orchestrate** (skill) | Antigravity/Gemini filosuyla ucuz geniş tarama; Claude CodeGraph ile doğrular | Tek koşum | DÜŞÜK (Claude kotası yerine Gemini) |
-| **Tekil skill** (plan-challenger, diff-review, code-review, 20-eksen, prd-complexity, supabase-security…) | Paketlenmiş tek amaçlı prosedür | Tek koşum | DÜŞÜK-ORTA |
+| **Tekil skill** (office-hours, plan-challenger, diff-review, code-review, qa, 20-eksen, prd-complexity, supabase-security…) | Paketlenmiş tek amaçlı prosedür | Tek koşum | DÜŞÜK-ORTA |
 | **Plan modu** (`EnterPlanMode`) | Kapsamı belirsiz işi ÖNCE ölçüp planlamak: paralel salt-okuma `Explore` ajanları + `AskUserQuestion` ile kapsam sorusu → plan | Tek koşum; plan Linear kaydına ve `docs/plans/`e kalır | DÜŞÜK-ORTA (ajanlar sonnet, yazma yok) |
 | **Elle** (oturumun kendisi) | Doğrudan okuma/düzenleme | — | En ucuz, en dar |
 
@@ -41,8 +41,10 @@
 | **Çok-eksenli denetim** ya da bulgunun **bağımsız çürütülmesi** gerekiyor ("gerçek mi?") | **Workflow** (fan-out + çürütme + sentez) | Kullanıcı açık opt-in vermediyse araç kilitli → emirde **"workflow kullan"** yazmalı | `docs/audits/` |
 | Repo çapında **geniş tarama** ("her X'i bul", 50+ dosya) | **agy-orchestrate** (ucuz) → CodeGraph doğrulama | Yargı gerektiren her adım (agy tarar, karar vermez) | `docs/audits/` |
 | **Aynı yapısal değişiklik çok hedefe** (24 admin sayfası → ortak kit; 40 bileşen → aynı hook) | **maestro** | Tek dosya · hedefler birbirinden farklı (o zaman şerit içinde sıralı) | Dalga PR'ları |
+| **Fikir / "şunu yapsak mı"** — emir açılmadan, plan yazılmadan ÖNCE ("doğru problem mi, talep kanıtı ne, en dar dilim ne") | **office-hours** (altı zorlayıcı soru + öncül çürütme + 2-3 yol → tasarım notu) | Kapsamı belli tek iş · Kararlar defterinde kapanmış konu (yeniden açma) · yazılmış planın red-team'i (→ plan-challenger) | `docs/plans/<konu>-tasarim-notu-*.md` + Recep'e ödev |
 | **Plan** yazıldı, uygulanmadan önce — özellikle **migration / veri göçü / rota değişikliği** | **plan-challenger** (red-team) | Docs-only plan, geri alınabilir tek PR | `red_team_report.md` → plana "ÇELİŞEN-MEVCUT" |
 | **PR diff** incelemesi | **diff-review** / **code-review** | — | PR yorumu |
+| **Uygulama gerçekten çalışıyor mu** — görsel/etkileşimli değişiklik, "öyle mi oldu", PR öncesi tarayıcı kanıtı, hidrasyon/Suspense-kökte şüphesi | **qa** (Playwright+Chromium ile gez → kanıt → atomik düzeltme → yeniden ölç) | Kod okuma denetimi (→ 20-eksen/auditor) · birim test · prod'da eylem (yalnız bakış) · uzak konteynerde dış URL (yerel `pnpm start`) | `docs/audits/qa-<hedef>-<tarih>.md` + ekran görüntüsü |
 | **Lansman öncesi / büyük katman değişti** | **venthub-20-eksen-denetimi** (karne) | Tek kusur avı | `docs/audits/` karne |
 | "Neyi silebiliriz, vizyona sadık mı" | **prd-complexity-audit** | Bug avı | `docs/audits/` |
 | RLS / politika / migration yazımı | **supabase-security** + plan-challenger | — | migration + INV |
