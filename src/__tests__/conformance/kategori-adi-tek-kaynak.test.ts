@@ -46,6 +46,32 @@ const KOK = join(process.cwd(), 'src')
  * veritabanından ölçüldü (23/23). Konformans testi ağa çıkamaz, bu yüzden liste
  * DONDURULMUŞTUR. DB'ye yeni kategori eklendiğinde bu liste ve iki sözlük birlikte
  * güncellenir; güncellenmezse o kategori İngilizce sayfada Türkçe ad basar.
+ *
+ * ── ⚠BU LİSTENİN ÖLÇMEDİĞİ HÂL, ADIYLA (2026-09-08, ALTYAPI'nın bildirimi üzerine) ──
+ * Sabitin adı `DB_` diyor ama liste **elle yazılıdır ve DB'den okunmaz**. Aşağıdaki
+ * `.length === 23` iddiası bu listeyi KENDİNE karşı doğrular, canlı şemaya karşı değil.
+ * Yani ayırt EDEMEDİĞİ hâl şudur: **liste ile DB'nin ayrışması.** DB'de artık olmayan bir
+ * anahtar listede kalsa da yeşil verir; DB'ye yeni kategori girse de yeşil verir.
+ *
+ * Bu bir kusur DEĞİL, bilinçli bir sınırdır: konformans kapıları çevrimdışı ve
+ * deterministik olmak zorunda. Listeyi DB'den türetmek kapıyı ağa bağımlı yapar — ağ
+ * kesildiğinde kapı ya kırmızı yanıp yalan söyler ya da atlanıp fail-open olur. Sınır
+ * KABUL EDİLİYOR ama artık YAZILI: ölçmediğini bilmek, ölçtüğünü sanmaktan iyidir.
+ *
+ * ⭐TAZELİK ÖLÇÜMÜ, 2026-09-08 (REC-286 penceresi): canlı DB'de `is_active = true` ve
+ * `translation_key IS NOT NULL` olan kategoriler sayıldı → **23 satır, listeyle BİREBİR
+ * aynı. Ayrışma YOK.** Ölçüm o gün KATALOG'un 7 kategori silmesinden SONRA yapıldı;
+ * silinenlerin hepsi `is_active = false` olduğu için bu listeye zaten hiç girmiyorlardı.
+ *
+ * Ölçerken bir yanlış-alarm da elendi ve kayda geçiyor: `air-curtains` ve
+ * `heat-recovery-vmc` bu listede o adlarla YOK — çünkü liste **slug değil anahtar**
+ * taşır; karşılıkları `sub.air-curtain` ve `hrv`. Eksik değil, farklı anahtarlama.
+ * (Yan not, kusur değil ama okuyanı yanıltır: `sub.air-curtain` `level = 0` yani KÖK bir
+ * kategoridir, `sub.` öneki buna rağmen duruyor.)
+ *
+ * AYRIŞMAYI ölçmek isteyen, bunu bir KAPI olarak değil bir ÖLÇÜM işi olarak kurmalı
+ * (ALTYAPI'nın `tip-drift.mjs` deseni: canlı şemayı ayrı koşan bir betik okur, taban
+ * dosyasıyla karşılaştırır). Bugün böyle bir betik YOK ve olduğunu iddia etmiyorum.
  */
 const DB_TRANSLATION_KEYS = [
   'accessories',
