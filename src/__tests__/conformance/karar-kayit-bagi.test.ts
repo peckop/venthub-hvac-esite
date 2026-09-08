@@ -55,9 +55,19 @@ const KIP: Record<string, 'KIRMIZI' | 'UYARI'> = {
   //       OPS'un dosyası; onarımı onda. Kip, o düzeltme master'a inince açılır.
   // Kendi CI'ımı başkasının dosyasındaki kusurla kırmızı yapmak, kapıyı susturulası hâle
   // getirirdi; UYARI kipi bugün o kusuru RAPOR ediyor ve sahibi biliyor.
-  // OPS'un iki biçim düzeltmesi (K18-a, K1-a) master'a ininde AÇILACAK — REC-274.
-  // Ölçüldü 2026-09-08: kip açıkken kalan ihlal 2 ve İKİSİ DE o iki başlık.
-  // 'kararlar-vitrin-15a': 'KIRMIZI',
+  // ⭐AÇILDI 2026-09-08 (#1118 master'a indikten SONRA), ve açmadan ÖNCE ölçüldü:
+  // UYARI kipindeki canlı rapor `kararlar-vitrin-15a-2026-09-08.md — karar 49, ihlal 0`
+  // dedi. "İndi demek temiz demek" saymadım; bu satır bir ölçümün sonucudur, bir umudun değil.
+  //
+  // YOL BURAYA NASIL GELDİ — üç adım, ikisi KAPININ kendi kusuruydu:
+  //   26 ihlal → (beşinci DURUM biçimi tanındı: `KURAL → kapı YOK (REC-nnn)`) → 7
+  //            → (ek karar `K<n>-<harf>` ayrı kimlik sayıldı) → 2
+  //            → (#1118: OPS iki biçimsiz başlığı K18-a / K1-a yaptı) → 0
+  // Yani 26'nın 26'sı belgenin kusuru DEĞİLDİ; 21+5'i kapının okuma kusuruydu.
+  //
+  // Diğer altı belge UYARI'da kalır — onlarda DURUM satırı henüz yok; OPS doldurdukça
+  // her biri kendi ölçümüyle, tek tek açılır.
+  'kararlar-vitrin-15a': 'KIRMIZI',
 }
 
 type Baslik = { ham: string; satir: number; kararMi: boolean; kimlik: string[]; govde: string }
