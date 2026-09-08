@@ -492,6 +492,7 @@ gerektirmez).
 | satis-kipi-gecis-standard | Satış Kipi Geçiş Cetveli — v1.0 | OPS | cagiran-yok (betik taramasi; anma: docs/plans/rec168-migration-taslagi-2026-09-06.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | hafiza-kancalari-standard | Hafıza Kancaları Standardı (REC-177) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | urun-yapisal-veri-standard | VentHub Ürün Yapısal Verisi Standardı (Cetvel) — v1.0 | URUN | src/__tests__/conformance/jsonld-urungrubu-gorsel.test.ts (INV-URUNGRUBU-GORSEL-1) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| kategori-adlandirma-standard | Kategori Adlandırma Cetveli — hangi alan NEREDE kazanır | URUN | docs/README.md (soru→otorite tablosu) | 2026-09-08 (canlı DB + kod ölçümüyle yazıldı) | kategori-adi-tek-kaynak.test.ts (INV-KATEGORI-ADI-1) — **KISMEN**: zincirin 1. adımını ve sözlüksüz çağrıyı ölçer, sıranın kendisini ölçmez | KAL |
 
 ---
 
