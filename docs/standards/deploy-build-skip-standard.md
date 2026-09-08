@@ -751,3 +751,16 @@ yanıyordu, oysa kural hiç işlemiyordu. Sabotajla doğrulandı (2026-09-08): d
 3. **`jq` bu makinede YOKTUR** ve izleyici betiklerinde kullanımı **yasaktır**: 2026-09-07'de
    fail-open verip "bitti" diye yanlış rapor üretti. JSON ayrıştırma `awk` ya da `python`
    ile yapılır.
+4. **ÖLÇÜM KOŞULAMAYAN AĞAÇ YEŞİL DE KIRMIZI DA DEĞİLDİR.** `/c/tmp/vh-altyapi-t165`
+   worktree'sinin `node_modules` sembolik bağı ÖLÜ bir hedefe bakıyor
+   (`venthub-wt-altyapi/node_modules`); o ağaçta `vitest` hiç başlamıyor
+   (*"Cannot find package '@vitejs/plugin-react'"*). Böyle bir ağaçta "test geçti"
+   de "test düştü" de kurulamaz — **ölçüm yok**. İş, ölçümün gerçekten koşabildiği
+   bir ağaca taşınır (2026-09-08'de `vh-altyapi-envanter`'e taşındı). Envantere
+   **KAYIP** olarak girer.
+5. **ARACIN KENDİSİ FAIL-OPEN VEREBİLİR — çıkış kodu 0 "koştu" demek DEĞİLDİR.**
+   Ölçülmüş vaka, 2026-09-08: tam konformans takımı `--reporter=basic` ile koşuldu;
+   Vitest 4'te böyle bir raportör YOK, raportör yüklenemedi, **hiçbir test koşmadı**
+   ve süreç **exit 0** döndü. Yalnız çıkış koduna bakan bir rapor "tam takım yeşil"
+   yazardı. Kural: bir takım koşumunun kanıtı **çıkış kodu değil**, çıktıdaki
+   `Test Files` / `Tests` sayılarıdır; sayı yoksa ölçüm yoktur.
