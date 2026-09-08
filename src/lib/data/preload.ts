@@ -73,6 +73,63 @@ const CATEGORY_COLUMNS = 'id, name, parent_id, slug, is_active, sort_order, leve
 const SAFE_SLUG = /^[a-zA-Z0-9._~-]+$/
 
 /**
+ * Kategori satırı seçimi — ÜÇ KOŞULLU `.or()` sorgusunun sonucunu tek satıra indirir.
+ *
+ * NİÇİN AYRI VE SAF (REC-286): eski hâl `rows.find(r => r.slug === slug) ?? rows[0]` idi ve
+ * SESSİZ bir yanlış-satır kolu taşıyordu. Gelen adres kanonik slug DEĞİLSE — ki TR
+ * yüzeyinde çoğu adres öyle: `/tr/category/aksiyel-sanayi-fanlari` kanonik değil, kanonik
+ * `axial-industrial-fans` — `find` DAİMA ıskalar ve seçim `rows[0]`'a düşer. PostgREST
+ * sırasız döner, yani iki satır eşleştiği anda HANGİSİNİN geleceği belirsizdir. Bugün
+ * zararsız (ölçüldü: `aksiyel-sanayi-fanlari` sorgusuna tek satır uyuyor), ama ikinci satır
+ * eşleşir eşleşmez ziyaretçiye BAŞKA kategorinin sayfası döner ve hiçbir yerde ses çıkmaz.
+ *
+ * Kural, cetvelin dil hiyerarşisiyle aynı sırada (`category-taxonomy-standard.md` §4):
+ * kanonik EN slug > o dilin görünen slug'ı (tr) > diğer dilin görünen slug'ı (en).
+ *
+ * Fonksiyon SAF ve dışa açık: kapı (`INV-KATEGORI-COZUCU-1`) onu ağ/DB olmadan ölçer.
+ */
+type SlugAdayi = { slug: string | null; metadata: unknown; id?: string | null }
+
+export function kategoriSatiriSec<T extends SlugAdayi>(rows: T[], slug: string): T | null {
+  if (rows.length === 0) return null
+
+  const yerel = (row: T, dil: 'tr' | 'en'): string | null => {
+    const meta = row.metadata
+    if (!meta || typeof meta !== 'object' || !('slug' in meta)) return null
+    const s = (meta as { slug?: unknown }).slug
+    if (!s || typeof s !== 'object') return null
+    const v = (s as Record<string, unknown>)[dil]
+    return typeof v === 'string' && v.length > 0 ? v : null
+  }
+
+  const oncelik = (row: T): number =>
+    row.slug === slug ? 0 : yerel(row, 'tr') === slug ? 1 : yerel(row, 'en') === slug ? 2 : 3
+
+  const sirali = [...rows].sort((a, b) => {
+    const fark = oncelik(a) - oncelik(b)
+    if (fark !== 0) return fark
+    // AYNI öncelikte iki satır = VERİ kusuru (iki kategori aynı adresi iddia ediyor).
+    // Çözücü burada doğruyu BİLEMEZ; yapabileceği tek şey seçimi DETERMİNİSTİK kılmak,
+    // yani aynı istek iki kez geldiğinde aynı sayfayı vermek. Rastgele salınan bir seçim
+    // "bazen doğru" görünür ve tam o yüzden hiçbir ölçüm onu yakalayamaz.
+    return String(a.id ?? a.slug ?? '').localeCompare(String(b.id ?? b.slug ?? ''))
+  })
+
+  const secilen = sirali[0]
+  if (oncelik(secilen) === 3) return null
+
+  const ayniOncelikte = sirali.filter((r) => oncelik(r) === oncelik(secilen))
+  if (ayniOncelikte.length > 1) {
+    console.warn(
+      `[kategoriSatiriSec] "${slug}" adresini ${ayniOncelikte.length} satır aynı öncelikle ` +
+        `iddia ediyor: ${ayniOncelikte.map((r) => r.slug).join(', ')}. Deterministik seçim ` +
+        `yapıldı ama bu bir VERİ kusurudur — kategori adresleri tekil olmalı.`
+    )
+  }
+  return secilen
+}
+
+/**
  * Kategoriyi kanonik slug (EN kolon) VEYA dile göre yerelleştirilmiş
  * `metadata.slug.tr` / `metadata.slug.en` üzerinden çözer.
  * Migration uygulanmamışsa metadata yolları hiç eşleşmez, kanonik yol çalışır.
@@ -80,15 +137,18 @@ const SAFE_SLUG = /^[a-zA-Z0-9._~-]+$/
 export const getCachedCategoryData = cache(async (slug: string) => {
   const query = supabase.from('categories').select(CATEGORY_COLUMNS)
 
+  // `.limit(3)`: `.or()` üç koşullu, sağlıklı veride her koşul en fazla bir satır gösterir.
+  // Eski değer 2 idi ve üçüncü eşleşmeyi görünmez yapıyordu — belirsizliği ölçemediğimiz
+  // hâl, belirsizlik yokmuş gibi görünür.
   const { data: rows, error } = SAFE_SLUG.test(slug)
     ? await query
         .or(`slug.eq.${slug},metadata->slug->>tr.eq.${slug},metadata->slug->>en.eq.${slug}`)
-        .limit(2)
+        .limit(3)
     : await query.eq('slug', slug).limit(1)
 
   if (error || !rows || rows.length === 0) return null
-  // Birden fazla eşleşmede kanonik slug önceliklidir (deterministik seçim).
-  const data = rows.find((row) => row.slug === slug) ?? rows[0]
+  const data = kategoriSatiriSec(rows, slug)
+  if (!data) return null
 
   return mapDatabaseCategoryToDomain({
     ...data,

@@ -56,6 +56,34 @@ Kategori sistemi **bilinçli olarak genişletilebilir** tasarlandı (admin `Cate
 - ✅ TR sızıntı düzeltildi (PR #456: PDP breadcrumb+özellik, Footer, kategori SEO metadata) ·
   ✅ eksik/bozuk `translation_key`'ler onarıldı (PR #457 migration).
 
+### 4.1 Bir adres BİRDEN ÇOK satıra uyarsa hangisi kazanır (REC-286, 2026-09-08)
+
+Yukarıdaki kural adresin nasıl **üretildiğini** söylüyordu; **nasıl çözüleceğini** söylemiyordu.
+Çözücü üç koşulu birden sorar (`slug` · `metadata.slug.tr` · `metadata.slug.en`), yani bir
+adrese birden çok satır uyabilir. Bu boşluk sessiz bir yanlış-sayfa kolu üretmişti.
+
+**Kural — öncelik, §4'ün dil hiyerarşisiyle AYNI sırada:**
+
+| # | eşleşme | anlamı |
+|---|---|---|
+| 0 | `categories.slug` (kanonik EN) | kimliğin kendisi — daima kazanır |
+| 1 | `metadata.slug.tr` | TR yüzeyinin görünen adresi |
+| 2 | `metadata.slug.en` | EN yüzeyinin görünen adresi |
+| 3 | hiçbiri | **`null`** — satır uydurulmaz |
+
+Üç ek şart, üçü de ölçülür (`INV-KATEGORI-COZUCU-1`):
+1. **Seçim giriş sırasından bağımsızdır.** PostgREST sırasız döner; sıraya bağlı bir seçim
+   "bazen doğru" olur ve tam o yüzden hiçbir ölçüm onu yakalayamaz.
+2. **Hiçbir satır adresi iddia etmiyorsa `null` döner** — eldeki ilk satır "bulundu" sayılamaz.
+   Eksik alan, uydurulmuş alandan yeğdir.
+3. **Aynı öncelikte iki satır bir VERİ kusurudur.** Çözücü doğruyu bilemez; deterministik
+   seçer **ve sessiz kalmaz** (uyarı yazar). Çakışan kategori adresi düzeltilmesi gereken
+   veridir, tolere edilecek bir hâl değil.
+
+**Değiştirme kuralı:** bu öncelik sırası değişecekse önce `INV-KATEGORI-COZUCU-1` değişir ve
+sabotajla doğrulanır (kuralı bozan kod kapıyı KIRMIZI yapmalı). Kapının kendisi ağ/DB
+kullanmaz — seçim mantığı `kategoriSatiriSec` olarak saf ve dışa açıktır.
+
 ## 5. HRV slug tekilleştir + seed
 
 - `heat-recovery-vmc` BOŞ ama mimari en olgun dal (EN 308 hesaplayıcı + HRVModel 3D + katalog entegrasyonu kurulu).
