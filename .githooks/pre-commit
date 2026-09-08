@@ -50,6 +50,20 @@ if [ -n "$EKSIK" ]; then
     echo "[ORION-HOOK] Bu bir UYARI — commit engellenmedi (bkz. dosya başındaki gerekçe)."
 fi
 
+# ------------------------------------------------------- COMMIT ÖNCESİ UYARILAR (REC-267)
+# İki kol, ikisi de UYARI: (1) yeni betik araç envanterinde ilan edilmemiş, (2) şerit önekli
+# dal ANA REPO ağacında. İkisi de 2026-09-08'de sahada ölçüldü; birincisine bir günde DÖRT
+# şerit takıldı (dördüncüsü kapıyı yazan kişi), ikincisi iki şeritte çalışma ağacı kaymasına
+# yol açtı ve yalnız DİSİPLİNLE yakalandı.
+#
+# NİÇİN ŞERİT KAPISINDAN ÖNCE: aşağıdaki kapı BLOKLAR. Bloklayan bir çıktının ardına
+# eklenen uyarı, commit reddedildiğinde ekranın yukarısında kalır ve okunmaz.
+#
+# Betiğin kendisi daima çıkış 0 verir; yine de çıkış kodu BURADA kontrol edilmiyor —
+# bilerek. Bu satırın bir gün commit'i durdurması, betikte bir kaza olduğu anlamına gelir
+# ve o kaza sessizce herkesin commit'ini bloklamasın.
+node "$REPO_ROOT/scripts/hijyen/commit-oncesi-uyarilar.cjs" || true
+
 # ---------------------------------------------------------------- ŞERİT KAPISI (E1)
 # YUKARIDAKİ companion kontrolü UYARI-ONLY kalır. Aşağıdaki şerit kontrolü BLOKLAR — ve
 # bu, dosyanın başındaki "bloklama eklemek istersen ölçütün deterministik olsun" şartını
