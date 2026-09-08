@@ -56,6 +56,39 @@ yanlış olurdu (PDF'ten çıkarmaya çalışırdık).
 **Toplam gerçekçi tahmin: 1,5–2 gün**, B adımının sonucuna bağlı. Merkezleme/orantı işi (Recep'in
 5. maddesi) bu plana **dahil değil** — A–E kapanmadan sıraya girmez.
 
+---
+
+## 6. ⛔B ADIMI KOŞULDU — SONUÇ KIRMIZI (07:0xZ, avensair.com)
+
+| aradığım | sitede | sonuç |
+|---|---|---|
+| **BVU-LS 1000 / 2000-3000** (kalem 1, `accessories`) | BVU 1000/2000/3000 var, **LS varyantı YOK** | ⛔bulunamadı |
+| **3–18 kW kanal tipi elektrikli ısıtıcı** (kalem 2) | yalnız *hava perdesi* alt kategorisi "Elektrikli Isıtıcılı" — **başka ürün** | ⛔bulunamadı |
+| sulu batarya (REC-282'nin doğru fotoğrafı) | **YOK** | ⛔bulunamadı |
+
+**Hüküm: AVenS tarafında görsel kaynağı yok — ne katalog PDF'i (0 dosya) ne marka sitesi.**
+Kalem 1–2 plandaki **C′ dalına** düşüyor: bu bir tedarik işi değil, **Recep kapısı**.
+
+Üçüncü satır REC-282'yi de etkiliyor: *"doğru sulu batarya fotoğrafı elde yok"* hükmü artık
+**iki bağımsız kaynakta** ölçülmüş durumda (ingestor + marka sitesi). Yanlış fotoğrafın yerine
+konacak bir şey yok; seçenek "kaldır" ya da "tedarikçiden iste".
+
+⭐**Yan bulgu — kaynağın kendisi eksik:** BVU-LS ve kW'lı elektrikli ısıtıcılar bizim katalogda
+var ama üreticinin kendi vitrininde yok. Bu, görselden önce **veri sorusu**: bu ürünler hâlâ
+üretimde mi, adları mı değişti? Cevap Recep'te ya da tedarikçide; ölçümle çözülmez.
+
+### Güncel sıra (B sonrası)
+
+| kalem | durum |
+|---|---|
+| 3 `industrial-ceiling-fans` | ✅ kaynak bulundu (NORDIK HVLS kataloğu s.7, 3052×2527), aday hazır |
+| 5 `air-curtains` | ✅ **tedarik gerekmiyor** — 8 ürünün 44 görseli storage'da; iş SEÇİM |
+| 4 `fans` | ✅ aday hazır (Punto/Quadro Evo, storage'da) — Recep seçer |
+| 1–2 AVenS | ⛔**tıkalı** — kaynak yok, Recep kapısı |
+
+**Revize tahmin: 3–4 saat** (kalem 3-4-5, karar gelir gelmez) + kalem 1-2 kararı beklemede.
+İlk tahmin 1,5–2 gündü; küçülmesinin sebebi hava perdesi görsellerinin zaten elde çıkması.
+
 ## 5. Recep'e gidecek üç şey
 
 1. **Karar:** altı sulu batarya ürününün yanlış fotoğrafı (REC-282) — kaldır mı, bekle mi.
