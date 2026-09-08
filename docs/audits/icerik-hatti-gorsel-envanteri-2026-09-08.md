@@ -75,6 +75,29 @@ davranıştır. Envanterde **ayrı** listelenir ki "mükerrer" sayısı korkutuc
 Tam liste JSON'da (`gorselsiz_urunler`, SKU + ad + kategori + durum).
 **Recep kararı gereği hiçbiri silinmedi/değiştirilmedi** — bu belge kaydın kendisidir.
 
+### ⭐Listenin kaynak durumu ölçüldü — bugün çözülebilecek olan YALNIZ 7 ürün
+
+Görselsiz 103 ürün markaya göre: **78 AVenS · 23 Vortice · 2 SEAT**.
+Her küme için kaynak ayrı ayrı arandı:
+
+| küme | ürün | kaynakta durum | hüküm |
+|---|---|---|---|
+| **NORDIK HVLS** tavan vantilatörü | **7** | `nordik-hvls-…-181471.pdf` · 7 görselli sayfa, en büyük **3052×2527** | ✅**çözülebilir** |
+| VORTICENT CMS ATEX | 11 | `industrial_Ventilation.pdf`'te 18 sayfa geçiyor ama en büyük görsel **216×180** | ⛔yetersiz çözünürlük |
+| CA IL ES RECT (`VRT-16076…16080`) | 5 | hiçbir Vortice PDF'inde geçmiyor | ⛔kaynak yok |
+| AVenS | 78 | katalog PDF'i **yok** (0 dosya) · avensair.com'da ürünler **yok** | ⛔kaynak yok |
+| SEAT | 2 | **ölçülmedi** | — |
+
+⛔**VORTICENT için "kaynak yok" hükmü iki eşikle ölçüldü:** önce ≥600px (0 sayfa), sonra
+eşiksiz sayım (en büyük 216×180). Yani sorun "aramadım" değil, kaynağın kendisi yetersiz.
+
+⭐**İki iş aynı ürünlerde birleşti:** `VRT-16076…16080` — hem kimliği uydurma olan beş ürün
+(REC-226/275, Recep'in kararını bekliyor) hem de görselsiz. Aynı beş ürün, iki ayrı boşluk.
+Sebebi ortak: bu ürünler kaynakta zayıf temsil ediliyor.
+
+**Sonuç:** 103 görselsiz ürünün **7'si** eldeki kaynakla bugün kapatılabilir; kalan **96'sı
+tedarikçiden fotoğraf istemeyi gerektirir.** Bu, tedarik talebinin somut gerekçesidir.
+
 ## Sınır — bu envanterin ölçmediği
 
 - Görselin **doğru ürüne ait olup olmadığı**: yalnız *aynı dosya iki üründe mi* sorusunu
