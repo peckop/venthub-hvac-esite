@@ -1,0 +1,6523 @@
+{
+  "damga": "2026-09-08T07:09:49.018Z",
+  "olcum": {
+    "gorsel_kaydi": 1042,
+    "benzersiz_dosya": 1042,
+    "hashlenen": 898,
+    "boyutu_benzersiz_elenen": 144,
+    "mukerrer_grup": 129,
+    "kategori_sinirini_asan_grup": 3,
+    "gorselsiz_urun": 103
+  },
+  "kategori_sinirini_asanlar": [
+    {
+      "hash": "e5ebeadb41e3a5f0",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "heat-recovery-vmc",
+        "air-treatment"
+      ],
+      "kategori_sinirini_asiyor": true,
+      "urunler": [
+        {
+          "sku": "AVE-13010",
+          "ad": "AVenS 750 ISI GERİ KAZANIM CİHAZI",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "AVE-13011",
+          "ad": "AVenS 1000 ISI GERİ KAZANIM CİHAZI",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "AVE-13013",
+          "ad": "AVenS 2000 ISI GERİ KAZANIM CİHAZI",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "AVE-13052",
+          "ad": "SULU BATARYA 11 KW KANAL TİPİ-11300(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13053",
+          "ad": "SULU BATARYA 14 KW KANAL TİPİ-20700(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13054",
+          "ad": "SULU BATARYA 20 KW KANAL TİPİ-33000(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13055",
+          "ad": "SULU BATARYA 28 KW KANAL TİPİ-37400(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13056",
+          "ad": "SULU BATARYA 36 KW KANAL TİPİ-42500(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13057",
+          "ad": "SULU BATARYA 40 KW KANAL TİPİ-47300(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        }
+      ]
+    },
+    {
+      "hash": "bac4bcd2c8666dbc",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "heat-recovery-vmc",
+        "air-treatment"
+      ],
+      "kategori_sinirini_asiyor": true,
+      "urunler": [
+        {
+          "sku": "AVE-13010",
+          "ad": "AVenS 750 ISI GERİ KAZANIM CİHAZI",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "AVE-13011",
+          "ad": "AVenS 1000 ISI GERİ KAZANIM CİHAZI",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "AVE-13013",
+          "ad": "AVenS 2000 ISI GERİ KAZANIM CİHAZI",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "AVE-13052",
+          "ad": "SULU BATARYA 11 KW KANAL TİPİ-11300(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13053",
+          "ad": "SULU BATARYA 14 KW KANAL TİPİ-20700(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13054",
+          "ad": "SULU BATARYA 20 KW KANAL TİPİ-33000(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13055",
+          "ad": "SULU BATARYA 28 KW KANAL TİPİ-37400(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13056",
+          "ad": "SULU BATARYA 36 KW KANAL TİPİ-42500(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13057",
+          "ad": "SULU BATARYA 40 KW KANAL TİPİ-47300(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        }
+      ]
+    },
+    {
+      "hash": "767e808a589d9668",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "heat-recovery-vmc",
+        "air-treatment"
+      ],
+      "kategori_sinirini_asiyor": true,
+      "urunler": [
+        {
+          "sku": "AVE-13010",
+          "ad": "AVenS 750 ISI GERİ KAZANIM CİHAZI",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "AVE-13011",
+          "ad": "AVenS 1000 ISI GERİ KAZANIM CİHAZI",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "AVE-13013",
+          "ad": "AVenS 2000 ISI GERİ KAZANIM CİHAZI",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "AVE-13052",
+          "ad": "SULU BATARYA 11 KW KANAL TİPİ-11300(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13053",
+          "ad": "SULU BATARYA 14 KW KANAL TİPİ-20700(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13054",
+          "ad": "SULU BATARYA 20 KW KANAL TİPİ-33000(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13055",
+          "ad": "SULU BATARYA 28 KW KANAL TİPİ-37400(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13056",
+          "ad": "SULU BATARYA 36 KW KANAL TİPİ-42500(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "AVE-13057",
+          "ad": "SULU BATARYA 40 KW KANAL TİPİ-47300(Kcal/h) 90/70°C",
+          "kategori": "air-treatment"
+        }
+      ]
+    }
+  ],
+  "kategori_ici_paylasim": [
+    {
+      "hash": "549f88f110f56203",
+      "dosya_sayisi": 23,
+      "urun_sayisi": 23,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11521",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11522",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11523",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11524",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11525",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11526",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11527",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11528",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11531",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11532",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11533",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11534",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11535",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11536",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11537",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11538",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11541",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11542",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11543",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11544",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11545",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11546",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11547",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T PIR",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "d8bde3ae7f6de6d3",
+      "dosya_sayisi": 23,
+      "urun_sayisi": 23,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11521",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11522",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11523",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11524",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11525",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11526",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11527",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11528",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11531",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11532",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11533",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11534",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11535",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11536",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11537",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11538",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11541",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11542",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11543",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11544",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11545",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11546",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11547",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T PIR",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "60a7689cc86211a5",
+      "dosya_sayisi": 23,
+      "urun_sayisi": 23,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11521",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11522",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11523",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11524",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11525",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11526",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11527",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11528",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11531",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11532",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11533",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11534",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11535",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11536",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11537",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11538",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11541",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11542",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11543",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11544",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11545",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11546",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11547",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T PIR",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "ffed4860b35db21c",
+      "dosya_sayisi": 23,
+      "urun_sayisi": 23,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11521",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11522",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11523",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11524",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11525",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11526",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11527",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11528",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11531",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11532",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11533",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11534",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11535",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11536",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11537",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11538",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11541",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11542",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11543",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11544",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11545",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11546",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11547",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T PIR",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "abc36666b9d8bc0e",
+      "dosya_sayisi": 23,
+      "urun_sayisi": 23,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11521",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11522",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11523",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11524",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11525",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11526",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11527",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11528",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11531",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11532",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11533",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11534",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11535",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11536",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11537",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11538",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11541",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11542",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11543",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11544",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11545",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11546",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11547",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T PIR",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "f58afc3d1a0ea67d",
+      "dosya_sayisi": 23,
+      "urun_sayisi": 23,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11521",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11522",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11523",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11524",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11525",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11526",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11527",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11528",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11531",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11532",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11533",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11534",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11535",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11536",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11537",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11538",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11541",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11542",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11543",
+          "ad": "Vortice Vort Quadro Evo QE 100/60/35 LL TP HCS",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11544",
+          "ad": "Vortice Vort Quadro Evo QE 60 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11545",
+          "ad": "Vortice Vort Quadro Evo QE 100 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11546",
+          "ad": "Vortice Vort Quadro Evo QE 60/35 LL T PIR",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11547",
+          "ad": "Vortice Vort Quadro Evo QE 100/60 LL T PIR",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "6ee1d6ca7c0eefdc",
+      "dosya_sayisi": 21,
+      "urun_sayisi": 21,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-43151",
+          "ad": "VORT QBK SAL KC EVO 315 M4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43152",
+          "ad": "VORT QBK SAL KC EVO 315 T2 1,5 kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43153",
+          "ad": "VORT QBK SAL KC EVO 315 T4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43154",
+          "ad": "VORT QBK SAL KC EVO 355 M4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43155",
+          "ad": "VORT QBK SAL KC EVO 355 T4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43156",
+          "ad": "VORT QBK SAL KC EVO 400 M4 0,55kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43157",
+          "ad": "VORT QBK SAL KC EVO 400 T4 0,55kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43158",
+          "ad": "VORT QBK SAL KC EVO 450 T4 1,1kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43159",
+          "ad": "VORT QBK SAL KC EVO 500 T4 1,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43160",
+          "ad": "VORT QBK SAL KC EVO 500 T6 0,55 kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43161",
+          "ad": "VORT QBK SAL KC EVO 560 T4 3kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43162",
+          "ad": "VORT QBK SAL KC EVO 560 T6 1,1 kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43163",
+          "ad": "VORT QBK SAL KC EVO 630 T4 5,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43164",
+          "ad": "VORT QBK SAL KC EVO 630 T6 1,5 kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43165",
+          "ad": "VORT QBK SAL KC EVO 315 T4/8 0,25/0,03kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43166",
+          "ad": "VORT QBK SAL KC EVO 355 T4/8 0,25/0,03kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43167",
+          "ad": "VORT QBK SAL KC EVO 400 T4/8 0,75/0,12kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43168",
+          "ad": "VORT QBK SAL KC EVO 450 T4/8 1,1/0,18kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43169",
+          "ad": "VORT QBK SAL KC EVO 500 T4/8 1,5/0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43170",
+          "ad": "VORT QBK SAL KC EVO 560 T4/8 3/0,55kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43171",
+          "ad": "VORT QBK SAL KC EVO 630 T4/8 5,5/1,1kW",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "5f085cf307eea7b7",
+      "dosya_sayisi": 20,
+      "urun_sayisi": 20,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-43151",
+          "ad": "VORT QBK SAL KC EVO 315 M4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43152",
+          "ad": "VORT QBK SAL KC EVO 315 T2 1,5 kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43153",
+          "ad": "VORT QBK SAL KC EVO 315 T4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43154",
+          "ad": "VORT QBK SAL KC EVO 355 M4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43155",
+          "ad": "VORT QBK SAL KC EVO 355 T4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43156",
+          "ad": "VORT QBK SAL KC EVO 400 M4 0,55kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43158",
+          "ad": "VORT QBK SAL KC EVO 450 T4 1,1kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43159",
+          "ad": "VORT QBK SAL KC EVO 500 T4 1,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43160",
+          "ad": "VORT QBK SAL KC EVO 500 T6 0,55 kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43161",
+          "ad": "VORT QBK SAL KC EVO 560 T4 3kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43162",
+          "ad": "VORT QBK SAL KC EVO 560 T6 1,1 kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43163",
+          "ad": "VORT QBK SAL KC EVO 630 T4 5,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43164",
+          "ad": "VORT QBK SAL KC EVO 630 T6 1,5 kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43165",
+          "ad": "VORT QBK SAL KC EVO 315 T4/8 0,25/0,03kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43166",
+          "ad": "VORT QBK SAL KC EVO 355 T4/8 0,25/0,03kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43167",
+          "ad": "VORT QBK SAL KC EVO 400 T4/8 0,75/0,12kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43168",
+          "ad": "VORT QBK SAL KC EVO 450 T4/8 1,1/0,18kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43169",
+          "ad": "VORT QBK SAL KC EVO 500 T4/8 1,5/0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43170",
+          "ad": "VORT QBK SAL KC EVO 560 T4/8 3/0,55kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-43171",
+          "ad": "VORT QBK SAL KC EVO 630 T4/8 5,5/1,1kW",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "3451505ae2b1253d",
+      "dosya_sayisi": 17,
+      "urun_sayisi": 17,
+      "kategoriler": [
+        "control-systems"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "DAN-80120",
+          "ad": "FC102P1K1 1,1",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80121",
+          "ad": "FC102P1K5 1,5",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80122",
+          "ad": "FC102P2K2 2,2",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80123",
+          "ad": "FC102P3K0 3",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80124",
+          "ad": "FC102P4K0 4",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80125",
+          "ad": "FC102P5K5 5,5",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80126",
+          "ad": "FC102P7K5 7,5",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80127",
+          "ad": "FC102P11K 11",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80128",
+          "ad": "FC102P15K 15",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80129",
+          "ad": "FC102P18K 18,5",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80130",
+          "ad": "FC102P22K 22",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80131",
+          "ad": "FC102P30K 30",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80132",
+          "ad": "FC102P37K 37",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80133",
+          "ad": "FC102P45K 45",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80134",
+          "ad": "FC102P55K 55",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80135",
+          "ad": "FC102P75K 75",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80136",
+          "ad": "FC102P90K 90",
+          "kategori": "control-systems"
+        }
+      ]
+    },
+    {
+      "hash": "64143e83ab87f4c2",
+      "dosya_sayisi": 16,
+      "urun_sayisi": 16,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-40703",
+          "ad": "Vortice E 354 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-40903",
+          "ad": "Vortice E 404 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-41219",
+          "ad": "Vortice E 504 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-41459",
+          "ad": "Vortice E 604 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42259",
+          "ad": "Vortice A-E 354 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42302",
+          "ad": "Vortice MP 302 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42304",
+          "ad": "Vortice MP 304 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42308",
+          "ad": "Vortice A-E 454 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42314",
+          "ad": "Vortice MP 354 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42324",
+          "ad": "Vortice MP 404 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42327",
+          "ad": "Vortice A-E 504 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42334",
+          "ad": "Vortice MP 506 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42335",
+          "ad": "Vortice MP 454 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42336",
+          "ad": "Vortice A-E 564 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42344",
+          "ad": "Vortice MP 504 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42374",
+          "ad": "Vortice MP 604 T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "faa38bf9e4c03f90",
+      "dosya_sayisi": 16,
+      "urun_sayisi": 16,
+      "kategoriler": [
+        "control-systems"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "DAN-80102",
+          "ad": "FC-101 - 380V - 1,5kW Frekans Konvertörü",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80103",
+          "ad": "FC 101-2.2kW Frekans Konvertörü",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80104",
+          "ad": "FC-101 - 380V - 3kW Frekans Konvertörü",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80105",
+          "ad": "FC101P4K0 4",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80106",
+          "ad": "FC-101 - 380V - 5,5kW Frekans Konvertörü",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80107",
+          "ad": "FC101P7K5 7,5",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80108",
+          "ad": "FC101P11K 11",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80109",
+          "ad": "FC101P15K 15",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80110",
+          "ad": "FC101P18K 18,5",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80111",
+          "ad": "FC101P22K 22",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80112",
+          "ad": "FC101P30K 30",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80113",
+          "ad": "FC101P37K 37",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80114",
+          "ad": "FC101P45K 45",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80115",
+          "ad": "FC101P55K 55",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80116",
+          "ad": "FC101P75K 75",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80117",
+          "ad": "FC101P90K 90",
+          "kategori": "control-systems"
+        }
+      ]
+    },
+    {
+      "hash": "ea3382174b212923",
+      "dosya_sayisi": 16,
+      "urun_sayisi": 16,
+      "kategoriler": [
+        "control-systems"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "DAN-80102",
+          "ad": "FC-101 - 380V - 1,5kW Frekans Konvertörü",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80103",
+          "ad": "FC 101-2.2kW Frekans Konvertörü",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80104",
+          "ad": "FC-101 - 380V - 3kW Frekans Konvertörü",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80105",
+          "ad": "FC101P4K0 4",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80106",
+          "ad": "FC-101 - 380V - 5,5kW Frekans Konvertörü",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80107",
+          "ad": "FC101P7K5 7,5",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80108",
+          "ad": "FC101P11K 11",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80109",
+          "ad": "FC101P15K 15",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80110",
+          "ad": "FC101P18K 18,5",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80111",
+          "ad": "FC101P22K 22",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80112",
+          "ad": "FC101P30K 30",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80113",
+          "ad": "FC101P37K 37",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80114",
+          "ad": "FC101P45K 45",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80115",
+          "ad": "FC101P55K 55",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80116",
+          "ad": "FC101P75K 75",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80117",
+          "ad": "FC101P90K 90",
+          "kategori": "control-systems"
+        }
+      ]
+    },
+    {
+      "hash": "f3757b726856a55d",
+      "dosya_sayisi": 14,
+      "urun_sayisi": 14,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "AVE-248312106",
+          "ad": "KENTALFAN 315 T2 1,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248314103",
+          "ad": "KENTALFAN 315 M4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248314106",
+          "ad": "KENTALFAN 315 T4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248354103",
+          "ad": "KENTALFAN 355 M4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248354106",
+          "ad": "KENTALFAN 355 T4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248404103",
+          "ad": "KENTALFAN 400 M4 0,55kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248404106",
+          "ad": "KENTALFAN 400 T4 0,55kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248454106",
+          "ad": "KENTALFAN 450 T4 1,1kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248504106",
+          "ad": "KENTALFAN 500 T4 1,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248506106",
+          "ad": "KENTALFAN 500 T6 0,55kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248564106",
+          "ad": "KENTALFAN 560 T4 3kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248566106",
+          "ad": "KENTALFAN 560 T6 1,1kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248634106",
+          "ad": "KENTALFAN 630 T4 5,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-248636106",
+          "ad": "KENTALFAN 630 T6 1,5kW",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "7bf99ca4692530ba",
+      "dosya_sayisi": 13,
+      "urun_sayisi": 13,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "NIC-11901",
+          "ad": "DD 7/7 147W 1F 4P 3V - 6M0678",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11902",
+          "ad": "DD 9/7 420W 1F 4P 3V - 6M0695",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11905",
+          "ad": "DD 9/9 750W 1F 4P 3V - 6M06MH",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11907",
+          "ad": "DD 10/10 550W 1F 4P 3V - 6M061U",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11908",
+          "ad": "DD 10/10 750W 1F 4P 3V - 6M06MF",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11909",
+          "ad": "DD 12/12 735W 1F 6P 3V - 6N06HX",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11910",
+          "ad": "DD 7/7 150W 1F 4P 1V - 610982",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11911",
+          "ad": "DD 9/7 300W 1F 4P 1V - 6M0671",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11912",
+          "ad": "DD 9/9 373W 1F 4P 1V - 6M0642",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11913",
+          "ad": "DD 9/9 300W 1F 4P 1V - 6M0661",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11916",
+          "ad": "DD 10/10 373W 1F 4P 1V - 6M0627",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11920",
+          "ad": "DD 12/12 1100W 1F 6P 1V - 61091A",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11921",
+          "ad": "DD 12/12 1500W 3F 4P 2V** - 6N090P",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "90af67db8b106f3c",
+      "dosya_sayisi": 10,
+      "urun_sayisi": 10,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-15261",
+          "ad": "Vortice HEATMASTER F400 315 T4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15262",
+          "ad": "Vortice HEATMASTER F400 355 T4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15263",
+          "ad": "Vortice HEATMASTER F400 400 T4 0,55kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15264",
+          "ad": "Vortice HEATMASTER F400 450 T4 1,1kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15265",
+          "ad": "Vortice HEATMASTER F400 500 T4 1,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15266",
+          "ad": "Vortice HEATMASTER F400 560 T4 3kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15267",
+          "ad": "Vortice HEATMASTER F400 630 T4 5,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15301",
+          "ad": "Vortice HEATMASTER F400 315 M4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15302",
+          "ad": "Vortice HEATMASTER F400 355 M4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15303",
+          "ad": "Vortice HEATMASTER F400 400 M4 0,55kW",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "36dbe65dd6d0412e",
+      "dosya_sayisi": 10,
+      "urun_sayisi": 10,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-15261",
+          "ad": "Vortice HEATMASTER F400 315 T4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15262",
+          "ad": "Vortice HEATMASTER F400 355 T4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15263",
+          "ad": "Vortice HEATMASTER F400 400 T4 0,55kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15264",
+          "ad": "Vortice HEATMASTER F400 450 T4 1,1kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15265",
+          "ad": "Vortice HEATMASTER F400 500 T4 1,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15266",
+          "ad": "Vortice HEATMASTER F400 560 T4 3kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15267",
+          "ad": "Vortice HEATMASTER F400 630 T4 5,5kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15301",
+          "ad": "Vortice HEATMASTER F400 315 M4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15302",
+          "ad": "Vortice HEATMASTER F400 355 M4 0,25kW",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15303",
+          "ad": "Vortice HEATMASTER F400 400 M4 0,55kW",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "225a1886ad76470d",
+      "dosya_sayisi": 10,
+      "urun_sayisi": 10,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-15271",
+          "ad": "Vortice SLIMROOF 155 M ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15272",
+          "ad": "Vortice SLIMROOF 190 M ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15273",
+          "ad": "Vortice SLIMROOF 220 M ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15274",
+          "ad": "Vortice SLIMROOF 250 M ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15275",
+          "ad": "Vortice SLIMROOF 310 M ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15276",
+          "ad": "Vortice SLIMROOF 355 T ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15277",
+          "ad": "Vortice SLIMROOF 450 T ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15278",
+          "ad": "Vortice SLIMROOF 500 T ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15279",
+          "ad": "Vortice SLIMROOF 560 T ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15311",
+          "ad": "Vortice SLIMROOF 630 T ES",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "e81223a86e1366a3",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-15271",
+          "ad": "Vortice SLIMROOF 155 M ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15272",
+          "ad": "Vortice SLIMROOF 190 M ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15273",
+          "ad": "Vortice SLIMROOF 220 M ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15275",
+          "ad": "Vortice SLIMROOF 310 M ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15276",
+          "ad": "Vortice SLIMROOF 355 T ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15277",
+          "ad": "Vortice SLIMROOF 450 T ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15278",
+          "ad": "Vortice SLIMROOF 500 T ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15279",
+          "ad": "Vortice SLIMROOF 560 T ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-15311",
+          "ad": "Vortice SLIMROOF 630 T ES",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "7fde4dc4aab8d623",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51251000",
+          "ad": "SEAT 25 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51251003",
+          "ad": "SEAT 25 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252000",
+          "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252003",
+          "ad": "SEAT 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252010",
+          "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253000",
+          "ad": "SEAT 25 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253001",
+          "ad": "SEAT 25 · 2800 d/dk · 1,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253003",
+          "ad": "SEAT 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253300",
+          "ad": "SEAT 25 · 2800 d/dk · 3 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "1be5977b54e11674",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51251000",
+          "ad": "SEAT 25 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51251003",
+          "ad": "SEAT 25 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252000",
+          "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252003",
+          "ad": "SEAT 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252010",
+          "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253000",
+          "ad": "SEAT 25 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253001",
+          "ad": "SEAT 25 · 2800 d/dk · 1,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253003",
+          "ad": "SEAT 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253300",
+          "ad": "SEAT 25 · 2800 d/dk · 3 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "76c65ea4fd1c4270",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51251000",
+          "ad": "SEAT 25 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51251003",
+          "ad": "SEAT 25 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252000",
+          "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252003",
+          "ad": "SEAT 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252010",
+          "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253000",
+          "ad": "SEAT 25 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253001",
+          "ad": "SEAT 25 · 2800 d/dk · 1,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253003",
+          "ad": "SEAT 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253300",
+          "ad": "SEAT 25 · 2800 d/dk · 3 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "812d5bb510ce8cca",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51251000",
+          "ad": "SEAT 25 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51251003",
+          "ad": "SEAT 25 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252000",
+          "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252003",
+          "ad": "SEAT 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252010",
+          "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253000",
+          "ad": "SEAT 25 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253001",
+          "ad": "SEAT 25 · 2800 d/dk · 1,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253003",
+          "ad": "SEAT 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253300",
+          "ad": "SEAT 25 · 2800 d/dk · 3 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "19d096bb1a20788b",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51251000",
+          "ad": "SEAT 25 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51251003",
+          "ad": "SEAT 25 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252000",
+          "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252003",
+          "ad": "SEAT 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51252010",
+          "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253000",
+          "ad": "SEAT 25 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253001",
+          "ad": "SEAT 25 · 2800 d/dk · 1,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253003",
+          "ad": "SEAT 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51253300",
+          "ad": "SEAT 25 · 2800 d/dk · 3 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "ad96df01cdb7ed88",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51201000",
+          "ad": "SEAT 20 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51201003",
+          "ad": "SEAT 20 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202000",
+          "ad": "SEAT 20 · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202003",
+          "ad": "SEAT 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202010",
+          "ad": "SEAT 20 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203000",
+          "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203001",
+          "ad": "SEAT 20 · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203003",
+          "ad": "SEAT 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203010",
+          "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "649e481543ae7043",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51201000",
+          "ad": "SEAT 20 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51201003",
+          "ad": "SEAT 20 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202000",
+          "ad": "SEAT 20 · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202003",
+          "ad": "SEAT 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202010",
+          "ad": "SEAT 20 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203000",
+          "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203001",
+          "ad": "SEAT 20 · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203003",
+          "ad": "SEAT 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203010",
+          "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "b1ecc0697b6daf67",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51201000",
+          "ad": "SEAT 20 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51201003",
+          "ad": "SEAT 20 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202000",
+          "ad": "SEAT 20 · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202003",
+          "ad": "SEAT 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202010",
+          "ad": "SEAT 20 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203000",
+          "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203001",
+          "ad": "SEAT 20 · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203003",
+          "ad": "SEAT 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203010",
+          "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "1838a4deda60dc3a",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51201000",
+          "ad": "SEAT 20 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51201003",
+          "ad": "SEAT 20 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202000",
+          "ad": "SEAT 20 · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202003",
+          "ad": "SEAT 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202010",
+          "ad": "SEAT 20 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203000",
+          "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203001",
+          "ad": "SEAT 20 · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203003",
+          "ad": "SEAT 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203010",
+          "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "fd98fdb9cd10a71e",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51201000",
+          "ad": "SEAT 20 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51201003",
+          "ad": "SEAT 20 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202000",
+          "ad": "SEAT 20 · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202003",
+          "ad": "SEAT 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51202010",
+          "ad": "SEAT 20 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203000",
+          "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203001",
+          "ad": "SEAT 20 · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203003",
+          "ad": "SEAT 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51203010",
+          "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "4dd70ee34a79f476",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71201000",
+          "ad": "JET 20 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71201003",
+          "ad": "JET 20 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202000",
+          "ad": "JET 20 · 1400 d/dk · 0,25 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202003",
+          "ad": "JET 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202010",
+          "ad": "JET 20 · 1400 d/dk · 0,18 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203000",
+          "ad": "JET 20 · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203001",
+          "ad": "JET 20 · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203003",
+          "ad": "JET 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203010",
+          "ad": "JET 20 · 2800 d/dk · 0,75 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "b1c02df9de8431d3",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71201000",
+          "ad": "JET 20 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71201003",
+          "ad": "JET 20 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202000",
+          "ad": "JET 20 · 1400 d/dk · 0,25 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202003",
+          "ad": "JET 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202010",
+          "ad": "JET 20 · 1400 d/dk · 0,18 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203000",
+          "ad": "JET 20 · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203001",
+          "ad": "JET 20 · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203003",
+          "ad": "JET 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203010",
+          "ad": "JET 20 · 2800 d/dk · 0,75 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "1ff8930eadd010c2",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71201000",
+          "ad": "JET 20 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71201003",
+          "ad": "JET 20 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202000",
+          "ad": "JET 20 · 1400 d/dk · 0,25 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202003",
+          "ad": "JET 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202010",
+          "ad": "JET 20 · 1400 d/dk · 0,18 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203000",
+          "ad": "JET 20 · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203001",
+          "ad": "JET 20 · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203003",
+          "ad": "JET 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203010",
+          "ad": "JET 20 · 2800 d/dk · 0,75 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "33dc0da62393f4f0",
+      "dosya_sayisi": 9,
+      "urun_sayisi": 9,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71201000",
+          "ad": "JET 20 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71201003",
+          "ad": "JET 20 ATEX · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202000",
+          "ad": "JET 20 · 1400 d/dk · 0,25 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202003",
+          "ad": "JET 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71202010",
+          "ad": "JET 20 · 1400 d/dk · 0,18 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203000",
+          "ad": "JET 20 · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203001",
+          "ad": "JET 20 · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203003",
+          "ad": "JET 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71203010",
+          "ad": "JET 20 · 2800 d/dk · 0,75 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "f4139431c930d808",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "air-curtains"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-65155",
+          "ad": "Vortice Air Door H AD 900 M",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65156",
+          "ad": "Vortice Air Door H AD 900 T",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65157",
+          "ad": "Vortice Air Door H AD 1200 T",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65158",
+          "ad": "Vortice Air Door H AD 1500 T",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65195",
+          "ad": "Vortice Air Door AD 900",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65196",
+          "ad": "Vortice Air Door AD 1200",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65197",
+          "ad": "Vortice Air Door AD 1500",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65198",
+          "ad": "Vortice Air Door AD 2000",
+          "kategori": "air-curtains"
+        }
+      ]
+    },
+    {
+      "hash": "bddfb1e34f45390c",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-40703",
+          "ad": "Vortice E 354 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-40903",
+          "ad": "Vortice E 404 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-41219",
+          "ad": "Vortice E 504 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-41459",
+          "ad": "Vortice E 604 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42259",
+          "ad": "Vortice A-E 354 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42308",
+          "ad": "Vortice A-E 454 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42327",
+          "ad": "Vortice A-E 504 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42336",
+          "ad": "Vortice A-E 564 T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "4614bb6506eb0b18",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-42302",
+          "ad": "Vortice MP 302 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42304",
+          "ad": "Vortice MP 304 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42314",
+          "ad": "Vortice MP 354 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42324",
+          "ad": "Vortice MP 404 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42334",
+          "ad": "Vortice MP 506 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42335",
+          "ad": "Vortice MP 454 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42344",
+          "ad": "Vortice MP 504 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42374",
+          "ad": "Vortice MP 604 T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "0a1f57e3c1725b88",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-42302",
+          "ad": "Vortice MP 302 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42304",
+          "ad": "Vortice MP 304 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42314",
+          "ad": "Vortice MP 354 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42324",
+          "ad": "Vortice MP 404 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42334",
+          "ad": "Vortice MP 506 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42335",
+          "ad": "Vortice MP 454 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42344",
+          "ad": "Vortice MP 504 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42374",
+          "ad": "Vortice MP 604 T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "6d50d7333b6e8527",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-42302",
+          "ad": "Vortice MP 302 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42304",
+          "ad": "Vortice MP 304 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42314",
+          "ad": "Vortice MP 354 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42324",
+          "ad": "Vortice MP 404 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42334",
+          "ad": "Vortice MP 506 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42335",
+          "ad": "Vortice MP 454 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42344",
+          "ad": "Vortice MP 504 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42374",
+          "ad": "Vortice MP 604 T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "7811fa3bdc2c3a03",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-42302",
+          "ad": "Vortice MP 302 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42304",
+          "ad": "Vortice MP 304 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42314",
+          "ad": "Vortice MP 354 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42324",
+          "ad": "Vortice MP 404 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42334",
+          "ad": "Vortice MP 506 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42335",
+          "ad": "Vortice MP 454 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42344",
+          "ad": "Vortice MP 504 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42374",
+          "ad": "Vortice MP 604 T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "9983f77cde193a18",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51350000",
+          "ad": "SEAT 35 · 750 d/dk · 1,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51351000",
+          "ad": "SEAT 35 · 950 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51351003",
+          "ad": "SEAT 35 ATEX · 950 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352000",
+          "ad": "SEAT 35 · 1400 d/dk · 5,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352001",
+          "ad": "SEAT 35 · 1400 d/dk · 7,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352003",
+          "ad": "SEAT 35 ATEX · 1400 d/dk · 5,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352004",
+          "ad": "SEAT 35 ATEX · 1400 d/dk · 7,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352400",
+          "ad": "SEAT 35 · 1400 d/dk · 4 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "2ca97de956ec9871",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51350000",
+          "ad": "SEAT 35 · 750 d/dk · 1,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51351000",
+          "ad": "SEAT 35 · 950 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51351003",
+          "ad": "SEAT 35 ATEX · 950 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352000",
+          "ad": "SEAT 35 · 1400 d/dk · 5,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352001",
+          "ad": "SEAT 35 · 1400 d/dk · 7,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352003",
+          "ad": "SEAT 35 ATEX · 1400 d/dk · 5,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352004",
+          "ad": "SEAT 35 ATEX · 1400 d/dk · 7,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352400",
+          "ad": "SEAT 35 · 1400 d/dk · 4 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "a4585218de2de973",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51350000",
+          "ad": "SEAT 35 · 750 d/dk · 1,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51351000",
+          "ad": "SEAT 35 · 950 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51351003",
+          "ad": "SEAT 35 ATEX · 950 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352000",
+          "ad": "SEAT 35 · 1400 d/dk · 5,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352001",
+          "ad": "SEAT 35 · 1400 d/dk · 7,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352003",
+          "ad": "SEAT 35 ATEX · 1400 d/dk · 5,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352004",
+          "ad": "SEAT 35 ATEX · 1400 d/dk · 7,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51352400",
+          "ad": "SEAT 35 · 1400 d/dk · 4 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "9e563f0ad60af0bd",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71251000",
+          "ad": "JET 25 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71251003",
+          "ad": "JET 25 ATEX · 900 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252000",
+          "ad": "JET 25 · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252003",
+          "ad": "JET 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252010",
+          "ad": "JET 25 · 1400 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252055",
+          "ad": "JET 25 · 1400 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71253000",
+          "ad": "JET 25 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71253003",
+          "ad": "JET 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "05a94025b0964389",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71251000",
+          "ad": "JET 25 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71251003",
+          "ad": "JET 25 ATEX · 900 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252000",
+          "ad": "JET 25 · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252003",
+          "ad": "JET 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252010",
+          "ad": "JET 25 · 1400 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252055",
+          "ad": "JET 25 · 1400 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71253000",
+          "ad": "JET 25 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71253003",
+          "ad": "JET 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "fdcd2b53f29dcfe5",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71251000",
+          "ad": "JET 25 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71251003",
+          "ad": "JET 25 ATEX · 900 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252000",
+          "ad": "JET 25 · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252003",
+          "ad": "JET 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252010",
+          "ad": "JET 25 · 1400 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252055",
+          "ad": "JET 25 · 1400 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71253000",
+          "ad": "JET 25 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71253003",
+          "ad": "JET 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "da6c7a15807a4364",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71251000",
+          "ad": "JET 25 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71251003",
+          "ad": "JET 25 ATEX · 900 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252000",
+          "ad": "JET 25 · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252003",
+          "ad": "JET 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252010",
+          "ad": "JET 25 · 1400 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71252055",
+          "ad": "JET 25 · 1400 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71253000",
+          "ad": "JET 25 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71253003",
+          "ad": "JET 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "4338770423962e5d",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "NIC-11942",
+          "ad": "ADH-200 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11943",
+          "ad": "ADH-225 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11947",
+          "ad": "ADH-355 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11948",
+          "ad": "ADH-400 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11949",
+          "ad": "ADH-450 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11950",
+          "ad": "ADH-500 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11951",
+          "ad": "ADH-560 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11956",
+          "ad": "ADH-1000-K",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "ea19f8f14d3f951c",
+      "dosya_sayisi": 8,
+      "urun_sayisi": 8,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "NIC-11930",
+          "ad": "AT 7/7",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11931",
+          "ad": "AT 9/7",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11932",
+          "ad": "AT 9/9",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11933",
+          "ad": "AT 10/8",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11934",
+          "ad": "AT 10/10",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11935",
+          "ad": "AT 12/9",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11938",
+          "ad": "AT 15/15",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11939",
+          "ad": "AT 18/13",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "8ebc0e5622a946bf",
+      "dosya_sayisi": 7,
+      "urun_sayisi": 7,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16107",
+          "ad": "Vortice CA 100 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16108",
+          "ad": "Vortice CA 125 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16109",
+          "ad": "Vortice CA 150 Q MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16153",
+          "ad": "Vortice CA 150 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16155",
+          "ad": "Vortice CA 200 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16156",
+          "ad": "Vortice CA 250 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16157",
+          "ad": "Vortice CA 315 MD",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "3fef37d75c8026b8",
+      "dosya_sayisi": 7,
+      "urun_sayisi": 7,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16107",
+          "ad": "Vortice CA 100 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16108",
+          "ad": "Vortice CA 125 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16109",
+          "ad": "Vortice CA 150 Q MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16153",
+          "ad": "Vortice CA 150 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16155",
+          "ad": "Vortice CA 200 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16156",
+          "ad": "Vortice CA 250 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16157",
+          "ad": "Vortice CA 315 MD",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "0e7ef4b29f6935c5",
+      "dosya_sayisi": 7,
+      "urun_sayisi": 7,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-17143",
+          "ad": "Vortice Lineo 100 Q",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17144",
+          "ad": "Vortice Lineo 100",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17145",
+          "ad": "Vortice Lineo 125",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17146",
+          "ad": "Vortice Lineo 150",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17180",
+          "ad": "Vortice Lineo 200",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17181",
+          "ad": "Vortice Lineo 250",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17182",
+          "ad": "Vortice Lineo 315",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "29ac4f76b096d1ab",
+      "dosya_sayisi": 7,
+      "urun_sayisi": 7,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16107",
+          "ad": "Vortice CA 100 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16108",
+          "ad": "Vortice CA 125 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16109",
+          "ad": "Vortice CA 150 Q MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16153",
+          "ad": "Vortice CA 150 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16155",
+          "ad": "Vortice CA 200 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16156",
+          "ad": "Vortice CA 250 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16157",
+          "ad": "Vortice CA 315 MD",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "694af856476357db",
+      "dosya_sayisi": 7,
+      "urun_sayisi": 7,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51151000",
+          "ad": "SEAT 15 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152000",
+          "ad": "SEAT 15 · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152003",
+          "ad": "SEAT 15 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152010",
+          "ad": "SEAT 15 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153000",
+          "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153003",
+          "ad": "SEAT 15 ATEX · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153010",
+          "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "36f7e29070e2a990",
+      "dosya_sayisi": 7,
+      "urun_sayisi": 7,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51151000",
+          "ad": "SEAT 15 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152000",
+          "ad": "SEAT 15 · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152003",
+          "ad": "SEAT 15 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152010",
+          "ad": "SEAT 15 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153000",
+          "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153003",
+          "ad": "SEAT 15 ATEX · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153010",
+          "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "33423872d8bb8a14",
+      "dosya_sayisi": 7,
+      "urun_sayisi": 7,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51151000",
+          "ad": "SEAT 15 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152000",
+          "ad": "SEAT 15 · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152003",
+          "ad": "SEAT 15 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152010",
+          "ad": "SEAT 15 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153000",
+          "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153003",
+          "ad": "SEAT 15 ATEX · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153010",
+          "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "fc282f34e322d98d",
+      "dosya_sayisi": 7,
+      "urun_sayisi": 7,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51151000",
+          "ad": "SEAT 15 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152000",
+          "ad": "SEAT 15 · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152003",
+          "ad": "SEAT 15 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152010",
+          "ad": "SEAT 15 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153000",
+          "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153003",
+          "ad": "SEAT 15 ATEX · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153010",
+          "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "039c1d30cfe4567d",
+      "dosya_sayisi": 7,
+      "urun_sayisi": 7,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51151000",
+          "ad": "SEAT 15 · 950 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152000",
+          "ad": "SEAT 15 · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152003",
+          "ad": "SEAT 15 ATEX · 1400 d/dk · 0,18 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51152010",
+          "ad": "SEAT 15 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153000",
+          "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153003",
+          "ad": "SEAT 15 ATEX · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51153010",
+          "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "fca3b2cc1a307881",
+      "dosya_sayisi": 6,
+      "urun_sayisi": 6,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-17160",
+          "ad": "Vortice Lineo 100 Quiet",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17161",
+          "ad": "Vortice Lineo 125 Quiet",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17162",
+          "ad": "Vortice Lineo 150 Quiet",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17164",
+          "ad": "Vortice Lineo 200 Quiet",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17165",
+          "ad": "Vortice Lineo 250 Quiet",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17166",
+          "ad": "Vortice Lineo 315 Quiet",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "36d3fe08aa46acff",
+      "dosya_sayisi": 6,
+      "urun_sayisi": 6,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16107",
+          "ad": "Vortice CA 100 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16109",
+          "ad": "Vortice CA 150 Q MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16153",
+          "ad": "Vortice CA 150 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16155",
+          "ad": "Vortice CA 200 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16156",
+          "ad": "Vortice CA 250 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16157",
+          "ad": "Vortice CA 315 MD",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "f734682be91dfc59",
+      "dosya_sayisi": 6,
+      "urun_sayisi": 6,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16107",
+          "ad": "Vortice CA 100 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16109",
+          "ad": "Vortice CA 150 Q MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16153",
+          "ad": "Vortice CA 150 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16155",
+          "ad": "Vortice CA 200 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16156",
+          "ad": "Vortice CA 250 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16157",
+          "ad": "Vortice CA 315 MD",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "bc45a53ae2961052",
+      "dosya_sayisi": 6,
+      "urun_sayisi": 6,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-17170",
+          "ad": "Vortice Lineo 100 Quiet ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17171",
+          "ad": "Vortice Lineo 125 Quiet ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17172",
+          "ad": "Vortice Lineo 150 Quiet ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17174",
+          "ad": "Vortice Lineo 200 Quiet ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17175",
+          "ad": "Vortice Lineo 250 Quiet ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17176",
+          "ad": "Vortice Lineo 315 Quiet ES",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "64f921f1de99a3a0",
+      "dosya_sayisi": 6,
+      "urun_sayisi": 6,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-61122000",
+          "ad": "STORM 12 · 1400 d/dk · 0,25 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61122003",
+          "ad": "STORM 12 ATEX · 1400 d/dk · 0,25 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61122010",
+          "ad": "STORM 12 · 1400 d/dk · 0,25 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61123000",
+          "ad": "STORM 12 · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61123003",
+          "ad": "STORM 12 ATEX · 2800 d/dk · 0,37 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61123010",
+          "ad": "STORM 12 · 2800 d/dk · 0,37 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "52b46b7e069ebe11",
+      "dosya_sayisi": 6,
+      "urun_sayisi": 6,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-61102000",
+          "ad": "STORM 10 · 1400 d/dk · 0,06 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61102003",
+          "ad": "STORM 10 ATEX · 1400 d/dk · 0,06 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61103000",
+          "ad": "STORM 10 · 2800 d/dk · 0,09 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61103003",
+          "ad": "STORM 10 ATEX · 2800 d/dk · 0,12 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61103010",
+          "ad": "STORM 10 · 2800 d/dk · 0,09 kW · 220V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61103110",
+          "ad": "STORM 10 · 1400 d/dk · 0,06 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "ebcaf9b56c63a539",
+      "dosya_sayisi": 6,
+      "urun_sayisi": 6,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "NIC-11960",
+          "ad": "RDH-180 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11961",
+          "ad": "RDH-200 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11962",
+          "ad": "RDH-225 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11963",
+          "ad": "RDH-250 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11964",
+          "ad": "RDH-280 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11969",
+          "ad": "RDH-500 E2",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "53add7714aa06059",
+      "dosya_sayisi": 6,
+      "urun_sayisi": 6,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "NIC-11960",
+          "ad": "RDH-180 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11961",
+          "ad": "RDH-200 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11962",
+          "ad": "RDH-225 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11963",
+          "ad": "RDH-250 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11964",
+          "ad": "RDH-280 E2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "NIC-11969",
+          "ad": "RDH-500 E2",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "a99b890b6706d177",
+      "dosya_sayisi": 5,
+      "urun_sayisi": 5,
+      "kategoriler": [
+        "heat-recovery-vmc"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-12431",
+          "ad": "Vortice VORT HRW 60 MONO EVO HCS",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12432",
+          "ad": "Vortice VORT HRW 60 MONO EVO HCS Wi-Fi",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12435",
+          "ad": "Vortice VORT HRW 40 MONO EVO",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12437",
+          "ad": "Vortice VORT HRW 40 MONO EVO HCS",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12444",
+          "ad": "Vortice VORT HRW 40 MONO EVO HCS Wi-Fi",
+          "kategori": "heat-recovery-vmc"
+        }
+      ]
+    },
+    {
+      "hash": "02656ec93729eecd",
+      "dosya_sayisi": 5,
+      "urun_sayisi": 5,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16277",
+          "ad": "Vortice CA-RM 100 ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16278",
+          "ad": "Vortice CA-RM 125 ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16279",
+          "ad": "Vortice CA-RM 150 ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16280",
+          "ad": "Vortice CA-RM 160 ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16281",
+          "ad": "Vortice CA-RM 200 ES",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "45ea69903026c917",
+      "dosya_sayisi": 5,
+      "urun_sayisi": 5,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-17144",
+          "ad": "Vortice Lineo 100",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17145",
+          "ad": "Vortice Lineo 125",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17146",
+          "ad": "Vortice Lineo 150",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17180",
+          "ad": "Vortice Lineo 200",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17181",
+          "ad": "Vortice Lineo 250",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "4adcd7299cc20023",
+      "dosya_sayisi": 5,
+      "urun_sayisi": 5,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16277",
+          "ad": "Vortice CA-RM 100 ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16278",
+          "ad": "Vortice CA-RM 125 ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16279",
+          "ad": "Vortice CA-RM 150 ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16280",
+          "ad": "Vortice CA-RM 160 ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16281",
+          "ad": "Vortice CA-RM 200 ES",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "14e6b9ad349e0ba3",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11313",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11314",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11333",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11334",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "b28fb9309046a259",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11313",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11314",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11333",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11334",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "c427c550aeadbffc",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11313",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11314",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11333",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11334",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "4a9e979540e5b8c7",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11313",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11314",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11333",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11334",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "90b6e5800738544d",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11313",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11314",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11333",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11334",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "a30c3437401831c4",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11313",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11314",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11333",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11334",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "3c31b0406f94ea43",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11313",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11314",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11333",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11334",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "3c9369c51538872f",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-11313",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11314",
+          "ad": "Vortice Punto Evo Flexo MEX 100/4\" LL 1S T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11333",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-11334",
+          "ad": "Vortice Punto Evo Flexo MEX 120/5\" LL 1S T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "24209e1b4af6b440",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "heat-recovery-vmc"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-12431",
+          "ad": "Vortice VORT HRW 60 MONO EVO HCS",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12432",
+          "ad": "Vortice VORT HRW 60 MONO EVO HCS Wi-Fi",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12437",
+          "ad": "Vortice VORT HRW 40 MONO EVO HCS",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12444",
+          "ad": "Vortice VORT HRW 40 MONO EVO HCS Wi-Fi",
+          "kategori": "heat-recovery-vmc"
+        }
+      ]
+    },
+    {
+      "hash": "066d3bde43d7246e",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-13147",
+          "ad": "Vortice BRA.VO S1",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-13148",
+          "ad": "Vortice BRA.VO S2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-13149",
+          "ad": "Vortice BRA.VO S3",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-13150",
+          "ad": "Vortice BRA.VO S4",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "be111ff84f97a2f3",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-13147",
+          "ad": "Vortice BRA.VO S1",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-13148",
+          "ad": "Vortice BRA.VO S2",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-13149",
+          "ad": "Vortice BRA.VO S3",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-13150",
+          "ad": "Vortice BRA.VO S4",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "1ddf6a97e9189459",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-40703",
+          "ad": "Vortice E 354 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-40903",
+          "ad": "Vortice E 404 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-41219",
+          "ad": "Vortice E 504 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-41459",
+          "ad": "Vortice E 604 M",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "a350f4f989a3e908",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "air-curtains"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-65155",
+          "ad": "Vortice Air Door H AD 900 M",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65156",
+          "ad": "Vortice Air Door H AD 900 T",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65157",
+          "ad": "Vortice Air Door H AD 1200 T",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65158",
+          "ad": "Vortice Air Door H AD 1500 T",
+          "kategori": "air-curtains"
+        }
+      ]
+    },
+    {
+      "hash": "b86d54d3008c694b",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "air-curtains"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-65155",
+          "ad": "Vortice Air Door H AD 900 M",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65156",
+          "ad": "Vortice Air Door H AD 900 T",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65157",
+          "ad": "Vortice Air Door H AD 1200 T",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65158",
+          "ad": "Vortice Air Door H AD 1500 T",
+          "kategori": "air-curtains"
+        }
+      ]
+    },
+    {
+      "hash": "a9465013fb9d49b9",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51301000",
+          "ad": "SEAT 30 · 950 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302000",
+          "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302003",
+          "ad": "SEAT 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302010",
+          "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "d8469ccfe29590c7",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51301000",
+          "ad": "SEAT 30 · 950 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302000",
+          "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302003",
+          "ad": "SEAT 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302010",
+          "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "016b8632e3ef9678",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51301000",
+          "ad": "SEAT 30 · 950 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302000",
+          "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302003",
+          "ad": "SEAT 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302010",
+          "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "1e87e648b00eaa65",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51301000",
+          "ad": "SEAT 30 · 950 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302000",
+          "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302003",
+          "ad": "SEAT 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302010",
+          "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "31b3a18ec9db9dec",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51301000",
+          "ad": "SEAT 30 · 950 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302000",
+          "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302003",
+          "ad": "SEAT 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51302010",
+          "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "f3fed1723dfa4cfa",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71301000",
+          "ad": "JET 30 · 950 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302000",
+          "ad": "JET 30 · 1500 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302003",
+          "ad": "JET 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302010",
+          "ad": "JET 30 · 1400 d/dk · 1,1 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "e09bca461054093c",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71301000",
+          "ad": "JET 30 · 950 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302000",
+          "ad": "JET 30 · 1500 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302003",
+          "ad": "JET 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302010",
+          "ad": "JET 30 · 1400 d/dk · 1,1 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "7252ecbc653bc8d8",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71301000",
+          "ad": "JET 30 · 950 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302000",
+          "ad": "JET 30 · 1500 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302003",
+          "ad": "JET 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302010",
+          "ad": "JET 30 · 1400 d/dk · 1,1 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "dc16a7078b7053fa",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 4,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-71301000",
+          "ad": "JET 30 · 950 d/dk · 0,55 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302000",
+          "ad": "JET 30 · 1500 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302003",
+          "ad": "JET 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-71302010",
+          "ad": "JET 30 · 1400 d/dk · 1,1 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "d46f47468f0bc0d9",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-17160",
+          "ad": "Vortice Lineo 100 Quiet",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17161",
+          "ad": "Vortice Lineo 125 Quiet",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17162",
+          "ad": "Vortice Lineo 150 Quiet",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "897e4cef0b692eb3",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "heat-recovery-vmc"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-12434",
+          "ad": "Vortice VORT HRW 30 MONO EVO",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12436",
+          "ad": "Vortice VORT HRW 30 MONO EVO HCS",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12443",
+          "ad": "Vortice VORT HRW 30 MONO EVO HCS Wi-Fi",
+          "kategori": "heat-recovery-vmc"
+        }
+      ]
+    },
+    {
+      "hash": "642689c7d2335ef8",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "heat-recovery-vmc"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-12434",
+          "ad": "Vortice VORT HRW 30 MONO EVO",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12436",
+          "ad": "Vortice VORT HRW 30 MONO EVO HCS",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12443",
+          "ad": "Vortice VORT HRW 30 MONO EVO HCS Wi-Fi",
+          "kategori": "heat-recovery-vmc"
+        }
+      ]
+    },
+    {
+      "hash": "ec72f443dd8479dd",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16257",
+          "ad": "Vortice CA-RM 150 RF ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16258",
+          "ad": "Vortice CA-RM 160 RF ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16259",
+          "ad": "Vortice CA-RM 200 RF ES",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "577c05ac45561f68",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-17164",
+          "ad": "Vortice Lineo 200 Quiet",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17165",
+          "ad": "Vortice Lineo 250 Quiet",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17166",
+          "ad": "Vortice Lineo 315 Quiet",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "299461a8e9dc1698",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16107",
+          "ad": "Vortice CA 100 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16108",
+          "ad": "Vortice CA 125 MD",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16109",
+          "ad": "Vortice CA 150 Q MD",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "12c3578a7eb9e368",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16257",
+          "ad": "Vortice CA-RM 150 RF ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16258",
+          "ad": "Vortice CA-RM 160 RF ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16259",
+          "ad": "Vortice CA-RM 200 RF ES",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "4f9d652919fb8d25",
+      "dosya_sayisi": 4,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-16257",
+          "ad": "Vortice CA-RM 150 RF ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16258",
+          "ad": "Vortice CA-RM 160 RF ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-16259",
+          "ad": "Vortice CA-RM 200 RF ES",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "0cbece5153bb1273",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-17170",
+          "ad": "Vortice Lineo 100 Quiet ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17171",
+          "ad": "Vortice Lineo 125 Quiet ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17172",
+          "ad": "Vortice Lineo 150 Quiet ES",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "fb6bc8366ca669e5",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-42308",
+          "ad": "Vortice A-E 454 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42327",
+          "ad": "Vortice A-E 504 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42336",
+          "ad": "Vortice A-E 564 T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "10fd24be175d848c",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-42308",
+          "ad": "Vortice A-E 454 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42327",
+          "ad": "Vortice A-E 504 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42336",
+          "ad": "Vortice A-E 564 T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "51e927a559c1c18a",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-42308",
+          "ad": "Vortice A-E 454 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42327",
+          "ad": "Vortice A-E 504 T",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-42336",
+          "ad": "Vortice A-E 564 T",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "a1035333ed7c631c",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-40903",
+          "ad": "Vortice E 404 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-41219",
+          "ad": "Vortice E 504 M",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-41459",
+          "ad": "Vortice E 604 M",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "5e555f0fb8c54683",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51501000",
+          "ad": "SEAT 50 · 950 d/dk · 4 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51502000",
+          "ad": "SEAT 50 · 1400 d/dk · 5,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51502003",
+          "ad": "SEAT 50 ATEX · 1400 d/dk · 5,5 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "eef3a77963fcd9bc",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-51501000",
+          "ad": "SEAT 50 · 950 d/dk · 4 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51502000",
+          "ad": "SEAT 50 · 1400 d/dk · 5,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-51502003",
+          "ad": "SEAT 50 ATEX · 1400 d/dk · 5,5 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "402e9d5bb9fad42a",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-61143000",
+          "ad": "STORM 14 · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61143003",
+          "ad": "STORM 14 ATEX · 2800 d/dk · 1,1 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61143010",
+          "ad": "STORM 14 · 2800 d/dk · 1,1 kW · 220V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "388b4c7fc16bddab",
+      "dosya_sayisi": 3,
+      "urun_sayisi": 3,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "AVE-30100",
+          "ad": "BVU 1000-230W",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-30101",
+          "ad": "BVU 2000-310W",
+          "kategori": "fans"
+        },
+        {
+          "sku": "AVE-30102",
+          "ad": "BVU 3000-430W",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "80f0da211f220be0",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "heat-recovery-vmc"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-10911",
+          "ad": "Vortice Vort HR 350 Avel H",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12106",
+          "ad": "Vortice Vort HR 350 Avel",
+          "kategori": "heat-recovery-vmc"
+        }
+      ]
+    },
+    {
+      "hash": "79276e34464ad448",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "heat-recovery-vmc"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-10911",
+          "ad": "Vortice Vort HR 350 Avel H",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12106",
+          "ad": "Vortice Vort HR 350 Avel",
+          "kategori": "heat-recovery-vmc"
+        }
+      ]
+    },
+    {
+      "hash": "35ddb7d34ebf526f",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "heat-recovery-vmc"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-10911",
+          "ad": "Vortice Vort HR 350 Avel H",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12106",
+          "ad": "Vortice Vort HR 350 Avel",
+          "kategori": "heat-recovery-vmc"
+        }
+      ]
+    },
+    {
+      "hash": "67a292ace1e054fc",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "heat-recovery-vmc"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-10911",
+          "ad": "Vortice Vort HR 350 Avel H",
+          "kategori": "heat-recovery-vmc"
+        },
+        {
+          "sku": "VRT-12106",
+          "ad": "Vortice Vort HR 350 Avel",
+          "kategori": "heat-recovery-vmc"
+        }
+      ]
+    },
+    {
+      "hash": "715a7cee160eee87",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-17143",
+          "ad": "Vortice Lineo 100 Q",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17144",
+          "ad": "Vortice Lineo 100",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "adbc30dbc584158e",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-17174",
+          "ad": "Vortice Lineo 200 Quiet ES",
+          "kategori": "fans"
+        },
+        {
+          "sku": "VRT-17175",
+          "ad": "Vortice Lineo 250 Quiet ES",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "3846f0bceca3c8ea",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "air-treatment"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-26021",
+          "ad": "Vortice DEUMIDO NG 16",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "VRT-26022",
+          "ad": "Vortice DEUMIDO NG 20",
+          "kategori": "air-treatment"
+        }
+      ]
+    },
+    {
+      "hash": "2c1f8de8fca12d9c",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "air-treatment"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-26021",
+          "ad": "Vortice DEUMIDO NG 16",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "VRT-26022",
+          "ad": "Vortice DEUMIDO NG 20",
+          "kategori": "air-treatment"
+        }
+      ]
+    },
+    {
+      "hash": "49076253b0ac9a41",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "air-treatment"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-26021",
+          "ad": "Vortice DEUMIDO NG 16",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "VRT-26022",
+          "ad": "Vortice DEUMIDO NG 20",
+          "kategori": "air-treatment"
+        }
+      ]
+    },
+    {
+      "hash": "1b5f0f48050d2254",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "air-treatment"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-26021",
+          "ad": "Vortice DEUMIDO NG 16",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "VRT-26022",
+          "ad": "Vortice DEUMIDO NG 20",
+          "kategori": "air-treatment"
+        }
+      ]
+    },
+    {
+      "hash": "c5250e6bf2b234cd",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "air-treatment"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-26021",
+          "ad": "Vortice DEUMIDO NG 16",
+          "kategori": "air-treatment"
+        },
+        {
+          "sku": "VRT-26022",
+          "ad": "Vortice DEUMIDO NG 20",
+          "kategori": "air-treatment"
+        }
+      ]
+    },
+    {
+      "hash": "19e8e8df81c66e79",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "air-curtains"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-65155",
+          "ad": "Vortice Air Door H AD 900 M",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65156",
+          "ad": "Vortice Air Door H AD 900 T",
+          "kategori": "air-curtains"
+        }
+      ]
+    },
+    {
+      "hash": "374fbf9458d62853",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "air-curtains"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-65155",
+          "ad": "Vortice Air Door H AD 900 M",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65156",
+          "ad": "Vortice Air Door H AD 900 T",
+          "kategori": "air-curtains"
+        }
+      ]
+    },
+    {
+      "hash": "23dbf8498547547d",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "air-curtains"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "VRT-65155",
+          "ad": "Vortice Air Door H AD 900 M",
+          "kategori": "air-curtains"
+        },
+        {
+          "sku": "VRT-65156",
+          "ad": "Vortice Air Door H AD 900 T",
+          "kategori": "air-curtains"
+        }
+      ]
+    },
+    {
+      "hash": "b2cfeab1accf9491",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-61163000",
+          "ad": "STORM 16 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61163003",
+          "ad": "STORM 16 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "f458d751c121ab2f",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-61163000",
+          "ad": "STORM 16 · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61163003",
+          "ad": "STORM 16 ATEX · 2800 d/dk · 2,2 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "8a888f3dfeaf9ab4",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "fans"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "SEA-61183000",
+          "ad": "STORM 18 · 2800 d/dk · 7,5 kW · 380V",
+          "kategori": "fans"
+        },
+        {
+          "sku": "SEA-61183003",
+          "ad": "STORM 18 ATEX · 2800 d/dk · 7,5 kW · 380V",
+          "kategori": "fans"
+        }
+      ]
+    },
+    {
+      "hash": "19668d16d86d9991",
+      "dosya_sayisi": 2,
+      "urun_sayisi": 2,
+      "kategoriler": [
+        "control-systems"
+      ],
+      "kategori_sinirini_asiyor": false,
+      "urunler": [
+        {
+          "sku": "AVE-80141",
+          "ad": "FC-51 - 230V - 0,37kW Frekans Konvertörü",
+          "kategori": "control-systems"
+        },
+        {
+          "sku": "DAN-80101",
+          "ad": "FC-51 - 220V - 0,37kW Frekans Konvertörü",
+          "kategori": "control-systems"
+        }
+      ]
+    }
+  ],
+  "gorselsiz_urunler": [
+    {
+      "sku": "AVE-11560",
+      "ad": "QE-B I",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-11561",
+      "ad": "QE-B M",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-11562",
+      "ad": "QE-B I VK90",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-11563",
+      "ad": "QE-B M VK90",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-11564",
+      "ad": "QE-B I K90 R",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-11565",
+      "ad": "QE-B I K90 S",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-11566",
+      "ad": "QE-B I K90 R 2R",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-11567",
+      "ad": "QE-B I K90 R 2L",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-11568",
+      "ad": "QE-B I K90 S 2R",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-1200",
+      "ad": "AVENS 40x20",
+      "kategori": "commercial-ventilation",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-1250",
+      "ad": "AVENS 50x25",
+      "kategori": "commercial-ventilation",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-13032",
+      "ad": "6 kW Elektrikli Isıtıcı",
+      "kategori": "air-treatment",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-13033",
+      "ad": "9 kW Elektrikli Isıtıcı",
+      "kategori": "air-treatment",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-13034",
+      "ad": "12 kW Elektrikli Isıtıcı",
+      "kategori": "air-treatment",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-13037",
+      "ad": "3 kW Elektrikli Isıtıcı",
+      "kategori": "air-treatment",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-13038",
+      "ad": "15 kW Elektrikli Isıtıcı",
+      "kategori": "air-treatment",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-13039",
+      "ad": "18 kW Elektrikli Isıtıcı",
+      "kategori": "air-treatment",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-13050",
+      "ad": "SULU BATARYA 7 KW KANAL TİPİ-4700(Kcal/h) 90/70°C",
+      "kategori": "air-treatment",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-13051",
+      "ad": "SULU BATARYA 8 KW KANAL TİPİ-7000(Kcal/h) 90/70°C",
+      "kategori": "air-treatment",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-1316",
+      "ad": "AVENS 60x30",
+      "kategori": "commercial-ventilation",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-1317",
+      "ad": "AVENS 60x35",
+      "kategori": "commercial-ventilation",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-1355",
+      "ad": "AVENS 70x40",
+      "kategori": "commercial-ventilation",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-1360",
+      "ad": "AVENS 80x50",
+      "kategori": "commercial-ventilation",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-1410",
+      "ad": "AVENS 100x50",
+      "kategori": "commercial-ventilation",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20100",
+      "ad": "AVenS-HF/FW 7/7 1,1 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20110",
+      "ad": "AVenS-HF/FW 9/9 1,5 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20120",
+      "ad": "AVenS-HF/FW 10/10 2,2 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20130",
+      "ad": "AVenS-HF/FW 12/12 3 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20140",
+      "ad": "AVenS-HF/FW 15/15 4 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20150",
+      "ad": "AVenS-HF/FW 18/18 5,5 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20200",
+      "ad": "AVenS-HF/S 250 1,1 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20210",
+      "ad": "AVenS-HF/S 280 1,5 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20220",
+      "ad": "AVenS-HF/S 315 3 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20230",
+      "ad": "AVenS-HF/S 355 4 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20240",
+      "ad": "AVenS-HF/S 400 5,5 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20250",
+      "ad": "AVenS-HF/S 450 7,5 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-20260",
+      "ad": "AVenS-HF/S 500 11 kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-30110",
+      "ad": "BVU-LS 1000",
+      "kategori": "accessories",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-30111",
+      "ad": "BVU-LS 2000/3000",
+      "kategori": "accessories",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-ENKEC155",
+      "ad": "ENKELFAN 155 EEC",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-ENKEC190",
+      "ad": "ENKELFAN 190 EEC",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-ENKEC250",
+      "ad": "ENKELFAN 250 EEC",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-ENKEC310",
+      "ad": "ENKELFAN 310 EEC",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-ENKEC355",
+      "ad": "ENKELFAN 355 EEC",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-ENKEC450",
+      "ad": "ENKELFAN 450 EEC",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-ENKEC500",
+      "ad": "ENKELFAN 500 EEC",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-ENKEC560",
+      "ad": "ENKELFAN 560 EEC",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-ENKEC630",
+      "ad": "ENKELFAN 630 EEC",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS10014225",
+      "ad": "NIMUS 1001 T4 45kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS311280",
+      "ad": "NIMUS 311 T2 1,1kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS351290",
+      "ad": "NIMUS 351 T2 2,2kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS351471",
+      "ad": "NIMUS 351 T4 0,37kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS4012100",
+      "ad": "NIMUS 401 T2 4kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS401480",
+      "ad": "NIMUS 401 T4 0,55kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS4512132",
+      "ad": "NIMUS 451 T2 7,5kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS451480",
+      "ad": "NIMUS 451 T4 0,75kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS5012160",
+      "ad": "NIMUS 501 T2 11kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS501490",
+      "ad": "NIMUS 501 T4 1,5kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS5624100",
+      "ad": "NIMUS 561 T4 2,2kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS6314112",
+      "ad": "NIMUS 631 T4 4kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS7114132",
+      "ad": "NIMUS 711 T4 7,5kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS8014160",
+      "ad": "NIMUS 801 T4 15kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NS9014200",
+      "ad": "NIMUS 901 T4 30kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX10034250",
+      "ad": "NIMAX 1004 T4 55kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX313290",
+      "ad": "NIMAX 314 T2 1,5kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX353290",
+      "ad": "NIMAX 354 T2 3kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX353471",
+      "ad": "NIMAX 354 T4 0,37kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX4032112",
+      "ad": "NIMAX 404 T2 5,5kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX403480",
+      "ad": "NIMAX 404 T4 0,55kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX4532132",
+      "ad": "NIMAX 454 T2 11kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX453490",
+      "ad": "NIMAX 454 T4 1,1kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX5032160",
+      "ad": "NIMAX 504 T2 15kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX503490",
+      "ad": "NIMAX 504 T4 2,2kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX5634100",
+      "ad": "NIMAX 564 T4 3kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX6334132",
+      "ad": "NIMAX 634 T4 5,5kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX7144160",
+      "ad": "NIMAX 714 T4 11kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX8034180",
+      "ad": "NIMAX 804 T4 18,5kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "AVE-NX9034200",
+      "ad": "NIMAX 904 T4 37kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "SEA-61102010",
+      "ad": "STORM 10 XRM · 1400 d/dk · 0,06 kW · 220V",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "SEA-810105",
+      "ad": "PTC SENSOR",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-16076",
+      "ad": "Vortice CA IL 4020 ES RECT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-16077",
+      "ad": "Vortice CA IL 5035 ES RECT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-16078",
+      "ad": "Vortice CA IL 6040 ES RECT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-16079",
+      "ad": "Vortice CA IL 7050 ES RECT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-16080",
+      "ad": "Vortice CA IL 8060 ES RECT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253080106XN",
+      "ad": "VORTICENT CMS ATEX 12/5 T4 0,09kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253090106XE",
+      "ad": "VORTICENT CMS ATEX 14/5 T4 0,09kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253100106XN",
+      "ad": "VORTICENT CMS ATEX 14/5 T2 0,25kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253110106XN",
+      "ad": "VORTICENT CMS ATEX 16/6 T2 0,37kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253260106XN",
+      "ad": "VORTICENT CMS ATEX 22/9 T4 0,37kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253320106XN",
+      "ad": "VORTICENT CMS ATEX 25/10 T4 0,75kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253410106XN",
+      "ad": "VORTICENT CMS ATEX 28/11 T4 1,1kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253420106XN",
+      "ad": "VORTICENT CMS ATEX 31/12 T4 2,2kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253490106XN",
+      "ad": "VORTICENT CMS ATEX 35/14 T4 4kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253510106XN",
+      "ad": "VORTICENT CMS ATEX 40/16 T4 7,5kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-253530121XN",
+      "ad": "VORTICENT CMS ATEX 45/18 T4 11kW",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-61181",
+      "ad": "Vortice NORDIK HVLS HYPERBLADE 300/120 M SVT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-61182",
+      "ad": "Vortice NORDIK HVLS HYPERBLADE 400/160 M SVT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-61186",
+      "ad": "Vortice NORDIK HVLS HYPERBLADE 300/120 T SVT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-61187",
+      "ad": "Vortice NORDIK HVLS HYPERBLADE 400/160 T SVT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-61188",
+      "ad": "Vortice NORDIK HVLS HYPERBLADE 500/200 T SVT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-61189",
+      "ad": "Vortice NORDIK HVLS HYPERBLADE 600/240 T SVT",
+      "kategori": "fans",
+      "durum": "active"
+    },
+    {
+      "sku": "VRT-61190",
+      "ad": "Vortice NORDIK HVLS HYPERBLADE 700/280 T SVT",
+      "kategori": "fans",
+      "durum": "active"
+    }
+  ]
+}
