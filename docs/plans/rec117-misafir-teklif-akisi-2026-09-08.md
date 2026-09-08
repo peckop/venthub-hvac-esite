@@ -99,7 +99,8 @@ tablo/kolona dokunamadığı **testle çivilenir**. Kabul edilen risk budur ve y
 | # | Kalem | Yüzey | Migration? |
 |---|---|---|---|
 | 1 | `quote-request-guest` Edge Function — doğrulama + hız limiti + INSERT. **`tenant_id` AÇIKÇA yazılır** (DEFAULT'a yaslanılmaz), **idempotency anahtarı alır**, hız limiti için `_shared/rate_limit.ts` → `bump_rate_limit` kullanılır (bellek-içi limit Deno izolatları arasında paylaşılmaz, koruma değildir) | `supabase/functions/quote-request-guest/**` | HAYIR |
-| 1b | ⭐**`quote-notification-webhook` misafir dalı** — bugün alıcıyı `auth.admin.getUserById(quote.user_id)` ile okuyor; `user_id` NULL'da 503 döner ve **e-posta hiç gitmez**. `contact_email`'e düşen dal eklenir; SELECT listesine `contact_email` girer | `supabase/functions/quote-notification-webhook/index.ts` | HAYIR |
+| 1b | ⭐**`quote-notification-webhook` alıcı çözümü TEK DALA iner** — bugün alıcıyı `auth.admin.getUserById(quote.user_id)` ile okuyor; `user_id` NULL'da 503 döner ve **e-posta hiç gitmez**. `contact_email` her teklifte NOT NULL olduğu için tek dal yeter; `user_id` dalı kalkar, SELECT listesine `contact_email` girer | `supabase/functions/quote-notification-webhook/index.ts` | HAYIR |
+| 3b | ⭐**KVKK aydınlatma** — bugün yok (`src/components/quotes` altında `kvkk`/`consent`/`aydinlatma` 0 eşleşme; `venthub_quotes`'ta kolon yok). Dayanak **KVKK m.5/2-c** (sözleşme öncesi zorunluluk): **rıza şart değil, AYDINLATMA şart.** Forma aydınlatma bağlantısı (`Routes.legal.kvkk`, iletişim formu kalıbı) + tek kutu "Aydınlatma metnini okudum"; **işaretsiz istek gönderilmez.** İspat: Edge Function aydınlatma **sürüm + zamanını** olay defterine yazar; kalıcı kolon borcu bir sonraki migration turuna yazılır | modal + Edge Function | HAYIR (kolon borcu ertelenir) |
 | 2 | `QuoteRequestButton` login kapısının kaldırılması (oturumlu akış korunur) | `src/components/quotes/QuoteRequestButton.tsx` | HAYIR |
 | 3 | `QuoteRequestModal` misafir alanları (ad/firma/e-posta/telefon) + oturumluda otomatik dolum | `src/components/quotes/QuoteRequestModal.tsx` | HAYIR |
 | 4 | `quoteService` misafir dalı — DI kuralı 2 aynen (ilk parametre `supabase`) | `src/lib/services/quoteService.ts` | HAYIR |
@@ -152,6 +153,7 @@ görünmüyorsa o zaman iş açılır.
 | INV-MISAFIR-YAZIM-1 | `quote-request-guest` yalnız `status='requested'` ve `user_id=null` yazar; başka tabloya/duruma yazan satır YOK | gövdeye `'draft'` yaz → kırmızı olmalı |
 | INV-MISAFIR-KIMLIK-1 | Üç kimlik alanı da doğrulanmadan INSERT'e gidilmez | doğrulamayı kaldır → kırmızı |
 | INV-MISAFIR-HIZ-1 | Hız limiti dalı gövdede mevcut ve devre dışı bırakılamaz | limiti sonsuz yap → kırmızı |
+| INV-MISAFIR-AYDINLATMA-1 | Formda aydınlatma bağlantısı + onay kutusu var; Edge Function işaretsiz isteği REDDEDER ve aydınlatma sürüm/zamanını deftere yazar | kutuyu kaldır ya da reddi gevşet → kırmızı |
 | Mevcut `quote-insert-policy-guard` | Değişmemeli — ama aşağıdaki şerhle | politika eklenirse ratchet kırmızı verir |
 | `edge-security` R7 | Yeni fonksiyon `config.toml`'da `[functions."quote-request-guest"]` bloğu ister | blok yazılmazsa KIRMIZI (beklenen) |
 | `edge-security` R10 | Dosya başında `// Çağıran sınıfı:` beyanı ister — *"YENİ fonksiyon beyansız eklenemez"* | beyan yazılmazsa KIRMIZI (beklenen) |
@@ -186,11 +188,12 @@ değişimi ayrıca `edge-shared-input-drift` yüzeyini tetikler.
 
 ## 6) SIRA VE ONAY
 
-1. Bu plan → **plan-challenger** (skill) → **OPS bağımsız çürütme** (alt-ajan).
-2. Çürütme sonrası **Recep'e tek karar sorusu**: Yol B (Edge Function, migration yok) kabul mü?
-   — Migration olmadığı için bu bir *merge onayı* değil, bir *yön onayı*. Yapısal karar
-   olduğu için tek başına sorulur, paket içinde değil.
-3. Onay gelirse kod; kapılar için ALTYAPI'ya emir.
+1. ✅ Bu plan → **plan-challenger** (bağımsız denetçi, §8) → ✅ **OPS bağımsız çürütmesi** (§9).
+2. ⛔ **Recep'e Yol B SORUSU SORULMAZ** (OPS hükmü, 2026-09-08). Gerekçe: bu **yapısal bir karar
+   değil** — menü yeri, URL şeması ya da sayfa mimarisi değiştirmiyor; migration da yok, yani
+   merge onayı da gerekmiyor. Recep'e **bilgi** gider, karar sorusu değil. Karar zaten
+   2026-09-01'de verilmiş; buradaki seçim onun *nasıl* uygulanacağıdır ve o mühendislik kararıdır.
+3. Kod; kapılar için ALTYAPI'ya emir (`src/__tests__/conformance/**` onun şeridi).
 4. REC-59 canlı ölçümü Vercel kotasına bağlı; bu iş ona bağımlı DEĞİL, paralel yürür.
 
 ---
@@ -223,3 +226,29 @@ beşi de hükmü destekledi, üstelik §7'deki kaçış şartım ölçümle çö
 4. `tenant_id` açıkça yazılmalı + idempotency anahtarı → **kalem 1 ve §5'e girdi**
 
 Bu bölüm silinmeyecek: bir planın nerede yanıldığı, doğru çıktığı yer kadar bilgi taşır.
+
+---
+
+## 9) İKİNCİ ÇÜRÜTME (OPS) — KOŞULLU KABUL, üç düzeltme daha
+
+Yol B ayakta. Üçü de işlendi:
+
+**1. KVKK aydınlatma eksikti — hukuki, ve planda hiç yoktu.** → kalem **3b** + kapı
+**INV-MISAFIR-AYDINLATMA-1**. Rıza değil aydınlatma şart (m.5/2-c); ispat olay defterine
+sürüm+zaman olarak yazılır, kalıcı kolon borcu sonraki migration turuna.
+
+**2. Idempotency nerede saklanacak, yazılmamıştı.** → Kolon eklenmiyor (migration yok):
+anahtar `hash(contact_email + kalemler)`, `bump_rate_limit` üzerinden `quote:<hash>` ile
+**10 dakikada 1**. Yani çift gönderim koruması hız limiti altyapısına biniyor, ayrı bir
+tablo istemiyor. Kalem 1'in kapsamında.
+
+**3. Kalem 1b sadeleşti: tek dal `contact_email`, `user_id` dalı kalkar.** Dayanak:
+`contact_email` her teklifte NOT NULL, yani tek dal daima bir değer bulur; ayrıca teklif
+yanıtının gitmesi gereken adres, kullanıcının **formda yazdığı** adrestir.
+
+> ⚠ **OPS bu kalem için "önce ölç: üye kayıtlarında `contact_email` ile auth e-postası ayrışan
+> var mı" dedi. ÖLÇTÜM VE ÖLÇÜM AYIRT ETMİYOR** — `venthub_quotes` bugün **toplam 1 satır**
+> taşıyor (üyeli 1, misafir 0, ayrışan 0). Tek satırla "ayrışma olmuyor" denemez; sıfır sonucu
+> burada yokluğu değil, **örneklemin yokluğunu** gösterir. Kararı bu sayıya değil, yukarıdaki
+> iki yapısal gerekçeye dayandırıyorum. Bugünün dersinin kendi işimize uygulanmış hâli: sıfır
+> gördüğümde önce ölçütün ayırt ettiğini kanıtlamak zorundayım, ve burada kanıtlayamadım.
