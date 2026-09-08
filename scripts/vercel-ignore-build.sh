@@ -77,6 +77,44 @@
 
 set -u
 
+# --- DAL KAPISI: üretim dalı DIŞINDAKİ her ref için derleme ATLANIR ---------
+#
+# NİÇİN VAR (ölçüldü 2026-09-08, ALTYAPI): REC-217 "PR dalları yayın üretmesin"
+# diye `vercel.json`'a `git.deploymentEnabled {"*": false, "master": true}`
+# yazdı. İŞLEMEDİ, ve niçini Vercel'in kendi belgesinde yazıyor
+# (project-configuration/git-configuration): nesne biçimi YALNIZ ADI VERİLEN
+# dalları eşler ve **"unspecified branches default to true"**. JOKER YOK — yani
+# `"*"` literal bir dal adı sanıldı, hiçbir şeyle eşleşmedi, geri kalan her dal
+# VARSAYILAN OLARAK AÇIK kaldı. Ölçüm: kuralı TAŞIYAN dört dal (#1107, #1108,
+# rec121, #1109) yine önizleme üretti (READY) — yani "dosya dalda yok" değil,
+# "kural öyle çalışmıyor". Boolean biçim (`deploymentEnabled: false`) ise
+# MASTER'I DA kapatırdı. Dolayısıyla "yalnız üretim dalı dağıtsın" kuralı
+# vercel.json'da YAZILAMIYOR; ifade edilebileceği tek yer BURASI.
+#
+# 2026-09-07 GECESİ NEYE MAL OLDU: dokuz saatte 60+ dağıtım, kota 21:14Z'de
+# doldu, master'ın ÜÇ commit'i "Deployment rate limited — retry in 24 hours"
+# ile REDDEDİLDİ ve Recep'in seçtiği kart düzeni siteye HİÇ çıkmadı.
+#
+# ⚠SINIRI ADIYLA: bu kol DERLEMEYİ atlar; Vercel yine bir dağıtım KAYDI açar
+# (iptal). İptal kaydının günlük dağıtım kotasına SAYILIP SAYILMADIĞI
+# 2026-09-08 itibariyle ÖLÇÜLMEDİ. Sayılıyorsa bu kol derleme dakikasını
+# kurtarır ama kotayı kurtarmaz. Bu yüzden "REC-217 çözüldü" DEMEZ.
+#
+# ⭐REF BOŞSA ATLAMIYORUZ — bu satırın yönü hayati: boş ref "üretim dalı değil"
+# demek DEĞİL, "ölçemedim" demektir. Ölçemediği hâlde atlayan bir kol üretim
+# dağıtımını SESSİZCE öldürürdü; bu dosyanın baştan beri uyardığı vacuous-skip
+# sınıfının ta kendisi (bkz. yukarıdaki FAIL-SAFE DALLARI). Bilmiyorsak DERLERİZ.
+URETIM_DALI="${VERCEL_GIT_REPO_DEFAULT_BRANCH:-master}"
+MEVCUT_REF="${VERCEL_GIT_COMMIT_REF:-}"
+if [ -z "$MEVCUT_REF" ]; then
+  echo "ignore-build: VERCEL_GIT_COMMIT_REF BOS -> dal olculemedi, ATLAMIYORUM (fail-safe)"
+elif [ "$MEVCUT_REF" != "$URETIM_DALI" ]; then
+  echo "ignore-build: ref '$MEVCUT_REF' != uretim dali '$URETIM_DALI' -> ATLA (dal kapisi)"
+  exit 0
+else
+  echo "ignore-build: ref uretim dali ('$URETIM_DALI') -> dal kapisi gecildi, dosya sinifina bakilir"
+fi
+
 # --- Değişen dosya listesini üret ------------------------------------------
 
 if [ "$#" -ge 1 ] && [ -n "${1:-}" ]; then

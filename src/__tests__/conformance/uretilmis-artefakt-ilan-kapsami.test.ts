@@ -53,6 +53,14 @@ function git(args: string[]): string {
   })
 }
 
+/** Aynı komut, çıktı BAYT olarak — `cat-file --batch` içeriği bayt boyuyla sınırlar. */
+function gitBayt(args: string[], girdi: string): Buffer {
+  return execFileSync('git', ['-C', KOK, ...args], {
+    input: girdi,
+    maxBuffer: 256 * 1024 * 1024,
+  })
+}
+
 /**
  * ⭐PİN (§32) — ölçüm TEK BİR ANA sabitlenir.
  *
@@ -140,9 +148,54 @@ const damgaliDosyalar = birKez(function damgaliDosyalarOku(): Array<{ yol: strin
     .split('\n')
     .filter((p) => p.endsWith('.md'))
   const out: Array<{ yol: string; damga: string[] }> = []
+  if (yollar.length === 0) return out
+
+  /**
+   * ⭐TEK SÜREÇ — ÖLÇÜLMÜŞ ZORUNLULUK (2026-09-08, ALTYAPI).
+   *
+   * Önceki hâli dosya BAŞINA bir `git show` açıyordu: 498 `.md` için 498 alt süreç.
+   * Ölçüm (bu ağaç, boş makine): **24,1 sn**. Tam konformans takımı yükü altında
+   * aynı kol **82,8 sn** sürdü ve 60 sn eşiğini aşarak **KIRMIZI** verdi — ihlal
+   * yoktu, yalnız süre. URUN aynı düşmeyi bağımsız ölçüp bildirdi.
+   *
+   * ⛔NİÇİN "yavaş test"ten fazlası: rastgele kırmızı veren kapı, mühendisin
+   * görmezden geldiği kapıya dönüşür — lambanın mobilyaya dönüşmesinin CI'daki
+   * hâli. Eşiği yükseltmek belirtiyi gizlerdi; kök sebep SÜREÇ SAYISIYDI.
+   *
+   * `cat-file --batch` stdin'den `<pin>:<yol>` satırları alır, her nesne için
+   * `<oid> <tip> <boyut>\n<içerik>\n` yazar ve İSTENEN SIRAYI korur; başlıkta
+   * dönen ad OID olduğundan eşleme SIRAYLA yapılır.
+   *
+   * ⚠BAYT OKUNUR, KARAKTER DEĞİL: boyut baytla verilir. Çıktıyı utf8 string'e
+   * çevirip dilimlemek çok-baytlı karakterde kaydırır ve içeriği SESSİZCE bozar —
+   * bozulan içerik, sessizce yanlış damga kararı demektir.
+   *
+   * ⭐EŞDEĞERLİK KANITLANDI, VARSAYILMADI: iki yol aynı ağaçta yan yana koşuldu;
+   * 498 dosya tarandı, İKİSİ DE 7 damgalı dosya buldu ve liste (yol + damga
+   * adları) BİREBİR aynıydı. Süre 24,1 sn → 0,6 sn.
+   */
+  const girdi = yollar.map((y) => `${PIN}:${y}`).join('\n') + '\n'
+  const cikti = gitBayt(['cat-file', '--batch'], girdi)
+
+  let off = 0
   for (const yol of yollar) {
-    const icerik = headOku(yol)
-    if (icerik === null) continue
+    const nl = cikti.indexOf(0x0a, off)
+    if (nl < 0) {
+      throw new Error(
+        `cat-file --batch ciktisi beklenenden once bitti (${yol}). Kapi OLCUM YAPAMADI; ` +
+          'bu hal "ihlal yok" DEGIL, "olculemedi"dir.',
+      )
+    }
+    const baslik = cikti.subarray(off, nl).toString('utf8')
+    off = nl + 1
+    // Eksik/belirsiz nesne: eski `git show` yolunda da atlanıyordu (catch → null).
+    if (/ (missing|ambiguous)$/.test(baslik)) continue
+    const boyut = Number(baslik.split(' ')[2])
+    if (!Number.isFinite(boyut)) {
+      throw new Error(`cat-file --batch basligi ayristirilamadi: "${baslik}" (${yol})`)
+    }
+    const icerik = cikti.subarray(off, off + boyut).toString('utf8')
+    off += boyut + 1
     const d = damgalar(icerik)
     if (d.length) out.push({ yol, damga: d })
   }

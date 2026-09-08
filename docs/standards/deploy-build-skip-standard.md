@@ -681,3 +681,86 @@ merge 3 (docs)              ->  D   <- kapı A..D bakar, package.json GÖRÜR, B
    `taban = ...` satırı. Commit ebeveyninden hesap yapmak bu penceresi görmez.
 4. **Yoğun günlerde atlama oranı DÜŞER.** Kota planlaması bunu hesaba katmalı: sakin günün
    ölçümü yoğun günü tahmin etmez.
+
+## D15 — Dal kapısı: "yalnız üretim dalı dağıtsın" kuralı `vercel.json`'da YAZILAMAZ
+
+**HÜKÜM:** Üretim dalı dışındaki her ref için derleme atlanır, ve bu kural
+`scripts/vercel-ignore-build.sh` içindeki **dal kapısında** yaşar — `vercel.json`'da değil.
+
+**ÖNCÜL ÇÜRÜDÜ (2026-09-08, ALTYAPI).** REC-217 bu işi `vercel.json`'a şöyle yazmıştı:
+
+```json
+{ "git": { "deploymentEnabled": { "*": false, "master": true } } }
+```
+
+Vercel'in kendi belgesi (`project-configuration/git-configuration`) iki biçim tanımlıyor:
+`deploymentEnabled: false` **boolean** biçimi *"prevent any branch from triggering a
+deployment"*; **nesne** biçimi ise *"map **specific branch names** to boolean values"* ve
+**"unspecified branches default to true"**. **JOKER YOKTUR.** Yani `"*"` literal bir dal adı
+sanıldı, hiçbir dalla eşleşmedi ve geri kalan **her dal varsayılan olarak açık kaldı**.
+
+**ÖLÇÜM, tahmin değil:** kuralı **taşıyan** dört dal (#1107, #1108, `altyapi/rec121-tip-drift`,
+#1109) yine `READY` önizleme üretti. Yani "dosya o dalda yoktu" açıklaması ÇÜRÜK — hipotez
+kuruldu ve dört commit'te `vercel.json`'un varlığı doğrulanarak elendi.
+
+**Neden dosyada ifade edilemiyor:** nesne biçimi yalnız **kapatılacak dalları** sayabilir;
+"yalnız üretim dalı açık" demek, adı henüz bilinmeyen her yeni özellik dalını saymayı
+gerektirir. Boolean biçim ise üretim dalını da kapatır. Kural bu yüzden betiğe taşındı.
+
+**NEYE MAL OLDU (2026-09-07):** dokuz saatte 60+ dağıtım; kota **21:14Z**'de doldu ve
+master'ın üç commit'i (#1109, #1114, #1115) `Deployment rate limited — retry in 24 hours`
+ile **reddedildi**. Site 21:14Z'den önceki derlemeyi servis etmeye devam etti; yani indiği
+söylenen işler **ekranda yoktu** ve Recep'in seçtiği kart düzeni siteye hiç çıkmadı.
+
+### D15.1 — Sınır: bu kol DERLEMEYİ atlar, dağıtım KAYDINI engellemez
+
+Atlanan derleme yine bir dağıtım kaydı açar (`CANCELED`). **İptal kaydının günlük dağıtım
+kotasına sayılıp sayılmadığı 2026-09-08 itibariyle ÖLÇÜLMEMİŞTİR.** Sayılıyorsa bu kol
+derleme dakikasını kurtarır, kotayı kurtarmaz. Bu yüzden dal kapısı **"REC-217 çözüldü"
+demez** — D13.1'in iki-bütçe ayrımı burada da geçerlidir.
+
+### D15.2 — Fail-safe yönü: boş ref "üretim dalı değil" DEĞİL, "ölçemedim"dir
+
+`VERCEL_GIT_COMMIT_REF` boşsa **atlanmaz**. Ters yazılsaydı üretim dağıtımı sessizce ölürdü
+ve hiçbir kırmızı doğmazdı — D5'in ve bu belgedeki vacuous-skip sınıfının tekrarı. Üretim
+dalının adı `VERCEL_GIT_REPO_DEFAULT_BRANCH`'ten okunur; koda gömülü `master` sabiti değildir
+(kapının bir kolu bunu ölçer, yoksa dal yeniden adlandırıldığında üretim sessizce atlanırdı).
+
+### D15.3 — Kapı: `INV-BUILD-SKIP-DAL`
+
+`src/__tests__/conformance/build-skip-positive-logic.test.ts` — altı kol, hepsi betiği
+**çalıştırıp** çıkış kodunu ölçer: üretim dalı + kaynak → BUILD · üretim dalı + belge → ATLA ·
+**özellik dalı + kaynak → ATLA** (ayırt edici) · özellik dalı + belge → ATLA · **ref boş +
+kaynak → BUILD** · üretim dalı adı ortamdan gelir (iki yönlü).
+
+⭐**BU KAPININ VARLIK SEBEBİ, ÖNCEKİ KAPININ KÖRLÜĞÜ:** REC-217'yi ölçmesi gereken kapı
+`vercel.json`'un **içeriğine** bakıyordu, **sonucuna** değil. Dosyada doğru dizeyi görüp yeşil
+yanıyordu, oysa kural hiç işlemiyordu. Sabotajla doğrulandı (2026-09-08): dal kapısının
+`exit 0`'ı kaldırıldığında iki kol kırmızı verdi, geri konunca 41/41 yeşil.
+
+## D16 — Vercel sonucunu okumadan "canlıda" denmez (üç gözlem, 2026-09-07)
+
+1. **Master'a ardışık merge, önceki CI koşusunu `CANCELLED` yapar.** İptal edilmiş koşu
+   *yeşil değil, BELİRSİZ*dir; okunacak olan **son** koşunun sonucudur. Ölçülen bedel:
+   2026-09-07'de master 3,5 saat kırmızı kaldı ve kimse görmedi, çünkü son beş koşunun
+   dördü iptaldi ve belirsizlik sessizce "sorun yok" diye okundu.
+2. **Vercel kontrolü dal korumasında ZORUNLU DEĞİLDİR.** Birleştirme kuralı `ci` +
+   `admin-smoke` yeşil **ve** migration yok. Vercel'in `failure`/`rate limited` sonucu
+   **merge'i durdurmaz ama YAYINI durdurur** — bu yüzden merge sonrası commit status
+   okunmadan bir işe **"canlıda"** denmez. (2026-09-07 gecesinin tam kusuru budur.)
+3. **`jq` bu makinede YOKTUR** ve izleyici betiklerinde kullanımı **yasaktır**: 2026-09-07'de
+   fail-open verip "bitti" diye yanlış rapor üretti. JSON ayrıştırma `awk` ya da `python`
+   ile yapılır.
+4. **ÖLÇÜM KOŞULAMAYAN AĞAÇ YEŞİL DE KIRMIZI DA DEĞİLDİR.** `/c/tmp/vh-altyapi-t165`
+   worktree'sinin `node_modules` sembolik bağı ÖLÜ bir hedefe bakıyor
+   (`venthub-wt-altyapi/node_modules`); o ağaçta `vitest` hiç başlamıyor
+   (*"Cannot find package '@vitejs/plugin-react'"*). Böyle bir ağaçta "test geçti"
+   de "test düştü" de kurulamaz — **ölçüm yok**. İş, ölçümün gerçekten koşabildiği
+   bir ağaca taşınır (2026-09-08'de `vh-altyapi-envanter`'e taşındı). Envantere
+   **KAYIP** olarak girer.
+5. **ARACIN KENDİSİ FAIL-OPEN VEREBİLİR — çıkış kodu 0 "koştu" demek DEĞİLDİR.**
+   Ölçülmüş vaka, 2026-09-08: tam konformans takımı `--reporter=basic` ile koşuldu;
+   Vitest 4'te böyle bir raportör YOK, raportör yüklenemedi, **hiçbir test koşmadı**
+   ve süreç **exit 0** döndü. Yalnız çıkış koduna bakan bir rapor "tam takım yeşil"
+   yazardı. Kural: bir takım koşumunun kanıtı **çıkış kodu değil**, çıktıdaki
+   `Test Files` / `Tests` sayılarıdır; sayı yoksa ölçüm yoktur.
