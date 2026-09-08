@@ -63,6 +63,11 @@
           {
             "type": "command",
             "command": "node .claude/hooks/sensitive-path-guard.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/hafiza-indeks-bekcisi.cjs",
+            "statusMessage": "hafiza-indeksi"
           }
         ]
       },
