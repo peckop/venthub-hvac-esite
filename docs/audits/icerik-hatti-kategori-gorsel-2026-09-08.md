@@ -129,3 +129,29 @@ Düzeltmeyi ararken çıktı; görsel işinden ayrı ve muhtemelen daha ağır:
 Ürünlerin kendisi aktif ama bulundukları kategori kapalı. **Bu ürünlere kategori üzerinden
 erişilip erişilemediği ÖLÇÜLMEDİ** — kategori sayfası ve menü URUN'ün alanı, ölçümü ona ait.
 Eğer erişilemiyorsa 26 aktif ürün vitrinde görünmüyor demektir. Ayrı kayıt açılacak.
+
+---
+
+## ⛔İKİNCİ DÜZELTME — 06:5xZ, "26 ürün" SAYIM HATASI (URUN ölçtü, kabul)
+
+**26 değil 19.** `commercial-ventilation` (7) ile `rectangular-duct-fans` (7) **aynı yedi ürün**:
+yedisinin de `category_id` üst pasif kategoriye, `subcategory_id` alt pasif kategoriye bakıyor.
+Sorgum iki kolonu `OR` ile saydığı için **aynı kayıt iki kez** göründü. Gerçek: 12 + 7 = **19**.
+SKU'lar (URUN ölçtü): AVE-1200/1250/1316/1317/1355/1360/1410.
+
+**Ve teşhisim ters yöndeymiş:** ürünler görünmez DEĞİL — kusur tersi, **pasif kategori vitrini
+kapatmıyor**. Kayıt REC-283'te (URUN).
+
+## ⭐BUGÜNÜN DESENİ — üç sayım hatası, üç ayrı kök
+
+| # | hata | yakalayan | kök |
+|---|---|---|---|
+| 1 | "16 boş kategori" | ben | **evren**: görünürlük (`is_active`) sayıma dahil değildi |
+| 2 | "26 ürün pasif kategoride" | **URUN** | **tekillik**: `OR` ile iki kolon → çift sayım |
+| 3 | "AVenS'te 0 kullanılabilir görsel" | ben | **sebep**: 0 görsel değil, 0 PDF |
+
+Üçü de "sorgu doğru çalıştı, cevap yanlış" biçiminde. Ortak ders: **bir sayı iş emri doğuracaksa
+sayının EVRENİ · TEKİLLİĞİ · YOKLUĞUN SEBEBİ ayrı ayrı ölçülür.** Sorgunun hatasız koşması
+bunların hiçbirini garanti etmiyor.
+
+Bu, kurulacak kapının da tasarım ölçütü: kapı **sayıyı** değil, sayının **evrenini** doğrulamalı.
