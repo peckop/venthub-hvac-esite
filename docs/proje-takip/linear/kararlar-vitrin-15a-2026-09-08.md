@@ -1,6 +1,6 @@
-# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-07 ayna: K1–K55)
+# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-08 ayna: K1–K55)
 
-<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-07T20:46:04.352Z · kopya: 2026-09-07T20:48Z -->
+<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-08T07:13:27.355Z · kopya: 2026-09-08T07:14Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -267,7 +267,7 @@ DURUM: KURAL → kapı YOK (REC-200 açıldı)
 
 Çizimde örnek ürün değişirse aynı turda kimlik satırı + sertifika çipleri + açıklama + hesap gerekçesi + seçici eksenleri `technical_specs` ve `description_i18n`'den yeniden yazılır. Anahtarı olmayan hiçbir eksen ve tek değerli hiçbir alan seçici olarak çizilmez (K7 uzantısı).
 
-## K18 eki · Ürün Seçici kademeli açılış önkoşulları (DESIGN-MENU önerisi, OPS kabul 2026-09-05 12:42 TR [Linear damgası 09:42Z]; Recep K18 "önce A, geliştiğiçe C" kapsamında)
+## K18-a · Ürün Seçici kademeli açılış önkoşulları (eski başlık: "K18 eki") (DESIGN-MENU önerisi, OPS kabul 2026-09-05 12:42 TR [Linear damgası 09:42Z]; Recep K18 "önce A, geliştiğiçe C" kapsamında)
 
 DURUM: İŞ → REC-198 (Backlog)
 
@@ -306,7 +306,7 @@ DURUM: İSTİŞARE — karar değil
 
 Parçaların tek çatıda birleşme yolu ayrı belgede: **"Tasarım Programı Haritası — parçalar, roller, birleşme yolu"** (bu proje). Özü: tek çatı = DS + Kararlar; her parça Menü v17'ye kare olarak akar (Ana Sayfa = kare 02, hikâye 07c altı, Ürün Seçici B4); Recep tek dosyada gezer → prototip → kod 4 faz.
 
-## K1a uygulama notu · Satış kipi ekranları Menü v17'de (OPS, 2026-09-05 gece; Recep: "sepet açılınca sayfalar hazır olacaktı, hiçbir yerde yok")
+## K1-a · Uygulama notu: Satış kipi ekranları Menü v17'de (eski başlık: "K1a uygulama notu") (OPS, 2026-09-05 gece; Recep: "sepet açılınca sayfalar hazır olacaktı, hiçbir yerde yok")
 
 DURUM: İŞ → REC-168 (In Review)
 

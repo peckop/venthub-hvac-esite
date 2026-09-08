@@ -1,6 +1,6 @@
-# Kararlar — SEO ve Yayın (Linear belgesinin TAM dışa aktarımı · 2026-09-07 ayna: K1–K6)
+# Kararlar — SEO ve Yayın (Linear belgesinin TAM dışa aktarımı · 2026-09-08 ayna: K1–K6)
 
-<!-- kaynak_id: 2eb6c0f6-8cc6-4197-9e91-527c59a2e16e · kaynak_updatedAt: 2026-09-03T13:33:40.207Z · kopya: 2026-09-07T08:42Z -->
+<!-- kaynak_id: 2eb6c0f6-8cc6-4197-9e91-527c59a2e16e · kaynak_updatedAt: 2026-09-03T13:33:40.207Z · kopya: 2026-09-08T07:14Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
