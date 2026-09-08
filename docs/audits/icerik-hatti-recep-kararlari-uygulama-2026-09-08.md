@@ -89,3 +89,40 @@ taşıdığı için tek başına karar verilmedi.
 
 Madde 5'in ikinci yarısı (*"sonra taşınabilir kategoride de olsun"*) → REC-212, görsellerin
 taşınabilir katalog dışa aktarımına dahil edilmesi; bu belgenin kapsamı dışında.
+
+---
+
+## ⭐EK — KAPI İLK KOŞUŞUNDA İKİNCİ YARIM TAŞIMAYI YAKALADI
+
+OPS emriyle (`category-taxonomy-standard §8`) ayrışma ölçümü kuruldu:
+
+```sql
+select count(*) from products p join product_families f on f.id = p.family_id
+where f.deleted_at is null
+  and (p.subcategory_id is distinct from f.subcategory_id
+    or p.category_id   is distinct from f.category_id);
+```
+
+**İlk koşum: 0 değil, `11`.** On birinin hepsi **az önce "taşındı" diye raporladığım**
+VORTICENT CMS ATEX ürünleriydi — ailesi (`vortice-vorticent-cms-atex`) hâlâ pasif
+`ex-proof-atex-fans` altındaydı. **Madde 3 de madde 1 ile aynı sebeple yarım kalmış.**
+
+| adım | ölçüm |
+|---|---|
+| önce | **11** ayrışan satır |
+| onarım | aile → `fans > axial-industrial-fans` |
+| sonra | **0** |
+| vitrin | `aksiyel-sanayi-fanlari` **3 ürün ailesi**, VORTICENT sayfada |
+
+⭐**Kaydedilmeye değer:** kapı, kurulduğu günün ilk koşumunda **kendi yazarının** hatasını buldu.
+Vitrin ölçümü olmasaydı madde 1, SQL ölçümü olmasaydı madde 3 sessizce yarım kalacaktı — ve
+ikisi de "bitti" diye raporlanmıştı.
+
+## ⛔YENİ AÇIK KONU — Recep'e sorulacak (madde 3'ün yan bulgusu)
+
+Aile kaydının tam adı: **"Vortice VORTICENT CMS ATEX *Santrifüj* Fanlar."**
+Recep'in emri *"bunlar aksiyel fan çatısında olmalı"* idi ve uygulandı — ama ürünün kendi adı
+**santrifüj** diyor. Santrifüj ve aksiyel **farklı fan tipleridir**.
+
+Emir uygulandı (Recep kararı ezer), fakat bu bir **teknik çelişki** ve kayda geçirilir:
+ya aile adı yanlış, ya hedef kategori. Karar Recep'in; ölçüm ve soru burada durur.

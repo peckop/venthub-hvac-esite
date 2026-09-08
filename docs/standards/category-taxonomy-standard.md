@@ -105,3 +105,49 @@ bloklamaz); **her YENİ slug İngilizce açılır** + `translation_key` zorunlu 
 4. HRV slug (`heat-recovery-vmc` zaten kanonik; `heat-recovery`/`hrv` varyantları kodda kontrol) + seed.
 5. Çatı fanlarını yatay/dikey/F400 ayır (taksonomi kararı → ben).
 > Sıra: bunlar bitince → full ürün load (catalog-ingestion-standard) güvenle başlar.
+
+## 8. ⭐ÜRÜN TAŞIMA İKİ TABLODUR — vitrin AİLE listeler (2026-09-08, sahada ölçüldü)
+
+**Kural:** bir ürünü başka kategoriye taşımak, `products` satırını güncellemekle **tamamlanmış
+sayılmaz.** Kategori vitrini **ürün değil AİLE** listeler (sayfa metni: *"N ürün ailesi"*).
+
+| güncellenecek | tablo |
+|---|---|
+| `category_id` + `subcategory_id` | `products` |
+| `category_id` + `subcategory_id` | **`product_families`** |
+
+İkisi **birlikte** yazılmazsa: **veri doğru, vitrin sessizce yanlış** kalır. Aile listeye hiç
+girmediği için ürünler müşteriye görünmez — ve **hiçbir test bunu yakalamaz.**
+
+### Kanıt satırı (beyan yeterli değil)
+Taşıma sonrası **vitrin sayımı** ölçülür: **hiç sorulmamış adres** (`?v=<damga>`),
+`X-Vercel-Cache: MISS`, `Age: 0`, ve kategori sayfasındaki *"N ürün ailesi"* sayısı **artmış** olmalı.
+
+### Kapı (INV-AILE-KATEGORI-1 → REC-290, ALTYAPI)
+```sql
+select count(*) from products p join product_families f on f.id = p.family_id
+where f.deleted_at is null
+  and (p.subcategory_id is distinct from f.subcategory_id
+    or p.category_id   is distinct from f.category_id);
+-- beklenen: 0
+```
+
+### ⭐Bu maddeyi doğuran vaka — ölçüm kapıyı ilk koşuşunda haklı çıkardı
+2026-09-08, Recep kararıyla iki taşıma yapıldı. **İkisi de yarım kaldı, ikisi de aynı sebeple:**
+
+| taşıma | ürün | aile | sonuç |
+|---|---|---|---|
+| 7 AVenS → `duct-fans` | ✅ taşındı | ⛔`subcategory_id` pasif kategoride kaldı | vitrinde **yoktu** |
+| 11 VORTICENT ATEX → `axial-industrial-fans` | ✅ taşındı | ⛔aynı hata | vitrinde **yoktu** |
+
+Birincisi vitrin ölçülünce (5→6 ürün ailesi), **ikincisi bu maddenin SQL'i ilk koşulduğunda**
+yakalandı: sayı 0 değil **11** çıktı ve 11'in hepsi az önce "taşındı" diye raporlanan ürünlerdi.
+Onarım sonrası **0**; vitrin `aksiyel-sanayi-fanlari` **3 ürün ailesi**, VORTICENT sayfada.
+
+⛔**Genel ders:** *"taşıdım" bir beyandır; kanıt vitrindedir.* Bu, `rendering-cache-standard`'ın
+**"veri değişti, sayfa değişmedi"** deseninin taksonomi tarafındaki karşılığıdır — çapraz atıf oraya.
+
+### §1 ile çelişki — kayda geçirilir, karar Recep'in
+§1 *"kategori ASLA boş diye silinmez"* der. **2026-09-08'de Recep 7 boş kategoriyi sildirdi**
+(hepsi `is_active=false`, ürün/alt kategori/aile bağı **0** ölçülerek). Karar cetveli ezer;
+madde burada kayıtlıdır ki cetvel sahada yanlış bilgi vermesin. §1'in yeniden yazımı Recep kapısında.
