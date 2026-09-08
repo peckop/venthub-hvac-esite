@@ -239,6 +239,28 @@ jobs:
           export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/db/checks/catalog-integrity.mjs
 
+      # INV-AILE-KATEGORI-1 (REC-290) — urunun kategorisi ile AILESININ kategorisi ayrismasin.
+      #
+      # NICIN AYNI ISE BAGLI, ayri is degil: ayni sirri (SUPABASE_DB_URL) ve ayni kok
+      # sertifikayi kullaniyor, olcum suresi bir sorgu. Ayri is acmak ayni on-yoklamayi
+      # ikinci kez kurmak olurdu; `db-gate-precheck` zaten iki kapiya hizmet ediyor ve
+      # yorumu bunu adiyla yaziyor - ucuncusu de ayni cumleye giriyor.
+      #
+      # NICIN AYRI ADIM (ayni betige eklenmedi): catalog-integrity TABAN dosyasina karsi
+      # olcuyor (yeni ihlal var mi); bu kapinin tabani YOK, olcut mutlak sifir. Iki farkli
+      # olcut tek betikte yasarsa biri digerinin taban mantigini miras alir.
+      #
+      # ⛔ADIM SIRASI ANLAMLI: bu adim catalog-integrity'den SONRA. Kirmizi oldugunda
+      # kardesinin ciktisi zaten basilmis olur, yani "hangi kapi kirmizi" sorusu logdan
+      # tek bakista okunur.
+      - name: Aile-kategori tutarlilik kapisi (INV-AILE-KATEGORI-1)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          node scripts/db/checks/aile-kategori-tutarlilik.mjs
+
       # Kapi TLS yuzunden kirmizi oldugunda, sunucunun GERCEKTEN sundugu zinciri gosterir.
       # NICIN VAR: ayni betik ayni sertifikayla YERELDE calisiyor, CI'da calismiyordu; fark
       # baglanilan SUNUCUDA olmali ve bunu tahminle degil olcumle kapatmak gerekiyor.
