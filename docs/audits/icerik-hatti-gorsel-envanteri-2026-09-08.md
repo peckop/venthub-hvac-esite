@@ -98,9 +98,38 @@ Sebebi ortak: bu ürünler kaynakta zayıf temsil ediliyor.
 **Sonuç:** 103 görselsiz ürünün **7'si** eldeki kaynakla bugün kapatılabilir; kalan **96'sı
 tedarikçiden fotoğraf istemeyi gerektirir.** Bu, tedarik talebinin somut gerekçesidir.
 
+## ⭐SINIRIN AYNI GÜN GERÇEKLEŞMESİ — 14 ürünün "fotoğrafı" fotoğraf değil
+
+Aşağıdaki sınırı yazdıktan **saatler sonra** tam o boşluktan bir kusur çıktı.
+
+`vortice-vort-e-atex` ailesinin **14 ürününün tek görseli bir PERFORMANS GRAFİĞİDİR** —
+basınç/debi eğrisi, ürün fotoğrafı değil. Gözle doğrulandı (VRT-40325), sonra 14'ü birden ölçüldü.
+
+**Envanter bunu göremezdi ve görmedi:** 14 görselin her biri *farklı* dosya (her ürünün kendi
+eğrisi), yani "aynı dosya iki üründe" ölçütüne hiç takılmıyorlar. Envanterde temiz göründüler.
+
+| ölçüt | 14 ATEX görseli | bilinen 3 fotoğraf |
+|---|---|---|
+| beyaz oranı | %86–88 | %18–68 |
+| **orta ton (gölge/hacim)** | **%9–10** | **%24–54** |
+| doygun renk | %0 | %0–32 |
+
+⭐**İlk ölçütüm KÖRDÜ, düzeltildi:** "renk sayısı ≤ 40" koşulu koymuştum; grafiğin ekseni ve
+ızgarası 68 renk kovası ürettiği için bilinen grafiği **"fotoğraf" saydı**. Ayırt eden alan renk
+sayısı değil **orta ton oranı** — gölge geçişi fotoğrafta olur, çizgi grafiğinde olmaz.
+Kalibrasyon iki bilinen örnekle yapıldı (biri gözle doğrulanmış grafik, biri gerçek fotoğraf).
+
+**Yeni kusur sınıfı, adıyla:** *yanlış fotoğraf* değil, **fotoğraf olmayan görsel**.
+Bu sınıf için ayrı bir ölçüm gerekir; mükerrer taraması onu asla yakalayamaz.
+
+Recep'in *"fotosu da burdan al ve koy"* emri (avensair.com adresiyle) tam bu kusuru hedefliyor.
+
+---
+
 ## Sınır — bu envanterin ölçmediği
 
 - Görselin **doğru ürüne ait olup olmadığı**: yalnız *aynı dosya iki üründe mi* sorusunu
   ölçer. Tek bir ürüne yapıştırılmış yanlış fotoğraf (kopya değilse) bu taramada **görünmez**.
+  ⭐Bu satır yazıldığı gün gerçekleşti — yukarıdaki ATEX bölümüne bakınız.
 - Görselin **nereden geldiği**: kayıt yok, üretilemez (uydurulmayacak).
 - Görselin **kalitesi/çerçevelemesi**: Recep'in "merkezleme/orantı" maddesi bu ölçümün dışında.
