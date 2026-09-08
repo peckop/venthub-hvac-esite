@@ -2161,6 +2161,37 @@ cevap verirdi — yani ölçülen kusur testin içinde tekrarlanırdı.
 kancaya eklendi. Sebep: yeni kanca kaydı `.claude/settings.json` düzenlemek demektir, yani
 **config** — ve bu iş akran iletisiyle geldi. **Config'e akran sözüyle dokunulmaz.**
 
+### ⭐ÖLÇÜLMÜŞ VAKA (2026-09-08, URUN-KATALOG) — RİSK ÖLÇÜMDE DEĞİL, **YAZMADA**
+
+**Olan:** `git add -A && git commit`, worktree'de sanılarak **ANA REPODA** koşuldu (dizin
+beyan edilmedi). Sonuç: ana repo `master` dalına, **BAŞKA ŞERİTLERİN beş ekran görüntüsü**
+(`rec213a-*.png` ×4, `rec266-mobil-aciklama.png`) **başkasının commit mesajıyla** yazıldı —
+commit `f2b59c7b7`. **Pushlanmadı.** Yakalayan: bu bölümün §28 kancası, bir sonraki turda.
+Onarım: `git -C <ana> reset --mixed HEAD~1` ile ana repo oturum başı hâline döndü, metin
+doğru ağaca commit edildi ve niçin commit mesajına yazıldı. Vakayı **sahibi kendisi bildirdi.**
+
+⭐**VAKANIN CETVELE KATTIĞI ŞEY — kendi metnimin eksiği:** §28 buraya kadar riski
+*"ölçüm ayrışır, yanlış ağacı ölçersin"* diye anlatıyordu. Bu vaka onu **eksik** gösterdi.
+Kanca uyarısını "beyansız **ölçüm**" diye bastı, oysa gerçekleşen zarar **yazma**
+tarafındaydı ve iki kat daha ağırdı:
+
+1. **Yanlış yere yazar** — beklenen zarar.
+2. ⛔**ÖNÜNE GELEN HERKESİN KİRLİ DOSYASINI ALIR.** `git add -A` ana repoda çalışınca
+   o an paylaşılan ağaçta duran *başka şeritlerin* izlenmeyen dosyalarını da commit'ler.
+   Yani hata tek şeridin işini bozmakla kalmaz, **başkasının yarım işini yabancı bir
+   commit'e hapseder** ve sahibi onu kendi ağacında arar.
+
+**HÜKÜM (iki parça, ikisi de kanonik):**
+- Git komutu **daima `git -C <ağaç>`** — ortam cwd'sine yaslanmak §9.1 ihlalidir.
+- **`git add -A` YASAK; `add` her zaman AÇIK DOSYA YOLU alır.** Gerekçe artık ölçülmüş:
+  `-A`'nın kapsamı "benim değişikliklerim" değil, "bu ağaçta ne varsa"dır.
+
+⚠**Ve kancanın kendi sınırı, adıyla:** kayıt "ölçüm komutu" sınıfı üzerinden tuttu —
+yani bu vakayı **doğru yakaladı ama yanlış adla** anlattı. Uyarı metni "beyansız ölçüm"
+derken okuyan "zararsız, sadece yanlış dizinde saydım" diye anlayabilir. Bir sonraki
+düzeltme kancanın **yazan fiilleri ayrı sınıf olarak adlandırması** olmalıdır; bu satır
+o işin gerekçesidir ve şimdilik **açık kalem** olarak yazılıdır (kanca değiştirilmedi).
+
 ---
 
 ## 29. KARARA GİDEN ÖLÇÜM BETİKTEN GELİR — kaynak gösterilmeyen sayı karar dayanağı değildir
