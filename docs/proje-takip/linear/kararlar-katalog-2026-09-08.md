@@ -1,6 +1,6 @@
-# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-07 ayna: K1–K12)
+# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-08 ayna: K1–K12)
 
-<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-07T08:47:15.686Z · kopya: 2026-09-07T21:02Z -->
+<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-07T08:47:15.686Z · kopya: 2026-09-08T07:14Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
