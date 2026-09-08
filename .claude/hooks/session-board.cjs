@@ -272,7 +272,20 @@ try {
     const teslimBayat =
       teslim === 'KANITSIZ' || (esik && teslim > esik.TESLIM_ESIK_DK)
     if (tarama === 'TARIYOR' && !teslimBayat) {
-      context += 'MEKANIZMA: TARAMA taze + TESLIMAT ' + teslim + 'dk once KANITLI.\n'
+      /**
+       * ⭐REC-287 — "KANITLI" KELIMESI BURADAN KALKTI. Bu satir her oturumun ACILISINDA
+       * gorunur, yani filonun teslimat katmani hakkindaki kanaatini TEK BASINA kuran satir.
+       * "KANITLI" diyordu; oysa damganin dayanagi bir akran jetonudur ve o jeton panoyu okuyan
+       * herkese aciktir (gozcu `to` suzmez, pano dosyasi `cat` lenebilir). Sahte-yesili
+       * mechanism-setup'tan kaldirip burada birakmak, onu yalnizca TASIMAK olurdu.
+       * Sinif damgadan OKUNUR — kanca kendi adini uydurmaz.
+       */
+      const sinif = board.teslimKanitSinifi ? board.teslimKanitSinifi(sid) : null
+      context +=
+        'MEKANIZMA: TARAMA taze + TESLIMAT ' + teslim + 'dk once ' +
+        (sinif || 'SINIFI YAZILMAMIS (eski damga)') + ' kanit.\n' +
+        '  ⛔Bu YESIL DEGILDIR: teslimat katmaninda yesil YOKTUR (REC-287). Jeton panoyu\n' +
+        '  okuyan herkese acik oldugu icin kanit, iki tarafin isbirligi yapmamasina dayanir.\n'
     } else if (tarama === 'TARIYOR' && teslimBayat) {
       context +=
         'MEKANIZMA — YARIM: gozcu panoyu OKUYOR ama bildirimin sana ULASTIGI KANITSIZ' +

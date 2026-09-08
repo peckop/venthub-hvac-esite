@@ -20,8 +20,10 @@
  *
  * Cetvel: docs/standards/fleet-mechanism-standard.md
  */
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
+import os from 'node:os'
 import path from 'node:path'
 
 import { describe, expect,it } from 'vitest'
@@ -265,10 +267,10 @@ const mech = require_(path.join(KOK, 'scripts', 'board', 'mechanism-setup.cjs'))
     simdiMs: number
     esikSn?: number
   }) => {
-    sinif: 'YESIL' | 'ZAYIF' | 'KIRMIZI'
+    sinif: 'ZAYIF-PAYLASILAN' | 'ZAYIF-OZ' | 'KIRMIZI'
     sebep: string
     gecenSn: number | null
-    /** YALNIZ YESIL'de: kuyrukta hangi atanın kaydı sayıldı (tüketim işareti buna göre konur). */
+    /** YALNIZ ZAYIF-PAYLASILAN'da: kuyrukta hangi atanın kaydı sayıldı (tüketim işareti buna göre). */
     atanSid?: string
   }
   TESLIM_TAZELIK_SN: number
@@ -290,9 +292,9 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     const k = mech.teslimatKaniti({
       damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
     })
-    expect(k.sinif, 'bağımsız ve taze kanıt yeşil sayılmadı — taban kol düşerse alttakiler bir şey kanıtlamaz').toBe('YESIL')
+    expect(k.sinif, 'akranın attığı taze jeton ZAYIF-PAYLASILAN sayılmadı — taban kol düşerse alttakiler bir şey kanıtlamaz').toBe('ZAYIF-PAYLASILAN')
     expect(k.gecenSn).toBe(30)
-    expect(k.sebep, 'yeşilin DAYANAĞI yazılmamış; sonradan "yeşildi" demek kanıt değil').toMatch(/BAGIMSIZ/)
+    expect(k.sebep, 'sınıfın DAYANAĞI yazılmamış; sonradan "kanıtlıydı" demek kanıt değil').toMatch(/AKRAN jetonu/)
   })
 
   it('⭐AYIRT EDİCİ ÇİFT: jetonu ATAN da kendisiyse → KIRMIZI (tanık, tanıklık ettiği kişi olamaz)', () => {
@@ -329,7 +331,7 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     const k = mech.teslimatKaniti({
       damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 30_000,
     })
-    expect(k.sinif, 'yeni kol gerçek bağımsız tanığı da düşürdü — kapı fazla geniş').toBe('YESIL')
+    expect(k.sinif, 'yeni kol gerçek akranı da düşürdü — kapı fazla geniş').toBe('ZAYIF-PAYLASILAN')
   })
 
   /**
@@ -353,7 +355,7 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     expect(
       k.sinif,
       'ölçüt eşitlikten benzerliğe kaymış — bu hâlde sid kuyruğu tesadüfen yakın olan GERÇEK akranlar da reddedilir',
-    ).toBe('YESIL')
+    ).toBe('ZAYIF-PAYLASILAN')
   })
 
   it('⭐BAYAT jeton kanıt değildir: eşiği aşan geri yazım KIRMIZI', () => {
@@ -363,7 +365,7 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     const bayat = mech.teslimatKaniti({
       damga: bagimsizDamga(), gordum: 'PROB-ac03-XYZ123', kendiSid: BEN, simdiMs: T0 + 181_000,
     })
-    expect(taze.sinif, 'eşiğin ALTINDAKİ geri yazım reddedildi — eşik yanlış tarafa kapanıyor').toBe('YESIL')
+    expect(taze.sinif, 'eşiğin ALTINDAKİ geri yazım reddedildi — eşik yanlış tarafa kapanıyor').toBe('ZAYIF-PAYLASILAN')
     expect(bayat.sinif, 'eski jeton kanalın BUGÜN çalıştığını söylemez ama yeşil sayıldı').toBe('KIRMIZI')
     expect(bayat.sebep).toMatch(/SURESI GECMIS/)
     expect(mech.TESLIM_TAZELIK_SN, 'eşik 180 sn değil — cetvelle betik ayrışmış').toBe(180)
@@ -386,7 +388,7 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
         bekleyenler: { [ATAN_A]: { jeton: 'PROB-ac03-ESKI11', atildiTs: new Date(T0).toISOString(), tuketildi: true } },
       }
       const k = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-OZPROB', kendiSid: BEN, simdiMs: T0 + 10_000 })
-      expect(k.sinif, 'tüketilmiş bekleyen kayıt taze öz-probu bloke etti — eski tek-slot davranışı geri gelmiş').toBe('ZAYIF')
+      expect(k.sinif, 'tüketilmiş bekleyen kayıt taze öz-probu bloke etti — eski tek-slot davranışı geri gelmiş').toBe('ZAYIF-OZ')
     })
 
     it('SÜRESİ GEÇMİŞ kayıt öz-prob yolunu KESMEZ (URUN 06:43Z, 12 saatlik jeton)', () => {
@@ -395,7 +397,7 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
         bekleyenler: { [ATAN_A]: { jeton: 'PROB-ac03-OLU22', atildiTs: new Date(T0).toISOString() } },
       }
       const k = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-OZPROB', kendiSid: BEN, simdiMs: T0 + 43_200_000 })
-      expect(k.sinif, 'süresi geçmiş bekleyen kayıt taze öz-probu bloke etti').toBe('ZAYIF')
+      expect(k.sinif, 'süresi geçmiş bekleyen kayıt taze öz-probu bloke etti').toBe('ZAYIF-OZ')
     })
 
     it('İKİ FARKLI ATAN aynı hedefte YAN YANA yaşar (çarpışma bulgusu)', () => {
@@ -407,8 +409,8 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
       }
       const a = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-AAA111', kendiSid: BEN, simdiMs: T0 + 5_000 })
       const b = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-BBB222', kendiSid: BEN, simdiMs: T0 + 5_000 })
-      expect(a.sinif, 'A kaydı okunamadı — tek slot davranışı: son yazan ötekini siliyor').toBe('YESIL')
-      expect(b.sinif, 'B kaydı okunamadı').toBe('YESIL')
+      expect(a.sinif, 'A kaydı okunamadı — tek slot davranışı: son yazan ötekini siliyor').toBe('ZAYIF-PAYLASILAN')
+      expect(b.sinif, 'B kaydı okunamadı').toBe('ZAYIF-PAYLASILAN')
       expect(a.atanSid, 'hangi atanın kaydı sayıldığı dönmüyor — tüketim yanlış kaydı işaretler').toBe(ATAN_A)
       expect(b.atanSid).toBe(ATAN_B)
     })
@@ -438,7 +440,7 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     it('ESKİ TEK SLOT okunmaya devam eder (geriye uyum — diskteki damgalar filo koşarken yazıldı)', () => {
       const damga = { bekleyenJeton: 'PROB-ac03-ESKIYOL', atanSid: ATAN_A, atildiTs: new Date(T0).toISOString() }
       const k = mech.teslimatKaniti({ damga, gordum: 'PROB-ac03-ESKIYOL', kendiSid: BEN, simdiMs: T0 + 5_000 })
-      expect(k.sinif, 'eski biçim damga artık okunamıyor — filonun diskteki kayıtları kör kaldı').toBe('YESIL')
+      expect(k.sinif, 'eski biçim damga artık okunamıyor — filonun diskteki kayıtları kör kaldı').toBe('ZAYIF-PAYLASILAN')
     })
   })
 
@@ -459,7 +461,7 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
     const k = mech.teslimatKaniti({
       damga: { jeton: 'PROB-ac03-ESKI99' }, gordum: 'PROB-ac03-ESKI99', kendiSid: BEN, simdiMs: T0,
     })
-    expect(k.sinif, 'geriye uyum kırıldı ya da eski yol hâlâ yeşil sayılıyor').toBe('ZAYIF')
+    expect(k.sinif, 'geriye uyum kırıldı ya da eski yol hâlâ yeşil sayılıyor').toBe('ZAYIF-OZ')
     expect(k.sebep, 'ZAYIF sınıfı sebebini söylemeli: jeton ajanın kendi ekranına da basılıyor').toMatch(/KENDI probunun/)
   })
 
@@ -493,16 +495,230 @@ describe('INV-MECH-1 · teslimat kanıtı BAĞIMSIZ TANIK ister (sahte-yeşil ka
      * Yeni ölçüt: bağımsız dal jetonu BASMADIĞINI söylüyor, ve basma çağrısı KOŞULLU.
      */
     expect(
-      /jeton BASILMADI|jeton YAZILMADI/.test(kurulumKaynak),
+      /jeton bu ekrana BASILMADI/.test(kurulumKaynak),
       'prob artık jetonu basmadığını AÇIKÇA söylemiyor — sınır sessizleşti',
     ).toBe(true)
     expect(
-      /hedefSid \?[\s\S]{0,200}jeton YAZILMADI[\s\S]{0,120}:[\s\S]{0,60}jeton/.test(kurulumKaynak),
-      'jeton basımı KOŞULSUZ — bağımsız probda da değer ekrana düşer, bağımsızlık buharlaşır',
+      /hedefSid[\s\S]{0,80}jeton bu ekrana BASILMADI[\s\S]{0,320}:[\s\S]{0,60}jeton/.test(kurulumKaynak),
+      'jeton basımı KOŞULSUZ — akran probunda da değer ekrana düşer, ekran hijyeni buharlaşır',
     ).toBe(true)
     expect(
       /--to KENDINE verilemez/.test(kurulumKaynak),
       'prob --to kendine atmayı reddetmiyor: bağımsızlık tek komutla dolanılabilir',
     ).toBe(true)
+  })
+})
+
+/**
+ * ============================================================================
+ * INV-MECH-BAGIMSIZLIK-1 — REC-287: TESLİMAT KATMANINDA YEŞİL YOKTUR.
+ * ============================================================================
+ *
+ * NİÇİN VAR (2026-09-08'de ÖLÇÜLDÜ, ve bu kapı o gün ÜÇ KEZ kanıt diye kullanıldı):
+ * `dogrula --gordum`, akranın attığı bir jeton geri yazıldığında `YESIL` yazıyor ve sebebine
+ * *"BAGIMSIZ tanik"* diyordu. Üç ölçüm bunun sahte-bağımsız olduğunu gösterdi:
+ *   1) `prob --to` yardımı "Jeton ATANIN ekranina basilir" diyordu, kod BASMIYORDU — yani
+ *      aracın kendi kanıt hikâyesi kendi davranışıyla çelişiyordu.
+ *   2) Gizlemek zaten işe yaramıyor: `gozcu.cjs` `type:'note'` olan HER olayı basar, `to`
+ *      süzgeci YOKTUR; prob olayının sid'i hedeften türetilmiş sentetik bir uuid olduğu için
+ *      ATANIN kendi gözcüsü de onu basar. Saha kanıtı: ALTYAPI'nın URUN'a attığı jeton
+ *      ALTYAPI'nın kendi bildirimine düştü; OPS gözcüsü kendisine ait olmayan iki probu gördü.
+ *   3) Ve pano düz bir jsonl dizinidir: jetonu görmek için hiçbir bildirime gerek yok, `cat` yeter.
+ *
+ * ⛔KAYITTAKİ 3. SEÇENEK (hedefin kendi koşumunda üretilen ikinci sır) UYGULANMADI, ve
+ * gerekçesi hem kodda hem burada yazılı: sınanan kanalın KENDİSİ panodur, test malzemesi
+ * panodan geçmek zorundadır, panodan geçen her şey okunabilir. İkinci sır sırrın YAZARINI
+ * değiştirir, OKUNABİLİRLİĞİNİ değiştirmez — geri yazılan jeton "bildirim KONUŞMAYA ulaştı"
+ * ile "ajan DOSYAYI okudu"yu hâlâ ayırt edemez. Bu koldaki asıl iş, o yanılsamanın bir daha
+ * `YESIL` adıyla dönmesini ENGELLEMEKTİR.
+ *
+ * KAPSAM SINIRI — ADIYLA: bu kollar kanıtın GÜÇLENDİĞİNİ ölçmez (güçlendirilemez).
+ * Kanıt SINIFININ doğru ADLANDIRILDIĞINI ölçer. Adlandırma bu vakada işin kendisidir:
+ * ölçüm doğruydu, ADI yanlıştı ve üç şerit o ada güvenerek karar verdi.
+ */
+describe('INV-MECH-BAGIMSIZLIK-1 · teslimat kanıtı YEŞİL olamaz, sınıfı ADIYLA anılır', () => {
+  const KENDI = 'ac03ce11-c975-478d-bf30-66afb7c00f15'
+  const AKRAN = 'cb0467f1-f1a3-437d-bc15-52c0bd90feb3'
+  const T = Date.parse('2026-09-08T12:00:00Z')
+
+  /**
+   * ⭐EN ÖNEMLİ KOL: çekirdek, HİÇBİR fikstürde `YESIL` dönmez.
+   * Tek tek sınıf eşitliği ölçen kollar bu garantiyi vermiyordu — biri "kolaylık olsun" diye
+   * yeni bir yeşil dal eklerse o kollar sessiz kalırdı. Bu kol EVRENİ ölçer: girdi uzayının
+   * temsili bir kesitinde yeşil ÇIKMAMALI. (Evren tam değil; sınırı burada yazılı.)
+   */
+  it('⭐ÇEKİRDEK HİÇBİR HÂLDE `YESIL` DÖNDÜRMEZ (sınıf kaldırıldı, dal eklenirse bu kol düşer)', () => {
+    const haller = [
+      { damga: { bekleyenler: { [AKRAN]: { jeton: 'J1', atildiTs: new Date(T).toISOString() } } }, gordum: 'J1', simdi: T + 5_000 },
+      { damga: { jeton: 'J2' }, gordum: 'J2', simdi: T },
+      { damga: { bekleyenJeton: 'J3', atanSid: AKRAN, atildiTs: new Date(T).toISOString() }, gordum: 'J3', simdi: T + 1_000 },
+      { damga: null, gordum: 'J4', simdi: T },
+      { damga: { bekleyenler: { [AKRAN]: { jeton: 'J5', atildiTs: new Date(T).toISOString() } } }, gordum: 'YANLIS', simdi: T },
+    ]
+    for (const h of haller) {
+      const k = mech.teslimatKaniti({ damga: h.damga, gordum: h.gordum, kendiSid: KENDI, simdiMs: h.simdi })
+      expect(
+        k.sinif,
+        'teslimat katmanında YEŞİL yeniden doğmuş — REC-287: jeton panoyu okuyan herkese açık, ' +
+          'bu katmanda kanıt tavanı ZAYIF-PAYLASILAN dır',
+      ).not.toBe('YESIL')
+    }
+  })
+
+  it('TAVAN sınıfı SINIRINI söyler: paylaşıldığını ve neyi AYIRT ETMEDİĞİNİ yazar', () => {
+    const k = mech.teslimatKaniti({
+      damga: { bekleyenler: { [AKRAN]: { jeton: 'PROB-ac03-TAVAN1', atildiTs: new Date(T).toISOString() } } },
+      gordum: 'PROB-ac03-TAVAN1', kendiSid: KENDI, simdiMs: T + 10_000,
+    })
+    expect(k.sinif).toBe('ZAYIF-PAYLASILAN')
+    // Sebep okunmadan karar verilmiyor: sınıf adı kısa, sınırı taşıyan şey SEBEPTİR.
+    expect(k.sebep, 'sınıfın PAYLAŞILAN olduğu yazılmıyor — okuyan bunu bağımsız sanar').toMatch(/PAYLASILAN/)
+    expect(k.sebep, 'neyi ayırt ETMEDİĞİ yazılmıyor').toMatch(/ayirt ETMEZ|ayirt etmez/)
+    expect(k.sebep, '"YESIL DEGIL" demiyor — kaldırılan yanılsama sebep metninde yaşamaya devam eder').toMatch(/YESIL DEGIL/)
+  })
+
+  /**
+   * ⭐DAVRANIŞSAL KOL — kaynak taraması DEĞİL: CLI gerçekten koşuluyor, fikstür panoyla.
+   * Sebep: sınıf adını değiştirip çıktıda "YESIL" bırakmak mümkündü; o hâlde bütün kaynak
+   * kolları geçerdi ve ekranda okunan şey yine yeşil olurdu. Ekranda ne yazdığı ölçülür.
+   */
+  describe('CLI davranışı (fikstür pano, gerçek koşum)', () => {
+    const kos = (
+      damga: Record<string, unknown> | null,
+    ): { kod: number; cikti: string; damgaSonu: Record<string, unknown> | null } => {
+      const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'rec287-'))
+      const sid8 = KENDI.slice(0, 8)
+      // Gözcü katmanı YEŞİL olsun ki ölçülen tek şey TESLİMAT satırı ve çıkış kodu olsun.
+      fs.writeFileSync(
+        path.join(dizin, '.gozcu-imlec.' + sid8 + '.json'),
+        JSON.stringify({ sid: KENDI, aralikSn: 60, sonTarama: new Date().toISOString(), ofsetler: { 'events.x.jsonl': 1 } }),
+      )
+      const dy = path.join(dizin, '.mekanizma-durum.' + sid8 + '.json')
+      if (damga) fs.writeFileSync(dy, JSON.stringify(damga))
+      let kod = 0
+      let cikti = ''
+      try {
+        cikti = execFileSync(
+          process.execPath,
+          [path.join(KOK, 'scripts', 'board', 'mechanism-setup.cjs'), 'dogrula', '--sid', KENDI, '--gordum', 'PROB-ac03-CLI001'],
+          { encoding: 'utf8', env: { ...process.env, VENTHUB_BOARD_DIR: dizin }, stdio: 'pipe' },
+        )
+      } catch (e) {
+        const err = e as { status?: number; stdout?: string; stderr?: string }
+        kod = err.status ?? 1
+        cikti = `${err.stdout ?? ''}${err.stderr ?? ''}`
+      }
+      let damgaSonu: Record<string, unknown> | null = null
+      try {
+        damgaSonu = JSON.parse(fs.readFileSync(dy, 'utf8'))
+      } catch {
+        damgaSonu = null
+      }
+      return { kod, cikti, damgaSonu }
+    }
+
+    const tazeAkran = () => ({
+      bekleyenler: { [AKRAN]: { jeton: 'PROB-ac03-CLI001', atildiTs: new Date().toISOString() } },
+    })
+
+    it('⭐AKRAN jetonu: çıktıda `TESLIMAT  : YESIL` YOK, sınıf adı VAR', () => {
+      const { cikti } = kos(tazeAkran())
+      expect(cikti, 'TESLIMAT satırı hâlâ YEŞİL yazıyor — REC-287 ekranda geri gelmiş').not.toMatch(/TESLIMAT\s*:\s*YESIL/)
+      expect(cikti, 'sınıf adı ekranda yok; okuyan neye güvendiğini bilemez').toMatch(/ZAYIF-PAYLASILAN/)
+      expect(cikti, 'ekran "YESIL DEGIL" demiyor').toMatch(/YESIL DEGIL/)
+    })
+
+    it('⭐TAVAN KIRMIZI SAYILMAZ: akran jetonu → çıkış 0 (kanıtlanamaz katmanı cezalandırmak gürültüdür)', () => {
+      const { kod, cikti } = kos(tazeAkran())
+      expect(
+        kod,
+        'tavan sınıfı kırmızı sayıldı: her oturum kalıcı kırmızı alır ve gerçek kırmızılar ' +
+          '(gözcü, bayat/taklit jeton) gölgelenir — CRON katmanı için 2026-09-06 da verilen hükmün aynısı',
+      ).toBe(0)
+      expect(cikti).toMatch(/KIRMIZI YOK/)
+    })
+
+    it('AYIRT EDİCİ ÇİFT — ÖZ prob (tavanın ALTI) → çıkış 1 (erişilebilir üst sınıf varken bedava geçmez)', () => {
+      const { kod, cikti } = kos({ jeton: 'PROB-ac03-CLI001' })
+      expect(kod, 'ZAYIF-OZ kırmızı saymıyor — kapı iki hâli ayırt etmiyor demektir').toBe(1)
+      expect(cikti).toMatch(/ZAYIF-OZ/)
+    })
+
+    it('SINIF DAMGAYA YAZILIR (yoksa aşağı akış onu "kanıtlı" diye yeniden yeşillendirir)', () => {
+      const { damgaSonu } = kos(tazeAkran())
+      expect(damgaSonu, 'damga hiç yazılmadı — yoklamanın TESLİM sütunu körleşir').not.toBeNull()
+      expect(damgaSonu?.teslimKanitSinifi, 'sınıf damgada yok').toBe('ZAYIF-PAYLASILAN')
+      expect(damgaSonu?.teslimDogrulandiTs, 'yaş damgası yazılmamış').toBeTruthy()
+    })
+  })
+
+  it('YARDIM METNİ ile DAVRANIŞ eşit: "atanin ekranina basilir" cümlesi KALDIRILDI (kabul ölçütü 1)', () => {
+    /**
+     * ⭐ÖLÇÜM EVRENİ = YALNIZ KULLANIM BLOĞU, dosyanın tamamı DEĞİL — ve bunu bu kol
+     * KENDİSİ ÖĞRETTİ (2026-09-08, ilk koşum): kol dosya genelinde arıyordu ve KIRMIZI verdi,
+     * çünkü REC-287 gerekçesi eski yanlış cümleyi **alıntılıyor** ("yardım metni şunu diyordu:
+     * ...") — yani kol, kusurun ONARIM KAYDINI kusurun kendisi saydı.
+     * Aynı sınıfın bir örneği daha: *ölçüt keskin, evren yanlış.* Doğru evren, ekrana basılan
+     * kullanım bloğudur; yorumdaki tarihsel alıntı ekrana çıkmaz ve çıkmaması da gerekmez —
+     * gerekçenin silinmesi, gerekçesiz bir kurala dönüşmek olurdu.
+     */
+    const kullanimBlogu = kurulumKaynak.slice(kurulumKaynak.indexOf("yaz('kullanim: mechanism-setup.cjs"))
+    expect(kullanimBlogu.length, 'kullanım bloğu bulunamadı — ölçüm evreni boş, kol kör').toBeGreaterThan(200)
+    expect(
+      /Jeton ATANIN ekranina basilir/.test(kullanimBlogu),
+      'yardım metni hâlâ davranışın TERSİNİ söylüyor — REC-287 kabul ölçütü 1',
+    ).toBe(false)
+    // Ve yeni metin doğruyu söylüyor: gizlemenin bir bariyer OLMADIĞINI.
+    expect(kurulumKaynak, 'yardım metni jetonun atanın bildirimine düştüğünü söylemiyor').toMatch(/BASILMAZ; ama GIZLI DE DEGILDIR/)
+    expect(kurulumKaynak, 'yardım metni bu katmanda yeşil olmadığını söylemiyor').toMatch(/BU KATMANDA YESIL YOKTUR/)
+  })
+
+  /**
+   * ⭐İDDİANIN DAYANAĞI KODDA SABİTLENİR — ve bu kol bilerek `gozcu.cjs`'e bakar.
+   * Bütün gerekçe şu ölçüme dayanıyor: gözcü `to` süzmez, bu yüzden jeton atanın bildirimine
+   * de düşer. Yarın biri gözcüye hedef süzgeci eklerse gerekçe BAYATLAR — ve bayat bir gerekçe,
+   * yanlış bir gerekçeden daha sinsidir çünkü kimse ona bakmaz. O gün bu kol kırmızı vererek
+   * "sınıf adını yeniden düşün" der. Kol, süzgeci YASAKLAMIYOR; gerekçeyle birlikte
+   * değerlendirilmesini ZORUNLU kılıyor.
+   */
+  it('⭐GEREKÇENİN DAYANAĞI: gozcu.cjs not basarken `to` ile SÜZMÜYOR (değişirse bu kol uyarır)', () => {
+    expect(gozcuKaynak, 'gözcü kaynağı okunamadı — dayanak ölçülemez').toContain('notSatiri')
+    const basimBlogu = gozcuKaynak.slice(gozcuKaynak.indexOf('for (const satir of'), gozcuKaynak.indexOf('if (bozukSatir)'))
+    expect(basimBlogu.length, 'basım bloğu bulunamadı; ölçüm evreni boş — kör kol').toBeGreaterThan(100)
+    expect(
+      /o\.to/.test(basimBlogu),
+      'gözcüye hedef süzgeci EKLENMİŞ. Bu iyi bir değişiklik olabilir ama REC-287 gerekçesi ' +
+        '"jeton atanın bildirimine de düşer" ölçümüne dayanıyor: gerekçeyi ve kanıt sınıfını ' +
+        'YENİDEN ÖLÇ. (Panonun dosya olarak okunabilirliği yine de yeşili geri getirmez.)',
+    ).toBe(false)
+  })
+
+  it('AÇILIŞ SATIRI teslimatı "KANITLI" diye sunmaz ve sınıfı DAMGADAN okur (yer değiştiren yeşil)', () => {
+    expect(
+      /TESLIMAT ' \+ teslim \+ 'dk once KANITLI/.test(oturumKaynak),
+      'açılış satırı hâlâ "KANITLI" diyor — sahte-yeşil mechanism-setup tan buraya TAŞINMIŞ olur',
+    ).toBe(false)
+    expect(oturumKaynak, 'açılış satırı sınıfı damgadan okumuyor (kendi adını uyduruyor)').toMatch(/teslimKanitSinifi/)
+    expect(oturumKaynak, 'açılış satırı yeşil olmadığını söylemiyor').toMatch(/YESIL DEGILDIR/)
+    expect(panoKaynak, 'board.cjs sınıf okuyucusunu dışa açmıyor').toMatch(/teslimKanitSinifi,/)
+  })
+
+  it('YOKLAMA, TESLİM sütununun sınırını KOŞULSUZ basar (taze olduğu günler de dahil)', () => {
+    // Sınırı yalnız "teslimatsız şerit varken" basmak, tam da yanlış kanaatin serbest kaldığı
+    // günü (hepsi taze) açıkta bırakırdı.
+    expect(panoKaynak, 'TESLİM sütununun sınırı yoklamada yazılı değil').toMatch(/TESLIM sutunu YAS olcer, GUC olcmez/)
+    expect(panoKaynak).toMatch(/Teslimatta YESIL YOKTUR/)
+  })
+
+  it('CETVEL bu hükmü taşıyor (araç ile cetvel ayrışmaz)', () => {
+    const cetvel = oku('docs/standards/fleet-mechanism-standard.md')
+    expect(cetvel, 'cetvel okunamadı').not.toBe('')
+    expect(cetvel, 'kanıt sınıfları cetvelde yok — araç kararı tek başına taşıyor').toMatch(/ZAYIF-PAYLASILAN/)
+    // Cetvel Türkçe yazılır (YEŞİL), araç ASCII basar (YESIL) — ölçüt ikisini de kabul eder.
+    expect(cetvel, 'cetvel teslimatta yeşil olmadığını yazmıyor').toMatch(/(YEŞİL|YESIL)[^\n.]{0,40}YOKTUR/)
+    expect(
+      cetvel,
+      'ikinci-sır seçeneğinin NİÇİN reddedildiği cetvelde yazılı değil — altı ay sonra "nonce ekleyelim" diye yeniden açılır',
+    ).toMatch(/[İIi]kinci s[ıi]r/)
   })
 })
