@@ -77,6 +77,15 @@ const _getCachedSupabaseData = cache((id: string) => {
 })
 
 
+/**
+ * ⭐DENEY (REC-59, geri alınabilir): rota sınıfını AÇIKÇA ilan et.
+ * `about` rotası bunu yazıyor ve üretilen HTML'inde CSR bailout işareti YOK (ölçüldü: 0);
+ * kategori yazmıyordu ve 2 işaret taşıyordu. `force-static` altında `useSearchParams()`
+ * boş döner ve bailout üretmez — yani işaretin kaynağını bileşen bileşen aramak yerine
+ * rotayı ait olduğu sınıfa koymak.
+ */
+export const dynamic = 'force-static'
+
 /** ISR yedeği (1 saat) — birincil yol webhook; bkz. `rendering-cache-standard.md` §3-4. */
 export const revalidate = 3600
 
