@@ -67,8 +67,9 @@
         "zorunlu degil"
       ],
       "yasak": [
-        "uyelik zorunludur",
-        "giris yapmak zorunlu"
+        "teklif icin uyelik zorunludur",
+        "teklif icin giris yapmak zorunlu",
+        "uye olmadan teklif alinamaz"
       ],
       "kaynak": "REC-117 (09-01)",
       "beklenen_biri": [
@@ -109,17 +110,20 @@
       "alan": "vitrin",
       "soru": "Mobilde hesap simgesi ve dil secimi nerede?",
       "beklenen": [
-        "sag ust"
+        "sekme"
       ],
       "yasak": [
         "yalniz logo"
       ],
-      "kaynak": "K 16:50",
+      "kaynak": "K19 (09-05) — K9/K16 mobil maddelerini gunceller",
       "beklenen_biri": [
-        "uyusmazl",
-        "akilli dil",
+        "alt cubuk",
+        "alt sekme",
+        "header'in sag",
+        "header sag",
+        "ust serit",
         "dil cipi",
-        "dil secimi"
+        "tr/en"
       ]
     },
     {
@@ -127,16 +131,22 @@
       "alan": "vitrin",
       "soru": "Urun secici nerede yasar, urun sayfasinda hesaplama var mi?",
       "beklenen": [
-        "tek sayfa",
         "ayri"
       ],
       "yasak": [],
-      "kaynak": "K17, K18"
+      "kaynak": "K17, K18",
+      "beklenen_biri": [
+        "tek sayfa",
+        "tek bir sayfa",
+        "bagimsiz bir sayfa",
+        "urun-secici",
+        "tek ve bagimsiz"
+      ]
     },
     {
       "id": "S09",
       "alan": "vitrin",
-      "soru": "Kategori agaci kac kategori kac dal, ucuncu seviye var mi, Siginak nerede?",
+      "soru": "K3 kararina gore (henuz uygulanmadi; canlida 37 kategori var) kategori agaci kac kategori kac dal olacak, ucuncu seviye var mi, Siginak nerede?",
       "beklenen": [
         "7",
         "26"
