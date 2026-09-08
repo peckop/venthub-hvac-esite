@@ -277,6 +277,38 @@ yeni testle kırmızı" farkı, kapının gerçekten yeni bir şey ölçtüğün
 - Bir iş bitmeden ikincisine başlama; **dallar/şeritler karışmasın**.
 - `.agent/skills/` (Antigravity) ile `.claude/skills/` (Claude Code) **ayrı ve kasıtlı** — birleştirme/karıştırma yok.
 
----
+### 8.1 ⛔ARA PUSH YASAK — her push bir dağıtım kaydı üretir ve KOTAYI YER (2026-09-08, OPS hükmü)
+
+**KURAL:** dal üzerindeki ara commit'ler **yerelde kalır**. `git push` yalnız **iki anda** yapılır:
+PR **açılırken** ve PR **güncellenirken** (kapı kırmızısını onarmak, rebase, gözden geçirme
+düzeltmesi). "Kaydolsun diye" ya da "her commit'te" push YOK.
+
+**NİÇİN — ölçülmüş, tahmin değil.** Vercel Git entegrasyonu **her push için bir dağıtım kaydı
+oluşturur**; şerit dalı kapısı (#1117) o kaydı **oluştuktan SONRA** iptal eder (Ignored Build
+Step olarak koşar), yani **oluşumu engellemez**. İptal edilen kayıt da kabul edilmiş kayıttır ve
+kotayı yer. 2026-09-08 ölçümü, kapıdan **sonraki** 25 saat:
+
+- **37 önizleme kaydı** (25 iptal · 12 hazır) + 23 production kaydı = 60 kayıt
+- ~10 PR için 37 önizleme → **PR başına ~3,7 push**
+- Bedeli: kota kilidi **iki kez** kapandı ve canlı site 11:29Z–13:14Z arası **beş
+  birleştirme geride** kaldı; müşteri o süre boyunca eski vitrini gördü.
+
+⚠**KİLİTLİYKEN VERCEL HİÇ KAYIT OLUŞTURMUYOR** (aynı ölçümde 16,5 saatlik boşluk). Yani
+"kaç dağıtım engellendi" sorusunun cevabı hiçbir yerde yoktur ve kota tavanı ölçülemez.
+Ölçülemeyen bir tavanın altında kalmanın tek yolu **tüketimi azaltmaktır**.
+
+**NİÇİN AYAR DEĞİL DAVRANIŞ:** depo tarafında "yalnız master dağıtsın" diyen bir ayar **yok**.
+`vercel.json` `git.deploymentEnabled` ya **boolean `false`** (o zaman master'ın production
+yayını da durur) ya da **belirli dal adlarını** eşler — belgesi *"unspecified branches default
+to true"* diyor, **joker yok** (#1117'nin bulgusu, belgeden teyitli). Dal adları iş başına
+üretildiği için sayarak kapatmak sonlu değildir. Bu kural, ayarla kapatılamayan bir sızıntının
+**tek bedelsiz** kapatma yoludur; tüketimin ~%60'ını keser.
+
+**ÖLÇÜT:** PR başına push sayısı. Bugünün tabanı **3,7**; hedef **1–2**.
+
+**SINIR — adıyla:** bu bir **kural**, kapı DEĞİL. Bir kanca ile zorlanmıyor, çünkü push'un
+"PR açılışı mı, ara mı" olduğunu yerel kanca ölçemez (PR'ın varlığı ağ sorusudur ve kanca
+cetveli çevrimdışı olmayı şart koşuyor). Zorlanamayan kural, **ölçülerek** yaşar: sayı
+büyüyorsa kural çürümüştür ve o gün yeniden konuşulur.
 
 *SSOT: bu dosya. Controller'lar = Claude Code (eş, çoğul) · ortak Worker = Antigravity CLI · onay & relay = Recep.*
