@@ -571,7 +571,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
             {/* Brand & Badge */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2.5">
-                <BrandIcon brand={family.brand_name || ''} className="w-8 h-8" />
+                {/* Marka adı hemen yanında yazıyla basılıyor — logo dekoratif (REC-268). */}
+                <BrandIcon brand={family.brand_name || ''} className="w-8 h-8" dekoratif />
                 <div className="flex flex-col">
                   <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">{family.brand_name}</span>
                   <span className="text-steel-gray text-xs font-medium tracking-hvac-normal">{t('pdp.officialDistributor')}</span>

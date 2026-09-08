@@ -187,7 +187,8 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
         <div className="relative z-10 max-w-page mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div ref={heroIconRef} className={scrollAnimationClasses.fadeUp(heroIconVisible) + " mb-12 flex justify-center"}>
             <div className="w-32 h-32 lg:w-48 lg:h-48 rounded-hvac-3xl bg-white p-8 shadow-white-glow-lg flex items-center justify-center overflow-hidden">
-              <BrandIcon brand={brand.name} className="w-full h-full" />
+              {/* Marka adı hemen altında h1 olarak yazıyor — logo dekoratif (REC-268). */}
+              <BrandIcon brand={brand.name} className="w-full h-full" dekoratif />
             </div>
           </div>
 
