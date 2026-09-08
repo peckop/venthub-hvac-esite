@@ -46,10 +46,21 @@ const DOKUM_ONEK = 'is-dagilimi-'
  * ⭐Kırmızıya geçiş tarihi REC-274'e yazılır; buradaki satır o kararın KODDAKİ karşılığıdır.
  */
 const KIP: Record<string, 'KIRMIZI' | 'UYARI'> = {
-  // 'kararlar-vitrin-15a': 'KIRMIZI',  // OPS doldurmasi master'a ininde ACILACAK (REC-274)
+  // ⛔2026-09-08: KIRMIZI'ya ALINAMADI ve sebebi ÖLÇÜLDÜ — öncül çürüdü.
+  // #1113 ile 57 başlığa DURUM satırı indi, ama kip açılınca **26 ihlal** çıktı; ikisi
+  // ayrı sınıf ve YALNIZ BİRİ bendeydi:
+  //   (a) 21 satır `KURAL → kapı YOK (REC-nnn)` — MEŞRU bir hâl, kapı beni yanlış ölçüyordu.
+  //       Beşinci biçim olarak TANINDI (aşağıda), REC varlık kontrolüyle.
+  //   (b) 8 satır MÜKERRER numara (K1, K18×2, K23×3, K25, K31) — belgenin GERÇEK kusuru ve
+  //       OPS'un dosyası; onarımı onda. Kip, o düzeltme master'a inince açılır.
+  // Kendi CI'ımı başkasının dosyasındaki kusurla kırmızı yapmak, kapıyı susturulası hâle
+  // getirirdi; UYARI kipi bugün o kusuru RAPOR ediyor ve sahibi biliyor.
+  // OPS'un iki biçim düzeltmesi (K18-a, K1-a) master'a ininde AÇILACAK — REC-274.
+  // Ölçüldü 2026-09-08: kip açıkken kalan ihlal 2 ve İKİSİ DE o iki başlık.
+  // 'kararlar-vitrin-15a': 'KIRMIZI',
 }
 
-type Baslik = { ham: string; satir: number; kararMi: boolean; nolar: number[]; govde: string }
+type Baslik = { ham: string; satir: number; kararMi: boolean; kimlik: string[]; govde: string }
 
 /** Karar başlığı mı? `K1 ·` / `K — ` / `K32–K35` / `AÇIK — ` evet; düz metin başlığı hayır. */
 function kararBasligiMi(baslik: string): boolean {
@@ -57,14 +68,36 @@ function kararBasligiMi(baslik: string): boolean {
 }
 
 /** Başlıktaki numara(lar). `K32–K35` aralığı tek başlıkta kabul (kayıt hükmü). */
-function numaralar(baslik: string): number[] {
+/**
+ * Başlığın KİMLİK(LER)İ. Sayı değil DİZE döner ve sebebi ölçülmüş bir kusurdur.
+ *
+ * ⭐ÖNCE SAYI DÖNÜYORDU VE BU YANLIŞTI (2026-09-08, OPS ölçtü, kabul ettim):
+ * Belgede `K<n>-<harf>` **ek karar** biçimi KASITLI ve beş başlıkta zaten kullanılıyordu
+ * (K18-b, K23-a, K23-b, K25-b, K31-a). Eski çözümleme yalnız ön rakamı alıp **ek harfi
+ * YUTUYORDU**, yani `K23-a` ile `K23-b` aynı kimlik sanılıyor ve kapı bunları MÜKERRER
+ * diye kırmızıya yazıyordu.
+ *
+ * ⛔BU BENİM KENDİ HATAMIN DÜZELTMESİ, ve atfı da düzeltiyor: dün "7 mükerrer numara,
+ * belgenin kusuru" diye raporladım. SAYI doğruydu, ATIF yanlıştı — yedinin **beşi**
+ * kapının çözümleme kusuruydu, yalnız ikisi gerçekten biçimsiz başlıktı (onları OPS
+ * `K18-a` / `K1-a` olarak düzeltti). "Ölçüt keskin ama yorum yanlış" sınıfı.
+ *
+ * KURAL: kimlik `K<n>` YA DA `K<n>-<harf>`; ikisi AYRI kimliktir. Aralık (`K32–K35`)
+ * her sayıyı ayrı kimlik üretir. Mükerrer ölçütü **tam kimliğin** iki kez geçmesidir.
+ */
+function kimlikler(baslik: string): string[] {
+  // 1) Ek karar: K<n>-<harf>. Harf ekini aralık ayıracından ayırt eder (aralıkta rakam gelir).
+  const ek = /^##\s+K(\d+)-([A-Za-zÇĞİıÖŞÜçğöşü]+)/.exec(baslik)
+  if (ek) return ['K' + Number(ek[1]) + '-' + ek[2].toLowerCase()]
+
+  // 2) Aralık ya da tek numara.
   const m = /^##\s+K(\d+)(?:\s*[–—-]\s*K?(\d+))?/.exec(baslik)
   if (!m) return []
   const bas = Number(m[1])
   const son = m[2] ? Number(m[2]) : bas
-  if (!Number.isFinite(bas) || !Number.isFinite(son) || son < bas || son - bas > 50) return [bas]
-  const out: number[] = []
-  for (let i = bas; i <= son; i++) out.push(i)
+  if (!Number.isFinite(bas) || !Number.isFinite(son) || son < bas || son - bas > 50) return ['K' + bas]
+  const out: string[] = []
+  for (let i = bas; i <= son; i++) out.push('K' + i)
   return out
 }
 
@@ -78,7 +111,7 @@ function basliklariCikar(metin: string): Baslik[] {
       ham: satirlar[i],
       satir: i + 1,
       kararMi: kararBasligiMi(satirlar[i]),
-      nolar: numaralar(satirlar[i]),
+      kimlik: kimlikler(satirlar[i]),
       govde: satirlar.slice(i + 1, son).join('\n'),
     }
   })
@@ -110,11 +143,25 @@ function dokumKayitlari(): Map<string, string> {
 }
 
 /**
- * DURUM değerini doğrula. Dört biçim (kayıt hükmü):
- *   `KURAL → kapı: <dosya>`  · dosya `src/__tests__/conformance/` altında VAR olmalı
- *   `İŞ → REC-nnn (<state>)` · kayıt dökümde var olmalı, Canceled ise KIRMIZI
+ * DURUM değerini doğrula. BEŞ biçim (kayıt hükmü):
+ *   `KURAL → kapı: <dosya>`      · dosya `src/__tests__/conformance/` altında VAR olmalı
+ *   `KURAL → kapı YOK (REC-nnn)` · kapısı HENÜZ yazılmamış kural; REC dökümde VAR olmalı
+ *   `İŞ → REC-nnn (<state>)`     · kayıt dökümde var olmalı, Canceled ise KIRMIZI
  *   `İSTİŞARE — karar değil`
- *   `AÇIK — karar bekliyor`  · başlıktaki tarih 7 günden eskiyse KIRMIZI
+ *   `AÇIK — karar bekliyor`      · başlıktaki tarih 7 günden eskiyse KIRMIZI
+ *
+ * ⭐BEŞİNCİ BİÇİM SONRADAN EKLENDİ, VE SEBEBİ ÖLÇÜMDÜR (2026-09-08).
+ * Kapı KIRMIZI kipe alınmak istendiğinde vitrin belgesinde 26 ihlal çıktı; **21'i**
+ * `KURAL → kapı YOK (REC-nnn)` biçimindeydi. İlk tepki "OPS yanlış yazmış" olurdu —
+ * DEĞİLDİ. Bu, MEŞRU ve bu depoda ADI KONMUŞ bir hâl: CLAUDE.md kural 1 "cetvel yok
+ * geçerli bir cevaptır ama BEDAVA DEĞİLDİR — o zaman iş, cetveli yazmayı da kapsar"
+ * der. Yani "kural karara bağlandı, kapısı henüz yazılmadı, takibi şu kayıtta" tam
+ * olarak o cümlenin karşılığıdır. Kapı bunu ihlal sayarken **kendi cetvelini** ölçmüyordu.
+ *
+ * ⛔AMA KAÇIŞ DELİĞİ DEĞİL: REC dökümde YOKSA ya da İPTAL ise KIRMIZI. Aksi hâlde
+ * "kapı YOK (REC-9999)" yazmak her kararı susturmanın bedava yolu olurdu — yani
+ * ölçmeyen bir gösterge. Kontrol `İŞ` kolundakinin AYNISI, bilerek: iki yerde iki
+ * kural olmasın.
  */
 export function durumDogrula(
   durum: string,
@@ -126,6 +173,22 @@ export function durumDogrula(
   const d = durum.trim()
 
   let m
+  // ⭐SIRA ÖNEMLİ: "kapı YOK (...)" kolu, "kapı: <dosya>" kolundan ÖNCE denenir. Tersi
+  // olsaydı iki nokta içermeyen bu biçim ikinci kola düşüp "biçimsiz" sayılırdı.
+  if ((m = /^KURAL\s*(?:→|->)\s*kap[ıi]\s+YOK\s*\((REC-\d+)[^)]*\)\s*$/i.exec(d))) {
+    const rec = m[1].toUpperCase()
+    if (!kayitlar.has(rec)) {
+      return 'KURAL kapisi YOK deniyor ama takip kaydi dokumde YOK: ' + rec +
+        ' (kapisiz kural ancak bir kayda bagliysa mesrudur)'
+    }
+    const durumu = kayitlar.get(rec) || ''
+    if (/^cancel/i.test(durumu)) {
+      return 'KURAL kapisi YOK ve takip kaydi IPTAL: ' + rec + ' (' + durumu +
+        ') — kapi da kayit da yok, karar sahipsiz'
+    }
+    return null
+  }
+
   if ((m = /^KURAL\s*(?:→|->)\s*kap[ıi]\s*:\s*(.+)$/i.exec(d))) {
     const dosya = m[1].trim().replace(/^`|`$/g, '')
     if (!/^[\w./-]+$/.test(dosya)) return 'KURAL kapi adi bicimsiz: ' + dosya
@@ -164,7 +227,7 @@ export function belgeOlc(
 ): { ihlaller: Ihlal[]; kararSayisi: number; yapisalSayisi: number } {
   const basliklar = basliklariCikar(metin)
   const ihlaller: Ihlal[] = []
-  const gorulen = new Map<number, number>()
+  const gorulen = new Map<string, number>()
   let kararSayisi = 0
   let yapisalSayisi = 0
 
@@ -172,17 +235,17 @@ export function belgeOlc(
     if (!b.kararMi) { yapisalSayisi++; continue }
     kararSayisi++
 
-    if (b.nolar.length === 0) {
+    if (b.kimlik.length === 0) {
       ihlaller.push({ belge: belgeAdi, satir: b.satir, baslik: b.ham.slice(0, 90), sebep: 'NUMARASIZ karar basligi' })
     }
-    for (const n of b.nolar) {
-      if (gorulen.has(n)) {
+    for (const k of b.kimlik) {
+      if (gorulen.has(k)) {
         ihlaller.push({
           belge: belgeAdi, satir: b.satir, baslik: b.ham.slice(0, 90),
-          sebep: 'MUKERRER numara K' + n + ' (ilk gorulus satir ' + gorulen.get(n) + ')',
+          sebep: 'MUKERRER kimlik ' + k + ' (ilk gorulus satir ' + gorulen.get(k) + ')',
         })
       } else {
-        gorulen.set(n, b.satir)
+        gorulen.set(k, b.satir)
       }
     }
 
@@ -198,6 +261,20 @@ export function belgeOlc(
   return { ihlaller, kararSayisi, yapisalSayisi }
 }
 
+/**
+ * KİP ANAHTARI = dosya adının TARİHSİZ öneki.
+ *
+ * ⭐NİÇİN DIŞA AÇIK VE ÖLÇÜLÜYOR (OPS uyarısı, 2026-09-08): Kararlar belgeleri her gün
+ * yeni tarih damgasıyla yeniden yazılıyor ve eski kopya SİLİNİYOR
+ * (`kararlar-vitrin-15a-2026-09-07.md` → `...-2026-09-08.md`). `KIP` haritası TAM DOSYA
+ * ADIYLA bakıyor olsaydı, belge her yenilendiğinde kip sessizce UYARI'ya düşer ve kimse
+ * farketmezdi — yani "kırmızıya aldık" sanılan kapı ölçmez hâle gelirdi. Önek türetimi
+ * bunu yapısal olarak imkânsız kılar, ve bu satır artık BİR KOLLA sabitlenmiştir.
+ */
+export function onekCikar(ad: string): string {
+  return ad.replace(/-\d{4}-\d{2}-\d{2}\.md$/, '')
+}
+
 /** Her proje için EN YENİ `kararlar-<proje>-<tarih>.md`. Eski kopyalar ölçülmez. */
 function kararBelgeleri(): { ad: string; onek: string; yol: string }[] {
   let hepsi: string[] = []
@@ -208,8 +285,7 @@ function kararBelgeleri(): { ad: string; onek: string; yol: string }[] {
   }
   const enYeni = new Map<string, string>()
   for (const ad of hepsi.sort()) {
-    const onek = ad.replace(/-\d{4}-\d{2}-\d{2}\.md$/, '')
-    enYeni.set(onek, ad) // sirali oldugu icin son yazan EN YENI tarihtir
+    enYeni.set(onekCikar(ad), ad) // sirali oldugu icin son yazan EN YENI tarihtir
   }
   return [...enYeni.entries()].map(([onek, ad]) => ({ ad, onek, yol: path.join(BELGE_DIZINI, ad) }))
 }
@@ -254,10 +330,27 @@ describe('INV-KARAR-KAYIT-1: karar basligi kendisini bir yere baglar', () => {
     expect(kararBasligiMi('## AÇIK — Ürün sayfasındaki hesap paneli (Recep, 2026-09-04)')).toBe(true)
   })
 
-  it('ARALIK basligi kabul: K32–K35 dort numara tutar', () => {
-    expect(numaralar('## K32–K35 · Toplu karar (Recep)')).toEqual([32, 33, 34, 35])
-    expect(numaralar('## K7 · Tek karar')).toEqual([7])
-    expect(numaralar('## K — numarasiz')).toEqual([])
+  it('ARALIK basligi kabul: K32–K35 dort kimlik tutar', () => {
+    expect(kimlikler('## K32–K35 · Toplu karar (Recep)')).toEqual(['K32', 'K33', 'K34', 'K35'])
+    expect(kimlikler('## K7 · Tek karar')).toEqual(['K7'])
+    expect(kimlikler('## K — numarasiz')).toEqual([])
+  })
+
+  /**
+   * ⭐EK KARAR `K<n>-<harf>` AYRI KİMLİKTİR — ve bu kol, kapının dünkü kusurunun
+   * geri gelmesini engeller. Eski çözümleme yalnız ön rakamı alıyordu; `K23-a` ile
+   * `K23-b` aynı sanılıp MÜKERRER yazılıyordu. Beş canlı başlık bu yüzden yanlış
+   * yere ihlal olarak raporlandı ve ben onu "belgenin kusuru" diye bildirdim —
+   * sayı doğruydu, ATIF yanlıştı.
+   */
+  it('EK KARAR ayri kimlik: K23-a ile K23-b mukerrer DEGIL', () => {
+    expect(kimlikler('## K23-a · Ek karar (Recep)')).toEqual(['K23-a'])
+    expect(kimlikler('## K23-b · Baska ek karar (Recep)')).toEqual(['K23-b'])
+    expect(kimlikler('## K23 · Ana karar (Recep)')).toEqual(['K23'])
+    // Üçü de FARKLI kimlik: küme boyutu 3 olmalı.
+    expect(new Set([
+      ...kimlikler('## K23 · x'), ...kimlikler('## K23-a · y'), ...kimlikler('## K23-b · z'),
+    ]).size).toBe(3)
   })
 
   /**
@@ -270,7 +363,7 @@ describe('INV-KARAR-KAYIT-1: karar basligi kendisini bir yere baglar', () => {
     const bugun = new Date('2026-09-07T00:00:00Z')
     const olc = (metin: string) => belgeOlc('fikstur.md', metin, kayitlar, kapiVar, bugun)
 
-    it('GECERLI belge: dort DURUM bicimi de kabul edilir, ihlal 0', () => {
+    it('GECERLI belge: BES DURUM bicimi de kabul edilir, ihlal 0', () => {
       const o = olc([
         '## K1 · Kural karari (2026-09-07, Recep)',
         'DURUM: KURAL → kapı: var-olan-kapi.test.ts',
@@ -284,12 +377,31 @@ describe('INV-KARAR-KAYIT-1: karar basligi kendisini bir yere baglar', () => {
         '## K4 · Bekleyen (2026-09-05, Recep)',
         'DURUM: AÇIK — karar bekliyor',
         '',
+        // BEŞİNCİ BİÇİM: kural karara bağlanmış, kapısı henüz YAZILMAMIŞ, takibi bir kayıtta.
+        '## K5 · Kapisi yazilmamis kural (2026-09-07, Recep)',
+        'DURUM: KURAL → kapı YOK (REC-100 açıldı)',
+        '',
         '## Yapisal bolum (OPS)',
         'DURUM satiri YOK ama karar da degil.',
       ].join('\n'))
       expect(o.ihlaller.map((i) => i.sebep), 'gecerli belgede ihlal uretildi — yanlis alarm').toEqual([])
-      expect(o.kararSayisi).toBe(4)
+      expect(o.kararSayisi).toBe(5)
       expect(o.yapisalSayisi, 'yapisal baslik karar sayilmis').toBe(1)
+    })
+
+    /**
+     * ⛔BEŞİNCİ BİÇİM KAÇIŞ DELİĞİ OLMASIN — iki kol tam bunu ölçer. Bunlar olmasaydı
+     * "kapı YOK (REC-9999)" yazmak her kararı susturmanın BEDAVA yolu olurdu; yani
+     * kapı, ölçtüğünü sandığı şeyi ölçmez hâle gelirdi.
+     */
+    it('KAPISIZ KURAL: takip kaydi dokumde YOKSA KIRMIZI', () => {
+      const o = olc(['## K1 · Karar (2026-09-07, Recep)', 'DURUM: KURAL → kapı YOK (REC-9999 açıldı)'].join('\n'))
+      expect(o.ihlaller.map((i) => i.sebep).join(' ')).toContain('takip kaydi dokumde YOK')
+    })
+
+    it('KAPISIZ KURAL: takip kaydi IPTAL ise KIRMIZI (kapi da kayit da yok)', () => {
+      const o = olc(['## K1 · Karar (2026-09-07, Recep)', 'DURUM: KURAL → kapı YOK (REC-1, Canceled)'].join('\n'))
+      expect(o.ihlaller.map((i) => i.sebep).join(' ')).toContain('takip kaydi IPTAL')
     })
 
     it('SABOTAJ 1: DURUM satiri silinirse KIRMIZI', () => {
@@ -303,7 +415,7 @@ describe('INV-KARAR-KAYIT-1: karar basligi kendisini bir yere baglar', () => {
       expect(o.ihlaller[0].sebep).toContain('KURAL kapisi YOK')
     })
 
-    it('SABOTAJ 3: ayni numara iki kez KIRMIZI', () => {
+    it('SABOTAJ 3: ayni kimlik iki kez KIRMIZI', () => {
       const o = olc([
         '## K18 · Birinci (2026-09-07, Recep)',
         'DURUM: İSTİŞARE — karar değil',
@@ -311,7 +423,27 @@ describe('INV-KARAR-KAYIT-1: karar basligi kendisini bir yere baglar', () => {
         'DURUM: İSTİŞARE — karar değil',
       ].join('\n'))
       expect(o.ihlaller.length).toBe(1)
-      expect(o.ihlaller[0].sebep).toContain('MUKERRER numara K18')
+      expect(o.ihlaller[0].sebep).toContain('MUKERRER kimlik K18')
+    })
+
+    // ⭐AYIRT EDİCİ ÇİFT: aynı EK kimlik iki kez de kırmızı olmalı. Bu kol olmasaydı
+    // "ek harf ayrı kimliktir" düzeltmesi, ek kararları TOPTAN denetimsiz bırakabilirdi.
+    it('SABOTAJ 3b: ayni EK kimlik (K23-a) iki kez KIRMIZI', () => {
+      const o = olc([
+        '## K23-a · Birinci ek (2026-09-07, Recep)',
+        'DURUM: İSTİŞARE — karar değil',
+        '## K23-a · Ayni ek, yanlislikla (2026-09-07, Recep)',
+        'DURUM: İSTİŞARE — karar değil',
+      ].join('\n'))
+      expect(o.ihlaller.length).toBe(1)
+      expect(o.ihlaller[0].sebep).toContain('MUKERRER kimlik K23-a')
+    })
+
+    it('KIP ANAHTARI tarihten bagimsiz: belge her gun yenilenince kip DUSMEZ', () => {
+      expect(onekCikar('kararlar-vitrin-15a-2026-09-07.md')).toBe('kararlar-vitrin-15a')
+      expect(onekCikar('kararlar-vitrin-15a-2026-09-08.md')).toBe('kararlar-vitrin-15a')
+      // Tarih taşımayan ad olduğu gibi kalır (yanlış kırpma yapmaz).
+      expect(onekCikar('kararlar-belge.md')).toBe('kararlar-belge.md')
     })
 
     it('NUMARASIZ karar basligi KIRMIZI', () => {
