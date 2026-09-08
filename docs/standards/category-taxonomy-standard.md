@@ -8,13 +8,39 @@
 
 ---
 
-## 1. İlke: extensible/plugin iskele (kategori ASLA "boş diye silinmez")
+## 1. İlke: extensible/plugin iskele — boş kategori kendiliğinden silinmez, **Recep silebilir**
+
+> ⭐**2026-09-08 GÜNCELLENDİ (Recep kararı).** Eski hâli *"boş diye kategori ASLA silinmez"*
+> diyordu; Recep 7 boş kategoriyi sildirdi ve kararı teyit etti: *"iyi silmen isabet çünkü
+> silmeni istedim."* Cetvel sahada yanlış bilgi vermesin diye madde yeniden yazıldı.
 
 Kategori sistemi **bilinçli olarak genişletilebilir** tasarlandı (admin `CategoryFormModal` ile ekle/düzenle;
 `CategoryContext` dinamik yükler; ürün `category_id`/`subcategory_id` ile bağlanır):
-- **Boş kategori = gelecekteki ürün için hazır iskele**, hata değil. (air-conditioning, smart-home,
-  electric-heating, hygiene = Vortice'in gerçek ürün aileleri, henüz yüklenmedi.)
-- ❌ **Boş diye kategori SİLME.** İskele DB'de tam kalır.
+- **Boş kategori = gelecekteki ürün için hazır iskele** olabilir, tek başına hata değildir.
+- ❌ **Kendi kararınla boş kategori SİLME.** Şerit/ajan girişimiyle silme yasaktır.
+- ✅ **Silme Recep'in kararıdır.** Recep söylediğinde silinir; iskele varsayımı karara üstün değildir.
+
+### Silme öncesi zorunlu kapı (karar varken bile)
+Silme geri dönüşsüzdür. Recep'in kararı olsa da, **her kategori için üç sayı ölçülür ve üçü de
+`0` olmalıdır**; ölçülmeden silinmez:
+
+```sql
+select c.slug,
+ (select count(*) from products p where p.category_id=c.id or p.subcategory_id=c.id) as urun,
+ (select count(*) from categories k where k.parent_id=c.id)                          as alt_kategori,
+ (select count(*) from product_families f where f.category_id=c.id)                  as aile
+from categories c where c.slug in (...);
+-- üçü de 0 değilse SİLME, önce Recep'e bildir
+```
+
+**Belirsiz kapsamda güvenli taraf:** karar cümlesi birden fazla kategoriyi işaret ediyorsa
+(ör. *"jet fan kalsın"* dendiğinde `jet-fans` **ve** `parking-jet-fan` varsa) **daha az silinir**;
+fazladan tutulan pasif kategorinin maliyeti yok, yanlış silmenin geri dönüşü yok. Durum Recep'e
+bildirilir, tersi karar tek komutluk iştir.
+
+**Uygulanan vaka (2026-09-08):** silinen 7 — `air-conditioning`, `air-conditioning-solutions`,
+`electric-heating`, `hygiene-sanitizer`, `smart-home`, `summer-ventilation`, `window-fans`
+(hepsi `is_active=false`, üç sayı da 0). Tutulan 2 — `jet-fans`, `parking-jet-fan`.
 
 ## 2. Gösterim kuralı: "doluysa göster" (müşteri) / "hepsi" (admin)
 
