@@ -146,9 +146,45 @@ if (!sayfalar.length) { console.error('ÖLÇÜLEMEDİ — dizin BOŞ'); process.
 
 // ── ürün kodu → sayfalar (kelime sınırlı: "20210" kodu "120210" içinde SAYILMAZ)
 const kacis = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+// ── ⭐KODU OLMAYAN ÜRÜN İÇİN İKİNCİ EŞLEME: AD (OPS hükmü 12:32Z-b)
+// Bu sabah 5 üründe uydurma model kodu silindi; kodları NULL olduğu için ilk koşumda
+// arama HİÇ YAPILAMADI. Ama ürün kaynakta olabilir — kodla değil ADIYLA. Ad normalize
+// edilir (boşluk/tire/nokta eşdeğer sayılır: kaynakta "CA-IL 8060", pakette "CA IL 8060")
+// ve marka adı düşürülür. Eşleşme en uzun parçadan başlar, üç parçaya kadar KISALTILIR;
+// üçün altına inilmez — "8060" tek başına ayırt edici değildir ve uydurma kanıt üretir.
+const sadeAd = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+const sayfaSade = new Map(sayfalar.map(p => [p, sadeAd(p.govde)]))
+const adIleAra = (ad, marka) => {
+  let parca = sadeAd(ad).split(' ').filter(Boolean)
+  if (marka) { const m = sadeAd(marka); if (parca[0] === m) parca = parca.slice(1) }
+  for (let n = parca.length; n >= 3; n--) {
+    const aday = parca.slice(0, n).join(' ')
+    // Yakınlık ölçümü HAM metin üzerinde yapıldığı için çapa da ham metinde bulunmalı:
+    // normalize metindeki konum ham metne birebir düşmez (uzunluk değişir). Çapa =
+    // ad parçasındaki en uzun sayı (ör. "8060") — ürünün sayfadaki fiziksel yeri odur.
+    const capa = aday.split(' ').filter(x => /^\d+$/.test(x)).sort((a, b) => b.length - a.length)[0]
+    if (!capa) continue
+    const bulunan = []
+    for (const p of sayfalar) {
+      if (!sayfaSade.get(p).includes(aday)) continue
+      const yerler = [...p.govde.matchAll(new RegExp(`(?<![\\w-])${capa}(?![\\w-])`, 'g'))].map(m => m.index)
+      if (yerler.length) bulunan.push({ ...p, kodYerleri: yerler, adEslesmesi: aday })
+    }
+    if (bulunan.length) return bulunan
+  }
+  return []
+}
+
 const urunSayfa = new Map()
+const adIleBulunan = new Set()
 for (const [sku, k] of kod) {
-  if (!k) { urunSayfa.set(sku, []); continue }
+  if (!k) {
+    const u = urunler.find(x => x.sku === sku)
+    const bulunan = adIleAra(u?.ad, u?.marka)
+    if (bulunan.length) adIleBulunan.add(sku)
+    urunSayfa.set(sku, bulunan)
+    continue
+  }
   const re = new RegExp(`(?<![\\w-])${kacis(k)}(?![\\w-])`, 'g')
   const bulunan = []
   for (const p of sayfalar) {
@@ -221,7 +257,8 @@ for (const t of girdi) {
   const turev = turevMi(t, urunAlan.get(t.sku) || new Map())
   if (turev) {
     sayim.TUREV++
-    sonuc.push({ ...t, durum: 'TUREV', kaynak_dosya: '', kaynak_sayfa: '', alinti: turev })
+    sonuc.push({ ...t, durum: 'TUREV', kaynak_tur: `turev(${turev.split(' ')[0]})`,
+      kaynak_dosya: '', kaynak_sayfa: '', alinti: turev })
     continue
   }
   if (!adaylar.length) {
@@ -231,8 +268,9 @@ for (const t of girdi) {
     const kodsuz = !kod.get(t.sku)
     const d = kodsuz ? 'KOD YOK' : 'URUN KAYNAKTA YOK'
     sayim[d]++
-    sonuc.push({ ...t, durum: d, kaynak_dosya: '', kaynak_sayfa: '',
-      alinti: kodsuz ? 'ürünün model kodu yok — arama YAPILAMADI' : '' })
+    sonuc.push({ ...t, durum: d, kaynak_tur: kodsuz ? 'kodsuz, adla da bulunamadi' : '',
+      kaynak_dosya: '', kaynak_sayfa: '',
+      alinti: kodsuz ? 'model kodu yok — adla ikinci arama da sonuç vermedi' : '' })
     continue
   }
   const sayisal = /^-?\d[\d.,]*$/.test(deger)
@@ -253,7 +291,11 @@ for (const t of girdi) {
   if (enYakin > YAKINLIK) { bulundu = null }
   if (bulundu) {
     sayim.VAR++
-    sonuc.push({ ...t, durum: 'VAR', kaynak_dosya: bulundu.dosya, kaynak_sayfa: bulundu.sayfa,
+    // kaynak_tur: kanıtın NASIL kurulduğu. "Bulundu" yetmez — kodla mı, adla mı, türev mi
+    // bulunduğu okuyanın hükmünü değiştirir (OPS hükmü 12:32Z-a).
+    sonuc.push({ ...t, durum: 'VAR',
+      kaynak_tur: bulundu.adEslesmesi ? `ad ("${bulundu.adEslesmesi}")` : 'model kodu',
+      kaynak_dosya: bulundu.dosya, kaynak_sayfa: bulundu.sayfa,
       alinti: alinti(bulundu.govde, iz) })
     continue
   }
@@ -289,14 +331,14 @@ for (const t of girdi) {
       sayim.CELISIYOR++
       celiskiListesi.push({ sku: t.sku, urun: t.urun, alan: t.alan, paket_degeri: deger,
         sinif, kaynak_dosya: etiketli.dosya, kaynak_sayfa: etiketli.sayfa })
-      sonuc.push({ ...t, durum: 'CELISIYOR', kaynak_dosya: etiketli.dosya,
+      sonuc.push({ ...t, durum: 'CELISIYOR', kaynak_tur: 'etiket yakini', kaynak_dosya: etiketli.dosya,
         kaynak_sayfa: etiketli.sayfa, alinti: `çelişki sınıfı: ${sinif}` })
       continue
     }
   }
   if (!etiketler) celiskiOlculmedi++
   sayim['DEGER YOK']++
-  sonuc.push({ ...t, durum: 'DEGER YOK', kaynak_dosya: '', kaynak_sayfa: '', alinti: '' })
+  sonuc.push({ ...t, durum: 'DEGER YOK', kaynak_tur: '', kaynak_dosya: '', kaynak_sayfa: '', alinti: '' })
 }
 return { sonuc, sayim, celiskiOlculmedi, celiskiListesi }
 }
@@ -380,7 +422,7 @@ if (YAZ) {
     let s = String(v).replace(/\r?\n/g, ' ').trim()
     return (s.includes(';') || s.includes('"')) ? '"' + s.replace(/"/g, '""') + '"' : s
   }
-  const BAS = ['sku', 'urun', 'alan', 'deger', 'durum', 'kaynak_dosya', 'kaynak_sayfa', 'alinti']
+  const BAS = ['sku', 'urun', 'alan', 'deger', 'durum', 'kaynak_tur', 'kaynak_dosya', 'kaynak_sayfa', 'alinti']
   writeFileSync(join(HEDEF, 'teknik-ozellikler.csv'),
     BOM + [BAS.join(';'), ...sonuc.map(r => BAS.map(b => hucre(r[b])).join(';'))].join('\r\n') + '\r\n', 'utf8')
   const CB = ['sku', 'urun', 'alan', 'paket_degeri', 'sinif', 'kaynak_dosya', 'kaynak_sayfa']

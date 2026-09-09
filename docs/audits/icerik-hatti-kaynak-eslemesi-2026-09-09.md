@@ -33,6 +33,42 @@ gösterdi ki bu **13 ürün**tü ve ikiye ayrılıyordu:
 - **8 ürün** (`VRT-16257…16281`) → kodu var, kaynakta **gerçekten yok**.
 "Aranamadı" ile "arandı, bulunamadı" aynı kovaya konursa ilki de kusur sayılır.
 
+### ⭐İKİNCİ EŞLEME (ad ile) — 5 kodsuz ürün BULUNDU, ve sabahki hüküm DOĞRULANDI
+
+OPS hükmü (12:32Z-b): kodu olmayan ürün **adıyla** ikinci kez aranır. Ad normalize edilir
+(boşluk/tire eşdeğer), marka düşürülür, eşleşme en uzun parçadan başlayıp **üç parçaya
+kadar** kısaltılır — altına inilmez, çünkü `8060` tek başına ayırt edici değildir.
+
+Beş ürünün **tam adı kısaltılmadan** eşleşti: `ca il 8060 es rect` →
+`avens_fiyat_listesi_2026_HQ.pdf` s.26. **KOD YOK kovası 75 → 0.**
+
+Ve o sayfanın dizin satırı sabahki hükmü **bağımsız olarak doğruladı**:
+
+```
+KOD   MODEL              DEBİ       HIZ ANAHTARI   FİYAT (Euro)
+      CA IL 4020 ES RECT 715 m³/h   POT (REGC)     664
+      CA IL 5035 ES RECT 1610 m³/h  POT (REGC)     795
+      …
+```
+
+**Başlıkta `KOD` sütunu var, hücrelerde kod YOK.** Yani bu ürünlerin kaynakta bir kodu
+hiç olmamış. Sabah silinen `16076–16080` kodları uydurmaydı; bu, o kararın kaynaktan
+gelen ikinci kanıtıdır — ve *"kaçış valfi olmayan zorunlu alan, boşluğu uydurmayla
+doldurur"* dersinin tam sahnesi: boş kalması gereken hücre boş bırakılmamış.
+
+### Kanıtın NASIL kurulduğu kolonda: `kaynak_tur`
+
+| kaynak_tur | satır |
+|---|---|
+| model kodu | 2192 |
+| turev(kardeş alan) | 655 |
+| etiket yakini | 299 |
+| ad ("…") | 10 |
+| (boş) | 2012 |
+
+"Bulundu" tek başına yetmez: kodla mı, adla mı, türev mi bulunduğu okuyanın hükmünü
+değiştirir. Kolon bunu her satırda söyler.
+
 ### Çelişki sınıfları (299) — makine, gözle değil
 
 | sınıf | satır |
