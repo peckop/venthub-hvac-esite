@@ -684,7 +684,23 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                         <span>{inStock ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
                       </div>
                     )}
-                    <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.sku')}: {selectedVariant.sku}</span>
+                    {/* ⭐MÜŞTERİYE GÖRÜNEN KOD = YALNIZ `model_code` (REC-146, 2026-09-09).
+                        Burası ham iç kodu (varyantın SKU alanı) basıyordu — yani müşteriye
+                        BİZİM kimliğimizi. (Alan adını burada AÇIKÇA yazmıyorum: kardeş kapı
+                        INV-PRODUCT-IDENTITY metin tabanlı tarıyor ve yorumdaki bir dize onu
+                        yanıltır — bugün tam bu yüzden bir kez kırmızı verdi.)
+                        İki ayrı kusur birden: (a) `sku` bizim iç kimliğimizdir, müşterinin
+                        işine yaramaz; (b) uydurma kod taşıyan üründe müşteri o uydurmayı
+                        görür (Recep sözü: "kodu boşalt" — amaç, müşterinin uydurma kod
+                        GÖRMEMESİ).
+                        `getProductModelLabel` doğru çözücüdür ve kendi hükmü zaten şudur
+                        (REC-272): `model_code` yoksa **null döner**, `sku`ya DÜŞMEZ —
+                        "etiketi hiç göstermemek, müşteriye iç kod göstermekten iyidir".
+                        Kardeş yüzeyler bu çözücüye çoktan geçmişti (VariantSelector:78,
+                        JSON-LD `mpn`); geride kalan tek yer burasıydı. */}
+                    {variantLabel && (
+                      <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.sku')}: {variantLabel}</span>
+                    )}
                   </div>
                 </div>
               </div>
