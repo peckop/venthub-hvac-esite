@@ -47,8 +47,10 @@ aile **0** ölçüldü. Ölçmeden silinmedi.
 > **Kalıcı ders:** geri dönüşsüz işlemde *"kapı ölçtüm"* demek yetmez; **ne silindiğinin ADI**
 > yazılmalı. Sayı (7) kimliği taşımaz.
 >
-> **İkinci bulgu (ayrı, filoya bildirildi):** bu silmeler `admin_audit_log`'a **düşmedi** —
-> tabloda 2026-09-08 için `categories` satırı **0**. Kural 11 admin işlemlerinin loglanmasını
+> **İkinci bulgu (ayrı, filoya bildirildi → REC-292):** bu silmeler `admin_audit_log`'a **düşmedi** —
+> ⚠düzeltme (2026-09-09): tablo **boş değil**, `categories` için 12 satır var; hepsi admin
+> panelinden ve eski. Ayırt edici ölçüt tablonun doluluğu değil **o günün yazımları**:
+> 2026-09-08 tarihiyle hiçbir tabloda satır yok. Kural 11 admin işlemlerinin loglanmasını
 > istiyor; betikle yapılan doğrudan DB yazımları bu kaydı üretmiyor.
 
 ---

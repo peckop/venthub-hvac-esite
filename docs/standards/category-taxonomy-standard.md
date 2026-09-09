@@ -202,7 +202,7 @@ sorusu CEVAPLANAMADI:**
 | kaynak | sildiklerimin adı var mı |
 |---|---|
 | denetim belgesi | ❌ yalnız sayı (7) |
-| `admin_audit_log` | ❌ 2026-09-08 için `categories` satırı **0** |
+| `admin_audit_log` | ❌ o günün (2026-09-08) yazımlarından **hiçbir tabloda satır yok** |
 | betik | ❌ scratchpad'de kalmamış |
 | oturum kaydı (`.jsonl`) | ✅ — ama bu bir **denetim kaydı değil**, tesadüfen duran transkript |
 
@@ -214,5 +214,8 @@ Geri dönüşsüz yazım içeren her PR'da: dökümde satır sayısı = yazımda
 ve dökümdeki her satır **id + ad** taşıyor.
 
 > **Ayrı ve daha büyük kusur (bu cetvelin kapsamı DIŞINDA, ALTYAPI'ya gitti):** betikle yapılan
-> doğrudan DB yazımları `admin_audit_log`'a **hiç düşmüyor** — kural 11 ihlali. Bu madde onun
+> doğrudan DB yazımları `admin_audit_log`'a **düşmüyor** — kural 11 ihlali. ⚠Tablo BOŞ DEĞİL:
+> `categories` için 12 satır var ama hepsi **admin panelinden** ve eski (2025-12, 2026-03);
+> ayırt edici ölçüt tablonun doluluğu değil **O GÜNÜN yazımları** — 2026-09-08'de hiçbir tablodan
+> satır yok. (Ölçümü ALTYAPI genişletti; "tablo boş" demek yanlış iş emri doğururdu.) Bu madde onun
 > yerine geçmez, yalnız o mekanizma gelene kadar **belge düzeyinde** izlenebilirlik sağlar.
