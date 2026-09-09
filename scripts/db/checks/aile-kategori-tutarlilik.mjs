@@ -131,7 +131,17 @@ async function main() {
     oldur('pg surucusu yuklenemedi (npm install pg@8).')
   }
 
-  const client = new Client({ connectionString: baglanti, ssl: tlsCoz() })
+  // ⛔`sslmode` SÖKÜLÜR — bu kapı 2026-09-09'da CI'da tam bu yüzden düşüyordu
+  // (`self-issued certificate in certificate chain`, exit 2, master'da da kırmızı).
+  // Teşhis ölçüldü: kök sertifika DOĞRU ve zincir TAM (`openssl -CAfile` → 0 ok); sorun,
+  // bağlantı dizesindeki `sslmode`'un node-postgres'te bizim `ssl` nesnemizin YERİNE
+  // geçmesi ve kökü sessizce devre dışı bırakmasıydı. Söküm dört kardeş betikte zaten
+  // vardı, bu ikisinde YOKTU — kopya sürüklenmesi. Tekrarı `INV-DENETIM-IZI-1` kolu ölçer.
+  const sslmodeVardi = /[?&]sslmode=/.test(baglanti)
+  const temizBaglanti = baglanti.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '')
+  if (sslmodeVardi) console.log('aile-kategori: baglanti dizesindeki sslmode kaldirildi (TLS ayari KODDA belirlenir)')
+
+  const client = new Client({ connectionString: temizBaglanti, ssl: tlsCoz() })
   let sayimlar
   let satirlar = []
   try {

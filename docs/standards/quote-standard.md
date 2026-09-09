@@ -475,8 +475,25 @@ Recep kararı bununla birebir örtüşüyor ve bir adım ileri gidiyor: **opt-in
 Teklif iletilen **her** müşteri, kendi tekliflerini **korumalı girişle geçmişe dönük** izler.
 
 - **Giriş:** mevcut hesap oturumu. E-postadaki teklif linki, oturum yoksa **hesap girişine
-  düşer** (dönüş yoluyla) — v0.1 Q4'ün login şartı korunur, misafir kabul yok.
-  - **NOT (2026-09-01, REC-117):** misafir teklif (üyeliksiz) kararı verildi; anon INSERT için RLS migration Recep kapısı; migration inince Q4 güncellenir.
+  düşer** (dönüş yoluyla). **Portal'ın login şartı sürüyor** — değişen TALEP AÇMA kapısıdır,
+  teklif GÖRÜNTÜLEME değil.
+  - **⭐GÜNCELLENDİ (2026-09-09, REC-117 kodu indi):** Teklif TALEBİ artık üyelik istemez.
+    Recep kararı (2026-09-01, yazılı): *"Zorunlu olmamalı; kullanıcı rahat hissetmeli … ama
+    belirli bilgiler olmadan da teklif ve bilgilendirme yürümez."* Yani **hesap opsiyonel,
+    kimlik zorunlu** — ad/e-posta/telefon DB'de zaten NOT NULL.
+  - **Yazım yolu:** misafir talebini `quote-request-guest` Edge Function'ı yazar
+    (`service_role`). **`anon` RLS politikası AÇILMADI ve migration YAZILMADI** — prod'da
+    teklif tablolarının dokuz politikasının dokuzu da `{authenticated}` kalır (ölçüm 2026-09-08).
+    Gerekçe: hız limiti, honeypot ve aydınlatma onayı gibi *davranışlar* RLS'te güvenilir
+    biçimde ifade edilemez; `anon`'a kolon GRANT'i vermek ise tabloları her ziyaretçiye açardı.
+  - **Kimliğin yerini alan üç kapı:** alan doğrulaması · IP (10/saat) + idempotency
+    (aynı sepet+e-posta 10 dk'da 1) hız limiti · KVKK aydınlatma onayı. Ayrıca honeypot.
+  - **Misafir belgesi `user_id` NULL'dır** ve bu §7/R17 gereği **kasıtlıdır**: sahiplik
+    yüklemi NULL ile eşleşmediği için prospect belge müşteri portalında görünmez, yalnız
+    satıcı yüzünde yaşar. Bu bir eksiklik değil, çivilenmiş bir tasarımdır.
+  - **⚠AÇIK BORÇ:** aydınlatma onayının **sürüm + zamanını tutacak kolon yok**. Onay bugün
+    ZORUNLU (uç işaretsiz isteği 422 ile reddeder) ama ispatın kalıcı yeri yalnız Edge
+    günlüğüdür. Kolon bir sonraki migration turuna yazılacak (REC-117 planı §2 kalem 3b).
 - **Yüzey:** `views/account` altında yeni bir alan; SaaS **Proje paketi bayrağına** bağlanır.
 - **İçerik:** durumlar · **revizyon geçmişi** (arşiv PDF'ler dahil, §5/5) · güncel PDF ·
   kabul/red eylemleri (yalnız güncel revizyonda ve süre içindeyse etkin).

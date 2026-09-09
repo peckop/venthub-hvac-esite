@@ -104,7 +104,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: quote, error: quoteErr } = await supabase
       .from('venthub_quotes')
-      .select('id, user_id, status, created_at, request_email_sent_at')
+      .select('id, user_id, status, created_at, request_email_sent_at, contact_email')
       .eq('id', quoteId)
       .maybeSingle()
     // Okuma düştüyse 503: "bakamadım" ile "yok" AYNI cevaba düşmemeli (pg_net tekrar dener).
@@ -119,10 +119,46 @@ Deno.serve(async (req: Request) => {
       return json({ ok: true, skipped: 'already_sent', quote_id: quote.id }, 200)
     }
 
-    const { data: userInfo, error: userErr } = await supabase.auth.admin.getUserById(quote.user_id)
-    if (userErr) return json({ error: 'user_lookup_failed' }, 503)
-    const to = userInfo?.user?.email
-    if (!to) return json({ error: 'user_has_no_email' }, 422)
+    // ⭐ALICI = `contact_email`, TEK DAL (REC-117, 2026-09-08 red-team bulgusu).
+    //
+    // Eskiden burada `supabase.auth.admin.getUserById(quote.user_id)` vardı ve alıcı
+    // AUTH KAYDINDAN okunuyordu. Misafir teklifinde `user_id` NULL'dır — o çağrı 503
+    // `user_lookup_failed` döndürürdü ve E-POSTA HİÇ GİTMEZDİ. Dahası bu uç
+    // `quote_email_events` defterine YAZMIYOR, `pg_net` de ateşle-unut çalışıyor: arıza
+    // hiçbir yerde satır bırakmazdı. Yani Recep'in kararının ikinci yarısı — "belirli
+    // bilgiler olmadan teklif ve BİLGİLENDİRME yürümez" — sessizce karşılanmamış olurdu.
+    //
+    // Tek dal iki sebeple doğru: (1) `contact_email` her teklifte NOT NULL (prod ölçümü,
+    // 2026-09-08), yani daima bir değer bulunur; (2) teklif yanıtının gitmesi gereken adres,
+    // kullanıcının FORMDA yazdığı adrestir — üyeli akışta da o alan formdan doldurulur.
+    const to = (quote.contact_email || '').trim()
+    if (!to) return json({ error: 'quote_has_no_contact_email' }, 422)
+
+    // ⭐OTURUMLU KAYITTA ÇAPRAZ DOĞRULAMA (güvenlik incelemesi, bulgu 7).
+    //
+    // Alıcının tek dala inmesinin bir yan etkisi var: `authenticated` rolünün
+    // `contact_email` üzerinde INSERT grant'i var (quote_v2_schema §8), yani PostgREST'e
+    // doğrudan yazan oturumlu bir kullanıcı `contact_email`'e BAŞKASININ adresini koyup
+    // VentHub'dan ona e-posta gönderttirebilirdi. Misafir kaydında (`user_id` NULL) böyle
+    // bir sorun yok — orada zaten hesap yok ve uç kendi kapılarını uyguluyor.
+    //
+    // Hesap sahibinin kendi teklifini BAŞKA bir adrese istemesi meşru olabilir (muhasebe,
+    // satın alma birimi), o yüzden gönderim ENGELLENMİYOR; ayrışma DEFTERE yazılıyor.
+    // Engellemek meşru bir kullanımı kırardı, susmak ise röleyi görünmez bırakırdı.
+    if (quote.user_id) {
+      const { data: userInfo } = await supabase.auth.admin.getUserById(quote.user_id)
+      const authEposta = (userInfo?.user?.email || '').trim().toLowerCase()
+      if (authEposta && authEposta !== to.toLowerCase()) {
+        await supabase.from('quote_email_events').insert({
+          quote_id: quote.id,
+          email_to: to,
+          subject: 'contact_email auth e-postasindan AYRISIYOR',
+          provider: 'guard',
+          status: 'mismatch',
+          error: 'contact_email != auth.email (bulgu 7 — kayit, engelleme degil)',
+        })
+      }
+    }
 
     const { data: items } = await supabase
       .from('venthub_quote_items')
@@ -133,8 +169,24 @@ Deno.serve(async (req: Request) => {
     if (!resendApiKey) return json({ error: 'CONFIG_MISSING' }, 500)
     const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <onboarding@resend.dev>'
 
+    // ⭐HTML KAÇIŞI — ZORUNLU (güvenlik incelemesi 2026-09-09, KRİTİK bulgu 1).
+    //
+    // `product_name` e-posta gövdesine KAÇIŞSIZ giriyordu. Misafir teklif akışı açılınca
+    // bu, kimliksiz bir uçtan tetiklenebilir hâle geldi: saldırgan alıcıya kurbanın
+    // adresini, ürün adına `<a href="https://evil.tld">Ödemeyi tamamlayın</a>` yazar ve
+    // kurban VentHub alan adından bir KİMLİK AVI e-postası alırdı. İki kapı birden kondu:
+    // misafir uçta ad artık DB'den çözülüyor (istemciden alınmıyor) ve burada kaçış var.
+    // İkisi ayrı katman: biri kaynağı, diğeri çıktıyı korur.
+    const kacir = (s: unknown): string =>
+      String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+
     const kalemler = (items ?? [])
-      .map((i) => `<li>${i.product_name} — ${i.qty} adet</li>`)
+      .map((i) => `<li>${kacir(i.product_name)} — ${kacir(i.qty)} adet</li>`)
       .join('')
     const kisaId = quote.id.slice(0, 8).toUpperCase()
     const subject = `Teklif talebiniz alındı (#${kisaId})`
@@ -143,7 +195,13 @@ Deno.serve(async (req: Request) => {
       '<h2>Teklif talebiniz bize ulaştı</h2>',
       `<p><strong>#${kisaId}</strong> numaralı teklif talebinizi aldık. Ekibimiz kalemleri fiyatlandırıp size dönecek.</p>`,
       kalemler ? `<p>Talebinizdeki ürünler:</p><ul>${kalemler}</ul>` : '',
-      '<p>Teklifiniz hazır olduğunda hesabınızdaki <em>Tekliflerim</em> sayfasından görüntüleyip onaylayabilir ya da reddedebilirsiniz.</p>',
+      // ⭐MİSAFİR DALI (güvenlik incelemesi, bulgu 9): metin "hesabınızdaki Tekliflerim
+      // sayfasından" diyordu — ama misafirin hesabı YOK ve prospect belge cetvel §7/R17
+      // gereği müşteri portalında GÖRÜNMEZ. Yani e-posta, var olmayan bir yere yönlendirip
+      // kullanıcıyı boşuna aratacaktı. Vaat, gerçekten yapabildiğimiz şey kadar olmalı.
+      quote.user_id
+        ? '<p>Teklifiniz hazır olduğunda hesabınızdaki <em>Tekliflerim</em> sayfasından görüntüleyip onaylayabilir ya da reddedebilirsiniz.</p>'
+        : '<p>Teklifiniz hazır olduğunda size bu e-posta adresinden döneceğiz. Dilerseniz bir hesap oluşturarak taleplerinizi tek yerden takip edebilirsiniz.</p>',
       '<p>Teşekkürler,<br><strong>VentHub Ekibi</strong></p>',
       '</div>',
     ].join('')

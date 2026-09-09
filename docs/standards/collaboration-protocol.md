@@ -227,6 +227,37 @@ ve kategori kolonlarını çekmiyordu, dolayısıyla kilit iki kapsam için sess
 kurduktan sonra **kusuru birebir geri koyup** kırmızı gördüğünü kanıtla; "eski testle yeşil,
 yeni testle kırmızı" farkı, kapının gerçekten yeni bir şey ölçtüğünün tek kanıtıdır.
 
+### 3.2 ⛔DIFF-REVIEW SONUCU İKİ SATIRDIR — eksen hükmü YALNIZ BAŞINA "GEÇ" DEĞİLDİR (2026-09-09, OPS hükmü)
+
+Bir şeridin başka şeridin PR'ına verdiği diff-review sonucu **iki satır** olmak zorundadır:
+
+1. **EKSEN HÜKMÜ** — `GEÇ` / `DÜZELT`, incelenen eksende (güvenlik · veri bütünlüğü · kapı
+   tasarımı · ne istendiyse).
+2. **PAKET SATIRI** — tam konformans paketi koşuldu mu, **sayıyla**: `Test Files N/N`,
+   `Tests N/N`.
+
+⛔**Sayı yoksa `GEÇ` YAZILAMAZ.** Yazılırsa o sonuç bir eksen görüşüdür, kapı hükmü değildir
+ve öyle adlandırılmalıdır.
+
+**NİÇİN — ölçülmüş vaka, 2026-09-09 (ALTYAPI'nın kendi hatası):**
+ALTYAPI, #1143'e güvenlik ekseninde `GEÇ` verdi. Hüküm o eksende doğruydu ve doğru kaldı
+(beş zorunlu güvenlik kalemi gerçekten kapanmıştı). Ama **paket koşulmadı** ve PR merge
+kuyruğunda `i18n-dead-key` kapısında **CI KIRMIZI** düştü. Yazan şerit de aynı boşluktaydı:
+43/43 **el seçimi** alt küme koşmuştu.
+
+⭐**Sınıf, bir gün önce yazılmış olanın aynısı ve bu kez İNCELEYEN tarafta tekrarlandı:**
+2026-09-08'de ALTYAPI, sınıf/ad değişikliğinde doğru evrenin grep çıktısı değil **paketin
+kendisi** olduğunu yazdı (kendi CI kırmızısından). Ertesi gün aynı şerit, incelemede el
+seçimine güvendi. Ders: **"el seçimi yetmez" kuralı yazana da bağlıdır** ve yalnız kod
+yazarken değil **inceleme yaparken de** geçerlidir.
+
+**Bedeli somut:** paket koşulmuş olsaydı kırmızı bir turda görülür, yazan şerit tek düzeltmeyle
+kapatırdı. Koşulmadığı için PR merge kuyruğuna girdi, orada düştü ve bir tur kaybedildi.
+
+⚠**Bu kural inceleyenin işini iki katına çıkarmaz:** paket zaten koşulabilir bir komuttur ve
+maliyeti dakikalarla ölçülür; kaybedilen tur ise saatlerle. Sayı yazmak, koşmadığını
+gizlememenin de tek yoludur — "baktım, iyi görünüyor" bir ölçüm değildir.
+
 ---
 
 ## 4. Standart-Önce (No-Standard-No-Code)
@@ -277,6 +308,38 @@ yeni testle kırmızı" farkı, kapının gerçekten yeni bir şey ölçtüğün
 - Bir iş bitmeden ikincisine başlama; **dallar/şeritler karışmasın**.
 - `.agent/skills/` (Antigravity) ile `.claude/skills/` (Claude Code) **ayrı ve kasıtlı** — birleştirme/karıştırma yok.
 
----
+### 8.1 ⛔ARA PUSH YASAK — her push bir dağıtım kaydı üretir ve KOTAYI YER (2026-09-08, OPS hükmü)
+
+**KURAL:** dal üzerindeki ara commit'ler **yerelde kalır**. `git push` yalnız **iki anda** yapılır:
+PR **açılırken** ve PR **güncellenirken** (kapı kırmızısını onarmak, rebase, gözden geçirme
+düzeltmesi). "Kaydolsun diye" ya da "her commit'te" push YOK.
+
+**NİÇİN — ölçülmüş, tahmin değil.** Vercel Git entegrasyonu **her push için bir dağıtım kaydı
+oluşturur**; şerit dalı kapısı (#1117) o kaydı **oluştuktan SONRA** iptal eder (Ignored Build
+Step olarak koşar), yani **oluşumu engellemez**. İptal edilen kayıt da kabul edilmiş kayıttır ve
+kotayı yer. 2026-09-08 ölçümü, kapıdan **sonraki** 25 saat:
+
+- **37 önizleme kaydı** (25 iptal · 12 hazır) + 23 production kaydı = 60 kayıt
+- ~10 PR için 37 önizleme → **PR başına ~3,7 push**
+- Bedeli: kota kilidi **iki kez** kapandı ve canlı site 11:29Z–13:14Z arası **beş
+  birleştirme geride** kaldı; müşteri o süre boyunca eski vitrini gördü.
+
+⚠**KİLİTLİYKEN VERCEL HİÇ KAYIT OLUŞTURMUYOR** (aynı ölçümde 16,5 saatlik boşluk). Yani
+"kaç dağıtım engellendi" sorusunun cevabı hiçbir yerde yoktur ve kota tavanı ölçülemez.
+Ölçülemeyen bir tavanın altında kalmanın tek yolu **tüketimi azaltmaktır**.
+
+**NİÇİN AYAR DEĞİL DAVRANIŞ:** depo tarafında "yalnız master dağıtsın" diyen bir ayar **yok**.
+`vercel.json` `git.deploymentEnabled` ya **boolean `false`** (o zaman master'ın production
+yayını da durur) ya da **belirli dal adlarını** eşler — belgesi *"unspecified branches default
+to true"* diyor, **joker yok** (#1117'nin bulgusu, belgeden teyitli). Dal adları iş başına
+üretildiği için sayarak kapatmak sonlu değildir. Bu kural, ayarla kapatılamayan bir sızıntının
+**tek bedelsiz** kapatma yoludur; tüketimin ~%60'ını keser.
+
+**ÖLÇÜT:** PR başına push sayısı. Bugünün tabanı **3,7**; hedef **1–2**.
+
+**SINIR — adıyla:** bu bir **kural**, kapı DEĞİL. Bir kanca ile zorlanmıyor, çünkü push'un
+"PR açılışı mı, ara mı" olduğunu yerel kanca ölçemez (PR'ın varlığı ağ sorusudur ve kanca
+cetveli çevrimdışı olmayı şart koşuyor). Zorlanamayan kural, **ölçülerek** yaşar: sayı
+büyüyorsa kural çürümüştür ve o gün yeniden konuşulur.
 
 *SSOT: bu dosya. Controller'lar = Claude Code (eş, çoğul) · ortak Worker = Antigravity CLI · onay & relay = Recep.*

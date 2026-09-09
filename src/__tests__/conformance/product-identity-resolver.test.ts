@@ -236,15 +236,18 @@ describe('INV-PRODUCT-IDENTITY · çağrı yeri (ürün detay sayfası)', () => 
     ).toEqual([])
   })
 
-  // BILINEN ve KABUL EDILEN uc kullanim. Muafiyet ADIYLA yazilir, sessiz gecilmez.
+  // BILINEN ve KABUL EDILEN kullanim. Muafiyet ADIYLA yazilir, sessiz gecilmez.
   // (a) selectedSku={...} — VariantSelector'a giden SECIM ANAHTARI, gorunen metin degil.
-  // (c) etiketli SKU satiri — musteriye ACIKCA 'SKU: ...' diye gosteriliyor. Bu bir URUN
-  //     KARARI, kusur degil; T098 kapsaminda DEGISTIRILMEDI (LEGAL'in onayladigi dar diff
-  //     disindaydi) ve karari OPS'a bildirildi. Karar 'gosterilmesin' cikarsa BU SATIR
-  //     listeden silinir ve kapi kendiliginden kirmizi verir.
+  //
+  // ⭐(c) SATIRI 2026-09-09'DA SILINDI ve bu, kapinin KENDI ONGORDUGU sonuctur.
+  //     Eski yorum aynen soyle diyordu: "etiketli SKU satiri musteriye ACIKCA gosteriliyor,
+  //     bu bir URUN KARARI... Karar 'gosterilmesin' cikarsa BU SATIR listeden silinir ve
+  //     kapi kendiliginden kirmizi verir." Bugun o karar cikti (REC-146, Recep sozu
+  //     "kodu bosalt"; OPS hukmu: musteriye gorunen kod YALNIZ model_code). Satir silindi,
+  //     kapi kirmizi verdi, PDP duzeltildi — yani muafiyet listesi bir BORC DEFTERI gibi
+  //     calisti ve borc kapandiginda kendini hatirlatti.
   const BILINEN_SKU_KULLANIMI = [
     'selectedSku={selectedVariant.sku}',
-    "{t('pdp.labels.sku')}: {selectedVariant.sku}",
   ]
 
   it('ham SKU yedeği geri gelmiyor (bilinen kullanımlar dışında)', () => {

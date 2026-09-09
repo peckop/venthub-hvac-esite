@@ -179,3 +179,43 @@ Onarım sonrası **0**; vitrin `aksiyel-sanayi-fanlari` **3 ürün ailesi**, VOR
 §1 *"kategori ASLA boş diye silinmez"* der. **2026-09-08'de Recep 7 boş kategoriyi sildirdi**
 (hepsi `is_active=false`, ürün/alt kategori/aile bağı **0** ölçülerek). Karar cetveli ezer;
 madde burada kayıtlıdır ki cetvel sahada yanlış bilgi vermesin. §1'in yeniden yazımı Recep kapısında.
+
+---
+
+## 9. ⭐GERİ DÖNÜŞSÜZ BETİK YAZIMI: ÖNCE DÖKÜM, SONRA BETİK, SONRA YAZIM (2026-09-08, OPS emri)
+
+**Kapsam:** kategori/ürün/aile/görsel üzerinde **geri dönüşü olmayan** her betik yazımı —
+`delete`, kimlik değiştiren `update` (kategori/aile taşıma), toplu görsel değişimi.
+*(Buraya yazıldı çünkü §1 silmeyi, §8 taşımayı yönetiyor; ikisinin ortak kusuru buydu.)*
+
+### Zorunlu sıra — üçü de yazımdan ÖNCE
+1. **DÖKÜM belgeye yazılır:** etkilenen her satırın **id · slug · ad · önceki değerler**.
+   Sayı yeterli DEĞİLDİR.
+2. **Betik depoya girer:** `scripts/` altına commit edilir — **scratchpad'e değil**.
+3. **Yazım koşulur.**
+
+### ⛔NİÇİN — ölçülmüş vaka (2026-09-08, bu şerit)
+7 boş kategori silindi. Belgeye yalnız *"7 kategori silindi, bağımlılık kapısı ölçüldü"* yazıldı.
+Aynı gün URUN *"DB'de `endustriyel-havalandirma` yok"* bulgusunu bildirdi ve **"onu ben mi sildim"
+sorusu CEVAPLANAMADI:**
+
+| kaynak | sildiklerimin adı var mı |
+|---|---|
+| denetim belgesi | ❌ yalnız sayı (7) |
+| `admin_audit_log` | ❌ o günün (2026-09-08) yazımlarından **hiçbir tabloda satır yok** |
+| betik | ❌ scratchpad'de kalmamış |
+| oturum kaydı (`.jsonl`) | ✅ — ama bu bir **denetim kaydı değil**, tesadüfen duran transkript |
+
+**Sayı kimlik taşımaz.** "7 sildim" cümlesi, geri dönüşü olmayan bir işlemi **denetlenebilir
+kılmaz**. Kurtaran şey bir mekanizma değil, şanstı.
+
+### Bitti ölçütü
+Geri dönüşsüz yazım içeren her PR'da: dökümde satır sayısı = yazımda etkilenen satır sayısı,
+ve dökümdeki her satır **id + ad** taşıyor.
+
+> **Ayrı ve daha büyük kusur (bu cetvelin kapsamı DIŞINDA, ALTYAPI'ya gitti):** betikle yapılan
+> doğrudan DB yazımları `admin_audit_log`'a **düşmüyor** — kural 11 ihlali. ⚠Tablo BOŞ DEĞİL:
+> `categories` için 12 satır var ama hepsi **admin panelinden** ve eski (2025-12, 2026-03);
+> ayırt edici ölçüt tablonun doluluğu değil **O GÜNÜN yazımları** — 2026-09-08'de hiçbir tablodan
+> satır yok. (Ölçümü ALTYAPI genişletti; "tablo boş" demek yanlış iş emri doğururdu.) Bu madde onun
+> yerine geçmez, yalnız o mekanizma gelene kadar **belge düzeyinde** izlenebilirlik sağlar.
