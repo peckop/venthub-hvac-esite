@@ -62,6 +62,25 @@ ayırt edici alan **tablodan tabloya değişir**, sabit bir liste yazılamaz.
 **Kural (sabit liste yerine):** kodsuz tabloda kimlik = `model_name` + **MODEL ile FİYAT arasındaki
 TÜM sütunların** değerleri. Bu sütunlar tablonun kendi başlığından okunur, varsayılmaz.
 
+### ⛔2a. KENDİ İDDİAMI ÖLÇTÜM VE ÇÜRÜTTÜM — yükleyici sessizce birleştirmiyor
+
+Bu belgenin ilk hâlinde *"yükleyici onları mükerrer sanıp birleştirir ve bir ürün sessizce
+kaybolur"* yazmıştım. **Ölçmeden yazmıştım. Yanlış.** `scripts/kademe2-load/load.mjs` okundu:
+
+| satır | davranış |
+|---|---|
+| `kimlik-kurali.mjs:84` | kod yoksa **SKU addan türetilir** → dört "STORM 10" → **aynı SKU** |
+| `load.mjs:187` | `skuSeen.has(sku)` → **hata yazılır ve satır atlanır** (sessiz değil) |
+| `load.mjs:274` | `if (errors.length) APPLY iptal` → **yükleme TAMAMEN durur** |
+
+**Doğrusu:** yükleyici **fail-closed**. Birleştirme yok, sessiz kayıp yok — ama sonuç daha ağır:
+**27 kodsuz ürün yüzünden AVenS yüklemesinin TAMAMI reddedilir.** Tek bir ürün bile inmez.
+
+⭐Yani `ayirt_edici` sütunu bir "iyileştirme" değil, **yüklemenin ön koşulu**. O olmadan
+CSV ne kadar doğru olursa olsun `kademe2-load` hiçbir satırı yazmaz.
+*(Ders: kapının ne yaptığını okumadan onun adına konuşma —* [[fail-open-kapi-kapi-degildir]]
+*tersi de geçerli: fail-CLOSED bir kapıyı fail-open sanmak da yanlış hüküm üretir.)*
+
 ## 3. Yapılacak — çıkarım yolu
 
 | # | iş | ölçütü |
@@ -75,8 +94,8 @@ TÜM sütunların** değerleri. Bu sütunlar tablonun kendi başlığından okun
 ### ⛔3a. CSV şeması — v2'de yazılana EK
 Plan v2 `confidence` ve `kod_kaynakta_yok` sütunlarını ekliyordu. Buna **`ayirt_edici`**
 eklenir (kodsuz satırda kimliği kuran alanların `alan=değer` listesi). Aksi hâlde kodsuz
-ürünler CSV'de **birbirinden ayırt edilemez** ve yükleyici onları mükerrer sanıp birleştirir —
-bugün 27 ürünün 27'si de bu riskte.
+ürünler CSV'de **birbirinden ayırt edilemez** → `kademe2-load` SKU çakışması görür ve
+**yüklemenin tamamını reddeder** (§2a, ölçüldü). Tek ürün değil, tüm parti iner ya da hiçbiri inmez.
 
 ## 4. Bitti ölçütü (plan v2 §3'e ek dördüncü kontrol)
 
