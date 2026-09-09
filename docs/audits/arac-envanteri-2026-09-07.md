@@ -288,6 +288,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/katalog-paket-uret.mjs` | TAŞINABİLİR KATALOG — İNSAN-OKUR PAKET ÜRETİCİ (REC-212 F1, adım 1-2) | URUN-KATALOG | elle (`--hedef=<paket>`), `katalog-disa-aktar.mjs`'ten SONRA | 2026-09-09: koştu, 7 CSV/8088 satır + 1146 görsel üretti, başarısız 0 | yok | AKTİF |
 | `scripts/icerik-hatti/paket-belgeler-uret.mjs` | PAKET BELGE TABLOSU — belgeler.csv (REC-212 F1 eki, OPS emri 2026-09-09 12:02Z) | URUN-KATALOG | elle kosulur (paket uretimi sonrasi) | 2026-09-09 (60 belge / 65 satir) | yok | AKTIF |
 | `scripts/icerik-hatti/kaynak-eslemesi.mjs` | ADIM 3 — KAYNAK EŞLEMESİ: her teknik değer ↔ kaynak dizini (REC-212 F1, OPS emri 12:13Z) | URUN-KATALOG | elle kosulur (paket uretimi sonrasi, adim 3) | 2026-09-09 (5168 deger, VAR 2205, tesadduf tabani 355) | yok | AKTIF |
+| `scripts/icerik-hatti/paket-karnesi.mjs` | KATALOG KARNESİ — EVREN = PAKET (OPS hükmü 2026-09-09 12:32Z, Recep kararı K13) | URUN-KATALOG | elle kosulur (karne istendiginde) | 2026-09-09 (8 eksen, genel %57) | yok | AKTIF |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
