@@ -82,9 +82,19 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     const productNode: Record<string, unknown> = {
       '@type': 'Product',
       name: getProductDisplayName(variant, family, lang),
-      // `sku` SATICININ kendi kodudur — bizim olduğu için yayınlanması doğrudur.
-      sku: variant.sku,
     }
+
+    // ⭐`sku` ARTIK YAYINLANMIYOR (REC-146, 2026-09-09).
+    //
+    // Eskiden `sku: variant.sku` koşulsuz yazılıyordu ve gerekçesi "satıcının kendi kodu,
+    // bizim olduğu için yayınlanması doğrudur" idi. Hüküm değişti: müşteriye — ve arama
+    // motoru müşterinin gördüğü yüzeydir — görünen kod YALNIZ `model_code` olacak.
+    // İki sebep: (a) `sku` bizim İÇ kimliğimizdir, dışarıya taahhüt etmediğimiz bir şey;
+    // (b) uydurma kod taşıyan üründe o uydurmayı arama motoruna BEYAN ederdik.
+    //
+    // Ürün kimliği yayınlama yolu artık tek: aşağıdaki `mpn`, yani `model_code`. O da
+    // yoksa hiçbir kod alanı yazılmaz — kardeş kuralın (REC-272) cümlesiyle: eksik alan,
+    // yanlış alandan iyidir. `sku` gerekirse ayrı ve bilinçli bir kararla geri gelir.
 
     // REC-272: `mpn` ÜRETİCİ kodudur. `model_code` yoksa iç SKU'ya düşmek, arama
     // motoruna "üreticinin kodu budur" diye YANLIŞ BEYAN etmektir. productHelpers'ın
