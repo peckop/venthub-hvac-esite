@@ -1,6 +1,6 @@
 # Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-09 ayna: K1–K58)
 
-<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-09T06:45:48.915Z · kopya: 2026-09-09T11:42Z -->
+<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-09T12:15:15.574Z · kopya: 2026-09-09T12:15Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -474,6 +474,6 @@ Recep canlıda /tr/category/fanlar sayfasında alt grup kartlarını gördü: ya
 
 ## K58 · SEAT ATEX PTC sensörü ve BVU-LS separatörler için Aksesuarlar altına yaprak alt kategori açılır (Recep, 2026-09-09 06:5xZ, OPS penceresinde; lafzıyla "ingestoru halledin diğerlerini de" — KATALOG'un dün akşamdan bekleyen üç kararına toplu GO)
 
-DURUM: İŞ → KATALOG (canlı DB yazımı: products + product_families birlikte, taksonomi cetveli §8; yazımdan ÖNCE §9 dökümü + pano notu, SONRA yazım; URUN deploy olmadan sayfayı ölçer = webhook tazeleme ÇALIŞMA kanıtı). Etki: 3 ürün yaprak kategoriye kavuşur (SEA-810105 + iki BVU-LS), catalog-integrity kapısındaki product-no-subcategory:seat-atex-ptc-sensor kırmızısı kapanır.
+DURUM: İŞ → REC-135 (Todo; kategori ağacı boşlukları kaydı; sensör/separatör yaprak kategorisi KATALOG'ca 2026-09-09 canlıda açıldı, kapanışı KATALOG yazar). Uygulama notu: canlı DB yazımı: products + product_families birlikte, taksonomi cetveli §8; yazımdan ÖNCE §9 dökümü + pano notu, SONRA yazım; URUN deploy olmadan sayfayı ölçer = webhook tazeleme ÇALIŞMA kanıtı). Etki: 3 ürün yaprak kategoriye kavuşur (SEA-810105 + iki BVU-LS), catalog-integrity kapısındaki product-no-subcategory:seat-atex-ptc-sensor kırmızısı kapanır.
 
 Aynı sözle: ingestor deposundaki 4 pushsuz commit (marka/seri kaynak haritası v1-v4) PUSH edilir; ingestor CI 5/5 kırmızısı (avensair-fiyat.csv bayat) KATALOG onarır. Santrifüj/aksiyel çelişkisi Recep'e sorulmaz, KATALOG veriye göre karar verip belgeye yazar. marketing_title: OPS önerisi uygulanır — h1'e bağlanmaz, alan emekli (kolon silinmez), URUN küçük iş.
