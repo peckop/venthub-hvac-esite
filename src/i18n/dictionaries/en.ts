@@ -2385,6 +2385,8 @@ export const en: typeof tr = {
       contactRequired: 'Full name, phone and email are required — a quote must name its recipient',
       kvkkConsent: 'I have read the privacy notice',
       kvkkRequired: 'Please confirm you have read the privacy notice to continue',
+      duplicateToast: 'You just sent this request — our team is already on it',
+      rateLimitToast: 'Too many requests sent; please try again a little later',
       guestSignupInvite: 'Create an account to track this request and your future quotes.',
       guestSignupCta: 'Create Account',
       note: 'Note (optional)',

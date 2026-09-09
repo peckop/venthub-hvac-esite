@@ -2390,6 +2390,8 @@ export const tr = {
       contactRequired: 'Ad soyad, telefon ve e-posta zorunludur — teklif belgesinde muhatap yazmalıdır',
       kvkkConsent: 'aydınlatma metnini okudum',
       kvkkRequired: 'Devam etmek için aydınlatma metnini okuduğunuzu onaylayın',
+      duplicateToast: 'Bu talebi az önce gönderdiniz — ekibimiz üzerinde çalışıyor',
+      rateLimitToast: 'Çok fazla talep gönderildi, lütfen bir süre sonra tekrar deneyin',
       guestSignupInvite: 'Hesap oluşturursanız bu talebi ve sonraki tekliflerinizi hesabınızdan takip edebilirsiniz.',
       guestSignupCta: 'Hesap Oluştur',
       note: 'Not (opsiyonel)',

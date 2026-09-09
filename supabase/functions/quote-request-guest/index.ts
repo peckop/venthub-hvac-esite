@@ -44,6 +44,8 @@ const MAKS_ADET = 9999
 /** IP başına: saatte 10 talep. Formu dolduran gerçek bir insan bunu görmez. */
 const IP_LIMIT = 10
 const IP_PENCERE_SN = 3600
+/** E-posta başına: saatte 5. IP değiştirmek ucuz, e-posta değiştirmek talebi işlevsiz kılar. */
+const EPOSTA_LIMIT = 5
 /** Aynı sepetin aynı e-postadan tekrarı: 10 dakikada 1 (çift gönderim koruması). */
 const IDEM_PENCERE_SN = 600
 
@@ -81,20 +83,30 @@ function metin(v: unknown, maks: number): string | null {
   return s
 }
 
-/** Idempotency anahtarı: aynı e-posta + aynı sepet = aynı hash. SHA-256, kısaltılmış. */
-async function sepetHashi(eposta: string, kalemler: Array<{ productId: string; qty: number }>) {
-  const imza =
+/**
+ * SHA-256'nın ilk 16 baytı, onaltılık. İki yerde kullanılır: e-posta başına sayaç anahtarı
+ * ve idempotency anahtarı. HAM e-posta anahtara YAZILMAZ — `rate_limits` tablosu kişisel
+ * veri deposu değildir (bulgu 11'in bu PR'daki payı; `iyzico:` anahtarındaki ham IP ayrı
+ * kayda taşındı).
+ */
+async function kisaHash(girdi: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(girdi))
+  return Array.from(new Uint8Array(buf))
+    .slice(0, 16)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+/** Idempotency anahtarı: aynı e-posta + aynı sepet = aynı hash. */
+function sepetImzasi(eposta: string, kalemler: Array<{ productId: string; qty: number }>): string {
+  return (
     eposta.toLowerCase() +
     '|' +
     kalemler
       .map((k) => `${k.productId}:${k.qty}`)
       .sort()
       .join(',')
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(imza))
-  return Array.from(new Uint8Array(buf))
-    .slice(0, 16)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
+  )
 }
 
 Deno.serve(async (req: Request) => {
@@ -118,7 +130,12 @@ Deno.serve(async (req: Request) => {
   // Doluysa BAŞARI döner ama HİÇBİR ŞEY YAZILMAZ. Bot'a "yakalandın" demek, bir
   // sonraki denemesini daha iyi yapmasına yardım etmektir.
   if (typeof govde.website === 'string' && govde.website.trim().length > 0) {
-    return json({ ok: true }, 200, cors)
+    // ⭐SAHTE `quoteId` DE DÖNÜLÜR (güvenlik incelemesi, bulgu 8). İlk yazışta yalnız
+    // `{ok:true}` dönüyordu; istemci `quoteId` göremediği için genel hata fırlatıyordu.
+    // Yani honeypot'a yakalanan bir GERÇEK kullanıcı (tarayıcı otomatik doldurması bu
+    // alanı doldurabilir) hata ekranı görürdü — sessiz yutmanın amacı tam da bunun
+    // tersiydi. Kimlik rastgele: hiçbir gerçek kayda karşılık gelmez.
+    return json({ ok: true, quoteId: crypto.randomUUID() }, 200, cors)
   }
 
   // ── KVKK AYDINLATMA — İŞARETSİZ İSTEK GEÇMEZ ───────────────────────────────
@@ -145,29 +162,51 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'kalem_sayisi_gecersiz' }, 422, cors)
   }
 
-  const kalemler: Array<{ productId: string; productName: string; qty: number; note: string | null }> = []
+  // ⭐ÜRÜN ADI İSTEMCİDEN ALINMAZ (güvenlik incelemesi, KRİTİK bulgu 1).
+  //
+  // İlk yazışta `productName` gövdeden geliyordu ve doğrudan e-postaya basılıyordu. Bu, uçu
+  // AÇIK BİR E-POSTA RÖLESİNE çeviriyordu: saldırgan `contact.email`'e kurbanın adresini,
+  // `productName`'e `<a href="https://evil.tld">Ödemeyi tamamlayın</a>` yazar ve kurban
+  // VentHub alan adından bir kimlik avı e-postası alırdı. İki kapı birden gerekiyordu:
+  // (a) ad İSTEMCİDEN DEĞİL veritabanından çözülür (aşağıda), (b) e-posta gövdesinde HTML
+  // kaçışı yapılır (`quote-notification-webhook`).
+  //
+  // Aynı adımda bulgu 3 de kapanıyor: ürünün VAR OLDUĞU ve satılabilir olduğu YAZIMDAN ÖNCE
+  // ölçülür. Eskiden yalnız UUID BİÇİMİ kontrol ediliyordu; rastgele bir UUID ile başlık
+  // yazılıp e-posta gidiyor, kalem INSERT'i FK'ya takılıyor ve admin kuyruğunda KALEMSİZ
+  // bir "requested" belge kalıyordu.
+  const istenenler: Array<{ productId: string; qty: number; note: string | null }> = []
   for (const ham of govde.items as GelenKalem[]) {
     const productId = metin(ham?.productId, 64)
-    const productName = metin(ham?.productName, 300)
     const qty = Number(ham?.qty)
     // `venthub_quote_items.product_id` v2'de NOT NULL'a çekildi — yani misafir akışı
     // katalog DIŞI serbest kalem KABUL EDEMEZ. Sınır burada açıkça uygulanır.
-    if (!productId || !UUID_DESENI.test(productId) || !productName) {
+    if (!productId || !UUID_DESENI.test(productId)) {
       return json({ error: 'kalem_kimligi_gecersiz' }, 422, cors)
     }
     if (!Number.isInteger(qty) || qty < 1 || qty > MAKS_ADET) {
       return json({ error: 'kalem_adedi_gecersiz' }, 422, cors)
     }
-    kalemler.push({ productId, productName, qty, note: metin(ham?.note, 2000) })
+    istenenler.push({ productId, qty, note: metin(ham?.note, 2000) })
   }
 
   // ── HIZ LİMİTİ + IDEMPOTENCY ───────────────────────────────────────────────
   // İkisi de PAYLAŞILAN sayaç üzerinden (`bump_rate_limit`). Bellek-içi bir sayaç
   // Deno izolatları arasında paylaşılmadığı için koruma DEĞİLDİR — ölçülmüş bir sınır.
-  const ip =
-    (req.headers.get('x-forwarded-for') || '').split(',')[0].trim() ||
+  // ⭐IP KAYNAĞI SIRASI DÜZELTİLDİ (güvenlik incelemesi, YÜKSEK bulgu 2).
+  //
+  // İlk yazışta `x-forwarded-for`'un İLK öğesi alınıyordu. O öğe İSTEMCİ TARAFINDAN
+  // YAZILABİLİR: her istekte farklı bir XFF göndermek, saatte 10 sınırını YOK HÜKMÜNDE
+  // bırakırdı — yani hız limiti VAR GİBİ görünüp hiçbir şey ölçmezdi (fail-open sınıfı).
+  // Doğru sıra, depodaki emsalle aynı (`iyzico-payment`): kenar sunucusunun YAZDIĞI
+  // başlıklar önce; XFF'e düşülürse SON öğe alınır (zinciri kenar ekler, o güvenilir).
+  const xff = (req.headers.get('x-forwarded-for') || '').split(',').map((p) => p.trim()).filter(Boolean)
+  const ip = (
     req.headers.get('cf-connecting-ip') ||
+    req.headers.get('x-real-ip') ||
+    (xff.length > 0 ? xff[xff.length - 1] : '') ||
     'bilinmeyen'
+  ).slice(0, 64) // anahtar uzunluğu sınırlı: uzun başlık sayaç tablosunu şişirmesin
 
   try {
     const { result: ipSonuc, limit } = await checkRateLimit(
@@ -183,17 +222,18 @@ Deno.serve(async (req: Request) => {
       })
     }
 
-    const hash = await sepetHashi(eposta, kalemler)
-    const { result: idemSonuc } = await checkRateLimit(
-      `quote-idem:${hash}`,
+    // İKİNCİ SAYAÇ, E-POSTA BAŞINA: IP değiştirmek ucuzdur (proxy, mobil ağ), e-posta
+    // adresini değiştirmek ise talebin kendisini işe yaramaz kılar. Tek eksenli bir limit,
+    // atlaması en kolay ekseni ölçer.
+    const epostaHash = await kisaHash(eposta.toLowerCase())
+    const { result: epostaSonuc } = await checkRateLimit(
+      `quote-guest-email:${epostaHash}`,
       SUPABASE_URL,
       SERVICE_ROLE,
-      { limit: 1, windowSec: IDEM_PENCERE_SN },
+      { limit: EPOSTA_LIMIT, windowSec: IP_PENCERE_SN },
     )
-    if (!idemSonuc.allowed) {
-      // Çift gönderim: kullanıcıya HATA değil, BAŞARI benzeri bir cevap dönmek yanlış
-      // olurdu (talebi iki kez gönderdiğini bilmeli), ama bu bir kusur da değil.
-      return json({ error: 'ayni_talep_yeni_gonderildi' }, 409, cors)
+    if (!epostaSonuc.allowed) {
+      return json({ error: 'cok_fazla_istek' }, 429, cors)
     }
   } catch (e) {
     // Sayaç düştüyse SUSMAK yasak: korumasız yazmaktansa isteği reddetmek doğrudur.
@@ -201,15 +241,90 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'rate_limit_unavailable' }, 503, cors)
   }
 
-  // ── YAZIM ──────────────────────────────────────────────────────────────────
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE, {
     auth: { persistSession: false },
   })
 
+  // ── IDEMPOTENCY — DAMGA ÖNCE KONUR, YAZIM DÜŞERSE GERİ ALINIR ──────────────
+  //
+  // Güvenlik incelemesi (bulgu 4) haklıydı: damga yazımdan önce konup öylece bırakılırsa,
+  // yazımın düştüğü durumda kullanıcı 10 dakika boyunca 409 alır — koruma, korumak istediği
+  // kullanıcıyı kilitler.
+  //
+  // ⚠AMA "damgayı yazımdan SONRA koy" tek başına ÇALIŞMAZDI, ve bunu incelemeye karşı
+  // yazıyorum: `bump_rate_limit` atomik olarak hem OKUR hem ARTIRIR. Damga yalnız yazımdan
+  // sonra konsaydı, eşzamanlı gelen ikinci istek kontrol edecek bir damga BULAMAZ ve
+  // ikisi de yazardı — yani çift gönderim koruması hiç çalışmazdı.
+  //
+  // Uygulanan çözüm ikisini de karşılıyor: damga ÖNCE konur (çift gönderim gerçekten
+  // engellenir), yazım düşerse `rate_limits` satırı SİLİNİR (kilit kalmaz). Tablo bizim ve
+  // `service_role` yazabiliyor; ölçüldü: kolonları `key · bucket · count`.
+  const imzaAnahtari = `quote-idem:${await kisaHash(sepetImzasi(eposta, istenenler))}`
+  const damgayiGeriAl = async (): Promise<void> => {
+    const { error } = await supabase.from('rate_limits').delete().eq('key', imzaAnahtari)
+    if (error) console.error('quote-request-guest: idempotency damgasi geri alinamadi', error)
+  }
+
+  try {
+    const { result: idemSonuc } = await checkRateLimit(imzaAnahtari, SUPABASE_URL, SERVICE_ROLE, {
+      limit: 1,
+      windowSec: IDEM_PENCERE_SN,
+    })
+    if (!idemSonuc.allowed) {
+      // Çift gönderim. Kullanıcıya BAŞARI dönmek yanlış olurdu — talebini iki kez
+      // gönderdiğini bilmeli; ama bu bir kusur da değil, o yüzden 409 (çakışma).
+      return json({ error: 'ayni_talep_yeni_gonderildi' }, 409, cors)
+    }
+  } catch (e) {
+    console.error('quote-request-guest: idempotency olculemedi', e)
+    return json({ error: 'rate_limit_unavailable' }, 503, cors)
+  }
+
+  // ── ÜRÜN DOĞRULAMASI — YAZIMDAN ÖNCE (bulgu 1b + 3) ────────────────────────
+  // Ad DB'den gelir, istemciden DEĞİL; ayrıca ürünün var olduğu ve satılabilir olduğu
+  // burada ölçülür. Eskiden yalnız UUID biçimi kontrol ediliyordu ve rastgele bir UUID
+  // başlığın yazılmasına + e-postanın gitmesine yetiyordu.
+  const istenenIdler = [...new Set(istenenler.map((k) => k.productId))]
+  const { data: urunler, error: urunHatasi } = await supabase
+    .from('products')
+    .select('id, name, status')
+    .in('id', istenenIdler)
+
+  if (urunHatasi) {
+    // "Bakamadım" ile "yok" ayrı: ölçemediğimizde reddediyoruz, uydurmuyoruz.
+    console.error('quote-request-guest: urun dogrulamasi olculemedi', urunHatasi)
+    await damgayiGeriAl()
+    return json({ error: 'product_lookup_failed' }, 503, cors)
+  }
+
+  type UrunSatiri = { id: string; name: string | null; status: string | null }
+  const urunHaritasi = new Map<string, UrunSatiri>(
+    ((urunler ?? []) as UrunSatiri[]).map((u) => [u.id, u]),
+  )
+  for (const id of istenenIdler) {
+    const urun = urunHaritasi.get(id)
+    // Pasif/taslak ürün de teklife girebilir (cetvel §3.2 pasif-ürün kararı); yasak olan
+    // VAR OLMAYAN kimliktir. `archived` gibi kapatılmış statüler dışarıda tutulur.
+    if (!urun || urun.status === 'archived') {
+      await damgayiGeriAl()
+      return json({ error: 'kalem_kimligi_gecersiz' }, 422, cors)
+    }
+  }
+
+  const kalemler = istenenler.map((k) => ({
+    productId: k.productId,
+    productName: String(urunHaritasi.get(k.productId)?.name ?? ''),
+    qty: k.qty,
+    note: k.note,
+  }))
+
+  // ── YAZIM ──────────────────────────────────────────────────────────────────
+  const tenantId = Deno.env.get('DEFAULT_TENANT_ID') || VARSAYILAN_TENANT
+
   const { data: teklif, error: teklifHatasi } = await supabase
     .from('venthub_quotes')
     .insert({
-      tenant_id: Deno.env.get('DEFAULT_TENANT_ID') || VARSAYILAN_TENANT,
+      tenant_id: tenantId,
       // ⭐MİSAFİR BELGESİ: `user_id` NULL. Bu bir eksiklik değil, cetvelde adı konmuş bir
       // hâl — `quote_v2_schema` §7: "prospect belge zaten yalnız satıcı yüzünde yaşar",
       // çünkü sahiplik yüklemi `user_id = auth.uid()` NULL ile eşleşmez. Yani misafir
@@ -226,12 +341,18 @@ Deno.serve(async (req: Request) => {
 
   if (teklifHatasi || !teklif) {
     console.error('quote-request-guest: baslik yazilamadi', teklifHatasi)
+    await damgayiGeriAl()
     return json({ error: 'quote_insert_failed' }, 500, cors)
   }
 
   const { error: kalemHatasi } = await supabase.from('venthub_quote_items').insert(
     kalemler.map((k) => ({
       quote_id: teklif.id,
+      // ⭐KALEMLERE DE AYNI `tenant_id` (güvenlik incelemesi, bulgu 5). Eskiden yalnız
+      // başlıkta vardı; kalem kolonunun varsayılanı bir gün başlıktakinden ayrışsaydı
+      // başlık tenant A, kalemler tenant B olur ve admin kalemleri GÖREMEZDİ. Aynı
+      // değişkenden yazmak, ikisinin ayrışmasını yapısal olarak imkânsız kılar.
+      tenant_id: tenantId,
       product_id: k.productId,
       product_name: k.productName,
       qty: k.qty,
@@ -243,9 +364,17 @@ Deno.serve(async (req: Request) => {
     // Kalemsiz başlık anlamsızdır ama DELETE yolu bilinçli olarak yok (ticari kayıt
     // silinmez, cetvel). Yarım kayıt admin kuyruğunda kalemsiz görünür; hatayı YUTMAK
     // yerine yükseltiyoruz ki kullanıcı yeniden denesin ve dikiş görünür olsun.
+    //
+    // NOT (bulgu 3'ün kalan yarısı): başlık + kalemler hâlâ İKİ AYRI INSERT. Tek bir
+    // RPC/transaction'a almak bir DB fonksiyonu ister, yani MIGRATION ister — bu iş
+    // migration yazmıyor. Risk daraltıldı: artık ürünler yazımdan ÖNCE doğrulanıyor,
+    // yani FK'ya takılma yolu kapandı. Kalan pencere (ağ/zaman aşımı) ayrı kayda
+    // yazıldı ve oturumlu `createQuoteRequest` de aynı deseni taşıyor.
     console.error('quote-request-guest: kalemler yazilamadi', kalemHatasi, teklif.id)
+    await damgayiGeriAl()
     return json({ error: 'quote_items_insert_failed' }, 500, cors)
   }
+
 
   // ⚠AYDINLATMA İSPATININ KALICI YERİ HENÜZ YOK — bu sınırı gizlemiyorum.
   // Onay ZORUNLU (yukarıda reddediliyor), ama "hangi sürüme, ne zaman onay verildi"

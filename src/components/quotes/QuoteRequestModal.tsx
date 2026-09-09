@@ -155,7 +155,20 @@ const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
       setSubmitted(true)
     } catch (e) {
       console.error('Quote request error', e)
-      toast.error(t('quotes.request.errorToast'))
+      // Uç, reddin SEBEBİNİ kodla söylüyor; hepsini tek genel hataya indirmek kullanıcıyı
+      // çaresiz bırakırdı ("çift gönderdim" ile "e-postam geçersiz" aynı ekranı görürdü).
+      const kod = e instanceof Error ? e.message : ''
+      const anahtar =
+        kod === 'ayni_talep_yeni_gonderildi'
+          ? 'quotes.request.duplicateToast'
+          : kod === 'cok_fazla_istek'
+            ? 'quotes.request.rateLimitToast'
+            : kod === 'kvkk_onay_gerekli'
+              ? 'quotes.request.kvkkRequired'
+              : kod === 'iletisim_bilgisi_eksik'
+                ? 'quotes.request.contactRequired'
+                : 'quotes.request.errorToast'
+      toast.error(t(anahtar))
     } finally {
       setSubmitting(false)
     }

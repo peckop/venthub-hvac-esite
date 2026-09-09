@@ -155,8 +155,27 @@ export async function createGuestQuoteRequest(
     },
   )
 
-  if (error) throw error
-  // Uç, doğrulama reddini gövdede taşır (422/409). Sessizce başarı saymak, kullanıcıya
+  // ⭐HATA GÖVDESİ OKUNUR (güvenlik incelemesi, bulgu 4'ün istemci yarısı).
+  //
+  // `functions.invoke` non-2xx yanıtları `error` olarak döndürür ve GÖVDEYİ okumaz — yani
+  // aşağıdaki `data?.error` dalı 409/422/429 için HİÇ çalışmazdı ve kullanıcı hepsinde
+  // aynı genel hatayı görürdü ("çift gönderdim" ile "e-postam geçersiz" ayırt edilmezdi).
+  // `error.context` gövdeyi taşır; kodu oradan çıkarıp çağırana veriyoruz.
+  if (error) {
+    const context = (error as { context?: unknown }).context
+    let kod = ''
+    if (context && typeof context === 'object' && 'json' in context) {
+      try {
+        const govde = await (context as { json: () => Promise<{ error?: string }> }).json()
+        kod = govde?.error ?? ''
+      } catch {
+        // Gövde okunamadıysa genel hataya düşeriz — sessizce başarı SAYMAYIZ.
+      }
+    }
+    throw new Error(kod || 'guest_quote_failed')
+  }
+
+  // Uç, doğrulama reddini gövdede taşıyabilir. Sessizce başarı saymak, kullanıcıya
   // gitmemiş bir talebi gitmiş göstermek olurdu.
   if (!data?.ok || !data.quoteId) {
     throw new Error(data?.error || 'guest_quote_failed')
