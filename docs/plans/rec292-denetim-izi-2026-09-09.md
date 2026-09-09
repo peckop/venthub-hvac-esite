@@ -409,3 +409,90 @@ demekti — kurmuyorum.
 
 Plan (bu belge) → `plan-challenger` (migration içerdiği için ZORUNLU) → OPS çürütmesi →
 Recep kararı → uygulama ayrı emirle, tek push (ara push yasağı §8.1).
+
+---
+
+## 10. PROD ÖLÇÜMÜ — 2026-09-09, SALT OKUMA (§6 kapatıldı)
+
+OPS emriyle, Recep kararından **önce**, yalnız `SELECT`. Prod'a hiçbir yazım yapılmadı.
+Proje `tnofewwkwlyjsqgwjjga`. Bu bölüm §6'nın "bilmiyorum" kalemlerini **sayıya** çevirir.
+
+### 10.1 ⭐EN KRİTİK KALEM KAPANDI — keyfi SQL yolu prod'da YOK
+
+| ölçüm | sonuç |
+|---|---|
+| `exec`/`exec_sql`/`execute_sql`/`eval`/`run_sql` adlı fonksiyon | **0 satır — YOK** |
+| **Ada değil davranışa** bakan tarama: `public`+`extensions` içinde SECURITY DEFINER + metin argüman + gövdesinde dinamik `EXECUTE` | **0 satır — YOK** |
+
+⭐**Sonuç: §3'ün en ağır kaygısı kalktı.** Betikler `rpc/exec` çağırıyor ama karşılığı prod'da
+yok (çağrılar 404 alıyor). Yani denetim tetiği service_role anahtarıyla **kaldırılamaz**.
+⚠İkinci sorguyu bilerek **ada göre değil davranışa göre** yazdım — ilk sorgu beş ad taramıştı ve
+bugün sekiz kez düştüğüm tuzak tam buydu.
+
+### 10.2 §2.6'nın KRİTİK bulgusu prod'da DOĞRULANDI
+
+| tablo | `tenant_id` | RLS | FORCE RLS | mevcut tetik |
+|---|---|---|---|---|
+| `site_settings` | ⛔**YOK (0)** | açık | false | **0** |
+| `categories` | var | açık | false | 2 (`categories_set_level`, `on_categories_change`) |
+| `products` | var | açık | false | 2 (`on_products_change`, `products_set_updated_at`) |
+| `product_families` | var | açık | false | 3 |
+| `product_images` | var | açık | false | 1 (`on_product_images_change`) |
+| `brands` | var | açık | false | 2 |
+| `admin_audit_log` | var | açık | **false** | 0 |
+| `product_prices` | var | açık | false | 4 |
+| `price_lists` | var | açık | false | 2 |
+
+- **`site_settings`'te `tenant_id` gerçekten yok** → ev şablonu orada patlardı. Kritik bulgu
+  teyitli; OPS hükmü H3 (ayrı, tenant'sız tetik + sabit tenant + borç yorumu) uygulanacak.
+- Altı tablodaki mevcut tetik toplamı **10** (repo tahmini ≥10 ile uyumlu).
+- FORCE RLS **hiçbir tabloda açık değil** → definer yolu bugün çalışıyor.
+
+### 10.3 ⛔İKİ DÜZELTME — biri benim, biri emrin sayısında
+
+**(a) `admin_audit_log` politikaları: repo eksik anlatıyordu.** §2.4'te "iki politika
+`TO authenticated`, `postgres` için yok" yazmıştım. Prod'da **üç** politika var:
+`admin_audit_log_insert_v2` (authenticated), `admin_audit_log_select_v2` (authenticated),
+ve **`admin_audit_log_service_role` (service_role, ALL)** — repoda görmediğim üçüncüsü.
+FORCE-RLS analizinin sonucu değişmiyor (definer `postgres` için hâlâ politika yok), ama
+**dayanağım eksikti**; repo bu soruda yetkili kaynak değil, tekrar ölçüldü.
+
+**(b) ⭐"Audit logda `categories` satırı 0" — SAYI YANLIŞ, BULGU DAHA GÜÇLÜ.**
+Ölçüm: `categories` satırı **12 tane var** (8 × 2026-03-12, 4 × 2025-12-10) — hepsi admin
+panelinden, hepsi tarihî. Yani "0" ifadesi olduğu gibi yanlıştır.
+**Ama doğrusu iddiadan ağır:** 2026-09-08'de — 7 kategori silme + 18 ürün taşıma + 104 görselin
+yapıldığı gün — denetim kaydında **HİÇBİR TABLODAN tek satır yok.** Son kayıt 09-07 (`quotes`,
+1 satır). Yani boşluk `categories`'e özel değil, **o günün tamamı boş**.
+Toplam tablo hacmi bir yılda **61 satır** — denetim izi neredeyse hiç kullanılmıyor.
+⚠Bu düzeltme bulguyu çürütmez, **keskinleştirir**; ama yanlış sayı yanlış iş emri doğurur, o
+yüzden adıyla yazıldı.
+
+### 10.4 ⛔KAPSAM DIŞI AMA CİDDİ — TRUNCATE yetkisi `anon`'da
+
+Ölçüm: `has_table_privilege` → altı tablonun **hepsinde** TRUNCATE yetkisi
+**`anon`, `authenticated` ve `service_role`** rollerinde. Yalnız service_role değil, **anonim
+rol de** dahil. TRUNCATE satır tetiği ateşlemez **ve RLS'e tabi değildir**.
+
+⚠**Bugün canlı bir açık DEĞİL, LATENT bir yetki:** PostgREST TRUNCATE fiilini dışa açmaz ve
+§10.1 ölçümüne göre keyfi SQL koşturacak bir RPC de yok. Yani bugün ulaşılabilir bir yol
+görmüyorum. Ama iki koşuldan biri değişirse (bir RPC eklenir ya da başka bir SQL yüzeyi açılır)
+yetki **hazır bekliyor**. `db-grant-hygiene-standard.md` §4 bu sınıfa zaten "latent yetki" adını
+vermiş.
+
+⛔**Bu REC-292'nin kapsamı değil** (OPS TRUNCATE tetiğini kapsam dışı bıraktı) ve bu planda
+çözülmeyecek. **Ayrı kayıt açılması için OPS'a bildirildi** — kendi başıma iş açmıyorum,
+ama ölçtüğüm bir riski de sessizce bırakmıyorum.
+
+### 10.5 OPS hükümleri (çürütme sonrası) — plana işlenen karar
+
+| # | hüküm | plandaki karşılığı |
+|---|---|---|
+| H1 | fail-CLOSED **altı tabloda da**; sınıf ayrımı YOK | §4.2'nin iki sınıflı tablosu tek karara indi. ⚠Bedeli adıyla: kütle göç akışı artık denetim yazımına bağlı. OPS'un gerekçesi tutarlı — "görünür kanal" sorunu kendiliğinden kalkıyor, çünkü kayıp artık **kırmızı** veriyor. Sabotaj C = yazımın kırmızı vermesi. |
+| H2 | `products` tetiği `AFTER UPDATE OF` katalog kolonları; stok/rezervasyon **dışarıda** | §4.3'teki gürültü sorununu kökten çözer. |
+| H3 | `site_settings` ayrı, tenant'sız tetik + sabit tenant + borç yorumu | §2.6'nın kritik bulgusunun kapanışı. |
+| H4 | Çift-log: **tetik SSOT**; `logAdminAction` emekliliği ayrı küçük PR | §4.5 karara bağlandı. |
+| H5 | EDGE şeridi YOK → canlı tetik sayım kapısı CI'ya, **benim** | §2.4'te "benim değil" dediğim bekçi yarısı, şerit kapalı olduğu için bana döndü. |
+| H6 | `exec` RPC ölçümü **şimdi**, Recep kararından önce | §10.1'de yapıldı: **yok**. Ayrı kayıt gerekmiyor. |
+
+**Kapsam dışı (OPS):** actor jetonu (§4.1), TRUNCATE tetiği, FORCE-RLS politikası.
+Üçü de planda **ölçülmüş ve gerekçesiyle dışarıda** duruyor — sessizce düşmediler.
