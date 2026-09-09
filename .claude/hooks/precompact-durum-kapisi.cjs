@@ -42,6 +42,19 @@ const BAYAT_ESIK_DK = 60
 const MEMORY_ESIK_BAYT = 16384
 
 /**
+ * ⭐YUMUŞAK EŞİK (REC-280) — SERT eşiğin uyarısı GEÇ KALIYORDU, ölçüldü.
+ *
+ * VAKA (2026-09-07 20:41–20:57Z, üç şerit): dosya 16414 → 16510 bayta çıktı ve alt satırlar
+ * SESSİZCE kırpıldı; en alttaki dersler hiçbir oturuma yüklenmedi. Sert eşik ancak taşma
+ * OLDUKTAN sonra yanar — yani kırpma zaten gerçekleşmiştir ve uyarı "haber" değil "otopsi"dir.
+ * 15800, taşmaya ~584 bayt kala uyarır: bir indeks satırı ortalama 60-120 bayt, yani
+ * katlamak için hâlâ birkaç satırlık pay vardır.
+ * İKİ EŞİK, İKİ AD: yumuşak = "satır ekleme, katla" · sert = "taşma OLDU, alt satırlar gitti".
+ * Aynı sayıyı iki anlam için kullanmak, ikisinden birinin sessizce yanlış olması demekti.
+ */
+const MEMORY_YUMUSAK_ESIK_BAYT = 15800
+
+/**
  * ⭐TÜRKÇE HARFLERİ ASCII'YE KATLAR — ölçülmüş kusur (2026-09-01, URUN bildirdi, ALTYAPI ölçtü).
  *
  * VAKA: Bu kapı GÜNDE İKİ KEZ yanlış alarm verdi. `DORT_ALAN` desenleri ASCII yazılıydı
@@ -273,8 +286,16 @@ try {
   const bayt = fs.statSync(idx).size
   if (bayt > MEMORY_ESIK_BAYT) {
     uyarilar.push(
-      'MEMORY.md ' + bayt + ' bayt (esik ' + MEMORY_ESIK_BAYT + ', asim ' + (bayt - MEMORY_ESIK_BAYT) +
-        ') — yeni satir eklemeden ONCE bir eskisini katla/kisalt. Indeks SESSIZCE kirpilir; olcu BAYT.',
+      '⛔MEMORY.md ' + bayt + ' bayt — SERT esik ' + MEMORY_ESIK_BAYT + ' ASILDI (asim ' +
+        (bayt - MEMORY_ESIK_BAYT) + '). Bu bir haber degil OTOPSI: alt satirlar SESSIZCE ' +
+        'kirpilmis olabilir ve o dersler hicbir oturuma yuklenmez. HEMEN katla; olcu BAYT.',
+    )
+  } else if (bayt >= MEMORY_YUMUSAK_ESIK_BAYT) {
+    // ⭐YUMUŞAK eşik: taşmadan ÖNCE söyler. Sert eşiğe ~584 bayt kaldı, yani hâlâ pay var.
+    uyarilar.push(
+      'MEMORY.md ' + bayt + ' bayt — YUMUSAK esik ' + MEMORY_YUMUSAK_ESIK_BAYT + ' asildi, ' +
+        'sert esige ' + (MEMORY_ESIK_BAYT - bayt) + ' bayt kaldi. Yeni satir EKLEMEDEN once ' +
+        'eski ders satirlarini dizin-*.md dosyalarina katla; indekste isaretci birak.',
     )
   }
 } catch { /* indeks yoksa bu kol sessiz geçer */ }
