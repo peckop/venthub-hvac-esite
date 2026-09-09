@@ -369,6 +369,44 @@ jobs:
           export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/db/checks/rls-politika-sarma.mjs
 
+      # ⭐INV-DENETIM-IZI-1 — DENETIM TETIGI CANLI DB'DE DURUYOR MU (REC-292).
+      #
+      # NICIN BU ISE ADIM OLARAK: kardes adimlarin (Anon yazma nobetcisi, RLS politika sarma)
+      # gerekcesi burada da AYNEN gecerli ve yukarida yazili — yeni bir IS ADI acmak acik
+      # PR'lari "beklenen kontrol gelmedi"de kilitler. Ustelik bu adimda o gerekce TERSINE
+      # DONMUYOR (tip-drift'te donuyordu): ayni siri (SUPABASE_DB_URL), ayni `pg` surucusunu
+      # ve ayni kok sertifikayi kullaniyor. Yani yeni bir erisim karari GEREKTIRMIYOR.
+      #
+      # NICIN METIN TARAMASI DEGIL CANLI DB (olculdu 2026-09-09): bu depoda migration dosyasi,
+      # "prod'da hangi tetikler var" sorusunda YETKILI KAYNAK DEGIL. `on_products_change` ve
+      # `on_categories_change` migration'larda YOK — `scripts/webhook_setup.sql` uzerinden,
+      # migration hattinin DISINDAN kurulmuslar. Dosyaya bakan bir kapi, `DROP TRIGGER` ile
+      # sokulmus bir tetigi goremez ve YESIL doner.
+      #
+      # ⭐UC AYRI ARIZA SINIFI OLCULUR: (1) tetik var mi, (2) fonksiyon HALA fail-closed mi
+      # (gövdeye `exception when` girdiyse tetik ayakta gorunur ama kayip SESSIZ olur —
+      # kapi tetigi sayip bunu olcmezse korumaya calistigi seyi kacirir), (3) `products`
+      # kolon suzgeci duruyor mu (kalkarsa stok gurultusu, daralirsa fiyat degisimi kayitsiz).
+      #
+      # ⛔KAPSAM DISI, ADIYLA: TRUNCATE. Satir tetigi TRUNCATE'te ateslenmez ve o yetki alti
+      # tabloda `anon`a kadar acik (2026-09-09 olcumu). Onarimi (REVOKE) AYRI kayitta ve ayri
+      # PR'da; bu kapi o boslugu kapattigini IDDIA ETMEZ.
+      #
+      # ⚠BU ADIM MIGRATION INMEDEN KIRMIZI VERIR — ve bu KASITLI DEGIL, SIRA MESELESIDIR:
+      # kapi ile migration AYNI PR'da iner. Migration Recep kapisindan gecmezse kapi da
+      # inmez; ikisini ayirmak "kapi var ama olctugu sey yok" sinifi uretirdi.
+      - name: Denetim izi tetik kapisi (INV-DENETIM-IZI-1)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          # Kok sertifikanin TEK kaynagi depo dosyasidir (kardes adimlarla ayni gerekce).
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          echo "NOT: bu kapi CANLI DB'yi olcer, migration DOSYASINI degil."
+          echo "     Sebebi olculdu: iki webhook tetigi migration hattinin DISINDAN kurulmus,"
+          echo "     yani dosya prod durumu icin yetkili kaynak DEGIL."
+          node scripts/db/checks/denetim-izi-tetik-kapisi.mjs
+
       # TLS teshisi BILEREK TEKRARLANMADI: kardes is ayni sunucuya ayni sertifikayla
       # baglaniyor ve zincir teshisini o basiyor. Ayni teshisi iki yere kopyalamak,
       # birini guncelleyip digerini unutmanin davetidir.
