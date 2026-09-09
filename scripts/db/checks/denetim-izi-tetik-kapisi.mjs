@@ -40,7 +40,7 @@ import pg from 'pg'
 import fs from 'node:fs'
 import path from 'node:path'
 import tls from 'node:tls'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const CA_PATH = path.join(__dirname, 'supabase-root-2021-ca.pem')
@@ -345,12 +345,39 @@ async function main() {
   process.exit(1)
 }
 
-main().catch((err) => {
-  if (/certificate|self-signed|SELF_SIGNED/i.test(err.message)) {
-    console.error('denetim-izi-tetik-kapisi: OLCULEMEDI — TLS zinciri dogrulanamadi:', err.message)
-    console.error('Kok sertifikayi PGSSLROOTCERT ile verin (dogrulamayi KAPATMAK cozum degildir).')
-  } else {
-    console.error('denetim-izi-tetik-kapisi: kosum HATASI —', err.message)
+/**
+ * ⛔MODUL IMPORT EDILDIGINDE KOSMAZ — yalnizca DOGRUDAN cagrildiginda.
+ *
+ * OLCULDU (2026-09-09, URUN un yan bulgusu, ben dogruladim): bu dosyayi bir birim
+ * testinden `import` etmek kapinin KENDISINI kosturuyordu; ekrana "kok sertifika
+ * yuklendi" yazdi ve ardindan CANLI DB-ye baglanmayi denedi
+ * ("password authentication failed"). Yani `degerlendir`-i sinamak icin dosyayi
+ * import eden her kol, kimlik bilgisi olmayan bir makinede prod-a UZANIYORDU.
+ *
+ * NICIN CIDDI: (a) birim testi ag-a cikmamali - yavas, kirilgan ve makineye gore
+ * farkli sonuc verir; (b) sirsiz makinede uretilen hata, testin ASIL olctugu seyi
+ * GOLGELER (bugun tam bu oldu: kollar dusunce sebep import yolu mu, DB mi, ayirt
+ * edilemedi); (c) bir kapi betiginin yan etkisi, onu okuyan araca sizmamali.
+ */
+const dogrudanCagrildi = (() => {
+  const giris = process.argv[1]
+  if (!giris) return false
+  try {
+    return pathToFileURL(path.resolve(giris)).href === import.meta.url
+  } catch {
+    return false
   }
-  process.exit(2)
-})
+})()
+
+// Import edildiyse hicbir sey KOSMAZ; `degerlendir` disa acik ve sinanabilir kalir.
+if (dogrudanCagrildi) {
+  main().catch((err) => {
+    if (/certificate|self-signed|SELF_SIGNED/i.test(err.message)) {
+      console.error('denetim-izi-tetik-kapisi: OLCULEMEDI — TLS zinciri dogrulanamadi:', err.message)
+      console.error('Kok sertifikayi PGSSLROOTCERT ile verin (dogrulamayi KAPATMAK cozum degildir).')
+    } else {
+      console.error('denetim-izi-tetik-kapisi: kosum HATASI —', err.message)
+    }
+    process.exit(2)
+  })
+}

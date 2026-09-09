@@ -6,6 +6,7 @@
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
@@ -152,7 +153,15 @@ describe('INV-SATIS-KIPI: satış kipi anahtarı TEK kaynaktan okunur ve varsay�
      * bazı yerlerde fiyat görür bazı yerlerde görmez. Yarım hâl, kapalı hâlden daha kötüdür:
      * kapalıyken tutarlıdır, yarımken güven kırar.
      */
-    const mod = await import(path.join(KOK, 'scripts', 'kip', 'satis-kipine-gec.mjs').replace(/\\/g, '/'))
+    /**
+     * ⛔`file://` URL ZORUNLU — ters bolu cevirmek YETMEZ. Onceki hali
+     * `path.join(...).replace(/\\/g, '/')` idi: ters bolular gitmis ama SEMA yok, ve Node
+     * ESM yukleyicisi semasiz yolu reddeder ("Only URLs with a scheme in: file, data, and
+     * node are supported"). Bu satir benim agacimda GECIYORDU (8/8) — kusur ortama bagli.
+     * Ayni sinif `denetim-izi-kapisi.test.ts`te UC bagimsiz olcumle yakalandi ve orada
+     * kapinin AYIRT EDICI alti kolu sessizce sinanmiyordu. Kapi: INV-KAPI-IMPORT-1.
+     */
+    const mod = await import(pathToFileURL(path.join(KOK, 'scripts', 'kip', 'satis-kipine-gec.mjs')).href)
     /**
      * ⚠DÖNÜŞ ŞEKLİ: `{ tutarli, beklenen }` — düz boolean DEĞİL. İlk yazışımda boolean
      * varsaydım ve kol kırmızı verdi; kusur betikte değil TESTTEYDİ. Beklenen metni bilerek
