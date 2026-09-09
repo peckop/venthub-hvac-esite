@@ -446,6 +446,93 @@ sonradan eklenirse veri geriye dönük yeniden üretilmek zorunda kalmasın diye
 
 ---
 
+## 6.4 KATALOG DEFTERİ (NotebookLM) — soru yüzeyi, KANIT DEĞİL (K14, 2026-09-09)
+
+**Recep kararı K14:** katalog kaynakları için **tek** NotebookLM defteri.
+Defter kimliği: `8bb600d9-4342-4a74-88f5-e4e47dbeebc9`
+İçeriği: **kaynak dizinindeki 58 belgenin birebir kendisi** (+ paket CSV'leri ve aile föyleri
+hazır oldukça eklenir).
+
+### ⛔KURAL — defter SORU sorulan yerdir, KANIT üretilen yer DEĞİL
+
+| soru | nereye |
+|---|---|
+| *"bu ürün hangi katalogda geçiyor, nerede aramalıyım?"* | **defter** — hızlı, geniş, bulucu |
+| *"bu değer kaynakta ne yazıyor?"* | **kaynak dizini** — sayfa + alıntı ile |
+
+Defterin cevabı **tek başına bir katalog verisini doğrulamaz.** Her cevap
+`kaynak-dizini/sayfalar.jsonl` üzerinde **dosya + sayfa + alıntı** ile karşılanır; karşılanmayan
+cevap **kanıtsız** sayılır ve pakete `alinti` kolonu boş girer.
+
+**Niçin bu sınır yazılı:** defter bir dil modelinin özetidir; kaynak dizini deterministik bir
+çıkarımdır. İkisi çelişirse **dizin kazanır**. Bu ayrım yazılmazsa defter zamanla "hatırlanan
+katalog" hâline gelir ve bu projede tam o sınıf hata yaşandı (bayat ikiz → yanlış hüküm).
+
+### Dizin ↔ defter eşlemesi (kapı)
+
+**Aynı liste kuralı:** kaynak dizinine giren belge **deftere de girer**.
+Eşleme `sha256` üzerinden ölçülür — dosya adı değil, çünkü ad değişir içerik aynı kalır
+(ya da tersi, ve ikisi de sessizce yanlış eşleşme üretir).
+
+```
+dizindeki belge kümesi  ==  defterdeki belge kümesi     → fark 0
+fark varsa: dizinde VAR defterde YOK  → deftere eklenir
+            defterde VAR dizinde YOK  → ⛔dizine EKLENİR, defterden silinmez
+```
+İkinci yön özellikle önemli: defterde olup dizinde olmayan belge, **hiçbir kapının görmediği
+bir kaynak** demektir — cevaplar ondan gelir ama doğrulanamaz.
+
+**Bugünkü durum:** yükleme OPS'ta, sayı bittiğinde panoya yazılacak. Bu madde kuralı
+bağlar; **sayım ayrı bir ölçümdür ve bu belgeye sayı yazılmaz** (bayat sayı yalan söyler).
+
+---
+
+## 6.5 ⛔PDF BİR KEZ AÇILIR — patinaj kuralı (Recep kararı K15, 2026-09-09)
+
+**Karar aynen:** *"PDF çıkarımı BİR KEZ. Eşleştirme MAKİNE işi, bir kez koşulur, sonuç pakete,
+konu KAPANIR. Hiçbir iş PDF'i yeniden AÇMAZ."*
+
+### Niçin bu madde var — bedeli ölçüldü
+
+Bu kural bir tercih değil, **yaşanmış bir kaybın karşılığı.** Katalog hattı günlerce aynı
+kaynaktan yeniden çıkarım yapmaya hazırlandı; ölçüldüğünde **ürünlerin zaten DB'de olduğu**
+görüldü (s.42/43'ün 27 satırı `STORM Serisi` + `JET Serisi` altında, gerçek üretici
+kodlarıyla). Yani yeniden üretim **zaten girilmiş verinin kopyasını** üretecekti.
+
+Recep'in kendi teşhisi: *"saçma saçma patinaj çekiyoruz günlerdir"* ·
+*"aynı veriyi tekrar tekrar çıkartmaya mı bakıyorsun?"*
+
+⭐**Kök neden — YANLIŞ SORU:** hat *"CSV eksiksiz mi"* sorusunu çözüyordu, doğru soru
+**"hedefte ne eksik"**ti. İkisi aynı şey değil. Doğru soru **tek sorguyla** cevaplandı.
+
+### Kural — hangi soru nereye gider
+
+| soru | yer | PDF açılır mı |
+|---|---|---|
+| *"bu ürün hangi kaynakta geçiyor?"* | **defter** (§6.4) | ❌ |
+| *"kaynakta ne yazıyor?"* | **kaynak dizini satırı** (sayfa + alıntı) | ❌ |
+| *"bu değer doğru mu?"* | **paket CSV'si** — `kaynak_dosya`/`kaynak_sayfa`/`alinti` kolonları | ❌ |
+| *"dizinde hiç yok"* | **dizine EKLENİR** (`cikar.py`) — bir kez | ✅ tek sefer |
+
+⛔**Şüphe PDF açmak için gerekçe DEĞİLDİR.** Şüphe doğduğunda: deftere sor → dizinde doğrula.
+Dizin cevap veremiyorsa eksik olan **dizindir**, ve çözüm PDF'i açmak değil **dizini
+tamamlamaktır** — bir kez, kalıcı olarak.
+
+### Eşleştirme: bir kez koşar, sonuç PAKETE yazılır
+
+Kaynak eşlemesi (`kaynak_dosya` · `kaynak_sayfa` · `alinti`) **makine işidir**, bir kez koşar,
+sonucu pakete girer ve **konu kapanır**. Aynı eşleme ikinci kez koşulacaksa gerekçesi
+**kaynağın değişmesidir**, "emin olamadım" değil.
+*(Bkz. `work-doesnt-stale-by-time-only-by-change` — iş zamanla bayatlamaz, değişimle bayatlar.)*
+
+### Gözle kontrol: TEK GEÇİŞ, isteğe bağlı, PDF'siz
+
+Recep'in gözle kontrolü **paket CSV'leri üzerinde** yapılır, **tek geçiştir** ve
+**isteğe bağlıdır**. *"Gözle okuman lazım"* diye iş geri döndürülmez.
+Şüpheli değer **çelişki listesine** yazılır ve **tek kararla** çözülür — döngü açılmaz.
+
+---
+
 ## 7. Provenance / ilişki
 
 Kaynak: çapraz-sorgu (`cross_notebook_query` Vortice-Full + Avensair, 2026-06-19) → Avensair'in 27 gerçek bölümü atıfla.
