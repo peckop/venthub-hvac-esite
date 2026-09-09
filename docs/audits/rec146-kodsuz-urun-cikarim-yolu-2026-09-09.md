@@ -97,6 +97,40 @@ eklenir (kodsuz satırda kimliği kuran alanların `alan=değer` listesi). Aksi 
 ürünler CSV'de **birbirinden ayırt edilemez** → `kademe2-load` SKU çakışması görür ve
 **yüklemenin tamamını reddeder** (§2a, ölçüldü). Tek ürün değil, tüm parti iner ya da hiçbiri inmez.
 
+## 3b. ⭐SKU türetme kuralı — üç aday ölçüldü, biri seçildi
+
+`kimlik-kurali.mjs` (B) hâli kodsuz üründe SKU'yu **addan** türetiyor. 27 ürün aynı adı
+paylaştığı için bu çakışıyor. Üç aday kural gerçek veriyle koşuldu (34 kodsuz ürün):
+
+| aday | çakışma | SKU uzunluğu ort. | örnek |
+|---|---|---|---|
+| A · **tüm** ara sütunlar | 0 | 32.9 | `VRT-STORM-10-2-70-220-V-0-06-1400` |
+| B · **en küçük** ayırt edici küme | 0 | — | `VRT-STORM-10-2-70` |
+| C · **ad çakışırsa** mühendislik alanları | **0** | **23.8** | `VRT-STORM-10-220-V-0-06-1400` |
+
+### ⛔"En küçük küme" ölçütü YANLIŞ CEVAP VERİYOR
+Aday B'nin bulduğu minimal ayırt edici **`AĞIRLIK`** — s.42 ve s.43'te ağırlık tek başına
+13/13 ve 14/14 tekil. Matematiksel olarak doğru, **mühendislik olarak saçma**: ağırlık bir
+ölçüm değeridir, kimlik değil. Kataloğun bir sonraki baskısında `2.70` → `2.75` olursa
+SKU değişir ve **ürün kimliğini kaybeder.**
+⭐Ders: *"tekilliği sağlayan en küçük küme"* bir kimlik ölçütü değildir; tekillik gereklidir
+ama yeterli değildir. Alanın **anlamı** da ölçüte girer.
+
+### Seçilen: Aday C
+```
+kodsuz üründe SKU:
+  ad, kodsuz küme içinde TEKİL ise      → <ÖNEK>-<ad>
+  ad ÇAKIŞIYORSA                        → <ÖNEK>-<ad>-<mühendislik alanları>
+  mühendislik alanı = MOTOR · kW · RPM · DEBİ · HAVA DEBİSİ · HIZ ANAHTARI
+  ⛔AĞIRLIK ayırt edici DEĞİLDİR (spec olarak taşınır, kimliğe girmez)
+```
+**Ölçüm:** 34 kodsuz ürün → **34 tekil SKU, çakışma 0**, ayırt edici yalnız **24 üründe**
+eklendi. `VRT-CA-IL-4020-ES-RECT` temiz kaldı — modülün kendi 2026-09-07 ölçümünün
+önerdiği biçimin aynısı.
+
+**Ayırt ediciliğin sınırı ölçüldü:** s.43'te `MOTOR+RPM` **yetmiyor** (14 üründen 12 tekil);
+`MOTOR+kW` ve `MOTOR+kW+RPM` yetiyor. Yani üçlü keyfi seçilmedi, en dar güvenli küme.
+
 ## 4. Bitti ölçütü (plan v2 §3'e ek dördüncü kontrol)
 
 ```
