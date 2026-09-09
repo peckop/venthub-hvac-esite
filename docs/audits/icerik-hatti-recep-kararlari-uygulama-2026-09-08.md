@@ -34,6 +34,25 @@ tutuldu**; ikisi de pasif, vitrinde görünmüyor, tutmanın maliyeti yok. Aksi 
 **Silme öncesi bağımlılık kapısı:** yedi kategorinin her biri için ürün **0**, alt kategori **0**,
 aile **0** ölçüldü. Ölçmeden silinmedi.
 
+**⭐SİLİNEN YEDİ KATEGORİNİN ADI (2026-09-08 sonradan eklendi — ilk yazımda EKSİKTİ):**
+`air-conditioning` · `air-conditioning-solutions` · `electric-heating` · `hygiene-sanitizer` ·
+`smart-home` · `summer-ventilation` · `window-fans`
+
+> ⛔**NİÇİN SONRADAN EKLENDİ — kendi kusurum:** geri dönüşü olmayan bir silme yaptım ve **neyi
+> sildiğimi hiçbir yere yazmadım**. Bugün URUN *"DB'de `endustriyel-havalandirma` yok"* diye bir
+> bulgu bildirince "acaba ben mi sildim" sorusunu **cevaplayamadım**: ad ne bu belgede, ne
+> `admin_audit_log`'da, ne de betikte vardı. Listeyi ancak oturum kaydından (`.jsonl`) çıkarabildim.
+> Cevap: **hayır, o kategori benim sildiklerimden değil** — yedisinin hiçbiri o değil.
+>
+> **Kalıcı ders:** geri dönüşsüz işlemde *"kapı ölçtüm"* demek yetmez; **ne silindiğinin ADI**
+> yazılmalı. Sayı (7) kimliği taşımaz.
+>
+> **İkinci bulgu (ayrı, filoya bildirildi → REC-292):** bu silmeler `admin_audit_log`'a **düşmedi** —
+> ⚠düzeltme (2026-09-09): tablo **boş değil**, `categories` için 12 satır var; hepsi admin
+> panelinden ve eski. Ayırt edici ölçüt tablonun doluluğu değil **o günün yazımları**:
+> 2026-09-08 tarihiyle hiçbir tabloda satır yok. Kural 11 admin işlemlerinin loglanmasını
+> istiyor; betikle yapılan doğrudan DB yazımları bu kaydı üretmiyor.
+
 ---
 
 ## ⛔İKİ HATA — ikisi de aynı turda yakalandı ve onarıldı
