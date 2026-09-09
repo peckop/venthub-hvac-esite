@@ -358,6 +358,16 @@ Sonuç: planın canlı sahne kanıtı **Recep'in kendi kararına bağlı** ve ge
 gelmesi başkasının kararına bağlı bir ölçümün üstüne kurmak, o kararı beklerken işi durdurmak
 demekti — kurmuyorum.
 
+✅**GELDİ VE ÖNCÜL DOĞRULANDI (2026-09-09 07:25:50Z, `date -u` ile ölçülmüş damga).** Recep
+kendi sözünü verdi, KATALOG sensör kategorisi yazımını yaptı: **canlıya beş satır** yazıldı
+(`categories` + `products` + `product_families`), yazma yüzeyi **MCP `execute_sql`** — yani
+§2.3'teki "dosya olmayan yazma yüzeyi" iddiasının **ilk kayıtlı örneği**. Yazımdan sonra
+`admin_audit_log`'da bugünün tarihiyle **tüm tablolarda 0 satır**.
+Belge: `docs/audits/icerik-hatti-sensor-kategorisi-yazimi-2026-09-09.md` (KATALOG).
+⭐Söz tutuldu: "0 çıkmazsa planın öncülü yanlıştır ve plan yeniden yazılır" demiştim; **0
+çıktı**, dolayısıyla plan yeniden yazılmadı. Beklediğim sonucu ölçümden önce doğru saymamak,
+bu kez planı değiştirmedi — ama ölçüm ters çıksaydı değiştirecekti, ve fark buradadır.
+
 ### 6.1 ⛔ÇÜRÜTME SONRASI EKLENEN ÖLÇÜM KALEMLERİ (ilk hâlinde yoktu)
 
 6. ⭐**Prod'da `exec` / `exec_sql` RPC fonksiyonu VAR MI, sahibi kim, SECURITY DEFINER mi, kime
