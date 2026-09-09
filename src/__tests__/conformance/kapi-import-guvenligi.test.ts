@@ -88,6 +88,24 @@ describe('INV-KAPI-IMPORT-1 · kapi betikleri IMPORT EDILDIGINDE kosmaz', () => 
    */
   const BETIKLER = ['scripts/db/checks/denetim-izi-tetik-kapisi.mjs']
 
+  /**
+   * ⭐CRLF + SHEBANG BIRLESIMI KAPI KORLESTIRIYOR (2026-09-09, uc agacta olculdu).
+   *
+   * vite-node dosyayi bir fonksiyon govdesine sarar ve shebang'i sokerken satir sonunu
+   * LF VARSAYAR; CRLF'te geriye kalan \r govdede SyntaxError verir. Bedeli: kapinin
+   * AYIRT EDICI alti kolu CRLF'li iki agacta SESSIZCE dustu, LF'li agacta gecti.
+   * Uc agacta da ayni surumler vardi — degisken SURUM DEGIL SATIR SONUYDU.
+   *
+   * ⚠BU KOL YALNIZ BU AGACIN diskteki halini olcer; baska agacin satir sonunu goremez.
+   * `.gitattributes` (eol=lf) yeni checkout'lari, shebang'in kaldirilmasi da MEVCUT
+   * agaclari korur. Kol, ikisinin de geri alinmasini engeller.
+   */
+  it.each(BETIKLER)('%s: shebang YOK ve CR (\\r) TASIMIYOR', (goreli) => {
+    const ham = fs.readFileSync(path.join(KOK, goreli), 'utf8')
+    expect(ham.startsWith('#!')).toBe(false)
+    expect(ham.includes('\r')).toBe(false)
+  })
+
   it.each(BETIKLER)('%s: main() kosulsuz CAGRILMAZ', (goreli) => {
     const govde = jsYorumsuz(oku(path.join(KOK, goreli)))
     // Kolon 0-da duran bir main() cagrisi = import edildiginde de kosar.
