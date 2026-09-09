@@ -11,6 +11,31 @@
   alınıyor. Benim önerim ayrı PR idi; OPS sıralamayı kurdu, uyuyorum.
 - **Birlikte okunacak:** REC-128.
 
+### ⭐DAYANAK KARAR — atfı DÜZELTTİM (kendim okuyarak)
+
+OPS bu işi *"K10 mimari kararı, 09-08"* diye dayandırdı ve ben o belgeyi okumadan
+kabul etmemiştim. Okudum: **atıf yanlış, hüküm doğru.**
+
+- `docs/audits/karar-kayit-bagi-vitrin-15a-2026-09-07.md:39` → **K10 = "Liste ve
+  karşılaştırma — Ekran 11" (2026-09-04), bağlı kayıt REC-197.** Render/statik ile ilgisi
+  yok. (`K10` deposu genelinde ÜÇ ayrı konuda kullanılmış — Nicotra basınç kararı, bu, ve
+  satınalma belgeleri. Ad ölçüt değildir.)
+- **Gerçek dayanak** `docs/proje-takip/design/belge/kararlar-vitrin-15a-2026-09-04.md:102-103`,
+  Recep'in 2026-09-04 tarihli **numarasız** kararı, kaydın kendi dilinde "Adım B":
+  - **B/1 (satır 102):** *"kiracı çözümü derleme anında sabit; `getTenantConfig` istek başlığı
+    okumaz; çok kiracılı yetenek kodda kalır, kapalı. Hedef: ana sayfa önceden üretilir."*
+  - **B/2 (satır 103):** *"1. sayfa statik, `?page=N` ayrı dinamik yol, **adres değişmez**."*
+
+Sonuç: Recep'e yeni yapısal soru GİTMEZ — karar zaten verilmiş. OPS'un hükmü ayakta,
+yalnız gerekçesi başka bir belgeye aitti.
+
+### ⚠BU OKUMA PLANA EKSİK BİR ŞART GETİRDİ
+
+Kararın B/2 maddesi **"adres değişmez"** diyor; benim ilk taslağımda bu şart YOKTU.
+Yani sayfalamayı uç bileşene indirirken `?page=N` adres biçimi korunacak — `/products/2`
+gibi bir yola geçmek KARARA AYKIRI olurdu ve ilk taslağım bunu yasaklamıyordu.
+Ölçüt: mevcut `?page=N` adresleri merge sonrası aynı içeriği vermeye devam eder.
+
 ## 1 · BUGÜN ÖLÇÜLEN DURUM (08-24 notuna DEĞİL, 09-09 ölçümüne dayanır)
 
 Canlı `X-Vercel-Cache` + `Cache-Control`, 2026-09-09 ~09:1xZ:
@@ -44,6 +69,8 @@ hangi ADIM sorulur.)
 2. **`/tr/products` — aynı sabit + sayfa-1 statik deseni.** `searchParams` gövdeden çıkar;
    sayfa 1 statik üretilir, sayfalama uç bileşene iner ve `<Suspense>` **yalnız o ucu** sarar
    (kural 5 — sınır sayfa köküne konursa sunucu gövdeyi boş verir, 09-05'te ölçüldü).
+   ⛔**ADRES DEĞİŞMEZ** (Recep kararı B/2): `?page=N` biçimi korunur; yol-tabanlı sayfalamaya
+   (`/products/2`) GEÇİLMEZ. Merge sonrası mevcut `?page=N` adresleri aynı içeriği verir.
 3. **REC-297 — `select` kolon listesi daraltılır.** `CATEGORY_COLUMNS` (`preload.ts:69`) ve
    kategori sayfasındaki eşi (`page.tsx:232`) emekli `marketing_title`'ı taşımayı bırakır.
    ⚠**Tuzak, önceden ölçüldü:** `type-converters.ts:42` hâlâ
