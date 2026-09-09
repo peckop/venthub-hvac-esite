@@ -7,8 +7,10 @@
 - **Yöneten cetvel:** `docs/standards/rendering-cache-standard.md` (REC-59 kaydının kendisi bu
   cetveli adıyla veriyor). Ek: `CLAUDE.md` kural 4 (RSC öncelikli), kural 5 (Suspense sınırı
   yalnız uç bileşeni sarar), kural 12 (`tenantId` önbellek anahtarında).
-- **İkinci kayıt:** REC-297 (`marketing_title` RSC yükü, Low) — OPS hükmüyle **aynı PR'a**
-  alınıyor. Benim önerim ayrı PR idi; OPS sıralamayı kurdu, uyuyorum.
+- **İkinci kayıt:** ~~REC-297 aynı PR'a alınıyor~~ → **BU CÜMLE BAYAT. REC-297 AYRI ve ÖNCE
+  yapıldı** (D2): PR #1153, merge 2026-09-09 09:57Z. Ayrı tutma hükmü benimdi, OPS önce
+  birleştirmişti, sonra çürütmede kendi hükmünü geri aldı. Bu plan artık **yalnız REC-59
+  Adım 2**'yi kapsar.
 - **Birlikte okunacak:** REC-128.
 
 ### ⭐DAYANAK KARAR — atfı DÜZELTTİM (kendim okuyarak)
@@ -71,7 +73,13 @@ hangi ADIM sorulur.)
    (kural 5 — sınır sayfa köküne konursa sunucu gövdeyi boş verir, 09-05'te ölçüldü).
    ⛔**ADRES DEĞİŞMEZ** (Recep kararı B/2): `?page=N` biçimi korunur; yol-tabanlı sayfalamaya
    (`/products/2`) GEÇİLMEZ. Merge sonrası mevcut `?page=N` adresleri aynı içeriği verir.
-3. **REC-297 — `select` kolon listesi daraltılır.** `CATEGORY_COLUMNS` (`preload.ts:69`) ve
+3. ~~**REC-297 — `select` kolon listesi daraltılır.**~~ **BİTTİ, AYRI PR'DA** (#1153, 09:57Z).
+   Aşağıdaki tuzak notu KAYIT olarak kalıyor çünkü doğru çıktı ve uygulanışını yönetti;
+   ayrıca birim testi değişmezi daralttırdı (ayrıntı PR #1153 gövdesinde).
+
+   <details><summary>özgün madde (arşiv)</summary>
+
+   **REC-297 — `select` kolon listesi daraltılır.** `CATEGORY_COLUMNS` (`preload.ts:69`) ve
    kategori sayfasındaki eşi (`page.tsx:232`) emekli `marketing_title`'ı taşımayı bırakır.
    ⚠**Tuzak, önceden ölçüldü:** `type-converters.ts:42` hâlâ
    `marketing_title: String(dbCat.marketing_title || dbCat.name || '')` yazıyor ve
@@ -80,18 +88,62 @@ hangi ADIM sorulur.)
    `CategoryBuilderView`, `ProductFormModal`) **DOKUNULMAZ** — orası veriyi yönetim için
    okur, vitrin değil.
 
-## 4 · KAPILAR (hepsi sabotajla doğrulanır)
+   </details>
+
+## 3.5 · TAZELENME BORCU — ÖLÇÜLDÜ, ADIYLA YAZILIYOR (D1)
+
+Cetvelin hükmü: *statik vitrin sayfasında görünen HER tablonun DB tetiği + webhook handler
+dalı olmalı; yoksa veri değişir, sayfa değişmez ve hiçbir test görmez.* Ana sayfa ve ürünler
+rotası statiğe geçtiğinde bu hüküm onlara da bağlanır — o yüzden **"borç doğmuyor" demek
+ölçümsüz kalamazdı.**
+
+Ölçüm ALTYAPI tarafından yapıldı (2026-09-09 ~09:2xZ, prod'dan salt-okuma; ben yeniden
+ölçmedim, OPS öyle yönlendirdi):
+
+| Tablo | webhook tetiği | handler dalı |
+|---|---|---|
+| products · categories · product_families · product_images · brands | VAR | VAR |
+| product_prices · price_lists · inventory_movements | VAR | VAR |
+| **site_settings** | **YOK** | **YOK** |
+
+**TEK BOŞLUK: `site_settings`.** O tablo değişirse statik vitrin hiçbir şey duymaz; yalnız
+`revalidate = 3600` emniyet ağıyla, yani **en geç bir saat sonra** tazelenir.
+
+⚠**Ticari ağırlığı adıyla:** satış kipi anahtarı (fiyat görünürlüğü) `site_settings`'te.
+Yani en pahalı yüzey, tazelenmeyen tek tablonun üstünde duruyor. Bu, `rendering-cache-standard`
+cetvelinin doğduğu arızanın ta kendisidir (1044 fiyat satırı yazıldı, vitrin değişmedi).
+
+**Borç bu PR'a BİNMEZ, kaydı REC-298** (sahibi ALTYAPI): tetik = migration = Recep kapısı,
+handler dalı ise tetiksiz ölü doğar — ikisi aynı anda inmeli. Ters yönde borç YOK: handler'da
+dalı olan her tablonun tetiği var, ölü dal taşınmıyor. (hepsi sabotajla doğrulanır)
 
 | Kapı | Ne ölçer | Sabotaj |
 |---|---|---|
 | `INV-RENDER-*` (mevcut) | yasak liste | — |
-| **YENİ** `INV-ANASAYFA-STATIK-1` | `/[lang]/page.tsx` ve `products/page.tsx` RSC yolunda `getTenantConfig`/`headers()` çağırmaz | çağrıyı geri koy → kırmızı |
-| **YENİ** `INV-MARKETING-YUK-1` | kategori `select` listesi `marketing_title` içermez | listeye geri ekle → kırmızı |
-| `pnpm build` | REC-59'un kendi kabul ölçütü: 4 rota Static/ISR işaretli | — |
+| **YENİ** `INV-ANASAYFA-STATIK-1` (AST) | `/[lang]/page.tsx` ve `products/page.tsx` RSC yolunda `getTenantConfig`/`headers()`/`cookies()` çağırmaz; `searchParams` sayfa gövdesinde okunmaz | her birini tek tek geri koy → ayrı ayrı kırmızı |
+| ~~`INV-MARKETING-YUK-1`~~ | REC-297 ile **indi** (#1153) | — |
+| `pnpm build` | REC-59'un kendi kabul ölçütü: 4 rota Static/ISR, **bailout hedefi 0** | — |
+
+**Kapı AST olacak (D4):** `ts.Node.getText()` yorumları da taşır ve bu iş boyunca dosyalara
+"niçin `headers()` okumuyoruz" diye yazılmış yorumlar girecek. Metin tabanlı bir kapı kendi
+gerekçesini ihlal sayardı — depoda bu tuzağa bir kez düşüldü, bugün ikinci kez az kalsın.
+
+### KABUL — ÜÇ KATMAN, HEPSİ DAMGALI (D4)
 
 ⚠**Statik kapı bu işi TEK BAŞINA göremez:** "rota statik mi" sorusunun cevabı `tsc`/`lint`/
-`vitest` çıktısında yoktur, yalnız `next build` çıktısında ve canlı `X-Vercel-Cache`'te vardır.
-Bu yüzden kabul ölçütü **iki katmanlı**: build çıktısı + merge sonrası canlı ölçüm.
+`vitest` çıktısında YOKTUR. Bu yüzden kabul üç katmanlıdır ve üçü de damgayla yazılır
+(koşum kimliği + UTC):
+
+1. **Build:** `pnpm build` çıktısında dört rota Static/ISR, **bailout 0**.
+2. **Canlı:** merge sonrası `/tr` ve `/tr/products` için `X-Vercel-Cache` **HIT**
+   (bugün ikisi de `MISS` + `private, no-store` ölçüldü).
+3. **Webhook:** statiğe geçen rotanın okuduğu bir tabloya yazım sonrası tazelenme kanıtı —
+   `net._http_response` defterinden, isteğimden BAĞIMSIZ satırla. `REVALIDATED` görmek
+   TEK BAŞINA yetmez: `revalidate=3600` dolmuşsa aynı sonucu benim isteğim de üretir
+   (bu ayırt etmeyen ölçümü REC-59'un webhook kaleminde bir kez eledim).
+
+**PAGE_SIZE ölçülecek (D3), varsayılmayacak** — sayfa-1 sınırı koddan okunup plana yazılır.
+**Sayfa 2+ istek başına kalır ve bu KASITLIDIR**, cetvele öyle yazılır.
 
 ## 5 · RİSK
 
