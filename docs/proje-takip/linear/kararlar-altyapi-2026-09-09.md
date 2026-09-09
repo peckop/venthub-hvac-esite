@@ -1,6 +1,6 @@
-# Kararlar — Altyapı, Kapılar ve Belge Hattı (Linear belgesinin TAM dışa aktarımı · 2026-09-08 ayna: K1–K9)
+# Kararlar — Altyapı, Kapılar ve Belge Hattı (Linear belgesinin TAM dışa aktarımı · 2026-09-09 ayna: K1–K10)
 
-<!-- kaynak_id: 5f43fac5-f2a9-40d7-8da5-86bf5235764e · kaynak_updatedAt: 2026-09-05T06:22:55.844Z · kopya: 2026-09-08T07:14Z -->
+<!-- kaynak_id: 5f43fac5-f2a9-40d7-8da5-86bf5235764e · kaynak_updatedAt: 2026-09-08T12:19:34.533Z · kopya: 2026-09-09T11:42Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -49,6 +49,18 @@ Gözcü + cron + prob/doğrula ritüeli; "koptu" hükmü çift sinyal ister (nab
 * **Niçin (kök sebep):** 08-28'de üretici kapandı, tazelik kapıları ve üretim kancaları açık kaldı → aynı çelişki her hafta başka koldan kilit üretti (09-03 C4, 09-04 INV-DOC-4b, 09-05 C5; 7 gün penceresinde 49 dosya daha). Ölçüm: ALTYAPI + OPS 09-05 (37 worktree'de 412 bekleyen, 368'i .md).
 * **Açık soru (1-2 hafta sonra, Recep):** yeni "Venthub Proje Takip" defteri companion'ları dışlıyor, kod soruları CodeGraph'ta → companion sistemi emekliye mi? Bu karar altyapıyı KORUR, o soruyu öne çekmez.
 
+## K10 · Vitrin sayfaları HAZIR DOSYADIR; kiracı sorusu sayfanın DIŞINDA sorulur (2026-09-08, Recep; OPS teklif + URUN görüş)
+
+**Karar:** Ana sayfa, kategori, marka, ürün ve bilgi merkezi sayfaları derleme anında hazır dosya olarak üretilir; tazeleme webhook ile, `revalidate = 3600` yedek (cetvel `rendering-cache-standard.md` §1 zaten böyle diyordu, kod uymuyordu). Bir vitrin sayfası render yolunda `headers()` **/** `cookies()` **/** `searchParams` **OKUMAZ**; okuyan sayfa hazır dosya olamaz ve bu YASAKTIR. Hesap, sepet, ödeme ve admin dinamik kalır (doğru olan bu).
+
+**Kiracı (çok-kiracılı yapı,** REC-88 **parkta):** kiracı bugün DERLEME SABİTİ (DB'de tüm satırlar tek tenant_id, URUN 09-08 ölçtü). Yarın kiracı geri gelince seçim SAYFANIN DIŞINDA kurulur: ya kiracı başına ayrı yayın (aynı kod, kiracı derleme sabiti, ayrı alan adı) ya da kiracı adres/derleme parametresi olup her kiracının sayfaları önceden üretilir. İkisi de sayfaları hazır dosya tutar. Bugünden mekanizma kurulmaz (kullanılmayan yapı çürür). Recep sorusu: "kiracı olsa da olmasa da neden yapılamıyor?" → yapılabiliyor; engel kiracı değil, sorunun sayfanın içinde sorulmuş olmasıydı.
+
+**Uygulama sırası (URUN şartı):** önce kategori PR'ı (tenant sabiti + `?page=` kalkar, sayfa boyu 24→48; ölçüm: en kalabalık kategori 34 aile, ikinci 12; adres değişmez), sonra ana sayfa AYRI PR. Kapılar: (1) `.next/server` altında üretilen kategori + ana sayfa HTML sayısı beklenenle eşit değilse KIRMIZI (build etiketi ayırt etmiyor: 46 yol ● yazıp 0 dosya üretti); (2) en kalabalık kategori > sayfa boyu ise KIRMIZI; (3) HTML boyut kapısı. **Kabul ölçütü (URUN uyarısı):** statiğe geçtikten SONRA canlıda bir DB değişikliği yapılıp webhook tazelemesinin sayfayı gerçekten değiştirdiği ölçülür (hiç sorulmamış adres, MISS/Age 0); bugün her istek taze render olduğu için bozuk webhook maskeli olabilir. Ölçülmeden iş bitmiş sayılmaz.
+
+**Niçin:** 09-08'de ölçüldü: ana sayfa + 46 kategori her ziyarette sunucuda üretiliyor (`x-vercel-cache: MISS`, `age: 0`), sebep iki tane ve VE bağlı (`getTenantConfig` → `headers()`; `?page=` searchParams), biri onarılıp diğeri kalırsa kazanım sıfır. Kullanılmayan bir yetenek için en çok ziyaret edilen iki yüzey hız ve maliyet ödüyordu.
+
+DURUM: İŞ → REC-59 (Backlog; Recep "go" bekliyor). Kiracı şartı → REC-88 yorumunda da var (parktan çıkış şartı).
+
 ---
 
-*2026-09-04 ilk sürüm (OPS). 2026-09-05 K9 eklendi, K2 notu (OPS).*
+*2026-09-04 ilk sürüm (OPS). 2026-09-05 K9 eklendi, K2 notu (OPS). 2026-09-08 K10 eklendi (OPS, Recep talimatıyla; yorum arşive gider, karar belgesi kalır).*

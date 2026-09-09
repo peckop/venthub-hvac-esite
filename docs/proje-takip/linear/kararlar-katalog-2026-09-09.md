@@ -1,6 +1,6 @@
-# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-08 ayna: K1–K12)
+# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-09 ayna: K1–K15)
 
-<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-07T08:47:15.686Z · kopya: 2026-09-08T07:14Z -->
+<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-09T11:32:41.396Z · kopya: 2026-09-09T11:42Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -85,3 +85,30 @@ DD ailesinde ad ve slug'da `6N090P` yazan ürün (`model_code` 11921) kaynak kod
 ## K11-a · ATEX iki eksen, iki alan: `atex_marking` (ekipman grubu kodu) + `atex_zone` (kullanım bölgesi) (2026-09-07 09:2xZ, Recep KARARI "A")
 
 Kataloglar ATEX'i iki biçimde verir: ekipman grubu/kategori kodu (ör. `II 2G/D h T3/125C X Gb/Db`, Vortice 14 ürün) ve kullanım bölgesi beyanı (ör. `Zone 2, Category 3G`, JET 7 ürün; SEAT 12 satır aynı sınıf). İkisi farklı eksendir (K3 aynı eksen kıyas kuralı): aynı alana konmaz. Teknik tabloda iki ayrı satır: "ATEX sınıfı" ve "ATEX bölgesi"; hangisi varsa o görünür (K7 yoksa satır yok). Faset: bugün 375 üründe ~21 dolu (%6) → K13 gereği filtre olmaz, yalnız PDP tablosunda. K11 (kod + açıklama cümlesi) geçerli kalır; cümle her iki alan için de yazılır. Faz 4: 19 ATEX satırı yükleme listesine girer.
+
+## K13 · ÖNCELİK = TAŞINABİLİR KATALOG PAKETİ; sıra PDF → paket (gözle kontrol) → DB (2026-09-09 11:1xZ, **Recep KARARI**, kendi sözleriyle)
+
+*"Ben hiç DB'ye veri yüklememiş olsaydım elimde taşınabilir katalog paketinin olmasını istiyorum, bu kadar. Önceliğim bu. Alıp bu verileri girmek istediğimde önce açacağım, bakacağım, gözle kontrollerimi sağlayacağım; bunu yaparken PDF'ler referansım olacak. Sonrasında DB'ye yükleyeceğim. Önce CSV vs. tüm dokümanlardan emin oluruz, ondan sonra DB doğru mu değil mi bakarız."*
+
+* **Ana kaynak = paket.** Onaylı paket gerçektir; DB paketten yüklenir ve pakete göre denetlenir (DB'deki fark = düzeltilecek kalem, paket kazanır). Bugüne kadarki "DB kimlik kazanır" yaklaşımı bu kararla değişti.
+* **Paket insan okur:** açılır, bakılır; her değerin yanında PDF referansı (dosya + sayfa + alıntı). Biçim: tablo başına CSV + görsel klasörü + kaynak PDF referansı; jsonl yalnız makine kopyasıdır.
+* **DB'deki mevcut veri atılmaz:** paket, canlı DB dışa aktarımıyla TOHUMLANIR (5165 teknik değer, 1042 görsel bağı, 187 açıklama), sonra PDF kaynak dizinine karşı işaretlenir (PDF'te var/yok/çelişiyor). Sıfırdan çıkarım YOK.
+* **Sıra:** paket iskeleti + tohum → PDF referans eşleme → Recep gözle kontrol (aile aile) → onaylı paket → boş şemaya yükle → canlı DB ile fark raporu → farklar tek kararla.
+* Belge / açıklama / İngilizce fazları bu paketin İÇİNDE yürür; paket bitmeden ayrı hat açılmaz.
+* Kayıt: REC-212 (yeniden kapsamlandı). Yol haritası belgesi buna göre güncellendi.
+
+## K14 · Katalog kaynakları için TEK NotebookLM defteri; defter = kaynak dizininin aynası (2026-09-09 11:3xZ, **Recep isteği**: "ya eldekiler ya da yeni bir taneye tümünü koyalım; hazırladıklarımızı da oraya sorabiliriz; iş yapılış yöntemine eklenmeli" — OPS hükmü: YENİ, tek defter)
+
+* **Defter:** `VentHub Katalog Kaynaklari (kaynak dizini = defter)` — id `8bb600d9-4342-4a74-88f5-e4e47dbeebc9`. İçerik = kaynak dizini birebir: 60 kaynak (58 PDF: Vortice 22 · SEAT 17 · Nicotra 12 · Danfoss 6 · AVenS fiyat listesi 1; + 2 web metni: Nicotra ADH sayfası, SEAT Storm sayfası). 2026-09-09 11:3xZ ölçüm: defter 60 / tekil 60 / mükerrer 0 / dizin farkı 0 + hazırlanan paket çıktıları (aile föyleri, CSV'ler) eklendikçe.
+* **Neden yeni:** ölçüldü — mevcut 4 defter parçalı ve bayat: ingestor defteri (06-21, 24 PDF, yalnız Vortice), REC-172 defteri (09-06, 26 PDF: SEAT/Nicotra/Danfoss), Vortice TR distribütör (24 PDF), Vortice Full (28 PDF + 8 web) + 6 ürün grubu defteri. Hiçbiri dizinle birebir değil; iki defteri birleştirmek yerine dizinden üretilen tek defter tutulur. Eskiler arşiv, silinmez.
+* **Kural (cetvel eki, catalog-ingestion-standard §6.4):** defter SORU yüzeyidir, KANIT değil. "PDF'te ne yazıyor" cevabı defterden alınır, kaynak dizininde sayfa+alıntı ile doğrulanır; pakete yalnız dizin referansıyla girer. Dizine yeni belge girince deftere de eklenir (aynı liste, sha256 ile eşlenir); dizinde olmayan belge deftere konmaz.
+* **Hedef cümlesi (Recep):** *"Katalogdaki önceliğim taşınabilir, güvenli, doğru veri kaynaklarını oluşturmak; bu iş böyle başladı, sonlandıralım artık."*
+
+## K15 · PDF çıkarımı BİR KEZ yapılır, eşleştirilir, konu KAPANIR — PDF'e dönüş yok (2026-09-09 11:3xZ, **Recep KARARI**, kendi sözleriyle)
+
+*"Sürekli PDF'ten arama istemiyorum. PDF çıkarımı bir kere yapılır ve bitirilir. Çıkarımlar yapılır, sonra eşleştirme yapılır ve konu kapanır. Aradan üç gün geçiyor, 'gözümle okumalıyım' diye süreç tekrar başlıyor; günlerdir böyle. Yazık, kayıp."*
+
+* **Çıkarım bir kez:** kaynak dizini (60 kaynak, hash'li) o "bir kez"dir; **yapıldı**. Hiçbir iş PDF'i yeniden açmaz; soru varsa defter (K14), kanıt varsa dizin satırı.
+* **Eşleştirme makine işidir:** paketteki her değer dizinle bir kez eşlenir (VAR/YOK/ÇELİŞİYOR), sonuç pakete yazılır, **konu kapanır**. Aynı eşleme ikinci kez koşulmaz; yeni kaynak gelirse yalnız fark eşlenir (K8 sürüm kuralı).
+* **Recep'in gözle kontrolü TEK GEÇİŞ ve isteğe bağlıdır:** paket CSV'si üzerinde, PDF açmadan (referans kolonu yeter). "Gözle okumalısın" diye iş geri döndürülmez; şüpheli değer çelişki listesine gider, tek kararla kapanır.
+* **Kapanış ölçütü:** paket bitince "PDF'e dön" isteyen her emir K15 ihlalidir; OPS reddeder.

@@ -1,6 +1,6 @@
-# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-08 ayna: K1–K55)
+# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-09 ayna: K1–K58)
 
-<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-08T07:13:27.355Z · kopya: 2026-09-08T07:14Z -->
+<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-09T06:45:48.915Z · kopya: 2026-09-09T11:42Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -453,3 +453,27 @@ Marka'dan: K5'e "satış kipi eki" + kılavuza tek kart; ölçüm: yeni hex 0 ·
 DURUM: İŞ → REC-169 (Backlog)
 
 Recep: "Fiyatı olmayan ürünler satış kipi açıldığında teklif iste olarak görünürler, karardır." Kapsam: `product_prices`'ta geçerli fiyatı olmayan her ürün (bugün 27/375: 1 içe alım boşluğu + 26 ticari; dört Vortice ailesi tamamen fiyatsız, qbk-sal-kc-evo 11/21). Satış kipinde: kart ve PDP eylemi "Teklif iste" (K5 kiremit, tek fiil), fiyat satırı yok, sepete eklenemez; gizlenmez. Fiyatsız AİLE sayfasında "…'den başlayan" satırı çizilmez (K7), aile eylemi "Teklif iste". Uygulama: REC-168 betiği `--fiyatsiz-aile teklif` sabit (parametre kalır, varsayılan teklif); REC-169 vaka (a)/(b) kabul ölçütü bu hâl. Teklif kipinde değişen bir şey yok.
+
+## K56 · Ana sayfa kategori vitrini mobilde 2 kolonlu ızgara, yatay karusel kalkar (Recep, 2026-09-08 08:0xZ — Linear kaydı 08:03Z, ALTYAPI penceresinde; lafzıyla "A")
+
+DURUM: İŞ → REC-281 (Backlog; URUN, pencere sonrası)
+
+Recep 09-07 gece: "mobil ama sağa sola bar ile götürülebiliyor.. eski teknoloji.. o sayfada bir gözden geçirip ux kullanıcı kolaylığını da iyileştirmek lazım". 09-08: "kaydırma çubuğunun bence görünmemesi gerekir sence?" · "desen değişirse ne olacak önerin?" · "bana her ikisi için bir mockup yapar mısın göreyim de karar vereyim" → mockup (ALTYAPI, gerçek 390px, üç çerçeve: bugün / A ızgara / B karusel+işaret) → **"A"**.
+
+Kapsam: bileşen `GuidedCategoryDiscovery` üç yüzeyde (ana sayfa, Ürünler #1088, CategoryMasterView); masaüstü zaten ızgara, değişen yalnız mobil. Bedel: kart 280→171px, en uzun başlık üç satır; 390px okunurluk YENİDEN ölçülür (#1114 düzeni 280px'te ölçülmüştü). OPS ve ALTYAPI önerisi de A idi.
+
+*Kaynak: ALTYAPI pano notu 09-08; mockup [https://claude.ai/code/artifact/fef86ab1-e830-4947-80ce-f9e85ab403a9](<https://claude.ai/code/artifact/fef86ab1-e830-4947-80ce-f9e85ab403a9>)*
+
+## K57 · Kategori sayfasında "Alt Ürün Grupları" kartları GÖRSELLİ olur (Recep, 2026-09-08 12:2xZ, KATALOG penceresinde; lafzıyla "görselli olması lazım bence")
+
+DURUM: İŞ → REC-291 (URUN; PR #1137 master'a indi 2026-09-08 12:52Z; canlı kabul — bölümde img sayısı = 10, LCP/CLS — yayından sonra ölçülür. URUN hükmü: görselsiz alt kategoriye YER TUTUCU KONMAZ, eksik ekranda görünür kalır; alt metni boş, kare oran)
+
+Recep canlıda /tr/category/fanlar sayfasında alt grup kartlarını gördü: yalnız başlık + açıklama, görsel yok. KATALOG ölçtü (canlı, hiç sorulmamış adres): sayfada 18 storage görseli var, "Alt Ürün Grupları" bölümünde `<img>` 0, background-image 0; görsellerin hepsi bölümün üstündeki ve altındaki ürün kartlarında. Kaynak hazır: kategori görselleri bugün canlıya yazıldı (fans, hava perdesi, Nordik HVLS) ve 26 kategori için envanter #1124'te. Görseli olmayan alt kategoride kartın nasıl görüneceği URUN hükmü (yer tutucu / görselsiz kart), PR'da yazılır. Kanıt satırı: canlı sayfada bölümdeki `<img>` sayısı = alt kategori sayısı; `<Image/>` width/height zorunlu (kural 10), CLS ölçülür. Sıra: REC-59 kategori statik PR'ı (#1136) zaten açıktı, bu iş ondan sonra ve AYRI PR.
+
+*Kaynak: KATALOG pano notu 09-08 12:2xZ → URUN; OPS emri aynı saat.*
+
+## K58 · SEAT ATEX PTC sensörü ve BVU-LS separatörler için Aksesuarlar altına yaprak alt kategori açılır (Recep, 2026-09-09 06:5xZ, OPS penceresinde; lafzıyla "ingestoru halledin diğerlerini de" — KATALOG'un dün akşamdan bekleyen üç kararına toplu GO)
+
+DURUM: İŞ → KATALOG (canlı DB yazımı: products + product_families birlikte, taksonomi cetveli §8; yazımdan ÖNCE §9 dökümü + pano notu, SONRA yazım; URUN deploy olmadan sayfayı ölçer = webhook tazeleme ÇALIŞMA kanıtı). Etki: 3 ürün yaprak kategoriye kavuşur (SEA-810105 + iki BVU-LS), catalog-integrity kapısındaki product-no-subcategory:seat-atex-ptc-sensor kırmızısı kapanır.
+
+Aynı sözle: ingestor deposundaki 4 pushsuz commit (marka/seri kaynak haritası v1-v4) PUSH edilir; ingestor CI 5/5 kırmızısı (avensair-fiyat.csv bayat) KATALOG onarır. Santrifüj/aksiyel çelişkisi Recep'e sorulmaz, KATALOG veriye göre karar verip belgeye yazar. marketing_title: OPS önerisi uygulanır — h1'e bağlanmaz, alan emekli (kolon silinmez), URUN küçük iş.
