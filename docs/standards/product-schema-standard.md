@@ -207,9 +207,52 @@ parçasıdır.
 ### 11.4.1 Veri tarafı borcu (açık)
 
 Bu cetvel yüzeyi bağlar; **veriyi bağlamaz.** `products.model_code` bugün 374/374 dolu
-ama bunu zorlayan bir kısıt YOK. Doğru kalıcı çözüm katalog alımında zorunlu alan
-(`catalog-ingestion-standard.md`) ya da DB kısıtıdır. Sahibi: katalog hattı (PRICING).
+ama bunu zorlayan bir kısıt YOK. Sahibi: katalog hattı.
 Bu madde, kuralın **ölçülemez tarafını** adıyla yazar — kapının kapsamını abartmamak için.
+
+> ⛔**2026-09-09 DÜZELTMESİ — bu maddenin eski çözüm önerisi YANLIŞTI.**
+> Burada *"doğru kalıcı çözüm katalog alımında **zorunlu alan** ya da DB kısıtıdır"*
+> yazıyordu. **Sahada tam tersi oldu:** alım sözleşmesi `model_code`'u zorunlu
+> saydığı için, kaynağında kodu olmayan beş ürüne araç **ardışık kod ÜRETTİ**
+> (`16076`–`16080`), hiçbir kapı görmedi ve kod **müşteriye kadar gitti**.
+> ⭐**Kaçış valfi olmayan zorunlu alan, boşluğu uydurmayla doldurur.**
+> Doğru çözüm §11.4.2'dedir: kod **yoksa boş kalır**, kimlik başka yerden kurulur.
+
+### 11.4.2 KODSUZ ÜRÜNÜN KİMLİĞİ (2026-09-09, ölçüme dayalı)
+
+Kaynakta `model_code` **bulunmayan** ürün gerçektir ve reddedilemez — ölçüldü: AVenS
+kataloğunda **34 kodsuz ürün** (s.26 CA IL 5, s.42 STORM 13, s.43 JET 14).
+
+**Kural:**
+```
+model_code  : kaynakta yoksa NULL kalır · confidence = missing · KOD ÜRETİLMEZ
+sku         : ad, kodsuz küme içinde TEKİL ise      → <ÖNEK>-<ad>
+              ad ÇAKIŞIYORSA                        → <ÖNEK>-<ad>-<ayırt edici alanlar>
+ayırt edici : MOTOR · kW · RPM · DEBİ · HAVA DEBİSİ · HIZ ANAHTARI
+              tablonun KENDİ başlığından okunur, sabit liste varsayılmaz
+⛔AĞIRLIK ayırt edici DEĞİLDİR — `weight_kg` olarak taşınır, kimliğe girmez
+```
+
+**Niçin ad tek başına yetmiyor:** s.42'de `STORM 10` **dört ayrı ürün, dört ayrı fiyat**
+(628/655/628/640); ayıran şey motor gerilimi, güç ve devir.
+
+**Niçin AĞIRLIK dışlandı — "en küçük küme" ölçütü yanlış cevap verir:** ağırlık s.42'de
+13/13, s.43'te 14/14 tekil, yani matematiksel olarak *tek başına yeterli*. Ama ölçüm
+değeridir: bir sonraki baskıda `2.70` → `2.75` olursa **ürün kimliğini kaybeder.**
+⭐**Tekillik gereklidir, yeterli değildir; alanın ANLAMI da ölçüte girer.**
+
+**Ölçüm (34 kodsuz ürün):** 34 tekil SKU · çakışma **0** · ayırt edici yalnız 24 üründe
+gerekti. `VRT-CA-IL-4020-ES-RECT` biçimi korunur.
+**Ayırt ediciliğin sınırı:** s.43'te `MOTOR+RPM` yetmiyor (14'ten 12 tekil); `MOTOR+kW`
+yetiyor — üçlü keyfî değil, en dar güvenli küme.
+
+**Yükleyici tarafı — ölçüldü, sessiz kayıp YOK:** `kademe2-load/load.mjs:187` aynı SKU'yu
+görünce hata yazar, `:274` yüklemenin tamamını iptal eder (fail-closed). Yani ayırt edici
+alanlar taşınmadan **AVenS partisinin hiçbir satırı inmez** — bu kural yüklemenin
+**ön koşuludur**, iyileştirme değil.
+
+Ölçüm belgesi: `docs/audits/rec146-kodsuz-urun-cikarim-yolu-2026-09-09.md`
+Kapı: `<ingestor>/scripts/kaynak_dizini/csv_kaynak_kapisi.py` **EKSEN 4** + sabotaj sınavı.
 
 ## 11.5 MODEL KATMANI — seri / model / varyant (T138-VH, Recep onayi 2026-08-21)
 
