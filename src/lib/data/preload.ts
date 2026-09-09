@@ -66,7 +66,21 @@ export function preloadFamily(slug: string, lang: string) {
   void getCachedFamilyDetail(slug, lang)
 }
 
-const CATEGORY_COLUMNS = 'id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content'
+/**
+ * VİTRİN kategori kolonları — `marketing_title` KASITEN YOK (REC-297).
+ *
+ * NİÇİN: alan EMEKLİ (Recep kararı 2026-09-09). Emekli olmak "artık okunmuyor" demekti;
+ * ama kolon `select`'te kaldığı sürece satır RSC yüküne biniyor ve HER ZİYARETÇİYE
+ * gönderiliyordu. Canlı ölçüm (2026-09-09, `/tr/category/fanlar`): kolon HTML'de **11 kez**
+ * taşınıyor, görünen yüzeyde **0 kez**. Yani ölü veri, ücreti ödenen bir yük.
+ *
+ * ⚠BURASI YALNIZ VİTRİN. Admin yüzeyleri (`CategoriesTableBody`, `CategoryBuilderView`,
+ * `ProductFormModal`) kolonu okumaya DEVAM EDER — orası veriyi YÖNETİM için okur ve emekli
+ * alan DB'de duruyor (kolon silinmedi, 12 satırdaki metin yerinde).
+ *
+ * Bekçi: INV-MARKETING-YUK-1.
+ */
+const CATEGORY_COLUMNS = 'id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, menu_label, metadata, translation_key, authority_content'
 
 // PostgREST `.or()` filtreleri virgül/parantez ile ayrıştırılır; sadece güvenli
 // slug karakterlerine izin ver, aksi halde yalnız kanonik eşleşmeye düş.
@@ -178,7 +192,6 @@ export const getCachedCategoryData = cache(async (slug: string) => {
     ...data,
     name: data.name || '',
     menu_label: data.menu_label as string | null,
-    marketing_title: data.marketing_title as string | null,
     translation_key: data.translation_key as string | null,
     description: data.description as string | null,
     metadata: data.metadata as CategoryMetadata | null,
