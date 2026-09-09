@@ -154,7 +154,23 @@ export const getCachedCategoryData = cache(async (slug: string) => {
         .limit(3)
     : await query.eq('slug', slug).limit(1)
 
-  if (error || !rows || rows.length === 0) return null
+  // ⭐"YOK" İLE "ÖLÇEMEDİM" AYNI DEĞER OLAMAZ (2026-09-08, REC-205 soft-404 işi).
+  //
+  // Eskiden bu satır `if (error || !rows || rows.length === 0) return null` idi: sorgu HATASI ile
+  // "böyle bir kategori yok" ayrımsız biçimde `null` dönüyordu. Çağıran taraf o `null`'a bakıp
+  // 404 üretirse, GEÇİCİ bir DB arızası KALICI bir 404'e dönüşür — üstelik rota artık statik
+  // olduğu için o 404 CDN'e yazılır ve gerçek kategori sayfası ortadan kalkar.
+  //
+  // Doğru davranış: ölçemediğimizde SUSMAK değil, PATLAMAK. `throw` Next tarafında 5xx'e döner
+  // ve önbelleğe alınmaz; arıza geçince sayfa kendiliğinden geri gelir. Yokluk ise `null`
+  // olarak kalır ve çağıran onu `notFound()`'a çevirir.
+  if (error) {
+    throw new Error(
+      `getCachedCategoryData: kategori sorgusu DÜŞTÜ (slug=${slug}) — bu bir YOKLUK DEĞİL, ` +
+        `ölçüm başarısızlığıdır; 404'e çevrilmemeli. Sebep: ${error.message}`,
+    )
+  }
+  if (!rows || rows.length === 0) return null
   const data = kategoriSatiriSec(rows, slug)
   if (!data) return null
 

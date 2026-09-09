@@ -1,5 +1,5 @@
 import { unstable_cache } from 'next/cache'
-import { permanentRedirect } from 'next/navigation'
+import { notFound,permanentRedirect } from 'next/navigation'
 import React, { cache } from 'react'
 
 import { en } from '@/i18n/dictionaries/en'
@@ -169,9 +169,26 @@ export default async function Page({
   preloadCategory(categorySlug)
   const category = await getCachedCategoryData(categorySlug)
 
+  // ⭐OLMAYAN KATEGORİ GERÇEK 404 DÖNER (2026-09-08, REC-205 kardeşi — canlı ölçüm).
+  //
+  // Eskiden `category` null iken sayfa kendi "Kategori Bulunamadı" görünümünü çiziyor ve
+  // HTTP **200** dönüyordu. Canlıda ölçüldü: uydurma bir slug (`boyle-bir-kategori-yok-12345`)
+  // 200 + `noindex` YOK ile yanıtlanıyordu — klasik soft-404. Google böyle sayfaları tarar ve
+  // "Kopya / standart sayfa yok" kutusuna yazar; REC-205'te şikâyet edilen kutu tam budur.
+  //
+  // Rota statiğe geçince kusurun ÖMRÜ uzadı: üretilen "bulunamadı" sayfası artık CDN'de
+  // saklanıyor (ölçümde `X-Vercel-Cache: HIT`). Kusur yeni değil, kalıcı hâle geldi.
+  //
+  // `notFound()` güvenli, çünkü yokluk ile ölçüm hatası ARTIK AYRI: `getCachedCategoryData`
+  // sorgu düştüğünde `throw` eder (5xx, önbelleğe girmez), yalnız gerçekten satır yoksa null
+  // döner. Bu ayrım olmadan geçici bir DB arızası kalıcı 404 üretirdi.
+  if (!category) {
+    notFound()
+  }
+
   // Gelen slug aktif dilin görünen slug'ı değilse (ör. kanonik EN slug /tr/ altında,
   // ya da eski TR kanonik slug) doğru dil URL'ine 308 ile kalıcı yönlendir.
-  if (category) {
+  {
     const expectedSlug = getLocalizedCategorySlug(category, lang)
     if (expectedSlug && expectedSlug !== categorySlug) {
       permanentRedirect(`/${lang}/category/${expectedSlug}`)
