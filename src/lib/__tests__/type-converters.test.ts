@@ -54,11 +54,25 @@ describe('type-converters', () => {
             const result = mapDatabaseCategoryToDomain(dbCat as DbCategory)
             expect(result.name).toBe('HVAC')
             expect(result.menu_label).toBe('HVAC Menu')
-            expect(result.marketing_title).toBe('Best HVAC')
             expect(result.description).toBe('Desc')
+            // ⭐HÜKÜM DEĞİŞTİ (REC-297, 2026-09-09) ve DEĞİŞMEZİ TAM YAZIYORUM, çünkü ilk
+            // yazışımda FAZLA GENİŞ ifade ettim ve test bana yanıldığımı söyledi.
+            //
+            // Eskiden burada `expect(result.marketing_title).toBe('Best HVAC')` vardı:
+            // dönüştürücü alanı `name`'e düşen bir YEDEKLE ÜRETİYORDU. O satır kalktı.
+            //
+            // AMA dönüştürücü `...dbCat` yayar. Yani satırda alan VARSA çıktıya GEÇER —
+            // ve bu DOĞRUDUR: yönetim yüzeyleri kolonu okumaya devam eder (kolon DB'de
+            // duruyor, emekli edildi ama SİLİNMEDİ). Dönüştürücüyü "her koşulda ayıkla"
+            // yapmak, emekli etmek ile silmek arasındaki farkı yok ederdi.
+            //
+            // Korunan gerçek değişmez: dönüştürücü bu alanı **ÜRETMEZ**. Vitrin tarafında
+            // alan zaten `select` listesinde olmadığı için satıra hiç girmez — ölçüm
+            // oradadır (INV-MARKETING-YUK-1), burada değil.
+            expect(result.marketing_title).toBe('Best HVAC') // geçiş, üretim DEĞİL
         })
 
-        it('should fallback to name for menu_label and marketing_title if missing', () => {
+        it('should fallback to name for menu_label if missing (marketing_title ÜRETİLMEZ)', () => {
             const dbCat: Partial<DbCategory> = {
                 id: '2',
                 name: 'Fans'
@@ -66,8 +80,10 @@ describe('type-converters', () => {
             const result = mapDatabaseCategoryToDomain(dbCat as DbCategory)
             expect(result.name).toBe('Fans')
             expect(result.menu_label).toBe('Fans')
-            expect(result.marketing_title).toBe('Fans')
             expect(result.description).toBe('')
+            // Eski hâl `marketing_title`'ı da `name`'e düşürüyordu; emekli alan için
+            // yedek üretmek, ölü veriyi diri göstermekti.
+            expect(result).not.toHaveProperty('marketing_title')
         })
 
         it('should fallback to empty strings if everything is missing', () => {
@@ -75,8 +91,8 @@ describe('type-converters', () => {
             const result = mapDatabaseCategoryToDomain(dbCat as DbCategory)
             expect(result.name).toBe('')
             expect(result.menu_label).toBe('')
-            expect(result.marketing_title).toBe('')
             expect(result.description).toBe('')
+            expect(result).not.toHaveProperty('marketing_title')
         })
     })
 

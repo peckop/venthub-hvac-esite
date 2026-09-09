@@ -229,7 +229,9 @@ export default async function Page({
     const [{ data: subsData }, { data: countsData }] = await Promise.all([
       supabase
         .from('categories')
-        .select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content')
+        // `marketing_title` KASITEN YOK — emekli alan (REC-297); gerekçe `preload.ts`
+        // CATEGORY_COLUMNS başlığında. Bekçi: INV-MARKETING-YUK-1.
+        .select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, menu_label, metadata, translation_key, authority_content')
         .eq('parent_id', category.id)
         .eq('is_active', true)
         .order('sort_order', { ascending: true }),
@@ -250,7 +252,6 @@ export default async function Page({
         ...s,
         name: s.name || '',
         menu_label: s.menu_label as string | null,
-        marketing_title: s.marketing_title as string | null,
         translation_key: s.translation_key as string | null,
         description: s.description as string | null,
         metadata: s.metadata as CategoryMetadata | null,
