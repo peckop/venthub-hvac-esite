@@ -4,14 +4,59 @@
 **Yöntem:** `scripts/icerik-hatti/kaynak-eslemesi.mjs` — tek koşum, 2129 kaynak sayfası,
 **PDF açılmadı** (K15). Canlı DB'ye yazım yok, salt okuma.
 
-## Sonuç
+## Sonuç (OPS teşhis emri 12:25Z sonrası — sınıflar AYRIŞTIRILDI)
 
-| durum | satır | oran |
-|---|---|---|
-| VAR | 2205 | 42.7% |
-| DEGER YOK | 2403 | 46.5% |
-| URUN KAYNAKTA YOK | 261 | 5.1% |
-| CELISIYOR | 299 | 5.8% |
+| durum | satır | oran | ne demek |
+|---|---|---|---|
+| VAR | 2192 | 42.4% | değer, ürün kodunun 80 karakter yakınında |
+| TUREV | 655 | 12.7% | **kaynakta ARANMAZ** — türetilmiş değer |
+| DEGER YOK | 1800 | 34.8% | ürünün sayfası var, değer yok |
+| KOD YOK | 75 | 1.5% | ürünün model kodu yok → **arama YAPILAMADI** |
+| URUN KAYNAKTA YOK | 147 | 2.8% | kod var, hiçbir kaynakta geçmiyor |
+| CELISIYOR | 299 | 5.8% | → `celiski-listesi.csv` (sınıflı) |
+
+**ARANABİLİR EVREN 4438** (5168 − türev 655 − kodsuz 75) → bu evrende **VAR %49.4**.
+
+### İlk tablo YANLIŞ İŞ DOĞURACAKTI — iki sınıf ayrıştırıldı
+
+**1. TÜREV (655).** İlk teşhiste "DEGER YOK" kovasının tepesinde `erp_compliant: true` (174),
+`pq_curve: [[0,353],…]` (132), `max_delivery_ls: 27.78` (156) çıktı. Bunların **hiçbiri
+katalogda yazmaz**: biri boolean bir hüküm, biri eğrinin sayısallaştırılmışı, biri m³/h
+değerinden **bölünerek** üretilmiş. Ölçüt uydurulmadı, **ölçüldü**: birim türevi kardeş
+alanla bölme sınanarak doğrulanıyor (`max_delivery_m3h ÷ 3.6`, %1 tolerans).
+Bunlara "kaynakta bulunamadı" demek **olmayan bir iş** doğururdu.
+
+**2. KOD YOK (75) ≠ URUN KAYNAKTA YOK (147).** İlk koşumda 261 satır tek kovadaydı; teşhis
+gösterdi ki bu **13 ürün**tü ve ikiye ayrılıyordu:
+- **5 ürün** (`VRT-CA-IL-*-ES-RECT`) → bu sabah **uydurma kimliği silinen** ürünler; kodları
+  NULL olduğu için **arama hiç yapılamadı**. Bulunamamak değil, aranamamak.
+- **8 ürün** (`VRT-16257…16281`) → kodu var, kaynakta **gerçekten yok**.
+"Aranamadı" ile "arandı, bulunamadı" aynı kovaya konursa ilki de kusur sayılır.
+
+### Çelişki sınıfları (299) — makine, gözle değil
+
+| sınıf | satır |
+|---|---|
+| olcek (10 katı) | 125 |
+| ayni alanda cok deger | 101 |
+| birim (m3/h ↔ l/s) | 63 |
+| yuvarlama | 10 |
+| **gercek celiski** | **0** |
+
+⚠**Bu sınıflandırma CÖMERTTİR, kesin hüküm değil.** Ürün kodunun yakınında onlarca sayı
+bulunduğu için neredeyse her satır bir sınıfa oturuyor; "gerçek çelişki 0" sonucunu
+*"çelişki yok"* diye okumak yanlış olur. Kesin hüküm **etiket↔değer eşlemesi** ister —
+o da etiket sözlüğünün genişletilmesine bağlı. Şimdilik sınıf bir **ön elemedir**:
+birim ve ölçek sınıfları toplu kuralla çözülebilir, diğerleri tek tek bakılır.
+
+### İlk koşumun (ayrıştırma öncesi) rakamları
+
+| durum | satır |
+|---|---|
+| VAR | 2205 |
+| DEGER YOK | 2403 |
+| URUN KAYNAKTA YOK | 261 |
+| CELISIYOR | 299 |
 
 Çelişki yalnız **etiket sözlüğü olan 10 alanda** ölçülebildi. **1669 satırda çelişki
 ÖLÇÜLMEDİ** ve bu ayrı yazıldı — ölçülmeyeni "çelişki yok" saymak, olmayan bir güvence

@@ -177,18 +177,62 @@ const alinti = (govde, iz) => {
   if (i < 0) return ''
   return govde.slice(Math.max(0, i - 80), i + 120).replace(/\s+/g, ' ').trim().slice(0, 200)
 }
+// ── ⭐TÜREV DEĞER KAYNAKTA ARANMAZ (OPS teşhis emri 12:25Z sonrası, ölçüldü)
+// İlk teşhiste "DEGER YOK" kovasının tepesinde `erp_compliant: true` (174),
+// `pq_curve: [[0,353],…]` (132) ve `max_delivery_ls: 27.78` (156) çıktı. Bunların hiçbiri
+// katalogda YAZMAZ: biri boolean bir hüküm, biri çizilmiş eğrinin sayısallaştırılmışı,
+// biri m³/h değerinden BÖLÜNEREK üretilmiş. "Kaynakta bulunamadı" demek onları kusur
+// gibi gösterir ve OLMAYAN bir iş doğurur — oysa doğru cevap "orada aranmaz"dır.
+// Ölçüt uydurulmaz, ÖLÇÜLÜR: birim türevi, kardeş alanla bölme sınanarak doğrulanır.
+const TUREV_BOLME = { max_delivery_ls: ['max_delivery_m3h', 3.6] }
+const turevMi = (t, ayniUrununAlanlari) => {
+  const d = String(t.deger || '').trim()
+  if (d === 'true' || d === 'false') return 'boolean hüküm — metinde geçmez'
+  if (d.startsWith('[') || d.startsWith('{')) return 'yapılandırılmış değer (eğri/dizi)'
+  const kural = TUREV_BOLME[t.alan]
+  if (kural) {
+    const kaynakDeger = Number(String(ayniUrununAlanlari.get(kural[0]) || '').replace(',', '.'))
+    const bu = Number(d.replace(',', '.'))
+    if (Number.isFinite(kaynakDeger) && Number.isFinite(bu) && bu > 0
+        && Math.abs(kaynakDeger / kural[1] - bu) / bu < 0.01) {
+      return `${kural[0]} ÷ ${kural[1]} — birim türevi (ölçüldü)`
+    }
+  }
+  return null
+}
+
 const esle = (girdi) => {
+// Ürün başına alan tablosu: türev sınaması kardeş alanı okumak zorunda.
+const urunAlan = new Map()
+for (const t of girdi) {
+  if (!urunAlan.has(t.sku)) urunAlan.set(t.sku, new Map())
+  urunAlan.get(t.sku).set(t.alan, t.deger)
+}
 const sonuc = []
-const sayim = { VAR: 0, 'DEGER YOK': 0, 'URUN KAYNAKTA YOK': 0, CELISIYOR: 0 }
+const sayim = { VAR: 0, TUREV: 0, 'DEGER YOK': 0, 'KOD YOK': 0, 'URUN KAYNAKTA YOK': 0, CELISIYOR: 0 }
 let celiskiOlculmedi = 0
 const celiskiListesi = []
 
 for (const t of girdi) {
   const adaylar = urunSayfa.get(t.sku) || []
   const deger = String(t.deger || '').trim()
+
+  // Türev önce sınanır: kaynakta ARANMAYAN değeri "bulunamadı" saymak yanlış iş doğurur.
+  const turev = turevMi(t, urunAlan.get(t.sku) || new Map())
+  if (turev) {
+    sayim.TUREV++
+    sonuc.push({ ...t, durum: 'TUREV', kaynak_dosya: '', kaynak_sayfa: '', alinti: turev })
+    continue
+  }
   if (!adaylar.length) {
-    sayim['URUN KAYNAKTA YOK']++
-    sonuc.push({ ...t, durum: 'URUN KAYNAKTA YOK', kaynak_dosya: '', kaynak_sayfa: '', alinti: '' })
+    // İKİ AYRI SEBEP, İKİ AYRI KOVA: kodu OLMAYAN ürün ile kodu OLUP kaynakta bulunmayan
+    // ürün aynı şey değildir. Birincisi arama hiç YAPILAMADI demek (bu sabah 5 üründe
+    // uydurma kimlik silindi, kod NULL oldu); ikincisi arandı ve BULUNAMADI demek.
+    const kodsuz = !kod.get(t.sku)
+    const d = kodsuz ? 'KOD YOK' : 'URUN KAYNAKTA YOK'
+    sayim[d]++
+    sonuc.push({ ...t, durum: d, kaynak_dosya: '', kaynak_sayfa: '',
+      alinti: kodsuz ? 'ürünün model kodu yok — arama YAPILAMADI' : '' })
     continue
   }
   const sayisal = /^-?\d[\d.,]*$/.test(deger)
@@ -218,11 +262,35 @@ for (const t of girdi) {
   if (etiketler && sayisal) {
     const etiketli = adaylar.find(p => etiketler.some(e => p.kucuk.includes(e)))
     if (etiketli) {
+      // ── ÇELİŞKİ SINIFLANDIRMASI (makine, gözle değil — OPS emri 12:25Z)
+      // Ürün kodunun yakınındaki sayılar toplanır ve paket değeriyle ORANLANIR. Her sınıf
+      // FARKLI bir işe götürür: birim düzeltmesi toplu kuralla çözülür, gerçek çelişki
+      // tek tek bakılır. Karıştırılırsa 299 satırın hepsi "elle incele" olur.
+      const yakinSayilar = []
+      for (const p of adaylar) {
+        for (const m of p.govde.matchAll(/\d[\d.,]*/g)) {
+          if (Math.min(...p.kodYerleri.map(k => Math.abs(k - m.index))) <= YAKINLIK) {
+            const n = Number(String(m[0]).replace(/\.(?=\d{3}\b)/g, '').replace(',', '.'))
+            if (Number.isFinite(n) && n > 0) yakinSayilar.push(n)
+          }
+        }
+      }
+      const bu = Number(deger.replace(',', '.'))
+      let sinif = 'gercek celiski'
+      if (Number.isFinite(bu) && bu > 0 && yakinSayilar.length) {
+        const oran = yakinSayilar.map(n => n / bu)
+        if (oran.some(o => Math.abs(o - 3.6) / 3.6 < 0.02 || Math.abs(o - 1 / 3.6) * 3.6 < 0.02))
+          sinif = 'birim (m3/h ↔ l/s)'
+        else if (oran.some(o => Math.abs(o - 1) < 0.02)) sinif = 'yuvarlama'
+        else if (oran.some(o => [10, 100, 1000, 0.1, 0.01, 0.001].some(k => Math.abs(o - k) / k < 0.02)))
+          sinif = 'olcek (10 kati)'
+        else if (yakinSayilar.filter(n => n !== bu).length > 3) sinif = 'ayni alanda cok deger'
+      }
       sayim.CELISIYOR++
       celiskiListesi.push({ sku: t.sku, urun: t.urun, alan: t.alan, paket_degeri: deger,
-        kaynak_dosya: etiketli.dosya, kaynak_sayfa: etiketli.sayfa })
+        sinif, kaynak_dosya: etiketli.dosya, kaynak_sayfa: etiketli.sayfa })
       sonuc.push({ ...t, durum: 'CELISIYOR', kaynak_dosya: etiketli.dosya,
-        kaynak_sayfa: etiketli.sayfa, alinti: '' })
+        kaynak_sayfa: etiketli.sayfa, alinti: `çelişki sınıfı: ${sinif}` })
       continue
     }
   }
@@ -263,6 +331,47 @@ console.log(`  (çelişki ÖLÇÜLMEDİ: ${celiskiOlculmedi} satır — alanın 
 console.log(`\nTESADÜF TABANI (sahte değerlerle aynı koşum): VAR ${taban}`)
 console.log(`  → "VAR" satırlarının ~%${(taban / sayim.VAR * 100).toFixed(1)}'i tesadüf olabilir.`)
 console.log(`  → GERÇEK KANIT payı: %${netOran} · ${sayim.VAR - taban} satır`)
+// ── ARANABİLİR EVREN: türev değer ve kodsuz ürün kaynakta ARANMAZ. Oranı ham 5168
+// üzerinden vermek yöntemi olduğundan kötü gösterir — evren düzeltmesi bu hattın
+// tekrar eden dersi (§6.6 ve "ölçüt keskin ama evren yanlış").
+const aranabilir = teknik.length - sayim.TUREV - sayim['KOD YOK']
+console.log(`\nARANABİLİR EVREN: ${aranabilir} (${teknik.length} − türev ${sayim.TUREV} − kodsuz ${sayim['KOD YOK']})`)
+console.log(`  → bu evrende VAR oranı: %${(sayim.VAR / aranabilir * 100).toFixed(1)}`)
+
+// \u2500\u2500 TE\u015eH\u0130S (--teshis): say\u0131lar ne DEMEK \u2014 OPS emri 12:25Z
+// Toplam rakam "ne kadar" der, "ni\u00e7in" demez. D\u00f6rt kova ayr\u0131 ayr\u0131 a\u00e7\u0131l\u0131r; her biri
+// farkl\u0131 bir i\u015fe g\u00f6t\u00fcr\u00fcr ve kar\u0131\u015ft\u0131r\u0131l\u0131rsa yanl\u0131\u015f i\u015fi do\u011fururlar.
+if (process.argv.includes('--teshis')) {
+  const say = (liste, anahtar) => {
+    const m = new Map()
+    for (const r of liste) m.set(anahtar(r), (m.get(anahtar(r)) || 0) + 1)
+    return [...m.entries()].sort((a, b) => b[1] - a[1])
+  }
+  const marka = (sku) => String(sku).split('-')[0]
+
+  const yokDeger = sonuc.filter(r => r.durum === 'DEGER YOK')
+  const yokUrun = sonuc.filter(r => r.durum === 'URUN KAYNAKTA YOK')
+
+  console.log('\n\u2550\u2550\u2550 TE\u015eH\u0130S \u2550\u2550\u2550')
+  console.log(`\n\u25b8 DEGER YOK (${yokDeger.length}) \u2014 ilk 10 alan:`)
+  for (const [a, n] of say(yokDeger, r => r.alan).slice(0, 10)) console.log(`    ${String(n).padStart(4)}  ${a}`)
+  console.log(`  marka da\u011f\u0131l\u0131m\u0131:`)
+  for (const [m, n] of say(yokDeger, r => marka(r.sku))) console.log(`    ${String(n).padStart(4)}  ${m}`)
+
+  console.log(`\n\u25b8 URUN KAYNAKTA YOK (${yokUrun.length}) \u2014 ka\u00e7 AYRI \u00fcr\u00fcn:`)
+  const urunKume = new Map()
+  for (const r of yokUrun) urunKume.set(r.sku, (urunKume.get(r.sku) || 0) + 1)
+  console.log(`    ${urunKume.size} \u00fcr\u00fcn \u00b7 ${yokUrun.length} de\u011fer`)
+  console.log('  \u00fcr\u00fcn ba\u015f\u0131na (kod ile):')
+  for (const [sku, n] of [...urunKume].sort((a, b) => b[1] - a[1])) {
+    console.log(`    ${String(n).padStart(3)} de\u011fer \u00b7 ${sku} \u00b7 kod="${kod.get(sku) || '(YOK)'}"`)
+  }
+
+  console.log(`\n\u25b8 CELISIYOR (${celiskiListesi.length}) \u2014 SINIF da\u011f\u0131l\u0131m\u0131 (her s\u0131n\u0131f ayr\u0131 i\u015fe g\u00f6t\u00fcr\u00fcr):`)
+  for (const [a, n] of say(celiskiListesi, r => r.sinif)) console.log(`    ${String(n).padStart(4)}  ${a}`)
+  console.log('  alan da\u011f\u0131l\u0131m\u0131:')
+  for (const [a, n] of say(celiskiListesi, r => r.alan)) console.log(`    ${String(n).padStart(4)}  ${a}`)
+}
 
 if (YAZ) {
   const BOM = '\ufeff'
@@ -274,7 +383,7 @@ if (YAZ) {
   const BAS = ['sku', 'urun', 'alan', 'deger', 'durum', 'kaynak_dosya', 'kaynak_sayfa', 'alinti']
   writeFileSync(join(HEDEF, 'teknik-ozellikler.csv'),
     BOM + [BAS.join(';'), ...sonuc.map(r => BAS.map(b => hucre(r[b])).join(';'))].join('\r\n') + '\r\n', 'utf8')
-  const CB = ['sku', 'urun', 'alan', 'paket_degeri', 'kaynak_dosya', 'kaynak_sayfa']
+  const CB = ['sku', 'urun', 'alan', 'paket_degeri', 'sinif', 'kaynak_dosya', 'kaynak_sayfa']
   writeFileSync(join(HEDEF, 'celiski-listesi.csv'),
     BOM + [CB.join(';'), ...celiskiListesi.map(r => CB.map(b => hucre(r[b])).join(';'))].join('\r\n') + '\r\n', 'utf8')
   // MANIFEST bölümü — ÜRETİLİR, idempotent (aynı koşum dosyayı büyütmez).
