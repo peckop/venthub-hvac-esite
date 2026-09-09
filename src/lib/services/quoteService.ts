@@ -112,6 +112,58 @@ export async function createQuoteRequest(
   return quote
 }
 
+export interface CreateGuestQuoteRequestInput {
+  contact: QuoteContactInput
+  source: QuoteSource
+  items: QuoteRequestItemInput[]
+  /** KVKK aydınlatma metninin okunduğu beyanı — `false` ise uç 422 döner. */
+  kvkkOnay: boolean
+  /** Honeypot: gerçek kullanıcı bu alanı görmez ve doldurmaz. */
+  website?: string
+}
+
+/**
+ * ÜYELİKSİZ teklif talebi (REC-117, Recep kararı 2026-09-01).
+ *
+ * ⭐NİÇİN DOĞRUDAN `insert` DEĞİL: misafirin PostgREST üzerinden teklif tablolarına yazması
+ * için `anon` rolüne INSERT politikası + kolon GRANT'i gerekirdi; bu, tabloları internetteki
+ * herkese açar ve hız limiti / honeypot / aydınlatma onayı gibi DAVRANIŞLAR RLS'te güvenilir
+ * biçimde ifade edilemez. Bunun yerine yazımı `quote-request-guest` Edge Function'ı yapar
+ * (service_role) ve teklif tablolarının RLS yüzeyi HİÇ genişlemez — prod'da dokuz politikanın
+ * dokuzu da `{authenticated}` kalır (2026-09-08 ölçümü). Migration da yazılmadı.
+ *
+ * DI kuralı korunur: client yine ilk parametredir ve çağrı onun üzerinden gider.
+ */
+export async function createGuestQuoteRequest(
+  supabase: SupabaseClient<Database>,
+  input: CreateGuestQuoteRequestInput,
+): Promise<{ quoteId: string }> {
+  if (input.items.length === 0) {
+    throw new Error('quote request needs at least one item')
+  }
+
+  const { data, error } = await supabase.functions.invoke<{ ok?: boolean; quoteId?: string; error?: string }>(
+    'quote-request-guest',
+    {
+      body: {
+        contact: input.contact,
+        source: input.source,
+        items: input.items,
+        kvkkOnay: input.kvkkOnay,
+        website: input.website ?? '',
+      },
+    },
+  )
+
+  if (error) throw error
+  // Uç, doğrulama reddini gövdede taşır (422/409). Sessizce başarı saymak, kullanıcıya
+  // gitmemiş bir talebi gitmiş göstermek olurdu.
+  if (!data?.ok || !data.quoteId) {
+    throw new Error(data?.error || 'guest_quote_failed')
+  }
+  return { quoteId: data.quoteId }
+}
+
 /** Oturum sahibinin teklifleri, kalemleriyle — en yeni önce. RLS zaten sahiplik süzer. */
 export async function listMyQuotes(
   supabase: SupabaseClient<Database>,

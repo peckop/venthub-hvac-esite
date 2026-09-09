@@ -31,10 +31,8 @@ import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/Vari
 import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
 import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../../config/features'
 import { useCategories } from '../../contexts/CategoryContext'
-import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
 import { useFavorites } from '../../hooks/useFavorites'
-import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -138,8 +136,6 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const { t, lang } = useI18n()
   const router = useRouter()
   const pathname = usePathname()
-  const { user } = useAuth()
-  const LocalizedRoutes = useLocalizedRoutes()
   const { addToCart } = useCart()
   const { isFavorite, toggleFavorite } = useFavorites()
   const { refreshProjects } = useProjectLists()
@@ -314,16 +310,15 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 
   const handleAddToCart = () => { if (actionProduct) addToCart(actionProduct, quantity) }
 
-  // T067 (cetvel Q4): teklif LOGIN'lidir — oturum yoksa dönüş-yollu login'e yönlendir
-  // (LoginPage ?redirect='i okur, T056 sözleşmesi); varsa gerçek teklif modalı açılır.
-  const openQuoteRequest = () => {
-    if (!user) {
-      toast.error(t('quotes.request.loginRequired'))
-      router.push(LocalizedRoutes.auth.login(pathname ?? undefined))
-      return
-    }
-    setQuoteOpen(true)
-  }
+  // ⭐LOGIN KAPISI KALDIRILDI (REC-117, Recep kararı 2026-09-01). Teklif TALEBİ artık
+  // üyelik istemez: hesap opsiyonel, kimlik zorunlu — ad/e-posta/telefon modalda toplanır
+  // ve DB'de zaten NOT NULL. Oturumlu akış değişmedi (alanlar oturumdan dolar).
+  //
+  // NOT: bu, `QuoteRequestButton`'daki kapının İKİNCİ nüshasıydı; aynı hüküm iki yerde
+  // ayrı ayrı yazılıydı ve biri düzeltilip diğeri unutulabilirdi. Nitekim sözlükten
+  // `loginRequired` silindiğinde bu satırı yakalayan şey INV-5 (i18n key-resolution)
+  // kapısı oldu — yani ham-key kapısı, i18n kusuru değil bir DAVRANIŞ kalıntısı buldu.
+  const openQuoteRequest = () => setQuoteOpen(true)
 
   const handleDownloadPdf = async () => {
     if (!actionProduct || isGeneratingPdf) return

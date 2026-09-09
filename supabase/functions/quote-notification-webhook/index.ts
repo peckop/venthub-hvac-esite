@@ -104,7 +104,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: quote, error: quoteErr } = await supabase
       .from('venthub_quotes')
-      .select('id, user_id, status, created_at, request_email_sent_at')
+      .select('id, user_id, status, created_at, request_email_sent_at, contact_email')
       .eq('id', quoteId)
       .maybeSingle()
     // Okuma düştüyse 503: "bakamadım" ile "yok" AYNI cevaba düşmemeli (pg_net tekrar dener).
@@ -119,10 +119,20 @@ Deno.serve(async (req: Request) => {
       return json({ ok: true, skipped: 'already_sent', quote_id: quote.id }, 200)
     }
 
-    const { data: userInfo, error: userErr } = await supabase.auth.admin.getUserById(quote.user_id)
-    if (userErr) return json({ error: 'user_lookup_failed' }, 503)
-    const to = userInfo?.user?.email
-    if (!to) return json({ error: 'user_has_no_email' }, 422)
+    // ⭐ALICI = `contact_email`, TEK DAL (REC-117, 2026-09-08 red-team bulgusu).
+    //
+    // Eskiden burada `supabase.auth.admin.getUserById(quote.user_id)` vardı ve alıcı
+    // AUTH KAYDINDAN okunuyordu. Misafir teklifinde `user_id` NULL'dır — o çağrı 503
+    // `user_lookup_failed` döndürürdü ve E-POSTA HİÇ GİTMEZDİ. Dahası bu uç
+    // `quote_email_events` defterine YAZMIYOR, `pg_net` de ateşle-unut çalışıyor: arıza
+    // hiçbir yerde satır bırakmazdı. Yani Recep'in kararının ikinci yarısı — "belirli
+    // bilgiler olmadan teklif ve BİLGİLENDİRME yürümez" — sessizce karşılanmamış olurdu.
+    //
+    // Tek dal iki sebeple doğru: (1) `contact_email` her teklifte NOT NULL (prod ölçümü,
+    // 2026-09-08), yani daima bir değer bulunur; (2) teklif yanıtının gitmesi gereken adres,
+    // kullanıcının FORMDA yazdığı adrestir — üyeli akışta da o alan formdan doldurulur.
+    const to = (quote.contact_email || '').trim()
+    if (!to) return json({ error: 'quote_has_no_contact_email' }, 422)
 
     const { data: items } = await supabase
       .from('venthub_quote_items')
