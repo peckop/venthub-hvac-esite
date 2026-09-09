@@ -227,6 +227,37 @@ ve kategori kolonlarını çekmiyordu, dolayısıyla kilit iki kapsam için sess
 kurduktan sonra **kusuru birebir geri koyup** kırmızı gördüğünü kanıtla; "eski testle yeşil,
 yeni testle kırmızı" farkı, kapının gerçekten yeni bir şey ölçtüğünün tek kanıtıdır.
 
+### 3.2 ⛔DIFF-REVIEW SONUCU İKİ SATIRDIR — eksen hükmü YALNIZ BAŞINA "GEÇ" DEĞİLDİR (2026-09-09, OPS hükmü)
+
+Bir şeridin başka şeridin PR'ına verdiği diff-review sonucu **iki satır** olmak zorundadır:
+
+1. **EKSEN HÜKMÜ** — `GEÇ` / `DÜZELT`, incelenen eksende (güvenlik · veri bütünlüğü · kapı
+   tasarımı · ne istendiyse).
+2. **PAKET SATIRI** — tam konformans paketi koşuldu mu, **sayıyla**: `Test Files N/N`,
+   `Tests N/N`.
+
+⛔**Sayı yoksa `GEÇ` YAZILAMAZ.** Yazılırsa o sonuç bir eksen görüşüdür, kapı hükmü değildir
+ve öyle adlandırılmalıdır.
+
+**NİÇİN — ölçülmüş vaka, 2026-09-09 (ALTYAPI'nın kendi hatası):**
+ALTYAPI, #1143'e güvenlik ekseninde `GEÇ` verdi. Hüküm o eksende doğruydu ve doğru kaldı
+(beş zorunlu güvenlik kalemi gerçekten kapanmıştı). Ama **paket koşulmadı** ve PR merge
+kuyruğunda `i18n-dead-key` kapısında **CI KIRMIZI** düştü. Yazan şerit de aynı boşluktaydı:
+43/43 **el seçimi** alt küme koşmuştu.
+
+⭐**Sınıf, bir gün önce yazılmış olanın aynısı ve bu kez İNCELEYEN tarafta tekrarlandı:**
+2026-09-08'de ALTYAPI, sınıf/ad değişikliğinde doğru evrenin grep çıktısı değil **paketin
+kendisi** olduğunu yazdı (kendi CI kırmızısından). Ertesi gün aynı şerit, incelemede el
+seçimine güvendi. Ders: **"el seçimi yetmez" kuralı yazana da bağlıdır** ve yalnız kod
+yazarken değil **inceleme yaparken de** geçerlidir.
+
+**Bedeli somut:** paket koşulmuş olsaydı kırmızı bir turda görülür, yazan şerit tek düzeltmeyle
+kapatırdı. Koşulmadığı için PR merge kuyruğuna girdi, orada düştü ve bir tur kaybedildi.
+
+⚠**Bu kural inceleyenin işini iki katına çıkarmaz:** paket zaten koşulabilir bir komuttur ve
+maliyeti dakikalarla ölçülür; kaybedilen tur ise saatlerle. Sayı yazmak, koşmadığını
+gizlememenin de tek yoludur — "baktım, iyi görünüyor" bir ölçüm değildir.
+
 ---
 
 ## 4. Standart-Önce (No-Standard-No-Code)
