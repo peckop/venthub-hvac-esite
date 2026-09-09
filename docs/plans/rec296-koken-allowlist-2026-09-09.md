@@ -110,7 +110,11 @@ Migration DEĞİL, yani kural 13 kapısına girmez; ama "yalnız kod" da değil.
 
 ## 6. CETVEL YAZIMI (bu işin parçası)
 
-`edge-function-security-standard.md` §3.6 — *"Köken allowlist'i JOKER SON EK içermez"*:
+`edge-function-security-standard.md` **§3.13** — *"Köken allowlist'i JOKER SON EK içermez"*:
+
+⚠**NUMARA DÜZELTİLDİ:** bu planın ilk hâli (ve OPS emri) "§3.6" diyordu; **§3.6 ZATEN DOLU**
+(`service_role` kuralı). Ölçmeden yazsaydım cetvelde iki tane §3.6 olurdu. Yeni madde §3.13.
+
 kural + niçin (`.vercel.app` paylaşılan son ektir) + ölçüm tablosu + kapı adı.
 
 ---

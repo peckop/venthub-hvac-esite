@@ -37,6 +37,22 @@ function kaynakOku(yol: string): string {
   return metin
 }
 
+/**
+ * Yorumları söker — kural KODU yönetir, prozayı değil.
+ *
+ * ⚠BU KOL KENDİ YAZARINI YAKALADI: `cors.ts`'in doküman yorumunda "ÖNCESİ:
+ * endsWith('.vercel.app')" cümlesi geçiyor ve ilk hâlinde bu kol KIRMIZI verdi —
+ * dedektör prozayı kod saydı. Aynı sınıf bugün bir kez daha görüldü (`protect-config`
+ * kancası bir yorumun içindeki deseni ihlal saymıştı). Ders: bir deseni yasaklayan
+ * kapı, ÖNCE yorumu ayırmak zorundadır; yoksa kuralın NİÇİN'ini yazmak ihlal olur.
+ */
+function yorumlariSok(kaynak: string): string {
+  // ⛔`(?<!:)` ZORUNLU — yoksa `https://` icindeki // yorum sanilir ve URL tasiyan
+  // satirin GERI KALANI silinir; o satirdaki gercek bir ihlal SESSIZCE kaybolur.
+  // Bu satiri ilk hâlinde onsuz yazdim ve INV-SCRUB-1 kapisi yakaladi (kendi kapim).
+  return kaynak.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(?<!:)\/\/[^\n]*/g, ' ')
+}
+
 /** Kalıbı GERÇEK kaynaktan çıkarır — testin kendi kopyasını sınamasını engeller. */
 function kalibiCikar(kaynak: string): RegExp {
   const esleme = kaynak.match(/ONIZLEME_KALIBI\s*=\s*(\/.+\/)\s*;?/)
@@ -50,8 +66,35 @@ function kalibiCikar(kaynak: string): RegExp {
 describe('INV-KOKEN-ALLOWLIST-1 — Edge CORS allowlist genisligi', () => {
   const kaynak = kaynakOku(CORS_YOLU)
 
-  it('joker son ek dali KALDIRILMIS olmali', () => {
-    expect(kaynak).not.toMatch(/endsWith\(\s*['"]\.vercel\.app['"]\s*\)/)
+  const kod = yorumlariSok(kaynak)
+
+  it('joker son ek dali KODDA kalmamis olmali', () => {
+    expect(kod).not.toMatch(/endsWith\(\s*['"]\.vercel\.app['"]\s*\)/)
+  })
+
+  it('joker taramasi KOD ile PROZAYI ayirt etmeli (dedektor sagligi)', () => {
+    // Yorumda gecen desen ihlal DEGILDIR — kuralin nicin'i yazilabilsin.
+    const fikstur = `/* ONCESI: origin.endsWith('.vercel.app') idi */\nconst x = 1`
+    expect(yorumlariSok(fikstur)).not.toMatch(/endsWith\(/)
+    // Ama KODDA gecerse YAKALANIR — sokum, kapiyi kor yapmiyor.
+    const ihlal = `const isVercel = origin.endsWith('.vercel.app')`
+    expect(yorumlariSok(ihlal)).toMatch(/endsWith\(\s*['"]\.vercel\.app['"]\s*\)/)
+  })
+
+  /**
+   * ALT SINIR (INV-SCRUB-1'in istedigi kanit): siyirici SEMAYI yemiyor.
+   * Yalnizca "siyirdi mi" degil, o satirdan HEDEFIN GERCEKTEN toplandigi da olculur —
+   * cunku semayi yiyen bir siyirici testi hep yesil yapar, yani KOR eder.
+   */
+  it('siyirici URL semasini YEMEZ ve o satirdaki ihlali YINE bulur', () => {
+    const satir = `const x = 'https://venthub-hvac-esite.vercel.app'; const y = origin.endsWith('.vercel.app')`
+    const temiz = yorumlariSok(satir)
+    expect(temiz).toContain('https://venthub-hvac-esite.vercel.app')
+    expect(temiz).toMatch(/endsWith\(\s*['"]\.vercel\.app['"]\s*\)/)
+  })
+
+  it('gercek dosyada kanonik URL satirlari siyirmadan SAG CIKAR', () => {
+    expect(kod).toContain('https://venthub.com.tr')
   })
 
   it('kalip kaynaktan cikarilabilir olmali (dedektor sagligi)', () => {
@@ -103,9 +146,16 @@ describe('INV-KOKEN-ALLOWLIST-1 — Edge CORS allowlist genisligi', () => {
     expect(kaynak).toMatch(/startsWith\(\s*['"]http:\/\/localhost:['"]\s*\)/)
   })
 
-  it('cetvel §3.6 yazilmis ve kola ADIYLA atif yapiyor olmali', () => {
+  /**
+   * ⚠NUMARA DUZELTILDI: plan ve OPS emri "§3.6" diyordu, ama §3.6 ZATEN DOLU
+   * (`service_role` kurali). Yeni madde §3.13 olarak yazildi — olcmeden yazsaydim
+   * cetvelde iki tane §3.6 olurdu. Kol da bu yuzden §3.13'u ariyor.
+   */
+  it('cetvel §3.13 yazilmis ve kola ADIYLA atif yapiyor olmali', () => {
     const cetvel = kaynakOku(CETVEL_YOLU)
-    expect(cetvel).toContain('3.6')
+    expect(cetvel).toContain('### 3.13')
     expect(cetvel).toContain('INV-KOKEN-ALLOWLIST-1')
+    // Dedektor sagligi: numara CAKISMASI olmasin — §3.13 basligi TEK olmali.
+    expect(cetvel.match(/^### 3\.13 /gm)?.length).toBe(1)
   })
 })

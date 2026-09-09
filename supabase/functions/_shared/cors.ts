@@ -22,7 +22,7 @@ const KANONIK_ORIGINLER = [
 
 /**
  * ⭐JOKER SON EK KALDIRILDI (REC-296, 2026-09-09) — cetvel:
- * `docs/standards/edge-function-security-standard.md` §3.6.
+ * `docs/standards/edge-function-security-standard.md` §3.13.
  *
  * ÖNCESİ: `origin.endsWith('.vercel.app')`. `.vercel.app` **paylaşılan** bir son ektir —
  * oraya herkes deploy edebilir. Yani allowlist "bizim önizlemelerimiz" değil,
