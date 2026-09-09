@@ -533,6 +533,39 @@ Recep'in gözle kontrolü **paket CSV'leri üzerinde** yapılır, **tek geçişt
 
 ---
 
+## 6.6 BAĞ KURMA — tekillik gereklidir ama YETERLİ DEĞİLDİR (2026-09-09, OPS kabulü)
+
+Belge ↔ aile, kod ↔ ürün, değer ↔ kaynak: bu hattın işi büyük ölçüde **bağ kurmaktır.**
+Bağların çoğu bir **simge eşleşmesiyle** kurulur (dizin adı, dosya adı, kod parçası).
+Kural üç maddedir ve üçü de sahada ödenmiştir.
+
+**1. Simgenin TEKİL olması bağın DOĞRU olduğunu göstermez — alanın ANLAMI da ölçüte girer.**
+`belgeler.csv` koşumunda `jet` simgesi tüm ailelerde tekildi; buna rağmen Vortice'in
+*"vort jet fan system"* broşürü SEAT'in **JET ailesine** bağlandı. İki ayrı ürün dünyası,
+aynı kelime. Kapı **anlam ekseninden** geldi: belgenin markası ile ailenin markası
+ayrışıyorsa bağ **kurulmaz**. Ölçüt keskin olabilir ve yine de yanlış EVRENDE ölçüyor olabilir.
+
+**2. Karşılaştırılan alanın kendisi de ölçülür, varsayılmaz.**
+Aynı kapıyı kurarken ailenin markasını `brand_id`'den okumak yetmedi: **kolon çoğu üründe
+BOŞTU** (JET serisinin 21 ürününün hepsinde), marka serbest metin `brand` kolonunda
+duruyordu. Tek kaynağa güvenen kapı **sessizce kör** olurdu — hiçbir bağı reddetmez,
+yeşil görünürdü. *Kolonun dolu olduğu varsayılmaz, sayılır.*
+
+**3. Genel kelime simge değildir.**
+`atex` · `evo` · `range` · `serisi` gibi son ekler tesadüfen eşleşip **dört yanlış bağ**
+üretti (`vort-e-atex` → `vorticent-cms-atex`, `radon-range` → `deumido-range`).
+Simge kademesi **kısa ayırt edici koda** (≤5 karakter, genel-kelime listesi dışı) sınırlanır.
+
+### Bağ bir KANIT MI, NOT MU — kolonda yazar
+
+Dizin adından ya da dosya adından türetilen bağ bir **tahmindir**. Tabloda kalır ama
+**hangi kademeden geldiği kolonda adıyla yazılır** (`eslesme_kaynagi`). Hiçbir kademe
+tutmazsa satır **yine yazılır**, hedef hücre **boş kalır**: belgeyi tablodan düşürmek onu
+görünmez yapardı, kanıtsız bağ kurmak ise yalan olurdu. Bu, `url_kaynagi` kuralının
+(`web_kaynagi_ekle.py`, §6.3) aynı kalıbıdır — hat boyunca **tek kalıp**.
+
+---
+
 ## 7. Provenance / ilişki
 
 Kaynak: çapraz-sorgu (`cross_notebook_query` Vortice-Full + Avensair, 2026-06-19) → Avensair'in 27 gerçek bölümü atıfla.
