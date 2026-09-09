@@ -130,7 +130,7 @@ describe('buildProductGroupJsonLd', () => {
   // kusuru sabitlemişti. `mpn` ÜRETİCİ kodudur; iç SKU'yu oraya yazmak arama motoruna
   // yanlış beyandır ve productHelpers'ın hükmü ("sku'ya düşmek YASAK") bunu zaten
   // yasaklıyordu. Test artık yasağı ölçüyor: kod yoksa alan HİÇ YAZILMAZ.
-  it('mpn yalnız model_code ile yazılır; kod yoksa alan hiç eklenmez (sku YEDEK DEĞİL)', () => {
+  it('mpn yalnız model_code ile yazılır; kod yoksa alan hiç eklenmez ve sku HİÇ yazılmaz', () => {
     const withModelCode = buildProductGroupJsonLd({
       family: makeFamily(),
       variants: [makeVariant({ sku: 'SKU-A', model_code: 'MC-100' })],
@@ -152,8 +152,14 @@ describe('buildProductGroupJsonLd', () => {
     // Alan YOK — `undefined` yeterli değil, anahtarın kendisi bulunmamalı ki
     // serialize edilen JSON-LD'de boş bir mpn görünmesin.
     expect(v2).not.toHaveProperty('mpn')
-    // `sku` yayınlanmaya devam eder: o SATICININ kendi kodudur, yanlış beyan değildir.
-    expect(v2.sku).toBe('SKU-B')
+    // ⭐HÜKÜM DEĞİŞTİ (REC-146, 2026-09-09) — burada eskiden şu yazıyordu:
+    // *"`sku` yayınlanmaya devam eder: o SATICININ kendi kodudur, yanlış beyan değildir."*
+    // Öncül çürüdü: beş üründe `sku` UYDURMA (VRT-16076..16080), yani tam olarak yanlış
+    // beyandır. Recep sözü *"kodu boşalt"*. Artık kod yayınlama yolu TEK: `mpn` (model_code),
+    // o da yoksa hiçbiri. `sku` hiçbir müşteri/arama motoru yüzeyine yazılmaz.
+    // Yapısal bekçi: INV-SKU-GORUNMEZ-1 (`bos-sku-render.test.ts`).
+    expect(v1).not.toHaveProperty('sku')
+    expect(v2).not.toHaveProperty('sku')
   })
 
   it('görseli olan varyanta image alanı ekler, olmayana eklemez', () => {

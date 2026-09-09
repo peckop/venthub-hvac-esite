@@ -125,3 +125,6 @@ scripts/hijyen/silme-ilani.json
 
 # Supabase CLI onbellegi/gecici durum (INV-ARAC-ONBELLEGI-1): link/surum bilgisini her komutta yeniden yazar, CI okumaz
 supabase/.temp/
+
+# /qa skill geçici ekran görüntüleri (kanıt olarak gerekenler docs/audits/qa-ekran/ altına kopyalanır)
+qa-raporlari/
