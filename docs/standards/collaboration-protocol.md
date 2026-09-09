@@ -258,6 +258,40 @@ kapatırdı. Koşulmadığı için PR merge kuyruğuna girdi, orada düştü ve 
 maliyeti dakikalarla ölçülür; kaybedilen tur ise saatlerle. Sayı yazmak, koşmadığını
 gizlememenin de tek yoludur — "baktım, iyi görünüyor" bir ölçüm değildir.
 
+### 3.3 ⛔BAŞKASINI DÜZELTİRKEN ÖLÇÜMÜN DAMGASI DA SÖYLENİR (2026-09-09, OPS hükmü)
+
+Bir şeridin başka bir şeridin (veya OPS'un) bulgusunu **düzelttiği** her not, düzeltmenin
+dayandığı ölçümün **damgasını** taşımak zorundadır:
+
+- **hangi koşum / hangi kayıt** (run kimliği, commit, dosya + satır — ne ölçüldüyse onun kimliği),
+- **hangi UTC an** (`date -u`, hatırlanan saat değil).
+
+⛔**Damgasız bir düzeltme, düzeltme sayılmaz** ve emre çevrilmez. Çünkü düzeltmenin kendisi
+bayat olabilir ve bayat bir düzeltme, düzelttiğini sandığı hatadan **daha pahalıdır**: yayılır.
+
+**NİÇİN — ölçülmüş vaka, 2026-09-09 (ALTYAPI'nın kendi hatası):**
+ALTYAPI, "master'daki `catalog-integrity` kırmızısı TLS değil, gerçek veri ihlali" diyerek
+OPS'u düzeltti. OPS bunu KATALOG'a **iş emri** olarak geçirdi. KATALOG adım adım ölçtü ve
+**tersini** buldu.
+
+Adım kırılımı, iki koşumda:
+
+| koşum | UTC | `Catalog integrity gate` | `Aile-kategori` adımı |
+|---|---|---|---|
+| 34319782643 | 06:35:45Z | **failure** (exit 1, veri ihlali) | **skipped** |
+| 34325812774 | 07:49:16Z | **success** | **failure** (exit 2, TLS) |
+
+İkisi de doğruydu. Veri ihlali 06:35'te vardı, 07:49'da yoktu (arada onu kapatan PR indi).
+ALTYAPI'nın ölçümü **yanlış değil, BAYATTI** — ve damgası söylenmediği için bayatlığı
+görünmedi. Bedeli: KATALOG artık var olmayan bir ihlali aradı.
+
+⭐**AYNI VAKADAN İKİNCİ KURAL — "İŞ KIRMIZI" BİR ÖLÇÜT DEĞİLDİR:**
+Bir işte birden çok kapı adımı varsa, `set -Eeuo pipefail` ile **ilk düşen adım işi keser ve
+sonrakiler `skipped` olur** — yani ilk arıza ikinciyi **gizler**. Yukarıdaki tabloda 06:35
+koşumunda TLS arızası hiç görünmedi, çünkü o adım hiç koşmadı.
+Dolayısıyla kırmızı bildirilirken sıra şudur: **önce HANGİ ADIM, sonra sahip.** İş düzeyi
+çıkış koduna bakıp adım düzeyini atlamak, gizlenmiş ikinci arızayı da atlamaktır.
+
 ---
 
 ## 4. Standart-Önce (No-Standard-No-Code)
