@@ -17,9 +17,10 @@
  * fail-open'lı fikstürlerin KIRMIZI verdiğini de gösterir. Bir kapının yeşil verdiği tek
  * hâlde de yeşil vermesi, kapı olduğunu kanıtlamaz.
  */
-import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
+
+import { describe, expect,it } from 'vitest'
 
 const KOK = path.resolve(__dirname, '../../..')
 const KAPI = path.join(KOK, 'scripts/db/checks/denetim-izi-tetik-kapisi.mjs')
@@ -293,5 +294,91 @@ describe('INV-DENETIM-IZI-1 · kapi MANTIGI fiksturle sinaniyor (ayirt edici cif
     }
     const { denetimTetikSayisi } = degerlendir([...TAM, PRODUCTS_UPD, webhook])
     expect(denetimTetikSayisi).toBe(7)
+  })
+})
+
+/**
+ * ⭐KOPYA SÜRÜKLENMESİNİ ENGELLEYEN KOL — 2026-09-09'da ölçülmüş kusurdan doğdu.
+ *
+ * `sslmode` sökümü DÖRT kapı betiğinde ayrı ayrı kopyalanmıştı; kopyalanmayan İKİ betik
+ * (`aile-kategori-tutarlilik` ve `denetim-izi-tetik-kapisi`) CI'da `self-signed certificate
+ * in certificate chain` ile exit 2 verdi ve master'da da kırmızı kaldı. Kusur bilgi
+ * eksikliği DEĞİL, **kopya sürüklenmesiydi**: çözüm her dosyaya elle taşındığı için yeni
+ * betik onu almadan doğuyor.
+ *
+ * Bu kol, YEDİNCİ betiğin aynı boşlukla doğmasını engeller. Paylaşılan yardımcıya çıkarma
+ * ayrı kalem — dört çalışan kapıyı bu PR'da elden geçirmek riski hak etmiyordu; ama o
+ * yapılana kadar boşluk ÖLÇÜLÜ kalır.
+ */
+describe('INV-DENETIM-IZI-1 · kapi betikleri sslmode SOKMEK ZORUNDA (kopya suruklenmesi kolu)', () => {
+  const CHECKS_DIZIN = path.join(KOK, 'scripts/db/checks')
+
+  it('pg Client kuran HER kapi betigi baglanti dizesinden sslmode sokuyor', () => {
+    const dosyalar = fs.readdirSync(CHECKS_DIZIN).filter((f) => f.endsWith('.mjs'))
+    // DEDEKTÖR SAĞLIĞI: tarama boşalırsa kol "ihlal yok" der ve kör koşar.
+    expect(dosyalar.length, 'kapi betigi taramasi bosaldi — dizin tasinmis olabilir').toBeGreaterThan(3)
+
+    const eksik: string[] = []
+    for (const d of dosyalar) {
+      const kaynak = fs.readFileSync(path.join(CHECKS_DIZIN, d), 'utf8')
+      // Evren: pg istemcisi KURAN betikler. Kurmayanlarda kural anlamsizdir.
+      if (!/new\s+(pg\.)?Client\s*\(/.test(kaynak)) continue
+      if (!/sslmode=/.test(kaynak)) eksik.push(d)
+    }
+
+    expect(
+      eksik,
+      `Bu betikler pg Client kuruyor ama sslmode SOKMUYOR: ${eksik.join(', ')}. ` +
+        'Baglanti dizesindeki sslmode, node-postgres te bizim ssl nesnemizin YERINE gecer ve ' +
+        'kok sertifika SESSIZCE devre disi kalir; kapi CI da self-signed hatasiyla exit 2 verir. ' +
+        'Olculdu 2026-09-09: tam bu boslukta iki kapi dustu.',
+    ).toEqual([])
+  })
+
+  it('ayiklayici gercekten calisiyor: sslmode sokmeyen uydurma kaynak YAKALANIR', () => {
+    // Kolun kendi korlugunu olcer: desen bozulursa sessizce yesile donmesin.
+    const uydurmaKaynak = 'const c = new pg.Client({ connectionString, ssl })'
+    expect(/new\s+(pg\.)?Client\s*\(/.test(uydurmaKaynak)).toBe(true)
+    expect(/sslmode=/.test(uydurmaKaynak)).toBe(false)
+  })
+})
+
+/**
+ * ⭐TAVUK-YUMURTA KOLU — kapi kendi migration'ini bekleyen PR'i BLOKLAMAMALI (OPS hukmu).
+ *
+ * PR kipinde tetikler prod'da henuz YOKTUR (migration merge edilmeden uygulanmaz, kural 13).
+ * Kapi orada kirmizi verirse hicbir migration'li PR kendi kapisindan gecemez. Ayrim SEMADAN
+ * yapilamaz ("bekleyen migration" ile "tetik sokuldu" ayni semayi uretir) — kosum
+ * BAGLAMINDAN yapilir. Bu kol o ayrimin GERCEKTEN kurulu oldugunu olcer.
+ */
+describe('INV-DENETIM-IZI-1 · bekleyen migration PR de SARI, master ta KIRMIZI', () => {
+  it('kapi kip ayrimini tasiyor ve SARI yalniz TETIK-YOK sinifina veriliyor', () => {
+    const kaynak = oku(KAPI)
+    expect(kaynak).toMatch(/GITHUB_EVENT_NAME/)
+    expect(kaynak).toMatch(/pull_request/)
+    // SARI kosulu UC sarta bagli olmali: kip pr + migration dosyasi var + hepsi TETIK-YOK.
+    expect(kaynak).toMatch(/kip === 'pr'\s*&&\s*migrationVar\s*&&\s*tumuTetikYok/)
+  })
+
+  it('⭐FAIL-OPEN ve SUZGEC sinifları PR kipinde de SARI OLMAZ (gevsetme yok)', () => {
+    const kaynak = oku(KAPI)
+    // `tumuTetikYok` sarti tam bunu saglar: bir tek FAIL-OPEN varsa SARI yolu kapanir.
+    expect(kaynak).toMatch(/every\(\(i\) => i\.sinif === 'TETIK-YOK'\)/)
+    expect(kaynak).toMatch(/SARI YALNIZ `TETIK-YOK` SINIFINA/)
+  })
+
+  it('migration dosyasi YOKKEN PR kipi bile SARI vermez (eksik migration ile bekleyen ayri)', () => {
+    const kaynak = oku(KAPI)
+    // ⚠Metin IKI console.log satirina bolunmus; tek satirlik desen onu goremez.
+    // (Ilk yazista tam bu yuzden yanlis kirmizi verdi — evren satir degil DOSYA.)
+    expect(kaynak).toMatch(/EKSIK migration/)
+    expect(kaynak).toMatch(/!migrationVar/)
+  })
+
+  it('master kipinin tam sertlikte durdugu YAZILI (gevsetme degil yer degistirme)', () => {
+    const kaynak = oku(KAPI)
+    // ⚠Turkce karakter: kaynak "sertliğiyle" yaziyor, ASCII "sertligiyle" DEGIL.
+    // Bugun ucuncu kez ayni tuzak; desen iki yazimi da kabul ediyor.
+    expect(kaynak).toMatch(/master ko[şs]umunda tam sertli[ğg]iyle durur/i)
   })
 })

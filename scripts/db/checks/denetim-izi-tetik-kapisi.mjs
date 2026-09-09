@@ -39,10 +39,42 @@
 import pg from 'pg'
 import fs from 'node:fs'
 import path from 'node:path'
+import tls from 'node:tls'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const CA_PATH = path.join(__dirname, 'supabase-root-2021-ca.pem')
+
+const KOK = path.resolve(__dirname, '../../..')
+const MIGRATION_DIZIN = path.join(KOK, 'supabase/migrations')
+
+/**
+ * Koşum kipi: `pr` (bekleyen migration SARI sayılır) · `master` (tam sertlik).
+ * Elle verilirse o kazanır — kapının kendisi fikstürle sınanabilsin.
+ */
+function kipSec(argv) {
+  const i = argv.indexOf('--kip')
+  if (i === -1) return null
+  const v = argv[i + 1]
+  if (v !== 'pr' && v !== 'master') {
+    console.error('[denetim-izi] --kip yalniz pr ya da master olabilir — olcemedim (fail-closed).')
+    process.exit(2)
+  }
+  return v
+}
+
+/**
+ * Depoda tetikleri kuran migration dosyası var mı?
+ * ⚠Bu, "migration UYGULANDI" demek DEĞİLDİR — yalnız "kurulum kaydı depoda var" demektir.
+ * Ayrım şemadan yapılamaz; kip ile yapılır (SARI hükmü, aşağıda).
+ */
+function migrationDosyasiVarMi() {
+  try {
+    return fs.readdirSync(MIGRATION_DIZIN).some((f) => /denetim_izi/.test(f) && f.endsWith('.sql'))
+  } catch {
+    return false
+  }
+}
 
 /** Denetim izi ZORUNLU olan tablolar (REC-292 kapsamı, ölçümle 6). */
 const KAPSAM = [
@@ -73,11 +105,51 @@ const SORGU = `
   order by c.relname, t.tgname
 `
 
+/**
+ * ⛔TLS AYARI — ve niçin `sslmode` bağlantı dizesinden SÖKÜLÜYOR (ölçülmüş kusur, 2026-09-09).
+ *
+ * İlk yazışta kök sertifikayı dosyadan okuyup `ssl: { ca }` veriyordum ve CI'da kapı
+ * `self-signed certificate in certificate chain` ile **exit 2** verdi. Teşhisi ölçtüm:
+ *
+ *   · Sunucunun sunduğu zincir: `*.pooler.supabase.com` ← `Supabase Intermediate 2021 CA`
+ *     ← `Supabase Root 2021 CA`. Depodaki PEM **tam o kök** ve `openssl -CAfile` ile
+ *     doğrulama **0 (ok)** veriyor. Yani kök ne bayat ne yanlış; ara sertifika da eksik değil.
+ *   · Node ile üç kipte el sıkışma denedim: `ca:[sistem+kök]` GEÇTİ · `ca:[kök]` GEÇTİ ·
+ *     `ca` HİÇ VERİLMEDİĞİNDE **birebir CI hatası** çıktı.
+ *   · Sebep: bağlantı dizesindeki `sslmode`, node-postgres'in yeni sürümünde bizim `ssl`
+ *     nesnemizin **yerine geçiyor** ve kök sertifika sessizce devre dışı kalıyor. CI günlüğü
+ *     bunu zaten söylüyordu: "If you want the current behavior, explicitly use
+ *     'sslmode=verify-full'".
+ *
+ * ⭐**ASIL BULGU — bilgi depoda VARDI, en yeni iki betiğe GEÇMEMİŞTİ.** `sslmode` sökümü
+ * `rls-role-coverage` · `catalog-integrity` · `anon-yazma-nobetcisi` · `rls-politika-sarma`
+ * içinde AYRI AYRI kopyalanmış; sökmeyen iki betik (`aile-kategori-tutarlilik` ve bu dosya)
+ * tam olarak CI'da düşen ikisiydi. Yani kusur bir bilgi eksikliği değil, **kopya sürüklenmesi**:
+ * çözüm her betiğe elle kopyalandığı için yeni betik onu almadan doğuyor. Bunun tekrarını
+ * `INV-DENETIM-IZI-1` kilidindeki bir kol engelliyor (paylaşılan yardımcıya çıkarma işi ayrı
+ * kalem — dört çalışan kapıyı bu PR'da elden geçirmek riski hak etmiyordu).
+ */
+function tlsAyari() {
+  const caYol = process.env.PGSSLROOTCERT || (fs.existsSync(CA_PATH) ? CA_PATH : '')
+  if (!caYol) return { rejectUnauthorized: true }
+  const pem = fs.readFileSync(caYol, 'utf8')
+  const blok = (pem.match(/-----BEGIN CERTIFICATE-----/g) ?? []).length
+  if (blok === 0) {
+    throw new Error(`PGSSLROOTCERT bir PEM sertifikasi degil (BEGIN CERTIFICATE blogu yok, ${pem.length} bayt).`)
+  }
+  console.log(`denetim-izi-tetik-kapisi: kok sertifika yuklendi (${blok} blok, ${pem.length} bayt)`)
+  // Sistem kökleri DE verilir: `ca` verildiğinde Node varsayılan depoyu devre dışı bırakır.
+  return { ca: [...tls.rootCertificates, pem], rejectUnauthorized: true }
+}
+
 async function semadanTopla(connectionString) {
-  const ssl = fs.existsSync(CA_PATH)
-    ? { ca: fs.readFileSync(CA_PATH, 'utf8') }
-    : undefined
-  const client = new pg.Client({ connectionString, ssl })
+  // `sslmode` SÖKÜLÜR (yukarıdaki gerekçe). Söküldüğünü ilan ediyoruz: sessiz bir düzeltme,
+  // bir sonraki kişinin aynı teşhisi baştan yapmasına yol açar.
+  const vardi = /[?&]sslmode=/.test(connectionString)
+  const temiz = connectionString.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '')
+  if (vardi) console.log('denetim-izi-tetik-kapisi: baglanti dizesindeki sslmode kaldirildi (TLS ayari KODDA belirlenir)')
+
+  const client = new pg.Client({ connectionString: temiz, ssl: tlsAyari() })
   await client.connect()
   try {
     const { rows } = await client.query(SORGU, [KAPSAM])
@@ -221,8 +293,47 @@ async function main() {
     process.exit(0)
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // ⭐BEKLEYEN MIGRATION = SARI, KIRMIZI DEĞİL (OPS hükmü, 2026-09-09)
+  //
+  // TAVUK-YUMURTA: bu kapı ile onu anlamlı kılan migration AYNI PR'da iner. PR kipinde
+  // tetikler prod'da HENÜZ YOKTUR — çünkü migration master'a merge edilene kadar
+  // uygulanmaz (kural 13). Kapı o hâlde kırmızı verirse **hiçbir migration'lı PR kendi
+  // kapısından geçemez** ve kapı, doğduğu PR'ı bloklar.
+  //
+  // AYIRT EDİCİ: "migration henüz uygulanmadı" ile "tetik SÖKÜLDÜ" aynı şemayı üretir —
+  // ikisi de "tetik yok"tur. Şemadan ayırt EDİLEMEZ. Ayrım koşum BAĞLAMINDAN gelir:
+  //   · `pull_request` → migration daha uygulanmamış olabilir → SARI (bekleyen migration)
+  //   · master'a `push` → migration UYGULANMIŞ olmalı → hâlâ yoksa KIRMIZI
+  // Bu, gevşetme DEĞİL yer değiştirmedir: kapı master koşumunda tam sertliğiyle durur.
+  //
+  // ⛔SARI YALNIZ `TETIK-YOK` SINIFINA VERİLİR. `FAIL-OPEN` ve `SUZGEC-*` ancak tetik
+  // VARKEN doğar; onlar bekleyen migration ile açıklanamaz ve PR kipinde de KIRMIZIDIR.
+  const kip =
+    kipSec(process.argv) ||
+    (process.env.GITHUB_EVENT_NAME === 'pull_request' ? 'pr' : 'master')
+  const migrationVar = migrationDosyasiVarMi()
+  const tumuTetikYok = ihlaller.every((i) => i.sinif === 'TETIK-YOK')
+
+  if (kip === 'pr' && migrationVar && tumuTetikYok) {
+    console.log('')
+    console.log('denetim-izi-tetik-kapisi: SARI — BEKLEYEN MIGRATION (kirmizi DEGIL, yesil de DEGIL)')
+    for (const i of ihlaller) console.log(`  [BEKLEYEN] ${i.tablo} — tetik prod'da yok`)
+    console.log('')
+    console.log('Depoda tetikleri kuran migration dosyasi VAR, prod\'da tetikler YOK. PR kipinde')
+    console.log('bu BEKLENEN haldir: migration master\'a merge edilmeden uygulanmaz (kural 13).')
+    console.log(`::warning title=Denetim izi: bekleyen migration::${ihlaller.length} tabloda tetik henuz YOK. ` +
+      'Bu PR kipinde SARI sayildi. ⛔MASTER kosumunda ayni hal KIRMIZI verir — merge sonrasi ' +
+      'ilk master kosumu kapinin gercekten olctugunun kanitidir.')
+    process.exit(0)
+  }
+
   console.log('')
   console.log('denetim-izi-tetik-kapisi: IHLAL VAR -> KIRMIZI')
+  if (kip === 'pr' && tumuTetikYok && !migrationVar) {
+    console.log('  ⚠PR kipindesin ama tetikleri kuran MIGRATION DOSYASI da YOK: bu bekleyen')
+    console.log('   migration degil, EKSIK migration. SARI verilmedi.')
+  }
   for (const i of ihlaller) {
     console.log(`  [${i.sinif}] ${i.tablo}`)
     console.log(`      ${i.aciklama}`)
