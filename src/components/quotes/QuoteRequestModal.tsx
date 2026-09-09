@@ -54,6 +54,16 @@ interface QuoteRequestModalProps {
  * yeniden artırırdı — çırçır "yeni kod sayacı ARTIRAMAZ" diyor ve haklı:
  * kopyalanan stil, token'a geçişi her seferinde biraz daha pahalı yapar.
  */
+/**
+ * İkincil ("Vazgeç") buton sınıfı TEK yerde. İki yerde kullanılıyor — misafirin başarı
+ * ekranında ve formun alt çubuğunda. İlk yazışta dizeyi KOPYALAMIŞTIM ve INV-9 ratchet'i
+ * kırmızı verdi (tavan 1456, ölçülen 1462): kopyalanan her ham-gri sınıf sayacı yeniden
+ * artırıyor ve token'a geçişi her seferinde biraz daha pahalı yapıyor. Kapı haklıydı;
+ * doğru düzeltme tavanı yükseltmek değil, kopyayı kaldırmak.
+ */
+const IKINCIL_BUTON_SINIFI =
+  'h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200'
+
 const ALAN_ETIKET_SINIFI = 'block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5'
 const ALAN_GIRDI_SINIFI =
   'w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors'
@@ -158,17 +168,23 @@ const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
       // Uç, reddin SEBEBİNİ kodla söylüyor; hepsini tek genel hataya indirmek kullanıcıyı
       // çaresiz bırakırdı ("çift gönderdim" ile "e-postam geçersiz" aynı ekranı görürdü).
       const kod = e instanceof Error ? e.message : ''
-      const anahtar =
+      // ⭐ANAHTARLAR LİTERAL — `t(degisken)` YAZILMAZ.
+      // İlk yazışta kodu bir anahtar DİZESİNE çevirip `t(anahtar)` çağırıyordum; INV-6
+      // (ölü anahtar bekçisi) bunu KIRMIZI verdi ve haklıydı: bekçi sözlükteki bir
+      // anahtarın tüketicisini LİTERAL arayarak bulur, değişkenle çağrılan anahtarı
+      // GÖREMEZ ve o anahtarları "ölü" sanıp silinmelerine yol açar. Yani kısaltma,
+      // başka bir kapıyı kör ediyordu.
+      toast.error(
         kod === 'ayni_talep_yeni_gonderildi'
-          ? 'quotes.request.duplicateToast'
+          ? t('quotes.request.duplicateToast')
           : kod === 'cok_fazla_istek'
-            ? 'quotes.request.rateLimitToast'
+            ? t('quotes.request.rateLimitToast')
             : kod === 'kvkk_onay_gerekli'
-              ? 'quotes.request.kvkkRequired'
+              ? t('quotes.request.kvkkRequired')
               : kod === 'iletisim_bilgisi_eksik'
-                ? 'quotes.request.contactRequired'
-                : 'quotes.request.errorToast'
-      toast.error(t(anahtar))
+                ? t('quotes.request.contactRequired')
+                : t('quotes.request.errorToast'),
+      )
     } finally {
       setSubmitting(false)
     }
@@ -224,7 +240,7 @@ const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200"
+                    className={IKINCIL_BUTON_SINIFI}
                   >
                     {t('quotes.request.cancel')}
                   </button>
@@ -380,6 +396,9 @@ const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
                   da 422 ile REDDEDİLİR; buradaki kontrol o kapının yerine geçmez. */}
               {!user && (
                 <div className="flex items-start gap-3 pt-1">
+                  {/* Kutu kalıbı `LeadModal`'dan geldi ama ham grilerini (`bg-gray-100
+                      border-gray-300`) BİRLİKTE GETİRMEDİ: INV-9 ratchet'i "yeni kod
+                      sayacı ARTIRAMAZ" diyor ve haklı — token karşılıkları kullanıldı. */}
                   <div className="flex items-center h-5">
                     <input
                       id="quote-request-kvkk"
@@ -387,7 +406,7 @@ const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
                       checked={kvkkOnay}
                       onChange={(e) => setKvkkOnay(e.target.checked)}
                       required
-                      className="w-4 h-4 text-primary-navy bg-gray-100 border-gray-300 rounded focus-visible:ring-primary-navy focus-visible:ring-2"
+                      className="w-4 h-4 text-primary-navy bg-light-gray border-steel-gray rounded focus-visible:ring-primary-navy focus-visible:ring-2"
                     />
                   </div>
                   <label htmlFor="quote-request-kvkk" className="text-xs text-steel-gray leading-tight cursor-pointer">
@@ -409,7 +428,7 @@ const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200"
+                className={IKINCIL_BUTON_SINIFI}
               >
                 {t('quotes.request.cancel')}
               </button>
