@@ -487,6 +487,52 @@ bağlar; **sayım ayrı bir ölçümdür ve bu belgeye sayı yazılmaz** (bayat 
 
 ---
 
+## 6.5 ⛔PDF BİR KEZ AÇILIR — patinaj kuralı (Recep kararı K15, 2026-09-09)
+
+**Karar aynen:** *"PDF çıkarımı BİR KEZ. Eşleştirme MAKİNE işi, bir kez koşulur, sonuç pakete,
+konu KAPANIR. Hiçbir iş PDF'i yeniden AÇMAZ."*
+
+### Niçin bu madde var — bedeli ölçüldü
+
+Bu kural bir tercih değil, **yaşanmış bir kaybın karşılığı.** Katalog hattı günlerce aynı
+kaynaktan yeniden çıkarım yapmaya hazırlandı; ölçüldüğünde **ürünlerin zaten DB'de olduğu**
+görüldü (s.42/43'ün 27 satırı `STORM Serisi` + `JET Serisi` altında, gerçek üretici
+kodlarıyla). Yani yeniden üretim **zaten girilmiş verinin kopyasını** üretecekti.
+
+Recep'in kendi teşhisi: *"saçma saçma patinaj çekiyoruz günlerdir"* ·
+*"aynı veriyi tekrar tekrar çıkartmaya mı bakıyorsun?"*
+
+⭐**Kök neden — YANLIŞ SORU:** hat *"CSV eksiksiz mi"* sorusunu çözüyordu, doğru soru
+**"hedefte ne eksik"**ti. İkisi aynı şey değil. Doğru soru **tek sorguyla** cevaplandı.
+
+### Kural — hangi soru nereye gider
+
+| soru | yer | PDF açılır mı |
+|---|---|---|
+| *"bu ürün hangi kaynakta geçiyor?"* | **defter** (§6.4) | ❌ |
+| *"kaynakta ne yazıyor?"* | **kaynak dizini satırı** (sayfa + alıntı) | ❌ |
+| *"bu değer doğru mu?"* | **paket CSV'si** — `kaynak_dosya`/`kaynak_sayfa`/`alinti` kolonları | ❌ |
+| *"dizinde hiç yok"* | **dizine EKLENİR** (`cikar.py`) — bir kez | ✅ tek sefer |
+
+⛔**Şüphe PDF açmak için gerekçe DEĞİLDİR.** Şüphe doğduğunda: deftere sor → dizinde doğrula.
+Dizin cevap veremiyorsa eksik olan **dizindir**, ve çözüm PDF'i açmak değil **dizini
+tamamlamaktır** — bir kez, kalıcı olarak.
+
+### Eşleştirme: bir kez koşar, sonuç PAKETE yazılır
+
+Kaynak eşlemesi (`kaynak_dosya` · `kaynak_sayfa` · `alinti`) **makine işidir**, bir kez koşar,
+sonucu pakete girer ve **konu kapanır**. Aynı eşleme ikinci kez koşulacaksa gerekçesi
+**kaynağın değişmesidir**, "emin olamadım" değil.
+*(Bkz. `work-doesnt-stale-by-time-only-by-change` — iş zamanla bayatlamaz, değişimle bayatlar.)*
+
+### Gözle kontrol: TEK GEÇİŞ, isteğe bağlı, PDF'siz
+
+Recep'in gözle kontrolü **paket CSV'leri üzerinde** yapılır, **tek geçiştir** ve
+**isteğe bağlıdır**. *"Gözle okuman lazım"* diye iş geri döndürülmez.
+Şüpheli değer **çelişki listesine** yazılır ve **tek kararla** çözülür — döngü açılmaz.
+
+---
+
 ## 7. Provenance / ilişki
 
 Kaynak: çapraz-sorgu (`cross_notebook_query` Vortice-Full + Avensair, 2026-06-19) → Avensair'in 27 gerçek bölümü atıfla.
