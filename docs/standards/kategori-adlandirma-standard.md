@@ -82,17 +82,31 @@ ama şekil aynı: bir alanın var olması, gösterildiğini kanıtlamaz.
 ama **sessiz bir yedek** olarak duruyor: sözlükten bir anahtar düşerse devreye girer ve
 Türkçe basar. Yani bugün ölü, arıza günü konuşan bir alan.
 
-## 4. AÇIK KARAR — Recep'te
+## 4. KARAR VERİLDİ — `marketing_title` EMEKLİ (Recep, 2026-09-09)
 
-`marketing_title` için iki yol var, ikisi de meşru; seçim **içerik kararıdır**, teknik değil:
+İki yol sunulmuştu: **(a)** kategori `h1`'ine bağlamak, **(b)** emekli etmek.
+**Seçilen: (b) — emekli.** Alan hiçbir yüzeye **bağlanmayacak.**
 
-- **(a) Bağla:** kategori sayfasının `h1`'i `marketing_title || displayName` olsun. 12
-  kategoride yazılmış başlık görünür hâle gelir; menü ve kırıntı menüsü kısa adı kullanmayı
-  sürdürür (uzun pazarlama başlığı menüde satır kırar).
-- **(b) Emekli et:** alan ve ölü çözücü kaldırılır, 12 satırdaki metin arşive alınır.
+**Emekliliğin sınırı, adıyla:**
 
-Karar verilene kadar **hiçbir yüzeye bağlanmaz** — yarısı bağlı bir alan, iki yüzeyde iki
-farklı ad demektir.
+- **Kolon SİLİNMEZ.** `categories.marketing_title` DB'de kalır ve 12 satırdaki metin durur.
+  Sebep: veri silmek geri dönüşsüzdür ve bu karar bir içerik kararıdır, bir temizlik değil;
+  yarın "aslında kullanalım" denirse metin yerinde olmalı.
+- **ÖLÜ ÇÖZÜCÜ KALDIRILIR.** `getCategoryMarketingTitle()` ve `useCategoryViewModel`'in
+  `marketingTitle` alanı silinir — ikisinin de tüketicisi yoktu (ölçüldü: ürün kodunda 0 çağıran).
+  Bir alanı "emekli" ilan edip çözücüsünü bırakmak, bir sonraki geliştiriciye "bu kullanılıyor
+  olmalı" dedirtir.
+- **SELECT listelerinden ÇIKARILMAZ.** Kolon hâlâ okunuyor ve tipte duruyor; çıkarmak
+  `DbCategory` sözleşmesini bozardı ve emekliliğin gereği değil.
+- **⭐KAPI: hiçbir RENDER yolu bu alanı okuyamaz.** `INV-KATEGORI-MARKETING-EMEKLI-1`
+  (`kategori-adi-marketing-emekli.test.ts`) bunu çiviler. Emeklilik bir niyet değil, ölçülen
+  bir hâl olmalı — aksi hâlde altı ay sonra biri `h1`'e bağlar ve karar sessizce çürür.
+
+**Niçin bu karar doğru (ve niçin kayda geçiyor):** alan 12 kategoride doluydu, yani birileri
+onu doldurmak için emek harcamıştı — ama hiçbir yüzeyde görünmüyordu. Bağlamak, bugün tek
+zincirden gelen kategori adını **iki başlı** hâle getirirdi (menüde kısa ad, sayfada uzun
+pazarlama başlığı) ve §2'nin kuralını zayıflatırdı. Emeklilik, ölü veriyi ölü ilan eder;
+yarı bağlı bir alan ise iki yüzeyde iki farklı ad demekti.
 
 ## 5. Değiştirme kuralı
 

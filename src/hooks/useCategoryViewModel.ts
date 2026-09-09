@@ -11,7 +11,8 @@ export interface CategoryViewModel {
   id: string
   slug: string
   displayName: string
-  marketingTitle: string
+  // `marketingTitle` KALDIRILDI — `marketing_title` emekli (Recep 2026-09-09,
+  // cetvel kategori-adlandirma-standard §4). Alanın 0 tüketicisi vardı.
   description: string
   imageUrl: string | null
   parentId: string | null
@@ -53,9 +54,6 @@ export function useCategoryViewModel() {
     // ve orbital karusel bu hook'tan besleniyor; yani kopya zincir müşteri yüzeyindeydi.
     const displayName = getCategoryDisplayName(localizedCategory as DbCategory, t)
 
-    // 2. Marketing Title Logic
-    const marketingTitle = localizedCategory.marketing_title || displayName
-
     // 3. DISPLAY MODE RESOLVER (TOTAL UNIFIED SHELL)
     // Priority: 1. DB Row (`display_mode`), 2. Metadata fallback (legacy), 3. Default ('series')
     const meta = (localizedCategory.metadata && typeof localizedCategory.metadata === 'object') ? (localizedCategory.metadata as Record<string, unknown>) : {}
@@ -75,7 +73,6 @@ export function useCategoryViewModel() {
       id: localizedCategory.id,
       slug: localizedCategory.slug,
       displayName,
-      marketingTitle,
       // ⭐REC-161: burası ham kolon okuyordu (`localizedCategory.description`) ve dile
       // KÖRDÜ. Emirde listelenmemişti; ölçtüm — CANLI kategori sayfasının GERÇEK yolu
       // burası: CategoryMasterView → CategoryShowcaseView → vm.description. (Emirde
