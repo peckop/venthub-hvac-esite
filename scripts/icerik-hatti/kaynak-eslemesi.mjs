@@ -382,7 +382,11 @@ for (const t of girdi) {
       if (bulunanlar.length && !bulunanlar.includes(deger.toUpperCase()) && farkli.length) {
         sayim.CELISIYOR++
         celiskiListesi.push({ sku: t.sku, urun: t.urun, alan: t.alan, paket_degeri: deger,
-          sinif: `metin: kaynakta ${farkli.join('/')}`, kaynak_dosya: p.dosya, kaynak_sayfa: p.sayfa })
+          sinif: `metin: kaynakta ${farkli.join('/')}`,
+          // Bu sınıf KESİNDİR (kod biçimli değer, tek sayfa, yanlış pozitif ölçüldü: 0) ve
+          // düzeltilirse VİTRİN DEĞİŞİR. O yüzden otomatik düzeltilmez, karar bekler.
+          karar: 'RECEP KAPISI — karar bekliyor',
+          kaynak_dosya: p.dosya, kaynak_sayfa: p.sayfa })
         sonuc.push({ ...t, durum: 'CELISIYOR', kaynak_tur: 'bicim deseni',
           kaynak_dosya: p.dosya, kaynak_sayfa: p.sayfa,
           alinti: `kaynakta ${farkli.join('/')}, pakette ${deger}` })
@@ -517,7 +521,7 @@ if (YAZ) {
   const BAS = ['sku', 'urun', 'alan', 'deger', 'durum', 'kaynak_tur', 'kaynak_dosya', 'kaynak_sayfa', 'alinti']
   writeFileSync(join(HEDEF, 'teknik-ozellikler.csv'),
     BOM + [BAS.join(';'), ...sonuc.map(r => BAS.map(b => hucre(r[b])).join(';'))].join('\r\n') + '\r\n', 'utf8')
-  const CB = ['sku', 'urun', 'alan', 'paket_degeri', 'sinif', 'kaynak_dosya', 'kaynak_sayfa']
+  const CB = ['sku', 'urun', 'alan', 'paket_degeri', 'sinif', 'karar', 'kaynak_dosya', 'kaynak_sayfa']
   writeFileSync(join(HEDEF, 'celiski-listesi.csv'),
     BOM + [CB.join(';'), ...celiskiListesi.map(r => CB.map(b => hucre(r[b])).join(';'))].join('\r\n') + '\r\n', 'utf8')
   // MANIFEST bölümü — ÜRETİLİR, idempotent (aynı koşum dosyayı büyütmez).
