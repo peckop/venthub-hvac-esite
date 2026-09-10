@@ -167,29 +167,60 @@ const sayfaSade = new Map(sayfalar.map(p => [p, sadeAd(p.govde)]))
 const adIleAra = (ad, marka) => {
   let parca = sadeAd(ad).split(' ').filter(Boolean)
   if (marka) { const m = sadeAd(marka); if (parca[0] === m) parca = parca.slice(1) }
-  for (let n = parca.length; n >= 3; n--) {
+  // Alt sınır 2: kaynak bazı ürünleri MODEL MODEL değil SERİ olarak anıyor — CA-RM belgesi
+  // "VORT CA RM ES · Diameters 100-125-150-160-200 mm" diyor, yani model adı ile ölçü AYRI
+  // yerlerde. Üç parça ("ca rm 100") hiçbir sayfada geçmiyor, iki parça ("ca rm") geçiyor.
+  // İki parçaya inmek yanlış eşleşme riskini artırır; bu yüzden o eşleşme AYRI işaretlenir
+  // (`aile duzeyi`) ve tesadüf tabanı her koşumda riski ÖLÇER — beyan değil, sayı.
+  for (let n = parca.length; n >= 2; n--) {
     const aday = parca.slice(0, n).join(' ')
+    const aileDuzeyi = n <= 2
     // Yakınlık ölçümü HAM metin üzerinde yapıldığı için çapa da ham metinde bulunmalı:
     // normalize metindeki konum ham metne birebir düşmez (uzunluk değişir). Çapa =
     // ad parçasındaki en uzun sayı (ör. "8060") — ürünün sayfadaki fiziksel yeri odur.
     const capa = aday.split(' ').filter(x => /^\d+$/.test(x)).sort((a, b) => b.length - a.length)[0]
-    if (!capa) continue
+    // Sayı çapası yoksa (ör. "ca rm") adın KENDİSİ çapa olur: ham metinde boşluk/tire
+    // toleranslı aranır — kaynakta "CA RM" da geçebiliyor, "CA-RM" da.
+    const capaRe = capa
+      ? new RegExp(`(?<![\\w-])${capa}(?![\\w-])`, 'g')
+      : new RegExp(aday.split(' ').map(kacis).join('[\\s\\-]*'), 'gi')
     const bulunan = []
     for (const p of sayfalar) {
       if (!sayfaSade.get(p).includes(aday)) continue
-      const yerler = [...p.govde.matchAll(new RegExp(`(?<![\\w-])${capa}(?![\\w-])`, 'g'))].map(m => m.index)
-      if (yerler.length) bulunan.push({ ...p, kodYerleri: yerler, adEslesmesi: aday })
+      capaRe.lastIndex = 0
+      const yerler = [...p.govde.matchAll(capaRe)].map(m => m.index)
+      if (yerler.length) bulunan.push({ ...p, kodYerleri: yerler, adEslesmesi: aday, aileDuzeyi })
     }
-    if (bulunan.length) return bulunan
+    if (bulunan.length) {
+      // ⭐AİLE DÜZEYİNDE DOĞRU SAYFAYI SEÇ — ölçüldü ve düzeltildi (2026-09-10)
+      // "ca rm" iki sayfada geçiyor: s.23 kanal serisi (IPX7), s.24 çatı serisi (IP45).
+      // Kısaltma ÖN EKten yapıldığı için "rf" gibi ORTADAKİ ayırt edici parça düşüyor ve
+      // ilk sayfa seçiliyordu — çatı fanı için kanal fanının sayfası kanıt gösteriliyordu.
+      // Yanlış sayfa, yanlış kanıttır. Sayfalar adın KALAN parçalarına göre puanlanır.
+      const kalan = parca.slice(n)
+      if (kalan.length) {
+        // NOT: `bulunan` içindeki nesneler sayfanın KOPYASIDIR ({...p}), o yüzden
+        // `sayfaSade` Map'inde anahtarları YOKTUR — puanı gövdeden yeniden türetiyoruz.
+        // (İlk yazımda Map'ten okunuyordu; sessizce undefined dönüyor ve sıralama hiç
+        // çalışmıyordu. Sessiz başarısızlık, yanlış sayfayı kanıt diye gösteriyordu.)
+        const puan = (p) => {
+          const s = sadeAd(p.govde)
+          return kalan.filter(x => new RegExp(`(?<![\\w])${kacis(x)}(?![\\w])`).test(s)).length
+        }
+        bulunan.sort((a, b) => puan(b) - puan(a))
+      }
+      return bulunan
+    }
   }
   return []
 }
 
 const urunSayfa = new Map()
 const adIleBulunan = new Set()
+const skuAd = new Map(urunler.map(u => [u.sku, u]))
 for (const [sku, k] of kod) {
   if (!k) {
-    const u = urunler.find(x => x.sku === sku)
+    const u = skuAd.get(sku)
     const bulunan = adIleAra(u?.ad, u?.marka)
     if (bulunan.length) adIleBulunan.add(sku)
     urunSayfa.set(sku, bulunan)
@@ -203,6 +234,17 @@ for (const [sku, k] of kod) {
     let m
     while ((m = re.exec(p.govde))) yerler.push(m.index)
     if (yerler.length) bulunan.push({ ...p, kodYerleri: yerler })
+  }
+  // ⭐KOD BULAMADIYSA AD İLE İKİNCİ TUR — kural genişletildi (2026-09-10, ödenmiş ders)
+  // Bu kural önce YALNIZ kodu olmayan ürünlerde çalışıyordu. Ama ürünün kodu OLMASI, o kodun
+  // KAYNAKTA bulunacağı anlamına gelmez: `16257…16281` Avensair SİPARİŞ kodlarıdır ve
+  // üreticinin kendi belgesi onları taşımaz. Sekiz CA-RM ürünü tam bu yüzden "kaynakta yok"
+  // sayıldı — oysa belge elimizdeydi (42 sayfa) ve ürünler s.23/24'te yazılıydı.
+  // Kural doğruydu, KAPSAMI DARDI.
+  if (!bulunan.length) {
+    const u = skuAd.get(sku)
+    const adla = adIleAra(u?.ad, u?.marka)
+    if (adla.length) { adIleBulunan.add(sku); urunSayfa.set(sku, adla); continue }
   }
   urunSayfa.set(sku, bulunan)
 }
@@ -304,13 +346,53 @@ for (const t of girdi) {
     // kaynak_tur: kanıtın NASIL kurulduğu. "Bulundu" yetmez — kodla mı, adla mı, türev mi
     // bulunduğu okuyanın hükmünü değiştirir (OPS hükmü 12:32Z-a).
     sonuc.push({ ...t, durum: 'VAR',
-      kaynak_tur: bulundu.adEslesmesi ? `ad ("${bulundu.adEslesmesi}")` : 'model kodu',
+      // Aile düzeyi eşleşme AYRI ADLA anılır: o değer ürünün kendi satırından değil,
+      // serinin ortak beyanından geliyor (K8 föy kalıbı). Aynı kolonda "model kodu" ile
+      // yan yana durursa okuyan ikisini eşit kanıt sanar.
+      kaynak_tur: bulundu.adEslesmesi
+        ? (bulundu.aileDuzeyi ? `aile duzeyi ("${bulundu.adEslesmesi}")` : `ad ("${bulundu.adEslesmesi}")`)
+        : 'model kodu',
       kaynak_dosya: bulundu.dosya, kaynak_sayfa: bulundu.sayfa,
       alinti: alinti(bulundu.govde, iz) })
     continue
   }
   // Değer bulunamadı — ÇELİŞKİ mi, yoksa sadece yok mu? Yalnız etiket sözlüğü olan alanda ayırt edilir.
   const etiketler = ETIKET[t.alan]
+
+  // ── METİN ALANINDA ÇELİŞKİ: aynı BİÇİMDE başka bir değer var mı?
+  // `ip_rating` sayısal değil, o yüzden sayısal çelişki kuralı onu hiç görmüyordu — ve
+  // gerçek bir çelişki (pakette IPX5, kaynakta IP45) "DEGER YOK" diye geçiyordu.
+  // Ölçüt dar tutulur: değerin kendi biçim deseni (ör. `IP` + son ek) sayfada BAŞKA bir
+  // değerle karşılanıyorsa çelişkidir. Etiket kelimesi aramak burada işe yaramaz —
+  // "ip" her sayfada geçer, bu da uydurma çelişki üretirdi.
+  // SINIR: yalnız KISA, KODSU değer (IPX5, IP45). Uzun serbest metin —
+  // "ATEX Zone II, category 3 G, ATEX directive 94/9/CE" gibi — bu desene takılıp
+  // ALTI YANLIŞ ÇELİŞKİ üretti: kaynakta "ATEX" geçiyor diye "farklı değer" sayıldı.
+  // Bir cümle, bir kod değildir; desen karşılaştırması yalnız kod biçimli değerde geçerli.
+  if (!sayisal && deger && deger.length <= 8 && !deger.includes(' ')
+      && /^[A-Za-z]{2,4}[\dXx]/.test(deger)) {
+    // ⛔ÖNEKTEKİ `X` HARF DEĞİL, JOKERDİR. `IPX5`ten önek "IPX" almak, kaynaktaki `IP45`i
+    // hiç aramamak demekti — ve ölçüm bu yüzden yanlış sayfayı (IPX7 geçen s.23) kanıt
+    // gösteriyordu. `IPX5` ile `IP45` aynı ailenin iki değeridir; ortak önek **IP**'dir.
+    const onek = deger.match(/^[A-Za-z]+?(?=[Xx]?[\dXx])/)?.[0] || deger.match(/^[A-Za-z]{2}/)[0]
+    const desen = new RegExp(`(?<![\\w-])${kacis(onek)}[\\dXx][\\dXx]?(?![\\w-])`, 'gi')
+    for (const p of adaylar) {
+      const bulunanlar = [...new Set((p.govde.match(desen) || []).map(x => x.toUpperCase()))]
+      const farkli = bulunanlar.filter(x => x !== deger.toUpperCase())
+      if (bulunanlar.length && !bulunanlar.includes(deger.toUpperCase()) && farkli.length) {
+        sayim.CELISIYOR++
+        celiskiListesi.push({ sku: t.sku, urun: t.urun, alan: t.alan, paket_degeri: deger,
+          sinif: `metin: kaynakta ${farkli.join('/')}`, kaynak_dosya: p.dosya, kaynak_sayfa: p.sayfa })
+        sonuc.push({ ...t, durum: 'CELISIYOR', kaynak_tur: 'bicim deseni',
+          kaynak_dosya: p.dosya, kaynak_sayfa: p.sayfa,
+          alinti: `kaynakta ${farkli.join('/')}, pakette ${deger}` })
+        break
+      }
+    }
+    if (sonuc.length && sonuc[sonuc.length - 1].sku === t.sku
+        && sonuc[sonuc.length - 1].alan === t.alan) continue
+  }
+
   if (etiketler && sayisal) {
     const etiketli = adaylar.find(p => etiketler.some(e => p.kucuk.includes(e)))
     if (etiketli) {
