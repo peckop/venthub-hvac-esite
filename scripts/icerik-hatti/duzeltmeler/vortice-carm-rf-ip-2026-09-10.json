@@ -1,0 +1,24 @@
+{
+  "_nicin": [
+    "KAYNAK ESLEMESI CELISKISI — Recep onayi 2026-09-10 ('duzelt evet').",
+    "Vortice CA-RM RF ES (cati tipi) uc uruntte koruma sinifi pakette IPX5 yaziyor;",
+    "kaynak belgesi 2022-11-en-ca-rm-es-radon.pdf s.24 acikca IP45 diyor:",
+    "  'VORT CA RM RF ES — Rooftop suction unit · Diameters 150-160-200 mm · IP45",
+    "   (suitable for outdoor installation)'",
+    "IPX5 toz derecesini BELIRTMEZ; IP45 toz 4 + su 5 demektir. Bu fanlar dis ortama",
+    "monte ediliyor ve deger vitrinde musteriye gosteriliyor."
+  ],
+  "_kanit": {
+    "belge": "markalar/vortice/konut-fanlari/radon-range/01-input/2022-11-en-ca-rm-es-radon.pdf",
+    "sayfa": 24,
+    "olcum": "docs/audits/icerik-hatti-carm-hukum-geri-cekildi-2026-09-10.md",
+    "yanlis_pozitif": 0,
+    "not": "Ayni belgenin s.23'undeki KANAL serisi (CA-RM ES, 5 urun) IPX7 diyor ve paketle UYUSUYOR — onlara DOKUNULMUYOR."
+  },
+  "_marka": "Vortice",
+  "skus": {
+    "16257": { "ip_rating": "IP45", "_urun": "Vortice CA-RM 150 RF ES", "_onceki": "IPX5" },
+    "16258": { "ip_rating": "IP45", "_urun": "Vortice CA-RM 160 RF ES", "_onceki": "IPX5" },
+    "16259": { "ip_rating": "IP45", "_urun": "Vortice CA-RM 200 RF ES", "_onceki": "IPX5" }
+  }
+}
