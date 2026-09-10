@@ -58,6 +58,32 @@ Yani STORM'un 223 çözülmemiş satırı bizim betiğimizin kusuru **değil**: 
 Kaynakta tek sayı yoksa, o sayılar ya eğriden okundu ya başka bir yerden. Adım 5'in fark
 raporu bunu ayrıştırmalı.
 
+## ⭐DEFTER ÇİFT YÖNLÜ SINAVI GEÇTİ — 18/18
+
+Defterin sözüne güvenmek yerine **her iddiasını dizinle sınadım**. Sınav konusu: kaynak
+eşlemesinin hiçbir kaynakta bulamadığı **8 ürün** (`VRT-16257…16281`, Vortice CA-RM serisi).
+
+Defter, sorulduğunda net konuştu: *"CA-RM serisi fanlar ve bu modellere ait ürün kodları
+**kaynaklarda yoktur**"* — ve yanına, kaynakta **gerçekten bulunan** komşu serileri saydı.
+
+| defterin iddiası | dizin ölçümü |
+|---|---|
+| "bu 10 kod kaynakta VAR" (16170, 16171, 16174, 16270, 16271, 16275, 16237, 16241, 16150, 16153) | **10/10 dizinde bulundu** (dosya + sayfa ile) |
+| "bu 8 kod kaynakta YOK" (16257…16281) | **8/8 dizinde yok** |
+
+**18/18.** Defter yalnız varlığı değil, **yokluğu da doğru bildirdi** — ve yokluk kanıtı
+uydurmaya en açık yerdir, çünkü "bulamadım" demek yerine benzerini uydurmak kolaydır.
+Burada uydurmadı: CA-RM yerine CA ES / CA-IL QUIET ES serilerini **ayrı seriler olarak**
+gösterdi, CA-RM'in yerine geçirmedi.
+
+**Kod bloğu dersi tekrar etti:** CA-RM kodları (16257–16281), kaynakta bulunan CA-IL QUIET ES
+(16270–16276) ve CA MD RF EP (16237–16242) bloklarının **arasına** düşüyor. Komşu kod aynı
+ürün demek değildir — 2026-09-09'daki `11936` hükmünün aynısı.
+
+**Sonuç:** `URUN KAYNAKTA YOK 147` satırı **gerçek**, ölçüm kusuru değil. Bu 8 ürün için
+kaynak **yok**; OPS'un (c) hükmü — web kaynağı dizine eklenmeli (`web_kaynagi_ekle.py`,
+K7.3) — doğru yoldur. Değer **uydurulmaz**.
+
 ## Hüküm: iki yol RAKİP DEĞİL, ZİNCİR
 
 1. **`data-table` + `-s <kaynak id>`** → aile başına **tek** çağrı; **ürün kodlarını** ve alan
