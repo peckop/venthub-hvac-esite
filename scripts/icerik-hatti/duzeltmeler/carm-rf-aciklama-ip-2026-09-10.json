@@ -1,0 +1,9 @@
+{
+  "_nicin": "ip_rating IPX5 -> IP45 canliya yazildi (Recep GO). Ayni degeri ANLATAN aciklama metni eski kaldi: musteri ayni sayfada tabloda IP45, paragrafta IPX5 goruyor. Bu vaat butunlugu ihlali.",
+  "_kanit": "2022-11-en-ca-rm-es-radon.pdf s.24 — VORT CA RM RF ES · IP45 (suitable for outdoor installation)",
+  "_kapsam": "TEK KELIME. Cumlenin geri kalani, dil, uslup, uzunluk DEGISMEZ.",
+  "eski": "IPX5",
+  "yeni": "IP45",
+  "diller": ["tr", "en"],
+  "skus": ["VRT-16257", "VRT-16258", "VRT-16259"]
+}

@@ -291,6 +291,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/paket-karnesi.mjs` | KATALOG KARNESİ — EVREN = PAKET (OPS hükmü 2026-09-09 12:32Z, Recep kararı K13) | URUN-KATALOG | elle kosulur (karne istendiginde) | 2026-09-09 (8 eksen, genel %57) | yok | AKTIF |
 | `scripts/icerik-hatti/defter-sorgu.mjs` | DEFTER SORGUSU — aile × alan soruları, ham cevaplar jsonl'e (OPS emri 2026-09-10 06:37Z) | URUN-KATALOG | elle kosulur (aile aile, seri — CLI kotali) | 2026-09-10 (3 aile pilot) | yok | AKTIF |
 | `scripts/icerik-hatti/defter-tablo-uret.mjs` | DEFTER TABLO ÜRETİMİ — aile başına kaynak-kısıtlı data-table (OPS kararı 2026-09-10 07:05Z) | URUN-KATALOG | elle kosulur (aile aile, kota gozetilir) | 2026-09-10 (yayim baslamadi; 'ready' kaynak kapisi eklendi) | yok | AKTIF |
+| `scripts/icerik-hatti/urun-aciklama-duzelt.mjs` | ÜRÜN AÇIKLAMASINDA TEK KELİME DÜZELTMESİ — `description_i18n` (REC-212, 2026-09-10) | URUN-KATALOG | elle kosulur (Recep tikiyla) | 2026-09-10 (kuru kosum 3 urun x 2 dil) | yok | AKTIF |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
