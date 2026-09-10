@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T18:23:14.106858+00:00
-total_compiled_files: 658
-source_commit: 88ba0a86
+compiled_at: 2026-09-09T12:24:56.203128+00:00
+total_compiled_files: 659
+source_commit: 59eaa47f6
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-03T18:23:14.106858+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-09T12:24:56.203128+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -66666,7 +66666,7 @@ source_path: C:\tmp\vh-urun-rec89\src\types\ui-models.ts
 skeleton_hash: 4874e85390a3507f
 entity_hashes:
   overview: 33a9634a40be4fcc
-generated_at: 2026-09-01T11:27:55Z
+generated_at: 2026-09-01T09:44:00Z
 ---
 
 ## Genel Bakış
@@ -80674,7 +80674,7 @@ entity_hashes:
   func:categoriesFetcher: c2a94f9401915640
   overview: 59e24a4d4621dc2a
   style_tokens: ebc7df49d9d6094c
-generated_at: 2026-09-01T11:27:56Z
+generated_at: 2026-08-31T07:44:00Z
 ---
 
 ## Genel Bakış
@@ -91900,7 +91900,7 @@ entity_hashes:
   func:ReturnsPage: 58d2fb57da45461b
   overview: 95b133e51b479d65
   style_tokens: 352aa79c8eb09e14
-generated_at: 2026-09-01T11:27:58Z
+generated_at: 2026-09-01T07:19:12Z
 ---
 
 ## Genel Bakış
@@ -92824,3 +92824,30 @@ Bu modül dışa açılan fonksiyon/sınıf/sabit/tip içermez; saf yan-etki (ba
 
 ## NODE ID STANDARD
 file: C:\Users\alize\venthub-hvac\vitest.setup.ts
+
+
+---
+# FILE: vitest.smoke.config.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\tmp\vh-altyapi-scrubber\vitest.smoke.config.ts
+skeleton_hash: b321d756eb3346fd
+generated_at: 2026-09-04T08:01:56.922600+00:00
+---
+
+## Genel Bakış
+
+Bu modül dışa açılan fonksiyon/sınıf/sabit/tip içermez; saf yan-etki (başlatma/konfigürasyon) veya yeniden-dışa-aktarım amaçlıdır. Davranışı, içindeki üst-seviye çağrıların (import/init) etkisinden ibarettir.
+
+## AXIOMS – Mimari Varsayımlar
+- [Aksiyom 1]: Bu modül yan-etki için yüklenir; kaldırılması veya yan-etkisinin değişmesi onu import eden giriş noktalarını etkiler.
+- [Aksiyom 2]: Dışa açılan API olmadığından tüketiciler doğrudan çağrıyla değil, yalnızca yükleme sırası/yan-etkisi üzerinden bağımlıdır.
+
+## AST POINTERS
+(Dışa açılan çağrılabilir öğe yok — modül-düzeyi yan-etki; AST işaretçisi gerektiren fonksiyon/metot yok.)
+
+## NODE ID STANDARD
+file: C:\tmp\vh-altyapi-scrubber\vitest.smoke.config.ts
