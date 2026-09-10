@@ -126,17 +126,17 @@ const YAKINLIK = 80
 // ── ALAN ETİKET SÖZLÜĞÜ — çelişki YALNIZ buradaki alanlarda ölçülebilir.
 // Sözlük kasıtlı olarak DAR: uydurma etiket, uydurma çelişki üretir. Kapsam dışı alan
 // "çelişki ÖLÇÜLMEDİ" sayılır ve raporda ayrı satırda görünür.
-const ETIKET = {
-  weight_kg: ['weight', 'ağırlık', 'agirlik', 'peso', 'kg'],
-  voltage_v: ['voltage', 'gerilim', 'volt', 'tension'],
-  frequency_hz: ['frequency', 'frekans', 'hz'],
-  rpm_max: ['rpm', 'devir', 'speed', 'r.p.m'],
-  max_absorbed_power_w: ['absorbed power', 'power', 'güç', 'guc', 'potenza'],
-  diameter_mm: ['diameter', 'çap', 'cap', 'ø'],
-  max_delivery_m3h: ['m3/h', 'm³/h', 'debi', 'delivery', 'airflow'],
-  ip_rating: ['ip', 'protection', 'koruma'],
-  insulation_class: ['insulation', 'izolasyon'],
-  noise_db: ['noise', 'gürültü', 'gurultu', 'db(a)', 'lp'],
+// Sözlük AYRI DOSYADA: `alan-etiket-sozlugu.json`. Betiğe gömülü liste iki sebeple
+// bırakıldı — (1) aynı sözlük Design sözleşme v1'in kolon karşılıkları için de kullanılıyor,
+// gömülü liste kopyalanır ve ayrışır; (2) etiket eklemek kod değişikliği olmamalı.
+const SOZLUK_YOLU = new URL('./alan-etiket-sozlugu.json', import.meta.url)
+let ETIKET = {}
+try {
+  const s = JSON.parse(readFileSync(SOZLUK_YOLU, 'utf8'))
+  ETIKET = Object.fromEntries(Object.entries(s.alanlar).map(([a, v]) => [a, v.etiketler]))
+} catch (e) {
+  console.error(`ÖLÇÜLEMEDİ — alan-etiket sözlüğü okunamadı: ${e.message}`)
+  process.exit(2)   // fail-closed: sözlüksüz koşum "çelişki yok" yanılsaması üretirdi
 }
 
 // ── VERİ
