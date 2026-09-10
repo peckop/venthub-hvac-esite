@@ -33,7 +33,16 @@ import { join } from 'node:path'
 
 const arg = (ad, vars) => process.argv.find(a => a.startsWith(`--${ad}=`))?.slice(ad.length + 3) || vars
 const HEDEF = arg('hedef', 'katalog-paketi')
-const DIZIN = arg('dizin', 'C:/Users/alize/venthub-pdf-ingestor/kaynak-dizini/sayfalar.jsonl')
+// ⛔MUTLAK YOL GÖMÜLMEZ (INV-MUTLAK-YOL-1): depo PUBLIC — kullanıcı adı taşıyan yol hem
+// sızıntıdır hem de betiği sessizce TEK MAKİNEYE bağlar. Yolu çağıran verir:
+//   --dizin=<yol>  ya da  VENTHUB_INGESTOR=<ingestor kökü>
+const INGESTOR = process.env.VENTHUB_INGESTOR
+const DIZIN = arg('dizin', INGESTOR ? join(INGESTOR, 'kaynak-dizini', 'sayfalar.jsonl') : '')
+if (!DIZIN) {
+  console.error('ÖLÇÜLEMEDİ — kaynak dizini yolu verilmedi.')
+  console.error('  --dizin=<sayfalar.jsonl> ya da VENTHUB_INGESTOR=<ingestor kökü>')
+  process.exit(2)
+}
 const HAM = join(HEDEF, 'ham')
 
 if (!existsSync(DIZIN)) { console.error(`ÖLÇÜLEMEDİ — kaynak dizini YOK: ${DIZIN}`); process.exit(2) }
