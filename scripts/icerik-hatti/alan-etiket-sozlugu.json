@@ -1,0 +1,59 @@
+{
+  "_nicin": [
+    "ALAN -> KATALOG BAŞLIĞI sözlüğü (OPS hükmü 2026-09-09 12:32Z-d).",
+    "Çelişki ancak alanın etiketi kaynakta tanınabildiğinde ÖLÇÜLEBİLİR. Sözlük yokken",
+    "5168 satırın 1096'sında çelişki ÖLÇÜLMEMİŞ sayılıyordu — bu dosya o boşluğu kapatır.",
+    "Aynı nesne Design sözleşme v1'in kolon karşılıkları için de kullanılır (kopyası Design'a gider)."
+  ],
+  "_kaynak": [
+    "Etiketler UYDURULMADI: kaynak dizinindeki 2129 sayfanın TABLO BAŞLIK satırlarından",
+    "sayılarak çıkarıldı (CODE 192 · MODELS 149 · kg 57 · Impeller diameter 51 · MAX AIRFLOW 36",
+    "· MAX PRESSURE 36 · RPM min/max 29 · W min/max 31 · A min/max 31 · HAVA DEBİSİ 38 · dB 38 …).",
+    "Kataloglar TR/EN/IT karışık olduğu için üç dil de aynı listede durur."
+  ],
+  "_kural": [
+    "Bir alan bu sözlükte YOKSA o alanda çelişki 'ÖLÇÜLMEDİ' sayılır — 'çelişki yok' DEĞİL.",
+    "Ölçülmeyeni temiz saymak, olmayan bir güvence vermektir.",
+    "Sözlük DAR tutulur: uydurma etiket, uydurma çelişki üretir."
+  ],
+  "alanlar": {
+    "weight_kg":                { "birim": "kg",    "etiketler": ["weight", "ağırlık", "agirlik", "peso", "kg", "net weight", "gewicht"] },
+    "voltage_v":                { "birim": "V",     "etiketler": ["voltage", "gerilim", "volt", "tension", "tensione", "v ~", "supply voltage"] },
+    "max_voltage_v":            { "birim": "V",     "etiketler": ["max voltage", "maks gerilim", "voltage max"] },
+    "min_voltage_v":            { "birim": "V",     "etiketler": ["min voltage", "min gerilim", "voltage min"] },
+    "frequency_hz":             { "birim": "Hz",    "etiketler": ["frequency", "frekans", "hz", "frequenza"] },
+    "rpm_max":                  { "birim": "rpm",   "etiketler": ["rpm", "rpm min/max", "devir", "speed", "r.p.m", "min-1", "giri/min"] },
+    "max_absorbed_power_w":     { "birim": "W",     "etiketler": ["absorbed power", "w min/max", "power", "güç", "guc", "potenza", "max power", "assorbita"] },
+    "rated_power_w":            { "birim": "W",     "etiketler": ["rated power", "nominal power", "anma gücü", "potenza nominale"] },
+    "absorbed_current_a":       { "birim": "A",     "etiketler": ["current", "akım", "akim", "a min/max", "absorbed current", "corrente", "amp"] },
+    "rated_output_current_a":   { "birim": "A",     "etiketler": ["output current", "rated current", "çıkış akımı"] },
+    "diameter_mm":              { "birim": "mm",    "etiketler": ["diameter", "çap", "cap", "ø d", "øa", "impeller diameter", "diametro", "ø"] },
+    "size_a_mm":                { "birim": "mm",    "etiketler": ["a", "dimensions", "ölçü a", "boyut a"] },
+    "size_b_mm":                { "birim": "mm",    "etiketler": ["b", "dimensions", "ölçü b", "boyut b"] },
+    "size_c_mm":                { "birim": "mm",    "etiketler": ["c", "dimensions", "ölçü c", "boyut c"] },
+    "max_delivery_m3h":         { "birim": "m³/h",  "etiketler": ["max airflow", "hava debisi", "debi", "delivery", "airflow", "portata", "m3/h", "m³/h"] },
+    "nominal_delivery_m3h":     { "birim": "m³/h",  "etiketler": ["nominal airflow", "anma debisi", "nominal delivery"] },
+    "max_delivery_ls":          { "birim": "l/s",   "etiketler": ["l/s", "max airflow", "delivery"] },
+    "max_static_pressure_pa":   { "birim": "Pa",    "etiketler": ["max pressure", "basınç", "basinc", "static pressure", "pressione", "pa", "mmh2o"] },
+    "nominal_static_pressure_pa": { "birim": "Pa",  "etiketler": ["nominal pressure", "anma basıncı", "static pressure"] },
+    "noise_level_db_a":         { "birim": "dB(A)", "etiketler": ["noise", "gürültü", "gurultu", "db(a)", "db", "lwa", "l wa", "sound power level", "rumore"] },
+    "noise_lpa_3m_db":          { "birim": "dB",    "etiketler": ["lpa", "l pa", "sound pressure", "ses basıncı", "db"] },
+    "ip_rating":                { "birim": null,    "etiketler": ["ip", "protection", "koruma", "protection degree", "grado di protezione"] },
+    "insulation_class":         { "birim": null,    "etiketler": ["insulation", "izolasyon", "insulation class", "classe di isolamento"] },
+    "motor_poles":              { "birim": null,    "etiketler": ["poles", "kutup", "poli", "pole"] },
+    "phase":                    { "birim": null,    "etiketler": ["phase", "faz", "fase", "single-phase", "three-phase", "monofase", "trifase"] },
+
+    "min_delivery_m3h":         { "birim": "m³/h",  "etiketler": ["min airflow", "min debi", "minimum delivery", "m3/h", "m³/h"] },
+    "min_static_pressure_pa":   { "birim": "Pa",    "etiketler": ["min pressure", "min basınç", "static pressure", "pa"] },
+    "max_total_pressure_pa":    { "birim": "Pa",    "etiketler": ["total pressure", "toplam basınç", "pressione totale", "pa"] },
+    "heating_power_w":          { "birim": "W",     "etiketler": ["heating power", "ısıtma gücü", "isitma gucu", "heater", "potenza riscaldamento"] },
+    "permissible_motor_power_w": { "birim": "W",    "etiketler": ["motor power", "permissible power", "motor gücü", "potenza motore"] },
+    "voltage_alt_v":            { "birim": "V",     "etiketler": ["voltage", "gerilim", "alternative voltage", "v ~"] }
+  },
+  "_kapsam_disi": [
+    "erp_compliant · pq_curve · motor_type · has_humidistat · has_timer — bunlar TÜREV ya da",
+    "boolean/enum değerlerdir; kaynakta bir etiketin yanında SAYI olarak aranmazlar.",
+    "Çelişki ölçümü bunlarda anlamsızdır, 'ölçülmedi' de denmez — kaynak eşlemesi onları",
+    "TUREV sınıfında zaten ayırıyor."
+  ]
+}
